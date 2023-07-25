@@ -1,44 +1,44 @@
-Return-Path: <netdev+bounces-21034-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21035-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 833ED762384
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 22:37:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A63CB762392
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 22:37:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B42D01C21013
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 20:37:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D5FA91C21024
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 20:37:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D10825937;
-	Tue, 25 Jul 2023 20:37:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67BF825937;
+	Tue, 25 Jul 2023 20:37:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37EE625915;
-	Tue, 25 Jul 2023 20:37:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9943BC433CD;
-	Tue, 25 Jul 2023 20:37:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 281362418A;
+	Tue, 25 Jul 2023 20:37:41 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20913C433C7;
+	Tue, 25 Jul 2023 20:37:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690317443;
-	bh=RPiqMj1z1W85oICRWt2s2s+fa+nVUWtB7x0vIZ8uq7Y=;
+	s=k20201202; t=1690317461;
+	bh=9gtBJHvUD+J8t2kUg24neaLbu7jEg3huz6j+x8XlohA=;
 	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=oFIIni8M8dm4e+wUGb2zipgkxugTvTtA8x5XYBCeAAwJMXTFOBJfeQYGkx1ZSrPsW
-	 GHMFr/EJ+fhTWVoWKjVdYoF0+PtjyE1VMU6EhFLMjJV5PxHGZrJ5gnX7tfc/AovdI1
-	 wRf/4w3NsMkNEBtVWLNMazGON+RTMrNdA7uWc/7u2shCnvSQm4qro+IsML0ywQnkex
-	 DkhTPUh8kkQyV0vj2D76b0F5pY2EOz6gfU+1Do2CHyAKQtrYR7qvhA66IDWcXjGwCg
-	 nqAPlJsoKzVL9xzUd2M6Dhspm4zmhc93l2/YAHKfhf6ycDAdwrdY8IXqobpoxmdBkN
-	 GrMP5twJrwnTA==
-Subject: [PATCH net-next v2 4/7] SUNRPC: Send TLS Closure alerts before
- closing a TCP socket
+	b=meL9TDWGcrgtmYmL8+/zGwZbXXjaWlalUhVma4Xq8rf358RYU/l8IHOstbO9Kxm2c
+	 2rBoEWAcoJLW8AH+Hsb4K07zzdOSlTsw+CcFeVFp3i4uAtTXao/6TJ8dkt+/lkmfqU
+	 2o3fpq2Z/p/I657Jux+TtEGIAKs8n3Rc7E/1hbFP1sfiGwG3QzDUKWPEmkk56iVjPH
+	 ZHvZtlhLGJpUQCBth7nNDVA9HZfNMlkgVxuMrHmsMgt1N1V6UJSupt2neSWnrLp5DG
+	 +1iTtpLE8nt4ur7binpny5s22lvcr6h5n2BP1apFUSqZKx/q5e1eezDoRimO17sEGv
+	 9/dzt3IUpwGPg==
+Subject: [PATCH net-next v2 5/7] net/handshake: Add helpers for parsing
+ incoming TLS Alerts
 From: Chuck Lever <cel@kernel.org>
 To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
  pabeni@redhat.com
 Cc: netdev@vger.kernel.org, kernel-tls-handshake@lists.linux.dev
-Date: Tue, 25 Jul 2023 16:37:11 -0400
+Date: Tue, 25 Jul 2023 16:37:30 -0400
 Message-ID: 
- <169031742144.15386.15256038720613330342.stgit@oracle-102.nfsv4bat.org>
+ <169031744823.15386.12253453581563018622.stgit@oracle-102.nfsv4bat.org>
 In-Reply-To: 
  <169031700320.15386.6923217931442885226.stgit@oracle-102.nfsv4bat.org>
 References: 
@@ -55,42 +55,78 @@ Content-Transfer-Encoding: 7bit
 
 From: Chuck Lever <chuck.lever@oracle.com>
 
-Before closing a TCP connection, the TLS protocol wants peers to
-send session close Alert notifications. Add those in both the RPC
-client and server.
+Kernel TLS consumers can replace common TLS Alert parsing code with
+these helpers.
 
 Signed-off-by: Chuck Lever <chuck.lever@oracle.com>
 ---
- net/sunrpc/svcsock.c  |    2 ++
- net/sunrpc/xprtsock.c |    2 ++
- 2 files changed, 4 insertions(+)
+ include/net/handshake.h |    4 ++++
+ net/handshake/alert.c   |   42 ++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 46 insertions(+)
 
-diff --git a/net/sunrpc/svcsock.c b/net/sunrpc/svcsock.c
-index e43f26382411..87bf685f2957 100644
---- a/net/sunrpc/svcsock.c
-+++ b/net/sunrpc/svcsock.c
-@@ -1621,6 +1621,8 @@ static void svc_tcp_sock_detach(struct svc_xprt *xprt)
- {
- 	struct svc_sock *svsk = container_of(xprt, struct svc_sock, sk_xprt);
+diff --git a/include/net/handshake.h b/include/net/handshake.h
+index bb88dfa6e3c9..8ebd4f9ed26e 100644
+--- a/include/net/handshake.h
++++ b/include/net/handshake.h
+@@ -42,4 +42,8 @@ int tls_server_hello_psk(const struct tls_handshake_args *args, gfp_t flags);
+ bool tls_handshake_cancel(struct sock *sk);
+ void tls_handshake_close(struct socket *sock);
  
-+	tls_handshake_close(svsk->sk_sock);
++u8 tls_get_record_type(const struct sock *sk, const struct cmsghdr *msg);
++void tls_alert_recv(const struct sock *sk, const struct msghdr *msg,
++		    u8 *level, u8 *description);
 +
- 	svc_sock_detach(xprt);
- 
- 	if (!test_bit(XPT_LISTENER, &xprt->xpt_flags)) {
-diff --git a/net/sunrpc/xprtsock.c b/net/sunrpc/xprtsock.c
-index 9f010369100a..871f141be96f 100644
---- a/net/sunrpc/xprtsock.c
-+++ b/net/sunrpc/xprtsock.c
-@@ -1292,6 +1292,8 @@ static void xs_close(struct rpc_xprt *xprt)
- 
- 	dprintk("RPC:       xs_close xprt %p\n", xprt);
- 
-+	if (transport->sock)
-+		tls_handshake_close(transport->sock);
- 	xs_reset_transport(transport);
- 	xprt->reestablish_timeout = 0;
+ #endif /* _NET_HANDSHAKE_H */
+diff --git a/net/handshake/alert.c b/net/handshake/alert.c
+index 999d3ffaf3e3..4cb76fc2c531 100644
+--- a/net/handshake/alert.c
++++ b/net/handshake/alert.c
+@@ -60,3 +60,45 @@ int tls_alert_send(struct socket *sock, u8 level, u8 description)
+ 	ret = sock_sendmsg(sock, &msg);
+ 	return ret < 0 ? ret : 0;
  }
++
++/**
++ * tls_get_record_type - Look for TLS RECORD_TYPE information
++ * @sk: socket (for IP address information)
++ * @cmsg: incoming message to be parsed
++ *
++ * Returns zero or a TLS_RECORD_TYPE value.
++ */
++u8 tls_get_record_type(const struct sock *sk, const struct cmsghdr *cmsg)
++{
++	u8 record_type;
++
++	if (cmsg->cmsg_level != SOL_TLS)
++		return 0;
++	if (cmsg->cmsg_type != TLS_GET_RECORD_TYPE)
++		return 0;
++
++	record_type = *((u8 *)CMSG_DATA(cmsg));
++	return record_type;
++}
++EXPORT_SYMBOL(tls_get_record_type);
++
++/**
++ * tls_alert_recv - Parse TLS Alert messages
++ * @sk: socket (for IP address information)
++ * @msg: incoming message to be parsed
++ * @level: OUT - TLS AlertLevel value
++ * @description: OUT - TLS AlertDescription value
++ *
++ */
++void tls_alert_recv(const struct sock *sk, const struct msghdr *msg,
++		    u8 *level, u8 *description)
++{
++	const struct kvec *iov;
++	u8 *data;
++
++	iov = msg->msg_iter.kvec;
++	data = iov->iov_base;
++	*level = data[0];
++	*description = data[1];
++}
++EXPORT_SYMBOL(tls_alert_recv);
 
 
 
