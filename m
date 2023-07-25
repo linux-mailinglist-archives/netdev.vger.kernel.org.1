@@ -1,181 +1,180 @@
-Return-Path: <netdev+bounces-21027-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21028-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 278E7762337
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 22:23:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81AC9762357
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 22:31:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5B7AC281982
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 20:23:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3C9742819AF
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 20:31:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F0ED26B2C;
-	Tue, 25 Jul 2023 20:23:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BC6D2593A;
+	Tue, 25 Jul 2023 20:31:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CB211F186
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 20:23:26 +0000 (UTC)
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2103.outbound.protection.outlook.com [40.107.95.103])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5C6110F7;
-	Tue, 25 Jul 2023 13:23:23 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=gTZYcswIRPxGU7SMNYqX8poC+lpFVOIxEqwZnfrYmbC49fRAEf5a+fqkM8uaU89u/ukV6LQuDOXTLRZQCVfM0qWlbSELfOgq8EBaLY1Kc2IY57GI28Ne4iAMKvdI/WmTBibqQALMnrQU3go/LgQpBq3PgfYm1eKjd3QspkAPHkgJwHnSGDv5d0LlC6HlhxkXMpoRs2LG4dlt7jpBwNWddlmPP/X+ZtA3cttQhDBIbgeNSejjUOV0FdQmo4xaRx9ogeSa2gt9rNZjl2ANHVm0BlEB92mBGZWS65uRUm/m2y5T4o5sizFJLkGVOOEVMCT9EHai/e9foJ23E5B+gXWuLg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=oLvJ/N5y9ZdO9bX9ogAHOyz9iCkrsuKTKIqDil3FdZY=;
- b=WqaExHg0THYVeaeTX3nlZgC/Lgup+v5oBZyg579m9/94XV0sJAZtHFYGyapTZJm+IL4rwPSk5/v0cf2UXQj9n0YpBvzuuUiEZorCLg3dZySn8oOyWJKuYtCerx716QbSZIQvWYombD0i1Nv7kxYt5rP/0uzOUtHzZQQsg57QAlX5SvLbcRGbNacTWgVb7hLqVuZm/O+AvQHDJSFkU37MqswSoG9zLG3yjOt/VRajpuhZ44Jg8KgFS5ybwXkyNbxvhHZYHFSlwXig7+jfebeRF0aleloRDqLttS2C+rEAYL4NreGBPlh+UgkZZW7VIQyITR9RAxCxo+uSz7q/M7aiTQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
- dkim=pass header.d=corigine.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C06D26B62
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 20:31:04 +0000 (UTC)
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5AA551B8
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 13:31:01 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-583a89cccf6so39737197b3.1
+        for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 13:31:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=oLvJ/N5y9ZdO9bX9ogAHOyz9iCkrsuKTKIqDil3FdZY=;
- b=s6ZstnW9V9tcdAnBj7/BFF1w5U50v11eGWUIRhEYItcsOMlS2JwHtITj3mQsogvje59jsfpoWCygLVz3IZZ3Xxed6PLcEyYf6AgsC+O+5n5TzU6oHdDckTNFTl0rdXsbhcNPguHkykgfoZ60PnbF5kPPgnItxDKhyn58+g4cpzg=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=corigine.com;
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
- by BY3PR13MB4996.namprd13.prod.outlook.com (2603:10b6:a03:356::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.31; Tue, 25 Jul
- 2023 20:23:20 +0000
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::fde7:9821:f2d9:101d]) by PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::fde7:9821:f2d9:101d%7]) with mapi id 15.20.6609.032; Tue, 25 Jul 2023
- 20:23:20 +0000
-Date: Tue, 25 Jul 2023 22:23:11 +0200
-From: Simon Horman <simon.horman@corigine.com>
-To: Dmitry Safonov <dima@arista.com>
-Cc: David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-kernel@vger.kernel.org, Andy Lutomirski <luto@amacapital.net>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Bob Gilligan <gilligan@arista.com>,
-	Dan Carpenter <error27@gmail.com>,
-	David Laight <David.Laight@aculab.com>,
-	Dmitry Safonov <0x7f454c46@gmail.com>,
-	Donald Cassidy <dcassidy@redhat.com>,
-	Eric Biggers <ebiggers@kernel.org>,
-	"Eric W. Biederman" <ebiederm@xmission.com>,
-	Francesco Ruggeri <fruggeri05@gmail.com>,
-	"Gaillardetz, Dominik" <dgaillar@ciena.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-	Ivan Delalande <colona@arista.com>,
-	Leonard Crestez <cdleonard@gmail.com>,
-	Salam Noureddine <noureddine@arista.com>,
-	"Tetreault, Francois" <ftetreau@ciena.com>, netdev@vger.kernel.org
-Subject: Re: [PATCH v8.1 net-next 06/23] net/tcp: Add TCP-AO sign to outgoing
- packets
-Message-ID: <ZMAvL+9gMIozLbpB@corigine.com>
-References: <20230721161916.542667-1-dima@arista.com>
- <20230721161916.542667-7-dima@arista.com>
- <ZMAAPBKnnrdk/c9K@corigine.com>
- <b01a63a7-eaaa-85db-b04d-8270e82e1080@arista.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b01a63a7-eaaa-85db-b04d-8270e82e1080@arista.com>
-X-ClientProxiedBy: AM4PR0302CA0028.eurprd03.prod.outlook.com
- (2603:10a6:205:2::41) To PH0PR13MB4842.namprd13.prod.outlook.com
- (2603:10b6:510:78::6)
+        d=google.com; s=20221208; t=1690317060; x=1690921860;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=eC/dy/DsRuqHBiBsNtNWiJUFBceHNUdHIHxVhKEBgUk=;
+        b=kSUUZlzE4FvqWwtJwJeMjbzpTx8Owoe0t4uYGtV8QNeG6UtH3Xm/72JvcZlRWiN1vy
+         BSHRTERsTsh8ELKePk42T879pOo1eRwvAi+FV5jxvJtKu+H/SE9IU0AHKEdqHqkkIQFz
+         y0A+duGwMiSbQvuCtgfpqaGibEvhUFUsYBdpAfpIDvQhBBnEOqYhtprmB8N9R94XDei5
+         V/sSS6CBLvVzQS/jXq879y3FI9WtnG98/zCeCnEwFVOMRo0+N+tajB26KhjPQ3ky9sZj
+         UdHH3TfdZ7b+S8eTImGpUOm2EkeYWwi7xS+pJh6czH1Ha9h0ZpQ8CkenEPEmprLD60L6
+         DCoQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690317060; x=1690921860;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=eC/dy/DsRuqHBiBsNtNWiJUFBceHNUdHIHxVhKEBgUk=;
+        b=DBUFHaC60VaHMXXaAWkca1D0w8j6DejRclRUlQh46T18DsZ3s5bVFA4p7Oqcv475Q0
+         MNuSUVrYCGRfVHlXwvPSSu3keUSqBYKZJDQBT7Kyh4SV5P+XTgfx0ySLFS4ZSWYqStfG
+         YyWLzBrT7MqsfnxtQRevCLjYU4+NVxzYqp6E/o1NiNkiwR/Z5MkUpq/dKk7CZ0F+0in1
+         ObD5VptQvPb+qaxBJ878jI9B4L1vD9583R/aQoTTJdGwOYI/f4IAgQq6yu86Aob23wYc
+         SOoK2SQU34k9+TI242VmTpRdLExMmQnYNujjJfEz2ZqOfkW/z1azNi+31WmeXZbjlBfV
+         2hQQ==
+X-Gm-Message-State: ABy/qLYNLm/Nge4/WuqOKUnX4Zz8qECsW3FooLn4waDO/Bt0VwcZGg1u
+	QnYgmrZKz/bJL8/823Fe7ZQEuYg=
+X-Google-Smtp-Source: APBJJlFbG5nFEEi2H4pwfaVfH/DKTIxAOYLxCgQ0gs6WLs4hQzL1SDyXEJi1sb6g7sI/m1Q0Xe912uY=
+X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
+ (user=sdf job=sendgmr) by 2002:a81:ad0e:0:b0:576:cd91:b888 with SMTP id
+ l14-20020a81ad0e000000b00576cd91b888mr2828ywh.0.1690317060484; Tue, 25 Jul
+ 2023 13:31:00 -0700 (PDT)
+Date: Tue, 25 Jul 2023 13:30:58 -0700
+In-Reply-To: <ZMAiYibjYzVTBjEF@corigine.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|BY3PR13MB4996:EE_
-X-MS-Office365-Filtering-Correlation-Id: d8a0879c-50d0-4858-5a4f-08db8d4cfce5
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	Qz734RLN9RYOzICcHKqmFwH2DSWLVcngQN8vuq90XXUk/c6UE5TUnVHsG+Nkbl/rdJGZaZIq6AtAe3iQFe4g609hCLEOCDX6Xzvl3cRFABUxkEGpDsO4tngfcMytsNrNp+C+YX853tOqtdNgGw5dlYxAi4ieRdOYOGJQz2kBgtdoApSVzji6hCxxW3CheEv6nwmo3GbHxG9fPpkHCOAJc6zbHoEnudOhN5FWdUSqZ1ZUgM6Q3Xxv/FBQO+BatlRDvw2BktxiT6ZiSny0k6S1uwYn2DmftY+8WDeUkmLJrji+RNYJSmJaJtdbsl2ejm6sY4yI88jhuc63Mth3Sz6aduDEtHSl9u0lMP2CReyXUVK8etF2USDGtIYw5K806CWoMw1sjPtmXpNSpv7SQom6vnF1yhv+TICqiPHgJPc7dz9iI2XhcAFD3z35JSF5dXiibcb7tPkvTmMROVCfsYJ5So6ZzgNI6XJ8NiXi01aSv1C4UKv9tE69igTRYrHo5/AG5knNXekaPP50Bsv7yy2FMzgAcFUeCA42fEMr/k6u2ckp76VQjqvJansPybc34q7KTGYT6dCkQoIObjzuEcDSjPw1dtsOF4ZjpVn504U/w/CAWMt4YzxsVe8Bcphmkx07wzENEVzgyxIKb9XKY5Wlj6lxZ8uNKkv3SxX5ZMQWPck=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(366004)(136003)(376002)(396003)(39840400004)(346002)(451199021)(6512007)(6486002)(478600001)(6666004)(54906003)(83380400001)(86362001)(4326008)(186003)(2616005)(6506007)(7416002)(2906002)(4744005)(36756003)(38100700002)(66946007)(44832011)(66556008)(5660300002)(41300700001)(8936002)(66476007)(6916009)(316002)(8676002)(67856001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?qjyZibuBCb2KiTHUJJNpU2hTum6PAe+0o5/wtyTZGMxXdmXQU1Ytqb8DnaKv?=
- =?us-ascii?Q?DOsfEzxiXSRot/fOWmCeDUI7L+GJDMD+fRYWaDp3kROUnyioza52S21ygzF7?=
- =?us-ascii?Q?1hiNCjvRli3Ox8h+FqMePQcZ4M6xB8tiVdUhGPrjcoYT1BsLWYop/o4TVCBK?=
- =?us-ascii?Q?g8Bl23qdin3tGHbGPqaT/4arDW2bgQW6Kq33NeqCKUpsEYbMzmvJQ9KcnokJ?=
- =?us-ascii?Q?amAEPj4ACEiCH3sl2ABPTt0Qy5JiMzRryg9Q+LIm5R2ZtZSL//nogAP3GPrx?=
- =?us-ascii?Q?+R1fTt9ntAg5YeKo5kw3dttoLzaVFScuDUlFdS5noksDpOPdNi00xqptd+JU?=
- =?us-ascii?Q?iQBcb9WHqotXhfAkIwpaDgZ65oIwzEhhKYLzU74KAfEcTn3PSgxi//l70W03?=
- =?us-ascii?Q?KphPgEQUvUiZMUSpNaycEnAGTl7h0vmU+6kPwpkdLzhqfM9ENoZY4UnWl6z0?=
- =?us-ascii?Q?wI85IvYzBw42g1eD9rYnMUwGxke/PULyt+nUV8YByeCMao0s4wEONEmwVnWt?=
- =?us-ascii?Q?1OMJ68KtkoEtvGTiOgRNON0iGlBuiy+3LVdzy8k/vg0BycpWa4+qRMUMjg3j?=
- =?us-ascii?Q?cyrlyC9OZe/BDguPMA8irUhO94VckeEVuhM9UYBsf1rWPSojKyyHc2Vzb5lS?=
- =?us-ascii?Q?zvHxOuSY9wR2V+7pcDYuDslxguLKLs+Yx2+G28mr1588Ci1jyKjO1pi5E4iI?=
- =?us-ascii?Q?LvrUxVnX/rg9ksB8JYy1GecvjCq+qduRU5uUL7gb0mMvuoiiIVWKUB2KCnO3?=
- =?us-ascii?Q?RvekM3fr8GkqzQLvL9K+M1awMjg7fSFrK4a3fqwJc21i6TlDbSaAizH+Y805?=
- =?us-ascii?Q?aNB/d6ZUp3oEDp74kCSC1lHlrq3fVBToHz89izrDnHw8epEuZgfv5ekNd/fk?=
- =?us-ascii?Q?MgDAM2oWSf8EcyP5eqedmoSDKB9ZtPeIuuXt4tI4lPhmRWhnOcm0cbvYw8hV?=
- =?us-ascii?Q?/ltQ7pZbxmWIZsiy/8CuH63w9ATXe/oywa3yAPBnkN2uy5YMjOEBoq6XOvWk?=
- =?us-ascii?Q?SvuQLJ3pGrNgkFjpIfOPqVKmi3mRnXke2xGuz6dIIou3WwuXdNhpUHI4Pt9o?=
- =?us-ascii?Q?cPQ/DXw+ORUsUdtNKLn0zx3zT8TiVJFHnmK97zF2dieJH86DoM28hXhu9ZCo?=
- =?us-ascii?Q?AO5H/wvmPqDKdoMwrq7WfbJpqSKxK8KaE/D5eEABdaQa/Vv2WkRCaEmteSco?=
- =?us-ascii?Q?uDgM/uE1sMfaQevILCO0IzcXnOObUN171W8GacTSsUQ50P7x5XiEtzmJ5Jej?=
- =?us-ascii?Q?mSKRS5iB5Ww4nPGhnKApX3bGpUXmPXnuVgMM+0tnR8ocmroq7vFoWLQBL9wK?=
- =?us-ascii?Q?unVA87btk7QJuroizqEXlUd/+lEPMg9HOgKEldj2kRW/rPOTK9TRLeS0hL/G?=
- =?us-ascii?Q?OZ0wxK62AC3kuXWh9j4LN0fpS4THBd3J7aNzsG5KKU+pGtrDCF6hLMSb14n9?=
- =?us-ascii?Q?9CpyWc+e8RJteOj9N9psgl4WD8JsMBtTDSbbiHyhBL8zHbqikzqH5HfPuk/u?=
- =?us-ascii?Q?iTN2Eh0w/CA0GyTViyHnFe9uxMYIMYADK3C6D70dbOTY6hhg9Lgfm6Y3vQH0?=
- =?us-ascii?Q?dxkKbckTwDUJu6jWUeAFbPLIs7BUSMVmn10g/92jxDNSe2O1Vo0sU5std18o?=
- =?us-ascii?Q?gkw/qC0grHv7Ky+zxCNSN07z7fF7Y0MkSZdssitCt1xosJC8JoDlVahi3RIK?=
- =?us-ascii?Q?VGGSPA=3D=3D?=
-X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d8a0879c-50d0-4858-5a4f-08db8d4cfce5
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jul 2023 20:23:20.4683
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: RevKSZqchaRlGKBWK/UGaZA/DA+9ZgD1SZ9P+WO6g59LeYTz4OSPy8iDkIq1Le4zcZUpNDxAzp6XL/jqKQ13xy54Tu8lpMfYPkVMcVcUwg0=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY3PR13MB4996
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+Mime-Version: 1.0
+References: <20230724235957.1953861-1-sdf@google.com> <20230724235957.1953861-3-sdf@google.com>
+ <ZMAiYibjYzVTBjEF@corigine.com>
+Message-ID: <ZMAxAmg187DgPCAr@google.com>
+Subject: Re: [RFC net-next v4 2/8] xsk: add TX timestamp and TX checksum
+ offload support
+From: Stanislav Fomichev <sdf@google.com>
+To: Simon Horman <simon.horman@corigine.com>
+Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net, 
+	andrii@kernel.org, martin.lau@linux.dev, song@kernel.org, yhs@fb.com, 
+	john.fastabend@gmail.com, kpsingh@kernel.org, haoluo@google.com, 
+	jolsa@kernel.org, kuba@kernel.org, toke@kernel.org, willemb@google.com, 
+	dsahern@kernel.org, magnus.karlsson@intel.com, bjorn@kernel.org, 
+	maciej.fijalkowski@intel.com, hawk@kernel.org, netdev@vger.kernel.org, 
+	xdp-hints@xdp-project.net
+Content-Type: text/plain; charset="utf-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Jul 25, 2023 at 08:10:21PM +0100, Dmitry Safonov wrote:
-
-...
-
-> > 
-> >> +		struct tcp_ao_key *rnext_key;
-> >> +		struct tcp_ao_info *ao_info;
-> >> +		u8 maclen;
-> >>  
-> >> +		if (WARN_ON_ONCE(!ao_key))
-> >> +			goto out_ao;
-> >> +		ao_info = rcu_dereference_check(tp->ao_info,
-> >> +				lockdep_sock_is_held(&tp->inet_conn.icsk_inet.sk));
-> > 
-> > Checkpatch complains about indentation here.
-> > 
-> > Rather than point out each case in the series,
-> > could I ask you to run ./scripts/checkpatch.pl --strict over the patchset?
+On 07/25, Simon Horman wrote:
+> On Mon, Jul 24, 2023 at 04:59:51PM -0700, Stanislav Fomichev wrote:
 > 
-> Yeah, but then it won't fit 80 columns here. As both aren't hard
-> requirements I tend to comply with 80 columns more than to indentation.
-> In this particular case I'll check if it could be a helper function.
-> If it won't make sense to separate it as a helper, I'll just move it to
-> the same line than, breaking 80 columns limit.
+> ...
+> 
+> Hi Stan,
+> 
+> > diff --git a/include/uapi/linux/netdev.h b/include/uapi/linux/netdev.h
+> > index bf71698a1e82..cf1e11c76339 100644
+> > --- a/include/uapi/linux/netdev.h
+> > +++ b/include/uapi/linux/netdev.h
+> > @@ -37,11 +37,26 @@ enum netdev_xdp_act {
+> >  	NETDEV_XDP_ACT_MASK = 127,
+> >  };
+> >  
+> > +/**
+> > + * enum netdev_xsk_flags
+> > + * @NETDEV_XSK_FLAGS_TX_TIMESTAMP: HW timestamping egress packets is supported
+> > + *   by the driver.
+> > + * @NETDEV_XSK_FLAGS_TX_CHECKSUM: L3 checksum HW offload is supported by the
+> > + *   driver.
+> > + */
+> > +enum netdev_xsk_flags {
+> > +	NETDEV_XSK_FLAGS_TX_TIMESTAMP = 1,
+> > +	NETDEV_XSK_FLAGS_TX_CHECKSUM = 2,
+> > +
+> 
+> I know that it isn't the practice in this file.
+> but adding the following makes kernel-doc happier
+> about NETDEV_XSK_FLAGS_MASK not being documented.
+> 
+> 	/* private: */
 
-Thanks, I missed the 80 column thing here.
-I'd actually think that what you have is better than an extra long line.
-But it's your call.
+This is autogenerated file :-( But I guess I can try to extend ynl
+scripts to put this comment before the mask. Let me look into that...
+ 
+ 
+> > +	NETDEV_XSK_FLAGS_MASK = 3,
+> > +};
+> > +
+> >  enum {
+> >  	NETDEV_A_DEV_IFINDEX = 1,
+> >  	NETDEV_A_DEV_PAD,
+> >  	NETDEV_A_DEV_XDP_FEATURES,
+> >  	NETDEV_A_DEV_XDP_ZC_MAX_SEGS,
+> > +	NETDEV_A_DEV_XSK_FEATURES,
+> >  
+> >  	__NETDEV_A_DEV_MAX,
+> >  	NETDEV_A_DEV_MAX = (__NETDEV_A_DEV_MAX - 1)
+> 
+> ...
+> 
+> > diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
+> 
+> ...
+> 
+> > @@ -626,6 +635,7 @@ static struct sk_buff *xsk_build_skb_zerocopy(struct xdp_sock *xs,
+> >  static struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
+> >  				     struct xdp_desc *desc)
+> >  {
+> > +	struct xsk_tx_metadata *meta = NULL;
+> >  	struct net_device *dev = xs->dev;
+> >  	struct sk_buff *skb = xs->skb;
+> >  	int err;
+> > @@ -678,12 +688,40 @@ static struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
+> >  
+> >  			skb_add_rx_frag(skb, nr_frags, page, 0, len, 0);
+> >  		}
+> > +
+> > +		if (desc->options & XDP_TX_METADATA) {
+> > +			if (unlikely(xs->tx_metadata_len == 0)) {
+> > +				err = -EINVAL;
+> > +				goto free_err;
+> > +			}
+> > +
+> > +			meta = buffer - xs->tx_metadata_len;
+> > +
+> > +			if (meta->flags & XDP_TX_METADATA_CHECKSUM) {
+> > +				if (unlikely(meta->csum_start + meta->csum_offset +
+> > +					     sizeof(__sum16) > len)) {
+> > +					err = -EINVAL;
+> > +					goto free_err;
+> > +				}
+> > +
+> > +				skb->csum_start = hr + meta->csum_start;
+> 
+> hr seems to only be set - by earlier, existing code in this function -
+> if skb is NULL. Is it always safe to use it here?
+> 
+> Smatch flags hr as being potentially used uninitialised,
+> the above is my understanding of why it thinks that is so.
 
-...
+Ugh, good point, I've missed that. This part is new and it's from
+multi-frag support. I need to be more careful here and apply metadata
+only from the first descriptor in the chain. Thanks!
 
