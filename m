@@ -1,96 +1,171 @@
-Return-Path: <netdev+bounces-20837-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20838-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3142761813
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 14:16:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0CFE761831
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 14:25:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 566A1281786
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 12:16:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 90ECA28150F
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 12:25:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 576841F16C;
-	Tue, 25 Jul 2023 12:16:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F8991F172;
+	Tue, 25 Jul 2023 12:25:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BEB913AD9
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 12:16:02 +0000 (UTC)
-Received: from out2-smtp.messagingengine.com (out2-smtp.messagingengine.com [66.111.4.26])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9DE810F9
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 05:16:00 -0700 (PDT)
-Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
-	by mailout.nyi.internal (Postfix) with ESMTP id 4D3C45C00E8;
-	Tue, 25 Jul 2023 08:16:00 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute6.internal (MEProxy); Tue, 25 Jul 2023 08:16:00 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:sender:subject
-	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-	:x-sasl-enc; s=fm3; t=1690287360; x=1690373760; bh=mvA9i+KS8O4p2
-	tc2N5nUjGjmv+LWaVsgHtUJiQAHBxU=; b=dW1wTosNDkk/dXk15iAR1B9zRNbIW
-	t3ma+RCrkDuX5Dsu2JoCQkRNe+5L+rLnJ9S+QcCOE7T07fOuhN4tAsFjopop7vp3
-	AbMSj+vk6vQSZqkZycQoJLhBJ96ynZgRXh8WEHCPZgCjk0HmgRwPotQU0olbJLjE
-	QOML6iwMqqhyfEr/RQNcTAYIktagAkchnlNveudHErtPOvxFtei8qAmZiLAMaCac
-	jbJzMTbQjoAl4cwDuFkxk5ge6AOa3B6znZJ/txkpOHV2sgw7O/6xuhFVPZ/0pdA3
-	WIRxXX4V8TwUPisHR5TqnfroLCYWjV7CQJXQr+4+Zyo90Lx0LtrVKpp4Q==
-X-ME-Sender: <xms:AL2_ZOWMa4D0adRxzbNytCjOgN53herdex-XjibevAsLzmpq1wrsOw>
-    <xme:AL2_ZKnXcg-XvcLtPxzwnpWg4Im29Ah_lhWm7S4HkgOUoRfJOPg6wdhBJWW9DeqFx
-    uAgz-ITws-iDJs>
-X-ME-Received: <xmr:AL2_ZCYB1Bby9WGiLqX1WKtndrYXoRgJsmPVZb46wXcIRAgxstIL_1rkUuvSYp1Pnw2mzSDgrHY38dxCmODV-bkOl_0>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedriedtgdeglecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
-    fjughrpeffhffvvefukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpefkughoucfu
-    tghhihhmmhgvlhcuoehiughoshgthhesihguohhstghhrdhorhhgqeenucggtffrrghtth
-    gvrhhnpedvudefveekheeugeeftddvveefgfduieefudeifefgleekheegleegjeejgeeg
-    hfenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehiug
-    hoshgthhesihguohhstghhrdhorhhg
-X-ME-Proxy: <xmx:AL2_ZFUNOHldvAGjmjDt6Q4_qqo8aHmphU2b9n6uKsBnGl9ra9h1pg>
-    <xmx:AL2_ZInPdzWQsBfKdK9pJF5acvXCLtljo2Im2QeJ1YehZnQtM-OXYA>
-    <xmx:AL2_ZKcPqwneCcu7F74RQPMXj0vUbFlWNe57xNeoB7JOgGdka4pNZw>
-    <xmx:AL2_ZHsOvzrfS2MD5KrrnVYKJp-hG2lQjDwkcrJk1WcYxs0o-2e6xw>
-Feedback-ID: i494840e7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 25 Jul 2023 08:15:59 -0400 (EDT)
-Date: Tue, 25 Jul 2023 15:15:56 +0300
-From: Ido Schimmel <idosch@idosch.org>
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Beniamino Galvani <bgalvani@redhat.com>
-Subject: Re: [PATCHv3 net-next] IPv6: add extack info for IPv6 address
- add/delete
-Message-ID: <ZL+8/E2uFOuwFdXM@shredder>
-References: <20230724075051.20081-1-liuhangbin@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71F508F4F
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 12:25:19 +0000 (UTC)
+Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2108.outbound.protection.outlook.com [40.107.212.108])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C11B1737
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 05:25:17 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=FP3cwmbuslGCzYXqBJ9d4Cb2MO9D/VOwK6fOqCKdsYNg1g42SR4inPTPozv7yGSNBHiihadMhLzKpxSBF3EjpOYFI9fhnsanCoPrYJFihatwjxpDFGKiMGMk8I34EsV1aLl2PVes3Txm+aXJ9ML4Qr0WuQpSzQbVlFUtqC8ytVTlzaDgexZrMpiXubwDZd5NTpbMotXqN4CAqX5nhJLDx4FUeALRaqyOsbKbTKrWrdavzcONSbbgkKTrdkLzjmWyAltBC9iTgcuV2FIfeX5cagnwFx7YmzbewAiVXc1ssBeyiRuD/c7Y5TGs267Mi7Gu03KmgS766OTA9QZBOTALcQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=VFekofBM6N8PaJ/9U2IIicSGkz96f/z4bYPLhmd9G8E=;
+ b=SNfkFyc0wJNn3BP7sH0LkuuerhQ5ywduINSNULhuW6vP1Qh4SGnbFL44S6bPsa0hVb5LWB+u+slILG+zzV7VNomaE/iPVx7/NoxOTDmBQAnCQHUyErKWfGn6XPO6UZI4taDsVVkKQmbbjaDJ04PhDvdBytH4a1gqb0DWz2jfeUEKe8zxAFJiUf8ITg/AKnJoM6QYokgLFGUeNMDLsPuRQMwjt8vDSSnTi8/LdyC3qC72sxcyK8p9HlFd6upx5+g3K0GifhrrLJNoxUIYqxfbU0vsCWfzvlW6bP5YIW4mZzD51kwoFvlyf82MXuU7WtEbkNC3FHSTWeJ3z9IF50gFTg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
+ dkim=pass header.d=corigine.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=VFekofBM6N8PaJ/9U2IIicSGkz96f/z4bYPLhmd9G8E=;
+ b=LvkXU9paxxVGD3dOkKzpNrlP73ieYeZ7MvUNl62dywdf7DZtKkQFRhD83TbO165mNJwRtyQ1llJUfof7yTYHx1a+l7bqBWq3j0ReTHnMTp0eOZUeCHQj7rDGQIeJzZGYyRxjbpq96kdo8LibCVwVwL58Hu4g7Ki/xOtttOc362A=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=corigine.com;
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
+ by SA3PR13MB6490.namprd13.prod.outlook.com (2603:10b6:806:380::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.33; Tue, 25 Jul
+ 2023 12:25:15 +0000
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::fde7:9821:f2d9:101d]) by PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::fde7:9821:f2d9:101d%7]) with mapi id 15.20.6609.032; Tue, 25 Jul 2023
+ 12:25:15 +0000
+Date: Tue, 25 Jul 2023 14:25:02 +0200
+From: Simon Horman <simon.horman@corigine.com>
+To: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	anthony.l.nguyen@intel.com,
+	Grzegorz Szczurek <grzegorzx.szczurek@intel.com>
+Subject: Re: [PATCH iwl-next v1] i40e: Clear stats after deleting tc
+Message-ID: <ZL++xYriOfc2V6Fb@corigine.com>
+References: <20230724094319.57359-1-jedrzej.jagielski@intel.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230724094319.57359-1-jedrzej.jagielski@intel.com>
+X-ClientProxiedBy: AM0PR02CA0212.eurprd02.prod.outlook.com
+ (2603:10a6:20b:28f::19) To PH0PR13MB4842.namprd13.prod.outlook.com
+ (2603:10b6:510:78::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230724075051.20081-1-liuhangbin@gmail.com>
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|SA3PR13MB6490:EE_
+X-MS-Office365-Filtering-Correlation-Id: d2ea13f7-caa0-4072-6b6e-08db8d0a3331
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	C1wQR+lUJTpsm4R21zMPuILtn6Zv7TX+zHmgErToFlYweKP1vfwDI/KpXmeQVN3/9q7H6RGW+oxsFi0GXXAXBtkS4Rw4YzSIGjkRqLep1Fcwgz7XdXw5Iix3wqVrj6f367Fe6y3EcxOi0RjSr9aFmnkPSlt4qEcQxFF60uruBN9cQw3xwpapUGbK2g+seXpSPsmA3nTzVi4LPFJS136vYdLu4AyiD/5m+P2ZtQYz/18eQMVJCvKAeJUPB1TJkrFHOdreOAFIrCyfUSxhBoOKxFf5k2nn8akLh5HK/XCdKZuGAIF79cmZ7wsOKSw55MoxHBcX0A9PbA00XvvgNRinHvT1CMkcNZZYj+gzX1PcNTdJzscamycfFoLqnS4edMAD90hkk3BN4ko01eqcm1gi0pZP8rG90NbwbJqmvGe2zKr3EyA7mEm3Fo4IQWApc2fIjoqe+fH+Lnw//a7PvAWhv973Z3F7Yz48ocYwzj6fgI+XxNF64r/2APQISFAxnKlnw3VgQm3KT4gPkebyNTnkPQyXHzj1PmufarRP/pvkd2q5HqI0BOgV/rR37o0fTXW93NkurpqqthdXkq9GDH9cbSV2D+o/Yqgg9DnDNMLP4xw=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(376002)(396003)(346002)(39840400004)(366004)(136003)(451199021)(36756003)(44832011)(41300700001)(5660300002)(8676002)(8936002)(38100700002)(2906002)(2616005)(478600001)(316002)(6666004)(6486002)(86362001)(186003)(6506007)(6512007)(66556008)(4326008)(66476007)(6916009)(66946007)(83380400001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?//yA2tXCNhEz663ioV+2u8xRc9lsfxpY1ez18zafX6J49eMFVInAH1GS5ixV?=
+ =?us-ascii?Q?HoTRJKJxp5DChZZUlV86rsv0P7MDn8KCws/Gc3pC49LTTFQrekxKjlX0gt4+?=
+ =?us-ascii?Q?so4Nyb7pzE7Ovn3BwgdFjbZuTAWgwYkWLMZCyZpbd4a+oNFSx5URKIE0Iq0+?=
+ =?us-ascii?Q?q0xR4YyDk4OKIONVIfrpjvJq2rjsI8aKqbFHix2L6fBB3onL2aerIKXfi9e0?=
+ =?us-ascii?Q?wpYpm/qKdt1Z//Sx6W3rmaFR5Sn0ikGl3tKqlTk9p2CoRs98jWm1FvZeE0E7?=
+ =?us-ascii?Q?XzKwnQe0fGnmm6liNNzd5Ggn5xTpE755gSK54OVJKhc4YEvSaC5KtksdsZUd?=
+ =?us-ascii?Q?dudN9jfnZ7ou9m8+Ofj3HkPJNZPQhVUTqssDdSZOD6gsU9TQj7iZmOZDCr2r?=
+ =?us-ascii?Q?VloB/iO73i1HHpEVvyxncR8uiP+jlb0s7xvemfKAUnB50KdHtSivy8sv2Vkb?=
+ =?us-ascii?Q?XD/zAT835S2C4lL1rFZGeu7diD9jMmPJ/PG3Da5PmNyHRQvfQhKymk8scSO3?=
+ =?us-ascii?Q?Fx1nfTSIUCJWfaqWJ5mL5bx0B55wobRzisiwG3SomKHycjLn6KoVJYesv7Wd?=
+ =?us-ascii?Q?uIPXqqzlKrOdoImdv4YPs27A7Hmde4Modmq4biDu4+371DpxkclSc8ho9S3L?=
+ =?us-ascii?Q?2QrTxghprV+ZYkf18dLuIA2AyB8RzjU5tdBfHDWE7dyIrKx5HeFWCzIp5jYZ?=
+ =?us-ascii?Q?gASxY79ULo1hDqceNLZ+wxzYd68V2sHwwqDpbV5kzkkZOXPYumhs380p4DhM?=
+ =?us-ascii?Q?neuzojxEguzyh3Qa0OEM9B7WJq8P9yI5S+DuwqfniiP4k8ZBtP0PWxn362zn?=
+ =?us-ascii?Q?sgDt/S8ypdd/e3EhG6AldeTNY6Kei88WHr6ay90GKtxyGnkCRQ7r9jNZEdZN?=
+ =?us-ascii?Q?tHr1YJXfCy1lpkTuRPw16N9jt0DpcPbtZ1ERo3UGMxEpGG0Dmq3fwf8W4K4L?=
+ =?us-ascii?Q?NVa8oH7K4mwtTEBig8FSzsKH90CS7fOZlqI26pqmRbggCC+jGctxf94ZTH66?=
+ =?us-ascii?Q?dXNuFjyRBnweqgVoSXfDsvIxsdS2iq+HIST3MumbVuVyHGk6QbkDCQ6P1/xj?=
+ =?us-ascii?Q?1KFWbeEcyLKhNqcGIOE/mqG1OkmLwCcoOg5MFyx4cFCux/UcxSUH5jfEbUK9?=
+ =?us-ascii?Q?pRwm2k68UCsw4n2zWPe93x+Z5Gft2IbG3sFwuliV+FlUxxCzYPjDzPrT03N/?=
+ =?us-ascii?Q?E94EkVXPLbkN6wiJU+VaniTIZ1Jjiq3aQIbTyy9+wmW4duMUkXlzgQ/b4yx5?=
+ =?us-ascii?Q?jkXzicfMTUpjMbAIRA8qY+8ewouexYeMFjy5Ceq2e5Tyq+GTTH0pEDV/kLmy?=
+ =?us-ascii?Q?yOaoXXoqCZHkFClh/WnB8dGG4IlqctPRwNt6Ex5uXUGmKS11qIAZLO7VsAH4?=
+ =?us-ascii?Q?6TPfOgX+TGW86dDjNYvrTjEPAFLHeFisze/DLB8iOlF1evBHZH/7umv3iwpS?=
+ =?us-ascii?Q?WXqqRdhoMgCFMB549RkohHHPzPv4OCwyJdGz2IvaJ8tmbZc7n18JZy1APAyp?=
+ =?us-ascii?Q?pFgKySgeIUlVzH4w34NgV7MxWFygWO3/DMnxFKIrzxR0geidGkkso0hmqE7U?=
+ =?us-ascii?Q?lVs9pJ7CS+FGLbW0q1I+aymWGltp56qm0QDn/TzlsGg84cYLLuPI6AxD21jk?=
+ =?us-ascii?Q?QFnNF7XYm7UcjcwTqSREJHkgINmdE1EbG5L3/JbKeMkVcuwqTJMKy+LXzSI+?=
+ =?us-ascii?Q?adflpg=3D=3D?=
+X-OriginatorOrg: corigine.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d2ea13f7-caa0-4072-6b6e-08db8d0a3331
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jul 2023 12:25:15.2239
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: cxCprx9cDrGBpo7Yn2XWKEPtiGFm/TmKxPZBb96vtD5qNKi9KOssYELg4/MdiPNOfrimZfbN3s+jF28CyUYz9rxg7Z9mB++5J9VFJUwOD/0=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR13MB6490
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Jul 24, 2023 at 03:50:51PM +0800, Hangbin Liu wrote:
-> Add extack info for IPv6 address add/delete, which would be useful for
-> users to understand the problem without having to read kernel code.
+On Mon, Jul 24, 2023 at 11:43:19AM +0200, Jedrzej Jagielski wrote:
+> From: Grzegorz Szczurek <grzegorzx.szczurek@intel.com>
 > 
-> Suggested-by: Beniamino Galvani <bgalvani@redhat.com>
-> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+> There was an issue with ethtool stats that
+> have not been cleared after tc had been deleted.
 
-Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+I think it would be good to elaborate on what the issue is,
+perhaps with an example. I think this should be added to
+the patch description.
+
+> Fix this by resetting stats after deleting tc
+> by calling i40e_vsi_reset_stats() function after
+> distroying qdisc.
+> 
+> Signed-off-by: Grzegorz Szczurek <grzegorzx.szczurek@intel.com>
+> Signed-off-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+> ---
+>  drivers/net/ethernet/intel/i40e/i40e_main.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
+> index 29ad1797adce..6f604bfe7437 100644
+> --- a/drivers/net/ethernet/intel/i40e/i40e_main.c
+> +++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
+> @@ -5885,6 +5885,11 @@ static int i40e_vsi_config_tc(struct i40e_vsi *vsi, u8 enabled_tc)
+>  
+>  	/* Update the netdev TC setup */
+>  	i40e_vsi_config_netdev_tc(vsi, enabled_tc);
+> +
+> +	/* After distroying qdisc reset all stats of the vsi */
+
+nit: distroying -> destroying
+
+> +	if (!vsi->mqprio_qopt.qopt.hw)
+> +		i40e_vsi_reset_stats(vsi);
+> +
+>  out:
+>  	return ret;
+>  }
+
+-- 
+pw-bot: changes-requested
 
