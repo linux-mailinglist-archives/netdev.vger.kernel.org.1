@@ -1,507 +1,181 @@
-Return-Path: <netdev+bounces-21026-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21027-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F6C576231F
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 22:16:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 278E7762337
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 22:23:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AAEB7281A2A
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 20:16:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5B7AC281982
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 20:23:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FBFD26B2A;
-	Tue, 25 Jul 2023 20:16:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F0ED26B2C;
+	Tue, 25 Jul 2023 20:23:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CF4D25931
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 20:16:49 +0000 (UTC)
-Received: from mail-wm1-x334.google.com (mail-wm1-x334.google.com [IPv6:2a00:1450:4864:20::334])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 793491BC8
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 13:16:46 -0700 (PDT)
-Received: by mail-wm1-x334.google.com with SMTP id 5b1f17b1804b1-3fbc244d307so59064435e9.1
-        for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 13:16:46 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CB211F186
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 20:23:26 +0000 (UTC)
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2103.outbound.protection.outlook.com [40.107.95.103])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5C6110F7;
+	Tue, 25 Jul 2023 13:23:23 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=gTZYcswIRPxGU7SMNYqX8poC+lpFVOIxEqwZnfrYmbC49fRAEf5a+fqkM8uaU89u/ukV6LQuDOXTLRZQCVfM0qWlbSELfOgq8EBaLY1Kc2IY57GI28Ne4iAMKvdI/WmTBibqQALMnrQU3go/LgQpBq3PgfYm1eKjd3QspkAPHkgJwHnSGDv5d0LlC6HlhxkXMpoRs2LG4dlt7jpBwNWddlmPP/X+ZtA3cttQhDBIbgeNSejjUOV0FdQmo4xaRx9ogeSa2gt9rNZjl2ANHVm0BlEB92mBGZWS65uRUm/m2y5T4o5sizFJLkGVOOEVMCT9EHai/e9foJ23E5B+gXWuLg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=oLvJ/N5y9ZdO9bX9ogAHOyz9iCkrsuKTKIqDil3FdZY=;
+ b=WqaExHg0THYVeaeTX3nlZgC/Lgup+v5oBZyg579m9/94XV0sJAZtHFYGyapTZJm+IL4rwPSk5/v0cf2UXQj9n0YpBvzuuUiEZorCLg3dZySn8oOyWJKuYtCerx716QbSZIQvWYombD0i1Nv7kxYt5rP/0uzOUtHzZQQsg57QAlX5SvLbcRGbNacTWgVb7hLqVuZm/O+AvQHDJSFkU37MqswSoG9zLG3yjOt/VRajpuhZ44Jg8KgFS5ybwXkyNbxvhHZYHFSlwXig7+jfebeRF0aleloRDqLttS2C+rEAYL4NreGBPlh+UgkZZW7VIQyITR9RAxCxo+uSz7q/M7aiTQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
+ dkim=pass header.d=corigine.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=arista.com; s=google; t=1690316205; x=1690921005;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=D0G3MJcvlh50tjHIhX84jyKiKeq3oJ9h5jmmEE6B1CY=;
-        b=QTohGC6rYWkTAV4tuF6CGONiML+Cx7KlKfmuZFcFK9MHb9VZ3DDF1eUZK/5j0Jxjef
-         6bcpULBh1w3W639bS6tHKWd0T9e1MlcuzPG3YI7qFT4OoaEvWbyckhhIAl7OPwnS/Ax8
-         20+yeXvazcLawyTjAxgPyK4LPdFZVWApOlNJQZwaRapNgRIHsZIMAOAfkREkVXdlHe2b
-         V9tZbdJi7DBFEaEvorgBMpj8nZEJmi9+ypnMMutLG66aSzU4YwwgjlF+0gfUm9WKrJAQ
-         RU1XdRXa+Tx0dq+TYqO2vG3pvJaUBbDsAQIgvbaKJJ8MDqsPhrHhBJjPjL77hbsoAo77
-         +ITA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690316205; x=1690921005;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=D0G3MJcvlh50tjHIhX84jyKiKeq3oJ9h5jmmEE6B1CY=;
-        b=PpdHOyNamceea4zVEcEHRkGQY0A6x7Aa8bLUghiniOngNtRQomQfsFKVQr9fz9CZLV
-         HYQPWNa29vgyW1jbEnjG62LACszMoEcVrpctXMO1Rbcioc6xZvPQhM6UbV/St7Jf9Vjq
-         QgsbzizTDzNKxkEHzbQ4Q16NGa++e9VRBVpf6ZJzfeVLzoAlx2OtWY147QGZHX/HIQ2L
-         xFMXJOxBqnid1JQu+XVzEW1bOyAqqjbzIgC4/bnYJdBSzkUzlOR2OnRL40p2DiEfTkEJ
-         Nnwr0rEkGYFutpXDCX/jqliA7yfmfCKMg2xY4C/TU9nLGPSz89NiKWZ21QFxiGCY4jGJ
-         EMUQ==
-X-Gm-Message-State: ABy/qLZBuWgHQhuX7AbVXzIXUF56X0K+KIP3yHgjWFBL2hRwZTiMuZqz
-	tnzUokvGYZxiejwVEWeyxNiO4w==
-X-Google-Smtp-Source: APBJJlHjclw1H8NRkLLLQBSPgEow5S93ysYrG8EVXHAgwzTUXlnElHSPJU1CD+MySrcL0B0ykmZbIQ==
-X-Received: by 2002:a05:600c:2315:b0:3fa:8fc2:3969 with SMTP id 21-20020a05600c231500b003fa8fc23969mr11112883wmo.17.1690316204839;
-        Tue, 25 Jul 2023 13:16:44 -0700 (PDT)
-Received: from [10.83.37.178] ([217.173.96.166])
-        by smtp.gmail.com with ESMTPSA id 5-20020a05600c028500b003fc04eb92cbsm14210070wmk.44.2023.07.25.13.16.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 25 Jul 2023 13:16:44 -0700 (PDT)
-Message-ID: <732218bf-9388-e8ce-0913-d681d1302a37@arista.com>
-Date: Tue, 25 Jul 2023 21:16:37 +0100
+ d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=oLvJ/N5y9ZdO9bX9ogAHOyz9iCkrsuKTKIqDil3FdZY=;
+ b=s6ZstnW9V9tcdAnBj7/BFF1w5U50v11eGWUIRhEYItcsOMlS2JwHtITj3mQsogvje59jsfpoWCygLVz3IZZ3Xxed6PLcEyYf6AgsC+O+5n5TzU6oHdDckTNFTl0rdXsbhcNPguHkykgfoZ60PnbF5kPPgnItxDKhyn58+g4cpzg=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=corigine.com;
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
+ by BY3PR13MB4996.namprd13.prod.outlook.com (2603:10b6:a03:356::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.31; Tue, 25 Jul
+ 2023 20:23:20 +0000
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::fde7:9821:f2d9:101d]) by PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::fde7:9821:f2d9:101d%7]) with mapi id 15.20.6609.032; Tue, 25 Jul 2023
+ 20:23:20 +0000
+Date: Tue, 25 Jul 2023 22:23:11 +0200
+From: Simon Horman <simon.horman@corigine.com>
+To: Dmitry Safonov <dima@arista.com>
+Cc: David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-kernel@vger.kernel.org, Andy Lutomirski <luto@amacapital.net>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Bob Gilligan <gilligan@arista.com>,
+	Dan Carpenter <error27@gmail.com>,
+	David Laight <David.Laight@aculab.com>,
+	Dmitry Safonov <0x7f454c46@gmail.com>,
+	Donald Cassidy <dcassidy@redhat.com>,
+	Eric Biggers <ebiggers@kernel.org>,
+	"Eric W. Biederman" <ebiederm@xmission.com>,
+	Francesco Ruggeri <fruggeri05@gmail.com>,
+	"Gaillardetz, Dominik" <dgaillar@ciena.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+	Ivan Delalande <colona@arista.com>,
+	Leonard Crestez <cdleonard@gmail.com>,
+	Salam Noureddine <noureddine@arista.com>,
+	"Tetreault, Francois" <ftetreau@ciena.com>, netdev@vger.kernel.org
+Subject: Re: [PATCH v8.1 net-next 06/23] net/tcp: Add TCP-AO sign to outgoing
+ packets
+Message-ID: <ZMAvL+9gMIozLbpB@corigine.com>
+References: <20230721161916.542667-1-dima@arista.com>
+ <20230721161916.542667-7-dima@arista.com>
+ <ZMAAPBKnnrdk/c9K@corigine.com>
+ <b01a63a7-eaaa-85db-b04d-8270e82e1080@arista.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b01a63a7-eaaa-85db-b04d-8270e82e1080@arista.com>
+X-ClientProxiedBy: AM4PR0302CA0028.eurprd03.prod.outlook.com
+ (2603:10a6:205:2::41) To PH0PR13MB4842.namprd13.prod.outlook.com
+ (2603:10b6:510:78::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH v8.1 net-next 03/23] net/tcp: Introduce TCP_AO
- setsockopt()s
-Content-Language: en-US
-To: Simon Horman <simon.horman@corigine.com>
-Cc: David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, linux-kernel@vger.kernel.org,
- Andy Lutomirski <luto@amacapital.net>, Ard Biesheuvel <ardb@kernel.org>,
- Bob Gilligan <gilligan@arista.com>, Dan Carpenter <error27@gmail.com>,
- David Laight <David.Laight@aculab.com>, Dmitry Safonov
- <0x7f454c46@gmail.com>, Donald Cassidy <dcassidy@redhat.com>,
- Eric Biggers <ebiggers@kernel.org>, "Eric W. Biederman"
- <ebiederm@xmission.com>, Francesco Ruggeri <fruggeri05@gmail.com>,
- "Gaillardetz, Dominik" <dgaillar@ciena.com>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
- Ivan Delalande <colona@arista.com>, Leonard Crestez <cdleonard@gmail.com>,
- Salam Noureddine <noureddine@arista.com>,
- "Tetreault, Francois" <ftetreau@ciena.com>, netdev@vger.kernel.org
-References: <20230721161916.542667-1-dima@arista.com>
- <20230721161916.542667-4-dima@arista.com> <ZL7RdEEz2nH/QFqZ@corigine.com>
-From: Dmitry Safonov <dima@arista.com>
-In-Reply-To: <ZL7RdEEz2nH/QFqZ@corigine.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|BY3PR13MB4996:EE_
+X-MS-Office365-Filtering-Correlation-Id: d8a0879c-50d0-4858-5a4f-08db8d4cfce5
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	Qz734RLN9RYOzICcHKqmFwH2DSWLVcngQN8vuq90XXUk/c6UE5TUnVHsG+Nkbl/rdJGZaZIq6AtAe3iQFe4g609hCLEOCDX6Xzvl3cRFABUxkEGpDsO4tngfcMytsNrNp+C+YX853tOqtdNgGw5dlYxAi4ieRdOYOGJQz2kBgtdoApSVzji6hCxxW3CheEv6nwmo3GbHxG9fPpkHCOAJc6zbHoEnudOhN5FWdUSqZ1ZUgM6Q3Xxv/FBQO+BatlRDvw2BktxiT6ZiSny0k6S1uwYn2DmftY+8WDeUkmLJrji+RNYJSmJaJtdbsl2ejm6sY4yI88jhuc63Mth3Sz6aduDEtHSl9u0lMP2CReyXUVK8etF2USDGtIYw5K806CWoMw1sjPtmXpNSpv7SQom6vnF1yhv+TICqiPHgJPc7dz9iI2XhcAFD3z35JSF5dXiibcb7tPkvTmMROVCfsYJ5So6ZzgNI6XJ8NiXi01aSv1C4UKv9tE69igTRYrHo5/AG5knNXekaPP50Bsv7yy2FMzgAcFUeCA42fEMr/k6u2ckp76VQjqvJansPybc34q7KTGYT6dCkQoIObjzuEcDSjPw1dtsOF4ZjpVn504U/w/CAWMt4YzxsVe8Bcphmkx07wzENEVzgyxIKb9XKY5Wlj6lxZ8uNKkv3SxX5ZMQWPck=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(366004)(136003)(376002)(396003)(39840400004)(346002)(451199021)(6512007)(6486002)(478600001)(6666004)(54906003)(83380400001)(86362001)(4326008)(186003)(2616005)(6506007)(7416002)(2906002)(4744005)(36756003)(38100700002)(66946007)(44832011)(66556008)(5660300002)(41300700001)(8936002)(66476007)(6916009)(316002)(8676002)(67856001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?qjyZibuBCb2KiTHUJJNpU2hTum6PAe+0o5/wtyTZGMxXdmXQU1Ytqb8DnaKv?=
+ =?us-ascii?Q?DOsfEzxiXSRot/fOWmCeDUI7L+GJDMD+fRYWaDp3kROUnyioza52S21ygzF7?=
+ =?us-ascii?Q?1hiNCjvRli3Ox8h+FqMePQcZ4M6xB8tiVdUhGPrjcoYT1BsLWYop/o4TVCBK?=
+ =?us-ascii?Q?g8Bl23qdin3tGHbGPqaT/4arDW2bgQW6Kq33NeqCKUpsEYbMzmvJQ9KcnokJ?=
+ =?us-ascii?Q?amAEPj4ACEiCH3sl2ABPTt0Qy5JiMzRryg9Q+LIm5R2ZtZSL//nogAP3GPrx?=
+ =?us-ascii?Q?+R1fTt9ntAg5YeKo5kw3dttoLzaVFScuDUlFdS5noksDpOPdNi00xqptd+JU?=
+ =?us-ascii?Q?iQBcb9WHqotXhfAkIwpaDgZ65oIwzEhhKYLzU74KAfEcTn3PSgxi//l70W03?=
+ =?us-ascii?Q?KphPgEQUvUiZMUSpNaycEnAGTl7h0vmU+6kPwpkdLzhqfM9ENoZY4UnWl6z0?=
+ =?us-ascii?Q?wI85IvYzBw42g1eD9rYnMUwGxke/PULyt+nUV8YByeCMao0s4wEONEmwVnWt?=
+ =?us-ascii?Q?1OMJ68KtkoEtvGTiOgRNON0iGlBuiy+3LVdzy8k/vg0BycpWa4+qRMUMjg3j?=
+ =?us-ascii?Q?cyrlyC9OZe/BDguPMA8irUhO94VckeEVuhM9UYBsf1rWPSojKyyHc2Vzb5lS?=
+ =?us-ascii?Q?zvHxOuSY9wR2V+7pcDYuDslxguLKLs+Yx2+G28mr1588Ci1jyKjO1pi5E4iI?=
+ =?us-ascii?Q?LvrUxVnX/rg9ksB8JYy1GecvjCq+qduRU5uUL7gb0mMvuoiiIVWKUB2KCnO3?=
+ =?us-ascii?Q?RvekM3fr8GkqzQLvL9K+M1awMjg7fSFrK4a3fqwJc21i6TlDbSaAizH+Y805?=
+ =?us-ascii?Q?aNB/d6ZUp3oEDp74kCSC1lHlrq3fVBToHz89izrDnHw8epEuZgfv5ekNd/fk?=
+ =?us-ascii?Q?MgDAM2oWSf8EcyP5eqedmoSDKB9ZtPeIuuXt4tI4lPhmRWhnOcm0cbvYw8hV?=
+ =?us-ascii?Q?/ltQ7pZbxmWIZsiy/8CuH63w9ATXe/oywa3yAPBnkN2uy5YMjOEBoq6XOvWk?=
+ =?us-ascii?Q?SvuQLJ3pGrNgkFjpIfOPqVKmi3mRnXke2xGuz6dIIou3WwuXdNhpUHI4Pt9o?=
+ =?us-ascii?Q?cPQ/DXw+ORUsUdtNKLn0zx3zT8TiVJFHnmK97zF2dieJH86DoM28hXhu9ZCo?=
+ =?us-ascii?Q?AO5H/wvmPqDKdoMwrq7WfbJpqSKxK8KaE/D5eEABdaQa/Vv2WkRCaEmteSco?=
+ =?us-ascii?Q?uDgM/uE1sMfaQevILCO0IzcXnOObUN171W8GacTSsUQ50P7x5XiEtzmJ5Jej?=
+ =?us-ascii?Q?mSKRS5iB5Ww4nPGhnKApX3bGpUXmPXnuVgMM+0tnR8ocmroq7vFoWLQBL9wK?=
+ =?us-ascii?Q?unVA87btk7QJuroizqEXlUd/+lEPMg9HOgKEldj2kRW/rPOTK9TRLeS0hL/G?=
+ =?us-ascii?Q?OZ0wxK62AC3kuXWh9j4LN0fpS4THBd3J7aNzsG5KKU+pGtrDCF6hLMSb14n9?=
+ =?us-ascii?Q?9CpyWc+e8RJteOj9N9psgl4WD8JsMBtTDSbbiHyhBL8zHbqikzqH5HfPuk/u?=
+ =?us-ascii?Q?iTN2Eh0w/CA0GyTViyHnFe9uxMYIMYADK3C6D70dbOTY6hhg9Lgfm6Y3vQH0?=
+ =?us-ascii?Q?dxkKbckTwDUJu6jWUeAFbPLIs7BUSMVmn10g/92jxDNSe2O1Vo0sU5std18o?=
+ =?us-ascii?Q?gkw/qC0grHv7Ky+zxCNSN07z7fF7Y0MkSZdssitCt1xosJC8JoDlVahi3RIK?=
+ =?us-ascii?Q?VGGSPA=3D=3D?=
+X-OriginatorOrg: corigine.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d8a0879c-50d0-4858-5a4f-08db8d4cfce5
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jul 2023 20:23:20.4683
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: RevKSZqchaRlGKBWK/UGaZA/DA+9ZgD1SZ9P+WO6g59LeYTz4OSPy8iDkIq1Le4zcZUpNDxAzp6XL/jqKQ13xy54Tu8lpMfYPkVMcVcUwg0=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY3PR13MB4996
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Simon,
+On Tue, Jul 25, 2023 at 08:10:21PM +0100, Dmitry Safonov wrote:
 
-On 7/24/23 20:31, Simon Horman wrote:
-> On Fri, Jul 21, 2023 at 05:18:54PM +0100, Dmitry Safonov wrote:
-> 
-> ...
-> 
-> Hi Dimitry,
-> 
->> diff --git a/include/linux/sockptr.h b/include/linux/sockptr.h
->> index bae5e2369b4f..307961b41541 100644
->> --- a/include/linux/sockptr.h
->> +++ b/include/linux/sockptr.h
->> @@ -55,6 +55,29 @@ static inline int copy_from_sockptr(void *dst, sockptr_t src, size_t size)
->>  	return copy_from_sockptr_offset(dst, src, 0, size);
->>  }
->>  
->> +static inline int copy_struct_from_sockptr(void *dst, size_t ksize,
->> +		sockptr_t src, size_t usize)
-> 
-> The indentation of the two lines above is not correct,
-> they should be aligned to the inside of the opening '('
-> on the preceding line.
-> 
-> In order to stop things being too far to the left,
-> which is perhaps the intent of the current indention scheme,
-> the return type of the function can be moved to it's own line.
-> 
-> static inline int
-> copy_struct_from_sockptr(void *dst, size_t ksize, sockptr_t src, size_t usize)
+...
 
-Well, that would be a bit more GNU coding-style alike. Which I don't
-mind, I can do that. Albeit it's a bit contrary to an example from
-kernel's coding-style, where it seems preferred to keep it on the same
-line with function name and rather not to indent argument list, see
-(6.1), second example with action().
+> > 
+> >> +		struct tcp_ao_key *rnext_key;
+> >> +		struct tcp_ao_info *ao_info;
+> >> +		u8 maclen;
+> >>  
+> >> +		if (WARN_ON_ONCE(!ao_key))
+> >> +			goto out_ao;
+> >> +		ao_info = rcu_dereference_check(tp->ao_info,
+> >> +				lockdep_sock_is_held(&tp->inet_conn.icsk_inet.sk));
+> > 
+> > Checkpatch complains about indentation here.
+> > 
+> > Rather than point out each case in the series,
+> > could I ask you to run ./scripts/checkpatch.pl --strict over the patchset?
+> 
+> Yeah, but then it won't fit 80 columns here. As both aren't hard
+> requirements I tend to comply with 80 columns more than to indentation.
+> In this particular case I'll check if it could be a helper function.
+> If it won't make sense to separate it as a helper, I'll just move it to
+> the same line than, breaking 80 columns limit.
 
-Yet, I don't feel particularly strong on either of options, so I can
-just do as you suggest.
+Thanks, I missed the 80 column thing here.
+I'd actually think that what you have is better than an extra long line.
+But it's your call.
 
-> 
-> ...
-> 
->> diff --git a/include/net/tcp.h b/include/net/tcp.h
-> 
-> ...
-> 
->> +static inline int ipv4_prefix_cmp(const struct in_addr *addr1,
->> +				  const struct in_addr *addr2,
->> +				  unsigned int prefixlen)
->> +{
->> +	__be32 mask = inet_make_mask(prefixlen);
->> +
->> +	if ((addr1->s_addr & mask) == (addr2->s_addr & mask))
->> +		return 0;
->> +	return ((addr1->s_addr & mask) > (addr2->s_addr & mask)) ? 1 : -1;
->> +}
-> 
-> Above, '>' is operating on two big endian values.
-> But typically such maths operates on host byte order values.
-> 
-> Flagged by Sparse.
-
-Yeah, the function just has to provide any way to compare keys.
-So, it's not very important, but just to silence Sparse I can convert
-them to host's byte order before the comparison.
-
-> 
-> ...
-> 
->> +static struct tcp_ao_key *__tcp_ao_do_lookup(const struct sock *sk,
->> +		const union tcp_ao_addr *addr, int family, u8 prefix,
->> +		int sndid, int rcvid, u16 port)
-> 
-> Same comment about indentation as above.
-> 
-> static struct tcp_ao_key *
-> __tcp_ao_do_lookup(const struct sock *sk, const union tcp_ao_addr *addr,
-> 		   int family, u8 prefix, int sndid, int rcvid, u16 port)
-> 
-> ...
-> 
->> +struct tcp_ao_key *tcp_ao_do_lookup(const struct sock *sk,
->> +				    const union tcp_ao_addr *addr,
->> +				    int family, int sndid, int rcvid, u16 port)
-> 
-> Should tcp_ao_do_lookup be static?
-> It seems to only be used in this file.
-
-Yeah, indeed. I think, I noticed previously, but probably managed to
-forget. Will fix.
-
-> 
-> ...
-> 
->> +static int tcp_ao_verify_port(struct sock *sk, u16 port)
->> +{
->> +	struct inet_sock *inet = inet_sk(sk);
->> +
->> +	if (port != 0) /* FIXME */
-> 
-> I guess this should be fixed :)
-
-Fair enough. I think, what I'll do is to remove from these initial
-patches TCP-port from uAPI: we've expected that it will be useful to
-implement port-matching, but so far none from customers requested it.
-So, it was left as reserved member in uAPI, not meant to be used just yet.
-
-Separately, as I've made UAPI structures for setsockopt() extendable,
-see copy_struct_from_sockptr() and the extendable syscall ideas
-(unfortunately, not in Documentation/):
-https://lpc.events/event/7/contributions/657/attachments/639/1159/extensible_syscalls.pdf
-https://lwn.net/Articles/830666/
-
-So, as those structs can be extended in future, it won't be any hard to
-add port-matching on the top of the patch set. RFC5925 is permissive on
-how IP address and TCP-port matching may be performed:
-
-: TCP connection identifier. A TCP socket pair, i.e., a local IP
-: address, a remote IP address, a TCP local port, and a TCP remote port.
-: Values can be partially specified using ranges (e.g., 2-30), masks
-: (e.g., 0xF0), wildcards (e.g., "*"), or any other suitable indication.
-
-I can see some utility of TCP-AO key port-range matching and it seems
-most useful/flexible, so I'll add that. Unsure if that will go in
-version 9 or rather later (even post-merge).
-
-I probably have to add something on that mater to
-Documentation/networking/tcp_ao.rst as well.
-
->> +		return -EINVAL;
->> +
->> +	/* Check that MKT port is consistent with socket */
->> +	if (port != 0 && inet->inet_dport != 0 && port != inet->inet_dport)
-> 
-> port is host byte order, but inet->inet_dport is big endian.
-> This does not seem correct.
-
-Thanks.
-
-> 
->> +		return -EINVAL;
->> +
->> +	return 0;
->> +}
-> 
-> ...
-> 
->> +static int tcp_ao_parse_crypto(struct tcp_ao_add *cmd, struct tcp_ao_key *key)
->> +{
->> +	unsigned int syn_tcp_option_space;
->> +	bool is_kdf_aes_128_cmac = false;
->> +	struct crypto_ahash *tfm;
->> +	struct tcp_sigpool hp;
->> +	void *tmp_key = NULL;
->> +	int err;
->> +
->> +	/* RFC5926, 3.1.1.2. KDF_AES_128_CMAC */
->> +	if (!strcmp("cmac(aes128)", cmd->alg_name)) {
->> +		strscpy(cmd->alg_name, "cmac(aes)", sizeof(cmd->alg_name));
->> +		is_kdf_aes_128_cmac = (cmd->keylen != 16);
->> +		tmp_key = kmalloc(cmd->keylen, GFP_KERNEL);
->> +		if (!tmp_key)
->> +			return -ENOMEM;
->> +	}
->> +
->> +	key->maclen = cmd->maclen ?: 12; /* 12 is the default in RFC5925 */
->> +
->> +	/* Check: maclen + tcp-ao header <= (MAX_TCP_OPTION_SPACE - mss
->> +	 *					- tstamp - wscale - sackperm),
->> +	 * see tcp_syn_options(), tcp_synack_options(), commit 33ad798c924b.
->> +	 *
->> +	 * In order to allow D-SACK with TCP-AO, the header size should be:
->> +	 * (MAX_TCP_OPTION_SPACE - TCPOLEN_TSTAMP_ALIGNED
->> +	 *			- TCPOLEN_SACK_BASE_ALIGNED
->> +	 *			- 2 * TCPOLEN_SACK_PERBLOCK) = 8 (maclen = 4),
->> +	 * see tcp_established_options().
->> +	 *
->> +	 * RFC5925, 2.2:
->> +	 * Typical MACs are 96-128 bits (12-16 bytes), but any length
->> +	 * that fits in the header of the segment being authenticated
->> +	 * is allowed.
->> +	 *
->> +	 * RFC5925, 7.6:
->> +	 * TCP-AO continues to consume 16 bytes in non-SYN segments,
->> +	 * leaving a total of 24 bytes for other options, of which
->> +	 * the timestamp consumes 10.  This leaves 14 bytes, of which 10
->> +	 * are used for a single SACK block. When two SACK blocks are used,
->> +	 * such as to handle D-SACK, a smaller TCP-AO MAC would be required
->> +	 * to make room for the additional SACK block (i.e., to leave 18
->> +	 * bytes for the D-SACK variant of the SACK option) [RFC2883].
->> +	 * Note that D-SACK is not supportable in TCP MD5 in the presence
->> +	 * of timestamps, because TCP MD5’s MAC length is fixed and too
->> +	 * large to leave sufficient option space.
->> +	 */
->> +	syn_tcp_option_space = MAX_TCP_OPTION_SPACE;
->> +	syn_tcp_option_space -= TCPOLEN_TSTAMP_ALIGNED;
->> +	syn_tcp_option_space -= TCPOLEN_WSCALE_ALIGNED;
->> +	syn_tcp_option_space -= TCPOLEN_SACKPERM_ALIGNED;
->> +	if (tcp_ao_len(key) > syn_tcp_option_space) {
->> +		err = -EMSGSIZE;
->> +		goto err_kfree;
->> +	}
->> +
->> +	key->keylen = cmd->keylen;
->> +	memcpy(key->key, cmd->key, cmd->keylen);
->> +
->> +	err = tcp_sigpool_start(key->tcp_sigpool_id, &hp);
->> +	if (err)
->> +		goto err_kfree;
->> +
->> +	tfm = crypto_ahash_reqtfm(hp.req);
->> +	if (is_kdf_aes_128_cmac) {
->> +		void *scratch = hp.scratch;
->> +		struct scatterlist sg;
->> +
->> +		memcpy(tmp_key, cmd->key, cmd->keylen);
->> +		sg_init_one(&sg, tmp_key, cmd->keylen);
->> +
->> +		/* Using zero-key of 16 bytes as described in RFC5926 */
->> +		memset(scratch, 0, 16);
->> +		err = crypto_ahash_setkey(tfm, scratch, 16);
->> +		if (err)
->> +			goto err_pool_end;
->> +
->> +		err = crypto_ahash_init(hp.req);
->> +		if (err)
->> +			goto err_pool_end;
->> +
->> +		ahash_request_set_crypt(hp.req, &sg, key->key, cmd->keylen);
->> +		err = crypto_ahash_update(hp.req);
->> +		if (err)
->> +			goto err_pool_end;
->> +
->> +		err |= crypto_ahash_final(hp.req);
->> +		if (err)
->> +			goto err_pool_end;
->> +		key->keylen = 16;
->> +	}
->> +
->> +	err = crypto_ahash_setkey(tfm, key->key, key->keylen);
->> +	if (err)
->> +		goto err_pool_end;
->> +
->> +	tcp_sigpool_end(&hp);
->> +
->> +	if (tcp_ao_maclen(key) > key->digest_size)
->> +		return -EINVAL;
-> 
-> 		tmp_key appears to be leaked here.
-> 
->> +
->> +	return 0;
-> 
-> And here.
-> 
-> This is flagged by Smatch.
-
-Ouch. Yeah, the change from v7 that got rid of TCP_AO_MAX_HASH_SIZE and
-allocated traffic keys with kmalloc(), managed to add a leak as well.
-Thanks, will fix.
-
-> 
->> +
->> +err_pool_end:
->> +	tcp_sigpool_end(&hp);
->> +err_kfree:
->> +	kfree(tmp_key);
->> +	return err;
->> +}
-> 
-> ...
-> 
->> +static int tcp_ao_add_cmd(struct sock *sk, unsigned short int family,
->> +			  sockptr_t optval, int optlen)
->> +{
->> +	struct tcp_ao_info *ao_info;
->> +	union tcp_ao_addr *addr;
->> +	struct tcp_ao_key *key;
->> +	struct tcp_ao_add cmd;
->> +	int ret;
->> +	bool first = false;
->> +	u16 port;
-> 
-> Please use reverse xmas tree - longest line to shortest - for
-> local variable declarations in new Networking code.
-
-Will do.
-
-> 
->> +static int tcp_ao_del_cmd(struct sock *sk, unsigned short int family,
->> +			  sockptr_t optval, int optlen)
->> +{
->> +	struct tcp_ao_key *key, *new_current = NULL, *new_rnext = NULL;
->> +	struct tcp_ao_info *ao_info;
->> +	union tcp_ao_addr *addr;
->> +	struct tcp_ao_del cmd;
->> +	int err;
->> +	__u8 prefix;
->> +	__be16 port;
->> +	int addr_len;
->> +
->> +	if (optlen < sizeof(cmd))
->> +		return -EINVAL;
->> +
->> +	err = copy_struct_from_sockptr(&cmd, sizeof(cmd), optval, optlen);
->> +	if (err)
->> +		return err;
->> +
->> +	if (cmd.reserved != 0 || cmd.reserved2 != 0)
->> +		return -EINVAL;
->> +
->> +	if (cmd.set_current || cmd.set_rnext) {
->> +		if (!tcp_ao_can_set_current_rnext(sk))
->> +			return -EINVAL;
->> +	}
->> +
->> +	ao_info = setsockopt_ao_info(sk);
->> +	if (IS_ERR(ao_info))
->> +		return PTR_ERR(ao_info);
->> +	if (!ao_info)
->> +		return -ENOENT;
->> +
->> +	/* For sockets in TCP_CLOSED it's possible set keys that aren't
->> +	 * matching the future peer (address/port/VRF/etc),
->> +	 * tcp_ao_connect_init() will choose a correct matching MKT
->> +	 * if there's any.
->> +	 */
->> +	if (cmd.set_current) {
->> +		new_current = tcp_ao_established_key(ao_info, cmd.current_key, -1);
->> +		if (!new_current)
->> +			return -ENOENT;
->> +	}
->> +	if (cmd.set_rnext) {
->> +		new_rnext = tcp_ao_established_key(ao_info, -1, cmd.rnext);
->> +		if (!new_rnext)
->> +			return -ENOENT;
->> +	}
->> +
->> +	if (family == AF_INET) {
->> +		struct sockaddr_in *sin = (struct sockaddr_in *)&cmd.addr;
->> +
->> +		addr = (union tcp_ao_addr *)&sin->sin_addr;
->> +		addr_len = sizeof(struct in_addr);
->> +		port = ntohs(sin->sin_port);
-> 
-> port is big endian, but here it is assigned a host-byte order value.
-> It looks like port should be u16 rather than __bbe16.
-> 
-> As flagged by Smatch.
-> 
->> +	} else {
->> +		struct sockaddr_in6 *sin6 = (struct sockaddr_in6 *)&cmd.addr;
->> +		struct in6_addr *addr6 = &sin6->sin6_addr;
->> +
->> +		if (ipv6_addr_v4mapped(addr6)) {
->> +			addr = (union tcp_ao_addr *)&addr6->s6_addr32[3];
->> +			addr_len = sizeof(struct in_addr);
->> +			family = AF_INET;
->> +		} else {
->> +			addr = (union tcp_ao_addr *)addr6;
->> +			addr_len = sizeof(struct in6_addr);
->> +		}
->> +		port = ntohs(sin6->sin6_port);
-> 
-> Ditto.
-> 
->> +	}
->> +	prefix = cmd.prefix;
->> +
->> +	/* We could choose random present key here for current/rnext
->> +	 * but that's less predictable. Let's be strict and don't
->> +	 * allow removing a key that's in use. RFC5925 doesn't
->> +	 * specify how-to coordinate key removal, but says:
->> +	 * "It is presumed that an MKT affecting a particular
->> +	 * connection cannot be destroyed during an active connection"
->> +	 */
->> +	hlist_for_each_entry_rcu(key, &ao_info->head, node) {
->> +		if (cmd.sndid != key->sndid ||
->> +		    cmd.rcvid != key->rcvid)
->> +			continue;
->> +
->> +		if (family != key->family ||
->> +		    prefix != key->prefixlen ||
-> o
->> +		    port != key->port ||
-> 
-> There is a similar problem here too.
-> port is host byte order but key->port is big endian.
-> 
->> +		    memcmp(addr, &key->addr, addr_len))
->> +			continue;
->> +
->> +		if (key == new_current || key == new_rnext)
->> +			continue;
->> +
->> +		return tcp_ao_delete_key(sk, ao_info, key,
->> +					  new_current, new_rnext);
->> +	}
->> +	return -ENOENT;
->> +}
-> 
-> ...
-Thanks,
-             Dmitry
-
+...
 
