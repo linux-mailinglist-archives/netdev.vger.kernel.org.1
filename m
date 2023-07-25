@@ -1,123 +1,140 @@
-Return-Path: <netdev+bounces-20811-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20812-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3049676112C
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 12:47:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69200761148
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 12:49:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 621BD1C20E20
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 10:47:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2597A281839
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 10:49:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B74F14A82;
-	Tue, 25 Jul 2023 10:47:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3904314ABC;
+	Tue, 25 Jul 2023 10:49:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2046B8F59
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 10:47:51 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EF2810FA
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 03:47:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1690282069;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cJQzTxThR2VztifReyTpqJYEB15Fq8bQiVZuW+ew/e4=;
-	b=Ps6i0Hongw5zRQxlfpS/s36YRDiPn33dLzAQekFIq0tMUKlyakRs99grAsXgyP+LGshL0q
-	e5cBdSWGQ8tKz3l/qbw8NIlXxCyTZ/t0RWR3hC+mYCtRT4Aecfb10CcICMVLOTyxd4EOvB
-	tcaCJ5FKTSgZx3v8EjlX/uKyz5iwnSo=
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
- [209.85.160.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-235-3Vi7-DTaPDaUKriFxmMWyg-1; Tue, 25 Jul 2023 06:47:48 -0400
-X-MC-Unique: 3Vi7-DTaPDaUKriFxmMWyg-1
-Received: by mail-qt1-f200.google.com with SMTP id d75a77b69052e-403fcf7a9d0so14708641cf.1
-        for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 03:47:48 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CA6F14A82
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 10:49:32 +0000 (UTC)
+Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 916D71990;
+	Tue, 25 Jul 2023 03:49:30 -0700 (PDT)
+Received: by mail-lf1-x136.google.com with SMTP id 2adb3069b0e04-4fbf1f6c771so8343909e87.1;
+        Tue, 25 Jul 2023 03:49:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1690282169; x=1690886969;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:subject:cc:to:from:date:message-id:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=xKaUQGPjdDfYhdrv9D3r8wNt4DpcmSXfx9EIaio0fng=;
+        b=LXifjZ/mWLZLJKXUG1XZqUsk1oAAJ3pVW9sAqnUn03nM32YdNrljcxEpUHsCPFO4iH
+         WgGXpaVPLa4Q+eJm+c27T/IzKHrb9NqTmVq49XhlPfQuN+3/5E6eC13Zee4K82ON9D0F
+         /KMoYGpj2F2nQLA8B/Zl6XoINJPwrjzRjbX/wM0wOqOX8LecLwS15XnkgGJs8EM6vo+c
+         dzS5/Uvj5djmTI/pUfCdy/inviuUarpn8d2BDbBmrrRKGa0pTa64MV4EEfs/L5CERjsD
+         l8sCuqhUDkubDcqIxYe75AxGYWoAfSXnvhfU8dDZNN9Orjb6LczeiVNlIFAbm7VQ+fFX
+         xD1g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690282068; x=1690886868;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=cJQzTxThR2VztifReyTpqJYEB15Fq8bQiVZuW+ew/e4=;
-        b=Ib0yRwbxsSzGqVq1zIydGO1oypX4fPGaQjNVenjn+A39XZU8WW/i61JTPwsmtN+5F1
-         s1jVoViz1Ni9fDd5p3IKLjbQ3lvdpABQcXjpCFT8zF373VsKpI8m+3NHoxpR71Se2Ruu
-         vllZMy02DciS/JKG8d0lGUs5aRUGRqIRMfmv+xXjToZx1wFku5WV4OoFTWBu9hvMtakh
-         2P1JAM775gU+6CBltyS3rQDnIOH+zpgpJw6MN/pWwOj+UUjtvI/lE6Piu4KDBJtcLNaM
-         5ZiYq/n9NpjfE/7ezxHq+trBzXAeRDhQEeu9HXnU1AI6yy5Lp2oeseDYd6QnjRWafpjK
-         cY6A==
-X-Gm-Message-State: ABy/qLZS/LGFUNxwsbD65sf+Qp2RDCF1ric/bqt1obmpNQVgOfCOW2Lc
-	xdg9BIu00IThwT4Pc4HleChpny+hgbwK1Vk61xQCdlOzE9EbbyueSJTUIHQJioiMFuT5B0/hzja
-	wck7Tuf2MDNV8d9xb
-X-Received: by 2002:a05:622a:1aaa:b0:403:b001:be3b with SMTP id s42-20020a05622a1aaa00b00403b001be3bmr16350741qtc.6.1690282067919;
-        Tue, 25 Jul 2023 03:47:47 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlFjHyvT827bv8a2AuTUh1x1s/iWAmW8Ra4YOQK6zvLyQFYP6favS5UMjBOH1c4Mx8EEHJuvTQ==
-X-Received: by 2002:a05:622a:1aaa:b0:403:b001:be3b with SMTP id s42-20020a05622a1aaa00b00403b001be3bmr16350721qtc.6.1690282067601;
-        Tue, 25 Jul 2023 03:47:47 -0700 (PDT)
-Received: from gerbillo.redhat.com (146-241-225-81.dyn.eolo.it. [146.241.225.81])
-        by smtp.gmail.com with ESMTPSA id a6-20020ac86106000000b0040697ea156asm1353597qtm.52.2023.07.25.03.47.45
+        d=1e100.net; s=20221208; t=1690282169; x=1690886969;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:subject:cc:to:from:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xKaUQGPjdDfYhdrv9D3r8wNt4DpcmSXfx9EIaio0fng=;
+        b=j78iCSgvNgZGkuQzg4F/ITiT0XUsAMDjUe2eROdxzCjQU2T+x5U8UDciVAXm/1NVN0
+         NlkSk+Q0AJw94wYZW1YwNYKQ4xIylbfgxanIGLoLGp1CYTp6EkFyuUJcjVWb8p4phca6
+         3FOjkEGgbOdiLRnY+Osx1YfGwQruw+mT8r7j5FioW6jqb3LnLUQle6nX1veA1i5rDJCu
+         cVZB1hnWfoq1EURCP3zBoUf55zn43dPFIMOCPpxNDMhI+KzzGiiXgAXdi6iDpOUU168u
+         uNtQfkcTYkuYt7tUfiQljSYOlZixdSMG8Z2TnwR8LvNMecKnlF4sDwbTYv4Mh3gOD+Ae
+         gT9Q==
+X-Gm-Message-State: ABy/qLYG3wnaKMHVp9//840yrHkfM4IIB7oo4wjMkaCHVWItrD9l0oMH
+	4jv3AHsUjMSTXI52v7KOo8fi/uPxNSTRZgrQ
+X-Google-Smtp-Source: APBJJlFHZDa5JGiPNcdmSGdDvacm6f4uAn24FLGnr6AtF453L+WG4jkhfRjsQnNjWdBVI1BQRpG/eg==
+X-Received: by 2002:a19:6755:0:b0:4f8:5bf7:db05 with SMTP id e21-20020a196755000000b004f85bf7db05mr7354401lfj.27.1690282168453;
+        Tue, 25 Jul 2023 03:49:28 -0700 (PDT)
+Received: from akanner-r14. ([77.222.25.78])
+        by smtp.gmail.com with ESMTPSA id c20-20020a197614000000b004edc72be17csm2695943lff.2.2023.07.25.03.49.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Jul 2023 03:47:47 -0700 (PDT)
-Message-ID: <e1cdc94be0e515a5de9d4af8fccfd99e25435b73.camel@redhat.com>
-Subject: Re: [PATCH net-next v3] net: dsa: mv88e6xxx: Add erratum 3.14 for
- 88E6390X and 88E6190X
-From: Paolo Abeni <pabeni@redhat.com>
-To: Ante Knezic <ante.knezic@helmholz.de>, "Russell King (Oracle)"
-	 <rmk+kernel@armlinux.org.uk>
-Cc: andrew@lunn.ch, davem@davemloft.net, edumazet@google.com, 
-	f.fainelli@gmail.com, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, olteanv@gmail.com
-Date: Tue, 25 Jul 2023 12:47:43 +0200
-In-Reply-To: <20230725095925.25121-1-ante.knezic@helmholz.de>
-References: <30e262679bfdfd975c2880b990fe8375b9860aab.camel@redhat.com>
-	 <20230725095925.25121-1-ante.knezic@helmholz.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+        Tue, 25 Jul 2023 03:49:27 -0700 (PDT)
+Message-ID: <64bfa8b7.190a0220.b6db7.53b7@mx.google.com>
+X-Google-Original-Message-ID: <ZL+otOFR1r507Opz@akanner-r14.>
+Date: Tue, 25 Jul 2023 13:49:24 +0300
+From: Andrew Kanner <andrew.kanner@gmail.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, netdev@vger.kernel.org, brouer@redhat.com,
+	linux-kernel@vger.kernel.org,
+	linux-kernel-mentees@lists.linuxfoundation.org,
+	syzbot+f817490f5bd20541b90a@syzkaller.appspotmail.com
+Subject: Re: [PATCH 2/2] drivers: net: prevent tun_can_build_skb() to exceed
+ xdp size limits
+References: <20230724221326.384-1-andrew.kanner@gmail.com>
+ <20230724221326.384-2-andrew.kanner@gmail.com>
+ <CACGkMEt+LW8FBNwcn6f0cBwTOuKy+ZPy3Smg6fJgo9OrCUAOjQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-	version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CACGkMEt+LW8FBNwcn6f0cBwTOuKy+ZPy3Smg6fJgo9OrCUAOjQ@mail.gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-[adding Russell]
-On Tue, 2023-07-25 at 11:59 +0200, Ante Knezic wrote:
-> On Tue, 25 Jul 2023 10:56:25 +0200 Paolo Abeni wrote
-> > It looks like you are ignoring the errors reported by
-> > mv88e6390_erratum_3_14(). Should the above be:
-> >=20
-> > 		return mv88e6390_erratum_3_14(mpcs);
-> >=20
-> > instead?
-> >=20
->=20
-> I guess you are right. Would it make sense to do the evaluation for the=
-=20
-> 	mv88e639x_sgmii_pcs_control_pwr(mpcs, true);
-> above as well?
+On Tue, Jul 25, 2023 at 11:39:46AM +0800, Jason Wang wrote:
+> On Tue, Jul 25, 2023 at 6:15 AM Andrew Kanner <andrew.kanner@gmail.com> wrote:
+> >
+> > Tested with syzkaller repro with reduced packet size. It was
+> > discovered that XDP_PACKET_HEADROOM is not checked in
+> > tun_can_build_skb(), although pad may be incremented in
+> > tun_build_skb().
+> >
+> > Fixes: 7df13219d757 ("tun: reserve extra headroom only when XDP is set")
+> > Link: https://syzkaller.appspot.com/text?tag=ReproC&x=12b2593ea80000
+> > Signed-off-by: Andrew Kanner <andrew.kanner@gmail.com>
+> > ---
+> >  drivers/net/tun.c | 8 +++++++-
+> >  1 file changed, 7 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+> > index 18ccbbe9830a..cdf2bd85b383 100644
+> > --- a/drivers/net/tun.c
+> > +++ b/drivers/net/tun.c
+> > @@ -1582,7 +1582,13 @@ static void tun_rx_batched(struct tun_struct *tun, struct tun_file *tfile,
+> >  static bool tun_can_build_skb(struct tun_struct *tun, struct tun_file *tfile,
+> >                               int len, int noblock, bool zerocopy, int *skb_xdp)
+> >  {
+> > -       if (SKB_DATA_ALIGN(len + TUN_RX_PAD) +
+> > +       int pad = TUN_RX_PAD;
+> > +       struct bpf_prog *xdp_prog = rcu_dereference(tun->xdp_prog);
+> 
+> This misses rcu read lock.
+> 
+> I wonder if things could be simpler if we move the limit check from
+> tun_can_build_skb() to tun_build_skb():
+> 
+> rcu_read_lock();
+> xdp_prog = rcu_dereference(tun->xdp_prog);
+>         if (xdp_prog)
+>                 pad += XDP_PACKET_HEADROOM;
+> buflen += SKB_DATA_ALIGN(len + pad);
+> rcu_read_unlock();
+> 
+> Thanks
+> 
 
-Good question ;) it looks like pcs_post_config() errors are always
-ignored by the core, but I guess it's better to report them as
-accurately as possible.
+Thanks, I missed the part with rcu read lock for some reason.
 
-@Russell, what it your preference here, should we just ignore the
-generate errors earlier, or try to propagate them to the core/phylink,
-should that later be changed to deal with them?
+It's a good idea to move / reduce duplication. Let me think and try to
+fix according to your comments, I will resend it as v2.
 
-Thanks,
-
-Paolo
-
+-- 
+Andrew Kanner
 
