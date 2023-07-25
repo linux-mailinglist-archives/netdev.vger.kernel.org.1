@@ -1,77 +1,126 @@
-Return-Path: <netdev+bounces-21018-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21019-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 871B37622BA
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 21:56:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 859357622CB
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 21:59:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B87741C20F92
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 19:56:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 415FD2819E7
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 19:59:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 896F826B14;
-	Tue, 25 Jul 2023 19:56:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F14B26B1B;
+	Tue, 25 Jul 2023 19:59:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FA362516D
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 19:56:03 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9CFB4C433C7;
-	Tue, 25 Jul 2023 19:56:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B22226B17
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 19:59:29 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82604C4167D;
+	Tue, 25 Jul 2023 19:59:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690314963;
-	bh=GiXQu/nD8DNTAps01d2gInzs5Y3/qwmhEDn60fHTXNc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=V2y6Y1HJ2urzh7TOYLE5dX/DhXm07qPkuUdUmM9FSyxBGbCikHDt7bKkVl1f4ictT
-	 jsfMI1oiafgXo3vqvhAmrWGzOpShV20VY8ImYhGtW2Mrzx/eHpj0Bx15JIPvzsH6Hr
-	 AyJXL9YDzBa1haqs/6/IVjlYz1XAvBRMh/dbje22tBMFnWPZkxF29wSnamY4p3eHQy
-	 qkqyclynQ8VFIbFZ/7n5lTOtHHMbHTR1jIevefLhtKdsgQ8FDf9RCcxeCvTUkd/rjU
-	 jsLw39GdxVXXh6Dm8ZxoagaoxwOgM0QkbTbdHJ70qhnl0V9YunOICB46M9DcBQiOb9
-	 otVlAUiij8ckg==
-Date: Tue, 25 Jul 2023 12:56:01 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Joe Perches <joe@perches.com>
-Cc: Lin Ma <linma@zju.edu.cn>, jhs@mojatatu.com, xiyou.wangcong@gmail.com,
- jiri@resnulli.us, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] net/sched: mqprio: Add length check for
- TCA_MQPRIO_{MAX/MIN}_RATE64
-Message-ID: <20230725125601.7ec04aa5@kernel.org>
-In-Reply-To: <4ce3c7a980be3ce9012ba02a5d9d4285cdf4fd07.camel@perches.com>
-References: <20230724014625.4087030-1-linma@zju.edu.cn>
-	<20230724160214.424573ac@kernel.org>
-	<63d69a72.e2656.1898a66ca22.Coremail.linma@zju.edu.cn>
-	<20230724175612.0649ef67@kernel.org>
-	<d02a90c5ca1475c27e06d3d592bac89ab17b37ea.camel@perches.com>
-	<20230725123842.546045f1@kernel.org>
-	<4ce3c7a980be3ce9012ba02a5d9d4285cdf4fd07.camel@perches.com>
+	s=k20201202; t=1690315169;
+	bh=jVkGbzOh79AEXIeMVY1s/WgLpPOOReQVmsy9pu11HgA=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=RK+5U9OHGM5kVctFC0fXVoH/MPRkxl3yqjH0JkiqY14J62a84cAuHHldU+QJmZwJw
+	 m+XqPzyLakTqHV2HXVcWKWGF1mJiOi483ksql83UAjacp2W+449PAc1Gy7ne7EwyeR
+	 MsoU56g+i2jjsXGJeJINbc52BCaV8HU0tYJJ7er833v7XkogTWiQi1fNS2kICYDa74
+	 P8CPb6B9Topo5JelE0Q1Pj/c79T5XDlopvnCrd/HqoNTziMh4A4pI0EHt0afJyJ7vk
+	 ha8zpcp3YQiQ9ilYgEvI8y/bppIY1jkW6W5qaFxm4Z0AGFxqSgeeGZwG6UB78Vkakt
+	 mzVNJZl4/0d6w==
+Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-2b74fa5e7d7so86559981fa.2;
+        Tue, 25 Jul 2023 12:59:29 -0700 (PDT)
+X-Gm-Message-State: ABy/qLbI9Y5P+8UuUMiQS5vzxtUz9KqZZjgFLvu9EGq2SorJqdtBXn4t
+	LKHbvRFikbW9zfYVyMFFWmvhSHIWureFQRetTg==
+X-Google-Smtp-Source: APBJJlFwGjXaJCJydGIeGV4iVYCIq6ysqPH1CxKSwb/h2lZDdMtrrV65McGRvNB57SLo+rUN/j76IhUhQXfq96gAGDg=
+X-Received: by 2002:a2e:8786:0:b0:2b6:dd26:c02a with SMTP id
+ n6-20020a2e8786000000b002b6dd26c02amr8693672lji.14.1690315146580; Tue, 25 Jul
+ 2023 12:59:06 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20230724212222.809909-1-robh@kernel.org> <ZMAD25Yp6gCNq+wH@corigine.com>
+In-Reply-To: <ZMAD25Yp6gCNq+wH@corigine.com>
+From: Rob Herring <robh@kernel.org>
+Date: Tue, 25 Jul 2023 13:58:54 -0600
+X-Gmail-Original-Message-ID: <CAL_Jsq+UYF79tUWvHh=5AfrERJPvFRaV4vh1mnbYn_nNjOQTcw@mail.gmail.com>
+Message-ID: <CAL_Jsq+UYF79tUWvHh=5AfrERJPvFRaV4vh1mnbYn_nNjOQTcw@mail.gmail.com>
+Subject: Re: [PATCH v2] net: Explicitly include correct DT includes
+To: Simon Horman <simon.horman@corigine.com>
+Cc: Andreas Larsson <andreas@gaisler.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Iyappan Subramanian <iyappan@os.amperecomputing.com>, 
+	Keyur Chudgar <keyur@os.amperecomputing.com>, Chris Snook <chris.snook@gmail.com>, 
+	Nicolas Ferre <nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@microchip.com>, 
+	Madalin Bucur <madalin.bucur@nxp.com>, Claudiu Manoil <claudiu.manoil@nxp.com>, 
+	Vladimir Oltean <vladimir.oltean@nxp.com>, Wei Fang <wei.fang@nxp.com>, 
+	Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, 
+	NXP Linux Team <linux-imx@nxp.com>, Sean Anderson <sean.anderson@seco.com>, 
+	Pantelis Antoniou <pantelis.antoniou@gmail.com>, Li Yang <leoyang.li@nxp.com>, 
+	Yisen Zhuang <yisen.zhuang@huawei.com>, Salil Mehta <salil.mehta@huawei.com>, 
+	Douglas Miller <dougmill@linux.ibm.com>, Marcin Wojtas <mw@semihalf.com>, 
+	Russell King <linux@armlinux.org.uk>, Taras Chorny i <taras.chornyi@plvision.eu>, 
+	Mirko Lindner <mlindner@marvell.com>, Stephen Hemminger <stephen@networkplumber.org>, 
+	Felix Fietkau <nbd@nbd.name>, John Crispin <john@phrozen.org>, Sean Wang <sean.wang@mediatek.com>, 
+	Mark Lee <Mark-MC.Lee@mediatek.com>, Lorenzo Bianconi <lorenzo@kernel.org>, 
+	Matthias Brugger <matthias.bgg@gmail.com>, 
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
+	Horatiu Vultur <horatiu.vultur@microchip.com>, UNGLinuxDriver@microchip.com, 
+	Alexandre Belloni <alexandre.belloni@bootlin.com>, Timur Tabi <timur@kernel.org>, 
+	Sergey Shtylyov <s.shtylyov@omp.ru>, Steve Glendinning <steve.glendinning@shawell.net>, 
+	Kunihiko Hayashi <hayashi.kunihiko@socionext.com>, 
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Jose Abreu <joabreu@synopsys.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+	Shawn Guo <shawnguo@kernel.org>, Sascha Hauer <s.hauer@pengutronix.de>, 
+	Pengutronix Kernel Team <kernel@pengutronix.de>, Fabio Estevam <festevam@gmail.com>, 
+	Neil Armstrong <neil.armstrong@linaro.org>, Kevin Hilman <khilman@baylibre.com>, 
+	Jerome Brunet <jbrunet@baylibre.com>, 
+	Martin Blumenstingl <martin.blumenstingl@googlemail.com>, Vinod Koul <vkoul@kernel.org>, 
+	Bhupesh Sharma <bhupesh.sharma@linaro.org>, Emil Renner Berthing <kernel@esmil.dk>, 
+	Samin Guo <samin.guo@starfivetech.com>, Chen-Yu Tsai <wens@csie.org>, 
+	Jernej Skrabec <jernej.skrabec@gmail.com>, Samuel Holland <samuel@sholland.org>, 
+	Thierry Reding <thierry.reding@gmail.com>, Jonathan Hunter <jonathanh@nvidia.com>, 
+	Nobuhiro Iwamatsu <nobuhiro1.iwamatsu@toshiba.co.jp>, 
+	Grygorii Strashko <grygorii.strashko@ti.com>, Kevin Brace <kevinbrace@bracecomputerlab.com>, 
+	Francois Romieu <romieu@fr.zoreil.com>, Michal Simek <michal.simek@amd.com>, 
+	Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>, Alexander Aring <alex.aring@gmail.com>, 
+	Stefan Schmidt <stefan@datenfreihafen.org>, Miquel Raynal <miquel.raynal@bootlin.com>, 
+	Alex Elder <elder@kernel.org>, A ndrew Lunn <andrew@lunn.ch>, 
+	Heiner Kallweit <hkallweit1@gmail.com>, Richard Cochran <richardcochran@gmail.com>, 
+	Alex Elder <elder@linaro.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linuxppc-dev@lists.ozlabs.org, linux-arm-kernel@lists.infradead.org, 
+	linux-mediatek@lists.infradead.org, linux-renesas-soc@vger.kernel.org, 
+	linux-stm32@st-md-mailman.stormreply.com, linux-amlogic@lists.infradead.org, 
+	linux-oxnas@groups.io, linux-arm-msm@vger.kernel.org, 
+	linux-sunxi@lists.linux.dev, linux-tegra@vger.kernel.org, 
+	linux-omap@vger.kernel.org, linux-wpan@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 25 Jul 2023 12:50:00 -0700 Joe Perches wrote:
-> > > What do you think the "case" is here?
-> > > 
-> > > Do you think John Fastabend, who hasn't touched the file in 7+ years
-> > > should be cc'd?  Why?  
-> > 
-> > Nope. The author of the patch under Fixes.  
-> 
-> It adds that already since 2019.
+On Tue, Jul 25, 2023 at 11:18=E2=80=AFAM Simon Horman <simon.horman@corigin=
+e.com> wrote:
+>
+> On Mon, Jul 24, 2023 at 03:22:16PM -0600, Rob Herring wrote:
+>
+> ...
+>
+> >  90 files changed, 88 insertions(+), 92 deletions(-)
+>
+> Hi Rob,
+>
+> I suppose that it's reasonable to take this patch through netdev.
+> But it does have a pretty wide surface, and netdev moves a lot.
+>
+> As it stands the patch doesn't apply due to a conflict
+> in dwmac-qcom-ethqos.c
 
-Which is awesome! But for that to work you have to run get_maintainer
-on the patchfile not the file paths. Lin Ma used:
+It did yesterday... Anyways, looks like 0-day decided to find something els=
+e.
 
-  # ./scripts/get_maintainer.pl net/sched/sch_mqprio.c
-
-That's what I keep complaining about. People run get_maintainer on
-paths and miss out on all the get_maintainer features which need 
-to see the commit message.
+Rob
 
