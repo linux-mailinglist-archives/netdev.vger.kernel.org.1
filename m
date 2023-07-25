@@ -1,145 +1,124 @@
-Return-Path: <netdev+bounces-20986-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20985-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64700762122
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 20:16:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3AFF7620EC
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 20:05:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 95B471C20F6D
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 18:16:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5DEBF2819C9
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 18:05:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65579263A0;
-	Tue, 25 Jul 2023 18:16:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 701C32593C;
+	Tue, 25 Jul 2023 18:05:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A53623BF5
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 18:16:23 +0000 (UTC)
-Received: from mx07-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77958E9;
-	Tue, 25 Jul 2023 11:16:20 -0700 (PDT)
-Received: from pps.filterd (m0046661.ppops.net [127.0.0.1])
-	by mx07-00178001.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36PDW7hH010621;
-	Tue, 25 Jul 2023 18:43:56 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding : content-type; s=selector1;
- bh=MqeCBr2iwB1ylpsZybUxjhY2AMLlO6u0i1cPCCrgpvE=;
- b=FcPygnpCmMRI4rYBfElPZ87KsqmzW5pFp7vAN9QNFeuHFaL2YEADnymUZrxcsZH+LuF/
- Zh2VGnjH6LPaiwLFPWgKnH9nEE/C2l6SvZ0s0l54VOrcgS6V9pPa5DfsE3auCVlfpBZ4
- KmvNUYN40YMUDrIg9Z1MdijvkMdnKGw+fJDkDyFbDh8GgDbZwABkKwr5ZDYhJjTc36KS
- g0x9vNXFxARKJNywnoSoZQWZWHGvLf/W6k21N0AInd1zoMTodVOfQVh/6g971RhU3NRI
- SXpJCegoMFVbE+qnqwDjPuZpO4VjOrm4aOck+kFu6V58OOIPFHVMaGF4OgpoeFvhV3fm uw== 
-Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
-	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3s2bkbjqrb-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 25 Jul 2023 18:43:56 +0200
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-	by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 1D06210002A;
-	Tue, 25 Jul 2023 18:43:56 +0200 (CEST)
-Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
-	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 0F5FA27FAB5;
-	Tue, 25 Jul 2023 18:43:56 +0200 (CEST)
-Received: from localhost (10.201.21.121) by SHFDAG1NODE1.st.com (10.75.129.69)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.21; Tue, 25 Jul
- 2023 18:43:55 +0200
-From: Gatien Chevallier <gatien.chevallier@foss.st.com>
-To: <Oleksii_Moisieiev@epam.com>, <gregkh@linuxfoundation.org>,
-        <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <robh+dt@kernel.org>, <krzysztof.kozlowski+dt@linaro.org>,
-        <conor+dt@kernel.org>, <alexandre.torgue@foss.st.com>,
-        <vkoul@kernel.org>, <jic23@kernel.org>, <olivier.moysan@foss.st.com>,
-        <arnaud.pouliquen@foss.st.com>, <mchehab@kernel.org>,
-        <fabrice.gasnier@foss.st.com>, <andi.shyti@kernel.org>,
-        <ulf.hansson@linaro.org>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <hugues.fruchet@foss.st.com>, <lee@kernel.org>,
-        <will@kernel.org>, <catalin.marinas@arm.com>, <arnd@kernel.org>,
-        <richardcochran@gmail.com>, Frank Rowand <frowand.list@gmail.com>
-CC: <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-        <dmaengine@vger.kernel.org>, <linux-i2c@vger.kernel.org>,
-        <linux-iio@vger.kernel.org>, <alsa-devel@alsa-project.org>,
-        <linux-media@vger.kernel.org>, <linux-mmc@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <linux-phy@lists.infradead.org>,
-        <linux-serial@vger.kernel.org>, <linux-spi@vger.kernel.org>,
-        <linux-usb@vger.kernel.org>,
-        Gatien Chevallier
-	<gatien.chevallier@foss.st.com>
-Subject: [PATCH v2 08/11] arm64: dts: st: add RIFSC as a domain controller for STM32MP25x boards
-Date: Tue, 25 Jul 2023 18:41:01 +0200
-Message-ID: <20230725164104.273965-9-gatien.chevallier@foss.st.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20230725164104.273965-1-gatien.chevallier@foss.st.com>
-References: <20230725164104.273965-1-gatien.chevallier@foss.st.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E66623BF5
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 18:05:24 +0000 (UTC)
+Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D4B31FDA
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 11:05:23 -0700 (PDT)
+Received: by mail-pf1-x431.google.com with SMTP id d2e1a72fcca58-666e6ecb52dso3367592b3a.2
+        for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 11:05:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1690308322; x=1690913122;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=k3CgSLVd+ZJZDKViTXj5kj6HukYvGzOacB2xw6mmHcM=;
+        b=V1janKDTCtoEJMuRDBKb4bK0rLgCDBydI2KJlrsUASSn3OoghO1mOl7fqbQprhWQZZ
+         nypUqx6QourAeNau9sNh0O87GrJYPESRKXV0a/aUvIIpXov5RiXC0j8Ron4DuYkXVMft
+         gwDyzcjrSs6nK9Jg1VGz/vAK8QcLeMouBOS9U=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690308322; x=1690913122;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=k3CgSLVd+ZJZDKViTXj5kj6HukYvGzOacB2xw6mmHcM=;
+        b=Ed09haDFDb/bKuDnj+F+rtCm5VboUorfSJNYBT2dLpJpp2ZRRojS9f/mG0w/dRBWrG
+         pclb0074gSC5WijGKJiGQCrlCOXfYYJLilIjcOg2Y6rhz83Absdkem4WQG7XLHi+gWeK
+         YvesYQhvtMJQ1QHZN9nowViynxngLRR4S6O0xdjiw76GEXMinaPXppupbYoUJhaa09n/
+         kyBUMacOdcy33nRW/UNKQXQdeeujcWh8q5Y4xBmQgZb6wBv22WHXeoJrcdrnAd2hBTM4
+         T5JWdH69g5rtx3LfxtQvPiTeJ6+9r7hSGfqXH4lO5kpgS5GsdqMk2i0tpzXJD6um1WAQ
+         bOkw==
+X-Gm-Message-State: ABy/qLZT0LnqjELYsAhvLJx9Ks1/D6nxB9Emhxx2MhvZTxwlL6zy1np9
+	EThx5fMiAr8P48V/URWaIxhoFA==
+X-Google-Smtp-Source: APBJJlGvAuwT7k+zZsz3aTxOIAebyGVrDMgqWiqCkTi96U8qv/Bp0HFGepay6fLgvRxh3A+XiJWKYQ==
+X-Received: by 2002:a17:902:a607:b0:1b9:ea60:cd91 with SMTP id u7-20020a170902a60700b001b9ea60cd91mr25793plq.7.1690308322503;
+        Tue, 25 Jul 2023 11:05:22 -0700 (PDT)
+Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
+        by smtp.gmail.com with ESMTPSA id m1-20020a170902db0100b001bb9883714dsm5612090plx.143.2023.07.25.11.05.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 25 Jul 2023 11:05:22 -0700 (PDT)
+Date: Tue, 25 Jul 2023 11:05:21 -0700
+From: Kees Cook <keescook@chromium.org>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	Breno Leitao <leitao@debian.org>,
+	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
+Subject: Re: [PATCH v3 net 0/2] net: Fix error/warning by
+ -fstrict-flex-arrays=3.
+Message-ID: <202307251104.74C96AF830@keescook>
+References: <20230724213425.22920-1-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.201.21.121]
-X-ClientProxiedBy: SHFCAS1NODE2.st.com (10.75.129.73) To SHFDAG1NODE1.st.com
- (10.75.129.69)
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-07-25_08,2023-07-25_01,2023-05-22_02
-X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230724213425.22920-1-kuniyu@amazon.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-RIFSC is a firewall controller. Change its compatible so that is matches
-the documentation and reference RIFSC as a feature-domain-controller.
+On Mon, Jul 24, 2023 at 02:34:23PM -0700, Kuniyuki Iwashima wrote:
+> df8fc4e934c1 ("kbuild: Enable -fstrict-flex-arrays=3") started applying
+> strict rules for standard string functions (strlen(), memcpy(), etc.) if
+> CONFIG_FORTIFY_SOURCE=y.
+> 
+> This series fixes two false positives caught by syzkaller.
+> 
+> 
+> Changes:
+>   v3:
+>     * Drop Reviewed-by
+>     * Patch 1: Use strnlen()
+>     * Patch 2: Add a new flex array member
+> 
+>   v2: https://lore.kernel.org/netdev/20230720004410.87588-1-kuniyu@amazon.com/
+>     * Patch 2: Fix offset calc.
+> 
+>   v1: https://lore.kernel.org/netdev/20230719185322.44255-1-kuniyu@amazon.com/
+> 
+> 
+> Kuniyuki Iwashima (2):
+>   af_unix: Fix fortify_panic() in unix_bind_bsd().
+>   af_packet: Fix warning of fortified memcpy() in packet_getname().
+> 
+>  include/uapi/linux/if_packet.h | 6 +++++-
+>  net/packet/af_packet.c         | 2 +-
+>  net/unix/af_unix.c             | 6 ++----
+>  3 files changed, 8 insertions(+), 6 deletions(-)
+> 
+> -- 
+> 2.30.2
+> 
 
-Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
----
+Thanks for updating and testing!
 
-Changes in V2:
-	- Fix rifsc node name
-	- Move the "ranges" property under the
-	  "feature-domains" one
+Reviewed-by: Kees Cook <keescook@chromium.org>
 
- arch/arm64/boot/dts/st/stm32mp251.dtsi | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
-
-diff --git a/arch/arm64/boot/dts/st/stm32mp251.dtsi b/arch/arm64/boot/dts/st/stm32mp251.dtsi
-index 5268a4321841..cb084381e4cd 100644
---- a/arch/arm64/boot/dts/st/stm32mp251.dtsi
-+++ b/arch/arm64/boot/dts/st/stm32mp251.dtsi
-@@ -105,11 +105,13 @@ soc@0 {
- 		interrupt-parent = <&intc>;
- 		ranges = <0x0 0x0 0x0 0x80000000>;
- 
--		rifsc: rifsc-bus@42080000 {
--			compatible = "simple-bus";
-+		rifsc: bus@42080000 {
-+			compatible = "st,stm32mp25-rifsc";
- 			reg = <0x42080000 0x1000>;
- 			#address-cells = <1>;
- 			#size-cells = <1>;
-+			feature-domain-controller;
-+			#feature-domain-cells = <1>;
- 			ranges;
- 
- 			usart2: serial@400e0000 {
-@@ -117,6 +119,7 @@ usart2: serial@400e0000 {
- 				reg = <0x400e0000 0x400>;
- 				interrupts = <GIC_SPI 115 IRQ_TYPE_LEVEL_HIGH>;
- 				clocks = <&ck_flexgen_08>;
-+				feature-domains = <&rifsc 32>;
- 				status = "disabled";
- 			};
- 		};
 -- 
-2.35.3
-
+Kees Cook
 
