@@ -1,132 +1,156 @@
-Return-Path: <netdev+bounces-20821-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20822-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 041B8761527
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 13:26:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6417E7615FD
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 13:35:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 824B92810E9
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 11:26:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 94EC81C20E27
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 11:35:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95EE51ED46;
-	Tue, 25 Jul 2023 11:26:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BB1A1ED4D;
+	Tue, 25 Jul 2023 11:35:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A80A1ED38
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 11:26:06 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49F4B19F
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 04:26:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=RbJRV8Wf5saGhMX+P3VQMMs1ukU5TwjpBHioDN2UWdA=; b=akmC2Rz31mrSkTLeVUbzi+fzJK
-	NHYkk9tPfP5DEu7ry0qHYv2JKDxkoyYdXeXPdc0EKXb/wybvIVCYu9JcDami0rgvUbYXhv8uStNRJ
-	YY6f0j1CWbT+Cy2Zy1KcyCOo5p3Hk5opnoRjFoZ7Ugj+1BCzidEF46vKCib+V6bKnUgjUqnsD2Fr1
-	jUKMX5g7xBGBQhILoDRNLZMZ45ldZx2ZPrsU1EC5kahy2peV25l/IYl30g9fxVX4qAIDawtP73XUI
-	j/K3ihYiObT/PqXDaJqJeqSqMZEOSW6ED7uyme4nsCZaXv/eumHD3pellzNRy/DtIlyGnUeHJE3D3
-	KA7pMIdg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:50228)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qOGAy-0001yG-28;
-	Tue, 25 Jul 2023 12:26:00 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qOGAy-0001mu-D4; Tue, 25 Jul 2023 12:26:00 +0100
-Date: Tue, 25 Jul 2023 12:26:00 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Linux regressions mailing list <regressions@lists.linux.dev>
-Cc: Vladimir Oltean <olteanv@gmail.com>, Sergei Antonov <saproj@gmail.com>,
-	netdev@vger.kernel.org
-Subject: Re: Regression: supported_interfaces filling enforcement
-Message-ID: <ZL+xSJh4pJArnaLU@shell.armlinux.org.uk>
-References: <CABikg9wM0f5cjYY0EV_i3cMT2JcUT1bSe_kkiYk0wFwMrTo8=w@mail.gmail.com>
- <20230710123556.gufuowtkre652fdp@skbuf>
- <ZLATb/obklRDT3KW@shell.armlinux.org.uk>
- <9e584314-cb54-1dd4-1686-572973777580@leemhuis.info>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E9A51ED38
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 11:35:27 +0000 (UTC)
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2090.outbound.protection.outlook.com [40.107.223.90])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA565199C;
+	Tue, 25 Jul 2023 04:35:25 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=O/UiiorLh6atgTX5l+MIk5bi9m8i5D3RsrwFZ9FMUTJsIc7jneQD4QbrFMFOhs01AQES80Ft+y1RcTvNC9EOI5BW8iQrdnrhVbuUIefS1kspGZYn4cJ34UOf+ipiEZJYR7VyzUWlTFwM/KCg8sYyeyp74i2j8LoVlG3q+U1JVT3rNGgtN6kpCSb3oRLoJEn3UDpqCrAJPbf81/u23D+6nUVt68y3A5h97KRpm27c8DE3mORw6kllXNGF5uxmY4zkoJ1LBiUCVK00v7MGQPSpwAnpytXgqiFOwe1klTB+nxiIartev01fXANjqWhk8gs0c/eeG7O3rgKhVJ/My/vziA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=xWL/uO6Yx1/4HsHO3Yolk2P+/1SIwN9IvZmQK3+X3Do=;
+ b=F3nGHwJe92+vcaeh90d4eqPg/QnpCqcB5MLWGZhR2O5TpKZL2SJTTDQ2aWYdHYhQmMuIt0RN0eMjE+wGHqoDmZSWs/0fz5CzleBYl1LHxCAwH2Q4PKK0hlNp+zHmQCC5XWuepY6fovDE40x2mbFedeLRkXZUonS0WuHOTbTW1/7CdqYMFuE8RHMZvPnutcZPayMSUtdKbFPhzTFs1FPHFbMTvc6mDF1EQGo/cHTaCxfL079wa/aOqL/B6DGLx4+0vy2DUlvw/i4YfB9WnCLyssjHUWyq+a3VRRqVTEKzJH7iFyI2DitYg8ZfAxK7K53JMOEIkMz6sJAIGSkMzHS4/g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
+ dkim=pass header.d=corigine.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=xWL/uO6Yx1/4HsHO3Yolk2P+/1SIwN9IvZmQK3+X3Do=;
+ b=LRKZ49UKrSxYmDTLuui8Q+OM21W0xFkGsjuSHmXMPDAcdQwGx9h+nexVNefM5zKumAASuHAGK1b62hYqFqaiwaG2yl5TjmelCln7hHv7V6GeTNpzEltUhuyByhRlZ/5VWEoTFDtWcLHvX1rxKOUA+6nU1X73rQUKAYe6B85/sJw=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=corigine.com;
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
+ by PH8PR13MB6184.namprd13.prod.outlook.com (2603:10b6:510:25b::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.31; Tue, 25 Jul
+ 2023 11:35:20 +0000
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::fde7:9821:f2d9:101d]) by PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::fde7:9821:f2d9:101d%7]) with mapi id 15.20.6609.032; Tue, 25 Jul 2023
+ 11:35:20 +0000
+Date: Tue, 25 Jul 2023 13:35:14 +0200
+From: Simon Horman <simon.horman@corigine.com>
+To: Lin Ma <linma@zju.edu.cn>
+Cc: steffen.klassert@secunet.com, herbert@gondor.apana.org.au,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v1] xfrm: add forgotten nla_policy for XFRMA_MTIMER_THRESH
+Message-ID: <ZL+zcukc8fscMrYG@corigine.com>
+References: <20230723074110.3705047-1-linma@zju.edu.cn>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230723074110.3705047-1-linma@zju.edu.cn>
+X-ClientProxiedBy: AM0PR03CA0075.eurprd03.prod.outlook.com
+ (2603:10a6:208:69::16) To PH0PR13MB4842.namprd13.prod.outlook.com
+ (2603:10b6:510:78::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9e584314-cb54-1dd4-1686-572973777580@leemhuis.info>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-	SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|PH8PR13MB6184:EE_
+X-MS-Office365-Filtering-Correlation-Id: febe403b-101b-43d4-acb8-08db8d0339ca
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	iM4Gd0r93aSLF9D7GFrSwM/8jOrOqLV/zl60QLwuFl9DR/ljWP3Ptw1AtvlQv8vxM1zHIU9lWliXCJI+rNUCmkpsG3saT9veKOBGPlH4cYWgJnjt3H29lTHPtIgeaaNC754Ytx8bXiYdDdG9teGtTYzUyXFRPdjWnl7JowbS49B6N68gErkgBRb1A53UzjfMLIRaululyvss9+CIC4Edw0ArIYSkgEO1yiARzXSBd5HMUYF3I+MMmTAjuEuDRKIUzOlS4KshL0X/QQwLwwCbBk5HB3vXgePej2/romYHdEZJUSwSCv/9ghLiJswKESAt6AfepjxsQUk+CX0vrYI75aZ94/GysO0o6lusGQaXTMsZmxjq6h4BMzUkGFAQgQ4JtTFHc4EaH87011vWKUY/vICr2JKWcUJh7lrTj2L5srsD8TeqtkxrJyIDcZ36uzE45rnm5R0VdukyzdqETbTxaGErS9RDCaY3NntBj6sn4g/wunYnKsesYH6KjP0vVUsd++ENgfcw647hdbWa791nb66e2cxJ4FYqGUCCS/Wccp2sHRumPGaNHS/9R8SdSrVdAhyr7Y6gukj2/IlDPOvOae7uEzx42kFvofOiWtgNmU5D772nBZbCGLRuZGOjaggIXj4Wg1yGrkALP5QJKBwnct5nBzr6rWld6KNohQbArtA=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(346002)(39840400004)(366004)(396003)(376002)(136003)(451199021)(478600001)(186003)(2616005)(83380400001)(6666004)(6506007)(6512007)(4326008)(2906002)(86362001)(41300700001)(5660300002)(6486002)(66556008)(6916009)(66946007)(8936002)(66476007)(36756003)(38100700002)(44832011)(316002)(8676002)(67856001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?pvc1M2m5Wax0Rmp4KtZJYGt8ahmA3yKLNvPe38J1pBSfvz9oa5tt2Fjrox/O?=
+ =?us-ascii?Q?qOLUy5+AJCL+fAy3GGkhfe/g9ozPLSw9Qe0sg/JEZoWjPzrqcEBgjW+4gvgL?=
+ =?us-ascii?Q?RZfpcprH4MnZicsY77lDjS81U1o9Fj15mx5j2Xybd1t2i60wVYwyiKSWPv10?=
+ =?us-ascii?Q?XGMLVZajmmDJM7MjEb/hU/bVlUkZEXf7JdAX3NYAdDkjiUEsrF8xd92Wgrcy?=
+ =?us-ascii?Q?aBMM6BzZBLTIyinPTQLbM7qaPjEwqqrXCNhtb3MPlstx0wKKhE4ymh+ppjG6?=
+ =?us-ascii?Q?8XTLGK9kEcqB5KFz4wHJR0vezIMHR+fEyPB9Vtnk81aTsQAaquUU6EcyEjIt?=
+ =?us-ascii?Q?SPMhOlx6niBjYct8ueu7CVKX0jn5onZ6sbJmbXxIXvKTumexruUEmEgljKt6?=
+ =?us-ascii?Q?hulSZR5aPgnOoB7WkhVuYPvsbfvMu8h5c1l3eO74+Y7Lyu8BuemvIHMpLSJ1?=
+ =?us-ascii?Q?PPEaPt+oRXzhzIPFdCaeJYViuoOJzCMSxAUbih5idem+lcNBtmkbIgvVehI+?=
+ =?us-ascii?Q?VAernDrPtKlNwetj1j4i5xHvLfpbbosACEBssi9NEmbXIrGohTXqDoA6XAGj?=
+ =?us-ascii?Q?FKgRuhjw16xk1vflDSbKnUnWi6r+TALn2m5qzkN2EpyF659gXghVCrOcMAu7?=
+ =?us-ascii?Q?pInVyp7ffp2Z+zCbzIc2rNi0mXhsR597A3i2r7pYpNgQ+nC0V5lEEumHEVnn?=
+ =?us-ascii?Q?eUj1cygkasFaKCw/75yU1tNRNzr1+A5/Secnq3qcyvHQWjhcUlr/cthhXXoQ?=
+ =?us-ascii?Q?FEnnjafxGJHVe1HdUja8cnb9lTk1Y3tjsDZjJeQZDkGUSM/Zg0Z/97/EFbt1?=
+ =?us-ascii?Q?fxnalcVzZvdEk6LGvoJpHhO/d++ju02VBS1fwUzABJ/nOeZ+Y72veDmRCp2i?=
+ =?us-ascii?Q?LMOjlOC9ESmHkvkrxIJQNDhHwlKW9Hsk6nMPKnuhuD0R991/K7QjCkBmo7t2?=
+ =?us-ascii?Q?na0qCeIxwFYHgF3Ue71uoCF4Uk17Mzi6C1dg8INGC2yeXj6GusFEz4j3R0iW?=
+ =?us-ascii?Q?+ig1s/7eA9umYTTHr8lyyRk+2jmlDVGXy1Bz0cPCxhY0ukV3uYA0AULDLiSe?=
+ =?us-ascii?Q?6J6G4638BgVYEqekk3vqH8mpjoykz7FRV+HjlJ49nWJ5hiU90voL05FetJ+D?=
+ =?us-ascii?Q?WoShiKO3Lqspdt/r4Bo3U8cghtkYmLqiZYghFMm7UYWq/UwIMWtyJ5hG/KUU?=
+ =?us-ascii?Q?PK9FgK9zFx2Z8Kwr+WaPuJSs39hvQr6ALHo58iwvLkhmvTBw0s1mVqrqnLnE?=
+ =?us-ascii?Q?OSP6LDmRJ+hafPtbyg+1UT8+GStlp9Do94gLpetQZVkrh361YMIrHVoUZvGj?=
+ =?us-ascii?Q?qOCAe2S/4mxZR9fb6vseiwrMs72qUvLDoyUnz2A1QILEPFzDq6M2UABQ/sB8?=
+ =?us-ascii?Q?DgGd8gUFJ5i76DH8kR2PlW2C8S1CBrhW/qVc9msfs4Fypw/lQpAauFZS4zdM?=
+ =?us-ascii?Q?QEihvIAbAhq8jGt/jIxP1pCJ3HxjcpoIiLz5fkuPGjKBiG2iGb7LSF1tqTFl?=
+ =?us-ascii?Q?63IDIyrJd7D8P5djnllojvbV7o2RtJM3wWM2z6Kc1UytF6zD/jvygKv2kHst?=
+ =?us-ascii?Q?KhUVXvMvo5dNITgnlQe+M2rW2zjZ2OWbjAWDZ7bhWOg/PTn46uTpd/vwQdcv?=
+ =?us-ascii?Q?KdvPecFI2qBYtKJaSfU/aZ/lQeJFh2DpsVJfaZpnUrrchVHnnAytCJtCDVr5?=
+ =?us-ascii?Q?vVWbsw=3D=3D?=
+X-OriginatorOrg: corigine.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: febe403b-101b-43d4-acb8-08db8d0339ca
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jul 2023 11:35:19.8799
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: fHXwYal1bPWVVHO43VwkkJfQz7r4/5rCnxY8/DerYLMjX0vxj6OsCB892pRK4GaNuoVWLSOITd9Rdpmdt8/dh0kWnZMPXuwfqDLfzAVAZnk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR13MB6184
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Jul 25, 2023 at 12:58:31PM +0200, Linux regression tracking (Thorsten Leemhuis) wrote:
-> [CCing the regression list, as it should be in the loop for regressions:
-> https://docs.kernel.org/admin-guide/reporting-regressions.html]
+On Sun, Jul 23, 2023 at 03:41:10PM +0800, Lin Ma wrote:
+> The previous commit 4e484b3e969b ("xfrm: rate limit SA mapping change
+> message to user space") added one additional attribute named
+> XFRMA_MTIMER_THRESH and described its type at compat_policy
+> (net/xfrm/xfrm_compat.c).
 > 
-> On 13.07.23 17:08, Russell King (Oracle) wrote:
-> > On Mon, Jul 10, 2023 at 03:35:56PM +0300, Vladimir Oltean wrote:
-> >> On Tue, Jul 04, 2023 at 05:28:47PM +0300, Sergei Antonov wrote:
-> >>> This commit seems to break the mv88e6060 dsa driver:
-> >>> de5c9bf40c4582729f64f66d9cf4920d50beb897    "net: phylink: require
-> >>> supported_interfaces to be filled"
-> >>>
-> >>> The driver does not fill 'supported_interfaces'. What is the proper
-> >>> way to fix it? I managed to fix it by the following quick code.
-> >>> Comments? Recommendations?
-> >>
-> >> Ok, it seems that commit de5c9bf40c45 ("net: phylink: require
-> >> supported_interfaces to be filled") was based on a miscalculation.
-> > 
-> > Yes, it seems so. I'm not great with dealing with legacy stuff - which
-> > is something I've stated time and time again when drivers fall behind
-> > with phylink development. There's only so much that I can hold in my
-> > head, and I can't runtime test the legacy stuff.
-> > 
-> > I suspect two other DSA drivers are also broken by this:
-> > 
-> > drivers/net/dsa/dsa_loop.c
-> > drivers/net/dsa/realtek/rtl8366rb.c
-> > 
-> > based upon:
-> > 
-> > $ grep -lr dsa_switch_ops drivers/net/dsa | xargs grep -L '\.phylink_get_caps.*=' | xargs grep -L '\.adjust_link'
+> However, the author forgot to also describe the nla_policy at
+> xfrma_policy (net/xfrm/xfrm_user.c). Hence, this suppose NLA_U32 (4
+> bytes) value can be faked as empty (0 bytes) by a malicious user, which
+> leads to 4 bytes overflow read and heap information leak when parsing
+> nlattrs.
 > 
-> What happened to this regression? From here it looks like things
-> stalled, but I might have missed something, hence allow me to ask:
+> To exploit this, one malicious user can spray the SLUB objects and then
+> leverage this 4 bytes OOB read to leak the heap data into
+> x->mapping_maxage (see xfrm_update_ae_params(...)), and leak it to
+> userspace via copy_to_user_state_extra(...).
 > 
-> Is this still happening? Is anyone still working on fixing this?
+> The above bug is assigned CVE-2023-3773. To fix it, this commit just 
+> completes the nla_policy description for XFRMA_MTIMER_THRESH, which 
+> enforces the length check and avoids such OOB read.
+> 
+> Fixes: 4e484b3e969b ("xfrm: rate limit SA mapping change message to user space")
+> Signed-off-by: Lin Ma <linma@zju.edu.cn>
 
-I think the discussion got side-tracked into whether mv88e6060 should
-be merged into mv88e6xxx, and then just petered out with no further
-patch(es) - plus I was on holiday so obviously wasn't paying much
-attention.
+Reviewed-by: Simon Horman <simon.horman@corigine.com>
 
-I suppose the sane thing to do would be to fix all drivers in one
-go - maybe something like this:
-
--	if (ds->ops->phylink_get_caps)
-+	if (ds->ops->phylink_get_caps) {
- 		ds->ops->phylink_get_caps(ds, dp->index, &dp->pl_config);
-+	} else {
-+		/* For legacy drivers */
-+		__set_bit(PHY_INTERFACE_MODE_INTERNAL,
-+			  &dp->pl_config.supported_interfaces);
-+		__set_bit(PHY_INTERFACE_MODE_GMII,
-+			  &dp->pl_config.supported_interfaces);
-+	}
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
