@@ -1,168 +1,92 @@
-Return-Path: <netdev+bounces-21052-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21053-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7977976240E
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 23:01:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F8EC762410
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 23:01:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AA98B1C2100A
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 21:00:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 23CAA2819CC
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 21:01:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3829826B6B;
-	Tue, 25 Jul 2023 21:00:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70C8C26B6D;
+	Tue, 25 Jul 2023 21:01:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28D2E23BF5;
-	Tue, 25 Jul 2023 21:00:54 +0000 (UTC)
-Received: from mail-lj1-x22a.google.com (mail-lj1-x22a.google.com [IPv6:2a00:1450:4864:20::22a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 791EBE78;
-	Tue, 25 Jul 2023 14:00:53 -0700 (PDT)
-Received: by mail-lj1-x22a.google.com with SMTP id 38308e7fff4ca-2b935316214so3626601fa.1;
-        Tue, 25 Jul 2023 14:00:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690318852; x=1690923652;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=oP0Ad9ZYbf8ZzfPr//Y47DXa0wIU8SOl3KLyUj0/PiE=;
-        b=rUp5Rh+uwSc3mLFndhwjsnLwHgrvkBQtkxYMzQ0TkRLvWc8mlgz2Wqbxrbuga05JKF
-         yWAAJSCECJTDF7q0xUEz2Be125ZSMxlC2oxdhoOx9iPKFawo71D6kLctw/nclirPa8ds
-         MaaZbKu2cV4v2Q9t/oEKC/F4i7PiUTUiD7n3vFXhuZ7MBrLUFiwuXQ7PRkcPXpD7xHVg
-         6SCFXKjQaZyCpp0PI08xpwwaoCSDk1h4l2ihdInOFzm9Y24qj/WNzXSwH7+K11NHl3b5
-         ymxd5s3p0pp+pGaZbGB2Si8k1zp7XAFeUlT6ZzJAGCVdx/wl9AIB77TgUwN+y9zC1iwJ
-         UCgw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690318852; x=1690923652;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=oP0Ad9ZYbf8ZzfPr//Y47DXa0wIU8SOl3KLyUj0/PiE=;
-        b=AN0vuxBUawEP/fRko2SOsvaFdMsZqst49Bho0ZUaYBQu1H9+s0wDrCCj7uzcO7S3rN
-         or7PKMyaqRkU/KoPTYfq0NPWpfFyOiMEZISawjnRi57EDOnC8B+XSK4ivBzHOHl0qr81
-         7Z6h7qRSXPpmyJyoSl7bBh8yeTuHKg+wRX9hlXnRPpwbjxuxqIK+P/PCq9WXUVcN6xlH
-         1IqHEOr2Ne7ieNb88+L226oKIAMYfMXJ7HleapXSyNGUzD2A6Sh1ftOQJWaWkM43wqJr
-         /7ADgORRHK5joFAzSYDgOlV4sPCmTID+vlaYW53bostsJJO7xRgS5q9S21CiXMsB1Ymm
-         Br2g==
-X-Gm-Message-State: ABy/qLa18fgS+e3KXk/TGIm9kfpEnZWyIY/qFA5eZA/RfmlU5ZTJfaC2
-	Wa7GhbovNRA51joEWGiE3XbVU7X0opapHWx4Lrs=
-X-Google-Smtp-Source: APBJJlF/U8yZemAC/wjNOB7cBzY+1jHtL9d3+AzXwkQIBJUz2CZVt6HrunFdp/6br8Q4/Q4HT7+wzwx3U51a7+LFvyU=
-X-Received: by 2002:a05:651c:48c:b0:2b7:34c4:f98f with SMTP id
- s12-20020a05651c048c00b002b734c4f98fmr1268577ljc.11.1690318851402; Tue, 25
- Jul 2023 14:00:51 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64CD526B65
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 21:01:52 +0000 (UTC)
+Received: from relay.hostedemail.com (smtprelay0015.hostedemail.com [216.40.44.15])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9B9B99;
+	Tue, 25 Jul 2023 14:01:50 -0700 (PDT)
+Received: from omf03.hostedemail.com (a10.router.float.18 [10.200.18.1])
+	by unirelay09.hostedemail.com (Postfix) with ESMTP id 1AD7180D6C;
+	Tue, 25 Jul 2023 21:01:49 +0000 (UTC)
+Received: from [HIDDEN] (Authenticated sender: joe@perches.com) by omf03.hostedemail.com (Postfix) with ESMTPA id 8B3EC6000B;
+	Tue, 25 Jul 2023 21:01:45 +0000 (UTC)
+Message-ID: <71070489e9fb57c341cea569042f837ce7c7ec9d.camel@perches.com>
+Subject: Re: [PATCH] scripts: checkpatch: steer people away from using file
+ paths
+From: Joe Perches <joe@perches.com>
+To: Jakub Kicinski <kuba@kernel.org>, Greg KH <gregkh@linuxfoundation.org>
+Cc: krzk@kernel.org, geert@linux-m68k.org, netdev@vger.kernel.org, 
+	workflows@vger.kernel.org, mario.limonciello@amd.com
+Date: Tue, 25 Jul 2023 14:01:44 -0700
+In-Reply-To: <20230725125207.73387bfc@kernel.org>
+References: <b6ab3c25-eab8-5573-f6e5-8415222439cd@kernel.org>
+	 <20230725155926.2775416-1-kuba@kernel.org>
+	 <2023072555-stamina-hurray-b95c@gregkh>
+	 <20230725101051.7287d7cf@kernel.org>
+	 <2023072507-smugness-landslide-bd42@gregkh>
+	 <20230725125207.73387bfc@kernel.org>
+Content-Type: text/plain; charset="ISO-8859-1"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230317201920.62030-1-alexei.starovoitov@gmail.com> <ZMA0SFhEDRp0UFGc@google.com>
-In-Reply-To: <ZMA0SFhEDRp0UFGc@google.com>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Tue, 25 Jul 2023 14:00:40 -0700
-Message-ID: <CAADnVQLkB4dkdje5hq9ZLW0fgiDhEWU0DW67zRtJzLOKTRGhbQ@mail.gmail.com>
-Subject: Re: [PATCH v2 bpf-next 0/4] bpf: Add detection of kfuncs.
-To: Matt Bobrowski <mattbobrowski@google.com>
-Cc: Andrii Nakryiko <andrii@kernel.org>, Alexei Starovoitov <ast@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Martin KaFai Lau <martin.lau@kernel.org>, David Vernet <void@manifault.com>, 
-	Dave Marchevsky <davemarchevsky@meta.com>, Tejun Heo <tj@kernel.org>, 
-	Kumar Kartikeya Dwivedi <memxor@gmail.com>, Network Development <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>, 
-	Kernel Team <kernel-team@fb.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+X-Stat-Signature: y1u5u7ho4z8za3orkerpag88w5moqbhr
+X-Rspamd-Server: rspamout04
+X-Spam-Status: No, score=-0.9 required=5.0 tests=BAYES_00,FORGED_SPF_HELO,
+	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,
+	SPF_NONE,T_SCC_BODY_TEXT_LINE,UNPARSEABLE_RELAY,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.6
+X-Rspamd-Queue-Id: 8B3EC6000B
+X-Session-Marker: 6A6F6540706572636865732E636F6D
+X-Session-ID: U2FsdGVkX19SYY1iThJ9rriAeSw3Esw43greG2YvKp8=
+X-HE-Tag: 1690318905-503073
+X-HE-Meta: U2FsdGVkX1940WfeGFQ3BuInvLpFaBTGC+8MpTuRyFt+50yWqolcLjiS6J69qNMoiRX+ZClvWfzH7Z5S6TgcOrniS8qN5MYSoSV3acVL1w5BxODFy+/JpavrwKlazvFM97iseS2o9UEUf1XeSk5db1xgOb9HVIyXI7OY5F0aZwRwy6CzvuAvdCSIK+/6Yi8TyxNUS1ywzIqWwzW1RjNdBS34Dlh10HE/DzG8bEbG06HF1ojgjFjtWES6H3xxomEbh/+IP7LVmqDSXfXafugzlUODnqxFzuF++nM50JgV/NRd5L/j0z9cUsukz2/LHPf3yieeHQD0pYrUWMvJ9mq56W3zcc2eovvMjc/nD4dUOo7mrYI5kCmDru1nr47AaSph
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Jul 25, 2023 at 1:45=E2=80=AFPM Matt Bobrowski <mattbobrowski@googl=
-e.com> wrote:
->
-> Hey Alexei/Andrii,
->
-> On Fri, Mar 17, 2023 at 01:19:16PM -0700, Alexei Starovoitov wrote:
-> > From: Alexei Starovoitov <ast@kernel.org>
-> >
-> > Allow BPF programs detect at load time whether particular kfunc exists.
->
-> So, I'm running a GCC built 6.3.7 Linux kernel and I'm attempting to
-> detect whether a specific kfunc i.e. bpf_rcu_read_lock/unlock() exists
-> using the bpf_ksym_exists() macro. However, I'm running into several
-> BPF verifier constraints that I'm not entirely sure how to work around
-> on the aforementioned Linux kernel version, and hence why I'm reaching
-> out for some guidance.
->
-> The first BPF verifier constraint that I'm running into is that prior
-> to commit 58aa2afbb1e6 ("bpf: Allow ld_imm64 instruction to point to
-> kfunc"), it seems that the ld_imm64 instruction with BPF_PSEUDO_BTF_ID
-> can only hold a ksym address for the kind KIND_VAR. However, when
-> attempting to use the kfuncs bpf_rcu_read_lock/unlock() from a BPF
-> program, the kind associated with the BPF_PSEUDO_BTF_ID is actually
-> KIND_FUNC, and therefore trips over this BPF verifier.
->
-> The code within the example BPF program is along the lines of the
-> following:
-> ```
-> ...
-> void bpf_rcu_read_lock(void) __ksym __weak;
-> void bpf_rcu_read_unlock(void) __ksym __weak;
-> ...
-> if (bpf_ksym_exists(bpf_rcu_read_lock)) {
->    bpf_rcu_read_lock();
-> }
-> ...
-> if (bpf_ksym_exists(bpf_rcu_read_unlock)) {
->    bpf_rcu_read_unlock();
-> }
-> ...
-> ```
->
-> The BPF verifier error message that is generated on a 6.3.7 Linux
-> kernel when attempting to load a BPF program that makes use of the
-> above approach is as follows:
->    * "pseudo btf_id {BTF_ID} in ldimm64 isn't KIND_VAR"
->
-> The second BPF verifier constraint comes from attempting to work
-> around the first BPF verifier constraint that I've mentioned
-> above. This is trivially by dropping the conditionals that contain the
-> bpf_ksym_exists() check and unconditionally calling the kfuncs
-> bpf_rcu_read_lock/unlock().
->
-> The code within the example BPF program is along the lines of the
-> following:
-> ```
-> ...
-> void bpf_rcu_read_lock(void) __ksym __weak;
-> void bpf_rcu_read_unlock(void) __ksym __weak;
-> ...
-> bpf_rcu_read_lock();
-> ...
-> bpf_rcu_read_unlock();
-> ...
-> ```
->
-> However, in this case the BPF verifier error message that is generated
-> on a 6.3.7 Linux kernel is as follows:
->    * "no vmlinux btf rcu tag support for kfunc bpf_rcu_read_lock"
->
-> This approach would be suboptimal anyway as the BPF program would fail
-> to load on older Linux kernels complaining that the kfunc is
-> referenced but couldn't be resolved.
->
-> Having said this, what's the best way to resolve this on a 6.3.7 Linux
-> kernel? The first BPF program I mentioned above making use of the
-> bpf_ksym_exists() macro works on a 6.4 Linux kernel with commit
-> 58aa2afbb1e6 ("bpf: Allow ld_imm64 instruction to point to kfunc")
-> applied. Also, the first BPF program I mentioned above works on a
-> 6.1.* Linux kernel...
+On Tue, 2023-07-25 at 12:52 -0700, Jakub Kicinski wrote:
+> On Tue, 25 Jul 2023 19:25:09 +0200 Greg KH wrote:
+> > I do:
+> > 	- git format-patch to generate the patch series.
+> > 	- run the generate_cc_list script which creates XXXX.info files
+> > 	  (the XXXX being the patch number) that contain the
+> > 	  people/lists to cc: on the patch
+> > 	- git rebase -i on the patch series and edit the changelog
+> > 	  description and paste in the XXXX.info file for that specific
+> > 	  patch.
+> >=20
+> > Yeah, it's a lot of manual steps, I should use b4 for it, one of these
+> > days...
+>=20
+> Oh, neat! I do a similar thing. Modulo the number of steps:
+>=20
+>   git rebase --exec './ccer.py --inline'
+>=20
+> I was wondering if I was the only one who pastes the Cc: person
+> into the patch, because I'd love to teach get_maintainer to do
+> the --inline thing, instead of carrying my own wrapper...
 
-Backport of that commit to 6.3.x is probably the only way.
+Now for that, you'd want checkpatch or yet another script to do it.
 
-And I don't think bpf_ksym_exists() actually works on 6.1
+
 
