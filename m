@@ -1,143 +1,133 @@
-Return-Path: <netdev+bounces-20916-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20917-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3AE4761E45
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 18:19:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5296761E58
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 18:22:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7110C28128F
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 16:19:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C75481C20E02
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 16:22:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FD4224170;
-	Tue, 25 Jul 2023 16:18:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76B432417F;
+	Tue, 25 Jul 2023 16:22:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CF9123BFA
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 16:18:59 +0000 (UTC)
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on20713.outbound.protection.outlook.com [IPv6:2a01:111:f400:7e8a::713])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C362897
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 09:18:49 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=lAZ+pmuEoAAMz3Eciej4w9TCB3Z6FgFH2Xc0iFmg3+vR8//zckTqg7woCL7AdzRqj9ex45sYhDjvRQhilzSdFUzyu9zLTp7UvaaIZvx0OyvtKWGx1v9Q+qFIvhJDfRtPkh7o+ADTcde4LSqaP47+UrRhdEgj02HqQSxsAh0wBjhVAqwxnlKB8gcxAebMJoe3br4wdg1RQbvLr1aw/RvIC7TirjkN5J+wIdcFIYmkXw4RD/WPyh7u3/JAabAiCb6YvWb+m4WboOhyKafXSNzlT8SARFyUhMQyXWpO1uzG/ZQymI9GgsUI5tBj6crZh9bimCLHDLUTsdW/x3MQi/20qw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=pMwc0QpFWwq5Jvg7p1Uaa2/vEkA6uS2NQVn1On0wIMM=;
- b=dyjPv5IOAm2+daELXNX2ihPaFuy4prU0aTha7BeVV/uy6DT58ndIIwpGmdB6HIZI/dEa7WGu7fFGnGsIzIThczHDS3ahhVA59aiIPSUmUyEq0En0qdqKtqT7SLat0c1HozPSFyoFHjH3JDAHOOOnhdewcAfjbxK352p4VhoJSErNY8nvdnpBxNJxFxYTxNZXWEbJvtOq+nrBgkFUStI0wTy9ZA1jeJN5uBuhtaaNlYloDxqzForhoJHVM5RzcC67rgzJ3KbYJDvH9TrjctJuP45T3Fxxm6jzjwaC1vUK3+FeuRcTKgWmIHrmY5CSLjqfqU2z2NaO1qmmSLi26Fhzag==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
- dkim=pass header.d=corigine.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B66B1F173
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 16:22:24 +0000 (UTC)
+Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11D3211A
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 09:22:23 -0700 (PDT)
+Received: by mail-lf1-x130.google.com with SMTP id 2adb3069b0e04-4fb96e2b573so8866333e87.3
+        for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 09:22:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=pMwc0QpFWwq5Jvg7p1Uaa2/vEkA6uS2NQVn1On0wIMM=;
- b=mNc5yB9jtyjIrlN2HTbG/Wt2GLnsko2qNWMQeCteHKZe9xCG38A2TpsfPm1VCDH0XKvRR0agBX6YEfnBrLkcuzwFsKIIBf1DaKPGtRtB65a3AW8pCKr7eM1H4IsiiTahSYe3poKvystQ/JNtcksvwIwnFk9fVHnMqJWelX/c3k8=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=corigine.com;
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
- by BY5PR13MB4437.namprd13.prod.outlook.com (2603:10b6:a03:1de::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.32; Tue, 25 Jul
- 2023 16:18:45 +0000
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::fde7:9821:f2d9:101d]) by PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::fde7:9821:f2d9:101d%7]) with mapi id 15.20.6609.032; Tue, 25 Jul 2023
- 16:18:45 +0000
-Date: Tue, 25 Jul 2023 18:18:38 +0200
-From: Simon Horman <simon.horman@corigine.com>
-To: Peter Seiderer <ps.report@gmx.net>
-Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
+        d=gmail.com; s=20221208; t=1690302140; x=1690906940;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=kALScSudc4ZvsfbM8+kpg1S9XHzm0ZoZelo2+24lvqg=;
+        b=H3So+5fSbkRHct92E89YPKrj734Ydo5lwhXLCaiTLFSGLHxYZThDiThaAsqlix3ArI
+         B/1TNgpHsgUQyff319VnegXC8t4nnfDgXAuek4uJ8I1ECNvd19Hzu4WQpE31wUi7tzmg
+         70oPV7TVAmafimSHerAF3AobMjMnZhkFXVxxF4wg5JmWCQtjq8IxdCf0e7EafExPomrY
+         0SrYxsc3GI7lfdFTnvq1nrDu6jsJjAdKh/x6gbM1emJNjHFdquyp25bG/FelcYCgi2Bb
+         kbEmiS4Ktmij21oVS/POUg+Hk5adwh0yB61nBbcec7UrwuJ2EjA0elEGFWvAU5v9fmxA
+         0y3A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690302140; x=1690906940;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=kALScSudc4ZvsfbM8+kpg1S9XHzm0ZoZelo2+24lvqg=;
+        b=EqeGgdx5U1Uqb0iwyR0ueh7VUrg46AIPRqWcsiCTjWcYpNkPDivfEd7s4nwR4VuDxH
+         vXsk9wWN2UOtE19Q1yHAtZLunIPENUeUrwg7NbnBLA1mbhvnO77fV80x/8mm9XfoyYIN
+         EG3dSTsqnuJELPf8pagtK7hZL8vrrebzgFuq1hZBlLVhM8sPXXoP4ObLwUuTwN5IQIrT
+         iI4GkZ45WT5UsRSEolz0v/kTbUeX+zUxh9VKIOIS2PgntcUqbebIgF8Sq0RZktJeH8xN
+         2TLhUg/aVqWaaw7PkMD1ibllMR2tXw1B0CXuAc0zL1U5ToAw1Yb1ZtzZHTR/1g+XnJ4y
+         wJGQ==
+X-Gm-Message-State: ABy/qLYCtqlea1IArSwKAFNh2DYbfDPG22wbm8FlNSaw6EgAMQeFxHWr
+	WXx8NtPJ9VtAXKUGHrOVJM+x5rSnWS6irz+v
+X-Google-Smtp-Source: APBJJlHBfH41cH42NFV1UM+MKZBJ4xTdsZW+3tNh5ft8VJQydB2FsmdEAiyFf+H/Ls633JKSuClpfg==
+X-Received: by 2002:a19:4357:0:b0:4fb:8dcc:59e5 with SMTP id m23-20020a194357000000b004fb8dcc59e5mr7122373lfj.39.1690302140134;
+        Tue, 25 Jul 2023 09:22:20 -0700 (PDT)
+Received: from imac.fritz.box ([2a02:8010:60a0:0:255e:7dc3:bcb1:e213])
+        by smtp.gmail.com with ESMTPSA id n3-20020a05600c294300b003fc01f7a42dsm13661303wmd.8.2023.07.25.09.22.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 25 Jul 2023 09:22:19 -0700 (PDT)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: netdev@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Yunsheng Lin <linyunsheng@huawei.com>,
-	Pavel Begunkov <asml.silence@gmail.com>,
-	Richard Gobert <richardbgobert@gmail.com>,
-	Patrick Ohly <patrick.ohly@intel.com>
-Subject: Re: [PATCH net-next v2] net: skbuff: remove unused
- HAVE_HW_TIME_STAMP feature define
-Message-ID: <ZL/13tcYiiy4j6CW@corigine.com>
-References: <20230724162255.14087-1-ps.report@gmx.net>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230724162255.14087-1-ps.report@gmx.net>
-X-ClientProxiedBy: AS4P251CA0003.EURP251.PROD.OUTLOOK.COM
- (2603:10a6:20b:5d2::9) To PH0PR13MB4842.namprd13.prod.outlook.com
- (2603:10b6:510:78::6)
+	Paolo Abeni <pabeni@redhat.com>
+Cc: donald.hunter@redhat.com,
+	Donald Hunter <donald.hunter@gmail.com>
+Subject: [PATCH net-next v1 0/3] tools/net/ynl: Add support for netlink-raw families
+Date: Tue, 25 Jul 2023 17:22:02 +0100
+Message-ID: <20230725162205.27526-1-donald.hunter@gmail.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|BY5PR13MB4437:EE_
-X-MS-Office365-Filtering-Correlation-Id: 43c31005-8a94-4144-f610-08db8d2ad1b3
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	zQlrSSYDqcfNi81JyexlsDfMUQUQSH0u6+lhj8X+ZQCHC1o3Diz+qHxS2Dh2Rji2yUFajZ+uFYxpjuB4hbUDL86IZyouzxFF7IIS0KmEJ9rmwa5+DV8+0sEce2x0xIGEkcOajGfowUIwpy8QV9bTD8i8XD4jh3uknVUUi/d7S1ulSTYkdrmKz1mx/dteSWf4ZbaVjIrxE/TeT8G56OLLV84yV5kJaqQy5NXI1lMs/P4sCgNxkZ+keHTN3otv56cG9svBdGxD5FxofsXYgHD4K2BarhxbGG1e4DtWbGFOMZA1l+sjmseu8SbjxDgONxZwLfyPUaiKW7ihtMZeVDUiAiSjeo5qCCeZ0dC+DzDiiClS2azx8n+VsKpu6UIqRWM6E6LMtXZ9ITMDrHAI0xDCflomP2tQE9eqAnD7niwpRCOAZXw5PwX9eB/FIz4QfxmeB4f6VcIRxavnktVSKcKUvpk72GEHYiSWgPbEhikGaiivhoCg5so3uGIPMk8NMo1zGRDF9lMxiE4v6zs9XdQyecsS3bMOh/vgsdvZGTJFVSEr/QkUotAF3B3OnLTEMk573hBt3axxqiJUvG9b78HAZPYotaQCGrCNwiH6lMi+QDQ=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(376002)(366004)(39830400003)(346002)(136003)(451199021)(36756003)(2906002)(2616005)(4744005)(41300700001)(5660300002)(6506007)(44832011)(186003)(8936002)(8676002)(7416002)(6666004)(66476007)(66946007)(66556008)(86362001)(54906003)(6486002)(478600001)(38100700002)(6512007)(316002)(4326008)(6916009);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?FU0h1uuKUY48RtFyzOhjc6tr3UuYi9QnTlh1QYBpUZajd5Mt6RLLWlply5z4?=
- =?us-ascii?Q?9PyfoYVMYqo3MgSWl+UDc/7hnWrSTtXuaE8x926KSJi4Ou9yn/HQ7Gp+vL43?=
- =?us-ascii?Q?ZIVoDMvZsN9jCE0ZaK2txRWIH+ItZP4u359PxICNK7dV/fb5zTf9tL4U2hru?=
- =?us-ascii?Q?PMxXsX8RuZ4t0MGqlJNbe8Q7V9L/IRJUKld+ltJZOiLVpNN9ubQEsIjYV1Io?=
- =?us-ascii?Q?okn4ZsYMRzz5IjyKrW+/JAlpTfHmdG7ptSQ+hvh6742ZuIv+JvklP+SumRn+?=
- =?us-ascii?Q?vDTfOctwwaDdb5qEkX+m0mQlLSY1ptnFp5udHWfZzt1QZ4OGENZiw1EH4YZj?=
- =?us-ascii?Q?6mW3anrzgUgbNVQAVGwUq8cpv1QaSrX1eUqulxm8GVpF84rxYT7XwxHbVan2?=
- =?us-ascii?Q?Wdlhh+1S1p3orRPo3NqOkjaavr2r9rFW94feiQFsB2Oc7GFT2VThckmT1lRj?=
- =?us-ascii?Q?9Q0nLx499y9YHzSoCs3ZQUGl+fU3/sU0gIbLNvBJgIFqOuhqLbsRfKQUqqYw?=
- =?us-ascii?Q?FHATuVkAfeweG0D4VKMLX0L7k3yjKb5Kf8/w0TCY6PEuzyE9wWN7RacYNiyf?=
- =?us-ascii?Q?nr1l/kot7qOAKkPijl+gVIw5c3B2mhdd8wkpB/DnzGyQi7UxQcTThlEiCFOz?=
- =?us-ascii?Q?p9LNv4Ntm82HNZGxtou4vURTBWtSX8C9yRYreM4DtpV7fkjVVfzlzcRV3vBS?=
- =?us-ascii?Q?+Z53rQUxFqV+KhXTcMLQdVbD7MbnWlkvfTsiUxTzOJOmSJxRs0JMVqB2tDSE?=
- =?us-ascii?Q?y860pS0JdzcUTortz3bpkNF7dKoGzPDb+vHEDk/sw/0wM8a4FK9AIreBdvkn?=
- =?us-ascii?Q?4TeC5vQ8oYx0uNM0jNwbcZaxe9eZ48Oa5I7C80F2y8oJx0mG98CIjvb9myLo?=
- =?us-ascii?Q?5oilhqlByaMWC5LnCyuDGWBPjkL3+A3ceyhvQkK8iAYqFcm5LtqHl6Egkmnc?=
- =?us-ascii?Q?we5Cf4zLzBgw/JfqPiGaFRXJZQneRZ//woPAZ6Xcspf5yBp9b1s3j/T8w+4g?=
- =?us-ascii?Q?PDR82lRv0OEyQTxtiKGsUHq+tOBpvYUv/V2uqlnA3ityRY2dnfST3gRtroaH?=
- =?us-ascii?Q?WRtuV+jfqpynX+VVVj3w8ss4B4A4fYxwUwIx4GD8XExMWKoMG1/i4BbbSTXe?=
- =?us-ascii?Q?ZsiKmK8L7weHcudhE8FlY4TABvmC2bzAT2nAAtNKXCCYgEQriq2QLkxDHb7P?=
- =?us-ascii?Q?QNYF9vQeMgEYkszDBw+So7Y36fDyswuZo4sRHNcVYND/zpDJc+oj8WAB6imE?=
- =?us-ascii?Q?fhY4PtI5PxLsDSfD2e+QFi1BixYCwPixuyZokiyhnhAEmj18ds6gGK0rw0Cn?=
- =?us-ascii?Q?jRsoDxM3GOG0e5R7s6RuE3Bh80Fv4IXMJbeiNkqPujrcfazSv4VaBmDWESy3?=
- =?us-ascii?Q?Q5rLgJ2W9352vGkHgG4rFTTLq74ZR+GaadCEmZLqmDk0T30EI76YzFkxB8jn?=
- =?us-ascii?Q?sH9q2uqag+l58e390zdzSi6m6q66jaAsfj1EUDrQuDMYtbQiXBTwPzTK5CM6?=
- =?us-ascii?Q?DNn718RnXSXIrWdF05NaD3GiGbJtIYb9UmnfKdvodks6Lq3DN7W/Ly7xYyQc?=
- =?us-ascii?Q?X6B+cbiDxMVQuYdCl+8F1RDUYVkn6eOy5hddstABfa2EpkSO9Hi8+x+uWZpo?=
- =?us-ascii?Q?UYPhGUdmqauf416d4+JFsw9uuCZT/Fks1MczLJbr1AcJROu39nwSrwanQ+sx?=
- =?us-ascii?Q?MWG+Jw=3D=3D?=
-X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 43c31005-8a94-4144-f610-08db8d2ad1b3
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jul 2023 16:18:45.1097
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: IK9Jl7D4hYiZXmjPv6ZRb/o/ebKLgWGNOUIH1/5ZM5yHmOH2yuW5gcR4noBrFTyqsn0Ro0sN3k6X1nN6U84uqmQRwCyULtVy7uL/kVsMXLA=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR13MB4437
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Jul 24, 2023 at 06:22:55PM +0200, Peter Seiderer wrote:
-> Remove unused HAVE_HW_TIME_STAMP feature define (introduced by
-> commit ac45f602ee3d ("net: infrastructure for hardware time stamping").
-> 
-> Signed-off-by: Peter Seiderer <ps.report@gmx.net>
+This patchset adds support for netlink-raw families such as rtnetlink.
 
-Reviewed-by: Simon Horman <simon.horman@corigine.com>
+The first patch contains the schema definition.
+The second patch extends ynl to support netlink-raw
+The third patch adds rtnetlink addr and route message types
+
+The second patch depends on "tools: ynl-gen: fix parse multi-attr enum
+attribute":
+
+https://patchwork.kernel.org/project/netdevbpf/list/?series=769229
+
+The netlink-raw schema is very similar to genetlink-legacy and I thought
+about making the changes there and symlinking to it. On balance I
+thought that might be problematic for accurate schema validation.
+
+rtnetlink doesn't seem to fit into unified or directional message
+enumeration models. It seems like an 'explicit' model would be useful,
+to require the schema author to specify the message ids directly. The
+patch supports commands and it supports notifications, but it's
+currently hard to support both simultaneously from the same netlink-raw
+spec. I plan to work on this in a future patchset.
+
+There is not yet support for notifications because ynl currently doesn't
+support defining 'event' properties on a 'do' operation. I plan to work
+on this in a future patch.
+
+The link message types are a work in progress that I plan to submit in a
+future patchset. Links contain different nested attributes dependent on
+the type of link. Decoding these will need some kind of attr-space
+selection based on the value of another attribute in the message.
+
+Donald Hunter (3):
+  doc/netlink: Add a schema for netlink-raw families
+  tools/net/ynl: Add support for netlink-raw families
+  doc/netlink: Add specs for addr and route rtnetlink message types
+
+ Documentation/netlink/netlink-raw.yaml    | 414 ++++++++++++++++++++++
+ Documentation/netlink/specs/rt_addr.yaml  | 179 ++++++++++
+ Documentation/netlink/specs/rt_route.yaml | 192 ++++++++++
+ tools/net/ynl/lib/nlspec.py               |  25 ++
+ tools/net/ynl/lib/ynl.py                  | 185 +++++++---
+ 5 files changed, 941 insertions(+), 54 deletions(-)
+ create mode 100644 Documentation/netlink/netlink-raw.yaml
+ create mode 100644 Documentation/netlink/specs/rt_addr.yaml
+ create mode 100644 Documentation/netlink/specs/rt_route.yaml
+
+-- 
+2.41.0
 
 
