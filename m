@@ -1,109 +1,83 @@
-Return-Path: <netdev+bounces-21057-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21058-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4B0676241F
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 23:08:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5205D762430
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 23:12:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7F391281A4B
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 21:08:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 041F62817B8
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 21:12:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A71DF26B77;
-	Tue, 25 Jul 2023 21:08:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 251AE26B7C;
+	Tue, 25 Jul 2023 21:12:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AD9825936;
-	Tue, 25 Jul 2023 21:08:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A928FC433C8;
-	Tue, 25 Jul 2023 21:08:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE17D1F188;
+	Tue, 25 Jul 2023 21:12:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48769C433C9;
+	Tue, 25 Jul 2023 21:12:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690319303;
-	bh=mFP4UYco3gOD5VKyaE0YzA7kaUtVPHKmet4Fc4mG02w=;
-	h=Date:From:To:cc:Subject:In-Reply-To:References:From;
-	b=KJ8lTP6dOcczngeRimNEKGAjKevSsSSrB4XmesB0YrYxMZrDgFiSqzxRMJGxYq0eG
-	 OCBFwq8IFfA4315z9VhHz+SpV8vl500TQP+L5GYKvt5dOHxxJ/79SV+FbXXkxbSXi2
-	 fQIhx3yJ4aWWg5P79YYEszk17WSRmv+HnIcRVPfJMYWdv3yAcfuyA9AqeF8s1D8MU0
-	 DOiGLdNNwCUyDphpBZ68MZ43v1qh7XyB4LYWP9f2CidFuwkaWjGM6L24ZMkWU66JpW
-	 BbAPKy9x+kJ0+S+ZfmINbU723wzIVGPXff3wsSjsUQ00kHHBoOpgp6XUI3aBBxAVbH
-	 nixNZGC6D5sUQ==
-Date: Tue, 25 Jul 2023 14:08:22 -0700 (PDT)
-From: Mat Martineau <martineau@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-cc: Greg KH <gregkh@linuxfoundation.org>, 
-    Matthieu Baerts <matthieu.baerts@tessares.net>, 
-    "David S. Miller" <davem@davemloft.net>, 
-    Eric Dumazet <edumazet@google.com>, Geliang Tang <geliang.tang@suse.com>, 
-    netdev@vger.kernel.org, mptcp@lists.linux.dev, stable@vger.kernel.org
-Subject: Re: [PATCH net 1/2] selftests: mptcp: join: only check for ip6tables
- if needed
-In-Reply-To: <2023072521-surfboard-starry-fbe8@gregkh>
-Message-ID: <1388a7a1-dbad-1653-d9eb-150fdd1ec746@kernel.org>
-References: <20230725-send-net-20230725-v1-0-6f60fe7137a9@kernel.org> <20230725-send-net-20230725-v1-1-6f60fe7137a9@kernel.org> <2023072521-surfboard-starry-fbe8@gregkh>
+	s=k20201202; t=1690319545;
+	bh=+wjx3PSEq0K5+Aw7/+zFEoqif9hytq8mg416yZy/nHU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=oDwGVunkHA4n7n03Gl8jk70U5ZjAYv48eGM6EMyCNpK27QgccD7LYKF9E3dH97YFT
+	 cqvhh48Z9nPUtchSJ/KbUX3zg0yMj4pX5j5/0Xn/ZvzJ6HIn4FMUmu7H3wKLHN0PXK
+	 zXoixoE1xRJinOW8sELWeoVoJKBphIpInvne8i+89HCy9OGrw636tFTmEixYbzEqkP
+	 yLrrITncMcu6w3VjQYDrfxrpNKUJwxhHRYgfv6WcW5N3LhGttkAyegjJfYv0C61xul
+	 pibX3ENru+yDIDv+zRTFwZbHQNBe0UH7lTDvydbQSgYvKj+dw/O78BZVL3tdK2a5aO
+	 65imaNtu1zwLw==
+Date: Tue, 25 Jul 2023 14:12:23 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Ilias Apalodimas <ilias.apalodimas@linaro.org>
+Cc: Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net,
+ pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Alexander Lobakin <aleksander.lobakin@intel.com>, Eric Dumazet
+ <edumazet@google.com>, Wei Fang <wei.fang@nxp.com>, Shenwei Wang
+ <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, NXP Linux Team
+ <linux-imx@nxp.com>, Sunil Goutham <sgoutham@marvell.com>, Geetha sowjanya
+ <gakula@marvell.com>, Subbaraya Sundeep <sbhatta@marvell.com>, hariprasad
+ <hkelam@marvell.com>, Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky
+ <leon@kernel.org>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
+ <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, John
+ Fastabend <john.fastabend@gmail.com>, Felix Fietkau <nbd@nbd.name>, Lorenzo
+ Bianconi <lorenzo@kernel.org>, Ryder Lee <ryder.lee@mediatek.com>, Shayne
+ Chen <shayne.chen@mediatek.com>, Sean Wang <sean.wang@mediatek.com>, Kalle
+ Valo <kvalo@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ linux-rdma@vger.kernel.org, bpf@vger.kernel.org,
+ linux-wireless@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH net-next v2] page_pool: split types and declarations
+ from page_pool.h
+Message-ID: <20230725141223.19c1c34c@kernel.org>
+In-Reply-To: <ZL/fVF7WetuLgB0l@hera>
+References: <20230725131258.31306-1-linyunsheng@huawei.com>
+	<ZL/fVF7WetuLgB0l@hera>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, 25 Jul 2023, Greg KH wrote:
-
-> On Tue, Jul 25, 2023 at 11:34:55AM -0700, Mat Martineau wrote:
->> From: Matthieu Baerts <matthieu.baerts@tessares.net>
->>
->> If 'iptables-legacy' is available, 'ip6tables-legacy' command will be
->> used instead of 'ip6tables'. So no need to look if 'ip6tables' is
->> available in this case.
->>
->> Fixes: 0c4cd3f86a40 ("selftests: mptcp: join: use 'iptables-legacy' if available")
->> Acked-by: Paolo Abeni <pabeni@redhat.com>
->> Signed-off-by: Matthieu Baerts <matthieu.baerts@tessares.net>
->> Signed-off-by: Mat Martineau <martineau@kernel.org>
->> ---
->>  tools/testing/selftests/net/mptcp/mptcp_join.sh | 4 +---
->>  1 file changed, 1 insertion(+), 3 deletions(-)
->>
->> diff --git a/tools/testing/selftests/net/mptcp/mptcp_join.sh b/tools/testing/selftests/net/mptcp/mptcp_join.sh
->> index e6c9d5451c5b..3c2096ac97ef 100755
->> --- a/tools/testing/selftests/net/mptcp/mptcp_join.sh
->> +++ b/tools/testing/selftests/net/mptcp/mptcp_join.sh
->> @@ -162,9 +162,7 @@ check_tools()
->>  	elif ! iptables -V &> /dev/null; then
->>  		echo "SKIP: Could not run all tests without iptables tool"
->>  		exit $ksft_skip
->> -	fi
->> -
->> -	if ! ip6tables -V &> /dev/null; then
->> +	elif ! ip6tables -V &> /dev/null; then
->>  		echo "SKIP: Could not run all tests without ip6tables tool"
->>  		exit $ksft_skip
->>  	fi
->>
->> --
->> 2.41.0
->>
->
-> <formletter>
->
-> This is not the correct way to submit patches for inclusion in the
-> stable kernel tree.  Please read:
->    https://www.kernel.org/doc/html/latest/process/stable-kernel-rules.html
-> for how to do this properly.
->
-> </formletter>
-
-Ugh, I did forget to add the "Cc: stable@vger.kernel.org" tag in the 
-commit messages for this series and only added in the email cc field.
-
-Jakub/Paolo, if you apply the series as-is I can make sure these end up in 
-stable (as they likely will even without the cc tag). If you prefer I send 
-a v2 just let me know.
+On Tue, 25 Jul 2023 17:42:28 +0300 Ilias Apalodimas wrote:
+> Apologies for the very late replies, I was on long vacation with limited
+> internet access.
+> Yunsheng, since there's been a few mails and I lost track, this is instead of
+> [0] right? If so, I prefer this approach.  It looks ok on a first quick pass,
+> I'll have a closer look later.
+> 
+> [0] https://lore.kernel.org/netdev/20230714170853.866018-2-aleksander.lobakin@intel.com/
 
 
-- Mat
+I prefer the more systematic approach of creating a separate types.h
+file, so I don't have to keep chasing people or cleaning up the include
+hell myself. I think it should be adopted more widely going forward,
+it's not just about the page pool.
 
