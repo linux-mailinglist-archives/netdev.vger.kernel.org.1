@@ -1,230 +1,144 @@
-Return-Path: <netdev+bounces-21033-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21036-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9115D762369
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 22:37:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6ECF176239A
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 22:38:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 46F25281AAD
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 20:37:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 29669281AC0
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 20:38:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A0462591D;
-	Tue, 25 Jul 2023 20:36:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C009425939;
+	Tue, 25 Jul 2023 20:37:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB6E81C39;
-	Tue, 25 Jul 2023 20:36:56 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CEA8CC433CB;
-	Tue, 25 Jul 2023 20:36:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690317416;
-	bh=iD+9/TG8utnpQ+5LlbD8UraXzNLd0V7t1XEdg0wvaug=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=u0anNnEfeRUpiGoIA46fKEDt66xPEL2hUj/1tB4QMHfE2rhDV6R5gxZzuQQTlRisG
-	 v/+AG1tKQ25YmJPBezw+qNBxbB7GlSUXbpqzLeogwG8kle7VS8gzOWBTsmsvol6jVS
-	 xVDgT3DZ+JiMeZImL+TAH/pnmDgaWx50iHJls03Xoxw8ZsP5t5QFhBPoRzYDgS9s4w
-	 6ySPNqbe0wccPxJU5ejuzZ41rYQnd1vwG0Zz/E34ngCbJei9UT6URFnAA1GK+6/Fs9
-	 Bu57fWSt+VP2DLR/dsVooiXEiJt7I6H51+jJ2aNntH+M6e76Sn4Osq1wdnrzIl2g7S
-	 elkCawXIlCrrA==
-Subject: [PATCH net-next v2 3/7] net/handshake: Add API for sending TLS
- Closure alerts
-From: Chuck Lever <cel@kernel.org>
-To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com
-Cc: netdev@vger.kernel.org, kernel-tls-handshake@lists.linux.dev
-Date: Tue, 25 Jul 2023 16:36:44 -0400
-Message-ID: 
- <169031739483.15386.5911126621395017786.stgit@oracle-102.nfsv4bat.org>
-In-Reply-To: 
- <169031700320.15386.6923217931442885226.stgit@oracle-102.nfsv4bat.org>
-References: 
- <169031700320.15386.6923217931442885226.stgit@oracle-102.nfsv4bat.org>
-User-Agent: StGit/1.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3A3A24181
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 20:37:58 +0000 (UTC)
+Received: from out1-smtp.messagingengine.com (out1-smtp.messagingengine.com [66.111.4.25])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 735FC1BE4;
+	Tue, 25 Jul 2023 13:37:30 -0700 (PDT)
+Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
+	by mailout.nyi.internal (Postfix) with ESMTP id ACF5F5C00F2;
+	Tue, 25 Jul 2023 16:37:28 -0400 (EDT)
+Received: from imap51 ([10.202.2.101])
+  by compute6.internal (MEProxy); Tue, 25 Jul 2023 16:37:28 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-type:content-type:date:date:from:from:in-reply-to
+	:in-reply-to:message-id:mime-version:references:reply-to:sender
+	:subject:subject:to:to; s=fm2; t=1690317448; x=1690403848; bh=tU
+	enbxuC5I1n+MGN9iC/9qo7/L6cRKUPK2gsdMgfmGw=; b=fUEfQhmeApsH9S+6d8
+	dYCpcvq8XcHWxwayJ0kqkX98H0Zrh192T3eC1AgofzGoeyFYLIMTQjjomWFFGH8d
+	WEFHRz2Qsk5f0pNrllJbEFWYMPAd1xVxoIMz6iw/+6RaB8HVb6eoA9F3CPl6Hc8u
+	MFDnIqBKICtznrqd34WKsUWbjprS//1HrCc8ZbXd1ZF4hdL3A/cnWy4/Ais+JJFr
+	Tf3B24U/KIg2nlnsfMEEvbDCPkeyQUb3AbwfKqHneedUCtVPEiq9F6YIn+l7qSV/
+	clqj/uyg0VymFXIiX1Cg/fO7KXvWC3i5+JiyxzNpFuA2kD+ypP3YtdUUdU86BPHD
+	3zvA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:sender:subject
+	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+	:x-sasl-enc; s=fm3; t=1690317448; x=1690403848; bh=tUenbxuC5I1n+
+	MGN9iC/9qo7/L6cRKUPK2gsdMgfmGw=; b=Yj2eA52T+f6RmDpoylZMRUKC49eAT
+	qp57mr5n4hyjAGu0NHElHMvyEaBmedsdszebCSN47BuQST3DhJEilKciT9g6P0DO
+	RKjyS9awY8sWwUJmcWI2XRF6M6MziA8k4mwsXa7Kgnr/nouxJCEiYSZWaK2bBeI7
+	Om082OLg70b/GiTeMLWs3yfM2MESjyL1U6LhXZDla8EHPdnQiA8mFeURA6fsKXfK
+	/GuIlO76msupya8Ql3+j4uj0dajz8DBRsnkNV4Gg2XSthYNiVVZsTP1VIb0OzdVZ
+	KnoPX4ZFCaxhRc1EH/JF4mZKfDFnrK4Nlc+kyX0amloNqvPdZjTibdXSQ==
+X-ME-Sender: <xms:iDLAZM9jlh-_2HEHcbS4mRTbbmV7kPLQxQDq-CruLOgM8MKATkkjSA>
+    <xme:iDLAZEuVfl1FcwsNTCbApVhVife_-LDQbJiyZKJAFHOQ6_xZV7oD8F22Vfc9gDAZx
+    UzMfjQ6jvO0A9q5hZc>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedriedtgddugeelucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepofgfggfkjghffffhvfevufgtsehttdertderredtnecuhfhrohhmpedftehr
+    nhguuceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrfgrth
+    htvghrnhepffehueegteeihfegtefhjefgtdeugfegjeelheejueethfefgeeghfektdek
+    teffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprg
+    hrnhgusegrrhhnuggsrdguvg
+X-ME-Proxy: <xmx:iDLAZCBLiytdthl5PM9WNDsivrcXlpjNPhcnuKl1Kn_SZA94j8AL8A>
+    <xmx:iDLAZMcoMfYrbCPhi9ppQARGQgtIYe9lT4XfX-aW2Xiu-SD0nyXeWQ>
+    <xmx:iDLAZBPrSGNq_sXGdp7Kv5wmgrlulBO_ptFX0OiFL0yICBK-8DZavw>
+    <xmx:iDLAZHvJ7u8686wpz0zedDpJYSTV8ckcM4jXj811Vp71k33Lu9OlCg>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+	id F280AB60089; Tue, 25 Jul 2023 16:37:27 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.9.0-alpha0-592-ga9d4a09b4b-fm-defalarms-20230725.001-ga9d4a09b
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+Message-Id: <990b6871-169b-4d03-b202-f19294730f8c@app.fastmail.com>
+In-Reply-To: <ZMAqPdO2XcIXOCFs@corigine.com>
+References: <20230725064403.581634-1-arnd@kernel.org>
+ <ZMAqPdO2XcIXOCFs@corigine.com>
+Date: Tue, 25 Jul 2023 22:37:07 +0200
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: "Simon Horman" <simon.horman@corigine.com>,
+ "Arnd Bergmann" <arnd@kernel.org>
+Cc: "David S . Miller" <davem@davemloft.net>,
+ "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
+ "Paolo Abeni" <pabeni@redhat.com>, "Ioana Ciornei" <ioana.ciornei@nxp.com>,
+ "Russell King" <linux@armlinux.org.uk>,
+ "Robert-Ionut Alexa" <robert-ionut.alexa@nxp.com>,
+ "Russell King" <rmk+kernel@armlinux.org.uk>,
+ "Vladimir Oltean" <vladimir.oltean@nxp.com>,
+ "Wolfram Sang" <wsa+renesas@sang-engineering.com>,
+ "Sean Anderson" <sean.anderson@seco.com>,
+ "Josua Mayer" <josua@solid-run.com>, Netdev <netdev@vger.kernel.org>,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] dpaa: avoid linking objects into multiple modules
+Content-Type: text/plain
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-From: Chuck Lever <chuck.lever@oracle.com>
+On Tue, Jul 25, 2023, at 22:02, Simon Horman wrote:
+> On Tue, Jul 25, 2023 at 08:43:40AM +0200, Arnd Bergmann wrote:
+>> From: Arnd Bergmann <arnd@arndb.de>
+>> 
+>> Each object file contains information about which module it gets linked
+>> into, so linking the same file into multiple modules now causes a warning:
+>> 
+>> scripts/Makefile.build:254: drivers/net/ethernet/freescale/dpaa2/Makefile: dpaa2-mac.o is added to multiple modules: fsl-dpaa2-eth fsl-dpaa2-switch
+>> scripts/Makefile.build:254: drivers/net/ethernet/freescale/dpaa2/Makefile: dpmac.o is added to multiple modules: fsl-dpaa2-eth fsl-dpaa2-switch
+>> 
+>> Chang the way that dpaa2 is built by moving the two common files into a
+>> separate module with exported symbols instead.
+>> 
+>> To avoid a link failure when the switch driver is built-in, but the dpio driver
+>> is a loadable module, add the same dependency in there that exists for
+>> the ethernet driver.
+>> 
+>> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+>
+> Hi Arnd,
+>
+> overall this looks good to me.
+> One thing that I noticed, and I'm not sure if we care,
+> is that an x86_64 allmodconfig now reports:
+>
+> WARNING: modpost: missing MODULE_DESCRIPTION() in 
+> drivers/net/ethernet/freescale/dpaa2/fsl-dpaa2-common.o
 
-This helper sends an alert only if a TLS session was established.
+My mistake, I had disabled the warning in modpost.c as it was
+generating too much output while I tried to address some
+other warnings, so I missed the regression I introduced.
 
-Signed-off-by: Chuck Lever <chuck.lever@oracle.com>
----
- include/net/handshake.h   |    1 +
- net/handshake/Makefile    |    2 +
- net/handshake/alert.c     |   62 +++++++++++++++++++++++++++++++++++++++++++++
- net/handshake/handshake.h |    4 +++
- net/handshake/tlshd.c     |   23 +++++++++++++++++
- 5 files changed, 91 insertions(+), 1 deletion(-)
- create mode 100644 net/handshake/alert.c
+I'll send a v2, adding
 
-diff --git a/include/net/handshake.h b/include/net/handshake.h
-index 2e26e436e85f..bb88dfa6e3c9 100644
---- a/include/net/handshake.h
-+++ b/include/net/handshake.h
-@@ -40,5 +40,6 @@ int tls_server_hello_x509(const struct tls_handshake_args *args, gfp_t flags);
- int tls_server_hello_psk(const struct tls_handshake_args *args, gfp_t flags);
- 
- bool tls_handshake_cancel(struct sock *sk);
-+void tls_handshake_close(struct socket *sock);
- 
- #endif /* _NET_HANDSHAKE_H */
-diff --git a/net/handshake/Makefile b/net/handshake/Makefile
-index 247d73c6ff6e..ef4d9a2112bd 100644
---- a/net/handshake/Makefile
-+++ b/net/handshake/Makefile
-@@ -8,6 +8,6 @@
- #
- 
- obj-y += handshake.o
--handshake-y := genl.o netlink.o request.o tlshd.o trace.o
-+handshake-y := alert.o genl.o netlink.o request.o tlshd.o trace.o
- 
- obj-$(CONFIG_NET_HANDSHAKE_KUNIT_TEST) += handshake-test.o
-diff --git a/net/handshake/alert.c b/net/handshake/alert.c
-new file mode 100644
-index 000000000000..999d3ffaf3e3
---- /dev/null
-+++ b/net/handshake/alert.c
-@@ -0,0 +1,62 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Handle the TLS Alert protocol
-+ *
-+ * Author: Chuck Lever <chuck.lever@oracle.com>
-+ *
-+ * Copyright (c) 2023, Oracle and/or its affiliates.
-+ */
-+
-+#include <linux/types.h>
-+#include <linux/socket.h>
-+#include <linux/kernel.h>
-+#include <linux/module.h>
-+#include <linux/skbuff.h>
-+#include <linux/inet.h>
-+
-+#include <net/sock.h>
-+#include <net/handshake.h>
-+#include <net/genetlink.h>
-+#include <net/tls.h>
-+#include <net/tls_prot.h>
-+
-+#include "handshake.h"
-+
-+/**
-+ * tls_alert_send - send a TLS Alert on a kTLS socket
-+ * @sock: open kTLS socket to send on
-+ * @level: TLS Alert level
-+ * @description: TLS Alert description
-+ *
-+ * Returns zero on success or a negative errno.
-+ */
-+int tls_alert_send(struct socket *sock, u8 level, u8 description)
-+{
-+	u8 record_type = TLS_RECORD_TYPE_ALERT;
-+	u8 buf[CMSG_SPACE(sizeof(record_type))];
-+	struct msghdr msg = { 0 };
-+	struct cmsghdr *cmsg;
-+	struct kvec iov;
-+	u8 alert[2];
-+	int ret;
-+
-+	alert[0] = level;
-+	alert[1] = description;
-+	iov.iov_base = alert;
-+	iov.iov_len = sizeof(alert);
-+
-+	memset(buf, 0, sizeof(buf));
-+	msg.msg_control = buf;
-+	msg.msg_controllen = sizeof(buf);
-+	msg.msg_flags = MSG_DONTWAIT;
-+
-+	cmsg = CMSG_FIRSTHDR(&msg);
-+	cmsg->cmsg_level = SOL_TLS;
-+	cmsg->cmsg_type = TLS_SET_RECORD_TYPE;
-+	cmsg->cmsg_len = CMSG_LEN(sizeof(record_type));
-+	memcpy(CMSG_DATA(cmsg), &record_type, sizeof(record_type));
-+
-+	iov_iter_kvec(&msg.msg_iter, ITER_SOURCE, &iov, 1, iov.iov_len);
-+	ret = sock_sendmsg(sock, &msg);
-+	return ret < 0 ? ret : 0;
-+}
-diff --git a/net/handshake/handshake.h b/net/handshake/handshake.h
-index 4dac965c99df..af1633d5ad73 100644
---- a/net/handshake/handshake.h
-+++ b/net/handshake/handshake.h
-@@ -41,6 +41,7 @@ struct handshake_req {
- 
- enum hr_flags_bits {
- 	HANDSHAKE_F_REQ_COMPLETED,
-+	HANDSHAKE_F_REQ_SESSION,
- };
- 
- /* Invariants for all handshake requests for one transport layer
-@@ -63,6 +64,9 @@ enum hp_flags_bits {
- 	HANDSHAKE_F_PROTO_NOTIFY,
- };
- 
-+/* alert.c */
-+int tls_alert_send(struct socket *sock, u8 level, u8 description);
-+
- /* netlink.c */
- int handshake_genl_notify(struct net *net, const struct handshake_proto *proto,
- 			  gfp_t flags);
-diff --git a/net/handshake/tlshd.c b/net/handshake/tlshd.c
-index b735f5cced2f..bbfb4095ddd6 100644
---- a/net/handshake/tlshd.c
-+++ b/net/handshake/tlshd.c
-@@ -18,6 +18,7 @@
- #include <net/sock.h>
- #include <net/handshake.h>
- #include <net/genetlink.h>
-+#include <net/tls_prot.h>
- 
- #include <uapi/linux/keyctl.h>
- #include <uapi/linux/handshake.h>
-@@ -100,6 +101,9 @@ static void tls_handshake_done(struct handshake_req *req,
- 	if (info)
- 		tls_handshake_remote_peerids(treq, info);
- 
-+	if (!status)
-+		set_bit(HANDSHAKE_F_REQ_SESSION, &req->hr_flags);
-+
- 	treq->th_consumer_done(treq->th_consumer_data, -status,
- 			       treq->th_peerid[0]);
- }
-@@ -424,3 +428,22 @@ bool tls_handshake_cancel(struct sock *sk)
- 	return handshake_req_cancel(sk);
- }
- EXPORT_SYMBOL(tls_handshake_cancel);
-+
-+/**
-+ * tls_handshake_close - send a Closure alert
-+ * @sock: an open socket
-+ *
-+ */
-+void tls_handshake_close(struct socket *sock)
-+{
-+	struct handshake_req *req;
-+
-+	req = handshake_req_hash_lookup(sock->sk);
-+	if (!req)
-+		return;
-+	if (!test_and_clear_bit(HANDSHAKE_F_REQ_SESSION, &req->hr_flags))
-+		return;
-+	tls_alert_send(sock, TLS_ALERT_LEVEL_WARNING,
-+		       TLS_ALERT_DESC_CLOSE_NOTIFY);
-+}
-+EXPORT_SYMBOL(tls_handshake_close);
+MODULE_DESCRIPTION("DPAA2 Ethernet core library");
 
-
+      Arnd
 
