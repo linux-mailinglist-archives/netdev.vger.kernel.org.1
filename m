@@ -1,91 +1,89 @@
-Return-Path: <netdev+bounces-21086-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21087-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71C30762569
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 00:03:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3EA477625CE
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 00:15:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9FC811C20FFD
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 22:03:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EE162281A6E
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 22:15:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 382ED27702;
-	Tue, 25 Jul 2023 22:03:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 058CA27707;
+	Tue, 25 Jul 2023 22:15:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D227226B6D
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 22:03:15 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3DD0C433C7;
-	Tue, 25 Jul 2023 22:03:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE14126B6D
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 22:15:53 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF6EEC433C8;
+	Tue, 25 Jul 2023 22:15:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690322595;
-	bh=oQxFAhpidA9V2q1VPA63bxve/3DIExxQn19eeLCZFhc=;
+	s=k20201202; t=1690323353;
+	bh=R8hDw13PkX4HnETJNxCMRO4YjpeRUQPJLGHS8yBElLM=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Xfev1x+Y1clHe6sv0jKhTpqz1JV6DGoLLUWc+caEfWdYUvcPtw50VRYQwTM391dHI
-	 Er5WuRP0GuFrUhnBALijqFaMVi7SUyWvBDaKwStDikU5/sc40/g1CWnaBLp63G17pg
-	 RWgGvXMjHWh6QSEXMZP77oYoLHrWumFzyL6ytPkZFajxFcApanfJ8erIQNJiOES0wg
-	 6fjxcp5PThRoUujauwI887hkfkWyloOD5tWtZu+8mg/vp+y+ZGVCqFPv3/ToNd/sTG
-	 taMY2mV0g0gD4XesaEDic4oyu9pyrib3zQicPp4VtOAYJSkeYPd9khNYqPnLHxZlFC
-	 WJKeRWS0Q8dLw==
-Date: Tue, 25 Jul 2023 15:03:14 -0700
+	b=NVmTupd2cexcEtLMEZ7j0wrpJNTbo88NpuFjFZHF0vIay7SlSgTI1IDjwkfsWHENn
+	 bfUDsklcZw6+yh4uk2K0IJYd1C9DQ6Jh4Gh8BAhSA4Q83Z/gcaKP508+J6PUk+CohD
+	 Ub/yycpVwUPOp7ATlrxSiIOLGe7njFWlcknXlTQNftDwTKjFAqyBMLafdOXJFOCssM
+	 M3uVlPORfEwKj7azXLVwk6Ws8uBbF20qG4M0y0c+j5Rwu5CvVcxjevPQ2CDV0s2OpI
+	 rWGjC4cuKyHrx7+NdSe7avUKpPuYXjHpUAkO0x4Lqhpr8NXUevfOG/cmb0XnTmnZ6o
+	 9iOMTXc4JSq5Q==
+Date: Tue, 25 Jul 2023 15:15:52 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: valis <sec@valis.email>
-Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us,
- davem@davemloft.net, edumazet@google.com, pctammela@mojatatu.com,
- victor@mojatatu.com, ramdhan@starlabs.sg, billy@starlabs.sg, Greg
- Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: Re: [PATCH net 0/3] net/sched Bind logic fixes for cls_fw, cls_u32
- and cls_route
-Message-ID: <20230725150314.342181ee@kernel.org>
-In-Reply-To: <CAEBa_SASfBCb8TCS=qzNw90ZNE+wzADmY1_VtJiBnmixXgt6NQ@mail.gmail.com>
-References: <20230721174856.3045-1-sec@valis.email>
-	<8a707435884e18ccb92e1e91e474f7662d4f9365.camel@redhat.com>
-	<CAEBa_SB6KCa787D3y4ozBczbHfZrsscBMmD9PS1RjcC=375jog@mail.gmail.com>
-	<20230725130917.36658b63@kernel.org>
-	<CAEBa_SASfBCb8TCS=qzNw90ZNE+wzADmY1_VtJiBnmixXgt6NQ@mail.gmail.com>
+To: Joe Perches <joe@perches.com>
+Cc: krzk@kernel.org, geert@linux-m68k.org, netdev@vger.kernel.org,
+ workflows@vger.kernel.org, mario.limonciello@amd.com
+Subject: Re: [PATCH] scripts: checkpatch: steer people away from using file
+ paths
+Message-ID: <20230725151552.723f1e3f@kernel.org>
+In-Reply-To: <e032507fcb9e6c72d19520898c0095a4c0bd1c33.camel@perches.com>
+References: <b6ab3c25-eab8-5573-f6e5-8415222439cd@kernel.org>
+	<20230725155926.2775416-1-kuba@kernel.org>
+	<e032507fcb9e6c72d19520898c0095a4c0bd1c33.camel@perches.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, 25 Jul 2023 23:36:14 +0200 valis wrote:
-> On Tue, Jul 25, 2023 at 10:09=E2=80=AFPM Jakub Kicinski <kuba@kernel.org>=
- wrote:
-> > We don't know who you are. To my understanding the adjustment means
-> > that you are not obligated to use the name on your birth certificate
-> > but we need to know who you are. =20
->=20
-> I could start a discussion about what makes a name valid, but I'm
-> pretty sure netdev is not the right place for it.
+On Tue, 25 Jul 2023 14:18:15 -0700 Joe Perches wrote:
+> > @@ -544,7 +546,13 @@ foreach my $file (@ARGV) {
+> >      if ($from_filename && (vcs_exists() && !vcs_file_exists($file))) {
+> >  	warn "$P: file '$file' not found in version control $!\n";
+> >      }
+> > -    if ($from_filename || ($file ne "&STDIN" && vcs_file_exists($file))) {
+> > +    if ($from_filename) {
+> > +	if (!$silence_file_warning) {
+> > +	    warn "$P: WARNING: Prefer running the script on patches as "
+> > +	        . "generated by git format-patch. Selecting paths is known "
+> > +		. "to miss recipients!\n";  
+> 
+> Don't separate a single output message into multiple lines.
+> Coalesce the string elements.
+> 
+> Also, this should show some reason why this isn't appropriate
+> as a patch to a single file would not have this issue.
+> 
+> e.g.:	When a patch series touches multiple files, showing all maintainers is useful. see:  <some process doc>
 
-Agreed, I CCed Greg KH to keep me honest, in case I'm outright
-incorrect. If it's a gray zone kinda answer I'm guessing that
-nobody here really wants to spend time discussing it.
+I tried to do that in --help. Added the "multiple files" one there, too.
 
-> > Why is it always "security" people who try act like this is some make
-> > believe metaverse. We're working on a real project with real licenses
-> > and real legal implications.
-> >
-> > Your S-o-b is pretty much meaningless. If a "real" person can vouch for
-> > who you are or put their own S-o-b on your code that's fine. =20
->=20
-> I posted my patches to this mailing list per maintainer's request and
-> according to the published rules of the patch submission process as I
-> understood them.
-> Sorry if I misinterpreted something and wasted anybody's time.
->=20
-> I'm not going to resubmit the patches under a different name.
->=20
-> Please feel free to use them if someone is willing to sign off on them.
+> > @@ -1089,6 +1098,10 @@ version: $V
+> >     --pattern-depth=0 --remove-duplicates --rolestats]
+> >  
+> >  Notes:
+> > +  Using "-f file" is generally discouraged, running the script on a filepatch
+> > +      (as generated by git format-patch) is usually the right thing to do.
+> > +      Commit message is an integral part of the change and $P
+> > +      will extract additional information from it (keywords, Fixes tags etc.)  
+> 
+> "filepatch" doesn't appear in the kernel at all. Use "patch file".
 
-If Jamal or anyone else feels like they can vouch for the provenance
-of the code, I think that may be the best compromise.
+I got it the wrong way around. I'll use patchfile (no space) for v2
+since that's what's what get_maintainer uses in two other places.
 
