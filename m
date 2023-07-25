@@ -1,165 +1,90 @@
-Return-Path: <netdev+bounces-21100-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21101-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B9E176274B
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 01:28:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E30976275A
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 01:32:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 41352281A5F
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 23:28:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2797B1C20F72
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 23:32:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B22B27704;
-	Tue, 25 Jul 2023 23:28:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A56CE2770E;
+	Tue, 25 Jul 2023 23:32:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01D4E8BE1
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 23:28:13 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F896C433C7;
-	Tue, 25 Jul 2023 23:28:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690327693;
-	bh=wFYXU8FW2j/CEZh6TX3L/u8JpUiq+8Aq7hmDBPOY9DU=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=mQ/ujqP6+Rw45KHYH5KJINobLDHmPO+KgDM8Os7LLAu0+kSpNkKsQGq2gw2CWRP/v
-	 I4onXPchvaMTAqf++F5DeKdXIjDFU7RxQ/Fobuh1zxAWuTEwWqiXF4Wfle8zFpgeWC
-	 XoBBnE8Ssfv8BayFhhB2/IfnYJw7llJXI9UueqXlChxaqkUCLvhQZoxJsVEw+mQEQ/
-	 ptnUTRj6NLNfrzKFxSyALgV6e7TGv0a4t/f1qlPvFmcDWIDc+AAW92iBhblfVAtmwY
-	 jWIWVg2hByLLPCgZppR+DtP028OrHl4KgrTgSSIxQaFNjP6E/nJSjRwGoLFZG55xAl
-	 9Cfkwpn0ZijVg==
-Message-ID: <1940c057-99c4-8355-cc95-3f17cca38481@kernel.org>
-Date: Tue, 25 Jul 2023 17:28:12 -0600
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97B808462
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 23:32:32 +0000 (UTC)
+Received: from mail-oo1-f69.google.com (mail-oo1-f69.google.com [209.85.161.69])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92A3C120
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 16:32:30 -0700 (PDT)
+Received: by mail-oo1-f69.google.com with SMTP id 006d021491bc7-565d6b6c1c7so9692010eaf.2
+        for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 16:32:30 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690327950; x=1690932750;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=NAib9FhsF/p+ZXO7Hu3qYWPzTDSVp9gbYDlcfRv4tfU=;
+        b=boKkI8tBp8QZysR2ECBzlLz4m7DZpfawcTInjdTAwo8mEIEtccHe/Ltj2CbVikZWkY
+         xoO707G1AmGWP7EY5jrGYGuvJyBuUJUiCiKi0d8hZeC6AeKl2RlBpj+v73omtSHtOmRi
+         sX3ubfIdsMwGrg9QZLIdjSLgqWACc0D5l5LTxVEQX3OAMFhjLFzU604aXz7VYAWuKt1q
+         JJwpfh1ClJ28DHHXwCE2k6eu8u2opwkuAKtUiwcFig49R/trW30R8woiIs86pHPc0fw0
+         iHHps8xP/K1NkG7C/tF3Vd3H6I3tTZoFFIpQ71gLJjp24t6FlBgeJxFq10PEWRo0cSrt
+         NEDw==
+X-Gm-Message-State: ABy/qLYqdlMnYb0bWYHeVaBPE1PazoRLuETtZL1Sz9QcI47Jqqaud8cw
+	eLTpf0uiRh5B/pLA5cagI4HOWVkYnzXE9kdpfm5o/9vSKYba
+X-Google-Smtp-Source: APBJJlFEYk/bqYGyuJAaHAL1JEWuUOwkkcZpbbHJ/FVewEDv5hVdmh7chgIV5DaFhIO4BzQtyA3NJlRpkIZDZVk0K+a5hwacR/az
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.13.0
-Subject: Re: [net-next] net: change accept_ra_min_rtr_lft to affect all RA
- lifetimes
-Content-Language: en-US
-To: Patrick Rohr <prohr@google.com>, "David S . Miller" <davem@davemloft.net>
-Cc: Linux Network Development Mailing List <netdev@vger.kernel.org>,
- =?UTF-8?Q?Maciej_=c5=bbenczykowski?= <maze@google.com>,
- Lorenzo Colitti <lorenzo@google.com>
-References: <20230725183122.4137963-1-prohr@google.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20230725183122.4137963-1-prohr@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a4a:4f8b:0:b0:569:d5ae:eb6e with SMTP id
+ c133-20020a4a4f8b000000b00569d5aeeb6emr495681oob.0.1690327949950; Tue, 25 Jul
+ 2023 16:32:29 -0700 (PDT)
+Date: Tue, 25 Jul 2023 16:32:29 -0700
+In-Reply-To: <0000000000000ced8905fecceeba@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000002c74d0601582595@google.com>
+Subject: Re: [syzbot] [crypto?] general protection fault in shash_async_update
+From: syzbot <syzbot+0bc501b7bf9e1bc09958@syzkaller.appspotmail.com>
+To: alexander.deucher@amd.com, davem@davemloft.net, dhowells@redhat.com, 
+	herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, mario.limonciello@amd.com, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=0.8 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H3,
+	RCVD_IN_MSPIKE_WL,SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On 7/25/23 12:31 PM, Patrick Rohr wrote:
-> @@ -2727,6 +2727,11 @@ void addrconf_prefix_rcv(struct net_device *dev, u8 *opt, int len, bool sllao)
->  		return;
->  	}
->  
-> +	if (valid_lft != 0 && valid_lft < in6_dev->cnf.accept_ra_min_lft) {
-> +		net_info_ratelimited("addrconf: prefix option lifetime too short\n");
+syzbot suspects this issue was fixed by commit:
 
-The error message does not really provide any value besides spamming the
-logs. Similar comment applies to existing error logging in that function
-too. I think a counter for invalid prefix packets would be more useful.
+commit 30c3d3b70aba2464ee8c91025e91428f92464077
+Author: Mario Limonciello <mario.limonciello@amd.com>
+Date:   Tue May 30 16:57:59 2023 +0000
 
-> +		return;
-> +	}
-> +
->  	/*
->  	 *	Two things going on here:
->  	 *	1) Add routes for on-link prefixes
-> @@ -5598,7 +5603,7 @@ static inline void ipv6_store_devconf(struct ipv6_devconf *cnf,
->  	array[DEVCONF_IOAM6_ID_WIDE] = cnf->ioam6_id_wide;
->  	array[DEVCONF_NDISC_EVICT_NOCARRIER] = cnf->ndisc_evict_nocarrier;
->  	array[DEVCONF_ACCEPT_UNTRACKED_NA] = cnf->accept_untracked_na;
-> -	array[DEVCONF_ACCEPT_RA_MIN_RTR_LFT] = cnf->accept_ra_min_rtr_lft;
-> +	array[DEVCONF_ACCEPT_RA_MIN_LFT] = cnf->accept_ra_min_lft;
->  }
->  
->  static inline size_t inet6_ifla6_size(void)
-> @@ -6793,8 +6798,8 @@ static const struct ctl_table addrconf_sysctl[] = {
->  		.proc_handler	= proc_dointvec,
->  	},
->  	{
-> -		.procname	= "accept_ra_min_rtr_lft",
-> -		.data		= &ipv6_devconf.accept_ra_min_rtr_lft,
-> +		.procname	= "accept_ra_min_lft",
-> +		.data		= &ipv6_devconf.accept_ra_min_lft,
->  		.maxlen		= sizeof(int),
->  		.mode		= 0644,
->  		.proc_handler	= proc_dointvec,
-> diff --git a/net/ipv6/ndisc.c b/net/ipv6/ndisc.c
-> index 29ddad1c1a2f..eeb60888187f 100644
-> --- a/net/ipv6/ndisc.c
-> +++ b/net/ipv6/ndisc.c
-> @@ -1280,8 +1280,6 @@ static enum skb_drop_reason ndisc_router_discovery(struct sk_buff *skb)
->  	if (!ndisc_parse_options(skb->dev, opt, optlen, &ndopts))
->  		return SKB_DROP_REASON_IPV6_NDISC_BAD_OPTIONS;
->  
-> -	lifetime = ntohs(ra_msg->icmph.icmp6_rt_lifetime);
-> -
->  	if (!ipv6_accept_ra(in6_dev)) {
->  		ND_PRINTK(2, info,
->  			  "RA: %s, did not accept ra for dev: %s\n",
-> @@ -1289,13 +1287,6 @@ static enum skb_drop_reason ndisc_router_discovery(struct sk_buff *skb)
->  		goto skip_linkparms;
->  	}
->  
-> -	if (lifetime != 0 && lifetime < in6_dev->cnf.accept_ra_min_rtr_lft) {
-> -		ND_PRINTK(2, info,
-> -			  "RA: router lifetime (%ds) is too short: %s\n",
-> -			  lifetime, skb->dev->name);
-> -		goto skip_linkparms;
-> -	}
-> -
->  #ifdef CONFIG_IPV6_NDISC_NODETYPE
->  	/* skip link-specific parameters from interior routers */
->  	if (skb->ndisc_nodetype == NDISC_NODETYPE_NODEFAULT) {
-> @@ -1336,6 +1327,14 @@ static enum skb_drop_reason ndisc_router_discovery(struct sk_buff *skb)
->  		goto skip_defrtr;
->  	}
->  
-> +	lifetime = ntohs(ra_msg->icmph.icmp6_rt_lifetime);
-> +	if (lifetime != 0 && lifetime < in6_dev->cnf.accept_ra_min_lft) {
-> +		ND_PRINTK(2, info,
-> +			  "RA: router lifetime (%ds) is too short: %s\n",
-> +			  lifetime, skb->dev->name);
-> +		goto skip_defrtr;
-> +	}
-> +
->  	/* Do not accept RA with source-addr found on local machine unless
->  	 * accept_ra_from_local is set to true.
->  	 */
-> @@ -1499,13 +1498,6 @@ static enum skb_drop_reason ndisc_router_discovery(struct sk_buff *skb)
->  		goto out;
->  	}
->  
-> -	if (lifetime != 0 && lifetime < in6_dev->cnf.accept_ra_min_rtr_lft) {
-> -		ND_PRINTK(2, info,
-> -			  "RA: router lifetime (%ds) is too short: %s\n",
-> -			  lifetime, skb->dev->name);
-> -		goto out;
-> -	}
-> -
+    drm/amd: Disallow s0ix without BIOS support again
 
-The commit mentioned in the Fixes was just applied and you are already
-sending a follow up moving the same code around again.
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=122e2c31a80000
+start commit:   [unknown] 
+git tree:       net-next
+kernel config:  https://syzkaller.appspot.com/x/.config?x=526f919910d4a671
+dashboard link: https://syzkaller.appspot.com/bug?extid=0bc501b7bf9e1bc09958
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13f71275280000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=11081055280000
 
->  #ifdef CONFIG_IPV6_ROUTE_INFO
->  	if (!in6_dev->cnf.accept_ra_from_local &&
->  	    ipv6_chk_addr(dev_net(in6_dev->dev), &ipv6_hdr(skb)->saddr,
-> @@ -1530,6 +1522,9 @@ static enum skb_drop_reason ndisc_router_discovery(struct sk_buff *skb)
->  			if (ri->prefix_len == 0 &&
->  			    !in6_dev->cnf.accept_ra_defrtr)
->  				continue;
-> +			if (ri->lifetime != 0 &&
-> +			    ntohl(ri->lifetime) < in6_dev->cnf.accept_ra_min_lft)
-> +				continue;
->  			if (ri->prefix_len < in6_dev->cnf.accept_ra_rt_info_min_plen)
->  				continue;
->  			if (ri->prefix_len > in6_dev->cnf.accept_ra_rt_info_max_plen)
+If the result looks correct, please mark the issue as fixed by replying with:
 
+#syz fix: drm/amd: Disallow s0ix without BIOS support again
+
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
