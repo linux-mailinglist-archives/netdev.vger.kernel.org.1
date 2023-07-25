@@ -1,235 +1,189 @@
-Return-Path: <netdev+bounces-20851-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20852-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8528E761941
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 15:06:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AF579761954
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 15:07:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B64F21C20E93
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 13:06:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E07101C20EB1
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 13:07:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21DDB1F174;
-	Tue, 25 Jul 2023 13:06:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 575231F17E;
+	Tue, 25 Jul 2023 13:07:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14B561F16C
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 13:06:17 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF5B71FD6
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 06:06:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1690290370;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=K1X8yDKyRljjlgsdrNt2jAkyf6vXFbNpPQPsSIK0WH0=;
-	b=I4Bmg4F9jSblxWBTjewMbOkDXhn/ssUHopnOGDVr8Gjk1h7S8eHHghlsB+KcER8k1tZd5S
-	1Omr/yn23tbDn6aKyIynrYvQ6WnirqRBFDyuEU3vFMdMJr7Y5m7znNfx9NOlG5spwJ/q7H
-	sscAnPMgznK/Kg5VZ69zaJDkyHXwyQU=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-59-CgYF6ku-NPqHZKqAVbVqGA-1; Tue, 25 Jul 2023 09:06:08 -0400
-X-MC-Unique: CgYF6ku-NPqHZKqAVbVqGA-1
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-94a355c9028so406608166b.3
-        for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 06:06:08 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690290367; x=1690895167;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=K1X8yDKyRljjlgsdrNt2jAkyf6vXFbNpPQPsSIK0WH0=;
-        b=VZ1duIoRSuS7T19yH7eNPsR7yVb1huwWe9wruI/WxcfD26eaQ8tvxZJREjp+EkQYtR
-         rZooHnEmCv5Dao54WocIxY+8rRwxYSvscIBVHfD/X3oDWgpjHuNMHpPXHk8zH930Ne0P
-         xkBM4OzFmskZBt1tY95lidQlUzhOfAQ2K5EX6H1OtUW97BpPAic33Zyck4CdQ5kkoWDZ
-         J+/Myl+yO5lp0nJ+hebk43A97Dr1SWBSi7AaPk9KJehI8AbaNXW46zhpS0jwLZelehXl
-         zHJkd73g7TGgIKy1j0okrDTs7aKaRL5TWSoCnsr18Kbdr+kHOsyZ5LGer/CiBRM+9ezJ
-         FuCA==
-X-Gm-Message-State: ABy/qLb8rB4Hjdq1vpAr9tQt0Mu4svac1xs3mnE3szw6obUcbMGX9hTR
-	JaxQSBfK8Gek41Jm2h6fetGpxtp1fJk25qEbTcxe/BA9exlPrVstLBCdmaFMY4YRsQrtaPH5Xg+
-	enL2IzGll+GYud9dC
-X-Received: by 2002:a17:907:7784:b0:982:2278:bcef with SMTP id ky4-20020a170907778400b009822278bcefmr12112964ejc.60.1690290367675;
-        Tue, 25 Jul 2023 06:06:07 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlFKe/e8kfIwy1WsKWMlpZ+w+bWS7V5xC/G665qa9FumF0OUD5sCTH9kWU/ysoN0KlGWemAgsA==
-X-Received: by 2002:a17:907:7784:b0:982:2278:bcef with SMTP id ky4-20020a170907778400b009822278bcefmr12112938ejc.60.1690290367254;
-        Tue, 25 Jul 2023 06:06:07 -0700 (PDT)
-Received: from redhat.com ([2.55.164.187])
-        by smtp.gmail.com with ESMTPSA id r7-20020a170906c28700b0099b42c90830sm8133731ejz.36.2023.07.25.06.06.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Jul 2023 06:06:06 -0700 (PDT)
-Date: Tue, 25 Jul 2023 09:06:02 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: Arseniy Krasnov <avkrasnov@sberdevices.ru>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Bobby Eshleman <bobby.eshleman@bytedance.com>, kvm@vger.kernel.org,
-	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kernel@sberdevices.ru,
-	oxffffaa@gmail.com
-Subject: Re: [PATCH net-next v3 4/4] vsock/virtio: MSG_ZEROCOPY flag support
-Message-ID: <20230725090514-mutt-send-email-mst@kernel.org>
-References: <20230720214245.457298-1-AVKrasnov@sberdevices.ru>
- <20230720214245.457298-5-AVKrasnov@sberdevices.ru>
- <091c067b-43a0-da7f-265f-30c8c7e62977@sberdevices.ru>
- <20230725042544-mutt-send-email-mst@kernel.org>
- <mul7yiwl2pspfegeanqyezhmw6ol4cxsdshch7ln6w3i2b54bw@7na6bf5kfxwy>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B0C41ED3E;
+	Tue, 25 Jul 2023 13:07:47 +0000 (UTC)
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2068.outbound.protection.outlook.com [40.107.92.68])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A1E6173F;
+	Tue, 25 Jul 2023 06:07:44 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=mPV3T2fVcW5UTSV74ow3vRcx2wt8PRU3JMqju3fTkoO8aHc1nWAu52pEajCpFOgyI4RvzgZnXPHgnfGd+fP6dNssqYCV0ZnN6lmpy+9633udWLW4gV5HjYHwYkqpP7vL3Sd7DIgHb6FESsvWWwzPHygItO2v2Gxs4/6b4Ylsq5tI4StbkaoOfl0/XqtwAylYK+yEm7HoONlMm00w3fedakyjWpnJRGEs2ZJW9OzdzA4yOZl7+M6e1cPYqox94KkIPvGY8xFf/DbkxRLXhFGIL0MCvQ+BZq/blafGyVGxENsVICQeCdSKCWveHlCBCX5UyLPJ57ZF4EXsR/uR1BATog==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=aK+8ALn189/VYcZZfobTNdm4LjWO8rr/qianUzVIx50=;
+ b=QAy2swkwMTphrCcrr5ihhBJLNSqspu++X1xfsklOg+eiLWMUsbK6zXbNzKD5EYGZ39goRnuUzABDIBoSLMJCqqrX9xK/xfUgntN5Huo0Nq63XrrCZrzoEIR3Qp1CJ43lLfjxBNn/pmB1z7v5AH/ZAtk15lTfd3bwFg3CeoiukvCk9XadsXnO6F2EqCxxNRNx4j5riAn9I3cwDZLwATIM6qxEL4hzXwBvAE9v82HUFKfVX2zg1B6xLh6/zqSqquKbk+/wj7WzkRi6cFB1VvlkpwG2WeW82xvz4d29paAbaehmCUL/BM2LQ2UbhdGMq2sOIAcJCMgwXbkGbvcF2dBkVA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=aK+8ALn189/VYcZZfobTNdm4LjWO8rr/qianUzVIx50=;
+ b=TxZQPLWKSlCevg1ua7hOpsCTz031DtNCepE1Y504auhNyipoRQLrwn+Jb7rkTzKHwhSe/UTtvhNXWkTR0m8zkBYYVziOoqBd6ZmyTfCizDrS/Ow5FHah7YzznMciFkjbMq2Oe4N5+jdWkc2q3V9RUSYV9xi0VwXaGBHPQ9t7+cZLAFdUygr6JD7XaYzyQtkOivR18Pg7frax4K0TtzwKN9gXWF68Y+uj7JuLMx7YJsAYWOYA8r7YxXgZo649KZkobc8khMJ0BKmRWUdAFgMBkA4n+XJQFYg0ENO5uo2Jvee/bVyALjnbmqNWWtnih9bbo6LMF3StaUbgLCM5qKSAbg==
+Received: from BN7PR02CA0018.namprd02.prod.outlook.com (2603:10b6:408:20::31)
+ by BL0PR12MB4915.namprd12.prod.outlook.com (2603:10b6:208:1c9::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.33; Tue, 25 Jul
+ 2023 13:07:42 +0000
+Received: from BN8NAM11FT033.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:408:20:cafe::2) by BN7PR02CA0018.outlook.office365.com
+ (2603:10b6:408:20::31) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.33 via Frontend
+ Transport; Tue, 25 Jul 2023 13:07:42 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ BN8NAM11FT033.mail.protection.outlook.com (10.13.177.149) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6631.25 via Frontend Transport; Tue, 25 Jul 2023 13:07:42 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Tue, 25 Jul 2023
+ 06:07:30 -0700
+Received: from nvidia.com (10.126.230.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37; Tue, 25 Jul
+ 2023 06:07:25 -0700
+From: Gavin Li <gavinl@nvidia.com>
+To: <mst@redhat.com>, <jasowang@redhat.com>, <xuanzhuo@linux.alibaba.com>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <ast@kernel.org>, <daniel@iogearbox.net>,
+	<hawk@kernel.org>, <john.fastabend@gmail.com>, <jiri@nvidia.com>,
+	<dtatulea@nvidia.com>
+CC: <gavi@nvidia.com>, <virtualization@lists.linux-foundation.org>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<bpf@vger.kernel.org>
+Subject: [PATCH net-next V4 0/3] virtio_net: add per queue interrupt coalescing support
+Date: Tue, 25 Jul 2023 16:07:06 +0300
+Message-ID: <20230725130709.58207-1-gavinl@nvidia.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <mul7yiwl2pspfegeanqyezhmw6ol4cxsdshch7ln6w3i2b54bw@7na6bf5kfxwy>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.126.230.35]
+X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN8NAM11FT033:EE_|BL0PR12MB4915:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8987c99c-59db-45ea-c4f4-08db8d102187
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	SKfLTiMKVgRqU/Wl6/sod3mmxpVs8Z619Uo+MCquKVxT45037wzQudYP09+YBvxGRpd645GJeF0y6wpSWlorp7U+qT2zqZUXskeFu2m6b25N+H88UOJiUW1dL37DAU+APo3jm+BTUWwyEnJuTWdxsIsuLElYRrOZAKWE7adPyGoac2Hn2lQfwMneObnWvyrrqmgGBjRYg5NIC+GRJqfGW9sAl2I5kYUaqKKvmGo06+O0GyWmqjsSyNrXjZBUtmPvAQqykxQVmhApoo3kGBaJiFxfdO6UE8xAVnEYnw7gM4OgjJym19px+5NbWw6zHE6qbPlNBi7NPZDyh33AgXcnE3498a7mjNVzF7QB8HlpQPmg7dZf0hxlmdvjjaXPo1iEXr/u/NjBtjtf/C0B61mWjPx2WYfB1hHv7Np7eOB+gD+hYNMBHZzBEekqlIEPCKPaMquPPZl9l2aIHsjjg9HtgY07FCsKY85P4J0yeNyEfz3HMVu2VU6HJ0J9nBp7KRTDfmkZgSQlsv319EQmaKci6IqaeNNdyZq7Hm5UR4f+kvHFeb+a46DPJFpD0d5wTvYu49CDw+mtjhLGAQz+9Ahr0L6mYM2L3S8bV70yVUIMH11xYEFkFmSLchm06cd3uirS8irzjHqb8a06zSUWMEtFW6z8wVguQLFlNpGRmdr5KYzaf4hxl3z8Odnxb51hoCDNR/Kfbz8Juvs4yCY6aYk/rcZBIXEGTOs4qxRb7QbGoax2rPlttwyCORl3MMGJBqwNcViF7i/63Ad8EV5hOT2BHpIacUxGtBa2cGT8i3zAXs9cWSa9xs2edub1pmZpuG6/
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(346002)(136003)(376002)(396003)(451199021)(82310400008)(36840700001)(46966006)(40470700004)(6286002)(16526019)(26005)(1076003)(40460700003)(336012)(186003)(36756003)(36860700001)(5660300002)(356005)(7636003)(8936002)(8676002)(7416002)(921005)(2906002)(55016003)(40480700001)(82740400003)(86362001)(7696005)(6666004)(70206006)(70586007)(83380400001)(54906003)(478600001)(110136005)(41300700001)(426003)(316002)(2616005)(4326008)(6636002)(47076005)(83996005)(2101003);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jul 2023 13:07:42.2721
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8987c99c-59db-45ea-c4f4-08db8d102187
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BN8NAM11FT033.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL0PR12MB4915
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
 	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Jul 25, 2023 at 02:53:39PM +0200, Stefano Garzarella wrote:
-> On Tue, Jul 25, 2023 at 07:50:53AM -0400, Michael S. Tsirkin wrote:
-> > On Fri, Jul 21, 2023 at 08:09:03AM +0300, Arseniy Krasnov wrote:
-> > > 
-> > > 
-> > > On 21.07.2023 00:42, Arseniy Krasnov wrote:
-> > > > This adds handling of MSG_ZEROCOPY flag on transmission path: if this
-> > > > flag is set and zerocopy transmission is possible (enabled in socket
-> > > > options and transport allows zerocopy), then non-linear skb will be
-> > > > created and filled with the pages of user's buffer. Pages of user's
-> > > > buffer are locked in memory by 'get_user_pages()'. Second thing that
-> > > > this patch does is replace type of skb owning: instead of calling
-> > > > 'skb_set_owner_sk_safe()' it calls 'skb_set_owner_w()'. Reason of this
-> > > > change is that '__zerocopy_sg_from_iter()' increments 'sk_wmem_alloc'
-> > > > of socket, so to decrease this field correctly proper skb destructor is
-> > > > needed: 'sock_wfree()'. This destructor is set by 'skb_set_owner_w()'.
-> > > >
-> > > > Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
-> > > > ---
-> > > >  Changelog:
-> > > >  v5(big patchset) -> v1:
-> > > >   * Refactorings of 'if' conditions.
-> > > >   * Remove extra blank line.
-> > > >   * Remove 'frag_off' field unneeded init.
-> > > >   * Add function 'virtio_transport_fill_skb()' which fills both linear
-> > > >     and non-linear skb with provided data.
-> > > >  v1 -> v2:
-> > > >   * Use original order of last four arguments in 'virtio_transport_alloc_skb()'.
-> > > >  v2 -> v3:
-> > > >   * Add new transport callback: 'msgzerocopy_check_iov'. It checks that
-> > > >     provided 'iov_iter' with data could be sent in a zerocopy mode.
-> > > >     If this callback is not set in transport - transport allows to send
-> > > >     any 'iov_iter' in zerocopy mode. Otherwise - if callback returns 'true'
-> > > >     then zerocopy is allowed. Reason of this callback is that in case of
-> > > >     G2H transmission we insert whole skb to the tx virtio queue and such
-> > > >     skb must fit to the size of the virtio queue to be sent in a single
-> > > >     iteration (may be tx logic in 'virtio_transport.c' could be reworked
-> > > >     as in vhost to support partial send of current skb). This callback
-> > > >     will be enabled only for G2H path. For details pls see comment
-> > > >     'Check that tx queue...' below.
-> > > >
-> > > >  include/net/af_vsock.h                  |   3 +
-> > > >  net/vmw_vsock/virtio_transport.c        |  39 ++++
-> > > >  net/vmw_vsock/virtio_transport_common.c | 257 ++++++++++++++++++------
-> > > >  3 files changed, 241 insertions(+), 58 deletions(-)
-> > > >
-> > > > diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
-> > > > index 0e7504a42925..a6b346eeeb8e 100644
-> > > > --- a/include/net/af_vsock.h
-> > > > +++ b/include/net/af_vsock.h
-> > > > @@ -177,6 +177,9 @@ struct vsock_transport {
-> > > >
-> > > >  	/* Read a single skb */
-> > > >  	int (*read_skb)(struct vsock_sock *, skb_read_actor_t);
-> > > > +
-> > > > +	/* Zero-copy. */
-> > > > +	bool (*msgzerocopy_check_iov)(const struct iov_iter *);
-> > > >  };
-> > > >
-> > > >  /**** CORE ****/
-> > > > diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
-> > > > index 7bbcc8093e51..23cb8ed638c4 100644
-> > > > --- a/net/vmw_vsock/virtio_transport.c
-> > > > +++ b/net/vmw_vsock/virtio_transport.c
-> > > > @@ -442,6 +442,43 @@ static void virtio_vsock_rx_done(struct virtqueue *vq)
-> > > >  	queue_work(virtio_vsock_workqueue, &vsock->rx_work);
-> > > >  }
-> > > >
-> > > > +static bool virtio_transport_msgzerocopy_check_iov(const struct iov_iter *iov)
-> > > > +{
-> > > > +	struct virtio_vsock *vsock;
-> > > > +	bool res = false;
-> > > > +
-> > > > +	rcu_read_lock();
-> > > > +
-> > > > +	vsock = rcu_dereference(the_virtio_vsock);
-> > > > +	if (vsock) {
-> > > > +		struct virtqueue *vq;
-> > > > +		int iov_pages;
-> > > > +
-> > > > +		vq = vsock->vqs[VSOCK_VQ_TX];
-> > > > +
-> > > > +		iov_pages = round_up(iov->count, PAGE_SIZE) / PAGE_SIZE;
-> > > > +
-> > > > +		/* Check that tx queue is large enough to keep whole
-> > > > +		 * data to send. This is needed, because when there is
-> > > > +		 * not enough free space in the queue, current skb to
-> > > > +		 * send will be reinserted to the head of tx list of
-> > > > +		 * the socket to retry transmission later, so if skb
-> > > > +		 * is bigger than whole queue, it will be reinserted
-> > > > +		 * again and again, thus blocking other skbs to be sent.
-> > > > +		 * Each page of the user provided buffer will be added
-> > > > +		 * as a single buffer to the tx virtqueue, so compare
-> > > > +		 * number of pages against maximum capacity of the queue.
-> > > > +		 * +1 means buffer for the packet header.
-> > > > +		 */
-> > > > +		if (iov_pages + 1 <= vq->num_max)
-> > > 
-> > > I think this check is actual only for case one we don't have indirect buffer feature.
-> > > With indirect mode whole data to send will be packed into one indirect buffer.
-> > > 
-> > > Thanks, Arseniy
-> > 
-> > Actually the reverse. With indirect you are limited to num_max.
-> > Without you are limited to whatever space is left in the
-> > queue (which you did not check here, so you should).
-> > 
-> > 
-> > > > +			res = true;
-> > > > +	}
-> > > > +
-> > > > +	rcu_read_unlock();
-> > 
-> > Just curious:
-> > is the point of all this RCU dance to allow vsock
-> > to change from under us? then why is it ok to
-> > have it change? the virtio_transport_msgzerocopy_check_iov
-> > will then refer to the old vsock ...
-> 
-> IIRC we introduced the RCU to handle hot-unplug issues:
-> commit 0deab087b16a ("vsock/virtio: use RCU to avoid use-after-free on
-> the_virtio_vsock")
-> 
-> When we remove the device, we flush all the works, etc. so we should
-> not be in this case (referring the old vsock), except for an irrelevant
-> transient as the device is disappearing.
-> 
-> Stefano
+Currently, coalescing parameters are grouped for all transmit and receive
+virtqueues. This patch series add support to set or get the parameters for
+a specified virtqueue.
 
-what if old device goes away then new one appears?
+When the traffic between virtqueues is unbalanced, for example, one virtqueue
+is busy and another virtqueue is idle, then it will be very useful to
+control coalescing parameters at the virtqueue granularity.
+
+Example command:
+$ ethtool -Q eth5 queue_mask 0x1 --coalesce tx-packets 10
+Would set max_packets=10 to VQ 1.
+$ ethtool -Q eth5 queue_mask 0x1 --coalesce rx-packets 10
+Would set max_packets=10 to VQ 0.
+$ ethtool -Q eth5 queue_mask 0x1 --show-coalesce
+ Queue: 0
+ Adaptive RX: off  TX: off
+ stats-block-usecs: 0
+ sample-interval: 0
+ pkt-rate-low: 0
+ pkt-rate-high: 0
+
+ rx-usecs: 222
+ rx-frames: 0
+ rx-usecs-irq: 0
+ rx-frames-irq: 256
+
+ tx-usecs: 222
+ tx-frames: 0
+ tx-usecs-irq: 0
+ tx-frames-irq: 256
+
+ rx-usecs-low: 0
+ rx-frame-low: 0
+ tx-usecs-low: 0
+ tx-frame-low: 0
+
+ rx-usecs-high: 0
+ rx-frame-high: 0
+ tx-usecs-high: 0
+ tx-frame-high: 0
+
+Gavin Li (3):
+  virtio_net: extract interrupt coalescing settings to a structure
+  virtio_net: support per queue interrupt coalesce command
+---
+changelog:
+v1->v2
+- Addressed the comment from Xuan Zhuo
+- Allocate memory from heap instead of using stack memory for control vq
+	messages
+v2->v3
+- Addressed the comment from Heng Qi
+- Use control_buf for control vq messages
+v3->v4
+- Addressed the comment from Michael S. Tsirkin
+- Refactor set_coalesce of both per queue and global config that were
+	littered with if/else branches
+---
+  virtio_net: enable per queue interrupt coalesce feature
+
+ drivers/net/virtio_net.c        | 187 ++++++++++++++++++++++++++++----
+ include/uapi/linux/virtio_net.h |  14 +++
+ 2 files changed, 177 insertions(+), 24 deletions(-)
 
 -- 
-MST
+2.39.1
 
 
