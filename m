@@ -1,83 +1,122 @@
-Return-Path: <netdev+bounces-21058-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21059-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5205D762430
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 23:12:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AEE46762437
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 23:18:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 041F62817B8
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 21:12:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB3301C20F64
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 21:18:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 251AE26B7C;
-	Tue, 25 Jul 2023 21:12:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8349226B79;
+	Tue, 25 Jul 2023 21:18:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE17D1F188;
-	Tue, 25 Jul 2023 21:12:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48769C433C9;
-	Tue, 25 Jul 2023 21:12:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690319545;
-	bh=+wjx3PSEq0K5+Aw7/+zFEoqif9hytq8mg416yZy/nHU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=oDwGVunkHA4n7n03Gl8jk70U5ZjAYv48eGM6EMyCNpK27QgccD7LYKF9E3dH97YFT
-	 cqvhh48Z9nPUtchSJ/KbUX3zg0yMj4pX5j5/0Xn/ZvzJ6HIn4FMUmu7H3wKLHN0PXK
-	 zXoixoE1xRJinOW8sELWeoVoJKBphIpInvne8i+89HCy9OGrw636tFTmEixYbzEqkP
-	 yLrrITncMcu6w3VjQYDrfxrpNKUJwxhHRYgfv6WcW5N3LhGttkAyegjJfYv0C61xul
-	 pibX3ENru+yDIDv+zRTFwZbHQNBe0UH7lTDvydbQSgYvKj+dw/O78BZVL3tdK2a5aO
-	 65imaNtu1zwLw==
-Date: Tue, 25 Jul 2023 14:12:23 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Ilias Apalodimas <ilias.apalodimas@linaro.org>
-Cc: Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net,
- pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Alexander Lobakin <aleksander.lobakin@intel.com>, Eric Dumazet
- <edumazet@google.com>, Wei Fang <wei.fang@nxp.com>, Shenwei Wang
- <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, NXP Linux Team
- <linux-imx@nxp.com>, Sunil Goutham <sgoutham@marvell.com>, Geetha sowjanya
- <gakula@marvell.com>, Subbaraya Sundeep <sbhatta@marvell.com>, hariprasad
- <hkelam@marvell.com>, Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky
- <leon@kernel.org>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
- <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, John
- Fastabend <john.fastabend@gmail.com>, Felix Fietkau <nbd@nbd.name>, Lorenzo
- Bianconi <lorenzo@kernel.org>, Ryder Lee <ryder.lee@mediatek.com>, Shayne
- Chen <shayne.chen@mediatek.com>, Sean Wang <sean.wang@mediatek.com>, Kalle
- Valo <kvalo@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- linux-rdma@vger.kernel.org, bpf@vger.kernel.org,
- linux-wireless@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH net-next v2] page_pool: split types and declarations
- from page_pool.h
-Message-ID: <20230725141223.19c1c34c@kernel.org>
-In-Reply-To: <ZL/fVF7WetuLgB0l@hera>
-References: <20230725131258.31306-1-linyunsheng@huawei.com>
-	<ZL/fVF7WetuLgB0l@hera>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77F6524198
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 21:18:22 +0000 (UTC)
+Received: from relay.hostedemail.com (smtprelay0017.hostedemail.com [216.40.44.17])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90DE4E42;
+	Tue, 25 Jul 2023 14:18:20 -0700 (PDT)
+Received: from omf17.hostedemail.com (a10.router.float.18 [10.200.18.1])
+	by unirelay05.hostedemail.com (Postfix) with ESMTP id F1F8640FAF;
+	Tue, 25 Jul 2023 21:18:18 +0000 (UTC)
+Received: from [HIDDEN] (Authenticated sender: joe@perches.com) by omf17.hostedemail.com (Postfix) with ESMTPA id 899D617;
+	Tue, 25 Jul 2023 21:18:16 +0000 (UTC)
+Message-ID: <e032507fcb9e6c72d19520898c0095a4c0bd1c33.camel@perches.com>
+Subject: Re: [PATCH] scripts: checkpatch: steer people away from using file
+ paths
+From: Joe Perches <joe@perches.com>
+To: Jakub Kicinski <kuba@kernel.org>, krzk@kernel.org
+Cc: geert@linux-m68k.org, netdev@vger.kernel.org, workflows@vger.kernel.org,
+  mario.limonciello@amd.com
+Date: Tue, 25 Jul 2023 14:18:15 -0700
+In-Reply-To: <20230725155926.2775416-1-kuba@kernel.org>
+References: <b6ab3c25-eab8-5573-f6e5-8415222439cd@kernel.org>
+	 <20230725155926.2775416-1-kuba@kernel.org>
+Content-Type: text/plain; charset="ISO-8859-1"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-Stat-Signature: gzfawxpno8g1tido3ymgj9f4fmse561o
+X-Rspamd-Server: rspamout04
+X-Spam-Status: No, score=-0.9 required=5.0 tests=BAYES_00,FORGED_SPF_HELO,
+	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,
+	SPF_NONE,T_SCC_BODY_TEXT_LINE,UNPARSEABLE_RELAY autolearn=no
+	autolearn_force=no version=3.4.6
+X-Rspamd-Queue-Id: 899D617
+X-Session-Marker: 6A6F6540706572636865732E636F6D
+X-Session-ID: U2FsdGVkX19+gnyP27RIeixagOLJtFpzlaFEYGgPOs0=
+X-HE-Tag: 1690319896-424278
+X-HE-Meta: U2FsdGVkX1/LZNSbfIXGQyGI2AhKaY5A1Mx9c52Aa6PDMKrcIhn8cn2Ug5Lnkhgr/O+10CYCGH1zUK5RUxhGINWFGYfg8mkDw4qGEtzI0IPQZFzcfFI6FfQn7BEQ+UsXocPDIPaUU95RZQuRyDGLPJ/Cjtjri3rZ3gFPRL+AXkV45dfbDJrz3VG6hGj43jYIYzwMz+r9dQ863fwiThq6M0RADGxthFS7uFw7gCXNXiRYcwLkYBVFaWSaWX2ExuiGxF1ZHCQypkiiKjX/R+uT87mh24/fWT5TLNjHLyXBBfDahk4dW7y8jt/s9s/m5Q8Y
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Tue, 25 Jul 2023 17:42:28 +0300 Ilias Apalodimas wrote:
-> Apologies for the very late replies, I was on long vacation with limited
-> internet access.
-> Yunsheng, since there's been a few mails and I lost track, this is instead of
-> [0] right? If so, I prefer this approach.  It looks ok on a first quick pass,
-> I'll have a closer look later.
-> 
-> [0] https://lore.kernel.org/netdev/20230714170853.866018-2-aleksander.lobakin@intel.com/
+On Tue, 2023-07-25 at 08:59 -0700, Jakub Kicinski wrote:
+> We repeatedly see noobs misuse get_maintainer by running it on
+> the file paths rather than the patchfile. This leads to authors
+> of changes (quoted commits and commits under Fixes) not getting
+> CCed. These are usually the best reviewers!
+>=20
+> The file option should really not be used by noobs, unless
+> they are just trying to find a maintainer to manually contact.
 
+noobs is not an appropriate use IMO for a commit message.
 
-I prefer the more systematic approach of creating a separate types.h
-file, so I don't have to keep chasing people or cleaning up the include
-hell myself. I think it should be adopted more widely going forward,
-it's not just about the page pool.
+> This is what I had in mind.
+
+<shrug>  I think it's unnecessary and this content should be
+better described in some process doc.
+
+> diff --git a/scripts/get_maintainer.pl b/scripts/get_maintainer.pl
+[]
+> @@ -544,7 +546,13 @@ foreach my $file (@ARGV) {
+>      if ($from_filename && (vcs_exists() && !vcs_file_exists($file))) {
+>  	warn "$P: file '$file' not found in version control $!\n";
+>      }
+> -    if ($from_filename || ($file ne "&STDIN" && vcs_file_exists($file)))=
+ {
+> +    if ($from_filename) {
+> +	if (!$silence_file_warning) {
+> +	    warn "$P: WARNING: Prefer running the script on patches as "
+> +	        . "generated by git format-patch. Selecting paths is known "
+> +		. "to miss recipients!\n";
+
+Don't separate a single output message into multiple lines.
+Coalesce the string elements.
+
+Also, this should show some reason why this isn't appropriate
+as a patch to a single file would not have this issue.
+
+e.g.:	When a patch series touches multiple files, showing all maintainers i=
+s useful. see:  <some process doc>
+
+> @@ -1089,6 +1098,10 @@ version: $V
+>     --pattern-depth=3D0 --remove-duplicates --rolestats]
+> =20
+>  Notes:
+> +  Using "-f file" is generally discouraged, running the script on a file=
+patch
+> +      (as generated by git format-patch) is usually the right thing to d=
+o.
+> +      Commit message is an integral part of the change and $P
+> +      will extract additional information from it (keywords, Fixes tags =
+etc.)
+
+-f <file>
+
+"filepatch" doesn't appear in the kernel at all. Use "patch file".
+
+grammar: The commit message is...
+
+may instead of will
+
 
