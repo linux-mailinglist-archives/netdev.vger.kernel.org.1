@@ -1,244 +1,154 @@
-Return-Path: <netdev+bounces-20705-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20706-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F0EC760B9C
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 09:26:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CCC3760BC5
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 09:30:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DD4842813A2
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 07:26:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 31DB92813B3
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 07:30:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07E908F78;
-	Tue, 25 Jul 2023 07:26:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B8F58F7A;
+	Tue, 25 Jul 2023 07:30:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E774D9440
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 07:26:02 +0000 (UTC)
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2092.outbound.protection.outlook.com [40.107.101.92])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A109F2;
-	Tue, 25 Jul 2023 00:26:01 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=N4hKvXjDvypb1zNFSgworeLkRuvCY+fAN6qiyjXUWOcJFeOO4bVvotaeGDjgzHFPnQVEnK+XYRwySPWzeJKyDIJzclzFiaxGh9tGyBAu1FZOuAMYUFDzEBKusTwMRzkeenBivQS94YIUjP0TV0X+4rY15uEklW69Q/jBdekGEuvd1K2VjOb9gkf4ynwUJtYqvjQT2xtzY3hAtCMcnu/pPnZxBcBlTWLGl2sZq6XG0v+6N4BnOKTz9s+v8Qf/tCNKPJHYZ4zLUdY97VLzL9DWcZVp+3AN5LK9KP9iqJdKU6JynkToE+vihM8AocOysAZv+4R+qEmKtvTPhyAerPB+wQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=5GaPYfnlOkLgO3Ra+JGe16BN6CCDpRjOU0Z8d9d5sxI=;
- b=lE1lzThimhUaHHGCTojclbcQFVX0ORIQ0VAqmRY+jw10ESdNenXI0TZwQ4F7rTGKs9IEP9X8POR2fhVW6tB7NdlzcoBLTddVCntTX4S1ETvn6ORmGteF2VyprGj7PNhlhVqQ0vtTZVDh5FdPiTBb3nyIi4w2npkIUMwxQ3a0qHIbxHccyl898zZQ8H8k5iGTPsVbzKAo+pp8bbgQJh7kjqpVDszg6jhwlOIbGTzleS3HAxrCpCJnAWIUDN0275nLgD7U6tvoEmGSAW0vca+P/T5ClEJwMd7DKTEUKYmqK3/+5T2KCSezCWWV3B3bI01LRfohQmRS/+mRqu62oOSYXQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
- dkim=pass header.d=corigine.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D51719F
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 07:30:24 +0000 (UTC)
+Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC0C23A9E;
+	Tue, 25 Jul 2023 00:30:14 -0700 (PDT)
+Received: by mail-pl1-x630.google.com with SMTP id d9443c01a7336-1bbc06f830aso1312755ad.0;
+        Tue, 25 Jul 2023 00:30:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5GaPYfnlOkLgO3Ra+JGe16BN6CCDpRjOU0Z8d9d5sxI=;
- b=mjGILJfjvtpj6dADmlHxj+btoWK4r/0+GyQ4w1i72lxJcC4/eONc7pOFcmnR1HjywB9JgYKe8R1HJzWLx0CfyGknHIzYnXFh0116AP72rSQdFP1Lfui3Hj68+DNvt6eJ1hwbFP7gVHVMHixb95dnhpeUbM9+ijmRcy7siQzRaM0=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=corigine.com;
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
- by SN7PR13MB6131.namprd13.prod.outlook.com (2603:10b6:806:359::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.31; Tue, 25 Jul
- 2023 07:25:57 +0000
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::fde7:9821:f2d9:101d]) by PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::fde7:9821:f2d9:101d%7]) with mapi id 15.20.6609.032; Tue, 25 Jul 2023
- 07:25:56 +0000
-Date: Tue, 25 Jul 2023 09:25:48 +0200
-From: Simon Horman <simon.horman@corigine.com>
-To: MD Danish Anwar <danishanwar@ti.com>
-Cc: Randy Dunlap <rdunlap@infradead.org>, Roger Quadros <rogerq@kernel.org>,
-	Vignesh Raghavendra <vigneshr@ti.com>, Andrew Lunn <andrew@lunn.ch>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Rob Herring <robh+dt@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	"David S. Miller" <davem@davemloft.net>, nm@ti.com, srk@ti.com,
-	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
-	netdev@vger.kernel.org, linux-omap@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v11 03/10] net: ti: icssg-prueth: Add Firmware config and
- classification APIs.
-Message-ID: <ZL94/L1RMlU5TiAb@corigine.com>
-References: <20230724112934.2637802-1-danishanwar@ti.com>
- <20230724112934.2637802-4-danishanwar@ti.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230724112934.2637802-4-danishanwar@ti.com>
-X-ClientProxiedBy: AM4PR07CA0031.eurprd07.prod.outlook.com
- (2603:10a6:205:1::44) To PH0PR13MB4842.namprd13.prod.outlook.com
- (2603:10b6:510:78::6)
+        d=gmail.com; s=20221208; t=1690270214; x=1690875014;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=h52mdhH7AN/s//mAEPa1uGifOdnK72pNrGrnuOGcMy8=;
+        b=koPV6gHU8enmCrWa1N+TlbeRDD/5LJ+xW8Qz538P1HQqoLBVhBjLYGmiuaNYSuTrhl
+         BSu+7VlFyggxLG6T7oeE57nZJ4CuVr/qWxlnrhhrVTc0w/3H66dbqaqES1YZ3FP3NtnX
+         jd/bVKJ3C5pyz8AVKgxCSIWunx09JqW2zUeTREXAefamc/FWUy6qBqz2RjLIP9hEZ/gt
+         Xb1GNWb6bnXjIlkdgcB7njxalXW//PPO309dGTET7BWZ1biXDrGzh5c6mn0iSdexq0+t
+         aCfZYpio4HELVZ5FPZpYIeRCzxPr5JMKJAwylMvP4SF2RYd8w05uIs43jMoOPQSKDcqw
+         Y92w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690270214; x=1690875014;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=h52mdhH7AN/s//mAEPa1uGifOdnK72pNrGrnuOGcMy8=;
+        b=bETz8d9frPzKg2liS5IHuf247X8/YQ1DAgsDS804cg9ivuiGX/GHoacVzQ0YA0c9V2
+         E2XPfs9sq2c7zT7fLTZV2ekfJdrzB+P0STY5NNqDnZHfVTqegte716eGHrr7/KWFymAm
+         MaLSqP6kcuMrkA6ar7kjX0VwCYVcco0sYIVeEHXH53sVD//k3SPiYlsFhPyZhxCJPOZu
+         1vqT4f45gJFXsngGhoHyne3fU02zcbg8jbg5aqN10k+iv61ukWtYWayOML5EB0ohhPFY
+         vp0a1hM0N5lFodiaeaEfW0vb2l8m1IdBS0LQ/zinq7j121CPgNfqP8rb9jUAehnWNwaC
+         IMuw==
+X-Gm-Message-State: ABy/qLYBQZvOUw4cu/j4H2lV6g/yyKfSCXhTsggWr2/yi5e9KnPBAfGy
+	nVfN0C0RrizURr2cnFfm8JU=
+X-Google-Smtp-Source: APBJJlFRd7kE2MMljHX9EPq/8meOMGyUQiqFmtR9ZtniKbCY/xVIugncO3/gT0vCe8tggvb5r5k+0Q==
+X-Received: by 2002:a17:902:e5cd:b0:1b9:e9ed:c721 with SMTP id u13-20020a170902e5cd00b001b9e9edc721mr2110877plf.19.1690270213797;
+        Tue, 25 Jul 2023 00:30:13 -0700 (PDT)
+Received: from Laptop-X1 ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id r15-20020a638f4f000000b005633fd3518dsm9911192pgn.40.2023.07.25.00.30.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 25 Jul 2023 00:30:13 -0700 (PDT)
+Date: Tue, 25 Jul 2023 15:30:07 +0800
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Lin Ma <linma@zju.edu.cn>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, razor@blackwall.org, idosch@nvidia.com,
+	lucien.xin@gmail.com, jiri@resnulli.us,
+	anirudh.venkataramanan@intel.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] rtnetlink: let rtnl_bridge_setlink checks
+ IFLA_BRIDGE_MODE length
+Message-ID: <ZL95/wR8EeO2yUku@Laptop-X1>
+References: <20230725055706.498774-1-linma@zju.edu.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|SN7PR13MB6131:EE_
-X-MS-Office365-Filtering-Correlation-Id: f130f460-2933-45d5-5423-08db8ce06317
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	oacCLqk/6V//hjdEHbkmuvpUClcVGO7fHiXZs4IXsV4VrtDJb4regix8ucktTwxdK97mmcGxfZCx+isDiExhH4u3D6quI/DHoBBOERiYQek/48g3Tz/a9gSiquyCeBjEz2y5Bz28FnPEa7MN+b1GLHL2ReOk1AR28kYoKgauDn8Sba9szYU6qIk0BTo3modqtqj7OJ3wpmNeOhHnPIOODO42L2ltAdP58AaWHEmx0DvaPx7T8UgUvtW4tVvnLPtNnCAiuV3/Inj9uu4xXeNuJCrDsdVFficwUgeeaB17zHy1i0Fz1cy3TGdmHAIf/T1OVucn7WhJkDvrM/s1Z2n1Dd0ISM0MTs10QvlKRig005K/TL2TCTNy/tZsa13uVpVllHC0eXCy/kq1py3WriPf64jnd95x01tU6YDVjgvtvm84KM8IisUsKauL5oFESzkTZuyEqtBVzfP3zPPJ6ad7VurIF9CpVLP85YJuQxn+hhUUEp6Ssv6YhdAPchVsKvLG/4fW/+LmroRKCkLcq5fvHsNAhwl6WHywksNKLaF60CVG+M01M2x4n0snn0zyGfJ2NyTdVRNpbKCoXm3D+5geLMKVHhaKMXIJz3xU01fB10k=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(376002)(39840400004)(346002)(396003)(136003)(366004)(451199021)(5660300002)(38100700002)(44832011)(8936002)(8676002)(7416002)(86362001)(66899021)(41300700001)(186003)(83380400001)(2906002)(2616005)(36756003)(6506007)(54906003)(66946007)(66476007)(66556008)(478600001)(4326008)(6666004)(6916009)(6486002)(6512007)(316002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?A/Qw0Ym4YNG0IXuyTjCnb8h43DZdjJMuTpEpvOFJ6gCk6y7eadaNH+obN+xo?=
- =?us-ascii?Q?WYNUE+xEAX7Zz7oZbk4OR6ygaghDw7MmHdP8+LHWHUzBw4M+h/yhJgfH0itM?=
- =?us-ascii?Q?cdYeTJuUr5BnGlvM1pLTmRj7xwrET3cSw2stvEayW7ZGjZODCSb9dVKc58sA?=
- =?us-ascii?Q?hoqJKX5ckmifIZPnQQRI7RGo/U8JcJcumpjoX/kmBzNtZuUnfKBbsjvdJuC2?=
- =?us-ascii?Q?x2aIoItUevIXTgnKrdENnK+SNnypTMGr7nPajtBKh9TAI0uzJ7Jm/1TQ6gNa?=
- =?us-ascii?Q?Y9bM9koGjLn17trDmTSTTmWy5Peyt3OFzAFlgNaiNldv/yJKHOtXiTKjRl4r?=
- =?us-ascii?Q?GzpED3YUHmqsweUl3yuK+AH7KYZArgx3I73Hea21hZ+vaUO8xSnn7Tl7s/iY?=
- =?us-ascii?Q?fsWRPJKu6DRfXURJCthOulsyu4OA8p2KSzPWQ1eYWiyc93ZE3S4gT0c0z5nb?=
- =?us-ascii?Q?OncCMsb5UAtMuow4EIX/UBBB5ncs5JUO/rUwQUknTeFxXwjAV54MuEhI+op/?=
- =?us-ascii?Q?JLUOc1VMW2zICD5Icbe0WJ8Q5U3W49HIziSf39gwgRoZk/q73nw+ncEgsArr?=
- =?us-ascii?Q?/kksKVBuDAVYHj6G2tpra+DxASWNLYpDMDv5/BYYJsiH5oISU3syISvyeSzK?=
- =?us-ascii?Q?GCkUflWj0uhYfSxbMol+rR3Co4m6cIzgph4XJEnNQPIV5mw/+saIH6YWCxac?=
- =?us-ascii?Q?tEbFLsKOVXWw03pPlVuQ9sZeE4w9k+MlROYl348ejGOglIgikyhgeCX+Qk1M?=
- =?us-ascii?Q?s7SDWaiblFNr8SjkNTTkAhwBjT7BCDppmSUlcVuecLZlFc9eXjRzs6oGi8/B?=
- =?us-ascii?Q?F6KCuudyrp3mG7JJg5lh+eqPxYTMpsxWo0X43Nb7Dt1tuKYB8Car0JxexQHO?=
- =?us-ascii?Q?dc9WjvICXhmwYQ1zcs2qzkNe10rxGp4+XZMsSO84tTDgGLoDUkYeqTzMQR8V?=
- =?us-ascii?Q?c1dOlVdJn8Tjcq2gE3Wfvcguj7T6fXT6+pqwMtkyQwDzCuTOqOBUZoqCy/7O?=
- =?us-ascii?Q?1gzs17/noApJoePzrtmvDiN2Kr1wKq8yTbNKiC8R9cakoD4MKkQmnfT6sHgr?=
- =?us-ascii?Q?xftMEPIZ8euEjqKoousoRatGEzll4WBA85b0E3qi1AW7JTmUJKmjPVCmQzwb?=
- =?us-ascii?Q?Z8KFsy4rlWQ7yVMllITyeTr8i7g+IwYX8El9hW+BtXoPr/bm8taDo9557Yd7?=
- =?us-ascii?Q?UWHuRrcG4CBcgEAJ2WyitM3ZbNsNNjTaHlIa4tz6f6KKWij6tArZ+TyUXcx/?=
- =?us-ascii?Q?4IxDvthAmptUs9GwbfAkaHPALHiV7HPdhKf7q0g8nwoDF4K78b2oVsh6cnoK?=
- =?us-ascii?Q?KXHjlqYnNCugCiD6sNWsqLpEvAvyk+2JENDr/ZJdnC86LR57M/Syu01W17Nq?=
- =?us-ascii?Q?tOne9mgk/i1k3ZpzZ23+NNMMc764JN5rHJGbOntfLwhAZcgFDMnLUhNMLS7M?=
- =?us-ascii?Q?Cdl46+SHluj9KXkCl53V4Brq+gIX6gG6YGPm80NNeFFJqYBbZRjpccFvXjvn?=
- =?us-ascii?Q?m15hagNYV4mopebqMSQVfi0vu9I3GWVoExRR5JV0bSBieOYPZKxwLpqacpKV?=
- =?us-ascii?Q?uErwFGhpSKcYEnxP7QGG2X9QM1s6YJ0M/gLsr1UCNLcPLZtjSHv1MwCH9skZ?=
- =?us-ascii?Q?5xMWIOmTw29RLAVCVG1I+oUedLkzlmFPPXIkTZ/0H6RMtVyYVvHp1ThjNaDq?=
- =?us-ascii?Q?FWb2Wg=3D=3D?=
-X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f130f460-2933-45d5-5423-08db8ce06317
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jul 2023 07:25:56.7489
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 2L735baJbN9O0dXBsQtSoVSSUa5ZhEwqDbRGYs6UrVTpqchmtdHgQrC3UGprIUDGIo+mslEwDNpZ2V7DshqQMUp1EiTE6qYG0HghrIOEERI=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR13MB6131
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230725055706.498774-1-linma@zju.edu.cn>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Jul 24, 2023 at 04:59:27PM +0530, MD Danish Anwar wrote:
-> Add icssg_config.h / .c and icssg_classifier.c files. These are firmware
-> configuration and classification related files. These will be used by
-> ICSSG ethernet driver.
+Hi Ma Lin,
+
+Please add the target branch in your subject. e.g. [PATCHv2 net]
+
+On Tue, Jul 25, 2023 at 01:57:06PM +0800, Lin Ma wrote:
+> There are totally 9 ndo_bridge_setlink handlers in the current kernel,
+> which are 1) bnxt_bridge_setlink, 2) be_ndo_bridge_setlink 3)
+> i40e_ndo_bridge_setlink 4) ice_bridge_setlink 5)
+> ixgbe_ndo_bridge_setlink 6) mlx5e_bridge_setlink 7)
+> nfp_net_bridge_setlink 8) qeth_l2_bridge_setlink 9) br_setlink.
 > 
-> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
-> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> By investigating the code, we find that 1-7 parse and use nlattr
+> IFLA_BRIDGE_MODE but 3 and 4 forget to do the nla_len check. This can
+> lead to an out-of-attribute read and allow a malformed nlattr (e.g.,
+> length 0) to be viewed as a 2 byte integer.
+> 
+> To avoid such issues, also for other ndo_bridge_setlink handlers in the
+> future. This patch adds the nla_len check in rtnl_bridge_setlink and
+> does an early error return if length mismatches. To make it works, the
+> break is removed from the parsing for IFLA_BRIDGE_FLAGS to make sure
+> this nla_for_each_nested iterates every attribute.
 
-Hi Danish,
+Since you have checked the length in rtnl_bridge_setlink(). Can we remove
+the check in the driver handlers to avoid duplicate code? You can hold on
+this update and see if others have different opinion.
 
-some feedback from my side.
+Thanks
+Hangbin
 
-...
-
-> diff --git a/drivers/net/ethernet/ti/icssg_classifier.c b/drivers/net/ethernet/ti/icssg_classifier.c
-
-...
-
-> +void icssg_class_set_mac_addr(struct regmap *miig_rt, int slice, u8 *mac)
-
-This function appears to be unused.
-Perhaps it would be better placed in a later patch?
-
-Or perhaps not, if it makes it hard to split up the patches nicely.
-In which case, perhaps the __maybe_unused annotation could be added,
-temporarily.
-
-Flagged by clang-16 W=1, and gcc=12 W=1 builds.
-Likewise for other issues flagged below regarding
-function declarations/definitions.
-
-> +{
-> +	regmap_write(miig_rt, offs[slice].mac0, (u32)(mac[0] | mac[1] << 8 |
-> +		     mac[2] << 16 | mac[3] << 24));
-> +	regmap_write(miig_rt, offs[slice].mac1, (u32)(mac[4] | mac[5] << 8));
-> +}
+> 
+> Fixes: b1edc14a3fbf ("ice: Implement ice_bridge_getlink and ice_bridge_setlink")
+> Fixes: 51616018dd1b ("i40e: Add support for getlink, setlink ndo ops")
+> Suggested-by: Jakub Kicinski <kuba@kernel.org>
+> Signed-off-by: Lin Ma <linma@zju.edu.cn>
+> ---
+> V1 -> V2: removes the break in parsing for IFLA_BRIDGE_FLAGS suggested
+>           by Hangbin Liu <liuhangbin@gmail.com>
+> 
+>  net/core/rtnetlink.c | 8 ++++++--
+>  1 file changed, 6 insertions(+), 2 deletions(-)
+> 
+> diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
+> index 3ad4e030846d..aef25aa5cf1d 100644
+> --- a/net/core/rtnetlink.c
+> +++ b/net/core/rtnetlink.c
+> @@ -5140,13 +5140,17 @@ static int rtnl_bridge_setlink(struct sk_buff *skb, struct nlmsghdr *nlh,
+>  	br_spec = nlmsg_find_attr(nlh, sizeof(struct ifinfomsg), IFLA_AF_SPEC);
+>  	if (br_spec) {
+>  		nla_for_each_nested(attr, br_spec, rem) {
+> -			if (nla_type(attr) == IFLA_BRIDGE_FLAGS) {
+> +			if (nla_type(attr) == IFLA_BRIDGE_FLAGS && !have_flags) {
+>  				if (nla_len(attr) < sizeof(flags))
+>  					return -EINVAL;
+>  
+>  				have_flags = true;
+>  				flags = nla_get_u16(attr);
+> -				break;
+> +			}
 > +
-> +/* disable all RX traffic */
-> +void icssg_class_disable(struct regmap *miig_rt, int slice)
-
-This function is only used in this file.
-Please consider making it static.
-
-...
-
-> +void icssg_class_default(struct regmap *miig_rt, int slice, bool allmulti)
-
-This function also appears to be unused.
-
-...
-
-> +/* required for SAV check */
-> +void icssg_ft1_set_mac_addr(struct regmap *miig_rt, int slice, u8 *mac_addr)
-
-This function also appears to be unused.
-
-...
-
-> diff --git a/drivers/net/ethernet/ti/icssg_config.c b/drivers/net/ethernet/ti/icssg_config.c
-
-...
-
-> +void icssg_config_ipg(struct prueth_emac *emac)
-
-This function is also only used in this file.
-
-...
-
-> +static void icssg_init_emac_mode(struct prueth *prueth)
-> +{
-> +	/* When the device is configured as a bridge and it is being brought
-> +	 * back to the emac mode, the host mac address has to be set as 0.
-> +	 */
-> +	u8 mac[ETH_ALEN] = { 0 };
-> +
-> +	if (prueth->emacs_initialized)
-> +		return;
-> +
-> +	regmap_update_bits(prueth->miig_rt, FDB_GEN_CFG1,
-> +			   SMEM_VLAN_OFFSET_MASK, 0);
-> +	regmap_write(prueth->miig_rt, FDB_GEN_CFG2, 0);
-> +	/* Clear host MAC address */
-> +	icssg_class_set_host_mac_addr(prueth->miig_rt, mac);
-
-icssg_class_set_host_mac_addr() is defined in icssg_classifier.c
-but used here in icssg_config.c.
-
-Please consider providing a declaration of this function,
-ideally in a .h file.
-
-...
-
-> +int emac_set_port_state(struct prueth_emac *emac,
-> +			enum icssg_port_state_cmd cmd)
-
-This function also appears to be unused.
-
-...
-
-> +void icssg_config_set_speed(struct prueth_emac *emac)
-
-Ditto.
-
-...
+> +			if (nla_type(attr) == IFLA_BRIDGE_MODE) {
+> +				if (nla_len(attr) < sizeof(u16))
+> +					return -EINVAL;
+>  			}
+>  		}
+>  	}
+> -- 
+> 2.17.1
+> 
 
