@@ -1,151 +1,101 @@
-Return-Path: <netdev+bounces-20644-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20645-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36D5576052D
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 04:26:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 22B8876052F
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 04:31:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 59BA91C20CD0
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 02:26:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C7812281748
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 02:31:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C02B0187B;
-	Tue, 25 Jul 2023 02:26:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A89BEA0;
+	Tue, 25 Jul 2023 02:31:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0D957C
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 02:26:16 +0000 (UTC)
-Received: from mail-qk1-x72e.google.com (mail-qk1-x72e.google.com [IPv6:2607:f8b0:4864:20::72e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD29FCD;
-	Mon, 24 Jul 2023 19:26:14 -0700 (PDT)
-Received: by mail-qk1-x72e.google.com with SMTP id af79cd13be357-7680e3910dfso538196685a.0;
-        Mon, 24 Jul 2023 19:26:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690251974; x=1690856774;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TehF5S5/JfahrMU4aaOoZH7A4B9KyduEfvtKt7cNHIo=;
-        b=rJ10GbD3//nGpTe9w3MNfRM2UQWvQqKclUq7RGKrUV/jxmFCkXYLAlKtselijB6wVl
-         KOeFJiIhmLykBWETdLEk109D5kQThrifuqVKQA20WJ4+mFmHzHRykrUvZwaLRnRgdzgm
-         L5HfwE7a9VDK8IEZ6KKlMS/Wg1jzam2Sdiz/7bLsy0dHpVjBLuNq9tAfjmvB6QeKw1lR
-         v2nOLdPx0HOFsKBZ38lS9jWjkKb/DkslUREn5GWZjqRvxQHi59j6ygfAPbrSieut0sN2
-         vINrY83GzT9lKejL/NBqQ3mpDpnuqcDlp/9aCrzaGaPbzUD4ULTRv23C8PIErJsLzN4D
-         /ySA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690251974; x=1690856774;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=TehF5S5/JfahrMU4aaOoZH7A4B9KyduEfvtKt7cNHIo=;
-        b=TD5mB3vPhMHQkucaVWkLgj2KuAAB/E/uDmSmMPUdg2qHpilZ5yvBoA0YA4Ixc9aLqA
-         hJaxVl4jRk5vuXhLSSm7bzzPDZXW67mH3MXb75F9w5ekY+L8rfXaDFPvupQv6j6BIHjl
-         U9feDRDx0HsTjQsnZoBc/PFrYTA/Z5ktptG/GWNu0Uw9PCWIDQwcpSEQj8llrnE546YY
-         ebi5ipVROhE7mok2CsZO+2B/eA9pVsSrS/YUP52NxX0u+VKHnMdOFF1sqc5xzS7ESEAo
-         17Kwl1I0TZiaNldzz+flDlB3NCicyqqZ7uYKagpK5fYI78VJhQMyNSFhW7qspPPYn2iF
-         bwgg==
-X-Gm-Message-State: ABy/qLb7D9G6yVhnoNmC5EDJo/yPvmvm0RfNqUtTexgO4couH+0Zg7d0
-	wPqAgjuva9+SV6uTZfEBBsxkRdEPe4sgMXTfbF0=
-X-Google-Smtp-Source: APBJJlFYxvvv2jrRLg6RQxmXWtetuQy0EACAabJAoi6cVXPJLtqX+cuOh8ickvhv/01nB4+siEnWeCINZfEW2UvYBd0=
-X-Received: by 2002:a05:620a:4549:b0:765:22d4:b267 with SMTP id
- u9-20020a05620a454900b0076522d4b267mr2234791qkp.52.1690251973593; Mon, 24 Jul
- 2023 19:26:13 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F0248BE5
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 02:31:19 +0000 (UTC)
+Received: from smtpbgsg2.qq.com (smtpbgsg2.qq.com [54.254.200.128])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3277710C8
+	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 19:31:13 -0700 (PDT)
+X-QQ-mid:Yeas5t1690252186t993t62476
+Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [183.128.134.159])
+X-QQ-SSF:00400000000000F0FQF000000000000
+From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
+X-BIZMAIL-ID: 7532735167881424581
+To: "'Russell King \(Oracle\)'" <linux@armlinux.org.uk>
+Cc: <netdev@vger.kernel.org>,
+	<andrew@lunn.ch>,
+	<hkallweit1@gmail.com>,
+	<Jose.Abreu@synopsys.com>,
+	<mengyuanlou@net-swift.com>
+References: <20230724102341.10401-1-jiawenwu@trustnetic.com> <20230724102341.10401-6-jiawenwu@trustnetic.com> <ZL5VDJeoRYy37LY/@shell.armlinux.org.uk>
+In-Reply-To: <ZL5VDJeoRYy37LY/@shell.armlinux.org.uk>
+Subject: RE: [PATCH net-next 5/7] net: txgbe: support switching mode to 1000BASE-X and SGMII
+Date: Tue, 25 Jul 2023 10:29:46 +0800
+Message-ID: <03cf01d9be9f$e0a2e670$a1e8b350$@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230311180630.4011201-1-zyytlz.wz@163.com> <20230710114253.GA132195@google.com>
- <20230710091545.5df553fc@kernel.org> <20230712115633.GB10768@google.com>
- <CAJedcCzRVSW7_R5WN0v3KdUQGdLEA88T3V2YUKmQO+A+uCQU8Q@mail.gmail.com>
- <a116e972-dfcf-6923-1ad3-a40870e02f6a@omp.ru> <CAJedcCz1ynutATi9qev1t3-moXti_19ZJSzgC2t-5q4JAYG3dw@mail.gmail.com>
- <CAJedcCydqmVBrNq_RCDF2gRds39XqWORFi32MV+9LGa5p28dPQ@mail.gmail.com>
- <20230717130408.GC1082701@google.com> <20230724092055.GB11203@google.com>
-In-Reply-To: <20230724092055.GB11203@google.com>
-From: Zheng Hacker <hackerzheng666@gmail.com>
-Date: Tue, 25 Jul 2023 10:26:00 +0800
-Message-ID: <CAJedcCzrLMVGKmTR-21Uk2EVRhX5fRmEZ95btg_XOpsN33UU6A@mail.gmail.com>
-Subject: Re: [PATCH net v3] net: ravb: Fix possible UAF bug in ravb_remove
-To: Lee Jones <lee@kernel.org>
-Cc: Sergey Shtylyov <s.shtylyov@omp.ru>, Jakub Kicinski <kuba@kernel.org>, Zheng Wang <zyytlz.wz@163.com>, 
-	davem@davemloft.net, linyunsheng@huawei.com, edumazet@google.com, 
-	pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	1395428693sheep@gmail.com, alex000young@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-	FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+X-Mailer: Microsoft Outlook 16.0
+Thread-Index: AQJQc7ZImbL9NUPTrDJxH1gVz1U29QEpEj0rANNTYPauzG5PUA==
+Content-Language: zh-cn
+X-QQ-SENDSIZE: 520
+Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz5a-1
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,FROM_EXCESS_BASE64,
+	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE,UNPARSEABLE_RELAY autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Lee Jones <lee@kernel.org> =E4=BA=8E2023=E5=B9=B47=E6=9C=8824=E6=97=A5=E5=
-=91=A8=E4=B8=80 17:21=E5=86=99=E9=81=93=EF=BC=9A
->
-> On Mon, 17 Jul 2023, Lee Jones wrote:
->
-> > On Sun, 16 Jul 2023, Zheng Hacker wrote:
-> > > Zheng Hacker <hackerzheng666@gmail.com> =E4=BA=8E2023=E5=B9=B47=E6=9C=
-=8816=E6=97=A5=E5=91=A8=E6=97=A5 10:11=E5=86=99=E9=81=93=EF=BC=9A
-> > > >
-> > > > Hello,
-> > > >
-> > > > This bug is found by static analysis. I'm sorry that my friends app=
-ly
-> > > > for a CVE number before we really fix it. We made a list about the
-> > > > bugs we have submitted and wouldn't disclose them before the fix. B=
-ut
-> > > > we had a inconsistent situation last month. And we applied it by
-> > > > mistake foe we thought we had fixed it. And so sorry about my late
-> > > > reply, I'll see the patch right now.
-> > > >
-> > > > Best regards,
-> > > > Zheng Wang
-> > > >
-> > > > Sergey Shtylyov <s.shtylyov@omp.ru> =E4=BA=8E2023=E5=B9=B47=E6=9C=
-=8816=E6=97=A5=E5=91=A8=E6=97=A5 04:48=E5=86=99=E9=81=93=EF=BC=9A
-> > > > >
-> > > > > On 7/15/23 7:07 PM, Zheng Hacker wrote:
-> > > > >
-> > > > > > Sorry for my late reply. I'll see what I can do later.
-> > > > >
-> > > > >    That's good to hear!
-> > > > >    Because I'm now only able to look at it during weekends...
-> > > > >
-> > > > > > Lee Jones <lee@kernel.org> =E4=BA=8E2023=E5=B9=B47=E6=9C=8812=
-=E6=97=A5=E5=91=A8=E4=B8=89 19:56=E5=86=99=E9=81=93=EF=BC=9A
-> > > > > >>
-> > > > > >> On Mon, 10 Jul 2023, Jakub Kicinski wrote:
-> > > > > >>
-> > > > > >>> On Mon, 10 Jul 2023 12:42:53 +0100 Lee Jones wrote:
-> > > > > >>>> For better or worse, it looks like this issue was assigned a=
- CVE.
-> > > > > >>>
-> > > > > >>> Ugh, what a joke.
-> > > > > >>
-> > > > > >> I think that's putting it politely. :)
-> > >
-> > > After reviewing the code, I think it's better to put the code in
-> > > ravb_remove. For the ravb_remove is bound with the device and
-> > > ravb_close is bound with the file. We may not call ravb_close if
-> > > there's no file opened.
+On Monday, July 24, 2023 6:40 PM, Russell King (Oracle) wrote:
+> On Mon, Jul 24, 2023 at 06:23:39PM +0800, Jiawen Wu wrote:
+> > @@ -185,6 +186,8 @@ static void txgbe_mac_link_up(struct phylink_config *config,
+> >  	struct wx *wx = netdev_priv(to_net_dev(config->dev));
+> >  	u32 txcfg, wdg;
 > >
-> > When you do submit this, would you be kind enough to Cc me please?
->
-> Could I trouble you for an update on this please?
->
-> Have you submitted v4 yet?
+> > +	txgbe_enable_sec_tx_path(wx);
+> > +
+> >  	txcfg = rd32(wx, WX_MAC_TX_CFG);
+> >  	txcfg &= ~WX_MAC_TX_CFG_SPEED_MASK;
+> >
+> > @@ -210,8 +213,20 @@ static void txgbe_mac_link_up(struct phylink_config *config,
+> >  	wr32(wx, WX_MAC_WDG_TIMEOUT, wdg);
+> >  }
+> >
+> > +static int txgbe_mac_prepare(struct phylink_config *config, unsigned int mode,
+> > +			     phy_interface_t interface)
+> > +{
+> > +	struct wx *wx = netdev_priv(to_net_dev(config->dev));
+> > +
+> > +	wr32m(wx, WX_MAC_TX_CFG, WX_MAC_TX_CFG_TE, 0);
+> > +	wr32m(wx, WX_MAC_RX_CFG, WX_MAC_RX_CFG_RE, 0);
+> > +
+> > +	return txgbe_disable_sec_tx_path(wx);
+> 
+> Is there a reason why the sec_tx_path is enabled/disabled asymmetrically?
+> 
+> I would expect the transmit path to be disabled in mac_link_down() and
+> re-enabled in mac_link_up().
+> 
+> Alternatively, if it just needs to be disabled for reconfiguration,
+> I would expect it to be disabled in mac_prepare() and re-enabled in
+> mac_finish().
+> 
+> The disable in mac_prepare() and enable in mac_link_up() just looks
+> rather strange, because it isn't symmetrical.
 
-Sorry, will do right now.
+It needs to be disabled for PCS switch mode, I will move the re-enable to
+mac_finish().
 
-Best regards,
-Zheng
->
-> --
-> Lee Jones [=E6=9D=8E=E7=90=BC=E6=96=AF]
 
