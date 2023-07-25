@@ -1,112 +1,126 @@
-Return-Path: <netdev+bounces-20998-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20999-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 400B87621CB
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 20:52:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4FD777621D2
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 20:55:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 70B3F1C20F58
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 18:52:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1345F2811D2
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 18:55:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 043DB263A0;
-	Tue, 25 Jul 2023 18:52:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E523B2592B;
+	Tue, 25 Jul 2023 18:55:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC0821F927
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 18:52:25 +0000 (UTC)
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A40A21BC2
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 11:52:24 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-584341f9cb3so2890127b3.0
-        for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 11:52:24 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8D8F1D2FD
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 18:55:19 +0000 (UTC)
+Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63EF2121;
+	Tue, 25 Jul 2023 11:55:18 -0700 (PDT)
+Received: by mail-wr1-x430.google.com with SMTP id ffacd0b85a97d-3144bf65ce9so4743451f8f.3;
+        Tue, 25 Jul 2023 11:55:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690311144; x=1690915944;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=dT0YzD5qGPW+7Z304F1tg4sfWV1IrnAiZkIMxNqneuE=;
-        b=7Vbo3oQ9bvUM6iPPx7Jt/ko9QtrVOH0bC3wDsfn4jh+7biX5SlixgWCQYk1QJR8+tl
-         l7otHyFMoYimgPTJHC7QD0wciyq9fkLWfDuEn/i37+3lOe0DO0BBjmvygQ7ZnqoLVkjh
-         F9D4SnzAumuZZdGC2SJOnMMcaewstY0D5oY4Kf+zOhDPwxww6IXVaD0sw+CMV4GdNICu
-         czcZ5uSfP89Mrbfv+EAnqzMJaRe8GI4jrfswsvNiAy1ZmVeJvf9rxre6FTKH28K9MR7F
-         6roXPAqhoAkY47kWBIqRHIR/KIkKM0xPnWItLeXVPxGMJ0e7p25S48KSaTJzAKPh1L+5
-         Ck8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690311144; x=1690915944;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+        d=gmail.com; s=20221208; t=1690311317; x=1690916117;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=dT0YzD5qGPW+7Z304F1tg4sfWV1IrnAiZkIMxNqneuE=;
-        b=j/yqc3wO0Q2nNIuRQLnwbQ1rj6EoeqwySOdidBAMLdGk94D6pLtTQ9sov+E/GaQDbC
-         kADTI/d+U2/KZoDxVw/xLeNysCIlEPgXpa72Hgi8WRAQMYXE1TnLslftOnNbYdrw9Dix
-         i+R9Ns4baCNhaGnhHKgOIP8ImMGm+lrDqOhcnWCWIWP/A1q9ErIAYXspR39+wPA5nq+W
-         f6enDguUbc/lb8gumXF7GKEGTamWXqLx7mNLkZ9NDhRVXuHQt/9xFlC8WgSjzVc0O++v
-         Ame0GpHtdnFVYdvpTynixHFqvOGmeF7Vq9i7bZCvhN8yS3VDN0AhZLGRygV4Nn6vwujI
-         f6VA==
-X-Gm-Message-State: ABy/qLZ7Ti1yTKmxOASywKIk3ArM2vtbmcc3pxt71Byx6PkWDwerbNAA
-	W8uDq2fk8Pfb4Uhrdtk2JJD6Sz/c2w==
-X-Google-Smtp-Source: APBJJlH4YFDsguijZmeCeI8xJjRMwtrp1/euoNuvoJ3l6+LjqTfpnUNpWLD2+a+XqDZgwCxCFnQ76n7Imw==
-X-Received: from prohr-desktop.mtv.corp.google.com ([2620:15c:211:200:12d9:d7b:133f:2bfa])
- (user=prohr job=sendgmr) by 2002:a25:c544:0:b0:ceb:324c:ba8e with SMTP id
- v65-20020a25c544000000b00ceb324cba8emr1393ybe.4.1690311143908; Tue, 25 Jul
- 2023 11:52:23 -0700 (PDT)
-Date: Tue, 25 Jul 2023 11:51:51 -0700
+        bh=ID2THAA/NbYE8R23svw1NZ1DXmlvllOYuUgG/DSAang=;
+        b=NpAdRJOK/nGc08rBOaPSeoHJDewfhcQojxFbtmtWPu8I7vOcjH7UoUsxIZzImb1M8f
+         hkZH/X6LIPi31fqxN/mBxBAQ+SkMx64bYGoorbyJa2KrST8IM9bWb6ORrg/hBLuj7Fhr
+         kdhgH/mrMJsuFnsDylrN9t44TvOa26zB9qT+7Q6+dDQC+UoA+pxr8nqNfZXIKhxPS7/S
+         /66tWLyeLceML5d77m7XqXWJIxSpUlZZrA0kp1zZ1U0t65LrTRAi6tJ9qXqkAr8TU/8J
+         fdzBO5jtBcBqAm3eWrduuDsowJQ7a0VoMhUmLMK/Deue2Lb184rQAH+sR6HXy7laSy9+
+         PHFQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690311317; x=1690916117;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ID2THAA/NbYE8R23svw1NZ1DXmlvllOYuUgG/DSAang=;
+        b=FlKpv/ofvC6y5c6WhfmVC0RCmLCWyh7/+ApEosOd0feQJHLMWzlns0ptmSMib4YVQ7
+         niLtCbtyAYKfW0aIIdOgWANi5Cm3AzDUPxDYnhZ/f0EHXDUv9BxRLMo6DDGFMLnK5nxe
+         fWgn8wNlEmaWXPLUOnVFuziwcAak+j3/Y+HT/90wAn/3kS3YS7TOypkEgNBYV3NDAKGw
+         OdWy+ykxc68yQV/451CnKDFz6DBUttTFXKgAp8zvSuOy/nee2NLjDvGTehrAogSig25J
+         S8cbvOnJgKqSZT/D40OGdwoO86ymz+nNghreiPhhgZvlUgf5kOuVdgOzCJA5od/Nmapg
+         G3FQ==
+X-Gm-Message-State: ABy/qLa2Xp4PxWLdMi4Fmb3kEEKeefVEf/ExFrMzwF/cKjft9eKYprUJ
+	c96wsffIz9AN8yH25XhaV4Q=
+X-Google-Smtp-Source: APBJJlF82vcbC5ug+0jWh48cqy9JDEpPZbebIZMd5AVDHKJVeKNzpC3uDB46oI5jR19N7ydWpjcumw==
+X-Received: by 2002:a5d:6783:0:b0:316:f25f:eb4 with SMTP id v3-20020a5d6783000000b00316f25f0eb4mr8544897wru.60.1690311316599;
+        Tue, 25 Jul 2023 11:55:16 -0700 (PDT)
+Received: from [192.168.0.103] ([77.126.7.132])
+        by smtp.gmail.com with ESMTPSA id v5-20020adfebc5000000b0031417b0d338sm17268946wrn.87.2023.07.25.11.55.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 25 Jul 2023 11:55:16 -0700 (PDT)
+Message-ID: <f0190c1c-3b2c-ed8d-b0e6-8176f756630a@gmail.com>
+Date: Tue, 25 Jul 2023 21:55:14 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.41.0.487.g6d72f3e995-goog
-Message-ID: <20230725185151.37310-1-prohr@google.com>
-Subject: [PATCH] net: move comment in ndisc_router_discovery
-From: Patrick Rohr <prohr@google.com>
-To: "David S . Miller" <davem@davemloft.net>
-Cc: Linux Network Development Mailing List <netdev@vger.kernel.org>, Patrick Rohr <prohr@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH net-next] net/mlx4: clean up a type issue
+Content-Language: en-US
+To: Dan Carpenter <dan.carpenter@linaro.org>, Tariq Toukan <tariqt@nvidia.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ linux-rdma@vger.kernel.org, kernel-janitors@vger.kernel.org
+References: <52d0814a-7287-4160-94b5-ac7939ac61c6@moroto.mountain>
+From: Tariq Toukan <ttoukan.linux@gmail.com>
+In-Reply-To: <52d0814a-7287-4160-94b5-ac7939ac61c6@moroto.mountain>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Move setting the received flag comment to the appropriate section.
 
-Signed-off-by: Patrick Rohr <prohr@google.com>
----
- net/ipv6/ndisc.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/net/ipv6/ndisc.c b/net/ipv6/ndisc.c
-index eeb60888187f..0a29a4626194 100644
---- a/net/ipv6/ndisc.c
-+++ b/net/ipv6/ndisc.c
-@@ -1266,10 +1266,6 @@ static enum skb_drop_reason ndisc_router_discovery(struct sk_buff *skb)
- 	}
- #endif
- 
--	/*
--	 *	set the RA_RECV flag in the interface
--	 */
--
- 	in6_dev = __in6_dev_get(skb->dev);
- 	if (!in6_dev) {
- 		ND_PRINTK(0, err, "RA: can't find inet6 device for %s\n",
-@@ -1297,6 +1293,10 @@ static enum skb_drop_reason ndisc_router_discovery(struct sk_buff *skb)
- 	}
- #endif
- 
-+	/*
-+	 *	set the RA_RECV flag in the interface
-+	 */
-+
- 	if (in6_dev->if_flags & IF_RS_SENT) {
- 		/*
- 		 *	flag that an RA was received after an RS was sent
--- 
-2.41.0.487.g6d72f3e995-goog
+On 25/07/2023 8:39, Dan Carpenter wrote:
+> These functions returns type bool, not pointers, so return false instead
+> of NULL.
+> 
+> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+> ---
+> Not a bug.  Targetting net-next.
+> 
+>   drivers/net/ethernet/mellanox/mlx4/mcg.c | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/mellanox/mlx4/mcg.c b/drivers/net/ethernet/mellanox/mlx4/mcg.c
+> index f1716a83a4d3..24d0c7c46878 100644
+> --- a/drivers/net/ethernet/mellanox/mlx4/mcg.c
+> +++ b/drivers/net/ethernet/mellanox/mlx4/mcg.c
+> @@ -294,7 +294,7 @@ static bool check_duplicate_entry(struct mlx4_dev *dev, u8 port,
+>   	struct mlx4_promisc_qp *dqp, *tmp_dqp;
+>   
+>   	if (port < 1 || port > dev->caps.num_ports)
+> -		return NULL;
+> +		return false;
+>   
+>   	s_steer = &mlx4_priv(dev)->steer[port - 1];
+>   
+> @@ -375,7 +375,7 @@ static bool can_remove_steering_entry(struct mlx4_dev *dev, u8 port,
+>   	bool ret = false;
+>   
+>   	if (port < 1 || port > dev->caps.num_ports)
+> -		return NULL;
+> +		return false;
+>   
+>   	s_steer = &mlx4_priv(dev)->steer[port - 1];
+>   
 
+Thanks for your patch.
+Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
 
