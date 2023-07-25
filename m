@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-20613-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20617-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84ADE7603C5
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 02:20:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 838737603E2
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 02:21:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E01982815E8
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 00:20:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B3CF51C20CD2
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 00:21:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B76D2804;
-	Tue, 25 Jul 2023 00:20:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACB181861;
+	Tue, 25 Jul 2023 00:20:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F008622
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 979C864A
 	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 00:20:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 2219AC433C7;
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 27D06C433CB;
 	Tue, 25 Jul 2023 00:20:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1690244421;
-	bh=AaHPCjNTPsxbN6hR0FPnXRlIegVUMqkvsXO5A3t+MfA=;
+	bh=c+BzqUQbiiMX/ltbMk+0YwPg8Ke15f2UHcVMv7m/L4o=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=bxhheRdGzrhDQT+XqyR4jSG8CCm0uPIzKdOQrGQBq4WCHkoyNtd+U5FN+VO539v/o
-	 AyKasWjmArPgbf5a53pbPnInT//J9tWaFg13aPk7s9C6QsIQhca4gRmi5hdnIRtVnM
-	 rmmj+6SRLDcUV1V7EOt0ffW3iAiknY63Bw23KsRwRuK2cuwJ/tjI6KddK9exw81iUL
-	 rg6BdNK+tDhmmN4ZHNF42vzBjy132u9OnBMxQd2hmkA+QCRNzOEJpKDgjgvmQ7SXZD
-	 3yJC8xMGwxr9+upFzZuwtcVBCZe/IXQQkUzgFm+Jsz4eg+jHD7XvRMJmfX2XCMlSqh
-	 nNiXDrmqdITvQ==
+	b=E0IGGztj+9WgtRiHrzWo4cwHArx9vVqFr+RTqChJwPEb7c1/nbTCSXN33kgQf1zJ6
+	 5Hhg6H5revqSUXvYRxcDVjNICA4YqeBPHhgLlqUcj0+Yw9l0eOOlmXZxjeVWnSFiJW
+	 J6hQTjrVUB8NgUId6qbQmkj+iY9n0EZlkEpIeeDy3P6WRZVuFZj9bj8hjBU+nfsgC4
+	 5ALMK+IgrMhw7v47Q9XzDB5cCSGoKhejIACIE+LRIixm5MCftFAYWVmvVh1xmaJgem
+	 sDlWv6RHMcshFSxNWKLUaVHsbbE3cRc8Y2d2UBkz8Eic/QguqGUQyZAUQjBjtQKkmk
+	 AlHmaBbHiuf8Q==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 07B79E451B7;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 0EF1BE21EE0;
 	Tue, 25 Jul 2023 00:20:21 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -41,37 +41,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 net] tcp: Reduce chance of collisions in inet6_hashfn().
+Subject: Re: [PATCH net 1/2] can: gs_usb: gs_can_close(): add missing set of CAN
+ state to CAN_STATE_STOPPED
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <169024442102.15014.10192763972225845991.git-patchwork-notify@kernel.org>
+ <169024442105.15014.10559557791748669718.git-patchwork-notify@kernel.org>
 Date: Tue, 25 Jul 2023 00:20:21 +0000
-References: <20230721222410.17914-1-kuniyu@amazon.com>
-In-Reply-To: <20230721222410.17914-1-kuniyu@amazon.com>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, dsahern@kernel.org, aksecurity@gmail.com, benh@amazon.com,
- kuni1840@gmail.com, netdev@vger.kernel.org, trawets@amazon.com,
- samjonas@amazon.com
+References: <20230724150141.766047-2-mkl@pengutronix.de>
+In-Reply-To: <20230724150141.766047-2-mkl@pengutronix.de>
+To: Marc Kleine-Budde <mkl@pengutronix.de>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+ linux-can@vger.kernel.org, kernel@pengutronix.de, stable@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+This series was applied to netdev/net.git (main)
+by Marc Kleine-Budde <mkl@pengutronix.de>:
 
-On Fri, 21 Jul 2023 15:24:10 -0700 you wrote:
-> From: Stewart Smith <trawets@amazon.com>
+On Mon, 24 Jul 2023 17:01:40 +0200 you wrote:
+> After an initial link up the CAN device is in ERROR-ACTIVE mode. Due
+> to a missing CAN_STATE_STOPPED in gs_can_close() it doesn't change to
+> STOPPED after a link down:
 > 
-> For both IPv4 and IPv6 incoming TCP connections are tracked in a hash
-> table with a hash over the source & destination addresses and ports.
-> However, the IPv6 hash is insufficient and can lead to a high rate of
-> collisions.
+> | ip link set dev can0 up
+> | ip link set dev can0 down
+> | ip --details link show can0
+> | 13: can0: <NOARP,ECHO> mtu 16 qdisc pfifo_fast state DOWN mode DEFAULT group default qlen 10
+> |     link/can  promiscuity 0 allmulti 0 minmtu 0 maxmtu 0
+> |     can state ERROR-ACTIVE restart-ms 1000
 > 
 > [...]
 
 Here is the summary with links:
-  - [v2,net] tcp: Reduce chance of collisions in inet6_hashfn().
-    https://git.kernel.org/netdev/net/c/d11b0df7ddf1
+  - [net,1/2] can: gs_usb: gs_can_close(): add missing set of CAN state to CAN_STATE_STOPPED
+    https://git.kernel.org/netdev/net/c/f8a2da6ec241
+  - [net,2/2] can: raw: fix lockdep issue in raw_release()
+    https://git.kernel.org/netdev/net/c/11c9027c983e
 
 You are awesome, thank you!
 -- 
