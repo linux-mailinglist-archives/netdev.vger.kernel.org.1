@@ -1,78 +1,70 @@
-Return-Path: <netdev+bounces-20729-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20730-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 278EA760C9E
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 10:06:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 826E2760CA5
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 10:08:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0A8EC1C20DF2
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 08:06:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 44BD82816CD
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 08:08:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD582134CE;
-	Tue, 25 Jul 2023 08:06:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A8B113AC6;
+	Tue, 25 Jul 2023 08:08:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDDA4125A5
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 08:06:15 +0000 (UTC)
-Received: from wout1-smtp.messagingengine.com (wout1-smtp.messagingengine.com [64.147.123.24])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE331E5
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 01:06:10 -0700 (PDT)
-Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
-	by mailout.west.internal (Postfix) with ESMTP id 42CAB3200910;
-	Tue, 25 Jul 2023 04:06:07 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute2.internal (MEProxy); Tue, 25 Jul 2023 04:06:08 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:sender:subject
-	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-	:x-sasl-enc; s=fm3; t=1690272366; x=1690358766; bh=d8UgxDMApZMQg
-	ejxMufhY4/d4FqjWsPgqnNtYvmfTOU=; b=0b+XFz1Tu3SA+XHcphH4PvVAYe1HT
-	Ty327CRSuOSMKT1xsHiLKf1Ktlm5BrUKEHwhqrsukQfuzR5z60l9HYlLlVc1ctbT
-	VKvhxIgoHXsgfBDkwz+wZoy3IiJ7kyI00S2G/ChqXATmcPfbA8b2kwbunhQ645wL
-	y3KbPbfrxbEX284jCFXd+7ucqAwe8SLqi242sZVq8RjapJ7eVbOpzcgFn2UZlCvi
-	rq1NNZA+QosdsiZA4bIeWKCv/LRayeGk7LjXWhcHHt7YG4LHC/2h22F5XONGMwTN
-	2fSCE4wQoJ1XkhSd3GOadKi7RQB5ul1P1ygOzvhZwoB+k5xDZadvra78Q==
-X-ME-Sender: <xms:boK_ZFacLw806Z6yQH286HmrESHBTvYWEH9brEjdpDDyUpeddb_lpQ>
-    <xme:boK_ZMbw-DhuhAOjmb3x7ARqAhySknEYBOk2hDkWYTZRn2VrjFoYrQIM_7cepwxUM
-    IK8Wpw7aYFvbyU>
-X-ME-Received: <xmr:boK_ZH_AOIyMkdMUlBY4a2nMN3BawCAFB8jAGyy35_wgvzfSU_I0Z7EQocKAKXUmUU14j94LuYrr88QZ8LaapuWAbsY>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrheelgdduvdehucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtvdenucfhrhhomhepkfguohcu
-    ufgthhhimhhmvghluceoihguohhstghhsehiughoshgthhdrohhrgheqnecuggftrfgrth
-    htvghrnhepvddufeevkeehueegfedtvdevfefgudeifeduieefgfelkeehgeelgeejjeeg
-    gefhnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepih
-    guohhstghhsehiughoshgthhdrohhrgh
-X-ME-Proxy: <xmx:boK_ZDp8E40-lC5cBdfNEvzYPLyW-y3ErW1BrTJFYKc8G_5Sjo_hzw>
-    <xmx:boK_ZArFo6CK5M5qXI7MmmhI39vtDIOgINCAifQx6xSVG4E1KmDj4w>
-    <xmx:boK_ZJR94FoCs6a2STzQKfKRux_HmZW-zCNEnSESHZ6UbKogxYqRyA>
-    <xmx:boK_ZFBY8auE83rz1D1Lch7q-zdJV6Y3Yyo5kHFoWMmdv37pvkHF4A>
-Feedback-ID: i494840e7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 25 Jul 2023 04:06:05 -0400 (EDT)
-Date: Tue, 25 Jul 2023 11:06:02 +0300
-From: Ido Schimmel <idosch@idosch.org>
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Thomas Haller <thaller@redhat.com>
-Subject: Re: [PATCHv3 net] ipv6: do not match device when remove source route
-Message-ID: <ZL+CarW9SMFYsx/d@shredder>
-References: <20230720065941.3294051-1-liuhangbin@gmail.com>
- <ZLk0/f82LfebI5OR@shredder>
- <ZLlJi7OUy3kwbBJ3@shredder>
- <ZLpI6YZPjmVD4r39@Laptop-X1>
- <ZLzhMDIayD2z4szG@shredder>
- <ZL5HijWsqLgVMHav@Laptop-X1>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88FBF134CC
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 08:08:04 +0000 (UTC)
+Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE227A4
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 01:08:02 -0700 (PDT)
+Received: by mail-ej1-x631.google.com with SMTP id a640c23a62f3a-98377c5d53eso836691566b.0
+        for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 01:08:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1690272481; x=1690877281;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=EiMiYo3qP01WupeBWwiFrDCmz1xS3zRXM9WAdt+5bjE=;
+        b=X5Uc/4KovNaS8tMqEAJJjLNMr3hIKqJWo+KstM9SwLGr8bDjGcjQtPsAPdYTS1E/Ty
+         8nfrQfduM0TIZnPcHWXoamp3/9B1cuXC66A3m9A/h3RmeDEtFs/SZxTaU2XPOUVKMVhv
+         e8Sgdxa7eYSd04pajLatXRCP1xM7AZm1xJHYf9gZK0pf8qANs1dF+SPlFV8WheN6V2nG
+         rIMBXqfFasPrvPe5z1xB75QB4/jM3vf6zDXLZnBepERq1V8wFJhA5FBTVCeUgM4keBbT
+         OiK+XkcBpQT/7ZATaMnNc/Yl+bZPvgHXelScs10sJA4YzlChQiM9MWuv9RmqOGk6NluC
+         Hemg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690272481; x=1690877281;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=EiMiYo3qP01WupeBWwiFrDCmz1xS3zRXM9WAdt+5bjE=;
+        b=TO5eMDg5vw/HckO4a7YWXoOponxPkQJP/94FuFk3Kgi2txoHPlwMyh+i+fZEwjB59H
+         UifIvza+xXVRA/SkWlYJ6+APQNjGZx5FngTKt86OgStThFRV5V+Wf0cW75LO3JjgEmZh
+         fW9qv7ZGhkhVSStoh9isvrYIRGkg3XQAeLgaJXbqfW21h3T80N7cJgvxM2zmJDfV0ueN
+         lDkjv7Sf+N9r4ECKB5dJiNF8WMqRQkdNeFGSSPdVMwhCI4BmWYTiNxsPtQ/nDbvz3u/d
+         3nRxUn3qQe7/G7LcRgtmaAEKF2Jvuzp4d0YOp/1cRuR32zculpXr2oc9oYypJelV4Yru
+         kg2g==
+X-Gm-Message-State: ABy/qLYs6w9ODsUJ70IZEmgrii7DNQMwHoRM41Ol4j2h5+MQUVTuSEf6
+	9iyWf1eid95rm2MBMTqMwHPzngWSzY4oOc/vB14=
+X-Google-Smtp-Source: APBJJlFUcj/ni7QDrtvoiXp9dr4Lw28gIBJSeWbEc16jK3O1l1jHeZ/JPAde2TQ8lJR82z6Q5/jUdw==
+X-Received: by 2002:a17:906:15d:b0:991:b834:af83 with SMTP id 29-20020a170906015d00b00991b834af83mr9876565ejh.59.1690272480985;
+        Tue, 25 Jul 2023 01:08:00 -0700 (PDT)
+Received: from localhost ([91.218.191.82])
+        by smtp.gmail.com with ESMTPSA id rv14-20020a17090710ce00b0099b921de301sm3114547ejb.159.2023.07.25.01.08.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 25 Jul 2023 01:08:00 -0700 (PDT)
+Date: Tue, 25 Jul 2023 10:07:59 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: netdev@vger.kernel.org
+Cc: kuba@kernel.org, pabeni@redhat.com, davem@davemloft.net,
+	edumazet@google.com, moshe@nvidia.com, saeedm@nvidia.com,
+	idosch@nvidia.com, petrm@nvidia.com
+Subject: Re: [patch net-next v2 00/11] devlink: introduce dump selector attr
+ and use it for per-instance dumps
+Message-ID: <ZL+C3xMq3Er79qDD@nanopsycho>
+References: <20230720121829.566974-1-jiri@resnulli.us>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,44 +73,95 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZL5HijWsqLgVMHav@Laptop-X1>
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20230720121829.566974-1-jiri@resnulli.us>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Jul 24, 2023 at 05:42:34PM +0800, Hangbin Liu wrote:
-> On Sun, Jul 23, 2023 at 11:13:36AM +0300, Ido Schimmel wrote:
-> > > BTW, to fix it, how about check if the IPv6 addr still exist. e.g.
-> > > 
-> > > --- a/net/ipv6/route.c
-> > > +++ b/net/ipv6/route.c
-> > > @@ -4590,10 +4590,11 @@ static int fib6_remove_prefsrc(struct fib6_info *rt, void *arg)
-> > >         struct net_device *dev = ((struct arg_dev_net_ip *)arg)->dev;
-> > >         struct net *net = ((struct arg_dev_net_ip *)arg)->net;
-> > >         struct in6_addr *addr = ((struct arg_dev_net_ip *)arg)->addr;
-> > > +       u32 tb6_id = l3mdev_fib_table(dev) ? : RT_TABLE_MAIN;
-> > > 
-> > > -       if (!rt->nh &&
-> > > -           ((void *)rt->fib6_nh->fib_nh_dev == dev || !dev) &&
-> > > -           rt != net->ipv6.fib6_null_entry &&
-> > > +       if (rt != net->ipv6.fib6_null_entry &&
-> > > +           rt->fib6_table->tb6_id == tb6_id &&
-> > > +           !ipv6_chk_addr_and_flags(net, addr, NULL, true, 0, IFA_F_TENTATIVE) &&
-> > >             ipv6_addr_equal(addr, &rt->fib6_prefsrc.addr)) {
-> > 
-> > ipv6_chk_addr_and_flags() is more expensive than ipv6_addr_equal() so
-> > better to first check that route indeed uses the address as the
-> > preferred source address and only then check if it exists.
-> 
-> OK.
-> > 
-> > Maybe you can even do it in rt6_remove_prefsrc(). That would be similar
-> > to what IPv4 is doing.
-> 
-> Do you mean call ipv6_chk_addr_and_flags() in rt6_remove_prefsrc()?
+I see that this patchset got moved to "changes requested" in patchwork.
+Why exacly? There was no comment so far. Petr's splat is clearly not
+caused by this patchset.
 
-Yes.
+Should I resubmit?
+
+Thanks!
+
+Thu, Jul 20, 2023 at 02:18:18PM CEST, jiri@resnulli.us wrote:
+>From: Jiri Pirko <jiri@nvidia.com>
+>
+>Motivation:
+>
+>For SFs, one devlink instance per SF is created. There might be
+>thousands of these on a single host. When a user needs to know port
+>handle for specific SF, he needs to dump all devlink ports on the host
+>which does not scale good.
+>
+>Solution:
+>
+>Allow user to pass devlink handle alongside the dump command
+>and dump only objects which are under selected devlink instance.
+>
+>Introduce new attr DEVLINK_ATTR_DUMP_SELECTOR to nest the selection
+>attributes. This way the userspace can use maxattr to tell if dump
+>selector is supported by kernel or not.
+>
+>Assemble netlink policy for selector attribute. If user passes attr
+>unknown to kernel, netlink validation errors out.
+>
+>Example:
+>$ devlink port show
+>auxiliary/mlx5_core.eth.0/65535: type eth netdev eth2 flavour physical port 0 splittable false
+>auxiliary/mlx5_core.eth.1/131071: type eth netdev eth3 flavour physical port 1 splittable false
+>
+>$ devlink port show auxiliary/mlx5_core.eth.0
+>auxiliary/mlx5_core.eth.0/65535: type eth netdev eth2 flavour physical port 0 splittable false
+>
+>$ devlink port show auxiliary/mlx5_core.eth.1
+>auxiliary/mlx5_core.eth.1/131071: type eth netdev eth3 flavour physical port 1 splittable false
+>
+>This is done in patch #10
+>
+>Dependency:
+>
+>The DEVLINK_ATTR_DUMP_SELECTOR parsing is very suitable to be done
+>once at the beginning of the dumping. Unfortunatelly, it is not possible
+>to define start() and done() callbacks for netlink small ops.
+>So all commands that use instance iterator for dumpit are converted to
+>split ops. This is done in patch #1-9
+>
+>Extension:
+>
+>patch #11 extends the selector by port index for health reporter
+>dumping.
+>
+>v1->v2:
+>- the original single patch (patch #10) was extended to a patchset
+>
+>Jiri Pirko (11):
+>  devlink: parse linecard attr in doit() callbacks
+>  devlink: parse rate attrs in doit() callbacks
+>  devlink: introduce __devlink_nl_pre_doit() with internal flags as
+>    function arg
+>  devlink: convert port get command to split ops
+>  devlink: convert health reporter get command to split ops
+>  devlink: convert param get command to split ops
+>  devlink: convert trap get command to split ops
+>  devlink: introduce set of macros and use it for split ops definitions
+>  devlink: convert rest of the iterator dumpit commands to split ops
+>  devlink: introduce dump selector attr and use it for per-instance
+>    dumps
+>  devlink: extend health reporter dump selector by port index
+>
+> include/uapi/linux/devlink.h |   2 +
+> net/devlink/devl_internal.h  |  42 +++---
+> net/devlink/health.c         |  21 ++-
+> net/devlink/leftover.c       | 211 ++++++++--------------------
+> net/devlink/netlink.c        | 263 ++++++++++++++++++++++++++++++-----
+> 5 files changed, 333 insertions(+), 206 deletions(-)
+>
+>-- 
+>2.41.0
+>
 
