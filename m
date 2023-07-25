@@ -1,129 +1,122 @@
-Return-Path: <netdev+bounces-20649-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20652-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D9DA7605F3
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 04:45:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7624876062E
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 05:01:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 790551C20D62
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 02:45:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A1BEB1C20921
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 03:01:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D04DA46A8;
-	Tue, 25 Jul 2023 02:44:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96E5F1876;
+	Tue, 25 Jul 2023 03:01:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2419210F
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 02:44:58 +0000 (UTC)
-Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [52.237.72.81])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6254019AF;
-	Mon, 24 Jul 2023 19:44:30 -0700 (PDT)
-Received: from localhost.localdomain (unknown [125.119.240.231])
-	by mail-app2 (Coremail) with SMTP id by_KCgDHuMCaNr9k_HqCCg--.1652S4;
-	Tue, 25 Jul 2023 10:42:35 +0800 (CST)
-From: Lin Ma <linma@zju.edu.cn>
-To: jhs@mojatatu.com,
-	xiyou.wangcong@gmail.com,
-	jiri@resnulli.us,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ADE520E1
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 03:01:50 +0000 (UTC)
+Received: from m12.mail.163.com (m12.mail.163.com [220.181.12.196])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 83DBD173D;
+	Mon, 24 Jul 2023 20:01:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=Y7Db9
+	CtYu9IW3X/wWavIFjW3pwP0JBOPHcat5DJxUPQ=; b=RIRF2W4aI3DUUx39z4OG9
+	6v5Rz2dG6AjeONNuuML9MW2NRCODYyvWmVmZpNYpiZOWefl+5OT8yGrRKmgyEnac
+	IRiTO13k/Aa8QajqA79MbT55ZwFSnhz38Bi55aelv5dFicALob56UF+FwOtBVUc6
+	ORWNfK4LtN2IpIIIXTiSik=
+Received: from leanderwang-LC2.localdomain (unknown [111.206.145.21])
+	by zwqz-smtp-mta-g1-2 (Coremail) with SMTP id _____wC3TZbMOr9kRW7dBA--.23188S2;
+	Tue, 25 Jul 2023 11:00:29 +0800 (CST)
+From: Zheng Wang <zyytlz.wz@163.com>
+To: s.shtylyov@omp.ru
+Cc: lee@kernel.org,
+	linyunsheng@huawei.com,
 	davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	amritha.nambiar@intel.com,
-	jeffrey.t.kirsher@intel.com,
+	richardcochran@gmail.com,
+	p.zabel@pengutronix.de,
+	geert+renesas@glider.be,
+	magnus.damm@gmail.com,
+	yoshihiro.shimoda.uh@renesas.com,
+	biju.das.jz@bp.renesas.com,
+	wsa+renesas@sang-engineering.com,
 	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Lin Ma <linma@zju.edu.cn>
-Subject: [PATCH v3] net/sched: mqprio: Add length check for TCA_MQPRIO_{MAX/MIN}_RATE64
-Date: Tue, 25 Jul 2023 10:42:27 +0800
-Message-Id: <20230725024227.426561-1-linma@zju.edu.cn>
-X-Mailer: git-send-email 2.17.1
-X-CM-TRANSID:by_KCgDHuMCaNr9k_HqCCg--.1652S4
-X-Coremail-Antispam: 1UD129KBjvJXoW7ZrWfXr1UKr4kAw1xKr1rWFg_yoW8Zr1fpF
-	ykXryxtFWDGrn7J393Cws7ZFZY9wsrAF42gFy5Zw18Arn8W34ag348Wry29r17Ar4rGws3
-	Jr1qya47urn0vFDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUv014x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
-	Y2ka0xkIwI1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
-	xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43
-	MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I
-	0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWU
-	JVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4UJVWxJrUvcSsGvfC2KfnxnUUI43ZEXa7VUb
-	XdbUUUUUU==
-X-CM-SenderInfo: qtrwiiyqvtljo62m3hxhgxhubq/
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_LOW,
-	RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+	linux-renesas-soc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	hackerzheng666@gmail.com,
+	1395428693sheep@gmail.com,
+	alex000young@gmail.com,
+	Zheng Wang <zyytlz.wz@163.com>
+Subject: [PATCH v4] net: ravb: Fix possible UAF bug in ravb_remove
+Date: Tue, 25 Jul 2023 11:00:26 +0800
+Message-Id: <20230725030026.1664873-1-zyytlz.wz@163.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wC3TZbMOr9kRW7dBA--.23188S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW7CF1DZF48JrWrZryUtr1xGrg_yoW8Xry3p3
+	9xKa4F9ws5J3WUWa1xJFs7ZFWrCw17Kr909FZ7Aw1rZ3Zay3WDXr1FgFy8Aw1UJFZ5t3Wa
+	vrWUZ3Wxu3WDAa7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0pM4E_DUUUUU=
+X-Originating-IP: [111.206.145.21]
+X-CM-SenderInfo: h2113zf2oz6qqrwthudrp/xtbBRw+3U2I0Ut2f+wAAsR
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-The nla_for_each_nested parsing in function mqprio_parse_nlattr() does
-not check the length of the nested attribute. This can lead to an
-out-of-attribute read and allow a malformed nlattr (e.g., length 0) to
-be viewed as 8 byte integer and passed to priv->max_rate/min_rate.
+In ravb_probe, priv->work was bound with ravb_tx_timeout_work.
+If timeout occurs, it will start the work. And if we call
+ravb_remove without finishing the work, there may be a
+use-after-free bug on ndev.
 
-This patch adds the check based on nla_len() when check the nla_type(),
-which ensures that the length of these two attribute must equals
-sizeof(u64).
+Fix it by finishing the job before cleanup in ravb_remove.
 
-Fixes: 4e8b86c06269 ("mqprio: Introduce new hardware offload mode and shaper in mqprio")
-Reviewed-by: Victor Nogueira <victor@mojatatu.com>
-Signed-off-by: Lin Ma <linma@zju.edu.cn>
+Note that this bug is found by static analysis, it might be
+false positive.
+
+Fixes: c156633f1353 ("Renesas Ethernet AVB driver proper")
+Signed-off-by: Zheng Wang <zyytlz.wz@163.com>
+Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
 ---
-V1 -> V2: do check with != rather than < as suggested
-          seperate the check and give clearer error message
-V2 -> V3: add Reviewed-by tag from Victor,
-          resend with correct CC list
+v4:
+- add information about the bug was found suggested by Yunsheng Lin
+v3:
+- fix typo in commit message
+v2:
+- stop dev_watchdog so that handle no more timeout work suggested by Yunsheng Lin,
+add an empty line to make code clear suggested by Sergey Shtylyov
+---
+ drivers/net/ethernet/renesas/ravb_main.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
- net/sched/sch_mqprio.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
-
-diff --git a/net/sched/sch_mqprio.c b/net/sched/sch_mqprio.c
-index ab69ff7577fc..f1d141a6d0aa 100644
---- a/net/sched/sch_mqprio.c
-+++ b/net/sched/sch_mqprio.c
-@@ -290,6 +290,13 @@ static int mqprio_parse_nlattr(struct Qdisc *sch, struct tc_mqprio_qopt *qopt,
- 						    "Attribute type expected to be TCA_MQPRIO_MIN_RATE64");
- 				return -EINVAL;
- 			}
-+
-+			if (nla_len(attr) != sizeof(u64)) {
-+				NL_SET_ERR_MSG_ATTR(extack, attr,
-+						    "Attribute TCA_MQPRIO_MIN_RATE64 expected to have 8 bytes length");
-+				return -EINVAL;
-+			}
-+
- 			if (i >= qopt->num_tc)
- 				break;
- 			priv->min_rate[i] = nla_get_u64(attr);
-@@ -312,6 +319,13 @@ static int mqprio_parse_nlattr(struct Qdisc *sch, struct tc_mqprio_qopt *qopt,
- 						    "Attribute type expected to be TCA_MQPRIO_MAX_RATE64");
- 				return -EINVAL;
- 			}
-+
-+			if (nla_len(attr) != sizeof(u64)) {
-+				NL_SET_ERR_MSG_ATTR(extack, attr,
-+						    "Attribute TCA_MQPRIO_MAX_RATE64 expected to have 8 bytes length");
-+				return -EINVAL;
-+			}
-+
- 			if (i >= qopt->num_tc)
- 				break;
- 			priv->max_rate[i] = nla_get_u64(attr);
+diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
+index 4d6b3b7d6abb..ce2da5101e51 100644
+--- a/drivers/net/ethernet/renesas/ravb_main.c
++++ b/drivers/net/ethernet/renesas/ravb_main.c
+@@ -2885,6 +2885,9 @@ static int ravb_remove(struct platform_device *pdev)
+ 	struct ravb_private *priv = netdev_priv(ndev);
+ 	const struct ravb_hw_info *info = priv->info;
+ 
++	netif_carrier_off(ndev);
++	netif_tx_disable(ndev);
++	cancel_work_sync(&priv->work);
+ 	/* Stop PTP Clock driver */
+ 	if (info->ccc_gac)
+ 		ravb_ptp_stop(ndev);
 -- 
-2.17.1
+2.25.1
 
 
