@@ -1,103 +1,79 @@
-Return-Path: <netdev+bounces-21092-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21093-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59112762703
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 00:46:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C254762709
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 00:50:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4A6901C2104F
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 22:46:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3F29C1C21072
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 22:50:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04441263B1;
-	Tue, 25 Jul 2023 22:46:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA73726B1B;
+	Tue, 25 Jul 2023 22:50:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBAE18462
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 22:46:52 +0000 (UTC)
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BD4A30ED
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 15:46:29 -0700 (PDT)
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-5704995f964so75604817b3.2
-        for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 15:46:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690324824; x=1690929624;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=NiMTN0rMxISrPavJuhLij0ZZFeIfou/gU+GcauPEaWc=;
-        b=l+F6L4Y2jK0wqpPmXgxnATvxDjh9nYNbwPKvjTlG1sF+oQUZXxXA3StckaHdexEtLt
-         9bMPDGL+JExkZXt4kGyPq9ukhflar5vApaRy2PbDkAw/XQ/J4DUh5AY1KfWg3dLMk28c
-         SRuA1yKnEohEZMH3ngQygTNW/R747mupfIkIxSjaOhOPkhrYYV7OeO6Nlp1wo46o/I6z
-         UOVRo9YjoB2Fuwpo0Xds91ANzgXdSuUNMFVxftcW5tX0Ok2cnGKJFzIYp+zCdW1EkVOM
-         cLX2THwSoLbFzKluchTcEwvcew5kH9PzW49NYeixr0WzPA9sR3dlmccE5FAZWS73y9NB
-         3f0A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690324824; x=1690929624;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=NiMTN0rMxISrPavJuhLij0ZZFeIfou/gU+GcauPEaWc=;
-        b=QFk3dReXzyOcHqGmGhvgOd42dMR/PoibT/8lkSSs/zoRqNzelq5DH+h0PsHv+uEBgu
-         5dwnvdzA11hJYvkZ9iHR5RpTIkQ92DIx3TP/epkdJuxd7IZX3CA+Rf62ldl/z+YVm4CM
-         BOwQECGDih4liWG5htYwVSd9gJvm+MzQWQU4KyFLpY2U/behTzCaAUqHf/xEw6m8ZGCi
-         84RjY1b6j+Yn3OQVsZDviqF/17n8G0EkGpZbRCALnlXIxuRy0SC6ACIxzhHkDh696+hJ
-         12Dw9ZbYLD4wb6cdgrXYx+/sjqNA5lkaD2d1btXyl++oLEjFb5vVnvmXZQ4m3Ttz5E1u
-         rBmQ==
-X-Gm-Message-State: ABy/qLYm7Rj/a9RIqcvB/bY8Oq/IofWwsgotW5VITw1CWadG0Jn81y3W
-	0ivfo0+OTUpMgaVzGtja7l3OPA0=
-X-Google-Smtp-Source: APBJJlG73PW2XF1DZfFfJbP9BuKp+qu3Y09U3Xnul7jVcOuNxW9ZWzIO+z21TOakhR1JRQG+dwcSi88=
-X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
- (user=sdf job=sendgmr) by 2002:a81:ae4e:0:b0:583:3609:50d2 with SMTP id
- g14-20020a81ae4e000000b00583360950d2mr4664ywk.8.1690324824202; Tue, 25 Jul
- 2023 15:40:24 -0700 (PDT)
-Date: Tue, 25 Jul 2023 15:40:22 -0700
-In-Reply-To: <20230725142811.07f4faa2@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCADE8462
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 22:50:00 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B75A7C433C7;
+	Tue, 25 Jul 2023 22:49:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1690325400;
+	bh=yCYXB/co0y66KfJ5siP/ruQ0G4HPzFeuKJ1ydF2sdcg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=nON4It2PJgV7wEINj51T8CkZ9jRF1X43G12KRSmLJ7POrAXcdM8vSHja5dY00Rm+q
+	 l6tkt6hmOFSMc4WolozDrpQapu5FYESr2JEJwyqhx1IeqMc+FKj43BdWnBMfCZdyZw
+	 2fwdwm2coM+xXbOCKr131y9fkJ8VT51zBS5OwSJvHsLXpuADOwUCa0KUeO9I9ezBKZ
+	 PbnSNQ6BpntKs/MJBRwVFGTgN0ybn+q7D3sYrEaM5PgqZ4LaHCBw1O2kz/WvJtaXy9
+	 w6sYnyrBXqKOHCL2gMmjdDx2aYbBrywJnpRPRkJAsYymRuuW2dFFL/gqpYXHeBxtiY
+	 bJOsnrtisaWQA==
+Date: Tue, 25 Jul 2023 15:49:58 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>, Vadim
+ Fedorenko <vadim.fedorenko@linux.dev>, Jonathan Lemon
+ <jonathan.lemon@gmail.com>, Paolo Abeni <pabeni@redhat.com>, "Olech,
+ Milena" <milena.olech@intel.com>, "Michalik, Michal"
+ <michal.michalik@intel.com>, "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>, poros <poros@redhat.com>, mschmidt
+ <mschmidt@redhat.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linux-clk@vger.kernel.org" <linux-clk@vger.kernel.org>, Bart Van Assche
+ <bvanassche@acm.org>
+Subject: Re: [PATCH 09/11] ice: implement dpll interface to control cgu
+Message-ID: <20230725154958.46b44456@kernel.org>
+In-Reply-To: <ZLpzwMQrqp7mIMFF@nanopsycho>
+References: <20230720091903.297066-1-vadim.fedorenko@linux.dev>
+	<20230720091903.297066-10-vadim.fedorenko@linux.dev>
+	<ZLk/9zwbBHgs+rlb@nanopsycho>
+	<DM6PR11MB46572F438AADB5801E58227A9B3EA@DM6PR11MB4657.namprd11.prod.outlook.com>
+	<ZLo0ujuLMF2NrMog@nanopsycho>
+	<DM6PR11MB46576153E0E28BA4C283A30A9B3FA@DM6PR11MB4657.namprd11.prod.outlook.com>
+	<ZLpzwMQrqp7mIMFF@nanopsycho>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20230724235957.1953861-1-sdf@google.com> <20230724235957.1953861-3-sdf@google.com>
- <ZMAiYibjYzVTBjEF@corigine.com> <ZMAxAmg187DgPCAr@google.com> <20230725142811.07f4faa2@kernel.org>
-Message-ID: <ZMBPVqyUb9N8OEWL@google.com>
-Subject: Re: [RFC net-next v4 2/8] xsk: add TX timestamp and TX checksum
- offload support
-From: Stanislav Fomichev <sdf@google.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Simon Horman <simon.horman@corigine.com>, bpf@vger.kernel.org, ast@kernel.org, 
-	daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev, 
-	song@kernel.org, yhs@fb.com, john.fastabend@gmail.com, kpsingh@kernel.org, 
-	haoluo@google.com, jolsa@kernel.org, toke@kernel.org, willemb@google.com, 
-	dsahern@kernel.org, magnus.karlsson@intel.com, bjorn@kernel.org, 
-	maciej.fijalkowski@intel.com, hawk@kernel.org, netdev@vger.kernel.org, 
-	xdp-hints@xdp-project.net
-Content-Type: text/plain; charset="utf-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On 07/25, Jakub Kicinski wrote:
-> On Tue, 25 Jul 2023 13:30:58 -0700 Stanislav Fomichev wrote:
-> > > I know that it isn't the practice in this file.
-> > > but adding the following makes kernel-doc happier
-> > > about NETDEV_XSK_FLAGS_MASK not being documented.
-> > > 
-> > > 	/* private: */  
-> > 
-> > This is autogenerated file :-( But I guess I can try to extend ynl
-> > scripts to put this comment before the mask. Let me look into that...
+On Fri, 21 Jul 2023 14:02:08 +0200 Jiri Pirko wrote:
+> So it is not a mode! Mode is either "automatic" or "manual". Then we
+> have a state to indicate the state of the state machine (unlocked, locked,
+> holdover, holdover-acq). So what you seek is a way for the user to
+> expliticly set the state to "unlocked" and reset of the state machine.
+
++1 for mixing the state machine and config.
+Maybe a compromise would be to rename the config mode?
+Detached? Standalone?
+
+> Please don't mix config and state. I think we untangled this in the past
+> :/
 > 
-> Yes, please! I think I even wrote a patch for it at some point...
-> but then we realized that enums didn't support /* private: */.
-> Commit e27cb89a22ada4 has added the support, so we can get back
-> to getting the YNL changes in place.
-
-Let me actually route these separately to you. I'll fix mxdp_zc_max_seg
-thing as well..
+> Perhaps you just need an extra cmd like DPLL_CMD_DEVICE_STATE_RESET cmd
+> to hit this button.
 
