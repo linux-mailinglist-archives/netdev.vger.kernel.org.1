@@ -1,38 +1,38 @@
-Return-Path: <netdev+bounces-20614-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20616-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D700B7603D0
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 02:20:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D049A7603DC
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 02:21:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 160AD2813C1
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 00:20:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 179051C20CCC
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 00:21:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1175B199;
-	Tue, 25 Jul 2023 00:20:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8522A15CE;
+	Tue, 25 Jul 2023 00:20:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F0BA630
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 00:20:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 16FD4C433C9;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7B757E5;
+	Tue, 25 Jul 2023 00:20:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 5C0B6C433AB;
 	Tue, 25 Jul 2023 00:20:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1690244421;
-	bh=QC0jDOn3ffVyRUueSqZ7CcXIH137nDxwop1B7b+rSjY=;
+	bh=/CYJf6waf/5H+qoHbl8j40uIaY97gRV1gVYHmtkTc60=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=n0/l2A106jLPJNzT1dhmN14v4NOD9fADIL4rNvbZ9hlUcuryfqyZzuW0/cnz8WXAr
-	 4yf7i4oNtO0dweSoPn5bjW3wSW5EOG30Dw3r4qBYNmif30eYxAcX3gljKHUiJm3MAp
-	 dhjiPA25ewdS7LsPih429JBMw+fwHk5NHqB3vUq/RK4nvonG6+GsoBCK8eNV9UVOJS
-	 EutaVYNmpIX0fSY/tgmzdQCfbcPT5PYbIG9UMExsWwhfzRt2jXZlPxckmBNqmj7+kl
-	 sR9ycDOujkQBFKicE+CjgEDasYE6GMYyFxFdgxhC3t0bX3Vd9SVotvkormuuXtbC7O
-	 18vZTSWeVN7tw==
+	b=DY9qFiBJU1eT6ASnLKNZ7Y0v2xiqyg9ocqEnuDYE5rqHY8HBjpwZ0okTPw0rjRQQi
+	 v8Fhs7FU0DeYVqUc0LB6r1LP0gHyHpdFe9+XFpg84eEuohx5Hko9mR5j8NJPesF6xe
+	 d6zCbPZoBdkwMWaB1tSVKEWrgPnZTcl4eyXrKHtXnab2PGkJWQCuHsv75ocqUXKdx7
+	 9bKtKgQVFdV9AbOnZuxHiHmTGQ4CcYU7bmdIAPQr+9CvH0jZ3lVA58tqmh2i91oWVm
+	 rrf0cjOtufB2JXe76WMJa8D6z04boxYmw9LKsnxNROOLrgfpGebqZZLgGmLkBjol11
+	 1H7/lcDTIvVXA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id EDFA1E21EDD;
-	Tue, 25 Jul 2023 00:20:20 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 46D96E21EDD;
+	Tue, 25 Jul 2023 00:20:21 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -41,40 +41,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 0/3][pull request] Intel Wired LAN Driver Updates
- 2023-07-21 (i40e, iavf)
+Subject: Re: [PATCH net-next] mptcp: fix rcv buffer auto-tuning
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <169024442097.15014.3686941471612516296.git-patchwork-notify@kernel.org>
-Date: Tue, 25 Jul 2023 00:20:20 +0000
-References: <20230721155812.1292752-1-anthony.l.nguyen@intel.com>
-In-Reply-To: <20230721155812.1292752-1-anthony.l.nguyen@intel.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, netdev@vger.kernel.org
+ <169024442128.15014.7119910740780685151.git-patchwork-notify@kernel.org>
+Date: Tue, 25 Jul 2023 00:20:21 +0000
+References: <20230720-upstream-net-next-20230720-mptcp-fix-rcv-buffer-auto-tuning-v1-1-175ef12b8380@tessares.net>
+In-Reply-To: <20230720-upstream-net-next-20230720-mptcp-fix-rcv-buffer-auto-tuning-v1-1-175ef12b8380@tessares.net>
+To: Matthieu Baerts <matthieu.baerts@tessares.net>
+Cc: mptcp@lists.linux.dev, edumazet@google.com, davem@davemloft.net,
+ kuba@kernel.org, pabeni@redhat.com, martineau@kernel.org, soheil@google.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
 Hello:
 
-This series was applied to netdev/net.git (main)
-by Tony Nguyen <anthony.l.nguyen@intel.com>:
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 21 Jul 2023 08:58:09 -0700 you wrote:
-> This series contains updates to i40e and iavf drivers.
+On Thu, 20 Jul 2023 20:47:50 +0200 you wrote:
+> From: Paolo Abeni <pabeni@redhat.com>
 > 
-> Wang Ming corrects an error check on i40e.
+> The MPTCP code uses the assumption that the tcp_win_from_space() helper
+> does not use any TCP-specific field, and thus works correctly operating
+> on an MPTCP socket.
 > 
-> Jake unlocks crit_lock on allocation failure to prevent deadlock and
-> stops re-enabling of interrupts when it's not intended for iavf.
+> The commit dfa2f0483360 ("tcp: get rid of sysctl_tcp_adv_win_scale")
+> broke such assumption, and as a consequence most MPTCP connections stall
+> on zero-window event due to auto-tuning changing the rcv buffer size
+> quite randomly.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,1/3] i40e: Fix an NULL vs IS_ERR() bug for debugfs_create_dir()
-    https://git.kernel.org/netdev/net/c/043b1f185fb0
-  - [net,2/3] iavf: fix potential deadlock on allocation failure
-    https://git.kernel.org/netdev/net/c/a2f054c10bef
-  - [net,3/3] iavf: check for removal state before IAVF_FLAG_PF_COMMS_FAILED
-    https://git.kernel.org/netdev/net/c/91896c8acce2
+  - [net-next] mptcp: fix rcv buffer auto-tuning
+    https://git.kernel.org/netdev/net-next/c/b8dc6d6ce931
 
 You are awesome, thank you!
 -- 
