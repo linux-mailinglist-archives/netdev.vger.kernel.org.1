@@ -1,74 +1,132 @@
-Return-Path: <netdev+bounces-21064-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21067-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4DA36762466
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 23:28:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D3314762490
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 23:36:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7F3941C20F98
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 21:28:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EE0A8281380
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 21:36:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36CC826B8D;
-	Tue, 25 Jul 2023 21:28:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0897526B93;
+	Tue, 25 Jul 2023 21:36:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0CB21F188;
-	Tue, 25 Jul 2023 21:28:13 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ADB03C433C7;
-	Tue, 25 Jul 2023 21:28:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690320493;
-	bh=MlVasKHUR67c8YAUaXJTiStk2sj8JIq65rkbxf8GQDs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=YVe5VQBtbrwoSD8W5d5GkTH5OY7Q+4U285lD7Wx+E/a93wFdw9JV6cnK4RW2XskfX
-	 kubj3MFPvztw8G3FMQf7GwZ9Fdzsdyw3fei7b3L2vccVXaXAShDHm4JpUkn3bTY4pd
-	 iTMetUQ0PvpsK+u3Zt3rMI/9sZV7VsnaGVy/leWmr7VsduoPNIM/0hj8Ro2NUhhOpC
-	 SdL8EKXw/ZB9kRB3sDlOCtA97HP1gCG+JVeQF0rbR5OWtclUbk7HgN3+Gwg/oAsP9C
-	 75vdOsOlU3pJZrCLFI/qfNF4Gj+QfI18G2pfTM7L8nnb0fHYRIoHKxnSfBJ5334G2b
-	 3NloLyLtZP+UQ==
-Date: Tue, 25 Jul 2023 14:28:11 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Stanislav Fomichev <sdf@google.com>
-Cc: Simon Horman <simon.horman@corigine.com>, bpf@vger.kernel.org,
- ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
- martin.lau@linux.dev, song@kernel.org, yhs@fb.com,
- john.fastabend@gmail.com, kpsingh@kernel.org, haoluo@google.com,
- jolsa@kernel.org, toke@kernel.org, willemb@google.com, dsahern@kernel.org,
- magnus.karlsson@intel.com, bjorn@kernel.org, maciej.fijalkowski@intel.com,
- hawk@kernel.org, netdev@vger.kernel.org, xdp-hints@xdp-project.net
-Subject: Re: [RFC net-next v4 2/8] xsk: add TX timestamp and TX checksum
- offload support
-Message-ID: <20230725142811.07f4faa2@kernel.org>
-In-Reply-To: <ZMAxAmg187DgPCAr@google.com>
-References: <20230724235957.1953861-1-sdf@google.com>
-	<20230724235957.1953861-3-sdf@google.com>
-	<ZMAiYibjYzVTBjEF@corigine.com>
-	<ZMAxAmg187DgPCAr@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE5BE1F188
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 21:36:26 +0000 (UTC)
+Received: from mail-lj1-x263.google.com (mail-lj1-x263.google.com [IPv6:2a00:1450:4864:20::263])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BAC01FDD
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 14:36:24 -0700 (PDT)
+Received: by mail-lj1-x263.google.com with SMTP id 38308e7fff4ca-2b6f97c7115so86740691fa.2
+        for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 14:36:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=valis-email.20221208.gappssmtp.com; s=20221208; t=1690320983; x=1690925783;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gwS4GX0mfalc+kp126daECekP9wGUm6cMHbkcjkgKn0=;
+        b=qzqocM+8zGCd2SsW2v8/8zqaI7iWgFx/B71n3z0+B2mXVbo4TkxwPSfwsEq/qgwqYm
+         f6Wo94zdRdEcnv4fyapvaCZ+ybkXkOy5K9cWps5ASHEMlPF2Zhmas+JeLq+wLyANtE5O
+         Giarwj/wvK7GOz4W6mtR9tYdOl3K9upYElO4j36Bon+wZFB83Qjh2dXUk7PgcIpoyE2d
+         gzcCNvZWKp0KMOSnQb6RcDt6/YkdZxcRYDuzcm92Jbjjs6zDYhLNZzvxuU5g3ONkCeAt
+         7Yw44LLonJQVu8uYF9ICCmCnD4Wl+wz1B3nEFurEga/ujGbR/AdXmyo1HHIHwDxZr8rs
+         1esQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690320983; x=1690925783;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=gwS4GX0mfalc+kp126daECekP9wGUm6cMHbkcjkgKn0=;
+        b=lg+ta/H/TchlF/TGh1zNZg4L3tFGMEiiMFbbQ8A0LXMI6vPoGnb0H8sVhbSJay/Juj
+         /i0xKd3HNJ9rrTz/kJfXPRLksQXxO2/BnrJqihSWCcEIf5c9F5Cg6HLwuXOMBSyv2/fp
+         azOjGYhTAKZA1NwhyGpwXXWrWMyjOwEVMECje+ImD2QSK2sXdqTuCMs2hLdv28lEm78O
+         ug0l+d5AQMN85R/HR9Ped6nrIa8X4yeZrKUIE2LGQl4IgNDeaIpOmPXOAbYjYCwmRiry
+         Li3XgOuEYmggxV34wmjzdjqHclRpTBFmU2V4v5R2/7hBc8NiK9dA4aGqddcM/Uxp2HHm
+         7YMQ==
+X-Gm-Message-State: ABy/qLYuFhzm3Wm2IiBZu6Y76MI938gC+P8Cy0nxRWy1qyiWkqMHrjMq
+	86ZMnpezHcnor9z1tVPGD4IrebBZj0n5UZUO41nfk/ptYCVBmk3VXpki
+X-Google-Smtp-Source: APBJJlFjj2XIL29P0AHC1q5RNqSFnJeYGK0ZdSMXr0WhfmD1iff9vQZXkf6dkxqwIsu/zcxuD+Dj9d/Kz8uX
+X-Received: by 2002:a2e:8607:0:b0:2b5:89a6:c12b with SMTP id a7-20020a2e8607000000b002b589a6c12bmr33563lji.10.1690320982821;
+        Tue, 25 Jul 2023 14:36:22 -0700 (PDT)
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com. [209.85.218.51])
+        by smtp-relay.gmail.com with ESMTPS id i23-20020a2e8657000000b002b6aa437f9dsm1663260ljj.59.2023.07.25.14.36.22
+        for <netdev@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 25 Jul 2023 14:36:22 -0700 (PDT)
+X-Relaying-Domain: valis.email
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-99b9421aaebso383928666b.2
+        for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 14:36:22 -0700 (PDT)
+X-Received: by 2002:a17:907:2ccb:b0:988:6e75:6b3d with SMTP id
+ hg11-20020a1709072ccb00b009886e756b3dmr81785ejc.33.1690320982053; Tue, 25 Jul
+ 2023 14:36:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20230721174856.3045-1-sec@valis.email> <8a707435884e18ccb92e1e91e474f7662d4f9365.camel@redhat.com>
+ <CAEBa_SB6KCa787D3y4ozBczbHfZrsscBMmD9PS1RjcC=375jog@mail.gmail.com> <20230725130917.36658b63@kernel.org>
+In-Reply-To: <20230725130917.36658b63@kernel.org>
+From: valis <sec@valis.email>
+Date: Tue, 25 Jul 2023 23:36:14 +0200
+X-Gmail-Original-Message-ID: <CAEBa_SASfBCb8TCS=qzNw90ZNE+wzADmY1_VtJiBnmixXgt6NQ@mail.gmail.com>
+Message-ID: <CAEBa_SASfBCb8TCS=qzNw90ZNE+wzADmY1_VtJiBnmixXgt6NQ@mail.gmail.com>
+Subject: Re: [PATCH net 0/3] net/sched Bind logic fixes for cls_fw, cls_u32
+ and cls_route
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, jhs@mojatatu.com, 
+	xiyou.wangcong@gmail.com, jiri@resnulli.us, davem@davemloft.net, 
+	edumazet@google.com, pctammela@mojatatu.com, victor@mojatatu.com, 
+	ramdhan@starlabs.sg, billy@starlabs.sg, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Tue, 25 Jul 2023 13:30:58 -0700 Stanislav Fomichev wrote:
-> > I know that it isn't the practice in this file.
-> > but adding the following makes kernel-doc happier
-> > about NETDEV_XSK_FLAGS_MASK not being documented.
-> > 
-> > 	/* private: */  
-> 
-> This is autogenerated file :-( But I guess I can try to extend ynl
-> scripts to put this comment before the mask. Let me look into that...
+On Tue, Jul 25, 2023 at 10:09=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> w=
+rote:
+>
+> On Tue, 25 Jul 2023 21:05:23 +0200 valis wrote:
+> > The document you quoted does not forbid pseudonyms.
+> > In fact, it was recently updated to clarify that very fact.
 
-Yes, please! I think I even wrote a patch for it at some point...
-but then we realized that enums didn't support /* private: */.
-Commit e27cb89a22ada4 has added the support, so we can get back
-to getting the YNL changes in place.
+Hi Jakub!
+
+>
+> We don't know who you are. To my understanding the adjustment means
+> that you are not obligated to use the name on your birth certificate
+> but we need to know who you are.
+
+I could start a discussion about what makes a name valid, but I'm
+pretty sure netdev is not the right place for it.
+
+>
+> Why is it always "security" people who try act like this is some make
+> believe metaverse. We're working on a real project with real licenses
+> and real legal implications.
+>
+> Your S-o-b is pretty much meaningless. If a "real" person can vouch for
+> who you are or put their own S-o-b on your code that's fine.
+
+I posted my patches to this mailing list per maintainer's request and
+according to the published rules of the patch submission process as I
+understood them.
+Sorry if I misinterpreted something and wasted anybody's time.
+
+I'm not going to resubmit the patches under a different name.
+
+Please feel free to use them if someone is willing to sign off on them.
+
+Best regards,
+
+valis
 
