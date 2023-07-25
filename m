@@ -1,43 +1,44 @@
-Return-Path: <netdev+bounces-21037-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21038-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A27557623A3
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 22:38:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 530CB7623A5
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 22:38:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5E79A281ADE
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 20:38:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 82CD71C20FAE
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 20:38:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F63F25939;
-	Tue, 25 Jul 2023 20:38:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B2F7263BA;
+	Tue, 25 Jul 2023 20:38:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7C021C39;
-	Tue, 25 Jul 2023 20:38:08 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BFDE5C433C7;
-	Tue, 25 Jul 2023 20:38:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78BC825939;
+	Tue, 25 Jul 2023 20:38:35 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D6F6C433C8;
+	Tue, 25 Jul 2023 20:38:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690317488;
-	bh=qYEaGe8x/x/I3W8Vd67YqdHd5WGuBqjX6kbNj9+vGBg=;
+	s=k20201202; t=1690317514;
+	bh=qkmY3uLqRjsX0uqKIGgEFPj1VUPQEPODKUeUELmASPk=;
 	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=RwMbTUWl6R+peBsNeiS6lk2/5GoObI01O+A0LA0YZSv5xidmnXgSzwsd3ZH51F8eE
-	 VKvq0m5AW92m7V+dQIpNd+hhse2lODjF8Am3Ce5uI+eFODCMfxedNBC6qupfTV9tpD
-	 Kf49hVibdGrZUkKe+H1U0ZHr/7jNXPj9jV8Pzz2l5NL4wHjCHNcC8mhEi5nCZtMQKl
-	 4gHTy+biGeKgg63zxKNzXEu/sBiJL4onzJvBEtF+eQJuS9Qc6s4WSNm/azIkTP7fXi
-	 jwYwrk/nogZPkPwz0X6pbQl0BJ5YtuzT4oUUNuIh/K3a/3u4jrj134T4dUmNQTW7b5
-	 5xo7yPEPQJrYg==
-Subject: [PATCH net-next v2 6/7] SUNRPC: Use new helpers to handle TLS Alerts
+	b=HRBMjMaZKTvjkbmPXTw+CGSV1PrddlKGn0sqDR98HfP6kQHfNPqpLbG/0w/lPKLA6
+	 +2OPcUXayuhAv0Lml+xSlC4HnpGig5QGhtt80fW+44lKKdMVymSa9WzGnT4ctm0CCV
+	 N/U+Cu7/AJ/dncxCD8Xr8ghlR9jHBRovynknMUIs07g5G5VzksY1hk3DrUqrECmsLF
+	 wPVoDiAa8altaBHNN2xITYYtGxvJWSGoJlheq0K7WvKrVz3CLvMHr6zxtcdkvKejdk
+	 0NOveYdAmsO1daf4T+uPJ1jWnDl5aylGF3FH8wI/yspAdrS/39RPspuPGOBc3ZRhHf
+	 ti2c4d9iPxiIA==
+Subject: [PATCH net-next v2 7/7] net/handshake: Trace events for TLS Alert
+ helpers
 From: Chuck Lever <cel@kernel.org>
 To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
  pabeni@redhat.com
 Cc: netdev@vger.kernel.org, kernel-tls-handshake@lists.linux.dev
-Date: Tue, 25 Jul 2023 16:37:56 -0400
+Date: Tue, 25 Jul 2023 16:38:23 -0400
 Message-ID: 
- <169031746673.15386.5483613200274291252.stgit@oracle-102.nfsv4bat.org>
+ <169031749340.15386.15667428526689326497.stgit@oracle-102.nfsv4bat.org>
 In-Reply-To: 
  <169031700320.15386.6923217931442885226.stgit@oracle-102.nfsv4bat.org>
 References: 
@@ -54,164 +55,255 @@ Content-Transfer-Encoding: 7bit
 
 From: Chuck Lever <chuck.lever@oracle.com>
 
-Use the helpers to parse the level and description fields in
-incoming alerts. "Warning" alerts are discarded, and "fatal"
-alerts mean the session is no longer valid.
+Add observability for the new TLS Alert infrastructure.
 
+Reviewed-by: Hannes Reinecke <hare@suse.de>
 Signed-off-by: Chuck Lever <chuck.lever@oracle.com>
 ---
- net/sunrpc/svcsock.c  |   48 ++++++++++++++++++++++++++----------------------
- net/sunrpc/xprtsock.c |   43 ++++++++++++++++++++++++-------------------
- 2 files changed, 50 insertions(+), 41 deletions(-)
+ include/trace/events/handshake.h |  160 ++++++++++++++++++++++++++++++++++++++
+ net/handshake/alert.c            |    7 ++
+ net/handshake/trace.c            |    2 
+ 3 files changed, 169 insertions(+)
 
-diff --git a/net/sunrpc/svcsock.c b/net/sunrpc/svcsock.c
-index 87bf685f2957..2ed29e40c6a9 100644
---- a/net/sunrpc/svcsock.c
-+++ b/net/sunrpc/svcsock.c
-@@ -43,7 +43,7 @@
- #include <net/udp.h>
- #include <net/tcp.h>
- #include <net/tcp_states.h>
--#include <net/tls.h>
-+#include <net/tls_prot.h>
- #include <net/handshake.h>
- #include <linux/uaccess.h>
- #include <linux/highmem.h>
-@@ -226,27 +226,30 @@ static int svc_one_sock_name(struct svc_sock *svsk, char *buf, int remaining)
- }
+diff --git a/include/trace/events/handshake.h b/include/trace/events/handshake.h
+index 8dadcab5f12a..bdd8a03cf5ba 100644
+--- a/include/trace/events/handshake.h
++++ b/include/trace/events/handshake.h
+@@ -6,7 +6,86 @@
+ #define _TRACE_HANDSHAKE_H
  
- static int
--svc_tcp_sock_process_cmsg(struct svc_sock *svsk, struct msghdr *msg,
-+svc_tcp_sock_process_cmsg(struct socket *sock, struct msghdr *msg,
- 			  struct cmsghdr *cmsg, int ret)
- {
--	if (cmsg->cmsg_level == SOL_TLS &&
--	    cmsg->cmsg_type == TLS_GET_RECORD_TYPE) {
--		u8 content_type = *((u8 *)CMSG_DATA(cmsg));
--
--		switch (content_type) {
--		case TLS_RECORD_TYPE_DATA:
--			/* TLS sets EOR at the end of each application data
--			 * record, even though there might be more frames
--			 * waiting to be decrypted.
--			 */
--			msg->msg_flags &= ~MSG_EOR;
--			break;
--		case TLS_RECORD_TYPE_ALERT:
--			ret = -ENOTCONN;
--			break;
--		default:
--			ret = -EAGAIN;
--		}
-+	u8 content_type = tls_get_record_type(sock->sk, cmsg);
-+	u8 level, description;
+ #include <linux/net.h>
++#include <net/tls_prot.h>
+ #include <linux/tracepoint.h>
++#include <trace/events/net_probe_common.h>
 +
-+	switch (content_type) {
-+	case 0:
-+		break;
-+	case TLS_RECORD_TYPE_DATA:
-+		/* TLS sets EOR at the end of each application data
-+		 * record, even though there might be more frames
-+		 * waiting to be decrypted.
-+		 */
-+		msg->msg_flags &= ~MSG_EOR;
-+		break;
-+	case TLS_RECORD_TYPE_ALERT:
-+		tls_alert_recv(sock->sk, msg, &level, &description);
-+		ret = (level == TLS_ALERT_LEVEL_FATAL) ?
-+			-ENOTCONN : -EAGAIN;
-+		break;
-+	default:
-+		/* discard this record type */
-+		ret = -EAGAIN;
- 	}
- 	return ret;
- }
-@@ -258,13 +261,14 @@ svc_tcp_sock_recv_cmsg(struct svc_sock *svsk, struct msghdr *msg)
- 		struct cmsghdr	cmsg;
- 		u8		buf[CMSG_SPACE(sizeof(u8))];
- 	} u;
-+	struct socket *sock = svsk->sk_sock;
++#define TLS_RECORD_TYPE_LIST \
++	record_type(CHANGE_CIPHER_SPEC) \
++	record_type(ALERT) \
++	record_type(HANDSHAKE) \
++	record_type(DATA) \
++	record_type(HEARTBEAT) \
++	record_type(TLS12_CID) \
++	record_type_end(ACK)
++
++#undef record_type
++#undef record_type_end
++#define record_type(x)		TRACE_DEFINE_ENUM(TLS_RECORD_TYPE_##x);
++#define record_type_end(x)	TRACE_DEFINE_ENUM(TLS_RECORD_TYPE_##x);
++
++TLS_RECORD_TYPE_LIST
++
++#undef record_type
++#undef record_type_end
++#define record_type(x)		{ TLS_RECORD_TYPE_##x, #x },
++#define record_type_end(x)	{ TLS_RECORD_TYPE_##x, #x }
++
++#define show_tls_content_type(type) \
++	__print_symbolic(type, TLS_RECORD_TYPE_LIST)
++
++TRACE_DEFINE_ENUM(TLS_ALERT_LEVEL_WARNING);
++TRACE_DEFINE_ENUM(TLS_ALERT_LEVEL_FATAL);
++
++#define show_tls_alert_level(level) \
++	__print_symbolic(level, \
++		{ TLS_ALERT_LEVEL_WARNING,	"Warning" }, \
++		{ TLS_ALERT_LEVEL_FATAL,	"Fatal" })
++
++#define TLS_ALERT_DESCRIPTION_LIST \
++	alert_description(CLOSE_NOTIFY) \
++	alert_description(UNEXPECTED_MESSAGE) \
++	alert_description(BAD_RECORD_MAC) \
++	alert_description(RECORD_OVERFLOW) \
++	alert_description(HANDSHAKE_FAILURE) \
++	alert_description(BAD_CERTIFICATE) \
++	alert_description(UNSUPPORTED_CERTIFICATE) \
++	alert_description(CERTIFICATE_REVOKED) \
++	alert_description(CERTIFICATE_EXPIRED) \
++	alert_description(CERTIFICATE_UNKNOWN) \
++	alert_description(ILLEGAL_PARAMETER) \
++	alert_description(UNKNOWN_CA) \
++	alert_description(ACCESS_DENIED) \
++	alert_description(DECODE_ERROR) \
++	alert_description(DECRYPT_ERROR) \
++	alert_description(TOO_MANY_CIDS_REQUESTED) \
++	alert_description(PROTOCOL_VERSION) \
++	alert_description(INSUFFICIENT_SECURITY) \
++	alert_description(INTERNAL_ERROR) \
++	alert_description(INAPPROPRIATE_FALLBACK) \
++	alert_description(USER_CANCELED) \
++	alert_description(MISSING_EXTENSION) \
++	alert_description(UNSUPPORTED_EXTENSION) \
++	alert_description(UNRECOGNIZED_NAME) \
++	alert_description(BAD_CERTIFICATE_STATUS_RESPONSE) \
++	alert_description(UNKNOWN_PSK_IDENTITY) \
++	alert_description(CERTIFICATE_REQUIRED) \
++	alert_description_end(NO_APPLICATION_PROTOCOL)
++
++#undef alert_description
++#undef alert_description_end
++#define alert_description(x)		TRACE_DEFINE_ENUM(TLS_ALERT_DESC_##x);
++#define alert_description_end(x)	TRACE_DEFINE_ENUM(TLS_ALERT_DESC_##x);
++
++TLS_ALERT_DESCRIPTION_LIST
++
++#undef alert_description
++#undef alert_description_end
++#define alert_description(x)		{ TLS_ALERT_DESC_##x, #x },
++#define alert_description_end(x)	{ TLS_ALERT_DESC_##x, #x }
++
++#define show_tls_alert_description(desc) \
++	__print_symbolic(desc, TLS_ALERT_DESCRIPTION_LIST)
+ 
+ DECLARE_EVENT_CLASS(handshake_event_class,
+ 	TP_PROTO(
+@@ -106,6 +185,47 @@ DECLARE_EVENT_CLASS(handshake_error_class,
+ 		),						\
+ 		TP_ARGS(net, req, sk, err))
+ 
++DECLARE_EVENT_CLASS(handshake_alert_class,
++	TP_PROTO(
++		const struct sock *sk,
++		unsigned char level,
++		unsigned char description
++	),
++	TP_ARGS(sk, level, description),
++	TP_STRUCT__entry(
++		/* sockaddr_in6 is always bigger than sockaddr_in */
++		__array(__u8, saddr, sizeof(struct sockaddr_in6))
++		__array(__u8, daddr, sizeof(struct sockaddr_in6))
++		__field(unsigned int, netns_ino)
++		__field(unsigned long, level)
++		__field(unsigned long, description)
++	),
++	TP_fast_assign(
++		const struct inet_sock *inet = inet_sk(sk);
++
++		memset(__entry->saddr, 0, sizeof(struct sockaddr_in6));
++		memset(__entry->daddr, 0, sizeof(struct sockaddr_in6));
++		TP_STORE_ADDR_PORTS(__entry, inet, sk);
++
++		__entry->netns_ino = sock_net(sk)->ns.inum;
++		__entry->level = level;
++		__entry->description = description;
++	),
++	TP_printk("src=%pISpc dest=%pISpc %s: %s",
++		__entry->saddr, __entry->daddr,
++		show_tls_alert_level(__entry->level),
++		show_tls_alert_description(__entry->description)
++	)
++);
++#define DEFINE_HANDSHAKE_ALERT(name)				\
++	DEFINE_EVENT(handshake_alert_class, name,		\
++		TP_PROTO(					\
++			const struct sock *sk,			\
++			unsigned char level,			\
++			unsigned char description		\
++		),						\
++		TP_ARGS(sk, level, description))
++
+ 
+ /*
+  * Request lifetime events
+@@ -154,6 +274,46 @@ DEFINE_HANDSHAKE_ERROR(handshake_cmd_accept_err);
+ DEFINE_HANDSHAKE_FD_EVENT(handshake_cmd_done);
+ DEFINE_HANDSHAKE_ERROR(handshake_cmd_done_err);
+ 
++/*
++ * TLS Record events
++ */
++
++TRACE_EVENT(tls_contenttype,
++	TP_PROTO(
++		const struct sock *sk,
++		unsigned char type
++	),
++	TP_ARGS(sk, type),
++	TP_STRUCT__entry(
++		/* sockaddr_in6 is always bigger than sockaddr_in */
++		__array(__u8, saddr, sizeof(struct sockaddr_in6))
++		__array(__u8, daddr, sizeof(struct sockaddr_in6))
++		__field(unsigned int, netns_ino)
++		__field(unsigned long, type)
++	),
++	TP_fast_assign(
++		const struct inet_sock *inet = inet_sk(sk);
++
++		memset(__entry->saddr, 0, sizeof(struct sockaddr_in6));
++		memset(__entry->daddr, 0, sizeof(struct sockaddr_in6));
++		TP_STORE_ADDR_PORTS(__entry, inet, sk);
++
++		__entry->netns_ino = sock_net(sk)->ns.inum;
++		__entry->type = type;
++	),
++	TP_printk("src=%pISpc dest=%pISpc %s",
++		__entry->saddr, __entry->daddr,
++		show_tls_content_type(__entry->type)
++	)
++);
++
++/*
++ * TLS Alert events
++ */
++
++DEFINE_HANDSHAKE_ALERT(tls_alert_send);
++DEFINE_HANDSHAKE_ALERT(tls_alert_recv);
++
+ #endif /* _TRACE_HANDSHAKE_H */
+ 
+ #include <trace/define_trace.h>
+diff --git a/net/handshake/alert.c b/net/handshake/alert.c
+index 4cb76fc2c531..5e558cb3c32f 100644
+--- a/net/handshake/alert.c
++++ b/net/handshake/alert.c
+@@ -22,6 +22,8 @@
+ 
+ #include "handshake.h"
+ 
++#include <trace/events/handshake.h>
++
+ /**
+  * tls_alert_send - send a TLS Alert on a kTLS socket
+  * @sock: open kTLS socket to send on
+@@ -40,6 +42,8 @@ int tls_alert_send(struct socket *sock, u8 level, u8 description)
+ 	u8 alert[2];
  	int ret;
  
- 	msg->msg_control = &u;
- 	msg->msg_controllen = sizeof(u);
--	ret = sock_recvmsg(svsk->sk_sock, msg, MSG_DONTWAIT);
-+	ret = sock_recvmsg(sock, msg, MSG_DONTWAIT);
- 	if (unlikely(msg->msg_controllen != sizeof(u)))
--		ret = svc_tcp_sock_process_cmsg(svsk, msg, &u.cmsg, ret);
-+		ret = svc_tcp_sock_process_cmsg(sock, msg, &u.cmsg, ret);
- 	return ret;
- }
- 
-diff --git a/net/sunrpc/xprtsock.c b/net/sunrpc/xprtsock.c
-index 871f141be96f..268a2cc61acd 100644
---- a/net/sunrpc/xprtsock.c
-+++ b/net/sunrpc/xprtsock.c
-@@ -47,7 +47,7 @@
- #include <net/checksum.h>
- #include <net/udp.h>
- #include <net/tcp.h>
--#include <net/tls.h>
-+#include <net/tls_prot.h>
- #include <net/handshake.h>
- 
- #include <linux/bvec.h>
-@@ -360,24 +360,27 @@ static int
- xs_sock_process_cmsg(struct socket *sock, struct msghdr *msg,
- 		     struct cmsghdr *cmsg, int ret)
- {
--	if (cmsg->cmsg_level == SOL_TLS &&
--	    cmsg->cmsg_type == TLS_GET_RECORD_TYPE) {
--		u8 content_type = *((u8 *)CMSG_DATA(cmsg));
--
--		switch (content_type) {
--		case TLS_RECORD_TYPE_DATA:
--			/* TLS sets EOR at the end of each application data
--			 * record, even though there might be more frames
--			 * waiting to be decrypted.
--			 */
--			msg->msg_flags &= ~MSG_EOR;
--			break;
--		case TLS_RECORD_TYPE_ALERT:
--			ret = -ENOTCONN;
--			break;
--		default:
--			ret = -EAGAIN;
--		}
-+	u8 content_type = tls_get_record_type(sock->sk, cmsg);
-+	u8 level, description;
++	trace_tls_alert_send(sock->sk, level, description);
 +
-+	switch (content_type) {
-+	case 0:
-+		break;
-+	case TLS_RECORD_TYPE_DATA:
-+		/* TLS sets EOR at the end of each application data
-+		 * record, even though there might be more frames
-+		 * waiting to be decrypted.
-+		 */
-+		msg->msg_flags &= ~MSG_EOR;
-+		break;
-+	case TLS_RECORD_TYPE_ALERT:
-+		tls_alert_recv(sock->sk, msg, &level, &description);
-+		ret = (level == TLS_ALERT_LEVEL_FATAL) ?
-+			-EACCES : -EAGAIN;
-+		break;
-+	default:
-+		/* discard this record type */
-+		ret = -EAGAIN;
- 	}
- 	return ret;
+ 	alert[0] = level;
+ 	alert[1] = description;
+ 	iov.iov_base = alert;
+@@ -78,6 +82,7 @@ u8 tls_get_record_type(const struct sock *sk, const struct cmsghdr *cmsg)
+ 		return 0;
+ 
+ 	record_type = *((u8 *)CMSG_DATA(cmsg));
++	trace_tls_contenttype(sk, record_type);
+ 	return record_type;
  }
-@@ -777,6 +780,8 @@ static void xs_stream_data_receive(struct sock_xprt *transport)
- 	}
- 	if (ret == -ESHUTDOWN)
- 		kernel_sock_shutdown(transport->sock, SHUT_RDWR);
-+	else if (ret == -EACCES)
-+		xprt_wake_pending_tasks(&transport->xprt, -EACCES);
- 	else
- 		xs_poll_check_readable(transport);
- out:
+ EXPORT_SYMBOL(tls_get_record_type);
+@@ -100,5 +105,7 @@ void tls_alert_recv(const struct sock *sk, const struct msghdr *msg,
+ 	data = iov->iov_base;
+ 	*level = data[0];
+ 	*description = data[1];
++
++	trace_tls_alert_recv(sk, *level, *description);
+ }
+ EXPORT_SYMBOL(tls_alert_recv);
+diff --git a/net/handshake/trace.c b/net/handshake/trace.c
+index 1c4d8e27e17a..44432d0857b9 100644
+--- a/net/handshake/trace.c
++++ b/net/handshake/trace.c
+@@ -8,8 +8,10 @@
+  */
+ 
+ #include <linux/types.h>
++#include <linux/ipv6.h>
+ 
+ #include <net/sock.h>
++#include <net/inet_sock.h>
+ #include <net/netlink.h>
+ #include <net/genetlink.h>
+ 
 
 
 
