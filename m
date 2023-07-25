@@ -1,129 +1,91 @@
-Return-Path: <netdev+bounces-21082-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21086-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62D717624F2
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 23:56:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71C30762569
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 00:03:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 17FF1280F8C
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 21:56:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9FC811C20FFD
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 22:03:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE294275D4;
-	Tue, 25 Jul 2023 21:56:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 382ED27702;
+	Tue, 25 Jul 2023 22:03:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF1F226B6D
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 21:56:03 +0000 (UTC)
-Received: from mail-vk1-xa2d.google.com (mail-vk1-xa2d.google.com [IPv6:2607:f8b0:4864:20::a2d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59A8A1FE6;
-	Tue, 25 Jul 2023 14:56:02 -0700 (PDT)
-Received: by mail-vk1-xa2d.google.com with SMTP id 71dfb90a1353d-4814bea10e0so2241347e0c.1;
-        Tue, 25 Jul 2023 14:56:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690322161; x=1690926961;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=volTAAeL8fKmMhSVDeFyV0ZoI3X0kFdQ4vEkodcC4os=;
-        b=aPfoBPRnQhWQ2T9EzFVNum8zlrhaNbwkP4cUQoofLJYJ24jlKvcUpTEGPl73BvsB9w
-         +/wHawbHaVoRAqXAkoe+e7N66jWegqcpCGhGHfNmjbJLP7kegofOmRNSFuKPzLv1r5zS
-         7asIYDgODM0udnr1i6GkFY4SunbJDIb2EL2RmnMMnOPrnyRBdtL5orw+SndgAY665wbk
-         UKCVx5iZgohjHdehGk6plJKSDdRd7V0qKw/RrGfrbF66UvUWtU5BhVr3YRy0peF/wO5Z
-         aeo1JOB8VDhT3z56HaSBfIdX0lczj2PXON82KA8ywR6WaNv0kZLT3OZJK9Tukqwz81oP
-         aL4Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690322161; x=1690926961;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=volTAAeL8fKmMhSVDeFyV0ZoI3X0kFdQ4vEkodcC4os=;
-        b=VZ4ZLDzFak9nER4UjbzCvWsmAiP+4PZf/uqF1gCXKCKyNhj/LL61OzUVjJV8yGcpFr
-         vybSXGC4Hy7+WZM517Yblih3EunRMLED9ouw6p5CFxecUXGfPCjjh9fDdkCHnW3OH3AR
-         3EAZ+FVdZKoWaEVy1v/aZ//w9QssILzYXeI20BG3JvQRMyd9ij541gdPypBRBa4O8ta2
-         Vq1Z/qiyxpEzsXMvpHkKiI5j6XS4jWL87NIjE/xE5md3iH/ao4gSWO/GCXckibIqu5ih
-         +I8xMpUIaEuNf4a9seHgKwhSHgVNkIHeOi2qHBdrvl4qI4NSP/yt4E0EQRoj1nti8GNI
-         vU9Q==
-X-Gm-Message-State: ABy/qLbh8jrQ61FyrYCllSTvQDWzgCGGNTcYPDJFwSgiWcCnHsBWimna
-	PxVBY/ImNZjGVuNzREISjiXX4ZflCRmCjzFBouq7ak/f+Co=
-X-Google-Smtp-Source: APBJJlFrZXsEVlYjvUdXZadZoz1nNgOSknSdQxqfQtqPBmWiZfPtnvvcE8DUans9nthQr12q3SVEZSnMXq13Bx4wbWM=
-X-Received: by 2002:a1f:45c9:0:b0:486:3e05:da14 with SMTP id
- s192-20020a1f45c9000000b004863e05da14mr372750vka.12.1690322161172; Tue, 25
- Jul 2023 14:56:01 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D227226B6D
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 22:03:15 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3DD0C433C7;
+	Tue, 25 Jul 2023 22:03:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1690322595;
+	bh=oQxFAhpidA9V2q1VPA63bxve/3DIExxQn19eeLCZFhc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Xfev1x+Y1clHe6sv0jKhTpqz1JV6DGoLLUWc+caEfWdYUvcPtw50VRYQwTM391dHI
+	 Er5WuRP0GuFrUhnBALijqFaMVi7SUyWvBDaKwStDikU5/sc40/g1CWnaBLp63G17pg
+	 RWgGvXMjHWh6QSEXMZP77oYoLHrWumFzyL6ytPkZFajxFcApanfJ8erIQNJiOES0wg
+	 6fjxcp5PThRoUujauwI887hkfkWyloOD5tWtZu+8mg/vp+y+ZGVCqFPv3/ToNd/sTG
+	 taMY2mV0g0gD4XesaEDic4oyu9pyrib3zQicPp4VtOAYJSkeYPd9khNYqPnLHxZlFC
+	 WJKeRWS0Q8dLw==
+Date: Tue, 25 Jul 2023 15:03:14 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: valis <sec@valis.email>
+Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us,
+ davem@davemloft.net, edumazet@google.com, pctammela@mojatatu.com,
+ victor@mojatatu.com, ramdhan@starlabs.sg, billy@starlabs.sg, Greg
+ Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: Re: [PATCH net 0/3] net/sched Bind logic fixes for cls_fw, cls_u32
+ and cls_route
+Message-ID: <20230725150314.342181ee@kernel.org>
+In-Reply-To: <CAEBa_SASfBCb8TCS=qzNw90ZNE+wzADmY1_VtJiBnmixXgt6NQ@mail.gmail.com>
+References: <20230721174856.3045-1-sec@valis.email>
+	<8a707435884e18ccb92e1e91e474f7662d4f9365.camel@redhat.com>
+	<CAEBa_SB6KCa787D3y4ozBczbHfZrsscBMmD9PS1RjcC=375jog@mail.gmail.com>
+	<20230725130917.36658b63@kernel.org>
+	<CAEBa_SASfBCb8TCS=qzNw90ZNE+wzADmY1_VtJiBnmixXgt6NQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cyninzffkwhc7mqbxpwhhpm7bav67tp7a7rqkpeu5bh3kafbyo@wx3q2x5nm3he> <20230725214628.25246-1-pchelkin@ispras.ru>
-In-Reply-To: <20230725214628.25246-1-pchelkin@ispras.ru>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Tue, 25 Jul 2023 17:55:39 -0400
-Message-ID: <CADvbK_eUm0KF1GOSkOu5HRO91yr3BSD8Ha9kh3b+Omd=pPNdvg@mail.gmail.com>
-Subject: Re: [PATCH v2] tipc: stop tipc crypto on failure in tipc_node_create
-To: Fedor Pchelkin <pchelkin@ispras.ru>
-Cc: Jon Maloy <jmaloy@redhat.com>, Ying Xue <ying.xue@windriver.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	tipc-discussion@lists.sourceforge.net, linux-kernel@vger.kernel.org, 
-	Alexey Khoroshilov <khoroshilov@ispras.ru>, lvc-project@linuxtesting.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-On Tue, Jul 25, 2023 at 5:46=E2=80=AFPM Fedor Pchelkin <pchelkin@ispras.ru>=
+On Tue, 25 Jul 2023 23:36:14 +0200 valis wrote:
+> On Tue, Jul 25, 2023 at 10:09=E2=80=AFPM Jakub Kicinski <kuba@kernel.org>=
  wrote:
->
-> If tipc_link_bc_create() fails inside tipc_node_create() for a newly
-> allocated tipc node then we should stop its tipc crypto and free the
-> resources allocated with a call to tipc_crypto_start().
->
-> As the node ref is initialized to one to that point, just put the ref on
-> tipc_link_bc_create() error case that would lead to tipc_node_free() be
-> eventually executed and properly clean the node and its crypto resources.
->
-> Found by Linux Verification Center (linuxtesting.org).
->
-> Fixes: cb8092d70a6f ("tipc: move bc link creation back to tipc_node_creat=
-e")
-> Suggested-by: Xin Long <lucien.xin@gmail.com>
-> Signed-off-by: Fedor Pchelkin <pchelkin@ispras.ru>
-> ---
-> v1->v2: simplify the patch per Xin Long's advice: putting the ref on erro=
-r
-> case would solve the problem more conveniently; update the patch
-> description accordingly.
->
->  net/tipc/node.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/net/tipc/node.c b/net/tipc/node.c
-> index 5e000fde8067..a9c5b6594889 100644
-> --- a/net/tipc/node.c
-> +++ b/net/tipc/node.c
-> @@ -583,7 +583,7 @@ struct tipc_node *tipc_node_create(struct net *net, u=
-32 addr, u8 *peer_id,
->                                  n->capabilities, &n->bc_entry.inputq1,
->                                  &n->bc_entry.namedq, snd_l, &n->bc_entry=
-.link)) {
->                 pr_warn("Broadcast rcv link creation failed, no memory\n"=
-);
-> -               kfree(n);
-> +               tipc_node_put(n);
->                 n =3D NULL;
->                 goto exit;
->         }
-> --
-> 2.41.0
->
-Reviewed-by: Xin Long <lucien.xin@gmail.com>
+> > We don't know who you are. To my understanding the adjustment means
+> > that you are not obligated to use the name on your birth certificate
+> > but we need to know who you are. =20
+>=20
+> I could start a discussion about what makes a name valid, but I'm
+> pretty sure netdev is not the right place for it.
+
+Agreed, I CCed Greg KH to keep me honest, in case I'm outright
+incorrect. If it's a gray zone kinda answer I'm guessing that
+nobody here really wants to spend time discussing it.
+
+> > Why is it always "security" people who try act like this is some make
+> > believe metaverse. We're working on a real project with real licenses
+> > and real legal implications.
+> >
+> > Your S-o-b is pretty much meaningless. If a "real" person can vouch for
+> > who you are or put their own S-o-b on your code that's fine. =20
+>=20
+> I posted my patches to this mailing list per maintainer's request and
+> according to the published rules of the patch submission process as I
+> understood them.
+> Sorry if I misinterpreted something and wasted anybody's time.
+>=20
+> I'm not going to resubmit the patches under a different name.
+>=20
+> Please feel free to use them if someone is willing to sign off on them.
+
+If Jamal or anyone else feels like they can vouch for the provenance
+of the code, I think that may be the best compromise.
 
