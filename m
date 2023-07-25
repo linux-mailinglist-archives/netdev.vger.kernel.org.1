@@ -1,75 +1,89 @@
-Return-Path: <netdev+bounces-20684-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20685-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E94137609B7
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 07:48:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 736A27609DE
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 07:54:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A56B52817FD
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 05:48:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ADBA01C20DE3
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 05:54:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B74F98BEC;
-	Tue, 25 Jul 2023 05:48:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 644D88C0A;
+	Tue, 25 Jul 2023 05:54:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACC828BE5
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 05:48:27 +0000 (UTC)
-Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [52.237.72.81])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 49613BC;
-	Mon, 24 Jul 2023 22:48:22 -0700 (PDT)
-Received: from linma$zju.edu.cn ( [42.120.103.62] ) by
- ajax-webmail-mail-app4 (Coremail) ; Tue, 25 Jul 2023 13:47:55 +0800
- (GMT+08:00)
-X-Originating-IP: [42.120.103.62]
-Date: Tue, 25 Jul 2023 13:47:55 +0800 (GMT+08:00)
-X-CM-HeaderCharset: UTF-8
-From: "Lin Ma" <linma@zju.edu.cn>
-To: "Hangbin Liu" <liuhangbin@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, razor@blackwall.org, idosch@nvidia.com, 
-	lucien.xin@gmail.com, edwin.peer@broadcom.com, jiri@resnulli.us, 
-	md.fahad.iqbal.polash@intel.com, anirudh.venkataramanan@intel.com, 
-	jeffrey.t.kirsher@intel.com, neerav.parikh@intel.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v1] rtnetlink: let rtnl_bridge_setlink checks
- IFLA_BRIDGE_MODE length
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version XT5.0.14 build 20220622(41e5976f)
- Copyright (c) 2002-2023 www.mailtech.cn
- mispb-4df6dc2c-e274-4d1c-b502-72c5c3dfa9ce-zj.edu.cn
-In-Reply-To: <ZL9hWEs4GNhm8xVY@Laptop-X1>
-References: <20230725022151.417450-1-linma@zju.edu.cn>
- <ZL9hWEs4GNhm8xVY@Laptop-X1>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E0AA848C;
+	Tue, 25 Jul 2023 05:54:39 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91B69C433C8;
+	Tue, 25 Jul 2023 05:54:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1690264479;
+	bh=aOySNSCJEoaRaJl24Sk+OTpPeYecm1osaIYiLeFOqSo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=YRx0OBU1SEI1SJ4LSmLkEPob1QuK5WFkuUqdVeYph9ed/UsG2IwyOFk7Kxeh+D7xA
+	 LawFmu2khRnM9557VkZ83V2GFmQQu/DXj2xET+YiR4qIOIVkir7lORnqdQBDi+c/4c
+	 m40Effm/hR8qO96KDgp7YURxsFrLShrUciFeYS6BMeTQUrr0SSDHg+EhkBPdwoEDsq
+	 VgSHNlvNLX1Qem3CDFHb5fCdKlTQlOVlNtWuP6iteR1YMcSBbbTBFrhUb36StgyciG
+	 2b04uwx98ow9qLqZYrVsbQQcAz2E4cao6cEXLDuGqzOIQqqGSSx2IgOkRBTv/jVN7E
+	 YWW79NAqNUNbw==
+Date: Tue, 25 Jul 2023 08:54:34 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Lin Ma <linma@zju.edu.cn>
+Cc: kuba@kernel.org, davem@davemloft.net, edumazet@google.com,
+	pabeni@redhat.com, ast@kernel.org, martin.lau@kernel.org,
+	yhs@fb.com, void@manifault.com, andrii@kernel.org,
+	houtao1@huawei.com, inwardvessel@gmail.com, kuniyu@amazon.com,
+	songliubraving@fb.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, bpf@vger.kernel.org
+Subject: Re: [PATCH v2] bpf: Add length check for
+ SK_DIAG_BPF_STORAGE_REQ_MAP_FD parsing
+Message-ID: <20230725055434.GM11388@unreal>
+References: <20230725023330.422856-1-linma@zju.edu.cn>
+ <20230725044409.GF11388@unreal>
+ <15dc24fc.e7c38.1898b81ac08.Coremail.linma@zju.edu.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <164730e5.e7cf6.1898b96fb76.Coremail.linma@zju.edu.cn>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:cS_KCgB3fxcLYr9kG2APCg--.50759W
-X-CM-SenderInfo: qtrwiiyqvtljo62m3hxhgxhubq/1tbiAwQHEmS-J3oE-QADsu
-X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VW7Jw
-	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
-	daVFxhVjvjDU=
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <15dc24fc.e7c38.1898b81ac08.Coremail.linma@zju.edu.cn>
 
-SGVsbG8gSGFuZ2JpbiwKCj4gCj4gSWYgd2UgZ290IGF0dHIgdElGTEFfQlJJREdFX0ZMQUdTIGZp
-cnN0LCBpdCB3aWxsIGJyZWFrIGhlcmUgYW5kIG5vdCBjaGVjawo+IHRoZSBsYXRlciBJRkxBX0JS
-SURHRV9NT0RFLgo+IAo+ID4gKwo+ID4gKwkJCWlmIChubGFfdHlwZShhdHRyKSA9PSBJRkxBX0JS
-SURHRV9NT0RFKSB7Cj4gPiArCQkJCWlmIChubGFfbGVuKGF0dHIpIDwgc2l6ZW9mKHUxNikpCj4g
-PiArCQkJCQlyZXR1cm4gLUVJTlZBTDsKPiA+ICsJCQl9Cj4gPiAgCQl9Cj4gPiAgCX0KPiAKPiBU
-aGFua3MKPiBIYW5nYmluCgpZZWFoLCB5b3UgYXJlIHNvb29vIHJpZ2h0LCB3aWxsIGZpeCB0aGlz
-IEFTQVAKClJlZ2FyZHMKTGluCg==
+On Tue, Jul 25, 2023 at 01:24:38PM +0800, Lin Ma wrote:
+> Hello Leon,
+> 
+> > 
+> > Jakub, it seems like Lin adds this check to all nla_for_each_nested() loops.
+> > IMHO, the better change will be to change nla_for_each_nested() skip empty/not valid NLAs.
+> > 
+> > Thanks
+> 
+> I guess you just get these fixes misunderstood. I do not add the nla_len check
+> to  **all nla_for_each_nested** :(. I only add checks to those who do not access 
+> the attributes without verifying the length, which is buggy.
+> 
+> The others, either do a similar nla_len check already or just do nla_validate
+> somewhere else. That is to say, they **validate** the relevant attributes.
+> 
+> In short, nla_for_each_nested is just a loop macro that iterates the nlattrs,
+> like nla_for_each macro. It is weird for them to do nlattr validation as there
+> could have already been a call to nla_validate to ensure those attributes are
+> correct. That is, for those who do not, a simple nla_len check is the simplest
+> and most efficient choice.
+
+My concern is related to maintainability in long run. Your check adds
+another layer of cabal knowledge which will be copied/pasted in other
+places.
+
+Thanks
+
+> 
+> Regards
+> Lin
 
