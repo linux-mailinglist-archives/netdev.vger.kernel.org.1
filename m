@@ -1,211 +1,145 @@
-Return-Path: <netdev+bounces-20693-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20694-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 029F7760AB2
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 08:44:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B7F1760AB4
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 08:44:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AD84828168B
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 06:44:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 276A728183B
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 06:44:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A88D0748F;
-	Tue, 25 Jul 2023 06:44:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8ABA4748F;
+	Tue, 25 Jul 2023 06:44:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D7751854
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 06:44:16 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BDF0FC433C8;
-	Tue, 25 Jul 2023 06:44:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690267455;
-	bh=yz9tejQmRx0Xt6//c3g3JmCXG0uP8NylRhmaVNjtDTU=;
-	h=From:To:Cc:Subject:Date:From;
-	b=ZOExzgn7F5V9iThfpbg7HDUV+VG/TXhhwOqbcwitxSPHAXP6/xNRMJRewii8CzgiW
-	 4xq41kqRsE6t21lZFUQ3jWxHGh3yZu3KWTQMjxsK+razCx8w+l30Y305nFBBDLz1zs
-	 /6WIqIjKQowKIRRkCKbElfZ7qg+GIKkCuXXNdRbqnHEaIAyDYLb+eoz2t/YIR4+hTD
-	 4wSqarNXIvRImgW6mcjBe/yhB4PgBOak3xjdE1SZ52mABYZurOYc3CKQ5xcdBE9U1x
-	 kyBeBA/+16QdsEF3yCQ9mMN9XvS+aI/xwLQHZAhx9EF0qsTDGAk6qlf485V+bgUxWa
-	 /vriDd/1mga7Q==
-From: Arnd Bergmann <arnd@kernel.org>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Ioana Ciornei <ioana.ciornei@nxp.com>
-Cc: Arnd Bergmann <arnd@arndb.de>,
-	Russell King <linux@armlinux.org.uk>,
-	Robert-Ionut Alexa <robert-ionut.alexa@nxp.com>,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Wolfram Sang <wsa+renesas@sang-engineering.com>,
-	Sean Anderson <sean.anderson@seco.com>,
-	Josua Mayer <josua@solid-run.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] dpaa: avoid linking objects into multiple modules
-Date: Tue, 25 Jul 2023 08:43:40 +0200
-Message-Id: <20230725064403.581634-1-arnd@kernel.org>
-X-Mailer: git-send-email 2.39.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BD438F4D
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 06:44:47 +0000 (UTC)
+Received: from mail-wm1-x330.google.com (mail-wm1-x330.google.com [IPv6:2a00:1450:4864:20::330])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDBAF116
+	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 23:44:45 -0700 (PDT)
+Received: by mail-wm1-x330.google.com with SMTP id 5b1f17b1804b1-3fc0aecf15bso51651785e9.1
+        for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 23:44:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=googlemail.com; s=20221208; t=1690267484; x=1690872284;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=z2sJvaOqA1wufNCy1EViFx1U0iK92J2+1LLg1ANsOjU=;
+        b=jXjtNqZ3UIIqIBnb/hXfySuKUygXmtuKlU91te3B0oUQxlxtvZ1a6iNpJyOya27J0m
+         AzR6cnDRNzBJ1wIYs4pzSJ5GQpcY6jG1ibjw6nJwudhX9OP+yjkiy9RlWUNk44Rdyoek
+         +IvmDCVCWxZc81zd+BXq4Iwj09SyLqJVOJpU/BqQwld/oUK+evJcFUnBTLb+nZiK6L9k
+         E9Ia7NPS4PogB0y3BkWbDOAoqI4Zj6ykwU6+vH6jUUX5E4B64lJ4WI0G079hs9UaD/TH
+         +dI4fWgDibfSXIGfI47ROA4HmcHyUvIFN35oHvjuAEOwtJaFUDT8Jx20v0Y1Fe3HvOsU
+         cXMg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690267484; x=1690872284;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=z2sJvaOqA1wufNCy1EViFx1U0iK92J2+1LLg1ANsOjU=;
+        b=QIAnJdCNrl5KabVNEIvKtrCpLQlHTYmAzlPbIWQdHKLo1z9Jf9dDWAEoQlIFXpYRnx
+         zsUXFTF8GLCGUq21a4lpBhc5E8XmNG6JP3mNoP2o2o11cSunTmaDDaNa2geC780cAvBn
+         u75YwGZEMpzEaZoJX/WI32+bHFy2Dp0CWwBgYRcqRAYKzeYKTKZ+cGOTk47Gzx0PPwGu
+         Ym/lhXb3b4UJwtsnT5dVdgkkmNdD/Tc0Mn4KUBCvtc4Ed6NsLQjktHTqV7Dw4+mQziHo
+         cc54Q8hl0ZUgR1tgeBEALUU85oqMEwb3lzF+DyAP0BNcbMfs/xgZM1USaL4W0+a/W38F
+         c+KA==
+X-Gm-Message-State: ABy/qLbsXVXSeIT52s9w4UcJYdb2uzIhONe0sdA/K/tE3uKn1PU2Gn/Y
+	RwBERSFGUmG+PUOZIkF9tno=
+X-Google-Smtp-Source: APBJJlGqK518VNFpbqMZGdZzPgglgojV6+mScuTCJyonA3PR006j4LUXxfGQAECvjl4dD3BEukB1wA==
+X-Received: by 2002:a1c:7403:0:b0:3f6:2ae:230e with SMTP id p3-20020a1c7403000000b003f602ae230emr9398994wmc.3.1690267484217;
+        Mon, 24 Jul 2023 23:44:44 -0700 (PDT)
+Received: from tycho (p200300c1c70b7b00ba8584fffebf2b17.dip0.t-ipconnect.de. [2003:c1:c70b:7b00:ba85:84ff:febf:2b17])
+        by smtp.gmail.com with ESMTPSA id c16-20020a7bc010000000b003fbe36a4ce6sm15178122wmb.10.2023.07.24.23.44.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 24 Jul 2023 23:44:43 -0700 (PDT)
+Sender: Zahari Doychev <zahari.doychev@googlemail.com>
+Date: Tue, 25 Jul 2023 08:44:42 +0200
+From: Zahari Doychev <zahari.doychev@linux.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
+	Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	syzbot <syzkaller@googlegroups.com>, Simon Horman <simon.horman@corigine.com>, 
+	Ido Schimmel <idosch@nvidia.com>
+Subject: Re: [PATCH net] net: flower: fix stack-out-of-bounds in
+ fl_set_key_cfm()
+Message-ID: <sma534z36vpf4ijyalaemiefyze3miqdusp73ewfpegtuuwv6n@vlz6erzympst>
+References: <20230724163254.106178-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230724163254.106178-1-edumazet@google.com>
+X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-From: Arnd Bergmann <arnd@arndb.de>
+On Mon, Jul 24, 2023 at 04:32:54PM +0000, Eric Dumazet wrote:
+> Typical misuse of
+> 
+> 	nla_parse_nested(array, XXX_MAX, ...);
+> 
+> array must be declared as
+> 
+> 	struct nlattr *array[XXX_MAX + 1];
+> 
+> Fixes: 7cfffd5fed3e ("net: flower: add support for matching cfm fields")
+> Reported-by: syzbot <syzkaller@googlegroups.com>
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Cc: Simon Horman <simon.horman@corigine.com>
+> Cc: Ido Schimmel <idosch@nvidia.com>
+> ---
+>  net/sched/cls_flower.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/net/sched/cls_flower.c b/net/sched/cls_flower.c
+> index 8da9d039d964ea417700a2f59ad95a9ce52f5eab..3c7a272bf7c7cf7d4ae21b5370cbc428086d6979 100644
+> --- a/net/sched/cls_flower.c
+> +++ b/net/sched/cls_flower.c
+> @@ -1709,7 +1709,7 @@ static int fl_set_key_cfm(struct nlattr **tb,
+>  			  struct fl_flow_key *mask,
+>  			  struct netlink_ext_ack *extack)
+>  {
+> -	struct nlattr *nla_cfm_opt[TCA_FLOWER_KEY_CFM_OPT_MAX];
+> +	struct nlattr *nla_cfm_opt[TCA_FLOWER_KEY_CFM_OPT_MAX + 1];
 
-Each object file contains information about which module it gets linked
-into, so linking the same file into multiple modules now causes a warning:
+I think we need to redefine TCA_FLOWER_KEY_CFM_OPT_MAX like this as well:
 
-scripts/Makefile.build:254: drivers/net/ethernet/freescale/dpaa2/Makefile: dpaa2-mac.o is added to multiple modules: fsl-dpaa2-eth fsl-dpaa2-switch
-scripts/Makefile.build:254: drivers/net/ethernet/freescale/dpaa2/Makefile: dpmac.o is added to multiple modules: fsl-dpaa2-eth fsl-dpaa2-switch
+diff --git a/include/uapi/linux/pkt_cls.h b/include/uapi/linux/pkt_cls.h
+index 7865f5a9885b..4f3932bb712d 100644
+--- a/include/uapi/linux/pkt_cls.h
++++ b/include/uapi/linux/pkt_cls.h
+@@ -710,9 +710,11 @@ enum {
+        TCA_FLOWER_KEY_CFM_OPT_UNSPEC,
+        TCA_FLOWER_KEY_CFM_MD_LEVEL,
+        TCA_FLOWER_KEY_CFM_OPCODE,
+-       TCA_FLOWER_KEY_CFM_OPT_MAX,
++       __TCA_FLOWER_KEY_CFM_OPT_MAX,
+ };
+ 
++#define TCA_FLOWER_KEY_CFM_OPT_MAX (__TCA_FLOWER_KEY_CFM_OPT_MAX - 1)
 
-Chang the way that dpaa2 is built by moving the two common files into a
-separate module with exported symbols instead.
+Thanks,
+Zahari
 
-To avoid a link failure when the switch driver is built-in, but the dpio driver
-is a loadable module, add the same dependency in there that exists for
-the ethernet driver.
-
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- drivers/net/ethernet/freescale/Makefile          |  4 +---
- drivers/net/ethernet/freescale/dpaa2/Kconfig     |  1 +
- drivers/net/ethernet/freescale/dpaa2/Makefile    |  9 +++++----
- drivers/net/ethernet/freescale/dpaa2/dpaa2-mac.c | 11 +++++++++++
- 4 files changed, 18 insertions(+), 7 deletions(-)
-
-diff --git a/drivers/net/ethernet/freescale/Makefile b/drivers/net/ethernet/freescale/Makefile
-index de7b318422330..c63e0c090f8f7 100644
---- a/drivers/net/ethernet/freescale/Makefile
-+++ b/drivers/net/ethernet/freescale/Makefile
-@@ -22,6 +22,4 @@ ucc_geth_driver-objs := ucc_geth.o ucc_geth_ethtool.o
- obj-$(CONFIG_FSL_FMAN) += fman/
- obj-$(CONFIG_FSL_DPAA_ETH) += dpaa/
- 
--obj-$(CONFIG_FSL_DPAA2_ETH) += dpaa2/
--
--obj-y += enetc/
-+obj-y += enetc/ dpaa2/
-diff --git a/drivers/net/ethernet/freescale/dpaa2/Kconfig b/drivers/net/ethernet/freescale/dpaa2/Kconfig
-index d029b69c3f183..4e26b5a4bc5c4 100644
---- a/drivers/net/ethernet/freescale/dpaa2/Kconfig
-+++ b/drivers/net/ethernet/freescale/dpaa2/Kconfig
-@@ -32,6 +32,7 @@ config FSL_DPAA2_PTP_CLOCK
- 
- config FSL_DPAA2_SWITCH
- 	tristate "Freescale DPAA2 Ethernet Switch"
-+	depends on FSL_MC_BUS && FSL_MC_DPIO
- 	depends on BRIDGE || BRIDGE=n
- 	depends on NET_SWITCHDEV
- 	help
-diff --git a/drivers/net/ethernet/freescale/dpaa2/Makefile b/drivers/net/ethernet/freescale/dpaa2/Makefile
-index 1b05ba8d1cbff..c042d2c27926c 100644
---- a/drivers/net/ethernet/freescale/dpaa2/Makefile
-+++ b/drivers/net/ethernet/freescale/dpaa2/Makefile
-@@ -3,15 +3,16 @@
- # Makefile for the Freescale DPAA2 Ethernet controller
- #
- 
--obj-$(CONFIG_FSL_DPAA2_ETH)		+= fsl-dpaa2-eth.o
-+obj-$(CONFIG_FSL_DPAA2_ETH)		+= fsl-dpaa2-eth.o fsl-dpaa2-common.o
- obj-$(CONFIG_FSL_DPAA2_PTP_CLOCK)	+= fsl-dpaa2-ptp.o
--obj-$(CONFIG_FSL_DPAA2_SWITCH)		+= fsl-dpaa2-switch.o
-+obj-$(CONFIG_FSL_DPAA2_SWITCH)		+= fsl-dpaa2-switch.o fsl-dpaa2-common.o
- 
--fsl-dpaa2-eth-objs	:= dpaa2-eth.o dpaa2-ethtool.o dpni.o dpaa2-mac.o dpmac.o dpaa2-eth-devlink.o dpaa2-xsk.o
-+fsl-dpaa2-eth-objs	:= dpaa2-eth.o dpaa2-ethtool.o dpni.o dpaa2-eth-devlink.o dpaa2-xsk.o
- fsl-dpaa2-eth-${CONFIG_FSL_DPAA2_ETH_DCB} += dpaa2-eth-dcb.o
- fsl-dpaa2-eth-${CONFIG_DEBUG_FS} += dpaa2-eth-debugfs.o
- fsl-dpaa2-ptp-objs	:= dpaa2-ptp.o dprtc.o
--fsl-dpaa2-switch-objs	:= dpaa2-switch.o dpaa2-switch-ethtool.o dpsw.o dpaa2-switch-flower.o dpaa2-mac.o dpmac.o
-+fsl-dpaa2-switch-objs	:= dpaa2-switch.o dpaa2-switch-ethtool.o dpsw.o dpaa2-switch-flower.o
-+fsl-dpaa2-common-objs	+= dpaa2-mac.o dpmac.o
- 
- # Needed by the tracing framework
- CFLAGS_dpaa2-eth.o := -I$(src)
-diff --git a/drivers/net/ethernet/freescale/dpaa2/dpaa2-mac.c b/drivers/net/ethernet/freescale/dpaa2/dpaa2-mac.c
-index a69bb22c37eab..4def1238855be 100644
---- a/drivers/net/ethernet/freescale/dpaa2/dpaa2-mac.c
-+++ b/drivers/net/ethernet/freescale/dpaa2/dpaa2-mac.c
-@@ -348,6 +348,7 @@ void dpaa2_mac_start(struct dpaa2_mac *mac)
- 
- 	phylink_start(mac->phylink);
- }
-+EXPORT_SYMBOL_GPL(dpaa2_mac_start);
- 
- void dpaa2_mac_stop(struct dpaa2_mac *mac)
- {
-@@ -358,6 +359,7 @@ void dpaa2_mac_stop(struct dpaa2_mac *mac)
- 	if (mac->serdes_phy)
- 		phy_power_off(mac->serdes_phy);
- }
-+EXPORT_SYMBOL_GPL(dpaa2_mac_stop);
- 
- int dpaa2_mac_connect(struct dpaa2_mac *mac)
- {
-@@ -450,6 +452,7 @@ int dpaa2_mac_connect(struct dpaa2_mac *mac)
- 
- 	return err;
- }
-+EXPORT_SYMBOL_GPL(dpaa2_mac_connect);
- 
- void dpaa2_mac_disconnect(struct dpaa2_mac *mac)
- {
-@@ -462,6 +465,7 @@ void dpaa2_mac_disconnect(struct dpaa2_mac *mac)
- 	of_phy_put(mac->serdes_phy);
- 	mac->serdes_phy = NULL;
- }
-+EXPORT_SYMBOL_GPL(dpaa2_mac_disconnect);
- 
- int dpaa2_mac_open(struct dpaa2_mac *mac)
- {
-@@ -510,6 +514,7 @@ int dpaa2_mac_open(struct dpaa2_mac *mac)
- 	dpmac_close(mac->mc_io, 0, dpmac_dev->mc_handle);
- 	return err;
- }
-+EXPORT_SYMBOL_GPL(dpaa2_mac_open);
- 
- void dpaa2_mac_close(struct dpaa2_mac *mac)
- {
-@@ -519,6 +524,7 @@ void dpaa2_mac_close(struct dpaa2_mac *mac)
- 	if (mac->fw_node)
- 		fwnode_handle_put(mac->fw_node);
- }
-+EXPORT_SYMBOL_GPL(dpaa2_mac_close);
- 
- static char dpaa2_mac_ethtool_stats[][ETH_GSTRING_LEN] = {
- 	[DPMAC_CNT_ING_ALL_FRAME]		= "[mac] rx all frames",
-@@ -557,6 +563,7 @@ int dpaa2_mac_get_sset_count(void)
- {
- 	return DPAA2_MAC_NUM_STATS;
- }
-+EXPORT_SYMBOL_GPL(dpaa2_mac_get_sset_count);
- 
- void dpaa2_mac_get_strings(u8 *data)
- {
-@@ -568,6 +575,7 @@ void dpaa2_mac_get_strings(u8 *data)
- 		p += ETH_GSTRING_LEN;
- 	}
- }
-+EXPORT_SYMBOL_GPL(dpaa2_mac_get_strings);
- 
- void dpaa2_mac_get_ethtool_stats(struct dpaa2_mac *mac, u64 *data)
- {
-@@ -587,3 +595,6 @@ void dpaa2_mac_get_ethtool_stats(struct dpaa2_mac *mac, u64 *data)
- 		*(data + i) = value;
- 	}
- }
-+EXPORT_SYMBOL_GPL(dpaa2_mac_get_ethtool_stats);
-+
-+MODULE_LICENSE("GPL");
--- 
-2.39.2
-
+>  	int err;
+>  
+>  	if (!tb[TCA_FLOWER_KEY_CFM])
+> -- 
+> 2.41.0.487.g6d72f3e995-goog
+> 
+> 
 
