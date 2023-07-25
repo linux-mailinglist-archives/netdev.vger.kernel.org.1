@@ -1,126 +1,108 @@
-Return-Path: <netdev+bounces-20999-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21000-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4FD777621D2
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 20:55:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F1DFC7621D4
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 20:55:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1345F2811D2
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 18:55:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2DF8F1C20F58
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 18:55:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E523B2592B;
-	Tue, 25 Jul 2023 18:55:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17CA1263A2;
+	Tue, 25 Jul 2023 18:55:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8D8F1D2FD
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 18:55:19 +0000 (UTC)
-Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63EF2121;
-	Tue, 25 Jul 2023 11:55:18 -0700 (PDT)
-Received: by mail-wr1-x430.google.com with SMTP id ffacd0b85a97d-3144bf65ce9so4743451f8f.3;
-        Tue, 25 Jul 2023 11:55:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690311317; x=1690916117;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ID2THAA/NbYE8R23svw1NZ1DXmlvllOYuUgG/DSAang=;
-        b=NpAdRJOK/nGc08rBOaPSeoHJDewfhcQojxFbtmtWPu8I7vOcjH7UoUsxIZzImb1M8f
-         hkZH/X6LIPi31fqxN/mBxBAQ+SkMx64bYGoorbyJa2KrST8IM9bWb6ORrg/hBLuj7Fhr
-         kdhgH/mrMJsuFnsDylrN9t44TvOa26zB9qT+7Q6+dDQC+UoA+pxr8nqNfZXIKhxPS7/S
-         /66tWLyeLceML5d77m7XqXWJIxSpUlZZrA0kp1zZ1U0t65LrTRAi6tJ9qXqkAr8TU/8J
-         fdzBO5jtBcBqAm3eWrduuDsowJQ7a0VoMhUmLMK/Deue2Lb184rQAH+sR6HXy7laSy9+
-         PHFQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690311317; x=1690916117;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ID2THAA/NbYE8R23svw1NZ1DXmlvllOYuUgG/DSAang=;
-        b=FlKpv/ofvC6y5c6WhfmVC0RCmLCWyh7/+ApEosOd0feQJHLMWzlns0ptmSMib4YVQ7
-         niLtCbtyAYKfW0aIIdOgWANi5Cm3AzDUPxDYnhZ/f0EHXDUv9BxRLMo6DDGFMLnK5nxe
-         fWgn8wNlEmaWXPLUOnVFuziwcAak+j3/Y+HT/90wAn/3kS3YS7TOypkEgNBYV3NDAKGw
-         OdWy+ykxc68yQV/451CnKDFz6DBUttTFXKgAp8zvSuOy/nee2NLjDvGTehrAogSig25J
-         S8cbvOnJgKqSZT/D40OGdwoO86ymz+nNghreiPhhgZvlUgf5kOuVdgOzCJA5od/Nmapg
-         G3FQ==
-X-Gm-Message-State: ABy/qLa2Xp4PxWLdMi4Fmb3kEEKeefVEf/ExFrMzwF/cKjft9eKYprUJ
-	c96wsffIz9AN8yH25XhaV4Q=
-X-Google-Smtp-Source: APBJJlF82vcbC5ug+0jWh48cqy9JDEpPZbebIZMd5AVDHKJVeKNzpC3uDB46oI5jR19N7ydWpjcumw==
-X-Received: by 2002:a5d:6783:0:b0:316:f25f:eb4 with SMTP id v3-20020a5d6783000000b00316f25f0eb4mr8544897wru.60.1690311316599;
-        Tue, 25 Jul 2023 11:55:16 -0700 (PDT)
-Received: from [192.168.0.103] ([77.126.7.132])
-        by smtp.gmail.com with ESMTPSA id v5-20020adfebc5000000b0031417b0d338sm17268946wrn.87.2023.07.25.11.55.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 25 Jul 2023 11:55:16 -0700 (PDT)
-Message-ID: <f0190c1c-3b2c-ed8d-b0e6-8176f756630a@gmail.com>
-Date: Tue, 25 Jul 2023 21:55:14 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 937091D2FD
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 18:55:29 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA3D3C433C9;
+	Tue, 25 Jul 2023 18:55:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1690311329;
+	bh=s6phFJ9yBv1XmQB6gDeUZIImvyU/LkcA0/ax2HSpizY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=o/r1Y25gagTV062gymRgKk6qq04PwJT5zjfx02tXUHLCKL8yZx6UFZVp4k7A0D3g5
+	 AR/ZYAfN24NroHcUWIQClQEa4RwJ4pGq371mLm9e8YyBowWNDE7vOt3hk+R1HlsYBC
+	 B/AjTIvxb3ods6l/uVaQGv1mNiLzhJm7CCaxpdk2Sek3wOsCj+Rrlez/y2/sdDj/dO
+	 lbHMkcGFwK0dF0fsxU9gqaiOZ6Tt1fsOXuzWXzQD58T20FFIc8FSasH6uABZZ+I9lC
+	 uq9Mnhe7hE7kfm3qfK08wi7kqwJkeqITbC4k6LPBiqGlf3gBf4u+NkSiaWrXClgPNo
+	 jOvEhLhLXAO0Q==
+Date: Tue, 25 Jul 2023 11:55:28 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Alexander H Duyck <alexander.duyck@gmail.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, corbet@lwn.net, linux-doc@vger.kernel.org
+Subject: Re: [PATCH net] docs: net: clarify the NAPI rules around XDP Tx
+Message-ID: <20230725115528.596b5305@kernel.org>
+In-Reply-To: <c429298e279bd549de923deba09952e7540e534a.camel@gmail.com>
+References: <20230720161323.2025379-1-kuba@kernel.org>
+	<c429298e279bd549de923deba09952e7540e534a.camel@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH net-next] net/mlx4: clean up a type issue
-Content-Language: en-US
-To: Dan Carpenter <dan.carpenter@linaro.org>, Tariq Toukan <tariqt@nvidia.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- linux-rdma@vger.kernel.org, kernel-janitors@vger.kernel.org
-References: <52d0814a-7287-4160-94b5-ac7939ac61c6@moroto.mountain>
-From: Tariq Toukan <ttoukan.linux@gmail.com>
-In-Reply-To: <52d0814a-7287-4160-94b5-ac7939ac61c6@moroto.mountain>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-
-
-On 25/07/2023 8:39, Dan Carpenter wrote:
-> These functions returns type bool, not pointers, so return false instead
-> of NULL.
+On Tue, 25 Jul 2023 10:30:24 -0700 Alexander H Duyck wrote:
+> > -In other words, it is recommended to ignore the budget argument when
+> > -performing TX buffer reclamation to ensure that the reclamation is not
+> > -arbitrarily bounded; however, it is required to honor the budget argument
+> > -for RX processing.
+> > +In other words for Rx processing the ``budget`` argument limits how many
+> > +packets driver can process in a single poll. Rx specific APIs like page
+> > +pool or XDP cannot be used at all when ``budget`` is 0.
+> > +skb Tx processing should happen regardless of the ``budget``, but if
+> > +the argument is 0 driver cannot call any XDP (or page pool) APIs.
 > 
-> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
-> ---
-> Not a bug.  Targetting net-next.
+> This isn't accurate, and I would say it is somewhat dangerous advice.
+> The Tx still needs to be processed regardless of if it is processing
+> page_pool pages or XDP pages. I agree the Rx should not be processed,
+> but the Tx must be processed using mechanisms that do NOT make use of
+> NAPI optimizations when budget is 0.
 > 
->   drivers/net/ethernet/mellanox/mlx4/mcg.c | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
+> So specifically, xdp_return_frame is safe in non-NAPI Tx cleanup. The
+> xdp_return_frame_rx_napi is not.
 > 
-> diff --git a/drivers/net/ethernet/mellanox/mlx4/mcg.c b/drivers/net/ethernet/mellanox/mlx4/mcg.c
-> index f1716a83a4d3..24d0c7c46878 100644
-> --- a/drivers/net/ethernet/mellanox/mlx4/mcg.c
-> +++ b/drivers/net/ethernet/mellanox/mlx4/mcg.c
-> @@ -294,7 +294,7 @@ static bool check_duplicate_entry(struct mlx4_dev *dev, u8 port,
->   	struct mlx4_promisc_qp *dqp, *tmp_dqp;
->   
->   	if (port < 1 || port > dev->caps.num_ports)
-> -		return NULL;
-> +		return false;
->   
->   	s_steer = &mlx4_priv(dev)->steer[port - 1];
->   
-> @@ -375,7 +375,7 @@ static bool can_remove_steering_entry(struct mlx4_dev *dev, u8 port,
->   	bool ret = false;
->   
->   	if (port < 1 || port > dev->caps.num_ports)
-> -		return NULL;
-> +		return false;
->   
->   	s_steer = &mlx4_priv(dev)->steer[port - 1];
->   
+> Likewise there is napi_consume_skb which will use either a NAPI or non-
+> NAPI version of things depending on if budget is 0 or not.
+> 
+> For the page_pool calls there is the "allow_direct" argument that is
+> meant to decide between recycling in directly into the page_pool cache
+> or not. It should only be used in the Rx handler itself when budget is
+> non-zero.
+> 
+> I realise this was written up in response to a patch on the Mellanox
+> driver. Based on the patch in question it looks like they were calling
+> page_pool_recycle_direct outside of NAPI context. There is an explicit
+> warning above that function about NOT calling it outside of NAPI
+> context.
 
-Thanks for your patch.
-Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
+Unless I'm missing something budget=0 can be called from hard IRQ
+context. And page pool takes _bh() locks. So unless we "teach it"
+not to recycle _anything_ in hard IRQ context, it is not safe to call.
+
+> >  .. warning::
+> >  
+> > -   The ``budget`` argument may be 0 if core tries to only process Tx completions
+> > -   and no Rx packets.
+> > +   The ``budget`` argument may be 0 if core tries to only process
+> > +   skb Tx completions and no Rx or XDP packets.
+> >  
+> >  The poll method returns the amount of work done. If the driver still
+> >  has outstanding work to do (e.g. ``budget`` was exhausted)  
+> 
+> We cannot make this distinction if both XDP and skb are processed in
+> the same Tx queue. Otherwise you will cause the Tx to stall and break
+> netpoll. If the ring is XDP only then yes, it can be skipped like what
+> they did in the Mellanox driver, but if it is mixed then the XDP side
+> of things needs to use the "safe" versions of the calls.
+
+IDK, a rare delay in sending of a netpoll message is not a major
+concern.
 
