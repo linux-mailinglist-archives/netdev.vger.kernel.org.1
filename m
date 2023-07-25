@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-20845-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20846-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 530D7761906
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 14:57:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 211FC761908
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 14:57:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9B50628166A
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 12:57:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CECAA280987
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 12:57:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BF0F1ED32;
-	Tue, 25 Jul 2023 12:56:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 509401F177;
+	Tue, 25 Jul 2023 12:56:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CC95C8C3
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 12:56:58 +0000 (UTC)
-Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8594A13D
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 05:56:55 -0700 (PDT)
-Received: by mail-ed1-x535.google.com with SMTP id 4fb4d7f45d1cf-5223fbd54c6so1614047a12.3
-        for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 05:56:55 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43D871F176
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 12:56:59 +0000 (UTC)
+Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF94EE76
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 05:56:56 -0700 (PDT)
+Received: by mail-ej1-x62a.google.com with SMTP id a640c23a62f3a-991da766865so923757866b.0
+        for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 05:56:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690289814; x=1690894614;
+        d=gmail.com; s=20221208; t=1690289815; x=1690894615;
         h=mime-version:user-agent:references:message-id:date:in-reply-to
          :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ho3GejCh9s0eGakroYl0akP3uIeiMqZai+ZwK04km0w=;
-        b=GK1qu4JeKW89CXZred8cq0vSFJQcVkodhQW/xfzgca+LPEoewJcLRVWPHhsgohRr2j
-         9ZXw6tuV1mcoyi0qEpTN4IfY6OiYka2WFmQ/2EL8yGUD8/o9hrxuLCa3I4sNFBxdspRb
-         4URWwaCc2+DIzcq3fQUMNinh4VvOSopY80mtbjrcIsi1SDK/ghNUN4aMEDXHfaM0oXZ/
-         xuvM/qFqBc/fztGrbDDScpM3N6nRZrThyNkWuATVqnSVdBe744X4Vk+lgDlMunbELENx
-         ZvcP3nR0KV+6bn3ftHNgmQu2W6xM6gtOQNHFFVl5iEu51T3iUloCQ2HveQTAuYNLV9iW
-         YtQA==
+        bh=I0KDBaGKZTZJhCcZx30aTIpkjJ/pRAvwQCEvucSLOFg=;
+        b=Iv47ou5knmmJGBF7EUDP50o9yoj4P2JLuc5sZV7imwVDo6obawnlSXYtcfdWQkaP6V
+         JSpVUWO0sLn3zaYuxRU04l9yeCp0WR2I186XqPKEOPOOfkwG7BToK4aGO1cNIoHqcnUo
+         SGKbHqwY2fw7n0RjYwNP+Sa1Tqp6NbT3+YRb7wAA/tDk6MJh9MW3ucHhE8QoUxT38B5/
+         k5LGYZl9wdbslkZko3Z1k8TDY+wTEQYpmuFChb+C+azND40a8kYxNEwMvgB3aZ/YJ5ub
+         a0mo2SH54woMSbstNXblOvp3Nxu8cukj0BF5H2ACU9gJHr/hmE3Xuex3LAq47w35Jkeq
+         NczQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690289814; x=1690894614;
+        d=1e100.net; s=20221208; t=1690289815; x=1690894615;
         h=mime-version:user-agent:references:message-id:date:in-reply-to
          :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Ho3GejCh9s0eGakroYl0akP3uIeiMqZai+ZwK04km0w=;
-        b=AAGswy0pQZDOIOcwoqylJ0tdDC2GOXvXiOJ0VDKShA/l3iiw6JaTurEBvt6LmKnSiB
-         dud/7BtL6vR26WgibxV51lkiPRyExs3J1tGlzls3pxdZTAfmIuxdyWqRoGg+UXje3OmW
-         d1HpAbKepZ5YAbDmekGSo8zHWachH86SHOV5hD1u5GlTxhiIi84L7E66Iz634YAYWuoe
-         1dBNMBHVaR5fTYQmpHEVtN2fhxH2Y8u+ewXjTjaf/g0Tetf55NVR8m35MytUtRc1h8yc
-         U+jyWmOyRTOlM35TqXnIKlOG1CPB76kQN9qnzbZlrS3lDnpPMGB6Fy2VTWaQhM/l6vmS
-         bMiA==
-X-Gm-Message-State: ABy/qLaTUs0te2qUMzcc/+0SXVZiXbO2BbHicckV4Wc6/O2u326Z+Asi
-	5c+tAaWXb0X8T4xdvTV0U14=
-X-Google-Smtp-Source: APBJJlH8+3ONd2K18r5T8WRsmWE+pmagfAxPaStNGOFDYp1omwdPC9zTzbK0gK80P5NsIM8VEWTcZQ==
-X-Received: by 2002:aa7:d8cf:0:b0:522:4dd0:de6e with SMTP id k15-20020aa7d8cf000000b005224dd0de6emr1420005eds.8.1690289813748;
-        Tue, 25 Jul 2023 05:56:53 -0700 (PDT)
+        bh=I0KDBaGKZTZJhCcZx30aTIpkjJ/pRAvwQCEvucSLOFg=;
+        b=F8az/u3wQrQ4f1Rh9YN04wQBs4WzL3H2bhk60xzUdqZfehuNzqfEGVaP/et3f4iJls
+         VEXuTzO/upfc1re//+fl+7/ISOk5sVFSO6sD8k1KtZXz19pJgSyBy5g5TeC6J215SJHE
+         runKU84Am55BqJXgiwa6DrpaY7fOoJcCb6KvioSGMxJUBKRb+/UdAXsp9fjts09CXdTc
+         TIOhGyMeKVt2ieKnYNImBF5l89Q/MWv0fmaRLwNG+0c/gSjdAuU/vAsLLD0a6hTRP97w
+         CoKzaOse5C9+bOA0PUXmrfeU85VTph2cMuMOU9fxKtOqG+E7ExikRwhlHSiX+FyVeuOe
+         zvUg==
+X-Gm-Message-State: ABy/qLbtdoQMzYRMnT6H2TtJIrgE/Lw9S3QABAgOTReAex3iH0ohe+vs
+	/R7v0XULEN9e7khrEbkCu0o=
+X-Google-Smtp-Source: APBJJlFSlz06bU+XbQla3sc+Xcuk2HnU53a5bu+PPwqC0WTfN21xkIr76Y3CpLOfCINAem35R/R/PQ==
+X-Received: by 2002:a17:906:74c6:b0:994:56d3:8a42 with SMTP id z6-20020a17090674c600b0099456d38a42mr14308317ejl.27.1690289815259;
+        Tue, 25 Jul 2023 05:56:55 -0700 (PDT)
 Received: from imac ([2a02:8010:60a0:0:281d:e8db:fbf2:5ca7])
-        by smtp.gmail.com with ESMTPSA id t23-20020a05640203d700b005223f398df1sm1371040edw.91.2023.07.25.05.56.52
+        by smtp.gmail.com with ESMTPSA id u15-20020a1709064acf00b00992025654c4sm8115677ejt.182.2023.07.25.05.56.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Jul 2023 05:56:52 -0700 (PDT)
+        Tue, 25 Jul 2023 05:56:54 -0700 (PDT)
 From: Donald Hunter <donald.hunter@gmail.com>
 To: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
 Cc: kuba@kernel.org,  netdev@vger.kernel.org,  davem@davemloft.net,
   pabeni@redhat.com,  edumazet@google.com,  simon.horman@corigine.com
-Subject: Re: [PATCH net-next v5 1/2] tools: ynl-gen: fix enum index in
- _decode_enum(..)
-In-Reply-To: <20230725101642.267248-2-arkadiusz.kubalewski@intel.com>
-	(Arkadiusz Kubalewski's message of "Tue, 25 Jul 2023 12:16:41 +0200")
-Date: Tue, 25 Jul 2023 13:53:52 +0100
-Message-ID: <m24jlsywwv.fsf@gmail.com>
+Subject: Re: [PATCH net-next v5 2/2] tools: ynl-gen: fix parse multi-attr
+ enum attribute
+In-Reply-To: <20230725101642.267248-3-arkadiusz.kubalewski@intel.com>
+	(Arkadiusz Kubalewski's message of "Tue, 25 Jul 2023 12:16:42 +0200")
+Date: Tue, 25 Jul 2023 13:56:41 +0100
+Message-ID: <m2zg3kxi7q.fsf@gmail.com>
 References: <20230725101642.267248-1-arkadiusz.kubalewski@intel.com>
-	<20230725101642.267248-2-arkadiusz.kubalewski@intel.com>
+	<20230725101642.267248-3-arkadiusz.kubalewski@intel.com>
 User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -84,40 +84,87 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 
 Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com> writes:
 
-> Remove wrong index adjustment, which is leftover from adding
-> support for sparse enums.
-> enum.entries_by_val() function shall not subtract the start-value, as
-> it is indexed with real enum value.
+> When attribute is enum type and marked as multi-attr, the netlink
+> respond is not parsed, fails with stack trace:
+> Traceback (most recent call last):
+>   File "/net-next/tools/net/ynl/./test.py", line 520, in <module>
+>     main()
+>   File "/net-next/tools/net/ynl/./test.py", line 488, in main
+>     dplls=dplls_get(282574471561216)
+>   File "/net-next/tools/net/ynl/./test.py", line 48, in dplls_get
+>     reply=act(args)
+>   File "/net-next/tools/net/ynl/./test.py", line 41, in act
+>     reply = ynl.dump(args.dump, attrs)
+>   File "/net-next/tools/net/ynl/lib/ynl.py", line 598, in dump
+>     return self._op(method, vals, dump=True)
+>   File "/net-next/tools/net/ynl/lib/ynl.py", line 584, in _op
+>     rsp_msg = self._decode(gm.raw_attrs, op.attr_set.name)
+>   File "/net-next/tools/net/ynl/lib/ynl.py", line 451, in _decode
+>     self._decode_enum(rsp, attr_spec)
+>   File "/net-next/tools/net/ynl/lib/ynl.py", line 408, in _decode_enum
+>     value = enum.entries_by_val[raw].name
+> TypeError: unhashable type: 'list'
+> error: 1
 >
-> Fixes: c311aaa74ca1 ("tools: ynl: fix enum-as-flags in the generic CLI")
+> Redesign _decode_enum(..) to take a enum int value and translate
+> it to either a bitmask or enum name as expected.
+>
 > Signed-off-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
 > ---
->  tools/net/ynl/lib/ynl.py | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  tools/net/ynl/lib/ynl.py | 12 ++++++------
+>  1 file changed, 6 insertions(+), 6 deletions(-)
 >
 > diff --git a/tools/net/ynl/lib/ynl.py b/tools/net/ynl/lib/ynl.py
-> index 1b3a36fbb1c3..027b1c0aecb4 100644
+> index 027b1c0aecb4..3ca28d4bcb18 100644
 > --- a/tools/net/ynl/lib/ynl.py
 > +++ b/tools/net/ynl/lib/ynl.py
-> @@ -420,8 +420,8 @@ class YnlFamily(SpecFamily):
->      def _decode_enum(self, rsp, attr_spec):
->          raw = rsp[attr_spec['name']]
+> @@ -417,8 +417,7 @@ class YnlFamily(SpecFamily):
+>          pad = b'\x00' * ((4 - len(attr_payload) % 4) % 4)
+>          return struct.pack('HH', len(attr_payload) + 4, nl_type) + attr_payload + pad
+>  
+> -    def _decode_enum(self, rsp, attr_spec):
+> -        raw = rsp[attr_spec['name']]
+> +    def _decode_enum(self, raw, attr_spec):
 >          enum = self.consts[attr_spec['enum']]
-> -        i = attr_spec.get('value-start', 0)
 >          if 'enum-as-flags' in attr_spec and attr_spec['enum-as-flags']:
-> +            i = 0
->              value = set()
->              while raw:
->                  if raw & 1:
-> @@ -429,7 +429,7 @@ class YnlFamily(SpecFamily):
->                  raw >>= 1
+>              i = 0
+> @@ -430,7 +429,7 @@ class YnlFamily(SpecFamily):
 >                  i += 1
 >          else:
-> -            value = enum.entries_by_val[raw - i].name
-> +            value = enum.entries_by_val[raw].name
->          rsp[attr_spec['name']] = value
+>              value = enum.entries_by_val[raw].name
+> -        rsp[attr_spec['name']] = value
+> +        return value
 >  
 >      def _decode_binary(self, attr, attr_spec):
+>          if attr_spec.struct_name:
+> @@ -438,7 +437,7 @@ class YnlFamily(SpecFamily):
+>              decoded = attr.as_struct(members)
+>              for m in members:
+>                  if m.enum:
+> -                    self._decode_enum(decoded, m)
+> +                    decoded[m.name] = self._decode_enum(decoded[m.name], m)
+>          elif attr_spec.sub_type:
+>              decoded = attr.as_c_array(attr_spec.sub_type)
+>          else:
+> @@ -466,6 +465,9 @@ class YnlFamily(SpecFamily):
+>              else:
+>                  raise Exception(f'Unknown {attr_spec["type"]} with name {attr_spec["name"]}')
+>  
+> +            if 'enum' in attr_spec:
+> +                decoded = self._decode_enum(decoded, attr_spec)
+> +
+>              if not attr_spec.is_multi:
+>                  rsp[attr_spec['name']] = decoded
+>              elif attr_spec.name in rsp:
+> @@ -473,8 +475,6 @@ class YnlFamily(SpecFamily):
+>              else:
+>                  rsp[attr_spec.name] = [decoded]
+>  
+> -            if 'enum' in attr_spec:
+> -                self._decode_enum(rsp, attr_spec)
+>          return rsp
+>  
+>      def _decode_extack_path(self, attrs, attr_set, offset, target):
 
 Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
 
