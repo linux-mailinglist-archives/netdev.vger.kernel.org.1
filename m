@@ -1,146 +1,113 @@
-Return-Path: <netdev+bounces-20655-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20659-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3C91760659
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 05:09:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 036D676068E
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 05:27:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 775431C20D4C
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 03:09:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B2492280FF1
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 03:27:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B1231FD1;
-	Tue, 25 Jul 2023 03:09:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B329C210F;
+	Tue, 25 Jul 2023 03:27:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ECB71FCA
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 03:09:25 +0000 (UTC)
-Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91FBAE7B
-	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 20:09:22 -0700 (PDT)
-Received: by mail-pj1-x1035.google.com with SMTP id 98e67ed59e1d1-267711d2b43so714277a91.0
-        for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 20:09:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1690254562; x=1690859362;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ZLkcXzJjvvDBLgu5DbJbwRAKtejO8FK7VlKqBEYpGhg=;
-        b=T37460khNMPot0VVWdDz4lB6VWzVdicUBxVfz7CttLqrgD8g0MkXpwdKxm81+5qM3E
-         yM+KFmnDFeQa0ZY5ZeNvvyumpxFJqPDg3oixgT5YKKGKOt9qmtbXs6vK0nUKy4kqsaDS
-         iJ3utK1jXEfJapBrHYjK+SRbiAPBWHkzR4mO0jKk+qC4Stl39POzbhCCP4MwAtpmSso5
-         ynGZ9erR4hLoA8pCdH+sRZpUbw1kMvKh2ycfFI2IzmOqd8Zq8Q0hlgUcK6mejCeashGS
-         UzcYSPHM74qvjYTTAriMRhyDbW62IR+NfEc7uD2qj/U2RIYLpDl8fGFG28yoLGatJrqh
-         GkTg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690254562; x=1690859362;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZLkcXzJjvvDBLgu5DbJbwRAKtejO8FK7VlKqBEYpGhg=;
-        b=X0Ki0Jvz3h0oW4J34THdW3cGA0RVPzHnV6gK2eaxPrNBuVnjuZ5X0RbpmPPs/LT76K
-         LxwfwKLl/h6wbG7UH2rU4ntWbM2AgqP7Qvmu6VjTTaj88wjeKu9wzudN9J19wqF6kn4v
-         O/YzFOjApGXT7+yqKjKoQ0Qeh7sxgSWU45cdfcPQwFpNyXnBJoB5H0FKNmDtyGRLyIuI
-         5/Xgu93ed3esmlC5Ngl1QJXxBEW4lwHU0yfrw82wihpX5IYt+HcJhMaUWiluBufm3yJi
-         8CYoOyAqi/KRmxEFkgAPupKTTsjuYJ59lErK8Y1xkpErviTRjB7FdgIDJb9lKWK0mW5v
-         nsdg==
-X-Gm-Message-State: ABy/qLbLCVTKkmB0/1+GGwktJ7P21ct/2wmW31+C5Tk6+yGrVgear7NY
-	yiTCMoMauCCUJLBNFracFZDt5A==
-X-Google-Smtp-Source: APBJJlEruF0WFFXXZAOwcLJKfTF/P8Yek4Wx/bwgxp4VRr2IRHJr9OEk7izXq54CPTEEiNehAqKYyg==
-X-Received: by 2002:a17:90a:50f:b0:263:730b:f568 with SMTP id h15-20020a17090a050f00b00263730bf568mr10246975pjh.3.1690254562043;
-        Mon, 24 Jul 2023 20:09:22 -0700 (PDT)
-Received: from [10.70.252.135] ([203.208.167.147])
-        by smtp.gmail.com with ESMTPSA id 21-20020a17090a199500b002633fa95ac2sm9540001pji.13.2023.07.24.20.09.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 24 Jul 2023 20:09:21 -0700 (PDT)
-Message-ID: <d2621ad0-8b99-9154-5ff5-509dec2f32a3@bytedance.com>
-Date: Tue, 25 Jul 2023 11:09:07 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A12814C80
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 03:27:19 +0000 (UTC)
+Received: from out-32.mta0.migadu.com (out-32.mta0.migadu.com [91.218.175.32])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1922D1720
+	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 20:27:16 -0700 (PDT)
+Content-Type: text/plain;
+	charset=us-ascii
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1690255094;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=keHNwQXyGxB+2fa9SqrEE3DvQ5TME2b5TMHAzSBP2pw=;
+	b=HAeGJ99i5xFhmj3CijzGTxYLYsS22+UCkxr4poXrv7YrVuJ+ys1PsTwIPg8xpWVSxn9zir
+	H57AkKYqiD1vOZNVzVNI7GcU+WBHpxaXuuBnNpw5g5o1ZYYgFiQKUmRNmm30EbXVxytcjf
+	W5muscH4uShV5wnAUhi90ZLbjVnLzlo=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.12.0
-Subject: Re: [PATCH v2 01/47] mm: vmscan: move shrinker-related code into a
- separate file
-Content-Language: en-US
-To: Muchun Song <muchun.song@linux.dev>
-Cc: Andrew Morton <akpm@linux-foundation.org>, david@fromorbit.com,
- tkhai@ya.ru, Vlastimil Babka <vbabka@suse.cz>,
- Roman Gushchin <roman.gushchin@linux.dev>, djwong@kernel.org,
- Christian Brauner <brauner@kernel.org>, "Paul E. McKenney"
- <paulmck@kernel.org>, tytso@mit.edu, steven.price@arm.com, cel@kernel.org,
- Sergey Senozhatsky <senozhatsky@chromium.org>, yujie.liu@intel.com,
- Greg KH <gregkh@linuxfoundation.org>, LKML <linux-kernel@vger.kernel.org>,
- Linux Memory Management List <linux-mm@kvack.org>, x86@kernel.org,
- kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
- linux-erofs@lists.ozlabs.org, linux-f2fs-devel@lists.sourceforge.net,
- cluster-devel@redhat.com, linux-nfs@vger.kernel.org,
- linux-mtd@lists.infradead.org, rcu@vger.kernel.org,
- netdev <netdev@vger.kernel.org>, dri-devel@lists.freedesktop.org,
- linux-arm-msm@vger.kernel.org, dm-devel@redhat.com,
- linux-raid@vger.kernel.org, linux-bcache@vger.kernel.org,
- virtualization@lists.linux-foundation.org, linux-fsdevel@vger.kernel.org,
- linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org,
+Subject: Re: [PATCH v2 02/47] mm: shrinker: remove redundant shrinker_rwsem in
+ debugfs operations
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Muchun Song <muchun.song@linux.dev>
+In-Reply-To: <20230724094354.90817-3-zhengqi.arch@bytedance.com>
+Date: Tue, 25 Jul 2023 11:17:24 +0800
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+ david@fromorbit.com,
+ tkhai@ya.ru,
+ Vlastimil Babka <vbabka@suse.cz>,
+ Roman Gushchin <roman.gushchin@linux.dev>,
+ djwong@kernel.org,
+ Christian Brauner <brauner@kernel.org>,
+ "Paul E. McKenney" <paulmck@kernel.org>,
+ tytso@mit.edu,
+ steven.price@arm.com,
+ cel@kernel.org,
+ Sergey Senozhatsky <senozhatsky@chromium.org>,
+ yujie.liu@intel.com,
+ Greg KH <gregkh@linuxfoundation.org>,
+ LKML <linux-kernel@vger.kernel.org>,
+ Linux Memory Management List <linux-mm@kvack.org>,
+ x86@kernel.org,
+ kvm@vger.kernel.org,
+ xen-devel@lists.xenproject.org,
+ linux-erofs@lists.ozlabs.org,
+ linux-f2fs-devel@lists.sourceforge.net,
+ cluster-devel@redhat.com,
+ linux-nfs@vger.kernel.org,
+ linux-mtd@lists.infradead.org,
+ rcu@vger.kernel.org,
+ netdev <netdev@vger.kernel.org>,
+ dri-devel@lists.freedesktop.org,
+ linux-arm-msm@vger.kernel.org,
+ dm-devel@redhat.com,
+ linux-raid@vger.kernel.org,
+ linux-bcache@vger.kernel.org,
+ virtualization@lists.linux-foundation.org,
+ linux-fsdevel@vger.kernel.org,
+ linux-ext4@vger.kernel.org,
+ linux-xfs@vger.kernel.org,
  linux-btrfs@vger.kernel.org
-References: <20230724094354.90817-1-zhengqi.arch@bytedance.com>
- <20230724094354.90817-2-zhengqi.arch@bytedance.com>
- <97E80C37-8872-4C5A-A027-A0B35F39152A@linux.dev>
-From: Qi Zheng <zhengqi.arch@bytedance.com>
-In-Reply-To: <97E80C37-8872-4C5A-A027-A0B35F39152A@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.6
+Message-Id: <210C013C-AB14-45BC-AB2E-199FF7F5E523@linux.dev>
+References: <20230724094354.90817-1-zhengqi.arch@bytedance.com>
+ <20230724094354.90817-3-zhengqi.arch@bytedance.com>
+To: Qi Zheng <zhengqi.arch@bytedance.com>
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
 
 
-On 2023/7/25 10:35, Muchun Song wrote:
+> On Jul 24, 2023, at 17:43, Qi Zheng <zhengqi.arch@bytedance.com> wrote:
 > 
+> The debugfs_remove_recursive() will wait for debugfs_file_put() to return,
+> so the shrinker will not be freed when doing debugfs operations (such as
+> shrinker_debugfs_count_show() and shrinker_debugfs_scan_write()), so there
+> is no need to hold shrinker_rwsem during debugfs operations.
 > 
->> On Jul 24, 2023, at 17:43, Qi Zheng <zhengqi.arch@bytedance.com> wrote:
->>
->> The mm/vmscan.c file is too large, so separate the shrinker-related
->> code from it into a separate file. No functional changes.
->>
->> Signed-off-by: Qi Zheng <zhengqi.arch@bytedance.com>
->> ---
->> include/linux/shrinker.h |   3 +
->> mm/Makefile              |   4 +-
->> mm/shrinker.c            | 707 +++++++++++++++++++++++++++++++++++++++
->> mm/vmscan.c              | 701 --------------------------------------
->> 4 files changed, 712 insertions(+), 703 deletions(-)
->> create mode 100644 mm/shrinker.c
->>
->> diff --git a/include/linux/shrinker.h b/include/linux/shrinker.h
->> index 224293b2dd06..961cb84e51f5 100644
->> --- a/include/linux/shrinker.h
->> +++ b/include/linux/shrinker.h
->> @@ -96,6 +96,9 @@ struct shrinker {
->>   */
->> #define SHRINKER_NONSLAB (1 << 3)
->>
->> +unsigned long shrink_slab(gfp_t gfp_mask, int nid, struct mem_cgroup *memcg,
->> +			   int priority);
-> 
-> A good cleanup, vmscan.c is so huge.
-> 
-> I'd like to introduce a new header in mm/ directory and contains those
-> declarations of functions (like this and other debug function in
-> shrinker_debug.c) since they are used internally across mm.
+> Signed-off-by: Qi Zheng <zhengqi.arch@bytedance.com>
 
-How about putting them in the mm/internal.h file?
+Reviewed-by: Muchun Song <songmuchun@bytedance.com>
 
-> 
-> Thanks.
-> 
+Thanks.
+
+
 
