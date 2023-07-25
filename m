@@ -1,108 +1,165 @@
-Return-Path: <netdev+bounces-21000-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21001-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1DFC7621D4
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 20:55:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF4167621E2
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 20:58:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2DF8F1C20F58
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 18:55:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C2F631C20F5A
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 18:58:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17CA1263A2;
-	Tue, 25 Jul 2023 18:55:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B975A263A8;
+	Tue, 25 Jul 2023 18:58:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 937091D2FD
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 18:55:29 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA3D3C433C9;
-	Tue, 25 Jul 2023 18:55:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690311329;
-	bh=s6phFJ9yBv1XmQB6gDeUZIImvyU/LkcA0/ax2HSpizY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=o/r1Y25gagTV062gymRgKk6qq04PwJT5zjfx02tXUHLCKL8yZx6UFZVp4k7A0D3g5
-	 AR/ZYAfN24NroHcUWIQClQEa4RwJ4pGq371mLm9e8YyBowWNDE7vOt3hk+R1HlsYBC
-	 B/AjTIvxb3ods6l/uVaQGv1mNiLzhJm7CCaxpdk2Sek3wOsCj+Rrlez/y2/sdDj/dO
-	 lbHMkcGFwK0dF0fsxU9gqaiOZ6Tt1fsOXuzWXzQD58T20FFIc8FSasH6uABZZ+I9lC
-	 uq9Mnhe7hE7kfm3qfK08wi7kqwJkeqITbC4k6LPBiqGlf3gBf4u+NkSiaWrXClgPNo
-	 jOvEhLhLXAO0Q==
-Date: Tue, 25 Jul 2023 11:55:28 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Alexander H Duyck <alexander.duyck@gmail.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, corbet@lwn.net, linux-doc@vger.kernel.org
-Subject: Re: [PATCH net] docs: net: clarify the NAPI rules around XDP Tx
-Message-ID: <20230725115528.596b5305@kernel.org>
-In-Reply-To: <c429298e279bd549de923deba09952e7540e534a.camel@gmail.com>
-References: <20230720161323.2025379-1-kuba@kernel.org>
-	<c429298e279bd549de923deba09952e7540e534a.camel@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADBC71D2FD
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 18:58:43 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2D352681;
+	Tue, 25 Jul 2023 11:58:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=X0R22BGbmRjXXZscNgSBbP4wiQyyIcB9qX3GclN3VKQ=; b=pMHzyljz3zocsCU3tG8KLgimld
+	AHsticsdDT5NHdPPBL5+fpo+9omp3YmofR8Zwa317kF/DgNvm/9XPvQuXDpOdnfCslAtEAoLt1+zT
+	AURHv8Doe0j2pA0GGUU5hmZWOkOB8hY8lebFHPL7ZVR8qayQsM1yxoXjSN2ClZWLW/J4=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qONEL-002IX2-IB; Tue, 25 Jul 2023 20:57:57 +0200
+Date: Tue, 25 Jul 2023 20:57:57 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Quan, Evan" <Evan.Quan@amd.com>
+Cc: "Limonciello, Mario" <Mario.Limonciello@amd.com>,
+	"rafael@kernel.org" <rafael@kernel.org>,
+	"lenb@kernel.org" <lenb@kernel.org>,
+	"Deucher, Alexander" <Alexander.Deucher@amd.com>,
+	"Koenig, Christian" <Christian.Koenig@amd.com>,
+	"Pan, Xinhui" <Xinhui.Pan@amd.com>,
+	"airlied@gmail.com" <airlied@gmail.com>,
+	"daniel@ffwll.ch" <daniel@ffwll.ch>,
+	"johannes@sipsolutions.net" <johannes@sipsolutions.net>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"mdaenzer@redhat.com" <mdaenzer@redhat.com>,
+	"maarten.lankhorst@linux.intel.com" <maarten.lankhorst@linux.intel.com>,
+	"tzimmermann@suse.de" <tzimmermann@suse.de>,
+	"hdegoede@redhat.com" <hdegoede@redhat.com>,
+	"jingyuwang_vip@163.com" <jingyuwang_vip@163.com>,
+	"Lazar, Lijo" <Lijo.Lazar@amd.com>,
+	"jim.cromie@gmail.com" <jim.cromie@gmail.com>,
+	"bellosilicio@gmail.com" <bellosilicio@gmail.com>,
+	"andrealmeid@igalia.com" <andrealmeid@igalia.com>,
+	"trix@redhat.com" <trix@redhat.com>,
+	"jsg@jsg.id.au" <jsg@jsg.id.au>, "arnd@arndb.de" <arnd@arndb.de>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-acpi@vger.kernel.org" <linux-acpi@vger.kernel.org>,
+	"amd-gfx@lists.freedesktop.org" <amd-gfx@lists.freedesktop.org>,
+	"dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
+	"linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH V7 4/9] wifi: mac80211: Add support for ACPI WBRF
+Message-ID: <d4cfbbae-9cd0-4767-8c80-ec09d1dbaf9c@lunn.ch>
+References: <20230719090020.2716892-1-evan.quan@amd.com>
+ <20230719090020.2716892-5-evan.quan@amd.com>
+ <9b1f45f9-02a3-4c03-b9d5-cc3b9ab3a058@lunn.ch>
+ <7d059aed-fac0-cdcd-63d5-58185bb345db@amd.com>
+ <DM6PR12MB26196A993B3BA93392AA0FEDE403A@DM6PR12MB2619.namprd12.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <DM6PR12MB26196A993B3BA93392AA0FEDE403A@DM6PR12MB2619.namprd12.prod.outlook.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Tue, 25 Jul 2023 10:30:24 -0700 Alexander H Duyck wrote:
-> > -In other words, it is recommended to ignore the budget argument when
-> > -performing TX buffer reclamation to ensure that the reclamation is not
-> > -arbitrarily bounded; however, it is required to honor the budget argument
-> > -for RX processing.
-> > +In other words for Rx processing the ``budget`` argument limits how many
-> > +packets driver can process in a single poll. Rx specific APIs like page
-> > +pool or XDP cannot be used at all when ``budget`` is 0.
-> > +skb Tx processing should happen regardless of the ``budget``, but if
-> > +the argument is 0 driver cannot call any XDP (or page pool) APIs.
-> 
-> This isn't accurate, and I would say it is somewhat dangerous advice.
-> The Tx still needs to be processed regardless of if it is processing
-> page_pool pages or XDP pages. I agree the Rx should not be processed,
-> but the Tx must be processed using mechanisms that do NOT make use of
-> NAPI optimizations when budget is 0.
-> 
-> So specifically, xdp_return_frame is safe in non-NAPI Tx cleanup. The
-> xdp_return_frame_rx_napi is not.
-> 
-> Likewise there is napi_consume_skb which will use either a NAPI or non-
-> NAPI version of things depending on if budget is 0 or not.
-> 
-> For the page_pool calls there is the "allow_direct" argument that is
-> meant to decide between recycling in directly into the page_pool cache
-> or not. It should only be used in the Rx handler itself when budget is
-> non-zero.
-> 
-> I realise this was written up in response to a patch on the Mellanox
-> driver. Based on the patch in question it looks like they were calling
-> page_pool_recycle_direct outside of NAPI context. There is an explicit
-> warning above that function about NOT calling it outside of NAPI
-> context.
+> > >> @@ -1395,6 +1395,8 @@ int ieee80211_register_hw(struct
+> > ieee80211_hw *hw)
+> > >>    debugfs_hw_add(local);
+> > >>    rate_control_add_debugfs(local);
+> > >>
+> > >> +  ieee80211_check_wbrf_support(local);
+> > >> +
+> > >>    rtnl_lock();
+> > >>    wiphy_lock(hw->wiphy);
+> > >>
+> > >
+> > >> +void ieee80211_check_wbrf_support(struct ieee80211_local *local) {
+> > >> +  struct wiphy *wiphy = local->hw.wiphy;
+> > >> +  struct device *dev;
+> > >> +
+> > >> +  if (!wiphy)
+> > >> +          return;
+> > >> +
+> > >> +  dev = wiphy->dev.parent;
+> > >> +  if (!dev)
+> > >> +          return;
+> > >> +
+> > >> +  local->wbrf_supported = wbrf_supported_producer(dev);
+> > >> +  dev_dbg(dev, "WBRF is %s supported\n",
+> > >> +          local->wbrf_supported ? "" : "not"); }
+> > >
+> > > This seems wrong. wbrf_supported_producer() is about "Should this
+> > > device report the frequencies it is using?" The answer to that depends
+> > > on a combination of: Are there consumers registered with the core, and
+> > > is the policy set so WBRF should take actions. > The problem here is,
+> > > you have no idea of the probe order. It could be this device probes
+> > > before others, so wbrf_supported_producer() reports false, but a few
+> > > second later would report true, once other devices have probed.
+> > >
+> > > It should be an inexpensive call into the core, so can be made every
+> > > time the channel changes. All the core needs to do is check if the
+> > > list of consumers is empty, and if not, check a Boolean policy value.
+> > >
+> > >       Andrew
+> >
+> > No, it's not a combination of whether consumers are registered with the core.
+> > If a consumer probes later it needs to know the current in use frequencies too.
+> >
+> > The reason is because of this sequence of events:
+> > 1) Producer probes.
+> > 2) Producer selects a frequency.
+> > 3) Consumer probes.
+> > 4) Producer stays at same frequency.
+> >
+> > If the producer doesn't notify the frequency because a consumer isn't yet
+> > loaded then the consumer won't be able to get the current frequency.
+> Yes, exactly.
 
-Unless I'm missing something budget=0 can be called from hard IRQ
-context. And page pool takes _bh() locks. So unless we "teach it"
-not to recycle _anything_ in hard IRQ context, it is not safe to call.
+So now we are back to, what is the point of wbrf_supported_producer()?
 
-> >  .. warning::
-> >  
-> > -   The ``budget`` argument may be 0 if core tries to only process Tx completions
-> > -   and no Rx packets.
-> > +   The ``budget`` argument may be 0 if core tries to only process
-> > +   skb Tx completions and no Rx or XDP packets.
-> >  
-> >  The poll method returns the amount of work done. If the driver still
-> >  has outstanding work to do (e.g. ``budget`` was exhausted)  
-> 
-> We cannot make this distinction if both XDP and skb are processed in
-> the same Tx queue. Otherwise you will cause the Tx to stall and break
-> netpoll. If the ring is XDP only then yes, it can be skipped like what
-> they did in the Mellanox driver, but if it is mixed then the XDP side
-> of things needs to use the "safe" versions of the calls.
+I'm talking general case here, not your ACPI implementation. All i'm
+really interested in is the generic API, which is what an Intel CPU,
+combined with a Radieon GPU and a Qualcomm WiFi device will use. Or an
+AMD CPU combined with an nvidia GPU and a Mediatek Wifi, etc. The wbrf
+core should support an combination of produces and consumers in a
+generic way.
 
-IDK, a rare delay in sending of a netpoll message is not a major
-concern.
+If you assume devices can probe in any order, and come and go, it
+seems like the producers need to always report what frequencies they
+are using. Otherwise when a noise generator pops into existence, as
+you say, it has no idea what frequencies the producers are using.
+
+The exception is when policy says there is no need to actually do
+anything. If we can assume the policy is fixed, then
+wbrf_supported_producer() could just report the policy which the wbrf
+core should know about.
+
+    Andrew
+
 
