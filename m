@@ -1,107 +1,177 @@
-Return-Path: <netdev+bounces-20895-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20896-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52064761D61
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 17:29:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3D4B761D78
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 17:39:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0D7ED28173B
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 15:29:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C242D1C20EED
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 15:39:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38A9923BD3;
-	Tue, 25 Jul 2023 15:29:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98F4523BDB;
+	Tue, 25 Jul 2023 15:39:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CC0C23BD1
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 15:29:29 +0000 (UTC)
-Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74A181BF6
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 08:29:27 -0700 (PDT)
-Received: by mail-ej1-x62d.google.com with SMTP id a640c23a62f3a-993a37b79e2so901271866b.1
-        for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 08:29:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1690298966; x=1690903766;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=SjlrbfT1i6tI7AFt+LbMcfKublLdL5rytJvECbAgqhw=;
-        b=3Av3W/H9AvKC2xhec4wLU32kj/ocz3g21KXV7GBjN2+pb/CcPWxxNsHubEAKO2s1VV
-         qL4rlCWHhLNJhcn+6v8C5QObtLUPh41uYbKHJ+MlNkWxx2dXMMYw9zw+vhujizbK8HQR
-         9YsF2kUpTqzM84WO8JSSw0A3zBYX5Zgswlw1OX4uQ3vV5DPCzlNjyIf5g1qDGBfw9uD3
-         L9jFvuIHE6yOUAZIeG31nSA3brM3h3Wo9/qU3XlAs+LPe1Fn0mI2mvINcyzuX2aZIQI8
-         yC//Kc0nFeA9CwPhp6FaXIfwCC42X4lHvGfNEU84qUyYileAjyAh5heW1ummpI+0iH0n
-         BFog==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A8C31F173
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 15:39:21 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 331811FD0
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 08:39:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1690299559;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=bcCFU2Ivogkl7HFNHxFyEJm3ALVxSHEsRN1xT36+tVI=;
+	b=bs5+xR6NomwkYvbPyyPgDy+5gKqCrKTEF32Ah6f7W5PJ/T5669EkDg1GVY2QAe1VBi/2cH
+	8Wcu7zXR1sGLtitqZLSDmB+wbb846Yj7DcfTZpYqhXTyYNljNSNvZFvvhuFRRffeE/BevR
+	L1Og6S5io9TDmd73+YM/ShyhMlLrCCU=
+Received: from mail-oi1-f199.google.com (mail-oi1-f199.google.com
+ [209.85.167.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-240-zYj8AniGNh-LaRSt2Y2AKA-1; Tue, 25 Jul 2023 11:39:17 -0400
+X-MC-Unique: zYj8AniGNh-LaRSt2Y2AKA-1
+Received: by mail-oi1-f199.google.com with SMTP id 5614622812f47-3a3a8d12040so11635958b6e.3
+        for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 08:39:17 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690298966; x=1690903766;
+        d=1e100.net; s=20221208; t=1690299556; x=1690904356;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=SjlrbfT1i6tI7AFt+LbMcfKublLdL5rytJvECbAgqhw=;
-        b=YOV7rHD+RqjWSS1WswCriFInxuT3MK+CTi6nEEhMBCNz3hYCNUdbmwHqeRESAwXG+h
-         g40vQZm0GPT6ehtNI7L/FPDrssBGsFhzw2hPPJGYFgQV91iGU99by2/TiGlwGNen0NOe
-         /sX2tvJ6ZRpQl2bdQpvzVzf+LQWs4UkTH4lVKq9wwn0B3vZnJGKwOVksB4FBNmnSokhL
-         QR76eEwwo+pY2rvEQ5x5d8WYbkLAGFvY/qr87Y0DHsCBVn6zkSuLdplw1/AX5d1uvT/n
-         ejJmv3oZ0sVqVae/YeJ9kfyL5R5jyh1Bt+6b1nxRQPK2o2/Jf8uCb/1MlyfL4WIr8ArX
-         0UCA==
-X-Gm-Message-State: ABy/qLZPQkpJZaz68EVCEGogc4dNAWt8NAnzECssGMHaCGgSafnXb5mD
-	FL8G3aXWOPnenwzZ5TiIsjPksA==
-X-Google-Smtp-Source: APBJJlE0hYqOUIltZnICvYfM/7nxuYFidgVxNNz28KNMxH/AG+NBkY4dQ7R3+Tzf1zDzfBAammcJIQ==
-X-Received: by 2002:a17:907:2cf7:b0:993:f8b2:d6fa with SMTP id hz23-20020a1709072cf700b00993f8b2d6famr11234456ejc.21.1690298965867;
-        Tue, 25 Jul 2023 08:29:25 -0700 (PDT)
-Received: from localhost ([91.218.191.82])
-        by smtp.gmail.com with ESMTPSA id lv19-20020a170906bc9300b00989257be620sm8216409ejb.200.2023.07.25.08.29.24
+        bh=bcCFU2Ivogkl7HFNHxFyEJm3ALVxSHEsRN1xT36+tVI=;
+        b=e06MotaB0neINZ8+1X74PN9xF/xC7tM88sHPQNh3CZ2H1Sr4jtd2Zht8n+28yt73TZ
+         WeonUsrHd0+tKe8s6cZZHc4iP3B5QuKhQ//2oJupSYZPBttJnTnF+zkKcN0SeDppEPf3
+         VPx3iGM5bhvpIyZOAC8L3klkAS9EZaSpj6z0fmBXa+U59rxdtigCQ6pkMGc4+0g280P/
+         kEV9+c1NLSk5rbw35N7JAdXa5Y/BBPJxpSM4nG8zdsUdLRtexHoESIAn+ocjvigVnAIC
+         qv/Zpx3/lo2G/3SAtvWX4lvh8Gcs1q2YIV9zDHJTqMd+U5cZCXUht5xA5YXEe95cdlPP
+         2Kcw==
+X-Gm-Message-State: ABy/qLZjtAjQazaeSNQmvScoQzLKjj4l+3csZKXKQ8Jq373zAGbLtu+t
+	R8FZviFYRa5lSqsESw6880c0HCzpQ6CzYN84RIZlVIppyaEwb4FoPhcIfYpVeIxwU08QuMwKvhW
+	Vk1kGrB7RR5iOZMhQ
+X-Received: by 2002:aca:903:0:b0:3a4:2983:fae4 with SMTP id 3-20020aca0903000000b003a42983fae4mr13668667oij.16.1690299556758;
+        Tue, 25 Jul 2023 08:39:16 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlH0TGaUqzi7xbyp+p32xHTznjTx8QeM+1IFMYrpqrtgsnqXajAIOZAP2vbA9ODUoVXO9/LaIw==
+X-Received: by 2002:aca:903:0:b0:3a4:2983:fae4 with SMTP id 3-20020aca0903000000b003a42983fae4mr13668657oij.16.1690299556430;
+        Tue, 25 Jul 2023 08:39:16 -0700 (PDT)
+Received: from sgarzare-redhat ([193.207.153.113])
+        by smtp.gmail.com with ESMTPSA id z9-20020a0cf249000000b005ef81cc63ccsm4396365qvl.117.2023.07.25.08.39.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Jul 2023 08:29:24 -0700 (PDT)
-Date: Tue, 25 Jul 2023 17:29:23 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, davem@davemloft.net,
-	edumazet@google.com, moshe@nvidia.com, saeedm@nvidia.com,
-	idosch@nvidia.com, petrm@nvidia.com
-Subject: Re: [patch net-next v2 00/11] devlink: introduce dump selector attr
- and use it for per-instance dumps
-Message-ID: <ZL/qU/cwvPlLR3ek@nanopsycho>
-References: <20230720121829.566974-1-jiri@resnulli.us>
- <ZL+C3xMq3Er79qDD@nanopsycho>
- <87ca1394a3110cad376d9bfb6d576f0f90674a2d.camel@redhat.com>
+        Tue, 25 Jul 2023 08:39:15 -0700 (PDT)
+Date: Tue, 25 Jul 2023 17:39:09 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Bobby Eshleman <bobby.eshleman@bytedance.com>, kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kernel@sberdevices.ru, 
+	oxffffaa@gmail.com
+Subject: Re: [RFC PATCH v2 1/4] virtio/vsock: rework MSG_PEEK for SOCK_STREAM
+Message-ID: <p5sh4fskegski2l4d5jkziaun266mjnzfpig6qs5zsxg55rc4t@vfi2icif57pj>
+References: <20230719192708.1775162-1-AVKrasnov@sberdevices.ru>
+ <20230719192708.1775162-2-AVKrasnov@sberdevices.ru>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <87ca1394a3110cad376d9bfb6d576f0f90674a2d.camel@redhat.com>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20230719192708.1775162-2-AVKrasnov@sberdevices.ru>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Tue, Jul 25, 2023 at 10:36:31AM CEST, pabeni@redhat.com wrote:
->On Tue, 2023-07-25 at 10:07 +0200, Jiri Pirko wrote:
->> I see that this patchset got moved to "changes requested" in patchwork.
->> Why exacly? There was no comment so far. Petr's splat is clearly not
->> caused by this patchset.
+On Wed, Jul 19, 2023 at 10:27:05PM +0300, Arseniy Krasnov wrote:
+>This reworks current implementation of MSG_PEEK logic:
+>1) Replaces 'skb_queue_walk_safe()' with 'skb_queue_walk()'. There is
+>   no need in the first one, as there are no removes of skb in loop.
+>2) Removes nested while loop - MSG_PEEK logic could be implemented
+>   without it: just iterate over skbs without removing it and copy
+>   data from each until destination buffer is not full.
 >
->Quickly skimming over the series I agree the reported splat looks
->possibly more related to core netlink and/or rhashtable but it would
->help if you could express your reasoning on the splat itself, possibly
->with a decoded back-trace.
+>Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+>Reviewed-by: Bobby Eshleman <bobby.eshleman@bytedance.com>
+>---
+> net/vmw_vsock/virtio_transport_common.c | 41 ++++++++++++-------------
+> 1 file changed, 19 insertions(+), 22 deletions(-)
+
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+
+>
+>diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+>index b769fc258931..2ee40574c339 100644
+>--- a/net/vmw_vsock/virtio_transport_common.c
+>+++ b/net/vmw_vsock/virtio_transport_common.c
+>@@ -348,37 +348,34 @@ virtio_transport_stream_do_peek(struct vsock_sock *vsk,
+> 				size_t len)
+> {
+> 	struct virtio_vsock_sock *vvs = vsk->trans;
+>-	size_t bytes, total = 0, off;
+>-	struct sk_buff *skb, *tmp;
+>-	int err = -EFAULT;
+>+	struct sk_buff *skb;
+>+	size_t total = 0;
+>+	int err;
+>
+> 	spin_lock_bh(&vvs->rx_lock);
+>
+>-	skb_queue_walk_safe(&vvs->rx_queue, skb,  tmp) {
+>-		off = 0;
+>+	skb_queue_walk(&vvs->rx_queue, skb) {
+>+		size_t bytes;
+>
+>-		if (total == len)
+>-			break;
+>+		bytes = len - total;
+>+		if (bytes > skb->len)
+>+			bytes = skb->len;
+>
+>-		while (total < len && off < skb->len) {
+>-			bytes = len - total;
+>-			if (bytes > skb->len - off)
+>-				bytes = skb->len - off;
+>+		spin_unlock_bh(&vvs->rx_lock);
+>
+>-			/* sk_lock is held by caller so no one else can dequeue.
+>-			 * Unlock rx_lock since memcpy_to_msg() may sleep.
+>-			 */
+>-			spin_unlock_bh(&vvs->rx_lock);
+>+		/* sk_lock is held by caller so no one else can dequeue.
+>+		 * Unlock rx_lock since memcpy_to_msg() may sleep.
+>+		 */
+>+		err = memcpy_to_msg(msg, skb->data, bytes);
+>+		if (err)
+>+			goto out;
+>
+>-			err = memcpy_to_msg(msg, skb->data + off, bytes);
+>-			if (err)
+>-				goto out;
+>+		total += bytes;
+>
+>-			spin_lock_bh(&vvs->rx_lock);
+>+		spin_lock_bh(&vvs->rx_lock);
+>
+>-			total += bytes;
+>-			off += bytes;
+>-		}
+>+		if (total == len)
+>+			break;
+> 	}
+>
+> 	spin_unlock_bh(&vvs->rx_lock);
+>-- 
+>2.25.1
 >
 
-Well, since I'm touching only devlink, this is underlated to this
-patchset. I don't see why I would need to care about the splat.
-I will repost, if that is ok.
-
-
->Thanks!
->
->Paolo
->> 
->
 
