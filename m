@@ -1,98 +1,172 @@
-Return-Path: <netdev+bounces-20979-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20980-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B7E57620AC
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 19:56:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DDB307620BC
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 19:58:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EAE22281370
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 17:56:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BF43B1C20F34
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 17:58:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D13AE2592A;
-	Tue, 25 Jul 2023 17:56:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96B312592C;
+	Tue, 25 Jul 2023 17:58:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5D1F25140
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 17:56:34 +0000 (UTC)
-X-Greylist: delayed 61384 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 25 Jul 2023 10:56:33 PDT
-Received: from out-14.mta0.migadu.com (out-14.mta0.migadu.com [91.218.175.14])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B0C81B8
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 10:56:33 -0700 (PDT)
-Message-ID: <87fa06c9-d8a9-fda4-d069-6812605aa10b@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1690307790;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=EHcSrzVLuqg7vsezDCAcR+Ts57qI809p7b33W2KdD0w=;
-	b=whGT7e5egGQVoPWhvX97cwbVVw3dUoUz9IAVmNp7vYZqlB+Qk/L3M6BbtJSM+iNCmYDXgK
-	jKslWJg5b1CpTf7FDTiy7k4Hy4bYDt2Re8klOcz0zUt9+2NcBzW8FJE+zR7yw7KCaf2/tn
-	hhr3zdTjr6IvqR+0PIGG8BC9rKzDqEY=
-Date: Tue, 25 Jul 2023 10:56:23 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84D2523BF5
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 17:58:26 +0000 (UTC)
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2089.outbound.protection.outlook.com [40.107.223.89])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55210BB;
+	Tue, 25 Jul 2023 10:58:25 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=M/TGjoUgOSBM1t+01pnFjVSA/seYc4gqh48pKaRyhYGNF8WJKLNDXpJSbjV+rC69gQsKVPMGsPYJ/6XiPn9ebZmZaCatwg+ElU7/EJgsRNUFnkzI27UJnpwZU5nU4qvn2+mWl335zpYSmK2nr7Izxt64tddyyIs6baCiby+dfmEBwY55g+Nizdfg/FTQbwUcYnNefd07MGfCw7VMRWscQpCVcVGYw/aaudsLxF0haTh9qZZ64dXc77A1XuzndVbpamXYoysJpxkAKfjYS+PHSVaTxIU1Cr3sG2LQkfiuM0JTCrGGDSXBvAVjnHKVUr9/O56wN97Z+uQsQZpIMllEfQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=meRP2K0smH/DP9Od0Zk/9waK66Py2ElJdG7sKwsVBb0=;
+ b=QypZY8NKQtSstavFni5/Zpv0+HCql0PQZtou/M+ittrw7EFpFcaX4uQYFvRy2/jQeUu/suOcAIRKLrWZRc1+/8mKyI/O8Alk+74ywvWYqboHCwDMjJjw0ym9Wy6Jga5q9MmwFfsEeHidPHoxqFi7kqYjyhZTflWKDzoxI9zFvCEF0jRnq9oRX+4CDQYbh19fEuTPznLH5OH6+PS6qXaU3aypLrHOLtnaPIwDeNPEW/x6+ufS5jo13NjJ90O2uFNPauyGEOQj4acbodfJqo3ILYf2BALJUHK+rIYlT44YWkXXeNM7eiwKUHUrP3GT9u92Aq4mMkdYqg/Pw6LZroyZLw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=meRP2K0smH/DP9Od0Zk/9waK66Py2ElJdG7sKwsVBb0=;
+ b=bglGT75u6Z+RWMZcIRrUj+eu4Yg+BCZ/NNDDghbPUdQD4b8vRtLS5E1gUTNjDMRUJSWri+VvSCEr9r0Cg1yh7Kv+e+zLRGNCeWPU6HKKcCCgfImlZ6rSG67x0ytFpnCFC8Xrp68J+YVyxx3dUsUyjTDzN6giSC7BHb8DjHC1uoQ=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from PH0PR12MB7982.namprd12.prod.outlook.com (2603:10b6:510:28d::5)
+ by DS7PR12MB6333.namprd12.prod.outlook.com (2603:10b6:8:96::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.33; Tue, 25 Jul
+ 2023 17:58:23 +0000
+Received: from PH0PR12MB7982.namprd12.prod.outlook.com
+ ([fe80::6872:1500:b609:f9cf]) by PH0PR12MB7982.namprd12.prod.outlook.com
+ ([fe80::6872:1500:b609:f9cf%5]) with mapi id 15.20.6609.029; Tue, 25 Jul 2023
+ 17:58:22 +0000
+Message-ID: <91d550a7-0759-664d-c31a-4d2b88a4741b@amd.com>
+Date: Tue, 25 Jul 2023 10:58:19 -0700
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH v12 vfio 4/7] vfio/pds: Add VFIO live migration support
+Content-Language: en-US
+To: Simon Horman <simon.horman@corigine.com>,
+ Brett Creeley <brett.creeley@amd.com>
+Cc: kvm@vger.kernel.org, netdev@vger.kernel.org, alex.williamson@redhat.com,
+ jgg@nvidia.com, yishaih@nvidia.com, shameerali.kolothum.thodi@huawei.com,
+ kevin.tian@intel.com, shannon.nelson@amd.com
+References: <20230719223527.12795-1-brett.creeley@amd.com>
+ <20230719223527.12795-5-brett.creeley@amd.com>
+ <ZMAHAE9dnMzKzFgW@corigine.com>
+From: Brett Creeley <bcreeley@amd.com>
+In-Reply-To: <ZMAHAE9dnMzKzFgW@corigine.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BYAPR11CA0093.namprd11.prod.outlook.com
+ (2603:10b6:a03:f4::34) To PH0PR12MB7982.namprd12.prod.outlook.com
+ (2603:10b6:510:28d::5)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH 2/4] io_uring/cmd: Introduce SOCKET_URING_OP_GETSOCKOPT
-Content-Language: en-US
-To: Stanislav Fomichev <sdf@google.com>, Breno Leitao <leitao@debian.org>
-Cc: asml.silence@gmail.com, axboe@kernel.dk, io-uring@vger.kernel.org,
- netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
- edumazet@google.com, pabeni@redhat.com, linux-kernel@vger.kernel.org,
- leit@meta.com, bpf@vger.kernel.org, ast@kernel.org
-References: <20230724142237.358769-1-leitao@debian.org>
- <20230724142237.358769-3-leitao@debian.org> <ZL61cIrQuo92Xzbu@google.com>
- <ZL+VfRiJQqrrLe/9@gmail.com> <ZMAAMKTaKSIKi1RW@google.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <ZMAAMKTaKSIKi1RW@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR12MB7982:EE_|DS7PR12MB6333:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7d89620d-6257-424f-efa2-08db8d38bc87
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	BQxm3lFQsoZA3QZHgTtoiNlIAqn2hdD6CXpX0FI8dwWGV2ePIzArkiQeKz6c/+UXFN5VWZOFHRbUuWXDmEtJLPxHGfA2E4H0UplsBh0Iwbll9CU6knKNIODC2o8tcKkVCxWOcPCuXETEj7iY7KF2iGPY+nPZPchxsXV6lxb8Unz4+rTZYOm6t+XgjBRJQWxWHd0aOXxRRwx+wvx86bFbZtmr5ompsPFsakHiWdq+Doyy7Q5S6CRNhnOGZFLBemiBulr48dIYcQ0SMeJL7mo96injNuWww2QhkklnKQGgRcmVryCnnlGzpWmuvl4zL3aP66ypyywm7vwndgh/xX3qgko/X/GyEa3TvFT6r46gLnw7GftxE4+8eDAPxaYu2zVdguXCvx+76WdIRjhSTorTSgifjgglkO6T1uD4MEHci6mIK4E5SWm39lHRFESh9HaeKkTZpqgF9ChDbaHQRKOyIVwkQukvkS+wxlta5truAFLCE5QO46Mg6TwpeX5OgMTYvSGlaUNdJ2hu5StBFB0NNOUn0cF5/oGe2XH1V3P4q0uR2sJ7Ywwiz/L1sJQomLby4CbucNnphxyK0eOn5PDWAd2f7ODX/iJuNjs6UAUToQlT6Lh9DlXZJRMZdxc5z7cVYuVH9Cz2GBYbqopaEboXhQ==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR12MB7982.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(366004)(396003)(136003)(39860400002)(376002)(346002)(451199021)(4744005)(66946007)(66556008)(66476007)(2616005)(36756003)(83380400001)(31696002)(38100700002)(6512007)(478600001)(110136005)(966005)(6486002)(186003)(53546011)(26005)(6506007)(6666004)(6636002)(31686004)(41300700001)(5660300002)(316002)(2906002)(4326008)(8676002)(8936002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?TE1PS25YM216dGhHSmhzc0tLc3g1ZkgyNjhRVE5TYXBZb3V6VXdnWTFXWkM0?=
+ =?utf-8?B?SVlMVUlYNWkwVldjdDFmMjBQSXRMNEFFbW5hZlpkakhDWnZ5N2RWK0E1WDZT?=
+ =?utf-8?B?OGFSb0xhYkdMY0xWemVncEE2OEl2bmNmaTZrOFlUL3dFT3BPOTluSnZtMXpU?=
+ =?utf-8?B?blRKTFRJUXJzMnRQdjJrWVkrZldSc1NaVU5zcFJUUGJubkdPU3dIbVNaaFk4?=
+ =?utf-8?B?amgwRHdRTUJ0c0Mrck1HUXRTWENTVFp3L1FURzlCUkZ6eU1UaGl3ampxbXpF?=
+ =?utf-8?B?a1lnOUFudEFUR01YWXpnVVBRb0hFYXhjcnRJUjRMeUw5NWtmdzNGeVdHZjVC?=
+ =?utf-8?B?OGlldVZ5dnVGZmhrY0dwRkllNEY2c2E1cEVKVG90VW1mK1NjVzN3V29Rd2Zi?=
+ =?utf-8?B?dXB2YTducEZiVUF5UEVmZkoxNUlYaE1Ob1lzMHpBWkQyTU9SSjFrdU8rODI0?=
+ =?utf-8?B?ZGVrVmUvdVA5L1RhUGtTb0VJYzRicURmU1k1aE01a3QvUDdsM0VMZzNrMHNF?=
+ =?utf-8?B?OTA5NktwT2Vwb0pPd3RGY3VyQmJGOEp2ZEdieUZqR0ZrWENrNUlicktGV2pW?=
+ =?utf-8?B?clR5QktZTkZLVTFEbGtkWTRLQ2JmZnJCbys0S1o1ZXdiWVhFdFJSUHkxMnNa?=
+ =?utf-8?B?Q1RRckZSRDVGNUV5SHlZa2JQc3hBRGhEUXE5TmNiaFc4d0dQNlJ6QVQyNEtJ?=
+ =?utf-8?B?dDdHbFJHM0JVcVZEZTFMK3QxNVBPKzJtSTFYcld0VXFqQWhrdE1zemxEa3h5?=
+ =?utf-8?B?WG9DczByL0xrczVITmc5U0J1WlZ2QWhBcjVxcVVra0llRFVVbjdpN0t6Y05t?=
+ =?utf-8?B?S3pqN0h2TGtQdHUyOXJjbnB6RGF3SlIyd2NENmpnTmlzOFo0Q01lOEtpYmdV?=
+ =?utf-8?B?MDhSeVJ5TnJUaExVa1lxQm8wa0xpd0NsYUl6NjRQVWhyZTl2N25EZmF0eXcy?=
+ =?utf-8?B?N3lVUlF2Vm9JdzdGVkpaK0ZrOEZUOFZrSnkxRUFFQmFnRnp2NkQ1WlloazA5?=
+ =?utf-8?B?c3NuWFVQQmRHRzBLL0d6NzJMOXF0ZFBtWVRzci9lWHVOcjhCVVlHQkhLRExE?=
+ =?utf-8?B?VGhNUHZuVUNjYW5zdjNJVHNvejk2cWRGeUFyYnZWVCtOMk1lS3RWcjNYWmdl?=
+ =?utf-8?B?VkxGeTh0NjNmNW1lcTZ1RUVMTmwyRGthSkcvWjVxZmovYzRGSW9PYzgyd2dO?=
+ =?utf-8?B?bXNMdVpuSlh5TUE5QStVdjlKOUhaeDBxTEczRmxjcXlmbWRoM3c2YTNFcDJN?=
+ =?utf-8?B?Zlo0SER1TEFhanZ3Ti93TFNSTkNGTWpDaVVPWTRITHcvYkNqOEhBRURLcG1X?=
+ =?utf-8?B?K1haK1N2UWNBc3hYcHhsUC80T2hvc1A5WFdwQ0NnVHN0V2xXUXI5ZUxtWDdL?=
+ =?utf-8?B?Tk4zRFBscFZUbVhOcWxWUFhoVGlXTTNlUW1YOUM4djRKVks1RkRzTldDQlNv?=
+ =?utf-8?B?czJQMkdlcUl2SjdYbGx1T0h6aXU0QzV3K2QySjlPblZyK2VXSk5YcUhLbktl?=
+ =?utf-8?B?OG0rU2VSY1dacTE5OEtCQnVqR2g3Tlp1Z0s1VkZHaXFiQ0diaTlOM3JFa2tr?=
+ =?utf-8?B?SnhWcGkzZncxRjRvK0ZSQm1oWTNrZjZwL0EyMkpsTkorZ2hrSFdsUVVoaFdm?=
+ =?utf-8?B?YU9lQlhZWXl2d0t1NFBRcExSQkl0UjdGdjhqSTBjM3dXMkdzWkNZeWx4ZXMw?=
+ =?utf-8?B?SkNRbkNQaGVoZGV4N1lEb2FRRDRGSEZ0WjFDMGsvR09EemlNZmJiZFBETjRl?=
+ =?utf-8?B?cnoxOEpQLzZmMys4ZGJhUkt1MGhTdFlnTHl4cjNjTWl3cnh4R2MxY0lNMVZv?=
+ =?utf-8?B?SmRWdkp2Rk4zTnFRQmc5K1QveHpGa3MzdG4xazBhRllsTWlqaERualdvN25U?=
+ =?utf-8?B?WXJBM1UwVjRyL1dUa25vRG4yQ292UHhaelJCbWMwank0bEJ3aGNHdmkzTDZi?=
+ =?utf-8?B?anJFN0IvYWd4aXNuVWtxR0lNSG1BNkRnL3ZjS2ZvQUJyS0k0ZDNoUHArbDZK?=
+ =?utf-8?B?Y294ekE3b0RYVDBzWGg5aC9aRDJ5RFdBQ1VPS2V2bnllR2JEVytuNVlGekpo?=
+ =?utf-8?B?U29zWkhMOWNUc2llLzdNa3RwRTFQMVAwUlJPY2VJbzhGQ0ZVNXhocHk0Ym9G?=
+ =?utf-8?Q?axIIB6iHQeY5C0kNHICLnBhUc?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7d89620d-6257-424f-efa2-08db8d38bc87
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR12MB7982.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jul 2023 17:58:22.5662
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: N7MnBbgPisGyyPBOD9cUbrXKjXO5+P++DzAwXXIxVNy0ny/926V9gOlFqYoHZ9H9xeRIvrDS1EVSK5ZA13obfQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB6333
+X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,NICE_REPLY_A,
+	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 7/25/23 10:02 AM, Stanislav Fomichev wrote:
-> On 07/25, Breno Leitao wrote:
->> On Mon, Jul 24, 2023 at 10:31:28AM -0700, Stanislav Fomichev wrote:
->>> On 07/24, Breno Leitao wrote:
->>>> Add support for getsockopt command (SOCKET_URING_OP_GETSOCKOPT), where
->>>> level is SOL_SOCKET. This is leveraging the sockptr_t infrastructure,
->>>> where a sockptr_t is either userspace or kernel space, and handled as
->>>> such.
->>>>
->>>> Function io_uring_cmd_getsockopt() is inspired by __sys_getsockopt().
->>>
->>> We probably need to also have bpf bits in the new
->>> io_uring_cmd_getsockopt?
 
-I also think this inconsistency behavior should be avoided.
 
->>
->> It might be interesting to have the BPF hook for this function as
->> well, but I would like to do it in a following patch, so, I can
->> experiment with it better, if that is OK.
+On 7/25/2023 10:31 AM, Simon Horman wrote:
+> Caution: This message originated from an External Source. Use proper caution when opening attachments, clicking links, or responding.
 > 
-> We are not using io_uring, so fine with me. However, having a way to bypass
-> get/setsockopt bpf might be problematic for some other heavy io_uring
-> users.
 > 
-> Lemme CC a bunch of Meta folks explicitly. I'm not sure what that state
-> of bpf support in io_uring.
+> On Wed, Jul 19, 2023 at 03:35:24PM -0700, Brett Creeley wrote:
+> 
+> ...
+> 
+>> diff --git a/drivers/vfio/pci/pds/lm.c b/drivers/vfio/pci/pds/lm.c
+> 
+> ...
+> 
+>> +static int pds_vfio_get_save_file(struct pds_vfio_pci_device *pds_vfio)
+>> +{
+>> +     struct device *dev = &pds_vfio->vfio_coredev.pdev->dev;
+>> +     struct pds_vfio_lm_file *lm_file;
+>> +     int err;
+>> +     u64 size;
+> 
+> Hi Brett,
+> 
+> please use reverse xmas tree - longest line to shortest -
+> for these local variable declarations.
+> 
+> https://github.com/ecree-solarflare/xmastree is your friend here.
 
-We have use cases on the "cgroup/{g,s}etsockopt". It will be a surprise when the 
-user moves from the syscall {g,s}etsockopt to SOCKET_URING_OP_*SOCKOPT and 
-figured that the bpf handling is skipped.
-
+Ah, good catch and thanks for the reference. Will fix on v13.
 
