@@ -1,118 +1,213 @@
-Return-Path: <netdev+bounces-20972-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20973-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A77076206A
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 19:45:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DFA82762071
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 19:49:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 20DA71C20F3A
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 17:45:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6D9F3280A20
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 17:49:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EC5F2592A;
-	Tue, 25 Jul 2023 17:44:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DA1325922;
+	Tue, 25 Jul 2023 17:49:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 445AB25140
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 17:44:54 +0000 (UTC)
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0149C1B8
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 10:44:53 -0700 (PDT)
-Received: by mail-pl1-x62b.google.com with SMTP id d9443c01a7336-1b9e9765f2cso30406265ad.3
-        for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 10:44:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690307092; x=1690911892;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=B59pjqUqoLv5eR+alBSWwxoWyuJwcimZEAnDNC7SrgM=;
-        b=h4yrpp1ziP1V/lGwZHWFnYUKZTeKO/5Wf8zQVnu1G3UjsNrHqP8/mfxtNErUXYQGTY
-         bxOYckEytR7hMuGinCnZxHiCyg7G7/CH7PLBi70BWepBQfOEmX2UFi6H2NNLK9+6S4DN
-         5EXmzq/7t8nVzKKvrjQEn4hE/phUxBtGOjfd/nGy1o1micSVyXaUR7cixXGJcI1cJW3a
-         R/CJGdD94dNxLpFRa2EZEXpS/zW1u91yUNdLPNe/jtwiMzFTekPt0F7RZHxEfhncK8Ch
-         hUrf0srXJhycktrGb4HTTvK/xtr6JGRC8I/2uTqHrc4yKqZyTXV6iQHaAxqFawkZXK8N
-         fOtA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690307092; x=1690911892;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=B59pjqUqoLv5eR+alBSWwxoWyuJwcimZEAnDNC7SrgM=;
-        b=L5sY2rrXyUgFlFafW3jo83u3dSjpwZP+j1xuofew8HCzvyWSwU3LInU4AAbVYML6Mp
-         9UNhgMSkIAhIhgC6ODYQI6CWrEvBbz0jGKzoSnhF8JZPCyvB/SBpUcxq+Pv7hQxw47hB
-         XeRkUckaILCYdestfSA7AYTmbdWuV0H8YUDyYeG2MvB1vrAm1APszu622DAz4/pROJ7L
-         o97nBAtW0LXRwWbH1qIh7nEPnX3TLgVbmI16ADSj0oNae3WOkVTiCd18WQW3uC94Ndn9
-         A9qLU/5w104beCjy73TGwJM+0swNr/GSlViVf20JegsNcQxubiqok/DEIH8DMhfDYFq0
-         OZaA==
-X-Gm-Message-State: ABy/qLYqp8B8xtmCOvpCIjLwpm0snYjY+98MQVaZeh3EUXNczGqKdfEU
-	0DwgsPpSrCtmkYJxKhpRciYwHNJgEGY=
-X-Google-Smtp-Source: APBJJlHd+ErsVOyCiC1NmXqwPjPpr9Jkl/5LOfWqRs6eANJ6fOtYoZMVrOWkpxEhY8RHpwez6KtZkQ==
-X-Received: by 2002:a17:902:ec8c:b0:1b9:dea2:800f with SMTP id x12-20020a170902ec8c00b001b9dea2800fmr12752872plg.8.1690307092295;
-        Tue, 25 Jul 2023 10:44:52 -0700 (PDT)
-Received: from ?IPv6:2605:59c8:448:b800:82ee:73ff:fe41:9a02? ([2605:59c8:448:b800:82ee:73ff:fe41:9a02])
-        by smtp.googlemail.com with ESMTPSA id a12-20020a170902eccc00b001bbc9bd51a8sm118678plh.229.2023.07.25.10.44.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Jul 2023 10:44:51 -0700 (PDT)
-Message-ID: <50201d64ba71669422c9bc2900179887d11a974e.camel@gmail.com>
-Subject: Re: [PATCH v2 1/1] net: ipv4: fix return value check in
- esp_remove_trailer()
-From: Alexander H Duyck <alexander.duyck@gmail.com>
-To: Yuanjun Gong <ruc_gongyuanjun@163.com>, dsahern@kernel.org
-Cc: herbert@gondor.apana.org.au, netdev@vger.kernel.org, 
-	steffen.klassert@secunet.com
-Date: Tue, 25 Jul 2023 10:44:50 -0700
-In-Reply-To: <20230725064031.4472-1-ruc_gongyuanjun@163.com>
-References: <f6831ace-df6c-f0bd-188e-a2b23a75c1a8@kernel.org>
-	 <20230725064031.4472-1-ruc_gongyuanjun@163.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.3 (3.48.3-1.fc38) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9076125140
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 17:49:28 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 668351B8;
+	Tue, 25 Jul 2023 10:49:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=WVszs+fPV5VJocGPJkqZKe75524bLLu7x9J+uwzPtJU=; b=0PcLQR3XYRdPqWSnrpPNmhk0fz
+	IfRZ5L4LfwiHloTc18gvxXessmJlAYjKCTwndg6y05chbPM+LMDEFRfHBcVXuDA4PpJFQ2su0bsCc
+	LZEJ0h+0TNOehQHyZqQtZPKA0LX8mU10mYDYXFmN/Yqg6roLzGqom43oH1eJb8O7QMtY9WkJ4KhYA
+	y/vhtWnaCuPscOuahc8oPg4AI1/331opk3c8ThOJq5XV8ksEyVhNl8QY0pnWd0Yyd41vA6MslfUMx
+	+YMXmyDX/4JaJTev9MalSiDJUKdPgxHr+pStkd/3pEWXSvOH7CRKm5vaG2zAJQHySGu5oddQ57+yX
+	IXHzF9vw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:52426)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qOM9x-0002PW-07;
+	Tue, 25 Jul 2023 18:49:21 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qOM9v-00022L-G6; Tue, 25 Jul 2023 18:49:19 +0100
+Date: Tue, 25 Jul 2023 18:49:19 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Ante Knezic <ante.knezic@helmholz.de>
+Cc: Vladimir Oltean <olteanv@gmail.com>, netdev@vger.kernel.org,
+	andrew@lunn.ch, f.fainelli@gmail.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v3] net: dsa: mv88e6xxx: Add erratum 3.14 for
+ 88E6390X and 88E6190X
+Message-ID: <ZMALH03Fbp3wKkO2@shell.armlinux.org.uk>
+References: <20230721102618.13408-1-ante.knezic@helmholz.de>
+ <20230721102618.13408-1-ante.knezic@helmholz.de>
+ <20230725172343.qcqmcoygyhcgunmh@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230725172343.qcqmcoygyhcgunmh@skbuf>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+	SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, 2023-07-25 at 14:40 +0800, Yuanjun Gong wrote:
-> return an error number if an unexpected result is returned by
-> pskb_tirm() in esp_remove_trailer().
->=20
-> Signed-off-by: Yuanjun Gong <ruc_gongyuanjun@163.com>
-> ---
->  net/ipv4/esp4.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
->=20
-> diff --git a/net/ipv4/esp4.c b/net/ipv4/esp4.c
-> index ba06ed42e428..b435e3fe4dc6 100644
-> --- a/net/ipv4/esp4.c
-> +++ b/net/ipv4/esp4.c
-> @@ -732,7 +732,9 @@ static inline int esp_remove_trailer(struct sk_buff *=
-skb)
->  		skb->csum =3D csum_block_sub(skb->csum, csumdiff,
->  					   skb->len - trimlen);
->  	}
-> -	pskb_trim(skb, skb->len - trimlen);
-> +	ret =3D pskb_trim(skb, skb->len - trimlen);
-> +	if (ret)
-> +		goto out;
-> =20
->  	ret =3D nexthdr[1];
-> =20
+Sorry, I don't have the original email to reply to, and this is the
+first which includes most of the patch. This reply is primerily for
+Ante Knezic.
 
-In what case would you encounter this error? From what I can tell it
-looks like there are checks in the callers, specifically the call to
-pskb_may_pull() at the start of esp_input() that will go through and
-automatically eliminate all the potential reasons for this to fail. So
-I am not sure what the point is in adding exception handling for an
-exception that is already handled.
+On Tue, Jul 25, 2023 at 08:23:43PM +0300, Vladimir Oltean wrote:
+> On Fri, Jul 21, 2023 at 12:26:18PM +0200, Ante Knezic wrote:
+> > diff --git a/drivers/net/dsa/mv88e6xxx/pcs-639x.c b/drivers/net/dsa/mv88e6xxx/pcs-639x.c
+> > index 98dd49dac421..50b14804c360 100644
+> > --- a/drivers/net/dsa/mv88e6xxx/pcs-639x.c
+> > +++ b/drivers/net/dsa/mv88e6xxx/pcs-639x.c
+> > @@ -20,6 +20,7 @@ struct mv88e639x_pcs {
+> >  	struct mdio_device mdio;
+> >  	struct phylink_pcs sgmii_pcs;
+> >  	struct phylink_pcs xg_pcs;
+> > +	struct mv88e6xxx_chip *chip;
+
+	bool erratum_3_14;
+
+> >  	bool supports_5g;
+> >  	phy_interface_t interface;
+> >  	unsigned int irq;
+> > @@ -205,13 +206,52 @@ static void mv88e639x_sgmii_pcs_pre_config(struct phylink_pcs *pcs,
+> >  	mv88e639x_sgmii_pcs_control_pwr(mpcs, false);
+> >  }
+> >  
+> > +static int mv88e6390_erratum_3_14(struct mv88e639x_pcs *mpcs)
+> > +{
+> > +	const int lanes[] = { MV88E6390_PORT9_LANE0, MV88E6390_PORT9_LANE1,
+> > +		MV88E6390_PORT9_LANE2, MV88E6390_PORT9_LANE3,
+> > +		MV88E6390_PORT10_LANE0, MV88E6390_PORT10_LANE1,
+> > +		MV88E6390_PORT10_LANE2, MV88E6390_PORT10_LANE3 };
+> > +	struct mdio_device mdio;
+> > +	int err, i;
+> > +
+> > +	/* 88e6190x and 88e6390x errata 3.14:
+> > +	 * After chip reset, SERDES reconfiguration or SERDES core
+> > +	 * Software Reset, the SERDES lanes may not be properly aligned
+> > +	 * resulting in CRC errors
+> > +	 */
+
+Does the errata say that _all_ lanes need this treatment, even when
+they are not being used as a group (e.g. for XAUI) ?
+
+> > +
+> > +	mdio.bus = mpcs->mdio.bus;
+> > +
+> > +	for (i = 0; i < ARRAY_SIZE(lanes); i++) {
+> > +		mdio.addr = lanes[i];
+> > +
+> > +		err = mdiodev_c45_write(&mdio, MDIO_MMD_PHYXS,
+> > +					0xf054, 0x400C);
+> > +		if (err)
+> > +			return err;
+> > +
+> > +		err = mdiodev_c45_write(&mdio, MDIO_MMD_PHYXS,
+> > +					0xf054, 0x4000);
+> > +		if (err)
+> > +			return err;
+> 
+> I'm not sure which way is preferred by PHY maintainers, but it seems to
+> be a useless complication to simulate that you have a struct mdio_device
+> for the other lanes when you don't. It appears more appropriate to just
+> use mdiobus_c45_write(mpcs->mdio.bus, lanes[i]).
+> 
+> There's also the locking question (with the big caveat that we don't
+> know what the register writes do!). There's locking at the bus level,
+> but the MDIO device isn't locked. So phylink on those other PCSes can
+> still do stuff, even in-between the first and the second write to
+> undocumented register 0xf054.
+> 
+> I can speculate that writing 0x400c -> 0x4000 is something like: set
+> RX_RESET | TX_RESET followed by clear RX_RESET | TX_RESET. Is it ok if
+> stuff happens in between these writes - will it stick, or does this
+> logically interact with anything else in any other way? I guess we won't
+> know. I might be a bit closer to being okay with it if you could confirm
+> that some other (unrelated) register write to the PCS does make it
+> through (and can be read back) in between the 2 erratum writes.
+> 
+> > +	}
+> > +
+> > +	return 0;
+> > +}
+> > +
+> >  static int mv88e639x_sgmii_pcs_post_config(struct phylink_pcs *pcs,
+> >  					   phy_interface_t interface)
+> >  {
+> >  	struct mv88e639x_pcs *mpcs = sgmii_pcs_to_mv88e639x_pcs(pcs);
+> > +	struct mv88e6xxx_chip *chip = mpcs->chip;
+> >  
+> >  	mv88e639x_sgmii_pcs_control_pwr(mpcs, true);
+> >  
+> > +	if (chip->info->prod_num == MV88E6XXX_PORT_SWITCH_ID_PROD_6190X ||
+> > +	    chip->info->prod_num == MV88E6XXX_PORT_SWITCH_ID_PROD_6390X)
+> > +		mv88e6390_erratum_3_14(mpcs);
+
+	int err;
+...
+	if (mpcs->erratum_3_14) {
+		err = mv88e6390_erratum_3_14(mpcs);
+		if (err)
+			dev_err(mpcs->mdio.dev.parent,
+				"failed to apply erratum 3.14: %pe\n",
+				ERR_PTR(err));
+	}
+
+> 
+> You could at least print an error if a write failure occurred, so that
+> it doesn't go completely unnoticed.
+> 
+> > +
+> >  	return 0;
+> >  }
+> >  
+> > @@ -523,6 +563,7 @@ static int mv88e6390_pcs_init(struct mv88e6xxx_chip *chip, int port)
+> >  	mpcs->sgmii_pcs.neg_mode = true;
+> >  	mpcs->xg_pcs.ops = &mv88e6390_xg_pcs_ops;
+> >  	mpcs->xg_pcs.neg_mode = true;
+> > +	mpcs->chip = chip;
+
+	if (chip->info->prod_num == MV88E6XXX_PORT_SWITCH_ID_PROD_6190X ||
+	    chip->info->prod_num == MV88E6XXX_PORT_SWITCH_ID_PROD_6390X)
+		mpcs->erratum_3_14 = true;
+
+> >  
+> >  	err = mv88e639x_pcs_setup_irq(mpcs, chip, port);
+> >  	if (err)
+> > @@ -873,6 +914,7 @@ static int mv88e6393x_pcs_init(struct mv88e6xxx_chip *chip, int port)
+> >  	mpcs->xg_pcs.ops = &mv88e6393x_xg_pcs_ops;
+> >  	mpcs->xg_pcs.neg_mode = true;
+> >  	mpcs->supports_5g = true;
+> > +	mpcs->chip = chip;
+
+Presumably the 6393x isn't affected by this, so this is not necessary
+with the above changes.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
