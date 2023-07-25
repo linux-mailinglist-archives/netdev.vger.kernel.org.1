@@ -1,58 +1,45 @@
-Return-Path: <netdev+bounces-20815-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20816-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4AE9376132C
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 13:08:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47A1B761364
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 13:10:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7794828181D
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 11:08:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 796C01C20CB8
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 11:10:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAA1F1D302;
-	Tue, 25 Jul 2023 11:08:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53A371D302;
+	Tue, 25 Jul 2023 11:10:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EAA91EA91;
-	Tue, 25 Jul 2023 11:08:32 +0000 (UTC)
-Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7AD553AAD;
-	Tue, 25 Jul 2023 04:08:29 -0700 (PDT)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R841e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046056;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0VoCypj._1690283304;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0VoCypj._1690283304)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4906C1EA7E
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 11:10:27 +0000 (UTC)
+Received: from out30-124.freemail.mail.aliyun.com (out30-124.freemail.mail.aliyun.com [115.124.30.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE1CD199D
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 04:10:24 -0700 (PDT)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R341e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046049;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=8;SR=0;TI=SMTPD_---0VoCzvI0_1690283420;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0VoCzvI0_1690283420)
           by smtp.aliyun-inc.com;
-          Tue, 25 Jul 2023 19:08:25 +0800
-Message-ID: <1690283243.4048996-1-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH vhost v11 05/10] virtio_ring: introduce virtqueue_dma_dev()
-Date: Tue, 25 Jul 2023 19:07:23 +0800
+          Tue, 25 Jul 2023 19:10:21 +0800
+Message-ID: <1690283405.6083395-2-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH net] virtio-net: fix race between set queues and probe
+Date: Tue, 25 Jul 2023 19:10:05 +0800
 From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Christoph Hellwig <hch@infradead.org>,
+To: Jason Wang <jasowang@redhat.com>
+Cc: davem@davemloft.net,
+ edumazet@google.com,
+ kuba@kernel.org,
+ pabeni@redhat.com,
  virtualization@lists.linux-foundation.org,
- Jason Wang <jasowang@redhat.com>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
  netdev@vger.kernel.org,
- bpf@vger.kernel.org
-References: <20230710034237.12391-1-xuanzhuo@linux.alibaba.com>
- <20230710034237.12391-6-xuanzhuo@linux.alibaba.com>
- <ZK/cxNHzI23I6efc@infradead.org>
- <20230713104805-mutt-send-email-mst@kernel.org>
- <ZLjSsmTfcpaL6H/I@infradead.org>
- <20230720131928-mutt-send-email-mst@kernel.org>
- <ZL6qPvd6X1CgUD4S@infradead.org>
- <1690251228.3455179-1-xuanzhuo@linux.alibaba.com>
- <20230725033321-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20230725033321-mutt-send-email-mst@kernel.org>
+ mst@redhat.com,
+ jasowang@redhat.com
+References: <20230725072049.617289-1-jasowang@redhat.com>
+In-Reply-To: <20230725072049.617289-1-jasowang@redhat.com>
 X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
 	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
 	T_SCC_BODY_TEXT_LINE,UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL
@@ -65,42 +52,45 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 
-On Tue, 25 Jul 2023 03:34:34 -0400, "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> On Tue, Jul 25, 2023 at 10:13:48AM +0800, Xuan Zhuo wrote:
-> > On Mon, 24 Jul 2023 09:43:42 -0700, Christoph Hellwig <hch@infradead.org> wrote:
-> > > On Thu, Jul 20, 2023 at 01:21:07PM -0400, Michael S. Tsirkin wrote:
-> > > > Well I think we can add wrappers like virtio_dma_sync and so on.
-> > > > There are NOP for non-dma so passing the dma device is harmless.
-> > >
-> > > Yes, please.
-> >
-> >
-> > I am not sure I got this fully.
-> >
-> > Are you mean this:
-> > https://lore.kernel.org/all/20230214072704.126660-8-xuanzhuo@linux.alibaba.com/
-> > https://lore.kernel.org/all/20230214072704.126660-9-xuanzhuo@linux.alibaba.com/
-> >
-> > Then the driver must do dma operation(map and sync) by these virtio_dma_* APIs.
-> > No care the device is non-dma device or dma device.
+On Tue, 25 Jul 2023 03:20:49 -0400, Jason Wang <jasowang@redhat.com> wrote:
+> A race were found where set_channels could be called after registering
+> but before virtnet_set_queues() in virtnet_probe(). Fixing this by
+> moving the virtnet_set_queues() before netdevice registering. While at
+> it, use _virtnet_set_queues() to avoid holding rtnl as the device is
+> not even registered at that time.
 >
-> yes
+> Fixes: a220871be66f ("virtio-net: correctly enable multiqueue")
+> Signed-off-by: Jason Wang <jasowang@redhat.com>
+
+Reviewed-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+
+> ---
+>  drivers/net/virtio_net.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 >
-> > Then the AF_XDP must use these virtio_dma_* APIs for virtio device.
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> index 0db14f6b87d3..1270c8d23463 100644
+> --- a/drivers/net/virtio_net.c
+> +++ b/drivers/net/virtio_net.c
+> @@ -4219,6 +4219,8 @@ static int virtnet_probe(struct virtio_device *vdev)
+>  	if (vi->has_rss || vi->has_rss_hash_report)
+>  		virtnet_init_default_rss(vi);
 >
-> We'll worry about AF_XDP when the patch is posted.
-
-YES.
-
-We discussed it. They voted 'no'.
-
-http://lore.kernel.org/all/20230424082856.15c1e593@kernel.org
-
-Thanks.
-
-
+> +	_virtnet_set_queues(vi, vi->curr_queue_pairs);
+> +
+>  	/* serialize netdev register + virtio_device_ready() with ndo_open() */
+>  	rtnl_lock();
 >
+> @@ -4257,8 +4259,6 @@ static int virtnet_probe(struct virtio_device *vdev)
+>  		goto free_unregister_netdev;
+>  	}
+>
+> -	virtnet_set_queues(vi, vi->curr_queue_pairs);
+> -
+>  	/* Assume link up if device can't report link status,
+>  	   otherwise get link status from config. */
+>  	netif_carrier_off(dev);
 > --
-> MST
+> 2.39.3
 >
 
