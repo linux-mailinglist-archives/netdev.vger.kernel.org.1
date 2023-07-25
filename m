@@ -1,83 +1,69 @@
-Return-Path: <netdev+bounces-20923-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20924-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32E4F761E9B
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 18:36:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8886B761EAB
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 18:37:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6269F1C20F15
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 16:36:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B9C311C20F51
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 16:37:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE6C61F17F;
-	Tue, 25 Jul 2023 16:36:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB1301F926;
+	Tue, 25 Jul 2023 16:37:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E34323C23
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 16:36:22 +0000 (UTC)
-Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A29F41723
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 09:36:20 -0700 (PDT)
-Received: by mail-pf1-x42a.google.com with SMTP id d2e1a72fcca58-666eec46206so5332468b3a.3
-        for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 09:36:20 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A09211F17F
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 16:37:30 +0000 (UTC)
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B8F41737
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 09:37:28 -0700 (PDT)
+Received: by mail-pj1-x102b.google.com with SMTP id 98e67ed59e1d1-2680eee423aso1075218a91.2
+        for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 09:37:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20221208.gappssmtp.com; s=20221208; t=1690302980; x=1690907780;
+        d=networkplumber-org.20221208.gappssmtp.com; s=20221208; t=1690303048; x=1690907848;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:subject:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=A97CSwlbfr210L3xTQ2jj0vKUT2FgRDInPwyOX20/gE=;
-        b=VRysFcXRTefeFQBE0UR6NDP+PAQQjgwFNVpTR8WfNFrozyrp+1T0W7dkICBUD122V7
-         eQhtA7g7ciSBBGSQlMx5iahj207wZkIO/O0/YAltwAI8B9ujueQeUJ4QD+EnuZ9tGOZz
-         kfEKTVbrtx/NaHdNbYltAOIMjG5L1AQRuaek0DS34N5huJoT1ZZTEPrZdP+2HdbUGzJW
-         14PjctGmCeVcMqxCfTjnHplB0aM9EZzqcqMHcMGNrXT2hKCiVvGytfY+zh5oMppE1VQf
-         +OYYrJ0TdB/Q2SKql51mhCi3NCVWitFr0D0NHd9ml71JPnOKfaL8tr2bNVJ/Oi6ii13E
-         9QFQ==
+        bh=IxV8UE2eWk1ycwtiduTKw0mPoDkEOgJdUW/6WyyR2n4=;
+        b=pbaEJs9JRSuOofn/kgGZHeCbSDeDo8uLApQF9OQ7y/aW2GWzvu7VyWf7/KZUi1xImy
+         Ud9TyECHDEecWDUhkRdunjHeSPMv9JbMHpKjryH5w7S7dN4oJUDi9dMqISkLyY8WwQ+B
+         /+dGXUfECITUl6IYB4UBqIg6DB8dUps+wjVqN0Iv7ZkFeky4VU9YRzgiwNm2Dl0LX/Tt
+         DTQ19nNXxPX8u6f4MUbyyNoj9H1nkfHWHBZ58F5KEv7KgsAuBDKlxMF0fO5E9jk/oA/E
+         l6CS0/ztxqcfbADR8NFSCH/T02YNDQY3JU8SWClU1QdRCLy/rrbb+Q2s/u+v5I+NAqTZ
+         Fz3g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690302980; x=1690907780;
+        d=1e100.net; s=20221208; t=1690303048; x=1690907848;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=A97CSwlbfr210L3xTQ2jj0vKUT2FgRDInPwyOX20/gE=;
-        b=dmfghQlgx3po9FRnHWSi2XCRjJCGPCUmqZmecLHfj81iuik0G/b+89BRBOu7yZfda0
-         wiZc64d57u7mGgwNXqIMhTe4bhZrT3D9eJb6oPgXyzJtLygiGJlyJ9KONxsr81pVZWvo
-         AXVB+xTqUoCgP/9DuVOB2ppbXEXh9HtLvQIvd2rOddqkop90C6R2OZV3FAvEsi41DW6E
-         oA6Z3oseZHkmH90ARnHO6R0iSDOri1betgY/LAchCNBNQvoZXJKSTTUlb9tbT086qGhc
-         aEbKivbjWj7dsExRhhgXmoCNDgZZC1IgmQ3ycHYxAfKIrsOfUnCdnxL5CUjpo8PmNcVd
-         P64A==
-X-Gm-Message-State: ABy/qLY0M2nCDs0jvKu/xvhyOls84IMKwAoDhfSyVizizoPWVWiVHJPR
-	l2FNsmNTPhMY9VGQ3GzOvBwzHA==
-X-Google-Smtp-Source: APBJJlF4Q5goY33ok4MsLz2bafCQ34dB7Bd0Vs7XQAJPCYP93GYqwi8qz52aspKgRe+xdEV68Cp3Bg==
-X-Received: by 2002:a05:6a00:1409:b0:686:24e1:d12e with SMTP id l9-20020a056a00140900b0068624e1d12emr14484091pfu.30.1690302980077;
-        Tue, 25 Jul 2023 09:36:20 -0700 (PDT)
+        bh=IxV8UE2eWk1ycwtiduTKw0mPoDkEOgJdUW/6WyyR2n4=;
+        b=RfeEV5UmV/pFGZKleexdnLEDy/ci/X0VnrD99E4EURexIQPjJa3C1Q6fIJpjq/KgSb
+         9r4/EVU5HIphO/RlCBSje5QqWMW1HuUI3sgrimFRIiGYP2/XEoOif327grOn0XYaH9kg
+         WO85JtxC2oEnOgw9I9uG1PSFe+VRGuDRdLeFoBBvrmPgzeR7Y0XN0y9RewszLb91tdx0
+         lH+WTRyyItCopyJU6K1JaadfabBis/ngY3he35v/A8D4Gw4FHhtQ3lHKN7FSuvLc5SjW
+         oDeUtxT1lux2K0EngO69u3B8AhuFjBKqfxI+7gfM7YU5nC0zWg1/e2oQ1sqGU9uNivG1
+         4rxA==
+X-Gm-Message-State: ABy/qLZDKpq0nlIZrWeK6Yere1escutkbfq/NnBwB2Ov6XNEFn21QMZq
+	KL2IbgkV1W+spZqxKRjoCRXtGzsRT8VzhyN0jPK8UQ==
+X-Google-Smtp-Source: APBJJlHnZLqgw0QUx1cj8ftYxG/ylXHVKNz3AYGrCn05rLepXNvW9exBCI45FDIEOQan9EdZWthY6Q==
+X-Received: by 2002:a17:90a:8c0d:b0:268:4dcb:b09e with SMTP id a13-20020a17090a8c0d00b002684dcbb09emr121060pjo.46.1690303047789;
+        Tue, 25 Jul 2023 09:37:27 -0700 (PDT)
 Received: from hermes.local (204-195-127-207.wavecable.com. [204.195.127.207])
-        by smtp.gmail.com with ESMTPSA id h23-20020aa786d7000000b0067f11aa76cbsm9856360pfo.108.2023.07.25.09.36.19
+        by smtp.gmail.com with ESMTPSA id 5-20020a17090a190500b0025bfda134ccsm8951426pjg.16.2023.07.25.09.37.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Jul 2023 09:36:19 -0700 (PDT)
-Date: Tue, 25 Jul 2023 09:36:17 -0700
+        Tue, 25 Jul 2023 09:37:27 -0700 (PDT)
+Date: Tue, 25 Jul 2023 09:37:25 -0700
 From: Stephen Hemminger <stephen@networkplumber.org>
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: Ido Schimmel <idosch@idosch.org>, David Ahern <dsahern@kernel.org>,
- netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Thomas Haller <thaller@redhat.com>
-Subject: Re: [PATCH net-next] ipv4/fib: send RTM_DELROUTE notify when flush
- fib
-Message-ID: <20230725093617.44887eb1@hermes.local>
-In-Reply-To: <ZL+F6zUIXfyhevmm@Laptop-X1>
-References: <ZLZnGkMxI+T8gFQK@shredder>
-	<20230718085814.4301b9dd@hermes.local>
-	<ZLjncWOL+FvtaHcP@Laptop-X1>
-	<ZLlE5of1Sw1pMPlM@shredder>
-	<ZLngmOaz24y5yLz8@Laptop-X1>
-	<d6a204b1-e606-f6ad-660a-28cc5469be2e@kernel.org>
-	<ZLobpQ7jELvCeuoD@Laptop-X1>
-	<ZLzY42I/GjWCJ5Do@shredder>
-	<ZL48xbowL8QQRr9s@Laptop-X1>
-	<20230724084820.4aa133cc@hermes.local>
-	<ZL+F6zUIXfyhevmm@Laptop-X1>
+To: Nicolas Escande <nico.escande@gmail.com>
+Cc: netdev@vger.kernel.org
+Subject: Re: [iproute2] bridge: link: allow filtering on bridge name
+Message-ID: <20230725093725.6d52cc03@hermes.local>
+In-Reply-To: <20230725092242.3752387-1-nico.escande@gmail.com>
+References: <20230725092242.3752387-1-nico.escande@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -92,27 +78,18 @@ X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, 25 Jul 2023 16:20:59 +0800
-Hangbin Liu <liuhangbin@gmail.com> wrote:
+On Tue, 25 Jul 2023 11:22:42 +0200
+Nicolas Escande <nico.escande@gmail.com> wrote:
 
-> On Mon, Jul 24, 2023 at 08:48:20AM -0700, Stephen Hemminger wrote:
-> > On Mon, 24 Jul 2023 16:56:37 +0800
-> > Hangbin Liu <liuhangbin@gmail.com> wrote:
-> >   
-> > > The NetworkManager keeps a cache of the routes. Missing/Wrong events mean that
-> > > the cache becomes inconsistent. The IPv4 will not send src route delete info
-> > > if it's bond to other device. While IPv6 only modify the src route instead of
-> > > delete it, and also no notify. So NetworkManager developers complained and
-> > > hope to have a consistent and clear notification about route modify/delete.  
-> > 
-> > Read FRR they get it right. The routing daemons have to track kernel,
-> > and the semantics have been worked out for years.  
+> When using 'brige link show' we can either dump all links enslaved to any bridge
+> (called without arg ) or display a single link (called with dev arg).
+> However there is no way to dummp all links of a single bridge.
 > 
-> Yes, normally the routing daemon need to track kernel. On the other hand,
-> the kernel also need to make a clear feedback. The userspace developers may
-> not know the kernel code very well. The unclear/inconsistent notification
-> would make them confused.
+> To do so, this adds new optional 'master XXX' arg to 'bridge link show' command.
+> usage: bridge link show master br0
+> 
+> Signed-off-by: Nicolas Escande <nico.escande@gmail.com>
 
-Right, that should be addressed by clearer documentation of the semantics
-and the rational.
+Looks good to me, but we really need to address removing the term master
+from bridge utility.
 
