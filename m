@@ -1,147 +1,91 @@
-Return-Path: <netdev+bounces-20900-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20901-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A8E7761D87
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 17:41:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32B16761D9A
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 17:46:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 03EE028176A
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 15:41:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 600421C20EF5
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 15:46:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCDCE23BE7;
-	Tue, 25 Jul 2023 15:41:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4B1223BEE;
+	Tue, 25 Jul 2023 15:46:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCBEC1F173
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 15:41:15 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 555931FD0
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 08:41:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1690299673;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Ywc41/BPTk/JOAzpj2Ndsq/haHQiohuM6GBycryh5is=;
-	b=emCsZIr6jKqZ7vlyZ45ONeGyycQJM+RgbU+DjUId2IW5s96A6Yxu3yxi8wJYk/0a8xuCso
-	OiMtvCYPuRz5CVxqbVphHMnB+9/QrNPG5kusnNLuY5VbqqlV2yKNhiQfdW7tNbTFKmw3z3
-	GUjQ9julY7wuWF4A3CleEWJy+Vb6qwQ=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-269-0jk-U6eQN8eRqCvWOgn5BQ-1; Tue, 25 Jul 2023 11:41:12 -0400
-X-MC-Unique: 0jk-U6eQN8eRqCvWOgn5BQ-1
-Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-7659d103147so783141385a.3
-        for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 08:41:12 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690299672; x=1690904472;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Ywc41/BPTk/JOAzpj2Ndsq/haHQiohuM6GBycryh5is=;
-        b=i5csOcYr4C1m2LiUU0A9HfZOINQhtOyc5z4pEmDOYMgL732bLgt5qUosZ48+Y/3Faw
-         AW5em3tjPU02elu1k37TQgPJilSJclfoIlh0F8ztgOe3HI9mHcwphp/krjKfQ0LVb3Yv
-         uPYr25gyCA0immx/5sUx7NYxtzXCYuBy6aYg+mPw5YkPsP9IGKMkQJ0TIS/t2y1uCt4q
-         g5XFLd43RhSS2xkghQLCqQcT30NEDfituAKKc8nEqT7A6UtWIeJLgOBtQrniqH5N28wG
-         Cv4cVMlqc79uEixVJdM1e+hPWBNL6/CKfrPt5mglkTRpla6egIPOA3BZWp33rWuF1vju
-         olqA==
-X-Gm-Message-State: ABy/qLYUUEHKLSOhjKi/P4DH/0g61SMVBpd8mEthAwLK5EXV1pHCB7uL
-	UEkcf5pYWiZmOfa/c/RoS/vpDRkJKhHUPr/0YfG9KTlEsFQUrLqE6yI9nDml9WKJjUm96YtCUzU
-	dhp4neHoPkN2yMalG
-X-Received: by 2002:ac8:5f0c:0:b0:405:47aa:742f with SMTP id x12-20020ac85f0c000000b0040547aa742fmr3527184qta.32.1690299671822;
-        Tue, 25 Jul 2023 08:41:11 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlHA1b4My1rtvlYJYA1W4nzseTpuRek/vvdBo/xbpSdUcXuiki19nX3FPgKAFwQK2ije6YiWNA==
-X-Received: by 2002:ac8:5f0c:0:b0:405:47aa:742f with SMTP id x12-20020ac85f0c000000b0040547aa742fmr3527157qta.32.1690299671554;
-        Tue, 25 Jul 2023 08:41:11 -0700 (PDT)
-Received: from sgarzare-redhat ([193.207.153.113])
-        by smtp.gmail.com with ESMTPSA id g1-20020ac870c1000000b00404f8e9902dsm4132859qtp.2.2023.07.25.08.41.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Jul 2023 08:41:11 -0700 (PDT)
-Date: Tue, 25 Jul 2023 17:41:05 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Bobby Eshleman <bobby.eshleman@bytedance.com>, kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kernel@sberdevices.ru, 
-	oxffffaa@gmail.com
-Subject: Re: [RFC PATCH v2 4/4] vsock/test: MSG_PEEK test for SOCK_SEQPACKET
-Message-ID: <lkfzuvv53lyycpun27knppjhk46lyqrz4idvzj7fzer2566y5t@mtc7v33q3erg>
-References: <20230719192708.1775162-1-AVKrasnov@sberdevices.ru>
- <20230719192708.1775162-5-AVKrasnov@sberdevices.ru>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C61141F173
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 15:46:47 +0000 (UTC)
+Received: from albert.telenet-ops.be (albert.telenet-ops.be [IPv6:2a02:1800:110:4::f00:1a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C56A82102
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 08:46:45 -0700 (PDT)
+Received: from ramsan.of.borg ([IPv6:2a02:1810:ac12:ed40:2d50:2ea4:d4e1:2af3])
+	by albert.telenet-ops.be with bizsmtp
+	id RTmj2A0022TBYXr06TmjAN; Tue, 25 Jul 2023 17:46:43 +0200
+Received: from rox.of.borg ([192.168.97.57])
+	by ramsan.of.borg with esmtp (Exim 4.95)
+	(envelope-from <geert@linux-m68k.org>)
+	id 1qOKF3-002Vht-Ta;
+	Tue, 25 Jul 2023 17:46:43 +0200
+Received: from geert by rox.of.borg with local (Exim 4.95)
+	(envelope-from <geert@linux-m68k.org>)
+	id 1qOKFH-009cV7-16;
+	Tue, 25 Jul 2023 17:46:43 +0200
+From: Geert Uytterhoeven <geert+renesas@glider.be>
+To: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Justin Chen <justin.chen@broadcom.com>,
+	Simon Horman <simon.horman@corigine.com>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Geert Uytterhoeven <geert+renesas@glider.be>
+Subject: [PATCH net] bcmasp: BCMASP should depend on ARCH_BRCMSTB
+Date: Tue, 25 Jul 2023 17:46:37 +0200
+Message-Id: <1e8b998aa8dcc6e38323e295ee2430b48245cc79.1690299794.git.geert+renesas@glider.be>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20230719192708.1775162-5-AVKrasnov@sberdevices.ru>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Jul 19, 2023 at 10:27:08PM +0300, Arseniy Krasnov wrote:
->This adds MSG_PEEK test for SOCK_SEQPACKET. It works in the same way as
->SOCK_STREAM test, except it also tests MSG_TRUNC flag.
->
->Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
->---
-> tools/testing/vsock/vsock_test.c | 58 +++++++++++++++++++++++++++++---
-> 1 file changed, 54 insertions(+), 4 deletions(-)
->
->diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
->index 444a3ff0681f..2ca2cbfa9808 100644
->--- a/tools/testing/vsock/vsock_test.c
->+++ b/tools/testing/vsock/vsock_test.c
->@@ -257,14 +257,19 @@ static void test_stream_multiconn_server(const struct test_opts *opts)
->
-> #define MSG_PEEK_BUF_LEN 64
->
->-static void test_stream_msg_peek_client(const struct test_opts *opts)
->+static void __test_msg_peek_client(const struct test_opts *opts,
+The Broadcom ASP 2.0 Ethernet controller is only present on Broadcom STB
+SoCs.  Hence add a dependency on ARCH_BRCMSTB, to prevent asking the
+user about this driver when configuring a kernel without Broadcom
+ARM-based set-top box chipset support.
 
-Let's stay with just test_msg_peek_client(), WDYT?
+Fixes: 490cb412007de593 ("net: bcmasp: Add support for ASP2.0 Ethernet controller")
+Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+---
+ drivers/net/ethernet/broadcom/Kconfig | 1 +
+ 1 file changed, 1 insertion(+)
 
->+				   bool seqpacket)
-> {
-> 	unsigned char buf[MSG_PEEK_BUF_LEN];
-> 	ssize_t send_size;
-> 	int fd;
-> 	int i;
->
->-	fd = vsock_stream_connect(opts->peer_cid, 1234);
->+	if (seqpacket)
->+		fd = vsock_seqpacket_connect(opts->peer_cid, 1234);
->+	else
->+		fd = vsock_stream_connect(opts->peer_cid, 1234);
->+
-> 	if (fd < 0) {
-> 		perror("connect");
-> 		exit(EXIT_FAILURE);
->@@ -290,7 +295,8 @@ static void test_stream_msg_peek_client(const struct test_opts *opts)
-> 	close(fd);
-> }
->
->-static void test_stream_msg_peek_server(const struct test_opts *opts)
->+static void __test_msg_peek_server(const struct test_opts *opts,
-
-Same here.
-
-The rest LGTM!
-
-Also the whole series should be ready for net-next, right?
-
-Stefano
+diff --git a/drivers/net/ethernet/broadcom/Kconfig b/drivers/net/ethernet/broadcom/Kconfig
+index d4166141145d631c..75ca3ddda1f5e09f 100644
+--- a/drivers/net/ethernet/broadcom/Kconfig
++++ b/drivers/net/ethernet/broadcom/Kconfig
+@@ -257,6 +257,7 @@ config BNXT_HWMON
+ 
+ config BCMASP
+ 	tristate "Broadcom ASP 2.0 Ethernet support"
++	depends on ARCH_BRCMSTB || COMPILE_TEST
+ 	default ARCH_BRCMSTB
+ 	depends on OF
+ 	select MII
+-- 
+2.34.1
 
 
