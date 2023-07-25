@@ -1,154 +1,172 @@
-Return-Path: <netdev+bounces-21090-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21089-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7300C7626F3
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 00:38:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 35F067626DB
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 00:37:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8ADD31C2106C
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 22:38:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6877B1C21075
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 22:37:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B10E8263B1;
-	Tue, 25 Jul 2023 22:38:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D78D18F51;
+	Tue, 25 Jul 2023 22:37:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A56F18462
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 22:38:24 +0000 (UTC)
-Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E7B25243
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 15:38:02 -0700 (PDT)
-Received: by mail-pg1-x549.google.com with SMTP id 41be03b00d2f7-55be4f03661so5309063a12.1
-        for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 15:38:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690324608; x=1690929408;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=mMfI3arKf9+YbxM5YZ3Ev/94eLBo3EGM5wKxDcmFtGU=;
-        b=CA5p7AoCQp/A+5LexlFHmH6M1E/EdsT2gZ07zUtXmpkqX/JmkTUEgmODI8gV73H8bg
-         qAiOZSuFLD8GZNhC2qL1340KL6dUfoKUvZPjT9so7h32p9aZeSQvjNE4KEKzoXAbppDe
-         yeIh5xNJiwnJrevV0n8pbyoXwO9UhHW9cuCiHlN5Go+/wm1CKzU9+9zcuVMMHAjyHzi/
-         w7n/gKemORarXKEC6j/Hi1wh8mXgTU0kSiFVd2G1oCaCOmdvx5itLN6JJhdHGPdqFEIr
-         Zsr7B2DGlvdac+gYGzXITizsm0iHj4GfUp7InvdKh2T+bd7d9e4sMl+NOhPhRykoCMTO
-         isww==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690324608; x=1690929408;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mMfI3arKf9+YbxM5YZ3Ev/94eLBo3EGM5wKxDcmFtGU=;
-        b=Ru6DXCQcU9JBQXQcBTPC+HCcms6PZUSHWPnaYcxaKYu02Gyx+tdpz8kbGG1K3DHQ1Z
-         J2lDriM1IbkYrlH5DoyQi1bLVEXbphm8+BdgnNfFSFXyW/1dfmx1zhcUYIV4k+jc1la4
-         l+wBdrCGvREN98yYQyDQ9zCE1zOmCSjeskAV8Rs5X+phdDcAz4PoKXbi9qgAB5J8FTQv
-         kZZuTt8gjGnSjJw2V3HFek8sQulWr5efC8EqZJdrBLixwzLwn0jyPMZsW+RR/kZSsGKF
-         exLAVIrLVUvXYwsfUJNtCjoRmEwWO1V6sgP4ZY1YZAUuR/KItdSuzUgFRtN5dLRVqGyU
-         Zy/A==
-X-Gm-Message-State: ABy/qLYsnja+a0YanPOYkqmWDYT6WJxHDEiYJN9iogGhAxMkZv76wkvV
-	hdmKZAC0XWxTG/ZdmYsdDjYu/oM=
-X-Google-Smtp-Source: APBJJlEZNki/cKWgg0Mhfcy8+MorsUExicYY85Pi8mD/yQP4agFWfIhcHNdF4aGg7gtbmcwO/5lRFVc=
-X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
- (user=sdf job=sendgmr) by 2002:a63:7d5c:0:b0:534:6903:efd8 with SMTP id
- m28-20020a637d5c000000b005346903efd8mr3150pgn.1.1690324608178; Tue, 25 Jul
- 2023 15:36:48 -0700 (PDT)
-Date: Tue, 25 Jul 2023 15:36:46 -0700
-In-Reply-To: <64c037a2cab54_3fe1bc29433@willemb.c.googlers.com.notmuch>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AA118462
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 22:37:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8EB67C433C8;
+	Tue, 25 Jul 2023 22:37:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1690324637;
+	bh=ibc4z5TWhzUB+1gt3pOwhVennqPbFoRXB2zXlc50XW4=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=vPQ99O5UO3fDfjKBO4NcTVt3z59y2lt2qz/NtCopYn+xr/pOCTLAfgKvxyGv8X1hI
+	 xRc33VrmFna+QbjJVkY7RCkCHQIlJOXnFCHogJApR0OSJVKx2YVSRnkNuEcWWKKoaM
+	 locEBRqtVRCZg+oVhfn93FsUor+Yikr5aNjHhYqoMcbvNlOJSH71DU36zs9JVih8AL
+	 FPFmgLuj4aYW/puQ4YQG5WhvnSOJsrxd1SQs1K5QAU5p8fEmLIm+p11ci2Cgsy4Tqq
+	 +3YJmmh40y4laQ59jJCqu6hILD/EL+ac33451UpeXeE7j9J5ED3DaO7QI7X8ua3hC4
+	 qr7+husqjHGIw==
+Message-ID: <7fb36754-9e7b-73a7-3c3b-0a8141e4a85f@kernel.org>
+Date: Tue, 25 Jul 2023 16:37:15 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20230724235957.1953861-1-sdf@google.com> <20230724235957.1953861-9-sdf@google.com>
- <64c037a2cab54_3fe1bc29433@willemb.c.googlers.com.notmuch>
-Message-ID: <ZMBOflNd3TOV7sd4@google.com>
-Subject: Re: [RFC net-next v4 8/8] selftests/bpf: Add TX side to xdp_hw_metadata
-From: Stanislav Fomichev <sdf@google.com>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net, 
-	andrii@kernel.org, martin.lau@linux.dev, song@kernel.org, yhs@fb.com, 
-	john.fastabend@gmail.com, kpsingh@kernel.org, haoluo@google.com, 
-	jolsa@kernel.org, kuba@kernel.org, toke@kernel.org, willemb@google.com, 
-	dsahern@kernel.org, magnus.karlsson@intel.com, bjorn@kernel.org, 
-	maciej.fijalkowski@intel.com, hawk@kernel.org, netdev@vger.kernel.org, 
-	xdp-hints@xdp-project.net
-Content-Type: text/plain; charset="utf-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-	autolearn=unavailable autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.13.0
+Subject: Re: [PATCHv3 net] ipv6: do not match device when remove source route
+Content-Language: en-US
+To: Ido Schimmel <idosch@idosch.org>
+Cc: Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Thomas Haller <thaller@redhat.com>,
+ Donald Sharp <sharpd@nvidia.com>
+References: <20230720065941.3294051-1-liuhangbin@gmail.com>
+ <ZLk0/f82LfebI5OR@shredder> <ZLlJi7OUy3kwbBJ3@shredder>
+ <ZLpI6YZPjmVD4r39@Laptop-X1> <ZLzhMDIayD2z4szG@shredder>
+ <8c8ba9bd-875f-fe2c-caf1-6621f1ecbb92@kernel.org> <ZL+ekVftp24TzrHz@shredder>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <ZL+ekVftp24TzrHz@shredder>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On 07/25, Willem de Bruijn wrote:
-> Stanislav Fomichev wrote:
-> > When we get packets on port 9091, we swap src/dst and send it out.
-> > At this point, we also request the timestamp and plumb it back
-> > to the userspace. The userspace simply prints the timestamp.
-> > 
-> > Also print current UDP checksum, rewrite it with the pseudo-header
-> > checksum and offload TX checksum calculation to devtx. Upon
-> > completion, report TX checksum back (mlx5 doesn't put it back, so
-> > I've used tcpdump to confirm that the checksum is correct).
-> > 
-> > Some other related changes:
-> > - switched to zerocopy mode by default; new flag can be used to force
-> >   old behavior
-> > - request fixed TX_METADATA_LEN headroom
-> > - some other small fixes (umem size, fill idx+i, etc)
-> > 
-> > mvbz3:~# ./xdp_hw_metadata eth3 -c mlx5e_devtx_complete_xdp -s mlx5e_devtx_submit_xd
-> > attach rx bpf program...
-> > ...
-> > 0x206d298: rx_desc[0]->addr=80100 addr=80100 comp_addr=80100
-> > rx_hash: 0x2BFB7FEC with RSS type:0x2A
-> > rx_timestamp:  1690238278345877848 (sec:1690238278.3459)
-> > XDP RX-time:   1690238278538397674 (sec:1690238278.5384) delta sec:0.1925 (192519.826 usec)
-> > AF_XDP time:   1690238278538515250 (sec:1690238278.5385) delta sec:0.0001 (117.576 usec)
-> > 0x206d298: ping-pong with csum=8e3b (want 57c9) csum_start=54 csum_offset=6
-> > 0x206d298: complete tx idx=0 addr=10
-> > 0x206d298: tx_timestamp:  1690238278577008140 (sec:1690238278.5770)
-> > 0x206d298: complete rx idx=128 addr=80100
-> > 
-> > mvbz4:~# nc  -Nu -q1 ${MVBZ3_LINK_LOCAL_IP}%eth3 9091
-> > 
-> > mvbz4:~# tcpdump -vvx -i eth3 udp
-> > tcpdump: listening on eth3, link-type EN10MB (Ethernet), snapshot length 262144 bytes
-> > 10:12:43.901436 IP6 (flowlabel 0x7a5d2, hlim 127, next-header UDP (17) payload length: 11) fe80::1270:fdff:fe48:1087.44339 > fe80::1270:fdff:fe48:1077.9091: [bad udp cksum 0x3b8e -> 0x0b4b!] UDP, length 3
-> >         0x0000:  6007 a5d2 000b 117f fe80 0000 0000 0000
-> >         0x0010:  1270 fdff fe48 1087 fe80 0000 0000 0000
-> >         0x0020:  1270 fdff fe48 1077 ad33 2383 000b 3b8e
-> >         0x0030:  7864 70
-> > 10:12:43.902125 IP6 (flowlabel 0x7a5d2, hlim 127, next-header UDP (17) payload length: 11) fe80::1270:fdff:fe48:1077.9091 > fe80::1270:fdff:fe48:1087.44339: [udp sum ok] UDP, length 3
-> >         0x0000:  6007 a5d2 000b 117f fe80 0000 0000 0000
-> >         0x0010:  1270 fdff fe48 1077 fe80 0000 0000 0000
-> >         0x0020:  1270 fdff fe48 1087 2383 ad33 000b 0b4b
-> >         0x0030:  7864 70
-> > 
-> > Signed-off-by: Stanislav Fomichev <sdf@google.com>
-> > ---
-> >  tools/testing/selftests/bpf/xdp_hw_metadata.c | 201 +++++++++++++++++-
-> >  1 file changed, 191 insertions(+), 10 deletions(-)
-> > 
+On 7/25/23 4:06 AM, Ido Schimmel wrote:
+> On Sun, Jul 23, 2023 at 12:12:00PM -0600, David Ahern wrote:
+>> On 7/23/23 2:13 AM, Ido Schimmel wrote:
+>>>
+>>> I don't know, but when I checked the code and tested it I noticed that
+>>> the kernel doesn't care on which interface the address is configured.
+>>> Therefore, in order for deletion to be consistent with addition and with
+>>> IPv4, the preferred source address shouldn't be removed from routes in
+>>> the VRF table as long as the address is configured on one of the
+>>> interfaces in the VRF.
+>>>
+>>
+>> Deleting routes associated with device 2 when an address is deleted from
+>> device 1 is going to introduce as many problems as it solves. The VRF
+>> use case is one example.
 > 
-> > +static void usage(const char *prog)
-> > +{
-> > +	fprintf(stderr,
-> > +		"usage: %s [OPTS] <ifname>\n"
-> > +		"OPTS:\n"
-> > +		"    -T    don't generate AF_XDP reply (rx metadata only)\n"
-> > +		"    -Z    run in copy mode\n",
+> This already happens in IPv4:
 > 
-> nit: makes more sense to call copy mode 'C', rather than 'Z'
+> # ip link add name dummy1 up type dummy
+> # ip link add name dummy2 up type dummy
+> # ip address add 192.0.2.1/24 dev dummy1
+> # ip route add 198.51.100.0/24 dev dummy2 src 192.0.2.1
+> # ip -4 r s
+> 192.0.2.0/24 dev dummy1 proto kernel scope link src 192.0.2.1 
+> 198.51.100.0/24 dev dummy2 scope link src 192.0.2.1 
+> # ip address del 192.0.2.1/24 dev dummy1
+> # ip -4 r s
+> 
+> IPv6 only removes the preferred source address from routes, but doesn't
+> delete them. The patch doesn't change that.
+> 
+> Another difference from IPv4 is that IPv6 only removes the preferred
+> source address from routes whose first nexthop device matches the device
+> from which the address was removed:
+> 
+> # ip link add name dummy1 up type dummy
+> # ip link add name dummy2 up type dummy
+> # ip address add 2001:db8:1::1/64 dev dummy1
+> # ip route add 2001:db8:2::/64 dev dummy2 src 2001:db8:1::1
+> # ip -6 r s
+> 2001:db8:1::/64 dev dummy1 proto kernel metric 256 pref medium
+> 2001:db8:2::/64 dev dummy2 src 2001:db8:1::1 metric 1024 pref medium
+> fe80::/64 dev dummy1 proto kernel metric 256 pref medium
+> fe80::/64 dev dummy2 proto kernel metric 256 pref medium
+> # ip address del 2001:db8:1::1/64 dev dummy1
+> # ip -6 r s
+> 2001:db8:2::/64 dev dummy2 src 2001:db8:1::1 metric 1024 pref medium
+> fe80::/64 dev dummy1 proto kernel metric 256 pref medium
+> fe80::/64 dev dummy2 proto kernel metric 256 pref medium
+> 
+> And this is despite the fact that the kernel only allowed the route to
+> be programmed because the preferred source address was present on
+> another interface in the same L3 domain / VRF:
+> 
+> # ip link add name dummy1 up type dummy
+> # ip link add name dummy2 up type dummy
+> # ip route add 2001:db8:2::/64 dev dummy2 src 2001:db8:1::1
+> Error: Invalid source address.
+> 
+> The intent of the patch (at least with the changes I proposed) is to
+> remove the preferred source address from routes in a VRF when the
+> address is no longer configured on any interface in the VRF.
+> 
+> Note that the above is true for addresses with a global scope. The
+> removal of a link-local address from a device should not affect other
+> devices. This restriction also applies when a route is added:
+> 
+> # ip link add name dummy1 up type dummy
+> # ip link add name dummy2 up type dummy
+> # ip -6 address add fe80::1/64 dev dummy1
+> # ip -6 route add 2001:db8:2::/64 dev dummy2 src fe80::1
+> Error: Invalid source address.
+> # ip -6 address add fe80::1/64 dev dummy2
+> # ip -6 route add 2001:db8:2::/64 dev dummy2 src fe80::1
 
-Initially I had -c and -s for completion/submission bpf hooks. Now that
-these are gone, can actually use -c. Capital letter here actually means
-'not'. Z - not zerocopy. T - no tx.
+Lot of permutations. It would be good to get these in a test script
+along with other variations - e.g.,
 
-I'll rename to:
--r - rx only
--c - copy mode
+# 2 devices with the same source address
+ip link add name dummy1 up type dummy
+ip link add name dummy2 up type dummy
+ip link add name dummy3 up type dummy
+ip address add 192.0.2.1/24 dev dummy1
+ip address add 192.0.2.1/24 dev dummy3
+ip route add 198.51.100.0/24 dev dummy2 src 192.0.2.1
+ip address del 192.0.2.1/24 dev dummy1
+--> src route should stay
 
-LMK if it doesn't make sense..
+# VRF with single device using src address
+ip li add name red up type vrf table 123
+ip link add name dummy4 up type dummy vrf red
+ip link add name dummy5 up type dummy vrf red
+ip address add 192.0.2.1/24 dev dummy4
+ip route add 198.51.100.0/24 dev dummy5 src 192.0.2.1
+ip address del 192.0.2.1/24 dev dummy4
+ip ro ls vrf red
+
+# VRF with two devices using src address
+ip li add name red up type vrf table 123
+ip link add name dummy4 up vrf red type dummy
+ip link add name dummy5 up vrf red type dummy
+ip link add name dummy6 up vrf red type dummy
+ip address add 192.0.2.1/24 dev dummy4
+ip address add 192.0.2.1/24 dev dummy6
+ip route add 198.51.100.0/24 dev dummy5 src 192.0.2.1 vrf red
+ip address del 192.0.2.1/24 dev dummy4
+
+
+I can not find my notes but I recall Donald raised a ticket at Cumulus
+when FRR tripped over a scenario like this or a related one (something
+about routes and address delete). CC'ed Donald in case he recalls the
+details
 
