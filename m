@@ -1,86 +1,118 @@
-Return-Path: <netdev+bounces-20678-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20679-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E75376092F
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 07:25:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2AA69760971
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 07:40:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DF71D281720
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 05:25:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C30732817F1
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 05:40:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7A978477;
-	Tue, 25 Jul 2023 05:24:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA578847A;
+	Tue, 25 Jul 2023 05:40:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A090679C4;
-	Tue, 25 Jul 2023 05:24:59 +0000 (UTC)
-X-Greylist: delayed 18711 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 24 Jul 2023 22:24:55 PDT
-Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [20.231.56.155])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id F2A72116;
-	Mon, 24 Jul 2023 22:24:55 -0700 (PDT)
-Received: from linma$zju.edu.cn ( [42.120.103.62] ) by
- ajax-webmail-mail-app4 (Coremail) ; Tue, 25 Jul 2023 13:24:38 +0800
- (GMT+08:00)
-X-Originating-IP: [42.120.103.62]
-Date: Tue, 25 Jul 2023 13:24:38 +0800 (GMT+08:00)
-X-CM-HeaderCharset: UTF-8
-From: "Lin Ma" <linma@zju.edu.cn>
-To: "Leon Romanovsky" <leon@kernel.org>
-Cc: kuba@kernel.org, davem@davemloft.net, edumazet@google.com, 
-	pabeni@redhat.com, ast@kernel.org, martin.lau@kernel.org, yhs@fb.com, 
-	void@manifault.com, andrii@kernel.org, houtao1@huawei.com, 
-	inwardvessel@gmail.com, kuniyu@amazon.com, songliubraving@fb.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	bpf@vger.kernel.org
-Subject: Re: [PATCH v2] bpf: Add length check for
- SK_DIAG_BPF_STORAGE_REQ_MAP_FD parsing
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version XT5.0.14 build 20220622(41e5976f)
- Copyright (c) 2002-2023 www.mailtech.cn
- mispb-4df6dc2c-e274-4d1c-b502-72c5c3dfa9ce-zj.edu.cn
-In-Reply-To: <20230725044409.GF11388@unreal>
-References: <20230725023330.422856-1-linma@zju.edu.cn>
- <20230725044409.GF11388@unreal>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ECC51374
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 05:40:15 +0000 (UTC)
+Received: from mail-wm1-x332.google.com (mail-wm1-x332.google.com [IPv6:2a00:1450:4864:20::332])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0AA072137
+	for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 22:39:52 -0700 (PDT)
+Received: by mail-wm1-x332.google.com with SMTP id 5b1f17b1804b1-3fbc244d384so42069625e9.0
+        for <netdev@vger.kernel.org>; Mon, 24 Jul 2023 22:39:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1690263591; x=1690868391;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=QK/okmUinC9yivXMdeIX7gtpB1W4+61OtE5OK7/P5uM=;
+        b=hGf5EtwfUSuy9kJcR7Zdai1zR/HrZNBAVsoFFQ4Wyfr0D3wJtHkYsDJe93CM7GURcG
+         hv6GpSzwkHjC4xgJLBcucTuJa7BFfLixJgvIxYnjbdTXusFn5MNcBoQ2jFW54vm43eqT
+         eAlu7D42IcjTUvA1F48PrCNopqiNyvm0JfkSfzf8YVYdd/9FbVn++/zZXEmnP0uBrkwc
+         BcYMa+AnSc2NrgkpwO478drbMBlXltslzQFbkxUuoey/GT0I/NB0aaIaUXTJO/56JL2q
+         3KHN3Apb7FLv1PybYP41iRT1mn0bS69anZ8fiIw5zGYqXhGPdq8sPQ71FNPWjHWSaOxm
+         61aw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690263591; x=1690868391;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=QK/okmUinC9yivXMdeIX7gtpB1W4+61OtE5OK7/P5uM=;
+        b=b4REInEJUlrdSFh2sy7KvX0dEPeQhs3IBRB0WSwZiPewrVZp1ie/yv6f9Ztg+kgJve
+         0GmLUQ7Rq2XSClX2OTaZySpfhC8eslRgkGd3dLK1hcGqfopiPFghz3VCgPeVOqOJHHUY
+         j/Wfu90yN/I/MlU594QZKNkoCQypRxUDvzUwsHDT7Zl48BzDKMo44VtCQYL332Fhr1qu
+         QylK4TopECeaNGhEMmdAxp+rRC7htg5882oLYN5yKs/fLPHs6/BOYN9H9T5MyBfHAF/d
+         Ps7yYM07uI5+5U+iaH89ArsWqdKKeP2UnyYxXITub3Q078CAgDmHK7Zx4hlTE1DW9+eo
+         mjgw==
+X-Gm-Message-State: ABy/qLaEUS1ZPU0X9YS3AtTo2HlZFG07tR1Py9MSDFGYwgzAWB6X9djM
+	SZl/DjXJadghC5LYHSteUzn1Zw==
+X-Google-Smtp-Source: APBJJlHonfpvehVKWDAgzjTBn8MdMn1leAqDn8dOoo5ZmhCLQseSzOxoAfr6/4Wt7yR3/q9Q6jVKhA==
+X-Received: by 2002:a7b:cc17:0:b0:3fa:e92e:7a8b with SMTP id f23-20020a7bcc17000000b003fae92e7a8bmr8339981wmh.13.1690263591355;
+        Mon, 24 Jul 2023 22:39:51 -0700 (PDT)
+Received: from localhost ([102.36.222.112])
+        by smtp.gmail.com with ESMTPSA id b13-20020a5d4d8d000000b0031417fd473csm1868914wru.78.2023.07.24.22.39.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 24 Jul 2023 22:39:51 -0700 (PDT)
+Date: Tue, 25 Jul 2023 08:39:47 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+	kernel-janitors@vger.kernel.org
+Subject: [PATCH net-next] net/mlx4: clean up a type issue
+Message-ID: <52d0814a-7287-4160-94b5-ac7939ac61c6@moroto.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <15dc24fc.e7c38.1898b81ac08.Coremail.linma@zju.edu.cn>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:cS_KCgB3ybGWXL9kwQAPCg--.53344W
-X-CM-SenderInfo: qtrwiiyqvtljo62m3hxhgxhubq/1tbiAwUHEmS-J3oE0gAAsD
-X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
-	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
-	daVFxhVjvjDU=
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-	version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Mailer: git-send-email haha only kidding
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-SGVsbG8gTGVvbiwKCj4gCj4gSmFrdWIsIGl0IHNlZW1zIGxpa2UgTGluIGFkZHMgdGhpcyBjaGVj
-ayB0byBhbGwgbmxhX2Zvcl9lYWNoX25lc3RlZCgpIGxvb3BzLgo+IElNSE8sIHRoZSBiZXR0ZXIg
-Y2hhbmdlIHdpbGwgYmUgdG8gY2hhbmdlIG5sYV9mb3JfZWFjaF9uZXN0ZWQoKSBza2lwIGVtcHR5
-L25vdCB2YWxpZCBOTEFzLgo+IAo+IFRoYW5rcwoKSSBndWVzcyB5b3UganVzdCBnZXQgdGhlc2Ug
-Zml4ZXMgbWlzdW5kZXJzdG9vZC4gSSBkbyBub3QgYWRkIHRoZSBubGFfbGVuIGNoZWNrCnRvICAq
-KmFsbCBubGFfZm9yX2VhY2hfbmVzdGVkKiogOiguIEkgb25seSBhZGQgY2hlY2tzIHRvIHRob3Nl
-IHdobyBkbyBub3QgYWNjZXNzIAp0aGUgYXR0cmlidXRlcyB3aXRob3V0IHZlcmlmeWluZyB0aGUg
-bGVuZ3RoLCB3aGljaCBpcyBidWdneS4KClRoZSBvdGhlcnMsIGVpdGhlciBkbyBhIHNpbWlsYXIg
-bmxhX2xlbiBjaGVjayBhbHJlYWR5IG9yIGp1c3QgZG8gbmxhX3ZhbGlkYXRlCnNvbWV3aGVyZSBl
-bHNlLiBUaGF0IGlzIHRvIHNheSwgdGhleSAqKnZhbGlkYXRlKiogdGhlIHJlbGV2YW50IGF0dHJp
-YnV0ZXMuCgpJbiBzaG9ydCwgbmxhX2Zvcl9lYWNoX25lc3RlZCBpcyBqdXN0IGEgbG9vcCBtYWNy
-byB0aGF0IGl0ZXJhdGVzIHRoZSBubGF0dHJzLApsaWtlIG5sYV9mb3JfZWFjaCBtYWNyby4gSXQg
-aXMgd2VpcmQgZm9yIHRoZW0gdG8gZG8gbmxhdHRyIHZhbGlkYXRpb24gYXMgdGhlcmUKY291bGQg
-aGF2ZSBhbHJlYWR5IGJlZW4gYSBjYWxsIHRvIG5sYV92YWxpZGF0ZSB0byBlbnN1cmUgdGhvc2Ug
-YXR0cmlidXRlcyBhcmUKY29ycmVjdC4gVGhhdCBpcywgZm9yIHRob3NlIHdobyBkbyBub3QsIGEg
-c2ltcGxlIG5sYV9sZW4gY2hlY2sgaXMgdGhlIHNpbXBsZXN0CmFuZCBtb3N0IGVmZmljaWVudCBj
-aG9pY2UuCgpSZWdhcmRzCkxpbg==
+These functions returns type bool, not pointers, so return false instead
+of NULL.
+
+Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+---
+Not a bug.  Targetting net-next.
+
+ drivers/net/ethernet/mellanox/mlx4/mcg.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/mellanox/mlx4/mcg.c b/drivers/net/ethernet/mellanox/mlx4/mcg.c
+index f1716a83a4d3..24d0c7c46878 100644
+--- a/drivers/net/ethernet/mellanox/mlx4/mcg.c
++++ b/drivers/net/ethernet/mellanox/mlx4/mcg.c
+@@ -294,7 +294,7 @@ static bool check_duplicate_entry(struct mlx4_dev *dev, u8 port,
+ 	struct mlx4_promisc_qp *dqp, *tmp_dqp;
+ 
+ 	if (port < 1 || port > dev->caps.num_ports)
+-		return NULL;
++		return false;
+ 
+ 	s_steer = &mlx4_priv(dev)->steer[port - 1];
+ 
+@@ -375,7 +375,7 @@ static bool can_remove_steering_entry(struct mlx4_dev *dev, u8 port,
+ 	bool ret = false;
+ 
+ 	if (port < 1 || port > dev->caps.num_ports)
+-		return NULL;
++		return false;
+ 
+ 	s_steer = &mlx4_priv(dev)->steer[port - 1];
+ 
+-- 
+2.39.2
+
 
