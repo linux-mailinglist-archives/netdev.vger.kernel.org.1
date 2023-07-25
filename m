@@ -1,485 +1,201 @@
-Return-Path: <netdev+bounces-20919-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20921-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D01A3761E5B
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 18:23:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DF6F6761E65
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 18:23:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DD1141C20835
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 16:23:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EB5181C20EAE
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 16:23:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4759A24194;
-	Tue, 25 Jul 2023 16:22:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1F8624182;
+	Tue, 25 Jul 2023 16:22:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 369D01F173
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 16:22:27 +0000 (UTC)
-Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 063DC11A
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 09:22:26 -0700 (PDT)
-Received: by mail-lf1-x12d.google.com with SMTP id 2adb3069b0e04-4fb960b7c9dso9031350e87.0
-        for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 09:22:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690302144; x=1690906944;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Zyc3EzLwdqsgpDl0SBwuT9+P2kLO2TC+IUifZiduORo=;
-        b=D3WjX9FrH4YhuwHOqUsWcAjdA/eJTGz7HCXrXMtc9YoZU5r8gDWf6+w7dzouv6v0JM
-         oK0N4BtW0EZRd1cA1RTU9pyahAZG1x6Q9Y6NMhX7nwi7MsA2iS53D9jbtEPC7vw5jOoh
-         92e3jJlxIjvvJ8YoDr5oqv/bIa69Vb3SrMmRuiBCbJlGikYH6AF9+hLj3M9rotMCojHD
-         OK5Q6GfPPnfwUmXCUTZ3lu2f9AuMTvgcfNwDd7s1fYIn8X/IzH/prJTQu9D7neBNUmjl
-         4daCXqaovQzz9GHAd0iKjJ2IdQ++xKJnX91zXrY45Sl4BNUQFu6OgDXhpk/y3ktIVt5E
-         91IA==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C73F71F173
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 16:22:55 +0000 (UTC)
+Received: from mail-ot1-f80.google.com (mail-ot1-f80.google.com [209.85.210.80])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE46FE6
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 09:22:52 -0700 (PDT)
+Received: by mail-ot1-f80.google.com with SMTP id 46e09a7af769-6b9e081b9f7so8958537a34.0
+        for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 09:22:52 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690302144; x=1690906944;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Zyc3EzLwdqsgpDl0SBwuT9+P2kLO2TC+IUifZiduORo=;
-        b=GBwn3e8OLNF7BkKmTwMWmb/Lk6IorC6PDx9KZJQPg/Fuejkbe3BWFOSgBY8diQVkM7
-         iXGgU8o1yQgsBefetD70s4z8kvoqL9I+gvPDUk8gUW1G1BEn87UJPZoVuW9dr6MFWxpZ
-         s4k7NrjpS99a4FMYIKT5RF0UbX42yCgCrtCKV60rbVEJrOKxk6FypcRlv7/CQ3LvDcEs
-         d8czOFwBf5oXko6GrNfpdTTOXf7xHKy0lo5zrnRraCM2YeMgAqU1Dv/XA/4IV7DMkuIz
-         7S90EkLE0WjY1dZGFK7P/2yzI+KwIAsgZUdnHIpk4CB4euArQ2uMtSuucsW1ggsXKaOd
-         p5Eg==
-X-Gm-Message-State: ABy/qLYUtbuWiIZaFYz+p4k4RA31tLizQVpDThzoyxqRhzQA201Wj38c
-	qRzRdmkM0/QXXbkr4dMuisNm40AiWg5TfGEL
-X-Google-Smtp-Source: APBJJlGJY3xYNwFXqqaRJSd36zr3iNFaWCo2DYiJFuglqReoJGELeeltzWu7fi+EkN+GhfZGPToSXg==
-X-Received: by 2002:a05:6512:250a:b0:4f8:69f8:47a0 with SMTP id be10-20020a056512250a00b004f869f847a0mr9066974lfb.29.1690302143595;
-        Tue, 25 Jul 2023 09:22:23 -0700 (PDT)
-Received: from imac.fritz.box ([2a02:8010:60a0:0:255e:7dc3:bcb1:e213])
-        by smtp.gmail.com with ESMTPSA id n3-20020a05600c294300b003fc01f7a42dsm13661303wmd.8.2023.07.25.09.22.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Jul 2023 09:22:23 -0700 (PDT)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: netdev@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: donald.hunter@redhat.com,
-	Donald Hunter <donald.hunter@gmail.com>
-Subject: [PATCH net-next v1 3/3] doc/netlink: Add specs for addr and route rtnetlink message types
-Date: Tue, 25 Jul 2023 17:22:05 +0100
-Message-ID: <20230725162205.27526-4-donald.hunter@gmail.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230725162205.27526-1-donald.hunter@gmail.com>
-References: <20230725162205.27526-1-donald.hunter@gmail.com>
+        d=1e100.net; s=20221208; t=1690302172; x=1690906972;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=/RUjeoNU1GLoQKADl/ixw/TxZx18p8HttwKhB2hjIa0=;
+        b=TgWO+9Lo0QYlMM/KpswwYV8hKfPUnkhwfDR77937YcW30ocS1LnRRtj0YsUGvRNxnF
+         M3B/Y9IN1qnGz1tj49JSoOGihtjXo1uc+GgGHFuU7xMN+j0qddKJL8kekCaDs2+8tZxO
+         XSiXLZ4S/FGXVbsK2XaysJkTDaR2POZ9Xj32pqPAytaFEvDgIQHuTissJk8aVGHsQo6Z
+         If7iwxOEN68sDZYIsvkpxpleMcuxDXPSLL1CxbiCzjrkqWTwhNlp7rvKCj8uivG++5jz
+         0dNOXELC0sk00Hx0KFcKbLHnfufx6ju0PrR0diQ0Z/pBhgylsJPhwM1790d0ATaGB3Vo
+         ON/w==
+X-Gm-Message-State: ABy/qLYBKooAnWxKQuneij3guPs+VVLMEoQGNr+n1iNu/qK/8gxA7CZp
+	QhYLz+DLczcbDkVRGxPbfuHWq508qnf05Ku0TwcLRLy0p3qU
+X-Google-Smtp-Source: APBJJlFbnOcag6iqozo/+3f7QhqH65++VpMbTZmqwxmmBPhLzlYAYBE4kKMY5PXMCc9Dl8z7QqfTtO37VZSOlRKe2SHEI6OYcIP1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+X-Received: by 2002:a05:6830:1287:b0:6b7:1e75:18e with SMTP id
+ z7-20020a056830128700b006b71e75018emr13263178otp.2.1690302172226; Tue, 25 Jul
+ 2023 09:22:52 -0700 (PDT)
+Date: Tue, 25 Jul 2023 09:22:52 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000089e8b806015224ff@google.com>
+Subject: [syzbot] [net?] BUG: soft lockup in addrconf_rs_timer (3)
+From: syzbot <syzbot+521990714fbdf5ffce04@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, jhs@mojatatu.com, 
+	jiri@resnulli.us, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com, 
+	vinicius.gomes@intel.com, xiyou.wangcong@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=0.8 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H3,
+	RCVD_IN_MSPIKE_WL,SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Add netlink-raw specs for the following rtnetlink messages:
- - newaddr, deladdr, getaddr (dump)
- - getroute (dump)
+Hello,
 
-Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
+syzbot found the following issue on:
+
+HEAD commit:    e40939bbfc68 Merge branch 'for-next/core' into for-kernelci
+git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-kernelci
+console output: https://syzkaller.appspot.com/x/log.txt?x=13fb9fd1a80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=c4a2640e4213bc2f
+dashboard link: https://syzkaller.appspot.com/bug?extid=521990714fbdf5ffce04
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+userspace arch: arm64
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1049c776a80000
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/9d87aa312c0e/disk-e40939bb.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/22a11d32a8b2/vmlinux-e40939bb.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/0978b5788b52/Image-e40939bb.gz.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+521990714fbdf5ffce04@syzkaller.appspotmail.com
+
+watchdog: BUG: soft lockup - CPU#0 stuck for 23s! [syz-executor.1:16445]
+Modules linked in:
+irq event stamp: 5993
+hardirqs last  enabled at (5992): [<ffff80008a44626c>] __exit_to_kernel_mode arch/arm64/kernel/entry-common.c:84 [inline]
+hardirqs last  enabled at (5992): [<ffff80008a44626c>] exit_to_kernel_mode+0xdc/0x10c arch/arm64/kernel/entry-common.c:94
+hardirqs last disabled at (5993): [<ffff80008a443ea4>] __el1_irq arch/arm64/kernel/entry-common.c:470 [inline]
+hardirqs last disabled at (5993): [<ffff80008a443ea4>] el1_interrupt+0x24/0x68 arch/arm64/kernel/entry-common.c:488
+softirqs last  enabled at (14): [<ffff800080034380>] local_bh_enable+0x10/0x34 include/linux/bottom_half.h:32
+softirqs last disabled at (677): [<ffff80008002b660>] ____do_softirq+0x14/0x20 arch/arm64/kernel/irq.c:80
+CPU: 0 PID: 16445 Comm: syz-executor.1 Not tainted 6.4.0-rc7-syzkaller-ge40939bbfc68 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/03/2023
+pstate: 80400005 (Nzcv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+pc : find_entry_to_transmit+0x4e0/0x6d0
+lr : find_entry_to_transmit+0x4c4/0x6d0
+sp : ffff800080007000
+x29: ffff8000800070c0 x28: ffff800080007230 x27: ffff0000e7bb1940
+x26: ffff0000e7bb1800 x25: 0000000000000000 x24: 0000000000000080
+x23: 04c978811b43be81 x22: 04c978811b43bec0 x21: 04c978811b43bf01
+x20: dfff800000000000 x19: 7fffffffffffffff x18: ffff800096460080
+x17: 0000000000000000 x16: ffff80008050b28c x15: 0000000000000100
+x14: 1ffff00011bde0ac x13: ffffffff80000040 x12: 0000000080000040
+x11: 0000000000000301 x10: 0000000000000100 x9 : 0000000000000000
+x8 : 0000000000000000 x7 : 0000000000000000 x6 : ffff800080007210
+x5 : ffff800080007230 x4 : 04c978809b43bf5d x3 : ffff80008898bde8
+x2 : 0000000000000000 x1 : 7fffffffffffffff x0 : 04c978811b43bf01
+Call trace:
+ find_entry_to_transmit+0x4e0/0x6d0 net/sched/sch_taprio.c:382
+ get_packet_txtime net/sched/sch_taprio.c:505 [inline]
+ taprio_enqueue_one+0xdb0/0x146c net/sched/sch_taprio.c:574
+ taprio_enqueue+0x328/0x544 net/sched/sch_taprio.c:655
+ dev_qdisc_enqueue+0x60/0x35c net/core/dev.c:3773
+ __dev_xmit_skb net/core/dev.c:3862 [inline]
+ __dev_queue_xmit+0xb24/0x3318 net/core/dev.c:4210
+ dev_queue_xmit include/linux/netdevice.h:3088 [inline]
+ neigh_resolve_output+0x518/0x618 net/core/neighbour.c:1552
+ neigh_output include/net/neighbour.h:544 [inline]
+ ip6_finish_output2+0xd60/0x1a1c net/ipv6/ip6_output.c:134
+ __ip6_finish_output net/ipv6/ip6_output.c:195 [inline]
+ ip6_finish_output+0x538/0x8c8 net/ipv6/ip6_output.c:206
+ NF_HOOK_COND include/linux/netfilter.h:292 [inline]
+ ip6_output+0x270/0x594 net/ipv6/ip6_output.c:227
+ dst_output include/net/dst.h:458 [inline]
+ NF_HOOK include/linux/netfilter.h:303 [inline]
+ ndisc_send_skb+0xc30/0x1790 net/ipv6/ndisc.c:508
+ ndisc_send_rs+0x47c/0x5d4 net/ipv6/ndisc.c:718
+ addrconf_rs_timer+0x300/0x58c net/ipv6/addrconf.c:3936
+ call_timer_fn+0x19c/0x8cc kernel/time/timer.c:1700
+ expire_timers kernel/time/timer.c:1751 [inline]
+ __run_timers+0x55c/0x734 kernel/time/timer.c:2022
+ run_timer_softirq+0x7c/0x114 kernel/time/timer.c:2035
+ __do_softirq+0x2d0/0xd54 kernel/softirq.c:571
+ ____do_softirq+0x14/0x20 arch/arm64/kernel/irq.c:80
+ call_on_irq_stack+0x24/0x4c arch/arm64/kernel/entry.S:882
+ do_softirq_own_stack+0x20/0x2c arch/arm64/kernel/irq.c:85
+ invoke_softirq kernel/softirq.c:452 [inline]
+ __irq_exit_rcu+0x28c/0x534 kernel/softirq.c:650
+ irq_exit_rcu+0x14/0x84 kernel/softirq.c:662
+ __el1_irq arch/arm64/kernel/entry-common.c:474 [inline]
+ el1_interrupt+0x38/0x68 arch/arm64/kernel/entry-common.c:488
+ el1h_64_irq_handler+0x18/0x24 arch/arm64/kernel/entry-common.c:493
+ el1h_64_irq+0x64/0x68 arch/arm64/kernel/entry.S:587
+ __daif_local_irq_enable arch/arm64/include/asm/irqflags.h:33 [inline]
+ arch_local_irq_enable arch/arm64/include/asm/irqflags.h:55 [inline]
+ lookup_bh_lru fs/buffer.c:1340 [inline]
+ __find_get_block+0x1a4/0xe8c fs/buffer.c:1352
+ __getblk_gfp+0x48/0xa50 fs/buffer.c:1378
+ sb_getblk include/linux/buffer_head.h:365 [inline]
+ __ext4_get_inode_loc+0x3b4/0xb90 fs/ext4/inode.c:4376
+ ext4_get_inode_loc fs/ext4/inode.c:4504 [inline]
+ ext4_reserve_inode_write+0x130/0x2e0 fs/ext4/inode.c:5734
+ __ext4_mark_inode_dirty+0x1c4/0x848 fs/ext4/inode.c:5911
+ ext4_ext_tree_init+0xc0/0x184 fs/ext4/extents.c:879
+ __ext4_new_inode+0x2ce0/0x39fc fs/ext4/ialloc.c:1335
+ ext4_symlink+0x328/0x9a0 fs/ext4/namei.c:3393
+ vfs_symlink+0x138/0x260 fs/namei.c:4475
+ do_symlinkat+0x364/0x6b0 fs/namei.c:4501
+ __do_sys_symlinkat fs/namei.c:4517 [inline]
+ __se_sys_symlinkat fs/namei.c:4514 [inline]
+ __arm64_sys_symlinkat+0xa4/0xbc fs/namei.c:4514
+ __invoke_syscall arch/arm64/kernel/syscall.c:38 [inline]
+ invoke_syscall+0x98/0x2c0 arch/arm64/kernel/syscall.c:52
+ el0_svc_common+0x138/0x244 arch/arm64/kernel/syscall.c:142
+ do_el0_svc+0x64/0x198 arch/arm64/kernel/syscall.c:191
+ el0_svc+0x4c/0x160 arch/arm64/kernel/entry-common.c:647
+ el0t_64_sync_handler+0x84/0xfc arch/arm64/kernel/entry-common.c:665
+ el0t_64_sync+0x190/0x194 arch/arm64/kernel/entry.S:591
+
+
 ---
- Documentation/netlink/specs/rt_addr.yaml  | 179 ++++++++++++++++++++
- Documentation/netlink/specs/rt_route.yaml | 192 ++++++++++++++++++++++
- 2 files changed, 371 insertions(+)
- create mode 100644 Documentation/netlink/specs/rt_addr.yaml
- create mode 100644 Documentation/netlink/specs/rt_route.yaml
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/Documentation/netlink/specs/rt_addr.yaml b/Documentation/netlink/specs/rt_addr.yaml
-new file mode 100644
-index 000000000000..f97ae7c35e44
---- /dev/null
-+++ b/Documentation/netlink/specs/rt_addr.yaml
-@@ -0,0 +1,179 @@
-+# SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-3-Clause)
-+
-+name: rt-addr
-+protocol: netlink-raw
-+protonum: 0
-+
-+doc:
-+  Address configuration over rtnetlink.
-+
-+definitions:
-+  -
-+    name: ifaddrmsg
-+    type: struct
-+    members:
-+      -
-+        name: ifa-family
-+        type: u8
-+      -
-+        name: ifa-prefixlen
-+        type: u8
-+      -
-+        name: ifa-flags
-+        type: u8
-+        enum: ifa-flags
-+        enum-as-flags: true
-+      -
-+        name: ifa-scope
-+        type: u8
-+      -
-+        name: ifa-index
-+        type: u32
-+  -
-+    name: ifa-cacheinfo
-+    type: struct
-+    members:
-+      -
-+        name: ifa-prefered
-+        type: u32
-+      -
-+        name: ifa-valid
-+        type: u32
-+      -
-+        name: cstamp
-+        type: u32
-+      -
-+        name: tstamp
-+        type: u32
-+
-+  -
-+    name: ifa-flags
-+    type: flags
-+    entries:
-+      -
-+        name: secondary
-+      -
-+        name: nodad
-+      -
-+        name: optimistic
-+      -
-+        name: dadfailed
-+      -
-+        name: homeaddress
-+      -
-+        name: deprecated
-+      -
-+        name: tentative
-+      -
-+        name: permanent
-+      -
-+        name: managetempaddr
-+      -
-+        name: noprefixroute
-+      -
-+        name: mcautojoin
-+      -
-+        name: stable-privacy
-+
-+attribute-sets:
-+  -
-+    name: addr-attrs
-+    attributes:
-+      -
-+        name: ifa-address
-+        type: binary
-+        display-hint: ipv4
-+      -
-+        name: ifa-local
-+        type: binary
-+        display-hint: ipv4
-+      -
-+        name: ifa-label
-+        type: string
-+      -
-+        name: ifa-broadcast
-+        type: binary
-+        display-hint: ipv4
-+      -
-+        name: ifa-anycast
-+        type: binary
-+      -
-+        name: ifa-cacheinfo
-+        type: binary
-+        struct: ifa-cacheinfo
-+      -
-+        name: ifa-multicast
-+        type: binary
-+      -
-+        name: ifa-flags
-+        type: u32
-+        enum: ifa-flags
-+        enum-as-flags: true
-+      -
-+        name: ifa-rt-priority
-+        type: u32
-+      -
-+        name: ifa-target-netnsid
-+        type: binary
-+      -
-+        name: ifa-proto
-+        type: u8
-+
-+
-+operations:
-+  fixed-header: ifaddrmsg
-+  enum-model: directional
-+  list:
-+    -
-+      name: newaddr
-+      doc: Add new address
-+      attribute-set: addr-attrs
-+      do:
-+        request:
-+          value: 20
-+          attributes: &ifaddr-all
-+            - ifa-family
-+            - ifa-flags
-+            - ifa-prefixlen
-+            - ifa-scope
-+            - ifa-index
-+            - ifa-address
-+            - ifa-label
-+            - ifa-local
-+            - ifa-cacheinfo
-+    -
-+      name: deladdr
-+      doc: Remove address
-+      attribute-set: addr-attrs
-+      do:
-+        request:
-+          value: 21
-+          attributes:
-+            - ifa-family
-+            - ifa-flags
-+            - ifa-prefixlen
-+            - ifa-scope
-+            - ifa-index
-+            - ifa-address
-+            - ifa-local
-+    -
-+      name: getaddr
-+      doc: Dump address information.
-+      attribute-set: addr-attrs
-+      dump:
-+        request:
-+          value: 22
-+          attributes:
-+            - index
-+        reply:
-+          value: 20
-+          attributes: *ifaddr-all
-+
-+mcast-groups:
-+  list:
-+    -
-+      name: rtnlgrp-ipv4-ifaddr
-+      id: 5
-+    -
-+      name: rtnlgrp-ipv6-ifaddr
-+      id: 9
-diff --git a/Documentation/netlink/specs/rt_route.yaml b/Documentation/netlink/specs/rt_route.yaml
-new file mode 100644
-index 000000000000..882af9b50bd4
---- /dev/null
-+++ b/Documentation/netlink/specs/rt_route.yaml
-@@ -0,0 +1,192 @@
-+# SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-3-Clause)
-+
-+name: rt-route
-+protocol: netlink-raw
-+protonum: 0
-+
-+doc:
-+  Route configuration over rtnetlink.
-+
-+definitions:
-+  -
-+    name: rtm-type
-+    name-prefix: rtn-
-+    type: enum
-+    entries:
-+      - unspec
-+      - unicast
-+      - local
-+      - broadcast
-+      - anycast
-+      - multicast
-+      - blackhole
-+      - unreachable
-+      - prohibit
-+      - throw
-+      - nat
-+      - xresolve
-+  -
-+    name: rtmsg
-+    type: struct
-+    members:
-+      -
-+        name: rtm-family
-+        type: u8
-+      -
-+        name: rtm-dst-len
-+        type: u8
-+      -
-+        name: rtm-src-len
-+        type: u8
-+      -
-+        name: rtm-tos
-+        type: u8
-+      -
-+        name: rtm-table
-+        type: u8
-+      -
-+        name: rtm-protocol
-+        type: u8
-+      -
-+        name: rtm-scope
-+        type: u8
-+      -
-+        name: rtm-type
-+        type: u8
-+        enum: rtm-type
-+      -
-+        name: rtm-flags
-+        type: u32
-+  -
-+    name: rta-cacheinfo
-+    type: struct
-+    members:
-+      -
-+        name: rta-clntref
-+        type: u32
-+      -
-+        name: rta-lastuse
-+        type: u32
-+      -
-+        name: rta-expires
-+        type: u32
-+      -
-+        name: rta-error
-+        type: u32
-+      -
-+        name: rta-used
-+        type: u32
-+
-+attribute-sets:
-+  -
-+    name: route-attrs
-+    attributes:
-+      -
-+        name: rta-dst
-+        type: binary
-+        display-hint: ipv4
-+      -
-+        name: rta-src
-+        type: binary
-+        display-hint: ipv4
-+      -
-+        name: rta-iif
-+        type: u32
-+      -
-+        name: rta-oif
-+        type: u32
-+      -
-+        name: rta-gateway
-+        type: binary
-+        display-hint: ipv4
-+      -
-+        name: rta-priority
-+        type: binary
-+      -
-+        name: rta-prefsrc
-+        type: binary
-+        display-hint: ipv4
-+      -
-+        name: rta-metrics
-+        type: binary
-+      -
-+        name: rta-multipath
-+        type: binary
-+      -
-+        name: rta-protoinfo
-+        type: binary
-+      -
-+        name: rta-flow
-+        type: u32
-+      -
-+        name: rta-cacheinfo
-+        type: binary
-+        struct: rta-cacheinfo
-+      -
-+        name: rta-session
-+        type: binary
-+      -
-+        name: rta-mp-algo
-+        type: binary
-+      -
-+        name: rta-table
-+        type: u32
-+      -
-+        name: rta-mark
-+        type: binary
-+      -
-+        name: rta-mfc-stats
-+        type: binary
-+      -
-+        name: rta-via
-+        type: binary
-+      -
-+        name: rta-newdst
-+        type: binary
-+      -
-+        name: rta-pref
-+        type: binary
-+      -
-+        name: rta-encap-type
-+        type: binary
-+      -
-+        name: rta-encap
-+        type: binary
-+      -
-+        name: rta-expires
-+        type: binary
-+      -
-+        name: rta-pad
-+        type: binary
-+      -
-+        name: rta-uid
-+        type: binary
-+      -
-+        name: rta-ttl-propagate
-+        type: binary
-+      -
-+        name: rta-ip-proto
-+        type: binary
-+      -
-+        name: rta-sport
-+        type: binary
-+      -
-+        name: rta-dport
-+        type: binary
-+      -
-+        name: rta-nh-id
-+        type: binary
-+
-+operations:
-+  enum-model: directional
-+  list:
-+    -
-+      name: getroute
-+      doc: Dump route information.
-+      attribute-set: route-attrs
-+      fixed-header: rtmsg
-+      dump:
-+        request:
-+          value: 26
-+        reply:
-+          value: 24
--- 
-2.41.0
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
+If the bug is already fixed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to change bug's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the bug is a duplicate of another bug, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
