@@ -1,217 +1,219 @@
-Return-Path: <netdev+bounces-20945-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20946-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4F18761FB8
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 19:03:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5DA7C761FBE
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 19:03:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 01D621C20D74
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 17:03:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7FFA51C20958
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 17:03:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1D2F2419A;
-	Tue, 25 Jul 2023 17:03:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C53AC25176;
+	Tue, 25 Jul 2023 17:03:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE33B3C23
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 17:03:07 +0000 (UTC)
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2098.outbound.protection.outlook.com [40.107.94.98])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B2DEE9;
-	Tue, 25 Jul 2023 10:03:05 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=J9YOr3ryOJJS2Z5k0IatcAFlUINGR/UWjuTCpUU5DL8dFJR21h3sedUNJio9j8UQCk5z68ghAooRv2i5gsrcABBLDYpEygm/TRZfNziHx3sRI5GDYOIOP2lm/KqcPf2SwCsHgrUp6HNUmWeTtM/5CTU29/JWABKEmNiTIEsfo9Yh30FufiUv3j0f0HY/SQfZRd2OZQNoEYwolcgHz8pHlc9ug88Sgn0YDc01SrQKdrEfAm5ZdTaKgQejWMIXZZYPpSRuCDay6E3A3YHEFF4gDdIjOO2ILA++cHijpJAFrWZbmBdcl7M3oZKo0SguaD9hgn1ox8dPikDDfwIWcBbNiA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=KMo3uekYzQachOdt5kB1z/qh/HVkL1SZkKeC4pzJrgI=;
- b=m5yIym9xSos648YhPhrcaZENDzXEcqQm2OPul621Ozmkg1qftDehYsXfeq7yEzmO6ENt4dKPlnADl18K1IjmPPyY5rKiAD9VMnE7QkP2GQvlV93JBXSlnta6faul4DWXnJLjLxzSMh4qfXLXUQ0MoYsbnA4ISz2exNupFQJlVQkMo9L5maUqg7BaJ4/cVckzdvXkLeHsyGB01l6i68bIugWWLDWI2fpw+HxBdPo3T3LC4mbSJgY8W6OD1IN1BFakPbrvx4thBqnF5qWQxJX5IN3BIuaUU1pq1+tgi1e1rtUO8WC8zrmqNDbKLEQalI18+0Phs3a/jew4FJqcujkfQw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
- dkim=pass header.d=corigine.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B763B3C23
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 17:03:08 +0000 (UTC)
+Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC16CFE
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 10:03:06 -0700 (PDT)
+Received: by mail-wm1-x335.google.com with SMTP id 5b1f17b1804b1-3fbc656873eso58167395e9.1
+        for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 10:03:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=KMo3uekYzQachOdt5kB1z/qh/HVkL1SZkKeC4pzJrgI=;
- b=d9lzL2kapXhKRpDQvdBvaE+ifbBOD1tfAkHFLYAq5SES1X/REH+P2uXziTH14Q9JMkSVCcYMTeadpdVZtma4PTNQXPA36wVzm8kNLthf6N/6Ir0mXyzmg5JhEigExp4/asbTuPVZNtxP98SASZENPTuX3xAVe/dTiH3M98U/IJA=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=corigine.com;
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
- by SA3PR13MB6371.namprd13.prod.outlook.com (2603:10b6:806:381::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.32; Tue, 25 Jul
- 2023 17:03:02 +0000
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::fde7:9821:f2d9:101d]) by PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::fde7:9821:f2d9:101d%7]) with mapi id 15.20.6609.032; Tue, 25 Jul 2023
- 17:03:01 +0000
-Date: Tue, 25 Jul 2023 19:02:52 +0200
-From: Simon Horman <simon.horman@corigine.com>
-To: Dmitry Safonov <dima@arista.com>
-Cc: David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-kernel@vger.kernel.org, Andy Lutomirski <luto@amacapital.net>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Bob Gilligan <gilligan@arista.com>,
-	Dan Carpenter <error27@gmail.com>,
-	David Laight <David.Laight@aculab.com>,
-	Dmitry Safonov <0x7f454c46@gmail.com>,
-	Donald Cassidy <dcassidy@redhat.com>,
-	Eric Biggers <ebiggers@kernel.org>,
-	"Eric W. Biederman" <ebiederm@xmission.com>,
-	Francesco Ruggeri <fruggeri05@gmail.com>,
-	"Gaillardetz, Dominik" <dgaillar@ciena.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-	Ivan Delalande <colona@arista.com>,
-	Leonard Crestez <cdleonard@gmail.com>,
-	Salam Noureddine <noureddine@arista.com>,
-	"Tetreault, Francois" <ftetreau@ciena.com>, netdev@vger.kernel.org
-Subject: Re: [PATCH v8.1 net-next 06/23] net/tcp: Add TCP-AO sign to outgoing
- packets
-Message-ID: <ZMAAPBKnnrdk/c9K@corigine.com>
-References: <20230721161916.542667-1-dima@arista.com>
- <20230721161916.542667-7-dima@arista.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230721161916.542667-7-dima@arista.com>
-X-ClientProxiedBy: AM0PR01CA0110.eurprd01.prod.exchangelabs.com
- (2603:10a6:208:168::15) To PH0PR13MB4842.namprd13.prod.outlook.com
- (2603:10b6:510:78::6)
+        d=gmail.com; s=20221208; t=1690304585; x=1690909385;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=AaG67F5PV92jBTVwJ9fE09T/CxSxAbtkMLZu0XHwRSE=;
+        b=j20Jca4+30PfyjlUeFlIdqXmUfj2deSxJMGqt+ezDJ0F5wKTMSLf6oZ/pN2Btf9eyj
+         ECSmuDSF6GFuCXWjNIwVpEuiuOFd2CyEFVpw35aHj5M392PuuLaKyC1d3LcMx6q6ZcU2
+         pA6Ryzis3F9oRT29J7/2rO1FFdeBFHCXBjHTAJBhOjco8+KOPKD3A7gAQpraQ+QMqABN
+         WTYQvuxDd6bOnJwxXWVeREA7n2bM0hReU9kP9ftCcRrqfWcE/9gy25Fx+DjWm8bF7sdZ
+         yGNlYFo3Ep3DUJOBZy4Nv6F/tmhJdN1ns5r1xCHv2NP5vgfrpPLxcJ+wwur16XuUTsvy
+         u6Iw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690304585; x=1690909385;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=AaG67F5PV92jBTVwJ9fE09T/CxSxAbtkMLZu0XHwRSE=;
+        b=RTwd+7r4JqqzmkPKf6wz7mIERy5kKj7XziqkGwaWO/AlAESYMYhKjvr/Xh3+uvpLHA
+         JVwdstOv2AsKFEY1O7aECxWdwvSfyjXIQLB3GfB3N78obT95ybpF51RG6vUVFhsACHsS
+         zuY5KLr7d9+QcJRCiL+161meYDQjJZPaFVk5bm7gopVdKCHbATlRbQyHyCcg62j57ZAZ
+         /rJCZ3JP7UYP8cTGF0DdOreGHyH+qokaYZrR06+k/pri9I1zqSLU8SuL/82e6WtKsN6m
+         /mCa1pubFNLX5m8ZYNoklI2NKuuZ1Yg4f7NzblxiXZehbVnAsBOQdsKUkBHGbF83w9Tv
+         gPuw==
+X-Gm-Message-State: ABy/qLbjld2SzTZciVuo6IoCTDknhKLh5+Rl53JYkE2t7QJVBaSk4KUr
+	gNpMXVItje0ta08H+COqGiM=
+X-Google-Smtp-Source: APBJJlE4BIQ40T4p8kltJFumDBMUuYFlKhRdQjBTKq3jOoSKLQZc9u2wCp2TFOmNs+ZEZlIF3NUCCg==
+X-Received: by 2002:a05:600c:2205:b0:3fc:193:734e with SMTP id z5-20020a05600c220500b003fc0193734emr11609228wml.32.1690304584632;
+        Tue, 25 Jul 2023 10:03:04 -0700 (PDT)
+Received: from skbuf ([188.25.175.105])
+        by smtp.gmail.com with ESMTPSA id 26-20020a05600c229a00b003fc3b03e41esm2041986wmf.1.2023.07.25.10.03.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 25 Jul 2023 10:03:04 -0700 (PDT)
+Date: Tue, 25 Jul 2023 20:03:02 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Daniel Mack <daniel.mack@holoplot.com>
+Cc: netdev@vger.kernel.org, andrew@lunn.ch, f.fainelli@gmail.com
+Subject: Re: [PATCH] net: dsa: mv88e6xxx: use distinct FIDs for each bridge
+Message-ID: <20230725170302.r3ajp2mbm6ntr4ej@skbuf>
+References: <20230724101059.2228381-1-daniel.mack@holoplot.com>
+ <20230724101059.2228381-1-daniel.mack@holoplot.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|SA3PR13MB6371:EE_
-X-MS-Office365-Filtering-Correlation-Id: 35eca9dd-cb0a-431b-424c-08db8d310120
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	wZN/ooXBe4ev4Kq7U+Bsfc4XkUvdlvL0tGcLOLfOR1y1mRaqFUnvpww+DF8qgHjdh2GHYnQGEtvFmIvEajgTEuQMJGqpH4TxybjAZWPzM+RrcqgNtGFszGtM6kENPMT9BqSbV1RSfZdlBrOFral5///W6g/gjwbsWupyyiysilxsjCOOF5TbTXnlcz/AnrpYoFqRXPz7ygSzEtAfH34NqJpEjoTMvicF/sTr0dXPSdBTEZ3zDCXepk2IDKowZORIDe0i+Q3J+A4bW6kYG2GtLSfy64FjDlhcxRVtAkS/MpY7cnvaudLcKuPXess8OKKgVvgbbsUwkHiyBvWmvTsTWVhqgIPFMkEYXa+gcRZKHBbvGoglUOfOKKRlgAg0hcKqqI8x2zLgx86nwRvkmudeYpUnS+Fr1pabN4wZwc7iTO887yuFUemZw5AeHOVzfZX1P7tva6WLRbzfjogK2Utyt2+3FHg+lhYp249WzTPk4hBKkSQZO1BsxoI4Vth5ijBA2NJIBSuBb5AjTm42x4rJp365UKsNZ84xfq3s7xL/AEc6BdsaXxye5tiLGTM4kIY4NUjSlgbYVzzS8sgKfNUZN8iwyv5iBXOM6638NQBMOzk=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(346002)(366004)(136003)(376002)(39830400003)(396003)(451199021)(6486002)(478600001)(6512007)(54906003)(6666004)(83380400001)(86362001)(44832011)(2906002)(2616005)(186003)(36756003)(6506007)(66556008)(38100700002)(66476007)(6916009)(4326008)(5660300002)(41300700001)(8936002)(66946007)(8676002)(7416002)(316002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?ycLOYVGqncnUeZQ41CjVP7m8vbaXQtzaWWoV2s52izVPlxmkgIZewgWap8aK?=
- =?us-ascii?Q?90/hn+j6q1hxd4AFOguuhjaMKUX/fYrU0kk8DamdY29ITeZdnpLaKDz/QLPs?=
- =?us-ascii?Q?Uj7FAhkmZbYFKurFEznwzKLltu2nw+DxSUmLkK3AUE596Ap3NULfuqtCp1HQ?=
- =?us-ascii?Q?w+z6gg7hDB3SCgUri6xc2Yx9lOWRyn9XD/AkqCm3FFFHq0bmL7rm30yTbkGW?=
- =?us-ascii?Q?8HueMlMtzaFn1EHCqzYYa2pXx5ugGf4fUw7k2h5fSHakAEoeb7lr7gRG+mTm?=
- =?us-ascii?Q?wH5T7EKQZXDVdbzeCS6XRxTi3sRprHBIPguiFZMnLg5NDVeSdIR5hTETgfD8?=
- =?us-ascii?Q?oN9EHLOC+CHqGOAXpwCZ+3tVT+z/SRopFtXHVKgw3H0lBnY9RpIz1Zcv78Iu?=
- =?us-ascii?Q?jPCWDOv7LYzXU8/Cbi8BlcFXj7pXCh30E4YzSYNAXnqgDnIdY48oEWcGFsPv?=
- =?us-ascii?Q?rDfYrDANuDS/mUGVvoyuyOe/mtDpd3vobnWkzCHS2diSt+tbpTa2GZNB9ztm?=
- =?us-ascii?Q?2js7yQG8c3ZO4LzqZYJxdiB3gYWy8b/VD6oYTIgCtEVSnNAcdNSQj5t9ujBk?=
- =?us-ascii?Q?YybqWWraJC2BM/xw4b/03zFsH907txgYYLegOZwi+gEgcWPQVb3CS+/o/v05?=
- =?us-ascii?Q?u2pwxROVqLh4mz8RTKpZv8dWh+E14gt6aH7O3LxTI7rwYZHTUcSh6C7a23JU?=
- =?us-ascii?Q?Ec/qyc0NOlAa+vl6DvTfwYhrLxKZ+jzDPhZG8ZG3fI/kv9VY9MOhkkWauPjQ?=
- =?us-ascii?Q?1LvD9jabGXAoLnF/jUK/Gq2V3cUwxxHjsgCOZus2o/r1m0/emKHDdc6ivDJc?=
- =?us-ascii?Q?hZSqgN0rnuQRXuNT3RGU2+8WawalfTy3F8FgzpTyijxNb+i5BgreNMsx6IRk?=
- =?us-ascii?Q?W0Es5XuDfDM1GYE4Y8u0PtVJKC/p29yBmJ4BH/wFmyLuvFsYitQnlUPFrDWZ?=
- =?us-ascii?Q?j6+mU/+9IICFtXmTRMjJtgUugI4gRntwdtVyMFQL2oOcJtoVOsd8Smnai3Mu?=
- =?us-ascii?Q?HvIdK++JhuTxsfWSPbxTpCKKpoOKk56xATOz1XoQHKZrehbdPl+hAbPOYRPp?=
- =?us-ascii?Q?OYgrQJbpQ9Yrf+6l6sdhrxGkAyxerJae83Re6mTKDWSra22e2rjtFEwqrom4?=
- =?us-ascii?Q?XWZrXf0qNadnw5JG+acaWiOR1oq4lWti4TpSRlhWO6uFhgMHdLUCtrboDbzc?=
- =?us-ascii?Q?94s5B/q5I7MeJsG3+RBkjH/DYKcZlMmt8RVu7UC92ARO59k2Wld/Wlc5h8L2?=
- =?us-ascii?Q?iZCwCNs5PdZaHvkQFXG7P4/W174QlDJVrCO83UXBiXsfmrTEtG72L2vR9NtI?=
- =?us-ascii?Q?H9LithdTXWXpXhnPpnDs26tEFPDB1OfqvT8x/hIxJlyPDgwtpIQH1PFdidbw?=
- =?us-ascii?Q?uHKKcOihMHKZGovjmTUeW0yxlk7jn9QJFWN0nUX4d0u/1934RhpWhT4hnmcs?=
- =?us-ascii?Q?2H+HEKl2S+wH/y3c12p5cpDuzivtocLmcqkHT1GJhYxu4ls7gXMYx4XSSH+q?=
- =?us-ascii?Q?1mZJq4wUyqoWvu57RC3vFTYOHjejq683iUdJAYQY0LIze+0b6T9hBLiTrbGJ?=
- =?us-ascii?Q?nfE9ajMV8AOorXQO4Khc/3PQ7lWXby7pMVX3KoWvBM9dULpTEc1pSUj+IFt5?=
- =?us-ascii?Q?qJdHIod1hnGmIiYEQRUOeMxdIJwL3qE0YOybSs7niAMSY2JaVTOXYkeoSgZo?=
- =?us-ascii?Q?eZCv7w=3D=3D?=
-X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 35eca9dd-cb0a-431b-424c-08db8d310120
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jul 2023 17:03:01.7853
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 8M/k5NiRFJPmA810Iiilq04JR158/805Rl5IU3c5DHBUNFJ1yW87rziwgxirnJC67QxQ7ZszozpNL8wdFTbYuOsw9ogcvN4DOVx3n+1HLYA=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR13MB6371
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230724101059.2228381-1-daniel.mack@holoplot.com>
+ <20230724101059.2228381-1-daniel.mack@holoplot.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Jul 21, 2023 at 05:18:57PM +0100, Dmitry Safonov wrote:
+Hi Daniel,
 
-...
+On Mon, Jul 24, 2023 at 12:10:59PM +0200, Daniel Mack wrote:
+> Allow setups with overlapping VLAN IDs in different bridges by settting
+> the FID of all bridge ports to the index of the bridge.
+> 
+> Read the FID back when detecting overlaps.
+> 
+> Signed-off-by: Daniel Mack <daniel.mack@holoplot.com>
+> ---
 
-Hi Dmitry,
+You will have to give more details about what you're trying to do and
+how, because my non-expert understanding of Marvell hardware is that
+it's simply not possible to allow overlapping VLAN IDs in different
+bridges without mapping them to the same FID, aka having them share the
+same address database - which is not what we want.
 
-> diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
+In fact we should be going in the opposite direction, and eventually
+convert mv88e6xxx to report ds->fdb_isolation = true - the fact that all
+VLAN-unaware bridges share MV88E6XXX_VID_BRIDGED and MV88E6XXX_FID_BRIDGED
+prevents us from doing that right now. Your patch is not exactly a correct
+step in that direction.
 
-...
+My understanding is that there are some newer Marvell switches with an
+8K entry VTU where VLANs might map to one FID or another depending on
+port, but your patch does not handle that in the way that I would
+expect.
 
-> @@ -619,7 +621,33 @@ static void tcp_options_write(struct tcphdr *th, struct tcp_sock *tp,
->  		opts->hash_location = (__u8 *)ptr;
->  		ptr += 4;
->  	}
-> +#ifdef CONFIG_TCP_AO
-> +	if (unlikely(OPTION_AO & options) && tp) {
+Currently, if you want to use multiple bridges, you need to do one of
+the following:
+- create them with "vlan_default_pvid 0" and use them in "vlan_filtering 0"
+  mode
+- disable CONFIG_BRIDGE_VLAN_FILTERING (has the same effect as the above)
+- if you want to use them in "vlan_filtering 1" mode, then each bridge
+  needs to be created with a different vlan_default_pvid value (this value
+  is irrelevant for the bridge operating in "vlan_filtering 0" mode).
 
-Smatch warns that here we check if tp is NULL,
-but later on in the same function (existing) code
-uses tp unconditionally.
-
-That code looks like this:
-
-        if (unlikely(opts->num_sack_blocks)) {
-                struct tcp_sack_block *sp = tp->rx_opt.dsack ?
-                        tp->duplicate_sack : tp->selective_acks;
-
-I would recommend running Smatch.
-It points out a lot of interesting things.
-
-
-> +		struct tcp_ao_key *rnext_key;
-> +		struct tcp_ao_info *ao_info;
-> +		u8 maclen;
+>  drivers/net/dsa/mv88e6xxx/chip.c | 15 +++++++++++++++
+>  1 file changed, 15 insertions(+)
+> 
+> diff --git a/drivers/net/dsa/mv88e6xxx/chip.c b/drivers/net/dsa/mv88e6xxx/chip.c
+> index c7d51a539451..dff271981c69 100644
+> --- a/drivers/net/dsa/mv88e6xxx/chip.c
+> +++ b/drivers/net/dsa/mv88e6xxx/chip.c
+> @@ -2028,6 +2028,7 @@ static int mv88e6xxx_port_check_hw_vlan(struct dsa_switch *ds, int port,
+>  	struct mv88e6xxx_chip *chip = ds->priv;
+>  	struct mv88e6xxx_vtu_entry vlan;
+>  	int err;
+> +	u16 fid;
 >  
-> +		if (WARN_ON_ONCE(!ao_key))
-> +			goto out_ao;
-> +		ao_info = rcu_dereference_check(tp->ao_info,
-> +				lockdep_sock_is_held(&tp->inet_conn.icsk_inet.sk));
-
-Checkpatch complains about indentation here.
-
-Rather than point out each case in the series,
-could I ask you to run ./scripts/checkpatch.pl --strict over the patchset?
-
-...
-
-> @@ -1363,6 +1424,34 @@ static int __tcp_transmit_skb(struct sock *sk, struct sk_buff *skb,
->  					       md5, sk, skb);
->  	}
->  #endif
-> +#ifdef CONFIG_TCP_AO
-> +	if (ao) {
-> +		u8 *traffic_key;
-> +		void *tkey_buf = NULL;
-> +		u32 disn;
+>  	/* DSA and CPU ports have to be members of multiple vlans */
+>  	if (dsa_port_is_dsa(dp) || dsa_port_is_cpu(dp))
+> @@ -2037,11 +2038,16 @@ static int mv88e6xxx_port_check_hw_vlan(struct dsa_switch *ds, int port,
+>  	if (err)
+>  		return err;
+>  
+> +	err = mv88e6xxx_port_get_fid(chip, port, &fid);
+> +	if (err)
+> +		return err;
 > +
-> +		sk_gso_disable(sk);
-> +		if (unlikely(tcb->tcp_flags & TCPHDR_SYN)) {
-> +			if (tcb->tcp_flags & TCPHDR_ACK)
-> +				disn = ao->risn;
+>  	if (!vlan.valid)
+>  		return 0;
+>  
+>  	dsa_switch_for_each_user_port(other_dp, ds) {
+>  		struct net_device *other_br;
+> +		u16 other_fid;
+>  
+>  		if (vlan.member[other_dp->index] ==
+>  		    MV88E6XXX_G1_VTU_DATA_MEMBER_TAG_NON_MEMBER)
+> @@ -2054,6 +2060,10 @@ static int mv88e6xxx_port_check_hw_vlan(struct dsa_switch *ds, int port,
+>  		if (!other_br)
+>  			continue;
+>  
+> +		err = mv88e6xxx_port_get_fid(chip, other_dp->index, &other_fid);
+> +		if (err == 0 && fid != other_fid)
+> +			continue;
+> +
+>  		dev_err(ds->dev, "p%d: hw VLAN %d already used by port %d in %s\n",
+>  			port, vlan.vid, other_dp->index, netdev_name(other_br));
+>  		return -EOPNOTSUPP;
+> @@ -2948,6 +2958,11 @@ static int mv88e6xxx_port_bridge_join(struct dsa_switch *ds, int port,
+>  		*tx_fwd_offload = true;
+>  	}
+>  
+> +	/* Set the port's FID to the bridge index so bridges can have
+> +	 * overlapping VLANs.
+> +	 */
+> +	err = mv88e6xxx_port_set_fid(chip, port, bridge.num);
 
-Sparse complains that there is an endian missmatch between disn and ao->risn ?
+To be clear, mv88e6xxx_port_set_fid() changes the port-default FID of
+the packets, which is used to classify frames when the port 8021Q mode
+is disabled and the port-default FID is not in the VTU. Currently, I
+believe that is never the case in this driver, so the port-default FID
+is never used, and the other call to mv88e6xxx_port_set_fid() could just
+as well be removed.
 
-Rather than point out every problem flagged by Sparse,
-could I ask you to run it over the series?
+IIRC, in standalone mode we install MV88E6XXX_VID_STANDALONE in the VTU
+and set the port 8021Q mode to disabled, which means that all packets
+will get classified to MV88E6XXX_FID_STANDALONE through the VTU mapping
+and not through the port-default FID whose value you're changing now.
 
-...
+For VLAN-unaware bridge ports it's a similar story as for standalone
+(802.1Q mode disabled), except that the port-default VID, as set up by
+mv88e6xxx_port_commit_pvid(), is MV88E6XXX_VID_BRIDGED. This is also
+present in the VTU, and is mapped to MV88E6XXX_FID_BRIDGED.
+
+Each bridge VLAN (used only in VLAN-aware mode) has its own unique FID
+as allocated by mv88e6xxx_atu_new(), which is always greater than 2
+because of the first 2 FIDs being reserved by the driver. The VTU is not
+namespaced per bridge. If br0 creates an ATU for VID 1 and gets a FID
+for it, br1 either has to use the same FID for VID 1, or not use VID 1
+at all. The driver writers decided that the 2nd option would be better.
+
+I think you are trying to bypass that restriction in a way that doesn't
+make much sense. Correct me if I'm wrong, but if I follow the intention
+of your patch, I think that what you're thinking is that the port's
+Default FID does something else (somehow namespaces all VLANs)?
+
+To see where your proposal falls short, try to have communication
+between 2 stations in different bridges br0 and br1, towards MAC address
+00:01:02:03:04:05. There is a single ATU (single FID), and if you have
+learning enabled, the ATU entry will bounce back and forth between a
+port in br0, and a port in br1. Forwarding is still restricted, so when
+another station tries to ping the 00:01:02:03:04:05 address and that
+happens to be learned on a br1 port, you'll just see packet loss because
+the switch won't permit communication between br0 and br1.
+
+> + unlock: mv88e6xxx_reg_unlock(chip);
+>  
+> -- 2.41.0
+> 
+> 
+
+Sorry, but:
+
+pw-bot: cr
 
