@@ -1,83 +1,80 @@
-Return-Path: <netdev+bounces-20628-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20629-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A353776046A
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 02:55:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D90976046E
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 02:56:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D716281706
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 00:55:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CDACB1C20CB1
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 00:56:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5866EA2;
-	Tue, 25 Jul 2023 00:55:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A497EA2;
+	Tue, 25 Jul 2023 00:56:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B98D87C
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 00:55:32 +0000 (UTC)
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59D7C10F7;
-	Mon, 24 Jul 2023 17:55:31 -0700 (PDT)
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.96)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1qO6Kc-0004Y6-2q;
-	Tue, 25 Jul 2023 00:55:18 +0000
-Date: Tue, 25 Jul 2023 01:55:10 +0100
-From: Daniel Golle <daniel@makrotopia.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>, Felix Fietkau <nbd@nbd.name>,
-	John Crispin <john@phrozen.org>, Sean Wang <sean.wang@mediatek.com>,
-	Mark Lee <Mark-MC.Lee@mediatek.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Russell King <linux@armlinux.org.uk>,
-	=?iso-8859-1?Q?Bj=F8rn?= Mork <bjorn@mork.no>,
-	Greg Ungerer <gerg@kernel.org>,
-	Florian Fainelli <f.fainelli@gmail.com>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH net-next v5 0/9] net: ethernet: mtk_eth_soc: add basic
- support for MT7988 SoC
-Message-ID: <ZL8dbpEwmA8G4Mq9@makrotopia.org>
-References: <cover.1690148927.git.daniel@makrotopia.org>
- <20230724160024.427b2bef@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 625BC7C
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 00:56:13 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 76B26C433C8;
+	Tue, 25 Jul 2023 00:56:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1690246573;
+	bh=cFkvzIqEVxtobth8BkWedQlxCsFQkol1UukjBn0/mMg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Z+1DX3GP3lPjJxrYCjQYbSmWeex1UZ94DyV6E0lKotL6TyUDAwRrCHqPRqd3GaP7w
+	 FuDixiNhnFQICs/uE5W+iOJdj78nURRS8yX7ISlZ0HXwXXQgXbGXWF/XKQ4oKv0p65
+	 YkETrCwaiTp84yG9Qq+tmAoYehUOee20qPwAtGo4hYfoj2/z0sYlEGCW/oWIwKj+Ih
+	 PM5fwPv8g/lrnp6rCLT4IykgFME/nOMtYbwGNBN7Jhf179SxNo2Dtpswa2chcxP6mK
+	 SJciRa3bfOR/S97FLTGewS9WHhWg5rTIs66Dfx4swS7wX2O9T0w9geOrQVZcLTqi8l
+	 VkFVhhqhy39gA==
+Date: Mon, 24 Jul 2023 17:56:12 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: "Lin Ma" <linma@zju.edu.cn>, Joe Perches <joe@perches.com>
+Cc: jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] net/sched: mqprio: Add length check for
+ TCA_MQPRIO_{MAX/MIN}_RATE64
+Message-ID: <20230724175612.0649ef67@kernel.org>
+In-Reply-To: <63d69a72.e2656.1898a66ca22.Coremail.linma@zju.edu.cn>
+References: <20230724014625.4087030-1-linma@zju.edu.cn>
+	<20230724160214.424573ac@kernel.org>
+	<63d69a72.e2656.1898a66ca22.Coremail.linma@zju.edu.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230724160024.427b2bef@kernel.org>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jul 24, 2023 at 04:00:24PM -0700, Jakub Kicinski wrote:
-> On Sun, 23 Jul 2023 22:57:08 +0100 Daniel Golle wrote:
-> > The series should not conflict with Russell's recently submitted series
-> > "Remove legacy phylink behaviour", hence the order of them being
-> > picked into net-next doesn't matter.
+On Tue, 25 Jul 2023 08:15:39 +0800 (GMT+08:00) Lin Ma wrote:
+> > > The nla_for_each_nested parsing in function mqprio_parse_nlattr() does
+> > > not check the length of the nested attribute. This can lead to an
+> > > out-of-attribute read and allow a malformed nlattr (e.g., length 0) to
+> > > be viewed as 8 byte integer and passed to priv->max_rate/min_rate.
+> > > 
+> > > This patch adds the check based on nla_len() when check the nla_type(),
+> > > which ensures that the length of these two attribute must equals
+> > > sizeof(u64).  
+> > 
+> > How do you run get_maintainer? You didn't CC the author of the code.  
 > 
-> Not sure what the exact conflict is, but:
+> That's weird, I just ran code below and send this patch to all 9 emails poped out.
 > 
-> Failed to apply patch:
-> [...]
+> # ./scripts/get_maintainer.pl net/sched/sch_mqprio.c
 
-Some things got applied in the meantime, I've rebased once again and
-sent v6 without any other changes made.
+Joe, here's another case.
+
+Lin Ma, you need to run the script on the file generated by 
+git format-patch, rather than the file path. That gives better
+coverage for keywords included in the commit message (especially 
+the Fixes tag). Please rerun it on the patch and repost with 
+the right CC list.
+-- 
+pw-bot: cr
 
