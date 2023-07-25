@@ -1,26 +1,26 @@
-Return-Path: <netdev+bounces-20650-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20649-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 305287605FE
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 04:48:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D9DA7605F3
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 04:45:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5ED9E1C20D67
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 02:48:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 790551C20D62
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 02:45:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12D5E15C0;
-	Tue, 25 Jul 2023 02:48:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D04DA46A8;
+	Tue, 25 Jul 2023 02:44:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 084E61114
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 02:48:28 +0000 (UTC)
-Received: from zg8tndyumtaxlji0oc4xnzya.icoremail.net (zg8tndyumtaxlji0oc4xnzya.icoremail.net [46.101.248.176])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id CCBEB1FD3;
-	Mon, 24 Jul 2023 19:47:56 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2419210F
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 02:44:58 +0000 (UTC)
+Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [52.237.72.81])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6254019AF;
+	Mon, 24 Jul 2023 19:44:30 -0700 (PDT)
 Received: from localhost.localdomain (unknown [125.119.240.231])
 	by mail-app2 (Coremail) with SMTP id by_KCgDHuMCaNr9k_HqCCg--.1652S4;
 	Tue, 25 Jul 2023 10:42:35 +0800 (CST)
@@ -59,9 +59,9 @@ X-Coremail-Antispam: 1UD129KBjvJXoW7ZrWfXr1UKr4kAw1xKr1rWFg_yoW8Zr1fpF
 	JVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4UJVWxJrUvcSsGvfC2KfnxnUUI43ZEXa7VUb
 	XdbUUUUUU==
 X-CM-SenderInfo: qtrwiiyqvtljo62m3hxhgxhubq/
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,RCVD_IN_MSPIKE_H4,
-	RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=unavailable autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_LOW,
+	RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 Precedence: bulk
