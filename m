@@ -1,51 +1,45 @@
-Return-Path: <netdev+bounces-20992-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20994-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D53C762180
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 20:37:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E108E762192
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 20:39:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6E6661C20F97
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 18:37:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1E3411C20FAA
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 18:39:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DB6C24182;
-	Tue, 25 Jul 2023 18:36:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43DB025916;
+	Tue, 25 Jul 2023 18:39:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 104E323BFE
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 18:36:57 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3088BC433C9;
-	Tue, 25 Jul 2023 18:36:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690310216;
-	bh=bjmPK5i8hRDzGjUnFu1I3rEttWK5DLd8NhrusoG1LHM=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FB0F21D52;
+	Tue, 25 Jul 2023 18:39:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE996C433C7;
+	Tue, 25 Jul 2023 18:39:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1690310362;
+	bh=/fLrYkomR7e++1jNKJRtYrKgRl1GFbBahIfCgp09/lw=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=SdcIkVwfwM8nNchwnyAIYUyNEQfIrLNu4VzEIYuK/6yR399E7HquUzR/dEqLDwynl
-	 cs+FB8L8PqQoFeknYUPYeowW+xWD6OekN6l/qDJixjEoe/qvUSv000ZEbMnilgzoFK
-	 iWFmJyTNaRFJ9FXuDqJfTWqKLFHGv72a3Hf8BSbDFjglnjwciYyPG5YtvrCxnfokXZ
-	 f7VYTKBs5OGzYR725ZwuO+mGVGSSvWMD8y5bmlBdzNoKOPRJvrrWkOT7WUzs3fh+fk
-	 uvEePo1Adzoa0h0Eqnn0xXtyVmeLUJdR3LA+GNYvxiM94trezxoCn99BSE8nB7PLMY
-	 2jvafCCIQiVjA==
-Date: Tue, 25 Jul 2023 21:36:52 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Lin Ma <linma@zju.edu.cn>, jesse.brandeburg@intel.com,
-	anthony.l.nguyen@intel.com, davem@davemloft.net,
-	edumazet@google.com, pabeni@redhat.com, richardcochran@gmail.com,
-	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
-	john.fastabend@gmail.com, intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v1] i40e: Add length check for IFLA_AF_SPEC parsing
-Message-ID: <20230725183652.GR11388@unreal>
-References: <20230723075042.3709043-1-linma@zju.edu.cn>
- <20230724174435.GA11388@unreal>
- <20230724142155.13c83625@kernel.org>
- <20230725054046.GK11388@unreal>
- <20230725095327.385616f1@kernel.org>
+	b=lCi+AlD89Bn50K7yO0dcmAhMhTzUp0Wtq0/0fOx5dr2wWX/GygO7lS8Tf0iVnkCJK
+	 9UYGSsn2OrmNj4PKYxLVSklO91voGLkZsc6mNW36nN77e5ItxIPAzTFF9nvaPz0EHs
+	 qyI3ng4ubUQoliW+k6qnDB36j+1dsT3UzbwjeGAo=
+Date: Tue, 25 Jul 2023 20:39:19 +0200
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Mat Martineau <martineau@kernel.org>
+Cc: Matthieu Baerts <matthieu.baerts@tessares.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Geliang Tang <geliang.tang@suse.com>, netdev@vger.kernel.org,
+	mptcp@lists.linux.dev, stable@vger.kernel.org
+Subject: Re: [PATCH net 2/2] mptcp: more accurate NL event generation
+Message-ID: <2023072513-citizen-skyward-9530@gregkh>
+References: <20230725-send-net-20230725-v1-0-6f60fe7137a9@kernel.org>
+ <20230725-send-net-20230725-v1-2-6f60fe7137a9@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -54,21 +48,50 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230725095327.385616f1@kernel.org>
+In-Reply-To: <20230725-send-net-20230725-v1-2-6f60fe7137a9@kernel.org>
 
-On Tue, Jul 25, 2023 at 09:53:27AM -0700, Jakub Kicinski wrote:
-> On Tue, 25 Jul 2023 08:40:46 +0300 Leon Romanovsky wrote:
-> > > Empty attributes are valid, we can't do that.  
-> > 
-> > Maybe Lin can add special version of nla_for_each_nested() which will
-> > skip these empty NLAs, for code which don't allow empty attributes.
+On Tue, Jul 25, 2023 at 11:34:56AM -0700, Mat Martineau wrote:
+> From: Paolo Abeni <pabeni@redhat.com>
 > 
-> It's way too arbitrary. Empty attrs are 100% legit, they are called
-> NLA_FLAG in policy parlance. They are basically a boolean.
+> Currently the mptcp code generate a "new listener" event even
+> if the actual listen() syscall fails. Address the issue moving
+> the event generation call under the successful branch.
+> 
+> Fixes: f8c9dfbd875b ("mptcp: add pm listener events")
+> Reviewed-by: Mat Martineau <martineau@kernel.org>
+> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+> Signed-off-by: Mat Martineau <martineau@kernel.org>
+> ---
+>  net/mptcp/protocol.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/net/mptcp/protocol.c b/net/mptcp/protocol.c
+> index 3613489eb6e3..3317d1cca156 100644
+> --- a/net/mptcp/protocol.c
+> +++ b/net/mptcp/protocol.c
+> @@ -3723,10 +3723,9 @@ static int mptcp_listen(struct socket *sock, int backlog)
+>  	if (!err) {
+>  		sock_prot_inuse_add(sock_net(sk), sk->sk_prot, 1);
+>  		mptcp_copy_inaddrs(sk, ssock->sk);
+> +		mptcp_event_pm_listener(ssock->sk, MPTCP_EVENT_LISTENER_CREATED);
+>  	}
+>  
+> -	mptcp_event_pm_listener(ssock->sk, MPTCP_EVENT_LISTENER_CREATED);
+> -
+>  unlock:
+>  	release_sock(sk);
+>  	return err;
+> 
+> -- 
+> 2.41.0
+> 
 
-I afraid that these nla_length() checks will be copied all other the
-kernel without any understanding and netlink API doesn't really provide
-any hint when length checks are needed and when they don't.
+<formletter>
 
-Thank
+This is not the correct way to submit patches for inclusion in the
+stable kernel tree.  Please read:
+    https://www.kernel.org/doc/html/latest/process/stable-kernel-rules.html
+for how to do this properly.
+
+</formletter>
 
