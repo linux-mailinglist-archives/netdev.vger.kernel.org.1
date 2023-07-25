@@ -1,181 +1,275 @@
-Return-Path: <netdev+bounces-21006-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21007-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5AE9D762207
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 21:10:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B662D76221A
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 21:15:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DC2731C20F8A
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 19:10:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D9E371C20F15
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 19:15:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7059E263BD;
-	Tue, 25 Jul 2023 19:10:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47736263CD;
+	Tue, 25 Jul 2023 19:15:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 617DE1F163
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 19:10:28 +0000 (UTC)
-Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C26BB10EC
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 12:10:25 -0700 (PDT)
-Received: by mail-wm1-x335.google.com with SMTP id 5b1f17b1804b1-3fc04692e20so58471815e9.0
-        for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 12:10:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=arista.com; s=google; t=1690312224; x=1690917024;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=fX6xLIXZZAr/AQm9E+cM414TFNlRnIjeGEpoYX0+8ho=;
-        b=UVAPMfmOJz6LMxHlgBfz8yTPlXk+vlnr+l6ZZXPjl82FxQbfYNRZznBcp0AFA4VoXv
-         PbRrjgR6uWU5hH4h3VUGIbbnpxjruUiNaS913b5W1uXGIqj7YCUUscqT7W7ccQ7ZGZ3q
-         lynWWQd3ImfjpxnN6+l+LAy38z2wpS11lGnNvZ1uLoo5LFG0drtmNYhxivN5141qxpos
-         5++8sMEvMLZOxkUSvUV6PmJJHoDdiQXCBrQKoemKm9OLT9d0UM0Rt0yR15Y4zJAxWJZc
-         DN4hcNJFTN5ib+HsAwLSWl1/lcbN0xizwPnRVfdBJRsqpTUPOqmNpj5x083Z3CrrWgEA
-         8xzg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690312224; x=1690917024;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fX6xLIXZZAr/AQm9E+cM414TFNlRnIjeGEpoYX0+8ho=;
-        b=WOqKeRD/lAzyUJKjhpJjr0DH+U7GarcQKxZVTVafGkvPghB0KPMjDgvTRIhzVKZPtb
-         vq812ITfe159abVuFO3LAgW+Ydm+oVm3iCfPNADQa/Tq5ktsiZWcR8vnqN71meC47trj
-         JE9E1SodgSCXcH32tlfg2Xy4y3nb3WpHc/QWqCm4xuvsYCOMuY/tUMHYfxgGmLIiuHCH
-         9yNOxg+GlKC1g0S21O8+AwIRWjwNmscotBHl/g66wEpojoN+MMeQAZ5ZHeEytjO3K/nY
-         1AEtmRs26IdPtSblC880qgKtel86b8UiLDPti+zbObVWJYMwGmdMzRn6gnls2UccfVm9
-         BOIA==
-X-Gm-Message-State: ABy/qLYueYblewMRV5Yq6wB8eaTedB/qw6gyAq6j+Chy740GRS/NlfB8
-	jt4paBIGmGuir+wUQIxhvLj/5A==
-X-Google-Smtp-Source: APBJJlFk7VlYyWtrQWDrsUhb/Zd3uDmUb6Ou49pg3ERUj4q3zy18zgW/gLqIjGhAuzqOgJcFRkedKA==
-X-Received: by 2002:a7b:c30e:0:b0:3f9:871:c2da with SMTP id k14-20020a7bc30e000000b003f90871c2damr9917149wmj.40.1690312224231;
-        Tue, 25 Jul 2023 12:10:24 -0700 (PDT)
-Received: from [10.83.37.178] ([217.173.96.166])
-        by smtp.gmail.com with ESMTPSA id p1-20020a05600c204100b003fc17e8a1efsm16393926wmg.45.2023.07.25.12.10.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 25 Jul 2023 12:10:23 -0700 (PDT)
-Message-ID: <b01a63a7-eaaa-85db-b04d-8270e82e1080@arista.com>
-Date: Tue, 25 Jul 2023 20:10:21 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 330D31D2FD
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 19:15:50 +0000 (UTC)
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2080.outbound.protection.outlook.com [40.107.237.80])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 248801B8;
+	Tue, 25 Jul 2023 12:15:49 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=JlwXduJJhXm+z1jmBImZlsOgnAHK6bzt86te/+2YvM02KksgLt3/Rv93/NXphWqhj9bfAznn2HLorVk0EdDghbx92vplCmJN3rVBrJLNg/6U+58DnPQkdUOj+V0gtwiIubdi0bTjLj/+0AQpVh20vH28I92TjnOvGW1mI31H04xu48ss7rok4/HlmBd1OofWzIg++4oHQfbzY5MOl0JWBeYlmwNdiqDhzIcX1MuMJOZ1IxMsqmdQw8HCjwImN9eiDrw9R0j3SxFz5mqOkbKE4aYhL/UR8L1UC3e+RifXfFz3rbTcJ9WTOSdwoqsvFy0/s/Jr0kLPYwpzdgZkVl/jRg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=HCjzoi60bx1RkiMYclYgTdNSzUEYuWh5C7PdD3kS8JU=;
+ b=TGV5hbvjrPZOU2uHTEk7ZVy+S248brd8PmkGDIQt3/ox4VwDqq+3DqATzOovEao6Py/WNC7jjtdIdeP4uMHEigS3QlEwJYTK/jB7hBIwcVF55/fCpP7isTGRvXY7O03wmlc2gsZhdInP4PSq7u3jnwnSTquUH2oB+HLm15qiG0qkSEaTA417UNPP8fQK2m7CEMuYBK5EdILWGKiHzb6WSgSf2OQfXSaTbZCrWFTA4YdxpcMtwcESGMw5OJz0oTGt6UEJ/60NpwohyVMwnI+fmJGXvFU8pl4nkrFJRq8WbYOTw5/ZWG2aVr4L5eK9gcFkzlnwNOWgcU19uXT7peDupg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=HCjzoi60bx1RkiMYclYgTdNSzUEYuWh5C7PdD3kS8JU=;
+ b=jNzgXx0klB60aG1Dy0TjdS8+vLwWTxmXotv23c9VUhoj4pC4HOJYgiJWSPK+SVN1xQuVg5KIB8WBmGhBnDpRsTz/ZESiMXxPiIGo/LOqG5VJ4BorvVfP42b98gaOMn8gMaWeN5hKkMoy6T4mZuCtSmOXjjmSXZMgfxYkXvoJ4hs=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from MN0PR12MB6101.namprd12.prod.outlook.com (2603:10b6:208:3cb::10)
+ by BY5PR12MB4132.namprd12.prod.outlook.com (2603:10b6:a03:209::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.33; Tue, 25 Jul
+ 2023 19:15:45 +0000
+Received: from MN0PR12MB6101.namprd12.prod.outlook.com
+ ([fe80::36f9:ffa7:c770:d146]) by MN0PR12MB6101.namprd12.prod.outlook.com
+ ([fe80::36f9:ffa7:c770:d146%7]) with mapi id 15.20.6609.031; Tue, 25 Jul 2023
+ 19:15:45 +0000
+Message-ID: <6aa9061b-1702-b8f2-9cb8-982895b9def4@amd.com>
+Date: Tue, 25 Jul 2023 14:15:41 -0500
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH V7 4/9] wifi: mac80211: Add support for ACPI WBRF
+Content-Language: en-US
+To: Andrew Lunn <andrew@lunn.ch>, "Quan, Evan" <Evan.Quan@amd.com>
+Cc: "rafael@kernel.org" <rafael@kernel.org>, "lenb@kernel.org"
+ <lenb@kernel.org>, "Deucher, Alexander" <Alexander.Deucher@amd.com>,
+ "Koenig, Christian" <Christian.Koenig@amd.com>,
+ "Pan, Xinhui" <Xinhui.Pan@amd.com>, "airlied@gmail.com" <airlied@gmail.com>,
+ "daniel@ffwll.ch" <daniel@ffwll.ch>,
+ "johannes@sipsolutions.net" <johannes@sipsolutions.net>,
+ "davem@davemloft.net" <davem@davemloft.net>,
+ "edumazet@google.com" <edumazet@google.com>,
+ "kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com"
+ <pabeni@redhat.com>, "mdaenzer@redhat.com" <mdaenzer@redhat.com>,
+ "maarten.lankhorst@linux.intel.com" <maarten.lankhorst@linux.intel.com>,
+ "tzimmermann@suse.de" <tzimmermann@suse.de>,
+ "hdegoede@redhat.com" <hdegoede@redhat.com>,
+ "jingyuwang_vip@163.com" <jingyuwang_vip@163.com>,
+ "Lazar, Lijo" <Lijo.Lazar@amd.com>,
+ "jim.cromie@gmail.com" <jim.cromie@gmail.com>,
+ "bellosilicio@gmail.com" <bellosilicio@gmail.com>,
+ "andrealmeid@igalia.com" <andrealmeid@igalia.com>,
+ "trix@redhat.com" <trix@redhat.com>, "jsg@jsg.id.au" <jsg@jsg.id.au>,
+ "arnd@arndb.de" <arnd@arndb.de>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "linux-acpi@vger.kernel.org" <linux-acpi@vger.kernel.org>,
+ "amd-gfx@lists.freedesktop.org" <amd-gfx@lists.freedesktop.org>,
+ "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
+ "linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+References: <20230719090020.2716892-1-evan.quan@amd.com>
+ <20230719090020.2716892-5-evan.quan@amd.com>
+ <9b1f45f9-02a3-4c03-b9d5-cc3b9ab3a058@lunn.ch>
+ <7d059aed-fac0-cdcd-63d5-58185bb345db@amd.com>
+ <DM6PR12MB26196A993B3BA93392AA0FEDE403A@DM6PR12MB2619.namprd12.prod.outlook.com>
+ <d4cfbbae-9cd0-4767-8c80-ec09d1dbaf9c@lunn.ch>
+From: Mario Limonciello <mario.limonciello@amd.com>
+In-Reply-To: <d4cfbbae-9cd0-4767-8c80-ec09d1dbaf9c@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SN6PR08CA0010.namprd08.prod.outlook.com
+ (2603:10b6:805:66::23) To MN0PR12MB6101.namprd12.prod.outlook.com
+ (2603:10b6:208:3cb::10)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH v8.1 net-next 06/23] net/tcp: Add TCP-AO sign to outgoing
- packets
-Content-Language: en-US
-To: Simon Horman <simon.horman@corigine.com>
-Cc: David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, linux-kernel@vger.kernel.org,
- Andy Lutomirski <luto@amacapital.net>, Ard Biesheuvel <ardb@kernel.org>,
- Bob Gilligan <gilligan@arista.com>, Dan Carpenter <error27@gmail.com>,
- David Laight <David.Laight@aculab.com>, Dmitry Safonov
- <0x7f454c46@gmail.com>, Donald Cassidy <dcassidy@redhat.com>,
- Eric Biggers <ebiggers@kernel.org>, "Eric W. Biederman"
- <ebiederm@xmission.com>, Francesco Ruggeri <fruggeri05@gmail.com>,
- "Gaillardetz, Dominik" <dgaillar@ciena.com>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
- Ivan Delalande <colona@arista.com>, Leonard Crestez <cdleonard@gmail.com>,
- Salam Noureddine <noureddine@arista.com>,
- "Tetreault, Francois" <ftetreau@ciena.com>, netdev@vger.kernel.org
-References: <20230721161916.542667-1-dima@arista.com>
- <20230721161916.542667-7-dima@arista.com> <ZMAAPBKnnrdk/c9K@corigine.com>
-From: Dmitry Safonov <dima@arista.com>
-In-Reply-To: <ZMAAPBKnnrdk/c9K@corigine.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN0PR12MB6101:EE_|BY5PR12MB4132:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4f52a4ac-523e-4674-86c3-08db8d438bfc
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	14lTPXTSQv7L110tPR0CNsQxASdmuEJZjI23SEiKZlLo2b6yi0Gwy961mFyp65SJJkg5khc74k5ua91seIwLH21S+rDkt28rpYK8B3rOlPGFuVAfYpJJnJxPbuTt0ET9a+gjMcS/T3x5vtuLqnxlX3SOh1AGpLj7TWwbpnUZdotIUK95ntGXDZqRF77o8BfCG8ElPiAW0gQJUPDxgsf7JwTnyJa6eVikpTVcN7rY9CHE/KcTIOy0MJWClW+3LtEgPj4EOJoEif/aMCgSPIvQRAJ4u2mXZELxJJXcNaJ0seWVYYMr8U2UaBDgawVxHBzXBnxYk16NjHo6rWCOdMJyeSWHpLY+GlsdZErGK7tGF8OiwMbt30rNT/6kqUG8YTqY3n2Dud8ACB/Sw2XMxH0evX9aAd/sl2tGDwJ+dcFKj9SauKiC4jlpfwdUwoJW/ZD3cgo7wC8rzILbn17JCeo46WPRZa7ike6qz39RNIw6Pn8U1XFLUNc68/9Y2YVr5LEu6AfgZX1RxIciPqS+Im6L2/CG85j/WFIBz6YLAFQnLkfyuuLuucGR2j7CwaN3aD5zjNR305Y6KJs5Bj3p+CsPO8/NXkg0gweGOEk52YVF9tiQHLygEwEHDwdlIbfjGO/mbwxExOQna5OV7xM7d2IN1Q==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN0PR12MB6101.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(366004)(396003)(136003)(39860400002)(376002)(346002)(451199021)(54906003)(66946007)(66556008)(66476007)(2616005)(36756003)(83380400001)(86362001)(31696002)(38100700002)(478600001)(110136005)(6506007)(6486002)(26005)(6666004)(53546011)(186003)(6512007)(31686004)(5660300002)(41300700001)(316002)(2906002)(4326008)(6636002)(44832011)(8676002)(8936002)(7416002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?d3NHVmNLUEZjdURLb0RuMnErZEt4V3lPQUhkUWRJaTJhZysvdVV1RGtXQUsw?=
+ =?utf-8?B?Wi95NnArczJiYjd3cUtpVkxLYXE3b3NjdHFmM3NSQUl0R1pTWHJTQ3daU1Nj?=
+ =?utf-8?B?cEMvcXEyTXdwYXFlS1E3TWY0bzl2RmQ3OVplY1FQdGNGb1NmdWU0TXlISnY2?=
+ =?utf-8?B?cUoyYjlCVm1EalpBWlQ5Z3Q1b1FrTTNMNkE1NkcxU0ViUFdrU05XaVlCazQ2?=
+ =?utf-8?B?SXBrZGFYa2RydTJ5bmFJeVUxbGkvSXplTTQ2aktvcUI1NmFsTWw1dUNVNGtt?=
+ =?utf-8?B?bjFPczgvRExyZVVuTDZmOGhYNUU3RWVqLzVCTld3Tkt3eERveUNhdkw5VFFH?=
+ =?utf-8?B?amxCWFNuMUdrZTY4Z1IvZEN5c2s1MEFnUHM4YzBqY0hWOE51RGgzb0pIbXBQ?=
+ =?utf-8?B?a05ITEgwbElwOWNaajd4TmxJc284bVhWUVZVUytkcTJXRjVVUEVCei9jcGZl?=
+ =?utf-8?B?NDI3SVZOUUJSeklrWW0vVkZoY0VVYWtlZWRUc2lBbHVyWjRNTjlPeUx5Nkxn?=
+ =?utf-8?B?TUFYNEVmZnhYZE43MCt3TVlmNUEzRk5YS1dXWjc5bnRkWExFMUpzdXl3RHFE?=
+ =?utf-8?B?MXQrRDI1UE1qUXlYczQ2NHJ5TjdZbGVFYkZ2aVZIaW8xcVl5RDQxRHhKcC9h?=
+ =?utf-8?B?U05oZlB3aFV6SUtUQzhnYlNldVQybnh3cFVqWGdROTIxOHpUZG0xUUV2THdF?=
+ =?utf-8?B?bjZUUTBoY1RQWFJBcHM2dnpQTGRVTEFtMUdrQkNJOGhDUlFqSDZtaDRQeFpQ?=
+ =?utf-8?B?c2VTZVRmTTJobnNOMDJkM2c5Zzk4L3J4YnVEanVwWEcwdEF6dGszYXRrTUov?=
+ =?utf-8?B?SmR0OG9tYzkveUJUSURjOWNqSTZoekNJYXJONk9SVjUxNlZ2V1MwMjZlN2xy?=
+ =?utf-8?B?dFBVcGVQUlJFTkdCVzF3VjZHbDlZQmY0cWpwcDJrSkhCaWM4Uk1JbFZSVm12?=
+ =?utf-8?B?VUplTGJXaWQrV3JoMXFIV1pTMWdPUmg3VHBFMm0vRjRuTlM5NVllY3dRNXV0?=
+ =?utf-8?B?UGNlNHJsamFHSitnUUYxQWkrbXdDM3pvU1htcWhCaUhvVkFDSnB6Q05MUVNS?=
+ =?utf-8?B?UE1VbTUyNENTMW5oMUFTYlM0SDVEZVVyT3lMRlhPb0p2RkRNWERKLzNLZHJk?=
+ =?utf-8?B?SEwxb0U0WHpPb0EyS1hrWUs5V01yV1ZhcE0zWlFOM2FCYmxzaHRVSnBxOHpJ?=
+ =?utf-8?B?VXJFell2NlFzZ09oa2lEYXE2TUUzWWxzL3hNajMxMlJEdnhSSzRiY242aEpR?=
+ =?utf-8?B?Z3lUeDE3cFY1bStRa0tURm12czgycGszL2RvcmRYMzFoQUpqQ0tGanVXcThD?=
+ =?utf-8?B?aGtwMHk3QXBwc1pMVFhtbk94dzFoTmZ1cWlmVHZtVnI2OTF1Q1F3S1gyOHhB?=
+ =?utf-8?B?TEJaNjNlaEg1bFBNRk1lQU5tZ1NCSkZIK1JobGpRRFYzc2xhb25RVmZpelZI?=
+ =?utf-8?B?WlRXZERITXk1SnpDRVJKVFRJOGx2K2FDcEhoY2ROZ2dsWG1jMFhyRzZDRTlB?=
+ =?utf-8?B?OFdJTGg0OUxxbTNJMHNqTHBJaE9LL3ZPZjVoM21wMndTeXVDYVYrY3VkWWxk?=
+ =?utf-8?B?S09ieG9PUXhBbi9lL0o4YzVGVVRuc1FmckFCa1gyRk5PTnRiMnQ1NzNzWW5l?=
+ =?utf-8?B?M2o0R0hsZDRKeE9zUUptdHY5cjFnTlVmOW5HNjI1VSttNlZSLzZ4MUxrM29z?=
+ =?utf-8?B?bjc1OFBnWkE4bktNRkFhT0JuR0pDLzNtVDBDeEg5bnZ2eU9lU1NnaGQwQld6?=
+ =?utf-8?B?c2Y3M2x3Rk1yaHYzL29SMnp4dEpLU2tJZmtVZjZZWkxLK0tqY2JzMGZVWXlV?=
+ =?utf-8?B?UUNNaFVsc005RkJwTTRiMjREWWZ4V1JwSWR5QkRvQ2Y3ZmNaOFZJcjdqdTAw?=
+ =?utf-8?B?Y1czbCtZS253ZGZnUkNmYzdwbGowYll5WGhGSGNWSnN4TGZxTm9WZ2ZxQzdx?=
+ =?utf-8?B?L0lXQVlnQ2tUbW9VSUliako2bzlDS1dEaHlqcEtyZHJoUVVxMUZ3MFB1TDVO?=
+ =?utf-8?B?Ym12eFR1U1RnVzV0NEZ0ajY4Yy90REkyMFczWW1NenV5RCs4TzY4cHdrQUxZ?=
+ =?utf-8?B?UlBERHRDVS9PVFlhUmR4OFh6dnYrWXZ6c3l6dkk2RlNiUTlxUFFwUm9BREUz?=
+ =?utf-8?Q?ZxMp0nNGciiFbj36qpKQXSez9?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4f52a4ac-523e-4674-86c3-08db8d438bfc
+X-MS-Exchange-CrossTenant-AuthSource: MN0PR12MB6101.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jul 2023 19:15:45.6248
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: uQpRVuwxXJ8TDqZGYoFd1cP5LyoCeVzIR/i1+KZlqM1Szx1U4iuH/v8Ss+XIvNqK6oHbKP61uSv47sKINapivQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4132
+X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,NICE_REPLY_A,
+	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Simon,
+On 7/25/2023 13:57, Andrew Lunn wrote:
+>>>>> @@ -1395,6 +1395,8 @@ int ieee80211_register_hw(struct
+>>> ieee80211_hw *hw)
+>>>>>     debugfs_hw_add(local);
+>>>>>     rate_control_add_debugfs(local);
+>>>>>
+>>>>> +  ieee80211_check_wbrf_support(local);
+>>>>> +
+>>>>>     rtnl_lock();
+>>>>>     wiphy_lock(hw->wiphy);
+>>>>>
+>>>>
+>>>>> +void ieee80211_check_wbrf_support(struct ieee80211_local *local) {
+>>>>> +  struct wiphy *wiphy = local->hw.wiphy;
+>>>>> +  struct device *dev;
+>>>>> +
+>>>>> +  if (!wiphy)
+>>>>> +          return;
+>>>>> +
+>>>>> +  dev = wiphy->dev.parent;
+>>>>> +  if (!dev)
+>>>>> +          return;
+>>>>> +
+>>>>> +  local->wbrf_supported = wbrf_supported_producer(dev);
+>>>>> +  dev_dbg(dev, "WBRF is %s supported\n",
+>>>>> +          local->wbrf_supported ? "" : "not"); }
+>>>>
+>>>> This seems wrong. wbrf_supported_producer() is about "Should this
+>>>> device report the frequencies it is using?" The answer to that depends
+>>>> on a combination of: Are there consumers registered with the core, and
+>>>> is the policy set so WBRF should take actions. > The problem here is,
+>>>> you have no idea of the probe order. It could be this device probes
+>>>> before others, so wbrf_supported_producer() reports false, but a few
+>>>> second later would report true, once other devices have probed.
+>>>>
+>>>> It should be an inexpensive call into the core, so can be made every
+>>>> time the channel changes. All the core needs to do is check if the
+>>>> list of consumers is empty, and if not, check a Boolean policy value.
+>>>>
+>>>>        Andrew
+>>>
+>>> No, it's not a combination of whether consumers are registered with the core.
+>>> If a consumer probes later it needs to know the current in use frequencies too.
+>>>
+>>> The reason is because of this sequence of events:
+>>> 1) Producer probes.
+>>> 2) Producer selects a frequency.
+>>> 3) Consumer probes.
+>>> 4) Producer stays at same frequency.
+>>>
+>>> If the producer doesn't notify the frequency because a consumer isn't yet
+>>> loaded then the consumer won't be able to get the current frequency.
+>> Yes, exactly.
+> 
+> So now we are back to, what is the point of wbrf_supported_producer()?
+> 
+> I'm talking general case here, not your ACPI implementation. All i'm
+> really interested in is the generic API, which is what an Intel CPU,
+> combined with a Radieon GPU and a Qualcomm WiFi device will use. Or an
+> AMD CPU combined with an nvidia GPU and a Mediatek Wifi, etc. The wbrf
+> core should support an combination of produces and consumers in a
+> generic way.
+> 
+> If you assume devices can probe in any order, and come and go, it
+> seems like the producers need to always report what frequencies they
+> are using. Otherwise when a noise generator pops into existence, as
+> you say, it has no idea what frequencies the producers are using.
+As the series stands today if the probe order is reversed everything 
+works fine.
 
-On 7/25/23 18:02, Simon Horman wrote:
-> On Fri, Jul 21, 2023 at 05:18:57PM +0100, Dmitry Safonov wrote:
-> 
-> ...
-> 
-> Hi Dmitry,
-> 
->> diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
-> 
-> ...
-> 
->> @@ -619,7 +621,33 @@ static void tcp_options_write(struct tcphdr *th, struct tcp_sock *tp,
->>  		opts->hash_location = (__u8 *)ptr;
->>  		ptr += 4;
->>  	}
->> +#ifdef CONFIG_TCP_AO
->> +	if (unlikely(OPTION_AO & options) && tp) {
-> 
-> Smatch warns that here we check if tp is NULL,
-> but later on in the same function (existing) code
-> uses tp unconditionally.
-> 
-> That code looks like this:
-> 
->         if (unlikely(opts->num_sack_blocks)) {
->                 struct tcp_sack_block *sp = tp->rx_opt.dsack ?
->                         tp->duplicate_sack : tp->selective_acks;
-> 
-> I would recommend running Smatch.
-> It points out a lot of interesting things.
-> 
-> 
->> +		struct tcp_ao_key *rnext_key;
->> +		struct tcp_ao_info *ao_info;
->> +		u8 maclen;
->>  
->> +		if (WARN_ON_ONCE(!ao_key))
->> +			goto out_ao;
->> +		ao_info = rcu_dereference_check(tp->ao_info,
->> +				lockdep_sock_is_held(&tp->inet_conn.icsk_inet.sk));
-> 
-> Checkpatch complains about indentation here.
-> 
-> Rather than point out each case in the series,
-> could I ask you to run ./scripts/checkpatch.pl --strict over the patchset?
+1) Consumer probes
+2) Producer probes
+3) Producer selects a frequency
+4) Consumer reacts to frequency.
 
-Yeah, but then it won't fit 80 columns here. As both aren't hard
-requirements I tend to comply with 80 columns more than to indentation.
-In this particular case I'll check if it could be a helper function.
-If it won't make sense to separate it as a helper, I'll just move it to
-the same line than, breaking 80 columns limit.
-
->> @@ -1363,6 +1424,34 @@ static int __tcp_transmit_skb(struct sock *sk, struct sk_buff *skb,
->>  					       md5, sk, skb);
->>  	}
->>  #endif
->> +#ifdef CONFIG_TCP_AO
->> +	if (ao) {
->> +		u8 *traffic_key;
->> +		void *tkey_buf = NULL;
->> +		u32 disn;
->> +
->> +		sk_gso_disable(sk);
->> +		if (unlikely(tcb->tcp_flags & TCPHDR_SYN)) {
->> +			if (tcb->tcp_flags & TCPHDR_ACK)
->> +				disn = ao->risn;
 > 
-> Sparse complains that there is an endian missmatch between disn and ao->risn ?
+> The exception is when policy says there is no need to actually do
+> anything. If we can assume the policy is fixed, then
+> wbrf_supported_producer() could just report the policy which the wbrf
+> core should know about.
 > 
-> Rather than point out every problem flagged by Sparse,
-> could I ask you to run it over the series?
+>      Andrew
+> 
 
+This comes back to the point that was mentioned by Johannes - you need 
+to have deep design understanding of the hardware to know whether or not 
+you will have producers that a consumer need to react to.
 
-Yeah, I noticed it on netdev patchwork, running it over the patches now.
+For example the physical location GDDR6 memory and proximity to the 
+hinge where the antenna was routed might play a big factor in whether 
+you need something like this.
 
-Thanks,
-             Dmitry
+If all producers indicate their frequency and all consumers react to it 
+you may have activated mitigations that are unnecessary. The hardware 
+designer may have added extra shielding or done the layout such that 
+they're not needed.
+
+So I don't think we're ever going to be in a situation that the generic 
+implementation should be turned on by default.  It's a "developer knob".
+
+As mentioned in the Kconfig it's intended use is for identifying 
+situations that may benefit from mitigation before support was 
+introduced into the firmware.
+
+If needed these can then be enabled using the AMD ACPI interface, a DT 
+one if one is developed or maybe even an allow-list of SMBIOS strings.
 
 
