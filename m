@@ -1,88 +1,85 @@
-Return-Path: <netdev+bounces-20942-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20943-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77AED761FA7
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 18:56:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46C93761FAA
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 18:57:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 618E61C2042F
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 16:56:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 00FCF2815FA
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 16:57:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DBF924191;
-	Tue, 25 Jul 2023 16:56:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 142C724193;
+	Tue, 25 Jul 2023 16:57:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 237FD1F927
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 16:56:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58D22C433C8;
-	Tue, 25 Jul 2023 16:56:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFF933C23
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 16:57:49 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74C1CC433C8;
+	Tue, 25 Jul 2023 16:57:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690304183;
-	bh=TJd9AOo4MJx0nSlvmoA1i6hcjsJ07qNeSFb9t986iX0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=uCv6RSFeQ8qyjbOwUfurnJXw/fvc2Gya/tWUGjiv7PgTbZDXUqFdGHHQFAmX57yBM
-	 BOCVSUZ85zdkqBifPueW4+5qjnMBzAgFJCui5Od20Nvcc64cn1l9vE5u997e3TFfEf
-	 JcYfO7zljGUgSrIY+qAtogy34lzBETSZI9AOtpGiRcQXaH9wVUtxY47ma3MkS1ZvID
-	 tZtZyJDcWc67OltGu57GisVR71HSBcETj7OVDC2AHc7K1BMK7v9OfHHlOdP4RzM+DL
-	 o6edEb4s9iWDrxTl/3+/D7nUQ4hIX7OLDKd+82wo6R52BlxCHGmgtRGUyCkVimEyoB
-	 3a7FUPGw3SvMw==
-Date: Tue, 25 Jul 2023 09:56:22 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- mkubecek@suse.cz, lorenzo@kernel.org
-Subject: Re: [PATCH net-next 1/2] net: store netdevs in an xarray
-Message-ID: <20230725095622.33fedff7@kernel.org>
-In-Reply-To: <e5655b23861d3c4b5684665874c19f37952b2e43.camel@redhat.com>
-References: <20230722014237.4078962-1-kuba@kernel.org>
-	<20230722014237.4078962-2-kuba@kernel.org>
-	<20788d4df9bbcdce9453be3fd047fdf8e0465714.camel@redhat.com>
-	<20230724084126.38d55715@kernel.org>
-	<2a531e60a0ea8187f1781d4075f127b01970321a.camel@redhat.com>
-	<20230724102741.469c0e42@kernel.org>
-	<20230724120718.4f01113a@kernel.org>
-	<e5655b23861d3c4b5684665874c19f37952b2e43.camel@redhat.com>
+	s=k20201202; t=1690304269;
+	bh=xKzii9Y3wXY0xeuIVkRtPbTVcYf7KRfwTosUVm60whs=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=VlJhakcz4b/DMDr9bYwDfPp/BMnco0Owjy3mDGJMTanVw87DT4PzEOJcCEOBu+XgV
+	 9LdwFAteInewwBg0HMYirxY49+W7b+ZXJtcFfRlyHmvBxg/l+bBSNi/I0JNfkEV/om
+	 nJYFyCSWrX4Pepfk5FbKqHYXv60Cy8lBqueqcUJwmh3sM2vSpGsRVarXEXu4axp6Mm
+	 veuFV4pNJ/2V7AtoWLYA6SaC+9pQ3zmZOYoNwqAs3YX5Yz06sM3paDqb7wUrDpk0zj
+	 FBGtT2RrUmxjQa8hN3l6xK09DR5bExUxUjTNhO1MmQKM41rY2LvZ3lUcaxk/JESMqX
+	 xeT5MHAAmDsSQ==
+Message-ID: <22eb89c5-9c94-6498-4079-b3b732aacfe0@kernel.org>
+Date: Tue, 25 Jul 2023 18:57:43 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH] scripts: checkpatch: steer people away from using file
+ paths
+Content-Language: en-US
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: joe@perches.com, geert@linux-m68k.org, netdev@vger.kernel.org,
+ workflows@vger.kernel.org, mario.limonciello@amd.com
+References: <b6ab3c25-eab8-5573-f6e5-8415222439cd@kernel.org>
+ <20230725155926.2775416-1-kuba@kernel.org>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+In-Reply-To: <20230725155926.2775416-1-kuba@kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On Tue, 25 Jul 2023 13:11:50 +0200 Paolo Abeni wrote:
-> > We can get the create, delete ordering with this or the list, but the
-> > inverse theoretical case of delete, create ordering can't be covered.
-> > A case where user wants to make sure at most one device is visible.
-> > 
-> > I'm not sure how much we should care about this. The basic hash table
-> > had the very real problem of hiding devices which were there *before
-> > and after* the dump.
-> > 
-> > Inconsistent info on devices which were created / deleted *during* the
-> > dump seems to me like something that's best handled with notifications.
-> > 
-> > I'm not sure whether we should set the inconsistency mark on the dump
-> > when del/add operation happened in the meantime either, as 
-> > the probability that the user space will care is minuscule.  
+On 25/07/2023 17:59, Jakub Kicinski wrote:
+> We repeatedly see noobs misuse get_maintainer by running it on
+> the file paths rather than the patchfile. This leads to authors
+> of changes (quoted commits and commits under Fixes) not getting
+> CCed. These are usually the best reviewers!
 > 
-> You convinced me the 'missed device' scenario is not very relevant. 
+> The file option should really not be used by noobs, unless
+> they are just trying to find a maintainer to manually contact.
 > 
-> The cursor with the dummy placeholder looks error-prone and/or too
-> invasive to me.
+> Print a warning when someone tries to use -f and remove
+> the "auto-guessing" of file paths.
 > 
-> I'm fine with this approach.
+> This script may break people's "scripts on top of get_maintainer"
+> if they are using -f... but that's the point.
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+> This is what I had in mind.
 
-I'll post a v2 with the fix Leon pointed out.
+"Anything that can go wrong will go wrong."
+https://en.wikipedia.org/wiki/Murphy%27s_law
 
-But do feel free to change your mind.
+Therefore:
 
-It seems like a problem where there's no perfect solution but
-there are multiple non-perfect ones, each with its advantages
-and disadvantages.
+Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+
+Best regards,
+Krzysztof
+
 
