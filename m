@@ -1,175 +1,111 @@
-Return-Path: <netdev+bounces-20726-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20727-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04BFD760C80
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 09:58:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C140760C95
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 10:03:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BD7072815CF
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 07:58:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A66BE28162B
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 08:02:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5362134A3;
-	Tue, 25 Jul 2023 07:58:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AC8E134AA;
+	Tue, 25 Jul 2023 08:02:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA59F12B69
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 07:58:54 +0000 (UTC)
-Received: from fllv0016.ext.ti.com (fllv0016.ext.ti.com [198.47.19.142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2AFE5E5;
-	Tue, 25 Jul 2023 00:58:52 -0700 (PDT)
-Received: from fllv0034.itg.ti.com ([10.64.40.246])
-	by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id 36P7wROP083164;
-	Tue, 25 Jul 2023 02:58:27 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1690271907;
-	bh=KLs1UfhwOOeaUBOV26Gx4K3vBuDMVvonxjcwLCj13Hg=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=y12Wzw4Iu2TXxeCPAFt+QG7cv9UIyRzGc0ybdSAuKvI+MLImJuTBhOZ9dGXCuAchB
-	 nndIJBPS/Nbatc8vdIJleFimwainDuHqXDKO+CxUMxi2cABTxU5UVl1PS/ZS0LQMDs
-	 9wBUXKTJ75mV8OKi5/S/Q/XgunmrCDaanCoR8wrA=
-Received: from DFLE114.ent.ti.com (dfle114.ent.ti.com [10.64.6.35])
-	by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 36P7wRZL121042
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Tue, 25 Jul 2023 02:58:27 -0500
-Received: from DFLE112.ent.ti.com (10.64.6.33) by DFLE114.ent.ti.com
- (10.64.6.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Tue, 25
- Jul 2023 02:58:27 -0500
-Received: from fllv0040.itg.ti.com (10.64.41.20) by DFLE112.ent.ti.com
- (10.64.6.33) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Tue, 25 Jul 2023 02:58:27 -0500
-Received: from [172.24.227.217] (ileaxei01-snat.itg.ti.com [10.180.69.5])
-	by fllv0040.itg.ti.com (8.15.2/8.15.2) with ESMTP id 36P7wLPJ102460;
-	Tue, 25 Jul 2023 02:58:22 -0500
-Message-ID: <5a4b293f-7729-ee03-2432-cd49ff92d809@ti.com>
-Date: Tue, 25 Jul 2023 13:28:21 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EBF3125A5
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 08:02:55 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFBDA128
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 01:02:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=j40/N9rkEiikPmoWmeVXUUwGa7PjZ9By9zurzN8T7c8=; b=ksUWv8dvEKeLX9vLbPRPuwGpAu
+	UW1rr/yWw22C74C39pM20gdbB6VxqBNq/GYY+JZyZpwhv5jgJwP/UDvCMwq+ee/Lzwh9xeZXUipSn
+	mf1IhIXNduKw/I0w2YvJ3Y0DtLvRAMw8tzA34IfXKopumjcpOqxa5nOQxBDcvulLWHe9RXAGSF7Ha
+	L6r6H5YGUssyA7qA2mQ43rp4ISCFEMm0GW7x9eltvLRaznuDBiYTtImjYB2dplO1kFAQ0qvemgEZK
+	EFfX3A8Yx8C2nmQ06RO72C3GAxS4QvVC1osNuHtVPwbSLQVJGPk+FapjPmsX+AJLnI1B9Nx0eia9g
+	Mjbko8AA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:54156)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qOD0L-0001gk-0J;
+	Tue, 25 Jul 2023 09:02:49 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qOD0J-0001e8-B8; Tue, 25 Jul 2023 09:02:47 +0100
+Date: Tue, 25 Jul 2023 09:02:47 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Jiawen Wu <jiawenwu@trustnetic.com>
+Cc: netdev@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
+	Jose.Abreu@synopsys.com, mengyuanlou@net-swift.com
+Subject: Re: [PATCH net-next 6/7] net: txgbe: support copper NIC with
+ external PHY
+Message-ID: <ZL+Bpxn8O3PRMv0p@shell.armlinux.org.uk>
+References: <20230724102341.10401-1-jiawenwu@trustnetic.com>
+ <20230724102341.10401-7-jiawenwu@trustnetic.com>
+ <ZL5VyBb9cUTq/y3Y@shell.armlinux.org.uk>
+ <03d201d9bea1$8dc4d740$a94e85c0$@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [EXTERNAL] Re: [EXTERNAL] Re: [PATCH v11 03/10] net: ti:
- icssg-prueth: Add Firmware config and classification APIs.
-Content-Language: en-US
-To: Simon Horman <simon.horman@corigine.com>
-CC: MD Danish Anwar <danishanwar@ti.com>,
-        Randy Dunlap
-	<rdunlap@infradead.org>,
-        Roger Quadros <rogerq@kernel.org>,
-        Vignesh
- Raghavendra <vigneshr@ti.com>, Andrew Lunn <andrew@lunn.ch>,
-        Richard Cochran
-	<richardcochran@gmail.com>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Krzysztof
- Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Rob Herring
-	<robh+dt@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-        Jakub Kicinski
-	<kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
-        "David S. Miller"
-	<davem@davemloft.net>, <nm@ti.com>, <srk@ti.com>,
-        <linux-kernel@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <linux-omap@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>
-References: <20230724112934.2637802-1-danishanwar@ti.com>
- <20230724112934.2637802-4-danishanwar@ti.com> <ZL94/L1RMlU5TiAb@corigine.com>
- <b2016718-b8e4-a1f8-92ed-f0d9e3cb9c17@ti.com> <ZL99WfF7iuzeMP78@corigine.com>
-From: Md Danish Anwar <a0501179@ti.com>
-Organization: Texas Instruments
-In-Reply-To: <ZL99WfF7iuzeMP78@corigine.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
-X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_MED,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <03d201d9bea1$8dc4d740$a94e85c0$@trustnetic.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+	SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 25/07/23 1:14 pm, Simon Horman wrote:
-> On Tue, Jul 25, 2023 at 01:10:30PM +0530, Md Danish Anwar wrote:
->> Hi Simon,
->>
->> On 25/07/23 12:55 pm, Simon Horman wrote:
->>> On Mon, Jul 24, 2023 at 04:59:27PM +0530, MD Danish Anwar wrote:
->>>> Add icssg_config.h / .c and icssg_classifier.c files. These are firmware
->>>> configuration and classification related files. These will be used by
->>>> ICSSG ethernet driver.
->>>>
->>>> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
->>>> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
->>>
->>> Hi Danish,
->>>
->>> some feedback from my side.
->>>
->>
->> Thanks for the feedback.
->>
->>> ...
->>>
->>>> diff --git a/drivers/net/ethernet/ti/icssg_classifier.c b/drivers/net/ethernet/ti/icssg_classifier.c
->>>
->>> ...
->>>
->>>> +void icssg_class_set_mac_addr(struct regmap *miig_rt, int slice, u8 *mac)
->>>
->>> This function appears to be unused.
->>> Perhaps it would be better placed in a later patch?
->>>
->>> Or perhaps not, if it makes it hard to split up the patches nicely.
->>> In which case, perhaps the __maybe_unused annotation could be added,
->>> temporarily.
->>>
->>
->> Due to splitting the patch into 8-9 patches, I had to introduce these helper
->> APIs earlier. All these APIs are helper APIs, they will be used in patch 6
->> (Introduce ICSSG Prueth driver).
->>
->> I had this concern that some APIs which will be used later but introduced
->> earlier can create some warnings, before splitting the patches.
->>
->> I had raised this concern in [1] and asked Jakub if it would be OK to introduce
->> these APIs earlier. Jakub said it would be fine [2], so I went ahead with this
->> approach.
->>
->> It will make very hard to break patches if these APIs are introduced and used
->> in same patch.
+On Tue, Jul 25, 2023 at 10:41:46AM +0800, Jiawen Wu wrote:
+> On Monday, July 24, 2023 6:43 PM, Russell King (Oracle) wrote:
+> > On Mon, Jul 24, 2023 at 06:23:40PM +0800, Jiawen Wu wrote:
+> > > @@ -22,6 +25,9 @@ static int txgbe_get_link_ksettings(struct net_device *netdev,
+> > >  {
+> > >  	struct txgbe *txgbe = netdev_to_txgbe(netdev);
+> > >
+> > > +	if (txgbe->wx->media_type == sp_media_copper)
+> > > +		return phy_ethtool_get_link_ksettings(netdev, cmd);
+> > 
+> > Why? If a PHY is attached via phylink, then phylink will automatically
+> > forward the call below to phylib.
 > 
-> Thanks, I understand.
+> No, there is no phylink implemented for sp_media_copper.
 > 
-> In that case my suggestion is to, temporarily, add __maybe_unused,
-> which will allow static analysis tools to work more cleanly over the
-> series. It is just a suggestion, not a hard requirement.
+> > > +
+> > >  	return phylink_ethtool_ksettings_get(txgbe->phylink, cmd);
+> > 
+> > If you implement it correctly, you also don't need two entirely
+> > separate paths to configure the MAC/PCS for the results of the PHY's
+> > negotiation, because phylink gives you a _generic_ set of interfaces
+> > between whatever is downstream from the MAC and the MAC.
 > 
-> Probably something along those lines applies to all the
-> review I provided in my previous email. Please use your discretion here.
+> For sp_media_copper, only mii bus is registered for attaching PHY.
+> Most MAC/PCS configuration is done in firmware, so it is not necessary
+> to implement phylink as sp_media_fiber.
 
-For now I think I will leave it as it is. Let reviewers review all other
-patches. Let's see if there are any other comments on all the patches in this
-series. If there are any more comments on other patches, then while re-spinning
-next revision I will keep this in mind and try to add __maybe_unused tags in
-all APIs that are used later.
+If you do implement phylink for copper, then you don't need all these
+conditionals and the additional adjust_link implementation. In other
+words, you can re-use a lot of the code you've already added.
 
-The idea behind splitting the patches was to get them reviewed individually as
-it is quite difficult to get one big patch reviewed as explained by Jakub. And
-these warnings were expected. If there are any other comments on this series, I
-will try to address all of them together in next revision.
-
-Meanwhile, Please let me know if you have any comments on other patches in this
-series.
+You don't have to provide a PCS to phylink provided you don't tell
+phylink that it's "in-band".
 
 -- 
-Thanks and Regards,
-Danish.
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
