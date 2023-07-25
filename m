@@ -1,132 +1,140 @@
-Return-Path: <netdev+bounces-21067-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21069-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3314762490
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 23:36:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9B88762496
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 23:39:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EE0A8281380
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 21:36:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9C9CF281A7D
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 21:39:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0897526B93;
-	Tue, 25 Jul 2023 21:36:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDDD926B95;
+	Tue, 25 Jul 2023 21:38:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE5BE1F188
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 21:36:26 +0000 (UTC)
-Received: from mail-lj1-x263.google.com (mail-lj1-x263.google.com [IPv6:2a00:1450:4864:20::263])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BAC01FDD
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 14:36:24 -0700 (PDT)
-Received: by mail-lj1-x263.google.com with SMTP id 38308e7fff4ca-2b6f97c7115so86740691fa.2
-        for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 14:36:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=valis-email.20221208.gappssmtp.com; s=20221208; t=1690320983; x=1690925783;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gwS4GX0mfalc+kp126daECekP9wGUm6cMHbkcjkgKn0=;
-        b=qzqocM+8zGCd2SsW2v8/8zqaI7iWgFx/B71n3z0+B2mXVbo4TkxwPSfwsEq/qgwqYm
-         f6Wo94zdRdEcnv4fyapvaCZ+ybkXkOy5K9cWps5ASHEMlPF2Zhmas+JeLq+wLyANtE5O
-         Giarwj/wvK7GOz4W6mtR9tYdOl3K9upYElO4j36Bon+wZFB83Qjh2dXUk7PgcIpoyE2d
-         gzcCNvZWKp0KMOSnQb6RcDt6/YkdZxcRYDuzcm92Jbjjs6zDYhLNZzvxuU5g3ONkCeAt
-         7Yw44LLonJQVu8uYF9ICCmCnD4Wl+wz1B3nEFurEga/ujGbR/AdXmyo1HHIHwDxZr8rs
-         1esQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690320983; x=1690925783;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=gwS4GX0mfalc+kp126daECekP9wGUm6cMHbkcjkgKn0=;
-        b=lg+ta/H/TchlF/TGh1zNZg4L3tFGMEiiMFbbQ8A0LXMI6vPoGnb0H8sVhbSJay/Juj
-         /i0xKd3HNJ9rrTz/kJfXPRLksQXxO2/BnrJqihSWCcEIf5c9F5Cg6HLwuXOMBSyv2/fp
-         azOjGYhTAKZA1NwhyGpwXXWrWMyjOwEVMECje+ImD2QSK2sXdqTuCMs2hLdv28lEm78O
-         ug0l+d5AQMN85R/HR9Ped6nrIa8X4yeZrKUIE2LGQl4IgNDeaIpOmPXOAbYjYCwmRiry
-         Li3XgOuEYmggxV34wmjzdjqHclRpTBFmU2V4v5R2/7hBc8NiK9dA4aGqddcM/Uxp2HHm
-         7YMQ==
-X-Gm-Message-State: ABy/qLYuFhzm3Wm2IiBZu6Y76MI938gC+P8Cy0nxRWy1qyiWkqMHrjMq
-	86ZMnpezHcnor9z1tVPGD4IrebBZj0n5UZUO41nfk/ptYCVBmk3VXpki
-X-Google-Smtp-Source: APBJJlFjj2XIL29P0AHC1q5RNqSFnJeYGK0ZdSMXr0WhfmD1iff9vQZXkf6dkxqwIsu/zcxuD+Dj9d/Kz8uX
-X-Received: by 2002:a2e:8607:0:b0:2b5:89a6:c12b with SMTP id a7-20020a2e8607000000b002b589a6c12bmr33563lji.10.1690320982821;
-        Tue, 25 Jul 2023 14:36:22 -0700 (PDT)
-Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com. [209.85.218.51])
-        by smtp-relay.gmail.com with ESMTPS id i23-20020a2e8657000000b002b6aa437f9dsm1663260ljj.59.2023.07.25.14.36.22
-        for <netdev@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 25 Jul 2023 14:36:22 -0700 (PDT)
-X-Relaying-Domain: valis.email
-Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-99b9421aaebso383928666b.2
-        for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 14:36:22 -0700 (PDT)
-X-Received: by 2002:a17:907:2ccb:b0:988:6e75:6b3d with SMTP id
- hg11-20020a1709072ccb00b009886e756b3dmr81785ejc.33.1690320982053; Tue, 25 Jul
- 2023 14:36:22 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B23D81F188
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 21:38:59 +0000 (UTC)
+Received: from mail.ispras.ru (mail.ispras.ru [83.149.199.84])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF4D31BE9;
+	Tue, 25 Jul 2023 14:38:56 -0700 (PDT)
+Received: from localhost (unknown [46.242.14.200])
+	by mail.ispras.ru (Postfix) with ESMTPSA id 77FC140737C9;
+	Tue, 25 Jul 2023 21:38:54 +0000 (UTC)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.ispras.ru 77FC140737C9
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ispras.ru;
+	s=default; t=1690321134;
+	bh=QIj/W1Ow+/WijWz7gTeX0AbUfuvnp4V1K0pNKv5gGZg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=fsIauPBTc/W7atPRGKYt8QwNj+biQdNNcPelkt0JUTlshG6hI41HS4OAz0uOgtQ/H
+	 4leIq+HT3FIPqvxRL/iF/ak2l3khQB14DcYXWjqJx1ZIxp4kHVCOnd1fJHN7EgIUEr
+	 kscZBXtCbpG+hHlXkZ3cHSBhn6bYxJkPwPPKfwrE=
+Date: Wed, 26 Jul 2023 00:38:53 +0300
+From: Fedor Pchelkin <pchelkin@ispras.ru>
+To: Xin Long <lucien.xin@gmail.com>
+Cc: Jon Maloy <jmaloy@redhat.com>, Ying Xue <ying.xue@windriver.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+	tipc-discussion@lists.sourceforge.net, linux-kernel@vger.kernel.org, 
+	Alexey Khoroshilov <khoroshilov@ispras.ru>, lvc-project@linuxtesting.org
+Subject: Re: [PATCH] tipc: stop tipc crypto on failure in tipc_node_create
+Message-ID: <cyninzffkwhc7mqbxpwhhpm7bav67tp7a7rqkpeu5bh3kafbyo@wx3q2x5nm3he>
+References: <20230725183646.5668-1-pchelkin@ispras.ru>
+ <CADvbK_dN4Z3kOqmJcNcUGHp56KLF87tKLHt-3BNbyRa=QOR0dw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230721174856.3045-1-sec@valis.email> <8a707435884e18ccb92e1e91e474f7662d4f9365.camel@redhat.com>
- <CAEBa_SB6KCa787D3y4ozBczbHfZrsscBMmD9PS1RjcC=375jog@mail.gmail.com> <20230725130917.36658b63@kernel.org>
-In-Reply-To: <20230725130917.36658b63@kernel.org>
-From: valis <sec@valis.email>
-Date: Tue, 25 Jul 2023 23:36:14 +0200
-X-Gmail-Original-Message-ID: <CAEBa_SASfBCb8TCS=qzNw90ZNE+wzADmY1_VtJiBnmixXgt6NQ@mail.gmail.com>
-Message-ID: <CAEBa_SASfBCb8TCS=qzNw90ZNE+wzADmY1_VtJiBnmixXgt6NQ@mail.gmail.com>
-Subject: Re: [PATCH net 0/3] net/sched Bind logic fixes for cls_fw, cls_u32
- and cls_route
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, jhs@mojatatu.com, 
-	xiyou.wangcong@gmail.com, jiri@resnulli.us, davem@davemloft.net, 
-	edumazet@google.com, pctammela@mojatatu.com, victor@mojatatu.com, 
-	ramdhan@starlabs.sg, billy@starlabs.sg, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CADvbK_dN4Z3kOqmJcNcUGHp56KLF87tKLHt-3BNbyRa=QOR0dw@mail.gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Jul 25, 2023 at 10:09=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> w=
-rote:
->
-> On Tue, 25 Jul 2023 21:05:23 +0200 valis wrote:
-> > The document you quoted does not forbid pseudonyms.
-> > In fact, it was recently updated to clarify that very fact.
+On 23/07/25 03:46PM, Xin Long wrote:
+> On Tue, Jul 25, 2023 at 2:37 PM Fedor Pchelkin <pchelkin@ispras.ru> wrote:
+> >
+> > If tipc_link_bc_create() fails inside tipc_node_create() for a newly
+> > allocated tipc node then we should stop its tipc crypto and free the
+> > resources allocated with a call to tipc_crypto_start().
+> >
+> > Call tipc_crypto_stop() in that case. Also extract the similar error exit
+> > paths into a goto statement.
+> >
+> > Found by Linux Verification Center (linuxtesting.org).
+> >
+> > Fixes: cb8092d70a6f ("tipc: move bc link creation back to tipc_node_create")
+> > Signed-off-by: Fedor Pchelkin <pchelkin@ispras.ru>
+> > ---
+> >  net/tipc/node.c | 17 +++++++++++------
+> >  1 file changed, 11 insertions(+), 6 deletions(-)
+> >
+> > diff --git a/net/tipc/node.c b/net/tipc/node.c
+> > index 5e000fde8067..0d64005a803b 100644
+> > --- a/net/tipc/node.c
+> > +++ b/net/tipc/node.c
+> > @@ -546,9 +546,7 @@ struct tipc_node *tipc_node_create(struct net *net, u32 addr, u8 *peer_id,
+> >  #ifdef CONFIG_TIPC_CRYPTO
+> >         if (unlikely(tipc_crypto_start(&n->crypto_rx, net, n))) {
+> >                 pr_warn("Failed to start crypto RX(%s)!\n", n->peer_id_string);
+> > -               kfree(n);
+> > -               n = NULL;
+> > -               goto exit;
+> > +               goto free_node;
+> >         }
+> >  #endif
+> >         n->addr = addr;
+> > @@ -583,9 +581,7 @@ struct tipc_node *tipc_node_create(struct net *net, u32 addr, u8 *peer_id,
+> >                                  n->capabilities, &n->bc_entry.inputq1,
+> >                                  &n->bc_entry.namedq, snd_l, &n->bc_entry.link)) {
+> >                 pr_warn("Broadcast rcv link creation failed, no memory\n");
+> > -               kfree(n);
+> > -               n = NULL;
+> > -               goto exit;
+> > +               goto stop_crypto;
+> >         }
+> >         tipc_node_get(n);
+> Can you please try moving up tipc_node_get(n) ahead tipc_link_bc_create()
+> and use tipc_node_put(n) to replace kfree(n) to avoid the extra
+> tipc_crypto_stop() call below?
+> 
+> Thanks.
+> 
 
-Hi Jakub!
+Guess moving tipc_node_get() before tipc_link_bc_create() would not solve
+the problem as ref is already initialized to 1 at that point. So just
+replacing direct kfree() with tipc_node_put() will fix it.
 
->
-> We don't know who you are. To my understanding the adjustment means
-> that you are not obligated to use the name on your birth certificate
-> but we need to know who you are.
+Thank you for advice! I'll resend the v2 shortly.
 
-I could start a discussion about what makes a name valid, but I'm
-pretty sure netdev is not the right place for it.
-
->
-> Why is it always "security" people who try act like this is some make
-> believe metaverse. We're working on a real project with real licenses
-> and real legal implications.
->
-> Your S-o-b is pretty much meaningless. If a "real" person can vouch for
-> who you are or put their own S-o-b on your code that's fine.
-
-I posted my patches to this mailing list per maintainer's request and
-according to the published rules of the patch submission process as I
-understood them.
-Sorry if I misinterpreted something and wasted anybody's time.
-
-I'm not going to resubmit the patches under a different name.
-
-Please feel free to use them if someone is willing to sign off on them.
-
-Best regards,
-
-valis
+> >         timer_setup(&n->timer, tipc_node_timeout, 0);
+> > @@ -610,6 +606,15 @@ struct tipc_node *tipc_node_create(struct net *net, u32 addr, u8 *peer_id,
+> >  exit:
+> >         spin_unlock_bh(&tn->node_list_lock);
+> >         return n;
+> > +stop_crypto:
+> > +
+> > +#ifdef CONFIG_TIPC_CRYPTO
+> > +       tipc_crypto_stop(&n->crypto_rx);
+> > +free_node:
+> > +#endif
+> > +       kfree(n);
+> > +       spin_unlock_bh(&tn->node_list_lock);
+> > +       return NULL;
+> >  }
+> >
+> >  static void tipc_node_calculate_timer(struct tipc_node *n, struct tipc_link *l)
+> > --
+> > 2.41.0
+> >
 
