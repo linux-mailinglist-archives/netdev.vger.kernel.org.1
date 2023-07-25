@@ -1,123 +1,296 @@
-Return-Path: <netdev+bounces-20675-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20676-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2879A760910
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 07:11:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83CF7760913
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 07:12:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AE29928175A
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 05:11:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 86B291C20DC2
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 05:12:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77B5979C4;
-	Tue, 25 Jul 2023 05:11:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3436679C4;
+	Tue, 25 Jul 2023 05:12:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62BF7538F;
-	Tue, 25 Jul 2023 05:11:39 +0000 (UTC)
-Received: from mout.web.de (mout.web.de [212.227.17.11])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 397CF10FD;
-	Mon, 24 Jul 2023 22:11:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
- s=s29768273; t=1690261865; x=1690866665; i=markus.elfring@web.de;
- bh=gpBzUwIoiVql1RWBRdKwOILlP0A/rHIXkDvD86LDThc=;
- h=X-UI-Sender-Class:Date:To:Cc:References:Subject:From:In-Reply-To;
- b=L3bK1NkZeOhr530L5md1xY4fyiqjK2b6WCMpeksTQiS9KpXW9KoyAEJ4jnNcMuALYE6bk9O
- W+Leo0qfEdHQURUZF1VQOZLsu/YMyLHtgZLU4o3iwBMfGcun2zyGeB92DukFONl0WmXwl6iSP
- DtU4WxZDTXj3UTjGPTCd/jHOW4ExgntkC5kqYYLfzyHkS5Bveojlf5Nphq16tb210RkvqMfrf
- oHVBE0GKBrxMoZChOOFgCD0ZUXyU1XbL59h+C+0Aw3O3vcDpUI2T3+Lkw4dB5yQF+A3RFFaPd
- hG8kmh71L/I6TVB2eE5rnDosugx3S8RiFC1q/CCSizI3+WshWzVA==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.21] ([94.31.90.83]) by smtp.web.de (mrweb105
- [213.165.67.124]) with ESMTPSA (Nemesis) id 1MLRYf-1qes5y1vE3-00IfnI; Tue, 25
- Jul 2023 07:11:05 +0200
-Message-ID: <9a5c27e4-a1a3-1fe5-a179-bfd0072e7c59@web.de>
-Date: Tue, 25 Jul 2023 07:10:52 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F5795385
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 05:12:03 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51EF5C433C7;
+	Tue, 25 Jul 2023 05:12:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1690261922;
+	bh=o4tAA6epNSPCuaR+b7SiG4Fd+cnPUOgYF9o/2OUaee8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ntTD5lziDYeAlPaLsZkUueuFUbrJRXlgDMjMBdyFUKIdBIQUgweSuiat38Tgieg79
+	 IgaK8y9ysnSt7oQbbe+ER3qf+CQ43AW33MUFhJvo7pnotxefag5BYr8eHYEmyPQNuF
+	 +7NDXsyaqj/bdBeFlXkLfCRL92MMybXJTla4I9xq9yofijwNoIPinSw9+nTedWxtuh
+	 P41x6ZAx8qH72lvYpYUK3T57qMJ/WkNOeBH166T0m2SDeM9I+dV6sFiMXUk+7jCvls
+	 u5EqTnKiS7f/7r3kZM+lwNGsWswPpt6Phgw3iN5e++owR7sDF+APhoP1ZPItaTxeE8
+	 D/BBKVOgzTzAw==
+Date: Tue, 25 Jul 2023 08:11:58 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Ratheesh Kannoth <rkannoth@marvell.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, jhs@mojatatu.com,
+	xiyou.wangcong@gmail.com, jiri@resnulli.us, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+Subject: Re: [PATCH net-next] flow_dissector: Add IPSEC dissectors
+Message-ID: <20230725051158.GG11388@unreal>
+References: <20230725032451.505189-1-rkannoth@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-To: Yan Zhai <yan@cloudflare.com>, kernel-team@cloudflare.com,
- bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
- netdev@vger.kernel.org, kernel-janitors@vger.kernel.org,
- Andrii Nakryiko <andrii@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Hao Luo <haoluo@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Jiri Olsa <jolsa@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
- KP Singh <kpsingh@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>,
- Mykola Lysenko <mykolal@fb.com>, Paolo Abeni <pabeni@redhat.com>,
- Shuah Khan <shuah@kernel.org>, Song Liu <song@kernel.org>,
- Yonghong Song <yhs@fb.com>
-Cc: LKML <linux-kernel@vger.kernel.org>,
- Jordan Griege <jgriege@cloudflare.com>, Stanislav Fomichev <sdf@google.com>
-References: <cdbbc9df16044b568448ed9cd828d406f0851bfb.1690255889.git.yan@cloudflare.com>
-Subject: Re: [PATCH v3 bpf 1/2] bpf: fix skb_do_redirect return values
-Content-Language: en-GB
-From: Markus Elfring <Markus.Elfring@web.de>
-In-Reply-To: <cdbbc9df16044b568448ed9cd828d406f0851bfb.1690255889.git.yan@cloudflare.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:NBSUsPXsXdwQK2KKtkSbw6CSaYoML4W5xJuP6HG6yzhK9jjeKqG
- h6RU9U0X/5W8gzycOtXF1foUQN2jWRX2sWIJuHH1z3vNcB9eSN819ogY1r6ByrDAzh68e6e
- g2fh/h9LIw0v9+qMqJXpViVvzPDIttn8352Ur8rigbo+eAu6cALhOkc8iKqRxm8zF7P54Jq
- jI0T4kGQ2ZgdjbwX3jHHA==
-UI-OutboundReport: notjunk:1;M01:P0:vAO7g8aD+4o=;VO6wgI2e0TV0fOScNGayaloXrPU
- GULxFViRQGG/sqm0FZqdTGvQcpxRWtLBQEauV/IhZOWJxf/g3TaWz7+wmhIkMDKHv8XZ/oQ2g
- I0wEW2pXkGIVS/CxL2/m9Qs+HdwnEHBsJE5qrLCC0dE5KUtZXCS0CUVyHNYC8QlECskbiS4un
- 99+2ZgJdfrtv0LzQqX6eugpChk762VoMcd2o4CkrXLqvQku66iqc74X2/e/qPKYcRCyPZFokp
- PXEALY9fjQYs29cziKWs0w3Ron8ksSkvrgzZgVknP4x8tI0AdcfKra4rhBt8nMpRkx6FYRoKp
- x2D9NYOCVmv+qRT6RIg+8LHVlEKY37+Aeb1kTmdLASZvvRoiavlNh1tNW9FDwJM2JIAftAV1z
- +m3AcPkWsF6yhr0Xdr9BG29DVuY1xAc2ZfEpLzJ0sKdszld6B3mcXbynjyOajbAmfRdgc91MA
- DOUGcXG96rpJPdE8DleF4UPVeOZNEV7US+fGFhRoBT39F/XsB5SCCIBFe/l5QPsbjiwvSGdF8
- MibbjK5t/eDB/EFWakgs+KdHjvgqkhLvF9aCy9ITnz9fCsq55Pemc9Jnu74H53YEL9uH/ZHBN
- QIFowuX5s5Si/RVejJLoZsMoQXBhjnwJ9yspMp/pXLi4QUqVPrAPO5kV0b3woo4RBF/CefVco
- ibzmSDo2+AQtZUsvsa9cMugvMVSqgGcGQ/BZnI7pD8KtOsF2kvrjVZOtJ4rEXrkVC8FSYPgiJ
- Ubrfyr25Hh/BY5p/wnjG/z3iVrESYgth7I+8+3Bhw7kyMP7XBitjjqusidbdB3mKN6cgqG1jo
- EnwAwhFt8/i2FsjLbWY80uCRF0IKyNbyHms8F3ojNwa8tOvbYmMGSm8ZW+CQ035PkrUNIuuek
- t+7+5PoNfMu6m5aD+aJRRMPlCQOJO656KEYktuEsONFVrUFk4xR928fbFgW0i/xCLe9oUl9ZR
- ik3KQg==
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230725032451.505189-1-rkannoth@marvell.com>
 
->                                      =E2=80=A6 unexpected problems. This=
- change
-> converts the positive status code to proper error code.
+On Tue, Jul 25, 2023 at 08:54:51AM +0530, Ratheesh Kannoth wrote:
+>  Support for dissecting IPSEC field SPI (which is
+>  32bits in size) for ESP and AH packets.
 
-Please choose a corresponding imperative change suggestion.
+Please don't add extra space in the beginning of lines.
 
-See also:
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Do=
-cumentation/process/submitting-patches.rst?h=3Dv6.5-rc3#n94
+> 
+>  This implementation does not support NAT-T
+>  (encapsulation of ESP packets over UDP).
 
+And how will user distinguish kernel which supports flow_dissector with
+NAT-T vs. without NAT-T?
 
-Did you provide sufficient justification for a possible addition of the ta=
-g =E2=80=9CFixes=E2=80=9D?
-
-
-=E2=80=A6
-> v2: code style change suggested by Stanislav Fomichev
+> 
+> Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
 > ---
->  net/core/filter.c | 12 +++++++++++-
-=E2=80=A6
+>  include/net/flow_dissector.h |  9 ++++++
+>  include/net/flow_offload.h   |  6 ++++
+>  include/uapi/linux/pkt_cls.h |  3 ++
+>  net/core/flow_dissector.c    | 53 +++++++++++++++++++++++++++++++++++-
+>  net/core/flow_offload.c      |  7 +++++
+>  net/sched/cls_flower.c       | 18 ++++++++++++
+>  6 files changed, 95 insertions(+), 1 deletion(-)
+> 
+> diff --git a/include/net/flow_dissector.h b/include/net/flow_dissector.h
+> index 8664ed4fbbdf..ffec739f049a 100644
+> --- a/include/net/flow_dissector.h
+> +++ b/include/net/flow_dissector.h
+> @@ -301,6 +301,14 @@ struct flow_dissector_key_l2tpv3 {
+>  	__be32 session_id;
+>  };
+>  
+> +/**
+> + * struct flow_dissector_key_ipsec:
+> + * @spi: identifier for a ipsec connection
+> + */
+> +struct flow_dissector_key_ipsec {
+> +	__be32 spi;
+> +};
+> +
+>  /**
+>   * struct flow_dissector_key_cfm
+>   * @mdl_ver: maintenance domain level (mdl) and cfm protocol version
+> @@ -353,6 +361,7 @@ enum flow_dissector_key_id {
+>  	FLOW_DISSECTOR_KEY_NUM_OF_VLANS, /* struct flow_dissector_key_num_of_vlans */
+>  	FLOW_DISSECTOR_KEY_PPPOE, /* struct flow_dissector_key_pppoe */
+>  	FLOW_DISSECTOR_KEY_L2TPV3, /* struct flow_dissector_key_l2tpv3 */
+> +	FLOW_DISSECTOR_KEY_IPSEC, /* struct flow_dissector_key_ipsec */
+>  	FLOW_DISSECTOR_KEY_CFM, /* struct flow_dissector_key_cfm */
+>  
+>  	FLOW_DISSECTOR_KEY_MAX,
+> diff --git a/include/net/flow_offload.h b/include/net/flow_offload.h
+> index 118082eae48c..9efa9a59e81f 100644
+> --- a/include/net/flow_offload.h
+> +++ b/include/net/flow_offload.h
+> @@ -64,6 +64,10 @@ struct flow_match_tcp {
+>  	struct flow_dissector_key_tcp *key, *mask;
+>  };
+>  
+> +struct flow_match_ipsec {
+> +	struct flow_dissector_key_ipsec *key, *mask;
+> +};
+> +
+>  struct flow_match_mpls {
+>  	struct flow_dissector_key_mpls *key, *mask;
+>  };
+> @@ -116,6 +120,8 @@ void flow_rule_match_ports_range(const struct flow_rule *rule,
+>  				 struct flow_match_ports_range *out);
+>  void flow_rule_match_tcp(const struct flow_rule *rule,
+>  			 struct flow_match_tcp *out);
+> +void flow_rule_match_ipsec(const struct flow_rule *rule,
+> +			   struct flow_match_ipsec *out);
+>  void flow_rule_match_icmp(const struct flow_rule *rule,
+>  			  struct flow_match_icmp *out);
+>  void flow_rule_match_mpls(const struct flow_rule *rule,
+> diff --git a/include/uapi/linux/pkt_cls.h b/include/uapi/linux/pkt_cls.h
+> index 7865f5a9885b..a90b0e3d351f 100644
+> --- a/include/uapi/linux/pkt_cls.h
+> +++ b/include/uapi/linux/pkt_cls.h
+> @@ -594,6 +594,9 @@ enum {
+>  
+>  	TCA_FLOWER_KEY_L2TPV3_SID,	/* be32 */
+>  
+> +	TCA_FLOWER_KEY_SPI,		/* be32 */
+> +	TCA_FLOWER_KEY_SPI_MASK,	/* be32 */
+> +
+>  	TCA_FLOWER_L2_MISS,		/* u8 */
+>  
+>  	TCA_FLOWER_KEY_CFM,		/* nested */
+> diff --git a/net/core/flow_dissector.c b/net/core/flow_dissector.c
+> index 85a2d0d9bd39..7162594d7940 100644
+> --- a/net/core/flow_dissector.c
+> +++ b/net/core/flow_dissector.c
+> @@ -205,6 +205,50 @@ static void __skb_flow_dissect_icmp(const struct sk_buff *skb,
+>  	skb_flow_get_icmp_tci(skb, key_icmp, data, thoff, hlen);
+>  }
+>  
+> +static void __skb_flow_dissect_ah(const struct sk_buff *skb,
+> +				  struct flow_dissector *flow_dissector,
+> +				  void *target_container, const void *data,
+> +				  int nhoff, int hlen)
+> +{
+> +	struct flow_dissector_key_ipsec *key_ah;
+> +	struct ip_auth_hdr _hdr, *hdr;
 
-How do you think about to replace this marker by a line break?
+In tunnel mode, this struct is ip_esp_hdr and not ip_auth_hdr.
 
-See also:
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Do=
-cumentation/process/submitting-patches.rst?h=3Dv6.5-rc3#n711
+Thanks
 
-Regards,
-Markus
+> +
+> +	if (!dissector_uses_key(flow_dissector, FLOW_DISSECTOR_KEY_IPSEC))
+> +		return;
+> +
+> +	hdr = __skb_header_pointer(skb, nhoff, sizeof(_hdr), data, hlen, &_hdr);
+> +	if (!hdr)
+> +		return;
+> +
+> +	key_ah = skb_flow_dissector_target(flow_dissector,
+> +					   FLOW_DISSECTOR_KEY_IPSEC,
+> +					   target_container);
+> +
+> +	key_ah->spi = hdr->spi;
+> +}
+> +
+> +static void __skb_flow_dissect_esp(const struct sk_buff *skb,
+> +				   struct flow_dissector *flow_dissector,
+> +				   void *target_container, const void *data,
+> +				   int nhoff, int hlen)
+> +{
+> +	struct flow_dissector_key_ipsec *key_esp;
+> +	struct ip_esp_hdr _hdr, *hdr;
+> +
+> +	if (!dissector_uses_key(flow_dissector, FLOW_DISSECTOR_KEY_IPSEC))
+> +		return;
+> +
+> +	hdr = __skb_header_pointer(skb, nhoff, sizeof(_hdr), data, hlen, &_hdr);
+> +	if (!hdr)
+> +		return;
+> +
+> +	key_esp = skb_flow_dissector_target(flow_dissector,
+> +					    FLOW_DISSECTOR_KEY_IPSEC,
+> +					    target_container);
+> +
+> +	key_esp->spi = hdr->spi;
+> +}
+> +
+>  static void __skb_flow_dissect_l2tpv3(const struct sk_buff *skb,
+>  				      struct flow_dissector *flow_dissector,
+>  				      void *target_container, const void *data,
+> @@ -1571,7 +1615,14 @@ bool __skb_flow_dissect(const struct net *net,
+>  		__skb_flow_dissect_l2tpv3(skb, flow_dissector, target_container,
+>  					  data, nhoff, hlen);
+>  		break;
+> -
+> +	case IPPROTO_ESP:
+> +		__skb_flow_dissect_esp(skb, flow_dissector, target_container,
+> +				       data, nhoff, hlen);
+> +		break;
+> +	case IPPROTO_AH:
+> +		__skb_flow_dissect_ah(skb, flow_dissector, target_container,
+> +				      data, nhoff, hlen);
+> +		break;
+>  	default:
+>  		break;
+>  	}
+> diff --git a/net/core/flow_offload.c b/net/core/flow_offload.c
+> index acfc1f88ea79..bc5169482710 100644
+> --- a/net/core/flow_offload.c
+> +++ b/net/core/flow_offload.c
+> @@ -146,6 +146,13 @@ void flow_rule_match_tcp(const struct flow_rule *rule,
+>  }
+>  EXPORT_SYMBOL(flow_rule_match_tcp);
+>  
+> +void flow_rule_match_ipsec(const struct flow_rule *rule,
+> +			   struct flow_match_ipsec *out)
+> +{
+> +	FLOW_DISSECTOR_MATCH(rule, FLOW_DISSECTOR_KEY_IPSEC, out);
+> +}
+> +EXPORT_SYMBOL(flow_rule_match_ipsec);
+> +
+>  void flow_rule_match_icmp(const struct flow_rule *rule,
+>  			  struct flow_match_icmp *out)
+>  {
+> diff --git a/net/sched/cls_flower.c b/net/sched/cls_flower.c
+> index 8da9d039d964..7ba839057d3c 100644
+> --- a/net/sched/cls_flower.c
+> +++ b/net/sched/cls_flower.c
+> @@ -72,6 +72,7 @@ struct fl_flow_key {
+>  	struct flow_dissector_key_num_of_vlans num_of_vlans;
+>  	struct flow_dissector_key_pppoe pppoe;
+>  	struct flow_dissector_key_l2tpv3 l2tpv3;
+> +	struct flow_dissector_key_ipsec ipsec;
+>  	struct flow_dissector_key_cfm cfm;
+>  } __aligned(BITS_PER_LONG / 8); /* Ensure that we can do comparisons as longs. */
+>  
+> @@ -726,6 +727,8 @@ static const struct nla_policy fl_policy[TCA_FLOWER_MAX + 1] = {
+>  	[TCA_FLOWER_KEY_PPPOE_SID]	= { .type = NLA_U16 },
+>  	[TCA_FLOWER_KEY_PPP_PROTO]	= { .type = NLA_U16 },
+>  	[TCA_FLOWER_KEY_L2TPV3_SID]	= { .type = NLA_U32 },
+> +	[TCA_FLOWER_KEY_SPI]		= { .type = NLA_U32 },
+> +	[TCA_FLOWER_KEY_SPI_MASK]	= { .type = NLA_U32 },
+>  	[TCA_FLOWER_L2_MISS]		= NLA_POLICY_MAX(NLA_U8, 1),
+>  	[TCA_FLOWER_KEY_CFM]		= { .type = NLA_NESTED },
+>  };
+> @@ -1894,6 +1897,13 @@ static int fl_set_key(struct net *net, struct nlattr **tb,
+>  			return ret;
+>  	}
+>  
+> +	if (tb[TCA_FLOWER_KEY_SPI]) {
+> +		fl_set_key_val(tb, &key->ipsec.spi,
+> +			       TCA_FLOWER_KEY_SPI,
+> +			       &mask->ipsec.spi, TCA_FLOWER_KEY_SPI_MASK,
+> +			       sizeof(key->ipsec.spi));
+> +	}
+> +
+>  	if (tb[TCA_FLOWER_KEY_ENC_IPV4_SRC] ||
+>  	    tb[TCA_FLOWER_KEY_ENC_IPV4_DST]) {
+>  		key->enc_control.addr_type = FLOW_DISSECTOR_KEY_IPV4_ADDRS;
+> @@ -2066,6 +2076,8 @@ static void fl_init_dissector(struct flow_dissector *dissector,
+>  			     FLOW_DISSECTOR_KEY_PPPOE, pppoe);
+>  	FL_KEY_SET_IF_MASKED(mask, keys, cnt,
+>  			     FLOW_DISSECTOR_KEY_L2TPV3, l2tpv3);
+> +	FL_KEY_SET_IF_MASKED(mask, keys, cnt,
+> +			     FLOW_DISSECTOR_KEY_IPSEC, ipsec);
+>  	FL_KEY_SET_IF_MASKED(mask, keys, cnt,
+>  			     FLOW_DISSECTOR_KEY_CFM, cfm);
+>  
+> @@ -3364,6 +3376,12 @@ static int fl_dump_key(struct sk_buff *skb, struct net *net,
+>  				 sizeof(key->l2tpv3.session_id)))
+>  		goto nla_put_failure;
+>  
+> +	if (key->ipsec.spi &&
+> +	    fl_dump_key_val(skb, &key->ipsec.spi, TCA_FLOWER_KEY_SPI,
+> +			    &mask->ipsec.spi, TCA_FLOWER_KEY_SPI_MASK,
+> +			    sizeof(key->ipsec.spi)))
+> +		goto nla_put_failure;
+> +
+>  	if ((key->basic.ip_proto == IPPROTO_TCP ||
+>  	     key->basic.ip_proto == IPPROTO_UDP ||
+>  	     key->basic.ip_proto == IPPROTO_SCTP) &&
+> -- 
+> 2.25.1
+> 
+> 
 
