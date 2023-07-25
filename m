@@ -1,90 +1,180 @@
-Return-Path: <netdev+bounces-20937-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20939-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7AF2761F72
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 18:49:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41C35761F95
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 18:52:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0141F281225
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 16:49:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 266591C20EA2
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 16:52:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EF082417E;
-	Tue, 25 Jul 2023 16:49:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E79C524186;
+	Tue, 25 Jul 2023 16:52:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA87A3C23
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 16:49:34 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E77FBC433C8;
-	Tue, 25 Jul 2023 16:49:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690303774;
-	bh=L4VvWc/XpiKpMxRX4WTAwtabVH7J0IT0oNOuEjjs92A=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
-	b=tl8a1jwSsPzW+8j4I2mT6JhlGUVLWHQEBBw+t4rtlyfhcVkvo95n0oiVHGQJmkYHk
-	 b8LjUZEGM0qlPVHPxbk+c7DJpPtCfbcWAbKTgihj+KvBcC/a9Bw4Yu0MbT7EZGW8ER
-	 76zq6mgEZ7vzJLIY5xS3OVo1GdU5eS/TbJNje/rWablIwmnAiqO+QlK8iqrsbjUVaP
-	 fVZ1nCCfvimonAU++LMLp3eVtMKJ1TZKu/arY+m0eE3iIHVOLI4HyTH2NqYJJ7dZZd
-	 DVAAlmiiNqHr2jy/tz6n1YPA+k5+EmtkAd74L4tmD+rNU2/glLSbZPIHMKRPBFABDo
-	 CjKFCrt/EBN8w==
-From: Mark Brown <broonie@kernel.org>
-To: Vladimir Oltean <olteanv@gmail.com>, 
- Richard Cochran <richardcochran@gmail.com>, linux-spi@vger.kernel.org, 
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
- Minjie Du <duminjie@vivo.com>
-Cc: opensource.kernel@vivo.com
-In-Reply-To: <20230725035038.1702-1-duminjie@vivo.com>
-References: <20230725035038.1702-1-duminjie@vivo.com>
-Subject: Re: [PATCH v2] spi: fsl-dspi: Use dev_err_probe() in
- dspi_request_dma()
-Message-Id: <169030377267.1485233.13435532825497669475.b4-ty@kernel.org>
-Date: Tue, 25 Jul 2023 17:49:32 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D91091F927
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 16:52:21 +0000 (UTC)
+Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D38A2698;
+	Tue, 25 Jul 2023 09:51:51 -0700 (PDT)
+Received: by mail-pf1-x429.google.com with SMTP id d2e1a72fcca58-686ba29ccb1so33440b3a.1;
+        Tue, 25 Jul 2023 09:51:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1690303906; x=1690908706;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=A+r2r5mfvosFn/xncTREw8QjIuYYBGolcffweMnuptc=;
+        b=G3NJvYKBwDkkjAdxaM/bYSjXav5fGSAHj1L3ZB/WDRvgXq2v3ZLKnRJerKyYQYOVhe
+         6vvKfFNiLTM06apWFW8pnmgTPRs5oBS3fXA0D95hZrY6Oeia7/uxbpkoguO+XkgZgrtf
+         bwsI7wj+8palBoasNdsJ3EjlQ57WHiQPUNcZ0/BvGu4cqD9pT7JCWf4sdkIVhab/g36o
+         n3fxcqCEKTT93YfCW1uhK1vVCRfBEMKa+Kvaqt9+/8CT+ApKxidzMvAbhxEIdABfML6n
+         wQlDN+W3OiS0inSpeWMGwTJqSdRTzt58SVOqyBMt4YcpGtGKzMQWhdWKaPCNJjUCg5VN
+         c51g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690303906; x=1690908706;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=A+r2r5mfvosFn/xncTREw8QjIuYYBGolcffweMnuptc=;
+        b=LZU1jQ/a8aOn6OgYGi79kXTN7ihTVxoHu670OwQn+8JDHtgK4e+LBalq8RjHFPKmZ2
+         ec2bdY2a8SRntBETsq/uJL0CMnaTk/GDikE+m0nfKSf701eGXAIJCF2jX6Huzy1HcaEi
+         8ZSwUZErPgjs4DH6zUFUNPdAT2FKwiiwgg56HGTF2JSU68HSTjOiiK0wL8At6ulN05mL
+         HudoXAm3PME9Gwyg9wc9ovWcqSynn047FcnzRQz14s6qJbDiSMbMjctaXjphFbO+H+rM
+         F8nCCC40Y0QqXFaUpkkxmhPfr/m1mFfGZNHhjdQSGf5dxZQ0yDdiCH+9qnj16SZdd+yW
+         FZtw==
+X-Gm-Message-State: ABy/qLZ0Dcb/M/J7WJsvjLhT+cinBuGTAKorRcDpIk/p++Mrx46QQb0Y
+	oeEZ5LjlYFsm07d191nKKHg=
+X-Google-Smtp-Source: APBJJlF0cwPMn0q7z3jjxEhagRb/CzXUXSeAY/nagVwlcA0j1JzqnmpHqJq6Aww9fIbZaFfcudLc5g==
+X-Received: by 2002:a05:6a21:998e:b0:12b:40d3:aeb1 with SMTP id ve14-20020a056a21998e00b0012b40d3aeb1mr1407749pzb.25.1690303906284;
+        Tue, 25 Jul 2023 09:51:46 -0700 (PDT)
+Received: from ?IPv6:2605:59c8:448:b800:82ee:73ff:fe41:9a02? ([2605:59c8:448:b800:82ee:73ff:fe41:9a02])
+        by smtp.googlemail.com with ESMTPSA id a20-20020a637f14000000b0055fedbf1938sm4722537pgd.31.2023.07.25.09.51.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 25 Jul 2023 09:51:45 -0700 (PDT)
+Message-ID: <70b71e7bb8a7dff2dacab99b0746e7bf2bee9344.camel@gmail.com>
+Subject: Re: [PATCH net] net: fec: tx processing does not call XDP APIs if
+ budget is 0
+From: Alexander H Duyck <alexander.duyck@gmail.com>
+To: Wei Fang <wei.fang@nxp.com>, davem@davemloft.net, edumazet@google.com, 
+ kuba@kernel.org, shenwei.wang@nxp.com, xiaoning.wang@nxp.com,
+ pabeni@redhat.com,  netdev@vger.kernel.org
+Cc: linux-imx@nxp.com, linux-kernel@vger.kernel.org
+Date: Tue, 25 Jul 2023 09:51:44 -0700
+In-Reply-To: <20230725074148.2936402-1-wei.fang@nxp.com>
+References: <20230725074148.2936402-1-wei.fang@nxp.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.3 (3.48.3-1.fc38) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.13-dev-099c9
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Tue, 25 Jul 2023 11:50:37 +0800, Minjie Du wrote:
-> It is possible for dma_request_chan() to return EPROBE_DEFER, which means
-> dev is not ready yet.
-> At this point dev_err() will have no output.
-> 
-> 
+On Tue, 2023-07-25 at 15:41 +0800, Wei Fang wrote:
+> According to the clarification [1] in the latest napi.rst, the tx
+> processing cannot call any XDP (or page pool) APIs if the "budget"
+> is 0. Because NAPI is called with the budget of 0 (such as netpoll)
+> indicates we may be in an IRQ context, however, we cannot use the
+> page pool from IRQ context.
+>=20
+> [1] https://lore.kernel.org/all/20230720161323.2025379-1-kuba@kernel.org/
+>=20
+> Fixes: 20f797399035 ("net: fec: recycle pages for transmitted XDP frames"=
+)
+> Signed-off-by: Wei Fang <wei.fang@nxp.com>
+> Suggested-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+>  drivers/net/ethernet/freescale/fec_main.c | 16 ++++++++++++----
+>  1 file changed, 12 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/drivers/net/ethernet/freescale/fec_main.c b/drivers/net/ethe=
+rnet/freescale/fec_main.c
+> index 073d61619336..66b5cbdb43b9 100644
+> --- a/drivers/net/ethernet/freescale/fec_main.c
+> +++ b/drivers/net/ethernet/freescale/fec_main.c
+> @@ -1372,7 +1372,7 @@ fec_enet_hwtstamp(struct fec_enet_private *fep, uns=
+igned ts,
+>  }
+> =20
+>  static void
+> -fec_enet_tx_queue(struct net_device *ndev, u16 queue_id)
+> +fec_enet_tx_queue(struct net_device *ndev, u16 queue_id, int budget)
+>  {
+>  	struct	fec_enet_private *fep;
+>  	struct xdp_frame *xdpf;
+> @@ -1416,6 +1416,14 @@ fec_enet_tx_queue(struct net_device *ndev, u16 que=
+ue_id)
+>  			if (!skb)
+>  				goto tx_buf_done;
+>  		} else {
+> +			/* Tx processing cannot call any XDP (or page pool) APIs if
+> +			 * the "budget" is 0. Because NAPI is called with budget of
+> +			 * 0 (such as netpoll) indicates we may be in an IRQ context,
+> +			 * however, we can't use the page pool from IRQ context.
+> +			 */
+> +			if (unlikely(!budget))
+> +				break;
+> +
+>  			xdpf =3D txq->tx_buf[index].xdp;
+>  			if (bdp->cbd_bufaddr)
+>  				dma_unmap_single(&fep->pdev->dev,
 
-Applied to
+This statement isn't correct. There are napi enabled and non-napi
+versions of these calls. This is the reason for things like the
+"allow_direct" parameter in page_pool_put_full_page and the
+"napi_direct" parameter in __xdp_return.
 
-   https://git.kernel.org/pub/scm/linux/kernel/git/broonie/spi.git for-next
+By blocking on these cases you can end up hanging the Tx queue which is
+going to break netpoll as you are going to stall the ring on XDP
+packets if they are already in the queue.
 
-Thanks!
+From what I can tell your driver is using xdp_return_frame in the case
+of an XDP frame which doesn't make use of the NAPI optimizations in
+freeing from what I can tell. The NAPI optimized version is
+xdp_return_frame_rx.
 
-[1/1] spi: fsl-dspi: Use dev_err_probe() in dspi_request_dma()
-      commit: 908e5a3d4e6f60fa2d3912be7087e745639c4404
+> @@ -1508,14 +1516,14 @@ fec_enet_tx_queue(struct net_device *ndev, u16 qu=
+eue_id)
+>  		writel(0, txq->bd.reg_desc_active);
+>  }
+> =20
+> -static void fec_enet_tx(struct net_device *ndev)
+> +static void fec_enet_tx(struct net_device *ndev, int budget)
+>  {
+>  	struct fec_enet_private *fep =3D netdev_priv(ndev);
+>  	int i;
+> =20
+>  	/* Make sure that AVB queues are processed first. */
+>  	for (i =3D fep->num_tx_queues - 1; i >=3D 0; i--)
+> -		fec_enet_tx_queue(ndev, i);
+> +		fec_enet_tx_queue(ndev, i, budget);
+>  }
+> =20
+>  static void fec_enet_update_cbd(struct fec_enet_priv_rx_q *rxq,
+> @@ -1858,7 +1866,7 @@ static int fec_enet_rx_napi(struct napi_struct *nap=
+i, int budget)
+> =20
+>  	do {
+>  		done +=3D fec_enet_rx(ndev, budget - done);
+> -		fec_enet_tx(ndev);
+> +		fec_enet_tx(ndev, budget);
+>  	} while ((done < budget) && fec_enet_collect_events(fep));
+> =20
+>  	if (done < budget) {
 
-All being well this means that it will be integrated into the linux-next
-tree (usually sometime in the next 24 hours) and sent to Linus during
-the next merge window (or sooner if it is a bug fix), however if
-problems are discovered then the patch may be dropped or reverted.
-
-You may get further e-mails resulting from automated or manual testing
-and review of the tree, please engage with people reporting problems and
-send followup patches addressing any issues that are reported if needed.
-
-If any updates are required or you are submitting further changes they
-should be sent as incremental updates against current git, existing
-patches will not be replaced.
-
-Please add any relevant lists and maintainers to the CCs when replying
-to this mail.
-
-Thanks,
-Mark
-
+Since you are passing budget, one optimization you could make use of
+would be napi_consume_skb in your Tx path instead of dev_kfree_skb_any.
 
