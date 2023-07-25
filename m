@@ -1,140 +1,84 @@
-Return-Path: <netdev+bounces-20909-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20910-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D8D6761DDF
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 17:59:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15CAB761DF1
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 18:02:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ABC91281946
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 15:59:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 422092817AA
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 16:02:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E52DC24165;
-	Tue, 25 Jul 2023 15:59:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B4ED24169;
+	Tue, 25 Jul 2023 16:02:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CAFB23BF4
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 15:59:35 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD016C433C8;
-	Tue, 25 Jul 2023 15:59:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690300775;
-	bh=nTTuihyI1xY7bppjNH5+k7uZ2Bsp3knPwVCY54xVBVc=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=bIXzsXIMqVjwdyyLRqhNfsHtiZmGus75WVrpYPtyJ8bAJjGbs/gHFG6mKO9D62kPj
-	 C6PQKrxMYnPNmxKJz9vF95HZlI0QuBf0FCDDuLKW+D3Ba4pCAYryIGCUr6NNZ6y5aB
-	 ROXCTjn+PB41uoWyDKDQwKUnMbNQlAyEl33EezoolwnFy2ZUrzSXD/cr6aOuhxu0Jk
-	 5GUwBMJ3v2USYS/uRdGIfnmHF1KnnQpg+mi1ZbP/8CVYExPu0nRMtMUfQxtxWLbNCb
-	 ttkXnMKG2I6LIPzTG6Tk8EjWi7ZTuark1OLMiqdjW4sZDRLeGrDvMiFUfkIQPVxJWg
-	 n9IGtLxJfwAJg==
-From: Jakub Kicinski <kuba@kernel.org>
-To: krzk@kernel.org
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	joe@perches.com,
-	geert@linux-m68k.org,
-	netdev@vger.kernel.org,
-	workflows@vger.kernel.org,
-	mario.limonciello@amd.com
-Subject: [PATCH] scripts: checkpatch: steer people away from using file paths
-Date: Tue, 25 Jul 2023 08:59:26 -0700
-Message-ID: <20230725155926.2775416-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <b6ab3c25-eab8-5573-f6e5-8415222439cd@kernel.org>
-References: <b6ab3c25-eab8-5573-f6e5-8415222439cd@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6137F23BF1
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 16:02:27 +0000 (UTC)
+Received: from mail-oi1-f198.google.com (mail-oi1-f198.google.com [209.85.167.198])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75F3B1BE
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 09:02:25 -0700 (PDT)
+Received: by mail-oi1-f198.google.com with SMTP id 5614622812f47-3a36b52afcfso11031265b6e.3
+        for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 09:02:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690300945; x=1690905745;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=OYrN+166SJjRTzPRLQqH1H2WZ+LKvtSBI3v/6mM3uCU=;
+        b=XEsoYR7iHIZbFHiQuZM/uiX/NjaL1tWbTbTmH0lTODeALrOXd8YdAqt8jrCi0QTCOU
+         GDJUjgkaNdso38dIIlG1hUKCP7lDRwfkn9l7zIHnaB+unmwd5GutPoGP4kqzXfsObYBe
+         1UDvtamot5m7uYkqQ9p1jpMz8cjDULhRIyJWKSJAF8/X43G0OpTLOFIHxsHE2ia+SXkB
+         M+m/FPJdOFPhGzUcmzoC+uKtmATm83EDcXIe3p6qEEQkMslcmOt6C6aHdJRwfuKYjKG+
+         1XXkIqfegYnjdMsSyFIsymEV2GKXVc8zCQDMrXVruDkqHar8/glPn1h9LvODDXtQBOQ8
+         beZw==
+X-Gm-Message-State: ABy/qLagfR4zLfhY4LI24cFLjY6l2EHsVW4nRYFH7pS8fLKHuxhu3+up
+	GorAQAUyt9VufYvqGpM09CdPk8s8RZpvXDfL/XJneiJ8l3Fz
+X-Google-Smtp-Source: APBJJlGXkX52G4eXyHWloF4CzCkRRIJE2m4tcBzyC92qEloDbaeV+IlGYdkjXcsjD5bzKsqPKNjZ3k70G1Mkz2BGwHGW0DFNLB8H
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6808:2025:b0:399:e5c2:f7d3 with SMTP id
+ q37-20020a056808202500b00399e5c2f7d3mr27685378oiw.7.1690300944879; Tue, 25
+ Jul 2023 09:02:24 -0700 (PDT)
+Date: Tue, 25 Jul 2023 09:02:24 -0700
+In-Reply-To: <104261.1690298950@warthog.procyon.org.uk>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000621765060151db5e@google.com>
+Subject: Re: [syzbot] [crypto?] general protection fault in cryptd_hash_export
+From: syzbot <syzbot+e79818f5c12416aba9de@syzkaller.appspotmail.com>
+To: davem@davemloft.net, dhowells@redhat.com, herbert@gondor.apana.org.au, 
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=0.8 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
+	SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-We repeatedly see noobs misuse get_maintainer by running it on
-the file paths rather than the patchfile. This leads to authors
-of changes (quoted commits and commits under Fixes) not getting
-CCed. These are usually the best reviewers!
+Hello,
 
-The file option should really not be used by noobs, unless
-they are just trying to find a maintainer to manually contact.
+syzbot has tested the proposed patch and the reproducer did not trigger any issue:
 
-Print a warning when someone tries to use -f and remove
-the "auto-guessing" of file paths.
+Reported-and-tested-by: syzbot+e79818f5c12416aba9de@syzkaller.appspotmail.com
 
-This script may break people's "scripts on top of get_maintainer"
-if they are using -f... but that's the point.
+Tested on:
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-This is what I had in mind.
+commit:         b6d972f6 crypto: af_alg/hash: Fix recvmsg() after send..
+git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+console output: https://syzkaller.appspot.com/x/log.txt?x=11736cbea80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=2cdac84c489b934f
+dashboard link: https://syzkaller.appspot.com/bug?extid=e79818f5c12416aba9de
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
 
-CC: joe@perches.com
-Cc: geert@linux-m68k.org
-Cc: krzk@kernel.org
-Cc: netdev@vger.kernel.org
-Cc: workflows@vger.kernel.org
-Cc: mario.limonciello@amd.com
----
- scripts/get_maintainer.pl | 15 ++++++++++++++-
- 1 file changed, 14 insertions(+), 1 deletion(-)
-
-diff --git a/scripts/get_maintainer.pl b/scripts/get_maintainer.pl
-index ab123b498fd9..3635b3d40ebe 100755
---- a/scripts/get_maintainer.pl
-+++ b/scripts/get_maintainer.pl
-@@ -51,6 +51,7 @@ my $output_roles = 0;
- my $output_rolestats = 1;
- my $output_section_maxlen = 50;
- my $scm = 0;
-+my $silence_file_warning = 0;
- my $tree = 1;
- my $web = 0;
- my $subsystem = 0;
-@@ -267,6 +268,7 @@ if (!GetOptions(
- 		'subsystem!' => \$subsystem,
- 		'status!' => \$status,
- 		'scm!' => \$scm,
-+		'silence-file-warning!' => \$silence_file_warning,
- 		'tree!' => \$tree,
- 		'web!' => \$web,
- 		'letters=s' => \$letters,
-@@ -544,7 +546,13 @@ foreach my $file (@ARGV) {
-     if ($from_filename && (vcs_exists() && !vcs_file_exists($file))) {
- 	warn "$P: file '$file' not found in version control $!\n";
-     }
--    if ($from_filename || ($file ne "&STDIN" && vcs_file_exists($file))) {
-+    if ($from_filename) {
-+	if (!$silence_file_warning) {
-+	    warn "$P: WARNING: Prefer running the script on patches as "
-+	        . "generated by git format-patch. Selecting paths is known "
-+		. "to miss recipients!\n";
-+	}
-+
- 	$file =~ s/^\Q${cur_path}\E//;	#strip any absolute path
- 	$file =~ s/^\Q${lk_path}\E//;	#or the path to the lk tree
- 	push(@files, $file);
-@@ -1081,6 +1089,7 @@ version: $V
-   --mailmap => use .mailmap file (default: $email_use_mailmap)
-   --no-tree => run without a kernel tree
-   --self-test => show potential issues with MAINTAINERS file content
-+  --silence-file-warning => silence the warning about -f being used (see Notes)
-   --version => show version
-   --help => show this help information
- 
-@@ -1089,6 +1098,10 @@ version: $V
-    --pattern-depth=0 --remove-duplicates --rolestats]
- 
- Notes:
-+  Using "-f file" is generally discouraged, running the script on a filepatch
-+      (as generated by git format-patch) is usually the right thing to do.
-+      Commit message is an integral part of the change and $P
-+      will extract additional information from it (keywords, Fixes tags etc.)
-   Using "-f directory" may give unexpected results:
-       Used with "--git", git signators for _all_ files in and below
-           directory are examined as git recurses directories.
--- 
-2.41.0
-
+Note: no patches were applied.
+Note: testing is done by a robot and is best-effort only.
 
