@@ -1,187 +1,339 @@
-Return-Path: <netdev+bounces-20743-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-20744-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BAA87760DB5
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 10:56:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4832760DE3
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 11:03:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 99E7F1C203AC
-	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 08:56:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 046B32812B3
+	for <lists+netdev@lfdr.de>; Tue, 25 Jul 2023 09:03:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49B3F14260;
-	Tue, 25 Jul 2023 08:56:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E13191426C;
+	Tue, 25 Jul 2023 09:03:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F0AB4C97
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 08:56:38 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8EEA310F6
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 01:56:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1690275391;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5F504C97
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 09:03:18 +0000 (UTC)
+Received: from out-50.mta1.migadu.com (out-50.mta1.migadu.com [IPv6:2001:41d0:203:375::32])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 588EF2106
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 02:03:08 -0700 (PDT)
+Message-ID: <3648ca69-d65e-8431-135a-a5738586bc25@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1690275782;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=kjRd2nXHnXpUTy8R/0ufiPmbuZDhKs4iFIHNNr41mVY=;
-	b=YCiIwDEC2TdXyPmC64vI2CP5+SVv/DePMdRrUXMuuurPg2PDrk70m/efkd9GHC76aRkF0p
-	UrlrVSvuta9qSJwahbwOy/5XisDYdQbkO39dvdiNUtNThZCz+3OueO1w37PqekSjE4P3r2
-	8S5z5bzbUUq38IYcBnEY+GnG/DPDlF4=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-345-fDtmtn8BOEmV20-bMWZ4aw-1; Tue, 25 Jul 2023 04:56:30 -0400
-X-MC-Unique: fDtmtn8BOEmV20-bMWZ4aw-1
-Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-63d05a56b4dso4131716d6.0
-        for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 01:56:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690275390; x=1690880190;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=kjRd2nXHnXpUTy8R/0ufiPmbuZDhKs4iFIHNNr41mVY=;
-        b=JotfJICJNsa5aLlUseHnj+lxI/nHplsX5qOtoRRbnqR1hiPkYA+OrvE8x4ukoupZ5s
-         OzwgxpdSDxLShlfDEfGsk38GV7R+OCWmtFBEeYGz6iaauSv9r7yFkcGLPCRMc2N9hCmT
-         J5qDDu/zATaGBl2rrz3haHsOholWbmMIOzD4xGyweNYGvGjENSDhsrT+ozerwLDghJe1
-         BuyL7iD5YYHiriSWOUMqPLJ9SAxkmW8YK9zx0RkcaXB5ngOHwkWL+zRzy3zzEz9pNl3a
-         +WloDz9o98nLldjpmVK1Iw6offbYIGDf/Ub/Fi+prydv/bDg8xHwosOL7BkO+ZPf/es8
-         Flqg==
-X-Gm-Message-State: ABy/qLY44kR5rS4Umx+Rw9hP2+d+ZjxhFshynG+rHY9ncri6IVIyUBxi
-	AuT0BCnHXnu2WWVCtm9+ZwQVWs6jSXFCc/u3b5IgG03EFYqW8Lm4pCFc/LmKgqrsn63fwjwjYGq
-	bfvM88UtVsLGe3TCb
-X-Received: by 2002:a05:6214:29cb:b0:635:fa38:5216 with SMTP id gh11-20020a05621429cb00b00635fa385216mr15071857qvb.0.1690275389736;
-        Tue, 25 Jul 2023 01:56:29 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlH+nOjJOePunrQn7mkCSkHunCPbip77FXQTvq7evnjfLoJQF3TxUHbxETMJrfEnmyfzEWwCgA==
-X-Received: by 2002:a05:6214:29cb:b0:635:fa38:5216 with SMTP id gh11-20020a05621429cb00b00635fa385216mr15071848qvb.0.1690275389443;
-        Tue, 25 Jul 2023 01:56:29 -0700 (PDT)
-Received: from gerbillo.redhat.com (146-241-225-81.dyn.eolo.it. [146.241.225.81])
-        by smtp.gmail.com with ESMTPSA id x14-20020a0ce0ce000000b00623813aa1d5sm4210585qvk.89.2023.07.25.01.56.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Jul 2023 01:56:29 -0700 (PDT)
-Message-ID: <30e262679bfdfd975c2880b990fe8375b9860aab.camel@redhat.com>
-Subject: Re: [PATCH net-next v3] net: dsa: mv88e6xxx: Add erratum 3.14 for
- 88E6390X and 88E6190X
-From: Paolo Abeni <pabeni@redhat.com>
-To: Ante Knezic <ante.knezic@helmholz.de>, netdev@vger.kernel.org
-Cc: andrew@lunn.ch, f.fainelli@gmail.com, olteanv@gmail.com,
- davem@davemloft.net,  edumazet@google.com, kuba@kernel.org,
- linux-kernel@vger.kernel.org
-Date: Tue, 25 Jul 2023 10:56:25 +0200
-In-Reply-To: <20230721102618.13408-1-ante.knezic@helmholz.de>
-References: <20230721102618.13408-1-ante.knezic@helmholz.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+	bh=jkjBh/Kp2KZsbd5A9bxpjAJZxN02Eft+lFTspqPnOCk=;
+	b=C86+NnAgVOWWduY0bypLj9pEd8+f7K2hQWQRdMiOl+4lNoex/sNqQF/OzRY+XF6R/pQj3x
+	RJfrwmBw/U62Xz7gGIQfDrsff33dmTRFy6JUY2ZoASoV8vvmjWXkOHfSOC62P8ONIDS3dq
+	14Z/qjc5TC07VTaeF50qDKBsNsdzhz4=
+Date: Tue, 25 Jul 2023 17:02:47 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Subject: Re: [PATCH v2 03/47] mm: shrinker: add infrastructure for dynamically
+ allocating shrinker
+To: Qi Zheng <zhengqi.arch@bytedance.com>
+Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org, x86@kernel.org,
+ kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
+ linux-erofs@lists.ozlabs.org, linux-f2fs-devel@lists.sourceforge.net,
+ cluster-devel@redhat.com, linux-nfs@vger.kernel.org,
+ linux-mtd@lists.infradead.org, rcu@vger.kernel.org, netdev@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linux-arm-msm@vger.kernel.org,
+ dm-devel@redhat.com, linux-raid@vger.kernel.org,
+ linux-bcache@vger.kernel.org, virtualization@lists.linux-foundation.org,
+ linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
+ linux-xfs@vger.kernel.org, linux-btrfs@vger.kernel.org,
+ akpm@linux-foundation.org, david@fromorbit.com, tkhai@ya.ru, vbabka@suse.cz,
+ roman.gushchin@linux.dev, djwong@kernel.org, brauner@kernel.org,
+ paulmck@kernel.org, tytso@mit.edu, steven.price@arm.com, cel@kernel.org,
+ senozhatsky@chromium.org, yujie.liu@intel.com, gregkh@linuxfoundation.org
+References: <20230724094354.90817-1-zhengqi.arch@bytedance.com>
+ <20230724094354.90817-4-zhengqi.arch@bytedance.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Muchun Song <muchun.song@linux.dev>
+In-Reply-To: <20230724094354.90817-4-zhengqi.arch@bytedance.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, 2023-07-21 at 12:26 +0200, Ante Knezic wrote:
-> Fixes XAUI/RXAUI lane alignment errors.
-> Issue causes dropped packets when trying to communicate over
-> fiber via SERDES lanes of port 9 and 10.
-> Errata document applies only to 88E6190X and 88E6390X devices.
-> Requires poking in undocumented registers.
->=20
-> Signed-off-by: Ante Knezic <ante.knezic@helmholz.de>
+
+
+On 2023/7/24 17:43, Qi Zheng wrote:
+> Currently, the shrinker instances can be divided into the following three
+> types:
+>
+> a) global shrinker instance statically defined in the kernel, such as
+>     workingset_shadow_shrinker.
+>
+> b) global shrinker instance statically defined in the kernel modules, such
+>     as mmu_shrinker in x86.
+>
+> c) shrinker instance embedded in other structures.
+>
+> For case a, the memory of shrinker instance is never freed. For case b,
+> the memory of shrinker instance will be freed after synchronize_rcu() when
+> the module is unloaded. For case c, the memory of shrinker instance will
+> be freed along with the structure it is embedded in.
+>
+> In preparation for implementing lockless slab shrink, we need to
+> dynamically allocate those shrinker instances in case c, then the memory
+> can be dynamically freed alone by calling kfree_rcu().
+>
+> So this commit adds the following new APIs for dynamically allocating
+> shrinker, and add a private_data field to struct shrinker to record and
+> get the original embedded structure.
+>
+> 1. shrinker_alloc()
+>
+> Used to allocate shrinker instance itself and related memory, it will
+> return a pointer to the shrinker instance on success and NULL on failure.
+>
+> 2. shrinker_free_non_registered()
+>
+> Used to destroy the non-registered shrinker instance.
+
+At least I don't like this name. I know you want to tell others
+this function only should be called when shrinker has not been
+registed but allocated. Maybe shrinker_free() is more simple.
+And and a comment to tell the users when to use it.
+
+>
+> 3. shrinker_register()
+>
+> Used to register the shrinker instance, which is same as the current
+> register_shrinker_prepared().
+>
+> 4. shrinker_unregister()
+>
+> Used to unregister and free the shrinker instance.
+>
+> In order to simplify shrinker-related APIs and make shrinker more
+> independent of other kernel mechanisms, subsequent submissions will use
+> the above API to convert all shrinkers (including case a and b) to
+> dynamically allocated, and then remove all existing APIs.
+>
+> This will also have another advantage mentioned by Dave Chinner:
+>
+> ```
+> The other advantage of this is that it will break all the existing
+> out of tree code and third party modules using the old API and will
+> no longer work with a kernel using lockless slab shrinkers. They
+> need to break (both at the source and binary levels) to stop bad
+> things from happening due to using uncoverted shrinkers in the new
+> setup.
+> ```
+>
+> Signed-off-by: Qi Zheng <zhengqi.arch@bytedance.com>
 > ---
-> V3 : Rework to fit the new phylink_pcs infrastructure
-> V2 : Rework as suggested by Andrew Lunn <andrew@lun.ch>=20
->  * make int lanes[] const=20
->  * reorder prod_nums
->  * update commit message to indicate we are dealing with
->    undocumented Marvell registers and magic values
-> ---
->  drivers/net/dsa/mv88e6xxx/pcs-639x.c | 42 ++++++++++++++++++++++++++++++=
-++++++
->  1 file changed, 42 insertions(+)
->=20
-> diff --git a/drivers/net/dsa/mv88e6xxx/pcs-639x.c b/drivers/net/dsa/mv88e=
-6xxx/pcs-639x.c
-> index 98dd49dac421..50b14804c360 100644
-> --- a/drivers/net/dsa/mv88e6xxx/pcs-639x.c
-> +++ b/drivers/net/dsa/mv88e6xxx/pcs-639x.c
-> @@ -20,6 +20,7 @@ struct mv88e639x_pcs {
->  	struct mdio_device mdio;
->  	struct phylink_pcs sgmii_pcs;
->  	struct phylink_pcs xg_pcs;
-> +	struct mv88e6xxx_chip *chip;
->  	bool supports_5g;
->  	phy_interface_t interface;
->  	unsigned int irq;
-> @@ -205,13 +206,52 @@ static void mv88e639x_sgmii_pcs_pre_config(struct p=
-hylink_pcs *pcs,
->  	mv88e639x_sgmii_pcs_control_pwr(mpcs, false);
->  }
-> =20
-> +static int mv88e6390_erratum_3_14(struct mv88e639x_pcs *mpcs)
+>   include/linux/shrinker.h |   6 +++
+>   mm/shrinker.c            | 113 +++++++++++++++++++++++++++++++++++++++
+>   2 files changed, 119 insertions(+)
+>
+> diff --git a/include/linux/shrinker.h b/include/linux/shrinker.h
+> index 961cb84e51f5..296f5e163861 100644
+> --- a/include/linux/shrinker.h
+> +++ b/include/linux/shrinker.h
+> @@ -70,6 +70,8 @@ struct shrinker {
+>   	int seeks;	/* seeks to recreate an obj */
+>   	unsigned flags;
+>   
+> +	void *private_data;
+> +
+>   	/* These are for internal use */
+>   	struct list_head list;
+>   #ifdef CONFIG_MEMCG
+> @@ -98,6 +100,10 @@ struct shrinker {
+>   
+>   unsigned long shrink_slab(gfp_t gfp_mask, int nid, struct mem_cgroup *memcg,
+>   			  int priority);
+> +struct shrinker *shrinker_alloc(unsigned int flags, const char *fmt, ...);
+> +void shrinker_free_non_registered(struct shrinker *shrinker);
+> +void shrinker_register(struct shrinker *shrinker);
+> +void shrinker_unregister(struct shrinker *shrinker);
+>   
+>   extern int __printf(2, 3) prealloc_shrinker(struct shrinker *shrinker,
+>   					    const char *fmt, ...);
+> diff --git a/mm/shrinker.c b/mm/shrinker.c
+> index 0a32ef42f2a7..d820e4cc5806 100644
+> --- a/mm/shrinker.c
+> +++ b/mm/shrinker.c
+> @@ -548,6 +548,119 @@ unsigned long shrink_slab(gfp_t gfp_mask, int nid, struct mem_cgroup *memcg,
+>   	return freed;
+>   }
+>   
+> +struct shrinker *shrinker_alloc(unsigned int flags, const char *fmt, ...)
 > +{
-> +	const int lanes[] =3D { MV88E6390_PORT9_LANE0, MV88E6390_PORT9_LANE1,
-> +		MV88E6390_PORT9_LANE2, MV88E6390_PORT9_LANE3,
-> +		MV88E6390_PORT10_LANE0, MV88E6390_PORT10_LANE1,
-> +		MV88E6390_PORT10_LANE2, MV88E6390_PORT10_LANE3 };
-> +	struct mdio_device mdio;
-> +	int err, i;
+> +	struct shrinker *shrinker;
+> +	unsigned int size;
+> +	va_list __maybe_unused ap;
+> +	int err;
 > +
-> +	/* 88e6190x and 88e6390x errata 3.14:
-> +	 * After chip reset, SERDES reconfiguration or SERDES core
-> +	 * Software Reset, the SERDES lanes may not be properly aligned
-> +	 * resulting in CRC errors
-> +	 */
+> +	shrinker = kzalloc(sizeof(struct shrinker), GFP_KERNEL);
+> +	if (!shrinker)
+> +		return NULL;
 > +
-> +	mdio.bus =3D mpcs->mdio.bus;
+> +#ifdef CONFIG_SHRINKER_DEBUG
+> +	va_start(ap, fmt);
+> +	shrinker->name = kvasprintf_const(GFP_KERNEL, fmt, ap);
+> +	va_end(ap);
+> +	if (!shrinker->name)
+> +		goto err_name;
+> +#endif
+
+So why not introduce another helper to handle this and declare it
+as a void function when !CONFIG_SHRINKER_DEBUG? Something like the
+following:
+
+#ifdef CONFIG_SHRINKER_DEBUG
+static int shrinker_debugfs_name_alloc(struct shrinker *shrinker, const 
+char *fmt,
+                                        va_list vargs)
+
+{
+     shrinker->name = kvasprintf_const(GFP_KERNEL, fmt, vargs);
+     return shrinker->name ? 0 : -ENOMEM;
+}
+#else
+static int shrinker_debugfs_name_alloc(struct shrinker *shrinker, const 
+char *fmt,
+                                        va_list vargs)
+{
+     return 0;
+}
+#endif
+
+> +	shrinker->flags = flags;
 > +
-> +	for (i =3D 0; i < ARRAY_SIZE(lanes); i++) {
-> +		mdio.addr =3D lanes[i];
-> +
-> +		err =3D mdiodev_c45_write(&mdio, MDIO_MMD_PHYXS,
-> +					0xf054, 0x400C);
-> +		if (err)
-> +			return err;
-> +
-> +		err =3D mdiodev_c45_write(&mdio, MDIO_MMD_PHYXS,
-> +					0xf054, 0x4000);
-> +		if (err)
-> +			return err;
+> +	if (flags & SHRINKER_MEMCG_AWARE) {
+> +		err = prealloc_memcg_shrinker(shrinker);
+> +		if (err == -ENOSYS)
+> +			shrinker->flags &= ~SHRINKER_MEMCG_AWARE;
+> +		else if (err == 0)
+> +			goto done;
+> +		else
+> +			goto err_flags;
 > +	}
 > +
-> +	return 0;
-> +}
+> +	/*
+> +	 * The nr_deferred is available on per memcg level for memcg aware
+> +	 * shrinkers, so only allocate nr_deferred in the following cases:
+> +	 *  - non memcg aware shrinkers
+> +	 *  - !CONFIG_MEMCG
+> +	 *  - memcg is disabled by kernel command line
+> +	 */
+> +	size = sizeof(*shrinker->nr_deferred);
+> +	if (flags & SHRINKER_NUMA_AWARE)
+> +		size *= nr_node_ids;
 > +
->  static int mv88e639x_sgmii_pcs_post_config(struct phylink_pcs *pcs,
->  					   phy_interface_t interface)
->  {
->  	struct mv88e639x_pcs *mpcs =3D sgmii_pcs_to_mv88e639x_pcs(pcs);
-> +	struct mv88e6xxx_chip *chip =3D mpcs->chip;
-> =20
->  	mv88e639x_sgmii_pcs_control_pwr(mpcs, true);
-> =20
-> +	if (chip->info->prod_num =3D=3D MV88E6XXX_PORT_SWITCH_ID_PROD_6190X ||
-> +	    chip->info->prod_num =3D=3D MV88E6XXX_PORT_SWITCH_ID_PROD_6390X)
-> +		mv88e6390_erratum_3_14(mpcs);
+> +	shrinker->nr_deferred = kzalloc(size, GFP_KERNEL);
+> +	if (!shrinker->nr_deferred)
+> +		goto err_flags;
+> +
+> +done:
+> +	return shrinker;
+> +
+> +err_flags:
+> +#ifdef CONFIG_SHRINKER_DEBUG
+> +	kfree_const(shrinker->name);
+> +	shrinker->name = NULL;
 
-It looks like you are ignoring the errors reported by
-mv88e6390_erratum_3_14(). Should the above be:
+This could be shrinker_debugfs_name_free()
 
-		return mv88e6390_erratum_3_14(mpcs);
+> +err_name:
+> +#endif
+> +	kfree(shrinker);
+> +	return NULL;
+> +}
+> +EXPORT_SYMBOL(shrinker_alloc);
+> +
+> +void shrinker_free_non_registered(struct shrinker *shrinker)
+> +{
+> +#ifdef CONFIG_SHRINKER_DEBUG
+> +	kfree_const(shrinker->name);
+> +	shrinker->name = NULL;
 
-instead?
+This could be shrinker_debugfs_name_free()
 
-Thanks!
+> +#endif
+> +	if (shrinker->flags & SHRINKER_MEMCG_AWARE) {
+> +		down_write(&shrinker_rwsem);
+> +		unregister_memcg_shrinker(shrinker);
+> +		up_write(&shrinker_rwsem);
+> +	}
+> +
+> +	kfree(shrinker->nr_deferred);
+> +	shrinker->nr_deferred = NULL;
+> +
+> +	kfree(shrinker);
+> +}
+> +EXPORT_SYMBOL(shrinker_free_non_registered);
+> +
+> +void shrinker_register(struct shrinker *shrinker)
+> +{
+> +	down_write(&shrinker_rwsem);
+> +	list_add_tail(&shrinker->list, &shrinker_list);
+> +	shrinker->flags |= SHRINKER_REGISTERED;
+> +	shrinker_debugfs_add(shrinker);
+> +	up_write(&shrinker_rwsem);
+> +}
+> +EXPORT_SYMBOL(shrinker_register);
+> +
+> +void shrinker_unregister(struct shrinker *shrinker)
 
-Paolo
+You have made all shrinkers to be dynamically allocated, so
+we should prevent users from allocating shrinkers statically and
+use this function to unregister it. It is better to add a
+flag like SHRINKER_ALLOCATED which is set in shrinker_alloc(),
+and check whether it is set in shrinker_unregister(), if not
+maybe a warning should be added to tell the users what happened.
+
+> +{
+> +	struct dentry *debugfs_entry;
+> +	int debugfs_id;
+> +
+> +	if (!shrinker || !(shrinker->flags & SHRINKER_REGISTERED))
+> +		return;
+> +
+> +	down_write(&shrinker_rwsem);
+> +	list_del(&shrinker->list);
+> +	shrinker->flags &= ~SHRINKER_REGISTERED;
+> +	if (shrinker->flags & SHRINKER_MEMCG_AWARE)
+> +		unregister_memcg_shrinker(shrinker);
+> +	debugfs_entry = shrinker_debugfs_detach(shrinker, &debugfs_id);
+
+In the internal of this function, you also could use
+shrinker_debugfs_name_free().
+
+Thanks.
+
+> +	up_write(&shrinker_rwsem);
+> +
+> +	shrinker_debugfs_remove(debugfs_entry, debugfs_id);
+> +
+> +	kfree(shrinker->nr_deferred);
+> +	shrinker->nr_deferred = NULL;
+> +
+> +	kfree(shrinker);
+> +}
+> +EXPORT_SYMBOL(shrinker_unregister);
+> +
+>   /*
+>    * Add a shrinker callback to be called from the vm.
+>    */
 
 
