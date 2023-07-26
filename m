@@ -1,107 +1,108 @@
-Return-Path: <netdev+bounces-21523-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21524-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B162F763CB8
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 18:43:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F228763CC1
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 18:44:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 651CA2819E0
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 16:43:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4AAF71C212B1
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 16:44:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 287721AA76;
-	Wed, 26 Jul 2023 16:43:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C04B1AA6D;
+	Wed, 26 Jul 2023 16:44:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D1891802C
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 16:43:16 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF17D26AE
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 09:43:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=xmIyfPnDArWfzWAoPJJMuxu5k+1HCUBA0+YqMDldAOw=; b=Gfoi1OXJjYJO2oICI9vQKdfiEL
-	MU8dWfExQsyeZkh3L0R/C1aSYI6JeaG8qvUYWGT6rskXva7fqNHdT2p3rlbGS8GHgqJnMZw6416EA
-	gm1JD5485WuYhAjzg0iQML1hjya3Wfjb9ZkIk/KOpat8rB5qYNcvLxh8NegGvqe3frP0=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qOhbJ-002NPs-QX; Wed, 26 Jul 2023 18:43:01 +0200
-Date: Wed, 26 Jul 2023 18:43:01 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "mengyuanlou@net-swift.com" <mengyuanlou@net-swift.com>,
-	"Russell King (Oracle)" <linux@armlinux.org.uk>,
-	Simon Horman <simon.horman@corigine.com>, netdev@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Subject: Re: [PATCH net-next 2/2] net: phy: add keep_data_connection to
- struct phydev
-Message-ID: <ba6f7147-6652-4858-b4bc-19b1e7dfa30c@lunn.ch>
-References: <20230724092544.73531-1-mengyuanlou@net-swift.com>
- <20207E0578DCE44C+20230724092544.73531-3-mengyuanlou@net-swift.com>
- <ZL+6kMqETdYL7QNF@corigine.com>
- <ZL/KIjjw3AZmQcGn@shell.armlinux.org.uk>
- <4B0F6878-3ABF-4F99-8CE3-F16608583EB4@net-swift.com>
- <21770a39-a0f4-485c-b6d1-3fd250536159@lunn.ch>
- <20230726090812.7ff5af72@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F0EC1AA61
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 16:44:25 +0000 (UTC)
+Received: from mail-io1-xd2e.google.com (mail-io1-xd2e.google.com [IPv6:2607:f8b0:4864:20::d2e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 049832712
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 09:44:18 -0700 (PDT)
+Received: by mail-io1-xd2e.google.com with SMTP id ca18e2360f4ac-7748ca56133so63490939f.0
+        for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 09:44:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1690389857; x=1690994657;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2MvAgiSRmmqjQuNSTvLvzhCp2dGR6DqVK9AaLsBcxns=;
+        b=ns+rOP5oX61phHnuBj++0wNoZJ7yKblh7Wh8NOL+Rb+Hm9ygQ2X5LFW319K/8SjQ0/
+         wa+7wnnDVEwblxlo/uZYR0ddHibvcRB7mhqKN4ohDjiKlh4B7yS5BjEE5Cn0KBXGAGfO
+         IqYz5UIGcioEORU69Hw9anTYRiZyXps0Hz32gOprLY2L1uKrkEevL5RZDhF16lwQw5Qe
+         FPMQlxtH1yL0xJbyZ0+AeZ6IpR42n8w7P6BTcXt5rCNJTPPAqRuPDEjfWk+6UOAqKLHY
+         R39IsO5dxwaDheXaBsbsISB2vlgCiOX+pLJTZ318pwraW/RYPu3mnUaBGm6mJhv6DuCA
+         fbmg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690389857; x=1690994657;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=2MvAgiSRmmqjQuNSTvLvzhCp2dGR6DqVK9AaLsBcxns=;
+        b=GLaoZexAfCL7ojw3M3pJkEr7WreSbC+oyMHoTHxwWA0BVaRPdirywgy6mfRWTacgrg
+         AGUQHBRSom/AFJwRaw07HBN+Bx7jn8vf9oXdGyi1k//XiRovBBYymtzQsgFYioelWJwM
+         GfyBC5+Gq8kD+NxMAz+I+kBq9XWG3ELraq/pi5t5wXiMBwgRMUuVq4sbytA1R1mUHKgl
+         1wP+GjVB4OaXotgM4y1bABBepdMsuLBNl/uRR2yGt/2cqN/N3Hn8Vg0rq2OIueqVxmR3
+         Ea4zLDgmHcRKBFVWM1igl4VvuwzoMb5uzOfgOnAi1NZhvCmnvwhicAjC5LQVYqratVZJ
+         6wIw==
+X-Gm-Message-State: ABy/qLZs/9aN0f7HkXkE0INuSUt0eikpALVkFqMDD1ci5oGYgMH2V2wb
+	oE0U/ig0uevmN8o6sFG3WqkECA==
+X-Google-Smtp-Source: APBJJlEB91rbYnaP2LHDb57KP3z2y30FE7fZyyItopmcLqEzRiw5IPgPfIAPfJ8Y6oZpET8xjhHYSQ==
+X-Received: by 2002:a6b:1446:0:b0:77a:ee79:652 with SMTP id 67-20020a6b1446000000b0077aee790652mr2185498iou.1.1690389857420;
+        Wed, 26 Jul 2023 09:44:17 -0700 (PDT)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id n4-20020a6bed04000000b00786fe5039b8sm4792120iog.46.2023.07.26.09.44.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 Jul 2023 09:44:16 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: Pavel Begunkov <asml.silence@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Breno Leitao <leitao@debian.org>
+Cc: gregkh@linuxfoundation.org, kuniyu@amazon.com, io-uring@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+In-Reply-To: <20230627134424.2784797-1-leitao@debian.org>
+References: <20230627134424.2784797-1-leitao@debian.org>
+Subject: Re: [PATCH v4] io_uring: Add io_uring command support for sockets
+Message-Id: <169038985660.932464.4047750126367212263.b4-ty@kernel.dk>
+Date: Wed, 26 Jul 2023 10:44:16 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230726090812.7ff5af72@kernel.org>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.13-dev-099c9
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Jul 26, 2023 at 09:08:12AM -0700, Jakub Kicinski wrote:
-> Sorry for chiming in, hopefully the comments are helpful..
 
-Thanks for commenting. This is a somewhat unusual setup, a server
-style Ethernet interface which Linux is driving, not firmware. So its
-more like an embedded SoC setup, but has NCSI which embedded systems
-don't.
-
-> On Wed, 26 Jul 2023 10:54:25 +0200 Andrew Lunn wrote:
-> > As far as i understand it, the host MAC is actually a switch, with the
-> > BMC connected to the second port of the switch.
+On Tue, 27 Jun 2023 06:44:24 -0700, Breno Leitao wrote:
+> Enable io_uring commands on network sockets. Create two new
+> SOCKET_URING_OP commands that will operate on sockets.
 > 
-> Not a learning switch (usually, sigh), but yes.
+> In order to call ioctl on sockets, use the file_operations->io_uring_cmd
+> callbacks, and map it to a uring socket function, which handles the
+> SOCKET_URING_OP accordingly, and calls socket ioctls.
 > 
-> > Does the BMC care about the PHY status?
-> > Does it need to know about link status? 
-> 
-> Yes, NIC sends link state notifications over the NCSI "link?" (which 
-> is a separate RGMII?/RMII from NIC to the BMC). BMC can select which
-> "channel" (NIC port) it uses based on PHY status.
+> [...]
 
-How do you define NIC when Linux is driving the hardware, not
-firmware? In this case we have a MAC driver, a PCS driver, a PHY
-driver and phylink gluing it all together. Which part of this is
-sending link state notifications over the NCSI "Link?".
- 
-> > Does the NCSI core on the host need to know about the PHY?
-> 
-> There is no NCSI core on the host.. Hosts are currently completely
-> oblivious to NCSI. The NCSI we have in tree is for the BMC, Linux
-> running on the BMC (e.g. OpenBMC).
+Applied, thanks!
 
-But in this case, it is not oblivious to NCSI, since the host is
-controlling the PHY. This patch is about Linux on the host not
-shutting down the PHY because it is also being used by the BMC.
+[1/1] io_uring: Add io_uring command support for sockets
+      commit: 95ba83afd0968d4699054e613033d1cefb295845
 
-	 Andrew
+Best regards,
+-- 
+Jens Axboe
+
+
+
 
