@@ -1,68 +1,90 @@
-Return-Path: <netdev+bounces-21475-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21479-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB989763AE2
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 17:23:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 51C3C763AF9
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 17:25:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9646D281374
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 15:23:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 81C9B1C2132E
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 15:25:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DEF9253A3;
-	Wed, 26 Jul 2023 15:23:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95F2C253B2;
+	Wed, 26 Jul 2023 15:25:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69AB61DA3F;
-	Wed, 26 Jul 2023 15:23:14 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51687C433C8;
-	Wed, 26 Jul 2023 15:23:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690384993;
-	bh=oC0eTTq4WytvUZB2KcVKqBozq5IBKTLRL8iBHm0r3F4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=OuXJb/EgmZaLAAaej2KcRStR7pVRlBD2dcRGeXpXjMz4oeNvpYhqMGqe5+26AJTyf
-	 8khmLayEaQSud57scWhtQeLKtj16EAsw8hfh8NQtPyGONuf0XjPqnvU1ygWJH+lJET
-	 fHpheeTlUxbntNn9qGMN/S272GtyQQBc9XIoL9GbwQAEqptoGCOBrtDInYSM1+64SH
-	 GKjbhiEnsUryPr72fsMBPO+5zxWZgEWAvvYMmoLDXITeNyBzCiN7vwY2rLEo+QGkfB
-	 IDbc9OLrOZc+z+GQlZ4TagMDoZ/UZeuou7dcIEomODgnuZotOWfNjJIt3Q0v1xzLXH
-	 5XK7LEWizP/xA==
-Date: Wed, 26 Jul 2023 08:23:12 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Leon Romanovsky <leon@kernel.org>, Daniel Borkmann
- <daniel@iogearbox.net>
-Cc: syzbot <syzbot+14736e249bce46091c18@syzkaller.appspotmail.com>,
- andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, haoluo@google.com,
- john.fastabend@gmail.com, jolsa@kernel.org, kpsingh@kernel.org,
- linux-kernel@vger.kernel.org, martin.lau@linux.dev, netdev@vger.kernel.org,
- sdf@google.com, song@kernel.org, syzkaller-bugs@googlegroups.com,
- yhs@fb.com, Gal Pressman <gal@nvidia.com>
-Subject: Re: [syzbot] [bpf?] WARNING: ODEBUG bug in tcx_uninstall
-Message-ID: <20230726082312.1600053e@kernel.org>
-In-Reply-To: <20230726071254.GA1380402@unreal>
-References: <000000000000ee69e80600ec7cc7@google.com>
-	<91396dc0-23e4-6c81-f8d8-f6427eaa52b0@iogearbox.net>
-	<20230726071254.GA1380402@unreal>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A3C1CA63
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 15:25:35 +0000 (UTC)
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [IPv6:2a0a:51c0:0:237:300::1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2799BF;
+	Wed, 26 Jul 2023 08:25:33 -0700 (PDT)
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+	(envelope-from <fw@breakpoint.cc>)
+	id 1qOgOG-0001Gb-BL; Wed, 26 Jul 2023 17:25:28 +0200
+From: Florian Westphal <fw@strlen.de>
+To: <netdev@vger.kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	<netfilter-devel@vger.kernel.org>
+Subject: [PATCH net 0/3] netfilter fixes for net
+Date: Wed, 26 Jul 2023 17:23:46 +0200
+Message-ID: <20230726152524.26268-1-fw@strlen.de>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_MED,SPF_HELO_PASS,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Wed, 26 Jul 2023 10:12:54 +0300 Leon Romanovsky wrote:
-> > Thanks, I'll take a look this evening.  
-> 
-> Did anybody post a fix for that?
-> 
-> We are experiencing the following kernel panic in netdev commit
-> b57e0d48b300 (net-next/main) Merge branch '100GbE' of git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue
+Hello,
 
-Not that I know, looks like this is with Daniel's previous fix already
-present, and syzbot is hitting it, too :(
+Here are three netfilter fixes for the *net* tree:
+1. On-demand overlap detection in 'rbtree' set can cause memory leaks.
+   This is broken since 6.2.
+
+2. An earlier fix in 6.4 to address an imbalance in refcounts during
+   transaction error unwinding was incomplete, from Pablo Neira.
+
+3. Disallow adding a rule to a deleted chain, also from Pablo.
+   Broken since 5.9.
+
+The following changes since commit d4a7ce642100765119a872d4aba1bf63e3a22c8a:
+
+  igc: Fix Kernel Panic during ndo_tx_timeout callback (2023-07-26 09:54:40 +0100)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git tags/nf-23-07-26
+
+for you to fetch changes up to 0ebc1064e4874d5987722a2ddbc18f94aa53b211:
+
+  netfilter: nf_tables: disallow rule addition to bound chain via NFTA_RULE_CHAIN_ID (2023-07-26 16:48:49 +0200)
+
+----------------------------------------------------------------
+netfilter pull request 2023-07-26
+
+----------------------------------------------------------------
+Florian Westphal (1):
+      netfilter: nft_set_rbtree: fix overlap expiration walk
+
+Pablo Neira Ayuso (2):
+      netfilter: nf_tables: skip immediate deactivate in _PREPARE_ERROR
+      netfilter: nf_tables: disallow rule addition to bound chain via NFTA_RULE_CHAIN_ID
+
+ net/netfilter/nf_tables_api.c  |  5 +++--
+ net/netfilter/nft_immediate.c  | 27 ++++++++++++++++++---------
+ net/netfilter/nft_set_rbtree.c | 20 ++++++++++++++------
+ 3 files changed, 35 insertions(+), 17 deletions(-)
 
