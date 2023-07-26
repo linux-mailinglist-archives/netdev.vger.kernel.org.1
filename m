@@ -1,204 +1,217 @@
-Return-Path: <netdev+bounces-21204-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21205-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61201762D20
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 09:20:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 58223762D36
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 09:24:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8381A1C21004
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 07:20:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9238B1C20754
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 07:24:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14156848E;
-	Wed, 26 Jul 2023 07:20:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C7E08801;
+	Wed, 26 Jul 2023 07:24:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F103A846B
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 07:20:35 +0000 (UTC)
-Received: from mail-lj1-x22a.google.com (mail-lj1-x22a.google.com [IPv6:2a00:1450:4864:20::22a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D138D3C07;
-	Wed, 26 Jul 2023 00:20:33 -0700 (PDT)
-Received: by mail-lj1-x22a.google.com with SMTP id 38308e7fff4ca-2b701e1ca63so94985361fa.1;
-        Wed, 26 Jul 2023 00:20:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690356032; x=1690960832;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:subject:cc:to:from:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=qIjAg3STPHrNomBKUumGhrzH+A1OTejnaQKtF+Ii1BY=;
-        b=b89jjWwJiBDG2oEiGcg/JALiB45ddMP2u6a2WXMQEM8EZGteM5sCa7eH3PNzkQyYHC
-         QPGZPY4O9IEmitqWRDReKl5g6XwASzx/pKRrNauSttsyC4RJHqGyoVerbgqNZ90+LYS3
-         PK89OErr44MIWudAgTKUwMFbP7LcRd/CpkmpZ2Tito6IGdfQyZWaMceythWP7zw3H4IL
-         wh9YLhodxBhpjmC1HqZdwQBvJc+iHPWXvIjqLg9PDxOg4t6he2D1f0QDWrxM0/ygARwT
-         2MN1nMkPOVJgE7oXWndmuo0LTTsC8jg/kfdjEN6PkAbwZF5UEsUxVNHXMBGss1LZI6oC
-         GTQQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690356032; x=1690960832;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:subject:cc:to:from:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qIjAg3STPHrNomBKUumGhrzH+A1OTejnaQKtF+Ii1BY=;
-        b=b8PJeaGaNb45lA1IVB9Zy+hVf8AZpf5EE/N4UbvDzHdU4lHrI0MpBFBXcQcyxwV+1c
-         vxA+k+m7B173ouNJClx2xsw1caEOTwBC6iyTJTrD47gZbacCInQ3m/QtDZvHuyQAq6cn
-         qNtDpueIEO/m5T8pmA6UJG29Begjib6pFAkWWSt9r/EpYKNvQKCK4EExQ8kHz9ERtp7W
-         iJrIHS6Nn13Aa0DG8sqXJmU+njIXpDOAtMlaIBtZBeguoydzllLBZpOzmFMxknS3bhq3
-         WpqlhRAyJrJ41OPlMSP45QogP9/vNM+Q0XSsA22HA09R/XQ/Vp06mbYliNOQp55HaOwQ
-         P6Ng==
-X-Gm-Message-State: ABy/qLbXNzUNi7VZmZai1MBs5abIJsV14Vd1X1fiCR/YMNBfk8VPNFO8
-	vH4fe78GpoIKspHZ53uS5DAB981XS9Y53WP+
-X-Google-Smtp-Source: APBJJlE4digYFNcgniMLPCgyqsbVEt12BREu8UdInq/XleqlenAUDJygmszhWK7XdWTDrcfDThHHEw==
-X-Received: by 2002:a2e:900a:0:b0:2b5:974f:385 with SMTP id h10-20020a2e900a000000b002b5974f0385mr808562ljg.9.1690356031776;
-        Wed, 26 Jul 2023 00:20:31 -0700 (PDT)
-Received: from akanner-r14. ([77.222.25.78])
-        by smtp.gmail.com with ESMTPSA id v14-20020a2e960e000000b002b9b90474c7sm132830ljh.129.2023.07.26.00.20.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Jul 2023 00:20:31 -0700 (PDT)
-Message-ID: <64c0c93f.2e0a0220.25086.02ae@mx.google.com>
-X-Google-Original-Message-ID: <ZMDJO1BGGJV4PQAZ@akanner-r14.>
-Date: Wed, 26 Jul 2023 10:20:27 +0300
-From: Andrew Kanner <andrew.kanner@gmail.com>
-To: Jason Wang <jasowang@redhat.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, netdev@vger.kernel.org, brouer@redhat.com,
-	linux-kernel@vger.kernel.org,
-	linux-kernel-mentees@lists.linuxfoundation.org,
-	syzbot+f817490f5bd20541b90a@syzkaller.appspotmail.com
-Subject: Re: [PATCH v3] drivers: net: prevent tun_get_user() to exceed xdp
- size limits
-References: <20230725155403.796-1-andrew.kanner@gmail.com>
- <CACGkMEt=Cd8J995+0k=6MT1Pj=Fk9E_r2eZREptLt2osj_H-hA@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C52E79D0
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 07:24:34 +0000 (UTC)
+Received: from out-9.mta1.migadu.com (out-9.mta1.migadu.com [95.215.58.9])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1AE5423C;
+	Wed, 26 Jul 2023 00:24:23 -0700 (PDT)
+Message-ID: <17de3f5b-3bef-be38-9801-0e84cfe8539b@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1690356262;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nTTDffXkzxVXBy4JmC8uLINROt4TIYQk3fp5u25NUNM=;
+	b=BnM6ObbVvlHjNT0EQ9FNfJjw5uDAlrCLhNEcIu2YqjXKf/vGuoud+hHft88ZtRNtDuEwCg
+	tBOK3Iz/LamlBXXb/s2VBKik1ft+6SPkGLcP8h8g11eIlgemJmkdkTnX+9qLAUoZF66N+E
+	FHLnBM7v5jm+QRNUOfsvfgruR8wkbzM=
+Date: Wed, 26 Jul 2023 15:24:02 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CACGkMEt=Cd8J995+0k=6MT1Pj=Fk9E_r2eZREptLt2osj_H-hA@mail.gmail.com>
+Subject: Re: [PATCH v2 23/47] drm/msm: dynamically allocate the drm-msm_gem
+ shrinker
+To: Qi Zheng <zhengqi.arch@bytedance.com>
+Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org, x86@kernel.org,
+ kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
+ linux-erofs@lists.ozlabs.org, linux-f2fs-devel@lists.sourceforge.net,
+ cluster-devel@redhat.com, linux-nfs@vger.kernel.org,
+ linux-mtd@lists.infradead.org, rcu@vger.kernel.org, netdev@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linux-arm-msm@vger.kernel.org,
+ dm-devel@redhat.com, linux-raid@vger.kernel.org,
+ linux-bcache@vger.kernel.org, virtualization@lists.linux-foundation.org,
+ linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
+ linux-xfs@vger.kernel.org, linux-btrfs@vger.kernel.org,
+ akpm@linux-foundation.org, david@fromorbit.com, tkhai@ya.ru, vbabka@suse.cz,
+ roman.gushchin@linux.dev, djwong@kernel.org, brauner@kernel.org,
+ paulmck@kernel.org, tytso@mit.edu, steven.price@arm.com, cel@kernel.org,
+ senozhatsky@chromium.org, yujie.liu@intel.com, gregkh@linuxfoundation.org
+References: <20230724094354.90817-1-zhengqi.arch@bytedance.com>
+ <20230724094354.90817-24-zhengqi.arch@bytedance.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Muchun Song <muchun.song@linux.dev>
+In-Reply-To: <20230724094354.90817-24-zhengqi.arch@bytedance.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Jul 26, 2023 at 10:09:53AM +0800, Jason Wang wrote:
-> On Tue, Jul 25, 2023 at 11:54 PM Andrew Kanner <andrew.kanner@gmail.com> wrote:
-> >
-> > Syzkaller reported the following issue:
-> > =======================================
-> > Too BIG xdp->frame_sz = 131072
-> > WARNING: CPU: 0 PID: 5020 at net/core/filter.c:4121
-> >   ____bpf_xdp_adjust_tail net/core/filter.c:4121 [inline]
-> > WARNING: CPU: 0 PID: 5020 at net/core/filter.c:4121
-> >   bpf_xdp_adjust_tail+0x466/0xa10 net/core/filter.c:4103
-> > ...
-> > Call Trace:
-> >  <TASK>
-> >  bpf_prog_4add87e5301a4105+0x1a/0x1c
-> >  __bpf_prog_run include/linux/filter.h:600 [inline]
-> >  bpf_prog_run_xdp include/linux/filter.h:775 [inline]
-> >  bpf_prog_run_generic_xdp+0x57e/0x11e0 net/core/dev.c:4721
-> >  netif_receive_generic_xdp net/core/dev.c:4807 [inline]
-> >  do_xdp_generic+0x35c/0x770 net/core/dev.c:4866
-> >  tun_get_user+0x2340/0x3ca0 drivers/net/tun.c:1919
-> >  tun_chr_write_iter+0xe8/0x210 drivers/net/tun.c:2043
-> >  call_write_iter include/linux/fs.h:1871 [inline]
-> >  new_sync_write fs/read_write.c:491 [inline]
-> >  vfs_write+0x650/0xe40 fs/read_write.c:584
-> >  ksys_write+0x12f/0x250 fs/read_write.c:637
-> >  do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-> >  do_syscall_64+0x38/0xb0 arch/x86/entry/common.c:80
-> >  entry_SYSCALL_64_after_hwframe+0x63/0xcd
-> >
-> > xdp->frame_sz > PAGE_SIZE check was introduced in commit c8741e2bfe87
-> > ("xdp: Allow bpf_xdp_adjust_tail() to grow packet size"). But
-> > tun_get_user() still provides an execution path with do_xdp_generic()
-> > and exceed XDP limits for packet size.
-> >
-> > Using the syzkaller repro with reduced packet size it was also
-> > discovered that XDP_PACKET_HEADROOM is not checked in
-> > tun_can_build_skb(), although pad may be incremented in
-> > tun_build_skb().
-> >
-> > If we move the limit check from tun_can_build_skb() to tun_build_skb()
-> > we will make xdp to be used only in tun_build_skb(), without falling
-> > in tun_alloc_skb(), etc. And moreover we will drop the packet which
-> > can't be processed in tun_build_skb().
-> >
-> > Reported-and-tested-by: syzbot+f817490f5bd20541b90a@syzkaller.appspotmail.com
-> > Closes: https://lore.kernel.org/all/000000000000774b9205f1d8a80d@google.com/T/
-> > Link: https://syzkaller.appspot.com/bug?id=5335c7c62bfff89bbb1c8f14cdabebe91909060f
-> > Fixes: 7df13219d757 ("tun: reserve extra headroom only when XDP is set")
-> > Signed-off-by: Andrew Kanner <andrew.kanner@gmail.com>
-> > ---
-> >
-> > Notes:
-> >     V2 -> V3:
-> >     * attach the forgotten changelog
-> >     V1 -> V2:
-> >     * merged 2 patches in 1, fixing both issues: WARN_ON_ONCE with
-> >       syzkaller repro and missing XDP_PACKET_HEADROOM in pad
-> >     * changed the title and description of the execution path, suggested
-> >       by Jason Wang <jasowang@redhat.com>
-> >     * move the limit check from tun_can_build_skb() to tun_build_skb() to
-> >       remove duplication and locking issue, and also drop the packet in
-> >       case of a failed check - noted by Jason Wang <jasowang@redhat.com>
-> 
-> Acked-by: Jason Wang <jasowang@redhat.com>
-> 
-> Thanks
-> 
-> >
-> >  drivers/net/tun.c | 7 +++----
-> >  1 file changed, 3 insertions(+), 4 deletions(-)
-> >
-> > diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-> > index d75456adc62a..7c2b05ce0421 100644
-> > --- a/drivers/net/tun.c
-> > +++ b/drivers/net/tun.c
-> > @@ -1594,10 +1594,6 @@ static bool tun_can_build_skb(struct tun_struct *tun, struct tun_file *tfile,
-> >         if (zerocopy)
-> >                 return false;
-> >
-> > -       if (SKB_DATA_ALIGN(len + TUN_RX_PAD) +
-> > -           SKB_DATA_ALIGN(sizeof(struct skb_shared_info)) > PAGE_SIZE)
-> > -               return false;
-> > -
-> >         return true;
-> >  }
-> >
-> > @@ -1673,6 +1669,9 @@ static struct sk_buff *tun_build_skb(struct tun_struct *tun,
-> >         buflen += SKB_DATA_ALIGN(len + pad);
-> >         rcu_read_unlock();
-> >
-> > +       if (buflen > PAGE_SIZE)
-> > +               return ERR_PTR(-EFAULT);
-> > +
-> >         alloc_frag->offset = ALIGN((u64)alloc_frag->offset, SMP_CACHE_BYTES);
-> >         if (unlikely(!skb_page_frag_refill(buflen, alloc_frag, GFP_KERNEL)))
-> >                 return ERR_PTR(-ENOMEM);
-> > --
-> > 2.39.3
-> >
-> 
 
-Thanks, Jason.
 
-Can anyone point me to some tests other than
-tools/testing/selftests/net/tun.c?
+On 2023/7/24 17:43, Qi Zheng wrote:
+> In preparation for implementing lockless slab shrink, use new APIs to
+> dynamically allocate the drm-msm_gem shrinker, so that it can be freed
+> asynchronously using kfree_rcu(). Then it doesn't need to wait for RCU
+> read-side critical section when releasing the struct msm_drm_private.
+>
+> Signed-off-by: Qi Zheng <zhengqi.arch@bytedance.com>
 
-This one shows:
-PASSED: 5 / 5 tests passed.
+Reviewed-by: Muchun Song <songmuchun@bytedance.com>
 
-I'm trying to figure out if we're dropping more packets than expected
-with this patch. Not sure if the test above is enough.
+A nit bellow.
 
--- 
-Andrew Kanner
+> ---
+>   drivers/gpu/drm/msm/msm_drv.c          |  4 ++-
+>   drivers/gpu/drm/msm/msm_drv.h          |  4 +--
+>   drivers/gpu/drm/msm/msm_gem_shrinker.c | 36 ++++++++++++++++----------
+>   3 files changed, 28 insertions(+), 16 deletions(-)
+>
+> diff --git a/drivers/gpu/drm/msm/msm_drv.c b/drivers/gpu/drm/msm/msm_drv.c
+> index 891eff8433a9..7f6933be703f 100644
+> --- a/drivers/gpu/drm/msm/msm_drv.c
+> +++ b/drivers/gpu/drm/msm/msm_drv.c
+> @@ -461,7 +461,9 @@ static int msm_drm_init(struct device *dev, const struct drm_driver *drv)
+>   	if (ret)
+>   		goto err_msm_uninit;
+>   
+> -	msm_gem_shrinker_init(ddev);
+> +	ret = msm_gem_shrinker_init(ddev);
+> +	if (ret)
+> +		goto err_msm_uninit;
+>   
+>   	if (priv->kms_init) {
+>   		ret = priv->kms_init(ddev);
+> diff --git a/drivers/gpu/drm/msm/msm_drv.h b/drivers/gpu/drm/msm/msm_drv.h
+> index e13a8cbd61c9..84523d4a1e58 100644
+> --- a/drivers/gpu/drm/msm/msm_drv.h
+> +++ b/drivers/gpu/drm/msm/msm_drv.h
+> @@ -217,7 +217,7 @@ struct msm_drm_private {
+>   	} vram;
+>   
+>   	struct notifier_block vmap_notifier;
+> -	struct shrinker shrinker;
+> +	struct shrinker *shrinker;
+>   
+>   	struct drm_atomic_state *pm_state;
+>   
+> @@ -279,7 +279,7 @@ int msm_ioctl_gem_submit(struct drm_device *dev, void *data,
+>   unsigned long msm_gem_shrinker_shrink(struct drm_device *dev, unsigned long nr_to_scan);
+>   #endif
+>   
+> -void msm_gem_shrinker_init(struct drm_device *dev);
+> +int msm_gem_shrinker_init(struct drm_device *dev);
+>   void msm_gem_shrinker_cleanup(struct drm_device *dev);
+>   
+>   int msm_gem_prime_mmap(struct drm_gem_object *obj, struct vm_area_struct *vma);
+> diff --git a/drivers/gpu/drm/msm/msm_gem_shrinker.c b/drivers/gpu/drm/msm/msm_gem_shrinker.c
+> index f38296ad8743..7daab1298c11 100644
+> --- a/drivers/gpu/drm/msm/msm_gem_shrinker.c
+> +++ b/drivers/gpu/drm/msm/msm_gem_shrinker.c
+> @@ -34,8 +34,7 @@ static bool can_block(struct shrink_control *sc)
+>   static unsigned long
+>   msm_gem_shrinker_count(struct shrinker *shrinker, struct shrink_control *sc)
+>   {
+> -	struct msm_drm_private *priv =
+> -		container_of(shrinker, struct msm_drm_private, shrinker);
+> +	struct msm_drm_private *priv = shrinker->private_data;
+>   	unsigned count = priv->lru.dontneed.count;
+>   
+>   	if (can_swap())
+> @@ -100,8 +99,7 @@ active_evict(struct drm_gem_object *obj)
+>   static unsigned long
+>   msm_gem_shrinker_scan(struct shrinker *shrinker, struct shrink_control *sc)
+>   {
+> -	struct msm_drm_private *priv =
+> -		container_of(shrinker, struct msm_drm_private, shrinker);
+> +	struct msm_drm_private *priv = shrinker->private_data;
+>   	struct {
+>   		struct drm_gem_lru *lru;
+>   		bool (*shrink)(struct drm_gem_object *obj);
+> @@ -148,10 +146,11 @@ msm_gem_shrinker_shrink(struct drm_device *dev, unsigned long nr_to_scan)
+>   	struct shrink_control sc = {
+>   		.nr_to_scan = nr_to_scan,
+>   	};
+> -	int ret;
+> +	unsigned long ret = SHRINK_STOP;
+>   
+>   	fs_reclaim_acquire(GFP_KERNEL);
+> -	ret = msm_gem_shrinker_scan(&priv->shrinker, &sc);
+> +	if (priv->shrinker)
+> +		ret = msm_gem_shrinker_scan(priv->shrinker, &sc);
+>   	fs_reclaim_release(GFP_KERNEL);
+>   
+>   	return ret;
+> @@ -210,16 +209,27 @@ msm_gem_shrinker_vmap(struct notifier_block *nb, unsigned long event, void *ptr)
+>    *
+>    * This function registers and sets up the msm shrinker.
+>    */
+> -void msm_gem_shrinker_init(struct drm_device *dev)
+> +int msm_gem_shrinker_init(struct drm_device *dev)
+>   {
+>   	struct msm_drm_private *priv = dev->dev_private;
+> -	priv->shrinker.count_objects = msm_gem_shrinker_count;
+> -	priv->shrinker.scan_objects = msm_gem_shrinker_scan;
+> -	priv->shrinker.seeks = DEFAULT_SEEKS;
+> -	WARN_ON(register_shrinker(&priv->shrinker, "drm-msm_gem"));
+> +
+> +	priv->shrinker = shrinker_alloc(0, "drm-msm_gem");
+> +	if (!priv->shrinker) {
+
+Just "if (WARN_ON(!priv->shrinker))"
+
+> +		WARN_ON(1);
+> +		return -ENOMEM;
+> +	}
+> +
+> +	priv->shrinker->count_objects = msm_gem_shrinker_count;
+> +	priv->shrinker->scan_objects = msm_gem_shrinker_scan;
+> +	priv->shrinker->seeks = DEFAULT_SEEKS;
+> +	priv->shrinker->private_data = priv;
+> +
+> +	shrinker_register(priv->shrinker);
+>   
+>   	priv->vmap_notifier.notifier_call = msm_gem_shrinker_vmap;
+>   	WARN_ON(register_vmap_purge_notifier(&priv->vmap_notifier));
+> +
+> +	return 0;
+>   }
+>   
+>   /**
+> @@ -232,8 +242,8 @@ void msm_gem_shrinker_cleanup(struct drm_device *dev)
+>   {
+>   	struct msm_drm_private *priv = dev->dev_private;
+>   
+> -	if (priv->shrinker.nr_deferred) {
+> +	if (priv->shrinker) {
+>   		WARN_ON(unregister_vmap_purge_notifier(&priv->vmap_notifier));
+> -		unregister_shrinker(&priv->shrinker);
+> +		shrinker_unregister(priv->shrinker);
+>   	}
+>   }
+
 
