@@ -1,110 +1,156 @@
-Return-Path: <netdev+bounces-21288-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21290-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A85976320A
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 11:29:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA1BD763234
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 11:32:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 066BC281C05
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 09:29:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 17C851C21144
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 09:32:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 251C1BA44;
-	Wed, 26 Jul 2023 09:29:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED71DBA4A;
+	Wed, 26 Jul 2023 09:32:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16FA0BA3E
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 09:29:19 +0000 (UTC)
-Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 225A211B;
-	Wed, 26 Jul 2023 02:29:17 -0700 (PDT)
-Received: by mail-pf1-x432.google.com with SMTP id d2e1a72fcca58-666e6ecb52dso3837496b3a.2;
-        Wed, 26 Jul 2023 02:29:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690363756; x=1690968556;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=MrB7Qi5dqHrz8cDTbgt7pGFf6VPuvPmMU9xcqmpYYwQ=;
-        b=gScQjFOjmX/EC3YJZSdTSS72sehY+SMQ0EMkbv60Se1hfaW4HdCkvPGkG+V2a3wtpv
-         1nQPamgCETSbzp5StTi6ScHSS9dJ4GvFONPvf+V8E2HFpOf9Ag1kq7/XfOum83fDK1q6
-         50GogIEUYnsvkYPTLq5tsDX057xpXv6lUB6shaqzueiDZf58xRDp93qSOJAt2WKg76Ow
-         k4hFx2qaakwvJNII2+JtBHLptw6dS90B942ENNsIzYDJlfGjzFcgI6a9x2ESt3VV7nBD
-         rDLu5HS7xJZpRfDWaYBaAYPPBq62+bvve5+KiJEnjHbcaertCZHBzmGcAv23LdSYyZDp
-         5KBQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690363756; x=1690968556;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MrB7Qi5dqHrz8cDTbgt7pGFf6VPuvPmMU9xcqmpYYwQ=;
-        b=RNAiKdVXdwmHByu29JmnsiyePe2UrQG0S1WR5LvTo938FkYQ7NN+3fUYySwdBPhr0W
-         iJtUNk15hQvk1nbX3rzywl39MAD09joj4YAeUJ+WKy6bckH9q81QUXddHQNLO6twSZUY
-         R+0QV3J77sLwIEr9TEL0DTb+rbaGbAD/wFoUtC26R4tHYjcsCltOM5RdTKxfrBZWfqc0
-         iWXGtgSBMgrUb3alDJEzFhMsFG3BaCav5+gK/81yNY8xmv005KrNn9wqsfvGdxl22fEh
-         6eGtOwHbOl0Yd/5q7ncLGzxJ4CrnresvvO+5a3uf2kO9XonmhyL6K+Vj0ajDEVlOtfXm
-         SZvA==
-X-Gm-Message-State: ABy/qLZNkmlRlExfWZJWvljV6yP2RsryxL3j4xX0A+Sxh58cSgay8nbN
-	mFSJ4J6GDR3RWcJUpmS23xU=
-X-Google-Smtp-Source: APBJJlF9TAHrJ+Ll+dUDANN9n5QrysXKA0k0S4H83YIEnbiojwif21ES5d9hKPIWFazPXAyEPh31SA==
-X-Received: by 2002:a05:6a00:3a1d:b0:662:f0d0:a77d with SMTP id fj29-20020a056a003a1d00b00662f0d0a77dmr1339284pfb.30.1690363756293;
-        Wed, 26 Jul 2023 02:29:16 -0700 (PDT)
-Received: from Laptop-X1 ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id t26-20020aa7939a000000b00640f51801e6sm10966696pfe.159.2023.07.26.02.29.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Jul 2023 02:29:15 -0700 (PDT)
-Date: Wed, 26 Jul 2023 17:29:10 +0800
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Lin Ma <linma@zju.edu.cn>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, razor@blackwall.org, lucien.xin@gmail.com,
-	jiri@resnulli.us, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v3] rtnetlink: let rtnl_bridge_setlink checks
- IFLA_BRIDGE_MODE length
-Message-ID: <ZMDnZhXaoKCui9ad@Laptop-X1>
-References: <20230726075314.1059224-1-linma@zju.edu.cn>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD118BA49
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 09:32:02 +0000 (UTC)
+Received: from out-10.mta0.migadu.com (out-10.mta0.migadu.com [91.218.175.10])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E77A212F
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 02:31:44 -0700 (PDT)
+Content-Type: text/plain;
+	charset=us-ascii
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1690363901;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=C9JATXkXZaN7f0jrXVOoaEMLIPnzZ4EB9BwhBVu88/k=;
+	b=BJaw31GHkPVMB5J3bFLk7nCWUXBih3Evut0vs64rGABml16vhPPP+VTCvSpnvcgPtpNdnt
+	lUE24RniQLpCmG5kFgpHNW+1PDmB/qhB9l9vhPT5YKqpl2p08nrVkD19PS1VqQI3/KFSOu
+	LvMc1Yox7zbU5EqPQ+5oAKbHUZVLA0E=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230726075314.1059224-1-linma@zju.edu.cn>
+Subject: Re: [PATCH v2 43/47] mm: shrinker: add a secondary array for
+ shrinker_info::{map, nr_deferred}
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Muchun Song <muchun.song@linux.dev>
+In-Reply-To: <20230724094354.90817-44-zhengqi.arch@bytedance.com>
+Date: Wed, 26 Jul 2023 17:30:53 +0800
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+ david@fromorbit.com,
+ tkhai@ya.ru,
+ Vlastimil Babka <vbabka@suse.cz>,
+ Roman Gushchin <roman.gushchin@linux.dev>,
+ djwong@kernel.org,
+ Christian Brauner <brauner@kernel.org>,
+ "Paul E. McKenney" <paulmck@kernel.org>,
+ tytso@mit.edu,
+ steven.price@arm.com,
+ cel@kernel.org,
+ Sergey Senozhatsky <senozhatsky@chromium.org>,
+ yujie.liu@intel.com,
+ Greg KH <gregkh@linuxfoundation.org>,
+ LKML <linux-kernel@vger.kernel.org>,
+ Linux Memory Management List <linux-mm@kvack.org>,
+ x86@kernel.org,
+ kvm@vger.kernel.org,
+ xen-devel@lists.xenproject.org,
+ linux-erofs@lists.ozlabs.org,
+ linux-f2fs-devel@lists.sourceforge.net,
+ cluster-devel@redhat.com,
+ linux-nfs@vger.kernel.org,
+ linux-mtd@lists.infradead.org,
+ rcu@vger.kernel.org,
+ netdev <netdev@vger.kernel.org>,
+ dri-devel@lists.freedesktop.org,
+ linux-arm-msm@vger.kernel.org,
+ dm-devel@redhat.com,
+ linux-raid@vger.kernel.org,
+ linux-bcache@vger.kernel.org,
+ virtualization@lists.linux-foundation.org,
+ linux-fsdevel@vger.kernel.org,
+ linux-ext4@vger.kernel.org,
+ linux-xfs@vger.kernel.org,
+ linux-btrfs@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <B421DD89-09B5-4488-BEC1-D6F88C6DE75A@linux.dev>
+References: <20230724094354.90817-1-zhengqi.arch@bytedance.com>
+ <20230724094354.90817-44-zhengqi.arch@bytedance.com>
+To: Qi Zheng <zhengqi.arch@bytedance.com>
+X-Migadu-Flow: FLOW_OUT
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Jul 26, 2023 at 03:53:14PM +0800, Lin Ma wrote:
-> There are totally 9 ndo_bridge_setlink handlers in the current kernel,
-> which are 1) bnxt_bridge_setlink, 2) be_ndo_bridge_setlink 3)
-> i40e_ndo_bridge_setlink 4) ice_bridge_setlink 5)
-> ixgbe_ndo_bridge_setlink 6) mlx5e_bridge_setlink 7)
-> nfp_net_bridge_setlink 8) qeth_l2_bridge_setlink 9) br_setlink.
-> 
-> By investigating the code, we find that 1-7 parse and use nlattr
-> IFLA_BRIDGE_MODE but 3 and 4 forget to do the nla_len check. This can
-> lead to an out-of-attribute read and allow a malformed nlattr (e.g.,
-> length 0) to be viewed as a 2 byte integer.
-> 
-> To avoid such issues, also for other ndo_bridge_setlink handlers in the
-> future. This patch adds the nla_len check in rtnl_bridge_setlink and
-> does an early error return if length mismatches. To make it works, the
-> break is removed from the parsing for IFLA_BRIDGE_FLAGS to make sure
-> this nla_for_each_nested iterates every attribute.
-> 
-> Fixes: b1edc14a3fbf ("ice: Implement ice_bridge_getlink and ice_bridge_setlink")
-> Fixes: 51616018dd1b ("i40e: Add support for getlink, setlink ndo ops")
-> Suggested-by: Jakub Kicinski <kuba@kernel.org>
-> Signed-off-by: Lin Ma <linma@zju.edu.cn>
-> Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
 
-Reviewed-by: Hangbin Liu <liuhangbin@gmail.com>
+
+> On Jul 24, 2023, at 17:43, Qi Zheng <zhengqi.arch@bytedance.com> =
+wrote:
+>=20
+> Currently, we maintain two linear arrays per node per memcg, which are
+> shrinker_info::map and shrinker_info::nr_deferred. And we need to =
+resize
+> them when the shrinker_nr_max is exceeded, that is, allocate a new =
+array,
+> and then copy the old array to the new array, and finally free the old
+> array by RCU.
+>=20
+> For shrinker_info::map, we do set_bit() under the RCU lock, so we may =
+set
+> the value into the old map which is about to be freed. This may cause =
+the
+> value set to be lost. The current solution is not to copy the old map =
+when
+> resizing, but to set all the corresponding bits in the new map to 1. =
+This
+> solves the data loss problem, but bring the overhead of more pointless
+> loops while doing memcg slab shrink.
+>=20
+> For shrinker_info::nr_deferred, we will only modify it under the read =
+lock
+> of shrinker_rwsem, so it will not run concurrently with the resizing. =
+But
+> after we make memcg slab shrink lockless, there will be the same data =
+loss
+> problem as shrinker_info::map, and we can't work around it like the =
+map.
+>=20
+> For such resizable arrays, the most straightforward idea is to change =
+it
+> to xarray, like we did for list_lru [1]. We need to do xa_store() in =
+the
+> list_lru_add()-->set_shrinker_bit(), but this will cause memory
+> allocation, and the list_lru_add() doesn't accept failure. A possible
+> solution is to pre-allocate, but the location of pre-allocation is not
+> well determined.
+>=20
+> Therefore, this commit chooses to introduce a secondary array for
+> shrinker_info::{map, nr_deferred}, so that we only need to copy this
+> secondary array every time the size is resized. Then even if we get =
+the
+> old secondary array under the RCU lock, the found map and nr_deferred =
+are
+> also true, so no data is lost.
+>=20
+> [1]. =
+https://lore.kernel.org/all/20220228122126.37293-13-songmuchun@bytedance.c=
+om/
+>=20
+> Signed-off-by: Qi Zheng <zhengqi.arch@bytedance.com>
+
+Reviewed-by: Muchun Song <songmuchun@bytedance.com>
+
+
 
