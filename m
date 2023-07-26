@@ -1,132 +1,215 @@
-Return-Path: <netdev+bounces-21615-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21616-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 504FA764094
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 22:36:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C47D8764098
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 22:37:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8066A1C2145F
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 20:36:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 00E7A1C213FD
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 20:37:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50A8B1BEE6;
-	Wed, 26 Jul 2023 20:36:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF5E01BEE9;
+	Wed, 26 Jul 2023 20:37:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16C2B1BEE3
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 20:36:49 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51F20C433C8;
-	Wed, 26 Jul 2023 20:36:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690403809;
-	bh=P+z1ai9L/8DqCyjjGblxecqfSTi2k0L3ebpLlrfSYUE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=gCPqwQ2WybGDUNyDcK5vsvV6yrA9vrqwCGMaRcZriaqORCXMD/Zw/DuI49DPmoVM1
-	 U33/2x18i39hdYToqmIgT0RwbG8UIRZB3+dIYUoc+/kxxGOrSueDet/Fr0Bf958z7V
-	 JtXVxLPz/jNsE4acR+wQtMWU21A1hvAHvzzBkPG5cnEn38deYXEiUBu8oaEGde9NjM
-	 ve09mw8HGdjRsPwLCIgY136sKHuaQiwGYwtsdXICPSVJspHE6SzDH5sTDrYg+qMKx2
-	 tjexY33eNiIfxX7CUpVgi1AnW73Mg/vbKAT12htPzFm/5YkoC9nPV46vCvtmBjx1qQ
-	 tEcJmKqCf2BFA==
-Date: Wed, 26 Jul 2023 13:36:48 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Joe Perches <joe@perches.com>, Krzysztof Kozlowski
- <krzysztof.kozlowski@linaro.org>, geert@linux-m68k.org,
- gregkh@linuxfoundation.org, netdev@vger.kernel.org,
- workflows@vger.kernel.org, mario.limonciello@amd.com
-Subject: Re: [PATCH v2] scripts: get_maintainer: steer people away from
- using file paths
-Message-ID: <20230726133648.54277d76@kernel.org>
-In-Reply-To: <CAHk-=wjfC4tFnOC0Lk_GcU4buf+X-Jv965pWg+kMRkDb6hX6mw@mail.gmail.com>
-References: <20230726151515.1650519-1-kuba@kernel.org>
-	<11ec5b3819ff17c7013348b766eab571eee5ca96.camel@perches.com>
-	<20230726092312.799503d6@kernel.org>
-	<CAHk-=wjEj2fGiaQXrYUZu65EPdgbGEAEMzch8LTtiUp6UveRCw@mail.gmail.com>
-	<20230726112031.61bd0c62@kernel.org>
-	<CAHk-=wi9MyyWmP_HAddLrmGfdANkut6_2f9hzv9HcyTBvg3+kA@mail.gmail.com>
-	<20230726114817.1bd52d48@kernel.org>
-	<CAHk-=wiuR7_A=PbN8jhmqGPJQHypUHR+W4-UuSVhOVWvYXs1Tg@mail.gmail.com>
-	<CAHk-=wh4pbrNZGqfV9u1urZr3Xjci=UV-MP+KneB6a5yo7-VOQ@mail.gmail.com>
-	<CAHk-=whCE9cWmTXu54WFQ7x-aH8n=dhCux2h49=pYN=14ybkxg@mail.gmail.com>
-	<20230726130318.099f96fc@kernel.org>
-	<CAHk-=wjfC4tFnOC0Lk_GcU4buf+X-Jv965pWg+kMRkDb6hX6mw@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D42241BEE1
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 20:37:27 +0000 (UTC)
+Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E40952701;
+	Wed, 26 Jul 2023 13:37:25 -0700 (PDT)
+Received: by mail-lj1-x235.google.com with SMTP id 38308e7fff4ca-2b9ba3d6157so2527171fa.3;
+        Wed, 26 Jul 2023 13:37:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1690403844; x=1691008644;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0lwD0XW5XNFFxl46sPGBkyRuR0c2+TXyAF+CGil8NRI=;
+        b=WBqtUarSorotOYNCJWkNReSAf19CXEDpnJUFPGIYyvbDGPlIhT1+vr65mlLeyLiFth
+         GmCuACdJUKmp+aXMjQJaPSWfUyQzmfkXHGzk1XVUCq+ELSSJcCrHrh6NujIUxHhB+pw6
+         nrYhrtteDJSDiCNTnF299w8Z9/ab/lCPugj6dQRq2KaUlgPuKoQROhjcGJ8gNM13Bqq6
+         HXJ0oEeCTipLRP3OmuZJqKsKtZxr2J8MAGrlTNRyxx+TIF/yZUzVNn9X44NDKlLi5I1l
+         PROjUW0OkV6M0DhbGgLHOtqYwRlhKYlkumzwjTCDK8bK1/gq+2Hvl44iae7i0AeSagm4
+         dsUw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690403844; x=1691008644;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=0lwD0XW5XNFFxl46sPGBkyRuR0c2+TXyAF+CGil8NRI=;
+        b=KIeyFqN3IrEPVStL8fHKKTBEc61YjKglY7MV8QLhdRs4w3hHd+BIJd/rGgpRtteHeM
+         ULe/wPZ/s22nwauGlOPb/0omYiRFlZTiV+m9BOCEAKxGO/wQtKBhHFd86jipOmVAWmKj
+         3WL83AaYdrIZ+GSblrFyYfWz2N5BFlyHHnOfzYdD2Xp7C/9inJ4AAMaQIzEffzmanCp4
+         wy2hQSCglKo7ievZpjeCKBLQzEp5LQbg6+eMF4XowBuA0W9vdFr0AvVu/00xJx+1e1bu
+         Qv/nEDV28WiypPjauHBQg2owMGaWSMiQZHlnD87S+Z9B3T6awYKQlBqyWpDvlBJdmsja
+         K0mA==
+X-Gm-Message-State: ABy/qLYXjZhn3ocZZW+AaEQCCUHyP+dx46werLhdSdWxqzC766UPg8aJ
+	ha2HAcPhnB+pzl2PHOCHAnUDSWA8p00vyg/hMI4=
+X-Google-Smtp-Source: APBJJlEBZjUVEWmH37ptqLNcNX8TxOf/NsFag9dWp+iIhP+gTcIv5RvFOUu1qEFSS9+AlBqg9RVIEdg2dS0OjOpUZFE=
+X-Received: by 2002:a2e:8490:0:b0:2b6:9afe:191c with SMTP id
+ b16-20020a2e8490000000b002b69afe191cmr129103ljh.7.1690403843955; Wed, 26 Jul
+ 2023 13:37:23 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20571.1690369076@warthog.procyon.org.uk> <416eca24-6baf-69d9-21a2-c434a9744596@redhat.com>
+In-Reply-To: <416eca24-6baf-69d9-21a2-c434a9744596@redhat.com>
+From: Steve French <smfrench@gmail.com>
+Date: Wed, 26 Jul 2023 15:37:12 -0500
+Message-ID: <CAH2r5mtMLQ91znvYP71s_K7uS_HibC_yOpkZea-f=+NteFJyPg@mail.gmail.com>
+Subject: Re: [PATCH] crypto, cifs: Fix error handling in extract_iter_to_sg()
+To: David Hildenbrand <david@redhat.com>
+Cc: David Howells <dhowells@redhat.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	Steve French <sfrench@samba.org>, akpm@linux-foundation.org, 
+	Sven Schnelle <svens@linux.ibm.com>, "David S. Miller" <davem@davemloft.net>, 
+	Jeff Layton <jlayton@kernel.org>, Shyam Prasad N <nspmangalore@gmail.com>, 
+	Rohith Surabattula <rohiths.msft@gmail.com>, Jens Axboe <axboe@kernel.dk>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Matthew Wilcox <willy@infradead.org>, linux-mm@kvack.org, linux-crypto@vger.kernel.org, 
+	linux-cachefs@redhat.com, linux-cifs@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Wed, 26 Jul 2023 13:13:11 -0700 Linus Torvalds wrote:
-> On Wed, 26 Jul 2023 at 13:03, Jakub Kicinski <kuba@kernel.org> wrote:
+Acked-off-by: Steve French <stfrench@microsoft.com>
+
+On Wed, Jul 26, 2023 at 8:56=E2=80=AFAM David Hildenbrand <david@redhat.com=
+> wrote:
+>
+> On 26.07.23 12:57, David Howells wrote:
 > >
-> > IOW solving the _actually_ missing CCs is higher priority for me.  
-> 
-> You have the script. It's already being run. Use it.
-> 
-> Having scripting that complains about missing Cc's, even *lists* them,
-> and then requires a human to do something about it - that's stupid.
+> > Fix error handling in extract_iter_to_sg().  Pages need to be unpinned,=
+ not
+> > put in extract_user_to_sg() when handling IOVEC/UBUF sources.
+> >
+> > The bug may result in a warning like the following:
+> >
+> >    WARNING: CPU: 1 PID: 20384 at mm/gup.c:229 __lse_atomic_add arch/arm=
+64/include/asm/atomic_lse.h:27 [inline]
+> >    WARNING: CPU: 1 PID: 20384 at mm/gup.c:229 arch_atomic_add arch/arm6=
+4/include/asm/atomic.h:28 [inline]
+> >    WARNING: CPU: 1 PID: 20384 at mm/gup.c:229 raw_atomic_add include/li=
+nux/atomic/atomic-arch-fallback.h:537 [inline]
+> >    WARNING: CPU: 1 PID: 20384 at mm/gup.c:229 atomic_add include/linux/=
+atomic/atomic-instrumented.h:105 [inline]
+> >    WARNING: CPU: 1 PID: 20384 at mm/gup.c:229 try_grab_page+0x108/0x160=
+ mm/gup.c:252
+> >    ...
+> >    pc : try_grab_page+0x108/0x160 mm/gup.c:229
+> >    lr : follow_page_pte+0x174/0x3e4 mm/gup.c:651
+> >    ...
+> >    Call trace:
+> >     __lse_atomic_add arch/arm64/include/asm/atomic_lse.h:27 [inline]
+> >     arch_atomic_add arch/arm64/include/asm/atomic.h:28 [inline]
+> >     raw_atomic_add include/linux/atomic/atomic-arch-fallback.h:537 [inl=
+ine]
+> >     atomic_add include/linux/atomic/atomic-instrumented.h:105 [inline]
+> >     try_grab_page+0x108/0x160 mm/gup.c:252
+> >     follow_pmd_mask mm/gup.c:734 [inline]
+> >     follow_pud_mask mm/gup.c:765 [inline]
+> >     follow_p4d_mask mm/gup.c:782 [inline]
+> >     follow_page_mask+0x12c/0x2e4 mm/gup.c:839
+> >     __get_user_pages+0x174/0x30c mm/gup.c:1217
+> >     __get_user_pages_locked mm/gup.c:1448 [inline]
+> >     __gup_longterm_locked+0x94/0x8f4 mm/gup.c:2142
+> >     internal_get_user_pages_fast+0x970/0xb60 mm/gup.c:3140
+> >     pin_user_pages_fast+0x4c/0x60 mm/gup.c:3246
+> >     iov_iter_extract_user_pages lib/iov_iter.c:1768 [inline]
+> >     iov_iter_extract_pages+0xc8/0x54c lib/iov_iter.c:1831
+> >     extract_user_to_sg lib/scatterlist.c:1123 [inline]
+> >     extract_iter_to_sg lib/scatterlist.c:1349 [inline]
+> >     extract_iter_to_sg+0x26c/0x6fc lib/scatterlist.c:1339
+> >     hash_sendmsg+0xc0/0x43c crypto/algif_hash.c:117
+> >     sock_sendmsg_nosec net/socket.c:725 [inline]
+> >     sock_sendmsg+0x54/0x60 net/socket.c:748
+> >     ____sys_sendmsg+0x270/0x2ac net/socket.c:2494
+> >     ___sys_sendmsg+0x80/0xdc net/socket.c:2548
+> >     __sys_sendmsg+0x68/0xc4 net/socket.c:2577
+> >     __do_sys_sendmsg net/socket.c:2586 [inline]
+> >     __se_sys_sendmsg net/socket.c:2584 [inline]
+> >     __arm64_sys_sendmsg+0x24/0x30 net/socket.c:2584
+> >     __invoke_syscall arch/arm64/kernel/syscall.c:38 [inline]
+> >     invoke_syscall+0x48/0x114 arch/arm64/kernel/syscall.c:52
+> >     el0_svc_common.constprop.0+0x44/0xe4 arch/arm64/kernel/syscall.c:14=
+2
+> >     do_el0_svc+0x38/0xa4 arch/arm64/kernel/syscall.c:191
+> >     el0_svc+0x2c/0xb0 arch/arm64/kernel/entry-common.c:647
+> >     el0t_64_sync_handler+0xc0/0xc4 arch/arm64/kernel/entry-common.c:665
+> >     el0t_64_sync+0x19c/0x1a0 arch/arm64/kernel/entry.S:591
+> >
+> > Fixes: 018584697533 ("netfs: Add a function to extract an iterator into=
+ a scatterlist")
+> > Reported-by: syzbot+9b82859567f2e50c123e@syzkaller.appspotmail.com
+> > Link: https://lore.kernel.org/linux-mm/000000000000273d0105ff97bf56@goo=
+gle.com/
+> > Signed-off-by: David Howells <dhowells@redhat.com>
+> > cc: Sven Schnelle <svens@linux.ibm.com>
+> > cc: akpm@linux-foundation.org
+> > cc: Herbert Xu <herbert@gondor.apana.org.au>
+> > cc: "David S. Miller" <davem@davemloft.net>
+> > cc: Jeff Layton <jlayton@kernel.org>
+> > cc: Steve French <sfrench@samba.org>
+> > cc: Shyam Prasad N <nspmangalore@gmail.com>
+> > cc: Rohith Surabattula <rohiths.msft@gmail.com>
+> > cc: Jens Axboe <axboe@kernel.dk>
+> > cc: Herbert Xu <herbert@gondor.apana.org.au>
+> > cc: "David S. Miller" <davem@davemloft.net>
+> > cc: Eric Dumazet <edumazet@google.com>
+> > cc: Jakub Kicinski <kuba@kernel.org>
+> > cc: Paolo Abeni <pabeni@redhat.com>
+> > cc: Matthew Wilcox <willy@infradead.org>
+> > cc: linux-mm@kvack.org
+> > cc: linux-crypto@vger.kernel.org
+> > cc: linux-cachefs@redhat.com
+> > cc: linux-cifs@vger.kernel.org
+> > cc: linux-fsdevel@vger.kernel.org
+> > cc: netdev@vger.kernel.org
+> > ---
+> >   lib/scatterlist.c |    2 +-
+> >   1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/lib/scatterlist.c b/lib/scatterlist.c
+> > index e86231a44c3d..c65566b4dc66 100644
+> > --- a/lib/scatterlist.c
+> > +++ b/lib/scatterlist.c
+> > @@ -1148,7 +1148,7 @@ static ssize_t extract_user_to_sg(struct iov_iter=
+ *iter,
+> >
+> >   failed:
+> >       while (sgtable->nents > sgtable->orig_nents)
+> > -             put_page(sg_page(&sgtable->sgl[--sgtable->nents]));
+> > +             unpin_user_page(sg_page(&sgtable->sgl[--sgtable->nents]))=
+;
+> >       return res;
+> >   }
+> >
+> >
+>
+> Reviewed-by: David Hildenbrand <david@redhat.com>
+>
+> --
+> Cheers,
+>
+> David / dhildenb
+>
 
-Just so I fully understand what you're saying - what do you expect me
-to do? Send the developer a notifications saying "please repost" with
-this CC list? How is that preferable to making them do it right the
-first time?!
 
-The script in patchwork *just runs get_maintainer on the patch*:
+--=20
+Thanks,
 
-https://github.com/kuba-moo/nipa/blob/master/tests/patch/cc_maintainers/test.py#L58
-
-And developers also *already* *run* get_maintainer, they just need to 
-be nudged to prefer running it on the patch rather than on the path.
-
-And no, Joe's position that this is "just a documentation problem"
-does not survive crash with reality because we already documented:
-
-Documentation/process/submitting-patches.rst:
-
-  scripts/get_maintainer.pl can be very useful at this step (pass paths
-  to your patches as arguments to scripts/get_maintainer.pl).
-
-Documentation/process/3.Early-stage.rst:
-
- If passed a patch on the command line, it will list the maintainers
- who should probably receive copies of the patch.  This is the
- preferred way (unlike "-f" option) to get the list of people to Cc for
- your patches.
-
-> Why are you using computers and automation in the first place, if said
-> automation then just makes for more work?
-
-Writing and maintaining that automation is also damn work. We complain
-nobody wants to be a maintainer and then refuse to make maintainers'
-life's easier :|
-
-> Then requiring inexperienced developers to do those extra things,
-> knowing - and not caring - that the experienced ones won't even
-> bother, that goes from stupid to actively malicious.
-> 
-> And then asking me to change my workflow because I use a different
-> script that does exactly what I want - that takes "stupid and
-> malicious" to something where I will just ignore you.
-> 
-> In other words: those changes to get_maintainer are simply not going to happen.
-> 
-> Fix your own scripts, and fix your bad workflows.
-> 
-> Your bad workflow not only makes it harder for new people to get
-> involved, they apparently waste your *own* time so much that you are
-> upset about it all.
-> 
-> Don't shoot yourself in the foot - and if you insist on doing so,
-> don't ask *others* to join you in your self-destructive tendencies.
-
-No idea what you mean by "my workflow". But yeah, I kind of expected
-that this patch would be a waste of time. Certain problems only become
-clear with sufficient volume of patches, and I'm clearly incapable
-of explaining shit.
+Steve
 
