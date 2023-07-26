@@ -1,66 +1,133 @@
-Return-Path: <netdev+bounces-21537-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21539-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FD7B763D68
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 19:15:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 051B6763DC5
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 19:35:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A14A21C212F9
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 17:15:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 190C4281E39
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 17:35:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 399701AA8D;
-	Wed, 26 Jul 2023 17:15:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 470871AA9F;
+	Wed, 26 Jul 2023 17:35:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B90B1AA6C
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 17:15:15 +0000 (UTC)
-Received: from mk.msdglouer.top (unknown [120.48.61.115])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id B1D4C2129
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 10:15:13 -0700 (PDT)
-Received: from ???? (113.111.83.40) by mk.msdglouer.top id ho5aa20e97c2 for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 01:15:10 +0800 (envelope-from <mk10@mk.msdglouer.top>)
-From: "Meguel Zheung" <meguel.zheung@mymetalproduct.com>
-Subject: =?UTF-8?B?5Zue5aSN77yaUkXvvJpJbnF1aXJ5?= at machines leveling
- casters ?  MIYA Metal PRODUCTS CHINA
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B7681AA81
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 17:35:50 +0000 (UTC)
+X-Greylist: delayed 970 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 26 Jul 2023 10:35:47 PDT
+Received: from relay.virtuozzo.com (relay.virtuozzo.com [130.117.225.111])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E0922706
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 10:35:46 -0700 (PDT)
+Received: from [130.117.225.1] (helo=finist-vl9.sw.ru)
+	by relay.virtuozzo.com with esmtp (Exim 4.96)
+	(envelope-from <khorenko@virtuozzo.com>)
+	id 1qOi8m-00FSsm-25;
+	Wed, 26 Jul 2023 19:19:18 +0200
+From: Konstantin Khorenko <khorenko@virtuozzo.com>
 To: netdev@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	Manish Chopra <manishc@marvell.com>,
+	Ariel Elior <aelior@marvell.com>,
+	David Miller <davem@davemloft.net>,
+	Sudarsana Kalluru <skalluru@marvell.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Konstantin Khorenko <khorenko@virtuozzo.com>
+Subject: [PATCH 0/1] qed: Yet another scheduling while atomic fix
+Date: Wed, 26 Jul 2023 20:19:29 +0300
+Message-Id: <20230726171930.1632710-1-khorenko@virtuozzo.com>
+X-Mailer: git-send-email 2.31.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Sender: mk10@mk.msdglouer.top
-Reply-To: meguel.zheung@mymetalproduct.com
-Date: Thu, 27 Jul 2023 01:15:08 +0800
-X-Priority: 3
-X-MSMail-Priority: Normal
-X-MimeOLE: Produced By Microsoft MimeOLE V6.00.3790.4913
-Content-Disposition: inline
-X-Spam-Status: No, score=4.5 required=5.0 tests=BAYES_50,DOS_BODY_HIGH_NO_MID,
-	FROM_SUSPICIOUS_NTLD,HEADER_FROM_DIFFERENT_DOMAINS,MISSING_MID,
-	RCVD_IN_VALIDITY_RPBL,RDNS_NONE,SPF_HELO_NONE,SPF_NONE,
-	TO_NO_BRKTS_MSFT,T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no
-	version=3.4.6
-X-Spam-Level: ****
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
+	SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
-Message-Id: <20230726171516.399701AA8D@smtp.subspace.kernel.org>
 
-SGVsbG8gRGlyZWN0b3IsDQpTb3JyeSBmb3IgdGhlIGRpc3R1cmJpbmcuDQpIZXJlIE1lZ3VlbCBv
-ZiBNSVlBIE1FVEFMIFBST0RVQ1RTIENISU5BLiANCldlIHByb2R1Y2UgdGhlIHRlc3RpbmcgbWFj
-aGluZXMgaGVpZ2h0IGFkanVzdGFibGUgbGV2ZWxpbmcgY2FzdGVycyBvZiB2YXJpb3VzIHR5cGVz
-LiBRdW90YXRpb24sIGNhdGFsb2cgYW5kIHNhbXBsZXMgYXZhaWxhYmxlIHRvIGNoZWNrLg0KRG8g
-eW91IHdhbnQgdG8ga25vdyBtb3JlIO+8nw0KIA0KQXBwbGljYXRpb246IHdvcmtiZW5jaC9wYWNr
-aW5nIG1hY2hpbmVzL2xhYiBlcXVpcG1lbnQvdmVuZGluZyBtYWNoaW5lcy9hbHVtaW51bSBleHRy
-dXNpb24vY29udmV5b3IvQ05DIG1hY2hpbmluZy9nYW1pbmcgZGlzcGxheS9hdXRvbWF0aW9uIGVx
-dWlwbWVudC93b3Jrc3RhdGlvbiBldGMuDQoNCllvdXJzIGZhaXRoZnVsbHksDQogDQpNZWd1ZWwg
-WmhldW5nDQpPdmVyc2VhcyBNYXJrZXRpbmcgTWFuYWdlcg0KIA0KQTAyOCwgM3JkIEZsb29yLCBO
-by4gMTE2NS0xMTg1LCBYaWh1YW4gUm9hZCwgU2hpcWlhbyBTdHJlZXQsIFBhbnl1IERpc3RyaWN0
-LCBHdWFuZ3pob3UsIENoaW5hLg0KV2hhdHNhcHAvV2VjaGF077yaKzg2IDE4NiA2NDgyIDI3NTEN
-Cg==
+Running an old RHEL7-based kernel we have got several cases of following
+BUG_ON():
+
+  BUG: scheduling while atomic: swapper/24/0/0x00000100
+
+   [<ffffffffb41c6199>] schedule+0x29/0x70
+   [<ffffffffb41c5512>] schedule_hrtimeout_range_clock+0xb2/0x150
+   [<ffffffffb41c55c3>] schedule_hrtimeout_range+0x13/0x20
+   [<ffffffffb41c3bcf>] usleep_range+0x4f/0x70
+   [<ffffffffc08d3e58>] qed_ptt_acquire+0x38/0x100 [qed]
+   [<ffffffffc08eac48>] _qed_get_vport_stats+0x458/0x580 [qed]
+   [<ffffffffc08ead8c>] qed_get_vport_stats+0x1c/0xd0 [qed]
+   [<ffffffffc08dffd3>] qed_get_protocol_stats+0x93/0x100 [qed]
+                        qed_mcp_send_protocol_stats
+            case MFW_DRV_MSG_GET_LAN_STATS:
+            case MFW_DRV_MSG_GET_FCOE_STATS:
+            case MFW_DRV_MSG_GET_ISCSI_STATS:
+            case MFW_DRV_MSG_GET_RDMA_STATS:
+   [<ffffffffc08e36d8>] qed_mcp_handle_events+0x2d8/0x890 [qed]
+                        qed_int_assertion
+                        qed_int_attentions
+   [<ffffffffc08d9490>] qed_int_sp_dpc+0xa50/0xdc0 [qed]
+   [<ffffffffb3aa7623>] tasklet_action+0x83/0x140
+   [<ffffffffb41d9125>] __do_softirq+0x125/0x2bb
+   [<ffffffffb41d560c>] call_softirq+0x1c/0x30
+   [<ffffffffb3a30645>] do_softirq+0x65/0xa0
+   [<ffffffffb3aa78d5>] irq_exit+0x105/0x110
+   [<ffffffffb41d8996>] do_IRQ+0x56/0xf0
+
+The situation is clear - tasklet function called schedule, but the fix
+is not so trivial.
+
+Checking the mainstream code it seem the same calltrace is still
+possible on the latest kernel as well, so here is the fix.
+
+The was a similar case recently for QEDE driver (reading stats through
+sysfs) which resulted in the commit:
+  42510dffd0e2 ("qed/qede: Fix scheduling while atomic")
+
+i tried to implement the same logic as a fix for my case, but failed:
+unfortunately it's not clear to me for this particular QED driver case
+which statistic to collect in delay works for each particular device and
+getting ALL possible stats for all devices, ignoring device type seems
+incorrect.
+
+Taking into account that i do not have access to the hardware at all,
+the delay work approach is nearly impossible for me.
+
+Thus i have taken the idea from patch v3 - just to provide the context
+by the caller:
+  https://www.spinics.net/lists/netdev/msg901089.html
+
+At least this solution is technically clear and hopefully i did not make
+stupid mistakes here.
+
+The patch is COMPILE TESTED ONLY.
+
+i would appreciate if somebody can test the patch. :)
+
+
+Konstantin Khorenko (1):
+  qed: Fix scheduling in a tasklet while getting stats
+
+ drivers/net/ethernet/qlogic/qed/qed_dev_api.h |  2 ++
+ drivers/net/ethernet/qlogic/qed/qed_fcoe.c    | 19 ++++++++++----
+ drivers/net/ethernet/qlogic/qed/qed_fcoe.h    |  6 +++--
+ drivers/net/ethernet/qlogic/qed/qed_hw.c      | 26 ++++++++++++++++---
+ drivers/net/ethernet/qlogic/qed/qed_iscsi.c   | 19 ++++++++++----
+ drivers/net/ethernet/qlogic/qed/qed_iscsi.h   |  6 +++--
+ drivers/net/ethernet/qlogic/qed/qed_l2.c      | 19 ++++++++++----
+ drivers/net/ethernet/qlogic/qed/qed_l2.h      |  3 +++
+ drivers/net/ethernet/qlogic/qed/qed_main.c    |  6 ++---
+ 9 files changed, 80 insertions(+), 26 deletions(-)
+
+-- 
+2.31.1
+
 
