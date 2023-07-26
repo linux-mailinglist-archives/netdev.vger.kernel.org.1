@@ -1,207 +1,390 @@
-Return-Path: <netdev+bounces-21393-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21394-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 021EA7637BD
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 15:38:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7664D7637C0
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 15:38:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB4581C212A7
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 13:38:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2C5A6281F05
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 13:38:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91C581119C;
-	Wed, 26 Jul 2023 13:38:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E4BF1119C;
+	Wed, 26 Jul 2023 13:38:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84FC7AD28
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 13:38:19 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C4031738
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 06:38:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1690378696;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=n8Z700vzR7baDs8b/e0kEl1jWEWNlBZFJe5eJ9LWL2M=;
-	b=cYKxX+f5W8GUBF/bVF+A9Se010HvytxlKcOf0y68e2N/F8OE1NI+wt2gjdQl0vBTJD0/jJ
-	IvYIFC5W8AcyrgYfqZSVITssoEt8EswqUuIJtuDadQcAspDSCa/l3q2cOS4WuXSN+cv080
-	TIGaEi5PrzUzo3ZsEOHyLEVblg/pJlo=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-310-vCTIHqE4OfCyVRPVzH6T8Q-1; Wed, 26 Jul 2023 09:38:15 -0400
-X-MC-Unique: vCTIHqE4OfCyVRPVzH6T8Q-1
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-31779e89e39so138114f8f.2
-        for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 06:38:15 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D322134B3
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 13:38:33 +0000 (UTC)
+Received: from mail-ua1-x92a.google.com (mail-ua1-x92a.google.com [IPv6:2607:f8b0:4864:20::92a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8EAD213F;
+	Wed, 26 Jul 2023 06:38:28 -0700 (PDT)
+Received: by mail-ua1-x92a.google.com with SMTP id a1e0cc1a2514c-794d1714617so2512999241.0;
+        Wed, 26 Jul 2023 06:38:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1690378707; x=1690983507;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cs/p7CEZuKxjp9osy4jGhfk2FuGB/ZhQkEOtsKZJ8ww=;
+        b=nrshTphkQdtZw7WFXHJ9bbOZFP4jYem4nHD12FXabkaLkuPa+RPDtf5HA09yrKd1th
+         LHt8gOlUP8nl07YfOAyKdc02fKmGxwVSX/9Xed3GC2xif02cGixvEfLq+IUdkCALUUcp
+         OvERfyALoXeV+spqW+ExxDgUMg6yDMRt/LQ19s63Y8Fb3SXjeJYzuH24psq7RjHEUd1j
+         yjoocYI2bj9xigqEbkAtBkxW9uGhjNr5KPclrHmXKK5sWDwrNJvtB7tSAUX/nD8DY1mr
+         eX3zQ5Q4a251q8FhtZhNg1E7ho9U/9U1uZ0ymn1PXEKpsLvQLevJmeQbN+99l6quhPpu
+         8sng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690378694; x=1690983494;
-        h=content-transfer-encoding:in-reply-to:organization:from:references
-         :cc:to:content-language:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=n8Z700vzR7baDs8b/e0kEl1jWEWNlBZFJe5eJ9LWL2M=;
-        b=cnLnoe8AHew4sN3Egve+h6HUu3zeiOOkbFDus1M+h54uuIO6Ni1BvTabgRu6iWLTOe
-         Dnjt3cW6f2d5Nw7vRAWWmAOfmvzgGfexZGoNgw+qWp7vdKAH91geo/z0DOjkips1qyNS
-         xFyAY7tPA/565rIJEzrhAJxS3sB37EPaklqEhJbPbFNom+gZw+aydNsHz7+sKARSKy5c
-         vxJ7CmQuflQo7KQtG0uihmeNyAzvgybBco86KVlAdvvXPQohxy8hmHfKEwy4ecN0+njY
-         AFIiEeV2wkpaiQVQaVigVdOnsUzc9wuXOXrMKRbbeMj15sqD6jCeZ996NHJtOopmvkHu
-         FcnQ==
-X-Gm-Message-State: ABy/qLaB96eJTwGpC8OEOxonJbhEAiXLLblEhBVfQv18+tpqcxUrxLDb
-	Zl/jZChK4lzlmZDkPL9dmVhHXbWFNX20u86NX8aONphUcCeb8Nk35i8J+A0HdGHu8gsjO1NQkJD
-	SM2797gNKUZ1kWSte
-X-Received: by 2002:a5d:468b:0:b0:317:59c8:17bc with SMTP id u11-20020a5d468b000000b0031759c817bcmr1262937wrq.15.1690378694084;
-        Wed, 26 Jul 2023 06:38:14 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlFW6fWGnz4rPcAEd3A5rxFde+FjwCaa7dB2oKhB0S6J5Gte5BzfN0mtzCoUlg3SX0ZdBK9MJw==
-X-Received: by 2002:a5d:468b:0:b0:317:59c8:17bc with SMTP id u11-20020a5d468b000000b0031759c817bcmr1262918wrq.15.1690378693599;
-        Wed, 26 Jul 2023 06:38:13 -0700 (PDT)
-Received: from [192.168.3.108] (p5b0c6c57.dip0.t-ipconnect.de. [91.12.108.87])
-        by smtp.gmail.com with ESMTPSA id k11-20020adfd84b000000b0031773e3cf46sm2867991wrl.61.2023.07.26.06.38.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 26 Jul 2023 06:38:13 -0700 (PDT)
-Message-ID: <416eca24-6baf-69d9-21a2-c434a9744596@redhat.com>
-Date: Wed, 26 Jul 2023 15:38:11 +0200
+        d=1e100.net; s=20221208; t=1690378707; x=1690983507;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=cs/p7CEZuKxjp9osy4jGhfk2FuGB/ZhQkEOtsKZJ8ww=;
+        b=EmP1P7Fk/nJNkFknKT9Y1umUS+FcJVd2TYKSKHZBFv9D1olhk9yB9JdTIgZ7nl9VDr
+         KMKKEH9khEiBnJQYcvGYWyESr5DhcrpOaXL9JuEAu16oYxizaX3XFIM4bvIHNBuu0JeA
+         ueREst2MDFB5hwm1sOnIupWw8a2UUTlCwYM+YkhkoyoQ6f3cuLi06MKGuOcrVeNZmlHd
+         Ag0Wb66Pm1S5dZkAPYY+Qi2NPb70ltzpx+1tfFJTH+COxpbSY8nOnJouOwo0T7EY6g7f
+         pDoR5aiDZyqhHD2W2QkPHhQ5F6ZnEcTSh0AwfSVtv4ouq0Qd3HcoO2XoAr3fQ6Sq6RVE
+         CptQ==
+X-Gm-Message-State: ABy/qLbOhOdo6rebQAqUUrbmEZDYm1RtiZyCHQRYpN4PcTWGjBi75Oi/
+	gOBGy6Y3q2L2uDGcZtnEd2+bVU1BuVL288j7wweZeu5BtpU=
+X-Google-Smtp-Source: APBJJlEyguJ8p3ofKHVLX5kUQfrFC8murdqdMJdO4JoSGYJ2j+uDsO2D4D5M22Q1aVzNZCe/H98JLmvCd8a+PCVS1cI=
+X-Received: by 2002:a67:ce11:0:b0:443:8f10:7f72 with SMTP id
+ s17-20020a67ce11000000b004438f107f72mr1443798vsl.14.1690378707462; Wed, 26
+ Jul 2023 06:38:27 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH] crypto, cifs: Fix error handling in extract_iter_to_sg()
-Content-Language: en-US
-To: David Howells <dhowells@redhat.com>,
- Herbert Xu <herbert@gondor.apana.org.au>, Steve French <sfrench@samba.org>
-Cc: akpm@linux-foundation.org, Sven Schnelle <svens@linux.ibm.com>,
- "David S. Miller" <davem@davemloft.net>, Jeff Layton <jlayton@kernel.org>,
- Shyam Prasad N <nspmangalore@gmail.com>,
- Rohith Surabattula <rohiths.msft@gmail.com>, Jens Axboe <axboe@kernel.dk>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Matthew Wilcox <willy@infradead.org>,
- linux-mm@kvack.org, linux-crypto@vger.kernel.org, linux-cachefs@redhat.com,
- linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20571.1690369076@warthog.procyon.org.uk>
-From: David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-In-Reply-To: <20571.1690369076@warthog.procyon.org.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-	SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-	version=3.4.6
+References: <CAA85sZsTF21va8HhwrJc_yuVgVU6+dppEd-SdQpDjqLNFtcneQ@mail.gmail.com>
+ <20230724142415.03a9d133@kernel.org> <ZMDTUHlPmns/85Kk@calendula> <CAA85sZs4RqJc51po=W-No-DMgWQGVa=hsRdRS5e6FG-F7SnZYA@mail.gmail.com>
+In-Reply-To: <CAA85sZs4RqJc51po=W-No-DMgWQGVa=hsRdRS5e6FG-F7SnZYA@mail.gmail.com>
+From: Ian Kumlien <ian.kumlien@gmail.com>
+Date: Wed, 26 Jul 2023 15:38:16 +0200
+Message-ID: <CAA85sZt46J5NJfja=Z-pHnoiS5bJphggf0us8UezmE1CsU8wFw@mail.gmail.com>
+Subject: Re: Kernel oops with 6.4.4 - flow offloads - NULL pointer deref
+To: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: Jakub Kicinski <kuba@kernel.org>, 
+	Linux Kernel Network Developers <netdev@vger.kernel.org>, netfilter-devel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 26.07.23 12:57, David Howells wrote:
->      
-> Fix error handling in extract_iter_to_sg().  Pages need to be unpinned, not
-> put in extract_user_to_sg() when handling IOVEC/UBUF sources.
-> 
-> The bug may result in a warning like the following:
-> 
->    WARNING: CPU: 1 PID: 20384 at mm/gup.c:229 __lse_atomic_add arch/arm64/include/asm/atomic_lse.h:27 [inline]
->    WARNING: CPU: 1 PID: 20384 at mm/gup.c:229 arch_atomic_add arch/arm64/include/asm/atomic.h:28 [inline]
->    WARNING: CPU: 1 PID: 20384 at mm/gup.c:229 raw_atomic_add include/linux/atomic/atomic-arch-fallback.h:537 [inline]
->    WARNING: CPU: 1 PID: 20384 at mm/gup.c:229 atomic_add include/linux/atomic/atomic-instrumented.h:105 [inline]
->    WARNING: CPU: 1 PID: 20384 at mm/gup.c:229 try_grab_page+0x108/0x160 mm/gup.c:252
->    ...
->    pc : try_grab_page+0x108/0x160 mm/gup.c:229
->    lr : follow_page_pte+0x174/0x3e4 mm/gup.c:651
->    ...
->    Call trace:
->     __lse_atomic_add arch/arm64/include/asm/atomic_lse.h:27 [inline]
->     arch_atomic_add arch/arm64/include/asm/atomic.h:28 [inline]
->     raw_atomic_add include/linux/atomic/atomic-arch-fallback.h:537 [inline]
->     atomic_add include/linux/atomic/atomic-instrumented.h:105 [inline]
->     try_grab_page+0x108/0x160 mm/gup.c:252
->     follow_pmd_mask mm/gup.c:734 [inline]
->     follow_pud_mask mm/gup.c:765 [inline]
->     follow_p4d_mask mm/gup.c:782 [inline]
->     follow_page_mask+0x12c/0x2e4 mm/gup.c:839
->     __get_user_pages+0x174/0x30c mm/gup.c:1217
->     __get_user_pages_locked mm/gup.c:1448 [inline]
->     __gup_longterm_locked+0x94/0x8f4 mm/gup.c:2142
->     internal_get_user_pages_fast+0x970/0xb60 mm/gup.c:3140
->     pin_user_pages_fast+0x4c/0x60 mm/gup.c:3246
->     iov_iter_extract_user_pages lib/iov_iter.c:1768 [inline]
->     iov_iter_extract_pages+0xc8/0x54c lib/iov_iter.c:1831
->     extract_user_to_sg lib/scatterlist.c:1123 [inline]
->     extract_iter_to_sg lib/scatterlist.c:1349 [inline]
->     extract_iter_to_sg+0x26c/0x6fc lib/scatterlist.c:1339
->     hash_sendmsg+0xc0/0x43c crypto/algif_hash.c:117
->     sock_sendmsg_nosec net/socket.c:725 [inline]
->     sock_sendmsg+0x54/0x60 net/socket.c:748
->     ____sys_sendmsg+0x270/0x2ac net/socket.c:2494
->     ___sys_sendmsg+0x80/0xdc net/socket.c:2548
->     __sys_sendmsg+0x68/0xc4 net/socket.c:2577
->     __do_sys_sendmsg net/socket.c:2586 [inline]
->     __se_sys_sendmsg net/socket.c:2584 [inline]
->     __arm64_sys_sendmsg+0x24/0x30 net/socket.c:2584
->     __invoke_syscall arch/arm64/kernel/syscall.c:38 [inline]
->     invoke_syscall+0x48/0x114 arch/arm64/kernel/syscall.c:52
->     el0_svc_common.constprop.0+0x44/0xe4 arch/arm64/kernel/syscall.c:142
->     do_el0_svc+0x38/0xa4 arch/arm64/kernel/syscall.c:191
->     el0_svc+0x2c/0xb0 arch/arm64/kernel/entry-common.c:647
->     el0t_64_sync_handler+0xc0/0xc4 arch/arm64/kernel/entry-common.c:665
->     el0t_64_sync+0x19c/0x1a0 arch/arm64/kernel/entry.S:591
-> 
-> Fixes: 018584697533 ("netfs: Add a function to extract an iterator into a scatterlist")
-> Reported-by: syzbot+9b82859567f2e50c123e@syzkaller.appspotmail.com
-> Link: https://lore.kernel.org/linux-mm/000000000000273d0105ff97bf56@google.com/
-> Signed-off-by: David Howells <dhowells@redhat.com>
-> cc: Sven Schnelle <svens@linux.ibm.com>
-> cc: akpm@linux-foundation.org
-> cc: Herbert Xu <herbert@gondor.apana.org.au>
-> cc: "David S. Miller" <davem@davemloft.net>
-> cc: Jeff Layton <jlayton@kernel.org>
-> cc: Steve French <sfrench@samba.org>
-> cc: Shyam Prasad N <nspmangalore@gmail.com>
-> cc: Rohith Surabattula <rohiths.msft@gmail.com>
-> cc: Jens Axboe <axboe@kernel.dk>
-> cc: Herbert Xu <herbert@gondor.apana.org.au>
-> cc: "David S. Miller" <davem@davemloft.net>
-> cc: Eric Dumazet <edumazet@google.com>
-> cc: Jakub Kicinski <kuba@kernel.org>
-> cc: Paolo Abeni <pabeni@redhat.com>
-> cc: Matthew Wilcox <willy@infradead.org>
-> cc: linux-mm@kvack.org
-> cc: linux-crypto@vger.kernel.org
-> cc: linux-cachefs@redhat.com
-> cc: linux-cifs@vger.kernel.org
-> cc: linux-fsdevel@vger.kernel.org
-> cc: netdev@vger.kernel.org
-> ---
->   lib/scatterlist.c |    2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/lib/scatterlist.c b/lib/scatterlist.c
-> index e86231a44c3d..c65566b4dc66 100644
-> --- a/lib/scatterlist.c
-> +++ b/lib/scatterlist.c
-> @@ -1148,7 +1148,7 @@ static ssize_t extract_user_to_sg(struct iov_iter *iter,
->   
->   failed:
->   	while (sgtable->nents > sgtable->orig_nents)
-> -		put_page(sg_page(&sgtable->sgl[--sgtable->nents]));
-> +		unpin_user_page(sg_page(&sgtable->sgl[--sgtable->nents]));
->   	return res;
->   }
->   
-> 
+On Wed, Jul 26, 2023 at 2:00=E2=80=AFPM Ian Kumlien <ian.kumlien@gmail.com>=
+ wrote:
+>
+> On Wed, Jul 26, 2023 at 10:03=E2=80=AFAM Pablo Neira Ayuso <pablo@netfilt=
+er.org> wrote:
+> >
+> > Hi,
+> >
+> > On Mon, Jul 24, 2023 at 02:24:15PM -0700, Jakub Kicinski wrote:
+> > > Adding netfilter to CC.
+> > >
+> > > On Sun, 23 Jul 2023 16:44:50 +0200 Ian Kumlien wrote:
+> > > > Running vanilla 6.4.4 with cherry picked:
+> > > > https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/co=
+mmit/?h=3Dv6.4.5&id=3D7a59f29961cf97b98b02acaadf5a0b1f8dde938c
+> > > >
+> > [...]
+> > > > [108431.305700] RSP: 0018:ffffac250ade7e28 EFLAGS: 00010206
+> > > > [108431.311107] RAX: 0000000000000081 RBX: ffff9ebc413b42f8 RCX:
+> > > > 0000000000000001
+> > > > [108431.318420] RDX: 00000001067200c0 RSI: ffff9ebeda71ce58 RDI:
+> > > > ffff9ebeda71ce58
+> > > > [108431.325735] RBP: ffff9ebc413b4250 R08: ffff9ebc413b4250 R09:
+> > > > ffff9ebe3d7fad58
+> > > > [108431.333068] R10: 0000000000000000 R11: 0000000000000003 R12:
+> > > > ffff9ebfafab0000
+> > > > [108431.340415] R13: 0000000000000000 R14: ffff9ebfafab0005 R15:
+> > > > ffff9ebd79a0f780
+> > > > [108431.347764] FS:  0000000000000000(0000) GS:ffff9ebfafa80000(000=
+0)
+> > > > knlGS:0000000000000000
+> > > > [108431.356069] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> > > > [108431.362012] CR2: 0000000000000081 CR3: 000000045e99e000 CR4:
+> > > > 00000000003526e0
+> > > > [108431.369361] Call Trace:
+> > > > [108431.371999]  <TASK>
+> > > > [108431.374296] ? __die (arch/x86/kernel/dumpstack.c:421
+> > > > arch/x86/kernel/dumpstack.c:434)
+> > > > [108431.377553] ? page_fault_oops (arch/x86/mm/fault.c:707)
+> > > > [108431.381850] ? load_balance (kernel/sched/fair.c:10926)
+> > > > [108431.385884] ? exc_page_fault (arch/x86/mm/fault.c:1279
+> > > > arch/x86/mm/fault.c:1486 arch/x86/mm/fault.c:1542)
+> > > > [108431.390094] ? asm_exc_page_fault (./arch/x86/include/asm/idtent=
+ry.h:570)
+> > > > [108431.394482] ? flow_offload_teardown
+> > > > (./arch/x86/include/asm/bitops.h:75
+> > > > ./include/asm-generic/bitops/instrumented-atomic.h:42
+> > > > net/netfilter/nf_flow_table_core.c:362)
+> > > > [108431.399036] nf_flow_offload_gc_step
+> > > > (./arch/x86/include/asm/bitops.h:207
+> > > > ./arch/x86/include/asm/bitops.h:239
+> > > > ./include/asm-generic/bitops/instrumented-non-atomic.h:142
+> > > > net/netfilter/nf_flow_table_core.c:436)
+> >
+> > This crash points here.
+> >
+> > static void nf_flow_offload_gc_step(struct nf_flowtable *flow_table,
+> >                                     struct flow_offload *flow, void *da=
+ta)
+> > {
+> >         if (nf_flow_has_expired(flow) ||
+> >             nf_ct_is_dying(flow->ct) ||
+> >             nf_flow_is_outdated(flow))
+> >                 flow_offload_teardown(flow);
+> >
+> >         if (test_bit(NF_FLOW_TEARDOWN, &flow->flags)) { <--
+> >
+> > Is this always reproducible on your testbed?
+>
+> That's a bit unknown, I don't quite know what triggers it... I only
+> know it's happened twice :/
+> (That i've noticed - the fw runs with a watchdog and it's always been
+> a "uhuh... uptime is less than expected" kind of thing)
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
+I should add that i do:
+for interface in eno1 eno2 eno3 eno4 ; do
+for offload in ntuple hw-tc-offload rx-udp-gro-forwarding rx-gro-list ; do
+ethtool -K $interface $offload on > /dev/null
+done
+done
 
--- 
-Cheers,
+And that some interfaces are directly attached to a bridge while
+others are more normal
 
-David / dhildenb
+lspci |grep Ethernet
+06:00.0 Ethernet controller: Intel Corporation Ethernet Connection
+X553 1GbE (rev 11)
+06:00.1 Ethernet controller: Intel Corporation Ethernet Connection
+X553 1GbE (rev 11)
+07:00.0 Ethernet controller: Intel Corporation Ethernet Connection
+X553 1GbE (rev 11)
+07:00.1 Ethernet controller: Intel Corporation Ethernet Connection
+X553 1GbE (rev 11)
 
+This is since i added NET_SCHED etc support back in to the kernel
+
+tc qdisc show
+qdisc noqueue 0: dev lo root refcnt 2
+qdisc mq 0: dev eno1 root
+qdisc fq 0: dev eno1 parent :c limit 10000p flow_limit 100p buckets
+1024 orphan_mask 1023 quantum 18028b initial_quantum 90140b
+low_rate_threshold 550Kbit refill_delay 40ms timer_slack 10us horizon
+10s horizon_drop
+qdisc fq 0: dev eno1 parent :b limit 10000p flow_limit 100p buckets
+1024 orphan_mask 1023 quantum 18028b initial_quantum 90140b
+low_rate_threshold 550Kbit refill_delay 40ms timer_slack 10us horizon
+10s horizon_drop
+qdisc fq 0: dev eno1 parent :a limit 10000p flow_limit 100p buckets
+1024 orphan_mask 1023 quantum 18028b initial_quantum 90140b
+low_rate_threshold 550Kbit refill_delay 40ms timer_slack 10us horizon
+10s horizon_drop
+qdisc fq 0: dev eno1 parent :9 limit 10000p flow_limit 100p buckets
+1024 orphan_mask 1023 quantum 18028b initial_quantum 90140b
+low_rate_threshold 550Kbit refill_delay 40ms timer_slack 10us horizon
+10s horizon_drop
+qdisc fq 0: dev eno1 parent :8 limit 10000p flow_limit 100p buckets
+1024 orphan_mask 1023 quantum 18028b initial_quantum 90140b
+low_rate_threshold 550Kbit refill_delay 40ms timer_slack 10us horizon
+10s horizon_drop
+qdisc fq 0: dev eno1 parent :7 limit 10000p flow_limit 100p buckets
+1024 orphan_mask 1023 quantum 18028b initial_quantum 90140b
+low_rate_threshold 550Kbit refill_delay 40ms timer_slack 10us horizon
+10s horizon_drop
+qdisc fq 0: dev eno1 parent :6 limit 10000p flow_limit 100p buckets
+1024 orphan_mask 1023 quantum 18028b initial_quantum 90140b
+low_rate_threshold 550Kbit refill_delay 40ms timer_slack 10us horizon
+10s horizon_drop
+qdisc fq 0: dev eno1 parent :5 limit 10000p flow_limit 100p buckets
+1024 orphan_mask 1023 quantum 18028b initial_quantum 90140b
+low_rate_threshold 550Kbit refill_delay 40ms timer_slack 10us horizon
+10s horizon_drop
+qdisc fq 0: dev eno1 parent :4 limit 10000p flow_limit 100p buckets
+1024 orphan_mask 1023 quantum 18028b initial_quantum 90140b
+low_rate_threshold 550Kbit refill_delay 40ms timer_slack 10us horizon
+10s horizon_drop
+qdisc fq 0: dev eno1 parent :3 limit 10000p flow_limit 100p buckets
+1024 orphan_mask 1023 quantum 18028b initial_quantum 90140b
+low_rate_threshold 550Kbit refill_delay 40ms timer_slack 10us horizon
+10s horizon_drop
+qdisc fq 0: dev eno1 parent :2 limit 10000p flow_limit 100p buckets
+1024 orphan_mask 1023 quantum 18028b initial_quantum 90140b
+low_rate_threshold 550Kbit refill_delay 40ms timer_slack 10us horizon
+10s horizon_drop
+qdisc fq 0: dev eno1 parent :1 limit 10000p flow_limit 100p buckets
+1024 orphan_mask 1023 quantum 18028b initial_quantum 90140b
+low_rate_threshold 550Kbit refill_delay 40ms timer_slack 10us horizon
+10s horizon_drop
+qdisc mq 0: dev eno2 root
+qdisc fq 0: dev eno2 parent :c limit 10000p flow_limit 100p buckets
+1024 orphan_mask 1023 quantum 18028b initial_quantum 90140b
+low_rate_threshold 550Kbit refill_delay 40ms timer_slack 10us horizon
+10s horizon_drop
+qdisc fq 0: dev eno2 parent :b limit 10000p flow_limit 100p buckets
+1024 orphan_mask 1023 quantum 18028b initial_quantum 90140b
+low_rate_threshold 550Kbit refill_delay 40ms timer_slack 10us horizon
+10s horizon_drop
+qdisc fq 0: dev eno2 parent :a limit 10000p flow_limit 100p buckets
+1024 orphan_mask 1023 quantum 18028b initial_quantum 90140b
+low_rate_threshold 550Kbit refill_delay 40ms timer_slack 10us horizon
+10s horizon_drop
+qdisc fq 0: dev eno2 parent :9 limit 10000p flow_limit 100p buckets
+1024 orphan_mask 1023 quantum 18028b initial_quantum 90140b
+low_rate_threshold 550Kbit refill_delay 40ms timer_slack 10us horizon
+10s horizon_drop
+qdisc fq 0: dev eno2 parent :8 limit 10000p flow_limit 100p buckets
+1024 orphan_mask 1023 quantum 18028b initial_quantum 90140b
+low_rate_threshold 550Kbit refill_delay 40ms timer_slack 10us horizon
+10s horizon_drop
+qdisc fq 0: dev eno2 parent :7 limit 10000p flow_limit 100p buckets
+1024 orphan_mask 1023 quantum 18028b initial_quantum 90140b
+low_rate_threshold 550Kbit refill_delay 40ms timer_slack 10us horizon
+10s horizon_drop
+qdisc fq 0: dev eno2 parent :6 limit 10000p flow_limit 100p buckets
+1024 orphan_mask 1023 quantum 18028b initial_quantum 90140b
+low_rate_threshold 550Kbit refill_delay 40ms timer_slack 10us horizon
+10s horizon_drop
+qdisc fq 0: dev eno2 parent :5 limit 10000p flow_limit 100p buckets
+1024 orphan_mask 1023 quantum 18028b initial_quantum 90140b
+low_rate_threshold 550Kbit refill_delay 40ms timer_slack 10us horizon
+10s horizon_drop
+qdisc fq 0: dev eno2 parent :4 limit 10000p flow_limit 100p buckets
+1024 orphan_mask 1023 quantum 18028b initial_quantum 90140b
+low_rate_threshold 550Kbit refill_delay 40ms timer_slack 10us horizon
+10s horizon_drop
+qdisc fq 0: dev eno2 parent :3 limit 10000p flow_limit 100p buckets
+1024 orphan_mask 1023 quantum 18028b initial_quantum 90140b
+low_rate_threshold 550Kbit refill_delay 40ms timer_slack 10us horizon
+10s horizon_drop
+qdisc fq 0: dev eno2 parent :2 limit 10000p flow_limit 100p buckets
+1024 orphan_mask 1023 quantum 18028b initial_quantum 90140b
+low_rate_threshold 550Kbit refill_delay 40ms timer_slack 10us horizon
+10s horizon_drop
+qdisc fq 0: dev eno2 parent :1 limit 10000p flow_limit 100p buckets
+1024 orphan_mask 1023 quantum 18028b initial_quantum 90140b
+low_rate_threshold 550Kbit refill_delay 40ms timer_slack 10us horizon
+10s horizon_drop
+qdisc mq 0: dev eno3 root
+qdisc fq 0: dev eno3 parent :c limit 10000p flow_limit 100p buckets
+1024 orphan_mask 1023 quantum 3028b initial_quantum 15140b
+low_rate_threshold 550Kbit refill_delay 40ms timer_slack 10us horizon
+10s horizon_drop
+qdisc fq 0: dev eno3 parent :b limit 10000p flow_limit 100p buckets
+1024 orphan_mask 1023 quantum 3028b initial_quantum 15140b
+low_rate_threshold 550Kbit refill_delay 40ms timer_slack 10us horizon
+10s horizon_drop
+qdisc fq 0: dev eno3 parent :a limit 10000p flow_limit 100p buckets
+1024 orphan_mask 1023 quantum 3028b initial_quantum 15140b
+low_rate_threshold 550Kbit refill_delay 40ms timer_slack 10us horizon
+10s horizon_drop
+qdisc fq 0: dev eno3 parent :9 limit 10000p flow_limit 100p buckets
+1024 orphan_mask 1023 quantum 3028b initial_quantum 15140b
+low_rate_threshold 550Kbit refill_delay 40ms timer_slack 10us horizon
+10s horizon_drop
+qdisc fq 0: dev eno3 parent :8 limit 10000p flow_limit 100p buckets
+1024 orphan_mask 1023 quantum 3028b initial_quantum 15140b
+low_rate_threshold 550Kbit refill_delay 40ms timer_slack 10us horizon
+10s horizon_drop
+qdisc fq 0: dev eno3 parent :7 limit 10000p flow_limit 100p buckets
+1024 orphan_mask 1023 quantum 3028b initial_quantum 15140b
+low_rate_threshold 550Kbit refill_delay 40ms timer_slack 10us horizon
+10s horizon_drop
+qdisc fq 0: dev eno3 parent :6 limit 10000p flow_limit 100p buckets
+1024 orphan_mask 1023 quantum 3028b initial_quantum 15140b
+low_rate_threshold 550Kbit refill_delay 40ms timer_slack 10us horizon
+10s horizon_drop
+qdisc fq 0: dev eno3 parent :5 limit 10000p flow_limit 100p buckets
+1024 orphan_mask 1023 quantum 3028b initial_quantum 15140b
+low_rate_threshold 550Kbit refill_delay 40ms timer_slack 10us horizon
+10s horizon_drop
+qdisc fq 0: dev eno3 parent :4 limit 10000p flow_limit 100p buckets
+1024 orphan_mask 1023 quantum 3028b initial_quantum 15140b
+low_rate_threshold 550Kbit refill_delay 40ms timer_slack 10us horizon
+10s horizon_drop
+qdisc fq 0: dev eno3 parent :3 limit 10000p flow_limit 100p buckets
+1024 orphan_mask 1023 quantum 3028b initial_quantum 15140b
+low_rate_threshold 550Kbit refill_delay 40ms timer_slack 10us horizon
+10s horizon_drop
+qdisc fq 0: dev eno3 parent :2 limit 10000p flow_limit 100p buckets
+1024 orphan_mask 1023 quantum 3028b initial_quantum 15140b
+low_rate_threshold 550Kbit refill_delay 40ms timer_slack 10us horizon
+10s horizon_drop
+qdisc fq 0: dev eno3 parent :1 limit 10000p flow_limit 100p buckets
+1024 orphan_mask 1023 quantum 3028b initial_quantum 15140b
+low_rate_threshold 550Kbit refill_delay 40ms timer_slack 10us horizon
+10s horizon_drop
+qdisc mq 0: dev eno4 root
+qdisc fq 0: dev eno4 parent :c limit 10000p flow_limit 100p buckets
+1024 orphan_mask 1023 quantum 3028b initial_quantum 15140b
+low_rate_threshold 550Kbit refill_delay 40ms timer_slack 10us horizon
+10s horizon_drop
+qdisc fq 0: dev eno4 parent :b limit 10000p flow_limit 100p buckets
+1024 orphan_mask 1023 quantum 3028b initial_quantum 15140b
+low_rate_threshold 550Kbit refill_delay 40ms timer_slack 10us horizon
+10s horizon_drop
+qdisc fq 0: dev eno4 parent :a limit 10000p flow_limit 100p buckets
+1024 orphan_mask 1023 quantum 3028b initial_quantum 15140b
+low_rate_threshold 550Kbit refill_delay 40ms timer_slack 10us horizon
+10s horizon_drop
+qdisc fq 0: dev eno4 parent :9 limit 10000p flow_limit 100p buckets
+1024 orphan_mask 1023 quantum 3028b initial_quantum 15140b
+low_rate_threshold 550Kbit refill_delay 40ms timer_slack 10us horizon
+10s horizon_drop
+qdisc fq 0: dev eno4 parent :8 limit 10000p flow_limit 100p buckets
+1024 orphan_mask 1023 quantum 3028b initial_quantum 15140b
+low_rate_threshold 550Kbit refill_delay 40ms timer_slack 10us horizon
+10s horizon_drop
+qdisc fq 0: dev eno4 parent :7 limit 10000p flow_limit 100p buckets
+1024 orphan_mask 1023 quantum 3028b initial_quantum 15140b
+low_rate_threshold 550Kbit refill_delay 40ms timer_slack 10us horizon
+10s horizon_drop
+qdisc fq 0: dev eno4 parent :6 limit 10000p flow_limit 100p buckets
+1024 orphan_mask 1023 quantum 3028b initial_quantum 15140b
+low_rate_threshold 550Kbit refill_delay 40ms timer_slack 10us horizon
+10s horizon_drop
+qdisc fq 0: dev eno4 parent :5 limit 10000p flow_limit 100p buckets
+1024 orphan_mask 1023 quantum 3028b initial_quantum 15140b
+low_rate_threshold 550Kbit refill_delay 40ms timer_slack 10us horizon
+10s horizon_drop
+qdisc fq 0: dev eno4 parent :4 limit 10000p flow_limit 100p buckets
+1024 orphan_mask 1023 quantum 3028b initial_quantum 15140b
+low_rate_threshold 550Kbit refill_delay 40ms timer_slack 10us horizon
+10s horizon_drop
+qdisc fq 0: dev eno4 parent :3 limit 10000p flow_limit 100p buckets
+1024 orphan_mask 1023 quantum 3028b initial_quantum 15140b
+low_rate_threshold 550Kbit refill_delay 40ms timer_slack 10us horizon
+10s horizon_drop
+qdisc fq 0: dev eno4 parent :2 limit 10000p flow_limit 100p buckets
+1024 orphan_mask 1023 quantum 3028b initial_quantum 15140b
+low_rate_threshold 550Kbit refill_delay 40ms timer_slack 10us horizon
+10s horizon_drop
+qdisc fq 0: dev eno4 parent :1 limit 10000p flow_limit 100p buckets
+1024 orphan_mask 1023 quantum 3028b initial_quantum 15140b
+low_rate_threshold 550Kbit refill_delay 40ms timer_slack 10us horizon
+10s horizon_drop
+qdisc noqueue 0: dev external-net root refcnt 2
+qdisc noqueue 0: dev local-lan root refcnt 2
+qdisc noqueue 0: dev virtual-net root refcnt 2
+qdisc noqueue 8001: dev vnet0 root refcnt 2
+qdisc noqueue 8002: dev vnet1 root refcnt 2
+qdisc noqueue 8003: dev vnet2 root refcnt 2
+qdisc noqueue 8004: dev vnet3 root refcnt 2
+qdisc noqueue 8005: dev vnet4 root refcnt 2
+qdisc noqueue 8006: dev vnet5 root refcnt 2
+qdisc noqueue 8007: dev vnet6 root refcnt 2
+qdisc noqueue 8008: dev vnet7 root refcnt 2
+qdisc noqueue 0: dev int root refcnt 2
+
+
+> > Thanks.
 
