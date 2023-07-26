@@ -1,130 +1,145 @@
-Return-Path: <netdev+bounces-21302-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21304-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69C2B76333B
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 12:16:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D95F3763344
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 12:17:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C8D9281CBB
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 10:16:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9442D281CA3
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 10:17:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 984C9BE60;
-	Wed, 26 Jul 2023 10:15:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3A8DBE66;
+	Wed, 26 Jul 2023 10:17:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8997ABA3B
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 10:15:59 +0000 (UTC)
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 622461995;
-	Wed, 26 Jul 2023 03:15:57 -0700 (PDT)
-Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
-	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-	id 1qObYg-0002RF-VA; Wed, 26 Jul 2023 12:15:55 +0200
-Message-ID: <31ddce1d-6014-bf9f-95da-97deb3240606@leemhuis.info>
-Date: Wed, 26 Jul 2023 12:15:54 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8A00AD37
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 10:17:01 +0000 (UTC)
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79AD41995
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 03:17:00 -0700 (PDT)
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1qObZO-0002ZA-8k; Wed, 26 Jul 2023 12:16:38 +0200
+Received: from pengutronix.de (unknown [172.20.34.65])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id C32901FB186;
+	Wed, 26 Jul 2023 10:16:36 +0000 (UTC)
+Date: Wed, 26 Jul 2023 12:16:36 +0200
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: haibo.chen@nxp.com
+Cc: robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
+	conor+dt@kernel.org, shawnguo@kernel.org, s.hauer@pengutronix.de,
+	wg@grandegger.com, kernel@pengutronix.de, linux-imx@nxp.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, devicetree@vger.kernel.org,
+	linux-can@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v2 3/3] can: flexcan: lack of stop mode dts properity
+ should not block driver probe
+Message-ID: <20230726-majorette-manor-ea82bb4afa68-mkl@pengutronix.de>
+References: <20230726090909.3417030-1-haibo.chen@nxp.com>
+ <20230726090909.3417030-3-haibo.chen@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>
-Subject: Re: Another regression in the af_alg series (s390x-specific)
-Content-Language: en-US, de-DE
-To: David Howells <dhowells@redhat.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>, Paolo Abeni
- <pabeni@redhat.com>, netdev@vger.kernel.org, regressions@lists.linux.dev,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- =?UTF-8?B?T25kcmVqIE1vc27DocSNZWs=?= <omosnacek@gmail.com>,
- Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-References: <CAAUqJDuRkHE8fPgZJGaKjUjd3QfGwzfumuJBmStPqBhubxyk_A@mail.gmail.com>
-From: "Linux regression tracking (Thorsten Leemhuis)"
- <regressions@leemhuis.info>
-In-Reply-To: <CAAUqJDuRkHE8fPgZJGaKjUjd3QfGwzfumuJBmStPqBhubxyk_A@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1690366557;77d5a048;
-X-HE-SMSGID: 1qObYg-0002RF-VA
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="cjbrrbvmxmmqq34f"
+Content-Disposition: inline
+In-Reply-To: <20230726090909.3417030-3-haibo.chen@nxp.com>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:b01:1d::7b
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi, Thorsten here, the Linux kernel's regression tracker. Top-posting
-for once, to make this easily accessible to everyone.
 
-What's the status wrt to this regression (caused by c1abe6f570af from
-David)? It looks like there never was a real reply and the regression
-still is unresolved. But maybe I missed something, which can easily
-happen in my position.
+--cjbrrbvmxmmqq34f
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
---
-Everything you wanna know about Linux kernel regression tracking:
-https://linux-regtracking.leemhuis.info/about/#tldr
-If I did something stupid, please tell me, as explained on that page.
+On 26.07.2023 17:09:09, haibo.chen@nxp.com wrote:
+> From: Haibo Chen <haibo.chen@nxp.com>
+>=20
+> If SoC claim to support stop mode, but dts file do not contain the stop
+> mode properity, this should not block the driver probe. For this case,
+> the driver only need to skip the wakeup capable setting which means this
+> device do not support the feature to wakeup system.
 
-#regzbot poke
+This still breaks old DTS on kernels with patch 2 applied, but not 3.
+Please squash this into 2.
 
-On 13.07.23 10:03, Ondrej Mosnáček wrote:
-> Hi,
-> 
-> It turns out that beneath the first bug [1] there was another one
-> hiding. It seems to happen only on the s390x architecture when running
-> the following libkcapi [2] reproducer:
-> 
-> kcapi -x 2 -s -c "gcm(aes)" -i 0d92aa861746b324f20ee6b7 \
->     -k f4a6a5e5f2066f6dd9ec6fc5169c29043560ef595c9e81e76f42d29212cc581c \
->     -a "" -t 5f24c68cbe6f32c29652442bf5d483ad -q ""
-> 
-> Frequently (but not always) it triggers an oops like this one:
-> 
-> [ 3986.766763] Unable to handle kernel pointer dereference in virtual
-> kernel address space
-> [ 3986.766774] Failing address: 0000000a00000000 TEID: 0000000a00000803
-> [ 3986.766776] Fault in home space mode while using kernel ASCE.
-> [ 3986.766778] AS:00000000a43a0007 R3:0000000000000024
-> [ 3986.766825] Oops: 003b ilc:2 [#1] SMP
-> <snip>
-> [ 3986.766877] CPU: 0 PID: 271064 Comm: kcapi Tainted: G        W
->     6.5.0-rc1 #1
-> [ 3986.767070] Hardware name: IBM 8561 LT1 400 (z/VM 7.2.0)
-> <snip>
-> [ 3986.767151] Call Trace:
-> [ 3986.767153]  [<000003ff7fc3d47e>] gcm_walk_start+0x16/0x28 [aes_s390]
-> [ 3986.767160]  [<00000000a2a342f2>] crypto_aead_decrypt+0x9a/0xb8
-> [ 3986.767166]  [<00000000a2a60888>] aead_recvmsg+0x478/0x698
-> [ 3986.767169]  [<00000000a2e519a0>] sock_recvmsg+0x70/0xb0
-> [ 3986.767175]  [<00000000a2e51a56>] sock_read_iter+0x76/0xa0
-> [ 3986.767177]  [<00000000a273e066>] vfs_read+0x26e/0x2a8
-> [ 3986.767182]  [<00000000a273e8c4>] ksys_read+0xbc/0x100
-> [ 3986.767184]  [<00000000a311d808>] __do_syscall+0x1d0/0x1f8
-> [ 3986.767189]  [<00000000a312ff30>] system_call+0x70/0x98
-> [ 3986.767193] Last Breaking-Event-Address:
-> [ 3986.767193]  [<000003ff7fc3e6b4>] gcm_aes_crypt+0x104/0xa68 [aes_s390]
-> [ 3986.767198] Kernel panic - not syncing: Fatal exception: panic_on_oops
-> 
-> This time the regression was bisected to:
-> 
-> commit c1abe6f570aff4b6d396dc551e60570d2f50bd79
-> Author: David Howells <dhowells@redhat.com>
-> Date:   Tue Jun 6 14:08:52 2023 +0100
-> 
->    crypto: af_alg: Use extract_iter_to_sg() to create scatterlists
-> 
-> I can't see what the problem is with the commit, so I'm reporting here
-> hoping that David or someone else can pick it up from here.
-> 
-> Cheers,
-> Ondrej
-> 
-> [1] https://lore.kernel.org/linux-crypto/CAAUqJDvFuvms55Td1c=XKv6epfRnnP78438nZQ-JKyuCptGBiQ@mail.gmail.com/T/
-> [2] https://github.com/smuellerDD/libkcapi/
+>=20
+> Signed-off-by: Haibo Chen <haibo.chen@nxp.com>
+> ---
+>  drivers/net/can/flexcan/flexcan-core.c | 9 ++++++++-
+>  1 file changed, 8 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/drivers/net/can/flexcan/flexcan-core.c b/drivers/net/can/fle=
+xcan/flexcan-core.c
+> index a3f3a9c909be..d8be69f4a0c3 100644
+> --- a/drivers/net/can/flexcan/flexcan-core.c
+> +++ b/drivers/net/can/flexcan/flexcan-core.c
+> @@ -1987,7 +1987,14 @@ static int flexcan_setup_stop_mode(struct platform=
+_device *pdev)
+>  		/* return 0 directly if doesn't support stop mode feature */
+>  		return 0;
+> =20
+> -	if (ret)
+> +	/* If ret is -EINVAL, this means SoC claim to support stop mode, but
+> +	 * dts file lack the stop mode property definition. For this case,
+> +	 * directly return 0, this will skip the wakeup capable setting and
+> +	 * will not block the driver probe.
+> +	 */
+> +	if (ret =3D=3D -EINVAL)
+> +		return 0;
+> +	else if (ret)
+>  		return ret;
+> =20
+>  	device_set_wakeup_capable(&pdev->dev, true);
+> --=20
+> 2.34.1
+>=20
+>=20
+
+regards,
+Marc
+
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--cjbrrbvmxmmqq34f
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEDs2BvajyNKlf9TJQvlAcSiqKBOgFAmTA8oEACgkQvlAcSiqK
+BOitZAgAre7gePm257fB84ueqkVE0mAA41PVK+xx6PvmmzojzCx48WrmuqgJUKxX
+iFaah4dWMj5ls7nm/HZBXCNrX8HVfwZQCqOok8TaMNWn2hlZ80kzJwykcngibAEB
+UCx+qAsIuUjniC8rEPkYNFxSTZg5Z+a2/oCo0orcMZ5G4mYzsIUMBH9jwtyuTJ1A
+qaZqSK58oLMKNrWtJHJox9Ji2i0uhFOtJuKKsZG8yizyxHQPkKvXk37C2aSEzDXV
+mDi3cI0KI+G0uNyoueYc/kxV+Dqpp03g5ZJmjSF1ak+NAvWu/g0KjoBKFSf1FYcE
+j24fcHXS6KoDt/1uSaorUjAPpPTTPQ==
+=FhOU
+-----END PGP SIGNATURE-----
+
+--cjbrrbvmxmmqq34f--
 
