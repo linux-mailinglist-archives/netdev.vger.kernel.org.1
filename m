@@ -1,113 +1,119 @@
-Return-Path: <netdev+bounces-21525-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21526-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF897763CCB
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 18:45:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F652763CCE
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 18:45:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0091E281BDD
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 16:45:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DE3F3281DA0
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 16:45:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CC761AA6F;
-	Wed, 26 Jul 2023 16:45:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 353231AA72;
+	Wed, 26 Jul 2023 16:45:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 404231AA61
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 16:45:28 +0000 (UTC)
-Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C8F02712;
-	Wed, 26 Jul 2023 09:45:26 -0700 (PDT)
-Received: by mail-wr1-x433.google.com with SMTP id ffacd0b85a97d-3174aac120aso3716153f8f.2;
-        Wed, 26 Jul 2023 09:45:26 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 294E61AA61
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 16:45:55 +0000 (UTC)
+Received: from mail-lj1-x22a.google.com (mail-lj1-x22a.google.com [IPv6:2a00:1450:4864:20::22a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E7572728
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 09:45:46 -0700 (PDT)
+Received: by mail-lj1-x22a.google.com with SMTP id 38308e7fff4ca-2b70404a5a0so104392971fa.2
+        for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 09:45:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690389925; x=1690994725;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=RyINUpaSQIyVJ5EZaqPGUzt+wHSb+xiB9GD+ZGRtpyo=;
-        b=ZIv6MvLgL/SspksBtDLx4z7qb77Gv29cz8ffslMueuLckTHAnIxd0aHL3dpeHfTEeJ
-         3MAkevbwQ5D5MnlkujwOdNBQZ//7VZW03LSVDJQjC+6v/5v7ZfVMG9piIUl49+N0MGtr
-         1pIObu8biaoH4+WfDUzXYsDVf6+Pzr+cNLfKh6K/p4Z6uFibUhLxzkOTUkPKm+v3Fr0q
-         A4dZjMwgWoP3D2jN9VzOyyQ4hkmstpPej3sCVVOCEZsH5m3ykEDu7ZsLzMo3hdQ0tuXU
-         oS6FzAoxT/tOw0CuQiZbQK7BMmFzrMcIaJdkBPDkjung++Qa9rFbaB3Jao7fgvlAJupL
-         91ug==
+        d=linux-foundation.org; s=google; t=1690389944; x=1690994744;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=C4mt+ojB+SP10w1OfygrpNmF+pEvocjVGgRwsRvZpZc=;
+        b=IZvMpzLllqI8kGs63oQoxaC1ivFZGhcl+AxYkXdEKCrmxPQAUEx3GMR3wfTSEkYK4n
+         VqzB51zQqfLo2hjrSdi5Bt1vmQdBFUdzb/lb6J/qVRkabrV6+79Qn/N2BoZKZ+tMeZdP
+         ewvhq6vfigxca10zBIuKGek8CV9a9N6g8Bc00=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690389925; x=1690994725;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20221208; t=1690389944; x=1690994744;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=RyINUpaSQIyVJ5EZaqPGUzt+wHSb+xiB9GD+ZGRtpyo=;
-        b=lhA0O7Xc8etDEmeKYh4Sl4eXYffLI4OcNHrnhyWriND6gajq7+asot9FFymOKXlg0x
-         sXfIcM6yMZmWsgtw+0Sk1cLhEnkwPtf9A5GtEWeHrZC0X3qeTzjYRZuOYAK5vCbSDPrP
-         IMaue/gVzyacGHzcOryAJaKpxctHETuAukQHt/FFp7hmwE9kT6P4B8E3LNt+id60lk5t
-         JslmFYE7lrUiqIGXRKJtvOjzvGgR1pM9jgo6CFYB3lV4ZMayE11WlU9j7ElRWmS4NbvV
-         TGeSW2zVDMv/SQUj8jD5wWC9jWtQMC1++uicS9XS7V5qfya2Cbty5mnrSoTGSa1vU3wU
-         yvWA==
-X-Gm-Message-State: ABy/qLb23gaBOk0eCtRl8kBv5NaAx9XuVnXw7OfmR0e0BtwX4DksvFoi
-	D7IysDilfkuUyKtG8clePZw=
-X-Google-Smtp-Source: APBJJlHVZ2wSIW+Wh2MzMPB0UbCn0yAmKqAxk1P/KDNshC1jdqCjWFnI7kHTaim05Oc3DvWD47lewA==
-X-Received: by 2002:a5d:4a0e:0:b0:317:60f0:41e7 with SMTP id m14-20020a5d4a0e000000b0031760f041e7mr1625695wrq.19.1690389924450;
-        Wed, 26 Jul 2023 09:45:24 -0700 (PDT)
-Received: from localhost (cpc154979-craw9-2-0-cust193.16-3.cable.virginm.net. [80.193.200.194])
-        by smtp.gmail.com with ESMTPSA id w16-20020adfec50000000b003143867d2ebsm20390617wrn.63.2023.07.26.09.45.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Jul 2023 09:45:23 -0700 (PDT)
-From: Colin Ian King <colin.i.king@gmail.com>
-To: Lino Sanfilippo <LinoSanfilippo@gmx.de>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Cc: kernel-janitors@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH][next] net: ethernet: slicoss: remove redundant increment of pointer data
-Date: Wed, 26 Jul 2023 17:45:22 +0100
-Message-Id: <20230726164522.369206-1-colin.i.king@gmail.com>
-X-Mailer: git-send-email 2.39.2
+        bh=C4mt+ojB+SP10w1OfygrpNmF+pEvocjVGgRwsRvZpZc=;
+        b=ZX2qnDPpKHKiTDBz/FuR+IO/ZOHOeOUnGhJPq/7+3WMCIy4slhqLe4w4xMq6i7o5fN
+         TQ1lZqixT6q3FyZXaQJXkM7YZNMwwZLA05IdHSbLI5A7/JsItKr3kiXwLvKcmsk4t6Xx
+         Vib5Z3my7+kUVu/Eo/V24D5fYBTaYCLDNd1sJwGE3xdbpNklT1lT9y4P0Bm/KiqTYgoc
+         E0QdrCZARFu1QGMnHZr3a8LTuH1XBvMqJV0ce00mHCSMDUtKCiF5sI7FiFwXXV9L752x
+         gECf2fwjI3hh6snCsteGyGQYqRDE5CygUVctxXGV0Xh8z0tonBoEwQLUVSzS779ikywq
+         fd9g==
+X-Gm-Message-State: ABy/qLZSnk8iE5qfXTPDCBuTqwKvO+3QSmyjURajKbASwUAfpbLUP3qn
+	iwDXAJni6tJLdReQtQv0hoRx+YVg5O5BqxxitbGpuL//
+X-Google-Smtp-Source: APBJJlGOtFkTYRhMO88Q65OzlUQlex0CufvEpYlBpyjwHHgENmlu3JyYQfYa1eqG8cHAdFWWrfZKtA==
+X-Received: by 2002:a2e:9150:0:b0:2b9:b41a:aa66 with SMTP id q16-20020a2e9150000000b002b9b41aaa66mr2316754ljg.20.1690389943769;
+        Wed, 26 Jul 2023 09:45:43 -0700 (PDT)
+Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com. [209.85.167.54])
+        by smtp.gmail.com with ESMTPSA id w21-20020a2e9995000000b002b95cc9fa30sm4234856lji.71.2023.07.26.09.45.42
+        for <netdev@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 26 Jul 2023 09:45:43 -0700 (PDT)
+Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-4fcd615d7d6so10817318e87.3
+        for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 09:45:42 -0700 (PDT)
+X-Received: by 2002:a05:6512:3b8:b0:4f4:c6ab:f119 with SMTP id
+ v24-20020a05651203b800b004f4c6abf119mr1714334lfp.64.1690389942453; Wed, 26
+ Jul 2023 09:45:42 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+References: <20230726151515.1650519-1-kuba@kernel.org> <11ec5b3819ff17c7013348b766eab571eee5ca96.camel@perches.com>
+ <20230726092312.799503d6@kernel.org>
+In-Reply-To: <20230726092312.799503d6@kernel.org>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Wed, 26 Jul 2023 09:45:25 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wjEj2fGiaQXrYUZu65EPdgbGEAEMzch8LTtiUp6UveRCw@mail.gmail.com>
+Message-ID: <CAHk-=wjEj2fGiaQXrYUZu65EPdgbGEAEMzch8LTtiUp6UveRCw@mail.gmail.com>
+Subject: Re: [PATCH v2] scripts: get_maintainer: steer people away from using
+ file paths
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Joe Perches <joe@perches.com>, Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, 
+	geert@linux-m68k.org, gregkh@linuxfoundation.org, netdev@vger.kernel.org, 
+	workflows@vger.kernel.org, mario.limonciello@amd.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-The pointer data is being incremented but this change to the pointer
-is not used afterwards. The increment is redundant and can be removed.
+On Wed, 26 Jul 2023 at 09:23, Jakub Kicinski <kuba@kernel.org> wrote:
+>
+> On Wed, 26 Jul 2023 08:43:30 -0700 Joe Perches wrote:
+> > > Print a warning when someone tries to use -f and remove
+> > > the "auto-guessing" of file paths.
+> >
+> > Nack on that bit.
+> > My recollection is it's Linus' preferred mechanism.
+>
+> Let Linus speak for himself, hopefully he's okay with throwing
+> in the -f.
 
-Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
----
- drivers/net/ethernet/alacritech/slicoss.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+It's not the '-f' that would be the problem - that's how the script
+used to work long ago, and I still occasionally end up adding the -f
+by habit.
 
-diff --git a/drivers/net/ethernet/alacritech/slicoss.c b/drivers/net/ethernet/alacritech/slicoss.c
-index a30d0f172986..78231c85234d 100644
---- a/drivers/net/ethernet/alacritech/slicoss.c
-+++ b/drivers/net/ethernet/alacritech/slicoss.c
-@@ -1520,10 +1520,8 @@ static void slic_get_ethtool_stats(struct net_device *dev,
- 
- static void slic_get_strings(struct net_device *dev, u32 stringset, u8 *data)
- {
--	if (stringset == ETH_SS_STATS) {
-+	if (stringset == ETH_SS_STATS)
- 		memcpy(data, slic_stats_strings, sizeof(slic_stats_strings));
--		data += sizeof(slic_stats_strings);
--	}
- }
- 
- static void slic_get_drvinfo(struct net_device *dev,
--- 
-2.39.2
+So removing the auto-guessing of file paths wouldn't be a problem.
 
+But the annoying warning is wrong.
+
+I use get_maintainers all the time, and I *only* use it for file
+paths. If I know the commit, I get the list of people from the commit
+itself, so why should I *ever* use that script if I have a patch?
+
+So the whole "use of get_maintainers is only for patches, and we
+should warn about file paths" is insane.
+
+No. If I get that patch, I will remove the warning. The *only* reason
+for me to ever use that script is for the file path lookup.
+
+             Linus
 
