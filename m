@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-21264-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21265-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 941FD7630AB
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 11:00:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A57E07630AC
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 11:00:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C40B0281C87
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 09:00:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AD73B1C21111
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 09:00:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D616DAD46;
-	Wed, 26 Jul 2023 09:00:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35D4FAD51;
+	Wed, 26 Jul 2023 09:00:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A590A849C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E12999455
 	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 09:00:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 2ED4BC433C9;
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 5E78EC433D9;
 	Wed, 26 Jul 2023 09:00:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1690362020;
-	bh=5DswEsNG69Uk11VvpOyj1fz3E3XLr3k52DbFt4XEzq4=;
+	bh=hu42oBZW1c+tecfvWgMv3CP+UiAieioJtItZYJGVrlw=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=LNj/mHqWAJ0RZTHSDf0f2l8CALgpWY38XVYNr5MRrK/3LbnaYp/7PtZzp0fcQ3XJE
-	 wI9CSZkgPCm0AjaIeuM/YTwBhKeNd5aNfxxB8F86Wuzs+A6uIcLNnrZ6EZ+i5dKo6v
-	 fRw0ESgeMrvZoUJ+/ohP5JYwza9UA8eatnrC/b3ui1ptK0iFecS9M2XE0Lo2lmkrcI
-	 xyXZ5eWrGMFbP5c9ajfhbsqMZZw6ajIzu1gmRcb1vyHhUTD5mTkEiDdfXz70jDm+E1
-	 MK99izX0US/JVtuZwJXfEW0RHZ41H0bOCytRyUh95TaIIBNqmDkH94jEs3gAWa+roA
-	 /Q39eZVAJFs2g==
+	b=G4V4/UIcyYaCSUbhOSrSgJ2qUeE85kXtUQvsdQWiYDEA2UAFj+Lb1tA91kaOzvbH2
+	 E/hvURz9JX8CDQYbRhHaGJ/IXbbaTyuDUwx/O/E1vmxVS4qImTsBEDHMs4gAeoXdoj
+	 opQ3SI5Z/58cXi+Z7gAwQV6hkE9bDiEHkk+5tfR5c1IGb7JDFlMKt2zVaTkCSdRm+y
+	 cVqLMLGOS5NZJzOGIFAmLdLtWhuAPdWFh3U4OQafSrmcqzvNyRNUjj7By7FlOgJeTE
+	 Wj99u+0cp+uCK7fLkYDzivOR+PBzZXTUZfwiJh2oa93I0Uwnz2K7mn1JxcoY3M7bR6
+	 beMKVcfJmUjiA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 0FF87C41672;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4B5F5C3959F;
 	Wed, 26 Jul 2023 09:00:20 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -41,40 +41,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] igc: Fix Kernel Panic during ndo_tx_timeout callback
+Subject: Re: [PATCH net-next v2] net: skbuff: remove unused HAVE_HW_TIME_STAMP
+ feature define
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <169036202006.9751.14838125009002591135.git-patchwork-notify@kernel.org>
+ <169036202030.9751.13798450530247127386.git-patchwork-notify@kernel.org>
 Date: Wed, 26 Jul 2023 09:00:20 +0000
-References: <20230724161250.2177321-1-anthony.l.nguyen@intel.com>
-In-Reply-To: <20230724161250.2177321-1-anthony.l.nguyen@intel.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, netdev@vger.kernel.org,
- muhammad.husaini.zulkifli@intel.com, sasha.neftin@intel.com,
- alejandra.victoria.alcaraz@intel.com, naamax.meir@linux.intel.com
+References: <20230724162255.14087-1-ps.report@gmx.net>
+In-Reply-To: <20230724162255.14087-1-ps.report@gmx.net>
+To: Peter Seiderer <ps.report@gmx.net>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, davem@davemloft.net,
+ edumazet@google.com, simon.horman@corigine.com, ast@kernel.org,
+ linyunsheng@huawei.com, asml.silence@gmail.com, richardbgobert@gmail.com,
+ patrick.ohly@intel.com
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Mon, 24 Jul 2023 09:12:50 -0700 you wrote:
-> From: Muhammad Husaini Zulkifli <muhammad.husaini.zulkifli@intel.com>
+On Mon, 24 Jul 2023 18:22:55 +0200 you wrote:
+> Remove unused HAVE_HW_TIME_STAMP feature define (introduced by
+> commit ac45f602ee3d ("net: infrastructure for hardware time stamping").
 > 
-> The Xeon validation group has been carrying out some loaded tests
-> with various HW configurations, and they have seen some transmit
-> queue time out happening during the test. This will cause the
-> reset adapter function to be called by igc_tx_timeout().
-> Similar race conditions may arise when the interface is being brought
-> down and up in igc_reinit_locked(), an interrupt being generated, and
-> igc_clean_tx_irq() being called to complete the TX.
+> Signed-off-by: Peter Seiderer <ps.report@gmx.net>
+> ---
+> Changes v1 -> v2:
+>   - specify target tree net-next
+>   - subject change from 'skbuff: ...' to 'net: skbuff: ...'
+>   - add CC netdev@vger.kernel.org (instead of linux-kernel@vger.kernel.org)
+>   - add CC Patrick Ohly <patrick.ohly@intel.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] igc: Fix Kernel Panic during ndo_tx_timeout callback
-    https://git.kernel.org/netdev/net/c/d4a7ce642100
+  - [net-next,v2] net: skbuff: remove unused HAVE_HW_TIME_STAMP feature define
+    https://git.kernel.org/netdev/net-next/c/2303fae13064
 
 You are awesome, thank you!
 -- 
