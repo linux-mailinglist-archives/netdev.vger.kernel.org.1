@@ -1,170 +1,110 @@
-Return-Path: <netdev+bounces-21239-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21240-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9C86762F4E
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 10:09:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C37E762F59
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 10:10:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 65758281C89
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 08:09:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 16145281AA3
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 08:10:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9884EA92F;
-	Wed, 26 Jul 2023 08:09:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DF01A959;
+	Wed, 26 Jul 2023 08:10:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87BD1A92E
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 08:09:26 +0000 (UTC)
-Received: from mail.helmholz.de (mail.helmholz.de [217.6.86.34])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51D359AA2
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 01:09:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=helmholz.de
-	; s=dkim1; h=Content-Type:MIME-Version:References:In-Reply-To:Message-ID:Date
-	:Subject:CC:To:From:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=dTPecCXuv8hKImfNCoAlPlEQbIut43mykpyXbbtAN1Q=; b=BkMEijpaNK24OtzRFTmhKJmrcU
-	VQ14NNkqh5PGBFak7oAblghWh7zOLZ+5LasJJ0B7C8sv/CulV66QpejfqHktFytRRv9A94hvKc2wl
-	inBZJq2NVV3pb33pu2tlnJ3+afKbRXjSiEQT9SrnbOpH8qLNnxSBPC9lJR43UP+CEeZztT4XmvkL+
-	OFl+zUKtPeTnspYR7aQC+ah7QGUaQYlMYOhbmDaY06rsuSXzBlVR9xX2NWRqqD7PxCOcy6BRfKEwC
-	DdmsxxoWUjw4MloROjFuGaftSpDXNrTPtY4NK80eqI98cR1EzMVeM28/TExHUAy1Re00eWyN75wcm
-	+yfTURCw==;
-Received: from [192.168.1.4] (port=27878 helo=SH-EX2013.helmholz.local)
-	by mail.helmholz.de with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384
-	(Exim 4.96)
-	(envelope-from <Ante.Knezic@helmholz.de>)
-	id 1qOZZv-0001ol-0I;
-	Wed, 26 Jul 2023 10:09:03 +0200
-Received: from linuxdev.helmholz.local (192.168.6.7) by
- SH-EX2013.helmholz.local (192.168.1.4) with Microsoft SMTP Server (TLS) id
- 15.0.1497.48; Wed, 26 Jul 2023 10:09:02 +0200
-From: Ante Knezic <ante.knezic@helmholz.de>
-To: <andrew@lunn.ch>
-CC: <ante.knezic@helmholz.de>, <davem@davemloft.net>, <edumazet@google.com>,
-	<f.fainelli@gmail.com>, <kuba@kernel.org>, <linux-kernel@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <olteanv@gmail.com>, <pabeni@redhat.com>
-Subject: [PATCH net-next] net: dsa: mv88e6xxx: enable automedia on 6190x and 6390x devices
-Date: Wed, 26 Jul 2023 10:08:58 +0200
-Message-ID: <20230726080858.12322-1-ante.knezic@helmholz.de>
-X-Mailer: git-send-email 2.11.0
-In-Reply-To: <e408ed0a-94fc-438f-b279-79f9253531d5@lunn.ch>
-References: <e408ed0a-94fc-438f-b279-79f9253531d5@lunn.ch>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EF349460;
+	Wed, 26 Jul 2023 08:10:51 +0000 (UTC)
+Received: from mout.web.de (mout.web.de [212.227.15.14])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80AEF72A0;
+	Wed, 26 Jul 2023 01:10:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
+ s=s29768273; t=1690359023; x=1690963823; i=markus.elfring@web.de;
+ bh=9zeE47CQClpui9T96duoFJfvV0RYj/exVKII3SPbVpo=;
+ h=X-UI-Sender-Class:Date:Subject:To:Cc:References:From:In-Reply-To;
+ b=FOM7O6VtdATtLsHLzQ5cnHqo3xAzliQUS2SLJrrHeTAZaPYeMFieL6QSoUewhyUo5lusmJs
+ gsVDzlQpWa2CuU4bloE4XZS2y3Vxxpm1nRF8NxtpM06Dy1tqaaGsKSYWX3ygbtzcizyRiCY44
+ seLsWgRvoJFtjOlhte0ONk+uDbqH8ALSIsYUMEfHNspiy2hh5s+twWte0dS45GrccLMHMC2V6
+ XRa5oQNNmwPRxOIkCBdgnFI0PIQ08CFj+93RAu9n6mcxJfAIsmFfgEIYhRtqZ0Wbz+8eBK6zn
+ IK4wGnucDwg3vb6teqku0cOBG0dmLzxbDUHljxktrGUJdBk91fjg==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.21] ([94.31.90.83]) by smtp.web.de (mrweb005
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 1MdfCH-1ppVte06Ub-00ZeoF; Wed, 26
+ Jul 2023 10:10:23 +0200
+Message-ID: <3ec61192-c65c-62cc-d073-d6111b08e690@web.de>
+Date: Wed, 26 Jul 2023 10:10:21 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [192.168.6.7]
-X-ClientProxiedBy: SH-EX2013.helmholz.local (192.168.1.4) To
- SH-EX2013.helmholz.local (192.168.1.4)
-X-EXCLAIMER-MD-CONFIG: 2ae5875c-d7e5-4d7e-baa3-654d37918933
-X-Spam-Status: No, score=0.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SORTED_RECIPS,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.1
+Subject: Re: [PATCH v4 bpf 2/2] bpf: selftests: add lwt redirect regression
+ test cases
+Content-Language: en-GB
+To: Yan Zhai <yan@cloudflare.com>, bpf@vger.kernel.org,
+ kernel-janitors@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, kernel-team@cloudflare.com
+Cc: Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
+ Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
+ Yonghong Song <yhs@fb.com>, John Fastabend <john.fastabend@gmail.com>,
+ KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
+ Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>,
+ Jordan Griege <jgriege@cloudflare.com>, Jakub Sitnicki
+ <jakub@cloudflare.com>, LKML <linux-kernel@vger.kernel.org>
+References: <cover.1690332693.git.yan@cloudflare.com>
+ <9c4896b109a39c3fa088844addaa1737a84bbbb5.1690332693.git.yan@cloudflare.com>
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <9c4896b109a39c3fa088844addaa1737a84bbbb5.1690332693.git.yan@cloudflare.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Provags-ID: V03:K1:pj8bYFrr+T3faUy5NZlWjXv2NPDIRmUQWtxL9xKwPOvKs99pbcs
+ D2uUurD+uXBNNqKLieZCh3Ufu+ghC02Ln4zsX8YBms7oBPb83ESI7jSU8nc3yauayZ15/aU
+ q5VTdfeoDt/B/AJubkAD8pIE25nlpKtkWoz4hImvkMDX30uXr920NuWB/Wa3YpfGvsU6Px0
+ Gq2Z+wvHkNeiNd51z82gA==
+UI-OutboundReport: notjunk:1;M01:P0:VxgsZFPivOo=;haeOKWsM2w5fG9ZAAjd3/riqtaS
+ /kPDKUXa1Q+MHGrNHe4uq+ClY4QEAeGOywvPdPC1wcAHeFxjsQFX/VDbYRllAeygB8YpAxahj
+ Dvb7/4mZ429+J08JcnjhLRsJHA2cDyiz78daXiDLRuHnEjusHUa/Py/bj12r9CgE8WfZ8ox3O
+ 4U/Av47sCMqwauh6q93aZAhzxbPN4+wLh7KWi9/4wyy5RiARW3QoQwil7v8LK6hoiq6siN2l0
+ s8IT5+xpYsU9dhLAba8dFD5zbtDzAkdX8ULvAs6MF72QczqY6OQfO9Ilzguyd0VYePobc7MWN
+ NNcYXab5bU3zpbaEfilCVM7hkzCobCGpwl0LL2k7+bZ8bxuqWZ8n/5m6/QYAJAoAXmiLlCJHD
+ mUn9PQJaQogrh2yNcDWT80VmyNHChd1T7RuIzc3xVGV6/yagrRsh0y3Ql+98SHBqLFr6VG3EK
+ oQWBQAsib7UGxxh8ljjJZoV0ytmU+SbhsiLMjQIFr/Z1VopIqT1jsUJUzwpI+4JLBaCkUk6QT
+ n6CuvhQAMWGdT6c18Gy9+JPTL9a2kBy9n1MeBWs/Mdj5srF0cYL1hxHuCLFbqGtc+7R5HqReI
+ 4zu3PBmn38yjnrhpNd02q+y6EmIAG1/46J1Rq/fvJehUTh5uKuBVBEDkh0iLBDLhbzmtSDkLJ
+ YFyJzqA+l053M/bXPyS0iP55dHa2A3OusJcQt/H2GDmbVBN31DyOPaquqncqXq0cFBiXzBM0R
+ /bMt+EjDKBWYA0/JEgleJ1b/DB7h0nbu2gHKq/LkHUmlA4JejfNqD2lCVRmkcCkQRQLOv2I+B
+ jXWT7SDCBtg9P6UmhNwMJewDhktMNZWE+3PUVKPIcZCbT8GQHNbj9jDn63sjUM+Atljo3WX53
+ AAun7gznPkqfUcsZgnRBlIwoayedwt4OkvhKvFUyG3WoFdL5Llp1WcJfbOI7CDOh7A4VcFVsd
+ uRtv2Pg717rex+V6R+zBkS3Np/o=
+X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+	RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, 25 Jul 2023 23:22:06 +0200, Andrew Lunn wrote:
->On Tue, Jul 25, 2023 at 11:57:12AM +0200, Ante Knezic wrote:
->> On Mon, 24 Jul 2023 20:34:27 +0200 Anrew Lunn wrote:
->> >By auto-media, you mean both a copper PHY and an SFP? And whichever
->> >gets link first wins the MAC?
->> >
->> 
->> Yes, that is correct.
->> 
->> On Mon, 24 Jul 2023 20:34:27 +0200 Anrew Lunn wrote:
->> >auto-media has been discussed a few times, and rejected, since Linux
->> >has no concept of multiple 'phy like devices' connected to one MAC.
->> >
->> >How are you representing this in DT? I assume you have both an SFP
->> >socket, and a phy-handle pointing to a PHY? phylink will not drive
->> >both at the same time. So you cannot have them admin up at the same
->> >time? How do you get the SFP out of TX disable, when phylink sees a
->> >PHY? What does ethtool return? What the PHY is advertising as its link
->> >modes? Or nothing since an SFP does not advertise speeds?
->> 
->> Patch simply covers the automedia aspect of the device while the
->> exact mode is specified by the DT.
->
->So i would not call this automedia. You are not supporting both copper
->and SFP at the same time, and you are not supporting first win. You
->are just allowing the lower ports to use the SERDES interfaces for
->SFPs.
->
+> Tests BPF redirect at the lwt xmit hook to ensure error handling are
+> safe, i.e. won't panic the kernel.
 
-That is true, but in order to be able to use SERDES interface for lower
-ports the switch needs to be operating in automedia mode. Automedia here 
-simply means power up serdes lane and connect to whichever links first,
-but there is no way to deny linking the PHY and allow only SERDES (as
-far as I am aware).
-I agree that commit message is misleading and wrongly assumes that 
-reader has any knowledge of chip details.
+Are imperative change descriptions still preferred?
 
->> So for example if you would like
->> to connect an SFP to port 3 of the device you would create a "regular"
->> sfp node just like for ports 9/10 along the lines of:
->>                         port@3 {
->>                                 reg = <3>;
->>                                 label = "SFP";
->>                                 phy-mode = "1000base-x";
->>                                 managed = "in-band-status";
->>                                 sfp = <&sfp1>;
->>                         };
->> 
->> >From then on, phylink will handle the sfp just as if it was connected
->> to ports 9/10 - the ethtool reports advertised and supported link mode
->> as 1000baseX, "Port" is "FIBRE", etc.
->> 
->> Patch looks for "1000base-x" phy-mode in the dt node so in case it
->> is not found the device can be linked only against a copper PHY.
->
->So this used to work. It got broken at some point, and i have a much
->simpler patch in one of the branches:
->
->https://github.com/lunn/linux/commit/74e2c2a9a56fd4e2baeee4d5fbe897c21f394ede
->
->Please try this and see if it works for you.
->
+See also:
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/process/submitting-patches.rst?h=v6.5-rc3#n94
 
-The provided patch does work, however I believe there are some drawbacks to
-such simplification:
-Firstly, it writes data to READ ONLY bits of the Port Status Register. As
-indicated by the datasheet, the CMODE is R/W only for ports 9 and 10, other
-ports actually reflect the actual connection via CMODE bits.
-Secondly, there is no filtering on setting the ports phy mode. You could be
-setting cmode of port 3 to sgmii for example, which is not supported.
-And thirdly, during probing of the device set_cmode is called with argument
-PHY_INTERFACE_MODE_NA from mv88e6xxx_setup_port. As we would now allow lower
-ports to set the cmode, it would be automatically assigned a cmode of 
-1000BASE-X because of:
 
-static int mv88e6xxx_port_set_cmode(struct mv88e6xxx_chip *chip, int port,
-                                    phy_interface_t mode, bool force)
-{
-        u16 cmode;
-        u16 reg;
-        int err;
+Can remaining wording weaknesses be adjusted accordingly?
 
-        /* Default to a slow mode, so freeing up SERDES interfaces for
-         * other ports which might use them for SFPs.
-         */
-        if (mode == PHY_INTERFACE_MODE_NA)
-                mode = PHY_INTERFACE_MODE_1000BASEX;
-
-So ultimately, when the pcs->init is called it sees that cmode for
-all ports is set to 1000BASE-X and proceeds with intialisation (assuming
-ports 9 or 10 are configured in XAUI/RXAUI depending on which lane is
-being accessed).
-
-If however you believe the above points are irrelevant and there is 
-nothing to be gained by the proposed patch than there is nothing more 
-to be done here.
+Regards,
+Markus
 
