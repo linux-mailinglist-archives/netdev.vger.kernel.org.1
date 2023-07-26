@@ -1,32 +1,40 @@
-Return-Path: <netdev+bounces-21180-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21181-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21827762B24
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 08:11:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A2945762B26
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 08:11:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0B95D1C21098
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 06:11:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 856EE1C210E0
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 06:11:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACC126FBC;
-	Wed, 26 Jul 2023 06:11:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D05366FBC;
+	Wed, 26 Jul 2023 06:11:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A049163CC
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 06:11:02 +0000 (UTC)
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C30FC0
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 23:10:58 -0700 (PDT)
-Received: from ptz.office.stw.pengutronix.de ([2a0a:edc0:0:900:1d::77] helo=[127.0.0.1])
-	by metis.ext.pengutronix.de with esmtp (Exim 4.92)
-	(envelope-from <j.zink@pengutronix.de>)
-	id 1qOXjP-00073w-Ss; Wed, 26 Jul 2023 08:10:43 +0200
-Message-ID: <09a2d767-d781-eba2-028f-a949f1128fbd@pengutronix.de>
-Date: Wed, 26 Jul 2023 08:10:35 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C557179C8
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 06:11:16 +0000 (UTC)
+Received: from mail.svario.it (mail.svario.it [IPv6:2a02:2770:13::112:0:1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B4091995
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 23:11:14 -0700 (PDT)
+Received: from [192.168.1.35] (212-88-24-13.hdsl.highway.telekom.at [212.88.24.13])
+	by mail.svario.it (Postfix) with ESMTPSA id C8B56D95AF;
+	Wed, 26 Jul 2023 08:11:10 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=svario.it; s=201710;
+	t=1690351870; bh=zxWmoVbYFXZmrVYUi85uL6I0dd2B6P3kCbTqFNVztHw=;
+	h=Date:To:Cc:References:From:Subject:In-Reply-To:From;
+	b=bSzIbklZ262EBfBQtndPZLPN/iPJ8WcjXZtVKQs8rUOxYPGvMAt7KhxJdbAWrP0n3
+	 MQ+v5fftFoMbr0XrIjKEDhcMJbFbfiykmr30dLF37nKVad6fkbhTcmBISztWWGMMAZ
+	 Rl2kiZ3myqx+iNGToxcBLMy/TrU+0W+Oj/d9agi48qTUFTnbt+5bMABytWeCHUXRX5
+	 W393Ak8Dz0Ix8D51NbXPdgVNSk35lNw/5WSl4MhBun8iFPVtBW/nzBceMgj9C7pe84
+	 C10aDrRti4F/gJdJJFvW0CHkS48FLp4AGXHZvxWa8lYjOzQRpLLh1NLu5+4qvKKz4n
+	 3raQ0HHEF6xdA==
+Message-ID: <44288e78-ad7c-c0ff-703b-f6b733e4f68e@svario.it>
+Date: Wed, 26 Jul 2023 08:11:10 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -35,103 +43,173 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.13.0
-Subject: Re: [PATCH v2] net: stmmac: correct MAC propagation delay
-To: Richard Cochran <richardcochran@gmail.com>,
- Jakub Kicinski <kuba@kernel.org>
-Cc: Giuseppe Cavallaro <peppe.cavallaro@st.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Russell King <linux@armlinux.org.uk>, patchwork-jzi@pengutronix.de,
- netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- kernel@pengutronix.de, kernel test robot <lkp@intel.com>
-References: <20230719-stmmac_correct_mac_delay-v2-1-3366f38ee9a6@pengutronix.de>
- <20230725200606.5264b59c@kernel.org> <ZMCRjcRF9XqEPg/Z@hoboy.vegasvil.org>
-Content-Language: en-US, de-DE
-From: Johannes Zink <j.zink@pengutronix.de>
-In-Reply-To: <ZMCRjcRF9XqEPg/Z@hoboy.vegasvil.org>
+To: Stephen Hemminger <stephen@networkplumber.org>
+Cc: netdev@vger.kernel.org
+References: <20230725142759.169725-1-gioele@svario.it>
+ <20230725110146.26584f9a@hermes.local>
+Content-Language: en-US
+From: Gioele Barabucci <gioele@svario.it>
+Subject: Re: [iproute2 v3] Read configuration files from /etc and /usr
+In-Reply-To: <20230725110146.26584f9a@hermes.local>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:900:1d::77
-X-SA-Exim-Mail-From: j.zink@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Richard,
+Thanks Stephen for the review, I'll soon send a v4 with the fixes 
+discussed below.
 
-On 7/26/23 05:22, Richard Cochran wrote:
-> On Tue, Jul 25, 2023 at 08:06:06PM -0700, Jakub Kicinski wrote:
+On 25/07/23 20:01, Stephen Hemminger wrote:
+> On Tue, 25 Jul 2023 16:27:59 +0200
+> Gioele Barabucci <gioele@svario.it> wrote:
 > 
->> any opinion on this one?
+>> @@ -2924,7 +2926,9 @@ static int bpf_elf_ctx_init(struct bpf_elf_ctx *ctx, const char *pathname,
+>>   	}
+>>   
+>>   	bpf_save_finfo(ctx);
+>> -	bpf_hash_init(ctx, CONFDIR "/bpf_pinning");
+>> +	ret = bpf_hash_init(ctx, CONF_USR_DIR "/bpf_pinning");
+>> +	if (ret == -ENOENT)
+>> +		bpf_hash_init(ctx, CONF_ETC_DIR "/bpf_pinning");
+>>   
 > 
-> Yeah, I saw it, but I can't get excited about drivers trying to
-> correct delays.  I don't think this can be done automatically in a
-> reliable way, and so I expect that the few end users who are really
-> getting into the microseconds and nanoseconds will calibrate their
-> systems end to end, maybe even patching out this driver nonsense in
-> their kernels.
+> Luca spotted this one, other places prefer /etc over /use but in BPF it is swapped?
+
+Yeah, that's a mistake. Thanks for spotting it. Fixed.
+
+>> -static void
+>> +static int
+>>   rtnl_hash_initialize(const char *file, struct rtnl_hash_entry **hash, int size)
+>>   {
+>>   	struct rtnl_hash_entry *entry;
+>> @@ -67,14 +69,14 @@ rtnl_hash_initialize(const char *file, struct rtnl_hash_entry **hash, int size)
+>>   
+>>   	fp = fopen(file, "r");
+>>   	if (!fp)
+>> -		return;
+>> +		return -errno;
+>>   
+>>   	while ((ret = fread_id_name(fp, &id, &namebuf[0]))) {
+>>   		if (ret == -1) {
+>>   			fprintf(stderr, "Database %s is corrupted at %s\n",
+>>   					file, namebuf);
+>>   			fclose(fp);
+>> -			return;
+>> +			return -1;
 > 
+> Having some errors return -errno and others return -1 is confusing.
+> Perhaps -EINVAL?
 
-Thanks for your reading and commenting on my patch. As the commit message 
-elaborates, the Patch corrects for the MAC-internal delays (this is neither PHY 
-delays nor cable delays), that arise from the timestamps not being taken at the 
-packet egress, but at an internal point in the MAC. The compensation values are 
-read from internal registers of the hardware since these values depend on the 
-actual operational mode of the MAC and on the MII link. I have done extensive 
-testing, and as far as my results are concerned, this is reliable at least on 
-the i.MX8MP Hardware I can access for testing. I would actually like correct 
-this on other MACs too, but they are often poorly documented. I have to admit 
-that the DWMAC is one of the first hardwares I encountered with proper 
-documentation. The driver admittedly still has room for improvements - so here 
-we go...
+The code was just relaying the -1 received from fread_id_name, but it 
+makes sense to use -EINVAL instead. Changed.
 
-Nevertheless, there is still PHY delays to be corrected for, but I need to 
-extend the PHY framework for querying the clause 45 registers to account for 
-the PHY delays (which are even a larger factor of). I plan to send another 
-series fixing this, but this still needs some cleanup being done.
 
-Also on a side-note, "driver nonsense" sounds a bit harsh from someone always 
-insisting that one should not compensate for bad drivers in the userspace stack 
-and instead fixing driver and hardware issues in the kernel, don't you think?
-
-> Having said that, I won't stand in the way of such driver stuff.
-> After all, who cares about a few microseconds time error one way or
-> the other?
-
-I do, and so does my customer. If you want to reach sub-microsecond accuracy 
-with a linuxptp setup (which is absolutely feasible on COTS hardware), you have 
-to take these things into account. I did quite extensive tests, and measuring 
-the peer delay as precisely as possible is one of the key steps in getting 
-offsets down between physical nodes. As I use the PHCs to recover clocks with 
-as low phase offset as possible, the peer delays matter, as they add phase 
-error. At the moment, this patch reduces the offset of approx 150ns to <50ns in 
-a real world application, which is not so bad for a few lines of code, i guess...
-
-I don't want to kick off a lengthy discussion here (especially since Jakub 
-already picked the patch to next), but maybe this mail can help for 
-clarification in the future, when the next poor soul does work on the hwtstamps 
-in the dwmac.
-
-Thanks, also for keeping linuxptp going,
-Johannes
-
+>> +		/* only consider filenames not present in /etc */
+>> +		snprintf(path, sizeof(path), "%s/%s", dirpath_etc, de->d_name);
+>> +		if (lstat(path, &sb) == 0)
+>> +			continue;
 > 
-> Thanks,
-> Richard
+> Do you want lstat() it will return 0 it is a symlink to non existent target.
+
+Yes, lstat is the right function IMO. Other programs that follow the 
+stateless pattern also use lstat. By making a symlink, the sysadmin 
+stated their intention to override a setting. The code should fail 
+reading the target rather than silently skipping the override.
+
+
+>> +		/* load the conf file in /etc */
+>> +		snprintf(path, sizeof(path), "%s/%s", dirpath_etc, de->d_name);
+>> +		if (is_tab)
+>> +			rtnl_tab_initialize(path, (char**)tabhash, size);
+>> +		else
+>> +			rtnl_hash_initialize(path, (struct rtnl_hash_entry**)tabhash, size);
 > 
-> 
+> I would prefer that generic function not loose all type information.
+> Maybe using a union for the two possible usages? Or type specific callback instead of is_tab.
+
+Makes sense. Changed to use a enum/union.
+
+
+ >> +	/* load /usr/lib/iproute2/foo.d/X conf files, unless 
+/etc/iproute2/foo.d/X exists */
+ >> +	d = opendir(dirpath_usr);
+ >> +	while (d && (de = readdir(d)) != NULL) {
+ >> +		char path[PATH_MAX];
+ >> +		size_t len;
+ >> +		struct stat sb;
+ >> +
+ >> +		if (*de->d_name == '.')
+ >> +			continue;
+ >> +
+ >> +		/* only consider filenames ending in '.conf' */
+ >> +		len = strlen(de->d_name);
+ >> +		if (len <= 5)
+ >> +			continue;
+ >> +		if (strcmp(de->d_name + len - 5, ".conf"))
+ >> +			continue;
+ >> +
+ >> +		/* only consider filenames not present in /etc */
+ >> +		snprintf(path, sizeof(path), "%s/%s", dirpath_etc, de->d_name);
+ >> +		if (lstat(path, &sb) == 0)
+ >> +			continue;
+ >> +
+ >> +		/* load the conf file in /usr */
+ >> +		snprintf(path, sizeof(path), "%s/%s", dirpath_usr, de->d_name);
+ >> +		if (is_tab)
+ >> +			rtnl_tab_initialize(path, (char**)tabhash, size);
+ >> +		else
+ >> +			rtnl_hash_initialize(path, (struct rtnl_hash_entry**)tabhash, size);
+ >> +	}
+ >> +	if (d)
+ >> +		closedir(d);
+ >> +
+ >> +	/* load /etc/iproute2/foo.d/X conf files */
+ >> +	d = opendir(dirpath_etc);
+ >> +	while (d && (de = readdir(d)) != NULL) {
+ >> +		char path[PATH_MAX];
+ >> +		size_t len;
+ >> +
+ >> +		if (*de->d_name == '.')
+ >> +			continue;
+ >> +
+ >> +		/* only consider filenames ending in '.conf' */
+ >> +		len = strlen(de->d_name);
+ >> +		if (len <= 5)
+ >> +			continue;
+ >> +		if (strcmp(de->d_name + len - 5, ".conf"))
+ >> +			continue;
+ >> +
+ >> +		/* load the conf file in /etc */
+ >> +		snprintf(path, sizeof(path), "%s/%s", dirpath_etc, de->d_name);
+ >> +		if (is_tab)
+ >> +			rtnl_tab_initialize(path, (char**)tabhash, size);
+ >> +		else
+ >> +			rtnl_hash_initialize(path, (struct rtnl_hash_entry**)tabhash, size);
+ >> +	}
+ >> +	if (d)
+ >> +		closedir(d);
+ >
+ > Why is code copy/pasted here instead of making a function?
+
+Because it deals with different paths in slightly different ways, has 
+different comments, and is only a few lines long, so an extra level of 
+indirection may be excessive.
+
+However I see your point and I have extracted the code into a separate 
+function in v4.
+
+ > Seems sloppy to me.
+
+BTW, this comment seems a bit unkind, given that the current iproute2 
+code carries multiple exact copies of the .d lookup code and this patch 
+_reduces_ the amount of duplication.
+
+Regards,
 
 -- 
-Pengutronix e.K.                | Johannes Zink                  |
-Steuerwalder Str. 21            | https://www.pengutronix.de/    |
-31137 Hildesheim, Germany       | Phone: +49-5121-206917-0       |
-Amtsgericht Hildesheim, HRA 2686| Fax:   +49-5121-206917-5555    |
-
+Gioele Barabucci
 
