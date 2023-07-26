@@ -1,205 +1,226 @@
-Return-Path: <netdev+bounces-21436-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21437-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 008BE7639B6
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 16:58:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 485957639C6
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 17:00:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AEE32280C08
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 14:58:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6D663281E4A
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 15:00:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B88F51DA45;
-	Wed, 26 Jul 2023 14:58:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 590D01DA47;
+	Wed, 26 Jul 2023 15:00:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD70C1DA22
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 14:58:19 +0000 (UTC)
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31FB7C1
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 07:58:18 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-573cacf4804so83129127b3.1
-        for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 07:58:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690383497; x=1690988297;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=lBhaCl8hvaO5jdm15wrzz1B5v3mtcR3NB5eQ6Ev+f8k=;
-        b=VQrXyOLYjRljirRGNue5Ze/fScjnvfQdT6p9FM5EjRnzKRTU+wr1Td9iPc2BJ2pLto
-         lnGDlEJPDzy7baH2uiqyLxV/3xYZQBIYOsxwJf5DJmuDMFXEGKLGOmhZ1eSm84MmYpVE
-         i0f04PGF8YNeRwWLk9Ijp7EuB+YlM2KkhkAWzxosMo6umHpJJ/Gc/mDwSVZEir2Se7UW
-         9XDpei+xdJI5WT9arZnLj/I4ywOVpR284eSSvMRUxzl1DrKyLkXo5deuIJ18ljF5OKtM
-         UJGpIeWa0cjW0MS8irse8GBC3ZCN9RWsblhqrKsqZyzS3YZJf4OLKlL4BEF6xJxKz9+C
-         NMDQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690383497; x=1690988297;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=lBhaCl8hvaO5jdm15wrzz1B5v3mtcR3NB5eQ6Ev+f8k=;
-        b=JDETzUsC7tVGxKBqiAbfU9sTwy5a9ouJbRqLHCy4yv8KcmO+nDwxku6Doxzc3ydw0T
-         WhWDCrL8HEJHTWws38dX/a9cjwMW38U0pCqo48zRN8JeO7Z6bTzCasl+kj9zJ/Ba9+UH
-         mWtJoDEXE24BpFMmVaM7lAtCXJ+0mx9UMOHi34g/yQhA7okqRNi0GgUSNsYtDP+hd1zC
-         JEH0rzZmEtvf94qqMQOZlAzRLvOXQym7a0kJyr1UgN+lLup0O0ahKojPzTRUenf1Na0X
-         JWwvyAahnEUjFE9fet4K+wRjqygZXyVSTnDTXgofYPzdyzr9E9nsPsHWhl834putZjPA
-         5VRg==
-X-Gm-Message-State: ABy/qLYIwIpRi4kvfIzUBbX5toIp9Hq0k8ucd0fpLm3FEP2MBUF2bnNE
-	zm3MgTp/RzXdKcBydesJGnD1bMbSg0Tj6A==
-X-Google-Smtp-Source: APBJJlG/zq2UmA4gheKN7bDk0oA2Lo4/JEJcxrmW73g/lx5coPEzfmIisd1sEZLAKvYFtgqlDd0a5IJ4VfhzpA==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a81:ac04:0:b0:576:6e4e:b87f with SMTP id
- k4-20020a81ac04000000b005766e4eb87fmr19827ywh.10.1690383497414; Wed, 26 Jul
- 2023 07:58:17 -0700 (PDT)
-Date: Wed, 26 Jul 2023 14:58:15 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44EB11DA3E
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 15:00:55 +0000 (UTC)
+Received: from EUR01-VE1-obe.outbound.protection.outlook.com (mail-ve1eur01on2049.outbound.protection.outlook.com [40.107.14.49])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49995CE
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 08:00:52 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=VCfoOPvCMrNNcuBktvN1xK3pgfnh4RCSP72MKHkcguMnKPAhNNgIHPFO/SddolvmB8NzEPthJi/csocwDdinjf6MEUySxPQ2GxarYqvly9qxf1xZDP4vY9b0sbfShoauWkVAuDwVEfENc4wtjP+bYas2vpWUdyWWq+AJmW28ouuu0TLRBQJMvPU1VBdcI5UVbgmbQuSjRuXlmCnTvAXzp9xfEdosJ9NVwNPztxhOqRx+qkx5Avj8hF0DWIS55FSxZHZydNESdd7ko2/WXjpnzCqt+8gvm/xFYbboKANcCnr8e+m3m2fuCLYR0wBhYqjHj2MXN760G9sYKpV4QhKfmg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=BwS0P9AFgb4pxb8y6ZAQZa3OS+wndRrVVkyZKDpnMLY=;
+ b=F7UY0ailveSBDQNnpgQSalltJ+duYy0TO4B5sZaU8euNS7jDzTOTRz3qxXYph6L5Y3uGU1+SZhzP24Orl2HMHNG3dr2gliBmWlURH0/RDB5KcWmm90X5b1AEr1U0IfjNPjmxVibdVr6WAZpgNATNH/pDMQjaW+w6LnCwjr/6sXBUsiu7R7xhwBEVsvNEEF4L5oZZCF6yrXzK2GI7R6PouIRtONgIcIeSTz8igWB4ho9QjKSDgbsI5W4oBJC+tFyRFZpd6qrRKdHMHy4KWQ8l47ZYpKGcXWX4MuxMEUuIU4chx+f3iVW8piGYuA1gKahi/qF4bblrRPLEqzpj4wJfRw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=BwS0P9AFgb4pxb8y6ZAQZa3OS+wndRrVVkyZKDpnMLY=;
+ b=NW5r4XIf1DBGaqvDNvJixnOGqPCQukPJaXYGZb776RBVdFAB+ypeRHyVkPFMkPtkBKT0gRphuJwW1yTteWiPYv4pMSHJ5quxAg9OUQhjeM7cnrr7LnXnq1vxqxaA4hdciuvJN9MoI2ERtBfOb+ID3C5M8WJGAjGB1Q9hJ3gsMLQ=
+Received: from PAXPR04MB9185.eurprd04.prod.outlook.com (2603:10a6:102:231::11)
+ by PAWPR04MB9888.eurprd04.prod.outlook.com (2603:10a6:102:385::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.29; Wed, 26 Jul
+ 2023 15:00:49 +0000
+Received: from PAXPR04MB9185.eurprd04.prod.outlook.com
+ ([fe80::d4ee:8daa:92f4:9671]) by PAXPR04MB9185.eurprd04.prod.outlook.com
+ ([fe80::d4ee:8daa:92f4:9671%3]) with mapi id 15.20.6631.026; Wed, 26 Jul 2023
+ 15:00:49 +0000
+From: Shenwei Wang <shenwei.wang@nxp.com>
+To: Russell King <linux@armlinux.org.uk>
+CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, Shawn Guo
+	<shawnguo@kernel.org>, dl-linux-imx <linux-imx@nxp.com>, Giuseppe Cavallaro
+	<peppe.cavallaro@st.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>, Sascha Hauer <s.hauer@pengutronix.de>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>, Fabio Estevam
+	<festevam@gmail.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-stm32@st-md-mailman.stormreply.com"
+	<linux-stm32@st-md-mailman.stormreply.com>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "imx@lists.linux.dev"
+	<imx@lists.linux.dev>, Frank Li <frank.li@nxp.com>
+Subject: RE: [EXT] Re: [PATCH] net: stmmac: dwmac-imx: pause the TXC clock in
+ fixed-link
+Thread-Topic: [EXT] Re: [PATCH] net: stmmac: dwmac-imx: pause the TXC clock in
+ fixed-link
+Thread-Index: AQHZvzEtwr0cB5x9EUCXrQC85+we9K/K+NqAgAEqaxA=
+Date: Wed, 26 Jul 2023 15:00:49 +0000
+Message-ID:
+ <PAXPR04MB91857EA7A0CECF71F961DC0B8900A@PAXPR04MB9185.eurprd04.prod.outlook.com>
+References: <20230725194931.1989102-1-shenwei.wang@nxp.com>
+ <ZMA45XUMM94GTjHx@shell.armlinux.org.uk>
+In-Reply-To: <ZMA45XUMM94GTjHx@shell.armlinux.org.uk>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PAXPR04MB9185:EE_|PAWPR04MB9888:EE_
+x-ms-office365-filtering-correlation-id: f4c93cd3-3b03-46b5-f1de-08db8de91934
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ iLAPyuaamXlZHmdBV9MENcxo8b0nRcxP8ud3e4Pa4WVj1z+G0UZmHAp+pvAAXPmb4Ul1Og4Y9SZAJnfrvgGbKYtTes5etyeE9WpP1I3lqMI2HgrhTdlsnxA7Ad05cITdCFSymnxnTeNYFldtioXpG/Q6uCrvcIkkMYr7BqV7ULK/A7ERjDIE8otA1k/TpmviagwMol2V55W1jW7+WVZ4jzMVO9Gi/4YXDYcXQXJerbi/Kv7xTFJAhREFR8WI4BBYv4HCpmtSSaG0uZqeksq5LDOhU7L6LOr1wfW+GaOibVd7xIVgKA/bZd3hxx7lEZMk1HjhKtm/s+Nr3jcIjojPw986onjOCtgHHJNsgBqLDunWIoJk+L2ZoXtaD+jRsQpesjuyl/T4RU8Q/i8RupkAaQsIzGVdPr4E/BNxRn+5HmM2n/vbkVqgefuVHGhXzwRqL4chBBw0M98jcRApMqKKyTNCxV6sPBq/HtZ/dn8C9CVQfhwZTNR26nSYztHnbgRfGFNGAHlYXtOc4jfL+q04XFEdpAzemjBeLXSg9weWIcdufQMsZ+3q03IKnus1xdDInYrgrW6CFcydNDiuPsY7apFflNFbbrUoVdqb2PiSa60=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB9185.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(346002)(376002)(396003)(136003)(366004)(451199021)(2906002)(122000001)(54906003)(52536014)(7696005)(71200400001)(45080400002)(5660300002)(478600001)(8936002)(8676002)(44832011)(64756008)(38070700005)(66446008)(66556008)(76116006)(66476007)(66946007)(6916009)(4326008)(316002)(55016003)(7416002)(38100700002)(41300700001)(55236004)(53546011)(26005)(6506007)(33656002)(186003)(86362001)(83380400001)(966005)(9686003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?uX5xaqRCqOHnkNRofSxpvCHG+MO2NIH0gnew1lPvf94M4IIxvswUb/L2rmHJ?=
+ =?us-ascii?Q?jvksyR2NYGtitIttRcUigfxH99ZJODSKDafqsgGsRRpBGPSeTZ4XkDKkxVb7?=
+ =?us-ascii?Q?I9SccDhL3GrlJad+cgvmOCTsykhXgt8H/xtBOWy2Ckz76Sn1Q8ECBURpvEpl?=
+ =?us-ascii?Q?r960zYBuSgNURlrY9UZE5f9o0p2nMfHZAXMRrCjfdjXomSVta523IdGSLs1E?=
+ =?us-ascii?Q?I3Qe4aFIp81nyYwxTwGMKloy0LA9bbsLPq4mD5hmmN8TIr6HFuohOQTjhDK3?=
+ =?us-ascii?Q?M3IGAaTIhsUZpEnqBMxPr+xEJCARwFmr9Wg1jQoJS9r5/3fdrqB3KngH96Kq?=
+ =?us-ascii?Q?cuFA5W2niCX4+lLSiDv5JNLYX6djcR4s2aeJTPTkHMR6+L5/1fk2nI+nH8B3?=
+ =?us-ascii?Q?eqDk6s+k241vu8p5IXSPA/fyiYRiVr+x7y5Pcc2h3nIe29h9naZ54e+TYMnH?=
+ =?us-ascii?Q?x2jt4XUreISUvTkjKxe0TwlRhn1E6E5ZOad/O2Oaqmwsqt2TtAOshsQsPurU?=
+ =?us-ascii?Q?0w0RJVQ61/OInO/pyqoaxk3s9A7znkoaR8xvsMIFD1WxMzug+5zbRPw8dOug?=
+ =?us-ascii?Q?CJcc6rbordxF4Qu/vm4chB3CJJTXh/2E1XSfcM5lRlT5Q1m9srr7qvMeFmQv?=
+ =?us-ascii?Q?gpuaMGehdYykLxGFC+rI8uQbrpGJP680yL0NSmn0CNRQgaX1XprQsJ0+nUKR?=
+ =?us-ascii?Q?0uxM23m5rR6itWsS0e/l/WFBftdHs+fznrkhOQ6DcON/w4JMeZEDl3hE+LkS?=
+ =?us-ascii?Q?OjJuOqOW6TTLOlaslTNkL0INZEUN6Awv/93yhyepjnL4NDsituDTMbAjCxaz?=
+ =?us-ascii?Q?jhSWo2q9QhYXKOc2YlYqukzT/z2PVLvMNQUuEwVk1aGgi/PR8oOcbg448oYK?=
+ =?us-ascii?Q?QBhxvOmtxMuFJviYv8xr7nZhBdpdEehvjuXa2J2+oTZaRJ9LeCeKZ0bk6/m+?=
+ =?us-ascii?Q?CzX8Xaqo66egZXA1n9RK2fYzziG/awSfwpj7fZWbk++70o3jHb8Erqd/6zVU?=
+ =?us-ascii?Q?BFn87/0UBwCm9yD+C1BBDi9GEojdlSsHFLOl7bWYzRWEzoxxb7CKZ5cBKuUV?=
+ =?us-ascii?Q?nn24yo99PGTDl9z1a7SKcP8cH+qqegZfNDUxUKRKvd2HMLwc3Eui0kcVNm6A?=
+ =?us-ascii?Q?Zh1M+fJTifDnjISNBwhrrANdiuiG/M3DJLfCtm7Zs/gahM4B52mYlLI/4dzg?=
+ =?us-ascii?Q?HTgRhSrJ/bXT5aiNTC0RwKwqnaw0s4KyLf2JDRxNJCj/IS3/N3rXCQelWsv7?=
+ =?us-ascii?Q?Q0cx1RILfh/snxM+gibinxnAqF7k1QuNbH+G+DNj/ge+hsUaqkkydzolubpQ?=
+ =?us-ascii?Q?lSRH/jajuEuekXKIDJrGfI36Z6NEa9cbjK1l1bhcHOkO/VaGxt4LgCxb31yp?=
+ =?us-ascii?Q?/lOLhQDGGznMGiioMyuLvdMeYMX3BUDO9nux7UjrglRQXTXTiwNUDxsfUSoV?=
+ =?us-ascii?Q?3TOLm1a1MyEAoJ65Ox+s9qV28fJXV0XxltU3QrdTDPmJhU09ATOR+8s0Rkug?=
+ =?us-ascii?Q?Sd9w5syjqtppZmpJ+c27p7PSTyfRFjD1uGnkkdIfz/+WRWumX2T+OhgoI+Cj?=
+ =?us-ascii?Q?Z4SM7DJRwZN1TZqBI/BvvvtayhB0FiTCdO5WeZfi?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.41.0.487.g6d72f3e995-goog
-Message-ID: <20230726145815.943910-1-edumazet@google.com>
-Subject: [PATCH v2 net] net: flower: fix stack-out-of-bounds in fl_set_key_cfm()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
-	Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, syzbot <syzkaller@googlegroups.com>, 
-	Zahari Doychev <zdoychev@maxlinear.com>, Simon Horman <simon.horman@corigine.com>, 
-	Ido Schimmel <idosch@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-	autolearn=ham autolearn_force=no version=3.4.6
+MIME-Version: 1.0
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB9185.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f4c93cd3-3b03-46b5-f1de-08db8de91934
+X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Jul 2023 15:00:49.2435
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: T5N5zoqjy9b8V6fzkFFetFqX6a1PiHDsh8QKscl4UYt7vCD0sDaPJ5ZMQf/PEMbq4hNtAvQObDBOSOtakMF7KA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAWPR04MB9888
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Typical misuse of
 
-	nla_parse_nested(array, XXX_MAX, ...);
 
-array must be declared as
+> -----Original Message-----
+> From: Russell King <linux@armlinux.org.uk>
+> Sent: Tuesday, July 25, 2023 4:05 PM
+> To: Shenwei Wang <shenwei.wang@nxp.com>
+> Cc: David S. Miller <davem@davemloft.net>; Eric Dumazet
+> <edumazet@google.com>; Jakub Kicinski <kuba@kernel.org>; Paolo Abeni
+> <pabeni@redhat.com>; Maxime Coquelin <mcoquelin.stm32@gmail.com>;
+> Shawn Guo <shawnguo@kernel.org>; dl-linux-imx <linux-imx@nxp.com>;
+> Giuseppe Cavallaro <peppe.cavallaro@st.com>; Alexandre Torgue
+> <alexandre.torgue@foss.st.com>; Jose Abreu <joabreu@synopsys.com>; Sascha
+> Hauer <s.hauer@pengutronix.de>; Pengutronix Kernel Team
+> <kernel@pengutronix.de>; Fabio Estevam <festevam@gmail.com>;
+> netdev@vger.kernel.org; linux-stm32@st-md-mailman.stormreply.com; linux-
+> arm-kernel@lists.infradead.org; imx@lists.linux.dev; Frank Li <frank.li@n=
+xp.com>
+> Subject: [EXT] Re: [PATCH] net: stmmac: dwmac-imx: pause the TXC clock in
+> fixed-link
+>
+> Caution: This is an external email. Please take care when clicking links =
+or
+> opening attachments. When in doubt, report the message using the 'Report =
+this
+> email' button
+>
+>
+> On Tue, Jul 25, 2023 at 02:49:31PM -0500, Shenwei Wang wrote:
+> > +static bool imx_dwmac_is_fixed_link(struct imx_priv_data *dwmac) {
+> > +     struct plat_stmmacenet_data *plat_dat;
+> > +     struct device_node *dn;
+> > +
+> > +     if (!dwmac || !dwmac->plat_dat)
+> > +             return false;
+> > +
+> > +     plat_dat =3D dwmac->plat_dat;
+> > +     dn =3D of_get_child_by_name(dwmac->dev->of_node, "fixed-link");
+> > +     if (!dn)
+> > +             return false;
+> > +
+> > +     if (plat_dat->phy_node =3D=3D dn || plat_dat->phylink_node =3D=3D=
+ dn)
+> > +             return true;
+>
+> Why would the phy_node or the phylink_node ever be pointing at the fixed-=
+link
+> node?
+>
 
-	struct nlattr *array[XXX_MAX + 1];
+The logic was learned from the function of stmmac_probe_config_dt, and it n=
+ormally
+save the phy handle to those two members: phy_node and phylink_node. But se=
+ems
+checking phy_node is enough here, right?
 
-v2: Based on feedbacks from Ido Schimmel and Zahari Doychev,
-I also changed TCA_FLOWER_KEY_CFM_OPT_MAX and cfm_opt_policy
-definitions.
+        plat->phy_node =3D of_parse_phandle(np, "phy-handle", 0);
 
-syzbot reported:
+        /* PHYLINK automatically parses the phy-handle property */
+        plat->phylink_node =3D np;
 
-BUG: KASAN: stack-out-of-bounds in __nla_validate_parse+0x136/0x2bd0 lib/nlattr.c:588
-Write of size 32 at addr ffffc90003a0ee20 by task syz-executor296/5014
+> For one, phylink expects the fwnode being passed to it to be pointing at =
+the
+> _parent_ node of the fixed-link node, since it looks up from the parent f=
+or
+> "fixed-link" node.
+>
 
-CPU: 0 PID: 5014 Comm: syz-executor296 Not tainted 6.5.0-rc2-syzkaller-00307-gd192f5382581 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/12/2023
-Call Trace:
-<TASK>
-__dump_stack lib/dump_stack.c:88 [inline]
-dump_stack_lvl+0x1e7/0x2d0 lib/dump_stack.c:106
-print_address_description mm/kasan/report.c:364 [inline]
-print_report+0x163/0x540 mm/kasan/report.c:475
-kasan_report+0x175/0x1b0 mm/kasan/report.c:588
-kasan_check_range+0x27e/0x290 mm/kasan/generic.c:187
-__asan_memset+0x23/0x40 mm/kasan/shadow.c:84
-__nla_validate_parse+0x136/0x2bd0 lib/nlattr.c:588
-__nla_parse+0x40/0x50 lib/nlattr.c:700
-nla_parse_nested include/net/netlink.h:1262 [inline]
-fl_set_key_cfm+0x1e3/0x440 net/sched/cls_flower.c:1718
-fl_set_key+0x2168/0x6620 net/sched/cls_flower.c:1884
-fl_tmplt_create+0x1fe/0x510 net/sched/cls_flower.c:2666
-tc_chain_tmplt_add net/sched/cls_api.c:2959 [inline]
-tc_ctl_chain+0x131d/0x1ac0 net/sched/cls_api.c:3068
-rtnetlink_rcv_msg+0x82b/0xf50 net/core/rtnetlink.c:6424
-netlink_rcv_skb+0x1df/0x430 net/netlink/af_netlink.c:2549
-netlink_unicast_kernel net/netlink/af_netlink.c:1339 [inline]
-netlink_unicast+0x7c3/0x990 net/netlink/af_netlink.c:1365
-netlink_sendmsg+0xa2a/0xd60 net/netlink/af_netlink.c:1914
-sock_sendmsg_nosec net/socket.c:725 [inline]
-sock_sendmsg net/socket.c:748 [inline]
-____sys_sendmsg+0x592/0x890 net/socket.c:2494
-___sys_sendmsg net/socket.c:2548 [inline]
-__sys_sendmsg+0x2b0/0x3a0 net/socket.c:2577
-do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-do_syscall_64+0x41/0xc0 arch/x86/entry/common.c:80
-entry_SYSCALL_64_after_hwframe+0x63/0xcd
-RIP: 0033:0x7f54c6150759
-Code: 48 83 c4 28 c3 e8 d7 19 00 00 0f 1f 80 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffe06c30578 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007f54c619902d RCX: 00007f54c6150759
-RDX: 0000000000000000 RSI: 0000000020000280 RDI: 0000000000000003
-RBP: 00007ffe06c30590 R08: 0000000000000000 R09: 00007ffe06c305f0
-R10: 0000000000000000 R11: 0000000000000246 R12: 00007f54c61c35f0
-R13: 00007ffe06c30778 R14: 0000000000000001 R15: 0000000000000001
-</TASK>
+Yes,  the above line of code passes the parent node to phylink_node.
 
-The buggy address belongs to stack of task syz-executor296/5014
-and is located at offset 32 in frame:
-fl_set_key_cfm+0x0/0x440 net/sched/cls_flower.c:374
+Thanks,
+Shenwei
 
-This frame has 1 object:
-[32, 56) 'nla_cfm_opt'
-
-The buggy address belongs to the virtual mapping at
-[ffffc90003a08000, ffffc90003a11000) created by:
-copy_process+0x5c8/0x4290 kernel/fork.c:2330
-
-Fixes: 7cfffd5fed3e ("net: flower: add support for matching cfm fields")
-Reported-by: syzbot <syzkaller@googlegroups.com>
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Cc: Zahari Doychev <zdoychev@maxlinear.com>
-Cc: Simon Horman <simon.horman@corigine.com>
-Cc: Ido Schimmel <idosch@nvidia.com>
----
- include/uapi/linux/pkt_cls.h | 4 +++-
- net/sched/cls_flower.c       | 5 +++--
- 2 files changed, 6 insertions(+), 3 deletions(-)
-
-diff --git a/include/uapi/linux/pkt_cls.h b/include/uapi/linux/pkt_cls.h
-index 7865f5a9885b9bc12332448418cfef8214391f09..4f3932bb712dcd9d5b5b5eb2252efee784abc7e5 100644
---- a/include/uapi/linux/pkt_cls.h
-+++ b/include/uapi/linux/pkt_cls.h
-@@ -710,9 +710,11 @@ enum {
- 	TCA_FLOWER_KEY_CFM_OPT_UNSPEC,
- 	TCA_FLOWER_KEY_CFM_MD_LEVEL,
- 	TCA_FLOWER_KEY_CFM_OPCODE,
--	TCA_FLOWER_KEY_CFM_OPT_MAX,
-+	__TCA_FLOWER_KEY_CFM_OPT_MAX,
- };
- 
-+#define TCA_FLOWER_KEY_CFM_OPT_MAX (__TCA_FLOWER_KEY_CFM_OPT_MAX - 1)
-+
- #define TCA_FLOWER_MASK_FLAGS_RANGE	(1 << 0) /* Range-based match */
- 
- /* Match-all classifier */
-diff --git a/net/sched/cls_flower.c b/net/sched/cls_flower.c
-index 8da9d039d964ea417700a2f59ad95a9ce52f5eab..9f0711da9c95907cf5c7fdbef74538a59f8b1a36 100644
---- a/net/sched/cls_flower.c
-+++ b/net/sched/cls_flower.c
-@@ -776,7 +776,8 @@ mpls_stack_entry_policy[TCA_FLOWER_KEY_MPLS_OPT_LSE_MAX + 1] = {
- 	[TCA_FLOWER_KEY_MPLS_OPT_LSE_LABEL]    = { .type = NLA_U32 },
- };
- 
--static const struct nla_policy cfm_opt_policy[TCA_FLOWER_KEY_CFM_OPT_MAX] = {
-+static const struct nla_policy
-+cfm_opt_policy[TCA_FLOWER_KEY_CFM_OPT_MAX + 1] = {
- 	[TCA_FLOWER_KEY_CFM_MD_LEVEL]	= NLA_POLICY_MAX(NLA_U8,
- 						FLOW_DIS_CFM_MDL_MAX),
- 	[TCA_FLOWER_KEY_CFM_OPCODE]	= { .type = NLA_U8 },
-@@ -1709,7 +1710,7 @@ static int fl_set_key_cfm(struct nlattr **tb,
- 			  struct fl_flow_key *mask,
- 			  struct netlink_ext_ack *extack)
- {
--	struct nlattr *nla_cfm_opt[TCA_FLOWER_KEY_CFM_OPT_MAX];
-+	struct nlattr *nla_cfm_opt[TCA_FLOWER_KEY_CFM_OPT_MAX + 1];
- 	int err;
- 
- 	if (!tb[TCA_FLOWER_KEY_CFM])
--- 
-2.41.0.487.g6d72f3e995-goog
-
+> --
+> RMK's Patch system:
+> https://www.ar/
+> mlinux.org.uk%2Fdeveloper%2Fpatches%2F&data=3D05%7C01%7Cshenwei.wang
+> %40nxp.com%7Cd5a4b8372a4a4e5092b008db8d52c6ce%7C686ea1d3bc2b4c6f
+> a92cd99c5c301635%7C0%7C0%7C638259158876867949%7CUnknown%7CTWF
+> pbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6
+> Mn0%3D%7C3000%7C%7C%7C&sdata=3DXPNpTlv7jbmOfeiQL5w0A6M2c3p5AOiT
+> UOGg73ijFb8%3D&reserved=3D0
+> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
