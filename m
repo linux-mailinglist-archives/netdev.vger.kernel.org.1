@@ -1,214 +1,162 @@
-Return-Path: <netdev+bounces-21595-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21596-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3C80763F6A
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 21:19:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1288F763F6D
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 21:20:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F1F581C212F0
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 19:19:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C133C281DF9
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 19:20:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89F0D4CE96;
-	Wed, 26 Jul 2023 19:19:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C51E84CE97;
+	Wed, 26 Jul 2023 19:20:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CF3D4CE68
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 19:19:50 +0000 (UTC)
-Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A478E271C
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 12:19:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1690399188; x=1721935188;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=lF8CTnUAZRbA3b9HAtXZQKj6RYRt60rP8Jrkx6clZKc=;
-  b=G/bI72tvptxjeFp5mIVruYolMMHBpKD9K+hNXC/WWqsBsSjzN+SOGdwL
-   FQD99nZiqtd2jQzMM7n8UH/hkcpn5620n4nkWlsaM7+HcQUWSpkD2IK5R
-   ZmZ/yQj/9QJ1ibAndFMSQp8KldcsCNPwK2Rrs0kP0XawaLHL20AH7uAkn
-   k=;
-X-IronPort-AV: E=Sophos;i="6.01,232,1684800000"; 
-   d="scan'208";a="18717985"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-iad-1e-m6i4x-a65ebc6e.us-east-1.amazon.com) ([10.25.36.214])
-  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jul 2023 19:19:45 +0000
-Received: from EX19MTAUWB002.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
-	by email-inbound-relay-iad-1e-m6i4x-a65ebc6e.us-east-1.amazon.com (Postfix) with ESMTPS id 792F46702C;
-	Wed, 26 Jul 2023 19:19:44 +0000 (UTC)
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Wed, 26 Jul 2023 19:19:40 +0000
-Received: from 88665a182662.ant.amazon.com.com (10.187.171.26) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Wed, 26 Jul 2023 19:19:37 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Vinicius Costa Gomes <vinicius.gomes@intel.com>, "Jamal
- Hadi Salim" <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, "Jiri
- Pirko" <jiri@resnulli.us>
-CC: Vedang Patel <vedang.patel@intel.com>, Kuniyuki Iwashima
-	<kuniyu@amazon.com>, Kuniyuki Iwashima <kuni1840@gmail.com>,
-	<netdev@vger.kernel.org>, syzkaller <syzkaller@googlegroups.com>
-Subject: [PATCH v2 net] net/sched: taprio: Limit TCA_TAPRIO_ATTR_SCHED_CYCLE_TIME to INT_MAX.
-Date: Wed, 26 Jul 2023 12:19:28 -0700
-Message-ID: <20230726191928.50768-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8A034CE68
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 19:20:36 +0000 (UTC)
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E04A271C;
+	Wed, 26 Jul 2023 12:20:34 -0700 (PDT)
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36QJDju9014729;
+	Wed, 26 Jul 2023 19:20:24 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : references : date : in-reply-to : message-id : mime-version :
+ content-type; s=pp1; bh=ULMQmjsjYc30tFAsSDGfTwUEtxmLnFVMNahNtH53+Lk=;
+ b=F96ixHS6BPhHO4lQmmVer/GPurx42EFg/eR5AJcqCAK+0qFzk3Itx99mpxslZLORuT/3
+ MUD5gvajYpcxyKT62eBg8llT7XWTZE3hjDDUwZrG6SMcmP+qtLsDBSI4LjjwhvmNNOoO
+ GYRlNfiUm5gMPmPxTfjq1ow8FHI4zZmcewcpmMJv5xERuql7faRSpxjOX1l0JW0b6yu3
+ wSdkwPZKjblhpageWE9ZHGpPi0PcLiLUjhLs4M+Ro6MY5QSjfOGZnUV3J+RmJm2YkYOy
+ MZXhlXaCOvx7h/z5Ja76aWYz/vtdY57Oea+l/VKCjW2MCCSvPqI+nq4k+Mcpdi98lDif 5A== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3s39f9r5wb-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 26 Jul 2023 19:20:24 +0000
+Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 36QJEVpk016128;
+	Wed, 26 Jul 2023 19:20:23 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3s39f9r5vx-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 26 Jul 2023 19:20:23 +0000
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 36QINM3g002181;
+	Wed, 26 Jul 2023 19:20:22 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3s0unjq0bj-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 26 Jul 2023 19:20:22 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 36QJKLCm18285264
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 26 Jul 2023 19:20:21 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 027DB20040;
+	Wed, 26 Jul 2023 19:20:21 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id A7BB820043;
+	Wed, 26 Jul 2023 19:20:20 +0000 (GMT)
+Received: from tuxmaker.linux.ibm.com (unknown [9.152.85.9])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Wed, 26 Jul 2023 19:20:20 +0000 (GMT)
+From: Sven Schnelle <svens@linux.ibm.com>
+To: David Howells <dhowells@redhat.com>
+Cc: Ondrej =?utf-8?B?TW9zbsOhxI1law==?= <omosnacek@gmail.com>,
+        Linux Crypto
+ Mailing List
+ <linux-crypto@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+        regressions@lists.linux.dev,
+        Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>,
+        Harald Freudenberger
+ <freude@linux.vnet.ibm.com>
+Subject: Re: Another regression in the af_alg series (s390x-specific)
+References: <CAAUqJDuRkHE8fPgZJGaKjUjd3QfGwzfumuJBmStPqBhubxyk_A@mail.gmail.com>
+	<15125.1690385912@warthog.procyon.org.uk>
+Date: Wed, 26 Jul 2023 21:20:20 +0200
+In-Reply-To: <15125.1690385912@warthog.procyon.org.uk> (David Howells's
+	message of "Wed, 26 Jul 2023 16:38:32 +0100")
+Message-ID: <yt9dsf9abhu3.fsf@linux.ibm.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.0.50 (gnu/linux)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-Originating-IP: [10.187.171.26]
-X-ClientProxiedBy: EX19D042UWB001.ant.amazon.com (10.13.139.160) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
-Precedence: Bulk
-X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-	T_SCC_BODY_TEXT_LINE,T_SPF_PERMERROR,URIBL_BLOCKED autolearn=ham
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: CXFDiluuVty54R36xuRWSL3pcgzLR6cH
+X-Proofpoint-ORIG-GUID: nw-JBIwxoc_g9VInTnoRyxFLBqafpeHa
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-07-26_08,2023-07-26_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=790
+ lowpriorityscore=0 bulkscore=0 spamscore=0 malwarescore=0 adultscore=0
+ mlxscore=0 suspectscore=0 priorityscore=1501 clxscore=1011 impostorscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2306200000 definitions=main-2307260171
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-syzkaller found zero division error [0] in div_s64_rem() called from
-get_cycle_time_elapsed(), where sched->cycle_time is the divisor.
+David Howells <dhowells@redhat.com> writes:
 
-We have tests in parse_taprio_schedule() so that cycle_time will never
-be 0, and actually cycle_time is not 0 in get_cycle_time_elapsed().
+> Well, I can reproduce it fairly easily.  It seems to be:
+>
+> 	static inline void scatterwalk_start(struct scatter_walk *walk,
+> 					     struct scatterlist *sg)
+> 	{
+> 		walk->sg = sg;
+> 		walk->offset = sg->offset;  <----
+> 	}
+>
+> Presumably sg is rubbish.
+>
+> Dump of assembler code for function gcm_walk_start:
+>    0x0000000000000038 <+0>:     jgnop   0x38 <gcm_walk_start>
+>    0x000000000000003e <+6>:     xc      8(64,%r2),8(%r2)
+>    0x0000000000000044 <+12>:    st      %r4,32(%r2)
+>    0x0000000000000048 <+16>:    stg     %r3,0(%r2)
+>    0x000000000000004e <+22>:    l       %r1,8(%r3)
+>    0x0000000000000052 <+26>:    st      %r1,8(%r2)
+>    0x0000000000000056 <+30>:    jg      0x56 <gcm_walk_start+30>
+>
+> I'm don't know much about s390x assembly, but I'm guessing %r2 has "walk" and
+> %r3 has "sg".
 
-The problem is that the types of divisor are different; cycle_time is
-s64, but the argument of div_s64_rem() is s32.
+Correct. I looked into this today, and it happens with c1abe6f570af
+("crypto: af_alg: Use extract_iter_to_sg() to create scatterlists"),
+but not with the commit before. It also only happens with
+arch/s390/crypto/aes_s390.c, but not with a generic aes implementation.
+I also see the s390 aes driver returning EBADMSG even when it's not
+crashing the kernel, so i wonder wether it's another problem in some
+error path.
 
-syzkaller fed this input and 0x100000000 is cast to s32 to be 0.
+I tried to understand the patch mentioned above, but i never worked with
+the crypto API in recent years, so that would require some learning on
+my side. Adding Harald, maybe he has some more insight.
 
-  @TCA_TAPRIO_ATTR_SCHED_CYCLE_TIME={0xc, 0x8, 0x100000000}
+> AS:0000000116d50007 R3:0000000000000024 
+> Fault in home space mode while using kernel ASCE.
+> Failing address: 0026070200000000 TEID: 0026070200000803
+> Unable to handle kernel pointer dereference in virtual kernel address space
+>
+> Krnl GPRS: 000000000000000c 0000038000000310 00000380002a7938 0026070200000000
+>            0000000000000000 0000000115593cb4 0000000000000000 0000000000000010
+>            0000000100000000 000000017e984690 000000000000000c 0000000000000000
+>            000003ffaf12cf98 0000000000000000 000003ff7fc536ba 00000380002a77e0
+>
+> I'm not sure what to make of the 0026070200000000.
 
-We use s64 for cycle_time to cast it to ktime_t, so let's keep it and
-set min/max for cycle_time.
-
-While at it, we prevent overflow in setup_txtime() and add another
-test in parse_taprio_schedule() to check if cycle_time overflows.
-
-[0]:
-divide error: 0000 [#1] PREEMPT SMP KASAN NOPTI
-CPU: 1 PID: 103 Comm: kworker/1:3 Not tainted 6.5.0-rc1-00330-g60cc1f7d0605 #3
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org 04/01/2014
-Workqueue: ipv6_addrconf addrconf_dad_work
-RIP: 0010:div_s64_rem include/linux/math64.h:42 [inline]
-RIP: 0010:get_cycle_time_elapsed net/sched/sch_taprio.c:223 [inline]
-RIP: 0010:find_entry_to_transmit+0x252/0x7e0 net/sched/sch_taprio.c:344
-Code: 3c 02 00 0f 85 5e 05 00 00 48 8b 4c 24 08 4d 8b bd 40 01 00 00 48 8b 7c 24 48 48 89 c8 4c 29 f8 48 63 f7 48 99 48 89 74 24 70 <48> f7 fe 48 29 d1 48 8d 04 0f 49 89 cc 48 89 44 24 20 49 8d 85 10
-RSP: 0018:ffffc90000acf260 EFLAGS: 00010206
-RAX: 177450e0347560cf RBX: 0000000000000000 RCX: 177450e0347560cf
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000100000000
-RBP: 0000000000000056 R08: 0000000000000000 R09: ffffed10020a0934
-R10: ffff8880105049a7 R11: ffff88806cf3a520 R12: ffff888010504800
-R13: ffff88800c00d800 R14: ffff8880105049a0 R15: 0000000000000000
-FS:  0000000000000000(0000) GS:ffff88806cf00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f0edf84f0e8 CR3: 000000000d73c002 CR4: 0000000000770ee0
-PKRU: 55555554
-Call Trace:
- <TASK>
- get_packet_txtime net/sched/sch_taprio.c:508 [inline]
- taprio_enqueue_one+0x900/0xff0 net/sched/sch_taprio.c:577
- taprio_enqueue+0x378/0xae0 net/sched/sch_taprio.c:658
- dev_qdisc_enqueue+0x46/0x170 net/core/dev.c:3732
- __dev_xmit_skb net/core/dev.c:3821 [inline]
- __dev_queue_xmit+0x1b2f/0x3000 net/core/dev.c:4169
- dev_queue_xmit include/linux/netdevice.h:3088 [inline]
- neigh_resolve_output net/core/neighbour.c:1552 [inline]
- neigh_resolve_output+0x4a7/0x780 net/core/neighbour.c:1532
- neigh_output include/net/neighbour.h:544 [inline]
- ip6_finish_output2+0x924/0x17d0 net/ipv6/ip6_output.c:135
- __ip6_finish_output+0x620/0xaa0 net/ipv6/ip6_output.c:196
- ip6_finish_output net/ipv6/ip6_output.c:207 [inline]
- NF_HOOK_COND include/linux/netfilter.h:292 [inline]
- ip6_output+0x206/0x410 net/ipv6/ip6_output.c:228
- dst_output include/net/dst.h:458 [inline]
- NF_HOOK.constprop.0+0xea/0x260 include/linux/netfilter.h:303
- ndisc_send_skb+0x872/0xe80 net/ipv6/ndisc.c:508
- ndisc_send_ns+0xb5/0x130 net/ipv6/ndisc.c:666
- addrconf_dad_work+0xc14/0x13f0 net/ipv6/addrconf.c:4175
- process_one_work+0x92c/0x13a0 kernel/workqueue.c:2597
- worker_thread+0x60f/0x1240 kernel/workqueue.c:2748
- kthread+0x2fe/0x3f0 kernel/kthread.c:389
- ret_from_fork+0x2c/0x50 arch/x86/entry/entry_64.S:308
- </TASK>
-Modules linked in:
-
-Fixes: 4cfd5779bd6e ("taprio: Add support for txtime-assist mode")
-Reported-by: syzkaller <syzkaller@googlegroups.com>
-Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-Co-developed-by: Eric Dumazet <edumazet@google.com>
----
-v2
-  * Prevent overflow in setup_txtime() and parse_taprio_schedule()
-    and add extack for such cases
-    (Added cycle < 0 test in addition to Eric's suggestion)
-
-v1: https://lore.kernel.org/netdev/20230726011432.19250-1-kuniyu@amazon.com/
----
- net/sched/sch_taprio.c | 15 +++++++++++++--
- 1 file changed, 13 insertions(+), 2 deletions(-)
-
-diff --git a/net/sched/sch_taprio.c b/net/sched/sch_taprio.c
-index 717ae51d94a0..61ec0c237440 100644
---- a/net/sched/sch_taprio.c
-+++ b/net/sched/sch_taprio.c
-@@ -1015,6 +1015,11 @@ static const struct nla_policy taprio_tc_policy[TCA_TAPRIO_TC_ENTRY_MAX + 1] = {
- 							      TC_FP_PREEMPTIBLE),
- };
- 
-+static struct netlink_range_validation_signed taprio_cycle_time_range = {
-+	.min = 1,
-+	.max = INT_MAX,
-+};
-+
- static const struct nla_policy taprio_policy[TCA_TAPRIO_ATTR_MAX + 1] = {
- 	[TCA_TAPRIO_ATTR_PRIOMAP]	       = {
- 		.len = sizeof(struct tc_mqprio_qopt)
-@@ -1023,7 +1028,8 @@ static const struct nla_policy taprio_policy[TCA_TAPRIO_ATTR_MAX + 1] = {
- 	[TCA_TAPRIO_ATTR_SCHED_BASE_TIME]            = { .type = NLA_S64 },
- 	[TCA_TAPRIO_ATTR_SCHED_SINGLE_ENTRY]         = { .type = NLA_NESTED },
- 	[TCA_TAPRIO_ATTR_SCHED_CLOCKID]              = { .type = NLA_S32 },
--	[TCA_TAPRIO_ATTR_SCHED_CYCLE_TIME]           = { .type = NLA_S64 },
-+	[TCA_TAPRIO_ATTR_SCHED_CYCLE_TIME]           =
-+		NLA_POLICY_FULL_RANGE_SIGNED(NLA_S64, &taprio_cycle_time_range),
- 	[TCA_TAPRIO_ATTR_SCHED_CYCLE_TIME_EXTENSION] = { .type = NLA_S64 },
- 	[TCA_TAPRIO_ATTR_FLAGS]                      = { .type = NLA_U32 },
- 	[TCA_TAPRIO_ATTR_TXTIME_DELAY]		     = { .type = NLA_U32 },
-@@ -1159,6 +1165,11 @@ static int parse_taprio_schedule(struct taprio_sched *q, struct nlattr **tb,
- 			return -EINVAL;
- 		}
- 
-+		if (cycle < 0 || cycle > INT_MAX) {
-+			NL_SET_ERR_MSG(extack, "'cycle_time' is too big");
-+			return -EINVAL;
-+		}
-+
- 		new->cycle_time = cycle;
- 	}
- 
-@@ -1347,7 +1358,7 @@ static void setup_txtime(struct taprio_sched *q,
- 			 struct sched_gate_list *sched, ktime_t base)
- {
- 	struct sched_entry *entry;
--	u32 interval = 0;
-+	u64 interval = 0;
- 
- 	list_for_each_entry(entry, &sched->entries, list) {
- 		entry->next_txtime = ktime_add_ns(base, interval);
--- 
-2.30.2
-
+Well, propbably just an arbitry value loaded from corrupted memory.
 
