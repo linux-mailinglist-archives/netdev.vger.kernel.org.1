@@ -1,152 +1,115 @@
-Return-Path: <netdev+bounces-21518-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21519-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9DDE763C82
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 18:29:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 935B2763C8B
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 18:32:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EA3671C21395
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 16:29:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 40BC128201F
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 16:32:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94734379A2;
-	Wed, 26 Jul 2023 16:29:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99FA4EA8;
+	Wed, 26 Jul 2023 16:32:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87083253BC
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 16:29:49 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (unknown [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2F9E26A1
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 09:29:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=OwJO2rYMHSmEa1Cymjihpbf4CVWm2/tebNBXFw4P7Uo=; b=P9H1BFljSrVVXFECl54skx9hT+
-	ucrFJ2ZwfjQNVwpiuFUbnKVXa7kpw3956AEIKtml8Il5Ml+YsMvz3Qd7B8aT3/pF7pYeyaibET7+n
-	qSRR9tZWZeFHcP3Hq8nZHtaKTAHmJKCIZk7nGES2Pn1lYMItvFMw2y4yLHee5cN+fiHyAAsblhIeE
-	yuFEXhtgZxHYa4rTemYyBlR1QroWNScmehJM0dHPtljX1aa0iaS1pAOTZC3HSMixUeyoCFf+nrx6w
-	Z/dF+BpRK0TopIsI+7bFDBJJsyFqlDhH7B1HzMHMgdT7ddwghpBk+oZwofLgemSx5SCbrfp9/+x2f
-	8VO613LA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:50408)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qOhOH-0004i4-1W;
-	Wed, 26 Jul 2023 17:29:33 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qOhOE-00030o-Fp; Wed, 26 Jul 2023 17:29:30 +0100
-Date: Wed, 26 Jul 2023 17:29:30 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Shenwei Wang <shenwei.wang@nxp.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Shawn Guo <shawnguo@kernel.org>, dl-linux-imx <linux-imx@nxp.com>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F0FA18024
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 16:32:04 +0000 (UTC)
+Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AB1F269E;
+	Wed, 26 Jul 2023 09:32:03 -0700 (PDT)
+Received: by mail-wm1-x32c.google.com with SMTP id 5b1f17b1804b1-3fbc63c2e84so71144925e9.3;
+        Wed, 26 Jul 2023 09:32:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1690389122; x=1690993922;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=tjPMb9HkbGw8tTyajg7c43jaFapql171y86o5wmOzBc=;
+        b=i8nLO/Svs8W9bsskGYQos6XO8qAO77J7FTAbvitLedxNiCuYkhan+NpOXxpecunaj3
+         rL/28meURqT/Cr4qBwsp7morWkSsyqZGRhqSa148JhhNL3h16PEizsVS8EZh2xJ4nSnm
+         Mns76R9u/czKHJ+qrcwpl60gopwTU3NPO56A+CLCcavpWYqBGwbukE08Ro0TrfT7WtVu
+         DNlz+v4WILDBBgbpptPPPLohM2MigKmSzqtiZx5p2U1jM3fqlSPOcgPaERZRq137ViXz
+         fZCoYQbxhr7X1dsMsdLgyL6ebqzdRgHM8qfLTfzbhUsODZ2zRes5CwhscOAtamzD5DoU
+         RAIA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690389122; x=1690993922;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=tjPMb9HkbGw8tTyajg7c43jaFapql171y86o5wmOzBc=;
+        b=MqGbWDr7VnuN5PnXA9W4/M8mW28nG9H8EUolz87d3IYjIHmwb17WQ9eDlosHiBC5D+
+         TYA4BNWBH8qD3Y4zk+7O95hN8B7EiB7ub4wH7kcc50PRdqWo2bVVLhczp0jtq8wMfuik
+         kbJpaiCcpYeEdPOYndQXF0vpSvj/RCWRxpm7nX4JeFOjpH5z7Ipq/cBHbkpeweJIlj9n
+         AW7a4aDkJfacOPWUaYYHcb/1FP/+N9TnmE1iCMtqYW+CbmiKwZkb0qEnFIwLnULaFOnK
+         m1LD1k0KbMhN0HNUGSLmeU4oVPjbVxHtXyaj/mt5ap6F38ol9/5ExGgzgyvt+lY2dRG+
+         PAyA==
+X-Gm-Message-State: ABy/qLaLdgGW9rtB6/GGlY1PNgynDq1OtN/ekw4oLChcgd4+iR6LFfoP
+	76I+YWERi1jIF07umwa7HD4=
+X-Google-Smtp-Source: APBJJlE/4DBmZ/C4HcUl8ceh4QCbZN09IERbJ2EaO1wfE/YP8sE9KJmVC4EHYm1G8MzJLqOeRE/GMQ==
+X-Received: by 2002:a05:600c:20d4:b0:3fb:b67b:7f15 with SMTP id y20-20020a05600c20d400b003fbb67b7f15mr2040587wmm.21.1690389121401;
+        Wed, 26 Jul 2023 09:32:01 -0700 (PDT)
+Received: from localhost (p200300e41f1bd600f22f74fffe1f3a53.dip0.t-ipconnect.de. [2003:e4:1f1b:d600:f22f:74ff:fe1f:3a53])
+        by smtp.gmail.com with ESMTPSA id o20-20020a05600c511400b003f7f475c3bcsm11205528wms.1.2023.07.26.09.32.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 Jul 2023 09:32:01 -0700 (PDT)
+From: Thierry Reding <thierry.reding@gmail.com>
+To: Giuseppe Cavallaro <peppe.cavallaro@st.com>,
 	Alexandre Torgue <alexandre.torgue@foss.st.com>,
 	Jose Abreu <joabreu@synopsys.com>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Fabio Estevam <festevam@gmail.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-stm32@st-md-mailman.stormreply.com" <linux-stm32@st-md-mailman.stormreply.com>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"imx@lists.linux.dev" <imx@lists.linux.dev>,
-	Frank Li <frank.li@nxp.com>
-Subject: Re: [EXT] Re: [PATCH] net: stmmac: dwmac-imx: pause the TXC clock in
- fixed-link
-Message-ID: <ZMFJ6ls0LHrUWahz@shell.armlinux.org.uk>
-References: <20230725194931.1989102-1-shenwei.wang@nxp.com>
- <ZMA45XUMM94GTjHx@shell.armlinux.org.uk>
- <PAXPR04MB91857EA7A0CECF71F961DC0B8900A@PAXPR04MB9185.eurprd04.prod.outlook.com>
- <ZME3JA9VuHMOzzWo@shell.armlinux.org.uk>
- <PAXPR04MB9185A31E1E3DEBABE03C60F78900A@PAXPR04MB9185.eurprd04.prod.outlook.com>
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Jon Hunter <jonathanh@nvidia.com>,
+	netdev@vger.kernel.org,
+	linux-tegra@vger.kernel.org
+Subject: [PATCH] net: stmmac: tegra: Properly allocate clock bulk data
+Date: Wed, 26 Jul 2023 18:32:00 +0200
+Message-ID: <20230726163200.2138394-1-thierry.reding@gmail.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <PAXPR04MB9185A31E1E3DEBABE03C60F78900A@PAXPR04MB9185.eurprd04.prod.outlook.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,RDNS_NONE,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Jul 26, 2023 at 04:10:11PM +0000, Shenwei Wang wrote:
-> > So, plat->phy_node will never ever be equal to your "dn" above.
-> > plat->phylink_node is the same as dwmac->dev->of_node above, and
-> > so plat->phylink_node will never be your "dn" above either.
-> >
-> > Those two together means that imx_dwmac_is_fixed_link() will _always_ return
-> > false, and thus most of the code you're adding is rather useless.
-> >
-> > It also means the code you're submitting probably hasn't been properly tested.
-> >
-> > Have you confirmed that imx_dwmac_is_fixed_link() will actually return true in
-> > your testing? Under what conditions did your testing reveal a true return value
-> > from this function?
-> >
-> 
-> We can't make that assumption. In my testing code, I had trace statements in that
-> section to indicate the code was actually executed. You may get some clues from the following DTS:
-> 
-> +&eqos {
-> +       pinctrl-names = "default";
-> +       pinctrl-0 = <&pinctrl_eqos_rgmii>;
-> +       phy-mode = "rgmii-rxid";
-> +       phy-handle = <&fixed0>;
-> +       status = "okay";
-> +
-> +       fixed0: fixed-link {
-> +               speed = <1000>;
-> +               full-duplex;
-> +       };
+From: Thierry Reding <treding@nvidia.com>
 
-This is just totally botched up.
+The clock data is an array of struct clk_bulk_data, so make sure to
+allocate enough memory.
 
-"fixed0" is _not_ a PHY, therefore you should NOT be referencing it
-in phy-handle. Please see the DT binding document:
+Fixes: d8ca113724e7 ("net: stmmac: tegra: Add MGBE support")
+Signed-off-by: Thierry Reding <treding@nvidia.com>
+---
+ drivers/net/ethernet/stmicro/stmmac/dwmac-tegra.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-  phy-handle:
-    $ref: /schemas/types.yaml#/definitions/phandle
-    description:
-      Specifies a reference to a node representing a PHY device.
-
-  fixed-link:
-    oneOf:
-      - $ref: /schemas/types.yaml#/definitions/uint32-array
-        deprecated: true
-...
-      - type: object
-        additionalProperties: false
-        properties:
-          speed:
-...
-
-As I said, fixed-link is _not_ a PHY, and thus phy-handle must *not*
-be used to point at it.
-
-The mere presence of a node called "fixed-link" will make this "eqos"
-device use that fixed-link node, and the phy-handle will be ignored.
-
-So sorry, but as far as your patch goes, it's a hard NAK from me
-right now until the DT description is actually correct.
-
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-tegra.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-tegra.c
+index 99e2e5a5cd60..78a492b91bc6 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-tegra.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-tegra.c
+@@ -234,7 +234,8 @@ static int tegra_mgbe_probe(struct platform_device *pdev)
+ 	res.addr = mgbe->regs;
+ 	res.irq = irq;
+ 
+-	mgbe->clks = devm_kzalloc(&pdev->dev, sizeof(*mgbe->clks), GFP_KERNEL);
++	mgbe->clks = devm_kcalloc(&pdev->dev, ARRAY_SIZE(mgbe_clks),
++				  sizeof(*mgbe->clks), GFP_KERNEL);
+ 	if (!mgbe->clks)
+ 		return -ENOMEM;
+ 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.41.0
+
 
