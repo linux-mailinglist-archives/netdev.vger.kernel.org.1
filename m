@@ -1,63 +1,77 @@
-Return-Path: <netdev+bounces-21544-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21545-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E98E1763E03
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 19:58:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 406EB763E07
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 20:00:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B2C981C212A4
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 17:58:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C7411281E43
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 18:00:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 452941803D;
-	Wed, 26 Jul 2023 17:58:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD22E1803D;
+	Wed, 26 Jul 2023 18:00:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A8451AA60
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 17:58:42 +0000 (UTC)
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDD302688;
-	Wed, 26 Jul 2023 10:58:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=YPmagiFQ/MeFHRjwmSRL0hWWXD4WhK730BMoQ57Tcfs=; b=kixqBCkSocxZEhHc2Sl4YQ3j/W
-	6MHhYsaeGcAEFz3Ikfkl0tpJZeVVuCe/BiTxlYG3dJ8HcvJ/T2vdQAQ5gIBhR2n6UhgaBfMrG4PI3
-	Z5Id/jv1a75gsjOtDXpt/LD7O15Touqa7NqiEPt/l8zBxXGlzsYO+bCoXjnUd4LyKsNR8uZGhhZRg
-	+OyiKfgZbY7fbFXMfGEJdwxH3fx8IGSflQLhVMJDAioTezH4kPOYHszoYxlRVTrC6/MqPhn7X667m
-	QRhIOcxcm6QRQ5XuiNwXgc2BldKLdF/obVnyC8UpbIg6DWBIlRNSJNh4WSktu5vL21AXLcVy8pPM7
-	x0bCwxMw==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-	id 1qOimM-00BE8R-2H;
-	Wed, 26 Jul 2023 17:58:30 +0000
-Date: Wed, 26 Jul 2023 10:58:30 -0700
-From: Luis Chamberlain <mcgrof@kernel.org>
-To: Joel Granados <j.granados@samsung.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Kees Cook <keescook@chromium.org>,
-	Iurii Zaikin <yzaikin@google.com>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFBC01AA60
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 18:00:08 +0000 (UTC)
+Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B17892697;
+	Wed, 26 Jul 2023 11:00:07 -0700 (PDT)
+Received: by mail-pf1-x42c.google.com with SMTP id d2e1a72fcca58-66d6a9851f3so27853b3a.0;
+        Wed, 26 Jul 2023 11:00:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1690394407; x=1690999207;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=pBrqRf9KetYwqqw9kE2OBONwOaipxgqPSXo8Gqyj3es=;
+        b=BJugwYfk9LHDG/VPjAGZ96UsiwDn8TCeZ9LCCV0vdU+A86oCwErSafXPcRTlt4wyHH
+         olEKlDsp5tCv9J+gTP/BCdtUV1gH+RSTCHx3QU5HZaWkvSMVDcnHbt0HTDCMOpGiNsVE
+         KyyFCDdEclB2qjuRpur33Oh2MGejJdqA7Pfq6/FOgmiHLUK7/y5O6PIXfnfP6kye5GyV
+         uEf8nCHvAvLC4zwWtjhSolGUu8oBsiIviNL8P5VLKgQCOepoWWgti5/7n7qeNhc9amP9
+         wgNYW8PGLhnvtR+Aax5NdsXZYVoX8zScB/0xptN72pTMS2Pro4MsWraYmL2WqtGk/Mrl
+         xVHw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690394407; x=1690999207;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pBrqRf9KetYwqqw9kE2OBONwOaipxgqPSXo8Gqyj3es=;
+        b=AfpQt7vMoj9TIqAokboYjpOGDZHEPAHIR5ewl3FgIlByJLMwu1eSkgnPPxlUJCRYiM
+         sksazTbL89ru3Stn0Ai1torwRQ2Gm+IBGIy8FSJfxK+cDljUk+kkPKeZYNJBc2e5EMNx
+         6sBwJdnKCw8UH0Ty39MoBnNDpk7v1x2/bRoaxkv5lKQPJyv5UNg7sMQO187ChK3gwxys
+         hQBP5Kby13MUWAE7vrcgC71Wu/ShNDNqA11B54S/ZLR4FJHx3Blmxo5iw3tVo0lKuLy9
+         Jjf7LpP64f3TpvNgpdtsvWOzR5Mig5QVjMVnGowRq17lgKqAA39cFLdY5H2M5xHcXE0i
+         LLEQ==
+X-Gm-Message-State: ABy/qLZl0BV1E7m9P1rmYjL6Wv4PZoYAsuoIhU0CV6qbePFIdE7a+dCh
+	ff+yx2LekXxDAa6t6GKRlKE=
+X-Google-Smtp-Source: APBJJlG559OmZQOAWOCS2hhWRYItf+2S/u6gwpf8Y2j8REtyCHKh5CtnNq+MNgm4Zg9WsYQYl0arUg==
+X-Received: by 2002:a05:6a00:2d82:b0:675:8627:a291 with SMTP id fb2-20020a056a002d8200b006758627a291mr2820706pfb.3.1690394407071;
+        Wed, 26 Jul 2023 11:00:07 -0700 (PDT)
+Received: from hoboy.vegasvil.org ([2601:640:8000:54:e2d5:5eff:fea5:802f])
+        by smtp.gmail.com with ESMTPSA id i8-20020aa78d88000000b006765cb32558sm11724126pfr.139.2023.07.26.11.00.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 Jul 2023 11:00:06 -0700 (PDT)
+Date: Wed, 26 Jul 2023 11:00:03 -0700
+From: Richard Cochran <richardcochran@gmail.com>
+To: Johannes Zink <j.zink@pengutronix.de>
+Cc: Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	willy@infradead.org, josh@joshtriplett.org,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Russell King <linux@armlinux.org.uk>, patchwork-jzi@pengutronix.de,
+	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
 	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-s390@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH 06/14] sysctl: Add size to register_sysctl
-Message-ID: <ZMFexmOcfyORkRRs@bombadil.infradead.org>
-References: <20230726140635.2059334-1-j.granados@samsung.com>
- <CGME20230726140659eucas1p2c3cd9f57dd13c71ddeb78d2480587e72@eucas1p2.samsung.com>
- <20230726140635.2059334-7-j.granados@samsung.com>
+	kernel@pengutronix.de, kernel test robot <lkp@intel.com>
+Subject: Re: [PATCH v2] net: stmmac: correct MAC propagation delay
+Message-ID: <ZMFfI3xU5pkJW4x4@hoboy.vegasvil.org>
+References: <20230719-stmmac_correct_mac_delay-v2-1-3366f38ee9a6@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,51 +80,38 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230726140635.2059334-7-j.granados@samsung.com>
-Sender: Luis Chamberlain <mcgrof@infradead.org>
-X-Spam-Status: No, score=-4.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_EF,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20230719-stmmac_correct_mac_delay-v2-1-3366f38ee9a6@pengutronix.de>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Jul 26, 2023 at 04:06:26PM +0200, Joel Granados wrote:
-> In order to remove the end element from the ctl_table struct arrays, we
-> replace the register_syctl function with a macro that will add the
-> ARRAY_SIZE to the new register_sysctl_sz function. In this way the
-> callers that are already using an array of ctl_table structs do not have
-> to change. We *do* change the callers that pass the ctl_table array as a
-> pointer.
+On Mon, Jul 24, 2023 at 12:01:31PM +0200, Johannes Zink wrote:
 
-Thanks for doing this and this series!
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.h b/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.h
+> index bf619295d079..d1fe4b46f162 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.h
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.h
+> @@ -26,6 +26,12 @@
+>  #define	PTP_ACR		0x40	/* Auxiliary Control Reg */
+>  #define	PTP_ATNR	0x48	/* Auxiliary Timestamp - Nanoseconds Reg */
+>  #define	PTP_ATSR	0x4c	/* Auxiliary Timestamp - Seconds Reg */
+> +#define	PTP_TS_INGR_CORR_NS	0x58	/* Ingress timestamp correction nanoseconds */
+> +#define	PTP_TS_EGR_CORR_NS	0x5C	/* Egress timestamp correction nanoseconds*/
+> +#define	PTP_TS_INGR_CORR_SNS	0x60	/* Ingress timestamp correction subnanoseconds */
+> +#define	PTP_TS_EGR_CORR_SNS	0x64	/* Egress timestamp correction subnanoseconds */
 
-> Signed-off-by: Joel Granados <j.granados@samsung.com>
-> ---
-> diff --git a/include/linux/sysctl.h b/include/linux/sysctl.h
-> index 0495c858989f..b1168ae281c9 100644
-> --- a/include/linux/sysctl.h
-> +++ b/include/linux/sysctl.h
-> @@ -215,6 +215,9 @@ struct ctl_path {
->  	const char *procname;
->  };
->  
-> +#define register_sysctl(path, table)	\
-> +	register_sysctl_sz(path, table, ARRAY_SIZE(table))
-> +
->  #ifdef CONFIG_SYSCTL
+These two...
 
-Wasn't it Greg who had suggested this? Maybe add Suggested-by with him
-on it.
+> +#define	PTP_TS_INGR_LAT	0x68	/* MAC internal Ingress Latency */
+> +#define	PTP_TS_EGR_LAT	0x6c	/* MAC internal Egress Latency */
 
-Also, your cover letter and first few patches are not CC'd to the netdev
-list or others. What you want to do is collect all the email addresses
-for this small patch series and add them to who you email for your
-entire series, otherwise at times they won't be able to properly review
-or understand the exact context of the changes. You want folks to do less
-work to review, not more.
+do not exist on earlier versions of the IP core.
 
-So please resend and add others to the other patches.
+I wonder what values are there?
 
-  Luis
+Thanks,
+Richard
 
