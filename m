@@ -1,35 +1,35 @@
-Return-Path: <netdev+bounces-21639-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21640-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12562764142
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 23:36:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 59DD6764143
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 23:36:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 42E581C2148D
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 21:36:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 14473281E79
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 21:36:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 345571CA14;
-	Wed, 26 Jul 2023 21:32:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D1711CA1D;
+	Wed, 26 Jul 2023 21:32:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6BBA1CA03
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 21:32:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85B47C433A9;
-	Wed, 26 Jul 2023 21:32:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA6B61C9E8
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 21:32:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8790AC433BD;
+	Wed, 26 Jul 2023 21:32:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690407140;
-	bh=7Mf/JvOfy1J/IMduLRib8lgIW10+7HjV496UEwESHLE=;
+	s=k20201202; t=1690407141;
+	bh=C95AFtXvhPYqZIYQdet/hoPNSjj7mMQz3iXHD1v0azM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=uuwXLRqMod52cOC7bykyzHSpT5wWcs0qInrI2F+VZuDaMCn4AF/ZSLCnQkuOVp/7Q
-	 ZBRijfN9hy6ypGWAn8CREjnlljtrfirHwm/yxclKLDFWvhMut85d9sM7MjoFAfXtOe
-	 TTdhuDrNw5UuaUX8q/6W+I/RKdyCMEYCdj5sGTnO8LsOw0mu+Kdmzv9rhxIZnpI8oC
-	 us/i+ig3/VHtSaZouVZjv3wJH1aqJmnZn1dmqNcK04SGwKwUu4ZRrbM8NF26sOyQSb
-	 oGr80qcq8EE55zvskoEvTa7IT8VkztyaiAoqM6+PIQ6DQtQYXpg2H/JRZXnzZLoapJ
-	 r7D5jk9xlWjOw==
+	b=lXiJfPsBcKNDZkbv2E4iz5iHab/uLFxErlfsu2Gt7tu4NSZQYS6CzwmlknncqmRwl
+	 3KG9ID0d3xZBysSI8IQpkAFk7TqyD9OnHyy7R2D1pLZGzHN8jaASBWMOmm6nCXbEUf
+	 5YxYnqEx+cjVcEJXONgPRIi7XASWoeAQyuTV8royE1QtcCsp9sFKM8P3A/ac6Uoti/
+	 7WBY7+jfaeYe0/Abi5reDFIwTfpnUrl1JmBZrrpK45v496mHy7IKJg9mF1nojtzGYD
+	 rvNPVjkjqUijrasxMTDrTM2q6HiTj/EIXNvXvi6oAWflCt5Nx4fzpE0pN6JnKrTa6x
+	 SysIEyfC2zJYQ==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -38,10 +38,12 @@ To: "David S. Miller" <davem@davemloft.net>,
 Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	netdev@vger.kernel.org,
 	Tariq Toukan <tariqt@nvidia.com>,
-	Jianbo Liu <jianbol@nvidia.com>
-Subject: [net 12/15] net/mlx5e: kTLS, Fix protection domain in use syndrome when devlink reload
-Date: Wed, 26 Jul 2023 14:32:03 -0700
-Message-ID: <20230726213206.47022-13-saeed@kernel.org>
+	Chris Mi <cmi@nvidia.com>,
+	Paul Blakey <paulb@nvidia.com>,
+	Roi Dayan <roid@nvidia.com>
+Subject: [net 13/15] net/mlx5: fs_chains: Fix ft prio if ignore_flow_level is not supported
+Date: Wed, 26 Jul 2023 14:32:04 -0700
+Message-ID: <20230726213206.47022-14-saeed@kernel.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230726213206.47022-1-saeed@kernel.org>
 References: <20230726213206.47022-1-saeed@kernel.org>
@@ -53,126 +55,51 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Jianbo Liu <jianbol@nvidia.com>
+From: Chris Mi <cmi@nvidia.com>
 
-There are DEK objects cached in DEK pool after kTLS is used, and they
-are freed only in mlx5e_ktls_cleanup().
+The cited commit sets ft prio to fs_base_prio. But if
+ignore_flow_level it not supported, ft prio must be set based on
+tc filter prio. Otherwise, all the ft prio are the same on the same
+chain. It is invalid if ignore_flow_level is not supported.
 
-mlx5e_destroy_mdev_resources() is called in mlx5e_suspend() to
-free mdev resources, including protection domain (PD). However, PD is
-still referenced by the cached DEK objects in this case, because
-profile->cleanup() (and therefore mlx5e_ktls_cleanup()) is called
-after mlx5e_suspend() during devlink reload. So the following FW
-syndrome is generated:
+Fix it by setting ft prio based on tc filter prio and setting
+fs_base_prio to 0 for fdb.
 
- mlx5_cmd_out_err:803:(pid 12948): DEALLOC_PD(0x801) op_mod(0x0) failed,
-    status bad resource state(0x9), syndrome (0xef0c8a), err(-22)
-
-To avoid this syndrome, move DEK pool destruction to
-mlx5e_ktls_cleanup_tx(), which is called by profile->cleanup_tx(). And
-move pool creation to mlx5e_ktls_init_tx() for symmetry.
-
-Fixes: f741db1a5171 ("net/mlx5e: kTLS, Improve connection rate by using fast update encryption key")
-Signed-off-by: Jianbo Liu <jianbol@nvidia.com>
-Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
+Fixes: 8e80e5648092 ("net/mlx5: fs_chains: Refactor to detach chains from tc usage")
+Signed-off-by: Chris Mi <cmi@nvidia.com>
+Reviewed-by: Paul Blakey <paulb@nvidia.com>
+Reviewed-by: Roi Dayan <roid@nvidia.com>
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
- .../mellanox/mlx5/core/en_accel/ktls.c        |  8 -----
- .../mellanox/mlx5/core/en_accel/ktls_tx.c     | 29 +++++++++++++++++--
- 2 files changed, 26 insertions(+), 11 deletions(-)
+ drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c | 1 -
+ drivers/net/ethernet/mellanox/mlx5/core/lib/fs_chains.c    | 2 +-
+ 2 files changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls.c b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls.c
-index cf704f106b7c..984fa04bd331 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls.c
-@@ -188,7 +188,6 @@ static void mlx5e_tls_debugfs_init(struct mlx5e_tls *tls,
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c b/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
+index 93b2b94d41cd..bc04abb31f9c 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
+@@ -1436,7 +1436,6 @@ esw_chains_create(struct mlx5_eswitch *esw, struct mlx5_flow_table *miss_fdb)
  
- int mlx5e_ktls_init(struct mlx5e_priv *priv)
- {
--	struct mlx5_crypto_dek_pool *dek_pool;
- 	struct mlx5e_tls *tls;
- 
- 	if (!mlx5e_is_ktls_device(priv->mdev))
-@@ -199,12 +198,6 @@ int mlx5e_ktls_init(struct mlx5e_priv *priv)
- 		return -ENOMEM;
- 	tls->mdev = priv->mdev;
- 
--	dek_pool = mlx5_crypto_dek_pool_create(priv->mdev, MLX5_ACCEL_OBJ_TLS_KEY);
--	if (IS_ERR(dek_pool)) {
--		kfree(tls);
--		return PTR_ERR(dek_pool);
--	}
--	tls->dek_pool = dek_pool;
- 	priv->tls = tls;
- 
- 	mlx5e_tls_debugfs_init(tls, priv->dfs_root);
-@@ -222,7 +215,6 @@ void mlx5e_ktls_cleanup(struct mlx5e_priv *priv)
- 	debugfs_remove_recursive(tls->debugfs.dfs);
- 	tls->debugfs.dfs = NULL;
- 
--	mlx5_crypto_dek_pool_destroy(tls->dek_pool);
- 	kfree(priv->tls);
- 	priv->tls = NULL;
- }
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls_tx.c b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls_tx.c
-index efb2cf74ad6a..d61be26a4df1 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls_tx.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls_tx.c
-@@ -908,28 +908,51 @@ static void mlx5e_tls_tx_debugfs_init(struct mlx5e_tls *tls,
- 
- int mlx5e_ktls_init_tx(struct mlx5e_priv *priv)
- {
-+	struct mlx5_crypto_dek_pool *dek_pool;
- 	struct mlx5e_tls *tls = priv->tls;
-+	int err;
-+
-+	if (!mlx5e_is_ktls_device(priv->mdev))
-+		return 0;
-+
-+	/* DEK pool could be used by either or both of TX and RX. But we have to
-+	 * put the creation here to avoid syndrome when doing devlink reload.
-+	 */
-+	dek_pool = mlx5_crypto_dek_pool_create(priv->mdev, MLX5_ACCEL_OBJ_TLS_KEY);
-+	if (IS_ERR(dek_pool))
-+		return PTR_ERR(dek_pool);
-+	tls->dek_pool = dek_pool;
- 
- 	if (!mlx5e_is_ktls_tx(priv->mdev))
- 		return 0;
- 
- 	priv->tls->tx_pool = mlx5e_tls_tx_pool_init(priv->mdev, &priv->tls->sw_stats);
--	if (!priv->tls->tx_pool)
--		return -ENOMEM;
-+	if (!priv->tls->tx_pool) {
-+		err = -ENOMEM;
-+		goto err_tx_pool_init;
-+	}
- 
- 	mlx5e_tls_tx_debugfs_init(tls, tls->debugfs.dfs);
- 
- 	return 0;
-+
-+err_tx_pool_init:
-+	mlx5_crypto_dek_pool_destroy(dek_pool);
-+	return err;
- }
- 
- void mlx5e_ktls_cleanup_tx(struct mlx5e_priv *priv)
- {
- 	if (!mlx5e_is_ktls_tx(priv->mdev))
--		return;
-+		goto dek_pool_destroy;
- 
- 	debugfs_remove_recursive(priv->tls->debugfs.dfs_tx);
- 	priv->tls->debugfs.dfs_tx = NULL;
- 
- 	mlx5e_tls_tx_pool_cleanup(priv->tls->tx_pool);
- 	priv->tls->tx_pool = NULL;
-+
-+dek_pool_destroy:
-+	if (mlx5e_is_ktls_device(priv->mdev))
-+		mlx5_crypto_dek_pool_destroy(priv->tls->dek_pool);
- }
+ 	esw_init_chains_offload_flags(esw, &attr.flags);
+ 	attr.ns = MLX5_FLOW_NAMESPACE_FDB;
+-	attr.fs_base_prio = FDB_TC_OFFLOAD;
+ 	attr.max_grp_num = esw->params.large_group_num;
+ 	attr.default_ft = miss_fdb;
+ 	attr.mapping = esw->offloads.reg_c0_obj_pool;
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/fs_chains.c b/drivers/net/ethernet/mellanox/mlx5/core/lib/fs_chains.c
+index db9df9798ffa..a80ecb672f33 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/lib/fs_chains.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/fs_chains.c
+@@ -178,7 +178,7 @@ mlx5_chains_create_table(struct mlx5_fs_chains *chains,
+ 	if (!mlx5_chains_ignore_flow_level_supported(chains) ||
+ 	    (chain == 0 && prio == 1 && level == 0)) {
+ 		ft_attr.level = chains->fs_base_level;
+-		ft_attr.prio = chains->fs_base_prio;
++		ft_attr.prio = chains->fs_base_prio + prio - 1;
+ 		ns = (chains->ns == MLX5_FLOW_NAMESPACE_FDB) ?
+ 			mlx5_get_fdb_sub_ns(chains->dev, chain) :
+ 			mlx5_get_flow_namespace(chains->dev, chains->ns);
 -- 
 2.41.0
 
