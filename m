@@ -1,109 +1,66 @@
-Return-Path: <netdev+bounces-21150-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21151-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BD17762936
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 05:23:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D5ED76293A
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 05:23:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9D4D71C20EE5
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 03:23:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3DB231C20F15
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 03:23:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BCA81FD5;
-	Wed, 26 Jul 2023 03:22:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 240CE1FD7;
+	Wed, 26 Jul 2023 03:23:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FC441855
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 03:22:59 +0000 (UTC)
-Received: from mail-io1-xd34.google.com (mail-io1-xd34.google.com [IPv6:2607:f8b0:4864:20::d34])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D57F2682;
-	Tue, 25 Jul 2023 20:22:57 -0700 (PDT)
-Received: by mail-io1-xd34.google.com with SMTP id ca18e2360f4ac-78706966220so53146439f.1;
-        Tue, 25 Jul 2023 20:22:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690341777; x=1690946577;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=NL3EuYyvjjhZCYD78dzuWYzAA4q7ImU5255kcivdAlA=;
-        b=YrDQVT3n1O3EiYwvIGJo9jid1fKsLNw2s5BtVJ5JvGxYyPR1XjrUtnjfk86ybuDqvD
-         mjkbbUuyR5VaB9rjSCR72ECLkPoHrMLk2ceMPKchY63bLMTQ0uCFoaZDI1rHSRdcZkBa
-         Rj4LJYewPahFgAw+IE0I66Qm8T3wULByAcoETQYDq8VJzatnTf4P27YEUdI0SknFz3lz
-         XEQP6TM/KY0h1JyYR68C89+l8h3L8U59mSzM8/oIOIzhC7QsCaK/HqQy8I1TjSgmiW8m
-         rYeskGDA9hosrrCFYfjvbKnf/0CWiTVMAuWvQE8UyAnzJLx1bvG10rIKl4kTIK4KL4+E
-         i4Jg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690341777; x=1690946577;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NL3EuYyvjjhZCYD78dzuWYzAA4q7ImU5255kcivdAlA=;
-        b=ZFUKr3MXFFgpLVQJoQ99KRY+WH6Go2sZFT0h+jdGANo7rzlk8tpjzBo7G7WJZSCHeT
-         3tCbY6k1XVuoHm+FZ+4gEUGEazWKBca+5jWHT4N+OnF5NWYQRZFMAr6XvZi+T9MC54wd
-         hIr1mM0BCvMECsNtC32s5ynjunHwcailj2ICnzTf5uh/K4bRHCvR14jVw3JUT2A/IsYs
-         JJikH7aGPBifoJoDg49RUXogLq46FPxLxDCp2lzBcLTbxH6qlsQ47xyLsJLkjGYl7OJ2
-         c07ph9qLIp6zawMxw24yrwPK8M3WdjbwGqFibLr+TCIVeQ1QSpzhAMRwA5L7KIJZTCT0
-         /czA==
-X-Gm-Message-State: ABy/qLYY8J6bLZsCBf0b8xLtBhZUMlfv9hX6QAw0B3FEZf+AAfyN1mB3
-	Ym33E5S9SflmCttw05qfhmQ=
-X-Google-Smtp-Source: APBJJlH6yBw+cvBcbmXyvs1PZzwvZEc6/RU38mhLvcrD3wYRbKLXGce0SxktHOdc8rnQsf8pyEfhoA==
-X-Received: by 2002:a6b:1446:0:b0:77a:ee79:652 with SMTP id 67-20020a6b1446000000b0077aee790652mr603947iou.1.1690341776913;
-        Tue, 25 Jul 2023 20:22:56 -0700 (PDT)
-Received: from hoboy.vegasvil.org ([2601:640:8000:54:e2d5:5eff:fea5:802f])
-        by smtp.gmail.com with ESMTPSA id i75-20020a639d4e000000b0055387ffef10sm134985pgd.24.2023.07.25.20.22.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Jul 2023 20:22:56 -0700 (PDT)
-Date: Tue, 25 Jul 2023 20:22:53 -0700
-From: Richard Cochran <richardcochran@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Johannes Zink <j.zink@pengutronix.de>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Russell King <linux@armlinux.org.uk>, patchwork-jzi@pengutronix.de,
-	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kernel@pengutronix.de, kernel test robot <lkp@intel.com>
-Subject: Re: [PATCH v2] net: stmmac: correct MAC propagation delay
-Message-ID: <ZMCRjcRF9XqEPg/Z@hoboy.vegasvil.org>
-References: <20230719-stmmac_correct_mac_delay-v2-1-3366f38ee9a6@pengutronix.de>
- <20230725200606.5264b59c@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED6D115CA
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 03:23:52 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4C1AEC433C7;
+	Wed, 26 Jul 2023 03:23:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1690341832;
+	bh=ng5DXKEW/N72oQKlESKJ9zgU19pEjauob6VDV+J67YQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=REJBLy7z+EgwaglFZtthpIeG4b7+3BI/P30GSWXMw4q+R9XkFZ6BkYCAh3nah0sWt
+	 VZkzXQoJFy8s0fl7RmKkdyyGrzOrai8ayIy6S1qBUL59Ccuucmv9TEM8NI4GiAq2hq
+	 SlHIK15vXRW9ls6XCj6R9T1II1J5k4if4Nn1EFi7zjd8MmC+uW0BQ6/6zNAJUf32rk
+	 7dBXRlS+2Fm4N3FlvUazLn7xito7dLcffUL7UEhR1hT85UEpFL++9imQfTLX379kTW
+	 W6HJBolxzJgNB+j/0Pgo9D9D3mw8md+UgSQ25LLHHt7dd0LEuKgY8M8kndCARQ5BsW
+	 zD0zKU8uKUUkw==
+Date: Tue, 25 Jul 2023 20:23:51 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: "mengyuanlou@net-swift.com" <mengyuanlou@net-swift.com>
+Cc: netdev@vger.kernel.org
+Subject: Re: [PATCH net-next 1/2] net: ngbe: add ncsi_enable flag for
+ wangxun nics
+Message-ID: <20230725202351.6d615c94@kernel.org>
+In-Reply-To: <2E243F8C-76F8-4792-B8C4-201E65F124F6@net-swift.com>
+References: <20230724092544.73531-1-mengyuanlou@net-swift.com>
+	<6E913AD9617D9BC9+20230724092544.73531-2-mengyuanlou@net-swift.com>
+	<20230725162234.1f26bfce@kernel.org>
+	<6D0E96D7-CDF4-4889-831D-B83388035A2C@net-swift.com>
+	<20230725194456.7832c02d@kernel.org>
+	<2E243F8C-76F8-4792-B8C4-201E65F124F6@net-swift.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230725200606.5264b59c@kernel.org>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jul 25, 2023 at 08:06:06PM -0700, Jakub Kicinski wrote:
+On Wed, 26 Jul 2023 11:12:41 +0800 mengyuanlou@net-swift.com wrote:
+> Another question.
+> Then, after drivers know that portx is using for BMC, it is necessary to
+> let phy to know this port should not be suspended?
+> I mean this patch 2/2 is useful.
 
-> any opinion on this one?
-
-Yeah, I saw it, but I can't get excited about drivers trying to
-correct delays.  I don't think this can be done automatically in a
-reliable way, and so I expect that the few end users who are really
-getting into the microseconds and nanoseconds will calibrate their
-systems end to end, maybe even patching out this driver nonsense in
-their kernels.
-
-Having said that, I won't stand in the way of such driver stuff.
-After all, who cares about a few microseconds time error one way or
-the other?
-
-Thanks,
-Richard
+Right, I think being more selective about which port sets
+netdev->ncsi_enabled is independent from patch 2. Some form
+of patch 2 is still needed, but how exactly it should look
+is up to the PHYLIB maintainers.
 
