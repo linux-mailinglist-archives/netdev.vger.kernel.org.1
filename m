@@ -1,199 +1,181 @@
-Return-Path: <netdev+bounces-21281-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21282-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE0347631B4
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 11:22:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95E017631B9
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 11:22:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7B5B0281312
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 09:22:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C73A31C2118D
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 09:22:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3D5DBA31;
-	Wed, 26 Jul 2023 09:22:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02BCABA3B;
+	Wed, 26 Jul 2023 09:22:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5E29AD2B
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 09:22:20 +0000 (UTC)
-Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3AAC2115
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 02:22:15 -0700 (PDT)
-Received: by mail-pf1-x42e.google.com with SMTP id d2e1a72fcca58-66d6a9851f3so1487681b3a.0
-        for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 02:22:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1690363335; x=1690968135;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=xHFf+qIXuXcHU2hnpeM9isQldhnSqSauyHf1oBu4R8I=;
-        b=jAMndxc3vAfZ9MlugwiN2m1td4+ENgo1ZcEkULNu4w0l2e+7SjL15Aj8xsnH/hg6mq
-         Yuh7Pj+WIpy+9FKbmqcmIZPowwXwCsZ/HE/uYPa/USpf5RWRvsmKXdX1EOhGqDHtCRhA
-         5Tx4ycmmPjyUjagwQ6weN00EPkG2yYEGVkFAeT+5NL38WWOxpIAWxDe7x+TtdzGSmFXw
-         AaN6OIhFdWcuFQV9AajQEHTHNR/HQhAWIjBkgsz+1GmBQBDd2nNKfKbDgsLcpETIdF18
-         CdbQtqtDxhcETBnzscklNfC8QDSVXvKpexDlKf4G6IIrjU6vkXpbe5y1T2yEBA/OqHN2
-         vBww==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3DF5BA34
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 09:22:48 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6B00199D
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 02:22:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1690363366;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=sk/PJvGKnh/DBuIKg5Yct3fF7G6zPABpNJl6TJTyRnA=;
+	b=ITu2is//lD4TPdlCgZ32ZjDEsT9zNFyvzv65I4pTiqCsuHJJ057OLMHkP7977Zllotc9Dk
+	woJVIcDq3StJKPeQlgSNrrCxwFha9D9milJd0g6xtI6KkA5w3+/ByElG470PfAAqYtcemF
+	8PPhxMpvbl+C2m76YgWgpEbbwgKOVYE=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-208-0GkUISMjNPimvqiRRJCgsA-1; Wed, 26 Jul 2023 05:22:44 -0400
+X-MC-Unique: 0GkUISMjNPimvqiRRJCgsA-1
+Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-94a355cf318so533392566b.2
+        for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 02:22:44 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690363335; x=1690968135;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xHFf+qIXuXcHU2hnpeM9isQldhnSqSauyHf1oBu4R8I=;
-        b=IOY4AlAY2IUowD7dwj7GpBK7ZSWtX+CvmsFYmCQ8U1GYHeQBIXk6ZtdFiS3/SmSJ1M
-         0UkqTX/iMHTTgjaP6rS7roVjB8upiSDQL4BfjZVgRjg2KvlBuKUzgAG6G7lRp3nb0F72
-         dQTIIdJaWC/ia7mrxSeX89kJdJL6Y2yVv7YDm4GMncI+DitzPEn49GVP6/7trD/kHWF7
-         U/2qhlHbq4DkkasyQn6i6d+ljiyi8r+MVw8LAnl9mGdxTZ37d5Y5A4QC/ZB3bfx8OlYq
-         IaxzWvrL7Uxpd6RWtHgnjnsZsCYib7TubFSpJrRsZaYkIELQDl55BqAQamGRYXAN93Uv
-         ydTg==
-X-Gm-Message-State: ABy/qLbH5hAXXPNhcZu9OOzjBACNxj4mbvuVsudYnKUlSweHEeIxEHM2
-	0gvJC4Eqyr4mIRoaQXrx3LP2sQ==
-X-Google-Smtp-Source: APBJJlGzKLkoeooTK7rnc1fJ6mfD6dUCrzzNETRC7Ci4c1Yh8zXhisYlXfajH5gn3qqQbLizO8XVQA==
-X-Received: by 2002:a05:6a20:729a:b0:100:b92b:e8be with SMTP id o26-20020a056a20729a00b00100b92be8bemr1779967pzk.2.1690363335131;
-        Wed, 26 Jul 2023 02:22:15 -0700 (PDT)
-Received: from [10.70.252.135] ([203.208.167.147])
-        by smtp.gmail.com with ESMTPSA id k11-20020aa790cb000000b006827c26f147sm10955045pfk.138.2023.07.26.02.22.03
+        d=1e100.net; s=20221208; t=1690363363; x=1690968163;
+        h=content-transfer-encoding:in-reply-to:references:to
+         :content-language:subject:cc:user-agent:mime-version:date:message-id
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=sk/PJvGKnh/DBuIKg5Yct3fF7G6zPABpNJl6TJTyRnA=;
+        b=cMGtRvqoEowtQdVmCZQnVQi0DSSCf71fVhGEquQf6l3otp8O6W/dnGJujiNcvzfvi/
+         wvUYferaIMvc6xttf3on3Pbdw9pbp+LQem9QX+7v0g7sZk41BccWuqRvzh9oHKwZhzJl
+         vq2tedDpxz05uVy9diaeaLEqVm9Zn+LeUdeoByk12CiDpbu2IwiXdzjMYQOicfykdbPv
+         wS1CCCANqu+zV4HV3SOFV6Zt7VHl9r45Zd0yLfdbva3vsGoIIxjqOubxDOvHmHz1Di3H
+         Gx0oQX9eIT0aXBtUg8JsJCvMCFZKuoSaSZZpskxGtob8oozMlnlhgmnj+aDCZIY/Ytks
+         /Vtg==
+X-Gm-Message-State: ABy/qLaO+pWyacXBBkxl78RHugMF3G9zfK775nkIhaaGNR307SngZe+F
+	UmmqAewqjucyg5zTYsCiTaGNdG3dOifAYLWtoazqWkwtbs1hWsrdqTDJxVJFaWvFp0SrfNrO0NZ
+	j5LHrAONQtZEMbvR5
+X-Received: by 2002:a17:906:7a57:b0:994:4e16:d430 with SMTP id i23-20020a1709067a5700b009944e16d430mr1366798ejo.20.1690363363456;
+        Wed, 26 Jul 2023 02:22:43 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlFxJiPkcQtMLhAVgg8mHrSnrgOR7Jaaj/757VyQ9wgV7p4JZKyo7863vYBZ/msQVa/a9QHdjw==
+X-Received: by 2002:a17:906:7a57:b0:994:4e16:d430 with SMTP id i23-20020a1709067a5700b009944e16d430mr1366773ejo.20.1690363363145;
+        Wed, 26 Jul 2023 02:22:43 -0700 (PDT)
+Received: from [192.168.42.222] (194-45-78-10.static.kviknet.net. [194.45.78.10])
+        by smtp.gmail.com with ESMTPSA id y7-20020a17090629c700b009887f4e0291sm9211263eje.27.2023.07.26.02.22.41
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 26 Jul 2023 02:22:14 -0700 (PDT)
-Message-ID: <d96777ce-be8a-1665-dd00-1e696e5575a8@bytedance.com>
-Date: Wed, 26 Jul 2023 17:22:02 +0800
+        Wed, 26 Jul 2023 02:22:42 -0700 (PDT)
+From: Jesper Dangaard Brouer <jbrouer@redhat.com>
+X-Google-Original-From: Jesper Dangaard Brouer <brouer@redhat.com>
+Message-ID: <6396223c-6008-0e1b-e6ed-79c04c87a5e0@redhat.com>
+Date: Wed, 26 Jul 2023 11:22:40 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.12.0
-Subject: Re: [PATCH v2 11/47] gfs2: dynamically allocate the gfs2-qd shrinker
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Cc: brouer@redhat.com, Dexuan Cui <decui@microsoft.com>,
+ KY Srinivasan <kys@microsoft.com>, Paul Rosswurm <paulros@microsoft.com>,
+ "olaf@aepfle.de" <olaf@aepfle.de>, "vkuznets@redhat.com"
+ <vkuznets@redhat.com>, "davem@davemloft.net" <davem@davemloft.net>,
+ "wei.liu@kernel.org" <wei.liu@kernel.org>,
+ "edumazet@google.com" <edumazet@google.com>,
+ "kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com"
+ <pabeni@redhat.com>, "leon@kernel.org" <leon@kernel.org>,
+ Long Li <longli@microsoft.com>,
+ "ssengar@linux.microsoft.com" <ssengar@linux.microsoft.com>,
+ "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+ "daniel@iogearbox.net" <daniel@iogearbox.net>,
+ "john.fastabend@gmail.com" <john.fastabend@gmail.com>,
+ "bpf@vger.kernel.org" <bpf@vger.kernel.org>, "ast@kernel.org"
+ <ast@kernel.org>, Ajay Sharma <sharmaajay@microsoft.com>,
+ "hawk@kernel.org" <hawk@kernel.org>, "tglx@linutronix.de"
+ <tglx@linutronix.de>,
+ "shradhagupta@linux.microsoft.com" <shradhagupta@linux.microsoft.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>
+Subject: Re: [PATCH V3,net-next] net: mana: Add page pool for RX buffers
 Content-Language: en-US
-To: Muchun Song <muchun.song@linux.dev>
-Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org, x86@kernel.org,
- kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
- linux-erofs@lists.ozlabs.org, linux-f2fs-devel@lists.sourceforge.net,
- cluster-devel@redhat.com, linux-nfs@vger.kernel.org,
- linux-mtd@lists.infradead.org, rcu@vger.kernel.org, netdev@vger.kernel.org,
- dri-devel@lists.freedesktop.org, linux-arm-msm@vger.kernel.org,
- dm-devel@redhat.com, linux-raid@vger.kernel.org,
- linux-bcache@vger.kernel.org, virtualization@lists.linux-foundation.org,
- linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
- linux-xfs@vger.kernel.org, linux-btrfs@vger.kernel.org,
- akpm@linux-foundation.org, david@fromorbit.com, tkhai@ya.ru, vbabka@suse.cz,
- roman.gushchin@linux.dev, djwong@kernel.org, brauner@kernel.org,
- paulmck@kernel.org, tytso@mit.edu, steven.price@arm.com, cel@kernel.org,
- senozhatsky@chromium.org, yujie.liu@intel.com, gregkh@linuxfoundation.org
-References: <20230724094354.90817-1-zhengqi.arch@bytedance.com>
- <20230724094354.90817-12-zhengqi.arch@bytedance.com>
- <e7204276-9de5-17eb-90ae-e51657d73ef4@linux.dev>
-From: Qi Zheng <zhengqi.arch@bytedance.com>
-In-Reply-To: <e7204276-9de5-17eb-90ae-e51657d73ef4@linux.dev>
+To: Haiyang Zhang <haiyangz@microsoft.com>,
+ Jesper Dangaard Brouer <jbrouer@redhat.com>,
+ "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+References: <1689966321-17337-1-git-send-email-haiyangz@microsoft.com>
+ <1af55bbb-7aff-e575-8dc1-8ba64b924580@redhat.com>
+ <PH7PR21MB3116F8A97F3626AB04915B96CA02A@PH7PR21MB3116.namprd21.prod.outlook.com>
+ <PH7PR21MB311675E57B81B49577ADE98FCA02A@PH7PR21MB3116.namprd21.prod.outlook.com>
+ <729b360c-4d79-1025-f5be-384b17f132d3@redhat.com>
+ <PH7PR21MB3116F5612AA8303512EEBA4CCA03A@PH7PR21MB3116.namprd21.prod.outlook.com>
+In-Reply-To: <PH7PR21MB3116F5612AA8303512EEBA4CCA03A@PH7PR21MB3116.namprd21.prod.outlook.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+	SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
 
 
-On 2023/7/26 14:49, Muchun Song wrote:
+On 25/07/2023 21.02, Haiyang Zhang wrote:
 > 
-> 
-> On 2023/7/24 17:43, Qi Zheng wrote:
->> Use new APIs to dynamically allocate the gfs2-qd shrinker.
+>> -----Original Message-----
+>> From: Jesper Dangaard Brouer <jbrouer@redhat.com>
+>> Sent: Tuesday, July 25, 2023 2:01 PM
+>>>>
+>>>> Our driver is using NUMA 0 by default, so I implicitly assign NUMA node id
+>>>> to zero during pool init.
+>>>>
+>>>> And, if the IRQ/CPU affinity is changed, the page_pool_nid_changed()
+>>>> will update the nid for the pool. Does this sound good?
+>>>>
+>>>
+>>> Also, since our driver is getting the default node from here:
+>>> 	gc->numa_node = dev_to_node(&pdev->dev);
+>>> I will update this patch to set the default node as above, instead of implicitly
+>>> assigning it to 0.
+>>>
 >>
->> Signed-off-by: Qi Zheng <zhengqi.arch@bytedance.com>
->> ---
->>   fs/gfs2/main.c  |  6 +++---
->>   fs/gfs2/quota.c | 26 ++++++++++++++++++++------
->>   fs/gfs2/quota.h |  3 ++-
->>   3 files changed, 25 insertions(+), 10 deletions(-)
+>> In that case, I agree that it make sense to use dev_to_node(&pdev->dev),
+>> like:
+>> 	pprm.nid = dev_to_node(&pdev->dev);
 >>
->> diff --git a/fs/gfs2/main.c b/fs/gfs2/main.c
->> index afcb32854f14..e47b1cc79f59 100644
->> --- a/fs/gfs2/main.c
->> +++ b/fs/gfs2/main.c
->> @@ -147,7 +147,7 @@ static int __init init_gfs2_fs(void)
->>       if (!gfs2_trans_cachep)
->>           goto fail_cachep8;
->> -    error = register_shrinker(&gfs2_qd_shrinker, "gfs2-qd");
->> +    error = gfs2_qd_shrinker_init();
->>       if (error)
->>           goto fail_shrinker;
->> @@ -196,7 +196,7 @@ static int __init init_gfs2_fs(void)
->>   fail_wq2:
->>       destroy_workqueue(gfs_recovery_wq);
->>   fail_wq1:
->> -    unregister_shrinker(&gfs2_qd_shrinker);
->> +    gfs2_qd_shrinker_exit();
->>   fail_shrinker:
->>       kmem_cache_destroy(gfs2_trans_cachep);
->>   fail_cachep8:
->> @@ -229,7 +229,7 @@ static int __init init_gfs2_fs(void)
->>   static void __exit exit_gfs2_fs(void)
->>   {
->> -    unregister_shrinker(&gfs2_qd_shrinker);
->> +    gfs2_qd_shrinker_exit();
->>       gfs2_glock_exit();
->>       gfs2_unregister_debugfs();
->>       unregister_filesystem(&gfs2_fs_type);
->> diff --git a/fs/gfs2/quota.c b/fs/gfs2/quota.c
->> index 704192b73605..bc9883cea847 100644
->> --- a/fs/gfs2/quota.c
->> +++ b/fs/gfs2/quota.c
->> @@ -186,13 +186,27 @@ static unsigned long gfs2_qd_shrink_count(struct 
->> shrinker *shrink,
->>       return vfs_pressure_ratio(list_lru_shrink_count(&gfs2_qd_lru, sc));
->>   }
->> -struct shrinker gfs2_qd_shrinker = {
->> -    .count_objects = gfs2_qd_shrink_count,
->> -    .scan_objects = gfs2_qd_shrink_scan,
->> -    .seeks = DEFAULT_SEEKS,
->> -    .flags = SHRINKER_NUMA_AWARE,
->> -};
->> +static struct shrinker *gfs2_qd_shrinker;
->> +
->> +int gfs2_qd_shrinker_init(void)
+>> Driver must have a reason for assigning gc->numa_node for this hardware,
+>> which is okay. That is why page_pool API allows driver to control this.
+>>
+>> But then I don't think you should call page_pool_nid_changed() like
+>>
+>> 	page_pool_nid_changed(rxq->page_pool, numa_mem_id());
+>>
+>> Because then you will (at first packet processing event) revert the
+>> dev_to_node() setting to use numa_mem_id() of processing/running CPU.
+>> (In effect this will be the same as setting NUMA_NO_NODE).
+>>
+>> I know, mlx5 do call page_pool_nid_changed(), but they showed benchmark
+>> numbers that this was preferred action, even-when sysadm had
+>> "misconfigured" the default smp_affinity RX-processing to happen on a
+>> remote NUMA node.  AFAIK mlx5 keeps the descriptor rings on the
+>> originally configured NUMA node that corresponds to the NIC PCIe slot.
 > 
-> It's better to declare this as __init.
+> In mana_gd_setup_irqs(), we set the default IRQ/CPU affinity to gc->numa_node
+> too, so it won't revert the nid initial setting.
+> 
+> Currently, the Azure hypervisor always indicates numa 0 as default. (In
+> the future, it will start to provide the accurate default dev node.) When a
+> user manually changes the IRQ/CPU affinity for perf tuning, we want to
+> allow page_pool_nid_changed() to update the pool. Is this OK?
+> 
 
-OK, Will do.
+If I were you, I would wait with the page_pool_nid_changed()
+"optimization" and do a benchmark mark to see if this actually have a
+benefit.  (You can do this in another patch).  (In a Azure hypervisor
+environment is might not be the right choice).
 
-> 
->> +{
->> +    gfs2_qd_shrinker = shrinker_alloc(SHRINKER_NUMA_AWARE, "gfs2-qd");
->> +    if (!gfs2_qd_shrinker)
->> +        return -ENOMEM;
->> +
->> +    gfs2_qd_shrinker->count_objects = gfs2_qd_shrink_count;
->> +    gfs2_qd_shrinker->scan_objects = gfs2_qd_shrink_scan;
->> +    gfs2_qd_shrinker->seeks = DEFAULT_SEEKS;
->> +
->> +    shrinker_register(gfs2_qd_shrinker);
->> +    return 0;
->> +}
->> +
->> +void gfs2_qd_shrinker_exit(void)
->> +{
->> +    shrinker_unregister(gfs2_qd_shrinker);
->> +}
->>   static u64 qd2index(struct gfs2_quota_data *qd)
->>   {
->> diff --git a/fs/gfs2/quota.h b/fs/gfs2/quota.h
->> index 21ada332d555..f9cb863373f7 100644
->> --- a/fs/gfs2/quota.h
->> +++ b/fs/gfs2/quota.h
->> @@ -59,7 +59,8 @@ static inline int gfs2_quota_lock_check(struct 
->> gfs2_inode *ip,
->>   }
->>   extern const struct quotactl_ops gfs2_quotactl_ops;
->> -extern struct shrinker gfs2_qd_shrinker;
->> +int gfs2_qd_shrinker_init(void);
->> +void gfs2_qd_shrinker_exit(void);
->>   extern struct list_lru gfs2_qd_lru;
->>   extern void __init gfs2_quota_hash_init(void);
-> 
+This reminds me, do you have any benchmark data on the improvement this
+patch (using page_pool) gave?
+
+--Jesper
+
 
