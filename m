@@ -1,93 +1,107 @@
-Return-Path: <netdev+bounces-21366-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21363-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 801C5763630
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 14:22:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 751AD763604
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 14:14:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3A2B42812F7
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 12:22:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A58081C2123B
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 12:14:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82202C13F;
-	Wed, 26 Jul 2023 12:22:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEA5EC132;
+	Wed, 26 Jul 2023 12:14:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76A78CA41
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 12:22:42 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1498619B5
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 05:14:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1690373676;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9y3yg5KgefYDIN9bSf2g3F3ifzh5J50cmp3vp0NbN6I=;
-	b=f/jjpYefZC+203m0VN4ob/f61A/RxPDtB50OivL+haGUY0LoSrzCYsb+tpfBXWIdJUCvHa
-	WEalWN+oTTlo1PCgetfudxPgQQ2CIdwJVfd8wgA/cgQmwPJA4r1DVAatC2k1PLZ5I6DLWi
-	iYvKM5mK3y5nr9WS7xYi96xHmUszYi4=
-Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-246-VAR8qLzmMzq89RhDCSTq8g-1; Wed, 26 Jul 2023 08:14:32 -0400
-X-MC-Unique: VAR8qLzmMzq89RhDCSTq8g-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 520162815E2A;
-	Wed, 26 Jul 2023 12:14:32 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.131])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id AE5D0492CA6;
-	Wed, 26 Jul 2023 12:14:31 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <168979148257.1905271.8311839188162164611.stgit@morisot.1015granger.net>
-References: <168979148257.1905271.8311839188162164611.stgit@morisot.1015granger.net> <168979108540.1905271.9720708849149797793.stgit@morisot.1015granger.net>
-To: Chuck Lever <cel@kernel.org>
-Cc: dhowells@redhat.com, linux-nfs@vger.kernel.org,
-    netdev@vger.kernel.org, Chuck Lever <chuck.lever@oracle.com>
-Subject: Re: [PATCH v3 4/5] SUNRPC: Revert e0a912e8ddba
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C151EC128
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 12:14:41 +0000 (UTC)
+Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 442C519BF;
+	Wed, 26 Jul 2023 05:14:40 -0700 (PDT)
+Received: by mail-wm1-x335.google.com with SMTP id 5b1f17b1804b1-3fbef8ad9bbso68105135e9.0;
+        Wed, 26 Jul 2023 05:14:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1690373679; x=1690978479;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=o/ynjO23HFdCrYklHUN+6zq8DWOUsElQ5pQJdXR+FlI=;
+        b=gRQNOMEam8G5d6CAh5u/aOAw2L8qg/n/05jy0BEtwiONVwXbBUO9a/K7svGAPPNU/W
+         N/ENYsH/sdaoNTT06xRmQtP+WbvPpEmBGI+4SKS0GWMpLwAnawqbG8ro08RohiGBqQSX
+         RTlQtVWFbjVGSnZUNHseYPQKwB9Qc+TQswhpJWJUWnz307IM52Gw5JQof55M9rxr0/n2
+         MxS6/ySN9WkJG152EmK/jnoUSOQ0UbSpqSiGM/MPmAKlWoNkbe5v0g4b+FxVvtVwqIbK
+         GMhjNGoA7Gs5gqYIiX0fYojCf+gzd0f50OWXW0EqtvOUwnd+A9Tj46aRbyCYqfdJE6j9
+         y95w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690373679; x=1690978479;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=o/ynjO23HFdCrYklHUN+6zq8DWOUsElQ5pQJdXR+FlI=;
+        b=c8HDyNSCVqK9hexnITYVtOyQvWOKbj4f4NhEiAKNxVrdETOQjxynrhfDrp1w3gTV1/
+         mJnvoLZO3EnUMTMzoMuq6JO2WQGbjA4B5haaM6P3hSaoNjbT0xv4bD1FB2+Z1Z7ZOpW2
+         Mei3+JzMCjrLaDzds7g4W/TFYgvLKRNeF7K4P1Hr9B5vM9sO4FdbzCKnKvar/iMzKZ1P
+         lDoAk2t6+6i/CFiGEvmasIowOxbbu4uu5mwDwF9YothEPzqJ2ArNnlnO2xR9ls0ppA+G
+         S5zRa+OTjhfltKOpdeE6bosdNWMUGg4t6Fb98vIWQNXXncNTP8lCR3xPJK63FTNpy657
+         Ci0A==
+X-Gm-Message-State: ABy/qLYZ3rYtwGD2AQAV7E2ybb77dQVdodNg8kbgHvsilCqLDFDJzSRv
+	i0OqmomBz2/Uu0TImOWRAbA=
+X-Google-Smtp-Source: APBJJlGWTDBiEnax8+xwNXTCKQAEQxbqt/DOcxpmSI6anxYHa8R0YllndpppRIZ+aIF1bXJJfcxjag==
+X-Received: by 2002:a1c:7310:0:b0:3fb:a0fc:1ba1 with SMTP id d16-20020a1c7310000000b003fba0fc1ba1mr1284026wmb.35.1690373678427;
+        Wed, 26 Jul 2023 05:14:38 -0700 (PDT)
+Received: from skbuf ([188.25.175.105])
+        by smtp.gmail.com with ESMTPSA id o10-20020a1c750a000000b003fc01189b0dsm1821361wmc.42.2023.07.26.05.14.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 Jul 2023 05:14:38 -0700 (PDT)
+Date: Wed, 26 Jul 2023 15:14:35 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Simon Horman <simon.horman@corigine.com>
+Cc: Christian Marangi <ansuelsmth@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Atin Bainada <hi@atinb.me>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [net-next PATCH 2/3] net: dsa: qca8k: make learning configurable
+ and keep off if standalone
+Message-ID: <20230726121435.stqwc3jzjll222ck@skbuf>
+References: <20230724033058.16795-1-ansuelsmth@gmail.com>
+ <20230724033058.16795-2-ansuelsmth@gmail.com>
+ <ZMDXFiSFI/hyr8j6@corigine.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <6617.1690373671.1@warthog.procyon.org.uk>
-Date: Wed, 26 Jul 2023 13:14:31 +0100
-Message-ID: <6618.1690373671@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-	version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZMDXFiSFI/hyr8j6@corigine.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Chuck Lever <cel@kernel.org> wrote:
-
-> Flamegraph analysis showed that the cork/uncork calls consume
-> nearly a third of the CPU time spent in svc_tcp_sendto(). The
-> other two consumers are mutex lock/unlock and svc_tcp_sendmsg().
+On Wed, Jul 26, 2023 at 10:19:34AM +0200, Simon Horman wrote:
+> > +int qca8k_port_pre_bridge_flags(struct dsa_switch *ds, int port,
+> > +				struct switchdev_brport_flags flags,
+> > +				struct netlink_ext_ack *extack)
+> > +{
+> > +	if (flags.mask & ~BR_LEARNING)
+> > +		return -EINVAL;
 > 
-> Now that svc_tcp_sendto() coalesces RPC messages properly, there
-> is no need to introduce artificial delays to prevent sending
-> partial messages.
+> If I am reading things right then some implementation of this callback
+> return -EINVAL when they see unexpected flags. And some seem not to
+> - possibly because all flags are expected.
 > 
-> After applying this change, I measured a 1.2K read IOPS increase
-> for 8KB random I/O (several percent) on 56Gb IP over IB.
-> 
-> Signed-off-by: Chuck Lever <chuck.lever@oracle.com>
+> So I'm slightly unsure if this is correct or not.
 
-Reviewed-by: David Howells <dhowells@redhat.com>
-
+Which ones don't? All handlers of SWITCHDEV_ATTR_ID_PORT_PRE_BRIDGE_FLAGS
+should return -EINVAL for changes made to bridge port flags that aren't
+supported.
 
