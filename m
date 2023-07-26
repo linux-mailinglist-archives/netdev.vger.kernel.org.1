@@ -1,227 +1,146 @@
-Return-Path: <netdev+bounces-21220-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21222-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20439762E2A
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 09:42:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24221762E2F
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 09:43:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D5D2E281C22
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 07:42:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 547491C208F5
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 07:43:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 534419463;
-	Wed, 26 Jul 2023 07:42:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 239049469;
+	Wed, 26 Jul 2023 07:43:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F6C3944C
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 07:42:29 +0000 (UTC)
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2091.outbound.protection.outlook.com [40.107.244.91])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 585A03C32;
-	Wed, 26 Jul 2023 00:42:27 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=U1AOfbuM+7tKYDUxw4VlNM+ojMjV6t31vwZwgdPRRXSTK5aWMv+vsaas8n8/d6WFbhbjodgSzoRTwvl40UjQsYwbZQUZm1VeeUjT2j4x47cgI5/8nc2WsSueccFOkv4a4/7rC++fIRHKlqpktAPxrWWnbikKGO/RTjJiuQFewpTk7TGUhocNoemfPVt9zn/D5SKb8SKEfNu3P5QCQMNvtebgBaHnjMmwpYyzTAVgla5gdMvYvtxmtfF4M0il9T7oVpl36mWVJct/QU+Qgb4vOGzqxdV5RvCet9CHXBBxY5oASRkWKIoYUapB5iQ00NFlWCslkeWaXps5NqgwNRDWpw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=mfK5Mqei6tosDyVAsQotaEz4wVcJD/feM3nGjlxYb2I=;
- b=VIY07L9fsv0qOZOZme8UXK7A0yPHqw4b7tARcSl98oR4WPGC+xoThZjPOEHaw0hiRUn5wAWqIm+z49O4lvlcIbHAwTX+0safGbnW9EnYanLVsk8r3FgF/YdDQF37XF6W4rCjMX6dTsRYZCbILj5oXokQ6lowrCtM7VCGJZW8uixRMiFcp9qiCFsK35dMBImsw7oRz1eBDhdVl5PMCjLxWjcUGFIMDX8KKcHEEsQOq3P3kYDBt6K66VF5niMVjgDc1SrdZc4fJo4blvG0DM6m7EcfoHcRgK75RmxF0FdkpKmkTiuGCiHNz9FUR+uk8/VauisL+HtoSYmBLPk7eQJAvw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
- dkim=pass header.d=corigine.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=mfK5Mqei6tosDyVAsQotaEz4wVcJD/feM3nGjlxYb2I=;
- b=tmdxW3C/nHnyH2gS5jvNQhisN7dCt5ywir0HBGZEOuuxP3msZ5us0Q3pfaGEzL5W4pVhw7mINmbzJyQtyfpJ5wOgkFzi7as/up9alkT1pGgZwc2D1htZLNV3J5jMPw/+xbxrujZnN7XIRzEV2ptjox3UdgYV/t3u8IAXi7oO3Ik=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=corigine.com;
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
- by PH7PR13MB6540.namprd13.prod.outlook.com (2603:10b6:510:2fe::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.33; Wed, 26 Jul
- 2023 07:42:25 +0000
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::fde7:9821:f2d9:101d]) by PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::fde7:9821:f2d9:101d%7]) with mapi id 15.20.6609.032; Wed, 26 Jul 2023
- 07:42:25 +0000
-Date: Wed, 26 Jul 2023 09:42:17 +0200
-From: Simon Horman <simon.horman@corigine.com>
-To: Md Danish Anwar <a0501179@ti.com>
-Cc: MD Danish Anwar <danishanwar@ti.com>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Roger Quadros <rogerq@kernel.org>,
-	Vignesh Raghavendra <vigneshr@ti.com>, Andrew Lunn <andrew@lunn.ch>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Rob Herring <robh+dt@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	"David S. Miller" <davem@davemloft.net>, nm@ti.com, srk@ti.com,
-	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
-	netdev@vger.kernel.org, linux-omap@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: [EXTERNAL] Re: [EXTERNAL] Re: [PATCH v11 03/10] net: ti:
- icssg-prueth: Add Firmware config and classification APIs.
-Message-ID: <ZMDOWecss/9F+0nb@corigine.com>
-References: <20230724112934.2637802-1-danishanwar@ti.com>
- <20230724112934.2637802-4-danishanwar@ti.com>
- <ZL94/L1RMlU5TiAb@corigine.com>
- <b2016718-b8e4-a1f8-92ed-f0d9e3cb9c17@ti.com>
- <ZL99WfF7iuzeMP78@corigine.com>
- <5a4b293f-7729-ee03-2432-cd49ff92d809@ti.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5a4b293f-7729-ee03-2432-cd49ff92d809@ti.com>
-X-ClientProxiedBy: AM8P251CA0020.EURP251.PROD.OUTLOOK.COM
- (2603:10a6:20b:21b::25) To PH0PR13MB4842.namprd13.prod.outlook.com
- (2603:10b6:510:78::6)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 118729456;
+	Wed, 26 Jul 2023 07:43:13 +0000 (UTC)
+Received: from mout.web.de (mout.web.de [212.227.15.14])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CCB01FCB;
+	Wed, 26 Jul 2023 00:43:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
+ s=s29768273; t=1690357359; x=1690962159; i=markus.elfring@web.de;
+ bh=/Cba7IENj/1PiZrrNfL6I9qy31acwecgijBrnKGStl0=;
+ h=X-UI-Sender-Class:Date:Subject:To:Cc:References:From:In-Reply-To;
+ b=Tq2dfqQk5fZMnGR3QKI2c7p3hYAhBd6CnyAT1O0VeuZjJ4XqjDulczaXwdtvLK8iXHF5PKS
+ Ol5BWIwfFwVIUH3x5e2xkTSRqxr5E0merXwifwYFuWeNlxUqBIAAZ7X/V6FLzH6KoWX61Iapz
+ 2iIt3TYXhdUpYdrVT1uCnN4op8RDeVHBzNvu49dI0/KhyvGl51d9kONbotxV3UuPZiqy1hmlU
+ VxZwFSvZaLJN5vr8nVete0gSVisqscFw3VbjCoVBdihSAGBfMaQU6ShfKx0twu01UXN6nqbfZ
+ w8PHMG8onWnNA3BVvMV7DJ0ns/OjiO2rZkqFw4SszNcU/zCmbgSw==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.21] ([94.31.90.83]) by smtp.web.de (mrweb006
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 1MNOVK-1qE3Qj0ITC-00P0gn; Wed, 26
+ Jul 2023 09:42:39 +0200
+Message-ID: <484551aa-8336-fded-cc0c-0611c29aa4f8@web.de>
+Date: Wed, 26 Jul 2023 09:42:28 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|PH7PR13MB6540:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4c11b621-5d7d-42ed-4c5a-08db8dabdab6
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	SSOM9dkACHaDuAH0Q9EHeJtKrenNEEvdW2qCmRvRK1b/JhRJ2Iwq6nnD6PVFGUqi7jAzzs1tBnt6Tme+/6x/j/N0GhDp5BhMHhujQITBRiU23rBOdc1Oq3lI4xKY1oH/mwO+fXv1GvXgPMJtTONl/C4VEUUTmCnRm6iy5voGC/VvLXM3V+R5rGE2p8VLbcCzLQqgWHduVe0PsbgGToJw33p/t0Bys4mM6DhTGlY4UFWz0Kef3OVMMBYZCnzvjPkKMIgaLmcpnzX7jVOMtWwzRlLqDulv05rQL7BIAfWjz6+CE0gaYPTweQjWhTWAzEw2U+nrnT005/ce2x0Wk8Kq4C2Pn0RsoytxTP7ley0kKtp1FtqIX6dyF7Wm+aIiMSR0gzXmPbRv8K7dY7Qk5kql0wX3ZQ6l/MUIHpeM3uWg0qoNK5nlvvNenFNs1ZstRAvqkdNq6CcHSRtMNMvkmyVJFvVLCycJQpSO1kAu5W0rvu4rXawxQkCRKDnXh1+4uMMq2w80e/0hiCKJ8h26cyLTU2DnmMz5L2R0OZJh8AoeqAcQmY8wZw4He3ONnp11DhK8wXf73Y9aPwXRgcRiT4MRuxfhWpWYjuXRX0VY5jPt2rQ=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39840400004)(366004)(376002)(136003)(346002)(396003)(451199021)(36756003)(7416002)(44832011)(86362001)(2906002)(83380400001)(53546011)(186003)(6506007)(38100700002)(6512007)(6486002)(6666004)(54906003)(4326008)(66556008)(6916009)(316002)(66476007)(2616005)(8936002)(5660300002)(66946007)(41300700001)(478600001)(8676002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?PzwdvUX0iNntN7rw0VidNvr5M1noN271byhhEPBUKAVDV9ZTZBAmq2rIKMKV?=
- =?us-ascii?Q?DGhdj3GbpnyLw9wSkohy75hbtZOpdGIGfxndRHlIYvZc/XFi9OKbO7i3gelB?=
- =?us-ascii?Q?ZgJn9Rg2Zv/ikE+0al95Oi3zjigJs7Fp7XS9gkyI5Gi4gZJHJBPUoQ3EXMvC?=
- =?us-ascii?Q?3txFpjYq1OAGB+Yao03oa6Qpl01yQ5fAgrS1fD6kVmjgY0U8wQDaHB+BhE6K?=
- =?us-ascii?Q?YjpU8aH7g7y7w53NZj4QW2vAK62HTwF7c5fy0CmTpIAwH4bL9JLh8RnPxktM?=
- =?us-ascii?Q?DAopyCJlYP96LR3/gzWnQBFh0gPcq5wgAE+G0lQ7aEskC48F4j28V1PQNR3g?=
- =?us-ascii?Q?NZ0V8PCfucwr6clt5fGIWiJ+93qIJNM8JptYSANVBfWjjc3g0dpz/fvsbgVt?=
- =?us-ascii?Q?dID6sZQyS90BIEAHTY4PltJnOWHYkzO/D/Tx1uIJUd0q2FdOFL4M0mBcai3t?=
- =?us-ascii?Q?5jFMgnSNoNjFroM+5wXpBKRahjAfDrFBuYmM2KxPBZXsG+TgoXs1fYl6f3+P?=
- =?us-ascii?Q?8IrBmumg9om47hBVqnz62xIMT1sFrLpxfgb83/w9tu/Rcf83CpUwXLMCNmxd?=
- =?us-ascii?Q?tKonKGlNLcbNJu/Lduma13M13GUFP9gGycwvPZsUP/HYXs0hwoAkU0bQnOUU?=
- =?us-ascii?Q?vYc1GoXNpStb/aqZr8HnZYuJEY2YimpqH6mFEzDldpjIyqRxzzZMbVuYtP63?=
- =?us-ascii?Q?KjicKF150cRfir2uqkNVlng5zyWGGo0KYdd2wu5R6/iVOg6ux2UwFWXVDrgk?=
- =?us-ascii?Q?e9GyCEwfX5ronw999NTFJau0jzfWF7d2itOSkiKg/f8O89FslHTFbIFXMS15?=
- =?us-ascii?Q?pFZWBiLzZpjFmnVJX9ujVcM/SRtvKYrmlVDbFE+Lre2VLLv37YF3/Jd56bEM?=
- =?us-ascii?Q?1p0D2kRnrHTn7J5b/l2K5hTf6NPgaJgFRCp+Qm7xhd94UmygwREVhxf3rMqc?=
- =?us-ascii?Q?nngXyQTwrV/qEbjqUDOBJ9R9fMfzGvvVGUb6raoPLl2Z5heSgpgHtqzvhuju?=
- =?us-ascii?Q?lLlPWRgFezgjAD3BZEAMiXXfgFHrrR+bfBV7tbOJa3hsJjH/HY8IoDzx1QXG?=
- =?us-ascii?Q?RuwqP9r+kKlhO6avSxHU9HfPcjlz9Kyo+9ZUf3bkKN2EEY1Ory/vF3dpT/DU?=
- =?us-ascii?Q?Lbh67jarvJRYMb3KUyGH5wIu7W79w1qL6wFuDB11b51giQehsVxq+oLbwEn4?=
- =?us-ascii?Q?gnfM2YWtQxp9MYGVvGbVJ++nYPG9bdbZUJOow9zAqNKdGAItN6EKFKdO6Vhy?=
- =?us-ascii?Q?+2BIhljfjO/Ws36aVG8K4Run+Ve6AjJmZDWoCikpqOTZe6fJWPqok7PrMT8p?=
- =?us-ascii?Q?/pjRDkuvGepNyCR0mAwYmZaI0Aa6sdpgehW7pypDzrqHhXwMKrk3LauoKZiS?=
- =?us-ascii?Q?X5neREUpDrLhtDRidx67mYLENy0vE62/zZfOTy4Eocf8HxIXBPjgRK18oKHZ?=
- =?us-ascii?Q?TLEAQk8/k04Z48qdU5KXyKR+4GHkE0fDk+jwP1dIsEHPOjurwchAzdseTdJj?=
- =?us-ascii?Q?aWKtxaopgJUT6VPwks//gpaRd3LgC+mFRQgllHdP2yY45S0BUh4i/w8+cjj5?=
- =?us-ascii?Q?McZQerDF3eOgjVaISIwIqikaueTL1rxokvGo70PsXwHhMXpV2g6WnKt33sJb?=
- =?us-ascii?Q?zOSHo2T81O5v7NeWXdICGyjirehzTl0XL+lfr3sSQkbL42b+45q9mc0cNh+D?=
- =?us-ascii?Q?Hhuh/w=3D=3D?=
-X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4c11b621-5d7d-42ed-4c5a-08db8dabdab6
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Jul 2023 07:42:25.4158
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Q8C33K5u8FiIccNCQpfaxNm904ebdPzBLuKauFfd5kPMOaxGUobyNuuRGc8XOK7x2pXpM3DMhIx+FxjMknt/LPeOmGzOa+pzTSzNhZGuRWE=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR13MB6540
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.1
+Subject: Re: [PATCH v4 bpf 1/2] bpf: fix skb_do_redirect return values
+Content-Language: en-GB
+To: Yan Zhai <yan@cloudflare.com>, bpf@vger.kernel.org,
+ kernel-janitors@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, kernel-team@cloudflare.com
+Cc: Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
+ Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
+ Yonghong Song <yhs@fb.com>, John Fastabend <john.fastabend@gmail.com>,
+ KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
+ Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>,
+ Jordan Griege <jgriege@cloudflare.com>, Jakub Sitnicki
+ <jakub@cloudflare.com>, LKML <linux-kernel@vger.kernel.org>
+References: <cover.1690332693.git.yan@cloudflare.com>
+ <e5d05e56bf41de82f10d33229b8a8f6b49290e98.1690332693.git.yan@cloudflare.com>
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <e5d05e56bf41de82f10d33229b8a8f6b49290e98.1690332693.git.yan@cloudflare.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:KPHvQziJWcP9XK4+FXuSjQUE0NW9jwQbMWhFKVMyXUB+48F7KnF
+ Dz0bhEwRf0Ozl40OoWGwggab23uiP5vwAICYoLd8GhSsP3bae0Dben6dc8suoyQ8V6ofa0L
+ XkemI/VVeQWweHKC9/HKTumdeUzcqw4loJChhvYOA5+oLyi2Uqwy6FlvlbdYUPWZOVV/UF1
+ EhMPqEVrXo+9y/CkkFAOw==
+UI-OutboundReport: notjunk:1;M01:P0:bnQolJ42oqo=;ySfKGMmo+h02GjM49Sxv6G1NKPq
+ ZS/PqY2Xhuk5fiAhwW9uMixb2QQqIWlQAegXlQd/8njRLZrH7JC2dxMV7kOB1auu5Px+EtcfJ
+ rakdgR+w0RN7DeucYRG1yKx5+07VHd88m1q2jpe1DwOI6Z53OUsHMrfDBJplZLOsYNQrpUG3T
+ 2xEZpnYvHhwNNhiy/ExNCLysftZXgAOhcdaJ/bABCM3caLAn1qghslj6erIP5gMYKlZuIP9Pi
+ x9HPoeCbZQsQF69SOOC3nR0/9iKlRKnk3B/CXPoL0RtesNjddwx0wQIlzP07s+qjkqglyBJlV
+ kYynNPnKGKsSPiBs2YrSWFO10KdkownxkmpTg5ub+5q0jACho8kbObK/DrXJtsYGpx9PdefwD
+ Fv76vcYsM83AJlV8hj3SNvDfhA7FVhFoCn0wDntb66voKSrhKgeISx9f7V09rbdOdu07OoArM
+ cWOKSyN6zeloDnZLdMqOwjdi3PVzLsSXTHs33ZonZqJ9NKHi48BMMiiUSbVGapF8i1xA92Lhx
+ Y6lyG/WR8tEXj1ykNGGuBpCcjHbD+mpCnx7jG8dn8ChMZFXpeumKqVqALN8AS9J1sN/KkHTV4
+ NuuG5QVjUc47IFEnmI8+U3qZSBl8F7YfvcaVXH8gAQwyGjdZLeGadZkee/C7dab8c7zyn5npI
+ QepHD9TqjrB/WZrQdPfQIeYg8kNshaMNj1+Z5peIH5XM9kTGl4HjSC03sr8BU6PYEHaX15u8H
+ JADHoJtjQOWFzwSQ5rmokMLNT1dQgVPWlbLStOLP/D5Vj/w20ohYDkdM3BlP/i2qKtgognDsX
+ Z1xFKtV26WQcxpre0IkthPhxxHCeFV5p1wR7c0PL2PPzex2Yv+mhJN4/6d0v+/Axxy5wHzYHm
+ 0BFxzB7nnciwskWpjfhR7yqt2PIU2/V+FemShhp4YTtXOnvda1zNwaxxTydx9LWr46enSzJou
+ F6oHb6ivxU79LprHGBYe0YdvF0k=
+X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+	RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Jul 25, 2023 at 01:28:21PM +0530, Md Danish Anwar wrote:
-> On 25/07/23 1:14 pm, Simon Horman wrote:
-> > On Tue, Jul 25, 2023 at 01:10:30PM +0530, Md Danish Anwar wrote:
-> >> Hi Simon,
-> >>
-> >> On 25/07/23 12:55 pm, Simon Horman wrote:
-> >>> On Mon, Jul 24, 2023 at 04:59:27PM +0530, MD Danish Anwar wrote:
-> >>>> Add icssg_config.h / .c and icssg_classifier.c files. These are firmware
-> >>>> configuration and classification related files. These will be used by
-> >>>> ICSSG ethernet driver.
-> >>>>
-> >>>> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
-> >>>> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-> >>>
-> >>> Hi Danish,
-> >>>
-> >>> some feedback from my side.
-> >>>
-> >>
-> >> Thanks for the feedback.
-> >>
-> >>> ...
-> >>>
-> >>>> diff --git a/drivers/net/ethernet/ti/icssg_classifier.c b/drivers/net/ethernet/ti/icssg_classifier.c
-> >>>
-> >>> ...
-> >>>
-> >>>> +void icssg_class_set_mac_addr(struct regmap *miig_rt, int slice, u8 *mac)
-> >>>
-> >>> This function appears to be unused.
-> >>> Perhaps it would be better placed in a later patch?
-> >>>
-> >>> Or perhaps not, if it makes it hard to split up the patches nicely.
-> >>> In which case, perhaps the __maybe_unused annotation could be added,
-> >>> temporarily.
-> >>>
-> >>
-> >> Due to splitting the patch into 8-9 patches, I had to introduce these helper
-> >> APIs earlier. All these APIs are helper APIs, they will be used in patch 6
-> >> (Introduce ICSSG Prueth driver).
-> >>
-> >> I had this concern that some APIs which will be used later but introduced
-> >> earlier can create some warnings, before splitting the patches.
-> >>
-> >> I had raised this concern in [1] and asked Jakub if it would be OK to introduce
-> >> these APIs earlier. Jakub said it would be fine [2], so I went ahead with this
-> >> approach.
-> >>
-> >> It will make very hard to break patches if these APIs are introduced and used
-> >> in same patch.
-> > 
-> > Thanks, I understand.
-> > 
-> > In that case my suggestion is to, temporarily, add __maybe_unused,
-> > which will allow static analysis tools to work more cleanly over the
-> > series. It is just a suggestion, not a hard requirement.
-> > 
-> > Probably something along those lines applies to all the
-> > review I provided in my previous email. Please use your discretion here.
-> 
-> For now I think I will leave it as it is. Let reviewers review all other
-> patches. Let's see if there are any other comments on all the patches in this
-> series. If there are any more comments on other patches, then while re-spinning
-> next revision I will keep this in mind and try to add __maybe_unused tags in
-> all APIs that are used later.
+> skb_do_redirect returns various of values: error code (negative),
+> 0 (success), and some positive status code, e.g. NET_XMIT_CN,
 
-Sure, that sounds reasonable.
+How do you think about to use a wording variant (like the following)?
 
-> The idea behind splitting the patches was to get them reviewed individually as
-> it is quite difficult to get one big patch reviewed as explained by Jakub. And
-> these warnings were expected. If there are any other comments on this series, I
-> will try to address all of them together in next revision.
+  skb_do_redirect() returns different value kinds so far:
 
-Yes, I understand.
-Thanks for splitting things up into multiple patches.
-I know that is a lot of work. But it is very helpful.
 
-> Meanwhile, Please let me know if you have any comments on other patches
-> in this series.
+Can it be nicer to use a multi-line enumeration here?
 
-Will do, but I nothing to add at this time.
+
+> NET_RX_DROP. Commit 3a0af8fd61f9 ("bpf: BPF for lightweight tunnel
+
+I suggest to start this sentence on a separate line.
+Can the commit specification fit into the same line then?
+
+
+=E2=80=A6
+> https://gist.github.com/zhaiyan920/8fbac245b261fe316a7ef04c9b1eba48
+
+Can it help to mention here that you would like to refer to
+a complete KASAN report (which contains 89 text lines then)?
+
+
+> Convert positive statuses from skb_do_redirect eliminates this issue.
+
+Would you like to avoid another wording weakness in this sentence?
+How do you think about to use the following wording variant?
+
+  Thus convert positive status values from the execution of
+  the function =E2=80=9Cskb_do_redirect=E2=80=9D into special error codes.
+
+
+=E2=80=A6
+> Suggested-by: Markus Elfring
+=E2=80=A6
+
+I dare to point review concerns out for various software components.
+But I did not get the impression that I suggested the patch idea.
+
+See also:
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Do=
+cumentation/process/submitting-patches.rst?h=3Dv6.5-rc3#n584
+
+Thus I find this tag inappropriate here.
+Would any information become more relevant for related version description=
+s?
+
+Regards,
+Markus
 
