@@ -1,337 +1,110 @@
-Return-Path: <netdev+bounces-21580-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21581-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46B31763F16
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 20:56:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD630763F1E
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 20:59:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 80D191C211BF
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 18:56:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D71E01C211A9
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 18:59:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C694D4CE8D;
-	Wed, 26 Jul 2023 18:55:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDB044CE7A;
+	Wed, 26 Jul 2023 18:59:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C479C4CE7A
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 18:55:36 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 180A9C43391;
-	Wed, 26 Jul 2023 18:55:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690397736;
-	bh=F4y7eWxMfs7O1IXxa+ay+LQqygCGbMR3JalUCB0tsrc=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=WHEtT/HMfcrEubH/3uRkKoi0mkLGFHGu3NQ7Sarm872EJqorpVgXvbq5jR4VRRcya
-	 EaiJaduCCmx8iUQeDdalLjcKfcs+/tRGst19+9SQj4GwbpB074k09v+tqOlrXy6Q9b
-	 X1QAWoZPbHbUn8HLwUafHRnn8H2yKn5VhsiJwsADlaR39KlkoxoxPIlo4R6v1JvbwK
-	 Y032uyCfWygOvz88wN7pH/JoorwoXfXT3KEnBhiEsdY7IDa01Q5GzBYtMMojzCyNH4
-	 el5hHP3etFJpPijSD+PqpM5I27LfSWtEeb0KyKyIRrH3IG1cyRZYOV0ZVkPOaDB+Mo
-	 xHsU+IaYijQBQ==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	sd@queasysnail.net,
-	leon@kernel.org,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v2 2/2] net: convert some netlink netdev iterators to depend on the xarray
-Date: Wed, 26 Jul 2023 11:55:30 -0700
-Message-ID: <20230726185530.2247698-3-kuba@kernel.org>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230726185530.2247698-1-kuba@kernel.org>
-References: <20230726185530.2247698-1-kuba@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B21B37E1
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 18:59:25 +0000 (UTC)
+Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3600B19A0
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 11:59:24 -0700 (PDT)
+Received: by mail-lf1-x129.google.com with SMTP id 2adb3069b0e04-4fdddf92b05so194603e87.3
+        for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 11:59:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google; t=1690397962; x=1691002762;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=9ltB90dbZBs9x2w+zTel/ot+HALu1Ht+7bi6jGbPAdk=;
+        b=H2XJWiCoD7KhXfeojnRimRKEFZc2C/9H5g8aJ4i1DGkWQVukNSDP33l4XgAR3Vr9q7
+         CJG0DYnu+674+LKE0mfCHvAvLMZ75UrdhRTrU30CAglnbvmOv3qyb0iWgsD8pTXPDOrc
+         xxd3Gpjakobk15VI731GXxslOpbzWfz+pyo6k=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690397962; x=1691002762;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=9ltB90dbZBs9x2w+zTel/ot+HALu1Ht+7bi6jGbPAdk=;
+        b=IY0sqgEY/Ru90RRyHPWdjmHr2nBbe1NokE5LNCn7dMMDGa2+vQ08K2qDv3HFNLkPkU
+         U2bqynCdLmdgY5QcQCNsZVXqaZCASkBxN8px8sk2b/z0nwDFZpC4AwTYxIPyX4uxBX8R
+         E8FRwtm6mk6QTq6RzF7ga0I7ulTwF9WWAudAsH/RfJUBfPVzN1zQ3o0UeBhBLUNJI1jd
+         zUPcb7WPDW5XjiFoxUv+KIPWEnO2r5HCf/kvEB8F1vW5FQygFPnzq5o3wdB/BqehaER/
+         17a4gpcXOmc236QTpu7jJrhdKcpqdS1kQqLcaBn4XscmWdRVzUtb7ak4swd26McCXPr6
+         vVUw==
+X-Gm-Message-State: ABy/qLYtk9l/rJsZJxMWnSXoqj+Oi1EkkzncKDsCx2Sg7CCflbp6qqdJ
+	8SPFoCplTKSb0U/jtX61Ed+D2H8Dp13YCYzn3XTQO9hy
+X-Google-Smtp-Source: APBJJlHXO219Q7wGMqNvO1K1mXORyfeghhPBpQLZUPP5AjyTylvUI3APa5wIdkDd0BCB8CemImLuSA==
+X-Received: by 2002:ac2:4c93:0:b0:4f3:b708:f554 with SMTP id d19-20020ac24c93000000b004f3b708f554mr25015lfl.47.1690397962334;
+        Wed, 26 Jul 2023 11:59:22 -0700 (PDT)
+Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com. [209.85.208.170])
+        by smtp.gmail.com with ESMTPSA id n7-20020a056512388700b004fb9d7b9922sm3429540lft.144.2023.07.26.11.59.21
+        for <netdev@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 26 Jul 2023 11:59:21 -0700 (PDT)
+Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-2b97f34239cso887041fa.3
+        for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 11:59:21 -0700 (PDT)
+X-Received: by 2002:a2e:9510:0:b0:2b5:9d2a:ab51 with SMTP id
+ f16-20020a2e9510000000b002b59d2aab51mr1859153ljh.5.1690397960827; Wed, 26 Jul
+ 2023 11:59:20 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20230726151515.1650519-1-kuba@kernel.org> <11ec5b3819ff17c7013348b766eab571eee5ca96.camel@perches.com>
+ <20230726092312.799503d6@kernel.org> <CAHk-=wjEj2fGiaQXrYUZu65EPdgbGEAEMzch8LTtiUp6UveRCw@mail.gmail.com>
+ <20230726112031.61bd0c62@kernel.org> <CAHk-=wi9MyyWmP_HAddLrmGfdANkut6_2f9hzv9HcyTBvg3+kA@mail.gmail.com>
+ <20230726114817.1bd52d48@kernel.org>
+In-Reply-To: <20230726114817.1bd52d48@kernel.org>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Wed, 26 Jul 2023 11:59:04 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wiuR7_A=PbN8jhmqGPJQHypUHR+W4-UuSVhOVWvYXs1Tg@mail.gmail.com>
+Message-ID: <CAHk-=wiuR7_A=PbN8jhmqGPJQHypUHR+W4-UuSVhOVWvYXs1Tg@mail.gmail.com>
+Subject: Re: [PATCH v2] scripts: get_maintainer: steer people away from using
+ file paths
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Joe Perches <joe@perches.com>, Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, 
+	geert@linux-m68k.org, gregkh@linuxfoundation.org, netdev@vger.kernel.org, 
+	workflows@vger.kernel.org, mario.limonciello@amd.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Reap the benefits of easier iteration thanks to the xarray.
-Convert just the genetlink ones, those are easier to test.
+On Wed, 26 Jul 2023 at 11:48, Jakub Kicinski <kuba@kernel.org> wrote:
+>
+> We get at least one fix a week where author adds a Fixes tag
+> but somehow magically didn't CC the author of that commit.
+> When we ask they usually reply with "but I run get_maintainer -f,
+> isn't that what I'm supposed to do?".
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
- include/linux/netdevice.h |  3 ++
- net/core/netdev-genl.c    | 37 +++++---------------
- net/ethtool/netlink.c     | 59 ++++++++-----------------------
- net/ethtool/tunnels.c     | 73 +++++++++++++++------------------------
- 4 files changed, 52 insertions(+), 120 deletions(-)
+Bah. I think you're blaming entirely the wrong people, and the wrong tool.
 
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index 11652e464f5d..c35126180541 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -3016,6 +3016,9 @@ extern rwlock_t				dev_base_lock;		/* Device list lock */
- 			if (netdev_master_upper_dev_get_rcu(slave) == (bond))
- #define net_device_entry(lh)	list_entry(lh, struct net_device, dev_list)
- 
-+#define for_each_netdev_dump(net, d, ifindex)				\
-+	xa_for_each_start(&(net)->dev_by_index, (ifindex), (d), (ifindex))
-+
- static inline struct net_device *next_net_device(struct net_device *dev)
- {
- 	struct list_head *lh;
-diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
-index 65ef4867fc49..797c813c7c77 100644
---- a/net/core/netdev-genl.c
-+++ b/net/core/netdev-genl.c
-@@ -101,43 +101,22 @@ int netdev_nl_dev_get_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
- {
- 	struct net *net = sock_net(skb->sk);
- 	struct net_device *netdev;
--	int idx = 0, s_idx;
--	int h, s_h;
--	int err;
--
--	s_h = cb->args[0];
--	s_idx = cb->args[1];
-+	int err = 0;
- 
- 	rtnl_lock();
--
--	for (h = s_h; h < NETDEV_HASHENTRIES; h++, s_idx = 0) {
--		struct hlist_head *head;
--
--		idx = 0;
--		head = &net->dev_index_head[h];
--		hlist_for_each_entry(netdev, head, index_hlist) {
--			if (idx < s_idx)
--				goto cont;
--			err = netdev_nl_dev_fill(netdev, skb,
--						 NETLINK_CB(cb->skb).portid,
--						 cb->nlh->nlmsg_seq, 0,
--						 NETDEV_CMD_DEV_GET);
--			if (err < 0)
--				break;
--cont:
--			idx++;
--		}
-+	for_each_netdev_dump(net, netdev, cb->args[0]) {
-+		err = netdev_nl_dev_fill(netdev, skb,
-+					 NETLINK_CB(cb->skb).portid,
-+					 cb->nlh->nlmsg_seq, 0,
-+					 NETDEV_CMD_DEV_GET);
-+		if (err < 0)
-+			break;
- 	}
--
- 	rtnl_unlock();
- 
- 	if (err != -EMSGSIZE)
- 		return err;
- 
--	cb->args[1] = idx;
--	cb->args[0] = h;
--	cb->seq = net->dev_base_seq;
--
- 	return skb->len;
- }
- 
-diff --git a/net/ethtool/netlink.c b/net/ethtool/netlink.c
-index 39a459b0111b..ae344f1b0bbd 100644
---- a/net/ethtool/netlink.c
-+++ b/net/ethtool/netlink.c
-@@ -252,8 +252,7 @@ int ethnl_multicast(struct sk_buff *skb, struct net_device *dev)
-  * @ops:        request ops of currently processed message type
-  * @req_info:   parsed request header of processed request
-  * @reply_data: data needed to compose the reply
-- * @pos_hash:   saved iteration position - hashbucket
-- * @pos_idx:    saved iteration position - index
-+ * @pos_ifindex: saved iteration position - ifindex
-  *
-  * These parameters are kept in struct netlink_callback as context preserved
-  * between iterations. They are initialized by ethnl_default_start() and used
-@@ -263,8 +262,7 @@ struct ethnl_dump_ctx {
- 	const struct ethnl_request_ops	*ops;
- 	struct ethnl_req_info		*req_info;
- 	struct ethnl_reply_data		*reply_data;
--	int				pos_hash;
--	int				pos_idx;
-+	unsigned long			pos_ifindex;
- };
- 
- static const struct ethnl_request_ops *
-@@ -490,55 +488,27 @@ static int ethnl_default_dumpit(struct sk_buff *skb,
- {
- 	struct ethnl_dump_ctx *ctx = ethnl_dump_context(cb);
- 	struct net *net = sock_net(skb->sk);
--	int s_idx = ctx->pos_idx;
--	int h, idx = 0;
-+	struct net_device *dev;
- 	int ret = 0;
- 
- 	rtnl_lock();
--	for (h = ctx->pos_hash; h < NETDEV_HASHENTRIES; h++, s_idx = 0) {
--		struct hlist_head *head;
--		struct net_device *dev;
--		unsigned int seq;
-+	for_each_netdev_dump(net, dev, ctx->pos_ifindex) {
-+		dev_hold(dev);
-+		rtnl_unlock();
- 
--		head = &net->dev_index_head[h];
-+		ret = ethnl_default_dump_one(skb, dev, ctx, cb);
- 
--restart_chain:
--		seq = net->dev_base_seq;
--		cb->seq = seq;
--		idx = 0;
--		hlist_for_each_entry(dev, head, index_hlist) {
--			if (idx < s_idx)
--				goto cont;
--			dev_hold(dev);
--			rtnl_unlock();
-+		rtnl_lock();
-+		dev_put(dev);
- 
--			ret = ethnl_default_dump_one(skb, dev, ctx, cb);
--			dev_put(dev);
--			if (ret < 0) {
--				if (ret == -EOPNOTSUPP)
--					goto lock_and_cont;
--				if (likely(skb->len))
--					ret = skb->len;
--				goto out;
--			}
--lock_and_cont:
--			rtnl_lock();
--			if (net->dev_base_seq != seq) {
--				s_idx = idx + 1;
--				goto restart_chain;
--			}
--cont:
--			idx++;
-+		if (ret < 0 && ret != -EOPNOTSUPP) {
-+			if (likely(skb->len))
-+				ret = skb->len;
-+			break;
- 		}
--
- 	}
- 	rtnl_unlock();
- 
--out:
--	ctx->pos_hash = h;
--	ctx->pos_idx = idx;
--	nl_dump_check_consistent(cb, nlmsg_hdr(skb));
--
- 	return ret;
- }
- 
-@@ -584,8 +554,7 @@ static int ethnl_default_start(struct netlink_callback *cb)
- 	ctx->ops = ops;
- 	ctx->req_info = req_info;
- 	ctx->reply_data = reply_data;
--	ctx->pos_hash = 0;
--	ctx->pos_idx = 0;
-+	ctx->pos_ifindex = 0;
- 
- 	return 0;
- 
-diff --git a/net/ethtool/tunnels.c b/net/ethtool/tunnels.c
-index 67fb414ca859..05f752557b5e 100644
---- a/net/ethtool/tunnels.c
-+++ b/net/ethtool/tunnels.c
-@@ -212,8 +212,7 @@ int ethnl_tunnel_info_doit(struct sk_buff *skb, struct genl_info *info)
- 
- struct ethnl_tunnel_info_dump_ctx {
- 	struct ethnl_req_info	req_info;
--	int			pos_hash;
--	int			pos_idx;
-+	unsigned long		ifindex;
- };
- 
- int ethnl_tunnel_info_start(struct netlink_callback *cb)
-@@ -243,56 +242,38 @@ int ethnl_tunnel_info_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
- {
- 	struct ethnl_tunnel_info_dump_ctx *ctx = (void *)cb->ctx;
- 	struct net *net = sock_net(skb->sk);
--	int s_idx = ctx->pos_idx;
--	int h, idx = 0;
-+	struct net_device *dev;
- 	int ret = 0;
- 	void *ehdr;
- 
- 	rtnl_lock();
--	cb->seq = net->dev_base_seq;
--	for (h = ctx->pos_hash; h < NETDEV_HASHENTRIES; h++, s_idx = 0) {
--		struct hlist_head *head;
--		struct net_device *dev;
--
--		head = &net->dev_index_head[h];
--		idx = 0;
--		hlist_for_each_entry(dev, head, index_hlist) {
--			if (idx < s_idx)
--				goto cont;
--
--			ehdr = ethnl_dump_put(skb, cb,
--					      ETHTOOL_MSG_TUNNEL_INFO_GET_REPLY);
--			if (!ehdr) {
--				ret = -EMSGSIZE;
--				goto out;
--			}
--
--			ret = ethnl_fill_reply_header(skb, dev, ETHTOOL_A_TUNNEL_INFO_HEADER);
--			if (ret < 0) {
--				genlmsg_cancel(skb, ehdr);
--				goto out;
--			}
--
--			ctx->req_info.dev = dev;
--			ret = ethnl_tunnel_info_fill_reply(&ctx->req_info, skb);
--			ctx->req_info.dev = NULL;
--			if (ret < 0) {
--				genlmsg_cancel(skb, ehdr);
--				if (ret == -EOPNOTSUPP)
--					goto cont;
--				goto out;
--			}
--			genlmsg_end(skb, ehdr);
--cont:
--			idx++;
-+	for_each_netdev_dump(net, dev, ctx->ifindex) {
-+		ehdr = ethnl_dump_put(skb, cb,
-+				      ETHTOOL_MSG_TUNNEL_INFO_GET_REPLY);
-+		if (!ehdr) {
-+			ret = -EMSGSIZE;
-+			break;
- 		}
--	}
--out:
--	rtnl_unlock();
- 
--	ctx->pos_hash = h;
--	ctx->pos_idx = idx;
--	nl_dump_check_consistent(cb, nlmsg_hdr(skb));
-+		ret = ethnl_fill_reply_header(skb, dev,
-+					      ETHTOOL_A_TUNNEL_INFO_HEADER);
-+		if (ret < 0) {
-+			genlmsg_cancel(skb, ehdr);
-+			break;
-+		}
-+
-+		ctx->req_info.dev = dev;
-+		ret = ethnl_tunnel_info_fill_reply(&ctx->req_info, skb);
-+		ctx->req_info.dev = NULL;
-+		if (ret < 0) {
-+			genlmsg_cancel(skb, ehdr);
-+			if (ret == -EOPNOTSUPP)
-+				continue;
-+			break;
-+		}
-+		genlmsg_end(skb, ehdr);
-+	}
-+	rtnl_unlock();
- 
- 	if (ret == -EMSGSIZE && skb->len)
- 		return skb->len;
--- 
-2.41.0
+Your complaint seems to be "we got a fix, it even says what commit it
+is fixing, and the tool that the person ran didn't add the right
+people automatically".
 
+And my reaction is "I use that tooling, I want it to do exactly what
+it does right now, why are you blaming that tool"?
+
+You're already using 'patchwork'. Why don't you instead go "Oh, *that*
+tool isn't doing the right thing?"
+
+                  Linus
 
