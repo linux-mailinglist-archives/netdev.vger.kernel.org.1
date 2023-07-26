@@ -1,135 +1,107 @@
-Return-Path: <netdev+bounces-21522-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21523-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8654C763CB3
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 18:43:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B162F763CB8
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 18:43:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 41563281A6E
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 16:43:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 651CA2819E0
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 16:43:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E08B41AA6D;
-	Wed, 26 Jul 2023 16:43:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 287721AA76;
+	Wed, 26 Jul 2023 16:43:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C62041AA63;
-	Wed, 26 Jul 2023 16:43:13 +0000 (UTC)
-Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91A4626B8;
-	Wed, 26 Jul 2023 09:43:12 -0700 (PDT)
-Received: by mail-pl1-x634.google.com with SMTP id d9443c01a7336-1b89cfb4571so55417545ad.3;
-        Wed, 26 Jul 2023 09:43:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690389792; x=1690994592;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KCv8whutDfLJorKpUOqJ8+KkOpc2kOBhY8hTu1PhHvI=;
-        b=QMUznHOLJYfI3Cg1OGbvbUK2zwN4Xs54ZJ3JbZrw4JhdF1uxPQBZ3HVCSn31MYAgdc
-         Q3UdwouTq+Mcv+ne7ujpatnJtig71lQqScyMfCpcd4njFTx2RrYTuWYS75n+F8Ub+lJb
-         sgYnZK0m3NpEEtpkxeXqvlCQL5FyNn9joXe4bALGP92MnaPs+jHcAWAHXearGlrCz8vp
-         NiOWaE+mGvO2zNT5aJxPyQVlYzpIxZgun8DIiMsIyNzjTELMbe8K/8SOPkhf+s3/lXjk
-         II5NtI1EzZjw6UkqZdZsvukqb8KGZBLOTuS3MfVf02FYRvI+M5kRxGwBzEWcbh/IBuyC
-         WI3w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690389792; x=1690994592;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KCv8whutDfLJorKpUOqJ8+KkOpc2kOBhY8hTu1PhHvI=;
-        b=GBt3NA5pNQ1akjvGOAZItclKXqBzKoEc9R+/iZ4uWNPpeAs1ZMC2STAudf54WM8YPr
-         oEznqknjN1S5jLmJpBkyplAi9+3A34DJZ4L7EfCZdLhHn522n0OEYpJA4O8JkR5dngjv
-         pWtP0MogwAQTEU+8g6lqEnj48k47bM1ALXY5k9Jms3ORK2Q0P0f8uuC0v//1kdRbripe
-         ydXFDYsa5+uRYdmHO7/DCGhoUX+AsD3QT/sXR6zHL0PugOlYffmgAzUfkMgVct3m5vEh
-         XzYRFfqG/duH9w3UKYKdh3z1f/7gnZxt1eOmnzYu5p2liSyvrpM1AtEx5qHzfXmlrDnY
-         x07g==
-X-Gm-Message-State: ABy/qLYhU4dukQt5W0+ubN3zpnyzYGDdYO06KOw22brnUGgkGAKpBNlM
-	Nak27gn0Z8BuShSCHRpH1D87JTjtvobx6LhC1nU=
-X-Google-Smtp-Source: APBJJlExta4H2GjqFCFJjAPMwlKu75pRye0RG2yh6z7/8hWP5WKagkLUkY7X/mJhBRsTApJB/W2FhSG2fN3oUXYQ7wA=
-X-Received: by 2002:a17:90a:c714:b0:263:f643:4bd3 with SMTP id
- o20-20020a17090ac71400b00263f6434bd3mr2209207pjt.27.1690389791855; Wed, 26
- Jul 2023 09:43:11 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D1891802C
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 16:43:16 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF17D26AE
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 09:43:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=xmIyfPnDArWfzWAoPJJMuxu5k+1HCUBA0+YqMDldAOw=; b=Gfoi1OXJjYJO2oICI9vQKdfiEL
+	MU8dWfExQsyeZkh3L0R/C1aSYI6JeaG8qvUYWGT6rskXva7fqNHdT2p3rlbGS8GHgqJnMZw6416EA
+	gm1JD5485WuYhAjzg0iQML1hjya3Wfjb9ZkIk/KOpat8rB5qYNcvLxh8NegGvqe3frP0=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qOhbJ-002NPs-QX; Wed, 26 Jul 2023 18:43:01 +0200
+Date: Wed, 26 Jul 2023 18:43:01 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "mengyuanlou@net-swift.com" <mengyuanlou@net-swift.com>,
+	"Russell King (Oracle)" <linux@armlinux.org.uk>,
+	Simon Horman <simon.horman@corigine.com>, netdev@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Subject: Re: [PATCH net-next 2/2] net: phy: add keep_data_connection to
+ struct phydev
+Message-ID: <ba6f7147-6652-4858-b4bc-19b1e7dfa30c@lunn.ch>
+References: <20230724092544.73531-1-mengyuanlou@net-swift.com>
+ <20207E0578DCE44C+20230724092544.73531-3-mengyuanlou@net-swift.com>
+ <ZL+6kMqETdYL7QNF@corigine.com>
+ <ZL/KIjjw3AZmQcGn@shell.armlinux.org.uk>
+ <4B0F6878-3ABF-4F99-8CE3-F16608583EB4@net-swift.com>
+ <21770a39-a0f4-485c-b6d1-3fd250536159@lunn.ch>
+ <20230726090812.7ff5af72@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230725131258.31306-1-linyunsheng@huawei.com>
- <94272ffed7636c4c92fcc73ccfc15236dd8e47dc.camel@gmail.com>
- <16b4ab57-dfb0-2c1d-9be1-57da30dff3c3@intel.com> <22af47fe-1347-3e32-70bf-745d833e88b9@huawei.com>
- <CAKgT0UcU4RJj0SMQiVM8oZu86ZzK+5NjzZ2ELg_yWZyWGr04PA@mail.gmail.com>
- <CAKgT0UfL4ri-o7WifeewpezGQY1UQKwcBEUSSY80DyKoE8g-0w@mail.gmail.com> <20230726085049.36b527a4@kernel.org>
-In-Reply-To: <20230726085049.36b527a4@kernel.org>
-From: Alexander Duyck <alexander.duyck@gmail.com>
-Date: Wed, 26 Jul 2023 09:42:34 -0700
-Message-ID: <CAKgT0UddT2CY_HrQ-d+5vPbpguuscsfF=oUVW02AFy0JAYet3w@mail.gmail.com>
-Subject: Re: [PATCH net-next v2] page_pool: split types and declarations from page_pool.h
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Yunsheng Lin <linyunsheng@huawei.com>, 
-	Alexander Lobakin <aleksander.lobakin@intel.com>, davem@davemloft.net, pabeni@redhat.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Eric Dumazet <edumazet@google.com>, Wei Fang <wei.fang@nxp.com>, 
-	Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, 
-	NXP Linux Team <linux-imx@nxp.com>, Sunil Goutham <sgoutham@marvell.com>, 
-	Geetha sowjanya <gakula@marvell.com>, Subbaraya Sundeep <sbhatta@marvell.com>, 
-	hariprasad <hkelam@marvell.com>, Saeed Mahameed <saeedm@nvidia.com>, 
-	Leon Romanovsky <leon@kernel.org>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, Felix Fietkau <nbd@nbd.name>, 
-	Lorenzo Bianconi <lorenzo@kernel.org>, Ryder Lee <ryder.lee@mediatek.com>, 
-	Shayne Chen <shayne.chen@mediatek.com>, Sean Wang <sean.wang@mediatek.com>, 
-	Kalle Valo <kvalo@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>, 
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, linux-rdma@vger.kernel.org, 
-	bpf@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230726090812.7ff5af72@kernel.org>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Jul 26, 2023 at 8:50=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Wed, 26 Jul 2023 08:39:43 -0700 Alexander Duyck wrote:
-> > > > I suppose the above suggestion is about splitting or naming by
-> > > > the user as the discussed in the below thread?
-> > > > https://lore.kernel.org/all/20230721182942.0ca57663@kernel.org/
-> > >
-> > > Actually my suggestion is more about defining boundaries for what is
-> > > meant to be used by drivers and what isn't. The stuff you could keep
-> > > in net/core/page_pool.h would only be usable by the files in net/core=
-/
-> > > whereas the stuff you are keeping in the include/net/ folder is usabl=
-e
-> > > by drivers. It is meant to prevent things like what you were
-> > > complaining about with the Mellanox drivers making use of interfaces
-> > > you didn't intend them to use.
->
-> FWIW moving stuff which is only supposed to be used by core (xdp, skb,
-> etc.) to net/core/page_pool.h is a good idea, too.
-> Seems a bit independent from splitting the main header, tho.
+On Wed, Jul 26, 2023 at 09:08:12AM -0700, Jakub Kicinski wrote:
+> Sorry for chiming in, hopefully the comments are helpful..
 
-It seems a bit independent, but I was reacting only because I feel
-like this ijust adding to the technical debt on this. Basically before
-we can really just go ahead and split it the header file itself should
-probably be cleaned up a bit.
+Thanks for commenting. This is a somewhat unusual setup, a server
+style Ethernet interface which Linux is driving, not firmware. So its
+more like an embedded SoC setup, but has NCSI which embedded systems
+don't.
 
-The reason why it occurred to me is that I noticed things like
-page_pool_use_xdp_mem and the forward declaration for xdp_mem_info was
-being picked up and moved into the types.h file in the move. The whole
-block was in a #if/#else statement w/ definitions for the PAGE_POOL
-and non-PAGE_POOL cases.
+> On Wed, 26 Jul 2023 10:54:25 +0200 Andrew Lunn wrote:
+> > As far as i understand it, the host MAC is actually a switch, with the
+> > BMC connected to the second port of the switch.
+> 
+> Not a learning switch (usually, sigh), but yes.
+> 
+> > Does the BMC care about the PHY status?
+> > Does it need to know about link status? 
+> 
+> Yes, NIC sends link state notifications over the NCSI "link?" (which 
+> is a separate RGMII?/RMII from NIC to the BMC). BMC can select which
+> "channel" (NIC port) it uses based on PHY status.
 
-We also have functions that don't really need to be included such as
-page_pool_unlink_napi which is exported but not used outside of
-page_pool.c from what I can tell.
+How do you define NIC when Linux is driving the hardware, not
+firmware? In this case we have a MAC driver, a PCS driver, a PHY
+driver and phylink gluing it all together. Which part of this is
+sending link state notifications over the NCSI "Link?".
+ 
+> > Does the NCSI core on the host need to know about the PHY?
+> 
+> There is no NCSI core on the host.. Hosts are currently completely
+> oblivious to NCSI. The NCSI we have in tree is for the BMC, Linux
+> running on the BMC (e.g. OpenBMC).
+
+But in this case, it is not oblivious to NCSI, since the host is
+controlling the PHY. This patch is about Linux on the host not
+shutting down the PHY because it is also being used by the BMC.
+
+	 Andrew
 
