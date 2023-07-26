@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-21151-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21152-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D5ED76293A
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 05:23:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 70E7076294A
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 05:31:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3DB231C20F15
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 03:23:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9E20D1C21062
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 03:31:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 240CE1FD7;
-	Wed, 26 Jul 2023 03:23:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D7191FD9;
+	Wed, 26 Jul 2023 03:31:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED6D115CA
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 03:23:52 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4C1AEC433C7;
-	Wed, 26 Jul 2023 03:23:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E01615C9
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 03:31:53 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0FE6CC433C7;
+	Wed, 26 Jul 2023 03:31:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690341832;
-	bh=ng5DXKEW/N72oQKlESKJ9zgU19pEjauob6VDV+J67YQ=;
+	s=k20201202; t=1690342313;
+	bh=owdyVoGHzwrB1kYbBsJ2Addg8UsT4A8rZ0oG+GuSTf0=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=REJBLy7z+EgwaglFZtthpIeG4b7+3BI/P30GSWXMw4q+R9XkFZ6BkYCAh3nah0sWt
-	 VZkzXQoJFy8s0fl7RmKkdyyGrzOrai8ayIy6S1qBUL59Ccuucmv9TEM8NI4GiAq2hq
-	 SlHIK15vXRW9ls6XCj6R9T1II1J5k4if4Nn1EFi7zjd8MmC+uW0BQ6/6zNAJUf32rk
-	 7dBXRlS+2Fm4N3FlvUazLn7xito7dLcffUL7UEhR1hT85UEpFL++9imQfTLX379kTW
-	 W6HJBolxzJgNB+j/0Pgo9D9D3mw8md+UgSQ25LLHHt7dd0LEuKgY8M8kndCARQ5BsW
-	 zD0zKU8uKUUkw==
-Date: Tue, 25 Jul 2023 20:23:51 -0700
+	b=jFI+JT6o1d1qPVFNEXJJD0tgP0wRf/W53JxQniwqQcQ1UU9wbZDhS3RJeX/MXFpa9
+	 r18kGGF3kqWcFP65/sVK+gMt224vaZDj8OYE6Xne8gM72jI3huiIoM7U4d30wHPNHE
+	 /cNCwEO4GeM9FnjYhw6Qwt660EN+m+c7TnEQ8FnVmTDA+ucKgxcqiGtzrh0hi0bOfe
+	 24k1l1SkSeoEsnFDnPORAkYZh5ORrWFA+k87mLNwaEiuRuuxt4RgluNJ8F9iS1j5I3
+	 Uuua/euU75BpZZqmUsuTZPKPDAm/KjBW5b5cXqWmo5eWZOWY7ZGwQyMWgE7CFuw+xz
+	 VYdFT8dOS5fZw==
+Date: Tue, 25 Jul 2023 20:31:52 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: "mengyuanlou@net-swift.com" <mengyuanlou@net-swift.com>
-Cc: netdev@vger.kernel.org
-Subject: Re: [PATCH net-next 1/2] net: ngbe: add ncsi_enable flag for
- wangxun nics
-Message-ID: <20230725202351.6d615c94@kernel.org>
-In-Reply-To: <2E243F8C-76F8-4792-B8C4-201E65F124F6@net-swift.com>
-References: <20230724092544.73531-1-mengyuanlou@net-swift.com>
-	<6E913AD9617D9BC9+20230724092544.73531-2-mengyuanlou@net-swift.com>
-	<20230725162234.1f26bfce@kernel.org>
-	<6D0E96D7-CDF4-4889-831D-B83388035A2C@net-swift.com>
-	<20230725194456.7832c02d@kernel.org>
-	<2E243F8C-76F8-4792-B8C4-201E65F124F6@net-swift.com>
+To: Saeed Mahameed <saeed@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Paolo Abeni
+ <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, Saeed Mahameed
+ <saeedm@nvidia.com>, netdev@vger.kernel.org, Tariq Toukan
+ <tariqt@nvidia.com>, Adham Faris <afaris@nvidia.com>, Gal Pressman
+ <gal@nvidia.com>
+Subject: Re: [net-next 02/14] net/mlx5: Expose NIC temperature via hardware
+ monitoring kernel API
+Message-ID: <20230725203152.363d5dae@kernel.org>
+In-Reply-To: <20230724224426.231024-3-saeed@kernel.org>
+References: <20230724224426.231024-1-saeed@kernel.org>
+	<20230724224426.231024-3-saeed@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,14 +53,34 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 26 Jul 2023 11:12:41 +0800 mengyuanlou@net-swift.com wrote:
-> Another question.
-> Then, after drivers know that portx is using for BMC, it is necessary to
-> let phy to know this port should not be suspended?
-> I mean this patch 2/2 is useful.
+On Mon, 24 Jul 2023 15:44:14 -0700 Saeed Mahameed wrote:
+> Expose NIC temperature by implementing hwmon kernel API, which turns
+> current thermal zone kernel API to redundant.
+> 
+> For each one of the supported and exposed thermal diode sensors, expose
+> the following attributes:
+> 1) Input temperature.
+> 2) Highest temperature.
+> 3) Temperature label.
+> 4) Temperature critical max value:
+>    refers to the high threshold of Warning Event. Will be exposed as
+>    `tempY_crit` hwmon attribute (RO attribute). For example for
+>    ConnectX5 HCA's this temperature value will be 105 Celsius, 10
+>    degrees lower than the HW shutdown temperature).
+> 5) Temperature reset history: resets highest temperature.
+> 
+> For example, for dualport ConnectX5 NIC with a single IC thermal diode
+> sensor will have 2 hwmon directories (one for each PCI function)
+> under "/sys/class/hwmon/hwmon[X,Y]".
+> 
+> Listing one of the directories above (hwmonX/Y) generates the
+> corresponding output below:
+> 
+> $ grep -H -d skip . /sys/class/hwmon/hwmon0/*
 
-Right, I think being more selective about which port sets
-netdev->ncsi_enabled is independent from patch 2. Some form
-of patch 2 is still needed, but how exactly it should look
-is up to the PHYLIB maintainers.
+I missed it glancing on the series yesterday because it's just 
+a warning in pw - we should really get hwmon folks and ML CCed
+on this one.
+-- 
+pw-bot: cr
 
