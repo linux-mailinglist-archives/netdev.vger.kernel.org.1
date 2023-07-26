@@ -1,145 +1,139 @@
-Return-Path: <netdev+bounces-21331-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21334-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 099F476349A
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 13:13:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03F107634CA
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 13:23:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BA276281DAE
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 11:13:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2C0AE1C21222
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 11:23:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA82ECA78;
-	Wed, 26 Jul 2023 11:13:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 110758466;
+	Wed, 26 Jul 2023 11:23:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF3D2CA51
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 11:13:23 +0000 (UTC)
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4AD1597
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 04:13:22 -0700 (PDT)
-Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
-	by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1qOcRv-0001BM-7s; Wed, 26 Jul 2023 13:12:59 +0200
-Received: from pengutronix.de (unknown [172.20.34.65])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 0D3BE1FB27F;
-	Wed, 26 Jul 2023 11:12:57 +0000 (UTC)
-Date: Wed, 26 Jul 2023 13:12:56 +0200
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Bough Chen <haibo.chen@nxp.com>
-Cc: "robh+dt@kernel.org" <robh+dt@kernel.org>,
-	"krzysztof.kozlowski+dt@linaro.org" <krzysztof.kozlowski+dt@linaro.org>,
-	"conor+dt@kernel.org" <conor+dt@kernel.org>,
-	"shawnguo@kernel.org" <shawnguo@kernel.org>,
-	"s.hauer@pengutronix.de" <s.hauer@pengutronix.de>,
-	"wg@grandegger.com" <wg@grandegger.com>,
-	"kernel@pengutronix.de" <kernel@pengutronix.de>,
-	dl-linux-imx <linux-imx@nxp.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"linux-can@vger.kernel.org" <linux-can@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: RE: [PATCH v2 1/3] arm64: dts: imx93: add the Flex-CAN stop mode
- by GPR
-Message-ID: <20230726-expedited-clinking-3e7f212352f7-mkl@pengutronix.de>
-References: <20230726090909.3417030-1-haibo.chen@nxp.com>
- <20230726-moocher-managing-5a5352a4266a-mkl@pengutronix.de>
- <DB7PR04MB40107ED22966EF83DDA0759B9000A@DB7PR04MB4010.eurprd04.prod.outlook.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0826CA51;
+	Wed, 26 Jul 2023 11:23:28 +0000 (UTC)
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 081DD1982;
+	Wed, 26 Jul 2023 04:23:25 -0700 (PDT)
+Received: from dggpemm500005.china.huawei.com (unknown [172.30.72.53])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4R9s181gh0zTlsy;
+	Wed, 26 Jul 2023 19:21:48 +0800 (CST)
+Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
+ (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Wed, 26 Jul
+ 2023 19:23:22 +0800
+Subject: Re: [PATCH net-next v2] page_pool: split types and declarations from
+ page_pool.h
+To: Alexander Lobakin <aleksander.lobakin@intel.com>, Alexander H Duyck
+	<alexander.duyck@gmail.com>
+CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Eric Dumazet
+	<edumazet@google.com>, Wei Fang <wei.fang@nxp.com>, Shenwei Wang
+	<shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, NXP Linux Team
+	<linux-imx@nxp.com>, Sunil Goutham <sgoutham@marvell.com>, Geetha sowjanya
+	<gakula@marvell.com>, Subbaraya Sundeep <sbhatta@marvell.com>, hariprasad
+	<hkelam@marvell.com>, Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky
+	<leon@kernel.org>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
+	<daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, John
+ Fastabend <john.fastabend@gmail.com>, Felix Fietkau <nbd@nbd.name>, Lorenzo
+ Bianconi <lorenzo@kernel.org>, Ryder Lee <ryder.lee@mediatek.com>, Shayne
+ Chen <shayne.chen@mediatek.com>, Sean Wang <sean.wang@mediatek.com>, Kalle
+ Valo <kvalo@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Ilias
+ Apalodimas <ilias.apalodimas@linaro.org>, <linux-rdma@vger.kernel.org>,
+	<bpf@vger.kernel.org>, <linux-wireless@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-mediatek@lists.infradead.org>
+References: <20230725131258.31306-1-linyunsheng@huawei.com>
+ <94272ffed7636c4c92fcc73ccfc15236dd8e47dc.camel@gmail.com>
+ <16b4ab57-dfb0-2c1d-9be1-57da30dff3c3@intel.com>
+From: Yunsheng Lin <linyunsheng@huawei.com>
+Message-ID: <22af47fe-1347-3e32-70bf-745d833e88b9@huawei.com>
+Date: Wed, 26 Jul 2023 19:23:21 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.2.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="glv2skkv3tf7s5b2"
-Content-Disposition: inline
-In-Reply-To: <DB7PR04MB40107ED22966EF83DDA0759B9000A@DB7PR04MB4010.eurprd04.prod.outlook.com>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:b01:1d::7b
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.6
+In-Reply-To: <16b4ab57-dfb0-2c1d-9be1-57da30dff3c3@intel.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.69.30.204]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ dggpemm500005.china.huawei.com (7.185.36.74)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+On 2023/7/26 18:43, Alexander Lobakin wrote:
+> From: Alexander H Duyck <alexander.duyck@gmail.com>
+> Date: Tue, 25 Jul 2023 08:47:46 -0700
+> 
+>> On Tue, 2023-07-25 at 21:12 +0800, Yunsheng Lin wrote:
+>>> Split types and pure function declarations from page_pool.h
+>>> and add them in page_pool/types.h, so that C sources can
+>>> include page_pool.h and headers should generally only include
+>>> page_pool/types.h as suggested by jakub.
+>>>
+>>> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
+>>> Suggested-by: Jakub Kicinski <kuba@kernel.org>
+>>> CC: Alexander Lobakin <aleksander.lobakin@intel.com>
+> 
+> [...]
+> 
+>>> +/* Caller must provide appropriate safe context, e.g. NAPI. */
+>>> +void page_pool_update_nid(struct page_pool *pool, int new_nid);
+>>> +
+>>> +#endif /* _NET_PAGE_POOL_H */
+>>
+>>
+>> This seems kind of overkill for what is needed. It seems like the
+>> general thought process with splitting this was so that you had just
+>> the minimum of what is needed to support skbuff.h and the functions
+>> declared there. The rest of this would then be added via the .h to the
+>> .c files that will actually be calling the functions.
+>>
+>> By that logic I think the only thing we really need is the function
+>> declaration for page_pool_return_skb_page moved into skbuff.h. We could
+>> then just remove page_pool.h from skbuff.h couldn't we?
+> 
+> This patch is not to drop page_pool.h include from skbuff.h.
+> This is more future-proof (since I'm dropping this include anyway in my
+> series) to have includes organized and prevent cases like that one with
+> skbuff.h from happening. And to save some CPU cycles on preprocessing if
+> that makes sense.
 
---glv2skkv3tf7s5b2
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+The suggestion is from below:
 
-On 26.07.2023 11:10:10, Bough Chen wrote:
-> > >  arch/arm64/boot/dts/freescale/imx93.dtsi | 2 ++
-> > >  1 file changed, 2 insertions(+)
-> > >
-> > > diff --git a/arch/arm64/boot/dts/freescale/imx93.dtsi
-> > > b/arch/arm64/boot/dts/freescale/imx93.dtsi
-> > > index 4ec9df78f205..d2040019e9c7 100644
-> > > --- a/arch/arm64/boot/dts/freescale/imx93.dtsi
-> > > +++ b/arch/arm64/boot/dts/freescale/imx93.dtsi
-> > > @@ -319,6 +319,7 @@ flexcan1: can@443a0000 {
-> > >  				assigned-clock-parents =3D <&clk
-> > IMX93_CLK_SYS_PLL_PFD1_DIV2>;
-> > >  				assigned-clock-rates =3D <40000000>;
-> > >  				fsl,clk-source =3D /bits/ 8 <0>;
-> > > +				fsl,stop-mode =3D <&anomix_ns_gpr 0x14 0>;
-> >=20
-> > I think there's a typo in the mainline imx93.dtsi. AFAICS it's supposed=
- to be
-> > "aonmix_ns_gpr", not "anomix_ns_gpr". But that's a different problem to
-> > patch :)
->=20
-> Yes, this is a typo.
-> >=20
-> > AFAICS, according to imx93, rev2 data sheet, offset 0x14 is 76.6.1.3 QC=
-HANNEL
-> > DISABLE (QCH_DIS) and bit 0 is "GPIO1". Are you sure this is the correc=
-t reg?
-> >=20
->=20
-> Imx93 A1 doc has some update, I double confirm with the internal doc and =
-IC team, the setting is correct.
-> I also test on imx93-9x9 qsb board, system can be wakeup by this setting.
+https://lore.kernel.org/all/20230710113841.482cbeac@kernel.org/
 
-Thanks for double checking.
+> 
+>>
+>> Another thing we could consider doing is looking at splitting things up
+>> so that we had a include file in net/core/page_pool.h to handle some of
+>> the cases where we are just linking the page_pool bits to other core
+>> file bits such as xdp.c and skbuff.c.
 
-Marc
+I suppose the above suggestion is about splitting or naming by
+the user as the discussed in the below thread?
+https://lore.kernel.org/all/20230721182942.0ca57663@kernel.org/
 
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
-
---glv2skkv3tf7s5b2
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEDs2BvajyNKlf9TJQvlAcSiqKBOgFAmTA/7UACgkQvlAcSiqK
-BOj8HAf/ad3k8d8Ns6FEeuNcOzdNMPToWeyL2H6xN/1lD88jnF7pCPAsVt9xajCp
-lQNb6Y4Nv0av+B2Q1qzdypwz4IIxPdzkkFWA7L3c1+59tO+SKxsJEBU9K9PYEw3b
-jrR84W40irP0bpSDJIP3VcIfLMa5U8c7LkjNIaZHv73E74GmF1zwGGMasxTYbzNi
-Hzcqqyg5vXPp0Lyb/PI6Rp+tT/DlelupD3R3BMhhmhBhJ8cWXVVFldPB8G7kys49
-CqXRSzvg/X+oKs4didIPKPhUF0ay/HkcY+KuitVm/pi42qYNNKKTaRYKFoTLBAGn
-Dtxq//ja6lLqhS/+bgOm/7g4F0kTjw==
-=YycX
------END PGP SIGNATURE-----
-
---glv2skkv3tf7s5b2--
+> 
+> Thanks,
+> Olek
+> .
+> 
 
