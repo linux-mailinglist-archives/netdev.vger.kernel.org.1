@@ -1,134 +1,185 @@
-Return-Path: <netdev+bounces-21275-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21276-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 238E97630F4
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 11:05:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D976A763109
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 11:06:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D2914281C2A
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 09:05:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B5E301C2114C
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 09:06:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95C20AD52;
-	Wed, 26 Jul 2023 09:04:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A2E7AD53;
+	Wed, 26 Jul 2023 09:06:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89C6B9455
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 09:04:44 +0000 (UTC)
-Received: from mx07-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E080188;
-	Wed, 26 Jul 2023 02:04:42 -0700 (PDT)
-Received: from pps.filterd (m0046661.ppops.net [127.0.0.1])
-	by mx07-00178001.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36Q8fK2J008196;
-	Wed, 26 Jul 2023 11:04:20 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=selector1;
- bh=mHlSDUHrC46OTsxrd1MgTw0c0UTb8rmL5Uuj7fDW+n0=;
- b=zO3V27RgKExY/q85tnvfYLxhy2slSf7Knw1gPHQf1WoyeM7uiF8GSo1HznFiPyivKlq4
- L6CKD1U051jxT89xFuqjU/17wMDs9euvT7E9nzje/VEkTvWeYLOCZ6cGOXYOCNFYYfFZ
- 5/xEUkV7rFy/XBYdkTEq6JpgOFqOWREZgROdss/Mt2JSe0VWdZSCuM2agejgclldDvuF
- bCBjlpm6D7UbVjE5CUgrTIKrckaEo9oaPGeIbr9rw5b8vbc4Yi80Jy/IuujGL9AEBH4E
- 29bz4VSinulO+vTqLeac2u1LjXFK0Jqfr53vxDsceG483W5WzuNtgT2Co+XpVgDPakkq ww== 
-Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
-	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3s306u876r-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 26 Jul 2023 11:04:20 +0200
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-	by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 8659710002A;
-	Wed, 26 Jul 2023 11:04:19 +0200 (CEST)
-Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
-	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 7C2052115FC;
-	Wed, 26 Jul 2023 11:04:19 +0200 (CEST)
-Received: from [10.201.21.121] (10.201.21.121) by SHFDAG1NODE1.st.com
- (10.75.129.69) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.21; Wed, 26 Jul
- 2023 11:04:17 +0200
-Message-ID: <5458d1d3-6c4c-738c-6dec-8b7ff78a5431@foss.st.com>
-Date: Wed, 26 Jul 2023 11:04:16 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86C639455
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 09:06:22 +0000 (UTC)
+Received: from EUR01-HE1-obe.outbound.protection.outlook.com (mail-he1eur01on2053.outbound.protection.outlook.com [40.107.13.53])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57BCD2D59;
+	Wed, 26 Jul 2023 02:05:43 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Axv3oCk/XbRXU/sfIpmZY2x9CJ5fY1uNzV7Ez9f0zb/A5UMpI0zFhi0BprjK4seuhTWAgPtgrYRyhbbL5mJhamKQ1KnFeLUq74HYhRyvecm7aWUHikuwOmlsr4ZxqiYymQZWI9+DEBn4AC/0ces3TUOVvEBXY5EQFkS7cIUeAP9liuwP2APZX5ic8dCnBUD1sQ9SNJ0AeDhKU7kUsKe2NjLjXWOWEkE9w81L7LRWpW0+BZxOIKRB3fUVDlCqyWQKyIM1cZPnYuU/K0LeRlWoWL8RLKhDxR++Opz+GYfQC5GFFy+TRg256CryF5PNBDWd0u12taltxMokfkMRGG8/6Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=qkgp1aONYEiXonWIrKmtj4+JiDEyuW/bDkG9WZciH1o=;
+ b=KShjqYrzEUQ1Wb9r0F4CutD9MWMn+EYCdRgL15IBHfRxOPrrtj+havLGr5EUpmHT+O5r+LX1Bc0ATPn3BQ+Qc8uwnqVwE40YmVtE5hdM6PhqGMyzXaHas8TiP8SICvQ4Ba1oacGtRyLZjPJ5usGjuJ72a0J7qb8KIH92tE2/m0Q/tqUJ11yFasGQ6WJLtoggoe3Ka7sxzj1QEG4oKYgZ/hEDwVhGzf5/e7PB5AMTwmfgU+uAnvQWWTduriT5JedzQnk5VMTdfZggBwnyjrFt7l6WGjYlj6RC1AnbzxS9CLyoZlULrKW7Vxn3W046e2kwqLa36NOmvDE2YYAEOOhlbg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=qkgp1aONYEiXonWIrKmtj4+JiDEyuW/bDkG9WZciH1o=;
+ b=qcgRGkkp6CqcmJl0X8A69wg0QROsGcJQVX76gEff2rLi0fDQ0nwxq4Xifpj9vf/9iFJF6M3R9wJaJS0JCbNQb2wYHoH4l1O7e+AXEAHVrH2U1kFNieKgswHTNyYRQiEsXfN64BDBAzwW/kUZPYp9GpCw8KPH5oXvqFr38XMDJmo=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from DB7PR04MB4010.eurprd04.prod.outlook.com (2603:10a6:5:21::30) by
+ VI1PR04MB7056.eurprd04.prod.outlook.com (2603:10a6:800:12c::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.31; Wed, 26 Jul
+ 2023 09:05:30 +0000
+Received: from DB7PR04MB4010.eurprd04.prod.outlook.com
+ ([fe80::d73c:e747:3911:dcc]) by DB7PR04MB4010.eurprd04.prod.outlook.com
+ ([fe80::d73c:e747:3911:dcc%5]) with mapi id 15.20.6631.026; Wed, 26 Jul 2023
+ 09:05:30 +0000
+From: haibo.chen@nxp.com
+To: robh+dt@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org,
+	conor+dt@kernel.org,
+	shawnguo@kernel.org,
+	s.hauer@pengutronix.de,
+	wg@grandegger.com,
+	mkl@pengutronix.de
+Cc: kernel@pengutronix.de,
+	linux-imx@nxp.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	haibo.chen@nxp.com,
+	devicetree@vger.kernel.org,
+	linux-can@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH v2 1/3] arm64: dts: imx93: add the Flex-CAN stop mode by GPR
+Date: Wed, 26 Jul 2023 17:09:07 +0800
+Message-Id: <20230726090909.3417030-1-haibo.chen@nxp.com>
+X-Mailer: git-send-email 2.34.1
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: SI2P153CA0007.APCP153.PROD.OUTLOOK.COM (2603:1096:4:140::8)
+ To DB7PR04MB4010.eurprd04.prod.outlook.com (2603:10a6:5:21::30)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [IGNORE][PATCH v3 01/11] dt-bindings: Document common device
- controller bindings
-Content-Language: en-US
-To: Greg KH <gregkh@linuxfoundation.org>
-CC: <Oleksii_Moisieiev@epam.com>, <herbert@gondor.apana.org.au>,
-        <davem@davemloft.net>, <robh+dt@kernel.org>,
-        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
-        <alexandre.torgue@foss.st.com>, <vkoul@kernel.org>, <jic23@kernel.org>,
-        <olivier.moysan@foss.st.com>, <arnaud.pouliquen@foss.st.com>,
-        <mchehab@kernel.org>, <fabrice.gasnier@foss.st.com>,
-        <andi.shyti@kernel.org>, <ulf.hansson@linaro.org>,
-        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-        <hugues.fruchet@foss.st.com>, <lee@kernel.org>, <will@kernel.org>,
-        <catalin.marinas@arm.com>, <arnd@kernel.org>,
-        <richardcochran@gmail.com>, Frank Rowand <frowand.list@gmail.com>,
-        <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-        <dmaengine@vger.kernel.org>, <linux-i2c@vger.kernel.org>,
-        <linux-iio@vger.kernel.org>, <alsa-devel@alsa-project.org>,
-        <linux-media@vger.kernel.org>, <linux-mmc@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <linux-phy@lists.infradead.org>,
-        <linux-serial@vger.kernel.org>, <linux-spi@vger.kernel.org>,
-        <linux-usb@vger.kernel.org>
-References: <20230726083810.232100-1-gatien.chevallier@foss.st.com>
- <20230726083810.232100-2-gatien.chevallier@foss.st.com>
- <2023072605-removed-pacemaker-faff@gregkh>
-From: Gatien CHEVALLIER <gatien.chevallier@foss.st.com>
-In-Reply-To: <2023072605-removed-pacemaker-faff@gregkh>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.201.21.121]
-X-ClientProxiedBy: SHFCAS1NODE2.st.com (10.75.129.73) To SHFDAG1NODE1.st.com
- (10.75.129.69)
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-07-26_03,2023-07-25_01,2023-05-22_02
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DB7PR04MB4010:EE_|VI1PR04MB7056:EE_
+X-MS-Office365-Filtering-Correlation-Id: c9c29d9d-5041-467f-11fa-08db8db775fe
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	RNO7v2GHCoKJOs/hI4W0jMuMs/syjA3j51sEVHBlMCKocbdj5SkE5cwsG5gT5uZYgp55KBS59yhHhXFrwp2EuQQ9tj84K2i2OIvRhcPpcr6rYL862+9h88omybK91H2u35S+Y47F/TuStbMvYgbEhJbb2NQpNi92Exm9bayprrTnawHaHMmmhAslLQu2FMmjFJoFIHEvemjITFxDUwm0HFxI0aQU/ZETZwEcMw6VsuTJJglxd3M4YfeFSL3LNgO5WpOgyLYve3j8JTinJDAJ9Et42uH0Ix3atxZEyYLfGm6JtUvMRhrVbyljIFEzwhQYyL47D8lGpWFqshdnoZO2XIwUT2aLKwQDL/xkcLfOm0XHONlZa+V8OKd8u81k/xHPWJ0OjWLeJV3qjVWpdGz811xGmkf0WXgbLYlUKM+vZ8ciQc+OTHeoeU1e2GH7U+gNhKIs8OgVppxoUkz2SifwTFygNqLRkIYbHZIyZUkHRaQga4anWkU1jpEx8XtUJYqM83Jx28ftuXU3yMpXCVU37u9qiQoGxB2aINf+z8JkE0AklOGkYXDC05U0F87VmZZYIss3GpV+1qaTaqP+f0CkaITkIbIX0m6QqFCAq6bU65TIXnUu82pLozeE92bGqsK6
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DB7PR04MB4010.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(366004)(136003)(376002)(396003)(346002)(451199021)(6486002)(52116002)(6512007)(9686003)(6666004)(478600001)(83380400001)(86362001)(36756003)(2906002)(186003)(38350700002)(6506007)(2616005)(26005)(1076003)(66476007)(38100700002)(316002)(8676002)(41300700001)(4326008)(66946007)(5660300002)(8936002)(66556008)(7416002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?eVhHVXIvaVB5UElldTBseUUycEdhMEZTUzIyc2Fud3E0R3ZqaW1XOCtsTzZF?=
+ =?utf-8?B?Qkx2QWxtSmxIU1RxOXZqOUxWdG5HdmpkcndNVTRLTmlQMkhsb2IwTjQvU0dY?=
+ =?utf-8?B?YnhTR0RPM3VEMXUyeTIxYmJFeXFha0NMSk1GaWJFZnQvZ0xjN0xQUTRUbDlC?=
+ =?utf-8?B?K3JOQXZadDVTNWJkWllNaUtDNytPdXBGM1RYbUIzK0k4OC83bThqTk5jZXNV?=
+ =?utf-8?B?U0ZiQmgxMnZIQmM3Yzg5K2dCb0xpWlpIeFZjWTdEM3FVdlBaalBOd3htYTI1?=
+ =?utf-8?B?bk5Kdy9pNlRZS1Q0RkZyOXlrYzU1bGRPMUhPcW9zeDlQaWxnNFFSbzVOSHpD?=
+ =?utf-8?B?akNMOWhmaHJIQ0k4TmswODhQUnhQbDBVallhM050elVPbm9mdHM1L0Vacjkv?=
+ =?utf-8?B?K2ZINGhlTWtzL0NUS0t1UXN6UXRUN1Npb2xMTnNBekQ3aUw3UTMzQ3czYXAv?=
+ =?utf-8?B?RGZ6L3lRVC9CWS8rK3V1TktwMEN1a1FtUUFaU3hxb3BjK3VVU1JDYmh4SXpx?=
+ =?utf-8?B?OXlGbDBrSTJzcVVSOGZSNHpCMFEvK1VaendKV29HYlMxVnVQbEZJcmJ6OGp4?=
+ =?utf-8?B?WEdrdWlwdHAvUWpFYTg1UjAyaU1YZVczdTFWUGFCYmVKUjJmMHpzM1cybU9p?=
+ =?utf-8?B?d2RGM3JSbGJZb0swVDZVZ2ptV3NGbEdLVldKZ3BPZVFyekxWR1IzajRndGJr?=
+ =?utf-8?B?VEg1RlgvQmg1MDVaTGpKNy8ya0JhcVhhUHFENkF2R3pWTkxJRnF2R0l0TU5i?=
+ =?utf-8?B?RklvVVVuaVBoWXYzaWM3Nm1DZXVnM2p3QmJRNDRUb1hITDc2UUVSNEtVYW1W?=
+ =?utf-8?B?ZnB4NmRNbGJ4bkRMUmtxdWRkRVFSanlVUHJDZEtyRGFiMWZTWEt3VFRqQ1pU?=
+ =?utf-8?B?QTBqanRWMXpxTTQ4dllpSFFVUGJ3N1lhVGJublVObmRETDlJT1ZrdXhHTTlx?=
+ =?utf-8?B?a0x1aVpBRWx6RXFmeXYrZzRzL2xsK3JCVGpsSVQycjJDNDBtSk1PanR6RzBt?=
+ =?utf-8?B?eFBwUkwwTU5hUFZvaVVNOW5BMHpYWiszU044UHRVRWZPd3V6ZHRmREhGQWZW?=
+ =?utf-8?B?S2VHb2RBZzlqOEdJQmMxelF5czhSN1JFdGEwUUVydEVKYUhuVVc0aXpYYk5h?=
+ =?utf-8?B?blQzdTV5WFlhNjc2UTFsT2xaNTNtWFVhVDdDalRpZEhDMEJoMmpMWjJydGNT?=
+ =?utf-8?B?YmhtWHloR3liMUtLSGVoVENrSXY0L2ZnL0xsTXJCdU03QTVZR1dOOG5KdFFr?=
+ =?utf-8?B?bnZ4a0hSTGh0ajZZako1bkVsZmNZeGFzRGpzSlV6ck4vNHhlS01tVFFnRkZw?=
+ =?utf-8?B?TVBqU1A4VzlXeE1vVnZqSm9kUVduNG1Rbm1tS2dXU09oNmpyRkZ0Ky9yVUV6?=
+ =?utf-8?B?MUxENnd3RlpsdkdLcjdMOUZyREFMZEIwOFpNNHFxNFRWaUo2SG1KU1JJUjht?=
+ =?utf-8?B?VzBTM0JBdzdTbDZIanAxSFJHNUt6b0VORkI3RW9UaDhvcmtTNHlDQ1JON1o0?=
+ =?utf-8?B?WTkvaE96dVd2Y0FQUTErMHY5NEZrVXRDSFpIM1hzQ3NOc2pnbTNXbDRzMWRQ?=
+ =?utf-8?B?ZTVqeFpidDlIdkd4SW9WMHp5eGd4UFBDVlBSZUdITFhyR0p3VUlUWnBmWHRp?=
+ =?utf-8?B?QlVqVjBicnNsMTJ2dTBQUzd3d21VVzdwaHlqV3BaaG9GcnRha0E4a3lGME56?=
+ =?utf-8?B?UGtxSUVYZGxxZGhGaUR4TmVlUU4xeHhuS0RZa2hFdmJ5T1FsZWR0M1pSL2dq?=
+ =?utf-8?B?Z25zQmpyZ0VOZyszMjRVQ2RWYTNxclhFRmYzbTVscHFzWE9LcWJXbE5LSTU1?=
+ =?utf-8?B?R3Fha1p3NDgwczY4bEdmRTZJSWx1aEJZaFVrZUtxc0hOZzA0MGJoa1RncEtj?=
+ =?utf-8?B?dGF5WStFNUh0azNwWWwxa0FNNzZOUit2M0J5UERCbkZ1YW56dDZaQmRva3JF?=
+ =?utf-8?B?a2lZM2pkdXNpVEFENUFSUHdxNXdkL3M2MStCOWdvMXpwSXdjRVV2b1pyWFlz?=
+ =?utf-8?B?SCt6Z2Fjakt1MVFIbUdvUHp6aGlLeVVqVTVIQzZRREtxWUk1NnVCUkc5aDFW?=
+ =?utf-8?B?REF3SjhJajVHQ2oxS2RCRkZuR3JSanJPbEttazNvZUJRbXltczRleXZHZ0xF?=
+ =?utf-8?Q?YymsgkMXUBu/OiIq8Td1WJHlT?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c9c29d9d-5041-467f-11fa-08db8db775fe
+X-MS-Exchange-CrossTenant-AuthSource: DB7PR04MB4010.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Jul 2023 09:05:30.3257
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 6S8euYm+pM61Vn4Aq1+PA+LMGw9pVs4hj0XDplnLkNb8VsILN8dM2vdEeaM/emiqXO5olAXb+FAgRc2F2p7dKw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB7056
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hello Greg,
+From: Haibo Chen <haibo.chen@nxp.com>
 
-On 7/26/23 10:48, Greg KH wrote:
-> On Wed, Jul 26, 2023 at 10:38:00AM +0200, Gatien Chevallier wrote:
->> From: Oleksii Moisieiev <Oleksii_Moisieiev@epam.com>
->>
->> Introducing of the common device controller bindings for the controller
->> provider and consumer devices. Those bindings are intended to allow
->> divided system on chip into muliple domains, that can be used to
->> configure hardware permissions.
->>
->> Signed-off-by: Oleksii Moisieiev <oleksii_moisieiev@epam.com>
->> ---
->>   .../feature-domain-controller.yaml            | 84 +++++++++++++++++++
->>   1 file changed, 84 insertions(+)
->>   create mode 100644 Documentation/devicetree/bindings/feature-controllers/feature-domain-controller.yaml
-> 
-> What is the [IGNORE] prefix for?
-> 
+imx93 A0 chip use the internal q-channel handshake signal in LPCG
+and CCM to automatically handle the Flex-CAN stop mode. But this
+method meet issue when do the system PM stress test. IC can't fix
+it easily. So in the new imx93 A1 chip, IC drop this method, and
+involve back the old way，use the GPR method to trigger the Flex-CAN
+stop mode signal. Now NXP claim to drop imx93 A0, and only support
+imx93 A1. So here add the stop mode through GPR.
 
-I put this prefix to specify that the review for this patch should
-not be done on this thread.
+Signed-off-by: Haibo Chen <haibo.chen@nxp.com>
+---
+ arch/arm64/boot/dts/freescale/imx93.dtsi | 2 ++
+ 1 file changed, 2 insertions(+)
 
-It is still under review on the thread linked in the cover-letter.
+diff --git a/arch/arm64/boot/dts/freescale/imx93.dtsi b/arch/arm64/boot/dts/freescale/imx93.dtsi
+index 4ec9df78f205..d2040019e9c7 100644
+--- a/arch/arm64/boot/dts/freescale/imx93.dtsi
++++ b/arch/arm64/boot/dts/freescale/imx93.dtsi
+@@ -319,6 +319,7 @@ flexcan1: can@443a0000 {
+ 				assigned-clock-parents = <&clk IMX93_CLK_SYS_PLL_PFD1_DIV2>;
+ 				assigned-clock-rates = <40000000>;
+ 				fsl,clk-source = /bits/ 8 <0>;
++				fsl,stop-mode = <&anomix_ns_gpr 0x14 0>;
+ 				status = "disabled";
+ 			};
+ 
+@@ -591,6 +592,7 @@ flexcan2: can@425b0000 {
+ 				assigned-clock-parents = <&clk IMX93_CLK_SYS_PLL_PFD1_DIV2>;
+ 				assigned-clock-rates = <40000000>;
+ 				fsl,clk-source = /bits/ 8 <0>;
++				fsl,stop-mode = <&wakeupmix_gpr 0x0C 2>;
+ 				status = "disabled";
+ 			};
+ 
+-- 
+2.34.1
 
-This series aims to provide a use-case for this binding so its scope
-can be better defined.
-
-Best regards,
-Gatien
 
