@@ -1,81 +1,78 @@
-Return-Path: <netdev+bounces-21114-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21115-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5A417627D4
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 02:43:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C38E07627D5
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 02:44:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 092DB1C21079
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 00:43:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F23AA1C2107B
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 00:44:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADEB610E7;
-	Wed, 26 Jul 2023 00:43:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1F1964A;
+	Wed, 26 Jul 2023 00:44:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A228E64A
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 00:43:45 +0000 (UTC)
-Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 909B91BFB
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 17:43:43 -0700 (PDT)
-Received: by mail-ej1-x631.google.com with SMTP id a640c23a62f3a-9891c73e0fbso92381466b.1
-        for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 17:43:43 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A53A97C
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 00:44:54 +0000 (UTC)
+Received: from mail-ej1-x634.google.com (mail-ej1-x634.google.com [IPv6:2a00:1450:4864:20::634])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35DDC1BFB;
+	Tue, 25 Jul 2023 17:44:53 -0700 (PDT)
+Received: by mail-ej1-x634.google.com with SMTP id a640c23a62f3a-98df3dea907so948001166b.3;
+        Tue, 25 Jul 2023 17:44:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690332222; x=1690937022;
+        d=gmail.com; s=20221208; t=1690332291; x=1690937091;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=kzMeq122EOx0WClFDw8E5FGXVSDQXhMLtpdYnB5KEhE=;
-        b=rCXOFOSZzvDmeeApZdiE2vysrOJpkwjtuwvtU1bf29LkRxM6AYlw2fZd7d2i9PcPjm
-         +W11XmK4je/aZMdDboBH2Lo1cM1xt/9foDHz5xhNeiDVUGJBeK+dGmrH5FM/qXKW9YLq
-         rM+29x7NL+0VFecSgb/VznJqSCYTW+HuGt0zBQzMxjcPkN3rXe+UjsHabvOOY9QKpGOA
-         yNqnSs5xBVg6wo8k5nPLWzXj0btLPz0dAytmBX4XbWKobx5M3c/k7mcaVWnzueYoXGK/
-         ChQdgYeJZlzovWokbo5/hSk/lDCCvkuN70z1uHYSBHVNOeTtdg8/8r0JCBtpKw+J2Xjm
-         8ZdA==
+        bh=qM+o2x0Q9td2BAJ6ErJnDWRLqW6HpDY4XZZK/xV7DJk=;
+        b=VvinILAje6hRqPdaqfbQf9bzhtnpCg24gtbeWFXmRnQogQ08NnWKzGNQLwtVODnM3H
+         s/CSC99woI9rU0OcTEWhcFNcTdeNDZublWp3rQhqaOy6DZImFMRVMO8bau9wVLdeBQ8p
+         Adzi0Icn91S17dWMtr7qxo0VBOadTPN54U84MB4h2bOBdLtD8CkgXbR7z7jqPn8pDhIO
+         4fpHVu1K1fif0CTD+oaqgvyN3eUkQ5jqt5UfFy676Yf9S/DV6UXUeRkbtxukVasa3+JN
+         O+XtEUktRjEoJzU8G3Y8IuLTiHdgfn6+ntZepGiDNWzPHDurB3AOEyBnW9t9j665XxXp
+         XVfw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690332222; x=1690937022;
+        d=1e100.net; s=20221208; t=1690332291; x=1690937091;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=kzMeq122EOx0WClFDw8E5FGXVSDQXhMLtpdYnB5KEhE=;
-        b=RZU+th5ArBdiReU41bQSitan01rNxIkNmCUrGSO+UND3cZoQIBdNm7mADXylfUmX2C
-         SHLkUg9oACgLRpUVCIlbZlNjkqHBy0K0a6fP4Zo6ARuFQZy4HWCZX3scQ7U4Oqr+B335
-         YSROYatc9GgZofURn6TD8rt5+eagqXBYt/TVbImkKxiKLQQetMH8/a8UCjjwCUa9lBxY
-         ujclBvL0+Y/RHIWsfOxOy/C4xaqZEHf7pOeKK6nApz1HOX+4sxaE4zpsqZR0u/QG5GbU
-         874HZHkvM9Q5Ifs1SlLsiEKNfBJH9vVPLB32nfZnofNFNmhv4F+rB28N9KStCrI6suGK
-         tirw==
-X-Gm-Message-State: ABy/qLYLjZeQckYgoROXL7POHnwtA64pmugFxBmAteheFjo1NvD1+1de
-	e4M9IAGRJM2WBRmPaoV3NhY=
-X-Google-Smtp-Source: APBJJlHwe2LqFb+lOsuZJE20DQkYEjOIxawrT1fLB/cSVFrUIWnFWKl8ujaoNdXJsqT52Aa++t2d0A==
-X-Received: by 2002:a17:906:2253:b0:993:e695:b585 with SMTP id 19-20020a170906225300b00993e695b585mr867715ejr.9.1690332221810;
-        Tue, 25 Jul 2023 17:43:41 -0700 (PDT)
+        bh=qM+o2x0Q9td2BAJ6ErJnDWRLqW6HpDY4XZZK/xV7DJk=;
+        b=D1utsuttQWYPyYlx7Na7+NCi0DiW7OINCQ+iYVnA4p3MqS4+AuTxNTebYiD26lHPe6
+         Z+g8ClgrrOEzRUebRQnkmp7K/iYXmV7ZvnDqe7IVu/2u0HkKST/r0jTx3hdNq9rGaBcR
+         S8Na2KGChogp2uF7fH4tbX3qQdo8LHuBaW8DREm0PEAw5EwFRwp/b7rrFwa7rlZAOTKN
+         UktwtjsGbd+byX+fVThHrrKieJ4Uo+YiEOUzStaUqhadEwEEFwxu34t4MUWWchTXRtzS
+         QDbk6nlEuB4voPUZdWFcH6CL1VpCNHGjD2ZNR3/tJPhkV//h3O05YpTw33bMY2nC6O4g
+         Y8Yw==
+X-Gm-Message-State: ABy/qLb0JvKtL6KM9GEdw/0SG7LkKnIAmJjT3e2995zb8H/HmUpHNECg
+	4run84cE2VUqNhTyxEHjBiw=
+X-Google-Smtp-Source: APBJJlHlPfzZ6qbC7dkc0DtHVZlVOnNjAEeLA5C4h9N570Z0BOO6mVhWMJOa4FO1xoP29KyrUNp38g==
+X-Received: by 2002:a17:906:224e:b0:993:ec0b:1a24 with SMTP id 14-20020a170906224e00b00993ec0b1a24mr357232ejr.7.1690332291380;
+        Tue, 25 Jul 2023 17:44:51 -0700 (PDT)
 Received: from skbuf ([188.25.175.105])
-        by smtp.gmail.com with ESMTPSA id rl6-20020a170907216600b009920a690cd9sm8865097ejb.59.2023.07.25.17.43.40
+        by smtp.gmail.com with ESMTPSA id b11-20020a170906150b00b009786ae9ed50sm8849308ejd.194.2023.07.25.17.44.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Jul 2023 17:43:41 -0700 (PDT)
-Date: Wed, 26 Jul 2023 03:43:38 +0300
+        Tue, 25 Jul 2023 17:44:51 -0700 (PDT)
+Date: Wed, 26 Jul 2023 03:44:48 +0300
 From: Vladimir Oltean <olteanv@gmail.com>
-To: Shenwei Wang <shenwei.wang@nxp.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>,
 	Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Shawn Guo <shawnguo@kernel.org>, NXP Linux Team <linux-imx@nxp.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Fabio Estevam <festevam@gmail.com>, netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, imx@lists.linux.dev,
-	Frank Li <frank.li@nxp.com>
-Subject: Re: [PATCH] net: stmmac: dwmac-imx: pause the TXC clock in fixed-link
-Message-ID: <20230726004338.6i354ue576hb35of@skbuf>
-References: <20230725194931.1989102-1-shenwei.wang@nxp.com>
+	Woojung Huh <woojung.huh@microchip.com>,
+	Arun Ramadoss <arun.ramadoss@microchip.com>,
+	"Russell King (Oracle)" <linux@armlinux.org.uk>,
+	kernel@pengutronix.de, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, UNGLinuxDriver@microchip.com,
+	Petr Machata <petrm@nvidia.com>
+Subject: Re: [PATCH net-next v2 1/1] net: dsa: microchip: Add partial ACL
+ support for ksz9477 switches
+Message-ID: <20230726004448.yctikq3kipyehd7v@skbuf>
+References: <20230721140224.1465766-1-o.rempel@pengutronix.de>
+ <20230721140224.1465766-1-o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,7 +81,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230725194931.1989102-1-shenwei.wang@nxp.com>
+In-Reply-To: <20230721140224.1465766-1-o.rempel@pengutronix.de>
+ <20230721140224.1465766-1-o.rempel@pengutronix.de>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
 	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
@@ -92,103 +90,80 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Shenwei,
-
-On Tue, Jul 25, 2023 at 02:49:31PM -0500, Shenwei Wang wrote:
-> When using a fixed-link setup, certain devices like the SJA1105 require a
-> small pause in the TXC clock line to enable their internal tunable
-> delay line (TDL).
+On Fri, Jul 21, 2023 at 04:02:24PM +0200, Oleksij Rempel wrote:
+> This patch adds partial Access Control List (ACL) support for the
+> ksz9477 family of switches. ACLs enable filtering of incoming layer 2
+> MAC, layer 3 IP, and layer 4 TCP/UDP packets on each port. They provide
+> additional capabilities for filtering routed network protocols and can
+> take precedence over other forwarding functions.
 > 
-> To satisfy this requirement, this patch temporarily disables the TX clock,
-> and restarts it after a required period. This provides the required
-> silent interval on the clock line for SJA1105 to complete the frequency
-> transition and enable the internal TDLs.
+> ACLs can filter ingress traffic based on header fields such as
+> source/destination MAC address, EtherType, IPv4 address, IPv4 protocol,
+> UDP/TCP ports, and TCP flags. The ACL is an ordered list of up to 16
+> access control rules programmed into the ACL Table. Each entry specifies
+> a set of matching conditions and action rules for controlling packet
+> forwarding and priority.
 > 
-> So far we have only enabled this feature on the i.MX93 platform.
+> The ACL also implements a count function, generating an interrupt
+> instead of a forwarding action. It can be used as a watchdog timer or an
+> event counter. The ACL consists of three parts: matching rules, action
+> rules, and processing entries. Multiple match conditions can be either
+> AND'ed or OR'ed together.
 > 
-> Signed-off-by: Shenwei Wang <shenwei.wang@nxp.com>
-> Reviewed-by: Frank Li <frank.li@nxp.com>
+> This patch introduces support for a subset of the available ACL
+> functionality, specifically layer 2 matching and prioritization of
+> matched packets. For example:
+> 
+> tc qdisc add dev lan2 clsact
+> tc filter add dev lan2 ingress protocol 0x88f7 flower action skbedit prio 7
+> 
+> tc qdisc add dev lan1 clsact
+> tc filter add dev lan1 ingress protocol 0x88f7 flower action skbedit prio 7
+> 
+> The hardware offloading implementation was benchmarked against a
+> configuration without hardware offloading. This latter setup relied on a
+> software-based Linux bridge. No noticeable differences were observed
+> between the two configurations. Here is an example of software-based
+> test:
+> 
+> ip l s dev enu1u1 up
+> ip l s dev enu1u2 up
+> ip l s dev enu1u4 up
+> ethtool -A enu1u1 autoneg off rx off tx off
+> ethtool -A enu1u2 autoneg off rx off tx off
+> ethtool -A enu1u4 autoneg off rx off tx off
+> ip l a name br0 type bridge
+> ip l s dev br0 up
+> ip l s enu1u1 master br0
+> ip l s enu1u2 master br0
+> ip l s enu1u4 master br0
+> 
+> tc qdisc add dev enu1u1 root handle 1:  ets strict 4 priomap 3 3 2 2 1 1 0 0
+> tc qdisc add dev enu1u4 root handle 1:  ets strict 4 priomap 3 3 2 2 1 1 0 0
+> tc qdisc add dev enu1u2 root handle 1:  ets strict 4 priomap 3 3 2 2 1 1 0 0
+> 
+> tc qdisc add dev enu1u1 clsact
+> tc filter add dev enu1u1 ingress protocol 0x0800  flower action skbedit prio 7
+> 
+> tc qdisc add dev enu1u4 clsact
+> tc filter add dev enu1u4 ingress protocol 0x0800  flower action skbedit prio 0
+> 
+> On a system attached to the port enu1u2 I run two iperf3 server
+> instances:
+> iperf3 -s -p 5210 &
+> iperf3 -s -p 5211 &
+> 
+> On systems attached to enu1u4 and enu1u1 I run:
+> iperf3 -u -c  172.17.0.1 -p 5210 -b100M  -l1472 -t100
+> and
+> iperf3 -u -c  172.17.0.1 -p 5211 -b100M  -l1472 -t100
+> 
+> As a result, IP traffic on port enu1u1 will be prioritized and take
+> precedence over IP traffic on port enu1u4
+> 
+> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
 > ---
 
-Sorry for not responding off-list. Super busy.
-
-I've tested both this patch on top of net-next as well as the lf-6.1.y
-version you've sent separately - on a cold boot in both cases. Both the
-i.MX93 base board and the SJA1105 EVB (powered by an external power supply)
-were cold booted.
-
-Unfortunately, the patch does not appear to work as intended, and
-ethtool -S eth1 still shows no RX counter incrementing on the SJA1105
-CPU port when used in RGMII mode (where the problem is).
-
->  .../net/ethernet/stmicro/stmmac/dwmac-imx.c   | 62 +++++++++++++++++++
->  1 file changed, 62 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c
-> index b9378a63f0e8..799aedeec094 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c
-> @@ -40,6 +40,9 @@
->  #define DMA_BUS_MODE			0x00001000
->  #define DMA_BUS_MODE_SFT_RESET		(0x1 << 0)
->  #define RMII_RESET_SPEED		(0x3 << 14)
-> +#define TEN_BASET_RESET_SPEED		(0x2 << 14)
-> +#define RGMII_RESET_SPEED		(0x0 << 14)
-> +#define CTRL_SPEED_MASK			(0x3 << 14)
->  
->  struct imx_dwmac_ops {
->  	u32 addr_width;
-> @@ -56,6 +59,7 @@ struct imx_priv_data {
->  	struct regmap *intf_regmap;
->  	u32 intf_reg_off;
->  	bool rmii_refclk_ext;
-> +	void __iomem *base_addr;
->  
->  	const struct imx_dwmac_ops *ops;
->  	struct plat_stmmacenet_data *plat_dat;
-> @@ -212,6 +216,61 @@ static void imx_dwmac_fix_speed(void *priv, unsigned int speed)
->  		dev_err(dwmac->dev, "failed to set tx rate %lu\n", rate);
->  }
->  
-> +static bool imx_dwmac_is_fixed_link(struct imx_priv_data *dwmac)
-> +{
-> +	struct plat_stmmacenet_data *plat_dat;
-> +	struct device_node *dn;
-> +
-> +	if (!dwmac || !dwmac->plat_dat)
-> +		return false;
-> +
-> +	plat_dat = dwmac->plat_dat;
-> +	dn = of_get_child_by_name(dwmac->dev->of_node, "fixed-link");
-> +	if (!dn)
-> +		return false;
-> +
-> +	if (plat_dat->phy_node == dn || plat_dat->phylink_node == dn)
-> +		return true;
-> +
-> +	return false;
-> +}
-
-I'm really not sure what prompted the complication here, since instead of:
-
-if (imx_dwmac_is_fixed_link(dwmac)) {
-
-you can do:
-
-#include <linux/of_mdio.h>
-
-if (of_phy_is_fixed_link(dwmac->dev->of_node)) {
-
-and the latter has the advantage that it also matches (tested on
-imx93-11x11-evk-sja1105.dts). I've had to make this change for testing,
-because otherwise, the workaround wasn't even executing. Other than that,
-I've done no other debugging.
-
-Considering the fact that you need to resend a functional version even
-in principle anyway, let's continue the discussion and debugging off-list.
-
-Ah, please be aware of the message from the kernel test robot which said
-that you're setting but not using the plat_dat variable in imx_dwmac_fix_speed_mx93().
-It's probably a remnant of what later became imx_dwmac_is_fixed_link(),
-but it still needs to be removed.
+Sorry for the delay. I will review this patch (and other pending DSA
+patches) tomorrow.
 
