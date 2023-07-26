@@ -1,54 +1,58 @@
-Return-Path: <netdev+bounces-21168-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21169-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0162A762A0A
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 06:09:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 59E33762A27
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 06:14:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B2E7E28188F
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 04:09:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 916E22819EE
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 04:14:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1A1C523F;
-	Wed, 26 Jul 2023 04:09:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 995E25250;
+	Wed, 26 Jul 2023 04:14:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A8A65382
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 04:09:41 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CBD6BC433C8;
-	Wed, 26 Jul 2023 04:09:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F525523F
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 04:14:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 855FCC433C8;
+	Wed, 26 Jul 2023 04:14:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690344581;
-	bh=ku1nE39/TTrl/Uk7uhUIacdlmfCDkaxNE1UEjYekZco=;
+	s=k20201202; t=1690344865;
+	bh=JctyBO2YGDNHm6PyaYDElro5t1yWDJCFcyBIWaxzZLM=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=cl+tt96BUc+4oGpCAUspkgwUXGcWQm+hGLkPXiAiOsfTtS0+PC7Ud9PZRw61XFN+D
-	 GMijLReeVQfeloe6NBB/+zZwnr48Lbnw93ky0jOb8QZXMLnn6+DwV0KrmFe3FyQdLB
-	 d2oo+rZlkkJ+VQbsKbyMPiol/qZUrZyVhn6LWph1ZeLzx1Kl5az4CsIY6aIfO93jt3
-	 LatHN1gFnRd5I0hM3uuAe0okMGec7W8vwCzc2z/7UzLWXVUHPAxoZqM5xmlux00dyr
-	 yEoeCJUdfW3CZlrgZTUJijb8VycOMcuaNC/AqqHxtFQkuLJ9FWCZZgWS7nc8J1Va9J
-	 5kRmmN2VYjkmg==
-Date: Tue, 25 Jul 2023 21:09:39 -0700
+	b=CncVg9XCuOLZ7wI2l6fLx7/R1NMrNWelj3kUrm4rZfMdvSuTwYGpmTN0y1Zu76Tpr
+	 dJyX+eas2yz+azx5J1DiGLD/3bB6EpoA+bs1CXtyZWZSHwI1h8n4RHNH5PGGL1d9Q5
+	 T2iBMuuNuFzaUMc/KlkJndDN/KS81elqs8bqwYuCv9K9NEF+mrKiAj17s0Rpkfnnie
+	 wvWtQAWMzY23+5E9xEP9DyL0tEiz1oissxpVF4jqf6M9qeEn5NjaAOJ+C71bfuDsO5
+	 0pRboaWRg76D3OJMxx9u+wpH+7izUWI4pRmEPGyjqk7FbFQ7sJih9+6mq4x7rBlkG8
+	 6UNFyA/sc9S1A==
+Date: Tue, 25 Jul 2023 21:14:23 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: MD Danish Anwar <danishanwar@ti.com>
-Cc: Randy Dunlap <rdunlap@infradead.org>, Roger Quadros <rogerq@kernel.org>,
- Simon Horman <simon.horman@corigine.com>, Vignesh Raghavendra
- <vigneshr@ti.com>, Andrew Lunn <andrew@lunn.ch>, Richard Cochran
- <richardcochran@gmail.com>, Conor Dooley <conor+dt@kernel.org>, Krzysztof
- Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Rob Herring
- <robh+dt@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Eric Dumazet
- <edumazet@google.com>, "David S. Miller" <davem@davemloft.net>,
- <nm@ti.com>, <srk@ti.com>, <linux-kernel@vger.kernel.org>,
- <devicetree@vger.kernel.org>, <netdev@vger.kernel.org>,
- <linux-omap@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>
-Subject: Re: [PATCH v11 06/10] net: ti: icssg-prueth: Add ICSSG ethernet
- driver
-Message-ID: <20230725210939.56d77726@kernel.org>
-In-Reply-To: <20230724112934.2637802-7-danishanwar@ti.com>
-References: <20230724112934.2637802-1-danishanwar@ti.com>
-	<20230724112934.2637802-7-danishanwar@ti.com>
+To: Herve Codina <herve.codina@bootlin.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn
+ <andrew@lunn.ch>, Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski
+ <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
+ Lee Jones <lee@kernel.org>, Linus Walleij <linus.walleij@linaro.org>, Qiang
+ Zhao <qiang.zhao@nxp.com>, Li Yang <leoyang.li@nxp.com>, Liam Girdwood
+ <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, Jaroslav Kysela
+ <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, Shengjiu Wang
+ <shengjiu.wang@gmail.com>, Xiubo Li <Xiubo.Lee@gmail.com>, Fabio Estevam
+ <festevam@gmail.com>, Nicolin Chen <nicoleotsuka@gmail.com>, Christophe
+ Leroy <christophe.leroy@csgroup.eu>, netdev@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, alsa-devel@alsa-project.org, Thomas
+ Petazzoni <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH 00/26] Add support for QMC HDLC, framer infrastruture
+ and PEF2256 framer
+Message-ID: <20230725211423.742f0a6a@kernel.org>
+In-Reply-To: <20230725092417.43706-1-herve.codina@bootlin.com>
+References: <20230725092417.43706-1-herve.codina@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -58,263 +62,12 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Mon, 24 Jul 2023 16:59:30 +0530 MD Danish Anwar wrote:
->  drivers/net/ethernet/ti/Kconfig        |   13 +
->  drivers/net/ethernet/ti/Makefile       |    3 +
->  drivers/net/ethernet/ti/icssg_prueth.c | 1831 ++++++++++++++++++++++++
->  drivers/net/ethernet/ti/icssg_prueth.h |   48 +
+On Tue, 25 Jul 2023 11:23:36 +0200 Herve Codina wrote:
+> I have a system where I need to handle an HDLC interface and some audio
+> data.
 
-Please create a sub-directory for the driver.
-
-> +static int prueth_ndev_add_tx_napi(struct prueth_emac *emac)
-> +{
-> +	struct prueth *prueth = emac->prueth;
-> +	int i, ret;
-> +
-> +	for (i = 0; i < emac->tx_ch_num; i++) {
-> +		struct prueth_tx_chn *tx_chn = &emac->tx_chns[i];
-> +
-> +		netif_napi_add_tx_weight(emac->ndev, &tx_chn->napi_tx,
-> +					 emac_napi_tx_poll, NAPI_POLL_WEIGHT);
-
-Skip specifying weight, please.
-
-> +/**
-> + * emac_ndo_start_xmit - EMAC Transmit function
-> + * @skb: SKB pointer
-> + * @ndev: EMAC network adapter
-> + *
-> + * Called by the system to transmit a packet  - we queue the packet in
-> + * EMAC hardware transmit queue
-> + * Doesn't wait for completion we'll check for TX completion in
-> + * emac_tx_complete_packets().
-> + *
-> + * Return: enum netdev_tx
-> + */
-> +static enum netdev_tx emac_ndo_start_xmit(struct sk_buff *skb, struct net_device *ndev)
-> +{
-> +	struct cppi5_host_desc_t *first_desc, *next_desc, *cur_desc;
-> +	struct prueth_emac *emac = netdev_priv(ndev);
-> +	struct netdev_queue *netif_txq;
-> +	struct prueth_tx_chn *tx_chn;
-> +	dma_addr_t desc_dma, buf_dma;
-> +	int i, ret = 0, q_idx;
-> +	void **swdata;
-> +	u32 pkt_len;
-> +	u32 *epib;
-> +
-> +	pkt_len = skb_headlen(skb);
-> +	q_idx = skb_get_queue_mapping(skb);
-> +
-> +	tx_chn = &emac->tx_chns[q_idx];
-> +	netif_txq = netdev_get_tx_queue(ndev, q_idx);
-> +
-> +	/* Map the linear buffer */
-> +	buf_dma = dma_map_single(tx_chn->dma_dev, skb->data, pkt_len, DMA_TO_DEVICE);
-> +	if (dma_mapping_error(tx_chn->dma_dev, buf_dma)) {
-> +		netdev_err(ndev, "tx: failed to map skb buffer\n");
-> +		ret = NETDEV_TX_BUSY;
-
-Drop it if it can't be mapped and return OK. What's going to re-enable
-the queue in this case?
-
-> +		goto drop_stop_q;
-> +	}
-> +
-> +	first_desc = k3_cppi_desc_pool_alloc(tx_chn->desc_pool);
-> +	if (!first_desc) {
-> +		netdev_dbg(ndev, "tx: failed to allocate descriptor\n");
-> +		dma_unmap_single(tx_chn->dma_dev, buf_dma, pkt_len, DMA_TO_DEVICE);
-> +		ret = NETDEV_TX_BUSY;
-> +		goto drop_stop_q_busy;
-> +	}
-> +
-> +	cppi5_hdesc_init(first_desc, CPPI5_INFO0_HDESC_EPIB_PRESENT,
-> +			 PRUETH_NAV_PS_DATA_SIZE);
-> +	cppi5_hdesc_set_pkttype(first_desc, 0);
-> +	epib = first_desc->epib;
-> +	epib[0] = 0;
-> +	epib[1] = 0;
-> +
-> +	/* set dst tag to indicate internal qid at the firmware which is at
-> +	 * bit8..bit15. bit0..bit7 indicates port num for directed
-> +	 * packets in case of switch mode operation
-> +	 */
-> +	cppi5_desc_set_tags_ids(&first_desc->hdr, 0, (emac->port_id | (q_idx << 8)));
-> +	k3_udma_glue_tx_dma_to_cppi5_addr(tx_chn->tx_chn, &buf_dma);
-> +	cppi5_hdesc_attach_buf(first_desc, buf_dma, pkt_len, buf_dma, pkt_len);
-> +	swdata = cppi5_hdesc_get_swdata(first_desc);
-> +	*swdata = skb;
-> +
-> +	if (!skb_is_nonlinear(skb))
-> +		goto tx_push;
-
-Why the goto? The loop won't be entered.
-
-> +	/* Handle the case where skb is fragmented in pages */
-> +	cur_desc = first_desc;
-> +	for (i = 0; i < skb_shinfo(skb)->nr_frags; i++) {
-> +		skb_frag_t *frag = &skb_shinfo(skb)->frags[i];
-> +		u32 frag_size = skb_frag_size(frag);
-> +
-> +		next_desc = k3_cppi_desc_pool_alloc(tx_chn->desc_pool);
-> +		if (!next_desc) {
-> +			netdev_err(ndev,
-> +				   "tx: failed to allocate frag. descriptor\n");
-> +			ret = NETDEV_TX_BUSY;
-> +			goto drop_free_descs;
-> +		}
-> +
-> +		buf_dma = skb_frag_dma_map(tx_chn->dma_dev, frag, 0, frag_size,
-> +					   DMA_TO_DEVICE);
-> +		if (dma_mapping_error(tx_chn->dma_dev, buf_dma)) {
-> +			netdev_err(ndev, "tx: Failed to map skb page\n");
-> +			k3_cppi_desc_pool_free(tx_chn->desc_pool, next_desc);
-> +			ret = NETDEV_TX_BUSY;
-> +			goto drop_free_descs;
-
-this label frees the skb, you can't return BUSY
-
-> +		}
-> +
-> +		cppi5_hdesc_reset_hbdesc(next_desc);
-> +		k3_udma_glue_tx_dma_to_cppi5_addr(tx_chn->tx_chn, &buf_dma);
-> +		cppi5_hdesc_attach_buf(next_desc,
-> +				       buf_dma, frag_size, buf_dma, frag_size);
-> +
-> +		desc_dma = k3_cppi_desc_pool_virt2dma(tx_chn->desc_pool,
-> +						      next_desc);
-> +		k3_udma_glue_tx_dma_to_cppi5_addr(tx_chn->tx_chn, &desc_dma);
-> +		cppi5_hdesc_link_hbdesc(cur_desc, desc_dma);
-> +
-> +		pkt_len += frag_size;
-> +		cur_desc = next_desc;
-> +	}
-> +	WARN_ON(pkt_len != skb->len);
-
-WARN_ON_ONCE() if at all
-
-> +
-> +tx_push:
-> +	/* report bql before sending packet */
-> +	netdev_tx_sent_queue(netif_txq, pkt_len);
-> +
-> +	cppi5_hdesc_set_pktlen(first_desc, pkt_len);
-> +	desc_dma = k3_cppi_desc_pool_virt2dma(tx_chn->desc_pool, first_desc);
-> +	/* cppi5_desc_dump(first_desc, 64); */
-> +
-> +	skb_tx_timestamp(skb);  /* SW timestamp if SKBTX_IN_PROGRESS not set */
-> +	ret = k3_udma_glue_push_tx_chn(tx_chn->tx_chn, first_desc, desc_dma);
-> +	if (ret) {
-> +		netdev_err(ndev, "tx: push failed: %d\n", ret);
-> +		goto drop_free_descs;
-> +	}
-> +
-> +	if (k3_cppi_desc_pool_avail(tx_chn->desc_pool) < MAX_SKB_FRAGS) {
-> +		netif_tx_stop_queue(netif_txq);
-> +		/* Barrier, so that stop_queue visible to other cpus */
-> +		smp_mb__after_atomic();
-> +
-> +		if (k3_cppi_desc_pool_avail(tx_chn->desc_pool) >=
-> +		    MAX_SKB_FRAGS)
-
-MAX_FRAGS + 1?
-
-> +			netif_tx_wake_queue(netif_txq);
-> +	}
-> +
-> +	return NETDEV_TX_OK;
-
-
-> +static int emac_napi_rx_poll(struct napi_struct *napi_rx, int budget)
-> +{
-> +	struct prueth_emac *emac = prueth_napi_to_emac(napi_rx);
-> +	int rx_flow = PRUETH_RX_FLOW_DATA;
-> +	int flow = PRUETH_MAX_RX_FLOWS;
-> +	int num_rx = 0;
-> +	int cur_budget;
-> +	int ret;
-> +
-> +	while (flow--) {
-> +		cur_budget = budget - num_rx;
-> +
-> +		while (cur_budget--) {
-> +			ret = emac_rx_packet(emac, flow);
-> +			if (ret)
-> +				break;
-> +			num_rx++;
-> +		}
-> +
-> +		if (num_rx >= budget)
-> +			break;
-> +	}
-> +
-> +	if (num_rx < budget) {
-> +		napi_complete(napi_rx);
-
-Prefer using napi_complete_done()
-
-> +		enable_irq(emac->rx_chns.irq[rx_flow]);
-> +	}
-> +
-> +	return num_rx;
-> +}
-
-> +static void emac_ndo_tx_timeout(struct net_device *ndev, unsigned int txqueue)
-> +{
-> +	struct prueth_emac *emac = netdev_priv(ndev);
-> +
-> +	if (netif_msg_tx_err(emac))
-> +		netdev_err(ndev, "xmit timeout");
-
-Core already prints something, you can drop this.
-
-> +	ndev->stats.tx_errors++;
-> +}
-
-> +static void emac_ndo_set_rx_mode_work(struct work_struct *work)
-> +{
-> +	struct prueth_emac *emac = container_of(work, struct prueth_emac, rx_mode_work);
-> +	struct net_device *ndev = emac->ndev;
-> +	bool promisc, allmulti;
-> +
-> +	if (!netif_running(ndev))
-> +		return;
-> +
-> +	promisc = ndev->flags & IFF_PROMISC;
-> +	allmulti = ndev->flags & IFF_ALLMULTI;
-> +	emac_set_port_state(emac, ICSSG_EMAC_PORT_UC_FLOODING_DISABLE);
-> +	emac_set_port_state(emac, ICSSG_EMAC_PORT_MC_FLOODING_DISABLE);
-> +
-> +	if (promisc) {
-> +		emac_set_port_state(emac, ICSSG_EMAC_PORT_UC_FLOODING_ENABLE);
-> +		emac_set_port_state(emac, ICSSG_EMAC_PORT_MC_FLOODING_ENABLE);
-> +		return;
-> +	}
-> +
-> +	if (allmulti) {
-> +		emac_set_port_state(emac, ICSSG_EMAC_PORT_MC_FLOODING_ENABLE);
-> +		return;
-> +	}
-> +
-> +	if (!netdev_mc_empty(ndev)) {
-> +		emac_set_port_state(emac, ICSSG_EMAC_PORT_MC_FLOODING_ENABLE);
-> +		return;
-> +	}
-> +}
-
-There's no need for locking in this work?
-
-> +	netif_napi_add(ndev, &emac->napi_rx,
-> +		       emac_napi_rx_poll);
-
-nit: fits on a line
-
-> +static struct platform_driver prueth_driver = {
-> +	.probe = prueth_probe,
-> +	.remove = prueth_remove,
-
-Please use .remove_new (which has a void return).
+The new code must build cleanly with C=1 W=1, after every individual
+patch.
 -- 
 pw-bot: cr
 
