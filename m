@@ -1,138 +1,271 @@
-Return-Path: <netdev+bounces-21601-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21602-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 733BA763FD5
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 21:37:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C02A763FD7
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 21:37:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9AFA6281F36
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 19:37:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 546741C211D2
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 19:37:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A68B14CE90;
-	Wed, 26 Jul 2023 19:37:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3914E4CE90;
+	Wed, 26 Jul 2023 19:37:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 978184CE89
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 19:37:36 +0000 (UTC)
-Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D56F6E73
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 12:37:34 -0700 (PDT)
-Received: by mail-ej1-x62c.google.com with SMTP id a640c23a62f3a-992f15c36fcso9419566b.3
-        for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 12:37:34 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DA1418057
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 19:37:45 +0000 (UTC)
+Received: from mail-io1-xd2e.google.com (mail-io1-xd2e.google.com [IPv6:2607:f8b0:4864:20::d2e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C50B41BD6;
+	Wed, 26 Jul 2023 12:37:42 -0700 (PDT)
+Received: by mail-io1-xd2e.google.com with SMTP id ca18e2360f4ac-78360b822abso5002139f.2;
+        Wed, 26 Jul 2023 12:37:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1690400253; x=1691005053;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=p+iMlIz9uQbnImW6R6xhQWYY5Lm4RTCv4TZdvPS1rcA=;
-        b=CJQldOJMx34hVnMk6LaZxcxB3dAuK5dGvI8w3Fg7dW9Jt+T8j0E360Emf67BiNc3m0
-         7wEOl8WlkSnozAIDGmAgOCqjvNlpGMC02S2/WCZjdBC9SSgOGD6RR0OuinfaBvY/j45R
-         u3eAi0PwgK0IPiK+Rk0zlxMqNu+aIzeePFUaA=
+        d=gmail.com; s=20221208; t=1690400262; x=1691005062;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=UrJGrxEAP7eaauI+6CZSMeVgAKxwElVpsCCTJPBsNHM=;
+        b=QJTlVT7E2T8qVnUonw3PSbJX+A7B1q+SNrmp2MQcG658IuG+mfKth/n6N37x5Fu1UO
+         2QrbRQQ14JsDrFIsTQ+8dqgUQlMWPY3dICBmvQa+5MdVoKAvLxFZ/kIBeesB/4NcLQTC
+         uDr47XrhC7QMHEMAU60XQ/Q47j3qnx/qxrODJRnECyxDiqK2+YXBOSAhZlVNPlGbLPze
+         Cq5S5xF9mombQhgOBkypogR0+QmwvxqsM+Y1whJUaaYw4YODfh6yGSb0tfnz6ZhrPlr+
+         BkMM2quYhYBbmG8q3WnDpXNN3c+cm5vlDP9xUesvdDPQ0CKrGoPmbSMQ5fS7gVU2zwOb
+         5/JA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690400253; x=1691005053;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=p+iMlIz9uQbnImW6R6xhQWYY5Lm4RTCv4TZdvPS1rcA=;
-        b=iDKxUaTFKKMc5hD8lPQ4lzIBeo8Mk84E4nr0kioO+Wjdt2BLYWucCvuoyPhN3Y2QG4
-         taJb9lD28fKGFARxZBUAx/ir6G88b+J8i6yvc4iZrspD856W6yeaiBjL836UQE7XUlPF
-         DZQk4WWNar5nacITuznCaN/QVvE45EZ7S708xqpym3mBzXKdAtuaGc/UIA43a0kXc6aH
-         yNsxJolBLyo8AuOi3wCJm5HC8PUvSUH5H9u/Y+yihxscZpxx/FjSMYn64qPj65UisEuT
-         HFZDbPC+9dxRs3kHqJ1EEcDZ6Y0NFQHP/DZcWhpoIVevsnVIuHNsIIuP1Ch3pnutYOVM
-         2G/Q==
-X-Gm-Message-State: ABy/qLaznosRXvSK6Ng6gCFfH6mClabDUEnDBJW0wdFrufLN2XA8fscD
-	k4ofXzNiQ98Rrl8khjrbsFLFaWNzD2Fly36PhecgdLfB
-X-Google-Smtp-Source: APBJJlGCbNXuuXTTwM9XQTpNGd9vGL+uUwMDPPzbgMHVN6HmWUGQ3wi9yYYm+w0oNNmian0quYbSkw==
-X-Received: by 2002:a17:906:64c1:b0:991:d727:6977 with SMTP id p1-20020a17090664c100b00991d7276977mr152738ejn.38.1690400253200;
-        Wed, 26 Jul 2023 12:37:33 -0700 (PDT)
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com. [209.85.208.51])
-        by smtp.gmail.com with ESMTPSA id q6-20020a1709060f8600b00993b381f808sm9889179ejj.38.2023.07.26.12.37.31
-        for <netdev@vger.kernel.org>
+        d=1e100.net; s=20221208; t=1690400262; x=1691005062;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=UrJGrxEAP7eaauI+6CZSMeVgAKxwElVpsCCTJPBsNHM=;
+        b=H6S3hXprUBITPmJTIwsxRmobXLMK+8HT1itXfGMTSY32Npsu1ChkbikkmnzQVJgGo8
+         /QafmMm/ON+exVXyPvN3woTknZRDu46U8H9Z1BT5ad+L4yLHvvGe/427nMgQeSsAs9Py
+         e4CjdXCVtDX99VtjmXguDbbr6GSPKsWCWNhPJj992Qp7FSXpcL+PemTlz3ILCi373c5I
+         PCylC1GbGcw6ysBnyZE2VFXn47VeAoEi6P0ctwRZv1aSfPR3ksvnOtutAoHqBv7FnKqh
+         YKX5PlbctOt14R+zbG7cnwXZFDZ3Ln79tkzxfrx32bdoGddOQ7Lppnx418xnc487vcX6
+         KSRg==
+X-Gm-Message-State: ABy/qLbA7GeVnrnY9HjK0LD04r45LREe4XsGjaeIAzAaE+qNlHjZPaHS
+	SIwh6ngt167L00csawERFrg=
+X-Google-Smtp-Source: APBJJlFbwmAk3lw1hX4Cmcj+s6vABmChQ0DLw/LFf37ey+U/gscJZxXYRBqheVGjgGmGxeAhAtM7pg==
+X-Received: by 2002:a5d:84d8:0:b0:76c:56fb:3c59 with SMTP id z24-20020a5d84d8000000b0076c56fb3c59mr3288332ior.10.1690400261991;
+        Wed, 26 Jul 2023 12:37:41 -0700 (PDT)
+Received: from ?IPV6:2601:282:800:7ed0:bd1d:fe8d:d220:8378? ([2601:282:800:7ed0:bd1d:fe8d:d220:8378])
+        by smtp.googlemail.com with ESMTPSA id z21-20020a6b5c15000000b007836e9ff198sm4996858ioh.55.2023.07.26.12.37.40
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 26 Jul 2023 12:37:32 -0700 (PDT)
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5222b917e0cso183943a12.0
-        for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 12:37:31 -0700 (PDT)
-X-Received: by 2002:a50:ee89:0:b0:522:678d:45e5 with SMTP id
- f9-20020a50ee89000000b00522678d45e5mr93988edr.30.1690400251387; Wed, 26 Jul
- 2023 12:37:31 -0700 (PDT)
+        Wed, 26 Jul 2023 12:37:41 -0700 (PDT)
+Message-ID: <179979e6-eb8a-0300-5445-999b9366250a@gmail.com>
+Date: Wed, 26 Jul 2023 13:37:40 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230726151515.1650519-1-kuba@kernel.org> <11ec5b3819ff17c7013348b766eab571eee5ca96.camel@perches.com>
- <20230726092312.799503d6@kernel.org> <CAHk-=wjEj2fGiaQXrYUZu65EPdgbGEAEMzch8LTtiUp6UveRCw@mail.gmail.com>
- <20230726112031.61bd0c62@kernel.org> <CAHk-=wi9MyyWmP_HAddLrmGfdANkut6_2f9hzv9HcyTBvg3+kA@mail.gmail.com>
- <20230726114817.1bd52d48@kernel.org> <CAHk-=wiuR7_A=PbN8jhmqGPJQHypUHR+W4-UuSVhOVWvYXs1Tg@mail.gmail.com>
- <CAHk-=wh4pbrNZGqfV9u1urZr3Xjci=UV-MP+KneB6a5yo7-VOQ@mail.gmail.com>
-In-Reply-To: <CAHk-=wh4pbrNZGqfV9u1urZr3Xjci=UV-MP+KneB6a5yo7-VOQ@mail.gmail.com>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Wed, 26 Jul 2023 12:37:14 -0700
-X-Gmail-Original-Message-ID: <CAHk-=whCE9cWmTXu54WFQ7x-aH8n=dhCux2h49=pYN=14ybkxg@mail.gmail.com>
-Message-ID: <CAHk-=whCE9cWmTXu54WFQ7x-aH8n=dhCux2h49=pYN=14ybkxg@mail.gmail.com>
-Subject: Re: [PATCH v2] scripts: get_maintainer: steer people away from using
- file paths
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Joe Perches <joe@perches.com>, Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, 
-	geert@linux-m68k.org, gregkh@linuxfoundation.org, netdev@vger.kernel.org, 
-	workflows@vger.kernel.org, mario.limonciello@amd.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.13.0
+Subject: Re: [PATCH v3] drivers: net: prevent tun_get_user() to exceed xdp
+ size limits
+Content-Language: en-US
+To: Jesper Dangaard Brouer <jbrouer@redhat.com>,
+ Jason Wang <jasowang@redhat.com>, Andrew Kanner <andrew.kanner@gmail.com>
+Cc: brouer@redhat.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org,
+ linux-kernel-mentees@lists.linuxfoundation.org,
+ syzbot+f817490f5bd20541b90a@syzkaller.appspotmail.com,
+ John Fastabend <john.fastabend@gmail.com>
+References: <20230725155403.796-1-andrew.kanner@gmail.com>
+ <CACGkMEt=Cd8J995+0k=6MT1Pj=Fk9E_r2eZREptLt2osj_H-hA@mail.gmail.com>
+ <ab722ec1-ae45-af1f-b869-e7339402c852@redhat.com>
+From: David Ahern <dsahern@gmail.com>
+In-Reply-To: <ab722ec1-ae45-af1f-b869-e7339402c852@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
 	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, 26 Jul 2023 at 12:05, Linus Torvalds
-<torvalds@linux-foundation.org> wrote:
->
-> Except it looks like it might be set up to just complain
-> ("netdev/cc_maintainers"). Which seems to be why you're complaining.
->
-> IOW, you're complaining about *another* tool, because your own tool
-> use is set up to complain instead of being helpful.
+On 7/26/23 3:02 AM, Jesper Dangaard Brouer wrote:
+> Cc. John and Ahern
+> 
+> On 26/07/2023 04.09, Jason Wang wrote:
+>> On Tue, Jul 25, 2023 at 11:54 PM Andrew Kanner
+>> <andrew.kanner@gmail.com> wrote:
+>>>
+>>> Syzkaller reported the following issue:
+>>> =======================================
+>>> Too BIG xdp->frame_sz = 131072
+> 
+> Is this a contiguous physical memory allocation?
+> 
+> 131072 bytes equal order 5 page.
+> 
+> Looking at tun.c code I cannot find a code path that could create
+> order-5 skb->data, but only SKB with order-0 fragments.  But I guess it
+> is the netif_receive_generic_xdp() what will realloc to make this linear
+> (via skb_linearize())
 
-The very first case I actually looked at wasn't even some
-"inexperienced developer" - the kind you claim is the problem, and the
-kind you claim this would help.
 
-It was a random fix from Florian Westphal, who has been around for
-more than a decade, is credited with over 1500 commits (and mentioned
-in many many more), and knows what he's doing.
+get_tun_user is passed an iov_iter with a single segment of 65007
+total_len. The alloc_skb path is hit with an align size of only 64. That
+is insufficient for XDP so the netif_receive_generic_xdp hits the
+pskb_expand_head path. Something is off in the math in
+netif_receive_generic_xdp resulting in the skb markers being off. That
+causes bpf_prog_run_generic_xdp to compute the wrong frame_sz.
 
-He has a patch that references a "Fixes:" line, and clearly didn't go
-through the get_maintainer script as such, and the
-netdev/cc_maintainers script complains as a result.
 
-So Jakub, I think you are barking *entirely* up the wrong tree.
+> 
+>>> WARNING: CPU: 0 PID: 5020 at net/core/filter.c:4121
+>>>    ____bpf_xdp_adjust_tail net/core/filter.c:4121 [inline]
+>>> WARNING: CPU: 0 PID: 5020 at net/core/filter.c:4121
+>>>    bpf_xdp_adjust_tail+0x466/0xa10 net/core/filter.c:4103
+>>> ...
+>>> Call Trace:
+>>>   <TASK>
+>>>   bpf_prog_4add87e5301a4105+0x1a/0x1c
+>>>   __bpf_prog_run include/linux/filter.h:600 [inline]
+>>>   bpf_prog_run_xdp include/linux/filter.h:775 [inline]
+>>>   bpf_prog_run_generic_xdp+0x57e/0x11e0 net/core/dev.c:4721
+>>>   netif_receive_generic_xdp net/core/dev.c:4807 [inline]
+>>>   do_xdp_generic+0x35c/0x770 net/core/dev.c:4866
+>>>   tun_get_user+0x2340/0x3ca0 drivers/net/tun.c:1919
+>>>   tun_chr_write_iter+0xe8/0x210 drivers/net/tun.c:2043
+>>>   call_write_iter include/linux/fs.h:1871 [inline]
+>>>   new_sync_write fs/read_write.c:491 [inline]
+>>>   vfs_write+0x650/0xe40 fs/read_write.c:584
+>>>   ksys_write+0x12f/0x250 fs/read_write.c:637
+>>>   do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+>>>   do_syscall_64+0x38/0xb0 arch/x86/entry/common.c:80
+>>>   entry_SYSCALL_64_after_hwframe+0x63/0xcd
+>>>
+>>> xdp->frame_sz > PAGE_SIZE check was introduced in commit c8741e2bfe87
+>>> ("xdp: Allow bpf_xdp_adjust_tail() to grow packet size"). But
+>>> tun_get_user() still provides an execution path with do_xdp_generic()
+>>> and exceed XDP limits for packet size.
+> 
+> I added this check and maybe it is too strict. XDP can work on higher
+> order pages, as long as this is contiguous physical memory (e.g. a
+> page).  And
+> 
+> An order 5 page (131072 bytes) seems excessive, but maybe TUN have a
+> use-case for having such large packets? (Question to Ahern?)
+> 
+> I'm considering we should change the size-limit to order-2 (16384) or
+> order-3 (32768).
+> 
+> Order-3 because netstack have:
+>   #define SKB_FRAG_PAGE_ORDER get_order(32768)
+> 
+> And order-2 because netstack have: SKB_MAX_ALLOC (16KiB)
+>  - See discussion in commit 6306c1189e77 ("bpf: Remove MTU check in
+> __bpf_skb_max_len").
+>  - https://git.kernel.org/torvalds/c/6306c1189e77
+> 
+> 
+>>>
+>>> Using the syzkaller repro with reduced packet size it was also
+>>> discovered that XDP_PACKET_HEADROOM is not checked in
+>>> tun_can_build_skb(), although pad may be incremented in
+>>> tun_build_skb().
+>>>
+>>> If we move the limit check from tun_can_build_skb() to tun_build_skb()
+>>> we will make xdp to be used only in tun_build_skb(), without falling
+>>> in tun_alloc_skb(), etc. And moreover we will drop the packet which
+>>> can't be processed in tun_build_skb().
+> 
+> Looking at tun_build_skb() is uses the page_frag system, and can thus
+> create up-to SKB_FRAG_PAGE_ORDER (size 32768 / order-3).
+> 
+>>>
+>>> Reported-and-tested-by:
+>>> syzbot+f817490f5bd20541b90a@syzkaller.appspotmail.com
+>>> Closes:
+>>> https://lore.kernel.org/all/000000000000774b9205f1d8a80d@google.com/T/
+>>> Link:
+>>> https://syzkaller.appspot.com/bug?id=5335c7c62bfff89bbb1c8f14cdabebe91909060f
+>>> Fixes: 7df13219d757 ("tun: reserve extra headroom only when XDP is set")
+>>> Signed-off-by: Andrew Kanner <andrew.kanner@gmail.com>
+>>> ---
+>>>
+>>> Notes:
+>>>      V2 -> V3:
+>>>      * attach the forgotten changelog
+>>>      V1 -> V2:
+>>>      * merged 2 patches in 1, fixing both issues: WARN_ON_ONCE with
+>>>        syzkaller repro and missing XDP_PACKET_HEADROOM in pad
+>>>      * changed the title and description of the execution path,
+>>> suggested
+>>>        by Jason Wang <jasowang@redhat.com>
+>>>      * move the limit check from tun_can_build_skb() to
+>>> tun_build_skb() to
+>>>        remove duplication and locking issue, and also drop the packet in
+>>>        case of a failed check - noted by Jason Wang
+>>> <jasowang@redhat.com>
+>>
+>> Acked-by: Jason Wang <jasowang@redhat.com>
+>>
+>> Thanks
+>>
+>>>
+>>>   drivers/net/tun.c | 7 +++----
+>>>   1 file changed, 3 insertions(+), 4 deletions(-)
+>>>
+>>> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+>>> index d75456adc62a..7c2b05ce0421 100644
+>>> --- a/drivers/net/tun.c
+>>> +++ b/drivers/net/tun.c
+>>> @@ -1594,10 +1594,6 @@ static bool tun_can_build_skb(struct
+>>> tun_struct *tun, struct tun_file *tfile,
+>>>          if (zerocopy)
+>>>                  return false;
+>>>
+>>> -       if (SKB_DATA_ALIGN(len + TUN_RX_PAD) +
+>>> -           SKB_DATA_ALIGN(sizeof(struct skb_shared_info)) > PAGE_SIZE)
+>>> -               return false;
+>>> -
+>>>          return true;
+>>>   }
+>>>
+>>> @@ -1673,6 +1669,9 @@ static struct sk_buff *tun_build_skb(struct
+>>> tun_struct *tun,
+>>>          buflen += SKB_DATA_ALIGN(len + pad);
+>>>          rcu_read_unlock();
+>>>
+>>> +       if (buflen > PAGE_SIZE)
+>>> +               return ERR_PTR(-EFAULT);
+> 
+> Concretely I'm saying maybe use SKB_FRAG_PAGE_ORDER "size" here?
+> 
+> e.g. create SKB_FRAG_PAGE_SIZE define as below.
+>  if (buflen > SKB_FRAG_PAGE_SIZE)
+> 
+> diff --git a/include/net/sock.h b/include/net/sock.h
+> index 656ea89f60ff..4c4b3c257b52 100644
+> --- a/include/net/sock.h
+> +++ b/include/net/sock.h
+> @@ -2886,7 +2886,8 @@ extern int sysctl_optmem_max;
+>  extern __u32 sysctl_wmem_default;
+>  extern __u32 sysctl_rmem_default;
+> 
+> -#define SKB_FRAG_PAGE_ORDER    get_order(32768)
+> +#define SKB_FRAG_PAGE_SIZE     32768
+> +#define SKB_FRAG_PAGE_ORDER    get_order(SKB_FRAG_PAGE_SIZE)
+>  DECLARE_STATIC_KEY_FALSE(net_high_order_alloc_disable_key);
+> 
+>>> +
+>>>          alloc_frag->offset = ALIGN((u64)alloc_frag->offset,
+>>> SMP_CACHE_BYTES);
+>>>          if (unlikely(!skb_page_frag_refill(buflen, alloc_frag,
+>>> GFP_KERNEL)))
+>>>                  return ERR_PTR(-ENOMEM);
+> 
+> --Jesper
+> 
 
-The reason you blame this on mis-use by inexperienced maintainers is
-that you probably never even react to the experienced ones that do the
-very same things, because you trust them and never bother to tell them
-"you didn't use get_maintainers to get the precise list of people that
-patchwork complains about".
-
-So the problem is not in get_maintainers. It's in having expectations
-that are simply not realistic.
-
-You seem to think that those inexperienced developers should do something that
-
- (a) experienced developers don't do *EITHER*
-
- (b) the scripts complain about instead of just doing
-
-and then you think that changing get_maintainers would somehow hide the issue.
-
-You definitely shouldn't require inexperienced developers to do
-something that clearly experienced people then don't do.
-
-Now, maybe I happened to just randomly pick a patchwork entry that was
-very unusual. But I doubt it.
-
-           Linus
 
