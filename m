@@ -1,144 +1,109 @@
-Return-Path: <netdev+bounces-21128-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21129-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A0437628AA
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 04:19:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE6EE7628B3
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 04:25:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 242A5281B42
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 02:19:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0C4D41C21026
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 02:25:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3868111F;
-	Wed, 26 Jul 2023 02:18:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7E811360;
+	Wed, 26 Jul 2023 02:25:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E56367C
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 02:18:57 +0000 (UTC)
-Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94AF71BD6
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 19:18:56 -0700 (PDT)
-Received: by mail-pf1-x434.google.com with SMTP id d2e1a72fcca58-6686a05bc66so4017822b3a.1
-        for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 19:18:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20221208.gappssmtp.com; s=20221208; t=1690337936; x=1690942736;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+kKNdrkdfyEFstR1y5xEZ+Oaic/KHimE93Cnl6163A0=;
-        b=AavjTf6gNnnFGvsqSxpmq+LXMyxh6sGf1VTG/sZRgivd+Ig2qrfzkFRDPRM5ezhJGS
-         apnYMoxTv6Uan5jt4/QcbKZuDc4/GUtT3PUVvfCHAbHrXgaicM1kvCBwv7OwRKa5kg4J
-         N4XBsLoNboaUvn1DmYTh5fTC9TGi85Bl3n8z52orZNZZlTyme49NrJ+3KUYitEcdrKGd
-         7uXgVjDPHlbv3iLaZA7Dc1xGjxY2kFW2LYq6SiF7gHvqOKcZMSFBEib+SOc4E4yT7qeZ
-         J0kBcOkZJFfT1L/GGoUzRUQ5/iamGxTPla7BkND/BY9hzfQOBPwBMZGfQiqQjJHD2/4C
-         Jo4Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690337936; x=1690942736;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=+kKNdrkdfyEFstR1y5xEZ+Oaic/KHimE93Cnl6163A0=;
-        b=lvVIYkheOZ0QkSM3m4jiIv1tjSBENrR2Q5l53cOuGvC75H4ZkiyqNIXUF24NPrQCgC
-         Z6yqzP6enSOuWj7gp7XVHn+gbrihbsGOvA7Y5GLnwwiuXhF0BRdQMGtFYaEGyZSPMKhC
-         NP1YPcATuvnVi0n8S/tkFPA77oc+EBbYwVD3EjXQeVaEHW3wGEORUJ8uvMgTeT8oQ2Zs
-         3lwcdlBx5t3y1s0ovuxasTk7lgPxfnY7Z3rFNEv+3A6BIdz0IjOcn3389nUmOec7a4xk
-         gOicOORKZpQlN8h7wRp2eSavh27cDfWzHTxO1RIQu+EfwNbyZ16h352FlaT6vFBRqJDr
-         Qzxg==
-X-Gm-Message-State: ABy/qLbgf9ZdQLEgUAjHyfzuFIzaVbFsvsKGgO2D1vR4nEi5R2KCaJzk
-	qTvAGmBZmtF162btowqS+ejmInpPmDFFr1uQrRqJyw==
-X-Google-Smtp-Source: APBJJlFDGnAxDcGaGey/mluYwzQ9syOX61wDuKA7yRoyT9Z/c0Tq6VAmKQpkMdy/BrYdmoP2w64OhA==
-X-Received: by 2002:a05:6a20:12c5:b0:126:42ce:bd41 with SMTP id v5-20020a056a2012c500b0012642cebd41mr774056pzg.47.1690337936054;
-        Tue, 25 Jul 2023 19:18:56 -0700 (PDT)
-Received: from hermes.local (204-195-127-207.wavecable.com. [204.195.127.207])
-        by smtp.gmail.com with ESMTPSA id h2-20020a170902748200b001bb98de2507sm5975865pll.213.2023.07.25.19.18.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Jul 2023 19:18:55 -0700 (PDT)
-Date: Tue, 25 Jul 2023 19:18:54 -0700
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Gioele Barabucci <gioele@svario.it>
-Cc: netdev@vger.kernel.org
-Subject: Re: [iproute2 v3] Read configuration files from /etc and /usr
-Message-ID: <20230725191854.75b40337@hermes.local>
-In-Reply-To: <20230725142759.169725-1-gioele@svario.it>
-References: <20230725142759.169725-1-gioele@svario.it>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 990E37C
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 02:25:18 +0000 (UTC)
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E49D92689
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 19:25:16 -0700 (PDT)
+Received: from dggpeml500026.china.huawei.com (unknown [172.30.72.57])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4R9d2J3R5WztRkN;
+	Wed, 26 Jul 2023 10:22:00 +0800 (CST)
+Received: from [10.174.178.66] (10.174.178.66) by
+ dggpeml500026.china.huawei.com (7.185.36.106) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Wed, 26 Jul 2023 10:25:13 +0800
+Message-ID: <13ab411d-32b0-b5e2-3e00-08a07e873a09@huawei.com>
+Date: Wed, 26 Jul 2023 10:25:13 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.0.2
+Subject: Re: [PATCH net-next] net: remove redundant NULL check in
+ remove_xps_queue()
+To: Simon Horman <simon.horman@corigine.com>
+CC: <netdev@vger.kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <kuniyu@amazon.com>,
+	<liuhangbin@gmail.com>, <jiri@resnulli.us>, <hkallweit1@gmail.com>,
+	<andy.ren@getcruise.com>, <weiyongjun1@huawei.com>, <yuehaibing@huawei.com>
+References: <20230724023735.2751602-1-shaozhengchao@huawei.com>
+ <ZL90FnzgLUAPc1Sk@corigine.com>
+From: shaozhengchao <shaozhengchao@huawei.com>
+In-Reply-To: <ZL90FnzgLUAPc1Sk@corigine.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Originating-IP: [10.174.178.66]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ dggpeml500026.china.huawei.com (7.185.36.106)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, 25 Jul 2023 16:27:59 +0200
-Gioele Barabucci <gioele@svario.it> wrote:
 
-> +	/* load /usr/lib/iproute2/foo.d/X conf files, unless /etc/iproute2/foo.d/X exists */
-> +	d = opendir(dirpath_usr);
-> +	while (d && (de = readdir(d)) != NULL) {
-> +		char path[PATH_MAX];
-> +		size_t len;
-> +		struct stat sb;
-> +
-> +		if (*de->d_name == '.')
-> +			continue;
-> +
-> +		/* only consider filenames ending in '.conf' */
-> +		len = strlen(de->d_name);
-> +		if (len <= 5)
-> +			continue;
-> +		if (strcmp(de->d_name + len - 5, ".conf"))
-> +			continue;
-> +
-> +		/* only consider filenames not present in /etc */
-> +		snprintf(path, sizeof(path), "%s/%s", dirpath_etc, de->d_name);
-> +		if (lstat(path, &sb) == 0)
-> +			continue;
-> +
-> +		/* load the conf file in /usr */
-> +		snprintf(path, sizeof(path), "%s/%s", dirpath_usr, de->d_name);
-> +		if (is_tab)
-> +			rtnl_tab_initialize(path, (char**)tabhash, size);
-> +		else
-> +			rtnl_hash_initialize(path, (struct rtnl_hash_entry**)tabhash, size);
-> +	}
-> +	if (d)
-> +		closedir(d);
-> +
-> +	/* load /etc/iproute2/foo.d/X conf files */
-> +	d = opendir(dirpath_etc);
-> +	while (d && (de = readdir(d)) != NULL) {
-> +		char path[PATH_MAX];
-> +		size_t len;
-> +
-> +		if (*de->d_name == '.')
-> +			continue;
-> +
-> +		/* only consider filenames ending in '.conf' */
-> +		len = strlen(de->d_name);
-> +		if (len <= 5)
-> +			continue;
-> +		if (strcmp(de->d_name + len - 5, ".conf"))
-> +			continue;
-> +
-> +		/* load the conf file in /etc */
-> +		snprintf(path, sizeof(path), "%s/%s", dirpath_etc, de->d_name);
-> +		if (is_tab)
-> +			rtnl_tab_initialize(path, (char**)tabhash, size);
-> +		else
-> +			rtnl_hash_initialize(path, (struct rtnl_hash_entry**)tabhash, size);
-> +	}
-> +	if (d)
-> +		closedir(d);
 
-Why is code copy/pasted here instead of making a function?
-Seems sloppy to me.
+On 2023/7/25 15:04, Simon Horman wrote:
+> On Mon, Jul 24, 2023 at 10:37:35AM +0800, Zhengchao Shao wrote:
+>> There are currently two paths that call remove_xps_queue():
+>> 1. __netif_set_xps_queue -> remove_xps_queue
+>> 2. clean_xps_maps -> remove_xps_queue_cpu -> remove_xps_queue
+>> There is no need to check dev_maps in remove_xps_queue() because
+>> dev_maps has been checked on these two paths.
+>>
+>> Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
+> 
+> I have verified the reasoning above is correct.
+> I am, however, slightly less sure that this is a good idea.
+> 
+Since commit 044ab86d431b("net: move the xps maps to an array") and
+commit 867d0ad476db("net: fix XPS static_key accounting are
+incorporated"), it is meaningless to reserve the null judgment. Perhaps
+after removing this null check, add comment, like
+/ * the caller must make sure that dev_maps != NULL */ ?
+Thank you.
+
+Zhengchao Shao
+>> ---
+>>   net/core/dev.c | 3 +--
+>>   1 file changed, 1 insertion(+), 2 deletions(-)
+>>
+>> diff --git a/net/core/dev.c b/net/core/dev.c
+>> index f95e0674570f..76a91b849829 100644
+>> --- a/net/core/dev.c
+>> +++ b/net/core/dev.c
+>> @@ -2384,8 +2384,7 @@ static bool remove_xps_queue(struct xps_dev_maps *dev_maps,
+>>   	struct xps_map *map = NULL;
+>>   	int pos;
+>>   
+>> -	if (dev_maps)
+>> -		map = xmap_dereference(dev_maps->attr_map[tci]);
+>> +	map = xmap_dereference(dev_maps->attr_map[tci]);
+>>   	if (!map)
+>>   		return false;
+>>   
+>> -- 
+>> 2.34.1
+>>
 
