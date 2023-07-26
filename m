@@ -1,92 +1,73 @@
-Return-Path: <netdev+bounces-21388-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21389-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E196763796
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 15:30:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BCEC07637A9
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 15:33:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3817A281EEA
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 13:30:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 57118281EE7
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 13:33:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4A6DC2DC;
-	Wed, 26 Jul 2023 13:30:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 718BCC2D7;
+	Wed, 26 Jul 2023 13:33:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A546C141
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 13:30:45 +0000 (UTC)
-Received: from m12.mail.163.com (m12.mail.163.com [220.181.12.196])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id ADA7FBC
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 06:30:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:Subject:Date:Message-Id; bh=UzedVzlTPugKIi7yUj
-	DBwd/JHG3+tRrpUhFRnCHdDnA=; b=pueHs0apaf7YqajYsoYGNgwrLLQ81HLRqr
-	9wc/+NdKRzsRs/ZiGhZUYBO1CtfgZz/1kcqYtsSSJXcaGrsbdNdfq5cuTcB0e01r
-	Po8j35zol9LFqlvQmIXWOuFdRy32eFLRk3CSR2WqWtEvdbpJKuxGjeWj2GxmajyV
-	JAQVPN3bs=
-Received: from localhost.localdomain (unknown [202.112.113.212])
-	by zwqz-smtp-mta-g3-3 (Coremail) with SMTP id _____wAHdzPJH8Fk67VHBQ--.55025S4;
-	Wed, 26 Jul 2023 21:29:51 +0800 (CST)
-From: Yuanjun Gong <ruc_gongyuanjun@163.com>
-To: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Cc: Yuanjun Gong <ruc_gongyuanjun@163.com>
-Subject: [PATCH 1/1] net: korina: fix value check in korina_probe()
-Date: Wed, 26 Jul 2023 21:29:43 +0800
-Message-Id: <20230726132943.20318-1-ruc_gongyuanjun@163.com>
-X-Mailer: git-send-email 2.17.1
-X-CM-TRANSID:_____wAHdzPJH8Fk67VHBQ--.55025S4
-X-Coremail-Antispam: 1Uf129KBjvdXoW7Jr4rAw4fGw18tF47Kr4fGrg_yoWftFcE93
-	yxZr93Gr4agr1Yywn5GrZ8Ar9Fk3Z2vF1F93WxK3y5try7Gr17Zr1kX39rAws3Ww4jkF9r
-	KF17A3y7Cw13KjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7sRNrcTJUUUUU==
-X-Originating-IP: [202.112.113.212]
-X-CM-SenderInfo: 5uxfsw5rqj53pdqm30i6rwjhhfrp/1tbiURG45WDESbveuAAAst
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_BL,RCVD_IN_MSPIKE_L3,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66457C141
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 13:33:10 +0000 (UTC)
+Received: from zju.edu.cn (mail.zju.edu.cn [61.164.42.155])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id A749BE2;
+	Wed, 26 Jul 2023 06:33:07 -0700 (PDT)
+Received: from linma$zju.edu.cn ( [10.181.197.74] ) by
+ ajax-webmail-mail-app4 (Coremail) ; Wed, 26 Jul 2023 21:32:43 +0800
+ (GMT+08:00)
+X-Originating-IP: [10.181.197.74]
+Date: Wed, 26 Jul 2023 21:32:43 +0800 (GMT+08:00)
+X-CM-HeaderCharset: UTF-8
+From: "Lin Ma" <linma@zju.edu.cn>
+To: "Leon Romanovsky" <leon@kernel.org>
+Cc: steffen.klassert@secunet.com, herbert@gondor.apana.org.au, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v1] xfrm: add forgotten nla_policy for
+ XFRMA_MTIMER_THRESH
+X-Priority: 3
+X-Mailer: Coremail Webmail Server Version XT5.0.14 build 20220622(41e5976f)
+ Copyright (c) 2002-2023 www.mailtech.cn
+ mispb-4df6dc2c-e274-4d1c-b502-72c5c3dfa9ce-zj.edu.cn
+In-Reply-To: <20230726115500.GV11388@unreal>
+References: <20230723074110.3705047-1-linma@zju.edu.cn>
+ <20230726115500.GV11388@unreal>
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=UTF-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Message-ID: <5be7712f.ead00.1899266e0a1.Coremail.linma@zju.edu.cn>
+X-Coremail-Locale: zh_CN
+X-CM-TRANSID:cS_KCgBHjAl7IMFkxFImCg--.52542W
+X-CM-SenderInfo: qtrwiiyqvtljo62m3hxhgxhubq/1tbiAwIIEmTAePoLZAAMse
+X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
+	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
+	daVFxhVjvjDU=
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_PASS,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-in korina_probe(), check the return value of clk_prepare_enable()
-and return the error code if clk_prepare_enable() returns an
-unexpected value.
-
-Fixes: e4cd854ec487 ("net: korina: Get mdio input clock via common clock framework")
-Signed-off-by: Yuanjun Gong <ruc_gongyuanjun@163.com>
----
- drivers/net/ethernet/korina.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/korina.c b/drivers/net/ethernet/korina.c
-index 2b9335cb4bb3..e18062007ae3 100644
---- a/drivers/net/ethernet/korina.c
-+++ b/drivers/net/ethernet/korina.c
-@@ -1306,7 +1306,9 @@ static int korina_probe(struct platform_device *pdev)
- 	if (IS_ERR(clk))
- 		return PTR_ERR(clk);
- 	if (clk) {
--		clk_prepare_enable(clk);
-+		rc = clk_prepare_enable(clk);
-+		if (rc)
-+			return rc;
- 		lp->mii_clock_freq = clk_get_rate(clk);
- 	} else {
- 		lp->mii_clock_freq = 200000000; /* max possible input clk */
--- 
-2.17.1
-
+SGVsbG8gTGVvbiwKCj4gCj4gVGhpcyBDVkUgaXMgYSBqb2tlLCB5b3UgbmVlZCB0byBiZSByb290
+IHRvIGV4ZWN1dGUgdGhpcyBhdHRhY2suCj4gCgpOb3QgcmVhbGx5LCB0aGlzIGNhbGwgcm91dGlu
+ZSBvbmx5IGNoZWNrcwoKICBpZiAoIW5ldGxpbmtfbmV0X2NhcGFibGUoc2tiLCBDQVBfTkVUX0FE
+TUlOKSkKICAgIHJldHVybiAtRVBFUk07CgphbmQgYW55IHVzZXJzIGluIG1vc3QgdmVuZG9yIGtl
+cm5lbCBjYW4gY3JlYXRlIGEgbmV0d29yayBuYW1lc3BhY2UgdG8KZ2V0IHN1Y2ggcHJpdmlsZWdl
+IGFuZCB0cmlnZ2VyIHRoaXMgYnVnLgoKPiBBbnl3YXkgY2hhbmdlIGlzIG9rLgo+IFJldmlld2Vk
+LWJ5OiBMZW9uIFJvbWFub3Zza3kgPGxlb25yb0BudmlkaWEuY29tPgoKUmVnYXJkcwpMaW4=
 
