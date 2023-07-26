@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-21587-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21589-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7DD4763F55
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 21:16:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF8F3763F57
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 21:16:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2554B1C211BF
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 19:16:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 57442281E1C
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 19:16:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 914E64CE96;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9AC24CE9F;
 	Wed, 26 Jul 2023 19:16:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FA57C141
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B7AE4CE89
 	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 19:16:11 +0000 (UTC)
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 924622723
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E35552720
 	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 12:16:08 -0700 (PDT)
 Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-	by smtp-out2.suse.de (Postfix) with ESMTP id 189DC1F381;
+	by smtp-out2.suse.de (Postfix) with ESMTP id 203621F74A;
 	Wed, 26 Jul 2023 19:16:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
 	t=1690398967; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=ur8bxmTX7RGEWUho3Mf/Fk06O2EG1BkelISI9wrzJxA=;
-	b=dBSDFdWJxF151d1+sbgc1zNJU0gYnfo3FsGmjcjDfXpIfmRy8KjSfhNB1Egjp2i8vzfIMU
-	8KhV49cCPQxx4ECAiD8B4jZE2H2GrSzfY/C31OfcL5vqxIz+IvBg628n2juXVSXIxu2NJh
-	eZiQ3kLuM8KnhPyzbxxPgETfHckFcRU=
+	bh=tETkjaWgXVuTvk58wCoIZ9udC/W2IHj1ashGLgXQA1w=;
+	b=NsuZHpGCRv0tFPuKLuTNtvMvxtJfgst/H9Cp74aFnN+gAe3qp6c32eixAcLKNltPpWNAlU
+	/4+8hfpKm7r46y4QIHFG7ezj2NiADnu5WkMh2x3NL9SJf2+bwcwTOsuw18fa5L7IFZZeLK
+	PaAgA+/B9iMgqbiQFf16WsJNlakihL4=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
 	s=susede2_ed25519; t=1690398967;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=ur8bxmTX7RGEWUho3Mf/Fk06O2EG1BkelISI9wrzJxA=;
-	b=V16zE0G7JooPAq2bpu+SQ0eO1xLR7Za1uGeDhJT0Ntc537SMZGB5KFuPDq5lI9HbkzIJn0
-	4BEQuDxd102lX+Cw==
+	bh=tETkjaWgXVuTvk58wCoIZ9udC/W2IHj1ashGLgXQA1w=;
+	b=rfOMgD/7HSTT4iVwZ8ynNq8OQ6UdYjVVgFoTsoT6tVnMGL/vgan+AuwTm+KzLZ01FQVO+o
+	JnPK7z33VYt42fBQ==
 Received: from adalid.arch.suse.de (adalid.arch.suse.de [10.161.8.13])
-	by relay2.suse.de (Postfix) with ESMTP id 3170E2C146;
+	by relay2.suse.de (Postfix) with ESMTP id 425D52C149;
 	Wed, 26 Jul 2023 19:16:06 +0000 (UTC)
 Received: by adalid.arch.suse.de (Postfix, from userid 16045)
-	id 25AD751CA333; Wed, 26 Jul 2023 21:16:06 +0200 (CEST)
+	id 2D52651CA335; Wed, 26 Jul 2023 21:16:06 +0200 (CEST)
 From: Hannes Reinecke <hare@suse.de>
 To: Christoph Hellwig <hch@lst.de>
 Cc: Sagi Grimberg <sagi@grimberg.me>,
@@ -57,9 +57,9 @@ Cc: Sagi Grimberg <sagi@grimberg.me>,
 	Paolo Abeni <pabeni@redhat.com>,
 	netdev@vger.kernel.org,
 	Hannes Reinecke <hare@suse.de>
-Subject: [PATCH 3/6] selftests/net/tls: add test for MSG_EOR
-Date: Wed, 26 Jul 2023 21:15:53 +0200
-Message-Id: <20230726191556.41714-4-hare@suse.de>
+Subject: [PATCH 4/6] net/tls: Use tcp_read_sock() instead of ops->read_sock()
+Date: Wed, 26 Jul 2023 21:15:54 +0200
+Message-Id: <20230726191556.41714-5-hare@suse.de>
 X-Mailer: git-send-email 2.35.3
 In-Reply-To: <20230726191556.41714-1-hare@suse.de>
 References: <20230726191556.41714-1-hare@suse.de>
@@ -77,38 +77,43 @@ X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-As the recent patch is modifying the behaviour for TLS re MSG_EOR
-handling we should be having a test for it.
+TLS resets the protocol operations, so the read_sock() callback might
+be changed, too.
+In this case using sock->ops->readsock() in tls_strp_read_copyin() will
+enter an infinite recursion if the read_sock() callback is calling
+tls_rx_rec_wait() which will call into sock->ops->readsock() via
+tls_strp_read_copyin().
+But as tls_strp_read_copyin() is supposed to produce data from the
+consumed socket and that socket is always a TCP socket we can call
+tcp_read_sock() directly without having to deal with callbacks.
 
 Signed-off-by: Hannes Reinecke <hare@suse.de>
-Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
 Reviewed-by: Jakub Kicinski <kuba@kernel.org>
 ---
- tools/testing/selftests/net/tls.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ net/tls/tls_strp.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/tools/testing/selftests/net/tls.c b/tools/testing/selftests/net/tls.c
-index a3c57004344c..4b63708c6a81 100644
---- a/tools/testing/selftests/net/tls.c
-+++ b/tools/testing/selftests/net/tls.c
-@@ -486,6 +486,17 @@ TEST_F(tls, msg_more_unsent)
- 	EXPECT_EQ(recv(self->cfd, buf, send_len, MSG_DONTWAIT), -1);
- }
+diff --git a/net/tls/tls_strp.c b/net/tls/tls_strp.c
+index f37f4a0fcd3c..ca1e0e198ceb 100644
+--- a/net/tls/tls_strp.c
++++ b/net/tls/tls_strp.c
+@@ -369,7 +369,6 @@ static int tls_strp_copyin(read_descriptor_t *desc, struct sk_buff *in_skb,
  
-+TEST_F(tls, msg_eor)
-+{
-+	char const *test_str = "test_read";
-+	int send_len = 10;
-+	char buf[10];
-+
-+	EXPECT_EQ(send(self->fd, test_str, send_len, MSG_EOR), send_len);
-+	EXPECT_EQ(recv(self->cfd, buf, send_len, MSG_WAITALL), send_len);
-+	EXPECT_EQ(memcmp(buf, test_str, send_len), 0);
-+}
-+
- TEST_F(tls, sendmsg_single)
+ static int tls_strp_read_copyin(struct tls_strparser *strp)
  {
- 	struct msghdr msg;
+-	struct socket *sock = strp->sk->sk_socket;
+ 	read_descriptor_t desc;
+ 
+ 	desc.arg.data = strp;
+@@ -377,7 +376,7 @@ static int tls_strp_read_copyin(struct tls_strparser *strp)
+ 	desc.count = 1; /* give more than one skb per call */
+ 
+ 	/* sk should be locked here, so okay to do read_sock */
+-	sock->ops->read_sock(strp->sk, &desc, tls_strp_copyin);
++	tcp_read_sock(strp->sk, &desc, tls_strp_copyin);
+ 
+ 	return desc.error;
+ }
 -- 
 2.35.3
 
