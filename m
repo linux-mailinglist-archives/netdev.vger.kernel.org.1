@@ -1,65 +1,126 @@
-Return-Path: <netdev+bounces-21340-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21344-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63BF9763577
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 13:42:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2462C76359E
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 13:51:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 364B51C2121E
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 11:42:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D22D281DCD
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 11:51:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7501A935;
-	Wed, 26 Jul 2023 11:42:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAB16BA20;
+	Wed, 26 Jul 2023 11:51:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7775DBA30
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 11:41:59 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 632ECC433C8;
-	Wed, 26 Jul 2023 11:41:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690371718;
-	bh=exhq4U2IdbwszONqSYwEUK7cbNGuFjDmaNPZyLdXnNI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=PoJqhY2ypW2D2VfIQmaErMhLAGUeXj5TAlsctkGNXx3DU90VXqASZJbFsg2n1vuyk
-	 HuXMonI08pnEol+fQkKvxpctYVOE3RoPijnCClHn5+dIkn6z4hbwA6Jm6yfFSl+kN+
-	 uLse6e4N90HTm0i+7OMde+xLfvvZdH+NYlU1fm1Xqheqp8VYHf7GQwO4GpgAd7kv83
-	 4fkkWLESTDHLkVnp4vyMswWSkUP49vpXON7ylKzsS1YbpXTipBWnthLjPQi49ti6eS
-	 uK1dDbWaivhmS7yu452XGhsiB539997PFA/kEEhl+eMkpKvabLt3146Ojwaj9fKIxA
-	 cJsFkAnXVWdFw==
-Date: Wed, 26 Jul 2023 14:41:53 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Yuanjun Gong <ruc_gongyuanjun@163.com>
-Cc: borisp@nvidia.com, netdev@vger.kernel.org, saeedm@nvidia.com
-Subject: Re: [PATCH net v2 1/1] net/mlx5e: fix return value check in
- mlx5e_ipsec_remove_trailer()
-Message-ID: <20230726114153.GT11388@unreal>
-References: <20230717185533.GA8808@unreal>
- <20230725065655.6964-1-ruc_gongyuanjun@163.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A066B8473
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 11:51:11 +0000 (UTC)
+Received: from xry111.site (xry111.site [89.208.246.23])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97A98270E;
+	Wed, 26 Jul 2023 04:50:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=xry111.site;
+	s=default; t=1690371783;
+	bh=jWiCyAHDoFfZLpVNTNaoY7OP9Un2BLhuB6gAtCXKxiU=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+	b=epxZ6oJu5I1Pe8FpvkK1jHRkLtIvks6AYMbFelpyGFHzchlagQmzNd50QWdc2TanX
+	 9FjyZYTraCEf+1/TL5wnh9gsQQmD8VUZg2kkeWK7QSSoqHxU7ldI+tn3XrFj72vD7e
+	 eNBmLfOoQZoadxbZi0zSV3KonoOf1Jb11MBNiQFM=
+Received: from [IPv6:240e:456:1120:202:485:bd13:935c:5daf] (unknown [IPv6:240e:456:1120:202:485:bd13:935c:5daf])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-384) server-digest SHA384)
+	(Client did not present a certificate)
+	(Authenticated sender: xry111@xry111.site)
+	by xry111.site (Postfix) with ESMTPSA id A1F23659A1;
+	Wed, 26 Jul 2023 07:42:55 -0400 (EDT)
+Message-ID: <3fa06f06727d8742a76fac9553e623095b7c7099.camel@xry111.site>
+Subject: Re: [PATCH v2] splice, net: Fix splice_to_socket() for O_NONBLOCK
+ socket
+From: Xi Ruoyao <xry111@xry111.site>
+To: Jan Stancek <jstancek@redhat.com>, dhowells@redhat.com, kuba@kernel.org,
+  netdev@vger.kernel.org
+Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	brauner@kernel.org, viro@zeniv.linux.org.uk
+Date: Wed, 26 Jul 2023 19:42:47 +0800
+In-Reply-To: <023c0e21e595e00b93903a813bc0bfb9a5d7e368.1690219914.git.jstancek@redhat.com>
+References: 
+	<023c0e21e595e00b93903a813bc0bfb9a5d7e368.1690219914.git.jstancek@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.4 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230725065655.6964-1-ruc_gongyuanjun@163.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Tue, Jul 25, 2023 at 02:56:55PM +0800, Yuanjun Gong wrote:
-> mlx5e_ipsec_remove_trailer() should return an error code if function
-> pskb_trim() returns an unexpected value.
-> 
-> Fixes: 2ac9cfe78223 ("net/mlx5e: IPSec, Add Innova IPSec offload TX data path")
-> Signed-off-by: Yuanjun Gong <ruc_gongyuanjun@163.com>
+On Mon, 2023-07-24 at 19:39 +0200, Jan Stancek wrote:
+> LTP sendfile07 [1], which expects sendfile() to return EAGAIN when
+> transferring data from regular file to a "full" O_NONBLOCK socket,
+> started failing after commit 2dc334f1a63a ("splice, net: Use
+> sendmsg(MSG_SPLICE_PAGES) rather than ->sendpage()").
+> sendfile() no longer immediately returns, but now blocks.
+>=20
+> Removed sock_sendpage() handled this case by setting a MSG_DONTWAIT
+> flag, fix new splice_to_socket() to do the same for O_NONBLOCK sockets.
+>=20
+> [1] https://github.com/linux-test-project/ltp/blob/master/testcases/kerne=
+l/syscalls/sendfile/sendfile07.c
+>=20
+> Fixes: 2dc334f1a63a ("splice, net: Use sendmsg(MSG_SPLICE_PAGES) rather t=
+han ->sendpage()")
+> Acked-by: David Howells <dhowells@redhat.com>
+> Signed-off-by: Jan Stancek <jstancek@redhat.com>
+
+This issue caused the "test_asyncio" test in Python 3 test suite to hang
+indefinitely.  I can confirm this patch fixes the issue.
+
+Tested-by: Xi Ruoyao <xry111@xry111.site>
+
 > ---
->  drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec_rxtx.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
-> 
+> Changes in v2:
+> - add David's Acked-by
+> - add netdev list
+>=20
+> =C2=A0fs/splice.c | 2 ++
+> =C2=A01 file changed, 2 insertions(+)
+>=20
+> diff --git a/fs/splice.c b/fs/splice.c
+> index 004eb1c4ce31..3e2a31e1ce6a 100644
+> --- a/fs/splice.c
+> +++ b/fs/splice.c
+> @@ -876,6 +876,8 @@ ssize_t splice_to_socket(struct pipe_inode_info *pipe=
+, struct file *out,
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0msg=
+.msg_flags |=3D MSG_MORE;
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0if (remain && pipe_occupancy(pipe->head, tail) > 0)
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0msg=
+.msg_flags |=3D MSG_MORE;
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0if (out->f_flags & O_NONBLOCK)
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0msg.msg_f=
+lags |=3D MSG_DONTWAIT;
+> =C2=A0
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0iov_iter_bvec(&msg.msg_iter, ITER_SOURCE, bvec, bc,
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 len - remain);
 
-Thanks,
-Reviewed-by: Leon Romanovsky <leonro@nvidia.com>
+--=20
+Xi Ruoyao <xry111@xry111.site>
+School of Aerospace Science and Technology, Xidian University
 
