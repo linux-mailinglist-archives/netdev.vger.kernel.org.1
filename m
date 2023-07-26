@@ -1,116 +1,213 @@
-Return-Path: <netdev+bounces-21584-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21585-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7CFF7763F36
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 21:06:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 65591763F3F
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 21:09:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 37308281EE6
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 19:06:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1EDE4281D5F
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 19:09:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 389004CE84;
-	Wed, 26 Jul 2023 19:06:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F9EF7E1;
+	Wed, 26 Jul 2023 19:09:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CEA17E1
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 19:06:18 +0000 (UTC)
-Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6E46E62
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 12:06:16 -0700 (PDT)
-Received: by mail-lf1-x131.google.com with SMTP id 2adb3069b0e04-4fb7dc16ff0so208932e87.2
-        for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 12:06:16 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1272F17EE
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 19:09:02 +0000 (UTC)
+Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C025211C
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 12:09:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1690398375; x=1691003175;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=5ISopsp3GPjCEYylIemfLA0z3JmRG0JusuOWHSGEOLw=;
-        b=Wyo2LaoVHtAiw2PazwAFDmQcirOzA6gP9C+wgO1nx2DyTeSWDe2UJT4YLSqbezPdXi
-         FYtDoimOGsFJYfth3e4yqD0aQQCIlAZEvYrZJstJwIyZhZBqWxo2I2fHbgXhkZpRUsLY
-         h0Ca7UDrIZ9c7yA/XeOF95zhnwrbRRHcS7fMo=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690398375; x=1691003175;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=5ISopsp3GPjCEYylIemfLA0z3JmRG0JusuOWHSGEOLw=;
-        b=MaNtil9ZMhCcnHV61Sno7evatzhpgAdy4D8DA30blT6whJZ3ONc+VbuI8W81UObG7E
-         PJKM6BvQtugPAnNAP16d6NVvdaHf8CAM/r++pUCLQGblrFbchwhu5wjUuFKIWJuk0gfh
-         Bx+nhgNU15Ry2P6Kt5K7B16pBhoNNAaUTUG7G12fNI0pdX1F6c5IAOPRxrEEegSy/p+3
-         RQbg9LOXlDf4brm7dsagxmXCoY0TCu/vhl2xP1RS12yvrOO6vVujxhJmAQqmshKN8msa
-         WlBrrtL9mpkJgCMYOqxEs4lrkc4pMGStt9n9BXwEXKw77Ua3Hfln6hMnc5kUWhAupRSA
-         PXtw==
-X-Gm-Message-State: ABy/qLbwfPG5z/1rDsN3viDRDJrCX8n8hXETDuXjde9iKawJUS1h6cCb
-	EB2P8b91ZWPqik6jof5xkSHBjy61ocoAfAgJ7CqYfHQ8
-X-Google-Smtp-Source: APBJJlEcWIPvCv4sc+pWWkMX6i0omfy9UlYJ66/I6q33UF0NuZTszgqjQtFxco1wKMHDZGsSavA3DA==
-X-Received: by 2002:a19:674a:0:b0:4fe:676:8c0b with SMTP id e10-20020a19674a000000b004fe06768c0bmr59222lfj.11.1690398374801;
-        Wed, 26 Jul 2023 12:06:14 -0700 (PDT)
-Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com. [209.85.167.48])
-        by smtp.gmail.com with ESMTPSA id v27-20020a056512049b00b004fdc8e52ddasm3444951lfq.129.2023.07.26.12.06.14
-        for <netdev@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 26 Jul 2023 12:06:14 -0700 (PDT)
-Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-4fbaef9871cso245100e87.0
-        for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 12:06:14 -0700 (PDT)
-X-Received: by 2002:a19:c519:0:b0:4fb:c0b5:63d4 with SMTP id
- w25-20020a19c519000000b004fbc0b563d4mr42636lfe.43.1690398373839; Wed, 26 Jul
- 2023 12:06:13 -0700 (PDT)
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1690398541; x=1721934541;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=1r9wvoMQtXrjBbThSHmxAMwUwa3uJ8gOmIK0QO/EBrA=;
+  b=Ioximgw8UviGyyTsqY/K4r6F1nyeLbtZgjI4ACGjskgFA0d3/YIfCLKB
+   2silkftsEPzgtA56M7yUCXKfQkdeccuSIq1SFA3cpDFuaQhQDZXYelxNI
+   E+7MquImPZlbRZtcA0Z80WqTmm+6icLobQ5kgednaucUCp8NzskcLLRFR
+   c=;
+X-IronPort-AV: E=Sophos;i="6.01,232,1684800000"; 
+   d="scan'208";a="353814571"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-iad-1a-m6i4x-617e30c2.us-east-1.amazon.com) ([10.25.36.210])
+  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jul 2023 19:08:54 +0000
+Received: from EX19MTAUWA002.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan2.iad.amazon.com [10.40.163.34])
+	by email-inbound-relay-iad-1a-m6i4x-617e30c2.us-east-1.amazon.com (Postfix) with ESMTPS id 8388365484;
+	Wed, 26 Jul 2023 19:08:51 +0000 (UTC)
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Wed, 26 Jul 2023 19:08:41 +0000
+Received: from 88665a182662.ant.amazon.com.com (10.106.100.32) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1118.30;
+ Wed, 26 Jul 2023 19:08:38 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>
+CC: Simon Horman <simon.horman@corigine.com>, Kees Cook
+	<keescook@chromium.org>, Kuniyuki Iwashima <kuniyu@amazon.com>, "Kuniyuki
+ Iwashima" <kuni1840@gmail.com>, <netdev@vger.kernel.org>, kernel test robot
+	<oliver.sang@intel.com>
+Subject: [PATCH v1 net] af_unix: Terminate sun_path when bind()ing pathname socket.
+Date: Wed, 26 Jul 2023 12:08:28 -0700
+Message-ID: <20230726190828.47874-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230726151515.1650519-1-kuba@kernel.org> <11ec5b3819ff17c7013348b766eab571eee5ca96.camel@perches.com>
- <20230726092312.799503d6@kernel.org> <CAHk-=wjEj2fGiaQXrYUZu65EPdgbGEAEMzch8LTtiUp6UveRCw@mail.gmail.com>
- <20230726112031.61bd0c62@kernel.org> <CAHk-=wi9MyyWmP_HAddLrmGfdANkut6_2f9hzv9HcyTBvg3+kA@mail.gmail.com>
- <20230726114817.1bd52d48@kernel.org> <CAHk-=wiuR7_A=PbN8jhmqGPJQHypUHR+W4-UuSVhOVWvYXs1Tg@mail.gmail.com>
-In-Reply-To: <CAHk-=wiuR7_A=PbN8jhmqGPJQHypUHR+W4-UuSVhOVWvYXs1Tg@mail.gmail.com>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Wed, 26 Jul 2023 12:05:56 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wh4pbrNZGqfV9u1urZr3Xjci=UV-MP+KneB6a5yo7-VOQ@mail.gmail.com>
-Message-ID: <CAHk-=wh4pbrNZGqfV9u1urZr3Xjci=UV-MP+KneB6a5yo7-VOQ@mail.gmail.com>
-Subject: Re: [PATCH v2] scripts: get_maintainer: steer people away from using
- file paths
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Joe Perches <joe@perches.com>, Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, 
-	geert@linux-m68k.org, gregkh@linuxfoundation.org, netdev@vger.kernel.org, 
-	workflows@vger.kernel.org, mario.limonciello@amd.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.106.100.32]
+X-ClientProxiedBy: EX19D036UWB003.ant.amazon.com (10.13.139.172) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Precedence: Bulk
+X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+	T_SCC_BODY_TEXT_LINE,T_SPF_PERMERROR autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, 26 Jul 2023 at 11:59, Linus Torvalds
-<torvalds@linux-foundation.org> wrote:
->
-> You're already using 'patchwork'. Why don't you instead go "Oh, *that*
-> tool isn't doing the right thing?"
+kernel test robot reported slab-out-of-bounds access in strlen(). [0]
 
-Christ. Looking around, patchwork *ALREADY DOES THIS*.
+Commit 06d4c8a80836 ("af_unix: Fix fortify_panic() in unix_bind_bsd().")
+removed unix_mkname_bsd() call in unix_bind_bsd().
 
-Except it looks like it might be set up to just complain
-("netdev/cc_maintainers"). Which seems to be why you're complaining.
+If sunaddr->sun_path is not terminated by user and we don't enable
+CONFIG_INIT_STACK_ALL_ZERO=y, strlen() will do the out-of-bounds access
+during file creation.
 
-IOW, you're complaining about *another* tool, because your own tool
-use is set up to complain instead of being helpful.
+Let's go back to strlen()-with-sockaddr_storage way and pack all 108
+trickiness into unix_mkname_bsd() with bold comments.
 
-I'm now even more convinced that that warning is completely bogus.
+[0]:
+BUG: KASAN: slab-out-of-bounds in strlen (lib/string.c:?)
+Read of size 1 at addr ffff000015492777 by task fortify_strlen_/168
 
-No way in hell am *I* going to bend over backwards and add some stupid
-new rule to my workflow because *you* use a tool that is a whining
-little complaint-machine instead of just *fixing* the problem.
+CPU: 0 PID: 168 Comm: fortify_strlen_ Not tainted 6.5.0-rc1-00333-g3329b603ebba #16
+Hardware name: linux,dummy-virt (DT)
+Call trace:
+ dump_backtrace (arch/arm64/kernel/stacktrace.c:235)
+ show_stack (arch/arm64/kernel/stacktrace.c:242)
+ dump_stack_lvl (lib/dump_stack.c:107)
+ print_report (mm/kasan/report.c:365 mm/kasan/report.c:475)
+ kasan_report (mm/kasan/report.c:590)
+ __asan_report_load1_noabort (mm/kasan/report_generic.c:378)
+ strlen (lib/string.c:?)
+ getname_kernel (./include/linux/fortify-string.h:? fs/namei.c:226)
+ kern_path_create (fs/namei.c:3926)
+ unix_bind (net/unix/af_unix.c:1221 net/unix/af_unix.c:1324)
+ __sys_bind (net/socket.c:1792)
+ __arm64_sys_bind (net/socket.c:1801)
+ invoke_syscall (arch/arm64/kernel/syscall.c:? arch/arm64/kernel/syscall.c:52)
+ el0_svc_common (./include/linux/thread_info.h:127 arch/arm64/kernel/syscall.c:147)
+ do_el0_svc (arch/arm64/kernel/syscall.c:189)
+ el0_svc (./arch/arm64/include/asm/daifflags.h:28 arch/arm64/kernel/entry-common.c:133 arch/arm64/kernel/entry-common.c:144 arch/arm64/kernel/entry-common.c:648)
+ el0t_64_sync_handler (arch/arm64/kernel/entry-common.c:?)
+ el0t_64_sync (arch/arm64/kernel/entry.S:591)
 
-Guys, tools are supposed to *help*, not just whine about
-technicalities and make it harder for everybody else.
+Allocated by task 168:
+ kasan_set_track (mm/kasan/common.c:45 mm/kasan/common.c:52)
+ kasan_save_alloc_info (mm/kasan/generic.c:512)
+ __kasan_kmalloc (mm/kasan/common.c:383)
+ __kmalloc (mm/slab_common.c:? mm/slab_common.c:998)
+ unix_bind (net/unix/af_unix.c:257 net/unix/af_unix.c:1213 net/unix/af_unix.c:1324)
+ __sys_bind (net/socket.c:1792)
+ __arm64_sys_bind (net/socket.c:1801)
+ invoke_syscall (arch/arm64/kernel/syscall.c:? arch/arm64/kernel/syscall.c:52)
+ el0_svc_common (./include/linux/thread_info.h:127 arch/arm64/kernel/syscall.c:147)
+ do_el0_svc (arch/arm64/kernel/syscall.c:189)
+ el0_svc (./arch/arm64/include/asm/daifflags.h:28 arch/arm64/kernel/entry-common.c:133 arch/arm64/kernel/entry-common.c:144 arch/arm64/kernel/entry-common.c:648)
+ el0t_64_sync_handler (arch/arm64/kernel/entry-common.c:?)
+ el0t_64_sync (arch/arm64/kernel/entry.S:591)
 
-So just fix your tool. Don't complain about *my* use of another tool.
+The buggy address belongs to the object at ffff000015492700
+ which belongs to the cache kmalloc-128 of size 128
+The buggy address is located 0 bytes to the right of
+ allocated 119-byte region [ffff000015492700, ffff000015492777)
 
-                 Linus
+The buggy address belongs to the physical page:
+page:00000000aeab52ba refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x55492
+anon flags: 0x3fffc0000000200(slab|node=0|zone=0|lastcpupid=0xffff)
+page_type: 0xffffffff()
+raw: 03fffc0000000200 ffff0000084018c0 fffffc00003d0e00 0000000000000005
+raw: 0000000000000000 0000000080100010 00000001ffffffff 0000000000000000
+page dumped because: kasan: bad access detected
+
+Memory state around the buggy address:
+ ffff000015492600: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+ ffff000015492680: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+>ffff000015492700: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 07 fc
+                                                             ^
+ ffff000015492780: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+ ffff000015492800: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+
+Fixes: 06d4c8a80836 ("af_unix: Fix fortify_panic() in unix_bind_bsd().")
+Reported-by: kernel test robot <oliver.sang@intel.com>
+Closes: https://lore.kernel.org/netdev/202307262110.659e5e8-oliver.sang@intel.com/
+Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+---
+ net/unix/af_unix.c | 21 ++++++++++++++++-----
+ 1 file changed, 16 insertions(+), 5 deletions(-)
+
+diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+index bbacf4c60fe3..78585217f61a 100644
+--- a/net/unix/af_unix.c
++++ b/net/unix/af_unix.c
+@@ -289,17 +289,29 @@ static int unix_validate_addr(struct sockaddr_un *sunaddr, int addr_len)
+ 	return 0;
+ }
+ 
+-static void unix_mkname_bsd(struct sockaddr_un *sunaddr, int addr_len)
++static int unix_mkname_bsd(struct sockaddr_un *sunaddr, int addr_len)
+ {
++	struct sockaddr_storage *addr = (struct sockaddr_storage *)sunaddr;
++	short offset = offsetof(struct sockaddr_storage, __data);
++
++	BUILD_BUG_ON(offset != offsetof(struct sockaddr_un, sun_path));
++
+ 	/* This may look like an off by one error but it is a bit more
+ 	 * subtle.  108 is the longest valid AF_UNIX path for a binding.
+ 	 * sun_path[108] doesn't as such exist.  However in kernel space
+ 	 * we are guaranteed that it is a valid memory location in our
+ 	 * kernel address buffer because syscall functions always pass
+ 	 * a pointer of struct sockaddr_storage which has a bigger buffer
+-	 * than 108.
++	 * than 108.  Also, we must terminate sun_path for strlen() in
++	 * getname_kernel().
++	 */
++	addr->__data[addr_len - offset] = 0;
++
++	/* Don't pass sunaddr->sun_path to strlen().  Otherwise, 108 will
++	 * cause panic if CONFIG_FORTIFY_SOURCE=y.  Let __fortify_strlen()
++	 * know the actual buffer.
+ 	 */
+-	((char *)sunaddr)[addr_len] = 0;
++	return strlen(addr->__data) + offset + 1;
+ }
+ 
+ static void __unix_remove_socket(struct sock *sk)
+@@ -1208,8 +1220,7 @@ static int unix_bind_bsd(struct sock *sk, struct sockaddr_un *sunaddr,
+ 	struct path parent;
+ 	int err;
+ 
+-	addr_len = strnlen(sunaddr->sun_path, sizeof(sunaddr->sun_path))
+-		+ offsetof(struct sockaddr_un, sun_path) + 1;
++	addr_len = unix_mkname_bsd(sunaddr, addr_len);
+ 	addr = unix_create_addr(sunaddr, addr_len);
+ 	if (!addr)
+ 		return -ENOMEM;
+-- 
+2.30.2
+
 
