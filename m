@@ -1,115 +1,254 @@
-Return-Path: <netdev+bounces-21285-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21286-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94BC57631EB
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 11:26:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EC097631F1
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 11:28:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C5D301C211A2
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 09:26:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2EB0E281C46
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 09:28:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53D52BA3B;
-	Wed, 26 Jul 2023 09:26:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 586FBBA3B;
+	Wed, 26 Jul 2023 09:28:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44299AD37;
-	Wed, 26 Jul 2023 09:26:44 +0000 (UTC)
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66C6130F4;
-	Wed, 26 Jul 2023 02:26:35 -0700 (PDT)
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-52256241c66so1675609a12.1;
-        Wed, 26 Jul 2023 02:26:35 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BAC7AD47
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 09:28:04 +0000 (UTC)
+Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED39210F9
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 02:28:01 -0700 (PDT)
+Received: by mail-pf1-x42e.google.com with SMTP id d2e1a72fcca58-6864c144897so1488722b3a.1
+        for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 02:28:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1690363681; x=1690968481;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=3q/836hkNQMpcz/8YX2aFfQHacV0FqcsnRX2KDKmGK4=;
+        b=VrX61tolI6lx5cf13TzjBUi7Jr7lyRI0PErux25Ugwzya6Gr7la8Z5mF2+cskv3TWz
+         UBVd0Z5Poj3PRTux8odPv45l8gQzAXnTFOr3Tf8UDx7d9uUEKzN37AEVIKYy6agrhmgA
+         YruSiWL83SB/lZ95d/ocS5Ez1ClN1w8sLcjpu26a2KNj8aWhEC89NaIXAD4IQeJcJzfH
+         uYL7oLGt6F17I0XKTtTRSbeLX7ktBDSzYJstMwVG/599hz7kBf24kzbOMqBXrGbap2ZR
+         iYE22Dihl4RYEd6b6MxzHd9sXrRhtrB75dhklT8m88pkRrstmkcW4eCpJX3cURQ8vJOi
+         rydw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690363594; x=1690968394;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3i0QbOeDmajmhvzhQ0MHR/DHrb4f2crGlJ6oBy8fycY=;
-        b=aBC2GxV8krGiOmvnL7iCYCL42tUd1s8s73kdPl+WxGxI4hQxlhM6cDrKEQamxftXeM
-         rZudOi6ykrwDzAiFLyJLLlygCXwpxYpGVQH3Et+eDWcOXE8jreiiylK61Dq0g8WuOhWJ
-         xjQkkW72mk/pc+yAElo6EeUIB9hPUAskUqEKjvY0Y29Q0szZxWHeqGrI+UJKYQtBRD1O
-         TGW0hCHUmqiDXi9cdYcxFh6I/1lQeNumT+ub8BNx2VKih+shGFzKOQEtQICTkWmsFMpU
-         65ZuB/7qSlM+BOFgfwS8+x59TzDsugR3EKby71In9EymEryG340ZD02r2Wu6vybW7C+/
-         z35g==
-X-Gm-Message-State: ABy/qLYsRjRaHBOEzeZ4840OOZ3PMgkhsEOfYrb251bvVbgA2jeAyCWs
-	PWuWadoVcbXxmW0+7NFhJKkL8Nx4FYc=
-X-Google-Smtp-Source: APBJJlE6qT/NqcvaDVc5i63FlNpKEp8i80T0F5ej/emHMoykI5Ra0Sxw4Rw1wHel/mg8V4dGwOiT0w==
-X-Received: by 2002:a05:6402:1391:b0:522:3a1d:c233 with SMTP id b17-20020a056402139100b005223a1dc233mr1862501edv.11.1690363593529;
-        Wed, 26 Jul 2023 02:26:33 -0700 (PDT)
-Received: from gmail.com (fwdproxy-cln-016.fbsv.net. [2a03:2880:31ff:10::face:b00c])
-        by smtp.gmail.com with ESMTPSA id l27-20020a056402345b00b0052279f773e3sm227327edc.32.2023.07.26.02.26.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Jul 2023 02:26:32 -0700 (PDT)
-Date: Wed, 26 Jul 2023 02:26:30 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: Stanislav Fomichev <sdf@google.com>, asml.silence@gmail.com,
-	axboe@kernel.dk, io-uring@vger.kernel.org, netdev@vger.kernel.org,
-	davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
-	pabeni@redhat.com, linux-kernel@vger.kernel.org, leit@meta.com,
-	bpf@vger.kernel.org, ast@kernel.org
-Subject: Re: [PATCH 2/4] io_uring/cmd: Introduce SOCKET_URING_OP_GETSOCKOPT
-Message-ID: <ZMDmxkacOklM7Oi2@gmail.com>
-References: <20230724142237.358769-1-leitao@debian.org>
- <20230724142237.358769-3-leitao@debian.org>
- <ZL61cIrQuo92Xzbu@google.com>
- <ZL+VfRiJQqrrLe/9@gmail.com>
- <ZMAAMKTaKSIKi1RW@google.com>
- <87fa06c9-d8a9-fda4-d069-6812605aa10b@linux.dev>
+        d=1e100.net; s=20221208; t=1690363681; x=1690968481;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=3q/836hkNQMpcz/8YX2aFfQHacV0FqcsnRX2KDKmGK4=;
+        b=ck6fHaB3BRtSSxlvGVNSxb0B0L7woDTiOA8VBpfUNP23dR0LBIDaE2OKZUPjWILanZ
+         MxZlK/VewyBA+GlxGrTqfOSS7hc0h6imYXQ4fLOpoPLuk/dofD9S0iEA5TpygD6jAoVq
+         YebpCNx8WYcakD3Gh3z4acEaEO81YJmCsEmTAnUFpOem0B9DYfvdPuY6bkCLdudvQH2r
+         L74YbpOx37zfyW1YF386MlfQ/FMnPrJ7d4L88XBIClydjn2vkmSHcTZe5Uu1nKvhSN2n
+         GjIFU+2VeX4KU45ulV3VaSvbDuP9TKe3SMlCXvlmwzsjcxiFCK85vtoVqE7HEowsvHTN
+         SS2A==
+X-Gm-Message-State: ABy/qLYFZ6H92L4D4QE3gjdw49XLYVqhQGsRz1KxjmcfStqipUi8M6J7
+	UV2KhggPxoIQ8owb37FQXUAN9g==
+X-Google-Smtp-Source: APBJJlFbGXVT1jvZWB8OqMMjwV1wWa8tPHrXXzsgQ/SF73jQ8jhDFJz/C4eSTJgkpJW81UF91auuJQ==
+X-Received: by 2002:a05:6a20:3c90:b0:134:d4d3:f0a5 with SMTP id b16-20020a056a203c9000b00134d4d3f0a5mr1941746pzj.2.1690363681365;
+        Wed, 26 Jul 2023 02:28:01 -0700 (PDT)
+Received: from [10.70.252.135] ([203.208.167.147])
+        by smtp.gmail.com with ESMTPSA id l73-20020a633e4c000000b00563da87a52dsm1901427pga.40.2023.07.26.02.27.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 26 Jul 2023 02:28:01 -0700 (PDT)
+Message-ID: <665ccd89-8434-fc45-4813-c6412ef80c10@bytedance.com>
+Date: Wed, 26 Jul 2023 17:27:47 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87fa06c9-d8a9-fda4-d069-6812605aa10b@linux.dev>
-X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FSL_HELO_FAKE,
-	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
-	autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.12.0
+Subject: Re: [PATCH v2 19/47] mm: thp: dynamically allocate the thp-related
+ shrinkers
+Content-Language: en-US
+To: Muchun Song <muchun.song@linux.dev>
+Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org, x86@kernel.org,
+ kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
+ linux-erofs@lists.ozlabs.org, linux-f2fs-devel@lists.sourceforge.net,
+ cluster-devel@redhat.com, linux-nfs@vger.kernel.org,
+ linux-mtd@lists.infradead.org, rcu@vger.kernel.org, netdev@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linux-arm-msm@vger.kernel.org,
+ dm-devel@redhat.com, linux-raid@vger.kernel.org,
+ linux-bcache@vger.kernel.org, virtualization@lists.linux-foundation.org,
+ linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
+ linux-xfs@vger.kernel.org, linux-btrfs@vger.kernel.org,
+ akpm@linux-foundation.org, david@fromorbit.com, tkhai@ya.ru, vbabka@suse.cz,
+ roman.gushchin@linux.dev, djwong@kernel.org, brauner@kernel.org,
+ paulmck@kernel.org, tytso@mit.edu, steven.price@arm.com, cel@kernel.org,
+ senozhatsky@chromium.org, yujie.liu@intel.com, gregkh@linuxfoundation.org
+References: <20230724094354.90817-1-zhengqi.arch@bytedance.com>
+ <20230724094354.90817-20-zhengqi.arch@bytedance.com>
+ <d41d09bc-7c1c-f708-ecfa-ffac59bf58ad@linux.dev>
+From: Qi Zheng <zhengqi.arch@bytedance.com>
+In-Reply-To: <d41d09bc-7c1c-f708-ecfa-ffac59bf58ad@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Jul 25, 2023 at 10:56:23AM -0700, Martin KaFai Lau wrote:
-> On 7/25/23 10:02 AM, Stanislav Fomichev wrote:
-> > On 07/25, Breno Leitao wrote:
-> > > On Mon, Jul 24, 2023 at 10:31:28AM -0700, Stanislav Fomichev wrote:
-> > > > On 07/24, Breno Leitao wrote:
-> > > > > Add support for getsockopt command (SOCKET_URING_OP_GETSOCKOPT), where
-> > > > > level is SOL_SOCKET. This is leveraging the sockptr_t infrastructure,
-> > > > > where a sockptr_t is either userspace or kernel space, and handled as
-> > > > > such.
-> > > > > 
-> > > > > Function io_uring_cmd_getsockopt() is inspired by __sys_getsockopt().
-> > > > 
-> > > > We probably need to also have bpf bits in the new
-> > > > io_uring_cmd_getsockopt?
-> 
-> I also think this inconsistency behavior should be avoided.
-> 
-> > > 
-> > > It might be interesting to have the BPF hook for this function as
-> > > well, but I would like to do it in a following patch, so, I can
-> > > experiment with it better, if that is OK.
-> > 
-> > We are not using io_uring, so fine with me. However, having a way to bypass
-> > get/setsockopt bpf might be problematic for some other heavy io_uring
-> > users.
-> > 
-> > Lemme CC a bunch of Meta folks explicitly. I'm not sure what that state
-> > of bpf support in io_uring.
-> 
-> We have use cases on the "cgroup/{g,s}etsockopt". It will be a surprise when
-> the user moves from the syscall {g,s}etsockopt to SOCKET_URING_OP_*SOCKOPT
-> and figured that the bpf handling is skipped.
 
-Ok, I will add the BPF bits in the next revision then. Thanks for
-clarifying it.
+
+On 2023/7/26 15:10, Muchun Song wrote:
+> 
+> 
+> On 2023/7/24 17:43, Qi Zheng wrote:
+>> Use new APIs to dynamically allocate the thp-zero and thp-deferred_split
+>> shrinkers.
+>>
+>> Signed-off-by: Qi Zheng <zhengqi.arch@bytedance.com>
+>> ---
+>>   mm/huge_memory.c | 69 +++++++++++++++++++++++++++++++-----------------
+>>   1 file changed, 45 insertions(+), 24 deletions(-)
+>>
+>> diff --git a/mm/huge_memory.c b/mm/huge_memory.c
+>> index 8c94b34024a2..4db5a1834d81 100644
+>> --- a/mm/huge_memory.c
+>> +++ b/mm/huge_memory.c
+>> @@ -65,7 +65,11 @@ unsigned long transparent_hugepage_flags 
+>> __read_mostly =
+>>       (1<<TRANSPARENT_HUGEPAGE_DEFRAG_KHUGEPAGED_FLAG)|
+>>       (1<<TRANSPARENT_HUGEPAGE_USE_ZERO_PAGE_FLAG);
+>> -static struct shrinker deferred_split_shrinker;
+>> +static struct shrinker *deferred_split_shrinker;
+>> +static unsigned long deferred_split_count(struct shrinker *shrink,
+>> +                      struct shrink_control *sc);
+>> +static unsigned long deferred_split_scan(struct shrinker *shrink,
+>> +                     struct shrink_control *sc);
+>>   static atomic_t huge_zero_refcount;
+>>   struct page *huge_zero_page __read_mostly;
+>> @@ -229,11 +233,7 @@ static unsigned long 
+>> shrink_huge_zero_page_scan(struct shrinker *shrink,
+>>       return 0;
+>>   }
+>> -static struct shrinker huge_zero_page_shrinker = {
+>> -    .count_objects = shrink_huge_zero_page_count,
+>> -    .scan_objects = shrink_huge_zero_page_scan,
+>> -    .seeks = DEFAULT_SEEKS,
+>> -};
+>> +static struct shrinker *huge_zero_page_shrinker;
+> 
+> Same as patch #17.
+
+OK, will do.
+
+> 
+>>   #ifdef CONFIG_SYSFS
+>>   static ssize_t enabled_show(struct kobject *kobj,
+>> @@ -454,6 +454,40 @@ static inline void hugepage_exit_sysfs(struct 
+>> kobject *hugepage_kobj)
+>>   }
+>>   #endif /* CONFIG_SYSFS */
+>> +static int thp_shrinker_init(void)
+> 
+> Better to declare it as __init.
+
+Will do.
+
+> 
+>> +{
+>> +    huge_zero_page_shrinker = shrinker_alloc(0, "thp-zero");
+>> +    if (!huge_zero_page_shrinker)
+>> +        return -ENOMEM;
+>> +
+>> +    deferred_split_shrinker = shrinker_alloc(SHRINKER_NUMA_AWARE |
+>> +                         SHRINKER_MEMCG_AWARE |
+>> +                         SHRINKER_NONSLAB,
+>> +                         "thp-deferred_split");
+>> +    if (!deferred_split_shrinker) {
+>> +        shrinker_free_non_registered(huge_zero_page_shrinker);
+>> +        return -ENOMEM;
+>> +    }
+>> +
+>> +    huge_zero_page_shrinker->count_objects = 
+>> shrink_huge_zero_page_count;
+>> +    huge_zero_page_shrinker->scan_objects = shrink_huge_zero_page_scan;
+>> +    huge_zero_page_shrinker->seeks = DEFAULT_SEEKS;
+>> +    shrinker_register(huge_zero_page_shrinker);
+>> +
+>> +    deferred_split_shrinker->count_objects = deferred_split_count;
+>> +    deferred_split_shrinker->scan_objects = deferred_split_scan;
+>> +    deferred_split_shrinker->seeks = DEFAULT_SEEKS;
+>> +    shrinker_register(deferred_split_shrinker);
+>> +
+>> +    return 0;
+>> +}
+>> +
+>> +static void thp_shrinker_exit(void)
+> 
+> Same as here.
+
+Will do.
+
+> 
+>> +{
+>> +    shrinker_unregister(huge_zero_page_shrinker);
+>> +    shrinker_unregister(deferred_split_shrinker);
+>> +}
+>> +
+>>   static int __init hugepage_init(void)
+>>   {
+>>       int err;
+>> @@ -482,12 +516,9 @@ static int __init hugepage_init(void)
+>>       if (err)
+>>           goto err_slab;
+>> -    err = register_shrinker(&huge_zero_page_shrinker, "thp-zero");
+>> -    if (err)
+>> -        goto err_hzp_shrinker;
+>> -    err = register_shrinker(&deferred_split_shrinker, 
+>> "thp-deferred_split");
+>> +    err = thp_shrinker_init();
+>>       if (err)
+>> -        goto err_split_shrinker;
+>> +        goto err_shrinker;
+>>       /*
+>>        * By default disable transparent hugepages on smaller systems,
+>> @@ -505,10 +536,8 @@ static int __init hugepage_init(void)
+>>       return 0;
+>>   err_khugepaged:
+>> -    unregister_shrinker(&deferred_split_shrinker);
+>> -err_split_shrinker:
+>> -    unregister_shrinker(&huge_zero_page_shrinker);
+>> -err_hzp_shrinker:
+>> +    thp_shrinker_exit();
+>> +err_shrinker:
+>>       khugepaged_destroy();
+>>   err_slab:
+>>       hugepage_exit_sysfs(hugepage_kobj);
+>> @@ -2851,7 +2880,7 @@ void deferred_split_folio(struct folio *folio)
+>>   #ifdef CONFIG_MEMCG
+>>           if (memcg)
+>>               set_shrinker_bit(memcg, folio_nid(folio),
+>> -                     deferred_split_shrinker.id);
+>> +                     deferred_split_shrinker->id);
+>>   #endif
+>>       }
+>>       spin_unlock_irqrestore(&ds_queue->split_queue_lock, flags);
+>> @@ -2925,14 +2954,6 @@ static unsigned long deferred_split_scan(struct 
+>> shrinker *shrink,
+>>       return split;
+>>   }
+>> -static struct shrinker deferred_split_shrinker = {
+>> -    .count_objects = deferred_split_count,
+>> -    .scan_objects = deferred_split_scan,
+>> -    .seeks = DEFAULT_SEEKS,
+>> -    .flags = SHRINKER_NUMA_AWARE | SHRINKER_MEMCG_AWARE |
+>> -         SHRINKER_NONSLAB,
+>> -};
+>> -
+>>   #ifdef CONFIG_DEBUG_FS
+>>   static void split_huge_pages_all(void)
+>>   {
+> 
 
