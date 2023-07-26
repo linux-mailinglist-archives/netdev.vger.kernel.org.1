@@ -1,283 +1,124 @@
-Return-Path: <netdev+bounces-21611-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21613-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11FDD764045
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 22:09:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11968764057
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 22:13:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 434141C21379
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 20:09:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 468262802AE
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 20:13:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 220DC198BF;
-	Wed, 26 Jul 2023 20:08:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D4F51988F;
+	Wed, 26 Jul 2023 20:13:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11951198AD
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 20:08:32 +0000 (UTC)
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id BFED12707;
-	Wed, 26 Jul 2023 13:08:29 -0700 (PDT)
-Received: by linux.microsoft.com (Postfix, from userid 1174)
-	id 560F82383126; Wed, 26 Jul 2023 13:08:29 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 560F82383126
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxonhyperv.com;
-	s=default; t=1690402109;
-	bh=JEIhw/jaTya18OX189IFQdQJH+n9QTgW7FoEIyakSrw=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=IzPINmxZxbi4LqskiAoPawlZDRF9ZVIjChONAgLDBIGQHeyqZ08CtR3YUjvDQUdyx
-	 sNyRjQhsn4ZrPic4n73xyIAa2hL30RMqot81bQ4RbUMz9pAXV3a9ab6sW6lsjorUW0
-	 wzAdHLS9h1Jr95qoOKLSP98+xrJJaWi+OYepc4ws=
-From: sharmaajay@linuxonhyperv.com
-To: Jason Gunthorpe <jgg@ziepe.ca>,
-	Leon Romanovsky <leon@kernel.org>,
-	Dexuan Cui <decui@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: linux-rdma@vger.kernel.org,
-	linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Ajay Sharma <sharmaajay@microsoft.com>
-Subject: [Patch v3 4/4] RDMA/mana_ib : Query adapter capabilities
-Date: Wed, 26 Jul 2023 13:08:24 -0700
-Message-Id: <1690402104-29518-5-git-send-email-sharmaajay@linuxonhyperv.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1690402104-29518-1-git-send-email-sharmaajay@linuxonhyperv.com>
-References: <1690402104-29518-1-git-send-email-sharmaajay@linuxonhyperv.com>
-X-Spam-Status: No, score=-11.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_MED,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED,USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FFF04CE6C
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 20:13:32 +0000 (UTC)
+Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8001C11B
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 13:13:31 -0700 (PDT)
+Received: by mail-ej1-x631.google.com with SMTP id a640c23a62f3a-99454855de1so13345966b.2
+        for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 13:13:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google; t=1690402409; x=1691007209;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=9CJQI8Qdop0YIXvc46Q9cOG1BD1fZ1dUQROtQfx9W58=;
+        b=HWeE6BYHQldG/g9aD2RlJWlrwEqBefZ0wRSion9GC2NbR8uOYIPDV0KCBPRjtLlt/F
+         ouofWwC5054sE8u2erErqII+w/DCye6AiiGEle30Q8V7pn5Pk/rCPo8PjNEkEyd7W7aC
+         VoBoBVApvYK8AfKl4/CVzylgrSnDNs83fMeqc=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690402409; x=1691007209;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=9CJQI8Qdop0YIXvc46Q9cOG1BD1fZ1dUQROtQfx9W58=;
+        b=jp5l+BDGxiagLmvR3Dr+xLDBAdfjoo/hoYZX5e3DjjPscE6AvzcEcOOPYAbkl6F26H
+         A67TNP8fOiDO1wCz3LjWWaR7ceU/Ot/GenViuvAfbYx84FZ6yNAPuN8bUcmWX/AH4V7j
+         Nh8TxFMEfm8kML89cVDbTvVy3+gj6vJC0U4MFUe2nQM0jm4dHsF4ZVrNTOWD64/JNsuN
+         Zeoiv0sP6+XJ01/RCewWTjFyrPTcteG3VtrlrYkcWrH0bdrx7E6ZW/QasMi1KUCgpEFe
+         dZsB/WNnIyBvryeThf7IkGRrmVOdZuuDNAyrfX/VTX0QFK3COTBGwxBKQoVczm+t6zn1
+         CR/w==
+X-Gm-Message-State: ABy/qLZb6a3+nKRnYMxTvoYbsPgd1gmFXhsT7slzamzJtg/1oTUZYAx3
+	Doo+C3QcN7wxOgieTNmcrvqcMlu68eks+VetprwhIfV9
+X-Google-Smtp-Source: APBJJlGbdqMiTKiF2Gd2TXwQ6dfMksMmoyr3FZUlgx7pwbntI734yyzMUlUQXtOESPni//u99cHh+g==
+X-Received: by 2002:a17:906:5a64:b0:99b:cb7a:c164 with SMTP id my36-20020a1709065a6400b0099bcb7ac164mr166215ejc.62.1690402409778;
+        Wed, 26 Jul 2023 13:13:29 -0700 (PDT)
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com. [209.85.128.47])
+        by smtp.gmail.com with ESMTPSA id ks17-20020a170906f85100b009930c80b87csm10141264ejb.142.2023.07.26.13.13.28
+        for <netdev@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 26 Jul 2023 13:13:29 -0700 (PDT)
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-3fbc5d5746cso1451865e9.2
+        for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 13:13:28 -0700 (PDT)
+X-Received: by 2002:a05:6000:1289:b0:313:ee2e:dae5 with SMTP id
+ f9-20020a056000128900b00313ee2edae5mr156669wrx.21.1690402408465; Wed, 26 Jul
+ 2023 13:13:28 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+References: <20230726151515.1650519-1-kuba@kernel.org> <11ec5b3819ff17c7013348b766eab571eee5ca96.camel@perches.com>
+ <20230726092312.799503d6@kernel.org> <CAHk-=wjEj2fGiaQXrYUZu65EPdgbGEAEMzch8LTtiUp6UveRCw@mail.gmail.com>
+ <20230726112031.61bd0c62@kernel.org> <CAHk-=wi9MyyWmP_HAddLrmGfdANkut6_2f9hzv9HcyTBvg3+kA@mail.gmail.com>
+ <20230726114817.1bd52d48@kernel.org> <CAHk-=wiuR7_A=PbN8jhmqGPJQHypUHR+W4-UuSVhOVWvYXs1Tg@mail.gmail.com>
+ <CAHk-=wh4pbrNZGqfV9u1urZr3Xjci=UV-MP+KneB6a5yo7-VOQ@mail.gmail.com>
+ <CAHk-=whCE9cWmTXu54WFQ7x-aH8n=dhCux2h49=pYN=14ybkxg@mail.gmail.com> <20230726130318.099f96fc@kernel.org>
+In-Reply-To: <20230726130318.099f96fc@kernel.org>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Wed, 26 Jul 2023 13:13:11 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wjfC4tFnOC0Lk_GcU4buf+X-Jv965pWg+kMRkDb6hX6mw@mail.gmail.com>
+Message-ID: <CAHk-=wjfC4tFnOC0Lk_GcU4buf+X-Jv965pWg+kMRkDb6hX6mw@mail.gmail.com>
+Subject: Re: [PATCH v2] scripts: get_maintainer: steer people away from using
+ file paths
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Joe Perches <joe@perches.com>, Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, 
+	geert@linux-m68k.org, gregkh@linuxfoundation.org, netdev@vger.kernel.org, 
+	workflows@vger.kernel.org, mario.limonciello@amd.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-From: Ajay Sharma <sharmaajay@microsoft.com>
+On Wed, 26 Jul 2023 at 13:03, Jakub Kicinski <kuba@kernel.org> wrote:
+>
+> IOW solving the _actually_ missing CCs is higher priority for me.
 
-Query the adapter capabilities to expose to
-other clients and VF. This checks against
-the user supplied values and protects against
-overflows.
+You have the script. It's already being run. Use it.
 
-Signed-off-by: Ajay Sharma <sharmaajay@microsoft.com>
----
- drivers/infiniband/hw/mana/device.c  |  4 ++
- drivers/infiniband/hw/mana/main.c    | 66 +++++++++++++++++++++++++---
- drivers/infiniband/hw/mana/mana_ib.h | 53 +++++++++++++++++++++-
- 3 files changed, 115 insertions(+), 8 deletions(-)
+Having scripting that complains about missing Cc's, even *lists* them,
+and then requires a human to do something about it - that's stupid.
 
-diff --git a/drivers/infiniband/hw/mana/device.c b/drivers/infiniband/hw/mana/device.c
-index 4077e440657a..e15da43c73a0 100644
---- a/drivers/infiniband/hw/mana/device.c
-+++ b/drivers/infiniband/hw/mana/device.c
-@@ -97,6 +97,10 @@ static int mana_ib_probe(struct auxiliary_device *adev,
- 		goto free_error_eq;
- 	}
- 
-+	ret = mana_ib_query_adapter_caps(mib_dev);
-+	if (ret)
-+		ibdev_dbg(&mib_dev->ib_dev, "Failed to get caps, use defaults");
-+
- 	ret = ib_register_device(&mib_dev->ib_dev, "mana_%d",
- 				 mdev->gdma_context->dev);
- 	if (ret)
-diff --git a/drivers/infiniband/hw/mana/main.c b/drivers/infiniband/hw/mana/main.c
-index 1b1a8670d0fa..512815e1e64d 100644
---- a/drivers/infiniband/hw/mana/main.c
-+++ b/drivers/infiniband/hw/mana/main.c
-@@ -469,21 +469,27 @@ int mana_ib_get_port_immutable(struct ib_device *ibdev, u32 port_num,
- int mana_ib_query_device(struct ib_device *ibdev, struct ib_device_attr *props,
- 			 struct ib_udata *uhw)
- {
-+	struct mana_ib_dev *mib_dev = container_of(ibdev,
-+			struct mana_ib_dev, ib_dev);
-+
- 	props->max_qp = MANA_MAX_NUM_QUEUES;
- 	props->max_qp_wr = MAX_SEND_BUFFERS_PER_QUEUE;
--
--	/*
--	 * max_cqe could be potentially much bigger.
--	 * As this version of driver only support RAW QP, set it to the same
--	 * value as max_qp_wr
--	 */
- 	props->max_cqe = MAX_SEND_BUFFERS_PER_QUEUE;
--
- 	props->max_mr_size = MANA_IB_MAX_MR_SIZE;
- 	props->max_mr = MANA_IB_MAX_MR;
- 	props->max_send_sge = MAX_TX_WQE_SGL_ENTRIES;
- 	props->max_recv_sge = MAX_RX_WQE_SGL_ENTRIES;
- 
-+	/* If the Management SW is updated and supports adapter creation */
-+	if (mib_dev->adapter_handle) {
-+		props->max_qp = mib_dev->adapter_caps.max_qp_count;
-+		props->max_qp_wr = mib_dev->adapter_caps.max_requester_sq_size;
-+		props->max_cqe = mib_dev->adapter_caps.max_requester_sq_size;
-+		props->max_mr = mib_dev->adapter_caps.max_mr_count;
-+		props->max_send_sge = mib_dev->adapter_caps.max_send_wqe_size;
-+		props->max_recv_sge = mib_dev->adapter_caps.max_recv_wqe_size;
-+	}
-+
- 	return 0;
- }
- 
-@@ -599,3 +605,49 @@ int mana_ib_create_error_eq(struct mana_ib_dev *mib_dev)
- 
- 	return 0;
- }
-+
-+static void assign_caps(struct mana_ib_adapter_caps *caps,
-+			struct mana_ib_query_adapter_caps_resp *resp)
-+{
-+	caps->max_sq_id = resp->max_sq_id;
-+	caps->max_rq_id = resp->max_rq_id;
-+	caps->max_cq_id = resp->max_cq_id;
-+	caps->max_qp_count = resp->max_qp_count;
-+	caps->max_cq_count = resp->max_cq_count;
-+	caps->max_mr_count = resp->max_mr_count;
-+	caps->max_pd_count = resp->max_pd_count;
-+	caps->max_inbound_read_limit = resp->max_inbound_read_limit;
-+	caps->max_outbound_read_limit = resp->max_outbound_read_limit;
-+	caps->mw_count = resp->mw_count;
-+	caps->max_srq_count = resp->max_srq_count;
-+	caps->max_requester_sq_size = resp->max_requester_sq_size;
-+	caps->max_responder_sq_size = resp->max_responder_sq_size;
-+	caps->max_requester_rq_size = resp->max_requester_rq_size;
-+	caps->max_responder_rq_size = resp->max_responder_rq_size;
-+	caps->max_send_wqe_size = resp->max_send_wqe_size;
-+	caps->max_recv_wqe_size = resp->max_recv_wqe_size;
-+	caps->max_inline_data_size = resp->max_inline_data_size;
-+}
-+
-+int mana_ib_query_adapter_caps(struct mana_ib_dev *mib_dev)
-+{
-+	struct mana_ib_query_adapter_caps_resp resp = {};
-+	struct mana_ib_query_adapter_caps_req req = {};
-+	int err;
-+
-+	mana_gd_init_req_hdr(&req.hdr, MANA_IB_GET_ADAPTER_CAP, sizeof(req),
-+			     sizeof(resp));
-+	req.hdr.resp.msg_version = MANA_IB__GET_ADAPTER_CAP_RESPONSE_V3;
-+	req.hdr.dev_id = mib_dev->gc->mana_ib.dev_id;
-+
-+	err = mana_gd_send_request(mib_dev->gc, sizeof(req), &req,
-+				   sizeof(resp), &resp);
-+
-+	if (err) {
-+		ibdev_err(&mib_dev->ib_dev, "Failed to query adapter caps err %d", err);
-+		return err;
-+	}
-+
-+	assign_caps(&mib_dev->adapter_caps, &resp);
-+	return 0;
-+}
-diff --git a/drivers/infiniband/hw/mana/mana_ib.h b/drivers/infiniband/hw/mana/mana_ib.h
-index 8a652bccd978..1044358230d3 100644
---- a/drivers/infiniband/hw/mana/mana_ib.h
-+++ b/drivers/infiniband/hw/mana/mana_ib.h
-@@ -20,19 +20,41 @@
- 
- /* MANA doesn't have any limit for MR size */
- #define MANA_IB_MAX_MR_SIZE	U64_MAX
--
-+#define MANA_IB__GET_ADAPTER_CAP_RESPONSE_V3 3
- /*
-  * The hardware limit of number of MRs is greater than maximum number of MRs
-  * that can possibly represent in 24 bits
-  */
- #define MANA_IB_MAX_MR		0xFFFFFFu
- 
-+struct mana_ib_adapter_caps {
-+	u32 max_sq_id;
-+	u32 max_rq_id;
-+	u32 max_cq_id;
-+	u32 max_qp_count;
-+	u32 max_cq_count;
-+	u32 max_mr_count;
-+	u32 max_pd_count;
-+	u32 max_inbound_read_limit;
-+	u32 max_outbound_read_limit;
-+	u32 mw_count;
-+	u32 max_srq_count;
-+	u32 max_requester_sq_size;
-+	u32 max_responder_sq_size;
-+	u32 max_requester_rq_size;
-+	u32 max_responder_rq_size;
-+	u32 max_send_wqe_size;
-+	u32 max_recv_wqe_size;
-+	u32 max_inline_data_size;
-+};
-+
- struct mana_ib_dev {
- 	struct ib_device ib_dev;
- 	struct gdma_dev *gdma_dev;
- 	struct gdma_context *gc;
- 	struct gdma_queue *fatal_err_eq;
- 	mana_handle_t adapter_handle;
-+	struct mana_ib_adapter_caps adapter_caps;
- };
- 
- struct mana_ib_wq {
-@@ -96,6 +118,7 @@ struct mana_ib_rwq_ind_table {
- };
- 
- enum mana_ib_command_code {
-+	MANA_IB_GET_ADAPTER_CAP = 0x30001,
- 	MANA_IB_CREATE_ADAPTER  = 0x30002,
- 	MANA_IB_DESTROY_ADAPTER = 0x30003,
- };
-@@ -120,6 +143,32 @@ struct mana_ib_destroy_adapter_resp {
- 	struct gdma_resp_hdr hdr;
- }; /* HW Data */
- 
-+struct mana_ib_query_adapter_caps_req {
-+	struct gdma_req_hdr hdr;
-+}; /*HW Data */
-+
-+struct mana_ib_query_adapter_caps_resp {
-+	struct gdma_resp_hdr hdr;
-+	u32 max_sq_id;
-+	u32 max_rq_id;
-+	u32 max_cq_id;
-+	u32 max_qp_count;
-+	u32 max_cq_count;
-+	u32 max_mr_count;
-+	u32 max_pd_count;
-+	u32 max_inbound_read_limit;
-+	u32 max_outbound_read_limit;
-+	u32 mw_count;
-+	u32 max_srq_count;
-+	u32 max_requester_sq_size;
-+	u32 max_responder_sq_size;
-+	u32 max_requester_rq_size;
-+	u32 max_responder_rq_size;
-+	u32 max_send_wqe_size;
-+	u32 max_recv_wqe_size;
-+	u32 max_inline_data_size;
-+}; /* HW Data */
-+
- int mana_ib_gd_create_dma_region(struct mana_ib_dev *mib_dev,
- 				 struct ib_umem *umem,
- 				 mana_handle_t *gdma_region);
-@@ -194,4 +243,6 @@ int mana_ib_create_adapter(struct mana_ib_dev *mib_dev);
- 
- int mana_ib_destroy_adapter(struct mana_ib_dev *mib_dev);
- 
-+int mana_ib_query_adapter_caps(struct mana_ib_dev *mib_dev);
-+
- #endif
--- 
-2.25.1
+Why are you using computers and automation in the first place, if said
+automation then just makes for more work?
 
+Then requiring inexperienced developers to do those extra things,
+knowing - and not caring - that the experienced ones won't even
+bother, that goes from stupid to actively malicious.
+
+And then asking me to change my workflow because I use a different
+script that does exactly what I want - that takes "stupid and
+malicious" to something where I will just ignore you.
+
+In other words: those changes to get_maintainer are simply not going to happen.
+
+Fix your own scripts, and fix your bad workflows.
+
+Your bad workflow not only makes it harder for new people to get
+involved, they apparently waste your *own* time so much that you are
+upset about it all.
+
+Don't shoot yourself in the foot - and if you insist on doing so,
+don't ask *others* to join you in your self-destructive tendencies.
+
+               Linus
 
