@@ -1,96 +1,156 @@
-Return-Path: <netdev+bounces-21647-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21648-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2BFB764165
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 23:49:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61CEE764173
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 23:53:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 979051C213BD
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 21:49:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 131BB281F9A
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 21:53:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B05A1BF1A;
-	Wed, 26 Jul 2023 21:49:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D28BF1BF1C;
+	Wed, 26 Jul 2023 21:52:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C26B1BEFF
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 21:49:08 +0000 (UTC)
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60D6CFA
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 14:49:06 -0700 (PDT)
-Received: by mail-pj1-x102f.google.com with SMTP id 98e67ed59e1d1-2681223aaacso152913a91.0
-        for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 14:49:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690408146; x=1691012946;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Mb9YC8hX6XkLT5eoXX1Q191alkB1moi8bE43Sv0cxAk=;
-        b=NTs46ZmS8vMcavND5PT3/eJjZqozvM9sZdOaTTfggmuMq/v6EWcTSLxukHVyzbReRx
-         nGfnGS2TkEdUpih0FM2qP9jVHTXpU4GqUK5kjZAd0IwcnqYnAeo4LnCMqFSBRWbVp8Zn
-         YfaKFVCQKV+RZ2RZdJfey7LX8c9OzP3XDdXOP4l5wkaTpjA+TIZU4NHlSrcodzZMkBWq
-         6jIWZ9SHDxFuoDJKSip4T0KUDSCXZ9+unt8PQwOeExAF28OedwJj3LFfTNx3JtoQeaJk
-         kxUz7eWZbMExr1v1damwa7h5HyvwlTNyoFhjcjD88GEv2b5XLLLuD6drDZFJX4Obtpei
-         Tluw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690408146; x=1691012946;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Mb9YC8hX6XkLT5eoXX1Q191alkB1moi8bE43Sv0cxAk=;
-        b=CUKW4xhcDrPXKsjUicTlxwKpgsR32uU9sYNMI9JbYCMp7Jri7vTRsBBWUNlWcXmVx0
-         ZJrM2G/jbnbjWoAcFdmWlTknQ9nuzOwrFxYZx0xW72DNkY7N/t/D5GMjHsXf2pybsrgG
-         FWgv2v72dFsvgVQ4OaQnCFMJVmoZgzUpMj9tM49FWt16eZYUy3aI6BPT4ScSwsUMuand
-         zFsTh5zWWDzu3lujQuXALJ3JNRkG2APsj0AkO1RSFZFhROmijUTyzz/Sa5PvJenEWYU9
-         ZEUHsWdxZwjtxhH07lXZJvskXvqN68i1Q46MkJq90fgzxZrnZ0wbfQPcyah7FdedPDW5
-         KVRw==
-X-Gm-Message-State: ABy/qLboARbSaPUWREhEcCSGGhgOxKpCgwRhdJ6uCvIU22Z7KBz9zuII
-	EXidV9+WoGINXN2EWAdsNibdVrpWtq12Ja82j5g=
-X-Google-Smtp-Source: APBJJlFBY2Pc2jVV3aq3KHm7YTfI6xXx4yhiWaXuBE8/GinfbucCTHgvqY+1ArnMSyjqpIuMZJ56a6s3csNYgKI8S4g=
-X-Received: by 2002:a17:90b:3a8c:b0:263:3386:9da3 with SMTP id
- om12-20020a17090b3a8c00b0026333869da3mr782457pjb.17.1690408145669; Wed, 26
- Jul 2023 14:49:05 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C47B11BEEA
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 21:52:57 +0000 (UTC)
+Received: from out-36.mta0.migadu.com (out-36.mta0.migadu.com [IPv6:2001:41d0:1004:224b::24])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30DBA1985
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 14:52:56 -0700 (PDT)
+Message-ID: <d988118b-3e02-24e3-281a-cff821f7abef@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1690408374;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=9bV/5zXyn83HygzV6+vhnrK/gefuxgdwL5wSx2YfGw0=;
+	b=bKW5yOlfjXQvgYO+MsYPCpiBf3LO4rjc9dVdsyNb5KC1iUPGnOUn0P1F4p0t4n56dGTbrd
+	FF2apvrn4mhrUKdYglRMq6ZtajjHxWbjofoU/6JFvCmohvZAXvjNcBEZ3lJNHV4MLHee4W
+	zas7uyNTj1h+0433iHi7pdY1Tr8WSo8=
+Date: Wed, 26 Jul 2023 14:52:45 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230725162205.27526-1-donald.hunter@gmail.com>
- <20230725162205.27526-2-donald.hunter@gmail.com> <20230726140941.2ef8f870@kernel.org>
-In-Reply-To: <20230726140941.2ef8f870@kernel.org>
-From: Donald Hunter <donald.hunter@gmail.com>
-Date: Wed, 26 Jul 2023 22:48:54 +0100
-Message-ID: <CAD4GDZy5BC6F_Asopz4WRnZ5KBasdHpchoseafcKwbBZ3ZLySQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v1 1/3] doc/netlink: Add a schema for netlink-raw families
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, donald.hunter@redhat.com
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [RESEND PATCH bpf-next v3 2/2] selftests/bpf: Add testcase for
+ xdp attaching failure tracepoint
+Content-Language: en-US
+To: Leon Hwang <hffilwlqm@gmail.com>
+Cc: ast@kernel.org, daniel@iogearbox.net, john.fastabend@gmail.com,
+ andrii@kernel.org, song@kernel.org, yhs@fb.com, kpsingh@kernel.org,
+ sdf@google.com, haoluo@google.com, jolsa@kernel.org, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, hawk@kernel.org,
+ tangyeechou@gmail.com, kernel-patches-bot@fb.com, bpf@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+References: <20230720155228.5708-1-hffilwlqm@gmail.com>
+ <20230720155228.5708-3-hffilwlqm@gmail.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <20230720155228.5708-3-hffilwlqm@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, 26 Jul 2023 at 22:09, Jakub Kicinski <kuba@kernel.org> wrote:
->
-> On Tue, 25 Jul 2023 17:22:03 +0100 Donald Hunter wrote:
-> >  - add an id property to mcast-group definitions
->
-> nit: my first thought would be to call it "value" rather than "id"
-> to stick with the naming we have to other objects. Any pros/cons
-> you see?
+On 7/20/23 8:52 AM, Leon Hwang wrote:
+> Add a test case for the tracepoint of xdp attaching failure by bpf
+> tracepoint when attach XDP to a device with invalid flags option.
+> 
+> The bpf tracepoint retrieves error message from the tracepoint, and
+> then put the error message to a perf buffer. The testing code receives
+> error message from perf buffer, and then ASSERT "Invalid XDP flags for
+> BPF link attachment".
+> 
+> Signed-off-by: Leon Hwang <hffilwlqm@gmail.com>
+> ---
+>   .../selftests/bpf/prog_tests/xdp_attach.c     | 65 +++++++++++++++++++
+>   .../bpf/progs/test_xdp_attach_fail.c          | 52 +++++++++++++++
+>   2 files changed, 117 insertions(+)
+>   create mode 100644 tools/testing/selftests/bpf/progs/test_xdp_attach_fail.c
+> 
+> diff --git a/tools/testing/selftests/bpf/prog_tests/xdp_attach.c b/tools/testing/selftests/bpf/prog_tests/xdp_attach.c
+> index fa3cac5488f5d..99f8d03f3c8bd 100644
+> --- a/tools/testing/selftests/bpf/prog_tests/xdp_attach.c
+> +++ b/tools/testing/selftests/bpf/prog_tests/xdp_attach.c
+> @@ -1,5 +1,6 @@
+>   // SPDX-License-Identifier: GPL-2.0
+>   #include <test_progs.h>
+> +#include "test_xdp_attach_fail.skel.h"
+>   
+>   #define IFINDEX_LO 1
+>   #define XDP_FLAGS_REPLACE		(1U << 4)
+> @@ -85,10 +86,74 @@ static void test_xdp_attach(const char *file)
+>   	bpf_object__close(obj1);
+>   }
+>   
+> +struct xdp_errmsg {
+> +	char msg[64];
+> +};
+> +
+> +static void on_xdp_errmsg(void *ctx, int cpu, void *data, __u32 size)
+> +{
+> +	struct xdp_errmsg *ctx_errmg = ctx, *tp_errmsg = data;
+> +
+> +	memcpy(&ctx_errmg->msg, &tp_errmsg->msg, size);
+> +}
+> +
+> +static const char tgt_errmsg[] = "Invalid XDP flags for BPF link attachment";
+> +
+> +static void test_xdp_attach_fail(const char *file)
 
-Yep, that makes sense. I wasn't sure about "id" anyway but it didn't occur
-to me to align with "value".
+The test crashed: 
+https://github.com/kernel-patches/bpf/actions/runs/5672753995/job/15373384795#step:6:8037
 
-> Other than that the big ask would be to update the documentation :)
+Please monitor the CI test result in the future.
 
-Do you mind if I update the docs as a follow up patch? I'm on holiday for
-the next 10 days - I should have time to respin this patchset but maybe
-not to work on docs as well.
+> +{
+> +	__u32 duration = 0;
+> +	int err, fd_xdp, fd_link_xdp;
+> +	struct bpf_object *obj = NULL;
+> +	struct test_xdp_attach_fail *skel = NULL;
+> +	struct bpf_link *link = NULL;
+> +	struct perf_buffer *pb = NULL;
+> +	struct xdp_errmsg errmsg = {};
+> +
+> +	LIBBPF_OPTS(bpf_link_create_opts, opts);
+> +
+> +	skel = test_xdp_attach_fail__open_and_load();
+> +	if (!ASSERT_OK_PTR(skel, "test_xdp_attach_fail_skel"))
+> +		goto out_close;
+> +
+> +	link = bpf_program__attach_tracepoint(skel->progs.tp__xdp__bpf_xdp_link_attach_failed,
+> +					      "xdp", "bpf_xdp_link_attach_failed");
+> +	if (!ASSERT_OK_PTR(link, "attach_tp"))
+> +		goto out_close;
+> +
+> +	/* set up perf buffer */
+> +	pb = perf_buffer__new(bpf_map__fd(skel->maps.xdp_errmsg_pb), 1,
+> +			      on_xdp_errmsg, NULL, &errmsg, NULL);
+> +
+> +	err = bpf_prog_test_load(file, BPF_PROG_TYPE_XDP, &obj, &fd_xdp);
+> +	if (CHECK_FAIL(err))
+> +		goto out_close;
+> +
+> +	opts.flags = 0xFF; // invalid flags to fail to attach XDP prog
+> +	fd_link_xdp = bpf_link_create(fd_xdp, IFINDEX_LO, BPF_XDP, &opts);
+> +	if (CHECK(fd_link_xdp != -22, "bpf_link_create_failed",
+
+Please stay with the ASSERT_* macro.
+
+-- 
+pw-bot: cr
+
+
 
