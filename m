@@ -1,213 +1,136 @@
-Return-Path: <netdev+bounces-21493-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21495-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5BD1763B67
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 17:42:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18835763B74
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 17:43:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 70920281D50
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 15:42:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 486991C21354
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 15:43:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B30B26B13;
-	Wed, 26 Jul 2023 15:42:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEE5326B2C;
+	Wed, 26 Jul 2023 15:43:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F4B31DA3F
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 15:42:53 +0000 (UTC)
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57E0D2137
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 08:42:50 -0700 (PDT)
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-320-dcFsfStROS6g0eU5qhDzZw-1; Wed, 26 Jul 2023 16:42:48 +0100
-X-MC-Unique: dcFsfStROS6g0eU5qhDzZw-1
-Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
- (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Wed, 26 Jul
- 2023 16:42:47 +0100
-Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
- id 15.00.1497.048; Wed, 26 Jul 2023 16:42:47 +0100
-From: David Laight <David.Laight@ACULAB.COM>
-To: 'Paolo Abeni' <pabeni@redhat.com>, "'willemdebruijn.kernel@gmail.com'"
-	<willemdebruijn.kernel@gmail.com>, "'davem@davemloft.net'"
-	<davem@davemloft.net>, "'dsahern@kernel.org'" <dsahern@kernel.org>, "'Eric
- Dumazet'" <edumazet@google.com>, "'kuba@kernel.org'" <kuba@kernel.org>,
-	"'netdev@vger.kernel.org'" <netdev@vger.kernel.org>
-Subject: RE: [PATCH 1/2] Move hash calculation inside udp4_lib_lookup2()
-Thread-Topic: [PATCH 1/2] Move hash calculation inside udp4_lib_lookup2()
-Thread-Index: Adm/uWROjgkE4udKTdiQAS8haeW/0gABYaaAAAYbQNA=
-Date: Wed, 26 Jul 2023 15:42:47 +0000
-Message-ID: <d0e93a4ec0594c38817ea9ad075aa122@AcuMS.aculab.com>
-References: <fbcaa54791cd44999de5fec7c6cf0b3c@AcuMS.aculab.com>
-	 <5eb8631d430248999116ce8ced13e4b2@AcuMS.aculab.com>
- <fce08e76da7e3882319ae935c38e9e2eccf2dcae.camel@redhat.com>
-In-Reply-To: <fce08e76da7e3882319ae935c38e9e2eccf2dcae.camel@redhat.com>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B330127706
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 15:43:29 +0000 (UTC)
+Received: from mail-oa1-x2d.google.com (mail-oa1-x2d.google.com [IPv6:2001:4860:4864:20::2d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 790D3212B;
+	Wed, 26 Jul 2023 08:43:26 -0700 (PDT)
+Received: by mail-oa1-x2d.google.com with SMTP id 586e51a60fabf-1bb6334fec5so360075fac.1;
+        Wed, 26 Jul 2023 08:43:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1690386206; x=1690991006;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=GgFvlAGeua6rkHRPoDyX/+JWDNQ8FgMvtlCof0tD8t4=;
+        b=RMArvMwJxEoqM7oM+2jJtH+rbGnNw2G9JiIwJG6hsgAf9RiedtfRmXrb5dmsFNY9UW
+         AHgdI1ToGQr4XBGX2YNwEmtv5r/fMatcmSO1nBwGM9M0rjGJqs/oB8fwrZff4HxAHX8B
+         00OpQZz+LNjdDZed8f5qjMOvn5NoMIv2SKxlpSGhPoxO8qwnBzROvCqT3P3/dPNvVriz
+         7vgjeGHAeN1fPuYC+gETeVHmnu9TCJ8DJjZW7sUZkF/SZiwACYE4VaTciKpj+evW0/2s
+         GcXhRmHG9g2+TuOyiFPK9GvuynmwHs63fcWsRqItpiONgSt8c3rh9cA9DcPkAtG6RJ5b
+         IzGg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690386206; x=1690991006;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=GgFvlAGeua6rkHRPoDyX/+JWDNQ8FgMvtlCof0tD8t4=;
+        b=BIRY17/XX87LYSY15qMLhSTbR+9Yylwzu9Ytem7pL4l7L2hbPaxHEtG896l1I4d0+J
+         KcN5If69s2y9QMXWpg+E0zblcSIhvsVY8OjHccS69oBHyJCKelTdu84LqWC9Q/whSofE
+         OjkoR8D7SgE6Ar2xQWcxjHHSmQ7TcXWpvdXD0y9UzmZM9h78/XnRLJiSKZdEeGrrs0q5
+         wZQwr5DLiCgDybuFm31Khl0IkbJhxNyK+gacwObhs4EmUHDKP3WInLfF8DaIPV5FW+US
+         CMObLPwBJcyE7axa0wlhQDuIHpYHPdf1dwMsn0H0l2DUlE4b8kcgU/B6TcHSvXXE5LVS
+         PHhg==
+X-Gm-Message-State: ABy/qLY2KMjTZmTxATzpaGsUK6uzkUrvgTqWhhwO+Jwx0QrXnYJBuFbB
+	oyroSmWBJgbXBrKW9OdNti4=
+X-Google-Smtp-Source: APBJJlH5TY7cNT9lCf4suTEQwBH46hx7lkSTs+i74ILJmSnyjHQ/it17SRxuPKv6AOjsfdVhaVHhhA==
+X-Received: by 2002:a05:6870:fba9:b0:1ba:bea1:b970 with SMTP id kv41-20020a056870fba900b001babea1b970mr2443328oab.5.1690386205632;
+        Wed, 26 Jul 2023 08:43:25 -0700 (PDT)
+Received: from hoboy.vegasvil.org ([2601:640:8000:54:e2d5:5eff:fea5:802f])
+        by smtp.gmail.com with ESMTPSA id fw3-20020a17090b128300b00262ca945cecsm1399094pjb.54.2023.07.26.08.43.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 Jul 2023 08:43:25 -0700 (PDT)
+Date: Wed, 26 Jul 2023 08:43:22 -0700
+From: Richard Cochran <richardcochran@gmail.com>
+To: Johannes Zink <j.zink@pengutronix.de>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Russell King <linux@armlinux.org.uk>, patchwork-jzi@pengutronix.de,
+	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	kernel@pengutronix.de, kernel test robot <lkp@intel.com>
+Subject: Re: [PATCH v2] net: stmmac: correct MAC propagation delay
+Message-ID: <ZME/GjBWdodiUO+8@hoboy.vegasvil.org>
+References: <20230719-stmmac_correct_mac_delay-v2-1-3366f38ee9a6@pengutronix.de>
+ <20230725200606.5264b59c@kernel.org>
+ <ZMCRjcRF9XqEPg/Z@hoboy.vegasvil.org>
+ <09a2d767-d781-eba2-028f-a949f1128fbd@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: base64
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <09a2d767-d781-eba2-028f-a949f1128fbd@pengutronix.de>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-RnJvbTogUGFvbG8gQWJlbmkNCj4gU2VudDogMjYgSnVseSAyMDIzIDE0OjQ0DQo+IA0KPiBPbiBX
-ZWQsIDIwMjMtMDctMjYgYXQgMTI6MDUgKzAwMDAsIERhdmlkIExhaWdodCB3cm90ZToNCj4gPiBQ
-YXNzIHRoZSB1ZHB0YWJsZSBhZGRyZXNzIGludG8gdWRwNF9saWJfbG9va3VwMigpIGluc3RlYWQg
-b2YgdGhlIGhhc2ggc2xvdC4NCj4gPg0KPiA+IFdoaWxlIGlwdjRfcG9ydGFkZHJfaGFzaChuZXQs
-IElQX0FERFJfQU5ZLCAwKSBpcyBjb25zdGFudCBmb3IgZWFjaCBuZXQNCj4gPiAodGhlIHBvcnQg
-aXMgYW4geG9yKSB0aGUgdmFsdWUgaXNuJ3Qgc2F2ZWQuDQo+ID4gU2luY2UgdGhlIGhhc2ggZnVu
-Y3Rpb24gZG9lc24ndCBnZXQgc2ltcGxpZmllZCB3aGVuIHBhc3NlZCB6ZXJvIHRoZSBoYXNoDQo+
-IA0KPiBBcmUgeW91IHN1cmU/IGNvdWxkIHlvdSBwbGVhc2Ugb2JqZHVtcCBhbmQgY29tcGFyZSB0
-aGUgYmluYXJ5IGNvZGUNCj4gZ2VuZXJhdGVkIGJlZm9yZSBhbmQgYWZ0ZXIgdGhlIHBhdGNoPyBJ
-biB0aGVvcnkgYWxsIHRoZSBjYWxsZXJzIHVwIHRvDQo+IF9famhhc2hfZmluYWwoKSBpbmNsdWRl
-ZCBzaG91bGQgYmUgaW5saW5lZCwgYW5kIHRoZSBjb21waWxlciBzaG91bGQgYmUNCj4gYWJsZSB0
-byBvcHRpbXplIGF0IGxlYXN0IHJvbDMyKDAsIDxuPikuDQoNCkZyb20gYW4gb2xkaXNoIGJ1aWxk
-IEkgaGF2ZSBsdXJraW5nOg0KMDAwMDAwMDAwMDAwMzk2MCA8X191ZHA0X2xpYl9sb29rdXA+Og0K
-ICAgIDM5NjA6ICAgICAgIGU4IDAwIDAwIDAwIDAwICAgICAgICAgIGNhbGxxICAzOTY1IDxfX3Vk
-cDRfbGliX2xvb2t1cCsweDU+DQogICAgICAgICAgICAgICAgICAgICAgICAzOTYxOiBSX1g4Nl82
-NF9QQzMyICAgICBfX2ZlbnRyeV9fLTB4NA0KICAgIDM5NjU6ICAgICAgIDQ4IDgzIGVjIDQ4ICAg
-ICAgICAgICAgIHN1YiAgICAkMHg0OCwlcnNwDQogICAgMzk2OTogICAgICAgNjYgNDEgYzEgYzAg
-MDggICAgICAgICAgcm9sICAgICQweDgsJXI4dw0KICAgIDM5NmU6ICAgICAgIDQ4IDg5IDVjIDI0
-IDE4ICAgICAgICAgIG1vdiAgICAlcmJ4LDB4MTgoJXJzcCkNCiAgICAzOTczOiAgICAgICA0OCA4
-OSA2YyAyNCAyMCAgICAgICAgICBtb3YgICAgJXJicCwweDIwKCVyc3ApDQogICAgMzk3ODogICAg
-ICAgODkgZjUgICAgICAgICAgICAgICAgICAgbW92ICAgICVlc2ksJWVicA0KICAgIDM5N2E6ICAg
-ICAgIDRjIDg5IDY0IDI0IDI4ICAgICAgICAgIG1vdiAgICAlcjEyLDB4MjgoJXJzcCkNCiAgICAz
-OTdmOiAgICAgICA0YyA4OSA2YyAyNCAzMCAgICAgICAgICBtb3YgICAgJXIxMywweDMwKCVyc3Ap
-DQogICAgMzk4NDogICAgICAgNDQgMGYgYjcgZTIgICAgICAgICAgICAgbW92endsICVkeCwlcjEy
-ZA0KICAgIDM5ODg6ICAgICAgIDRjIDg5IDc0IDI0IDM4ICAgICAgICAgIG1vdiAgICAlcjE0LDB4
-MzgoJXJzcCkNCiAgICAzOThkOiAgICAgICA0YyA4OSA3YyAyNCA0MCAgICAgICAgICBtb3YgICAg
-JXIxNSwweDQwKCVyc3ApDQogICAgMzk5MjogICAgICAgNDkgODkgZmUgICAgICAgICAgICAgICAg
-bW92ICAgICVyZGksJXIxNA0KICAgIDM5OTU6ICAgICAgIDhiIGJmIDQwIDAxIDAwIDAwICAgICAg
-IG1vdiAgICAweDE0MCglcmRpKSwlZWRpDQogICAgMzk5YjogICAgICAgNDUgMGYgYjcgZjggICAg
-ICAgICAgICAgbW92endsICVyOHcsJXIxNWQNCiAgICAzOTlmOiAgICAgICA0OCA4YiA1YyAyNCA1
-OCAgICAgICAgICBtb3YgICAgMHg1OCglcnNwKSwlcmJ4DQogICAgMzlhNDogICAgICAgNDggOGIg
-NTQgMjQgNjAgICAgICAgICAgbW92ICAgIDB4NjAoJXJzcCksJXJkeA0KICAgIDM5YTk6ICAgICAg
-IDQ1IDg5IGNkICAgICAgICAgICAgICAgIG1vdiAgICAlcjlkLCVyMTNkDQogICAgMzlhYzogICAg
-ICAgODEgZWYgMGQgNDEgNTIgMjEgICAgICAgc3ViICAgICQweDIxNTI0MTBkLCVlZGkNCiAgICAz
-OWIyOiAgICAgICA4OSBmZSAgICAgICAgICAgICAgICAgICBtb3YgICAgJWVkaSwlZXNpDQogICAg
-MzliNDogICAgICAgOGQgMDQgMzkgICAgICAgICAgICAgICAgbGVhICAgICglcmN4LCVyZGksMSks
-JWVheA0KICAgIDM5Yjc6ICAgICAgIDQ4IDg5IDU0IDI0IDEwICAgICAgICAgIG1vdiAgICAlcmR4
-LDB4MTAoJXJzcCkNCiAgICAzOWJjOiAgICAgICBjMSBjNiAwZSAgICAgICAgICAgICAgICByb2wg
-ICAgJDB4ZSwlZXNpDQogICAgMzliZjogICAgICAgNDQgODkgZTIgICAgICAgICAgICAgICAgbW92
-ICAgICVyMTJkLCVlZHgNCiAgICAzOWMyOiAgICAgICBmNyBkZSAgICAgICAgICAgICAgICAgICBu
-ZWcgICAgJWVzaQ0KICAgIDM5YzQ6ICAgICAgIDQxIDg5IGYwICAgICAgICAgICAgICAgIG1vdiAg
-ICAlZXNpLCVyOGQNCiAgICAzOWM3OiAgICAgICAzMSBmMCAgICAgICAgICAgICAgICAgICB4b3Ig
-ICAgJWVzaSwlZWF4DQogICAgMzljOTogICAgICAgNDEgYzEgYzAgMGIgICAgICAgICAgICAgcm9s
-ICAgICQweGIsJXI4ZA0KICAgIDM5Y2Q6ICAgICAgIDQ0IDI5IGMwICAgICAgICAgICAgICAgIHN1
-YiAgICAlcjhkLCVlYXgNCiAgICAzOWQwOiAgICAgICA0MSA4OSBjMCAgICAgICAgICAgICAgICBt
-b3YgICAgJWVheCwlcjhkDQogICAgMzlkMzogICAgICAgMzEgYzcgICAgICAgICAgICAgICAgICAg
-eG9yICAgICVlYXgsJWVkaQ0KICAgIDM5ZDU6ICAgICAgIDQxIGMxIGMwIDE5ICAgICAgICAgICAg
-IHJvbCAgICAkMHgxOSwlcjhkDQogICAgMzlkOTogICAgICAgNDQgMjkgYzcgICAgICAgICAgICAg
-ICAgc3ViICAgICVyOGQsJWVkaQ0KICAgIDM5ZGM6ICAgICAgIDQxIDg5IGY4ICAgICAgICAgICAg
-ICAgIG1vdiAgICAlZWRpLCVyOGQNCiAgICAzOWRmOiAgICAgICAzMSBmZSAgICAgICAgICAgICAg
-ICAgICB4b3IgICAgJWVkaSwlZXNpDQogICAgMzllMTogICAgICAgNDEgYzEgYzAgMTAgICAgICAg
-ICAgICAgcm9sICAgICQweDEwLCVyOGQNCiAgICAzOWU1OiAgICAgICA0NCAyOSBjNiAgICAgICAg
-ICAgICAgICBzdWIgICAgJXI4ZCwlZXNpDQogICAgMzllODogICAgICAgNDEgODkgZjAgICAgICAg
-ICAgICAgICAgbW92ICAgICVlc2ksJXI4ZA0KICAgIDM5ZWI6ICAgICAgIDMxIGYwICAgICAgICAg
-ICAgICAgICAgIHhvciAgICAlZXNpLCVlYXgNCiAgICAzOWVkOiAgICAgICA0MSBjMSBjMCAwNCAg
-ICAgICAgICAgICByb2wgICAgJDB4NCwlcjhkDQogICAgMzlmMTogICAgICAgNDQgMjkgYzAgICAg
-ICAgICAgICAgICAgc3ViICAgICVyOGQsJWVheA0KICAgIDM5ZjQ6ICAgICAgIDQ1IDg5IGY4ICAg
-ICAgICAgICAgICAgIG1vdiAgICAlcjE1ZCwlcjhkDQogICAgMzlmNzogICAgICAgMzEgYzcgICAg
-ICAgICAgICAgICAgICAgeG9yICAgICVlYXgsJWVkaQ0KICAgIDM5Zjk6ICAgICAgIGMxIGMwIDBl
-ICAgICAgICAgICAgICAgIHJvbCAgICAkMHhlLCVlYXgNCiAgICAzOWZjOiAgICAgICAyOSBjNyAg
-ICAgICAgICAgICAgICAgICBzdWIgICAgJWVheCwlZWRpDQogICAgMzlmZTogICAgICAgODkgZjgg
-ICAgICAgICAgICAgICAgICAgbW92ICAgICVlZGksJWVheA0KICAgIDNhMDA6ICAgICAgIGMxIGM3
-IDE4ICAgICAgICAgICAgICAgIHJvbCAgICAkMHgxOCwlZWRpDQogICAgM2EwMzogICAgICAgMzEg
-ZjAgICAgICAgICAgICAgICAgICAgeG9yICAgICVlc2ksJWVheA0KICAgIDNhMDU6ICAgICAgIDg5
-IGVlICAgICAgICAgICAgICAgICAgIG1vdiAgICAlZWJwLCVlc2kNCiAgICAzYTA3OiAgICAgICAy
-OSBmOCAgICAgICAgICAgICAgICAgICBzdWIgICAgJWVkaSwlZWF4DQogICAgM2EwOTogICAgICAg
-NGMgODkgZjcgICAgICAgICAgICAgICAgbW92ICAgICVyMTQsJXJkaQ0KICAgIDNhMGM6ICAgICAg
-IDQ0IDMxIGY4ICAgICAgICAgICAgICAgIHhvciAgICAlcjE1ZCwlZWF4DQogICAgM2EwZjogICAg
-ICAgMjMgNDMgMTAgICAgICAgICAgICAgICAgYW5kICAgIDB4MTAoJXJieCksJWVheA0KICAgIDNh
-MTI6ICAgICAgIDQ4IGMxIGUwIDA0ICAgICAgICAgICAgIHNobCAgICAkMHg0LCVyYXgNCiAgICAz
-YTE2OiAgICAgICA0OCAwMyA0MyAwOCAgICAgICAgICAgICBhZGQgICAgMHg4KCVyYngpLCVyYXgN
-CiAgICAzYTFhOiAgICAgICA0OCA4OSA0NCAyNCAwOCAgICAgICAgICBtb3YgICAgJXJheCwweDgo
-JXJzcCkNCiAgICAzYTFmOiAgICAgICA4YiA0NCAyNCA1MCAgICAgICAgICAgICBtb3YgICAgMHg1
-MCglcnNwKSwlZWF4DQogICAgM2EyMzogICAgICAgODkgMDQgMjQgICAgICAgICAgICAgICAgbW92
-ICAgICVlYXgsKCVyc3ApDQogICAgM2EyNjogICAgICAgZTggMDUgZjcgZmYgZmYgICAgICAgICAg
-Y2FsbHEgIDMxMzAgPHVkcDRfbGliX2xvb2t1cDI+DQogICAgM2EyYjogICAgICAgNDggODUgYzAg
-ICAgICAgICAgICAgICAgdGVzdCAgICVyYXgsJXJheA0KICAgIDNhMmU6ICAgICAgIDc0IDMyICAg
-ICAgICAgICAgICAgICAgIGplICAgICAzYTYyIDxfX3VkcDRfbGliX2xvb2t1cCsweDEwMj4NCiAg
-ICAzYTMwOiAgICAgICA0OCAzZCAwMSBmMCBmZiBmZiAgICAgICBjbXAgICAgJDB4ZmZmZmZmZmZm
-ZmZmZjAwMSwlcmF4DQogICAgM2EzNjogICAgICAgYmEgMDAgMDAgMDAgMDAgICAgICAgICAgbW92
-ICAgICQweDAsJWVkeA0KICAgIDNhM2I6ICAgICAgIDQ4IDhiIDVjIDI0IDE4ICAgICAgICAgIG1v
-diAgICAweDE4KCVyc3ApLCVyYngNCiAgICAzYTQwOiAgICAgICA0OCAwZiA0MyBjMiAgICAgICAg
-ICAgICBjbW92YWUgJXJkeCwlcmF4DQogICAgM2E0NDogICAgICAgNDggOGIgNmMgMjQgMjAgICAg
-ICAgICAgbW92ICAgIDB4MjAoJXJzcCksJXJicA0KICAgIDNhNDk6ICAgICAgIDRjIDhiIDY0IDI0
-IDI4ICAgICAgICAgIG1vdiAgICAweDI4KCVyc3ApLCVyMTINCiAgICAzYTRlOiAgICAgICA0YyA4
-YiA2YyAyNCAzMCAgICAgICAgICBtb3YgICAgMHgzMCglcnNwKSwlcjEzDQogICAgM2E1MzogICAg
-ICAgNGMgOGIgNzQgMjQgMzggICAgICAgICAgbW92ICAgIDB4MzgoJXJzcCksJXIxNA0KICAgIDNh
-NTg6ICAgICAgIDRjIDhiIDdjIDI0IDQwICAgICAgICAgIG1vdiAgICAweDQwKCVyc3ApLCVyMTUN
-CiAgICAzYTVkOiAgICAgICA0OCA4MyBjNCA0OCAgICAgICAgICAgICBhZGQgICAgJDB4NDgsJXJz
-cA0KICAgIDNhNjE6ICAgICAgIGMzICAgICAgICAgICAgICAgICAgICAgIHJldHENCiAgICAzYTYy
-OiAgICAgICA0MSA4YiA5NiA0MCAwMSAwMCAwMCAgICBtb3YgICAgMHgxNDAoJXIxNCksJWVkeA0K
-ICAgIDNhNjk6ICAgICAgIDQ1IDg5IGU5ICAgICAgICAgICAgICAgIG1vdiAgICAlcjEzZCwlcjlk
-DQogICAgM2E2YzogICAgICAgNDUgODkgZjggICAgICAgICAgICAgICAgbW92ICAgICVyMTVkLCVy
-OGQNCiAgICAzYTZmOiAgICAgICA0YyA4OSBmNyAgICAgICAgICAgICAgICBtb3YgICAgJXIxNCwl
-cmRpDQogICAgM2E3MjogICAgICAgODEgZWEgMGQgNDEgNTIgMjEgICAgICAgc3ViICAgICQweDIx
-NTI0MTBkLCVlZHgNCiAgICAzYTc4OiAgICAgICA4OSBkMCAgICAgICAgICAgICAgICAgICBtb3Yg
-ICAgJWVkeCwlZWF4DQogICAgM2E3YTogICAgICAgYzEgYzAgMGUgICAgICAgICAgICAgICAgcm9s
-ICAgICQweGUsJWVheA0KICAgIDNhN2Q6ICAgICAgIGY3IGQ4ICAgICAgICAgICAgICAgICAgIG5l
-ZyAgICAlZWF4DQogICAgM2E3ZjogICAgICAgODkgYzEgICAgICAgICAgICAgICAgICAgbW92ICAg
-ICVlYXgsJWVjeA0KICAgIDNhODE6ICAgICAgIDg5IGM2ICAgICAgICAgICAgICAgICAgIG1vdiAg
-ICAlZWF4LCVlc2kNCiAgICAzYTgzOiAgICAgICAzMSBkMSAgICAgICAgICAgICAgICAgICB4b3Ig
-ICAgJWVkeCwlZWN4DQogICAgM2E4NTogICAgICAgYzEgYzYgMGIgICAgICAgICAgICAgICAgcm9s
-ICAgICQweGIsJWVzaQ0KICAgIDNhODg6ICAgICAgIDI5IGYxICAgICAgICAgICAgICAgICAgIHN1
-YiAgICAlZXNpLCVlY3gNCiAgICAzYThhOiAgICAgICA4OSBjZSAgICAgICAgICAgICAgICAgICBt
-b3YgICAgJWVjeCwlZXNpDQogICAgM2E4YzogICAgICAgMzEgY2EgICAgICAgICAgICAgICAgICAg
-eG9yICAgICVlY3gsJWVkeA0KICAgIDNhOGU6ICAgICAgIGMxIGM2IDE5ICAgICAgICAgICAgICAg
-IHJvbCAgICAkMHgxOSwlZXNpDQogICAgM2E5MTogICAgICAgMjkgZjIgICAgICAgICAgICAgICAg
-ICAgc3ViICAgICVlc2ksJWVkeA0KICAgIDNhOTM6ICAgICAgIDg5IGQ2ICAgICAgICAgICAgICAg
-ICAgIG1vdiAgICAlZWR4LCVlc2kNCiAgICAzYTk1OiAgICAgICAzMSBkMCAgICAgICAgICAgICAg
-ICAgICB4b3IgICAgJWVkeCwlZWF4DQogICAgM2E5NzogICAgICAgYzEgYzYgMTAgICAgICAgICAg
-ICAgICAgcm9sICAgICQweDEwLCVlc2kNCiAgICAzYTlhOiAgICAgICAyOSBmMCAgICAgICAgICAg
-ICAgICAgICBzdWIgICAgJWVzaSwlZWF4DQogICAgM2E5YzogICAgICAgODkgYzYgICAgICAgICAg
-ICAgICAgICAgbW92ICAgICVlYXgsJWVzaQ0KICAgIDNhOWU6ICAgICAgIDMxIGMxICAgICAgICAg
-ICAgICAgICAgIHhvciAgICAlZWF4LCVlY3gNCiAgICAzYWEwOiAgICAgICBjMSBjNiAwNCAgICAg
-ICAgICAgICAgICByb2wgICAgJDB4NCwlZXNpDQogICAgM2FhMzogICAgICAgMjkgZjEgICAgICAg
-ICAgICAgICAgICAgc3ViICAgICVlc2ksJWVjeA0KICAgIDNhYTU6ICAgICAgIDg5IGVlICAgICAg
-ICAgICAgICAgICAgIG1vdiAgICAlZWJwLCVlc2kNCiAgICAzYWE3OiAgICAgICAzMSBjYSAgICAg
-ICAgICAgICAgICAgICB4b3IgICAgJWVjeCwlZWR4DQogICAgM2FhOTogICAgICAgYzEgYzEgMGUg
-ICAgICAgICAgICAgICAgcm9sICAgICQweGUsJWVjeA0KICAgIDNhYWM6ICAgICAgIDI5IGNhICAg
-ICAgICAgICAgICAgICAgIHN1YiAgICAlZWN4LCVlZHgNCiAgICAzYWFlOiAgICAgICA0OCA4YiA0
-YyAyNCA2MCAgICAgICAgICBtb3YgICAgMHg2MCglcnNwKSwlcmN4DQogICAgM2FiMzogICAgICAg
-MzEgZDAgICAgICAgICAgICAgICAgICAgeG9yICAgICVlZHgsJWVheA0KICAgIDNhYjU6ICAgICAg
-IGMxIGMyIDE4ICAgICAgICAgICAgICAgIHJvbCAgICAkMHgxOCwlZWR4DQogICAgM2FiODogICAg
-ICAgMjkgZDAgICAgICAgICAgICAgICAgICAgc3ViICAgICVlZHgsJWVheA0KICAgIDNhYmE6ICAg
-ICAgIDQ0IDg5IGUyICAgICAgICAgICAgICAgIG1vdiAgICAlcjEyZCwlZWR4DQogICAgM2FiZDog
-ICAgICAgNDggODkgNGMgMjQgMTAgICAgICAgICAgbW92ICAgICVyY3gsMHgxMCglcnNwKQ0KICAg
-IDNhYzI6ICAgICAgIDQ0IDMxIGY4ICAgICAgICAgICAgICAgIHhvciAgICAlcjE1ZCwlZWF4DQog
-ICAgM2FjNTogICAgICAgMjMgNDMgMTAgICAgICAgICAgICAgICAgYW5kICAgIDB4MTAoJXJieCks
-JWVheA0KICAgIDNhYzg6ICAgICAgIDMxIGM5ICAgICAgICAgICAgICAgICAgIHhvciAgICAlZWN4
-LCVlY3gNCiAgICAzYWNhOiAgICAgICA0OCBjMSBlMCAwNCAgICAgICAgICAgICBzaGwgICAgJDB4
-NCwlcmF4DQogICAgM2FjZTogICAgICAgNDggMDMgNDMgMDggICAgICAgICAgICAgYWRkICAgIDB4
-OCglcmJ4KSwlcmF4DQogICAgM2FkMjogICAgICAgNDggODkgNDQgMjQgMDggICAgICAgICAgbW92
-ICAgICVyYXgsMHg4KCVyc3ApDQogICAgM2FkNzogICAgICAgOGIgNDQgMjQgNTAgICAgICAgICAg
-ICAgbW92ICAgIDB4NTAoJXJzcCksJWVheA0KICAgIDNhZGI6ICAgICAgIDg5IDA0IDI0ICAgICAg
-ICAgICAgICAgIG1vdiAgICAlZWF4LCglcnNwKQ0KICAgIDNhZGU6ICAgICAgIGU4IDRkIGY2IGZm
-IGZmICAgICAgICAgIGNhbGxxICAzMTMwIDx1ZHA0X2xpYl9sb29rdXAyPg0KICAgIDNhZTM6ICAg
-ICAgIGU5IDQ4IGZmIGZmIGZmICAgICAgICAgIGptcHEgICAzYTMwIDxfX3VkcDRfbGliX2xvb2t1
-cCsweGQwPg0KDQpUaGUgdHdvIGNvcGllcyBvZiB0aGUgaGFzaCBhcmUgcHJldHR5IG11Y2ggdGhl
-IHNhbWUuDQoNCglEYXZpZA0KDQotDQpSZWdpc3RlcmVkIEFkZHJlc3MgTGFrZXNpZGUsIEJyYW1s
-ZXkgUm9hZCwgTW91bnQgRmFybSwgTWlsdG9uIEtleW5lcywgTUsxIDFQVCwgVUsNClJlZ2lzdHJh
-dGlvbiBObzogMTM5NzM4NiAoV2FsZXMpDQo=
+On Wed, Jul 26, 2023 at 08:10:35AM +0200, Johannes Zink wrote:
+
+> Also on a side-note, "driver nonsense" sounds a bit harsh from someone
+> always insisting that one should not compensate for bad drivers in the
+> userspace stack and instead fixing driver and hardware issues in the kernel,
+> don't you think?
+
+Everything has its place.
+
+The proper place to account for delay asymmetries is in the user space
+configuration, for example in linuxptp you have
+
+       delayAsymmetry
+              The  time  difference in nanoseconds of the transmit and receive
+              paths. This value should be positive when  the  server-to-client
+              propagation  time  is  longer  and  negative when the client-to-
+              server time is longer. The default is 0 nanoseconds.
+
+       egressLatency
+              Specifies the  difference  in  nanoseconds  between  the  actual
+              transmission time at the reference plane and the reported trans‐
+              mit time stamp. This value will be added to egress  time  stamps
+              obtained from the hardware.  The default is 0.
+
+       ingressLatency
+              Specifies the difference in nanoseconds between the reported re‐
+              ceive  time  stamp  and  the  actual reception time at reference
+              plane. This value will be subtracted from  ingress  time  stamps
+              obtained from the hardware.  The default is 0.
+
+Trying to hard code those into the driver?  Good luck getting that
+right for everyone.
+
+BTW this driver is actually for an IP core used in many, many SoCs.
+
+How many _other_ SoCs did you test your patch on?
+
+Thanks,
+Richard
 
 
