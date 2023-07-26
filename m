@@ -1,96 +1,74 @@
-Return-Path: <netdev+bounces-21132-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21133-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0DCE37628CA
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 04:42:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 202A37628CE
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 04:45:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B1B87281162
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 02:41:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CFF3228144D
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 02:45:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D24421108;
-	Wed, 26 Jul 2023 02:41:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8199A1108;
+	Wed, 26 Jul 2023 02:44:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C73DB1101
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 02:41:57 +0000 (UTC)
-Received: from smtpbguseast3.qq.com (smtpbguseast3.qq.com [54.243.244.52])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DFB82691
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 19:41:52 -0700 (PDT)
-X-QQ-mid:Yeas44t1690339233t549t05954
-Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [183.128.134.159])
-X-QQ-SSF:00400000000000F0FQF000000000000
-From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
-X-BIZMAIL-ID: 3078516715268493991
-To: "'Andrew Lunn'" <andrew@lunn.ch>
-Cc: <netdev@vger.kernel.org>,
-	<hkallweit1@gmail.com>,
-	<linux@armlinux.org.uk>,
-	<Jose.Abreu@synopsys.com>,
-	<mengyuanlou@net-swift.com>
-References: <20230724102341.10401-1-jiawenwu@trustnetic.com> <20230724102341.10401-3-jiawenwu@trustnetic.com> <d745524b-b306-447e-afbe-8935286301e4@lunn.ch>
-In-Reply-To: <d745524b-b306-447e-afbe-8935286301e4@lunn.ch>
-Subject: RE: [PATCH net-next 2/7] net: pcs: xpcs: support to switch mode for Wangxun NICs
-Date: Wed, 26 Jul 2023 10:40:32 +0800
-Message-ID: <043201d9bf6a$8c700350$a55009f0$@trustnetic.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 133C31101
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 02:44:57 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4C196C433C8;
+	Wed, 26 Jul 2023 02:44:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1690339497;
+	bh=YQK1s5Ah4BQ7ozFO4P/+hVUk2JoiWuZleyroP09VLBk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ENq15mZUoUwGkmZtrJITxychCBYG8Juz2s2gaLWB9sx1CebUBThfrOhxhIGGJENpb
+	 mUjF5SwdYr+noEkvbmlUZlz8Wnok/8qeWTW5FHftg4RL5qJMBVk43++NSyw3xEfHQ5
+	 H9Mjd9Ujj3kZJww+qZpmtHtkHwARI7g+YZRCy1j9LoSAThWKZfdv3jjDucXyMXIWAs
+	 LHFod4bbpYRhkZDSiqSRWIbCikWFVG5UkbxI+CwmlQxkH9DFGNrpqlgiMJC0d7mfef
+	 bujTTS/vAlPx5P0RpSQgXtpgj8cZexpFZdlT1MuDBfhfQf90RyjjXC+JW1eq4Daf3z
+	 AiDm98skk9hog==
+Date: Tue, 25 Jul 2023 19:44:56 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: "mengyuanlou@net-swift.com" <mengyuanlou@net-swift.com>
+Cc: netdev@vger.kernel.org
+Subject: Re: [PATCH net-next 1/2] net: ngbe: add ncsi_enable flag for
+ wangxun nics
+Message-ID: <20230725194456.7832c02d@kernel.org>
+In-Reply-To: <6D0E96D7-CDF4-4889-831D-B83388035A2C@net-swift.com>
+References: <20230724092544.73531-1-mengyuanlou@net-swift.com>
+	<6E913AD9617D9BC9+20230724092544.73531-2-mengyuanlou@net-swift.com>
+	<20230725162234.1f26bfce@kernel.org>
+	<6D0E96D7-CDF4-4889-831D-B83388035A2C@net-swift.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-X-Mailer: Microsoft Outlook 16.0
-Thread-Index: AQJQc7ZImbL9NUPTrDJxH1gVz1U29QJ2Yj+YAXg6ZPquvnOBAA==
-Content-Language: zh-cn
-X-QQ-SENDSIZE: 520
-Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz5a-1
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,FROM_EXCESS_BASE64,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,UNPARSEABLE_RELAY
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Wednesday, July 26, 2023 1:32 AM, Andrew Lunn wrote:
-> > +static void txgbe_pma_config_10gbaser(struct dw_xpcs *xpcs)
-> > +{
-> > +	int val;
-> > +
-> > +	txgbe_write_pma(xpcs, TXGBE_MPLLA_CTL0, 0x21);
-> > +	txgbe_write_pma(xpcs, TXGBE_MPLLA_CTL3, 0);
-> > +	val = txgbe_read_pma(xpcs, TXGBE_TX_GENCTL1);
-> > +	val = u16_replace_bits(val, 0x5, TXGBE_TX_GENCTL1_VBOOST_LVL);
-> > +	txgbe_write_pma(xpcs, TXGBE_TX_GENCTL1, val);
-> > +	txgbe_write_pma(xpcs, TXGBE_MISC_CTL0, 0xCF00);
-> > +	txgbe_write_pma(xpcs, TXGBE_VCO_CAL_LD0, 0x549);
-> > +	txgbe_write_pma(xpcs, TXGBE_VCO_CAL_REF0, 0x29);
-> > +	txgbe_write_pma(xpcs, TXGBE_TX_RATE_CTL, 0);
-> > +	txgbe_write_pma(xpcs, TXGBE_RX_RATE_CTL, 0);
-> > +	txgbe_write_pma(xpcs, TXGBE_TX_GEN_CTL2, 0x300);
-> > +	txgbe_write_pma(xpcs, TXGBE_RX_GEN_CTL2, 0x300);
-> > +	txgbe_write_pma(xpcs, TXGBE_MPLLA_CTL2, 0x600);
-> > +
-> > +	txgbe_write_pma(xpcs, TXGBE_RX_EQ_CTL0, 0x45);
-> > +	val = txgbe_read_pma(xpcs, TXGBE_RX_EQ_ATTN_CTL);
-> > +	val &= ~TXGBE_RX_EQ_ATTN_LVL0;
-> > +	txgbe_write_pma(xpcs, TXGBE_RX_EQ_ATTN_CTL, val);
-> > +	txgbe_write_pma(xpcs, TXGBE_DFE_TAP_CTL0, 0xBE);
-> 
-> You have a lot of magic numbers above. Please truy to add some
-> #defines to try to explain what is going on here.
+On Wed, 26 Jul 2023 09:59:15 +0800 mengyuanlou@net-swift.com wrote:
+> > 2023=E5=B9=B47=E6=9C=8826=E6=97=A5 07:22=EF=BC=8CJakub Kicinski <kuba@k=
+ernel.org> =E5=86=99=E9=81=93=EF=BC=9A
+> > On Mon, 24 Jul 2023 17:24:58 +0800 Mengyuan Lou wrote: =20
+> >> + netdev->ncsi_enabled =3D wx->ncsi_hw_supported; =20
+> >=20
+> > I don't think that enabled and supported are the same thing.
+> > If server has multiple NICs or a NIC with multiple ports and
+> > BMC only uses one, or even none, we shouldn't keep the PHY up.
+> > By that logic 99% of server NICs should report NCSI as enabled.
+>=20
+> For a NIC with multiple ports, BMC switch connection for port0 to port1 o=
+nline,
+> Drivers can not know port1 should keep up, if do not set ncsi_enabled bef=
+ore.=20
 
-Some registers give only magic numbers in the fields, like a frequency,
-bandwidth, etc. And other fields are reserved. Those registers don't
-make much sense to define the bits field. But I'll try to add more
-useful defines.
-
-
-
+I'm not crystal clear on what you're saying. But BMC sends a enable
+command to the NIC to enable a channel (or some such). This is all
+handled by FW. The FW can tell the host that the NCSI is now active
+on port1 and not port0.
 
