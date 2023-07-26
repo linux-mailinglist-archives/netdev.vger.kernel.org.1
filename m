@@ -1,137 +1,91 @@
-Return-Path: <netdev+bounces-21434-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21435-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64D97763986
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 16:48:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2251C7639AF
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 16:57:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 913611C212BB
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 14:48:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B6BCA280A0D
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 14:57:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 487111DA3D;
-	Wed, 26 Jul 2023 14:48:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCC7B1DA44;
+	Wed, 26 Jul 2023 14:57:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D52C1DA2E
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 14:48:43 +0000 (UTC)
-Received: from mail-qt1-x833.google.com (mail-qt1-x833.google.com [IPv6:2607:f8b0:4864:20::833])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12A762136
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 07:48:41 -0700 (PDT)
-Received: by mail-qt1-x833.google.com with SMTP id d75a77b69052e-40540a8a3bbso289671cf.1
-        for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 07:48:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690382920; x=1690987720;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nd8rriezwX4e6SuyDOFseqPtwBlBV/Ir+7t5aixv67I=;
-        b=5ejaB5UXJ+x/mlJPap88JGhKeRKbpgA/NjAPGFU83QlaujazP/9IEAYAFxKaSzxBp7
-         0PU6jHx4gdhfYYYKmPUCWx3hSh7l1mxjAJkPAvlnElYt1mWO8j7yCySmdgzutngGeh2i
-         NjnO8GkpVzyWg15b9EZVJzy07lvLGZGHmj5KwV/o6kCY/HCZYxsQemAIzbEP/91CPIUA
-         UyXTk8pMwS/XSB1J4slfCIYXQW/MnDvsmR18pMHcW7F+ltbiizGup7bQ1o+rRA5CaRGE
-         3LhQonUwiWbc8z9fmNWNFc9FjmHkFzET2VRPFwvj8/uBtrFJjPJZNOdzTYW7Ddl+k47p
-         Lbog==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690382920; x=1690987720;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nd8rriezwX4e6SuyDOFseqPtwBlBV/Ir+7t5aixv67I=;
-        b=VLmPm4AP7YsL0vbXf/lGV2az+jJc3y6fvbmZb5CEZ0WrCLRYFIG3mVMLMgY9X9Tagk
-         4fHrlhOS3epcNn+1zd47imb27xLv2t5Ir9tM9j2Cr50NPoGjQLE/9N8ccggO//2OFcK1
-         lm5fcHta8DEm5jjiSKkRvIYSZIo42uP69JXO+dGt66UEF4jAKy/9wodF+kT9J2FNDaqN
-         ZE5wbvGv2IkSjwbcOICQfMxln4bgK8H3/6EyRftSgCiqr8S0PmXK4pouWICtrCKeOkDY
-         FSy3ztKn5doxQxre+X75wvuWL7jg+3YFrPgGbSZDoxSfM0gCFH95PpoML3URm5RPZVzM
-         NLWg==
-X-Gm-Message-State: ABy/qLZTskVFVO2gwNYMDwJRC3+BfrHHTkHk+QUnJUc8AqdbHfV02QSM
-	eWUz+e+oFS8GWRCiiGa3pJ2IjUDMYQdLcba2GNOcLQ==
-X-Google-Smtp-Source: APBJJlH+tnfOu04+RHW5TlWRsbO7bbD5HBFzvrTqhr/hct4tOIHo5FEwrFGrGDpIAhBJOeEZPH53sNVcxkpAHp5kgEA=
-X-Received: by 2002:a05:622a:118a:b0:403:aee3:64f7 with SMTP id
- m10-20020a05622a118a00b00403aee364f7mr570476qtk.6.1690382920004; Wed, 26 Jul
- 2023 07:48:40 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3B181DA20
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 14:57:29 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F74EC433C8;
+	Wed, 26 Jul 2023 14:57:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1690383449;
+	bh=09yaDu2ZHSle3u9MUr1zN0Bdn2NyfbsEWr96pnC5KVM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=e16fFLOQocOn0hQNv0wqtXk7sZMegNZBpyMN+a29kS2D3GxhDsjeK33HgpkgDSdHh
+	 pl2vwJ5vtVJvsygh0JGBrGrnsPAoqEobDzPOg0/XD6xmQuuJFvnsxesifyC8l8s4+Q
+	 kYvK3oiE6nOI3VNUTzQKBm8epKX0eOAUHeXYOyH+9zr9B3bGWP8rwVh2iOaPJLb9te
+	 9Xg/dJyiqBwdCwRZZqj+6Hn3G1AElNxabZ6jbG3phpoTNRwFM44kwnRQsvPRP6qaR+
+	 OFvxGUV0Drp5zxUsOxDCcMT35uazDifx9y4OXft4tg+TeSkrU6SBgMXlisJwkbZaAC
+	 NNJpyTzZdjp4w==
+Date: Wed, 26 Jul 2023 07:57:27 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Tariq Toukan <ttoukan.linux@gmail.com>
+Cc: David Howells <dhowells@redhat.com>, netdev@vger.kernel.org, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, Willem de Bruijn
+ <willemdebruijn.kernel@gmail.com>, David Ahern <dsahern@kernel.org>,
+ Matthew Wilcox <willy@infradead.org>, Al Viro <viro@zeniv.linux.org.uk>,
+ Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>, Jeff
+ Layton <jlayton@kernel.org>, Christian Brauner <brauner@kernel.org>, Chuck
+ Lever III <chuck.lever@oracle.com>, Linus Torvalds
+ <torvalds@linux-foundation.org>, linux-fsdevel@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-mm@kvack.org, Boris Pismenny
+ <borisp@nvidia.com>, John Fastabend <john.fastabend@gmail.com>, Gal
+ Pressman <gal@nvidia.com>, ranro@nvidia.com, samiram@nvidia.com,
+ drort@nvidia.com, Tariq Toukan <tariqt@nvidia.com>
+Subject: Re: [PATCH net-next v10 08/16] tls: Inline do_tcp_sendpages()
+Message-ID: <20230726075727.3ba654ff@kernel.org>
+In-Reply-To: <fed78210-4560-b655-b43a-bc31d1cfe1b8@gmail.com>
+References: <bbdce803-0f23-7d3f-f75a-2bc3cfb794af@gmail.com>
+	<ecbb5d7e-7238-28e2-1a17-686325e2bb50@gmail.com>
+	<4c49176f-147a-4283-f1b1-32aac7b4b996@gmail.com>
+	<20230522121125.2595254-1-dhowells@redhat.com>
+	<20230522121125.2595254-9-dhowells@redhat.com>
+	<2267272.1686150217@warthog.procyon.org.uk>
+	<5a9d4ffb-a569-3f60-6ac8-070ab5e5f5ad@gmail.com>
+	<776549.1687167344@warthog.procyon.org.uk>
+	<7337a904-231d-201d-397a-7bbe7cae929f@gmail.com>
+	<20230630102143.7deffc30@kernel.org>
+	<f0538006-6641-eaf6-b7b5-b3ef57afc652@gmail.com>
+	<20230705091914.5bee12f8@kernel.org>
+	<20418.1690368701@warthog.procyon.org.uk>
+	<fed78210-4560-b655-b43a-bc31d1cfe1b8@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <fbcaa54791cd44999de5fec7c6cf0b3c@AcuMS.aculab.com>
- <c45337a3d46641dc8c4c66bd49fb55b6@AcuMS.aculab.com> <CANn89iKTC29of9bkVKWcLv0W27JFvkub7fuBMeK_J3a3Q-B1Cg@mail.gmail.com>
- <fc241086b32944ecae4f467cb5b0c6c7@AcuMS.aculab.com> <CANn89iLRDpAmaJVYCf+-F7mTTVkxSJMKfxZ+QhB8ATzYEi4X8g@mail.gmail.com>
- <badeae889d4743fb8eb99b85d69b714a@AcuMS.aculab.com>
-In-Reply-To: <badeae889d4743fb8eb99b85d69b714a@AcuMS.aculab.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 26 Jul 2023 16:48:29 +0200
-Message-ID: <CANn89iKs7e71dCFnKr-3NM8N7BAfRUa0VrOLhYrATVR-DzgWqA@mail.gmail.com>
-Subject: Re: [PATCH 2/2] Rescan the hash2 list if the hash chains have got cross-linked.
-To: David Laight <David.Laight@aculab.com>
-Cc: "willemdebruijn.kernel@gmail.com" <willemdebruijn.kernel@gmail.com>, 
-	"davem@davemloft.net" <davem@davemloft.net>, "dsahern@kernel.org" <dsahern@kernel.org>, 
-	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jul 26, 2023 at 4:39=E2=80=AFPM David Laight <David.Laight@aculab.c=
-om> wrote:
->
-> From: Eric Dumazet
-> > Sent: 26 July 2023 15:22
-> ...
-> > Can you describe what user space operation is done by your precious app=
-lication,
-> > triggering a rehash in the first place ?
->
-> We've no idea what is causing the rehash.
-> There are a lot of sockets that are receiving RTP audio.
-> But they are only created, bound and then deleted.
->
-> The 'best guess' is something to do with ipsec tunnels
-> being created, deleted or rehashed.
->
-> >
-> > Maybe we can think of something less disruptive in the kernel.
-> > (For instance, you could have a second socket, insert it in the new buc=
-ket,
-> > then remove the old socket)
-> >
-> > > The problem is that a single 'port unreachable' can be treated
-> > > as a fatal error by the receiving application.
-> > > So you really don't want to be sending them.
-> >
-> > Well, if your application needs to run with old kernels, and or
-> > transient netfilter changes (some firewall setups do not use
-> > iptables-restore)
-> > better be more resilient to transient ICMP messages anyway.
->
-> This is being done for the specific pair of sockets that caused grief.
-> For this setup they were on 127.0.0.1 but that isn't always true.
-> But they would be expected to be on a local network.
->
-> Reading between the lines of the comment in ipv4/icmp.c
-> it is reasonable to assume that ICMP_PORT_UNREACH be treated
-> as a fatal error (ie not a transient one).
-> So really the Linux kernel ought to try quite hard to not
-> generate them when the port exists.
+On Wed, 26 Jul 2023 14:43:35 +0300 Tariq Toukan wrote:
+> >> We repro the issue on the server side using this client command:
+> >> $ wrk -b2.2.2.2 -t4 -c1000 -d5 --timeout 5s https://2.2.2.3:20443/256000b.img  
+> > 
+> > What's wrk?
+> > 
+> > David
+> >   
+> 
+> Pretty known and standard client app.
+> wrk - a HTTP benchmarking tool
+> https://github.com/wg/wrk
 
-Sure, then please add the synchronize_rcu() call, because it won't affect y=
-ou.
-
-You could add a probe to try to identify what is causing a rehash.
-
-perf probe -a udp_lib_rehash
-perf record -a -g -e probe:udp_lib_rehash sleep 60
-...
-perf script
+Let us know if your build has CONFIG_DEBUG_VM, please.
+Because in the old code the warning was gated by this config,
+so the bug may be older. We just started reporting it.
 
