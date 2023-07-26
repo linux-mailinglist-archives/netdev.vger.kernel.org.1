@@ -1,116 +1,232 @@
-Return-Path: <netdev+bounces-21247-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21235-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61FC5762FCF
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 10:27:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 556EB762F18
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 10:05:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 929CE1C2112B
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 08:27:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 86E3D1C21134
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 08:05:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5487EAD2F;
-	Wed, 26 Jul 2023 08:27:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68459A930;
+	Wed, 26 Jul 2023 08:05:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45EDC4C99
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 08:27:24 +0000 (UTC)
-X-Greylist: delayed 1424 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 26 Jul 2023 01:27:22 PDT
-Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [IPv6:2001:780:45:1d:225:90ff:fe52:c662])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76D9B5266;
-	Wed, 26 Jul 2023 01:27:22 -0700 (PDT)
-Received: from [46.222.121.5] (port=4658 helo=gnumonks.org)
-	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <pablo@gnumonks.org>)
-	id 1qOZUY-005FWq-Qp; Wed, 26 Jul 2023 10:03:33 +0200
-Date: Wed, 26 Jul 2023 10:03:28 +0200
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: Ian Kumlien <ian.kumlien@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	Linux Kernel Network Developers <netdev@vger.kernel.org>,
-	netfilter-devel@vger.kernel.org
-Subject: Re: Kernel oops with 6.4.4 - flow offloads - NULL pointer deref
-Message-ID: <ZMDTUHlPmns/85Kk@calendula>
-References: <CAA85sZsTF21va8HhwrJc_yuVgVU6+dppEd-SdQpDjqLNFtcneQ@mail.gmail.com>
- <20230724142415.03a9d133@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C4FEA92F
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 08:05:04 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF2768690
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 01:04:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1690358699;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=eAjNRIihSOf+ZWCQiGmuIak9rrS2S/b0k59m1Q9Sn58=;
+	b=cRkZK7VepVRwbsTDg6CbZaFtEhlzuJ0re7gqD8KHpEHXjkuj43EqFncvdDaMJjqaZP6XXx
+	WEOTZNwMOsbxXi7xepCRJms0nAxJMyC0TBo6pktCGSlFPJ/nj5RiJ1c7C1pCGL+YXqNTv+
+	snXrfw+XjXrNP8ZUZNbMvWdN4UlEEhM=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-646-EWpLa-Q-Pay9addQbh8-yQ-1; Wed, 26 Jul 2023 04:04:57 -0400
+X-MC-Unique: EWpLa-Q-Pay9addQbh8-yQ-1
+Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-51e278a3a2dso4910611a12.3
+        for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 01:04:56 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690358696; x=1690963496;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=eAjNRIihSOf+ZWCQiGmuIak9rrS2S/b0k59m1Q9Sn58=;
+        b=RB2SJ4iywmF7/UUbADmKKACU+1xqraFcI9onvhwk5n/T3fyf3BHeBHOs81dJrEWuNe
+         8cVU/2e3tejY+4gR6ofrwHBaFv0n+XL+cTS86Nyb0OK8MkMPqcc/Z89P7fEG15EpVt2u
+         mhaXZZsJxp2cu0u1dQh32flF9QSXKwICfgvJORVZG4f+9CFmPseLnTVQ4B3Mh1Cn5PoM
+         5hz1V2CgZcJVLxrrk+VVta4uS7tZR0V+wR1EygpEPZvkMVYRqpFDL9YtAKwJ2/vUSDpU
+         r8iszeiwbi7z4J16pCzbFmldrM3kjyBBfDo1rjGiGYWiC6uxAP04cyNe3QsbUQ8om1MK
+         6iNg==
+X-Gm-Message-State: ABy/qLbmY4pLMhGRK+ePyckQ+SSmBNH4SbAHxt7FCPo0V500AHe6tLou
+	F6+dyxigOLHYtE1Jj94BhnweGu2vwi+w4ERqllGcxd0PZhfxq2he/mjCTjKHlVkHT61T4KeOIXL
+	03zfZjPgHLr3H2c+a
+X-Received: by 2002:a05:6402:1489:b0:522:30cc:a1f0 with SMTP id e9-20020a056402148900b0052230cca1f0mr1048237edv.14.1690358696041;
+        Wed, 26 Jul 2023 01:04:56 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlH9cTC/+4nVrUrzuc8eu1ehgpHLqa3C+TMwtpTbgkUOYw+ZUE8Z5I+GDauZapCy0HXIvtSFdQ==
+X-Received: by 2002:a05:6402:1489:b0:522:30cc:a1f0 with SMTP id e9-20020a056402148900b0052230cca1f0mr1048219edv.14.1690358695716;
+        Wed, 26 Jul 2023 01:04:55 -0700 (PDT)
+Received: from sgarzare-redhat ([5.77.111.137])
+        by smtp.gmail.com with ESMTPSA id f5-20020a056402068500b0051ded17b30bsm8479399edy.40.2023.07.26.01.04.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 Jul 2023 01:04:55 -0700 (PDT)
+Date: Wed, 26 Jul 2023 10:04:51 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Bobby Eshleman <bobby.eshleman@bytedance.com>, kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kernel@sberdevices.ru, 
+	oxffffaa@gmail.com
+Subject: Re: [PATCH net-next v3 4/4] vsock/test: MSG_PEEK test for
+ SOCK_SEQPACKET
+Message-ID: <fbyxkuf3z3grrwnj6riwy4fki47yqfrdplhmcsd4ye3ga7apsk@5zeiorqk6uaz>
+References: <20230725172912.1659970-1-AVKrasnov@sberdevices.ru>
+ <20230725172912.1659970-5-AVKrasnov@sberdevices.ru>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20230724142415.03a9d133@kernel.org>
-X-Spam-Score: -1.9 (-)
-X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+In-Reply-To: <20230725172912.1659970-5-AVKrasnov@sberdevices.ru>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi,
-
-On Mon, Jul 24, 2023 at 02:24:15PM -0700, Jakub Kicinski wrote:
-> Adding netfilter to CC.
+On Tue, Jul 25, 2023 at 08:29:12PM +0300, Arseniy Krasnov wrote:
+>This adds MSG_PEEK test for SOCK_SEQPACKET. It works in the same way as
+>SOCK_STREAM test, except it also tests MSG_TRUNC flag.
 >
-> On Sun, 23 Jul 2023 16:44:50 +0200 Ian Kumlien wrote:
-> > Running vanilla 6.4.4 with cherry picked:
-> > https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?h=v6.4.5&id=7a59f29961cf97b98b02acaadf5a0b1f8dde938c
-> >
-[...]
-> > [108431.305700] RSP: 0018:ffffac250ade7e28 EFLAGS: 00010206
-> > [108431.311107] RAX: 0000000000000081 RBX: ffff9ebc413b42f8 RCX:
-> > 0000000000000001
-> > [108431.318420] RDX: 00000001067200c0 RSI: ffff9ebeda71ce58 RDI:
-> > ffff9ebeda71ce58
-> > [108431.325735] RBP: ffff9ebc413b4250 R08: ffff9ebc413b4250 R09:
-> > ffff9ebe3d7fad58
-> > [108431.333068] R10: 0000000000000000 R11: 0000000000000003 R12:
-> > ffff9ebfafab0000
-> > [108431.340415] R13: 0000000000000000 R14: ffff9ebfafab0005 R15:
-> > ffff9ebd79a0f780
-> > [108431.347764] FS:  0000000000000000(0000) GS:ffff9ebfafa80000(0000)
-> > knlGS:0000000000000000
-> > [108431.356069] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > [108431.362012] CR2: 0000000000000081 CR3: 000000045e99e000 CR4:
-> > 00000000003526e0
-> > [108431.369361] Call Trace:
-> > [108431.371999]  <TASK>
-> > [108431.374296] ? __die (arch/x86/kernel/dumpstack.c:421
-> > arch/x86/kernel/dumpstack.c:434)
-> > [108431.377553] ? page_fault_oops (arch/x86/mm/fault.c:707)
-> > [108431.381850] ? load_balance (kernel/sched/fair.c:10926)
-> > [108431.385884] ? exc_page_fault (arch/x86/mm/fault.c:1279
-> > arch/x86/mm/fault.c:1486 arch/x86/mm/fault.c:1542)
-> > [108431.390094] ? asm_exc_page_fault (./arch/x86/include/asm/idtentry.h:570)
-> > [108431.394482] ? flow_offload_teardown
-> > (./arch/x86/include/asm/bitops.h:75
-> > ./include/asm-generic/bitops/instrumented-atomic.h:42
-> > net/netfilter/nf_flow_table_core.c:362)
-> > [108431.399036] nf_flow_offload_gc_step
-> > (./arch/x86/include/asm/bitops.h:207
-> > ./arch/x86/include/asm/bitops.h:239
-> > ./include/asm-generic/bitops/instrumented-non-atomic.h:142
-> > net/netfilter/nf_flow_table_core.c:436)
+>Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+>---
+> tools/testing/vsock/vsock_test.c | 58 +++++++++++++++++++++++++++++---
+> 1 file changed, 54 insertions(+), 4 deletions(-)
 
-This crash points here.
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 
-static void nf_flow_offload_gc_step(struct nf_flowtable *flow_table,
-                                    struct flow_offload *flow, void *data)
-{
-        if (nf_flow_has_expired(flow) ||
-            nf_ct_is_dying(flow->ct) ||
-            nf_flow_is_outdated(flow))
-                flow_offload_teardown(flow);
+Thanks,
+Stefano
 
-        if (test_bit(NF_FLOW_TEARDOWN, &flow->flags)) { <--
+>
+>diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
+>index 444a3ff0681f..90718c2fd4ea 100644
+>--- a/tools/testing/vsock/vsock_test.c
+>+++ b/tools/testing/vsock/vsock_test.c
+>@@ -257,14 +257,19 @@ static void test_stream_multiconn_server(const struct test_opts *opts)
+>
+> #define MSG_PEEK_BUF_LEN 64
+>
+>-static void test_stream_msg_peek_client(const struct test_opts *opts)
+>+static void test_msg_peek_client(const struct test_opts *opts,
+>+				 bool seqpacket)
+> {
+> 	unsigned char buf[MSG_PEEK_BUF_LEN];
+> 	ssize_t send_size;
+> 	int fd;
+> 	int i;
+>
+>-	fd = vsock_stream_connect(opts->peer_cid, 1234);
+>+	if (seqpacket)
+>+		fd = vsock_seqpacket_connect(opts->peer_cid, 1234);
+>+	else
+>+		fd = vsock_stream_connect(opts->peer_cid, 1234);
+>+
+> 	if (fd < 0) {
+> 		perror("connect");
+> 		exit(EXIT_FAILURE);
+>@@ -290,7 +295,8 @@ static void test_stream_msg_peek_client(const struct test_opts *opts)
+> 	close(fd);
+> }
+>
+>-static void test_stream_msg_peek_server(const struct test_opts *opts)
+>+static void test_msg_peek_server(const struct test_opts *opts,
+>+				 bool seqpacket)
+> {
+> 	unsigned char buf_half[MSG_PEEK_BUF_LEN / 2];
+> 	unsigned char buf_normal[MSG_PEEK_BUF_LEN];
+>@@ -298,7 +304,11 @@ static void test_stream_msg_peek_server(const struct test_opts *opts)
+> 	ssize_t res;
+> 	int fd;
+>
+>-	fd = vsock_stream_accept(VMADDR_CID_ANY, 1234, NULL);
+>+	if (seqpacket)
+>+		fd = vsock_seqpacket_accept(VMADDR_CID_ANY, 1234, NULL);
+>+	else
+>+		fd = vsock_stream_accept(VMADDR_CID_ANY, 1234, NULL);
+>+
+> 	if (fd < 0) {
+> 		perror("accept");
+> 		exit(EXIT_FAILURE);
+>@@ -340,6 +350,21 @@ static void test_stream_msg_peek_server(const struct test_opts *opts)
+> 		exit(EXIT_FAILURE);
+> 	}
+>
+>+	if (seqpacket) {
+>+		/* This type of socket supports MSG_TRUNC flag,
+>+		 * so check it with MSG_PEEK. We must get length
+>+		 * of the message.
+>+		 */
+>+		res = recv(fd, buf_half, sizeof(buf_half), MSG_PEEK |
+>+			   MSG_TRUNC);
+>+		if (res != sizeof(buf_peek)) {
+>+			fprintf(stderr,
+>+				"recv(2) + MSG_PEEK | MSG_TRUNC, exp %zu, got %zi\n",
+>+				sizeof(buf_half), res);
+>+			exit(EXIT_FAILURE);
+>+		}
+>+	}
+>+
+> 	res = recv(fd, buf_normal, sizeof(buf_normal), 0);
+> 	if (res != sizeof(buf_normal)) {
+> 		fprintf(stderr, "recv(2), expected %zu, got %zi\n",
+>@@ -356,6 +381,16 @@ static void test_stream_msg_peek_server(const struct test_opts *opts)
+> 	close(fd);
+> }
+>
+>+static void test_stream_msg_peek_client(const struct test_opts *opts)
+>+{
+>+	return test_msg_peek_client(opts, false);
+>+}
+>+
+>+static void test_stream_msg_peek_server(const struct test_opts *opts)
+>+{
+>+	return test_msg_peek_server(opts, false);
+>+}
+>+
+> #define SOCK_BUF_SIZE (2 * 1024 * 1024)
+> #define MAX_MSG_SIZE (32 * 1024)
+>
+>@@ -1125,6 +1160,16 @@ static void test_stream_virtio_skb_merge_server(const struct test_opts *opts)
+> 	close(fd);
+> }
+>
+>+static void test_seqpacket_msg_peek_client(const struct test_opts *opts)
+>+{
+>+	return test_msg_peek_client(opts, true);
+>+}
+>+
+>+static void test_seqpacket_msg_peek_server(const struct test_opts *opts)
+>+{
+>+	return test_msg_peek_server(opts, true);
+>+}
+>+
+> static struct test_case test_cases[] = {
+> 	{
+> 		.name = "SOCK_STREAM connection reset",
+>@@ -1200,6 +1245,11 @@ static struct test_case test_cases[] = {
+> 		.run_client = test_stream_virtio_skb_merge_client,
+> 		.run_server = test_stream_virtio_skb_merge_server,
+> 	},
+>+	{
+>+		.name = "SOCK_SEQPACKET MSG_PEEK",
+>+		.run_client = test_seqpacket_msg_peek_client,
+>+		.run_server = test_seqpacket_msg_peek_server,
+>+	},
+> 	{},
+> };
+>
+>-- 
+>2.25.1
+>
 
-Is this always reproducible on your testbed?
-
-Thanks.
 
