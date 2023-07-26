@@ -1,226 +1,209 @@
-Return-Path: <netdev+bounces-21437-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21438-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 485957639C6
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 17:00:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 49C9D7639CC
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 17:01:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6D663281E4A
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 15:00:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 036E8281EB0
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 15:01:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 590D01DA47;
-	Wed, 26 Jul 2023 15:00:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BE0B1DA47;
+	Wed, 26 Jul 2023 15:01:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44EB11DA3E
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 15:00:55 +0000 (UTC)
-Received: from EUR01-VE1-obe.outbound.protection.outlook.com (mail-ve1eur01on2049.outbound.protection.outlook.com [40.107.14.49])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49995CE
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 08:00:52 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=VCfoOPvCMrNNcuBktvN1xK3pgfnh4RCSP72MKHkcguMnKPAhNNgIHPFO/SddolvmB8NzEPthJi/csocwDdinjf6MEUySxPQ2GxarYqvly9qxf1xZDP4vY9b0sbfShoauWkVAuDwVEfENc4wtjP+bYas2vpWUdyWWq+AJmW28ouuu0TLRBQJMvPU1VBdcI5UVbgmbQuSjRuXlmCnTvAXzp9xfEdosJ9NVwNPztxhOqRx+qkx5Avj8hF0DWIS55FSxZHZydNESdd7ko2/WXjpnzCqt+8gvm/xFYbboKANcCnr8e+m3m2fuCLYR0wBhYqjHj2MXN760G9sYKpV4QhKfmg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=BwS0P9AFgb4pxb8y6ZAQZa3OS+wndRrVVkyZKDpnMLY=;
- b=F7UY0ailveSBDQNnpgQSalltJ+duYy0TO4B5sZaU8euNS7jDzTOTRz3qxXYph6L5Y3uGU1+SZhzP24Orl2HMHNG3dr2gliBmWlURH0/RDB5KcWmm90X5b1AEr1U0IfjNPjmxVibdVr6WAZpgNATNH/pDMQjaW+w6LnCwjr/6sXBUsiu7R7xhwBEVsvNEEF4L5oZZCF6yrXzK2GI7R6PouIRtONgIcIeSTz8igWB4ho9QjKSDgbsI5W4oBJC+tFyRFZpd6qrRKdHMHy4KWQ8l47ZYpKGcXWX4MuxMEUuIU4chx+f3iVW8piGYuA1gKahi/qF4bblrRPLEqzpj4wJfRw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=BwS0P9AFgb4pxb8y6ZAQZa3OS+wndRrVVkyZKDpnMLY=;
- b=NW5r4XIf1DBGaqvDNvJixnOGqPCQukPJaXYGZb776RBVdFAB+ypeRHyVkPFMkPtkBKT0gRphuJwW1yTteWiPYv4pMSHJ5quxAg9OUQhjeM7cnrr7LnXnq1vxqxaA4hdciuvJN9MoI2ERtBfOb+ID3C5M8WJGAjGB1Q9hJ3gsMLQ=
-Received: from PAXPR04MB9185.eurprd04.prod.outlook.com (2603:10a6:102:231::11)
- by PAWPR04MB9888.eurprd04.prod.outlook.com (2603:10a6:102:385::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.29; Wed, 26 Jul
- 2023 15:00:49 +0000
-Received: from PAXPR04MB9185.eurprd04.prod.outlook.com
- ([fe80::d4ee:8daa:92f4:9671]) by PAXPR04MB9185.eurprd04.prod.outlook.com
- ([fe80::d4ee:8daa:92f4:9671%3]) with mapi id 15.20.6631.026; Wed, 26 Jul 2023
- 15:00:49 +0000
-From: Shenwei Wang <shenwei.wang@nxp.com>
-To: Russell King <linux@armlinux.org.uk>
-CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, Shawn Guo
-	<shawnguo@kernel.org>, dl-linux-imx <linux-imx@nxp.com>, Giuseppe Cavallaro
-	<peppe.cavallaro@st.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>, Sascha Hauer <s.hauer@pengutronix.de>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>, Fabio Estevam
-	<festevam@gmail.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-stm32@st-md-mailman.stormreply.com"
-	<linux-stm32@st-md-mailman.stormreply.com>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "imx@lists.linux.dev"
-	<imx@lists.linux.dev>, Frank Li <frank.li@nxp.com>
-Subject: RE: [EXT] Re: [PATCH] net: stmmac: dwmac-imx: pause the TXC clock in
- fixed-link
-Thread-Topic: [EXT] Re: [PATCH] net: stmmac: dwmac-imx: pause the TXC clock in
- fixed-link
-Thread-Index: AQHZvzEtwr0cB5x9EUCXrQC85+we9K/K+NqAgAEqaxA=
-Date: Wed, 26 Jul 2023 15:00:49 +0000
-Message-ID:
- <PAXPR04MB91857EA7A0CECF71F961DC0B8900A@PAXPR04MB9185.eurprd04.prod.outlook.com>
-References: <20230725194931.1989102-1-shenwei.wang@nxp.com>
- <ZMA45XUMM94GTjHx@shell.armlinux.org.uk>
-In-Reply-To: <ZMA45XUMM94GTjHx@shell.armlinux.org.uk>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PAXPR04MB9185:EE_|PAWPR04MB9888:EE_
-x-ms-office365-filtering-correlation-id: f4c93cd3-3b03-46b5-f1de-08db8de91934
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- iLAPyuaamXlZHmdBV9MENcxo8b0nRcxP8ud3e4Pa4WVj1z+G0UZmHAp+pvAAXPmb4Ul1Og4Y9SZAJnfrvgGbKYtTes5etyeE9WpP1I3lqMI2HgrhTdlsnxA7Ad05cITdCFSymnxnTeNYFldtioXpG/Q6uCrvcIkkMYr7BqV7ULK/A7ERjDIE8otA1k/TpmviagwMol2V55W1jW7+WVZ4jzMVO9Gi/4YXDYcXQXJerbi/Kv7xTFJAhREFR8WI4BBYv4HCpmtSSaG0uZqeksq5LDOhU7L6LOr1wfW+GaOibVd7xIVgKA/bZd3hxx7lEZMk1HjhKtm/s+Nr3jcIjojPw986onjOCtgHHJNsgBqLDunWIoJk+L2ZoXtaD+jRsQpesjuyl/T4RU8Q/i8RupkAaQsIzGVdPr4E/BNxRn+5HmM2n/vbkVqgefuVHGhXzwRqL4chBBw0M98jcRApMqKKyTNCxV6sPBq/HtZ/dn8C9CVQfhwZTNR26nSYztHnbgRfGFNGAHlYXtOc4jfL+q04XFEdpAzemjBeLXSg9weWIcdufQMsZ+3q03IKnus1xdDInYrgrW6CFcydNDiuPsY7apFflNFbbrUoVdqb2PiSa60=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB9185.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(346002)(376002)(396003)(136003)(366004)(451199021)(2906002)(122000001)(54906003)(52536014)(7696005)(71200400001)(45080400002)(5660300002)(478600001)(8936002)(8676002)(44832011)(64756008)(38070700005)(66446008)(66556008)(76116006)(66476007)(66946007)(6916009)(4326008)(316002)(55016003)(7416002)(38100700002)(41300700001)(55236004)(53546011)(26005)(6506007)(33656002)(186003)(86362001)(83380400001)(966005)(9686003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?uX5xaqRCqOHnkNRofSxpvCHG+MO2NIH0gnew1lPvf94M4IIxvswUb/L2rmHJ?=
- =?us-ascii?Q?jvksyR2NYGtitIttRcUigfxH99ZJODSKDafqsgGsRRpBGPSeTZ4XkDKkxVb7?=
- =?us-ascii?Q?I9SccDhL3GrlJad+cgvmOCTsykhXgt8H/xtBOWy2Ckz76Sn1Q8ECBURpvEpl?=
- =?us-ascii?Q?r960zYBuSgNURlrY9UZE5f9o0p2nMfHZAXMRrCjfdjXomSVta523IdGSLs1E?=
- =?us-ascii?Q?I3Qe4aFIp81nyYwxTwGMKloy0LA9bbsLPq4mD5hmmN8TIr6HFuohOQTjhDK3?=
- =?us-ascii?Q?M3IGAaTIhsUZpEnqBMxPr+xEJCARwFmr9Wg1jQoJS9r5/3fdrqB3KngH96Kq?=
- =?us-ascii?Q?cuFA5W2niCX4+lLSiDv5JNLYX6djcR4s2aeJTPTkHMR6+L5/1fk2nI+nH8B3?=
- =?us-ascii?Q?eqDk6s+k241vu8p5IXSPA/fyiYRiVr+x7y5Pcc2h3nIe29h9naZ54e+TYMnH?=
- =?us-ascii?Q?x2jt4XUreISUvTkjKxe0TwlRhn1E6E5ZOad/O2Oaqmwsqt2TtAOshsQsPurU?=
- =?us-ascii?Q?0w0RJVQ61/OInO/pyqoaxk3s9A7znkoaR8xvsMIFD1WxMzug+5zbRPw8dOug?=
- =?us-ascii?Q?CJcc6rbordxF4Qu/vm4chB3CJJTXh/2E1XSfcM5lRlT5Q1m9srr7qvMeFmQv?=
- =?us-ascii?Q?gpuaMGehdYykLxGFC+rI8uQbrpGJP680yL0NSmn0CNRQgaX1XprQsJ0+nUKR?=
- =?us-ascii?Q?0uxM23m5rR6itWsS0e/l/WFBftdHs+fznrkhOQ6DcON/w4JMeZEDl3hE+LkS?=
- =?us-ascii?Q?OjJuOqOW6TTLOlaslTNkL0INZEUN6Awv/93yhyepjnL4NDsituDTMbAjCxaz?=
- =?us-ascii?Q?jhSWo2q9QhYXKOc2YlYqukzT/z2PVLvMNQUuEwVk1aGgi/PR8oOcbg448oYK?=
- =?us-ascii?Q?QBhxvOmtxMuFJviYv8xr7nZhBdpdEehvjuXa2J2+oTZaRJ9LeCeKZ0bk6/m+?=
- =?us-ascii?Q?CzX8Xaqo66egZXA1n9RK2fYzziG/awSfwpj7fZWbk++70o3jHb8Erqd/6zVU?=
- =?us-ascii?Q?BFn87/0UBwCm9yD+C1BBDi9GEojdlSsHFLOl7bWYzRWEzoxxb7CKZ5cBKuUV?=
- =?us-ascii?Q?nn24yo99PGTDl9z1a7SKcP8cH+qqegZfNDUxUKRKvd2HMLwc3Eui0kcVNm6A?=
- =?us-ascii?Q?Zh1M+fJTifDnjISNBwhrrANdiuiG/M3DJLfCtm7Zs/gahM4B52mYlLI/4dzg?=
- =?us-ascii?Q?HTgRhSrJ/bXT5aiNTC0RwKwqnaw0s4KyLf2JDRxNJCj/IS3/N3rXCQelWsv7?=
- =?us-ascii?Q?Q0cx1RILfh/snxM+gibinxnAqF7k1QuNbH+G+DNj/ge+hsUaqkkydzolubpQ?=
- =?us-ascii?Q?lSRH/jajuEuekXKIDJrGfI36Z6NEa9cbjK1l1bhcHOkO/VaGxt4LgCxb31yp?=
- =?us-ascii?Q?/lOLhQDGGznMGiioMyuLvdMeYMX3BUDO9nux7UjrglRQXTXTiwNUDxsfUSoV?=
- =?us-ascii?Q?3TOLm1a1MyEAoJ65Ox+s9qV28fJXV0XxltU3QrdTDPmJhU09ATOR+8s0Rkug?=
- =?us-ascii?Q?Sd9w5syjqtppZmpJ+c27p7PSTyfRFjD1uGnkkdIfz/+WRWumX2T+OhgoI+Cj?=
- =?us-ascii?Q?Z4SM7DJRwZN1TZqBI/BvvvtayhB0FiTCdO5WeZfi?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8803DC134
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 15:01:10 +0000 (UTC)
+Received: from mail-wr1-x434.google.com (mail-wr1-x434.google.com [IPv6:2a00:1450:4864:20::434])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7AC931FDD
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 08:01:06 -0700 (PDT)
+Received: by mail-wr1-x434.google.com with SMTP id ffacd0b85a97d-317716a4622so1380050f8f.1
+        for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 08:01:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1690383665; x=1690988465;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=7zM+YG+vsWbtMUD6XdWA2JUgtaWQiytdCsuMze1m6/k=;
+        b=xN+/DtpXH07sL2bRF9VUZv/uyejUHbIwAWXONp9i6bShF/IthrYdyTZLT21dJM/qr8
+         I5ew8CLX5YeZDjgGUd0yCTtM771EB4OKUZjDuYcLHEaWfVdyDLZGq/VJCmjTyislOOH7
+         /bdLpRikQFGNfjB9iskGIEUSrPpeNj2QJIV9AGMxkZ1jJVqVEtpT9G2eBVLNr+aJGdEj
+         1eTC3DrbPKi9DAuK/CaO6tyHt6309JGswVakuEOJv5B2n9LzhB8lGoll4rZFuKDZc+Jj
+         6zJ1a1mF6OY1s5ZHeY+fsVt7T9UdyA65pK+Zijy+e6VHka5DD7sHx0yTUV0npYpashkR
+         8RrA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690383665; x=1690988465;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7zM+YG+vsWbtMUD6XdWA2JUgtaWQiytdCsuMze1m6/k=;
+        b=jt7aj5JQp4d7mlK6g9aoUJ/CGwLwXUyU5KJr7vl94G/UbCnXABhvhvyre3cgtciE9s
+         ElJgvFClAjefdPF6fTnrJn3CZF5xql++wWdHATefR9Qo0/70F/hxIlmHLBI7F8KA6vso
+         CSzWQ5CmiyUS9KXcGkJM5gNpMTXB7Z2ZDye/GOOQ72W9PnGMw0G5N0T52y+AX0S5yAVi
+         3xFHDzFYxg/ex3GdNzBJT1xaCRKYjwAQIsJNtWkX6BaEfgcWsf6FICQ8m2OLbpI4EIHg
+         vsgWayehE0Tf8u4Fw1HTXB4pUlPYQtPkL0Q9JH1PI+9g/YtjBCDK8dlPc8Ei5l7A92Gh
+         ruCQ==
+X-Gm-Message-State: ABy/qLbbAljzNR00kKxZuE0YAnwrlWHsY7BFI7+bMGSeg/E0weUKTfc3
+	V/QdmBIs+Uon1mPInp8nzh0F6g==
+X-Google-Smtp-Source: APBJJlEaZJPaPa+6TPkoJHqPWeFXbl2DaYbcmbJ8WCzC3KLHfm3d4h9pKWO+0VMCv16cBZiIKuONVw==
+X-Received: by 2002:adf:f786:0:b0:317:49e9:c57 with SMTP id q6-20020adff786000000b0031749e90c57mr1591410wrp.43.1690383664792;
+        Wed, 26 Jul 2023 08:01:04 -0700 (PDT)
+Received: from localhost ([102.36.222.112])
+        by smtp.gmail.com with ESMTPSA id o20-20020a5d58d4000000b0031433443265sm20096799wrf.53.2023.07.26.08.01.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 Jul 2023 08:01:03 -0700 (PDT)
+Date: Wed, 26 Jul 2023 18:01:00 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Yan Zhai <yan@cloudflare.com>
+Cc: bpf@vger.kernel.org, Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
+	Yonghong Song <yhs@fb.com>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, kernel-team@cloudflare.com,
+	Jordan Griege <jgriege@cloudflare.com>,
+	Markus Elfring <Markus.Elfring@web.de>,
+	Jakub Sitnicki <jakub@cloudflare.com>
+Subject: Re: [PATCH v4 bpf 1/2] bpf: fix skb_do_redirect return values
+Message-ID: <bc3ec02d-4d4e-477a-b8a5-5245425326c6@kadam.mountain>
+References: <cover.1690332693.git.yan@cloudflare.com>
+ <e5d05e56bf41de82f10d33229b8a8f6b49290e98.1690332693.git.yan@cloudflare.com>
+ <a76b300a-e472-4568-b734-37115927621d@moroto.mountain>
+ <ZMEqYOOBc1ZNcEER@debian.debian>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB9185.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f4c93cd3-3b03-46b5-f1de-08db8de91934
-X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Jul 2023 15:00:49.2435
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: T5N5zoqjy9b8V6fzkFFetFqX6a1PiHDsh8QKscl4UYt7vCD0sDaPJ5ZMQf/PEMbq4hNtAvQObDBOSOtakMF7KA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAWPR04MB9888
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZMEqYOOBc1ZNcEER@debian.debian>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+On Wed, Jul 26, 2023 at 07:14:56AM -0700, Yan Zhai wrote:
+> On Wed, Jul 26, 2023 at 04:39:08PM +0300, Dan Carpenter wrote:
+> > I'm not positive I understand the code in ip_finish_output2().  I think
+> > instead of looking for LWTUNNEL_XMIT_DONE it should instead look for
+> > != LWTUNNEL_XMIT_CONTINUE.  It's unfortunate that NET_XMIT_DROP and
+> > LWTUNNEL_XMIT_CONTINUE are the both 0x1.  Why don't we just change that
+> > instead?
+> > 
+> I considered about changing lwt side logic. But it would bring larger
+> impact since there are multiple types of encaps on this hook, not just
+> bpf redirect. Changing bpf return values is a minimum change on the
+> other hand. In addition, returning value of NET_RX_DROP and
+> NET_XMIT_CN are the same, so if we don't do something in bpf redirect,
+> there is no way to distinguish them later: the former is considered as
+> an error, while "CN" is considered as non-error.
 
+Uh, NET_RX/XMIT_DROP values are 1.  NET_XMIT_CN is 2.
 
-> -----Original Message-----
-> From: Russell King <linux@armlinux.org.uk>
-> Sent: Tuesday, July 25, 2023 4:05 PM
-> To: Shenwei Wang <shenwei.wang@nxp.com>
-> Cc: David S. Miller <davem@davemloft.net>; Eric Dumazet
-> <edumazet@google.com>; Jakub Kicinski <kuba@kernel.org>; Paolo Abeni
-> <pabeni@redhat.com>; Maxime Coquelin <mcoquelin.stm32@gmail.com>;
-> Shawn Guo <shawnguo@kernel.org>; dl-linux-imx <linux-imx@nxp.com>;
-> Giuseppe Cavallaro <peppe.cavallaro@st.com>; Alexandre Torgue
-> <alexandre.torgue@foss.st.com>; Jose Abreu <joabreu@synopsys.com>; Sascha
-> Hauer <s.hauer@pengutronix.de>; Pengutronix Kernel Team
-> <kernel@pengutronix.de>; Fabio Estevam <festevam@gmail.com>;
-> netdev@vger.kernel.org; linux-stm32@st-md-mailman.stormreply.com; linux-
-> arm-kernel@lists.infradead.org; imx@lists.linux.dev; Frank Li <frank.li@n=
-xp.com>
-> Subject: [EXT] Re: [PATCH] net: stmmac: dwmac-imx: pause the TXC clock in
-> fixed-link
->
-> Caution: This is an external email. Please take care when clicking links =
-or
-> opening attachments. When in doubt, report the message using the 'Report =
-this
-> email' button
->
->
-> On Tue, Jul 25, 2023 at 02:49:31PM -0500, Shenwei Wang wrote:
-> > +static bool imx_dwmac_is_fixed_link(struct imx_priv_data *dwmac) {
-> > +     struct plat_stmmacenet_data *plat_dat;
-> > +     struct device_node *dn;
+I'm not an expert but I think what happens is that we treat NET_XMIT_CN
+as success so that it takes a while for the resend to happen.
+Eventually the TCP layer will detect it as a dropped packet.
+
+> 
+> > Also there seems to be a leak in lwtunnel_xmit().  Should that return
+> > LWTUNNEL_XMIT_CONTINUE or should it call kfree_skb() before returning?
+> > 
+> > Something like the following?
+> > 
+> > diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+> > index 11652e464f5d..375790b672bc 100644
+> > --- a/include/linux/netdevice.h
+> > +++ b/include/linux/netdevice.h
+> > @@ -112,6 +112,9 @@ void netdev_sw_irq_coalesce_default_on(struct net_device *dev);
+> >  #define NET_XMIT_CN		0x02	/* congestion notification	*/
+> >  #define NET_XMIT_MASK		0x0f	/* qdisc flags in net/sch_generic.h */
+> >  
+> > +#define LWTUNNEL_XMIT_DONE NET_XMIT_SUCCESS
+> > +#define LWTUNNEL_XMIT_CONTINUE 0x3
 > > +
-> > +     if (!dwmac || !dwmac->plat_dat)
-> > +             return false;
-> > +
-> > +     plat_dat =3D dwmac->plat_dat;
-> > +     dn =3D of_get_child_by_name(dwmac->dev->of_node, "fixed-link");
-> > +     if (!dn)
-> > +             return false;
-> > +
-> > +     if (plat_dat->phy_node =3D=3D dn || plat_dat->phylink_node =3D=3D=
- dn)
-> > +             return true;
->
-> Why would the phy_node or the phylink_node ever be pointing at the fixed-=
-link
-> node?
->
+> >  /* NET_XMIT_CN is special. It does not guarantee that this packet is lost. It
+> >   * indicates that the device will soon be dropping packets, or already drops
+> >   * some packets of the same priority; prompting us to send less aggressively. */
+> > diff --git a/include/net/lwtunnel.h b/include/net/lwtunnel.h
+> > index 6f15e6fa154e..8ab032ee04d0 100644
+> > --- a/include/net/lwtunnel.h
+> > +++ b/include/net/lwtunnel.h
+> > @@ -16,12 +16,6 @@
+> >  #define LWTUNNEL_STATE_INPUT_REDIRECT	BIT(1)
+> >  #define LWTUNNEL_STATE_XMIT_REDIRECT	BIT(2)
+> >  
+> > -enum {
+> > -	LWTUNNEL_XMIT_DONE,
+> > -	LWTUNNEL_XMIT_CONTINUE,
+> > -};
+> > -
+> > -
+> >  struct lwtunnel_state {
+> >  	__u16		type;
+> >  	__u16		flags;
+> > diff --git a/net/core/lwtunnel.c b/net/core/lwtunnel.c
+> > index 711cd3b4347a..732415d1287d 100644
+> > --- a/net/core/lwtunnel.c
+> > +++ b/net/core/lwtunnel.c
+> > @@ -371,7 +371,7 @@ int lwtunnel_xmit(struct sk_buff *skb)
+> >  
+> >  	if (lwtstate->type == LWTUNNEL_ENCAP_NONE ||
+> >  	    lwtstate->type > LWTUNNEL_ENCAP_MAX)
+> > -		return 0;
+> > +		return LWTUNNEL_XMIT_CONTINUE;
+> 
+> You are correct this path would leak skb. Return continue (or drop)
+> would avoid the leak. Personally I'd prefer drop instead to signal the
+> error setup. Since this is a separate issue, do you want to send a
+> separate patch on this? Or I am happy to do it if you prefer.
+> 
 
-The logic was learned from the function of stmmac_probe_config_dt, and it n=
-ormally
-save the phy handle to those two members: phy_node and phylink_node. But se=
-ems
-checking phy_node is enough here, right?
+I don't know which makes sense so I'll leave that up to you.
 
-        plat->phy_node =3D of_parse_phandle(np, "phy-handle", 0);
+> >  
+> >  	ret = -EOPNOTSUPP;
+> >  	rcu_read_lock();
+> > diff --git a/net/ipv4/ip_output.c b/net/ipv4/ip_output.c
+> > index 6e70839257f7..4be50a211b14 100644
+> > --- a/net/ipv4/ip_output.c
+> > +++ b/net/ipv4/ip_output.c
+> > @@ -216,7 +216,7 @@ static int ip_finish_output2(struct net *net, struct sock *sk, struct sk_buff *s
+> >  	if (lwtunnel_xmit_redirect(dst->lwtstate)) {
+> >  		int res = lwtunnel_xmit(skb);
+> >  
+> > -		if (res < 0 || res == LWTUNNEL_XMIT_DONE)
+> > +		if (res != LWTUNNEL_XMIT_CONTINUE)
+> >  			return res;
+> 
+> Unfortunately we cannot return res directly here when res > 0. This is
+> the final reason why I didn't patch here. Return values here can be
+> propagated back to sendmsg syscall, so returning a positive value
+> would break the syscall convention.
 
-        /* PHYLINK automatically parses the phy-handle property */
-        plat->phylink_node =3D np;
+The neigh_output() function is going to return NET_XMIT_DROP so this
+already happens.  Is that not what we want to happen?
 
-> For one, phylink expects the fwnode being passed to it to be pointing at =
-the
-> _parent_ node of the fixed-link node, since it looks up from the parent f=
-or
-> "fixed-link" node.
->
+I guess my concern is that eventually people will eventually new
+introduce bugs.  Fixing incorrect error codes is something that I do
+several times per week.  :P
 
-Yes,  the above line of code passes the parent node to phylink_node.
+regards,
+dan carpenter
 
-Thanks,
-Shenwei
 
-> --
-> RMK's Patch system:
-> https://www.ar/
-> mlinux.org.uk%2Fdeveloper%2Fpatches%2F&data=3D05%7C01%7Cshenwei.wang
-> %40nxp.com%7Cd5a4b8372a4a4e5092b008db8d52c6ce%7C686ea1d3bc2b4c6f
-> a92cd99c5c301635%7C0%7C0%7C638259158876867949%7CUnknown%7CTWF
-> pbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6
-> Mn0%3D%7C3000%7C%7C%7C&sdata=3DXPNpTlv7jbmOfeiQL5w0A6M2c3p5AOiT
-> UOGg73ijFb8%3D&reserved=3D0
-> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
