@@ -1,82 +1,80 @@
-Return-Path: <netdev+bounces-21519-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21520-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 935B2763C8B
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 18:32:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C7853763C98
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 18:36:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 40BC128201F
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 16:32:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8262628207A
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 16:36:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99FA4EA8;
-	Wed, 26 Jul 2023 16:32:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEB2418036;
+	Wed, 26 Jul 2023 16:36:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F0FA18024
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 16:32:04 +0000 (UTC)
-Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AB1F269E;
-	Wed, 26 Jul 2023 09:32:03 -0700 (PDT)
-Received: by mail-wm1-x32c.google.com with SMTP id 5b1f17b1804b1-3fbc63c2e84so71144925e9.3;
-        Wed, 26 Jul 2023 09:32:03 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C02591802C
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 16:36:33 +0000 (UTC)
+Received: from mail-wr1-x434.google.com (mail-wr1-x434.google.com [IPv6:2a00:1450:4864:20::434])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3587C2719
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 09:36:25 -0700 (PDT)
+Received: by mail-wr1-x434.google.com with SMTP id ffacd0b85a97d-3175d5ca8dbso3273263f8f.2
+        for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 09:36:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690389122; x=1690993922;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=tjPMb9HkbGw8tTyajg7c43jaFapql171y86o5wmOzBc=;
-        b=i8nLO/Svs8W9bsskGYQos6XO8qAO77J7FTAbvitLedxNiCuYkhan+NpOXxpecunaj3
-         rL/28meURqT/Cr4qBwsp7morWkSsyqZGRhqSa148JhhNL3h16PEizsVS8EZh2xJ4nSnm
-         Mns76R9u/czKHJ+qrcwpl60gopwTU3NPO56A+CLCcavpWYqBGwbukE08Ro0TrfT7WtVu
-         DNlz+v4WILDBBgbpptPPPLohM2MigKmSzqtiZx5p2U1jM3fqlSPOcgPaERZRq137ViXz
-         fZCoYQbxhr7X1dsMsdLgyL6ebqzdRgHM8qfLTfzbhUsODZ2zRes5CwhscOAtamzD5DoU
-         RAIA==
+        d=gmail.com; s=20221208; t=1690389383; x=1690994183;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=DeMoIBacfZeO68llFeOo9CIYM1efZwsrZVJHhcPHv/E=;
+        b=dMp1braHn+bifqhnb8MvIg4xpun/tHE53Pob4oCM57BDb1GElSpGCZl6dPe+DDcmhW
+         eXPBgDgjkQ4aegRNCkgt+H1ROXoHVZ9Vv7ZlMHQYWfSjpRNrqbLVKspz1/TrizD0Z0xR
+         M+F0Hks3yPLzt5Sz+OfJBsSBMuLwzF+HkPweHabp9RPJNeWTOJKqEDt7MWwX6Z0tjSef
+         GWdagRZ4VfdHCeX40N0/fLe0Si83ScBF+DBxqI1XEUOYA0CDW35KmKZAcftNp2RmZv5F
+         WMEA/T0zEsq8KNjwKVjz60h08kr2jp1MbbMl9/slWeVBYG2A4m+u8Dwy5/VVBfRigyW0
+         hHpQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690389122; x=1690993922;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=tjPMb9HkbGw8tTyajg7c43jaFapql171y86o5wmOzBc=;
-        b=MqGbWDr7VnuN5PnXA9W4/M8mW28nG9H8EUolz87d3IYjIHmwb17WQ9eDlosHiBC5D+
-         TYA4BNWBH8qD3Y4zk+7O95hN8B7EiB7ub4wH7kcc50PRdqWo2bVVLhczp0jtq8wMfuik
-         kbJpaiCcpYeEdPOYndQXF0vpSvj/RCWRxpm7nX4JeFOjpH5z7Ipq/cBHbkpeweJIlj9n
-         AW7a4aDkJfacOPWUaYYHcb/1FP/+N9TnmE1iCMtqYW+CbmiKwZkb0qEnFIwLnULaFOnK
-         m1LD1k0KbMhN0HNUGSLmeU4oVPjbVxHtXyaj/mt5ap6F38ol9/5ExGgzgyvt+lY2dRG+
-         PAyA==
-X-Gm-Message-State: ABy/qLaLdgGW9rtB6/GGlY1PNgynDq1OtN/ekw4oLChcgd4+iR6LFfoP
-	76I+YWERi1jIF07umwa7HD4=
-X-Google-Smtp-Source: APBJJlE/4DBmZ/C4HcUl8ceh4QCbZN09IERbJ2EaO1wfE/YP8sE9KJmVC4EHYm1G8MzJLqOeRE/GMQ==
-X-Received: by 2002:a05:600c:20d4:b0:3fb:b67b:7f15 with SMTP id y20-20020a05600c20d400b003fbb67b7f15mr2040587wmm.21.1690389121401;
-        Wed, 26 Jul 2023 09:32:01 -0700 (PDT)
-Received: from localhost (p200300e41f1bd600f22f74fffe1f3a53.dip0.t-ipconnect.de. [2003:e4:1f1b:d600:f22f:74ff:fe1f:3a53])
-        by smtp.gmail.com with ESMTPSA id o20-20020a05600c511400b003f7f475c3bcsm11205528wms.1.2023.07.26.09.32.01
+        d=1e100.net; s=20221208; t=1690389383; x=1690994183;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DeMoIBacfZeO68llFeOo9CIYM1efZwsrZVJHhcPHv/E=;
+        b=ft0NkorZmMcI05jyQqfrGKsHZtIRqBytmATEj3MxwgouGQCncxR7hUCYA70RmYozvD
+         CnMOV1uQ0TUNWu0I2r84Wuxuy52j6AGfFaCye+ULbSUDh9xPqeo1nddufnCejX0GlwN9
+         dj5krLlHoM6oeBiUU4ijm0MazWR3UYUgHhL630m/YySwS1gGmfTa1djoRjhq5XMY6TT0
+         Tfdil+dtDicAqosqd5n/Ii35o+3X2Nn3q6YCQkN1Q1O7Pig/eC4l2iXUlR1iuB5Qjl44
+         uJMz6pDQjwYMEnlL+cBBRBZspd24cQeHBDjLNu1P5Mf/VI6HTqKlhojeI4mmdqf9ECWg
+         uLzQ==
+X-Gm-Message-State: ABy/qLZzjTZblDL94bKLVJMTO8FVbIm8yN7UiOvtwiITnM562gCrIr9E
+	R/6qUFRJILCXk/7SNQY1+EM=
+X-Google-Smtp-Source: APBJJlH4B5HfZyaQIOYA2bWOz6gwawak+G1f3dyV3rlYO5mD508Osa5tbKi5vH3FS3PlTD4ZNATMLw==
+X-Received: by 2002:a5d:6591:0:b0:314:1f1e:3a85 with SMTP id q17-20020a5d6591000000b003141f1e3a85mr1594595wru.61.1690389383406;
+        Wed, 26 Jul 2023 09:36:23 -0700 (PDT)
+Received: from skbuf ([188.25.175.105])
+        by smtp.gmail.com with ESMTPSA id h18-20020a5d5492000000b003142e438e8csm20256163wrv.26.2023.07.26.09.36.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Jul 2023 09:32:01 -0700 (PDT)
-From: Thierry Reding <thierry.reding@gmail.com>
-To: Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S . Miller" <davem@davemloft.net>,
+        Wed, 26 Jul 2023 09:36:23 -0700 (PDT)
+Date: Wed, 26 Jul 2023 19:36:20 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Jon Hunter <jonathanh@nvidia.com>,
-	netdev@vger.kernel.org,
-	linux-tegra@vger.kernel.org
-Subject: [PATCH] net: stmmac: tegra: Properly allocate clock bulk data
-Date: Wed, 26 Jul 2023 18:32:00 +0200
-Message-ID: <20230726163200.2138394-1-thierry.reding@gmail.com>
-X-Mailer: git-send-email 2.41.0
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, Sergei Antonov <saproj@gmail.com>
+Subject: Re: [PATCH net] net: dsa: fix older DSA drivers using phylink
+Message-ID: <20230726163620.2vda2noig7wwk3jo@skbuf>
+References: <E1qOflM-001AEz-D3@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <E1qOflM-001AEz-D3@rmk-PC.armlinux.org.uk>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
 	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
@@ -84,32 +82,50 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Thierry Reding <treding@nvidia.com>
+On Wed, Jul 26, 2023 at 03:45:16PM +0100, Russell King (Oracle) wrote:
+> Older DSA drivers that do not provide an dsa_ops adjust_link method end
+> up using phylink. Unfortunately, a recent phylink change that requires
+> its supported_interfaces bitmap to be filled breaks these drivers
+> because the bitmap remains empty.
+> 
+> Rather than fixing each driver individually, fix it in the core code so
+> we have a sensible set of defaults.
+> 
+> Reported-by: Sergei Antonov <saproj@gmail.com>
+> Fixes: de5c9bf40c45 ("net: phylink: require supported_interfaces to be filled")
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> ---
 
-The clock data is an array of struct clk_bulk_data, so make sure to
-allocate enough memory.
+Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
+Tested-by: Vladimir Oltean <olteanv@gmail.com> # dsa_loop
 
-Fixes: d8ca113724e7 ("net: stmmac: tegra: Add MGBE support")
-Signed-off-by: Thierry Reding <treding@nvidia.com>
----
- drivers/net/ethernet/stmicro/stmmac/dwmac-tegra.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Thanks!
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-tegra.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-tegra.c
-index 99e2e5a5cd60..78a492b91bc6 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-tegra.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-tegra.c
-@@ -234,7 +234,8 @@ static int tegra_mgbe_probe(struct platform_device *pdev)
- 	res.addr = mgbe->regs;
- 	res.irq = irq;
- 
--	mgbe->clks = devm_kzalloc(&pdev->dev, sizeof(*mgbe->clks), GFP_KERNEL);
-+	mgbe->clks = devm_kcalloc(&pdev->dev, ARRAY_SIZE(mgbe_clks),
-+				  sizeof(*mgbe->clks), GFP_KERNEL);
- 	if (!mgbe->clks)
- 		return -ENOMEM;
- 
--- 
-2.41.0
-
+>  net/dsa/port.c | 9 ++++++++-
+>  1 file changed, 8 insertions(+), 1 deletion(-)
+> 
+> diff --git a/net/dsa/port.c b/net/dsa/port.c
+> index 0ce8fd311c78..2f6195d7b741 100644
+> --- a/net/dsa/port.c
+> +++ b/net/dsa/port.c
+> @@ -1727,8 +1727,15 @@ int dsa_port_phylink_create(struct dsa_port *dp)
+>  	    ds->ops->phylink_mac_an_restart)
+>  		dp->pl_config.legacy_pre_march2020 = true;
+>  
+> -	if (ds->ops->phylink_get_caps)
+> +	if (ds->ops->phylink_get_caps) {
+>  		ds->ops->phylink_get_caps(ds, dp->index, &dp->pl_config);
+> +	} else {
+> +		/* For legacy drivers */
+> +		__set_bit(PHY_INTERFACE_MODE_INTERNAL,
+> +			  dp->pl_config.supported_interfaces);
+> +		__set_bit(PHY_INTERFACE_MODE_GMII,
+> +			  dp->pl_config.supported_interfaces);
+> +	}
+>  
+>  	pl = phylink_create(&dp->pl_config, of_fwnode_handle(dp->dn),
+>  			    mode, &dsa_port_phylink_mac_ops);
+> -- 
+> 2.30.2
+> 
 
