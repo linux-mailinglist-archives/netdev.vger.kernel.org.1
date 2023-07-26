@@ -1,72 +1,51 @@
-Return-Path: <netdev+bounces-21549-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21550-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E22F6763E21
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 20:05:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68D3D763E37
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 20:15:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A72FD1C212CF
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 18:05:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 233EA281E52
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 18:15:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 703A418048;
-	Wed, 26 Jul 2023 18:05:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B6B71804C;
+	Wed, 26 Jul 2023 18:15:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62C881AA65
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 18:05:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3AC31AA65
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 18:15:47 +0000 (UTC)
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 520801FF5;
-	Wed, 26 Jul 2023 11:05:49 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB7B52D44;
+	Wed, 26 Jul 2023 11:15:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
 	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
 	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=fUdSbyMasri59LIxUKfjb5lu5YYJqsniF6+eeDt322Q=; b=DFkN7+kcpB7N73mFnnGHkptntF
-	MyxL56OIeohRI14G30XsmKj0s3vmZhE/AD7bJh8knddWtfQsfV3VeSz0D9bcumOq1hsMyngu9HgYQ
-	GL/niposaUkJBmS7Pkw5Kn0Tx6qPabY8YIQTrb0ue7SCCbqteV8F2Uy7/HHgVXPIUQuy4nFAONt9a
-	RhZRWNladuq/dGYVRt/HbTKLGLUVnfyYOcp8FtDkB6mlEwOApP1ObsVm+CPTD2MrzCtVc7WVlQ24w
-	D/eCeHDxQ3fB3lMWtwityCNHoHCkGCgolBBRmBQ4kjPm4WwOB92HuOuwvip8ulOpRb0+WJRPIgmvD
-	NKK9pRhA==;
+	bh=x97cDGBfbbYgCu4TNBD9kXaxFG/QZ+f5W68FlyrkZcE=; b=Q2VKv6oQ6oHWzZEFcT0SsIsfBn
+	oD6MQPzRS5vQQlGWM5+zSeNvcE6Xyd37XYO3CpHLWgeAwlRVV6of7bh40pq3z2rmFr3UWJ6opyss6
+	5xmm07nFq4G84pv8yjwZTMUuua6sDDICAkKq2lvbSUsQ8mOMZ7KpxXAfIaq39fe5+m47fdqJu2CMK
+	Tn2RWeUgMz0lSjQj5z6W5UmOFQNclWFYFpEQl55xY6r9/NC6S8Lf4bxH+ZzMJCWJ7XdeF8SSHrPK6
+	pyiUI2TwB4IZx2YDr6NiJ87nWWbeqHbZMhA0LbGJ0A3u9k8VMwpSlTaE+uKN8QlK0tnYPithCoPM8
+	ROqfp5UQ==;
 Received: from mcgrof by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-	id 1qOit2-00BF7a-29;
-	Wed, 26 Jul 2023 18:05:24 +0000
-Date: Wed, 26 Jul 2023 11:05:24 -0700
+	id 1qOj2y-00BG7X-34;
+	Wed, 26 Jul 2023 18:15:40 +0000
+Date: Wed, 26 Jul 2023 11:15:40 -0700
 From: Luis Chamberlain <mcgrof@kernel.org>
 To: Joel Granados <j.granados@samsung.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexander Aring <alex.aring@gmail.com>,
-	Stefan Schmidt <stefan@datenfreihafen.org>,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Matthieu Baerts <matthieu.baerts@tessares.net>,
-	Mat Martineau <martineau@kernel.org>,
-	Santosh Shilimkar <santosh.shilimkar@oracle.com>,
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
-	Xin Long <lucien.xin@gmail.com>,
-	Karsten Graul <kgraul@linux.ibm.com>,
-	Wenjia Zhang <wenjia@linux.ibm.com>,
-	Jan Karcher <jaka@linux.ibm.com>, willy@infradead.org,
-	keescook@chromium.org, josh@joshtriplett.org,
-	"D. Wythe" <alibuda@linux.alibaba.com>,
-	Tony Lu <tonylu@linux.alibaba.com>,
-	Wen Gu <guwen@linux.alibaba.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-wpan@vger.kernel.org,
-	mptcp@lists.linux.dev, linux-rdma@vger.kernel.org,
-	rds-devel@oss.oracle.com, linux-sctp@vger.kernel.org,
-	linux-s390@vger.kernel.org
-Subject: Re: [PATCH 11/14] networking: Update to register_net_sysctl_sz
-Message-ID: <ZMFgZHsnhrXNIQ53@bombadil.infradead.org>
-References: <20230726140635.2059334-1-j.granados@samsung.com>
- <CGME20230726140709eucas1p2033d64aec69a1962fd7e64c57ad60adc@eucas1p2.samsung.com>
- <20230726140635.2059334-12-j.granados@samsung.com>
+Cc: Kees Cook <keescook@chromium.org>, Iurii Zaikin <yzaikin@google.com>,
+	willy@infradead.org, josh@joshtriplett.org,
+	linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH 00/14] sysctl: Add a size argument to register functions
+ in sysctl
+Message-ID: <ZMFizKFkVxUFtSqa@bombadil.infradead.org>
+References: <CGME20230726140648eucas1p29a92c80fb28550e2087cd0ae190d29bd@eucas1p2.samsung.com>
+ <20230726140635.2059334-1-j.granados@samsung.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,7 +54,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230726140635.2059334-12-j.granados@samsung.com>
+In-Reply-To: <20230726140635.2059334-1-j.granados@samsung.com>
 Sender: Luis Chamberlain <mcgrof@infradead.org>
 X-Spam-Status: No, score=-4.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_EF,HEADER_FROM_DIFFERENT_DOMAINS,
@@ -84,67 +63,58 @@ X-Spam-Status: No, score=-4.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Jul 26, 2023 at 04:06:31PM +0200, Joel Granados wrote:
-> This is part of the effort to remove the sentinel (last empty) element
-> from the ctl_table arrays. We update to the new function and pass it the
-> array size. Care is taken to mirror the NULL assignments with a size of
-> zero (for the unprivileged users). An additional size function was added
-> to the following files in order to calculate the size of an array that
-> is defined in another file:
->     include/net/ipv6.h
->     net/ipv6/icmp.c
->     net/ipv6/route.c
->     net/ipv6/sysctl_net_ipv6.c
-> 
+On Wed, Jul 26, 2023 at 04:06:20PM +0200, Joel Granados wrote:
+> What?
+> These commits set things up so we can start removing the sentinel elements.
 
-Same here as with the other patches, the "why" and size impact should go here.
-I'll skip mentioning that in the other patches.
+Yes but the why must explained right away.
 
-> diff --git a/net/mpls/af_mpls.c b/net/mpls/af_mpls.c
-> index bf6e81d56263..5bad14b3c71e 100644
-> --- a/net/mpls/af_mpls.c
-> +++ b/net/mpls/af_mpls.c
-> @@ -1396,6 +1396,40 @@ static const struct ctl_table mpls_dev_table[] = {
->  	{ }
->  };
->  
-> +static int mpls_platform_labels(struct ctl_table *table, int write,
-> +				void *buffer, size_t *lenp, loff_t *ppos);
-> +#define MPLS_NS_SYSCTL_OFFSET(field)		\
-> +	(&((struct net *)0)->field)
-> +
-> +static const struct ctl_table mpls_table[] = {
-> +	{
-> +		.procname	= "platform_labels",
-> +		.data		= NULL,
-> +		.maxlen		= sizeof(int),
-> +		.mode		= 0644,
-> +		.proc_handler	= mpls_platform_labels,
-> +	},
-> +	{
-> +		.procname	= "ip_ttl_propagate",
-> +		.data		= MPLS_NS_SYSCTL_OFFSET(mpls.ip_ttl_propagate),
-> +		.maxlen		= sizeof(int),
-> +		.mode		= 0644,
-> +		.proc_handler	= proc_dointvec_minmax,
-> +		.extra1		= SYSCTL_ZERO,
-> +		.extra2		= SYSCTL_ONE,
-> +	},
-> +	{
-> +		.procname	= "default_ttl",
-> +		.data		= MPLS_NS_SYSCTL_OFFSET(mpls.default_ttl),
-> +		.maxlen		= sizeof(int),
-> +		.mode		= 0644,
-> +		.proc_handler	= proc_dointvec_minmax,
-> +		.extra1		= SYSCTL_ONE,
-> +		.extra2		= &ttl_max,
-> +	},
-> +	{ }
-> +};
+> Why?
+> This is part of the push to trim down kernel/sysctl.c by moving the large array
+> that was causing merge conflicts. 
 
-Unless we hear otherwise from networking folks, I think this move alone
-should probably go as a separate patch with no functional changes to
-make the changes easier to review / bisect.
+Let me elaborate on that:
+
+While the move moving over time of array elements out of kernel/sysctl.c
+to their own place helps merge conflicts this patch set does not help
+with that in and of itself, what it does is help make sure the move of
+sysctls to their own files does not bloat the kernel more, and in fact
+helps reduce the overall build time size of the kernel and run time
+memory consumed by the kernel by about ~64 bytes per array.
+
+Without this patch set each time we moved a set of sysctls out of
+kernel/sysctl.c to its own subsystem we'd have to add a new sentinel
+element (an empty sysctl entry), and while that helps clean up
+kernel/sysctl.c to avoid merge conflicts, it also bloats the kernel
+by about 64 bytes on average each time.
+
+We can do better. We can make those moves *not* have a size penalty, and
+all around also reduce the build / run time of the kernel.
+
+*This* is the why, that if we don't do this the cleanup of
+kernel/sysctl.c ends up slowly bloating the kernel. Willy had
+suggested we instead remove the sentinel so that each move does not
+incur a size penalty, but also that in turn reduces the size of the
+kernel at build time / run time by a ballpark about ~64 bytes per
+array.
+
+Then the following is more details about estimates of overall size
+savings, it's not miscellaneous information at all, it's very relevant
+information to this patch set.
+
+> Misc:
+> A consequence of eventually removing all the sentinels (64 bytes per sentinel)
+> is the bytes we save. Here I include numbers for when all sentinels are removed
+> to contextualize this chunk
+>   * bloat-o-meter:
+>     The "yesall" configuration results save 9158 bytes (you can see the output here
+>     https://lore.kernel.org/all/20230621091000.424843-1-j.granados@samsung.com/.
+>     The "tiny" configuration + CONFIG_SYSCTL save 1215 bytes (you can see the
+>     output here [2])
+>   * memory usage:
+>     As we no longer need the sentinel element within proc_sysctl.c, we save some
+>     bytes in main memory as well. In my testing kernel I measured a difference of
+>     6720 bytes. I include the way to measure this in [1]
 
   Luis
 
