@@ -1,113 +1,137 @@
-Return-Path: <netdev+bounces-21433-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21434-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0B4E763978
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 16:45:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64D97763986
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 16:48:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9C4D1281F34
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 14:45:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 913611C212BB
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 14:48:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C77EF1DA3B;
-	Wed, 26 Jul 2023 14:45:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 487111DA3D;
+	Wed, 26 Jul 2023 14:48:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBE811DA27
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 14:45:27 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (unknown [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40A121BF2
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 07:45:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:Reply-To:Content-ID
-	:Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:
-	Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=j31ms1ChU/V/xRNailWaZ1oO2kKqhcW/c4es6Q2G9Pw=; b=Yydm/1swu2tuOg4uAYCVL3vTUq
-	4+r0x/KoCSEDHHSqlzOgtI6naa6x0/+2G9x4Zc0mOAwuN+ZpAh0RomCXm7XFPW/6/gqhpW3hNGQPb
-	pCT/AXqHcwLM6JxGjHMcKWvoj6sOQGH+Jrk3oXEteNuXWBEbZaJKJgNXDGgzOA9j3O3VBC6+8zldq
-	+qAfNw7YsEMzpeNJd/csfevR73m291D9hbhtix1aKYwmLaRSpVsKa+cqwMO0HnId07Ho3e3UZeSOc
-	mjopMv0Qqn+5U4Md6lP3cspXLtTt9Pazidpsl5tKJvWY31Naftr2kq7V7vZVbd0+nOeliANH8bBlP
-	sx29MOsQ==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:33758 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1qOflM-0004Y7-1C;
-	Wed, 26 Jul 2023 15:45:16 +0100
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1qOflM-001AEz-D3; Wed, 26 Jul 2023 15:45:16 +0100
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Subject: [PATCH net] net: dsa: fix older DSA drivers using phylink
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D52C1DA2E
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 14:48:43 +0000 (UTC)
+Received: from mail-qt1-x833.google.com (mail-qt1-x833.google.com [IPv6:2607:f8b0:4864:20::833])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12A762136
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 07:48:41 -0700 (PDT)
+Received: by mail-qt1-x833.google.com with SMTP id d75a77b69052e-40540a8a3bbso289671cf.1
+        for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 07:48:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1690382920; x=1690987720;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nd8rriezwX4e6SuyDOFseqPtwBlBV/Ir+7t5aixv67I=;
+        b=5ejaB5UXJ+x/mlJPap88JGhKeRKbpgA/NjAPGFU83QlaujazP/9IEAYAFxKaSzxBp7
+         0PU6jHx4gdhfYYYKmPUCWx3hSh7l1mxjAJkPAvlnElYt1mWO8j7yCySmdgzutngGeh2i
+         NjnO8GkpVzyWg15b9EZVJzy07lvLGZGHmj5KwV/o6kCY/HCZYxsQemAIzbEP/91CPIUA
+         UyXTk8pMwS/XSB1J4slfCIYXQW/MnDvsmR18pMHcW7F+ltbiizGup7bQ1o+rRA5CaRGE
+         3LhQonUwiWbc8z9fmNWNFc9FjmHkFzET2VRPFwvj8/uBtrFJjPJZNOdzTYW7Ddl+k47p
+         Lbog==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690382920; x=1690987720;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=nd8rriezwX4e6SuyDOFseqPtwBlBV/Ir+7t5aixv67I=;
+        b=VLmPm4AP7YsL0vbXf/lGV2az+jJc3y6fvbmZb5CEZ0WrCLRYFIG3mVMLMgY9X9Tagk
+         4fHrlhOS3epcNn+1zd47imb27xLv2t5Ir9tM9j2Cr50NPoGjQLE/9N8ccggO//2OFcK1
+         lm5fcHta8DEm5jjiSKkRvIYSZIo42uP69JXO+dGt66UEF4jAKy/9wodF+kT9J2FNDaqN
+         ZE5wbvGv2IkSjwbcOICQfMxln4bgK8H3/6EyRftSgCiqr8S0PmXK4pouWICtrCKeOkDY
+         FSy3ztKn5doxQxre+X75wvuWL7jg+3YFrPgGbSZDoxSfM0gCFH95PpoML3URm5RPZVzM
+         NLWg==
+X-Gm-Message-State: ABy/qLZTskVFVO2gwNYMDwJRC3+BfrHHTkHk+QUnJUc8AqdbHfV02QSM
+	eWUz+e+oFS8GWRCiiGa3pJ2IjUDMYQdLcba2GNOcLQ==
+X-Google-Smtp-Source: APBJJlH+tnfOu04+RHW5TlWRsbO7bbD5HBFzvrTqhr/hct4tOIHo5FEwrFGrGDpIAhBJOeEZPH53sNVcxkpAHp5kgEA=
+X-Received: by 2002:a05:622a:118a:b0:403:aee3:64f7 with SMTP id
+ m10-20020a05622a118a00b00403aee364f7mr570476qtk.6.1690382920004; Wed, 26 Jul
+ 2023 07:48:40 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1qOflM-001AEz-D3@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Wed, 26 Jul 2023 15:45:16 +0100
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,RDNS_NONE,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+References: <fbcaa54791cd44999de5fec7c6cf0b3c@AcuMS.aculab.com>
+ <c45337a3d46641dc8c4c66bd49fb55b6@AcuMS.aculab.com> <CANn89iKTC29of9bkVKWcLv0W27JFvkub7fuBMeK_J3a3Q-B1Cg@mail.gmail.com>
+ <fc241086b32944ecae4f467cb5b0c6c7@AcuMS.aculab.com> <CANn89iLRDpAmaJVYCf+-F7mTTVkxSJMKfxZ+QhB8ATzYEi4X8g@mail.gmail.com>
+ <badeae889d4743fb8eb99b85d69b714a@AcuMS.aculab.com>
+In-Reply-To: <badeae889d4743fb8eb99b85d69b714a@AcuMS.aculab.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 26 Jul 2023 16:48:29 +0200
+Message-ID: <CANn89iKs7e71dCFnKr-3NM8N7BAfRUa0VrOLhYrATVR-DzgWqA@mail.gmail.com>
+Subject: Re: [PATCH 2/2] Rescan the hash2 list if the hash chains have got cross-linked.
+To: David Laight <David.Laight@aculab.com>
+Cc: "willemdebruijn.kernel@gmail.com" <willemdebruijn.kernel@gmail.com>, 
+	"davem@davemloft.net" <davem@davemloft.net>, "dsahern@kernel.org" <dsahern@kernel.org>, 
+	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Older DSA drivers that do not provide an dsa_ops adjust_link method end
-up using phylink. Unfortunately, a recent phylink change that requires
-its supported_interfaces bitmap to be filled breaks these drivers
-because the bitmap remains empty.
+On Wed, Jul 26, 2023 at 4:39=E2=80=AFPM David Laight <David.Laight@aculab.c=
+om> wrote:
+>
+> From: Eric Dumazet
+> > Sent: 26 July 2023 15:22
+> ...
+> > Can you describe what user space operation is done by your precious app=
+lication,
+> > triggering a rehash in the first place ?
+>
+> We've no idea what is causing the rehash.
+> There are a lot of sockets that are receiving RTP audio.
+> But they are only created, bound and then deleted.
+>
+> The 'best guess' is something to do with ipsec tunnels
+> being created, deleted or rehashed.
+>
+> >
+> > Maybe we can think of something less disruptive in the kernel.
+> > (For instance, you could have a second socket, insert it in the new buc=
+ket,
+> > then remove the old socket)
+> >
+> > > The problem is that a single 'port unreachable' can be treated
+> > > as a fatal error by the receiving application.
+> > > So you really don't want to be sending them.
+> >
+> > Well, if your application needs to run with old kernels, and or
+> > transient netfilter changes (some firewall setups do not use
+> > iptables-restore)
+> > better be more resilient to transient ICMP messages anyway.
+>
+> This is being done for the specific pair of sockets that caused grief.
+> For this setup they were on 127.0.0.1 but that isn't always true.
+> But they would be expected to be on a local network.
+>
+> Reading between the lines of the comment in ipv4/icmp.c
+> it is reasonable to assume that ICMP_PORT_UNREACH be treated
+> as a fatal error (ie not a transient one).
+> So really the Linux kernel ought to try quite hard to not
+> generate them when the port exists.
 
-Rather than fixing each driver individually, fix it in the core code so
-we have a sensible set of defaults.
+Sure, then please add the synchronize_rcu() call, because it won't affect y=
+ou.
 
-Reported-by: Sergei Antonov <saproj@gmail.com>
-Fixes: de5c9bf40c45 ("net: phylink: require supported_interfaces to be filled")
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
----
- net/dsa/port.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+You could add a probe to try to identify what is causing a rehash.
 
-diff --git a/net/dsa/port.c b/net/dsa/port.c
-index 0ce8fd311c78..2f6195d7b741 100644
---- a/net/dsa/port.c
-+++ b/net/dsa/port.c
-@@ -1727,8 +1727,15 @@ int dsa_port_phylink_create(struct dsa_port *dp)
- 	    ds->ops->phylink_mac_an_restart)
- 		dp->pl_config.legacy_pre_march2020 = true;
- 
--	if (ds->ops->phylink_get_caps)
-+	if (ds->ops->phylink_get_caps) {
- 		ds->ops->phylink_get_caps(ds, dp->index, &dp->pl_config);
-+	} else {
-+		/* For legacy drivers */
-+		__set_bit(PHY_INTERFACE_MODE_INTERNAL,
-+			  dp->pl_config.supported_interfaces);
-+		__set_bit(PHY_INTERFACE_MODE_GMII,
-+			  dp->pl_config.supported_interfaces);
-+	}
- 
- 	pl = phylink_create(&dp->pl_config, of_fwnode_handle(dp->dn),
- 			    mode, &dsa_port_phylink_mac_ops);
--- 
-2.30.2
-
+perf probe -a udp_lib_rehash
+perf record -a -g -e probe:udp_lib_rehash sleep 60
+...
+perf script
 
