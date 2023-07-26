@@ -1,439 +1,152 @@
-Return-Path: <netdev+bounces-21540-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21538-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CDACA763DC6
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 19:36:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 859A9763DB9
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 19:33:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AE446281E76
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 17:36:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B15EA1C21235
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 17:33:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FCAA1AA9F;
-	Wed, 26 Jul 2023 17:35:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61BC11AA9C;
+	Wed, 26 Jul 2023 17:33:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EE4C18036
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 17:35:54 +0000 (UTC)
-Received: from relay.virtuozzo.com (relay.virtuozzo.com [130.117.225.111])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3549F268C
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 10:35:52 -0700 (PDT)
-Received: from [130.117.225.1] (helo=finist-vl9.sw.ru)
-	by relay.virtuozzo.com with esmtp (Exim 4.96)
-	(envelope-from <khorenko@virtuozzo.com>)
-	id 1qOi8m-00FSsm-2F;
-	Wed, 26 Jul 2023 19:19:18 +0200
-From: Konstantin Khorenko <khorenko@virtuozzo.com>
-To: netdev@vger.kernel.org
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	Manish Chopra <manishc@marvell.com>,
-	Ariel Elior <aelior@marvell.com>,
-	David Miller <davem@davemloft.net>,
-	Sudarsana Kalluru <skalluru@marvell.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Konstantin Khorenko <khorenko@virtuozzo.com>
-Subject: [PATCH 1/1] qed: Fix scheduling in a tasklet while getting stats
-Date: Wed, 26 Jul 2023 20:19:30 +0300
-Message-Id: <20230726171930.1632710-2-khorenko@virtuozzo.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20230726171930.1632710-1-khorenko@virtuozzo.com>
-References: <20230726171930.1632710-1-khorenko@virtuozzo.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 531951AA81
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 17:33:34 +0000 (UTC)
+Received: from mail-qt1-x82f.google.com (mail-qt1-x82f.google.com [IPv6:2607:f8b0:4864:20::82f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25FD92697
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 10:33:25 -0700 (PDT)
+Received: by mail-qt1-x82f.google.com with SMTP id d75a77b69052e-40631c5b9e9so19411cf.1
+        for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 10:33:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1690392804; x=1690997604;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YtIy08pp5HfXcX9OUYtJL+0L1NNsjbESIXlJjsDZKI8=;
+        b=CMCZPd64uNy9aduzei9ImLFfsZ3HXYND7ITzOtVEw0tymcoYO87udLaSVqR8D3xk2v
+         Na3N4HEvCKvHCO9XQ+d88AkngCq3U2L4sLwexMV3Iz6tugbbwSgRBt5wLlYyEiNxhv9+
+         NmVBIJdf6UZmFlMb3A8DhvE/bRtvykm4N6nMzoE29ch7MCF+3SSq7nJC4jsEDZK86E8m
+         mrt1I2zkfKjR8Q8fz4dC67rR56ZC0FdrMoLkqwDZ0rwTbTDaSLDfBaoCwteBVSp1heyG
+         4hY22qe8KNKjNMz9PCGolQ2stQaXjVUdsBR/K8FgC7H9ze6lLSDxKPgktq0y81mMKwrb
+         BJOw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690392804; x=1690997604;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=YtIy08pp5HfXcX9OUYtJL+0L1NNsjbESIXlJjsDZKI8=;
+        b=cjEMxX18pRl95ebjNDYmKHPCIJBh/6kXhrDTX1Vz5AKUVpv8BQECmcIPwj8IZaLhJ/
+         iOj33n4Yis+YjT0Fg8PEiWPNEcjdJR/J0IRLq1+ovshpvNC2YzA4SjjBQF3lvyVdFpta
+         48ZSrmKtizEPRGrUKP7DXa2Lk41sWXnbC6dQMNZGKjjvRlXbiMA/dtwdATihNZ0iP0Qc
+         dspudDm3BjsvA+9CEtijKSJkhnXqvuWk2xkNOv3DMM3kyaAyzxGu6OXG42YYbyhpOOdo
+         NsrlEwj82a5AMh8CKbJc8wroGXsk9fnh3T4vPdhtx8afi+v0cBihoEyxn8fNK22QqnXm
+         ienA==
+X-Gm-Message-State: ABy/qLZ3zPCZyuh/sdcouSuv1hEHQqtDPxE2mtvOjaSWCcv26uq9LQjS
+	wIEyKOaDA2487ycloql4GtbSKncCslxW2H3ZyqeShw==
+X-Google-Smtp-Source: APBJJlGDYq0rOFSwCXhXTm+EF3lfPllSN0RRTn8OupqpKIHyIMT0Io8RwSkzQM+4Uc4AJsHwbctZVt+tRJjgaRSXCB8=
+X-Received: by 2002:a05:622a:18a7:b0:403:affb:3c03 with SMTP id
+ v39-20020a05622a18a700b00403affb3c03mr614292qtc.10.1690392804100; Wed, 26 Jul
+ 2023 10:33:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
-	SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-	version=3.4.6
+References: <20230725183122.4137963-1-prohr@google.com> <1940c057-99c4-8355-cc95-3f17cca38481@kernel.org>
+In-Reply-To: <1940c057-99c4-8355-cc95-3f17cca38481@kernel.org>
+From: Patrick Rohr <prohr@google.com>
+Date: Wed, 26 Jul 2023 10:33:07 -0700
+Message-ID: <CANLD9C1aV3U+GZ3hUE-_AgbeSyCNgUvJPmOPcFEDDgD_fQWJ0A@mail.gmail.com>
+Subject: Re: [net-next] net: change accept_ra_min_rtr_lft to affect all RA lifetimes
+To: David Ahern <dsahern@kernel.org>
+Cc: "David S . Miller" <davem@davemloft.net>, 
+	Linux Network Development Mailing List <netdev@vger.kernel.org>, =?UTF-8?Q?Maciej_=C5=BBenczykowski?= <maze@google.com>, 
+	Lorenzo Colitti <lorenzo@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Here we've got to a situation when tasklet called usleep_range() in PTT
-acquire logic, thus welcome to the "scheduling while atomic" BUG().
+On Tue, Jul 25, 2023 at 4:28=E2=80=AFPM David Ahern <dsahern@kernel.org> wr=
+ote:
+>
+> On 7/25/23 12:31 PM, Patrick Rohr wrote:
+> > @@ -2727,6 +2727,11 @@ void addrconf_prefix_rcv(struct net_device *dev,=
+ u8 *opt, int len, bool sllao)
+> >               return;
+> >       }
+> >
+> > +     if (valid_lft !=3D 0 && valid_lft < in6_dev->cnf.accept_ra_min_lf=
+t) {
+> > +             net_info_ratelimited("addrconf: prefix option lifetime to=
+o short\n");
+>
+> The error message does not really provide any value besides spamming the
+> logs. Similar comment applies to existing error logging in that function
+> too. I think a counter for invalid prefix packets would be more useful.
+>
 
-  BUG: scheduling while atomic: swapper/24/0/0x00000100
+Agreed. Let me remove the error log in this commit and clean up the
+entire function in a follow up.
 
-   [<ffffffffb41c6199>] schedule+0x29/0x70
-   [<ffffffffb41c5512>] schedule_hrtimeout_range_clock+0xb2/0x150
-   [<ffffffffb41c55c3>] schedule_hrtimeout_range+0x13/0x20
-   [<ffffffffb41c3bcf>] usleep_range+0x4f/0x70
-   [<ffffffffc08d3e58>] qed_ptt_acquire+0x38/0x100 [qed]
-   [<ffffffffc08eac48>] _qed_get_vport_stats+0x458/0x580 [qed]
-   [<ffffffffc08ead8c>] qed_get_vport_stats+0x1c/0xd0 [qed]
-   [<ffffffffc08dffd3>] qed_get_protocol_stats+0x93/0x100 [qed]
-                        qed_mcp_send_protocol_stats
-            case MFW_DRV_MSG_GET_LAN_STATS:
-            case MFW_DRV_MSG_GET_FCOE_STATS:
-            case MFW_DRV_MSG_GET_ISCSI_STATS:
-            case MFW_DRV_MSG_GET_RDMA_STATS:
-   [<ffffffffc08e36d8>] qed_mcp_handle_events+0x2d8/0x890 [qed]
-                        qed_int_assertion
-                        qed_int_attentions
-   [<ffffffffc08d9490>] qed_int_sp_dpc+0xa50/0xdc0 [qed]
-   [<ffffffffb3aa7623>] tasklet_action+0x83/0x140
-   [<ffffffffb41d9125>] __do_softirq+0x125/0x2bb
-   [<ffffffffb41d560c>] call_softirq+0x1c/0x30
-   [<ffffffffb3a30645>] do_softirq+0x65/0xa0
-   [<ffffffffb3aa78d5>] irq_exit+0x105/0x110
-   [<ffffffffb41d8996>] do_IRQ+0x56/0xf0
+> The commit mentioned in the Fixes was just applied and you are already
+> sending a follow up moving the same code around again.
 
-Fix this by making caller to provide the context whether it could be in
-atomic context flow or not when getting stats from QED driver.
-QED driver based on the context provided decide to schedule out or not
-when acquiring the PTT BAR window.
+I got feedback off of the mailing list after the patch was applied. In orde=
+r for
+the sysctl to be useful to Android, it should really apply to all lifetimes=
+ in
+the RA, since that is what determines the minimum frequency at which RAs mu=
+st be
+processed by the kernel. Android uses hardware offloads to drop RAs
+for a fraction of the
+minimum of all lifetimes present in the RA (some networks have very
+frequent RAs (5s) with high lifetimes (2h)). Despite this, we have
+encountered
+networks that set the router lifetime to 30s which results in very frequent=
+ CPU
+wakeups. Instead of disabling IPv6 (and dropping IPv6 ethertype in the
+WiFi firmware)
+entirely on such networks, it seems better to ignore such routers
+while still processing RAs from other IPv6 routers on the same network
+(i.e. to support IoT applications).
+The previous implementation dropped the entire RA
+based on router lifetime. This turned out to be hard to expand to the other
+lifetimes present in the RA in a consistent manner -- dropping the
+entire RA based on
+RIO/PIO lifetimes would essentially require parsing the whole thing twice. =
+I am
+sending this follow up patch now to fix 1671bcfd76fd before it is released.
 
-We faced the BUG_ON() while getting vport stats, but according to the
-code same issue could happen for fcoe and iscsi statistics as well, so
-fixing them too.
-
-Fixes: 6c75424612a7 ("qed: Add support for NCSI statistics.")
-Fixes: 1e128c81290a ("qed: Add support for hardware offloaded FCoE.")
-Fixes: 2f2b2614e893 ("qed: Provide iSCSI statistics to management")
-
-Signed-off-by: Konstantin Khorenko <khorenko@virtuozzo.com>
----
- drivers/net/ethernet/qlogic/qed/qed_dev_api.h |  2 ++
- drivers/net/ethernet/qlogic/qed/qed_fcoe.c    | 19 ++++++++++----
- drivers/net/ethernet/qlogic/qed/qed_fcoe.h    |  6 +++--
- drivers/net/ethernet/qlogic/qed/qed_hw.c      | 26 ++++++++++++++++---
- drivers/net/ethernet/qlogic/qed/qed_iscsi.c   | 19 ++++++++++----
- drivers/net/ethernet/qlogic/qed/qed_iscsi.h   |  6 +++--
- drivers/net/ethernet/qlogic/qed/qed_l2.c      | 19 ++++++++++----
- drivers/net/ethernet/qlogic/qed/qed_l2.h      |  3 +++
- drivers/net/ethernet/qlogic/qed/qed_main.c    |  6 ++---
- 9 files changed, 80 insertions(+), 26 deletions(-)
-
-diff --git a/drivers/net/ethernet/qlogic/qed/qed_dev_api.h b/drivers/net/ethernet/qlogic/qed/qed_dev_api.h
-index f8682356d0cf..2ec8333363ae 100644
---- a/drivers/net/ethernet/qlogic/qed/qed_dev_api.h
-+++ b/drivers/net/ethernet/qlogic/qed/qed_dev_api.h
-@@ -192,6 +192,8 @@ void qed_hw_remove(struct qed_dev *cdev);
-  * exported function).
-  */
- struct qed_ptt *qed_ptt_acquire(struct qed_hwfn *p_hwfn);
-+struct qed_ptt *qed_ptt_acquire_context(struct qed_hwfn *p_hwfn,
-+					bool is_atomic);
- 
- /**
-  * qed_ptt_release(): Release PTT Window.
-diff --git a/drivers/net/ethernet/qlogic/qed/qed_fcoe.c b/drivers/net/ethernet/qlogic/qed/qed_fcoe.c
-index 3764190b948e..04602ac94708 100644
---- a/drivers/net/ethernet/qlogic/qed/qed_fcoe.c
-+++ b/drivers/net/ethernet/qlogic/qed/qed_fcoe.c
-@@ -693,13 +693,14 @@ static void _qed_fcoe_get_pstats(struct qed_hwfn *p_hwfn,
- }
- 
- static int qed_fcoe_get_stats(struct qed_hwfn *p_hwfn,
--			      struct qed_fcoe_stats *p_stats)
-+			      struct qed_fcoe_stats *p_stats,
-+			      bool is_atomic)
- {
- 	struct qed_ptt *p_ptt;
- 
- 	memset(p_stats, 0, sizeof(*p_stats));
- 
--	p_ptt = qed_ptt_acquire(p_hwfn);
-+	p_ptt = qed_ptt_acquire_context(p_hwfn, is_atomic);
- 
- 	if (!p_ptt) {
- 		DP_ERR(p_hwfn, "Failed to acquire ptt\n");
-@@ -973,19 +974,27 @@ static int qed_fcoe_destroy_conn(struct qed_dev *cdev,
- 					QED_SPQ_MODE_EBLOCK, NULL);
- }
- 
-+static int qed_fcoe_stats_context(struct qed_dev *cdev,
-+				  struct qed_fcoe_stats *stats,
-+				  bool is_atomic)
-+{
-+	return qed_fcoe_get_stats(QED_AFFIN_HWFN(cdev), stats, is_atomic);
-+}
-+
- static int qed_fcoe_stats(struct qed_dev *cdev, struct qed_fcoe_stats *stats)
- {
--	return qed_fcoe_get_stats(QED_AFFIN_HWFN(cdev), stats);
-+	return qed_fcoe_stats_context(cdev, stats, false);
- }
- 
- void qed_get_protocol_stats_fcoe(struct qed_dev *cdev,
--				 struct qed_mcp_fcoe_stats *stats)
-+				 struct qed_mcp_fcoe_stats *stats,
-+				 bool is_atomic)
- {
- 	struct qed_fcoe_stats proto_stats;
- 
- 	/* Retrieve FW statistics */
- 	memset(&proto_stats, 0, sizeof(proto_stats));
--	if (qed_fcoe_stats(cdev, &proto_stats)) {
-+	if (qed_fcoe_stats_context(cdev, &proto_stats, is_atomic)) {
- 		DP_VERBOSE(cdev, QED_MSG_STORAGE,
- 			   "Failed to collect FCoE statistics\n");
- 		return;
-diff --git a/drivers/net/ethernet/qlogic/qed/qed_fcoe.h b/drivers/net/ethernet/qlogic/qed/qed_fcoe.h
-index 19c85adf4ceb..883a3942a1af 100644
---- a/drivers/net/ethernet/qlogic/qed/qed_fcoe.h
-+++ b/drivers/net/ethernet/qlogic/qed/qed_fcoe.h
-@@ -29,7 +29,8 @@ void qed_fcoe_setup(struct qed_hwfn *p_hwfn);
- 
- void qed_fcoe_free(struct qed_hwfn *p_hwfn);
- void qed_get_protocol_stats_fcoe(struct qed_dev *cdev,
--				 struct qed_mcp_fcoe_stats *stats);
-+				 struct qed_mcp_fcoe_stats *stats,
-+				 bool is_atomic);
- #else /* CONFIG_QED_FCOE */
- static inline int qed_fcoe_alloc(struct qed_hwfn *p_hwfn)
- {
-@@ -40,7 +41,8 @@ static inline void qed_fcoe_setup(struct qed_hwfn *p_hwfn) {}
- static inline void qed_fcoe_free(struct qed_hwfn *p_hwfn) {}
- 
- static inline void qed_get_protocol_stats_fcoe(struct qed_dev *cdev,
--					       struct qed_mcp_fcoe_stats *stats)
-+					       struct qed_mcp_fcoe_stats *stats,
-+					       bool is_atomic)
- {
- }
- #endif /* CONFIG_QED_FCOE */
-diff --git a/drivers/net/ethernet/qlogic/qed/qed_hw.c b/drivers/net/ethernet/qlogic/qed/qed_hw.c
-index 554f30b0cfd5..6263f847b6b9 100644
---- a/drivers/net/ethernet/qlogic/qed/qed_hw.c
-+++ b/drivers/net/ethernet/qlogic/qed/qed_hw.c
-@@ -23,7 +23,10 @@
- #include "qed_reg_addr.h"
- #include "qed_sriov.h"
- 
--#define QED_BAR_ACQUIRE_TIMEOUT 1000
-+#define QED_BAR_ACQUIRE_TIMEOUT_USLEEP_CNT	1000
-+#define QED_BAR_ACQUIRE_TIMEOUT_USLEEP		1000
-+#define QED_BAR_ACQUIRE_TIMEOUT_UDELAY_CNT	100000
-+#define QED_BAR_ACQUIRE_TIMEOUT_UDELAY		10
- 
- /* Invalid values */
- #define QED_BAR_INVALID_OFFSET          (cpu_to_le32(-1))
-@@ -84,12 +87,22 @@ void qed_ptt_pool_free(struct qed_hwfn *p_hwfn)
- }
- 
- struct qed_ptt *qed_ptt_acquire(struct qed_hwfn *p_hwfn)
-+{
-+	return qed_ptt_acquire_context(p_hwfn, false);
-+}
-+
-+struct qed_ptt *qed_ptt_acquire_context(struct qed_hwfn *p_hwfn, bool is_atomic)
- {
- 	struct qed_ptt *p_ptt;
--	unsigned int i;
-+	unsigned int i, count;
-+
-+	if (is_atomic)
-+		count = QED_BAR_ACQUIRE_TIMEOUT_UDELAY_CNT;
-+	else
-+		count = QED_BAR_ACQUIRE_TIMEOUT_USLEEP_CNT;
- 
- 	/* Take the free PTT from the list */
--	for (i = 0; i < QED_BAR_ACQUIRE_TIMEOUT; i++) {
-+	for (i = 0; i < count; i++) {
- 		spin_lock_bh(&p_hwfn->p_ptt_pool->lock);
- 
- 		if (!list_empty(&p_hwfn->p_ptt_pool->free_list)) {
-@@ -105,7 +118,12 @@ struct qed_ptt *qed_ptt_acquire(struct qed_hwfn *p_hwfn)
- 		}
- 
- 		spin_unlock_bh(&p_hwfn->p_ptt_pool->lock);
--		usleep_range(1000, 2000);
-+
-+		if (is_atomic)
-+			udelay(QED_BAR_ACQUIRE_TIMEOUT_UDELAY);
-+		else
-+			usleep_range(QED_BAR_ACQUIRE_TIMEOUT_USLEEP,
-+				     QED_BAR_ACQUIRE_TIMEOUT_USLEEP * 2);
- 	}
- 
- 	DP_NOTICE(p_hwfn, "PTT acquire timeout - failed to allocate PTT\n");
-diff --git a/drivers/net/ethernet/qlogic/qed/qed_iscsi.c b/drivers/net/ethernet/qlogic/qed/qed_iscsi.c
-index 511ab214eb9c..980e7289b481 100644
---- a/drivers/net/ethernet/qlogic/qed/qed_iscsi.c
-+++ b/drivers/net/ethernet/qlogic/qed/qed_iscsi.c
-@@ -999,13 +999,14 @@ static void _qed_iscsi_get_pstats(struct qed_hwfn *p_hwfn,
- }
- 
- static int qed_iscsi_get_stats(struct qed_hwfn *p_hwfn,
--			       struct qed_iscsi_stats *stats)
-+			       struct qed_iscsi_stats *stats,
-+			       bool is_atomic)
- {
- 	struct qed_ptt *p_ptt;
- 
- 	memset(stats, 0, sizeof(*stats));
- 
--	p_ptt = qed_ptt_acquire(p_hwfn);
-+	p_ptt = qed_ptt_acquire_context(p_hwfn, is_atomic);
- 	if (!p_ptt) {
- 		DP_ERR(p_hwfn, "Failed to acquire ptt\n");
- 		return -EAGAIN;
-@@ -1336,9 +1337,16 @@ static int qed_iscsi_destroy_conn(struct qed_dev *cdev,
- 					   QED_SPQ_MODE_EBLOCK, NULL);
- }
- 
-+static int qed_iscsi_stats_context(struct qed_dev *cdev,
-+				   struct qed_iscsi_stats *stats,
-+				   bool is_atomic)
-+{
-+	return qed_iscsi_get_stats(QED_AFFIN_HWFN(cdev), stats, is_atomic);
-+}
-+
- static int qed_iscsi_stats(struct qed_dev *cdev, struct qed_iscsi_stats *stats)
- {
--	return qed_iscsi_get_stats(QED_AFFIN_HWFN(cdev), stats);
-+	return qed_iscsi_stats_context(cdev, stats, false);
- }
- 
- static int qed_iscsi_change_mac(struct qed_dev *cdev,
-@@ -1358,13 +1366,14 @@ static int qed_iscsi_change_mac(struct qed_dev *cdev,
- }
- 
- void qed_get_protocol_stats_iscsi(struct qed_dev *cdev,
--				  struct qed_mcp_iscsi_stats *stats)
-+				  struct qed_mcp_iscsi_stats *stats,
-+				  bool is_atomic)
- {
- 	struct qed_iscsi_stats proto_stats;
- 
- 	/* Retrieve FW statistics */
- 	memset(&proto_stats, 0, sizeof(proto_stats));
--	if (qed_iscsi_stats(cdev, &proto_stats)) {
-+	if (qed_iscsi_stats_context(cdev, &proto_stats, is_atomic)) {
- 		DP_VERBOSE(cdev, QED_MSG_STORAGE,
- 			   "Failed to collect ISCSI statistics\n");
- 		return;
-diff --git a/drivers/net/ethernet/qlogic/qed/qed_iscsi.h b/drivers/net/ethernet/qlogic/qed/qed_iscsi.h
-index dec2b00259d4..7d8d6ad7faa9 100644
---- a/drivers/net/ethernet/qlogic/qed/qed_iscsi.h
-+++ b/drivers/net/ethernet/qlogic/qed/qed_iscsi.h
-@@ -43,7 +43,8 @@ void qed_iscsi_free(struct qed_hwfn *p_hwfn);
-  * Return: Void.
-  */
- void qed_get_protocol_stats_iscsi(struct qed_dev *cdev,
--				  struct qed_mcp_iscsi_stats *stats);
-+				  struct qed_mcp_iscsi_stats *stats,
-+				  bool is_atomic);
- #else /* IS_ENABLED(CONFIG_QED_ISCSI) */
- static inline int qed_iscsi_alloc(struct qed_hwfn *p_hwfn)
- {
-@@ -56,7 +57,8 @@ static inline void qed_iscsi_free(struct qed_hwfn *p_hwfn) {}
- 
- static inline void
- qed_get_protocol_stats_iscsi(struct qed_dev *cdev,
--			     struct qed_mcp_iscsi_stats *stats) {}
-+			     struct qed_mcp_iscsi_stats *stats,
-+			     bool is_atomic) {}
- #endif /* IS_ENABLED(CONFIG_QED_ISCSI) */
- 
- #endif
-diff --git a/drivers/net/ethernet/qlogic/qed/qed_l2.c b/drivers/net/ethernet/qlogic/qed/qed_l2.c
-index 7776d3bdd459..970b9aabbc3d 100644
---- a/drivers/net/ethernet/qlogic/qed/qed_l2.c
-+++ b/drivers/net/ethernet/qlogic/qed/qed_l2.c
-@@ -1863,7 +1863,8 @@ static void __qed_get_vport_stats(struct qed_hwfn *p_hwfn,
- }
- 
- static void _qed_get_vport_stats(struct qed_dev *cdev,
--				 struct qed_eth_stats *stats)
-+				 struct qed_eth_stats *stats,
-+				 bool is_atomic)
- {
- 	u8 fw_vport = 0;
- 	int i;
-@@ -1872,10 +1873,11 @@ static void _qed_get_vport_stats(struct qed_dev *cdev,
- 
- 	for_each_hwfn(cdev, i) {
- 		struct qed_hwfn *p_hwfn = &cdev->hwfns[i];
--		struct qed_ptt *p_ptt = IS_PF(cdev) ? qed_ptt_acquire(p_hwfn)
--						    :  NULL;
-+		struct qed_ptt *p_ptt;
- 		bool b_get_port_stats;
- 
-+		p_ptt = IS_PF(cdev) ? qed_ptt_acquire_context(p_hwfn, is_atomic)
-+				    : NULL;
- 		if (IS_PF(cdev)) {
- 			/* The main vport index is relative first */
- 			if (qed_fw_vport(p_hwfn, 0, &fw_vport)) {
-@@ -1900,6 +1902,13 @@ static void _qed_get_vport_stats(struct qed_dev *cdev,
- }
- 
- void qed_get_vport_stats(struct qed_dev *cdev, struct qed_eth_stats *stats)
-+{
-+	qed_get_vport_stats_context(cdev, stats, false);
-+}
-+
-+void qed_get_vport_stats_context(struct qed_dev *cdev,
-+				 struct qed_eth_stats *stats,
-+				 bool is_atomic)
- {
- 	u32 i;
- 
-@@ -1908,7 +1917,7 @@ void qed_get_vport_stats(struct qed_dev *cdev, struct qed_eth_stats *stats)
- 		return;
- 	}
- 
--	_qed_get_vport_stats(cdev, stats);
-+	_qed_get_vport_stats(cdev, stats, is_atomic);
- 
- 	if (!cdev->reset_stats)
- 		return;
-@@ -1960,7 +1969,7 @@ void qed_reset_vport_stats(struct qed_dev *cdev)
- 	if (!cdev->reset_stats) {
- 		DP_INFO(cdev, "Reset stats not allocated\n");
- 	} else {
--		_qed_get_vport_stats(cdev, cdev->reset_stats);
-+		_qed_get_vport_stats(cdev, cdev->reset_stats, false);
- 		cdev->reset_stats->common.link_change_count = 0;
- 	}
- }
-diff --git a/drivers/net/ethernet/qlogic/qed/qed_l2.h b/drivers/net/ethernet/qlogic/qed/qed_l2.h
-index a538cf478c14..8aa2cbc50ede 100644
---- a/drivers/net/ethernet/qlogic/qed/qed_l2.h
-+++ b/drivers/net/ethernet/qlogic/qed/qed_l2.h
-@@ -250,6 +250,9 @@ qed_sp_eth_rx_queues_update(struct qed_hwfn *p_hwfn,
- 			    struct qed_spq_comp_cb *p_comp_data);
- 
- void qed_get_vport_stats(struct qed_dev *cdev, struct qed_eth_stats *stats);
-+void qed_get_vport_stats_context(struct qed_dev *cdev,
-+				 struct qed_eth_stats *stats,
-+				 bool is_atomic);
- 
- void qed_reset_vport_stats(struct qed_dev *cdev);
- 
-diff --git a/drivers/net/ethernet/qlogic/qed/qed_main.c b/drivers/net/ethernet/qlogic/qed/qed_main.c
-index f5af83342856..c278f8893042 100644
---- a/drivers/net/ethernet/qlogic/qed/qed_main.c
-+++ b/drivers/net/ethernet/qlogic/qed/qed_main.c
-@@ -3092,7 +3092,7 @@ void qed_get_protocol_stats(struct qed_dev *cdev,
- 
- 	switch (type) {
- 	case QED_MCP_LAN_STATS:
--		qed_get_vport_stats(cdev, &eth_stats);
-+		qed_get_vport_stats_context(cdev, &eth_stats, true);
- 		stats->lan_stats.ucast_rx_pkts =
- 					eth_stats.common.rx_ucast_pkts;
- 		stats->lan_stats.ucast_tx_pkts =
-@@ -3100,10 +3100,10 @@ void qed_get_protocol_stats(struct qed_dev *cdev,
- 		stats->lan_stats.fcs_err = -1;
- 		break;
- 	case QED_MCP_FCOE_STATS:
--		qed_get_protocol_stats_fcoe(cdev, &stats->fcoe_stats);
-+		qed_get_protocol_stats_fcoe(cdev, &stats->fcoe_stats, true);
- 		break;
- 	case QED_MCP_ISCSI_STATS:
--		qed_get_protocol_stats_iscsi(cdev, &stats->iscsi_stats);
-+		qed_get_protocol_stats_iscsi(cdev, &stats->iscsi_stats, true);
- 		break;
- 	default:
- 		DP_VERBOSE(cdev, QED_MSG_SP,
--- 
-2.31.1
-
+>
+> >  #ifdef CONFIG_IPV6_ROUTE_INFO
+> >       if (!in6_dev->cnf.accept_ra_from_local &&
+> >           ipv6_chk_addr(dev_net(in6_dev->dev), &ipv6_hdr(skb)->saddr,
+> > @@ -1530,6 +1522,9 @@ static enum skb_drop_reason ndisc_router_discover=
+y(struct sk_buff *skb)
+> >                       if (ri->prefix_len =3D=3D 0 &&
+> >                           !in6_dev->cnf.accept_ra_defrtr)
+> >                               continue;
+> > +                     if (ri->lifetime !=3D 0 &&
+> > +                         ntohl(ri->lifetime) < in6_dev->cnf.accept_ra_=
+min_lft)
+> > +                             continue;
+> >                       if (ri->prefix_len < in6_dev->cnf.accept_ra_rt_in=
+fo_min_plen)
+> >                               continue;
+> >                       if (ri->prefix_len > in6_dev->cnf.accept_ra_rt_in=
+fo_max_plen)
+>
 
