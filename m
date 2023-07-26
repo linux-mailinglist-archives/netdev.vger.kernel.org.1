@@ -1,35 +1,35 @@
-Return-Path: <netdev+bounces-21629-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21630-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26380764131
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 23:32:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B331C764132
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 23:33:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D5108281E79
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 21:32:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E44191C21457
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 21:33:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1E3318044;
-	Wed, 26 Jul 2023 21:32:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97CA81988F;
+	Wed, 26 Jul 2023 21:32:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4138F1BEE3
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 21:32:11 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 047ABC433C8;
-	Wed, 26 Jul 2023 21:32:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 124DB18045
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 21:32:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9D9AC433C7;
+	Wed, 26 Jul 2023 21:32:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1690407131;
-	bh=JGGrB4NwV2vAix+LnjMOouDpWo1lR8GK79P8ZkAEGlE=;
+	bh=Jipv8kNRgo3yBMh8Ls+LiUo4PYRyWDjEoYvF5+uS7jk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Gkrhx066qZflPTR3O9va0VEtdN9lH7RnBnea+WrMsXi4jYHJeCngAmgNPg+xpfohd
-	 l13UQHejR2Unoar8wNadpIJUX6TNqynCe8vYce5tNo5MATC7oN0+l4Y3/94SdAoqyc
-	 C+7+d1zZr/uNSkk3A6oEL5ExdwnGqgaaw6L5gsAhnD3FpOlpGmiL6VLjzDrtlHI3TK
-	 /iDvn4NOt4OB/KGWRdUnTOPlYGsAUYa6gffloUj6XSJaxIGkptewsjbXFY6CANlpfA
-	 il86L33o/vg/D0CkK2PftmtJQKzwAmgx80QU1dNplS9zMh2GO5QFpmoDm0Po2p9Qzq
-	 RufVHcBTf2//g==
+	b=FMB1fqW0Te9oQ77cVcyKKu8XBbPV2Bl1POblYKKvMRhK+W7VcuR8OWo2GYVHSeXG+
+	 PUOa2Mung7u+tFdoxDPqXjVeYUgPMpv+Xg4DUsKvGFZuHzrzqsyJqsJ3Dz00O+MLrv
+	 2OZ4CgHj3jwBTKN8KJBlkiUubwge5XBNL/j93+CNRxvKVoSI0a1fcOvzUSrx11bSQM
+	 OF1kXPgghRpU6UalZHmvraxgfRok17hRxbDTI4uFj07MdDrFlxciujsX4r0jIlVCs8
+	 JapelQ3Lhuu27jux4SyCMEJTls8My0DsV8Bxx6eGfbSpiu6XjEtxsEpSjshmof3te8
+	 Tcb3UeuF3BC9w==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -39,10 +39,10 @@ Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	netdev@vger.kernel.org,
 	Tariq Toukan <tariqt@nvidia.com>,
 	Zhengchao Shao <shaozhengchao@huawei.com>,
-	Leon Romanovsky <leonro@nvidia.com>
-Subject: [net 02/15] net/mlx5: DR, fix memory leak in mlx5dr_cmd_create_reformat_ctx
-Date: Wed, 26 Jul 2023 14:31:53 -0700
-Message-ID: <20230726213206.47022-3-saeed@kernel.org>
+	Simon Horman <simon.horman@corigine.com>
+Subject: [net 03/15] net/mlx5: fix potential memory leak in mlx5e_init_rep_rx
+Date: Wed, 26 Jul 2023 14:31:54 -0700
+Message-ID: <20230726213206.47022-4-saeed@kernel.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230726213206.47022-1-saeed@kernel.org>
 References: <20230726213206.47022-1-saeed@kernel.org>
@@ -56,37 +56,41 @@ Content-Transfer-Encoding: 8bit
 
 From: Zhengchao Shao <shaozhengchao@huawei.com>
 
-when mlx5_cmd_exec failed in mlx5dr_cmd_create_reformat_ctx, the memory
-pointed by 'in' is not released, which will cause memory leak. Move memory
-release after mlx5_cmd_exec.
+The memory pointed to by the priv->rx_res pointer is not freed in the error
+path of mlx5e_init_rep_rx, which can lead to a memory leak. Fix by freeing
+the memory in the error path, thereby making the error path identical to
+mlx5e_cleanup_rep_rx().
 
-Fixes: 1d9186476e12 ("net/mlx5: DR, Add direct rule command utilities")
+Fixes: af8bbf730068 ("net/mlx5e: Convert mlx5e_flow_steering member of mlx5e_priv to pointer")
 Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
-Reviewed-by: Leon Romanovsky <leonro@nvidia.com>
+Reviewed-by: Simon Horman <simon.horman@corigine.com>
+Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
- drivers/net/ethernet/mellanox/mlx5/core/steering/dr_cmd.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/mellanox/mlx5/core/en_rep.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_cmd.c b/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_cmd.c
-index 7491911ebcb5..8c2a34a0d6be 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_cmd.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_cmd.c
-@@ -564,11 +564,12 @@ int mlx5dr_cmd_create_reformat_ctx(struct mlx5_core_dev *mdev,
- 
- 	err = mlx5_cmd_exec(mdev, in, inlen, out, sizeof(out));
- 	if (err)
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_rep.c b/drivers/net/ethernet/mellanox/mlx5/core/en_rep.c
+index 152b62138450..0b265a3f9b76 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_rep.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_rep.c
+@@ -1012,7 +1012,7 @@ static int mlx5e_init_rep_rx(struct mlx5e_priv *priv)
+ 	err = mlx5e_open_drop_rq(priv, &priv->drop_rq);
+ 	if (err) {
+ 		mlx5_core_err(mdev, "open drop rq failed, %d\n", err);
 -		return err;
-+		goto err_free_in;
++		goto err_rx_res_free;
+ 	}
  
- 	*reformat_id = MLX5_GET(alloc_packet_reformat_context_out, out, packet_reformat_id);
--	kvfree(in);
- 
-+err_free_in:
-+	kvfree(in);
- 	return err;
- }
- 
+ 	err = mlx5e_rx_res_init(priv->rx_res, priv->mdev, 0,
+@@ -1046,6 +1046,7 @@ static int mlx5e_init_rep_rx(struct mlx5e_priv *priv)
+ 	mlx5e_rx_res_destroy(priv->rx_res);
+ err_close_drop_rq:
+ 	mlx5e_close_drop_rq(&priv->drop_rq);
++err_rx_res_free:
+ 	mlx5e_rx_res_free(priv->rx_res);
+ 	priv->rx_res = NULL;
+ err_free_fs:
 -- 
 2.41.0
 
