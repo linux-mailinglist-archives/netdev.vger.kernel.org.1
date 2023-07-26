@@ -1,90 +1,89 @@
-Return-Path: <netdev+bounces-21386-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21387-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF6BA763767
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 15:22:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A935876376E
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 15:22:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 16455281E8C
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 13:22:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6E701280FD8
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 13:22:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2183BC2C3;
-	Wed, 26 Jul 2023 13:22:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71A28C2C6;
+	Wed, 26 Jul 2023 13:22:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CDFFCA71
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 13:22:05 +0000 (UTC)
-Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A6E4128;
-	Wed, 26 Jul 2023 06:22:04 -0700 (PDT)
-Received: by mail-lf1-x136.google.com with SMTP id 2adb3069b0e04-4fe0fe622c3so1204795e87.2;
-        Wed, 26 Jul 2023 06:22:04 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63AD8C15C
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 13:22:30 +0000 (UTC)
+Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D1762717
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 06:22:25 -0700 (PDT)
+Received: by mail-lj1-x235.google.com with SMTP id 38308e7fff4ca-2b9ab1725bbso26137201fa.0
+        for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 06:22:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690377723; x=1690982523;
+        d=linaro.org; s=google; t=1690377744; x=1690982544;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=YPWzpufJv6n62uslZTbP65dBXeCecv6//7U8vz226A4=;
-        b=ewpF9oz+uxhIZKk+HzUv370fc6StqAv+3SfLkcmwF3t5VfkJFS3RbGlFqoCCyoynRc
-         W8tOXEg1WJzADL8UXDNNoyqdobUJ9cpKVE0SNXiBf7ZlFgMJcEkt17f+vqVi++vFoysW
-         0wXqYnl2qvhmh6/BVHYZ+WHProF1bCivgcoLiUa4EtjPkZhZMS8ABJY1CQHWFmbm6eHD
-         lP77rpRYF/5JIePlt61ThEqkGf+tmcFnHh6kDyBe7X7D7qVqmdvYc7l9sNgDtISlllIA
-         9W1DRoTQnLozR2kCMMkmo7/9Ivuv2Iwkt/PoMNWJ3Wg1tGqMhoBEsBf+CtpmJfIbV8kO
-         nFvg==
+        bh=RNBj29jr4jl10Xi2/aZroQsmuwBmNBwOZzK39VygtuU=;
+        b=ZR7ItMsoA1A/Nf0sOAsNBK3BvkceyjN/sL6fBQtaSZAld48YYK29eLHJpLbOmYcO4N
+         dYwufolsoOqxG66gXyatccol9XCFhslUJtN1fSKS7Ig5Kau5SMVFE7RX4yg5Rr4WodvW
+         KGP5UDr+Anz0VQpD54p7Qveowg/GfBiANDGM4tvbiskCVcrN2Ayh2uU5VmTDPv4ac5wh
+         wcczHEKlYM7+fs6dv2GFmLWJlAaieMsDTw3DWr/Yz6IprmyjYryQs6+CCKCZy1hgZmch
+         9OcYz90i81pg25VCT++Zf0XNmTEBd2fezyDACkORNjUdmjCl6szBneV8zsIq5EvQsgSr
+         1QLg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690377723; x=1690982523;
+        d=1e100.net; s=20221208; t=1690377744; x=1690982544;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=YPWzpufJv6n62uslZTbP65dBXeCecv6//7U8vz226A4=;
-        b=MkM/t4TG/u3r5Pn404M+whZg813p4chZQ1s3hdcYDfV5UUovbvpwCbfIHITbxoBSaQ
-         tjOPmR29tn+nT2NwZPjtGHgG5wbymP//GB0bBEQkzvPVJLakRDt/6rGOnLBn/GKh4ptS
-         EBYM67H4hBpvI76XpIbilDFi2gL3d45mMkqegyodPQWUORaiIXblBZK1RDOKd6NdYJ4x
-         LIlJE9xw+vEKc+tRfq1cdde/xtnFm0+Aqz20kZqupkl/7eH2KjKt2/TeJbThjtzxjFul
-         nYaIGmepvdwaTSissRtzU3eHXm7Cb3eQxxJpmy/AOWec31/4qjobrUurNLq/u0bou03y
-         575w==
-X-Gm-Message-State: ABy/qLZ5+XFStFqDD8yX90EaLTgETALghSLFtnn4PKTHOjWFt+piLRvo
-	R5iZuNNQNFodBQOd9KAUXKU=
-X-Google-Smtp-Source: APBJJlGrVtjZgA1ReJiDb3S0p0zyLFY5w1xsxsReaY7BnpGYnv56qAkNuEZZeM3E1fI6AMEfVisIOw==
-X-Received: by 2002:a19:e05d:0:b0:4fc:6e21:ff53 with SMTP id g29-20020a19e05d000000b004fc6e21ff53mr1406574lfj.11.1690377722464;
-        Wed, 26 Jul 2023 06:22:02 -0700 (PDT)
-Received: from skbuf ([188.25.175.105])
-        by smtp.gmail.com with ESMTPSA id u2-20020a5d4342000000b003141f96ed36sm19868392wrr.0.2023.07.26.06.22.00
+        bh=RNBj29jr4jl10Xi2/aZroQsmuwBmNBwOZzK39VygtuU=;
+        b=bFos5was5Igab2HzLBMntDrIXpVNKwfnQEse86h74z5xp/blUv5+h9A+U3BhEK0D2Z
+         ijcHcS663iTP6Pk++d6SC2qbHPqVw0Jx/xy2Us1Ra9tbAG0zpmSXPLFvLox8k+y17UBQ
+         F3lPGy14MxhbEltuIkRiLwPY/u0RIWwxvQSsnp+PPt2Z7MVayaZ9Pxz67eQFODuiRpF5
+         F4rVhOtP9cZZP+ZQEM36jtevSDUiOf+PhMU+XwIs75+UW4nEjx7+tTxkGEM8D6LKVEHM
+         DEb++6DTTemgZ4biW5vFH59a4NLTBlV71gUmvOJT3VcX5ww7IlGRDpBCSCZE8tMDNJ1g
+         1ySA==
+X-Gm-Message-State: ABy/qLY+zpsV+iQYn0JGZxQyrXb+moly2wDzVyXvT6QsIYb5uIw6Ut4q
+	iPCfpa+tvGE1q+BvanrB24dlbg==
+X-Google-Smtp-Source: APBJJlFMUTV8xO+xbHIIv/bIIICqq09UIEpnnxDWYTvm3DUYUWAby+Rd3s59OPhDm1XNqeKodSv6yA==
+X-Received: by 2002:a2e:9805:0:b0:2b6:fe55:7318 with SMTP id a5-20020a2e9805000000b002b6fe557318mr1472225ljj.12.1690377743727;
+        Wed, 26 Jul 2023 06:22:23 -0700 (PDT)
+Received: from localhost ([102.36.222.112])
+        by smtp.gmail.com with ESMTPSA id y7-20020a1c4b07000000b003fc0505be19sm1939327wma.37.2023.07.26.06.22.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Jul 2023 06:22:02 -0700 (PDT)
-Date: Wed, 26 Jul 2023 16:21:59 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Rob Herring <robh@kernel.org>
-Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
-	Andrew Lunn <andrew@lunn.ch>,
+        Wed, 26 Jul 2023 06:22:23 -0700 (PDT)
+Date: Wed, 26 Jul 2023 16:22:20 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Yan Zhai <yan@cloudflare.com>
+Cc: Markus Elfring <Markus.Elfring@web.de>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Kurt Kanzenbach <kurt@linutronix.de>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	UNGLinuxDriver@microchip.com,
-	=?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Landen Chao <Landen.Chao@mediatek.com>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Claudiu Manoil <claudiu.manoil@nxp.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Alvin =?utf-8?Q?=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
-	George McCollister <george.mccollister@gmail.com>,
-	Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH v2] net: dsa: Explicitly include correct DT includes
-Message-ID: <20230726132159.rni7zc5ayu67tkxv@skbuf>
-References: <20230724211859.805481-1-robh@kernel.org>
- <20230724211859.805481-1-robh@kernel.org>
+	Eric Dumazet <edumazet@google.com>, Hao Luo <haoluo@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jakub Sitnicki <jakub@cloudflare.com>, Jiri Olsa <jolsa@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Jordan Griege <jgriege@cloudflare.com>,
+	KP Singh <kpsingh@kernel.org>, LKML <linux-kernel@vger.kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Mykola Lysenko <mykolal@fb.com>, Paolo Abeni <pabeni@redhat.com>,
+	Shuah Khan <shuah@kernel.org>, Song Liu <song@kernel.org>,
+	Stanislav Fomichev <sdf@google.com>, Yonghong Song <yhs@fb.com>,
+	bpf@vger.kernel.org, kernel-janitors@vger.kernel.org,
+	kernel-team@cloudflare.com, linux-kselftest@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH v4 bpf 2/2] bpf: selftests: add lwt redirect regression
+ test cases
+Message-ID: <b0a4c52b-427d-462f-93a9-d94a294cedcf@kadam.mountain>
+References: <cover.1690332693.git.yan@cloudflare.com>
+ <9c4896b109a39c3fa088844addaa1737a84bbbb5.1690332693.git.yan@cloudflare.com>
+ <3ec61192-c65c-62cc-d073-d6111b08e690@web.de>
+ <CAO3-PbraNcfQnqHUG_992vssuA795RxtexYsMdEo=k9zp-XHog@mail.gmail.com>
+ <ZMD1sFTW8SFiex+x@debian.debian>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,27 +92,17 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230724211859.805481-1-robh@kernel.org>
- <20230724211859.805481-1-robh@kernel.org>
+In-Reply-To: <ZMD1sFTW8SFiex+x@debian.debian>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Jul 24, 2023 at 03:18:58PM -0600, Rob Herring wrote:
-> The DT of_device.h and of_platform.h date back to the separate
-> of_platform_bus_type before it as merged into the regular platform bus.
-> As part of that merge prepping Arm DT support 13 years ago, they
-> "temporarily" include each other. They also include platform_device.h
-> and of.h. As a result, there's a pretty much random mix of those include
-> files used throughout the tree. In order to detangle these headers and
-> replace the implicit includes with struct declarations, users need to
-> explicitly include the correct includes.
-> 
-> Signed-off-by: Rob Herring <robh@kernel.org>
-> ---
+Was Markus unbanned from vger?  How are we recieving these emails?
 
-Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
+regards,
+dan carpenter
+
 
