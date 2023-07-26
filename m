@@ -1,236 +1,122 @@
-Return-Path: <netdev+bounces-21592-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21593-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17E90763F63
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 21:17:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7EBB2763F68
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 21:18:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CA8141C2140E
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 19:17:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AF5D01C208E3
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 19:18:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4677E198A6;
-	Wed, 26 Jul 2023 19:16:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 195C54CE96;
+	Wed, 26 Jul 2023 19:16:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EDAC19891
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 19:16:12 +0000 (UTC)
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 514EF2733
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 12:16:09 -0700 (PDT)
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-	by smtp-out1.suse.de (Postfix) with ESMTP id 3307221CAB;
-	Wed, 26 Jul 2023 19:16:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1690398967; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6j8St0mqpj/4YNSM4Bra0NsJcodhAVb5gyxj6MKUhdk=;
-	b=zXWi4E8qyms6+JfNssIwU8YQ+vdDbLl51GaS2tKZnM6kQUO9wflPajRS34Ro7ARyVFq8/C
-	fDHbKbbm/0LxcycEBWzEUIH+Zm1iq6IJbSVCwHwI6VLI/X8nG1FXk+XUX5ylf88v9cWWWN
-	LvXqziFwuaF3hSUm+VZUHfGVJqQTTsQ=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1690398967;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6j8St0mqpj/4YNSM4Bra0NsJcodhAVb5gyxj6MKUhdk=;
-	b=VxA96baqyrSx0Th7wF9VVaXJWqbTx1sxVsdjs+NPqeZMfRwqN4AKt2l5riUzo12mooDWJF
-	DRMoFhe1u7DDqyAw==
-Received: from adalid.arch.suse.de (adalid.arch.suse.de [10.161.8.13])
-	by relay2.suse.de (Postfix) with ESMTP id 17F0B2C14E;
-	Wed, 26 Jul 2023 19:16:07 +0000 (UTC)
-Received: by adalid.arch.suse.de (Postfix, from userid 16045)
-	id 413E751CA339; Wed, 26 Jul 2023 21:16:06 +0200 (CEST)
-From: Hannes Reinecke <hare@suse.de>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Sagi Grimberg <sagi@grimberg.me>,
-	Keith Busch <kbusch@kernel.org>,
-	linux-nvme@lists.infradead.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	Hannes Reinecke <hare@suse.de>,
-	Boris Pismenny <boris.pismenny@gmail.com>
-Subject: [PATCH 6/6] net/tls: implement ->read_sock()
-Date: Wed, 26 Jul 2023 21:15:56 +0200
-Message-Id: <20230726191556.41714-7-hare@suse.de>
-X-Mailer: git-send-email 2.35.3
-In-Reply-To: <20230726191556.41714-1-hare@suse.de>
-References: <20230726191556.41714-1-hare@suse.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E4434CE7C
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 19:16:48 +0000 (UTC)
+Received: from mout.gmx.net (mout.gmx.net [212.227.17.20])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A81C1FF0;
+	Wed, 26 Jul 2023 12:16:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.de;
+ s=s31663417; t=1690398994; x=1691003794; i=linosanfilippo@gmx.de;
+ bh=XtJKEwl+cc1nQ+vurQl0d32oGbJP4QDV2yIvd7ZPqs0=;
+ h=X-UI-Sender-Class:Date:Subject:To:Cc:References:From:In-Reply-To;
+ b=dplnZJIMnrIdh/gSEjhvNBNQsMptt4qN/OUF01q78qsYA0rW46BE/bLHokop0YWnVbjiPox
+ /XbRc1OZvJa4zZseDk0M4YHwD6jg47/zXs5rqQ0znSYx67LMh63d2ftK6o+zK7fNPQFoEON2X
+ YEdi9UlontscDa6heAa8E8/j4S3dLLWUzHI8r+oSfYroQNdiAVq09NCaw9nO9a1YY2PawCuMd
+ KOE6DqUT6PYS6w/zVbvY5Jiwf+a/fVFn70y8zHEOnMtlfuPkCwfWatLoSTRV9+VPIqzaIUAWx
+ oqKERFQWozTWA1tLK84m1/AB5gygPSymjVuv0pIUDT+L0RcYBuGw==
+X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
+Received: from [10.0.0.62] ([113.53.91.195]) by mail.gmx.net (mrgmx104
+ [212.227.17.168]) with ESMTPSA (Nemesis) id 1MGz1f-1qcAGf1ZqN-00E2LQ; Wed, 26
+ Jul 2023 21:16:34 +0200
+Message-ID: <3f88771d-17df-fcf8-ef25-8813c6c754a9@gmx.de>
+Date: Wed, 26 Jul 2023 21:16:30 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH][next] net: ethernet: slicoss: remove redundant increment
+ of pointer data
+Content-Language: en-US
+To: Colin Ian King <colin.i.king@gmail.com>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
+Cc: kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20230726164522.369206-1-colin.i.king@gmail.com>
+From: Lino Sanfilippo <LinoSanfilippo@gmx.de>
+In-Reply-To: <20230726164522.369206-1-colin.i.king@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:AoC8OX8jnUVP4YKYXasQs7JkiMpGUGOGDMbE1u8ZVDQoJOJ17Bn
+ ilfbkpeYu+t3/Ck2FlxgjGaA0SiLOTLMD6TTGB/hShJUyEMUtJ7GAcmXOCOkd0rGxOcbb88
+ kcuOYYeyH2e8jcTgkn9Q5GJSu9P0U0Oruc+Nnq3XJkVFHlqkJOShhRgei3jTE8r2dUb+0q9
+ DAMgW5ugcqeOJUVKc7dpQ==
+UI-OutboundReport: notjunk:1;M01:P0:UOCVVL4dRLQ=;bNlu7v9O1dj5KH4akcoWPoKAb3+
+ gletTswkxhLgWgesVvdtVauYQiRsHwnsDU4VDxLLdHKD8KoFiG9a83xs/6tt5H7F1D6WrMAYZ
+ jvwqEdgdObMClNvlwO+5If/XuQg3Pyn1Iuv0LBZNO/C2oThIb4vNSQaOJ3cxeXvb2+AQagaYo
+ LyBMq/E703ohR3uldFVmmq59M+RkwtDmPYWSZELZxebiMGIawj8tBqoIiDXp1PG+jtcgxXI/J
+ vJoMzVXYU780i9etmHoy56G2SN7ijdsQtyQ/jWYnhiWGRpV+P/y5cT63Z6Y3BCSu3I/tLP5L2
+ 6UVGAkzJijF2MdEnp7oMwWiYOeTmFl1gt+4YElzIBSkAzLr/T/4jTAGj0lVbsBQFFJ+TWi7Pp
+ 3r0qlD5PoSFmwhpzr+6jPIL1SLvlUGmAP7bZJsWq7fnmbg/d9DEo1scsd05Re8wcIEgxnZ/Dl
+ xxNT2pMfCds5eU6oIkdfrxZibHks5f70rCQ4vP/Ngxb7GN91z5mzDSZHBHnyFbkyWWUR2u/bq
+ 6CoAmTk6VIBaKRhq0V9fJM6yXOFXcN4qtkiWkAIXJ9elJMpihdEOXSZD/MYHU7Y52rnhzJ15+
+ cII4uuM5MjgneY2y4ifx3VDj4PTBUFcLm8UYJJLcRd37bN7iBesgpiuBeGgRs8b7fn/vmb0VF
+ ROyv55KCW5Zmrr+go3ztNpWCTvWyYCyILPu/OmJOItXSdBa/7Zt3TA2S2ebpn3PzjCMkDU/Ya
+ ByLcXO22n3F2jW7RJMy8TrqCzHqm4Z6zShpFyk87VymoLXxdS5DWfddA3BBxF5SrLlftf8Wx/
+ eogtdhxk2goeDuDMlkQ7aNOdditbxAIrfNRitoTPe9wzM4gUPnvWTDbvmIak4Vi/Xrw+v6YDU
+ 0+8rSacfVgEmCiCDGBVG6DS3znyhrg+AzeI3kgYjuNPppnA3Umfsf3GwdtkjIfgCJAyMOTB4L
+ E+QgEXdQ2MQh3q15of04ps6cyR8=
+X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+	RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Implement ->read_sock() function for use with nvme-tcp.
+Hi,
 
-Signed-off-by: Hannes Reinecke <hare@suse.de>
-Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
-Reviewed-by: Jakub Kicinski <kuba@kernel.org>
-Cc: Boris Pismenny <boris.pismenny@gmail.com>
----
- net/tls/tls.h      |  2 +
- net/tls/tls_main.c |  2 +
- net/tls/tls_sw.c   | 99 ++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 103 insertions(+)
+On 26.07.23 18:45, Colin Ian King wrote:
+> The pointer data is being incremented but this change to the pointer
+> is not used afterwards. The increment is redundant and can be removed.
+>
+> Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
+> ---
+>  drivers/net/ethernet/alacritech/slicoss.c | 4 +---
+>  1 file changed, 1 insertion(+), 3 deletions(-)
+>
+> diff --git a/drivers/net/ethernet/alacritech/slicoss.c b/drivers/net/eth=
+ernet/alacritech/slicoss.c
+> index a30d0f172986..78231c85234d 100644
+> --- a/drivers/net/ethernet/alacritech/slicoss.c
+> +++ b/drivers/net/ethernet/alacritech/slicoss.c
+> @@ -1520,10 +1520,8 @@ static void slic_get_ethtool_stats(struct net_dev=
+ice *dev,
+>
+>  static void slic_get_strings(struct net_device *dev, u32 stringset, u8 =
+*data)
+>  {
+> -	if (stringset =3D=3D ETH_SS_STATS) {
+> +	if (stringset =3D=3D ETH_SS_STATS)
+>  		memcpy(data, slic_stats_strings, sizeof(slic_stats_strings));
+> -		data +=3D sizeof(slic_stats_strings);
+> -	}
+>  }
+>
+>  static void slic_get_drvinfo(struct net_device *dev,
 
-diff --git a/net/tls/tls.h b/net/tls/tls.h
-index 86cef1c68e03..7e4d45537deb 100644
---- a/net/tls/tls.h
-+++ b/net/tls/tls.h
-@@ -110,6 +110,8 @@ bool tls_sw_sock_is_readable(struct sock *sk);
- ssize_t tls_sw_splice_read(struct socket *sock, loff_t *ppos,
- 			   struct pipe_inode_info *pipe,
- 			   size_t len, unsigned int flags);
-+int tls_sw_read_sock(struct sock *sk, read_descriptor_t *desc,
-+		     sk_read_actor_t read_actor);
- 
- int tls_device_sendmsg(struct sock *sk, struct msghdr *msg, size_t size);
- void tls_device_splice_eof(struct socket *sock);
-diff --git a/net/tls/tls_main.c b/net/tls/tls_main.c
-index b6896126bb92..7dbb8cd8f809 100644
---- a/net/tls/tls_main.c
-+++ b/net/tls/tls_main.c
-@@ -962,10 +962,12 @@ static void build_proto_ops(struct proto_ops ops[TLS_NUM_CONFIG][TLS_NUM_CONFIG]
- 	ops[TLS_BASE][TLS_SW  ] = ops[TLS_BASE][TLS_BASE];
- 	ops[TLS_BASE][TLS_SW  ].splice_read	= tls_sw_splice_read;
- 	ops[TLS_BASE][TLS_SW  ].poll		= tls_sk_poll;
-+	ops[TLS_BASE][TLS_SW  ].read_sock	= tls_sw_read_sock;
- 
- 	ops[TLS_SW  ][TLS_SW  ] = ops[TLS_SW  ][TLS_BASE];
- 	ops[TLS_SW  ][TLS_SW  ].splice_read	= tls_sw_splice_read;
- 	ops[TLS_SW  ][TLS_SW  ].poll		= tls_sk_poll;
-+	ops[TLS_SW  ][TLS_SW  ].read_sock	= tls_sw_read_sock;
- 
- #ifdef CONFIG_TLS_DEVICE
- 	ops[TLS_HW  ][TLS_BASE] = ops[TLS_BASE][TLS_BASE];
-diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
-index d0636ea13009..9c1f13541708 100644
---- a/net/tls/tls_sw.c
-+++ b/net/tls/tls_sw.c
-@@ -2202,6 +2202,105 @@ ssize_t tls_sw_splice_read(struct socket *sock,  loff_t *ppos,
- 	goto splice_read_end;
- }
- 
-+int tls_sw_read_sock(struct sock *sk, read_descriptor_t *desc,
-+		     sk_read_actor_t read_actor)
-+{
-+	struct tls_context *tls_ctx = tls_get_ctx(sk);
-+	struct tls_sw_context_rx *ctx = tls_sw_ctx_rx(tls_ctx);
-+	struct tls_prot_info *prot = &tls_ctx->prot_info;
-+	struct strp_msg *rxm = NULL;
-+	struct sk_buff *skb = NULL;
-+	struct sk_psock *psock;
-+	size_t flushed_at = 0;
-+	bool released = true;
-+	struct tls_msg *tlm;
-+	ssize_t copied = 0;
-+	ssize_t decrypted;
-+	int err, used;
-+
-+	psock = sk_psock_get(sk);
-+	if (psock) {
-+		sk_psock_put(sk, psock);
-+		return -EINVAL;
-+	}
-+	err = tls_rx_reader_acquire(sk, ctx, true);
-+	if (err < 0)
-+		return err;
-+
-+	/* If crypto failed the connection is broken */
-+	err = ctx->async_wait.err;
-+	if (err)
-+		goto read_sock_end;
-+
-+	decrypted = 0;
-+	do {
-+		if (!skb_queue_empty(&ctx->rx_list)) {
-+			skb = __skb_dequeue(&ctx->rx_list);
-+			rxm = strp_msg(skb);
-+			tlm = tls_msg(skb);
-+		} else {
-+			struct tls_decrypt_arg darg;
-+			int to_decrypt;
-+
-+			err = tls_rx_rec_wait(sk, NULL, true, released);
-+			if (err <= 0)
-+				goto read_sock_end;
-+
-+			memset(&darg.inargs, 0, sizeof(darg.inargs));
-+
-+			rxm = strp_msg(tls_strp_msg(ctx));
-+			tlm = tls_msg(tls_strp_msg(ctx));
-+
-+			to_decrypt = rxm->full_len - prot->overhead_size;
-+
-+			err = tls_rx_one_record(sk, NULL, &darg);
-+			if (err < 0) {
-+				tls_err_abort(sk, -EBADMSG);
-+				goto read_sock_end;
-+			}
-+
-+			released = tls_read_flush_backlog(sk, prot, rxm->full_len, to_decrypt,
-+							  decrypted, &flushed_at);
-+			skb = darg.skb;
-+			decrypted += rxm->full_len;
-+
-+			tls_rx_rec_done(ctx);
-+		}
-+
-+		/* read_sock does not support reading control messages */
-+		if (tlm->control != TLS_RECORD_TYPE_DATA) {
-+			err = -EINVAL;
-+			goto read_sock_requeue;
-+		}
-+
-+		used = read_actor(desc, skb, rxm->offset, rxm->full_len);
-+		if (used <= 0) {
-+			if (!copied)
-+				err = used;
-+			goto read_sock_requeue;
-+		}
-+		copied += used;
-+		if (used < rxm->full_len) {
-+			rxm->offset += used;
-+			rxm->full_len -= used;
-+			if (!desc->count)
-+				goto read_sock_requeue;
-+		} else {
-+			consume_skb(skb);
-+			if (!desc->count)
-+				skb = NULL;
-+		}
-+	} while (skb);
-+
-+read_sock_end:
-+	tls_rx_reader_release(sk, ctx);
-+	return copied ? : err;
-+
-+read_sock_requeue:
-+	__skb_queue_head(&ctx->rx_list, skb);
-+	goto read_sock_end;
-+}
-+
- bool tls_sw_sock_is_readable(struct sock *sk)
- {
- 	struct tls_context *tls_ctx = tls_get_ctx(sk);
--- 
-2.35.3
+FWIW
+Acked-by: Lino Sanfilippo <LinoSanfilippo@gmx.de>
 
+Best Regards,
+Lino
 
