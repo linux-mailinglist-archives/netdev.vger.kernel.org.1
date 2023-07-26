@@ -1,53 +1,54 @@
-Return-Path: <netdev+bounces-21314-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21315-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C27917633EA
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 12:36:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7347F7633F0
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 12:38:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F2E111C21224
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 10:36:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 05802281D5D
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 10:38:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCAFCCA44;
-	Wed, 26 Jul 2023 10:36:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 278AFCA4B;
+	Wed, 26 Jul 2023 10:38:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B16EACA41
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 10:36:32 +0000 (UTC)
-Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 118EF2126;
-	Wed, 26 Jul 2023 03:36:30 -0700 (PDT)
-Received: from fllv0035.itg.ti.com ([10.64.41.0])
-	by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 36QAaDvp045912;
-	Wed, 26 Jul 2023 05:36:13 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1690367773;
-	bh=AsQ7eL3/H2JJHOml5th1RT/qIatR0oms1Ab+63AsSdY=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=oO2vlJsRYavoQbpnR7BH7gv/D6zsLsuKLq8VVi5DAQcF5dI92qLsXfFhlduzSrmeH
-	 ArZM4IJpCeczHcpAVUPJDp8KPKaVcK0Lo5i2oIt3GC/hjn3Gth5hPMbAnAnK6d49+b
-	 cwvbg8c/vCB7LtynoQBuBk2cuAEcXDjkBhsWlmO4=
-Received: from DLEE114.ent.ti.com (dlee114.ent.ti.com [157.170.170.25])
-	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 36QAaDhR058238
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Wed, 26 Jul 2023 05:36:13 -0500
-Received: from DLEE114.ent.ti.com (157.170.170.25) by DLEE114.ent.ti.com
- (157.170.170.25) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Wed, 26
- Jul 2023 05:36:13 -0500
-Received: from fllv0039.itg.ti.com (10.64.41.19) by DLEE114.ent.ti.com
- (157.170.170.25) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Wed, 26 Jul 2023 05:36:13 -0500
-Received: from [172.24.227.217] (ileaxei01-snat.itg.ti.com [10.180.69.5])
-	by fllv0039.itg.ti.com (8.15.2/8.15.2) with ESMTP id 36QAa7iP077859;
-	Wed, 26 Jul 2023 05:36:07 -0500
-Message-ID: <296b0e98-4012-09f6-84cd-6f87a85f095f@ti.com>
-Date: Wed, 26 Jul 2023 16:06:06 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1615FCA47
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 10:38:38 +0000 (UTC)
+Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83E692688;
+	Wed, 26 Jul 2023 03:38:33 -0700 (PDT)
+Received: from pps.filterd (m0241204.ppops.net [127.0.0.1])
+	by mx07-00178001.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36Q7VVTF007894;
+	Wed, 26 Jul 2023 12:38:04 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=selector1;
+ bh=m3mYWrA/DTLv41VpwfV17mvsYoyUfau6u7+hEa+ifQc=;
+ b=StqXKwyL7+7LDaIZyI07PQqK9myM1eGjwiJXVgV7hXd1HYwrwqVxv0Ke6+jBU+gEHnNF
+ C4IWMIndiWGcKwbazL4krgpwvf0h+hRpncBgnU0chBIWga4Ti/udQnnasVMjaruPCDHt
+ SGLg56OGWAZ5MLGhf7vm28pQPHuWDFIdooMSYiONkEHXPU9h8iM3l1CmJnyRESF0yefK
+ /LeH2/ekGQ5JH8AUoemR6NcabEhFT60e7RnR9S4yJUcJvDQoU5WwMRE4ECf+VSFP9dWq
+ gThtuuQifp5g4G1WsHdpQU8TXWWKcSSiWY4Mv9xfZ5XkPtDsodKpJhg5UXAukT11wbv2 +A== 
+Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
+	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3s2y641bv3-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 26 Jul 2023 12:38:04 +0200
+Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
+	by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id AC79A10002A;
+	Wed, 26 Jul 2023 12:38:03 +0200 (CEST)
+Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
+	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 9C31C217876;
+	Wed, 26 Jul 2023 12:38:03 +0200 (CEST)
+Received: from [10.201.21.121] (10.201.21.121) by SHFDAG1NODE1.st.com
+ (10.75.129.69) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.21; Wed, 26 Jul
+ 2023 12:38:01 +0200
+Message-ID: <d228e17b-4f5f-d5e0-1c59-d247cbc0693e@foss.st.com>
+Date: Wed, 26 Jul 2023 12:38:00 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,96 +56,266 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [EXTERNAL] Re: [PATCH v11 07/10] net: ti: icssg-prueth: Add ICSSG
- Stats
+ Thunderbird/102.13.0
+Subject: Re: [PATCH v2 05/11] firewall: introduce stm32_firewall framework
 Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>, MD Danish Anwar <danishanwar@ti.com>
-CC: Randy Dunlap <rdunlap@infradead.org>, Roger Quadros <rogerq@kernel.org>,
-        Simon Horman <simon.horman@corigine.com>,
-        Vignesh Raghavendra
-	<vigneshr@ti.com>, Andrew Lunn <andrew@lunn.ch>,
-        Richard Cochran
-	<richardcochran@gmail.com>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Krzysztof
- Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Rob Herring
-	<robh+dt@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-        Eric Dumazet
-	<edumazet@google.com>,
-        "David S. Miller" <davem@davemloft.net>, <nm@ti.com>, <srk@ti.com>,
-        <linux-kernel@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <linux-omap@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>
-References: <20230724112934.2637802-1-danishanwar@ti.com>
- <20230724112934.2637802-8-danishanwar@ti.com>
- <20230725205014.04e4bba3@kernel.org>
-From: Md Danish Anwar <a0501179@ti.com>
-Organization: Texas Instruments
-In-Reply-To: <20230725205014.04e4bba3@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+To: Simon Horman <simon.horman@corigine.com>
+CC: <Oleksii_Moisieiev@epam.com>, <gregkh@linuxfoundation.org>,
+        <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <robh+dt@kernel.org>, <krzysztof.kozlowski+dt@linaro.org>,
+        <conor+dt@kernel.org>, <alexandre.torgue@foss.st.com>,
+        <vkoul@kernel.org>, <jic23@kernel.org>, <olivier.moysan@foss.st.com>,
+        <arnaud.pouliquen@foss.st.com>, <mchehab@kernel.org>,
+        <fabrice.gasnier@foss.st.com>, <andi.shyti@kernel.org>,
+        <ulf.hansson@linaro.org>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <hugues.fruchet@foss.st.com>, <lee@kernel.org>,
+        <will@kernel.org>, <catalin.marinas@arm.com>, <arnd@kernel.org>,
+        <richardcochran@gmail.com>, Frank Rowand <frowand.list@gmail.com>,
+        <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+        <dmaengine@vger.kernel.org>, <linux-i2c@vger.kernel.org>,
+        <linux-iio@vger.kernel.org>, <alsa-devel@alsa-project.org>,
+        <linux-media@vger.kernel.org>, <linux-mmc@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <linux-phy@lists.infradead.org>,
+        <linux-serial@vger.kernel.org>, <linux-spi@vger.kernel.org>,
+        <linux-usb@vger.kernel.org>
+References: <20230725164104.273965-1-gatien.chevallier@foss.st.com>
+ <20230725164104.273965-6-gatien.chevallier@foss.st.com>
+ <ZMDzNSkRvvVsxUto@corigine.com>
+From: Gatien CHEVALLIER <gatien.chevallier@foss.st.com>
+In-Reply-To: <ZMDzNSkRvvVsxUto@corigine.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
-X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_MED,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+X-Originating-IP: [10.201.21.121]
+X-ClientProxiedBy: SHFCAS1NODE2.st.com (10.75.129.73) To SHFDAG1NODE1.st.com
+ (10.75.129.69)
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-07-26_04,2023-07-25_01,2023-05-22_02
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,NICE_REPLY_A,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Jakub
 
-On 26/07/23 9:20 am, Jakub Kicinski wrote:
-> On Mon, 24 Jul 2023 16:59:31 +0530 MD Danish Anwar wrote:
->> +	/* Rx */
->> +	ICSSG_STATS(rx_packets, true),
->> +	ICSSG_STATS(rx_broadcast_frames, false),
->> +	ICSSG_STATS(rx_multicast_frames, false),
+
+On 7/26/23 12:19, Simon Horman wrote:
+> On Tue, Jul 25, 2023 at 06:40:58PM +0200, Gatien Chevallier wrote:
+>> Introduce a STM32 firewall framework that offers to firewall consumers
+>> different firewall services such as the ability to check their access
+>> rights against their firewall controller(s).
+>>
+>> The STM32 firewall framework offers a generic API for STM32 firewall
+>> controllers that is defined in their drivers to best fit the
+>> specificity of each firewall.
+>>
+>> There are various types of firewalls:
+>> -Peripheral firewalls that filter accesses to peripherals
+>> -Memory firewalls that filter accesses to memories or memory regions
+>> -No type for undefined type of firewall
+>>
+>> Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
 > 
-> There is a standard stat for mcast.
+> ...
+> 
+>> diff --git a/drivers/bus/stm32_firewall.c b/drivers/bus/stm32_firewall.c
+> 
+> ...
+> 
+>> +int stm32_firewall_populate_bus(struct stm32_firewall_controller *firewall_controller)
+>> +{
+>> +	struct stm32_firewall *firewalls;
+>> +	struct device_node *child;
+>> +	struct device *parent;
+>> +	unsigned int i;
+>> +	int len;
+>> +	int err;
+>> +
+>> +	parent = firewall_controller->dev;
+>> +
+>> +	dev_dbg(parent, "Populating %s system bus\n", dev_name(firewall_controller->dev));
+>> +
+>> +	for_each_available_child_of_node(dev_of_node(parent), child) {
+>> +		/* The feature-domains property is mandatory for firewall bus devices */
+>> +		len = of_count_phandle_with_args(child, "feature-domains", "#feature-domain-cells");
+>> +		if (len <= 0)
+> 
+> Coccinelle says that, due to breaking out of a
+> for_each_available_child_of_node() loop, a call to of_node_put()
+> is needed here
 > 
 
-Sure. I will add multicast stats via .ndo_get_stats64 instead of ethtool.
+Hi Simon,
 
->> +	ICSSG_STATS(rx_crc_errors, true),
->> +	ICSSG_STATS(rx_mii_error_frames, false),
->> +	ICSSG_STATS(rx_odd_nibble_frames, false),
->> +	ICSSG_STATS(rx_frame_max_size, false),
->> +	ICSSG_STATS(rx_max_size_error_frames, false),
->> +	ICSSG_STATS(rx_frame_min_size, false),
->> +	ICSSG_STATS(rx_min_size_error_frames, false),
->> +	ICSSG_STATS(rx_over_errors, true),
->> +	ICSSG_STATS(rx_class0_hits, false),
->> +	ICSSG_STATS(rx_class1_hits, false),
->> +	ICSSG_STATS(rx_class2_hits, false),
->> +	ICSSG_STATS(rx_class3_hits, false),
->> +	ICSSG_STATS(rx_class4_hits, false),
->> +	ICSSG_STATS(rx_class5_hits, false),
->> +	ICSSG_STATS(rx_class6_hits, false),
->> +	ICSSG_STATS(rx_class7_hits, false),
->> +	ICSSG_STATS(rx_class8_hits, false),
->> +	ICSSG_STATS(rx_class9_hits, false),
->> +	ICSSG_STATS(rx_class10_hits, false),
->> +	ICSSG_STATS(rx_class11_hits, false),
->> +	ICSSG_STATS(rx_class12_hits, false),
->> +	ICSSG_STATS(rx_class13_hits, false),
->> +	ICSSG_STATS(rx_class14_hits, false),
->> +	ICSSG_STATS(rx_class15_hits, false),
->> +	ICSSG_STATS(rx_smd_frags, false),
->> +	ICSSG_STATS(rx_bucket1_size, false),
->> +	ICSSG_STATS(rx_bucket2_size, false),
->> +	ICSSG_STATS(rx_bucket3_size, false),
->> +	ICSSG_STATS(rx_bucket4_size, false),
+Thank you, I already sent a V3 correcting the patch ordering issue. I
+will implement this for V4.
+
+>> +			return -EINVAL;
+>> +
+>> +		firewalls = kcalloc(len, sizeof(*firewalls), GFP_KERNEL);
+>> +		if (!firewalls)
 > 
-> Are the bucket sizes configurable? Can we set the bucket sizes
-> to standard RMON ones and use ethtool RMON stats?
+> And here.
+> 
 
-The bucket sizes are not configurable. Bucket size is read from hardware and is
-fixed. I don't think we can configure bucket size and use ethtool RMON stats.
-It's better to dump bucket sizes via ethtool -S.
+ditto
 
--- 
-Thanks and Regards,
-Danish.
+>> +			return -ENOMEM;
+>> +
+>> +		err = stm32_firewall_get_firewall(child, firewalls, (unsigned int)len);
+>> +		if (err) {
+>> +			kfree(firewalls);
+> 
+> And here.
+> 
+
+ditto
+
+>> +			return err;
+>> +		}
+>> +
+>> +		for (i = 0; i < len; i++) {
+>> +			if (firewall_controller->grant_access(firewall_controller,
+>> +							      firewalls[i].firewall_id)) {
+>> +				/*
+>> +				 * Peripheral access not allowed or not defined.
+>> +				 * Mark the node as populated so platform bus won't probe it
+>> +				 */
+>> +				of_node_set_flag(child, OF_POPULATED);
+>> +				dev_err(parent, "%s: Device driver will not be probed\n",
+>> +					child->full_name);
+>> +			}
+>> +		}
+>> +
+>> +		kfree(firewalls);
+>> +	}
+>> +
+>> +	return 0;
+>> +}
+>> +EXPORT_SYMBOL_GPL(stm32_firewall_populate_bus);
+> 
+>> diff --git a/drivers/bus/stm32_firewall.h b/drivers/bus/stm32_firewall.h
+> 
+> ...
+> 
+>> +/**
+>> + * struct stm32_firewall_controller - Information on firewall controller supplying services
+>> + *
+>> + * @name			Name of the firewall controller
+> 
+> kernel-doc complains that name and the other fields of
+> struct stm32_firewall_controller are not documented.
+> I believe this is because a ':' is needed after the name of
+> the parameter (in this case 'name').
+> 
+>   * @name:			Name of the firewall controller
+> 
+> Likewise, elsewhere.
+> 
+
+I will implement it in V4, thank you.
+
+>> + * @dev				Device reference of the firewall controller
+>> + * @mmio			Base address of the firewall controller
+>> + * @entry			List entry of the firewall controller list
+>> + * @type			Type of firewall
+>> + * @max_entries			Number of entries covered by the firewall
+>> + * @grant_access		Callback used to grant access for a device access against a
+>> + *				firewall controller
+>> + * @release_access		Callback used to release resources taken by a device when access was
+>> + *				granted
+>> + * @grant_memory_range_access	Callback used to grant access for a device to a given memory region
+>> + */
+>> +struct stm32_firewall_controller {
+>> +	const char *name;
+>> +	struct device *dev;
+>> +	void __iomem *mmio;
+>> +	struct list_head entry;
+>> +	unsigned int type;
+>> +	unsigned int max_entries;
+>> +
+>> +	int (*grant_access)(struct stm32_firewall_controller *ctrl, u32 id);
+>> +	void (*release_access)(struct stm32_firewall_controller *ctrl, u32 id);
+>> +	int (*grant_memory_range_access)(struct stm32_firewall_controller *ctrl, phys_addr_t paddr,
+>> +					 size_t size);
+>> +};
+>> +
+>> +/**
+>> + * int stm32_firewall_controller_register - Register a firewall controller to the STM32 firewall
+> 
+> kernel-doc seems unhappy about the presence of 'int' on this line.
+> 
+>   * stm32_firewall_controller_register - Register a firewall controller to the STM32 firewall
+> 
+> Likewise, elsewhere.
+> 
+
+Yes, I will remove the type in V4.
+
+>> + *					    framework
+>> + * @firewall_controller		Firewall controller to register
+>> + *
+>> + * Returns 0 in case of success or -ENODEV if no controller was given.
+>> + */
+>> +int stm32_firewall_controller_register(struct stm32_firewall_controller *firewall_controller);
+> 
+> ...
+> 
+>> diff --git a/include/linux/bus/stm32_firewall_device.h b/include/linux/bus/stm32_firewall_device.h
+>> new file mode 100644
+>> index 000000000000..9bdc4060154c
+>> --- /dev/null
+>> +++ b/include/linux/bus/stm32_firewall_device.h
+>> @@ -0,0 +1,140 @@
+>> +/* SPDX-License-Identifier: GPL-2.0-only */
+>> +/*
+>> + * Copyright (C) 2023, STMicroelectronics - All Rights Reserved
+>> + */
+>> +
+>> +#ifndef STM32_FIREWALL_DEVICE_H
+>> +#define STM32_FIREWALL_DEVICE_H
+>> +
+>> +#include <linux/of.h>
+>> +#include <linux/platform_device.h>
+>> +#include <linux/types.h>
+>> +
+>> +#define STM32_FIREWALL_MAX_EXTRA_ARGS		5
+>> +
+>> +/* Opaque reference to stm32_firewall_controller */
+>> +struct stm32_firewall_controller;
+>> +
+>> +/**
+>> + * stm32_firewall - Information on a device's firewall. Each device can have more than one firewall.
+> 
+> kernel-doc seems unhappy about the absence of struct on this line.
+> 
+>   * struct stm32_firewall - Information on a device's firewall. Each device can have more than one firewall.
+> 
+
+Yes, I will add the struct in V4.
+
+>> + *
+>> + * @firewall_ctrl		Pointer referencing a firewall controller of the device. It is
+>> + *				opaque so a device cannot manipulate the controller's ops or access
+>> + *				the controller's data
+>> + * @extra_args			Extra arguments that are implementation dependent
+>> + * @entry			Name of the firewall entry
+>> + * @extra_args_size		Number of extra arguments
+>> + * @firewall_id			Firewall ID associated the device for this firewall controller
+>> + */
+>> +struct stm32_firewall {
+>> +	struct stm32_firewall_controller *firewall_ctrl;
+>> +	u32 extra_args[STM32_FIREWALL_MAX_EXTRA_ARGS];
+>> +	const char *entry;
+>> +	size_t extra_args_size;
+>> +	u32 firewall_id;
+>> +};
+> 
+> ...
+> 
+Best regards,
+Gatien
 
