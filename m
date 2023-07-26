@@ -1,99 +1,123 @@
-Return-Path: <netdev+bounces-21482-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21476-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A10E763B00
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 17:26:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D34D0763AEE
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 17:24:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CAEA71C21342
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 15:26:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 100AF1C2133A
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 15:24:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4251E253C6;
-	Wed, 26 Jul 2023 15:25:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99DB8253A3;
+	Wed, 26 Jul 2023 15:24:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3777DCA63
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 15:25:46 +0000 (UTC)
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [IPv6:2a0a:51c0:0:237:300::1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26D7394;
-	Wed, 26 Jul 2023 08:25:45 -0700 (PDT)
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@breakpoint.cc>)
-	id 1qOgOS-0001Hn-H8; Wed, 26 Jul 2023 17:25:40 +0200
-From: Florian Westphal <fw@strlen.de>
-To: <netdev@vger.kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	<netfilter-devel@vger.kernel.org>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Kevin Rich <kevinrich1337@gmail.com>
-Subject: [PATCH net 3/3] netfilter: nf_tables: disallow rule addition to bound chain via NFTA_RULE_CHAIN_ID
-Date: Wed, 26 Jul 2023 17:23:49 +0200
-Message-ID: <20230726152524.26268-4-fw@strlen.de>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230726152524.26268-1-fw@strlen.de>
-References: <20230726152524.26268-1-fw@strlen.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B761E57C
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 15:24:42 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8ED6C433C7;
+	Wed, 26 Jul 2023 15:24:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1690385081;
+	bh=XtQHPjwlUAYxGYo7V7WNdtEo+xDINh3xf8oWKZdFtPM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ajWOBzMzGhBoqzfc5/DW9aF/gzYa0wM+vSx2pxzmI/7dY0miIeIIjqjyBGxE0JzWb
+	 0+Be9ZPNi4QMYnzvKxNL06mLMrPnlHI6r1AFOiBDJf0fub79NUx64XIhQxnbfb0qAS
+	 0D2Qj+MXNiJeESeORBdztPo+ffbinai/Z+J5lIIuGm3cxF998g2HPKBJc4e4AKgdHr
+	 SWC1FzJ4EbDQNDK/SsYHmtcsCxrAyNLRVB7/n0Be8lW9ED2pkKPxE56jwkFYjX1z3x
+	 FdGILD3G7swQqW17sCU6lryDnJAMjG5uHjqnHSQ90YgI369/OKpvKUMfyTRSF281Do
+	 G3Z8h4PW665iA==
+Received: (nullmailer pid 1474009 invoked by uid 1000);
+	Wed, 26 Jul 2023 15:24:39 -0000
+Date: Wed, 26 Jul 2023 09:24:39 -0600
+From: Rob Herring <robh@kernel.org>
+To: Jisheng Zhang <jszhang@kernel.org>
+Cc: "David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, Giuseppe Cavallaro <peppe.cavallaro@st.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, devicetree@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH net-next 09/10] dt-bindings: net: snps,dwmac: add per
+ channel irq support
+Message-ID: <20230726152439.GA1471409-robh@kernel.org>
+References: <20230723161029.1345-1-jszhang@kernel.org>
+ <20230723161029.1345-10-jszhang@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_MED,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230723161029.1345-10-jszhang@kernel.org>
 
-From: Pablo Neira Ayuso <pablo@netfilter.org>
+On Mon, Jul 24, 2023 at 12:10:28AM +0800, Jisheng Zhang wrote:
+> The IP supports per channel interrupt, add support for this usage case.
+> 
+> Signed-off-by: Jisheng Zhang <jszhang@kernel.org>
+> ---
+>  .../devicetree/bindings/net/snps,dwmac.yaml   | 23 +++++++++++++++++++
+>  1 file changed, 23 insertions(+)
+> 
+> diff --git a/Documentation/devicetree/bindings/net/snps,dwmac.yaml b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+> index bb80ca205d26..525210c2c06c 100644
+> --- a/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+> +++ b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+> @@ -101,6 +101,11 @@ properties:
+>      minItems: 1
+>      maxItems: 2
+>  
+> +  snps,per-channel-interrupt:
+> +    $ref: /schemas/types.yaml#/definitions/flag
+> +    description:
+> +      Indicates that Rx and Tx complete will generate a unique interrupt for each channel
 
-Bail out with EOPNOTSUPP when adding rule to bound chain via
-NFTA_RULE_CHAIN_ID. The following warning splat is shown when
-adding a rule to a deleted bound chain:
+Can't you determine this based on the number of interrupts or interrupt 
+names?
 
- WARNING: CPU: 2 PID: 13692 at net/netfilter/nf_tables_api.c:2013 nf_tables_chain_destroy+0x1f7/0x210 [nf_tables]
- CPU: 2 PID: 13692 Comm: chain-bound-rul Not tainted 6.1.39 #1
- RIP: 0010:nf_tables_chain_destroy+0x1f7/0x210 [nf_tables]
+> +
+>    interrupts:
+>      minItems: 1
+>      items:
+> @@ -109,6 +114,8 @@ properties:
+>        - description: The interrupt that occurs when Rx exits the LPI state
+>        - description: The interrupt that occurs when Safety Feature Correctible Errors happen
+>        - description: The interrupt that occurs when Safety Feature Uncorrectible Errors happen
+> +      - description: All of the rx per-channel interrupts
+> +      - description: All of the tx per-channel interrupts
 
-Fixes: d0e2c7de92c7 ("netfilter: nf_tables: add NFT_CHAIN_BINDING")
-Reported-by: Kevin Rich <kevinrich1337@gmail.com>
-Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
-Signed-off-by: Florian Westphal <fw@strlen.de>
----
- net/netfilter/nf_tables_api.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+You added 2 interrupts here and...
 
-diff --git a/net/netfilter/nf_tables_api.c b/net/netfilter/nf_tables_api.c
-index b9a4d3fd1d34..d3c6ecd1f5a6 100644
---- a/net/netfilter/nf_tables_api.c
-+++ b/net/netfilter/nf_tables_api.c
-@@ -3811,8 +3811,6 @@ static int nf_tables_newrule(struct sk_buff *skb, const struct nfnl_info *info,
- 			NL_SET_BAD_ATTR(extack, nla[NFTA_RULE_CHAIN]);
- 			return PTR_ERR(chain);
- 		}
--		if (nft_chain_is_bound(chain))
--			return -EOPNOTSUPP;
- 
- 	} else if (nla[NFTA_RULE_CHAIN_ID]) {
- 		chain = nft_chain_lookup_byid(net, table, nla[NFTA_RULE_CHAIN_ID],
-@@ -3825,6 +3823,9 @@ static int nf_tables_newrule(struct sk_buff *skb, const struct nfnl_info *info,
- 		return -EINVAL;
- 	}
- 
-+	if (nft_chain_is_bound(chain))
-+		return -EOPNOTSUPP;
-+
- 	if (nla[NFTA_RULE_HANDLE]) {
- 		handle = be64_to_cpu(nla_get_be64(nla[NFTA_RULE_HANDLE]));
- 		rule = __nft_rule_lookup(chain, handle);
--- 
-2.41.0
+>  
+>    interrupt-names:
+>      minItems: 1
+> @@ -118,6 +125,22 @@ properties:
+>        - const: eth_lpi
+>        - const: sfty_ce_irq
+>        - const: sfty_ue_irq
+> +      - const: rx0
+> +      - const: rx1
+> +      - const: rx2
+> +      - const: rx3
+> +      - const: rx4
+> +      - const: rx5
+> +      - const: rx6
+> +      - const: rx7
+> +      - const: tx0
+> +      - const: tx1
+> +      - const: tx2
+> +      - const: tx3
+> +      - const: tx4
+> +      - const: tx5
+> +      - const: tx6
+> +      - const: tx7
 
+And 16 here?
+
+>  
+>    clocks:
+>      minItems: 1
+> -- 
+> 2.40.1
+> 
 
