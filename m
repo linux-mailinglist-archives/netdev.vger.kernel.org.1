@@ -1,232 +1,249 @@
-Return-Path: <netdev+bounces-21511-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21513-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB891763C07
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 18:10:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5174D763C44
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 18:20:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CAB951C213D9
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 16:10:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 74AE81C213B3
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 16:20:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8469937994;
-	Wed, 26 Jul 2023 16:10:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACED63799F;
+	Wed, 26 Jul 2023 16:20:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71202E57F
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 16:10:26 +0000 (UTC)
-Received: from mail-qt1-x82e.google.com (mail-qt1-x82e.google.com [IPv6:2607:f8b0:4864:20::82e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23AFB1FF2
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 09:10:24 -0700 (PDT)
-Received: by mail-qt1-x82e.google.com with SMTP id d75a77b69052e-403aa5d07caso49972361cf.0
-        for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 09:10:24 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C6E737991
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 16:20:18 +0000 (UTC)
+Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42BF3268C
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 09:20:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google; t=1690387823; x=1690992623;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=K7viDi95/DtqS7YumhA/QRcfR2/DcATgamUSnc6vM2A=;
-        b=sxj07bNcg5678Si4gdEEp+WW40Oh8OI/eqiNU57JICAoq/E0Moh1ql4Pa0rJCD5mXQ
-         owdUb7eyP+YcKFu9dUnu4PnUQ1PmNYO06AVBi6/Nq1AJjmy0x9dpbxtZCwdMGx8tDzkR
-         u9NWYslhaCMLBzgQIrcdD92wnxlUg+s93/lZY=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690387823; x=1690992623;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=K7viDi95/DtqS7YumhA/QRcfR2/DcATgamUSnc6vM2A=;
-        b=IOyI0hbtQ66qhc4UkHgVcwlLF89BDlExJI3J47e8J0uK900woCyGDcbhOHHp1X8mM6
-         mPdeozQg2n4OSwWgTvrnWTXKonnxpm1LHWnUdEXfiUrwrlB11VOJZzPHS9bqXpfFu77A
-         Mp2jJbebQCG9aBREl+P8zCmV6iNRrJTwOZuw2WGk694Y2yZR8BXcSfNuXV/tiV+9Mm8Q
-         KJIBggEViGSCX+3yAFluxxOmSyBACGZ53Oc6eijJkikLXW5/4K8YsYYmnjBpQYMNBY4Y
-         HtXKn84ggdhT5kpxxdijTrqSyoWPQkG33eVkh5e/fHTE3nx/oAJnROaHMcFnD2W9ZzXO
-         CV1w==
-X-Gm-Message-State: ABy/qLas1NfVlnfvfzU1WZOeztHDTVsithqwH6Ts8g+HFqSfhjp8cGv7
-	u0HlZwi4ricKSIN3jWpd3ZQJwQ==
-X-Google-Smtp-Source: APBJJlFVm/mD0dcIslde2+vo1h0MzL3tM9Znqz5P9eLlBAcDjqJloXRDQy5GwhCsjZ2SScRq8TUP2A==
-X-Received: by 2002:ac8:5c02:0:b0:403:a63d:9a2e with SMTP id i2-20020ac85c02000000b00403a63d9a2emr3018341qti.10.1690387823149;
-        Wed, 26 Jul 2023 09:10:23 -0700 (PDT)
-Received: from debian.debian ([140.141.197.139])
-        by smtp.gmail.com with ESMTPSA id fb14-20020a05622a480e00b003f7fd3ce69fsm4902747qtb.59.2023.07.26.09.10.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Jul 2023 09:10:22 -0700 (PDT)
-Date: Wed, 26 Jul 2023 09:10:20 -0700
-From: Yan Zhai <yan@cloudflare.com>
-To: Dan Carpenter <dan.carpenter@linaro.org>
-Cc: Yan Zhai <yan@cloudflare.com>, bpf@vger.kernel.org,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
-	Yonghong Song <yhs@fb.com>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
-	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, kernel-team@cloudflare.com,
-	Jordan Griege <jgriege@cloudflare.com>,
-	Markus Elfring <Markus.Elfring@web.de>,
-	Jakub Sitnicki <jakub@cloudflare.com>
-Subject: Re: [PATCH v4 bpf 1/2] bpf: fix skb_do_redirect return values
-Message-ID: <ZMFFbChK/66/8XZd@debian.debian>
-References: <cover.1690332693.git.yan@cloudflare.com>
- <e5d05e56bf41de82f10d33229b8a8f6b49290e98.1690332693.git.yan@cloudflare.com>
- <a76b300a-e472-4568-b734-37115927621d@moroto.mountain>
- <ZMEqYOOBc1ZNcEER@debian.debian>
- <bc3ec02d-4d4e-477a-b8a5-5245425326c6@kadam.mountain>
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1690388404; x=1721924404;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=vedA0tBPnLKFhmZ2bBCP4QsuT1oa0T4cLKtKhheWcEE=;
+  b=YsmikmSKNI2laYTBAQR5Fi4/vNgVsrj7E8uPQzlyRcpeHGqMukVfj2Rm
+   IeK5XaGFcTUUyRL0tgHUErPHgoi4jn1r6mZjNgfCa6n1BwXaQA/pc/8CI
+   T1N8GDtNAKXU8yCThw7u8V+z6XS7eIBELsdt2YA/T8xm/lepK4X+cHMS8
+   4=;
+X-IronPort-AV: E=Sophos;i="6.01,232,1684800000"; 
+   d="scan'208";a="598517829"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-iad-1d-m6i4x-d8e96288.us-east-1.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jul 2023 16:20:02 +0000
+Received: from EX19MTAUWC001.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
+	by email-inbound-relay-iad-1d-m6i4x-d8e96288.us-east-1.amazon.com (Postfix) with ESMTPS id A7663856B1;
+	Wed, 26 Jul 2023 16:19:58 +0000 (UTC)
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Wed, 26 Jul 2023 16:19:46 +0000
+Received: from 88665a182662.ant.amazon.com (10.106.100.32) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1118.30;
+ Wed, 26 Jul 2023 16:19:42 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <oliver.sang@intel.com>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <gustavoars@kernel.org>,
+	<keescook@chromium.org>, <kuba@kernel.org>, <kuni1840@gmail.com>,
+	<kuniyu@amazon.com>, <leitao@debian.org>, <lkp@intel.com>,
+	<netdev@vger.kernel.org>, <oe-lkp@lists.linux.dev>, <pabeni@redhat.com>,
+	<syzkaller@googlegroups.com>, <willemdebruijn.kernel@gmail.com>
+Subject: Re: [PATCH v3 net 1/2] af_unix: Fix fortify_panic() in unix_bind_bsd().
+Date: Wed, 26 Jul 2023 09:19:33 -0700
+Message-ID: <20230726161933.26778-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <202307262110.659e5e8-oliver.sang@intel.com>
+References: <202307262110.659e5e8-oliver.sang@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <bc3ec02d-4d4e-477a-b8a5-5245425326c6@kadam.mountain>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.106.100.32]
+X-ClientProxiedBy: EX19D037UWC003.ant.amazon.com (10.13.139.231) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Precedence: Bulk
+X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+	T_SCC_BODY_TEXT_LINE,T_SPF_PERMERROR autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Jul 26, 2023 at 06:01:00PM +0300, Dan Carpenter wrote:
-> On Wed, Jul 26, 2023 at 07:14:56AM -0700, Yan Zhai wrote:
-> > On Wed, Jul 26, 2023 at 04:39:08PM +0300, Dan Carpenter wrote:
-> > > I'm not positive I understand the code in ip_finish_output2().  I think
-> > > instead of looking for LWTUNNEL_XMIT_DONE it should instead look for
-> > > != LWTUNNEL_XMIT_CONTINUE.  It's unfortunate that NET_XMIT_DROP and
-> > > LWTUNNEL_XMIT_CONTINUE are the both 0x1.  Why don't we just change that
-> > > instead?
-> > > 
-> > I considered about changing lwt side logic. But it would bring larger
-> > impact since there are multiple types of encaps on this hook, not just
-> > bpf redirect. Changing bpf return values is a minimum change on the
-> > other hand. In addition, returning value of NET_RX_DROP and
-> > NET_XMIT_CN are the same, so if we don't do something in bpf redirect,
-> > there is no way to distinguish them later: the former is considered as
-> > an error, while "CN" is considered as non-error.
+From: kernel test robot <oliver.sang@intel.com>
+Date: Wed, 26 Jul 2023 21:52:45 +0800
+> Hello,
 > 
-> Uh, NET_RX/XMIT_DROP values are 1.  NET_XMIT_CN is 2.
+> kernel test robot noticed "BUG:KASAN:slab-out-of-bounds_in_strlen" on:
 > 
-> I'm not an expert but I think what happens is that we treat NET_XMIT_CN
-> as success so that it takes a while for the resend to happen.
-> Eventually the TCP layer will detect it as a dropped packet.
+> commit: 33652e138afbe3f7c814567c4ffdf57492664220 ("[PATCH v3 net 1/2] af_unix: Fix fortify_panic() in unix_bind_bsd().")
+> url: https://github.com/intel-lab-lkp/linux/commits/Kuniyuki-Iwashima/af_unix-Fix-fortify_panic-in-unix_bind_bsd/20230725-053836
+> base: https://git.kernel.org/cgit/linux/kernel/git/davem/net.git 22117b3ae6e37d07225653d9ae5ae86b3a54f99c
+> patch link: https://lore.kernel.org/all/20230724213425.22920-2-kuniyu@amazon.com/
+> patch subject: [PATCH v3 net 1/2] af_unix: Fix fortify_panic() in unix_bind_bsd().
 > 
-My eyes slipped lines. CN is 2. But the fact RX return value can be
-returned on a TX path still makes me feel unclean. Odds are low that
-we will have new statuses in future, it is a risk. I'd hope to contain
-these values only inside BPF redirect code as they are the reason why
-such rx values can show up there. Meanwhile, your argument do make
-good sense to me that the same problem may occur for other stuff. It
-is true. In fact, I just re-examined BPF-REROUTE path, it has the
-exact same issue by directly sending dst_output value back.
+> in testcase: boot
+> 
+> compiler: gcc-12
+> test machine: qemu-system-x86_64 -enable-kvm -cpu SandyBridge -smp 2 -m 16G
+> 
+> (please refer to attached dmesg/kmsg for entire log/backtrace)
+> 
+> 
+> [   33.452659][   T68] ==================================================================
+> [   33.453726][   T68] BUG: KASAN: slab-out-of-bounds in strlen+0x35/0x4f
+> [   33.454515][   T68] Read of size 1 at addr ffff88812ff65577 by task udevd/68
+> [   33.455352][   T68]
+> [   33.455644][   T68] CPU: 0 PID: 68 Comm: udevd Not tainted 6.5.0-rc2-00197-g33652e138afb #1
+> [   33.456627][   T68] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+> [   33.457802][   T68] Call Trace:
+> [   33.458184][   T68]  <TASK>
+> [   33.458521][   T68]  print_address_description+0x4d/0x2dd
+> [   33.459259][   T68]  print_report+0x139/0x241
+> [   33.459783][   T68]  ? __phys_addr+0x91/0xa3
+> [   33.460290][   T68]  ? virt_to_folio+0x5/0x27
+> [   33.460800][   T68]  ? strlen+0x35/0x4f
+> [   33.461241][   T68]  kasan_report+0xaf/0xda
+> [   33.461756][   T68]  ? strlen+0x35/0x4f
+> [   33.462218][   T68]  strlen+0x35/0x4f
+> [   33.462657][   T68]  getname_kernel+0xe/0x234
 
-So I would propose to do two things:
-1. still convert BPF redirect ingress code to contain the propagation
-of mixed return. Return only TX side value instead, which is also what
-majority of those local senders are expecting. (I was wrong about
-positive values returned to sendmsg below btw, they are not).
+Ok, we still need to terminate the string with unix_mkname_bsd().. so
+I perfer using strlen() here as well to warn about this situation.
 
-2. change LWTUNNEL_XMIT_CONTINUE and check for this at xmit hook.
+I'll post a patch soon.
 
-> > 
-> > > Also there seems to be a leak in lwtunnel_xmit().  Should that return
-> > > LWTUNNEL_XMIT_CONTINUE or should it call kfree_skb() before returning?
-> > > 
-> > > Something like the following?
-> > > 
-> > > diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-> > > index 11652e464f5d..375790b672bc 100644
-> > > --- a/include/linux/netdevice.h
-> > > +++ b/include/linux/netdevice.h
-> > > @@ -112,6 +112,9 @@ void netdev_sw_irq_coalesce_default_on(struct net_device *dev);
-> > >  #define NET_XMIT_CN		0x02	/* congestion notification	*/
-> > >  #define NET_XMIT_MASK		0x0f	/* qdisc flags in net/sch_generic.h */
-> > >  
-> > > +#define LWTUNNEL_XMIT_DONE NET_XMIT_SUCCESS
-> > > +#define LWTUNNEL_XMIT_CONTINUE 0x3
-> > > +
-> > >  /* NET_XMIT_CN is special. It does not guarantee that this packet is lost. It
-> > >   * indicates that the device will soon be dropping packets, or already drops
-> > >   * some packets of the same priority; prompting us to send less aggressively. */
-> > > diff --git a/include/net/lwtunnel.h b/include/net/lwtunnel.h
-> > > index 6f15e6fa154e..8ab032ee04d0 100644
-> > > --- a/include/net/lwtunnel.h
-> > > +++ b/include/net/lwtunnel.h
-> > > @@ -16,12 +16,6 @@
-> > >  #define LWTUNNEL_STATE_INPUT_REDIRECT	BIT(1)
-> > >  #define LWTUNNEL_STATE_XMIT_REDIRECT	BIT(2)
-> > >  
-> > > -enum {
-> > > -	LWTUNNEL_XMIT_DONE,
-> > > -	LWTUNNEL_XMIT_CONTINUE,
-> > > -};
-> > > -
-> > > -
-> > >  struct lwtunnel_state {
-> > >  	__u16		type;
-> > >  	__u16		flags;
-> > > diff --git a/net/core/lwtunnel.c b/net/core/lwtunnel.c
-> > > index 711cd3b4347a..732415d1287d 100644
-> > > --- a/net/core/lwtunnel.c
-> > > +++ b/net/core/lwtunnel.c
-> > > @@ -371,7 +371,7 @@ int lwtunnel_xmit(struct sk_buff *skb)
-> > >  
-> > >  	if (lwtstate->type == LWTUNNEL_ENCAP_NONE ||
-> > >  	    lwtstate->type > LWTUNNEL_ENCAP_MAX)
-> > > -		return 0;
-> > > +		return LWTUNNEL_XMIT_CONTINUE;
-> > 
-> > You are correct this path would leak skb. Return continue (or drop)
-> > would avoid the leak. Personally I'd prefer drop instead to signal the
-> > error setup. Since this is a separate issue, do you want to send a
-> > separate patch on this? Or I am happy to do it if you prefer.
-> > 
-> 
-> I don't know which makes sense so I'll leave that up to you.
-> 
-This conversation is juicy, I think we discovered two potential new
-problem sites (the leak here and the reroute path) :)
+---8<---
+diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+index bbacf4c60fe3..6056c3bad54e 100644
+--- a/net/unix/af_unix.c
++++ b/net/unix/af_unix.c
+@@ -1208,7 +1208,8 @@ static int unix_bind_bsd(struct sock *sk, struct sockaddr_un *sunaddr,
+ 	struct path parent;
+ 	int err;
+ 
+-	addr_len = strnlen(sunaddr->sun_path, sizeof(sunaddr->sun_path))
++	unix_mkname_bsd(sunaddr->sun_path, addr_len);
++	addr_len = strlen(((struct sockaddr_storage *)sunaddr)->__data)
+ 		+ offsetof(struct sockaddr_un, sun_path) + 1;
+ 	addr = unix_create_addr(sunaddr, addr_len);
+ 	if (!addr)
+---8<---
 
-> > >  
-> > >  	ret = -EOPNOTSUPP;
-> > >  	rcu_read_lock();
-> > > diff --git a/net/ipv4/ip_output.c b/net/ipv4/ip_output.c
-> > > index 6e70839257f7..4be50a211b14 100644
-> > > --- a/net/ipv4/ip_output.c
-> > > +++ b/net/ipv4/ip_output.c
-> > > @@ -216,7 +216,7 @@ static int ip_finish_output2(struct net *net, struct sock *sk, struct sk_buff *s
-> > >  	if (lwtunnel_xmit_redirect(dst->lwtstate)) {
-> > >  		int res = lwtunnel_xmit(skb);
-> > >  
-> > > -		if (res < 0 || res == LWTUNNEL_XMIT_DONE)
-> > > +		if (res != LWTUNNEL_XMIT_CONTINUE)
-> > >  			return res;
-> > 
-> > Unfortunately we cannot return res directly here when res > 0. This is
-> > the final reason why I didn't patch here. Return values here can be
-> > propagated back to sendmsg syscall, so returning a positive value
-> > would break the syscall convention.
-> 
-> The neigh_output() function is going to return NET_XMIT_DROP so this
-> already happens.  Is that not what we want to happen?
-> 
-My bad, those return values are processed at ip_send_skb etc, while I
-was staring only at ip_local_out and beneath with my sleepy eyes.
 
-> I guess my concern is that eventually people will eventually new
-> introduce bugs.  Fixing incorrect error codes is something that I do
-> several times per week.  :P
+> [   33.463190][   T68]  kern_path_create+0x18/0x4d
+> [   33.463727][   T68]  unix_bind_bsd+0x180/0x5a4
+> [   33.464367][   T68]  ? unix_create_addr+0xdd/0xdd
+> [   33.464929][   T68]  __sys_bind+0xf2/0x15f
+> [   33.465437][   T68]  ? __ia32_sys_socketpair+0xb3/0xb3
+> [   33.466046][   T68]  __x64_sys_bind+0x79/0x87
+> [   33.466575][   T68]  do_syscall_64+0x6b/0x87
+> [   33.467094][   T68]  ? lockdep_hardirqs_on_prepare+0x326/0x350
+> [   33.467780][   T68]  ? do_syscall_64+0x78/0x87
+> [   33.468305][   T68]  ? lockdep_hardirqs_on_prepare+0x326/0x350
+> [   33.468989][   T68]  ? do_syscall_64+0x78/0x87
+> [   33.469538][   T68]  ? do_syscall_64+0x78/0x87
+> [   33.470051][   T68]  ? do_syscall_64+0x78/0x87
+> [   33.470576][   T68]  ? lockdep_hardirqs_on_prepare+0x326/0x350
+> [   33.471268][   T68]  entry_SYSCALL_64_after_hwframe+0x5d/0xc7
+> [   33.471917][   T68] RIP: 0033:0x7fd5b1091b77
+> [   33.472426][   T68] Code: ff ff ff ff c3 48 8b 15 17 b3 0b 00 f7 d8 64 89 02 b8 ff ff ff ff eb ba 66 2e 0f 1f 84 00 00 00 00 00 90 b8 31 00 00 00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d e9 b2 0b 00 f7 d8 64 89 01 48
+> [   33.474908][   T68] RSP: 002b:00007ffddf8bb5c8 EFLAGS: 00000246 ORIG_RAX: 0000000000000031
+> [   33.475878][   T68] RAX: ffffffffffffffda RBX: 000055dcbcd8e8c0 RCX: 00007fd5b1091b77
+> [   33.476785][   T68] RDX: 0000000000000013 RSI: 000055dcbcd8e8d8 RDI: 0000000000000003
+> [   33.477697][   T68] RBP: 000055dcbcd8e8d8 R08: 0000000000000004 R09: 000055dcbcd8ed50
+> [   33.478561][   T68] R10: 00007ffddf8bb5d4 R11: 0000000000000246 R12: 00007ffddf8bbe18
+> [   33.479431][   T68] R13: 00007ffddf8bbe10 R14: 0000000000000000 R15: 000055dcbcd8e260
+> [   33.480352][   T68]  </TASK>
+> [   33.480723][   T68]
+> [   33.481014][   T68] Allocated by task 68:
+> [   33.481537][   T68]  stack_trace_save+0x77/0x98
+> [   33.482086][   T68]  kasan_save_stack+0x2e/0x53
+> [   33.482644][   T68]  kasan_set_track+0x20/0x2c
+> [   33.483188][   T68]  ____kasan_kmalloc+0x68/0x7b
+> [   33.483761][   T68]  __kmalloc+0xac/0xe5
+> [   33.484260][   T68]  unix_create_addr+0x1f/0xdd
+> [   33.484821][   T68]  unix_bind_bsd+0x161/0x5a4
+> [   33.485512][   T68]  __sys_bind+0xf2/0x15f
+> [   33.486024][   T68]  __x64_sys_bind+0x79/0x87
+> [   33.486559][   T68]  do_syscall_64+0x6b/0x87
+> [   33.487066][   T68]  entry_SYSCALL_64_after_hwframe+0x5d/0xc7
+> [   33.487761][   T68]
+> [   33.488048][   T68] The buggy address belongs to the object at ffff88812ff65500
+> [   33.488048][   T68]  which belongs to the cache kmalloc-128 of size 128
+> [   33.489631][   T68] The buggy address is located 0 bytes to the right of
+> [   33.489631][   T68]  allocated 119-byte region [ffff88812ff65500, ffff88812ff65577)
+> [   33.491272][   T68]
+> [   33.491571][   T68] The buggy address belongs to the physical page:
+> [   33.492321][   T68] page:(____ptrval____) refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x12ff65
+> [   33.493503][   T68] flags: 0x8000000000000200(slab|zone=2)
+> [   33.494120][   T68] page_type: 0xffffffff()
+> [   33.494610][   T68] raw: 8000000000000200 ffff8881000418c0 dead000000000122 0000000000000000
+> [   33.495560][   T68] raw: 0000000000000000 0000000080100010 00000001ffffffff 0000000000000000
+> [   33.496528][   T68] page dumped because: kasan: bad access detected
+> [   33.497265][   T68] page_owner tracks the page as allocated
+> [   33.497959][   T68] page last allocated via order 0, migratetype Unmovable, gfp_mask 0x12820(GFP_ATOMIC|__GFP_NOWARN|__GFP_NORETRY), pid 1, tgid 1 (swapper), ts 31189252946, free_ts 0
+> [   33.499819][   T68]  __set_page_owner+0x15/0x59
+> [   33.500391][   T68]  prep_new_page+0x17/0x70
+> [   33.500931][   T68]  get_page_from_freelist+0x1ca/0x3d2
+> [   33.501972][   T68]  __alloc_pages+0x159/0x25f
+> [   33.502494][   T68]  alloc_slab_page+0x1a/0x4c
+> [   33.503011][   T68]  allocate_slab+0x59/0x1b6
+> [   33.503517][   T68]  ___slab_alloc+0x348/0x510
+> [   33.504034][   T68]  __slab_alloc+0x11/0x27
+> [   33.504641][   T68]  __kmem_cache_alloc_node+0x63/0x10d
+> [   33.505246][   T68]  __kmalloc+0x9b/0xe5
+> [   33.505736][   T68]  pci_create_attr+0x33/0x3c4
+> [   33.506282][   T68]  pci_create_resource_files+0x9c/0x126
+> [   33.506907][   T68]  pci_sysfs_init+0x66/0xf1
+> [   33.507434][   T68]  do_one_initcall+0xc3/0x274
+> [   33.507955][   T68]  do_initcalls+0x308/0x366
+> [   33.508479][   T68]  kernel_init_freeable+0x2b1/0x315
+> [   33.509081][   T68] page_owner free stack trace missing
+> [   33.509687][   T68]
+> [   33.509974][   T68] Memory state around the buggy address:
+> [   33.510640][   T68]  ffff88812ff65400: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+> [   33.511564][   T68]  ffff88812ff65480: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+> [   33.512499][   T68] >ffff88812ff65500: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 07 fc
+> [   33.513453][   T68]                                                              ^
+> [   33.514393][   T68]  ffff88812ff65580: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+> [   33.515328][   T68]  ffff88812ff65600: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+> [   33.516257][   T68] ==================================================================
+> [   33.517245][   T68] Disabling lock debugging due to kernel taint
+> [   33.518764][   T68] udevd[68]: starting version 3.2.7
 > 
-> regards,
-> dan carpenter
 > 
 > 
+> To reproduce:
+> 
+>         # build kernel
+> 	cd linux
+> 	cp config-6.5.0-rc2-00197-g33652e138afb .config
+> 	make HOSTCC=gcc-12 CC=gcc-12 ARCH=x86_64 olddefconfig prepare modules_prepare bzImage modules
+> 	make HOSTCC=gcc-12 CC=gcc-12 ARCH=x86_64 INSTALL_MOD_PATH=<mod-install-dir> modules_install
+> 	cd <mod-install-dir>
+> 	find lib/ | cpio -o -H newc --quiet | gzip > modules.cgz
+> 
+> 
+>         git clone https://github.com/intel/lkp-tests.git
+>         cd lkp-tests
+>         bin/lkp qemu -k <bzImage> -m modules.cgz job-script # job-script is attached in this email
+> 
+>         # if come across any failure that blocks the test,
+>         # please remove ~/.lkp and /lkp dir to run from a clean state.
+> 
+> 
+> 
+> -- 
+> 0-DAY CI Kernel Test Service
+> https://github.com/intel/lkp-tests/wiki
 
