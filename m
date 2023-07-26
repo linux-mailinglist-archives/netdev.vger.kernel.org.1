@@ -1,99 +1,76 @@
-Return-Path: <netdev+bounces-21346-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21347-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F9017635A2
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 13:51:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B7E497635B2
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 13:55:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 786A21C21236
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 11:51:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 94B051C2121C
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 11:55:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E371BA50;
-	Wed, 26 Jul 2023 11:51:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E2BDBE56;
+	Wed, 26 Jul 2023 11:55:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42410BE5E
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 11:51:24 +0000 (UTC)
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C7F12707
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 04:51:10 -0700 (PDT)
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-23-n_gsjf-cO9y4kYTHGY7s8A-1; Wed, 26 Jul 2023 12:51:08 +0100
-X-MC-Unique: n_gsjf-cO9y4kYTHGY7s8A-1
-Received: from AcuMS.Aculab.com (10.202.163.4) by AcuMS.aculab.com
- (10.202.163.4) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Wed, 26 Jul
- 2023 12:51:06 +0100
-Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
- id 15.00.1497.048; Wed, 26 Jul 2023 12:51:06 +0100
-From: David Laight <David.Laight@ACULAB.COM>
-To: "willemdebruijn.kernel@gmail.com" <willemdebruijn.kernel@gmail.com>,
-	"davem@davemloft.net" <davem@davemloft.net>, "dsahern@kernel.org"
-	<dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, "kuba@kernel.org"
-	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: [PATCH 0/2] udp: rescan hash2 list if chains crossed.
-Thread-Topic: [PATCH 0/2] udp: rescan hash2 list if chains crossed.
-Thread-Index: Adm/tzLjTa0Xped3QGK8HLejyxiyjQ==
-Date: Wed, 26 Jul 2023 11:51:06 +0000
-Message-ID: <fbcaa54791cd44999de5fec7c6cf0b3c@AcuMS.aculab.com>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E482CA4C
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 11:55:04 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36F7AC433CB;
+	Wed, 26 Jul 2023 11:55:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1690372504;
+	bh=5bSCzRai7BDolec9wDv9JgFOcpS52Iak09xrBEf8yiI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=N8xqPWPAfRjQd2Uh5S6GLG9JqxvkX7NFJrLHo9O/8oAHt/fPKpr9IL+5oPQejvhJq
+	 VEw2VOV0KAn6PFjBSnJxOjQFV6z35kcGq9XjU1pJcXW1a3F4W1dl9aMFDZC+gxpQOA
+	 vxnCcB2KHM/6Pl8aMpAB8ObiAWJSlOc9MTwKlU04d5sN3RVhoxHVPzMw9piYVLVnUa
+	 Byzbsv+tZSVneo/8xrtLvfEIvitiZxNu+6OdYE4ISCpbr/jsFlcjktg5ilCxlpjfXT
+	 8gVFe01Yz5hNO0upNZqIQx9peBzbSR2HEn2Y6QC05E9zLLgEJubLa/MR06Bv6YSAcB
+	 0ZGB3H4rZXqeg==
+Date: Wed, 26 Jul 2023 14:55:00 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Lin Ma <linma@zju.edu.cn>
+Cc: steffen.klassert@secunet.com, herbert@gondor.apana.org.au,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v1] xfrm: add forgotten nla_policy for XFRMA_MTIMER_THRESH
+Message-ID: <20230726115500.GV11388@unreal>
+References: <20230723074110.3705047-1-linma@zju.edu.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230723074110.3705047-1-linma@zju.edu.cn>
 
-Commit ca065d0cf80fa removed the rescan of the hash2 list (local
-address + local port) during udp receive if the final socket
-wasn't on the expected hash chain.
+On Sun, Jul 23, 2023 at 03:41:10PM +0800, Lin Ma wrote:
+> The previous commit 4e484b3e969b ("xfrm: rate limit SA mapping change
+> message to user space") added one additional attribute named
+> XFRMA_MTIMER_THRESH and described its type at compat_policy
+> (net/xfrm/xfrm_compat.c).
+> 
+> However, the author forgot to also describe the nla_policy at
+> xfrma_policy (net/xfrm/xfrm_user.c). Hence, this suppose NLA_U32 (4
+> bytes) value can be faked as empty (0 bytes) by a malicious user, which
+> leads to 4 bytes overflow read and heap information leak when parsing
+> nlattrs.
+> 
+> To exploit this, one malicious user can spray the SLUB objects and then
+> leverage this 4 bytes OOB read to leak the heap data into
+> x->mapping_maxage (see xfrm_update_ae_params(...)), and leak it to
+> userspace via copy_to_user_state_extra(...).
+> 
+> The above bug is assigned CVE-2023-3773. 
 
-While unusual, udp sockets can get rehashed (and without an rcu
-delay) without this rescan received packets can generate an unexpected
-ICMP port unreachable instead of being delivered to a local socket.
+This CVE is a joke, you need to be root to execute this attack.
 
-The rescan could be checked for every socket, but the chances of
-the hash chain being diverted twice and ending up in the correct
-list is pretty minimal.
-
-This is the 'smoking gun' for some ICMP port unreachable messages
-being received on long-lived UDP sockets on 127.0.0.1.
-The failures are rare and being seen on AWS - so it is pretty
-impossible to test the patch.
-
-David Laight (2):
-  Move hash calculation inside udp4_lib_lookup2()
-  Rescan the hash2 list if the hash chains have got cross-linked.
-
- net/ipv4/udp.c | 36 +++++++++++++++++++++++-------------
- 1 file changed, 23 insertions(+), 13 deletions(-)
-
---=20
-2.17.1
-
--
-Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1=
-PT, UK
-Registration No: 1397386 (Wales)
-
+Anyway change is ok.
+Reviewed-by: Leon Romanovsky <leonro@nvidia.com>
 
