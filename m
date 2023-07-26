@@ -1,72 +1,103 @@
-Return-Path: <netdev+bounces-21144-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21145-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 590E5762920
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 05:11:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AD3C2762923
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 05:13:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 12D9C281A91
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 03:11:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7103C281B91
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 03:13:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EEE21846;
-	Wed, 26 Jul 2023 03:11:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B37731878;
+	Wed, 26 Jul 2023 03:13:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B782A1101;
-	Wed, 26 Jul 2023 03:11:44 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9968CC433C7;
-	Wed, 26 Jul 2023 03:11:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690341104;
-	bh=9Upzi3S02vKTUvKJdNd22YEHdE2llnbz3XXAiMSuNQE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=OOjHtuoBNOKGC4Cyl5+apIy5ejwGjm9BJ7VcnFMgxtPGfvvNZJe/ZX/G/1B8Z4O2x
-	 eQOAs2Kp/LYfxkavQsjHHjqeqmQMFBWaOSHZyF3g58ifceVEphQL0CWIbMJg5yix7O
-	 sV3Nakdf8ebHoYjkgZL3xmQFkb0EYnxcj1xjjUKTsK+MdgcRbL7/iR+GDM6/maUP+N
-	 uhqmu0yaUEv2hQEPKz5yM2akmGRqPFuGwwlrWCB2g4VUSNJ1CKrv237SPUKq2mLR5f
-	 pdS2eVt5vTQGqGiuDApscRr5VzxEIat80QMf97lEdTGdpWeA/5zsZz9uLNlld8yhsa
-	 t/+5LIi+hmeRw==
-Date: Tue, 25 Jul 2023 20:11:42 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Lin Ma <linma@zju.edu.cn>
-Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- ast@kernel.org, martin.lau@kernel.org, yhs@fb.com, void@manifault.com,
- andrii@kernel.org, houtao1@huawei.com, inwardvessel@gmail.com,
- kuniyu@amazon.com, songliubraving@fb.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org
-Subject: Re: [PATCH v2] bpf: Add length check for
- SK_DIAG_BPF_STORAGE_REQ_MAP_FD parsing
-Message-ID: <20230725201142.593ae606@kernel.org>
-In-Reply-To: <20230725023330.422856-1-linma@zju.edu.cn>
-References: <20230725023330.422856-1-linma@zju.edu.cn>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A844E1108
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 03:13:21 +0000 (UTC)
+Received: from smtpbguseast3.qq.com (smtpbguseast3.qq.com [54.243.244.52])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B01F02682
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 20:13:18 -0700 (PDT)
+X-QQ-mid: bizesmtp82t1690341172tcsnzy8k
+Received: from smtpclient.apple ( [183.128.134.159])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Wed, 26 Jul 2023 11:12:51 +0800 (CST)
+X-QQ-SSF: 00400000000000O0Z000000B0000000
+X-QQ-FEAT: 6/K5pWSRdGqvuE1UuUhl7Tf19bBxPZ6I+G8qbtTMvfj0YzZ5MGOUyfm55VoTm
+	ujJ0GuoywAfuLfUjDyaUumQhLvt4whJ1ZsDRIZR3MlYXjJVCL9thZMzqrAHMITdA0D4tOky
+	vzHHWthZyPNlNQntY6qxrus5AwRFSCa7gjfyg6i0Z/1oBVF7fGrfBrnqSPalzbZnG+LlkLs
+	QUSx0iU97Jrw+V5GYN+R/3tPvoZRNRS5eA3NKy5FTRyCl9QYdNcCeYYfnxNPb7S/DHcvr9M
+	ljDUCmIX6F0BiC5QTbncNoMfojdHbJzywGBj2zAQsLv+18BCBpzBSOp9RMUREmFMZc40AgS
+	8hcfCoCLWsE8MGWJJTW3/j83bW7jMGnzEI5k48rhRpwhO4/h/2LpLIgl7wbj1yEdHBhdjQY
+	CvPaK0O4w8s=
+X-QQ-GoodBg: 2
+X-BIZMAIL-ID: 8522088838517270912
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3731.600.7\))
+Subject: Re: [PATCH net-next 1/2] net: ngbe: add ncsi_enable flag for wangxun
+ nics
+From: "mengyuanlou@net-swift.com" <mengyuanlou@net-swift.com>
+In-Reply-To: <20230725194456.7832c02d@kernel.org>
+Date: Wed, 26 Jul 2023 11:12:41 +0800
+Cc: netdev@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <2E243F8C-76F8-4792-B8C4-201E65F124F6@net-swift.com>
+References: <20230724092544.73531-1-mengyuanlou@net-swift.com>
+ <6E913AD9617D9BC9+20230724092544.73531-2-mengyuanlou@net-swift.com>
+ <20230725162234.1f26bfce@kernel.org>
+ <6D0E96D7-CDF4-4889-831D-B83388035A2C@net-swift.com>
+ <20230725194456.7832c02d@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+X-Mailer: Apple Mail (2.3731.600.7)
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtp:net-swift.com:qybglogicsvrgz:qybglogicsvrgz6a-1
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Tue, 25 Jul 2023 10:33:30 +0800 Lin Ma wrote:
-> The nla_for_each_nested parsing in function bpf_sk_storage_diag_alloc
-> does not check the length of the nested attribute. This can lead to an
-> out-of-attribute read and allow a malformed nlattr (e.g., length 0) to
-> be viewed as a 4 byte integer.
-> 
-> This patch adds an additional check when the nlattr is getting counted.
-> This makes sure the latter nla_get_u32 can access the attributes with
-> the correct length.
-> 
-> Fixes: 1ed4d92458a9 ("bpf: INET_DIAG support in bpf_sk_storage")
-> Suggested-by: Jakub Kicinski <kuba@kernel.org>
-> Signed-off-by: Lin Ma <linma@zju.edu.cn>
 
-Reviewed-by: Jakub Kicinski <kuba@kernel.org>
 
-Those who parse manually must do checks manually. It is what it is.
+> 2023=E5=B9=B47=E6=9C=8826=E6=97=A5 10:44=EF=BC=8CJakub Kicinski =
+<kuba@kernel.org> =E5=86=99=E9=81=93=EF=BC=9A
+>=20
+> On Wed, 26 Jul 2023 09:59:15 +0800 mengyuanlou@net-swift.com wrote:
+>>> 2023=E5=B9=B47=E6=9C=8826=E6=97=A5 07:22=EF=BC=8CJakub Kicinski =
+<kuba@kernel.org> =E5=86=99=E9=81=93=EF=BC=9A
+>>> On Mon, 24 Jul 2023 17:24:58 +0800 Mengyuan Lou wrote: =20
+>>>> + netdev->ncsi_enabled =3D wx->ncsi_hw_supported; =20
+>>>=20
+>>> I don't think that enabled and supported are the same thing.
+>>> If server has multiple NICs or a NIC with multiple ports and
+>>> BMC only uses one, or even none, we shouldn't keep the PHY up.
+>>> By that logic 99% of server NICs should report NCSI as enabled.
+>>=20
+>> For a NIC with multiple ports, BMC switch connection for port0 to =
+port1 online,
+>> Drivers can not know port1 should keep up, if do not set ncsi_enabled =
+before.=20
+>=20
+> I'm not crystal clear on what you're saying. But BMC sends a enable
+> command to the NIC to enable a channel (or some such). This is all
+> handled by FW. The FW can tell the host that the NCSI is now active
+> on port1 and not port0.
+>=20
+>=20
+Ok, I think I understand.
+Thanks.
+
+Another question.
+Then, after drivers know that portx is using for BMC, it is necessary to
+let phy to know this port should not be suspended?
+I mean this patch 2/2 is useful.=
 
