@@ -1,192 +1,85 @@
-Return-Path: <netdev+bounces-21325-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21326-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFE0176345F
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 12:58:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1BD16763473
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 13:02:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DFB811C2120C
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 10:58:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE2C2281D97
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 11:02:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6CB0CA69;
-	Wed, 26 Jul 2023 10:58:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A89DCA6C;
+	Wed, 26 Jul 2023 11:02:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B1E5CA4D
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 10:58:07 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF0E6132
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 03:58:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1690369084;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=jGubfG0J6/LbJU8ZklZwV88L9biaQyHs5qooncbU0FI=;
-	b=E6xkEtAimg/2Eu7hWj8ssUd5LebA3rC/z/sm6zcjIwoQknuydLBXxhUyTqXqffTMeHgcfb
-	VcWpj72sFpGK2P3ldLL56T6tYiVovtRnJgU20jQR8oQ1pWcLMLQyc1DXDGNKsVfEHAgCRu
-	TK1wpi3j6OgJ2xitoX1C33k7jd48uRg=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-206-dqoDG2KSNXWgfEIc4HVvzQ-1; Wed, 26 Jul 2023 06:58:00 -0400
-X-MC-Unique: dqoDG2KSNXWgfEIc4HVvzQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7327F801CF3;
-	Wed, 26 Jul 2023 10:57:59 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.158])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id DA5BE2166B25;
-	Wed, 26 Jul 2023 10:57:56 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-    Steve French <sfrench@samba.org>
-cc: dhowells@redhat.com, akpm@linux-foundation.org,
-    Sven Schnelle <svens@linux.ibm.com>,
-    "David S. Miller" <davem@davemloft.net>,
-    Jeff Layton <jlayton@kernel.org>,
-    Shyam Prasad N <nspmangalore@gmail.com>,
-    Rohith Surabattula <rohiths.msft@gmail.com>,
-    Jens Axboe <axboe@kernel.dk>, Eric Dumazet <edumazet@google.com>,
-    Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-    Matthew Wilcox <willy@infradead.org>, linux-mm@kvack.org,
-    linux-crypto@vger.kernel.org, linux-cachefs@redhat.com,
-    linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-    netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto, cifs: Fix error handling in extract_iter_to_sg()
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DF41CA4D
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 11:02:55 +0000 (UTC)
+Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2556110EC;
+	Wed, 26 Jul 2023 04:02:51 -0700 (PDT)
+Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
+	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+	id 1qOcI2-0002aO-AM; Wed, 26 Jul 2023 13:02:46 +0200
+Message-ID: <cbc3f335-fc6a-f45a-4a08-f31bda1efd88@leemhuis.info>
+Date: Wed, 26 Jul 2023 13:02:45 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <20570.1690369076.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 26 Jul 2023 11:57:56 +0100
-Message-ID: <20571.1690369076@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-	version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: Another regression in the af_alg series (s390x-specific)
+Content-Language: en-US, de-DE
+To: David Howells <dhowells@redhat.com>,
+ Linux regressions mailing list <regressions@lists.linux.dev>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, Paolo Abeni
+ <pabeni@redhat.com>, netdev@vger.kernel.org,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ =?UTF-8?B?T25kcmVqIE1vc27DocSNZWs=?= <omosnacek@gmail.com>,
+ Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+References: <31ddce1d-6014-bf9f-95da-97deb3240606@leemhuis.info>
+ <CAAUqJDuRkHE8fPgZJGaKjUjd3QfGwzfumuJBmStPqBhubxyk_A@mail.gmail.com>
+ <20079.1690368182@warthog.procyon.org.uk>
+From: "Linux regression tracking (Thorsten Leemhuis)"
+ <regressions@leemhuis.info>
+Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>
+In-Reply-To: <20079.1690368182@warthog.procyon.org.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1690369371;464acef4;
+X-HE-SMSGID: 1qOcI2-0002aO-AM
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-    =
+On 26.07.23 12:43, David Howells wrote:
+> "Linux regression tracking (Thorsten Leemhuis)" wrote:
+> 
+>> What's the status wrt to this regression (caused by c1abe6f570af from
+>> David)? It looks like there never was a real reply and the regression
+>> still is unresolved. But maybe I missed something, which can easily
+>> happen in my position.
+> 
+> I was on holiday when the regression was posted.
 
-Fix error handling in extract_iter_to_sg().  Pages need to be unpinned, no=
-t
-put in extract_user_to_sg() when handling IOVEC/UBUF sources.
+Welcome back. And, no worries, I was just wondering what was up here.
 
-The bug may result in a warning like the following:
+>  This week I've been working
+> through various things raised during the last couple of weeks whilst fighting
+> an intermittent apparent bug on my desktop kernel somewhere in ext4, the mm
+> subsys, md or dm-crypt.
 
-  WARNING: CPU: 1 PID: 20384 at mm/gup.c:229 __lse_atomic_add arch/arm64/i=
-nclude/asm/atomic_lse.h:27 [inline]
-  WARNING: CPU: 1 PID: 20384 at mm/gup.c:229 arch_atomic_add arch/arm64/in=
-clude/asm/atomic.h:28 [inline]
-  WARNING: CPU: 1 PID: 20384 at mm/gup.c:229 raw_atomic_add include/linux/=
-atomic/atomic-arch-fallback.h:537 [inline]
-  WARNING: CPU: 1 PID: 20384 at mm/gup.c:229 atomic_add include/linux/atom=
-ic/atomic-instrumented.h:105 [inline]
-  WARNING: CPU: 1 PID: 20384 at mm/gup.c:229 try_grab_page+0x108/0x160 mm/=
-gup.c:252
-  ...
-  pc : try_grab_page+0x108/0x160 mm/gup.c:229
-  lr : follow_page_pte+0x174/0x3e4 mm/gup.c:651
-  ...
-  Call trace:
-   __lse_atomic_add arch/arm64/include/asm/atomic_lse.h:27 [inline]
-   arch_atomic_add arch/arm64/include/asm/atomic.h:28 [inline]
-   raw_atomic_add include/linux/atomic/atomic-arch-fallback.h:537 [inline]
-   atomic_add include/linux/atomic/atomic-instrumented.h:105 [inline]
-   try_grab_page+0x108/0x160 mm/gup.c:252
-   follow_pmd_mask mm/gup.c:734 [inline]
-   follow_pud_mask mm/gup.c:765 [inline]
-   follow_p4d_mask mm/gup.c:782 [inline]
-   follow_page_mask+0x12c/0x2e4 mm/gup.c:839
-   __get_user_pages+0x174/0x30c mm/gup.c:1217
-   __get_user_pages_locked mm/gup.c:1448 [inline]
-   __gup_longterm_locked+0x94/0x8f4 mm/gup.c:2142
-   internal_get_user_pages_fast+0x970/0xb60 mm/gup.c:3140
-   pin_user_pages_fast+0x4c/0x60 mm/gup.c:3246
-   iov_iter_extract_user_pages lib/iov_iter.c:1768 [inline]
-   iov_iter_extract_pages+0xc8/0x54c lib/iov_iter.c:1831
-   extract_user_to_sg lib/scatterlist.c:1123 [inline]
-   extract_iter_to_sg lib/scatterlist.c:1349 [inline]
-   extract_iter_to_sg+0x26c/0x6fc lib/scatterlist.c:1339
-   hash_sendmsg+0xc0/0x43c crypto/algif_hash.c:117
-   sock_sendmsg_nosec net/socket.c:725 [inline]
-   sock_sendmsg+0x54/0x60 net/socket.c:748
-   ____sys_sendmsg+0x270/0x2ac net/socket.c:2494
-   ___sys_sendmsg+0x80/0xdc net/socket.c:2548
-   __sys_sendmsg+0x68/0xc4 net/socket.c:2577
-   __do_sys_sendmsg net/socket.c:2586 [inline]
-   __se_sys_sendmsg net/socket.c:2584 [inline]
-   __arm64_sys_sendmsg+0x24/0x30 net/socket.c:2584
-   __invoke_syscall arch/arm64/kernel/syscall.c:38 [inline]
-   invoke_syscall+0x48/0x114 arch/arm64/kernel/syscall.c:52
-   el0_svc_common.constprop.0+0x44/0xe4 arch/arm64/kernel/syscall.c:142
-   do_el0_svc+0x38/0xa4 arch/arm64/kernel/syscall.c:191
-   el0_svc+0x2c/0xb0 arch/arm64/kernel/entry-common.c:647
-   el0t_64_sync_handler+0xc0/0xc4 arch/arm64/kernel/entry-common.c:665
-   el0t_64_sync+0x19c/0x1a0 arch/arm64/kernel/entry.S:591
+Good luck with that!
 
-Fixes: 018584697533 ("netfs: Add a function to extract an iterator into a =
-scatterlist")
-Reported-by: syzbot+9b82859567f2e50c123e@syzkaller.appspotmail.com
-Link: https://lore.kernel.org/linux-mm/000000000000273d0105ff97bf56@google=
-.com/
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Sven Schnelle <svens@linux.ibm.com>
-cc: akpm@linux-foundation.org
-cc: Herbert Xu <herbert@gondor.apana.org.au>
-cc: "David S. Miller" <davem@davemloft.net>
-cc: Jeff Layton <jlayton@kernel.org>
-cc: Steve French <sfrench@samba.org>
-cc: Shyam Prasad N <nspmangalore@gmail.com>
-cc: Rohith Surabattula <rohiths.msft@gmail.com>
-cc: Jens Axboe <axboe@kernel.dk>
-cc: Herbert Xu <herbert@gondor.apana.org.au>
-cc: "David S. Miller" <davem@davemloft.net>
-cc: Eric Dumazet <edumazet@google.com>
-cc: Jakub Kicinski <kuba@kernel.org>
-cc: Paolo Abeni <pabeni@redhat.com>
-cc: Matthew Wilcox <willy@infradead.org>
-cc: linux-mm@kvack.org
-cc: linux-crypto@vger.kernel.org
-cc: linux-cachefs@redhat.com
-cc: linux-cifs@vger.kernel.org
-cc: linux-fsdevel@vger.kernel.org
-cc: netdev@vger.kernel.org
----
- lib/scatterlist.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> I'll get round to it, but I'll I don't have s390x h/w immediately to hand.
 
-diff --git a/lib/scatterlist.c b/lib/scatterlist.c
-index e86231a44c3d..c65566b4dc66 100644
---- a/lib/scatterlist.c
-+++ b/lib/scatterlist.c
-@@ -1148,7 +1148,7 @@ static ssize_t extract_user_to_sg(struct iov_iter *i=
-ter,
- =
-
- failed:
- 	while (sgtable->nents > sgtable->orig_nents)
--		put_page(sg_page(&sgtable->sgl[--sgtable->nents]));
-+		unpin_user_page(sg_page(&sgtable->sgl[--sgtable->nents]));
- 	return res;
- }
- =
-
+thx! Ciao, Thorsten
 
