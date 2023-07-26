@@ -1,111 +1,91 @@
-Return-Path: <netdev+bounces-21603-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21604-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33BDA764019
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 22:03:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E59AC76401B
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 22:03:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 65A851C21390
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 20:03:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A6D8D281EA8
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 20:03:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6D1A1805E;
-	Wed, 26 Jul 2023 20:03:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7ACB319880;
+	Wed, 26 Jul 2023 20:03:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B0864CE9C
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 20:03:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C391FC433C7;
-	Wed, 26 Jul 2023 20:03:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DABE4CE9F
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 20:03:37 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E6E2C433C8;
+	Wed, 26 Jul 2023 20:03:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690401800;
-	bh=VVHwf66l8pA8JawgRvoE5WwcQKi+dmka5tHGRFwa1yM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=g4VLiRDbwRTE5D2e1ZygoQiGkE8aYuemRt7GSFATpoPylmzCZfpY2no7d0ZUQMHNs
-	 N71VGPvICfZlDKrE39yYTBOtSM3VGOaXSUI03WSpSuzPSZif9JSiv2e2uHjghWL2Zw
-	 FuUXdFse777NtJz7vG4YPIdHKFpsl2KdUh1zm4B3mHtg0H43Xj7GIh86F/fo+XtBpA
-	 x4pySstbazZktAxEVTUAIxYTs1xXtC52MEPOZvjiGz8zB25v8r23Wb31jnYRU2kzYv
-	 SOxIvb5TfcsRfbjSm1W6eIYBr6OcxYI5XO/yy5v1ZDHZBHGDzRIKo+yXcvdG3RNmK9
-	 ow4ALY8QeqZKg==
-Date: Wed, 26 Jul 2023 13:03:18 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Joe Perches <joe@perches.com>, Krzysztof Kozlowski
- <krzysztof.kozlowski@linaro.org>, geert@linux-m68k.org,
- gregkh@linuxfoundation.org, netdev@vger.kernel.org,
- workflows@vger.kernel.org, mario.limonciello@amd.com
-Subject: Re: [PATCH v2] scripts: get_maintainer: steer people away from
- using file paths
-Message-ID: <20230726130318.099f96fc@kernel.org>
-In-Reply-To: <CAHk-=whCE9cWmTXu54WFQ7x-aH8n=dhCux2h49=pYN=14ybkxg@mail.gmail.com>
-References: <20230726151515.1650519-1-kuba@kernel.org>
-	<11ec5b3819ff17c7013348b766eab571eee5ca96.camel@perches.com>
-	<20230726092312.799503d6@kernel.org>
-	<CAHk-=wjEj2fGiaQXrYUZu65EPdgbGEAEMzch8LTtiUp6UveRCw@mail.gmail.com>
-	<20230726112031.61bd0c62@kernel.org>
-	<CAHk-=wi9MyyWmP_HAddLrmGfdANkut6_2f9hzv9HcyTBvg3+kA@mail.gmail.com>
-	<20230726114817.1bd52d48@kernel.org>
-	<CAHk-=wiuR7_A=PbN8jhmqGPJQHypUHR+W4-UuSVhOVWvYXs1Tg@mail.gmail.com>
-	<CAHk-=wh4pbrNZGqfV9u1urZr3Xjci=UV-MP+KneB6a5yo7-VOQ@mail.gmail.com>
-	<CAHk-=whCE9cWmTXu54WFQ7x-aH8n=dhCux2h49=pYN=14ybkxg@mail.gmail.com>
+	s=k20201202; t=1690401817;
+	bh=PaX7dVmnCCB8w0j6I/nVSkPgIRQ/pMH3li/D/asV7FQ=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=C779fouleZVC4ftkiskufd5TPCbV6Bg7uYVVrbOJtrMPbihG/pTDaWqWEggHtFSNt
+	 ijZPArvniENHsI88ko70e7DNwyjAqld8urqVoKtkmTpN/9sMOq7Y9Z8ip3t9tfuleg
+	 /8HFrQIxmppXyDBlrhdYEwCCCshxqfxrOJpec4TFDRjmYVdMxtrwDtnBF86aF9KuxK
+	 tKHCNSACUHzpeqN30yN5CkalBWIkdntjn+Gvyb8Ml9rjVr8EYe6V7JLKBfsVJFPkgt
+	 qWoWmqQqloPJQH4tnB32knpYusP3laeaX0E6wuPA4Xfph5dRhcflUr6ytKHPUoh22H
+	 vmZDXycnJdoag==
+Message-ID: <b28d8028-5167-ff6d-e845-3630519f662a@kernel.org>
+Date: Wed, 26 Jul 2023 14:03:36 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.13.0
+Subject: Re: [net-next] net: change accept_ra_min_rtr_lft to affect all RA
+ lifetimes
+Content-Language: en-US
+To: Patrick Rohr <prohr@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+ Linux Network Development Mailing List <netdev@vger.kernel.org>,
+ =?UTF-8?Q?Maciej_=c5=bbenczykowski?= <maze@google.com>,
+ Lorenzo Colitti <lorenzo@google.com>
+References: <20230725183122.4137963-1-prohr@google.com>
+ <1940c057-99c4-8355-cc95-3f17cca38481@kernel.org>
+ <CANLD9C1aV3U+GZ3hUE-_AgbeSyCNgUvJPmOPcFEDDgD_fQWJ0A@mail.gmail.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <CANLD9C1aV3U+GZ3hUE-_AgbeSyCNgUvJPmOPcFEDDgD_fQWJ0A@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On Wed, 26 Jul 2023 12:37:14 -0700 Linus Torvalds wrote:
-> The very first case I actually looked at wasn't even some
-> "inexperienced developer" - the kind you claim is the problem, and the
-> kind you claim this would help.
+On 7/26/23 11:33 AM, Patrick Rohr wrote:
+>> The commit mentioned in the Fixes was just applied and you are already
+>> sending a follow up moving the same code around again.
 > 
-> It was a random fix from Florian Westphal, who has been around for
-> more than a decade, is credited with over 1500 commits (and mentioned
-> in many many more), and knows what he's doing.
-> 
-> He has a patch that references a "Fixes:" line, and clearly didn't go
-> through the get_maintainer script as such, and the
-> netdev/cc_maintainers script complains as a result.
+> I got feedback off of the mailing list after the patch was applied.
 
-Florian is sending us patches from his tree which have already been
-reviewed on the netfilter mailing list. It's basically a PR.
-There's a handful of people who do that and I don't care enough to
-silence it because ignoring the false positives is a noop.
+That offlist discussion should be summarized in the commit message (text
+below?)
 
-When some noob sends a patch which actually *should* have been CCed
-to more people I need to either go and CC that person in myself.
-Or tell the noob to repost.
+> In order for
+> the sysctl to be useful to Android, it should really apply to all lifetimes in
+> the RA, since that is what determines the minimum frequency at which RAs must be
+> processed by the kernel. Android uses hardware offloads to drop RAs
+> for a fraction of the
+> minimum of all lifetimes present in the RA (some networks have very
+> frequent RAs (5s) with high lifetimes (2h)). Despite this, we have
+> encountered
+> networks that set the router lifetime to 30s which results in very frequent CPU
+> wakeups. Instead of disabling IPv6 (and dropping IPv6 ethertype in the
+> WiFi firmware)
+> entirely on such networks, it seems better to ignore such routers
+> while still processing RAs from other IPv6 routers on the same network
+> (i.e. to support IoT applications).
+> The previous implementation dropped the entire RA
+> based on router lifetime. This turned out to be hard to expand to the other
+> lifetimes present in the RA in a consistent manner -- dropping the
+> entire RA based on
+> RIO/PIO lifetimes would essentially require parsing the whole thing twice. I am
+> sending this follow up patch now to fix 1671bcfd76fd before it is released.
+> 
 
-IOW solving the _actually_ missing CCs is higher priority for me.
 
-> So Jakub, I think you are barking *entirely* up the wrong tree.
-> 
-> The reason you blame this on mis-use by inexperienced maintainers is
-> that you probably never even react to the experienced ones that do the
-> very same things, because you trust them and never bother to tell them
-> "you didn't use get_maintainers to get the precise list of people that
-> patchwork complains about".
-> 
-> So the problem is not in get_maintainers. It's in having expectations
-> that are simply not realistic.
-> 
-> You seem to think that those inexperienced developers should do something that
-> 
->  (a) experienced developers don't do *EITHER*
-> 
->  (b) the scripts complain about instead of just doing
-> 
-> and then you think that changing get_maintainers would somehow hide the issue.
-> 
-> You definitely shouldn't require inexperienced developers to do
-> something that clearly experienced people then don't do.
-> 
-> Now, maybe I happened to just randomly pick a patchwork entry that was
-> very unusual. But I doubt it.
 
