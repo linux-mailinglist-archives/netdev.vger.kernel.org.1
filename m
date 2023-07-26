@@ -1,139 +1,195 @@
-Return-Path: <netdev+bounces-21334-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21332-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03F107634CA
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 13:23:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83EF07634B2
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 13:21:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2C0AE1C21222
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 11:23:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B7FA31C21233
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 11:21:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 110758466;
-	Wed, 26 Jul 2023 11:23:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EE5DCA7B;
+	Wed, 26 Jul 2023 11:21:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0826CA51;
-	Wed, 26 Jul 2023 11:23:28 +0000 (UTC)
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 081DD1982;
-	Wed, 26 Jul 2023 04:23:25 -0700 (PDT)
-Received: from dggpemm500005.china.huawei.com (unknown [172.30.72.53])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4R9s181gh0zTlsy;
-	Wed, 26 Jul 2023 19:21:48 +0800 (CST)
-Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
- (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Wed, 26 Jul
- 2023 19:23:22 +0800
-Subject: Re: [PATCH net-next v2] page_pool: split types and declarations from
- page_pool.h
-To: Alexander Lobakin <aleksander.lobakin@intel.com>, Alexander H Duyck
-	<alexander.duyck@gmail.com>
-CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Eric Dumazet
-	<edumazet@google.com>, Wei Fang <wei.fang@nxp.com>, Shenwei Wang
-	<shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, NXP Linux Team
-	<linux-imx@nxp.com>, Sunil Goutham <sgoutham@marvell.com>, Geetha sowjanya
-	<gakula@marvell.com>, Subbaraya Sundeep <sbhatta@marvell.com>, hariprasad
-	<hkelam@marvell.com>, Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky
-	<leon@kernel.org>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
-	<daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, John
- Fastabend <john.fastabend@gmail.com>, Felix Fietkau <nbd@nbd.name>, Lorenzo
- Bianconi <lorenzo@kernel.org>, Ryder Lee <ryder.lee@mediatek.com>, Shayne
- Chen <shayne.chen@mediatek.com>, Sean Wang <sean.wang@mediatek.com>, Kalle
- Valo <kvalo@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Ilias
- Apalodimas <ilias.apalodimas@linaro.org>, <linux-rdma@vger.kernel.org>,
-	<bpf@vger.kernel.org>, <linux-wireless@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-mediatek@lists.infradead.org>
-References: <20230725131258.31306-1-linyunsheng@huawei.com>
- <94272ffed7636c4c92fcc73ccfc15236dd8e47dc.camel@gmail.com>
- <16b4ab57-dfb0-2c1d-9be1-57da30dff3c3@intel.com>
-From: Yunsheng Lin <linyunsheng@huawei.com>
-Message-ID: <22af47fe-1347-3e32-70bf-745d833e88b9@huawei.com>
-Date: Wed, 26 Jul 2023 19:23:21 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.2.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 667FDCA66
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 11:21:44 +0000 (UTC)
+Received: from EUR02-VI1-obe.outbound.protection.outlook.com (mail-vi1eur02on2080.outbound.protection.outlook.com [40.107.241.80])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D39110D4;
+	Wed, 26 Jul 2023 04:21:34 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Q6YVy6M1VItomtlEfxzaHu9r62t8Qy3pXJpaGeWdy+n323GK8cDfoyf6yZXBNWzOlOJWzH9Mx8HUEp3YFqq6Xo+FdQoNAYQOzdPwkoj4BjKfodpFabC6ddVkaRFlT+nl4vMUOEdSKyKYvKfDTW9xR/a6swsQoKHfAipSH8nBHhIp34x0hlty3KmagrtqmxykRB1/gAh/i2lS959lcm7YkSDKVDmg3mkO1zziWhGZsv8YqRxDW9FrvzAyXtan5JjyuFHrjNEnzXBNvt6Lb+WNIzqtJtnDq3gjEB4L7rXiUKYbXg1uOiTl6TgHtj4dhoF6A+i2AoDfBrK8NC5ed2jHNA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=9IOQxIa8FKC0yUlr0xsHuBIdtG+zywvS5eDQEPXrJo4=;
+ b=g8E5en/jMQtCXwkUVmxTNqmYJwIC6xacGzKJe4LR3Ny492p6r/zdMak/z8x5LOHthrtw3oIgPXcCYwrS5YZPXxolXSZw3le35rp0gAXIgls+oH62iCqoJ4mMhEQjAqR3+owELgusGsDoJhKl5kDQeQKIESv9GVymgQ3cvdg0K04NVQNMUm+ciEkrYL6KFjlt5Z4+uFsREwcQyfu2YB7iZ7/keYYOehTWZSo/ugpg67fG+EqGxGSu1tOaYR1QLCFUPQ/O94KZMc1I/t/VnDV9UJ8yyFu5o/EZmlP2DbdRmpmNFbPGSts42m8sR/wKI8inBt3OcRJTJO1x3sCJZZjyWA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=9IOQxIa8FKC0yUlr0xsHuBIdtG+zywvS5eDQEPXrJo4=;
+ b=Y5zQgd5oZVxgZ6cUkfOaPAfM83KJkdQKm1o3fSH2w59GHXIwBIQhteTEVuKw0LH6CIwbFU6gqgI91mm/qO1kkNDM4dkpZKH00iPK7YMy1ktHBXjHLlCrKH7AAlunI0wNLZKzXIHB7UnYXhAn4woOQdIHezTz/rPSrgkRLdVn2R0=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from DB7PR04MB4010.eurprd04.prod.outlook.com (2603:10a6:5:21::30) by
+ DB8PR04MB6892.eurprd04.prod.outlook.com (2603:10a6:10:113::10) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6631.29; Wed, 26 Jul 2023 11:21:31 +0000
+Received: from DB7PR04MB4010.eurprd04.prod.outlook.com
+ ([fe80::d73c:e747:3911:dcc]) by DB7PR04MB4010.eurprd04.prod.outlook.com
+ ([fe80::d73c:e747:3911:dcc%5]) with mapi id 15.20.6631.026; Wed, 26 Jul 2023
+ 11:21:31 +0000
+From: haibo.chen@nxp.com
+To: robh+dt@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org,
+	conor+dt@kernel.org,
+	shawnguo@kernel.org,
+	s.hauer@pengutronix.de,
+	wg@grandegger.com,
+	mkl@pengutronix.de
+Cc: kernel@pengutronix.de,
+	linux-imx@nxp.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	haibo.chen@nxp.com,
+	devicetree@vger.kernel.org,
+	linux-can@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH v3 1/2] arm64: dts: imx93: add the Flex-CAN stop mode by GPR
+Date: Wed, 26 Jul 2023 19:24:57 +0800
+Message-Id: <20230726112458.3524165-1-haibo.chen@nxp.com>
+X-Mailer: git-send-email 2.34.1
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: SG2P153CA0049.APCP153.PROD.OUTLOOK.COM (2603:1096:4:c6::18)
+ To DB7PR04MB4010.eurprd04.prod.outlook.com (2603:10a6:5:21::30)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <16b4ab57-dfb0-2c1d-9be1-57da30dff3c3@intel.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.69.30.204]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- dggpemm500005.china.huawei.com (7.185.36.74)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-	version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DB7PR04MB4010:EE_|DB8PR04MB6892:EE_
+X-MS-Office365-Filtering-Correlation-Id: db47d5ad-573b-4b15-5c9c-08db8dca767c
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	nyO6F1nn1XhuY1ex9HGqpiV3XtayohqgQpwhf3LwhpWOeuRwkFqm6ODv/twM70igBUxJDQLVeuJx+pBurtBzuQgFyW5p313Yh3Yz5iVeLfkNTu+t52z3TVnjHclcCc0sSTxjLzd/M0MFMaarc2HSa9fj91EzyyfUAgIBN4vZLH4UD+rQ0wciZauu43geeyYrEkZcXjfVsZv/h9J5SIxjLDTPMhggBtEVz5lrXFmbz4hL4ahtz+wMy04scOMUErC50qTyVBB6FZoQr2x9I5AMqSUi9QP8keHpXZg2a8q9ehtk1mfXzY3wg5ln8NA0sk0sCO/v5atqggk1hsSteA9QGvLUB6TJNer1xqirobn1qPX5mV4jdrti0uQezR0X37AhalF1eCpgFlw6JMpfN7oUP1pEf3z/u9hcRmEurer7f65zlTu8RJdsOuUp/IxZwSZOD2NpxnA6m24Pduu3mtDq+XfQDMThmM1rEzW1xa6uoWJE2iQw+MT5GbaZkPq17pE/J5ATNRVlEjeQ/KSy3TIy6BwamHkB1gAzNUEaGl+M0Nhb54HDYk4m0FDoiMYKhg0vXPq4mN18Qkg0qCgpAvwnZ6WLhxQ7t8rmViotCJgOuHKyxdukWsqyvGZKke79y1Lw
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DB7PR04MB4010.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(396003)(346002)(376002)(366004)(136003)(451199021)(2906002)(52116002)(6486002)(6666004)(2616005)(38350700002)(38100700002)(36756003)(186003)(7416002)(5660300002)(86362001)(83380400001)(41300700001)(8676002)(316002)(6506007)(26005)(8936002)(1076003)(66556008)(478600001)(6512007)(4326008)(66946007)(9686003)(66476007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?OHAwR3JDVFk4TUVnbTN2dlNuRkJYbUhCejBkcUh6SDVOMjhJb3o4VnZDenZp?=
+ =?utf-8?B?MWdiTGlqSEFHazNrSnFRV3dTRjd3YkxBUFRGYTFQMnBudFNvcTVoUFdjMHVS?=
+ =?utf-8?B?UXg4MjNRTFRhVVR6YXhWSzNldEdIc29Rd0pCNklEcUVIL0tlRnVPaXVTV3o5?=
+ =?utf-8?B?VTl1aGY2UlcxaXg2dlRCT2x0QnVMR0VwZ1JuOGQwN25wNEdBUi9kVUxkRnc5?=
+ =?utf-8?B?M0RkTkpIRjdMbU8yRXJWSkFYOHd2Smw0MXRvZVhQVmlORXgyLzA0UW1TSEpL?=
+ =?utf-8?B?SUE1L1ppc2N2WExvVXpWS3BnZVdjazFkZVo1b0lwUVlSSDd2bzgyUTlST1ox?=
+ =?utf-8?B?b3NNdEhCZGdTaUVtSjd1dXg2b0ZtTGdaendnZHdRek9GMWxIYUdIamdrU1Bt?=
+ =?utf-8?B?WGs4emRtN3BwR2NDM005YitlbnVCZmczcWFqY05USFdBU2tyVzgxY29pRFRB?=
+ =?utf-8?B?NzdoU2llWlYwZHhUZFA1TUhoc05ERWlQVzF5ZnRxUXBMeG1NRUZjUWpoRWxa?=
+ =?utf-8?B?dHNRTFBSSGRXejRHcVUwcCtsaWdyNmhuZ2NWTHlpUURmZGE0Z0U1bXN0ZitU?=
+ =?utf-8?B?TVVUbS91d3EyZzQ1QVFIZ3Q3VWVVQkw4Z2RPV3E3dkRGbGNaQ1pqcEd6RTc3?=
+ =?utf-8?B?bmsvaVhHbDQ5NnRVNWVNcStGTU94a3lUTzRRSlFtaVZBOFhPMjhML3RJR3Fy?=
+ =?utf-8?B?TkkxbHgzK0ZJR3JHNGdrYjdOcU1KM2pyR3pSUlFwbmxjZWJaMGFIeE5oOU1k?=
+ =?utf-8?B?RkVpTXhmR3ZINUV3cEpkeHhOR2NMRFAwOFFnZUw2SjJLaHBOYWFST2x3OWZS?=
+ =?utf-8?B?WndoblVXK2kxMTlRZUQwc0FzbDRJeWVnWEE3eEwvN0I4RXRrMlpiYXZ4Qkha?=
+ =?utf-8?B?M25sa1JkZjIwbVlsK3FIRXpGczMrUnlkWm5nOGJYQXBNdTBXa1oxUDluNU9B?=
+ =?utf-8?B?Y0RacjdUcHBJcnhZcGd4YkpzRk5rbDhMR3BtczROdFN4elppM294a1F0WHJo?=
+ =?utf-8?B?SlVDVFZYWmh1UUNnZUNWalJBVTEzeHcvTzV4bjFqWWFNa2RCWXlMOHBES0ZV?=
+ =?utf-8?B?T2lmc1U4SmVNdFNqSXFtQ1lDOVhDaXFiRjVod25sbFZ6Q24wS2FDK0VkOUta?=
+ =?utf-8?B?ekx2emo2YlhzOTkydlNYUW9pVEcvMlBKdnQ2bFUydE5BM0pZa2x2bWZFWm13?=
+ =?utf-8?B?a1E2eU1va1JaRlhvb1Y3dmpXd1FvSkxXMEZRRGpDakhWRks5TSszV25LUUN0?=
+ =?utf-8?B?VW1jc1QrbDVsdHEwb2R6Y0RQVkpKY1A0cFNQU3hRc0VQaVg2UlpJRi9zeEt6?=
+ =?utf-8?B?dVpyL2o0MWxYci9oL3JJQ05JY0JNQm5jWHFodUp0ZUhaMzFaRzcxT0FLakVi?=
+ =?utf-8?B?MEZBcEFXdFFWVHN6dzlQR2UrZ3ZIUVdhNGVqeWt3SGRxU2Zxa1I3SHVBZGpE?=
+ =?utf-8?B?RUZ0alRzbjRxbGpwTkJ4K1h6R0NwTWJEbnFSR29SbXlFWGloYWVJOWJnN05a?=
+ =?utf-8?B?Q0QwaHJRNWppMERZYW1TL3VKQUp6SlFlcnBWdUFtQ2Y0aTNTSTFOOWxLWDVB?=
+ =?utf-8?B?NGdVbWo3T2hEajVqN0k2bFBMb2tQaE1UNjJvWUROV3V2clI3OWU1cElTczZO?=
+ =?utf-8?B?WStWcG1xazZWVm5pUk90bXBybHkxQVlSWnJHenlxd2V2SG5RM09zNlZQZHJk?=
+ =?utf-8?B?eDNnbndFZCtqYWU5R1g2aUtqU0FXOFJwUkQvd0VlVE1qamJGWHVkaXQweHVU?=
+ =?utf-8?B?d2kvbHJkYWRGTUtEYzVSdDVGMTFZU2Jpa3ZDNmFvUFJiUUhCTVFCNlFtRHVu?=
+ =?utf-8?B?Y2tLT0I4bXh2SVA4RVAvOHpBZkdaWXlaT3hoWXVET01meisxSmFxZjlHbWVu?=
+ =?utf-8?B?Uk83L0ZpRUFkRGxleVFXTWU0ZnBUd09uN3VWSjJlK0hnaEdVOHZObW5FZWZJ?=
+ =?utf-8?B?b29saVpUZUxPMzZ6TmRWdjQvQUJSZUxaODIvM0ExTENLUEdVSGxDdDlncGdV?=
+ =?utf-8?B?K3QxVWFtMEVpaDJueUI0YjlYZE53UzRkZGhZQ01vUXRDR2IrT3Z3V0JpOXFm?=
+ =?utf-8?B?akc5c2ljem4yUjROMFFkRnMwUDlrQnk2NGZpb1NBRmIyYitzNUxIY09SN3RK?=
+ =?utf-8?Q?STji5jCx1pAbbPwYqY/XgbwAX?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: db47d5ad-573b-4b15-5c9c-08db8dca767c
+X-MS-Exchange-CrossTenant-AuthSource: DB7PR04MB4010.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Jul 2023 11:21:31.6428
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 7zp4guQRAJ6nTFdbEUhM7H6kTyNkM7Hp4wGse/erOq5sBB5yzs70C35pLtf4RyPeBqNLsoRNR5pL28x44G6m7w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR04MB6892
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 2023/7/26 18:43, Alexander Lobakin wrote:
-> From: Alexander H Duyck <alexander.duyck@gmail.com>
-> Date: Tue, 25 Jul 2023 08:47:46 -0700
-> 
->> On Tue, 2023-07-25 at 21:12 +0800, Yunsheng Lin wrote:
->>> Split types and pure function declarations from page_pool.h
->>> and add them in page_pool/types.h, so that C sources can
->>> include page_pool.h and headers should generally only include
->>> page_pool/types.h as suggested by jakub.
->>>
->>> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
->>> Suggested-by: Jakub Kicinski <kuba@kernel.org>
->>> CC: Alexander Lobakin <aleksander.lobakin@intel.com>
-> 
-> [...]
-> 
->>> +/* Caller must provide appropriate safe context, e.g. NAPI. */
->>> +void page_pool_update_nid(struct page_pool *pool, int new_nid);
->>> +
->>> +#endif /* _NET_PAGE_POOL_H */
->>
->>
->> This seems kind of overkill for what is needed. It seems like the
->> general thought process with splitting this was so that you had just
->> the minimum of what is needed to support skbuff.h and the functions
->> declared there. The rest of this would then be added via the .h to the
->> .c files that will actually be calling the functions.
->>
->> By that logic I think the only thing we really need is the function
->> declaration for page_pool_return_skb_page moved into skbuff.h. We could
->> then just remove page_pool.h from skbuff.h couldn't we?
-> 
-> This patch is not to drop page_pool.h include from skbuff.h.
-> This is more future-proof (since I'm dropping this include anyway in my
-> series) to have includes organized and prevent cases like that one with
-> skbuff.h from happening. And to save some CPU cycles on preprocessing if
-> that makes sense.
+From: Haibo Chen <haibo.chen@nxp.com>
 
-The suggestion is from below:
+imx93 A0 chip use the internal q-channel handshake signal in LPCG
+and CCM to automatically handle the Flex-CAN stop mode. But this
+method meet issue when do the system PM stress test. IC can't fix
+it easily. So in the new imx93 A1 chip, IC drop this method, and
+involve back the old way，use the GPR method to trigger the Flex-CAN
+stop mode signal. Now NXP claim to drop imx93 A0, and only support
+imx93 A1. So here add the stop mode through GPR.
 
-https://lore.kernel.org/all/20230710113841.482cbeac@kernel.org/
+This patch also fix a typo for aonmix_ns_gpr.
 
-> 
->>
->> Another thing we could consider doing is looking at splitting things up
->> so that we had a include file in net/core/page_pool.h to handle some of
->> the cases where we are just linking the page_pool bits to other core
->> file bits such as xdp.c and skbuff.c.
+Signed-off-by: Haibo Chen <haibo.chen@nxp.com>
+---
+ arch/arm64/boot/dts/freescale/imx93.dtsi | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-I suppose the above suggestion is about splitting or naming by
-the user as the discussed in the below thread?
-https://lore.kernel.org/all/20230721182942.0ca57663@kernel.org/
+diff --git a/arch/arm64/boot/dts/freescale/imx93.dtsi b/arch/arm64/boot/dts/freescale/imx93.dtsi
+index 4ec9df78f205..e0282c4ba11d 100644
+--- a/arch/arm64/boot/dts/freescale/imx93.dtsi
++++ b/arch/arm64/boot/dts/freescale/imx93.dtsi
+@@ -185,7 +185,7 @@ aips1: bus@44000000 {
+ 			#size-cells = <1>;
+ 			ranges;
+ 
+-			anomix_ns_gpr: syscon@44210000 {
++			aonmix_ns_gpr: syscon@44210000 {
+ 				compatible = "fsl,imx93-aonmix-ns-syscfg", "syscon";
+ 				reg = <0x44210000 0x1000>;
+ 			};
+@@ -319,6 +319,7 @@ flexcan1: can@443a0000 {
+ 				assigned-clock-parents = <&clk IMX93_CLK_SYS_PLL_PFD1_DIV2>;
+ 				assigned-clock-rates = <40000000>;
+ 				fsl,clk-source = /bits/ 8 <0>;
++				fsl,stop-mode = <&aonmix_ns_gpr 0x14 0>;
+ 				status = "disabled";
+ 			};
+ 
+@@ -591,6 +592,7 @@ flexcan2: can@425b0000 {
+ 				assigned-clock-parents = <&clk IMX93_CLK_SYS_PLL_PFD1_DIV2>;
+ 				assigned-clock-rates = <40000000>;
+ 				fsl,clk-source = /bits/ 8 <0>;
++				fsl,stop-mode = <&wakeupmix_gpr 0x0c 2>;
+ 				status = "disabled";
+ 			};
+ 
+-- 
+2.34.1
 
-> 
-> Thanks,
-> Olek
-> .
-> 
 
