@@ -1,190 +1,221 @@
-Return-Path: <netdev+bounces-21597-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21598-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DBB4763F70
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 21:20:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83634763F7C
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 21:25:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 870BB1C20CA0
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 19:20:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 37F1F281F1E
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 19:25:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67D0A4CE98;
-	Wed, 26 Jul 2023 19:20:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0CACBE56;
+	Wed, 26 Jul 2023 19:25:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58B784CE8B
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 19:20:52 +0000 (UTC)
-Received: from mail-wm1-x32e.google.com (mail-wm1-x32e.google.com [IPv6:2a00:1450:4864:20::32e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC2292737;
-	Wed, 26 Jul 2023 12:20:48 -0700 (PDT)
-Received: by mail-wm1-x32e.google.com with SMTP id 5b1f17b1804b1-3fbea147034so1016195e9.0;
-        Wed, 26 Jul 2023 12:20:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690399247; x=1691004047;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=SU5w/Qd+Q2s6pTNTUx/bglHlSYRuAA+mciT7JmjRh4Q=;
-        b=eoqi2tQD/6t5XYrmp8b4wsx9lND/kXSpo3WDzgeBYvmGmX8P0Qbv9v7pDii13+pyfd
-         ER0K4tqBLphE04ZvAen5YdS1W0X1OBqgYPjwYZNF9l4seZ+oVg3f3Wvoofn7LEg6K6En
-         /CdCtVnq50U+RI2LK6KD1tvDN5gfFJCL9qy+DBqSF9Ug8+PG0K0ekDURaqkHa3eAJoSq
-         aSFL4/zvZxnGjG0iXbDYoPJ8Pw2hA+1skJ+X+eOS0HgX5l6DwLaWRT8BDboDgh/LOhh3
-         ufkWtTbCRp5fKH7T3EtwgN0c9JqUb+re9tVFoOESHeVAXxYlwkIGDrBn9wel/6xHfbOt
-         AU8A==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3A844CE7A
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 19:25:12 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29B422115
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 12:25:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1690399510;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=cHY6puW3nOI/U4qtJv8yKQr5CJoUzjywbPXurWGe+CU=;
+	b=cVBUM6WtqT1bo3DjuvdML/OftCLMohRC8k1fH1P07QcpaWo2XrwqqLtkHXqC1PAGj2Sa1C
+	yId0HBo9WbCEH+gw08Gk5NfvN0SHsOGmX0nKNrWklVRw9mBmnFniem19rSWxOgiovTWvo+
+	wH3DChQRpLhCUD3myuY3TSrbpj6PsRY=
+Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
+ [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-690-5eB__eV4Pu2pO73z4G6B_w-1; Wed, 26 Jul 2023 15:25:05 -0400
+X-MC-Unique: 5eB__eV4Pu2pO73z4G6B_w-1
+Received: by mail-lf1-f70.google.com with SMTP id 2adb3069b0e04-4fb7bd971aeso45691e87.0
+        for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 12:25:05 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690399247; x=1691004047;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SU5w/Qd+Q2s6pTNTUx/bglHlSYRuAA+mciT7JmjRh4Q=;
-        b=lUDnI30A7RAjmZXqicWXD9S4xbjUW4zJyvhCxx1Q7BVd7z8roCepoxMPpHlAm4ztLc
-         fPG9a4PCOjOy8W80rU0tSFIrdC0aL3n3bNWMlcffo43DetrnNcGTU4Mx9nTIAcW2Ckgz
-         ISulF1H51WxM0fb0h5KSG3zVW9/N0mJRbz6j+T0JAj9ukMwx16HB3NtiOV2rkQDAijW+
-         ZhibVgrjlXAlhYlTxhH+V173dqW+QQk0f1ceEWZcPdTLeLEBm2D2MZKeotmwIwMXYdIl
-         Aivcve23R5MIPaA8I7+zWcrlUh6sV+ttxLcw5wuShFWC33lVee23q5tmaoXI8KNo3O9M
-         225g==
-X-Gm-Message-State: ABy/qLZtBzZhTDa0a2VMfnGXgzdrlFaQOFy6+4Q5DRbn9p3E5XjzACNc
-	4g8wvDZ206AT0tvcmOKxi8w=
-X-Google-Smtp-Source: APBJJlHBRtroaMd2u/pxowsVAjxlt8UGtzJgYXLG5mldxeUG4NiXgFfvruege631QAMLsz2xk70BvA==
-X-Received: by 2002:a05:600c:2181:b0:3fa:98c3:7dbd with SMTP id e1-20020a05600c218100b003fa98c37dbdmr10406wme.41.1690399246785;
-        Wed, 26 Jul 2023 12:20:46 -0700 (PDT)
-Received: from [192.168.0.103] ([77.126.7.132])
-        by smtp.gmail.com with ESMTPSA id c22-20020a7bc856000000b003fbd0c50ba2sm2782413wml.32.2023.07.26.12.20.43
+        d=1e100.net; s=20221208; t=1690399504; x=1691004304;
+        h=content-transfer-encoding:in-reply-to:references:to
+         :content-language:subject:cc:user-agent:mime-version:date:message-id
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=cHY6puW3nOI/U4qtJv8yKQr5CJoUzjywbPXurWGe+CU=;
+        b=XdvjlJiKanFhR5bTXABXqb0Zqwmexyliv0yMevJ1cos9gJL2vW/ZsFTNE0nIpyFXER
+         10bP6ZhfH0u6W7Ps3PgasUX89CgMY2yUbV6jYbu5H+flFHG6va8dId7BQu5TPeWHCofb
+         JoZguVsuV7XVc/TKZ5UlhDR4o0M2fPRLEPbnRM6lPdcj3nwolRt7Th3DXjsKMQF9slfz
+         kIJXIAMJhhzPVJXTablJ2sAzCASsGBvc65LAN7DZZNd1NPb84XNQxuRX26PXYxA7xC8R
+         KBJPTsES3VWYe/xZPBx41VzMCOMqKPwodeTN/eleY1KppKJEl8OnEulxo1DwmkWqodb4
+         ztnQ==
+X-Gm-Message-State: ABy/qLb3eELBuq9Ht7BmSYD5CZPKrSA8YENVEh4O1SFDDeWM/gFcVFRi
+	D8TgGOtYx5B9DFznpV33ddcA3hCN+/ngQ/pzDt0sfHTV9byj77Q67g+CCojqSW3KM4fXCFwaVZC
+	tVIhYu5z/EAkEsUGQClVZBR60USk=
+X-Received: by 2002:a05:6512:3b87:b0:4f8:6ac4:1aa9 with SMTP id g7-20020a0565123b8700b004f86ac41aa9mr2398lfv.21.1690399503948;
+        Wed, 26 Jul 2023 12:25:03 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlEjiKCpkX+P4Z3nt2t+ufZnzpxiL4Gj0TH3p3OJqMF5PL8k5Iv6RKEIjFlz16Dmr71XroFz7A==
+X-Received: by 2002:a05:6512:3b87:b0:4f8:6ac4:1aa9 with SMTP id g7-20020a0565123b8700b004f86ac41aa9mr2388lfv.21.1690399503524;
+        Wed, 26 Jul 2023 12:25:03 -0700 (PDT)
+Received: from [192.168.41.200] (83-90-141-187-cable.dk.customer.tdc.net. [83.90.141.187])
+        by smtp.gmail.com with ESMTPSA id m26-20020a056512015a00b004fb745fd22fsm3428341lfo.32.2023.07.26.12.25.01
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 26 Jul 2023 12:20:46 -0700 (PDT)
-Message-ID: <e9c41176-829a-af5a-65d2-78a2f414cd04@gmail.com>
-Date: Wed, 26 Jul 2023 22:20:42 +0300
+        Wed, 26 Jul 2023 12:25:02 -0700 (PDT)
+From: Jesper Dangaard Brouer <jbrouer@redhat.com>
+X-Google-Original-From: Jesper Dangaard Brouer <brouer@redhat.com>
+Message-ID: <383cc1ce-3c87-4b80-9e70-e0c10a7c1dcc@redhat.com>
+Date: Wed, 26 Jul 2023 21:25:00 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH net-next v10 08/16] tls: Inline do_tcp_sendpages()
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Cc: brouer@redhat.com, ast@kernel.org, daniel@iogearbox.net,
+ andrii@kernel.org, martin.lau@linux.dev, song@kernel.org, yhs@fb.com,
+ john.fastabend@gmail.com, kpsingh@kernel.org, haoluo@google.com,
+ jolsa@kernel.org, kuba@kernel.org, toke@kernel.org, willemb@google.com,
+ dsahern@kernel.org, magnus.karlsson@intel.com, bjorn@kernel.org,
+ maciej.fijalkowski@intel.com, hawk@kernel.org, netdev@vger.kernel.org,
+ xdp-hints@xdp-project.net
+Subject: Re: [xdp-hints] [RFC net-next v4 2/8] xsk: add TX timestamp and TX
+ checksum offload support
 Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: David Howells <dhowells@redhat.com>, netdev@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- David Ahern <dsahern@kernel.org>, Matthew Wilcox <willy@infradead.org>,
- Al Viro <viro@zeniv.linux.org.uk>, Christoph Hellwig <hch@infradead.org>,
- Jens Axboe <axboe@kernel.dk>, Jeff Layton <jlayton@kernel.org>,
- Christian Brauner <brauner@kernel.org>,
- Chuck Lever III <chuck.lever@oracle.com>,
- Linus Torvalds <torvalds@linux-foundation.org>,
- linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-mm@kvack.org, Boris Pismenny <borisp@nvidia.com>,
- John Fastabend <john.fastabend@gmail.com>, Gal Pressman <gal@nvidia.com>,
- ranro@nvidia.com, samiram@nvidia.com, drort@nvidia.com,
- Tariq Toukan <tariqt@nvidia.com>
-References: <ecbb5d7e-7238-28e2-1a17-686325e2bb50@gmail.com>
- <4c49176f-147a-4283-f1b1-32aac7b4b996@gmail.com>
- <20230522121125.2595254-1-dhowells@redhat.com>
- <20230522121125.2595254-9-dhowells@redhat.com>
- <2267272.1686150217@warthog.procyon.org.uk>
- <5a9d4ffb-a569-3f60-6ac8-070ab5e5f5ad@gmail.com>
- <776549.1687167344@warthog.procyon.org.uk>
- <7337a904-231d-201d-397a-7bbe7cae929f@gmail.com>
- <20230630102143.7deffc30@kernel.org>
- <f0538006-6641-eaf6-b7b5-b3ef57afc652@gmail.com>
- <20230705091914.5bee12f8@kernel.org>
- <bbdce803-0f23-7d3f-f75a-2bc3cfb794af@gmail.com>
- <20230725173036.442ba8ba@kernel.org>
-From: Tariq Toukan <ttoukan.linux@gmail.com>
-In-Reply-To: <20230725173036.442ba8ba@kernel.org>
+To: Stanislav Fomichev <sdf@google.com>, bpf@vger.kernel.org
+References: <20230724235957.1953861-1-sdf@google.com>
+ <20230724235957.1953861-3-sdf@google.com>
+In-Reply-To: <20230724235957.1953861-3-sdf@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-	NORMAL_HTTP_TO_IP,NUMERIC_HTTP_ADDR,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED,WEIRD_PORT autolearn=ham
-	autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+	SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
 
 
-On 26/07/2023 3:30, Jakub Kicinski wrote:
-> On Sun, 23 Jul 2023 09:35:56 +0300 Tariq Toukan wrote:
->> Hi Jakub, David,
->>
->> We repro the issue on the server side using this client command:
->> $ wrk -b2.2.2.2 -t4 -c1000 -d5 --timeout 5s
->> https://2.2.2.3:20443/256000b.img
->>
->> Port 20443 is configured with:
->>       ssl_ciphers ECDHE-RSA-AES128-GCM-SHA256;
->>       sendfile    off;
->>
->>
->> Important:
->> 1. Couldn't repro with files smaller than 40KB.
->> 2. Couldn't repro with "sendfile    on;"
->>
->> In addition, we collected the vmcore (forced by panic_on_warn), it can
->> be downloaded from here:
->> https://drive.google.com/file/d/1Fi2dzgq6k2hb2L_kwyntRjfLF6_RmbxB/view?usp=sharing
-> 
-> This has no symbols :(
-> 
-
-Uh.. :/
-I'll try to fix this and re-generate.
-
-> There is a small bug in this commit, we should always set SPLICE.
-> But I don't see how that'd cause the warning you're seeing.
-> Does your build have CONFIG_DEBUG_VM enabled?
-
-No.
-
-# CONFIG_DEBUG_VM is not set
-# CONFIG_DEBUG_VM_PGTABLE is not set
-
-> 
-> -->8-------------------------
-> 
-> From: Jakub Kicinski <kuba@kernel.org>
-> Date: Tue, 25 Jul 2023 17:03:25 -0700
-> Subject: net: tls: set MSG_SPLICE_PAGES consistently
-> 
-> We used to change the flags for the last segment, because
-> non-last segments had the MSG_SENDPAGE_NOTLAST flag set.
-> That flag is no longer a thing so remove the setting.
-> 
-> Since flags most likely don't have MSG_SPLICE_PAGES set
-> this avoids passing parts of the sg as splice and parts
-> as non-splice.
-> 
-> ... tags ...
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
->   net/tls/tls_main.c | 3 ---
->   1 file changed, 3 deletions(-)
-> 
-> diff --git a/net/tls/tls_main.c b/net/tls/tls_main.c
-> index b6896126bb92..4a8ee2f6badb 100644
-> --- a/net/tls/tls_main.c
-> +++ b/net/tls/tls_main.c
-> @@ -139,9 +139,6 @@ int tls_push_sg(struct sock *sk,
+On 25/07/2023 01.59, Stanislav Fomichev wrote:
+> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+> index 11652e464f5d..8b40c80557aa 100644
+> --- a/include/linux/netdevice.h
+> +++ b/include/linux/netdevice.h
+> @@ -1660,6 +1660,31 @@ struct xdp_metadata_ops {
+>   			       enum xdp_rss_hash_type *rss_type);
+>   };
 >   
->   	ctx->splicing_pages = true;
->   	while (1) {
-> -		if (sg_is_last(sg))
-> -			msg.msg_flags = flags;
-> -
->   		/* is sending application-limited? */
->   		tcp_rate_check_app_limited(sk);
->   		p = sg_page(sg);
+> +/*
+> + * This structure defines the AF_XDP TX metadata hooks for network devices.
+> + * The following hooks can be defined; unless noted otherwise, they are
+> + * optional and can be filled with a null pointer.
+> + *
+> + * int (*tmo_request_timestamp)(void *priv)
+> + *     This function is called when AF_XDP frame requested egress timestamp.
+> + *
+> + * int (*tmo_fill_timestamp)(void *priv)
+> + *     This function is called when AF_XDP frame, that had requested
+> + *     egress timestamp, received a completion. The hook needs to return
+> + *     the actual HW timestamp.
+> + *
+> + * int (*tmo_request_timestamp)(u16 csum_start, u16 csum_offset, void *priv)
+> + *     This function is called when AF_XDP frame requested HW checksum
+> + *     offload. csum_start indicates position where checksumming should start.
+> + *     csum_offset indicates position where checksum should be stored.
+> + *
+> + */
+> +struct xsk_tx_metadata_ops {
+> +	void	(*tmo_request_timestamp)(void *priv);
+> +	u64	(*tmo_fill_timestamp)(void *priv);
+> +	void	(*tmo_request_checksum)(u16 csum_start, u16 csum_offset, void *priv);
+> +};
+> +
+>   /**
+>    * enum netdev_priv_flags - &struct net_device priv_flags
+>    *
+> @@ -1844,6 +1869,7 @@ enum netdev_ml_priv_type {
+>    *	@netdev_ops:	Includes several pointers to callbacks,
+>    *			if one wants to override the ndo_*() functions
+>    *	@xdp_metadata_ops:	Includes pointers to XDP metadata callbacks.
+> + *	@xsk_tx_metadata_ops:	Includes pointers to AF_XDP TX metadata callbacks.
+>    *	@ethtool_ops:	Management operations
+>    *	@l3mdev_ops:	Layer 3 master device operations
+>    *	@ndisc_ops:	Includes callbacks for different IPv6 neighbour
+> @@ -2100,6 +2126,7 @@ struct net_device {
+>   	unsigned long long	priv_flags;
+>   	const struct net_device_ops *netdev_ops;
+>   	const struct xdp_metadata_ops *xdp_metadata_ops;
+> +	const struct xsk_tx_metadata_ops *xsk_tx_metadata_ops;
+>   	int			ifindex;
+>   	unsigned short		gflags;
+>   	unsigned short		hard_header_len;
+> diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
+> index faaba050f843..5febc1a5131e 100644
+> --- a/include/linux/skbuff.h
+> +++ b/include/linux/skbuff.h
+> @@ -581,7 +581,10 @@ struct skb_shared_info {
+>   	/* Warning: this field is not always filled in (UFO)! */
+>   	unsigned short	gso_segs;
+>   	struct sk_buff	*frag_list;
+> -	struct skb_shared_hwtstamps hwtstamps;
+> +	union {
+> +		struct skb_shared_hwtstamps hwtstamps;
+> +		struct xsk_tx_metadata *xsk_meta;
+> +	};
+>   	unsigned int	gso_type;
+>   	u32		tskey;
+>   
+> diff --git a/include/net/xdp_sock.h b/include/net/xdp_sock.h
+> index 467b9fb56827..288fa58c4665 100644
+> --- a/include/net/xdp_sock.h
+> +++ b/include/net/xdp_sock.h
+> @@ -90,6 +90,54 @@ int xsk_generic_rcv(struct xdp_sock *xs, struct xdp_buff *xdp);
+>   int __xsk_map_redirect(struct xdp_sock *xs, struct xdp_buff *xdp);
+>   void __xsk_map_flush(void);
+>   
+> +/**
+> + *  xsk_tx_metadata_request - Evaluate AF_XDP TX metadata at submission
+> + *  and call appropriate xsk_tx_metadata_ops operation.
+> + *  @meta: pointer to AF_XDP metadata area
+> + *  @ops: pointer to struct xsk_tx_metadata_ops
+> + *  @priv: pointer to driver-private aread
+> + *
+> + *  This function should be called by the networking device when
+> + *  it prepares AF_XDP egress packet.
+> + */
+> +static inline void xsk_tx_metadata_request(const struct xsk_tx_metadata *meta,
+> +					   const struct xsk_tx_metadata_ops *ops,
+> +					   void *priv)
 
-I'll test this anyway tomorrow and update.
+(As you mentioned) this gets inlined in drivers for performance.
 
-Regards,
-Tariq
+> +{
+> +	if (!meta)
+> +		return;
+> +
+> +	if (ops->tmo_request_timestamp)
+> +		if (meta->flags & XDP_TX_METADATA_TIMESTAMP)
+> +			ops->tmo_request_timestamp(priv);
+
+We still have the overhead of function pointer call.
+With RETPOLINE this is costly.
+
+Measured on my testlab CPU E5-1650 v4 @ 3.60GHz
+  Type:function_call_cost:  3 cycles(tsc) 1.010 ns
+  Type:func_ptr_call_cost: 30 cycles(tsc) 8.341 ns
+
+Given this get inlined in drivers, perhaps we can add some
+INDIRECT_CALL_1 macros to avoid these indirect calls?
+
+> +
+> +	if (ops->tmo_request_checksum)
+> +		if (meta->flags & XDP_TX_METADATA_CHECKSUM)
+> +			ops->tmo_request_checksum(meta->csum_start, meta->csum_offset, priv);
+> +}
+> +
+
 
