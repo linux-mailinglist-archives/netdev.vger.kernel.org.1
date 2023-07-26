@@ -1,83 +1,95 @@
-Return-Path: <netdev+bounces-21160-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21161-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6226762981
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 05:52:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1005B76298A
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 05:57:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EFFE41C2103C
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 03:52:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 64EA5281B57
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 03:57:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C05955228;
-	Wed, 26 Jul 2023 03:52:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4ABFE5233;
+	Wed, 26 Jul 2023 03:57:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DD311FD0;
-	Wed, 26 Jul 2023 03:52:53 +0000 (UTC)
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 503BB2695;
-	Tue, 25 Jul 2023 20:52:51 -0700 (PDT)
-Received: from dggpeml500026.china.huawei.com (unknown [172.30.72.55])
-	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4R9g050wtlzLp3n;
-	Wed, 26 Jul 2023 11:50:13 +0800 (CST)
-Received: from [10.174.178.66] (10.174.178.66) by
- dggpeml500026.china.huawei.com (7.185.36.106) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Wed, 26 Jul 2023 11:52:47 +0800
-Message-ID: <0878305d-7393-ea7a-25c4-455a43d3549e@huawei.com>
-Date: Wed, 26 Jul 2023 11:52:47 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CE941FD0
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 03:57:04 +0000 (UTC)
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id D70D71BF2;
+	Tue, 25 Jul 2023 20:57:03 -0700 (PDT)
+Received: by linux.microsoft.com (Postfix, from userid 1174)
+	id 1A4BB2380B17; Tue, 25 Jul 2023 20:57:03 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 1A4BB2380B17
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxonhyperv.com;
+	s=default; t=1690343823;
+	bh=+FVUEn1yD0tAL3RMqa721SSRIJPoJUbzwns9YtZH6jY=;
+	h=From:To:Cc:Subject:Date:From;
+	b=XF6CDhGicdUdrGXLMt1FMTgiZBG9hmmlYdUfRtKfv8hsIVfeLijxyPD1xHZBP7S9M
+	 W0p9bLWATFsR87DPae1MA6t9J1b+6MuswUUDdvLfmVAl8WMlLh8AKmmKtzpRq/N8Ug
+	 Pz4wJ3zcZchQuZLAV+mqlqXOvrLcKSEypjy/SfLU=
+From: sharmaajay@linuxonhyperv.com
+To: Jason Gunthorpe <jgg@ziepe.ca>,
+	Leon Romanovsky <leon@kernel.org>,
+	Dexuan Cui <decui@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: linux-rdma@vger.kernel.org,
+	linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Ajay Sharma <sharmaajay@microsoft.com>
+Subject: [Patch v2 0/5] RDMA/mana_ib Read Capabilities
+Date: Tue, 25 Jul 2023 20:56:55 -0700
+Message-Id: <1690343820-20188-1-git-send-email-sharmaajay@linuxonhyperv.com>
+X-Mailer: git-send-email 1.8.3.1
+X-Spam-Status: No, score=-9.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED,USER_IN_DEF_SPF_WL autolearn=no autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.0.2
-From: shaozhengchao <shaozhengchao@huawei.com>
-Subject: [Question]Attach xdp program to bond driver with skb mode
-To: netdev <netdev@vger.kernel.org>, <bpf@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.178.66]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- dggpeml500026.china.huawei.com (7.185.36.106)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-	RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-Hi:
-	Now, as shown in commit 879af96ffd72("net, core: Add support for
-XDP redirection to slave device"), if the master has been attached
-program, the slave cannot be attached program. Similarly, if the slave
-is already attached program, the master is not allowed to attach the
-program. It does work for hw and driver mode. But in skb mode, if the
-slave has been attached program, the master also can be attached
-program. So I have two questions:
-1. should skb mode work the same to hw/drv mode?
-2. If other "master" drivers (team?) need to implement XDP feature, is
-it more appropriate to place the restriction in dev_xdp_attach? As shown
-in the following figure:
+From: Ajay Sharma <sharmaajay@microsoft.com>
 
-@@ -9194,6 +9194,14 @@  static int dev_xdp_attach(struct net_device 
-*dev, struct netlink_ext_ack *extack
-  		}
-  	}
+This version has style formatting corrections.
+The V1 introduced changes to control resource
+allocation. The resources are managed by
+Management SW and the patch allows reading the
+limits to prevent overflow. 
 
-+	/* don't allow if a slave device already has a program */
-+	netdev_for_each_lower_dev(dev, lower, iter) {
-+		if (dev_xdp_prog_count(lower) > 0) {
-+			NL_SET_ERR_MSG(extack, "Cannot attach when a slave device already 
-has a program");
-+			return -EEXIST;
-+		}
-+	}
-+
+Ajay Sharma (5):
+  RDMA/mana-ib : Rename all mana_ib_dev type variables to mib_dev
+  RDMA/mana_ib : Register Mana IB  device with Management SW
+  RDMA/mana_ib : Add error eq and notification from SoC
+  RDMA/mana_ib : Create Adapter - each vf bound to adapter object
+  RDMA/mana_ib : Query adapter capabilities
+
+ drivers/infiniband/hw/mana/cq.c               |  12 +-
+ drivers/infiniband/hw/mana/device.c           |  72 +++--
+ drivers/infiniband/hw/mana/main.c             | 258 ++++++++++++------
+ drivers/infiniband/hw/mana/mana_ib.h          |  96 ++++++-
+ drivers/infiniband/hw/mana/mr.c               |  42 ++-
+ drivers/infiniband/hw/mana/qp.c               |  82 +++---
+ drivers/infiniband/hw/mana/wq.c               |  21 +-
+ .../net/ethernet/microsoft/mana/gdma_main.c   | 151 +++++-----
+ drivers/net/ethernet/microsoft/mana/mana_en.c |   3 +
+ include/net/mana/gdma.h                       |  16 +-
+ 10 files changed, 505 insertions(+), 248 deletions(-)
+
+-- 
+2.25.1
+
 
