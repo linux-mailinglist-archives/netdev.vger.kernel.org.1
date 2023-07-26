@@ -1,214 +1,196 @@
-Return-Path: <netdev+bounces-21582-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21583-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B2B3763F2B
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 21:02:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13D9E763F31
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 21:05:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4FC93281E41
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 19:02:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3695D1C2113C
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 19:05:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 321314CE7F;
-	Wed, 26 Jul 2023 19:02:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3EE04CE82;
+	Wed, 26 Jul 2023 19:05:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25FA217EE
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 19:02:52 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (unknown [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13DA1E7
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 12:02:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=wXW4zeJ6rlfREB6dHGCPp9zXTWqhL1U69TNjRIothDQ=; b=vFpsbbfGBMkes3CY8idRKZv0Xn
-	IGb36va9ijEmQ7dTr4klI+bsegyBoafgJVLOQmpmqqs+3CaHhD6swE/mZGG6pnYwgI0b9I0GQTO1A
-	ps7Ub0Wb1MTe1LJLD+VEKnKAFctTFgMt78gNxZZECMQRoNMMv1qO35GBDaG5Id6WukqPBgWkyvugD
-	bEUH6/d3Woe6RpSZRxSflFWs+tk2GPwqArQTAg7CIBYlXG7UzUP6BKNAZJ4J851a9VUgtf+OQnQYy
-	k7x5hbf/oj7NXcHTYd5OgXBqYBaxGyVWmiim3yt17+9ODQtfqBSXRRBwvP51e9j/5vVsDnMB2N8kF
-	VzN2igtQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:58924)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qOjmK-0004rd-1P;
-	Wed, 26 Jul 2023 20:02:32 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qOjmF-00036U-As; Wed, 26 Jul 2023 20:02:27 +0100
-Date: Wed, 26 Jul 2023 20:02:27 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Shenwei Wang <shenwei.wang@nxp.com>
-Cc: Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Shawn Guo <shawnguo@kernel.org>, dl-linux-imx <linux-imx@nxp.com>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Fabio Estevam <festevam@gmail.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-stm32@st-md-mailman.stormreply.com" <linux-stm32@st-md-mailman.stormreply.com>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"imx@lists.linux.dev" <imx@lists.linux.dev>,
-	Frank Li <frank.li@nxp.com>
-Subject: Re: [EXT] Re: [PATCH] net: stmmac: dwmac-imx: pause the TXC clock in
- fixed-link
-Message-ID: <ZMFtw0LNozhNjRGF@shell.armlinux.org.uk>
-References: <20230725194931.1989102-1-shenwei.wang@nxp.com>
- <20230726004338.6i354ue576hb35of@skbuf>
- <PAXPR04MB9185C1A95E101AC2E08639B78900A@PAXPR04MB9185.eurprd04.prod.outlook.com>
- <ZME71epmSHYIB4DZ@shell.armlinux.org.uk>
- <PAXPR04MB91856018959FE0752F1A27888900A@PAXPR04MB9185.eurprd04.prod.outlook.com>
- <ZMFRVtg5WQyGlBJ1@shell.armlinux.org.uk>
- <PAXPR04MB9185108CB4A04C4CD5AE29FC8900A@PAXPR04MB9185.eurprd04.prod.outlook.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D142F7E1
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 19:05:22 +0000 (UTC)
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2081.outbound.protection.outlook.com [40.107.244.81])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 850BEE7;
+	Wed, 26 Jul 2023 12:05:21 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ZthxYFhGtkmDUsCMlfGTdxQBMJmFLfKqwkcj4q3EIITjvZ3IjUzJG71C6zsujD3dGAxqdb/HbZiETLYEnkWGj9C60caR+HVKv+gFzzypttoNJpwN9jTZ8G3bBh2WXo4Z0IvxGt0xIG3nggbk8AUh49hoD6Ilt5kWn5VwImJOGvu9rZu5glvFfQiaNKTkoL7tWSYK1cuahRfeMx5r/hxvjUh2+G7MBVG2mAUZEXirikCln5rXSFFrS8mkCYfacnU1lNvlB+lhuQYuv92GWlv0JwVK0pMygnGZAXfW2964+WbkKckRXnSpFtF2oDliFnnwweeFVAm51AG9E+4PdS4SLg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=kzR+LxNKZwCadXpbFUuDxhN8oHRVyaAEZ4uXSt0WGQA=;
+ b=djPKyk95gc1X0BWATmJ6lsT0yiqSDS0ahIzJYi8C57d7bSKMvCZt8DSkO+biwBXPUjjIxC4gOop2adqlier9o/Mm4Wt4JnFmb5AWwQAmB+OffrtGds7AKQoo7nIwarI3E8cjmWbqz11tfpdRcOxF435Y3H6rjr1BT9p6KBXNZFvnXg74L42X0gXlSRiop/oM9yyFmAcUeT9Q8ZFgLwN+Hx2ldGbgLKR42HdqQG/he0woKCrtwlgWpzmHapasMaek7ven0UW6oW796GZNTxpkYOCFONuyPCg8uyH9knKqS2ot+Y6Mi/aTUzOutj7p9n0wy8VnzNzCW7At2hodGD5z4Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=kzR+LxNKZwCadXpbFUuDxhN8oHRVyaAEZ4uXSt0WGQA=;
+ b=h8IXeVF9pMSoueX6Xc0uXiM9zTZhkxHUk9gPADvl4GEo/05miOG3TN8oM4lu8cK8+lu+LWv/fjXFpImIXXGaNm0vwLF3XVqH8sqWo66xcWPIIIx1dDKgpsqqHGnRA4KBOlbSv5ha9p9gOvUIYYOvDYGm3zTZxWGSBCpISQswOIw=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from PH0PR12MB7982.namprd12.prod.outlook.com (2603:10b6:510:28d::5)
+ by CY8PR12MB7516.namprd12.prod.outlook.com (2603:10b6:930:94::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.29; Wed, 26 Jul
+ 2023 19:05:16 +0000
+Received: from PH0PR12MB7982.namprd12.prod.outlook.com
+ ([fe80::6872:1500:b609:f9cf]) by PH0PR12MB7982.namprd12.prod.outlook.com
+ ([fe80::6872:1500:b609:f9cf%5]) with mapi id 15.20.6631.026; Wed, 26 Jul 2023
+ 19:05:16 +0000
+Message-ID: <95fa9f2d-a529-4d79-167f-eaee1ed0ac4f@amd.com>
+Date: Wed, 26 Jul 2023 12:05:13 -0700
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH v13 vfio 0/7] pds-vfio-pci driver
+Content-Language: en-US
+To: Alex Williamson <alex.williamson@redhat.com>,
+ Jason Gunthorpe <jgg@nvidia.com>
+Cc: Brett Creeley <brett.creeley@amd.com>, kvm@vger.kernel.org,
+ netdev@vger.kernel.org, yishaih@nvidia.com,
+ shameerali.kolothum.thodi@huawei.com, kevin.tian@intel.com,
+ simon.horman@corigine.com, shannon.nelson@amd.com
+References: <20230725214025.9288-1-brett.creeley@amd.com>
+ <ZMEhCrZDNLSrWP/5@nvidia.com>
+ <20230726125051.424ed592.alex.williamson@redhat.com>
+From: Brett Creeley <bcreeley@amd.com>
+In-Reply-To: <20230726125051.424ed592.alex.williamson@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SJ0PR03CA0283.namprd03.prod.outlook.com
+ (2603:10b6:a03:39e::18) To PH0PR12MB7982.namprd12.prod.outlook.com
+ (2603:10b6:510:28d::5)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <PAXPR04MB9185108CB4A04C4CD5AE29FC8900A@PAXPR04MB9185.eurprd04.prod.outlook.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,RDNS_NONE,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR12MB7982:EE_|CY8PR12MB7516:EE_
+X-MS-Office365-Filtering-Correlation-Id: f357dba7-1639-4b3a-141f-08db8e0b3f42
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	XwjTKMIfkIEitWF1AJlIAy8MC/A9Q5JN+hakJ/3Qut+iyoXY8xzNAtJrPhUWr9k3fWkJMa67iFdKinRyZfO5ZOCBgLQ59TtzW8xVqfEw8r2x/SzsxQp+Twr69Hxr2kQvXsK/91GdmWwAGieQwX5a4JHGIexeuyZI7/Ax+QBr0IQ7Oe+0SxeBPKlFj0ogm+RFv4qhhyBq+4VCtm4XwrzG+b0lz8smH0OfRAJHJnwvEffI/Lf17696frTMRXRRpkDa7DStVncUh2WlxC1rCkJUqKNBVUTGLmfG8DnBEY6qomjkL5/tNAtr1YgRD7iO3e263UOmN15CcFCxIt3q4dX6HJ5T5g0jZAT2CNnTdp6HQ6/QYSn3UdJDGVXT62OHb7l3Tp6CNxmKgteW2nh4A6zS2pBJedifihUlZE8ZRDf3MmODNOAVlf2Ym4HZ26QD2IRxZSci6x/LpEifOjcM7jQnMOEjUqb3EXPkmhjAzMIF+AJszf9vSPC4IsPJcCeq33DfNfsfOVVOm/UiJ1TEOOywfOueoqhl6g+k2WZtGQzugETDYlZmXsdvjhCV/DDWcYCtnJU44ZKK+lHyrsNSUsuNbvgIWJSmPzU2CJcgR9jlxGwj/V4jUTWe5QUOMjXQZrIp64TEHYw5dKbTnVnmRko+nA==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR12MB7982.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(136003)(376002)(366004)(39860400002)(346002)(451199021)(6666004)(6486002)(478600001)(83380400001)(6506007)(53546011)(26005)(6512007)(38100700002)(110136005)(4326008)(186003)(66946007)(66556008)(66476007)(31686004)(2616005)(5660300002)(8676002)(8936002)(2906002)(41300700001)(316002)(31696002)(36756003)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?TWVkekppandiMVY0bFRtSkdmdFN5NFU0bmJWa3RnZFVBVEd3YVJUNEVHODZT?=
+ =?utf-8?B?NGVKQit2RE5lVDVkVTlOM2tFSFhacUZzVTFQbkIyT2RLa3d6M1dzUTNFcE5p?=
+ =?utf-8?B?RnROY2t5OTNvZ1FyR2V1bmNDcWk0WUgzTW1XbU5hOXNrQ0k1cDJRRHRxR284?=
+ =?utf-8?B?dDZ4UlZMOWg4SnYwdGUwOENUNCtlMUpTN2p5Ym92c2VXNzVDTjZqQmNKUHl2?=
+ =?utf-8?B?OFJpK3JhRDNUbVVVYmNub3lEc1E5ZXE5MzdkZnU4amx6b21IUFIxSEorVEtF?=
+ =?utf-8?B?TTdlbEZjOFpYaWRKVUYrZ1hjYVdtTEhUdlE4RzloOTNXUlNFMDBnd1hvTWVY?=
+ =?utf-8?B?am91bmJmOU1QRDRFdG1WelB1OWZKT01Zc2luK01FVWJ5SFM1am5HbnBobmtL?=
+ =?utf-8?B?WnFVRGg0amw5c1VvQ1Z5VDhocHgxQXc3b2oxRE5Zd0FWMzdNQURFd281ZEpH?=
+ =?utf-8?B?UXNBMDUzUDVTMmlJTWRHeFhLOEg0c1hwR3FQY3VCZjFQSlZlSEQwQXdzNk9R?=
+ =?utf-8?B?K2dMM1o2V1NkT05NQVZmcmxZT3lLNnlkajNNNW5QNVhUQ3RDbk51UTBDRHdD?=
+ =?utf-8?B?aldtcXRiR2szVnhjWmRpVnZ0L2FoMVNnL1VrZy8zb1RZVEFWZnpJWEpjcXhM?=
+ =?utf-8?B?Rk52QVNDSlN1dHAxcEJZcEJnWmpxU1gzQnZvYmgwZytiamtDakZycHJINVBl?=
+ =?utf-8?B?bjVYekFrRURuQk1CNS8xY1VPangxbW0wcEdUQ2QxMFhGL3hKNStyWmlVNGFi?=
+ =?utf-8?B?NHNBd2c5dlRmM1VEYmJWbE5LSjhJa0I2WmJUY2JtODJyOWZNOTlWUU5OS3Zj?=
+ =?utf-8?B?cm5CL0FaWXhsQ1kvSURvQ1YveXZLU2NkUTd6NHlSaEZQMEpZY2cxMzAycTRD?=
+ =?utf-8?B?YTVrNmk5cGxvS1dOd2I2RkZPWHZaQ1BFNmxqaDZqMUNjVmp5aDU1aEZ4dTBY?=
+ =?utf-8?B?R0pRRzk5bDdPVzhKR1J1Y0dPbDNrU1JJemJTR1JtVVMvZmNGT0JCTVRSbEdG?=
+ =?utf-8?B?Z0RLTGFibVJQZHJwM3o1Sm1yRGs1NDE5VnVrUEZnZGdmbWNwTTZyZ2RYSzNZ?=
+ =?utf-8?B?LzhSRmI5MTVBL0FENkJqRXFoK1VzMFdkdi9XR093bnBtVytmNS9KMkZ5MkZM?=
+ =?utf-8?B?RTlRN1N5RStxTXg4SXY4V0VkY1BmM2RoOHVZRnBmeHkxN1lkTUlIUUZ1QTZk?=
+ =?utf-8?B?U3gwMjJUTmluY01mMVROZWJrMDBwWGdzbmdKTHdNVTdiZTlkdUs3d21XQXpv?=
+ =?utf-8?B?Zk92MlRNbi9zY2lOa0RBaWovUE1IYTIvRVEvZnlOK0tzZllXeFlCYTZoRGE4?=
+ =?utf-8?B?YmFsT1RaNmtjMnNpK0svOGNvY2FSZFY2OXhZQXNySHl5QnZHZ3g4WjJsMWE0?=
+ =?utf-8?B?Yk5xaEpGaTJVN3dCL2JOdkdOazh1MVNrYm9jbGo0eE5WR3lMY0NVRnhKbUU0?=
+ =?utf-8?B?Q052UTIwY2VBR2VVZmkrSmVQVXJWM0c4a2d5bUNJOTRBaG1oR3FyN2Y3MzFR?=
+ =?utf-8?B?cG05WkpVRCtlaDNkd29wQkpCR3ppWElWWGl2WHMwMFlZeHV0Q0lZcFNkR1dI?=
+ =?utf-8?B?aXViY2lXU3R1UEdKNDYvQXRiQnB5VFZRbTgyNW1kdHFHVHJ4bE9QaG5jTTkx?=
+ =?utf-8?B?OTVpWHd4UDdIR2JYQ0JWTmROV3B4Z01BZUdOTXpRVDRGNDNGUGRXMTdVckZi?=
+ =?utf-8?B?UFFVdy9uc01zdU50dkVGblorNVlIdlYvUjRCSHhnY2VNdm9ub2lhU0dTQ2pM?=
+ =?utf-8?B?cWIva0RsN2kxS2JmazZOcFExZDVZcFYwNnRqSnBIT2lXc3dzQXIwZmR6Nk91?=
+ =?utf-8?B?ZUVSUlBYeFRydERGeGtxUTN0Qzc0VkZ5Z1E1RERhSXdjUkNxTGpYanhNVHdW?=
+ =?utf-8?B?WjlZNlpRcXR3c3A1UlpUcURzK3RXWGJKWi9XaVF0aWpmTnJrWnJ5KzNUeUFB?=
+ =?utf-8?B?TUhEWHpjYmM5M0VtRmVRRi9zWENkMVZLRHBQdTdWRVRmNHdPaERORktsL2NU?=
+ =?utf-8?B?d2h3UEp3KzdseGhCOXBlTFRFZVdPaFhtRG5LMVVwRllvamxOMnMzYUhKVisx?=
+ =?utf-8?B?dDhVWmhtbTY2KzZ5VmJFMWg1c3haa24wYVlGbG5rTUZtcFlxUmNLKzA1OU1k?=
+ =?utf-8?Q?gpqoznuTgY8pDFVAIQ0Hw0tGS?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f357dba7-1639-4b3a-141f-08db8e0b3f42
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR12MB7982.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Jul 2023 19:05:16.1483
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: r9/zC5mHuoAI3Da/kRpJAq+edbIlUaIIgbG5zlhb45fALsPCWKNmdSZC6EC7L97tv+dyNl4gYchpQ728c83GKQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7516
+X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,NICE_REPLY_A,
+	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Jul 26, 2023 at 06:47:15PM +0000, Shenwei Wang wrote:
+On 7/26/2023 11:50 AM, Alex Williamson wrote:
+> Caution: This message originated from an External Source. Use proper caution when opening attachments, clicking links, or responding.
 > 
 > 
-> > -----Original Message-----
-> > From: Russell King <linux@armlinux.org.uk>
-> > Sent: Wednesday, July 26, 2023 12:01 PM
-> > To: Shenwei Wang <shenwei.wang@nxp.com>
-> > Cc: Vladimir Oltean <olteanv@gmail.com>; David S. Miller
-> > <davem@davemloft.net>; Eric Dumazet <edumazet@google.com>; Jakub
-> > Kicinski <kuba@kernel.org>; Paolo Abeni <pabeni@redhat.com>; Maxime
-> > Coquelin <mcoquelin.stm32@gmail.com>; Shawn Guo <shawnguo@kernel.org>;
-> > dl-linux-imx <linux-imx@nxp.com>; Giuseppe Cavallaro
-> > <peppe.cavallaro@st.com>; Alexandre Torgue <alexandre.torgue@foss.st.com>;
-> > Jose Abreu <joabreu@synopsys.com>; Sascha Hauer <s.hauer@pengutronix.de>;
-> > Pengutronix Kernel Team <kernel@pengutronix.de>; Fabio Estevam
-> > <festevam@gmail.com>; netdev@vger.kernel.org; linux-stm32@st-md-
-> > mailman.stormreply.com; linux-arm-kernel@lists.infradead.org;
-> > imx@lists.linux.dev; Frank Li <frank.li@nxp.com>
-> > Subject: Re: [EXT] Re: [PATCH] net: stmmac: dwmac-imx: pause the TXC clock in
-> > fixed-link
-> >
-> > Caution: This is an external email. Please take care when clicking links or
-> > opening attachments. When in doubt, report the message using the 'Report this
-> > email' button
-> >
-> >
-> > On Wed, Jul 26, 2023 at 03:59:38PM +0000, Shenwei Wang wrote:
-> > > > -----Original Message-----
-> > > > From: Russell King <linux@armlinux.org.uk>
-> > > > Sent: Wednesday, July 26, 2023 10:29 AM
-> > > > To: Shenwei Wang <shenwei.wang@nxp.com>
-> > > > Cc: Vladimir Oltean <olteanv@gmail.com>; David S. Miller
-> > > > <davem@davemloft.net>; Eric Dumazet <edumazet@google.com>; Jakub
-> > > > Kicinski <kuba@kernel.org>; Paolo Abeni <pabeni@redhat.com>; Maxime
-> > > > Coquelin <mcoquelin.stm32@gmail.com>; Shawn Guo
-> > > > <shawnguo@kernel.org>; dl-linux-imx <linux-imx@nxp.com>; Giuseppe
-> > > > Cavallaro <peppe.cavallaro@st.com>; Alexandre Torgue
-> > > > <alexandre.torgue@foss.st.com>; Jose Abreu <joabreu@synopsys.com>;
-> > > > Sascha Hauer <s.hauer@pengutronix.de>; Pengutronix Kernel Team
-> > > > <kernel@pengutronix.de>; Fabio Estevam <festevam@gmail.com>;
-> > > > netdev@vger.kernel.org; linux-stm32@st-md- mailman.stormreply.com;
-> > > > linux-arm-kernel@lists.infradead.org;
-> > > > imx@lists.linux.dev; Frank Li <frank.li@nxp.com>
-> > > > Subject: Re: [EXT] Re: [PATCH] net: stmmac: dwmac-imx: pause the TXC
-> > > > clock in fixed-link
-> > > >
-> > > > Caution: This is an external email. Please take care when clicking
-> > > > links or opening attachments. When in doubt, report the message
-> > > > using the 'Report this email' button
-> > > >
-> > > >
-> > > > On Wed, Jul 26, 2023 at 03:10:19PM +0000, Shenwei Wang wrote:
-> > > > > > if (of_phy_is_fixed_link(dwmac->dev->of_node)) {
-> > > > > >
-> > > > >
-> > > > > This does not help in this case. What I need to determine is if
-> > > > > the PHY currently
-> > > > in use is a fixed-link.
-> > > > > The dwmac DTS node may have multiple PHY nodes defined, including
-> > > > > both
-> > > > fixed-link and real PHYs.
-> > > >
-> > > > ... and this makes me wonder what DT node structure you think would
-> > > > describe a fixed-link.
-> > > >
-> > > > A valid ethernet device node would be:
-> > > >
-> > > >         dwmac-node {
-> > > >                 phy-handle = <&phy1>;
-> > > >         };
-> > > >
-> > > > In this case:
-> > > >         dwmac->dev->of_node points at "dwmac-node"
-> > > >         plat->phylink_node points at "dwmac-node"
-> > > >         plat->phy_node points at "phy1"
-> > > >         Your "dn" is NULL.
-> > > >         Therefore, your imx_dwmac_is_fixed_link() returns false.
-> > > >
-> > > >         dwmac-node {
-> > > >                 fixed-link {
-> > > >                         speed = <...>;
-> > > >                         full-duplex;
-> > > >                 };
-> > > >         };
-> > > >
-> > > > In this case:
-> > > >         dwmac->dev->of_node points at "dwmac-node"
-> > > >         plat->phylink_node points at "dwmac-node"
-> > > >         plat->phy_node is NULL
-> > > >         Your "dn" points at the "fixed-link" node.
-> > > >         Therefore, your imx_dwmac_is_fixed_link() also returns false.
-> > > >
-> > > > Now, as far as your comment "What I need to determine is if the PHY
-> > > > currently in use is a fixed-link." I'm just going "Eh? What?" at
-> > > > that, because it makes zero sense to me.
-> > > >
-> > > > stmmac uses phylink. phylink doesn't use a PHY for fixed-links,
-> > > > unlike the old phylib-based fixed-link implementation that software-
-> > emulated a clause-22 PHY.
-> > > > With phylink, when fixed-link is specified, there is _no_ PHY.
-> > >
-> > > So you mean the fixed-link node will always be the highest priority to
-> > > be used in the phylink use case?
-> >
-> > Yes, because that is how all network drivers have behaved. If you look at the
-> > function that Vladimir pointed out, then you will notice that the mere presence
-> > of a fixed-link node makes it a "fixed link".
-> >
+> On Wed, 26 Jul 2023 10:35:06 -0300
+> Jason Gunthorpe <jgg@nvidia.com> wrote:
 > 
-> Then, the way this phylink driver behaves makes the rest of the discussion kind of pointless
-> for now, because I don't actually need fix_mac_speed to give me any interface info now.
-> The basic of_phy_is_fixed_link check does the job for me.
+>> On Tue, Jul 25, 2023 at 02:40:18PM -0700, Brett Creeley wrote:
+>>
+>>> Note: This series is based on the latest linux-next tree. I did not base
+>>> it on the Alex Williamson's vfio/next because it has not yet pulled in
+>>> the latest changes which include the pds_vdpa driver. The pds_vdpa
+>>> driver has conflicts with the pds-vfio-pci driver that needed to be
+>>> resolved, which is why this series is based on the latest linux-next
+>>> tree.
+>>
+>> This is not the right way to handle this, Alex cannot apply a series
+>> against linux-next.
+>>
+>> If you can't make a shared branch and the conflicts are too
+>> significant to forward to Linus then you have to wait for the next
+>> cycle.
 > 
-> Not sure why you think it's inefficient - could you explain that part?
+> Brett, can you elaborate on what's missing from my next branch vs
+> linux-next?
+> 
+> AFAICT the pds_vdpa driver went into mainline via a8d70602b186 ("Merge
+> tag 'for_linus' of
+> git://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost") during the
+> v6.5 merge window and I'm not spotting anything in linux-next obviously
+> relevant to pds-vfio-pci since then.
+> 
+> There's a debugfs fix on the list, but that's sufficiently trivial to
+> fixup on merge if necessary.  This series also applies cleanly vs my
+> current next branch.  Was the issue simply that I hadn't updated my
+> next branch (done yesterday) since the v6.5 merge window?  You can
+> always send patches vs mainline.  Thanks,
 
-Because of_phy_is_fixed_link() has to chase various pointers, walk
-the child nodes and do a string compare on each, whereas you could
-just be testing an integer!
+Yeah, this was exactly it. Your vfio/next branch didn't have the 
+pds_vdpa series in it yet, which also included some changes to the 
+header files used by the pds-vfio-pci series, which is where the 
+conflicts are.
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Should I rebase my series on your vfio/next branch and resend?
+
+Thanks,
+
+Brett
+
+> 
+> Alex
+> 
 
