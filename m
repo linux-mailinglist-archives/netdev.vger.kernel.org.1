@@ -1,110 +1,214 @@
-Return-Path: <netdev+bounces-21581-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21582-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD630763F1E
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 20:59:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B2B3763F2B
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 21:02:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D71E01C211A9
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 18:59:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4FC93281E41
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 19:02:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDB044CE7A;
-	Wed, 26 Jul 2023 18:59:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 321314CE7F;
+	Wed, 26 Jul 2023 19:02:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B21B37E1
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 18:59:25 +0000 (UTC)
-Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3600B19A0
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 11:59:24 -0700 (PDT)
-Received: by mail-lf1-x129.google.com with SMTP id 2adb3069b0e04-4fdddf92b05so194603e87.3
-        for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 11:59:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1690397962; x=1691002762;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=9ltB90dbZBs9x2w+zTel/ot+HALu1Ht+7bi6jGbPAdk=;
-        b=H2XJWiCoD7KhXfeojnRimRKEFZc2C/9H5g8aJ4i1DGkWQVukNSDP33l4XgAR3Vr9q7
-         CJG0DYnu+674+LKE0mfCHvAvLMZ75UrdhRTrU30CAglnbvmOv3qyb0iWgsD8pTXPDOrc
-         xxd3Gpjakobk15VI731GXxslOpbzWfz+pyo6k=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690397962; x=1691002762;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=9ltB90dbZBs9x2w+zTel/ot+HALu1Ht+7bi6jGbPAdk=;
-        b=IY0sqgEY/Ru90RRyHPWdjmHr2nBbe1NokE5LNCn7dMMDGa2+vQ08K2qDv3HFNLkPkU
-         U2bqynCdLmdgY5QcQCNsZVXqaZCASkBxN8px8sk2b/z0nwDFZpC4AwTYxIPyX4uxBX8R
-         E8FRwtm6mk6QTq6RzF7ga0I7ulTwF9WWAudAsH/RfJUBfPVzN1zQ3o0UeBhBLUNJI1jd
-         zUPcb7WPDW5XjiFoxUv+KIPWEnO2r5HCf/kvEB8F1vW5FQygFPnzq5o3wdB/BqehaER/
-         17a4gpcXOmc236QTpu7jJrhdKcpqdS1kQqLcaBn4XscmWdRVzUtb7ak4swd26McCXPr6
-         vVUw==
-X-Gm-Message-State: ABy/qLYtk9l/rJsZJxMWnSXoqj+Oi1EkkzncKDsCx2Sg7CCflbp6qqdJ
-	8SPFoCplTKSb0U/jtX61Ed+D2H8Dp13YCYzn3XTQO9hy
-X-Google-Smtp-Source: APBJJlHXO219Q7wGMqNvO1K1mXORyfeghhPBpQLZUPP5AjyTylvUI3APa5wIdkDd0BCB8CemImLuSA==
-X-Received: by 2002:ac2:4c93:0:b0:4f3:b708:f554 with SMTP id d19-20020ac24c93000000b004f3b708f554mr25015lfl.47.1690397962334;
-        Wed, 26 Jul 2023 11:59:22 -0700 (PDT)
-Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com. [209.85.208.170])
-        by smtp.gmail.com with ESMTPSA id n7-20020a056512388700b004fb9d7b9922sm3429540lft.144.2023.07.26.11.59.21
-        for <netdev@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 26 Jul 2023 11:59:21 -0700 (PDT)
-Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-2b97f34239cso887041fa.3
-        for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 11:59:21 -0700 (PDT)
-X-Received: by 2002:a2e:9510:0:b0:2b5:9d2a:ab51 with SMTP id
- f16-20020a2e9510000000b002b59d2aab51mr1859153ljh.5.1690397960827; Wed, 26 Jul
- 2023 11:59:20 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25FA217EE
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 19:02:52 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (unknown [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13DA1E7
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 12:02:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=wXW4zeJ6rlfREB6dHGCPp9zXTWqhL1U69TNjRIothDQ=; b=vFpsbbfGBMkes3CY8idRKZv0Xn
+	IGb36va9ijEmQ7dTr4klI+bsegyBoafgJVLOQmpmqqs+3CaHhD6swE/mZGG6pnYwgI0b9I0GQTO1A
+	ps7Ub0Wb1MTe1LJLD+VEKnKAFctTFgMt78gNxZZECMQRoNMMv1qO35GBDaG5Id6WukqPBgWkyvugD
+	bEUH6/d3Woe6RpSZRxSflFWs+tk2GPwqArQTAg7CIBYlXG7UzUP6BKNAZJ4J851a9VUgtf+OQnQYy
+	k7x5hbf/oj7NXcHTYd5OgXBqYBaxGyVWmiim3yt17+9ODQtfqBSXRRBwvP51e9j/5vVsDnMB2N8kF
+	VzN2igtQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:58924)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qOjmK-0004rd-1P;
+	Wed, 26 Jul 2023 20:02:32 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qOjmF-00036U-As; Wed, 26 Jul 2023 20:02:27 +0100
+Date: Wed, 26 Jul 2023 20:02:27 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Shenwei Wang <shenwei.wang@nxp.com>
+Cc: Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Shawn Guo <shawnguo@kernel.org>, dl-linux-imx <linux-imx@nxp.com>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-stm32@st-md-mailman.stormreply.com" <linux-stm32@st-md-mailman.stormreply.com>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"imx@lists.linux.dev" <imx@lists.linux.dev>,
+	Frank Li <frank.li@nxp.com>
+Subject: Re: [EXT] Re: [PATCH] net: stmmac: dwmac-imx: pause the TXC clock in
+ fixed-link
+Message-ID: <ZMFtw0LNozhNjRGF@shell.armlinux.org.uk>
+References: <20230725194931.1989102-1-shenwei.wang@nxp.com>
+ <20230726004338.6i354ue576hb35of@skbuf>
+ <PAXPR04MB9185C1A95E101AC2E08639B78900A@PAXPR04MB9185.eurprd04.prod.outlook.com>
+ <ZME71epmSHYIB4DZ@shell.armlinux.org.uk>
+ <PAXPR04MB91856018959FE0752F1A27888900A@PAXPR04MB9185.eurprd04.prod.outlook.com>
+ <ZMFRVtg5WQyGlBJ1@shell.armlinux.org.uk>
+ <PAXPR04MB9185108CB4A04C4CD5AE29FC8900A@PAXPR04MB9185.eurprd04.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230726151515.1650519-1-kuba@kernel.org> <11ec5b3819ff17c7013348b766eab571eee5ca96.camel@perches.com>
- <20230726092312.799503d6@kernel.org> <CAHk-=wjEj2fGiaQXrYUZu65EPdgbGEAEMzch8LTtiUp6UveRCw@mail.gmail.com>
- <20230726112031.61bd0c62@kernel.org> <CAHk-=wi9MyyWmP_HAddLrmGfdANkut6_2f9hzv9HcyTBvg3+kA@mail.gmail.com>
- <20230726114817.1bd52d48@kernel.org>
-In-Reply-To: <20230726114817.1bd52d48@kernel.org>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Wed, 26 Jul 2023 11:59:04 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wiuR7_A=PbN8jhmqGPJQHypUHR+W4-UuSVhOVWvYXs1Tg@mail.gmail.com>
-Message-ID: <CAHk-=wiuR7_A=PbN8jhmqGPJQHypUHR+W4-UuSVhOVWvYXs1Tg@mail.gmail.com>
-Subject: Re: [PATCH v2] scripts: get_maintainer: steer people away from using
- file paths
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Joe Perches <joe@perches.com>, Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, 
-	geert@linux-m68k.org, gregkh@linuxfoundation.org, netdev@vger.kernel.org, 
-	workflows@vger.kernel.org, mario.limonciello@amd.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <PAXPR04MB9185108CB4A04C4CD5AE29FC8900A@PAXPR04MB9185.eurprd04.prod.outlook.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,RDNS_NONE,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, 26 Jul 2023 at 11:48, Jakub Kicinski <kuba@kernel.org> wrote:
->
-> We get at least one fix a week where author adds a Fixes tag
-> but somehow magically didn't CC the author of that commit.
-> When we ask they usually reply with "but I run get_maintainer -f,
-> isn't that what I'm supposed to do?".
+On Wed, Jul 26, 2023 at 06:47:15PM +0000, Shenwei Wang wrote:
+> 
+> 
+> > -----Original Message-----
+> > From: Russell King <linux@armlinux.org.uk>
+> > Sent: Wednesday, July 26, 2023 12:01 PM
+> > To: Shenwei Wang <shenwei.wang@nxp.com>
+> > Cc: Vladimir Oltean <olteanv@gmail.com>; David S. Miller
+> > <davem@davemloft.net>; Eric Dumazet <edumazet@google.com>; Jakub
+> > Kicinski <kuba@kernel.org>; Paolo Abeni <pabeni@redhat.com>; Maxime
+> > Coquelin <mcoquelin.stm32@gmail.com>; Shawn Guo <shawnguo@kernel.org>;
+> > dl-linux-imx <linux-imx@nxp.com>; Giuseppe Cavallaro
+> > <peppe.cavallaro@st.com>; Alexandre Torgue <alexandre.torgue@foss.st.com>;
+> > Jose Abreu <joabreu@synopsys.com>; Sascha Hauer <s.hauer@pengutronix.de>;
+> > Pengutronix Kernel Team <kernel@pengutronix.de>; Fabio Estevam
+> > <festevam@gmail.com>; netdev@vger.kernel.org; linux-stm32@st-md-
+> > mailman.stormreply.com; linux-arm-kernel@lists.infradead.org;
+> > imx@lists.linux.dev; Frank Li <frank.li@nxp.com>
+> > Subject: Re: [EXT] Re: [PATCH] net: stmmac: dwmac-imx: pause the TXC clock in
+> > fixed-link
+> >
+> > Caution: This is an external email. Please take care when clicking links or
+> > opening attachments. When in doubt, report the message using the 'Report this
+> > email' button
+> >
+> >
+> > On Wed, Jul 26, 2023 at 03:59:38PM +0000, Shenwei Wang wrote:
+> > > > -----Original Message-----
+> > > > From: Russell King <linux@armlinux.org.uk>
+> > > > Sent: Wednesday, July 26, 2023 10:29 AM
+> > > > To: Shenwei Wang <shenwei.wang@nxp.com>
+> > > > Cc: Vladimir Oltean <olteanv@gmail.com>; David S. Miller
+> > > > <davem@davemloft.net>; Eric Dumazet <edumazet@google.com>; Jakub
+> > > > Kicinski <kuba@kernel.org>; Paolo Abeni <pabeni@redhat.com>; Maxime
+> > > > Coquelin <mcoquelin.stm32@gmail.com>; Shawn Guo
+> > > > <shawnguo@kernel.org>; dl-linux-imx <linux-imx@nxp.com>; Giuseppe
+> > > > Cavallaro <peppe.cavallaro@st.com>; Alexandre Torgue
+> > > > <alexandre.torgue@foss.st.com>; Jose Abreu <joabreu@synopsys.com>;
+> > > > Sascha Hauer <s.hauer@pengutronix.de>; Pengutronix Kernel Team
+> > > > <kernel@pengutronix.de>; Fabio Estevam <festevam@gmail.com>;
+> > > > netdev@vger.kernel.org; linux-stm32@st-md- mailman.stormreply.com;
+> > > > linux-arm-kernel@lists.infradead.org;
+> > > > imx@lists.linux.dev; Frank Li <frank.li@nxp.com>
+> > > > Subject: Re: [EXT] Re: [PATCH] net: stmmac: dwmac-imx: pause the TXC
+> > > > clock in fixed-link
+> > > >
+> > > > Caution: This is an external email. Please take care when clicking
+> > > > links or opening attachments. When in doubt, report the message
+> > > > using the 'Report this email' button
+> > > >
+> > > >
+> > > > On Wed, Jul 26, 2023 at 03:10:19PM +0000, Shenwei Wang wrote:
+> > > > > > if (of_phy_is_fixed_link(dwmac->dev->of_node)) {
+> > > > > >
+> > > > >
+> > > > > This does not help in this case. What I need to determine is if
+> > > > > the PHY currently
+> > > > in use is a fixed-link.
+> > > > > The dwmac DTS node may have multiple PHY nodes defined, including
+> > > > > both
+> > > > fixed-link and real PHYs.
+> > > >
+> > > > ... and this makes me wonder what DT node structure you think would
+> > > > describe a fixed-link.
+> > > >
+> > > > A valid ethernet device node would be:
+> > > >
+> > > >         dwmac-node {
+> > > >                 phy-handle = <&phy1>;
+> > > >         };
+> > > >
+> > > > In this case:
+> > > >         dwmac->dev->of_node points at "dwmac-node"
+> > > >         plat->phylink_node points at "dwmac-node"
+> > > >         plat->phy_node points at "phy1"
+> > > >         Your "dn" is NULL.
+> > > >         Therefore, your imx_dwmac_is_fixed_link() returns false.
+> > > >
+> > > >         dwmac-node {
+> > > >                 fixed-link {
+> > > >                         speed = <...>;
+> > > >                         full-duplex;
+> > > >                 };
+> > > >         };
+> > > >
+> > > > In this case:
+> > > >         dwmac->dev->of_node points at "dwmac-node"
+> > > >         plat->phylink_node points at "dwmac-node"
+> > > >         plat->phy_node is NULL
+> > > >         Your "dn" points at the "fixed-link" node.
+> > > >         Therefore, your imx_dwmac_is_fixed_link() also returns false.
+> > > >
+> > > > Now, as far as your comment "What I need to determine is if the PHY
+> > > > currently in use is a fixed-link." I'm just going "Eh? What?" at
+> > > > that, because it makes zero sense to me.
+> > > >
+> > > > stmmac uses phylink. phylink doesn't use a PHY for fixed-links,
+> > > > unlike the old phylib-based fixed-link implementation that software-
+> > emulated a clause-22 PHY.
+> > > > With phylink, when fixed-link is specified, there is _no_ PHY.
+> > >
+> > > So you mean the fixed-link node will always be the highest priority to
+> > > be used in the phylink use case?
+> >
+> > Yes, because that is how all network drivers have behaved. If you look at the
+> > function that Vladimir pointed out, then you will notice that the mere presence
+> > of a fixed-link node makes it a "fixed link".
+> >
+> 
+> Then, the way this phylink driver behaves makes the rest of the discussion kind of pointless
+> for now, because I don't actually need fix_mac_speed to give me any interface info now.
+> The basic of_phy_is_fixed_link check does the job for me.
+> 
+> Not sure why you think it's inefficient - could you explain that part?
 
-Bah. I think you're blaming entirely the wrong people, and the wrong tool.
+Because of_phy_is_fixed_link() has to chase various pointers, walk
+the child nodes and do a string compare on each, whereas you could
+just be testing an integer!
 
-Your complaint seems to be "we got a fix, it even says what commit it
-is fixing, and the tool that the person ran didn't add the right
-people automatically".
-
-And my reaction is "I use that tooling, I want it to do exactly what
-it does right now, why are you blaming that tool"?
-
-You're already using 'patchwork'. Why don't you instead go "Oh, *that*
-tool isn't doing the right thing?"
-
-                  Linus
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
