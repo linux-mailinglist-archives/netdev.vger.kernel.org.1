@@ -1,136 +1,194 @@
-Return-Path: <netdev+bounces-21113-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21114-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 973437627C1
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 02:30:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5A417627D4
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 02:43:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 55521281B23
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 00:30:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 092DB1C21079
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 00:43:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA374622;
-	Wed, 26 Jul 2023 00:30:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADEB610E7;
+	Wed, 26 Jul 2023 00:43:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78E9510EB
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 00:30:39 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 17D78C433C8;
-	Wed, 26 Jul 2023 00:30:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690331438;
-	bh=HwRJf2zxAV2y30LZeuhROoAoaYKeWsk0jz6e4I2TDSc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=O/Ew3KvC2OYxWejrYo1gr0rQQ3g5uQPthHMWNklJWVnh5zoMPVe9NzCIdZwAQXmLf
-	 +1A+Di9DS6TD36yOmgISCSfAjdrPLh2TO7Gbf1llPGWTo3i3KCDRMNpz0eJEW06PkR
-	 PILqC53xtrFUkEZcCYmGEATmmHWo2vsJnwIEiJQWQZ8e39JEEtVOjgEdF788hEV7y6
-	 LbY+o2nfE+LCSAt0m1hkH+uxNWGQuJzg87s9AuaxvDlkX5mUpfPQUchBaBrAbCjAd9
-	 vjYoJAQjDlA/IbWCElcdUES1bgjq+sK/7YXbIMhgjI05BqtIe16+S+ZTjck/dNyHVE
-	 3UZ8A2gLfr8dw==
-Date: Tue, 25 Jul 2023 17:30:36 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Tariq Toukan <ttoukan.linux@gmail.com>
-Cc: David Howells <dhowells@redhat.com>, netdev@vger.kernel.org, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Willem de Bruijn
- <willemdebruijn.kernel@gmail.com>, David Ahern <dsahern@kernel.org>,
- Matthew Wilcox <willy@infradead.org>, Al Viro <viro@zeniv.linux.org.uk>,
- Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>, Jeff
- Layton <jlayton@kernel.org>, Christian Brauner <brauner@kernel.org>, Chuck
- Lever III <chuck.lever@oracle.com>, Linus Torvalds
- <torvalds@linux-foundation.org>, linux-fsdevel@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-mm@kvack.org, Boris Pismenny
- <borisp@nvidia.com>, John Fastabend <john.fastabend@gmail.com>, Gal
- Pressman <gal@nvidia.com>, ranro@nvidia.com, samiram@nvidia.com,
- drort@nvidia.com, Tariq Toukan <tariqt@nvidia.com>
-Subject: Re: [PATCH net-next v10 08/16] tls: Inline do_tcp_sendpages()
-Message-ID: <20230725173036.442ba8ba@kernel.org>
-In-Reply-To: <bbdce803-0f23-7d3f-f75a-2bc3cfb794af@gmail.com>
-References: <ecbb5d7e-7238-28e2-1a17-686325e2bb50@gmail.com>
-	<4c49176f-147a-4283-f1b1-32aac7b4b996@gmail.com>
-	<20230522121125.2595254-1-dhowells@redhat.com>
-	<20230522121125.2595254-9-dhowells@redhat.com>
-	<2267272.1686150217@warthog.procyon.org.uk>
-	<5a9d4ffb-a569-3f60-6ac8-070ab5e5f5ad@gmail.com>
-	<776549.1687167344@warthog.procyon.org.uk>
-	<7337a904-231d-201d-397a-7bbe7cae929f@gmail.com>
-	<20230630102143.7deffc30@kernel.org>
-	<f0538006-6641-eaf6-b7b5-b3ef57afc652@gmail.com>
-	<20230705091914.5bee12f8@kernel.org>
-	<bbdce803-0f23-7d3f-f75a-2bc3cfb794af@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A228E64A
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 00:43:45 +0000 (UTC)
+Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 909B91BFB
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 17:43:43 -0700 (PDT)
+Received: by mail-ej1-x631.google.com with SMTP id a640c23a62f3a-9891c73e0fbso92381466b.1
+        for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 17:43:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1690332222; x=1690937022;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=kzMeq122EOx0WClFDw8E5FGXVSDQXhMLtpdYnB5KEhE=;
+        b=rCXOFOSZzvDmeeApZdiE2vysrOJpkwjtuwvtU1bf29LkRxM6AYlw2fZd7d2i9PcPjm
+         +W11XmK4je/aZMdDboBH2Lo1cM1xt/9foDHz5xhNeiDVUGJBeK+dGmrH5FM/qXKW9YLq
+         rM+29x7NL+0VFecSgb/VznJqSCYTW+HuGt0zBQzMxjcPkN3rXe+UjsHabvOOY9QKpGOA
+         yNqnSs5xBVg6wo8k5nPLWzXj0btLPz0dAytmBX4XbWKobx5M3c/k7mcaVWnzueYoXGK/
+         ChQdgYeJZlzovWokbo5/hSk/lDCCvkuN70z1uHYSBHVNOeTtdg8/8r0JCBtpKw+J2Xjm
+         8ZdA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690332222; x=1690937022;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kzMeq122EOx0WClFDw8E5FGXVSDQXhMLtpdYnB5KEhE=;
+        b=RZU+th5ArBdiReU41bQSitan01rNxIkNmCUrGSO+UND3cZoQIBdNm7mADXylfUmX2C
+         SHLkUg9oACgLRpUVCIlbZlNjkqHBy0K0a6fP4Zo6ARuFQZy4HWCZX3scQ7U4Oqr+B335
+         YSROYatc9GgZofURn6TD8rt5+eagqXBYt/TVbImkKxiKLQQetMH8/a8UCjjwCUa9lBxY
+         ujclBvL0+Y/RHIWsfOxOy/C4xaqZEHf7pOeKK6nApz1HOX+4sxaE4zpsqZR0u/QG5GbU
+         874HZHkvM9Q5Ifs1SlLsiEKNfBJH9vVPLB32nfZnofNFNmhv4F+rB28N9KStCrI6suGK
+         tirw==
+X-Gm-Message-State: ABy/qLYLjZeQckYgoROXL7POHnwtA64pmugFxBmAteheFjo1NvD1+1de
+	e4M9IAGRJM2WBRmPaoV3NhY=
+X-Google-Smtp-Source: APBJJlHwe2LqFb+lOsuZJE20DQkYEjOIxawrT1fLB/cSVFrUIWnFWKl8ujaoNdXJsqT52Aa++t2d0A==
+X-Received: by 2002:a17:906:2253:b0:993:e695:b585 with SMTP id 19-20020a170906225300b00993e695b585mr867715ejr.9.1690332221810;
+        Tue, 25 Jul 2023 17:43:41 -0700 (PDT)
+Received: from skbuf ([188.25.175.105])
+        by smtp.gmail.com with ESMTPSA id rl6-20020a170907216600b009920a690cd9sm8865097ejb.59.2023.07.25.17.43.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 25 Jul 2023 17:43:41 -0700 (PDT)
+Date: Wed, 26 Jul 2023 03:43:38 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Shenwei Wang <shenwei.wang@nxp.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Shawn Guo <shawnguo@kernel.org>, NXP Linux Team <linux-imx@nxp.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>, netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, imx@lists.linux.dev,
+	Frank Li <frank.li@nxp.com>
+Subject: Re: [PATCH] net: stmmac: dwmac-imx: pause the TXC clock in fixed-link
+Message-ID: <20230726004338.6i354ue576hb35of@skbuf>
+References: <20230725194931.1989102-1-shenwei.wang@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230725194931.1989102-1-shenwei.wang@nxp.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Sun, 23 Jul 2023 09:35:56 +0300 Tariq Toukan wrote:
-> Hi Jakub, David,
+Hi Shenwei,
+
+On Tue, Jul 25, 2023 at 02:49:31PM -0500, Shenwei Wang wrote:
+> When using a fixed-link setup, certain devices like the SJA1105 require a
+> small pause in the TXC clock line to enable their internal tunable
+> delay line (TDL).
 > 
-> We repro the issue on the server side using this client command:
-> $ wrk -b2.2.2.2 -t4 -c1000 -d5 --timeout 5s 
-> https://2.2.2.3:20443/256000b.img
+> To satisfy this requirement, this patch temporarily disables the TX clock,
+> and restarts it after a required period. This provides the required
+> silent interval on the clock line for SJA1105 to complete the frequency
+> transition and enable the internal TDLs.
 > 
-> Port 20443 is configured with:
->      ssl_ciphers ECDHE-RSA-AES128-GCM-SHA256;
->      sendfile    off;
+> So far we have only enabled this feature on the i.MX93 platform.
 > 
+> Signed-off-by: Shenwei Wang <shenwei.wang@nxp.com>
+> Reviewed-by: Frank Li <frank.li@nxp.com>
+> ---
+
+Sorry for not responding off-list. Super busy.
+
+I've tested both this patch on top of net-next as well as the lf-6.1.y
+version you've sent separately - on a cold boot in both cases. Both the
+i.MX93 base board and the SJA1105 EVB (powered by an external power supply)
+were cold booted.
+
+Unfortunately, the patch does not appear to work as intended, and
+ethtool -S eth1 still shows no RX counter incrementing on the SJA1105
+CPU port when used in RGMII mode (where the problem is).
+
+>  .../net/ethernet/stmicro/stmmac/dwmac-imx.c   | 62 +++++++++++++++++++
+>  1 file changed, 62 insertions(+)
 > 
-> Important:
-> 1. Couldn't repro with files smaller than 40KB.
-> 2. Couldn't repro with "sendfile    on;"
-> 
-> In addition, we collected the vmcore (forced by panic_on_warn), it can 
-> be downloaded from here:
-> https://drive.google.com/file/d/1Fi2dzgq6k2hb2L_kwyntRjfLF6_RmbxB/view?usp=sharing
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c
+> index b9378a63f0e8..799aedeec094 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c
+> @@ -40,6 +40,9 @@
+>  #define DMA_BUS_MODE			0x00001000
+>  #define DMA_BUS_MODE_SFT_RESET		(0x1 << 0)
+>  #define RMII_RESET_SPEED		(0x3 << 14)
+> +#define TEN_BASET_RESET_SPEED		(0x2 << 14)
+> +#define RGMII_RESET_SPEED		(0x0 << 14)
+> +#define CTRL_SPEED_MASK			(0x3 << 14)
+>  
+>  struct imx_dwmac_ops {
+>  	u32 addr_width;
+> @@ -56,6 +59,7 @@ struct imx_priv_data {
+>  	struct regmap *intf_regmap;
+>  	u32 intf_reg_off;
+>  	bool rmii_refclk_ext;
+> +	void __iomem *base_addr;
+>  
+>  	const struct imx_dwmac_ops *ops;
+>  	struct plat_stmmacenet_data *plat_dat;
+> @@ -212,6 +216,61 @@ static void imx_dwmac_fix_speed(void *priv, unsigned int speed)
+>  		dev_err(dwmac->dev, "failed to set tx rate %lu\n", rate);
+>  }
+>  
+> +static bool imx_dwmac_is_fixed_link(struct imx_priv_data *dwmac)
+> +{
+> +	struct plat_stmmacenet_data *plat_dat;
+> +	struct device_node *dn;
+> +
+> +	if (!dwmac || !dwmac->plat_dat)
+> +		return false;
+> +
+> +	plat_dat = dwmac->plat_dat;
+> +	dn = of_get_child_by_name(dwmac->dev->of_node, "fixed-link");
+> +	if (!dn)
+> +		return false;
+> +
+> +	if (plat_dat->phy_node == dn || plat_dat->phylink_node == dn)
+> +		return true;
+> +
+> +	return false;
+> +}
 
-This has no symbols :(
+I'm really not sure what prompted the complication here, since instead of:
 
-There is a small bug in this commit, we should always set SPLICE.
-But I don't see how that'd cause the warning you're seeing.
-Does your build have CONFIG_DEBUG_VM enabled?
+if (imx_dwmac_is_fixed_link(dwmac)) {
 
--->8-------------------------
+you can do:
 
-From: Jakub Kicinski <kuba@kernel.org>
-Date: Tue, 25 Jul 2023 17:03:25 -0700
-Subject: net: tls: set MSG_SPLICE_PAGES consistently
+#include <linux/of_mdio.h>
 
-We used to change the flags for the last segment, because
-non-last segments had the MSG_SENDPAGE_NOTLAST flag set.
-That flag is no longer a thing so remove the setting.
+if (of_phy_is_fixed_link(dwmac->dev->of_node)) {
 
-Since flags most likely don't have MSG_SPLICE_PAGES set
-this avoids passing parts of the sg as splice and parts
-as non-splice.
+and the latter has the advantage that it also matches (tested on
+imx93-11x11-evk-sja1105.dts). I've had to make this change for testing,
+because otherwise, the workaround wasn't even executing. Other than that,
+I've done no other debugging.
 
-... tags ...
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
- net/tls/tls_main.c | 3 ---
- 1 file changed, 3 deletions(-)
+Considering the fact that you need to resend a functional version even
+in principle anyway, let's continue the discussion and debugging off-list.
 
-diff --git a/net/tls/tls_main.c b/net/tls/tls_main.c
-index b6896126bb92..4a8ee2f6badb 100644
---- a/net/tls/tls_main.c
-+++ b/net/tls/tls_main.c
-@@ -139,9 +139,6 @@ int tls_push_sg(struct sock *sk,
- 
- 	ctx->splicing_pages = true;
- 	while (1) {
--		if (sg_is_last(sg))
--			msg.msg_flags = flags;
--
- 		/* is sending application-limited? */
- 		tcp_rate_check_app_limited(sk);
- 		p = sg_page(sg);
--- 
-2.41.0
-
+Ah, please be aware of the message from the kernel test robot which said
+that you're setting but not using the plat_dat variable in imx_dwmac_fix_speed_mx93().
+It's probably a remnant of what later became imx_dwmac_is_fixed_link(),
+but it still needs to be removed.
 
