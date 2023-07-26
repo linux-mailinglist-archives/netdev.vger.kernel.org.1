@@ -1,154 +1,164 @@
-Return-Path: <netdev+bounces-21241-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21242-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC4F7762F5C
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 10:11:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E96A762F62
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 10:14:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DC7671C21154
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 08:11:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EDA272819EB
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 08:14:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A625A959;
-	Wed, 26 Jul 2023 08:11:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08062AD23;
+	Wed, 26 Jul 2023 08:14:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B9F6AD22
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 08:11:17 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F405B132
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 01:11:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=ipSDKjf8aWICQwTKGMW/CPVUz6BniY6Kc/UbNgl/ZGg=; b=Puhw7lh5Ce+2+cG0KadpOArLBn
-	Oiaysb92Edeu8wuyIXG6ikutYuha3c+xo4pEZ5Pi5RkvF7P1Zoey+KWnaOqFWUFkwWssUa+aguvnc
-	tmGK3CNo1cAptfyZ4Qr3HR9voNnwj2Cb+K3Cngj29Vp1oVC1v6gxKOtCiyhM8TKVZo56m+Zlp0rvg
-	/M6VTL9861lM0q6hUcROEX4JJ/7UlOVdOwk/3y6BTpKorG1g/rgjijU7RP0z/ynS6AcUfOHZ2wUgU
-	NXewKzV+Mq4EJkCeIfPmbOB7yI2WsbJZ2P55k2oj8TtY8CMUJCT3fGllnonRAkKi11DNBtiU+Uljd
-	Lv+Z9Rlg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:35568)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qOZbu-00048s-0n;
-	Wed, 26 Jul 2023 09:11:06 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qOZbn-0002i0-8w; Wed, 26 Jul 2023 09:10:59 +0100
-Date: Wed, 26 Jul 2023 09:10:59 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: "mengyuanlou@net-swift.com" <mengyuanlou@net-swift.com>
-Cc: Simon Horman <simon.horman@corigine.com>, netdev@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>
-Subject: Re: [PATCH net-next 2/2] net: phy: add keep_data_connection to
- struct phydev
-Message-ID: <ZMDVE1Ju4c6NMrLJ@shell.armlinux.org.uk>
-References: <20230724092544.73531-1-mengyuanlou@net-swift.com>
- <20207E0578DCE44C+20230724092544.73531-3-mengyuanlou@net-swift.com>
- <ZL+6kMqETdYL7QNF@corigine.com>
- <ZL/KIjjw3AZmQcGn@shell.armlinux.org.uk>
- <4B0F6878-3ABF-4F99-8CE3-F16608583EB4@net-swift.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0F71947E
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 08:14:05 +0000 (UTC)
+Received: from mail-lj1-x234.google.com (mail-lj1-x234.google.com [IPv6:2a00:1450:4864:20::234])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DD663C07
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 01:14:04 -0700 (PDT)
+Received: by mail-lj1-x234.google.com with SMTP id 38308e7fff4ca-2b6fdaf6eefso96317011fa.0
+        for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 01:14:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1690359242; x=1690964042;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=jUR+8HTvxKrmvFbKVVHSsJQHXeGbUXJFaikg5YZ0Qg4=;
+        b=hVOpcFpH0o9M+kWMA1us4uHJmwkZz8VJJTOjlCvXtknJP2KTtjeXi51E/MkYtRU26z
+         pOQ+WbXaS2WDw9hRw4aFfOpOxHiGhZV/gVbZ5i+iXQo+GYC9zpPR8f/DsLUFR1942m4W
+         mSYXlvXmTckSyuz8skauGYqxeuptEjQXITktH0nqV+hL5btbA1Jv4yi1x17ftB7Es9Mk
+         wX+olh6QnI8hZCBq4aLBROKcbuec3+jKiE3cnJPFF6NweBrK/2KlrtvxZFxpVtB+m538
+         xM+WJLnmTXDmPUh5m8v12t44j/tvMrUVZPncE0j9SezFIe7P1uR/uU+R7RmnZAS0SxeM
+         ksAg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690359242; x=1690964042;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=jUR+8HTvxKrmvFbKVVHSsJQHXeGbUXJFaikg5YZ0Qg4=;
+        b=TL4yLgPnCC+7iYNTm2MUIzkBYuWaWcDPFt2XY7L46ml/2lM9oI8SOrNtk+9b5VUQ9G
+         i/u2e9t+Sy/sbh/ouE6C6H7AOUtX8ZhklFSvY6pI1I/dQIkT2ZQHeZLikEQm1e5PtEro
+         rcK4cRN66LhB+nKswk7aY2W/rZxVRKoUBTCU3HAEzjVpHbDvKBP0Yd24JqcdLaWEQXJ3
+         X7pNoxe41nlvHxpbgPW+OBMlUejM0szqyE9lSPz94qgCz5/cAKpEsgiyu70VAOoKAKkR
+         kXImcWj+U+esPH0kvJejlXrQ4GqH22+j4RY5Z9gUA7pb009rFgkrcoBgnv3n+Gj147v/
+         I6Ew==
+X-Gm-Message-State: ABy/qLashWIGps4V/N2wbAayJib3fbf1JZk5NAyBY/QH1xc7G151OVqQ
+	B1/GIorz0PMIvCNhO5UwvM+t78Bbmw/AboQo69ooXA==
+X-Google-Smtp-Source: APBJJlHbi0hdaP/HaNWOatMh0uvG9VNHJEZMEze5ENOxchuWLXB33lHowUBJwFb3Gub9ShI4NkHCaG0qA2Ph84M9JgE=
+X-Received: by 2002:a2e:8914:0:b0:2b5:7dd9:74f5 with SMTP id
+ d20-20020a2e8914000000b002b57dd974f5mr987059lji.21.1690359242501; Wed, 26 Jul
+ 2023 01:14:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <4B0F6878-3ABF-4F99-8CE3-F16608583EB4@net-swift.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-	SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.6
+References: <20230714170853.866018-1-aleksander.lobakin@intel.com>
+ <20230714170853.866018-3-aleksander.lobakin@intel.com> <ac97825d-6a27-f121-4cee-9d2ee0934ce6@redhat.com>
+ <e48185cb-3057-e778-75c4-d266a249088b@intel.com>
+In-Reply-To: <e48185cb-3057-e778-75c4-d266a249088b@intel.com>
+From: Ilias Apalodimas <ilias.apalodimas@linaro.org>
+Date: Wed, 26 Jul 2023 11:13:26 +0300
+Message-ID: <CAC_iWjJ-yfW2Bu-vYQHVw3Y0svkYQNOva3orsv0VzvWyfQkiLw@mail.gmail.com>
+Subject: Re: [PATCH RFC net-next v2 2/7] net: page_pool: place frag_* fields
+ in one cacheline
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: Jesper Dangaard Brouer <jbrouer@redhat.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	brouer@redhat.com, Maciej Fijalkowski <maciej.fijalkowski@intel.com>, 
+	Larysa Zaremba <larysa.zaremba@intel.com>, Yunsheng Lin <linyunsheng@huawei.com>, 
+	Alexander Duyck <alexanderduyck@fb.com>, Jesper Dangaard Brouer <hawk@kernel.org>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Jul 26, 2023 at 10:35:32AM +0800, mengyuanlou@net-swift.com wrote:
-> 
-> 
-> > 2023年7月25日 21:12，Russell King (Oracle) <linux@armlinux.org.uk> 写道：
-> > 
-> > Hi Simon,
-> > 
-> > Thanks for spotting that this wasn't sent to those who should have
-> > been.
-> > 
-> > Mengyuan Lou, please ensure that you address your patches to
-> > appropriate recipients.
-> > 
-> > On Tue, Jul 25, 2023 at 02:05:36PM +0200, Simon Horman wrote:
-> >>> + * @keep_data_connection: Set to true if the PHY or the attached MAC need
-> >>> + *                        physical connection to receive packets.
-> > 
-> > Having had a brief read through, this comment seems to me to convey
-> > absolutely no useful information what so ever.
-> > 
-> > In order to receive packets, a physical connection between the MAC and
-> > PHY is required. So, based on that comment, keep_data_connection must
-> > always be true!
-> > 
-> > So, the logic in phylib at the moment is:
-> > 
-> >        phydev->wol_enabled = wol.wolopts || (netdev && netdev->wol_enabled);
-> >        /* If the device has WOL enabled, we cannot suspend the PHY */
-> >        if (phydev->wol_enabled && !(phydrv->flags & PHY_ALWAYS_CALL_SUSPEND))
-> >                return -EBUSY;
-> > 
-> > wol_enabled will be true if the PHY driver reports that WoL is
-> > enabled at the PHY, or the network device marks that WoL is
-> > enabled at the network device. netdev->wol_enabled should be set
-> > when the network device is looking for the wakeup packets.
-> > 
-> > Then, the PHY_ALWAYS_CALL_SUSPEND flag basically says that "even
-> > in these cases, we want to suspend the PHY".
-> > 
-> > This patch appears to drop netdev->wol_enabled, replacing it with
-> > netdev->ncsi_enabled, whatever that is - and this change alone is
-> > probably going to break drivers, since they will already be
-> > expecting that netdev->wol_enabled causes the PHY _not_ to be
-> > suspended.
-> > 
-> > Therefore, I'm not sure this patch makes much sense.
-> > 
-> > Since the phylib maintainers were not copied with the original
-> > patch, that's also a reason to NAK it.
-> > 
-> > Thanks.
-> > 
-> > -- 
-> > RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-> > FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
-> > 
-> 
-> 
-> Now Mac and phy in kernel is separated into two parts.
-> There are some features need to keep data connection.
-> 
-> Phy ——— Wake-on-Lan —— magic packets
-> 
-> When NIC as a ethernet in host os and it also supports ncsi as a bmc network port at same time.
-> Mac/mng —— LLDP/NCSI —— ncsi packtes
-> I think it need a way to notice phy modules.
+Apologies for the late reply, I was on vacation and start going
+through my email piles...
 
-Right, so this is _in addtion_ to WoL. Therefore, when adding support
-for it, you need to _keep_ the existing WoL support, not remove it in
-preference for NCSI.
+On Tue, 18 Jul 2023 at 16:52, Alexander Lobakin
+<aleksander.lobakin@intel.com> wrote:
+>
+> From: Jesper Dangaard Brouer <jbrouer@redhat.com>
+> Date: Fri, 14 Jul 2023 20:37:39 +0200
+>
+> >
+> >
+> > On 14/07/2023 19.08, Alexander Lobakin wrote:
+> >> On x86_64, frag_* fields of struct page_pool are scattered across two
+> >> cachelines despite the summary size of 24 bytes. The last field,
+> >> ::frag_users, is pushed out to the next one, sharing it with
+> >> ::alloc_stats.
+> >> All three fields are used in pretty much the same places. There are some
+> >> holes and cold members to move around. Move frag_* one block up, placing
+> >> them right after &page_pool_params perfectly at the beginning of CL2.
+> >> This doesn't do any meaningful to the second block, as those are some
+> >> destroy-path cold structures, and doesn't do anything to ::alloc_stats,
+> >> which still starts at 200-byte offset, 8 bytes after CL3 (still fitting
+> >> into 1 cacheline).
+> >> On my setup, this yields 1-2% of Mpps when using PP frags actively.
+> >> When it comes to 32-bit architectures with 32-byte CL: &page_pool_params
+> >> plus ::pad is 44 bytes, the block taken care of is 16 bytes within one
+> >> CL, so there should be at least no regressions from the actual change.
+> >>
+> >> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+> >> ---
+> >>   include/net/page_pool.h | 10 +++++-----
+> >>   1 file changed, 5 insertions(+), 5 deletions(-)
+> >>
+> >> diff --git a/include/net/page_pool.h b/include/net/page_pool.h
+> >> index 829dc1f8ba6b..212d72b5cfec 100644
+> >> --- a/include/net/page_pool.h
+> >> +++ b/include/net/page_pool.h
+> >> @@ -130,16 +130,16 @@ static inline u64
+> >> *page_pool_ethtool_stats_get(u64 *data, void *stats)
+> >>   struct page_pool {
+> >>       struct page_pool_params p;
+> >>   +    long frag_users;
+> >> +    struct page *frag_page;
+> >> +    unsigned int frag_offset;
+> >> +    u32 pages_state_hold_cnt;
+> >
+> > I think this is okay, but I want to highlight that:
+> >  - pages_state_hold_cnt and pages_state_release_cnt
+> > need to be kept on separate cache-lines.
+>
+> They're pretty far away from each other. I moved hold_cnt here as well
+> to keep it stacked with frag_offset and avoid introducing 32-bit holes.
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+This is to prevent cache line bouncing and/or false sharing right?
+The change seems fine to me as well but mind adding a comment about
+this when you resend?
+
+Thanks
+/Ilias
+>
+> >
+> >
+> >> +
+> >>       struct delayed_work release_dw;
+> >>       void (*disconnect)(void *);
+> >>       unsigned long defer_start;
+> >>       unsigned long defer_warn;
+> >>   -    u32 pages_state_hold_cnt;
+> >> -    unsigned int frag_offset;
+> >> -    struct page *frag_page;
+> >> -    long frag_users;
+> >> -
+> >>   #ifdef CONFIG_PAGE_POOL_STATS
+> >>       /* these stats are incremented while in softirq context */
+> >>       struct page_pool_alloc_stats alloc_stats;
+> >
+>
+> Thanks,
+> Olek
 
