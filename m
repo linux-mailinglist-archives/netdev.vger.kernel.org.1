@@ -1,153 +1,150 @@
-Return-Path: <netdev+bounces-21175-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21176-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07560762AE1
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 07:38:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9286762AF3
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 07:50:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B3ED4281BC2
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 05:38:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 950EA1C210C0
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 05:50:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDF3D63BF;
-	Wed, 26 Jul 2023 05:38:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54B9263CC;
+	Wed, 26 Jul 2023 05:50:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0EF063AC
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 05:38:40 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2EFC426A2
-	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 22:38:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1690349918;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=pfs3nnD/SOOUA7MFV9W94hwiVWoxJiHiqbutUMOkKZQ=;
-	b=bu/0wS/rC944LMPG0hrxFwvanzuSGpleBFlAEtLuK7TA/fMUL2U2tA000CjQUSG1ca+PWB
-	DNzeMReFKqtTikrKbuXhudEQIcD68FMHuf68hHfIStuOzvgUA+j93APdXIszlD9uzp2fwh
-	/LOpXUsvizeN+HcU26DUrGYICtxI7rU=
-Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com
- [209.85.208.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-300-w5TjdmgzPQe_bWb25PRpgw-1; Wed, 26 Jul 2023 01:38:36 -0400
-X-MC-Unique: w5TjdmgzPQe_bWb25PRpgw-1
-Received: by mail-lj1-f197.google.com with SMTP id 38308e7fff4ca-2b710c5677eso57171111fa.0
-        for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 22:38:35 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690349914; x=1690954714;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=pfs3nnD/SOOUA7MFV9W94hwiVWoxJiHiqbutUMOkKZQ=;
-        b=IG5pEm0jeWZUb199RcpRmx9LZ+dABCwRZ80OL+PSt5JJal2TAMhLZkH/+btOJIz61m
-         uuSGb0fLLd5o83WxGS8PXq1Fo0qDxCHTp8O14PU9fZ956DeaoShJWV5NPciAjnG9DM75
-         0QAtaTfXZgV5BKsRxfMVeaVs47BEkvQzA/MYa7sIiFekFWyzIK1R7Ygsb4Fs5zQV4d/w
-         fOacVkBPkzkF4aNk4DsipEpjD8B1+Cq0TBqnsnZTBudKvEZLXlsFXzvLrSSIFrQ5GyMX
-         yvFikDvWKYSkpIMguvXpHJRHZBk8Xsq3Z1bc/ynSEVFUepf/QXQ5V32rmR9aLBM6u3zR
-         bdcw==
-X-Gm-Message-State: ABy/qLYFKdm0ETdhsGtSHXEmMpz96DdbGaBo9d1eCLUUmjXf+iUWPpcs
-	jwxdf39/NA+OQPP4SfN19oKXmvklF2rhuWImntzyVjMR/seC6uLVEvhgjz/fVLR2IRwsy53w9Y/
-	7TU9Opm0vy74r0vUgBpDwoaKUUxqWItEO
-X-Received: by 2002:a2e:8042:0:b0:2b6:dd9a:e1d3 with SMTP id p2-20020a2e8042000000b002b6dd9ae1d3mr605680ljg.44.1690349914782;
-        Tue, 25 Jul 2023 22:38:34 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlHZ1ivRh44yxvv5AoW/k+bdQtpElC2pldw9fqqViy1tLZuooCCFV/0/FqgQ945tCdp+io30vgVHGutAPfdVtuA=
-X-Received: by 2002:a2e:8042:0:b0:2b6:dd9a:e1d3 with SMTP id
- p2-20020a2e8042000000b002b6dd9ae1d3mr605673ljg.44.1690349914469; Tue, 25 Jul
- 2023 22:38:34 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 438A91FB9
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 05:50:43 +0000 (UTC)
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88A811982
+	for <netdev@vger.kernel.org>; Tue, 25 Jul 2023 22:50:42 -0700 (PDT)
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1qOXPd-00042j-DG; Wed, 26 Jul 2023 07:50:17 +0200
+Received: from pengutronix.de (unknown [172.20.34.65])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id A5F631FAD5F;
+	Wed, 26 Jul 2023 05:50:11 +0000 (UTC)
+Date: Wed, 26 Jul 2023 07:50:11 +0200
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Richard Cochran <richardcochran@gmail.com>,
+	Johannes Zink <j.zink@pengutronix.de>, linux-kernel@vger.kernel.org,
+	kernel@pengutronix.de, netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Russell King <linux@armlinux.org.uk>,
+	kernel test robot <lkp@intel.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-arm-kernel@lists.infradead.org, patchwork-jzi@pengutronix.de
+Subject: Re: [PATCH v2] net: stmmac: correct MAC propagation delay
+Message-ID: <20230726-subsector-unguided-8f1fc1edb037-mkl@pengutronix.de>
+References: <20230719-stmmac_correct_mac_delay-v2-1-3366f38ee9a6@pengutronix.de>
+ <20230725200606.5264b59c@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230705114505.63274-1-maxime.coquelin@redhat.com>
-In-Reply-To: <20230705114505.63274-1-maxime.coquelin@redhat.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Wed, 26 Jul 2023 13:38:22 +0800
-Message-ID: <CACGkMEtF9c0dL+bk0=JovcVs-ZVzEJJXdt9gx=_Lh+KtwFu9ig@mail.gmail.com>
-Subject: Re: [PATCH] vduse: Use proper spinlock for IRQ injection
-To: Maxime Coquelin <maxime.coquelin@redhat.com>
-Cc: xieyongji@bytedance.com, mst@redhat.com, david.marchand@redhat.com, 
-	lulu@redhat.com, linux-kernel@vger.kernel.org, 
-	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org, 
-	xuanzhuo@linux.alibaba.com, eperezma@redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-	version=3.4.6
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="n73y6rsllricxc2b"
+Content-Disposition: inline
+In-Reply-To: <20230725200606.5264b59c@kernel.org>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:b01:1d::7b
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Jul 5, 2023 at 7:45=E2=80=AFPM Maxime Coquelin
-<maxime.coquelin@redhat.com> wrote:
->
-> The IRQ injection work used spin_lock_irq() to protect the
-> scheduling of the softirq, but spin_lock_bh() should be
-> used.
->
-> With spin_lock_irq(), we noticed delay of more than 6
-> seconds between the time a NAPI polling work is scheduled
-> and the time it is executed.
->
-> Fixes: c8a6153b6c59 ("vduse: Introduce VDUSE - vDPA Device in Userspace")
-> Cc: xieyongji@bytedance.com
->
-> Suggested-by: Jason Wang <jasowang@redhat.com>
-> Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
 
-Acked-by: Jason Wang <jasowang@redhat.com>
+--n73y6rsllricxc2b
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Thanks
+On 25.07.2023 20:06:06, Jakub Kicinski wrote:
+> On Mon, 24 Jul 2023 12:01:31 +0200 Johannes Zink wrote:
+> > The IEEE1588 Standard specifies that the timestamps of Packets must be
+> > captured when the PTP message timestamp point (leading edge of first
+> > octet after the start of frame delimiter) crosses the boundary between
+> > the node and the network. As the MAC latches the timestamp at an
+> > internal point, the captured timestamp must be corrected for the
+> > additional path latency, as described in the publicly available
+> > datasheet [1].
+> >=20
+> > This patch only corrects for the MAC-Internal delay, which can be read
+> > out from the MAC_Ingress_Timestamp_Latency register, since the Phy
+> > framework currently does not support querying the Phy ingress and egress
+> > latency. The Closs Domain Crossing Circuits errors as indicated in [1]
+> > are already being accounted in the stmmac_get_tx_hwtstamp() function and
+> > are not corrected here.
+> >=20
+> > As the Latency varies for different link speeds and MII
+> > modes of operation, the correction value needs to be updated on each
+> > link state change.
+> >=20
+> > As the delay also causes a phase shift in the timestamp counter compared
+> > to the rest of the network, this correction will also reduce phase error
+> > when generating PPS outputs from the timestamp counter.
+> >=20
+> > [1] i.MX8MP Reference Manual, rev.1 Section 11.7.2.5.3 "Timestamp
+> > correction"
+>=20
+> Hi Richard,
+>=20
+> any opinion on this one?
+>=20
+> The subject read to me like it's about *MII clocking delays, I figured
+> you may have missed it, too.
 
+The patch description clarifies what is being corrected, namely the
+"MAC-internal delay, which can be read out from the
+MAC_Ingress_Timestamp_Latency register".
 
-> ---
->  drivers/vdpa/vdpa_user/vduse_dev.c | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
->
-> diff --git a/drivers/vdpa/vdpa_user/vduse_dev.c b/drivers/vdpa/vdpa_user/=
-vduse_dev.c
-> index dc38ed21319d..df7869537ef1 100644
-> --- a/drivers/vdpa/vdpa_user/vduse_dev.c
-> +++ b/drivers/vdpa/vdpa_user/vduse_dev.c
-> @@ -935,10 +935,10 @@ static void vduse_dev_irq_inject(struct work_struct=
- *work)
->  {
->         struct vduse_dev *dev =3D container_of(work, struct vduse_dev, in=
-ject);
->
-> -       spin_lock_irq(&dev->irq_lock);
-> +       spin_lock_bh(&dev->irq_lock);
->         if (dev->config_cb.callback)
->                 dev->config_cb.callback(dev->config_cb.private);
-> -       spin_unlock_irq(&dev->irq_lock);
-> +       spin_unlock_bh(&dev->irq_lock);
->  }
->
->  static void vduse_vq_irq_inject(struct work_struct *work)
-> @@ -946,10 +946,10 @@ static void vduse_vq_irq_inject(struct work_struct =
-*work)
->         struct vduse_virtqueue *vq =3D container_of(work,
->                                         struct vduse_virtqueue, inject);
->
-> -       spin_lock_irq(&vq->irq_lock);
-> +       spin_lock_bh(&vq->irq_lock);
->         if (vq->ready && vq->cb.callback)
->                 vq->cb.callback(vq->cb.private);
-> -       spin_unlock_irq(&vq->irq_lock);
-> +       spin_unlock_bh(&vq->irq_lock);
->  }
->
->  static bool vduse_vq_signal_irqfd(struct vduse_virtqueue *vq)
-> --
-> 2.41.0
->
+The next step would be to correct PHY latency, but there is no support
+for querying PHY latency yet.
 
+regards,
+Marc
+
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--n73y6rsllricxc2b
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEDs2BvajyNKlf9TJQvlAcSiqKBOgFAmTAtA0ACgkQvlAcSiqK
+BOj+xAf9HnUMaNIWiFRIZoj3nuV0Sm7RBhk/exT6G18NMZPSk82FtzDgOsBQmJba
+Jg1SR+1P8sQl41S08+MUGp8la2aafbin8uKx59u9Cc2awqTCm8LKkH0Dy6VbIs+0
+kzwv9OnjeUW59XCtw14bf6A98IzSF7EjUQbYHohSzu3rpPcP8FUFHn80E3Mx7eMf
+lCUbHVKVSwk0UX/SEic4hBowFTIn5IOLhpvSShLGBTkG+Cwl2t7xQikqtlrrzoBd
+cFA14fvDpoeN/zSkP/L+5RPheqpAsNMxfz/W1+c84+6k06yMZrg+0nlkD0u18MNg
+nsLo15Uu8pW06snGCiGSny4ZBzEUQQ==
+=o4NS
+-----END PGP SIGNATURE-----
+
+--n73y6rsllricxc2b--
 
