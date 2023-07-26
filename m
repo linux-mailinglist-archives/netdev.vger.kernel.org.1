@@ -1,105 +1,135 @@
-Return-Path: <netdev+bounces-21521-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21522-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46190763C9D
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 18:38:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8654C763CB3
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 18:43:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 528AF1C2141E
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 16:38:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 41563281A6E
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 16:43:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EC4D1AA63;
-	Wed, 26 Jul 2023 16:37:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E08B41AA6D;
+	Wed, 26 Jul 2023 16:43:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 242C2A42
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 16:37:58 +0000 (UTC)
-Received: from mail-qk1-x729.google.com (mail-qk1-x729.google.com [IPv6:2607:f8b0:4864:20::729])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8FDE94
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 09:37:57 -0700 (PDT)
-Received: by mail-qk1-x729.google.com with SMTP id af79cd13be357-766b22593faso484139385a.2
-        for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 09:37:57 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C62041AA63;
+	Wed, 26 Jul 2023 16:43:13 +0000 (UTC)
+Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91A4626B8;
+	Wed, 26 Jul 2023 09:43:12 -0700 (PDT)
+Received: by mail-pl1-x634.google.com with SMTP id d9443c01a7336-1b89cfb4571so55417545ad.3;
+        Wed, 26 Jul 2023 09:43:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690389477; x=1690994277;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=RgsePXBKbSDp1kSCObKDaf6K6E6g2Ti2BShLV11QRxE=;
-        b=giOQVG1gkrSZpLRzbkX05cERPMccjp/jczQqVntPJwSBYXPvd7u+akkWUtOREK0BH4
-         cXiEbZtaN7AS167VFa7Fiyd1Cya19UR5BEQ54Xx5jrvR1f4IdZKgDjPJxcAmPSe5vgb0
-         EHDiTlC/xQlrt78LgjrtaCrdSes7lm/8gpngJfQyt6rTNhtih7I2RbhXBQDtm0N7IBpP
-         zDdMCF2bKXpQXxjrirFjMho/YTtmVJv9bZHplbVnRkfQyySb3INk72qY4JS7yYLRRaJg
-         rdb6PuGDXK0N7s3UU1COMCLiqfflpTI8LUfQm4zYwk7irxHnupp3i+1pFLEFAkaI5OeK
-         +FYA==
+        d=gmail.com; s=20221208; t=1690389792; x=1690994592;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KCv8whutDfLJorKpUOqJ8+KkOpc2kOBhY8hTu1PhHvI=;
+        b=QMUznHOLJYfI3Cg1OGbvbUK2zwN4Xs54ZJ3JbZrw4JhdF1uxPQBZ3HVCSn31MYAgdc
+         Q3UdwouTq+Mcv+ne7ujpatnJtig71lQqScyMfCpcd4njFTx2RrYTuWYS75n+F8Ub+lJb
+         sgYnZK0m3NpEEtpkxeXqvlCQL5FyNn9joXe4bALGP92MnaPs+jHcAWAHXearGlrCz8vp
+         NiOWaE+mGvO2zNT5aJxPyQVlYzpIxZgun8DIiMsIyNzjTELMbe8K/8SOPkhf+s3/lXjk
+         II5NtI1EzZjw6UkqZdZsvukqb8KGZBLOTuS3MfVf02FYRvI+M5kRxGwBzEWcbh/IBuyC
+         WI3w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690389477; x=1690994277;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=RgsePXBKbSDp1kSCObKDaf6K6E6g2Ti2BShLV11QRxE=;
-        b=Gkxm4/9aGQFo+F7CyyE0qfJcJ7yZvTwvYx0c9HSDlxSGBOOCqZO74CRPsayS7a5syh
-         zRodG+6ayd43l9rGszS7RMhPbTePddeUpmC67bl4GeTcLA+vQt6qLShn0Q1WQbQbZ8rr
-         j+vQ3JTjV0+z/hmoelLSObtBm5kiYhE/bsGuI1/HfPk7gWiiE1nNVYnKzfsCZuwe6IrD
-         VblPuxEi+9bJ0+jEWJV2QxwrbJE77hphBrWBtrobGc6aPJMGB7bJ3tW0ZlHqjukNLYmi
-         wBE4wyB3sKxRveB7QdqVjZQJBhXCKn3uMdkHdgl7DP5ebPaL5AtQ29j+856dE+iX0A68
-         Aikg==
-X-Gm-Message-State: ABy/qLaDCQg0ZwZqVudCUgvdhusweIOJU+bmxLug2RvM6/5tII6paP9+
-	h3JMn3OFrX+jj4Uxw/J86DA=
-X-Google-Smtp-Source: APBJJlFlwqHSii7XFcBDXZ6ikEcu1Gtjecjl9jb4A+xtRWEw6BQ2XfKFQj+0Np4z8FpgawrZ0fbzow==
-X-Received: by 2002:a0c:dd94:0:b0:63d:2902:638c with SMTP id v20-20020a0cdd94000000b0063d2902638cmr2104975qvk.24.1690389476781;
-        Wed, 26 Jul 2023 09:37:56 -0700 (PDT)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.googlemail.com with ESMTPSA id z15-20020a0cf00f000000b0063d20b391dcsm1073627qvk.46.2023.07.26.09.37.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 26 Jul 2023 09:37:56 -0700 (PDT)
-Message-ID: <f20c3029-65bb-5390-6eec-664d802acf64@gmail.com>
-Date: Wed, 26 Jul 2023 09:37:53 -0700
+        d=1e100.net; s=20221208; t=1690389792; x=1690994592;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=KCv8whutDfLJorKpUOqJ8+KkOpc2kOBhY8hTu1PhHvI=;
+        b=GBt3NA5pNQ1akjvGOAZItclKXqBzKoEc9R+/iZ4uWNPpeAs1ZMC2STAudf54WM8YPr
+         oEznqknjN1S5jLmJpBkyplAi9+3A34DJZ4L7EfCZdLhHn522n0OEYpJA4O8JkR5dngjv
+         pWtP0MogwAQTEU+8g6lqEnj48k47bM1ALXY5k9Jms3ORK2Q0P0f8uuC0v//1kdRbripe
+         ydXFDYsa5+uRYdmHO7/DCGhoUX+AsD3QT/sXR6zHL0PugOlYffmgAzUfkMgVct3m5vEh
+         XzYRFfqG/duH9w3UKYKdh3z1f/7gnZxt1eOmnzYu5p2liSyvrpM1AtEx5qHzfXmlrDnY
+         x07g==
+X-Gm-Message-State: ABy/qLYhU4dukQt5W0+ubN3zpnyzYGDdYO06KOw22brnUGgkGAKpBNlM
+	Nak27gn0Z8BuShSCHRpH1D87JTjtvobx6LhC1nU=
+X-Google-Smtp-Source: APBJJlExta4H2GjqFCFJjAPMwlKu75pRye0RG2yh6z7/8hWP5WKagkLUkY7X/mJhBRsTApJB/W2FhSG2fN3oUXYQ7wA=
+X-Received: by 2002:a17:90a:c714:b0:263:f643:4bd3 with SMTP id
+ o20-20020a17090ac71400b00263f6434bd3mr2209207pjt.27.1690389791855; Wed, 26
+ Jul 2023 09:43:11 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH net] net: dsa: fix older DSA drivers using phylink
-Content-Language: en-US
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
- Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
-References: <E1qOflM-001AEz-D3@rmk-PC.armlinux.org.uk>
-From: Florian Fainelli <f.fainelli@gmail.com>
-In-Reply-To: <E1qOflM-001AEz-D3@rmk-PC.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+References: <20230725131258.31306-1-linyunsheng@huawei.com>
+ <94272ffed7636c4c92fcc73ccfc15236dd8e47dc.camel@gmail.com>
+ <16b4ab57-dfb0-2c1d-9be1-57da30dff3c3@intel.com> <22af47fe-1347-3e32-70bf-745d833e88b9@huawei.com>
+ <CAKgT0UcU4RJj0SMQiVM8oZu86ZzK+5NjzZ2ELg_yWZyWGr04PA@mail.gmail.com>
+ <CAKgT0UfL4ri-o7WifeewpezGQY1UQKwcBEUSSY80DyKoE8g-0w@mail.gmail.com> <20230726085049.36b527a4@kernel.org>
+In-Reply-To: <20230726085049.36b527a4@kernel.org>
+From: Alexander Duyck <alexander.duyck@gmail.com>
+Date: Wed, 26 Jul 2023 09:42:34 -0700
+Message-ID: <CAKgT0UddT2CY_HrQ-d+5vPbpguuscsfF=oUVW02AFy0JAYet3w@mail.gmail.com>
+Subject: Re: [PATCH net-next v2] page_pool: split types and declarations from page_pool.h
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Yunsheng Lin <linyunsheng@huawei.com>, 
+	Alexander Lobakin <aleksander.lobakin@intel.com>, davem@davemloft.net, pabeni@redhat.com, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Eric Dumazet <edumazet@google.com>, Wei Fang <wei.fang@nxp.com>, 
+	Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, 
+	NXP Linux Team <linux-imx@nxp.com>, Sunil Goutham <sgoutham@marvell.com>, 
+	Geetha sowjanya <gakula@marvell.com>, Subbaraya Sundeep <sbhatta@marvell.com>, 
+	hariprasad <hkelam@marvell.com>, Saeed Mahameed <saeedm@nvidia.com>, 
+	Leon Romanovsky <leon@kernel.org>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, Felix Fietkau <nbd@nbd.name>, 
+	Lorenzo Bianconi <lorenzo@kernel.org>, Ryder Lee <ryder.lee@mediatek.com>, 
+	Shayne Chen <shayne.chen@mediatek.com>, Sean Wang <sean.wang@mediatek.com>, 
+	Kalle Valo <kvalo@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>, 
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>, linux-rdma@vger.kernel.org, 
+	bpf@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
 	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 7/26/23 07:45, Russell King (Oracle) wrote:
-> Older DSA drivers that do not provide an dsa_ops adjust_link method end
-> up using phylink. Unfortunately, a recent phylink change that requires
-> its supported_interfaces bitmap to be filled breaks these drivers
-> because the bitmap remains empty.
-> 
-> Rather than fixing each driver individually, fix it in the core code so
-> we have a sensible set of defaults.
-> 
-> Reported-by: Sergei Antonov <saproj@gmail.com>
-> Fixes: de5c9bf40c45 ("net: phylink: require supported_interfaces to be filled")
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+On Wed, Jul 26, 2023 at 8:50=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Wed, 26 Jul 2023 08:39:43 -0700 Alexander Duyck wrote:
+> > > > I suppose the above suggestion is about splitting or naming by
+> > > > the user as the discussed in the below thread?
+> > > > https://lore.kernel.org/all/20230721182942.0ca57663@kernel.org/
+> > >
+> > > Actually my suggestion is more about defining boundaries for what is
+> > > meant to be used by drivers and what isn't. The stuff you could keep
+> > > in net/core/page_pool.h would only be usable by the files in net/core=
+/
+> > > whereas the stuff you are keeping in the include/net/ folder is usabl=
+e
+> > > by drivers. It is meant to prevent things like what you were
+> > > complaining about with the Mellanox drivers making use of interfaces
+> > > you didn't intend them to use.
+>
+> FWIW moving stuff which is only supposed to be used by core (xdp, skb,
+> etc.) to net/core/page_pool.h is a good idea, too.
+> Seems a bit independent from splitting the main header, tho.
 
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
--- 
-Florian
+It seems a bit independent, but I was reacting only because I feel
+like this ijust adding to the technical debt on this. Basically before
+we can really just go ahead and split it the header file itself should
+probably be cleaned up a bit.
 
+The reason why it occurred to me is that I noticed things like
+page_pool_use_xdp_mem and the forward declaration for xdp_mem_info was
+being picked up and moved into the types.h file in the move. The whole
+block was in a #if/#else statement w/ definitions for the PAGE_POOL
+and non-PAGE_POOL cases.
+
+We also have functions that don't really need to be included such as
+page_pool_unlink_napi which is exported but not used outside of
+page_pool.c from what I can tell.
 
