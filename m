@@ -1,121 +1,132 @@
-Return-Path: <netdev+bounces-21614-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21615-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67E99764085
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 22:31:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 504FA764094
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 22:36:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1AABA1C213D9
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 20:31:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8066A1C2145F
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 20:36:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D1B24CE81;
-	Wed, 26 Jul 2023 20:31:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50A8B1BEE6;
+	Wed, 26 Jul 2023 20:36:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E8A91989E
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 20:31:17 +0000 (UTC)
-Received: from mail-ej1-x629.google.com (mail-ej1-x629.google.com [IPv6:2a00:1450:4864:20::629])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A968F2127;
-	Wed, 26 Jul 2023 13:31:16 -0700 (PDT)
-Received: by mail-ej1-x629.google.com with SMTP id a640c23a62f3a-99b9161b94aso16665866b.1;
-        Wed, 26 Jul 2023 13:31:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690403475; x=1691008275;
-        h=cc:to:subject:message-id:date:from:references:in-reply-to
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=+pV4iCMz6JjqVwmfQiE6VOuZFXbz9ARYQvR895v1vFE=;
-        b=JNUbBAXD3E216BCygF81S/3TlUl81snUcIHssa5bxnCxVIlFD/kLrowujjEdB2FMtj
-         59g0uCjq1k9c4vowKmz3i1ItUM2erxywPCqYLVjhsD/7Fxn7hMbF6Mj4JONIQhLmfJE9
-         KbSZcoXRb/HbgdS4bNRaWdPxaOxS940pMiCarO2ThCMxPxI8mBdYqSSFTsdGNwq6zu6B
-         pbOX8Teh9k1lFFzP6djerTL1dsI3L0sqayfCrgtQzEEQSEJvjRFBACdnN2MJAkgivUWs
-         Dl53hiq1NW+o45YDTXDG1bv9iJ/191AmFoJJ8nLaztozT/WnTeFt+jRz6s+OOtgRPake
-         WUIA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690403475; x=1691008275;
-        h=cc:to:subject:message-id:date:from:references:in-reply-to
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=+pV4iCMz6JjqVwmfQiE6VOuZFXbz9ARYQvR895v1vFE=;
-        b=fR/W6PZLwq7l6BhvxQnx2sFz2moOJj1MlSZHPy0pmtNg4yExdhgDE1NPlBeHA7S68f
-         X/CYwummpf5zaJ9DnrdL8X4ICLDcgP37omAme9iswcQDz3l0u63SIGvek7fwIOS76pPT
-         VomY9P3XNsflMT7ejJEmdASeTPu5b2sOIBuUtlLtBbz8oLFLN6Q9SQm2UIi4XdHL95/5
-         L+V0BCTE1B1A0ljXTlnGkcFMnGeoYdje1SuSq4sY4M/LQKbOhXUz7DI/RY0CTkHuu2Va
-         IAhImTJoWdLJrgcKeGi8ONxJiOFD6TZEFlzJ9IFaQJ83aOPm1jFnqDbHgg0r3xXbx0qH
-         S7Xw==
-X-Gm-Message-State: ABy/qLZnTpKP3Rno3zr6W4iWMqv0pS7xERl4fYcAO+nrkyRj0Z3VQs9S
-	pY4H+6+Kz7qMIYs0tUwzaT/aPsn5aUyutKhRyRc=
-X-Google-Smtp-Source: APBJJlEMSBpMM9/vHYFMY2X+yF+5ZRvyi5C+cWFBG+9gSm9BidcFDe78hGuQT2ngJP70tET0/CvJguorQGPQ2/Tqdg4=
-X-Received: by 2002:a17:907:2cd5:b0:99b:5a73:4d04 with SMTP id
- hg21-20020a1709072cd500b0099b5a734d04mr228592ejc.71.1690403474891; Wed, 26
- Jul 2023 13:31:14 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16C2B1BEE3
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 20:36:49 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51F20C433C8;
+	Wed, 26 Jul 2023 20:36:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1690403809;
+	bh=P+z1ai9L/8DqCyjjGblxecqfSTi2k0L3ebpLlrfSYUE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=gCPqwQ2WybGDUNyDcK5vsvV6yrA9vrqwCGMaRcZriaqORCXMD/Zw/DuI49DPmoVM1
+	 U33/2x18i39hdYToqmIgT0RwbG8UIRZB3+dIYUoc+/kxxGOrSueDet/Fr0Bf958z7V
+	 JtXVxLPz/jNsE4acR+wQtMWU21A1hvAHvzzBkPG5cnEn38deYXEiUBu8oaEGde9NjM
+	 ve09mw8HGdjRsPwLCIgY136sKHuaQiwGYwtsdXICPSVJspHE6SzDH5sTDrYg+qMKx2
+	 tjexY33eNiIfxX7CUpVgi1AnW73Mg/vbKAT12htPzFm/5YkoC9nPV46vCvtmBjx1qQ
+	 tEcJmKqCf2BFA==
+Date: Wed, 26 Jul 2023 13:36:48 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Joe Perches <joe@perches.com>, Krzysztof Kozlowski
+ <krzysztof.kozlowski@linaro.org>, geert@linux-m68k.org,
+ gregkh@linuxfoundation.org, netdev@vger.kernel.org,
+ workflows@vger.kernel.org, mario.limonciello@amd.com
+Subject: Re: [PATCH v2] scripts: get_maintainer: steer people away from
+ using file paths
+Message-ID: <20230726133648.54277d76@kernel.org>
+In-Reply-To: <CAHk-=wjfC4tFnOC0Lk_GcU4buf+X-Jv965pWg+kMRkDb6hX6mw@mail.gmail.com>
+References: <20230726151515.1650519-1-kuba@kernel.org>
+	<11ec5b3819ff17c7013348b766eab571eee5ca96.camel@perches.com>
+	<20230726092312.799503d6@kernel.org>
+	<CAHk-=wjEj2fGiaQXrYUZu65EPdgbGEAEMzch8LTtiUp6UveRCw@mail.gmail.com>
+	<20230726112031.61bd0c62@kernel.org>
+	<CAHk-=wi9MyyWmP_HAddLrmGfdANkut6_2f9hzv9HcyTBvg3+kA@mail.gmail.com>
+	<20230726114817.1bd52d48@kernel.org>
+	<CAHk-=wiuR7_A=PbN8jhmqGPJQHypUHR+W4-UuSVhOVWvYXs1Tg@mail.gmail.com>
+	<CAHk-=wh4pbrNZGqfV9u1urZr3Xjci=UV-MP+KneB6a5yo7-VOQ@mail.gmail.com>
+	<CAHk-=whCE9cWmTXu54WFQ7x-aH8n=dhCux2h49=pYN=14ybkxg@mail.gmail.com>
+	<20230726130318.099f96fc@kernel.org>
+	<CAHk-=wjfC4tFnOC0Lk_GcU4buf+X-Jv965pWg+kMRkDb6hX6mw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Received: by 2002:a17:906:dc89:b0:978:9011:58a1 with HTTP; Wed, 26 Jul 2023
- 13:31:14 -0700 (PDT)
-In-Reply-To: <20230726112913.4393-1-machel@vivo.com>
-References: <20230726112913.4393-1-machel@vivo.com>
-From: Jay Vosburgh <j.vosburgh@gmail.com>
-Date: Wed, 26 Jul 2023 13:31:14 -0700
-Message-ID: <CAAoacNk1sdkvdkdNpOu9yy9RtRW2zRbuNWnPV2cFzijfuQbMLw@mail.gmail.com>
-Subject: Re: [PATCH net v5] bonding: Remove error checking for debugfs_create_dir()
-To: Wang Ming <machel@vivo.com>
-Cc: Andy Gospodarek kjmatt <andy@greyhouse.net>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	opensource.kernel@vivo.com, gregkh@linuxfoundation.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On 7/26/23, Wang Ming <machel@vivo.com> wrote:
-> It is expected that most callers should _ignore_ the errors
-> return by debugfs_create_dir() in bond_debug_reregister().
+On Wed, 26 Jul 2023 13:13:11 -0700 Linus Torvalds wrote:
+> On Wed, 26 Jul 2023 at 13:03, Jakub Kicinski <kuba@kernel.org> wrote:
+> >
+> > IOW solving the _actually_ missing CCs is higher priority for me.  
+> 
+> You have the script. It's already being run. Use it.
+> 
+> Having scripting that complains about missing Cc's, even *lists* them,
+> and then requires a human to do something about it - that's stupid.
 
-I'm confused; I recall that the prior version kept the pr_warn(), but
-changed the
-test from a NULL check  to instead use IS_ERR().  I'll state again
-that I think printing the error is useful, as it would provide an
-indication of why the debugfs directory isn't available.  I also don't
-see an obvious way the error could be used to spam the dmesg.
+Just so I fully understand what you're saying - what do you expect me
+to do? Send the developer a notifications saying "please repost" with
+this CC list? How is that preferable to making them do it right the
+first time?!
 
-        -J
+The script in patchwork *just runs get_maintainer on the patch*:
 
+https://github.com/kuba-moo/nipa/blob/master/tests/patch/cc_maintainers/test.py#L58
 
->
-> Signed-off-by: Wang Ming <machel@vivo.com>
-> ---
->  drivers/net/bonding/bond_debugfs.c | 3 ---
->  1 file changed, 3 deletions(-)
->
-> diff --git a/drivers/net/bonding/bond_debugfs.c
-> b/drivers/net/bonding/bond_debugfs.c
-> index 594094526..a41f76542 100644
-> --- a/drivers/net/bonding/bond_debugfs.c
-> +++ b/drivers/net/bonding/bond_debugfs.c
-> @@ -87,9 +87,6 @@ void bond_debug_reregister(struct bonding *bond)
->  void bond_create_debugfs(void)
->  {
->  	bonding_debug_root = debugfs_create_dir("bonding", NULL);
-> -
-> -	if (!bonding_debug_root)
-> -		pr_warn("Warning: Cannot create bonding directory in debugfs\n");
->  }
->
->  void bond_destroy_debugfs(void)
-> --
-> 2.25.1
->
->
+And developers also *already* *run* get_maintainer, they just need to 
+be nudged to prefer running it on the patch rather than on the path.
+
+And no, Joe's position that this is "just a documentation problem"
+does not survive crash with reality because we already documented:
+
+Documentation/process/submitting-patches.rst:
+
+  scripts/get_maintainer.pl can be very useful at this step (pass paths
+  to your patches as arguments to scripts/get_maintainer.pl).
+
+Documentation/process/3.Early-stage.rst:
+
+ If passed a patch on the command line, it will list the maintainers
+ who should probably receive copies of the patch.  This is the
+ preferred way (unlike "-f" option) to get the list of people to Cc for
+ your patches.
+
+> Why are you using computers and automation in the first place, if said
+> automation then just makes for more work?
+
+Writing and maintaining that automation is also damn work. We complain
+nobody wants to be a maintainer and then refuse to make maintainers'
+life's easier :|
+
+> Then requiring inexperienced developers to do those extra things,
+> knowing - and not caring - that the experienced ones won't even
+> bother, that goes from stupid to actively malicious.
+> 
+> And then asking me to change my workflow because I use a different
+> script that does exactly what I want - that takes "stupid and
+> malicious" to something where I will just ignore you.
+> 
+> In other words: those changes to get_maintainer are simply not going to happen.
+> 
+> Fix your own scripts, and fix your bad workflows.
+> 
+> Your bad workflow not only makes it harder for new people to get
+> involved, they apparently waste your *own* time so much that you are
+> upset about it all.
+> 
+> Don't shoot yourself in the foot - and if you insist on doing so,
+> don't ask *others* to join you in your self-destructive tendencies.
+
+No idea what you mean by "my workflow". But yeah, I kind of expected
+that this patch would be a waste of time. Certain problems only become
+clear with sufficient volume of patches, and I'm clearly incapable
+of explaining shit.
 
