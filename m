@@ -1,164 +1,163 @@
-Return-Path: <netdev+bounces-21242-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21243-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E96A762F62
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 10:14:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FE73762F67
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 10:14:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EDA272819EB
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 08:14:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DE24E281A9D
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 08:14:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08062AD23;
-	Wed, 26 Jul 2023 08:14:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3E89AD24;
+	Wed, 26 Jul 2023 08:14:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0F71947E
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 08:14:05 +0000 (UTC)
-Received: from mail-lj1-x234.google.com (mail-lj1-x234.google.com [IPv6:2a00:1450:4864:20::234])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DD663C07
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 01:14:04 -0700 (PDT)
-Received: by mail-lj1-x234.google.com with SMTP id 38308e7fff4ca-2b6fdaf6eefso96317011fa.0
-        for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 01:14:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1690359242; x=1690964042;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=jUR+8HTvxKrmvFbKVVHSsJQHXeGbUXJFaikg5YZ0Qg4=;
-        b=hVOpcFpH0o9M+kWMA1us4uHJmwkZz8VJJTOjlCvXtknJP2KTtjeXi51E/MkYtRU26z
-         pOQ+WbXaS2WDw9hRw4aFfOpOxHiGhZV/gVbZ5i+iXQo+GYC9zpPR8f/DsLUFR1942m4W
-         mSYXlvXmTckSyuz8skauGYqxeuptEjQXITktH0nqV+hL5btbA1Jv4yi1x17ftB7Es9Mk
-         wX+olh6QnI8hZCBq4aLBROKcbuec3+jKiE3cnJPFF6NweBrK/2KlrtvxZFxpVtB+m538
-         xM+WJLnmTXDmPUh5m8v12t44j/tvMrUVZPncE0j9SezFIe7P1uR/uU+R7RmnZAS0SxeM
-         ksAg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690359242; x=1690964042;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=jUR+8HTvxKrmvFbKVVHSsJQHXeGbUXJFaikg5YZ0Qg4=;
-        b=TL4yLgPnCC+7iYNTm2MUIzkBYuWaWcDPFt2XY7L46ml/2lM9oI8SOrNtk+9b5VUQ9G
-         i/u2e9t+Sy/sbh/ouE6C6H7AOUtX8ZhklFSvY6pI1I/dQIkT2ZQHeZLikEQm1e5PtEro
-         rcK4cRN66LhB+nKswk7aY2W/rZxVRKoUBTCU3HAEzjVpHbDvKBP0Yd24JqcdLaWEQXJ3
-         X7pNoxe41nlvHxpbgPW+OBMlUejM0szqyE9lSPz94qgCz5/cAKpEsgiyu70VAOoKAKkR
-         kXImcWj+U+esPH0kvJejlXrQ4GqH22+j4RY5Z9gUA7pb009rFgkrcoBgnv3n+Gj147v/
-         I6Ew==
-X-Gm-Message-State: ABy/qLashWIGps4V/N2wbAayJib3fbf1JZk5NAyBY/QH1xc7G151OVqQ
-	B1/GIorz0PMIvCNhO5UwvM+t78Bbmw/AboQo69ooXA==
-X-Google-Smtp-Source: APBJJlHbi0hdaP/HaNWOatMh0uvG9VNHJEZMEze5ENOxchuWLXB33lHowUBJwFb3Gub9ShI4NkHCaG0qA2Ph84M9JgE=
-X-Received: by 2002:a2e:8914:0:b0:2b5:7dd9:74f5 with SMTP id
- d20-20020a2e8914000000b002b57dd974f5mr987059lji.21.1690359242501; Wed, 26 Jul
- 2023 01:14:02 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8F9B947E
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 08:14:41 +0000 (UTC)
+Received: from zg8tmtyylji0my4xnjqumte4.icoremail.net (zg8tmtyylji0my4xnjqumte4.icoremail.net [162.243.164.118])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2141097;
+	Wed, 26 Jul 2023 01:14:39 -0700 (PDT)
+Received: from ubuntu.localdomain (unknown [124.236.128.36])
+	by mail-app3 (Coremail) with SMTP id cC_KCgA36JzP1cBk53O_Cw--.42286S2;
+	Wed, 26 Jul 2023 16:14:16 +0800 (CST)
+From: Duoming Zhou <duoming@zju.edu.cn>
+To: linux-kernel@vger.kernel.org
+Cc: linux-usb@vger.kernel.org,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	kuba@kernel.org,
+	edumazet@google.com,
+	davem@davemloft.net,
+	UNGLinuxDriver@microchip.com,
+	woojung.huh@microchip.com,
+	Duoming Zhou <duoming@zju.edu.cn>
+Subject: [PATCH net] net: usb: lan78xx: reorder cleanup operations to avoid UAF bugs
+Date: Wed, 26 Jul 2023 16:14:07 +0800
+Message-Id: <20230726081407.18977-1-duoming@zju.edu.cn>
+X-Mailer: git-send-email 2.17.1
+X-CM-TRANSID:cC_KCgA36JzP1cBk53O_Cw--.42286S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxCr1kJFyDuFWrKr48Jw1UKFg_yoW5Zr4Dpa
+	95XF98Gr1kWr45KF13ZF48XFyrurs2yw4DGryfKw4vq3Z5tFyaq3srJ397WFW3CFWDZFsx
+	Zw1jqan3XFs5uaUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvG14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4U
+	JVW0owA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+	I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
+	n2kIc2xKxwCY02Avz4vE14v_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr
+	0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY
+	17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcV
+	C0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY
+	6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa
+	73UjIFyTuYvjfUOnmRUUUUU
+X-CM-SenderInfo: qssqjiasttq6lmxovvfxof0/1tbiAwQIAWTAePoKggA3sX
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20230714170853.866018-1-aleksander.lobakin@intel.com>
- <20230714170853.866018-3-aleksander.lobakin@intel.com> <ac97825d-6a27-f121-4cee-9d2ee0934ce6@redhat.com>
- <e48185cb-3057-e778-75c4-d266a249088b@intel.com>
-In-Reply-To: <e48185cb-3057-e778-75c4-d266a249088b@intel.com>
-From: Ilias Apalodimas <ilias.apalodimas@linaro.org>
-Date: Wed, 26 Jul 2023 11:13:26 +0300
-Message-ID: <CAC_iWjJ-yfW2Bu-vYQHVw3Y0svkYQNOva3orsv0VzvWyfQkiLw@mail.gmail.com>
-Subject: Re: [PATCH RFC net-next v2 2/7] net: page_pool: place frag_* fields
- in one cacheline
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: Jesper Dangaard Brouer <jbrouer@redhat.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	brouer@redhat.com, Maciej Fijalkowski <maciej.fijalkowski@intel.com>, 
-	Larysa Zaremba <larysa.zaremba@intel.com>, Yunsheng Lin <linyunsheng@huawei.com>, 
-	Alexander Duyck <alexanderduyck@fb.com>, Jesper Dangaard Brouer <hawk@kernel.org>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-Apologies for the late reply, I was on vacation and start going
-through my email piles...
+The timer dev->stat_monitor can schedule the delayed work dev->wq and
+the delayed work dev->wq can also arm the dev->stat_monitor timer.
 
-On Tue, 18 Jul 2023 at 16:52, Alexander Lobakin
-<aleksander.lobakin@intel.com> wrote:
->
-> From: Jesper Dangaard Brouer <jbrouer@redhat.com>
-> Date: Fri, 14 Jul 2023 20:37:39 +0200
->
-> >
-> >
-> > On 14/07/2023 19.08, Alexander Lobakin wrote:
-> >> On x86_64, frag_* fields of struct page_pool are scattered across two
-> >> cachelines despite the summary size of 24 bytes. The last field,
-> >> ::frag_users, is pushed out to the next one, sharing it with
-> >> ::alloc_stats.
-> >> All three fields are used in pretty much the same places. There are some
-> >> holes and cold members to move around. Move frag_* one block up, placing
-> >> them right after &page_pool_params perfectly at the beginning of CL2.
-> >> This doesn't do any meaningful to the second block, as those are some
-> >> destroy-path cold structures, and doesn't do anything to ::alloc_stats,
-> >> which still starts at 200-byte offset, 8 bytes after CL3 (still fitting
-> >> into 1 cacheline).
-> >> On my setup, this yields 1-2% of Mpps when using PP frags actively.
-> >> When it comes to 32-bit architectures with 32-byte CL: &page_pool_params
-> >> plus ::pad is 44 bytes, the block taken care of is 16 bytes within one
-> >> CL, so there should be at least no regressions from the actual change.
-> >>
-> >> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-> >> ---
-> >>   include/net/page_pool.h | 10 +++++-----
-> >>   1 file changed, 5 insertions(+), 5 deletions(-)
-> >>
-> >> diff --git a/include/net/page_pool.h b/include/net/page_pool.h
-> >> index 829dc1f8ba6b..212d72b5cfec 100644
-> >> --- a/include/net/page_pool.h
-> >> +++ b/include/net/page_pool.h
-> >> @@ -130,16 +130,16 @@ static inline u64
-> >> *page_pool_ethtool_stats_get(u64 *data, void *stats)
-> >>   struct page_pool {
-> >>       struct page_pool_params p;
-> >>   +    long frag_users;
-> >> +    struct page *frag_page;
-> >> +    unsigned int frag_offset;
-> >> +    u32 pages_state_hold_cnt;
-> >
-> > I think this is okay, but I want to highlight that:
-> >  - pages_state_hold_cnt and pages_state_release_cnt
-> > need to be kept on separate cache-lines.
->
-> They're pretty far away from each other. I moved hold_cnt here as well
-> to keep it stacked with frag_offset and avoid introducing 32-bit holes.
+When the device is detaching, the net_device will be deallocated. but
+the net_device private data could still be dereferenced in delayed work
+or timer handler. As a result, the UAF bugs will happen.
 
-This is to prevent cache line bouncing and/or false sharing right?
-The change seems fine to me as well but mind adding a comment about
-this when you resend?
+One racy situation is shown below:
 
-Thanks
-/Ilias
->
-> >
-> >
-> >> +
-> >>       struct delayed_work release_dw;
-> >>       void (*disconnect)(void *);
-> >>       unsigned long defer_start;
-> >>       unsigned long defer_warn;
-> >>   -    u32 pages_state_hold_cnt;
-> >> -    unsigned int frag_offset;
-> >> -    struct page *frag_page;
-> >> -    long frag_users;
-> >> -
-> >>   #ifdef CONFIG_PAGE_POOL_STATS
-> >>       /* these stats are incremented while in softirq context */
-> >>       struct page_pool_alloc_stats alloc_stats;
-> >
->
-> Thanks,
-> Olek
+      (Thread 1)                 |      (Thread 2)
+lan78xx_stat_monitor()           |
+ ...                             |  lan78xx_disconnect()
+ lan78xx_defer_kevent()          |    ...
+  ...                            |    cancel_delayed_work_sync(&dev->wq);
+  schedule_delayed_work()        |    ...
+  (wait some time)               |    free_netdev(net); //free net_device
+  lan78xx_delayedwork()          |
+  //use net_device private data  |
+  dev-> //use                    |
+
+Although we use cancel_delayed_work_sync() to cancel the delayed work
+in lan78xx_disconnect(), it could still be scheduled in timer handler
+lan78xx_stat_monitor().
+
+Another racy situation is shown below:
+
+      (Thread 1)                |      (Thread 2)
+lan78xx_delayedwork             |
+ mod_timer()                    |  lan78xx_disconnect()
+                                |   cancel_delayed_work_sync()
+ (wait some time)               |   if (timer_pending(&dev->stat_monitor))
+             	                |       del_timer_sync(&dev->stat_monitor);
+ lan78xx_stat_monitor()         |   ...
+  lan78xx_defer_kevent()        |   free_netdev(net); //free
+   //use net_device private data|
+   dev-> //use                  |
+
+Although we use del_timer_sync() to delete the timer, the function
+timer_pending() returns 0 when the timer is activated. As a result,
+the del_timer_sync() will not be executed and the timer could be
+re-armed.
+
+In order to mitigate this bug, We use timer_shutdown_sync() to shutdown
+the timer and then use cancel_delayed_work_sync() to cancel the delayed
+work. As a result, the net_device could be deallocated safely.
+
+What's more, the dev->flags is set to EVENT_DEV_DISCONNECT in
+lan78xx_disconnect(). But it could still be set to EVENT_STAT_UPDATE
+in lan78xx_stat_monitor(). So this patch put the set_bit() behind
+timer_shutdown_sync().
+
+Fixes: 77dfff5bb7e2 ("lan78xx: Fix race condition in disconnect handling")
+Signed-off-by: Duoming Zhou <duoming@zju.edu.cn>
+---
+ drivers/net/usb/lan78xx.c | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/net/usb/lan78xx.c b/drivers/net/usb/lan78xx.c
+index c458c030fad..59cde06aa7f 100644
+--- a/drivers/net/usb/lan78xx.c
++++ b/drivers/net/usb/lan78xx.c
+@@ -4224,8 +4224,6 @@ static void lan78xx_disconnect(struct usb_interface *intf)
+ 	if (!dev)
+ 		return;
+ 
+-	set_bit(EVENT_DEV_DISCONNECT, &dev->flags);
+-
+ 	netif_napi_del(&dev->napi);
+ 
+ 	udev = interface_to_usbdev(intf);
+@@ -4233,6 +4231,8 @@ static void lan78xx_disconnect(struct usb_interface *intf)
+ 
+ 	unregister_netdev(net);
+ 
++	timer_shutdown_sync(&dev->stat_monitor);
++	set_bit(EVENT_DEV_DISCONNECT, &dev->flags);
+ 	cancel_delayed_work_sync(&dev->wq);
+ 
+ 	phydev = net->phydev;
+@@ -4247,9 +4247,6 @@ static void lan78xx_disconnect(struct usb_interface *intf)
+ 
+ 	usb_scuttle_anchored_urbs(&dev->deferred);
+ 
+-	if (timer_pending(&dev->stat_monitor))
+-		del_timer_sync(&dev->stat_monitor);
+-
+ 	lan78xx_unbind(dev, intf);
+ 
+ 	lan78xx_free_tx_resources(dev);
+-- 
+2.17.1
+
 
