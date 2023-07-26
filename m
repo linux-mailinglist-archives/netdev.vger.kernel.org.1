@@ -1,108 +1,92 @@
-Return-Path: <netdev+bounces-21387-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21388-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A935876376E
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 15:22:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E196763796
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 15:30:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6E701280FD8
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 13:22:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3817A281EEA
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 13:30:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71A28C2C6;
-	Wed, 26 Jul 2023 13:22:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4A6DC2DC;
+	Wed, 26 Jul 2023 13:30:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63AD8C15C
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 13:22:30 +0000 (UTC)
-Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D1762717
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 06:22:25 -0700 (PDT)
-Received: by mail-lj1-x235.google.com with SMTP id 38308e7fff4ca-2b9ab1725bbso26137201fa.0
-        for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 06:22:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1690377744; x=1690982544;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=RNBj29jr4jl10Xi2/aZroQsmuwBmNBwOZzK39VygtuU=;
-        b=ZR7ItMsoA1A/Nf0sOAsNBK3BvkceyjN/sL6fBQtaSZAld48YYK29eLHJpLbOmYcO4N
-         dYwufolsoOqxG66gXyatccol9XCFhslUJtN1fSKS7Ig5Kau5SMVFE7RX4yg5Rr4WodvW
-         KGP5UDr+Anz0VQpD54p7Qveowg/GfBiANDGM4tvbiskCVcrN2Ayh2uU5VmTDPv4ac5wh
-         wcczHEKlYM7+fs6dv2GFmLWJlAaieMsDTw3DWr/Yz6IprmyjYryQs6+CCKCZy1hgZmch
-         9OcYz90i81pg25VCT++Zf0XNmTEBd2fezyDACkORNjUdmjCl6szBneV8zsIq5EvQsgSr
-         1QLg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690377744; x=1690982544;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RNBj29jr4jl10Xi2/aZroQsmuwBmNBwOZzK39VygtuU=;
-        b=bFos5was5Igab2HzLBMntDrIXpVNKwfnQEse86h74z5xp/blUv5+h9A+U3BhEK0D2Z
-         ijcHcS663iTP6Pk++d6SC2qbHPqVw0Jx/xy2Us1Ra9tbAG0zpmSXPLFvLox8k+y17UBQ
-         F3lPGy14MxhbEltuIkRiLwPY/u0RIWwxvQSsnp+PPt2Z7MVayaZ9Pxz67eQFODuiRpF5
-         F4rVhOtP9cZZP+ZQEM36jtevSDUiOf+PhMU+XwIs75+UW4nEjx7+tTxkGEM8D6LKVEHM
-         DEb++6DTTemgZ4biW5vFH59a4NLTBlV71gUmvOJT3VcX5ww7IlGRDpBCSCZE8tMDNJ1g
-         1ySA==
-X-Gm-Message-State: ABy/qLY+zpsV+iQYn0JGZxQyrXb+moly2wDzVyXvT6QsIYb5uIw6Ut4q
-	iPCfpa+tvGE1q+BvanrB24dlbg==
-X-Google-Smtp-Source: APBJJlFMUTV8xO+xbHIIv/bIIICqq09UIEpnnxDWYTvm3DUYUWAby+Rd3s59OPhDm1XNqeKodSv6yA==
-X-Received: by 2002:a2e:9805:0:b0:2b6:fe55:7318 with SMTP id a5-20020a2e9805000000b002b6fe557318mr1472225ljj.12.1690377743727;
-        Wed, 26 Jul 2023 06:22:23 -0700 (PDT)
-Received: from localhost ([102.36.222.112])
-        by smtp.gmail.com with ESMTPSA id y7-20020a1c4b07000000b003fc0505be19sm1939327wma.37.2023.07.26.06.22.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Jul 2023 06:22:23 -0700 (PDT)
-Date: Wed, 26 Jul 2023 16:22:20 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Yan Zhai <yan@cloudflare.com>
-Cc: Markus Elfring <Markus.Elfring@web.de>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Hao Luo <haoluo@google.com>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A546C141
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 13:30:45 +0000 (UTC)
+Received: from m12.mail.163.com (m12.mail.163.com [220.181.12.196])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id ADA7FBC
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 06:30:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:Subject:Date:Message-Id; bh=UzedVzlTPugKIi7yUj
+	DBwd/JHG3+tRrpUhFRnCHdDnA=; b=pueHs0apaf7YqajYsoYGNgwrLLQ81HLRqr
+	9wc/+NdKRzsRs/ZiGhZUYBO1CtfgZz/1kcqYtsSSJXcaGrsbdNdfq5cuTcB0e01r
+	Po8j35zol9LFqlvQmIXWOuFdRy32eFLRk3CSR2WqWtEvdbpJKuxGjeWj2GxmajyV
+	JAQVPN3bs=
+Received: from localhost.localdomain (unknown [202.112.113.212])
+	by zwqz-smtp-mta-g3-3 (Coremail) with SMTP id _____wAHdzPJH8Fk67VHBQ--.55025S4;
+	Wed, 26 Jul 2023 21:29:51 +0800 (CST)
+From: Yuanjun Gong <ruc_gongyuanjun@163.com>
+To: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Jakub Sitnicki <jakub@cloudflare.com>, Jiri Olsa <jolsa@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Jordan Griege <jgriege@cloudflare.com>,
-	KP Singh <kpsingh@kernel.org>, LKML <linux-kernel@vger.kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Mykola Lysenko <mykolal@fb.com>, Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>, Song Liu <song@kernel.org>,
-	Stanislav Fomichev <sdf@google.com>, Yonghong Song <yhs@fb.com>,
-	bpf@vger.kernel.org, kernel-janitors@vger.kernel.org,
-	kernel-team@cloudflare.com, linux-kselftest@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
 	netdev@vger.kernel.org
-Subject: Re: [PATCH v4 bpf 2/2] bpf: selftests: add lwt redirect regression
- test cases
-Message-ID: <b0a4c52b-427d-462f-93a9-d94a294cedcf@kadam.mountain>
-References: <cover.1690332693.git.yan@cloudflare.com>
- <9c4896b109a39c3fa088844addaa1737a84bbbb5.1690332693.git.yan@cloudflare.com>
- <3ec61192-c65c-62cc-d073-d6111b08e690@web.de>
- <CAO3-PbraNcfQnqHUG_992vssuA795RxtexYsMdEo=k9zp-XHog@mail.gmail.com>
- <ZMD1sFTW8SFiex+x@debian.debian>
+Cc: Yuanjun Gong <ruc_gongyuanjun@163.com>
+Subject: [PATCH 1/1] net: korina: fix value check in korina_probe()
+Date: Wed, 26 Jul 2023 21:29:43 +0800
+Message-Id: <20230726132943.20318-1-ruc_gongyuanjun@163.com>
+X-Mailer: git-send-email 2.17.1
+X-CM-TRANSID:_____wAHdzPJH8Fk67VHBQ--.55025S4
+X-Coremail-Antispam: 1Uf129KBjvdXoW7Jr4rAw4fGw18tF47Kr4fGrg_yoWftFcE93
+	yxZr93Gr4agr1Yywn5GrZ8Ar9Fk3Z2vF1F93WxK3y5try7Gr17Zr1kX39rAws3Ww4jkF9r
+	KF17A3y7Cw13KjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7sRNrcTJUUUUU==
+X-Originating-IP: [202.112.113.212]
+X-CM-SenderInfo: 5uxfsw5rqj53pdqm30i6rwjhhfrp/1tbiURG45WDESbveuAAAst
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_BL,RCVD_IN_MSPIKE_L3,SPF_HELO_NONE,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZMD1sFTW8SFiex+x@debian.debian>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-Was Markus unbanned from vger?  How are we recieving these emails?
+in korina_probe(), check the return value of clk_prepare_enable()
+and return the error code if clk_prepare_enable() returns an
+unexpected value.
 
-regards,
-dan carpenter
+Fixes: e4cd854ec487 ("net: korina: Get mdio input clock via common clock framework")
+Signed-off-by: Yuanjun Gong <ruc_gongyuanjun@163.com>
+---
+ drivers/net/ethernet/korina.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/korina.c b/drivers/net/ethernet/korina.c
+index 2b9335cb4bb3..e18062007ae3 100644
+--- a/drivers/net/ethernet/korina.c
++++ b/drivers/net/ethernet/korina.c
+@@ -1306,7 +1306,9 @@ static int korina_probe(struct platform_device *pdev)
+ 	if (IS_ERR(clk))
+ 		return PTR_ERR(clk);
+ 	if (clk) {
+-		clk_prepare_enable(clk);
++		rc = clk_prepare_enable(clk);
++		if (rc)
++			return rc;
+ 		lp->mii_clock_freq = clk_get_rate(clk);
+ 	} else {
+ 		lp->mii_clock_freq = 200000000; /* max possible input clk */
+-- 
+2.17.1
 
 
