@@ -1,152 +1,229 @@
-Return-Path: <netdev+bounces-21650-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21651-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE6FD764183
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 23:57:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 618C67641D2
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 00:01:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1C874281F9F
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 21:57:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 106C9281FA0
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 22:01:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CD80CA63;
-	Wed, 26 Jul 2023 21:57:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13C3018044;
+	Wed, 26 Jul 2023 22:01:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAC051BF07
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 21:57:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0DB31C433C7;
-	Wed, 26 Jul 2023 21:57:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690408642;
-	bh=tAlkFh8lTCa8bL32N8xgDfGEtzco/lV9MYjctWZA4+U=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=VBRKPcqX/JaPGrEj1BXBVAJFPPa2Ymb/SPsNhcVKtUwQm458GgI/X0Gv4YRtUD9bv
-	 +fw87Qb2DqQ5zrZbWkWO59+EOYckfsRKTMpXtlHAXoSdMgeKLPR4vsJLdKhhnkG0XS
-	 VqFKM13VhqxqjZdKH28wHpVre9C68XK3UkEQlBXrqfftMWvUgXsX4S/E2Ck972Zfwa
-	 XA3IE3R1Izl93IguTTz559kn8jjfZlMtpIpxjwo41eINePyA3/q5BbbF17YX5UvGdd
-	 amxBqdVOSjvYEGNRKEfdhC4Ovo7sE08IUQsJlHYXzR3E0Vx8J5CCJdEKMCstUwZA6A
-	 Sbtar2vcyC9ew==
-Date: Wed, 26 Jul 2023 14:57:21 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Joe Perches <joe@perches.com>, Krzysztof Kozlowski
- <krzysztof.kozlowski@linaro.org>, geert@linux-m68k.org,
- gregkh@linuxfoundation.org, netdev@vger.kernel.org,
- workflows@vger.kernel.org, mario.limonciello@amd.com
-Subject: Re: [PATCH v2] scripts: get_maintainer: steer people away from
- using file paths
-Message-ID: <20230726145721.52a20cb7@kernel.org>
-In-Reply-To: <CAHk-=whZHcergYrraQGgazmOGMbuPsDfRMBXjFLo1aEQPqH2xQ@mail.gmail.com>
-References: <20230726151515.1650519-1-kuba@kernel.org>
-	<11ec5b3819ff17c7013348b766eab571eee5ca96.camel@perches.com>
-	<20230726092312.799503d6@kernel.org>
-	<CAHk-=wjEj2fGiaQXrYUZu65EPdgbGEAEMzch8LTtiUp6UveRCw@mail.gmail.com>
-	<20230726112031.61bd0c62@kernel.org>
-	<CAHk-=wi9MyyWmP_HAddLrmGfdANkut6_2f9hzv9HcyTBvg3+kA@mail.gmail.com>
-	<20230726114817.1bd52d48@kernel.org>
-	<CAHk-=wiuR7_A=PbN8jhmqGPJQHypUHR+W4-UuSVhOVWvYXs1Tg@mail.gmail.com>
-	<CAHk-=wh4pbrNZGqfV9u1urZr3Xjci=UV-MP+KneB6a5yo7-VOQ@mail.gmail.com>
-	<CAHk-=whCE9cWmTXu54WFQ7x-aH8n=dhCux2h49=pYN=14ybkxg@mail.gmail.com>
-	<20230726130318.099f96fc@kernel.org>
-	<CAHk-=wjfC4tFnOC0Lk_GcU4buf+X-Jv965pWg+kMRkDb6hX6mw@mail.gmail.com>
-	<20230726133648.54277d76@kernel.org>
-	<CAHk-=whZHcergYrraQGgazmOGMbuPsDfRMBXjFLo1aEQPqH2xQ@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 010431BF04
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 22:01:27 +0000 (UTC)
+Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D6B9211C
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 15:01:25 -0700 (PDT)
+Received: by mail-pl1-x630.google.com with SMTP id d9443c01a7336-1b9e9765f2cso1891865ad.3
+        for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 15:01:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1690408885; x=1691013685;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=jPO0lNo7EtBoDjUIbm+hlaYeLGktUlocDKNxXWN7Lq0=;
+        b=S0X6v/nU+OtqTGy0DKrTcfZRpBMq8PvQULDvv+538zevQb5LF3H4buERXwycGotJ2G
+         ZVhqO5greIxoROHL76Y9tkPMmfQpUr6i98/iAl3joH8orn3CrrOlwVFVNv4Ec/9Zz/1b
+         HUOMJd9UPeMGzVjhiCGdIN2s4RlTCjaTX3+rYz7tso2JpkX9hmZDOm3Dj7LV7C4iOO3W
+         cyhYv9An/A/5aju9TBIpPdYy/LUsayPtRj2OX/lo08XmJR/GwJuzB6vtg84SkKmCLs04
+         tkmS9q0d9FvjTyvnRUmAuCqul9FQaQxuF/30jA+Ret3MvQzGLUwz+b5Ve8+7gSxeD15f
+         4Owg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690408885; x=1691013685;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=jPO0lNo7EtBoDjUIbm+hlaYeLGktUlocDKNxXWN7Lq0=;
+        b=U82SJ9iv0g3o5ylIvWStXDEJCYok+AuwkhVKBrkxO3ZadX6hD5VEyXJvXnBszh+Im5
+         RHuypntoont/z3ExgHwOhl1NfrvcHTast/KNXyqkYM5ubGLic58B64PmswxvwyTYAyAl
+         fKtxdmGden68+F/rfbEIc8kr+sVmsW2ZRL1XeZKKSd2A/HNCzKVfwL/lx2yvemk1EPlC
+         pEQhiYLMJBEnEjc6lxJmrwGGVUCFT14Hh71Rc1g2t7ASvvA2ZNomAeI7Ve/q/seww4bp
+         213EBXreKjZs5kYqzKdy56GfV8oZY3WfKNlr0AO6uKQ6nquZW8ws+sXZ9baHb2kWdObQ
+         9vXw==
+X-Gm-Message-State: ABy/qLZp/exjhQirm/TCMC61wZriPyrlhUcr64J+atB12uJ189SbrJn1
+	qSvHWyRVpXFQVyUWBUBEgjPlvPvVVNQheSoXrYY=
+X-Google-Smtp-Source: APBJJlFyTYd1wmn4PepePwSBfDp8PILFtX8qsj9f/S8MPpDC0AuleVoaobP9eL5U4bFJ2Y5FO6th8J0c2dhtO4tJuW4=
+X-Received: by 2002:a17:90a:d155:b0:263:4685:f9a5 with SMTP id
+ t21-20020a17090ad15500b002634685f9a5mr2818107pjw.8.1690408884419; Wed, 26 Jul
+ 2023 15:01:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20230725162205.27526-1-donald.hunter@gmail.com>
+ <20230725162205.27526-3-donald.hunter@gmail.com> <20230726143709.791169dd@kernel.org>
+In-Reply-To: <20230726143709.791169dd@kernel.org>
+From: Donald Hunter <donald.hunter@gmail.com>
+Date: Wed, 26 Jul 2023 23:01:12 +0100
+Message-ID: <CAD4GDZw=CoHXbTn_AR1h2YUnn92K_JVj+ACAKH670PWRrJ+_pA@mail.gmail.com>
+Subject: Re: [PATCH net-next v1 2/3] tools/net/ynl: Add support for
+ netlink-raw families
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, donald.hunter@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Wed, 26 Jul 2023 14:07:28 -0700 Linus Torvalds wrote:
-> On Wed, 26 Jul 2023 at 13:36, Jakub Kicinski <kuba@kernel.org> wrote:
+On Wed, 26 Jul 2023 at 22:37, Jakub Kicinski <kuba@kernel.org> wrote:
+>
+> On Tue, 25 Jul 2023 17:22:04 +0100 Donald Hunter wrote:
+> > Refactor the ynl code to encapsulate protocol-family specifics into
+> > NetlinkProtocolFamily and GenlProtocolFamily.
+>
+> > +class SpecMcastGroup(SpecElement):
+> > +    """Netlink Multicast Group
+> > +
+> > +    Information about a multicast group.
+> > +
+> > +    Attributes:
+> > +        id        numerical id of this multicast group for netlink-raw
+> > +        yaml      raw spec as loaded from the spec file
+> > +    """
+> > +    def __init__(self, family, yaml):
+> > +        super().__init__(family, yaml)
+> > +        self.id = self.yaml.get('id')
+>
+> name, too?
+
+Ack.
+
+> > +        mcgs = self.yaml.get('mcast-groups')
+> > +        if mcgs:
+> > +            for elem in mcgs['list']:
+> > +                mcg = self.new_mcast_group(elem)
+> > +                self.mcast_groups[elem['name']] = mcg
+>
+> Could you factor out the mcgroup changes to a separate patch?
+
+Will do.
+
+> > diff --git a/tools/net/ynl/lib/ynl.py b/tools/net/ynl/lib/ynl.py
+> > index 3e2ade2194cd..7e877c43e10f 100644
+> > --- a/tools/net/ynl/lib/ynl.py
+> > +++ b/tools/net/ynl/lib/ynl.py
+> > @@ -25,6 +25,7 @@ class Netlink:
+> >      NETLINK_ADD_MEMBERSHIP = 1
+> >      NETLINK_CAP_ACK = 10
+> >      NETLINK_EXT_ACK = 11
+> > +    NETLINK_GET_STRICT_CHK = 12
 > >
-> > Just so I fully understand what you're saying - what do you expect me
-> > to do? Send the developer a notifications saying "please repost" with
-> > this CC list? How is that preferable to making them do it right the
-> > first time?!  
-> 
-> Not at all.
-> 
-> The whole point is that you already end up relying on scripting to
-> notice that some people should be cc'd, so just add them
-> automatically.
-> 
-> Why would you
-> 
->  (a) waste your own time asking the original developer to re-do his submission
-> 
->  (b) ask the original developer to do something that clearly long-time
-> developers don't do
-> 
->  (c) waste *everybody's* time re-submitting a change that was detected
-> automatically and could just have been done automatically in the first
-> place?
-> 
-> just make patchwork add the cc's automatically to the patch - and send
-> out emails to the people it added.
-> 
-> Patchwork already sends out emails for other things. Guess how I know?
-> Because I get the patchwork-bot emails all the time for things I have
-> been cc'd on.  Including, very much, the netdevbpf ones.
-> 
-> And people who don't want to be notified can already register with
-> patchwork to not be notified. It's right there in that
-> 
->    Deet-doot-dot, I am a bot.
->    https://korg.docs.kernel.org/patchwork/pwbot.html
-> 
-> footer.
-> 
-> So I would literally suggest you just stop asking people to do things
-> that automation CAN DO BETTER.
-> 
-> The patchwork notification could be just a small note (the same way
-> the pull request notes are) that point to the submission, and say
-> "your name has been added to the Cc for this patch because it claims
-> to fix something you authored or acked".
+> >      # Netlink message
+> >      NLMSG_ERROR = 2
+> > @@ -153,6 +154,21 @@ class NlAttr:
+> >              value[m.name] = decoded
+> >          return value
+> >
+> > +    @classmethod
+> > +    def decode_enum(cls, raw, attr_spec, consts):
+> > +        enum = consts[attr_spec['enum']]
+> > +        if 'enum-as-flags' in attr_spec and attr_spec['enum-as-flags']:
+> > +            i = 0
+> > +            value = set()
+> > +            while raw:
+> > +                if raw & 1:
+> > +                    value.add(enum.entries_by_val[i].name)
+> > +                raw >>= 1
+> > +                i += 1
+> > +        else:
+> > +            value = enum.entries_by_val[raw].name
+> > +        return value
+>
+> This doesn't always operates on netlink attributes, technically,
+> so how about we make it a standalone function, not a member of NlAttr?
+> Or should we move it to a parent class, NetlinkProtocolFamily?
 
-Lots of those will be false positives, and also I do not want 
-to sign up to maintain a bot which actively bothers people.
-And have every other subsystem replicate something of that nature.
+Fair point. I'll maybe go for standalone just now but will think on
+it some more first.
 
-Sidebar, but IMO we should work on lore to create a way to *subscribe*
-to patches based on paths without running any local agents. But if I
-can't explain how get_maintainers is misused I'm sure I'll have a lot
-of luck explaining that one :D
+>
+> > +    def decode_fixed_header(self, consts, op):
+> > +        fixed_header_members = consts[op.fixed_header].members
+> > +        self.fixed_header_attrs = dict()
+> > +        offset = 0
+> > +        for m in fixed_header_members:
+> > +            format = NlAttr.get_format(m.type, m.byte_order)
+> > +            [ value ] = format.unpack_from(self.raw, offset)
+> > +            offset += format.size
+> > +
+> > +            if m.enum:
+> > +                value = NlAttr.decode_enum(value, m, consts)
+> > +
+> > +            self.fixed_header_attrs[m.name] = value
+> > +        self.raw = self.raw[offset:]
+> > +
+> > +    def cmd(self):
+> > +        return self.nl_type
+>
+> And perhaps the pure code moves could be a separate patch for ease
+> of review?
 
-> See what I'm saying? Why are you wasting your time on this? Why are
-> you making new developers do pointless stuff that is better done by a
-> script, since you're just asking the developer to run a script in the
-> first place?
+Ack.
 
-For the last time, most people already run get_maintainer, they just 
-choose the wrong "mode" of running it for the use case.
-I am not trying to make anyone do anything they aren't already doing.
+> >      def __repr__(self):
+> >          msg = f"nl_len = {self.nl_len} ({len(self.raw)}) nl_flags = 0x{self.nl_flags:x} nl_type = {self.nl_type}\n"
+> >          if self.error:
+> > @@ -318,23 +353,21 @@ def _genl_load_families():
+> >
+> >
+> >  class GenlMsg:
+> > -    def __init__(self, nl_msg, fixed_header_members=[]):
+> > -        self.nl = nl_msg
+> > +    def __init__(self, nl_msg, ynl=None):
+> > +        self.genl_cmd, self.genl_version, _ = struct.unpack_from("BBH", nl_msg.raw, 0)
+> > +        nl_msg.raw = nl_msg.raw[4:]
+> >
+> > -        self.hdr = nl_msg.raw[0:4]
+> > -        offset = 4
+> > +        if ynl:
+> > +            op = ynl.rsp_by_value[self.genl_cmd]
+>
+> Took me a while to figure out why ynl gets passed here :S
+> I'm not sure what the best structure of inheritance is but
+> I think we should at the very least *not* call genl vs raw-nl
+> "family".
+>
+> NetlinkProtocolFamily -> NetlinkProtocol
+> GenlProtocolFamily -> GenlProtocol
 
-> You are just wasting literally EVERYBODY'S time with your workflow
-> rules. For no actual advantage, since the whole - and only - point of
-> this all was that it was scriptable, and is in fact already being
-> scripted, which is how you even notice the issue in the first place.
+Yeah, agreed. "Family" is way too overloaded already :-)
 
-And it has nothing to do with *my* workflow. Unless you're arguing 
-that asking for authors of patches which Fixes points to is part of
-"my" workflow and nobody else's.
+> and store them in YnlFamily to self.nlproto or self.protocol
+> or some such.
 
-> You seem to be just overly attached to having people waste their time
-> on running a script that you run automatically *anyway*, and make that
-> some "required thing for inexperienced developers".
+Ack. Just a note that I have been wondering about refactoring this
+from "YnlFamily is a Spec" to "Ynl has n Specs" so that we could do
+multi spec notification handling. If we did this, then passing a
+SpecContext around would look more natural maybe.
 
-I said "for the last time" so I won't repeat...
+> > +            if op.fixed_header:
+> > +                nl_msg.decode_fixed_header(ynl.consts, op)
+>
+> >      def _decode_binary(self, attr, attr_spec):
+> >          if attr_spec.struct_name:
+> >              members = self.consts[attr_spec.struct_name]
+> > -            decoded = attr.as_struct(members)
+> > +            decoded = attr.as_struct(members, self.consts)
+>
+> I applied the series on top of Arkadiusz's fixes and this line throws
+> an "as_struct takes 2 arguments, 3 given" exception.
 
-> And it can't even be the right thing to do, when experienced
-> developers don't do it.
+Ah, my bad. Looks like I missed a fix for that from the patchset.
 
-I explained to you already that Florian's posting is a PR.
+> >              for m in members:
+> >                  if m.enum:
+> >                       decoded[m.name] = self._decode_enum(decoded[m.name], m)
+>
 
