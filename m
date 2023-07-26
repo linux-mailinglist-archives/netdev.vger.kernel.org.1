@@ -1,297 +1,358 @@
-Return-Path: <netdev+bounces-21662-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21663-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F5D0764259
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 01:07:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2480B764262
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 01:09:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C3E1D1C21342
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 23:07:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4411F1C21342
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 23:09:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E088A940;
-	Wed, 26 Jul 2023 23:07:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED080A944;
+	Wed, 26 Jul 2023 23:09:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DEE81BEE4
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 23:07:36 +0000 (UTC)
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8E49272A
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 16:07:34 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d052f58b7deso237501276.2
-        for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 16:07:34 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB2EDA93A
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 23:09:50 +0000 (UTC)
+Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15B962720
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 16:09:47 -0700 (PDT)
+Received: by mail-pf1-x42f.google.com with SMTP id d2e1a72fcca58-6862842a028so327343b3a.0
+        for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 16:09:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690412854; x=1691017654;
-        h=content-transfer-encoding:cc:to:from:subject:message-id
-         :mime-version:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=W0mq6p9ERAh9KOULcmCjxmhnbV0tAeCG5WIuUCSe80A=;
-        b=bbpRFMbGmr2UwTuLkznNiooTXEnrrexv5G7TFKzMaa9qalKUMNt3+vGTZ2rMMHqIQR
-         kyaM55ANzFth2mO2x/SgCPoktrT4vuwRCDjqIoMTxJEeap37l9xFagDvvh5g5AvG40yC
-         VspJMGVZQH4EufToNIoG5DIwzBBlVmStB8XdNrOYaLQ6f2zjN7BDK3qOf5pO+jKCEWQL
-         ZGh08+lmbldQJjLDaAbhAvsX2LEBJWxWkl7LTYZTj7zTjqNZvT4QSc8DBr2sDyTnDW0L
-         ocIrseYMrrlN5Pd0t+tg6dIIACwd4waNfmVi1p+0cJ/oHEdmohIHTOvB3TxpEU5dx1LG
-         A2vw==
+        d=fromorbit-com.20221208.gappssmtp.com; s=20221208; t=1690412986; x=1691017786;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=bNBWi9BFA7oJZNyI/XnA5H8tHZCJl01gNE0DBxlvZ40=;
+        b=Lnuap/X4mLRvumv8rxik6XXAmLQssX2LaTRnfxOwbhhRA6q+4W8DfrIsG7kVikG4Iw
+         ozUx9bZZDKNb4aqqrWuoDs7rpphs2fFB4IjiULQPXjflO/XhZA2vc5TzngrkqmMIM5UL
+         tCjpn3hCX/GmJvs5MwDi73VFwiTs9hADB2Cru8fy0ICxuL68/fE/7pFEUcb8ihUp2Ey5
+         GxMGCc+rwQuZGeGguv2m2EFaBOeJPE6kWVGxSMJPh4gYWl2FbXQzGnA0u5AYkb1ckWFe
+         PYG7wUThiNHKJJU/Kftp/PqqvyLMK20NIq4IuXuyA0M1JDxZWj46ZkNyp0CVDzf4FlQ+
+         b/TA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690412854; x=1691017654;
-        h=content-transfer-encoding:cc:to:from:subject:message-id
-         :mime-version:date:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20221208; t=1690412986; x=1691017786;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=W0mq6p9ERAh9KOULcmCjxmhnbV0tAeCG5WIuUCSe80A=;
-        b=AxUtZgUsWkk3FzrC/AZmwzI518B1N3c7VWEQA3ONeHueg66N7pT7QlH3F8dD/Uylqp
-         dSbIsKLM1tvM8xRCJ43OvDSSUR2OtMBUAYCKliu9UFpWlgiLlWqAMRYe074SFUauM/QN
-         ofSksb3GrU7AMU4VEg/4zTbnSR4SmXPnvuMp1lyby42i76vMNPnxcqTWB3XN39bMBndr
-         DPgVDn1pVJmyX/3McJe7OsDjkMS63rUH9XMlVfWhA2TTm8a9CdtFrVFPErxBfNHaHFpm
-         GTqCAyFGK044eZohiA+iE80VtM4D71XZKOF5+FI0xp53ZjzlgtcXPuKpOu/eIjOw42Kj
-         xkXw==
-X-Gm-Message-State: ABy/qLZR2bcdTzw17NAtr+a+0NvBMCLyNRLx199k6O3tFmxLSuJ2U1z+
-	joH8lXa/oBSN2olVH+ndfcPiAMXicQ==
-X-Google-Smtp-Source: APBJJlEBhehJXqUhoJUx/TsD/JbXc1e/+F82kZoTckUUBuckwXjEutOTR1cG+n/yBUvtkrimxU0xq9HxyQ==
-X-Received: from prohr-desktop.mtv.corp.google.com ([2620:15c:211:200:5e5d:827a:19e1:949])
- (user=prohr job=sendgmr) by 2002:a25:734f:0:b0:d05:38ba:b616 with SMTP id
- o76-20020a25734f000000b00d0538bab616mr18485ybc.6.1690412854136; Wed, 26 Jul
- 2023 16:07:34 -0700 (PDT)
-Date: Wed, 26 Jul 2023 16:07:01 -0700
+        bh=bNBWi9BFA7oJZNyI/XnA5H8tHZCJl01gNE0DBxlvZ40=;
+        b=UN2abQsrIihRAxauFzXRZy3j1aGJC8tF6mGpgH+rFICPww6L71dNjtglCpdSa1VE7y
+         0BffmT5FaZnh8SOSvJlU0ZTi2wMJF3tq58trtu4VbCzrE2qCl+YjIQGdcK4D2/1SNkc8
+         U8nh+HKSA7+IlXyZImYs2xvse8GjvD/uyj8aRO+rBeP4KMEgTdgwVjhbYnBtzGrmmoCE
+         QhfSuCuy3tE4Ribot/zoK2bZ+5GhT4Z6MHpZgSefkpUndZBXP2pzWdiSj3OC9GQzpLW5
+         niFMKNeRhW4xpfsIl2DK3tMtsUDhoDWQK9IYW3PIiVuOk+fIV5tAAOux8rW1O5U2FWA0
+         fJLQ==
+X-Gm-Message-State: ABy/qLbLZXC9RZOwJKTXMUD7GrOg0PLzlrum9ZyxcJpzcNwUsNrLrcqh
+	OpsyBhJxiCgJcuM/e3HXT+jc7Q==
+X-Google-Smtp-Source: APBJJlHUt9d2hTqe2ud94c6lNUCrPn/cPviOHGLjkBp5h1xJnkt7lTpPKllT1sxo0CM9mi2vK7HwDA==
+X-Received: by 2002:a17:902:c10c:b0:1b8:b382:f6c3 with SMTP id 12-20020a170902c10c00b001b8b382f6c3mr2914213pli.13.1690412986476;
+        Wed, 26 Jul 2023 16:09:46 -0700 (PDT)
+Received: from dread.disaster.area (pa49-186-119-116.pa.vic.optusnet.com.au. [49.186.119.116])
+        by smtp.gmail.com with ESMTPSA id u9-20020a17090341c900b001ac95be5081sm58846ple.307.2023.07.26.16.09.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 Jul 2023 16:09:45 -0700 (PDT)
+Received: from dave by dread.disaster.area with local (Exim 4.96)
+	(envelope-from <david@fromorbit.com>)
+	id 1qOndW-00AvaD-0j;
+	Thu, 27 Jul 2023 09:09:42 +1000
+Date: Thu, 27 Jul 2023 09:09:42 +1000
+From: Dave Chinner <david@fromorbit.com>
+To: Qi Zheng <zhengqi.arch@bytedance.com>
+Cc: akpm@linux-foundation.org, tkhai@ya.ru, vbabka@suse.cz,
+	roman.gushchin@linux.dev, djwong@kernel.org, brauner@kernel.org,
+	paulmck@kernel.org, tytso@mit.edu, steven.price@arm.com,
+	cel@kernel.org, senozhatsky@chromium.org, yujie.liu@intel.com,
+	gregkh@linuxfoundation.org, muchun.song@linux.dev,
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org, x86@kernel.org,
+	kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
+	linux-erofs@lists.ozlabs.org,
+	linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
+	linux-nfs@vger.kernel.org, linux-mtd@lists.infradead.org,
+	rcu@vger.kernel.org, netdev@vger.kernel.org,
+	dri-devel@lists.freedesktop.org, linux-arm-msm@vger.kernel.org,
+	dm-devel@redhat.com, linux-raid@vger.kernel.org,
+	linux-bcache@vger.kernel.org,
+	virtualization@lists.linux-foundation.org,
+	linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
+	linux-xfs@vger.kernel.org, linux-btrfs@vger.kernel.org
+Subject: Re: [PATCH v2 44/47] mm: shrinker: make global slab shrink lockless
+Message-ID: <ZMGnthZAh48JF+eV@dread.disaster.area>
+References: <20230724094354.90817-1-zhengqi.arch@bytedance.com>
+ <20230724094354.90817-45-zhengqi.arch@bytedance.com>
+ <ZMDUkoIXUlTkCSYL@dread.disaster.area>
+ <19ad6d06-8a14-6102-5eae-2134dc2c5061@bytedance.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.41.0.487.g6d72f3e995-goog
-Message-ID: <20230726230701.919212-1-prohr@google.com>
-Subject: [net-next v2] net: change accept_ra_min_rtr_lft to affect all RA lifetimes
-From: Patrick Rohr <prohr@google.com>
-To: "David S . Miller" <davem@davemloft.net>
-Cc: Linux Network Development Mailing List <netdev@vger.kernel.org>, Patrick Rohr <prohr@google.com>, 
-	"=?UTF-8?q?Maciej=20=C5=BBenczykowski?=" <maze@google.com>, Lorenzo Colitti <lorenzo@google.com>, David Ahern <dsahern@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.6
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <19ad6d06-8a14-6102-5eae-2134dc2c5061@bytedance.com>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-accept_ra_min_rtr_lft only considered the lifetime of the default route
-and discarded entire RAs accordingly.
+On Wed, Jul 26, 2023 at 05:14:09PM +0800, Qi Zheng wrote:
+> On 2023/7/26 16:08, Dave Chinner wrote:
+> > On Mon, Jul 24, 2023 at 05:43:51PM +0800, Qi Zheng wrote:
+> > > @@ -122,6 +126,13 @@ void shrinker_free_non_registered(struct shrinker *shrinker);
+> > >   void shrinker_register(struct shrinker *shrinker);
+> > >   void shrinker_unregister(struct shrinker *shrinker);
+> > > +static inline bool shrinker_try_get(struct shrinker *shrinker)
+> > > +{
+> > > +	return READ_ONCE(shrinker->registered) &&
+> > > +	       refcount_inc_not_zero(&shrinker->refcount);
+> > > +}
+> > 
+> > Why do we care about shrinker->registered here? If we don't set
+> > the refcount to 1 until we have fully initialised everything, then
+> > the shrinker code can key entirely off the reference count and
+> > none of the lookup code needs to care about whether the shrinker is
+> > registered or not.
+> 
+> The purpose of checking shrinker->registered here is to stop running
+> shrinker after calling shrinker_free(), which can prevent the following
+> situations from happening:
+> 
+> CPU 0                 CPU 1
+> 
+> shrinker_try_get()
+> 
+>                        shrinker_try_get()
+> 
+> shrinker_put()
+> shrinker_try_get()
+>                        shrinker_put()
 
-This change renames accept_ra_min_rtr_lft to accept_ra_min_lft, and
-applies the value to individual RA sections; in particular, router
-lifetime, PIO preferred lifetime, and RIO lifetime. If any of those
-lifetimes are lower than the configured value, the specific RA section
-is ignored.
+I don't see any race here? What is wrong with having multiple active
+users at once?
 
-In order for the sysctl to be useful to Android, it should really apply
-to all lifetimes in the RA, since that is what determines the minimum
-frequency at which RAs must be processed by the kernel. Android uses
-hardware offloads to drop RAs for a fraction of the minimum of all
-lifetimes present in the RA (some networks have very frequent RAs (5s)
-with high lifetimes (2h)). Despite this, we have encountered networks
-that set the router lifetime to 30s which results in very frequent CPU
-wakeups. Instead of disabling IPv6 (and dropping IPv6 ethertype in the
-WiFi firmware) entirely on such networks, it seems better to ignore the
-misconfigured routers while still processing RAs from other IPv6 routers
-on the same network (i.e. to support IoT applications).
+> > 
+> > This should use a completion, then it is always safe under
+> > rcu_read_lock().  This also gets rid of the shrinker_lock spin lock,
+> > which only exists because we can't take a blocking lock under
+> > rcu_read_lock(). i.e:
+> > 
+> > 
+> > void shrinker_put(struct shrinker *shrinker)
+> > {
+> > 	if (refcount_dec_and_test(&shrinker->refcount))
+> > 		complete(&shrinker->done);
+> > }
+> > 
+> > void shrinker_free()
+> > {
+> > 	.....
+> > 	refcount_dec(&shrinker->refcount);
+> 
+> I guess what you mean is shrinker_put(), because here may be the last
+> refcount.
 
-The previous implementation dropped the entire RA based on router
-lifetime. This turned out to be hard to expand to the other lifetimes
-present in the RA in a consistent manner; dropping the entire RA based
-on RIO/PIO lifetimes would essentially require parsing the whole thing
-twice.
+Yes, I did.
 
-Fixes: 1671bcfd76fd ("net: add sysctl accept_ra_min_rtr_lft")
-Cc: Maciej =C5=BBenczykowski <maze@google.com>
-Cc: Lorenzo Colitti <lorenzo@google.com>
-Cc: David Ahern <dsahern@kernel.org>
-Signed-off-by: Patrick Rohr <prohr@google.com>
----
- Documentation/networking/ip-sysctl.rst |  8 ++++----
- include/linux/ipv6.h                   |  2 +-
- include/uapi/linux/ipv6.h              |  2 +-
- net/ipv6/addrconf.c                    | 14 ++++++++-----
- net/ipv6/ndisc.c                       | 27 +++++++++++---------------
- 5 files changed, 26 insertions(+), 27 deletions(-)
+> > 	wait_for_completion(&shrinker->done);
+> > 	/*
+> > 	 * lookups on the shrinker will now all fail as refcount has
+> > 	 * fallen to zero. We can now remove it from the lists and
+> > 	 * free it.
+> > 	 */
+> > 	down_write(shrinker_rwsem);
+> > 	list_del_rcu(&shrinker->list);
+> > 	up_write(&shrinker_rwsem);
+> > 	call_rcu(shrinker->rcu_head, shrinker_free_rcu_cb);
+> > }
+> > 
+> > ....
+> > 
+> > > @@ -686,11 +711,14 @@ EXPORT_SYMBOL(shrinker_free_non_registered);
+> > >   void shrinker_register(struct shrinker *shrinker)
+> > >   {
+> > > -	down_write(&shrinker_rwsem);
+> > > -	list_add_tail(&shrinker->list, &shrinker_list);
+> > > -	shrinker->flags |= SHRINKER_REGISTERED;
+> > > +	refcount_set(&shrinker->refcount, 1);
+> > > +
+> > > +	spin_lock(&shrinker_lock);
+> > > +	list_add_tail_rcu(&shrinker->list, &shrinker_list);
+> > > +	spin_unlock(&shrinker_lock);
+> > > +
+> > >   	shrinker_debugfs_add(shrinker);
+> > > -	up_write(&shrinker_rwsem);
+> > > +	WRITE_ONCE(shrinker->registered, true);
+> > >   }
+> > >   EXPORT_SYMBOL(shrinker_register);
+> > 
+> > This just looks wrong - you are trying to use WRITE_ONCE() as a
+> > release barrier to indicate that the shrinker is now set up fully.
+> > That's not necessary - the refcount is an atomic and along with the
+> > rcu locks they should provides all the barriers we need. i.e.
+> 
+> The reason I used WRITE_ONCE() here is because the shrinker->registered
+> will be read and written concurrently (read in shrinker_try_get() and
+> written in shrinker_free()), which is why I added shrinker::registered
+> field instead of using SHRINKER_REGISTERED flag (this can reduce the
+> addition of WRITE_ONCE()/READ_ONCE()).
 
-diff --git a/Documentation/networking/ip-sysctl.rst b/Documentation/network=
-ing/ip-sysctl.rst
-index 37603ad6126b..a66054d0763a 100644
---- a/Documentation/networking/ip-sysctl.rst
-+++ b/Documentation/networking/ip-sysctl.rst
-@@ -2288,11 +2288,11 @@ accept_ra_min_hop_limit - INTEGER
-=20
- 	Default: 1
-=20
--accept_ra_min_rtr_lft - INTEGER
--	Minimum acceptable router lifetime in Router Advertisement.
-+accept_ra_min_lft - INTEGER
-+	Minimum acceptable lifetime value in Router Advertisement.
-=20
--	RAs with a router lifetime less than this value shall be
--	ignored. RAs with a router lifetime of 0 are unaffected.
-+	RA sections with a lifetime less than this value shall be
-+	ignored. Zero lifetimes stay unaffected.
-=20
- 	Default: 0
-=20
-diff --git a/include/linux/ipv6.h b/include/linux/ipv6.h
-index 0295b47c10a3..5883551b1ee8 100644
---- a/include/linux/ipv6.h
-+++ b/include/linux/ipv6.h
-@@ -33,7 +33,7 @@ struct ipv6_devconf {
- 	__s32		accept_ra_defrtr;
- 	__u32		ra_defrtr_metric;
- 	__s32		accept_ra_min_hop_limit;
--	__s32		accept_ra_min_rtr_lft;
-+	__s32		accept_ra_min_lft;
- 	__s32		accept_ra_pinfo;
- 	__s32		ignore_routes_with_linkdown;
- #ifdef CONFIG_IPV6_ROUTER_PREF
-diff --git a/include/uapi/linux/ipv6.h b/include/uapi/linux/ipv6.h
-index 8b6bcbf6ed4a..cf592d7b630f 100644
---- a/include/uapi/linux/ipv6.h
-+++ b/include/uapi/linux/ipv6.h
-@@ -198,7 +198,7 @@ enum {
- 	DEVCONF_IOAM6_ID_WIDE,
- 	DEVCONF_NDISC_EVICT_NOCARRIER,
- 	DEVCONF_ACCEPT_UNTRACKED_NA,
--	DEVCONF_ACCEPT_RA_MIN_RTR_LFT,
-+	DEVCONF_ACCEPT_RA_MIN_LFT,
- 	DEVCONF_MAX
- };
-=20
-diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
-index 19eb4b3d26ea..7f7d2b677711 100644
---- a/net/ipv6/addrconf.c
-+++ b/net/ipv6/addrconf.c
-@@ -202,7 +202,7 @@ static struct ipv6_devconf ipv6_devconf __read_mostly =
-=3D {
- 	.ra_defrtr_metric	=3D IP6_RT_PRIO_USER,
- 	.accept_ra_from_local	=3D 0,
- 	.accept_ra_min_hop_limit=3D 1,
--	.accept_ra_min_rtr_lft	=3D 0,
-+	.accept_ra_min_lft	=3D 0,
- 	.accept_ra_pinfo	=3D 1,
- #ifdef CONFIG_IPV6_ROUTER_PREF
- 	.accept_ra_rtr_pref	=3D 1,
-@@ -263,7 +263,7 @@ static struct ipv6_devconf ipv6_devconf_dflt __read_mos=
-tly =3D {
- 	.ra_defrtr_metric	=3D IP6_RT_PRIO_USER,
- 	.accept_ra_from_local	=3D 0,
- 	.accept_ra_min_hop_limit=3D 1,
--	.accept_ra_min_rtr_lft	=3D 0,
-+	.accept_ra_min_lft	=3D 0,
- 	.accept_ra_pinfo	=3D 1,
- #ifdef CONFIG_IPV6_ROUTER_PREF
- 	.accept_ra_rtr_pref	=3D 1,
-@@ -2727,6 +2727,10 @@ void addrconf_prefix_rcv(struct net_device *dev, u8 =
-*opt, int len, bool sllao)
- 		return;
- 	}
-=20
-+	if (valid_lft !=3D 0 && valid_lft < in6_dev->cnf.accept_ra_min_lft) {
-+		return;
-+	}
-+
- 	/*
- 	 *	Two things going on here:
- 	 *	1) Add routes for on-link prefixes
-@@ -5598,7 +5602,7 @@ static inline void ipv6_store_devconf(struct ipv6_dev=
-conf *cnf,
- 	array[DEVCONF_IOAM6_ID_WIDE] =3D cnf->ioam6_id_wide;
- 	array[DEVCONF_NDISC_EVICT_NOCARRIER] =3D cnf->ndisc_evict_nocarrier;
- 	array[DEVCONF_ACCEPT_UNTRACKED_NA] =3D cnf->accept_untracked_na;
--	array[DEVCONF_ACCEPT_RA_MIN_RTR_LFT] =3D cnf->accept_ra_min_rtr_lft;
-+	array[DEVCONF_ACCEPT_RA_MIN_LFT] =3D cnf->accept_ra_min_lft;
- }
-=20
- static inline size_t inet6_ifla6_size(void)
-@@ -6793,8 +6797,8 @@ static const struct ctl_table addrconf_sysctl[] =3D {
- 		.proc_handler	=3D proc_dointvec,
- 	},
- 	{
--		.procname	=3D "accept_ra_min_rtr_lft",
--		.data		=3D &ipv6_devconf.accept_ra_min_rtr_lft,
-+		.procname	=3D "accept_ra_min_lft",
-+		.data		=3D &ipv6_devconf.accept_ra_min_lft,
- 		.maxlen		=3D sizeof(int),
- 		.mode		=3D 0644,
- 		.proc_handler	=3D proc_dointvec,
-diff --git a/net/ipv6/ndisc.c b/net/ipv6/ndisc.c
-index 29ddad1c1a2f..eeb60888187f 100644
---- a/net/ipv6/ndisc.c
-+++ b/net/ipv6/ndisc.c
-@@ -1280,8 +1280,6 @@ static enum skb_drop_reason ndisc_router_discovery(st=
-ruct sk_buff *skb)
- 	if (!ndisc_parse_options(skb->dev, opt, optlen, &ndopts))
- 		return SKB_DROP_REASON_IPV6_NDISC_BAD_OPTIONS;
-=20
--	lifetime =3D ntohs(ra_msg->icmph.icmp6_rt_lifetime);
--
- 	if (!ipv6_accept_ra(in6_dev)) {
- 		ND_PRINTK(2, info,
- 			  "RA: %s, did not accept ra for dev: %s\n",
-@@ -1289,13 +1287,6 @@ static enum skb_drop_reason ndisc_router_discovery(s=
-truct sk_buff *skb)
- 		goto skip_linkparms;
- 	}
-=20
--	if (lifetime !=3D 0 && lifetime < in6_dev->cnf.accept_ra_min_rtr_lft) {
--		ND_PRINTK(2, info,
--			  "RA: router lifetime (%ds) is too short: %s\n",
--			  lifetime, skb->dev->name);
--		goto skip_linkparms;
--	}
--
- #ifdef CONFIG_IPV6_NDISC_NODETYPE
- 	/* skip link-specific parameters from interior routers */
- 	if (skb->ndisc_nodetype =3D=3D NDISC_NODETYPE_NODEFAULT) {
-@@ -1336,6 +1327,14 @@ static enum skb_drop_reason ndisc_router_discovery(s=
-truct sk_buff *skb)
- 		goto skip_defrtr;
- 	}
-=20
-+	lifetime =3D ntohs(ra_msg->icmph.icmp6_rt_lifetime);
-+	if (lifetime !=3D 0 && lifetime < in6_dev->cnf.accept_ra_min_lft) {
-+		ND_PRINTK(2, info,
-+			  "RA: router lifetime (%ds) is too short: %s\n",
-+			  lifetime, skb->dev->name);
-+		goto skip_defrtr;
-+	}
-+
- 	/* Do not accept RA with source-addr found on local machine unless
- 	 * accept_ra_from_local is set to true.
- 	 */
-@@ -1499,13 +1498,6 @@ static enum skb_drop_reason ndisc_router_discovery(s=
-truct sk_buff *skb)
- 		goto out;
- 	}
-=20
--	if (lifetime !=3D 0 && lifetime < in6_dev->cnf.accept_ra_min_rtr_lft) {
--		ND_PRINTK(2, info,
--			  "RA: router lifetime (%ds) is too short: %s\n",
--			  lifetime, skb->dev->name);
--		goto out;
--	}
--
- #ifdef CONFIG_IPV6_ROUTE_INFO
- 	if (!in6_dev->cnf.accept_ra_from_local &&
- 	    ipv6_chk_addr(dev_net(in6_dev->dev), &ipv6_hdr(skb)->saddr,
-@@ -1530,6 +1522,9 @@ static enum skb_drop_reason ndisc_router_discovery(st=
-ruct sk_buff *skb)
- 			if (ri->prefix_len =3D=3D 0 &&
- 			    !in6_dev->cnf.accept_ra_defrtr)
- 				continue;
-+			if (ri->lifetime !=3D 0 &&
-+			    ntohl(ri->lifetime) < in6_dev->cnf.accept_ra_min_lft)
-+				continue;
- 			if (ri->prefix_len < in6_dev->cnf.accept_ra_rt_info_min_plen)
- 				continue;
- 			if (ri->prefix_len > in6_dev->cnf.accept_ra_rt_info_max_plen)
---=20
-2.41.0.487.g6d72f3e995-goog
+Using WRITE_ONCE/READ_ONCE doesn't provide memory barriers needed to
+use the field like this. You need release/acquire memory ordering
+here. i.e. smp_store_release()/smp_load_acquire().
 
+As it is, the refcount_inc_not_zero() provides a control dependency,
+as documented in include/linux/refcount.h, refcount_dec_and_test()
+provides release memory ordering. The only thing I think we may need
+is a write barrier before refcount_set(), such that if
+refcount_inc_not_zero() sees a non-zero value, it is guaranteed to
+see an initialised structure...
+
+i.e. refcounts provide all the existence and initialisation
+guarantees. Hence I don't see the need to use shrinker->registered
+like this and it can remain a bit flag protected by the
+shrinker_rwsem().
+
+
+> > void shrinker_register(struct shrinker *shrinker)
+> > {
+> > 	down_write(&shrinker_rwsem);
+> > 	list_add_tail_rcu(&shrinker->list, &shrinker_list);
+> > 	shrinker->flags |= SHRINKER_REGISTERED;
+> > 	shrinker_debugfs_add(shrinker);
+> > 	up_write(&shrinker_rwsem);
+> > 
+> > 	/*
+> > 	 * now the shrinker is fully set up, take the first
+> > 	 * reference to it to indicate that lookup operations are
+> > 	 * now allowed to use it via shrinker_try_get().
+> > 	 */
+> > 	refcount_set(&shrinker->refcount, 1);
+> > }
+> > 
+> > > diff --git a/mm/shrinker_debug.c b/mm/shrinker_debug.c
+> > > index f1becfd45853..c5573066adbf 100644
+> > > --- a/mm/shrinker_debug.c
+> > > +++ b/mm/shrinker_debug.c
+> > > @@ -5,6 +5,7 @@
+> > >   #include <linux/seq_file.h>
+> > >   #include <linux/shrinker.h>
+> > >   #include <linux/memcontrol.h>
+> > > +#include <linux/rculist.h>
+> > >   /* defined in vmscan.c */
+> > >   extern struct rw_semaphore shrinker_rwsem;
+> > > @@ -161,17 +162,21 @@ int shrinker_debugfs_add(struct shrinker *shrinker)
+> > >   {
+> > >   	struct dentry *entry;
+> > >   	char buf[128];
+> > > -	int id;
+> > > -
+> > > -	lockdep_assert_held(&shrinker_rwsem);
+> > > +	int id, ret = 0;
+> > >   	/* debugfs isn't initialized yet, add debugfs entries later. */
+> > >   	if (!shrinker_debugfs_root)
+> > >   		return 0;
+> > > +	down_write(&shrinker_rwsem);
+> > > +	if (shrinker->debugfs_entry)
+> > > +		goto fail;
+> > > +
+> > >   	id = ida_alloc(&shrinker_debugfs_ida, GFP_KERNEL);
+> > > -	if (id < 0)
+> > > -		return id;
+> > > +	if (id < 0) {
+> > > +		ret = id;
+> > > +		goto fail;
+> > > +	}
+> > >   	shrinker->debugfs_id = id;
+> > >   	snprintf(buf, sizeof(buf), "%s-%d", shrinker->name, id);
+> > > @@ -180,7 +185,8 @@ int shrinker_debugfs_add(struct shrinker *shrinker)
+> > >   	entry = debugfs_create_dir(buf, shrinker_debugfs_root);
+> > >   	if (IS_ERR(entry)) {
+> > >   		ida_free(&shrinker_debugfs_ida, id);
+> > > -		return PTR_ERR(entry);
+> > > +		ret = PTR_ERR(entry);
+> > > +		goto fail;
+> > >   	}
+> > >   	shrinker->debugfs_entry = entry;
+> > > @@ -188,7 +194,10 @@ int shrinker_debugfs_add(struct shrinker *shrinker)
+> > >   			    &shrinker_debugfs_count_fops);
+> > >   	debugfs_create_file("scan", 0220, entry, shrinker,
+> > >   			    &shrinker_debugfs_scan_fops);
+> > > -	return 0;
+> > > +
+> > > +fail:
+> > > +	up_write(&shrinker_rwsem);
+> > > +	return ret;
+> > >   }
+> > >   int shrinker_debugfs_rename(struct shrinker *shrinker, const char *fmt, ...)
+> > > @@ -243,6 +252,11 @@ struct dentry *shrinker_debugfs_detach(struct shrinker *shrinker,
+> > >   	shrinker->name = NULL;
+> > >   	*debugfs_id = entry ? shrinker->debugfs_id : -1;
+> > > +	/*
+> > > +	 * Ensure that shrinker->registered has been set to false before
+> > > +	 * shrinker->debugfs_entry is set to NULL.
+> > > +	 */
+> > > +	smp_wmb();
+> > >   	shrinker->debugfs_entry = NULL;
+> > >   	return entry;
+> > > @@ -266,14 +280,26 @@ static int __init shrinker_debugfs_init(void)
+> > >   	shrinker_debugfs_root = dentry;
+> > >   	/* Create debugfs entries for shrinkers registered at boot */
+> > > -	down_write(&shrinker_rwsem);
+> > > -	list_for_each_entry(shrinker, &shrinker_list, list)
+> > > +	rcu_read_lock();
+> > > +	list_for_each_entry_rcu(shrinker, &shrinker_list, list) {
+> > > +		if (!shrinker_try_get(shrinker))
+> > > +			continue;
+> > > +		rcu_read_unlock();
+> > > +
+> > >   		if (!shrinker->debugfs_entry) {
+> > > -			ret = shrinker_debugfs_add(shrinker);
+> > > -			if (ret)
+> > > -				break;
+> > > +			/* Paired with smp_wmb() in shrinker_debugfs_detach() */
+> > > +			smp_rmb();
+> > > +			if (READ_ONCE(shrinker->registered))
+> > > +				ret = shrinker_debugfs_add(shrinker);
+> > >   		}
+> > > -	up_write(&shrinker_rwsem);
+> > > +
+> > > +		rcu_read_lock();
+> > > +		shrinker_put(shrinker);
+> > > +
+> > > +		if (ret)
+> > > +			break;
+> > > +	}
+> > > +	rcu_read_unlock();
+> > >   	return ret;
+> > >   }
+> > 
+> > And all this churn and complexity can go away because the
+> > shrinker_rwsem is still used to protect shrinker_register()
+> > entirely....
+> 
+> My consideration is that during this process, there may be a
+> driver probe failure and then shrinker_free() is called (the
+> shrinker_debugfs_init() is called in late_initcall stage). In
+> this case, we need to use RCU+refcount to ensure that the shrinker
+> is not freed.
+
+Yeah, you're trying to work around the lack of a
+wait_for_completion() call in shrinker_free().
+
+With that, this doesn't need RCU at all, and the iteration can be
+done fully under the shrinker_rwsem() safely and so none of this
+code needs to change.
+
+Cheers,
+
+Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
 
