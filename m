@@ -1,130 +1,197 @@
-Return-Path: <netdev+bounces-21668-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21669-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93C7C7642B4
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 01:47:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C9357642B8
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 01:48:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 379F5282007
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 23:47:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 26BE3281ED2
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 23:48:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47A09DDCA;
-	Wed, 26 Jul 2023 23:47:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 026A5101F6;
+	Wed, 26 Jul 2023 23:47:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B18EDDCE
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 23:47:43 +0000 (UTC)
-Received: from mail-qv1-xf2c.google.com (mail-qv1-xf2c.google.com [IPv6:2607:f8b0:4864:20::f2c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95C26AA
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 16:47:42 -0700 (PDT)
-Received: by mail-qv1-xf2c.google.com with SMTP id 6a1803df08f44-63cf57c79b5so2791846d6.0
-        for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 16:47:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linuxfoundation.org; s=google; t=1690415261; x=1691020061;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=b2NTLb/puU8U6C4ofXhlTQlXpZUglV4pD0JYAgBXbl0=;
-        b=er1zrpYeIqGlzNrbH19Q6aMGuLmQQWTkL0L5MxIcF5ltPL3FTkYondsKru27rr5YST
-         odC8GsnYuWW417RCXirGSvREgx3bAR4weKKRv66/tqjy3QVATAOE/xAT/QALb/fFibev
-         xe2Gd6LOoDZ73xURnhSf+oV1bGTSauXHHfuMo=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690415261; x=1691020061;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=b2NTLb/puU8U6C4ofXhlTQlXpZUglV4pD0JYAgBXbl0=;
-        b=Ne1Sug0CoJwPi36TrlkVt0Be3urL8e2aETgTOkw1dKer2LMSi+TPSBZmZiFovfzDjL
-         k2koglGuNSMMU/MTvFobkIFkKJF5/0h8CQyxiV46wsEBXTBIb5BDSgwXJVjYcPrlwmCF
-         cQqHCtOGB2N+Umd2F8kby55vi3LOGHAUC559oolvbDmuwPSgowKw/2oksQbwX+9Ekk1w
-         lr/8k2XtU+bKUdzGMk7WKYdTGytddxvIbNc1Fe8SogVRNoCIFnQWdZmEeo2Cofl8IeV0
-         YNRSAyKaTbbwDtXeWWODuv+4+j8i1E1LYz3216px7JF8cJ+8yOk2/5pzCQ0nwYI/08Oq
-         kFGQ==
-X-Gm-Message-State: ABy/qLY1c2clhNepiXBzJLHbPTpy8UgtI8z0Bv0MP3XFOF+C01+0svrZ
-	vCo8dQFLQ4i8t1Eg7RiQyiBr9w==
-X-Google-Smtp-Source: APBJJlGCKembOaaHRK5Xt40R50gl2FC9xqA985Mdk/VdrxNGSAgyQc07IxqGLUBRm723Qx6jo99l6Q==
-X-Received: by 2002:a05:6214:d46:b0:636:2e7c:4955 with SMTP id 6-20020a0562140d4600b006362e7c4955mr4994336qvr.20.1690415261717;
-        Wed, 26 Jul 2023 16:47:41 -0700 (PDT)
-Received: from meerkat.local ([142.113.79.114])
-        by smtp.gmail.com with ESMTPSA id v6-20020a0c9c06000000b00623839cba8csm11576qve.44.2023.07.26.16.47.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Jul 2023 16:47:40 -0700 (PDT)
-Date: Wed, 26 Jul 2023 19:47:31 -0400
-From: Konstantin Ryabitsev <konstantin@linuxfoundation.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, 
-	Joe Perches <joe@perches.com>, Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, 
-	geert@linux-m68k.org, gregkh@linuxfoundation.org, netdev@vger.kernel.org, 
-	workflows@vger.kernel.org, mario.limonciello@amd.com
-Subject: Re: [PATCH v2] scripts: get_maintainer: steer people away from using
- file paths
-Message-ID: <20230726-june-mocha-ad6809@meerkat>
-References: <CAHk-=wi9MyyWmP_HAddLrmGfdANkut6_2f9hzv9HcyTBvg3+kA@mail.gmail.com>
- <20230726114817.1bd52d48@kernel.org>
- <CAHk-=wiuR7_A=PbN8jhmqGPJQHypUHR+W4-UuSVhOVWvYXs1Tg@mail.gmail.com>
- <CAHk-=wh4pbrNZGqfV9u1urZr3Xjci=UV-MP+KneB6a5yo7-VOQ@mail.gmail.com>
- <CAHk-=whCE9cWmTXu54WFQ7x-aH8n=dhCux2h49=pYN=14ybkxg@mail.gmail.com>
- <20230726130318.099f96fc@kernel.org>
- <CAHk-=wjfC4tFnOC0Lk_GcU4buf+X-Jv965pWg+kMRkDb6hX6mw@mail.gmail.com>
- <20230726133648.54277d76@kernel.org>
- <CAHk-=whZHcergYrraQGgazmOGMbuPsDfRMBXjFLo1aEQPqH2xQ@mail.gmail.com>
- <20230726145721.52a20cb7@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBF82DDCA
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 23:47:48 +0000 (UTC)
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F35BAA;
+	Wed, 26 Jul 2023 16:47:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1690415267; x=1721951267;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=b9UOzZVHUyoZOolVH4sgzZgNDeRsx2SzYjy5By3+dfY=;
+  b=dVub8iKZH5pox21J0MdsY+osfW02fF3Zhwe0d6vgm0/V4YoEjjWdy0EN
+   +j9eHi3sp6XQ+R/mczohBx5b70YSCSYM3vSSnNzgDpxWvAnmt0bLPQ5ip
+   3Jsravd1MKdnXxslw3dg/ErF9bmXFenuHPX42Fr+sNUaMGpLoCJTeMLQR
+   fysS7QWx35XsiYyY20g6tixNuTyL2MZYPYMrXiCuOwEAjCXhNo2GfoezQ
+   GpIrq0slUoDf7uQFmD540p4cb76AQxHcl03QfNsm4GgBNNHJfHkr1i4eN
+   cgH8wIlQ25KXtQ9Xq4As4GD0laKrggxhyof7NecjGWwVuzl80OtK0dewx
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10783"; a="348439894"
+X-IronPort-AV: E=Sophos;i="6.01,233,1684825200"; 
+   d="scan'208";a="348439894"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jul 2023 16:47:46 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10783"; a="792084731"
+X-IronPort-AV: E=Sophos;i="6.01,233,1684825200"; 
+   d="scan'208";a="792084731"
+Received: from lkp-server02.sh.intel.com (HELO 953e8cd98f7d) ([10.239.97.151])
+  by fmsmga008.fm.intel.com with ESMTP; 26 Jul 2023 16:47:39 -0700
+Received: from kbuild by 953e8cd98f7d with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1qOoEF-0001S6-0N;
+	Wed, 26 Jul 2023 23:47:39 +0000
+Date: Thu, 27 Jul 2023 07:47:34 +0800
+From: kernel test robot <lkp@intel.com>
+To: Ratheesh Kannoth <rkannoth@marvell.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, vladimir.oltean@nxp.com,
+	claudiu.manoil@nxp.com, alexandre.belloni@bootlin.com,
+	andrew@lunn.ch, f.fainelli@gmail.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	olteanv@gmail.com, michael.chan@broadcom.com, rajur@chelsio.com,
+	yisen.zhuang@huawei.com, salil.mehta@huawei.com,
+	jesse.brandeburg@intel.com, anthony.l.nguyen@intel.com,
+	sgoutham@marvell.com, gakula@marvell.com, sbhatta@marvell.com,
+	hkelam@marvell.com, taras.chornyi@plvision.eu, saeedm@nvidia.com,
+	leon@kernel.org, idosch@nvidia.com, petrm@nvidia.com,
+	horatiu.vultur@microchip.com, lars.povlsen@microchip.com,
+	Steen.Hegelund@microchip.com
+Subject: Re: [PATCH net-next] dissector: Use 64bits for used_keys
+Message-ID: <202307270742.fr5uXCME-lkp@intel.com>
+References: <20230726131223.1230526-1-rkannoth@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230726145721.52a20cb7@kernel.org>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+In-Reply-To: <20230726131223.1230526-1-rkannoth@marvell.com>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Jul 26, 2023 at 02:57:21PM -0700, Jakub Kicinski wrote:
-> > The patchwork notification could be just a small note (the same way
-> > the pull request notes are) that point to the submission, and say
-> > "your name has been added to the Cc for this patch because it claims
-> > to fix something you authored or acked".
-> 
-> Lots of those will be false positives, and also I do not want 
-> to sign up to maintain a bot which actively bothers people.
+Hi Ratheesh,
 
-I feel seen.
+kernel test robot noticed the following build warnings:
 
-> And have every other subsystem replicate something of that nature.
-> 
-> Sidebar, but IMO we should work on lore to create a way to *subscribe*
-> to patches based on paths without running any local agents. But if I
-> can't explain how get_maintainers is misused I'm sure I'll have a lot
-> of luck explaining that one :D
+[auto build test WARNING on net-next/main]
 
-I just need to get off my ass and implement this. We should be able to offer
-the following:
+url:    https://github.com/intel-lab-lkp/linux/commits/Ratheesh-Kannoth/dissector-Use-64bits-for-used_keys/20230726-211458
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20230726131223.1230526-1-rkannoth%40marvell.com
+patch subject: [PATCH net-next] dissector: Use 64bits for used_keys
+config: sparc-allyesconfig (https://download.01.org/0day-ci/archive/20230727/202307270742.fr5uXCME-lkp@intel.com/config)
+compiler: sparc64-linux-gcc (GCC) 12.3.0
+reproduce: (https://download.01.org/0day-ci/archive/20230727/202307270742.fr5uXCME-lkp@intel.com/reproduce)
 
-- subsystem maintainers come up with query language for what they want
-  to monitor (basically, whatever the query box of lore.kernel.org takes)
-- we maintain a bot that runs these queries and populates a public-inbox feed
-- this feed is available via read-only pop/imap/nntp (pull subscription)
-- it is also fed to a mailing list service (push subscription)
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202307270742.fr5uXCME-lkp@intel.com/
 
-The goal is to turn the tables -- instead of patch submitters needing to
-figure out where the patch needs to go (via get_maintainer or similar
-scripts), they just send everything to lkml or patches@lists.linux.dev and let
-the system figure out who needs to look at them.
+All warnings (new ones prefixed by >>):
 
-That's for the part that I was already planning to do. In addition, coming
-back to the topic of this thread, we could also look at individual patches
-hitting the feed, pass them through any desired configuration of
-get_maintainer.pl, and send them off any recipients not already cc'd by the
-patch author. I believe this is what you want to have in place, right, Jakub?
+   In file included from include/linux/device.h:15,
+                    from include/linux/acpi.h:14,
+                    from drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c:4:
+   drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c: In function 'hclge_parse_cls_flower':
+>> drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c:7325:43: warning: format '%lx' expects argument of type 'long unsigned int', but argument 3 has type 'long long unsigned int' [-Wformat=]
+    7325 |                 dev_err(&hdev->pdev->dev, "unsupported key set: %#lx\n",
+         |                                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/dev_printk.h:110:30: note: in definition of macro 'dev_printk_index_wrap'
+     110 |                 _p_func(dev, fmt, ##__VA_ARGS__);                       \
+         |                              ^~~
+   include/linux/dev_printk.h:144:56: note: in expansion of macro 'dev_fmt'
+     144 |         dev_printk_index_wrap(_dev_err, KERN_ERR, dev, dev_fmt(fmt), ##__VA_ARGS__)
+         |                                                        ^~~~~~~
+   drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c:7325:17: note: in expansion of macro 'dev_err'
+    7325 |                 dev_err(&hdev->pdev->dev, "unsupported key set: %#lx\n",
+         |                 ^~~~~~~
+   drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c:7325:68: note: format string is defined here
+    7325 |                 dev_err(&hdev->pdev->dev, "unsupported key set: %#lx\n",
+         |                                                                 ~~~^
+         |                                                                    |
+         |                                                                    long unsigned int
+         |                                                                 %#llx
+--
+   In file included from include/linux/printk.h:564,
+                    from include/asm-generic/bug.h:22,
+                    from arch/sparc/include/asm/bug.h:25,
+                    from include/linux/bug.h:5,
+                    from include/linux/refcount.h:96,
+                    from drivers/net/ethernet/mellanox/mlx5/core/en/tc/ct_fs_smfs.c:4:
+   drivers/net/ethernet/mellanox/mlx5/core/en/tc/ct_fs_smfs.c: In function 'mlx5_ct_fs_smfs_ct_validate_flow_rule':
+>> drivers/net/ethernet/mellanox/mlx5/core/en/tc/ct_fs_smfs.c:15:32: warning: format '%x' expects argument of type 'unsigned int', but argument 4 has type 'long long unsigned int' [-Wformat=]
+      15 |         netdev_dbg(fs->netdev, "ct_fs_smfs debug: " fmt "\n", ##args)
+         |                                ^~~~~~~~~~~~~~~~~~~~
+   include/linux/dynamic_debug.h:222:29: note: in definition of macro '__dynamic_func_call_cls'
+     222 |                 func(&id, ##__VA_ARGS__);                       \
+         |                             ^~~~~~~~~~~
+   include/linux/dynamic_debug.h:248:9: note: in expansion of macro '_dynamic_func_call_cls'
+     248 |         _dynamic_func_call_cls(_DPRINTK_CLASS_DFLT, fmt, func, ##__VA_ARGS__)
+         |         ^~~~~~~~~~~~~~~~~~~~~~
+   include/linux/dynamic_debug.h:275:9: note: in expansion of macro '_dynamic_func_call'
+     275 |         _dynamic_func_call(fmt, __dynamic_netdev_dbg,           \
+         |         ^~~~~~~~~~~~~~~~~~
+   include/net/net_debug.h:57:9: note: in expansion of macro 'dynamic_netdev_dbg'
+      57 |         dynamic_netdev_dbg(__dev, format, ##args);              \
+         |         ^~~~~~~~~~~~~~~~~~
+   drivers/net/ethernet/mellanox/mlx5/core/en/tc/ct_fs_smfs.c:15:9: note: in expansion of macro 'netdev_dbg'
+      15 |         netdev_dbg(fs->netdev, "ct_fs_smfs debug: " fmt "\n", ##args)
+         |         ^~~~~~~~~~
+   drivers/net/ethernet/mellanox/mlx5/core/en/tc/ct_fs_smfs.c:255:17: note: in expansion of macro 'ct_dbg'
+     255 |                 ct_dbg("rule uses unexpected dissectors (0x%016x)",
+         |                 ^~~~~~
 
--K
+
+vim +7325 drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
+
+  7309	
+  7310	static int hclge_parse_cls_flower(struct hclge_dev *hdev,
+  7311					  struct flow_cls_offload *cls_flower,
+  7312					  struct hclge_fd_rule *rule)
+  7313	{
+  7314		struct flow_rule *flow = flow_cls_offload_flow_rule(cls_flower);
+  7315		struct flow_dissector *dissector = flow->match.dissector;
+  7316	
+  7317		if (dissector->used_keys &
+  7318		    ~(BIT_ULL(FLOW_DISSECTOR_KEY_CONTROL) |
+  7319		      BIT_ULL(FLOW_DISSECTOR_KEY_BASIC) |
+  7320		      BIT_ULL(FLOW_DISSECTOR_KEY_ETH_ADDRS) |
+  7321		      BIT_ULL(FLOW_DISSECTOR_KEY_VLAN) |
+  7322		      BIT_ULL(FLOW_DISSECTOR_KEY_IPV4_ADDRS) |
+  7323		      BIT_ULL(FLOW_DISSECTOR_KEY_IPV6_ADDRS) |
+  7324		      BIT_ULL(FLOW_DISSECTOR_KEY_PORTS))) {
+> 7325			dev_err(&hdev->pdev->dev, "unsupported key set: %#lx\n",
+  7326				dissector->used_keys);
+  7327			return -EOPNOTSUPP;
+  7328		}
+  7329	
+  7330		hclge_get_cls_key_basic(flow, rule);
+  7331		hclge_get_cls_key_mac(flow, rule);
+  7332		hclge_get_cls_key_vlan(flow, rule);
+  7333		hclge_get_cls_key_ip(flow, rule);
+  7334		hclge_get_cls_key_port(flow, rule);
+  7335	
+  7336		return 0;
+  7337	}
+  7338	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
