@@ -1,88 +1,116 @@
-Return-Path: <netdev+bounces-21233-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21247-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D1EE762EF9
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 10:00:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 61FC5762FCF
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 10:27:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6D70E1C21126
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 08:00:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 929CE1C2112B
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 08:27:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A885947F;
-	Wed, 26 Jul 2023 08:00:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5487EAD2F;
+	Wed, 26 Jul 2023 08:27:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37AF39456
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 08:00:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id A0BB3C433CC;
-	Wed, 26 Jul 2023 08:00:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690358420;
-	bh=yWSdPYZf5W9vc3gmJ8AeUrtS+Dz7ZzMlfiBA1k/PSzI=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=j6JF2nTKGzruBY9zlzjprZUkOx05r/FtY7z9wG7MmFibR04VWBH3m9joSHdmdnUz+
-	 VT96uUaGn8z941+xreQmV0JVYbmr7FxFku8joWyNW/q+EG5Zw+AZuY6BBVw5oQmYKY
-	 yRuPtzf4yfIxPiuJpmzbTYujm4sWjXFUG5AJfoVUY6Q/k1KQXtlasn9mXQyicCTvJ3
-	 qW+Ypq/oFqjkiJycXY3jXqFw5oVhHysmf2bxRkvwsMK+3bXgJypiZxPF8pAGSkf1q2
-	 bwQJPLKNe/1OOkHTDYZbDk1lLNB/9MikhLZHI62nwZtB210MtHL+WkGeooqozOxAx7
-	 m1p8Ecyo52U7w==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 84EA5C691D7;
-	Wed, 26 Jul 2023 08:00:20 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45EDC4C99
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 08:27:24 +0000 (UTC)
+X-Greylist: delayed 1424 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 26 Jul 2023 01:27:22 PDT
+Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [IPv6:2001:780:45:1d:225:90ff:fe52:c662])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76D9B5266;
+	Wed, 26 Jul 2023 01:27:22 -0700 (PDT)
+Received: from [46.222.121.5] (port=4658 helo=gnumonks.org)
+	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <pablo@gnumonks.org>)
+	id 1qOZUY-005FWq-Qp; Wed, 26 Jul 2023 10:03:33 +0200
+Date: Wed, 26 Jul 2023 10:03:28 +0200
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Ian Kumlien <ian.kumlien@gmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	Linux Kernel Network Developers <netdev@vger.kernel.org>,
+	netfilter-devel@vger.kernel.org
+Subject: Re: Kernel oops with 6.4.4 - flow offloads - NULL pointer deref
+Message-ID: <ZMDTUHlPmns/85Kk@calendula>
+References: <CAA85sZsTF21va8HhwrJc_yuVgVU6+dppEd-SdQpDjqLNFtcneQ@mail.gmail.com>
+ <20230724142415.03a9d133@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [net PATCH 1/4] net: dsa: qca8k: enable use_single_write for qca8xxx
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169035842054.6334.15739257039093388104.git-patchwork-notify@kernel.org>
-Date: Wed, 26 Jul 2023 08:00:20 +0000
-References: <20230724032531.15998-1-ansuelsmth@gmail.com>
-In-Reply-To: <20230724032531.15998-1-ansuelsmth@gmail.com>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: andrew@lunn.ch, f.fainelli@gmail.com, olteanv@gmail.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- hi@atinb.me, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- broonie@kernel.org, stable@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20230724142415.03a9d133@kernel.org>
+X-Spam-Score: -1.9 (-)
+X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
+Hi,
 
-This series was applied to netdev/net.git (main)
-by David S. Miller <davem@davemloft.net>:
+On Mon, Jul 24, 2023 at 02:24:15PM -0700, Jakub Kicinski wrote:
+> Adding netfilter to CC.
+>
+> On Sun, 23 Jul 2023 16:44:50 +0200 Ian Kumlien wrote:
+> > Running vanilla 6.4.4 with cherry picked:
+> > https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?h=v6.4.5&id=7a59f29961cf97b98b02acaadf5a0b1f8dde938c
+> >
+[...]
+> > [108431.305700] RSP: 0018:ffffac250ade7e28 EFLAGS: 00010206
+> > [108431.311107] RAX: 0000000000000081 RBX: ffff9ebc413b42f8 RCX:
+> > 0000000000000001
+> > [108431.318420] RDX: 00000001067200c0 RSI: ffff9ebeda71ce58 RDI:
+> > ffff9ebeda71ce58
+> > [108431.325735] RBP: ffff9ebc413b4250 R08: ffff9ebc413b4250 R09:
+> > ffff9ebe3d7fad58
+> > [108431.333068] R10: 0000000000000000 R11: 0000000000000003 R12:
+> > ffff9ebfafab0000
+> > [108431.340415] R13: 0000000000000000 R14: ffff9ebfafab0005 R15:
+> > ffff9ebd79a0f780
+> > [108431.347764] FS:  0000000000000000(0000) GS:ffff9ebfafa80000(0000)
+> > knlGS:0000000000000000
+> > [108431.356069] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> > [108431.362012] CR2: 0000000000000081 CR3: 000000045e99e000 CR4:
+> > 00000000003526e0
+> > [108431.369361] Call Trace:
+> > [108431.371999]  <TASK>
+> > [108431.374296] ? __die (arch/x86/kernel/dumpstack.c:421
+> > arch/x86/kernel/dumpstack.c:434)
+> > [108431.377553] ? page_fault_oops (arch/x86/mm/fault.c:707)
+> > [108431.381850] ? load_balance (kernel/sched/fair.c:10926)
+> > [108431.385884] ? exc_page_fault (arch/x86/mm/fault.c:1279
+> > arch/x86/mm/fault.c:1486 arch/x86/mm/fault.c:1542)
+> > [108431.390094] ? asm_exc_page_fault (./arch/x86/include/asm/idtentry.h:570)
+> > [108431.394482] ? flow_offload_teardown
+> > (./arch/x86/include/asm/bitops.h:75
+> > ./include/asm-generic/bitops/instrumented-atomic.h:42
+> > net/netfilter/nf_flow_table_core.c:362)
+> > [108431.399036] nf_flow_offload_gc_step
+> > (./arch/x86/include/asm/bitops.h:207
+> > ./arch/x86/include/asm/bitops.h:239
+> > ./include/asm-generic/bitops/instrumented-non-atomic.h:142
+> > net/netfilter/nf_flow_table_core.c:436)
 
-On Mon, 24 Jul 2023 05:25:28 +0200 you wrote:
-> The qca8xxx switch supports 2 way to write reg values, a slow way using
-> mdio and a fast way by sending specially crafted mgmt packet to
-> read/write reg.
-> 
-> The fast way can support up to 32 bytes of data as eth packet are used
-> to send/receive.
-> 
-> [...]
+This crash points here.
 
-Here is the summary with links:
-  - [net,1/4] net: dsa: qca8k: enable use_single_write for qca8xxx
-    https://git.kernel.org/netdev/net/c/2c39dd025da4
-  - [net,2/4] net: dsa: qca8k: fix search_and_insert wrong handling of new rule
-    https://git.kernel.org/netdev/net/c/80248d416089
-  - [net,3/4] net: dsa: qca8k: fix broken search_and_del
-    https://git.kernel.org/netdev/net/c/ae70dcb9d9ec
-  - [net,4/4] net: dsa: qca8k: fix mdb add/del case with 0 VID
-    https://git.kernel.org/netdev/net/c/dfd739f182b0
+static void nf_flow_offload_gc_step(struct nf_flowtable *flow_table,
+                                    struct flow_offload *flow, void *data)
+{
+        if (nf_flow_has_expired(flow) ||
+            nf_ct_is_dying(flow->ct) ||
+            nf_flow_is_outdated(flow))
+                flow_offload_teardown(flow);
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+        if (test_bit(NF_FLOW_TEARDOWN, &flow->flags)) { <--
 
+Is this always reproducible on your testbed?
 
+Thanks.
 
