@@ -1,96 +1,99 @@
-Return-Path: <netdev+bounces-21342-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21346-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A20C4763594
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 13:48:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F9017635A2
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 13:51:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D2B751C2125A
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 11:48:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 786A21C21236
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 11:51:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7734CAD30;
-	Wed, 26 Jul 2023 11:48:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E371BA50;
+	Wed, 26 Jul 2023 11:51:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4773E8466
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 11:48:41 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E39E5C433C7;
-	Wed, 26 Jul 2023 11:48:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690372121;
-	bh=eZG9v0oZO9uEfsEIeSuInQVaRCDGDxegAVVDWaK0lZU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=FO/McMF4qjCJ/ZEnvhx0ROGZLqNZRvkrnD/QyR5ni2dYbxz78blKyECZOeUSmTOYl
-	 p/Bd0GGnU4Hq+WBUscxgIngIdoLN8Cfzw4quDBiosVJsARc4iSDKujlP6LM7yu8OEb
-	 P0niNcp41mrQ7Is4Ri8H1gOTNcuIvI4M3voLzyhOpYoBtC4mw8Cn1MKcR79mjPF897
-	 GCChIgLoqO3+kyWIV1LIkpTvQaBUE0/Kx6wiGjZ+tnSzW/YgClnDFO/TWSExNbOMJA
-	 yg3yBBatxEnLBnr73eu6OgGvpori4tpJr/Aop2PkwBIJ1fUfwXkQwvFfLxAg+uHulF
-	 zkrVjB6xThYWQ==
-Date: Wed, 26 Jul 2023 14:48:36 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Suman Ghosh <sumang@marvell.com>
-Cc: sgoutham@marvell.com, gakula@marvell.com, sbhatta@marvell.com,
-	hkelam@marvell.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, lcherian@marvell.com,
-	jerinj@marvell.com
-Subject: Re: [net-next PATCH] octeontx2-af: Tc flower offload support for
- inner VLAN
-Message-ID: <20230726114836.GU11388@unreal>
-References: <20230725103442.2749183-1-sumang@marvell.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42410BE5E
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 11:51:24 +0000 (UTC)
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C7F12707
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 04:51:10 -0700 (PDT)
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-23-n_gsjf-cO9y4kYTHGY7s8A-1; Wed, 26 Jul 2023 12:51:08 +0100
+X-MC-Unique: n_gsjf-cO9y4kYTHGY7s8A-1
+Received: from AcuMS.Aculab.com (10.202.163.4) by AcuMS.aculab.com
+ (10.202.163.4) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Wed, 26 Jul
+ 2023 12:51:06 +0100
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.048; Wed, 26 Jul 2023 12:51:06 +0100
+From: David Laight <David.Laight@ACULAB.COM>
+To: "willemdebruijn.kernel@gmail.com" <willemdebruijn.kernel@gmail.com>,
+	"davem@davemloft.net" <davem@davemloft.net>, "dsahern@kernel.org"
+	<dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, "kuba@kernel.org"
+	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: [PATCH 0/2] udp: rescan hash2 list if chains crossed.
+Thread-Topic: [PATCH 0/2] udp: rescan hash2 list if chains crossed.
+Thread-Index: Adm/tzLjTa0Xped3QGK8HLejyxiyjQ==
+Date: Wed, 26 Jul 2023 11:51:06 +0000
+Message-ID: <fbcaa54791cd44999de5fec7c6cf0b3c@AcuMS.aculab.com>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230725103442.2749183-1-sumang@marvell.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Tue, Jul 25, 2023 at 04:04:42PM +0530, Suman Ghosh wrote:
-> This patch extends current TC flower offload support to allow filters
-> involving inner VLAN matching, to be offloaded to HW.
-> 
-> Example command:
-> tc filter add dev eth2 protocol 802.1AD parent ffff: flower vlan_id 10
-> vlan_ethtype 802.1Q cvlan_id 20 skip_sw action drop
-> 
-> Signed-off-by: Suman Ghosh <sumang@marvell.com>
-> ---
->  .../net/ethernet/marvell/octeontx2/af/mbox.h  |   1 +
->  .../net/ethernet/marvell/octeontx2/af/npc.h   |   3 +
->  .../marvell/octeontx2/af/rvu_debugfs.c        |   5 +
->  .../marvell/octeontx2/af/rvu_npc_fs.c         |  13 +++
->  .../ethernet/marvell/octeontx2/nic/otx2_tc.c  | 106 +++++++++++-------
->  5 files changed, 90 insertions(+), 38 deletions(-)
+Commit ca065d0cf80fa removed the rescan of the hash2 list (local
+address + local port) during udp receive if the final socket
+wasn't on the expected hash chain.
 
-<...>
+While unusual, udp sockets can get rehashed (and without an rcu
+delay) without this rescan received packets can generate an unexpected
+ICMP port unreachable instead of being delivered to a local socket.
 
-> +	if (!is_inner)
-> +		flow_rule_match_vlan(rule, &match);
-> +	else
-> +		flow_rule_match_cvlan(rule, &match);
+The rescan could be checked for every socket, but the chances of
+the hash chain being diverted twice and ending up in the correct
+list is pretty minimal.
 
-<...>
+This is the 'smoking gun' for some ICMP port unreachable messages
+being received on long-lived UDP sockets on 127.0.0.1.
+The failures are rare and being seen on AWS - so it is pretty
+impossible to test the patch.
 
-> +		if (!is_inner) {
-> +			flow_spec->vlan_tci = htons(vlan_tci);
-> +			flow_mask->vlan_tci = htons(vlan_tci_mask);
-> +			req->features |= BIT_ULL(NPC_OUTER_VID);
-> +		} else {
-> +			flow_spec->vlan_itci = htons(vlan_tci);
-> +			flow_mask->vlan_itci = htons(vlan_tci_mask);
-> +			req->features |= BIT_ULL(NPC_INNER_VID);
-> +		}
+David Laight (2):
+  Move hash calculation inside udp4_lib_lookup2()
+  Rescan the hash2 list if the hash chains have got cross-linked.
 
-Slightly better approach will be to reverse these checks from
-"if (!is_inner)" to be "f (is_inner)".
+ net/ipv4/udp.c | 36 +++++++++++++++++++++++-------------
+ 1 file changed, 23 insertions(+), 13 deletions(-)
 
-Other than that,
-Reviewed-by: Leon Romanovsky <leonro@nvidia.com>
+--=20
+2.17.1
+
+-
+Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1=
+PT, UK
+Registration No: 1397386 (Wales)
+
 
