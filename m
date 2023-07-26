@@ -1,175 +1,544 @@
-Return-Path: <netdev+bounces-21278-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21279-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E672763133
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 11:07:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC49C76316D
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 11:14:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8FEBE1C2119A
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 09:07:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 732A4281CC7
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 09:14:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7B73AD54;
-	Wed, 26 Jul 2023 09:06:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 556B0BA28;
+	Wed, 26 Jul 2023 09:14:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94C4FBA2B
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 09:06:59 +0000 (UTC)
-Received: from EUR01-HE1-obe.outbound.protection.outlook.com (mail-he1eur01on2053.outbound.protection.outlook.com [40.107.13.53])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 639103A89;
-	Wed, 26 Jul 2023 02:06:22 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=hamM460N4oKqWbbOBRnWblzSOYnjUzAIGc4KCu48mxfeEpNNdw4HKqagn6V6Enf747XpjlZWXHbF25WbHO4juNIQ3qF9JVJm5ClFNGhPAfgW9V1EZlNq5G2+xub0VWMNQhfl6xLmh/DJuR+6msqJZvoWTHGQK3htWwLsNuNralof76d3IKGlJF/cpcIBaeBAjLZB45NWtXX5XbCcIjmVVokRd828gfas8ielmzE10ayfzG3LOt6nZFx0ahU78aAhS9KnQvUA8YOkgAFmiXnWkRsfaZPqF+3ni8kiZinyXzvHDbgBaiki21Qj2m+pp3O0UXFGhauAoqywYT/v88PEvw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=AM8ezf1mfsTBAcluUcy9r5HSykVDS01DHMSVGLkGRPc=;
- b=UqVnZHQK7nZReYApzQGRjaZpNuQZY4O2ghcqBtT1Rbpvg+U5qULPTVnl03nIkja6oHh9CxPdM4CP40llnfVcomIPtP4UDx68lDiEQ2FT52S/rUazJOdZB9ukYGOW2YS8NbSM+UJHQ7wB3Hx6rYQUajhI7iuGDlt7Y4n5oR6/LT1JphPP3yz+GKHgQdxs9kucczggnKx0gjf/JWteWZYf3h6O5Lxk4Vy+ymGRvrWKMzyHdrsxjpcrTiKGbiIgaj+b3Qs53ytCvwrKIS8HrAeCxowGG0BY34kuV6QkDZFnmfq0quQVxVzYSYkVY+hQryXKBvG0Z3PqaoB0/QKKCtttpQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=AM8ezf1mfsTBAcluUcy9r5HSykVDS01DHMSVGLkGRPc=;
- b=AsV+BOuVC4q8sh7eTUKlI6gKf8jVjyChTmxm8hmTNh0E6KY8unsshrQyZzHSUaHSpl8JeFFDzmL1oFN7MZFlhJYMXHDBcdMyGvjWNwSwn6ZlyvqhAH/uPx5R0sJU0RidfpR1eGocTUBcQljBu+BtrOM5lMdQjNzT8nisZWDAhW4=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from DB7PR04MB4010.eurprd04.prod.outlook.com (2603:10a6:5:21::30) by
- VI1PR04MB7056.eurprd04.prod.outlook.com (2603:10a6:800:12c::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.31; Wed, 26 Jul
- 2023 09:05:40 +0000
-Received: from DB7PR04MB4010.eurprd04.prod.outlook.com
- ([fe80::d73c:e747:3911:dcc]) by DB7PR04MB4010.eurprd04.prod.outlook.com
- ([fe80::d73c:e747:3911:dcc%5]) with mapi id 15.20.6631.026; Wed, 26 Jul 2023
- 09:05:40 +0000
-From: haibo.chen@nxp.com
-To: robh+dt@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org,
-	conor+dt@kernel.org,
-	shawnguo@kernel.org,
-	s.hauer@pengutronix.de,
-	wg@grandegger.com,
-	mkl@pengutronix.de
-Cc: kernel@pengutronix.de,
-	linux-imx@nxp.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	haibo.chen@nxp.com,
-	devicetree@vger.kernel.org,
-	linux-can@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH v2 3/3] can: flexcan: lack of stop mode dts properity should not block driver probe
-Date: Wed, 26 Jul 2023 17:09:09 +0800
-Message-Id: <20230726090909.3417030-3-haibo.chen@nxp.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230726090909.3417030-1-haibo.chen@nxp.com>
-References: <20230726090909.3417030-1-haibo.chen@nxp.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SI2P153CA0007.APCP153.PROD.OUTLOOK.COM (2603:1096:4:140::8)
- To DB7PR04MB4010.eurprd04.prod.outlook.com (2603:10a6:5:21::30)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 434E4AD51
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 09:14:54 +0000 (UTC)
+Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5216A4696
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 02:14:25 -0700 (PDT)
+Received: by mail-pf1-x434.google.com with SMTP id d2e1a72fcca58-6862d4a1376so1658099b3a.0
+        for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 02:14:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1690362865; x=1690967665;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=/CEWWslQ6JRIcxWLpzXErjeuLKPqXLpeeNrG0RittG0=;
+        b=I3KXDVsNZkZkuHySHT+7GWxUFOEURGUG8DKW/uSkEUX9NAh5BxZruCb6I7dMvZVAZp
+         gsbdGCxz8Ek9MEWYKBET899voNBoDRWjZhWTGqOkdiqJvYMIu89z6Y9ah3jNNgYJvmXe
+         Ynyibhx5k2BqOJ8kTOB1j8+dHCtoSqjccCQyKrRToAfOvHIxUPGvJI4XwsvGDIJs06k4
+         8UkoomoCP1d/we1vQJY/HKL4Ldc1XzpJ76adbBgaJNhbNz340Yq4eG/RdHVXX03WkC40
+         lRLRDZ4CrOQxHgzNE8n8ymMoEoXG0N/DL2iV7w9wV2y2yTzS9rwi2nR608KOVDSDoCfD
+         iYbg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690362865; x=1690967665;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=/CEWWslQ6JRIcxWLpzXErjeuLKPqXLpeeNrG0RittG0=;
+        b=dh7yRQV1PCsfd2uN/T35wzSamz2kJRjOrFMnlW6owgtSVxuU84sNWbsxxsSk0WYG/T
+         BkvcCC7tv/l2bzAezX/p0EnkV581rMEcwnOeWb59PRYGpI/SprQjsab+ZpvaMKSohZXx
+         CK2kvqrxLQEV84gTY6JV+QGJu06pPxf72O/eQEh/Y46tlvCFufkfwhQYAWbqVZOmaZTu
+         2JHkJ+YADG1OIMq0nVo0dMWLNAvkGU/LvGr6BNmNUgAlkyBg7XoYAksYUwVgVZY386uz
+         UTCul+Grm7Md7hixwJrMKVRysYfmVUFz49k8UiCRuU01ULeFCj8wiEHitYAQB5QQPY4X
+         LWuQ==
+X-Gm-Message-State: ABy/qLZu+EkaZCEmc+pxb8jryrCeyU6dmJy8QuZBNRIWEpr/W9SoQA+4
+	cI+7pzyUlecXe4jOz031QsDzKQ==
+X-Google-Smtp-Source: APBJJlGoXxnnO1iRfxB9PGRuwMGmdgeETCuWP6k42EmfJJj8AnwarjYqC2btd9IS9Qo2Ingl4K7QKw==
+X-Received: by 2002:aa7:8615:0:b0:681:9fe0:b543 with SMTP id p21-20020aa78615000000b006819fe0b543mr1640368pfn.2.1690362864530;
+        Wed, 26 Jul 2023 02:14:24 -0700 (PDT)
+Received: from [10.70.252.135] ([203.208.167.147])
+        by smtp.gmail.com with ESMTPSA id f13-20020aa78b0d000000b006815fbe3245sm10999998pfd.37.2023.07.26.02.14.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 26 Jul 2023 02:14:24 -0700 (PDT)
+Message-ID: <19ad6d06-8a14-6102-5eae-2134dc2c5061@bytedance.com>
+Date: Wed, 26 Jul 2023 17:14:09 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DB7PR04MB4010:EE_|VI1PR04MB7056:EE_
-X-MS-Office365-Filtering-Correlation-Id: 935170e0-bd15-47f8-e939-08db8db77c06
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	+pJRkkk6ttoK2Owi3dB4vowZsi08h/db+BNk2QUvwhJBl2qfnBeHeTPmPpcsJBDaoEIc9YphjTlFuRRfEkZAUswXnrHkFB8GNNyqPCQBDyeG9DbWK26lj4nRofvJ/fUBkRKebGvQqxRuRsMj5l1AKggTaBxxVbfPS0WVPESrDwiabUaTcNb2rkBjcCgR+qv7XxH59TrPgiTl7+eWJp1ETpnj5eq9TbOlrOuH/luEKjMhyZfuUqR/1NV13Wi1aLiWMyiFv3WawKpaaTYlge+P3LEePqyjWW9edDe/MU7hmju9uUhC/Qvn7KNGMzITJ27SMSQ1veANNUnIF/Ns1BiobGNhVGXQpcTN7UonPfePMWMPp1WE2W7QgaTH8uOTT4bUIlJE+q5p1R2YOyn9E9AMiG0evVRJZ2lgpHbVzgK70HYOPhC7sLV/dy9IIJvurWWLA96W86dwBS8riu680lEQy9FeRteqLeDs7CJkxJqf4AnJ0j+rscIuDh9z49TY0kF+lLjj+DEL9SAwQgMC7f+v3NImWphbIjBg1MRJCs/dSMW/1Twydn5SPdZg/CJ30aIRnZd6Z2kY5Gl8nFzSeqPclfg8Dw21SvuLu6BOf2AiKty4aFBlgKz+JSaXnD6iCCMb
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DB7PR04MB4010.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(366004)(136003)(376002)(396003)(346002)(451199021)(6486002)(52116002)(6512007)(9686003)(6666004)(478600001)(83380400001)(86362001)(36756003)(2906002)(186003)(38350700002)(6506007)(2616005)(26005)(1076003)(66476007)(38100700002)(316002)(8676002)(41300700001)(4326008)(66946007)(5660300002)(8936002)(66556008)(7416002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?sJaarLdx9m2On/o9X48wDpgjaNeGhGTgKq/WRktOJ5b5eN4VYiQIbHalZwct?=
- =?us-ascii?Q?C18/Mw4xijbrx/WMaT6Tluj0TooKXQMAH8MPAC2tKbgj41Xb4K7Qp8tFWVX5?=
- =?us-ascii?Q?aW8h2ujWw0zmpuYpVwAyx36bmSABl3aDBj3RasRNCkc67cy4T4gw2QfLrFDc?=
- =?us-ascii?Q?cgx3sKQsK+DHVaryAwjPHsXrZtskH5egT7kyDWUWUVKtzVtearEy7xJj59kG?=
- =?us-ascii?Q?KCu9Bp7DJVQ5GSn/Zs4dvrFXPRoJTYTDv1KzAmiIpD2Fuq/nkJbqLYWGlccR?=
- =?us-ascii?Q?BMEXyaDFax6Q7lMjPVc431lC2SMscOm80EdomppMz8sfUPv+dQUWslAkOmLh?=
- =?us-ascii?Q?ey/kPdBiAodJTZTcM5MDy0HjAywoqTVQ9+ADx4XIKvYkR+PeKSMEnspmj7wA?=
- =?us-ascii?Q?te0bI5b1LtpmrXNNtVaR6EBaBU41KaTYMdCxYbiLXsP5+lEgCSKOEsg5aPbe?=
- =?us-ascii?Q?+P7i3MF31bZymYeFUFWvvwQ8cAAhiHOsmusv0HfnvMcYiA2+2UREUhEjmpk0?=
- =?us-ascii?Q?ZwbXwtbQnndsnMiaJCE9tdZ+jffPqYhUO9emxy3JsfmLnELSDSsySicvXFrs?=
- =?us-ascii?Q?giI34SMnHsys2LfRm9uDjQv4fw7uy+MPupU0JAj0jQtYFOEzUXLcZQQh+NgL?=
- =?us-ascii?Q?87aAReYSI00JaLzLxa7RTBd/L8P8viNqqHwZWhqSjDdfb18uVkYibPkoJssc?=
- =?us-ascii?Q?vPIHxw9G/KQt3B15uJnC8FTHoKDhDaR5JBkI2GtSchtFUaFfiXxdp8azMkV1?=
- =?us-ascii?Q?kf6ZsgUOZWj1wfnSUd8eutOeYs/ww1p45ai3lQzBjO5QEX4jrm6KSwOX+oec?=
- =?us-ascii?Q?C5Q4MD3100FfkBfChjd5TaTqSbTLkSwni48AHmhshiAqsTVjbdgUt3pqw7oc?=
- =?us-ascii?Q?32FcVB9g59YS+/0gPDoUfjHTldWV9Dbj0U6muz1VQAzUw3KRF3KlUVOAic/t?=
- =?us-ascii?Q?Xw/I99KcjBpjQopv/8pzgnRu142XF+CVbC/iki5lPgLzZc5L2g/o1p5Dg3w6?=
- =?us-ascii?Q?fvjG0RMM6B9Nk5YiolpbXJDF4MBuTCnlq1z2PCgRkIyOYOKAYlZ3PvCTYnFX?=
- =?us-ascii?Q?S6gOktN/52amyMpPyeVHM+cTViCYcBPQucHNsZm8cfr8lTjBWGo/mo01vn8+?=
- =?us-ascii?Q?DQMDnHQIJHElLOxLRjbcDhpGoajr1UUD9RdQvdadWQPalM0LUStF2vVHRGA9?=
- =?us-ascii?Q?b7O5ON1R3/Cenmd8bmvCNB6PgNUYljKtQb1Hku6GAkrFC6VtNACmg4H2ZY7S?=
- =?us-ascii?Q?2Ih4xDfL7ehrI2zGwCFTzZK6KQ7qbHj/5q866HkpFX+ugbPAjtp3azjFYINz?=
- =?us-ascii?Q?YCme8lCxJc/mtiiHjuASCohpSPG9Pei6QhsxoAo0sBkaHQacjDDme83OuJru?=
- =?us-ascii?Q?5e/LsAPV0I9Tsp8mCTNWUGw0G0T0d9FO3d9JKut+He+Xuy1Sty8pmN/E4PME?=
- =?us-ascii?Q?cD3ObGkMLyg1l3ImHDVlWAkxR8tPKjcwdCcZgSTh3BU5ZchCsoIfWX+LUIKy?=
- =?us-ascii?Q?xaeJOm7nzDhb3UcR9lMaMvcFckO9oikW2/0zhFcmiZXSHkP6zOogkk3/ceYw?=
- =?us-ascii?Q?M46ycf0hoVwIQaF+HQGV74NqaMNE7LUP900O9Inc?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 935170e0-bd15-47f8-e939-08db8db77c06
-X-MS-Exchange-CrossTenant-AuthSource: DB7PR04MB4010.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Jul 2023 09:05:40.5606
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: nZVlQLvBnWEAF8wLC4W8PNzDMqDQZxvC5uZggFfSThupurZfuhonn+PR5Ora6ZPXbE6RfLsmEM6J+YzJqaLbQw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB7056
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.12.0
+Subject: Re: [PATCH v2 44/47] mm: shrinker: make global slab shrink lockless
+Content-Language: en-US
+To: Dave Chinner <david@fromorbit.com>
+Cc: akpm@linux-foundation.org, tkhai@ya.ru, vbabka@suse.cz,
+ roman.gushchin@linux.dev, djwong@kernel.org, brauner@kernel.org,
+ paulmck@kernel.org, tytso@mit.edu, steven.price@arm.com, cel@kernel.org,
+ senozhatsky@chromium.org, yujie.liu@intel.com, gregkh@linuxfoundation.org,
+ muchun.song@linux.dev, linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+ x86@kernel.org, kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
+ linux-erofs@lists.ozlabs.org, linux-f2fs-devel@lists.sourceforge.net,
+ cluster-devel@redhat.com, linux-nfs@vger.kernel.org,
+ linux-mtd@lists.infradead.org, rcu@vger.kernel.org, netdev@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linux-arm-msm@vger.kernel.org,
+ dm-devel@redhat.com, linux-raid@vger.kernel.org,
+ linux-bcache@vger.kernel.org, virtualization@lists.linux-foundation.org,
+ linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
+ linux-xfs@vger.kernel.org, linux-btrfs@vger.kernel.org
+References: <20230724094354.90817-1-zhengqi.arch@bytedance.com>
+ <20230724094354.90817-45-zhengqi.arch@bytedance.com>
+ <ZMDUkoIXUlTkCSYL@dread.disaster.area>
+From: Qi Zheng <zhengqi.arch@bytedance.com>
+In-Reply-To: <ZMDUkoIXUlTkCSYL@dread.disaster.area>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Haibo Chen <haibo.chen@nxp.com>
+Hi Dave,
 
-If SoC claim to support stop mode, but dts file do not contain the stop
-mode properity, this should not block the driver probe. For this case,
-the driver only need to skip the wakeup capable setting which means this
-device do not support the feature to wakeup system.
+On 2023/7/26 16:08, Dave Chinner wrote:
+> On Mon, Jul 24, 2023 at 05:43:51PM +0800, Qi Zheng wrote:
+>> The shrinker_rwsem is a global read-write lock in shrinkers subsystem,
+>> which protects most operations such as slab shrink, registration and
+>> unregistration of shrinkers, etc. This can easily cause problems in the
+>> following cases.
+>>
+>> 1) When the memory pressure is high and there are many filesystems
+>>     mounted or unmounted at the same time, slab shrink will be affected
+>>     (down_read_trylock() failed).
+>>
+>>     Such as the real workload mentioned by Kirill Tkhai:
+>>
+>>     ```
+>>     One of the real workloads from my experience is start
+>>     of an overcommitted node containing many starting
+>>     containers after node crash (or many resuming containers
+>>     after reboot for kernel update). In these cases memory
+>>     pressure is huge, and the node goes round in long reclaim.
+>>     ```
+>>
+>> 2) If a shrinker is blocked (such as the case mentioned
+>>     in [1]) and a writer comes in (such as mount a fs),
+>>     then this writer will be blocked and cause all
+>>     subsequent shrinker-related operations to be blocked.
+>>
+>> Even if there is no competitor when shrinking slab, there may still be a
+>> problem. The down_read_trylock() may become a perf hotspot with frequent
+>> calls to shrink_slab(). Because of the poor multicore scalability of
+>> atomic operations, this can lead to a significant drop in IPC
+>> (instructions per cycle).
+>>
+>> We used to implement the lockless slab shrink with SRCU [2], but then
+>> kernel test robot reported -88.8% regression in
+>> stress-ng.ramfs.ops_per_sec test case [3], so we reverted it [4].
+>>
+>> This commit uses the refcount+RCU method [5] proposed by Dave Chinner
+>> to re-implement the lockless global slab shrink. The memcg slab shrink is
+>> handled in the subsequent patch.
+>>
+>> For now, all shrinker instances are converted to dynamically allocated and
+>> will be freed by kfree_rcu(). So we can use rcu_read_{lock,unlock}() to
+>> ensure that the shrinker instance is valid.
+>>
+>> And the shrinker instance will not be run again after unregistration. So
+>> the structure that records the pointer of shrinker instance can be safely
+>> freed without waiting for the RCU read-side critical section.
+>>
+>> In this way, while we implement the lockless slab shrink, we don't need to
+>> be blocked in unregister_shrinker().
+>>
+>> The following are the test results:
+>>
+>> stress-ng --timeout 60 --times --verify --metrics-brief --ramfs 9 &
+>>
+>> 1) Before applying this patchset:
+>>
+>> setting to a 60 second run per stressor
+>> dispatching hogs: 9 ramfs
+>> stressor       bogo ops real time  usr time  sys time   bogo ops/s     bogo ops/s
+>>                            (secs)    (secs)    (secs)   (real time) (usr+sys time)
+>> ramfs            735238     60.00     12.37    363.70     12253.05        1955.08
+>> for a 60.01s run time:
+>>     1440.27s available CPU time
+>>       12.36s user time   (  0.86%)
+>>      363.70s system time ( 25.25%)
+>>      376.06s total time  ( 26.11%)
+>> load average: 10.79 4.47 1.69
+>> passed: 9: ramfs (9)
+>> failed: 0
+>> skipped: 0
+>> successful run completed in 60.01s (1 min, 0.01 secs)
+>>
+>> 2) After applying this patchset:
+>>
+>> setting to a 60 second run per stressor
+>> dispatching hogs: 9 ramfs
+>> stressor       bogo ops real time  usr time  sys time   bogo ops/s     bogo ops/s
+>>                            (secs)    (secs)    (secs)   (real time) (usr+sys time)
+>> ramfs            746677     60.00     12.22    367.75     12443.70        1965.13
+>> for a 60.01s run time:
+>>     1440.26s available CPU time
+>>       12.21s user time   (  0.85%)
+>>      367.75s system time ( 25.53%)
+>>      379.96s total time  ( 26.38%)
+>> load average: 8.37 2.48 0.86
+>> passed: 9: ramfs (9)
+>> failed: 0
+>> skipped: 0
+>> successful run completed in 60.01s (1 min, 0.01 secs)
+>>
+>> We can see that the ops/s has hardly changed.
+>>
+>> [1]. https://lore.kernel.org/lkml/20191129214541.3110-1-ptikhomirov@virtuozzo.com/
+>> [2]. https://lore.kernel.org/lkml/20230313112819.38938-1-zhengqi.arch@bytedance.com/
+>> [3]. https://lore.kernel.org/lkml/202305230837.db2c233f-yujie.liu@intel.com/
+>> [4]. https://lore.kernel.org/all/20230609081518.3039120-1-qi.zheng@linux.dev/
+>> [5]. https://lore.kernel.org/lkml/ZIJhou1d55d4H1s0@dread.disaster.area/
+>>
+>> Signed-off-by: Qi Zheng <zhengqi.arch@bytedance.com>
+>> ---
+>>   include/linux/shrinker.h | 19 +++++++---
+>>   mm/shrinker.c            | 75 ++++++++++++++++++++++++++--------------
+>>   mm/shrinker_debug.c      | 52 +++++++++++++++++++++-------
+>>   3 files changed, 104 insertions(+), 42 deletions(-)
+>>
+>> diff --git a/include/linux/shrinker.h b/include/linux/shrinker.h
+>> index 36977a70bebb..335da93cccee 100644
+>> --- a/include/linux/shrinker.h
+>> +++ b/include/linux/shrinker.h
+>> @@ -4,6 +4,7 @@
+>>   
+>>   #include <linux/atomic.h>
+>>   #include <linux/types.h>
+>> +#include <linux/refcount.h>
+>>   
+>>   #define SHRINKER_UNIT_BITS	BITS_PER_LONG
+>>   
+>> @@ -86,6 +87,10 @@ struct shrinker {
+>>   	long batch;	/* reclaim batch size, 0 = default */
+>>   	int seeks;	/* seeks to recreate an obj */
+>>   	unsigned flags;
+>> +	bool registered;
+>> +
+>> +	refcount_t refcount;
+>> +	struct rcu_head rcu;
+>>   
+>>   	void *private_data;
+>>   
+>> @@ -106,14 +111,13 @@ struct shrinker {
+>>   #define DEFAULT_SEEKS 2 /* A good number if you don't know better. */
+>>   
+>>   /* Flags */
+>> -#define SHRINKER_REGISTERED	(1 << 0)
+>> -#define SHRINKER_NUMA_AWARE	(1 << 1)
+>> -#define SHRINKER_MEMCG_AWARE	(1 << 2)
+>> +#define SHRINKER_NUMA_AWARE	(1 << 0)
+>> +#define SHRINKER_MEMCG_AWARE	(1 << 1)
+>>   /*
+>>    * It just makes sense when the shrinker is also MEMCG_AWARE for now,
+>>    * non-MEMCG_AWARE shrinker should not have this flag set.
+>>    */
+>> -#define SHRINKER_NONSLAB	(1 << 3)
+>> +#define SHRINKER_NONSLAB	(1 << 2)
+>>   
+>>   unsigned long shrink_slab(gfp_t gfp_mask, int nid, struct mem_cgroup *memcg,
+>>   			  int priority);
+>> @@ -122,6 +126,13 @@ void shrinker_free_non_registered(struct shrinker *shrinker);
+>>   void shrinker_register(struct shrinker *shrinker);
+>>   void shrinker_unregister(struct shrinker *shrinker);
+>>   
+>> +static inline bool shrinker_try_get(struct shrinker *shrinker)
+>> +{
+>> +	return READ_ONCE(shrinker->registered) &&
+>> +	       refcount_inc_not_zero(&shrinker->refcount);
+>> +}
+> 
+> Why do we care about shrinker->registered here? If we don't set
+> the refcount to 1 until we have fully initialised everything, then
+> the shrinker code can key entirely off the reference count and
+> none of the lookup code needs to care about whether the shrinker is
+> registered or not.
 
-Signed-off-by: Haibo Chen <haibo.chen@nxp.com>
----
- drivers/net/can/flexcan/flexcan-core.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+The purpose of checking shrinker->registered here is to stop running
+shrinker after calling shrinker_free(), which can prevent the following
+situations from happening:
 
-diff --git a/drivers/net/can/flexcan/flexcan-core.c b/drivers/net/can/flexcan/flexcan-core.c
-index a3f3a9c909be..d8be69f4a0c3 100644
---- a/drivers/net/can/flexcan/flexcan-core.c
-+++ b/drivers/net/can/flexcan/flexcan-core.c
-@@ -1987,7 +1987,14 @@ static int flexcan_setup_stop_mode(struct platform_device *pdev)
- 		/* return 0 directly if doesn't support stop mode feature */
- 		return 0;
- 
--	if (ret)
-+	/* If ret is -EINVAL, this means SoC claim to support stop mode, but
-+	 * dts file lack the stop mode property definition. For this case,
-+	 * directly return 0, this will skip the wakeup capable setting and
-+	 * will not block the driver probe.
-+	 */
-+	if (ret == -EINVAL)
-+		return 0;
-+	else if (ret)
- 		return ret;
- 
- 	device_set_wakeup_capable(&pdev->dev, true);
--- 
-2.34.1
+CPU 0                 CPU 1
 
+shrinker_try_get()
+
+                        shrinker_try_get()
+
+shrinker_put()
+shrinker_try_get()
+                        shrinker_put()
+
+This chance of this happening is small, but theoretically possible, so
+I added this check.
+
+> 
+>> +void shrinker_put(struct shrinker *shrinker);
+>> +
+>>   #ifdef CONFIG_SHRINKER_DEBUG
+>>   extern int shrinker_debugfs_add(struct shrinker *shrinker);
+>>   extern struct dentry *shrinker_debugfs_detach(struct shrinker *shrinker,
+>> diff --git a/mm/shrinker.c b/mm/shrinker.c
+>> index 8a1fe844f1a4..8e3334749552 100644
+>> --- a/mm/shrinker.c
+>> +++ b/mm/shrinker.c
+>> @@ -2,10 +2,13 @@
+>>   #include <linux/memcontrol.h>
+>>   #include <linux/rwsem.h>
+>>   #include <linux/shrinker.h>
+>> +#include <linux/rculist.h>
+>> +#include <linux/spinlock.h>
+>>   #include <trace/events/vmscan.h>
+>>   
+>>   LIST_HEAD(shrinker_list);
+>>   DECLARE_RWSEM(shrinker_rwsem);
+>> +DEFINE_SPINLOCK(shrinker_lock);
+>>   
+>>   #ifdef CONFIG_MEMCG
+>>   static int shrinker_nr_max;
+>> @@ -450,6 +453,18 @@ static unsigned long do_shrink_slab(struct shrink_control *shrinkctl,
+>>   	return freed;
+>>   }
+>>   
+>> +void shrinker_put(struct shrinker *shrinker)
+>> +{
+>> +	if (refcount_dec_and_test(&shrinker->refcount)) {
+>> +		spin_lock(&shrinker_lock);
+>> +		list_del_rcu(&shrinker->list);
+>> +		spin_unlock(&shrinker_lock);
+>> +
+>> +		kfree(shrinker->nr_deferred);
+>> +		kfree_rcu(shrinker, rcu);
+>> +	}
+>> +}
+> 
+> Urk, no.
+> 
+> We want the shrinker_free() code to block waiting for the shrinker
+> reference count to go to zero, because the shrinkers can reference
+> structures that are associated with the path that is freeing the
+> shrinker.
+> 
+> i.e. we do not want to free the superblock of a filesystem whilst
+> the shrinker is still running, but the way you've done this is that
+> the shrinker can run whilst the structure that contains it has been
+> torn down.
+
+Oh, I missed this. I will change it back to use completion as soon as
+possible.
+
+> 
+> This should use a completion, then it is always safe under
+> rcu_read_lock().  This also gets rid of the shrinker_lock spin lock,
+> which only exists because we can't take a blocking lock under
+> rcu_read_lock(). i.e:
+> 
+> 
+> void shrinker_put(struct shrinker *shrinker)
+> {
+> 	if (refcount_dec_and_test(&shrinker->refcount))
+> 		complete(&shrinker->done);
+> }
+> 
+> void shrinker_free()
+> {
+> 	.....
+> 	refcount_dec(&shrinker->refcount);
+
+I guess what you mean is shrinker_put(), because here may be the last
+refcount.
+
+> 	wait_for_completion(&shrinker->done);
+> 	/*
+> 	 * lookups on the shrinker will now all fail as refcount has
+> 	 * fallen to zero. We can now remove it from the lists and
+> 	 * free it.
+> 	 */
+> 	down_write(shrinker_rwsem);
+> 	list_del_rcu(&shrinker->list);
+> 	up_write(&shrinker_rwsem);
+> 	call_rcu(shrinker->rcu_head, shrinker_free_rcu_cb);
+> }
+> 
+> ....
+> 
+>> @@ -686,11 +711,14 @@ EXPORT_SYMBOL(shrinker_free_non_registered);
+>>   
+>>   void shrinker_register(struct shrinker *shrinker)
+>>   {
+>> -	down_write(&shrinker_rwsem);
+>> -	list_add_tail(&shrinker->list, &shrinker_list);
+>> -	shrinker->flags |= SHRINKER_REGISTERED;
+>> +	refcount_set(&shrinker->refcount, 1);
+>> +
+>> +	spin_lock(&shrinker_lock);
+>> +	list_add_tail_rcu(&shrinker->list, &shrinker_list);
+>> +	spin_unlock(&shrinker_lock);
+>> +
+>>   	shrinker_debugfs_add(shrinker);
+>> -	up_write(&shrinker_rwsem);
+>> +	WRITE_ONCE(shrinker->registered, true);
+>>   }
+>>   EXPORT_SYMBOL(shrinker_register);
+> 
+> This just looks wrong - you are trying to use WRITE_ONCE() as a
+> release barrier to indicate that the shrinker is now set up fully.
+> That's not necessary - the refcount is an atomic and along with the
+> rcu locks they should provides all the barriers we need. i.e.
+
+The reason I used WRITE_ONCE() here is because the shrinker->registered
+will be read and written concurrently (read in shrinker_try_get() and
+written in shrinker_free()), which is why I added shrinker::registered
+field instead of using SHRINKER_REGISTERED flag (this can reduce the
+addition of WRITE_ONCE()/READ_ONCE()).
+
+> 
+> void shrinker_register(struct shrinker *shrinker)
+> {
+> 	down_write(&shrinker_rwsem);
+> 	list_add_tail_rcu(&shrinker->list, &shrinker_list);
+> 	shrinker->flags |= SHRINKER_REGISTERED;
+> 	shrinker_debugfs_add(shrinker);
+> 	up_write(&shrinker_rwsem);
+> 
+> 	/*
+> 	 * now the shrinker is fully set up, take the first
+> 	 * reference to it to indicate that lookup operations are
+> 	 * now allowed to use it via shrinker_try_get().
+> 	 */
+> 	refcount_set(&shrinker->refcount, 1);
+> }
+> 
+>> diff --git a/mm/shrinker_debug.c b/mm/shrinker_debug.c
+>> index f1becfd45853..c5573066adbf 100644
+>> --- a/mm/shrinker_debug.c
+>> +++ b/mm/shrinker_debug.c
+>> @@ -5,6 +5,7 @@
+>>   #include <linux/seq_file.h>
+>>   #include <linux/shrinker.h>
+>>   #include <linux/memcontrol.h>
+>> +#include <linux/rculist.h>
+>>   
+>>   /* defined in vmscan.c */
+>>   extern struct rw_semaphore shrinker_rwsem;
+>> @@ -161,17 +162,21 @@ int shrinker_debugfs_add(struct shrinker *shrinker)
+>>   {
+>>   	struct dentry *entry;
+>>   	char buf[128];
+>> -	int id;
+>> -
+>> -	lockdep_assert_held(&shrinker_rwsem);
+>> +	int id, ret = 0;
+>>   
+>>   	/* debugfs isn't initialized yet, add debugfs entries later. */
+>>   	if (!shrinker_debugfs_root)
+>>   		return 0;
+>>   
+>> +	down_write(&shrinker_rwsem);
+>> +	if (shrinker->debugfs_entry)
+>> +		goto fail;
+>> +
+>>   	id = ida_alloc(&shrinker_debugfs_ida, GFP_KERNEL);
+>> -	if (id < 0)
+>> -		return id;
+>> +	if (id < 0) {
+>> +		ret = id;
+>> +		goto fail;
+>> +	}
+>>   	shrinker->debugfs_id = id;
+>>   
+>>   	snprintf(buf, sizeof(buf), "%s-%d", shrinker->name, id);
+>> @@ -180,7 +185,8 @@ int shrinker_debugfs_add(struct shrinker *shrinker)
+>>   	entry = debugfs_create_dir(buf, shrinker_debugfs_root);
+>>   	if (IS_ERR(entry)) {
+>>   		ida_free(&shrinker_debugfs_ida, id);
+>> -		return PTR_ERR(entry);
+>> +		ret = PTR_ERR(entry);
+>> +		goto fail;
+>>   	}
+>>   	shrinker->debugfs_entry = entry;
+>>   
+>> @@ -188,7 +194,10 @@ int shrinker_debugfs_add(struct shrinker *shrinker)
+>>   			    &shrinker_debugfs_count_fops);
+>>   	debugfs_create_file("scan", 0220, entry, shrinker,
+>>   			    &shrinker_debugfs_scan_fops);
+>> -	return 0;
+>> +
+>> +fail:
+>> +	up_write(&shrinker_rwsem);
+>> +	return ret;
+>>   }
+>>   
+>>   int shrinker_debugfs_rename(struct shrinker *shrinker, const char *fmt, ...)
+>> @@ -243,6 +252,11 @@ struct dentry *shrinker_debugfs_detach(struct shrinker *shrinker,
+>>   	shrinker->name = NULL;
+>>   
+>>   	*debugfs_id = entry ? shrinker->debugfs_id : -1;
+>> +	/*
+>> +	 * Ensure that shrinker->registered has been set to false before
+>> +	 * shrinker->debugfs_entry is set to NULL.
+>> +	 */
+>> +	smp_wmb();
+>>   	shrinker->debugfs_entry = NULL;
+>>   
+>>   	return entry;
+>> @@ -266,14 +280,26 @@ static int __init shrinker_debugfs_init(void)
+>>   	shrinker_debugfs_root = dentry;
+>>   
+>>   	/* Create debugfs entries for shrinkers registered at boot */
+>> -	down_write(&shrinker_rwsem);
+>> -	list_for_each_entry(shrinker, &shrinker_list, list)
+>> +	rcu_read_lock();
+>> +	list_for_each_entry_rcu(shrinker, &shrinker_list, list) {
+>> +		if (!shrinker_try_get(shrinker))
+>> +			continue;
+>> +		rcu_read_unlock();
+>> +
+>>   		if (!shrinker->debugfs_entry) {
+>> -			ret = shrinker_debugfs_add(shrinker);
+>> -			if (ret)
+>> -				break;
+>> +			/* Paired with smp_wmb() in shrinker_debugfs_detach() */
+>> +			smp_rmb();
+>> +			if (READ_ONCE(shrinker->registered))
+>> +				ret = shrinker_debugfs_add(shrinker);
+>>   		}
+>> -	up_write(&shrinker_rwsem);
+>> +
+>> +		rcu_read_lock();
+>> +		shrinker_put(shrinker);
+>> +
+>> +		if (ret)
+>> +			break;
+>> +	}
+>> +	rcu_read_unlock();
+>>   
+>>   	return ret;
+>>   }
+> 
+> And all this churn and complexity can go away because the
+> shrinker_rwsem is still used to protect shrinker_register()
+> entirely....
+
+My consideration is that during this process, there may be a
+driver probe failure and then shrinker_free() is called (the
+shrinker_debugfs_init() is called in late_initcall stage). In
+this case, we need to use RCU+refcount to ensure that the shrinker
+is not freed.
+
+And after switching back to using completion, the smp_rmb()/smp_wmb()
+is no longer needed.
+
+Thanks,
+Qi
+
+> 
+> -Dave.
 
