@@ -1,151 +1,174 @@
-Return-Path: <netdev+bounces-21485-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21486-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22021763B09
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 17:29:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5DD78763B1B
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 17:31:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0B6291C21385
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 15:29:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1894B281AFC
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 15:31:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9764F253BD;
-	Wed, 26 Jul 2023 15:29:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F25AC253C6;
+	Wed, 26 Jul 2023 15:31:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B095F9C5
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 15:29:44 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (unknown [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E5CD2137
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 08:29:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=BjrSQ5IKcciLqpEbqlMKfz6FUHHN3vwxCeK/ewwtna4=; b=TaPWC+C+4uIwdrOzp/Om38TvyX
-	raBlxmx3U4JM1EKRP62aTIA1WVTSZdRD18lH/V1yY/xY7jMr13RRK3lU+nUNUZqHy/oZ0KOSGytzD
-	pmtarKSR3aIEIKRDw3c5C6OpS706E6iqL0vJo4D4KFPjKzLukKaiBapDikz1cL5cbGVan+dhQMQkt
-	SLp08qTpwplSvChhladPL2mnySpOyVYqMtjWyUBUVCsfwfLtA1eclUxJSSZxFv/brgGgy2G5GldBM
-	A40IAwnQxmtz/xyC9Nv1BF18QHAPq2lr1UKzhUpHVAFLPlA/r2qe4gJ8kmt89Oo9R5AGCLZrATBjO
-	XLulJ8fg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:40774)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qOgS6-0004dh-2x;
-	Wed, 26 Jul 2023 16:29:26 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qOgS5-0002yX-BF; Wed, 26 Jul 2023 16:29:25 +0100
-Date: Wed, 26 Jul 2023 16:29:25 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Shenwei Wang <shenwei.wang@nxp.com>
-Cc: Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Shawn Guo <shawnguo@kernel.org>, dl-linux-imx <linux-imx@nxp.com>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Fabio Estevam <festevam@gmail.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-stm32@st-md-mailman.stormreply.com" <linux-stm32@st-md-mailman.stormreply.com>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"imx@lists.linux.dev" <imx@lists.linux.dev>,
-	Frank Li <frank.li@nxp.com>
-Subject: Re: [EXT] Re: [PATCH] net: stmmac: dwmac-imx: pause the TXC clock in
- fixed-link
-Message-ID: <ZME71epmSHYIB4DZ@shell.armlinux.org.uk>
-References: <20230725194931.1989102-1-shenwei.wang@nxp.com>
- <20230726004338.6i354ue576hb35of@skbuf>
- <PAXPR04MB9185C1A95E101AC2E08639B78900A@PAXPR04MB9185.eurprd04.prod.outlook.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4D941DA3F;
+	Wed, 26 Jul 2023 15:31:00 +0000 (UTC)
+Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFEBD2701;
+	Wed, 26 Jul 2023 08:30:54 -0700 (PDT)
+Received: by mail-pf1-x42f.google.com with SMTP id d2e1a72fcca58-686bd857365so1101499b3a.3;
+        Wed, 26 Jul 2023 08:30:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1690385454; x=1690990254;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QIvg9RvPixHqfad2Kamp9kJBh4DIZcFMKZRn7pfOsNE=;
+        b=UvNxr8eLJ9hNPoNo/nmVkgjI4LmuR9ztzcTY+8rMIzSoHv7gwljQlaHHd92gm95UVm
+         nU56pgA2IgpkZ87/1SXR5DOwjHop16+wfwPEV6IS33mO1QlQi6mSJ8FVmwoSi/+kZx4P
+         qanoK+6WcjuZX7MFStjdzc0nrwV3XSiclq3I9Cq47+YLuQmJjCuttPtZTA47gY8Px5VL
+         M0KGCrZjA8PmkcEwyq7+BkhWwhnMHinBdCCuaa+ygSj2WTJ1OO0iLTikgnWKqb83HYA/
+         7qGLhQ84+9qqmlQzBfUs/lur7fuEApadKSY61qyN9KpEKVsfsHhr/QJ2E0h+XppBvQji
+         sYQQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690385454; x=1690990254;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=QIvg9RvPixHqfad2Kamp9kJBh4DIZcFMKZRn7pfOsNE=;
+        b=RwbvIAEsfrnnAkZp10d5GK2xnJ/PISXCb4hDRbDeoDEAmfqr/c4Ry6lcfXUFfrCNcq
+         /YuhuMlV5YN/35P4vjYhnxHYyM4BmmUDKUTu5/TirswnbZ9XEu5zOFbpWIYFsYTOSH06
+         xXSVVKhkHcEX3IxTQb9HvIVvz41o3dl1jg/0P+BkXFrleILggOmvUXldqNR/Yy4rmDY/
+         P0yx34lN5RE6pu2uVLYN554MMMEu63ERszFVgcobyM4pMxinpMBUuk6fhQPtNZIrvjPt
+         TuTkFx4KMcefaApb59FNLM4lPOOaEDRR/gr/HWit9Jg1XcHv0x1uze8oFF8beD4yzzoH
+         INyg==
+X-Gm-Message-State: ABy/qLaxNMwdkA9M8i8MKjifByrfhN1ISoeOjHYk1hO/kqAgpCx+3V03
+	cXLWMZBv4nW+bJU2y4bHpyqZhuyxoMLZPOtpal4=
+X-Google-Smtp-Source: APBJJlGsYifDPtFqieNjZSRGPJL2WJtbotBq8b23fwCEiS2YFyApRJq7zsSItWWZeZOofGURnKLE/TZxtTf3oC+7O6c=
+X-Received: by 2002:a17:90b:a4e:b0:268:5620:cfc7 with SMTP id
+ gw14-20020a17090b0a4e00b002685620cfc7mr1509855pjb.30.1690385453708; Wed, 26
+ Jul 2023 08:30:53 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <PAXPR04MB9185C1A95E101AC2E08639B78900A@PAXPR04MB9185.eurprd04.prod.outlook.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,RDNS_NONE,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+References: <20230725131258.31306-1-linyunsheng@huawei.com>
+ <94272ffed7636c4c92fcc73ccfc15236dd8e47dc.camel@gmail.com>
+ <16b4ab57-dfb0-2c1d-9be1-57da30dff3c3@intel.com> <22af47fe-1347-3e32-70bf-745d833e88b9@huawei.com>
+In-Reply-To: <22af47fe-1347-3e32-70bf-745d833e88b9@huawei.com>
+From: Alexander Duyck <alexander.duyck@gmail.com>
+Date: Wed, 26 Jul 2023 08:30:17 -0700
+Message-ID: <CAKgT0UcU4RJj0SMQiVM8oZu86ZzK+5NjzZ2ELg_yWZyWGr04PA@mail.gmail.com>
+Subject: Re: [PATCH net-next v2] page_pool: split types and declarations from page_pool.h
+To: Yunsheng Lin <linyunsheng@huawei.com>
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>, davem@davemloft.net, kuba@kernel.org, 
+	pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Eric Dumazet <edumazet@google.com>, Wei Fang <wei.fang@nxp.com>, 
+	Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, 
+	NXP Linux Team <linux-imx@nxp.com>, Sunil Goutham <sgoutham@marvell.com>, 
+	Geetha sowjanya <gakula@marvell.com>, Subbaraya Sundeep <sbhatta@marvell.com>, 
+	hariprasad <hkelam@marvell.com>, Saeed Mahameed <saeedm@nvidia.com>, 
+	Leon Romanovsky <leon@kernel.org>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, Felix Fietkau <nbd@nbd.name>, 
+	Lorenzo Bianconi <lorenzo@kernel.org>, Ryder Lee <ryder.lee@mediatek.com>, 
+	Shayne Chen <shayne.chen@mediatek.com>, Sean Wang <sean.wang@mediatek.com>, 
+	Kalle Valo <kvalo@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>, 
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>, linux-rdma@vger.kernel.org, 
+	bpf@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Jul 26, 2023 at 03:10:19PM +0000, Shenwei Wang wrote:
-> > if (of_phy_is_fixed_link(dwmac->dev->of_node)) {
-> > 
-> 
-> This does not help in this case. What I need to determine is if the PHY currently in use is a fixed-link.
-> The dwmac DTS node may have multiple PHY nodes defined, including both fixed-link and real PHYs.
+On Wed, Jul 26, 2023 at 4:23=E2=80=AFAM Yunsheng Lin <linyunsheng@huawei.co=
+m> wrote:
+>
+> On 2023/7/26 18:43, Alexander Lobakin wrote:
+> > From: Alexander H Duyck <alexander.duyck@gmail.com>
+> > Date: Tue, 25 Jul 2023 08:47:46 -0700
+> >
+> >> On Tue, 2023-07-25 at 21:12 +0800, Yunsheng Lin wrote:
+> >>> Split types and pure function declarations from page_pool.h
+> >>> and add them in page_pool/types.h, so that C sources can
+> >>> include page_pool.h and headers should generally only include
+> >>> page_pool/types.h as suggested by jakub.
+> >>>
+> >>> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
+> >>> Suggested-by: Jakub Kicinski <kuba@kernel.org>
+> >>> CC: Alexander Lobakin <aleksander.lobakin@intel.com>
+> >
+> > [...]
+> >
+> >>> +/* Caller must provide appropriate safe context, e.g. NAPI. */
+> >>> +void page_pool_update_nid(struct page_pool *pool, int new_nid);
+> >>> +
+> >>> +#endif /* _NET_PAGE_POOL_H */
+> >>
+> >>
+> >> This seems kind of overkill for what is needed. It seems like the
+> >> general thought process with splitting this was so that you had just
+> >> the minimum of what is needed to support skbuff.h and the functions
+> >> declared there. The rest of this would then be added via the .h to the
+> >> .c files that will actually be calling the functions.
+> >>
+> >> By that logic I think the only thing we really need is the function
+> >> declaration for page_pool_return_skb_page moved into skbuff.h. We coul=
+d
+> >> then just remove page_pool.h from skbuff.h couldn't we?
+> >
+> > This patch is not to drop page_pool.h include from skbuff.h.
+> > This is more future-proof (since I'm dropping this include anyway in my
+> > series) to have includes organized and prevent cases like that one with
+> > skbuff.h from happening. And to save some CPU cycles on preprocessing i=
+f
+> > that makes sense.
+>
+> The suggestion is from below:
+>
+> https://lore.kernel.org/all/20230710113841.482cbeac@kernel.org/
 
-... and this makes me wonder what DT node structure you think would
-describe a fixed-link.
+I get that. But it seemed like your types.h is full of inline
+functions. That is what I was responding to. I would leave the inline
+functions in page_pool.h unless there is some significant need for
+them.
 
-A valid ethernet device node would be:
+> >
+> >>
+> >> Another thing we could consider doing is looking at splitting things u=
+p
+> >> so that we had a include file in net/core/page_pool.h to handle some o=
+f
+> >> the cases where we are just linking the page_pool bits to other core
+> >> file bits such as xdp.c and skbuff.c.
+>
+> I suppose the above suggestion is about splitting or naming by
+> the user as the discussed in the below thread?
+> https://lore.kernel.org/all/20230721182942.0ca57663@kernel.org/
 
-	dwmac-node {
-		phy-handle = <&phy1>;
-	};
+Actually my suggestion is more about defining boundaries for what is
+meant to be used by drivers and what isn't. The stuff you could keep
+in net/core/page_pool.h would only be usable by the files in net/core/
+whereas the stuff you are keeping in the include/net/ folder is usable
+by drivers. It is meant to prevent things like what you were
+complaining about with the Mellanox drivers making use of interfaces
+you didn't intend them to use.
 
-In this case:
-	dwmac->dev->of_node points at "dwmac-node"
-	plat->phylink_node points at "dwmac-node"
-	plat->phy_node points at "phy1"
-	Your "dn" is NULL.
-	Therefore, your imx_dwmac_is_fixed_link() returns false.
-
-	dwmac-node {
-		fixed-link {
-			speed = <...>;
-			full-duplex;
-		};
-	};
-
-In this case:
-	dwmac->dev->of_node points at "dwmac-node"
-	plat->phylink_node points at "dwmac-node"
-	plat->phy_node is NULL
-	Your "dn" points at the "fixed-link" node.
-	Therefore, your imx_dwmac_is_fixed_link() also returns false.
-
-Now, as far as your comment "What I need to determine is if the PHY
-currently in use is a fixed-link." I'm just going "Eh? What?" at that,
-because it makes zero sense to me.
-
-stmmac uses phylink. phylink doesn't use a PHY for fixed-links, unlike
-the old phylib-based fixed-link implementation that software-emulated
-a clause-22 PHY. With phylink, when fixed-link is specified, there is
-_no_ PHY.
-
-There is no need to do any of this poking about to determine if the
-link that is being brought up is a fixed-link or not, because phylink's
-callbacks into the MAC driver already contain this information in the
-"mode" argument. However, that is not passed to the driver's internal
-priv->plat->fix_mac_speed() method - but this is the information you
-need.
-
-There is no need to write code to try and second-guess this, phylink
-tells drivers what mode it is operating under.
-
-stmmac really needs to be cleaned up - and really doesn't need more
-complexity when the information is already being provided to the
-driver.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+So for example you could pull out functions like
+page_pool_return_skb_page, page_pool_use_xdp_mem,
+page_pool_update_nid, and the like and look at relocating them into
+the net/core/ folder and thereby prevent abuse of those functions by
+drivers.
 
