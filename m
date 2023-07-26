@@ -1,98 +1,92 @@
-Return-Path: <netdev+bounces-21358-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21359-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9E6A7635E4
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 14:13:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4258C7635F1
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 14:13:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 861082811C4
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 12:13:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 713C81C2127E
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 12:13:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90107C129;
-	Wed, 26 Jul 2023 12:13:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44F1EC12A;
+	Wed, 26 Jul 2023 12:13:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20AA1BE7C
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 12:12:58 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 73356C433C8;
-	Wed, 26 Jul 2023 12:12:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690373578;
-	bh=Ke8AONnAOWupVgvu9a1rrtccA5xWjVMePJQxM8Ht3Kc=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
-	b=gYrqFr8wvj2MJmmwmwf8M6I8rekTV9+bxmW2rqLD55Qm7Z/X+3fqo2oPfopkxdlCi
-	 n241AQBCMxM7eFrih3i3Sbv5AKj0bq28ozziIAExFd7E/RXMMNS1aKn+yJARtnBmU4
-	 FfN14X79faCpLGre6x+vnvwoxjIsG/L/ooLw+V13rcjVx7tIPmq/1O2zG9aawBpzTf
-	 uhcvPI4MEqZ0fNFaHRBAISQWggi8tN88wV4MzFoUqwVN0pOsQ3BgyiTak4/MrtL+0t
-	 6GpQd+/9rUTZVGi45edSMIe9j4qSBoulHPW7gK71wysfs2CSJoMHtELswVidt7IBP2
-	 x+DypAIC/tqTg==
-Received: (nullmailer pid 1182938 invoked by uid 1000);
-	Wed, 26 Jul 2023 12:12:54 -0000
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A5AACA41
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 12:13:29 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44F041BF6
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 05:13:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1690373597;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=lsERt6CnZNRE+dhh1BGptB8b+vQ21piRrkA+84QPZcM=;
+	b=UYxdC+5seiekNY+hCM6PJO1QwgVdSmYDK6oji3CjQF2KOmvtzP7RmrT1rYp9EJMaoYvl9V
+	NeBHSqfDPd/0m6okh4hV1BpdwagsgR5QdSnaYnQClSILDjblpakjfalFKuzbwzxYyWUx6M
+	LtXuKgkvZ+gZWfu6IP3hm+GoNxFDDTg=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-101-DAfwQkvvPdicDDG69ac9QA-1; Wed, 26 Jul 2023 08:13:16 -0400
+X-MC-Unique: DAfwQkvvPdicDDG69ac9QA-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 133AF185A792;
+	Wed, 26 Jul 2023 12:13:16 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.131])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 6E858492C13;
+	Wed, 26 Jul 2023 12:13:15 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <168979108540.1905271.9720708849149797793.stgit@morisot.1015granger.net>
+References: <168979108540.1905271.9720708849149797793.stgit@morisot.1015granger.net>
+To: Chuck Lever <cel@kernel.org>
+Cc: dhowells@redhat.com, linux-nfs@vger.kernel.org,
+    netdev@vger.kernel.org, Chuck Lever <chuck.lever@oracle.com>
+Subject: Re: [PATCH v3 0/5] Send RPC-on-TCP with one sock_sendmsg() call
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Rob Herring <robh@kernel.org>
-To: Gatien Chevallier <gatien.chevallier@foss.st.com>
-Cc: linux-mmc@vger.kernel.org, gregkh@linuxfoundation.org, lee@kernel.org, catalin.marinas@arm.com, jic23@kernel.org, hugues.fruchet@foss.st.com, richardcochran@gmail.com, will@kernel.org, arnd@kernel.org, davem@davemloft.net, Oleksii Moisieiev <oleksii_moisieiev@epam.com>, Frank Rowand <frowand.list@gmail.com>, Oleksii_Moisieiev@epam.com, linux-phy@lists.infradead.org, linux-crypto@vger.kernel.org, kuba@kernel.org, linux-spi@vger.kernel.org, linux-usb@vger.kernel.org, vkoul@kernel.org, linux-arm-kernel@lists.infradead.org, edumazet@google.com, devicetree@vger.kernel.org, linux-iio@vger.kernel.org, alsa-devel@alsa-project.org, linux-stm32@st-md-mailman.stormreply.com, herbert@gondor.apana.org.au, linux-i2c@vger.kernel.org, alexandre.torgue@foss.st.com, mchehab@kernel.org, robh+dt@kernel.org, linux-kernel@vger.kernel.org, ulf.hansson@linaro.org, netdev@vger.kernel.org, andi.shyti@kernel.org, olivier.moysan@foss.st.com, linux-serial@vger.kernel.org, pabeni@redhat.com, arnaud.pouliquen@
- foss.st.com, dmaengine@vger.kernel.org, krzysztof.kozlowski+dt@linaro.org, linux-media@vger.kernel.org, conor+dt@kernel.org, fabrice.gasnier@foss.st.com
-In-Reply-To: <20230726083810.232100-2-gatien.chevallier@foss.st.com>
-References: <20230726083810.232100-1-gatien.chevallier@foss.st.com>
- <20230726083810.232100-2-gatien.chevallier@foss.st.com>
-Message-Id: <169037357425.1182922.8121576517266921442.robh@kernel.org>
-Subject: Re: [IGNORE][PATCH v3 01/11] dt-bindings: Document common device
- controller bindings
-Date: Wed, 26 Jul 2023 06:12:54 -0600
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <6564.1690373594.1@warthog.procyon.org.uk>
+Date: Wed, 26 Jul 2023 13:13:14 +0100
+Message-ID: <6565.1690373594@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
+Chuck Lever <cel@kernel.org> wrote:
 
-On Wed, 26 Jul 2023 10:38:00 +0200, Gatien Chevallier wrote:
-> From: Oleksii Moisieiev <Oleksii_Moisieiev@epam.com>
+> After some discussion with David Howells at LSF/MM 2023, we arrived
+> at a plan to use a single sock_sendmsg() call for transmitting an
+> RPC message on socket-based transports. This is an initial part of
+> the transition to support handling folios with file content, but it
+> has scalability benefits as well.
 > 
-> Introducing of the common device controller bindings for the controller
-> provider and consumer devices. Those bindings are intended to allow
-> divided system on chip into muliple domains, that can be used to
-> configure hardware permissions.
-> 
-> Signed-off-by: Oleksii Moisieiev <oleksii_moisieiev@epam.com>
-> ---
->  .../feature-domain-controller.yaml            | 84 +++++++++++++++++++
->  1 file changed, 84 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/feature-controllers/feature-domain-controller.yaml
-> 
+> Initial performance benchmark results show 5-10% throughput gains
+> with a fast link layer and a tmpfs export. I've added some other
+> ideas to this series for further discussion -- these have also shown
+> performance benefits in my testing.
 
-My bot found errors running 'make DT_CHECKER_FLAGS=-m dt_binding_check'
-on your patch (DT_CHECKER_FLAGS is new in v5.13):
+I like it :-)
 
-yamllint warnings/errors:
-
-dtschema/dtc warnings/errors:
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/feature-controllers/feature-domain-controller.yaml: title: 'Generic Domain Controller bindings' should not be valid under {'pattern': '([Bb]inding| [Ss]chema)'}
-	hint: Everything is a binding/schema, no need to say it. Describe what hardware the binding is for.
-	from schema $id: http://devicetree.org/meta-schemas/core.yaml#
-
-doc reference errors (make refcheckdocs):
-
-See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20230726083810.232100-2-gatien.chevallier@foss.st.com
-
-The base for the series is generally the latest rc1. A different dependency
-should be noted in *this* patch.
-
-If you already ran 'make dt_binding_check' and didn't see the above
-error(s), then make sure 'yamllint' is installed and dt-schema is up to
-date:
-
-pip3 install dtschema --upgrade
-
-Please check and re-submit after running the above command yourself. Note
-that DT_SCHEMA_FILES can be set to your schema file to speed up checking
-your schema. However, it must be unset to test all examples with your schema.
+David
 
 
