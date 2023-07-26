@@ -1,146 +1,108 @@
-Return-Path: <netdev+bounces-21294-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21295-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E82B57632C2
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 11:49:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9E267632C6
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 11:50:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9820A281C8C
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 09:49:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 269761C21166
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 09:50:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91DA9BA5E;
-	Wed, 26 Jul 2023 09:49:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1DCBBE47;
+	Wed, 26 Jul 2023 09:50:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 817DCBA57
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 09:49:44 +0000 (UTC)
-Received: from mail.helmholz.de (mail.helmholz.de [217.6.86.34])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C8D2F3
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 02:49:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=helmholz.de
-	; s=dkim1; h=Content-Type:MIME-Version:References:In-Reply-To:Message-ID:Date
-	:Subject:CC:To:From:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=z/VYs/tG4q/jmWkTELjey7jwXdK/M+A/kvcC69LhECg=; b=nBeqMirnPYjIgzt1dxHLh5U/oI
-	EPz6/Gu1wUjbSztxBJg8fXpga1gtvtFGX2G+2ixBUQ0IhIr0biy6TbW5mN3WqYnjD5k5wzfT/URCi
-	t0vIPAxChnE1lug5q8QS95bOuzHBKrXgLGOUgU0iH41Fp2m1R8T7qHg5CB+n0lyqiH+VpfN0MEUiA
-	A11mWpdnmqbzEUi27lYtquW4lwPXy0LhtXmGDKCwwwxWJ1bjiCcnkKDaTt06D6c41qMV+k+xgeTur
-	gyEmSkTsbCOzO5mlKtM5sdzhLrTTAJDQOtxLS7Bw5NxmrrIqnwD0Cl/V/ehvwUprDhJSKGPIEycqV
-	TrTk06Ow==;
-Received: from [192.168.1.4] (port=36940 helo=SH-EX2013.helmholz.local)
-	by mail.helmholz.de with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384
-	(Exim 4.96)
-	(envelope-from <Ante.Knezic@helmholz.de>)
-	id 1qOb9G-0004Nd-1S;
-	Wed, 26 Jul 2023 11:49:38 +0200
-Received: from linuxdev.helmholz.local (192.168.6.7) by
- SH-EX2013.helmholz.local (192.168.1.4) with Microsoft SMTP Server (TLS) id
- 15.0.1497.48; Wed, 26 Jul 2023 11:49:38 +0200
-From: Ante Knezic <ante.knezic@helmholz.de>
-To: <linux@armlinux.org.uk>
-CC: <andrew@lunn.ch>, <ante.knezic@helmholz.de>, <davem@davemloft.net>,
-	<edumazet@google.com>, <f.fainelli@gmail.com>, <kuba@kernel.org>,
-	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<olteanv@gmail.com>, <pabeni@redhat.com>
-Subject: Re: [PATCH net-next v3] net: dsa: mv88e6xxx: Add erratum 3.14 for 88E6390X and 88E6190X
-Date: Wed, 26 Jul 2023 11:49:35 +0200
-Message-ID: <20230726094935.12629-1-ante.knezic@helmholz.de>
-X-Mailer: git-send-email 2.11.0
-In-Reply-To: <ZMALH03Fbp3wKkO2@shell.armlinux.org.uk>
-References: <ZMALH03Fbp3wKkO2@shell.armlinux.org.uk>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9117AA92E
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 09:50:28 +0000 (UTC)
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2DD9DBF;
+	Wed, 26 Jul 2023 02:50:23 -0700 (PDT)
+Authenticated-By: 
+X-SpamFilter-By: ArmorX SpamTrap 5.77 with qID 36Q9npfpF021032, This message is accepted by code: ctloc85258
+Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
+	by rtits2.realtek.com.tw (8.15.2/2.81/5.90) with ESMTPS id 36Q9npfpF021032
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=FAIL);
+	Wed, 26 Jul 2023 17:49:51 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.32; Wed, 26 Jul 2023 17:50:02 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXMBS04.realtek.com.tw (172.21.6.97) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.7; Wed, 26 Jul 2023 17:50:01 +0800
+Received: from RTEXMBS04.realtek.com.tw ([fe80::e138:e7f1:4709:ff4d]) by
+ RTEXMBS04.realtek.com.tw ([fe80::e138:e7f1:4709:ff4d%5]) with mapi id
+ 15.01.2375.007; Wed, 26 Jul 2023 17:50:01 +0800
+From: Hayes Wang <hayeswang@realtek.com>
+To: Andrew Lunn <andrew@lunn.ch>
+CC: "kuba@kernel.org" <kuba@kernel.org>,
+        "davem@davemloft.net"
+	<davem@davemloft.net>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        nic_swsd <nic_swsd@realtek.com>,
+        "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>,
+        "linux-usb@vger.kernel.org"
+	<linux-usb@vger.kernel.org>
+Subject: RE: [PATCH net-next v2 1/2] r8152: adjust generic_ocp_write function
+Thread-Topic: [PATCH net-next v2 1/2] r8152: adjust generic_ocp_write function
+Thread-Index: AQHZv253hmgza7BjuU+Y5BpmqDIk26/LM6YAgACP1oA=
+Date: Wed, 26 Jul 2023 09:50:01 +0000
+Message-ID: <95ecef91f1b9446f8a69280d69422b40@realtek.com>
+References: <20230726030808.9093-417-nic_swsd@realtek.com>
+ <20230726030808.9093-418-nic_swsd@realtek.com>
+ <c63b0f24-4e6b-4df3-8783-9899d178b16e@lunn.ch>
+In-Reply-To: <c63b0f24-4e6b-4df3-8783-9899d178b16e@lunn.ch>
+Accept-Language: zh-TW, en-US
+Content-Language: zh-TW
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-originating-ip: [172.22.228.6]
+x-kse-serverinfo: RTEXMBS04.realtek.com.tw, 9
+x-kse-antispam-interceptor-info: fallback
+x-kse-antivirus-interceptor-info: fallback
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [192.168.6.7]
-X-ClientProxiedBy: SH-EX2013.helmholz.local (192.168.1.4) To
- SH-EX2013.helmholz.local (192.168.1.4)
-X-EXCLAIMER-MD-CONFIG: 2ae5875c-d7e5-4d7e-baa3-654d37918933
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-KSE-AntiSpam-Interceptor-Info: fallback
+X-KSE-ServerInfo: RTEXH36505.realtek.com.tw, 9
+X-KSE-AntiSpam-Interceptor-Info: fallback
+X-KSE-Antivirus-Interceptor-Info: fallback
+X-KSE-AntiSpam-Interceptor-Info: fallback
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
 	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, 25 Jul 2023 18:49:19 +0100 Russell King (Oracle) wrote:
-> Does the errata say that _all_ lanes need this treatment, even when
-> they are not being used as a group (e.g. for XAUI) ?
+Andrew Lunn <andrew@lunn.ch>
+> Sent: Wednesday, July 26, 2023 4:37 PM
+[...]
+> How often is byte_en 0xff? Do you have some benchmark numbers to show
+> it is worth the complexity?
 
-No, unfortunatelly errata says very little, I tried applying erratum only on the requested 
-lane of port 9/10 but this did not work out as expected and the issue was still visible.
-I dont have the necessary HW to perform more tests on other lanes unfortunatelly.
+It is usually used for writing firmware.
+The firmware contains several blocks of continuous registers.
 
-On Tue, 25 Jul 2023 18:49:19 +0100 Russell King (Oracle) wrote:
-> On Tue, Jul 25, 2023 at 08:23:43PM +0300, Vladimir Oltean wrote:
-> > On Fri, Jul 21, 2023 at 12:26:18PM +0200, Ante Knezic wrote:
-> > > diff --git a/drivers/net/dsa/mv88e6xxx/pcs-639x.c b/drivers/net/dsa/mv88e6xxx/pcs-639x.c
-> > > index 98dd49dac421..50b14804c360 100644
-> > > --- a/drivers/net/dsa/mv88e6xxx/pcs-639x.c
-> > > +++ b/drivers/net/dsa/mv88e6xxx/pcs-639x.c
-> > > @@ -20,6 +20,7 @@ struct mv88e639x_pcs {
-> > >  	struct mdio_device mdio;
-> > >  	struct phylink_pcs sgmii_pcs;
-> > >  	struct phylink_pcs xg_pcs;
-> > > +	struct mv88e6xxx_chip *chip;
-> 
-> 	bool erratum_3_14;
+I think it is worth, even this only saves several numbers of control transf=
+er.
+This patch could replace 3 control transfers with 1 control transfer.
+If you could do it with one step, why do you use 3 steps?
+Besides, a control transfer is a complex process.
+I think this could reduce the loading of both software and hardware.
 
-...
+Best Regards,
+Hayes
 
-> > >  static int mv88e639x_sgmii_pcs_post_config(struct phylink_pcs *pcs,
-> > >  					   phy_interface_t interface)
-> > >  {
-> > >  	struct mv88e639x_pcs *mpcs = sgmii_pcs_to_mv88e639x_pcs(pcs);
-> > > +	struct mv88e6xxx_chip *chip = mpcs->chip;
-> > >  
-> > >  	mv88e639x_sgmii_pcs_control_pwr(mpcs, true);
-> > >  
-> > > +	if (chip->info->prod_num == MV88E6XXX_PORT_SWITCH_ID_PROD_6190X ||
-> > > +	    chip->info->prod_num == MV88E6XXX_PORT_SWITCH_ID_PROD_6390X)
-> > > +		mv88e6390_erratum_3_14(mpcs);
-> 
-> 	int err;
-> ...
-> 	if (mpcs->erratum_3_14) {
-> 		err = mv88e6390_erratum_3_14(mpcs);
-> 		if (err)
-> 			dev_err(mpcs->mdio.dev.parent,
-> 				"failed to apply erratum 3.14: %pe\n",
-> 				ERR_PTR(err));
-> 	}
-> 
 
-So you propose to ditch the chip ptr from the mpcs and add a bool variable instead. But
-isn't this too general - the errata applies only to 6190X and 6390X, other devices
-might (and probably do) have errata 3.14 as something completely different? Possible new changes
-(new errata, fixes etc) in the pcs-xxx.c might benefit from having a chip ptr more than 
-using a bool variable "just" for one errata found on two device types?
-
-> > >  
-> > >  	err = mv88e639x_pcs_setup_irq(mpcs, chip, port);
-> > >  	if (err)
-> > > @@ -873,6 +914,7 @@ static int mv88e6393x_pcs_init(struct mv88e6xxx_chip *chip, int port)
-> > >  	mpcs->xg_pcs.ops = &mv88e6393x_xg_pcs_ops;
-> > >  	mpcs->xg_pcs.neg_mode = true;
-> > >  	mpcs->supports_5g = true;
-> > > +	mpcs->chip = chip;
-> 
-> Presumably the 6393x isn't affected by this, so this is not necessary
-> with the above changes.
-
-This was done merely for consistency, besides the memory is already reserved, why not point
-it to something? In case of bool replacement it will not matter anymore.
-
-Thanks,
-	Ante
 
