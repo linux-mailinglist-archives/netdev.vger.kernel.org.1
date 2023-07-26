@@ -1,183 +1,208 @@
-Return-Path: <netdev+bounces-21355-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21356-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26C377635DC
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 14:08:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E36F87635E0
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 14:11:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5B7521C20F8C
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 12:08:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8D283281DBB
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 12:11:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31CEDBE77;
-	Wed, 26 Jul 2023 12:08:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C6FFC126;
+	Wed, 26 Jul 2023 12:11:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25CFBCA77
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 12:08:25 +0000 (UTC)
-Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65D3E199C
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 05:08:24 -0700 (PDT)
-Received: by mail-ed1-x533.google.com with SMTP id 4fb4d7f45d1cf-52164adea19so8872516a12.1
-        for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 05:08:24 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 679EBCA4C
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 12:11:13 +0000 (UTC)
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2095.outbound.protection.outlook.com [40.107.244.95])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BECA71739
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 05:11:11 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=e3WCwmMYwTwfccG9+izuWERzTvirnAuuNGTy5wrsjYjC+QQAEmp3a+fyRxoVL4DC6O63OcpHN3eddJXwSUE6WdwSkhu5S3gVnhH48weyl3zHbkYMuzP29M2UEnpPsaWM+yEOk9YiMHgqW4EyzgqC4QHgZeVSYp90d0Tx5m1rpSYvocCxIqrCuMpn9OZlf0qf8wikZLTjzmkAWlRAMM5x2sj4LOek5S5G5T5FFzGbR15bp9vzrPfREqYyn8WDxzpAdhzlAfCSWDQHlvzKciPwANdThjvM01Lx9KhFWW5WLa6uiMh1xrH4gs6oOTve3BWxXFdncoG2K86+VlGsNpypJA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=cpipeLmJgEx03bEum2q0znlULJjUfggMF2HiLAdm4Tw=;
+ b=Oi1uaB7PH33D9uHjmf6Ev0FOK60TemR0r/BieSENE6uxcTBQyT0XeHhgGI+9adXrSR8xzcRTW0Z/ixFzBuqwfU8cRNixr+ECOU9fEdemsiZM+cWr3U77GFk0ZPzlEr9hZx2MIOjyCTwKmroXyZ8pbZrfT1Uks5o7A+6Z4yBEB7NSCMK90Ps3US9KWGJ87L4FMADWKANrAGpWKWUXppfXvcQArMiYeiOdXCcXuAnCrSPtJ5kB7WJAFw9mAH0uhqhufNrNfxhreyJONrngihZrDF35M+LZQLbQHHGyeoAygJc8kIWX8ugPvgE6fuLR+GczglcsAaCn3U79swwkyXnH9w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
+ dkim=pass header.d=corigine.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690373303; x=1690978103;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=J8f8xfrf9CO1UwpWhwva0oZFFF0z+1JGQgE5+04wLko=;
-        b=7JuuMn+MBz5hYgANnpD4bEvks7OS3SHktyfwoRDMJGaRJlR3i5MAAhEZmypTHWIyuU
-         btCWNmq9Pv4hGz6MJnqT3RauPr/grcWGwTB97C6LgE8o9CtC2Y21vI9abDbmnyujE3B1
-         SKSpzgGkPEygRPQL2ui5iDwCvJf1pkbNHd6P3Id6TJx4JZNE7Nud8vnGeUaNqyo3JyCk
-         /ZFQy6M1+WbOk/TQ3KyIHuXV9luoiFEHsx0HgDqJfy/DpzF+mOAcqlG9+LGe4B+F9Ibk
-         /pdicgMTjiM1I4r4q0huPczbjkFjt6LeDFcFoxmPkfcH8Ae2whA8RGg8k3WF9greqpmJ
-         SO6Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690373303; x=1690978103;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=J8f8xfrf9CO1UwpWhwva0oZFFF0z+1JGQgE5+04wLko=;
-        b=jGyjcZhFmB2kjIQPF0x74ZPhAtRFv8qEPee/FWGwwdf4XkrqIyljUDxi71IvjvEM9b
-         xAAwyid1nmn0tkxyMg8q0Etq4XCXFGbX0yT27RPhzSG8YQr0x1eb7Y9py2tyqT1CqCmT
-         otasTEZUOaLiLFln+Eueze6EZJ+V4kefo9oRptFLS1RAi3qf+oXfMsrSsJ9AJI6DIcM0
-         d0z+wua5R7g8ZGpDEGnt+2zG0bEh+YkObRx4+n34Z+epvpIky/yB1B1ljaTtbUhHCKyP
-         YpM55uk1NHLcLXMPtX4T9pGT7B+rRwqpreHrQzfLVI4YuHZeCQGkv/fSfQ1RPFAsJReI
-         nlww==
-X-Gm-Message-State: ABy/qLb8P7k2uzocbLIYZZ0wWMu4CGHuhQqa/Xu+zb2fKSylvlnzg9fM
-	mQ5Z6kGxJYhj1RWzU+IxOQhmTg==
-X-Google-Smtp-Source: APBJJlFfOkPz2EQQoFKz5CJOLmVEaFKbVA+ian4eCyKk+BO4Er+9/WwSwumtYgFBv5QV1xjXsi5Nrg==
-X-Received: by 2002:a17:906:7690:b0:982:487c:7508 with SMTP id o16-20020a170906769000b00982487c7508mr1508512ejm.38.1690373302686;
-        Wed, 26 Jul 2023 05:08:22 -0700 (PDT)
-Received: from google.com (107.187.32.34.bc.googleusercontent.com. [34.32.187.107])
-        by smtp.gmail.com with ESMTPSA id s8-20020a170906960800b0099316c56db9sm9438817ejx.127.2023.07.26.05.08.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Jul 2023 05:08:22 -0700 (PDT)
-Date: Wed, 26 Jul 2023 12:08:17 +0000
-From: Matt Bobrowski <mattbobrowski@google.com>
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Andrii Nakryiko <andrii@kernel.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Martin KaFai Lau <martin.lau@kernel.org>,
-	David Vernet <void@manifault.com>,
-	Dave Marchevsky <davemarchevsky@meta.com>,
-	Tejun Heo <tj@kernel.org>,
-	Kumar Kartikeya Dwivedi <memxor@gmail.com>,
-	Network Development <netdev@vger.kernel.org>,
-	bpf <bpf@vger.kernel.org>, Kernel Team <kernel-team@fb.com>
-Subject: Re: [PATCH v2 bpf-next 0/4] bpf: Add detection of kfuncs.
-Message-ID: <ZMEMseIyJH9ctdKA@google.com>
-References: <20230317201920.62030-1-alexei.starovoitov@gmail.com>
- <ZMA0SFhEDRp0UFGc@google.com>
- <CAADnVQLkB4dkdje5hq9ZLW0fgiDhEWU0DW67zRtJzLOKTRGhbQ@mail.gmail.com>
+ d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=cpipeLmJgEx03bEum2q0znlULJjUfggMF2HiLAdm4Tw=;
+ b=b6l8Z3C0juL6Y2Nl/7LQHDmrO1ZybaItiZ4bQqjxMvT61dpWqpZeNXIG+s8pN6GdNlUrLjklxf7KX60HJ4PqicAo+KEniyFfQJBc3nZ+t4bJib+jnp7cNr0CjRehK2LRaOxjWvzdWqpCRG1w4EU0ko5YYVvWn43KCAOQAW8JBjE=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=corigine.com;
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
+ by SN4PR13MB5710.namprd13.prod.outlook.com (2603:10b6:806:1ee::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.33; Wed, 26 Jul
+ 2023 12:11:09 +0000
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::fde7:9821:f2d9:101d]) by PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::fde7:9821:f2d9:101d%7]) with mapi id 15.20.6609.032; Wed, 26 Jul 2023
+ 12:11:09 +0000
+Date: Wed, 26 Jul 2023 14:10:57 +0200
+From: Simon Horman <simon.horman@corigine.com>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+	Vedang Patel <vedang.patel@intel.com>,
+	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org,
+	syzkaller <syzkaller@googlegroups.com>
+Subject: Re: [PATCH v1 net] net/sched: taprio: Limit
+ TCA_TAPRIO_ATTR_SCHED_CYCLE_TIME to INT_MAX.
+Message-ID: <ZMENUf0/vg/zBtzf@corigine.com>
+References: <20230726011432.19250-1-kuniyu@amazon.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230726011432.19250-1-kuniyu@amazon.com>
+X-ClientProxiedBy: AS4P250CA0016.EURP250.PROD.OUTLOOK.COM
+ (2603:10a6:20b:5e3::8) To PH0PR13MB4842.namprd13.prod.outlook.com
+ (2603:10b6:510:78::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAADnVQLkB4dkdje5hq9ZLW0fgiDhEWU0DW67zRtJzLOKTRGhbQ@mail.gmail.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,FSL_HELO_FAKE,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-	autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|SN4PR13MB5710:EE_
+X-MS-Office365-Filtering-Correlation-Id: e2e137fa-042a-4238-206d-08db8dd16536
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	/wCE4Zz28jYoLvZmT7mIfDBpaEJY7df9U0kLNYBnU5rDcFqCmoRWp3v5S603HWSFmmi0JPf1tdKWkKmKdV1FlcQwMIYqPnNt2hNZUpr7NvctVnjflKGc8PMtiDNbrkuir/cyfDt/EYOeJXZTsexbAUyCG2VvxOSLiXM/F+ViL6wvTi9+oFP2+Y2Awij82QFSs/IywdRVpoNURu5ORDGC12ZHJxuuUpTWsuIw9hYX4LSQlQQnVYyPeYIZjVyfKTD1PeJINOSDbwyo+PqsTL4VGn8+m6052+0kSDT3Kf2Ts1SEXsDq1+ool+ck//JQ0kYKHXUSVxe8IRrCMlRritAeVWEl1xL3okLbRbEehVnKPq7c5xNS3CG7GvRPuYJxBaIPSZzG1XmmwhMO+wofZVLLxTvWM3IQrle5d/Q+ZQtl64pFgIpXxnyzMgGuODzt0SnQw5SfMI0XckXnzBuIxfTVeixq6HjWZ9O/X+CWjY2BeY1fII3CjHIcLmrpqqo/EzmQ5VCWMQH0TJ/A0FqmIWMKateGFrA2d9kBl5b4JarZM3yFdNAZE9Y4jw9N/JpYdAxQ5lfp1WSHdJc07A8JgZLPF9Ec9Lmf/IhiiX/lRXB/314=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(346002)(39850400004)(136003)(376002)(366004)(396003)(451199021)(7416002)(8676002)(8936002)(44832011)(5660300002)(2906002)(38100700002)(478600001)(2616005)(45080400002)(36756003)(6666004)(54906003)(6486002)(6506007)(6512007)(186003)(316002)(86362001)(41300700001)(66946007)(4326008)(66556008)(66476007)(6916009);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?nHegtkhC1bdbV9z4y9tj46LBiAciww3q7J5G5eCeG48RBXzP5p8b7oCjX5qP?=
+ =?us-ascii?Q?kvhv+qpGTZoegnj1wpfLqfYyDBI7VQF65RqtE4R8JPaNmFdDrz+IbVY3t4zO?=
+ =?us-ascii?Q?fgk1lPjGwUItOKnbeXx4Y4w0DcWTNptPkpm4Jo4NrPFi0SDHG8fFQvvToJ4N?=
+ =?us-ascii?Q?McDiLIkQcLiggySoSkFLtKqf2sAREtszUjSUy9L66lZen/TOgLRDNjf88tCA?=
+ =?us-ascii?Q?YcvMkxOCejcahVqCcgUue5S7c9SVmc3Qba+0hbYgM53sDaj/wEyTbVFjMDeu?=
+ =?us-ascii?Q?RiBMcAGXgKLwaxp7cuTavXyG3bn5W3JaqPYh8uvid5GOBQmpzA6Vul+HSEWr?=
+ =?us-ascii?Q?QfuPNANlWqLRq8pnpSuGPxtmzdFz3eWHbd1+vrcymagt78+AhXP16aTo7iB4?=
+ =?us-ascii?Q?HdeP5F8fbdsah2idYq0ki3p3b3gMIOgi+HY1MjfH0nBycGDaYyVZUYwKFDZG?=
+ =?us-ascii?Q?QWh4+offLnXnU01Mb6M49KMPmHoTzw4RzqW7dT4cJLNOKgv7bIc0OP26IUak?=
+ =?us-ascii?Q?HBXX9XD9A6/kQqzgfYxF+GZCCLjUFJSWaq6smxLfWQt702AfdGUHIwVCGuk2?=
+ =?us-ascii?Q?qPyFnNe1MI6qWzjrQTvh4H+TUnUix2gOCZHILNr4CN37/d1k4FIFH6gzFs03?=
+ =?us-ascii?Q?X96tJPBE8FyHGyMw4dr8ZR3/DenGLx9HCMZjP9EYxJF4IsiLv84cprS8CG+2?=
+ =?us-ascii?Q?r8U2/7t7YPJpmZ+LNyNKANe9W2bJvhbQ4exkeHjZsLigIAu1mzI5ztUUkAJ3?=
+ =?us-ascii?Q?XwH6nm4739xwColCwJJhhEegboYkqjTUMzELQFx3yXSxivNMpVk0BQr/qvat?=
+ =?us-ascii?Q?Ig/vh0gKpYxuV2PC/slP+6DeFfmZd3TM/cD8XLlLk8p5nlS7/2PZQh6vVw3B?=
+ =?us-ascii?Q?5zClyUy7uP6t7mFNUiiqtMQeAcXkEqOAcTCsztl70042+8qwwWklCD+/2bJh?=
+ =?us-ascii?Q?t/ZRbeIoKWCwEQiCDLAKV1qhvFlGLIOGZBhqG+jNM+LjZ+u/6bxWBFt4B25+?=
+ =?us-ascii?Q?lKNIQ1awxUSh5BGj5Cz9BVepQ2Nn90ru5Fl5pxJyLVp0xl990fhXvJ0QTUsg?=
+ =?us-ascii?Q?zolxO+G9CuvL2rSYPpVxr4uaBYotSviexgopIYionBBxXUVoZNivWLpNXLTs?=
+ =?us-ascii?Q?YZCd8yVl85HYBZpMTA+B5Hm5tozXokiBJluKZIb9RObTue66+0sGxo97UGxW?=
+ =?us-ascii?Q?b6tBI1FJJSqGwAYYtFr8avUJoxo/4UW9GVlqmz5QnHcCRWpGkATGZDLJLYY8?=
+ =?us-ascii?Q?pb4Ox1Dr3o7Q/S8JPUCczDTJJz1TFE0wF7/xVu9y5NShDZPBQiYlvpdl0gel?=
+ =?us-ascii?Q?TbRA6b4H3XRh5EDFjRnPEHEwoPw0XhS9nIOcanhjlNR+XZ6WZl2LR04bLewH?=
+ =?us-ascii?Q?utOKprnjX7pxnr1LdLxnhzRxvWXWpS2IrA2M6HLsk6XFhzrMLwLSf19UbcKW?=
+ =?us-ascii?Q?1AasZWeDoGc63gmHdbnNRQ/STak8D+2CJm+sLnp2MOEOLgmBmWOSbxFVi2Qg?=
+ =?us-ascii?Q?HK6kJW7HXP0teKz7vvZtK0vU0j/hZDEqwhpw1KdMoBdP8EbZ/OjaRjMh97bz?=
+ =?us-ascii?Q?LnU56e6nN0HgBNzS1xAtm4NopGOzZ1Cfs235NGt5JQxvqFjQ9EPHfMf0VAmE?=
+ =?us-ascii?Q?EbbaDorvmV5+01JWJRsyNwdGfbJ7Q+NzBFkFcgfk8sQvfx6RNijlPFrCvfU/?=
+ =?us-ascii?Q?sZd0MA=3D=3D?=
+X-OriginatorOrg: corigine.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e2e137fa-042a-4238-206d-08db8dd16536
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Jul 2023 12:11:09.0761
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: t5yNw29WzdUy5tHhAg6QfVDovYgq6r92umLIw+5qJA1E6bR919qFW3Jw7wr+rB8SPL9u5ozyEEhcS2584Uq9hOu1V2Edk3vYQZgrZwu7Sl8=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN4PR13MB5710
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Jul 25, 2023 at 02:00:40PM -0700, Alexei Starovoitov wrote:
-> On Tue, Jul 25, 2023 at 1:45 PM Matt Bobrowski <mattbobrowski@google.com> wrote:
-> >
-> > Hey Alexei/Andrii,
-> >
-> > On Fri, Mar 17, 2023 at 01:19:16PM -0700, Alexei Starovoitov wrote:
-> > > From: Alexei Starovoitov <ast@kernel.org>
-> > >
-> > > Allow BPF programs detect at load time whether particular kfunc exists.
-> >
-> > So, I'm running a GCC built 6.3.7 Linux kernel and I'm attempting to
-> > detect whether a specific kfunc i.e. bpf_rcu_read_lock/unlock() exists
-> > using the bpf_ksym_exists() macro. However, I'm running into several
-> > BPF verifier constraints that I'm not entirely sure how to work around
-> > on the aforementioned Linux kernel version, and hence why I'm reaching
-> > out for some guidance.
-> >
-> > The first BPF verifier constraint that I'm running into is that prior
-> > to commit 58aa2afbb1e6 ("bpf: Allow ld_imm64 instruction to point to
-> > kfunc"), it seems that the ld_imm64 instruction with BPF_PSEUDO_BTF_ID
-> > can only hold a ksym address for the kind KIND_VAR. However, when
-> > attempting to use the kfuncs bpf_rcu_read_lock/unlock() from a BPF
-> > program, the kind associated with the BPF_PSEUDO_BTF_ID is actually
-> > KIND_FUNC, and therefore trips over this BPF verifier.
-> >
-> > The code within the example BPF program is along the lines of the
-> > following:
-> > ```
-> > ...
-> > void bpf_rcu_read_lock(void) __ksym __weak;
-> > void bpf_rcu_read_unlock(void) __ksym __weak;
-> > ...
-> > if (bpf_ksym_exists(bpf_rcu_read_lock)) {
-> >    bpf_rcu_read_lock();
-> > }
-> > ...
-> > if (bpf_ksym_exists(bpf_rcu_read_unlock)) {
-> >    bpf_rcu_read_unlock();
-> > }
-> > ...
-> > ```
-> >
-> > The BPF verifier error message that is generated on a 6.3.7 Linux
-> > kernel when attempting to load a BPF program that makes use of the
-> > above approach is as follows:
-> >    * "pseudo btf_id {BTF_ID} in ldimm64 isn't KIND_VAR"
-> >
-> > The second BPF verifier constraint comes from attempting to work
-> > around the first BPF verifier constraint that I've mentioned
-> > above. This is trivially by dropping the conditionals that contain the
-> > bpf_ksym_exists() check and unconditionally calling the kfuncs
-> > bpf_rcu_read_lock/unlock().
-> >
-> > The code within the example BPF program is along the lines of the
-> > following:
-> > ```
-> > ...
-> > void bpf_rcu_read_lock(void) __ksym __weak;
-> > void bpf_rcu_read_unlock(void) __ksym __weak;
-> > ...
-> > bpf_rcu_read_lock();
-> > ...
-> > bpf_rcu_read_unlock();
-> > ...
-> > ```
-> >
-> > However, in this case the BPF verifier error message that is generated
-> > on a 6.3.7 Linux kernel is as follows:
-> >    * "no vmlinux btf rcu tag support for kfunc bpf_rcu_read_lock"
-> >
-> > This approach would be suboptimal anyway as the BPF program would fail
-> > to load on older Linux kernels complaining that the kfunc is
-> > referenced but couldn't be resolved.
-> >
-> > Having said this, what's the best way to resolve this on a 6.3.7 Linux
-> > kernel? The first BPF program I mentioned above making use of the
-> > bpf_ksym_exists() macro works on a 6.4 Linux kernel with commit
-> > 58aa2afbb1e6 ("bpf: Allow ld_imm64 instruction to point to kfunc")
-> > applied. Also, the first BPF program I mentioned above works on a
-> > 6.1.* Linux kernel...
+On Tue, Jul 25, 2023 at 06:14:32PM -0700, Kuniyuki Iwashima wrote:
+> syzkaller found a zero division error [0] in div_s64_rem() called from
+> get_cycle_time_elapsed(), where sched->cycle_time is the divisor.
 > 
-> Backport of that commit to 6.3.x is probably the only way.
+> We have tests in parse_taprio_schedule() so that cycle_time will never
+> be 0, and actually cycle_time is not 0 in get_cycle_time_elapsed().
+> 
+> The problem is that the types of divisor are different; cycle_time is
+> s64, but the argument of div_s64_rem() is s32.
+> 
+> syzkaller fed this input and 0x100000000 is cast to s32 to be 0.
+> 
+>   @TCA_TAPRIO_ATTR_SCHED_CYCLE_TIME={0xc, 0x8, 0x100000000}
+> 
+> We use s64 for cycle_time to cast it to ktime_t, so let's keep it and
+> set min/max for cycle_time.
+> 
+> [0]:
+> divide error: 0000 [#1] PREEMPT SMP KASAN NOPTI
+> CPU: 1 PID: 103 Comm: kworker/1:3 Not tainted 6.5.0-rc1-00330-g60cc1f7d0605 #3
+> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org 04/01/2014
+> Workqueue: ipv6_addrconf addrconf_dad_work
+> RIP: 0010:div_s64_rem include/linux/math64.h:42 [inline]
+> RIP: 0010:get_cycle_time_elapsed net/sched/sch_taprio.c:223 [inline]
+> RIP: 0010:find_entry_to_transmit+0x252/0x7e0 net/sched/sch_taprio.c:344
+> Code: 3c 02 00 0f 85 5e 05 00 00 48 8b 4c 24 08 4d 8b bd 40 01 00 00 48 8b 7c 24 48 48 89 c8 4c 29 f8 48 63 f7 48 99 48 89 74 24 70 <48> f7 fe 48 29 d1 48 8d 04 0f 49 89 cc 48 89 44 24 20 49 8d 85 10
+> RSP: 0018:ffffc90000acf260 EFLAGS: 00010206
+> RAX: 177450e0347560cf RBX: 0000000000000000 RCX: 177450e0347560cf
+> RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000100000000
+> RBP: 0000000000000056 R08: 0000000000000000 R09: ffffed10020a0934
+> R10: ffff8880105049a7 R11: ffff88806cf3a520 R12: ffff888010504800
+> R13: ffff88800c00d800 R14: ffff8880105049a0 R15: 0000000000000000
+> FS:  0000000000000000(0000) GS:ffff88806cf00000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 00007f0edf84f0e8 CR3: 000000000d73c002 CR4: 0000000000770ee0
+> PKRU: 55555554
+> Call Trace:
+>  <TASK>
+>  get_packet_txtime net/sched/sch_taprio.c:508 [inline]
+>  taprio_enqueue_one+0x900/0xff0 net/sched/sch_taprio.c:577
+>  taprio_enqueue+0x378/0xae0 net/sched/sch_taprio.c:658
+>  dev_qdisc_enqueue+0x46/0x170 net/core/dev.c:3732
+>  __dev_xmit_skb net/core/dev.c:3821 [inline]
+>  __dev_queue_xmit+0x1b2f/0x3000 net/core/dev.c:4169
+>  dev_queue_xmit include/linux/netdevice.h:3088 [inline]
+>  neigh_resolve_output net/core/neighbour.c:1552 [inline]
+>  neigh_resolve_output+0x4a7/0x780 net/core/neighbour.c:1532
+>  neigh_output include/net/neighbour.h:544 [inline]
+>  ip6_finish_output2+0x924/0x17d0 net/ipv6/ip6_output.c:135
+>  __ip6_finish_output+0x620/0xaa0 net/ipv6/ip6_output.c:196
+>  ip6_finish_output net/ipv6/ip6_output.c:207 [inline]
+>  NF_HOOK_COND include/linux/netfilter.h:292 [inline]
+>  ip6_output+0x206/0x410 net/ipv6/ip6_output.c:228
+>  dst_output include/net/dst.h:458 [inline]
+>  NF_HOOK.constprop.0+0xea/0x260 include/linux/netfilter.h:303
+>  ndisc_send_skb+0x872/0xe80 net/ipv6/ndisc.c:508
+>  ndisc_send_ns+0xb5/0x130 net/ipv6/ndisc.c:666
+>  addrconf_dad_work+0xc14/0x13f0 net/ipv6/addrconf.c:4175
+>  process_one_work+0x92c/0x13a0 kernel/workqueue.c:2597
+>  worker_thread+0x60f/0x1240 kernel/workqueue.c:2748
+>  kthread+0x2fe/0x3f0 kernel/kthread.c:389
+>  ret_from_fork+0x2c/0x50 arch/x86/entry/entry_64.S:308
+>  </TASK>
+> Modules linked in:
+> 
+> Fixes: 4cfd5779bd6e ("taprio: Add support for txtime-assist mode")
+> Reported-by: syzkaller <syzkaller@googlegroups.com>
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
-Ah, that's very unfortunate. Should we consider sending this patch
-series to linux-stable so that it can be considered for 6.3.x?
+Reviewed-by: Simon Horman <simon.horman@corigine.com>
 
-/M
 
