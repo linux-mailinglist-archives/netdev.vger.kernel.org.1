@@ -1,147 +1,168 @@
-Return-Path: <netdev+bounces-21390-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21391-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 424397637AF
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 15:35:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 805ED7637B5
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 15:37:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E2A69281E00
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 13:35:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B159A1C2124B
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 13:37:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 087D7C2D8;
-	Wed, 26 Jul 2023 13:35:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 831BCC2D9;
+	Wed, 26 Jul 2023 13:37:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF142AD28
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 13:35:11 +0000 (UTC)
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2081.outbound.protection.outlook.com [40.107.102.81])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 449E4172E;
-	Wed, 26 Jul 2023 06:35:10 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=lBp64wciSwXL3x+3w08OAGJUXTnPI2G5V9om9s1rT4l8Zjh/nSL256t2RJIAILqvkwmDrNjVedgB7sJ7qumIs3hMriy7ogw8P+NDfj+gfgTW8G8hfmK6Oee7+gQViR7G8IC5LLfArB3ApJDxdgFznTpwim1TSgSS57/3uK0gTB40g504j8TQHK4XUwujxtbaJqTpRvuxCFhLUqE5sEgyQvmQUX6Hmfp2r8PxMTXs/IT70KAWPta9dHOGca5bZ8ytLJvrjppAK4s8DXzlxnOCUwNfJqPFSnw2+1I/XLU3eHS6VHndrTRNq69vuH6pJocGtZMnAWP9NW5XsSEqf6uB4w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=XPqRzSsEPHumIe2cBUoZ7hzergtu5ALtiCQyFKsdWG0=;
- b=YQfnbt9o/dV/2JZcLrLevDUceYxPQcGB2fyO4tgkhi6t2F75KFWPTYBlOdVmLbGRmLuCWPh4yL0ClnsN07/HXuxGYTtYfTi/qVGaxvTVefUjrydqT6BifYZKa8HKcm+aAT6LkE7BAfgotLpXy43YSpXfrR4nnealUE/dMDEsg7jCcPEGUD6HT8r/nY4uQAbA8XmuAQtvR0D4HCcE7KTpMsjcqr/npVPrAF3RyjCkP9JPo2IAvgLzgHkfy96EgI8hl4Bd4U6eDHvegZFMmI/1hukv5I0Q8v7kJouxQmnuGl/5xzZqqvhFZlmnnQwkG19P1/6eajObZudgRVsOlrT3Xw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=XPqRzSsEPHumIe2cBUoZ7hzergtu5ALtiCQyFKsdWG0=;
- b=uHSA9rTorFohI58q/8SkUBFpF67NbjQH5G68kG/3ouNkOFJIxKUBE94yZmDFAjOa6Kwutunk5eZy/49iFVuBnNUcL37mqVxwmOd+YBDJNihOVsBGgFXDaIcaS5dNBQv/0R2pSxzkZiPM9zK6Wiyb7sZ8RT6yRipvtytbGVlSa2c/rTm26KnvR1zWf2ewFuXYi2VMmtNo7NbpT5XDfTyBVH4kdRb3saIE3Mtj6KEhPD3czxm4mFOPvPajNZSXJa7ZqmQ3RUVqiXaqYRRvdyJP6QOOl6D94iDjyMxU+NbAYkLTF1c53Ra1EJkndHL/LAdAe75ozc8kSR400/zbX45jxA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by CH3PR12MB8188.namprd12.prod.outlook.com (2603:10b6:610:120::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.29; Wed, 26 Jul
- 2023 13:35:07 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::5111:16e8:5afe:1da1]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::5111:16e8:5afe:1da1%6]) with mapi id 15.20.6631.026; Wed, 26 Jul 2023
- 13:35:07 +0000
-Date: Wed, 26 Jul 2023 10:35:06 -0300
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Brett Creeley <brett.creeley@amd.com>
-Cc: kvm@vger.kernel.org, netdev@vger.kernel.org, alex.williamson@redhat.com,
-	yishaih@nvidia.com, shameerali.kolothum.thodi@huawei.com,
-	kevin.tian@intel.com, simon.horman@corigine.com,
-	shannon.nelson@amd.com
-Subject: Re: [PATCH v13 vfio 0/7] pds-vfio-pci driver
-Message-ID: <ZMEhCrZDNLSrWP/5@nvidia.com>
-References: <20230725214025.9288-1-brett.creeley@amd.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230725214025.9288-1-brett.creeley@amd.com>
-X-ClientProxiedBy: BL0PR05CA0029.namprd05.prod.outlook.com
- (2603:10b6:208:91::39) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7789CAD28
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 13:37:01 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0EF22689
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 06:36:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1690378618;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=dWXs5awLY8UzHFu6yejKew3eLks3/P9TSyf4ogo8JHs=;
+	b=FI+/qgydhO29616+/eplUQaPbEQKr9A5aXyVJEdp5AJXXqKjKNH8qXipetStNYG2+eJtib
+	FziqmhKcP1n5C0b2nxSP0O1vcD80vIe3S1HB/wPN+Xx/yBhhUwXq2IJMoMLBuUcG8pZMWZ
+	f/riqO4lzawQPfRjMxMH4Um6p9ChvMU=
+Received: from mail-oi1-f200.google.com (mail-oi1-f200.google.com
+ [209.85.167.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-673-r1gVAY-1OgiyOLbEGVUa3Q-1; Wed, 26 Jul 2023 09:36:57 -0400
+X-MC-Unique: r1gVAY-1OgiyOLbEGVUa3Q-1
+Received: by mail-oi1-f200.google.com with SMTP id 5614622812f47-3a361b64226so1071881b6e.0
+        for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 06:36:57 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690378616; x=1690983416;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:to:from:subject:message-id:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=dWXs5awLY8UzHFu6yejKew3eLks3/P9TSyf4ogo8JHs=;
+        b=bFgJRyyxMO2Qjxe4ZZ8tqP3l9+nxR7NGhW3h8JcWQ6OXQ1GtTZwJbH31I9EVSmZYDI
+         LP9egALKQM5vtZaYgxv8wBnCKBJdyY8hRXGl37zeZKF2p9g/QfBtrIYQLvhbRF8CALqd
+         gvusuPGYlB0/t1ZV3Rlbuv0brj01Gr5FFX5Z0nQWRbJuTPwIBlPLhI1R/vLcBqFEWZSj
+         +vR96IXIMUINkjIobU6jHSaXrzxIDSvJRG05fK5Lqb1fd9P+q8Ji1Sw7leaJNyxN2JS2
+         DMNQxqfnKAbGtyd5Z4KQSQw/INjFEcciyDuvUXLYOVGGeTBqmihxaLqWKG1gdRwUxkn/
+         FyIg==
+X-Gm-Message-State: ABy/qLbt8rOouiDe/x3F97MeVvWzMuSWyiivjdRthT5HCHWiORIQ0nTb
+	QKpExOf1DuMaq6/MQi9TZQscImkzRBrR3UAGs6SrNOe9W5P6ZKvKkh+2eN/a/GQlDjWnqQm3W8V
+	DOr6tYElScRLE8z9X6SNx5HXS
+X-Received: by 2002:a05:6808:1917:b0:39e:86b3:d8ab with SMTP id bf23-20020a056808191700b0039e86b3d8abmr2385235oib.4.1690378616328;
+        Wed, 26 Jul 2023 06:36:56 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlHMyMXgGmvRI8opQ0hYPtCsIdnGTPfN/9hGRGoh1dVOw83uSmzP8jjIbe6i59ebwJ8us/M9pQ==
+X-Received: by 2002:a05:6808:1917:b0:39e:86b3:d8ab with SMTP id bf23-20020a056808191700b0039e86b3d8abmr2385223oib.4.1690378616094;
+        Wed, 26 Jul 2023 06:36:56 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-225-81.dyn.eolo.it. [146.241.225.81])
+        by smtp.gmail.com with ESMTPSA id jt40-20020a05622aa02800b00403f5b07e27sm4765749qtb.51.2023.07.26.06.36.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 Jul 2023 06:36:55 -0700 (PDT)
+Message-ID: <34c11a9d2b473b7809e9fb9839b1b7b7d721eaa0.camel@redhat.com>
+Subject: Re: [PATCH 2/2] Rescan the hash2 list if the hash chains have got
+ cross-linked.
+From: Paolo Abeni <pabeni@redhat.com>
+To: David Laight <David.Laight@ACULAB.COM>, 
+ "'willemdebruijn.kernel@gmail.com'" <willemdebruijn.kernel@gmail.com>,
+ "'davem@davemloft.net'" <davem@davemloft.net>,  "'dsahern@kernel.org'"
+ <dsahern@kernel.org>, 'Eric Dumazet' <edumazet@google.com>,
+ "'kuba@kernel.org'" <kuba@kernel.org>, "'netdev@vger.kernel.org'"
+ <netdev@vger.kernel.org>
+Date: Wed, 26 Jul 2023 15:36:52 +0200
+In-Reply-To: <c45337a3d46641dc8c4c66bd49fb55b6@AcuMS.aculab.com>
+References: <fbcaa54791cd44999de5fec7c6cf0b3c@AcuMS.aculab.com>
+	 <c45337a3d46641dc8c4c66bd49fb55b6@AcuMS.aculab.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|CH3PR12MB8188:EE_
-X-MS-Office365-Filtering-Correlation-Id: fd54593a-9646-4acc-117c-08db8ddd203a
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	Z6Lbc6dgD7fYLBbDq0Z6MZ50yp3B95hOCWEvIzTnZ5t7KvDx7VhAsP/2ojIZtNWqioYFGFVrRSL4MENfGTpr2SoM62te+//qUNrT/I68K5F40ms+Pmr/b7DoGHOlDWLnn5EkrKC77yFwY7AOqYTIMLKw4G4QLh0FNgcZjFswfZXEksc92lhw4TntURr5HubHsT1lEjJkgCwB+NE6CjKVLmC7vr1dfnCSyH0zoljeWxoXAKgvhOLS5U3843Lde2uVm+EFIxkzv6nHfxKZF1zj1Kit1OQHd1jcooQmUw9iVXYvzoTCQzgn5mEIWdvAzpZKcIZhovoB3nzc4Cud3spGuEY2iCTqfsCk6RxBwIHhuc8fogkukaBHPBX/aIKa+lcwjpYkptDgF2bJ2tDRlY/bKn+RpUvKqW3EDwYV89Q9Pe2cKFSjDs33LkA9v0fW3VUNVh2DLqrSUq6+3rPWylDvofVr+osZwIvgMkkARCkUuZjjDCoJR40fsOoabbCO9oUZ3G+2a+ednrHY0iC/CBqnA7wbL2lUIM4BDjrRlnyLLn4oR0ucYeUECcFxPSJo4q9h
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(376002)(136003)(366004)(346002)(396003)(39860400002)(451199021)(316002)(6506007)(26005)(8936002)(8676002)(41300700001)(478600001)(66556008)(6916009)(66946007)(6512007)(66476007)(4326008)(6486002)(38100700002)(36756003)(4744005)(2616005)(2906002)(83380400001)(86362001)(186003)(5660300002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?big3acHRHyyaNywdk3GadSbJXZINBiKs1PSFrvoMEd3wzS24DKOjqqwSreJL?=
- =?us-ascii?Q?Q/INvB56N5QhW4+V42WA0ShdWod7pRdZSVa5CKOtq2Z02pS1WsJcewokFKUU?=
- =?us-ascii?Q?iSpJQvCDSy+aAAg20V3G0jfAsE2asR2wLzoksY7po9IeIg8V7mosX7Zacg1+?=
- =?us-ascii?Q?MEEn3Av2jX3pMqcuu+xjvHnW4a5UBGivCNiKRp7oLeVGba8sjZrY3TgjyVaX?=
- =?us-ascii?Q?EE45s+UtUsmRlVRkk8a1NijKpr27Jx3R3ME9em8BX7sg2hEXwQyrFgLi1sBz?=
- =?us-ascii?Q?C4Ynv6BLmfB6as16jMk9xKHeCFiBguOsahd9XyuWz3pMLQDAyHm4vUhHus8S?=
- =?us-ascii?Q?fjVb07mEIserAgj7rNd2xW0fYvJVAvOAdd0MAeG1ATJklRB54tf6a1pIfGf+?=
- =?us-ascii?Q?I+M/2Yiljy5aNhF+jPpqkI2uz8Mo+ObicYX9BnLOHYzwGAcMMu5AelTpNeL3?=
- =?us-ascii?Q?lqCiIZnqp8RzAGzR8PluuIM/EE2VVmoFv6/V6pTj8gEyJxnZdlzQHDNXeIF9?=
- =?us-ascii?Q?PSnmFLOJ7qjdb1mSV7TJEC86Yh1qjUcz6cjaT6VinkLtM2AkvohSAiIFeMOD?=
- =?us-ascii?Q?SIIauf90tU9HhF0SiI4iRRI25xDSiYnsDL39ezHei65T/ujLeTAV84d4t42Z?=
- =?us-ascii?Q?a07CI2iep+FW9YSRUai87NBpSjAiCu3ttRVdMhNL09fIzzphmbgb3dBg8Il9?=
- =?us-ascii?Q?wC40r+OCawSSGt0D/cSZgesc29t4bhDuNmlJe45vhA+qwcX8LHx9mantBVa/?=
- =?us-ascii?Q?OJ677TeYpPU0vjhN9fJzNLONwVTTLUgnf4L8HJtNW/g31yrEEZNNyExUD1u2?=
- =?us-ascii?Q?HAGZU/txPB2a11SHzytUREfY+oHSWREmXHwgkVCZuKfpQUILm5kfrbCQmfL6?=
- =?us-ascii?Q?QobB13Y6NUIzThJgL3xWpRlSWZYLoltzUQ7FMl6LiwNkv/xXPQzBxFOMAe+8?=
- =?us-ascii?Q?DJJ3ZlDu4VkGzb2SGqUagvqdONqGsWNbvgZvvaPwrhQbdPMW+jRQV5ceFNda?=
- =?us-ascii?Q?ZHYq+ooxoR7b7m5nsHn/iTX0VBJRXewUQ5v/Ylt0+BxzhDdCBCRwk00p4dP0?=
- =?us-ascii?Q?mUpGEscuPYVAWMR1geKbrqWN2e8RONF2GhhosciELgDjiSxcPp61R2Ac7jRw?=
- =?us-ascii?Q?+boXxGUqmLhLeD3yLHCX7HVlF0M5jcVmBbchHDsev+dmJV2V38Rlkv8689A3?=
- =?us-ascii?Q?otohSb/CuuznBRRaB8B2GJjm8Zmvy3Q5AerkoPVYzbXTbEBT1zyWL5g2dxA/?=
- =?us-ascii?Q?MBaAOn03ZrYGrCt74SGaMWeGxlJXlPRgqGS8qZn7DIl0cBF8b/4xb5ds2uFP?=
- =?us-ascii?Q?KUW9yOrHXezG0KH0vFeiYOlMHRaNFiYUmqb0HwSOIXbKs75jUD81xTQvPXae?=
- =?us-ascii?Q?CA+qLFpySCJoBlJNFaNIYC1NBNS0vU+FgdlrEo+EuTNT/N/HJjjzb/vKq0TB?=
- =?us-ascii?Q?nV/TUPVN3XJRWYZHQ6UE3nxaZrQef8j9RTPHBeeJzoOdp/Xiss6r5pD+oIPy?=
- =?us-ascii?Q?f/18x/JgPKDWqZMopTo/Pn/cn1tIzpiqwiyF1aWInRE6dPW2IG+vTNxXpm2i?=
- =?us-ascii?Q?PtgWt2BzBJaf/8jotzHhO3hc1KS0R7yX4HkLgI8Y?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fd54593a-9646-4acc-117c-08db8ddd203a
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Jul 2023 13:35:07.2715
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: zUXjwBifyNXHPgnRfpTJugWHEg22+0RSC6xVZ0xszyACduXpz5T19UJMiPoyvzV/
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8188
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Jul 25, 2023 at 02:40:18PM -0700, Brett Creeley wrote:
+Hi,
 
-> Note: This series is based on the latest linux-next tree. I did not base
-> it on the Alex Williamson's vfio/next because it has not yet pulled in
-> the latest changes which include the pds_vdpa driver. The pds_vdpa
-> driver has conflicts with the pds-vfio-pci driver that needed to be
-> resolved, which is why this series is based on the latest linux-next
-> tree.
+On Wed, 2023-07-26 at 12:05 +0000, David Laight wrote:
+> udp_lib_rehash() can get called at any time and will move a
+> socket to a different hash2 chain.
+> This can cause udp4_lib_lookup2() (processing incoming UDP) to
+> fail to find a socket and an ICMP port unreachable be sent.
+>=20
+> Prior to ca065d0cf80fa the lookup used 'hlist_nulls' and checked
+> that the 'end if list' marker was on the correct list.
+>=20
+> Rather than re-instate the 'nulls' list just check that the final
+> socket is on the correct list.
+>=20
+> The cross-linking can definitely happen (see earlier issues with
+> it looping forever because gcc cached the list head).
+>=20
+> Fixes: ca065d0cf80fa ("udp: no longer use SLAB_DESTROY_BY_RCU")
+> Signed-off-by: David Laight <david.laight@aculab.com>
+> ---
+>  net/ipv4/udp.c | 14 ++++++++++++++
+>  1 file changed, 14 insertions(+)
+>=20
+> diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+> index ad64d6c4cd99..ed92ba7610b0 100644
+> --- a/net/ipv4/udp.c
+> +++ b/net/ipv4/udp.c
+> @@ -443,6 +443,7 @@ static struct sock *udp4_lib_lookup2(struct net *net,
+>  				     struct sk_buff *skb)
+>  {
+>  	unsigned int hash2, slot2;
+> +	unsigned int hash2_rescan;
+>  	struct udp_hslot *hslot2;
+>  	struct sock *sk, *result;
+>  	int score, badness;
+> @@ -451,9 +452,12 @@ static struct sock *udp4_lib_lookup2(struct net *net=
+,
+>  	slot2 =3D hash2 & udptable->mask;
+>  	hslot2 =3D &udptable->hash2[slot2];
+> =20
+> +rescan:
+> +	hash2_rescan =3D hash2;
+>  	result =3D NULL;
+>  	badness =3D 0;
+>  	udp_portaddr_for_each_entry_rcu(sk, &hslot2->head) {
+> +		hash2_rescan =3D udp_sk(sk)->udp_portaddr_hash;
+>  		score =3D compute_score(sk, net, saddr, sport,
+>  				      daddr, hnum, dif, sdif);
+>  		if (score > badness) {
+> @@ -467,6 +471,16 @@ static struct sock *udp4_lib_lookup2(struct net *net=
+,
+>  			badness =3D score;
+>  		}
+>  	}
+> +
+> +	/* udp sockets can get moved to a different hash chain.
+> +	 * If the chains have got crossed then rescan.
+> +	 */
+> +	if ((hash2_rescan & udptable->mask) !=3D slot2) {
+> +		/* Ensure hslot2->head is reread */
+> +		barrier();
 
-This is not the right way to handle this, Alex cannot apply a series
-against linux-next.
+udp_portaddr_for_each_entry_rcu() uses (indirectly)
+rcu_dereference_raw() to access the head. That implies a READ_ONCE().
+Additional barriers for re-read should not be necessary.
 
-If you can't make a shared branch and the conflicts are too
-significant to forward to Linus then you have to wait for the next
-cycle.
+What about IPV6?
 
-Jason
+Cheers,
+
+Paolo
+
 
