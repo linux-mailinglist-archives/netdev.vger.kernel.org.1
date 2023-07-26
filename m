@@ -1,81 +1,129 @@
-Return-Path: <netdev+bounces-21228-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21232-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07FBC762EAE
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 09:49:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 694FD762EF5
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 09:59:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C714F281B87
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 07:49:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 25A62280F79
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 07:59:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E86809471;
-	Wed, 26 Jul 2023 07:49:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4595F947E;
+	Wed, 26 Jul 2023 07:59:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE71C9456
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 07:49:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A8549456
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 07:59:12 +0000 (UTC)
 Received: from zg8tmja2lje4os4yms4ymjma.icoremail.net (zg8tmja2lje4os4yms4ymjma.icoremail.net [206.189.21.223])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4B89A7687;
-	Wed, 26 Jul 2023 00:49:35 -0700 (PDT)
-Received: from linma$zju.edu.cn ( [42.120.103.60] ) by
- ajax-webmail-mail-app4 (Coremail) ; Wed, 26 Jul 2023 15:49:02 +0800
- (GMT+08:00)
-X-Originating-IP: [42.120.103.60]
-Date: Wed, 26 Jul 2023 15:49:02 +0800 (GMT+08:00)
-X-CM-HeaderCharset: UTF-8
-From: "Lin Ma" <linma@zju.edu.cn>
-To: "Nikolay Aleksandrov" <razor@blackwall.org>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, idosch@nvidia.com, lucien.xin@gmail.com, 
-	liuhangbin@gmail.com, edwin.peer@broadcom.com, jiri@resnulli.us, 
-	md.fahad.iqbal.polash@intel.com, anirudh.venkataramanan@intel.com, 
-	jeffrey.t.kirsher@intel.com, neerav.parikh@intel.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] rtnetlink: let rtnl_bridge_setlink checks
- IFLA_BRIDGE_MODE length
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version XT5.0.14 build 20220622(41e5976f)
- Copyright (c) 2002-2023 www.mailtech.cn
- mispb-4df6dc2c-e274-4d1c-b502-72c5c3dfa9ce-zj.edu.cn
-In-Reply-To: <6a177bb3-0ee4-f453-695b-d9bdd441aa2c@blackwall.org>
-References: <20230725055706.498774-1-linma@zju.edu.cn>
- <6a177bb3-0ee4-f453-695b-d9bdd441aa2c@blackwall.org>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 758F4449C;
+	Wed, 26 Jul 2023 00:59:01 -0700 (PDT)
+Received: from localhost.localdomain (unknown [125.120.144.234])
+	by mail-app2 (Coremail) with SMTP id by_KCgDHr37t0MBk3WGYCg--.38569S4;
+	Wed, 26 Jul 2023 15:53:18 +0800 (CST)
+From: Lin Ma <linma@zju.edu.cn>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	razor@blackwall.org,
+	idosch@nvidia.com,
+	lucien.xin@gmail.com,
+	liuhangbin@gmail.com,
+	edwin.peer@broadcom.com,
+	jiri@resnulli.us,
+	md.fahad.iqbal.polash@intel.com,
+	anirudh.venkataramanan@intel.com,
+	jeffrey.t.kirsher@intel.com,
+	neerav.parikh@intel.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Lin Ma <linma@zju.edu.cn>
+Subject: [PATCH net v3] rtnetlink: let rtnl_bridge_setlink checks IFLA_BRIDGE_MODE length
+Date: Wed, 26 Jul 2023 15:53:14 +0800
+Message-Id: <20230726075314.1059224-1-linma@zju.edu.cn>
+X-Mailer: git-send-email 2.17.1
+X-CM-TRANSID:by_KCgDHr37t0MBk3WGYCg--.38569S4
+X-Coremail-Antispam: 1UD129KBjvJXoW7Zr4rAw15KF4Dtr45WrWkXrb_yoW8tF1xp3
+	W8Ka47GF1DXrn2vFsrZ3W7Za4fZFZ3KrW5Gr42ywn2yr1jqFyUCr9Fkrn09ry7CFsaqFy5
+	tr4DCFyYvw1DXFDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvC14x267AKxVW5JVWrJwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
+	Y2ka0xkIwI1lc2xSY4AK67AK6r4xMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r
+	1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CE
+	b7AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0x
+	vE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAI
+	cVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2Kf
+	nxnUUI43ZEXa7VUbsmitUUUUU==
+X-CM-SenderInfo: qtrwiiyqvtljo62m3hxhgxhubq/
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Message-ID: <7670876b.ea0b8.189912c3a92.Coremail.linma@zju.edu.cn>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:cS_KCgBHjAnvz8BkdjkkCg--.52320W
-X-CM-SenderInfo: qtrwiiyqvtljo62m3hxhgxhubq/1tbiAwIIEmTAePoLZAAAsS
-X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
-	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
-	daVFxhVjvjDU=
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-SGkgTmlrb2xheSwKCj4gCj4gUGF0Y2ggbG9va3MgZ29vZCBub3csIHlvdSBzaG91bGQgcHJvYmFi
-bHkgcmVtb3ZlIHRoZSBleHRyYSBjaGVja3MgZG9uZQo+IGJ5IGVhY2ggZHJpdmVyIHRoYXQgYXJl
-IG5vdyB1bm5lY2Vzc2FyeSAobmV0LW5leHQgbWF0ZXJpYWwpLiBBcyBIYW5nYmluCj4gY29tbWVu
-dGVkIHlvdSBzaG91bGQgdGFyZ2V0IHRoaXMgZml4IGF0IC1uZXQsIHdpdGggdGhhdDoKPiAKPiBB
-Y2tlZC1ieTogTmlrb2xheSBBbGVrc2FuZHJvdiA8cmF6b3JAYmxhY2t3YWxsLm9yZz4KCkNvb2ws
-IEkgYWdyZWUgd2l0aCBIYW5nYmluIHRoYXQgYW5vdGhlciBwYXRjaCB3aGljaCByZW1vdmVzIHRo
-ZSByZWR1bmRhbnQKY2hlY2tzIGluIGRyaXZlciBpcyBuZWVkZWQuCgpCdXQgSSBoYXZlIGEgc2lt
-cGxlIHF1ZXN0aW9uLiBJIHdpbGwgc2VuZCB0aGlzIHBhdGNoIHRvIG5ldCBvbmUgYW5kIGFub3Ro
-ZXIKdG8gbmV0LW5leHQgb25lLiBIb3cgY2FuIEkgZW5zdXJlIHRoZSBsYXR0ZXIgb25lIGRlcGVu
-ZHMgb24gdGhlIGZvcm1lciBvbmU/Ck9yIHNob3VsZCBJIHNlbmQgYSBwYXRjaCBzZXJpZXMgdG8g
-bmV0LW5leHQgdGhhdCBjb250YWlucyB0aGUgZm9ybWVyIG9uZSA6KQooSSBjdXJyZW50bHkgY2hv
-b3NlIHRoZSBtZXRob2QgMiBhbmQgcGxlYXNlIGxldCBtZSBrbm93IGlmIEkgZG8gdGhpcyB3cm9u
-ZykKClJlZ2FyZHMKTGlu
+There are totally 9 ndo_bridge_setlink handlers in the current kernel,
+which are 1) bnxt_bridge_setlink, 2) be_ndo_bridge_setlink 3)
+i40e_ndo_bridge_setlink 4) ice_bridge_setlink 5)
+ixgbe_ndo_bridge_setlink 6) mlx5e_bridge_setlink 7)
+nfp_net_bridge_setlink 8) qeth_l2_bridge_setlink 9) br_setlink.
+
+By investigating the code, we find that 1-7 parse and use nlattr
+IFLA_BRIDGE_MODE but 3 and 4 forget to do the nla_len check. This can
+lead to an out-of-attribute read and allow a malformed nlattr (e.g.,
+length 0) to be viewed as a 2 byte integer.
+
+To avoid such issues, also for other ndo_bridge_setlink handlers in the
+future. This patch adds the nla_len check in rtnl_bridge_setlink and
+does an early error return if length mismatches. To make it works, the
+break is removed from the parsing for IFLA_BRIDGE_FLAGS to make sure
+this nla_for_each_nested iterates every attribute.
+
+Fixes: b1edc14a3fbf ("ice: Implement ice_bridge_getlink and ice_bridge_setlink")
+Fixes: 51616018dd1b ("i40e: Add support for getlink, setlink ndo ops")
+Suggested-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Lin Ma <linma@zju.edu.cn>
+Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
+---
+V1 -> V2: removes the break in parsing for IFLA_BRIDGE_FLAGS suggested
+          by Hangbin Liu <liuhangbin@gmail.com>
+V2 -> V3: add net subject prefix and Acked-by tag
+ net/core/rtnetlink.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
+index 3ad4e030846d..aef25aa5cf1d 100644
+--- a/net/core/rtnetlink.c
++++ b/net/core/rtnetlink.c
+@@ -5140,13 +5140,17 @@ static int rtnl_bridge_setlink(struct sk_buff *skb, struct nlmsghdr *nlh,
+ 	br_spec = nlmsg_find_attr(nlh, sizeof(struct ifinfomsg), IFLA_AF_SPEC);
+ 	if (br_spec) {
+ 		nla_for_each_nested(attr, br_spec, rem) {
+-			if (nla_type(attr) == IFLA_BRIDGE_FLAGS) {
++			if (nla_type(attr) == IFLA_BRIDGE_FLAGS && !have_flags) {
+ 				if (nla_len(attr) < sizeof(flags))
+ 					return -EINVAL;
+ 
+ 				have_flags = true;
+ 				flags = nla_get_u16(attr);
+-				break;
++			}
++
++			if (nla_type(attr) == IFLA_BRIDGE_MODE) {
++				if (nla_len(attr) < sizeof(u16))
++					return -EINVAL;
+ 			}
+ 		}
+ 	}
+-- 
+2.17.1
+
 
