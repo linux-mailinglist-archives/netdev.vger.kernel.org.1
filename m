@@ -1,141 +1,100 @@
-Return-Path: <netdev+bounces-21353-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21354-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E81DC7635D6
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 14:06:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 564AC7635D8
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 14:06:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ACB6C281DEF
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 12:06:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8703D1C211F4
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 12:06:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 274CBBE71;
-	Wed, 26 Jul 2023 12:06:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35D1BBE75;
+	Wed, 26 Jul 2023 12:06:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BB0BBE5D
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 12:06:05 +0000 (UTC)
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A03EAE0
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 05:06:03 -0700 (PDT)
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-65-dxeZYJvvPxaSglt4r8Eqag-1; Wed, 26 Jul 2023 13:06:01 +0100
-X-MC-Unique: dxeZYJvvPxaSglt4r8Eqag-1
-Received: from AcuMS.Aculab.com (10.202.163.4) by AcuMS.aculab.com
- (10.202.163.4) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Wed, 26 Jul
- 2023 13:05:59 +0100
-Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
- id 15.00.1497.048; Wed, 26 Jul 2023 13:05:59 +0100
-From: David Laight <David.Laight@ACULAB.COM>
-To: "'willemdebruijn.kernel@gmail.com'" <willemdebruijn.kernel@gmail.com>,
-	"'davem@davemloft.net'" <davem@davemloft.net>, "'dsahern@kernel.org'"
-	<dsahern@kernel.org>, 'Eric Dumazet' <edumazet@google.com>,
-	"'kuba@kernel.org'" <kuba@kernel.org>, "'pabeni@redhat.com'"
-	<pabeni@redhat.com>, "'netdev@vger.kernel.org'" <netdev@vger.kernel.org>
-Subject: [PATCH 2/2] Rescan the hash2 list if the hash chains have got
- cross-linked.
-Thread-Topic: [PATCH 2/2] Rescan the hash2 list if the hash chains have got
- cross-linked.
-Thread-Index: Adm/uYXsrlBDnyZsQsqXScrMcg4Dhw==
-Date: Wed, 26 Jul 2023 12:05:59 +0000
-Message-ID: <c45337a3d46641dc8c4c66bd49fb55b6@AcuMS.aculab.com>
-References: <fbcaa54791cd44999de5fec7c6cf0b3c@AcuMS.aculab.com>
-In-Reply-To: <fbcaa54791cd44999de5fec7c6cf0b3c@AcuMS.aculab.com>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 266EF9453
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 12:06:18 +0000 (UTC)
+Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D67AAA;
+	Wed, 26 Jul 2023 05:06:13 -0700 (PDT)
+Received: by mail-wm1-x331.google.com with SMTP id 5b1f17b1804b1-3fbc5d5742bso67886895e9.2;
+        Wed, 26 Jul 2023 05:06:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1690373171; x=1690977971;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=kul53tadDBthI+ZaYzNeqd+TymcKzV5bL/24P+6hvFk=;
+        b=HJ87S4KwmBeYfs8n8uOY2DvNi1TT5XMvV+W4HvcYCD53KW8wdJoXGMtrkByjWP6E6O
+         Rhv+oOjLfMiPiMnpp8u/bx+/d+UlQxqjfaAV4KVZBVpIYiFayZn5kNOheuD4sqybRaAD
+         Fngd4YbABMDvlfcq4A4CPw+mgQVhImWjMkN7Xqp993TeDze9R4zXl2/ZQ/Pm0VRNefLv
+         QCAa47iZ4WD5FYgIbf/KjvFlFmmFhc7CUDe2tcrBiCF4AyQW+Q142ovOHt99lARzmWQR
+         mvM0dLUi7sVuxuRWeSFP1iEexROZfvAZDEXG7Kkh57gKtwywBDO3o1rEZbbdhwfB7V5h
+         EaLg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690373171; x=1690977971;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kul53tadDBthI+ZaYzNeqd+TymcKzV5bL/24P+6hvFk=;
+        b=hhpNYGfng9OonaVz5xpCqWBJVbvHQWTC8K0OGmqdjgjosBx/1+2SQQ9OJf7j69ftJM
+         wMRI9sOp9dr5aEFMmL6epJEHg+chA47GgqridU+lAv9l9/IiXWpcEmgpYe2FhsuuRmjE
+         GL4KSbfR+N2LGhNLzI9U4CK4o4tq52wpqkyFWIOPaVU+JcoBojA7y5Lvhe01Dwc3QAqW
+         lKM6T724dHTR/+QDd2dTKb+JB4JIWJG37VOFox9KmONtBVffB8QsPu7jdzjhE42bzF1r
+         iAjZMJBUzYdbI7kjFZOVwuzunmHTjJDZn3cfgR3YYLhtfwSpzlEC+BZL0Ep/ycRsPcQV
+         2sOg==
+X-Gm-Message-State: ABy/qLbX6ToI4OooARBRFNJRuUzZ8sBvmQRgQSWDBJg6qkJZWFq5kGid
+	rJNckhBIl0IGyNCZ6OaT0DQ=
+X-Google-Smtp-Source: APBJJlFl5ailxFDydedUb6tBX/nt3ApQLi716/ErNlzeATDHBIA1sI+tWXTMiHZzE2OkPgbDhof/Tg==
+X-Received: by 2002:a5d:5550:0:b0:315:ad00:e628 with SMTP id g16-20020a5d5550000000b00315ad00e628mr1307335wrw.47.1690373171442;
+        Wed, 26 Jul 2023 05:06:11 -0700 (PDT)
+Received: from skbuf ([188.25.175.105])
+        by smtp.gmail.com with ESMTPSA id l25-20020a7bc459000000b003fbaade072dsm1819165wmi.23.2023.07.26.05.06.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 Jul 2023 05:06:11 -0700 (PDT)
+Date: Wed, 26 Jul 2023 15:06:08 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Atin Bainada <hi@atinb.me>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [net-next PATCH 1/3] net: dsa: tag_qca: return early if dev is
+ not found
+Message-ID: <20230726120608.idjprlnv2i4uy4jg@skbuf>
+References: <20230724033058.16795-1-ansuelsmth@gmail.com>
+ <20230724033058.16795-1-ansuelsmth@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230724033058.16795-1-ansuelsmth@gmail.com>
+ <20230724033058.16795-1-ansuelsmth@gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-udp_lib_rehash() can get called at any time and will move a
-socket to a different hash2 chain.
-This can cause udp4_lib_lookup2() (processing incoming UDP) to
-fail to find a socket and an ICMP port unreachable be sent.
+On Mon, Jul 24, 2023 at 05:30:56AM +0200, Christian Marangi wrote:
+> Currently checksum is recalculated and dsa tag stripped even if we later
+> don't find the dev.
+> 
+> To improve code, exit early if we don't find the dev and skip additional
+> operation on the skb since it will be freed anyway.
+> 
+> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+> ---
 
-Prior to ca065d0cf80fa the lookup used 'hlist_nulls' and checked
-that the 'end if list' marker was on the correct list.
-
-Rather than re-instate the 'nulls' list just check that the final
-socket is on the correct list.
-
-The cross-linking can definitely happen (see earlier issues with
-it looping forever because gcc cached the list head).
-
-Fixes: ca065d0cf80fa ("udp: no longer use SLAB_DESTROY_BY_RCU")
-Signed-off-by: David Laight <david.laight@aculab.com>
----
- net/ipv4/udp.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
-
-diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-index ad64d6c4cd99..ed92ba7610b0 100644
---- a/net/ipv4/udp.c
-+++ b/net/ipv4/udp.c
-@@ -443,6 +443,7 @@ static struct sock *udp4_lib_lookup2(struct net *net,
- =09=09=09=09     struct sk_buff *skb)
- {
- =09unsigned int hash2, slot2;
-+=09unsigned int hash2_rescan;
- =09struct udp_hslot *hslot2;
- =09struct sock *sk, *result;
- =09int score, badness;
-@@ -451,9 +452,12 @@ static struct sock *udp4_lib_lookup2(struct net *net,
- =09slot2 =3D hash2 & udptable->mask;
- =09hslot2 =3D &udptable->hash2[slot2];
-=20
-+rescan:
-+=09hash2_rescan =3D hash2;
- =09result =3D NULL;
- =09badness =3D 0;
- =09udp_portaddr_for_each_entry_rcu(sk, &hslot2->head) {
-+=09=09hash2_rescan =3D udp_sk(sk)->udp_portaddr_hash;
- =09=09score =3D compute_score(sk, net, saddr, sport,
- =09=09=09=09      daddr, hnum, dif, sdif);
- =09=09if (score > badness) {
-@@ -467,6 +471,16 @@ static struct sock *udp4_lib_lookup2(struct net *net,
- =09=09=09badness =3D score;
- =09=09}
- =09}
-+
-+=09/* udp sockets can get moved to a different hash chain.
-+=09 * If the chains have got crossed then rescan.
-+=09 */
-+=09if ((hash2_rescan & udptable->mask) !=3D slot2) {
-+=09=09/* Ensure hslot2->head is reread */
-+=09=09barrier();
-+=09=09goto rescan;
-+=09}
-+
- =09return result;
- }
-=20
---=20
-2.17.1
-
--
-Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1=
-PT, UK
-Registration No: 1397386 (Wales)
-
+Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
 
