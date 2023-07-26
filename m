@@ -1,74 +1,79 @@
-Return-Path: <netdev+bounces-21349-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21350-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43D007635C3
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 14:00:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF4E47635C6
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 14:02:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 74AF01C2037D
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 12:00:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A2AD3281E07
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 12:02:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38F63BE5D;
-	Wed, 26 Jul 2023 12:00:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92E1ABE5F;
+	Wed, 26 Jul 2023 12:02:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C541CA4C
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 12:00:24 +0000 (UTC)
-Received: from mail-vk1-xa36.google.com (mail-vk1-xa36.google.com [IPv6:2607:f8b0:4864:20::a36])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48F92E7E;
-	Wed, 26 Jul 2023 05:00:21 -0700 (PDT)
-Received: by mail-vk1-xa36.google.com with SMTP id 71dfb90a1353d-48138949fb4so2109030e0c.1;
-        Wed, 26 Jul 2023 05:00:21 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8440DCA4C
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 12:02:28 +0000 (UTC)
+Received: from mail-ej1-x635.google.com (mail-ej1-x635.google.com [IPv6:2a00:1450:4864:20::635])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B106AA
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 05:02:23 -0700 (PDT)
+Received: by mail-ej1-x635.google.com with SMTP id a640c23a62f3a-99bcc0adab4so58406566b.2
+        for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 05:02:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690372820; x=1690977620;
+        d=gmail.com; s=20221208; t=1690372941; x=1690977741;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=0C8d55qq0/+Eur6tN53Z2zDq3kG0eUZEUIloyHUkHKI=;
-        b=kcbw7pIAygPKnky8yzBlO7hZ7o4GGbZuFYECKU4DLHtq4aR2iLCfYEalhkOufp6Vym
-         4DqifUbZ8YqdGhktCGwd/5LysIuYXT6QuKbYtntdtyFb4jmAgKutTy0ywhhhSjIloq1d
-         cUDkk5XAf7AgcYphIBKKMMPMTT4Kn38+/s6U+etPWkl7+7CEK67f85PvfPPnfFT7BwO/
-         Y/++njn5+7TeS0F/szdE9/p07L2Nzwr/PpUtiaa4xBctljdoZztBBpXrMOahXQDasvf0
-         sHURRNLDV31ErqYj9in+/MXlXLm79WFlrSxj9UCtjcsolXDO95hHeDwI5y2cvfuc7oJ4
-         dlkQ==
+        bh=qoPCQO3CIWnYMM0tX6KNUXPCxTm/c6ulY3wdvUR9O3k=;
+        b=fXcn05ddUN9vYrh1ugt4x04y/YcV0UlEHd1XbmnKxljT0pYmnwNzxEbNMGby7u586D
+         ZCGtiAumAa1h+6+tIO0DZi+UF0ryr//Ym6wWygmuVvwGa9zWLBk8iZHwK9syYBUEyVfE
+         o5Sttj5qbc0FCRLNMnOLtmyw0KAcqFW2fE+dAbYFl2WizKx9SP53Pqe8L9OGkV/+xcV4
+         AOt7meVttoKQpVIUhqA+5s9k9VYdMKVCHJA/sTF6UNOfNXPuLwddpBN52JMyLdnJR8ZI
+         Te5dPdBAfnVz/yqv2oQZOOu8EVstDtFLW6h398NDVyKJ86oHQ+8UHRswJYv2c1ouAxz3
+         ovzA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690372820; x=1690977620;
+        d=1e100.net; s=20221208; t=1690372941; x=1690977741;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=0C8d55qq0/+Eur6tN53Z2zDq3kG0eUZEUIloyHUkHKI=;
-        b=MtpQGjh1aABYV8r+c5dlIX6Fiqph1Kp0yuToMB+jX5+Llf0qBEBKP9Smx444uE+lMq
-         KgtSJ9MuuDmglZu058nuUEhqtq6DB0LCZtjrOK5nBSkIWSfC6fY/CyqF4yF7QVzhwNI/
-         +YgNXbyedn31tlGIaTYC95DUW+Tjmi91XZu9sBg/Ir545vTZ8S/TzYUyPUZxkFaUXGV4
-         PTv22kwHkTlDqGNoiied+RBIh5i8FAUvCUr+p6iBjZ/Dr2RLUdEPfocJGrQWY/5jkQFR
-         ZbQFvKonhRh776aa93VmITs26U821pEHlpmUbt0nIDMn0c+hl9mS2F4sU7xp7LLPQweZ
-         oU6A==
-X-Gm-Message-State: ABy/qLaojCNuhg4v2YdfqbJ1jdiN0+EM4O11UmjdBbbVXKB6goTYIaIm
-	+lg4QTVJdGeq5dGrM8+hMvvCRJ8owv29hEzKXhg2nAJU
-X-Google-Smtp-Source: APBJJlGKlakVABDzsWyJWplEA7UFkKskX8Awsy1oWJ2L7EKBABUtjyMabv27vJau8UHZTbn12pdosvc6vsBNpAtl9HE=
-X-Received: by 2002:a1f:4596:0:b0:485:e984:64ca with SMTP id
- s144-20020a1f4596000000b00485e98464camr1164073vka.3.1690372820196; Wed, 26
- Jul 2023 05:00:20 -0700 (PDT)
+        bh=qoPCQO3CIWnYMM0tX6KNUXPCxTm/c6ulY3wdvUR9O3k=;
+        b=ce5vxtHgBI/H98AJmS4Vqxcd+nBgl7egQRPee4i9mzJLj6ntkcS1hBXbEZHiAI6N/a
+         Y8MlJ3gONORtlCWxII+dBtqcfjf0vdUEsumNLNooTYtopTX9iOYuEaL692Uifd5WgTVt
+         zJcU/udY7HlCgzeDw8+ys9VGf3JwHrd0iA5ZvaHmCFX4QJuDylV8JpjeCZ20GQjny+ii
+         Zmb5cYJY1hT8tXvS+qi/TnRnuzO3WYAODsyIS1Mcb9ydMBdp8Kq9AN0ZWuX1kWHiPgz6
+         eRqturNCNB629viWPBH1D9tOugqmlarDW6yDqets2o/cfIjm7X2EOKPVgb0aQI3gglGF
+         vEAQ==
+X-Gm-Message-State: ABy/qLYZppzNFMhhqkiz7c0xPiEeAL8e5MoFQibydJTmdDFQax6t/+rt
+	PcMuy4CYbzMijxQRB3GiPoVkrgPYoZndsCL+2qo=
+X-Google-Smtp-Source: APBJJlGCtZkEdxLxj+wDw3nfkiQ9ynP6L2xpuL8g7cVF/3nB4WS+zihn9Q74H6Uf3KkzYO/fIAEgI2luhWo4wNmYwgQ=
+X-Received: by 2002:a17:906:5dcc:b0:99b:492d:25fa with SMTP id
+ p12-20020a1709065dcc00b0099b492d25famr1358608ejv.76.1690372941252; Wed, 26
+ Jul 2023 05:02:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAA85sZsTF21va8HhwrJc_yuVgVU6+dppEd-SdQpDjqLNFtcneQ@mail.gmail.com>
- <20230724142415.03a9d133@kernel.org> <ZMDTUHlPmns/85Kk@calendula>
-In-Reply-To: <ZMDTUHlPmns/85Kk@calendula>
-From: Ian Kumlien <ian.kumlien@gmail.com>
-Date: Wed, 26 Jul 2023 14:00:08 +0200
-Message-ID: <CAA85sZs4RqJc51po=W-No-DMgWQGVa=hsRdRS5e6FG-F7SnZYA@mail.gmail.com>
-Subject: Re: Kernel oops with 6.4.4 - flow offloads - NULL pointer deref
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: Jakub Kicinski <kuba@kernel.org>, 
-	Linux Kernel Network Developers <netdev@vger.kernel.org>, netfilter-devel@vger.kernel.org
+References: <20230721071532.613888-1-marcin.szycik@linux.intel.com>
+ <20230721071532.613888-3-marcin.szycik@linux.intel.com> <ZLqZRFa1VOHHWCqX@smile.fi.intel.com>
+ <5775952b-943a-f8ad-55a1-c4d0fd08475f@intel.com>
+In-Reply-To: <5775952b-943a-f8ad-55a1-c4d0fd08475f@intel.com>
+From: Andy Shevchenko <andy.shevchenko@gmail.com>
+Date: Wed, 26 Jul 2023 15:01:44 +0300
+Message-ID: <CAHp75VcFse1_gijfhDkyxhBFtd1d-o5_4RO2j2urSXJ_HuZzyg@mail.gmail.com>
+Subject: Re: [PATCH iwl-next v3 2/6] ip_tunnel: convert __be16 tunnel flags to bitmaps
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: Andy Shevchenko <andy@kernel.org>, Yury Norov <yury.norov@gmail.com>, 
+	Marcin Szycik <marcin.szycik@linux.intel.com>, intel-wired-lan@lists.osuosl.org, 
+	netdev@vger.kernel.org, wojciech.drewek@intel.com, 
+	michal.swiatkowski@linux.intel.com, davem@davemloft.net, kuba@kernel.org, 
+	jiri@resnulli.us, pabeni@redhat.com, jesse.brandeburg@intel.com, 
+	simon.horman@corigine.com, idosch@nvidia.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -78,75 +83,101 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Jul 26, 2023 at 10:03=E2=80=AFAM Pablo Neira Ayuso <pablo@netfilter=
-.org> wrote:
+On Wed, Jul 26, 2023 at 2:11=E2=80=AFPM Alexander Lobakin
+<aleksander.lobakin@intel.com> wrote:
+> From: Andy Shevchenko <andy@kernel.org>, Yury Norov <yury.norov@gmail.com=
 >
-> Hi,
+> Date: Fri, 21 Jul 2023 17:42:12 +0300
 >
-> On Mon, Jul 24, 2023 at 02:24:15PM -0700, Jakub Kicinski wrote:
-> > Adding netfilter to CC.
+> > +Cc: Yury on bitmap assignments.
+>
+> I told Marcin to add you to Cc when sending, but forgot Yury, my
+> apologies =3D\
+>
 > >
-> > On Sun, 23 Jul 2023 16:44:50 +0200 Ian Kumlien wrote:
-> > > Running vanilla 6.4.4 with cherry picked:
-> > > https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/comm=
-it/?h=3Dv6.4.5&id=3D7a59f29961cf97b98b02acaadf5a0b1f8dde938c
-> > >
-> [...]
-> > > [108431.305700] RSP: 0018:ffffac250ade7e28 EFLAGS: 00010206
-> > > [108431.311107] RAX: 0000000000000081 RBX: ffff9ebc413b42f8 RCX:
-> > > 0000000000000001
-> > > [108431.318420] RDX: 00000001067200c0 RSI: ffff9ebeda71ce58 RDI:
-> > > ffff9ebeda71ce58
-> > > [108431.325735] RBP: ffff9ebc413b4250 R08: ffff9ebc413b4250 R09:
-> > > ffff9ebe3d7fad58
-> > > [108431.333068] R10: 0000000000000000 R11: 0000000000000003 R12:
-> > > ffff9ebfafab0000
-> > > [108431.340415] R13: 0000000000000000 R14: ffff9ebfafab0005 R15:
-> > > ffff9ebd79a0f780
-> > > [108431.347764] FS:  0000000000000000(0000) GS:ffff9ebfafa80000(0000)
-> > > knlGS:0000000000000000
-> > > [108431.356069] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > > [108431.362012] CR2: 0000000000000081 CR3: 000000045e99e000 CR4:
-> > > 00000000003526e0
-> > > [108431.369361] Call Trace:
-> > > [108431.371999]  <TASK>
-> > > [108431.374296] ? __die (arch/x86/kernel/dumpstack.c:421
-> > > arch/x86/kernel/dumpstack.c:434)
-> > > [108431.377553] ? page_fault_oops (arch/x86/mm/fault.c:707)
-> > > [108431.381850] ? load_balance (kernel/sched/fair.c:10926)
-> > > [108431.385884] ? exc_page_fault (arch/x86/mm/fault.c:1279
-> > > arch/x86/mm/fault.c:1486 arch/x86/mm/fault.c:1542)
-> > > [108431.390094] ? asm_exc_page_fault (./arch/x86/include/asm/idtentry=
-.h:570)
-> > > [108431.394482] ? flow_offload_teardown
-> > > (./arch/x86/include/asm/bitops.h:75
-> > > ./include/asm-generic/bitops/instrumented-atomic.h:42
-> > > net/netfilter/nf_flow_table_core.c:362)
-> > > [108431.399036] nf_flow_offload_gc_step
-> > > (./arch/x86/include/asm/bitops.h:207
-> > > ./arch/x86/include/asm/bitops.h:239
-> > > ./include/asm-generic/bitops/instrumented-non-atomic.h:142
-> > > net/netfilter/nf_flow_table_core.c:436)
->
-> This crash points here.
->
-> static void nf_flow_offload_gc_step(struct nf_flowtable *flow_table,
->                                     struct flow_offload *flow, void *data=
-)
-> {
->         if (nf_flow_has_expired(flow) ||
->             nf_ct_is_dying(flow->ct) ||
->             nf_flow_is_outdated(flow))
->                 flow_offload_teardown(flow);
->
->         if (test_bit(NF_FLOW_TEARDOWN, &flow->flags)) { <--
->
-> Is this always reproducible on your testbed?
+> > (Yury, JFYI,
+> >  if you need the whole series, take message ID as $MSG_ID of this email
+> >  and execute
+> >
+> >    `b4 mbox $MSG_ID`
+> >
+> >  to retrieve it)
+> >
+> > On Fri, Jul 21, 2023 at 09:15:28AM +0200, Marcin Szycik wrote:
+> >> From: Alexander Lobakin <aleksander.lobakin@intel.com>
 
-That's a bit unknown, I don't quite know what triggers it... I only
-know it's happened twice :/
-(That i've noticed - the fw runs with a watchdog and it's always been
-a "uhuh... uptime is less than expected" kind of thing)
+...
 
-> Thanks.
+> >> and replace all TUNNEL_* occurencies to
+
+occurrences
+
+...
+
+> >> otherwise there will be too much conversions
+
+too many
+(countable)
+
+...
+
+> >> +static inline void ip_tunnel_flags_from_be16(unsigned long *dst, __be=
+16 flags)
+> >> +{
+> >> +    bitmap_zero(dst, __IP_TUNNEL_FLAG_NUM);
+> >
+> >> +    *dst =3D be16_to_cpu(flags);
+> >
+> > Oh, This is not good. What you need is something like bitmap_set_value1=
+6() in
+> > analogue with bitmap_set_value8().
+>
+> But I don't need `start`, those flag will always be in the first word
+> and I don't need to replace only some range, but to clear everything and
+> then set only the flags which are set in that __be16.
+> Why shouldn't this work?
+
+I'm not saying it should or shouldn't (actually you need to prove that
+with some test cases added). What I'm saying is that this code is a
+hack because of a layering violation. We do not dereference bitmaps
+with direct access. Even in your code you have bitmap_zero() followed
+by this hack. Why do you call that bitmap_zero() in the first place if
+you are so sure everything will be okay? So either you stick with
+bitops / bitmap APIs or drop all of them and use POD types and bit
+wise ops.
+
+...
+
+> >> +    ret =3D cpu_to_be16(*flags & U16_MAX);
+
+Same as above.
+
+...
+
+> >> +    __set_bit(IP_TUNNEL_KEY_BIT, info->key.tun_flags);
+> >> +    __set_bit(IP_TUNNEL_CSUM_BIT, info->key.tun_flags);
+> >> +    __set_bit(IP_TUNNEL_NOCACHE_BIT, info->key.tun_flags);
+> >>      if (flags & BPF_F_DONT_FRAGMENT)
+> >> -            info->key.tun_flags |=3D TUNNEL_DONT_FRAGMENT;
+> >> +            __set_bit(IP_TUNNEL_DONT_FRAGMENT_BIT, info->key.tun_flag=
+s);
+> >>      if (flags & BPF_F_ZERO_CSUM_TX)
+> >> -            info->key.tun_flags &=3D ~TUNNEL_CSUM;
+> >> +            __clear_bit(IP_TUNNEL_CSUM_BIT, info->key.tun_flags);
+> >
+> > Instead of set/clear, use assign, i.e. __asign_bit().
+>
+> Just to make it clear, you mean
+>
+>         __assign_bit(IP_TUNNEL_CSUM_BIT, info->key.tun_flags,
+>                      flags & BPF_F_ZERO_CSUM_TX);
+>
+> right?
+
+Yes.
+
+
+--=20
+With Best Regards,
+Andy Shevchenko
 
