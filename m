@@ -1,208 +1,216 @@
-Return-Path: <netdev+bounces-21644-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21645-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7DA9676414A
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 23:37:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A0B776414B
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 23:38:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A11021C2145C
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 21:37:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 59BC11C2147D
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 21:38:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E0931BF1E;
-	Wed, 26 Jul 2023 21:34:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0BB11BF1D;
+	Wed, 26 Jul 2023 21:37:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3A421BF15
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 21:34:36 +0000 (UTC)
-Received: from BN3PR00CU001.outbound.protection.outlook.com (mail-eastus2azon11020020.outbound.protection.outlook.com [52.101.56.20])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81A3B268B;
-	Wed, 26 Jul 2023 14:34:35 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=HpYofjG2Hf8sNd5VL0TchCSxvpsu80hND/cOkdCt/AdX7mI2SMaQyKVxDLQ2pvwjeVnNSbaghbzRsUWMxxVsd7y//VTesLkivN+RuZXcK6DvKkkWsxkJaDK5XpAKLqeDGXNAsrclWc0gHei26bnhVCpK1V5Lb0ely816a9PfPaVKzhVkyifGoHFw69QG2euvbboW2rw5f1lLHBpKGmRUL4/3f3ymVBPo8rngwQvs4O5/if6gCe/IJK8Pd3UMT+aoaSzVc2g5XwyS5DuLRpJAbvpOCmpVMHrHVVA7DSnPDfNo7gShQgu5QmPwFo7ugFZ7sFsd4Ym0PMLrYXHgu4VcFA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=WR3JqA2tuStq4WUWoPGPAw3bKTAR72ia5TRU7WLPkEk=;
- b=N1s+LnAokNZ5M8kra/6BnXks7QYfpEwY0rKqixNRiyHJo327Xr8761OXg+4EOSnItXgUbdIhtyWzjCuJz1bMZ5QXEnph5I9SViUlF6juvBZwFWmcQFJuGN82G7mMJ90oJ+WPrh+JzFa9RpsA1UtprnD5edosv2FUoA87OXVMNilGbtE0QqlifPoB7PGyRk7goHSTeNx0su1kQR6NJS8XTR44o2RDN9NgDtQAAG7fsdOtTMKBkhTuN1qM8zxImuqluF5EP3k5hnFetPHPeNQIjy0gAz0rPU9DmnQ8+/0j8TloYJPA9Vi7JpfANR4EkHjZgswnx3MPq/g7+d3lEIZ0BQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microsoft.com; dmarc=pass action=none
- header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=WR3JqA2tuStq4WUWoPGPAw3bKTAR72ia5TRU7WLPkEk=;
- b=ZN9N3sIRhShea0ewLjPByRhZe4xEnLWzFRxZrtZ5Ih4lwak8Hr6md5X03lmYDF6YeQuKx2Z2QmemtFX4UDKRPA6AUDqdZpjz/DD1plILhNVliy3qOAY2ZGHt3tp2Gq3sjOiNVCsnTXwZn1ShdwO4TocS3pLXo9QGseFzxn9PsJE=
-Received: from SA1PR21MB1335.namprd21.prod.outlook.com (2603:10b6:806:1f2::11)
- by MN0PR21MB3779.namprd21.prod.outlook.com (2603:10b6:208:3d3::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.3; Wed, 26 Jul
- 2023 21:34:32 +0000
-Received: from SA1PR21MB1335.namprd21.prod.outlook.com
- ([fe80::49e7:77aa:3b13:3b3a]) by SA1PR21MB1335.namprd21.prod.outlook.com
- ([fe80::49e7:77aa:3b13:3b3a%6]) with mapi id 15.20.6652.002; Wed, 26 Jul 2023
- 21:34:32 +0000
-From: Dexuan Cui <decui@microsoft.com>
-To: Stefano Garzarella <sgarzare@redhat.com>, Gary Guo <gary@garyguo.net>
-CC: KY Srinivasan <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, "linux-hyperv@vger.kernel.org"
-	<linux-hyperv@vger.kernel.org>, "virtualization@lists.linux-foundation.org"
-	<virtualization@lists.linux-foundation.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, Nischala Yelchuri
-	<Nischala.Yelchuri@microsoft.com>
-Subject: RE: Hyper-V vsock streams do not fill the supplied buffer in full
-Thread-Topic: Hyper-V vsock streams do not fill the supplied buffer in full
-Thread-Index: AQHZwAj2zyxoHYhk5ECPjRgD3kbIxg==
-Date: Wed, 26 Jul 2023 21:34:32 +0000
-Message-ID:
- <SA1PR21MB13358086D8E23229FCE692ABBF00A@SA1PR21MB1335.namprd21.prod.outlook.com>
-References: <20230704234532.532c8ee7.gary@garyguo.net>
- <CAGxU2F4_br6e3hEELXP_wpQSZTs5FYhQ-iahiZKzMMRYWpFXdA@mail.gmail.com>
-In-Reply-To:
- <CAGxU2F4_br6e3hEELXP_wpQSZTs5FYhQ-iahiZKzMMRYWpFXdA@mail.gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=ea2a89ff-9318-4207-a1d9-90bca40709ba;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2023-07-26T21:24:09Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microsoft.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SA1PR21MB1335:EE_|MN0PR21MB3779:EE_
-x-ms-office365-filtering-correlation-id: 69525710-3629-4802-b726-08db8e2019a5
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- 8Ctg8/vL+VgU/NgsnCXLC7RBAhzzHIYyqy7Io46+YmfDtIjDJy93MEwUG6sxhRGMc/lpAM23NkAXN2aCh2BMUWLDXchkLtVIIUC1klhgXiuwaJ00wr284o+WR1meIobZ9WmVLDbpK2aFhexn+qSup3LUUyy7q4zglyIfe4/nnVUQkUNySrdKlS0LIvaHR/Gf3kp8EfZEpf+/BFjdgA/lywa78exeYX0UVICBFmPggQxyZER7tJDSvNo/TLbcE+82tj5AbGumVVsvjIdKGE5Al7x9Opnk9u4Pw+XNNAmv90/GiRX1ZeASsZ3CUHhKzOLdJGkd1wzOsaVWcEWuTv40gY5L7jsRHPKdj5qcSvbXwiwjMNXk/pdnetPwmWnhDP2UFlYCf3vC1Zj2WssGXjAd3ccIEaYgnrtl2sEwv5iX7mW4gRWlPYbKTLMmtCB06KL7JoGKqjLdKoSzPUIj5LkkshDfpu0ivOURYIzABCaYhLtjBonY4TNWyiEHC9RRYdX20REb1ly7zjbxcAxq6SzOKXl3IP4CVLDJ9TBPenY6Ei5oHYWfR37UHrvLc1ptbWNUYeqLfQzGEfcnD99iAZKfCO6o4xb1aKIz4vXsLJf5JTNSmXs9uiwLkgHdDbAYuqNAGPR5DaFrgReP8BNvPsEEzI1I4VbFJW8MJ/iRAwR8ltQ=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR21MB1335.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(366004)(136003)(376002)(396003)(346002)(451199021)(55016003)(5660300002)(71200400001)(107886003)(2906002)(52536014)(8936002)(7696005)(41300700001)(8676002)(9686003)(82950400001)(6506007)(86362001)(8990500004)(66946007)(53546011)(4326008)(76116006)(110136005)(54906003)(10290500003)(82960400001)(316002)(66476007)(478600001)(38070700005)(64756008)(66556008)(66446008)(38100700002)(83380400001)(122000001)(186003)(33656002)(26005);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?SlhONEkxUi9VaXczQVVsclBta09kUW1zYUtndDN1ak12dFRnK2JydWFJYncw?=
- =?utf-8?B?Qk1rRmlkN3BOVG5aeXV6Y2gySjBqNW1HV1d1cUlocTJtTmV5L0RhL2lZYlNr?=
- =?utf-8?B?T0pNa3Z4ZHR5VkJQQURVQ1Z2aXQ0ZTNVY3pqN3Zhaml3QzYrd25sckRDNlNL?=
- =?utf-8?B?WHQ5NXNzM1hEbndYRmJOdExxaVlPdUpsZ0JFTnFxS0JCSk9ZZVdHWDQwNkM0?=
- =?utf-8?B?cGZ4V3l4QndsOTVnUGhLOFhxMDlQUk02T3NmZmlVNXozMCt6RVVNcXROelMz?=
- =?utf-8?B?WTU5eDhnM05URFZMbi94aFI0Z2U3RkFOSlVqTzZnNWRmQzNnZWtRaGxhekFh?=
- =?utf-8?B?SzIrOUkyZGdzTEFTZGs3OUFDWkdpS0RXN1RJRVQ2VDNpS3diOWxuejZKeDZj?=
- =?utf-8?B?Lzh1bkFLeTdNZTJFb29mWEczRVp0OERBN3Y1aENqSHpZT3ppeWsxN3JUQWJO?=
- =?utf-8?B?Y3c3amI0d25rQk9DNlUrbVRXN1N2Sm5ySnZDSXZRQ1pIZXdDNTEwYWdCRDY3?=
- =?utf-8?B?N0RveGxZcWpONjRsT01TazNSTGVsZ2hOcVJHeUF0QXJlUjRDK29zMUNFbVdP?=
- =?utf-8?B?NVNHTDc5QzZUN1BpSzdXbnZjMVdZdVJucFozdEJmdjFXMG9Wc29waDd4eW4y?=
- =?utf-8?B?bFhycHZXRXFFelZuazlRSTN2WnpsMW1UeWhkdFIzc2d5Y01BRUJ0VXdQQWcz?=
- =?utf-8?B?OWtqN2dMSU5vMnY5WEhNdFdUam9sS3hueldOaW1mZlI1a3k5ZHpCZHhuc1Bt?=
- =?utf-8?B?dU9yTmFtZmxsKzkxa283MjI3SnJKOTZjWmRsNkE5QXdjTGdpK3Nlb2hJcm81?=
- =?utf-8?B?VVFSU1RndjRZbWlOTEJ3ZCtuWnZKZEtPcXV4d3BrMGtiNk5vbnpUUGN3MVdo?=
- =?utf-8?B?UjFPNjNGNmdSbWJXOWlqakNVM2Fnbkh6MDFsYlZaMzg4bDJaZWNabEtqOHEx?=
- =?utf-8?B?VkY0cjBMMHJGMGRIblVwVjlodkVaRTZaTmlRL1p3UkNXMjlJUFRVZ2FYZ3V5?=
- =?utf-8?B?c1dLWStoVzJmc3phOEFOOFEzNlFjTFpianVhaStPYm80bTY3NXJkaVE0WW5X?=
- =?utf-8?B?V2VFbUNBOGdGNWdqa1BOZXoyWDFoTk4waEVPby9ra0hweHlPTnByNUJ3YjdC?=
- =?utf-8?B?Q2I4U2cvMDhDaVlSQTIwUnNUZ0w5elpKNWVkaHZJa3l5a2QzZitSVUJPTFBt?=
- =?utf-8?B?eGlGY0Q0Y1JvYWdXUTI2MER3WitlRFNJcVFlN0dmN3ptOWZUNEVnOWxLNUh6?=
- =?utf-8?B?ektqbEpvWGZ4UldXNU1qTHlqQ1ZEVW9LaHFWcTJCNTh2NnRqQThGWFpZelJp?=
- =?utf-8?B?bnd2MzVLUjhkaWZQdFhVeXpzaGxxV0YyaVU1c21GYTFxeTdKY2xoUUFZMStU?=
- =?utf-8?B?NlgwaFBHOWhRazFxVkV3WDByU0hZRnF1OEk5ZUNod3h2Y1ZOUEFjbHJzcm4x?=
- =?utf-8?B?Sm12THplTnJSRnV0b2poT0E5cGRKYUk0WjRuMCs4MTlBdjBnUDFyUzc3L0Fy?=
- =?utf-8?B?aE4vYjA5MkpnQWZxM0FkeDl3NkhaK1RFMWtGZXBFL2xEdUNsc0tnbGZZdUhQ?=
- =?utf-8?B?RkxJK0VraDFoRld3YUViZTlkSThkVnJVRmlIREdRYld0N0E2YkZPb0svVlNE?=
- =?utf-8?B?cjk1YkFhYlBKNEd6T2tXRm5vNG9NNm1oakgraXBsejFMOWt6dDhuSTVCZWZ4?=
- =?utf-8?B?eTNEMlBOVkZDMTJzdEQrMXIzRWdpQkpjcWpqTFlHQ0tTaHUyL2wwVDcrMUcz?=
- =?utf-8?B?VC8wMHUzMlJYQzhRMW5qWGRFU1lITi9mUjF6M0RlTXZYSm1mSzNyQitONS9z?=
- =?utf-8?B?QTAzTEdrNW40NnFjRElxN2FsYi9JTCs1QXhZNEpHZk9PYWs1eUlhRkZBeFRR?=
- =?utf-8?B?RjVmdmFBSkpicE9iY2pPUkhrWGExSHIzWUgrWWZha1BSdU9IbDJlbmN3TGt6?=
- =?utf-8?B?ZjZ6TmJqSG5nalFZRFhxV2dsNXAyNy8vbXIreU5pblhwL1BRUnV4OTFLbkxl?=
- =?utf-8?B?SFNkTWhpbFYxSkJVcitiejZOY29sOTBkRUtHU1haam1iMjFYWUphaUQ0Y1NJ?=
- =?utf-8?B?OXpMa1ZEMndLNXI5eGRQaG9sUkVmQ1k5MzBYbFFOLzRrN3FVUlVlUTVGSEhp?=
- =?utf-8?Q?Jcw6eThv4Hlb53ix5GvO2IsYC?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEE891BEEA
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 21:37:10 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 29EA4C433C7;
+	Wed, 26 Jul 2023 21:37:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1690407430;
+	bh=dTO1TCXCc3C5QkLMYbYAgfBJOTZoSw3d99NQ5//zOFM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=O/ohuGqlKPefwlGw6ZuKFdDxb/98ojxp5fUnnIpEHQ13a25AQ6ocx1iosBEyZeLxj
+	 msiwK/HzpgViipQ9bi0IlPskEtqfUcnG9i3fPfnBIx5hNN4yNi4LaDmGFmARMg1cu3
+	 s2C+6RvAT6+8KKl3xnCMNDbC3rlYAvJQ7DJtkwD1g+zz8P38Ej5/b5iejjFiR9D2jj
+	 I79NDC9Qj+g1z+foqOlTer0B1zlvgm+pYx34z4UQdWorE9h7KYeRp0ZnZBc0N9NALb
+	 1cuoVaSCDtdDPn8p/2aQvoOvdI3n3tHD/Nfo4pZr2+MwmZySi6cFt2iJ0WWcgu+ANr
+	 g0rit5Sy8gMsw==
+Date: Wed, 26 Jul 2023 14:37:09 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Donald Hunter <donald.hunter@gmail.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ donald.hunter@redhat.com
+Subject: Re: [PATCH net-next v1 2/3] tools/net/ynl: Add support for
+ netlink-raw families
+Message-ID: <20230726143709.791169dd@kernel.org>
+In-Reply-To: <20230725162205.27526-3-donald.hunter@gmail.com>
+References: <20230725162205.27526-1-donald.hunter@gmail.com>
+	<20230725162205.27526-3-donald.hunter@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: microsoft.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SA1PR21MB1335.namprd21.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 69525710-3629-4802-b726-08db8e2019a5
-X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Jul 2023 21:34:32.2861
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: XCpqjt7X2BACb2kR41d4Qv2a4kfkZFQP3z6cGCTggRjBVhlaVJod3oSjwQBpR0HlfXWp7iQEDOQd5kJgLPczeg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR21MB3779
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBTdGVmYW5vIEdhcnphcmVsbGEg
-PHNnYXJ6YXJlQHJlZGhhdC5jb20+DQo+IFNlbnQ6IFRodXJzZGF5LCBKdWx5IDYsIDIwMjMgMzow
-MiBBTQ0KPiBUbzogR2FyeSBHdW8gPGdhcnlAZ2FyeWd1by5uZXQ+OyBEZXh1YW4gQ3VpIDxkZWN1
-aUBtaWNyb3NvZnQuY29tPg0KPiBDYzogS1kgU3Jpbml2YXNhbiA8a3lzQG1pY3Jvc29mdC5jb20+
-OyBIYWl5YW5nIFpoYW5nDQo+IDxoYWl5YW5nekBtaWNyb3NvZnQuY29tPjsgV2VpIExpdSA8d2Vp
-LmxpdUBrZXJuZWwub3JnPjsgbGludXgtDQo+IGh5cGVydkB2Z2VyLmtlcm5lbC5vcmc7IHZpcnR1
-YWxpemF0aW9uQGxpc3RzLmxpbnV4LWZvdW5kYXRpb24ub3JnOw0KPiBuZXRkZXZAdmdlci5rZXJu
-ZWwub3JnOyBsaW51eC1rZXJuZWxAdmdlci5rZXJuZWwub3JnDQo+IFN1YmplY3Q6IFJlOiBIeXBl
-ci1WIHZzb2NrIHN0cmVhbXMgZG8gbm90IGZpbGwgdGhlIHN1cHBsaWVkIGJ1ZmZlciBpbiBmdWxs
-DQo+IA0KPiBIaSBHYXJ5LA0KPiANCj4gT24gV2VkLCBKdWwgNSwgMjAyMyBhdCAxMjo0NeKAr0FN
-IEdhcnkgR3VvIDxnYXJ5QGdhcnlndW8ubmV0PiB3cm90ZToNCj4gPg0KPiA+IFdoZW4gYSB2c29j
-ayBzdHJlYW0gaXMgY2FsbGVkIHdpdGggcmVjdm1zZyB3aXRoIGEgYnVmZmVyLCBpdCBvbmx5IGZp
-bGxzDQo+ID4gdGhlIGJ1ZmZlciB3aXRoIGRhdGEgZnJvbSB0aGUgZmlyc3Qgc2luZ2xlIFZNIHBh
-Y2tldC4gRXZlbiBpZiB0aGVyZSBhcmUNCj4gPiBtb3JlIFZNIHBhY2tldHMgYXQgdGhlIHRpbWUg
-YW5kIHRoZSBidWZmZXIgaXMgc3RpbGwgbm90IGNvbXBsZXRlbHkNCj4gPiBmaWxsZWQsIGl0IHdp
-bGwganVzdCBsZWF2ZSB0aGUgYnVmZmVyIHBhcnRpYWxseSBmaWxsZWQuDQo+ID4NCj4gPiBUaGlz
-IGNhdXNlcyBzb21lIGlzc3VlcyB3aGVuIGluIFdTTEQgd2hpY2ggdXNlcyB0aGUgdnNvY2sgaW4N
-Cj4gPiBub24tYmxvY2tpbmcgbW9kZSBhbmQgdXNlcyBlcG9sbC4NCj4gPg0KPiA+IEZvciBzdHJl
-YW0tb3JpZW50ZWQgc29ja2V0cywgdGhlIGVwb2xsIG1hbiBwYWdlIFsxXSBzYXlzIHRoYXQNCj4g
-Pg0KPiA+ID4gRm9yIHN0cmVhbS1vcmllbnRlZCBmaWxlcyAoZS5nLiwgcGlwZSwgRklGTywgc3Ry
-ZWFtIHNvY2tldCksDQo+ID4gPiB0aGUgY29uZGl0aW9uIHRoYXQgdGhlIHJlYWQvd3JpdGUgSS9P
-IHNwYWNlIGlzIGV4aGF1c3RlZCBjYW4NCj4gPiA+IGFsc28gYmUgZGV0ZWN0ZWQgYnkgY2hlY2tp
-bmcgdGhlIGFtb3VudCBvZiBkYXRhIHJlYWQgZnJvbSAvDQo+ID4gPiB3cml0dGVuIHRvIHRoZSB0
-YXJnZXQgZmlsZSBkZXNjcmlwdG9yLiAgRm9yIGV4YW1wbGUsIGlmIHlvdQ0KPiA+ID4gY2FsbCBy
-ZWFkKDIpIGJ5IGFza2luZyB0byByZWFkIGEgY2VydGFpbiBhbW91bnQgb2YgZGF0YSBhbmQNCj4g
-PiA+IHJlYWQoMikgcmV0dXJucyBhIGxvd2VyIG51bWJlciBvZiBieXRlcywgeW91IGNhbiBiZSBz
-dXJlIG9mDQo+ID4gPiBoYXZpbmcgZXhoYXVzdGVkIHRoZSByZWFkIEkvTyBzcGFjZSBmb3IgdGhl
-IGZpbGUgZGVzY3JpcHRvci4NCj4gPg0KPiA+IFRoaXMgaGFzIGJlZW4gdXNlZCBhcyBhbiBvcHRp
-bWlzYXRpb24gaW4gdGhlIHdpbGQgZm9yIHJlZHVjaW5nIG51bWJlcg0KPiA+IG9mIHN5c2NhbGxz
-IHJlcXVpcmVkIGZvciBzdHJlYW0gc29ja2V0cyAoYnkgYXNzZXJ0aW5nIHRoYXQgdGhlIHNvY2tl
-dA0KPiA+IHdpbGwgbm90IGhhdmUgdG8gcG9sbGVkIHRvIEVBR0FJTiBpbiBlZGdlLXRyaWdnZXIg
-bW9kZSwgaWYgdGhlIGJ1ZmZlcg0KPiA+IGdpdmVuIHRvIHJlY3Ztc2cgaXMgbm90IGZpbGxlZCBj
-b21wbGV0ZWx5KS4gQW4gZXhhbXBsZSBpcyBUb2tpbywgd2hpY2gNCj4gPiBzdGFydGluZyBpbiB2
-MS4yMS4wIFsyXS4NCj4gPg0KPiA+IFdoZW4gdGhpcyBvcHRpbWlzYXRpb24gY29tYmluZXMgd2l0
-aCB0aGUgYmVoYXZpb3VyIG9mIEh5cGVyLVYgdnNvY2ssIGl0DQo+ID4gY2F1c2VzIGlzc3VlIGlu
-IHRoaXMgc2NlbmFyaW86DQo+ID4gKiB0aGUgVk0gaG9zdCBzZW5kIGRhdGEgdG8gdGhlIGd1ZXN0
-LCBhbmQgaXQncyBzcGxpdHRlZCBpbnRvIG11bHRpcGxlDQo+ID4gICBWTSBwYWNrZXRzDQo+ID4g
-KiBza19kYXRhX3JlYWR5IGlzIGNhbGxlZCBhbmQgZXBvbGwgcmV0dXJucywgbm90aWZ5aW5nIHRo
-ZSB1c2Vyc3BhY2UNCj4gPiAgIHRoYXQgdGhlIHNvY2tldCBpcyByZWFkeQ0KPiA+ICogdXNlcnNw
-YWNlIGNhbGwgcmVjdm1zZyB3aXRoIGEgYnVmZmVyLCBhbmQgaXQncyBwYXJ0aWFsbHkgZmlsbGVk
-DQo+ID4gKiB1c2Vyc3BhY2UgYXNzdW1lcyB0aGF0IHRoZSBzdHJlYW0gc29ja2V0IGlzIGRlcGxl
-dGVkLCBhbmQgaWYgbmV3IGRhdGENCj4gPiAgIGFycml2ZXMgZXBvbGwgd2lsbCBub3RpZnkgaXQg
-YWdhaW4uDQo+ID4gKiBrZXJuZWwgYWx3YXlzIGNvbnNpZGVycyB0aGUgc29ja2V0IHRvIGJlIHJl
-YWR5LCBhbmQgc2luY2UgaXQncyBpbg0KPiA+ICAgZWRnZS10cmlnZ2VyIG1vZGUsIHRoZSBlcG9s
-bCBpbnN0YW5jZSB3aWxsIG5ldmVyIGJlIG5vdGlmaWVkIGFnYWluLg0KPiA+DQo+ID4gVGhpcyBk
-aWZmZXJlbnQgcmVhbGlzYXRpb24gb2YgdGhlIHJlYWRpbmVzcyBjYXVzZXMgdGhlIHVzZXJzcGFj
-ZSB0bw0KPiA+IGJsb2NrIGZvcmV2ZXIuDQo+IA0KPiBUaGFua3MgZm9yIHRoZSBkZXRhaWxlZCBk
-ZXNjcmlwdGlvbiBvZiB0aGUgcHJvYmxlbS4NCj4gDQo+IEkgdGhpbmsgd2Ugc2hvdWxkIGZpeCB0
-aGUgaHZzX3N0cmVhbV9kZXF1ZXVlKCkgaW4NCj4gbmV0L3Ztd192c29jay9oeXBlcnZfdHJhbnNw
-b3J0LmMuDQo+IFdlIGNhbiBkbyBzb21ldGhpbmcgc2ltaWxhciB0byB3aGF0IHdlIGRvIGluDQo+
-IHZpcnRpb190cmFuc3BvcnRfc3RyZWFtX2RvX2RlcXVldWUoKSBpbg0KPiBuZXQvdm13X3Zzb2Nr
-L3ZpcnRpb190cmFuc3BvcnRfY29tbW9uLmMNCj4gDQo+IEBEZXh1YW4gV0RZVD8NCj4gDQo+IFRo
-YW5rcywNCj4gU3RlZmFubw0KDQooU29ycnkgZm9yIHRoZSBsYXRlIHJlc3BvbnNlLi4uKQ0KDQpU
-aGFua3MgR2FyeSBHdW8gZm9yIHRoZSBnb29kIGFuYWx5c2lzIQ0KDQpJIGRpZG4ndCByZWFsaXpl
-IHRoYXQgaHZzX3N0cmVhbV9kZXF1ZXVlKCkgaXMgc3VwcG9zZWQgdG8NCmNvcHkgYXMgbXVjaCBk
-YXRhIGFzIHBvc3NpYmxlIHRvIHRoZSB1c2Vyc3BhY2UgaW4gdGhlIGNhc2UNCm9mIEVQT0xMRVQg
-bW9kZS4gDQoNClllcywgSSB0aGluayB3ZSBzaG91bGQgZml4IGh2c19zdHJlYW1fZGVxdWV1ZSgp
-LiBXZSdsbCB0cnkgdG8gZ2V0DQp0aGlzIGZpeGVkIGFzYXAuDQoNClRoYW5rcywNCi0tIERleHVh
-bg0K
+On Tue, 25 Jul 2023 17:22:04 +0100 Donald Hunter wrote:
+> Refactor the ynl code to encapsulate protocol-family specifics into
+> NetlinkProtocolFamily and GenlProtocolFamily.
+
+> +class SpecMcastGroup(SpecElement):
+> +    """Netlink Multicast Group
+> +
+> +    Information about a multicast group.
+> +
+> +    Attributes:
+> +        id        numerical id of this multicast group for netlink-raw
+> +        yaml      raw spec as loaded from the spec file
+> +    """
+> +    def __init__(self, family, yaml):
+> +        super().__init__(family, yaml)
+> +        self.id = self.yaml.get('id')
+
+name, too?
+
+>  class SpecFamily(SpecElement):
+>      """ Netlink Family Spec class.
+>  
+> @@ -343,6 +357,7 @@ class SpecFamily(SpecElement):
+>          ntfs       dict of all async events
+>          consts     dict of all constants/enums
+>          fixed_header  string, optional name of family default fixed header struct
+> +        mcast_groups  dict of all multicast groups (index by name)
+>      """
+>      def __init__(self, spec_path, schema_path=None, exclude_ops=None):
+>          with open(spec_path, "r") as stream:
+> @@ -384,6 +399,7 @@ class SpecFamily(SpecElement):
+>          self.ops = collections.OrderedDict()
+>          self.ntfs = collections.OrderedDict()
+>          self.consts = collections.OrderedDict()
+> +        self.mcast_groups = collections.OrderedDict()
+>  
+>          last_exception = None
+>          while len(self._resolution_list) > 0:
+> @@ -416,6 +432,9 @@ class SpecFamily(SpecElement):
+>      def new_operation(self, elem, req_val, rsp_val):
+>          return SpecOperation(self, elem, req_val, rsp_val)
+>  
+> +    def new_mcast_group(self, elem):
+> +        return SpecMcastGroup(self, elem)
+> +
+>      def add_unresolved(self, elem):
+>          self._resolution_list.append(elem)
+>  
+> @@ -512,3 +531,9 @@ class SpecFamily(SpecElement):
+>                  self.ops[op.name] = op
+>              elif op.is_async:
+>                  self.ntfs[op.name] = op
+> +
+> +        mcgs = self.yaml.get('mcast-groups')
+> +        if mcgs:
+> +            for elem in mcgs['list']:
+> +                mcg = self.new_mcast_group(elem)
+> +                self.mcast_groups[elem['name']] = mcg
+
+Could you factor out the mcgroup changes to a separate patch?
+
+> diff --git a/tools/net/ynl/lib/ynl.py b/tools/net/ynl/lib/ynl.py
+> index 3e2ade2194cd..7e877c43e10f 100644
+> --- a/tools/net/ynl/lib/ynl.py
+> +++ b/tools/net/ynl/lib/ynl.py
+> @@ -25,6 +25,7 @@ class Netlink:
+>      NETLINK_ADD_MEMBERSHIP = 1
+>      NETLINK_CAP_ACK = 10
+>      NETLINK_EXT_ACK = 11
+> +    NETLINK_GET_STRICT_CHK = 12
+>  
+>      # Netlink message
+>      NLMSG_ERROR = 2
+> @@ -153,6 +154,21 @@ class NlAttr:
+>              value[m.name] = decoded
+>          return value
+>  
+> +    @classmethod
+> +    def decode_enum(cls, raw, attr_spec, consts):
+> +        enum = consts[attr_spec['enum']]
+> +        if 'enum-as-flags' in attr_spec and attr_spec['enum-as-flags']:
+> +            i = 0
+> +            value = set()
+> +            while raw:
+> +                if raw & 1:
+> +                    value.add(enum.entries_by_val[i].name)
+> +                raw >>= 1
+> +                i += 1
+> +        else:
+> +            value = enum.entries_by_val[raw].name
+> +        return value
+
+This doesn't always operates on netlink attributes, technically,
+so how about we make it a standalone function, not a member of NlAttr?
+Or should we move it to a parent class, NetlinkProtocolFamily?
+
+> +    def decode_fixed_header(self, consts, op):
+> +        fixed_header_members = consts[op.fixed_header].members
+> +        self.fixed_header_attrs = dict()
+> +        offset = 0
+> +        for m in fixed_header_members:
+> +            format = NlAttr.get_format(m.type, m.byte_order)
+> +            [ value ] = format.unpack_from(self.raw, offset)
+> +            offset += format.size
+> +
+> +            if m.enum:
+> +                value = NlAttr.decode_enum(value, m, consts)
+> +
+> +            self.fixed_header_attrs[m.name] = value
+> +        self.raw = self.raw[offset:]
+> +
+> +    def cmd(self):
+> +        return self.nl_type
+
+And perhaps the pure code moves could be a separate patch for ease 
+of review?
+
+>      def __repr__(self):
+>          msg = f"nl_len = {self.nl_len} ({len(self.raw)}) nl_flags = 0x{self.nl_flags:x} nl_type = {self.nl_type}\n"
+>          if self.error:
+> @@ -318,23 +353,21 @@ def _genl_load_families():
+>  
+>  
+>  class GenlMsg:
+> -    def __init__(self, nl_msg, fixed_header_members=[]):
+> -        self.nl = nl_msg
+> +    def __init__(self, nl_msg, ynl=None):
+> +        self.genl_cmd, self.genl_version, _ = struct.unpack_from("BBH", nl_msg.raw, 0)
+> +        nl_msg.raw = nl_msg.raw[4:]
+>  
+> -        self.hdr = nl_msg.raw[0:4]
+> -        offset = 4
+> +        if ynl:
+> +            op = ynl.rsp_by_value[self.genl_cmd]
+
+Took me a while to figure out why ynl gets passed here :S
+I'm not sure what the best structure of inheritance is but
+I think we should at the very least *not* call genl vs raw-nl
+"family".
+
+NetlinkProtocolFamily -> NetlinkProtocol
+GenlProtocolFamily -> GenlProtocol
+
+and store them in YnlFamily to self.nlproto or self.protocol
+or some such.
+
+> +            if op.fixed_header:
+> +                nl_msg.decode_fixed_header(ynl.consts, op)
+
+>      def _decode_binary(self, attr, attr_spec):
+>          if attr_spec.struct_name:
+>              members = self.consts[attr_spec.struct_name]
+> -            decoded = attr.as_struct(members)
+> +            decoded = attr.as_struct(members, self.consts)
+
+I applied the series on top of Arkadiusz's fixes and this line throws
+an "as_struct takes 2 arguments, 3 given" exception.
+
+>              for m in members:
+>                  if m.enum:
+>                       decoded[m.name] = self._decode_enum(decoded[m.name], m)
+
 
