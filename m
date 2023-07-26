@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-21466-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21469-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D14F763A7F
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 17:11:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id ABBDF763A9F
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 17:15:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EBD5A280845
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 15:11:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 59C16281128
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 15:15:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09D79BE77;
-	Wed, 26 Jul 2023 15:11:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3ECAECA63;
+	Wed, 26 Jul 2023 15:15:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B82381DA20
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 15:11:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB90AC433C8;
-	Wed, 26 Jul 2023 15:11:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B53651DA3F
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 15:15:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C42F1C433C7;
+	Wed, 26 Jul 2023 15:15:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690384283;
-	bh=XiLHsDn5JUHJIq50wmGiHJqBzQCqwg/qbiBjlAfgQpI=;
+	s=k20201202; t=1690384527;
+	bh=yqb0YdgIVLLbmhpJ7snqhokkIjG5EyFWE3z0t550FNU=;
 	h=From:To:Cc:Subject:Date:From;
-	b=m5s4sv63z8+2fpaxRUjmqMOlsO9+PjGa3KLdjAPRcpp4llJXoep9o73zyHsnKPCiG
-	 711ps8WpqluhMvVszdGAYdrL/0vfVChjbZpwkDvVmnso0vWp7yhTXxwq7naqsB7koJ
-	 03XgHN+8f+kFlYjSncqK5waFDNVxh3V23gh2m7xPtC3fnIMCpcWI7WgZwRRt4PjowE
-	 h6ZIjF/QqlZ3jri9bneJHmcPQFLPOTN9CYcJB1cBdBLvZRUp2ABtm/4OUHbEsAgkLO
-	 1Udfvs5o9utOwGPd7T6s+Ta+ow6piD3TDPM0cXZf0BdjS0/eSLxCiaWTDPY1A4fb1U
-	 gLh7Ph2CWtajw==
+	b=OVs4MkrZalnVwhD1cqVycejNl1mfCnRTWRpwJ9SWo6AWMWtW5L6EZ9UQrXEJ3Y92G
+	 GH65g2C54gEVD0ErmdSUFxHeluVexM6Svvzp7+VVmAxm0WSnO9pQqWrNCDTLpRyPlf
+	 tis2TwGbND1SDGcekzspJFzE7tjGfMWGhEbr1goBAyl7g5Kq24YBuRwf5vAK/7nIfe
+	 QjP/yVoV0HjSdopNWOwIbYt8Pi3HykuAqo9ur578y4W1N/TpGU4T3r+6bPt5kVwZPV
+	 LWRyM0v8dZQtbx7Bt0JVYCaUkx3w2zqTgWTzt+L8JBy7g9GJO4wkUcoMWdbw2VEQkM
+	 3JQz2Q+mJzv2g==
 From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	Jakub Kicinski <kuba@kernel.org>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>
-Subject: [PATCH net] MAINTAINERS: stmmac: retire Giuseppe Cavallaro
-Date: Wed, 26 Jul 2023 08:11:20 -0700
-Message-ID: <20230726151120.1649474-1-kuba@kernel.org>
+To: joe@perches.com
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+	geert@linux-m68k.org,
+	gregkh@linuxfoundation.org,
+	netdev@vger.kernel.org,
+	workflows@vger.kernel.org,
+	mario.limonciello@amd.com
+Subject: [PATCH v2] scripts: get_maintainer: steer people away from using file paths
+Date: Wed, 26 Jul 2023 08:15:15 -0700
+Message-ID: <20230726151515.1650519-1-kuba@kernel.org>
 X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -51,34 +51,97 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-I tried to get stmmac maintainers to be more active by agreeing with
-them off-list on a review rotation. I pinged Peppe 3 times over 2 weeks
-during his "shift month", no reviews are flowing.
+We repeatedly see netcomers misuse get_maintainer by running it on
+the file paths rather than the patchfile. This leads to authors
+of changes (quoted commits and commits under Fixes) not getting
+CCed. These are usually the best reviewers!
 
-All the contributions are much appreciated! But stmmac is quite
-active, we need participating maintainers :(
+The file option should really not be used by inexperienced developers,
+unless they are just trying to find a maintainer to manually contact.
 
+Print a warning when someone tries to use -f and remove
+the "auto-guessing" of file paths.
+
+This script may break people's "scripts on top of get_maintainer"
+if they are using -f... but that's the point.
+
+Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
-CC: Giuseppe Cavallaro <peppe.cavallaro@st.com>
-CC: Alexandre Torgue <alexandre.torgue@foss.st.com>
-CC: Jose Abreu <joabreu@synopsys.com>
----
- MAINTAINERS | 1 -
- 1 file changed, 1 deletion(-)
+note addressed:
+ - put more info into the warning. I think it's more than fine.
+v2:
+ - fix the subject (Greg)
+ - s/noob/inexperienced|newcomer/ (Joe)
+ - put the message on a single line (Joe)
+ - s/will/may/ (Joe)
+ - s/filepatch/patchfile/
+ - add more reasons to help
+v1: https://lore.kernel.org/all/20230725155926.2775416-1-kuba@kernel.org/
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index aee340630eca..2db30d652c4d 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -20401,7 +20401,6 @@ F:	drivers/pwm/pwm-stm32*
- F:	include/linux/*/stm32-*tim*
+CC: joe@perches.com
+Cc: geert@linux-m68k.org
+Cc: gregkh@linuxfoundation.org
+Cc: netdev@vger.kernel.org
+Cc: workflows@vger.kernel.org
+Cc: mario.limonciello@amd.com
+---
+ scripts/get_maintainer.pl | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
+
+diff --git a/scripts/get_maintainer.pl b/scripts/get_maintainer.pl
+index ab123b498fd9..4714056ca7f1 100755
+--- a/scripts/get_maintainer.pl
++++ b/scripts/get_maintainer.pl
+@@ -51,6 +51,7 @@ my $output_roles = 0;
+ my $output_rolestats = 1;
+ my $output_section_maxlen = 50;
+ my $scm = 0;
++my $silence_file_warning = 0;
+ my $tree = 1;
+ my $web = 0;
+ my $subsystem = 0;
+@@ -267,6 +268,7 @@ if (!GetOptions(
+ 		'subsystem!' => \$subsystem,
+ 		'status!' => \$status,
+ 		'scm!' => \$scm,
++		'silence-file-warning!' => \$silence_file_warning,
+ 		'tree!' => \$tree,
+ 		'web!' => \$web,
+ 		'letters=s' => \$letters,
+@@ -544,7 +546,11 @@ foreach my $file (@ARGV) {
+     if ($from_filename && (vcs_exists() && !vcs_file_exists($file))) {
+ 	warn "$P: file '$file' not found in version control $!\n";
+     }
+-    if ($from_filename || ($file ne "&STDIN" && vcs_file_exists($file))) {
++    if ($from_filename) {
++	if (!$silence_file_warning) {
++	    warn "$P: WARNING: Prefer running the script on patches as generated by git format-patch. Selecting paths is known to miss recipients!\n";
++	}
++
+ 	$file =~ s/^\Q${cur_path}\E//;	#strip any absolute path
+ 	$file =~ s/^\Q${lk_path}\E//;	#or the path to the lk tree
+ 	push(@files, $file);
+@@ -1081,6 +1087,7 @@ version: $V
+   --mailmap => use .mailmap file (default: $email_use_mailmap)
+   --no-tree => run without a kernel tree
+   --self-test => show potential issues with MAINTAINERS file content
++  --silence-file-warning => silence the warning about -f being used (see Notes)
+   --version => show version
+   --help => show this help information
  
- STMMAC ETHERNET DRIVER
--M:	Giuseppe Cavallaro <peppe.cavallaro@st.com>
- M:	Alexandre Torgue <alexandre.torgue@foss.st.com>
- M:	Jose Abreu <joabreu@synopsys.com>
- L:	netdev@vger.kernel.org
+@@ -1089,6 +1096,11 @@ version: $V
+    --pattern-depth=0 --remove-duplicates --rolestats]
+ 
+ Notes:
++  Using "-f file" is generally discouraged, running the script on a patchfile
++      (as generated by git format-patch) is usually the right thing to do.
++      It's easy to miss a file changed by a commit and the script
++      may extract additional information from the commit message
++      (keywords, Fixes tags etc.)
+   Using "-f directory" may give unexpected results:
+       Used with "--git", git signators for _all_ files in and below
+           directory are examined as git recurses directories.
 -- 
 2.41.0
 
