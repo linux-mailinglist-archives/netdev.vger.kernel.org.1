@@ -1,118 +1,146 @@
-Return-Path: <netdev+bounces-21293-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21294-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 707717632B1
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 11:47:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E82B57632C2
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 11:49:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2ADB1281CC6
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 09:46:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9820A281C8C
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 09:49:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A7F8BA5D;
-	Wed, 26 Jul 2023 09:46:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91DA9BA5E;
+	Wed, 26 Jul 2023 09:49:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FAD9BA3B
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 09:46:57 +0000 (UTC)
-Received: from mail-wm1-x333.google.com (mail-wm1-x333.google.com [IPv6:2a00:1450:4864:20::333])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C76FA2
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 02:46:55 -0700 (PDT)
-Received: by mail-wm1-x333.google.com with SMTP id 5b1f17b1804b1-3fd28ae8b90so46965e9.1
-        for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 02:46:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690364814; x=1690969614;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sVk3D2Ovs0OQVitdb5xswV9gYU6xHuGerRDbOGRGHI8=;
-        b=YtbGpl+bbWM3rTcDg4aZUCnuzhi5Xj+jW4e9Tx1UvYMbD5ctmqWK4dlB0+FcLsuEw+
-         iSYIB/XmLE/wG9/TtL2NQlGEdSMI83+1h0DcpUcFBdQYpoOiI/aQCuU+kkS20yGjMnxv
-         eoTOdLdUH7W0ZwLHvdeE/+I24/wJzt9nzZacXoOk1BD6Bn+dPMdCzWXrk2GqceioFr+w
-         CARCA7YRVNjzvqqXrpqi9Wg+nqiVi7LxV2OA+sIJvhe9Jr0IEjl2WCTpc7/Z4I4NU3td
-         186/8uB0yXTnbWkcmn6rqLmJcINHjDtkQezb4zswDpljftvJnOuf6fFt8Ut92IXDCYWU
-         7/eQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690364814; x=1690969614;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=sVk3D2Ovs0OQVitdb5xswV9gYU6xHuGerRDbOGRGHI8=;
-        b=iqraFiCepFLnWttOQ0rQ0eO6cfmKF9r/KpTl577ePCdzZgoNAzI6IcQYUDmN4slsmf
-         dac1Srqf6wiFwCcdGCQN20jjQCG1s2k/xUPw21zr9RNOZncUtuI0j7zwqfJY3d4NO/mr
-         HEry/tErTkflzgwVdRXNZPsSgqEjNWjyd1QpAhFvsfbmE91Xa8D9DlcdwmhOxAqjPmFa
-         q2kaC3mo0MVqvl2vRtAtyT88D6AkEui6YE3FJNQdIcXQ2lV8VI7q2tC+rzth9OYeawb7
-         oFrY4kqmuAjPvby3Ebv9x2kynrvyysMCK7h6LXuwSDmMj2tNebFrGrodS9/ByVbUhFjy
-         d5aw==
-X-Gm-Message-State: ABy/qLYMZqPlthk4xCdfPUmyCD02Q13lno+S4i8IRCbnepJmGozpkFcu
-	Y0jVWA5biXKGd6cDAg73H7WbMPOumlih375DgQGNKQ==
-X-Google-Smtp-Source: APBJJlHzycgPSHCO7xhc73QYvhqdiMVjY11q/GUx1ttiW2v8T+9YQxSks0t8zGKVP7VjXEpaJRkGP+VJ9bfKjR9IYqU=
-X-Received: by 2002:a05:600c:1c82:b0:3f7:e4d8:2569 with SMTP id
- k2-20020a05600c1c8200b003f7e4d82569mr176062wms.5.1690364813965; Wed, 26 Jul
- 2023 02:46:53 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 817DCBA57
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 09:49:44 +0000 (UTC)
+Received: from mail.helmholz.de (mail.helmholz.de [217.6.86.34])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C8D2F3
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 02:49:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=helmholz.de
+	; s=dkim1; h=Content-Type:MIME-Version:References:In-Reply-To:Message-ID:Date
+	:Subject:CC:To:From:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=z/VYs/tG4q/jmWkTELjey7jwXdK/M+A/kvcC69LhECg=; b=nBeqMirnPYjIgzt1dxHLh5U/oI
+	EPz6/Gu1wUjbSztxBJg8fXpga1gtvtFGX2G+2ixBUQ0IhIr0biy6TbW5mN3WqYnjD5k5wzfT/URCi
+	t0vIPAxChnE1lug5q8QS95bOuzHBKrXgLGOUgU0iH41Fp2m1R8T7qHg5CB+n0lyqiH+VpfN0MEUiA
+	A11mWpdnmqbzEUi27lYtquW4lwPXy0LhtXmGDKCwwwxWJ1bjiCcnkKDaTt06D6c41qMV+k+xgeTur
+	gyEmSkTsbCOzO5mlKtM5sdzhLrTTAJDQOtxLS7Bw5NxmrrIqnwD0Cl/V/ehvwUprDhJSKGPIEycqV
+	TrTk06Ow==;
+Received: from [192.168.1.4] (port=36940 helo=SH-EX2013.helmholz.local)
+	by mail.helmholz.de with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384
+	(Exim 4.96)
+	(envelope-from <Ante.Knezic@helmholz.de>)
+	id 1qOb9G-0004Nd-1S;
+	Wed, 26 Jul 2023 11:49:38 +0200
+Received: from linuxdev.helmholz.local (192.168.6.7) by
+ SH-EX2013.helmholz.local (192.168.1.4) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.48; Wed, 26 Jul 2023 11:49:38 +0200
+From: Ante Knezic <ante.knezic@helmholz.de>
+To: <linux@armlinux.org.uk>
+CC: <andrew@lunn.ch>, <ante.knezic@helmholz.de>, <davem@davemloft.net>,
+	<edumazet@google.com>, <f.fainelli@gmail.com>, <kuba@kernel.org>,
+	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<olteanv@gmail.com>, <pabeni@redhat.com>
+Subject: Re: [PATCH net-next v3] net: dsa: mv88e6xxx: Add erratum 3.14 for 88E6390X and 88E6190X
+Date: Wed, 26 Jul 2023 11:49:35 +0200
+Message-ID: <20230726094935.12629-1-ante.knezic@helmholz.de>
+X-Mailer: git-send-email 2.11.0
+In-Reply-To: <ZMALH03Fbp3wKkO2@shell.armlinux.org.uk>
+References: <ZMALH03Fbp3wKkO2@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <0000000000000ced8905fecceeba@google.com> <00000000000002c74d0601582595@google.com>
-In-Reply-To: <00000000000002c74d0601582595@google.com>
-From: Aleksandr Nogikh <nogikh@google.com>
-Date: Wed, 26 Jul 2023 11:46:42 +0200
-Message-ID: <CANp29Y5cQX3eOo+rB5bWcqn38bcPY7o12wcJ_WmAY6D+UxGTcw@mail.gmail.com>
-Subject: Re: [syzbot] [crypto?] general protection fault in shash_async_update
-To: syzbot <syzbot+0bc501b7bf9e1bc09958@syzkaller.appspotmail.com>
-Cc: alexander.deucher@amd.com, davem@davemloft.net, dhowells@redhat.com, 
-	herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, mario.limonciello@amd.com, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-15.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SORTED_RECIPS,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL,
-	USER_IN_DEF_SPF_WL autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Originating-IP: [192.168.6.7]
+X-ClientProxiedBy: SH-EX2013.helmholz.local (192.168.1.4) To
+ SH-EX2013.helmholz.local (192.168.1.4)
+X-EXCLAIMER-MD-CONFIG: 2ae5875c-d7e5-4d7e-baa3-654d37918933
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Jul 26, 2023 at 1:32=E2=80=AFAM syzbot
-<syzbot+0bc501b7bf9e1bc09958@syzkaller.appspotmail.com> wrote:
->
-> syzbot suspects this issue was fixed by commit:
->
-> commit 30c3d3b70aba2464ee8c91025e91428f92464077
-> Author: Mario Limonciello <mario.limonciello@amd.com>
-> Date:   Tue May 30 16:57:59 2023 +0000
->
->     drm/amd: Disallow s0ix without BIOS support again
->
-> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=3D122e2c31a8=
-0000
-> start commit:   [unknown]
-> git tree:       net-next
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=3D526f919910d4a=
-671
-> dashboard link: https://syzkaller.appspot.com/bug?extid=3D0bc501b7bf9e1bc=
-09958
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=3D13f71275280=
-000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=3D1108105528000=
-0
->
-> If the result looks correct, please mark the issue as fixed by replying w=
-ith:
+On Tue, 25 Jul 2023 18:49:19 +0100 Russell King (Oracle) wrote:
+> Does the errata say that _all_ lanes need this treatment, even when
+> they are not being used as a group (e.g. for XAUI) ?
 
-No, that's unlikely.
+No, unfortunatelly errata says very little, I tried applying erratum only on the requested 
+lane of port 9/10 but this did not work out as expected and the issue was still visible.
+I dont have the necessary HW to perform more tests on other lanes unfortunatelly.
 
->
-> #syz fix: drm/amd: Disallow s0ix without BIOS support again
->
-> For information about bisection process see: https://goo.gl/tpsmEJ#bisect=
-ion
->
+On Tue, 25 Jul 2023 18:49:19 +0100 Russell King (Oracle) wrote:
+> On Tue, Jul 25, 2023 at 08:23:43PM +0300, Vladimir Oltean wrote:
+> > On Fri, Jul 21, 2023 at 12:26:18PM +0200, Ante Knezic wrote:
+> > > diff --git a/drivers/net/dsa/mv88e6xxx/pcs-639x.c b/drivers/net/dsa/mv88e6xxx/pcs-639x.c
+> > > index 98dd49dac421..50b14804c360 100644
+> > > --- a/drivers/net/dsa/mv88e6xxx/pcs-639x.c
+> > > +++ b/drivers/net/dsa/mv88e6xxx/pcs-639x.c
+> > > @@ -20,6 +20,7 @@ struct mv88e639x_pcs {
+> > >  	struct mdio_device mdio;
+> > >  	struct phylink_pcs sgmii_pcs;
+> > >  	struct phylink_pcs xg_pcs;
+> > > +	struct mv88e6xxx_chip *chip;
+> 
+> 	bool erratum_3_14;
+
+...
+
+> > >  static int mv88e639x_sgmii_pcs_post_config(struct phylink_pcs *pcs,
+> > >  					   phy_interface_t interface)
+> > >  {
+> > >  	struct mv88e639x_pcs *mpcs = sgmii_pcs_to_mv88e639x_pcs(pcs);
+> > > +	struct mv88e6xxx_chip *chip = mpcs->chip;
+> > >  
+> > >  	mv88e639x_sgmii_pcs_control_pwr(mpcs, true);
+> > >  
+> > > +	if (chip->info->prod_num == MV88E6XXX_PORT_SWITCH_ID_PROD_6190X ||
+> > > +	    chip->info->prod_num == MV88E6XXX_PORT_SWITCH_ID_PROD_6390X)
+> > > +		mv88e6390_erratum_3_14(mpcs);
+> 
+> 	int err;
+> ...
+> 	if (mpcs->erratum_3_14) {
+> 		err = mv88e6390_erratum_3_14(mpcs);
+> 		if (err)
+> 			dev_err(mpcs->mdio.dev.parent,
+> 				"failed to apply erratum 3.14: %pe\n",
+> 				ERR_PTR(err));
+> 	}
+> 
+
+So you propose to ditch the chip ptr from the mpcs and add a bool variable instead. But
+isn't this too general - the errata applies only to 6190X and 6390X, other devices
+might (and probably do) have errata 3.14 as something completely different? Possible new changes
+(new errata, fixes etc) in the pcs-xxx.c might benefit from having a chip ptr more than 
+using a bool variable "just" for one errata found on two device types?
+
+> > >  
+> > >  	err = mv88e639x_pcs_setup_irq(mpcs, chip, port);
+> > >  	if (err)
+> > > @@ -873,6 +914,7 @@ static int mv88e6393x_pcs_init(struct mv88e6xxx_chip *chip, int port)
+> > >  	mpcs->xg_pcs.ops = &mv88e6393x_xg_pcs_ops;
+> > >  	mpcs->xg_pcs.neg_mode = true;
+> > >  	mpcs->supports_5g = true;
+> > > +	mpcs->chip = chip;
+> 
+> Presumably the 6393x isn't affected by this, so this is not necessary
+> with the above changes.
+
+This was done merely for consistency, besides the memory is already reserved, why not point
+it to something? In case of bool replacement it will not matter anymore.
+
+Thanks,
+	Ante
 
