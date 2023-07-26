@@ -1,179 +1,111 @@
-Return-Path: <netdev+bounces-21395-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21396-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6140D7637CC
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 15:39:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2AF17637E3
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 15:44:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1BC09281F12
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 13:39:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E336B1C212C6
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 13:44:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4351913ADF;
-	Wed, 26 Jul 2023 13:39:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7589512B66;
+	Wed, 26 Jul 2023 13:44:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3593B12B9C
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 13:39:19 +0000 (UTC)
-Received: from mail-lj1-x232.google.com (mail-lj1-x232.google.com [IPv6:2a00:1450:4864:20::232])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93C3E26BC
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 06:39:14 -0700 (PDT)
-Received: by mail-lj1-x232.google.com with SMTP id 38308e7fff4ca-2b74fa5e7d7so99326181fa.2
-        for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 06:39:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1690378753; x=1690983553;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=sHorn2FTxwc0GDGivshkp6+VTJEJlE83QxVA+vKmjNE=;
-        b=QtqNqfpE1x1/0/UDSxEqRIfyyVp5wMDHWM4K+MqdPWDXaWnPNZ23aDH1w4ey7rt3fq
-         koE1R4PoykZZ3WtvdpH0gebC9FGFI9CXVLTgrq0zRjQwNHeQjzB6sGSnUA6pSZLgdGvi
-         ndrD70cwEd3c+e1nYlS73PNkpzS0qpTV5ymUqdqDkKTK0QNTgZF3SdRrffaJ0z8t7pdc
-         k9jryvlx+EusM3TCaspE7FiJ7Z8v1y/03sg1uiguZMdRO1tbyNP/HcHIOzmF+I9a9Uf2
-         p6fluw7tX1PoZnlRruOJWB0AdgDobaaHWUb8uKlih3Iz823NB0HZJXAPVUZQqfSvqA0x
-         mSTA==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 651F7BA43
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 13:44:40 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6898419B5
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 06:44:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1690379074;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Wn2jDJiGuVW5obSdP2moup5cJGVSeLTAzm9z2TiK2m0=;
+	b=cUL8Xi9xT6LpXVV9nMXC5YYtTfVQGVtRreRwwJorCXo1PlTeTpi+disdHqtNQEuTxMt5Pi
+	Ho75lW4ElrhrWaO5/xyKjzW4K+O4qMJf7Uzw/sdUJIJdgFi7GxRt+1ufgRGVSQTRcep0ky
+	XX8hECt1Gy2hBEPSkfYbU9JzVocoecs=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-330-pXfiw9dRMh6OS8HI-swAzw-1; Wed, 26 Jul 2023 09:44:33 -0400
+X-MC-Unique: pXfiw9dRMh6OS8HI-swAzw-1
+Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-63cebe9238bso9757416d6.1
+        for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 06:44:33 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690378753; x=1690983553;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sHorn2FTxwc0GDGivshkp6+VTJEJlE83QxVA+vKmjNE=;
-        b=NVlkaGot8+yDg/38Qm4TCYv9LKQbpmS4UpnuuMwYAHnSDsQBCPfNBthcV/U98OEiKZ
-         Lj8RGgDPCTVyKtrLMA8rEBAjjrmfLwYkVYw8324DadvsX9a+SSja8+dl9x2Btg7uJPjk
-         qve4QmGanN6ePDzjPX6zNVncgCugah8H/06bnRMJfdzTULV0zVFRj20Wwky195xcyrbK
-         ZhVAEaJAmntlxcSK9vTlO/rfIMP08n/tZ9QPEaQctAEKQ34EeilTb3e2Aopi3kFwe1to
-         STVXEa1OgJWiN1PQwBY+lsEUPLtlsbb82nnfIgtr9k+I/5nqS3o79gIO4OiV9zfd55h7
-         MayQ==
-X-Gm-Message-State: ABy/qLbiZAnWFRi37OP8BC91ggwA6bv6a31hUV7kKgtHXx27ufEHGfeE
-	5F/ic+6GFQqzbwu9hLzZrrFfqw==
-X-Google-Smtp-Source: APBJJlGW/Eo+ksZ3sdIvRgAMD3SNfOzhdacCr9UTiIET+4QsoqSNOu4fp37X+OSa0YBrEyJX2Nzdpw==
-X-Received: by 2002:a2e:2e16:0:b0:2b6:c818:a9bc with SMTP id u22-20020a2e2e16000000b002b6c818a9bcmr1560633lju.23.1690378752781;
-        Wed, 26 Jul 2023 06:39:12 -0700 (PDT)
-Received: from localhost ([102.36.222.112])
-        by smtp.gmail.com with ESMTPSA id n12-20020a7bcbcc000000b003fbb346279dsm1986398wmi.38.2023.07.26.06.39.11
+        d=1e100.net; s=20221208; t=1690379073; x=1690983873;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:to:from:subject:message-id:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=Wn2jDJiGuVW5obSdP2moup5cJGVSeLTAzm9z2TiK2m0=;
+        b=DUBVbOlWg471/U8VRxWscNCSHZY4rxfkhkaQheVGyiIv2kawp4zOpvf/vsn7UJomoC
+         hKkdnuUNQgCT9sCwemI5uyDvAIKOWr1XdmLGAyMByvoUl9LPSDx0muLLA6qJ7mEMVBko
+         2XseuWVLMvsAh3gRC79awQe2RbaOclBcMnlw0Sul3NFAI8CDXgc5ZJv/RdYSJgwQ4fQq
+         SkEI/xKnVySXQg4s9eTNkrerEDJr3eCdi+HRxdfU10F/fmTBMvquIrMATWqH2qqhvne+
+         RJEvbsHSXjCPx+XZMjghYuQnZGFfWYoiIZS+HawOm0c5fiEwWv56VutztRqibsAy5Ivg
+         N8sA==
+X-Gm-Message-State: ABy/qLaQGn2/LiO7JtCG5PS0ujSS1ZWPm3NnA0EYxV6QOCVG92OI2wlh
+	Ffm0qjjNzuDLaDs1NE4RSBI13FLQjEtRDrViYUaXi+vXVE2g3PLf6fB0r0YvTJSfVsjmljQGzsL
+	upKwgcleqvqLD517NTRfmnKDv
+X-Received: by 2002:a05:6214:5003:b0:626:2305:6073 with SMTP id jo3-20020a056214500300b0062623056073mr2376842qvb.4.1690379072881;
+        Wed, 26 Jul 2023 06:44:32 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlEY+wPDJIS9P4TfJgVk4WzmK4E9kEih0HHh2jwPuojmzz36OjuqWoIjvCtsFjptNMksebir6Q==
+X-Received: by 2002:a05:6214:5003:b0:626:2305:6073 with SMTP id jo3-20020a056214500300b0062623056073mr2376834qvb.4.1690379072631;
+        Wed, 26 Jul 2023 06:44:32 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-225-81.dyn.eolo.it. [146.241.225.81])
+        by smtp.gmail.com with ESMTPSA id m10-20020ae9f20a000000b00767e98535b7sm4379577qkg.67.2023.07.26.06.44.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Jul 2023 06:39:12 -0700 (PDT)
-Date: Wed, 26 Jul 2023 16:39:08 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Yan Zhai <yan@cloudflare.com>
-Cc: bpf@vger.kernel.org, Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
-	Yonghong Song <yhs@fb.com>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
-	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, kernel-team@cloudflare.com,
-	Jordan Griege <jgriege@cloudflare.com>,
-	Markus Elfring <Markus.Elfring@web.de>,
-	Jakub Sitnicki <jakub@cloudflare.com>
-Subject: Re: [PATCH v4 bpf 1/2] bpf: fix skb_do_redirect return values
-Message-ID: <a76b300a-e472-4568-b734-37115927621d@moroto.mountain>
-References: <cover.1690332693.git.yan@cloudflare.com>
- <e5d05e56bf41de82f10d33229b8a8f6b49290e98.1690332693.git.yan@cloudflare.com>
+        Wed, 26 Jul 2023 06:44:32 -0700 (PDT)
+Message-ID: <fce08e76da7e3882319ae935c38e9e2eccf2dcae.camel@redhat.com>
+Subject: Re: [PATCH 1/2] Move hash calculation inside udp4_lib_lookup2()
+From: Paolo Abeni <pabeni@redhat.com>
+To: David Laight <David.Laight@ACULAB.COM>, 
+ "'willemdebruijn.kernel@gmail.com'" <willemdebruijn.kernel@gmail.com>,
+ "'davem@davemloft.net'" <davem@davemloft.net>,  "'dsahern@kernel.org'"
+ <dsahern@kernel.org>, 'Eric Dumazet' <edumazet@google.com>,
+ "'kuba@kernel.org'" <kuba@kernel.org>, "'netdev@vger.kernel.org'"
+ <netdev@vger.kernel.org>
+Date: Wed, 26 Jul 2023 15:44:29 +0200
+In-Reply-To: <5eb8631d430248999116ce8ced13e4b2@AcuMS.aculab.com>
+References: <fbcaa54791cd44999de5fec7c6cf0b3c@AcuMS.aculab.com>
+	 <5eb8631d430248999116ce8ced13e4b2@AcuMS.aculab.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e5d05e56bf41de82f10d33229b8a8f6b49290e98.1690332693.git.yan@cloudflare.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-I'm not positive I understand the code in ip_finish_output2().  I think
-instead of looking for LWTUNNEL_XMIT_DONE it should instead look for
-!= LWTUNNEL_XMIT_CONTINUE.  It's unfortunate that NET_XMIT_DROP and
-LWTUNNEL_XMIT_CONTINUE are the both 0x1.  Why don't we just change that
-instead?
+On Wed, 2023-07-26 at 12:05 +0000, David Laight wrote:
+> Pass the udptable address into udp4_lib_lookup2() instead of the hash slo=
+t.
+>=20
+> While ipv4_portaddr_hash(net, IP_ADDR_ANY, 0) is constant for each net
+> (the port is an xor) the value isn't saved.
+> Since the hash function doesn't get simplified when passed zero the hash
 
-Also there seems to be a leak in lwtunnel_xmit().  Should that return
-LWTUNNEL_XMIT_CONTINUE or should it call kfree_skb() before returning?
+Are you sure? could you please objdump and compare the binary code
+generated before and after the patch? In theory all the callers up to
+__jhash_final() included should be inlined, and the compiler should be
+able to optimze at least rol32(0, <n>).
 
-Something like the following?
+Cheers,
 
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index 11652e464f5d..375790b672bc 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -112,6 +112,9 @@ void netdev_sw_irq_coalesce_default_on(struct net_device *dev);
- #define NET_XMIT_CN		0x02	/* congestion notification	*/
- #define NET_XMIT_MASK		0x0f	/* qdisc flags in net/sch_generic.h */
- 
-+#define LWTUNNEL_XMIT_DONE NET_XMIT_SUCCESS
-+#define LWTUNNEL_XMIT_CONTINUE 0x3
-+
- /* NET_XMIT_CN is special. It does not guarantee that this packet is lost. It
-  * indicates that the device will soon be dropping packets, or already drops
-  * some packets of the same priority; prompting us to send less aggressively. */
-diff --git a/include/net/lwtunnel.h b/include/net/lwtunnel.h
-index 6f15e6fa154e..8ab032ee04d0 100644
---- a/include/net/lwtunnel.h
-+++ b/include/net/lwtunnel.h
-@@ -16,12 +16,6 @@
- #define LWTUNNEL_STATE_INPUT_REDIRECT	BIT(1)
- #define LWTUNNEL_STATE_XMIT_REDIRECT	BIT(2)
- 
--enum {
--	LWTUNNEL_XMIT_DONE,
--	LWTUNNEL_XMIT_CONTINUE,
--};
--
--
- struct lwtunnel_state {
- 	__u16		type;
- 	__u16		flags;
-diff --git a/net/core/lwtunnel.c b/net/core/lwtunnel.c
-index 711cd3b4347a..732415d1287d 100644
---- a/net/core/lwtunnel.c
-+++ b/net/core/lwtunnel.c
-@@ -371,7 +371,7 @@ int lwtunnel_xmit(struct sk_buff *skb)
- 
- 	if (lwtstate->type == LWTUNNEL_ENCAP_NONE ||
- 	    lwtstate->type > LWTUNNEL_ENCAP_MAX)
--		return 0;
-+		return LWTUNNEL_XMIT_CONTINUE;
- 
- 	ret = -EOPNOTSUPP;
- 	rcu_read_lock();
-diff --git a/net/ipv4/ip_output.c b/net/ipv4/ip_output.c
-index 6e70839257f7..4be50a211b14 100644
---- a/net/ipv4/ip_output.c
-+++ b/net/ipv4/ip_output.c
-@@ -216,7 +216,7 @@ static int ip_finish_output2(struct net *net, struct sock *sk, struct sk_buff *s
- 	if (lwtunnel_xmit_redirect(dst->lwtstate)) {
- 		int res = lwtunnel_xmit(skb);
- 
--		if (res < 0 || res == LWTUNNEL_XMIT_DONE)
-+		if (res != LWTUNNEL_XMIT_CONTINUE)
- 			return res;
- 	}
- 
-diff --git a/net/ipv6/ip6_output.c b/net/ipv6/ip6_output.c
-index 1e8c90e97608..016b0a513259 100644
---- a/net/ipv6/ip6_output.c
-+++ b/net/ipv6/ip6_output.c
-@@ -113,7 +113,7 @@ static int ip6_finish_output2(struct net *net, struct sock *sk, struct sk_buff *
- 	if (lwtunnel_xmit_redirect(dst->lwtstate)) {
- 		int res = lwtunnel_xmit(skb);
- 
--		if (res < 0 || res == LWTUNNEL_XMIT_DONE)
-+		if (res != LWTUNNEL_XMIT_CONTINUE)
- 			return res;
- 	}
- 
+Paolo
+
 
