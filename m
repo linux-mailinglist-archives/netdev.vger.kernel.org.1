@@ -1,76 +1,86 @@
-Return-Path: <netdev+bounces-21617-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21618-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40D1D7640C8
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 22:52:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA3817640CD
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 22:57:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 652A91C213C5
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 20:52:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0813A281D8B
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 20:57:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 450C51BEF4;
-	Wed, 26 Jul 2023 20:52:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01D061BEF5;
+	Wed, 26 Jul 2023 20:57:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39FEE1BEE4
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 20:52:28 +0000 (UTC)
-Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AEED610DB;
-	Wed, 26 Jul 2023 13:45:30 -0700 (PDT)
-Received: by mail-lj1-x22f.google.com with SMTP id 38308e7fff4ca-2b9b9f0387dso3012921fa.0;
-        Wed, 26 Jul 2023 13:45:30 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7B681BEE1
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 20:57:33 +0000 (UTC)
+Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91AB719B6;
+	Wed, 26 Jul 2023 13:57:32 -0700 (PDT)
+Received: by mail-pf1-x42c.google.com with SMTP id d2e1a72fcca58-6864c144897so61843b3a.1;
+        Wed, 26 Jul 2023 13:57:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690404329; x=1691009129;
-        h=cc:to:subject:message-id:date:from:references:in-reply-to
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=qGCqCU+TezLIUfpUCfOZVe0/fV0+wUaNn6X+yCvMglk=;
-        b=lNNTh4PYpy1EsvS/52nqXdTfZcerS4ldeEFiGJlgaPcyZYHxaWWQeENoJaZkzhyvsr
-         cyn/H40ulEnp8SkBAW8cRIQ6dmATRIiX0Y2IzODNLyItOlaE+w9+1ZADH/Rc4j+ANCmZ
-         kUFmVU0Jyw1c9yAbAOxdPV5i/nAa8Y5hEOJZeoVw9tB4FQp3YhuxiYYkFICpv7Si1c1f
-         KsalESTA7JU9o+ZcK6eGoIowgjP2iE5ZHZiaR9DDj30AklCLp/3S3a3OqKkrPQMAx+Ri
-         InXLNdZgqxpA3tDn4nwkkRN9wSIH9YuHHW3fRy/5CB0+i9TNt4+oGfAjuvohN0YCMAdc
-         iv3g==
+        d=gmail.com; s=20221208; t=1690405052; x=1691009852;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=40xe9fvFJ9sOsupKilGdDObjo09oxlOirIRg3aGbZbs=;
+        b=aghccPiw+p9jl5oj4/mcOtE1wC1J1UAJ2zUK/5yyjyk1dFvroG7sU6HuGwpy9/hvVj
+         5jK+Jb3SxNJ5ZQIFHmq3EExt5e9K5UJ4J13mbKBPTqxwJ5djmgPP30A/L6rafMnaawiv
+         DHONLr/aScs0ReBeBekOjIRVTu0W3tPcZ4NTpBDC9cMzvmQSp6Y2UdwdNx+LG0E81zy3
+         pSBmUU8BFSyB4tjXLaaGKaFvhZbQ836OmdxBiK4bGLRdPL3sbNomzAKelKvSLeV9VEni
+         8LzVfDBqMBOw7bIYBmYiiJVZdxrjXfslOoK1xcJxmbJFTcBfwY1JE4AvVf+o8G9CmVUc
+         iNrA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690404329; x=1691009129;
-        h=cc:to:subject:message-id:date:from:references:in-reply-to
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=qGCqCU+TezLIUfpUCfOZVe0/fV0+wUaNn6X+yCvMglk=;
-        b=IbRapYEITWECe77hptxCxlEvBBKqf2k7F0jF0qgoyIJb2WIyTp/Labt7tOu9UyVbIM
-         UeNSarJSmV3JDywSRDYdRmMLdozomYnZIw3Zi2+CNu2B0ejcBdDDMdf927AQzhcB/9ER
-         MnX/FKSaR0oAZLXVYlGOxVGwMxbi3pBQWbR70NYLM63crTj63ClIcf7hYwSsqaRT2lwf
-         R+GK9f3sN8/SvvtP0Ec/nsF6sX+ayL7B14KXQjx8LWwJpngBeoW9R6TUb5gKRj4KZC0K
-         wdI/9W45l2sswcC5wck1Rb2I8aRn4+PymhCQGeTvKUwn1bLw/CAujw7hiOzJoxAIlAt/
-         OJ1w==
-X-Gm-Message-State: ABy/qLYH+1ujNQEjIroz8/iIrD+Ba8uwefAf3JlOimb2ot0eeJYy+1JS
-	zhMQbpGqk6o7c7JGcvkk/d+B0CCC+oRd5vGXG+M=
-X-Google-Smtp-Source: APBJJlH4LtWwe/HU8YemRgvsa1IGuLJxx5RnR8HJey8fqgicxFCJQhO6NCTMFIxODRaNkQ+2UVCUr+Cg2IF6sSY1WJk=
-X-Received: by 2002:a2e:7315:0:b0:2b6:a763:5d13 with SMTP id
- o21-20020a2e7315000000b002b6a7635d13mr164823ljc.27.1690404328662; Wed, 26 Jul
- 2023 13:45:28 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1690405052; x=1691009852;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=40xe9fvFJ9sOsupKilGdDObjo09oxlOirIRg3aGbZbs=;
+        b=bOaD0eenVvU/BMrT0WKhsxuTpj7VvCog3wjugE0JBBxveGLeeFSimlnOJERokBSD/R
+         JumJFL9VZhfsEp7jHGq2+prcj+iNhJ1OoioZ/yCeEBIZS2XIYSptCJbbFVsNuGffpwZn
+         KDz9yad41P14SP27ABd8xFYIZ8EhKjkXjG5ea4G3rqPBe/gUXLYKcXGX5M8nz7s9s8+4
+         IrQPB4oDkxGV896D87Q0EgPIcIySbBgSeuf2ouY5Ndd9AJCTHnhBCH0tXzfv/ZT+0zjZ
+         xPvNvkFN2ds8M4ZaJqKmvUBZrE5ojVdJBXolG426yGxpXyIItSNjk7mkuilVGnM1gFo6
+         J+qw==
+X-Gm-Message-State: ABy/qLYKRD2+HmJrrmFJoxF/yP0I7UffzkDnC1Rk+Pd2FX6ELBBRxYD3
+	peWjOtSL0OGLQP8+3AYooqQ=
+X-Google-Smtp-Source: APBJJlFwOFlKgUr5EHQGcfI4UKTPdcLNmhmJVe7LY3hHHwZO0dDZEIG8OC7wGY1Ci/7PEnT5pj2+sA==
+X-Received: by 2002:a05:6a00:4a0e:b0:677:3439:874a with SMTP id do14-20020a056a004a0e00b006773439874amr3577463pfb.3.1690405051983;
+        Wed, 26 Jul 2023 13:57:31 -0700 (PDT)
+Received: from hoboy.vegasvil.org ([2601:640:8000:54:e2d5:5eff:fea5:802f])
+        by smtp.gmail.com with ESMTPSA id n10-20020aa7904a000000b00682c864f35bsm27660pfo.140.2023.07.26.13.57.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 Jul 2023 13:57:31 -0700 (PDT)
+Date: Wed, 26 Jul 2023 13:57:28 -0700
+From: Richard Cochran <richardcochran@gmail.com>
+To: Johannes Zink <j.zink@pengutronix.de>
+Cc: Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Russell King <linux@armlinux.org.uk>, patchwork-jzi@pengutronix.de,
+	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	kernel@pengutronix.de, kernel test robot <lkp@intel.com>
+Subject: Re: [PATCH v2] net: stmmac: correct MAC propagation delay
+Message-ID: <ZMGIuKVP7BEotbrn@hoboy.vegasvil.org>
+References: <20230719-stmmac_correct_mac_delay-v2-1-3366f38ee9a6@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Received: by 2002:a17:906:dc89:b0:978:9011:58a1 with HTTP; Wed, 26 Jul 2023
- 13:45:27 -0700 (PDT)
-In-Reply-To: <20230726143419.19392-1-yuehaibing@huawei.com>
-References: <20230726143419.19392-1-yuehaibing@huawei.com>
-From: Jay Vosburgh <j.vosburgh@gmail.com>
-Date: Wed, 26 Jul 2023 13:45:27 -0700
-Message-ID: <CAAoacNmRXNbc5wZAjre3U-VwzKh_V==bmJZCoXLAHcWmNVW9Eg@mail.gmail.com>
-Subject: Re: [PATCH 27/29] bonding: 3ad: Remove unused declaration bond_3ad_update_lacp_active()
-To: YueHaibing <yuehaibing@huawei.com>
-Cc: andy@greyhouse.net, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, jon.toppins+linux@gmail.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, liuhangbin@gmail.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230719-stmmac_correct_mac_delay-v2-1-3366f38ee9a6@pengutronix.de>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
 	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
@@ -78,41 +88,50 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 7/26/23, YueHaibing <yuehaibing@huawei.com> wrote:
-> This is not used since commit 3a755cd8b7c6 ("bonding: add new option
-> lacp_active")
+On Mon, Jul 24, 2023 at 12:01:31PM +0200, Johannes Zink wrote:
 
-To be clear, it appears that the cited commit added the declaration of
-bond_3ad_upate_lacp_active() to bond_3ad.h, but did not add the actual
-function definition.  A brief search suggests that the function has
-never existed.
+Earlier versions of the IP core return zero from these...
 
-Regardless, the declaration shouldn't be there now.
+> +#define	PTP_TS_INGR_LAT	0x68	/* MAC internal Ingress Latency */
+> +#define	PTP_TS_EGR_LAT	0x6c	/* MAC internal Egress Latency */
 
-Acked-by: Jay Vosburgh <j.vosburgh@gmail.com>
+and so...
 
+> +static void correct_latency(struct stmmac_priv *priv)
+> +{
+> +	void __iomem *ioaddr = priv->ptpaddr;
+> +	u32 reg_tsic, reg_tsicsns;
+> +	u32 reg_tsec, reg_tsecsns;
+> +	u64 scaled_ns;
+> +	u32 val;
+> +
+> +	/* MAC-internal ingress latency */
+> +	scaled_ns = readl(ioaddr + PTP_TS_INGR_LAT);
+> +
+> +	/* See section 11.7.2.5.3.1 "Ingress Correction" on page 4001 of
+> +	 * i.MX8MP Applications Processor Reference Manual Rev. 1, 06/2021
+> +	 */
+> +	val = readl(ioaddr + PTP_TCR);
+> +	if (val & PTP_TCR_TSCTRLSSR)
+> +		/* nanoseconds field is in decimal format with granularity of 1ns/bit */
+> +		scaled_ns = ((u64)NSEC_PER_SEC << 16) - scaled_ns;
+> +	else
+> +		/* nanoseconds field is in binary format with granularity of ~0.466ns/bit */
+> +		scaled_ns = ((1ULL << 31) << 16) -
+> +			DIV_U64_ROUND_CLOSEST(scaled_ns * PSEC_PER_NSEC, 466U);
+> +
+> +	reg_tsic = scaled_ns >> 16;
+> +	reg_tsicsns = scaled_ns & 0xff00;
+> +
+> +	/* set bit 31 for 2's compliment */
+> +	reg_tsic |= BIT(31);
+> +
+> +	writel(reg_tsic, ioaddr + PTP_TS_INGR_CORR_NS);
 
-> Signed-off-by: YueHaibing <yuehaibing@huawei.com>
-> ---
->  include/net/bond_3ad.h | 1 -
->  1 file changed, 1 deletion(-)
->
-> diff --git a/include/net/bond_3ad.h b/include/net/bond_3ad.h
-> index a016f275cb01..c5e57c6bd873 100644
-> --- a/include/net/bond_3ad.h
-> +++ b/include/net/bond_3ad.h
-> @@ -301,7 +301,6 @@ int  __bond_3ad_get_active_agg_info(struct bonding
-> *bond,
->  int bond_3ad_lacpdu_recv(const struct sk_buff *skb, struct bonding *bond,
->  			 struct slave *slave);
->  int bond_3ad_set_carrier(struct bonding *bond);
-> -void bond_3ad_update_lacp_active(struct bonding *bond);
->  void bond_3ad_update_lacp_rate(struct bonding *bond);
->  void bond_3ad_update_ad_actor_settings(struct bonding *bond);
->  int bond_3ad_stats_fill(struct sk_buff *skb, struct bond_3ad_stats
-> *stats);
-> --
-> 2.34.1
->
->
+here reg_tsic = 0x80000000 for a correction of -2.15 seconds!
+
+@Jakub  Can you please revert this patch?
+
+Thanks,
+Richard
 
