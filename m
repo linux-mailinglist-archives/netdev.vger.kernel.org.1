@@ -1,136 +1,74 @@
-Return-Path: <netdev+bounces-21495-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21496-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18835763B74
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 17:43:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E489763B75
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 17:44:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 486991C21354
-	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 15:43:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D0CC5281E1A
+	for <lists+netdev@lfdr.de>; Wed, 26 Jul 2023 15:44:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEE5326B2C;
-	Wed, 26 Jul 2023 15:43:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6849D26B8C;
+	Wed, 26 Jul 2023 15:43:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B330127706
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 15:43:29 +0000 (UTC)
-Received: from mail-oa1-x2d.google.com (mail-oa1-x2d.google.com [IPv6:2001:4860:4864:20::2d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 790D3212B;
-	Wed, 26 Jul 2023 08:43:26 -0700 (PDT)
-Received: by mail-oa1-x2d.google.com with SMTP id 586e51a60fabf-1bb6334fec5so360075fac.1;
-        Wed, 26 Jul 2023 08:43:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690386206; x=1690991006;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=GgFvlAGeua6rkHRPoDyX/+JWDNQ8FgMvtlCof0tD8t4=;
-        b=RMArvMwJxEoqM7oM+2jJtH+rbGnNw2G9JiIwJG6hsgAf9RiedtfRmXrb5dmsFNY9UW
-         AHgdI1ToGQr4XBGX2YNwEmtv5r/fMatcmSO1nBwGM9M0rjGJqs/oB8fwrZff4HxAHX8B
-         00OpQZz+LNjdDZed8f5qjMOvn5NoMIv2SKxlpSGhPoxO8qwnBzROvCqT3P3/dPNvVriz
-         7vgjeGHAeN1fPuYC+gETeVHmnu9TCJ8DJjZW7sUZkF/SZiwACYE4VaTciKpj+evW0/2s
-         GcXhRmHG9g2+TuOyiFPK9GvuynmwHs63fcWsRqItpiONgSt8c3rh9cA9DcPkAtG6RJ5b
-         IzGg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690386206; x=1690991006;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GgFvlAGeua6rkHRPoDyX/+JWDNQ8FgMvtlCof0tD8t4=;
-        b=BIRY17/XX87LYSY15qMLhSTbR+9Yylwzu9Ytem7pL4l7L2hbPaxHEtG896l1I4d0+J
-         KcN5If69s2y9QMXWpg+E0zblcSIhvsVY8OjHccS69oBHyJCKelTdu84LqWC9Q/whSofE
-         OjkoR8D7SgE6Ar2xQWcxjHHSmQ7TcXWpvdXD0y9UzmZM9h78/XnRLJiSKZdEeGrrs0q5
-         wZQwr5DLiCgDybuFm31Khl0IkbJhxNyK+gacwObhs4EmUHDKP3WInLfF8DaIPV5FW+US
-         CMObLPwBJcyE7axa0wlhQDuIHpYHPdf1dwMsn0H0l2DUlE4b8kcgU/B6TcHSvXXE5LVS
-         PHhg==
-X-Gm-Message-State: ABy/qLY2KMjTZmTxATzpaGsUK6uzkUrvgTqWhhwO+Jwx0QrXnYJBuFbB
-	oyroSmWBJgbXBrKW9OdNti4=
-X-Google-Smtp-Source: APBJJlH5TY7cNT9lCf4suTEQwBH46hx7lkSTs+i74ILJmSnyjHQ/it17SRxuPKv6AOjsfdVhaVHhhA==
-X-Received: by 2002:a05:6870:fba9:b0:1ba:bea1:b970 with SMTP id kv41-20020a056870fba900b001babea1b970mr2443328oab.5.1690386205632;
-        Wed, 26 Jul 2023 08:43:25 -0700 (PDT)
-Received: from hoboy.vegasvil.org ([2601:640:8000:54:e2d5:5eff:fea5:802f])
-        by smtp.gmail.com with ESMTPSA id fw3-20020a17090b128300b00262ca945cecsm1399094pjb.54.2023.07.26.08.43.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Jul 2023 08:43:25 -0700 (PDT)
-Date: Wed, 26 Jul 2023 08:43:22 -0700
-From: Richard Cochran <richardcochran@gmail.com>
-To: Johannes Zink <j.zink@pengutronix.de>
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Russell King <linux@armlinux.org.uk>, patchwork-jzi@pengutronix.de,
-	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kernel@pengutronix.de, kernel test robot <lkp@intel.com>
-Subject: Re: [PATCH v2] net: stmmac: correct MAC propagation delay
-Message-ID: <ZME/GjBWdodiUO+8@hoboy.vegasvil.org>
-References: <20230719-stmmac_correct_mac_delay-v2-1-3366f38ee9a6@pengutronix.de>
- <20230725200606.5264b59c@kernel.org>
- <ZMCRjcRF9XqEPg/Z@hoboy.vegasvil.org>
- <09a2d767-d781-eba2-028f-a949f1128fbd@pengutronix.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B59826B71
+	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 15:43:44 +0000 (UTC)
+Received: from relay.hostedemail.com (smtprelay0017.hostedemail.com [216.40.44.17])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 127C52707;
+	Wed, 26 Jul 2023 08:43:35 -0700 (PDT)
+Received: from omf14.hostedemail.com (a10.router.float.18 [10.200.18.1])
+	by unirelay09.hostedemail.com (Postfix) with ESMTP id DC232801FD;
+	Wed, 26 Jul 2023 15:43:33 +0000 (UTC)
+Received: from [HIDDEN] (Authenticated sender: joe@perches.com) by omf14.hostedemail.com (Postfix) with ESMTPA id 2B4B53B;
+	Wed, 26 Jul 2023 15:43:31 +0000 (UTC)
+Message-ID: <11ec5b3819ff17c7013348b766eab571eee5ca96.camel@perches.com>
+Subject: Re: [PATCH v2] scripts: get_maintainer: steer people away from
+ using file paths
+From: Joe Perches <joe@perches.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, 
+	geert@linux-m68k.org, gregkh@linuxfoundation.org, netdev@vger.kernel.org, 
+	workflows@vger.kernel.org, mario.limonciello@amd.com
+Date: Wed, 26 Jul 2023 08:43:30 -0700
+In-Reply-To: <20230726151515.1650519-1-kuba@kernel.org>
+References: <20230726151515.1650519-1-kuba@kernel.org>
+Content-Type: text/plain; charset="ISO-8859-1"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <09a2d767-d781-eba2-028f-a949f1128fbd@pengutronix.de>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+X-Rspamd-Queue-Id: 2B4B53B
+X-Stat-Signature: kekwf3boy5oqzgutd3xcrgxyb8zmqfpo
+X-Spam-Status: No, score=-0.9 required=5.0 tests=BAYES_00,FORGED_SPF_HELO,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE,UNPARSEABLE_RELAY
+	autolearn=no autolearn_force=no version=3.4.6
+X-Rspamd-Server: rspamout01
+X-Session-Marker: 6A6F6540706572636865732E636F6D
+X-Session-ID: U2FsdGVkX1+72Wd9vEYwCd4qCLZ11+p0SIW+an4W+Ow=
+X-HE-Tag: 1690386211-699822
+X-HE-Meta: U2FsdGVkX1+UpmbqDRhQT+3wZngmi/dvSPNsMFg4A3BVrNxgZT2Qs75z/BS6gQx5s4JQZdKTYCtnX1LDu0K5hNYg06QJzsP8EFz53UQsqRBlCi4mL+/LiRJVrdQYFpVhkITK8cYKBRGSPOlKj1L12dR6Pev3YbhDU8tryOpiGzW5GxgU4cmbe8OMEsgrfZqT141Islyw7Nr41WcF9FAHbWgYQXC6DEvbSSVL/jCt5CUYUflMFI4+28y1iTkD6uBm8/se5jpMEOkTF3/KTTdCc+ijx/vlixdGJTh5V8JyPxjbIdQJS7+xg4YEpTvPH8ns
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Jul 26, 2023 at 08:10:35AM +0200, Johannes Zink wrote:
+On Wed, 2023-07-26 at 08:15 -0700, Jakub Kicinski wrote:
+> We repeatedly see netcomers misuse get_maintainer by running it on
 
-> Also on a side-note, "driver nonsense" sounds a bit harsh from someone
-> always insisting that one should not compensate for bad drivers in the
-> userspace stack and instead fixing driver and hardware issues in the kernel,
-> don't you think?
+newcomers
 
-Everything has its place.
+> Print a warning when someone tries to use -f and remove
+> the "auto-guessing" of file paths.
 
-The proper place to account for delay asymmetries is in the user space
-configuration, for example in linuxptp you have
-
-       delayAsymmetry
-              The  time  difference in nanoseconds of the transmit and receive
-              paths. This value should be positive when  the  server-to-client
-              propagation  time  is  longer  and  negative when the client-to-
-              server time is longer. The default is 0 nanoseconds.
-
-       egressLatency
-              Specifies the  difference  in  nanoseconds  between  the  actual
-              transmission time at the reference plane and the reported trans‐
-              mit time stamp. This value will be added to egress  time  stamps
-              obtained from the hardware.  The default is 0.
-
-       ingressLatency
-              Specifies the difference in nanoseconds between the reported re‐
-              ceive  time  stamp  and  the  actual reception time at reference
-              plane. This value will be subtracted from  ingress  time  stamps
-              obtained from the hardware.  The default is 0.
-
-Trying to hard code those into the driver?  Good luck getting that
-right for everyone.
-
-BTW this driver is actually for an IP core used in many, many SoCs.
-
-How many _other_ SoCs did you test your patch on?
-
-Thanks,
-Richard
+Nack on that bit.
+My recollection is it's Linus' preferred mechanism.
 
 
