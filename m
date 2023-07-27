@@ -1,660 +1,140 @@
-Return-Path: <netdev+bounces-21963-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21965-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 601BF7657BD
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 17:34:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E95727657C4
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 17:35:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D4E342823C5
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 15:34:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AA10B1C21519
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 15:35:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBFBC17AA5;
-	Thu, 27 Jul 2023 15:34:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8404B17AAE;
+	Thu, 27 Jul 2023 15:35:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6AD1FBEF
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 15:34:12 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF6A32686
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 08:34:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1690472049;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FrZxwHP4S8NUkOKu182yLC6CoPV/jo8VZgoF1heo5gQ=;
-	b=TOj9WiKVq5AdAFUinflLCAs1EC7kPvzTYj/PtSZ48+GqzgEOfiz5X0+zCDJPMFhUl/woi3
-	7Vo5ST9ILks9DNP5fobrfO3BYvdEXmDErfjTi3RKdq79JtHC47VEO54hEyOBpUIRqGCQ88
-	iesSYdGG75PG6hPDz8PFFpOvsmFsoZM=
-Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-286-SX88gJ6nNg2CR7gNF588CA-1; Thu, 27 Jul 2023 11:34:05 -0400
-X-MC-Unique: SX88gJ6nNg2CR7gNF588CA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A32FB1C04326;
-	Thu, 27 Jul 2023 15:34:04 +0000 (UTC)
-Received: from RHTPC1VM0NT (unknown [10.22.8.217])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 483484094DC0;
-	Thu, 27 Jul 2023 15:34:03 +0000 (UTC)
-From: Aaron Conole <aconole@redhat.com>
-To: Adrian Moreno <amorenoz@redhat.com>
-Cc: netdev@vger.kernel.org,  dev@openvswitch.org,  Ilya Maximets
- <i.maximets@ovn.org>,  Eric Dumazet <edumazet@google.com>,
-  linux-kselftest@vger.kernel.org,  Jakub Kicinski <kuba@kernel.org>,
-  Paolo Abeni <pabeni@redhat.com>,  shuah@kernel.org,  "David S. Miller"
- <davem@davemloft.net>
-Subject: Re: [ovs-dev] [PATCH net-next 1/4] selftests: openvswitch: add an
- initial flow programming case
-References: <20230628162714.392047-1-aconole@redhat.com>
-	<20230628162714.392047-2-aconole@redhat.com>
-	<9375ccbc-dd40-9998-dde5-c94e4e28f4f1@redhat.com>
-Date: Thu, 27 Jul 2023 11:34:02 -0400
-In-Reply-To: <9375ccbc-dd40-9998-dde5-c94e4e28f4f1@redhat.com> (Adrian
-	Moreno's message of "Fri, 7 Jul 2023 17:40:14 +0200")
-Message-ID: <f7tfs59cqs5.fsf@redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 490AC171AB
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 15:35:31 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42AC9C433C8;
+	Thu, 27 Jul 2023 15:35:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1690472131;
+	bh=gM6ofG1nGUEoDfXpgi/FASWiYdmEVl7mx7tb7tgZJr4=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=uaYdiayb1L8p5J2I/DVyWBz/MEnRXku3tDpX89iJAVlxuEsY/VsqcOLFtH4DMlxnz
+	 mQOkYNVDKCoARX7SXWHD7gKvojw4PY3Kzy1dwWYiYJn2y5yabNJ+OT1rG8PUTqgE1E
+	 XMUP92CDa08lqiMPjBMmZ2A8FdW30DBtTiCBnD+uv+m8qTF8bPEgjPOezJXp06lb9l
+	 7E88wKIoh7ycQlRcbsQv/DEJSBq5sD4zwRB+x1jntDkcBe7P0YwNNiOLtBz7g6WvXL
+	 e/Y4p+aK2jGAbg1DzKiFdWFB4bfdXnmgEE+GLVGGoCM/oa1uGzePNX7UKvUVSGwtv9
+	 2lHPcQyQIRerg==
+Message-ID: <55dbb48d-dee3-e119-1bdf-edaa080c1c3d@kernel.org>
+Date: Thu, 27 Jul 2023 09:35:30 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.13.0
+Subject: Re: [Questions] Some issues about IPv4/IPv6 nexthop route
+Content-Language: en-US
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: Stephen Hemminger <stephen@networkplumber.org>,
+ Ido Schimmel <idosch@idosch.org>, netdev@vger.kernel.org,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Thomas Haller <thaller@redhat.com>
+References: <ZLjncWOL+FvtaHcP@Laptop-X1> <ZLlE5of1Sw1pMPlM@shredder>
+ <ZLngmOaz24y5yLz8@Laptop-X1>
+ <d6a204b1-e606-f6ad-660a-28cc5469be2e@kernel.org>
+ <ZLobpQ7jELvCeuoD@Laptop-X1> <ZLzY42I/GjWCJ5Do@shredder>
+ <ZL48xbowL8QQRr9s@Laptop-X1> <20230724084820.4aa133cc@hermes.local>
+ <ZMDyoRzngXVESEd1@Laptop-X1>
+ <9a421bef-2b19-8619-601e-b00c0b1dc515@kernel.org>
+ <ZMHwROD1AJrd4pND@Laptop-X1>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <ZMHwROD1AJrd4pND@Laptop-X1>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Adrian Moreno <amorenoz@redhat.com> writes:
+On 7/26/23 10:19 PM, Hangbin Liu wrote:
+> On Wed, Jul 26, 2023 at 09:57:59AM -0600, David Ahern wrote:
+>>> So my questions are, should we show weight/scope for IPv4? How to deal the
+>>> type/proto info missing for IPv6? How to deal with the difference of merging
+>>> policy for IPv4/IPv6?
+>>> + ip route add 172.16.105.0/24 table 100 via 172.16.104.100 dev dummy1
+>>> + ip route append 172.16.105.0/24 table 100 via 172.16.104.100 dev dummy2
+>>
+>>> + ip route add 172.16.106.0/24 table 100 nexthop via 172.16.104.100 dev dummy1 weight 1
+>>> + ip route append 172.16.106.0/24 table 100 nexthop via 172.16.104.100 dev dummy1 weight 2
+>>
+>> Weight only has meaning with a multipath route. In both of these caess
+>> these are 2 separate entries in the FIB
+> 
+> Yes, we know these are 2 separate entries. The NM developers know these
+> are 2 separate entries. But the uses don't know, and the route daemon don't
+> know. If a user add these 2 entires. And kernel show them as the same. The
+> route daemon will store them as a same entries. But if the user delete the
+> entry. We actually delete one and left one in the kernel. This will make
+> the route daemon and user confused.
+> 
+> So my question is, should we export the weight/scope? Or stop user add
+> the second entry? Or just leave it there and ask route daemon/uses try
+> the new nexthop api.
+> 
+>> with the second one only hit under certain conditions.
+> 
+> Just curious, with what kind of certain conditions we will hit the second one?
 
-> On 6/28/23 18:27, Aaron Conole wrote:
->> The openvswitch self-tests can test much of the control side of
->> the module (ie: what a vswitchd implementation would process),
->> but the actual packet forwarding cases aren't supported, making
->> the testing of limited value.
->> Add some flow parsing and an initial ARP based test case using
->> arping utility.  This lets us display flows, add some basic
->> output flows with simple matches, and test against a known good
->> forwarding case.
->> Signed-off-by: Aaron Conole <aconole@redhat.com>
->> ---
->> NOTE: 3 lines flag the line-length checkpatch warning, but there didn't
->>        seem to bea good way of breaking the lines smaller for 2 of them.
->>        The third would still flag, even if broken at what looks like a
->>        good point to break it.
->>   .../selftests/net/openvswitch/openvswitch.sh  |  51 +++
->>   .../selftests/net/openvswitch/ovs-dpctl.py    | 408 ++++++++++++++++++
->>   2 files changed, 459 insertions(+)
->> diff --git a/tools/testing/selftests/net/openvswitch/openvswitch.sh
->> b/tools/testing/selftests/net/openvswitch/openvswitch.sh
->> index 3117a4be0cd04..5cdacb3c8c925 100755
->> --- a/tools/testing/selftests/net/openvswitch/openvswitch.sh
->> +++ b/tools/testing/selftests/net/openvswitch/openvswitch.sh
->> @@ -11,6 +11,7 @@ VERBOSE=0
->>   TRACING=0
->>     tests="
->> +	arp_ping				eth-arp: Basic arp ping between two NS
->>   	netlink_checks				ovsnl: validate netlink attrs and settings
->>   	upcall_interfaces			ovs: test the upcall interfaces"
->>   @@ -127,6 +128,16 @@ ovs_add_netns_and_veths () {
->>   	return 0
->>   }
->>   +ovs_add_flow () {
->> +	info "Adding flow to DP: sbx:$1 br:$2 flow:$3 act:$4"
->> +	ovs_sbx "$1" python3 $ovs_base/ovs-dpctl.py add-flow "$2" "$3" "$4"
->> +	if [ $? -ne 0 ]; then
->> +		echo "Flow [ $3 : $4 ] failed" >> ${ovs_dir}/debug.log
->> +		return 1
->> +	fi
->> +	return 0
->> +}
->> +
->>   usage() {
->>   	echo
->>   	echo "$0 [OPTIONS] [TEST]..."
->> @@ -141,6 +152,46 @@ usage() {
->>   	exit 1
->>   }
->>   +# arp_ping test
->> +# - client has 1500 byte MTU
->> +# - server has 1500 byte MTU
->> +# - send ARP ping between two ns
->> +test_arp_ping () {
->> +
->> +	which arping >/dev/null 2>&1 || return $ksft_skip
->> +
->> +	sbx_add "test_arp_ping" || return $?
->> +
->> +	ovs_add_dp "test_arp_ping" arpping || return 1
->> +
->> +	info "create namespaces"
->> +	for ns in client server; do
->> +		ovs_add_netns_and_veths "test_arp_ping" "arpping" "$ns" \
->> +		    "${ns:0:1}0" "${ns:0:1}1" || return 1
->> +	done
->> +
->> +	# Setup client namespace
->> +	ip netns exec client ip addr add 172.31.110.10/24 dev c1
->> +	ip netns exec client ip link set c1 up
->> + HW_CLIENT=`ip netns exec client ip link show dev c1 | grep -E
-> 'link/ether [0-9a-f:]+' | awk '{print $2;}'`
->> +	info "Client hwaddr: $HW_CLIENT"
->> +
->> +	# Setup server namespace
->> +	ip netns exec server ip addr add 172.31.110.20/24 dev s1
->> +	ip netns exec server ip link set s1 up
->> + HW_SERVER=`ip netns exec server ip link show dev s1 | grep -E
-> 'link/ether [0-9a-f:]+' | awk '{print $2;}'`
->> +	info "Server hwaddr: $HW_SERVER"
->> +
->> +	ovs_add_flow "test_arp_ping" arpping \
->> +
-> "in_port(1),eth(),eth_type(0x0806),arp(sip=172.31.110.10,tip=172.31.110.20,sha=$HW_CLIENT,tha=ff:ff:ff:ff:ff:ff)"
-> '2' || return 1
->> +	ovs_add_flow "test_arp_ping" arpping \
->> +		"in_port(2),eth(),eth_type(0x0806),arp()" '1' || return 1
->> +
->> +	ovs_sbx "test_arp_ping" ip netns exec client arping -I c1 172.31.110.20 -c 1 || return 1
->> +
->> +	return 0
->> +}
->> +
->>   # netlink_validation
->>   # - Create a dp
->>   # - check no warning with "old version" simulation
->> diff --git a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
-> b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
->> index 1c8b36bc15d48..799bfb3064b90 100644
->> --- a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
->> +++ b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
->> @@ -9,9 +9,12 @@ import errno
->>   import ipaddress
->>   import logging
->>   import multiprocessing
->> +import re
->>   import struct
->>   import sys
->>   import time
->> +import types
->> +import uuid
->>     try:
->>       from pyroute2 import NDB
->> @@ -59,6 +62,104 @@ def macstr(mac):
->>       return outstr
->>     +def strspn(str1, str2):
->> +    tot = 0
->> +    for char in str1:
->> +        if str2.find(char) == -1:
->> +            return tot
->> +        tot += 1
->> +    return tot
->> +
->> +
->> +def intparse(statestr, defmask="0xffffffff"):
->> +    totalparse = strspn(statestr, "0123456789abcdefABCDEFx/")
->> +    # scan until "/"
->> +    count = strspn(statestr, "x0123456789abcdefABCDEF")
->> +
->> +    firstnum = statestr[:count]
->> +    if firstnum[-1] == "/":
->> +        firstnum = firstnum[:-1]
->> +    k = int(firstnum, 0)
->> +
->> +    m = None
->> +    if defmask is not None:
->> +        secondnum = defmask
->> +        if statestr[count] == "/":
->> +            secondnum = statestr[count + 1 :]  # this is wrong...
->> +        m = int(secondnum, 0)
->> +
->> +    return statestr[totalparse + 1 :], k, m
->> +
->> +
->> +def parse_flags(flag_str, flag_vals):
->> +    bitResult = 0
->> +    maskResult = 0
->> +
->> +    if len(flag_str) == 0:
->> +        return flag_str, bitResult, maskResult
->> +
->> +    if flag_str[0].isdigit():
->> +        idx = 0
->> +        while flag_str[idx].isdigit() or flag_str[idx] == "x":
->> +            idx += 1
->> +        digits = flag_str[:idx]
->> +        flag_str = flag_str[idx:]
->> +
->> +        bitResult = int(digits, 0)
->> +        maskResult = int(digits, 0)
->> +
->> +    while len(flag_str) > 0 and (flag_str[0] == "+" or flag_str[0] == "-"):
->> +        if flag_str[0] == "+":
->> +            setFlag = True
->> +        elif flag_str[0] == "-":
->> +            setFlag = False
->> +
->> +        flag_str = flag_str[1:]
->> +
->> +        flag_len = 0
->> +        while (
->> +            flag_str[flag_len] != "+"
->> +            and flag_str[flag_len] != "-"
->> +            and flag_str[flag_len] != ","
->> +            and flag_str[flag_len] != ")"
->> +        ):
->> +            flag_len += 1
->> +
->> +        flag = flag_str[0:flag_len]
->> +
->> +        if flag in flag_vals:
->> +            if maskResult & flag_vals[flag]:
->> +                raise KeyError(
->> +                    "Flag %s set once, cannot be set in multiples" % flag
->> +                )
->> +
->> +            if setFlag:
->> +                bitResult |= flag_vals[flag]
->> +
->> +            maskResult |= flag_vals[flag]
->> +        else:
->> +            raise KeyError("Missing flag value: %s" % flag)
->> +
->> +        flag_str = flag_str[flag_len:]
->> +
->> +    return flag_str, bitResult, maskResult
->> +
->> +
->> +def parse_ct_state(statestr):
->> +    ct_flags = {
->> +        "new": 1 << 0,
->> +        "est": 1 << 1,
->> +        "rel": 1 << 2,
->> +        "rpl": 1 << 3,
->> +        "inv": 1 << 4,
->> +        "trk": 1 << 5,
->> +        "snat": 1 << 6,
->> +        "dnat": 1 << 7,
->> +    }
->> +
->> +    return parse_flags(statestr, ct_flags)
->> +
->> +
->>   def convert_mac(mac_str, mask=False):
->>       if mac_str is None or mac_str == "":
->>           mac_str = "00:00:00:00:00:00"
->> @@ -79,6 +180,61 @@ def convert_ipv4(ip, mask=False):
->>       return int(ipaddress.IPv4Address(ip))
->>     +def parse_starts_block(block_str, scanstr, returnskipped,
->> scanregex=False):
->> +    if scanregex:
->> +        m = re.search(scanstr, block_str)
->> +        if m is None:
->> +            if returnskipped:
->> +                return block_str
->> +            return False
->> +        if returnskipped:
->> +            block_str = block_str[len(m.group(0)) :]
->> +            return block_str
->> +        return True
->> +
->> +    if block_str.startswith(scanstr):
->> +        if returnskipped:
->> +            block_str = block_str[len(scanstr) :]
->> +        else:
->> +            return True
->> +
->> +    if returnskipped:
->> +        return block_str
->> +
->> +    return False
->> +
->> +
->> +def parse_extract_field(
->> +    block_str, fieldstr, scanfmt, convert, masked=False, defval=None
->> +):
->> +    if fieldstr and not block_str.startswith(fieldstr):
->> +        return block_str, defval
->> +
->> +    if fieldstr:
->> +        str_skiplen = len(fieldstr)
->> +        str_skipped = block_str[str_skiplen:]
->> +        if str_skiplen == 0:
->> +            return str_skipped, defval
->> +    else:
->> +        str_skiplen = 0
->> +        str_skipped = block_str
->> +
->> +    m = re.search(scanfmt, str_skipped)
->> +    if m is None:
->> +        raise ValueError("Bad fmt string")
->> +
->> +    data = m.group(0)
->> +    if convert:
->> +        data = convert(m.group(0))
->> +
->> +    str_skipped = str_skipped[len(m.group(0)) :]
->> +    if masked:
->> +        if str_skipped[0] == "/":
->> +            raise ValueError("Masking support TBD...")
->> +
->> +    return str_skipped, data
->> +
->> +
->>   class ovs_dp_msg(genlmsg):
->>       # include the OVS version
->>       # We need a custom header rather than just being able to rely on
->> @@ -278,6 +434,52 @@ class ovsactions(nla):
->>             return print_str
->>   +    def parse(self, actstr):
->> +        parsed = False
->> +        while len(actstr) != 0:
->> +            if actstr.startswith("drop"):
->> +                # for now, drops have no explicit action, so we
->> +                # don't need to set any attributes.  The final
->> +                # act of the processing chain will just drop the packet
->> +                return
->> +
->> +            elif parse_starts_block(actstr, "^(\d+)", False, True):
->> +                actstr, output = parse_extract_field(
->> +                    actstr, None, "(\d+)", lambda x: int(x), False, "0"
->> +                )
->> +                actstr = actstr[strspn(actstr, ", ") :]
->> +                self["attrs"].append(["OVS_ACTION_ATTR_OUTPUT", output])
->> +                parsed = True
->> +            elif parse_starts_block(actstr, "recirc(", False):
->> +                actstr, recircid = parse_extract_field(
->> +                    actstr,
->> +                    "recirc(",
->> +                    "([0-9a-fA-Fx]+)",
->> +                    lambda x: int(x, 0),
->> +                    False,
->> +                    0,
->> +                )
->> +                actstr = actstr[strspn(actstr, "), ") :]
->> +                self["attrs"].append(["OVS_ACTION_ATTR_RECIRC", recircid])
->> +                parsed = True
->> +
->> +            parse_flat_map = (
->> +                ("ct_clear", "OVS_ACTION_ATTR_CT_CLEAR"),
->> +                ("pop_vlan", "OVS_ACTION_ATTR_POP_VLAN"),
->> +                ("pop_eth", "OVS_ACTION_ATTR_POP_ETH"),
->> +                ("pop_nsh", "OVS_ACTION_ATTR_POP_NSH"),
->> +            )
->> +
->> +            for flat_act in parse_flat_map:
->> +                if parse_starts_block(actstr, flat_act[0], False):
->> +                    actstr += len(flat_act[0])
->> +                    self["attrs"].append([flat_act[1]])
->> +                    actstr = actstr[strspn(actstr, ", ") :]
->> +                    parsed = True
->> +
->> +            if not parsed:
->> +                raise ValueError("Action str: '%s' not supported" % actstr)
->> +
->>     class ovskey(nla):
->>       nla_flags = NLA_F_NESTED
->> @@ -347,6 +549,53 @@ class ovskey(nla):
->>                   init=init,
->>               )
->>   +        def parse(self, flowstr, typeInst):
->> +            if not flowstr.startswith(self.proto_str):
->> +                return None, None
->> +
->> +            k = typeInst()
->> +            m = typeInst()
->> +
->> +            flowstr = flowstr[len(self.proto_str) :]
->> +            if flowstr.startswith("("):
->> +                flowstr = flowstr[1:]
->> +
->> +            keybits = b""
->> +            maskbits = b""
->> +            for f in self.fields_map:
->> +                if flowstr.startswith(f[1]):
->> +                    # the following assumes that the field looks
->> +                    # something like 'field.' where '.' is a
->> +                    # character that we don't exactly care about.
->> +                    flowstr = flowstr[len(f[1]) + 1 :]
->> +                    splitchar = 0
->> +                    for c in flowstr:
->> +                        if c == "," or c == ")":
->> +                            break
->> +                        splitchar += 1
->> +                    data = flowstr[:splitchar]
->> +                    flowstr = flowstr[splitchar:]
->> +                else:
->> +                    data = None
->> +
->> +                if len(f) > 4:
->> +                    func = f[4]
->> +                else:
->> +                    func = f[3]
->> +                k[f[0]] = func(data)
->> +                if len(f) > 4:
->> +                    m[f[0]] = func(data, True)
->> +                else:
->> +                    m[f[0]] = func(data)
->> +
->> +                flowstr = flowstr[strspn(flowstr, ", ") :]
->> +                if len(flowstr) == 0:
->> +                    return flowstr, k, m
->> +
->> +            flowstr = flowstr[strspn(flowstr, "), ") :]
->> +
->> +            return flowstr, k, m
->> +
->>           def dpstr(self, masked=None, more=False):
->>               outstr = self.proto_str + "("
->>               first = False
->> @@ -810,6 +1059,71 @@ class ovskey(nla):
->>       class ovs_key_mpls(nla):
->>           fields = (("lse", ">I"),)
->>   +    def parse(self, flowstr, mask=None):
->> +        for field in (
->> +            ("OVS_KEY_ATTR_PRIORITY", "skb_priority", intparse),
->> +            ("OVS_KEY_ATTR_SKB_MARK", "skb_mark", intparse),
->> +            ("OVS_KEY_ATTR_RECIRC_ID", "recirc_id", intparse),
->> +            ("OVS_KEY_ATTR_DP_HASH", "dp_hash", intparse),
->> +            ("OVS_KEY_ATTR_CT_STATE", "ct_state", parse_ct_state),
->> +            ("OVS_KEY_ATTR_CT_ZONE", "ct_zone", intparse),
->> +            ("OVS_KEY_ATTR_CT_MARK", "ct_mark", intparse),
->> +            ("OVS_KEY_ATTR_IN_PORT", "in_port", intparse),
->> +            (
->> +                "OVS_KEY_ATTR_ETHERNET",
->> +                "eth",
->> +                ovskey.ethaddr,
->> +            ),
->> +            (
->> +                "OVS_KEY_ATTR_ETHERTYPE",
->> +                "eth_type",
->> +                lambda x: intparse(x, "0xffff"),
->> +            ),
->> +            (
->> +                "OVS_KEY_ATTR_IPV4",
->> +                "ipv4",
->> +                ovskey.ovs_key_ipv4,
->> +            ),
->> +            (
->> +                "OVS_KEY_ATTR_IPV6",
->> +                "ipv6",
->> +                ovskey.ovs_key_ipv6,
->> +            ),
->> +            (
->> +                "OVS_KEY_ATTR_ARP",
->> +                "arp",
->> +                ovskey.ovs_key_arp,
->> +            ),
->> +            (
->> +                "OVS_KEY_ATTR_TCP",
->> +                "tcp",
->> +                ovskey.ovs_key_tcp,
->> +            ),
->> +            (
->> +                "OVS_KEY_ATTR_TCP_FLAGS",
->> +                "tcp_flags",
->> +                lambda x: parse_flags(x, None),
->> +            ),
->> +        ):
->> +            fld = field[1] + "("
->> +            if not flowstr.startswith(fld):
->> +                continue
->> +
->> +            if not isinstance(field[2], types.FunctionType):
->> +                nk = field[2]()
->> +                flowstr, k, m = nk.parse(flowstr, field[2])
->> +            else:
->> +                flowstr = flowstr[len(fld) :]
->> +                flowstr, k, m = field[2](flowstr)
->> +
->> +            if m and mask is not None:
->> +                mask["attrs"].append([field[0], m])
->> +            self["attrs"].append([field[0], k])
->> +
->> +            flowstr = flowstr[strspn(flowstr, "),") :]
->> +
->> +        return flowstr
->> +
->>       def dpstr(self, mask=None, more=False):
->>           print_str = ""
->>   @@ -1358,11 +1672,92 @@ class OvsFlow(GenericNetlinkSocket):
->>                 return print_str
->>   +        def parse(self, flowstr, actstr, dpidx=0):
->> +            OVS_UFID_F_OMIT_KEY = 1 << 0
->> +            OVS_UFID_F_OMIT_MASK = 1 << 1
->> +            OVS_UFID_F_OMIT_ACTIONS = 1 << 2
->> +
->> +            self["cmd"] = 0
->> +            self["version"] = 0
->> +            self["reserved"] = 0
->> +            self["dpifindex"] = 0
->> +
->> +            if flowstr.startswith("ufid:"):
->> +                count = 5
->> +                while flowstr[count] != ",":
->> +                    count += 1
->> +                ufidstr = flowstr[5:count]
->> +                flowstr = flowstr[count + 1 :]
->> +            else:
->> +                ufidstr = str(uuid.uuid4())
->> +            uuidRawObj = uuid.UUID(ufidstr).fields
->> +
->> +            self["attrs"].append(
->> +                [
->> +                    "OVS_FLOW_ATTR_UFID",
->> +                    [
->> +                        uuidRawObj[0],
->> +                        uuidRawObj[1] << 16 | uuidRawObj[2],
->> +                        uuidRawObj[3] << 24
->> +                        | uuidRawObj[4] << 16
->> +                        | uuidRawObj[5] & (0xFF << 32) >> 32,
->> +                        uuidRawObj[5] & (0xFFFFFFFF),
->> +                    ],
->> +                ]
->> +            )
->> +            self["attrs"].append(
->> +                [
->> +                    "OVS_FLOW_ATTR_UFID_FLAGS",
->> +                    int(
->> +                        OVS_UFID_F_OMIT_KEY
->> +                        | OVS_UFID_F_OMIT_MASK
->> +                        | OVS_UFID_F_OMIT_ACTIONS
->> +                    ),
->> +                ]
->> +            )
->> +
->> +            k = ovskey()
->> +            m = ovskey()
->> +            k.parse(flowstr, m)
->> +            self["attrs"].append(["OVS_FLOW_ATTR_KEY", k])
->> +            self["attrs"].append(["OVS_FLOW_ATTR_MASK", m])
->> +
->> +            a = ovsactions()
->> +            a.parse(actstr)
->> +            self["attrs"].append(["OVS_FLOW_ATTR_ACTIONS", a])
->> +
->>       def __init__(self):
->>           GenericNetlinkSocket.__init__(self)
->>             self.bind(OVS_FLOW_FAMILY, OvsFlow.ovs_flow_msg)
->>   +    def add_flow(self, dpifindex, flowmsg):
->> +        """
->> +        Send a new flow message to the kernel.
->> +
->> +        dpifindex should be a valid datapath obtained by calling
->> +        into the OvsDatapath lookup
->> +
->> +        flowmsg is a flow object obtained by calling a dpparse
->> +        """
->> +
->> +        flowmsg["cmd"] = OVS_FLOW_CMD_NEW
->> +        flowmsg["version"] = OVS_DATAPATH_VERSION
->> +        flowmsg["reserved"] = 0
->> +        flowmsg["dpifindex"] = dpifindex
->> +
->> +        try:
->> +            reply = self.nlm_request(
->> +                flowmsg,
->> +                msg_type=self.prid,
->> +                msg_flags=NLM_F_REQUEST | NLM_F_ACK,
->> +            )
->> +            reply = reply[0]
->> +        except NetlinkError as ne:
->> +            print(flowmsg)
->> +            raise ne
->> +        return reply
->> +
->>       def dump(self, dpifindex, flowspec=None):
->>           """
->>           Returns a list of messages containing flows.
->> @@ -1514,6 +1909,11 @@ def main(argv):
->>       dumpflcmd = subparsers.add_parser("dump-flows")
->>       dumpflcmd.add_argument("dumpdp", help="Datapath Name")
->>   +    addflcmd = subparsers.add_parser("add-flow")
->> +    addflcmd.add_argument("flbr", help="Datapath name")
->> +    addflcmd.add_argument("flow", help="Flow specification")
->> +    addflcmd.add_argument("acts", help="Flow actions")
->> +
->>       args = parser.parse_args()
->>         if args.verbose > 0:
->> @@ -1589,6 +1989,14 @@ def main(argv):
->>           rep = ovsflow.dump(rep["dpifindex"])
->>           for flow in rep:
->>               print(flow.dpstr(True if args.verbose > 0 else False))
->> +    elif hasattr(args, "flbr"):
->
-> These checks on the attributes means every command must have
-> attributes with different names. So if we then add del-br it must not
-> have an attribute called "flbr". We could rename it to "fladdbr"
-> (following the other commands) or match on the subcommand name, which
-> would be cleaner imho and less error, e.g: all the datapath attributes
-> can be called the same (see below).
+Look at the checks in net/ipv4/fib_trie.c starting at line 1573 (comment
+before is "/* Step 3: Process the leaf, if that fails fall back to
+backtracing */")
 
-I agree we can adjust this to use the subparser dest= and just check for
-the specific command passed.  I will do that in a different series, just
-to keep it as a separate thing.
+> 
+>>
+>>> + ip route show table 200
+>>> default dev dummy1 scope link
+>>> local default dev dummy1 scope host
+>>> 172.16.107.0/24 via 172.16.104.100 dev dummy1
+>>> 172.16.107.0/24 via 172.16.104.100 dev dummy1
+>>>
+>>> + ip addr add 2001:db8:101::1/64 dev dummy1
+>>> + ip addr add 2001:db8:101::2/64 dev dummy2
+>>> + ip route add 2001:db8:102::/64 via 2001:db8:101::10 dev dummy1 table 100
+>>> + ip route prepend 2001:db8:102::/64 via 2001:db8:101::10 dev dummy2 table 100
+>>> + ip route add local 2001:db8:103::/64 via 2001:db8:101::10 dev dummy1 table 100
+>>> + ip route prepend unicast 2001:db8:103::/64 via 2001:db8:101::10 dev dummy2 table 1
+>> Unfortunately the original IPv6 multipath implementation did not follow
+>> the same semantics as IPv4. Each leg in a MP route is a separate entry
+>> and the append and prepend work differently for v6. :-(
+>>
+>> This difference is one of the many goals of the separate nexthop objects
+>> -- aligning ipv4 and ipv6 behavior which can only be done with a new
+>> API. There were many attempts to make the legacy route infrastructure
+>> more closely aligned between v4 and v6 and inevitably each was reverted
+>> because it broke some existing user.
+> 
+> Yes, I understand the difficult and risk to aligned the v4/v6 behavior.
+> On the other hand, changing to new nexthop api also a large work for the
+> routing daemons. Here is a quote from NM developers replied to me.
 
->> +        rep = ovsdp.info(args.flbr, 0)
->> +        if rep is None:
->> +            print("DP '%s' not found." % args.dumpdp)
->
-> "dumpdp" is not an attribute of this subcommand.
+It is some level of work yes, but the netlink message format between old
+and new was left as aligned and similar as possible - to make it easier
+to move between old and new api.
 
-I'll fix this.
-
->> +            return 1
->> +        flow = OvsFlow.ovs_flow_msg()
->> +        flow.parse(args.flow, args.acts, rep["dpifindex"])
->> +        ovsflow.add_flow(rep["dpifindex"], flow)
->>         return 0
->>   
+> 
+> "If the issues (this and others) of the netlink API for route objects can be
+> fixed, then there seems less reason to change NetworkManager to nexthop
+> objects. If it cannot (won't) be fixed, then would be another argument for using
+> nexthop objects..."
+> 
+> I will check if all the issues could be fixed with new nexthop api.
+> 
+> Thanks
+> Hangbin
 
 
