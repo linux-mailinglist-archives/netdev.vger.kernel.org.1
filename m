@@ -1,113 +1,215 @@
-Return-Path: <netdev+bounces-22012-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22013-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57DD5765AB8
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 19:47:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9FE4765B1A
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 20:01:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 88EE61C21612
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 17:47:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C6D02282439
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 18:01:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8D5A8F41;
-	Thu, 27 Jul 2023 17:47:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 986FD171B6;
+	Thu, 27 Jul 2023 18:01:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99129171D0
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 17:47:32 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 96556C433C8;
-	Thu, 27 Jul 2023 17:47:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690480052;
-	bh=8hhmn8+Ux+A5/8bfiHx76Y+Keb0yncfBW6JKFFqonaI=;
-	h=From:To:Cc:Subject:Date:From;
-	b=PSmn3vIHdcE4YAvK30kxOfH+NwljypVDfa1Y/IjWI/dbuMd3C6YC/siSK6lnFtTpE
-	 gHws0kigPY53o+U/hFangapFoH2jflVmFyuN7YAMaoSlHYLROupPXxYWn3Gw6xc4W2
-	 eVKg3NYE7/jIkvU6lSugbZxMBFAfo5CA2Z6DyO8w8ja8rlq06BQXPp1i9N85fiJ+9x
-	 MayhU1yyZq0bKNmu4i2XQ4n6QJvT3bGbxZLW2kgCRSfz4MkhngfHUfu7rQsxP1fzqE
-	 HN3K4s6DkL9be5qiy8Wfw5UNRCcT9zVxD/nWarpKXEfBJv+RR4mKoDilXoYGwcIbb+
-	 FzzIKDIUrrDhg==
-From: SeongJae Park <sj@kernel.org>
-To: stable@vger.kernel.org
-Cc: M A Ramdhan <ramdhan@starlabs.sg>,
-	gregkh@linuxfoundation.org,
-	sashal@kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	hailmo@amazon.com,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Pedro Tammela <pctammela@mojatatu.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	SeongJae Park <sj@kernel.org>
-Subject: [PATCH 4.14] net/sched: cls_fw: Fix improper refcount update leads to use-after-free
-Date: Thu, 27 Jul 2023 17:47:27 +0000
-Message-Id: <20230727174727.55795-1-sj@kernel.org>
-X-Mailer: git-send-email 2.25.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8419E13AE5
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 18:01:51 +0000 (UTC)
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B319A30ED
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 11:01:49 -0700 (PDT)
+Received: by mail-pg1-x54a.google.com with SMTP id 41be03b00d2f7-55c475c6da6so769605a12.2
+        for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 11:01:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1690480909; x=1691085709;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=zQhQ+VSPJiT/sF1vRnyh4Q/edWHny2NYyXr78uE6E6M=;
+        b=MXN0RwiQuEoK59/406fj3hfB9GFLmNe746Z+h8t73hbQCE1d1qq/izbPkNLsJ6Px2M
+         Vban7KRfw/LuyxsjsqlFIKu5xuwLJxZQjqwf6YOq26lb6AyvDNcUvqSG8vj6as2sTY+T
+         qfo4dzt8M6QFxjvNpOCieikt35YsPF8NOsjN+Zeb0qqtrOHb1CID/EzxYvoLeNCRuhQk
+         X6Zj6RiQh0RnXAkaWNvbvk6ESEeLk0T4UqTFWfarPMmqOQ4NKQ8QkhuhmZeO8Rwy6d3v
+         qTa/LwBgOg5pPo63GPS7Rkndq7A3Pz0klfwoCUoBCvtZ6xPRb4mWucJ//Dab3DxcBzBf
+         tMqQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690480909; x=1691085709;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=zQhQ+VSPJiT/sF1vRnyh4Q/edWHny2NYyXr78uE6E6M=;
+        b=KdXLKO8yCs/4dV9tAcjkwWDavU6im3vwYhWBBD5oO9CVoDJwcKitLf3oMbwqgX4q86
+         06SqRA85Cwo8wB6s29GmzUM9wL79ubgrNvHwiZdNP5n6iOvjTIK/0RB8cWaYWyWAPFwm
+         36DDZx/zhVMmpwuZalNNFtLZRqFR26E0k5i20C02ABockDvdsA2L9KcFBgMfTO0SiZ4Y
+         4PYbyYWcjS0ZbQti/Fm6Fr9LRxDPub7ufRJC0ZdVQUQtYvC/1WKAOxm6dTulDjOzE7jx
+         qU3VQ/NtZfnpUVafmTX5Pbq/xU3LVcNs17CKMofmxNl+S+kt7ukl6uuTLRXIIuJ3h/pR
+         dFqA==
+X-Gm-Message-State: ABy/qLYYEoxmF4mqvoMCQ9y07ZQseVsVWARhy++AMfvdkYDj0dFJCncr
+	n6KtQH+z42FI+igjDzvaQYtzo1U=
+X-Google-Smtp-Source: APBJJlGroNGzDDua9ZSJVxJ3gwxUQcJeCDe6elRlqKhr2EYpQR+GDuPvk08ZnrYhFF5YheOlKnAjVj8=
+X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
+ (user=sdf job=sendgmr) by 2002:a63:790a:0:b0:55a:b9bb:7ca with SMTP id
+ u10-20020a63790a000000b0055ab9bb07camr29145pgc.10.1690480909118; Thu, 27 Jul
+ 2023 11:01:49 -0700 (PDT)
+Date: Thu, 27 Jul 2023 11:01:47 -0700
+In-Reply-To: <b41babb1-f0f2-dc2f-c2e3-1870107fbd9f@tessares.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <3076188eb88cca9151a2d12b50ba1e870b11ce09.1689693294.git.geliang.tang@suse.com>
+ <CAHC9VhS_LKdkEmm5_J5y34RpaRcTbg8==fpz8pMThDCjF6nYtQ@mail.gmail.com> <b41babb1-f0f2-dc2f-c2e3-1870107fbd9f@tessares.net>
+Message-ID: <ZMKxC+CFj4GbCklg@google.com>
+Subject: Re: [RFC bpf-next v5] bpf: Force to MPTCP
+From: Stanislav Fomichev <sdf@google.com>
+To: Matthieu Baerts <matthieu.baerts@tessares.net>
+Cc: Paul Moore <paul@paul-moore.com>, Geliang Tang <geliang.tang@suse.com>, 
+	Alexei Starovoitov <ast@kernel.org>, bpf@vger.kernel.org, netdev@vger.kernel.org, 
+	mptcp@lists.linux.dev, apparmor@lists.ubuntu.com, 
+	linux-security-module@vger.kernel.org, selinux@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+	autolearn=unavailable autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-From: M A Ramdhan <ramdhan@starlabs.sg>
-
-[ Upstream commit 0323bce598eea038714f941ce2b22541c46d488f ]
-
-In the event of a failure in tcf_change_indev(), fw_set_parms() will
-immediately return an error after incrementing or decrementing
-reference counter in tcf_bind_filter().  If attacker can control
-reference counter to zero and make reference freed, leading to
-use after free.
-
-In order to prevent this, move the point of possible failure above the
-point where the TC_FW_CLASSID is handled.
-
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Reported-by: M A Ramdhan <ramdhan@starlabs.sg>
-Signed-off-by: M A Ramdhan <ramdhan@starlabs.sg>
-Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
-Reviewed-by: Pedro Tammela <pctammela@mojatatu.com>
-Message-ID: <20230705161530.52003-1-ramdhan@starlabs.sg>
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: SeongJae Park <sj@kernel.org>
----
- net/sched/cls_fw.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
-
-diff --git a/net/sched/cls_fw.c b/net/sched/cls_fw.c
-index 7f45e5ab8afcd..e63f9c2e37e50 100644
---- a/net/sched/cls_fw.c
-+++ b/net/sched/cls_fw.c
-@@ -225,11 +225,6 @@ static int fw_set_parms(struct net *net, struct tcf_proto *tp,
- 	if (err < 0)
- 		return err;
- 
--	if (tb[TCA_FW_CLASSID]) {
--		f->res.classid = nla_get_u32(tb[TCA_FW_CLASSID]);
--		tcf_bind_filter(tp, &f->res, base);
--	}
+On 07/27, Matthieu Baerts wrote:
+> Hi Paul, Stanislav,
+>=20
+> On 18/07/2023 18:14, Paul Moore wrote:
+> > On Tue, Jul 18, 2023 at 11:21=E2=80=AFAM Geliang Tang <geliang.tang@sus=
+e.com> wrote:
+> >>
+> >> As is described in the "How to use MPTCP?" section in MPTCP wiki [1]:
+> >>
+> >> "Your app can create sockets with IPPROTO_MPTCP as the proto:
+> >> ( socket(AF_INET, SOCK_STREAM, IPPROTO_MPTCP); ). Legacy apps can be
+> >> forced to create and use MPTCP sockets instead of TCP ones via the
+> >> mptcpize command bundled with the mptcpd daemon."
+> >>
+> >> But the mptcpize (LD_PRELOAD technique) command has some limitations
+> >> [2]:
+> >>
+> >>  - it doesn't work if the application is not using libc (e.g. GoLang
+> >> apps)
+> >>  - in some envs, it might not be easy to set env vars / change the way
+> >> apps are launched, e.g. on Android
+> >>  - mptcpize needs to be launched with all apps that want MPTCP: we cou=
+ld
+> >> have more control from BPF to enable MPTCP only for some apps or all t=
+he
+> >> ones of a netns or a cgroup, etc.
+> >>  - it is not in BPF, we cannot talk about it at netdev conf.
+> >>
+> >> So this patchset attempts to use BPF to implement functions similer to
+> >> mptcpize.
+> >>
+> >> The main idea is add a hook in sys_socket() to change the protocol id
+> >> from IPPROTO_TCP (or 0) to IPPROTO_MPTCP.
+> >>
+> >> [1]
+> >> https://github.com/multipath-tcp/mptcp_net-next/wiki
+> >> [2]
+> >> https://github.com/multipath-tcp/mptcp_net-next/issues/79
+> >>
+> >> v5:
+> >>  - add bpf_mptcpify helper.
+> >>
+> >> v4:
+> >>  - use lsm_cgroup/socket_create
+> >>
+> >> v3:
+> >>  - patch 8: char cmd[128]; -> char cmd[256];
+> >>
+> >> v2:
+> >>  - Fix build selftests errors reported by CI
+> >>
+> >> Closes: https://github.com/multipath-tcp/mptcp_net-next/issues/79
+> >> Signed-off-by: Geliang Tang <geliang.tang@suse.com>
+> >> ---
+> >>  include/linux/bpf.h                           |   1 +
+> >>  include/linux/lsm_hook_defs.h                 |   2 +-
+> >>  include/linux/security.h                      |   6 +-
+> >>  include/uapi/linux/bpf.h                      |   7 +
+> >>  kernel/bpf/bpf_lsm.c                          |   2 +
+> >>  net/mptcp/bpf.c                               |  20 +++
+> >>  net/socket.c                                  |   4 +-
+> >>  security/apparmor/lsm.c                       |   8 +-
+> >>  security/security.c                           |   2 +-
+> >>  security/selinux/hooks.c                      |   6 +-
+> >>  tools/include/uapi/linux/bpf.h                |   7 +
+> >>  .../testing/selftests/bpf/prog_tests/mptcp.c  | 128 ++++++++++++++++-=
 -
- #ifdef CONFIG_NET_CLS_IND
- 	if (tb[TCA_FW_INDEV]) {
- 		int ret;
-@@ -248,6 +243,11 @@ static int fw_set_parms(struct net *net, struct tcf_proto *tp,
- 	} else if (head->mask != 0xFFFFFFFF)
- 		return err;
- 
-+	if (tb[TCA_FW_CLASSID]) {
-+		f->res.classid = nla_get_u32(tb[TCA_FW_CLASSID]);
-+		tcf_bind_filter(tp, &f->res, base);
-+	}
-+
- 	return 0;
- }
- 
--- 
-2.40.1
+> >>  tools/testing/selftests/bpf/progs/mptcpify.c  |  17 +++
+> >>  13 files changed, 187 insertions(+), 23 deletions(-)
+> >>  create mode 100644 tools/testing/selftests/bpf/progs/mptcpify.c
+> >=20
+> > ...
+> >=20
+> >> diff --git a/security/security.c b/security/security.c
+> >> index b720424ca37d..bbebcddce420 100644
+> >> --- a/security/security.c
+> >> +++ b/security/security.c
+> >> @@ -4078,7 +4078,7 @@ EXPORT_SYMBOL(security_unix_may_send);
+> >>   *
+> >>   * Return: Returns 0 if permission is granted.
+> >>   */
+> >> -int security_socket_create(int family, int type, int protocol, int ke=
+rn)
+> >> +int security_socket_create(int *family, int *type, int *protocol, int=
+ kern)
+> >>  {
+> >>         return call_int_hook(socket_create, 0, family, type, protocol,=
+ kern);
+> >>  }
+> >=20
+> > Using the LSM to change the protocol family is not something we want
+> > to allow.  I'm sorry, but you will need to take a different approach.
+>=20
+> @Paul: Thank you for your feedback. It makes sense and I understand.
+>=20
+> @Stanislav: Despite the fact the implementation was smaller and reusing
+> more code, it looks like we cannot go in the direction you suggested. Do
+> you think what Geliang suggested before in his v3 [1] can be accepted?
+>=20
+> (Note that the v3 is the same as the v1, only some fixes in the selftests=
+.)
 
+We have too many hooks in networking, so something that doesn't add
+a new one is preferable :-( Moreover, we already have a 'socket init'
+hook, but it runs a bit late.
+
+Is existing cgroup/sock completely unworkable? Is it possible to
+expose some new bpf_upgrade_socket_to(IPPROTO_MPTCP) kfunc which would
+call some new net_proto_family->upgrade_to(IPPROTO_MPTCP) to do the surgery=
+?
+Or is it too hacky?
+
+Another option Alexei suggested is to add some fentry-like thing:
+
+noinline int update_socket_protocol(int protocol)
+{
+	return protocol;
+}
+/* TODO: ^^^ add the above to mod_ret set */
+
+int __sys_socket(int family, int type, int protocol)
+{
+	...
+
+	protocol =3D update_socket_protocol(protocol);
+
+	...
+}
+
+But it's also too problem specific it seems? And it's not cgroup-aware.
 
