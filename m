@@ -1,190 +1,233 @@
-Return-Path: <netdev+bounces-22005-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22006-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6EBBB765A79
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 19:36:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EB2A765A81
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 19:37:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 65A301C21684
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 17:36:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 591E51C216D2
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 17:37:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 034D127157;
-	Thu, 27 Jul 2023 17:36:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBC298BE8;
+	Thu, 27 Jul 2023 17:36:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC5EF947A
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 17:36:16 +0000 (UTC)
-Received: from mail-wr1-x42b.google.com (mail-wr1-x42b.google.com [IPv6:2a00:1450:4864:20::42b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52E0330E2
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 10:36:10 -0700 (PDT)
-Received: by mail-wr1-x42b.google.com with SMTP id ffacd0b85a97d-316feb137a7so1266156f8f.1
-        for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 10:36:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tessares.net; s=google; t=1690479369; x=1691084169;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=nZEdmXcGRVAYlxfEgnvOAfccfUnHNgUdBg+5krTA/eo=;
-        b=140/ZYZn5bDqKWf+wtgvTuFeQqiCVUSA/6Q5OO7O0WeKyYsRVQMbnTuopDsK2fxe2p
-         KLlyVMs5Zmtc/7UktSC3SpLCTEW/vdXLPvuFm5rxdQWHlUPJHFGUA+7+xXdsKl6AGPdj
-         q4OJM/afLGrRgpOns2Z/bywNyao9qTe3Zm2kedU5th8Vzt5qv9z24IG8JI6LARbKoSy8
-         Z7/LpOQafS6os04kr+lECyuqzVDEzbnEFVJAe9gqo9niWc6n57MhGFUkvDlErwhQLKCH
-         1ZkrfgVwdaxa851gtWNyCHRnGJ/xZNu462YAT+niCH1guBT2WAIPvzkldt6z8Xt3eEnB
-         pLGQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690479369; x=1691084169;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nZEdmXcGRVAYlxfEgnvOAfccfUnHNgUdBg+5krTA/eo=;
-        b=KA/WwnCIm+Ld+nAx4En0hO2C4UK1si29IO+VoEikSdKiZtbedT58jpt1OrlUMg1AV2
-         lbdb7VFkmigt8EZmVrhQ6YNaPfjwcVGCmfTdgeoSaTJRrOzDKJ1sP7PCC+TjIwMH2bWE
-         MnF5s9vWY11/0jy5+4pwB8D6Uode9WsWyRiXDEUfdnyR9BAsPy0dqeOqAHzNBqObog1J
-         gconq4S/sRxbyEOWU3ifxjfJJPwSEq7tpUbO+YaDBDygBQM1pd0lnBq2Xp2HZMxmzpnO
-         2NHfmMZ42SFzzpDKpwE8FfAsxg+piY55CPgUFBuGI2tehR0lhPYS7Vo74R7tAiQou0bm
-         LwSg==
-X-Gm-Message-State: ABy/qLYGvBeK5J+ZjhY1EdI902OiyLlv0yiM8UkNHBn817nsDS7kGVH3
-	rWjxa1S218Qrr4FxeEG8Gk+UVQ==
-X-Google-Smtp-Source: APBJJlGMk1Xbashk7NwJvWkofxfajDTbQ+0ipK5s7hbscVG6QYWNuqzGkgAhhPffQxv2ODQ5lOiWAw==
-X-Received: by 2002:a5d:45d2:0:b0:313:fe1b:f441 with SMTP id b18-20020a5d45d2000000b00313fe1bf441mr2253468wrs.29.1690479368727;
-        Thu, 27 Jul 2023 10:36:08 -0700 (PDT)
-Received: from ?IPV6:2a02:578:8593:1200:e411:185b:7f55:ef18? ([2a02:578:8593:1200:e411:185b:7f55:ef18])
-        by smtp.gmail.com with ESMTPSA id b10-20020a5d4b8a000000b003175f00e555sm2560128wrt.97.2023.07.27.10.36.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 27 Jul 2023 10:36:08 -0700 (PDT)
-Message-ID: <b41babb1-f0f2-dc2f-c2e3-1870107fbd9f@tessares.net>
-Date: Thu, 27 Jul 2023 19:36:06 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C930171D0;
+	Thu, 27 Jul 2023 17:36:29 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5CE2BC433C7;
+	Thu, 27 Jul 2023 17:36:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1690479388;
+	bh=Baa84B0LBfTXJKcOLEFb3vDZi/aHYn/vWaeUyeHhHnM=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+	b=iyLGe3zYBOgZYnwN62ZOLaBp+Ad2Rs9zHyk+If1/3e6kMhdJduyv9ksNM9SehxNq3
+	 7kRGOuT7Aty1sEDXa+CIRB2U2OHkujEhyKq+e9saneORd/yayYybuHcw7DnG9x7vv6
+	 0ByE7PNj31KVz7WDh0zUegKYmoM+Lxfq64iED3oRdxhCPRcSriaMWnL7bmsiu7lNbB
+	 3iBx/jaH8nd8YNXiGkPHfQpw8mQrGxFKpI1G59aF776M+KfVt+umpYFYhFHrJtDahS
+	 sk/F8SESYm+mc63u+QNizzfX5VZTb+ToWiSRHjAR7Q/HurI0Mwdc3LAoXDYj+0AMLP
+	 Q4IcLknJHENeQ==
+Subject: [PATCH net-next v3 3/7] net/handshake: Add API for sending TLS
+ Closure alerts
+From: Chuck Lever <cel@kernel.org>
+To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com
+Cc: netdev@vger.kernel.org, kernel-tls-handshake@lists.linux.dev
+Date: Thu, 27 Jul 2023 13:36:17 -0400
+Message-ID: 
+ <169047936730.5241.618595693821012638.stgit@oracle-102.nfsv4bat.org>
+In-Reply-To: 
+ <169047923706.5241.1181144206068116926.stgit@oracle-102.nfsv4bat.org>
+References: 
+ <169047923706.5241.1181144206068116926.stgit@oracle-102.nfsv4bat.org>
+User-Agent: StGit/1.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [RFC bpf-next v5] bpf: Force to MPTCP
-Content-Language: en-GB
-To: Paul Moore <paul@paul-moore.com>, Geliang Tang <geliang.tang@suse.com>,
- Stanislav Fomichev <sdf@google.com>
-Cc: Alexei Starovoitov <ast@kernel.org>, bpf@vger.kernel.org,
- netdev@vger.kernel.org, mptcp@lists.linux.dev, apparmor@lists.ubuntu.com,
- linux-security-module@vger.kernel.org, selinux@vger.kernel.org,
- linux-kselftest@vger.kernel.org
-References: <3076188eb88cca9151a2d12b50ba1e870b11ce09.1689693294.git.geliang.tang@suse.com>
- <CAHC9VhS_LKdkEmm5_J5y34RpaRcTbg8==fpz8pMThDCjF6nYtQ@mail.gmail.com>
-From: Matthieu Baerts <matthieu.baerts@tessares.net>
-In-Reply-To: <CAHC9VhS_LKdkEmm5_J5y34RpaRcTbg8==fpz8pMThDCjF6nYtQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 
-Hi Paul, Stanislav,
+From: Chuck Lever <chuck.lever@oracle.com>
 
-On 18/07/2023 18:14, Paul Moore wrote:
-> On Tue, Jul 18, 2023 at 11:21 AM Geliang Tang <geliang.tang@suse.com> wrote:
->>
->> As is described in the "How to use MPTCP?" section in MPTCP wiki [1]:
->>
->> "Your app can create sockets with IPPROTO_MPTCP as the proto:
->> ( socket(AF_INET, SOCK_STREAM, IPPROTO_MPTCP); ). Legacy apps can be
->> forced to create and use MPTCP sockets instead of TCP ones via the
->> mptcpize command bundled with the mptcpd daemon."
->>
->> But the mptcpize (LD_PRELOAD technique) command has some limitations
->> [2]:
->>
->>  - it doesn't work if the application is not using libc (e.g. GoLang
->> apps)
->>  - in some envs, it might not be easy to set env vars / change the way
->> apps are launched, e.g. on Android
->>  - mptcpize needs to be launched with all apps that want MPTCP: we could
->> have more control from BPF to enable MPTCP only for some apps or all the
->> ones of a netns or a cgroup, etc.
->>  - it is not in BPF, we cannot talk about it at netdev conf.
->>
->> So this patchset attempts to use BPF to implement functions similer to
->> mptcpize.
->>
->> The main idea is add a hook in sys_socket() to change the protocol id
->> from IPPROTO_TCP (or 0) to IPPROTO_MPTCP.
->>
->> [1]
->> https://github.com/multipath-tcp/mptcp_net-next/wiki
->> [2]
->> https://github.com/multipath-tcp/mptcp_net-next/issues/79
->>
->> v5:
->>  - add bpf_mptcpify helper.
->>
->> v4:
->>  - use lsm_cgroup/socket_create
->>
->> v3:
->>  - patch 8: char cmd[128]; -> char cmd[256];
->>
->> v2:
->>  - Fix build selftests errors reported by CI
->>
->> Closes: https://github.com/multipath-tcp/mptcp_net-next/issues/79
->> Signed-off-by: Geliang Tang <geliang.tang@suse.com>
->> ---
->>  include/linux/bpf.h                           |   1 +
->>  include/linux/lsm_hook_defs.h                 |   2 +-
->>  include/linux/security.h                      |   6 +-
->>  include/uapi/linux/bpf.h                      |   7 +
->>  kernel/bpf/bpf_lsm.c                          |   2 +
->>  net/mptcp/bpf.c                               |  20 +++
->>  net/socket.c                                  |   4 +-
->>  security/apparmor/lsm.c                       |   8 +-
->>  security/security.c                           |   2 +-
->>  security/selinux/hooks.c                      |   6 +-
->>  tools/include/uapi/linux/bpf.h                |   7 +
->>  .../testing/selftests/bpf/prog_tests/mptcp.c  | 128 ++++++++++++++++--
->>  tools/testing/selftests/bpf/progs/mptcpify.c  |  17 +++
->>  13 files changed, 187 insertions(+), 23 deletions(-)
->>  create mode 100644 tools/testing/selftests/bpf/progs/mptcpify.c
-> 
-> ...
-> 
->> diff --git a/security/security.c b/security/security.c
->> index b720424ca37d..bbebcddce420 100644
->> --- a/security/security.c
->> +++ b/security/security.c
->> @@ -4078,7 +4078,7 @@ EXPORT_SYMBOL(security_unix_may_send);
->>   *
->>   * Return: Returns 0 if permission is granted.
->>   */
->> -int security_socket_create(int family, int type, int protocol, int kern)
->> +int security_socket_create(int *family, int *type, int *protocol, int kern)
->>  {
->>         return call_int_hook(socket_create, 0, family, type, protocol, kern);
->>  }
-> 
-> Using the LSM to change the protocol family is not something we want
-> to allow.  I'm sorry, but you will need to take a different approach.
+This helper sends an alert only if a TLS session was established.
 
-@Paul: Thank you for your feedback. It makes sense and I understand.
+Signed-off-by: Chuck Lever <chuck.lever@oracle.com>
+---
+ include/net/handshake.h   |    1 +
+ net/handshake/Makefile    |    2 +
+ net/handshake/alert.c     |   61 +++++++++++++++++++++++++++++++++++++++++++++
+ net/handshake/handshake.h |    6 ++++
+ net/handshake/tlshd.c     |   23 +++++++++++++++++
+ 5 files changed, 92 insertions(+), 1 deletion(-)
+ create mode 100644 net/handshake/alert.c
 
-@Stanislav: Despite the fact the implementation was smaller and reusing
-more code, it looks like we cannot go in the direction you suggested. Do
-you think what Geliang suggested before in his v3 [1] can be accepted?
+diff --git a/include/net/handshake.h b/include/net/handshake.h
+index 2e26e436e85f..bb88dfa6e3c9 100644
+--- a/include/net/handshake.h
++++ b/include/net/handshake.h
+@@ -40,5 +40,6 @@ int tls_server_hello_x509(const struct tls_handshake_args *args, gfp_t flags);
+ int tls_server_hello_psk(const struct tls_handshake_args *args, gfp_t flags);
+ 
+ bool tls_handshake_cancel(struct sock *sk);
++void tls_handshake_close(struct socket *sock);
+ 
+ #endif /* _NET_HANDSHAKE_H */
+diff --git a/net/handshake/Makefile b/net/handshake/Makefile
+index 247d73c6ff6e..ef4d9a2112bd 100644
+--- a/net/handshake/Makefile
++++ b/net/handshake/Makefile
+@@ -8,6 +8,6 @@
+ #
+ 
+ obj-y += handshake.o
+-handshake-y := genl.o netlink.o request.o tlshd.o trace.o
++handshake-y := alert.o genl.o netlink.o request.o tlshd.o trace.o
+ 
+ obj-$(CONFIG_NET_HANDSHAKE_KUNIT_TEST) += handshake-test.o
+diff --git a/net/handshake/alert.c b/net/handshake/alert.c
+new file mode 100644
+index 000000000000..2f1a16868ff6
+--- /dev/null
++++ b/net/handshake/alert.c
+@@ -0,0 +1,61 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Handle the TLS Alert protocol
++ *
++ * Author: Chuck Lever <chuck.lever@oracle.com>
++ *
++ * Copyright (c) 2023, Oracle and/or its affiliates.
++ */
++
++#include <linux/types.h>
++#include <linux/socket.h>
++#include <linux/kernel.h>
++#include <linux/module.h>
++#include <linux/skbuff.h>
++#include <linux/inet.h>
++
++#include <net/sock.h>
++#include <net/handshake.h>
++#include <net/tls.h>
++#include <net/tls_prot.h>
++
++#include "handshake.h"
++
++/**
++ * tls_alert_send - send a TLS Alert on a kTLS socket
++ * @sock: open kTLS socket to send on
++ * @level: TLS Alert level
++ * @description: TLS Alert description
++ *
++ * Returns zero on success or a negative errno.
++ */
++int tls_alert_send(struct socket *sock, u8 level, u8 description)
++{
++	u8 record_type = TLS_RECORD_TYPE_ALERT;
++	u8 buf[CMSG_SPACE(sizeof(record_type))];
++	struct msghdr msg = { 0 };
++	struct cmsghdr *cmsg;
++	struct kvec iov;
++	u8 alert[2];
++	int ret;
++
++	alert[0] = level;
++	alert[1] = description;
++	iov.iov_base = alert;
++	iov.iov_len = sizeof(alert);
++
++	memset(buf, 0, sizeof(buf));
++	msg.msg_control = buf;
++	msg.msg_controllen = sizeof(buf);
++	msg.msg_flags = MSG_DONTWAIT;
++
++	cmsg = CMSG_FIRSTHDR(&msg);
++	cmsg->cmsg_level = SOL_TLS;
++	cmsg->cmsg_type = TLS_SET_RECORD_TYPE;
++	cmsg->cmsg_len = CMSG_LEN(sizeof(record_type));
++	memcpy(CMSG_DATA(cmsg), &record_type, sizeof(record_type));
++
++	iov_iter_kvec(&msg.msg_iter, ITER_SOURCE, &iov, 1, iov.iov_len);
++	ret = sock_sendmsg(sock, &msg);
++	return ret < 0 ? ret : 0;
++}
+diff --git a/net/handshake/handshake.h b/net/handshake/handshake.h
+index 4dac965c99df..a48163765a7a 100644
+--- a/net/handshake/handshake.h
++++ b/net/handshake/handshake.h
+@@ -41,8 +41,11 @@ struct handshake_req {
+ 
+ enum hr_flags_bits {
+ 	HANDSHAKE_F_REQ_COMPLETED,
++	HANDSHAKE_F_REQ_SESSION,
+ };
+ 
++struct genl_info;
++
+ /* Invariants for all handshake requests for one transport layer
+  * security protocol
+  */
+@@ -63,6 +66,9 @@ enum hp_flags_bits {
+ 	HANDSHAKE_F_PROTO_NOTIFY,
+ };
+ 
++/* alert.c */
++int tls_alert_send(struct socket *sock, u8 level, u8 description);
++
+ /* netlink.c */
+ int handshake_genl_notify(struct net *net, const struct handshake_proto *proto,
+ 			  gfp_t flags);
+diff --git a/net/handshake/tlshd.c b/net/handshake/tlshd.c
+index b735f5cced2f..bbfb4095ddd6 100644
+--- a/net/handshake/tlshd.c
++++ b/net/handshake/tlshd.c
+@@ -18,6 +18,7 @@
+ #include <net/sock.h>
+ #include <net/handshake.h>
+ #include <net/genetlink.h>
++#include <net/tls_prot.h>
+ 
+ #include <uapi/linux/keyctl.h>
+ #include <uapi/linux/handshake.h>
+@@ -100,6 +101,9 @@ static void tls_handshake_done(struct handshake_req *req,
+ 	if (info)
+ 		tls_handshake_remote_peerids(treq, info);
+ 
++	if (!status)
++		set_bit(HANDSHAKE_F_REQ_SESSION, &req->hr_flags);
++
+ 	treq->th_consumer_done(treq->th_consumer_data, -status,
+ 			       treq->th_peerid[0]);
+ }
+@@ -424,3 +428,22 @@ bool tls_handshake_cancel(struct sock *sk)
+ 	return handshake_req_cancel(sk);
+ }
+ EXPORT_SYMBOL(tls_handshake_cancel);
++
++/**
++ * tls_handshake_close - send a Closure alert
++ * @sock: an open socket
++ *
++ */
++void tls_handshake_close(struct socket *sock)
++{
++	struct handshake_req *req;
++
++	req = handshake_req_hash_lookup(sock->sk);
++	if (!req)
++		return;
++	if (!test_and_clear_bit(HANDSHAKE_F_REQ_SESSION, &req->hr_flags))
++		return;
++	tls_alert_send(sock, TLS_ALERT_LEVEL_WARNING,
++		       TLS_ALERT_DESC_CLOSE_NOTIFY);
++}
++EXPORT_SYMBOL(tls_handshake_close);
 
-(Note that the v3 is the same as the v1, only some fixes in the selftests.)
 
-Cheers,
-Matt
-
-[1] https://lore.kernel.org/r/cover.1688631200.git.geliang.tang@suse.com
--- 
-Tessares | Belgium | Hybrid Access Solutions
-www.tessares.net
 
