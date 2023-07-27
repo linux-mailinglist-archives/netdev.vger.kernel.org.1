@@ -1,132 +1,91 @@
-Return-Path: <netdev+bounces-21856-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21857-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C70A76514F
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 12:35:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C74B9765155
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 12:36:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B17631C215A6
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 10:35:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 08F14281268
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 10:36:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94FD9C8EA;
-	Thu, 27 Jul 2023 10:34:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6EB4DDD3;
+	Thu, 27 Jul 2023 10:35:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87210C2FC
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 10:34:58 +0000 (UTC)
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76D8D19A7;
-	Thu, 27 Jul 2023 03:34:56 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id CBAA01BF207;
-	Thu, 27 Jul 2023 10:34:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1690454095;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=49SapdFsUUzXkb0zmYsMHZkg7CHiz7VOLc7j0san1b4=;
-	b=D7sErss6g6hwoemn0ONI4uqJb+K/IsweOTLB1naVOQSB0jnxItj4HIIYOc01Bt1PCbQWls
-	x2lcEAR9Bd9VjcK6MIkZw2GgBXiwTdL0BWCBkLp6FGIk8zL9HeoByCjQcU71EgLZvHIX9c
-	ENATbxHfRlfF0SU97Zp8/habefY7ZArdGsISAkXbKwdQKnHTa46Poh7Izti1MQgJHfgtY+
-	+trXOG76m0g/9BUX139rvy1EaJBvWlTKa0L2vTIHxz+5+JsANW+49ziW/vf766xYPBj86D
-	/xe6CDk60hgIFLNs0LFEukyLTaCTJBZRtsZB+11cVUQUOpWASao2sGMwjhfrJQ==
-Date: Thu, 27 Jul 2023 12:34:49 +0200
-From: Herve Codina <herve.codina@bootlin.com>
-To: Conor Dooley <conor@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>, Rob Herring
- <robh+dt@kernel.org>, Krzysztof Kozlowski
- <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
- Lee Jones <lee@kernel.org>, Linus Walleij <linus.walleij@linaro.org>, Qiang
- Zhao <qiang.zhao@nxp.com>, Li Yang <leoyang.li@nxp.com>, Liam Girdwood
- <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, Jaroslav Kysela
- <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, Shengjiu Wang
- <shengjiu.wang@gmail.com>, Xiubo Li <Xiubo.Lee@gmail.com>, Fabio Estevam
- <festevam@gmail.com>, Nicolin Chen <nicoleotsuka@gmail.com>, Christophe
- Leroy <christophe.leroy@csgroup.eu>, Randy Dunlap <rdunlap@infradead.org>,
- netdev@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-gpio@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- alsa-devel@alsa-project.org, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH v2 05/28] dt-bindings: net: Add support for QMC HDLC
-Message-ID: <20230727123449.0ab1c58e@bootlin.com>
-In-Reply-To: <20230727-decidable-sterile-06ef617c144b@spud>
-References: <20230726150225.483464-1-herve.codina@bootlin.com>
-	<20230726150225.483464-6-herve.codina@bootlin.com>
-	<20230727-talcum-backside-5bdbe2171fb6@spud>
-	<20230727110948.7926a532@bootlin.com>
-	<20230727-decidable-sterile-06ef617c144b@spud>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C5631FDD
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 10:35:59 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0705A2684
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 03:35:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=bl78Tq6a6qufkM1Ok03PUmnHbqshN4ZqLWgn47tc/Pk=; b=o08IEbS97okEP/CacoZindUoSu
+	n2npWoYj8Ax90FK1i+sKenFYAYJFmpU9CkEndHjJacFGToK9WIomorUSurxEwzV7dHjvSkc4BZcbT
+	KJSwsu//gGQuvziYJbEWc+2k11TGp8c9MIIV8h/HgO1pKSeGV3S9ZHMnfFF8i1eenImc=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qOyLL-002RRz-JH; Thu, 27 Jul 2023 12:35:39 +0200
+Date: Thu, 27 Jul 2023 12:35:39 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Feiyang Chen <chenfeiyang@loongson.cn>
+Cc: hkallweit1@gmail.com, peppe.cavallaro@st.com,
+	alexandre.torgue@foss.st.com, joabreu@synopsys.com,
+	chenhuacai@loongson.cn, linux@armlinux.org.uk, dongbiao@loongson.cn,
+	loongson-kernel@lists.loongnix.cn, netdev@vger.kernel.org,
+	loongarch@lists.linux.dev, chris.chenfeiyang@gmail.com
+Subject: Re: [PATCH v2 07/10] net: stmmac: dwmac-loongson: Add LS7A support
+Message-ID: <9add374b-27ba-47c9-95cf-eec896231d58@lunn.ch>
+References: <cover.1690439335.git.chenfeiyang@loongson.cn>
+ <dd88ed0f53e9ee0f653ddeb78b326f8eb44bdbd1.1690439335.git.chenfeiyang@loongson.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: herve.codina@bootlin.com
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS,
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <dd88ed0f53e9ee0f653ddeb78b326f8eb44bdbd1.1690439335.git.chenfeiyang@loongson.cn>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
 	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Conor,
+> +static int loongson_dwmac_probe(struct pci_dev *pdev,
+> +				const struct pci_device_id *id)
+>  {
+> +	int ret, i, bus_id, phy_mode;
+>  	struct plat_stmmacenet_data *plat;
+> +	struct stmmac_pci_info *info;
+>  	struct stmmac_resources res;
+>  	struct device_node *np;
+> -	int ret, i, phy_mode;
+> -
+> -	np = dev_of_node(&pdev->dev);
+> -
+> -	if (!np) {
+> -		pr_info("dwmac_loongson_pci: No OF node\n");
+> -		return -ENODEV;
+> -	}
+> -
+> -	if (!of_device_is_compatible(np, "loongson, pci-gmac")) {
+> -		pr_info("dwmac_loongson_pci: Incompatible OF node\n");
+> -		return -ENODEV;
+> -	}
 
-On Thu, 27 Jul 2023 10:53:15 +0100
-Conor Dooley <conor@kernel.org> wrote:
+There are a lot of changes here, and it is not easy to review.  I
+would suggest you first do a refactoring patch, moving all handling of
+DT into a helper. Since it is just moving code around, it should be
+easy to review. Then you can add support for platforms which don't
+support DT.
 
-> On Thu, Jul 27, 2023 at 11:09:48AM +0200, Herve Codina wrote:
-> > On Thu, 27 Jul 2023 09:19:59 +0100
-> > Conor Dooley <conor@kernel.org> wrote:  
-> > > On Wed, Jul 26, 2023 at 05:02:01PM +0200, Herve Codina wrote:  
-> 
-> > If needed, I can change to:
-> >   title: QMC (QUICC Multichannel Controller) HDLC
-> > Let me known if it is better to you.  
-> 
-> If it were me writing the binding, I'd probably use something like
-> "Freescale/NXP QUICC Multichannel Controller (QMC) HDLC", but it is not
-> a big deal, I just had a "wtf is this" moment :)
-
-I will change to "Freescale/NXP QUICC Multichannel Controller (QMC) HDLC" in
-the next iteration.
-
-> 
-> 
-> 
-> > > > +  fsl,qmc-chan:  
-> > > 
-> > > Perhaps I am just showing my lack of knowledge in this area, but what is
-> > > fsl specific about wanting a reference to the channel of a "QMC"?
-> > > Is this something that hardware from other manufacturers would not also
-> > > want to do?  
-> > 
-> > The QMC and the QMC channel are something specific to the SoC. This IP is only
-> > available on some Freescale/NXP SoCs.
-> > 
-> > When I upstreamed the 'fsl,qmc-audio.yaml', I first used a generic name for this
-> > property and Kristoff asked to change to a vendor prefixed name.
-> >   https://lore.kernel.org/linux-kernel/1dfade07-f8c4-2e16-00dc-c7d183708259@linaro.org/
-> > 
-> > Based on this, as the property 'fsl,qmc-chan' has the exact same meaning in
-> > fsl,qmc-audio.yaml and fsl,qmc-hdlc.yaml, I use the same name.  
-> 
-> Okay, thanks for explaining!
-
-You're welcome.
-
-Regards,
-Hervé
-
+	Andrew
 
