@@ -1,119 +1,83 @@
-Return-Path: <netdev+bounces-21701-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21702-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A3B4764522
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 06:52:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6BBFD764531
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 07:00:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 449C828205C
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 04:52:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9BB6E1C214BB
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 05:00:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A0B020EB;
-	Thu, 27 Jul 2023 04:52:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 121C41FBE;
+	Thu, 27 Jul 2023 05:00:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F29D1FD8
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 04:52:42 +0000 (UTC)
-Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B69CF2D5A;
-	Wed, 26 Jul 2023 21:52:32 -0700 (PDT)
-Received: from fllv0035.itg.ti.com ([10.64.41.0])
-	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 36R4q3wl040175;
-	Wed, 26 Jul 2023 23:52:04 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1690433524;
-	bh=b0XLCYPeMxL5GqXwy8aDkOrIMz6Dbp7sZF1xTbGQpqk=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=FKF99HOSHKYtw3Zq962zpPazvFR4SAaXEBT1aZw8vpaqZMFR/TkuGLoBShZAj6giN
-	 H7w4v2jC5QV3SjyQmca05s7i7A/g4K/jl3x2RV7ZuwjN/fKkOGZE0O/L5B9AWHWa3H
-	 Y5lAEwuQSZntFdocQ5nto1H1xY2R3F0zCprlxsPo=
-Received: from DFLE114.ent.ti.com (dfle114.ent.ti.com [10.64.6.35])
-	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 36R4q3XW055887
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Wed, 26 Jul 2023 23:52:03 -0500
-Received: from DFLE111.ent.ti.com (10.64.6.32) by DFLE114.ent.ti.com
- (10.64.6.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Wed, 26
- Jul 2023 23:52:03 -0500
-Received: from fllv0040.itg.ti.com (10.64.41.20) by DFLE111.ent.ti.com
- (10.64.6.32) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Wed, 26 Jul 2023 23:52:03 -0500
-Received: from [10.249.135.225] (ileaxei01-snat.itg.ti.com [10.180.69.5])
-	by fllv0040.itg.ti.com (8.15.2/8.15.2) with ESMTP id 36R4pv9h127551;
-	Wed, 26 Jul 2023 23:51:58 -0500
-Message-ID: <17b67407-0507-8978-0d6b-04578ca6b812@ti.com>
-Date: Thu, 27 Jul 2023 10:21:57 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 943651FA0
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 05:00:20 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 07E5FC433C9;
+	Thu, 27 Jul 2023 05:00:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1690434020;
+	bh=bz/ycI4oGS9bRmVVuXMmTPwI4myesbiM5Q3vRbb3WqE=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=BCkOZwMm7x9e1wydST6BP5Skrc0qwMvnM4HEMv2kRU/o87OgvqxZRll9uGKRqj+Ir
+	 vPwUP7OTIjn18tl2Sflaq/+ySlK5d7LUEdw+eDpwFtoNNbfQ1peD1LErTl6+n3mlpQ
+	 72TteqnOD1FIJeYIRMA8lRWmzZbW8vRDqiTc2iW5ckaHmD97WI2U6l1C8d7ZuqE+Fx
+	 sxiNu7aE3943F/RShwD7FqZa22mRovf++pArj/j8ajKFQ22e+GtJ677GSpMkVQqCAi
+	 stAiJ98Z7TKGm1QmrPcKtpRKhT2q/0EWT0Re3dsOeJiLTqDhRDx54fHRlpoT89w1uU
+	 kzPNVfKiZXkEQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id DB0ADC59A4C;
+	Thu, 27 Jul 2023 05:00:19 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [EXTERNAL] Re: [EXTERNAL] Re: [PATCH v11 07/10] net: ti:
- icssg-prueth: Add ICSSG Stats
-To: Jakub Kicinski <kuba@kernel.org>
-CC: MD Danish Anwar <danishanwar@ti.com>,
-        Randy Dunlap
-	<rdunlap@infradead.org>,
-        Roger Quadros <rogerq@kernel.org>,
-        Simon Horman
-	<simon.horman@corigine.com>,
-        Vignesh Raghavendra <vigneshr@ti.com>, Andrew
- Lunn <andrew@lunn.ch>,
-        Richard Cochran <richardcochran@gmail.com>,
-        Conor
- Dooley <conor+dt@kernel.org>,
-        Krzysztof Kozlowski
-	<krzysztof.kozlowski+dt@linaro.org>,
-        Rob Herring <robh+dt@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>,
-        Eric Dumazet <edumazet@google.com>,
-        "David S.
- Miller" <davem@davemloft.net>, <nm@ti.com>, <srk@ti.com>,
-        <linux-kernel@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <linux-omap@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>
-References: <20230724112934.2637802-1-danishanwar@ti.com>
- <20230724112934.2637802-8-danishanwar@ti.com>
- <20230725205014.04e4bba3@kernel.org>
- <296b0e98-4012-09f6-84cd-6f87a85f095f@ti.com>
- <20230726083915.1323c501@kernel.org>
-Content-Language: en-US
-From: "Anwar, Md Danish" <a0501179@ti.com>
-In-Reply-To: <20230726083915.1323c501@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
-X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2] splice, net: Fix splice_to_socket() for O_NONBLOCK socket
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169043401989.24382.16722066763021301341.git-patchwork-notify@kernel.org>
+Date: Thu, 27 Jul 2023 05:00:19 +0000
+References: <023c0e21e595e00b93903a813bc0bfb9a5d7e368.1690219914.git.jstancek@redhat.com>
+In-Reply-To: <023c0e21e595e00b93903a813bc0bfb9a5d7e368.1690219914.git.jstancek@redhat.com>
+To: Jan Stancek <jstancek@redhat.com>
+Cc: dhowells@redhat.com, kuba@kernel.org, netdev@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+ brauner@kernel.org, viro@zeniv.linux.org.uk
 
-On 7/26/2023 9:09 PM, Jakub Kicinski wrote:
-> On Wed, 26 Jul 2023 16:06:06 +0530 Md Danish Anwar wrote:
->>> Are the bucket sizes configurable? Can we set the bucket sizes
->>> to standard RMON ones and use ethtool RMON stats?
->>
->> The bucket sizes are not configurable. Bucket size is read from hardware and is
->> fixed. I don't think we can configure bucket size and use ethtool RMON stats.
->> It's better to dump bucket sizes via ethtool -S.
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Mon, 24 Jul 2023 19:39:04 +0200 you wrote:
+> LTP sendfile07 [1], which expects sendfile() to return EAGAIN when
+> transferring data from regular file to a "full" O_NONBLOCK socket,
+> started failing after commit 2dc334f1a63a ("splice, net: Use
+> sendmsg(MSG_SPLICE_PAGES) rather than ->sendpage()").
+> sendfile() no longer immediately returns, but now blocks.
 > 
-> The buckets in the ethtool API are up to the device to define.
-> Driver returns bucket ranges via struct ethtool_rmon_hist_range
-> from struct ethtool_ops::get_rmon_stats.
+> Removed sock_sendpage() handled this case by setting a MSG_DONTWAIT
+> flag, fix new splice_to_socket() to do the same for O_NONBLOCK sockets.
+> 
+> [...]
 
-Sure Jakub I will try to implement this using ethtool_ops::get_rmon_stats.
+Here is the summary with links:
+  - [v2] splice, net: Fix splice_to_socket() for O_NONBLOCK socket
+    https://git.kernel.org/netdev/net/c/0f0fa27b871b
 
+You are awesome, thank you!
 -- 
-Thanks and Regards,
-Md Danish Anwar
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
