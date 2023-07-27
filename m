@@ -1,156 +1,161 @@
-Return-Path: <netdev+bounces-22047-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22046-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3EDD765BF5
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 21:16:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 645D3765BF1
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 21:16:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7EEB12822F8
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 19:16:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 366601C2167A
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 19:16:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1227198BB;
-	Thu, 27 Jul 2023 19:16:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD100198BD;
+	Thu, 27 Jul 2023 19:16:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5C901C9E0
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 19:16:13 +0000 (UTC)
-Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E9142735;
-	Thu, 27 Jul 2023 12:16:12 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 926501989F;
+	Thu, 27 Jul 2023 19:16:06 +0000 (UTC)
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 524A52735;
+	Thu, 27 Jul 2023 12:16:04 -0700 (PDT)
+Received: by mail-pj1-x1029.google.com with SMTP id 98e67ed59e1d1-267f8f36a3cso836203a91.2;
+        Thu, 27 Jul 2023 12:16:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1690485373; x=1722021373;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=T/pVh4qaWdruJ5g2WTsNDraJeIi+BJjyRLbyt9/I2iA=;
-  b=pY8P5mRnP1FtdAyPksDWuBpEqFmCTNRG0v7TnrRb9AUNxirD+Hj6nzP5
-   KD1jqDylm73L9lMnbTmMOn6PACNJqUqd8ltA+P/IuAGrMViXPF1K+FyAB
-   Ce1KCgZ8f2a1Y8UasLfWmw9vrmazlB/Cn6q/mIL12nnAbKWVG9agm41hr
-   s=;
-X-IronPort-AV: E=Sophos;i="6.01,235,1684800000"; 
-   d="scan'208";a="145203898"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-pdx-2a-m6i4x-1cca8d67.us-west-2.amazon.com) ([10.43.8.2])
-  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jul 2023 19:16:12 +0000
-Received: from EX19MTAUWB001.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
-	by email-inbound-relay-pdx-2a-m6i4x-1cca8d67.us-west-2.amazon.com (Postfix) with ESMTPS id 01BD880B55;
-	Thu, 27 Jul 2023 19:16:09 +0000 (UTC)
-Received: from EX19D002UWA004.ant.amazon.com (10.13.138.230) by
- EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Thu, 27 Jul 2023 19:16:09 +0000
-Received: from EX19MTAUWC001.ant.amazon.com (10.250.64.145) by
- EX19D002UWA004.ant.amazon.com (10.13.138.230) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Thu, 27 Jul 2023 19:16:09 +0000
-Received: from dev-dsk-risbhat-2b-8bdc64cd.us-west-2.amazon.com
- (10.189.73.169) by mail-relay.amazon.com (10.250.64.145) with Microsoft SMTP
- Server id 15.2.1118.30 via Frontend Transport; Thu, 27 Jul 2023 19:16:09
- +0000
-Received: by dev-dsk-risbhat-2b-8bdc64cd.us-west-2.amazon.com (Postfix, from userid 22673075)
-	id 726CD2711; Thu, 27 Jul 2023 19:16:09 +0000 (UTC)
-From: Rishabh Bhatnagar <risbhat@amazon.com>
-To: <gregkh@linuxfoundation.org>, <lee@kernel.org>, <davem@davemloft.net>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<stable@vger.kernel.org>, Eric Dumazet <edumazet@google.com>, "Jamal Hadi
- Salim" <jhs@mojatatu.com>, Rishabh Bhatnagar <risbhat@amazon.com>
-Subject: [PATCH 4.14] net/sched: cls_u32: Fix reference counter leak leading to overflow
-Date: Thu, 27 Jul 2023 19:15:54 +0000
-Message-ID: <20230727191554.21333-1-risbhat@amazon.com>
-X-Mailer: git-send-email 2.40.1
+        d=gmail.com; s=20221208; t=1690485364; x=1691090164;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dID8NeabSHsX05XePj2pj/qvoOM/hy2hl2C7bgvnd6Q=;
+        b=OlJmul22CWmxmKQyZwAmojqt7OH591SEnUtxWzeOTbRFOOt2l3pQlJEasuyGHj9RD3
+         8X7/Fg65Jix7XBWBMIU/ee2ogSi1dnfHmUazeqwAvJ6IWicNVXjQsPIlri5axUr57y5O
+         6D8+ajJV2u+cKyObOyIyX7f+xAXFxQVnlRpFlw335dqa3acZVmJGSUD6ArsmdDTodlTU
+         52h0cSxfRSpu943/W8pR4DaC/npOB0wS7I0uwEwNPswJNVzo5La3AK8vSaQzGjxWpF3T
+         2ND/m27pvDEuHS0Cbu9RjIptmwLJ9Xxw1sjE10AwukwVTix+thPYn2Hwxs45cYk7FV8A
+         4E4A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690485364; x=1691090164;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=dID8NeabSHsX05XePj2pj/qvoOM/hy2hl2C7bgvnd6Q=;
+        b=IlJK1QGfzw8DDx6j/cEHNt7AKMBv7BrtHsObSunixwj/ZwXIYkUtcA7xnidyfNWwfP
+         x/plCCZ5T3Lrh4hAPvqKg9fJvHFbuWewMQo7p3RT4NvzsO9eWEI1Q8wbejT8RQiH91Nl
+         pa7ciFmLWSW3GrtGK6UfIQk1NKce7ulySTnZ0EOQePb4ELE7Lj5yW4zxAhqlHJ4Xu4Ph
+         0balBh5Yyn8rGz9F/6uPPE0gUbfkruj+X45HC2TRHzZ56a2Jnbshg/tJbRNszhY2M/aU
+         rxE+aDBlHUUEFI3a2Cz0TFb70mWBqnGJ7BlCEJa9XUrcBQPE0ji+K1be92IC1T5bu8l6
+         xNYw==
+X-Gm-Message-State: ABy/qLYuwQ61gjBWhqfnvmiWsnqwLGuvkzbzVCC//OCadrjseTeAk8ig
+	hx+4uX5poESSQXNP40FFe3Y=
+X-Google-Smtp-Source: APBJJlGRJ6kgWY3B0JuC7JNvsEnptYN4e9RQNs80fEcAIYq4rGRyxlw3GIlPdl7RUNW1q/WFV9QlOg==
+X-Received: by 2002:a17:90a:948a:b0:268:1c7f:c041 with SMTP id s10-20020a17090a948a00b002681c7fc041mr191328pjo.29.1690485363769;
+        Thu, 27 Jul 2023 12:16:03 -0700 (PDT)
+Received: from localhost ([2605:59c8:148:ba10:705d:54ca:a48d:47da])
+        by smtp.gmail.com with ESMTPSA id n12-20020a17090ade8c00b00263ba6a248bsm3112835pjv.1.2023.07.27.12.16.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Jul 2023 12:16:03 -0700 (PDT)
+Date: Thu, 27 Jul 2023 12:16:02 -0700
+From: John Fastabend <john.fastabend@gmail.com>
+To: Eric Dumazet <edumazet@google.com>, 
+ Liu Jian <liujian56@huawei.com>
+Cc: davem@davemloft.net, 
+ kuba@kernel.org, 
+ pabeni@redhat.com, 
+ john.fastabend@gmail.com, 
+ jakub@cloudflare.com, 
+ dsahern@kernel.org, 
+ ast@kernel.org, 
+ daniel@iogearbox.net, 
+ netdev@vger.kernel.org, 
+ bpf@vger.kernel.org
+Message-ID: <64c2c272c111_831d20880@john.notmuch>
+In-Reply-To: <CANn89i+DuhGRXj9U-iXcEA__j6jvV5FC+tLNkGBCSqMCPpuFaA@mail.gmail.com>
+References: <20230726142029.2867663-1-liujian56@huawei.com>
+ <20230726142029.2867663-2-liujian56@huawei.com>
+ <CANn89i+DuhGRXj9U-iXcEA__j6jvV5FC+tLNkGBCSqMCPpuFaA@mail.gmail.com>
+Subject: Re: [PATCH bpf 1/2] net: introduce __sk_rmem_schedule() helper
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-Precedence: Bulk
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Lee Jones <lee@kernel.org>
+Eric Dumazet wrote:
+> On Wed, Jul 26, 2023 at 4:15=E2=80=AFPM Liu Jian <liujian56@huawei.com>=
+ wrote:
+> >
+> > Compared with sk_wmem_schedule(), sk_rmem_schedule() not only perform=
+s
+> > rmem accounting, but also checks skb_pfmemalloc. The __sk_rmem_schedu=
+le()
+> > helper function is introduced here to perform only rmem accounting re=
+lated
+> > activities.
+> >
+> =
 
-Upstream commit 04c55383fa5689357bcdd2c8036725a55ed632bc.
+> Why not care about pfmemalloc ? Why is it safe ?
+> =
 
-In the event of a failure in tcf_change_indev(), u32_set_parms() will
-immediately return without decrementing the recently incremented
-reference counter.  If this happens enough times, the counter will
-rollover and the reference freed, leading to a double free which can be
-used to do 'bad things'.
+> You need to give more details, or simply reuse the existing helper.
 
-In order to prevent this, move the point of possible failure above the
-point where the reference counter is incremented.  Also save any
-meaningful return values to be applied to the return data at the
-appropriate point in time.
+I would just use the existing helper. Seems it should be fine.
 
-This issue was caught with KASAN.
+> =
 
-Fixes: 705c7091262d ("net: sched: cls_u32: no need to call tcf_exts_change for newly allocated struct")
-Suggested-by: Eric Dumazet <edumazet@google.com>
-Signed-off-by: Lee Jones <lee@kernel.org>
-Reviewed-by: Eric Dumazet <edumazet@google.com>
-Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
-Signed-off-by: David S. Miller <davem@davemloft.net>
-Signed-off-by: Rishabh Bhatnagar <risbhat@amazon.com>
----
- net/sched/cls_u32.c | 21 ++++++++++++++-------
- 1 file changed, 14 insertions(+), 7 deletions(-)
+> > Signed-off-by: Liu Jian <liujian56@huawei.com>
+> > ---
+> >  include/net/sock.h | 12 ++++++++----
+> >  1 file changed, 8 insertions(+), 4 deletions(-)
+> >
+> > diff --git a/include/net/sock.h b/include/net/sock.h
+> > index 2eb916d1ff64..58bf26c5c041 100644
+> > --- a/include/net/sock.h
+> > +++ b/include/net/sock.h
+> > @@ -1617,16 +1617,20 @@ static inline bool sk_wmem_schedule(struct so=
+ck *sk, int size)
+> >         return delta <=3D 0 || __sk_mem_schedule(sk, delta, SK_MEM_SE=
+ND);
+> >  }
+> >
+> > -static inline bool
+> > -sk_rmem_schedule(struct sock *sk, struct sk_buff *skb, int size)
+> > +static inline bool __sk_rmem_schedule(struct sock *sk, int size)
+> >  {
+> >         int delta;
+> >
+> >         if (!sk_has_account(sk))
+> >                 return true;
+> >         delta =3D size - sk->sk_forward_alloc;
+> > -       return delta <=3D 0 || __sk_mem_schedule(sk, delta, SK_MEM_RE=
+CV) ||
+> > -               skb_pfmemalloc(skb);
+> > +       return delta <=3D 0 || __sk_mem_schedule(sk, delta, SK_MEM_RE=
+CV);
+> > +}
+> > +
+> > +static inline bool
+> > +sk_rmem_schedule(struct sock *sk, struct sk_buff *skb, int size)
+> > +{
+> > +       return __sk_rmem_schedule(sk, size) || skb_pfmemalloc(skb);
+> >  }
+> >
+> >  static inline int sk_unused_reserved_mem(const struct sock *sk)
+> > --
+> > 2.34.1
+> >
 
-diff --git a/net/sched/cls_u32.c b/net/sched/cls_u32.c
-index fdbdcba44917..a4e01220a53a 100644
---- a/net/sched/cls_u32.c
-+++ b/net/sched/cls_u32.c
-@@ -774,11 +774,22 @@ static int u32_set_parms(struct net *net, struct tcf_proto *tp,
- 			 struct nlattr *est, bool ovr)
- {
- 	int err;
-+#ifdef CONFIG_NET_CLS_IND
-+	int ifindex = -1;
-+#endif
- 
- 	err = tcf_exts_validate(net, tp, tb, est, &n->exts, ovr);
- 	if (err < 0)
- 		return err;
- 
-+#ifdef CONFIG_NET_CLS_IND
-+	if (tb[TCA_U32_INDEV]) {
-+		ifindex = tcf_change_indev(net, tb[TCA_U32_INDEV]);
-+		if (ifindex < 0)
-+			return -EINVAL;
-+	}
-+#endif
-+
- 	if (tb[TCA_U32_LINK]) {
- 		u32 handle = nla_get_u32(tb[TCA_U32_LINK]);
- 		struct tc_u_hnode *ht_down = NULL, *ht_old;
-@@ -806,14 +817,10 @@ static int u32_set_parms(struct net *net, struct tcf_proto *tp,
- 	}
- 
- #ifdef CONFIG_NET_CLS_IND
--	if (tb[TCA_U32_INDEV]) {
--		int ret;
--		ret = tcf_change_indev(net, tb[TCA_U32_INDEV]);
--		if (ret < 0)
--			return -EINVAL;
--		n->ifindex = ret;
--	}
-+	if (ifindex >= 0)
-+		n->ifindex = ifindex;
- #endif
-+
- 	return 0;
- }
- 
--- 
-2.40.1
 
 
