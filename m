@@ -1,176 +1,169 @@
-Return-Path: <netdev+bounces-21807-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21808-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D44D7764CC7
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 10:27:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE27D764CEF
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 10:30:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 114741C208F0
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 08:27:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C81971C2156F
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 08:30:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA0BFD301;
-	Thu, 27 Jul 2023 08:27:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E32C4D50F;
+	Thu, 27 Jul 2023 08:30:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AECF8D2F0
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 08:27:08 +0000 (UTC)
-Received: from mail.helmholz.de (mail.helmholz.de [217.6.86.34])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 491484EDB
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 01:26:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=helmholz.de
-	; s=dkim1; h=Content-Type:MIME-Version:Message-ID:Date:Subject:CC:To:From:
-	Sender:Reply-To:Content-Transfer-Encoding:Content-ID:Content-Description:
-	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
-	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=pTHDtCKW0IluBtg4WbpD49owSeMHqMqck+SFzjWQotw=; b=DnDo5654XBkLj2a+Wb/1W2yCw2
-	LP+AsX0KoX/GhpwB0oZjvlsInyvP3LzcmMwiiD2LhVdKkOqXYFME3L4LfRwAN+abEkV1dAQRKv9MF
-	aHy0/IdfyFKUCDM8TJ6opxZY95f0gs6ZlB+766vJZnNFDLbY6//H0WyXUbh0PVRhvWIGnJqieRB6s
-	QqfE5cHfUvn6BoyWT8nTdlnQuaEfKDlJfc2e1ke3XPwKOm042/wKpUvrOx6Fdlb4rXftZjABWSEvQ
-	BbRVATgTw0sw+6ZY7kvzR89IdCdP05B9Gp0xUEz8g+iTQSXTEaMQ9MTDVswxgQLpZP180xrQOzyg/
-	q7QpZdNw==;
-Received: from [192.168.1.4] (port=13596 helo=SH-EX2013.helmholz.local)
-	by mail.helmholz.de with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384
-	(Exim 4.96)
-	(envelope-from <Ante.Knezic@helmholz.de>)
-	id 1qOwJp-0002sf-2y;
-	Thu, 27 Jul 2023 10:25:57 +0200
-Received: from linuxdev.helmholz.local (192.168.6.7) by
- SH-EX2013.helmholz.local (192.168.1.4) with Microsoft SMTP Server (TLS) id
- 15.0.1497.48; Thu, 27 Jul 2023 10:25:57 +0200
-From: Ante Knezic <ante.knezic@helmholz.de>
-To: <netdev@vger.kernel.org>
-CC: <andrew@lunn.ch>, <f.fainelli@gmail.com>, <olteanv@gmail.com>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <linux-kernel@vger.kernel.org>, Ante Knezic
-	<ante.knezic@helmholz.de>
-Subject: [PATCH net-next v4] net: dsa: mv88e6xxx: Add erratum 3.14 for 88E6390X and 88E6190X
-Date: Thu, 27 Jul 2023 10:25:50 +0200
-Message-ID: <20230727082550.15254-1-ante.knezic@helmholz.de>
-X-Mailer: git-send-email 2.11.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ED62E57A
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 08:30:06 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06711C433C7;
+	Thu, 27 Jul 2023 08:30:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1690446606;
+	bh=lgMwb11ItIJ27YCsuj2akQ0e0AMgpISaoiuOUrGiITY=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=Tr4M7HQ3pxhso0Q/eg4xKtwD0lUURtq4zUL2WnDxbX7YJArr/oNtVx0HKmYWbVJCj
+	 uZ3CjjOq76HigUmfxsBIfU5BJp2UCC8gXysiCMyY4oUiNa0NyuYtXgOb+GgYI2e2UD
+	 q/DMid3QMY2nJGias56vfjnyYrQ2kAGyvOg7az/lKKcQPYsllW1cAnQl1FfA/ktsaA
+	 ypQoOxGNqaMUpP2GFbXa8+1QKt5gSsrAShH7O9rxadTFuFxweU5IvbZDayprJj2afQ
+	 IGlbjA9TtQP0FcoHyTXu4yjcQ81VS0g2mOFp+HrXHsn6/kAwTiNlXyj4HVftm6tXbg
+	 kxbv5Cd7EwHzQ==
+Message-ID: <baaf7de4-9a0e-b953-2b6a-46e60c415614@kernel.org>
+Date: Thu, 27 Jul 2023 17:30:01 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [192.168.6.7]
-X-ClientProxiedBy: SH-EX2013.helmholz.local (192.168.1.4) To
- SH-EX2013.helmholz.local (192.168.1.4)
-X-EXCLAIMER-MD-CONFIG: 2ae5875c-d7e5-4d7e-baa3-654d37918933
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH v3 28/49] dm zoned: dynamically allocate the dm-zoned-meta
+ shrinker
+Content-Language: en-US
+To: Qi Zheng <zhengqi.arch@bytedance.com>, akpm@linux-foundation.org,
+ david@fromorbit.com, tkhai@ya.ru, vbabka@suse.cz, roman.gushchin@linux.dev,
+ djwong@kernel.org, brauner@kernel.org, paulmck@kernel.org, tytso@mit.edu,
+ steven.price@arm.com, cel@kernel.org, senozhatsky@chromium.org,
+ yujie.liu@intel.com, gregkh@linuxfoundation.org, muchun.song@linux.dev
+Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org, x86@kernel.org,
+ kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
+ linux-erofs@lists.ozlabs.org, linux-f2fs-devel@lists.sourceforge.net,
+ cluster-devel@redhat.com, linux-nfs@vger.kernel.org,
+ linux-mtd@lists.infradead.org, rcu@vger.kernel.org, netdev@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linux-arm-msm@vger.kernel.org,
+ dm-devel@redhat.com, linux-raid@vger.kernel.org,
+ linux-bcache@vger.kernel.org, virtualization@lists.linux-foundation.org,
+ linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
+ linux-xfs@vger.kernel.org, linux-btrfs@vger.kernel.org,
+ Muchun Song <songmuchun@bytedance.com>
+References: <20230727080502.77895-1-zhengqi.arch@bytedance.com>
+ <20230727080502.77895-29-zhengqi.arch@bytedance.com>
+From: Damien Le Moal <dlemoal@kernel.org>
+Organization: Western Digital Research
+In-Reply-To: <20230727080502.77895-29-zhengqi.arch@bytedance.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Fixes XAUI/RXAUI lane alignment errors.
-Issue causes dropped packets when trying to communicate over
-fiber via SERDES lanes of port 9 and 10.
-Errata document applies only to 88E6190X and 88E6390X devices.
-Requires poking in undocumented registers.
+On 7/27/23 17:04, Qi Zheng wrote:
+> In preparation for implementing lockless slab shrink, use new APIs to
+> dynamically allocate the dm-zoned-meta shrinker, so that it can be freed
+> asynchronously using kfree_rcu(). Then it doesn't need to wait for RCU
+> read-side critical section when releasing the struct dmz_metadata.
+> 
+> Signed-off-by: Qi Zheng <zhengqi.arch@bytedance.com>
+> Reviewed-by: Muchun Song <songmuchun@bytedance.com>
+> ---
+>  drivers/md/dm-zoned-metadata.c | 28 ++++++++++++++++------------
+>  1 file changed, 16 insertions(+), 12 deletions(-)
+> 
+> diff --git a/drivers/md/dm-zoned-metadata.c b/drivers/md/dm-zoned-metadata.c
+> index 9d3cca8e3dc9..0bcb26a43578 100644
+> --- a/drivers/md/dm-zoned-metadata.c
+> +++ b/drivers/md/dm-zoned-metadata.c
+> @@ -187,7 +187,7 @@ struct dmz_metadata {
+>  	struct rb_root		mblk_rbtree;
+>  	struct list_head	mblk_lru_list;
+>  	struct list_head	mblk_dirty_list;
+> -	struct shrinker		mblk_shrinker;
+> +	struct shrinker		*mblk_shrinker;
+>  
+>  	/* Zone allocation management */
+>  	struct mutex		map_lock;
+> @@ -615,7 +615,7 @@ static unsigned long dmz_shrink_mblock_cache(struct dmz_metadata *zmd,
+>  static unsigned long dmz_mblock_shrinker_count(struct shrinker *shrink,
+>  					       struct shrink_control *sc)
+>  {
+> -	struct dmz_metadata *zmd = container_of(shrink, struct dmz_metadata, mblk_shrinker);
+> +	struct dmz_metadata *zmd = shrink->private_data;
+>  
+>  	return atomic_read(&zmd->nr_mblks);
+>  }
+> @@ -626,7 +626,7 @@ static unsigned long dmz_mblock_shrinker_count(struct shrinker *shrink,
+>  static unsigned long dmz_mblock_shrinker_scan(struct shrinker *shrink,
+>  					      struct shrink_control *sc)
+>  {
+> -	struct dmz_metadata *zmd = container_of(shrink, struct dmz_metadata, mblk_shrinker);
+> +	struct dmz_metadata *zmd = shrink->private_data;
+>  	unsigned long count;
+>  
+>  	spin_lock(&zmd->mblk_lock);
+> @@ -2936,19 +2936,23 @@ int dmz_ctr_metadata(struct dmz_dev *dev, int num_dev,
+>  	 */
+>  	zmd->min_nr_mblks = 2 + zmd->nr_map_blocks + zmd->zone_nr_bitmap_blocks * 16;
+>  	zmd->max_nr_mblks = zmd->min_nr_mblks + 512;
+> -	zmd->mblk_shrinker.count_objects = dmz_mblock_shrinker_count;
+> -	zmd->mblk_shrinker.scan_objects = dmz_mblock_shrinker_scan;
+> -	zmd->mblk_shrinker.seeks = DEFAULT_SEEKS;
+>  
+>  	/* Metadata cache shrinker */
+> -	ret = register_shrinker(&zmd->mblk_shrinker, "dm-zoned-meta:(%u:%u)",
+> -				MAJOR(dev->bdev->bd_dev),
+> -				MINOR(dev->bdev->bd_dev));
+> -	if (ret) {
+> -		dmz_zmd_err(zmd, "Register metadata cache shrinker failed");
+> +	zmd->mblk_shrinker = shrinker_alloc(0,  "dm-zoned-meta:(%u:%u)",
+> +					    MAJOR(dev->bdev->bd_dev),
+> +					    MINOR(dev->bdev->bd_dev));
+> +	if (!zmd->mblk_shrinker) {
+> +		dmz_zmd_err(zmd, "Allocate metadata cache shrinker failed");
 
-Signed-off-by: Ante Knezic <ante.knezic@helmholz.de>
----
-V4 : Rework as suggested by Vladimir Oltean <olteanv@gmail.com>
-     and Russell King <linux@armlinux.org.uk>
- * print error in case of failure to apply erratum
- * use mdiobus_c45_write instead of mdiodev_c45_write
- * use bool variable instead of embedding a chip pointer inside
-   pcs struct.
-V3 : Rework to fit the new phylink_pcs infrastructure
-V2 : Rework as suggested by Andrew Lunn <andrew@lun.ch> 
- * make int lanes[] const 
- * reorder prod_nums
- * update commit message to indicate we are dealing with
-   undocumented Marvell registers and magic values
----
- drivers/net/dsa/mv88e6xxx/pcs-639x.c | 45 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 45 insertions(+)
+ret is not set here, so dmz_ctr_metadata() will return success. You need to add:
+		ret = -ENOMEM;
+or something.
+>  		goto err;
+>  	}
+>  
+> +	zmd->mblk_shrinker->count_objects = dmz_mblock_shrinker_count;
+> +	zmd->mblk_shrinker->scan_objects = dmz_mblock_shrinker_scan;
+> +	zmd->mblk_shrinker->seeks = DEFAULT_SEEKS;
+> +	zmd->mblk_shrinker->private_data = zmd;
+> +
+> +	shrinker_register(zmd->mblk_shrinker);
 
-diff --git a/drivers/net/dsa/mv88e6xxx/pcs-639x.c b/drivers/net/dsa/mv88e6xxx/pcs-639x.c
-index 98dd49dac421..ba373656bfe1 100644
---- a/drivers/net/dsa/mv88e6xxx/pcs-639x.c
-+++ b/drivers/net/dsa/mv88e6xxx/pcs-639x.c
-@@ -20,6 +20,7 @@ struct mv88e639x_pcs {
- 	struct mdio_device mdio;
- 	struct phylink_pcs sgmii_pcs;
- 	struct phylink_pcs xg_pcs;
-+	bool erratum_3_14;
- 	bool supports_5g;
- 	phy_interface_t interface;
- 	unsigned int irq;
-@@ -205,13 +206,53 @@ static void mv88e639x_sgmii_pcs_pre_config(struct phylink_pcs *pcs,
- 	mv88e639x_sgmii_pcs_control_pwr(mpcs, false);
- }
- 
-+static int mv88e6390_erratum_3_14(struct mv88e639x_pcs *mpcs)
-+{
-+	const int lanes[] = { MV88E6390_PORT9_LANE0, MV88E6390_PORT9_LANE1,
-+		MV88E6390_PORT9_LANE2, MV88E6390_PORT9_LANE3,
-+		MV88E6390_PORT10_LANE0, MV88E6390_PORT10_LANE1,
-+		MV88E6390_PORT10_LANE2, MV88E6390_PORT10_LANE3 };
-+	int err, i;
-+
-+	/* 88e6190x and 88e6390x errata 3.14:
-+	 * After chip reset, SERDES reconfiguration or SERDES core
-+	 * Software Reset, the SERDES lanes may not be properly aligned
-+	 * resulting in CRC errors
-+	 */
-+
-+	for (i = 0; i < ARRAY_SIZE(lanes); i++) {
-+		err = mdiobus_c45_write(mpcs->mdio.bus, lanes[i],
-+					MDIO_MMD_PHYXS,
-+					0xf054, 0x400C);
-+		if (err)
-+			return err;
-+
-+		err = mdiobus_c45_write(mpcs->mdio.bus, lanes[i],
-+					MDIO_MMD_PHYXS,
-+					0xf054, 0x4000);
-+		if (err)
-+			return err;
-+	}
-+
-+	return 0;
-+}
-+
- static int mv88e639x_sgmii_pcs_post_config(struct phylink_pcs *pcs,
- 					   phy_interface_t interface)
- {
- 	struct mv88e639x_pcs *mpcs = sgmii_pcs_to_mv88e639x_pcs(pcs);
-+	int err;
- 
- 	mv88e639x_sgmii_pcs_control_pwr(mpcs, true);
- 
-+	if (mpcs->erratum_3_14) {
-+		err = mv88e6390_erratum_3_14(mpcs);
-+		if (err)
-+			dev_err(mpcs->mdio.dev.parent,
-+				"failed to apply erratum 3.14: %pe\n",
-+				ERR_PTR(err));
-+	}
-+
- 	return 0;
- }
- 
-@@ -524,6 +565,10 @@ static int mv88e6390_pcs_init(struct mv88e6xxx_chip *chip, int port)
- 	mpcs->xg_pcs.ops = &mv88e6390_xg_pcs_ops;
- 	mpcs->xg_pcs.neg_mode = true;
- 
-+	if (chip->info->prod_num == MV88E6XXX_PORT_SWITCH_ID_PROD_6190X ||
-+	    chip->info->prod_num == MV88E6XXX_PORT_SWITCH_ID_PROD_6390X)
-+		mpcs->erratum_3_14 = true;
-+
- 	err = mv88e639x_pcs_setup_irq(mpcs, chip, port);
- 	if (err)
- 		goto err_free;
+I fail to see how this new shrinker API is better... Why isn't there a
+shrinker_alloc_and_register() function ? That would avoid adding all this code
+all over the place as the new API call would be very similar to the current
+shrinker_register() call with static allocation.
+
+> +
+>  	dmz_zmd_info(zmd, "DM-Zoned metadata version %d", zmd->sb_version);
+>  	for (i = 0; i < zmd->nr_devs; i++)
+>  		dmz_print_dev(zmd, i);
+> @@ -2995,7 +2999,7 @@ int dmz_ctr_metadata(struct dmz_dev *dev, int num_dev,
+>   */
+>  void dmz_dtr_metadata(struct dmz_metadata *zmd)
+>  {
+> -	unregister_shrinker(&zmd->mblk_shrinker);
+> +	shrinker_free(zmd->mblk_shrinker);
+>  	dmz_cleanup_metadata(zmd);
+>  	kfree(zmd);
+>  }
+
 -- 
-2.11.0
+Damien Le Moal
+Western Digital Research
 
 
