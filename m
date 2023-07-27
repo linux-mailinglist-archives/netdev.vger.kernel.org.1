@@ -1,184 +1,71 @@
-Return-Path: <netdev+bounces-21834-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21835-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26ECA764EEE
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 11:13:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A7969764F01
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 11:14:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D1131282203
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 09:13:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 63DA828223F
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 09:14:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 757C9FC0A;
-	Thu, 27 Jul 2023 09:13:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53E54FC10;
+	Thu, 27 Jul 2023 09:13:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 681FDFBE4
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 09:13:25 +0000 (UTC)
-Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2ADBE3A8C
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 02:13:22 -0700 (PDT)
-Received: by mail-pf1-x433.google.com with SMTP id d2e1a72fcca58-6862d4a1376so201869b3a.0
-        for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 02:13:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1690449201; x=1691054001;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ab3i02uMNDVjAVrJgavtDQnv7B+TbSMr9u4LPtdCXIk=;
-        b=DcofMrRnwJynNkdGxtjH9DqKXau2yqZGatjPtAtzn+O56nMmwXuVd7ToeAQUojKhyr
-         PVIHt52Ove4HfRkW5Jz6nWPZD9BmVLc7SbBBPIeMe8wFyfKaQIk+EbU0k3nRPfOKNwBh
-         oCNv2ZD1HFVJTkxvMKWyxXL9Onk9dGrGolbp1H25aJz81J4GYNUwPghcXVGUuE5zAHUa
-         mP22aBPwBQ4pP/D5mY0ghxG8TnuQLNORwYORdeX0ZvQJ20+Z3LaIninEXnknTqruUQCo
-         Za3jxS8cFIItCGBaY6f3hGkZx+gttPFDrR9vIxhOGVxid7Al6RP9znkmq9WOz9AcYgeV
-         IdKg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690449201; x=1691054001;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ab3i02uMNDVjAVrJgavtDQnv7B+TbSMr9u4LPtdCXIk=;
-        b=QfvuFTn8xrhNjYgPrNhDtViwvCr5riUaicPghpd04/mMU44nE32mKIcja6ilNEUTod
-         2JnzzAw7XM3JtuQXvLpnmG+WjRPXCXPx5BYZDM4nyxnjOfJvkoL3MTWiwaOAN+9BAN0I
-         O5SrGIX713Cwn8wMA10qkMD9eqiYIZ32ZFb3tGRhA7zaCmTio/atwP6Vln2njkzabyRf
-         dqMKQXhp09HJI4OSfPPCxnL0RzNppQkQ1iBds1bgS6czYgKgF0WxeBqzvyHfFDLqJ8PR
-         bxdFWU2M0ZsoiFzXTt01tatYB5seT2LvMmnwm+BTvfuC76s008AEUf4dc400kjN6DOvE
-         Bzlg==
-X-Gm-Message-State: ABy/qLZY4uuoccsVGwvITcqHKywCsMOIEzceL/KxJ6ZRUyop3hHX3jac
-	k2zF35Fs3fHa0DQgzJjxrx3SfA==
-X-Google-Smtp-Source: APBJJlGBn5Xl2QFHzxgRMihSAaLd28csKz8Em946xGdOgBfe3ljiGqu5+YaMyvDFvdIkqmZPd3zpbQ==
-X-Received: by 2002:a05:6a00:4792:b0:668:834d:4bd with SMTP id dh18-20020a056a00479200b00668834d04bdmr4787709pfb.0.1690449201600;
-        Thu, 27 Jul 2023 02:13:21 -0700 (PDT)
-Received: from [10.70.252.135] ([203.208.167.147])
-        by smtp.gmail.com with ESMTPSA id m26-20020a056a00165a00b006687b41c4dasm1017146pfc.110.2023.07.27.02.13.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 27 Jul 2023 02:13:21 -0700 (PDT)
-Message-ID: <961f6055-a395-8490-4c22-765a30668460@bytedance.com>
-Date: Thu, 27 Jul 2023 17:13:07 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49351FC0C
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 09:13:58 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BC1572B7
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 02:13:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=H8yStCZrx/lPZS6tsaEFybt2+EVVkMybFAlOQ91jDoE=; b=Z4x+FFyPXgCvwsOF+td+pWAJLJ
+	GHr20HwRaLmsrd4PyVYQzscCdgESqzIO0Ag6u6ZEHD7SKeFtAlJS6+Jn+kdh9JcfwMMKETKWGbaFD
+	kpwb51kvR1oFS0hmrRSMd4Sdisu/mHAAMdm3zG/Zun8nUJpvkj6mLyDmfgw5r0bYiHGw=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qOx3y-002RCE-RU; Thu, 27 Jul 2023 11:13:38 +0200
+Date: Thu, 27 Jul 2023 11:13:38 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Feiyang Chen <chenfeiyang@loongson.cn>
+Cc: hkallweit1@gmail.com, peppe.cavallaro@st.com,
+	alexandre.torgue@foss.st.com, joabreu@synopsys.com,
+	chenhuacai@loongson.cn, linux@armlinux.org.uk, dongbiao@loongson.cn,
+	loongson-kernel@lists.loongnix.cn, netdev@vger.kernel.org,
+	loongarch@lists.linux.dev, chris.chenfeiyang@gmail.com
+Subject: Re: [PATCH v2 05/10] net: stmmac: dwmac1000: Add Loongson register
+ definitions
+Message-ID: <30e8518e-4862-4aa5-afda-2f511dde2b44@lunn.ch>
+References: <cover.1690439335.git.chenfeiyang@loongson.cn>
+ <a752f67c6cfe481a2329f1f4b477ff962c46f515.1690439335.git.chenfeiyang@loongson.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.12.0
-Subject: Re: [PATCH v3 27/49] dm: dynamically allocate the dm-bufio shrinker
-Content-Language: en-US
-To: akpm@linux-foundation.org, david@fromorbit.com, tkhai@ya.ru,
- vbabka@suse.cz, roman.gushchin@linux.dev, djwong@kernel.org,
- brauner@kernel.org, paulmck@kernel.org, tytso@mit.edu, steven.price@arm.com,
- cel@kernel.org, senozhatsky@chromium.org, yujie.liu@intel.com,
- gregkh@linuxfoundation.org, muchun.song@linux.dev
-Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org, x86@kernel.org,
- kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
- linux-erofs@lists.ozlabs.org, linux-f2fs-devel@lists.sourceforge.net,
- cluster-devel@redhat.com, linux-nfs@vger.kernel.org,
- linux-mtd@lists.infradead.org, rcu@vger.kernel.org, netdev@vger.kernel.org,
- dri-devel@lists.freedesktop.org, linux-arm-msm@vger.kernel.org,
- dm-devel@redhat.com, linux-raid@vger.kernel.org,
- linux-bcache@vger.kernel.org, virtualization@lists.linux-foundation.org,
- linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
- linux-xfs@vger.kernel.org, linux-btrfs@vger.kernel.org,
- Muchun Song <songmuchun@bytedance.com>
-References: <20230727080502.77895-1-zhengqi.arch@bytedance.com>
- <20230727080502.77895-28-zhengqi.arch@bytedance.com>
-From: Qi Zheng <zhengqi.arch@bytedance.com>
-In-Reply-To: <20230727080502.77895-28-zhengqi.arch@bytedance.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a752f67c6cfe481a2329f1f4b477ff962c46f515.1690439335.git.chenfeiyang@loongson.cn>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+>  /* GMAC HW ADDR regs */
+> -#define GMAC_ADDR_HIGH(reg)	((reg > 15) ? 0x00000800 + (reg - 16) * 8 : \
+> +#define GMAC_ADDR_HIGH(reg, x)	((reg > 15) ? 0x00000800 + (reg - 16) * 8 * (x) : \
+>  				 0x00000040 + (reg * 8))
 
+please give x a more descriptive name.
 
-On 2023/7/27 16:04, Qi Zheng wrote:
-> In preparation for implementing lockless slab shrink, use new APIs to
-> dynamically allocate the dm-bufio shrinker, so that it can be freed
-> asynchronously using kfree_rcu(). Then it doesn't need to wait for RCU
-> read-side critical section when releasing the struct dm_bufio_client.
-> 
-> Signed-off-by: Qi Zheng <zhengqi.arch@bytedance.com>
-> Reviewed-by: Muchun Song <songmuchun@bytedance.com>
-> ---
->   drivers/md/dm-bufio.c | 26 +++++++++++++++-----------
->   1 file changed, 15 insertions(+), 11 deletions(-)
-> 
-> diff --git a/drivers/md/dm-bufio.c b/drivers/md/dm-bufio.c
-> index bc309e41d074..5a9124b83d53 100644
-> --- a/drivers/md/dm-bufio.c
-> +++ b/drivers/md/dm-bufio.c
-> @@ -963,7 +963,7 @@ struct dm_bufio_client {
->   
->   	sector_t start;
->   
-> -	struct shrinker shrinker;
-> +	struct shrinker *shrinker;
->   	struct work_struct shrink_work;
->   	atomic_long_t need_shrink;
->   
-> @@ -2368,7 +2368,7 @@ static unsigned long dm_bufio_shrink_scan(struct shrinker *shrink, struct shrink
->   {
->   	struct dm_bufio_client *c;
->   
-> -	c = container_of(shrink, struct dm_bufio_client, shrinker);
-> +	c = shrink->private_data;
->   	atomic_long_add(sc->nr_to_scan, &c->need_shrink);
->   	queue_work(dm_bufio_wq, &c->shrink_work);
->   
-> @@ -2377,7 +2377,7 @@ static unsigned long dm_bufio_shrink_scan(struct shrinker *shrink, struct shrink
->   
->   static unsigned long dm_bufio_shrink_count(struct shrinker *shrink, struct shrink_control *sc)
->   {
-> -	struct dm_bufio_client *c = container_of(shrink, struct dm_bufio_client, shrinker);
-> +	struct dm_bufio_client *c = shrink->private_data;
->   	unsigned long count = cache_total(&c->cache);
->   	unsigned long retain_target = get_retain_buffers(c);
->   	unsigned long queued_for_cleanup = atomic_long_read(&c->need_shrink);
-> @@ -2490,15 +2490,19 @@ struct dm_bufio_client *dm_bufio_client_create(struct block_device *bdev, unsign
->   	INIT_WORK(&c->shrink_work, shrink_work);
->   	atomic_long_set(&c->need_shrink, 0);
->   
-> -	c->shrinker.count_objects = dm_bufio_shrink_count;
-> -	c->shrinker.scan_objects = dm_bufio_shrink_scan;
-> -	c->shrinker.seeks = 1;
-> -	c->shrinker.batch = 0;
-> -	r = register_shrinker(&c->shrinker, "dm-bufio:(%u:%u)",
-> -			      MAJOR(bdev->bd_dev), MINOR(bdev->bd_dev));
-> -	if (r)
-> +	c->shrinker = shrinker_alloc(0, "dm-bufio:(%u:%u)",
-> +				     MAJOR(bdev->bd_dev), MINOR(bdev->bd_dev));
-> +	if (!c->shrinker)
-
-Here should set r to -ENOMEM, will fix.
-
->   		goto bad;
->   
-> +	c->shrinker->count_objects = dm_bufio_shrink_count;
-> +	c->shrinker->scan_objects = dm_bufio_shrink_scan;
-> +	c->shrinker->seeks = 1;
-> +	c->shrinker->batch = 0;
-> +	c->shrinker->private_data = c;
-> +
-> +	shrinker_register(c->shrinker);
-> +
->   	mutex_lock(&dm_bufio_clients_lock);
->   	dm_bufio_client_count++;
->   	list_add(&c->client_list, &dm_bufio_all_clients);
-> @@ -2537,7 +2541,7 @@ void dm_bufio_client_destroy(struct dm_bufio_client *c)
->   
->   	drop_buffers(c);
->   
-> -	unregister_shrinker(&c->shrinker);
-> +	shrinker_free(c->shrinker);
->   	flush_work(&c->shrink_work);
->   
->   	mutex_lock(&dm_bufio_clients_lock);
+       Andrew
 
