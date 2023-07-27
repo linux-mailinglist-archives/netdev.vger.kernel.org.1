@@ -1,41 +1,42 @@
-Return-Path: <netdev+bounces-21865-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21870-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D1687651C8
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 12:58:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1EF327651D4
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 13:00:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DC36428223B
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 10:58:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 502171C215BF
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 11:00:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87DFB156C8;
-	Thu, 27 Jul 2023 10:58:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24893168A5;
+	Thu, 27 Jul 2023 10:58:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B1AD154AD
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 10:58:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16FAF168A0
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 10:58:28 +0000 (UTC)
 Received: from mint-fitpc2.localdomain (unknown [81.168.73.77])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 38BC22710
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 03:58:22 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id C76BC271F
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 03:58:25 -0700 (PDT)
 Received: from palantir17.mph.net (palantir17 [192.168.0.4])
-	by mint-fitpc2.localdomain (Postfix) with ESMTP id D7226321AC7;
-	Thu, 27 Jul 2023 11:40:48 +0100 (BST)
+	by mint-fitpc2.localdomain (Postfix) with ESMTP id EA11E321AC9;
+	Thu, 27 Jul 2023 11:40:54 +0100 (BST)
 Received: from localhost ([::1] helo=palantir17.mph.net)
 	by palantir17.mph.net with esmtp (Exim 4.95)
 	(envelope-from <habetsm.xilinx@gmail.com>)
-	id 1qOyQK-0002XT-Mn;
-	Thu, 27 Jul 2023 11:40:48 +0100
-Subject: [PATCH net-next 02/11] sfc: Remove siena_nic_data and stats
+	id 1qOyQQ-0002Xd-C2;
+	Thu, 27 Jul 2023 11:40:54 +0100
+Subject: [PATCH net-next 03/11] sfc: Remove support for siena high priority
+ queue
 From: Martin Habets <habetsm.xilinx@gmail.com>
 To: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
  edumazet@google.com
 Cc: netdev@vger.kernel.org, linux-net-drivers@amd.com
-Date: Thu, 27 Jul 2023 11:40:48 +0100
-Message-ID: <169045444861.9625.12040773949640122124.stgit@palantir17.mph.net>
+Date: Thu, 27 Jul 2023 11:40:54 +0100
+Message-ID: <169045445398.9625.14203742535724682000.stgit@palantir17.mph.net>
 In-Reply-To: <169045436482.9625.4994454326362709391.stgit@palantir17.mph.net>
 References: <169045436482.9625.4994454326362709391.stgit@palantir17.mph.net>
 User-Agent: StGit/0.19
@@ -54,126 +55,121 @@ X-Spam-Status: No, score=0.7 required=5.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-These are no longer used, and the two  Siena specific functions are
-no longer present in sfc.ko.
+This also removes TC support code, since that was never supported for EF10.
+TC support for EF100 is not handled from efx.c.
 
 Signed-off-by: Martin Habets <habetsm.xilinx@gmail.com>
 Acked-by: Edward Cree <ecree.xilinx@gmail.com>
 ---
- drivers/net/ethernet/sfc/nic.h |   95 ----------------------------------------
- 1 file changed, 95 deletions(-)
+ drivers/net/ethernet/sfc/efx.c        |    1 -
+ drivers/net/ethernet/sfc/efx.h        |    2 -
+ drivers/net/ethernet/sfc/net_driver.h |    4 +--
+ drivers/net/ethernet/sfc/tx.c         |   45 +--------------------------------
+ 4 files changed, 2 insertions(+), 50 deletions(-)
 
-diff --git a/drivers/net/ethernet/sfc/nic.h b/drivers/net/ethernet/sfc/nic.h
-index bd17962436ba..1db64fc6e909 100644
---- a/drivers/net/ethernet/sfc/nic.h
-+++ b/drivers/net/ethernet/sfc/nic.h
-@@ -23,97 +23,6 @@ enum {
- 	PHY_TYPE_SFT9001B = 10,
- };
+diff --git a/drivers/net/ethernet/sfc/efx.c b/drivers/net/ethernet/sfc/efx.c
+index d670a319b379..19f4b4d0b851 100644
+--- a/drivers/net/ethernet/sfc/efx.c
++++ b/drivers/net/ethernet/sfc/efx.c
+@@ -605,7 +605,6 @@ static const struct net_device_ops efx_netdev_ops = {
+ #endif
+ 	.ndo_get_phys_port_id   = efx_get_phys_port_id,
+ 	.ndo_get_phys_port_name	= efx_get_phys_port_name,
+-	.ndo_setup_tc		= efx_setup_tc,
+ #ifdef CONFIG_RFS_ACCEL
+ 	.ndo_rx_flow_steer	= efx_filter_rfs,
+ #endif
+diff --git a/drivers/net/ethernet/sfc/efx.h b/drivers/net/ethernet/sfc/efx.h
+index 4239c7ece123..48d3623735ba 100644
+--- a/drivers/net/ethernet/sfc/efx.h
++++ b/drivers/net/ethernet/sfc/efx.h
+@@ -30,8 +30,6 @@ static inline netdev_tx_t efx_enqueue_skb(struct efx_tx_queue *tx_queue, struct
+ 			       tx_queue, skb);
+ }
+ void efx_xmit_done_single(struct efx_tx_queue *tx_queue);
+-int efx_setup_tc(struct net_device *net_dev, enum tc_setup_type type,
+-		 void *type_data);
+ extern unsigned int efx_piobuf_size;
  
--enum {
--	SIENA_STAT_tx_bytes = GENERIC_STAT_COUNT,
--	SIENA_STAT_tx_good_bytes,
--	SIENA_STAT_tx_bad_bytes,
--	SIENA_STAT_tx_packets,
--	SIENA_STAT_tx_bad,
--	SIENA_STAT_tx_pause,
--	SIENA_STAT_tx_control,
--	SIENA_STAT_tx_unicast,
--	SIENA_STAT_tx_multicast,
--	SIENA_STAT_tx_broadcast,
--	SIENA_STAT_tx_lt64,
--	SIENA_STAT_tx_64,
--	SIENA_STAT_tx_65_to_127,
--	SIENA_STAT_tx_128_to_255,
--	SIENA_STAT_tx_256_to_511,
--	SIENA_STAT_tx_512_to_1023,
--	SIENA_STAT_tx_1024_to_15xx,
--	SIENA_STAT_tx_15xx_to_jumbo,
--	SIENA_STAT_tx_gtjumbo,
--	SIENA_STAT_tx_collision,
--	SIENA_STAT_tx_single_collision,
--	SIENA_STAT_tx_multiple_collision,
--	SIENA_STAT_tx_excessive_collision,
--	SIENA_STAT_tx_deferred,
--	SIENA_STAT_tx_late_collision,
--	SIENA_STAT_tx_excessive_deferred,
--	SIENA_STAT_tx_non_tcpudp,
--	SIENA_STAT_tx_mac_src_error,
--	SIENA_STAT_tx_ip_src_error,
--	SIENA_STAT_rx_bytes,
--	SIENA_STAT_rx_good_bytes,
--	SIENA_STAT_rx_bad_bytes,
--	SIENA_STAT_rx_packets,
--	SIENA_STAT_rx_good,
--	SIENA_STAT_rx_bad,
--	SIENA_STAT_rx_pause,
--	SIENA_STAT_rx_control,
--	SIENA_STAT_rx_unicast,
--	SIENA_STAT_rx_multicast,
--	SIENA_STAT_rx_broadcast,
--	SIENA_STAT_rx_lt64,
--	SIENA_STAT_rx_64,
--	SIENA_STAT_rx_65_to_127,
--	SIENA_STAT_rx_128_to_255,
--	SIENA_STAT_rx_256_to_511,
--	SIENA_STAT_rx_512_to_1023,
--	SIENA_STAT_rx_1024_to_15xx,
--	SIENA_STAT_rx_15xx_to_jumbo,
--	SIENA_STAT_rx_gtjumbo,
--	SIENA_STAT_rx_bad_gtjumbo,
--	SIENA_STAT_rx_overflow,
--	SIENA_STAT_rx_false_carrier,
--	SIENA_STAT_rx_symbol_error,
--	SIENA_STAT_rx_align_error,
--	SIENA_STAT_rx_length_error,
--	SIENA_STAT_rx_internal_error,
--	SIENA_STAT_rx_nodesc_drop_cnt,
--	SIENA_STAT_COUNT
--};
--
--/**
-- * struct siena_nic_data - Siena NIC state
-- * @efx: Pointer back to main interface structure
-- * @wol_filter_id: Wake-on-LAN packet filter id
-- * @stats: Hardware statistics
-- * @vf: Array of &struct siena_vf objects
-- * @vf_buftbl_base: The zeroth buffer table index used to back VF queues.
-- * @vfdi_status: Common VFDI status page to be dmad to VF address space.
-- * @local_addr_list: List of local addresses. Protected by %local_lock.
-- * @local_page_list: List of DMA addressable pages used to broadcast
-- *	%local_addr_list. Protected by %local_lock.
-- * @local_lock: Mutex protecting %local_addr_list and %local_page_list.
-- * @peer_work: Work item to broadcast peer addresses to VMs.
-- */
--struct siena_nic_data {
--	struct efx_nic *efx;
--	int wol_filter_id;
--	u64 stats[SIENA_STAT_COUNT];
--#ifdef CONFIG_SFC_SRIOV
--	struct siena_vf *vf;
--	struct efx_channel *vfdi_channel;
--	unsigned vf_buftbl_base;
--	struct efx_buffer vfdi_status;
--	struct list_head local_addr_list;
--	struct list_head local_page_list;
--	struct mutex local_lock;
--	struct work_struct peer_work;
--#endif
--};
--
- enum {
- 	EF10_STAT_port_tx_bytes = GENERIC_STAT_COUNT,
- 	EF10_STAT_port_tx_packets,
-@@ -302,8 +211,4 @@ int efx_ef10_tx_tso_desc(struct efx_tx_queue *tx_queue, struct sk_buff *skb,
- extern const struct efx_nic_type efx_hunt_a0_nic_type;
- extern const struct efx_nic_type efx_hunt_a0_vf_nic_type;
+ /* RX */
+diff --git a/drivers/net/ethernet/sfc/net_driver.h b/drivers/net/ethernet/sfc/net_driver.h
+index b64a68a51050..25013caaeefb 100644
+--- a/drivers/net/ethernet/sfc/net_driver.h
++++ b/drivers/net/ethernet/sfc/net_driver.h
+@@ -67,9 +67,7 @@
+ #define EFX_MAX_CORE_TX_QUEUES	(EFX_MAX_TX_TC * EFX_MAX_CHANNELS)
+ #define EFX_TXQ_TYPE_OUTER_CSUM	1	/* Outer checksum offload */
+ #define EFX_TXQ_TYPE_INNER_CSUM	2	/* Inner checksum offload */
+-#define EFX_TXQ_TYPE_HIGHPRI	4	/* High-priority (for TC) */
+-#define EFX_TXQ_TYPES		8
+-/* HIGHPRI is Siena-only, and INNER_CSUM is EF10, so no need for both */
++#define EFX_TXQ_TYPES		4
+ #define EFX_MAX_TXQ_PER_CHANNEL	4
+ #define EFX_MAX_TX_QUEUES	(EFX_MAX_TXQ_PER_CHANNEL * EFX_MAX_CHANNELS)
  
--/* Global Resources */
--void siena_prepare_flush(struct efx_nic *efx);
--void siena_finish_flush(struct efx_nic *efx);
+diff --git a/drivers/net/ethernet/sfc/tx.c b/drivers/net/ethernet/sfc/tx.c
+index 4ed4082836a9..fe2d476028e7 100644
+--- a/drivers/net/ethernet/sfc/tx.c
++++ b/drivers/net/ethernet/sfc/tx.c
+@@ -517,13 +517,8 @@ netdev_tx_t efx_hard_start_xmit(struct sk_buff *skb,
+ 	unsigned index, type;
+ 
+ 	EFX_WARN_ON_PARANOID(!netif_device_present(net_dev));
 -
- #endif /* EFX_NIC_H */
+ 	index = skb_get_queue_mapping(skb);
+ 	type = efx_tx_csum_type_skb(skb);
+-	if (index >= efx->n_tx_channels) {
+-		index -= efx->n_tx_channels;
+-		type |= EFX_TXQ_TYPE_HIGHPRI;
+-	}
+ 
+ 	/* PTP "event" packet */
+ 	if (unlikely(efx_xmit_with_hwtstamp(skb)) &&
+@@ -603,43 +598,5 @@ void efx_init_tx_queue_core_txq(struct efx_tx_queue *tx_queue)
+ 	/* Must be inverse of queue lookup in efx_hard_start_xmit() */
+ 	tx_queue->core_txq =
+ 		netdev_get_tx_queue(efx->net_dev,
+-				    tx_queue->channel->channel +
+-				    ((tx_queue->type & EFX_TXQ_TYPE_HIGHPRI) ?
+-				     efx->n_tx_channels : 0));
+-}
+-
+-int efx_setup_tc(struct net_device *net_dev, enum tc_setup_type type,
+-		 void *type_data)
+-{
+-	struct efx_nic *efx = efx_netdev_priv(net_dev);
+-	struct tc_mqprio_qopt *mqprio = type_data;
+-	unsigned tc, num_tc;
+-
+-	if (type != TC_SETUP_QDISC_MQPRIO)
+-		return -EOPNOTSUPP;
+-
+-	/* Only Siena supported highpri queues */
+-	if (efx_nic_rev(efx) > EFX_REV_SIENA_A0)
+-		return -EOPNOTSUPP;
+-
+-	num_tc = mqprio->num_tc;
+-
+-	if (num_tc > EFX_MAX_TX_TC)
+-		return -EINVAL;
+-
+-	mqprio->hw = TC_MQPRIO_HW_OFFLOAD_TCS;
+-
+-	if (num_tc == net_dev->num_tc)
+-		return 0;
+-
+-	for (tc = 0; tc < num_tc; tc++) {
+-		net_dev->tc_to_txq[tc].offset = tc * efx->n_tx_channels;
+-		net_dev->tc_to_txq[tc].count = efx->n_tx_channels;
+-	}
+-
+-	net_dev->num_tc = num_tc;
+-
+-	return netif_set_real_num_tx_queues(net_dev,
+-					    max_t(int, num_tc, 1) *
+-					    efx->n_tx_channels);
++				    tx_queue->channel->channel);
+ }
 
 
 
