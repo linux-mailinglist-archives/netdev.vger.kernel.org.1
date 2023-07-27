@@ -1,187 +1,107 @@
-Return-Path: <netdev+bounces-21673-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21674-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7ACF57642E5
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 02:19:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B5997642EA
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 02:22:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3C6311C21444
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 00:19:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 628E31C2149E
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 00:22:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D3057E2;
-	Thu, 27 Jul 2023 00:19:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 197D37EA;
+	Thu, 27 Jul 2023 00:22:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF60419C
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 00:19:13 +0000 (UTC)
-Received: from out-34.mta1.migadu.com (out-34.mta1.migadu.com [IPv6:2001:41d0:203:375::22])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 822CB1BC3
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 17:19:10 -0700 (PDT)
-Date: Wed, 26 Jul 2023 17:19:00 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1690417148;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jizH7v8h0ocLCeBVRJsVfm8/gDMdAlThvwyLIayxfSI=;
-	b=lHp8Ez0cvZftnjDrB+shn/YNJVCu9ie28cUDW6kKAWN9CYushKaLWWLFDlFpQOd9vnCkaO
-	r4qTSQbFbOUgr2R2v2e9qVbliFGWAF6WcfaWgPuxoQboQjxu39lTx2LJSJKTdhv8YbLd4U
-	7V/b6hzWXibp+IHendqnuPPJOMGZtJM=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Roman Gushchin <roman.gushchin@linux.dev>
-To: Abel Wu <wuyun.abel@bytedance.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	Michal Hocko <mhocko@kernel.org>,
-	Shakeel Butt <shakeelb@google.com>,
-	Muchun Song <muchun.song@linux.dev>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	David Ahern <dsahern@kernel.org>,
-	Yosry Ahmed <yosryahmed@google.com>,
-	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
-	Yu Zhao <yuzhao@google.com>,
-	Kefeng Wang <wangkefeng.wang@huawei.com>,
-	Yafang Shao <laoar.shao@gmail.com>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Martin KaFai Lau <martin.lau@kernel.org>,
-	Alexander Mikhalitsyn <alexander@mihalicyn.com>,
-	Breno Leitao <leitao@debian.org>,
-	David Howells <dhowells@redhat.com>,
-	Jason Xing <kernelxing@tencent.com>,
-	Xin Long <lucien.xin@gmail.com>, Michal Hocko <mhocko@suse.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	open list <linux-kernel@vger.kernel.org>,
-	"open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-	"open list:CONTROL GROUP - MEMORY RESOURCE CONTROLLER (MEMCG)" <cgroups@vger.kernel.org>,
-	"open list:CONTROL GROUP - MEMORY RESOURCE CONTROLLER (MEMCG)" <linux-mm@kvack.org>
-Subject: Re: Re: [PATCH RESEND net-next 1/2] net-memcg: Scopify the
- indicators of sockmem pressure
-Message-ID: <ZMG39B6B41yLAu9r@P9FQF9L96D>
-References: <20230711124157.97169-1-wuyun.abel@bytedance.com>
- <ZLsg1wklldKkVI2Z@P9FQF9L96D.corp.robot.car>
- <58e75f44-16e3-a40a-4c8a-0f61bbf393f9@bytedance.com>
- <ZMCLTQgVT68jwbVh@P9FQF9L96D>
- <29de901f-ae4c-a900-a553-17ec4f096f0e@bytedance.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC50519C
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 00:22:48 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE6DAC433C8;
+	Thu, 27 Jul 2023 00:22:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1690417368;
+	bh=wsFL7PRt+t0InkGKyo3Ef7hCCdgDTFQH8ggIv+rfFQQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=HbG14v5/kupp42ye2pjqEJILEpRZjgVPH3vpoaonmfnfE98K2LPVKTpmNt7Ht50W2
+	 nTEGQOF7kz+r9eN6zKKAcUFRxruUFabYqMGR/WDULn6dpc4lr3ibRcowIml1zJWljq
+	 80paXeexgu4V9lWCaL2/vTBWGWX57lNmNlNePRH1rlRD9yaoHiv4AS9dJ3gT6wYat/
+	 5lh1lK2CsIX9bhyjOUht5N6rh3wUpTpAZXNcRBrZ33PYcoGw7qLcmKgaSG8k5z53HQ
+	 clrHRBGR+K3bVbf3VcPFh5B0w/uYkvg9c7VjBkdW24AT2fuZXC+u5WFVUl70W4WrMf
+	 b44Ek1QN2Pl6w==
+Date: Wed, 26 Jul 2023 17:22:47 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Stanislav Fomichev <sdf@google.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com
+Subject: Re: [PATCH net-next 3/4] ynl: regenerate all headers
+Message-ID: <20230726172247.021045e7@kernel.org>
+In-Reply-To: <CAKH8qBvix3YLwrFjMspk3Wttc=CfYW5xJgQt86x2Jg98v2Y55w@mail.gmail.com>
+References: <20230725233517.2614868-1-sdf@google.com>
+	<20230725233517.2614868-4-sdf@google.com>
+	<20230726163718.6b744ccf@kernel.org>
+	<CAKH8qBvix3YLwrFjMspk3Wttc=CfYW5xJgQt86x2Jg98v2Y55w@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <29de901f-ae4c-a900-a553-17ec4f096f0e@bytedance.com>
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jul 26, 2023 at 04:44:24PM +0800, Abel Wu wrote:
-> On 7/26/23 10:56 AM, Roman Gushchin wrote:
-> > On Mon, Jul 24, 2023 at 11:47:02AM +0800, Abel Wu wrote:
-> > > Hi Roman, thanks for taking time to have a look!
-> > > > 
-> > > > > When in legacy mode aka. cgroupv1, the socket memory is charged
-> > > > > into a separate counter memcg->tcpmem rather than ->memory, so
-> > > > > the reclaim pressure of the memcg has nothing to do with socket's
-> > > > > pressure at all.
-> > > > 
-> > > > But we still might set memcg->socket_pressure and propagate the pressure,
-> > > > right?
-> > > 
-> > > Yes, but the pressure comes from memcg->socket_pressure does not mean
-> > > pressure in socket memory in cgroupv1, which might lead to premature
-> > > reclamation or throttling on socket memory allocation. As the following
-> > > example shows:
-> > > 
-> > > 			->memory	->tcpmem
-> > > 	limit		10G		10G
-> > > 	usage		9G		4G
-> > > 	pressure	true		false
-> > 
-> > Yes, now it makes sense to me. Thank you for the explanation.
+On Wed, 26 Jul 2023 16:55:07 -0700 Stanislav Fomichev wrote:
+> Oh, didn't know about this. Something like this maybe? Ugly?
 > 
-> Cheers!
+> diff --git a/tools/net/ynl/Makefile b/tools/net/ynl/Makefile
+> index d664b36deb5b..c36380bf1536 100644
+> --- a/tools/net/ynl/Makefile
+> +++ b/tools/net/ynl/Makefile
+> @@ -3,6 +3,7 @@
+>  SUBDIRS = lib generated samples
 > 
-> > 
-> > Then I'd organize the patchset in the following way:
-> > 1) cgroup v1-only fix to not throttle tcpmem based on the vmpressure
-> > 2) a formal code refactoring
-> 
-> OK, I will take a try to re-organize in next version.
+>  all: $(SUBDIRS)
+> +       (cd ../../../ && ./tools/net/ynl/ynl-regen.sh -f)
 
-Thank you!
-> 
-> > > > 
-> > > > Overall I think it's a good idea to clean these things up and thank you
-> > > > for working on this. But I wonder if we can make the next step and leave only
-> > > > one mechanism for both cgroup v1 and v2 instead of having this weird setup
-> > > > where memcg->socket_pressure is set differently from different paths on cgroup
-> > > > v1 and v2.
-> > > 
-> > > There is some difficulty in unifying the mechanism for both cgroup
-> > > designs. Throttling socket memory allocation when memcg is under
-> > > pressure only makes sense when socket memory and other usages are
-> > > sharing the same limit, which is not true for cgroupv1. Thoughts?
-> > 
-> > I see... Generally speaking cgroup v1 is considered frozen, so we can leave it
-> > as it is, except when it creates an unnecessary complexity in the code.
-> 
-> Are you suggesting that the 2nd patch can be ignored and keep
-> ->tcpmem_pressure as it is? Or keep the 2nd patch and add some
-> explanation around as you suggested in last reply?
+Hm, I thought the script itself would handle this. I guess I did a
+stupid. How about we extend the script to default to the full tree:
 
-I suggest to split a code refactoring (which is not expected to bring any
-functional changes) and an actual change of the behavior on cgroup v1.
-Re the refactoring: I see a lot of value in adding comments and make the
-code more readable, I don't see that much value in merging two variables.
-But if it comes organically with the code simplification - nice.
+diff --git a/tools/net/ynl/ynl-regen.sh b/tools/net/ynl/ynl-regen.sh
+index 8d4ca6a50582..bdba24066cf1 100755
+--- a/tools/net/ynl/ynl-regen.sh
++++ b/tools/net/ynl/ynl-regen.sh
+@@ -4,15 +4,18 @@
+ TOOL=$(dirname $(realpath $0))/ynl-gen-c.py
+ 
+ force=
++search=
+ 
+ while [ ! -z "$1" ]; do
+   case "$1" in
+     -f ) force=yes; shift ;;
++    -p ) search=$2; shift 2 ;;
+     * )  echo "Unrecognized option '$1'"; exit 1 ;;
+   esac
+ done
+ 
+ KDIR=$(dirname $(dirname $(dirname $(dirname $(realpath $0)))))
++pushd ${search:-$KDIR} >>/dev/null
+ 
+ files=$(git grep --files-with-matches '^/\* YNL-GEN \(kernel\|uapi\|user\)')
+ for f in $files; do
+@@ -30,3 +33,5 @@ for f in $files; do
+     $TOOL --mode ${params[2]} --${params[3]} --spec $KDIR/${params[0]} \
+ 	  $args -o $f
+ done
++
++popd >>/dev/null
 
+>  $(SUBDIRS):
+>         @if [ -f "$@/Makefile" ] ; then \
 > 
-> > 
-> > I'm curious, was your work driven by some real-world problem or a desire to clean
-> > up the code? Both are valid reasons of course.
-> 
-> We (a cloud service provider) are migrating users to cgroupv2,
-> but encountered some problems among which the socket memory
-> really puts us in a difficult situation. There is no specific
-> threshold for socket memory in cgroupv2 and relies largely on
-> workloads doing traffic control themselves.
-> 
-> Say one workload behaves fine in cgroupv1 with 10G of ->memory
-> and 1G of ->tcpmem, but will suck (or even be OOMed) in cgroupv2
-> with 11G of ->memory due to burst memory usage on socket.
-> 
-> It's rational for the workloads to build some traffic control
-> to better utilize the resources they bought, but from kernel's
-> point of view it's also reasonable to suppress the allocation
-> of socket memory once there is a shortage of free memory, given
-> that performance degradation is better than failure.
+> Or, now that I know about the script I can actually run it manually.
+> But with a makefile imo a bit easier to discover..
 
-Yeah, I can see it. But Idk if it's too workload-specific to have
-a single-policy-fits-all-cases approach.
-E.g. some workloads might prefer to have a portion of pagecache
-being reclaimed.
-What do you think?
-
-> 
-> Currently the mechanism of net-memcg's pressure doesn't work as
-> we expected, please check the discussion in [1]. Besides this,
-> we are also working on mitigating the priority inversion issue
-> introduced by the net protocols' global shared thresholds [2],
-> which has something to do with the net-memcg's pressure. This
-> patchset and maybe some other are byproducts of the above work.
-> 
-> [1] https://lore.kernel.org/netdev/20230602081135.75424-1-wuyun.abel@bytedance.com/
-> [2] https://lore.kernel.org/netdev/20230609082712.34889-1-wuyun.abel@bytedance.com/
-
-Thanks for the clarification!
+Yea, agreed.
 
