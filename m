@@ -1,173 +1,132 @@
-Return-Path: <netdev+bounces-21992-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21991-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C63DB7658E9
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 18:39:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C87C7658DA
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 18:37:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 80C232817EF
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 16:39:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 26268282457
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 16:37:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C1E227132;
-	Thu, 27 Jul 2023 16:39:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E453C27131;
+	Thu, 27 Jul 2023 16:37:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9176B27124
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 16:39:41 +0000 (UTC)
-Received: from mgamail.intel.com (unknown [192.55.52.151])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 824EF2D4B
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 09:39:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1690475975; x=1722011975;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=h+4dCkLMPc4K9vhEve+IB/2UKNL6/ESbbvqGzEUUYbo=;
-  b=J24nh/vKPWIE8gEv5TjCkgpBFDVxF4gwA1A4E6s/FrxC3/+7qkNVVc8o
-   kJutQazqcGoAii/PNkm8T3rqD979smVOWLGHiM8Ky6OZlT4bUWy91hzSZ
-   6dQttu+aYUVZ28lMuZ6jAI5xf9vaIW0gHIou5cA0iOLLQdypXX4kVAF2K
-   9K6/xVeFI6eS2XY8fIajtqnJ7KnWwPAJgs2sep/UnC1aQnS3fYaztoWJR
-   c9G6uwPTjcMUF0oxlNjxQjeWRgNluw9aFVOPTdpmdpBwd7tgScSaXQTdK
-   EHbRiVZkMl/e4eXA0+ij7sJUU16tQNRvTgaxelJD2AfeX6pJCCZP6Ldsk
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10784"; a="348643852"
-X-IronPort-AV: E=Sophos;i="6.01,235,1684825200"; 
-   d="scan'208";a="348643852"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jul 2023 09:36:28 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10784"; a="817177974"
-X-IronPort-AV: E=Sophos;i="6.01,235,1684825200"; 
-   d="scan'208";a="817177974"
-Received: from lkp-server02.sh.intel.com (HELO 953e8cd98f7d) ([10.239.97.151])
-  by FMSMGA003.fm.intel.com with ESMTP; 27 Jul 2023 09:36:24 -0700
-Received: from kbuild by 953e8cd98f7d with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1qP3yP-0002Pn-0r;
-	Thu, 27 Jul 2023 16:36:24 +0000
-Date: Fri, 28 Jul 2023 00:35:06 +0800
-From: kernel test robot <lkp@intel.com>
-To: Feiyang Chen <chenfeiyang@loongson.cn>, andrew@lunn.ch,
-	hkallweit1@gmail.com, peppe.cavallaro@st.com,
-	alexandre.torgue@foss.st.com, joabreu@synopsys.com,
-	chenhuacai@loongson.cn
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	Feiyang Chen <chenfeiyang@loongson.cn>, linux@armlinux.org.uk,
-	dongbiao@loongson.cn, loongson-kernel@lists.loongnix.cn,
-	netdev@vger.kernel.org, loongarch@lists.linux.dev,
-	chris.chenfeiyang@gmail.com
-Subject: Re: [PATCH v2 03/10] net: stmmac: dwmac1000: Add multi-channel
- support
-Message-ID: <202307280004.UhGTxBbU-lkp@intel.com>
-References: <373259d4ac9ac0b9e1e64ad96d60a9bbd35b85aa.1690439335.git.chenfeiyang@loongson.cn>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D67AE8F41
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 16:37:40 +0000 (UTC)
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C8CC211D
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 09:37:39 -0700 (PDT)
+Received: by mail-pg1-x54a.google.com with SMTP id 41be03b00d2f7-55c04f5827eso729105a12.1
+        for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 09:37:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1690475858; x=1691080658;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=1cgG0ZaR8t8OuiGWgd5910cYe86YjYguqpgeUn39fOY=;
+        b=e6/UbFsHk5eizjT5n+2u8ZniNz1vcRcOL144F87T9aq3Xb3S+Z770M2JeO7GzCIij0
+         pqt0Wu3hRJseTkyyBuazhmeXI3y6WYYizS11JMDJZFtFkjpufxWz2sJzo+cZfMfYFTRM
+         8HtfvmebTNEpFtpn9BrICx6SmJtjhpjuQHsfHkCwRCth9jCPA+npLIO8dp7x1WF1olO3
+         rYNT0Du5FAc5QN5M85aJQhFeusKWL6sU2j3CGcoNVg6/e0i0blFkQHrVMYCeWGVPkEdv
+         xIom1v918Lmm26QazAiYonVcqDMIr5gPE35k0H+AbTNwvUoIpPbzQAHB2QLomrcOJyFx
+         ccpw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690475858; x=1691080658;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=1cgG0ZaR8t8OuiGWgd5910cYe86YjYguqpgeUn39fOY=;
+        b=YWyCqMhAoSNtcb7ULcnOyLrAjqDtZBdicEmPNpYbYe38fsDvaNvPmjiAsrhuRj4Gir
+         qhxkNMnkNME0YJEeFhna17LTPEgLtuVoWs7vI2i+wmRQorBH1zHa+tC/XPaLE1paWiBn
+         /OGBzaP9DawFy6dVbNbjL4B2027yy+m12wLCALhLuebh6NOH+c7jPyIVcHNd83/9yKfX
+         ABJRrh6R72N8hsurvtSfKWxbwFdY8wSrraksV8e9ZOThTPYtxvc8JHDemT0qtb7SWaql
+         ikR6h9iTZ1NuZpSH5QQts6mUWJNmOkczKLXnnEihQVGza+M65JDdWp4Iq/4DPCEjVQAR
+         XxwQ==
+X-Gm-Message-State: ABy/qLZ696/0z8/LhnNxVEhQdDA6q6IWx61+tacsPkhw7hfiLx/naL9u
+	lrAiEzSErBKBmczicKqmBR6Q8Kw=
+X-Google-Smtp-Source: APBJJlFNxoH43LyPCKEvWiRj/irsFrJ1yuIR2ttQ29BMDgQJitWqrego1USHOLVdcIkP8/t602c14Y4=
+X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
+ (user=sdf job=sendgmr) by 2002:a63:6f86:0:b0:55a:12cf:3660 with SMTP id
+ k128-20020a636f86000000b0055a12cf3660mr25756pgc.1.1690475858489; Thu, 27 Jul
+ 2023 09:37:38 -0700 (PDT)
+Date: Thu, 27 Jul 2023 09:37:37 -0700
+In-Reply-To: <50fc375a-27a7-8b6a-3938-f9fcb4f85b06@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <373259d4ac9ac0b9e1e64ad96d60a9bbd35b85aa.1690439335.git.chenfeiyang@loongson.cn>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+Mime-Version: 1.0
+References: <20230724235957.1953861-1-sdf@google.com> <20230724235957.1953861-3-sdf@google.com>
+ <64c0369eadbd5_3fe1bc2940@willemb.c.googlers.com.notmuch> <ZMBPDe+IhvTQnKQa@google.com>
+ <64c056686b527_3a4d294e6@willemb.c.googlers.com.notmuch> <50fc375a-27a7-8b6a-3938-f9fcb4f85b06@redhat.com>
+Message-ID: <ZMKdUbsAGe318yCS@google.com>
+Subject: Re: [RFC net-next v4 2/8] xsk: add TX timestamp and TX checksum
+ offload support
+From: Stanislav Fomichev <sdf@google.com>
+To: Jesper Dangaard Brouer <jbrouer@redhat.com>
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, brouer@redhat.com, bpf@vger.kernel.org, 
+	ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev, 
+	song@kernel.org, yhs@fb.com, john.fastabend@gmail.com, kpsingh@kernel.org, 
+	haoluo@google.com, jolsa@kernel.org, kuba@kernel.org, toke@kernel.org, 
+	willemb@google.com, dsahern@kernel.org, magnus.karlsson@intel.com, 
+	bjorn@kernel.org, maciej.fijalkowski@intel.com, hawk@kernel.org, 
+	netdev@vger.kernel.org, xdp-hints@xdp-project.net
+Content-Type: text/plain; charset="utf-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Feiyang,
+On 07/27, Jesper Dangaard Brouer wrote:
+> 
+> On 26/07/2023 01.10, Willem de Bruijn wrote:
+> > Stanislav Fomichev wrote:
+> > > On 07/25, Willem de Bruijn wrote:
+> > > > Stanislav Fomichev wrote:
+> [...]
+> > > > > +struct xsk_tx_metadata {
+> > > > > +	__u32 flags;
+> > > > > +
+> > > > > +	/* XDP_TX_METADATA_CHECKSUM */
+> > > > > +
+> > > > > +	/* Offset from desc->addr where checksumming should start. */
+> > > > > +	__u16 csum_start;
+> > > > > +	/* Offset from csum_start where checksum should be stored. */
+> > > > > +	__u16 csum_offset;
+> > > > > +
+> > > > > +	/* XDP_TX_METADATA_TIMESTAMP */
+> > > > > +
+> > > > > +	__u64 tx_timestamp;
+> > > > > +};
+> >>>
+> > > > Is this structure easily extensible for future offloads,
+> [...]
+> > 
+> > Pacing offload is the other feature that comes to mind. That could
+> > conceivably use the tx_timestamp field.
+> 
+> I would really like to see hardware offload "pacing" or LaunchTime as
+> hardware chips i210 and i225 calls it. I looked at the TX descriptor
+> details for drivers igc (i225) and igb (i210), and documented my finding
+> here[1], which should help with the code details if someone is motivated
+> for implementing this (I know of people on xdp-hints list that wanted
+> this LaunchTime feature).
+> 
+>   [1] https://github.com/xdp-project/xdp-project/blob/master/areas/tsn/code01_follow_qdisc_TSN_offload.org#tx-time-to-hardware-driver-igc
 
-kernel test robot noticed the following build warnings:
+Nice!
 
-[auto build test WARNING on net/main]
-[also build test WARNING on linus/master v6.5-rc3]
-[cannot apply to sunxi/sunxi/for-next net-next/main horms-ipvs/master next-20230727]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+> AFAIK this patchset uses struct xsk_tx_metadata as both TX and
+> TX-Completion, right?.  It would be "conceivable" to reuse tx_timestamp
+> field, but it might be confusing for uAPI end-users.  Maybe a union?
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Feiyang-Chen/net-stmmac-Pass-stmmac_priv-and-chan-in-some-callbacks/20230727-155954
-base:   net/main
-patch link:    https://lore.kernel.org/r/373259d4ac9ac0b9e1e64ad96d60a9bbd35b85aa.1690439335.git.chenfeiyang%40loongson.cn
-patch subject: [PATCH v2 03/10] net: stmmac: dwmac1000: Add multi-channel support
-config: i386-buildonly-randconfig-r006-20230727 (https://download.01.org/0day-ci/archive/20230728/202307280004.UhGTxBbU-lkp@intel.com/config)
-compiler: clang version 16.0.4 (https://github.com/llvm/llvm-project.git ae42196bc493ffe877a7e3dff8be32035dea4d07)
-reproduce: (https://download.01.org/0day-ci/archive/20230728/202307280004.UhGTxBbU-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202307280004.UhGTxBbU-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
->> drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c:114:6: warning: no previous prototype for function 'dwmac1000_dma_init_channel' [-Wmissing-prototypes]
-   void dwmac1000_dma_init_channel(struct stmmac_priv *priv, void __iomem *ioaddr,
-        ^
-   drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c:114:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
-   void dwmac1000_dma_init_channel(struct stmmac_priv *priv, void __iomem *ioaddr,
-   ^
-   static 
-   1 warning generated.
-
-
-vim +/dwmac1000_dma_init_channel +114 drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
-
-   113	
- > 114	void dwmac1000_dma_init_channel(struct stmmac_priv *priv, void __iomem *ioaddr,
-   115					struct stmmac_dma_cfg *dma_cfg,
-   116					u32 chan)
-   117	{
-   118		u32 value;
-   119		int txpbl = dma_cfg->txpbl ?: dma_cfg->pbl;
-   120		int rxpbl = dma_cfg->rxpbl ?: dma_cfg->pbl;
-   121	
-   122		if (!priv->plat->dwmac_is_loongson)
-   123			return;
-   124	
-   125		/* common channel control register config */
-   126		value = readl(ioaddr + DMA_BUS_MODE + chan * DMA_CHAN_OFFSET);
-   127	
-   128		/*
-   129		 * Set the DMA PBL (Programmable Burst Length) mode.
-   130		 *
-   131		 * Note: before stmmac core 3.50 this mode bit was 4xPBL, and
-   132		 * post 3.5 mode bit acts as 8*PBL.
-   133		 */
-   134		if (dma_cfg->pblx8)
-   135			value |= DMA_BUS_MODE_MAXPBL;
-   136		value |= DMA_BUS_MODE_USP;
-   137		value &= ~(DMA_BUS_MODE_PBL_MASK | DMA_BUS_MODE_RPBL_MASK);
-   138		value |= (txpbl << DMA_BUS_MODE_PBL_SHIFT);
-   139		value |= (rxpbl << DMA_BUS_MODE_RPBL_SHIFT);
-   140	
-   141		/* Set the Fixed burst mode */
-   142		if (dma_cfg->fixed_burst)
-   143			value |= DMA_BUS_MODE_FB;
-   144	
-   145		/* Mixed Burst has no effect when fb is set */
-   146		if (dma_cfg->mixed_burst)
-   147			value |= DMA_BUS_MODE_MB;
-   148	
-   149		value |= DMA_BUS_MODE_ATDS;
-   150	
-   151		if (dma_cfg->aal)
-   152			value |= DMA_BUS_MODE_AAL;
-   153	
-   154		writel(value, ioaddr + DMA_BUS_MODE + chan * DMA_CHAN_OFFSET);
-   155	
-   156		/* Mask interrupts by writing to CSR7 */
-   157		writel(DMA_INTR_DEFAULT_MASK,
-   158		       ioaddr + DMA_INTR_ENA + chan * DMA_CHAN_OFFSET);
-   159	}
-   160	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Sure, but do we add it later when we add launch time? For now, let's
+figure out whether 'tx_timestamp' is the right name for the 'tx
+completion timestamp' :-D Later on, we can union it with launch_time?
 
