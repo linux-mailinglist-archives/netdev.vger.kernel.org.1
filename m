@@ -1,104 +1,135 @@
-Return-Path: <netdev+bounces-21742-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21740-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0A00764864
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 09:21:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB266764860
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 09:20:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8979B280D35
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 07:21:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 280881C214F0
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 07:20:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 732ADC14D;
-	Thu, 27 Jul 2023 07:19:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E05ACC8D8;
+	Thu, 27 Jul 2023 07:18:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 670E0D2EF
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 07:19:04 +0000 (UTC)
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDEA52D78
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 00:19:03 -0700 (PDT)
-Received: from ptz.office.stw.pengutronix.de ([2a0a:edc0:0:900:1d::77] helo=[127.0.0.1])
-	by metis.ext.pengutronix.de with esmtp (Exim 4.92)
-	(envelope-from <j.zink@pengutronix.de>)
-	id 1qOvGy-0008Dp-0g; Thu, 27 Jul 2023 09:18:56 +0200
-Message-ID: <65810968-d34f-8a89-f235-95391a959c2b@pengutronix.de>
-Date: Thu, 27 Jul 2023 09:18:49 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5619C2DA
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 07:18:59 +0000 (UTC)
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2865B271C
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 00:18:57 -0700 (PDT)
+Received: from loongson.cn (unknown [112.20.109.108])
+	by gateway (Coremail) with SMTP id _____8CxtPBfGsJkd5wKAA--.26951S3;
+	Thu, 27 Jul 2023 15:18:55 +0800 (CST)
+Received: from localhost.localdomain (unknown [112.20.109.108])
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8Ax8uReGsJkn7c8AA--.31333S2;
+	Thu, 27 Jul 2023 15:18:54 +0800 (CST)
+From: Feiyang Chen <chenfeiyang@loongson.cn>
+To: andrew@lunn.ch,
+	hkallweit1@gmail.com,
+	peppe.cavallaro@st.com,
+	alexandre.torgue@foss.st.com,
+	joabreu@synopsys.com,
+	chenhuacai@loongson.cn
+Cc: Feiyang Chen <chenfeiyang@loongson.cn>,
+	linux@armlinux.org.uk,
+	dongbiao@loongson.cn,
+	loongson-kernel@lists.loongnix.cn,
+	netdev@vger.kernel.org,
+	loongarch@lists.linux.dev,
+	chris.chenfeiyang@gmail.com
+Subject: [PATCH v2 08/10] net: stmmac: dwmac-loongson: Disable flow control for GMAC
+Date: Thu, 27 Jul 2023 15:18:51 +0800
+Message-Id: <0ec0ae938964697010b3d035b7885e4dda89b012.1690439335.git.chenfeiyang@loongson.cn>
+X-Mailer: git-send-email 2.39.3
+In-Reply-To: <cover.1690439335.git.chenfeiyang@loongson.cn>
+References: <cover.1690439335.git.chenfeiyang@loongson.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH v2] net: stmmac: correct MAC propagation delay
-Content-Language: en-US, de-DE
-To: Kurt Kanzenbach <kurt@linutronix.de>,
- Richard Cochran <richardcochran@gmail.com>
-Cc: linux-kernel@vger.kernel.org, kernel@pengutronix.de,
- netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Russell King <linux@armlinux.org.uk>, kernel test robot <lkp@intel.com>,
- Eric Dumazet <edumazet@google.com>, Jose Abreu <joabreu@synopsys.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Giuseppe Cavallaro <peppe.cavallaro@st.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- "David S. Miller" <davem@davemloft.net>,
- linux-arm-kernel@lists.infradead.org, patchwork-jzi@pengutronix.de
-References: <20230719-stmmac_correct_mac_delay-v2-1-3366f38ee9a6@pengutronix.de>
- <20230725200606.5264b59c@kernel.org> <ZMCRjcRF9XqEPg/Z@hoboy.vegasvil.org>
- <09a2d767-d781-eba2-028f-a949f1128fbd@pengutronix.de>
- <ZME/GjBWdodiUO+8@hoboy.vegasvil.org>
- <8742d597-e8b1-705f-6616-dca4ead529f4@pengutronix.de> <873519u8o3.fsf@kurt>
-From: Johannes Zink <j.zink@pengutronix.de>
-In-Reply-To: <873519u8o3.fsf@kurt>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:900:1d::77
-X-SA-Exim-Mail-From: j.zink@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:AQAAf8Ax8uReGsJkn7c8AA--.31333S2
+X-CM-SenderInfo: hfkh0wphl1t03j6o00pqjv00gofq/
+X-Coremail-Antispam: 1Uk129KBj93XoW7ZFyrWrWDCFy3Ww13KF15Awc_yoW8CF4Upa
+	9rAa4I9r97Jr47A3Z8Aw4DZFy5XayUKrZrWayxKw4fWFZ2kr9FqryYqayYvFy7ArW5XFya
+	gr4jkr4UCF1DGrgCm3ZEXasCq-sJn29KB7ZKAUJUUUUf529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUBlb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26r4UJVWxJr1l84ACjcxK6I8E87Iv6xkF7I0E
+	14v26r4UJVWxJr1ln4kS14v26r126r1DM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6x
+	kI12xvs2x26I8E6xACxx1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v2
+	6Fy26r45twAv7VC2z280aVAFwI0_Cr0_Gr1UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0x
+	vY0x0EwIxGrwCY1x0262kKe7AKxVWUAVWUtwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE
+	7xkEbVWUJVW8JwCFI7km07C267AKxVWUAVWUtwC20s026c02F40E14v26r1j6r18MI8I3I
+	0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAI
+	cVC0I7IYx2IY67AKxVW7JVWDJwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Cr0_Gr1UMIIF0x
+	vE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWxJVW8Jr1lIxAIcVC2z280
+	aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU0wqXPUUUUU==
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Kurt,
+Loongson GMAC does not support Flow Control featurei. Use
+disable_flow_control flag to disable it.
 
-On 7/27/23 09:15, Kurt Kanzenbach wrote:
-> Hi Johannes, Richard,
-> 
-> On Thu Jul 27 2023, Johannes Zink wrote:
->>> BTW this driver is actually for an IP core used in many, many SoCs.
->>>
->>> How many _other_ SoCs did you test your patch on?
->>>
->> I don't have many available, thus as stated in the description: on the i.MX8MP
->> only. That's why I am implementing my stuff in the imx glue code, you're
->> welcome to help testing on other hardware if you have any at hand.
-> 
-> I can assist with testing on Intel real time platforms, stm32mp1 and
-> Cyclone V (and imx8mp). Just Cc me on the next the version of this
-> patch.
+Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
+---
+ drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c | 2 ++
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c    | 5 +++++
+ include/linux/stmmac.h                               | 1 +
+ 3 files changed, 8 insertions(+)
 
-Thanks for your kind offer, I am going to CC you when I send my v3.
-
-Best regards
-Johannes
-
-> 
-> Thanks,
-> Kurt
-
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+index 3ab55340a6b8..439a5f8bcabe 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+@@ -61,6 +61,8 @@ static int loongson_gmac_data(struct pci_dev *pdev,
+ 	plat->phy_addr = -1;
+ 	plat->phy_interface = PHY_INTERFACE_MODE_RGMII_ID;
+ 
++	plat->disable_flow_control = true;
++
+ 	return 0;
+ }
+ 
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index 829de274e75d..4f69cad0be42 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -3829,6 +3829,11 @@ static int __stmmac_open(struct net_device *dev,
+ 				   __func__, ret);
+ 			goto init_phy_error;
+ 		}
++
++		if (priv->plat->disable_flow_control) {
++			phy_support_sym_pause(dev->phydev);
++			phy_set_sym_pause(dev->phydev, false, false, true);
++		}
+ 	}
+ 
+ 	/* Extra statistics */
+diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
+index e21076f57205..54b9f308aabb 100644
+--- a/include/linux/stmmac.h
++++ b/include/linux/stmmac.h
+@@ -345,5 +345,6 @@ struct plat_stmmacenet_data {
+ 	const struct dwmac_regs *dwmac_regs;
+ 	bool dwmac_is_loongson;
+ 	int has_lgmac;
++	bool disable_flow_control;
+ };
+ #endif
 -- 
-Pengutronix e.K.                | Johannes Zink                  |
-Steuerwalder Str. 21            | https://www.pengutronix.de/    |
-31137 Hildesheim, Germany       | Phone: +49-5121-206917-0       |
-Amtsgericht Hildesheim, HRA 2686| Fax:   +49-5121-206917-5555    |
+2.39.3
 
 
