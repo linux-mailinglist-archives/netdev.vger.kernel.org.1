@@ -1,35 +1,35 @@
-Return-Path: <netdev+bounces-22011-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22012-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05E89765AB4
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 19:47:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57DD5765AB8
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 19:47:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A24792823F6
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 17:47:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 88EE61C21612
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 17:47:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B52528F41;
-	Thu, 27 Jul 2023 17:47:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8D5A8F41;
+	Thu, 27 Jul 2023 17:47:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B14327150
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 17:47:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 237CCC433C7;
-	Thu, 27 Jul 2023 17:47:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99129171D0
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 17:47:32 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 96556C433C8;
+	Thu, 27 Jul 2023 17:47:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690480040;
-	bh=QfaodoqmhOaqVb7r9DJuHMcMwJQYPs4wOqOC0JVyr0k=;
+	s=k20201202; t=1690480052;
+	bh=8hhmn8+Ux+A5/8bfiHx76Y+Keb0yncfBW6JKFFqonaI=;
 	h=From:To:Cc:Subject:Date:From;
-	b=MvW3RuPCZ/4dSoKiUmYb11DUaNNa07/NIWH1PeKw/LetAbx1oysjUrNBE64fFDL3d
-	 a1z0Z4umsyOz95ktHIveSWhNRHjMR3PyKDHl+Bkp/EX9i5KlutIy9FwVXneiaWZ+LN
-	 633DK6235IIchcG3EFpjCbSYX10Q5sL0eILuUyUD9miJQiFkZW6lDGM1G5k52YY3sk
-	 91Z5PJW0DS56CM+xbZgJXkjfTFnBbyymltrD45RZaOGyjixyrNRRYebrXDwnzFVddN
-	 xDFNN1Rnk0BdzRjhIxMiLw5LYIPmEzFnUE2pglwC3vNzEDUixpKzSiGAHzyGUJLRix
-	 WBv/HjZydJn/A==
+	b=PSmn3vIHdcE4YAvK30kxOfH+NwljypVDfa1Y/IjWI/dbuMd3C6YC/siSK6lnFtTpE
+	 gHws0kigPY53o+U/hFangapFoH2jflVmFyuN7YAMaoSlHYLROupPXxYWn3Gw6xc4W2
+	 eVKg3NYE7/jIkvU6lSugbZxMBFAfo5CA2Z6DyO8w8ja8rlq06BQXPp1i9N85fiJ+9x
+	 MayhU1yyZq0bKNmu4i2XQ4n6QJvT3bGbxZLW2kgCRSfz4MkhngfHUfu7rQsxP1fzqE
+	 HN3K4s6DkL9be5qiy8Wfw5UNRCcT9zVxD/nWarpKXEfBJv+RR4mKoDilXoYGwcIbb+
+	 FzzIKDIUrrDhg==
 From: SeongJae Park <sj@kernel.org>
 To: stable@vger.kernel.org
 Cc: M A Ramdhan <ramdhan@starlabs.sg>,
@@ -42,9 +42,9 @@ Cc: M A Ramdhan <ramdhan@starlabs.sg>,
 	Pedro Tammela <pctammela@mojatatu.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	SeongJae Park <sj@kernel.org>
-Subject: [PATCH 4.19] net/sched: cls_fw: Fix improper refcount update leads to use-after-free
-Date: Thu, 27 Jul 2023 17:46:28 +0000
-Message-Id: <20230727174629.55740-1-sj@kernel.org>
+Subject: [PATCH 4.14] net/sched: cls_fw: Fix improper refcount update leads to use-after-free
+Date: Thu, 27 Jul 2023 17:47:27 +0000
+Message-Id: <20230727174727.55795-1-sj@kernel.org>
 X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -80,10 +80,10 @@ Signed-off-by: SeongJae Park <sj@kernel.org>
  1 file changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/net/sched/cls_fw.c b/net/sched/cls_fw.c
-index cb2c62605fc76..5284a473c697f 100644
+index 7f45e5ab8afcd..e63f9c2e37e50 100644
 --- a/net/sched/cls_fw.c
 +++ b/net/sched/cls_fw.c
-@@ -221,11 +221,6 @@ static int fw_set_parms(struct net *net, struct tcf_proto *tp,
+@@ -225,11 +225,6 @@ static int fw_set_parms(struct net *net, struct tcf_proto *tp,
  	if (err < 0)
  		return err;
  
@@ -95,7 +95,7 @@ index cb2c62605fc76..5284a473c697f 100644
  #ifdef CONFIG_NET_CLS_IND
  	if (tb[TCA_FW_INDEV]) {
  		int ret;
-@@ -244,6 +239,11 @@ static int fw_set_parms(struct net *net, struct tcf_proto *tp,
+@@ -248,6 +243,11 @@ static int fw_set_parms(struct net *net, struct tcf_proto *tp,
  	} else if (head->mask != 0xFFFFFFFF)
  		return err;
  
