@@ -1,169 +1,299 @@
-Return-Path: <netdev+bounces-22048-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22049-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D15A6765BFA
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 21:17:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7DBF765C0F
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 21:26:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8B6C22823AD
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 19:17:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9C80A1C216DB
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 19:26:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD1E3198BB;
-	Thu, 27 Jul 2023 19:17:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16AD11AA6F;
+	Thu, 27 Jul 2023 19:26:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE9B817AC1
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 19:17:55 +0000 (UTC)
-Received: from mail-qt1-x834.google.com (mail-qt1-x834.google.com [IPv6:2607:f8b0:4864:20::834])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4D1BFE
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 12:17:53 -0700 (PDT)
-Received: by mail-qt1-x834.google.com with SMTP id d75a77b69052e-4036bd4fff1so51811cf.0
-        for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 12:17:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690485473; x=1691090273;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vjaICTqH+cZvfMDigfbOcA5yUI6vz5+/jEk/szdxuyE=;
-        b=3eURap2jCy1X1+Y0vpp99Mf1wqN21k7CprGG94jUm0nCmOjDF5YmGVGfUOv7brl3v6
-         yTrRE0UHjwn8xaokwm7gwwYqB7mhKwshXo9H9hHInqnBjTGdpF7vidjAkfFZjRNjodJr
-         iVYhsBFSc7+2wDnAKPGZhe6BOkhWHZGxfZtfogeDDk7D7TB8WHAI3+oWw2u4NIcsqRYg
-         fC9/VCW9K4aDiFWUwO5K7gKzaPBSQsoU0SVOQKfijMUKnj4TpPEKy6/zX2cf2mzVXhev
-         uQnvvLny6Pu9737cnCfbDRG+Is7ydcHSc97wTjSYtdEUpt04GFFzPzk2BPpbyirW3Lcu
-         qrFg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690485473; x=1691090273;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vjaICTqH+cZvfMDigfbOcA5yUI6vz5+/jEk/szdxuyE=;
-        b=DMq1MB35FZ+n6F4mA0NJnnZny8cJF7m4GywmAjqpZPP0gkMh9ji7ayzpMVeTyrmEZP
-         XYNVqu1ATu7V4I+NMEt2XKoVFPITE6tT9gQ4Xx0IFKDYf03Lr/ZlKg6OYeDVmSLwHlNc
-         IzqTD9UEUHHxXdhlTUqoi77s/eDfjtEavIgDmVM96yBZZ1hQP7UR7q4e4HlEHUFsFoaH
-         M0a+zoxwHS0aCnkrogvNnpq/XYmV0lxLD+Ppoe4mNxCZiDzc/jVrDbon5xFRuQb9Mjjo
-         tgXg89RRkzK6iuO1NdfhNm+ofF5r6qslBeooSLj7QrmgSAgmTsUKmrpkhDKO5ANJapR+
-         JXEw==
-X-Gm-Message-State: ABy/qLbNxsjcfMhAt2WNPsLaHil8WTVTF6fFEzDIkKS+25ThEYjWiVbY
-	Ie5K154Gqfwd3IiE4/iPueEXl3b9x+vc7opCFdyUow==
-X-Google-Smtp-Source: APBJJlH/+kGW+EsrfzDedROZlWmvYOKTcHd3WCSC6kPSaTfi+smYxRUcwpQztQBzk+rM1Yc+Nc2UsHv+AznNLs7YOHA=
-X-Received: by 2002:ac8:58d5:0:b0:403:b1e5:bcae with SMTP id
- u21-20020ac858d5000000b00403b1e5bcaemr62160qta.10.1690485472810; Thu, 27 Jul
- 2023 12:17:52 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0994C1805C
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 19:26:16 +0000 (UTC)
+Received: from domac.alu.hr (domac.alu.unizg.hr [161.53.235.3])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28430268B;
+	Thu, 27 Jul 2023 12:26:14 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+	by domac.alu.hr (Postfix) with ESMTP id 64CB260171;
+	Thu, 27 Jul 2023 21:26:11 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
+	t=1690485971; bh=7fw+979HTyI3g1irHu9HUvXN9G+83ViUcHnWOykGLQo=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=ds7DmjwyRCEn/utPKUwbq8uOWCVvzYsxdhFPhfZCeG7V7oijdsNqGDIxntdSCBjoI
+	 mRlymUUKnIR56QpsixQIYBble7Ye3+K/6jYGivvFeEdM9Nc7bSvpzmnXNKBgbjrRvW
+	 1sRtInDngtJWDHJ8brAuRvGaxsDh3hZm0UYaB4jmQciDkjBpisgJR8Ne6tbJE7Kxot
+	 oUAIkVqq1y8Bw2++ZG2ddjRTd4Y80apfiS6FG72WeBLILcKXHU7Zjd9pJGoC+hrtkF
+	 Dynlh+WqLc4bdOjRLGkCteC7nypRGxWWH4ML7tJBHKf3yN2shLvHWnrRtxMJQwAijv
+	 WTyEicERvYA1g==
+X-Virus-Scanned: Debian amavisd-new at domac.alu.hr
+Received: from domac.alu.hr ([127.0.0.1])
+	by localhost (domac.alu.hr [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id JQ1USOFRCqN7; Thu, 27 Jul 2023 21:26:08 +0200 (CEST)
+Received: from [192.168.1.6] (unknown [94.250.191.183])
+	by domac.alu.hr (Postfix) with ESMTPSA id 6AAA96016E;
+	Thu, 27 Jul 2023 21:26:06 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
+	t=1690485968; bh=7fw+979HTyI3g1irHu9HUvXN9G+83ViUcHnWOykGLQo=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=YdkWLbc/ePFiF615XLOoQ43cVK8dZujUylvK+MTbybvavLuJA0m2bq3GcDpPDq1AJ
+	 bVdFbK6i4/x8v+mQbDGoS24Ze1pJNPrsT2ypJgak3qEaYsrpxQjYBBQUF7btXEdvwP
+	 sa2iEjxnr0cLEj9cZxg8DycbAIe2vSiRNCA06U1EZAmr23SjoxrqFFSgLrPHH3RwGQ
+	 KnGOpO7pmJ50LXnvlPHZLdhVu1i00swp+K3RMu0xP3dD6Qvn7eH/bwsjTTj1ViUo9W
+	 z0ZxoEF3zSujUciSa5drnAWBBElnCOfkw3gIo+YSo5xTiVoqrly1GFHjBMa/AdjThV
+	 8IBxsb/7JtwUw==
+Message-ID: <a9b6d9f5-14ae-a931-ab7b-d31b5e40f5df@alu.unizg.hr>
+Date: Thu, 27 Jul 2023 21:26:03 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230727125125.1194376-1-imagedong@tencent.com> <20230727125125.1194376-2-imagedong@tencent.com>
-In-Reply-To: <20230727125125.1194376-2-imagedong@tencent.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 27 Jul 2023 21:17:41 +0200
-Message-ID: <CANn89iLwLxzSLKtobE9y+ZBU_eizfNo6FUfBa61KeUXsodA2FQ@mail.gmail.com>
-Subject: Re: [PATCH net-next 1/3] net: tcp: send zero-window ACK when no memory
-To: menglong8.dong@gmail.com
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	dsahern@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Menglong Dong <imagedong@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-	autolearn=unavailable autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.1
+Subject: Re: [PATCH v1 01/11] selftests: forwarding: custom_multipath_hash.sh:
+ add cleanup for SIGTERM sent by timeout
+Content-Language: en-US
+To: Ido Schimmel <idosch@idosch.org>
+Cc: Ido Schimmel <idosch@nvidia.com>, netdev@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Shuah Khan <shuah@kernel.org>
+References: <20230722003609.380549-1-mirsad.todorovac@alu.unizg.hr>
+ <ZLzj5oYrbHGvCMkq@shredder>
+ <0550924e-dce9-f90d-df8a-db810fd2499f@alu.unizg.hr>
+ <adc5e40d-d040-a65e-eb26-edf47dac5b02@alu.unizg.hr>
+ <ZL6OljQubhVtQjcD@shredder>
+ <cab8ea8a-98f4-ef9b-4215-e2a93cccaab1@alu.unizg.hr>
+ <ZMEQGIOQXv6so30x@shredder>
+From: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
+In-Reply-To: <ZMEQGIOQXv6so30x@shredder>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Jul 27, 2023 at 2:51=E2=80=AFPM <menglong8.dong@gmail.com> wrote:
->
-> From: Menglong Dong <imagedong@tencent.com>
->
-> For now, skb will be dropped when no memory, which makes client keep
-> retrans util timeout and it's not friendly to the users.
->
-> In this patch, we reply an ACK with zero-window in this case to update
-> the snd_wnd of the sender to 0. Therefore, the sender won't timeout the
-> connection and will probe the zero-window with the retransmits.
->
-> Signed-off-by: Menglong Dong <imagedong@tencent.com>
-> ---
->  include/net/inet_connection_sock.h |  3 ++-
->  net/ipv4/tcp_input.c               |  4 ++--
->  net/ipv4/tcp_output.c              | 14 +++++++++++---
->  3 files changed, 15 insertions(+), 6 deletions(-)
->
-> diff --git a/include/net/inet_connection_sock.h b/include/net/inet_connec=
-tion_sock.h
-> index c2b15f7e5516..be3c858a2ebb 100644
-> --- a/include/net/inet_connection_sock.h
-> +++ b/include/net/inet_connection_sock.h
-> @@ -164,7 +164,8 @@ enum inet_csk_ack_state_t {
->         ICSK_ACK_TIMER  =3D 2,
->         ICSK_ACK_PUSHED =3D 4,
->         ICSK_ACK_PUSHED2 =3D 8,
-> -       ICSK_ACK_NOW =3D 16       /* Send the next ACK immediately (once)=
- */
-> +       ICSK_ACK_NOW =3D 16,      /* Send the next ACK immediately (once)=
- */
-> +       ICSK_ACK_NOMEM =3D 32,
->  };
->
->  void inet_csk_init_xmit_timers(struct sock *sk,
-> diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-> index 3cd92035e090..03111af6115d 100644
-> --- a/net/ipv4/tcp_input.c
-> +++ b/net/ipv4/tcp_input.c
-> @@ -5061,7 +5061,8 @@ static void tcp_data_queue(struct sock *sk, struct =
-sk_buff *skb)
->                         reason =3D SKB_DROP_REASON_PROTO_MEM;
->                         NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPRCVQDROP=
-);
->                         sk->sk_data_ready(sk);
-> -                       goto drop;
-> +                       inet_csk(sk)->icsk_ack.pending |=3D ICSK_ACK_NOME=
-M;
+On 7/26/23 14:22, Ido Schimmel wrote:
+> On Mon, Jul 24, 2023 at 10:46:09PM +0200, Mirsad Todorovac wrote:
+>> On 7/24/23 16:45, Ido Schimmel wrote:
+>>> On Sun, Jul 23, 2023 at 11:37:46PM +0200, Mirsad Todorovac wrote:
+>>>> Some tests however exited with error:
+>>
+>> Hi,
+>>
+>>>> marvin@defiant:~/linux/kernel/linux_torvalds$ grep "not ok" ../kselftest-6.5-rc2-net-forwarding-11.log
+>>>> not ok 3 selftests: net/forwarding: bridge_mdb.sh # exit=1
+>>>> not ok 5 selftests: net/forwarding: bridge_mdb_max.sh # exit=1
+>>>> not ok 11 selftests: net/forwarding: bridge_vlan_mcast.sh # exit=1
+>>>
+>>> I can't reproduce these three.
+>>
+>> I have now enabled 'set -x' and here is the link to the output.
+>>
+>> NOTE as there are side-effects to running the test scripts, I have ran the
+> 
+> I don't believe this is correct after "selftests: forwarding: Switch off
+> timeout".
+> 
+>> whole suite, just in case:
+>>
+>> https://domac.alu.unizg.hr/~mtodorov/linux/selftests/net-forwarding/kselftest-6.5-rc3-net-forwarding-12.log.xz
+>>
+>>> Do you have systemd-networkd running?
+>>
+>> No:
+> 
+> [...]
+> 
+>>>> not ok 15 selftests: net/forwarding: ethtool_extended_state.sh # exit=1
+>>>> not ok 17 selftests: net/forwarding: ethtool.sh # exit=1
+>>>> not ok 25 selftests: net/forwarding: hw_stats_l3_gre.sh # exit=1
+>>>
+>>> Fixed these three.
+>>>
+>>>> not ok 26 selftests: net/forwarding: ip6_forward_instats_vrf.sh # exit=1
+>>>
+>>> Fixed.
+>>
+>> Great job, that's almost 50% of them!
+>>
+>>>> not ok 80 selftests: net/forwarding: tc_actions.sh # exit=1
+>>>> not ok 83 selftests: net/forwarding: tc_flower.sh # exit=1
+>>>> not ok 84 selftests: net/forwarding: tc_flower_l2_miss.sh # exit=1
+>>>> not ok 89 selftests: net/forwarding: tc_tunnel_key.sh # exit=1
+>>>
+>>> Can't reproduce these.
+>>
+>> Hope the above will help.
+> 
+> Pushed fixes for tc_actions.sh, tc_flower.sh and tc_tunnel_key.sh to the
+> same branch. Please test them.
+> 
+> Regarding the MDB tests and tc_flower_l2_miss.sh, I suspect you might
+> have some daemon in user space that sends IGMP queries and therefore
+> messes with the tests. Please run the following commands in a separate
+> terminal before running tc_flower_l2_miss.sh:
+> 
+> # perf probe --add 'br_ip4_multicast_query'
+> # perf record -a -g -e 'probe:br_ip4_multicast_query'
+> 
+> After the test finishes, terminate the second command and run:
+> 
+> # perf report --stdio
+> 
+> It should show us if queries were received and which process sent them.
+> 
+>>
+>>> Pushed the fixes on top of the fixes from yesterday:
+>>>
+>>> https://github.com/idosch/linux/commits/submit/sefltests_fix_v1
+>>
+>> I have applied them.
+>>
+>> BTW, after running the full net/forwarding test suite, "ip link show"
+>> looks like this:
+>>
+>> marvin@defiant:~/linux/kernel/linux_torvalds$ ip link show
+>> 256: veth7@veth6: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noqueue state DOWN mode DEFAULT group default qlen 1000
+>>      link/ether 16:74:e0:e6:f0:92 brd ff:ff:ff:ff:ff:ff
+>> 257: veth6@veth7: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noqueue state DOWN mode DEFAULT group default qlen 1000
+>>      link/ether 22:f3:40:50:fb:73 brd ff:ff:ff:ff:ff:ff
+>> 1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
+>>      link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+>> 2: enp16s0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP mode DEFAULT group default qlen 1000
+>>      link/ether 9c:6b:00:01:fb:80 brd ff:ff:ff:ff:ff:ff
+>> 3: veth1@veth0: <BROADCAST,MULTICAST,M-DOWN> mtu 10000 qdisc noqueue state DOWN mode DEFAULT group default qlen 1000
+>>      link/ether b6:46:e6:4c:e4:00 brd ff:ff:ff:ff:ff:ff
+>> 4: veth0@veth1: <BROADCAST,MULTICAST,M-DOWN> mtu 2000 qdisc noqueue state DOWN mode DEFAULT group default qlen 1000
+>>      link/ether 2e:ff:7f:8a:6b:d4 brd ff:ff:ff:ff:ff:ff
+>> 5: veth3@veth2: <BROADCAST,MULTICAST,M-DOWN> mtu 10000 qdisc noqueue state DOWN mode DEFAULT group default qlen 1000
+>>      link/ether ba:33:37:81:dc:5b brd ff:ff:ff:ff:ff:ff
+>> 6: veth2@veth3: <BROADCAST,MULTICAST,M-DOWN> mtu 2000 qdisc noqueue state DOWN mode DEFAULT group default qlen 1000
+>>      link/ether f2:fd:0a:9b:94:17 brd ff:ff:ff:ff:ff:ff
+>> 278: veth9@veth8: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noqueue state DOWN mode DEFAULT group default qlen 1000
+>>      link/ether 0a:f1:22:04:0f:55 brd ff:ff:ff:ff:ff:ff
+>> 279: veth8@veth9: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noqueue state DOWN mode DEFAULT group default qlen 1000
+>>      link/ether 92:be:71:00:59:0f brd ff:ff:ff:ff:ff:ff
+>> 282: gre0@NONE: <NOARP> mtu 1476 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+>>      link/gre 0.0.0.0 brd 0.0.0.0
+>> 283: gretap0@NONE: <BROADCAST,MULTICAST> mtu 1462 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+>>      link/ether 00:00:00:00:00:00 brd ff:ff:ff:ff:ff:ff
+>> 284: erspan0@NONE: <BROADCAST,MULTICAST> mtu 1450 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+>>      link/ether 00:00:00:00:00:00 brd ff:ff:ff:ff:ff:ff
+>> 366: ip6tnl0@NONE: <NOARP> mtu 1452 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+>>      link/tunnel6 :: brd :: permaddr ce1e:75f3:f565::
+>> 367: ip6gre0@NONE: <NOARP> mtu 1448 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+>>      link/gre6 :: brd :: permaddr 1e91:da47:154d::
+>> 237: veth5@veth4: <BROADCAST,MULTICAST,M-DOWN> mtu 2000 qdisc noqueue state DOWN mode DEFAULT group default qlen 1000
+>>      link/ether 6a:e3:dc:ad:8c:a0 brd ff:ff:ff:ff:ff:ff
+>> 238: veth4@veth5: <BROADCAST,MULTICAST,M-DOWN> mtu 10000 qdisc noqueue state DOWN mode DEFAULT group default qlen 1000
+>>      link/ether ce:a7:61:90:c8:2d brd ff:ff:ff:ff:ff:ff
+>> marvin@defiant:~/linux/kernel/linux_torvalds$
+>>
+>> This is kinda awkward, because I have to reboot the machine for the next run, each time.
+> 
+> Why? The fact that the veth pairs are already present doesn't impact the
+> selftests.
+> 
+>>
+>> I am in no condition to try to figure out which tests leaked links.
+> 
+> The veth pairs were created by the first invocation of the selftests and
+> are not deleted at the end. We already discussed it. But the fact that
+> they are already present does not mean you can't re-run the tests.
+> 
+> Regarding gre0, gretap0, erspan0, ip6tnl0 and ip6gre0, they are
+> automatically created by the kernel when the relevant kernel modules are
+> loaded. They are not used by the selftests.
 
-Also set ICSK_ACK_NOW ?
+If you're in dilemma, my experiment had shown that it is sufficient to delete one
+side of the veth link, for another side automagically vanishes.
 
-We also need to make sure to send an immediate ACK WIN 0 in the case we que=
-ued
-the skb in an empty receive queue and we were under pressure.
+BTW, the patches successfully applied, safe for the following:
 
-We do not want to have a delayed ACK sending a normal RWIN,
-then wait for another packet that we will probably drop.
+error: patch failed: tools/testing/selftests/net/forwarding/hw_stats_l3_gre.sh:99
+error: tools/testing/selftests/net/forwarding/hw_stats_l3_gre.sh: patch does not apply
 
-Look at the code :
+error: patch failed: tools/testing/selftests/net/forwarding/ethtool_extended_state.sh:108
+error: tools/testing/selftests/net/forwarding/ethtool_extended_state.sh: patch does not apply
 
-if (skb_queue_len(&sk->sk_receive_queue) =3D=3D 0)
-     sk_forced_mem_schedule(sk, skb->truesize);
-else if (tcp_try_rmem_schedule(sk, skb, skb->truesize)) {
+error: patch failed: tools/testing/selftests/net/forwarding/ethtool_mm.sh:278
+error: tools/testing/selftests/net/forwarding/ethtool_mm.sh: patch does not apply
 
-and refactor it to make sure to set  ICSK_ACK_NOMEM even on the first packe=
-t
-that bypassed the rmem_schedule().
+(Manual inspection revealed that all of those are adding of skip_on_veth which was already
+present in the script, but I recall you added skip_on_veth recently, so I guess this is something
+in our patch communication.)
 
+The test results are very good:
 
+marvin@defiant:~/linux/kernel/linux_torvalds$ grep "not ok" ../kselftest-6.5-rc3-net-forwarding-16.log
+not ok 3 selftests: net/forwarding: bridge_mdb.sh # exit=1
+not ok 5 selftests: net/forwarding: bridge_mdb_max.sh # exit=1
+not ok 11 selftests: net/forwarding: bridge_vlan_mcast.sh # exit=1
+not ok 26 selftests: net/forwarding: ip6_forward_instats_vrf.sh # exit=1
+not ok 49 selftests: net/forwarding: mirror_gre_changes.sh # exit=1
+not ok 84 selftests: net/forwarding: tc_flower_l2_miss.sh # exit=1
+marvin@defiant:~/linux/kernel/linux_torvalds$ grep -v "^# +" ../kselftest-6.5-rc3-net-forwarding-16.log | grep -A1 FAIL | grep -v -e -- | grep -v OK
+# TEST: IPv6 (S, G) port group entries configuration tests            [FAIL]
+# 	"temp" entry has an unpending group timer
+# TEST: IPv4 host entries forwarding tests                            [FAIL]
+# 	Packet not locally received after adding a host entry
+# TEST: IPv4 port group "exclude" entries forwarding tests            [FAIL]
+# 	Packet from valid source not received on H2 after adding entry
+# TEST: IPv4 port group "include" entries forwarding tests            [FAIL]
+# 	Packet from valid source not received on H2 after adding entry
+# TEST: IGMPv3 MODE_IS_INCLUDE tests                                  [FAIL]
+# 	Source not add to source list
+# TEST: ctl4: port: ngroups reporting                                 [FAIL]
+# 	Couldn't add MDB entries
+# TEST: ctl4: port maxgroups: reporting and treatment of 0            [FAIL]
+# 	Adding 5 MDB entries failed but should have passed
+# TEST: ctl4: port maxgroups: configure below ngroups                 [FAIL]
+# 	dev veth1: Couldn't add MDB entries
+# TEST: ctl4: port: ngroups reporting                                 [FAIL]
+# 	Couldn't add MDB entries
+# TEST: ctl4: port maxgroups: reporting and treatment of 0            [FAIL]
+# 	Adding 5 MDB entries failed but should have passed
+# TEST: ctl4: port maxgroups: configure below ngroups                 [FAIL]
+# 	dev veth1 vid 10: Couldn't add MDB entries
+# TEST: ctl4: port_vlan: ngroups reporting                            [FAIL]
+# 	Couldn't add MDB entries
+# TEST: ctl4: port_vlan: isolation of port and per-VLAN ngroups       [FAIL]
+# 	Couldn't add MDB entries to VLAN 10
+# TEST: ctl4: port_vlan maxgroups: reporting and treatment of 0       [FAIL]
+# 	Adding 5 MDB entries failed but should have passed
+# TEST: ctl4: port_vlan maxgroups: configure below ngroups            [FAIL]
+# 	dev veth1 vid 10: Couldn't add MDB entries
+# TEST: ctl4: port_vlan maxgroups: isolation of port and per-VLAN ngroups   [FAIL]
+# 	Couldn't add 5 entries
+# TEST: Vlan mcast_startup_query_interval global option default value   [FAIL]
+# 	Wrong default mcast_startup_query_interval global vlan option value
+# TEST: Ip6InHdrErrors                                                [FAIL]
+# TEST: mirror to gretap: TTL change (skip_hw)                        [FAIL]
+# 	Expected to capture 10 packets, got 14.
+# TEST: L2 miss - Multicast (IPv4)                                    [FAIL]
+# 	Unregistered multicast filter was not hit before adding MDB entry
+marvin@defiant:~/linux/kernel/linux_torvalds$
 
-> +                       goto out_of_window;
+In case you want to pursue these failures, there is the complete test output log
+here:
 
-Why forcing quickack mode ? Please leave the "goto drop;"
+https://domac.alu.unizg.hr/~mtodorov/linux/selftests/net-forwarding/kselftest-6.5-rc3-net-forwarding-16.log.xz
 
->                 }
->
->                 eaten =3D tcp_queue_rcv(sk, skb, &fragstolen);
-> @@ -5102,7 +5103,6 @@ static void tcp_data_queue(struct sock *sk, struct =
-sk_buff *skb)
->  out_of_window:
->                 tcp_enter_quickack_mode(sk, TCP_MAX_QUICKACKS);
->                 inet_csk_schedule_ack(sk);
-> -drop:
->                 tcp_drop_reason(sk, skb, reason);
->                 return;
->         }
->
+Thanks again, great work!
+
+Kind regards,
+Mirsad
 
