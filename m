@@ -1,119 +1,120 @@
-Return-Path: <netdev+bounces-22074-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22075-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1251765DD1
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 23:15:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 08D5F765DD9
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 23:17:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 541272824B3
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 21:15:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B7A8A2824D3
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 21:17:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63E831CA01;
-	Thu, 27 Jul 2023 21:15:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4E3E1CA02;
+	Thu, 27 Jul 2023 21:17:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 576E21C9E4
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 21:15:06 +0000 (UTC)
-Received: from mail-wr1-x429.google.com (mail-wr1-x429.google.com [IPv6:2a00:1450:4864:20::429])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A29130E3;
-	Thu, 27 Jul 2023 14:15:04 -0700 (PDT)
-Received: by mail-wr1-x429.google.com with SMTP id ffacd0b85a97d-317715ec496so1482110f8f.3;
-        Thu, 27 Jul 2023 14:15:04 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8D022714B
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 21:17:02 +0000 (UTC)
+Received: from mail-yb1-xb31.google.com (mail-yb1-xb31.google.com [IPv6:2607:f8b0:4864:20::b31])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A132030EA
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 14:16:56 -0700 (PDT)
+Received: by mail-yb1-xb31.google.com with SMTP id 3f1490d57ef6-d07c535377fso1385131276.1
+        for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 14:16:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690492503; x=1691097303;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=qRfseTaFLr304DLTt7nKnevuj2u0Rk8R7CojLp+3Nsk=;
-        b=sdBinHaItPP1FOSRdJjPB9Wr1YgmwzB0lntxdHHCqp79CStmeT+H6K1xe0f7VcV8lD
-         Don1ABgWfC1CAH8JNf1sJN2MoWH1FifyC5UeTv1xiMFest6O9fKEYoyLz+R9I4lII37m
-         Zf5DhRr6U6expFyp8MDka3D+dRRgrbLIJfiLzMoNPFjrvga5aTLSUrMXmmIVPgum4siE
-         gme1xJRr1T3h7mkEe0cChQrSqejzqI3PPBPU62XnVNCo7Qq0cA+oSH5pTNZD+kfmJtTS
-         oMano+ChPIt+q8WweN0dZRq6rssRy3uXINV6k2lmPQ3fOOXDuXUissU8vobvMGd78GU9
-         8pkw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690492503; x=1691097303;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=linaro.org; s=google; t=1690492616; x=1691097416;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=qRfseTaFLr304DLTt7nKnevuj2u0Rk8R7CojLp+3Nsk=;
-        b=ZS3PDn46bQNtb9fpRUyLhPOPbgXYqjSAnJf08cCdTHuks5vzlg5sl0UTlOEo/EWNnH
-         TnXnACbz0StRFKFwZ5bSt/99s3x1UgcvCXr39Rg7q6Q1svCs7tPlwQIl+Uw5BcbdJrUO
-         PGsK0P5cGdtAiFS2arSjth9EpIjVTc1EZAJS83mwOkU+SRzQchG4lzY4ODZwAVM0yNrb
-         5vvZTaVwl4TqJtms0iGq0Uyq1PBNqbeLId3tPZPl1Mtl4JAo9TrA8L6scNpEBW0yuhon
-         UyWNQcKgazEY2VjTIAPQlIJNKulkn1UYi5A8picosXamEz1MyCgxUePngyYlykOXy1s/
-         7nqg==
-X-Gm-Message-State: ABy/qLZA25PZsCFHhIimvt3+H2FmurhTg/PIuU/ROtFqDuPr1rDSCP9K
-	rut8Fk+nIVKpwNu4FcaQtGM=
-X-Google-Smtp-Source: APBJJlHzXSYdxXFg2S34bYD7NxT6UZUU+p69AY6r3V1v6pQKzWB5HRFe8zFIB4oTltdeCYTbmfFDPg==
-X-Received: by 2002:a5d:4109:0:b0:317:5c05:e1c with SMTP id l9-20020a5d4109000000b003175c050e1cmr207894wrp.25.1690492502727;
-        Thu, 27 Jul 2023 14:15:02 -0700 (PDT)
-Received: from skbuf ([188.25.175.105])
-        by smtp.gmail.com with ESMTPSA id o12-20020adfcf0c000000b00301a351a8d6sm2975093wrj.84.2023.07.27.14.15.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Jul 2023 14:15:02 -0700 (PDT)
-Date: Fri, 28 Jul 2023 00:14:59 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Atin Bainada <hi@atinb.me>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [net-next PATCH 3/3] net: dsa: qca8k: limit user ports access to
- the first CPU port on setup
-Message-ID: <20230727211459.zp36vd3xlvdccrie@skbuf>
-References: <20230724033058.16795-1-ansuelsmth@gmail.com>
- <20230724033058.16795-1-ansuelsmth@gmail.com>
- <20230724033058.16795-3-ansuelsmth@gmail.com>
- <20230724033058.16795-3-ansuelsmth@gmail.com>
- <20230726131851.w5ty2mftr7tdl3mi@skbuf>
- <64c2c142.5d0a0220.9ae33.deab@mx.google.com>
+        bh=/uGRhmfCXLxN6YU1cWESg55BRtPox1xD8u6NHDhwMzU=;
+        b=wswgZlkJ4NBe7/FtnWso7C3R/rqxZSJUmuWg9QHSi9JMGr8w9D2uQzTwgYsequJulq
+         is/1hwyg+1vqmZ9shtq1fLohk50d+i8QBH94zB9Ej1yzYbUEOx8Q8l3bt0oVwirfr+xh
+         AcGAad0J9UQ+W6bzboUyHjcJsZi+WSrDF+7OkvzGWimEu22FXf1MLJ5EWwQk8FgWWRli
+         5nuxAenh9aEGSFI3R+2Wy25KS6nV9YXFHtJMJgUjRnHRAdpCMvCEBYpGfAgwwEMdv3tk
+         6JayWaqklc5v3KEH7PSXfzGTJ/CMqnzNShHlNUjbz1y94StJOZzcLCOnavQ4iCJKf8+F
+         iyZA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690492616; x=1691097416;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/uGRhmfCXLxN6YU1cWESg55BRtPox1xD8u6NHDhwMzU=;
+        b=N4WL2zR7IDv2ujvovpzYk2CCi/pvvZwhpZ5gr+A48VIefGdm3LtGEjksz1s+c+Yuzu
+         3XuFWuo+C9jd2tWPY6qmHt5sdD+sMj+RIXQ/Nu7JTfVOvUIxytcZTaKb3zju41lFRwLG
+         aEewF+eZO9f17kSvgrYlGgFCeWHhe/S63G0uhoCo3/NlW8HFh9zCf4QSY31kkuFKaIzW
+         m2v5BH3JjxOwjqPwBGvvMu96nq3+PPZ4rcm1qce67zkw0EYes9RJoqCE9FLupWR64I7x
+         E/bs3a6E43YoJM4+XK4s2MJGlwOUz4pOy5utzECb78UxvMy36YTWwBCJdbGDbfYIZy3Q
+         9y+Q==
+X-Gm-Message-State: ABy/qLadzIeXI9/SEDDM6BEeMQbyQGxmXKxXIpZHHmMQeiyFQ5UF8OzL
+	9myIdr/1EY8+io6FY0jfOmKQr2jcd9TuYbPsxn9TcA==
+X-Google-Smtp-Source: APBJJlF/WP9UF5vhbN5Eh27rtP31+QJ0KngVSCOWM/D/823cWc4t3dHqdkGuZ+k5czJWqkSh0GU74FyljZsGrCSOQus=
+X-Received: by 2002:a25:fe0f:0:b0:cfa:f7cb:be16 with SMTP id
+ k15-20020a25fe0f000000b00cfaf7cbbe16mr513279ybe.49.1690492615774; Thu, 27 Jul
+ 2023 14:16:55 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <64c2c142.5d0a0220.9ae33.deab@mx.google.com>
+References: <20230623123820.42850-1-arkadiusz.kubalewski@intel.com> <20230623123820.42850-8-arkadiusz.kubalewski@intel.com>
+In-Reply-To: <20230623123820.42850-8-arkadiusz.kubalewski@intel.com>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Thu, 27 Jul 2023 23:16:42 +0200
+Message-ID: <CACRpkdar39x8nd5cWEDiFDHwLqHghUQZqkR0rEcv2-sZOZZ0KQ@mail.gmail.com>
+Subject: Re: [RFC PATCH v9 07/10] ice: add admin commands to access cgu configuration
+To: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+Cc: kuba@kernel.org, jiri@resnulli.us, vadfed@meta.com, 
+	jonathan.lemon@gmail.com, pabeni@redhat.com, corbet@lwn.net, 
+	davem@davemloft.net, edumazet@google.com, vadfed@fb.com, 
+	jesse.brandeburg@intel.com, anthony.l.nguyen@intel.com, saeedm@nvidia.com, 
+	leon@kernel.org, richardcochran@gmail.com, sj@kernel.org, javierm@redhat.com, 
+	ricardo.canuelo@collabora.com, mst@redhat.com, tzimmermann@suse.de, 
+	michal.michalik@intel.com, gregkh@linuxfoundation.org, 
+	jacek.lawrynowicz@linux.intel.com, airlied@redhat.com, ogabbay@kernel.org, 
+	arnd@arndb.de, nipun.gupta@amd.com, axboe@kernel.dk, linux@zary.sk, 
+	masahiroy@kernel.org, benjamin.tissoires@redhat.com, geert+renesas@glider.be, 
+	milena.olech@intel.com, kuniyu@amazon.com, liuhangbin@gmail.com, 
+	hkallweit1@gmail.com, andy.ren@getcruise.com, razor@blackwall.org, 
+	idosch@nvidia.com, lucien.xin@gmail.com, nicolas.dichtel@6wind.com, 
+	phil@nwl.cc, claudiajkang@gmail.com, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	intel-wired-lan@lists.osuosl.org, linux-rdma@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, poros@redhat.com, mschmidt@redhat.com, 
+	linux-clk@vger.kernel.org, vadim.fedorenko@linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Jul 27, 2023 at 09:10:56PM +0200, Christian Marangi wrote:
-> On Wed, Jul 26, 2023 at 04:18:51PM +0300, Vladimir Oltean wrote:
-> > On Mon, Jul 24, 2023 at 05:30:58AM +0200, Christian Marangi wrote:
-> > > In preparation for multi-CPU support, set CPU port LOOKUP MEMBER outside
-> > > the port loop and setup the LOOKUP MEMBER mask for user ports only to
-> > > the first CPU port.
-> > > 
-> > > This is to handle flooding condition where every CPU port is set as
-> > > target and prevent packet duplication for unknown frames from user ports.
-> > > 
-> > > Secondary CPU port LOOKUP MEMBER mask will be setup later when
-> > > port_change_master will be implemented.
-> > > 
-> > > Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
-> > > ---
-> > 
-> > This is kinda "net.git" material, in the sense that it fixes the current
-> > driver behavior with device trees from the future, right?
-> 
-> This is not strictly a fix. The secondary CPU (if defined) doesn't have
-> flood enabled so the switch won't forward packet. It's more of a
-> cleanup/preparation from my point of view. What do you think?
-> 
-> -- 
-> 	Ansuel
+Hi Arkadiusz,
 
-Ah, ok, if packets don't reach the second CPU port anyway then it's fine.
+On Fri, Jun 23, 2023 at 2:45=E2=80=AFPM Arkadiusz Kubalewski
+<arkadiusz.kubalewski@intel.com> wrote:
+
+> +/**
+> + * convert_s48_to_s64 - convert 48 bit value to 64 bit value
+> + * @signed_48: signed 64 bit variable storing signed 48 bit value
+> + *
+> + * Convert signed 48 bit value to its 64 bit representation.
+> + *
+> + * Return: signed 64 bit representation of signed 48 bit value.
+> + */
+> +static s64 convert_s48_to_s64(s64 signed_48)
+> +{
+> +       return signed_48 & BIT_ULL(47) ?
+> +               GENMASK_ULL(63, 48) | signed_48 : signed_48;
+> +}
+
+Can't you just use sign_extend64() from <linux/bitops.h>
+passing bit 48 as sign bit istead of inventing this?
+
+Yours,
+Linus Walleij
 
