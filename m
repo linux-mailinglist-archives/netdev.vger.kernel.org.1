@@ -1,507 +1,255 @@
-Return-Path: <netdev+bounces-21962-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21964-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B365765787
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 17:27:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AD3F07657BF
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 17:34:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AE7831C216A6
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 15:27:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DE4D21C215E6
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 15:34:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EE6E17AC5;
-	Thu, 27 Jul 2023 15:26:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7507417AA9;
+	Thu, 27 Jul 2023 15:34:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BCBF17AB3
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 15:26:41 +0000 (UTC)
-Received: from relay.virtuozzo.com (relay.virtuozzo.com [130.117.225.111])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3B003583
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 08:26:20 -0700 (PDT)
-Received: from [130.117.225.1] (helo=finist-vl9.sw.ru)
-	by relay.virtuozzo.com with esmtp (Exim 4.96)
-	(envelope-from <khorenko@virtuozzo.com>)
-	id 1qP2qc-006EQV-2J;
-	Thu, 27 Jul 2023 17:26:09 +0200
-From: Konstantin Khorenko <khorenko@virtuozzo.com>
-To: Simon Horman <simon.horman@corigine.com>
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	Manish Chopra <manishc@marvell.com>,
-	Ariel Elior <aelior@marvell.com>,
-	David Miller <davem@davemloft.net>,
-	Sudarsana Kalluru <skalluru@marvell.com>,
-	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	Konstantin Khorenko <khorenko@virtuozzo.com>
-Subject: [PATCH v2 1/1] qed: Fix scheduling in a tasklet while getting stats
-Date: Thu, 27 Jul 2023 18:26:09 +0300
-Message-Id: <20230727152609.1633966-2-khorenko@virtuozzo.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20230727152609.1633966-1-khorenko@virtuozzo.com>
-References: <ZMJcDvPrz1pEBPft@corigine.com>
- <20230727152609.1633966-1-khorenko@virtuozzo.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 662BC17AA5
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 15:34:23 +0000 (UTC)
+Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 700D426A8;
+	Thu, 27 Jul 2023 08:34:21 -0700 (PDT)
+Received: by mail-wm1-x32f.google.com with SMTP id 5b1f17b1804b1-3fdfd4c749dso6776085e9.3;
+        Thu, 27 Jul 2023 08:34:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1690472060; x=1691076860;
+        h=user-agent:in-reply-to:content-disposition:mime-version:references
+         :message-id:subject:to:from:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=dj+mM5KXpQqCCdCwg7vn+GdZ5wm15kON6FaHozgs714=;
+        b=hAQvKhK091T0tUaIvXPYoWFzlb6eor6LUdeIJ4WWQAwzdDrg+ltlDU91aqOBZWT4zh
+         zl4x9uFxX97u2PBDQ1XaOi1RF6lnGejCIlWmijkD0/Oqze666acioz5aqQTi73wrbnjQ
+         cULmQjVLqZ85oVM/d0f3rdyvryFi/YAPWzRGQi1QTDcCzmlp+JnKCBZfLKaYkRjZiwFa
+         F4oaJWKETp+g7d+4aDAzQAtsttaEbY9KmMVlwFheq7/iKQrac/aphxsyTx/8knvRPaDB
+         MnU5c6W4W8gqhpLwFkdEVh9nRF5IB8qjS2j9E79PD2hTzn/XOJpupjuK0jy6cuj2DLFQ
+         fzHg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690472060; x=1691076860;
+        h=user-agent:in-reply-to:content-disposition:mime-version:references
+         :message-id:subject:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dj+mM5KXpQqCCdCwg7vn+GdZ5wm15kON6FaHozgs714=;
+        b=IuS7zDdJYcnhpQ0rtuho+5U6d6IWrdrslwepuKgdlRA99ZjwLFeURQkhI03MvtXQ7y
+         7lDS2jdzkBo3jm0AYHvvaz5gk7nGe79zk1eCkTDgIp332HXE2Z3KcvWcgz5s9RT8l4MK
+         v0EC9wBFpZaBWyXifQwLl1vgrJEUNJJr4Cv74N7TdG19kzwfekPG2qWky4AHRr6L4qN+
+         akR9Mjo91mslNIUvncrGzLpBng7edrooi7p2NA5Otqh6+EQWgHQ8WqVoO1efQzK0VyjK
+         mVYGQ7kV2T6VyLkGOAcJulfVgypKof2GSHZRS5tiTxPkZGDR0XWtvgItPFAxn/4pXbep
+         08Nw==
+X-Gm-Message-State: ABy/qLZb+mzGQt0r21VVkmz1xTBG0OcWnSdkdE5gjATDJt9jdY5CkH9N
+	M9qmjTqu9mtaAYP/nGQJ75A=
+X-Google-Smtp-Source: APBJJlFy/wMBqU0Gg/y2CXR24xy2zzDL9gqjAOotNeqP9fu8MXSMh18TU9oB8j63QvuUy2a6Ioo3TA==
+X-Received: by 2002:a7b:cc86:0:b0:3fb:e356:b60d with SMTP id p6-20020a7bcc86000000b003fbe356b60dmr2068046wma.38.1690472059635;
+        Thu, 27 Jul 2023 08:34:19 -0700 (PDT)
+Received: from debian ([89.238.191.199])
+        by smtp.gmail.com with ESMTPSA id 1-20020a05600c248100b003fbb5142c4bsm5026343wms.18.2023.07.27.08.34.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Jul 2023 08:34:19 -0700 (PDT)
+Date: Thu, 27 Jul 2023 17:33:56 +0200
+From: Richard Gobert <richardbgobert@gmail.com>
+To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, willemdebruijn.kernel@gmail.com,
+	dsahern@kernel.org, tom@herbertland.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, gal@nvidia.com
+Subject: [PATCH v3 1/1] net: gro: fix misuse of CB in udp socket lookup
+Message-ID: <20230727153353.GA32089@debian>
+References: <20230727152503.GA32010@debian>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
-	SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-	version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230727152503.GA32010@debian>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Here we've got to a situation when tasklet called usleep_range() in PTT
-acquire logic, thus welcome to the "scheduling while atomic" BUG().
+This patch fixes a misuse of IP{6}CB(skb) in GRO, while calling to
+`udp6_lib_lookup2` when handling udp tunnels. `udp6_lib_lookup2` fetch the
+device from CB. The fix changes it to fetch the device from `skb->dev`.
+l3mdev case requires special attention since it has a master and a slave
+device.
 
-  BUG: scheduling while atomic: swapper/24/0/0x00000100
-
-   [<ffffffffb41c6199>] schedule+0x29/0x70
-   [<ffffffffb41c5512>] schedule_hrtimeout_range_clock+0xb2/0x150
-   [<ffffffffb41c55c3>] schedule_hrtimeout_range+0x13/0x20
-   [<ffffffffb41c3bcf>] usleep_range+0x4f/0x70
-   [<ffffffffc08d3e58>] qed_ptt_acquire+0x38/0x100 [qed]
-   [<ffffffffc08eac48>] _qed_get_vport_stats+0x458/0x580 [qed]
-   [<ffffffffc08ead8c>] qed_get_vport_stats+0x1c/0xd0 [qed]
-   [<ffffffffc08dffd3>] qed_get_protocol_stats+0x93/0x100 [qed]
-                        qed_mcp_send_protocol_stats
-            case MFW_DRV_MSG_GET_LAN_STATS:
-            case MFW_DRV_MSG_GET_FCOE_STATS:
-            case MFW_DRV_MSG_GET_ISCSI_STATS:
-            case MFW_DRV_MSG_GET_RDMA_STATS:
-   [<ffffffffc08e36d8>] qed_mcp_handle_events+0x2d8/0x890 [qed]
-                        qed_int_assertion
-                        qed_int_attentions
-   [<ffffffffc08d9490>] qed_int_sp_dpc+0xa50/0xdc0 [qed]
-   [<ffffffffb3aa7623>] tasklet_action+0x83/0x140
-   [<ffffffffb41d9125>] __do_softirq+0x125/0x2bb
-   [<ffffffffb41d560c>] call_softirq+0x1c/0x30
-   [<ffffffffb3a30645>] do_softirq+0x65/0xa0
-   [<ffffffffb3aa78d5>] irq_exit+0x105/0x110
-   [<ffffffffb41d8996>] do_IRQ+0x56/0xf0
-
-Fix this by making caller to provide the context whether it could be in
-atomic context flow or not when getting stats from QED driver.
-QED driver based on the context provided decide to schedule out or not
-when acquiring the PTT BAR window.
-
-We faced the BUG_ON() while getting vport stats, but according to the
-code same issue could happen for fcoe and iscsi statistics as well, so
-fixing them too.
-
-Fixes: 6c75424612a7 ("qed: Add support for NCSI statistics.")
-Fixes: 1e128c81290a ("qed: Add support for hardware offloaded FCoE.")
-Fixes: 2f2b2614e893 ("qed: Provide iSCSI statistics to management")
-Cc: Sudarsana Kalluru <skalluru@marvell.com>
-Cc: David Miller <davem@davemloft.net>
-Cc: Manish Chopra <manishc@marvell.com>
-
-Signed-off-by: Konstantin Khorenko <khorenko@virtuozzo.com>
-
+Fixes: a6024562ffd7 ("udp: Add GRO functions to UDP socket")
+Reported-by: Gal Pressman <gal@nvidia.com>
+Signed-off-by: Richard Gobert <richardbgobert@gmail.com>
 ---
-v1->v2:
- - Fixed kdoc for qed_get_protocol_stats_iscsi()
-   (added new arg description)
- - Added kdoc descriptions for qed_ptt_acquire_context(),
-   qed_get_protocol_stats_fcoe(), qed_get_vport_stats() and
-   qed_get_vport_stats_context()
----
- drivers/net/ethernet/qlogic/qed/qed_dev_api.h | 16 ++++++++++++
- drivers/net/ethernet/qlogic/qed/qed_fcoe.c    | 19 ++++++++++----
- drivers/net/ethernet/qlogic/qed/qed_fcoe.h    | 17 ++++++++++--
- drivers/net/ethernet/qlogic/qed/qed_hw.c      | 26 ++++++++++++++++---
- drivers/net/ethernet/qlogic/qed/qed_iscsi.c   | 19 ++++++++++----
- drivers/net/ethernet/qlogic/qed/qed_iscsi.h   |  8 ++++--
- drivers/net/ethernet/qlogic/qed/qed_l2.c      | 19 ++++++++++----
- drivers/net/ethernet/qlogic/qed/qed_l2.h      | 24 +++++++++++++++++
- drivers/net/ethernet/qlogic/qed/qed_main.c    |  6 ++---
- 9 files changed, 128 insertions(+), 26 deletions(-)
+ include/net/gro.h      | 43 ++++++++++++++++++++++++++++++++++++++++++
+ net/ipv4/udp.c         |  8 ++++++--
+ net/ipv4/udp_offload.c |  7 +++++--
+ net/ipv6/udp.c         |  8 ++++++--
+ net/ipv6/udp_offload.c |  7 +++++--
+ 5 files changed, 65 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/net/ethernet/qlogic/qed/qed_dev_api.h b/drivers/net/ethernet/qlogic/qed/qed_dev_api.h
-index f8682356d0cf..94d4f9413ab7 100644
---- a/drivers/net/ethernet/qlogic/qed/qed_dev_api.h
-+++ b/drivers/net/ethernet/qlogic/qed/qed_dev_api.h
-@@ -193,6 +193,22 @@ void qed_hw_remove(struct qed_dev *cdev);
-  */
- struct qed_ptt *qed_ptt_acquire(struct qed_hwfn *p_hwfn);
+diff --git a/include/net/gro.h b/include/net/gro.h
+index 75efa6fb8441..88644b3ca660 100644
+--- a/include/net/gro.h
++++ b/include/net/gro.h
+@@ -452,6 +452,49 @@ static inline void gro_normal_one(struct napi_struct *napi, struct sk_buff *skb,
+ 		gro_normal_list(napi);
+ }
  
-+/**
-+ * qed_ptt_acquire_context(): Allocate a PTT window honoring the context
-+ *			      atomicy.
++/* This function is the alternative of 'inet_iif' and 'inet_sdif'
++ * functions in case we can not rely on fields of IPCB.
 + *
-+ * @p_hwfn: HW device data.
-+ * @is_atomic: Hint from the caller - if the func can sleep or not.
-+ *
-+ * Context: The function should not sleep in case is_atomic == true.
-+ * Return: struct qed_ptt.
-+ *
-+ * Should be called at the entry point to the driver
-+ * (at the beginning of an exported function).
++ * The caller must verify skb_valid_dst(skb) is false and skb->dev is initialized.
++ * The caller must hold the RCU read lock.
 + */
-+struct qed_ptt *qed_ptt_acquire_context(struct qed_hwfn *p_hwfn,
-+					bool is_atomic);
-+
- /**
-  * qed_ptt_release(): Release PTT Window.
-  *
-diff --git a/drivers/net/ethernet/qlogic/qed/qed_fcoe.c b/drivers/net/ethernet/qlogic/qed/qed_fcoe.c
-index 3764190b948e..04602ac94708 100644
---- a/drivers/net/ethernet/qlogic/qed/qed_fcoe.c
-+++ b/drivers/net/ethernet/qlogic/qed/qed_fcoe.c
-@@ -693,13 +693,14 @@ static void _qed_fcoe_get_pstats(struct qed_hwfn *p_hwfn,
- }
- 
- static int qed_fcoe_get_stats(struct qed_hwfn *p_hwfn,
--			      struct qed_fcoe_stats *p_stats)
-+			      struct qed_fcoe_stats *p_stats,
-+			      bool is_atomic)
- {
- 	struct qed_ptt *p_ptt;
- 
- 	memset(p_stats, 0, sizeof(*p_stats));
- 
--	p_ptt = qed_ptt_acquire(p_hwfn);
-+	p_ptt = qed_ptt_acquire_context(p_hwfn, is_atomic);
- 
- 	if (!p_ptt) {
- 		DP_ERR(p_hwfn, "Failed to acquire ptt\n");
-@@ -973,19 +974,27 @@ static int qed_fcoe_destroy_conn(struct qed_dev *cdev,
- 					QED_SPQ_MODE_EBLOCK, NULL);
- }
- 
-+static int qed_fcoe_stats_context(struct qed_dev *cdev,
-+				  struct qed_fcoe_stats *stats,
-+				  bool is_atomic)
++static inline void inet_get_iif_sdif(const struct sk_buff *skb, int *iif, int *sdif)
 +{
-+	return qed_fcoe_get_stats(QED_AFFIN_HWFN(cdev), stats, is_atomic);
++	*iif = inet_iif(skb) ?: skb->dev->ifindex;
++	*sdif = 0;
++
++#if IS_ENABLED(CONFIG_NET_L3_MASTER_DEV)
++	if (netif_is_l3_slave(skb->dev)) {
++		struct net_device *master = netdev_master_upper_dev_get_rcu(skb->dev);
++
++		*sdif = *iif;
++		*iif = master ? master->ifindex : 0;
++	}
++#endif
 +}
 +
- static int qed_fcoe_stats(struct qed_dev *cdev, struct qed_fcoe_stats *stats)
- {
--	return qed_fcoe_get_stats(QED_AFFIN_HWFN(cdev), stats);
-+	return qed_fcoe_stats_context(cdev, stats, false);
- }
- 
- void qed_get_protocol_stats_fcoe(struct qed_dev *cdev,
--				 struct qed_mcp_fcoe_stats *stats)
-+				 struct qed_mcp_fcoe_stats *stats,
-+				 bool is_atomic)
- {
- 	struct qed_fcoe_stats proto_stats;
- 
- 	/* Retrieve FW statistics */
- 	memset(&proto_stats, 0, sizeof(proto_stats));
--	if (qed_fcoe_stats(cdev, &proto_stats)) {
-+	if (qed_fcoe_stats_context(cdev, &proto_stats, is_atomic)) {
- 		DP_VERBOSE(cdev, QED_MSG_STORAGE,
- 			   "Failed to collect FCoE statistics\n");
- 		return;
-diff --git a/drivers/net/ethernet/qlogic/qed/qed_fcoe.h b/drivers/net/ethernet/qlogic/qed/qed_fcoe.h
-index 19c85adf4ceb..214e8299ecb4 100644
---- a/drivers/net/ethernet/qlogic/qed/qed_fcoe.h
-+++ b/drivers/net/ethernet/qlogic/qed/qed_fcoe.h
-@@ -28,8 +28,20 @@ int qed_fcoe_alloc(struct qed_hwfn *p_hwfn);
- void qed_fcoe_setup(struct qed_hwfn *p_hwfn);
- 
- void qed_fcoe_free(struct qed_hwfn *p_hwfn);
-+/**
-+ * qed_get_protocol_stats_fcoe(): Fills provided statistics
-+ *				  struct with statistics.
++/* This function is the alternative of 'inet6_iif' and 'inet6_sdif'
++ * functions in case we can not rely on fields of IP6CB.
 + *
-+ * @cdev: Qed dev pointer.
-+ * @stats: Points to struct that will be filled with statistics.
-+ * @is_atomic: Hint from the caller - if the func can sleep or not.
-+ *
-+ * Context: The function should not sleep in case is_atomic == true.
-+ * Return: Void.
++ * The caller must verify skb_valid_dst(skb) is false and skb->dev is initialized.
++ * The caller must hold the RCU read lock.
 + */
- void qed_get_protocol_stats_fcoe(struct qed_dev *cdev,
--				 struct qed_mcp_fcoe_stats *stats);
-+				 struct qed_mcp_fcoe_stats *stats,
-+				 bool is_atomic);
- #else /* CONFIG_QED_FCOE */
- static inline int qed_fcoe_alloc(struct qed_hwfn *p_hwfn)
- {
-@@ -40,7 +52,8 @@ static inline void qed_fcoe_setup(struct qed_hwfn *p_hwfn) {}
- static inline void qed_fcoe_free(struct qed_hwfn *p_hwfn) {}
- 
- static inline void qed_get_protocol_stats_fcoe(struct qed_dev *cdev,
--					       struct qed_mcp_fcoe_stats *stats)
-+					       struct qed_mcp_fcoe_stats *stats,
-+					       bool is_atomic)
- {
- }
- #endif /* CONFIG_QED_FCOE */
-diff --git a/drivers/net/ethernet/qlogic/qed/qed_hw.c b/drivers/net/ethernet/qlogic/qed/qed_hw.c
-index 554f30b0cfd5..6263f847b6b9 100644
---- a/drivers/net/ethernet/qlogic/qed/qed_hw.c
-+++ b/drivers/net/ethernet/qlogic/qed/qed_hw.c
-@@ -23,7 +23,10 @@
- #include "qed_reg_addr.h"
- #include "qed_sriov.h"
- 
--#define QED_BAR_ACQUIRE_TIMEOUT 1000
-+#define QED_BAR_ACQUIRE_TIMEOUT_USLEEP_CNT	1000
-+#define QED_BAR_ACQUIRE_TIMEOUT_USLEEP		1000
-+#define QED_BAR_ACQUIRE_TIMEOUT_UDELAY_CNT	100000
-+#define QED_BAR_ACQUIRE_TIMEOUT_UDELAY		10
- 
- /* Invalid values */
- #define QED_BAR_INVALID_OFFSET          (cpu_to_le32(-1))
-@@ -84,12 +87,22 @@ void qed_ptt_pool_free(struct qed_hwfn *p_hwfn)
- }
- 
- struct qed_ptt *qed_ptt_acquire(struct qed_hwfn *p_hwfn)
++static inline void inet6_get_iif_sdif(const struct sk_buff *skb, int *iif, int *sdif)
 +{
-+	return qed_ptt_acquire_context(p_hwfn, false);
++	/* using skb->dev->ifindex because skb_dst(skb) is not initialized */
++	*iif = skb->dev->ifindex;
++	*sdif = 0;
++
++#if IS_ENABLED(CONFIG_NET_L3_MASTER_DEV)
++	if (netif_is_l3_slave(skb->dev)) {
++		struct net_device *master = netdev_master_upper_dev_get_rcu(skb->dev);
++
++		*sdif = *iif;
++		*iif = master ? master->ifindex : 0;
++	}
++#endif
 +}
 +
-+struct qed_ptt *qed_ptt_acquire_context(struct qed_hwfn *p_hwfn, bool is_atomic)
- {
- 	struct qed_ptt *p_ptt;
--	unsigned int i;
-+	unsigned int i, count;
-+
-+	if (is_atomic)
-+		count = QED_BAR_ACQUIRE_TIMEOUT_UDELAY_CNT;
-+	else
-+		count = QED_BAR_ACQUIRE_TIMEOUT_USLEEP_CNT;
+ extern struct list_head offload_base;
  
- 	/* Take the free PTT from the list */
--	for (i = 0; i < QED_BAR_ACQUIRE_TIMEOUT; i++) {
-+	for (i = 0; i < count; i++) {
- 		spin_lock_bh(&p_hwfn->p_ptt_pool->lock);
- 
- 		if (!list_empty(&p_hwfn->p_ptt_pool->free_list)) {
-@@ -105,7 +118,12 @@ struct qed_ptt *qed_ptt_acquire(struct qed_hwfn *p_hwfn)
- 		}
- 
- 		spin_unlock_bh(&p_hwfn->p_ptt_pool->lock);
--		usleep_range(1000, 2000);
-+
-+		if (is_atomic)
-+			udelay(QED_BAR_ACQUIRE_TIMEOUT_UDELAY);
-+		else
-+			usleep_range(QED_BAR_ACQUIRE_TIMEOUT_USLEEP,
-+				     QED_BAR_ACQUIRE_TIMEOUT_USLEEP * 2);
- 	}
- 
- 	DP_NOTICE(p_hwfn, "PTT acquire timeout - failed to allocate PTT\n");
-diff --git a/drivers/net/ethernet/qlogic/qed/qed_iscsi.c b/drivers/net/ethernet/qlogic/qed/qed_iscsi.c
-index 511ab214eb9c..980e7289b481 100644
---- a/drivers/net/ethernet/qlogic/qed/qed_iscsi.c
-+++ b/drivers/net/ethernet/qlogic/qed/qed_iscsi.c
-@@ -999,13 +999,14 @@ static void _qed_iscsi_get_pstats(struct qed_hwfn *p_hwfn,
- }
- 
- static int qed_iscsi_get_stats(struct qed_hwfn *p_hwfn,
--			       struct qed_iscsi_stats *stats)
-+			       struct qed_iscsi_stats *stats,
-+			       bool is_atomic)
- {
- 	struct qed_ptt *p_ptt;
- 
- 	memset(stats, 0, sizeof(*stats));
- 
--	p_ptt = qed_ptt_acquire(p_hwfn);
-+	p_ptt = qed_ptt_acquire_context(p_hwfn, is_atomic);
- 	if (!p_ptt) {
- 		DP_ERR(p_hwfn, "Failed to acquire ptt\n");
- 		return -EAGAIN;
-@@ -1336,9 +1337,16 @@ static int qed_iscsi_destroy_conn(struct qed_dev *cdev,
- 					   QED_SPQ_MODE_EBLOCK, NULL);
- }
- 
-+static int qed_iscsi_stats_context(struct qed_dev *cdev,
-+				   struct qed_iscsi_stats *stats,
-+				   bool is_atomic)
-+{
-+	return qed_iscsi_get_stats(QED_AFFIN_HWFN(cdev), stats, is_atomic);
-+}
-+
- static int qed_iscsi_stats(struct qed_dev *cdev, struct qed_iscsi_stats *stats)
- {
--	return qed_iscsi_get_stats(QED_AFFIN_HWFN(cdev), stats);
-+	return qed_iscsi_stats_context(cdev, stats, false);
- }
- 
- static int qed_iscsi_change_mac(struct qed_dev *cdev,
-@@ -1358,13 +1366,14 @@ static int qed_iscsi_change_mac(struct qed_dev *cdev,
- }
- 
- void qed_get_protocol_stats_iscsi(struct qed_dev *cdev,
--				  struct qed_mcp_iscsi_stats *stats)
-+				  struct qed_mcp_iscsi_stats *stats,
-+				  bool is_atomic)
- {
- 	struct qed_iscsi_stats proto_stats;
- 
- 	/* Retrieve FW statistics */
- 	memset(&proto_stats, 0, sizeof(proto_stats));
--	if (qed_iscsi_stats(cdev, &proto_stats)) {
-+	if (qed_iscsi_stats_context(cdev, &proto_stats, is_atomic)) {
- 		DP_VERBOSE(cdev, QED_MSG_STORAGE,
- 			   "Failed to collect ISCSI statistics\n");
- 		return;
-diff --git a/drivers/net/ethernet/qlogic/qed/qed_iscsi.h b/drivers/net/ethernet/qlogic/qed/qed_iscsi.h
-index dec2b00259d4..974cb8d26608 100644
---- a/drivers/net/ethernet/qlogic/qed/qed_iscsi.h
-+++ b/drivers/net/ethernet/qlogic/qed/qed_iscsi.h
-@@ -39,11 +39,14 @@ void qed_iscsi_free(struct qed_hwfn *p_hwfn);
-  *
-  * @cdev: Qed dev pointer.
-  * @stats: Points to struct that will be filled with statistics.
-+ * @is_atomic: Hint from the caller - if the func can sleep or not.
-  *
-+ * Context: The function should not sleep in case is_atomic == true.
-  * Return: Void.
-  */
- void qed_get_protocol_stats_iscsi(struct qed_dev *cdev,
--				  struct qed_mcp_iscsi_stats *stats);
-+				  struct qed_mcp_iscsi_stats *stats,
-+				  bool is_atomic);
- #else /* IS_ENABLED(CONFIG_QED_ISCSI) */
- static inline int qed_iscsi_alloc(struct qed_hwfn *p_hwfn)
- {
-@@ -56,7 +59,8 @@ static inline void qed_iscsi_free(struct qed_hwfn *p_hwfn) {}
- 
- static inline void
- qed_get_protocol_stats_iscsi(struct qed_dev *cdev,
--			     struct qed_mcp_iscsi_stats *stats) {}
-+			     struct qed_mcp_iscsi_stats *stats,
-+			     bool is_atomic) {}
- #endif /* IS_ENABLED(CONFIG_QED_ISCSI) */
- 
+ #endif /* _NET_IPV6_GRO_H */
+diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+index 8c3ebd95f5b9..1ee9e56dc79a 100644
+--- a/net/ipv4/udp.c
++++ b/net/ipv4/udp.c
+@@ -114,6 +114,7 @@
+ #include <net/sock_reuseport.h>
+ #include <net/addrconf.h>
+ #include <net/udp_tunnel.h>
++#include <net/gro.h>
+ #if IS_ENABLED(CONFIG_IPV6)
+ #include <net/ipv6_stubs.h>
  #endif
-diff --git a/drivers/net/ethernet/qlogic/qed/qed_l2.c b/drivers/net/ethernet/qlogic/qed/qed_l2.c
-index 7776d3bdd459..970b9aabbc3d 100644
---- a/drivers/net/ethernet/qlogic/qed/qed_l2.c
-+++ b/drivers/net/ethernet/qlogic/qed/qed_l2.c
-@@ -1863,7 +1863,8 @@ static void __qed_get_vport_stats(struct qed_hwfn *p_hwfn,
- }
- 
- static void _qed_get_vport_stats(struct qed_dev *cdev,
--				 struct qed_eth_stats *stats)
-+				 struct qed_eth_stats *stats,
-+				 bool is_atomic)
+@@ -555,10 +556,13 @@ struct sock *udp4_lib_lookup_skb(const struct sk_buff *skb,
  {
- 	u8 fw_vport = 0;
- 	int i;
-@@ -1872,10 +1873,11 @@ static void _qed_get_vport_stats(struct qed_dev *cdev,
+ 	const struct iphdr *iph = ip_hdr(skb);
+ 	struct net *net = dev_net(skb->dev);
++	int iif, sdif;
++
++	inet_get_iif_sdif(skb, &iif, &sdif);
  
- 	for_each_hwfn(cdev, i) {
- 		struct qed_hwfn *p_hwfn = &cdev->hwfns[i];
--		struct qed_ptt *p_ptt = IS_PF(cdev) ? qed_ptt_acquire(p_hwfn)
--						    :  NULL;
-+		struct qed_ptt *p_ptt;
- 		bool b_get_port_stats;
- 
-+		p_ptt = IS_PF(cdev) ? qed_ptt_acquire_context(p_hwfn, is_atomic)
-+				    : NULL;
- 		if (IS_PF(cdev)) {
- 			/* The main vport index is relative first */
- 			if (qed_fw_vport(p_hwfn, 0, &fw_vport)) {
-@@ -1900,6 +1902,13 @@ static void _qed_get_vport_stats(struct qed_dev *cdev,
+ 	return __udp4_lib_lookup(net, iph->saddr, sport,
+-				 iph->daddr, dport, inet_iif(skb),
+-				 inet_sdif(skb), net->ipv4.udp_table, NULL);
++				 iph->daddr, dport, iif,
++				 sdif, net->ipv4.udp_table, NULL);
  }
  
- void qed_get_vport_stats(struct qed_dev *cdev, struct qed_eth_stats *stats)
-+{
-+	qed_get_vport_stats_context(cdev, stats, false);
-+}
-+
-+void qed_get_vport_stats_context(struct qed_dev *cdev,
-+				 struct qed_eth_stats *stats,
-+				 bool is_atomic)
+ /* Must be called under rcu_read_lock().
+diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
+index 75aa4de5b731..d734f11e13cc 100644
+--- a/net/ipv4/udp_offload.c
++++ b/net/ipv4/udp_offload.c
+@@ -603,10 +603,13 @@ static struct sock *udp4_gro_lookup_skb(struct sk_buff *skb, __be16 sport,
  {
- 	u32 i;
- 
-@@ -1908,7 +1917,7 @@ void qed_get_vport_stats(struct qed_dev *cdev, struct qed_eth_stats *stats)
- 		return;
- 	}
- 
--	_qed_get_vport_stats(cdev, stats);
-+	_qed_get_vport_stats(cdev, stats, is_atomic);
- 
- 	if (!cdev->reset_stats)
- 		return;
-@@ -1960,7 +1969,7 @@ void qed_reset_vport_stats(struct qed_dev *cdev)
- 	if (!cdev->reset_stats) {
- 		DP_INFO(cdev, "Reset stats not allocated\n");
- 	} else {
--		_qed_get_vport_stats(cdev, cdev->reset_stats);
-+		_qed_get_vport_stats(cdev, cdev->reset_stats, false);
- 		cdev->reset_stats->common.link_change_count = 0;
- 	}
- }
-diff --git a/drivers/net/ethernet/qlogic/qed/qed_l2.h b/drivers/net/ethernet/qlogic/qed/qed_l2.h
-index a538cf478c14..2d2f82c785ad 100644
---- a/drivers/net/ethernet/qlogic/qed/qed_l2.h
-+++ b/drivers/net/ethernet/qlogic/qed/qed_l2.h
-@@ -249,8 +249,32 @@ qed_sp_eth_rx_queues_update(struct qed_hwfn *p_hwfn,
- 			    enum spq_mode comp_mode,
- 			    struct qed_spq_comp_cb *p_comp_data);
- 
-+/**
-+ * qed_get_vport_stats(): Fills provided statistics
-+ *			  struct with statistics.
-+ *
-+ * @cdev: Qed dev pointer.
-+ * @stats: Points to struct that will be filled with statistics.
-+ *
-+ * Return: Void.
-+ */
- void qed_get_vport_stats(struct qed_dev *cdev, struct qed_eth_stats *stats);
- 
-+/**
-+ * qed_get_vport_stats_context(): Fills provided statistics
-+ *				  struct with statistics.
-+ *
-+ * @cdev: Qed dev pointer.
-+ * @stats: Points to struct that will be filled with statistics.
-+ * @is_atomic: Hint from the caller - if the func can sleep or not.
-+ *
-+ * Context: The function should not sleep in case is_atomic == true.
-+ * Return: Void.
-+ */
-+void qed_get_vport_stats_context(struct qed_dev *cdev,
-+				 struct qed_eth_stats *stats,
-+				 bool is_atomic);
+ 	const struct iphdr *iph = skb_gro_network_header(skb);
+ 	struct net *net = dev_net(skb->dev);
++	int iif, sdif;
 +
- void qed_reset_vport_stats(struct qed_dev *cdev);
++	inet_get_iif_sdif(skb, &iif, &sdif);
  
- /**
-diff --git a/drivers/net/ethernet/qlogic/qed/qed_main.c b/drivers/net/ethernet/qlogic/qed/qed_main.c
-index f5af83342856..c278f8893042 100644
---- a/drivers/net/ethernet/qlogic/qed/qed_main.c
-+++ b/drivers/net/ethernet/qlogic/qed/qed_main.c
-@@ -3092,7 +3092,7 @@ void qed_get_protocol_stats(struct qed_dev *cdev,
+ 	return __udp4_lib_lookup(net, iph->saddr, sport,
+-				 iph->daddr, dport, inet_iif(skb),
+-				 inet_sdif(skb), net->ipv4.udp_table, NULL);
++				 iph->daddr, dport, iif,
++				 sdif, net->ipv4.udp_table, NULL);
+ }
  
- 	switch (type) {
- 	case QED_MCP_LAN_STATS:
--		qed_get_vport_stats(cdev, &eth_stats);
-+		qed_get_vport_stats_context(cdev, &eth_stats, true);
- 		stats->lan_stats.ucast_rx_pkts =
- 					eth_stats.common.rx_ucast_pkts;
- 		stats->lan_stats.ucast_tx_pkts =
-@@ -3100,10 +3100,10 @@ void qed_get_protocol_stats(struct qed_dev *cdev,
- 		stats->lan_stats.fcs_err = -1;
- 		break;
- 	case QED_MCP_FCOE_STATS:
--		qed_get_protocol_stats_fcoe(cdev, &stats->fcoe_stats);
-+		qed_get_protocol_stats_fcoe(cdev, &stats->fcoe_stats, true);
- 		break;
- 	case QED_MCP_ISCSI_STATS:
--		qed_get_protocol_stats_iscsi(cdev, &stats->iscsi_stats);
-+		qed_get_protocol_stats_iscsi(cdev, &stats->iscsi_stats, true);
- 		break;
- 	default:
- 		DP_VERBOSE(cdev, QED_MSG_SP,
+ INDIRECT_CALLABLE_SCOPE
+diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
+index b7c972aa09a7..e5da5d1cb215 100644
+--- a/net/ipv6/udp.c
++++ b/net/ipv6/udp.c
+@@ -51,6 +51,7 @@
+ #include <net/inet6_hashtables.h>
+ #include <net/busy_poll.h>
+ #include <net/sock_reuseport.h>
++#include <net/gro.h>
+ 
+ #include <linux/proc_fs.h>
+ #include <linux/seq_file.h>
+@@ -300,10 +301,13 @@ struct sock *udp6_lib_lookup_skb(const struct sk_buff *skb,
+ {
+ 	const struct ipv6hdr *iph = ipv6_hdr(skb);
+ 	struct net *net = dev_net(skb->dev);
++	int iif, sdif;
++
++	inet6_get_iif_sdif(skb, &iif, &sdif);
+ 
+ 	return __udp6_lib_lookup(net, &iph->saddr, sport,
+-				 &iph->daddr, dport, inet6_iif(skb),
+-				 inet6_sdif(skb), net->ipv4.udp_table, NULL);
++				 &iph->daddr, dport, iif,
++				 sdif, net->ipv4.udp_table, NULL);
+ }
+ 
+ /* Must be called under rcu_read_lock().
+diff --git a/net/ipv6/udp_offload.c b/net/ipv6/udp_offload.c
+index ad3b8726873e..31f12bd5d0fe 100644
+--- a/net/ipv6/udp_offload.c
++++ b/net/ipv6/udp_offload.c
+@@ -119,10 +119,13 @@ static struct sock *udp6_gro_lookup_skb(struct sk_buff *skb, __be16 sport,
+ {
+ 	const struct ipv6hdr *iph = skb_gro_network_header(skb);
+ 	struct net *net = dev_net(skb->dev);
++	int iif, sdif;
++
++	inet6_get_iif_sdif(skb, &iif, &sdif);
+ 
+ 	return __udp6_lib_lookup(net, &iph->saddr, sport,
+-				 &iph->daddr, dport, inet6_iif(skb),
+-				 inet6_sdif(skb), net->ipv4.udp_table, NULL);
++				 &iph->daddr, dport, iif,
++				 sdif, net->ipv4.udp_table, NULL);
+ }
+ 
+ INDIRECT_CALLABLE_SCOPE
 -- 
-2.31.1
+2.36.1
 
 
