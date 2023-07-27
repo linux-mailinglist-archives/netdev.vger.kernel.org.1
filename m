@@ -1,136 +1,116 @@
-Return-Path: <netdev+bounces-21937-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21938-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9501F76553B
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 15:37:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F90A76553C
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 15:38:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 511B228237C
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 13:37:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 177C32823B6
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 13:38:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E7EF17AA5;
-	Thu, 27 Jul 2023 13:36:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3463174D4;
+	Thu, 27 Jul 2023 13:36:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3401B17AA1
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 13:36:34 +0000 (UTC)
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [IPv6:2a0a:51c0:0:237:300::1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04E832728;
-	Thu, 27 Jul 2023 06:36:33 -0700 (PDT)
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@breakpoint.cc>)
-	id 1qP1AK-0003FC-UA; Thu, 27 Jul 2023 15:36:28 +0200
-From: Florian Westphal <fw@strlen.de>
-To: <netdev@vger.kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7234174C5
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 13:36:48 +0000 (UTC)
+Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0A922728;
+	Thu, 27 Jul 2023 06:36:47 -0700 (PDT)
+Received: by mail-pg1-x534.google.com with SMTP id 41be03b00d2f7-55b5a37acb6so127003a12.0;
+        Thu, 27 Jul 2023 06:36:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1690465007; x=1691069807;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=xOaiTAn8rGdkF5zlwNwyGQldTdN+p5xKE7WTqru15pI=;
+        b=pMLpHBb6BmMtboe1C4sJxIkYr8dNkmU+gKItdL4KdTIAwZPMTR2WEHApDlsNV/exj1
+         vy0HrrjjphyqbyWiPKGTuaxEYwpOglO2en25CdqUE9j5dhZ2a59goHyfmFznLDJueic8
+         Ftx/ZuOfCZHWqLSYtBEVxldkYBeqd0YopDBzFV/paNo8mbOFGRNRgi9/5tupwMfANpMu
+         Df5wCQmmFutdRrUMGt0Ju9G8B7vYQyrMyTlUYpmo1Vx4/K6QxFP5PUyUNLbfG4gtky2Y
+         diAvLRVMBLWfPAkZ1CxES0UoHywH5CDidcKxVnCputXmfMZgTGXQesEw+D8ECKrNFyrc
+         ZtCw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690465007; x=1691069807;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xOaiTAn8rGdkF5zlwNwyGQldTdN+p5xKE7WTqru15pI=;
+        b=XuncTDNiJJMMnenuVaL7XM87dP7qbbFITrDHRRc/yffV8+gkRWYJn9e5MgmVk2UyRa
+         d6fIlwtGFTND0xFfPMaDEEexFhh2aDaUCss2o0alIwdJhKUaMh/ArWOGzDpHs4fXbep+
+         s8SeWTV1jMOgNFSbxQISBGzbh+0pqGPp3MDa6sNI534lDm1LzgdDS7h7syzq64fm6M1z
+         lAVajiySOhyoU0ZmmELatNuvIYjodNgQuJ2Iqaj1pf12qqnRhU4IFagzZch0GTV4FUWL
+         YItLb3Q6e37VQfMK2i1x44DYw1RHwR0a71dl5WnnpG+68327P3SOe50U2QFImND0Oswn
+         TyJQ==
+X-Gm-Message-State: ABy/qLZlY4SoZnKS+TLeyMbazxUlB+KYHR0UOL3qd7tGjhSMzWVEv1c7
+	nFFgsWHJNqvz3K4XLBONkUg=
+X-Google-Smtp-Source: APBJJlHCafwH9S3OPhpqA+8W7Lczg5j327l0RTvLcvMbx0d1mOFIr6oHUvQ+C0fUqmdUivM04gTd/g==
+X-Received: by 2002:a17:90a:1189:b0:263:f36e:d610 with SMTP id e9-20020a17090a118900b00263f36ed610mr4812722pja.0.1690465007141;
+        Thu, 27 Jul 2023 06:36:47 -0700 (PDT)
+Received: from hoboy.vegasvil.org ([2601:640:8000:54:e2d5:5eff:fea5:802f])
+        by smtp.gmail.com with ESMTPSA id fy16-20020a17090b021000b00267f9bf21ebsm2899810pjb.0.2023.07.27.06.36.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Jul 2023 06:36:46 -0700 (PDT)
+Date: Thu, 27 Jul 2023 06:36:43 -0700
+From: Richard Cochran <richardcochran@gmail.com>
+To: Johannes Zink <j.zink@pengutronix.de>
+Cc: Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	<netfilter-devel@vger.kernel.org>,
-	Jeremy Sowden <jeremy@azazel.net>
-Subject: [PATCH net-next 5/5] lib/ts_bm: add helper to reduce indentation and improve readability
-Date: Thu, 27 Jul 2023 15:36:00 +0200
-Message-ID: <20230727133604.8275-6-fw@strlen.de>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230727133604.8275-1-fw@strlen.de>
-References: <20230727133604.8275-1-fw@strlen.de>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Russell King <linux@armlinux.org.uk>, patchwork-jzi@pengutronix.de,
+	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	kernel@pengutronix.de, kernel test robot <lkp@intel.com>
+Subject: Re: [PATCH v2] net: stmmac: correct MAC propagation delay
+Message-ID: <ZMJy6yt4CL250x6Q@hoboy.vegasvil.org>
+References: <20230719-stmmac_correct_mac_delay-v2-1-3366f38ee9a6@pengutronix.de>
+ <ZMGIuKVP7BEotbrn@hoboy.vegasvil.org>
+ <729dd79e-83aa-0237-1edd-1662a6ae28cd@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_MED,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <729dd79e-83aa-0237-1edd-1662a6ae28cd@pengutronix.de>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Jeremy Sowden <jeremy@azazel.net>
+On Thu, Jul 27, 2023 at 09:20:10AM +0200, Johannes Zink wrote:
+> Hi Richard,
+> 
+> On 7/26/23 22:57, Richard Cochran wrote:
+> > On Mon, Jul 24, 2023 at 12:01:31PM +0200, Johannes Zink wrote:
+> > 
+> > Earlier versions of the IP core return zero from these...
+> > 
+> > > +#define	PTP_TS_INGR_LAT	0x68	/* MAC internal Ingress Latency */
+> > > +#define	PTP_TS_EGR_LAT	0x6c	/* MAC internal Egress Latency */
+> > 
+> 
+> good catch. Gonna send a v3 with a check to and set the values for dwmac v5 only.
 
-The flow-control of `bm_find` is very deeply nested with a conditional
-comparing a ternary expression against the pattern inside a for-loop
-inside a while-loop inside a for-loop.
+AFAICT there is no feature bit that indicates the presence or absence
+of these two registers.
 
-Move the inner for-loop into a helper function to reduce the amount of
-indentation and make the code easier to read.
+Are you sure that *all* v5 IP cores have these?
 
-Fix indentation and trailing white-space in preceding debug logging
-statement.
+I am not sure.
 
-Signed-off-by: Jeremy Sowden <jeremy@azazel.net>
-Signed-off-by: Florian Westphal <fw@strlen.de>
----
- lib/ts_bm.c | 43 ++++++++++++++++++++++++++++++-------------
- 1 file changed, 30 insertions(+), 13 deletions(-)
-
-diff --git a/lib/ts_bm.c b/lib/ts_bm.c
-index c8ecbf74ef29..e5f30f9177df 100644
---- a/lib/ts_bm.c
-+++ b/lib/ts_bm.c
-@@ -55,6 +55,24 @@ struct ts_bm
- 	unsigned int	good_shift[];
- };
- 
-+static unsigned int matchpat(const u8 *pattern, unsigned int patlen,
-+			     const u8 *text, bool icase)
-+{
-+	unsigned int i;
-+
-+	for (i = 0; i < patlen; i++) {
-+		u8 t = *(text-i);
-+
-+		if (icase)
-+			t = toupper(t);
-+
-+		if (t != *(pattern-i))
-+			break;
-+	}
-+
-+	return i;
-+}
-+
- static unsigned int bm_find(struct ts_config *conf, struct ts_state *state)
- {
- 	struct ts_bm *bm = ts_config_priv(conf);
-@@ -72,19 +90,18 @@ static unsigned int bm_find(struct ts_config *conf, struct ts_state *state)
- 			break;
- 
- 		while (shift < text_len) {
--			DEBUGP("Searching in position %d (%c)\n", 
--				shift, text[shift]);
--			for (i = 0; i < bm->patlen; i++) 
--				if ((icase ? toupper(text[shift-i])
--				    : text[shift-i])
--					!= bm->pattern[bm->patlen-1-i])
--				     goto next;
--
--			/* London calling... */
--			DEBUGP("found!\n");
--			return consumed + (shift-(bm->patlen-1));
--
--next:			bs = bm->bad_shift[text[shift-i]];
-+			DEBUGP("Searching in position %d (%c)\n",
-+			       shift, text[shift]);
-+
-+			i = matchpat(&bm->pattern[bm->patlen-1], bm->patlen,
-+				     &text[shift], icase);
-+			if (i == bm->patlen) {
-+				/* London calling... */
-+				DEBUGP("found!\n");
-+				return consumed + (shift-(bm->patlen-1));
-+			}
-+
-+			bs = bm->bad_shift[text[shift-i]];
- 
- 			/* Now jumping to... */
- 			shift = max_t(int, shift-i+bs, shift+bm->good_shift[i]);
--- 
-2.41.0
-
+Thanks,
+Richard
 
