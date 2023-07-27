@@ -1,321 +1,220 @@
-Return-Path: <netdev+bounces-21919-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21920-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF972765463
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 14:53:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A827976547B
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 15:03:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6F092282339
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 12:53:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A808E1C21653
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 13:03:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D09C16439;
-	Thu, 27 Jul 2023 12:52:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1704168DE;
+	Thu, 27 Jul 2023 13:03:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BCC0FBFA
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 12:52:22 +0000 (UTC)
-Received: from mail-qt1-x830.google.com (mail-qt1-x830.google.com [IPv6:2607:f8b0:4864:20::830])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38DF435AD
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 05:52:09 -0700 (PDT)
-Received: by mail-qt1-x830.google.com with SMTP id d75a77b69052e-4036bd4fff1so281981cf.0
-        for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 05:52:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690462328; x=1691067128;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KbxwpGLeivztqxhT2pHp7OuwmFwsVMzhXAPdU1zv9GA=;
-        b=Lvt2cKI9qFID5RbTZBmLZjRkz9/TwbH5efMSCwbgg7Rhwksk8666j/QVe88nc7sOvL
-         x0RqujN8l8EpxLlfgcSUIp6SWDZMz55FA5ylBXGCxJRflXMXYhNVx9Tp9icffxvuNsWi
-         rt16IcN8mgnG7LbmUatpCjxBMLgZSgLAPWo2LSJWizs2vgJSa9Lt5Awz251+ipzxQfcI
-         Nwmlqf7pQYKreyvpvRIxpzf9pQHiB+UYwOtZOwpavGC0Y/RRwpNJIOPmYL93l1qMYwBK
-         J8Ogoe+L9O1ZUuCTHxtmklX2oXiDWNw54ILWsYE/oXuLMyWkUhQNPNY4NhhtkCI6ObDk
-         I41A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690462328; x=1691067128;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KbxwpGLeivztqxhT2pHp7OuwmFwsVMzhXAPdU1zv9GA=;
-        b=ABCWL1FqT/EnG66rPhejMEy7Ul55isAkgsiGzV/hcSqYQFQb/ZxuRTRiilTyDNEDrI
-         Tuov+UBa8luLwd4G0hU8h8bpl2yE+myPbpqSJjYGI0mT3TxWfgtlabS3ss9GbAfM4y3F
-         BiNo3vnHck8cJ3nE0W4X5VZ0mTDJLcsP0YbXjNogCXQOIKaGJGLgWgQ/ROizDsQln7vh
-         8H7/TCxThbJpZsj0CLztwRFv2kne/xsXH3mmTUuogvLjbQM2kFewI0MpkF+zHCnnmZc8
-         zP8suM6GeoLCJJM5bbHID7wRV0BFw/c5TEFzEqyaFKfgooVifRCg6oSQ8TR6dvrdRzNP
-         +tIw==
-X-Gm-Message-State: ABy/qLa0mPh11PW8hlyQ+eBvKyoJu1wUuiGFx1i9sPjXyLvkXt6B8a10
-	gZyjFFQaAHN/dVCySieY5CgZiY/plfS+JJRAuvwCeA==
-X-Google-Smtp-Source: APBJJlGMB1mkXIvDQVCrQP5SaakFkJG9H8POfSzZ1z72Mb5c+IZJCcHQxDsDa2F59AbrsX/GTQ1cPVxyboKJrAkykJc=
-X-Received: by 2002:a05:622a:349:b0:3f6:97b4:1a4d with SMTP id
- r9-20020a05622a034900b003f697b41a4dmr168798qtw.23.1690462327659; Thu, 27 Jul
- 2023 05:52:07 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7995168C7
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 13:03:55 +0000 (UTC)
+Received: from EUR02-VI1-obe.outbound.protection.outlook.com (mail-vi1eur02on2088.outbound.protection.outlook.com [40.107.241.88])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 169DC1FFA
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 06:03:54 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=FycEWn/AXSdMwJ7qZf4HVJ3xIliAyv8n72x4JYSgd2DrOdTJpXpHtjOxNTEjEXqv71HzUaj5pmO5dF3uuR0yvX+T+/8pE0kWILpwjNFRMo1xAInnALM4nRrOc2CMaEs5Rv3S+MecIjqG3RY5T09HSQM9ZVxFC1mAsmYQ/u2nwP6JCBlF5dIOdB273ju2nxEEvOecriDP/auTjjHm45PM8Zw99EI9+Ar/ervmLYZbuUmolziQ8CVR6ETnLpDNmpaCeLGGc/NNmGK01FZsC2pTki1iWvvEAbpcPntj/kfa7PVVrnG2yFMroUN7gYy18NmjlQlctJO9qdnxkoIahEt3rQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Do725Fiepu5OmUk/Z1tOeu5Hay3MCEG01AWJKETBCqY=;
+ b=Pf6w5wRNk5gT+P6EYUyRx+K4fn5cFAqkAqQC+4cr7fLi0X6W/banUG0EbfxQKD4peoLQPJ+KovK0Iz/Pcp72rF9p1+pUwfR1xz/qhXfNiH+gxc2VR7no8z1sKnVBBx+YhQ+b10HmD4g0uOpIdS6v5x5oR+RpXbLGmxQ2pdBaqnIXXiCMAiqTiENh1iON4ntVma17jbH2BxU+S637p8dXkpmZUJRSYo0Umf/jGJl8Gh9kdIF59Ahe2Gpe0NzlgSGuguczAzVuEUCyZtChw/carpQAjTf7EQMpT2d/xg2yn/j5ec3HWFjnLFCb8UfF2VNMWO3QnhYRaspFnSE0Y5KgOQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Do725Fiepu5OmUk/Z1tOeu5Hay3MCEG01AWJKETBCqY=;
+ b=NMuTZb7zvNHo3YEh4V4RVLGsWeCgG44c4DUaydxZYY7iN1hc7I2ubv7A8CrIo0dw8Ftt32vloMJPUjh9kFU9D3C9N76Btoy4GgszaY+z6+jR81a7K8GM0tQtK63g4An/SFJnci5QpfBLedaXL1npQZeehNkbdean33OrHAvBL7M=
+Received: from PAXPR04MB9185.eurprd04.prod.outlook.com (2603:10a6:102:231::11)
+ by AM8PR04MB7938.eurprd04.prod.outlook.com (2603:10a6:20b:24e::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.29; Thu, 27 Jul
+ 2023 13:03:50 +0000
+Received: from PAXPR04MB9185.eurprd04.prod.outlook.com
+ ([fe80::d4ee:8daa:92f4:9671]) by PAXPR04MB9185.eurprd04.prod.outlook.com
+ ([fe80::d4ee:8daa:92f4:9671%3]) with mapi id 15.20.6631.026; Thu, 27 Jul 2023
+ 13:03:50 +0000
+From: Shenwei Wang <shenwei.wang@nxp.com>
+To: Russell King <linux@armlinux.org.uk>
+CC: Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin
+	<mcoquelin.stm32@gmail.com>, Shawn Guo <shawnguo@kernel.org>, dl-linux-imx
+	<linux-imx@nxp.com>, Giuseppe Cavallaro <peppe.cavallaro@st.com>, Alexandre
+ Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>,
+	Sascha Hauer <s.hauer@pengutronix.de>, Pengutronix Kernel Team
+	<kernel@pengutronix.de>, Fabio Estevam <festevam@gmail.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-stm32@st-md-mailman.stormreply.com"
+	<linux-stm32@st-md-mailman.stormreply.com>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "imx@lists.linux.dev"
+	<imx@lists.linux.dev>, Frank Li <frank.li@nxp.com>
+Subject: RE: [EXT] Re: [PATCH] net: stmmac: dwmac-imx: pause the TXC clock in
+ fixed-link
+Thread-Topic: [EXT] Re: [PATCH] net: stmmac: dwmac-imx: pause the TXC clock in
+ fixed-link
+Thread-Index:
+ AQHZvzEtwr0cB5x9EUCXrQC85+we9K/LNgwAgADv2GCAAAekgIAABiMwgAATfwCAABs2cIAABq2AgAACNGCAAOd3gIAAQuuQ
+Date: Thu, 27 Jul 2023 13:03:50 +0000
+Message-ID:
+ <PAXPR04MB91859AE9A323EA6929F1D02F8901A@PAXPR04MB9185.eurprd04.prod.outlook.com>
+References: <20230725194931.1989102-1-shenwei.wang@nxp.com>
+ <20230726004338.6i354ue576hb35of@skbuf>
+ <PAXPR04MB9185C1A95E101AC2E08639B78900A@PAXPR04MB9185.eurprd04.prod.outlook.com>
+ <ZME71epmSHYIB4DZ@shell.armlinux.org.uk>
+ <PAXPR04MB91856018959FE0752F1A27888900A@PAXPR04MB9185.eurprd04.prod.outlook.com>
+ <ZMFRVtg5WQyGlBJ1@shell.armlinux.org.uk>
+ <PAXPR04MB9185108CB4A04C4CD5AE29FC8900A@PAXPR04MB9185.eurprd04.prod.outlook.com>
+ <ZMFtw0LNozhNjRGF@shell.armlinux.org.uk>
+ <PAXPR04MB91855E5990464A1B31058B508900A@PAXPR04MB9185.eurprd04.prod.outlook.com>
+ <ZMIxx2TkW2Ry4AoR@shell.armlinux.org.uk>
+In-Reply-To: <ZMIxx2TkW2Ry4AoR@shell.armlinux.org.uk>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PAXPR04MB9185:EE_|AM8PR04MB7938:EE_
+x-ms-office365-filtering-correlation-id: a127d848-d52d-4c55-df21-08db8ea1ebf2
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ mTI2WRxWdrkyyPKfleVI7sXV/NKnTuGlqPyyHK2dRHmbYMJ5xuFrrlaONh7Mue9STu8XTfpd5FR5BLAjpz4tACPV4q6ZM0+O6plKGbNdBAOfxzBkjBgxd3FwTaUdeNRZM5uwvPzWpgcUr+kOpis18f2DqkvLvXwZr1YuAaAOMp3hl2CDkHXYziOCruxdkItjy7vUcIgAPA/OtJ1iu2ripsmB5lIZ+mchIGkez75GITBoQgE7V9g3XA3uE4MovAsnA3WRy2Bm3AMWm8Txpm5HMenwQ+IP75pXPg9LNaqCNbjSF9Q5MxR4fq3mHLwkHQJ0DxtVZ3lKhSs4U3mMbyz1YtDEK1JbSBtpeaQ0H/EHPtFSKpBiE0MXjyv4wJ6tRvjyHHwvQ2gTzp8P/BGVeEa08NAZlEv++b3NpF49AV23M/ab8Op05cDIQLmDtdooBBl6M6CH/SE52j70pRk+MM+z4zCQGBVa4trwnI3yXVS5vujf6YEugL7dROdACjWoU4t96Vu/5TeObPa/QCm9I4E2WUC4fwpzXzJ4QhWbL8cjQ4X2TP+h3pZHMKUd5gx5fd1150QYbu1XIbxygisQjE4TvIz31dye0bLin1uUHy3Ai6w=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB9185.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(136003)(366004)(376002)(346002)(396003)(39860400002)(451199021)(71200400001)(7696005)(45080400002)(478600001)(83380400001)(6506007)(26005)(53546011)(55236004)(9686003)(966005)(4326008)(64756008)(6916009)(66446008)(122000001)(54906003)(66476007)(76116006)(66946007)(66556008)(38100700002)(186003)(5660300002)(52536014)(44832011)(7416002)(38070700005)(316002)(33656002)(8936002)(8676002)(2906002)(41300700001)(86362001)(55016003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?5t5lqreEz1sBR15/2AtET2HRb7+WbzoLVc8+YfbyihZqWcYCCKvzlCe7gsOA?=
+ =?us-ascii?Q?Bzhtn1EiYXLJewGJ7APQOeFFj+FjCPYjoQR7hT1BiBxiqphzucyiKWp9R8CM?=
+ =?us-ascii?Q?3T6q9JQHC4MtGzSu2sx1zyIal0EAFGYD+iqfBGrBiYNLmozOn8Bq/bRpcOGE?=
+ =?us-ascii?Q?gRyb5FYfiSF3V9elnVIiaRqSoKRR3nW4zXkgXTtyIALxUIPFfXb/UIyeEo3Y?=
+ =?us-ascii?Q?7B3YD6Ej9jAut9xxPQtMDLj/fBMqKjcB878RNREqSvz558KeP26O4PxNj/YX?=
+ =?us-ascii?Q?a4YmGqnOWEL2rh8eZApK+ysx22MLjzEVfLbpQf21cR4/m8zIXWOXz9RJcRWQ?=
+ =?us-ascii?Q?J3Cqe/tZfTKxlviXifYMMt2MeBKtS0jQbl9wOO/J734tUdkve6vci5pEd5Yg?=
+ =?us-ascii?Q?nnLQI/2ownuBAjnMCyPKekKb7a++tYKeQ0Abhng6XLEeno4QC7ISYRfLo5f1?=
+ =?us-ascii?Q?7gFkCvHqDmGs4dhkF26N887NqBBnllUJFabBteL5QTM7I4VFkMGri2om3K5s?=
+ =?us-ascii?Q?1SQKSlvgLsCbg2ETitc0Sx7fqO8ctsRUx1ltBTsSwJ1mEmZ++9dOxCV3z3Nm?=
+ =?us-ascii?Q?DbuNh1zdMYkRMMthw1+boHuG91jqBW9uODWKfdojgxzIcXcUYO21HRDiD2uM?=
+ =?us-ascii?Q?iaf6kAvq8I4uCoUbHErMy6SXjMSW7Luu4BnajhaX+NI0GBlf1kxAGXIjouM0?=
+ =?us-ascii?Q?L+qYBDpgDYyJa2zqOyznx56Fa6vCP/pf/8nTwbLnsooYB/AGqFQYWu0PNb8B?=
+ =?us-ascii?Q?vXULBXDhxPdbAGzuDQ9ZZijWUQidgCXTqnoLbUPtocp89JymCQvvXDARdJjf?=
+ =?us-ascii?Q?TYhwwA7qy58pc8DPTTKuwyimPQAfwcb4i+gMiovWxn/yuKjW+GAsyGWYfPYA?=
+ =?us-ascii?Q?/pFZHO2QPfHMqEke1YedpXqrzNX3lh1Kh6pMeLwQwowb0Njl1ByZTcILEXxA?=
+ =?us-ascii?Q?ezoGD8RsxdgSxk3RCMvlcciaYAegHLPP/sgBx3p8R/WFILl7bVhJuzTxhroP?=
+ =?us-ascii?Q?xRIPGRBRkTUwqUF2dj6vGulr/imEp2oy2anYJuHptMzyuOjizV7oSOaKiBBv?=
+ =?us-ascii?Q?dDDXUdwm7Yx/kldLM+6FrQG/U161BO6u1/4K14tOCKzasSQc4dWHXSauTbsm?=
+ =?us-ascii?Q?gTgQk7cvd5VG7YXOP/UcwQa60MFTOf/qWGQoWUYxg2WCl5UyC0iG4f6qBK8I?=
+ =?us-ascii?Q?sXxZImQyauDqm9KkUUW1lfjn/xmnI+Ch/u6VeENCpIIh/jX4tfg/F0UyKl08?=
+ =?us-ascii?Q?3lU3ZENh+oF3cnQq+gV1ByVpYg/7rvEuTO/H0+TplTcoPOe02T4QiaWCNYo+?=
+ =?us-ascii?Q?WVWP1UKdzqPohRf04Sfvrq55XGiT8Z/VI0BumW4RQR8FltKuPVauORFo3h0Z?=
+ =?us-ascii?Q?9VK8sAm4gvu9HS4jy+eBCFO6NWzogjW+yh241vf64EeSnsjaeDuIyiTbbdjx?=
+ =?us-ascii?Q?QEUnNCMpNVhepAgV4YgiS/pHuo20A0zia6w3AYYuYr/ljh/PhYyNSTg0wxN0?=
+ =?us-ascii?Q?frdaV/YpaGhT3uYxecDHecRO05xE3xS4Wk1Nx5QJpzFApiH7JGASqkWx9gBr?=
+ =?us-ascii?Q?xiCiN+pUj/bBSWj2GwfnUDyKcVmlIiBpJi7d/1GR?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230726230701.919212-1-prohr@google.com>
-In-Reply-To: <20230726230701.919212-1-prohr@google.com>
-From: =?UTF-8?Q?Maciej_=C5=BBenczykowski?= <maze@google.com>
-Date: Thu, 27 Jul 2023 14:51:55 +0200
-Message-ID: <CANP3RGfYiAyXTp4yPX42eOSsob0Hzt50+6X6UwRpwYajPvdUqw@mail.gmail.com>
-Subject: Re: [net-next v2] net: change accept_ra_min_rtr_lft to affect all RA lifetimes
-To: Patrick Rohr <prohr@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, 
-	Linux Network Development Mailing List <netdev@vger.kernel.org>, Lorenzo Colitti <lorenzo@google.com>, 
-	David Ahern <dsahern@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB9185.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a127d848-d52d-4c55-df21-08db8ea1ebf2
+X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Jul 2023 13:03:50.2398
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Dq19CfAo9i8X0Nurs14eQ/CCYd1B9z20K0J9YYBgcKvTMB9G6CqHB2KKbdZRlOndeKg+UXk3dwdRCcKLWpcPDA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM8PR04MB7938
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Jul 27, 2023 at 1:07=E2=80=AFAM Patrick Rohr <prohr@google.com> wro=
-te:
+
+
+> -----Original Message-----
+> From: Russell King <linux@armlinux.org.uk>
+> Sent: Thursday, July 27, 2023 3:59 AM
+> To: Shenwei Wang <shenwei.wang@nxp.com>
+> Cc: Vladimir Oltean <olteanv@gmail.com>; David S. Miller
+> <davem@davemloft.net>; Eric Dumazet <edumazet@google.com>; Jakub
+> Kicinski <kuba@kernel.org>; Paolo Abeni <pabeni@redhat.com>; Maxime
+> Coquelin <mcoquelin.stm32@gmail.com>; Shawn Guo <shawnguo@kernel.org>;
+> dl-linux-imx <linux-imx@nxp.com>; Giuseppe Cavallaro
+> <peppe.cavallaro@st.com>; Alexandre Torgue <alexandre.torgue@foss.st.com>=
+;
+> Jose Abreu <joabreu@synopsys.com>; Sascha Hauer <s.hauer@pengutronix.de>;
+> Pengutronix Kernel Team <kernel@pengutronix.de>; Fabio Estevam
+> <festevam@gmail.com>; netdev@vger.kernel.org; linux-stm32@st-md-
+> mailman.stormreply.com; linux-arm-kernel@lists.infradead.org;
+> imx@lists.linux.dev; Frank Li <frank.li@nxp.com>
+> Subject: Re: [EXT] Re: [PATCH] net: stmmac: dwmac-imx: pause the TXC cloc=
+k in
+> fixed-link
 >
-> accept_ra_min_rtr_lft only considered the lifetime of the default route
-> and discarded entire RAs accordingly.
+> Caution: This is an external email. Please take care when clicking links =
+or
+> opening attachments. When in doubt, report the message using the 'Report =
+this
+> email' button
 >
-> This change renames accept_ra_min_rtr_lft to accept_ra_min_lft, and
-> applies the value to individual RA sections; in particular, router
-> lifetime, PIO preferred lifetime, and RIO lifetime. If any of those
-> lifetimes are lower than the configured value, the specific RA section
-> is ignored.
 >
-> In order for the sysctl to be useful to Android, it should really apply
-> to all lifetimes in the RA, since that is what determines the minimum
-> frequency at which RAs must be processed by the kernel. Android uses
-> hardware offloads to drop RAs for a fraction of the minimum of all
-> lifetimes present in the RA (some networks have very frequent RAs (5s)
-> with high lifetimes (2h)). Despite this, we have encountered networks
-> that set the router lifetime to 30s which results in very frequent CPU
-> wakeups. Instead of disabling IPv6 (and dropping IPv6 ethertype in the
-> WiFi firmware) entirely on such networks, it seems better to ignore the
-> misconfigured routers while still processing RAs from other IPv6 routers
-> on the same network (i.e. to support IoT applications).
+> On Wed, Jul 26, 2023 at 07:17:59PM +0000, Shenwei Wang wrote:
+> > > Because of_phy_is_fixed_link() has to chase various pointers, walk
+> > > the child nodes and do a string compare on each, whereas you could
+> > > just be testing an integer!
+> > >
+> >
+> > I don't think It's worth the effort to change the definition of
+> > fix_mac_speed across all platforms, because the function is only called=
+ once
+> when the interface is up.
 >
-> The previous implementation dropped the entire RA based on router
-> lifetime. This turned out to be hard to expand to the other lifetimes
-> present in the RA in a consistent manner; dropping the entire RA based
-> on RIO/PIO lifetimes would essentially require parsing the whole thing
-> twice.
+> If you look at Feiyang Chen's patch set, then his first patch of his set =
+adds a
+> pointer to struct stmmac_priv to a whole bunch of callbacks used between =
+the
+> stmmac core and the various implementations.
 >
-> Fixes: 1671bcfd76fd ("net: add sysctl accept_ra_min_rtr_lft")
-> Cc: Maciej =C5=BBenczykowski <maze@google.com>
-> Cc: Lorenzo Colitti <lorenzo@google.com>
-> Cc: David Ahern <dsahern@kernel.org>
-> Signed-off-by: Patrick Rohr <prohr@google.com>
-> ---
->  Documentation/networking/ip-sysctl.rst |  8 ++++----
->  include/linux/ipv6.h                   |  2 +-
->  include/uapi/linux/ipv6.h              |  2 +-
->  net/ipv6/addrconf.c                    | 14 ++++++++-----
->  net/ipv6/ndisc.c                       | 27 +++++++++++---------------
->  5 files changed, 26 insertions(+), 27 deletions(-)
+> If you're not willing to do it, then I will send a patch instead.
 >
-> diff --git a/Documentation/networking/ip-sysctl.rst b/Documentation/netwo=
-rking/ip-sysctl.rst
-> index 37603ad6126b..a66054d0763a 100644
-> --- a/Documentation/networking/ip-sysctl.rst
-> +++ b/Documentation/networking/ip-sysctl.rst
-> @@ -2288,11 +2288,11 @@ accept_ra_min_hop_limit - INTEGER
+> I don't see what the problem is.
 >
->         Default: 1
->
-> -accept_ra_min_rtr_lft - INTEGER
-> -       Minimum acceptable router lifetime in Router Advertisement.
-> +accept_ra_min_lft - INTEGER
-> +       Minimum acceptable lifetime value in Router Advertisement.
->
-> -       RAs with a router lifetime less than this value shall be
-> -       ignored. RAs with a router lifetime of 0 are unaffected.
-> +       RA sections with a lifetime less than this value shall be
-> +       ignored. Zero lifetimes stay unaffected.
->
->         Default: 0
->
-> diff --git a/include/linux/ipv6.h b/include/linux/ipv6.h
-> index 0295b47c10a3..5883551b1ee8 100644
-> --- a/include/linux/ipv6.h
-> +++ b/include/linux/ipv6.h
-> @@ -33,7 +33,7 @@ struct ipv6_devconf {
->         __s32           accept_ra_defrtr;
->         __u32           ra_defrtr_metric;
->         __s32           accept_ra_min_hop_limit;
-> -       __s32           accept_ra_min_rtr_lft;
-> +       __s32           accept_ra_min_lft;
->         __s32           accept_ra_pinfo;
->         __s32           ignore_routes_with_linkdown;
->  #ifdef CONFIG_IPV6_ROUTER_PREF
-> diff --git a/include/uapi/linux/ipv6.h b/include/uapi/linux/ipv6.h
-> index 8b6bcbf6ed4a..cf592d7b630f 100644
-> --- a/include/uapi/linux/ipv6.h
-> +++ b/include/uapi/linux/ipv6.h
-> @@ -198,7 +198,7 @@ enum {
->         DEVCONF_IOAM6_ID_WIDE,
->         DEVCONF_NDISC_EVICT_NOCARRIER,
->         DEVCONF_ACCEPT_UNTRACKED_NA,
-> -       DEVCONF_ACCEPT_RA_MIN_RTR_LFT,
-> +       DEVCONF_ACCEPT_RA_MIN_LFT,
->         DEVCONF_MAX
->  };
->
-> diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
-> index 19eb4b3d26ea..7f7d2b677711 100644
-> --- a/net/ipv6/addrconf.c
-> +++ b/net/ipv6/addrconf.c
-> @@ -202,7 +202,7 @@ static struct ipv6_devconf ipv6_devconf __read_mostly=
- =3D {
->         .ra_defrtr_metric       =3D IP6_RT_PRIO_USER,
->         .accept_ra_from_local   =3D 0,
->         .accept_ra_min_hop_limit=3D 1,
-> -       .accept_ra_min_rtr_lft  =3D 0,
-> +       .accept_ra_min_lft      =3D 0,
->         .accept_ra_pinfo        =3D 1,
->  #ifdef CONFIG_IPV6_ROUTER_PREF
->         .accept_ra_rtr_pref     =3D 1,
-> @@ -263,7 +263,7 @@ static struct ipv6_devconf ipv6_devconf_dflt __read_m=
-ostly =3D {
->         .ra_defrtr_metric       =3D IP6_RT_PRIO_USER,
->         .accept_ra_from_local   =3D 0,
->         .accept_ra_min_hop_limit=3D 1,
-> -       .accept_ra_min_rtr_lft  =3D 0,
-> +       .accept_ra_min_lft      =3D 0,
->         .accept_ra_pinfo        =3D 1,
->  #ifdef CONFIG_IPV6_ROUTER_PREF
->         .accept_ra_rtr_pref     =3D 1,
-> @@ -2727,6 +2727,10 @@ void addrconf_prefix_rcv(struct net_device *dev, u=
-8 *opt, int len, bool sllao)
->                 return;
->         }
->
-> +       if (valid_lft !=3D 0 && valid_lft < in6_dev->cnf.accept_ra_min_lf=
-t) {
-> +               return;
-> +       }
-> +
->         /*
->          *      Two things going on here:
->          *      1) Add routes for on-link prefixes
-> @@ -5598,7 +5602,7 @@ static inline void ipv6_store_devconf(struct ipv6_d=
-evconf *cnf,
->         array[DEVCONF_IOAM6_ID_WIDE] =3D cnf->ioam6_id_wide;
->         array[DEVCONF_NDISC_EVICT_NOCARRIER] =3D cnf->ndisc_evict_nocarri=
-er;
->         array[DEVCONF_ACCEPT_UNTRACKED_NA] =3D cnf->accept_untracked_na;
-> -       array[DEVCONF_ACCEPT_RA_MIN_RTR_LFT] =3D cnf->accept_ra_min_rtr_l=
-ft;
-> +       array[DEVCONF_ACCEPT_RA_MIN_LFT] =3D cnf->accept_ra_min_lft;
->  }
->
->  static inline size_t inet6_ifla6_size(void)
-> @@ -6793,8 +6797,8 @@ static const struct ctl_table addrconf_sysctl[] =3D=
- {
->                 .proc_handler   =3D proc_dointvec,
->         },
->         {
-> -               .procname       =3D "accept_ra_min_rtr_lft",
-> -               .data           =3D &ipv6_devconf.accept_ra_min_rtr_lft,
-> +               .procname       =3D "accept_ra_min_lft",
-> +               .data           =3D &ipv6_devconf.accept_ra_min_lft,
->                 .maxlen         =3D sizeof(int),
->                 .mode           =3D 0644,
->                 .proc_handler   =3D proc_dointvec,
-> diff --git a/net/ipv6/ndisc.c b/net/ipv6/ndisc.c
-> index 29ddad1c1a2f..eeb60888187f 100644
-> --- a/net/ipv6/ndisc.c
-> +++ b/net/ipv6/ndisc.c
-> @@ -1280,8 +1280,6 @@ static enum skb_drop_reason ndisc_router_discovery(=
-struct sk_buff *skb)
->         if (!ndisc_parse_options(skb->dev, opt, optlen, &ndopts))
->                 return SKB_DROP_REASON_IPV6_NDISC_BAD_OPTIONS;
->
-> -       lifetime =3D ntohs(ra_msg->icmph.icmp6_rt_lifetime);
-> -
->         if (!ipv6_accept_ra(in6_dev)) {
->                 ND_PRINTK(2, info,
->                           "RA: %s, did not accept ra for dev: %s\n",
-> @@ -1289,13 +1287,6 @@ static enum skb_drop_reason ndisc_router_discovery=
-(struct sk_buff *skb)
->                 goto skip_linkparms;
->         }
->
-> -       if (lifetime !=3D 0 && lifetime < in6_dev->cnf.accept_ra_min_rtr_=
-lft) {
-> -               ND_PRINTK(2, info,
-> -                         "RA: router lifetime (%ds) is too short: %s\n",
-> -                         lifetime, skb->dev->name);
-> -               goto skip_linkparms;
-> -       }
-> -
->  #ifdef CONFIG_IPV6_NDISC_NODETYPE
->         /* skip link-specific parameters from interior routers */
->         if (skb->ndisc_nodetype =3D=3D NDISC_NODETYPE_NODEFAULT) {
-> @@ -1336,6 +1327,14 @@ static enum skb_drop_reason ndisc_router_discovery=
-(struct sk_buff *skb)
->                 goto skip_defrtr;
->         }
->
-> +       lifetime =3D ntohs(ra_msg->icmph.icmp6_rt_lifetime);
-> +       if (lifetime !=3D 0 && lifetime < in6_dev->cnf.accept_ra_min_lft)=
- {
-> +               ND_PRINTK(2, info,
-> +                         "RA: router lifetime (%ds) is too short: %s\n",
-> +                         lifetime, skb->dev->name);
-> +               goto skip_defrtr;
-> +       }
-> +
->         /* Do not accept RA with source-addr found on local machine unles=
-s
->          * accept_ra_from_local is set to true.
->          */
-> @@ -1499,13 +1498,6 @@ static enum skb_drop_reason ndisc_router_discovery=
-(struct sk_buff *skb)
->                 goto out;
->         }
->
-> -       if (lifetime !=3D 0 && lifetime < in6_dev->cnf.accept_ra_min_rtr_=
-lft) {
-> -               ND_PRINTK(2, info,
-> -                         "RA: router lifetime (%ds) is too short: %s\n",
-> -                         lifetime, skb->dev->name);
-> -               goto out;
-> -       }
-> -
->  #ifdef CONFIG_IPV6_ROUTE_INFO
->         if (!in6_dev->cnf.accept_ra_from_local &&
->             ipv6_chk_addr(dev_net(in6_dev->dev), &ipv6_hdr(skb)->saddr,
-> @@ -1530,6 +1522,9 @@ static enum skb_drop_reason ndisc_router_discovery(=
-struct sk_buff *skb)
->                         if (ri->prefix_len =3D=3D 0 &&
->                             !in6_dev->cnf.accept_ra_defrtr)
->                                 continue;
-> +                       if (ri->lifetime !=3D 0 &&
-> +                           ntohl(ri->lifetime) < in6_dev->cnf.accept_ra_=
-min_lft)
-> +                               continue;
->                         if (ri->prefix_len < in6_dev->cnf.accept_ra_rt_in=
-fo_min_plen)
->                                 continue;
->                         if (ri->prefix_len > in6_dev->cnf.accept_ra_rt_in=
-fo_max_plen)
+
+Never mind. I will pull this off.
+
+Thanks,
+Shenwei
+
 > --
-> 2.41.0.487.g6d72f3e995-goog
-
-Reviewed-by: Maciej =C5=BBenczykowski <maze@google.com>
-
-Patrick and I have spoken about this at length, and this (ignoring low
-lifetime portions of the RA) seems like the best approach...
-
-(though I will admit that I'm not super knowledgeable about IPv6 RAs
-and this particular code)
+> RMK's Patch system:
+> https://www.ar/
+> mlinux.org.uk%2Fdeveloper%2Fpatches%2F&data=3D05%7C01%7Cshenwei.wang
+> %40nxp.com%7C70e2358c209e47c8612608db8e7fb5cc%7C686ea1d3bc2b4c6fa
+> 92cd99c5c301635%7C0%7C0%7C638260451379427007%7CUnknown%7CTWFp
+> bGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6
+> Mn0%3D%7C3000%7C%7C%7C&sdata=3DKQCQ%2B6t%2BMz0EQsCAYOJ%2BY3Of
+> OG68KqJB0%2FCLiGnULRo%3D&reserved=3D0
+> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
