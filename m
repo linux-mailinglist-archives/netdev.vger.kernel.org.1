@@ -1,130 +1,176 @@
-Return-Path: <netdev+bounces-21804-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21807-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5136E764C9C
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 10:24:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D44D7764CC7
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 10:27:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 81B761C21599
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 08:24:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 114741C208F0
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 08:27:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B211D2F7;
-	Thu, 27 Jul 2023 08:22:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA0BFD301;
+	Thu, 27 Jul 2023 08:27:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F02BD2F0
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 08:22:27 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9C6F26AFE
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 01:22:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1690446075;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=RGeV47pO7s8gps9ksu/4+lDYD8FHRHT3YEWZYPUU9kM=;
-	b=RldPOVqEBRKf09bvgrDbo2Pcno1jKMFtP2Nl/f7D1hVWOg6TM0C634KIh6ff7RI/R2s1Lq
-	uJi6dyZKQzOpgRU/0zZY2JnaMUQFwDd1kb0TwbBXJx4PoXDBL2iLteY288AaNetl6NDBkp
-	V0SdcBXgt2FDcDWWlIv0yOhmDuK7J3s=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-296-BnJlvnDON3OwQ6B8JJDlAA-1; Thu, 27 Jul 2023 04:21:13 -0400
-X-MC-Unique: BnJlvnDON3OwQ6B8JJDlAA-1
-Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-767ca6391aeso16195785a.1
-        for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 01:21:13 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690446073; x=1691050873;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=RGeV47pO7s8gps9ksu/4+lDYD8FHRHT3YEWZYPUU9kM=;
-        b=YCysjojncibU+ehoG2Cxb87uDI4CMSLim7jRrHDK7N2ZKAb1aMNfdw2tTBk+AuUj/V
-         I25aTZ8WsSQxxO9yumcdmAw4d6cscTSY5pxiNFYKtF3clwUR8qymTOdglW52r7G5R2aX
-         U/1W8XgIX0I54zNpCYx1I7GU+x4eor/VxTl2fI8asuOD8udzdhLzCdKU7Yh0UZVQU7JD
-         O+aJsbwDeJbwUgTqH56NMfa4lLwD3e++D/3XVzgJ+RgHZKFiL2TsnO7pQWeMhE8iXUzF
-         N6iz1pxisEDoT8rV83T//oB4kI9sxfTP/2KGHw27ZreK25jj355eGyzkNwEbTAzeUKlx
-         KY+Q==
-X-Gm-Message-State: ABy/qLZBfQ2VyVSqecSBXLzq2OmRieOSMVBTnFbBQzU1d9xZNz1r+CLF
-	C2R7DmlPoD85xA+d4mn7EoQUrGdBzHdARRz3k4MGOMvNNMjKAYClHSE5iLm3OtHbSZcP9Psorej
-	NEIpPQryybFizffdq
-X-Received: by 2002:a05:620a:31a1:b0:75b:23a1:69ee with SMTP id bi33-20020a05620a31a100b0075b23a169eemr4576173qkb.5.1690446073022;
-        Thu, 27 Jul 2023 01:21:13 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlHs3zPOBeUj9ojGrgUE/X3gQH8r73DGALfDrJ+7Y3EtRQm+q4OZUXkV2TRkziNvYTa7JtMfZA==
-X-Received: by 2002:a05:620a:31a1:b0:75b:23a1:69ee with SMTP id bi33-20020a05620a31a100b0075b23a169eemr4576160qkb.5.1690446072769;
-        Thu, 27 Jul 2023 01:21:12 -0700 (PDT)
-Received: from gerbillo.redhat.com (146-241-238-55.dyn.eolo.it. [146.241.238.55])
-        by smtp.gmail.com with ESMTPSA id j4-20020a05620a000400b00767d8663b3asm253886qki.53.2023.07.27.01.21.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Jul 2023 01:21:12 -0700 (PDT)
-Message-ID: <9cfa70cca3cb1dd20bb2cab70a213e5a4dd28f89.camel@redhat.com>
-Subject: Re: [PATCH v4] net: ravb: Fix possible UAF bug in ravb_remove
-From: Paolo Abeni <pabeni@redhat.com>
-To: Jakub Kicinski <kuba@kernel.org>, Zheng Wang <zyytlz.wz@163.com>
-Cc: s.shtylyov@omp.ru, lee@kernel.org, linyunsheng@huawei.com, 
-	davem@davemloft.net, edumazet@google.com, richardcochran@gmail.com, 
-	p.zabel@pengutronix.de, geert+renesas@glider.be, magnus.damm@gmail.com, 
-	yoshihiro.shimoda.uh@renesas.com, biju.das.jz@bp.renesas.com, 
-	wsa+renesas@sang-engineering.com, netdev@vger.kernel.org, 
-	linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	hackerzheng666@gmail.com, 1395428693sheep@gmail.com, alex000young@gmail.com
-Date: Thu, 27 Jul 2023 10:21:07 +0200
-In-Reply-To: <20230725201952.2f23bb3b@kernel.org>
-References: <20230725030026.1664873-1-zyytlz.wz@163.com>
-	 <20230725201952.2f23bb3b@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AECF8D2F0
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 08:27:08 +0000 (UTC)
+Received: from mail.helmholz.de (mail.helmholz.de [217.6.86.34])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 491484EDB
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 01:26:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=helmholz.de
+	; s=dkim1; h=Content-Type:MIME-Version:Message-ID:Date:Subject:CC:To:From:
+	Sender:Reply-To:Content-Transfer-Encoding:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=pTHDtCKW0IluBtg4WbpD49owSeMHqMqck+SFzjWQotw=; b=DnDo5654XBkLj2a+Wb/1W2yCw2
+	LP+AsX0KoX/GhpwB0oZjvlsInyvP3LzcmMwiiD2LhVdKkOqXYFME3L4LfRwAN+abEkV1dAQRKv9MF
+	aHy0/IdfyFKUCDM8TJ6opxZY95f0gs6ZlB+766vJZnNFDLbY6//H0WyXUbh0PVRhvWIGnJqieRB6s
+	QqfE5cHfUvn6BoyWT8nTdlnQuaEfKDlJfc2e1ke3XPwKOm042/wKpUvrOx6Fdlb4rXftZjABWSEvQ
+	BbRVATgTw0sw+6ZY7kvzR89IdCdP05B9Gp0xUEz8g+iTQSXTEaMQ9MTDVswxgQLpZP180xrQOzyg/
+	q7QpZdNw==;
+Received: from [192.168.1.4] (port=13596 helo=SH-EX2013.helmholz.local)
+	by mail.helmholz.de with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384
+	(Exim 4.96)
+	(envelope-from <Ante.Knezic@helmholz.de>)
+	id 1qOwJp-0002sf-2y;
+	Thu, 27 Jul 2023 10:25:57 +0200
+Received: from linuxdev.helmholz.local (192.168.6.7) by
+ SH-EX2013.helmholz.local (192.168.1.4) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.48; Thu, 27 Jul 2023 10:25:57 +0200
+From: Ante Knezic <ante.knezic@helmholz.de>
+To: <netdev@vger.kernel.org>
+CC: <andrew@lunn.ch>, <f.fainelli@gmail.com>, <olteanv@gmail.com>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <linux-kernel@vger.kernel.org>, Ante Knezic
+	<ante.knezic@helmholz.de>
+Subject: [PATCH net-next v4] net: dsa: mv88e6xxx: Add erratum 3.14 for 88E6390X and 88E6190X
+Date: Thu, 27 Jul 2023 10:25:50 +0200
+Message-ID: <20230727082550.15254-1-ante.knezic@helmholz.de>
+X-Mailer: git-send-email 2.11.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-	version=3.4.6
+Content-Type: text/plain
+X-Originating-IP: [192.168.6.7]
+X-ClientProxiedBy: SH-EX2013.helmholz.local (192.168.1.4) To
+ SH-EX2013.helmholz.local (192.168.1.4)
+X-EXCLAIMER-MD-CONFIG: 2ae5875c-d7e5-4d7e-baa3-654d37918933
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, 2023-07-25 at 20:19 -0700, Jakub Kicinski wrote:
-> On Tue, 25 Jul 2023 11:00:26 +0800 Zheng Wang wrote:
-> > diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/eth=
-ernet/renesas/ravb_main.c
-> > index 4d6b3b7d6abb..ce2da5101e51 100644
-> > --- a/drivers/net/ethernet/renesas/ravb_main.c
-> > +++ b/drivers/net/ethernet/renesas/ravb_main.c
-> > @@ -2885,6 +2885,9 @@ static int ravb_remove(struct platform_device *pd=
-ev)
-> >  	struct ravb_private *priv =3D netdev_priv(ndev);
-> >  	const struct ravb_hw_info *info =3D priv->info;
-> > =20
-> > +	netif_carrier_off(ndev);
-> > +	netif_tx_disable(ndev);
-> > +	cancel_work_sync(&priv->work);
->=20
-> Still racy, the carrier can come back up after canceling the work.
+Fixes XAUI/RXAUI lane alignment errors.
+Issue causes dropped packets when trying to communicate over
+fiber via SERDES lanes of port 9 and 10.
+Errata document applies only to 88E6190X and 88E6390X devices.
+Requires poking in undocumented registers.
 
-I must admit I don't see how/when this driver sets the carrier on ?!?
+Signed-off-by: Ante Knezic <ante.knezic@helmholz.de>
+---
+V4 : Rework as suggested by Vladimir Oltean <olteanv@gmail.com>
+     and Russell King <linux@armlinux.org.uk>
+ * print error in case of failure to apply erratum
+ * use mdiobus_c45_write instead of mdiodev_c45_write
+ * use bool variable instead of embedding a chip pointer inside
+   pcs struct.
+V3 : Rework to fit the new phylink_pcs infrastructure
+V2 : Rework as suggested by Andrew Lunn <andrew@lun.ch> 
+ * make int lanes[] const 
+ * reorder prod_nums
+ * update commit message to indicate we are dealing with
+   undocumented Marvell registers and magic values
+---
+ drivers/net/dsa/mv88e6xxx/pcs-639x.c | 45 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 45 insertions(+)
 
-> But whatever, this is a non-issue in the first place.
-
-Do you mean the UaF can't happen? I think that is real.=20
-
-> The fact that ravb_tx_timeout_work doesn't take any locks seems much
-> more suspicious.
-
-Indeed! But that should be a different patch, right?
-
-Waiting a little more for feedback from renesas.
-
-/P
+diff --git a/drivers/net/dsa/mv88e6xxx/pcs-639x.c b/drivers/net/dsa/mv88e6xxx/pcs-639x.c
+index 98dd49dac421..ba373656bfe1 100644
+--- a/drivers/net/dsa/mv88e6xxx/pcs-639x.c
++++ b/drivers/net/dsa/mv88e6xxx/pcs-639x.c
+@@ -20,6 +20,7 @@ struct mv88e639x_pcs {
+ 	struct mdio_device mdio;
+ 	struct phylink_pcs sgmii_pcs;
+ 	struct phylink_pcs xg_pcs;
++	bool erratum_3_14;
+ 	bool supports_5g;
+ 	phy_interface_t interface;
+ 	unsigned int irq;
+@@ -205,13 +206,53 @@ static void mv88e639x_sgmii_pcs_pre_config(struct phylink_pcs *pcs,
+ 	mv88e639x_sgmii_pcs_control_pwr(mpcs, false);
+ }
+ 
++static int mv88e6390_erratum_3_14(struct mv88e639x_pcs *mpcs)
++{
++	const int lanes[] = { MV88E6390_PORT9_LANE0, MV88E6390_PORT9_LANE1,
++		MV88E6390_PORT9_LANE2, MV88E6390_PORT9_LANE3,
++		MV88E6390_PORT10_LANE0, MV88E6390_PORT10_LANE1,
++		MV88E6390_PORT10_LANE2, MV88E6390_PORT10_LANE3 };
++	int err, i;
++
++	/* 88e6190x and 88e6390x errata 3.14:
++	 * After chip reset, SERDES reconfiguration or SERDES core
++	 * Software Reset, the SERDES lanes may not be properly aligned
++	 * resulting in CRC errors
++	 */
++
++	for (i = 0; i < ARRAY_SIZE(lanes); i++) {
++		err = mdiobus_c45_write(mpcs->mdio.bus, lanes[i],
++					MDIO_MMD_PHYXS,
++					0xf054, 0x400C);
++		if (err)
++			return err;
++
++		err = mdiobus_c45_write(mpcs->mdio.bus, lanes[i],
++					MDIO_MMD_PHYXS,
++					0xf054, 0x4000);
++		if (err)
++			return err;
++	}
++
++	return 0;
++}
++
+ static int mv88e639x_sgmii_pcs_post_config(struct phylink_pcs *pcs,
+ 					   phy_interface_t interface)
+ {
+ 	struct mv88e639x_pcs *mpcs = sgmii_pcs_to_mv88e639x_pcs(pcs);
++	int err;
+ 
+ 	mv88e639x_sgmii_pcs_control_pwr(mpcs, true);
+ 
++	if (mpcs->erratum_3_14) {
++		err = mv88e6390_erratum_3_14(mpcs);
++		if (err)
++			dev_err(mpcs->mdio.dev.parent,
++				"failed to apply erratum 3.14: %pe\n",
++				ERR_PTR(err));
++	}
++
+ 	return 0;
+ }
+ 
+@@ -524,6 +565,10 @@ static int mv88e6390_pcs_init(struct mv88e6xxx_chip *chip, int port)
+ 	mpcs->xg_pcs.ops = &mv88e6390_xg_pcs_ops;
+ 	mpcs->xg_pcs.neg_mode = true;
+ 
++	if (chip->info->prod_num == MV88E6XXX_PORT_SWITCH_ID_PROD_6190X ||
++	    chip->info->prod_num == MV88E6XXX_PORT_SWITCH_ID_PROD_6390X)
++		mpcs->erratum_3_14 = true;
++
+ 	err = mv88e639x_pcs_setup_irq(mpcs, chip, port);
+ 	if (err)
+ 		goto err_free;
+-- 
+2.11.0
 
 
