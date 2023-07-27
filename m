@@ -1,75 +1,105 @@
-Return-Path: <netdev+bounces-21671-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21672-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F9467642D1
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 02:03:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4D017642DB
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 02:11:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D11DC1C21495
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 00:03:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 138461C21497
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 00:11:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2E06EC3;
-	Thu, 27 Jul 2023 00:03:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9C53646;
+	Thu, 27 Jul 2023 00:11:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 958CCEBE
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 00:03:47 +0000 (UTC)
-Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [52.237.72.81])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8A3069C;
-	Wed, 26 Jul 2023 17:03:43 -0700 (PDT)
-Received: from linma$zju.edu.cn ( [10.181.249.112] ) by
- ajax-webmail-mail-app2 (Coremail) ; Thu, 27 Jul 2023 08:03:17 +0800
- (GMT+08:00)
-X-Originating-IP: [10.181.249.112]
-Date: Thu, 27 Jul 2023 08:03:17 +0800 (GMT+08:00)
-X-CM-HeaderCharset: UTF-8
-From: "Lin Ma" <linma@zju.edu.cn>
-To: "Jakub Kicinski" <kuba@kernel.org>
-Cc: "Nikolay Aleksandrov" <razor@blackwall.org>, davem@davemloft.net, 
-	edumazet@google.com, pabeni@redhat.com, idosch@nvidia.com, 
-	lucien.xin@gmail.com, liuhangbin@gmail.com, edwin.peer@broadcom.com, 
-	jiri@resnulli.us, md.fahad.iqbal.polash@intel.com, 
-	anirudh.venkataramanan@intel.com, jeffrey.t.kirsher@intel.com, 
-	neerav.parikh@intel.com, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] rtnetlink: let rtnl_bridge_setlink checks
- IFLA_BRIDGE_MODE length
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version XT5.0.14 build 20220622(41e5976f)
- Copyright (c) 2002-2023 www.mailtech.cn
- mispb-4df6dc2c-e274-4d1c-b502-72c5c3dfa9ce-zj.edu.cn
-In-Reply-To: <20230726084420.1bf95ef9@kernel.org>
-References: <20230725055706.498774-1-linma@zju.edu.cn>
- <6a177bb3-0ee4-f453-695b-d9bdd441aa2c@blackwall.org>
- <7670876b.ea0b8.189912c3a92.Coremail.linma@zju.edu.cn>
- <20230726084420.1bf95ef9@kernel.org>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5313C19C
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 00:11:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 777A2C433C8;
+	Thu, 27 Jul 2023 00:11:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1690416684;
+	bh=tKiRxD59OQixQ/evxuII/f2eAwOKeS3mdm+pVnVX+sI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=UXKssJi+hZYTx+FhcYd583PTDvNIviwNYhxHkxMwqnAdHx77jakmR86QYiCdslsPn
+	 coI6ChtYTro1hqCsi/GBnakYTVG/RZrmtfiy59meovOLzdsvuDh1flm7dXzAkDDazC
+	 BConrzR++XSHeiOkcaUEPoUASdbpj5z2WRG9Ay8G6nrfkiNYtzAN6LYHsuxeq1/sYQ
+	 /ud6OX7M2m2zn197b2aSkziC3YNRJqFRYMMLXbzF7zHkIsLcKbd4er8YxubZsBqNqP
+	 C9BMPlc3+Od1T0sxGB37Jr3rdcWspbnvyzYEzy9QtHiyCesWb0Qg/RvOpdnUAOC3MU
+	 wrH0l44JSvXig==
+Date: Wed, 26 Jul 2023 17:11:23 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Konstantin Ryabitsev <konstantin@linuxfoundation.org>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, Joe Perches
+ <joe@perches.com>, Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+ geert@linux-m68k.org, gregkh@linuxfoundation.org, netdev@vger.kernel.org,
+ workflows@vger.kernel.org, mario.limonciello@amd.com
+Subject: Re: [PATCH v2] scripts: get_maintainer: steer people away from
+ using file paths
+Message-ID: <20230726171123.0d573f7c@kernel.org>
+In-Reply-To: <20230726-june-mocha-ad6809@meerkat>
+References: <CAHk-=wi9MyyWmP_HAddLrmGfdANkut6_2f9hzv9HcyTBvg3+kA@mail.gmail.com>
+	<20230726114817.1bd52d48@kernel.org>
+	<CAHk-=wiuR7_A=PbN8jhmqGPJQHypUHR+W4-UuSVhOVWvYXs1Tg@mail.gmail.com>
+	<CAHk-=wh4pbrNZGqfV9u1urZr3Xjci=UV-MP+KneB6a5yo7-VOQ@mail.gmail.com>
+	<CAHk-=whCE9cWmTXu54WFQ7x-aH8n=dhCux2h49=pYN=14ybkxg@mail.gmail.com>
+	<20230726130318.099f96fc@kernel.org>
+	<CAHk-=wjfC4tFnOC0Lk_GcU4buf+X-Jv965pWg+kMRkDb6hX6mw@mail.gmail.com>
+	<20230726133648.54277d76@kernel.org>
+	<CAHk-=whZHcergYrraQGgazmOGMbuPsDfRMBXjFLo1aEQPqH2xQ@mail.gmail.com>
+	<20230726145721.52a20cb7@kernel.org>
+	<20230726-june-mocha-ad6809@meerkat>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <2b14aaf4.e65a0.18994a82f19.Coremail.linma@zju.edu.cn>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:by_KCgBnEZxFtMFk6q+iCg--.43986W
-X-CM-SenderInfo: qtrwiiyqvtljo62m3hxhgxhubq/1tbiAwIIEmTAePoLZAAdsP
-X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
-	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
-	daVFxhVjvjDU=
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_LOW,
-	RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-SGkgSmFrdWIsCgo+IAo+IFlvdSdsbCBuZWVkIHRvIHdhaXQgZm9yIHRoZSBwYXRjaCB0byBwcm9w
-YWdhdGUgYmVmb3JlIHBvc3RpbmcuCj4gT3VyIHRyZWVzIG1lcmdlIGVhY2ggVGh1cnNkYXksIHNv
-IGlmIHlvdSBwb3N0IG9uIEZyaWRheSB0aGUgZml4Cj4gc2hvdWxkIGJlIGluIG5ldC1uZXh0LgoK
-Q29vbCwgSSB1bmRlcnN0YW5kIG5vdy4gVGhhbmtzIQoKUmVnYXJkcwpMaW4=
+On Wed, 26 Jul 2023 19:47:31 -0400 Konstantin Ryabitsev wrote:
+> > And have every other subsystem replicate something of that nature.
+> > 
+> > Sidebar, but IMO we should work on lore to create a way to *subscribe*
+> > to patches based on paths without running any local agents. But if I
+> > can't explain how get_maintainers is misused I'm sure I'll have a lot
+> > of luck explaining that one :D  
+> 
+> I just need to get off my ass and implement this. We should be able to offer
+> the following:
+> 
+> - subsystem maintainers come up with query language for what they want
+>   to monitor (basically, whatever the query box of lore.kernel.org takes)
+> - we maintain a bot that runs these queries and populates a public-inbox feed
+> - this feed is available via read-only pop/imap/nntp (pull subscription)
+> - it is also fed to a mailing list service (push subscription)
+
+*Nod*
+
+> The goal is to turn the tables -- instead of patch submitters needing to
+> figure out where the patch needs to go (via get_maintainer or similar
+> scripts), they just send everything to lkml or patches@lists.linux.dev and let
+> the system figure out who needs to look at them.
+
+My initial motivation for this was to let people (who are *not*
+maintainers) subscribe to parts of netdev. During previous cycles we
+saw ~246 emails a day. If someone is only interested in e.g. IP routing
+fishing out the one routing patch a week from all the driver noise is
+almost impossible.
+
+> That's for the part that I was already planning to do. In addition, coming
+> back to the topic of this thread, we could also look at individual patches
+> hitting the feed, pass them through any desired configuration of
+> get_maintainer.pl, and send them off any recipients not already cc'd by the
+> patch author. I believe this is what you want to have in place, right, Jakub?
+
+Hm, hm. I wasn't thrilled by the idea of sending people a notification
+that "you weren't CCed on this patch, here's a link". But depending on
+your definition of "hitting the feed" it sounds like we may be able to
+insert the CC into the actual email before it hits lore? That'd be
+very cool! At least for the lists already migrated from vger to korg?
 
