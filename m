@@ -1,106 +1,135 @@
-Return-Path: <netdev+bounces-21675-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21676-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D20227642EC
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 02:24:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 500A27642EF
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 02:27:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 941B4282019
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 00:24:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 72DB61C21492
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 00:27:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5AB17EA;
-	Thu, 27 Jul 2023 00:24:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A0F57EA;
+	Thu, 27 Jul 2023 00:27:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BACC319C
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 00:24:17 +0000 (UTC)
-Received: from mail-qk1-x735.google.com (mail-qk1-x735.google.com [IPv6:2607:f8b0:4864:20::735])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 790D7E73
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 17:24:16 -0700 (PDT)
-Received: by mail-qk1-x735.google.com with SMTP id af79cd13be357-76af2cb7404so33778685a.0
-        for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 17:24:16 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ACBA19C
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 00:27:15 +0000 (UTC)
+Received: from mail-io1-xd35.google.com (mail-io1-xd35.google.com [IPv6:2607:f8b0:4864:20::d35])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA509100;
+	Wed, 26 Jul 2023 17:27:14 -0700 (PDT)
+Received: by mail-io1-xd35.google.com with SMTP id ca18e2360f4ac-7835ae70e46so13933339f.3;
+        Wed, 26 Jul 2023 17:27:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linuxfoundation.org; s=google; t=1690417455; x=1691022255;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=51TmouK3bQfcqf7zaNKCd8MK7cCyJry2iObUP3bhEHw=;
-        b=DccICbdEIa2wnCVWIBRU2/Mo1iCa2JZQ/5JsPGF49XmuicqrP3cORW9krtbhIX415l
-         9J4H7IRv9bUbJfHrQLzKr95BHNlhjutJxADDiBjy45Fvh0gvMB8TWbLMhszjsOVt8Uaa
-         66wR0tLanO2w0wSxy0h2cYeZYBp+8ca9idrx8=
+        d=gmail.com; s=20221208; t=1690417634; x=1691022434;
+        h=content-transfer-encoding:in-reply-to:references:cc:to:from
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=i7g88EX3ElPzMHH1cxDZbT04edVSiNRVHvA7iXAYrAo=;
+        b=f3H4vfeLylp2wg0nVMIywz+9PHn/KiSpcbldySF26DRn9AiUtEeBB5CkQJitGwEGKj
+         5+mGkVG8SN4a05BWWSw67S9uT+IRrj9Rl+y/6sl3GTzp4tSHEzRFK66+RDz5xqhulEuz
+         Hf4chdxIPAiC7+ba9o2axjXiPOoA8e8lb0YkWRMoQVMkWEPKfa6Jhgsb4b9ZF+wqTSgW
+         HhN5FYEkXL2tkRrmctmcxQHBxrNJwZhneObt8vu7IqQhMzGa2Fix58MpS/CouPOcLmyo
+         +LQV10zDWU4U49DYhoXS50330wNYor0r2MwB58UCJPg08YePkj/s/rdaRAZ0koKzL7zp
+         5bzA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690417455; x=1691022255;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=51TmouK3bQfcqf7zaNKCd8MK7cCyJry2iObUP3bhEHw=;
-        b=BwPxetfD353ubrkSdYoMk0YWAAraNRraInJq8H8ldHd5KAqyYMEGYpssxsKVjbv12p
-         jDcAIyG0aMdsLhgGpvUmmi4YHiXLVhQGuDUT2kT4HUEo7sRaSBLz2nndnE2az0GN7YIq
-         5c3I2XN+aTOdODBhGPKuRng8g0E+EF5mYSIEtupwUmttVVxZk0ZUcsHLjcpJc5OGVHxR
-         FFkBdaORnWK8t1kBQQdloVqI7GqVFHdBqr+PEsimjpWuxl7jZZV9N673PexEW3x6lLZJ
-         /Z2Thx9tEbg/3C052NTo3u6JfdSJkI31aq2aCXLqUsGE03UeOd0h7Tka780WfI30W6bn
-         nMLA==
-X-Gm-Message-State: ABy/qLbwf+rlbOYO8zdtkBQ9hvAMLEKkdADk1aFgKZBJwGPewLYEk7C1
-	wYklwWZKhGpwBb/uBbvPxYlGuBIlM9Wewx47/M4=
-X-Google-Smtp-Source: APBJJlFPrVeNK+Esuyd1CMyM2UVHXHOda0pZ6g4OHeYqaPavDA42Fy8/kwdMdFZW76JN+dfkYqf/bQ==
-X-Received: by 2002:a05:620a:44c3:b0:75b:23a1:832f with SMTP id y3-20020a05620a44c300b0075b23a1832fmr5009797qkp.42.1690417455662;
-        Wed, 26 Jul 2023 17:24:15 -0700 (PDT)
-Received: from meerkat.local ([142.113.79.114])
-        by smtp.gmail.com with ESMTPSA id o12-20020a05620a15cc00b0076af430d902sm29638qkm.63.2023.07.26.17.24.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Jul 2023 17:24:15 -0700 (PDT)
-Date: Wed, 26 Jul 2023 20:24:06 -0400
-From: Konstantin Ryabitsev <konstantin@linuxfoundation.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, 
-	Joe Perches <joe@perches.com>, Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, 
-	geert@linux-m68k.org, gregkh@linuxfoundation.org, netdev@vger.kernel.org, 
-	workflows@vger.kernel.org, mario.limonciello@amd.com
-Subject: Re: [PATCH v2] scripts: get_maintainer: steer people away from using
- file paths
-Message-ID: <20230726-armless-ungodly-a3242f@meerkat>
-References: <CAHk-=wiuR7_A=PbN8jhmqGPJQHypUHR+W4-UuSVhOVWvYXs1Tg@mail.gmail.com>
- <CAHk-=wh4pbrNZGqfV9u1urZr3Xjci=UV-MP+KneB6a5yo7-VOQ@mail.gmail.com>
- <CAHk-=whCE9cWmTXu54WFQ7x-aH8n=dhCux2h49=pYN=14ybkxg@mail.gmail.com>
- <20230726130318.099f96fc@kernel.org>
- <CAHk-=wjfC4tFnOC0Lk_GcU4buf+X-Jv965pWg+kMRkDb6hX6mw@mail.gmail.com>
- <20230726133648.54277d76@kernel.org>
- <CAHk-=whZHcergYrraQGgazmOGMbuPsDfRMBXjFLo1aEQPqH2xQ@mail.gmail.com>
- <20230726145721.52a20cb7@kernel.org>
- <20230726-june-mocha-ad6809@meerkat>
- <20230726171123.0d573f7c@kernel.org>
+        d=1e100.net; s=20221208; t=1690417634; x=1691022434;
+        h=content-transfer-encoding:in-reply-to:references:cc:to:from
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=i7g88EX3ElPzMHH1cxDZbT04edVSiNRVHvA7iXAYrAo=;
+        b=SCuBItLu68uBRZRk51bRn48z5aNLLKJGBp8SnPlfrqbIp/UVYlNHpj2ZOkJXzkZqBf
+         LXs3uEwzMCQ9WhUAn+a2+/J/LwEBRX/mibsLB4SrOp9jv3s5Mt2sT4xhtnQPWMZW2jZM
+         GN49nPlvou3lvsPz8PSYyrxgJ8gRYTnF4vLK5c8qR7HhjLYv7XSXrJU/IVKB64VkGi74
+         PPU5IY3x989z4kURqOZCtHFPdpJtAO2v7PMhiQrSvxfRQ7yap8S/aEMUdRU19RgS9HAq
+         aC7BRpQ4wvxFuHp3z4mKRIP8War9N+DpUAEZiCKEoGluCjtF7kiEEX+wYqoTembccwVF
+         SuSQ==
+X-Gm-Message-State: ABy/qLbdBmuSl3Uycm9JpxfcakIScOqIJPjN9WG5j78YpMz32D8cGsoH
+	96KulSwKhmeORN6pWHC0xLc=
+X-Google-Smtp-Source: APBJJlFpcp26uwvnPQ3z9ha61DL/89HUSRq9ynlxFUpBBUyir6DJ+iZRgQvQTbgbjaz1GmQ4xAxT8w==
+X-Received: by 2002:a05:6e02:1a85:b0:346:63f1:a979 with SMTP id k5-20020a056e021a8500b0034663f1a979mr3892802ilv.30.1690417634018;
+        Wed, 26 Jul 2023 17:27:14 -0700 (PDT)
+Received: from ?IPV6:2601:282:800:7ed0:bd1d:fe8d:d220:8378? ([2601:282:800:7ed0:bd1d:fe8d:d220:8378])
+        by smtp.googlemail.com with ESMTPSA id y5-20020a92d805000000b0033b2a123254sm147546ilm.61.2023.07.26.17.27.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 26 Jul 2023 17:27:13 -0700 (PDT)
+Message-ID: <0c06b067-349c-9fe2-2cc3-36c149fd5277@gmail.com>
+Date: Wed, 26 Jul 2023 18:27:12 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20230726171123.0d573f7c@kernel.org>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-	autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.13.0
+Subject: Re: [PATCH v3] drivers: net: prevent tun_get_user() to exceed xdp
+ size limits
+Content-Language: en-US
+From: David Ahern <dsahern@gmail.com>
+To: Jesper Dangaard Brouer <jbrouer@redhat.com>,
+ Jason Wang <jasowang@redhat.com>, Andrew Kanner <andrew.kanner@gmail.com>
+Cc: brouer@redhat.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org,
+ linux-kernel-mentees@lists.linuxfoundation.org,
+ syzbot+f817490f5bd20541b90a@syzkaller.appspotmail.com,
+ John Fastabend <john.fastabend@gmail.com>
+References: <20230725155403.796-1-andrew.kanner@gmail.com>
+ <CACGkMEt=Cd8J995+0k=6MT1Pj=Fk9E_r2eZREptLt2osj_H-hA@mail.gmail.com>
+ <ab722ec1-ae45-af1f-b869-e7339402c852@redhat.com>
+ <179979e6-eb8a-0300-5445-999b9366250a@gmail.com>
+In-Reply-To: <179979e6-eb8a-0300-5445-999b9366250a@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Jul 26, 2023 at 05:11:23PM -0700, Jakub Kicinski wrote:
-> Hm, hm. I wasn't thrilled by the idea of sending people a notification
-> that "you weren't CCed on this patch, here's a link". But depending on
-> your definition of "hitting the feed" it sounds like we may be able to
-> insert the CC into the actual email before it hits lore? That'd be
-> very cool! At least for the lists already migrated from vger to korg?
+On 7/26/23 1:37 PM, David Ahern wrote:
+> On 7/26/23 3:02 AM, Jesper Dangaard Brouer wrote:
+>> Cc. John and Ahern
+>>
+>> On 26/07/2023 04.09, Jason Wang wrote:
+>>> On Tue, Jul 25, 2023 at 11:54 PM Andrew Kanner
+>>> <andrew.kanner@gmail.com> wrote:
+>>>>
+>>>> Syzkaller reported the following issue:
+>>>> =======================================
+>>>> Too BIG xdp->frame_sz = 131072
+>>
+>> Is this a contiguous physical memory allocation?
+>>
+>> 131072 bytes equal order 5 page.
+>>
+>> Looking at tun.c code I cannot find a code path that could create
+>> order-5 skb->data, but only SKB with order-0 fragments.  But I guess it
+>> is the netif_receive_generic_xdp() what will realloc to make this linear
+>> (via skb_linearize())
+> 
+> 
+> get_tun_user is passed an iov_iter with a single segment of 65007
+> total_len. The alloc_skb path is hit with an align size of only 64. That
+> is insufficient for XDP so the netif_receive_generic_xdp hits the
+> pskb_expand_head path. Something is off in the math in
+> netif_receive_generic_xdp resulting in the skb markers being off. That
+> causes bpf_prog_run_generic_xdp to compute the wrong frame_sz.
 
-No, inserting their addresses into message headers would invalidate DKIM,
-which is not what we want to do. However, the idea is that they would receive
-the actual patches in the same way they would receive them if they were
-subscribed to a mailing list.
 
-Think as if instead of being Cc'd on patches, they got Bcc'd on them.
+BTW, it is pskb_expand_head that turns it from a 64kB to a 128 kB
+allocation. But the 128kB part is not relevant to the "bug" here really.
 
--K
+The warn on getting tripped in bpf_xdp_adjust_tail is because xdp
+generic path is skb based and can have a frame_sz > 4kB. That's what the
+splat is about.
+
+Perhaps the solution is to remove the WARN_ON.
+
+
 
