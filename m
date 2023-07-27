@@ -1,299 +1,186 @@
-Return-Path: <netdev+bounces-22049-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22050-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7DBF765C0F
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 21:26:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C5B65765C25
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 21:30:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9C80A1C216DB
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 19:26:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C683F1C216F2
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 19:30:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16AD11AA6F;
-	Thu, 27 Jul 2023 19:26:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D8551AA77;
+	Thu, 27 Jul 2023 19:30:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0994C1805C
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 19:26:16 +0000 (UTC)
-Received: from domac.alu.hr (domac.alu.unizg.hr [161.53.235.3])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28430268B;
-	Thu, 27 Jul 2023 12:26:14 -0700 (PDT)
-Received: from localhost (localhost [127.0.0.1])
-	by domac.alu.hr (Postfix) with ESMTP id 64CB260171;
-	Thu, 27 Jul 2023 21:26:11 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
-	t=1690485971; bh=7fw+979HTyI3g1irHu9HUvXN9G+83ViUcHnWOykGLQo=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=ds7DmjwyRCEn/utPKUwbq8uOWCVvzYsxdhFPhfZCeG7V7oijdsNqGDIxntdSCBjoI
-	 mRlymUUKnIR56QpsixQIYBble7Ye3+K/6jYGivvFeEdM9Nc7bSvpzmnXNKBgbjrRvW
-	 1sRtInDngtJWDHJ8brAuRvGaxsDh3hZm0UYaB4jmQciDkjBpisgJR8Ne6tbJE7Kxot
-	 oUAIkVqq1y8Bw2++ZG2ddjRTd4Y80apfiS6FG72WeBLILcKXHU7Zjd9pJGoC+hrtkF
-	 Dynlh+WqLc4bdOjRLGkCteC7nypRGxWWH4ML7tJBHKf3yN2shLvHWnrRtxMJQwAijv
-	 WTyEicERvYA1g==
-X-Virus-Scanned: Debian amavisd-new at domac.alu.hr
-Received: from domac.alu.hr ([127.0.0.1])
-	by localhost (domac.alu.hr [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id JQ1USOFRCqN7; Thu, 27 Jul 2023 21:26:08 +0200 (CEST)
-Received: from [192.168.1.6] (unknown [94.250.191.183])
-	by domac.alu.hr (Postfix) with ESMTPSA id 6AAA96016E;
-	Thu, 27 Jul 2023 21:26:06 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
-	t=1690485968; bh=7fw+979HTyI3g1irHu9HUvXN9G+83ViUcHnWOykGLQo=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=YdkWLbc/ePFiF615XLOoQ43cVK8dZujUylvK+MTbybvavLuJA0m2bq3GcDpPDq1AJ
-	 bVdFbK6i4/x8v+mQbDGoS24Ze1pJNPrsT2ypJgak3qEaYsrpxQjYBBQUF7btXEdvwP
-	 sa2iEjxnr0cLEj9cZxg8DycbAIe2vSiRNCA06U1EZAmr23SjoxrqFFSgLrPHH3RwGQ
-	 KnGOpO7pmJ50LXnvlPHZLdhVu1i00swp+K3RMu0xP3dD6Qvn7eH/bwsjTTj1ViUo9W
-	 z0ZxoEF3zSujUciSa5drnAWBBElnCOfkw3gIo+YSo5xTiVoqrly1GFHjBMa/AdjThV
-	 8IBxsb/7JtwUw==
-Message-ID: <a9b6d9f5-14ae-a931-ab7b-d31b5e40f5df@alu.unizg.hr>
-Date: Thu, 27 Jul 2023 21:26:03 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DF5517AC1
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 19:30:06 +0000 (UTC)
+Received: from mail-ed1-x536.google.com (mail-ed1-x536.google.com [IPv6:2a00:1450:4864:20::536])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE2D13AA8
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 12:29:39 -0700 (PDT)
+Received: by mail-ed1-x536.google.com with SMTP id 4fb4d7f45d1cf-52227142a27so1664477a12.1
+        for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 12:29:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1690486177; x=1691090977;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=gYWwIPKKacieAHEo/bnQJFUUh+Fpl3lwb9Yyne8Kf/A=;
+        b=NT2LbC7e4qU6n//5DxKuo15V1+uYFEgTJJVOoeII1YYd+57bz7Ilf+W0vwromlfUXD
+         uKOp94fSYuOYNRf54Gk1UDYxveZeWHoAv/jJe40ErmeAICwp8lHsk7rOrdaST7fgi66Q
+         /lDaBzuVAZvsqrnMQ6oRviDlDNLnp8s6nOxu8=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690486177; x=1691090977;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=gYWwIPKKacieAHEo/bnQJFUUh+Fpl3lwb9Yyne8Kf/A=;
+        b=hubYI7DGKuH/V/ujsu6je6nZLCR23bE2ilb8bL+vxcik8/WsJTZiv1v+gDT09wvVg3
+         IZABMEun6lcSHAi2q26NwzsOXA4dnleeAn2oCVIX+YFvwx4E0MzhJzLwWrlaKb8rQ5XV
+         sWiJQwRhP2UFdBEnIXS2JdbXmRgV7PtsQnlBDbjvLR3wJ/KH1mFNo+1ws6pXSNa8/ZOX
+         vMz7EfpKp0WpNCVtNyaW5KZ92hcPtplhWQqO1hkrD3ND2r3zPFwWS0ImIFTG7BMEdii6
+         7zQPanOYvpdGP5tilXk6A7XPTBqxlZhHd4myOXWVUmM6Bru29eg+8zhtPwWWUdxf2owq
+         Es4Q==
+X-Gm-Message-State: ABy/qLZFXmwsvBaM3GzX++qmCS3pZD9QX8ysqNS7AJ65vH/b3294cLNt
+	KMtpVi50a1DLE28UY2/PazYOoID98i5Xj2iUlJ2x7g==
+X-Google-Smtp-Source: APBJJlEGh/WjiLVfu/G15nTaHhZT59pyINweE6iQo6JDwRmEByAA1j15GFkSc/n19lsG1ahKUgC77LSyjp2fwQub9z8=
+X-Received: by 2002:a05:6402:2c1:b0:51d:88b2:872e with SMTP id
+ b1-20020a05640202c100b0051d88b2872emr1955846edx.42.1690486177298; Thu, 27 Jul
+ 2023 12:29:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.1
-Subject: Re: [PATCH v1 01/11] selftests: forwarding: custom_multipath_hash.sh:
- add cleanup for SIGTERM sent by timeout
-Content-Language: en-US
-To: Ido Schimmel <idosch@idosch.org>
-Cc: Ido Schimmel <idosch@nvidia.com>, netdev@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Shuah Khan <shuah@kernel.org>
-References: <20230722003609.380549-1-mirsad.todorovac@alu.unizg.hr>
- <ZLzj5oYrbHGvCMkq@shredder>
- <0550924e-dce9-f90d-df8a-db810fd2499f@alu.unizg.hr>
- <adc5e40d-d040-a65e-eb26-edf47dac5b02@alu.unizg.hr>
- <ZL6OljQubhVtQjcD@shredder>
- <cab8ea8a-98f4-ef9b-4215-e2a93cccaab1@alu.unizg.hr>
- <ZMEQGIOQXv6so30x@shredder>
-From: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
-In-Reply-To: <ZMEQGIOQXv6so30x@shredder>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+References: <20230727170505.1298325-1-kuba@kernel.org> <CACKFLikZfjMnK3gwJ=xP8Hb3Bfu8CYa1NMGqHJj7ChcJTWwjmg@mail.gmail.com>
+ <20230727120522.392fe60b@kernel.org>
+In-Reply-To: <20230727120522.392fe60b@kernel.org>
+From: Michael Chan <michael.chan@broadcom.com>
+Date: Thu, 27 Jul 2023 12:29:24 -0700
+Message-ID: <CACKFLikORos5OuSfmrBpayaHx2usz_CR1hryYT3o8ZOvkhfMsg@mail.gmail.com>
+Subject: Re: [PATCH net] bnxt: don't handle XDP in netpoll
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
+	pabeni@redhat.com, gospo@broadcom.com
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="00000000000022783a06017cfc05"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 7/26/23 14:22, Ido Schimmel wrote:
-> On Mon, Jul 24, 2023 at 10:46:09PM +0200, Mirsad Todorovac wrote:
->> On 7/24/23 16:45, Ido Schimmel wrote:
->>> On Sun, Jul 23, 2023 at 11:37:46PM +0200, Mirsad Todorovac wrote:
->>>> Some tests however exited with error:
->>
->> Hi,
->>
->>>> marvin@defiant:~/linux/kernel/linux_torvalds$ grep "not ok" ../kselftest-6.5-rc2-net-forwarding-11.log
->>>> not ok 3 selftests: net/forwarding: bridge_mdb.sh # exit=1
->>>> not ok 5 selftests: net/forwarding: bridge_mdb_max.sh # exit=1
->>>> not ok 11 selftests: net/forwarding: bridge_vlan_mcast.sh # exit=1
->>>
->>> I can't reproduce these three.
->>
->> I have now enabled 'set -x' and here is the link to the output.
->>
->> NOTE as there are side-effects to running the test scripts, I have ran the
-> 
-> I don't believe this is correct after "selftests: forwarding: Switch off
-> timeout".
-> 
->> whole suite, just in case:
->>
->> https://domac.alu.unizg.hr/~mtodorov/linux/selftests/net-forwarding/kselftest-6.5-rc3-net-forwarding-12.log.xz
->>
->>> Do you have systemd-networkd running?
->>
->> No:
-> 
-> [...]
-> 
->>>> not ok 15 selftests: net/forwarding: ethtool_extended_state.sh # exit=1
->>>> not ok 17 selftests: net/forwarding: ethtool.sh # exit=1
->>>> not ok 25 selftests: net/forwarding: hw_stats_l3_gre.sh # exit=1
->>>
->>> Fixed these three.
->>>
->>>> not ok 26 selftests: net/forwarding: ip6_forward_instats_vrf.sh # exit=1
->>>
->>> Fixed.
->>
->> Great job, that's almost 50% of them!
->>
->>>> not ok 80 selftests: net/forwarding: tc_actions.sh # exit=1
->>>> not ok 83 selftests: net/forwarding: tc_flower.sh # exit=1
->>>> not ok 84 selftests: net/forwarding: tc_flower_l2_miss.sh # exit=1
->>>> not ok 89 selftests: net/forwarding: tc_tunnel_key.sh # exit=1
->>>
->>> Can't reproduce these.
->>
->> Hope the above will help.
-> 
-> Pushed fixes for tc_actions.sh, tc_flower.sh and tc_tunnel_key.sh to the
-> same branch. Please test them.
-> 
-> Regarding the MDB tests and tc_flower_l2_miss.sh, I suspect you might
-> have some daemon in user space that sends IGMP queries and therefore
-> messes with the tests. Please run the following commands in a separate
-> terminal before running tc_flower_l2_miss.sh:
-> 
-> # perf probe --add 'br_ip4_multicast_query'
-> # perf record -a -g -e 'probe:br_ip4_multicast_query'
-> 
-> After the test finishes, terminate the second command and run:
-> 
-> # perf report --stdio
-> 
-> It should show us if queries were received and which process sent them.
-> 
->>
->>> Pushed the fixes on top of the fixes from yesterday:
->>>
->>> https://github.com/idosch/linux/commits/submit/sefltests_fix_v1
->>
->> I have applied them.
->>
->> BTW, after running the full net/forwarding test suite, "ip link show"
->> looks like this:
->>
->> marvin@defiant:~/linux/kernel/linux_torvalds$ ip link show
->> 256: veth7@veth6: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noqueue state DOWN mode DEFAULT group default qlen 1000
->>      link/ether 16:74:e0:e6:f0:92 brd ff:ff:ff:ff:ff:ff
->> 257: veth6@veth7: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noqueue state DOWN mode DEFAULT group default qlen 1000
->>      link/ether 22:f3:40:50:fb:73 brd ff:ff:ff:ff:ff:ff
->> 1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
->>      link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
->> 2: enp16s0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP mode DEFAULT group default qlen 1000
->>      link/ether 9c:6b:00:01:fb:80 brd ff:ff:ff:ff:ff:ff
->> 3: veth1@veth0: <BROADCAST,MULTICAST,M-DOWN> mtu 10000 qdisc noqueue state DOWN mode DEFAULT group default qlen 1000
->>      link/ether b6:46:e6:4c:e4:00 brd ff:ff:ff:ff:ff:ff
->> 4: veth0@veth1: <BROADCAST,MULTICAST,M-DOWN> mtu 2000 qdisc noqueue state DOWN mode DEFAULT group default qlen 1000
->>      link/ether 2e:ff:7f:8a:6b:d4 brd ff:ff:ff:ff:ff:ff
->> 5: veth3@veth2: <BROADCAST,MULTICAST,M-DOWN> mtu 10000 qdisc noqueue state DOWN mode DEFAULT group default qlen 1000
->>      link/ether ba:33:37:81:dc:5b brd ff:ff:ff:ff:ff:ff
->> 6: veth2@veth3: <BROADCAST,MULTICAST,M-DOWN> mtu 2000 qdisc noqueue state DOWN mode DEFAULT group default qlen 1000
->>      link/ether f2:fd:0a:9b:94:17 brd ff:ff:ff:ff:ff:ff
->> 278: veth9@veth8: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noqueue state DOWN mode DEFAULT group default qlen 1000
->>      link/ether 0a:f1:22:04:0f:55 brd ff:ff:ff:ff:ff:ff
->> 279: veth8@veth9: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noqueue state DOWN mode DEFAULT group default qlen 1000
->>      link/ether 92:be:71:00:59:0f brd ff:ff:ff:ff:ff:ff
->> 282: gre0@NONE: <NOARP> mtu 1476 qdisc noop state DOWN mode DEFAULT group default qlen 1000
->>      link/gre 0.0.0.0 brd 0.0.0.0
->> 283: gretap0@NONE: <BROADCAST,MULTICAST> mtu 1462 qdisc noop state DOWN mode DEFAULT group default qlen 1000
->>      link/ether 00:00:00:00:00:00 brd ff:ff:ff:ff:ff:ff
->> 284: erspan0@NONE: <BROADCAST,MULTICAST> mtu 1450 qdisc noop state DOWN mode DEFAULT group default qlen 1000
->>      link/ether 00:00:00:00:00:00 brd ff:ff:ff:ff:ff:ff
->> 366: ip6tnl0@NONE: <NOARP> mtu 1452 qdisc noop state DOWN mode DEFAULT group default qlen 1000
->>      link/tunnel6 :: brd :: permaddr ce1e:75f3:f565::
->> 367: ip6gre0@NONE: <NOARP> mtu 1448 qdisc noop state DOWN mode DEFAULT group default qlen 1000
->>      link/gre6 :: brd :: permaddr 1e91:da47:154d::
->> 237: veth5@veth4: <BROADCAST,MULTICAST,M-DOWN> mtu 2000 qdisc noqueue state DOWN mode DEFAULT group default qlen 1000
->>      link/ether 6a:e3:dc:ad:8c:a0 brd ff:ff:ff:ff:ff:ff
->> 238: veth4@veth5: <BROADCAST,MULTICAST,M-DOWN> mtu 10000 qdisc noqueue state DOWN mode DEFAULT group default qlen 1000
->>      link/ether ce:a7:61:90:c8:2d brd ff:ff:ff:ff:ff:ff
->> marvin@defiant:~/linux/kernel/linux_torvalds$
->>
->> This is kinda awkward, because I have to reboot the machine for the next run, each time.
-> 
-> Why? The fact that the veth pairs are already present doesn't impact the
-> selftests.
-> 
->>
->> I am in no condition to try to figure out which tests leaked links.
-> 
-> The veth pairs were created by the first invocation of the selftests and
-> are not deleted at the end. We already discussed it. But the fact that
-> they are already present does not mean you can't re-run the tests.
-> 
-> Regarding gre0, gretap0, erspan0, ip6tnl0 and ip6gre0, they are
-> automatically created by the kernel when the relevant kernel modules are
-> loaded. They are not used by the selftests.
+--00000000000022783a06017cfc05
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-If you're in dilemma, my experiment had shown that it is sufficient to delete one
-side of the veth link, for another side automagically vanishes.
+On Thu, Jul 27, 2023 at 12:05=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> w=
+rote:
+>
+> On Thu, 27 Jul 2023 11:52:10 -0700 Michael Chan wrote:
+> > These TX packet completions have already been counted in
+> > __bnxt_poll_work().  If we do nothing here, I think the TX ring will
+> > forever be out-of-sync with the completion ring.
+>
+> I see...
+>
+> Do you prefer adding a return value to tx_int() to tell
+> __bnxt_poll_work_done() whether the work has been done;
+> or to clear tx_pkts in the handler itself rather than
+> the caller?
+>
 
-BTW, the patches successfully applied, safe for the following:
+It's a bigger problem.  When we transmit packets, we store these
+packet buffers and advance the producer index.  The completion ring
+tells us how many TX packets have completed.  We then walk the TX ring
+for the number of TX packets completed and free the buffers.  If we
+cannot free the buffers now, we have to save this information (the
+consumer index).  We won't get this information again in the
+completion ring.
 
-error: patch failed: tools/testing/selftests/net/forwarding/hw_stats_l3_gre.sh:99
-error: tools/testing/selftests/net/forwarding/hw_stats_l3_gre.sh: patch does not apply
+--00000000000022783a06017cfc05
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
 
-error: patch failed: tools/testing/selftests/net/forwarding/ethtool_extended_state.sh:108
-error: tools/testing/selftests/net/forwarding/ethtool_extended_state.sh: patch does not apply
-
-error: patch failed: tools/testing/selftests/net/forwarding/ethtool_mm.sh:278
-error: tools/testing/selftests/net/forwarding/ethtool_mm.sh: patch does not apply
-
-(Manual inspection revealed that all of those are adding of skip_on_veth which was already
-present in the script, but I recall you added skip_on_veth recently, so I guess this is something
-in our patch communication.)
-
-The test results are very good:
-
-marvin@defiant:~/linux/kernel/linux_torvalds$ grep "not ok" ../kselftest-6.5-rc3-net-forwarding-16.log
-not ok 3 selftests: net/forwarding: bridge_mdb.sh # exit=1
-not ok 5 selftests: net/forwarding: bridge_mdb_max.sh # exit=1
-not ok 11 selftests: net/forwarding: bridge_vlan_mcast.sh # exit=1
-not ok 26 selftests: net/forwarding: ip6_forward_instats_vrf.sh # exit=1
-not ok 49 selftests: net/forwarding: mirror_gre_changes.sh # exit=1
-not ok 84 selftests: net/forwarding: tc_flower_l2_miss.sh # exit=1
-marvin@defiant:~/linux/kernel/linux_torvalds$ grep -v "^# +" ../kselftest-6.5-rc3-net-forwarding-16.log | grep -A1 FAIL | grep -v -e -- | grep -v OK
-# TEST: IPv6 (S, G) port group entries configuration tests            [FAIL]
-# 	"temp" entry has an unpending group timer
-# TEST: IPv4 host entries forwarding tests                            [FAIL]
-# 	Packet not locally received after adding a host entry
-# TEST: IPv4 port group "exclude" entries forwarding tests            [FAIL]
-# 	Packet from valid source not received on H2 after adding entry
-# TEST: IPv4 port group "include" entries forwarding tests            [FAIL]
-# 	Packet from valid source not received on H2 after adding entry
-# TEST: IGMPv3 MODE_IS_INCLUDE tests                                  [FAIL]
-# 	Source not add to source list
-# TEST: ctl4: port: ngroups reporting                                 [FAIL]
-# 	Couldn't add MDB entries
-# TEST: ctl4: port maxgroups: reporting and treatment of 0            [FAIL]
-# 	Adding 5 MDB entries failed but should have passed
-# TEST: ctl4: port maxgroups: configure below ngroups                 [FAIL]
-# 	dev veth1: Couldn't add MDB entries
-# TEST: ctl4: port: ngroups reporting                                 [FAIL]
-# 	Couldn't add MDB entries
-# TEST: ctl4: port maxgroups: reporting and treatment of 0            [FAIL]
-# 	Adding 5 MDB entries failed but should have passed
-# TEST: ctl4: port maxgroups: configure below ngroups                 [FAIL]
-# 	dev veth1 vid 10: Couldn't add MDB entries
-# TEST: ctl4: port_vlan: ngroups reporting                            [FAIL]
-# 	Couldn't add MDB entries
-# TEST: ctl4: port_vlan: isolation of port and per-VLAN ngroups       [FAIL]
-# 	Couldn't add MDB entries to VLAN 10
-# TEST: ctl4: port_vlan maxgroups: reporting and treatment of 0       [FAIL]
-# 	Adding 5 MDB entries failed but should have passed
-# TEST: ctl4: port_vlan maxgroups: configure below ngroups            [FAIL]
-# 	dev veth1 vid 10: Couldn't add MDB entries
-# TEST: ctl4: port_vlan maxgroups: isolation of port and per-VLAN ngroups   [FAIL]
-# 	Couldn't add 5 entries
-# TEST: Vlan mcast_startup_query_interval global option default value   [FAIL]
-# 	Wrong default mcast_startup_query_interval global vlan option value
-# TEST: Ip6InHdrErrors                                                [FAIL]
-# TEST: mirror to gretap: TTL change (skip_hw)                        [FAIL]
-# 	Expected to capture 10 packets, got 14.
-# TEST: L2 miss - Multicast (IPv4)                                    [FAIL]
-# 	Unregistered multicast filter was not hit before adding MDB entry
-marvin@defiant:~/linux/kernel/linux_torvalds$
-
-In case you want to pursue these failures, there is the complete test output log
-here:
-
-https://domac.alu.unizg.hr/~mtodorov/linux/selftests/net-forwarding/kselftest-6.5-rc3-net-forwarding-16.log.xz
-
-Thanks again, great work!
-
-Kind regards,
-Mirsad
+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
+OnaLEot1MoQO7BIe5S9H4AcCEXXcrJJiAtMCl47ARpyHmvQFQFFTrHgUYEd9V+9bOzY7MBIGSV1N
+/JfsT1sZw6HT0lJkSQefhPGpBniAob62DJP3qr11tu8CAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
+AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
+c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
+AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
+TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
+bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
+L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
+BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
+HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQU31rAyTdZweIF0tJTFYwfOv2w
+L4QwDQYJKoZIhvcNAQELBQADggEBACcuyaGmk0NSZ7Kio7O7WSZ0j0f9xXcBnLbJvQXFYM7JI5uS
+kw5ozATEN5gfmNIe0AHzqwoYjAf3x8Dv2w7HgyrxWdpjTKQFv5jojxa3A5LVuM8mhPGZfR/L5jSk
+5xc3llsKqrWI4ov4JyW79p0E99gfPA6Waixoavxvv1CZBQ4Stu7N660kTu9sJrACf20E+hdKLoiU
+hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
+E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
+aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
+EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEINb8i8wgY6nX4EPNQ7corWSQfMd1fryo
+OnXKHXxH3nw+MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMDcy
+NzE5MjkzN1owaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
+ATANBgkqhkiG9w0BAQEFAASCAQChFeVFESqg+9+lNS1EH+z11L+hU+QbDq9uAsys5P7fdnkaZIV7
+4B8phHf9XE6A5XNjSHsIGtca0wYDTeqV58rG+NukzA3YGHRSIRSMXShn1T862R9kjZ3TRhsrveUF
++NJr7VMN9SXtKoRCQ8DglIN2gJfSllLK0YZPV2fWnYH32vS4XhRBNXLnMqlv7Ypu1DZvD3C9sc+o
+DBGx397e3RYzA0QG87txw+KX6VNhVwbJR8N0RU1geHpYmU0I0+siH9q1xBeKbdVN2rXwMH4PooV6
+mKXmRAL3L0iG7oNhhRvBi5juwLV9fGkLSOsxo1q3GcrvxrdVBO/keo4cqqBvtfml
+--00000000000022783a06017cfc05--
 
