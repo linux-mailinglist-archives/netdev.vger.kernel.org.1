@@ -1,233 +1,83 @@
-Return-Path: <netdev+bounces-21711-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21712-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B412764553
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 07:13:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D50B76455C
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 07:20:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 14EF61C21501
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 05:13:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 438C01C214B4
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 05:20:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AE3B5237;
-	Thu, 27 Jul 2023 05:13:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48B62538C;
+	Thu, 27 Jul 2023 05:20:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5784E3D72
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 05:13:30 +0000 (UTC)
-Received: from mail-yw1-x1134.google.com (mail-yw1-x1134.google.com [IPv6:2607:f8b0:4864:20::1134])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6C8E2724;
-	Wed, 26 Jul 2023 22:13:25 -0700 (PDT)
-Received: by mail-yw1-x1134.google.com with SMTP id 00721157ae682-5768a7e3adbso25780197b3.0;
-        Wed, 26 Jul 2023 22:13:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690434805; x=1691039605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=oc2iF7zyvIQRZQViezTnM3M7DWBbv3484xuglbYBePo=;
-        b=jI3Ew8cfqJbKUTa9Nis7dkVYeEEuOLY7PYnlip/+Xcs7S4CAyeBNOoJfgvyVVNBtfZ
-         iIMJ66GIjwWTrlrw4Pbf8Bsgd3jmOcsDmVc9a1gxuAQH9PFyk6PLfuIMohUN+l9cAC/B
-         6r7ZtXbh7QsGkE0ouY8Ci6eGAibCzfPzK+PPp69dsnPFA2ny8lENoZDI/2ztiEkdVgvd
-         BPfhRfVy59qBfx9gVphh7Rt+TlFXHtuexV5YhxL2Cv7QuBCL8I+wmBfvroh2XTiRPUwu
-         f+mj1jx07UULer6nJgZVpyetVHPWpRBgfYizy/SQXUbGiGCfNyV9PHJZomJgMQqfkRFs
-         sCeQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690434805; x=1691039605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=oc2iF7zyvIQRZQViezTnM3M7DWBbv3484xuglbYBePo=;
-        b=ZW67x7rMXOLMa8QfCFreaZSt8ABZW8u/zm0Q09P0S9hndKb/Tukrk0oXV/LrhwFH+I
-         bB0lP8TqRV5aMI6dZg+olqndVjIkt9o0S+cEPU2rR05/qqip/o1QjmbVPtB5iRjCTE9P
-         ixBu9L4JR5WNFCkgUf6Fl5qqCk65/R9GE+84Uuq2Srq94rBiEd73Uf2i/cFvX3SKed4k
-         i1J44OBsd5FytCogMbikPP+d6rwnPdWYy4ELAh+Kt34SoGO/79PAN7dMYibkMWaCninV
-         LMdhh2v27crEUCIEENagyDECcz6bkNUGF1JKSjuIp4mUO6+fBAqnobLSvpXu8XGl0Mq6
-         4cAA==
-X-Gm-Message-State: ABy/qLb8y6jAb3ttEghm+9BfSimxrARfXaGoLV4NpkSy8Q9MUkwb2bbK
-	jFjHxdc/FkWR5BghW4fETLC3Z7DSb5A/gtVwkN6YzlZD
-X-Google-Smtp-Source: APBJJlE7T/W9W1hCjdIskW6DU4QgxrnAxOmX5Qf7N1kEmh3y+G5Hs0rHTAdkhs3KKZZ+zvfjielGXhKAu/4uIPceSdE=
-X-Received: by 2002:a81:91cb:0:b0:577:2aa4:70aa with SMTP id
- i194-20020a8191cb000000b005772aa470aamr1923520ywg.21.1690434804053; Wed, 26
- Jul 2023 22:13:24 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E79593D72
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 05:20:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 44950C433C8;
+	Thu, 27 Jul 2023 05:20:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1690435221;
+	bh=nixmqmz0SCMUSGv4N/J4Quar1kf4vv7lNBNc5my/Fpc=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=GCZMERSfojTbTsD3y55DbQ99S1RNIBO1XzufCASIxPaMbTcDDRtxKYk2aMfJAtq8l
+	 sjlsFrHZ64I95d3lCX9cWHzJAIMIV1yITlePpsUtTejXzt1hXBIt3bY6GcTpi7uA1H
+	 TLOtsu0/BlcznPU9zq4Ynh/nF0y9kuXCLDUC2kjbu3ag9lXW6YDSchJUDw0xZs6ENu
+	 Ab2OYvbXY0XvPwWgqNo3EMkQUwKcNRoJzK6K72E/6wqACFETKPuwgvolUpg5VIzlj2
+	 OEEX+XRPs51BAT6Ni9ZIimdx38fd560tWuhtxo/qmibR+OFi6L1UT2ffKYfnR1pZ9D
+	 je8aLz100eWMQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 25E0FC59A4C;
+	Thu, 27 Jul 2023 05:20:21 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <1690377336-1353-1-git-send-email-schakrabarti@linux.microsoft.com>
- <519602aa-0a6a-70a5-23c7-ce190045e4af@linux.dev>
-In-Reply-To: <519602aa-0a6a-70a5-23c7-ce190045e4af@linux.dev>
-From: Souradeep Chakrabarti <souradch.linux@gmail.com>
-Date: Thu, 27 Jul 2023 10:43:12 +0530
-Message-ID: <CABNGXZrcW1tmJALpkx38QxkUs=8ivFzDEc0urgrKVWwybngs0Q@mail.gmail.com>
-Subject: Re: [PATCH V6 net] net: mana: Fix MANA VF unload when hardware is
-To: Zhu Yanjun <yanjun.zhu@linux.dev>
-Cc: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>, kys@microsoft.com, 
-	haiyangz@microsoft.com, wei.liu@kernel.org, decui@microsoft.com, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	longli@microsoft.com, sharmaajay@microsoft.com, leon@kernel.org, 
-	cai.huoqing@linux.dev, ssengar@linux.microsoft.com, vkuznets@redhat.com, 
-	tglx@linutronix.de, linux-hyperv@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org, 
-	schakrabarti@microsoft.com, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] virtio-net: fix race between set queues and probe
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169043522115.2558.14440034474051213901.git-patchwork-notify@kernel.org>
+Date: Thu, 27 Jul 2023 05:20:21 +0000
+References: <20230725072049.617289-1-jasowang@redhat.com>
+In-Reply-To: <20230725072049.617289-1-jasowang@redhat.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: mst@redhat.com, xuanzhuo@linux.alibaba.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
 
-On Thu, Jul 27, 2023 at 9:07=E2=80=AFAM Zhu Yanjun <yanjun.zhu@linux.dev> w=
-rote:
->
-> =E5=9C=A8 2023/7/26 21:15, Souradeep Chakrabarti =E5=86=99=E9=81=93:
-> > When unloading the MANA driver, mana_dealloc_queues() waits for the MAN=
-A
-> > hardware to complete any inflight packets and set the pending send coun=
-t
-> > to zero. But if the hardware has failed, mana_dealloc_queues()
-> > could wait forever.
-> >
-> > Fix this by adding a timeout to the wait. Set the timeout to 120 second=
-s,
-> > which is a somewhat arbitrary value that is more than long enough for
-> > functional hardware to complete any sends.
-> >
-> > Cc: stable@vger.kernel.org
-> > Fixes: ca9c54d2d6a5 ("net: mana: Add a driver for Microsoft Azure Netwo=
-rk Adapter (MANA)")
-> >
-> > Signed-off-by: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
-> > ---
-> > V5 -> V6:
-> > * Added pcie_flr to reset the pci after timeout.
-> > * Fixed the position of changelog.
-> > * Removed unused variable like cq.
-> >
-> > V4 -> V5:
-> > * Added fixes tag
-> > * Changed the usleep_range from static to incremental value.
-> > * Initialized timeout in the begining.
-> >
-> > V3 -> V4:
-> > * Removed the unnecessary braces from mana_dealloc_queues().
-> >
-> > V2 -> V3:
-> > * Removed the unnecessary braces from mana_dealloc_queues().
-> >
-> > V1 -> V2:
-> > * Added net branch
-> > * Removed the typecasting to (struct mana_context*) of void pointer
-> > * Repositioned timeout variable in mana_dealloc_queues()
-> > * Repositioned vf_unload_timeout in mana_context struct, to utilise the
-> >   6 bytes hole
-> > ---
-> >   drivers/net/ethernet/microsoft/mana/mana_en.c | 38 +++++++++++++++++-=
--
-> >   1 file changed, 34 insertions(+), 4 deletions(-)
-> >
-> > diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/ne=
-t/ethernet/microsoft/mana/mana_en.c
-> > index a499e460594b..ea039e2d4c4b 100644
-> > --- a/drivers/net/ethernet/microsoft/mana/mana_en.c
-> > +++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
-> > @@ -8,6 +8,7 @@
-> >   #include <linux/ethtool.h>
-> >   #include <linux/filter.h>
-> >   #include <linux/mm.h>
-> > +#include <linux/pci.h>
-> >
-> >   #include <net/checksum.h>
-> >   #include <net/ip6_checksum.h>
-> > @@ -2345,9 +2346,12 @@ int mana_attach(struct net_device *ndev)
-> >   static int mana_dealloc_queues(struct net_device *ndev)
-> >   {
-> >       struct mana_port_context *apc =3D netdev_priv(ndev);
-> > +     unsigned long timeout =3D jiffies + 120 * HZ;
-> >       struct gdma_dev *gd =3D apc->ac->gdma_dev;
-> >       struct mana_txq *txq;
-> > +     struct sk_buff *skb;
-> >       int i, err;
-> > +     u32 tsleep;
-> >
-> >       if (apc->port_is_up)
-> >               return -EINVAL;
-> > @@ -2363,15 +2367,41 @@ static int mana_dealloc_queues(struct net_devic=
-e *ndev)
-> >        * to false, but it doesn't matter since mana_start_xmit() drops =
-any
-> >        * new packets due to apc->port_is_up being false.
-> >        *
-> > -      * Drain all the in-flight TX packets
-> > +      * Drain all the in-flight TX packets.
-> > +      * A timeout of 120 seconds for all the queues is used.
-> > +      * This will break the while loop when h/w is not responding.
-> > +      * This value of 120 has been decided here considering max
-> > +      * number of queues.
-> >        */
-> > +
-> >       for (i =3D 0; i < apc->num_queues; i++) {
-> >               txq =3D &apc->tx_qp[i].txq;
-> > -
-> > -             while (atomic_read(&txq->pending_sends) > 0)
-> > -                     usleep_range(1000, 2000);
-> > +             tsleep =3D 1000;
-> > +             while (atomic_read(&txq->pending_sends) > 0 &&
-> > +                    time_before(jiffies, timeout)) {
-> > +                     usleep_range(tsleep, tsleep + 1000);
-> > +                     tsleep <<=3D 1;
-> > +             }
-> > +             if (atomic_read(&txq->pending_sends)) {
-> > +                     err  =3D pcie_flr(to_pci_dev(gd->gdma_context->de=
-v));
-> > +                     if (err) {
-> > +                             netdev_err(ndev, "flr failed %d with %d p=
-kts pending in txq %u\n",
-> > +                                        err, atomic_read(&txq->pending=
-_sends),
-> > +                                        txq->gdma_txq_id);
-> > +                     }
-> > +                     break;
-> > +             }
-> >       }
-> >
-> > +     for (i =3D 0; i < apc->num_queues; i++) {
-> > +             txq =3D &apc->tx_qp[i].txq;
-> > +             while (atomic_read(&txq->pending_sends)) {
-> > +                     skb =3D skb_dequeue(&txq->pending_skbs);
-> > +                     mana_unmap_skb(skb, apc);
-> > +                     dev_consume_skb_any(skb);
-> > +                     atomic_sub(1, &txq->pending_sends);
-> > +             }
-> If I get this commit correctly, txq->pending_sends should be equal to
-> the length of txq->pending_skbs?
->
-> If yes, can we only handle the pending_skbs?
->
-> the above snippet can be changed to as below? So the performance is bette=
-r?
-> "
->                 while ((skb =3D skb_dequeue(&txq->pending_skbs))) {
->                         mana_unmap_skb(skb, apc);
->                         dev_consume_skb_any(skb);
->                 }
->                 atomic_set(&txq->pending_sends, 0);
-> "
->
-> Zhu Yanjun
-Yes, we can do that, thanks for pointing. Will take care of it in next vers=
-ion.
->
-> > +     }
-> >       /* We're 100% sure the queues can no longer be woken up, because
-> >        * we're sure now mana_poll_tx_cq() can't be running.
-> >        */
->
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Tue, 25 Jul 2023 03:20:49 -0400 you wrote:
+> A race were found where set_channels could be called after registering
+> but before virtnet_set_queues() in virtnet_probe(). Fixing this by
+> moving the virtnet_set_queues() before netdevice registering. While at
+> it, use _virtnet_set_queues() to avoid holding rtnl as the device is
+> not even registered at that time.
+> 
+> Fixes: a220871be66f ("virtio-net: correctly enable multiqueue")
+> Signed-off-by: Jason Wang <jasowang@redhat.com>
+> 
+> [...]
+
+Here is the summary with links:
+  - [net] virtio-net: fix race between set queues and probe
+    https://git.kernel.org/netdev/net/c/25266128fe16
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
