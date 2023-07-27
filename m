@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-21812-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21813-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79941764E1A
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 10:50:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8056764E1D
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 10:50:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2C888281F9A
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 08:50:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E547D1C21181
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 08:50:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35588D516;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D607D51C;
 	Thu, 27 Jul 2023 08:50:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED8DAD301
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED8A4C2C2
 	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 08:50:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 98B8BC433CA;
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 9456FC433C9;
 	Thu, 27 Jul 2023 08:50:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1690447821;
-	bh=ipAFE1PedARgTISrY20Q3M/AMYk5COsb1aBJHF2CSHk=;
+	bh=GlH5mbp9j0RGJ071GfQGT/J6uBVSMxt/8MVV9sBYAnU=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=k/5GhiFzHz8iKWC48SfmcAgXcztZIUqer7lrh4SSTVxJrQDZ+DKpeSM+nPq4m5Oo9
-	 vU5gYNXij8W+wO2VbSqGRZsny6DKz+kKVxHMr/x4BidO3PjqQqou3EyAfFpIwGQvaN
-	 mCPf0CBYpPgEjYDhr4bs+sGHI3Ocb9x3Ob4anE8q3uJktSgET4gFopQItbhA/vF2AV
-	 5onbVr9fIbMluImONBTBGNSP6qpMQtm1G/gFE9/Iu5ZHXCOwlp5/OqBJcHQJWkspNU
-	 SvoGl0/yuvZhh9U/W+Fzu2vChtX7L4LhOHq6GhhYt58oNcFYT18QNUuQDYhZSXOKPb
-	 KQ56Tt8xsHJCw==
+	b=s9BaKUC8EICrfKaElJOyIyZsP9PYqR/aZ+JpHahxy/JHrzznz8NDbLLMmhynBC/kz
+	 JXLUZelVG3w/F+ocXGXIShkL6pzapwkY64m261kPuhIQziZFxgl+CJ9PE3cXozRI9f
+	 lo/GwGuNJOxjJaU9ZSGwjF+vbgYRpSswF1slQEFGAvUS2utOh/qLqt6j20xN3qSFPJ
+	 6lImbGQw38+YE3RYzCF5ZGR8rmMwOCuu8Wfc6Vu+S2y1RbFJKxoufdTLj4vTjfkmWV
+	 sC9Wxk4PzpGUDoYaZlrmwKasQM9OghZTkmxpc5nYNweeRKqd4XSpvcQrgwa8K0ATlU
+	 rr/RQaRD5tAqA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 7F8D6C41672;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 78686C691EE;
 	Thu, 27 Jul 2023 08:50:21 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -41,35 +41,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 1/1] tipc: check return value of pskb_trim()
+Subject: Re: [PATCH net v2 1/1] benet: fix return value check in
+ be_lancer_xmit_workarounds()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <169044782151.5847.14421459356429788068.git-patchwork-notify@kernel.org>
+ <169044782148.5847.13565294652021594404.git-patchwork-notify@kernel.org>
 Date: Thu, 27 Jul 2023 08:50:21 +0000
-References: <20230725064810.5820-1-ruc_gongyuanjun@163.com>
-In-Reply-To: <20230725064810.5820-1-ruc_gongyuanjun@163.com>
+References: <20230725032726.15002-1-ruc_gongyuanjun@163.com>
+In-Reply-To: <20230725032726.15002-1-ruc_gongyuanjun@163.com>
 To: Yuanjun Gong <ruc_gongyuanjun@163.com>
-Cc: kuniyu@amazon.com, jmaloy@redhat.com, netdev@vger.kernel.org,
- ying.xue@windriver.com
+Cc: kuniyu@amazon.com, ajit.khaparde@broadcom.com, netdev@vger.kernel.org,
+ somnath.kotur@broadcom.com, sriharsha.basavapatna@broadcom.com
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Paolo Abeni <pabeni@redhat.com>:
 
-On Tue, 25 Jul 2023 14:48:10 +0800 you wrote:
-> goto free_skb if an unexpected result is returned by pskb_tirm()
-> in tipc_crypto_rcv_complete().
+On Tue, 25 Jul 2023 11:27:26 +0800 you wrote:
+> in be_lancer_xmit_workarounds(), it should go to label 'tx_drop'
+> if an unexpected value is returned by pskb_trim().
 > 
-> Fixes: fc1b6d6de220 ("tipc: introduce TIPC encryption & authentication")
+> Fixes: 93040ae5cc8d ("be2net: Fix to trim skb for padded vlan packets to workaround an ASIC Bug")
 > Signed-off-by: Yuanjun Gong <ruc_gongyuanjun@163.com>
 > ---
->  net/tipc/crypto.c | 3 ++-
+>  drivers/net/ethernet/emulex/benet/be_main.c | 3 ++-
 >  1 file changed, 2 insertions(+), 1 deletion(-)
 
 Here is the summary with links:
-  - [v2,1/1] tipc: check return value of pskb_trim()
-    https://git.kernel.org/netdev/net/c/e46e06ffc6d6
+  - [net,v2,1/1] benet: fix return value check in be_lancer_xmit_workarounds()
+    https://git.kernel.org/netdev/net/c/5c85f7065718
 
 You are awesome, thank you!
 -- 
