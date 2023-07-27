@@ -1,195 +1,116 @@
-Return-Path: <netdev+bounces-21687-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21688-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C598764428
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 05:11:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95BAF764447
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 05:22:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ACB501C21412
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 03:11:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 59CF3281FF0
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 03:22:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 348FF1BF01;
-	Thu, 27 Jul 2023 03:11:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2660C17F5;
+	Thu, 27 Jul 2023 03:22:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 218611BEE4
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 03:10:59 +0000 (UTC)
-Received: from out-39.mta0.migadu.com (out-39.mta0.migadu.com [IPv6:2001:41d0:1004:224b::27])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5D9E1FC0
-	for <netdev@vger.kernel.org>; Wed, 26 Jul 2023 20:10:56 -0700 (PDT)
-Message-ID: <519602aa-0a6a-70a5-23c7-ce190045e4af@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1690427454;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=D6AAFz5LXq+gKWR7MYd9L3gmF4UqvD9x32qWV+TlC8E=;
-	b=GNSyC2eocgWDA6uOLCb+43xxY0HaJs/PcYEyA62P/8mi6H8Zz2r84qPqkosCDfGHcVYu6z
-	6XhkWS/g1oPw9O+8zeQ2jWyoWJq1aV7vjps54cg4a/WQZrGLMF/wNQ2o9VvwL8+51+xYIU
-	pxO8y7gxs9HzphNAfL8KFNHxZo5JFy0=
-Date: Thu, 27 Jul 2023 11:10:37 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A4FF1BEE4
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 03:22:48 +0000 (UTC)
+Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5E531FFC;
+	Wed, 26 Jul 2023 20:22:47 -0700 (PDT)
+Received: by mail-pl1-x629.google.com with SMTP id d9443c01a7336-1bba54f7eefso11094625ad.1;
+        Wed, 26 Jul 2023 20:22:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1690428167; x=1691032967;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=dOCw3tpOEkG5/EtUROA6ZEpUAqPahbTI4RHTbQoB/Hg=;
+        b=HzcG3g3UHsjEAs3chpzxRsJX2TKUE6woS5MmSGktqiGRnoAikjc5OlNSR8NXmoKNdv
+         yDh0j+qIdpkv5hJEWcpG6SAaRVUYRVOrpvmzrHQeF7dsqhlvYCcWrbdD3Pb0mCK21KkU
+         rrL9dKtee3BCYh5IxauF966Yh7n41glBpUA9A++2KXZGtl3+4OQXkAnENKkq/YLhK74P
+         +roXcaOkz3ZuAR7DjvtQ+o+11zOZUEUZ4BOfmqWm7dVxZkotE1JD4aWYmVNtxC+alvFS
+         dTAkNEX8UazU3WmZYFbmiqPGmEuNbQbhwNPpsYPFwU5hyYiotL22sIxN0Y4jwelJ9AYe
+         Z4Eg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690428167; x=1691032967;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dOCw3tpOEkG5/EtUROA6ZEpUAqPahbTI4RHTbQoB/Hg=;
+        b=kz2l72+El+UZTvcV7QHhe1tOdh1HCdi483ohMO4JiNib44a/usPyuRRqVLnQLnZzHr
+         Apa4NKRDjqz2ft/2Nvlr2kogXr0vMyU5RBU7CSHhlcpu0nALIsGO1fBP/oivc6B9sgj1
+         3BqgAIaE43NeRXd/O2dwuiVyNgv6mffegeBd9bmNiF09x1wpb/Yrn+EkYfoN26dw/aO8
+         utBOJg+E4DTQTYJuF4Dv/CFtRaf0lLBCkFRog3/1henf/zrKFwjH8wFHK5y5TFrfQoch
+         BHWt4DwBo6VmYpVd9utgjM++x7bJJpTn3IRk0TOvLOMQM7/ztdnWdANQ4s4MfkcH8FD4
+         +ywQ==
+X-Gm-Message-State: ABy/qLZ6DRngWsI9inwM17SZPk+V+SRWpFLTGP1ZkMsOmDkn7eYCuynI
+	Q8r6ICJmWJsqUbe3qEpbljq9Msh9wkANP4pQ
+X-Google-Smtp-Source: APBJJlGZe/I1Ujw/CjltJQl1utB7MetkJz1HzRVtMnRswtp5PbgsxjNlYnFHni0NfgXc/eaakokBBg==
+X-Received: by 2002:a17:902:d2cb:b0:1bb:b2f7:e075 with SMTP id n11-20020a170902d2cb00b001bbb2f7e075mr1758828plc.7.1690428167028;
+        Wed, 26 Jul 2023 20:22:47 -0700 (PDT)
+Received: from Laptop-X1 ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id p5-20020a1709028a8500b001b8ab115ce4sm292544plo.278.2023.07.26.20.22.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 Jul 2023 20:22:46 -0700 (PDT)
+Date: Thu, 27 Jul 2023 11:22:41 +0800
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: YueHaibing <yuehaibing@huawei.com>
+Cc: j.vosburgh@gmail.com, andy@greyhouse.net, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	jon.toppins+linux@gmail.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 net-next] bonding: 3ad: Remove unused declaration
+ bond_3ad_update_lacp_active()
+Message-ID: <ZMHjAWT60adJfhqY@Laptop-X1>
+References: <20230726143816.15280-1-yuehaibing@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH V6 net] net: mana: Fix MANA VF unload when hardware is
-To: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>,
- kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
- decui@microsoft.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, longli@microsoft.com,
- sharmaajay@microsoft.com, leon@kernel.org, cai.huoqing@linux.dev,
- ssengar@linux.microsoft.com, vkuznets@redhat.com, tglx@linutronix.de,
- linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org
-Cc: schakrabarti@microsoft.com, stable@vger.kernel.org
-References: <1690377336-1353-1-git-send-email-schakrabarti@linux.microsoft.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Zhu Yanjun <yanjun.zhu@linux.dev>
-In-Reply-To: <1690377336-1353-1-git-send-email-schakrabarti@linux.microsoft.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230726143816.15280-1-yuehaibing@huawei.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-	autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-在 2023/7/26 21:15, Souradeep Chakrabarti 写道:
-> When unloading the MANA driver, mana_dealloc_queues() waits for the MANA
-> hardware to complete any inflight packets and set the pending send count
-> to zero. But if the hardware has failed, mana_dealloc_queues()
-> could wait forever.
+On Wed, Jul 26, 2023 at 10:38:16PM +0800, YueHaibing wrote:
+> This is not used since commit 3a755cd8b7c6 ("bonding: add new option lacp_active")
 > 
-> Fix this by adding a timeout to the wait. Set the timeout to 120 seconds,
-> which is a somewhat arbitrary value that is more than long enough for
-> functional hardware to complete any sends.
-> 
-> Cc: stable@vger.kernel.org
-> Fixes: ca9c54d2d6a5 ("net: mana: Add a driver for Microsoft Azure Network Adapter (MANA)")
-> 
-> Signed-off-by: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
+> Signed-off-by: YueHaibing <yuehaibing@huawei.com>
+
+It looks like a function I added in the draft patch and forgot to remove it
+when post... Thanks for the fix.
+
+Acked-by: Hangbin Liu <liuhangbin@gmail.com>
+
 > ---
-> V5 -> V6:
-> * Added pcie_flr to reset the pci after timeout.
-> * Fixed the position of changelog.
-> * Removed unused variable like cq.
-> 
-> V4 -> V5:
-> * Added fixes tag
-> * Changed the usleep_range from static to incremental value.
-> * Initialized timeout in the begining.
-> 
-> V3 -> V4:
-> * Removed the unnecessary braces from mana_dealloc_queues().
-> 
-> V2 -> V3:
-> * Removed the unnecessary braces from mana_dealloc_queues().
-> 
-> V1 -> V2:
-> * Added net branch
-> * Removed the typecasting to (struct mana_context*) of void pointer
-> * Repositioned timeout variable in mana_dealloc_queues()
-> * Repositioned vf_unload_timeout in mana_context struct, to utilise the
->   6 bytes hole
+> v2: fix patch prefix
 > ---
->   drivers/net/ethernet/microsoft/mana/mana_en.c | 38 +++++++++++++++++--
->   1 file changed, 34 insertions(+), 4 deletions(-)
+>  include/net/bond_3ad.h | 1 -
+>  1 file changed, 1 deletion(-)
 > 
-> diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
-> index a499e460594b..ea039e2d4c4b 100644
-> --- a/drivers/net/ethernet/microsoft/mana/mana_en.c
-> +++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
-> @@ -8,6 +8,7 @@
->   #include <linux/ethtool.h>
->   #include <linux/filter.h>
->   #include <linux/mm.h>
-> +#include <linux/pci.h>
->   
->   #include <net/checksum.h>
->   #include <net/ip6_checksum.h>
-> @@ -2345,9 +2346,12 @@ int mana_attach(struct net_device *ndev)
->   static int mana_dealloc_queues(struct net_device *ndev)
->   {
->   	struct mana_port_context *apc = netdev_priv(ndev);
-> +	unsigned long timeout = jiffies + 120 * HZ;
->   	struct gdma_dev *gd = apc->ac->gdma_dev;
->   	struct mana_txq *txq;
-> +	struct sk_buff *skb;
->   	int i, err;
-> +	u32 tsleep;
->   
->   	if (apc->port_is_up)
->   		return -EINVAL;
-> @@ -2363,15 +2367,41 @@ static int mana_dealloc_queues(struct net_device *ndev)
->   	 * to false, but it doesn't matter since mana_start_xmit() drops any
->   	 * new packets due to apc->port_is_up being false.
->   	 *
-> -	 * Drain all the in-flight TX packets
-> +	 * Drain all the in-flight TX packets.
-> +	 * A timeout of 120 seconds for all the queues is used.
-> +	 * This will break the while loop when h/w is not responding.
-> +	 * This value of 120 has been decided here considering max
-> +	 * number of queues.
->   	 */
-> +
->   	for (i = 0; i < apc->num_queues; i++) {
->   		txq = &apc->tx_qp[i].txq;
-> -
-> -		while (atomic_read(&txq->pending_sends) > 0)
-> -			usleep_range(1000, 2000);
-> +		tsleep = 1000;
-> +		while (atomic_read(&txq->pending_sends) > 0 &&
-> +		       time_before(jiffies, timeout)) {
-> +			usleep_range(tsleep, tsleep + 1000);
-> +			tsleep <<= 1;
-> +		}
-> +		if (atomic_read(&txq->pending_sends)) {
-> +			err  = pcie_flr(to_pci_dev(gd->gdma_context->dev));
-> +			if (err) {
-> +				netdev_err(ndev, "flr failed %d with %d pkts pending in txq %u\n",
-> +					   err, atomic_read(&txq->pending_sends),
-> +					   txq->gdma_txq_id);
-> +			}
-> +			break;
-> +		}
->   	}
->   
-> +	for (i = 0; i < apc->num_queues; i++) {
-> +		txq = &apc->tx_qp[i].txq;
-> +		while (atomic_read(&txq->pending_sends)) {
-> +			skb = skb_dequeue(&txq->pending_skbs);
-> +			mana_unmap_skb(skb, apc);
-> +			dev_consume_skb_any(skb);
-> +			atomic_sub(1, &txq->pending_sends);
-> +		}
-If I get this commit correctly, txq->pending_sends should be equal to 
-the length of txq->pending_skbs?
-
-If yes, can we only handle the pending_skbs?
-
-the above snippet can be changed to as below? So the performance is better?
-"
-		while ((skb = skb_dequeue(&txq->pending_skbs))) {
-			mana_unmap_skb(skb, apc);
-			dev_consume_skb_any(skb);
-		}
-		atomic_set(&txq->pending_sends, 0);
-"
-
-Zhu Yanjun
-
-> +	}
->   	/* We're 100% sure the queues can no longer be woken up, because
->   	 * we're sure now mana_poll_tx_cq() can't be running.
->   	 */
-
+> diff --git a/include/net/bond_3ad.h b/include/net/bond_3ad.h
+> index a016f275cb01..c5e57c6bd873 100644
+> --- a/include/net/bond_3ad.h
+> +++ b/include/net/bond_3ad.h
+> @@ -301,7 +301,6 @@ int  __bond_3ad_get_active_agg_info(struct bonding *bond,
+>  int bond_3ad_lacpdu_recv(const struct sk_buff *skb, struct bonding *bond,
+>  			 struct slave *slave);
+>  int bond_3ad_set_carrier(struct bonding *bond);
+> -void bond_3ad_update_lacp_active(struct bonding *bond);
+>  void bond_3ad_update_lacp_rate(struct bonding *bond);
+>  void bond_3ad_update_ad_actor_settings(struct bonding *bond);
+>  int bond_3ad_stats_fill(struct sk_buff *skb, struct bond_3ad_stats *stats);
+> -- 
+> 2.34.1
+> 
 
