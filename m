@@ -1,248 +1,137 @@
-Return-Path: <netdev+bounces-21905-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21906-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47B6976532D
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 14:04:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0ED3C76532E
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 14:05:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F4222280D9C
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 12:04:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B765D2817DB
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 12:05:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EC7E168D1;
-	Thu, 27 Jul 2023 12:04:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 500F616436;
+	Thu, 27 Jul 2023 12:04:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A134168BC
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 12:04:08 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDE072D54
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 05:04:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1690459445;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4cRK8aFosSp0xPRhmivUk0Jy8zSEbEAWDP8gOa7Pj1M=;
-	b=ETVfhxnB6TjgTtPRz3RKjYURKyzeu868vvro8HrQhwsA7YMOfycwSKBK21zzdgpMpiVmn0
-	yEINhdOAay+sg+LR0wlU9XSBNhRTQq7U3uCQO6XXcQr/S2m6KdlwWnRX2tprS1oYvK4hkz
-	uXXU9BfGER7OFKyudLs5uThLQq4GoUI=
-Received: from mail-ot1-f72.google.com (mail-ot1-f72.google.com
- [209.85.210.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-179-e3s4QARzMWOYaUiTxtyvxw-1; Thu, 27 Jul 2023 08:04:03 -0400
-X-MC-Unique: e3s4QARzMWOYaUiTxtyvxw-1
-Received: by mail-ot1-f72.google.com with SMTP id 46e09a7af769-6b9cf208fb5so1509634a34.3
-        for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 05:04:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690459442; x=1691064242;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4cRK8aFosSp0xPRhmivUk0Jy8zSEbEAWDP8gOa7Pj1M=;
-        b=OguUPFzScJWmx2O0mY0Nv3rxp6AMJ8yDR5EXiZpC2Zy2ADmhu+3fONJvvAqC+5VHT9
-         CabhVGoAvjf2iLJSlVrNKZ2/rjcRLWVv+2cLqjsOlvcP5PzbTt7sz1+H1F6O0YOKetCB
-         oAP6VsyYs6qe3MgGPESopV2AGbRXJ7+LJL4w94xOcA0IuzvoZM3/2lXFInHUy5KGhwo0
-         WzXyzS/QXciMoKZMGBCjL70HuQSEMpfArZBjPylguYnKZQwkRKbZZkkQAbMedKYNCPTI
-         bw5wmDArzCJbEntzQgSCeI2BmPe849P9y1tG6a1EhfEoCK7plZ7Tcjnp+cuvULc8sPla
-         dswA==
-X-Gm-Message-State: ABy/qLZ8NPxiCEpsPh5Q/Zkv19mqyQft+mtTqZPf3745BZsmQjZlf6wW
-	KjKD5XMPoGU1Oc3HwjuVBGMtW+4uh16pYVx/u50CBFEvxH7i4dfJEqC1ID8c0TWbbwzti/it03R
-	PsnKU7K775H4So8gUj1y5oWFoSX0pziWvqsSjYTlxtmojFyJRdjyCcIupoBMIzYpHHcn9pyLqYQ
-	mi6Q==
-X-Received: by 2002:a9d:7556:0:b0:6b9:c51c:f4d5 with SMTP id b22-20020a9d7556000000b006b9c51cf4d5mr5308668otl.10.1690459442485;
-        Thu, 27 Jul 2023 05:04:02 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlECRLCunbtl3no5N7wifKjiPAYFp/yF2j2yZpTn/OobhnFozPl9/IEnck6syOmL7DnRdM/BpQ==
-X-Received: by 2002:a9d:7556:0:b0:6b9:c51c:f4d5 with SMTP id b22-20020a9d7556000000b006b9c51cf4d5mr5308634otl.10.1690459442199;
-        Thu, 27 Jul 2023 05:04:02 -0700 (PDT)
-Received: from nfvsdn-06.redhat.com (nat-pool-232-132.redhat.com. [66.187.232.132])
-        by smtp.gmail.com with ESMTPSA id t1-20020a0ca681000000b006262e5c96d0sm369295qva.129.2023.07.27.05.04.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Jul 2023 05:04:01 -0700 (PDT)
-From: Maryam Tahhan <mtahhan@redhat.com>
-To: netdev@vger.kernel.org
-Cc: kuba@kernel.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	Maryam Tahhan <mtahhan@redhat.com>,
-	Keith Wiles <keith.wiles@intel.com>
-Subject: [PATCH net-next v2 2/2] tools/net/ynl: validate config against schema
-Date: Thu, 27 Jul 2023 08:03:31 -0400
-Message-ID: <20230727120353.3020678-3-mtahhan@redhat.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230727120353.3020678-1-mtahhan@redhat.com>
-References: <20230727120353.3020678-1-mtahhan@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 424B713AC1
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 12:04:20 +0000 (UTC)
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2106.outbound.protection.outlook.com [40.107.94.106])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC273272C
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 05:04:18 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=kLpbD8nT+oPZvTSq1DgEucNd6FG7x1pL6galieF60VKPfV3TME+Hz4NWixIAhmjVz7MD+3W3dOKV7Bq6SfBOK09gJIk8OfvOvbmMFox3otICPt1XWRsQX/E7GjV31FYgX2DBPSHorh9xnF5csDW7uqm+a6uaXO6boDlXORnpa2hQHsClgW5Mj7p5PLiWrTJKafHGpRGX0qtlkLyUvJ2HL633yToJS1Z9gT9l8lWWs8llBy083IBan9lnqR3Cz9XaFEyeQMp+y/Q/UUG4ELAojeIqcoB8YtqzFfvbYe3aKgDbXohQaIjO+0aXf6xzwgTwn5XW6/7o+bvXZgAT4833Ug==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=0aqsditGr5QAqh/nZbqjAGQ+HTaagt7D3ha/uFIXpVk=;
+ b=loUREkwaFq3Rh9mnDlki0lD65FJsX0Gv5ZooAJYxMdPQn9fHtcg7Sjqtb/TQ+UQuSKjZ4dlHKdSoi+DC7GZTSDKcSKn7ZHaoUrur7IAojpIxwWbA0aNt8JzrMX2CiLmg5JqmOa+nN3y9ld1okQjAGC841/rqAGqH4qy60XmxkepacmmPg8bJ/hMg3T/8i948dyIp5ASAQJz/db3EYYS8x70kwleWUQE66OdTU05ODvRxsZAMsrDyBb02Jx+ezZXjbkexDn+Gs3fui5xnPdpldijDvII1i7jv9JoTwnLEM7DNYlUCCMR8YW4ld706SOGtP1OwqE046giiA5skmiPlcg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
+ dkim=pass header.d=corigine.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=0aqsditGr5QAqh/nZbqjAGQ+HTaagt7D3ha/uFIXpVk=;
+ b=uzFVkGpYZ9M293jpQQClyrclsusPI7w4vicPmAEqvGWzLgSg9lofUc9ZLO3opZxgBirpkpa7RvDpIe7a5TTiDa3o8iv2N/hNQkKxNp1Yoh1rNa/b3NnB1f0CJoUSq0fMf/dlA/Oi4R6rYmIcjf/NaBBJ51Nk22AgVIhuEJ6ZgW8=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=corigine.com;
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
+ by CH0PR13MB5098.namprd13.prod.outlook.com (2603:10b6:610:ed::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.29; Thu, 27 Jul
+ 2023 12:04:15 +0000
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::fde7:9821:f2d9:101d]) by PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::fde7:9821:f2d9:101d%7]) with mapi id 15.20.6631.026; Thu, 27 Jul 2023
+ 12:04:15 +0000
+Date: Thu, 27 Jul 2023 14:04:09 +0200
+From: Simon Horman <simon.horman@corigine.com>
+To: Patrick Rohr <prohr@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Linux Network Development Mailing List <netdev@vger.kernel.org>
+Subject: Re: [PATCH v2] net: remove comment in ndisc_router_discovery
+Message-ID: <ZMJdOYFWq19m0Bq8@corigine.com>
+References: <c3f90818-3991-4b76-6f3a-9e9aed976dea@kernel.org>
+ <20230726184742.342825-1-prohr@google.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230726184742.342825-1-prohr@google.com>
+X-ClientProxiedBy: AM4PR0302CA0017.eurprd03.prod.outlook.com
+ (2603:10a6:205:2::30) To PH0PR13MB4842.namprd13.prod.outlook.com
+ (2603:10b6:510:78::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|CH0PR13MB5098:EE_
+X-MS-Office365-Filtering-Correlation-Id: 99d1c126-30ef-4b78-fadf-08db8e999912
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	j4giz1k09wntHcfKvbqegkBV+oXpYM0W+m5/IPDM5L2aItIBuuzqJM6heCQSWmivyfbwyPj3trqdT6sxtN5vUu+Lm+MlaAieq7IAH3yglv5ESq20QH0kvoIo9+M01RwOp6mcyWgTc0EKq3MSUsQWr1ATX6Tgemlz5b+8j8vyCHS6rHeS9SPc6TuT09ZmJj5iDblTwKCP1i23qaIo4vDoEu8KlCqTBhMUYoHfkYzH5LswSNmoqFvC+8JZnlZrKkSJxqIWJyRVjAO645+cibp4NSCazkzf90qIBlOEL2c9rw1M+qliBx8EnEEV+NGPe5I2oOwvU2okGHNDUnWMrqHC8wRtTzEN8FzDKcfxz/dXI4YLzUm/N/LAm+aIpSS+qwY1PphHkTyn5akL7r7ACuNw0FhY/UII3ZYaQgV4ka6oECbN6oYV7ZseE0c1p2pL90jU0f4+t9DfPiEKTF/ma5Ow+Ej8p+Lt+PtdzLgoPJesjFe+fMT0SHLresSmZ8SC8tXBCZUMdiWaiizXRiEG97h8JECyMiMfRWriAEbMbkQeTlaZL5/X1k6xsTUZGp5gIBrPOkZkpCnWKsOXzp9PE6SXsjO8xIfZqQ+OMxZ0n7OTDtU=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(366004)(136003)(396003)(39840400004)(376002)(346002)(451199021)(6666004)(6486002)(478600001)(6506007)(6512007)(6916009)(4326008)(54906003)(66946007)(66476007)(66556008)(66574015)(2616005)(38100700002)(186003)(44832011)(8936002)(8676002)(5660300002)(316002)(41300700001)(86362001)(2906002)(558084003)(36756003);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?UePlD/w0f8YvH7bM5ZPp6tFEa8EzTMnuE4Hnplx2eeZpE1wWz7s912XoFj6L?=
+ =?us-ascii?Q?lcs9+O197+vs6njRaZ6jvh/nG2aAfbnv4GJW0v3H0EGvgP+iHZt1eXcZ2Ofb?=
+ =?us-ascii?Q?B1/z54jsZrZq75eKH4n7ilaDhDepmLCP/JUnuA+C/oBgyeA5rhk45Qb9/wYn?=
+ =?us-ascii?Q?o11t3IBCRao2n/R9nIZ7ij8x9PdYV52Cf5TNGfOTpgLiMClMCSEpLr0Z4ESU?=
+ =?us-ascii?Q?o1U2zhG3YLIgkqhkkgShkKZSfubtNms6cqmGJ3rT7BfvObIYFHtF4bu8GME/?=
+ =?us-ascii?Q?5GzZnr+rZZwMoezMxgjKhaWc5a7ezCcw/7kKnzbDZsfTx6/3Q26MH5DYdERR?=
+ =?us-ascii?Q?bGqBFF56wih2dqDj799rBhEzFI2nDmQANyOybyhbZaPaT1MFEf3NLq/zUQK7?=
+ =?us-ascii?Q?Tbp2OI5pFGwjIBMqxey0hY6sja5kdAmu+d5TKzs6G7FjymcNcZya8xX9r79I?=
+ =?us-ascii?Q?ibQGWtNSWNjATRLioNdH2XJQF1TMKLY9QnZzMANXnMaAac3npS+6f1uCU8oL?=
+ =?us-ascii?Q?8g283eusN/2L5+lcaWqpTKfQWEFKA2LBLG7tHcRcFssJAFn+Y+d4TQlAILVZ?=
+ =?us-ascii?Q?cUYpji5FVWBzSBRfKEz69/1cdZktxHzbAe11Tg6P+zMOcK/zp9ieTEmyK57l?=
+ =?us-ascii?Q?vYpZhXjsl3RMNHyGb38ji26kPxwuzJUBqO8lRQo+RJEXBBLkf9ghYBWrdfHV?=
+ =?us-ascii?Q?RC26F/k2eN+olGVzwKg/9T/81+m6rZOAKTKSWQcw0V/vqlDxBap9kf6DR7+i?=
+ =?us-ascii?Q?VcduqzevkEcLGEmL6/pYVWBGW32TahFtKJAhPWacoFGvn1UI8pp6utJ+taut?=
+ =?us-ascii?Q?4LqVGHWqCZ5D6wq6fEpH1EMX0WWG6yrCPRKLRHkzTd1xaBxKl5Xx3mpgbm4S?=
+ =?us-ascii?Q?QVQCINmdph8nLjyGhtmqYcjK0uQeI/PjxoXQvLy5Hscg3aGzZR4L652ivI0c?=
+ =?us-ascii?Q?KkT4pKfQJh7QydoN+SbvChbs7tWzjb0LJowEevtkIUovombaeC+CpwelzbR6?=
+ =?us-ascii?Q?VykVJkfnHTW2nRjOhMmeVJQ1PCP4nrmOqxqgC8OLKCIDRtP/JFCIoX8R3MN5?=
+ =?us-ascii?Q?uiEGM0pY9WT8NdP7htAfxTkjF4HVVSNgWKb/c3b6HkCdLfms/FJYTLLRjVNG?=
+ =?us-ascii?Q?oVCcxhvC7K814vdXroH6p/hsmqCbuz0r1p9W+s0PELXCXieDO0lIJg2Madon?=
+ =?us-ascii?Q?AWrdx3D94HCY1VDpucmw8OTqWHd4Sl183mFJZNF5iSDG1HsH0WQBAIQl0Drt?=
+ =?us-ascii?Q?YiqrmKId/eO2hYSeH6ijczVAkBq61mPc4kDT/mIjghzGUMsCTxxih3DZrv0t?=
+ =?us-ascii?Q?q3ot5uMCduqNVhN4QA8WCndV1tTL62mcE37GnqIr5nR0Z2DvbJ15Qz5ESlNF?=
+ =?us-ascii?Q?Zd9Z9mlkilNedbpIhGfVTUk7BOl0MeZD4IFo9SdV3tgWCaPtgQddq7PlShm0?=
+ =?us-ascii?Q?preu3fIlgz+0TUfTz/e1j+FKT0TiMD9KNiwx2mjNpyMLJb3YK44pgkZg54bI?=
+ =?us-ascii?Q?2SCKDtKh+insqgopnSOhgCHGJgCgwYSZoojiyRqSZ5nnF/75OKt9TSwN6sN5?=
+ =?us-ascii?Q?HcL6DXmBLrQAHVrC8xjgITBrs8kYe+KzO5d7n9lwCQKrik47YxlEzkTYK52Y?=
+ =?us-ascii?Q?sC3cTe0+xqaskgNrhLgQjmw5XhwZ4hj46jkgD+FPy1BaC38RgMpIFyGZG+AR?=
+ =?us-ascii?Q?/hQLCA=3D=3D?=
+X-OriginatorOrg: corigine.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 99d1c126-30ef-4b78-fadf-08db8e999912
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Jul 2023 12:04:15.3820
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: x2mfft2T4RAZ7R5uUjRHRBAHNRxL5O7nyf8PlJ+IWvc6syG3Tt1qG/9/Q+8/GjvmSXX+IajofQDkoq8UuiGTUbKUOvsPki7jGHhAbmY58zw=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR13MB5098
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Validate the provided configuration file against
-the ynl-config.schema.
+On Wed, Jul 26, 2023 at 11:47:42AM -0700, Patrick Rohr wrote:
+> Removes superfluous (and misplaced) comment from ndisc_router_discovery.
+> 
+> Signed-off-by: Patrick Rohr <prohr@google.com>
 
-Signed-off-by: Maryam Tahhan <mtahhan@redhat.com>
-Signed-off-by: Keith Wiles <keith.wiles@intel.com>
-Signed-off-by: Maryam Tahhan <mtahhan@redhat.com>
----
- tools/net/ynl/cli.py            | 43 ++++++++++++++++----
- tools/net/ynl/ynl-config.schema | 72 +++++++++++++++++++++++++++++++++
- 2 files changed, 108 insertions(+), 7 deletions(-)
- create mode 100644 tools/net/ynl/ynl-config.schema
-
-diff --git a/tools/net/ynl/cli.py b/tools/net/ynl/cli.py
-index 1749851f8460..3071ef9e3117 100755
---- a/tools/net/ynl/cli.py
-+++ b/tools/net/ynl/cli.py
-@@ -9,6 +9,12 @@ import os
- 
- from lib import YnlFamily
- 
-+try:
-+    import jsonschema
-+except ModuleNotFoundError as e:
-+    print('Error: {}. Try `pip install jsonschema`'.format(e))
-+    raise SystemExit(1)
-+
- class ynlConfig():
-     def __init__(self):
-         self.no_schema = True
-@@ -66,13 +72,36 @@ def main():
-     if args.config:
-         directory = ""
-         yamls = {}
--
--        if not os.path.exists(args.config):
--             print("Error: ", args.config, " doesn't exist")
--             exit(-1)
--
--        f = open(args.config)
--        data = json.load(f)
-+        configSchema = os.path.dirname(__file__) + "/ynl-config.schema"
-+
-+        # Load ynl-config json schema
-+        try:
-+            with open(configSchema, 'r') as f:
-+                s = json.load(f)
-+        except FileNotFoundError as e:
-+            print('Error:', e)
-+            raise SystemExit(1)
-+        except json.decoder.JSONDecodeError as e:
-+            print('Error: {}:'.format(args.schema), e)
-+            raise SystemExit(1)
-+
-+        # Load config file
-+        try:
-+            with open(args.config, 'r') as f:
-+                data = json.load(f)
-+        except FileNotFoundError as e:
-+            print('Error:', e)
-+            raise SystemExit(1)
-+        except json.decoder.JSONDecodeError as e:
-+            print('Error: {}:'.format(args.schema), e)
-+            raise SystemExit(1)
-+
-+        # Validate json config against the ynl-config schema
-+        try:
-+            jsonschema.validate(instance=data, schema=s)
-+        except jsonschema.exceptions.ValidationError as e:
-+            print('Error:', e)
-+            raise SystemExit(1)
- 
-         for k in data:
-             if k == 'yaml-specs-path':
-diff --git a/tools/net/ynl/ynl-config.schema b/tools/net/ynl/ynl-config.schema
-new file mode 100644
-index 000000000000..c127e2acbabb
---- /dev/null
-+++ b/tools/net/ynl/ynl-config.schema
-@@ -0,0 +1,72 @@
-+{
-+    "$schema": "https://json-schema.org/draft-07/schema",
-+    "description": "YNL specs configuration file",
-+    "type": "object",
-+
-+    "properties": {
-+        "yaml-specs-path": {
-+            "description": "Path to Yaml specs",
-+            "type": "string"
-+        },
-+        "spec-args": {
-+            "description": "Individual spec args",
-+            "type": "object",
-+            "patternProperties": {
-+                "^.*(\\.yaml)$": {
-+                    "description": "Specific yaml spec arguments",
-+                    "type": "object",
-+                    "properties": {
-+                        "schema": {
-+                            "description": "The schema to use",
-+                            "type": "string"
-+                        },
-+                        "no-schema": {
-+                            "description": "No schema",
-+                            "type": "boolean",
-+                            "default": true
-+                        },
-+                        "do": {
-+                            "description": "The do function to use",
-+                            "type": "string"
-+                        },
-+                        "dump": {
-+                            "description": "The dump function to use",
-+                            "type": "string"
-+                        },
-+                        "subscribe": {
-+                            "description": "The multicast group to subscribe to",
-+                            "type": "string"
-+                        },
-+                        "sleep": {
-+                            "description": "The number to seconds to sleep",
-+                            "type": "number",
-+                            "default": 0
-+                        },
-+                        "json-params": {
-+                            "description": "The json params to use for different functions",
-+                            "type": "object",
-+                            "patternProperties": {
-+                                "^.*$": {
-+                                  "type": ["string", "number", "object"],
-+                                  "patternProperties": {
-+                                        "^.*$": {
-+                                        "type": ["string", "number"]
-+                                        }
-+                                    },
-+                                    "additionalProperties": false
-+                                }
-+                            }
-+                        },
-+                        "additionalProperties": false
-+                    },
-+                    "additionalProperties": false
-+                }
-+            },
-+            "additionalProperties": false
-+        }
-+    },
-+    "additionalProperties": false,
-+    "required": [
-+        "yaml-specs-path"
-+    ]
-+}
--- 
-2.41.0
+Reviewed-by: Simon Horman <simon.horman@corigine.com>
 
 
