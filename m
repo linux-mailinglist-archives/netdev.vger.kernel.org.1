@@ -1,32 +1,32 @@
-Return-Path: <netdev+bounces-21734-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21737-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9BD576484A
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 09:18:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BDC9B764852
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 09:19:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7C231281F17
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 07:18:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E1E4B1C214CF
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 07:19:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA61BC154;
-	Thu, 27 Jul 2023 07:18:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3612C2E8;
+	Thu, 27 Jul 2023 07:18:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9C4EC142
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 07:18:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7FEAC8C4
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 07:18:26 +0000 (UTC)
 Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6766F83CA
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 00:18:13 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id BEBCA83D1
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 00:18:14 -0700 (PDT)
 Received: from loongson.cn (unknown [112.20.109.108])
-	by gateway (Coremail) with SMTP id _____8BxyeozGsJkJ5wKAA--.16887S3;
-	Thu, 27 Jul 2023 15:18:11 +0800 (CST)
+	by gateway (Coremail) with SMTP id _____8Dx6eo1GsJkMJwKAA--.20857S3;
+	Thu, 27 Jul 2023 15:18:13 +0800 (CST)
 Received: from localhost.localdomain (unknown [112.20.109.108])
-	by localhost.localdomain (Coremail) with SMTP id AQAAf8BxB80wGsJkNLc8AA--.24390S3;
-	Thu, 27 Jul 2023 15:18:10 +0800 (CST)
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8BxB80wGsJkNLc8AA--.24390S4;
+	Thu, 27 Jul 2023 15:18:11 +0800 (CST)
 From: Feiyang Chen <chenfeiyang@loongson.cn>
 To: andrew@lunn.ch,
 	hkallweit1@gmail.com,
@@ -41,9 +41,9 @@ Cc: Feiyang Chen <chenfeiyang@loongson.cn>,
 	netdev@vger.kernel.org,
 	loongarch@lists.linux.dev,
 	chris.chenfeiyang@gmail.com
-Subject: [PATCH v2 05/10] net: stmmac: dwmac1000: Add Loongson register definitions
-Date: Thu, 27 Jul 2023 15:18:05 +0800
-Message-Id: <a752f67c6cfe481a2329f1f4b477ff962c46f515.1690439335.git.chenfeiyang@loongson.cn>
+Subject: [PATCH v2 06/10] net: stmmac: Add Loongson HWIF entry
+Date: Thu, 27 Jul 2023 15:18:06 +0800
+Message-Id: <7cae63ede2792cb2a7189f251b282aecbb0945b1.1690439335.git.chenfeiyang@loongson.cn>
 X-Mailer: git-send-email 2.39.3
 In-Reply-To: <cover.1690439335.git.chenfeiyang@loongson.cn>
 References: <cover.1690439335.git.chenfeiyang@loongson.cn>
@@ -54,11 +54,11 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:AQAAf8BxB80wGsJkNLc8AA--.24390S3
+X-CM-TRANSID:AQAAf8BxB80wGsJkNLc8AA--.24390S4
 X-CM-SenderInfo: hfkh0wphl1t03j6o00pqjv00gofq/
-X-Coremail-Antispam: 1Uk129KBj93XoW3uw1kur47CF47ur1rJw4fWFX_yoWkWr15pa
-	y7Aa45GrW8tF45Za1kJr48XFy5Z3yYkFW7ur4xKw1a9Fs29r9Iqrn0kay5Cr13ZFWDJr12
-	gr4jkw13WFn8KwbCm3ZEXasCq-sJn29KB7ZKAUJUUUUf529EdanIXcx71UUUUU7KY7ZEXa
+X-Coremail-Antispam: 1Uk129KBj93XoW3CF4UKw18GF4kuw4UKFW8KrX_yoWDWFW8pa
+	yUAa4qvry8tF1Igan5Aw4DuFy5K34SkF42y3yfG3yagF4avr9Fqr9IqFWYyrnrGFW5Xa4a
+	qFyq9w1ku3WUJrgCm3ZEXasCq-sJn29KB7ZKAUJUUUUf529EdanIXcx71UUUUU7KY7ZEXa
 	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
 	0xBIdaVrnRJUUUBvb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
 	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
@@ -79,312 +79,303 @@ X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Add definitions for Loongson platform.
+Add a new entry to HWIF table for Loongson.
 
 Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
 ---
- .../net/ethernet/stmicro/stmmac/dwmac1000.h   |  4 +-
- .../ethernet/stmicro/stmmac/dwmac1000_core.c  | 43 +++++++---
- .../ethernet/stmicro/stmmac/dwmac1000_dma.c   | 10 ++-
- .../net/ethernet/stmicro/stmmac/dwmac_dma.h   |  2 +
- .../net/ethernet/stmicro/stmmac/dwmac_lib.c   | 84 +++++++++++++++++--
- 5 files changed, 119 insertions(+), 24 deletions(-)
+ drivers/net/ethernet/stmicro/stmmac/common.h  |  3 ++
+ .../ethernet/stmicro/stmmac/dwmac1000_dma.c   |  6 +++
+ drivers/net/ethernet/stmicro/stmmac/hwif.c    | 48 ++++++++++++++++++-
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c | 25 ++++++----
+ include/linux/stmmac.h                        |  1 +
+ 5 files changed, 73 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac1000.h b/drivers/net/ethernet/stmicro/stmmac/dwmac1000.h
-index 4296ddda8aaa..f827bf8f30a9 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac1000.h
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac1000.h
-@@ -76,9 +76,9 @@ enum power_event {
- #define LPI_CTRL_STATUS_TLPIEN	0x00000001	/* Transmit LPI Entry */
+diff --git a/drivers/net/ethernet/stmicro/stmmac/common.h b/drivers/net/ethernet/stmicro/stmmac/common.h
+index 16e67c18b6f7..267f9a7913ac 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/common.h
++++ b/drivers/net/ethernet/stmicro/stmmac/common.h
+@@ -29,11 +29,13 @@
+ /* Synopsys Core versions */
+ #define	DWMAC_CORE_3_40		0x34
+ #define	DWMAC_CORE_3_50		0x35
++#define	DWMAC_CORE_3_70		0x37
+ #define	DWMAC_CORE_4_00		0x40
+ #define DWMAC_CORE_4_10		0x41
+ #define DWMAC_CORE_5_00		0x50
+ #define DWMAC_CORE_5_10		0x51
+ #define DWMAC_CORE_5_20		0x52
++#define DWLGMAC_CORE_1_00	0x10
+ #define DWXGMAC_CORE_2_10	0x21
+ #define DWXLGMAC_CORE_2_00	0x20
  
- /* GMAC HW ADDR regs */
--#define GMAC_ADDR_HIGH(reg)	((reg > 15) ? 0x00000800 + (reg - 16) * 8 : \
-+#define GMAC_ADDR_HIGH(reg, x)	((reg > 15) ? 0x00000800 + (reg - 16) * 8 * (x) : \
- 				 0x00000040 + (reg * 8))
--#define GMAC_ADDR_LOW(reg)	((reg > 15) ? 0x00000804 + (reg - 16) * 8 : \
-+#define GMAC_ADDR_LOW(reg, x)	((reg > 15) ? 0x00000804 + (reg - 16) * 8 * (x) : \
- 				 0x00000044 + (reg * 8))
- #define GMAC_MAX_PERFECT_ADDRESSES	1
+@@ -547,6 +549,7 @@ int dwmac1000_setup(struct stmmac_priv *priv);
+ int dwmac4_setup(struct stmmac_priv *priv);
+ int dwxgmac2_setup(struct stmmac_priv *priv);
+ int dwxlgmac2_setup(struct stmmac_priv *priv);
++int dwmac_loongson_setup(struct stmmac_priv *priv);
  
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_core.c b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_core.c
-index a9b42a122ed6..1063865d126e 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_core.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_core.c
-@@ -24,6 +24,7 @@
- static void dwmac1000_core_init(struct mac_device_info *hw,
- 				struct net_device *dev)
- {
-+	struct stmmac_priv *priv = netdev_priv(dev);
- 	void __iomem *ioaddr = hw->pcsr;
- 	u32 value = readl(ioaddr + GMAC_CONTROL);
- 	int mtu = dev->mtu;
-@@ -31,6 +32,9 @@ static void dwmac1000_core_init(struct mac_device_info *hw,
- 	/* Configure GMAC core */
- 	value |= GMAC_CORE_INIT;
- 
-+	if (priv->plat->dwmac_is_loongson)
-+		value |= GMAC_CONTROL_ACS;
-+
- 	if (mtu > 1500)
- 		value |= GMAC_CONTROL_2K;
- 	if (mtu > 2000)
-@@ -100,9 +104,10 @@ static void dwmac1000_set_umac_addr(struct stmmac_priv *priv,
- 				    const unsigned char *addr,
- 				    unsigned int reg_n)
- {
-+	bool is_loongson = priv->plat->dwmac_is_loongson;
- 	void __iomem *ioaddr = hw->pcsr;
--	stmmac_set_mac_addr(ioaddr, addr, GMAC_ADDR_HIGH(reg_n),
--			    GMAC_ADDR_LOW(reg_n));
-+	stmmac_set_mac_addr(ioaddr, addr, GMAC_ADDR_HIGH(reg_n, !is_loongson),
-+			    GMAC_ADDR_LOW(reg_n, !is_loongson));
- }
- 
- static void dwmac1000_get_umac_addr(struct stmmac_priv *priv,
-@@ -110,9 +115,10 @@ static void dwmac1000_get_umac_addr(struct stmmac_priv *priv,
- 				    unsigned char *addr,
- 				    unsigned int reg_n)
- {
-+	bool is_loongson = priv->plat->dwmac_is_loongson;
- 	void __iomem *ioaddr = hw->pcsr;
--	stmmac_get_mac_addr(ioaddr, addr, GMAC_ADDR_HIGH(reg_n),
--			    GMAC_ADDR_LOW(reg_n));
-+	stmmac_get_mac_addr(ioaddr, addr, GMAC_ADDR_HIGH(reg_n, !is_loongson),
-+			    GMAC_ADDR_LOW(reg_n, !is_loongson));
- }
- 
- static void dwmac1000_set_mchash(void __iomem *ioaddr, u32 *mcfilterbits,
-@@ -144,6 +150,7 @@ static void dwmac1000_set_filter(struct stmmac_priv *priv,
- 				 struct mac_device_info *hw,
- 				 struct net_device *dev)
- {
-+	bool is_loongson = priv->plat->dwmac_is_loongson;
- 	void __iomem *ioaddr = (void __iomem *)dev->base_addr;
- 	unsigned int value = 0;
- 	unsigned int perfect_addr_number = hw->unicast_filter_entries;
-@@ -156,7 +163,9 @@ static void dwmac1000_set_filter(struct stmmac_priv *priv,
- 	memset(mc_filter, 0, sizeof(mc_filter));
- 
- 	if (dev->flags & IFF_PROMISC) {
--		value = GMAC_FRAME_FILTER_PR | GMAC_FRAME_FILTER_PCF;
-+		value = GMAC_FRAME_FILTER_PR;
-+		if (!is_loongson)
-+			value |= GMAC_FRAME_FILTER_PCF;
- 	} else if (dev->flags & IFF_ALLMULTI) {
- 		value = GMAC_FRAME_FILTER_PM;	/* pass all multi */
- 	} else if (!netdev_mc_empty(dev) && (mcbitslog2 == 0)) {
-@@ -200,14 +209,14 @@ static void dwmac1000_set_filter(struct stmmac_priv *priv,
- 
- 		netdev_for_each_uc_addr(ha, dev) {
- 			stmmac_set_mac_addr(ioaddr, ha->addr,
--					    GMAC_ADDR_HIGH(reg),
--					    GMAC_ADDR_LOW(reg));
-+					    GMAC_ADDR_HIGH(reg, !is_loongson),
-+					    GMAC_ADDR_LOW(reg, !is_loongson));
- 			reg++;
- 		}
- 
- 		while (reg < perfect_addr_number) {
--			writel(0, ioaddr + GMAC_ADDR_HIGH(reg));
--			writel(0, ioaddr + GMAC_ADDR_LOW(reg));
-+			writel(0, ioaddr + GMAC_ADDR_HIGH(reg, !is_loongson));
-+			writel(0, ioaddr + GMAC_ADDR_LOW(reg, !is_loongson));
- 			reg++;
- 		}
- 	}
-@@ -562,8 +571,20 @@ int dwmac1000_setup(struct stmmac_priv *priv)
- {
- 	dev_info(priv->device, "\tDWMAC1000\n");
- 
--	priv->plat->dwmac_is_loongson = false;
--	priv->plat->dwmac_regs = &dwmac_default_dma_regs;
-+	if (priv->plat->dma_cfg->dma64)
-+		priv->plat->dwmac_regs = &dwmac_loongson64_dma_regs;
-+	else
-+		priv->plat->dwmac_regs = &dwmac_default_dma_regs;
-+
-+	return _dwmac1000_setup(priv);
-+}
-+
-+int dwmac_loongson_setup(struct stmmac_priv *priv)
-+{
-+	dev_info(priv->device, "\tDWMAC1000(LOONGSON)\n");
-+
-+	priv->plat->dwmac_is_loongson = true;
-+	priv->plat->dwmac_regs = &dwmac_loongson_dma_regs;
- 
- 	return _dwmac1000_setup(priv);
- }
+ void stmmac_set_mac_addr(void __iomem *ioaddr, const u8 addr[6],
+ 			 unsigned int high, unsigned int low);
 diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
-index 632c4f110d01..7aa450d6a81a 100644
+index 7aa450d6a81a..5da5f111d7e0 100644
 --- a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
 +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
-@@ -329,8 +329,14 @@ static int dwmac1000_get_hw_feature(struct stmmac_priv *priv,
- 	dma_cap->rx_coe_type2 = (hw_cap & DMA_HW_FEAT_RXTYP2COE) >> 18;
- 	dma_cap->rxfifo_over_2048 = (hw_cap & DMA_HW_FEAT_RXFIFOSIZE) >> 19;
- 	/* TX and RX number of channels */
--	dma_cap->number_rx_channel = (hw_cap & DMA_HW_FEAT_RXCHCNT) >> 20;
--	dma_cap->number_tx_channel = (hw_cap & DMA_HW_FEAT_TXCHCNT) >> 22;
-+	if (priv->plat->dwmac_is_loongson &&
-+	    ((hw_cap & (DMA_HW_FEAT_RXCHCNT | DMA_HW_FEAT_TXCHCNT)) >> 20) == 0) {
-+		dma_cap->number_rx_channel = 8;
-+		dma_cap->number_tx_channel = 8;
-+	} else {
-+		dma_cap->number_rx_channel = (hw_cap & DMA_HW_FEAT_RXCHCNT) >> 20;
-+		dma_cap->number_tx_channel = (hw_cap & DMA_HW_FEAT_TXCHCNT) >> 22;
-+	}
- 	/* Alternate (enhanced) DESC mode */
- 	dma_cap->enh_desc = (hw_cap & DMA_HW_FEAT_ENHDESSEL) >> 24;
+@@ -172,6 +172,12 @@ static void dwmac1000_dma_init_rx(struct stmmac_priv *priv,
+ 		       chan * DMA_CHAN_OFFSET);
+ 		writel(upper_32_bits(dma_rx_phy), ioaddr + DMA_RCV_BASE_ADDR_HI +
+ 		       chan * DMA_CHAN_OFFSET);
++		if (priv->plat->has_lgmac) {
++			writel(upper_32_bits(dma_rx_phy),
++			       ioaddr + DMA_RCV_BASE_ADDR_SHADOW1);
++			writel(upper_32_bits(dma_rx_phy),
++			       ioaddr + DMA_RCV_BASE_ADDR_SHADOW2);
++		}
+ 	} else {
+ 		/* RX descriptor base address list must be written into DMA CSR3 */
+ 		writel(lower_32_bits(dma_rx_phy), ioaddr + DMA_RCV_BASE_ADDR +
+diff --git a/drivers/net/ethernet/stmicro/stmmac/hwif.c b/drivers/net/ethernet/stmicro/stmmac/hwif.c
+index b8ba8f2d8041..b376ac4f80d5 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/hwif.c
++++ b/drivers/net/ethernet/stmicro/stmmac/hwif.c
+@@ -58,7 +58,8 @@ static int stmmac_dwmac1_quirks(struct stmmac_priv *priv)
+ 		dev_info(priv->device, "Enhanced/Alternate descriptors\n");
  
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h b/drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h
-index 915a4d70fd3b..3828902baa80 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h
-@@ -160,6 +160,8 @@
- #define NUM_DWMAC4_DMA_REGS	27
- 
- extern const struct dwmac_regs dwmac_default_dma_regs;
-+extern const struct dwmac_regs dwmac_loongson_dma_regs;
-+extern const struct dwmac_regs dwmac_loongson64_dma_regs;
- 
- void dwmac_enable_dma_transmission(struct stmmac_priv *priv,
- 				   void __iomem *ioaddr, u32 chan);
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c b/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c
-index 99838497b183..7911eab175d9 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c
-@@ -20,6 +20,21 @@ static const struct dwmac_dma_addrs default_dma_addrs = {
- 	.cur_rx_buf_addr = 0x00001054
+ 		/* GMAC older than 3.50 has no extended descriptors */
+-		if (priv->synopsys_id >= DWMAC_CORE_3_50) {
++		if (priv->synopsys_id >= DWMAC_CORE_3_50 ||
++		    priv->plat->has_lgmac) {
+ 			dev_info(priv->device, "Enabled extended descriptors\n");
+ 			priv->extend_desc = 1;
+ 		} else {
+@@ -104,6 +105,7 @@ static const struct stmmac_hwif_entry {
+ 	bool gmac;
+ 	bool gmac4;
+ 	bool xgmac;
++	bool lgmac;
+ 	u32 min_id;
+ 	u32 dev_id;
+ 	const struct stmmac_regs_off regs;
+@@ -122,6 +124,7 @@ static const struct stmmac_hwif_entry {
+ 		.gmac = false,
+ 		.gmac4 = false,
+ 		.xgmac = false,
++		.lgmac = false,
+ 		.min_id = 0,
+ 		.regs = {
+ 			.ptp_off = PTP_GMAC3_X_OFFSET,
+@@ -140,6 +143,7 @@ static const struct stmmac_hwif_entry {
+ 		.gmac = true,
+ 		.gmac4 = false,
+ 		.xgmac = false,
++		.lgmac = false,
+ 		.min_id = 0,
+ 		.regs = {
+ 			.ptp_off = PTP_GMAC3_X_OFFSET,
+@@ -158,6 +162,7 @@ static const struct stmmac_hwif_entry {
+ 		.gmac = false,
+ 		.gmac4 = true,
+ 		.xgmac = false,
++		.lgmac = false,
+ 		.min_id = 0,
+ 		.regs = {
+ 			.ptp_off = PTP_GMAC4_OFFSET,
+@@ -176,6 +181,7 @@ static const struct stmmac_hwif_entry {
+ 		.gmac = false,
+ 		.gmac4 = true,
+ 		.xgmac = false,
++		.lgmac = false,
+ 		.min_id = DWMAC_CORE_4_00,
+ 		.regs = {
+ 			.ptp_off = PTP_GMAC4_OFFSET,
+@@ -194,6 +200,7 @@ static const struct stmmac_hwif_entry {
+ 		.gmac = false,
+ 		.gmac4 = true,
+ 		.xgmac = false,
++		.lgmac = false,
+ 		.min_id = DWMAC_CORE_4_10,
+ 		.regs = {
+ 			.ptp_off = PTP_GMAC4_OFFSET,
+@@ -212,6 +219,7 @@ static const struct stmmac_hwif_entry {
+ 		.gmac = false,
+ 		.gmac4 = true,
+ 		.xgmac = false,
++		.lgmac = false,
+ 		.min_id = DWMAC_CORE_5_10,
+ 		.regs = {
+ 			.ptp_off = PTP_GMAC4_OFFSET,
+@@ -230,6 +238,7 @@ static const struct stmmac_hwif_entry {
+ 		.gmac = false,
+ 		.gmac4 = false,
+ 		.xgmac = true,
++		.lgmac = false,
+ 		.min_id = DWXGMAC_CORE_2_10,
+ 		.dev_id = DWXGMAC_ID,
+ 		.regs = {
+@@ -249,6 +258,7 @@ static const struct stmmac_hwif_entry {
+ 		.gmac = false,
+ 		.gmac4 = false,
+ 		.xgmac = true,
++		.lgmac = false,
+ 		.min_id = DWXLGMAC_CORE_2_00,
+ 		.dev_id = DWXLGMAC_ID,
+ 		.regs = {
+@@ -264,6 +274,42 @@ static const struct stmmac_hwif_entry {
+ 		.mmc = &dwxgmac_mmc_ops,
+ 		.setup = dwxlgmac2_setup,
+ 		.quirks = stmmac_dwxlgmac_quirks,
++	}, {
++		.gmac = true,
++		.gmac4 = false,
++		.xgmac = false,
++		.lgmac = true,
++		.min_id = DWLGMAC_CORE_1_00,
++		.regs = {
++			.ptp_off = PTP_GMAC3_X_OFFSET,
++			.mmc_off = MMC_GMAC3_X_OFFSET,
++		},
++		.desc = NULL,
++		.dma = &dwmac1000_dma_ops,
++		.mac = &dwmac1000_ops,
++		.hwtimestamp = &stmmac_ptp,
++		.mode = NULL,
++		.tc = NULL,
++		.setup = dwmac_loongson_setup,
++		.quirks = stmmac_dwmac1_quirks,
++	}, {
++		.gmac = true,
++		.gmac4 = false,
++		.xgmac = false,
++		.lgmac = true,
++		.min_id = DWMAC_CORE_3_50,
++		.regs = {
++			.ptp_off = PTP_GMAC3_X_OFFSET,
++			.mmc_off = MMC_GMAC3_X_OFFSET,
++		},
++		.desc = NULL,
++		.dma = &dwmac1000_dma_ops,
++		.mac = &dwmac1000_ops,
++		.hwtimestamp = &stmmac_ptp,
++		.mode = NULL,
++		.tc = NULL,
++		.setup = dwmac1000_setup,
++		.quirks = stmmac_dwmac1_quirks,
+ 	},
  };
  
-+static const struct dwmac_dma_addrs loongson_dma_addrs = {
-+	.chan_offset = 0x100,
-+	.rcv_base_addr = 0x0000100c,
-+	.tx_base_addr = 0x00001010,
-+	.cur_tx_buf_addr = 0x00001050,
-+	.cur_rx_buf_addr = 0x00001054
-+};
-+
-+static const struct dwmac_dma_addrs loongson64_dma_addrs = {
-+	.rcv_base_addr = 0x00001090,
-+	.tx_base_addr = 0x00001098,
-+	.cur_tx_buf_addr = 0x000010b0,
-+	.cur_rx_buf_addr = 0x000010b8
-+};
-+
- static const struct dwmac_dma_axi default_dma_axi = {
- 	.wr_osr_lmt = GENMASK(23, 20),
- 	.wr_osr_lmt_shift = 20,
-@@ -30,11 +45,26 @@ static const struct dwmac_dma_axi default_dma_axi = {
- 	.osr_max = 0xf
- };
- 
-+static const struct dwmac_dma_axi loongson_dma_axi = {
-+	.wr_osr_lmt = BIT(20),
-+	.wr_osr_lmt_shift = 20,
-+	.wr_osr_lmt_mask = 0x1,
-+	.rd_osr_lmt = BIT(16),
-+	.rd_osr_lmt_shift = 16,
-+	.rd_osr_lmt_mask = 0x1,
-+	.osr_max = 0x1
-+};
-+
- static const struct dwmac_dma_intr_ena default_dma_intr_ena = {
- 	.nie = 0x00010000,
- 	.aie = 0x00008000
- };
- 
-+static const struct dwmac_dma_intr_ena loongson_dma_intr_ena = {
-+	.nie = 0x00060000,
-+	.aie = 0x00018000
-+};
-+
- static const struct dwmac_dma_status default_dma_status = {
- 	.glpii = 0x40000000,
- 	.eb_mask = 0x00380000,
-@@ -47,6 +77,18 @@ static const struct dwmac_dma_status default_dma_status = {
- 	.fbi = 0x00002000
- };
- 
-+static const struct dwmac_dma_status loongson_dma_status = {
-+	.glpii = 0x10000000,
-+	.eb_mask = 0x0e000000,
-+	.ts_mask = 0x01c00000,
-+	.ts_shift = 22,
-+	.rs_mask = 0x00380000,
-+	.rs_shift = 19,
-+	.nis = 0x00040000 | 0x00020000,
-+	.ais = 0x00010000 | 0x00008000,
-+	.fbi = 0x00002000 | 0x00001000
-+};
-+
- const struct dwmac_regs dwmac_default_dma_regs = {
- 	.addrs = &default_dma_addrs,
- 	.axi = &default_dma_axi,
-@@ -54,17 +96,37 @@ const struct dwmac_regs dwmac_default_dma_regs = {
- 	.status = &default_dma_status
- };
- 
-+const struct dwmac_regs dwmac_loongson_dma_regs = {
-+	.addrs = &loongson_dma_addrs,
-+	.axi = &loongson_dma_axi,
-+	.intr_ena = &loongson_dma_intr_ena,
-+	.status = &loongson_dma_status
-+};
-+
-+const struct dwmac_regs dwmac_loongson64_dma_regs = {
-+	.addrs = &loongson64_dma_addrs,
-+	.axi = &loongson_dma_axi,
-+	.intr_ena = &default_dma_intr_ena,
-+	.status = &default_dma_status
-+};
-+
- int dwmac_dma_reset(void __iomem *ioaddr)
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index e8619853b6d6..829de274e75d 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -3505,17 +3505,21 @@ static int stmmac_request_irq_multi_msi(struct net_device *dev)
  {
-+	int err;
-+	int cnt = 5;
- 	u32 value = readl(ioaddr + DMA_BUS_MODE);
+ 	struct stmmac_priv *priv = netdev_priv(dev);
+ 	enum request_irq_err irq_err;
++	unsigned long flags = 0;
+ 	cpumask_t cpu_mask;
+ 	int irq_idx = 0;
+ 	char *int_name;
+ 	int ret;
+ 	int i;
  
- 	/* DMA SW reset */
--	value |= DMA_BUS_MODE_SFT_RESET;
--	writel(value, ioaddr + DMA_BUS_MODE);
-+	do {
-+		value |= DMA_BUS_MODE_SFT_RESET;
-+		writel(value, ioaddr + DMA_BUS_MODE);
++	if (priv->plat->has_lgmac)
++		flags |= IRQF_TRIGGER_RISING;
 +
-+		err = readl_poll_timeout(ioaddr + DMA_BUS_MODE, value,
-+					 !(value & DMA_BUS_MODE_SFT_RESET),
-+					 10000, 200000);
-+	} while (cnt-- && err);
+ 	/* For common interrupt */
+ 	int_name = priv->int_name_mac;
+ 	sprintf(int_name, "%s:%s", dev->name, "mac");
+ 	ret = request_irq(dev->irq, stmmac_mac_interrupt,
+-			  0, int_name, dev);
++			  flags, int_name, dev);
+ 	if (unlikely(ret < 0)) {
+ 		netdev_err(priv->dev,
+ 			   "%s: alloc mac MSI %d (error: %d)\n",
+@@ -3532,7 +3536,7 @@ static int stmmac_request_irq_multi_msi(struct net_device *dev)
+ 		sprintf(int_name, "%s:%s", dev->name, "wol");
+ 		ret = request_irq(priv->wol_irq,
+ 				  stmmac_mac_interrupt,
+-				  0, int_name, dev);
++				  flags, int_name, dev);
+ 		if (unlikely(ret < 0)) {
+ 			netdev_err(priv->dev,
+ 				   "%s: alloc wol MSI %d (error: %d)\n",
+@@ -3550,7 +3554,7 @@ static int stmmac_request_irq_multi_msi(struct net_device *dev)
+ 		sprintf(int_name, "%s:%s", dev->name, "lpi");
+ 		ret = request_irq(priv->lpi_irq,
+ 				  stmmac_mac_interrupt,
+-				  0, int_name, dev);
++				  flags, int_name, dev);
+ 		if (unlikely(ret < 0)) {
+ 			netdev_err(priv->dev,
+ 				   "%s: alloc lpi MSI %d (error: %d)\n",
+@@ -3568,7 +3572,7 @@ static int stmmac_request_irq_multi_msi(struct net_device *dev)
+ 		sprintf(int_name, "%s:%s", dev->name, "safety-ce");
+ 		ret = request_irq(priv->sfty_ce_irq,
+ 				  stmmac_safety_interrupt,
+-				  0, int_name, dev);
++				  flags, int_name, dev);
+ 		if (unlikely(ret < 0)) {
+ 			netdev_err(priv->dev,
+ 				   "%s: alloc sfty ce MSI %d (error: %d)\n",
+@@ -3586,7 +3590,7 @@ static int stmmac_request_irq_multi_msi(struct net_device *dev)
+ 		sprintf(int_name, "%s:%s", dev->name, "safety-ue");
+ 		ret = request_irq(priv->sfty_ue_irq,
+ 				  stmmac_safety_interrupt,
+-				  0, int_name, dev);
++				  flags, int_name, dev);
+ 		if (unlikely(ret < 0)) {
+ 			netdev_err(priv->dev,
+ 				   "%s: alloc sfty ue MSI %d (error: %d)\n",
+@@ -3607,7 +3611,7 @@ static int stmmac_request_irq_multi_msi(struct net_device *dev)
+ 		sprintf(int_name, "%s:%s-%d", dev->name, "rx", i);
+ 		ret = request_irq(priv->rx_irq[i],
+ 				  stmmac_msi_intr_rx,
+-				  0, int_name, &priv->dma_conf.rx_queue[i]);
++				  flags, int_name, &priv->dma_conf.rx_queue[i]);
+ 		if (unlikely(ret < 0)) {
+ 			netdev_err(priv->dev,
+ 				   "%s: alloc rx-%d  MSI %d (error: %d)\n",
+@@ -3632,7 +3636,7 @@ static int stmmac_request_irq_multi_msi(struct net_device *dev)
+ 		sprintf(int_name, "%s:%s-%d", dev->name, "tx", i);
+ 		ret = request_irq(priv->tx_irq[i],
+ 				  stmmac_msi_intr_tx,
+-				  0, int_name, &priv->dma_conf.tx_queue[i]);
++				  flags, int_name, &priv->dma_conf.tx_queue[i]);
+ 		if (unlikely(ret < 0)) {
+ 			netdev_err(priv->dev,
+ 				   "%s: alloc tx-%d  MSI %d (error: %d)\n",
+@@ -6057,8 +6061,10 @@ static u16 stmmac_select_queue(struct net_device *dev, struct sk_buff *skb,
+ 			       struct net_device *sb_dev)
+ {
+ 	int gso = skb_shinfo(skb)->gso_type;
++	struct stmmac_priv *priv = netdev_priv(dev);
  
--	return readl_poll_timeout(ioaddr + DMA_BUS_MODE, value,
--				 !(value & DMA_BUS_MODE_SFT_RESET),
--				 10000, 200000);
-+	return err;
- }
- 
- /* CSR1 enables the transmit DMA to check for new descriptor */
-@@ -267,12 +329,16 @@ int dwmac_dma_interrupt(struct stmmac_priv *priv, void __iomem *ioaddr,
- 			x->rx_early_irq++;
- 	}
- 	/* Optional hardware blocks, interrupts should be disabled */
--	if (unlikely(intr_status &
--		     (DMA_STATUS_GPI | DMA_STATUS_GMI | DMA_STATUS_GLI)))
-+	if (!priv->plat->dwmac_is_loongson &&
-+	    unlikely(intr_status & (DMA_STATUS_GPI | DMA_STATUS_GMI | DMA_STATUS_GLI)))
- 		pr_warn("%s: unexpected status %08x\n", __func__, intr_status);
- 
--	/* Clear the interrupt by writing a logic 1 to the CSR5[15-0] */
--	writel((intr_status & 0x1ffff), ioaddr + DMA_STATUS);
-+	if (priv->plat->dwmac_is_loongson)
-+		writel((intr_status & 0x7ffff), ioaddr + DMA_STATUS);
-+	else {
-+		/* Clear the interrupt by writing a logic 1 to the CSR5[15-0] */
-+		writel((intr_status & 0x1ffff), ioaddr + DMA_STATUS);
-+	}
- 
- 	return ret;
- }
+-	if (gso & (SKB_GSO_TCPV4 | SKB_GSO_TCPV6 | SKB_GSO_UDP_L4)) {
++	if ((gso & (SKB_GSO_TCPV4 | SKB_GSO_TCPV6 | SKB_GSO_UDP_L4)) ||
++	    priv->plat->has_lgmac) {
+ 		/*
+ 		 * There is no way to determine the number of TSO/USO
+ 		 * capable Queues. Let's use always the Queue 0
+@@ -6936,7 +6942,8 @@ static int stmmac_hw_init(struct stmmac_priv *priv)
+ 	 * riwt_off field from the platform.
+ 	 */
+ 	if (((priv->synopsys_id >= DWMAC_CORE_3_50) ||
+-	    (priv->plat->has_xgmac)) && (!priv->plat->riwt_off)) {
++	    (priv->plat->has_xgmac) || (priv->plat->has_lgmac)) &&
++	    (!priv->plat->riwt_off)) {
+ 		priv->use_riwt = 1;
+ 		dev_info(priv->device,
+ 			 "Enable RX Mitigation via HW Watchdog Timer\n");
+diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
+index 46bccc34814d..e21076f57205 100644
+--- a/include/linux/stmmac.h
++++ b/include/linux/stmmac.h
+@@ -344,5 +344,6 @@ struct plat_stmmacenet_data {
+ 	bool has_integrated_pcs;
+ 	const struct dwmac_regs *dwmac_regs;
+ 	bool dwmac_is_loongson;
++	int has_lgmac;
+ };
+ #endif
 -- 
 2.39.3
 
