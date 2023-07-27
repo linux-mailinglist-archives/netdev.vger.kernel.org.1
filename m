@@ -1,213 +1,147 @@
-Return-Path: <netdev+bounces-21817-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21818-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E09A764E40
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 10:55:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DF425764E46
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 10:56:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 58637281F8D
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 08:55:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 98D6D281DED
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 08:56:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40568D532;
-	Thu, 27 Jul 2023 08:55:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D86FED537;
+	Thu, 27 Jul 2023 08:56:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F3A5C2C2
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 08:55:46 +0000 (UTC)
-Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58DEB49F3
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 01:55:42 -0700 (PDT)
-Received: by mail-pf1-x436.google.com with SMTP id d2e1a72fcca58-6748a616e17so192442b3a.1
-        for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 01:55:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1690448142; x=1691052942;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=WiPjRg1/kjwO6K5zl232SDHPqYtmZOtFvHbsJXMq+7g=;
-        b=Umb+YV+a9lWFhAL8II9iFkMStUOOBYcco6VfVBA99lXKZrqzVwUjfYjnKm4Dm0LFjT
-         qdoJauj14z5/Q/ALZNZe4hty9eUQzFUzAPUNYhh89WT1GQpVMRyZmNBBpLKeWi1ZbclH
-         LZhMvQeV3S/E/ICy+9O5ITOO1Phn4D+1/k/6DGPG+fLuYZVwP+5BQnq4IpnQhN9xTXZe
-         rfTcvD1n0zxeVBrWB1YcR+3kK3++SSPnDRJs7hwNhsakSHiwU6PBsTieOJN2pDWuMDWg
-         xnIMDcCLv5tsUy7qwBc5TOF+eIq3rIHBy6gcXooMjKSZ0a9wuV4u6V1UPp0vjKeCWB6q
-         aakQ==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC6B5D2F7
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 08:56:07 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2ACD85FFB
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 01:56:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1690448163;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=HJr/LOxM4lZv4w4CQeON2CQ08oZ8bTnRRLKHoh2xLYw=;
+	b=jAl5974rmDEAlC+phVEM8hKb65NVDlq2AOsqlTe0sUy6so7c6aGst57o/7o6RZmPZ750+w
+	EK19hcaXenztS2GS91sJyePW8s3G9WeFohOEcL3MVLW7U2Bco9MeEbP1Wk8musBUnLzk7y
+	siV3PFH/lyjsH9oYRKIyG2aRfIvzelE=
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
+ [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-227-2dF5FPCyOPimYXUVmgBjiQ-1; Thu, 27 Jul 2023 04:56:02 -0400
+X-MC-Unique: 2dF5FPCyOPimYXUVmgBjiQ-1
+Received: by mail-qv1-f72.google.com with SMTP id 6a1803df08f44-5eee6742285so9294976d6.2
+        for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 01:56:02 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690448142; x=1691052942;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WiPjRg1/kjwO6K5zl232SDHPqYtmZOtFvHbsJXMq+7g=;
-        b=eLxjhema4H0A5X0RtH0gpqAPKHiPlfiuNtADHS+djA/7uBL7RTDKEqUYEFKIBbDRzL
-         HRjk9mWrMpncqcwkvADP8pzpl5V0E8gTiK5WQW/mJB55MXJ4yZpzMkGHqFSlTp/WtIUV
-         20sQbE/GCydulDCeptH5BgRRny5ZGuTh3B1rHxVpfNZpbHGDuVM113Lw0nBdcjL4f/4o
-         99WqzGxsOf6mcKKq2AKmOEeLFHX9pNiJuUHK+sNcZwKBtqees+XLbxNk0q1li7zrgKDw
-         BdwE8nTYONDxDZil/b+tIoaJnPqc/gtilP+nTuEKXwHzgJiuNDkWabTqY9Qnlnb0bLyn
-         5wIw==
-X-Gm-Message-State: ABy/qLYibTapuz1MfRBYwXhNL3tgzMBxFwKchBXTg+G+fRrVWkmWwwsJ
-	2yU/iEz9FMmlYdpNeAdAdN1jkg==
-X-Google-Smtp-Source: APBJJlGwmdjot/rbtwF9nTotnOmqaOAtVmCVUqRrFxhkDx7eGx5gFUYRsJSjv9frk6zdjI0egP1lkA==
-X-Received: by 2002:a17:902:e891:b0:1b3:d4bb:3515 with SMTP id w17-20020a170902e89100b001b3d4bb3515mr5854967plg.0.1690448141745;
-        Thu, 27 Jul 2023 01:55:41 -0700 (PDT)
-Received: from [10.70.252.135] ([203.208.167.147])
-        by smtp.gmail.com with ESMTPSA id iy15-20020a170903130f00b001bbb1eec92esm1023927plb.281.2023.07.27.01.55.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 27 Jul 2023 01:55:41 -0700 (PDT)
-Message-ID: <56ee1d92-28ee-81cb-9c41-6ca7ea6556b0@bytedance.com>
-Date: Thu, 27 Jul 2023 16:55:27 +0800
+        d=1e100.net; s=20221208; t=1690448161; x=1691052961;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=HJr/LOxM4lZv4w4CQeON2CQ08oZ8bTnRRLKHoh2xLYw=;
+        b=BDlvhm8mZmHjGpnnJ7RhNMW4wROeNsoT9XaGByUfTneIy1CuOfu7lUsA+CRwBXJFbU
+         tnniONlJLEN6bZ+pAg0Gc+2TA4K0SJUdiVU/cnDpkMyv4GDvznj7eBOg7IHYPm4/rKXf
+         lZs+333Fo8zhBlg56dvyohi4PHiLbgSJYpTVKaK/1AdyQLiKvMb4mZGfm3z++utEKMEe
+         l+kEhttqLZJK4kqafCDtYQifnDasvzEQxje90ej9bf48IAddzZgm0ao6gL48ak+r+RS5
+         vWcS2PX02GM2kQE1CDyep0ZIX/EWEKFuXrvpCczWlV+Wk67k5d/Jt39L9V191zKVflzM
+         BHMA==
+X-Gm-Message-State: ABy/qLaZHzImc3xM34/7jM85Dgwvx3jQ7BszaGaGJ/jJaKpLGRk93Ass
+	E+qU5fmIs332PMcFnsWQTbaSmWR4TCS6pf1gy8jDkJ/WCPpJYoyAUXs1pSm+43L9/cHxA66qoav
+	LRF80+zzXiNj2NoYNvoE2C9vI0aPDPj8fn9cxXBLTYnnDupMstalrgJQ26Y1VjTTmpGc3CiToMT
+	s+eg==
+X-Received: by 2002:a0c:a892:0:b0:631:fb35:27e1 with SMTP id x18-20020a0ca892000000b00631fb3527e1mr3390705qva.4.1690448161323;
+        Thu, 27 Jul 2023 01:56:01 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlFTSssZCGMsNwCshAycu204bY4Oh2wqpnsdZCFy57WNmtumSwYLEcSvcRtqfI61eZGplg/x2Q==
+X-Received: by 2002:a0c:a892:0:b0:631:fb35:27e1 with SMTP id x18-20020a0ca892000000b00631fb3527e1mr3390693qva.4.1690448160880;
+        Thu, 27 Jul 2023 01:56:00 -0700 (PDT)
+Received: from nfvsdn-06.redhat.com (nat-pool-232-132.redhat.com. [66.187.232.132])
+        by smtp.gmail.com with ESMTPSA id f30-20020a0caa9e000000b0063612e03433sm273260qvb.101.2023.07.27.01.56.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Jul 2023 01:56:00 -0700 (PDT)
+From: mtahhan@redhat.com
+To: netdev@vger.kernel.org,
+	kuba@kernel.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com
+Cc: Maryam Tahhan <mtahhan@redhat.com>
+Subject: [net-next,v1 0/2] tools/net/ynl: enable json configuration
+Date: Thu, 27 Jul 2023 04:55:55 -0400
+Message-Id: <cover.1690447762.git.mtahhan@redhat.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.12.0
-Subject: Re: [PATCH v3 28/49] dm zoned: dynamically allocate the dm-zoned-meta
- shrinker
-Content-Language: en-US
-To: Damien Le Moal <dlemoal@kernel.org>
-Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org, x86@kernel.org,
- kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
- linux-erofs@lists.ozlabs.org, linux-f2fs-devel@lists.sourceforge.net,
- cluster-devel@redhat.com, linux-nfs@vger.kernel.org,
- linux-mtd@lists.infradead.org, rcu@vger.kernel.org, netdev@vger.kernel.org,
- dri-devel@lists.freedesktop.org, linux-arm-msm@vger.kernel.org,
- dm-devel@redhat.com, linux-raid@vger.kernel.org,
- linux-bcache@vger.kernel.org, virtualization@lists.linux-foundation.org,
- linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
- linux-xfs@vger.kernel.org, linux-btrfs@vger.kernel.org,
- Muchun Song <songmuchun@bytedance.com>, akpm@linux-foundation.org,
- david@fromorbit.com, tkhai@ya.ru, vbabka@suse.cz, roman.gushchin@linux.dev,
- djwong@kernel.org, brauner@kernel.org, paulmck@kernel.org, tytso@mit.edu,
- steven.price@arm.com, cel@kernel.org, senozhatsky@chromium.org,
- yujie.liu@intel.com, gregkh@linuxfoundation.org, muchun.song@linux.dev
-References: <20230727080502.77895-1-zhengqi.arch@bytedance.com>
- <20230727080502.77895-29-zhengqi.arch@bytedance.com>
- <baaf7de4-9a0e-b953-2b6a-46e60c415614@kernel.org>
-From: Qi Zheng <zhengqi.arch@bytedance.com>
-In-Reply-To: <baaf7de4-9a0e-b953-2b6a-46e60c415614@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi,
+From: Maryam Tahhan <mtahhan@redhat.com>
 
-On 2023/7/27 16:30, Damien Le Moal wrote:
-> On 7/27/23 17:04, Qi Zheng wrote:
->> In preparation for implementing lockless slab shrink, use new APIs to
->> dynamically allocate the dm-zoned-meta shrinker, so that it can be freed
->> asynchronously using kfree_rcu(). Then it doesn't need to wait for RCU
->> read-side critical section when releasing the struct dmz_metadata.
->>
->> Signed-off-by: Qi Zheng <zhengqi.arch@bytedance.com>
->> Reviewed-by: Muchun Song <songmuchun@bytedance.com>
->> ---
->>   drivers/md/dm-zoned-metadata.c | 28 ++++++++++++++++------------
->>   1 file changed, 16 insertions(+), 12 deletions(-)
->>
->> diff --git a/drivers/md/dm-zoned-metadata.c b/drivers/md/dm-zoned-metadata.c
->> index 9d3cca8e3dc9..0bcb26a43578 100644
->> --- a/drivers/md/dm-zoned-metadata.c
->> +++ b/drivers/md/dm-zoned-metadata.c
->> @@ -187,7 +187,7 @@ struct dmz_metadata {
->>   	struct rb_root		mblk_rbtree;
->>   	struct list_head	mblk_lru_list;
->>   	struct list_head	mblk_dirty_list;
->> -	struct shrinker		mblk_shrinker;
->> +	struct shrinker		*mblk_shrinker;
->>   
->>   	/* Zone allocation management */
->>   	struct mutex		map_lock;
->> @@ -615,7 +615,7 @@ static unsigned long dmz_shrink_mblock_cache(struct dmz_metadata *zmd,
->>   static unsigned long dmz_mblock_shrinker_count(struct shrinker *shrink,
->>   					       struct shrink_control *sc)
->>   {
->> -	struct dmz_metadata *zmd = container_of(shrink, struct dmz_metadata, mblk_shrinker);
->> +	struct dmz_metadata *zmd = shrink->private_data;
->>   
->>   	return atomic_read(&zmd->nr_mblks);
->>   }
->> @@ -626,7 +626,7 @@ static unsigned long dmz_mblock_shrinker_count(struct shrinker *shrink,
->>   static unsigned long dmz_mblock_shrinker_scan(struct shrinker *shrink,
->>   					      struct shrink_control *sc)
->>   {
->> -	struct dmz_metadata *zmd = container_of(shrink, struct dmz_metadata, mblk_shrinker);
->> +	struct dmz_metadata *zmd = shrink->private_data;
->>   	unsigned long count;
->>   
->>   	spin_lock(&zmd->mblk_lock);
->> @@ -2936,19 +2936,23 @@ int dmz_ctr_metadata(struct dmz_dev *dev, int num_dev,
->>   	 */
->>   	zmd->min_nr_mblks = 2 + zmd->nr_map_blocks + zmd->zone_nr_bitmap_blocks * 16;
->>   	zmd->max_nr_mblks = zmd->min_nr_mblks + 512;
->> -	zmd->mblk_shrinker.count_objects = dmz_mblock_shrinker_count;
->> -	zmd->mblk_shrinker.scan_objects = dmz_mblock_shrinker_scan;
->> -	zmd->mblk_shrinker.seeks = DEFAULT_SEEKS;
->>   
->>   	/* Metadata cache shrinker */
->> -	ret = register_shrinker(&zmd->mblk_shrinker, "dm-zoned-meta:(%u:%u)",
->> -				MAJOR(dev->bdev->bd_dev),
->> -				MINOR(dev->bdev->bd_dev));
->> -	if (ret) {
->> -		dmz_zmd_err(zmd, "Register metadata cache shrinker failed");
->> +	zmd->mblk_shrinker = shrinker_alloc(0,  "dm-zoned-meta:(%u:%u)",
->> +					    MAJOR(dev->bdev->bd_dev),
->> +					    MINOR(dev->bdev->bd_dev));
->> +	if (!zmd->mblk_shrinker) {
->> +		dmz_zmd_err(zmd, "Allocate metadata cache shrinker failed");
-> 
-> ret is not set here, so dmz_ctr_metadata() will return success. You need to add:
-> 		ret = -ENOMEM;
-> or something.
+Use a json configuration file to pass parameters to ynl to allow
+for operations on multiple specs in one go. Additionally, check
+this new configuration against a schema to validate it in the cli
+module before parsing it and passing info to the ynl module.
 
-Indeed, will fix.
+Example configs would be:
+{
+    "yaml-specs-path": "/<path-to>/linux/Documentation/netlink/specs",
+    "spec-args": {
+        "ethtool.yaml": {
+            "do": "rings-get",
+            "json-params": {
+                "header": {
+                    "dev-name": "eno1"
+                }
+            }
+        },
+       "netdev.yaml": {
+            "do": "dev-get",
+            "json-params": {
+            "ifindex": 3
+            }
+        }
+    }
+}
 
->>   		goto err;
->>   	}
->>   
->> +	zmd->mblk_shrinker->count_objects = dmz_mblock_shrinker_count;
->> +	zmd->mblk_shrinker->scan_objects = dmz_mblock_shrinker_scan;
->> +	zmd->mblk_shrinker->seeks = DEFAULT_SEEKS;
->> +	zmd->mblk_shrinker->private_data = zmd;
->> +
->> +	shrinker_register(zmd->mblk_shrinker);
-> 
-> I fail to see how this new shrinker API is better... Why isn't there a
-> shrinker_alloc_and_register() function ? That would avoid adding all this code
-> all over the place as the new API call would be very similar to the current
-> shrinker_register() call with static allocation.
+OR
 
-In some registration scenarios, memory needs to be allocated in advance.
-So we continue to use the previous prealloc/register_prepared()
-algorithm. The shrinker_alloc_and_register() is just a helper function
-that combines the two, and this increases the number of APIs that
-shrinker exposes to the outside, so I choose not to add this helper.
+{
+    "yaml-specs-path": "/<path-to>/linux/Documentation/netlink/specs",
+    "spec-args": {
+        "ethtool.yaml": {
+            "subscribe": "monitor",
+            "sleep": 10
+        },
+        "netdev.yaml": {
+            "subscribe": "mgmt",
+            "sleep": 5
+        }
+    }
+}
 
-Thanks,
-Qi
+Maryam Tahhan (2):
+  tools/net/ynl: configuration through json
+  tools/net/ynl: validate config against schema
 
-> 
->> +
->>   	dmz_zmd_info(zmd, "DM-Zoned metadata version %d", zmd->sb_version);
->>   	for (i = 0; i < zmd->nr_devs; i++)
->>   		dmz_print_dev(zmd, i);
->> @@ -2995,7 +2999,7 @@ int dmz_ctr_metadata(struct dmz_dev *dev, int num_dev,
->>    */
->>   void dmz_dtr_metadata(struct dmz_metadata *zmd)
->>   {
->> -	unregister_shrinker(&zmd->mblk_shrinker);
->> +	shrinker_free(zmd->mblk_shrinker);
->>   	dmz_cleanup_metadata(zmd);
->>   	kfree(zmd);
->>   }
-> 
+ tools/net/ynl/cli.py            | 135 +++++++++++++++++++++++++++-----
+ tools/net/ynl/ynl-config.schema |  72 +++++++++++++++++
+ 2 files changed, 187 insertions(+), 20 deletions(-)
+ create mode 100644 tools/net/ynl/ynl-config.schema
+
+-- 
+2.39.2
+
 
