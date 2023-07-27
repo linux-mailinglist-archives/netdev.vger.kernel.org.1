@@ -1,64 +1,271 @@
-Return-Path: <netdev+bounces-22040-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22041-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1835B765BD9
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 21:05:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5486A765BDC
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 21:05:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C46442822B2
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 19:05:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8EB591C21679
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 19:05:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8FA51989B;
-	Thu, 27 Jul 2023 19:05:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB84A1989F;
+	Thu, 27 Jul 2023 19:05:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB23327127
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 19:05:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24416C433C7;
-	Thu, 27 Jul 2023 19:05:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690484723;
-	bh=6n1hxKoAxhSd9tu71Hxc0S41CHLjqKNvtMKeTAZ6R/E=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=g6PJqzWrhEPcKuV37iYS8a5YIJr7QXBRZXiVPqYqFl5aw4DcFjOZJeYu+WLbJcGJa
-	 9dd3qa3OkGWQIakMdKm0V/tXeveiUY8WpHbBX0QC47yH05spVbs/sW6l/c/I9j3Rg6
-	 AWlft3nrfzPtHSBDZrDnMlychYf99CfIEJ0CcVHQ9FpQfjEaeX+H7s/fIOOChL9CF5
-	 FVmuXZlclIBNafvn0KdRALL2E6+YxXQyMBJ/RiBnY6AL1E+Q7YN3Mq6O7ZN0dSHpA5
-	 dnYORXDLFq8AJFhmdV0hjqZ6pgrKrKPbliszbU47z0DJIO4wHxbLd6rrC6Xqtkujio
-	 ccpFUCihcrZkA==
-Date: Thu, 27 Jul 2023 12:05:22 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Michael Chan <michael.chan@broadcom.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, gospo@broadcom.com
-Subject: Re: [PATCH net] bnxt: don't handle XDP in netpoll
-Message-ID: <20230727120522.392fe60b@kernel.org>
-In-Reply-To: <CACKFLikZfjMnK3gwJ=xP8Hb3Bfu8CYa1NMGqHJj7ChcJTWwjmg@mail.gmail.com>
-References: <20230727170505.1298325-1-kuba@kernel.org>
-	<CACKFLikZfjMnK3gwJ=xP8Hb3Bfu8CYa1NMGqHJj7ChcJTWwjmg@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99EDA1989B
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 19:05:34 +0000 (UTC)
+Received: from mail-wm1-x333.google.com (mail-wm1-x333.google.com [IPv6:2a00:1450:4864:20::333])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85FB9210B;
+	Thu, 27 Jul 2023 12:05:32 -0700 (PDT)
+Received: by mail-wm1-x333.google.com with SMTP id 5b1f17b1804b1-3fc0aecf15bso14676015e9.1;
+        Thu, 27 Jul 2023 12:05:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1690484731; x=1691089531;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=nIx6nzK1csipmfPjI95rDJjLnMfx1PFSyc3lWa7vvrc=;
+        b=ii3hjhVJ3BJkubwmKOh79nhvCZikM1KTN7kY7sfD45meSp7XEmATGp7W4mWIx3bJwB
+         CWHV25uZpWDIMGKGBBkmv4v67g+DrVd8gHuzFmhoY3wD/3wAKMzIFSVWdBV5QPcFBFm3
+         Twe6zGISOulfT8GJ/E3+ow2I0ftejuCVdBdCO+16BcXIoKorJ2RE3aq8iVGlIFJLfBjT
+         SHTjPulLqzlRZkdL95WuaYRA5iRhX1+OuWYdfJEwCXcc6LGpM7bQ7Trsb2nYFVmE6XRx
+         p+prALiRW6zqI9u9cUB1uUrirm1/f0ce626pVkA4ael7U2AbiuhN3EhIN0ar1G37IFm/
+         3rkQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690484731; x=1691089531;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nIx6nzK1csipmfPjI95rDJjLnMfx1PFSyc3lWa7vvrc=;
+        b=Hro1a4x4QBX02zHlg/IncbuxUpTW5ZK0gMVo/2xrPjR+vEFMwggU8h7cBRGY+joUCE
+         ZpnBevSsIjhk/5zGBsnsEetQVXzAugI/urGtJXqOYnKqYejdxMmmN0/ZrPXfTxc+8pEr
+         MCx1Ro8bRQLYLq0TNW4o3ilAcRIqAb3vvMxMTLn2NJ2A6wR6rTaE9tQltPQ1UBEOKSu3
+         PQ6fXN3jtiEKIMM26iiExjv5KdScrmOd6pt3CRr1JduA9Nj3ahRQuwmoHbIkhSCPpIFB
+         +LjflgVfHpzJ+ZM/f85ZX/05bOPeyGyDv1oMmPHrcydn08Cj2SUdLbGtDxXYJ/pSguUX
+         Y90A==
+X-Gm-Message-State: ABy/qLbX4kGhXYPd6GzCaL6j3DSfVlgsy7/BmU+z/wKgbykMmU6t3ljx
+	hxYgPehq5Ig6YnbvHfra5HhmF07MK8ehdg==
+X-Google-Smtp-Source: APBJJlHJ7puWts4CflXO4H+wofp3DYNCnNSEPNzyOp9lZBZmPIP+OFWm7CMpHs3T3c1zd2APi0RuEQ==
+X-Received: by 2002:a7b:c4d3:0:b0:3f8:fac0:ad40 with SMTP id g19-20020a7bc4d3000000b003f8fac0ad40mr2449541wmk.29.1690484730568;
+        Thu, 27 Jul 2023 12:05:30 -0700 (PDT)
+Received: from Ansuel-xps. (host-87-19-253-131.retail.telecomitalia.it. [87.19.253.131])
+        by smtp.gmail.com with ESMTPSA id 17-20020a05600c029100b003f9bd9e3226sm2530980wmk.7.2023.07.27.12.05.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Jul 2023 12:05:29 -0700 (PDT)
+Message-ID: <64c2bff9.050a0220.49b7e.cb84@mx.google.com>
+X-Google-Original-Message-ID: <ZMK/+P2OMKuKFl7P@Ansuel-xps.>
+Date: Thu, 27 Jul 2023 21:05:28 +0200
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Atin Bainada <hi@atinb.me>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [net-next PATCH 2/3] net: dsa: qca8k: make learning configurable
+ and keep off if standalone
+References: <20230724033058.16795-1-ansuelsmth@gmail.com>
+ <20230724033058.16795-1-ansuelsmth@gmail.com>
+ <20230724033058.16795-2-ansuelsmth@gmail.com>
+ <20230724033058.16795-2-ansuelsmth@gmail.com>
+ <20230726121213.3uehfygkz7rchlqf@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230726121213.3uehfygkz7rchlqf@skbuf>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Thu, 27 Jul 2023 11:52:10 -0700 Michael Chan wrote:
-> These TX packet completions have already been counted in
-> __bnxt_poll_work().  If we do nothing here, I think the TX ring will
-> forever be out-of-sync with the completion ring.
+On Wed, Jul 26, 2023 at 03:12:13PM +0300, Vladimir Oltean wrote:
+> On Mon, Jul 24, 2023 at 05:30:57AM +0200, Christian Marangi wrote:
+> > Address learning should initially be turned off by the driver for port
+> > operation in standalone mode, then the DSA core handles changes to it
+> > via ds->ops->port_bridge_flags().
+> > 
+> > Currently this is not the case for qca8k where learning is enabled
+> > unconditionally in qca8k_setup for every user port.
+> > 
+> > Handle ports configured in standalone mode by making the learning
+> > configurable and not enabling it by default.
+> > 
+> > Implement .port_pre_bridge_flags and .port_bridge_flags dsa ops to
+> > enable learning for bridge that request it and tweak
+> > .port_stp_state_set to correctly disable learning when port is
+> > configured in standalone mode.
+> > 
+> > Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+> > ---
+> 
+> Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
+> 
+> Small nitpick below.
+> 
+> >  drivers/net/dsa/qca/qca8k-8xxx.c   |  7 +++--
+> >  drivers/net/dsa/qca/qca8k-common.c | 44 ++++++++++++++++++++++++++++++
+> >  drivers/net/dsa/qca/qca8k.h        |  6 ++++
+> >  3 files changed, 54 insertions(+), 3 deletions(-)
+> > 
+> > diff --git a/drivers/net/dsa/qca/qca8k-8xxx.c b/drivers/net/dsa/qca/qca8k-8xxx.c
+> > index ae088a4df794..31552853fdd4 100644
+> > --- a/drivers/net/dsa/qca/qca8k-8xxx.c
+> > +++ b/drivers/net/dsa/qca/qca8k-8xxx.c
+> > @@ -1870,9 +1870,8 @@ qca8k_setup(struct dsa_switch *ds)
+> >  			if (ret)
+> >  				return ret;
+> >  
+> > -			/* Enable ARP Auto-learning by default */
+> > -			ret = regmap_set_bits(priv->regmap, QCA8K_PORT_LOOKUP_CTRL(i),
+> > -					      QCA8K_PORT_LOOKUP_LEARN);
+> > +			ret = regmap_clear_bits(priv->regmap, QCA8K_PORT_LOOKUP_CTRL(i),
+> > +						QCA8K_PORT_LOOKUP_LEARN);
+> >  			if (ret)
+> >  				return ret;
+> >  
+> > @@ -1978,6 +1977,8 @@ static const struct dsa_switch_ops qca8k_switch_ops = {
+> >  	.port_change_mtu	= qca8k_port_change_mtu,
+> >  	.port_max_mtu		= qca8k_port_max_mtu,
+> >  	.port_stp_state_set	= qca8k_port_stp_state_set,
+> > +	.port_pre_bridge_flags	= qca8k_port_pre_bridge_flags,
+> > +	.port_bridge_flags	= qca8k_port_bridge_flags,
+> >  	.port_bridge_join	= qca8k_port_bridge_join,
+> >  	.port_bridge_leave	= qca8k_port_bridge_leave,
+> >  	.port_fast_age		= qca8k_port_fast_age,
+> > diff --git a/drivers/net/dsa/qca/qca8k-common.c b/drivers/net/dsa/qca/qca8k-common.c
+> > index 13b8452ce5b2..e53694d2852a 100644
+> > --- a/drivers/net/dsa/qca/qca8k-common.c
+> > +++ b/drivers/net/dsa/qca/qca8k-common.c
+> > @@ -565,9 +565,26 @@ int qca8k_get_mac_eee(struct dsa_switch *ds, int port,
+> >  	return 0;
+> >  }
+> >  
+> > +static int qca8k_port_configure_learning(struct dsa_switch *ds, int port,
+> > +					 bool learning)
+> > +{
+> > +	struct qca8k_priv *priv = ds->priv;
+> > +
+> > +	if (learning)
+> > +		return regmap_set_bits(priv->regmap,
+> > +				       QCA8K_PORT_LOOKUP_CTRL(port),
+> > +				       QCA8K_PORT_LOOKUP_LEARN);
+> > +	else
+> > +		return regmap_clear_bits(priv->regmap,
+> > +					 QCA8K_PORT_LOOKUP_CTRL(port),
+> > +					 QCA8K_PORT_LOOKUP_LEARN);
+> > +}
+> > +
+> >  void qca8k_port_stp_state_set(struct dsa_switch *ds, int port, u8 state)
+> >  {
+> > +	struct dsa_port *dp = dsa_to_port(ds, port);
+> >  	struct qca8k_priv *priv = ds->priv;
+> > +	bool learning = false;
+> >  	u32 stp_state;
+> >  
+> >  	switch (state) {
+> > @@ -582,8 +599,11 @@ void qca8k_port_stp_state_set(struct dsa_switch *ds, int port, u8 state)
+> >  		break;
+> >  	case BR_STATE_LEARNING:
+> >  		stp_state = QCA8K_PORT_LOOKUP_STATE_LEARNING;
+> > +		learning = dp->learning;
+> >  		break;
+> >  	case BR_STATE_FORWARDING:
+> > +		learning = dp->learning;
+> > +		fallthrough;
+> >  	default:
+> >  		stp_state = QCA8K_PORT_LOOKUP_STATE_FORWARD;
+> >  		break;
+> > @@ -591,6 +611,30 @@ void qca8k_port_stp_state_set(struct dsa_switch *ds, int port, u8 state)
+> >  
+> >  	qca8k_rmw(priv, QCA8K_PORT_LOOKUP_CTRL(port),
+> >  		  QCA8K_PORT_LOOKUP_STATE_MASK, stp_state);
+> > +
+> > +	qca8k_port_configure_learning(ds, port, learning);
+> > +}
+> > +
+> > +int qca8k_port_pre_bridge_flags(struct dsa_switch *ds, int port,
+> > +				struct switchdev_brport_flags flags,
+> > +				struct netlink_ext_ack *extack)
+> > +{
+> > +	if (flags.mask & ~BR_LEARNING)
+> > +		return -EINVAL;
+> > +
+> > +	return 0;
+> > +}
+> > +
+> > +int qca8k_port_bridge_flags(struct dsa_switch *ds, int port,
+> > +			    struct switchdev_brport_flags flags,
+> > +			    struct netlink_ext_ack *extack)
+> > +{
+> > +	int ret;
+> > +
+> > +	ret = qca8k_port_configure_learning(ds, port,
+> > +					    flags.val & BR_LEARNING);
+> > +
+> > +	return ret;
+> 
+> I worry that the way in this is formulated will attract patches from
+> kernel janitors to simplify it to:
+> 
+> 	return qca8k_port_configure_learning(...)
+> 
+> I agree that it's not strictly necessary to check flags.mask when
+> port_pre_bridge_flags supports a single flag, but if you did that and
+> structured the code for more future flags, you could avoid that.
+> 
+> 	int ret;
+> 
+> 	if (flags.mask & BR_LEARNING) {
+> 		ret = qca8k_port_configure_learning(...,
+> 						    flags.val & BR_LEARNING);
+> 		if (ret)
+> 			return ret;
+> 	}
+> 
+> 	return 0;
+> 
+> Anyway, probably not a big deal.
+> 
+> >  }
 
-I see...
+I hope and expect to send fbd isolation later with FLOOD flags so I will
+send v2 of this with the suggested format.
 
-Do you prefer adding a return value to tx_int() to tell
-__bnxt_poll_work_done() whether the work has been done;
-or to clear tx_pkts in the handler itself rather than
-the caller?
+> >  
+> >  int qca8k_port_bridge_join(struct dsa_switch *ds, int port,
+> > diff --git a/drivers/net/dsa/qca/qca8k.h b/drivers/net/dsa/qca/qca8k.h
+> > index c5cc8a172d65..8f88b7db384d 100644
+> > --- a/drivers/net/dsa/qca/qca8k.h
+> > +++ b/drivers/net/dsa/qca/qca8k.h
+> > @@ -522,6 +522,12 @@ int qca8k_get_mac_eee(struct dsa_switch *ds, int port, struct ethtool_eee *e);
+> >  
+> >  /* Common bridge function */
+> >  void qca8k_port_stp_state_set(struct dsa_switch *ds, int port, u8 state);
+> > +int qca8k_port_pre_bridge_flags(struct dsa_switch *ds, int port,
+> > +				struct switchdev_brport_flags flags,
+> > +				struct netlink_ext_ack *extack);
+> > +int qca8k_port_bridge_flags(struct dsa_switch *ds, int port,
+> > +			    struct switchdev_brport_flags flags,
+> > +			    struct netlink_ext_ack *extack);
+> >  int qca8k_port_bridge_join(struct dsa_switch *ds, int port,
+> >  			   struct dsa_bridge bridge,
+> >  			   bool *tx_fwd_offload,
+> > -- 
+> > 2.40.1
+> > 
+> 
 
+-- 
+	Ansuel
 
