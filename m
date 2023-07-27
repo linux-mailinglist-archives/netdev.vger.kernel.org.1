@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-21953-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21954-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F880765659
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 16:48:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 703BF76565E
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 16:48:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5FC3F1C21680
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 14:48:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2BCE428240A
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 14:48:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D543B17746;
-	Thu, 27 Jul 2023 14:46:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AD0317751;
+	Thu, 27 Jul 2023 14:46:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C733D18024
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 14:46:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EBBE1988B
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 14:46:19 +0000 (UTC)
 Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.31])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3EBB230DA;
-	Thu, 27 Jul 2023 07:45:58 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A92473AAA;
+	Thu, 27 Jul 2023 07:46:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1690469158; x=1722005158;
+  t=1690469161; x=1722005161;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=KlYBSALGjCnGn6k2NRIvrpGdhSLAEVVLVU2ig0CAvyw=;
-  b=E1rw8pp/7blEWzZ30GBezU/a32XZ1bZtX4JhsYd9TC6z0+LkW5HwkN+N
-   A0r1ZIDYW7v7OYEriIAzfvItykKq51XJ5dGIdeDx8IjGz6Z9dfUtnYd7p
-   bnRwUF0MfiZZ54rcadt5OVV26Wn9NsuqRpEBa07V+ibWpcHWwkWBKhAws
-   9rCk502nY6mm5j98ZIbKxwLyaQSS7OWdb6UrAqc9cb4J4jaAMoB4+e8Eb
-   n82LFweB6wFPBOMntjWukbjOA4XCTKYA1wH5RWiNgEhIY7YmURFWfGhh2
-   gMHutjSJbBaOESLaQMQU6bXLL83AEfCu6Nvm6sx/LNVU1UKp9JaxRAxqT
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10784"; a="432139848"
+  bh=eYl99+L8eoZb9TdbyaCeQo6lRhwlNSjOXE6qobDW3K0=;
+  b=IkgpUQGNIbKtfpljDJGk10+TiBLptw0DunKPCOtyK55fN2OgBAW8gYxh
+   eAejiz0Qn+pA/f/3udRKxN9koAJPdaQbkAhqmPLdbMJt3s/TmXZSbgtIu
+   GOHKwafQ11X6w1VQcvfY/7h2Iza0yEkwY/OyqxzAYtUjAHtjGE3kR1itl
+   nBs0rbe+RYJIKim6+gGQg8LP5VHFJddzobUnjCF58eoRQR0MjE1TctsnU
+   AlrcR8gyKvFuD7zLnuxzjq2pZVDI2WY0aa5wy9ocflw5Hr52fnSUMGdLF
+   wxASAuNvr3TR5FqIM4P2wuiY3gfWRAGbSvb0902opVK/rHCVxVyP5mfsJ
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10784"; a="432139872"
 X-IronPort-AV: E=Sophos;i="6.01,235,1684825200"; 
-   d="scan'208";a="432139848"
+   d="scan'208";a="432139872"
 Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jul 2023 07:45:57 -0700
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jul 2023 07:46:00 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10784"; a="817119955"
+X-IronPort-AV: E=McAfee;i="6600,9927,10784"; a="817119964"
 X-IronPort-AV: E=Sophos;i="6.01,235,1684825200"; 
-   d="scan'208";a="817119955"
+   d="scan'208";a="817119964"
 Received: from newjersey.igk.intel.com ([10.102.20.203])
-  by FMSMGA003.fm.intel.com with ESMTP; 27 Jul 2023 07:45:54 -0700
+  by FMSMGA003.fm.intel.com with ESMTP; 27 Jul 2023 07:45:57 -0700
 From: Alexander Lobakin <aleksander.lobakin@intel.com>
 To: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
@@ -60,9 +60,9 @@ Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
 	Simon Horman <simon.horman@corigine.com>,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next 8/9] page_pool: add a lockdep check for recycling in hardirq
-Date: Thu, 27 Jul 2023 16:43:35 +0200
-Message-ID: <20230727144336.1646454-9-aleksander.lobakin@intel.com>
+Subject: [PATCH net-next 9/9] net: skbuff: always try to recycle PP pages directly when in softirq
+Date: Thu, 27 Jul 2023 16:43:36 +0200
+Message-ID: <20230727144336.1646454-10-aleksander.lobakin@intel.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230727144336.1646454-1-aleksander.lobakin@intel.com>
 References: <20230727144336.1646454-1-aleksander.lobakin@intel.com>
@@ -80,60 +80,48 @@ X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Jakub Kicinski <kuba@kernel.org>
+Commit 8c48eea3adf3 ("page_pool: allow caching from safely localized
+NAPI") allowed direct recycling of skb pages to their PP for some cases,
+but unfortunately missed a couple of other majors.
+For example, %XDP_DROP in skb mode. The netstack just calls kfree_skb(),
+which unconditionally passes `false` as @napi_safe. Thus, all pages go
+through ptr_ring and locks, although most of time we're actually inside
+the NAPI polling this PP is linked with, so that it would be perfectly
+safe to recycle pages directly.
+Let's address such. If @napi_safe is true, we're fine, don't change
+anything for this path. But if it's false, check whether we are in the
+softirq context. It will most likely be so and then if ->list_owner
+is our current CPU, we're good to use direct recycling, even though
+@napi_safe is false -- concurrent access is excluded. in_softirq()
+protection is needed mostly due to we can hit this place in the
+process context (not the hardirq though).
+For the mentioned xdp-drop-skb-mode case, the improvement I got is
+3-4% in Mpps. As for page_pool stats, recycle_ring is now 0 and
+alloc_slow counter doesn't change most of time, which means the
+MM layer is not even called to allocate any new pages.
 
-Page pool use in hardirq is prohibited, add debug checks
-to catch misuses. IIRC we previously discussed using
-DEBUG_NET_WARN_ON_ONCE() for this, but there were concerns
-that people will have DEBUG_NET enabled in perf testing.
-I don't think anyone enables lockdep in perf testing,
-so use lockdep to avoid pushback and arguing :)
-
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Suggested-by: Jakub Kicinski <kuba@kernel.org> # in_softirq()
 Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
 ---
- include/linux/lockdep.h | 7 +++++++
- net/core/page_pool.c    | 2 ++
- 2 files changed, 9 insertions(+)
+ net/core/skbuff.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/include/linux/lockdep.h b/include/linux/lockdep.h
-index 310f85903c91..dc2844b071c2 100644
---- a/include/linux/lockdep.h
-+++ b/include/linux/lockdep.h
-@@ -625,6 +625,12 @@ do {									\
- 	WARN_ON_ONCE(__lockdep_enabled && !this_cpu_read(hardirq_context)); \
- } while (0)
+diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+index e701401092d7..5ba3948cceed 100644
+--- a/net/core/skbuff.c
++++ b/net/core/skbuff.c
+@@ -901,8 +901,10 @@ bool page_pool_return_skb_page(struct page *page, bool napi_safe)
+ 	/* Allow direct recycle if we have reasons to believe that we are
+ 	 * in the same context as the consumer would run, so there's
+ 	 * no possible race.
++	 * __page_pool_put_page() makes sure we're not in hardirq context
++	 * and interrupts are enabled prior to accessing the cache.
+ 	 */
+-	if (napi_safe) {
++	if (napi_safe || in_softirq()) {
+ 		const struct napi_struct *napi = READ_ONCE(pp->p.napi);
  
-+#define lockdep_assert_no_hardirq()					\
-+do {									\
-+	WARN_ON_ONCE(__lockdep_enabled && (this_cpu_read(hardirq_context) || \
-+					   !this_cpu_read(hardirqs_enabled))); \
-+} while (0)
-+
- #define lockdep_assert_preemption_enabled()				\
- do {									\
- 	WARN_ON_ONCE(IS_ENABLED(CONFIG_PREEMPT_COUNT)	&&		\
-@@ -659,6 +665,7 @@ do {									\
- # define lockdep_assert_irqs_enabled() do { } while (0)
- # define lockdep_assert_irqs_disabled() do { } while (0)
- # define lockdep_assert_in_irq() do { } while (0)
-+# define lockdep_assert_no_hardirq() do { } while (0)
- 
- # define lockdep_assert_preemption_enabled() do { } while (0)
- # define lockdep_assert_preemption_disabled() do { } while (0)
-diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-index 529e4b41e9eb..be9371cd9ac7 100644
---- a/net/core/page_pool.c
-+++ b/net/core/page_pool.c
-@@ -579,6 +579,8 @@ static __always_inline struct page *
- __page_pool_put_page(struct page_pool *pool, struct page *page,
- 		     unsigned int dma_sync_size, bool allow_direct)
- {
-+	lockdep_assert_no_hardirq();
-+
- 	/* This allocator is optimized for the XDP mode that uses
- 	 * one-frame-per-page, but have fallbacks that act like the
- 	 * regular page allocator APIs.
+ 		allow_direct = napi &&
 -- 
 2.41.0
 
