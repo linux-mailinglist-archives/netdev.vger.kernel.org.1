@@ -1,35 +1,35 @@
-Return-Path: <netdev+bounces-22028-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22029-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01583765B82
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 20:42:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4BA62765B83
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 20:43:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E1B3B1C21595
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 18:42:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4C0671C216EF
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 18:43:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9D1E1CA13;
-	Thu, 27 Jul 2023 18:39:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30A881CA1D;
+	Thu, 27 Jul 2023 18:39:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B74091C9ED
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 18:39:32 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E72CC433CA;
-	Thu, 27 Jul 2023 18:39:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B00DF1C9FA
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 18:39:33 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7290DC433B7;
+	Thu, 27 Jul 2023 18:39:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690483172;
-	bh=9HPMgzP1VpnPfSM+5ynHx12PlsFUHRgKFE5See3xJUU=;
+	s=k20201202; t=1690483173;
+	bh=KU2PkTqCvH2iTuJ72764GBNfl2BCk1EalHuuKsQh44s=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=XipfDzYa88HbLXSel8oTM739LxCYuXbo9nbb2bYuJkWDutOQ6HlfY4joEyDUNK68/
-	 rNEMAiGhs6wSxduo9ze2Ob830IxDTYIQVlQxopAKZPqji3XvUu4tdZhpij2gtBcd4x
-	 jZhKMFMdIb7r1l1GMhxRdSP9XPUvqNWJFQ0OJwkSl6TzKh4TD4gaoaiCUnSSoVoC7K
-	 CiGu3+jBEQfJKdr4E3u4KmmBxzjvziHP6aFVJWq6C8othlF7lYacL2jmgUGBZsx/0r
-	 /rY8Rg9Uu05eRNY+HZ5BiDZjyEvVKjM9l8SfjN+9paJTzxHXgqI+4OTbCl0u54sfam
-	 4nMQiycGVqclg==
+	b=KflT9P1ExQFVJbc9veCKSNeTM30Pqt+YhIh2w+WlqFWvfmIQdOGe4X4ZqiimWPeh2
+	 QR4SYc75cT4X7nfXuUgRJQ+Kz6TaWD000+IDpeM71q+L8lA0pO42Bxv+/jQ8pKejrN
+	 r0IKiotDVCQ+gyZV979Et6ODIXbTSUSjyTRIS/LN/yLAUZl/Chlp70uFIaMJKme+tc
+	 NCRVN8MEcplQtTPGunx58MR1bBdsP/2j5ImLJ+dqPUD3pFn+DbkOCkFpl3a/rECWVU
+	 wvBDRHbkAbJ7fprMrLOlpalhVufBZeGfgrrfISVFPq6VoRdpclflACsm3pIaPmOEkJ
+	 td7gWjJZI+YDw==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -38,11 +38,11 @@ To: "David S. Miller" <davem@davemloft.net>,
 Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	netdev@vger.kernel.org,
 	Tariq Toukan <tariqt@nvidia.com>,
-	Parav Pandit <parav@nvidia.com>,
-	Roi Dayan <roid@nvidia.com>
-Subject: [net-next V2 10/15] net/mlx5e: Make flow classification filters static
-Date: Thu, 27 Jul 2023 11:39:09 -0700
-Message-ID: <20230727183914.69229-11-saeed@kernel.org>
+	Jiri Pirko <jiri@nvidia.com>,
+	Shay Drory <shayd@nvidia.com>
+Subject: [net-next V2 11/15] net/mlx5: Don't check vport->enabled in port ops
+Date: Thu, 27 Jul 2023 11:39:10 -0700
+Message-ID: <20230727183914.69229-12-saeed@kernel.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230727183914.69229-1-saeed@kernel.org>
 References: <20230727183914.69229-1-saeed@kernel.org>
@@ -54,57 +54,112 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Parav Pandit <parav@nvidia.com>
+From: Jiri Pirko <jiri@nvidia.com>
 
-Get and set flow classification filters are used in a single file.
-Hence, make them static.
+vport->enabled is always set for a vport for which a devlink port is
+registered, therefore the checks in the ops are pointless.
+Remove those.
 
-Signed-off-by: Parav Pandit <parav@nvidia.com>
-Reviewed-by: Roi Dayan <roid@nvidia.com>
+Signed-off-by: Jiri Pirko <jiri@nvidia.com>
+Reviewed-by: Shay Drory <shayd@nvidia.com>
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
- drivers/net/ethernet/mellanox/mlx5/core/en.h         | 3 ---
- drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c | 6 +++---
- 2 files changed, 3 insertions(+), 6 deletions(-)
+ .../mellanox/mlx5/core/eswitch_offloads.c     | 28 ++++---------------
+ 1 file changed, 6 insertions(+), 22 deletions(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en.h b/drivers/net/ethernet/mellanox/mlx5/core/en.h
-index b1807bfb815f..0f8f70b91485 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en.h
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en.h
-@@ -1167,9 +1167,6 @@ int mlx5e_ethtool_set_link_ksettings(struct mlx5e_priv *priv,
- int mlx5e_get_rxfh(struct net_device *netdev, u32 *indir, u8 *key, u8 *hfunc);
- int mlx5e_set_rxfh(struct net_device *dev, const u32 *indir, const u8 *key,
- 		   const u8 hfunc);
--int mlx5e_get_rxnfc(struct net_device *dev, struct ethtool_rxnfc *info,
--		    u32 *rule_locs);
--int mlx5e_set_rxnfc(struct net_device *dev, struct ethtool_rxnfc *cmd);
- u32 mlx5e_ethtool_get_rxfh_key_size(struct mlx5e_priv *priv);
- u32 mlx5e_ethtool_get_rxfh_indir_size(struct mlx5e_priv *priv);
- int mlx5e_ethtool_get_ts_info(struct mlx5e_priv *priv,
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c b/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c
-index 27861b68ced5..04195a673a6b 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c
-@@ -2163,8 +2163,8 @@ static u32 mlx5e_get_priv_flags(struct net_device *netdev)
- 	return priv->channels.params.pflags;
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c b/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
+index b4b8cb788573..c192000e3614 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
+@@ -4125,7 +4125,6 @@ int mlx5_devlink_port_fn_migratable_get(struct devlink_port *port, bool *is_enab
+ {
+ 	struct mlx5_eswitch *esw;
+ 	struct mlx5_vport *vport;
+-	int err = -EOPNOTSUPP;
+ 
+ 	esw = mlx5_devlink_eswitch_get(port->devlink);
+ 	if (IS_ERR(esw))
+@@ -4133,7 +4132,7 @@ int mlx5_devlink_port_fn_migratable_get(struct devlink_port *port, bool *is_enab
+ 
+ 	if (!MLX5_CAP_GEN(esw->dev, migration)) {
+ 		NL_SET_ERR_MSG_MOD(extack, "Device doesn't support migration");
+-		return err;
++		return -EOPNOTSUPP;
+ 	}
+ 
+ 	vport = mlx5_devlink_port_fn_get_vport(port, esw);
+@@ -4143,12 +4142,9 @@ int mlx5_devlink_port_fn_migratable_get(struct devlink_port *port, bool *is_enab
+ 	}
+ 
+ 	mutex_lock(&esw->state_lock);
+-	if (vport->enabled) {
+-		*is_enabled = vport->info.mig_enabled;
+-		err = 0;
+-	}
++	*is_enabled = vport->info.mig_enabled;
+ 	mutex_unlock(&esw->state_lock);
+-	return err;
++	return 0;
  }
  
--int mlx5e_get_rxnfc(struct net_device *dev, struct ethtool_rxnfc *info,
--		    u32 *rule_locs)
-+static int mlx5e_get_rxnfc(struct net_device *dev, struct ethtool_rxnfc *info,
-+			   u32 *rule_locs)
- {
- 	struct mlx5e_priv *priv = netdev_priv(dev);
+ int mlx5_devlink_port_fn_migratable_set(struct devlink_port *port, bool enable,
+@@ -4177,10 +4173,6 @@ int mlx5_devlink_port_fn_migratable_set(struct devlink_port *port, bool enable,
+ 	}
  
-@@ -2181,7 +2181,7 @@ int mlx5e_get_rxnfc(struct net_device *dev, struct ethtool_rxnfc *info,
- 	return mlx5e_ethtool_get_rxnfc(priv, info, rule_locs);
+ 	mutex_lock(&esw->state_lock);
+-	if (!vport->enabled) {
+-		NL_SET_ERR_MSG_MOD(extack, "Eswitch vport is disabled");
+-		goto out;
+-	}
+ 
+ 	if (vport->info.mig_enabled == enable) {
+ 		err = 0;
+@@ -4224,7 +4216,6 @@ int mlx5_devlink_port_fn_roce_get(struct devlink_port *port, bool *is_enabled,
+ {
+ 	struct mlx5_eswitch *esw;
+ 	struct mlx5_vport *vport;
+-	int err = -EOPNOTSUPP;
+ 
+ 	esw = mlx5_devlink_eswitch_get(port->devlink);
+ 	if (IS_ERR(esw))
+@@ -4237,12 +4228,9 @@ int mlx5_devlink_port_fn_roce_get(struct devlink_port *port, bool *is_enabled,
+ 	}
+ 
+ 	mutex_lock(&esw->state_lock);
+-	if (vport->enabled) {
+-		*is_enabled = vport->info.roce_enabled;
+-		err = 0;
+-	}
++	*is_enabled = vport->info.roce_enabled;
+ 	mutex_unlock(&esw->state_lock);
+-	return err;
++	return 0;
  }
  
--int mlx5e_set_rxnfc(struct net_device *dev, struct ethtool_rxnfc *cmd)
-+static int mlx5e_set_rxnfc(struct net_device *dev, struct ethtool_rxnfc *cmd)
- {
- 	struct mlx5e_priv *priv = netdev_priv(dev);
+ int mlx5_devlink_port_fn_roce_set(struct devlink_port *port, bool enable,
+@@ -4251,10 +4239,10 @@ int mlx5_devlink_port_fn_roce_set(struct devlink_port *port, bool enable,
+ 	int query_out_sz = MLX5_ST_SZ_BYTES(query_hca_cap_out);
+ 	struct mlx5_eswitch *esw;
+ 	struct mlx5_vport *vport;
+-	int err = -EOPNOTSUPP;
+ 	void *query_ctx;
+ 	void *hca_caps;
+ 	u16 vport_num;
++	int err;
  
+ 	esw = mlx5_devlink_eswitch_get(port->devlink);
+ 	if (IS_ERR(esw))
+@@ -4268,10 +4256,6 @@ int mlx5_devlink_port_fn_roce_set(struct devlink_port *port, bool enable,
+ 	vport_num = vport->vport;
+ 
+ 	mutex_lock(&esw->state_lock);
+-	if (!vport->enabled) {
+-		NL_SET_ERR_MSG_MOD(extack, "Eswitch vport is disabled");
+-		goto out;
+-	}
+ 
+ 	if (vport->info.roce_enabled == enable) {
+ 		err = 0;
 -- 
 2.41.0
 
