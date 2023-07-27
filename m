@@ -1,70 +1,108 @@
-Return-Path: <netdev+bounces-21859-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21868-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C5F776515A
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 12:38:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0EBD17651D1
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 13:00:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AE63A28112C
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 10:38:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BDAEC281555
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 11:00:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2698FBEE;
-	Thu, 27 Jul 2023 10:38:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6DE0156DA;
+	Thu, 27 Jul 2023 10:58:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C64A8D539
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 10:38:03 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BA07269E
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 03:38:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=gUQMzQyKjcDc8bRIA4Rye4QCND40jXimAuOGpygqhkw=; b=5ixRRImxB2bwzy7gCHeIwm/wbq
-	m0YRjf8ihmcT9SaxKzhGucyFHvwhLLpGi/KhmsmLL6cVtL4HUpbfdr+H9NRGMQbSw/AHSbZXCGGP5
-	FN9IGi3NZMR76acEXeB2WuZNWqCMsE2nNsuuuc4eK6BYKJXIWJE8M6er6QXXgS1VBjME=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qOyNW-002RTV-LB; Thu, 27 Jul 2023 12:37:54 +0200
-Date: Thu, 27 Jul 2023 12:37:54 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Feiyang Chen <chenfeiyang@loongson.cn>
-Cc: hkallweit1@gmail.com, peppe.cavallaro@st.com,
-	alexandre.torgue@foss.st.com, joabreu@synopsys.com,
-	chenhuacai@loongson.cn, linux@armlinux.org.uk, dongbiao@loongson.cn,
-	loongson-kernel@lists.loongnix.cn, netdev@vger.kernel.org,
-	loongarch@lists.linux.dev, chris.chenfeiyang@gmail.com
-Subject: Re: [PATCH v2 09/10] net: stmmac: dwmac-loongson: Add 64-bit DMA and
- multi-vector support
-Message-ID: <26015def-bee6-4427-9da4-ca27de8c1d87@lunn.ch>
-References: <cover.1690439335.git.chenfeiyang@loongson.cn>
- <f626f2e1b9ed10854e96963a14a6e793611bd86b.1690439335.git.chenfeiyang@loongson.cn>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BEA616418
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 10:58:26 +0000 (UTC)
+Received: from mint-fitpc2.localdomain (unknown [81.168.73.77])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4622810D2
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 03:58:25 -0700 (PDT)
+Received: from palantir17.mph.net (palantir17 [192.168.0.4])
+	by mint-fitpc2.localdomain (Postfix) with ESMTP id 9B7EC32016B;
+	Thu, 27 Jul 2023 11:40:45 +0100 (BST)
+Received: from localhost ([::1] helo=palantir17.mph.net)
+	by palantir17.mph.net with esmtp (Exim 4.95)
+	(envelope-from <habetsm.xilinx@gmail.com>)
+	id 1qOyQ9-0002X7-To;
+	Thu, 27 Jul 2023 11:40:37 +0100
+Subject: [PATCH net-next 00/11] sfc: Remove Siena bits from sfc.ko
+From: Martin Habets <habetsm.xilinx@gmail.com>
+To: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com
+Cc: netdev@vger.kernel.org, linux-net-drivers@amd.com
+Date: Thu, 27 Jul 2023 11:40:37 +0100
+Message-ID: <169045436482.9625.4994454326362709391.stgit@palantir17.mph.net>
+User-Agent: StGit/0.19
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f626f2e1b9ed10854e96963a14a6e793611bd86b.1690439335.git.chenfeiyang@loongson.cn>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=0.7 required=5.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	FORGED_GMAIL_RCVD,FREEMAIL_FROM,KHOP_HELO_FCRDNS,MAY_BE_FORGED,
+	NML_ADSP_CUSTOM_MED,SPF_HELO_NONE,SPF_SOFTFAIL,SPOOFED_FREEMAIL,
+	SPOOF_GMAIL_MID,T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-> +	case DWMAC_CORE_3_50:
-> +		fallthrough;
-> +	case DWMAC_CORE_3_70:
+Last year we split off Siena into it's own driver under directory siena.
+This patch series removes the now unused Falcon and Siena code from sfc.ko.
+No functional changes are intended.
 
-You don't need fallthrough here.
+---
 
-    Andrew
+Martin Habets (11):
+      sfc: Remove falcon references
+      sfc: Remove siena_nic_data and stats
+      sfc: Remove support for siena high priority queue
+      sfc: Remove EFX_REV_SIENA_A0
+      sfc: Remove PTP code for Siena
+      sfc: Remove some NIC type indirections that are no longer needed
+      sfc: Filter cleanups for Falcon and Siena
+      sfc: Remove struct efx_special_buffer
+      sfc: Miscellaneous comment removals
+      sfc: Cleanups in io.h
+      sfc: Remove vfdi.h
+
+
+ drivers/net/ethernet/sfc/ef10.c             |    4 
+ drivers/net/ethernet/sfc/ef100_nic.c        |    2 
+ drivers/net/ethernet/sfc/ef100_tx.c         |    6 
+ drivers/net/ethernet/sfc/ef10_sriov.h       |    2 
+ drivers/net/ethernet/sfc/efx.c              |    1 
+ drivers/net/ethernet/sfc/efx.h              |    2 
+ drivers/net/ethernet/sfc/efx_channels.c     |   30 
+ drivers/net/ethernet/sfc/efx_common.c       |    7 
+ drivers/net/ethernet/sfc/farch_regs.h       | 2929 ---------------------------
+ drivers/net/ethernet/sfc/filter.h           |    7 
+ drivers/net/ethernet/sfc/io.h               |   84 -
+ drivers/net/ethernet/sfc/mcdi.c             |    7 
+ drivers/net/ethernet/sfc/mcdi_functions.c   |   24 
+ drivers/net/ethernet/sfc/mcdi_port_common.c |    5 
+ drivers/net/ethernet/sfc/net_driver.h       |   63 -
+ drivers/net/ethernet/sfc/nic.c              |  158 -
+ drivers/net/ethernet/sfc/nic.h              |  178 --
+ drivers/net/ethernet/sfc/nic_common.h       |   13 
+ drivers/net/ethernet/sfc/ptp.c              |  227 --
+ drivers/net/ethernet/sfc/selftest.c         |    7 
+ drivers/net/ethernet/sfc/tx.c               |   45 
+ drivers/net/ethernet/sfc/tx_tso.c           |    2 
+ drivers/net/ethernet/sfc/vfdi.h             |  252 --
+ drivers/net/ethernet/sfc/workarounds.h      |    7 
+ 24 files changed, 42 insertions(+), 4020 deletions(-)
+ delete mode 100644 drivers/net/ethernet/sfc/farch_regs.h
+ delete mode 100644 drivers/net/ethernet/sfc/vfdi.h
+
+--
+Martin Habets <habetsm.xilinx@gmail.com>
+
+
 
