@@ -1,241 +1,113 @@
-Return-Path: <netdev+bounces-21896-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21897-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB8297652C1
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 13:43:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 098A47652C2
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 13:44:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DCA6F1C21640
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 11:43:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 39FB51C21624
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 11:44:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B51815AF8;
-	Thu, 27 Jul 2023 11:43:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F4D015AF8;
+	Thu, 27 Jul 2023 11:44:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 275DC13AE9
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 11:43:25 +0000 (UTC)
-Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40FDE2109;
-	Thu, 27 Jul 2023 04:43:24 -0700 (PDT)
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-	by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20230727114322euoutp0134004c8a77ac176e91161a8d5b51acc6~1tsdL9YlV0082500825euoutp01d;
-	Thu, 27 Jul 2023 11:43:22 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20230727114322euoutp0134004c8a77ac176e91161a8d5b51acc6~1tsdL9YlV0082500825euoutp01d
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1690458202;
-	bh=hmpNR9U6LTorqWJzfNPkY5F9nV+bEnuWiv2TwR92kxM=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-	b=m10tv1G6HDR7M+JA6KMXYvf/Y9PKDJHfZmoE0f3iDA3meFCLns3IB/Np8+7+A/Iyr
-	 HYrXI8Z2DTRbJ2UDea0o1BMmpJl3hdLCV09CqxKfBiz2IABQM2mdOP7b+jxFB+p9uK
-	 bZw1cRF2RDDzTOhHoN4DppVKMm9E3m1HOC6iyi3E=
-Received: from eusmges3new.samsung.com (unknown [203.254.199.245]) by
-	eucas1p2.samsung.com (KnoxPortal) with ESMTP id
-	20230727114322eucas1p25c1f527c05b944e9023faf4ae2c7c42b~1tsdAgKHa0792707927eucas1p2n;
-	Thu, 27 Jul 2023 11:43:22 +0000 (GMT)
-Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
-	eusmges3new.samsung.com (EUCPMTA) with SMTP id 4A.82.37758.95852C46; Thu, 27
-	Jul 2023 12:43:21 +0100 (BST)
-Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
-	eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
-	20230727114321eucas1p2a249d5e24184b2b770d61d1e81537eec~1tsctCw-s0770607706eucas1p2o;
-	Thu, 27 Jul 2023 11:43:21 +0000 (GMT)
-Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
-	eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
-	20230727114321eusmtrp12382e8d4f22ebb7631d34ce39a02871e~1tscsYUFi0189401894eusmtrp1O;
-	Thu, 27 Jul 2023 11:43:21 +0000 (GMT)
-X-AuditID: cbfec7f5-7ffff7000002937e-77-64c258591d85
-Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
-	eusmgms2.samsung.com (EUCPMTA) with SMTP id D2.73.14344.95852C46; Thu, 27
-	Jul 2023 12:43:21 +0100 (BST)
-Received: from CAMSVWEXC02.scsc.local (unknown [106.1.227.72]) by
-	eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
-	20230727114321eusmtip11e0511ba785bbe4a381a3b1f9ad6d6df~1tsceeQ5K2178121781eusmtip1C;
-	Thu, 27 Jul 2023 11:43:21 +0000 (GMT)
-Received: from localhost (106.210.248.223) by CAMSVWEXC02.scsc.local
-	(2002:6a01:e348::6a01:e348) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
-	Thu, 27 Jul 2023 12:43:20 +0100
-Date: Thu, 27 Jul 2023 13:43:18 +0200
-From: Joel Granados <j.granados@samsung.com>
-To: Luis Chamberlain <mcgrof@kernel.org>
-CC: Kees Cook <keescook@chromium.org>, Iurii Zaikin <yzaikin@google.com>,
-	<willy@infradead.org>, <josh@joshtriplett.org>,
-	<linux-kernel@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
-	<netdev@vger.kernel.org>
-Subject: Re: [PATCH 00/14] sysctl: Add a size argument to register functions
- in sysctl
-Message-ID: <20230727114318.q5hxwwnjbwhm37wn@localhost>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25301E57A
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 11:44:08 +0000 (UTC)
+Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53DAA2109
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 04:44:06 -0700 (PDT)
+Received: by mail-ed1-x530.google.com with SMTP id 4fb4d7f45d1cf-51e619bcbf9so1057587a12.3
+        for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 04:44:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=blackwall-org.20221208.gappssmtp.com; s=20221208; t=1690458245; x=1691063045;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=0Pd52QAOVtNNbgDqHYQEjCrAzdyOOjihPSFq0M5Ik4Y=;
+        b=Bbak6hOsd1TyATRGYe05W+0/rKMMCiOckHsDdv6SyfQ0uqHMfd3rafUSrblXXzZoyK
+         FHmSWmyL7uuFub/fafa5s6Gam61mZI3IzRKmsHFU0ZiMqKVeVGtqm5DR7DqF7JXKTXUF
+         aH+mx/OTorlYbaLSNJgaozLQQOD+gkVjFPJryET2EKavzdFF74BjnpzS0aMo5Q7aO3++
+         DfWTnOH1fDDHf/iOk1+Vek4v6aZDcu8EJJ/ZEiXBsQtUnj/6LXvYIGvW1+7cYa3iH/aX
+         NNhAbdaKjxHA33v71NGTz73iWZdfrmjAVdhuUqBoLHqsSK82OhCjmn5onGqGbvwAQWUf
+         PGXQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690458245; x=1691063045;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=0Pd52QAOVtNNbgDqHYQEjCrAzdyOOjihPSFq0M5Ik4Y=;
+        b=gDNtcmV4HjuBM3IEV/IeblRd0WaY0fR4s4NIH4xcsMy/QMMo85R5X79vSk/1wxiGbo
+         FZt/6+GlsNhw5OgmYp6E2wKkDxZgGBG4xKXdMlWdz3rOIJpuOJUyezBtAT6t+xBDf9YI
+         xUFrx0BsXgJAm+cZ5/zPJI0YPbiRnhXMF9LxurdPeg+BDIt++72VKJR1yjwCyGeGfSr/
+         AY973kj4QybWniuJcBRwdVMYcNol9TkVCUQyimJAYWlszs4nPEJddG++9e6jF0DRmTAu
+         a6R4Sio15eQKhPyEodeMfadBrSWu3k5PiwNh1MxePWd+pyiL79acjUHo1ZnDl2OVwYie
+         oIEQ==
+X-Gm-Message-State: ABy/qLa+zi/c3164XhgJMP1ZZeOGIL13lTkeZZQZw5jJ2je/t+HLw8bS
+	hVP64INcMGYhUmB7Q0bJUhY2xhXtJyqT/C3kafY=
+X-Google-Smtp-Source: APBJJlHxaXVKfTJi3HvDwrCK+UddDlp4jZfELrpULv5ukfq77Dm+KA3G/1qp1PoAPSnHwBXlpw+QCA==
+X-Received: by 2002:aa7:d65a:0:b0:518:6a99:cac3 with SMTP id v26-20020aa7d65a000000b005186a99cac3mr1394418edr.31.1690458244681;
+        Thu, 27 Jul 2023 04:44:04 -0700 (PDT)
+Received: from [192.168.1.2] (handbookness.lineup.volia.net. [93.73.104.44])
+        by smtp.gmail.com with ESMTPSA id d7-20020a056402078700b005221ce96801sm565226edy.35.2023.07.27.04.44.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 27 Jul 2023 04:44:04 -0700 (PDT)
+Message-ID: <bd9e39da-088c-976e-982e-f5e2d4f4528b@blackwall.org>
+Date: Thu, 27 Jul 2023 14:44:03 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg="pgp-sha512";
-	protocol="application/pgp-signature"; boundary="un5gp6ss3vtarjvy"
-Content-Disposition: inline
-In-Reply-To: <ZMFizKFkVxUFtSqa@bombadil.infradead.org>
-X-Originating-IP: [106.210.248.223]
-X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
-	CAMSVWEXC02.scsc.local (2002:6a01:e348::6a01:e348)
-X-Brightmail-Tracker: H4sIAAAAAAAAA2WSf1CLcRzHffc89jzllsfW8VEdZ/l1LdH59fjRRsL843Kcy6/L1COdtbEV
-	xTl1uiQ/KqFVYt11E3MhtaUVtmjaKISbwsmlSM6U7pAba8/8uPPf+/163u/n+bzvHhLjPx4Z
-	QCYqkhmVQiYXcn1xQ9O3lhkbYizxszQ9C+ifWiV9/2gSXd/QjNNtdWe5tCPvLaKbtGPpoa9u
-	p7uxegkpLUl/hEu1VSnS6xUh0vYPEdKqS0e40oGqCdHcjb6L4xl54h5GNVO81XdHrr2Es8s8
-	KXXIlsFJRyWBOciHBGoOmJ1mPAf5knyqAsGnlg6CNV8QdGsrEWsGEFieteG/K/2tBm/qAoJD
-	jZn4n9St93Uc1tQgsFbrseEKTk2BF1YXMay5VCi09r3wcH9qOtzMO+4pYNRzBM33jZ6QgIoB
-	Y47J8z0eNR/OHXMQrB4DzUVdHo5RqeDI17g56daBcMFFDmMfah6cdb3msKcGg7l8iGD1AbBV
-	t3t5oQ+8swtYHQW9zx56pwmg11rtzQeBveCYZxlQBe5lLifBGj0CXcag902LIPNJl7exFC7a
-	mkYOHwSUHzg+jmHv9IOThkKMxTzIzuKz6amgf9WH56Hg4n+WFf+zrPjvMhaHgtbUz/0Pi0BX
-	9gFjdQRUVn7CtYi4hMYxKeqkBEY9W8HsDVPLktQpioSwOGVSFXL/anaXdbAWVfR+DrMgDoks
-	aLK7/Oaq/iEKwBVKBSP059miLfF8XrwsbR+jUsaqUuSM2oICSVw4jieKaI7jUwmyZGYnw+xi
-	VL+fckifgHTOSvpUw5Uy+116hU5EPP3YFfKy7WJd5eF3nY2RTU+70u4ZRt9ZWJ+2TWN9A6aD
-	Gr0ktu67IDf1YJAkWRPNLOvYjJ0LisnCVi3IQ8aaKFXkxv4r0+SM+MGIE0xp48CyGeIVNdfM
-	pcnfbqyZa5RLTJEtEgMRR1nLI/cdFsxWK/0CuT2XP+9pb89Vqor61q4Lxoa6TbbScI19U2EG
-	lnEve4PMURMl3n76cmJrbec2UYm2e+r4gb6EnFunhEZJ794yy5TdgxMfONf0dNSX+ztbwzsn
-	r3/pd15mDP0uKjqzPEuyJHu/cMsTMbd6VMPX/B+1+Ykj8Pm3nUduZ+73byHCeLpYIa7eIQsP
-	wVRq2S9aE8zj5QMAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrHIsWRmVeSWpSXmKPExsVy+t/xu7qREYdSDNZPUrH4vyDf4kx3rsWe
-	vSdZLC7vmsNmcWPCU0aLYwvELH7/APKW7fRz4PCY3XCRxWPBplKPzSu0PG69tvXYtKqTzePz
-	JrkAtig9m6L80pJUhYz84hJbpWhDCyM9Q0sLPSMTSz1DY/NYKyNTJX07m5TUnMyy1CJ9uwS9
-	jElXWtgK9itWtG4taGCcKd3FyMkhIWAi8en8NvYuRi4OIYGljBJHjh1mh0jISGz8cpUVwhaW
-	+HOtiw2i6COjxJTVL1kgnK2MEt+Xv2MBqWIRUJW4c/wfWDebgI7E+Td3mEFsEQENiX0TeplA
-	GpgFbjJKnDyzHaxIWCBCYnvXbrBmXgFziXk9N6Du2MsocefzTKiEoMTJmU/AbGaBMomOyRuB
-	7uAAsqUllv/jAAlzCphJzPn3gAniVGWJg0t+Q71QK/H57zPGCYzCs5BMmoVk0iyESRBhLYkb
-	/14yYQhrSyxb+JoZwraVWLfuPcsCRvZVjCKppcW56bnFRnrFibnFpXnpesn5uZsYgZG97djP
-	LTsYV776qHeIkYmD8RCjClDnow2rLzBKseTl56UqifCeCjiUIsSbklhZlVqUH19UmpNafIjR
-	FBiME5mlRJPzgSknryTe0MzA1NDEzNLA1NLMWEmc17OgI1FIID2xJDU7NbUgtQimj4mDU6qB
-	aaELg/v1pKkWsV9e/Jy9TNoi+vDei4lOO79uzzgUVHIiZCfn0wXH9PvWRaq+q3OVu+qw588d
-	mxoXtwt7GpauXLYwk99/4626a5n85QHF3Vatz55ft/bdq/Dhm8uXW3zsFry8zW0s50sjkjs+
-	WTBGXFgm9EfozHX7j3GmSfvvFkscC1rmnX32RGWKt7k29/MN3vraanIRxZlzfx5nuNs6O0zl
-	zePpMU03v7EaGT6/FvDzVv2Tv3fTOb9LvLNt+3bobNuMG8/4H55kjVroMClI6ouRb3PS7f/3
-	asRS5fknJ92ewb/n/4LoU/GRcxaeUXc2ZGJbdbs4+Kj+9rqA9r+CO77uXGreULJVLfcWm6VO
-	oBJLcUaioRZzUXEiAI+D5TiBAwAA
-X-CMS-MailID: 20230727114321eucas1p2a249d5e24184b2b770d61d1e81537eec
-X-Msg-Generator: CA
-X-RootMTR: 20230726140648eucas1p29a92c80fb28550e2087cd0ae190d29bd
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20230726140648eucas1p29a92c80fb28550e2087cd0ae190d29bd
-References: <CGME20230726140648eucas1p29a92c80fb28550e2087cd0ae190d29bd@eucas1p2.samsung.com>
-	<20230726140635.2059334-1-j.granados@samsung.com>
-	<ZMFizKFkVxUFtSqa@bombadil.infradead.org>
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Subject: Re: [PATCH net-next] bridge: Remove unused declaration
+ br_multicast_set_hash_max()
+Content-Language: en-US
+To: YueHaibing <yuehaibing@huawei.com>, roopa@nvidia.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, idosch@nvidia.com
+Cc: bridge@lists.linux-foundation.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20230726143141.11704-1-yuehaibing@huawei.com>
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <20230726143141.11704-1-yuehaibing@huawei.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
---un5gp6ss3vtarjvy
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On 7/26/23 17:31, YueHaibing wrote:
+> Since commit 19e3a9c90c53 ("net: bridge: convert multicast to generic rhashtable")
+> this is not used, so can remove it.
+> 
+> Signed-off-by: YueHaibing <yuehaibing@huawei.com>
+> ---
+>   net/bridge/br_private.h | 1 -
+>   1 file changed, 1 deletion(-)
+> 
+> diff --git a/net/bridge/br_private.h b/net/bridge/br_private.h
+> index 51e4ca54b537..a1f4acfa6994 100644
+> --- a/net/bridge/br_private.h
+> +++ b/net/bridge/br_private.h
+> @@ -974,7 +974,6 @@ int br_multicast_set_vlan_router(struct net_bridge_vlan *v, u8 mcast_router);
+>   int br_multicast_toggle(struct net_bridge *br, unsigned long val,
+>   			struct netlink_ext_ack *extack);
+>   int br_multicast_set_querier(struct net_bridge_mcast *brmctx, unsigned long val);
+> -int br_multicast_set_hash_max(struct net_bridge *br, unsigned long val);
+>   int br_multicast_set_igmp_version(struct net_bridge_mcast *brmctx,
+>   				  unsigned long val);
+>   #if IS_ENABLED(CONFIG_IPV6)
 
-On Wed, Jul 26, 2023 at 11:15:40AM -0700, Luis Chamberlain wrote:
-> On Wed, Jul 26, 2023 at 04:06:20PM +0200, Joel Granados wrote:
-> > What?
-> > These commits set things up so we can start removing the sentinel eleme=
-nts.
->=20
-> Yes but the why must explained right away.
-My intention of putting the "what" first was to explain the chunking and
-clarify right away that what was contained in the "why" was not for this
-chunk but for the *whole* patchset.
+Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
 
-I have swapped them in my cover letter as I can see that the ambiguity
-is gone once you start reading the "what"
-
->=20
-> > Why?
-> > This is part of the push to trim down kernel/sysctl.c by moving the lar=
-ge array
-> > that was causing merge conflicts.=20
->=20
-> Let me elaborate on that:
->=20
-> While the move moving over time of array elements out of kernel/sysctl.c
-> to their own place helps merge conflicts this patch set does not help
-> with that in and of itself, what it does is help make sure the move of
-> sysctls to their own files does not bloat the kernel more, and in fact
-> helps reduce the overall build time size of the kernel and run time
-> memory consumed by the kernel by about ~64 bytes per array.
->=20
-> Without this patch set each time we moved a set of sysctls out of
-> kernel/sysctl.c to its own subsystem we'd have to add a new sentinel
-> element (an empty sysctl entry), and while that helps clean up
-> kernel/sysctl.c to avoid merge conflicts, it also bloats the kernel
-> by about 64 bytes on average each time.
->=20
-> We can do better. We can make those moves *not* have a size penalty, and
-> all around also reduce the build / run time of the kernel.
->=20
-> *This* is the why, that if we don't do this the cleanup of
-> kernel/sysctl.c ends up slowly bloating the kernel. Willy had
-> suggested we instead remove the sentinel so that each move does not
-> incur a size penalty, but also that in turn reduces the size of the
-> kernel at build time / run time by a ballpark about ~64 bytes per
-> array.
-Thx for this.
-This is a more clear wording for the "Why". Do you mind if I copy/paste
-it (with some changes to make it flow) into my next cover letter?
-
->=20
-> Then the following is more details about estimates of overall size
-> savings, it's not miscellaneous information at all, it's very relevant
-> information to this patch set.
-Did not mean to downplay the importance here. Just did not have a good
-title for the section. I'll change it to "Size saving estimates".
->=20
-> > Misc:
-> > A consequence of eventually removing all the sentinels (64 bytes per se=
-ntinel)
-> > is the bytes we save. Here I include numbers for when all sentinels are=
- removed
-> > to contextualize this chunk
-> >   * bloat-o-meter:
-> >     The "yesall" configuration results save 9158 bytes (you can see the=
- output here
-> >     https://lore.kernel.org/all/20230621091000.424843-1-j.granados@sams=
-ung.com/.
-> >     The "tiny" configuration + CONFIG_SYSCTL save 1215 bytes (you can s=
-ee the
-> >     output here [2])
-> >   * memory usage:
-> >     As we no longer need the sentinel element within proc_sysctl.c, we =
-save some
-> >     bytes in main memory as well. In my testing kernel I measured a dif=
-ference of
-> >     6720 bytes. I include the way to measure this in [1]
->=20
->   Luis
-
---=20
-
-best
-
-Joel Granados
-
---un5gp6ss3vtarjvy
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQGzBAABCgAdFiEErkcJVyXmMSXOyyeQupfNUreWQU8FAmTCWFUACgkQupfNUreW
-QU8gZQv6A/JPdyEMJM+WZNlax/U3RF4zQ82hUr00IwsVsFcKmsO0BE4FqcvJGvaR
-aARhNTofi/WyX7nALCwj1lLCcB6FNsJTlprsLd3N8axWlIEoLrpuph4G5b830ogU
-MNvrTaS8qKx26baRQ/KR8rniV0H5S2XZzg6xpXo9FMo06NY58YPXOPjaBIvUYaQL
-l3R/COZan+15Uow7op8qKTNzU6wQDpRoBz1i5b+IJgHnpJz3QToAGjLiXoPAj11z
-Qdclhmlv7oFkmuPH3XUSs4coE2qPypauGHjOiOzwgqOCd9UNI4u25oYPSC7Gf6vy
-Mx4TDJkxC/Bn7uWKVrnbP/inppOY5HAsqDjUXyl+526ZhS5vs40PD3u2R3PPvgHq
-tbPE+t93g25EQAcyAs5KpiqxvdC4JPjoFhYR6gc6h7FNLgJzHbSk6OwmgnVM4/J5
-ZQBH6ADV8gH3XnK6inNAGsyYSIHpelt16cjng8xM6w3Dlp3FNnfP38X9VPzVCNPL
-fH92JfWn
-=0ihf
------END PGP SIGNATURE-----
-
---un5gp6ss3vtarjvy--
 
