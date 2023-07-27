@@ -1,137 +1,225 @@
-Return-Path: <netdev+bounces-21906-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21907-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0ED3C76532E
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 14:05:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38D27765390
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 14:22:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B765D2817DB
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 12:05:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 51BC21C2102D
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 12:22:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 500F616436;
-	Thu, 27 Jul 2023 12:04:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3009168DC;
+	Thu, 27 Jul 2023 12:22:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 424B713AC1
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 12:04:20 +0000 (UTC)
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2106.outbound.protection.outlook.com [40.107.94.106])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC273272C
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 05:04:18 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=kLpbD8nT+oPZvTSq1DgEucNd6FG7x1pL6galieF60VKPfV3TME+Hz4NWixIAhmjVz7MD+3W3dOKV7Bq6SfBOK09gJIk8OfvOvbmMFox3otICPt1XWRsQX/E7GjV31FYgX2DBPSHorh9xnF5csDW7uqm+a6uaXO6boDlXORnpa2hQHsClgW5Mj7p5PLiWrTJKafHGpRGX0qtlkLyUvJ2HL633yToJS1Z9gT9l8lWWs8llBy083IBan9lnqR3Cz9XaFEyeQMp+y/Q/UUG4ELAojeIqcoB8YtqzFfvbYe3aKgDbXohQaIjO+0aXf6xzwgTwn5XW6/7o+bvXZgAT4833Ug==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0aqsditGr5QAqh/nZbqjAGQ+HTaagt7D3ha/uFIXpVk=;
- b=loUREkwaFq3Rh9mnDlki0lD65FJsX0Gv5ZooAJYxMdPQn9fHtcg7Sjqtb/TQ+UQuSKjZ4dlHKdSoi+DC7GZTSDKcSKn7ZHaoUrur7IAojpIxwWbA0aNt8JzrMX2CiLmg5JqmOa+nN3y9ld1okQjAGC841/rqAGqH4qy60XmxkepacmmPg8bJ/hMg3T/8i948dyIp5ASAQJz/db3EYYS8x70kwleWUQE66OdTU05ODvRxsZAMsrDyBb02Jx+ezZXjbkexDn+Gs3fui5xnPdpldijDvII1i7jv9JoTwnLEM7DNYlUCCMR8YW4ld706SOGtP1OwqE046giiA5skmiPlcg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
- dkim=pass header.d=corigine.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0aqsditGr5QAqh/nZbqjAGQ+HTaagt7D3ha/uFIXpVk=;
- b=uzFVkGpYZ9M293jpQQClyrclsusPI7w4vicPmAEqvGWzLgSg9lofUc9ZLO3opZxgBirpkpa7RvDpIe7a5TTiDa3o8iv2N/hNQkKxNp1Yoh1rNa/b3NnB1f0CJoUSq0fMf/dlA/Oi4R6rYmIcjf/NaBBJ51Nk22AgVIhuEJ6ZgW8=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=corigine.com;
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
- by CH0PR13MB5098.namprd13.prod.outlook.com (2603:10b6:610:ed::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.29; Thu, 27 Jul
- 2023 12:04:15 +0000
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::fde7:9821:f2d9:101d]) by PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::fde7:9821:f2d9:101d%7]) with mapi id 15.20.6631.026; Thu, 27 Jul 2023
- 12:04:15 +0000
-Date: Thu, 27 Jul 2023 14:04:09 +0200
-From: Simon Horman <simon.horman@corigine.com>
-To: Patrick Rohr <prohr@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Linux Network Development Mailing List <netdev@vger.kernel.org>
-Subject: Re: [PATCH v2] net: remove comment in ndisc_router_discovery
-Message-ID: <ZMJdOYFWq19m0Bq8@corigine.com>
-References: <c3f90818-3991-4b76-6f3a-9e9aed976dea@kernel.org>
- <20230726184742.342825-1-prohr@google.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230726184742.342825-1-prohr@google.com>
-X-ClientProxiedBy: AM4PR0302CA0017.eurprd03.prod.outlook.com
- (2603:10a6:205:2::30) To PH0PR13MB4842.namprd13.prod.outlook.com
- (2603:10b6:510:78::6)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4B181641B
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 12:22:31 +0000 (UTC)
+Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC1A73A9C;
+	Thu, 27 Jul 2023 05:22:07 -0700 (PDT)
+Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
+	by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20230727122204euoutp01c1300deceb0647d29e9f84fa39a09ce3~1uOP6PDUE0931709317euoutp01R;
+	Thu, 27 Jul 2023 12:22:04 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20230727122204euoutp01c1300deceb0647d29e9f84fa39a09ce3~1uOP6PDUE0931709317euoutp01R
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1690460524;
+	bh=UNpV9Xfy6rp5fo9PV60OHzWHjUdlfdxrbzjpXgfrMzE=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
+	b=J6gXorgabGEge6zNvEh5HCvYIAXt+h44UjgRfdyRmGIcen/8tve5J8MNYg0AJ7mmv
+	 sXN+b6zRCzTdalmNd0Aa2J+1Jf04UiYIXGXv6mrewSZQayMhOJkiLqcdwtn3vYh/nL
+	 uTuVZeVf7kEL1+9EhCJ61bAh1Mz5znOWmnARoQtw=
+Received: from eusmges1new.samsung.com (unknown [203.254.199.242]) by
+	eucas1p1.samsung.com (KnoxPortal) with ESMTP id
+	20230727122204eucas1p1cab21b16ee35e3c5ec2c7b5e885da187~1uOPs5hFJ0682006820eucas1p1s;
+	Thu, 27 Jul 2023 12:22:04 +0000 (GMT)
+Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
+	eusmges1new.samsung.com (EUCPMTA) with SMTP id ED.EC.42423.B6162C46; Thu, 27
+	Jul 2023 13:22:04 +0100 (BST)
+Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
+	eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
+	20230727122203eucas1p2853f35c6361a8ff038a9c18f029426c3~1uOPIozYY0928709287eucas1p2k;
+	Thu, 27 Jul 2023 12:22:03 +0000 (GMT)
+Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
+	eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
+	20230727122203eusmtrp1bc81063491283ffdfd5d2cc34cb2a542~1uOPHcLuJ2541825418eusmtrp1u;
+	Thu, 27 Jul 2023 12:22:03 +0000 (GMT)
+X-AuditID: cbfec7f2-a3bff7000002a5b7-a7-64c2616b8f92
+Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
+	eusmgms2.samsung.com (EUCPMTA) with SMTP id 93.C9.14344.B6162C46; Thu, 27
+	Jul 2023 13:22:03 +0100 (BST)
+Received: from CAMSVWEXC02.scsc.local (unknown [106.1.227.72]) by
+	eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
+	20230727122203eusmtip1272296c5a534d5b122bea29b4cbc9ca3~1uOOxtg841066510665eusmtip1g;
+	Thu, 27 Jul 2023 12:22:03 +0000 (GMT)
+Received: from localhost (106.210.248.223) by CAMSVWEXC02.scsc.local
+	(2002:6a01:e348::6a01:e348) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
+	Thu, 27 Jul 2023 13:22:02 +0100
+Date: Thu, 27 Jul 2023 14:22:00 +0200
+From: Joel Granados <j.granados@samsung.com>
+To: Luis Chamberlain <mcgrof@kernel.org>
+CC: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Catalin Marinas
+	<catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Heiko Carstens
+	<hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev
+	<agordeev@linux.ibm.com>, Kees Cook <keescook@chromium.org>, Iurii Zaikin
+	<yzaikin@google.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, <willy@infradead.org>, <josh@joshtriplett.org>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>, Sven Schnelle
+	<svens@linux.ibm.com>, <linux-arm-kernel@lists.infradead.org>,
+	<linux-kernel@vger.kernel.org>, <linux-s390@vger.kernel.org>,
+	<linux-fsdevel@vger.kernel.org>, <netdev@vger.kernel.org>
+Subject: Re: [PATCH 06/14] sysctl: Add size to register_sysctl
+Message-ID: <20230727122200.r5o2mj5qgah5yfwm@localhost>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|CH0PR13MB5098:EE_
-X-MS-Office365-Filtering-Correlation-Id: 99d1c126-30ef-4b78-fadf-08db8e999912
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	j4giz1k09wntHcfKvbqegkBV+oXpYM0W+m5/IPDM5L2aItIBuuzqJM6heCQSWmivyfbwyPj3trqdT6sxtN5vUu+Lm+MlaAieq7IAH3yglv5ESq20QH0kvoIo9+M01RwOp6mcyWgTc0EKq3MSUsQWr1ATX6Tgemlz5b+8j8vyCHS6rHeS9SPc6TuT09ZmJj5iDblTwKCP1i23qaIo4vDoEu8KlCqTBhMUYoHfkYzH5LswSNmoqFvC+8JZnlZrKkSJxqIWJyRVjAO645+cibp4NSCazkzf90qIBlOEL2c9rw1M+qliBx8EnEEV+NGPe5I2oOwvU2okGHNDUnWMrqHC8wRtTzEN8FzDKcfxz/dXI4YLzUm/N/LAm+aIpSS+qwY1PphHkTyn5akL7r7ACuNw0FhY/UII3ZYaQgV4ka6oECbN6oYV7ZseE0c1p2pL90jU0f4+t9DfPiEKTF/ma5Ow+Ej8p+Lt+PtdzLgoPJesjFe+fMT0SHLresSmZ8SC8tXBCZUMdiWaiizXRiEG97h8JECyMiMfRWriAEbMbkQeTlaZL5/X1k6xsTUZGp5gIBrPOkZkpCnWKsOXzp9PE6SXsjO8xIfZqQ+OMxZ0n7OTDtU=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(366004)(136003)(396003)(39840400004)(376002)(346002)(451199021)(6666004)(6486002)(478600001)(6506007)(6512007)(6916009)(4326008)(54906003)(66946007)(66476007)(66556008)(66574015)(2616005)(38100700002)(186003)(44832011)(8936002)(8676002)(5660300002)(316002)(41300700001)(86362001)(2906002)(558084003)(36756003);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?UePlD/w0f8YvH7bM5ZPp6tFEa8EzTMnuE4Hnplx2eeZpE1wWz7s912XoFj6L?=
- =?us-ascii?Q?lcs9+O197+vs6njRaZ6jvh/nG2aAfbnv4GJW0v3H0EGvgP+iHZt1eXcZ2Ofb?=
- =?us-ascii?Q?B1/z54jsZrZq75eKH4n7ilaDhDepmLCP/JUnuA+C/oBgyeA5rhk45Qb9/wYn?=
- =?us-ascii?Q?o11t3IBCRao2n/R9nIZ7ij8x9PdYV52Cf5TNGfOTpgLiMClMCSEpLr0Z4ESU?=
- =?us-ascii?Q?o1U2zhG3YLIgkqhkkgShkKZSfubtNms6cqmGJ3rT7BfvObIYFHtF4bu8GME/?=
- =?us-ascii?Q?5GzZnr+rZZwMoezMxgjKhaWc5a7ezCcw/7kKnzbDZsfTx6/3Q26MH5DYdERR?=
- =?us-ascii?Q?bGqBFF56wih2dqDj799rBhEzFI2nDmQANyOybyhbZaPaT1MFEf3NLq/zUQK7?=
- =?us-ascii?Q?Tbp2OI5pFGwjIBMqxey0hY6sja5kdAmu+d5TKzs6G7FjymcNcZya8xX9r79I?=
- =?us-ascii?Q?ibQGWtNSWNjATRLioNdH2XJQF1TMKLY9QnZzMANXnMaAac3npS+6f1uCU8oL?=
- =?us-ascii?Q?8g283eusN/2L5+lcaWqpTKfQWEFKA2LBLG7tHcRcFssJAFn+Y+d4TQlAILVZ?=
- =?us-ascii?Q?cUYpji5FVWBzSBRfKEz69/1cdZktxHzbAe11Tg6P+zMOcK/zp9ieTEmyK57l?=
- =?us-ascii?Q?vYpZhXjsl3RMNHyGb38ji26kPxwuzJUBqO8lRQo+RJEXBBLkf9ghYBWrdfHV?=
- =?us-ascii?Q?RC26F/k2eN+olGVzwKg/9T/81+m6rZOAKTKSWQcw0V/vqlDxBap9kf6DR7+i?=
- =?us-ascii?Q?VcduqzevkEcLGEmL6/pYVWBGW32TahFtKJAhPWacoFGvn1UI8pp6utJ+taut?=
- =?us-ascii?Q?4LqVGHWqCZ5D6wq6fEpH1EMX0WWG6yrCPRKLRHkzTd1xaBxKl5Xx3mpgbm4S?=
- =?us-ascii?Q?QVQCINmdph8nLjyGhtmqYcjK0uQeI/PjxoXQvLy5Hscg3aGzZR4L652ivI0c?=
- =?us-ascii?Q?KkT4pKfQJh7QydoN+SbvChbs7tWzjb0LJowEevtkIUovombaeC+CpwelzbR6?=
- =?us-ascii?Q?VykVJkfnHTW2nRjOhMmeVJQ1PCP4nrmOqxqgC8OLKCIDRtP/JFCIoX8R3MN5?=
- =?us-ascii?Q?uiEGM0pY9WT8NdP7htAfxTkjF4HVVSNgWKb/c3b6HkCdLfms/FJYTLLRjVNG?=
- =?us-ascii?Q?oVCcxhvC7K814vdXroH6p/hsmqCbuz0r1p9W+s0PELXCXieDO0lIJg2Madon?=
- =?us-ascii?Q?AWrdx3D94HCY1VDpucmw8OTqWHd4Sl183mFJZNF5iSDG1HsH0WQBAIQl0Drt?=
- =?us-ascii?Q?YiqrmKId/eO2hYSeH6ijczVAkBq61mPc4kDT/mIjghzGUMsCTxxih3DZrv0t?=
- =?us-ascii?Q?q3ot5uMCduqNVhN4QA8WCndV1tTL62mcE37GnqIr5nR0Z2DvbJ15Qz5ESlNF?=
- =?us-ascii?Q?Zd9Z9mlkilNedbpIhGfVTUk7BOl0MeZD4IFo9SdV3tgWCaPtgQddq7PlShm0?=
- =?us-ascii?Q?preu3fIlgz+0TUfTz/e1j+FKT0TiMD9KNiwx2mjNpyMLJb3YK44pgkZg54bI?=
- =?us-ascii?Q?2SCKDtKh+insqgopnSOhgCHGJgCgwYSZoojiyRqSZ5nnF/75OKt9TSwN6sN5?=
- =?us-ascii?Q?HcL6DXmBLrQAHVrC8xjgITBrs8kYe+KzO5d7n9lwCQKrik47YxlEzkTYK52Y?=
- =?us-ascii?Q?sC3cTe0+xqaskgNrhLgQjmw5XhwZ4hj46jkgD+FPy1BaC38RgMpIFyGZG+AR?=
- =?us-ascii?Q?/hQLCA=3D=3D?=
-X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 99d1c126-30ef-4b78-fadf-08db8e999912
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Jul 2023 12:04:15.3820
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: x2mfft2T4RAZ7R5uUjRHRBAHNRxL5O7nyf8PlJ+IWvc6syG3Tt1qG/9/Q+8/GjvmSXX+IajofQDkoq8UuiGTUbKUOvsPki7jGHhAbmY58zw=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR13MB5098
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-	version=3.4.6
+Content-Type: multipart/signed; micalg="pgp-sha512";
+	protocol="application/pgp-signature"; boundary="eyp7i2qlh4lxb2ih"
+Content-Disposition: inline
+In-Reply-To: <ZMFexmOcfyORkRRs@bombadil.infradead.org>
+X-Originating-IP: [106.210.248.223]
+X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
+	CAMSVWEXC02.scsc.local (2002:6a01:e348::6a01:e348)
+X-Brightmail-Tracker: H4sIAAAAAAAAA2WSfUxTVxjGd3pvbwuz5FoaOQPmlgL7UISZMHYWhI25hOuyGWLiEliG6+gN
+	MmjL+qGAWcCVbq4CqUOZVMBWtCjUMkphUzeQRltpF4oOFzTUiMgyKF8WZHwMHOWyzWT//d7n
+	fZ6857m5XIzfRoRzc6VKWi4V5QuJYLzDsdC7LV9kF792ZhJDre5RAg0v2wk0ZSoHqNZThqMR
+	xwMO6tPPsZG6oYVAvvomgJ4YZOiXoxLU11HJRtbh39jop597cPTr5VoC6YxqDA3oRgByGDah
+	Ofc4QKaWixxUNvg6WppfNZgu7X57E2WuNwPqVOlNnLJduMOiDFYV1XZ+C3XXl0xZm74hKN2Z
+	q4DqqjNzqLazJdRU522CmrFuTt+QGbxDTOfnHqDl8SmfBO/3ac6xC34IK7RdKcVLgSNUC4K4
+	kEyAF0pdmBYEc/nkeQD1R7Q4M8wCODLpXN/MAGh1tLK0gLsW0U4/y+iNAC5qfKx/Td5RD4cZ
+	2gGcufQ1K3AEJ2Pg8Nh1IsAEGQs944NYgAXkK7BTV7GWxkg1AfX3eonAiVAyBfo9WQEPj3wD
+	dk60AYY3wp6ah3iAMbIQ2jQDnIAdIyNg4wo3IAeRidB8/C/AdIuC3WeXOAx/AV22u2unIHkx
+	GNa4y9cX78IOr3udQ+GY07bOkdBdVY4zgSoAu1amOczQDKDp8GMW40qCZf0P1xOp0LxQQzDf
+	KAQOTGxkHhoCv+34DmNkHjzyFZ9xvwSb743jOhClf6qa/qlq+v+qMXIsNFzxE/+Tt0KT0Ycx
+	nAwtlincADhNIIxWKSQ5tGK7lD4YpxBJFCppTly2TGIFq/+ye8Xp/xHUjT2KswMWF9hB9Gr4
+	wffNfSAcl8qktFDAc6XbxXyeWFRUTMtl++SqfFphBxFcXBjG25rck80nc0RKOo+mC2j5P1sW
+	Nyi8lCVZUl2PnC//uGGDKkteffWxoN3x2cG3LD33Lb6bKbPvHf8wYZeW542c7z5UO5hxgowQ
+	VLa3fvT7fG+1P+m+87JMU2W8o7mxL4l964Awa0/I+yXHEq5FSkKNkx3m1GMtmbM5yzdO5tXF
+	vLl3llR+IHYdffTMyZUK3uJpr77Bn4lXDBYdKhk+lTi9cC2+hMqWD6UtZcdK+tMs8frUrNt5
+	glue7pFPX+7uby6OTSuae1Gd4XjOXa2uLMgAQ67l9E7vq0P1o30ROxYnDEoyupVvYxXadu5+
+	slO8+fPo/sPOmBeUrr1N4UF2Gd174p36P7vinlc0fpm4Laruj5qhc8ZdZZG5xfFCXLFftH0L
+	JleI/gZGqk93RgQAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrPKsWRmVeSWpSXmKPExsVy+t/xu7rZiYdSDKbeFbfYePolm8Xjv4fY
+	LN4v62G0mHO+hcXi6bFH7BYXZn1jtWhevJ7N4vW8VYwW/xfkW5zpzrW4sK2P1WLT42usFnv2
+	nmSxuLxrDpvFhIXNzBY3JjxltDi2QMzi2+k3jBbL1q9lt2i5Y2rx+wdQwbKdfg5iHmvmrWH0
+	mN1wkcVjy8qbTB4LNpV6bF6h5XHrta3HplWdbB4TFh1g9Ng/dw27x+Yl9R7v911l8/i8SS6A
+	J0rPpii/tCRVISO/uMRWKdrQwkjP0NJCz8jEUs/Q2DzWyshUSd/OJiU1J7MstUjfLkEvo//F
+	SbaCreIVe94uZm1gPCLcxcjBISFgItH1gbuLkYtDSGApo8SqeTcZuxg5geIyEhu/XGWFsIUl
+	/lzrYoMo+sgoMfv4ZmYIZyujxLkNK8E6WARUJR6/OsoGYrMJ6Eicf3OHGcQWEdCQ2Dehlwmk
+	gVmgmU1i1r1zbCCrhQXsJD6djwOp4RUwl9j3djMj3Iap2z+yQCQEJU7OfAJmMwuUSXy6eYkV
+	pJdZQFpi+T8OkDCngJnEmil/oK5Wlji45Dc7hF0r8fnvM8YJjMKzkEyahWTSLIRJEGEtiRv/
+	XjJhCGtLLFv4mhnCtpVYt+49ywJG9lWMIqmlxbnpucVGesWJucWleel6yfm5mxiBqWnbsZ9b
+	djCufPVR7xAjEwfjIUYVoM5HG1ZfYJRiycvPS1US4T0VcChFiDclsbIqtSg/vqg0J7X4EKMp
+	MBQnMkuJJucDk2ZeSbyhmYGpoYmZpYGppZmxkjivZ0FHopBAemJJanZqakFqEUwfEwenVAOT
+	nMbRahHFNTc0OO+l352SzvB/VjCn0DaJ0vr/Gb8K3tyrDxO3l3vjv8XU31Li57a+Vof4mwtf
+	sv6ab5sY+/CFw7XQLQ9jd5qn13Bk/Dx2r6xc9l1Y2qHbEwV4FnobL84J3H3ne57az+n/mSbt
+	KpZcH+yzVHm1YMbuaekLbjmzri5eMsvlrU5OwN/1Ub4qa9fKrkrY+GjPOvkp64+6+u1IUP5x
+	T+jrqf/CIcJxFvuThL27alYLfHvyfubbBR9/BrPJxipu+ViySIPv5AuptnWfW8zUXjUczX/X
+	/LKBTfvQktSX/8y+sy7UcUxfcI/psu7pE099TXIepdiqH+I4zJRrsmLDzJffpDbl9ZTl+W/+
+	psRSnJFoqMVcVJwIAIjZKqXiAwAA
+X-CMS-MailID: 20230727122203eucas1p2853f35c6361a8ff038a9c18f029426c3
+X-Msg-Generator: CA
+X-RootMTR: 20230726140659eucas1p2c3cd9f57dd13c71ddeb78d2480587e72
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20230726140659eucas1p2c3cd9f57dd13c71ddeb78d2480587e72
+References: <20230726140635.2059334-1-j.granados@samsung.com>
+	<CGME20230726140659eucas1p2c3cd9f57dd13c71ddeb78d2480587e72@eucas1p2.samsung.com>
+	<20230726140635.2059334-7-j.granados@samsung.com>
+	<ZMFexmOcfyORkRRs@bombadil.infradead.org>
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Jul 26, 2023 at 11:47:42AM -0700, Patrick Rohr wrote:
-> Removes superfluous (and misplaced) comment from ndisc_router_discovery.
-> 
-> Signed-off-by: Patrick Rohr <prohr@google.com>
+--eyp7i2qlh4lxb2ih
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Simon Horman <simon.horman@corigine.com>
+On Wed, Jul 26, 2023 at 10:58:30AM -0700, Luis Chamberlain wrote:
+> On Wed, Jul 26, 2023 at 04:06:26PM +0200, Joel Granados wrote:
+> > In order to remove the end element from the ctl_table struct arrays, we
+> > replace the register_syctl function with a macro that will add the
+> > ARRAY_SIZE to the new register_sysctl_sz function. In this way the
+> > callers that are already using an array of ctl_table structs do not have
+> > to change. We *do* change the callers that pass the ctl_table array as a
+> > pointer.
+>=20
+> Thanks for doing this and this series!
+>=20
+> > Signed-off-by: Joel Granados <j.granados@samsung.com>
+> > ---
+> > diff --git a/include/linux/sysctl.h b/include/linux/sysctl.h
+> > index 0495c858989f..b1168ae281c9 100644
+> > --- a/include/linux/sysctl.h
+> > +++ b/include/linux/sysctl.h
+> > @@ -215,6 +215,9 @@ struct ctl_path {
+> >  	const char *procname;
+> >  };
+> > =20
+> > +#define register_sysctl(path, table)	\
+> > +	register_sysctl_sz(path, table, ARRAY_SIZE(table))
+> > +
+> >  #ifdef CONFIG_SYSCTL
+>=20
+> Wasn't it Greg who had suggested this? Maybe add Suggested-by with him
+> on it.
+Yes. I mentioned him in the cover letter and did not add the tag because
+I had not asked for permission to use it. I'll drop him a mail and
+include the suggested-by if he agrees.
 
+>=20
+> Also, your cover letter and first few patches are not CC'd to the netdev
+> list or others. What you want to do is collect all the email addresses
+> for this small patch series and add them to who you email for your
+> entire series, otherwise at times they won't be able to properly review
+> or understand the exact context of the changes. You want folks to do less
+> work to review, not more.
+Here I wanted to avoid very big e-mail headers as I have received
+rejections from lists in the past. But I for this set, the number of
+e-mails is ok to just include everyone.
+
+I'll do that for V2.
+thx for your feedback
+
+best
+
+>=20
+> So please resend and add others to the other patches.
+>=20
+>   Luis
+
+--=20
+
+Joel Granados
+
+--eyp7i2qlh4lxb2ih
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQGzBAABCgAdFiEErkcJVyXmMSXOyyeQupfNUreWQU8FAmTCYWMACgkQupfNUreW
+QU8CPgwAkr6P3axpBPzX0iTBJ2K6Cnt/H3xegrsFZtH2oCi5BcL3GjmmatTKqded
+N1XCtc6Cch2GBr3e9GXx2jz4884QGHZWiVta+8sxBtE4Jme+mRk0j14Z9jl9v1Zf
+9aYK2G2xPzhvaQcnRXh8n1dJOoJcLZLT8hb8JypNJ4R63yyiHSFZkqv8vNpriRDm
+4dL1P8z24wQKNiD5RlKJ1zq7BfCLg7JbwMmacKCxjQ8INWMP+1NAtmazejQbh7Ui
+VPXWkXWT2xyVrd18l4LhEYCCqckk7mJjuyzHUE5F3IXb1bdjuyNWZSJDuREBaA6Y
+FCpirpaUH7agFN6SzrZkDJ9ZTA4ZVTKvXUrHBza3mUBAojd34rFvZxLXFDdAhLM0
+8qdyB7DVLJs7q7NY8LVOyDnL/mhWQPU9pBdSPPDKb4qf9uRedOEhJtcD/7ez1jSg
+1xdxVoMk7YSI+NMQa/fMHGtNixyCydeZgp6A7Bjh5iRHH79cB6nQqVhBIABASO2l
+Exrcwht1
+=hAeI
+-----END PGP SIGNATURE-----
+
+--eyp7i2qlh4lxb2ih--
 
