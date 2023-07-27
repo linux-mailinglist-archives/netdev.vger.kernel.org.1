@@ -1,32 +1,32 @@
-Return-Path: <netdev+bounces-21731-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21733-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70CFA764842
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 09:17:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4F7C764847
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 09:18:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A4A4D1C214E0
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 07:17:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A1BE4281F23
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 07:18:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E61EC125;
-	Thu, 27 Jul 2023 07:17:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D821BC2C5;
+	Thu, 27 Jul 2023 07:17:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CF08BE79
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 07:17:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8234C2C4
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 07:17:38 +0000 (UTC)
 Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8A83326B9
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 00:17:02 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id EA4817D80
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 00:17:13 -0700 (PDT)
 Received: from loongson.cn (unknown [112.20.109.108])
-	by gateway (Coremail) with SMTP id _____8AxFvHCGcJke5sKAA--.26362S3;
-	Thu, 27 Jul 2023 15:16:18 +0800 (CST)
+	by gateway (Coremail) with SMTP id _____8Dx_+vFGcJkiJsKAA--.25449S3;
+	Thu, 27 Jul 2023 15:16:21 +0800 (CST)
 Received: from localhost.localdomain (unknown [112.20.109.108])
-	by localhost.localdomain (Coremail) with SMTP id AQAAf8DxJ8y8GcJkkrY8AA--.56466S4;
-	Thu, 27 Jul 2023 15:16:15 +0800 (CST)
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8DxJ8y8GcJkkrY8AA--.56466S5;
+	Thu, 27 Jul 2023 15:16:18 +0800 (CST)
 From: Feiyang Chen <chenfeiyang@loongson.cn>
 To: andrew@lunn.ch,
 	hkallweit1@gmail.com,
@@ -41,9 +41,9 @@ Cc: Feiyang Chen <chenfeiyang@loongson.cn>,
 	netdev@vger.kernel.org,
 	loongarch@lists.linux.dev,
 	chris.chenfeiyang@gmail.com
-Subject: [PATCH v2 03/10] net: stmmac: dwmac1000: Add multi-channel support
-Date: Thu, 27 Jul 2023 15:15:46 +0800
-Message-Id: <373259d4ac9ac0b9e1e64ad96d60a9bbd35b85aa.1690439335.git.chenfeiyang@loongson.cn>
+Subject: [PATCH v2 04/10] net: stmmac: dwmac1000: Add 64-bit DMA support
+Date: Thu, 27 Jul 2023 15:15:47 +0800
+Message-Id: <74a7f82d516836ba53edae509b561f50b441dd63.1690439335.git.chenfeiyang@loongson.cn>
 X-Mailer: git-send-email 2.39.3
 In-Reply-To: <cover.1690439335.git.chenfeiyang@loongson.cn>
 References: <cover.1690439335.git.chenfeiyang@loongson.cn>
@@ -54,282 +54,544 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:AQAAf8DxJ8y8GcJkkrY8AA--.56466S4
+X-CM-TRANSID:AQAAf8DxJ8y8GcJkkrY8AA--.56466S5
 X-CM-SenderInfo: hfkh0wphl1t03j6o00pqjv00gofq/
-X-Coremail-Antispam: 1Uk129KBj93XoW3Xr1fAF15GF17ZFW5KF1DXFc_yoWfZrW7pa
-	y5t3s5XFyrtr4fZa1kJws8Xr15J34agrWxuF4fG3yS9a1a9r1agrs0gayjyF13CFZ7Ar9I
-	qrWYvw17Wr1UZrgCm3ZEXasCq-sJn29KB7ZKAUJUUUUf529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUBIb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r106r15M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
-	xVW8Jr0_Cr1UM2kKe7AKxVWUAVWUtwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
-	AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
-	tVWrXwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7V
-	AKI48JMxkF7I0En4kS14v26r126r1DMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY
-	6r1j6r4UMxCIbckI1I0E14v26r126r1DMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7
-	xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xII
-	jxv20xvE14v26ryj6F1UMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw2
-	0EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Gr0_Cr1lIxAIcVC2z280aVCY1x02
-	67AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU8KNt3UUUUU==
+X-Coremail-Antispam: 1Uk129KBj9fXoWfJw4DtF47GF1xCw4UGry7CFX_yoW8CFykKo
+	ZrtFnay3yfXw1kX3yDKr1kJrnFqFnxW3s3C3yxC3yku39xZw1Yv3y7W3yrAw4Ykr1aqayU
+	C3W8JFZ7ZFW7Kw1Dl-sFpf9Il3svdjkaLaAFLSUrUUUUeb8apTn2vfkv8UJUUUU8wcxFpf
+	9Il3svdxBIdaVrn0xqx4xG64xvF2IEw4CE5I8CrVC2j2Jv73VFW2AGmfu7bjvjm3AaLaJ3
+	UjIYCTnIWjp_UUUYZ7kC6x804xWl14x267AKxVWUJVW8JwAFc2x0x2IEx4CE42xK8VAvwI
+	8IcIk0rVWrJVCq3wAFIxvE14AKwVWUXVWUAwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xG
+	Y2AK021l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14
+	v26F4j6r4UJwA2z4x0Y4vEx4A2jsIE14v26r4UJVWxJr1l84ACjcxK6I8E87Iv6xkF7I0E
+	14v26r4UJVWxJr1ln4kS14v26r126r1DM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6x
+	kI12xvs2x26I8E6xACxx1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v2
+	6rWY6Fy7McIj6I8E87Iv67AKxVW8JVWxJwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2
+	Ij64vIr41lc7CjxVAaw2AFwI0_JF0_Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Y
+	z7v_Jr0_Gr1l4IxYO2xFxVAFwI0_JF0_Jw1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x
+	8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE
+	2Ix0cI8IcVAFwI0_Xr0_Ar1lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42
+	xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8JVWxJwCI42IY6I8E87Iv6xkF
+	7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUVWrXDUUUU
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
 	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
 	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Some platforms have dwmac1000 implementations that support multi-
-channel. Extend the functions to add multi-channel support.
+Some platforms have dwmac1000 implementations that support 64-bit
+DMA. Extend the functions to add 64-bit DMA support.
 
 Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
 ---
- .../ethernet/stmicro/stmmac/dwmac1000_core.c  |  1 +
- .../ethernet/stmicro/stmmac/dwmac1000_dma.c   | 64 +++++++++++++++++--
- .../net/ethernet/stmicro/stmmac/dwmac_lib.c   | 28 ++++----
- include/linux/stmmac.h                        |  1 +
- 4 files changed, 73 insertions(+), 21 deletions(-)
+ .../net/ethernet/stmicro/stmmac/chain_mode.c  |  23 +++-
+ drivers/net/ethernet/stmicro/stmmac/descs.h   |   7 ++
+ .../net/ethernet/stmicro/stmmac/descs_com.h   |  49 ++++++---
+ .../ethernet/stmicro/stmmac/dwmac1000_dma.c   |  30 ++++--
+ .../net/ethernet/stmicro/stmmac/enh_desc.c    |  21 +++-
+ .../net/ethernet/stmicro/stmmac/ring_mode.c   | 101 ++++++++++++++----
+ include/linux/stmmac.h                        |   1 +
+ 7 files changed, 183 insertions(+), 49 deletions(-)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_core.c b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_core.c
-index 9015a61f804c..a9b42a122ed6 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_core.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_core.c
-@@ -562,6 +562,7 @@ int dwmac1000_setup(struct stmmac_priv *priv)
- {
- 	dev_info(priv->device, "\tDWMAC1000\n");
- 
-+	priv->plat->dwmac_is_loongson = false;
- 	priv->plat->dwmac_regs = &dwmac_default_dma_regs;
- 
- 	return _dwmac1000_setup(priv);
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
-index ce0e6ca6f3a2..efb219999a20 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
-@@ -111,13 +111,61 @@ static void dwmac1000_dma_init(struct stmmac_priv *priv, void __iomem *ioaddr,
- 	writel(DMA_INTR_DEFAULT_MASK, ioaddr + DMA_INTR_ENA);
- }
- 
-+void dwmac1000_dma_init_channel(struct stmmac_priv *priv, void __iomem *ioaddr,
-+				struct stmmac_dma_cfg *dma_cfg,
-+				u32 chan)
-+{
-+	u32 value;
-+	int txpbl = dma_cfg->txpbl ?: dma_cfg->pbl;
-+	int rxpbl = dma_cfg->rxpbl ?: dma_cfg->pbl;
+diff --git a/drivers/net/ethernet/stmicro/stmmac/chain_mode.c b/drivers/net/ethernet/stmicro/stmmac/chain_mode.c
+index a95866871f3e..c8d77cbd51bc 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/chain_mode.c
++++ b/drivers/net/ethernet/stmicro/stmmac/chain_mode.c
+@@ -36,6 +36,9 @@ static int jumbo_frm(struct stmmac_tx_queue *tx_q, struct sk_buff *skb,
+ 	des2 = dma_map_single(priv->device, skb->data,
+ 			      bmax, DMA_TO_DEVICE);
+ 	desc->des2 = cpu_to_le32(des2);
++	if (priv->plat->dma_cfg->dma64)
++		desc->des3 = cpu_to_le32(upper_32_bits(des2));
 +
-+	if (!priv->plat->dwmac_is_loongson)
+ 	if (dma_mapping_error(priv->device, des2))
+ 		return -1;
+ 	tx_q->tx_skbuff_dma[entry].buf = des2;
+@@ -54,12 +57,16 @@ static int jumbo_frm(struct stmmac_tx_queue *tx_q, struct sk_buff *skb,
+ 					      (skb->data + bmax * i),
+ 					      bmax, DMA_TO_DEVICE);
+ 			desc->des2 = cpu_to_le32(des2);
++			if (priv->plat->dma_cfg->dma64)
++				desc->des3 = cpu_to_le32(upper_32_bits(des2));
+ 			if (dma_mapping_error(priv->device, des2))
+ 				return -1;
+ 			tx_q->tx_skbuff_dma[entry].buf = des2;
+ 			tx_q->tx_skbuff_dma[entry].len = bmax;
+ 			stmmac_prepare_tx_desc(priv, desc, 0, bmax, csum,
+-					STMMAC_CHAIN_MODE, 1, false, skb->len);
++					       STMMAC_CHAIN_MODE,
++					       !priv->plat->dma_cfg->dma64,
++					       false, skb->len);
+ 			len -= bmax;
+ 			i++;
+ 		} else {
+@@ -67,6 +74,8 @@ static int jumbo_frm(struct stmmac_tx_queue *tx_q, struct sk_buff *skb,
+ 					      (skb->data + bmax * i), len,
+ 					      DMA_TO_DEVICE);
+ 			desc->des2 = cpu_to_le32(des2);
++			if (priv->plat->dma_cfg->dma64)
++				desc->des3 = cpu_to_le32(upper_32_bits(des2));
+ 			if (dma_mapping_error(priv->device, des2))
+ 				return -1;
+ 			tx_q->tx_skbuff_dma[entry].buf = des2;
+@@ -110,7 +119,11 @@ static void init_dma_chain(struct stmmac_priv *priv, void *des,
+ 		struct dma_extended_desc *p = (struct dma_extended_desc *)des;
+ 		for (i = 0; i < (size - 1); i++) {
+ 			dma_phy += sizeof(struct dma_extended_desc);
+-			p->basic.des3 = cpu_to_le32((unsigned int)dma_phy);
++			if (priv->plat->dma_cfg->dma64) {
++				p->des6 = cpu_to_le32((unsigned int)dma_phy);
++				p->des7 = cpu_to_le32(upper_32_bits(dma_phy));
++			} else
++				p->basic.des3 = cpu_to_le32((unsigned int)dma_phy);
+ 			p++;
+ 		}
+ 		p->basic.des3 = cpu_to_le32((unsigned int)phy_addr);
+@@ -130,6 +143,9 @@ static void refill_desc3(struct stmmac_rx_queue *rx_q, struct dma_desc *p)
+ {
+ 	struct stmmac_priv *priv = rx_q->priv_data;
+ 
++	if (priv->plat->dma_cfg->dma64)
 +		return;
 +
-+	/* common channel control register config */
-+	value = readl(ioaddr + DMA_BUS_MODE + chan * DMA_CHAN_OFFSET);
+ 	if (priv->hwts_rx_en && !priv->extend_desc)
+ 		/* NOTE: Device will overwrite des3 with timestamp value if
+ 		 * 1588-2002 time stamping is enabled, hence reinitialize it
+@@ -146,6 +162,9 @@ static void clean_desc3(struct stmmac_tx_queue *tx_q, struct dma_desc *p)
+ 	struct stmmac_priv *priv = tx_q->priv_data;
+ 	unsigned int entry = tx_q->dirty_tx;
+ 
++	if (priv->plat->dma_cfg->dma64)
++		return;
 +
-+	/*
-+	 * Set the DMA PBL (Programmable Burst Length) mode.
-+	 *
-+	 * Note: before stmmac core 3.50 this mode bit was 4xPBL, and
-+	 * post 3.5 mode bit acts as 8*PBL.
-+	 */
-+	if (dma_cfg->pblx8)
-+		value |= DMA_BUS_MODE_MAXPBL;
-+	value |= DMA_BUS_MODE_USP;
-+	value &= ~(DMA_BUS_MODE_PBL_MASK | DMA_BUS_MODE_RPBL_MASK);
-+	value |= (txpbl << DMA_BUS_MODE_PBL_SHIFT);
-+	value |= (rxpbl << DMA_BUS_MODE_RPBL_SHIFT);
+ 	if (tx_q->tx_skbuff_dma[entry].last_segment && !priv->extend_desc &&
+ 	    priv->hwts_tx_en)
+ 		/* NOTE: Device will overwrite des3 with timestamp value if
+diff --git a/drivers/net/ethernet/stmicro/stmmac/descs.h b/drivers/net/ethernet/stmicro/stmmac/descs.h
+index 49d6a866244f..223b77f0271c 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/descs.h
++++ b/drivers/net/ethernet/stmicro/stmmac/descs.h
+@@ -56,6 +56,9 @@
+ #define ERDES1_BUFFER2_SIZE_SHIFT	16
+ #define	ERDES1_DISABLE_IC		BIT(31)
+ 
++#define	E64RDES1_BUFFER1_SIZE_MASK	GENMASK(13, 0)
++#define	E64RDES1_BUFFER2_SIZE_MASK	GENMASK(29, 16)
 +
-+	/* Set the Fixed burst mode */
-+	if (dma_cfg->fixed_burst)
-+		value |= DMA_BUS_MODE_FB;
+ /* Normal transmit descriptor defines */
+ /* TDES0 */
+ #define	TDES0_DEFERRED			BIT(0)
+@@ -122,6 +125,10 @@
+ #define	ETDES1_BUFFER2_SIZE_MASK	GENMASK(28, 16)
+ #define	ETDES1_BUFFER2_SIZE_SHIFT	16
+ 
++#define	E64TDES1_BUFFER1_SIZE_MASK	GENMASK(13, 0)
++#define	E64TDES1_BUFFER2_SIZE_MASK	GENMASK(28, 15)
++#define	E64TDES1_BUFFER2_SIZE_SHIFT	15
 +
-+	/* Mixed Burst has no effect when fb is set */
-+	if (dma_cfg->mixed_burst)
-+		value |= DMA_BUS_MODE_MB;
+ /* Extended Receive descriptor definitions */
+ #define	ERDES4_IP_PAYLOAD_TYPE_MASK	GENMASK(6, 2)
+ #define	ERDES4_IP_HDR_ERR		BIT(3)
+diff --git a/drivers/net/ethernet/stmicro/stmmac/descs_com.h b/drivers/net/ethernet/stmicro/stmmac/descs_com.h
+index 40f7f2da9c5e..c5e7f2e5aee8 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/descs_com.h
++++ b/drivers/net/ethernet/stmicro/stmmac/descs_com.h
+@@ -20,12 +20,18 @@
+ 
+ /* Enhanced descriptors */
+ static inline void ehn_desc_rx_set_on_ring(struct dma_desc *p, int end,
+-					   int bfsize)
++					   int bfsize, bool dma64)
+ {
+-	if (bfsize == BUF_SIZE_16KiB)
+-		p->des1 |= cpu_to_le32((BUF_SIZE_8KiB
+-				<< ERDES1_BUFFER2_SIZE_SHIFT)
+-			   & ERDES1_BUFFER2_SIZE_MASK);
++	if (bfsize == BUF_SIZE_16KiB) {
++		if (dma64)
++			p->des1 |= cpu_to_le32((BUF_SIZE_8KiB
++					<< ERDES1_BUFFER2_SIZE_SHIFT)
++				   & E64RDES1_BUFFER2_SIZE_MASK);
++		else
++			p->des1 |= cpu_to_le32((BUF_SIZE_8KiB
++					<< ERDES1_BUFFER2_SIZE_SHIFT)
++				   & ERDES1_BUFFER2_SIZE_MASK);
++	}
+ 
+ 	if (end)
+ 		p->des1 |= cpu_to_le32(ERDES1_END_RING);
+@@ -39,15 +45,26 @@ static inline void enh_desc_end_tx_desc_on_ring(struct dma_desc *p, int end)
+ 		p->des0 &= cpu_to_le32(~ETDES0_END_RING);
+ }
+ 
+-static inline void enh_set_tx_desc_len_on_ring(struct dma_desc *p, int len)
++static inline void enh_set_tx_desc_len_on_ring(struct dma_desc *p, int len,
++					       bool dma64)
+ {
+ 	if (unlikely(len > BUF_SIZE_4KiB)) {
+-		p->des1 |= cpu_to_le32((((len - BUF_SIZE_4KiB)
+-					<< ETDES1_BUFFER2_SIZE_SHIFT)
+-			    & ETDES1_BUFFER2_SIZE_MASK) | (BUF_SIZE_4KiB
+-			    & ETDES1_BUFFER1_SIZE_MASK));
+-	} else
+-		p->des1 |= cpu_to_le32((len & ETDES1_BUFFER1_SIZE_MASK));
++		if (dma64)
++			p->des1 |= cpu_to_le32((((len - BUF_SIZE_8KiB)
++						<< E64TDES1_BUFFER2_SIZE_SHIFT)
++				    & E64TDES1_BUFFER2_SIZE_MASK) | (BUF_SIZE_8KiB
++				    & E64TDES1_BUFFER1_SIZE_MASK));
++		else
++			p->des1 |= cpu_to_le32((((len - BUF_SIZE_4KiB)
++						<< ETDES1_BUFFER2_SIZE_SHIFT)
++				    & ETDES1_BUFFER2_SIZE_MASK) | (BUF_SIZE_4KiB
++				    & ETDES1_BUFFER1_SIZE_MASK));
++	} else {
++		if (dma64)
++			p->des1 |= cpu_to_le32((len & E64TDES1_BUFFER1_SIZE_MASK));
++		else
++			p->des1 |= cpu_to_le32((len & ETDES1_BUFFER1_SIZE_MASK));
++	}
+ }
+ 
+ /* Normal descriptors */
+@@ -98,9 +115,13 @@ static inline void enh_desc_end_tx_desc_on_chain(struct dma_desc *p)
+ 	p->des0 |= cpu_to_le32(ETDES0_SECOND_ADDRESS_CHAINED);
+ }
+ 
+-static inline void enh_set_tx_desc_len_on_chain(struct dma_desc *p, int len)
++static inline void enh_set_tx_desc_len_on_chain(struct dma_desc *p, int len,
++						bool dma64)
+ {
+-	p->des1 |= cpu_to_le32(len & ETDES1_BUFFER1_SIZE_MASK);
++	if (dma64)
++		p->des1 |= cpu_to_le32(len & E64TDES1_BUFFER1_SIZE_MASK);
++	else
++		p->des1 |= cpu_to_le32(len & ETDES1_BUFFER1_SIZE_MASK);
+ }
+ 
+ /* Normal descriptors */
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
+index efb219999a20..632c4f110d01 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
+@@ -15,6 +15,7 @@
+ #include <asm/io.h>
+ #include "dwmac1000.h"
+ #include "dwmac_dma.h"
++#include "stmmac.h"
+ 
+ static void dwmac1000_dma_axi(struct stmmac_priv *priv, void __iomem *ioaddr,
+ 			      struct stmmac_axi *axi)
+@@ -109,6 +110,9 @@ static void dwmac1000_dma_init(struct stmmac_priv *priv, void __iomem *ioaddr,
+ 
+ 	/* Mask interrupts by writing to CSR7 */
+ 	writel(DMA_INTR_DEFAULT_MASK, ioaddr + DMA_INTR_ENA);
 +
-+	value |= DMA_BUS_MODE_ATDS;
-+
-+	if (dma_cfg->aal)
-+		value |= DMA_BUS_MODE_AAL;
-+
-+	writel(value, ioaddr + DMA_BUS_MODE + chan * DMA_CHAN_OFFSET);
-+
-+	/* Mask interrupts by writing to CSR7 */
-+	writel(DMA_INTR_DEFAULT_MASK,
-+	       ioaddr + DMA_INTR_ENA + chan * DMA_CHAN_OFFSET);
-+}
-+
- static void dwmac1000_dma_init_rx(struct stmmac_priv *priv,
- 				  void __iomem *ioaddr,
++	if (dma_cfg->dma64)
++		writel(0x100, ioaddr + DMA_FUNC_CONFIG);
+ }
+ 
+ void dwmac1000_dma_init_channel(struct stmmac_priv *priv, void __iomem *ioaddr,
+@@ -163,9 +167,16 @@ static void dwmac1000_dma_init_rx(struct stmmac_priv *priv,
  				  struct stmmac_dma_cfg *dma_cfg,
  				  dma_addr_t dma_rx_phy, u32 chan)
  {
- 	/* RX descriptor base address list must be written into DMA CSR3 */
--	writel(lower_32_bits(dma_rx_phy), ioaddr + DMA_RCV_BASE_ADDR);
-+	writel(lower_32_bits(dma_rx_phy), ioaddr + DMA_RCV_BASE_ADDR +
-+		chan * DMA_CHAN_OFFSET);
+-	/* RX descriptor base address list must be written into DMA CSR3 */
+-	writel(lower_32_bits(dma_rx_phy), ioaddr + DMA_RCV_BASE_ADDR +
+-		chan * DMA_CHAN_OFFSET);
++	if (dma_cfg->dma64) {
++		writel(lower_32_bits(dma_rx_phy), ioaddr + DMA_RCV_BASE_ADDR +
++		       chan * DMA_CHAN_OFFSET);
++		writel(upper_32_bits(dma_rx_phy), ioaddr + DMA_RCV_BASE_ADDR_HI +
++		       chan * DMA_CHAN_OFFSET);
++	} else {
++		/* RX descriptor base address list must be written into DMA CSR3 */
++		writel(lower_32_bits(dma_rx_phy), ioaddr + DMA_RCV_BASE_ADDR +
++		       chan * DMA_CHAN_OFFSET);
++	}
  }
  
  static void dwmac1000_dma_init_tx(struct stmmac_priv *priv,
-@@ -126,7 +174,8 @@ static void dwmac1000_dma_init_tx(struct stmmac_priv *priv,
+@@ -173,9 +184,16 @@ static void dwmac1000_dma_init_tx(struct stmmac_priv *priv,
+ 				  struct stmmac_dma_cfg *dma_cfg,
  				  dma_addr_t dma_tx_phy, u32 chan)
  {
- 	/* TX descriptor base address list must be written into DMA CSR4 */
--	writel(lower_32_bits(dma_tx_phy), ioaddr + DMA_TX_BASE_ADDR);
-+	writel(lower_32_bits(dma_tx_phy), ioaddr + DMA_TX_BASE_ADDR +
-+		chan * DMA_CHAN_OFFSET);
+-	/* TX descriptor base address list must be written into DMA CSR4 */
+-	writel(lower_32_bits(dma_tx_phy), ioaddr + DMA_TX_BASE_ADDR +
+-		chan * DMA_CHAN_OFFSET);
++	if (dma_cfg->dma64) {
++		writel(lower_32_bits(dma_tx_phy), ioaddr + DMA_TX_BASE_ADDR +
++		       chan * DMA_CHAN_OFFSET);
++		writel(upper_32_bits(dma_tx_phy), ioaddr + DMA_TX_BASE_ADDR_HI +
++		       chan * DMA_CHAN_OFFSET);
++	} else {
++		/* TX descriptor base address list must be written into DMA CSR4 */
++		writel(lower_32_bits(dma_tx_phy), ioaddr + DMA_TX_BASE_ADDR +
++		       chan * DMA_CHAN_OFFSET);
++	}
  }
  
  static u32 dwmac1000_configure_fc(u32 csr6, int rxfifosz)
-@@ -154,7 +203,7 @@ static void dwmac1000_dma_operation_mode_rx(struct stmmac_priv *priv,
- 					    void __iomem *ioaddr, int mode,
- 					    u32 channel, int fifosz, u8 qmode)
+diff --git a/drivers/net/ethernet/stmicro/stmmac/enh_desc.c b/drivers/net/ethernet/stmicro/stmmac/enh_desc.c
+index 1932a3a8e03c..ee07006c97c1 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/enh_desc.c
++++ b/drivers/net/ethernet/stmicro/stmmac/enh_desc.c
+@@ -11,6 +11,7 @@
+ #include <linux/stmmac.h>
+ #include "common.h"
+ #include "descs_com.h"
++#include "stmmac.h"
+ 
+ static int enh_desc_get_tx_status(struct net_device_stats *stats,
+ 				  struct stmmac_extra_stats *x,
+@@ -81,7 +82,10 @@ static int enh_desc_get_tx_status(struct net_device_stats *stats,
+ 
+ static int enh_desc_get_tx_len(struct stmmac_priv *priv, struct dma_desc *p)
  {
--	u32 csr6 = readl(ioaddr + DMA_CONTROL);
-+	u32 csr6 = readl(ioaddr + DMA_CONTROL + channel * DMA_CHAN_OFFSET);
- 
- 	if (mode == SF_DMA_MODE) {
- 		pr_debug("GMAC: enable RX store and forward mode\n");
-@@ -176,14 +225,14 @@ static void dwmac1000_dma_operation_mode_rx(struct stmmac_priv *priv,
- 	/* Configure flow control based on rx fifo size */
- 	csr6 = dwmac1000_configure_fc(csr6, fifosz);
- 
--	writel(csr6, ioaddr + DMA_CONTROL);
-+	writel(csr6, ioaddr + DMA_CONTROL + channel * DMA_CHAN_OFFSET);
+-	return (le32_to_cpu(p->des1) & ETDES1_BUFFER1_SIZE_MASK);
++	if (priv->plat->dma_cfg->dma64)
++		return (le32_to_cpu(p->des1) & E64TDES1_BUFFER1_SIZE_MASK);
++	else
++		return (le32_to_cpu(p->des1) & ETDES1_BUFFER1_SIZE_MASK);
  }
  
- static void dwmac1000_dma_operation_mode_tx(struct stmmac_priv *priv,
- 					    void __iomem *ioaddr, int mode,
- 					    u32 channel, int fifosz, u8 qmode)
- {
--	u32 csr6 = readl(ioaddr + DMA_CONTROL);
-+	u32 csr6 = readl(ioaddr + DMA_CONTROL + channel * DMA_CHAN_OFFSET);
+ static int enh_desc_coe_rdes0(int ipc_err, int type, int payload_err)
+@@ -263,12 +267,15 @@ static void enh_desc_init_rx_desc(struct stmmac_priv *priv, struct dma_desc *p,
+ 	p->des0 |= cpu_to_le32(RDES0_OWN);
  
- 	if (mode == SF_DMA_MODE) {
- 		pr_debug("GMAC: enable TX store and forward mode\n");
-@@ -210,7 +259,7 @@ static void dwmac1000_dma_operation_mode_tx(struct stmmac_priv *priv,
- 			csr6 |= DMA_CONTROL_TTC_256;
+ 	bfsize1 = min(bfsize, BUF_SIZE_8KiB);
+-	p->des1 |= cpu_to_le32(bfsize1 & ERDES1_BUFFER1_SIZE_MASK);
++	if (priv->plat->dma_cfg->dma64)
++		p->des1 |= cpu_to_le32(bfsize1 & E64RDES1_BUFFER1_SIZE_MASK);
++	else
++		p->des1 |= cpu_to_le32(bfsize1 & ERDES1_BUFFER1_SIZE_MASK);
+ 
+ 	if (mode == STMMAC_CHAIN_MODE)
+ 		ehn_desc_rx_set_on_chain(p);
+ 	else
+-		ehn_desc_rx_set_on_ring(p, end, bfsize);
++		ehn_desc_rx_set_on_ring(p, end, bfsize, priv->plat->dma_cfg->dma64);
+ 
+ 	if (disable_rx_ic)
+ 		p->des1 |= cpu_to_le32(ERDES1_DISABLE_IC);
+@@ -321,9 +328,9 @@ static void enh_desc_prepare_tx_desc(struct stmmac_priv *priv, struct dma_desc *
+ 	unsigned int tdes0 = le32_to_cpu(p->des0);
+ 
+ 	if (mode == STMMAC_CHAIN_MODE)
+-		enh_set_tx_desc_len_on_chain(p, len);
++		enh_set_tx_desc_len_on_chain(p, len, priv->plat->dma_cfg->dma64);
+ 	else
+-		enh_set_tx_desc_len_on_ring(p, len);
++		enh_set_tx_desc_len_on_ring(p, len, priv->plat->dma_cfg->dma64);
+ 
+ 	if (is_fs)
+ 		tdes0 |= ETDES0_FIRST_SEGMENT;
+@@ -445,11 +452,15 @@ static void enh_desc_set_addr(struct stmmac_priv *priv, struct dma_desc *p,
+ 			      dma_addr_t addr)
+ {
+ 	p->des2 = cpu_to_le32(addr);
++	if (priv->plat->dma_cfg->dma64)
++		p->des3 = cpu_to_le32(upper_32_bits(addr));
+ }
+ 
+ static void enh_desc_clear(struct stmmac_priv *priv, struct dma_desc *p)
+ {
+ 	p->des2 = 0;
++	if (priv->plat->dma_cfg->dma64)
++		p->des3 = 0;
+ }
+ 
+ const struct stmmac_desc_ops enh_desc_ops = {
+diff --git a/drivers/net/ethernet/stmicro/stmmac/ring_mode.c b/drivers/net/ethernet/stmicro/stmmac/ring_mode.c
+index 49dd6ea07416..2b664a51a4f7 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/ring_mode.c
++++ b/drivers/net/ethernet/stmicro/stmmac/ring_mode.c
+@@ -21,10 +21,14 @@ static int jumbo_frm(struct stmmac_tx_queue *tx_q, struct sk_buff *skb,
+ 	struct stmmac_priv *priv = tx_q->priv_data;
+ 	unsigned int entry = tx_q->cur_tx;
+ 	unsigned int bmax, len, des2;
++	unsigned int bmax2, len2;
++	struct dma_extended_desc *edesc;
+ 	struct dma_desc *desc;
+ 
+-	if (priv->extend_desc)
+-		desc = (struct dma_desc *)(tx_q->dma_etx + entry);
++	if (priv->extend_desc) {
++		edesc = tx_q->dma_etx + entry;
++		desc = (struct dma_desc *)edesc;
++	}
+ 	else
+ 		desc = tx_q->dma_tx + entry;
+ 
+@@ -33,23 +37,37 @@ static int jumbo_frm(struct stmmac_tx_queue *tx_q, struct sk_buff *skb,
+ 	else
+ 		bmax = BUF_SIZE_2KiB;
+ 
+-	len = nopaged_len - bmax;
++	if (priv->plat->dma_cfg->dma64) {
++		bmax2 = bmax * 2;
++		len2 = bmax2;
++	} else {
++		bmax2 = bmax;
++		len2 = BUF_SIZE_8KiB;
++	}
++	len = nopaged_len - bmax2;
+ 
+-	if (nopaged_len > BUF_SIZE_8KiB) {
++	if (nopaged_len > len2) {
+ 
+-		des2 = dma_map_single(priv->device, skb->data, bmax,
++		des2 = dma_map_single(priv->device, skb->data, bmax2,
+ 				      DMA_TO_DEVICE);
+ 		desc->des2 = cpu_to_le32(des2);
++		if (priv->plat->dma_cfg->dma64)
++			desc->des3 = cpu_to_le32(upper_32_bits(des2));
+ 		if (dma_mapping_error(priv->device, des2))
+ 			return -1;
+ 
+ 		tx_q->tx_skbuff_dma[entry].buf = des2;
+-		tx_q->tx_skbuff_dma[entry].len = bmax;
++		tx_q->tx_skbuff_dma[entry].len = bmax2;
+ 		tx_q->tx_skbuff_dma[entry].is_jumbo = true;
+ 
+-		desc->des3 = cpu_to_le32(des2 + BUF_SIZE_4KiB);
++		if (priv->plat->dma_cfg->dma64) {
++			edesc->des6 = cpu_to_le32(des2 + bmax);
++			edesc->des7 = cpu_to_le32(upper_32_bits(edesc->des6));
++		} else
++			desc->des3 = cpu_to_le32(des2 + BUF_SIZE_4KiB);
+ 		stmmac_prepare_tx_desc(priv, desc, 1, bmax, csum,
+-				STMMAC_RING_MODE, 0, false, skb->len);
++				STMMAC_RING_MODE, priv->plat->dma_cfg->dma64,
++				false, skb->len);
+ 		tx_q->tx_skbuff[entry] = NULL;
+ 		entry = STMMAC_GET_ENTRY(entry, priv->dma_conf.dma_tx_size);
+ 
+@@ -61,13 +79,19 @@ static int jumbo_frm(struct stmmac_tx_queue *tx_q, struct sk_buff *skb,
+ 		des2 = dma_map_single(priv->device, skb->data + bmax, len,
+ 				      DMA_TO_DEVICE);
+ 		desc->des2 = cpu_to_le32(des2);
++		if (priv->plat->dma_cfg->dma64)
++			desc->des3 = cpu_to_le32(upper_32_bits(des2));
+ 		if (dma_mapping_error(priv->device, des2))
+ 			return -1;
+ 		tx_q->tx_skbuff_dma[entry].buf = des2;
+ 		tx_q->tx_skbuff_dma[entry].len = len;
+ 		tx_q->tx_skbuff_dma[entry].is_jumbo = true;
+ 
+-		desc->des3 = cpu_to_le32(des2 + BUF_SIZE_4KiB);
++		if (priv->plat->dma_cfg->dma64) {
++			edesc->des6 = cpu_to_le32(des2 + bmax);
++			edesc->des7 = cpu_to_le32(upper_32_bits(edesc->des6));
++		} else
++			desc->des3 = cpu_to_le32(des2 + BUF_SIZE_4KiB);
+ 		stmmac_prepare_tx_desc(priv, desc, 0, len, csum,
+ 				STMMAC_RING_MODE, 1, !skb_is_nonlinear(skb),
+ 				skb->len);
+@@ -82,8 +106,8 @@ static int jumbo_frm(struct stmmac_tx_queue *tx_q, struct sk_buff *skb,
+ 		tx_q->tx_skbuff_dma[entry].is_jumbo = true;
+ 		desc->des3 = cpu_to_le32(des2 + BUF_SIZE_4KiB);
+ 		stmmac_prepare_tx_desc(priv, desc, 1, nopaged_len, csum,
+-				STMMAC_RING_MODE, 0, !skb_is_nonlinear(skb),
+-				skb->len);
++				STMMAC_RING_MODE, priv->plat->dma_cfg->dma64,
++				!skb_is_nonlinear(skb), skb->len);
  	}
  
--	writel(csr6, ioaddr + DMA_CONTROL);
-+	writel(csr6, ioaddr + DMA_CONTROL + channel * DMA_CHAN_OFFSET);
- }
+ 	tx_q->cur_tx = entry;
+@@ -103,36 +127,69 @@ static unsigned int is_jumbo_frm(int len, int enh_desc)
  
- static void dwmac1000_dump_dma_regs(struct stmmac_priv *priv,
-@@ -273,12 +322,13 @@ static int dwmac1000_get_hw_feature(struct stmmac_priv *priv,
- static void dwmac1000_rx_watchdog(struct stmmac_priv *priv,
- 				  void __iomem *ioaddr, u32 riwt, u32 queue)
+ static void refill_desc3(struct stmmac_rx_queue *rx_q, struct dma_desc *p)
  {
--	writel(riwt, ioaddr + DMA_RX_WATCHDOG);
-+	writel(riwt, ioaddr + DMA_RX_WATCHDOG + queue * DMA_CHAN_OFFSET);
++	struct dma_extended_desc *edesc = (struct dma_extended_desc *)p;
+ 	struct stmmac_priv *priv = rx_q->priv_data;
+ 
+-	/* Fill DES3 in case of RING mode */
+-	if (priv->dma_conf.dma_buf_sz == BUF_SIZE_16KiB)
+-		p->des3 = cpu_to_le32(le32_to_cpu(p->des2) + BUF_SIZE_8KiB);
++	if (priv->plat->dma_cfg->dma64) {
++		if (priv->dma_conf.dma_buf_sz >= BUF_SIZE_8KiB) {
++			edesc->des6 = cpu_to_le32(le32_to_cpu(edesc->basic.des2) +
++						BUF_SIZE_8KiB);
++			edesc->des7 = cpu_to_le32(le32_to_cpu(edesc->basic.des3));
++		}
++	} else {
++		/* Fill DES3 in case of RING mode */
++		if (priv->dma_conf.dma_buf_sz == BUF_SIZE_16KiB)
++			p->des3 = cpu_to_le32(le32_to_cpu(p->des2) +
++					BUF_SIZE_8KiB);
++	}
  }
  
- const struct stmmac_dma_ops dwmac1000_dma_ops = {
- 	.reset = dwmac_dma_reset,
- 	.init = dwmac1000_dma_init,
-+	.init_chan = dwmac1000_dma_init_channel,
- 	.init_rx_chan = dwmac1000_dma_init_rx,
- 	.init_tx_chan = dwmac1000_dma_init_tx,
- 	.axi = dwmac1000_dma_axi,
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c b/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c
-index 266f64148c1a..99838497b183 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c
-@@ -71,63 +71,63 @@ int dwmac_dma_reset(void __iomem *ioaddr)
- void dwmac_enable_dma_transmission(struct stmmac_priv *priv,
- 				   void __iomem *ioaddr, u32 chan)
+ /* In ring mode we need to fill the desc3 because it is used as buffer */
+ static void init_desc3(struct stmmac_priv *priv, struct dma_desc *p)
  {
--	writel(1, ioaddr + DMA_XMT_POLL_DEMAND);
-+	writel(1, ioaddr + DMA_XMT_POLL_DEMAND + chan * DMA_CHAN_OFFSET);
+-	p->des3 = cpu_to_le32(le32_to_cpu(p->des2) + BUF_SIZE_8KiB);
++	struct dma_extended_desc *edesc = (struct dma_extended_desc *)p;
++
++	if (priv->plat->dma_cfg->dma64) {
++		edesc->des6 = cpu_to_le32(le32_to_cpu(edesc->basic.des2) +
++					BUF_SIZE_8KiB);
++		edesc->des7 = cpu_to_le32(le32_to_cpu(edesc->basic.des3));
++	} else
++		p->des3 = cpu_to_le32(le32_to_cpu(p->des2) +
++				BUF_SIZE_8KiB);
  }
  
- void dwmac_enable_dma_irq(struct stmmac_priv *priv, void __iomem *ioaddr,
- 			  u32 chan, bool rx, bool tx)
+ static void clean_desc3(struct stmmac_tx_queue *tx_q, struct dma_desc *p)
  {
--	u32 value = readl(ioaddr + DMA_INTR_ENA);
-+	u32 value = readl(ioaddr + DMA_INTR_ENA + chan * DMA_CHAN_OFFSET);
++	struct dma_extended_desc *edesc = (struct dma_extended_desc *)p;
+ 	struct stmmac_priv *priv = tx_q->priv_data;
+ 	unsigned int entry = tx_q->dirty_tx;
  
- 	if (rx)
- 		value |= DMA_INTR_DEFAULT_RX;
- 	if (tx)
- 		value |= DMA_INTR_DEFAULT_TX;
- 
--	writel(value, ioaddr + DMA_INTR_ENA);
-+	writel(value, ioaddr + DMA_INTR_ENA + chan * DMA_CHAN_OFFSET);
+-	/* des3 is only used for jumbo frames tx or time stamping */
+-	if (unlikely(tx_q->tx_skbuff_dma[entry].is_jumbo ||
+-		     (tx_q->tx_skbuff_dma[entry].last_segment &&
+-		      !priv->extend_desc && priv->hwts_tx_en)))
+-		p->des3 = 0;
++	if (priv->plat->dma_cfg->dma64) {
++		if (unlikely(tx_q->tx_skbuff_dma[entry].is_jumbo)) {
++			edesc->des6 = 0;
++			edesc->des7 = 0;
++		}
++	} else {
++		/* des3 is only used for jumbo frames tx or time stamping */
++		if (unlikely(tx_q->tx_skbuff_dma[entry].is_jumbo ||
++			     (tx_q->tx_skbuff_dma[entry].last_segment &&
++			      !priv->extend_desc && priv->hwts_tx_en)))
++			p->des3 = 0;
++	}
  }
  
- void dwmac_disable_dma_irq(struct stmmac_priv *priv, void __iomem *ioaddr,
- 			   u32 chan, bool rx, bool tx)
- {
--	u32 value = readl(ioaddr + DMA_INTR_ENA);
-+	u32 value = readl(ioaddr + DMA_INTR_ENA + chan * DMA_CHAN_OFFSET);
- 
- 	if (rx)
- 		value &= ~DMA_INTR_DEFAULT_RX;
- 	if (tx)
- 		value &= ~DMA_INTR_DEFAULT_TX;
- 
--	writel(value, ioaddr + DMA_INTR_ENA);
-+	writel(value, ioaddr + DMA_INTR_ENA + chan * DMA_CHAN_OFFSET);
- }
- 
- void dwmac_dma_start_tx(struct stmmac_priv *priv, void __iomem *ioaddr,
- 			u32 chan)
- {
--	u32 value = readl(ioaddr + DMA_CONTROL);
-+	u32 value = readl(ioaddr + DMA_CONTROL + chan * DMA_CHAN_OFFSET);
- 	value |= DMA_CONTROL_ST;
--	writel(value, ioaddr + DMA_CONTROL);
-+	writel(value, ioaddr + DMA_CONTROL + chan * DMA_CHAN_OFFSET);
- }
- 
- void dwmac_dma_stop_tx(struct stmmac_priv *priv, void __iomem *ioaddr, u32 chan)
- {
--	u32 value = readl(ioaddr + DMA_CONTROL);
-+	u32 value = readl(ioaddr + DMA_CONTROL + chan * DMA_CHAN_OFFSET);
- 	value &= ~DMA_CONTROL_ST;
--	writel(value, ioaddr + DMA_CONTROL);
-+	writel(value, ioaddr + DMA_CONTROL + chan * DMA_CHAN_OFFSET);
- }
- 
- void dwmac_dma_start_rx(struct stmmac_priv *priv, void __iomem *ioaddr,
- 			u32 chan)
- {
--	u32 value = readl(ioaddr + DMA_CONTROL);
-+	u32 value = readl(ioaddr + DMA_CONTROL + chan * DMA_CHAN_OFFSET);
- 	value |= DMA_CONTROL_SR;
--	writel(value, ioaddr + DMA_CONTROL);
-+	writel(value, ioaddr + DMA_CONTROL + chan * DMA_CHAN_OFFSET);
- }
- 
- void dwmac_dma_stop_rx(struct stmmac_priv *priv, void __iomem *ioaddr, u32 chan)
- {
--	u32 value = readl(ioaddr + DMA_CONTROL);
-+	u32 value = readl(ioaddr + DMA_CONTROL + chan * DMA_CHAN_OFFSET);
- 	value &= ~DMA_CONTROL_SR;
--	writel(value, ioaddr + DMA_CONTROL);
-+	writel(value, ioaddr + DMA_CONTROL + chan * DMA_CHAN_OFFSET);
- }
- 
- #ifdef DWMAC_DMA_DEBUG
-@@ -205,7 +205,7 @@ int dwmac_dma_interrupt(struct stmmac_priv *priv, void __iomem *ioaddr,
+ static int set_16kib_bfsize(struct stmmac_priv *priv, int mtu)
  {
  	int ret = 0;
- 	/* read the status register (CSR5) */
--	u32 intr_status = readl(ioaddr + DMA_STATUS);
-+	u32 intr_status = readl(ioaddr + DMA_STATUS + chan * DMA_CHAN_OFFSET);
+-	if (unlikely(mtu > BUF_SIZE_8KiB))
+-		ret = BUF_SIZE_16KiB;
++
++	if (priv->plat->dma_cfg->dma64) {
++		if (unlikely(mtu >= BUF_SIZE_8KiB))
++			ret = BUF_SIZE_16KiB;
++	} else {
++		if (unlikely(mtu > BUF_SIZE_8KiB))
++			ret = BUF_SIZE_16KiB;
++	}
++
+ 	return ret;
+ }
  
- #ifdef DWMAC_DMA_DEBUG
- 	/* Enable it to monitor DMA rx/tx status in case of critical problems */
 diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
-index db61dc7c931d..5e68553433a7 100644
+index 5e68553433a7..46bccc34814d 100644
 --- a/include/linux/stmmac.h
 +++ b/include/linux/stmmac.h
-@@ -342,5 +342,6 @@ struct plat_stmmacenet_data {
- 	const struct dwmac4_addrs *dwmac4_addrs;
- 	bool has_integrated_pcs;
- 	const struct dwmac_regs *dwmac_regs;
-+	bool dwmac_is_loongson;
+@@ -98,6 +98,7 @@ struct stmmac_dma_cfg {
+ 	bool eame;
+ 	bool multi_msi_en;
+ 	bool dche;
++	bool dma64;
  };
- #endif
+ 
+ #define AXI_BLEN	7
 -- 
 2.39.3
 
