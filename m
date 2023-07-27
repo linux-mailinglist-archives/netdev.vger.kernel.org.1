@@ -1,70 +1,160 @@
-Return-Path: <netdev+bounces-21827-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21828-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3BE6764E8C
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 11:06:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3938764E93
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 11:07:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5FA9B2821F8
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 09:06:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1B1071C21536
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 09:07:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45A9DFBE4;
-	Thu, 27 Jul 2023 09:06:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED650FBE5;
+	Thu, 27 Jul 2023 09:07:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 396A4F9EF
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 09:06:19 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E01B64EC2
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 02:06:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=9gqk7BP5D/gYIjp96E7iKBj+3EAeBvpuuNNlMCOos/c=; b=rmfHGrkPEnh9wyv4uZj+vHkAa6
-	SzvzTwev4/Nf+Y1pBacqLXYTZfrd/5acSG8CdwgzJKI5AP8FH9p+ec9Z8ZxUTvehfx8y5riuqgSso
-	RedqShUU35qwYWltFrk+6CnvSvZVTypFmcyEQMK6zcIc86JcdwFb2ekOTxr2kYUacmOI=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qOwwj-002R8T-3e; Thu, 27 Jul 2023 11:06:09 +0200
-Date: Thu, 27 Jul 2023 11:06:09 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Feiyang Chen <chenfeiyang@loongson.cn>
-Cc: hkallweit1@gmail.com, peppe.cavallaro@st.com,
-	alexandre.torgue@foss.st.com, joabreu@synopsys.com,
-	chenhuacai@loongson.cn, linux@armlinux.org.uk, dongbiao@loongson.cn,
-	loongson-kernel@lists.loongnix.cn, netdev@vger.kernel.org,
-	loongarch@lists.linux.dev, chris.chenfeiyang@gmail.com
-Subject: Re: [PATCH v2 04/10] net: stmmac: dwmac1000: Add 64-bit DMA support
-Message-ID: <677d06af-eb83-4e11-9519-8f3606b97854@lunn.ch>
-References: <cover.1690439335.git.chenfeiyang@loongson.cn>
- <74a7f82d516836ba53edae509b561f50b441dd63.1690439335.git.chenfeiyang@loongson.cn>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E17F48467
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 09:07:16 +0000 (UTC)
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7ABF27ED5
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 02:07:13 -0700 (PDT)
+Received: by mail-pj1-x1032.google.com with SMTP id 98e67ed59e1d1-2659b1113c2so145043a91.1
+        for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 02:07:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1690448833; x=1691053633;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=UKiGuCYavgdrONYSlKU+hjlx/AzCB2LKMORbFgw7HEo=;
+        b=DjrROq91sf6Va+7++jhnZLLfMfZ3NpR+vs103Gffs3+O08HW6byjEgnIqMIjx7XVVU
+         6Esw8LCCRNx5FIzgZD2yLlNtiJ3fWUXbMzLdc62rKZLebfjHSG7L7jgEMl0D1hE7ZoNg
+         HZ2c9Q9i+LL0tt0iImhvHFOK+Hduw2G0dP+6wK+guSG8W2Nz3BegBODQY1lmNQJ14Dz4
+         uuXi2h/k5/64PvGOHou6Defqpklm1cGUHs8RqpArf+xI1YmvbpRswY34ry3JAORO90Jx
+         4NSzh0j5w+vqWxK/Ia35MiibA4wNxyya8QHOgB3QIdRRJ50Wt48gZu09EVgownqRkh1E
+         f6DQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690448833; x=1691053633;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=UKiGuCYavgdrONYSlKU+hjlx/AzCB2LKMORbFgw7HEo=;
+        b=XdQV9UfCz/GQsgzZfmGeYF/qGwPnLn+fMrAE0xukZmVLlS+MKQWUuPL9GSBr/RbYSP
+         Ancnp4Ao7a7fTRaftmYfIBnUvpRklTMo8vHh1+zz060I3jUvK47L39ofYaAvrwNJ4XuP
+         JwuEPFq7dMAb0BNQb84zcwjVp5h7EZgG3s80ro5uJiUPvEFVrUKxpNVm6rxICYJQxLle
+         7LCr47NLF1XyM6sbCBdHdns+R//ELFCa/Nb7FMFumv0C1D+1INFTb9vgMfPpI1Y59BrO
+         frEptPeh9QcchmdkwSvGWvuQ6L3+lu/bqTAAHB7p2nXPpGRStkCNhR2xUkgaM2OyOwqK
+         F/WQ==
+X-Gm-Message-State: ABy/qLbXujrmjInQa/zrrftjmOo73F5Apxl41U3LQIVrV5mgVPmoAh8H
+	ASBs8ds8ax3NkNpl3pLA2btmsHc+eDEbUwZrtyk=
+X-Google-Smtp-Source: APBJJlEquEzidizjgrmS1e55j2UU3CMKKyxPnlaVqAXQYQ+ePfvdxx8A4f9JU/BbmCjGKzVhoGuchQ==
+X-Received: by 2002:a17:90a:128e:b0:263:25f9:65b2 with SMTP id g14-20020a17090a128e00b0026325f965b2mr4139877pja.4.1690448832920;
+        Thu, 27 Jul 2023 02:07:12 -0700 (PDT)
+Received: from [10.70.252.135] ([203.208.167.147])
+        by smtp.gmail.com with ESMTPSA id a11-20020a170902ee8b00b001b7e63cfa19sm1063627pld.234.2023.07.27.02.07.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 27 Jul 2023 02:07:12 -0700 (PDT)
+Message-ID: <19461737-db63-2ab5-110b-e65035881ae2@bytedance.com>
+Date: Thu, 27 Jul 2023 17:06:57 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <74a7f82d516836ba53edae509b561f50b441dd63.1690439335.git.chenfeiyang@loongson.cn>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.12.0
+Subject: Re: [PATCH v3 15/49] nfs: dynamically allocate the nfs-acl shrinker
+Content-Language: en-US
+To: akpm@linux-foundation.org, david@fromorbit.com, tkhai@ya.ru,
+ vbabka@suse.cz, roman.gushchin@linux.dev, djwong@kernel.org,
+ brauner@kernel.org, paulmck@kernel.org, tytso@mit.edu, steven.price@arm.com,
+ cel@kernel.org, senozhatsky@chromium.org, yujie.liu@intel.com,
+ gregkh@linuxfoundation.org, muchun.song@linux.dev
+Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org, x86@kernel.org,
+ kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
+ linux-erofs@lists.ozlabs.org, linux-f2fs-devel@lists.sourceforge.net,
+ cluster-devel@redhat.com, linux-nfs@vger.kernel.org,
+ linux-mtd@lists.infradead.org, rcu@vger.kernel.org, netdev@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linux-arm-msm@vger.kernel.org,
+ dm-devel@redhat.com, linux-raid@vger.kernel.org,
+ linux-bcache@vger.kernel.org, virtualization@lists.linux-foundation.org,
+ linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
+ linux-xfs@vger.kernel.org, linux-btrfs@vger.kernel.org,
+ Muchun Song <songmuchun@bytedance.com>
+References: <20230727080502.77895-1-zhengqi.arch@bytedance.com>
+ <20230727080502.77895-16-zhengqi.arch@bytedance.com>
+From: Qi Zheng <zhengqi.arch@bytedance.com>
+In-Reply-To: <20230727080502.77895-16-zhengqi.arch@bytedance.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Jul 27, 2023 at 03:15:47PM +0800, Feiyang Chen wrote:
-> Some platforms have dwmac1000 implementations that support 64-bit
-> DMA. Extend the functions to add 64-bit DMA support.
 
-I wounder if it would be cleaner to implement a new struct
-stmmac_dma_ops for 64 bit DMA support?
 
-	Andrew
+On 2023/7/27 16:04, Qi Zheng wrote:
+> Use new APIs to dynamically allocate the nfs-acl shrinker.
+> 
+> Signed-off-by: Qi Zheng <zhengqi.arch@bytedance.com>
+> Reviewed-by: Muchun Song <songmuchun@bytedance.com>
+> ---
+>   fs/nfs/super.c | 20 ++++++++++++--------
+>   1 file changed, 12 insertions(+), 8 deletions(-)
+> 
+> diff --git a/fs/nfs/super.c b/fs/nfs/super.c
+> index 2284f749d892..072d82e1be06 100644
+> --- a/fs/nfs/super.c
+> +++ b/fs/nfs/super.c
+> @@ -129,11 +129,7 @@ static void nfs_ssc_unregister_ops(void)
+>   }
+>   #endif /* CONFIG_NFS_V4_2 */
+>   
+> -static struct shrinker acl_shrinker = {
+> -	.count_objects	= nfs_access_cache_count,
+> -	.scan_objects	= nfs_access_cache_scan,
+> -	.seeks		= DEFAULT_SEEKS,
+> -};
+> +static struct shrinker *acl_shrinker;
+>   
+>   /*
+>    * Register the NFS filesystems
+> @@ -153,9 +149,17 @@ int __init register_nfs_fs(void)
+>   	ret = nfs_register_sysctl();
+>   	if (ret < 0)
+>   		goto error_2;
+> -	ret = register_shrinker(&acl_shrinker, "nfs-acl");
+> -	if (ret < 0)
+> +
+> +	acl_shrinker = shrinker_alloc(0, "nfs-acl");
+> +	if (!acl_shrinker)
+>   		goto error_3;
+
+Here should set ret to -ENOMEM, will fix.
+
+> +
+> +	acl_shrinker->count_objects = nfs_access_cache_count;
+> +	acl_shrinker->scan_objects = nfs_access_cache_scan;
+> +	acl_shrinker->seeks = DEFAULT_SEEKS;
+> +
+> +	shrinker_register(acl_shrinker);
+> +
+>   #ifdef CONFIG_NFS_V4_2
+>   	nfs_ssc_register_ops();
+>   #endif
+> @@ -175,7 +179,7 @@ int __init register_nfs_fs(void)
+>    */
+>   void __exit unregister_nfs_fs(void)
+>   {
+> -	unregister_shrinker(&acl_shrinker);
+> +	shrinker_free(acl_shrinker);
+>   	nfs_unregister_sysctl();
+>   	unregister_nfs4_fs();
+>   #ifdef CONFIG_NFS_V4_2
 
