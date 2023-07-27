@@ -1,128 +1,153 @@
-Return-Path: <netdev+bounces-21954-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21944-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 703BF76565E
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 16:48:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA46176562E
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 16:45:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2BCE428240A
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 14:48:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9A9D41C21688
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 14:45:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AD0317751;
-	Thu, 27 Jul 2023 14:46:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54F7C168BC;
+	Thu, 27 Jul 2023 14:45:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EBBE1988B
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 14:46:19 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.31])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A92473AAA;
-	Thu, 27 Jul 2023 07:46:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1690469161; x=1722005161;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=eYl99+L8eoZb9TdbyaCeQo6lRhwlNSjOXE6qobDW3K0=;
-  b=IkgpUQGNIbKtfpljDJGk10+TiBLptw0DunKPCOtyK55fN2OgBAW8gYxh
-   eAejiz0Qn+pA/f/3udRKxN9koAJPdaQbkAhqmPLdbMJt3s/TmXZSbgtIu
-   GOHKwafQ11X6w1VQcvfY/7h2Iza0yEkwY/OyqxzAYtUjAHtjGE3kR1itl
-   nBs0rbe+RYJIKim6+gGQg8LP5VHFJddzobUnjCF58eoRQR0MjE1TctsnU
-   AlrcR8gyKvFuD7zLnuxzjq2pZVDI2WY0aa5wy9ocflw5Hr52fnSUMGdLF
-   wxASAuNvr3TR5FqIM4P2wuiY3gfWRAGbSvb0902opVK/rHCVxVyP5mfsJ
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10784"; a="432139872"
-X-IronPort-AV: E=Sophos;i="6.01,235,1684825200"; 
-   d="scan'208";a="432139872"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jul 2023 07:46:00 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10784"; a="817119964"
-X-IronPort-AV: E=Sophos;i="6.01,235,1684825200"; 
-   d="scan'208";a="817119964"
-Received: from newjersey.igk.intel.com ([10.102.20.203])
-  by FMSMGA003.fm.intel.com with ESMTP; 27 Jul 2023 07:45:57 -0700
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-To: "David S. Miller" <davem@davemloft.net>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48C30FBEF
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 14:45:11 +0000 (UTC)
+Received: from out5-smtp.messagingengine.com (out5-smtp.messagingengine.com [66.111.4.29])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CD0230D2
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 07:45:09 -0700 (PDT)
+Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
+	by mailout.nyi.internal (Postfix) with ESMTP id 03FCC5C0167;
+	Thu, 27 Jul 2023 10:45:07 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute4.internal (MEProxy); Thu, 27 Jul 2023 10:45:07 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:sender:subject
+	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+	:x-sasl-enc; s=fm3; t=1690469107; x=1690555507; bh=k+eZTz0o8P+6i
+	UZcKSKnIpwL6uic784O/D5m1QU8uoo=; b=bBgZ5Z3l0IuMpMJKZo4rvn6y9zZm3
+	AylH92/c+0nHWdsKq+o5P4yonU9Iz2K35/gDVtsFTvEsFFuLnYkUQvPk+sQcK3lw
+	OtBsH+lqXzspyUpU7H16SUv0l5MpEMWpc35hB7aQ+8IOxniMkCNx/wsz7K5U7bth
+	k5kvbW9vyCaupBaKZ+94qa8faTH7Wfrst5XC8FTdQAcLpYvtt4YmKspgjwn6FBMr
+	2Da8zkUj0CvSixtUgqC8NwsSwiya3E/ZC3X90bLCnVelwzHMJqUtIlW6a/RpyUZV
+	+Jz/7R711J2njw/UxGwN68VzNlk7dIq5h5g9mBdUpX7hSLLldbZb9kK8A==
+X-ME-Sender: <xms:8oLCZHVnDtaDV4rfnLhGU6QWq46yiGmQ_lyDxxXaZ5APG2n8-2Axpw>
+    <xme:8oLCZPlG5zLz9m1DZNsjHQRpE7whKNI5nAOMWXKGak0gBlkCpFnVJg_AJWDY7bmYn
+    M8rIBDVansYjWA>
+X-ME-Received: <xmr:8oLCZDZGKcnVLvgevENP4-LOkJVgHR5MZNsqr9CczHD1MsRRxtfnACIQCZvkifEoG1hT4OGYjuGDHeRywSv6BrX6S5BCDQ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrieeggdehgecutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+    fjughrpeffhffvvefukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpefkughoucfu
+    tghhihhmmhgvlhcuoehiughoshgthhesihguohhstghhrdhorhhgqeenucggtffrrghtth
+    gvrhhnpedvudefveekheeugeeftddvveefgfduieefudeifefgleekheegleegjeejgeeg
+    hfenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehiug
+    hoshgthhesihguohhstghhrdhorhhg
+X-ME-Proxy: <xmx:8oLCZCXVUo6kpcJh7wXA96Ynsgro7ruVUTl4elgG9KaJzF8FG6vQwA>
+    <xmx:8oLCZBnDI9WwOhXjE93_K7mnxnVfalGws__FLdJFZUa4M03a4jeeiA>
+    <xmx:8oLCZPcjdevrEid-RxS8UfFaUSCc3zR9U4FgqWrVb1t0mZC8KUL0IQ>
+    <xmx:84LCZPaT6OLFwoBl2gpXeQqxMbDD1hcXJHqTZsdl8zxi6f5cc-xUdg>
+Feedback-ID: i494840e7:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 27 Jul 2023 10:45:05 -0400 (EDT)
+Date: Thu, 27 Jul 2023 17:45:02 +0300
+From: Ido Schimmel <idosch@idosch.org>
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: Stephen Hemminger <stephen@networkplumber.org>,
+	David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org,
+	"David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	Larysa Zaremba <larysa.zaremba@intel.com>,
-	Yunsheng Lin <linyunsheng@huawei.com>,
-	Alexander Duyck <alexanderduyck@fb.com>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	Simon Horman <simon.horman@corigine.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next 9/9] net: skbuff: always try to recycle PP pages directly when in softirq
-Date: Thu, 27 Jul 2023 16:43:36 +0200
-Message-ID: <20230727144336.1646454-10-aleksander.lobakin@intel.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230727144336.1646454-1-aleksander.lobakin@intel.com>
-References: <20230727144336.1646454-1-aleksander.lobakin@intel.com>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Thomas Haller <thaller@redhat.com>
+Subject: Re: [Questions] Some issues about IPv4/IPv6 nexthop route (was Re:
+ [PATCH net-next] ipv4/fib: send RTM_DELROUTE notify when flush fib)
+Message-ID: <ZMKC7jTVF38JAeNb@shredder>
+References: <20230718085814.4301b9dd@hermes.local>
+ <ZLjncWOL+FvtaHcP@Laptop-X1>
+ <ZLlE5of1Sw1pMPlM@shredder>
+ <ZLngmOaz24y5yLz8@Laptop-X1>
+ <d6a204b1-e606-f6ad-660a-28cc5469be2e@kernel.org>
+ <ZLobpQ7jELvCeuoD@Laptop-X1>
+ <ZLzY42I/GjWCJ5Do@shredder>
+ <ZL48xbowL8QQRr9s@Laptop-X1>
+ <20230724084820.4aa133cc@hermes.local>
+ <ZMDyoRzngXVESEd1@Laptop-X1>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZMDyoRzngXVESEd1@Laptop-X1>
+X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Commit 8c48eea3adf3 ("page_pool: allow caching from safely localized
-NAPI") allowed direct recycling of skb pages to their PP for some cases,
-but unfortunately missed a couple of other majors.
-For example, %XDP_DROP in skb mode. The netstack just calls kfree_skb(),
-which unconditionally passes `false` as @napi_safe. Thus, all pages go
-through ptr_ring and locks, although most of time we're actually inside
-the NAPI polling this PP is linked with, so that it would be perfectly
-safe to recycle pages directly.
-Let's address such. If @napi_safe is true, we're fine, don't change
-anything for this path. But if it's false, check whether we are in the
-softirq context. It will most likely be so and then if ->list_owner
-is our current CPU, we're good to use direct recycling, even though
-@napi_safe is false -- concurrent access is excluded. in_softirq()
-protection is needed mostly due to we can hit this place in the
-process context (not the hardirq though).
-For the mentioned xdp-drop-skb-mode case, the improvement I got is
-3-4% in Mpps. As for page_pool stats, recycle_ring is now 0 and
-alloc_slow counter doesn't change most of time, which means the
-MM layer is not even called to allocate any new pages.
+On Wed, Jul 26, 2023 at 06:17:05PM +0800, Hangbin Liu wrote:
+> Hi Stephen, Ido, David,
+> On Mon, Jul 24, 2023 at 08:48:20AM -0700, Stephen Hemminger wrote:
+> > On Mon, 24 Jul 2023 16:56:37 +0800
+> > Hangbin Liu <liuhangbin@gmail.com> wrote:
+> > 
+> > > The NetworkManager keeps a cache of the routes. Missing/Wrong events mean that
+> > > the cache becomes inconsistent. The IPv4 will not send src route delete info
+> > > if it's bond to other device. While IPv6 only modify the src route instead of
+> > > delete it, and also no notify. So NetworkManager developers complained and
+> > > hope to have a consistent and clear notification about route modify/delete.
+> > 
+> > Read FRR they get it right. The routing daemons have to track kernel,
+> > and the semantics have been worked out for years.
+> 
+> Since we are talking about whether we should fix the issues or doc them. I
+> have some other route issues reported by NetworkManager developers. And want
+> discuss with you.
+> 
+> For IPv4, we add new route instead append the nexthop to same dest(or do I
+> miss something?).
 
-Suggested-by: Jakub Kicinski <kuba@kernel.org> # in_softirq()
-Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
----
- net/core/skbuff.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+The append / prepend trick to create a multipath route is an IPv6 hack.
+The correct way to install a multipath route is to add it in one go like
+in the IPv4 implementation (which predates the IPv6 implementation) or
+use the nexthop API.
 
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index e701401092d7..5ba3948cceed 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -901,8 +901,10 @@ bool page_pool_return_skb_page(struct page *page, bool napi_safe)
- 	/* Allow direct recycle if we have reasons to believe that we are
- 	 * in the same context as the consumer would run, so there's
- 	 * no possible race.
-+	 * __page_pool_put_page() makes sure we're not in hardirq context
-+	 * and interrupts are enabled prior to accessing the cache.
- 	 */
--	if (napi_safe) {
-+	if (napi_safe || in_softirq()) {
- 		const struct napi_struct *napi = READ_ONCE(pp->p.napi);
- 
- 		allow_direct = napi &&
--- 
-2.41.0
+> Since the route are not merged, the nexthop weight is not shown, which
+> make them look like the same for users. For IPv4, the scope is also
+> not shown, which look like the same for users.
 
+The routes are the same, but separate. They do not form a multipath
+route. Weight is meaningless for a non-multipath route.
+
+> 
+> While IPv6 will append another nexthop to the route if dest is same.
+
+Yes, that's a hack.
+
+> But there are 2 issues here:
+> 1. the *type* and *protocol* field are actally ignored
+> 2. when do `ip monitor route`, the info dumpped in fib6_add_rt2node()
+>    use the config info from user space. When means `ip monitor` show the
+>    incorrect type and protocol
+> 
+> So my questions are, should we show weight/scope for IPv4? How to deal the
+> type/proto info missing for IPv6? How to deal with the difference of merging
+> policy for IPv4/IPv6?
+
+In my opinion, if you want consistent behavior between IPv4 and IPv6 for
+multipath routes, then I suggest using the nexthop API. It was merged in
+5.3 (IIRC) and FRR started using it by default a few years ago. Other
+than a few bugs that were fixed, I don't remember many complaints. Also,
+any nexthop-related features will only be implemented in the nexthop
+API, not in the legacy API. Resilient nexthop groups is one example.
 
