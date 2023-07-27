@@ -1,129 +1,84 @@
-Return-Path: <netdev+bounces-21849-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21850-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5ED7765050
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 11:53:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC3F876509B
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 12:10:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 879BD282209
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 09:53:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7A91A1C21523
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 10:10:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DFD6134CA;
-	Thu, 27 Jul 2023 09:53:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37A0213AE5;
+	Thu, 27 Jul 2023 10:10:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 680221FDD
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 09:53:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3684EC433C7;
-	Thu, 27 Jul 2023 09:53:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0969D107AD
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 10:10:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 4E620C433C9;
+	Thu, 27 Jul 2023 10:10:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690451603;
-	bh=EdAZ9yCp4NjWVpXzH6AhTQQee2XgoMhciT9wDsXDj3c=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=CkkEAksCAqLlikCk9JjEcjPhux5P1puAANDl8+6/+YFdpP9MyxEJZmjYWgS9TNlVR
-	 D/PuEZi9uV2jU/E9C4t4GZeWLZTMBKdLz3XRpkg24gGeTKUymJLOlyRVjPhhAUhd1J
-	 R7XfjrbP+K1pz3BowFAxrPEyZSH7yb3kNfhihY0wUPK43CKgVjQtKxfdhC+BKb4kSZ
-	 vauM0v1qddB3XFsxJ84JTIG98VtZ4Sezo0oPi8G0dyOHMT7P7uRtPK7SJwMFGT0iRT
-	 wsSpKH6SkCMDV4cWplBERK47w7DXi27cZLxp9y98ByFJ5lFKGEO9cER2P8IuDSrw2p
-	 /+AUJuabvTyIw==
-Date: Thu, 27 Jul 2023 10:53:15 +0100
-From: Conor Dooley <conor@kernel.org>
-To: Herve Codina <herve.codina@bootlin.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew@lunn.ch>, Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>, Lee Jones <lee@kernel.org>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Qiang Zhao <qiang.zhao@nxp.com>, Li Yang <leoyang.li@nxp.com>,
-	Liam Girdwood <lgirdwood@gmail.com>,
-	Mark Brown <broonie@kernel.org>, Jaroslav Kysela <perex@perex.cz>,
-	Takashi Iwai <tiwai@suse.com>,
-	Shengjiu Wang <shengjiu.wang@gmail.com>,
-	Xiubo Li <Xiubo.Lee@gmail.com>, Fabio Estevam <festevam@gmail.com>,
-	Nicolin Chen <nicoleotsuka@gmail.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Randy Dunlap <rdunlap@infradead.org>, netdev@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, alsa-devel@alsa-project.org,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH v2 05/28] dt-bindings: net: Add support for QMC HDLC
-Message-ID: <20230727-decidable-sterile-06ef617c144b@spud>
-References: <20230726150225.483464-1-herve.codina@bootlin.com>
- <20230726150225.483464-6-herve.codina@bootlin.com>
- <20230727-talcum-backside-5bdbe2171fb6@spud>
- <20230727110948.7926a532@bootlin.com>
+	s=k20201202; t=1690452621;
+	bh=V8cRhjjMjy0S96MMHGyJjXFao2r6oszoTlft5F/lo94=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=XAmD/75Akb6sePqlWJX10dhM6Y0Bw3xikdxF2TFxaWS7lvQQaroZudPo7y6p4KS8L
+	 9ilRLPBmRIV8X0BM8ou/GAKTb3p8WVX6WU8vt08hXHjmjUDxR2s/BwnKWwFkWj6bM0
+	 obF5xXe/Tg8fBQ6co2e1Ws/Ke9HlFK/KcrOPXLqotsFWA+U01ZRP/LxiNb4MopzKer
+	 PiHK1JoTMI/Mdxb0V9iD7eNYmMa7fng0OlP8pPxrSImldse/Gw91W6s6z9E3TWc52z
+	 OSgbUoFk3OZffrCMWwibOszCGpaGY9ytT40wTDiYRh+AjC5JlMhu6wxWYLKg9JMtyb
+	 yeqmIFpGzvA8g==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 347B2C595D0;
+	Thu, 27 Jul 2023 10:10:21 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="O7XSXK7XxHjViR5H"
-Content-Disposition: inline
-In-Reply-To: <20230727110948.7926a532@bootlin.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2] tipc: stop tipc crypto on failure in tipc_node_create
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169045262121.6409.17871887881657519923.git-patchwork-notify@kernel.org>
+Date: Thu, 27 Jul 2023 10:10:21 +0000
+References: <20230725214628.25246-1-pchelkin@ispras.ru>
+In-Reply-To: <20230725214628.25246-1-pchelkin@ispras.ru>
+To: Fedor Pchelkin <pchelkin@ispras.ru>
+Cc: jmaloy@redhat.com, ying.xue@windriver.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ lucien.xin@gmail.com, netdev@vger.kernel.org,
+ tipc-discussion@lists.sourceforge.net, linux-kernel@vger.kernel.org,
+ khoroshilov@ispras.ru, lvc-project@linuxtesting.org
+
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Wed, 26 Jul 2023 00:46:25 +0300 you wrote:
+> If tipc_link_bc_create() fails inside tipc_node_create() for a newly
+> allocated tipc node then we should stop its tipc crypto and free the
+> resources allocated with a call to tipc_crypto_start().
+> 
+> As the node ref is initialized to one to that point, just put the ref on
+> tipc_link_bc_create() error case that would lead to tipc_node_free() be
+> eventually executed and properly clean the node and its crypto resources.
+> 
+> [...]
+
+Here is the summary with links:
+  - [v2] tipc: stop tipc crypto on failure in tipc_node_create
+    https://git.kernel.org/netdev/net/c/de52e17326c3
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
---O7XSXK7XxHjViR5H
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Thu, Jul 27, 2023 at 11:09:48AM +0200, Herve Codina wrote:
-> On Thu, 27 Jul 2023 09:19:59 +0100
-> Conor Dooley <conor@kernel.org> wrote:
-> > On Wed, Jul 26, 2023 at 05:02:01PM +0200, Herve Codina wrote:
-
-> If needed, I can change to:
->   title: QMC (QUICC Multichannel Controller) HDLC
-> Let me known if it is better to you.
-
-If it were me writing the binding, I'd probably use something like
-"Freescale/NXP QUICC Multichannel Controller (QMC) HDLC", but it is not
-a big deal, I just had a "wtf is this" moment :)
-
-
-
-> > > +  fsl,qmc-chan:
-> >=20
-> > Perhaps I am just showing my lack of knowledge in this area, but what is
-> > fsl specific about wanting a reference to the channel of a "QMC"?
-> > Is this something that hardware from other manufacturers would not also
-> > want to do?
->=20
-> The QMC and the QMC channel are something specific to the SoC. This IP is=
- only
-> available on some Freescale/NXP SoCs.
->=20
-> When I upstreamed the 'fsl,qmc-audio.yaml', I first used a generic name f=
-or this
-> property and Kristoff asked to change to a vendor prefixed name.
->   https://lore.kernel.org/linux-kernel/1dfade07-f8c4-2e16-00dc-c7d1837082=
-59@linaro.org/
->=20
-> Based on this, as the property 'fsl,qmc-chan' has the exact same meaning =
-in
-> fsl,qmc-audio.yaml and fsl,qmc-hdlc.yaml, I use the same name.
-
-Okay, thanks for explaining!
-
---O7XSXK7XxHjViR5H
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZMI+iwAKCRB4tDGHoIJi
-0qi3APwL74Mb2llAu7YBw/3bmeFa7gR7fA/ofP+aXSE3vKilNwEAr7q9DVx5VZdT
-1kkQaOjZ61gQb0aNwEfyWDLEqkpWAgw=
-=qYki
------END PGP SIGNATURE-----
-
---O7XSXK7XxHjViR5H--
 
