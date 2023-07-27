@@ -1,144 +1,146 @@
-Return-Path: <netdev+bounces-22076-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22077-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD9B6765DDB
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 23:17:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2123765E46
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 23:32:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0A30F1C2167A
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 21:17:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A4A502824B9
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 21:32:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D8E81CA18;
-	Thu, 27 Jul 2023 21:17:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 673DB1CA15;
+	Thu, 27 Jul 2023 21:32:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3357B1CA19
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 21:17:04 +0000 (UTC)
-Received: from mail-wm1-x330.google.com (mail-wm1-x330.google.com [IPv6:2a00:1450:4864:20::330])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0BB430E2;
-	Thu, 27 Jul 2023 14:17:02 -0700 (PDT)
-Received: by mail-wm1-x330.google.com with SMTP id 5b1f17b1804b1-3fbc244d384so15443385e9.0;
-        Thu, 27 Jul 2023 14:17:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690492621; x=1691097421;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=x8EiKycpWrQW8TPUC/04LyVjN+dd4bOmadKUuuhDzS8=;
-        b=GxB0Dy7BLrtouVb/j8aNJMF6RWEjP5wuLCNfe5Dtygl0ZPHI0+S2MWZQzyaGTyM3FE
-         hhBS0uT4abfN7g/3YxnZPh7hi23ThhPgh10HNajPYwhzGgcfO5qs7xRtR+c+2fkWkOK+
-         8NBGIhCYFJeKPTvHyzEUL4V11M86KEWpDdmGRTbtBzYIs7FrmEKIiT//phICCAauCGJG
-         ZEz9S/SSUkiCGMBKIW76swlb45geU3XnDAHUUCn4VhU4SDa7Sb+6z6MtpT04q3sinBAT
-         byIvyYTXdW5mPyBRytKkBCjRZzI09XtRFhHqeWeFdpNpJJDKguwKaUO7MVl3/1JJoqGs
-         LrAA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690492621; x=1691097421;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=x8EiKycpWrQW8TPUC/04LyVjN+dd4bOmadKUuuhDzS8=;
-        b=eq5p/I7sSgdcXhqzuT3KHehiZl+beiqexEPuym/KNYRmy3MsGcdEc1B6NonwWp4OuL
-         C7XAyULA9qHitAB/0ORKQxORMdXojUKc21R4j7NSD10n7imFa2XzGOScplfhpa5GtdIB
-         xtrlJad/tjDjdj3kgmiOfceLR4YgAO1/R5zowg8PbwJWamZYkq8rAi+7lPFkeSEwMspT
-         42bMi8CWcfjDBy/xd4ZMKJIUOg1qDiyM+z699uJewNdw1CpRkiV5lD/q621eQD20yyA6
-         yz8hrkUbMtK0W9C0Kms1rRkeAWGp2IIYnu8p7+2UBayvfb6Cv1D5O7NwwR3sCSz41bmy
-         5GMg==
-X-Gm-Message-State: ABy/qLZvm1QGlBAdiSSCbbQZPsraTkqz8O6MJtqrQy/L3c4SUmJOkOsH
-	b4eYb1apCSp5salsXPiBgOo=
-X-Google-Smtp-Source: APBJJlFvtkn/m5BFowdTBQQo1i9q7DMSDUxWMoSa7ByIXErw7qY4O6yChdzPBK5w4rNLFf22KtGfvQ==
-X-Received: by 2002:a5d:438f:0:b0:317:54d9:eb48 with SMTP id i15-20020a5d438f000000b0031754d9eb48mr246125wrq.11.1690492621102;
-        Thu, 27 Jul 2023 14:17:01 -0700 (PDT)
-Received: from skbuf ([188.25.175.105])
-        by smtp.gmail.com with ESMTPSA id z8-20020adfec88000000b0031773a8e5c4sm3049793wrn.37.2023.07.27.14.17.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Jul 2023 14:17:00 -0700 (PDT)
-Date: Fri, 28 Jul 2023 00:16:58 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EACFE17AC4
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 21:32:38 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B22F6C433C7;
+	Thu, 27 Jul 2023 21:32:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1690493558;
+	bh=LFiOuKaV4mYQNVWY6/YSUjVKfAWsifUjllsJxEWkg8U=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=C3h/UWMhwQ4HJv0OU0SmB484+Mafgk/jk4xS+WlpXnP+79zKugFJ0W00kXfqOMUb1
+	 V12jq8z7gzm+9/LDbIrDUUgD0o68nv+G//zyM5RiNm8OldUYjrw0vf+K/WRP8Xc9JA
+	 trmz3jisE21oeOqtLnSi2ABih/sVEOTC+P81D32c2u4+DX0q/9vJhnmC7ORaY/Inxn
+	 911c5GEXmYs12kMkBXi1f3ViZN9/45PPH0P+yrvqH+IB4Dr2P6xMuqfp3/JRoZKYAr
+	 lt9F+PKsw876bbfX5mygCil62jIQn8Vr9iX769LeyZVyChHBym8Bc58XQIi72H7UTS
+	 jsNI8ZItJ5trQ==
+From: SeongJae Park <sj@kernel.org>
+To: Rishabh Bhatnagar <risbhat@amazon.com>
+Cc: gregkh@linuxfoundation.org,
+	lee@kernel.org,
+	davem@davemloft.net,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Atin Bainada <hi@atinb.me>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [net-next PATCH 3/3] net: dsa: qca8k: limit user ports access to
- the first CPU port on setup
-Message-ID: <20230727211658.3gkjql5jww44hr4c@skbuf>
-References: <20230724033058.16795-1-ansuelsmth@gmail.com>
- <20230724033058.16795-3-ansuelsmth@gmail.com>
+	"Jamal Hadi Salim" <jhs@mojatatu.com>,
+	SeongJae Park <sj@kernel.org>
+Subject: Re: [PATCH 4.14] net/sched: cls_u32: Fix reference counter leak leading to overflow
+Date: Thu, 27 Jul 2023 21:32:36 +0000
+Message-Id: <20230727213236.49413-1-sj@kernel.org>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20230727191554.21333-1-risbhat@amazon.com>
+References: 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230724033058.16795-3-ansuelsmth@gmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
 
-On Mon, Jul 24, 2023 at 05:30:58AM +0200, Christian Marangi wrote:
-> In preparation for multi-CPU support, set CPU port LOOKUP MEMBER outside
-> the port loop and setup the LOOKUP MEMBER mask for user ports only to
-> the first CPU port.
+On Thu, 27 Jul 2023 19:15:54 +0000 Rishabh Bhatnagar <risbhat@amazon.com> wrote:
+
+> From: Lee Jones <lee@kernel.org>
 > 
-> This is to handle flooding condition where every CPU port is set as
-> target and prevent packet duplication for unknown frames from user ports.
+> Upstream commit 04c55383fa5689357bcdd2c8036725a55ed632bc.
 > 
-> Secondary CPU port LOOKUP MEMBER mask will be setup later when
-> port_change_master will be implemented.
+> In the event of a failure in tcf_change_indev(), u32_set_parms() will
+> immediately return without decrementing the recently incremented
+> reference counter.  If this happens enough times, the counter will
+> rollover and the reference freed, leading to a double free which can be
+> used to do 'bad things'.
 > 
-> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+> In order to prevent this, move the point of possible failure above the
+> point where the reference counter is incremented.  Also save any
+> meaningful return values to be applied to the return data at the
+> appropriate point in time.
+> 
+> This issue was caught with KASAN.
+> 
+> Fixes: 705c7091262d ("net: sched: cls_u32: no need to call tcf_exts_change for newly allocated struct")
+> Suggested-by: Eric Dumazet <edumazet@google.com>
+> Signed-off-by: Lee Jones <lee@kernel.org>
+> Reviewed-by: Eric Dumazet <edumazet@google.com>
+> Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
+> Signed-off-by: David S. Miller <davem@davemloft.net>
+> Signed-off-by: Rishabh Bhatnagar <risbhat@amazon.com>
+
+Acked-by: SeongJae Park <sj@kernel.org>
+
 > ---
-
-Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
-
->  drivers/net/dsa/qca/qca8k-8xxx.c | 14 ++++++--------
->  1 file changed, 6 insertions(+), 8 deletions(-)
+>  net/sched/cls_u32.c | 21 ++++++++++++++-------
+>  1 file changed, 14 insertions(+), 7 deletions(-)
 > 
-> diff --git a/drivers/net/dsa/qca/qca8k-8xxx.c b/drivers/net/dsa/qca/qca8k-8xxx.c
-> index 31552853fdd4..6286a64a2fe3 100644
-> --- a/drivers/net/dsa/qca/qca8k-8xxx.c
-> +++ b/drivers/net/dsa/qca/qca8k-8xxx.c
-> @@ -1850,18 +1850,16 @@ qca8k_setup(struct dsa_switch *ds)
->  	if (ret)
->  		return ret;
+> diff --git a/net/sched/cls_u32.c b/net/sched/cls_u32.c
+> index fdbdcba44917..a4e01220a53a 100644
+> --- a/net/sched/cls_u32.c
+> +++ b/net/sched/cls_u32.c
+> @@ -774,11 +774,22 @@ static int u32_set_parms(struct net *net, struct tcf_proto *tp,
+>  			 struct nlattr *est, bool ovr)
+>  {
+>  	int err;
+> +#ifdef CONFIG_NET_CLS_IND
+> +	int ifindex = -1;
+> +#endif
 >  
-> +	/* CPU port gets connected to all user ports of the switch */
-> +	ret = qca8k_rmw(priv, QCA8K_PORT_LOOKUP_CTRL(cpu_port),
-> +			QCA8K_PORT_LOOKUP_MEMBER, dsa_user_ports(ds));
-> +	if (ret)
-> +		return ret;
+>  	err = tcf_exts_validate(net, tp, tb, est, &n->exts, ovr);
+>  	if (err < 0)
+>  		return err;
+>  
+> +#ifdef CONFIG_NET_CLS_IND
+> +	if (tb[TCA_U32_INDEV]) {
+> +		ifindex = tcf_change_indev(net, tb[TCA_U32_INDEV]);
+> +		if (ifindex < 0)
+> +			return -EINVAL;
+> +	}
+> +#endif
 > +
->  	/* Setup connection between CPU port & user ports
->  	 * Configure specific switch configuration for ports
->  	 */
->  	for (i = 0; i < QCA8K_NUM_PORTS; i++) {
-> -		/* CPU port gets connected to all user ports of the switch */
-> -		if (dsa_is_cpu_port(ds, i)) {
-> -			ret = qca8k_rmw(priv, QCA8K_PORT_LOOKUP_CTRL(i),
-> -					QCA8K_PORT_LOOKUP_MEMBER, dsa_user_ports(ds));
-> -			if (ret)
-> -				return ret;
-> -		}
-> -
->  		/* Individual user ports get connected to CPU port only */
->  		if (dsa_is_user_port(ds, i)) {
->  			ret = qca8k_rmw(priv, QCA8K_PORT_LOOKUP_CTRL(i),
+>  	if (tb[TCA_U32_LINK]) {
+>  		u32 handle = nla_get_u32(tb[TCA_U32_LINK]);
+>  		struct tc_u_hnode *ht_down = NULL, *ht_old;
+> @@ -806,14 +817,10 @@ static int u32_set_parms(struct net *net, struct tcf_proto *tp,
+>  	}
+>  
+>  #ifdef CONFIG_NET_CLS_IND
+> -	if (tb[TCA_U32_INDEV]) {
+> -		int ret;
+> -		ret = tcf_change_indev(net, tb[TCA_U32_INDEV]);
+> -		if (ret < 0)
+> -			return -EINVAL;
+> -		n->ifindex = ret;
+> -	}
+> +	if (ifindex >= 0)
+> +		n->ifindex = ifindex;
+>  #endif
+> +
+>  	return 0;
 
-FWIW, the remaining loop can be rewritten (in a separate patch) using
-dsa_switch_for_each_user_port(), which is actually an operation of lower
-complexity compared to "for" + "dsa_is_user_port".
+Very trivial nit: Someone might think the above new line is better not to be
+added?  I don't really care, though.
 
+>  }
+>  
 > -- 
 > 2.40.1
 > 
+
+Thanks,
+SJ
 
