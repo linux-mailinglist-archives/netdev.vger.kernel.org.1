@@ -1,191 +1,152 @@
-Return-Path: <netdev+bounces-21816-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21815-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60F1F764E3C
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 10:55:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46469764E39
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 10:55:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 391EA1C21536
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 08:55:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7C44B281E6C
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 08:55:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E801D531;
-	Thu, 27 Jul 2023 08:55:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BEC9D521;
+	Thu, 27 Jul 2023 08:55:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12FA8C2C2
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 08:55:25 +0000 (UTC)
-Received: from fllv0016.ext.ti.com (fllv0016.ext.ti.com [198.47.19.142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A0DC49D1;
-	Thu, 27 Jul 2023 01:55:23 -0700 (PDT)
-Received: from lelv0265.itg.ti.com ([10.180.67.224])
-	by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id 36R8spY3085752;
-	Thu, 27 Jul 2023 03:54:51 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1690448091;
-	bh=t+4azm4KlYuktXbiE4ao52lhG1hibV+ERkkezyQ6TDA=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=Op8Lw5S5B67i3rN97ILL+pvtnXXE0QzUSgqVj1k/QykvJtT2t6IEDF1Rc6jjGpn/n
-	 cR+LyumK80kYRyeqk5Zh/LpzKvGPdSih/iJ/Timyi2sA6bf9UjIkF5ZxwUNYtwGOtw
-	 g/42xtaOZ6I7SdpQYILTZv1nQqgAC+C1TuirUNvc=
-Received: from DLEE102.ent.ti.com (dlee102.ent.ti.com [157.170.170.32])
-	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 36R8spZv030181
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Thu, 27 Jul 2023 03:54:51 -0500
-Received: from DLEE111.ent.ti.com (157.170.170.22) by DLEE102.ent.ti.com
- (157.170.170.32) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Thu, 27
- Jul 2023 03:54:50 -0500
-Received: from fllv0040.itg.ti.com (10.64.41.20) by DLEE111.ent.ti.com
- (157.170.170.22) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Thu, 27 Jul 2023 03:54:50 -0500
-Received: from [10.249.135.225] (ileaxei01-snat2.itg.ti.com [10.180.69.6])
-	by fllv0040.itg.ti.com (8.15.2/8.15.2) with ESMTP id 36R8sg1j090960;
-	Thu, 27 Jul 2023 03:54:43 -0500
-Message-ID: <054c1444-10d7-6daa-ec62-0059c00cd32c@ti.com>
-Date: Thu, 27 Jul 2023 14:24:42 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AC3DD2F7
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 08:55:01 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84DA649D8
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 01:54:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1690448098;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=T/5paF6Ykf/HR83J793r3ewLreNBy44O4jgk14P4ZU8=;
+	b=H955EESaArrm4U0/PbLujsB1wQdnG+cdqIyGTPt0R/JpkbhRqIqhyAXP/9nDbVfYtTXauQ
+	/h5nX9Sr3P0cPJE21SP7HzVBNHsLjlroSz5dBmYgA1uNQelOTwTrGacVV7/9786tDOnM+w
+	EEsb2l2Y3G67HG5Rc+wEgqdMTSC8RXo=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-606-LJGOTPb8PqKERv0vqQX0nQ-1; Thu, 27 Jul 2023 04:54:57 -0400
+X-MC-Unique: LJGOTPb8PqKERv0vqQX0nQ-1
+Received: by mail-ed1-f71.google.com with SMTP id 4fb4d7f45d1cf-5227fb36095so433876a12.3
+        for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 01:54:56 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690448096; x=1691052896;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=T/5paF6Ykf/HR83J793r3ewLreNBy44O4jgk14P4ZU8=;
+        b=hwMesVcJCdVj5ByWjAQUAC62yfVpuSHfX5gE1Ai+QXn4SeIxNu/swcFyM7aAbU7uZK
+         QuCjZrtaegwfbaDwZsG2cOdYVQ4m2o6S+ZQOOrEMArWQZXj8cZwsms1Bac0AvV5Pm2Ae
+         kXwKi61yh/njlKnz5lGxIse6kcV5sOv0lQU1lhr8fpbffsKRoP8EqY0WVCYQ0V+0myAf
+         42ZtiKzOgA8vy39ZyOQqtcfmWL+XMfmYJjYIFUgxrZpVi21AqeKE2yQOlj/xaC2phNb/
+         hEU8SqcvxTwOLZn4w1fIv/hcn4BQrSWhofLLvW9kfG4Do9jp598qkhWosv3w65JJ2o8q
+         UlUg==
+X-Gm-Message-State: ABy/qLZwnPyezWccvBWU5TzTHpQKcVsPTV9ViqXZmcQsA9ufegcwJG2E
+	6R4v6GEunCT6eV2DD91UjYSsd/xoES75f0at2jNptbrfSovBzc/uqdadCmXhkUtYN0kUJI0RoJO
+	oMsudn5g3IH7zn2vG
+X-Received: by 2002:a17:906:4e:b0:994:54ff:10f6 with SMTP id 14-20020a170906004e00b0099454ff10f6mr1252759ejg.30.1690448095934;
+        Thu, 27 Jul 2023 01:54:55 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlHcD3CURJMdg3NYZ8AZsEK4plNky1gLjXd8Cwvx/xUzv38SfV6WriScq+IHFtwAhFGzRaQCvg==
+X-Received: by 2002:a17:906:4e:b0:994:54ff:10f6 with SMTP id 14-20020a170906004e00b0099454ff10f6mr1252744ejg.30.1690448095632;
+        Thu, 27 Jul 2023 01:54:55 -0700 (PDT)
+Received: from sgarzare-redhat ([193.207.217.102])
+        by smtp.gmail.com with ESMTPSA id s15-20020a170906960f00b00988dbbd1f7esm500842ejx.213.2023.07.27.01.54.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Jul 2023 01:54:55 -0700 (PDT)
+Date: Thu, 27 Jul 2023 10:54:51 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Arseniy Krasnov <avkrasnov@sberdevices.ru>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Bobby Eshleman <bobby.eshleman@bytedance.com>, kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kernel@sberdevices.ru, 
+	oxffffaa@gmail.com
+Subject: Re: [PATCH net-next v3 4/4] vsock/virtio: MSG_ZEROCOPY flag support
+Message-ID: <p4v23nvilf45gl3snuyvypnhi3zfrmbi7qxtrdalluflt773sf@yt6tkgxiliar>
+References: <20230720214245.457298-1-AVKrasnov@sberdevices.ru>
+ <20230720214245.457298-5-AVKrasnov@sberdevices.ru>
+ <091c067b-43a0-da7f-265f-30c8c7e62977@sberdevices.ru>
+ <2k3cbz762ua3fmlben5vcm7rs624sktaltbz3ldeevwiguwk2w@klggxj5e3ueu>
+ <51022d5f-5b50-b943-ad92-b06f60bef433@sberdevices.ru>
+ <3d1d76c9-2fdb-3dfe-222a-b2184cf17708@sberdevices.ru>
+ <o6axh6mxd6mxai2zrpax6wa25slns7ysz5xsegntskvfxl53mt@wowjgb3jazt6>
+ <f020405e-86af-1b66-c5f4-9bec98298f44@sberdevices.ru>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [EXTERNAL] Re: [EXTERNAL] Re: [EXTERNAL] Re: [PATCH v11 03/10]
- net: ti: icssg-prueth: Add Firmware config and classification APIs.
-Content-Language: en-US
-To: Simon Horman <simon.horman@corigine.com>
-CC: MD Danish Anwar <danishanwar@ti.com>,
-        Randy Dunlap
-	<rdunlap@infradead.org>,
-        Roger Quadros <rogerq@kernel.org>,
-        Vignesh
- Raghavendra <vigneshr@ti.com>, Andrew Lunn <andrew@lunn.ch>,
-        Richard Cochran
-	<richardcochran@gmail.com>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Krzysztof
- Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Rob Herring
-	<robh+dt@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-        Jakub Kicinski
-	<kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
-        "David S. Miller"
-	<davem@davemloft.net>, <nm@ti.com>, <srk@ti.com>,
-        <linux-kernel@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <linux-omap@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>
-References: <20230724112934.2637802-1-danishanwar@ti.com>
- <20230724112934.2637802-4-danishanwar@ti.com> <ZL94/L1RMlU5TiAb@corigine.com>
- <b2016718-b8e4-a1f8-92ed-f0d9e3cb9c17@ti.com> <ZL99WfF7iuzeMP78@corigine.com>
- <5a4b293f-7729-ee03-2432-cd49ff92d809@ti.com> <ZMDOWecss/9F+0nb@corigine.com>
-From: "Anwar, Md Danish" <a0501179@ti.com>
-In-Reply-To: <ZMDOWecss/9F+0nb@corigine.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
-X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=iso-8859-1; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <f020405e-86af-1b66-c5f4-9bec98298f44@sberdevices.ru>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 7/26/2023 1:12 PM, Simon Horman wrote:
-> On Tue, Jul 25, 2023 at 01:28:21PM +0530, Md Danish Anwar wrote:
->> On 25/07/23 1:14 pm, Simon Horman wrote:
->>> On Tue, Jul 25, 2023 at 01:10:30PM +0530, Md Danish Anwar wrote:
->>>> Hi Simon,
+On Thu, Jul 27, 2023 at 11:32:00AM +0300, Arseniy Krasnov wrote:
+>On 25.07.2023 15:28, Stefano Garzarella wrote:
+>> On Tue, Jul 25, 2023 at 12:16:11PM +0300, Arseniy Krasnov wrote:
+>>> On 25.07.2023 11:46, Arseniy Krasnov wrote:
+>>>> On 25.07.2023 11:43, Stefano Garzarella wrote:
+>>>>> On Fri, Jul 21, 2023 at 08:09:03AM +0300, Arseniy Krasnov wrote:
+
+[...]
+
+>>>>>>> +    t = vsock_core_get_transport(info->vsk);
+>>>>>>>
+>>>>>>> -        if (msg_data_left(info->msg) == 0 &&
+>>>>>>> -            info->type == VIRTIO_VSOCK_TYPE_SEQPACKET) {
+>>>>>>> -            hdr->flags |= cpu_to_le32(VIRTIO_VSOCK_SEQ_EOM);
+>>>>>>> +    if (t->msgzerocopy_check_iov &&
+>>>>>>> +        !t->msgzerocopy_check_iov(iov_iter))
+>>>>>>> +        return false;
+>>>>>
+>>>>> I'd avoid adding a new transport callback used only internally in virtio
+>>>>> transports.
 >>>>
->>>> On 25/07/23 12:55 pm, Simon Horman wrote:
->>>>> On Mon, Jul 24, 2023 at 04:59:27PM +0530, MD Danish Anwar wrote:
->>>>>> Add icssg_config.h / .c and icssg_classifier.c files. These are firmware
->>>>>> configuration and classification related files. These will be used by
->>>>>> ICSSG ethernet driver.
->>>>>>
->>>>>> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
->>>>>> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
->>>>>
->>>>> Hi Danish,
->>>>>
->>>>> some feedback from my side.
->>>>>
+>>>> Ok, I see.
 >>>>
->>>> Thanks for the feedback.
->>>>
->>>>> ...
 >>>>>
->>>>>> diff --git a/drivers/net/ethernet/ti/icssg_classifier.c b/drivers/net/ethernet/ti/icssg_classifier.c
->>>>>
->>>>> ...
->>>>>
->>>>>> +void icssg_class_set_mac_addr(struct regmap *miig_rt, int slice, u8 *mac)
->>>>>
->>>>> This function appears to be unused.
->>>>> Perhaps it would be better placed in a later patch?
->>>>>
->>>>> Or perhaps not, if it makes it hard to split up the patches nicely.
->>>>> In which case, perhaps the __maybe_unused annotation could be added,
->>>>> temporarily.
->>>>>
->>>>
->>>> Due to splitting the patch into 8-9 patches, I had to introduce these helper
->>>> APIs earlier. All these APIs are helper APIs, they will be used in patch 6
->>>> (Introduce ICSSG Prueth driver).
->>>>
->>>> I had this concern that some APIs which will be used later but introduced
->>>> earlier can create some warnings, before splitting the patches.
->>>>
->>>> I had raised this concern in [1] and asked Jakub if it would be OK to introduce
->>>> these APIs earlier. Jakub said it would be fine [2], so I went ahead with this
->>>> approach.
->>>>
->>>> It will make very hard to break patches if these APIs are introduced and used
->>>> in same patch.
+>>>>> Usually the transport callbacks are used in af_vsock.c, if we need a
+>>>>> callback just for virtio transports, maybe better to add it in struct
+>>>>> virtio_vsock_pkt_info or struct virtio_vsock_sock.
 >>>
->>> Thanks, I understand.
->>>
->>> In that case my suggestion is to, temporarily, add __maybe_unused,
->>> which will allow static analysis tools to work more cleanly over the
->>> series. It is just a suggestion, not a hard requirement.
->>>
->>> Probably something along those lines applies to all the
->>> review I provided in my previous email. Please use your discretion here.
+>>> Hm, may be I just need to move this callback from 'struct vsock_transport' to parent 'struct virtio_transport',
+>>> after 'send_pkt' callback. In this case:
+>>> 1) AF_VSOCK part is not touched.
+>>> 2) This callback stays in 'virtio_transport.c' and is set also in this file.
+>>>   vhost and loopback are unchanged - only 'send_pkt' still enabled in both
+>>>   files for these two transports.
 >>
->> For now I think I will leave it as it is. Let reviewers review all other
->> patches. Let's see if there are any other comments on all the patches in this
->> series. If there are any more comments on other patches, then while re-spinning
->> next revision I will keep this in mind and try to add __maybe_unused tags in
->> all APIs that are used later.
-> 
-> Sure, that sounds reasonable.
-> 
+>> Yep, this could also work!
+>>
+>> Stefano
+>
+>Great! I'll send this implementation when this patchset for MSG_PEEK will be merged
+>to net-next as both conflicts with each other.
+>
+>https://lore.kernel.org/netdev/20230726060150-mutt-send-email-mst@kernel.org/T/#m56f3b850361a412735616145162d2d9df25f6350
 
-I will be adding __maybe_unused tags to all the helper APIs introduced 
-before the main driver patch. In the main driver patch I will be 
-removing all those __maybe_unused tags and all the helper APIs will be 
-back to their original name (without __maybe_unused tags)
+Ack!
 
->> The idea behind splitting the patches was to get them reviewed individually as
->> it is quite difficult to get one big patch reviewed as explained by Jakub. And
->> these warnings were expected. If there are any other comments on this series, I
->> will try to address all of them together in next revision.
-> 
-> Yes, I understand.
-> Thanks for splitting things up into multiple patches.
-> I know that is a lot of work. But it is very helpful.
-> 
->> Meanwhile, Please let me know if you have any comments on other patches
->> in this series.
-> 
-> Will do, but I nothing to add at this time.
+Thanks,
+Stefano
 
--- 
-Thanks and Regards,
-Md Danish Anwar
 
