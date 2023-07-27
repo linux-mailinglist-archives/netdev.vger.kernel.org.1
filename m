@@ -1,216 +1,143 @@
-Return-Path: <netdev+bounces-21876-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21877-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB99F765200
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 13:13:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id F366D765218
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 13:18:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9736E2822AB
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 11:13:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ADE1E28225C
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 11:18:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96D5715489;
-	Thu, 27 Jul 2023 11:13:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FB10154A9;
+	Thu, 27 Jul 2023 11:18:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A67BAD2E
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 11:13:18 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D43B9C
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 04:13:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1690456395;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kIORYueR8tQwkIlZ8oUtnpd4mJbrxO/lMh2S7W9x4Wk=;
-	b=BzONDiUqwLN0anNdMEtx/UTOskZo0c/1FhH5AU48EDXe2yJorRNS/aJhyTE2U3qfEPHUIL
-	29oLwhvyFZZSRHsTxAd8bE68WoBc+e7udxubahi+Q/IbXnTnfYf7+GYmj3F7lBhBNBENam
-	HfwFMb/k+zgqiiYBGVOcbwcFDJ5YqyQ=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-686-BtGAHVdcNU6royJO0p8VoQ-1; Thu, 27 Jul 2023 07:13:14 -0400
-X-MC-Unique: BtGAHVdcNU6royJO0p8VoQ-1
-Received: by mail-ed1-f71.google.com with SMTP id 4fb4d7f45d1cf-51da39aa6dcso518134a12.2
-        for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 04:13:13 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690456393; x=1691061193;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :to:subject:cc:user-agent:mime-version:date:message-id:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=kIORYueR8tQwkIlZ8oUtnpd4mJbrxO/lMh2S7W9x4Wk=;
-        b=ZqVGsoUfIFCgMxvIQI4VcjNqYRAZgYwmYrAouzUk2C41wfHdOEaavk/KRYJ1kkvs3b
-         AVjzJ2rkCKNN2A3c/CJczD1OEjHwZ1UJrT0V7dudWrCKMGWcDCh0nPUnlisOL1Mas4Ft
-         clT7WyU4/A/ZLXqMAKxYA4MJIRjZTkPZ05EkW7rBzxyxf8Dre6qEl98osJZAfdDyXL7i
-         eiqNSv6F9so6TurDFjZaGwkedFdc01eQZGDHnuUQXjGhW1XCnHfe0rRPCwb7gavt05LB
-         WBErZfpITtyudm/fX30puGonrcfGS5vzIOZrO4WN+Gl/tWkEXJHtRXRiK1oFjkbaj+G1
-         cvww==
-X-Gm-Message-State: ABy/qLZYBfF1kKste2NZZGoMLPSy//Xbg4fiRR+5uPh4wj8weJz/HIM+
-	2zCvEAYxWE5ZoDoinPqB5Wgp+qWd9dRRoNHxl7G0UbhEntu15NWZbiZOvMH5pldSgLHY8CFX+tD
-	u7SBeOTYaJnM/xNjN
-X-Received: by 2002:a17:906:3197:b0:98d:cd3e:c18f with SMTP id 23-20020a170906319700b0098dcd3ec18fmr1598508ejy.72.1690456393076;
-        Thu, 27 Jul 2023 04:13:13 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlFqK3O/7UO1KFVznkNq/qxTau4FDVlTt2cWwvQU0tJR/j+Id5u3sfes/xs7+rhzr3XHCaWT3A==
-X-Received: by 2002:a17:906:3197:b0:98d:cd3e:c18f with SMTP id 23-20020a170906319700b0098dcd3ec18fmr1598485ejy.72.1690456392762;
-        Thu, 27 Jul 2023 04:13:12 -0700 (PDT)
-Received: from [192.168.42.222] (194-45-78-10.static.kviknet.net. [194.45.78.10])
-        by smtp.gmail.com with ESMTPSA id u7-20020a170906408700b009786ae9ed50sm634077ejj.194.2023.07.27.04.13.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 27 Jul 2023 04:13:11 -0700 (PDT)
-From: Jesper Dangaard Brouer <jbrouer@redhat.com>
-X-Google-Original-From: Jesper Dangaard Brouer <brouer@redhat.com>
-Message-ID: <3659ea35-8d03-aae7-53c0-09181bb1b69d@redhat.com>
-Date: Thu, 27 Jul 2023 13:13:10 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6859014A97
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 11:18:16 +0000 (UTC)
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2130.outbound.protection.outlook.com [40.107.223.130])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0AFAC110
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 04:18:15 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=KWFWBAaVHytUkKKvFZrFMEfhOR1DAFJIGk8Zr0qROCOVqjUNZvuAaVm5G18PyOGuZn4pvobzw+mOcA6MVt50l6GLpb1ePxFec8f8odFvOd1zVqa6YaHwEImLUXfPbMh0sAPCuRy3xNvWxwpBKenzUOsi2J1cN8nQoqt+ckxdueHw1AkDKCpiV0qTQkW2UmILYFuceLgxb1ppP5tyoVlDy6Z+TcpjqGNnvyENzGugPP1vUdfd6mVRza8wkFhrUbxcLD2dariTB+e6DNShC8WBIUKCIVlYvuo76tfYhsJA7vqk1WbXd6BEu5lewFVh8JFqHYH1wN3lVRA3U7JoaD4w3g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=6YAMgg9vn7Y9L56yVJuIDw+G9XVlbZzqULsRBDBlvQ4=;
+ b=Ad5xNMKNiQ8MJY1cl0SvlhEu4pLBrpLEorRX3KgqfWbPST45YaMqdqOJGrXqk0hLp+3q0el7dl2UeGzNirW2QVgzXQLKmG8+qDNfl9enJAwn4IdqAil3jfNme9OMhaC3m9xhH4uhMJLpAz0CkpZMkvOs1QJQ0k94JOX8J/XKckaDzXREfhdL0PBsv9WaXvIXkNssFuSam3f7U3vE5sjRNhfLD6hyFPDMFwwHr2bXXdLu7vbbMEJqYP85V5e9BTi2Md9w0ub8sFIyZwE0IfFKv4Gi073gHirDCBk7rEW+u6Acdrhc3e8Vn1e8i4bDu5aCkvmHRtI74SpkTqjos8cwBw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
+ dkim=pass header.d=corigine.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=6YAMgg9vn7Y9L56yVJuIDw+G9XVlbZzqULsRBDBlvQ4=;
+ b=mfFeQYGtoEwwzVlz8uA77+pZm1KBN+xfdqD8QjxKrw6f9E8qtrzIvXqpCsNP62uRi0rNPoYBL4Ljg7qnY65kWEMl340LFnRKr6SqRqgDBvgHUeB/WH5raZ28WGQPp26eC5MoBINtCSaoZL2La6QFosjGMC96V3AXtpL5AnS7Q8s=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=corigine.com;
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
+ by CO6PR13MB6047.namprd13.prod.outlook.com (2603:10b6:303:14e::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.29; Thu, 27 Jul
+ 2023 11:18:11 +0000
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::fde7:9821:f2d9:101d]) by PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::fde7:9821:f2d9:101d%7]) with mapi id 15.20.6631.026; Thu, 27 Jul 2023
+ 11:18:11 +0000
+Date: Thu, 27 Jul 2023 13:18:04 +0200
+From: Simon Horman <simon.horman@corigine.com>
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Ido Schimmel <idosch@idosch.org>,
+	Beniamino Galvani <bgalvani@redhat.com>,
+	Ido Schimmel <idosch@nvidia.com>
+Subject: Re: [PATCHv4 net-next] IPv6: add extack info for IPv6 address
+ add/delete
+Message-ID: <ZMJSbIgDP3j1siMO@corigine.com>
+References: <20230726023905.555509-1-liuhangbin@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230726023905.555509-1-liuhangbin@gmail.com>
+X-ClientProxiedBy: AM0PR03CA0056.eurprd03.prod.outlook.com (2603:10a6:208::33)
+ To PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Cc: brouer@redhat.com, Jesper Dangaard Brouer <jbrouer@redhat.com>,
- Andrew Kanner <andrew.kanner@gmail.com>, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org,
- linux-kernel-mentees@lists.linuxfoundation.org,
- syzbot+f817490f5bd20541b90a@syzkaller.appspotmail.com,
- John Fastabend <john.fastabend@gmail.com>
-Subject: Re: [PATCH v3] drivers: net: prevent tun_get_user() to exceed xdp
- size limits
-To: Paolo Abeni <pabeni@redhat.com>, Jason Wang <jasowang@redhat.com>,
- David Ahern <dsahern@gmail.com>
-References: <20230725155403.796-1-andrew.kanner@gmail.com>
- <CACGkMEt=Cd8J995+0k=6MT1Pj=Fk9E_r2eZREptLt2osj_H-hA@mail.gmail.com>
- <ab722ec1-ae45-af1f-b869-e7339402c852@redhat.com>
- <179979e6-eb8a-0300-5445-999b9366250a@gmail.com>
- <0c06b067-349c-9fe2-2cc3-36c149fd5277@gmail.com>
- <CACGkMEsYzd1FphP-Ym9T9YjA9ZNBw7Mnw5xQ75dytQMJxDK3cg@mail.gmail.com>
- <220fc36ba1086c1390ba087d08561b61762c965a.camel@redhat.com>
-Content-Language: en-US
-In-Reply-To: <220fc36ba1086c1390ba087d08561b61762c965a.camel@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|CO6PR13MB6047:EE_
+X-MS-Office365-Filtering-Correlation-Id: e5bb7257-634b-4bfe-a82d-08db8e9328c9
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	2zUifxeDB0nyhi0RnFnlTqbAGVlhJDshl8HeftwnLJpgW6hM//1JqIAvJvGpg04KTGzi7InxxspDCAvcuzHAMV1u1KlIvzSaCDwRugljd1sfqfv7ERLjwGP69lEB+IHuovhV3GxwdPKSNT+jUDAsfWK4eErQOb7oCr8ruOopVZmV9gPy7SHzSqIF9f54UIWF9U+UNjHSMvHnyvmPiN9dkTa77VUG/siqgwNHojHe4tagzrAaHVDVh5p8tAuTmLwlKDSIc+xlBPe+KsOShjOI4pDiYzn0KBDdTIjXztvu8gUlCl6SP8SNZmsts2PfaOMJVeR6JGrWnRvLZhZnwT2AcN7CB7jFsd7C8unN2XyztvUGab2nauzugf9dc9I7fzqjiTKwWjpII7ArzwL3mo0z2V5+5BDh+wU8lLLaw8SjtpmfKK5cCleUWs5GCn4uinAo5eCaDuroIVeoHGuxMkpmHGX3T3pp05zZrRaSQcXinvsnhELwarm6XNLtqUtY9kfnmVA6HO/PwV0TNozZymuGZjxkvJio6qH9vbQufj6nVDpPAmaPdys9arqhoiBzC5tG0AukO7pOVc+ErortK2MKhH1KPvzof0lHx6kqE0LJS2I=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(366004)(136003)(346002)(39830400003)(396003)(376002)(451199021)(4744005)(2906002)(316002)(41300700001)(44832011)(7416002)(8676002)(8936002)(5660300002)(36756003)(86362001)(6512007)(6506007)(478600001)(6666004)(6486002)(83380400001)(186003)(2616005)(38100700002)(4326008)(6916009)(66476007)(66556008)(66946007)(54906003);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?OrPVJhwMeqpsr5Nro5GaE2hItWOaOScc/zb/FwrKJqa99Kd78U4iilu1Uoro?=
+ =?us-ascii?Q?rHig9Dkjj4JunIpN2DqrkCITeGQaNbWeR8r8S5j3tzBCUijnPBcbToMDNfUn?=
+ =?us-ascii?Q?B4G0XrAcvgwMY7BhQGtIjZMhgDdSQgJng0u3x4cnxgArN5akEU6zXK4aZpPo?=
+ =?us-ascii?Q?Kb4QS75OnXqXUgMhg+uYJPxsnFkkeUaF4Lytsry16EkQheK8LmEBAvdmU2P2?=
+ =?us-ascii?Q?8QBjqrRCDZ4uSQqY6OuEP+PrlAkLUPlROad73pcdUrKvUaFXXB627A9bEcUC?=
+ =?us-ascii?Q?2cDkZyY2c3lOpjbYdhNoIXJc8oWLZr7+c3hg+Co8ejPrJ1DhP8HfvTAUgrju?=
+ =?us-ascii?Q?5/S6VsXYRpgBvlPeXZJANQmlrUY15KzY772nDbzUmL43hLER1+8RYl4B6/E6?=
+ =?us-ascii?Q?dggPYj2hUoUTbYnF/1fWvoM0KIKY1HBUMwiiIPneHJgEF5jiX15uvE24TsXM?=
+ =?us-ascii?Q?uiMfNUD0hGsdoIlzG9pTxQa4WJkXSu7748XTeeJAYH1HDJUlMLA8hRgyHDIw?=
+ =?us-ascii?Q?XWRCiTJ5DFOFXQcBrc398Vt8oFusVJHyCfF4Sblv1KUgSCHaPN6A72ukO7XM?=
+ =?us-ascii?Q?2PzVtgPLz5NszBkCxbn1oCUGlgZD1HZwRVpua+N3fOGo+5w7Rcc70jxnEHRp?=
+ =?us-ascii?Q?zQ2rDpxPy9MLcq3FH24Ug7Op1Lh+6uMd7hMZ3IPwFtqMm6t/18r+KiCB+NvO?=
+ =?us-ascii?Q?LRthv+Q71YOHvqZwegiprznJ6OksNaHc5Lp2+flvcj4F67ZdTDmEgN1qMNuO?=
+ =?us-ascii?Q?M8WI8VELLL6v7MjzNvtza7I2JfDGQPoHz1/0j4cclZbDBfR5KnWdvGrUwmAP?=
+ =?us-ascii?Q?DDf4HrrgWy8wu46H6GPigVCbweYoG+GvkYOvnwnr9aiE31SdB7OZ3qaW9+3s?=
+ =?us-ascii?Q?+RZILezyo6cAamNorB7G+tTHKIyBy6O1oaGf0GtNjmJdK94I4VVgiegbfl9u?=
+ =?us-ascii?Q?0M3vEndmQmzchVxC53k93wLxqnoZydDYmaT2OSwp2RE/8iG9zdgOOa5852KV?=
+ =?us-ascii?Q?9ZSxdWaqsug9ybgdLTMeKMZQJyL4bvSN8YZO6Adx5d3K+updiJlveb1hr1yf?=
+ =?us-ascii?Q?FEZ+kpnafz6MV1chSHFbz9QpWexmdtZZzsQ/c9W8W+3tWwOWwuvvbdcS4WwF?=
+ =?us-ascii?Q?2ZU2ovmpjehP3OH2/hsnorgITLHECRVUAhaONua5HiIZy83zXyO5+cXDmSkM?=
+ =?us-ascii?Q?za9nC2ikR3xiIRPyO80AuORGWvx65oISXvT6SsIsT6aa6vHCq+N8rFNRPc8z?=
+ =?us-ascii?Q?LIYk7Oeqa3d76yoclhtRv2BA0sGoEcA5uztNsQh6ToHyi14Zh39YURRZuFTa?=
+ =?us-ascii?Q?G1DKqXi4FZ/jRE+nJxbtyi0aU5reAxpaAOjCc3ZY3R6PiQLjN8+jVrJsndmr?=
+ =?us-ascii?Q?V0GVcWmk7qhnUfRng2QCQvjXzl0Ej3q9Q63WB29MibNXxGMc0P62dSeD61hM?=
+ =?us-ascii?Q?fUAM8OcQ/Pcj+2VYkGYwAL19gKnV/R62zYNpTzkfSosbtt0/9SUrMLjxHSih?=
+ =?us-ascii?Q?5beOW35iwLHUpkAbtYH+rFWjNaPep5TI/JLV74kDGNbRy9HZYc2Q83MgYoIi?=
+ =?us-ascii?Q?5GbkO9FBBsNczQlSM0fQ2SechWm60oLriyDsA1Zm6ZuwGLGuLAmUfYvkAn7V?=
+ =?us-ascii?Q?ZdbBOiv6W2MM8ACrhSK+TjvCp1JK6GD6VPeDlTTW0wFWVmqbOK4kQo1gaOUn?=
+ =?us-ascii?Q?/zSaeQ=3D=3D?=
+X-OriginatorOrg: corigine.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e5bb7257-634b-4bfe-a82d-08db8e9328c9
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Jul 2023 11:18:10.1997
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: XwOab/mW6zdLqCuWmfTxbvcnM4MrGjkWh8DdVuQunwqPJeoCJ3pwB5X+8IvhaBcQ2xtTK8aNu86wHlJ2Ukzx8MymuN3BV+A0/s1UYUKby6s=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO6PR13MB6047
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-
-
-On 27/07/2023 11.30, Paolo Abeni wrote:
-> On Thu, 2023-07-27 at 14:07 +0800, Jason Wang wrote:
->> On Thu, Jul 27, 2023 at 8:27 AM David Ahern <dsahern@gmail.com> wrote:
->>>
->>> On 7/26/23 1:37 PM, David Ahern wrote:
->>>> On 7/26/23 3:02 AM, Jesper Dangaard Brouer wrote:
->>>>> Cc. John and Ahern
->>>>>
->>>>> On 26/07/2023 04.09, Jason Wang wrote:
->>>>>> On Tue, Jul 25, 2023 at 11:54 PM Andrew Kanner
->>>>>> <andrew.kanner@gmail.com> wrote:
->>>>>>>
->>>>>>> Syzkaller reported the following issue:
->>>>>>> =======================================
->>>>>>> Too BIG xdp->frame_sz = 131072
->>>>>
->>>>> Is this a contiguous physical memory allocation?
->>>>>
->>>>> 131072 bytes equal order 5 page.
->>>>>
->>>>> Looking at tun.c code I cannot find a code path that could create
->>>>> order-5 skb->data, but only SKB with order-0 fragments.  But I guess it
->>>>> is the netif_receive_generic_xdp() what will realloc to make this linear
->>>>> (via skb_linearize())
->>>>
->>>>
->>>> get_tun_user is passed an iov_iter with a single segment of 65007
->>>> total_len. The alloc_skb path is hit with an align size of only 64. That
->>>> is insufficient for XDP so the netif_receive_generic_xdp hits the
->>>> pskb_expand_head path. Something is off in the math in
->>>> netif_receive_generic_xdp resulting in the skb markers being off. That
->>>> causes bpf_prog_run_generic_xdp to compute the wrong frame_sz.
->>>
->>>
->>> BTW, it is pskb_expand_head that turns it from a 64kB to a 128 kB
->>> allocation. But the 128kB part is not relevant to the "bug" here really.
->>>
-
-True, it is another "bug"/unexpected-behavior that SKB gets reallocated
-to be 128KiB. We should likely solve this in another patch.
-
->>> The warn on getting tripped in bpf_xdp_adjust_tail is because xdp
->>> generic path is skb based and can have a frame_sz > 4kB. That's what the
->>> splat is about.
-
-Agree, that the warn condition should be changed, even removed.
-It is interesting that this warn caught this unexpected-behavior of
-expanding to 128KiB.
-
->>
->> Other possibility:
->>
->> tun_can_build_skb() doesn't count XDP_PACKET_HEADROOM this may end up
->> with producing a frame_sz which is greater than PAGE_SIZE as well in
->> tun_build_skb().
-
-True, and the way I read the tun_build_skb() code, via 
-skb_page_frag_refill(),
-it can produce an SKB with data size (buflen) upto order-3 = 32KiB 
-(SKB_FRAG_PAGE_ORDER).
-
-Thus, the existing check in tun_can_build_skb() for PAGE_SIZE can/should 
-be relaxed?
-(Please correct me as I don't fully understand tun_get_user() code)
-
->>
->> And rethink this patch, it looks wrong since it basically drops all
->> packets whose buflen is greater than PAGE_SIZE since it can't fall
->> back to tun_alloc_skb().
->>
-
-I agree, this is why I reacted, as this version of the patch could
-potentially cause issues and packet drops.
-
->>>
->>> Perhaps the solution is to remove the WARN_ON.
->>
->> Yes, that is what I'm asking if this warning still makes sense in V1.
+On Wed, Jul 26, 2023 at 10:39:05AM +0800, Hangbin Liu wrote:
+> Add extack info for IPv6 address add/delete, which would be useful for
+> users to understand the problem without having to read kernel code.
 > 
-> I understand the consensus is solving the issue by changing/removing
-> the WARN_ON() in XDP. I think it makes sense, I guess the same warn can
-> be reached via packet socket xmit on veth or similar topology.
-> 
+> Suggested-by: Beniamino Galvani <bgalvani@redhat.com>
+> Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+> Reviewed-by: David Ahern <dsahern@kernel.org>
+> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
 
-Yes, we can completely remove this check.  The original intend was to
-catch cases where XDP drivers have not been updated to use xdp.frame_sz,
-but that is not longer a concern (since xdp_init_buff).
-
-It was added (by me) in commit:
-  - c8741e2bfe87 ("xdp: Allow bpf_xdp_adjust_tail() to grow packet size")
-    - v5.8-rc1
-  - as part of merge 5cc5924d8315
-
-I'm sure it is safe to remove since commit:
-  - 43b5169d8355 ("net, xdp: Introduce xdp_init_buff utility routine")
-    - v5.12-rc1
-
-where we introduced xdp_init_buff() helper, which all XDP driver use today.
-Question is what "Fixes:" tag should the patch have?
-
-To Andrew, will you
-  (1) send a new patch that removes this check instead?
-  (2) have cycles to investigate why the unexpected-behavior of
-expanding to 128KiB happens?
-
---Jesper
-
+Reviewed-by: Simon Horman <simon.horman@corigine.com>
 
