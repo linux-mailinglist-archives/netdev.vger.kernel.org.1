@@ -1,81 +1,191 @@
-Return-Path: <netdev+bounces-21839-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21840-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C51F764F3B
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 11:19:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46E7E764F5C
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 11:20:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0805B282225
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 09:18:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3273A1C2135E
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 09:20:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2262D100BD;
-	Thu, 27 Jul 2023 09:18:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F271E101DB;
+	Thu, 27 Jul 2023 09:20:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14119FC16
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 09:18:56 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E185459E3
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 02:18:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=dSNsN/LTsKX10D6cdFw1cxgWEKBK7bNscrS4QLCJv6k=; b=ocf8x/lDQIZWAM7kjMqz6Y86QO
-	I35OhdbMgzkJAO/lETUiyDRD97U/R8K8UFC5qj3YFwVf8QtX/48mGFVdFY5vIDaqQEWSb7l/y+zfZ
-	5ZoraRkmMC+dqphEPxkwpZsl2Z00IXzsw1ie4amMVpbK5W9jH1PUaZJG97dXsVzQ8ch0=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qOx8w-002RE9-LP; Thu, 27 Jul 2023 11:18:46 +0200
-Date: Thu, 27 Jul 2023 11:18:46 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Feiyang Chen <chenfeiyang@loongson.cn>
-Cc: hkallweit1@gmail.com, peppe.cavallaro@st.com,
-	alexandre.torgue@foss.st.com, joabreu@synopsys.com,
-	chenhuacai@loongson.cn, linux@armlinux.org.uk, dongbiao@loongson.cn,
-	loongson-kernel@lists.loongnix.cn, netdev@vger.kernel.org,
-	loongarch@lists.linux.dev, chris.chenfeiyang@gmail.com
-Subject: Re: [PATCH v2 07/10] net: stmmac: dwmac-loongson: Add LS7A support
-Message-ID: <1bbba61c-19b7-48bb-8c93-0741b43abda5@lunn.ch>
-References: <cover.1690439335.git.chenfeiyang@loongson.cn>
- <dd88ed0f53e9ee0f653ddeb78b326f8eb44bdbd1.1690439335.git.chenfeiyang@loongson.cn>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E12DAF9FA
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 09:20:33 +0000 (UTC)
+Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 654C19AA9
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 02:20:07 -0700 (PDT)
+Received: by mail-pg1-x534.google.com with SMTP id 41be03b00d2f7-55c79b62f3aso52630a12.1
+        for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 02:20:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1690449603; x=1691054403;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=cb79b5va6gFfSJneJi5lY4rGeRwgOukMupryAUVW6kI=;
+        b=YCWSTu9U7oWMIxlz666y2QG523oA3QX5qQv7ZytrRVu6fJw8dRHyUfgDIT1gU69FG8
+         THUguZfsi1KeJApNPmw0jxmv7f8KFlV4UTxlH9XbeulHxoa/ldWA269gxLsqPd7fsDUL
+         3wrs7fjkTjLEvVIuFKVgIWoEr+OE7ZGV4f2QptD03saCT0x1g+4lQFRHQ9ruqft2Rhft
+         lQsKff8YPeqYMpcr6auHVhvyZ4A0b6O2v3t87pxn8FkR9lCy8v/ntqGuUNKm9Zf3rtD1
+         Pt/WGCyBPHzJX+fw7G8Ac9jWyGkR4LQhg8QoLvoZwbFMr8CqGaDCh/cUGTEJkXif0gLU
+         NqYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690449603; x=1691054403;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=cb79b5va6gFfSJneJi5lY4rGeRwgOukMupryAUVW6kI=;
+        b=GwUBEtW6g1tHesaBtPjlWM9eyRRtGJqmpS1TzNsbUIFxucWIJPKhKP58N079BGCxma
+         NDYW9wwTmEDttyrcO9j767WILDJeP0zCLDwztXXAJXN9CV6FWunLVEMY7qefdE4I6oVe
+         orPf1Yp7MoUiYxbTRIuMNxnhIwCqViyk+EAnUcCM1dTrVyZFvV8dKCdpxhW02nhBZoFI
+         24bm3yvb4HGOvsmCqQPPJRMsFu3q/MF/cYv6l1MQBpDssma3H/XY6lon4l1ngJIdSSPX
+         F7K5nLMZnT3EEFZ7ApZQuhrK5k3hFSD8WoLrrk0oh9w/V2CvU0rw1iy12AJqzjMt3pIv
+         QiOQ==
+X-Gm-Message-State: ABy/qLaWuwsoc4Om2fw7TwCPD0shhjmEQozT1i9ii7RZVtM1tvcsUIBq
+	uSd36xuy5DyeQQftTQE11yHBSA==
+X-Google-Smtp-Source: APBJJlH+dm0mCsob/js+yZXnXAfwEH4KDToex0aS0MQ56gbjyJxo+xxDZzOa2lZ9gy3mjvwdmWQa2g==
+X-Received: by 2002:a17:902:da82:b0:1b8:811:b079 with SMTP id j2-20020a170902da8200b001b80811b079mr5785873plx.0.1690449602958;
+        Thu, 27 Jul 2023 02:20:02 -0700 (PDT)
+Received: from [10.70.252.135] ([203.208.167.147])
+        by smtp.gmail.com with ESMTPSA id 5-20020a170902c24500b001bbb7d8fff2sm1109046plg.116.2023.07.27.02.19.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 27 Jul 2023 02:20:02 -0700 (PDT)
+Message-ID: <5f1b85b8-3655-1700-4d16-fa056b31ceeb@bytedance.com>
+Date: Thu, 27 Jul 2023 17:19:49 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <dd88ed0f53e9ee0f653ddeb78b326f8eb44bdbd1.1690439335.git.chenfeiyang@loongson.cn>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.12.0
+Subject: Re: [PATCH v3 40/49] xfs: dynamically allocate the xfs-qm shrinker
+Content-Language: en-US
+To: akpm@linux-foundation.org, david@fromorbit.com, tkhai@ya.ru,
+ vbabka@suse.cz, roman.gushchin@linux.dev, djwong@kernel.org,
+ brauner@kernel.org, paulmck@kernel.org, tytso@mit.edu, steven.price@arm.com,
+ cel@kernel.org, senozhatsky@chromium.org, yujie.liu@intel.com,
+ gregkh@linuxfoundation.org, muchun.song@linux.dev
+Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org, x86@kernel.org,
+ kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
+ linux-erofs@lists.ozlabs.org, linux-f2fs-devel@lists.sourceforge.net,
+ cluster-devel@redhat.com, linux-nfs@vger.kernel.org,
+ linux-mtd@lists.infradead.org, rcu@vger.kernel.org, netdev@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linux-arm-msm@vger.kernel.org,
+ dm-devel@redhat.com, linux-raid@vger.kernel.org,
+ linux-bcache@vger.kernel.org, virtualization@lists.linux-foundation.org,
+ linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
+ linux-xfs@vger.kernel.org, linux-btrfs@vger.kernel.org,
+ Muchun Song <songmuchun@bytedance.com>
+References: <20230727080502.77895-1-zhengqi.arch@bytedance.com>
+ <20230727080502.77895-41-zhengqi.arch@bytedance.com>
+From: Qi Zheng <zhengqi.arch@bytedance.com>
+In-Reply-To: <20230727080502.77895-41-zhengqi.arch@bytedance.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-> +static void common_default_data(struct pci_dev *pdev,
-> +				struct plat_stmmacenet_data *plat)
->  {
-> +	plat->bus_id = (pci_domain_nr(pdev->bus) << 16) | PCI_DEVID(pdev->bus->number, pdev->devfn);
+
+
+On 2023/7/27 16:04, Qi Zheng wrote:
+> In preparation for implementing lockless slab shrink, use new APIs to
+> dynamically allocate the xfs-qm shrinker, so that it can be freed
+> asynchronously using kfree_rcu(). Then it doesn't need to wait for RCU
+> read-side critical section when releasing the struct xfs_quotainfo.
+> 
+> Signed-off-by: Qi Zheng <zhengqi.arch@bytedance.com>
+> Reviewed-by: Muchun Song <songmuchun@bytedance.com>
+> ---
+>   fs/xfs/xfs_qm.c | 26 +++++++++++++-------------
+>   fs/xfs/xfs_qm.h |  2 +-
+>   2 files changed, 14 insertions(+), 14 deletions(-)
+> 
+> diff --git a/fs/xfs/xfs_qm.c b/fs/xfs/xfs_qm.c
+> index 6abcc34fafd8..032f0a208bd2 100644
+> --- a/fs/xfs/xfs_qm.c
+> +++ b/fs/xfs/xfs_qm.c
+> @@ -504,8 +504,7 @@ xfs_qm_shrink_scan(
+>   	struct shrinker		*shrink,
+>   	struct shrink_control	*sc)
+>   {
+> -	struct xfs_quotainfo	*qi = container_of(shrink,
+> -					struct xfs_quotainfo, qi_shrinker);
+> +	struct xfs_quotainfo	*qi = shrink->private_data;
+>   	struct xfs_qm_isolate	isol;
+>   	unsigned long		freed;
+>   	int			error;
+> @@ -539,8 +538,7 @@ xfs_qm_shrink_count(
+>   	struct shrinker		*shrink,
+>   	struct shrink_control	*sc)
+>   {
+> -	struct xfs_quotainfo	*qi = container_of(shrink,
+> -					struct xfs_quotainfo, qi_shrinker);
+> +	struct xfs_quotainfo	*qi = shrink->private_data;
+>   
+>   	return list_lru_shrink_count(&qi->qi_lru, sc);
+>   }
+> @@ -680,16 +678,18 @@ xfs_qm_init_quotainfo(
+>   	if (XFS_IS_PQUOTA_ON(mp))
+>   		xfs_qm_set_defquota(mp, XFS_DQTYPE_PROJ, qinf);
+>   
+> -	qinf->qi_shrinker.count_objects = xfs_qm_shrink_count;
+> -	qinf->qi_shrinker.scan_objects = xfs_qm_shrink_scan;
+> -	qinf->qi_shrinker.seeks = DEFAULT_SEEKS;
+> -	qinf->qi_shrinker.flags = SHRINKER_NUMA_AWARE;
+> -
+> -	error = register_shrinker(&qinf->qi_shrinker, "xfs-qm:%s",
+> -				  mp->m_super->s_id);
+> -	if (error)
+> +	qinf->qi_shrinker = shrinker_alloc(SHRINKER_NUMA_AWARE, "xfs-qm:%s",
+> +					   mp->m_super->s_id);
+> +	if (!qinf->qi_shrinker)
+
+Here should set error to -ENOMEM, will fix.
+
+>   		goto out_free_inos;
+>   
+> +	qinf->qi_shrinker->count_objects = xfs_qm_shrink_count;
+> +	qinf->qi_shrinker->scan_objects = xfs_qm_shrink_scan;
+> +	qinf->qi_shrinker->seeks = DEFAULT_SEEKS;
+> +	qinf->qi_shrinker->private_data = qinf;
 > +
->  	plat->clk_csr = 2;	/* clk_csr_i = 20-35MHz & MDC = clk_csr_i/16 */
->  	plat->has_gmac = 1;
->  	plat->force_sf_dma_mode = 1;
->  
->  	/* Set default value for multicast hash bins */
-> -	plat->multicast_filter_bins = HASH_TABLE_SIZE;
-> +	plat->multicast_filter_bins = 256;
-
-HASH_TABLE_SIZE is 64. You appear to be changing it to 256 for
-everybody, not just your platform. I would expect something like
-common_default_data() is called first, and then you change values in a
-loongson specific function.
-
-	 Andrew
+> +	shrinker_register(qinf->qi_shrinker);
+> +
+>   	return 0;
+>   
+>   out_free_inos:
+> @@ -718,7 +718,7 @@ xfs_qm_destroy_quotainfo(
+>   	qi = mp->m_quotainfo;
+>   	ASSERT(qi != NULL);
+>   
+> -	unregister_shrinker(&qi->qi_shrinker);
+> +	shrinker_free(qi->qi_shrinker);
+>   	list_lru_destroy(&qi->qi_lru);
+>   	xfs_qm_destroy_quotainos(qi);
+>   	mutex_destroy(&qi->qi_tree_lock);
+> diff --git a/fs/xfs/xfs_qm.h b/fs/xfs/xfs_qm.h
+> index 9683f0457d19..d5c9fc4ba591 100644
+> --- a/fs/xfs/xfs_qm.h
+> +++ b/fs/xfs/xfs_qm.h
+> @@ -63,7 +63,7 @@ struct xfs_quotainfo {
+>   	struct xfs_def_quota	qi_usr_default;
+>   	struct xfs_def_quota	qi_grp_default;
+>   	struct xfs_def_quota	qi_prj_default;
+> -	struct shrinker		qi_shrinker;
+> +	struct shrinker		*qi_shrinker;
+>   
+>   	/* Minimum and maximum quota expiration timestamp values. */
+>   	time64_t		qi_expiry_min;
 
