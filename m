@@ -1,41 +1,41 @@
-Return-Path: <netdev+bounces-21866-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21872-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39BB67651CC
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 12:59:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B0FD7651D6
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 13:01:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 235D61C215E4
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 10:59:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AE5E31C215F5
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 11:01:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A78D815AC1;
-	Thu, 27 Jul 2023 10:58:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D1B0168DB;
+	Thu, 27 Jul 2023 10:58:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97E53156DA
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 10:58:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60279168D1
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 10:58:28 +0000 (UTC)
 Received: from mint-fitpc2.localdomain (unknown [81.168.73.77])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4A169271D
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 03:58:22 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id ADEC72710
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 03:58:25 -0700 (PDT)
 Received: from palantir17.mph.net (palantir17 [192.168.0.4])
-	by mint-fitpc2.localdomain (Postfix) with ESMTP id D3FE2321B81;
-	Thu, 27 Jul 2023 11:41:26 +0100 (BST)
+	by mint-fitpc2.localdomain (Postfix) with ESMTP id 4BD16321B86;
+	Thu, 27 Jul 2023 11:41:32 +0100 (BST)
 Received: from localhost ([::1] helo=palantir17.mph.net)
 	by palantir17.mph.net with esmtp (Exim 4.95)
 	(envelope-from <habetsm.xilinx@gmail.com>)
-	id 1qOyQw-0002Yc-Lg;
-	Thu, 27 Jul 2023 11:41:26 +0100
-Subject: [PATCH net-next 09/11] sfc: Miscellaneous comment removals
+	id 1qOyR2-0002Ym-1s;
+	Thu, 27 Jul 2023 11:41:32 +0100
+Subject: [PATCH net-next 10/11] sfc: Cleanups in io.h
 From: Martin Habets <habetsm.xilinx@gmail.com>
 To: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
  edumazet@google.com
 Cc: netdev@vger.kernel.org, linux-net-drivers@amd.com
-Date: Thu, 27 Jul 2023 11:41:26 +0100
-Message-ID: <169045448657.9625.18095001657720834912.stgit@palantir17.mph.net>
+Date: Thu, 27 Jul 2023 11:41:32 +0100
+Message-ID: <169045449196.9625.12342669904944968266.stgit@palantir17.mph.net>
 In-Reply-To: <169045436482.9625.4994454326362709391.stgit@palantir17.mph.net>
 References: <169045436482.9625.4994454326362709391.stgit@palantir17.mph.net>
 User-Agent: StGit/0.19
@@ -54,91 +54,147 @@ X-Spam-Status: No, score=0.7 required=5.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Remove comments that only apply to Falcon and Siena.
+Most of the Falcon locking description does not apply to EF10.
 
 Signed-off-by: Martin Habets <habetsm.xilinx@gmail.com>
 Acked-by: Edward Cree <ecree.xilinx@gmail.com>
 ---
- drivers/net/ethernet/sfc/efx_common.c |    5 -----
- drivers/net/ethernet/sfc/filter.h     |    7 -------
- drivers/net/ethernet/sfc/nic_common.h |    4 +---
- drivers/net/ethernet/sfc/selftest.c   |    7 +------
- 4 files changed, 2 insertions(+), 21 deletions(-)
+ drivers/net/ethernet/sfc/io.h  |   84 ++++------------------------------------
+ drivers/net/ethernet/sfc/nic.c |    5 --
+ 2 files changed, 9 insertions(+), 80 deletions(-)
 
-diff --git a/drivers/net/ethernet/sfc/efx_common.c b/drivers/net/ethernet/sfc/efx_common.c
-index c8d8f1e9a21a..175bd9cdfdac 100644
---- a/drivers/net/ethernet/sfc/efx_common.c
-+++ b/drivers/net/ethernet/sfc/efx_common.c
-@@ -35,11 +35,6 @@ MODULE_PARM_DESC(debug, "Bitmapped debugging message enable value");
- 
- /* This is the time (in jiffies) between invocations of the hardware
-  * monitor.
-- * On Falcon-based NICs, this will:
-- * - Check the on-board hardware monitor;
-- * - Poll the link state and reconfigure the hardware as necessary.
-- * On Siena-based NICs for power systems with EEH support, this will give EEH a
-- * chance to start.
-  */
- static unsigned int efx_monitor_interval = 1 * HZ;
- 
-diff --git a/drivers/net/ethernet/sfc/filter.h b/drivers/net/ethernet/sfc/filter.h
-index 5f201a547e5b..0d45900afa76 100644
---- a/drivers/net/ethernet/sfc/filter.h
-+++ b/drivers/net/ethernet/sfc/filter.h
-@@ -30,13 +30,6 @@
+diff --git a/drivers/net/ethernet/sfc/io.h b/drivers/net/ethernet/sfc/io.h
+index 30439cc83a89..7432c09010d6 100644
+--- a/drivers/net/ethernet/sfc/io.h
++++ b/drivers/net/ethernet/sfc/io.h
+@@ -17,46 +17,22 @@
   *
-  * Only some combinations are supported, depending on NIC type:
+  **************************************************************************
   *
-- * - Falcon supports RX filters matching by {TCP,UDP}/IPv4 4-tuple or
-- *   local 2-tuple (only implemented for Falcon B0)
+- * Notes on locking strategy for the Falcon architecture:
 - *
-- * - Siena supports RX and TX filters matching by {TCP,UDP}/IPv4 4-tuple
-- *   or local 2-tuple, or local MAC with or without outer VID, and RX
-- *   default filters
+- * Many CSRs are very wide and cannot be read or written atomically.
+- * Writes from the host are buffered by the Bus Interface Unit (BIU)
+- * up to 128 bits.  Whenever the host writes part of such a register,
+- * the BIU collects the written value and does not write to the
+- * underlying register until all 4 dwords have been written.  A
+- * similar buffering scheme applies to host access to the NIC's 64-bit
+- * SRAM.
 - *
-  * - Huntington supports filter matching controlled by firmware, potentially
-  *   using {TCP,UDP}/IPv{4,6} 4-tuple or local 2-tuple, local MAC or I/G bit,
-  *   with or without outer and inner VID
-diff --git a/drivers/net/ethernet/sfc/nic_common.h b/drivers/net/ethernet/sfc/nic_common.h
-index 47b1c46c069d..466df5348b29 100644
---- a/drivers/net/ethernet/sfc/nic_common.h
-+++ b/drivers/net/ethernet/sfc/nic_common.h
-@@ -79,9 +79,7 @@ int efx_enqueue_skb_tso(struct efx_tx_queue *tx_queue, struct sk_buff *skb,
- 
- /* Decide whether to push a TX descriptor to the NIC vs merely writing
-  * the doorbell.  This can reduce latency when we are adding a single
-- * descriptor to an empty queue, but is otherwise pointless.  Further,
-- * Falcon and Siena have hardware bugs (SF bug 33851) that may be
-- * triggered if we don't check this.
-+ * descriptor to an empty queue, but is otherwise pointless.
-  * We use the write_count used for the last doorbell push, to get the
-  * NIC's view of the tx queue.
-  */
-diff --git a/drivers/net/ethernet/sfc/selftest.c b/drivers/net/ethernet/sfc/selftest.c
-index 96d856b9043c..40d9bf642408 100644
---- a/drivers/net/ethernet/sfc/selftest.c
-+++ b/drivers/net/ethernet/sfc/selftest.c
-@@ -38,8 +38,7 @@
- /*
-  * Loopback test packet structure
+- * Writes to different CSRs and 64-bit SRAM words must be serialised,
+- * since interleaved access can result in lost writes.  We use
+- * efx_nic::biu_lock for this.
+- *
+- * We also serialise reads from 128-bit CSRs and SRAM with the same
+- * spinlock.  This may not be necessary, but it doesn't really matter
+- * as there are no such reads on the fast path.
++ * The EF10 architecture exposes very few registers to the host and
++ * most of them are only 32 bits wide.  The only exceptions are the MC
++ * doorbell register pair, which has its own latching, and
++ * TX_DESC_UPD.
   *
-- * The self-test should stress every RSS vector, and unfortunately
-- * Falcon only performs RSS on TCP/UDP packets.
-+ * The self-test should stress every RSS vector.
+- * The DMA descriptor pointers (RX_DESC_UPD and TX_DESC_UPD) are
+- * 128-bit but are special-cased in the BIU to avoid the need for
+- * locking in the host:
++ * The TX_DESC_UPD DMA descriptor pointer is 128-bits but is a special
++ * case in the BIU to avoid the need for locking in the host:
+  *
+- * - They are write-only.
+- * - The semantics of writing to these registers are such that
++ * - It is write-only.
++ * - The semantics of writing to this register is such that
+  *   replacing the low 96 bits with zero does not affect functionality.
+- * - If the host writes to the last dword address of such a register
++ * - If the host writes to the last dword address of the register
+  *   (i.e. the high 32 bits) the underlying register will always be
+  *   written.  If the collector and the current write together do not
+  *   provide values for all 128 bits of the register, the low 96 bits
+  *   will be written as zero.
+- * - If the host writes to the address of any other part of such a
+- *   register while the collector already holds values for some other
+- *   register, the write is discarded and the collector maintains its
+- *   current state.
+- *
+- * The EF10 architecture exposes very few registers to the host and
+- * most of them are only 32 bits wide.  The only exceptions are the MC
+- * doorbell register pair, which has its own latching, and
+- * TX_DESC_UPD, which works in a similar way to the Falcon
+- * architecture.
   */
- struct efx_loopback_payload {
- 	char pad[2]; /* Ensures ip is 4-byte aligned */
-@@ -581,10 +580,6 @@ efx_test_loopback(struct efx_tx_queue *tx_queue,
- 	return 0;
+ 
+ #if BITS_PER_LONG == 64
+@@ -125,27 +101,6 @@ static inline void efx_writeo(struct efx_nic *efx, const efx_oword_t *value,
+ 	spin_unlock_irqrestore(&efx->biu_lock, flags);
  }
  
--/* Wait for link up. On Falcon, we would prefer to rely on efx_monitor, but
-- * any contention on the mac lock (via e.g. efx_mac_mcast_work) causes it
-- * to delay and retry. Therefore, it's safer to just poll directly. Wait
-- * for link up and any faults to dissipate. */
- static int efx_wait_for_link(struct efx_nic *efx)
- {
- 	struct efx_link_state *link_state = &efx->link_state;
+-/* Write 64-bit SRAM through the supplied mapping, locking as appropriate. */
+-static inline void efx_sram_writeq(struct efx_nic *efx, void __iomem *membase,
+-				   const efx_qword_t *value, unsigned int index)
+-{
+-	unsigned int addr = index * sizeof(*value);
+-	unsigned long flags __attribute__ ((unused));
+-
+-	netif_vdbg(efx, hw, efx->net_dev,
+-		   "writing SRAM address %x with " EFX_QWORD_FMT "\n",
+-		   addr, EFX_QWORD_VAL(*value));
+-
+-	spin_lock_irqsave(&efx->biu_lock, flags);
+-#ifdef EFX_USE_QWORD_IO
+-	__raw_writeq((__force u64)value->u64[0], membase + addr);
+-#else
+-	__raw_writel((__force u32)value->u32[0], membase + addr);
+-	__raw_writel((__force u32)value->u32[1], membase + addr + 4);
+-#endif
+-	spin_unlock_irqrestore(&efx->biu_lock, flags);
+-}
+-
+ /* Write a 32-bit CSR or the last dword of a special 128-bit CSR */
+ static inline void efx_writed(struct efx_nic *efx, const efx_dword_t *value,
+ 			      unsigned int reg)
+@@ -176,27 +131,6 @@ static inline void efx_reado(struct efx_nic *efx, efx_oword_t *value,
+ 		   EFX_OWORD_VAL(*value));
+ }
+ 
+-/* Read 64-bit SRAM through the supplied mapping, locking as appropriate. */
+-static inline void efx_sram_readq(struct efx_nic *efx, void __iomem *membase,
+-				  efx_qword_t *value, unsigned int index)
+-{
+-	unsigned int addr = index * sizeof(*value);
+-	unsigned long flags __attribute__ ((unused));
+-
+-	spin_lock_irqsave(&efx->biu_lock, flags);
+-#ifdef EFX_USE_QWORD_IO
+-	value->u64[0] = (__force __le64)__raw_readq(membase + addr);
+-#else
+-	value->u32[0] = (__force __le32)__raw_readl(membase + addr);
+-	value->u32[1] = (__force __le32)__raw_readl(membase + addr + 4);
+-#endif
+-	spin_unlock_irqrestore(&efx->biu_lock, flags);
+-
+-	netif_vdbg(efx, hw, efx->net_dev,
+-		   "read from SRAM address %x, got "EFX_QWORD_FMT"\n",
+-		   addr, EFX_QWORD_VAL(*value));
+-}
+-
+ /* Read a 32-bit CSR or SRAM */
+ static inline void efx_readd(struct efx_nic *efx, efx_dword_t *value,
+ 				unsigned int reg)
+diff --git a/drivers/net/ethernet/sfc/nic.c b/drivers/net/ethernet/sfc/nic.c
+index 7e057741425f..a33ed473cc8a 100644
+--- a/drivers/net/ethernet/sfc/nic.c
++++ b/drivers/net/ethernet/sfc/nic.c
+@@ -272,11 +272,6 @@ void efx_nic_get_regs(struct efx_nic *efx, void *buf)
+ 			case 4: /* 32-bit SRAM */
+ 				efx_readd(efx, buf, table->offset + 4 * i);
+ 				break;
+-			case 8: /* 64-bit SRAM */
+-				efx_sram_readq(efx,
+-					       efx->membase + table->offset,
+-					       buf, i);
+-				break;
+ 			case 16: /* 128-bit-readable register */
+ 				efx_reado_table(efx, buf, table->offset, i);
+ 				break;
 
 
 
