@@ -1,30 +1,30 @@
-Return-Path: <netdev+bounces-21961-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21962-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9F83765783
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 17:26:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B365765787
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 17:27:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 741F5281175
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 15:26:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AE7831C216A6
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 15:27:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26BC217AA1;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EE6E17AC5;
 	Thu, 27 Jul 2023 15:26:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 194B1171AB
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BCBF17AB3
 	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 15:26:41 +0000 (UTC)
 Received: from relay.virtuozzo.com (relay.virtuozzo.com [130.117.225.111])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E76E358D
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 08:26:21 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3B003583
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 08:26:20 -0700 (PDT)
 Received: from [130.117.225.1] (helo=finist-vl9.sw.ru)
 	by relay.virtuozzo.com with esmtp (Exim 4.96)
 	(envelope-from <khorenko@virtuozzo.com>)
-	id 1qP2qc-006EQV-2G;
+	id 1qP2qc-006EQV-2J;
 	Thu, 27 Jul 2023 17:26:09 +0200
 From: Konstantin Khorenko <khorenko@virtuozzo.com>
 To: Simon Horman <simon.horman@corigine.com>
@@ -36,12 +36,13 @@ Cc: Jakub Kicinski <kuba@kernel.org>,
 	netdev@vger.kernel.org,
 	Paolo Abeni <pabeni@redhat.com>,
 	Konstantin Khorenko <khorenko@virtuozzo.com>
-Subject: [PATCH v2 0/1] qed: Yet another scheduling while atomic fix
-Date: Thu, 27 Jul 2023 18:26:08 +0300
-Message-Id: <20230727152609.1633966-1-khorenko@virtuozzo.com>
+Subject: [PATCH v2 1/1] qed: Fix scheduling in a tasklet while getting stats
+Date: Thu, 27 Jul 2023 18:26:09 +0300
+Message-Id: <20230727152609.1633966-2-khorenko@virtuozzo.com>
 X-Mailer: git-send-email 2.31.1
-In-Reply-To: <ZMJcDvPrz1pEBPft@corigine.com>
+In-Reply-To: <20230727152609.1633966-1-khorenko@virtuozzo.com>
 References: <ZMJcDvPrz1pEBPft@corigine.com>
+ <20230727152609.1633966-1-khorenko@virtuozzo.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,8 +56,8 @@ X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Running an old RHEL7-based kernel we have got several cases of following
-BUG_ON():
+Here we've got to a situation when tasklet called usleep_range() in PTT
+acquire logic, thus welcome to the "scheduling while atomic" BUG().
 
   BUG: scheduling while atomic: swapper/24/0/0x00000100
 
@@ -84,38 +85,23 @@ BUG_ON():
    [<ffffffffb3aa78d5>] irq_exit+0x105/0x110
    [<ffffffffb41d8996>] do_IRQ+0x56/0xf0
 
-The situation is clear - tasklet function called schedule, but the fix
-is not so trivial.
+Fix this by making caller to provide the context whether it could be in
+atomic context flow or not when getting stats from QED driver.
+QED driver based on the context provided decide to schedule out or not
+when acquiring the PTT BAR window.
 
-Checking the mainstream code it seem the same calltrace is still
-possible on the latest kernel as well, so here is the fix.
+We faced the BUG_ON() while getting vport stats, but according to the
+code same issue could happen for fcoe and iscsi statistics as well, so
+fixing them too.
 
-The was a similar case recently for QEDE driver (reading stats through
-sysfs) which resulted in the commit:
-  42510dffd0e2 ("qed/qede: Fix scheduling while atomic")
+Fixes: 6c75424612a7 ("qed: Add support for NCSI statistics.")
+Fixes: 1e128c81290a ("qed: Add support for hardware offloaded FCoE.")
+Fixes: 2f2b2614e893 ("qed: Provide iSCSI statistics to management")
+Cc: Sudarsana Kalluru <skalluru@marvell.com>
+Cc: David Miller <davem@davemloft.net>
+Cc: Manish Chopra <manishc@marvell.com>
 
-i tried to implement the same logic as a fix for my case, but failed:
-unfortunately it's not clear to me for this particular QED driver case
-which statistic to collect in delay works for each particular device and
-getting ALL possible stats for all devices, ignoring device type seems
-incorrect.
-
-Taking into account that i do not have access to the hardware at all,
-the delay work approach is nearly impossible for me.
-
-Thus i have taken the idea from patch v3 - just to provide the context
-by the caller:
-  https://www.spinics.net/lists/netdev/msg901089.html
-
-At least this solution is technically clear and hopefully i did not make
-stupid mistakes here.
-
-The patch is COMPILE TESTED ONLY.
-
-i would appreciate if somebody can test the patch. :)
-
-Konstantin Khorenko (1):
-  qed: Fix scheduling in a tasklet while getting stats
+Signed-off-by: Konstantin Khorenko <khorenko@virtuozzo.com>
 
 ---
 v1->v2:
@@ -124,7 +110,7 @@ v1->v2:
  - Added kdoc descriptions for qed_ptt_acquire_context(),
    qed_get_protocol_stats_fcoe(), qed_get_vport_stats() and
    qed_get_vport_stats_context()
-
+---
  drivers/net/ethernet/qlogic/qed/qed_dev_api.h | 16 ++++++++++++
  drivers/net/ethernet/qlogic/qed/qed_fcoe.c    | 19 ++++++++++----
  drivers/net/ethernet/qlogic/qed/qed_fcoe.h    | 17 ++++++++++--
@@ -136,6 +122,385 @@ v1->v2:
  drivers/net/ethernet/qlogic/qed/qed_main.c    |  6 ++---
  9 files changed, 128 insertions(+), 26 deletions(-)
 
+diff --git a/drivers/net/ethernet/qlogic/qed/qed_dev_api.h b/drivers/net/ethernet/qlogic/qed/qed_dev_api.h
+index f8682356d0cf..94d4f9413ab7 100644
+--- a/drivers/net/ethernet/qlogic/qed/qed_dev_api.h
++++ b/drivers/net/ethernet/qlogic/qed/qed_dev_api.h
+@@ -193,6 +193,22 @@ void qed_hw_remove(struct qed_dev *cdev);
+  */
+ struct qed_ptt *qed_ptt_acquire(struct qed_hwfn *p_hwfn);
+ 
++/**
++ * qed_ptt_acquire_context(): Allocate a PTT window honoring the context
++ *			      atomicy.
++ *
++ * @p_hwfn: HW device data.
++ * @is_atomic: Hint from the caller - if the func can sleep or not.
++ *
++ * Context: The function should not sleep in case is_atomic == true.
++ * Return: struct qed_ptt.
++ *
++ * Should be called at the entry point to the driver
++ * (at the beginning of an exported function).
++ */
++struct qed_ptt *qed_ptt_acquire_context(struct qed_hwfn *p_hwfn,
++					bool is_atomic);
++
+ /**
+  * qed_ptt_release(): Release PTT Window.
+  *
+diff --git a/drivers/net/ethernet/qlogic/qed/qed_fcoe.c b/drivers/net/ethernet/qlogic/qed/qed_fcoe.c
+index 3764190b948e..04602ac94708 100644
+--- a/drivers/net/ethernet/qlogic/qed/qed_fcoe.c
++++ b/drivers/net/ethernet/qlogic/qed/qed_fcoe.c
+@@ -693,13 +693,14 @@ static void _qed_fcoe_get_pstats(struct qed_hwfn *p_hwfn,
+ }
+ 
+ static int qed_fcoe_get_stats(struct qed_hwfn *p_hwfn,
+-			      struct qed_fcoe_stats *p_stats)
++			      struct qed_fcoe_stats *p_stats,
++			      bool is_atomic)
+ {
+ 	struct qed_ptt *p_ptt;
+ 
+ 	memset(p_stats, 0, sizeof(*p_stats));
+ 
+-	p_ptt = qed_ptt_acquire(p_hwfn);
++	p_ptt = qed_ptt_acquire_context(p_hwfn, is_atomic);
+ 
+ 	if (!p_ptt) {
+ 		DP_ERR(p_hwfn, "Failed to acquire ptt\n");
+@@ -973,19 +974,27 @@ static int qed_fcoe_destroy_conn(struct qed_dev *cdev,
+ 					QED_SPQ_MODE_EBLOCK, NULL);
+ }
+ 
++static int qed_fcoe_stats_context(struct qed_dev *cdev,
++				  struct qed_fcoe_stats *stats,
++				  bool is_atomic)
++{
++	return qed_fcoe_get_stats(QED_AFFIN_HWFN(cdev), stats, is_atomic);
++}
++
+ static int qed_fcoe_stats(struct qed_dev *cdev, struct qed_fcoe_stats *stats)
+ {
+-	return qed_fcoe_get_stats(QED_AFFIN_HWFN(cdev), stats);
++	return qed_fcoe_stats_context(cdev, stats, false);
+ }
+ 
+ void qed_get_protocol_stats_fcoe(struct qed_dev *cdev,
+-				 struct qed_mcp_fcoe_stats *stats)
++				 struct qed_mcp_fcoe_stats *stats,
++				 bool is_atomic)
+ {
+ 	struct qed_fcoe_stats proto_stats;
+ 
+ 	/* Retrieve FW statistics */
+ 	memset(&proto_stats, 0, sizeof(proto_stats));
+-	if (qed_fcoe_stats(cdev, &proto_stats)) {
++	if (qed_fcoe_stats_context(cdev, &proto_stats, is_atomic)) {
+ 		DP_VERBOSE(cdev, QED_MSG_STORAGE,
+ 			   "Failed to collect FCoE statistics\n");
+ 		return;
+diff --git a/drivers/net/ethernet/qlogic/qed/qed_fcoe.h b/drivers/net/ethernet/qlogic/qed/qed_fcoe.h
+index 19c85adf4ceb..214e8299ecb4 100644
+--- a/drivers/net/ethernet/qlogic/qed/qed_fcoe.h
++++ b/drivers/net/ethernet/qlogic/qed/qed_fcoe.h
+@@ -28,8 +28,20 @@ int qed_fcoe_alloc(struct qed_hwfn *p_hwfn);
+ void qed_fcoe_setup(struct qed_hwfn *p_hwfn);
+ 
+ void qed_fcoe_free(struct qed_hwfn *p_hwfn);
++/**
++ * qed_get_protocol_stats_fcoe(): Fills provided statistics
++ *				  struct with statistics.
++ *
++ * @cdev: Qed dev pointer.
++ * @stats: Points to struct that will be filled with statistics.
++ * @is_atomic: Hint from the caller - if the func can sleep or not.
++ *
++ * Context: The function should not sleep in case is_atomic == true.
++ * Return: Void.
++ */
+ void qed_get_protocol_stats_fcoe(struct qed_dev *cdev,
+-				 struct qed_mcp_fcoe_stats *stats);
++				 struct qed_mcp_fcoe_stats *stats,
++				 bool is_atomic);
+ #else /* CONFIG_QED_FCOE */
+ static inline int qed_fcoe_alloc(struct qed_hwfn *p_hwfn)
+ {
+@@ -40,7 +52,8 @@ static inline void qed_fcoe_setup(struct qed_hwfn *p_hwfn) {}
+ static inline void qed_fcoe_free(struct qed_hwfn *p_hwfn) {}
+ 
+ static inline void qed_get_protocol_stats_fcoe(struct qed_dev *cdev,
+-					       struct qed_mcp_fcoe_stats *stats)
++					       struct qed_mcp_fcoe_stats *stats,
++					       bool is_atomic)
+ {
+ }
+ #endif /* CONFIG_QED_FCOE */
+diff --git a/drivers/net/ethernet/qlogic/qed/qed_hw.c b/drivers/net/ethernet/qlogic/qed/qed_hw.c
+index 554f30b0cfd5..6263f847b6b9 100644
+--- a/drivers/net/ethernet/qlogic/qed/qed_hw.c
++++ b/drivers/net/ethernet/qlogic/qed/qed_hw.c
+@@ -23,7 +23,10 @@
+ #include "qed_reg_addr.h"
+ #include "qed_sriov.h"
+ 
+-#define QED_BAR_ACQUIRE_TIMEOUT 1000
++#define QED_BAR_ACQUIRE_TIMEOUT_USLEEP_CNT	1000
++#define QED_BAR_ACQUIRE_TIMEOUT_USLEEP		1000
++#define QED_BAR_ACQUIRE_TIMEOUT_UDELAY_CNT	100000
++#define QED_BAR_ACQUIRE_TIMEOUT_UDELAY		10
+ 
+ /* Invalid values */
+ #define QED_BAR_INVALID_OFFSET          (cpu_to_le32(-1))
+@@ -84,12 +87,22 @@ void qed_ptt_pool_free(struct qed_hwfn *p_hwfn)
+ }
+ 
+ struct qed_ptt *qed_ptt_acquire(struct qed_hwfn *p_hwfn)
++{
++	return qed_ptt_acquire_context(p_hwfn, false);
++}
++
++struct qed_ptt *qed_ptt_acquire_context(struct qed_hwfn *p_hwfn, bool is_atomic)
+ {
+ 	struct qed_ptt *p_ptt;
+-	unsigned int i;
++	unsigned int i, count;
++
++	if (is_atomic)
++		count = QED_BAR_ACQUIRE_TIMEOUT_UDELAY_CNT;
++	else
++		count = QED_BAR_ACQUIRE_TIMEOUT_USLEEP_CNT;
+ 
+ 	/* Take the free PTT from the list */
+-	for (i = 0; i < QED_BAR_ACQUIRE_TIMEOUT; i++) {
++	for (i = 0; i < count; i++) {
+ 		spin_lock_bh(&p_hwfn->p_ptt_pool->lock);
+ 
+ 		if (!list_empty(&p_hwfn->p_ptt_pool->free_list)) {
+@@ -105,7 +118,12 @@ struct qed_ptt *qed_ptt_acquire(struct qed_hwfn *p_hwfn)
+ 		}
+ 
+ 		spin_unlock_bh(&p_hwfn->p_ptt_pool->lock);
+-		usleep_range(1000, 2000);
++
++		if (is_atomic)
++			udelay(QED_BAR_ACQUIRE_TIMEOUT_UDELAY);
++		else
++			usleep_range(QED_BAR_ACQUIRE_TIMEOUT_USLEEP,
++				     QED_BAR_ACQUIRE_TIMEOUT_USLEEP * 2);
+ 	}
+ 
+ 	DP_NOTICE(p_hwfn, "PTT acquire timeout - failed to allocate PTT\n");
+diff --git a/drivers/net/ethernet/qlogic/qed/qed_iscsi.c b/drivers/net/ethernet/qlogic/qed/qed_iscsi.c
+index 511ab214eb9c..980e7289b481 100644
+--- a/drivers/net/ethernet/qlogic/qed/qed_iscsi.c
++++ b/drivers/net/ethernet/qlogic/qed/qed_iscsi.c
+@@ -999,13 +999,14 @@ static void _qed_iscsi_get_pstats(struct qed_hwfn *p_hwfn,
+ }
+ 
+ static int qed_iscsi_get_stats(struct qed_hwfn *p_hwfn,
+-			       struct qed_iscsi_stats *stats)
++			       struct qed_iscsi_stats *stats,
++			       bool is_atomic)
+ {
+ 	struct qed_ptt *p_ptt;
+ 
+ 	memset(stats, 0, sizeof(*stats));
+ 
+-	p_ptt = qed_ptt_acquire(p_hwfn);
++	p_ptt = qed_ptt_acquire_context(p_hwfn, is_atomic);
+ 	if (!p_ptt) {
+ 		DP_ERR(p_hwfn, "Failed to acquire ptt\n");
+ 		return -EAGAIN;
+@@ -1336,9 +1337,16 @@ static int qed_iscsi_destroy_conn(struct qed_dev *cdev,
+ 					   QED_SPQ_MODE_EBLOCK, NULL);
+ }
+ 
++static int qed_iscsi_stats_context(struct qed_dev *cdev,
++				   struct qed_iscsi_stats *stats,
++				   bool is_atomic)
++{
++	return qed_iscsi_get_stats(QED_AFFIN_HWFN(cdev), stats, is_atomic);
++}
++
+ static int qed_iscsi_stats(struct qed_dev *cdev, struct qed_iscsi_stats *stats)
+ {
+-	return qed_iscsi_get_stats(QED_AFFIN_HWFN(cdev), stats);
++	return qed_iscsi_stats_context(cdev, stats, false);
+ }
+ 
+ static int qed_iscsi_change_mac(struct qed_dev *cdev,
+@@ -1358,13 +1366,14 @@ static int qed_iscsi_change_mac(struct qed_dev *cdev,
+ }
+ 
+ void qed_get_protocol_stats_iscsi(struct qed_dev *cdev,
+-				  struct qed_mcp_iscsi_stats *stats)
++				  struct qed_mcp_iscsi_stats *stats,
++				  bool is_atomic)
+ {
+ 	struct qed_iscsi_stats proto_stats;
+ 
+ 	/* Retrieve FW statistics */
+ 	memset(&proto_stats, 0, sizeof(proto_stats));
+-	if (qed_iscsi_stats(cdev, &proto_stats)) {
++	if (qed_iscsi_stats_context(cdev, &proto_stats, is_atomic)) {
+ 		DP_VERBOSE(cdev, QED_MSG_STORAGE,
+ 			   "Failed to collect ISCSI statistics\n");
+ 		return;
+diff --git a/drivers/net/ethernet/qlogic/qed/qed_iscsi.h b/drivers/net/ethernet/qlogic/qed/qed_iscsi.h
+index dec2b00259d4..974cb8d26608 100644
+--- a/drivers/net/ethernet/qlogic/qed/qed_iscsi.h
++++ b/drivers/net/ethernet/qlogic/qed/qed_iscsi.h
+@@ -39,11 +39,14 @@ void qed_iscsi_free(struct qed_hwfn *p_hwfn);
+  *
+  * @cdev: Qed dev pointer.
+  * @stats: Points to struct that will be filled with statistics.
++ * @is_atomic: Hint from the caller - if the func can sleep or not.
+  *
++ * Context: The function should not sleep in case is_atomic == true.
+  * Return: Void.
+  */
+ void qed_get_protocol_stats_iscsi(struct qed_dev *cdev,
+-				  struct qed_mcp_iscsi_stats *stats);
++				  struct qed_mcp_iscsi_stats *stats,
++				  bool is_atomic);
+ #else /* IS_ENABLED(CONFIG_QED_ISCSI) */
+ static inline int qed_iscsi_alloc(struct qed_hwfn *p_hwfn)
+ {
+@@ -56,7 +59,8 @@ static inline void qed_iscsi_free(struct qed_hwfn *p_hwfn) {}
+ 
+ static inline void
+ qed_get_protocol_stats_iscsi(struct qed_dev *cdev,
+-			     struct qed_mcp_iscsi_stats *stats) {}
++			     struct qed_mcp_iscsi_stats *stats,
++			     bool is_atomic) {}
+ #endif /* IS_ENABLED(CONFIG_QED_ISCSI) */
+ 
+ #endif
+diff --git a/drivers/net/ethernet/qlogic/qed/qed_l2.c b/drivers/net/ethernet/qlogic/qed/qed_l2.c
+index 7776d3bdd459..970b9aabbc3d 100644
+--- a/drivers/net/ethernet/qlogic/qed/qed_l2.c
++++ b/drivers/net/ethernet/qlogic/qed/qed_l2.c
+@@ -1863,7 +1863,8 @@ static void __qed_get_vport_stats(struct qed_hwfn *p_hwfn,
+ }
+ 
+ static void _qed_get_vport_stats(struct qed_dev *cdev,
+-				 struct qed_eth_stats *stats)
++				 struct qed_eth_stats *stats,
++				 bool is_atomic)
+ {
+ 	u8 fw_vport = 0;
+ 	int i;
+@@ -1872,10 +1873,11 @@ static void _qed_get_vport_stats(struct qed_dev *cdev,
+ 
+ 	for_each_hwfn(cdev, i) {
+ 		struct qed_hwfn *p_hwfn = &cdev->hwfns[i];
+-		struct qed_ptt *p_ptt = IS_PF(cdev) ? qed_ptt_acquire(p_hwfn)
+-						    :  NULL;
++		struct qed_ptt *p_ptt;
+ 		bool b_get_port_stats;
+ 
++		p_ptt = IS_PF(cdev) ? qed_ptt_acquire_context(p_hwfn, is_atomic)
++				    : NULL;
+ 		if (IS_PF(cdev)) {
+ 			/* The main vport index is relative first */
+ 			if (qed_fw_vport(p_hwfn, 0, &fw_vport)) {
+@@ -1900,6 +1902,13 @@ static void _qed_get_vport_stats(struct qed_dev *cdev,
+ }
+ 
+ void qed_get_vport_stats(struct qed_dev *cdev, struct qed_eth_stats *stats)
++{
++	qed_get_vport_stats_context(cdev, stats, false);
++}
++
++void qed_get_vport_stats_context(struct qed_dev *cdev,
++				 struct qed_eth_stats *stats,
++				 bool is_atomic)
+ {
+ 	u32 i;
+ 
+@@ -1908,7 +1917,7 @@ void qed_get_vport_stats(struct qed_dev *cdev, struct qed_eth_stats *stats)
+ 		return;
+ 	}
+ 
+-	_qed_get_vport_stats(cdev, stats);
++	_qed_get_vport_stats(cdev, stats, is_atomic);
+ 
+ 	if (!cdev->reset_stats)
+ 		return;
+@@ -1960,7 +1969,7 @@ void qed_reset_vport_stats(struct qed_dev *cdev)
+ 	if (!cdev->reset_stats) {
+ 		DP_INFO(cdev, "Reset stats not allocated\n");
+ 	} else {
+-		_qed_get_vport_stats(cdev, cdev->reset_stats);
++		_qed_get_vport_stats(cdev, cdev->reset_stats, false);
+ 		cdev->reset_stats->common.link_change_count = 0;
+ 	}
+ }
+diff --git a/drivers/net/ethernet/qlogic/qed/qed_l2.h b/drivers/net/ethernet/qlogic/qed/qed_l2.h
+index a538cf478c14..2d2f82c785ad 100644
+--- a/drivers/net/ethernet/qlogic/qed/qed_l2.h
++++ b/drivers/net/ethernet/qlogic/qed/qed_l2.h
+@@ -249,8 +249,32 @@ qed_sp_eth_rx_queues_update(struct qed_hwfn *p_hwfn,
+ 			    enum spq_mode comp_mode,
+ 			    struct qed_spq_comp_cb *p_comp_data);
+ 
++/**
++ * qed_get_vport_stats(): Fills provided statistics
++ *			  struct with statistics.
++ *
++ * @cdev: Qed dev pointer.
++ * @stats: Points to struct that will be filled with statistics.
++ *
++ * Return: Void.
++ */
+ void qed_get_vport_stats(struct qed_dev *cdev, struct qed_eth_stats *stats);
+ 
++/**
++ * qed_get_vport_stats_context(): Fills provided statistics
++ *				  struct with statistics.
++ *
++ * @cdev: Qed dev pointer.
++ * @stats: Points to struct that will be filled with statistics.
++ * @is_atomic: Hint from the caller - if the func can sleep or not.
++ *
++ * Context: The function should not sleep in case is_atomic == true.
++ * Return: Void.
++ */
++void qed_get_vport_stats_context(struct qed_dev *cdev,
++				 struct qed_eth_stats *stats,
++				 bool is_atomic);
++
+ void qed_reset_vport_stats(struct qed_dev *cdev);
+ 
+ /**
+diff --git a/drivers/net/ethernet/qlogic/qed/qed_main.c b/drivers/net/ethernet/qlogic/qed/qed_main.c
+index f5af83342856..c278f8893042 100644
+--- a/drivers/net/ethernet/qlogic/qed/qed_main.c
++++ b/drivers/net/ethernet/qlogic/qed/qed_main.c
+@@ -3092,7 +3092,7 @@ void qed_get_protocol_stats(struct qed_dev *cdev,
+ 
+ 	switch (type) {
+ 	case QED_MCP_LAN_STATS:
+-		qed_get_vport_stats(cdev, &eth_stats);
++		qed_get_vport_stats_context(cdev, &eth_stats, true);
+ 		stats->lan_stats.ucast_rx_pkts =
+ 					eth_stats.common.rx_ucast_pkts;
+ 		stats->lan_stats.ucast_tx_pkts =
+@@ -3100,10 +3100,10 @@ void qed_get_protocol_stats(struct qed_dev *cdev,
+ 		stats->lan_stats.fcs_err = -1;
+ 		break;
+ 	case QED_MCP_FCOE_STATS:
+-		qed_get_protocol_stats_fcoe(cdev, &stats->fcoe_stats);
++		qed_get_protocol_stats_fcoe(cdev, &stats->fcoe_stats, true);
+ 		break;
+ 	case QED_MCP_ISCSI_STATS:
+-		qed_get_protocol_stats_iscsi(cdev, &stats->iscsi_stats);
++		qed_get_protocol_stats_iscsi(cdev, &stats->iscsi_stats, true);
+ 		break;
+ 	default:
+ 		DP_VERBOSE(cdev, QED_MSG_SP,
 -- 
 2.31.1
 
