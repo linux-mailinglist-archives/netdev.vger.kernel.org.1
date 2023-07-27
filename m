@@ -1,244 +1,166 @@
-Return-Path: <netdev+bounces-21853-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21855-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98B9C765113
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 12:28:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 99EB0765142
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 12:32:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B34CE1C2159F
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 10:28:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CAD101C21632
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 10:32:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76A8E15489;
-	Thu, 27 Jul 2023 10:28:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66256C2C1;
+	Thu, 27 Jul 2023 10:32:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BB0713AE5
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 10:28:23 +0000 (UTC)
-Received: from out-102.mta0.migadu.com (out-102.mta0.migadu.com [91.218.175.102])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57CF02684
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 03:28:19 -0700 (PDT)
-Message-ID: <fd03a5f4-151a-bc7d-429c-c045745da523@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1690453697;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cdNMArdaFWVI5SKSPm1vQyJoyF/bmKiSh+QjqHSwJY0=;
-	b=NriIWc+uIleh+ze4o2J+UOpT04I4WThX6gf3dXAI8lj9M09YHk1OVVkXck++hhTRBTGk8E
-	4eD11Z3y+oNLibSGtUV+HnOmq1OsvnARyeqfL2Wx9+gW02TZ+HZXRAkKi1tB/Rw4BihKB4
-	GLLXJpQFGs6Ro14ZLlvr9uCoX7+GCBs=
-Date: Thu, 27 Jul 2023 11:28:12 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C115168A4
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 10:32:33 +0000 (UTC)
+Received: from mgamail.intel.com (unknown [192.55.52.115])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5AF6B19A1
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 03:32:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1690453947; x=1721989947;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=JpLUaZit3jeF5SNebaf1CxVT6Zm72efM5wymKLXsgEE=;
+  b=JK+qK2fG0FsT5mP+eaIj9lx2lc0nmqi7KteKfPB9cv28Fdd+eNTrFZ0g
+   pXUErd6mA4c87mHP6sA/QzlatBEqd6CVcY4JZq4w2iMRoqiG5zpWuRFnY
+   lf434pex8Bu++nN9bwg7JX0KGls4tQlZRyQ75qA8Xcis9zHlMAisexrBt
+   5hU09Rwc7NALVN4JMnYwfxslevBOKsDfsG+mDZ5rXxznY19VQL++jjj12
+   wLj8NdovezIFxa8fc0xTWD1GWaLQvonhXg3JC+67mn5aBvLlPumhZGuwf
+   7Mz+4OZF2sJPRVfgH8h+M4VRYMzx/Itc9jheIZX5Dgo2WMnUrR5CQ2Klx
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10783"; a="368290585"
+X-IronPort-AV: E=Sophos;i="6.01,234,1684825200"; 
+   d="scan'208";a="368290585"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jul 2023 03:32:22 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.01,202,1684825200"; 
+   d="scan'208";a="870300098"
+Received: from lkp-server02.sh.intel.com (HELO 953e8cd98f7d) ([10.239.97.151])
+  by fmsmga001.fm.intel.com with ESMTP; 27 Jul 2023 03:32:19 -0700
+Received: from kbuild by 953e8cd98f7d with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1qOyHg-0002CB-2M;
+	Thu, 27 Jul 2023 10:32:05 +0000
+Date: Thu, 27 Jul 2023 18:31:47 +0800
+From: kernel test robot <lkp@intel.com>
+To: Feiyang Chen <chenfeiyang@loongson.cn>, andrew@lunn.ch,
+	hkallweit1@gmail.com, peppe.cavallaro@st.com,
+	alexandre.torgue@foss.st.com, joabreu@synopsys.com,
+	chenhuacai@loongson.cn
+Cc: oe-kbuild-all@lists.linux.dev, Feiyang Chen <chenfeiyang@loongson.cn>,
+	linux@armlinux.org.uk, dongbiao@loongson.cn,
+	loongson-kernel@lists.loongnix.cn, netdev@vger.kernel.org,
+	loongarch@lists.linux.dev, chris.chenfeiyang@gmail.com
+Subject: Re: [PATCH v2 03/10] net: stmmac: dwmac1000: Add multi-channel
+ support
+Message-ID: <202307271817.7iWaIMw7-lkp@intel.com>
+References: <373259d4ac9ac0b9e1e64ad96d60a9bbd35b85aa.1690439335.git.chenfeiyang@loongson.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH 09/11] ice: implement dpll interface to control cgu
-Content-Language: en-US
-To: "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>,
- Jiri Pirko <jiri@resnulli.us>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: Jonathan Lemon <jonathan.lemon@gmail.com>,
- "Olech, Milena" <milena.olech@intel.com>,
- "Michalik, Michal" <michal.michalik@intel.com>,
- "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>, poros <poros@redhat.com>,
- mschmidt <mschmidt@redhat.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-clk@vger.kernel.org" <linux-clk@vger.kernel.org>,
- Bart Van Assche <bvanassche@acm.org>
-References: <ZLo0ujuLMF2NrMog@nanopsycho>
- <DM6PR11MB46576153E0E28BA4C283A30A9B3FA@DM6PR11MB4657.namprd11.prod.outlook.com>
- <ZLpzwMQrqp7mIMFF@nanopsycho>
- <DM6PR11MB46579CC7E6D314BFDE47E4EE9B3FA@DM6PR11MB4657.namprd11.prod.outlook.com>
- <ZLqoMhxHq3m4dp1u@nanopsycho>
- <DM6PR11MB46571D843FB903AC050E2F129B3FA@DM6PR11MB4657.namprd11.prod.outlook.com>
- <ZLt5GPRls7UL4zGx@nanopsycho>
- <DM6PR11MB465713389A234771BD29DF149B02A@DM6PR11MB4657.namprd11.prod.outlook.com>
- <ZL+B48Om/cf61/Vq@nanopsycho>
- <DM6PR11MB465734F6AD226A39DE8574419B03A@DM6PR11MB4657.namprd11.prod.outlook.com>
- <ZMC/TRSYqMQ57Rf7@nanopsycho>
- <DM6PR11MB46576A241EA1519BC559B5C09B00A@DM6PR11MB4657.namprd11.prod.outlook.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <DM6PR11MB46576A241EA1519BC559B5C09B00A@DM6PR11MB4657.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <373259d4ac9ac0b9e1e64ad96d60a9bbd35b85aa.1690439335.git.chenfeiyang@loongson.cn>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 26/07/2023 22:11, Kubalewski, Arkadiusz wrote:
->> From: Jiri Pirko <jiri@resnulli.us>
->> Sent: Wednesday, July 26, 2023 8:38 AM
->>
-> 
-> [...]
->   
->>>>>>>
->>>>>>> Just to make it clear:
->>>>>>>
->>>>>>> AUTOMATIC:
->>>>>>> - inputs monitored, validated, phase measurements available
->>>>>>> - possible states: unlocked, locked, locked-ho-acq, holdover
->>>>>>>
->>>>>>> FREERUN:
->>>>>>> - inputs not monitored, not validated, no phase measurements available
->>>>>>> - possible states: unlocked
->>>>>>
->>>>>> This is your implementation of DPLL. Others may have it done
->>>>>> differently. But the fact the input is monitored or not, does not make
->>>>>> any difference from user perspective.
->>>>>>
->>>>>> When he has automatic mode and does:
->>>>>> 1) disconnect all pins
->>>>>> 2) reset state    (however you implement it in the driver is totaly up
->>>>>> 		   to the device, you may go to your freerun dpll mode
->>>>>> 		   internally and to automatic back, up to you)
->>>>>> -> state will go to unlocked
->>>>>>
->>>>>> The behaviour is exactly the same, without any special mode.
->>>>>
->>>>> In this case there is special reset button, which doesn't exist in
->>>>> reality, actually your suggestion to go into FREERUN and back to AUTOMATIC
->>>>> to pretend the some kind of reset has happened, where in reality dpll went
->>>>> to
->>>>> FREERUN and AUTOMATIC.
->>>>
->>>> There are 3 pin states:
->>>> disconnected
->>>> connected
->>>> selectable
->>>>
->>>> When the last source disconnects, go to your internal freerun.
->>>> When some source gets selectable or connected, go to your internal
->>>> automatic mode.
->>>>
->>>
->>> This would make the driver to check if all the sources are disconnected
->>> each time someone disconnects a source. Which in first place is not
->>> efficient, but also dpll design already allows different driver instances
->>> to
->>> control separated sources, which in this case would force a driver to
->>> implement
->>> additional communication between the instances just to allow such hidden
->>> FREERUN mode.
->>> Which seems another argument not to do this in the way you are proposing:
->>> inefficient and unnecessarily complicated.
->>>
->>> We know that you could also implement FREERUN mode by disconnecting all
->>> the
->>> sources, even if HW doesn't support it explicitly.
->>>
->>> >From user perspactive, the mode didn't change.
->>>>
->>>
->>> The user didn't change the mode, the mode shall not change.
->>> You wrote to do it silently, so user didn't change the mode but it would
->> have
->>> changed, and we would have pretended the different working mode of DPLL
->> doesn't
->>> exist.
->>>
->>> >From user perepective, this is exacly the behaviour he requested.
->>>>
->>>
->>> IMHO this is wrong and comes from the definition of pin state DISCONNECTED,
->>> which is not sharp, for our HW means that the input will not be considered
->>> as valid input, but is not disconnecting anything, as input is still
->>> monitored and measured.
->>> Shall we have additional mode like PIN_STATE_NOT_SELECTABLE? As it is not
->>> possible to actually disconnect a pin..
->>>
->>>>
->>>>> For me it seems it seems like unnecessary complication of user's life.
->>>>> The idea of FREERUN mode is to run dpll on its system clock, so all the
->>>>> "external" dpll sources shall be disconnected when dpll is in FREERUN.
->>>>
->>>> Yes, that is when you set all pins to disconnect. no mode change needed.
->>>>
->>>
->>> We don't disconnect anything, we used a pin state DISCONNECTED as this
->>> seemed
->>> most appropriate.
->>>
->>>>
->>>>> Let's assume your HW doesn't have a FREERUN, can't you just create it by
->>>>> disconnecting all the sources?
->>>>
->>>> Yep, that's what we do.
->>>>
->>>
->>> No, you were saying that the mode doesn't exist and that your hardware
->>> doesn't
->>> support it. At the same time it can be achieved by manually disconnecting
->>> all
->>> the sources.
->>>
->>>>
->>>>> BTW, what chip are you using on mlx5 for this?
->>>>> I don't understand why the user would have to mangle state of all the pins
->>>>> just
->>>>> to stop dpll's work if he could just go into FREERUN and voila. Also what
->>>>> if
->>>>> user doesn't want change the configuration of the pins at all, and he just
->>>>> want
->>>>> to desynchronize it's dpll for i.e. testing reason.
->>>>
->>>> I tried to explain multiple times. Let the user have clean an abstracted
->>>> api, with clear semantics. Simple as that. Your internal freerun mode is
->>>> just something to abstract out, it is not needed to expose it.
->>>>
->>>
->>> Our hardware can support in total 4 modes, and 2 are now supported in ice.
->>> I don't get the idea for abstraction of hardware switches, modes or
->>> capabilities, and having those somehow achievable through different
->>> functionalities.
->>>
->>> I think we already discussed this long enough to make a decision..
->>> Though I am not convinced by your arguments, and you are not convinced by
->>> mine.
->>>
->>> Perhaps someone else could step in and cut the rope, so we could go further
->>> with this?
->>
->> Or, even better, please drop this for the initial patchset and have this
->> as a follow-up. Thanks!
->>
->>
-> 
-> On the responses from Jakub and Paolo, they supported the idea of having
-> such mode.
-> 
-> Although Jakub have asked if there could be better name then FREERUN, also
-> suggested DETACHED and STANDALONE.
-> For me DETACHED seems pretty good, STANDALONE a bit too far..
-> I am biased by the FREERUN from chip docs and don't have strong opinion
-> on any of those..
-> 
-> Any suggestions?
+Hi Feiyang,
 
-It looks like we have a kind of split-brain situation, and my thoughts 
-are following:
-Even though right now we don't have any hardware supporting 
-freerun/standalone mode, I do really like the idea to have it. It will 
-be used in monitoring implementations where we refer to internal 
-oscillator (Rb/Cs) as a source of truth to compare with the signal on 
-the other pins. We can name it DETACHED if it sounds better.
+kernel test robot noticed the following build warnings:
 
-> 
-> Thank you!
-> Arkadiusz
-> 
-> [...]
+[auto build test WARNING on net/main]
+[also build test WARNING on linus/master v6.5-rc3]
+[cannot apply to sunxi/sunxi/for-next net-next/main horms-ipvs/master next-20230727]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
+url:    https://github.com/intel-lab-lkp/linux/commits/Feiyang-Chen/net-stmmac-Pass-stmmac_priv-and-chan-in-some-callbacks/20230727-155954
+base:   net/main
+patch link:    https://lore.kernel.org/r/373259d4ac9ac0b9e1e64ad96d60a9bbd35b85aa.1690439335.git.chenfeiyang%40loongson.cn
+patch subject: [PATCH v2 03/10] net: stmmac: dwmac1000: Add multi-channel support
+config: alpha-randconfig-r012-20230727 (https://download.01.org/0day-ci/archive/20230727/202307271817.7iWaIMw7-lkp@intel.com/config)
+compiler: alpha-linux-gcc (GCC) 12.3.0
+reproduce: (https://download.01.org/0day-ci/archive/20230727/202307271817.7iWaIMw7-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202307271817.7iWaIMw7-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c:114:6: warning: no previous prototype for 'dwmac1000_dma_init_channel' [-Wmissing-prototypes]
+     114 | void dwmac1000_dma_init_channel(struct stmmac_priv *priv, void __iomem *ioaddr,
+         |      ^~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+vim +/dwmac1000_dma_init_channel +114 drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
+
+   113	
+ > 114	void dwmac1000_dma_init_channel(struct stmmac_priv *priv, void __iomem *ioaddr,
+   115					struct stmmac_dma_cfg *dma_cfg,
+   116					u32 chan)
+   117	{
+   118		u32 value;
+   119		int txpbl = dma_cfg->txpbl ?: dma_cfg->pbl;
+   120		int rxpbl = dma_cfg->rxpbl ?: dma_cfg->pbl;
+   121	
+   122		if (!priv->plat->dwmac_is_loongson)
+   123			return;
+   124	
+   125		/* common channel control register config */
+   126		value = readl(ioaddr + DMA_BUS_MODE + chan * DMA_CHAN_OFFSET);
+   127	
+   128		/*
+   129		 * Set the DMA PBL (Programmable Burst Length) mode.
+   130		 *
+   131		 * Note: before stmmac core 3.50 this mode bit was 4xPBL, and
+   132		 * post 3.5 mode bit acts as 8*PBL.
+   133		 */
+   134		if (dma_cfg->pblx8)
+   135			value |= DMA_BUS_MODE_MAXPBL;
+   136		value |= DMA_BUS_MODE_USP;
+   137		value &= ~(DMA_BUS_MODE_PBL_MASK | DMA_BUS_MODE_RPBL_MASK);
+   138		value |= (txpbl << DMA_BUS_MODE_PBL_SHIFT);
+   139		value |= (rxpbl << DMA_BUS_MODE_RPBL_SHIFT);
+   140	
+   141		/* Set the Fixed burst mode */
+   142		if (dma_cfg->fixed_burst)
+   143			value |= DMA_BUS_MODE_FB;
+   144	
+   145		/* Mixed Burst has no effect when fb is set */
+   146		if (dma_cfg->mixed_burst)
+   147			value |= DMA_BUS_MODE_MB;
+   148	
+   149		value |= DMA_BUS_MODE_ATDS;
+   150	
+   151		if (dma_cfg->aal)
+   152			value |= DMA_BUS_MODE_AAL;
+   153	
+   154		writel(value, ioaddr + DMA_BUS_MODE + chan * DMA_CHAN_OFFSET);
+   155	
+   156		/* Mask interrupts by writing to CSR7 */
+   157		writel(DMA_INTR_DEFAULT_MASK,
+   158		       ioaddr + DMA_INTR_ENA + chan * DMA_CHAN_OFFSET);
+   159	}
+   160	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
