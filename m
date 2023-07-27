@@ -1,114 +1,84 @@
-Return-Path: <netdev+bounces-21690-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21691-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30801764490
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 05:49:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 201587644C8
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 06:14:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 42CC61C214AC
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 03:49:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 25AEC1C21416
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 04:14:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 176AA1BEE4;
-	Thu, 27 Jul 2023 03:49:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2C6E1864;
+	Thu, 27 Jul 2023 04:14:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C7311851
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 03:49:17 +0000 (UTC)
-Received: from domac.alu.hr (domac.alu.unizg.hr [161.53.235.3])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BAB422706;
-	Wed, 26 Jul 2023 20:49:10 -0700 (PDT)
-Received: from localhost (localhost [127.0.0.1])
-	by domac.alu.hr (Postfix) with ESMTP id C068A6015F;
-	Thu, 27 Jul 2023 05:49:02 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
-	t=1690429742; bh=LvC5f0+bsJLrGcrnndWOgYlUfBmNxl0AAYWd0mu73eM=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=k0MpQF/1uLtggW8BRnM4mwuTQ+TyiDbsMxdJb2JvqGOstzElm/vKDVwZQOy8n03cb
-	 ByRl9Mht7CvypevdFbLyR2/OjvsHVhKbgXTNVhT+jOVMaIsk3iaCAjRGBn3dhAeaX7
-	 FT1ePyHZcBHvDAr3tPZI9JTvQ6kVPrQIZu3N0WvKCg0ku1x5/L2dRHHzYcoFe3Db4Z
-	 r1BV7G0m3Xd6P1q59Fj7/NWeZwV+w/vTWKO+T2G7vUsuGFfdgmvkEnKuNm4JT08+j/
-	 XjD3JPE5KJ6+aAM7jGDVtDkDhvefkp03b0H6Y9WDB7rGMg3otq+srSRg/+WZ/dqj1u
-	 /Rf4uKpphmqbw==
-X-Virus-Scanned: Debian amavisd-new at domac.alu.hr
-Received: from domac.alu.hr ([127.0.0.1])
-	by localhost (domac.alu.hr [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id GcMBv7-xvy9H; Thu, 27 Jul 2023 05:49:00 +0200 (CEST)
-Received: from [192.168.1.6] (unknown [94.250.191.183])
-	by domac.alu.hr (Postfix) with ESMTPSA id F11A360155;
-	Thu, 27 Jul 2023 05:48:45 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
-	t=1690429740; bh=LvC5f0+bsJLrGcrnndWOgYlUfBmNxl0AAYWd0mu73eM=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=EAKXOB/KOvRg+Y30StkNSRpZo9dV02bbxOmhyfhnoh40zQ2I/h8OdZi1rehZE/em7
-	 ykg097w/EOpQtFesg1rH7G4XqTAWBtRmxUJIh7rVo4gETkUAvSEDgUUtWp89oIkXyp
-	 o0hietEUQ4M1/5dv1nPuh1GeR0uEN2jYPIP8WzfuNoozCPFkhof338ZgirqDQuXLAQ
-	 leoLczFZWQtHXRwvHrFoxlVAKkkUQz+CAEx2GJ2WjJphKAsCLIAaNEBgl7FXpUQ6GB
-	 4ddBlWSixnUP6+vOOazFM1Gm1KjbU7CtbpYiFa7Pt+rSZSvtVxDnLm+Zio5Cuc6DbU
-	 VJ4G/GNQQ1lew==
-Message-ID: <55da6c17-9d65-0f29-2ce7-ccfb8339be14@alu.unizg.hr>
-Date: Thu, 27 Jul 2023 05:48:40 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C747F185D
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 04:14:52 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A861BC433C8;
+	Thu, 27 Jul 2023 04:14:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1690431292;
+	bh=n5IoGgevUqL40CMFdt7WgXl53BmR1iin6IDLbTGFxA4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=PzlXTbtf73znm020yTLJQ+ESa5D7kpfpxRD1SSEsIajcmjvFJDyaEY6MUrLZC6jTT
+	 lW3TwUZYa8YI4t6Sc8CKQK6C6UX4DTUh8riGzQuza9kRsV+k7MuxKkoskZHYjdBrDu
+	 2GaIc4oZG5n9EPhTqW+L4vaTnOaDm9ZMxT8NxT5H1WctgrG2WWqj0JkUtjshlQJOns
+	 ZOhi+5vRipzYv+x9/NFUYoJ7F5j8VaHmmtIOY53Dts/HzDa5eC0Lw9y2iI0TQS/5RZ
+	 mRlxMNX0I5JuQtLX/0shn+kGtIzWkb/eY3bzoT3werJ03+VTkIpnmi0KCUjstSg6pm
+	 hOqfv44pdnYaQ==
+Date: Wed, 26 Jul 2023 21:14:50 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Wei Fang <wei.fang@nxp.com>
+Cc: Alexander Duyck <alexander.duyck@gmail.com>, dl-linux-imx
+ <linux-imx@nxp.com>, "linux-kernel@vger.kernel.org"
+ <linux-kernel@vger.kernel.org>, "davem@davemloft.net"
+ <davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>, Shenwei
+ Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>,
+ "pabeni@redhat.com" <pabeni@redhat.com>, "netdev@vger.kernel.org"
+ <netdev@vger.kernel.org>
+Subject: Re: [PATCH net] net: fec: tx processing does not call XDP APIs if
+ budget is 0
+Message-ID: <20230726211450.209efe35@kernel.org>
+In-Reply-To: <AM5PR04MB3139FC9C3FED1759E1160EAE8801A@AM5PR04MB3139.eurprd04.prod.outlook.com>
+References: <20230725074148.2936402-1-wei.fang@nxp.com>
+	<70b71e7bb8a7dff2dacab99b0746e7bf2bee9344.camel@gmail.com>
+	<AM5PR04MB31390FCD7DB9F905FCB599108800A@AM5PR04MB3139.eurprd04.prod.outlook.com>
+	<CAKgT0Ufo8exTv1783Ud7EUg_1ei90Eb4ZoiHFd49zAbfhLgAsQ@mail.gmail.com>
+	<AM5PR04MB3139FC9C3FED1759E1160EAE8801A@AM5PR04MB3139.eurprd04.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.1
-Subject: Re: [PATCH v1 01/11] selftests: forwarding: custom_multipath_hash.sh:
- add cleanup for SIGTERM sent by timeout
-To: Ido Schimmel <idosch@idosch.org>
-Cc: Ido Schimmel <idosch@nvidia.com>, netdev@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Shuah Khan <shuah@kernel.org>
-References: <20230722003609.380549-1-mirsad.todorovac@alu.unizg.hr>
- <ZLzj5oYrbHGvCMkq@shredder>
- <0550924e-dce9-f90d-df8a-db810fd2499f@alu.unizg.hr>
- <adc5e40d-d040-a65e-eb26-edf47dac5b02@alu.unizg.hr>
- <ZL6OljQubhVtQjcD@shredder>
- <cab8ea8a-98f4-ef9b-4215-e2a93cccaab1@alu.unizg.hr>
- <ZMEQGIOQXv6so30x@shredder> <ZMFQZSI7InrLDG4m@shredder>
-Content-Language: en-US
-From: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
-In-Reply-To: <ZMFQZSI7InrLDG4m@shredder>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
+On Thu, 27 Jul 2023 02:08:32 +0000 Wei Fang wrote:
+> > Actually after talking with Jakub a bit more there is an issue here,
+> > but not freeing the frames isn't the solution. We likely need to just
+> > fix the page pool code so that it doesn't attempt to recycle the
+> > frames if operating in IRQ context.
+> > 
+> > The way this is dealt with for skbs is that we queue skbs if we are in
+> > IRQ context so that it can be deferred to be freed by the
+> > net_tx_action. We likely need to look at doing something similar for
+> > page_pool pages or XDP frames.
+> >   
+> After reading your discussion with Jakub, I understand this issue a bit more.
+> But we are not sure when this issue will be fixed in page pool, currently we
+> can only tolerate a delay in sending of a netpoll message. So I think this patch
+> is necessary, and I will refine it in the future when the page pool has fixed the
+> issue. In addition, as you mentioned before, napi_consume_skb should be
+> used to instead of dev_kfree_skb_any, so I will improve this patch in version 2.
 
-
-On 7/26/23 18:57, Ido Schimmel wrote:
-> On Wed, Jul 26, 2023 at 03:22:54PM +0300, Ido Schimmel wrote:
->> Regarding the MDB tests and tc_flower_l2_miss.sh, I suspect you might
->> have some daemon in user space that sends IGMP queries and therefore
->> messes with the tests. Please run the following commands in a separate
->> terminal before running tc_flower_l2_miss.sh:
-> 
-> Ignore that. I think it's a problem I already fixed in the past:
-> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=8bcfb4ae4d970b9a9724ddfbac26c387934e0e94
-> 
-> Ubuntu still uses an old version of libnet:
-> https://launchpad.net/ubuntu/+source/libnet
-> 
-> Pushed the fixes for tc_flower_l2_miss.sh, bridge_mdb.sh and
-> bridge_mdb_max.sh to the same branch.
-
-OK, just to give you some feedback, I will fix these in the afternoon (Lord willing) after my day job
-for the situation appeared on my home box.
-
-I wish I could thank you properly for your work but I do not own the Linux nor am I a maintainer :-)
-
-Kind regards,
-Mirsad
+I think so too, since the patch can only help, you already wrote it and
+it won't be extra backporting work since the code is only present in
+6.5 - I think it's worth applying. And we can refine things as page pool
+limitations get listed (the napi_consume_skb() is net-next material,
+anyway).
 
