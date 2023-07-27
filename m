@@ -1,116 +1,156 @@
-Return-Path: <netdev+bounces-22045-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22047-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25754765BE5
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 21:11:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3EDD765BF5
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 21:16:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 558021C21471
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 19:11:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7EEB12822F8
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 19:16:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1220198A8;
-	Thu, 27 Jul 2023 19:11:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1227198BB;
+	Thu, 27 Jul 2023 19:16:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC2081989B
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 19:11:03 +0000 (UTC)
-Received: from mail-wr1-x429.google.com (mail-wr1-x429.google.com [IPv6:2a00:1450:4864:20::429])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE0512735;
-	Thu, 27 Jul 2023 12:11:01 -0700 (PDT)
-Received: by mail-wr1-x429.google.com with SMTP id ffacd0b85a97d-3175f17a7baso1404884f8f.0;
-        Thu, 27 Jul 2023 12:11:01 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5C901C9E0
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 19:16:13 +0000 (UTC)
+Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E9142735;
+	Thu, 27 Jul 2023 12:16:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690485060; x=1691089860;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=7zkXhTHvZvOOCcCeSTeuHhsZO3DidrcpdwzgYznxPsY=;
-        b=pekMF4x7YAev7j/oPwDgwVLQFf/oPLUMt8SOvqZUQFdx//sDDCKaySmUszJ7CvzrIM
-         SjDnFFs+wE08aUOy3tQyJvKZ87NXBiK+wpB+6W2rhbfqXlYA47FsoIoDbhGs1izDMRTn
-         Cai/N+tRhbfkSWUbvt3B2xGpriISd3fRsBe55PxtlXaWNuC8GBn3/NYNNG9BfpBA1rN0
-         bY1v3460eJZKFSTmq5zAs+LLaV+ipROBz9SdKNVonGLnHklBW3BgcwaCAwU3/sgAb6Er
-         3kzZRdTS2FwdZxTT8xL0dZYeAlTLTKn/4RRtYAfznPLUTQ/MQIkv0LAUMvJGuf3uodYh
-         giBw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690485060; x=1691089860;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7zkXhTHvZvOOCcCeSTeuHhsZO3DidrcpdwzgYznxPsY=;
-        b=lyYwFWjvXG5HMfWLm0QUmQeKb7ZXpDvRyi//lZa164IYbrrvYuj6qhetAnYxHkituy
-         xeHGUy8LLkdaT2rXdXsjFmrgA4Mu01Yh+9+lhT7heA+oCEKvtFVz3nQzgLSYg9rZyd10
-         XXLzLIQbKgmNKGTpDYam2qQ14bGeZmWhpe1K0AX/QjKWbysXca0BHhy+5v5MnJ8uhcrm
-         koDabx5or+xHawzECzOGRovaN7depStgJ3NX6UosxdF3hytI7ObLK6TvFX3z7XueE4rx
-         wAn+E9mRNcU9ugmAK7GBEH9hFvNO3UpCcCGfaG4bzURsOeWNrTmi/1lg//eeZKmThRSm
-         Yq7w==
-X-Gm-Message-State: ABy/qLZ7l5tJa0X0MWMSE7FXkMh9UdmFPyI4zmFt56o3G3DUb3TAJAEv
-	AUcG2+TcBkceyZlZtdY/QnLiQoenXESMDQ==
-X-Google-Smtp-Source: APBJJlHKPUbLVvNM3gjxxvwdzoZ+s83DYQiDYT3zQK3IEXRl7qDrMoIibO7YNVk9nym5AaysCHGUOA==
-X-Received: by 2002:a5d:5004:0:b0:313:ee2e:dae1 with SMTP id e4-20020a5d5004000000b00313ee2edae1mr79532wrt.18.1690485060036;
-        Thu, 27 Jul 2023 12:11:00 -0700 (PDT)
-Received: from Ansuel-xps. (host-87-19-253-131.retail.telecomitalia.it. [87.19.253.131])
-        by smtp.gmail.com with ESMTPSA id s1-20020a5d4ec1000000b003063db8f45bsm2804448wrv.23.2023.07.27.12.10.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Jul 2023 12:10:58 -0700 (PDT)
-Message-ID: <64c2c142.5d0a0220.9ae33.deab@mx.google.com>
-X-Google-Original-Message-ID: <ZMLBQOagq5+i/lbY@Ansuel-xps.>
-Date: Thu, 27 Jul 2023 21:10:56 +0200
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Atin Bainada <hi@atinb.me>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [net-next PATCH 3/3] net: dsa: qca8k: limit user ports access to
- the first CPU port on setup
-References: <20230724033058.16795-1-ansuelsmth@gmail.com>
- <20230724033058.16795-1-ansuelsmth@gmail.com>
- <20230724033058.16795-3-ansuelsmth@gmail.com>
- <20230724033058.16795-3-ansuelsmth@gmail.com>
- <20230726131851.w5ty2mftr7tdl3mi@skbuf>
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1690485373; x=1722021373;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=T/pVh4qaWdruJ5g2WTsNDraJeIi+BJjyRLbyt9/I2iA=;
+  b=pY8P5mRnP1FtdAyPksDWuBpEqFmCTNRG0v7TnrRb9AUNxirD+Hj6nzP5
+   KD1jqDylm73L9lMnbTmMOn6PACNJqUqd8ltA+P/IuAGrMViXPF1K+FyAB
+   Ce1KCgZ8f2a1Y8UasLfWmw9vrmazlB/Cn6q/mIL12nnAbKWVG9agm41hr
+   s=;
+X-IronPort-AV: E=Sophos;i="6.01,235,1684800000"; 
+   d="scan'208";a="145203898"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-pdx-2a-m6i4x-1cca8d67.us-west-2.amazon.com) ([10.43.8.2])
+  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jul 2023 19:16:12 +0000
+Received: from EX19MTAUWB001.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
+	by email-inbound-relay-pdx-2a-m6i4x-1cca8d67.us-west-2.amazon.com (Postfix) with ESMTPS id 01BD880B55;
+	Thu, 27 Jul 2023 19:16:09 +0000 (UTC)
+Received: from EX19D002UWA004.ant.amazon.com (10.13.138.230) by
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Thu, 27 Jul 2023 19:16:09 +0000
+Received: from EX19MTAUWC001.ant.amazon.com (10.250.64.145) by
+ EX19D002UWA004.ant.amazon.com (10.13.138.230) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Thu, 27 Jul 2023 19:16:09 +0000
+Received: from dev-dsk-risbhat-2b-8bdc64cd.us-west-2.amazon.com
+ (10.189.73.169) by mail-relay.amazon.com (10.250.64.145) with Microsoft SMTP
+ Server id 15.2.1118.30 via Frontend Transport; Thu, 27 Jul 2023 19:16:09
+ +0000
+Received: by dev-dsk-risbhat-2b-8bdc64cd.us-west-2.amazon.com (Postfix, from userid 22673075)
+	id 726CD2711; Thu, 27 Jul 2023 19:16:09 +0000 (UTC)
+From: Rishabh Bhatnagar <risbhat@amazon.com>
+To: <gregkh@linuxfoundation.org>, <lee@kernel.org>, <davem@davemloft.net>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<stable@vger.kernel.org>, Eric Dumazet <edumazet@google.com>, "Jamal Hadi
+ Salim" <jhs@mojatatu.com>, Rishabh Bhatnagar <risbhat@amazon.com>
+Subject: [PATCH 4.14] net/sched: cls_u32: Fix reference counter leak leading to overflow
+Date: Thu, 27 Jul 2023 19:15:54 +0000
+Message-ID: <20230727191554.21333-1-risbhat@amazon.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230726131851.w5ty2mftr7tdl3mi@skbuf>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+Precedence: Bulk
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Jul 26, 2023 at 04:18:51PM +0300, Vladimir Oltean wrote:
-> On Mon, Jul 24, 2023 at 05:30:58AM +0200, Christian Marangi wrote:
-> > In preparation for multi-CPU support, set CPU port LOOKUP MEMBER outside
-> > the port loop and setup the LOOKUP MEMBER mask for user ports only to
-> > the first CPU port.
-> > 
-> > This is to handle flooding condition where every CPU port is set as
-> > target and prevent packet duplication for unknown frames from user ports.
-> > 
-> > Secondary CPU port LOOKUP MEMBER mask will be setup later when
-> > port_change_master will be implemented.
-> > 
-> > Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
-> > ---
-> 
-> This is kinda "net.git" material, in the sense that it fixes the current
-> driver behavior with device trees from the future, right?
+From: Lee Jones <lee@kernel.org>
 
-This is not strictly a fix. The secondary CPU (if defined) doesn't have
-flood enabled so the switch won't forward packet. It's more of a
-cleanup/preparation from my point of view. What do you think?
+Upstream commit 04c55383fa5689357bcdd2c8036725a55ed632bc.
 
+In the event of a failure in tcf_change_indev(), u32_set_parms() will
+immediately return without decrementing the recently incremented
+reference counter.  If this happens enough times, the counter will
+rollover and the reference freed, leading to a double free which can be
+used to do 'bad things'.
+
+In order to prevent this, move the point of possible failure above the
+point where the reference counter is incremented.  Also save any
+meaningful return values to be applied to the return data at the
+appropriate point in time.
+
+This issue was caught with KASAN.
+
+Fixes: 705c7091262d ("net: sched: cls_u32: no need to call tcf_exts_change for newly allocated struct")
+Suggested-by: Eric Dumazet <edumazet@google.com>
+Signed-off-by: Lee Jones <lee@kernel.org>
+Reviewed-by: Eric Dumazet <edumazet@google.com>
+Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Rishabh Bhatnagar <risbhat@amazon.com>
+---
+ net/sched/cls_u32.c | 21 ++++++++++++++-------
+ 1 file changed, 14 insertions(+), 7 deletions(-)
+
+diff --git a/net/sched/cls_u32.c b/net/sched/cls_u32.c
+index fdbdcba44917..a4e01220a53a 100644
+--- a/net/sched/cls_u32.c
++++ b/net/sched/cls_u32.c
+@@ -774,11 +774,22 @@ static int u32_set_parms(struct net *net, struct tcf_proto *tp,
+ 			 struct nlattr *est, bool ovr)
+ {
+ 	int err;
++#ifdef CONFIG_NET_CLS_IND
++	int ifindex = -1;
++#endif
+ 
+ 	err = tcf_exts_validate(net, tp, tb, est, &n->exts, ovr);
+ 	if (err < 0)
+ 		return err;
+ 
++#ifdef CONFIG_NET_CLS_IND
++	if (tb[TCA_U32_INDEV]) {
++		ifindex = tcf_change_indev(net, tb[TCA_U32_INDEV]);
++		if (ifindex < 0)
++			return -EINVAL;
++	}
++#endif
++
+ 	if (tb[TCA_U32_LINK]) {
+ 		u32 handle = nla_get_u32(tb[TCA_U32_LINK]);
+ 		struct tc_u_hnode *ht_down = NULL, *ht_old;
+@@ -806,14 +817,10 @@ static int u32_set_parms(struct net *net, struct tcf_proto *tp,
+ 	}
+ 
+ #ifdef CONFIG_NET_CLS_IND
+-	if (tb[TCA_U32_INDEV]) {
+-		int ret;
+-		ret = tcf_change_indev(net, tb[TCA_U32_INDEV]);
+-		if (ret < 0)
+-			return -EINVAL;
+-		n->ifindex = ret;
+-	}
++	if (ifindex >= 0)
++		n->ifindex = ifindex;
+ #endif
++
+ 	return 0;
+ }
+ 
 -- 
-	Ansuel
+2.40.1
+
 
