@@ -1,187 +1,184 @@
-Return-Path: <netdev+bounces-21684-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21685-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7EC3E764395
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 03:57:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D33AD7643AD
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 04:08:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B3B9D28206C
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 01:57:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CBE641C21472
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 02:08:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C90ED15B1;
-	Thu, 27 Jul 2023 01:57:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 685BA15B1;
+	Thu, 27 Jul 2023 02:08:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4A297C;
-	Thu, 27 Jul 2023 01:57:33 +0000 (UTC)
-Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18F70212A;
-	Wed, 26 Jul 2023 18:57:32 -0700 (PDT)
-Received: by mail-pf1-x434.google.com with SMTP id d2e1a72fcca58-666edfc50deso254586b3a.0;
-        Wed, 26 Jul 2023 18:57:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690423051; x=1691027851;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=LEjsP/ltbm5croJfxAs5qlFOgriD4zQ0avuotGYBbu4=;
-        b=eahNYGggeEgvUDyzlrIDhQQo1b2wEk+7H/Ca1jCf76MDplSkUIUN1YTX7vg6hfjaB1
-         FIRMYg2akZseLF37c1g/4dyPCO56IVd3vAOfh+fhvlGX/rmMy8FMWvXi3EnqyHFrU8mR
-         Qwttgzji9V/IcTt4pqUumai3R+9vz3qO51k7A9b5E6MgNttXaaAjVPO+Vd5Bx0uq3Gf8
-         U1WF8var4akqoo4V5xotMXoq7Q6j3OzOWNz23EJuLYSGXqlwICnkkv1/aDgvtG0ysKMx
-         FYURav52FaO9iwMGkHN1fvxpSuqBhmUZVt7VdRlrfKJj4UXGZsAO6ZgMmnJlsmIFAtgt
-         Ksiw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690423051; x=1691027851;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LEjsP/ltbm5croJfxAs5qlFOgriD4zQ0avuotGYBbu4=;
-        b=kbWh+/eFARSO3AxnPkEpU0VNvCHeCAyWMpvulMvnZ6XhIu0fH+TgEp3d7EsXcSm0Bp
-         0MqZ4XV3Vdujka4MeFBrLR80M5keFR/PBMC8ecXwQMgDDzOaBbaYJ0m75rRFRyo60Yeu
-         elqzs8owG66pnJ6S6Nl5Vjgv+2J9ZfqDH2KmNCUguWHtwIgQMrQklfS8mHT4xfcuglGu
-         HK2G+4Ox3DzYJhHcf/0mFdY63Fx6o0+OrznO1GAHHOAmwoSbCcbkBJUJlZ8H9BBEc9nO
-         D1ShypJ2YVF1++nhe193L2gwehUEedgK/5b9p7xr680hT7E0OUdMwMETFWQRMnEe29kY
-         SEXw==
-X-Gm-Message-State: ABy/qLYpKGHJ+z64y2VQIppFnE/zcFoytL/yvB3ZB9XCKlWDaGF2J8s6
-	TiZqsHBMEuHyvih9TY2VtCg=
-X-Google-Smtp-Source: APBJJlEBJ5hmV0TI+3igCwAAXKrV3f3iRW2hHj66Vn9M8yi4NRyOIXRzPPVSjSOKYkiw6fAtAPdtmw==
-X-Received: by 2002:a05:6a21:788f:b0:117:3c00:77ea with SMTP id bf15-20020a056a21788f00b001173c0077eamr1404141pzc.0.1690423051326;
-        Wed, 26 Jul 2023 18:57:31 -0700 (PDT)
-Received: from [10.22.68.111] ([122.11.166.8])
-        by smtp.gmail.com with ESMTPSA id c17-20020aa78811000000b0066ccb8e8024sm262131pfo.30.2023.07.26.18.57.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 26 Jul 2023 18:57:30 -0700 (PDT)
-Message-ID: <f1506d01-6063-e314-832b-ad3c72a580f1@gmail.com>
-Date: Thu, 27 Jul 2023 09:57:25 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EB807C
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 02:08:37 +0000 (UTC)
+Received: from EUR04-HE1-obe.outbound.protection.outlook.com (mail-he1eur04on2054.outbound.protection.outlook.com [40.107.7.54])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FEBA19A0;
+	Wed, 26 Jul 2023 19:08:35 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=MSFnk4qy8E9mvjh9kXinZ0y5ExvbT27XlE2463fn+JI0yr3ItZvKz5Rb8fjpEI4n4aneBKlEhWMJ5YZBvtu6A8woFbQD7Mfr+gSWi5VTO7ctxqT3iX/F3WToANYm956grjFTLXtZvMWDtMVg00L/QTpoRYeMHqxWx6bg/PMvfRusbl5WepUqFeNGsNBZIHICocA2xH9IM0K4T0OGe6tcK2Y7scaOBoTF8zWI8JblOXUYsfDp9xCeabMMTPRh4PtQ9JxoXNdGtGWrWgw7qyvK3NwukCE/O3PilOS1OA8hec4v8+2yEkozzqyNtX3j/ZL0uFkOJd5GekWFF8qI2zps3A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=WQgzPz5bkxkXEw2IwPNltZbK14yMsclL0tTXolqEXBA=;
+ b=OZ8jWIefAzN1fG5+olPX12kFjIU93Km3HK8n9Ui1tBLQ33rciHei59v3szcCBqACi9HhVfqjJDz9PqlbOddb77jykgckFt1/uC/MwmI3dQHKXFXuh/uVJCESkevT+gOMzrxXOxFExv+CI7MwlJfeIAUs3isYVFQIjCvg6dynxh7u27vGyz34jk0PAltL9Kzs9TSdF8X1LDH0pC1jCB6ZQu9jkpuhNKJ60/lxUrhGCsxmJ+ap2UM0JsR6UuFN7eWtGvFB6ABoEhU6jVWn9bARAvd0QKZB+UdV/WuQhO0ZSKyPBFNWBCODXCma9PhxZ+jS5s0hrSUBpzbh9s/i9MxXPA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=WQgzPz5bkxkXEw2IwPNltZbK14yMsclL0tTXolqEXBA=;
+ b=M2nI1wxdU8PkiBpW/7QAjqd7WnLoIIMtzM7XBs8jtP5rbPBDbFwWaXLB8tRRTWztC9jznmyRwDt+pufqYCBrADn3nbe7vgzNSg3UcnA8FhkmjtsWSoN87ydM+DvK7r6zfNRbY8pTOkh+h2fI2tM+P8lLv11cukI4zLZHhH7lYDg=
+Received: from AM5PR04MB3139.eurprd04.prod.outlook.com (2603:10a6:206:8::20)
+ by PAXPR04MB8560.eurprd04.prod.outlook.com (2603:10a6:102:217::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.29; Thu, 27 Jul
+ 2023 02:08:32 +0000
+Received: from AM5PR04MB3139.eurprd04.prod.outlook.com
+ ([fe80::2468:a15e:aa9b:7f8e]) by AM5PR04MB3139.eurprd04.prod.outlook.com
+ ([fe80::2468:a15e:aa9b:7f8e%4]) with mapi id 15.20.6631.026; Thu, 27 Jul 2023
+ 02:08:32 +0000
+From: Wei Fang <wei.fang@nxp.com>
+To: Alexander Duyck <alexander.duyck@gmail.com>
+CC: dl-linux-imx <linux-imx@nxp.com>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
+	<kuba@kernel.org>, Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang
+	<xiaoning.wang@nxp.com>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: RE: [PATCH net] net: fec: tx processing does not call XDP APIs if
+ budget is 0
+Thread-Topic: [PATCH net] net: fec: tx processing does not call XDP APIs if
+ budget is 0
+Thread-Index: AQHZvsxwawoZvXvGy0ONq5DghKmkjq/KsvwAgACtTTCAANTXgIAAoH7g
+Date: Thu, 27 Jul 2023 02:08:32 +0000
+Message-ID:
+ <AM5PR04MB3139FC9C3FED1759E1160EAE8801A@AM5PR04MB3139.eurprd04.prod.outlook.com>
+References: <20230725074148.2936402-1-wei.fang@nxp.com>
+ <70b71e7bb8a7dff2dacab99b0746e7bf2bee9344.camel@gmail.com>
+ <AM5PR04MB31390FCD7DB9F905FCB599108800A@AM5PR04MB3139.eurprd04.prod.outlook.com>
+ <CAKgT0Ufo8exTv1783Ud7EUg_1ei90Eb4ZoiHFd49zAbfhLgAsQ@mail.gmail.com>
+In-Reply-To:
+ <CAKgT0Ufo8exTv1783Ud7EUg_1ei90Eb4ZoiHFd49zAbfhLgAsQ@mail.gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: AM5PR04MB3139:EE_|PAXPR04MB8560:EE_
+x-ms-office365-filtering-correlation-id: 4914970d-13e0-47ea-3bcd-08db8e4660e1
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ gQ0e2B11wgyKUMmtOgVHarcyizAp8YQgyJMOLrNuMEEk2So64GMrLoY/CKeeXxj3T0/j36R3gw6N6lSYMI0Il9xODDXdoNxP0GpnEDSJLKsnUJXY9B5jLMbyNmM24awlEGTklDzfUBqlqG6lXFiaCOgpKKJ5+OSZfLCPCl3sbIz+xkyBH/esQmUAhiijO5rVmEMFWKKaTlZjv+2lAF7yrUYdCI5U76g0+484FqIINnGI3DLJtBDGbCpZzNvxuRQ13lESzlZ6/we/9xqaftwCKCDOsL07OZ69cJWiSnhtjSjaOsCaYyWqh6ng2l7KxQKX34nK12EUoL2RsDG/AOWLphQbkCb0muoo8p2NUS8raBDohC5BidoEr6ocOntR3OQ1LDAbMxhmC+HXNmbJH5TFgDpMrH6iNMMMnq4HvKT8m7qttIwqIde+WVl/f8/on9nUisb1zpjt8OJjl4JjZcJ8EvN2cf1k2eYWhhALg9CL3NLP7LLSMOLY+bEWo2L3uMK4bPPEmhhl+VspUXvEIkVDePGX42Cn13Kh2eq6pb0g9nFUKzn1QVngLTILCa5vGz+wg32Op+cNfCmJL4lskxnvDKOYhrUGI+Z7kxQK6M/A3RkmgTb4tXybGd7FVjEIGYpw
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM5PR04MB3139.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(366004)(346002)(396003)(136003)(376002)(451199021)(2906002)(66899021)(41300700001)(316002)(5660300002)(44832011)(52536014)(38070700005)(8676002)(8936002)(33656002)(55016003)(86362001)(9686003)(6506007)(26005)(478600001)(7696005)(71200400001)(83380400001)(64756008)(186003)(38100700002)(6916009)(4326008)(66446008)(66476007)(66556008)(66946007)(122000001)(54906003)(76116006);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?OWNDQ21mZldQS3Irb1gwY09yL2h3Q2dYMENWeHpWSndab2pSOHpyc1l2bW5W?=
+ =?utf-8?B?WFZHK1B1YUdGYUNsdnNmVlpTeFVyNEtGTEVKMmVncDliVEI1Z0QxVHhmTGs2?=
+ =?utf-8?B?ZjdLZXlxUVlSRlFrMW45OHp6UllnajJSUzdrTmJ4RVB6Y1dKNHUvTC8wWFo2?=
+ =?utf-8?B?QktCN0Q5N2prVERCcENYa0MycmxWc1ZuQmdYNUh5RjU4TTFJVy9uL09IOTNP?=
+ =?utf-8?B?bm9IcmJ2VjF4VTlLbWtuUVFaTEg2cVNST1VYd2ZDWnl4Z010UDFGVktyMmFT?=
+ =?utf-8?B?clM4ZzBaSUlYOW1BU285TU1SUy9iS0JsVjJZTzhDbVZBMjNTOEhNbytyNFIr?=
+ =?utf-8?B?QjNxZjloenRLK25nOVZVWE5lakp3S2pSMVg5REtzelFvdmtiRDNEM0FyTk9O?=
+ =?utf-8?B?aWFxY1pQNXdRU3lDZVR0Vi9KbTVDaFRzUHdPZlZFdENUMElvRE41M2ZiTGd3?=
+ =?utf-8?B?amZyRjBBM1plbHpINlhHbkFLUHJwSVBybTJqM0M4Z1lrd3VFRE1KZjFrN2c3?=
+ =?utf-8?B?NGQ1TFpDbGJpVjZUQTZqc21iNWFHeUpNRnp5NlBQN0Jtd2FodGVRZjhtMXlZ?=
+ =?utf-8?B?a2dhQitESURIaVlIeWE4NnpSeUZ6VXFiL0VQNC9tRWlDZk5LRVlvTDNPUTlL?=
+ =?utf-8?B?WkdJaVdpdi9DUzI1SHVEWG4rRysrS0ducVViZUovUHNRUjhmbXgxaHBSUGZE?=
+ =?utf-8?B?Q0FNOTMvSm5NL0tZNk5CZVFaTkQ5Z1UvNkVVVUJBSHo2MTRiUGh2TUg4azQ3?=
+ =?utf-8?B?Q3lvWWs1VnpXQUhabEFiMzBKVWcxeFJUNnE3YTRrYkxHdytCSzJEUnBEMm84?=
+ =?utf-8?B?Y2pZY3VWL3NrWkpPSE03akFJZGMzZ0JtL1N6SGw3aUpDQngxc1VQVnFZeWMw?=
+ =?utf-8?B?QnN0ZTJ3cnJSYnE1V0Z2c0ZVUXRhbnB6U3FxekhjS2Y2VTV1SWtyTUlvNnJq?=
+ =?utf-8?B?bVAwcnpZSm9ENE5hQW9qYmNSbWEyazNod3BTTnBSSVhJVWp3MWlTN2pjV3g4?=
+ =?utf-8?B?Z25yd05TMTlnL05aZVk0SVV6Y3M5RTd5MkxkeGxhRFlyVll5TkRZSmNiZnR2?=
+ =?utf-8?B?b0R4QkVyMlNUZVBETUZqSG54a3JMeGo4ME1wNm1ySlhha2hDWFB3aDZlR0wr?=
+ =?utf-8?B?NXZrUjM4NnVtbmNLWjFudkRKMk52MFlnQ1M3UmZScVFaVDhGRUQxSEpwd0Ja?=
+ =?utf-8?B?WjdES3kzdklUSGxGY1BCQXp4bFpaK1JqcEFtQnRrTHY0N215VVVKRDBXZGJJ?=
+ =?utf-8?B?d0dKbzdQUVJsMVNRV3JtbWpSaEZWNG5LbW4yeEEvMnQ5cXVIem1ZOWtSak1z?=
+ =?utf-8?B?YlNEYlBCYWYyVHVKUEhsaytnVi9VL1FkQUhrWGpVUEkwdkVvNXVqRDVoRWJw?=
+ =?utf-8?B?dzRreG92M3VnMlczUEpvMWdQaWtDci9kVitmcC9ob1MvVHdhZk9Vcm9mVUhw?=
+ =?utf-8?B?RitZUllsdmErbWF4NmpPcVd1aWlKeEtTalRTTSs5YTJPbTZOc2o5b2N4WUUx?=
+ =?utf-8?B?Q2xBd0xhRlkxaWV5VWxqcUJhK2hhS2tCK2NEU0YyZUM1NUVMcXpuMm00TkN5?=
+ =?utf-8?B?ZUxSNnEvbU96TkxSeXIxSGRXUjV6bnRoWTR5NFk5R1V6NDRGT2VaNmMzYjJj?=
+ =?utf-8?B?V1FhMzR2SUd3TWRLUW1vRElUd0l4Ym5oZFYvR1dZaDZpdUNuc1F2K2tPV3Zk?=
+ =?utf-8?B?K3Avb29vOXJ6TlFmZG9WT0hMaWxxbGZuQ20zbXRYSGN5L1JOKzdVUHlYSTN2?=
+ =?utf-8?B?bkw0Mk5JWXRBblY4ZEpWc2VaT2oxYTZTdGhYZms2TnpJVS9ud3RoMmhxNHBy?=
+ =?utf-8?B?R0RuckhYU1QyNUROazRFSXNkbDExT1dBMTlJcHF1SmxkdjBkb3VPTnJVaU4w?=
+ =?utf-8?B?aldpZjRkM0wxZm55UFJhVlQ0ZVRtZHZ3R1MxYkZyWGQ0dUVEL0ovcGpZMDFx?=
+ =?utf-8?B?czNjSFhFT1ZUL2xZS3FUR0hGblNaMUpMbk15WTVkOGxQSjNqbkd5ODBHRkJv?=
+ =?utf-8?B?UVE4cituV2hlS0JseENDb2crcUdHancyb1lKK0pDZWZzOVJ0VGd3TG5ud2NW?=
+ =?utf-8?B?d0E1VC93VEJMZm5MV3VOazlHVUJsbDMwNHdVTmdqQkxSbzNkcDNTaHRvNjJy?=
+ =?utf-8?Q?H+tI=3D?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.13.0
-Subject: Re: [RESEND PATCH bpf-next v3 2/2] selftests/bpf: Add testcase for
- xdp attaching failure tracepoint
-Content-Language: en-US
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: ast@kernel.org, daniel@iogearbox.net, john.fastabend@gmail.com,
- andrii@kernel.org, song@kernel.org, yhs@fb.com, kpsingh@kernel.org,
- sdf@google.com, haoluo@google.com, jolsa@kernel.org, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, hawk@kernel.org,
- tangyeechou@gmail.com, kernel-patches-bot@fb.com, bpf@vger.kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-References: <20230720155228.5708-1-hffilwlqm@gmail.com>
- <20230720155228.5708-3-hffilwlqm@gmail.com>
- <d988118b-3e02-24e3-281a-cff821f7abef@linux.dev>
-From: Leon Hwang <hffilwlqm@gmail.com>
-In-Reply-To: <d988118b-3e02-24e3-281a-cff821f7abef@linux.dev>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,HK_RANDOM_ENVFROM,
-	HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: AM5PR04MB3139.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4914970d-13e0-47ea-3bcd-08db8e4660e1
+X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Jul 2023 02:08:32.6764
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: FuB8mdc9dvxy5CsSO6oUvywRQqRZEm3fVqF6qnajnPnpeImUmUzvSIVdtljkEkGiUM93byug4j3jNIHUTuR0tw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR04MB8560
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-
-
-On 27/7/23 05:52, Martin KaFai Lau wrote:
-> On 7/20/23 8:52 AM, Leon Hwang wrote:
->> Add a test case for the tracepoint of xdp attaching failure by bpf
->> tracepoint when attach XDP to a device with invalid flags option.
->>
->> The bpf tracepoint retrieves error message from the tracepoint, and
->> then put the error message to a perf buffer. The testing code receives
->> error message from perf buffer, and then ASSERT "Invalid XDP flags for
->> BPF link attachment".
->>
->> Signed-off-by: Leon Hwang <hffilwlqm@gmail.com>
->> ---
->>   .../selftests/bpf/prog_tests/xdp_attach.c     | 65 +++++++++++++++++++
->>   .../bpf/progs/test_xdp_attach_fail.c          | 52 +++++++++++++++
->>   2 files changed, 117 insertions(+)
->>   create mode 100644 tools/testing/selftests/bpf/progs/test_xdp_attach_fail.c
->>
->> diff --git a/tools/testing/selftests/bpf/prog_tests/xdp_attach.c b/tools/testing/selftests/bpf/prog_tests/xdp_attach.c
->> index fa3cac5488f5d..99f8d03f3c8bd 100644
->> --- a/tools/testing/selftests/bpf/prog_tests/xdp_attach.c
->> +++ b/tools/testing/selftests/bpf/prog_tests/xdp_attach.c
->> @@ -1,5 +1,6 @@
->>   // SPDX-License-Identifier: GPL-2.0
->>   #include <test_progs.h>
->> +#include "test_xdp_attach_fail.skel.h"
->>     #define IFINDEX_LO 1
->>   #define XDP_FLAGS_REPLACE        (1U << 4)
->> @@ -85,10 +86,74 @@ static void test_xdp_attach(const char *file)
->>       bpf_object__close(obj1);
->>   }
->>   +struct xdp_errmsg {
->> +    char msg[64];
->> +};
->> +
->> +static void on_xdp_errmsg(void *ctx, int cpu, void *data, __u32 size)
->> +{
->> +    struct xdp_errmsg *ctx_errmg = ctx, *tp_errmsg = data;
->> +
->> +    memcpy(&ctx_errmg->msg, &tp_errmsg->msg, size);
->> +}
->> +
->> +static const char tgt_errmsg[] = "Invalid XDP flags for BPF link attachment";
->> +
->> +static void test_xdp_attach_fail(const char *file)
-> 
-> The test crashed: https://github.com/kernel-patches/bpf/actions/runs/5672753995/job/15373384795#step:6:8037
-> 
-> Please monitor the CI test result in the future.
-> 
-
-Get it. I'll fix it as soon as possible. And make sure all the CI tests are passed.
-
->> +{
->> +    __u32 duration = 0;
->> +    int err, fd_xdp, fd_link_xdp;
->> +    struct bpf_object *obj = NULL;
->> +    struct test_xdp_attach_fail *skel = NULL;
->> +    struct bpf_link *link = NULL;
->> +    struct perf_buffer *pb = NULL;
->> +    struct xdp_errmsg errmsg = {};
->> +
->> +    LIBBPF_OPTS(bpf_link_create_opts, opts);
->> +
->> +    skel = test_xdp_attach_fail__open_and_load();
->> +    if (!ASSERT_OK_PTR(skel, "test_xdp_attach_fail_skel"))
->> +        goto out_close;
->> +
->> +    link = bpf_program__attach_tracepoint(skel->progs.tp__xdp__bpf_xdp_link_attach_failed,
->> +                          "xdp", "bpf_xdp_link_attach_failed");
->> +    if (!ASSERT_OK_PTR(link, "attach_tp"))
->> +        goto out_close;
->> +
->> +    /* set up perf buffer */
->> +    pb = perf_buffer__new(bpf_map__fd(skel->maps.xdp_errmsg_pb), 1,
->> +                  on_xdp_errmsg, NULL, &errmsg, NULL);
->> +
->> +    err = bpf_prog_test_load(file, BPF_PROG_TYPE_XDP, &obj, &fd_xdp);
->> +    if (CHECK_FAIL(err))
->> +        goto out_close;
->> +
->> +    opts.flags = 0xFF; // invalid flags to fail to attach XDP prog
->> +    fd_link_xdp = bpf_link_create(fd_xdp, IFINDEX_LO, BPF_XDP, &opts);
->> +    if (CHECK(fd_link_xdp != -22, "bpf_link_create_failed",
-> 
-> Please stay with the ASSERT_* macro.
-> 
-
-Get it.
-
-
-Thanks,
-Leon
+PiA+ID4gVGhpcyBzdGF0ZW1lbnQgaXNuJ3QgY29ycmVjdC4gVGhlcmUgYXJlIG5hcGkgZW5hYmxl
+ZCBhbmQgbm9uLW5hcGkNCj4gPiA+IHZlcnNpb25zIG9mIHRoZXNlIGNhbGxzLiBUaGlzIGlzIHRo
+ZSByZWFzb24gZm9yIHRoaW5ncyBsaWtlIHRoZQ0KPiA+ID4gImFsbG93X2RpcmVjdCIgcGFyYW1l
+dGVyIGluIHBhZ2VfcG9vbF9wdXRfZnVsbF9wYWdlIGFuZCB0aGUNCj4gPiA+ICJuYXBpX2RpcmVj
+dCIgcGFyYW1ldGVyIGluIF9feGRwX3JldHVybi4NCj4gPiA+DQo+ID4gPiBCeSBibG9ja2luZyBv
+biB0aGVzZSBjYXNlcyB5b3UgY2FuIGVuZCB1cCBoYW5naW5nIHRoZSBUeCBxdWV1ZSB3aGljaCBp
+cw0KPiA+ID4gZ29pbmcgdG8gYnJlYWsgbmV0cG9sbCBhcyB5b3UgYXJlIGdvaW5nIHRvIHN0YWxs
+IHRoZSByaW5nIG9uIFhEUA0KPiA+ID4gcGFja2V0cyBpZiB0aGV5IGFyZSBhbHJlYWR5IGluIHRo
+ZSBxdWV1ZS4NCj4gPiA+DQo+ID4gPiBGcm9tIHdoYXQgSSBjYW4gdGVsbCB5b3VyIGRyaXZlciBp
+cyB1c2luZyB4ZHBfcmV0dXJuX2ZyYW1lIGluIHRoZSBjYXNlDQo+ID4gPiBvZiBhbiBYRFAgZnJh
+bWUgd2hpY2ggZG9lc24ndCBtYWtlIHVzZSBvZiB0aGUgTkFQSSBvcHRpbWl6YXRpb25zIGluDQo+
+ID4gPiBmcmVlaW5nIGZyb20gd2hhdCBJIGNhbiB0ZWxsLiBUaGUgTkFQSSBvcHRpbWl6ZWQgdmVy
+c2lvbiBpcw0KPiA+ID4geGRwX3JldHVybl9mcmFtZV9yeC4NCj4gPiA+DQo+ID4gU28geW91IG1l
+YW4gaXQgaXMgc2FmZSB0byB1c2UgeGRwX3JldHVybl9mcmFtZSBubyBtYXR0ZXIgaW4gTkFQSSBj
+b250ZXh0DQo+ID4gb3Igbm9uLU5BUEkgY29udGV4dD8gQW5kIHhkcF9yZXR1cm5fZnJhbWVfcnhf
+bmFwaSBtdXN0IGJlIHVzZWQgaW4gTkFQSQ0KPiA+IGNvbnRleHQ/IElmIHNvLCBJIHRoaW5rIEkg
+bXVzdCBoYXZlIG1pc3VuZGVyc3Rvb2QsIHRoZW4gdGhpcyBwYXRjaCBpcyBub3QNCj4gbmVjZXNz
+YXJ5Lg0KPiANCj4gQWN0dWFsbHkgYWZ0ZXIgdGFsa2luZyB3aXRoIEpha3ViIGEgYml0IG1vcmUg
+dGhlcmUgaXMgYW4gaXNzdWUgaGVyZSwNCj4gYnV0IG5vdCBmcmVlaW5nIHRoZSBmcmFtZXMgaXNu
+J3QgdGhlIHNvbHV0aW9uLiBXZSBsaWtlbHkgbmVlZCB0byBqdXN0DQo+IGZpeCB0aGUgcGFnZSBw
+b29sIGNvZGUgc28gdGhhdCBpdCBkb2Vzbid0IGF0dGVtcHQgdG8gcmVjeWNsZSB0aGUNCj4gZnJh
+bWVzIGlmIG9wZXJhdGluZyBpbiBJUlEgY29udGV4dC4NCj4gDQo+IFRoZSB3YXkgdGhpcyBpcyBk
+ZWFsdCB3aXRoIGZvciBza2JzIGlzIHRoYXQgd2UgcXVldWUgc2ticyBpZiB3ZSBhcmUgaW4NCj4g
+SVJRIGNvbnRleHQgc28gdGhhdCBpdCBjYW4gYmUgZGVmZXJyZWQgdG8gYmUgZnJlZWQgYnkgdGhl
+DQo+IG5ldF90eF9hY3Rpb24uIFdlIGxpa2VseSBuZWVkIHRvIGxvb2sgYXQgZG9pbmcgc29tZXRo
+aW5nIHNpbWlsYXIgZm9yDQo+IHBhZ2VfcG9vbCBwYWdlcyBvciBYRFAgZnJhbWVzLg0KPiANCkFm
+dGVyIHJlYWRpbmcgeW91ciBkaXNjdXNzaW9uIHdpdGggSmFrdWIsIEkgdW5kZXJzdGFuZCB0aGlz
+IGlzc3VlIGEgYml0IG1vcmUuDQpCdXQgd2UgYXJlIG5vdCBzdXJlIHdoZW4gdGhpcyBpc3N1ZSB3
+aWxsIGJlIGZpeGVkIGluIHBhZ2UgcG9vbCwgY3VycmVudGx5IHdlDQpjYW4gb25seSB0b2xlcmF0
+ZSBhIGRlbGF5IGluIHNlbmRpbmcgb2YgYSBuZXRwb2xsIG1lc3NhZ2UuIFNvIEkgdGhpbmsgdGhp
+cyBwYXRjaA0KaXMgbmVjZXNzYXJ5LCBhbmQgSSB3aWxsIHJlZmluZSBpdCBpbiB0aGUgZnV0dXJl
+IHdoZW4gdGhlIHBhZ2UgcG9vbCBoYXMgZml4ZWQgdGhlDQppc3N1ZS4gSW4gYWRkaXRpb24sIGFz
+IHlvdSBtZW50aW9uZWQgYmVmb3JlLCBuYXBpX2NvbnN1bWVfc2tiIHNob3VsZCBiZQ0KdXNlZCB0
+byBpbnN0ZWFkIG9mIGRldl9rZnJlZV9za2JfYW55LCBzbyBJIHdpbGwgaW1wcm92ZSB0aGlzIHBh
+dGNoIGluIHZlcnNpb24gMi4NClRoYW5rcy4NCg==
 
