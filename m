@@ -1,215 +1,242 @@
-Return-Path: <netdev+bounces-22013-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22014-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9FE4765B1A
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 20:01:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 861F5765B24
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 20:05:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C6D02282439
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 18:01:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8A6A81C21626
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 18:05:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 986FD171B6;
-	Thu, 27 Jul 2023 18:01:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4BA8171B6;
+	Thu, 27 Jul 2023 18:05:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8419E13AE5
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 18:01:51 +0000 (UTC)
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B319A30ED
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 11:01:49 -0700 (PDT)
-Received: by mail-pg1-x54a.google.com with SMTP id 41be03b00d2f7-55c475c6da6so769605a12.2
-        for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 11:01:49 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C68C62714D
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 18:05:08 +0000 (UTC)
+Received: from mail-qt1-x82a.google.com (mail-qt1-x82a.google.com [IPv6:2607:f8b0:4864:20::82a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2FD630F4
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 11:05:03 -0700 (PDT)
+Received: by mail-qt1-x82a.google.com with SMTP id d75a77b69052e-403aa5d07caso8336071cf.0
+        for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 11:05:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690480909; x=1691085709;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=zQhQ+VSPJiT/sF1vRnyh4Q/edWHny2NYyXr78uE6E6M=;
-        b=MXN0RwiQuEoK59/406fj3hfB9GFLmNe746Z+h8t73hbQCE1d1qq/izbPkNLsJ6Px2M
-         Vban7KRfw/LuyxsjsqlFIKu5xuwLJxZQjqwf6YOq26lb6AyvDNcUvqSG8vj6as2sTY+T
-         qfo4dzt8M6QFxjvNpOCieikt35YsPF8NOsjN+Zeb0qqtrOHb1CID/EzxYvoLeNCRuhQk
-         X6Zj6RiQh0RnXAkaWNvbvk6ESEeLk0T4UqTFWfarPMmqOQ4NKQ8QkhuhmZeO8Rwy6d3v
-         qTa/LwBgOg5pPo63GPS7Rkndq7A3Pz0klfwoCUoBCvtZ6xPRb4mWucJ//Dab3DxcBzBf
-         tMqQ==
+        d=broadcom.com; s=google; t=1690481103; x=1691085903;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=OC6LiCa1YC9xI+BK2/ZHlr7e4fbtV+mi6QcbdwKO5a0=;
+        b=CoeAU74m+ZojIKG8qcyzSkwjx2x6UVK0ekDSDx6+W6AaCJIbl95h8g5PgSHU8Q4GgA
+         +Ywq3KekH649qYCeOBpBnYjKTThtavqGqiAlP7ywi1L5WszVOGHFaKG7QyoqRHk4j0aA
+         4tKcLHfu+iywdk/DneA8YSS2xtz7lRVzanMP4=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690480909; x=1691085709;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=zQhQ+VSPJiT/sF1vRnyh4Q/edWHny2NYyXr78uE6E6M=;
-        b=KdXLKO8yCs/4dV9tAcjkwWDavU6im3vwYhWBBD5oO9CVoDJwcKitLf3oMbwqgX4q86
-         06SqRA85Cwo8wB6s29GmzUM9wL79ubgrNvHwiZdNP5n6iOvjTIK/0RB8cWaYWyWAPFwm
-         36DDZx/zhVMmpwuZalNNFtLZRqFR26E0k5i20C02ABockDvdsA2L9KcFBgMfTO0SiZ4Y
-         4PYbyYWcjS0ZbQti/Fm6Fr9LRxDPub7ufRJC0ZdVQUQtYvC/1WKAOxm6dTulDjOzE7jx
-         qU3VQ/NtZfnpUVafmTX5Pbq/xU3LVcNs17CKMofmxNl+S+kt7ukl6uuTLRXIIuJ3h/pR
-         dFqA==
-X-Gm-Message-State: ABy/qLYYEoxmF4mqvoMCQ9y07ZQseVsVWARhy++AMfvdkYDj0dFJCncr
-	n6KtQH+z42FI+igjDzvaQYtzo1U=
-X-Google-Smtp-Source: APBJJlGroNGzDDua9ZSJVxJ3gwxUQcJeCDe6elRlqKhr2EYpQR+GDuPvk08ZnrYhFF5YheOlKnAjVj8=
-X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
- (user=sdf job=sendgmr) by 2002:a63:790a:0:b0:55a:b9bb:7ca with SMTP id
- u10-20020a63790a000000b0055ab9bb07camr29145pgc.10.1690480909118; Thu, 27 Jul
- 2023 11:01:49 -0700 (PDT)
-Date: Thu, 27 Jul 2023 11:01:47 -0700
-In-Reply-To: <b41babb1-f0f2-dc2f-c2e3-1870107fbd9f@tessares.net>
+        d=1e100.net; s=20221208; t=1690481103; x=1691085903;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OC6LiCa1YC9xI+BK2/ZHlr7e4fbtV+mi6QcbdwKO5a0=;
+        b=NPWOyWS+oXPnsg6aZOWBkqzvsv2EQFsvNrILTIclfsHBxqXb5W+A6eMPaSULJyNIVP
+         IXFb+rN//Jb1n4+3jDKb57EiXGc6df6O4EL/X1Kuc+z/3p4urRuLLqaWhUZ0Go8UM7zV
+         dNUp78tqcVoHWuMQ53PB0lCkVQvWx/mFq36xi2sIPGOaQ9BJh3rgsWiGGHSNOjWXYKmu
+         v1B6BiSwqzGGRkDsL3j4n/0mmmGmUxOEN17G5Zb1m5Ezf3mESwk+onWIiPAuZSC/Leu2
+         oLNCwFsaxYUCtSZFirUVTccg3GXQ0K8UC3gNm6/UWOOG8Ia/KPUnrSKl4eB6rncYRm7b
+         VR3A==
+X-Gm-Message-State: ABy/qLZbVkl+qjJaQOjnFxY6y7CgRVhNx3+X6xCgUTSXIJAie7cVqjmv
+	cIhKfMf2hDKWcyY27ItIwTQf2Q==
+X-Google-Smtp-Source: APBJJlGAy7s5jAqThFClaYo0QRv7f3IKbNXj+dEQeN6unT+doVRq00I7m49gkTWhY2aM7Xmj5127VQ==
+X-Received: by 2002:ac8:5a85:0:b0:403:bfda:acb4 with SMTP id c5-20020ac85a85000000b00403bfdaacb4mr300493qtc.11.1690481103072;
+        Thu, 27 Jul 2023 11:05:03 -0700 (PDT)
+Received: from C02YVCJELVCG ([136.54.24.230])
+        by smtp.gmail.com with ESMTPSA id w16-20020a05622a135000b00403ff38d855sm592322qtk.4.2023.07.27.11.05.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Jul 2023 11:05:02 -0700 (PDT)
+From: Andy Gospodarek <andrew.gospodarek@broadcom.com>
+X-Google-Original-From: Andy Gospodarek <gospo@broadcom.com>
+Date: Thu, 27 Jul 2023 14:04:55 -0400
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, michael.chan@broadcom.com
+Subject: Re: [PATCH net] bnxt: don't handle XDP in netpoll
+Message-ID: <ZMKxx6sQgVdCE_JH@C02YVCJELVCG>
+References: <20230727170505.1298325-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <3076188eb88cca9151a2d12b50ba1e870b11ce09.1689693294.git.geliang.tang@suse.com>
- <CAHC9VhS_LKdkEmm5_J5y34RpaRcTbg8==fpz8pMThDCjF6nYtQ@mail.gmail.com> <b41babb1-f0f2-dc2f-c2e3-1870107fbd9f@tessares.net>
-Message-ID: <ZMKxC+CFj4GbCklg@google.com>
-Subject: Re: [RFC bpf-next v5] bpf: Force to MPTCP
-From: Stanislav Fomichev <sdf@google.com>
-To: Matthieu Baerts <matthieu.baerts@tessares.net>
-Cc: Paul Moore <paul@paul-moore.com>, Geliang Tang <geliang.tang@suse.com>, 
-	Alexei Starovoitov <ast@kernel.org>, bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	mptcp@lists.linux.dev, apparmor@lists.ubuntu.com, 
-	linux-security-module@vger.kernel.org, selinux@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230727170505.1298325-1-kuba@kernel.org>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-	autolearn=unavailable autolearn_force=no version=3.4.6
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 07/27, Matthieu Baerts wrote:
-> Hi Paul, Stanislav,
->=20
-> On 18/07/2023 18:14, Paul Moore wrote:
-> > On Tue, Jul 18, 2023 at 11:21=E2=80=AFAM Geliang Tang <geliang.tang@sus=
-e.com> wrote:
-> >>
-> >> As is described in the "How to use MPTCP?" section in MPTCP wiki [1]:
-> >>
-> >> "Your app can create sockets with IPPROTO_MPTCP as the proto:
-> >> ( socket(AF_INET, SOCK_STREAM, IPPROTO_MPTCP); ). Legacy apps can be
-> >> forced to create and use MPTCP sockets instead of TCP ones via the
-> >> mptcpize command bundled with the mptcpd daemon."
-> >>
-> >> But the mptcpize (LD_PRELOAD technique) command has some limitations
-> >> [2]:
-> >>
-> >>  - it doesn't work if the application is not using libc (e.g. GoLang
-> >> apps)
-> >>  - in some envs, it might not be easy to set env vars / change the way
-> >> apps are launched, e.g. on Android
-> >>  - mptcpize needs to be launched with all apps that want MPTCP: we cou=
-ld
-> >> have more control from BPF to enable MPTCP only for some apps or all t=
-he
-> >> ones of a netns or a cgroup, etc.
-> >>  - it is not in BPF, we cannot talk about it at netdev conf.
-> >>
-> >> So this patchset attempts to use BPF to implement functions similer to
-> >> mptcpize.
-> >>
-> >> The main idea is add a hook in sys_socket() to change the protocol id
-> >> from IPPROTO_TCP (or 0) to IPPROTO_MPTCP.
-> >>
-> >> [1]
-> >> https://github.com/multipath-tcp/mptcp_net-next/wiki
-> >> [2]
-> >> https://github.com/multipath-tcp/mptcp_net-next/issues/79
-> >>
-> >> v5:
-> >>  - add bpf_mptcpify helper.
-> >>
-> >> v4:
-> >>  - use lsm_cgroup/socket_create
-> >>
-> >> v3:
-> >>  - patch 8: char cmd[128]; -> char cmd[256];
-> >>
-> >> v2:
-> >>  - Fix build selftests errors reported by CI
-> >>
-> >> Closes: https://github.com/multipath-tcp/mptcp_net-next/issues/79
-> >> Signed-off-by: Geliang Tang <geliang.tang@suse.com>
-> >> ---
-> >>  include/linux/bpf.h                           |   1 +
-> >>  include/linux/lsm_hook_defs.h                 |   2 +-
-> >>  include/linux/security.h                      |   6 +-
-> >>  include/uapi/linux/bpf.h                      |   7 +
-> >>  kernel/bpf/bpf_lsm.c                          |   2 +
-> >>  net/mptcp/bpf.c                               |  20 +++
-> >>  net/socket.c                                  |   4 +-
-> >>  security/apparmor/lsm.c                       |   8 +-
-> >>  security/security.c                           |   2 +-
-> >>  security/selinux/hooks.c                      |   6 +-
-> >>  tools/include/uapi/linux/bpf.h                |   7 +
-> >>  .../testing/selftests/bpf/prog_tests/mptcp.c  | 128 ++++++++++++++++-=
--
-> >>  tools/testing/selftests/bpf/progs/mptcpify.c  |  17 +++
-> >>  13 files changed, 187 insertions(+), 23 deletions(-)
-> >>  create mode 100644 tools/testing/selftests/bpf/progs/mptcpify.c
-> >=20
-> > ...
-> >=20
-> >> diff --git a/security/security.c b/security/security.c
-> >> index b720424ca37d..bbebcddce420 100644
-> >> --- a/security/security.c
-> >> +++ b/security/security.c
-> >> @@ -4078,7 +4078,7 @@ EXPORT_SYMBOL(security_unix_may_send);
-> >>   *
-> >>   * Return: Returns 0 if permission is granted.
-> >>   */
-> >> -int security_socket_create(int family, int type, int protocol, int ke=
-rn)
-> >> +int security_socket_create(int *family, int *type, int *protocol, int=
- kern)
-> >>  {
-> >>         return call_int_hook(socket_create, 0, family, type, protocol,=
- kern);
-> >>  }
-> >=20
-> > Using the LSM to change the protocol family is not something we want
-> > to allow.  I'm sorry, but you will need to take a different approach.
->=20
-> @Paul: Thank you for your feedback. It makes sense and I understand.
->=20
-> @Stanislav: Despite the fact the implementation was smaller and reusing
-> more code, it looks like we cannot go in the direction you suggested. Do
-> you think what Geliang suggested before in his v3 [1] can be accepted?
->=20
-> (Note that the v3 is the same as the v1, only some fixes in the selftests=
-.)
+On Thu, Jul 27, 2023 at 10:05:05AM -0700, Jakub Kicinski wrote:
+> Similarly to other recently fixed drivers make sure we don't
+> try to access XDP or page pool APIs when NAPI budget is 0.
+> NAPI budget of 0 may mean that we are in netpoll.
+> 
+> This may result in running software IRQs in hard IRQ context,
+> leading to deadlocks or crashes.
+> 
+> Fixes: 322b87ca55f2 ("bnxt_en: add page_pool support")
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-We have too many hooks in networking, so something that doesn't add
-a new one is preferable :-( Moreover, we already have a 'socket init'
-hook, but it runs a bit late.
+Reviewed-by: Andy Gospodarek <gospo@broadcom.com>
 
-Is existing cgroup/sock completely unworkable? Is it possible to
-expose some new bpf_upgrade_socket_to(IPPROTO_MPTCP) kfunc which would
-call some new net_proto_family->upgrade_to(IPPROTO_MPTCP) to do the surgery=
-?
-Or is it too hacky?
+> ---
+> CC: michael.chan@broadcom.com
+> CC: gospo@broadcom.com
+> 
+> Side note - having to plumb the "budget" everywhere really makes
+> me wonder if we shouldn't have had those APIs accept a pointer
+> to napi_struct instead :S
 
-Another option Alexei suggested is to add some fentry-like thing:
+We could also consider adding budget to struct bnxt_napi.  I'm not sure that
+would work in all cases, however.
 
-noinline int update_socket_protocol(int protocol)
-{
-	return protocol;
-}
-/* TODO: ^^^ add the above to mod_ret set */
+I'm good if this goes in as-is and we make enhancements from this as a starting
+point.
 
-int __sys_socket(int family, int type, int protocol)
-{
-	...
-
-	protocol =3D update_socket_protocol(protocol);
-
-	...
-}
-
-But it's also too problem specific it seems? And it's not cgroup-aware.
+> ---
+>  drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 19 +++++++++++--------
+>  drivers/net/ethernet/broadcom/bnxt/bnxt.h     |  2 +-
+>  drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c |  6 +++++-
+>  drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.h |  3 ++-
+>  4 files changed, 19 insertions(+), 11 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> index a3bbd13c070f..fe1d645c39d0 100644
+> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> @@ -687,7 +687,8 @@ static netdev_tx_t bnxt_start_xmit(struct sk_buff *skb, struct net_device *dev)
+>  	return NETDEV_TX_OK;
+>  }
+>  
+> -static void bnxt_tx_int(struct bnxt *bp, struct bnxt_napi *bnapi, int nr_pkts)
+> +static void bnxt_tx_int(struct bnxt *bp, struct bnxt_napi *bnapi, int nr_pkts,
+> +			int budget)
+>  {
+>  	struct bnxt_tx_ring_info *txr = bnapi->tx_ring;
+>  	struct netdev_queue *txq = netdev_get_tx_queue(bp->dev, txr->txq_index);
+> @@ -2595,10 +2596,11 @@ static int __bnxt_poll_work(struct bnxt *bp, struct bnxt_cp_ring_info *cpr,
+>  	return rx_pkts;
+>  }
+>  
+> -static void __bnxt_poll_work_done(struct bnxt *bp, struct bnxt_napi *bnapi)
+> +static void __bnxt_poll_work_done(struct bnxt *bp, struct bnxt_napi *bnapi,
+> +				  int budget)
+>  {
+>  	if (bnapi->tx_pkts && !bnapi->tx_fault) {
+> -		bnapi->tx_int(bp, bnapi, bnapi->tx_pkts);
+> +		bnapi->tx_int(bp, bnapi, bnapi->tx_pkts, budget);
+>  		bnapi->tx_pkts = 0;
+>  	}
+>  
+> @@ -2629,7 +2631,7 @@ static int bnxt_poll_work(struct bnxt *bp, struct bnxt_cp_ring_info *cpr,
+>  	 */
+>  	bnxt_db_cq(bp, &cpr->cp_db, cpr->cp_raw_cons);
+>  
+> -	__bnxt_poll_work_done(bp, bnapi);
+> +	__bnxt_poll_work_done(bp, bnapi, budget);
+>  	return rx_pkts;
+>  }
+>  
+> @@ -2760,7 +2762,7 @@ static int __bnxt_poll_cqs(struct bnxt *bp, struct bnxt_napi *bnapi, int budget)
+>  }
+>  
+>  static void __bnxt_poll_cqs_done(struct bnxt *bp, struct bnxt_napi *bnapi,
+> -				 u64 dbr_type)
+> +				 u64 dbr_type, int budget)
+>  {
+>  	struct bnxt_cp_ring_info *cpr = &bnapi->cp_ring;
+>  	int i;
+> @@ -2776,7 +2778,7 @@ static void __bnxt_poll_cqs_done(struct bnxt *bp, struct bnxt_napi *bnapi,
+>  			cpr2->had_work_done = 0;
+>  		}
+>  	}
+> -	__bnxt_poll_work_done(bp, bnapi);
+> +	__bnxt_poll_work_done(bp, bnapi, budget);
+>  }
+>  
+>  static int bnxt_poll_p5(struct napi_struct *napi, int budget)
+> @@ -2806,7 +2808,8 @@ static int bnxt_poll_p5(struct napi_struct *napi, int budget)
+>  			if (cpr->has_more_work)
+>  				break;
+>  
+> -			__bnxt_poll_cqs_done(bp, bnapi, DBR_TYPE_CQ_ARMALL);
+> +			__bnxt_poll_cqs_done(bp, bnapi, DBR_TYPE_CQ_ARMALL,
+> +					     budget);
+>  			cpr->cp_raw_cons = raw_cons;
+>  			if (napi_complete_done(napi, work_done))
+>  				BNXT_DB_NQ_ARM_P5(&cpr->cp_db,
+> @@ -2836,7 +2839,7 @@ static int bnxt_poll_p5(struct napi_struct *napi, int budget)
+>  		}
+>  		raw_cons = NEXT_RAW_CMP(raw_cons);
+>  	}
+> -	__bnxt_poll_cqs_done(bp, bnapi, DBR_TYPE_CQ);
+> +	__bnxt_poll_cqs_done(bp, bnapi, DBR_TYPE_CQ, budget);
+>  	if (raw_cons != cpr->cp_raw_cons) {
+>  		cpr->cp_raw_cons = raw_cons;
+>  		BNXT_DB_NQ_P5(&cpr->cp_db, raw_cons);
+> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+> index 9d16757e27fe..bd44a5701e5f 100644
+> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+> @@ -1005,7 +1005,7 @@ struct bnxt_napi {
+>  	struct bnxt_tx_ring_info	*tx_ring;
+>  
+>  	void			(*tx_int)(struct bnxt *, struct bnxt_napi *,
+> -					  int);
+> +					  int tx_pkts, int budget);
+>  	int			tx_pkts;
+>  	u8			events;
+>  	u8			tx_fault:1;
+> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
+> index 5b6fbdc4dc40..33b7eddfbf41 100644
+> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
+> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
+> @@ -125,7 +125,8 @@ static void __bnxt_xmit_xdp_redirect(struct bnxt *bp,
+>  	dma_unmap_len_set(tx_buf, len, 0);
+>  }
+>  
+> -void bnxt_tx_int_xdp(struct bnxt *bp, struct bnxt_napi *bnapi, int nr_pkts)
+> +void bnxt_tx_int_xdp(struct bnxt *bp, struct bnxt_napi *bnapi, int nr_pkts,
+> +		     int budget)
+>  {
+>  	struct bnxt_tx_ring_info *txr = bnapi->tx_ring;
+>  	struct bnxt_rx_ring_info *rxr = bnapi->rx_ring;
+> @@ -135,6 +136,9 @@ void bnxt_tx_int_xdp(struct bnxt *bp, struct bnxt_napi *bnapi, int nr_pkts)
+>  	u16 last_tx_cons = tx_cons;
+>  	int i, j, frags;
+>  
+> +	if (!budget)
+> +		return;
+> +
+>  	for (i = 0; i < nr_pkts; i++) {
+>  		tx_buf = &txr->tx_buf_ring[tx_cons];
+>  
+> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.h b/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.h
+> index ea430d6961df..3ab47ae2f26d 100644
+> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.h
+> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.h
+> @@ -16,7 +16,8 @@ struct bnxt_sw_tx_bd *bnxt_xmit_bd(struct bnxt *bp,
+>  				   struct bnxt_tx_ring_info *txr,
+>  				   dma_addr_t mapping, u32 len,
+>  				   struct xdp_buff *xdp);
+> -void bnxt_tx_int_xdp(struct bnxt *bp, struct bnxt_napi *bnapi, int nr_pkts);
+> +void bnxt_tx_int_xdp(struct bnxt *bp, struct bnxt_napi *bnapi, int nr_pkts,
+> +		     int budget);
+>  bool bnxt_rx_xdp(struct bnxt *bp, struct bnxt_rx_ring_info *rxr, u16 cons,
+>  		 struct xdp_buff xdp, struct page *page, u8 **data_ptr,
+>  		 unsigned int *len, u8 *event);
+> -- 
+> 2.41.0
+> 
 
