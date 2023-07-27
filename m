@@ -1,142 +1,136 @@
-Return-Path: <netdev+bounces-21894-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-21895-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42DF676529B
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 13:38:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EA0D97652AB
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 13:40:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2F69F1C20949
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 11:38:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E9A951C21323
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 11:40:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C365015AE4;
-	Thu, 27 Jul 2023 11:38:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83D7615AE5;
+	Thu, 27 Jul 2023 11:40:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B43E2156C8
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 11:38:13 +0000 (UTC)
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2110.outbound.protection.outlook.com [40.107.244.110])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86140135
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 04:38:12 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=MtQ2PQ8QJIKdvIH3P/6UNLWPHeDIgxo8KjeNB+lPiFR71RKWXvKf7slwg1AGxAMLPdtgE1j88CHFxukkGLoOa13BGKKF0Z/ZrYwiABXGvG1NeIMRHPDieGEgsi6FYAI9AXL4N80meLgAjxBjlOkcJG2tYQPFvpSr4Uqzp3LrpIlvEtEPH3RXWo8Pre8FOz3Fq6FBjsqpz0MwWXeSUGM/Q7gosSjwjhHGSJ4kGZ3TBQE11bMwJ1BSgkqBmRyN8DV/12SzIJZ1P7TSPlzpRnFAI5gIuN3PPkbvhcWZKRMs1u5UmXEXOiHogyLmjMXLPoNEMn2qpbqdIl3HTPfjxUCEmQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=h34wVkWGmZXf+9CRSA+EAp4s9p38k/t8bAMnuoHmtxA=;
- b=L2NC23QKxJowPum5TMYJRO+jpvm/Y1QC5cdkaapnwfVTnV0NC2TmTAliSgDJS++TEGKmRcTLooyLq/a9tafxzWQWdjRkG8MiF3dp2wyMVbcGD9ThxBmLjq+J/6TnBf52YAFc7iENUoxNLm9i2C3w63+Bfpdj+jkSBivVxKKNvcOm+/aRo3dZHQr8LXAySfxX85cfdOsJevxK6dS0D/yLDsibq0R3YYgR3nwE1LCZt8VnFavvamL0Ov039jdVCR7F6o2qdtaOGAMGkuNa9tl57ryFnw/sodhQzemj8BKGqiZzdboxWq4NdUQ4TZ0Dsh3fCZR6HgB+6/5gLgIr398bUA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
- dkim=pass header.d=corigine.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 718DB15AC3
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 11:40:28 +0000 (UTC)
+Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E623B135;
+	Thu, 27 Jul 2023 04:40:26 -0700 (PDT)
+Received: by mail-lf1-x12c.google.com with SMTP id 2adb3069b0e04-4fba8f2197bso1403010e87.3;
+        Thu, 27 Jul 2023 04:40:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=h34wVkWGmZXf+9CRSA+EAp4s9p38k/t8bAMnuoHmtxA=;
- b=JJpF/nI5DtnlaGEFRZjQVU63S98xPxnFXo1e3isb8Kdr80jy01LM4owuS9cam+BiWLpriJl+Wq6hEkGtWJMHS8yKs7x2tNpJmiRYJivD4vkR57y6H6jbFrvySKezvkR86Pgo+PTahaszDkmob3PT8BhjUd12nrbq5r3Ruo3QhJA=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=corigine.com;
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
- by CH2PR13MB3751.namprd13.prod.outlook.com (2603:10b6:610:98::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.29; Thu, 27 Jul
- 2023 11:38:08 +0000
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::fde7:9821:f2d9:101d]) by PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::fde7:9821:f2d9:101d%7]) with mapi id 15.20.6631.026; Thu, 27 Jul 2023
- 11:38:08 +0000
-Date: Thu, 27 Jul 2023 13:38:02 +0200
-From: Simon Horman <simon.horman@corigine.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>
-Subject: Re: [PATCH net] MAINTAINERS: stmmac: retire Giuseppe Cavallaro
-Message-ID: <ZMJXGoEkFrHBhQl/@corigine.com>
-References: <20230726151120.1649474-1-kuba@kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230726151120.1649474-1-kuba@kernel.org>
-X-ClientProxiedBy: AM0PR04CA0018.eurprd04.prod.outlook.com
- (2603:10a6:208:122::31) To PH0PR13MB4842.namprd13.prod.outlook.com
- (2603:10b6:510:78::6)
+        d=gmail.com; s=20221208; t=1690458025; x=1691062825;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=CQNTkXPnx3vtxi9gXhe6F8GyptxWIzVy/cR8pZ3VmZI=;
+        b=n+dzJVefXszARcjuYn0EuJDKH4yuffGCemwWfVAWg7ZPElofPkCeKOzMNgjDwlIOqj
+         XZckvkessVyXYodF1UvhuOECm/TijRGu/fgNH4Ajq4t7HfAFkKQ9KevjJeKXapg8QxHW
+         qhH+rrwJheMYUHlt0jYw1zJhoIECYux/vEpfDLj8PIJMtKfbikVMi9jzG2e7RS3fGSfj
+         nx40Uk+jo0o91/rxBbIWje2meP7+ZE+Vkr1xHuA8yPoHsa62S9jTQ4//uTfmol4HQqoB
+         jvmvyCPRWlpvpuev5zQFMwZfKpPKVlBpIGkDEsMENkPrnv16yVDmHtUOv/17KdjaDH2T
+         FFMA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690458025; x=1691062825;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=CQNTkXPnx3vtxi9gXhe6F8GyptxWIzVy/cR8pZ3VmZI=;
+        b=f17APbwW0MYwpFIC/THCaafpK0POUhVp1nZVmZL8vfLQAZ4JJjwPCRs+PvllzTbrGM
+         Eue00UQ6wFZf72UpkIyZwyUGYPGQ5Dv+F9X1fjtYXWE60aVNgWCwMSYXDgPqvZ0Bf5NE
+         775sAL9dkvkNCPNz9axbw/q3FtfFlBe/nD4NEj4LloJe83zsLG9CqFlTfeJWsopaZSQw
+         XZFtlOhr7cTPdO/Yglzvc9Lshfh/p89xdZeP2Xc+HeiIfuixDkavLU7iGcxvghuWtsL1
+         pR0B7FA8ThZL8EKTNzhBNGslsWozYLcaQ82PnWNoHe0Wl3Y2OP5vhImMGMnDzyHk6Pox
+         lbLQ==
+X-Gm-Message-State: ABy/qLaDKKzROr9Y+Ytmo8fl3xipRErYnj+/HYLgKQRbHGIth/UXyUkS
+	EHafUWVnTjwqvMAgNXfpBG4=
+X-Google-Smtp-Source: APBJJlFZcJdV/2tsOuTHdZeivtkzWTWVOio476KT8N8lXbV+wlSd2bdlofgtNZw6MIh0NjgWFabYQA==
+X-Received: by 2002:a19:5f1c:0:b0:4fd:fc3d:cce7 with SMTP id t28-20020a195f1c000000b004fdfc3dcce7mr1288696lfb.44.1690458024822;
+        Thu, 27 Jul 2023 04:40:24 -0700 (PDT)
+Received: from ?IPV6:2a00:e180:1511:5300:e4c6:3a45:7174:efa8? ([2a00:e180:1511:5300:e4c6:3a45:7174:efa8])
+        by smtp.gmail.com with ESMTPSA id v16-20020a1cf710000000b003fc080acf68sm4459448wmh.34.2023.07.27.04.40.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 27 Jul 2023 04:40:23 -0700 (PDT)
+Message-ID: <dfe4bae7-13a0-3c5d-d671-f61b375cb0b4@gmail.com>
+Date: Thu, 27 Jul 2023 13:40:21 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|CH2PR13MB3751:EE_
-X-MS-Office365-Filtering-Correlation-Id: c04f4a82-611b-4109-6b6f-08db8e95f335
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	xjaHBV5mMjKIPqljQcf37x07HZ3e3PUcapW0lvTFJ12l33Y4hG2XrlvYmIS6bWEW/iew86DktHX7g1j2aON3wmTcl7zVPv1PEl+56vaFgbIX4LjSx0nolhzaFRztLWZFhiuRAwlx5b36m/D8DGLTk9nNHtnxWu02vllJ181HK+iVmeME8NKDg6y1r55TLeaLjbqJdnkkJQTZl+tD1cEFXlMK7jcX42ORyP/JOYP7/9fGmygJpul8WF9Xy4dTGJKgm+zCifETRRyiSZGtPycirOBZB3rq7Xn/qtDE3U7mDedyG1S+HY5sf4r8YXLwJ12i+s6/zhyNK9QS9J6n4FhKUpgwkPoTgco6iZwFz83PTw77NvrFpBGMkeHJjWLgc/OpWhizyK9UR3GrSgfWwoywCVuoSLfagnO2lQljS5rdFRVTMjH7XnHM+lYcURxBhf0H7rbQrq5+7pGoiHNucnVzXJ507kxMkFkIjbm4yq2b7C8dTTu/ZTuXwwmc/Y67Sjg83NmfGX1HGvWJDiN8243GOD5pBn6itKRquuyGARU9kI8JkyvgwpuCNblYu7bfIH/t91ptyehITtvOCAtVqIDdmqm/i3YJCBOdT2rwnLl969Y=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(376002)(136003)(366004)(39830400003)(346002)(451199021)(6666004)(6486002)(478600001)(6512007)(6506007)(38100700002)(66556008)(66946007)(4326008)(66476007)(6916009)(186003)(54906003)(2616005)(5660300002)(44832011)(316002)(8936002)(8676002)(2906002)(4744005)(41300700001)(86362001)(36756003);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?g0wRmdhZUQgZ5jzJ6THrPrBHFLM1hyIcF3X4FsplmIfTjfPxjK/2p/eRIkd+?=
- =?us-ascii?Q?ATfwGdOa0GJJU/ppcZX7U4a7K/iqDTzhpJAB2pv7ezKypArrpe3Kdd63FeMw?=
- =?us-ascii?Q?Xapj4hMhCycBHnVn8iQ+8Q+xLjNMU0fxpSCtq2JmQXz3YZ+y5ogX+1GbaX03?=
- =?us-ascii?Q?EY70dPcI0No/E3fSW8EQSlN5gLd5Mx4eKLsQaxrFH7FhxEpZ36hH14MqvXW0?=
- =?us-ascii?Q?fLZ5qXpLd9hi6THsAB0AXWIAKCUGqvbQOcrNV1FgNbCit66iOZUHpUeeo8e9?=
- =?us-ascii?Q?pgA4CT6UeLkrEweCaMb+e8o+dHWI83ytoldZgBqEAUTRCoqABjtM/0QOryUb?=
- =?us-ascii?Q?4PUtt6S/XKZoEYITzJMEVGQg0oG+c6VZCyPqAHzDJThIvFWCVjpsPIxWx8jg?=
- =?us-ascii?Q?oW7HmZU/dlhQ663XvpUgs72ywva/TgYqJHEWdww59jExzA/3hMK5BwMqa3Na?=
- =?us-ascii?Q?8GrTNlt1xRua8rK+84Bf8/+yRqbTuadfjCCVDPleCjUAzKhQ3wca8FtTPzME?=
- =?us-ascii?Q?o37UjFF10QJC6uUA6UJWawotPddmY+sc2TDX6igRhCOlNYEe1rHwHAbpuJzX?=
- =?us-ascii?Q?PR/nBkc0aYJqDHwNVr+F1UYd0qf3U6h3pa6a0D8Wm7SmpzbJpu7Zb9MqYBBk?=
- =?us-ascii?Q?cTKlbr9aTvbBqvb9/Aar7tnkrTVQyyQLDVB8NdxyoFMFAtnAcQuqXTo+FvK5?=
- =?us-ascii?Q?Rky7M9nghC4QqkFaTtsTe6T1ORlaurA1H7Kje3Loy8D2VEqp38DYda/IZr3M?=
- =?us-ascii?Q?V/XWP7+oxYRHT6Et7YwbO+fc8QdQtbvX0ceaiqxd7T1bkaKlkQ1wYzY8OVLk?=
- =?us-ascii?Q?PQV3jc1ixHDCC4q7Ru0viIpgreKf54T+Z38+T+vJJiH7ebgi0AF9dmC/xz4h?=
- =?us-ascii?Q?89L/9DJkteEENAmzByZqI/z6LeFXZUPK5FarBUvEtn/mu15xy7DR3s5/Bi3Y?=
- =?us-ascii?Q?CDX1StT/o2B08vpOULLxPHzoOmK07Nz2KvBz7iDWNJ3gyDJJy8LzYRTSMs59?=
- =?us-ascii?Q?jUoakUetpdw0ybene1Nl8xj+6JKtnsfxzCdoa1KXidLiBVkbuMk/Q1NZ6//0?=
- =?us-ascii?Q?VVDO96sXuZKZfNKAzAhfHkcTzGCdCCdnOVy7Zk69ftkCgQEEv+DJvXFOpmx2?=
- =?us-ascii?Q?jQUdGrMskevxMDQ9Wywx3xVSelcLjsxDSNELz8pOO/1K7GqexinQx74KcAAX?=
- =?us-ascii?Q?epdCyVeEut7fTpjLKIhgvdCsKgLg8Y0EJY05CwPld7SYpdGjL41UpbN2hK9L?=
- =?us-ascii?Q?nZNCKlUO333lvouV5lu7b4S9Hr1JJYDJIB0GFQ875i8oCTFA5QlkD2k/i0JT?=
- =?us-ascii?Q?ZeVTT/WhPnsR24TUX7jVnGEwqgwrJE2uDve5HIhaew4iV+zPDFKJ/YQvBKIE?=
- =?us-ascii?Q?pvUlabeoXUde9YVlyk06hhhJ8aXxt+b8BZOBZ1t3rMxlOABrK9bVVCu74uaG?=
- =?us-ascii?Q?Z6V4imDYkAVfGunJQaBLfn1msS8f1V0+wp4gpm+yUSS9Ic+ZjLAjzeE945x8?=
- =?us-ascii?Q?Qvhe/SOsVhxQjO5HIs8wPX0OkQax2NYKJ751/2VCbf0TemecUoCiaSI5vby/?=
- =?us-ascii?Q?w3RzuTwC2eCTfhuKAxlLw83dHN/yI0x7jS5m4p4qcFA8vlr5pbThMS2bzV56?=
- =?us-ascii?Q?u7Zr9q8LArL7OjXug6CsAuosw87rh1SF03y3hXG1ryoEM4FhIOFMe+QqSTpD?=
- =?us-ascii?Q?PtrX8g=3D=3D?=
-X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c04f4a82-611b-4109-6b6f-08db8e95f335
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Jul 2023 11:38:08.5923
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: pYpCgDK7WXQyXug9phNwjlyFjvRd9QrOy1zw0qnlWToJFLYsSDg18VDULkN1sn+ctSB+bSLZY3xQlDQXDfvzi8Qtm9S0b7pFscPKwdK2/iU=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR13MB3751
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [Linaro-mm-sig] Re: [RFC PATCH 00/10] Device Memory TCP
+Content-Language: en-US
+To: Jason Gunthorpe <jgg@ziepe.ca>,
+ Stephen Hemminger <stephen@networkplumber.org>
+Cc: Mina Almasry <almasrymina@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ David Ahern <dsahern@kernel.org>, Andy Lutomirski <luto@kernel.org>,
+ linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org,
+ netdev@vger.kernel.org, linux-arch@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, Sumit Semwal <sumit.semwal@linaro.org>,
+ =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Jesper Dangaard Brouer <hawk@kernel.org>,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>, Arnd Bergmann
+ <arnd@arndb.de>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Shuah Khan <shuah@kernel.org>
+References: <12393cd2-4b09-4956-fff0-93ef3929ee37@kernel.org>
+ <CAHS8izNPTwtk+zN7XYt-+ycpT+47LMcRrYXYh=suTXCZQ6-rVQ@mail.gmail.com>
+ <ZLbUpdNYvyvkD27P@ziepe.ca> <20230718111508.6f0b9a83@kernel.org>
+ <35f3ec37-11fe-19c8-9d6f-ae5a789843cb@kernel.org>
+ <20230718112940.2c126677@kernel.org>
+ <eb34f812-a866-a1a3-9f9b-7d5054d17609@kernel.org>
+ <20230718154503.0421b4cd@kernel.org>
+ <CAHS8izPORN=r2-hzYSgN4s_Aoo2dnwoJXrU5Hu=43sb8zsWyhQ@mail.gmail.com>
+ <20230719105711.448f8cad@hermes.local> <ZLhww+P+7zhTTUk7@ziepe.ca>
+From: =?UTF-8?Q?Christian_K=c3=b6nig?= <ckoenig.leichtzumerken@gmail.com>
+In-Reply-To: <ZLhww+P+7zhTTUk7@ziepe.ca>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Jul 26, 2023 at 08:11:20AM -0700, Jakub Kicinski wrote:
-> I tried to get stmmac maintainers to be more active by agreeing with
-> them off-list on a review rotation. I pinged Peppe 3 times over 2 weeks
-> during his "shift month", no reviews are flowing.
-> 
-> All the contributions are much appreciated! But stmmac is quite
-> active, we need participating maintainers :(
-> 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Am 20.07.23 um 01:24 schrieb Jason Gunthorpe:
+> On Wed, Jul 19, 2023 at 10:57:11AM -0700, Stephen Hemminger wrote:
+>
+>> Naive idea.
+>> Would it be possible for process to use mmap() on the GPU memory and then
+>> do zero copy TCP receive some how? Or is this what is being proposed.
+> It could be possible, but currently there is no API to recover the
+> underlying dmabuf from the VMA backing the mmap.
 
-Reviewed-by: Simon Horman <simon.horman@corigine.com>
+Sorry for being a bit late, have been on vacation.
+
+Well actually this was discussed before to work around problems with 
+Windows applications through wine/proton.
+
+Not 100% sure what the outcome of that was, but if I'm not completely 
+mistaken getting the fd behind a VMA should be possible.
+
+It might just not be the DMA-buf fd, because we use mmap() re-routing to 
+be able to work around problems with the reverse tracking of mappings.
+
+Christian.
+
+>
+> Also you can't just take arbitary struct pages from any old VMA and
+> make them "netmem"
+>
+> Jason
+> _______________________________________________
+> Linaro-mm-sig mailing list -- linaro-mm-sig@lists.linaro.org
+> To unsubscribe send an email to linaro-mm-sig-leave@lists.linaro.org
 
 
