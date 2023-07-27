@@ -1,179 +1,173 @@
-Return-Path: <netdev+bounces-22070-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22071-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0DE4B765D57
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 22:29:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC985765D87
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 22:42:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 31CC11C2171F
-	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 20:29:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E96292824FC
+	for <lists+netdev@lfdr.de>; Thu, 27 Jul 2023 20:42:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC9151CA0A;
-	Thu, 27 Jul 2023 20:29:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC61E2714B;
+	Thu, 27 Jul 2023 20:41:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1BCC1CA02
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 20:29:00 +0000 (UTC)
-Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44CD7213A
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 13:28:59 -0700 (PDT)
-Received: by mail-ed1-x529.google.com with SMTP id 4fb4d7f45d1cf-5222c5d71b8so1737919a12.2
-        for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 13:28:59 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D100F2712B
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 20:41:58 +0000 (UTC)
+Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6937B2D45;
+	Thu, 27 Jul 2023 13:41:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1690489738; x=1691094538;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=WzVKxSw4qovJx+vUORpKxU6ZmGj2MqEb0WCG7CiGn1U=;
-        b=PRWcWU8skTjfrdKzP/dLsYMk5uvHGiC13NfULfPnUnAX8Y7BBAFKSQ/qwIIQnlHJhX
-         QeVXgxbkzGFqVpmgO57gV1zpubNcut6wXnHL2VdYqlqvlZ9gatygWhT9dX4Ur9UXnd07
-         U+fzUYaF2qHIdopW/kWwKhts9ErgnyAr8d7o4=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690489738; x=1691094538;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=WzVKxSw4qovJx+vUORpKxU6ZmGj2MqEb0WCG7CiGn1U=;
-        b=HMPvwmqx2Qog7mbcS7SQ0XSdnbFEsaQL8kLIrhrnTlSQiZibjCI8E47DoLhUqrUNuQ
-         uHZEFt2cL/MVmV7CRbfqxbsvgyVqDRT8LRKIIAz2Bo7FuMCZS84jpsbwiTecWbLgC2f4
-         AvA9bGQIRC44R89lKvtOQlQXPGQkGeHHkhHK31ZUBChJlGYDH923TjN+ZybDgN9x6MFA
-         u49HBsGY/DJK/A0El7EWGYkbEI7/z0v7OkKvPU6irf2zTUsco8EMxtMf856/B2Yy/Es+
-         +WnmfdukGsyS8/KGcPWt8wJD5WQNpmmDuYRLCgcjjnFaAWH98qF3QCgMEckk/CCNiIfl
-         8p4w==
-X-Gm-Message-State: ABy/qLYVODPEavLcJ4D/s+qc3wsX4y7e2F+uxJDgzAjxDN2GTxqt7O7v
-	ky7ReojLfDWWkP2rNY99uo6APzdOGM44zVpWs8fhBg==
-X-Google-Smtp-Source: APBJJlGazOZpc1YwdzHHw9IpZXXasPUrE38hu5Ts6Vp6QdPKkgH6MzIYaYLBAov+XS0B1+z4LSuZyy4C7XHjX6HsLmY=
-X-Received: by 2002:a05:6402:741:b0:522:57d9:6553 with SMTP id
- p1-20020a056402074100b0052257d96553mr74674edy.1.1690489737525; Thu, 27 Jul
- 2023 13:28:57 -0700 (PDT)
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1690490518; x=1722026518;
+  h=date:from:to:cc:subject:message-id:mime-version;
+  bh=WLNg3ybLSGLXd9RmQLt1k/NytHNJA5YP1EVjXUFQdvo=;
+  b=eFz6oiDF68ekHW/M7mEscNlkg1HBW176W9Xs42HZXkoksH5Wlk+nvgte
+   JPhz9irxT79QQSCac8rSCoxzz9L5gAR1+cOKHXMkfnrAXEgbREJhwMNSp
+   B7RYtk53FED2KSu8rICT3GF9OrBHfdXjjqnQ1CgeL10NgC7Mnro0G+DZ+
+   w=;
+X-IronPort-AV: E=Sophos;i="6.01,235,1684800000"; 
+   d="scan'208";a="342172117"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-pdx-2c-m6i4x-fa5fe5fb.us-west-2.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jul 2023 20:41:56 +0000
+Received: from EX19MTAUWB002.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
+	by email-inbound-relay-pdx-2c-m6i4x-fa5fe5fb.us-west-2.amazon.com (Postfix) with ESMTPS id 2863640DC3;
+	Thu, 27 Jul 2023 20:41:55 +0000 (UTC)
+Received: from EX19D046UWB002.ant.amazon.com (10.13.139.181) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Thu, 27 Jul 2023 20:41:50 +0000
+Received: from EX19MTAUEB001.ant.amazon.com (10.252.135.35) by
+ EX19D046UWB002.ant.amazon.com (10.13.139.181) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Thu, 27 Jul 2023 20:41:49 +0000
+Received: from dev-dsk-shaoyi-2b-b6ac9e9c.us-west-2.amazon.com (10.189.91.91)
+ by mail-relay.amazon.com (10.252.135.35) with Microsoft SMTP Server id
+ 15.2.1118.30 via Frontend Transport; Thu, 27 Jul 2023 20:41:49 +0000
+Received: by dev-dsk-shaoyi-2b-b6ac9e9c.us-west-2.amazon.com (Postfix, from userid 13116433)
+	id 512B722508; Thu, 27 Jul 2023 20:41:49 +0000 (UTC)
+Date: Thu, 27 Jul 2023 20:41:49 +0000
+From: Shaoying Xu <shaoyi@amazon.com>
+To: <stable@vger.kernel.org>
+CC: <netdev@vger.kernel.org>, Shaoying Xu <shaoyi@amazon.com>, Lion
+	<nnamrec@gmail.com>, Eric Dumazet <edumazet@google.com>, Jamal Hadi Salim
+	<jhs@mojatatu.com>, Pedro Tammela <pctammela@mojatatu.com>, Simon Horman
+	<simon.horman@corigine.com>, Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH 4.14,5.4] net/sched: sch_qfq: account for stab overhead in
+ qfq_enqueue
+Message-ID: <20230727204149.GA30816@dev-dsk-shaoyi-2b-b6ac9e9c.us-west-2.amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230727190726.1859515-1-kuba@kernel.org>
-In-Reply-To: <20230727190726.1859515-1-kuba@kernel.org>
-From: Michael Chan <michael.chan@broadcom.com>
-Date: Thu, 27 Jul 2023 13:28:45 -0700
-Message-ID: <CACKFLinpFmVA7-95xYYpwBfP4yduvtHNmy7yMiG8FCwmcCo0Qw@mail.gmail.com>
-Subject: Re: [PATCH net-next 0/2] eth: bnxt: fix a couple of W=1 C=1 warnings
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
-	pabeni@redhat.com
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000545a2106017dd095"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+User-Agent: Mutt/1.5.21 (2010-09-15)
+Precedence: Bulk
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
---000000000000545a2106017dd095
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+[ Upstream commit 3e337087c3b5805fe0b8a46ba622a962880b5d64 ]
 
-On Thu, Jul 27, 2023 at 12:07=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> w=
-rote:
->
-> Fix a couple of build warnings.
->
-> Jakub Kicinski (2):
->   eth: bnxt: fix one of the W=3D1 warnings about fortified memcpy()
->   eth: bnxt: fix warning for define in struct_group
->
->  drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.c | 2 +-
->  drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.h | 3 ++-
->  2 files changed, 3 insertions(+), 2 deletions(-)
->
-For the series,
-Reviewed-by: Michael Chan <michael.chan@broadcom.com>
+Lion says:
+-------
+In the QFQ scheduler a similar issue to CVE-2023-31436
+persists.
 
-I will look into the other issue that you mentioned.  Thanks.
+Consider the following code in net/sched/sch_qfq.c:
 
---000000000000545a2106017dd095
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+static int qfq_enqueue(struct sk_buff *skb, struct Qdisc *sch,
+                struct sk_buff **to_free)
+{
+     unsigned int len = qdisc_pkt_len(skb), gso_segs;
 
-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
-OnaLEot1MoQO7BIe5S9H4AcCEXXcrJJiAtMCl47ARpyHmvQFQFFTrHgUYEd9V+9bOzY7MBIGSV1N
-/JfsT1sZw6HT0lJkSQefhPGpBniAob62DJP3qr11tu8CAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
-AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
-c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
-AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
-TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
-bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
-L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
-BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
-HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQU31rAyTdZweIF0tJTFYwfOv2w
-L4QwDQYJKoZIhvcNAQELBQADggEBACcuyaGmk0NSZ7Kio7O7WSZ0j0f9xXcBnLbJvQXFYM7JI5uS
-kw5ozATEN5gfmNIe0AHzqwoYjAf3x8Dv2w7HgyrxWdpjTKQFv5jojxa3A5LVuM8mhPGZfR/L5jSk
-5xc3llsKqrWI4ov4JyW79p0E99gfPA6Waixoavxvv1CZBQ4Stu7N660kTu9sJrACf20E+hdKLoiU
-hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
-E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
-aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
-EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIMTBCiknq2wV9mcwPGZLOddHgVrp9RZC
-LVpJOTRw0KDMMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMDcy
-NzIwMjg1N1owaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
-SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQBsRzwyLMLid66mAsWdDmJnQI4FtWnCIvlWckD2IS5IjmDs1Hg1
-P/hV5EMnLl9eQBPa2J4R0nZASXysV9h/WN+hJyBfrOWocq9EhZALBIGuf/W294D+EHgPUcSu4IS8
-GhNvzQCL9vRuMhQhKrQAypfUZmfCuI8ZXsWWvELYIXjcjmufnXdCYdfS8lBaBdmkdiQqmjc+xjX9
-Vxh2deufvvVLdE1oo/lufzNemTZu45v/Mhi6G/Q76aRcKsRNQkebqACFX9Gi0EqGk050+zjykNvk
-x+B/izafEZ3BZBZq7KALe9Ov9/w2berpAtFaBsdFFBC8FniONrBbUXGuF3uEAEdY
---000000000000545a2106017dd095--
+    // ...
+
+     if (unlikely(cl->agg->lmax < len)) {
+         pr_debug("qfq: increasing maxpkt from %u to %u for class %u",
+              cl->agg->lmax, len, cl->common.classid);
+         err = qfq_change_agg(sch, cl, cl->agg->class_weight, len);
+         if (err) {
+             cl->qstats.drops++;
+             return qdisc_drop(skb, sch, to_free);
+         }
+
+    // ...
+
+     }
+
+Similarly to CVE-2023-31436, "lmax" is increased without any bounds
+checks according to the packet length "len". Usually this would not
+impose a problem because packet sizes are naturally limited.
+
+This is however not the actual packet length, rather the
+"qdisc_pkt_len(skb)" which might apply size transformations according to
+"struct qdisc_size_table" as created by "qdisc_get_stab()" in
+net/sched/sch_api.c if the TCA_STAB option was set when modifying the qdisc.
+
+A user may choose virtually any size using such a table.
+
+As a result the same issue as in CVE-2023-31436 can occur, allowing heap
+out-of-bounds read / writes in the kmalloc-8192 cache.
+-------
+
+We can create the issue with the following commands:
+
+tc qdisc add dev $DEV root handle 1: stab mtu 2048 tsize 512 mpu 0 \
+overhead 999999999 linklayer ethernet qfq
+tc class add dev $DEV parent 1: classid 1:1 htb rate 6mbit burst 15k
+tc filter add dev $DEV parent 1: matchall classid 1:1
+ping -I $DEV 1.1.1.2
+
+This is caused by incorrectly assuming that qdisc_pkt_len() returns a
+length within the QFQ_MIN_LMAX < len < QFQ_MAX_LMAX.
+
+Fixes: 462dbc9101ac ("pkt_sched: QFQ Plus: fair-queueing service at DRR cost")
+Reported-by: Lion <nnamrec@gmail.com>
+Reviewed-by: Eric Dumazet <edumazet@google.com>
+Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
+Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
+Reviewed-by: Simon Horman <simon.horman@corigine.com>
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+[Backport patch for stable kernels 4.14 and 5.4. Since QFQ_MAX_LMAX is not 
+defined, replace it with 1UL << QFQ_MTU_SHIFT.]
+Cc: <stable@vger.kernel.org> # 4.14, 5.4
+Signed-off-by: Shaoying Xu <shaoyi@amazon.com>
+
+---
+ net/sched/sch_qfq.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/net/sched/sch_qfq.c b/net/sched/sch_qfq.c
+index 603bd3097bd8..34a54dcd95f2 100644
+--- a/net/sched/sch_qfq.c
++++ b/net/sched/sch_qfq.c
+@@ -375,8 +375,13 @@ static int qfq_change_agg(struct Qdisc *sch, struct qfq_class *cl, u32 weight,
+ 			   u32 lmax)
+ {
+ 	struct qfq_sched *q = qdisc_priv(sch);
+-	struct qfq_aggregate *new_agg = qfq_find_agg(q, lmax, weight);
++	struct qfq_aggregate *new_agg;
+ 
++	/* 'lmax' can range from [QFQ_MIN_LMAX, pktlen + stab overhead] */
++	if (lmax > (1UL << QFQ_MTU_SHIFT))
++		return -EINVAL;
++
++	new_agg = qfq_find_agg(q, lmax, weight);
+ 	if (new_agg == NULL) { /* create new aggregate */
+ 		new_agg = kzalloc(sizeof(*new_agg), GFP_ATOMIC);
+ 		if (new_agg == NULL)
+-- 
+2.40.1
+
 
