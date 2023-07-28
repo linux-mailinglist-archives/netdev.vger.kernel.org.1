@@ -1,161 +1,219 @@
-Return-Path: <netdev+bounces-22416-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22417-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25827767668
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 21:34:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 044A4767689
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 21:44:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 715D528271D
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 19:34:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E02141C21677
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 19:44:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD9CF1BB45;
-	Fri, 28 Jul 2023 19:34:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1F361BB4A;
+	Fri, 28 Jul 2023 19:44:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0EC714AA0
-	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 19:34:17 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (unknown [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45E97E69;
-	Fri, 28 Jul 2023 12:34:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=fPenveROvmLP9xK4bVQXMQSFpU0bLGq9l0utMcWGrfM=; b=S3P1XhiNI7tuydMrFHMGOtysw4
-	y7VxJlfdAExXJizqj4Qwc25CAaVdYRwdYTPeALneag129u+mW6NnjT+T7k+1BVbMz+6GnQ6+zyvVC
-	5D/9nWvpNBg6jeMWlTkQqS1v1Vjh6m0kkwvLLrcDyceBa4zN8zpSuc+kjysseEjfRfV+FRPavTh3I
-	2bEi9qFHbGOxrV/B3SdL+Wi8gKML0mDxdC/hgbe7PHi4k2/FvVElp9vrZNON7d8E+42y6XEfwhOfh
-	Z+s9pckqRxtpCUryeXfQx6shKLGrkvw7ZIZ02ie2f7et1TgNMLqrVWXt/zXpXur+ZGbxJDiZM4Cza
-	KjzCUZCQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:47138)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qPTDb-0007kx-2V;
-	Fri, 28 Jul 2023 20:33:43 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qPTDW-0005B7-3J; Fri, 28 Jul 2023 20:33:38 +0100
-Date: Fri, 28 Jul 2023 20:33:38 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Frank Li <Frank.li@nxp.com>
-Cc: Will Deacon <will@kernel.org>, Andrew Halaney <ahalaney@redhat.com>,
-	Shenwei Wang <shenwei.wang@nxp.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Shawn Guo <shawnguo@kernel.org>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Neil Armstrong <neil.armstrong@linaro.org>,
-	Kevin Hilman <khilman@baylibre.com>, Vinod Koul <vkoul@kernel.org>,
-	Chen-Yu Tsai <wens@csie.org>,
-	Jernej Skrabec <jernej.skrabec@gmail.com>,
-	Samuel Holland <samuel@sholland.org>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Fabio Estevam <festevam@gmail.com>,
-	NXP Linux Team <linux-imx@nxp.com>,
-	Jerome Brunet <jbrunet@baylibre.com>,
-	Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
-	Bhupesh Sharma <bhupesh.sharma@linaro.org>,
-	Nobuhiro Iwamatsu <nobuhiro1.iwamatsu@toshiba.co.jp>,
-	Simon Horman <simon.horman@corigine.com>,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
-	Wong Vee Khee <veekhee@apple.com>,
-	Revanth Kumar Uppala <ruppala@nvidia.com>,
-	Jochen Henneberg <jh@henneberg-systemdesign.com>,
-	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-amlogic@lists.infradead.org, imx@lists.linux.dev
-Subject: Re: [PATCH v2 net 2/2] net: stmmac: dwmac-imx: pause the TXC clock
- in fixed-link
-Message-ID: <ZMQYEs9gULZmmijV@shell.armlinux.org.uk>
-References: <20230727152503.2199550-1-shenwei.wang@nxp.com>
- <20230727152503.2199550-3-shenwei.wang@nxp.com>
- <4govb566nypifbtqp5lcbsjhvoyble5luww3onaa2liinboguf@4kgihys6vhrg>
- <ZMPdKyOtpZKEMLsO@shell.armlinux.org.uk>
- <20230728153611.GH21718@willie-the-truck>
- <ZMPs+sOIzWR0LmrP@lizhi-Precision-Tower-5810>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D47A1426E
+	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 19:44:34 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06BF1C433C7;
+	Fri, 28 Jul 2023 19:44:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1690573473;
+	bh=KeJCxAC9w3BXpwEAVqCWAunoHSIzyaOSX3Fwg/00SMY=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=aD3n4kjFDgC/GGnDrX5bBN8iODk/2fqbLismd6bqEZgy4gT/bQB2l3XY5sPDcDhmb
+	 y9rmG9uuXp4ujFHyH1Y5WQuqBYLmIZPnDrnYH0O78JJC4smZpZ7swE8Eh1o623hT0u
+	 2U5gP0iuzH6X98tvqxU0RqMMLrP76eOrWeSYmcJamUmteFsqaZb+jYazGoVdp/uy7s
+	 6EGqJECFuy9Cyxcny4gR2DI/cUoLjf/g77y8BPkN+kn4fxGLBsctXN4NUBBQKrlTxf
+	 jNBETC1zN502qXtpVBmg3cTQi+Q+jFWVQBWJ+R9N3fiiiu//Moqit5pnQ2ZqztrCaB
+	 GdoNvba4hk4bw==
+Message-ID: <e03c5f2c-a28a-898c-4999-100fd466a09d@kernel.org>
+Date: Fri, 28 Jul 2023 21:44:31 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZMPs+sOIzWR0LmrP@lizhi-Precision-Tower-5810>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,RDNS_NONE,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: shutdown(2) is underdocumented
+Content-Language: en-US
+To: Matthew House <mattlloydhouse@gmail.com>,
+ Askar Safin <safinaskar@gmail.com>
+Cc: linux-man@vger.kernel.org, netdev@vger.kernel.org
+References: <CAPnZJGCoHfwngQe5B1PgZ6kO7UK+GU7+G4vfVXxNpBZ6n-nB2g@mail.gmail.com>
+ <20230722153131.1156360-1-mattlloydhouse@gmail.com>
+From: Alejandro Colomar <alx@kernel.org>
+Organization: Linux
+In-Reply-To: <20230722153131.1156360-1-mattlloydhouse@gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------AiX5O0t96bvXqLuejaxR0BLs"
 
-On Fri, Jul 28, 2023 at 12:29:46PM -0400, Frank Li wrote:
-> On Fri, Jul 28, 2023 at 04:36:12PM +0100, Will Deacon wrote:
-> > Yes, I don't think wmb() is the right thing here. If you need to ensure
-> > that the write to MAC_CTRL_REG has taken effect, then you'll need to go
-> > through some device-specific sequence which probably involves reading
-> > something back. If you just need things to arrive in order eventually,
-> > the memory type already gives you that.
-> > 
-> > It's also worth pointing out that udelay() isn't necessarily ordered wrt
-> > MMIO writes, so that usleep_range() might need some help as well.
-> 
-> Hi Deacon:
-> 
-> Does it means below pattern will be problem?
-> 
-> 1.writel()
-> 2.udelay()
-> 3.writel()
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------AiX5O0t96bvXqLuejaxR0BLs
+Content-Type: multipart/mixed; boundary="------------aMQfl0OFq79WWr9yPRREtWpn";
+ protected-headers="v1"
+From: Alejandro Colomar <alx@kernel.org>
+To: Matthew House <mattlloydhouse@gmail.com>,
+ Askar Safin <safinaskar@gmail.com>
+Cc: linux-man@vger.kernel.org, netdev@vger.kernel.org
+Message-ID: <e03c5f2c-a28a-898c-4999-100fd466a09d@kernel.org>
+Subject: Re: shutdown(2) is underdocumented
+References: <CAPnZJGCoHfwngQe5B1PgZ6kO7UK+GU7+G4vfVXxNpBZ6n-nB2g@mail.gmail.com>
+ <20230722153131.1156360-1-mattlloydhouse@gmail.com>
+In-Reply-To: <20230722153131.1156360-1-mattlloydhouse@gmail.com>
 
-Yes, it can be a problem - because the first write may take a while
-to hit the hardware. It's been this way ever since PCI became a thing,
-even on x86 hardware.
+--------------aMQfl0OFq79WWr9yPRREtWpn
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-PCI posting rules are that writes can be posted into the various
-bridges in the bus structure and forwarded on at some point later.
-However, reads are not allowed to bypass writes - which means that if
-one reads from a PCI device, the preceeding writes need to be flushed
-out of the bridges _in the path to the device being read_.
+Hi Askar, Matthew,
 
-So, if we take an example and apply it to PCI:
+On 2023-07-22 17:30, Matthew House wrote:
+> On Sat, Jul 22, 2023 at 8:40 AM Askar Safin <safinaskar@gmail.com> wrot=
+e:
+>> shutdown(2) is underdocumented. Here is a lot of more details on
+>> shutdown(2): https://github.com/WebAssembly/WASI/issues/547 . I
+>> discovered them by experiment. So, please, document them
 
-	writel()
-	udelay(100)
-	writel()
-	readl()
+I'm not competent enough to do so, I fear.  If anyone wants to prepare
+a patch, please feel invited.  :-)
 
-The device could well see nothing for a while, and then two consecutive
-writes and a read in quick succession.
+Cheers,
+Alex
 
-> It may not wait enough time between 1 and 3. I think the above pattern
-> is quite common in driver code.  I am not sure if usleep_range involve
-> MMIO to get current counter, ARM may use cp15 to get local timer counter.
+>>
+>> --
+>> Askar Safin
+>=20
+> Documenting the asymmetry is probably a good idea: the TCP protocol onl=
+y
+> defines the equivalent of shutdown(SHUT_WR) and shutdown(SHUT_RDWR), an=
+d
+> there's no natural equivalent of a shutdown(SHUT_RD), so I don't think =
+the
+> semantics themselves can easily be made more symmetric.
+>=20
+> To expand, the current behavior, where shutdown(SHUT_RD) by itself sile=
+ntly
+> drops incoming data received before a shutdown(SHUT_WR), but replies wi=
+th a
+> RST to data received after a shutdown(SHUT_WR), is definitely pretty we=
+ird,
+> even looking at the relevant RFCs. tcp_rcv_state_process() in
+> net/ipv4/tcp_input.c implements this behavior: a RST is sent back if an=
+d
+> only if the connection is in the FIN-WAIT-1, FIN-WAIT-2, CLOSE-WAIT,
+> CLOSING, or LAST-ACK state (i.e., not in the ESTABLISHED state), data i=
+s
+> received on the socket, and shutdown(SHUT_RD) has previously been calle=
+d.
+> The logic is accompanied by the comment:
+>=20
+> /*
+>  * RFC 793 says to queue data in these states,
+>  * RFC 1122 says we MUST send a reset.
+>  * BSD 4.4 also does reset.
+>  */
+>=20
+> Looking at RFC 793 Section 3.5, it defines the CLOSE operation in a
+> "simplex fashion": a FIN is sent and further SENDs are no longer allowe=
+d,
+> but RECEIVEs are allowed until a FIN is sent from the remote host. This=
 
-There are no guarantees, even on x86, that udelay() offers anything to
-space device writes apart.
+> clearly corresponds to the shutdown(SHUT_WR) operation, so it doesn't
+> appear to define any particular behavior for shutdown(SHUT_RD).
+>=20
+> Instead, the entire justification for this behavior lies in RFC 1122
+> Section 4.2.2.13:
+>=20
+>> A host MAY implement a "half-duplex" TCP close sequence, so
+>> that an application that has called CLOSE cannot continue to
+>> read data from the connection.  If such a host issues a
+>> CLOSE call while received data is still pending in TCP, or
+>> if new data is received after CLOSE is called, its TCP
+>> SHOULD send a RST to show that data was lost.
+>=20
+> And in its Discussion:
+>=20
+>> Some systems have not implemented half-closed
+>> connections, presumably because they do not fit into
+>> the I/O model of their particular operating system.  On
+>> these systems, once an application has called CLOSE, it
+>> can no longer read input data from the connection; this
+>> is referred to as a "half-duplex" TCP close sequence.
+>=20
+> First off, this isn't a MUST but a SHOULD; I don't know where that idea=
 
-If this pattern is popular in drivers, and it's critical to the
-drivers operation, then it's technically buggy - and it's been that way
-for at least a couple of decades! One might get away with it (maybe the
-hardware isn't delaying the writes?) but the kernel has never
-guaranteed that writel(), udelay(), writel() will space the two writes
-apart by the specified delay.
+> came from. Second off, we reach a bit of a conflict (IMO) between the
+> wording and intent of this clause. It defines the RST behavior only
+> following a CLOSE operation by the application, and a CLOSE still alway=
+s
+> implies a shutdown(SHUT_WR). So at best, by a strict interpretation, th=
+e
+> application can be given a choice between shutdown(SHUT_WR) and
+> shutdown(SHUT_RDWR). Thus, Linux doesn't send any RSTs until after a
+> shutdown(SHUT_WR).
+>=20
+> However, the whole point here is "to show that data was lost", and sile=
+ntly
+> dropping incoming data prior to a shutdown(SHUT_WR) is clearly contrary=
+ to
+> this goal. Clearly, a RST isn't very nice to either host, but neither i=
+s
+> lost data. So it seems at least defensible for a TCP implementation to
+> unconditionally reply with a RST to data received after a
+> shutdown(SHUT_RD). (As far as I know, this wouldn't break TCP itself fr=
+om
+> the remote host's end, since it allows hosts to send a RST whenever the=
+y
+> feel like it. Higher-level protocols might be unhappy with it, though.)=
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+>=20
+> But of course, the current behavior is ancient, dating back to
+> Linux 2.3.41pre2 from 2000. (Before then, a RST would only be sent afte=
+r a
+> full close(2).) So there's no changing it at this point in Linux, at le=
+ast
+> not without an explicit option. I do wonder if there are any other OSes=
+
+> that have a shutdown(SHUT_RD) with different behavior, though.
+>=20
+> Matthew House
+
+--=20
+<http://www.alejandro-colomar.es/>
+GPG key fingerprint: A9348594CE31283A826FBDD8D57633D441E25BB5
+
+
+--------------aMQfl0OFq79WWr9yPRREtWpn--
+
+--------------AiX5O0t96bvXqLuejaxR0BLs
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEE6jqH8KTroDDkXfJAnowa+77/2zIFAmTEGp8ACgkQnowa+77/
+2zKvLg//epDvpglQX33VXwkin1dXrXtsCztsbFmUJPpfCKJgZrDsTvrxvGdhiQct
+vz2hNikIpZ5NiTaR5zpYw360JMJ7MQzLD/lFlFO5v7+GaLZfeJk3roHimqwbL/O6
+BcFn6R8SKaLZjNiF/3cNSCZyKmWB9QaeZwZ8EtAvuy0DclmrMZZSnM0BbI2DfSI3
+hv6RRhjhY2XrAIueYMzhIFcW6VQSr7TQ3LAhErlHxXgdsePttzpv2QV2epfrZVV8
+hb/vKkYDIV1Us7IOJzvZn1gA8cJGs4BjDhNiwQx9v3e/4Bjb0Rrtw51GMhHFxukv
+NKIBR3rdJ2Sa7ED7+mVaHRgH2OqPSVCBDGMhtwr6xLOYshVyzMg3BFdUPg0JbEsV
+YmVB17exV1vD9xDbB+MCQS6Qd1eKp4wfTGU/tBALX30EYZwgTNOeF1/6rx4YK7qd
+96mxEcNoWJkVYf+l6K2noJ2CmS5iVH1H2mqWwWhupbt9kw3vm1cTsxgfAgYNSlFm
+Cz8BOvPu9W9QRnn+mHk/9I/xxuKPvRZlDGiXoOscg00T4DxDCPwADeVJIn2pOtBS
+LWwcZsUewSzL2cj5XuzE9XvQWFk49Im4Rw028H6G3qfBTCqt2/uAF9UdmqhyERzz
+KGc5DnHhIUZcmGvfg+BkOw4gwsFGCoSlSavAUhqVi6fGoK7FO5s=
+=RUZU
+-----END PGP SIGNATURE-----
+
+--------------AiX5O0t96bvXqLuejaxR0BLs--
 
