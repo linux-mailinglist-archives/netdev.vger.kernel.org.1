@@ -1,209 +1,207 @@
-Return-Path: <netdev+bounces-22144-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22145-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C38B376633C
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 06:38:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A981E76634D
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 06:44:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C1EAF1C21084
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 04:38:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D8079281277
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 04:44:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 942251FC6;
-	Fri, 28 Jul 2023 04:37:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01B19522F;
+	Fri, 28 Jul 2023 04:44:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FC851FB4;
-	Fri, 28 Jul 2023 04:37:59 +0000 (UTC)
-Received: from wnew1-smtp.messagingengine.com (wnew1-smtp.messagingengine.com [64.147.123.26])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 945D83A89;
-	Thu, 27 Jul 2023 21:37:56 -0700 (PDT)
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-	by mailnew.west.internal (Postfix) with ESMTP id AD30D2B00094;
-	Fri, 28 Jul 2023 00:37:51 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute5.internal (MEProxy); Fri, 28 Jul 2023 00:37:53 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
-	:cc:content-type:content-type:date:date:from:from:in-reply-to
-	:in-reply-to:message-id:mime-version:references:reply-to:sender
-	:subject:subject:to:to; s=fm2; t=1690519071; x=1690526271; bh=mC
-	HEdnL0T3Kpk63KalD/dwpA1NDmMHVN2+cu3heDxgU=; b=OPReg3IA8PGot5tU7u
-	VEFTMdPQVyGCJdbHwagH6RTCQmO2TDnWHPFck8osBQstdii6OdMKyxId6BJ4FAA2
-	Vbs4UDcihOu684LpjzrzNGL1gqgPJOzb1jPvME3VC8+U//m0jHBvV4iybZ0+44I5
-	b2vK3J7ggPHUHF5KiLV6uLa0lK7Pph068mcGA6+Jld9mj7hB18bEXhYaqvjx7lYm
-	4TvaMAJ77brVU6lYTZCbuqMO+pSUs/1IkdO/JzE/SESX5aVA9GDXrmhlKW0FJZ1T
-	QFdoTLbQB0mIhrsHNphAa2PUYmMaW7qQklr9zMLDX2GF4bRElLqZiQ3phCItBm/u
-	On1Q==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:sender:subject
-	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-	:x-sasl-enc; s=fm3; t=1690519071; x=1690526271; bh=mCHEdnL0T3Kpk
-	63KalD/dwpA1NDmMHVN2+cu3heDxgU=; b=B7+4PSEy8zTkt5sy02FcnsCzC7OHs
-	ZxGkklFd0DrBu7sWUQoqZRwrZr6QI8NygFUhNujg9X4dLeSbD0M3MGbFTqpYESoe
-	Ec++QZDk+aZm1QR4VGs7RRSMfmxOj1RdrTJj3BL3obVB1iAUnB9nwfsfXPt8eTff
-	DAQp1rEWXX7WoQoo6cxsS+wm5d6T+Y4Ly7w5aEbUvsa/E5RZ1JzKXQ9HULIHzyi9
-	DAr+rhZ1iMX99lCtchxlJ8zPtSwYA/Hoc98WGey1Bs/kqJlc5jRrpgk1Y1R2qHWN
-	oYRUSTDKJiHgePgInIWZVwtgVdNgKK45DryvIRxfIzw0SMirlEW4avq1A==
-X-ME-Sender: <xms:HkbDZOBN9TEHzKvHK_qHu6hWfitdsT-A7jJq39o899CwEc3J_4S41w>
-    <xme:HkbDZIiE3_sYMNAysS_VFGV9BpN9XTuCZOv_UAxfh6nhtckJmIDzdUiRd6f1FT9UT
-    ch8WTd0AFGdb3_mHA>
-X-ME-Received: <xmr:HkbDZBn2_SPIosFWa52z89Fk4DcdYWz2eAAI2RetbucVLse7r-K1Spz_f1bFJWze9e2NTnzg3of7qfIDQDJhrQ>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrieehgdekfecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenfg
-    hrlhcuvffnffculdejtddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtsfdttddt
-    vdenucfhrhhomhepffgrnhhivghlucgiuhcuoegugihusegugihuuhhurdighiiiqeenuc
-    ggtffrrghtthgvrhhnpedvfeekteduudefieegtdehfeffkeeuudekheduffduffffgfeg
-    iedttefgvdfhvdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfh
-    hrohhmpegugihusegugihuuhhurdighiii
-X-ME-Proxy: <xmx:HkbDZMyqK1AHE_X9ppW_KvHmdG2vVeUuXFx4gXyo_ylfZlBihndlMQ>
-    <xmx:HkbDZDTFXvayGrXCkikk3zr3LowHaOqMc_qaA7Y8QPghfHyam_rnSw>
-    <xmx:HkbDZHZLXXDILADjfrzGzCDd5wj3iliL3vb67wWCnUdk21mIEW_Okw>
-    <xmx:H0bDZIBYqWhVsLdw8WOvGGYGtK8OEg_39w02Na4U3BgSuyKPj4DmGJ3FoO0>
-Feedback-ID: i6a694271:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 28 Jul 2023 00:37:48 -0400 (EDT)
-Date: Thu, 27 Jul 2023 22:37:47 -0600
-From: Daniel Xu <dxu@dxuuu.xyz>
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: daniel@iogearbox.net, kadlec@netfilter.org, edumazet@google.com, 
-	ast@kernel.org, fw@strlen.de, kuba@kernel.org, pabeni@redhat.com, 
-	pablo@netfilter.org, andrii@kernel.org, davem@davemloft.net, martin.lau@linux.dev, 
-	song@kernel.org, yhs@fb.com, john.fastabend@gmail.com, kpsingh@kernel.org, 
-	sdf@google.com, haoluo@google.com, jolsa@kernel.org, bpf@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
-	netdev@vger.kernel.org, dsahern@kernel.org
-Subject: Re: [PATCH bpf-next v6 2/5] netfilter: bpf: Support
- BPF_F_NETFILTER_IP_DEFRAG in netfilter link
-Message-ID: <c4w6rbxdciu27uzzdc2cpncxhdn2lkba2ekfuwzk6gmz7bdhdh@ymyq6b5wfkqf>
-References: <cover.1689970773.git.dxu@dxuuu.xyz>
- <5cff26f97e55161b7d56b09ddcf5f8888a5add1d.1689970773.git.dxu@dxuuu.xyz>
- <20230728011620.psvselzqdm7ku5e4@macbook-pro-8.dhcp.thefacebook.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EACC51FC6
+	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 04:44:46 +0000 (UTC)
+Received: from mail-vk1-xa2d.google.com (mail-vk1-xa2d.google.com [IPv6:2607:f8b0:4864:20::a2d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1923D2723
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 21:44:45 -0700 (PDT)
+Received: by mail-vk1-xa2d.google.com with SMTP id 71dfb90a1353d-48668399b29so454624e0c.1
+        for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 21:44:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1690519484; x=1691124284;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=692+S4FkHmBxAzri9hrerkt5cmhJNCiOy9pNKkxR03g=;
+        b=YzewPKio72RERcsDJVs1hi8YpkYWh8mmYJP/6oZ3AKBPd2ppBuK2N6hf1FV4t8m+oJ
+         2YYLjkQeGLOMv6tXIhyWKr7VOmJtWPoU62y5mr+FmqblVG7zLNVSx4m+G/NnSoebYdZr
+         CmY8U850HVcdOkgLUEbhx1UP7TDgE4OFDO9+N5xMZ1PKGxku206gCNmlFI7QSK8a1TS/
+         weFTypTMxFfxu/qZ+n0ys61at3MwVKLm+ctrs/BkGaToMN2ipz6AfjUwPQJ3P8PgNp8Y
+         NnkI0+tF11BRydfy4mOpVtQUYbf+JJTcQ4pSmCj2VP2JY3vyz04kaN3NFKv7niZ5NN2I
+         f+MQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690519484; x=1691124284;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=692+S4FkHmBxAzri9hrerkt5cmhJNCiOy9pNKkxR03g=;
+        b=kMtIs/7vnjMgn2PfERAmKIrdE+NmkjTlULUfw9lSlshKbHfihoVkOpF6tbjbXMJAOv
+         bqMiCeTGxcwbk6/bGLYPFjv78ioSx2/8B70pcaDGSE4Bcwmk/mcJZHJQk/oXFxWIb+XF
+         cDjlezerjH7zgnbVM4bAb2H4NHQHIt8V3KBBQzlNsfblJ9XfC6BSWBJnl87GaOw3OMVg
+         w5z9/w8hjmtu0sSx/cI71dba9uUGj3R+foIk9xxF5TBQmZJf19c55+zkgT22mAFFkxP5
+         gAs8TTbTmJKTgW3e4MBVnWi8uBFHUvtuil937f1tX/yIVYpO7RFKzhafMCQCEa9Bu3rn
+         8RUw==
+X-Gm-Message-State: ABy/qLZLja/1XU0sL5qCb1mid9LN7On0TsGWG/rMufYGUa9U0AE0iAzH
+	ngcIG0i53OIGXR07Wp8fnvYQigRftGk3VYlVvjqH2A==
+X-Google-Smtp-Source: APBJJlEKpoNFDzvfV+zFJbA+09Khp7PEOkCicSdyl2eevP65dKFx9uCaKuiELgPDji/ZXo/g5Z7+i4Bza4K4eTxjE2w=
+X-Received: by 2002:a67:fc52:0:b0:443:5f6e:c1b5 with SMTP id
+ p18-20020a67fc52000000b004435f6ec1b5mr1210977vsq.18.1690519484005; Thu, 27
+ Jul 2023 21:44:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230728011620.psvselzqdm7ku5e4@macbook-pro-8.dhcp.thefacebook.com>
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.6
+References: <20230727125125.1194376-1-imagedong@tencent.com>
+ <20230727125125.1194376-4-imagedong@tencent.com> <CANn89iKWTrgEp3QY34mNqVAx09fSxHUh+oHRTd6=aWurGS7qWA@mail.gmail.com>
+ <CADxym3YhjMv3Xkts99fiajq-cR-BqxDayKFzFZ1L49BNfFXkdw@mail.gmail.com>
+In-Reply-To: <CADxym3YhjMv3Xkts99fiajq-cR-BqxDayKFzFZ1L49BNfFXkdw@mail.gmail.com>
+From: Neal Cardwell <ncardwell@google.com>
+Date: Thu, 27 Jul 2023 21:44:26 -0700
+Message-ID: <CADVnQynQ1Hw+Jh7pjdNw_Mo4tWZV8V_sA+L-o=O4uV+9Gv7Prg@mail.gmail.com>
+Subject: Re: [PATCH net-next 3/3] net: tcp: check timeout by
+ icsk->icsk_timeout in tcp_retransmit_timer()
+To: Menglong Dong <menglong8.dong@gmail.com>
+Cc: Eric Dumazet <edumazet@google.com>, davem@davemloft.net, kuba@kernel.org, 
+	pabeni@redhat.com, dsahern@kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Menglong Dong <imagedong@tencent.com>, 
+	Yuchung Cheng <ycheng@google.com>, Soheil Hassas Yeganeh <soheil@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Alexei,
+On Thu, Jul 27, 2023 at 7:57=E2=80=AFPM Menglong Dong <menglong8.dong@gmail=
+.com> wrote:
+>
+> On Fri, Jul 28, 2023 at 3:31=E2=80=AFAM Eric Dumazet <edumazet@google.com=
+> wrote:
+> >
+> > On Thu, Jul 27, 2023 at 2:52=E2=80=AFPM <menglong8.dong@gmail.com> wrot=
+e:
+> > >
+> > > From: Menglong Dong <imagedong@tencent.com>
+> > >
+> > > In tcp_retransmit_timer(), a window shrunk connection will be regarde=
+d
+> > > as timeout if 'tcp_jiffies32 - tp->rcv_tstamp > TCP_RTO_MAX'. This is=
+ not
+> > > right all the time.
+> > >
+> > > The retransmits will become zero-window probes in tcp_retransmit_time=
+r()
+> > > if the 'snd_wnd=3D=3D0'. Therefore, the icsk->icsk_rto will come up t=
+o
+> > > TCP_RTO_MAX sooner or later.
+> > >
+> > > However, the timer is not precise enough, as it base on timer wheel.
+> > > Sorry that I am not good at timer, but I know the concept of time-whe=
+el.
+> > > The longer of the timer, the rougher it will be. So the timeout is no=
+t
+> > > triggered after TCP_RTO_MAX, but 122877ms as I tested.
+> > >
+> > > Therefore, 'tcp_jiffies32 - tp->rcv_tstamp > TCP_RTO_MAX' is always t=
+rue
+> > > once the RTO come up to TCP_RTO_MAX.
+> > >
+> > > Fix this by replacing the 'tcp_jiffies32' with '(u32)icsk->icsk_timeo=
+ut',
+> > > which is exact the timestamp of the timeout.
+> > >
+> > > Signed-off-by: Menglong Dong <imagedong@tencent.com>
+> > > ---
+> > >  net/ipv4/tcp_timer.c | 6 +++++-
+> > >  1 file changed, 5 insertions(+), 1 deletion(-)
+> > >
+> > > diff --git a/net/ipv4/tcp_timer.c b/net/ipv4/tcp_timer.c
+> > > index 470f581eedd4..3a20db15a186 100644
+> > > --- a/net/ipv4/tcp_timer.c
+> > > +++ b/net/ipv4/tcp_timer.c
+> > > @@ -511,7 +511,11 @@ void tcp_retransmit_timer(struct sock *sk)
+> > >                                             tp->snd_una, tp->snd_nxt)=
+;
+> > >                 }
+> > >  #endif
+> > > -               if (tcp_jiffies32 - tp->rcv_tstamp > TCP_RTO_MAX) {
+> > > +               /* It's a little rough here, we regard any valid pack=
+et that
+> > > +                * update tp->rcv_tstamp as the reply of the retransm=
+itted
+> > > +                * packet.
+> > > +                */
+> > > +               if ((u32)icsk->icsk_timeout - tp->rcv_tstamp > TCP_RT=
+O_MAX) {
+> > >                         tcp_write_err(sk);
+> > >                         goto out;
+> > >                 }
+> >
+> >
+> > Hmm, this looks like a net candidate, since this is unrelated to the
+> > other patches ?
+>
+> Yeah, this patch can be standalone. However, considering the
+> purpose of this series, it is necessary. Without this patch, the
+> OOM probe will always timeout after a few minutes.
+>
+> I'm not sure if I express the problem clearly in the commit log.
+> Let's explain it more.
+>
+> Let's mark the timestamp of the 10th timeout of the rtx timer
+> as TS1. Now, the retransmission happens and the ACK of
+> the retransmitted packet will update the tp->rcv_tstamp to
+> TS1+rtt.
+>
+> The RTO now is TCP_RTO_MAX. So let's see what will
+> happen in the 11th timeout. As we timeout after 122877ms,
+> so tcp_jiffies32 now is "TS1+122877ms", and
+> "tcp_jiffies32 - tp->rcv_tstamp" is
+> "TS1+122877ms - (TS1+rtt)" -> "122877ms - rtt",
+> which is always bigger than TCP_RTO_MAX, which is 120000ms.
+>
+> >
+> > Neal, what do you think ?
 
-On Thu, Jul 27, 2023 at 06:16:20PM -0700, Alexei Starovoitov wrote:
-> On Fri, Jul 21, 2023 at 02:22:46PM -0600, Daniel Xu wrote:
-> > This commit adds support for enabling IP defrag using pre-existing
-> > netfilter defrag support. Basically all the flag does is bump a refcnt
-> > while the link the active. Checks are also added to ensure the prog
-> > requesting defrag support is run _after_ netfilter defrag hooks.
-> > 
-> > We also take care to avoid any issues w.r.t. module unloading -- while
-> > defrag is active on a link, the module is prevented from unloading.
-> > 
-> > Signed-off-by: Daniel Xu <dxu@dxuuu.xyz>
-> > ---
-> >  include/uapi/linux/bpf.h       |   5 ++
-> >  net/netfilter/nf_bpf_link.c    | 123 +++++++++++++++++++++++++++++----
-> >  tools/include/uapi/linux/bpf.h |   5 ++
-> >  3 files changed, 118 insertions(+), 15 deletions(-)
-> > 
-> > diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
-> > index 739c15906a65..12a5480314a2 100644
-> > --- a/include/uapi/linux/bpf.h
-> > +++ b/include/uapi/linux/bpf.h
-> > @@ -1187,6 +1187,11 @@ enum bpf_perf_event_type {
-> >   */
-> >  #define BPF_F_KPROBE_MULTI_RETURN	(1U << 0)
-> >  
-> > +/* link_create.netfilter.flags used in LINK_CREATE command for
-> > + * BPF_PROG_TYPE_NETFILTER to enable IP packet defragmentation.
-> > + */
-> > +#define BPF_F_NETFILTER_IP_DEFRAG (1U << 0)
-> > +
-> >  /* When BPF ldimm64's insn[0].src_reg != 0 then this can have
-> >   * the following extensions:
-> >   *
-> > diff --git a/net/netfilter/nf_bpf_link.c b/net/netfilter/nf_bpf_link.c
-> > index c36da56d756f..8fe594bbc7e2 100644
-> > --- a/net/netfilter/nf_bpf_link.c
-> > +++ b/net/netfilter/nf_bpf_link.c
-> > @@ -1,6 +1,8 @@
-> >  // SPDX-License-Identifier: GPL-2.0
-> >  #include <linux/bpf.h>
-> >  #include <linux/filter.h>
-> > +#include <linux/kmod.h>
-> > +#include <linux/module.h>
-> >  #include <linux/netfilter.h>
-> >  
-> >  #include <net/netfilter/nf_bpf_link.h>
-> > @@ -23,8 +25,88 @@ struct bpf_nf_link {
-> >  	struct nf_hook_ops hook_ops;
-> >  	struct net *net;
-> >  	u32 dead;
-> > +	const struct nf_defrag_hook *defrag_hook;
-> >  };
-> >  
-> > +static const struct nf_defrag_hook *
-> > +get_proto_defrag_hook(struct bpf_nf_link *link,
-> > +		      const struct nf_defrag_hook __rcu *global_hook,
-> > +		      const char *mod)
-> > +{
-> > +	const struct nf_defrag_hook *hook;
-> > +	int err;
-> > +
-> > +	/* RCU protects us from races against module unloading */
-> > +	rcu_read_lock();
-> > +	hook = rcu_dereference(global_hook);
-> > +	if (!hook) {
-> > +		rcu_read_unlock();
-> > +		err = request_module(mod);
-> > +		if (err)
-> > +			return ERR_PTR(err < 0 ? err : -EINVAL);
-> > +
-> > +		rcu_read_lock();
-> > +		hook = rcu_dereference(global_hook);
-> > +	}
-> > +
-> > +	if (hook && try_module_get(hook->owner)) {
-> > +		/* Once we have a refcnt on the module, we no longer need RCU */
-> > +		hook = rcu_pointer_handoff(hook);
-> > +	} else {
-> > +		WARN_ONCE(!hook, "%s has bad registration", mod);
-> > +		hook = ERR_PTR(-ENOENT);
-> > +	}
-> > +	rcu_read_unlock();
-> > +
-> > +	if (!IS_ERR(hook)) {
-> > +		err = hook->enable(link->net);
-> > +		if (err) {
-> > +			module_put(hook->owner);
-> > +			hook = ERR_PTR(err);
-> > +		}
-> > +	}
-> > +
-> > +	return hook;
-> 
-> The rcu + module_get logic looks correct to me, but you've dropped all Florian's acks.
-> What's going on?
-> 
-> We need explicit acks to merge this through bpf-next.
+Sorry, I am probably missing something here, but: what would ever make
+this new proposed condition ((u32)icsk->icsk_timeout - tp->rcv_tstamp
+> TCP_RTO_MAX) true? :-)
 
-I understood acked-by tags to be a lighter form of reviewed-by tag. So
-b/c the patches changed so much I dropped the tag. It sounds like maybe
-I misunderstand -- I'll keep it in mind the next time around.
+In your nicely explained scenario, your new expression,
+icsk->icsk_timeout - tp->rcv_tstamp, will be:
 
-Thanks,
-Daniel
+  icsk->icsk_timeout - tp->rcv_tstamp
+=3D TS1 + 120 sec      - (TS1+rtt)
+=3D 120 sec - RTT
+
+AFAICT there is no way for that expression to be bigger than
+TCP_RTO_MAX =3D 120 sec unless somehow RTT is negative. :-)
+
+So AFAICT your expression ((u32)icsk->icsk_timeout - tp->rcv_tstamp >
+TCP_RTO_MAX) will always be false, so rather than this patch we may as
+well remove the if check and the body of the if block?
+
+To me such a change does not seem like a safe and clear bug fix for
+the "net" branch but rather a riskier design change (appropriate for
+"net-next" branch) that has connections retry forever when the
+receiver retracts the window to zero, under the estimation that this
+is preferable to having the connections die in such a case.
+
+There might be apps that depend on the old behavior of having
+connections die in such cases, so we might want to have this new
+fail-faster behavior guarded by a sysctl in case some sites need to
+revert to the older behavior? Not sure...
+
+neal
 
