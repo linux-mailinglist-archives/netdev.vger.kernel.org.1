@@ -1,85 +1,81 @@
-Return-Path: <netdev+bounces-22103-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22107-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4690476611E
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 03:16:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55B8976615A
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 03:36:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 76A2F1C21316
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 01:16:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F067C2825AD
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 01:36:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EEB415A7;
-	Fri, 28 Jul 2023 01:16:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 181FC15C3;
+	Fri, 28 Jul 2023 01:36:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 623E27C;
-	Fri, 28 Jul 2023 01:16:27 +0000 (UTC)
-Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D937930E1;
-	Thu, 27 Jul 2023 18:16:25 -0700 (PDT)
-Received: by mail-pf1-x429.google.com with SMTP id d2e1a72fcca58-686e0213c0bso1209471b3a.1;
-        Thu, 27 Jul 2023 18:16:25 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A3C715C1
+	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 01:36:23 +0000 (UTC)
+Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4743E3584
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 18:36:22 -0700 (PDT)
+Received: by mail-lf1-x133.google.com with SMTP id 2adb3069b0e04-4f954d7309fso1978191e87.1
+        for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 18:36:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690506985; x=1691111785;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=lvFN6hiDGiGK7bLL2rKPH9uniCD9C1RLgo5XQErJ7mg=;
-        b=WNQS724lJFU/8U7drNhRHsl4iM2XrqT1FV0aKjC/uhLfIHNHYairlvvM4qE3F86Wz5
-         2ofxJTR69We2Aa+KTi7ZjWWdO9rlbsxRpprU15XR4VGBQPeEO0A2swgBYpCKCRf2TOGa
-         j04xrvr/6HijktwqrhB0OFBn3cNuEXqU1/Ke69+Fvqg0KfNy6HwXo+V6SmfMvshXIIDZ
-         WwB1UKt0Nu1Se8jQgcVtpap7it47yJ1kHLaI70TjXU3YlPc9fWTK9F4wP57YZgxPnjAZ
-         E0vtX/SW+5brPenb8z32j5N1dxxOPQQmp6Mvvj93HBng/fDfxFbNt6oZP3Wnn0MdY+HY
-         UbAg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690506985; x=1691111785;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20221208; t=1690508180; x=1691112980;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=lvFN6hiDGiGK7bLL2rKPH9uniCD9C1RLgo5XQErJ7mg=;
-        b=e9vpB4b2zjiBaILAacr6oyfNhjMg2SkHPvUun4rExIqlW7B4ejFKgEUzAnRUWf7p9D
-         Sq4FNHKz4GJ9wa188V7M+arL5/0nEwFzCIwaz7qsydAgf5uZHDs1/4szed0sScdrjFU8
-         pUJkIhlN+EcuxxQnYCek4NIldX7fOJCAUMyjCI16Eb78NiLCAUsfpZ+Od4gEsqYd1ry+
-         OfZKaZ1ZHtRMyNu/qvpR9J708GSUv4sI4H2NzNXBmufkqwmRIG5nFK0Fx37Wqp4kWpYw
-         TQG62XAkIFZZH2RPXFuBPPZiuYYMQdpJrOqbZ3LPm9psenypr1cICK4g0czKMkknInbV
-         iBHA==
-X-Gm-Message-State: ABy/qLYDXE2Xgm9dfvyL1UZ6US1K22r2SHYa2ug9PkPMaX4lWl/aZfMi
-	r11uQeP3vb2K98suKuZ021I=
-X-Google-Smtp-Source: APBJJlEQxj3AXhexx+T1jcS0M1kRwMJQ/M8+DVCgVJU2/umqW4WqnvR5Hudlmguh8vmRTEe8M90YPQ==
-X-Received: by 2002:a05:6a20:9494:b0:137:a08b:8c04 with SMTP id hs20-20020a056a20949400b00137a08b8c04mr263393pzb.48.1690506985206;
-        Thu, 27 Jul 2023 18:16:25 -0700 (PDT)
-Received: from macbook-pro-8.dhcp.thefacebook.com ([2620:10d:c090:400::5:6cea])
-        by smtp.gmail.com with ESMTPSA id y15-20020a637d0f000000b00563b36264besm2187863pgc.85.2023.07.27.18.16.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Jul 2023 18:16:24 -0700 (PDT)
-Date: Thu, 27 Jul 2023 18:16:20 -0700
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-To: Daniel Xu <dxu@dxuuu.xyz>
-Cc: daniel@iogearbox.net, kadlec@netfilter.org, edumazet@google.com,
-	ast@kernel.org, fw@strlen.de, kuba@kernel.org, pabeni@redhat.com,
-	pablo@netfilter.org, andrii@kernel.org, davem@davemloft.net,
-	martin.lau@linux.dev, song@kernel.org, yhs@fb.com,
-	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@google.com,
-	haoluo@google.com, jolsa@kernel.org, bpf@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org, netdev@vger.kernel.org, dsahern@kernel.org
-Subject: Re: [PATCH bpf-next v6 2/5] netfilter: bpf: Support
- BPF_F_NETFILTER_IP_DEFRAG in netfilter link
-Message-ID: <20230728011620.psvselzqdm7ku5e4@macbook-pro-8.dhcp.thefacebook.com>
-References: <cover.1689970773.git.dxu@dxuuu.xyz>
- <5cff26f97e55161b7d56b09ddcf5f8888a5add1d.1689970773.git.dxu@dxuuu.xyz>
+        bh=YBY4dqR8k6VkxPBBD1QDAVOvsIKWDS67oRxcN+6z7R4=;
+        b=OdXU97AfLvUjjWYfRGF8Yq2orD02N8VH5dISv4o2HIBNcxoXWkX0dJWzFa6N+FAxzC
+         XB6+d+XSAX88Vzj1vwNT68ObRxmYsUN7wWafRYg9qahGBj6VP8MqcyRus5JFOFvX8VRC
+         uVtB2stZhsqBnqSY/tm6xpSV+GkpN5KKQqRC+JBRRokPF54a5T8jnQvyctiahw0d71Qd
+         0hQ0GMbCe6UfzOAyxLf99/Z0bEmOyNSGhKot0M+En7SklvlCxQFFjsqz9aM8gnY9hMpz
+         FrUQxTHe5OWx9oRUIn1NG9V55JWWMYJ8GG9QPJGdTs+xWzwsrBlaXN159fMJ93JE4y+N
+         zPQg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690508180; x=1691112980;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=YBY4dqR8k6VkxPBBD1QDAVOvsIKWDS67oRxcN+6z7R4=;
+        b=L8RCwJfdz14C8mvOO0ThOl0UKUf4L7YlYIz7J+9WKEiMj9DVyFjTRbSJpwY7yFiOEi
+         vu328t1TkMX+Lcwi+jpf03qPYOpiXmLePthGZ2pZN6WMqF12+eQpPa4FBTVQ6QGIWw15
+         ZhCWjQ9Rh9exrvSdIeIO1wEuP3HM58fkVzTdBkWkaIqZkpSEexS15Z0uqMqu7jzPyzrY
+         BOqcxtB+P7/mYY8IsG9/y0ycCVgaRIYkI8LycncMLRD1S2n5egqj62/t0oP5s86Yn6SH
+         j+smHk5MyiOY1huDq5euBCl52bLHcGrZroT9AUB4H4OOqsLahK2086HWM2M1IOvbvGCw
+         mBtw==
+X-Gm-Message-State: ABy/qLaW0KAgxB4sxHwPo8i1ipDPRiWsbsn8xLBwhMdbnJbCTSOCw9cI
+	htfeffNsDxFm0HMA78JNYatObzxHfXJjAgNs4K0=
+X-Google-Smtp-Source: APBJJlHgwB5gToyjMVHyY8YGLO7HADwdYYX5FTUcl+sxURYeMOlncTnSwDZJa6Zi/Zx1j8hiJcxH6uvOGCgmmHey1cw=
+X-Received: by 2002:ac2:5055:0:b0:4f9:dac6:2f3d with SMTP id
+ a21-20020ac25055000000b004f9dac62f3dmr345770lfm.13.1690508180156; Thu, 27 Jul
+ 2023 18:36:20 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5cff26f97e55161b7d56b09ddcf5f8888a5add1d.1689970773.git.dxu@dxuuu.xyz>
+References: <cover.1690439335.git.chenfeiyang@loongson.cn> <DM4PR12MB50880AA9F0C93F86B0A7A308D301A@DM4PR12MB5088.namprd12.prod.outlook.com>
+In-Reply-To: <DM4PR12MB50880AA9F0C93F86B0A7A308D301A@DM4PR12MB5088.namprd12.prod.outlook.com>
+From: Feiyang Chen <chris.chenfeiyang@gmail.com>
+Date: Fri, 28 Jul 2023 09:36:08 +0800
+Message-ID: <CACWXhK=qGZA=_5PyTpjfdUmtBabtYo7eammoeX87y6vQ+B3NQw@mail.gmail.com>
+Subject: Re: [PATCH v2 00/10] stmmac: Add Loongson platform support
+To: Jose Abreu <Jose.Abreu@synopsys.com>
+Cc: Feiyang Chen <chenfeiyang@loongson.cn>, "andrew@lunn.ch" <andrew@lunn.ch>, 
+	"hkallweit1@gmail.com" <hkallweit1@gmail.com>, "peppe.cavallaro@st.com" <peppe.cavallaro@st.com>, 
+	"alexandre.torgue@foss.st.com" <alexandre.torgue@foss.st.com>, 
+	"chenhuacai@loongson.cn" <chenhuacai@loongson.cn>, "linux@armlinux.org.uk" <linux@armlinux.org.uk>, 
+	"dongbiao@loongson.cn" <dongbiao@loongson.cn>, 
+	"loongson-kernel@lists.loongnix.cn" <loongson-kernel@lists.loongnix.cn>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+	"loongarch@lists.linux.dev" <loongarch@lists.linux.dev>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
 	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
@@ -87,100 +83,45 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Jul 21, 2023 at 02:22:46PM -0600, Daniel Xu wrote:
-> This commit adds support for enabling IP defrag using pre-existing
-> netfilter defrag support. Basically all the flag does is bump a refcnt
-> while the link the active. Checks are also added to ensure the prog
-> requesting defrag support is run _after_ netfilter defrag hooks.
-> 
-> We also take care to avoid any issues w.r.t. module unloading -- while
-> defrag is active on a link, the module is prevented from unloading.
-> 
-> Signed-off-by: Daniel Xu <dxu@dxuuu.xyz>
-> ---
->  include/uapi/linux/bpf.h       |   5 ++
->  net/netfilter/nf_bpf_link.c    | 123 +++++++++++++++++++++++++++++----
->  tools/include/uapi/linux/bpf.h |   5 ++
->  3 files changed, 118 insertions(+), 15 deletions(-)
-> 
-> diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
-> index 739c15906a65..12a5480314a2 100644
-> --- a/include/uapi/linux/bpf.h
-> +++ b/include/uapi/linux/bpf.h
-> @@ -1187,6 +1187,11 @@ enum bpf_perf_event_type {
->   */
->  #define BPF_F_KPROBE_MULTI_RETURN	(1U << 0)
->  
-> +/* link_create.netfilter.flags used in LINK_CREATE command for
-> + * BPF_PROG_TYPE_NETFILTER to enable IP packet defragmentation.
-> + */
-> +#define BPF_F_NETFILTER_IP_DEFRAG (1U << 0)
-> +
->  /* When BPF ldimm64's insn[0].src_reg != 0 then this can have
->   * the following extensions:
->   *
-> diff --git a/net/netfilter/nf_bpf_link.c b/net/netfilter/nf_bpf_link.c
-> index c36da56d756f..8fe594bbc7e2 100644
-> --- a/net/netfilter/nf_bpf_link.c
-> +++ b/net/netfilter/nf_bpf_link.c
-> @@ -1,6 +1,8 @@
->  // SPDX-License-Identifier: GPL-2.0
->  #include <linux/bpf.h>
->  #include <linux/filter.h>
-> +#include <linux/kmod.h>
-> +#include <linux/module.h>
->  #include <linux/netfilter.h>
->  
->  #include <net/netfilter/nf_bpf_link.h>
-> @@ -23,8 +25,88 @@ struct bpf_nf_link {
->  	struct nf_hook_ops hook_ops;
->  	struct net *net;
->  	u32 dead;
-> +	const struct nf_defrag_hook *defrag_hook;
->  };
->  
-> +static const struct nf_defrag_hook *
-> +get_proto_defrag_hook(struct bpf_nf_link *link,
-> +		      const struct nf_defrag_hook __rcu *global_hook,
-> +		      const char *mod)
-> +{
-> +	const struct nf_defrag_hook *hook;
-> +	int err;
-> +
-> +	/* RCU protects us from races against module unloading */
-> +	rcu_read_lock();
-> +	hook = rcu_dereference(global_hook);
-> +	if (!hook) {
-> +		rcu_read_unlock();
-> +		err = request_module(mod);
-> +		if (err)
-> +			return ERR_PTR(err < 0 ? err : -EINVAL);
-> +
-> +		rcu_read_lock();
-> +		hook = rcu_dereference(global_hook);
-> +	}
-> +
-> +	if (hook && try_module_get(hook->owner)) {
-> +		/* Once we have a refcnt on the module, we no longer need RCU */
-> +		hook = rcu_pointer_handoff(hook);
-> +	} else {
-> +		WARN_ONCE(!hook, "%s has bad registration", mod);
-> +		hook = ERR_PTR(-ENOENT);
-> +	}
-> +	rcu_read_unlock();
-> +
-> +	if (!IS_ERR(hook)) {
-> +		err = hook->enable(link->net);
-> +		if (err) {
-> +			module_put(hook->owner);
-> +			hook = ERR_PTR(err);
-> +		}
-> +	}
-> +
-> +	return hook;
+On Thu, Jul 27, 2023 at 5:02=E2=80=AFPM Jose Abreu <Jose.Abreu@synopsys.com=
+> wrote:
+>
+> From: Feiyang Chen <chenfeiyang@loongson.cn>
+> Date: Thu, Jul 27, 2023 at 08:15:44
+>
+> > Extend stmmac functions and macros for Loongson DWMAC.
+> > Add LS7A support for dwmac_loongson.
+> >
+> > Feiyang Chen (10):
+> >   net: stmmac: Pass stmmac_priv and chan in some callbacks
+> >   net: stmmac: dwmac1000: Allow platforms to choose some register
+> >     offsets
+> >   net: stmmac: dwmac1000: Add multi-channel support
+> >   net: stmmac: dwmac1000: Add 64-bit DMA support
+> >   net: stmmac: dwmac1000: Add Loongson register definitions
+> >   net: stmmac: Add Loongson HWIF entry
+> >   net: stmmac: dwmac-loongson: Add LS7A support
+> >   net: stmmac: dwmac-loongson: Disable flow control for GMAC
+> >   net: stmmac: dwmac-loongson: Add 64-bit DMA and multi-vector support
+> >   net: stmmac: dwmac-loongson: Add GNET support
+>
+> I took a quick look at your patches and I'm thinking whether this is the =
+correct way to go.
+> You are mixing up the stmmac generic layer by adding the Loongson HWIF en=
+try.
+> The whole idea of HWIF was to have it independent of vendor specific logi=
+c.
+>
+> Can you devise another alternative without mixing up the HWIF?
+>
 
-The rcu + module_get logic looks correct to me, but you've dropped all Florian's acks.
-What's going on?
+Hi, Jose,
 
-We need explicit acks to merge this through bpf-next.
+OK, I will try.
+
+Thanks,
+Feiyang
+
+> Thanks,
+> Jose
 
