@@ -1,83 +1,149 @@
-Return-Path: <netdev+bounces-22426-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22428-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A31A76774F
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 23:00:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21F0E767761
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 23:03:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 68CAE1C215D9
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 21:00:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5228A1C216B5
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 21:03:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBC491BB58;
-	Fri, 28 Jul 2023 21:00:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09E831F93F;
+	Fri, 28 Jul 2023 21:02:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD88A156C3
-	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 21:00:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 30ECBC433C9;
-	Fri, 28 Jul 2023 21:00:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690578022;
-	bh=BLuO9fxyb5nfsuBnY5gEGpyat676kpp+V/xinZWSiHM=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=eS4K4QLeoMRUwslZYdbKZBqypshcI6n5pZSkh9Bn/9DE2KQV5RtvX1zTI7W38seGi
-	 zH1gsfGax0ApM+7GIrAq6O9JbGQaMMniLxRKACoY6igdo09AGXE6poM6VwgfAUpU6P
-	 /3eM5Tq7aKhPYhmncXCF+4iMEPzZTPdcsjzHnX8wOWZw/uLT8ZY3X+gt6vVgVSWYAb
-	 0PUGEmwD1jq/sjkO70o9KtR4z409MFEZ4rOK35ouXmu1aXdB1YJ2bT+Neb74gIeqXW
-	 JjazlIxCFQjXnBVl4/BHNxRxrqjwCIztdRCUgy2J8tFhoUtV9CUZW/O/Zqjfbt75bm
-	 F3g5Y+ELr+nHw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 0C718C39562;
-	Fri, 28 Jul 2023 21:00:22 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0BC41F18F;
+	Fri, 28 Jul 2023 21:02:46 +0000 (UTC)
+Received: from mgamail.intel.com (unknown [134.134.136.126])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94C654490;
+	Fri, 28 Jul 2023 14:02:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1690578165; x=1722114165;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=TEuzJH5k9NjiUQxxhE7uZppNJs34BvDLFgeNAlEl6/4=;
+  b=MdAFllPDc3Xj0WCd4t/t4dGGII2LZQcyf5gg6N+JKARmeCG7beELGqyW
+   5t5XHRIm7tl53PoBbmSHk5zfleGhE44Y8F1i/qclnKuCTL05gl5r2TuNz
+   iuol7EUbwd7rxMOHw8WJPVEuENJJLEDF15rbqlgTevUoYQjIiwsWw9L3k
+   e++8WF/BTavECnEWMK9z2rSo51EVMhI96ac4yHc+M40vorIHBcz8CbCEB
+   skRS64pa1xORxwi1UNA9JzeCPXviTvxzFMdV/66rR0QuoBvzaJI0rAB8p
+   +Jt49SHpdNf6+sRCkSxThSupWC1M+0ugCCAldbdxUNgoQHZA2fpFpSd9p
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10785"; a="353588604"
+X-IronPort-AV: E=Sophos;i="6.01,238,1684825200"; 
+   d="scan'208";a="353588604"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jul 2023 14:02:41 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10785"; a="817634323"
+X-IronPort-AV: E=Sophos;i="6.01,238,1684825200"; 
+   d="scan'208";a="817634323"
+Received: from lkp-server02.sh.intel.com (HELO 953e8cd98f7d) ([10.239.97.151])
+  by FMSMGA003.fm.intel.com with ESMTP; 28 Jul 2023 14:02:35 -0700
+Received: from kbuild by 953e8cd98f7d with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1qPUba-0003Zk-1M;
+	Fri, 28 Jul 2023 21:02:34 +0000
+Date: Sat, 29 Jul 2023 05:02:25 +0800
+From: kernel test robot <lkp@intel.com>
+To: Larysa Zaremba <larysa.zaremba@intel.com>, bpf@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	Larysa Zaremba <larysa.zaremba@intel.com>, ast@kernel.org,
+	daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev,
+	song@kernel.org, yhs@fb.com, john.fastabend@gmail.com,
+	kpsingh@kernel.org, sdf@google.com, haoluo@google.com,
+	jolsa@kernel.org, David Ahern <dsahern@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Willem de Bruijn <willemb@google.com>,
+	Jesper Dangaard Brouer <brouer@redhat.com>,
+	Anatoly Burakov <anatoly.burakov@intel.com>,
+	Alexander Lobakin <alexandr.lobakin@intel.com>,
+	Magnus Karlsson <magnus.karlsson@gmail.com>,
+	Maryam Tahhan <mtahhan@redhat.com>, xdp-hints@xdp-project.net,
+	netdev@vger.kernel.org,
+	Alexei Starovoitov <alexei.starovoitov@gmail.com>,
+	Simon Horman <simon.horman@corigine.com>
+Subject: Re: [PATCH bpf-next v4 13/21] ice: Implement checksum hint
+Message-ID: <202307290459.rfUV5NZw-lkp@intel.com>
+References: <20230728173923.1318596-14-larysa.zaremba@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/2] eth: bnxt: fix a couple of W=1 C=1 warnings
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169057802204.29684.265732152415108009.git-patchwork-notify@kernel.org>
-Date: Fri, 28 Jul 2023 21:00:22 +0000
-References: <20230727190726.1859515-1-kuba@kernel.org>
-In-Reply-To: <20230727190726.1859515-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, michael.chan@broadcom.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230728173923.1318596-14-larysa.zaremba@intel.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,
+	SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
+Hi Larysa,
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+kernel test robot noticed the following build warnings:
 
-On Thu, 27 Jul 2023 12:07:24 -0700 you wrote:
-> Fix a couple of build warnings.
-> 
-> Jakub Kicinski (2):
->   eth: bnxt: fix one of the W=1 warnings about fortified memcpy()
->   eth: bnxt: fix warning for define in struct_group
-> 
->  drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.c | 2 +-
->  drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.h | 3 ++-
->  2 files changed, 3 insertions(+), 2 deletions(-)
+[auto build test WARNING on bpf-next/master]
 
-Here is the summary with links:
-  - [net-next,1/2] eth: bnxt: fix one of the W=1 warnings about fortified memcpy()
-    https://git.kernel.org/netdev/net-next/c/833c4a8105ac
-  - [net-next,2/2] eth: bnxt: fix warning for define in struct_group
-    https://git.kernel.org/netdev/net-next/c/9f49db62f58e
+url:    https://github.com/intel-lab-lkp/linux/commits/Larysa-Zaremba/ice-make-RX-HW-timestamp-reading-code-more-reusable/20230729-023952
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git master
+patch link:    https://lore.kernel.org/r/20230728173923.1318596-14-larysa.zaremba%40intel.com
+patch subject: [PATCH bpf-next v4 13/21] ice: Implement checksum hint
+config: i386-randconfig-i012-20230728 (https://download.01.org/0day-ci/archive/20230729/202307290459.rfUV5NZw-lkp@intel.com/config)
+compiler: clang version 16.0.4 (https://github.com/llvm/llvm-project.git ae42196bc493ffe877a7e3dff8be32035dea4d07)
+reproduce: (https://download.01.org/0day-ci/archive/20230729/202307290459.rfUV5NZw-lkp@intel.com/reproduce)
 
-You are awesome, thank you!
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202307290459.rfUV5NZw-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> drivers/net/ethernet/intel/ice/ice_txrx_lib.c:674: warning: expecting prototype for ice_xdp_rx_csum_lvl(). Prototype was for ice_xdp_rx_csum() instead
+
+
+vim +674 drivers/net/ethernet/intel/ice/ice_txrx_lib.c
+
+   662	
+   663	/**
+   664	 * ice_xdp_rx_csum_lvl - Get level, at which HW has checked the checksum
+   665	 * @ctx: XDP buff pointer
+   666	 * @csum_status: destination address
+   667	 * @csum_info: destination address
+   668	 *
+   669	 * Copy HW checksum level (if was checked) to the destination address.
+   670	 */
+   671	static int ice_xdp_rx_csum(const struct xdp_md *ctx,
+   672				   enum xdp_csum_status *csum_status,
+   673				   union xdp_csum_info *csum_info)
+ > 674	{
+   675		const struct ice_xdp_buff *xdp_ext = (void *)ctx;
+   676		const union ice_32b_rx_flex_desc *eop_desc;
+   677		enum ice_rx_csum_status status;
+   678		u16 ptype;
+   679	
+   680		eop_desc = xdp_ext->pkt_ctx.eop_desc;
+   681		ptype = ice_get_ptype(eop_desc);
+   682	
+   683		status = ice_get_rx_csum_status(eop_desc, ptype);
+   684		if (status & ICE_RX_CSUM_NONE)
+   685			return -ENODATA;
+   686	
+   687		*csum_status = XDP_CHECKSUM_VALID_LVL0 + ice_rx_csum_lvl(status);
+   688		return 0;
+   689	}
+   690	
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
