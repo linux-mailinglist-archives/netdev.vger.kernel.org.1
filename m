@@ -1,123 +1,113 @@
-Return-Path: <netdev+bounces-22121-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22118-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A156D766191
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 04:00:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2AC16766187
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 03:58:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5AE5D282830
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 02:00:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5C1CF1C217B6
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 01:58:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6996217F9;
-	Fri, 28 Jul 2023 02:00:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B0A617FF;
+	Fri, 28 Jul 2023 01:58:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BA1A17D2
-	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 02:00:49 +0000 (UTC)
-Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 100B4173F
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 19:00:48 -0700 (PDT)
-Received: by mail-lf1-x12c.google.com with SMTP id 2adb3069b0e04-4fdfefdf5abso2767702e87.1
-        for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 19:00:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690509646; x=1691114446;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=msn98uSrmp3cbj/UxZcQv417B0dm9hgVkWLxRLCqOCQ=;
-        b=BvIcPDaQ3ylQNdxQD1U56Hg2yNKmULsOKTaZ3U6AoWBLBiYlr45miZGrm78z9pM+fY
-         Bj9wXo7Puosr6BGQSTY/7v8RhPPZoGfMJ1y0Bc+YecZ8VZzo3ETW6YKlPtVIsUDY+U0w
-         Fj9fzjslJEBpa7rPK+MzcTpnnvKLg6QFGL0MbUb3uDxpO4LbREqfKTKQKqm/UsTu+xUa
-         hPD4DxuVXQ4reKx0dBaxI3obTLKkKQDyDkX1ylLOw07f6ya0S0sWrw/7QRmco+676Fh0
-         hD53xEcgm+pRu4IiIgyy/c1CMEJQfKcEBTaGDIp0MP2I4X9kozn8Sou+YNs6XSmIfRAg
-         m4/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690509646; x=1691114446;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=msn98uSrmp3cbj/UxZcQv417B0dm9hgVkWLxRLCqOCQ=;
-        b=RqBa2691YZY8k2lqvmKsZ9uk3awdQ/SgDJxqbpBtOhIEdoJKgcvx1V4UW0fChEIFIY
-         IeiS+MWcUFs2yaTqHVYaX/JwHRdSym1qUPK3wiBbVG5fKJlJCY9/3FaceeXOuqK0mUqr
-         04sEEDzpFaaeNBEWphBT4RqB6F7K9iqVXpGt7nrVJ/PSwAR0wDu5kP93KImh1z2ifvB7
-         b2Y5g3FnVKpg5CyR6WLmYacZDucnKv1pwUu1sunZNniF/7b2pOLEK0vvMblZUX3C0eJF
-         qBVOkZo/BX03qs0K2MdKVHBZe19Uglcf3JntjHAqTzs5rhTtX6ZmV4CjeBqQcyhTCW9T
-         huUQ==
-X-Gm-Message-State: ABy/qLbx04crvl6ba+aKOHyhVnBEruq7Bk0bQuMZvXkgGVu4F3O6H15k
-	9VoXL/N1jnjKZIIm4SlOnu1y7oTY10Sqrs+tikw=
-X-Google-Smtp-Source: APBJJlGfZAxG1J/1uxcdjl7oEhK0DiCdnf7IwT3YZFXU8CAr/+XLxn4pJSUAatCqRLpMUGFqX2cCgotDd7v1uvFYLkI=
-X-Received: by 2002:a05:6512:ad6:b0:4f8:5b23:5287 with SMTP id
- n22-20020a0565120ad600b004f85b235287mr676034lfu.62.1690509646152; Thu, 27 Jul
- 2023 19:00:46 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BC6F7C;
+	Fri, 28 Jul 2023 01:58:31 +0000 (UTC)
+Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27F8D2738;
+	Thu, 27 Jul 2023 18:58:29 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.143])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4RBrQ66hNcz4f3nqX;
+	Fri, 28 Jul 2023 09:58:22 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.124.27])
+	by APP4 (Coremail) with SMTP id gCh0CgCX_7K_IMNkBXLmOw--.17170S4;
+	Fri, 28 Jul 2023 09:58:25 +0800 (CST)
+From: Hou Tao <houtao@huaweicloud.com>
+To: bpf@vger.kernel.org
+Cc: netdev@vger.kernel.org,
+	"David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	=?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn.topel@gmail.com>,
+	=?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Alexei Starovoitov <alexei.starovoitov@gmail.com>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Song Liu <song@kernel.org>,
+	Hao Luo <haoluo@google.com>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	KP Singh <kpsingh@kernel.org>,
+	Stanislav Fomichev <sdf@google.com>,
+	Jiri Olsa <jolsa@kernel.org>,
+	houtao1@huawei.com
+Subject: [RFC PATCH bpf-next 0/2] Remove unnecessary synchronizations in cpumap
+Date: Fri, 28 Jul 2023 10:30:28 +0800
+Message-Id: <20230728023030.1906124-1-houtao@huaweicloud.com>
+X-Mailer: git-send-email 2.29.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1690439335.git.chenfeiyang@loongson.cn> <dd88ed0f53e9ee0f653ddeb78b326f8eb44bdbd1.1690439335.git.chenfeiyang@loongson.cn>
- <9add374b-27ba-47c9-95cf-eec896231d58@lunn.ch>
-In-Reply-To: <9add374b-27ba-47c9-95cf-eec896231d58@lunn.ch>
-From: Feiyang Chen <chris.chenfeiyang@gmail.com>
-Date: Fri, 28 Jul 2023 10:00:34 +0800
-Message-ID: <CACWXhKnmEgt9FFKrtcMZN75bNDuEqNoOqNtHWUP-W2s0U2JkQA@mail.gmail.com>
-Subject: Re: [PATCH v2 07/10] net: stmmac: dwmac-loongson: Add LS7A support
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Feiyang Chen <chenfeiyang@loongson.cn>, hkallweit1@gmail.com, peppe.cavallaro@st.com, 
-	alexandre.torgue@foss.st.com, joabreu@synopsys.com, chenhuacai@loongson.cn, 
-	linux@armlinux.org.uk, dongbiao@loongson.cn, 
-	loongson-kernel@lists.loongnix.cn, netdev@vger.kernel.org, 
-	loongarch@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgCX_7K_IMNkBXLmOw--.17170S4
+X-Coremail-Antispam: 1UD129KBjvdXoWrZFy7Aw15KF45trWfXw43ZFb_yoWfZwc_JF
+	WkJF97Gw48WF1vgFs0yF1xJa98WrZ5KF1jqa4vq3y5A343Za18Jr4v9FW8Zry8Z397trs8
+	Grn8G3yktr1aqjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUb2xYFVCjjxCrM7AC8VAFwI0_Xr0_Wr1l1xkIjI8I6I8E6xAIw20E
+	Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwV
+	A0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8IcVCY1x02
+	67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
+	0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
+	x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
+	0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1l42xK82IY
+	c2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s
+	026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6rW5MIIYrxkI7VAKI48JMIIF
+	0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0x
+	vE42xK8VAvwI8IcIk0rVWrJr0_WFyUJwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E
+	87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUFDGOUUUUU
+X-CM-SenderInfo: xkrx3t3r6k3tpzhluzxrxghudrp/
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,KHOP_HELO_FCRDNS,
+	MAY_BE_FORGED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Jul 27, 2023 at 6:35=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
->
-> > +static int loongson_dwmac_probe(struct pci_dev *pdev,
-> > +                             const struct pci_device_id *id)
-> >  {
-> > +     int ret, i, bus_id, phy_mode;
-> >       struct plat_stmmacenet_data *plat;
-> > +     struct stmmac_pci_info *info;
-> >       struct stmmac_resources res;
-> >       struct device_node *np;
-> > -     int ret, i, phy_mode;
-> > -
-> > -     np =3D dev_of_node(&pdev->dev);
-> > -
-> > -     if (!np) {
-> > -             pr_info("dwmac_loongson_pci: No OF node\n");
-> > -             return -ENODEV;
-> > -     }
-> > -
-> > -     if (!of_device_is_compatible(np, "loongson, pci-gmac")) {
-> > -             pr_info("dwmac_loongson_pci: Incompatible OF node\n");
-> > -             return -ENODEV;
-> > -     }
->
-> There are a lot of changes here, and it is not easy to review.  I
-> would suggest you first do a refactoring patch, moving all handling of
-> DT into a helper. Since it is just moving code around, it should be
-> easy to review. Then you can add support for platforms which don't
-> support DT.
->
+From: Hou Tao <houtao1@huawei.com>
 
-Hi, Andrew,
+Hi,
 
-OK.
+The patchset aims to remove unnecessary synchronizations in cpu-map
+which were found during code inspection. Patch #1 removes the
+unnecessary rcu_barrier() when freeing bpf_cpu_map_entry and replaces
+it by queue_rcu_work(). Patch #2 removes the unnecessary call_rcu()
+and queue_work() when destroying cpu-map and does the freeing directly.
 
-Thanks,
-Feiyang
+Simply testing the patchset by running xdp_redirect_cpu test for
+virtio-net and no issues are reported. Hope to get more feedback before
+removing the RFC tag. As ususal, comments and suggestions are always
+welcome.
 
->         Andrew
+Regards,
+Tao
+
+Hou Tao (2):
+  bpf, cpumap: Use queue_rcu_work() to remove unnecessary rcu_barrier()
+  bpf, cpumap: Clean up bpf_cpu_map_entry directly in cpu_map_free
+
+ kernel/bpf/cpumap.c | 110 +++++++++++++-------------------------------
+ 1 file changed, 31 insertions(+), 79 deletions(-)
+
+-- 
+2.29.2
+
 
