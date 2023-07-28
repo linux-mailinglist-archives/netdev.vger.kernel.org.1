@@ -1,180 +1,77 @@
-Return-Path: <netdev+bounces-22124-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22125-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 141D17661D5
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 04:38:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 02271766206
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 04:43:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 453451C213CC
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 02:38:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AE6FF2825A8
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 02:43:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E588310E6;
-	Fri, 28 Jul 2023 02:38:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86AB32714A;
+	Fri, 28 Jul 2023 02:43:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D693D19C
-	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 02:38:10 +0000 (UTC)
-Received: from mail-yb1-xb41.google.com (mail-yb1-xb41.google.com [IPv6:2607:f8b0:4864:20::b41])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11B2530E0;
-	Thu, 27 Jul 2023 19:38:08 -0700 (PDT)
-Received: by mail-yb1-xb41.google.com with SMTP id 3f1490d57ef6-c5f98fc4237so1438165276.2;
-        Thu, 27 Jul 2023 19:38:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690511887; x=1691116687;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4b3n4ix0PVCID/H1AF/PSs6xMKgdCeQOhECeB9MZXrY=;
-        b=hIEE8deFlO6a9hQYyGPt90EuEo57RSABAUGdR6qZzuOqVuRxjthPsgH17pu2HDmCB7
-         nlPeaz4YDPJs/q4s6baeiysbsJF8RxONzgHyOn4XH+pQQ2ONxcJZip2sP4QND5tmCCbu
-         bTwBkjRhnvKgioiqTc8Q7XDDC/zYAlpm1Qe0nadneHd+qBUnuGF+G6tMbGTalJEPxq4f
-         jqC+1p/FEsDYbcBGIS0BJZlmx7zbA1VNMRiYKNonZNrTpPVri74nzQL751NiLQ3cG7v4
-         2VbGGa8N59pdEMZgw31ButQ7Q49PeI4Pvr3UFsWYqW6s4lKN3bVsYYygK2H7nBDxbT9m
-         69fw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690511887; x=1691116687;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4b3n4ix0PVCID/H1AF/PSs6xMKgdCeQOhECeB9MZXrY=;
-        b=bH4anYWbwMD+5C/+GFakQTeeWJ/kxRTUIiuNzc3I1mBX/iUSQ8sIw3HHCX6eTfupPq
-         trVRIFdalH1XZbLoU968yoiVSstzF+wfJ7YtZbhA8jQ+/neQ/5ue32Vd9cienjC2nKjq
-         bD69WthyK5r0ZyueotQO1FmhaTDr9VvcUug7ZcCT4gJWt08QOeBKQDCPFjgbOAmeOHBZ
-         DyoaxZesBStrk4TBafsLT/BEgHrlum4pzPHNRr4vZBurcaR4E75hgIc8k2yy9yzw0Q2p
-         xIKUX8/KjWtOsmJ0pzrF1ZT5Es9wg0VPsXlc1GZycXpd/vOdMZTtubF+KLDuB5b+kJdu
-         7sOQ==
-X-Gm-Message-State: ABy/qLa5R3/+nk9R9bezHNf0hzuBB3NTl5l01Sg7auVk8rHTJET5HF2K
-	z9WztPSlFB2IehCE6QYHdWpX4ORaJfNNOi6M5H4=
-X-Google-Smtp-Source: APBJJlFcW97WvKAmuZ+JBhgClpagVh8f/RtiUWA+CD1OWVXxCqSpQ5+MaiYget9I+0WSTruvnWPKofUdjRJgyuWbj6I=
-X-Received: by 2002:a0d:d453:0:b0:582:5527:ddc with SMTP id
- w80-20020a0dd453000000b0058255270ddcmr510035ywd.34.1690511887183; Thu, 27 Jul
- 2023 19:38:07 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B66117EC;
+	Fri, 28 Jul 2023 02:43:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 35AECC433C9;
+	Fri, 28 Jul 2023 02:43:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1690512192;
+	bh=pm8EEJ3QVFbZRsnnFWhbHs7DxRk67vj7nVk7xzm5K6A=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=JY3PNodbQLvsX/IukNSn5Vy8hxvOWmgmZbr57BdemunG/lL+U0h/YWYpcQqnNiRqs
+	 mxnwR/BO7w1OkCYLZx2dQtDyjf5FdlCcRWeHJLR3PL56T00W16VIjBaQiDOjdkh9/m
+	 aRtXi96h3XHUh1AXrzpgggQa2nBFAsKoUCLjV8crWrW8ThqmXF2PUbJb0vv40fCCkL
+	 BjGH0CVYHb7/4fpBAM3VQyp3+5BAQlznyNuwDqjJHO1CSxxiezQygfHrsqRDYgipl5
+	 Q+q38AFIpg3yybJUMpQaNW9jr5Jf2KT5UKwvNtjrIv1+Atw0zGmyxs3vDU3tsyopi6
+	 TE658BcOcHnzA==
+Date: Thu, 27 Jul 2023 19:43:11 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Anjali Kulkarni <anjali.k.kulkarni@oracle.com>
+Cc: Shuah Khan <skhan@linuxfoundation.org>, Naresh Kamboju
+ <naresh.kamboju@linaro.org>, "open list:KERNEL SELFTEST FRAMEWORK"
+ <linux-kselftest@vger.kernel.org>, open list
+ <linux-kernel@vger.kernel.org>, "lkft-triage@lists.linaro.org"
+ <lkft-triage@lists.linaro.org>, Netdev <netdev@vger.kernel.org>,
+ clang-built-linux <llvm@lists.linux.dev>, Shuah Khan <shuah@kernel.org>,
+ Anders Roxell <anders.roxell@linaro.org>, "David S. Miller"
+ <davem@davemloft.net>, Liam Howlett <liam.howlett@oracle.com>
+Subject: Re: selftests: connector: proc_filter.c:48:20: error: invalid
+ application of 'sizeof' to an incomplete type 'struct proc_input'
+Message-ID: <20230727194311.6a51f285@kernel.org>
+In-Reply-To: <DD53AFBE-F948-40F9-A980-2DA155236237@oracle.com>
+References: <CA+G9fYt=6ysz636XcQ=-KJp7vJcMZ=NjbQBrn77v7vnTcfP2cA@mail.gmail.com>
+	<E8C72537-4280-401A-B25D-9734D2756A6A@oracle.com>
+	<BB43F17E-EC00-4E72-BB3D-F4E6FA65F954@oracle.com>
+	<799d6088-e28f-f386-6a00-2291304171a2@linuxfoundation.org>
+	<DD53AFBE-F948-40F9-A980-2DA155236237@oracle.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230727125125.1194376-1-imagedong@tencent.com>
- <20230727125125.1194376-2-imagedong@tencent.com> <CANn89iLwLxzSLKtobE9y+ZBU_eizfNo6FUfBa61KeUXsodA2FQ@mail.gmail.com>
-In-Reply-To: <CANn89iLwLxzSLKtobE9y+ZBU_eizfNo6FUfBa61KeUXsodA2FQ@mail.gmail.com>
-From: Menglong Dong <menglong8.dong@gmail.com>
-Date: Fri, 28 Jul 2023 10:37:55 +0800
-Message-ID: <CADxym3YP8zw-bCJxWmfcUWYz7Ncipsa=jDMweR6kZF-xaMwc3Q@mail.gmail.com>
-Subject: Re: [PATCH net-next 1/3] net: tcp: send zero-window ACK when no memory
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	dsahern@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Menglong Dong <imagedong@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri, Jul 28, 2023 at 3:17=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> On Thu, Jul 27, 2023 at 2:51=E2=80=AFPM <menglong8.dong@gmail.com> wrote:
-> >
-> > From: Menglong Dong <imagedong@tencent.com>
-> >
-> > For now, skb will be dropped when no memory, which makes client keep
-> > retrans util timeout and it's not friendly to the users.
-> >
-> > In this patch, we reply an ACK with zero-window in this case to update
-> > the snd_wnd of the sender to 0. Therefore, the sender won't timeout the
-> > connection and will probe the zero-window with the retransmits.
-> >
-> > Signed-off-by: Menglong Dong <imagedong@tencent.com>
-> > ---
-> >  include/net/inet_connection_sock.h |  3 ++-
-> >  net/ipv4/tcp_input.c               |  4 ++--
-> >  net/ipv4/tcp_output.c              | 14 +++++++++++---
-> >  3 files changed, 15 insertions(+), 6 deletions(-)
-> >
-> > diff --git a/include/net/inet_connection_sock.h b/include/net/inet_conn=
-ection_sock.h
-> > index c2b15f7e5516..be3c858a2ebb 100644
-> > --- a/include/net/inet_connection_sock.h
-> > +++ b/include/net/inet_connection_sock.h
-> > @@ -164,7 +164,8 @@ enum inet_csk_ack_state_t {
-> >         ICSK_ACK_TIMER  =3D 2,
-> >         ICSK_ACK_PUSHED =3D 4,
-> >         ICSK_ACK_PUSHED2 =3D 8,
-> > -       ICSK_ACK_NOW =3D 16       /* Send the next ACK immediately (onc=
-e) */
-> > +       ICSK_ACK_NOW =3D 16,      /* Send the next ACK immediately (onc=
-e) */
-> > +       ICSK_ACK_NOMEM =3D 32,
-> >  };
-> >
-> >  void inet_csk_init_xmit_timers(struct sock *sk,
-> > diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-> > index 3cd92035e090..03111af6115d 100644
-> > --- a/net/ipv4/tcp_input.c
-> > +++ b/net/ipv4/tcp_input.c
-> > @@ -5061,7 +5061,8 @@ static void tcp_data_queue(struct sock *sk, struc=
-t sk_buff *skb)
-> >                         reason =3D SKB_DROP_REASON_PROTO_MEM;
-> >                         NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPRCVQDR=
-OP);
-> >                         sk->sk_data_ready(sk);
-> > -                       goto drop;
-> > +                       inet_csk(sk)->icsk_ack.pending |=3D ICSK_ACK_NO=
-MEM;
->
-> Also set ICSK_ACK_NOW ?
->
-> We also need to make sure to send an immediate ACK WIN 0 in the case we q=
-ueued
-> the skb in an empty receive queue and we were under pressure.
->
-> We do not want to have a delayed ACK sending a normal RWIN,
-> then wait for another packet that we will probably drop.
->
-> Look at the code :
->
-> if (skb_queue_len(&sk->sk_receive_queue) =3D=3D 0)
->      sk_forced_mem_schedule(sk, skb->truesize);
-> else if (tcp_try_rmem_schedule(sk, skb, skb->truesize)) {
->
-> and refactor it to make sure to set  ICSK_ACK_NOMEM even on the first pac=
-ket
-> that bypassed the rmem_schedule().
->
+On Fri, 28 Jul 2023 01:38:40 +0000 Anjali Kulkarni wrote:
+> Jakub,
+> Do I need to revert the -f runtime filter option back to compile time
+> and commit with that disabled so the selftest compiles on a kernel on
+> which the new options are not defined?
 
-Ok, that makes sense.
+I'm not 100% sure myself on what's the expectations for building
+selftests against uAPI headers is..
 
->
->
-> > +                       goto out_of_window;
->
-> Why forcing quickack mode ? Please leave the "goto drop;"
->
+I _think_ that you're supposed to add an -I$something to
+the CFLAGS in your Makefile. KHDR_INCLUDES maybe? So that the uAPI
+headers from the build get used (rendered by make headers).
 
-Hmm...because I want to make it send an immediate
-ACK. Obviously, a ICSK_ACK_NOW flag should be
-the better choice here.
-
-> >                 }
-> >
-> >                 eaten =3D tcp_queue_rcv(sk, skb, &fragstolen);
-> > @@ -5102,7 +5103,6 @@ static void tcp_data_queue(struct sock *sk, struc=
-t sk_buff *skb)
-> >  out_of_window:
-> >                 tcp_enter_quickack_mode(sk, TCP_MAX_QUICKACKS);
-> >                 inet_csk_schedule_ack(sk);
-> > -drop:
-> >                 tcp_drop_reason(sk, skb, reason);
-> >                 return;
-> >         }
-> >
+Take a look at Documentation/dev-tools/kselftest.rst, I hope
+the answer is somewhere there.
 
