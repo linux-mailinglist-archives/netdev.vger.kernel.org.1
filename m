@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-22116-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22120-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B629176617F
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 03:51:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6C6676618F
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 04:00:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E30971C21785
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 01:51:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A0C08282773
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 02:00:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A520B17D1;
-	Fri, 28 Jul 2023 01:51:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B87C217F3;
+	Fri, 28 Jul 2023 02:00:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 934D815D1
-	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 01:51:55 +0000 (UTC)
-Received: from mail-lj1-x22b.google.com (mail-lj1-x22b.google.com [IPv6:2a00:1450:4864:20::22b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 030D9F2
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 18:51:54 -0700 (PDT)
-Received: by mail-lj1-x22b.google.com with SMTP id 38308e7fff4ca-2b9d07a8d84so1293881fa.3
-        for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 18:51:53 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB72717D0
+	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 02:00:08 +0000 (UTC)
+Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E29C173F
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 19:00:07 -0700 (PDT)
+Received: by mail-lf1-x130.google.com with SMTP id 2adb3069b0e04-4fe05fbe250so2793924e87.0
+        for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 19:00:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690509112; x=1691113912;
+        d=gmail.com; s=20221208; t=1690509605; x=1691114405;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=spl6msirgwM12Bz3dNNSl2svImPXOjpVr2B1RLvkZXY=;
-        b=DwhhtH676J+xnO7Ti6I5DxRcKK1/tNIiUspuBI2YPxQbBzWU23RspV7Z8ZIQ1Qn4WP
-         nzyVMC8VSYzI3UGV85rrIyEQ3RKhqyYcs1Q9Moy6o1muJnUi0SKzgiKh7lW9qn21TDjB
-         hwnreAuKolsWCAl/trzGZTbWEZVgicqIcztfZ9dh4x1idm4VMtQ7GDopkOpQISulzIwl
-         iw3g8RqM2xLBmnlqH0oC6WXQ7WD4R2yyGvdvXwIBAJSgPG79eTcHfaSp4kFNlBQA+Jky
-         GglqPSj6325MHZBm9xUJFLJu7zlz9eVJFr3DTrOAZHm4XgY99xUgfyibeb+cSc3kJC2B
-         hrdg==
+        bh=VQRjDvqI2wB+9kV9HDAkrT4+B9QHQmFxny+flLnsotM=;
+        b=sTd8an1jg+ArsGizoBbMuupDBtPeHRJzexdcZLypJrDrU2IXDXr8gUl91CViZ++lIw
+         VTtRpj2K1F3YC9qlxxxkgoK1Xi4tO+1N9ClyMomgT8el8fElcJYawmv7Oqua5NCEfddn
+         SkhCLXYOHmDoCE4l7RNs9Eb9puAWhucz3mXLHBxSfBJPq+j39BGAnL6gxB46b/1BGfmC
+         qNa1JhhK8olBB6NHHd1bV1PBJTHwwXhF9fgk5UkIpOc8b4/FdELvi7QMLfMFUogzZPvA
+         QtA6AwYQOohdKA7fl19PesiDe0ZTBnfCBAvGYK4NQMHneHOsXpvnwYiJanZ6F3HKbmI6
+         Uwfg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690509112; x=1691113912;
+        d=1e100.net; s=20221208; t=1690509605; x=1691114405;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=spl6msirgwM12Bz3dNNSl2svImPXOjpVr2B1RLvkZXY=;
-        b=dFYx1uQFEmgIux8EpJ163pZadIA3fJXTpGQaXoRJdz8yuHGEg+g5iIYwpVXjpFUL3k
-         65NhwAE1txQjmDC26kxvENDXouB2tnvStYHeiwdOpGtvOqbGC4w8l0gKc50PPFNg3lAJ
-         z+Y9A8b7ltKx5mEJi1j17ganalWsqJhx8ceH2nk62NtkDQf05c149veVUgCkALbxXbui
-         De2IReBZXBuJtLtD0Oz3lQ3li3DIGjZwj/VosT2FTUxYLiZONJHp1wJ6h9SZ0rTd4Qwa
-         U+kZdAvsy+wFMPT/WNaPfhhNPvsLXjFl5ccIKoajIzs6gwm0n/I4MhAati/YX6PycZbZ
-         AdKQ==
-X-Gm-Message-State: ABy/qLaMaVJ1QYLur7kp8DQbisWfzuVa2Hp6papUKwZ+kkD4CIh3JRCw
-	2IymHjeeoxi82im5I4RH/PkY8awaZaUD5ww/iPg=
-X-Google-Smtp-Source: APBJJlELIy6CzI7EadvaDv1i5jG2qBH+5qOGvagZFAIrDNAR32mZVOSW6K2uYyaAw2I57TwBIT220Ok980xXve9eHKM=
-X-Received: by 2002:a2e:8816:0:b0:2b9:ac48:d7fe with SMTP id
- x22-20020a2e8816000000b002b9ac48d7femr523226ljh.38.1690509111900; Thu, 27 Jul
- 2023 18:51:51 -0700 (PDT)
+        bh=VQRjDvqI2wB+9kV9HDAkrT4+B9QHQmFxny+flLnsotM=;
+        b=ZrTUM4ixWrcl9FtnSUpe9Gs9Zg0nBp9OpyGFmMYiM+lbqdl2Bu4yOT4MGIGT4bB4WO
+         bWvscEbW9+R3le/BsmIEjxUBur+AwwtdzPePDkH8ffqaWXChdeD57OJD/J8xv+yDsLTc
+         Qw5zhyV00HYranq3Kg1DhYUyB2GNswlcUAudoTWZeQTH1c/Ah7jtwVg4gim2GLvR+/H2
+         bmeuNjwJr64SkwOiU+ZFfAD7y25bHR9vSBMx7VBdsduEXGIe4Tlj7oHCtQ8yvoLvAb9X
+         EkDTMEzTE5iz17YQIMzze1+xghPm9JHJza/xL1tThsaKGDDIBtQYHtGTmc9xlh6ABc7i
+         QsDA==
+X-Gm-Message-State: ABy/qLbxyvUDvTu2smNTtDZw2l1dk1Z9NyjMRLSIL9dINCdH4G13HRGX
+	rSI5F2Dt+UmMutQ4bMfygM95c1TQSmMSwhlXrkw=
+X-Google-Smtp-Source: APBJJlFDrZ3zDcRnitvNO9k2G8Jf4yZ3wP9u3pkv+LgOzBuOLQtxjUD/EfN+EFCQd86sAT6E5pzf9LndL0lJ96csXPI=
+X-Received: by 2002:a19:641e:0:b0:4fe:85c:aeba with SMTP id
+ y30-20020a19641e000000b004fe085caebamr521667lfb.21.1690509605492; Thu, 27 Jul
+ 2023 19:00:05 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1690439335.git.chenfeiyang@loongson.cn> <373259d4ac9ac0b9e1e64ad96d60a9bbd35b85aa.1690439335.git.chenfeiyang@loongson.cn>
- <51338bc8-92b0-4aab-92f8-1e5d178b05d7@lunn.ch>
-In-Reply-To: <51338bc8-92b0-4aab-92f8-1e5d178b05d7@lunn.ch>
+References: <cover.1690439335.git.chenfeiyang@loongson.cn> <dd88ed0f53e9ee0f653ddeb78b326f8eb44bdbd1.1690439335.git.chenfeiyang@loongson.cn>
+ <1bbba61c-19b7-48bb-8c93-0741b43abda5@lunn.ch>
+In-Reply-To: <1bbba61c-19b7-48bb-8c93-0741b43abda5@lunn.ch>
 From: Feiyang Chen <chris.chenfeiyang@gmail.com>
-Date: Fri, 28 Jul 2023 09:51:40 +0800
-Message-ID: <CACWXhKm9Qu3CUjGpqa_5dx74MDVHODKVrsotTi0+V03zDBVqwg@mail.gmail.com>
-Subject: Re: [PATCH v2 03/10] net: stmmac: dwmac1000: Add multi-channel support
+Date: Fri, 28 Jul 2023 09:59:53 +0800
+Message-ID: <CACWXhK=rVTf=BYo2G2CDDo6AFOwqJJM_v+H6G=0YNohqh8OycA@mail.gmail.com>
+Subject: Re: [PATCH v2 07/10] net: stmmac: dwmac-loongson: Add LS7A support
 To: Andrew Lunn <andrew@lunn.ch>
 Cc: Feiyang Chen <chenfeiyang@loongson.cn>, hkallweit1@gmail.com, peppe.cavallaro@st.com, 
 	alexandre.torgue@foss.st.com, joabreu@synopsys.com, chenhuacai@loongson.cn, 
@@ -81,28 +81,37 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Jul 27, 2023 at 5:01=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
+On Thu, Jul 27, 2023 at 5:18=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
 >
-> On Thu, Jul 27, 2023 at 03:15:46PM +0800, Feiyang Chen wrote:
-> > Some platforms have dwmac1000 implementations that support multi-
-> > channel. Extend the functions to add multi-channel support.
+> > +static void common_default_data(struct pci_dev *pdev,
+> > +                             struct plat_stmmacenet_data *plat)
+> >  {
+> > +     plat->bus_id =3D (pci_domain_nr(pdev->bus) << 16) | PCI_DEVID(pde=
+v->bus->number, pdev->devfn);
+> > +
+> >       plat->clk_csr =3D 2;      /* clk_csr_i =3D 20-35MHz & MDC =3D clk=
+_csr_i/16 */
+> >       plat->has_gmac =3D 1;
+> >       plat->force_sf_dma_mode =3D 1;
 > >
-> > +     priv->plat->dwmac_is_loongson =3D false;
+> >       /* Set default value for multicast hash bins */
+> > -     plat->multicast_filter_bins =3D HASH_TABLE_SIZE;
+> > +     plat->multicast_filter_bins =3D 256;
 >
-> I don't know this driver, so my comments could be wrong...
->
-> Is this specific to loongson, or multi-channel? If you look at the
-> other bool in plat, they are all for features, not machines? Could
-> this actually be called priv->multi_chan_en ?
+> HASH_TABLE_SIZE is 64. You appear to be changing it to 256 for
+> everybody, not just your platform. I would expect something like
+> common_default_data() is called first, and then you change values in a
+> loongson specific function.
 >
 
 Hi, Andrew,
 
-It is specific to loongson. I think I can add some features instead of
-using dwmac_is_loongson.
+The common_default_data() here is defined in our platform driver. We
+have tested on our platforms (LS7A and LS2K) and it can be safely
+changed to 256.
 
 Thanks,
 Feiyang
 
->      Andrew
+>          Andrew
 
