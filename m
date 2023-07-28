@@ -1,84 +1,212 @@
-Return-Path: <netdev+bounces-22337-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22338-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E60C37670CF
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 17:42:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FEDD7670F3
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 17:49:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A303C282760
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 15:42:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3A59E2827BD
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 15:49:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13D981426F;
-	Fri, 28 Jul 2023 15:42:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EDFE14279;
+	Fri, 28 Jul 2023 15:49:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8338134B0
-	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 15:42:11 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39BF2C433C8;
-	Fri, 28 Jul 2023 15:42:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F2B4134B0
+	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 15:49:03 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 961F1C433C7;
+	Fri, 28 Jul 2023 15:49:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690558931;
-	bh=b49As86yg/5JYBX4M7DfYM4ZaQYfk/KakQKThOaO6kI=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=uWyWn/xYkBvwkCrZ7LFj7lIF824IQZoowK8kJ1HCZUuDNcS5ujpYEFABzx5g8AzkF
-	 1e96mljF/MQS4Opxxxt2SIAVz/GajtGvCO9BYH2wMQRWcWmiYdIPYcpFEobeVLc6II
-	 tMWu6WXk0UloKXLDzqS7VXr5yqsX0nb7JF5QGEaelXKfMCF45zfFjKp4ZyovJPAYZU
-	 ZLWI3eq0KOfZ4Y1rT2OufaNdC3K9OIuH4ooQ7R5xSWIBQdL389M19HFtGsQwFRUypw
-	 OYOq5qAQGy00dx4qFv4EeMOAlLhUkoNxA4lVXU2VmlhOKAyGPiwDJiur+N4BXcAlTz
-	 M8qieowzhNrww==
-Message-ID: <7e08dd3b-726d-3b1b-9db7-eddb21773817@kernel.org>
-Date: Fri, 28 Jul 2023 09:42:10 -0600
+	s=k20201202; t=1690559343;
+	bh=lxqglJYknCo8CfWOKOayQXUGyKrV7uOvRItRobwjvUw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=iabOlKeqBc2naHOaAS/tt6fMJ8hiRHkxEppX+IghDbdeQ2DDQFMISlGVctK3nTh5I
+	 Z7jVktei7DooTU4MVtVEhpfdjAnIXtmn2kAKMpFWto4HV5/mK8VxsYBKSNNOCp4Eoq
+	 /kM/oQ3yIdj59Ksfl1NRPh3m9/V6y6BpOxz5yEcf4LG2oa5++EMtgDFGDv52K9ZR8I
+	 J7b9W6c4PvnnX70Bac9KX5PMVJbpNCZNoRhrKtkNS/jSCsZDLQ6TcbfGbpGaeg9Trs
+	 CdzOE5z4BtPl99b2U66H5yzXynQ5gmXAMWQFtBYXv7k0c6DguR6w6KKls0ch21JUv/
+	 essPJy2YbVnQg==
+Date: Fri, 28 Jul 2023 08:49:02 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Maryam Tahhan <mtahhan@redhat.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com
+Subject: Re: [PATCH net-next v2 0/2] tools/net/ynl: enable json
+ configuration
+Message-ID: <20230728084902.1dd524c5@kernel.org>
+In-Reply-To: <908e8567-05c8-fb94-5910-ecbee16eb842@redhat.com>
+References: <20230727120353.3020678-1-mtahhan@redhat.com>
+	<20230727173753.6e044c13@kernel.org>
+	<908e8567-05c8-fb94-5910-ecbee16eb842@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.13.0
-Subject: Re: [PATCH net-next] ipv4/fib: send RTM_DELROUTE notify when flush
- fib
-Content-Language: en-US
-To: nicolas.dichtel@6wind.com, Stephen Hemminger
- <stephen@networkplumber.org>, Hangbin Liu <liuhangbin@gmail.com>
-Cc: Ido Schimmel <idosch@idosch.org>, netdev@vger.kernel.org,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Thomas Haller <thaller@redhat.com>
-References: <ZLZnGkMxI+T8gFQK@shredder> <20230718085814.4301b9dd@hermes.local>
- <ZLjncWOL+FvtaHcP@Laptop-X1> <ZLlE5of1Sw1pMPlM@shredder>
- <ZLngmOaz24y5yLz8@Laptop-X1>
- <d6a204b1-e606-f6ad-660a-28cc5469be2e@kernel.org>
- <ZLobpQ7jELvCeuoD@Laptop-X1> <ZLzY42I/GjWCJ5Do@shredder>
- <ZL48xbowL8QQRr9s@Laptop-X1> <20230724084820.4aa133cc@hermes.local>
- <ZL+F6zUIXfyhevmm@Laptop-X1> <20230725093617.44887eb1@hermes.local>
- <6b53e392-ca84-c50b-9d77-4f89e801d4f3@6wind.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <6b53e392-ca84-c50b-9d77-4f89e801d4f3@6wind.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
 
-On 7/28/23 7:01 AM, Nicolas Dichtel wrote:
-> Frankly, it's quite complex, there are corner cases.
+On Fri, 28 Jul 2023 11:24:51 +0100 Maryam Tahhan wrote:
+> On 28/07/2023 01:37, Jakub Kicinski wrote:
+> > On Thu, 27 Jul 2023 08:03:29 -0400 Maryam Tahhan wrote: =20
+> >> Use a json configuration file to pass parameters to ynl to allow
+> >> for operations on multiple specs in one go. Additionally, check
+> >> this new configuration against a schema to validate it in the cli
+> >> module before parsing it and passing info to the ynl module. =20
+> > Interesting. Is this related to Donald's comments about subscribing
+> > to notifications from multiple families?
+> >
+> > Can you share some info about your use case? =20
+>=20
+>=20
+> Yes it's related. We are working towards using YNL as a netlink agent or=
+=20
+> part of a netlink agent that's driven by YAML specs. We are
+>=20
+> trying to enable existing Kubernetes CNIs to integrate with DPUs via an=20
+> OPI [1] API without having to change these existing CNIs. In several
+>=20
+> cases these CNIs program the Kernel as both the control plane and the=20
+> fallback dataplane (for packets the DPU accelerator doesn't know what
+> to do with). And so being able to monitor netlink state and reflect it=20
+> to the DPU accelerator (and vice versa) via an OPI API would be=20
+> extremely useful.
+>=20
+>=20
+> We think the YAML part gives us a solid model that showcases the breadth=
+=20
+> of what these CNIs program (via netlink) as well as a base for the grpc=20
+> protobufs that the OPI API would like to define/use.
 
-yes there are.
-> 
-> When an interface is set down, the routes associated to this interface should be
-> removed. This is the simple part.
-> But for ecmp routes, there are several cases:
->  - if all nh use this interface: the routes are deleted by the kernel;
->  - if only some nh uses this interface :
->    + if all other nh already point to a down interface: the route are deleted by
-> the kernel;
->    + if at least one nh points to an up interface: the nh are temporarily disabled.
-> 
-> Managing a cache with this is not so obvious 😉
+So agent on the host is listening to netlink and sending to DPU gRPC
+requests? From what you're describing it sounds like you'd mostly want
+to pass the notifications. The multi-command thing is to let the DPU
+also make requests if it needs to do/know something specific?
 
+> >> Example configs would be:
+> >>
+> >> {
+> >>      "yaml-specs-path": "/<path-to>/linux/Documentation/netlink/specs",
+> >>      "spec-args": {
+> >>          "ethtool.yaml": {
+> >>              "do": "rings-get",
+> >>              "json-params": {
+> >>                  "header": {
+> >>                      "dev-name": "eno1"
+> >>                  }
+> >>              }
+> >>          },
+> >>         "netdev.yaml": {
+> >>              "do": "dev-get",
+> >>              "json-params": {
+> >>              "ifindex": 3
+> >>              }
+> >>          }
+> >>      }
+> >> } =20
+> > Why is the JSON preferable to writing a script to the same effect?
+> > It'd actually be shorter and more flexible.
+> > Maybe we should focus on packaging YNL as a python lib? =20
+>=20
+> I guess you can write a script. The reasons I picked JSON were mainly:
+>=20
+> -=C2=A0 Simplicity and Readability for both developers and non-developers=
+/users.
+>=20
+> - With the JSON Schema Validation I could very quickly validate the=20
+> incoming configuration without too much logic in cli.py.
+>=20
+> - I thought of it as a stepping stone towards an agent configuration=20
+> file if YNL evolves to provide or be part of a netlink agent (driven by=20
+> yaml specs)...
 
-FRR works well with Linux at this point, and libnl's caching was updated
-ad fixed by folks from Cumulus Networks so it should be a good too.
+Those are very valid. My worry is that:
+ - it's not a great fit for asynchronous stuff like notifications
+   (at least a simple version built directly from cli.py)
+ - we'd end up needing some flow control and/or transfer of values
+   at some point, and it will evolve into a full blown DSL
+
+> >> OR
+> >>
+> >> {
+> >>      "yaml-specs-path": "/<path-to>/linux/Documentation/netlink/specs",
+> >>      "spec-args": {
+> >>          "ethtool.yaml": {
+> >>              "subscribe": "monitor",
+> >>              "sleep": 10
+> >>          },
+> >>          "netdev.yaml": {
+> >>              "subscribe": "mgmt",
+> >>              "sleep": 5
+> >>          }
+> >>      }
+> >> } =20
+> > Could you also share the outputs the examples would produce?
+> > =20
+> Right now the output is simple, an example would be for the first config=
+=20
+> in the email:
+>=20
+> [ linux]# ./tools/net/ynl/cli.py --config ./tools/net/ynl/multi-do.json
+> ###############=C2=A0 ethtool.yaml=C2=A0 ###############
+>=20
+> {'header': {'dev-index': 3, 'dev-name': 'eno1'},
+>  =C2=A0'rx': 512,
+>  =C2=A0'rx-max': 8192,
+>  =C2=A0'rx-push': 0,
+>  =C2=A0'tx': 512,
+>  =C2=A0'tx-max': 8192,
+>  =C2=A0'tx-push': 0}
+> ###############=C2=A0 netdev.yaml=C2=A0 ###############
+>=20
+> {'ifindex': 3, 'xdp-features': {'xsk-zerocopy', 'redirect', 'basic'}}
+
+My concern was that this will not be optimal for the receiver to parse.
+Because the answer is not valid JSON. We'd need something like:
+
+[
+ { "cmd-id": "some-identifier?".
+   "response": { ... }
+ },
+ { "cmd-id": "identifier-of-second-command".
+   "response": { ... }
+ }
+]
+
+> Or for the second config in the email (note: I just toggled the tx ring=20
+> descriptors on one of my NICs to trigger an ethtool notification):
+>=20
+> [root@nfvsdn-06 linux]# ./tools/net/ynl/cli.py --config=20
+> ./tools/net/ynl/multi-ntf.json
+> ###############=C2=A0 ethtool.yaml=C2=A0 ###############
+>=20
+> [{'msg': {'header': {'dev-index': 3, 'dev-name': 'eno1'},
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'rx': 512,
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'rx-max': 8192,
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'rx-push': 0,
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'tx': 8192,
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'tx-max': 8192,
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'tx-push': 0},
+>  =C2=A0 'name': 'rings-ntf'}]
+> ###############=C2=A0 netdev.yaml=C2=A0 ###############
+>=20
+> []
+>=20
+> At the moment (even with these changes) YNL subscribes-sleeps-checks for=
+=20
+> notification for each family sequentially...
+> I will be looking into enabling an agent like behaviour: subscribe to=20
+> notifications from multiple families and monitor (babysteps)....
+>=20
+> [1] https://opiproject.org/
+
+Modulo the nits it sounds fairly reasonable. Main question is how much
+of that we put in the kernel tree, and how much lives elsewhere :S
+If we have a dependency on gRPC at some point, for example, that may
+be too much for kernel tools/
 
