@@ -1,92 +1,108 @@
-Return-Path: <netdev+bounces-22260-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22265-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 207FB766C3D
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 13:58:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D3E30766C5B
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 14:01:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3D4771C2189F
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 11:58:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1093D1C218C2
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 12:01:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CD0012B72;
-	Fri, 28 Jul 2023 11:58:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98CF2134DF;
+	Fri, 28 Jul 2023 11:59:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01F21125BE
-	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 11:58:07 +0000 (UTC)
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A14CC3;
-	Fri, 28 Jul 2023 04:58:05 -0700 (PDT)
-Received: from dggpemm500005.china.huawei.com (unknown [172.30.72.53])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RC5f62HY5zNmWP;
-	Fri, 28 Jul 2023 19:54:38 +0800 (CST)
-Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
- (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Fri, 28 Jul
- 2023 19:58:01 +0800
-Subject: Re: [PATCH net-next 1/9] page_pool: split types and declarations from
- page_pool.h
-To: Alexander Lobakin <aleksander.lobakin@intel.com>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-CC: Maciej Fijalkowski <maciej.fijalkowski@intel.com>, Larysa Zaremba
-	<larysa.zaremba@intel.com>, Alexander Duyck <alexanderduyck@fb.com>, Jesper
- Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas
-	<ilias.apalodimas@linaro.org>, Simon Horman <simon.horman@corigine.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-References: <20230727144336.1646454-1-aleksander.lobakin@intel.com>
- <20230727144336.1646454-2-aleksander.lobakin@intel.com>
-From: Yunsheng Lin <linyunsheng@huawei.com>
-Message-ID: <fb6330ef-5e74-01a4-a418-0b33748932ff@huawei.com>
-Date: Fri, 28 Jul 2023 19:58:01 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.2.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C66C134BA
+	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 11:59:51 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96F6319BF
+	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 04:59:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1690545588;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=wkYExyrH0hmK6H5XLA8WFiWWTbpLMfoLOCPaCc3YX2s=;
+	b=VH2ocyiB4z4LtE3e2Ge9zTZOB+haQuTg0AOH0+ZLwXmfVP2O2IEVYOcfJ4CZck4TWt283V
+	8URsrrTpkyfceucgxRCCF8SxNpwCMP1ZmrgRCWLnRzMjbUIUMLh9HqAbI2XXgw0SlHoKtU
+	11kfMCNXnNGvgbkRogcqN0o7kCqY3pg=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-230-hv_Mz3zuPv-n4WqRSpntkQ-1; Fri, 28 Jul 2023 07:59:42 -0400
+X-MC-Unique: hv_Mz3zuPv-n4WqRSpntkQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 84A781008142;
+	Fri, 28 Jul 2023 11:59:41 +0000 (UTC)
+Received: from RHTPC1VM0NT.redhat.com (unknown [10.22.8.217])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id D70EE207B338;
+	Fri, 28 Jul 2023 11:59:40 +0000 (UTC)
+From: Aaron Conole <aconole@redhat.com>
+To: netdev@vger.kernel.org
+Cc: dev@openvswitch.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Shuah Khan <shuah@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Pravin B Shelar <pshelar@ovn.org>,
+	Ilya Maximets <i.maximets@ovn.org>
+Subject: [PATCH v2 net-next 0/5] selftests: openvswitch: add flow programming cases
+Date: Fri, 28 Jul 2023 07:59:35 -0400
+Message-Id: <20230728115940.578658-1-aconole@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20230727144336.1646454-2-aleksander.lobakin@intel.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.69.30.204]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- dggpemm500005.china.huawei.com (7.185.36.74)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-	version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 2023/7/27 22:43, Alexander Lobakin wrote:
+The openvswitch selftests currently contain a few cases for managing the
+datapath, which includes creating datapath instances, adding interfaces,
+and doing some basic feature / upcall tests.  This is useful to validate
+the control path.
 
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index d0553ad37865..30037d39b82d 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -16015,8 +16015,7 @@ M:	Ilias Apalodimas <ilias.apalodimas@linaro.org>
->  L:	netdev@vger.kernel.org
->  S:	Supported
->  F:	Documentation/networking/page_pool.rst
-> -F:	include/net/page_pool.h
-> -F:	include/trace/events/page_pool.h
+Add the ability to program some of the more common flows with actions. This
+can be improved overtime to include regression testing, etc.
 
-Is there any reason to remove the above?
+Changes from original:
 
-> +F:	include/net/page_pool/*.h
+1. Fix issue when parsing ipv6 in the NAT action
+2. Fix issue calculating length during ctact parsing
+3. Fix error message when invalid bridge is passed
+4. Fold in Adrian's patch to support key masks
 
-It seems more common to use 'include/net/page_pool/' in
-MAINTAINERS.
+Aaron Conole (4):
+  selftests: openvswitch: add an initial flow programming case
+  selftests: openvswitch: add a test for ipv4 forwarding
+  selftests: openvswitch: add basic ct test case parsing
+  selftests: openvswitch: add ct-nat test case with ipv4
 
->  F:	net/core/page_pool.c
->  
+Adrian Moreno (1):
+  selftests: openvswitch: support key masks
+
+ .../selftests/net/openvswitch/openvswitch.sh  | 223 +++++++
+ .../selftests/net/openvswitch/ovs-dpctl.py    | 601 +++++++++++++++++-
+ 2 files changed, 800 insertions(+), 24 deletions(-)
+
+-- 
+2.40.1
+
 
