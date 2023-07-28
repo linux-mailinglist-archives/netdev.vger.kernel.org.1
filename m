@@ -1,82 +1,106 @@
-Return-Path: <netdev+bounces-22095-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22096-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D3A87660B8
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 02:21:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE58B7660CA
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 02:37:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8E8A31C215A4
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 00:21:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EB906282566
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 00:37:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D11757F2;
-	Fri, 28 Jul 2023 00:20:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E29F17EA;
+	Fri, 28 Jul 2023 00:37:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 816D8800
-	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 00:20:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 02D7BC433CD;
-	Fri, 28 Jul 2023 00:20:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2D947C
+	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 00:37:54 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E501EC433C7;
+	Fri, 28 Jul 2023 00:37:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690503621;
-	bh=JWpibV1AQXBMpPFvCewoBsCPhbnapxlbGt4HsLNitJo=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=cjsALfXyWA/6raCCl2px6oP9dHVI0H2lgfOOk0OgMkuMP5SgQggtxyRMFs+YHPDfp
-	 eEZR/KZdnLWiGaq56v2krh/Zj42BbLex/0ual0lDgI3DpqUrp8wSTgM5qWVrHT3yOG
-	 /eCUgIboNAuzcV8lTNA2NHthDvx5w0CaPWwEKI764J69oc7VJdZDSkCtt0h7XyvGZH
-	 A2Rq5fIuC/cER0EdPG5kV2jg2g8//gBIjNdYHL7hv7CkKbfMeT/diR+6gUwQ6c6qNs
-	 OddxVh7qRQnAilLi3WA++CpbLsNBOezNc1461qpd3FwrwftjG25y4ulzPBuRGm/Lfm
-	 yo0cOqsMs/1Fg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id E3C40C41672;
-	Fri, 28 Jul 2023 00:20:20 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1690504674;
+	bh=XfgaUva1Wbg+rSQo9n5K1iEo4s1KkgR6BlYCSkc5Rq8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=jzmqp/yCO5ca/d4g0u+j2tQfKXnFQNTQdKWroGxfS8FWYriofAamIDVN7u5Yhsj1A
+	 rROOB3c5XkTVHElI9OMSg5Auiqj4VedXbQThKuPEPBjTeymbS6e49n/MfoqaHQax0v
+	 H/E8vbmI0oItLJ0h8ptlERBt3H+BwgfCDBWLKf1lTroKetUSjBim0wZtv1cL/ejFAq
+	 2TI5KN0P6iUm31pKJiRJqLfmovIDOuag/4WKLa74Q2vcjRdol7ZdaXPKI3G1Mo+jUa
+	 N7pwusDkJyHkU1KDSjSPutcTB422IuOqpNeEXS1CKjQB9UpVk+TrzZXcD0zUlbJfkB
+	 sTaOy9rpvJG9A==
+Date: Thu, 27 Jul 2023 17:37:53 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Maryam Tahhan <mtahhan@redhat.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com
+Subject: Re: [PATCH net-next v2 0/2] tools/net/ynl: enable json
+ configuration
+Message-ID: <20230727173753.6e044c13@kernel.org>
+In-Reply-To: <20230727120353.3020678-1-mtahhan@redhat.com>
+References: <20230727120353.3020678-1-mtahhan@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] bridge: Remove unused declaration
- br_multicast_set_hash_max()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169050362092.24970.6426041238367256548.git-patchwork-notify@kernel.org>
-Date: Fri, 28 Jul 2023 00:20:20 +0000
-References: <20230726143141.11704-1-yuehaibing@huawei.com>
-In-Reply-To: <20230726143141.11704-1-yuehaibing@huawei.com>
-To: Yue Haibing <yuehaibing@huawei.com>
-Cc: roopa@nvidia.com, razor@blackwall.org, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, idosch@nvidia.com,
- bridge@lists.linux-foundation.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Thu, 27 Jul 2023 08:03:29 -0400 Maryam Tahhan wrote:
+> Use a json configuration file to pass parameters to ynl to allow
+> for operations on multiple specs in one go. Additionally, check
+> this new configuration against a schema to validate it in the cli
+> module before parsing it and passing info to the ynl module.
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Interesting. Is this related to Donald's comments about subscribing
+to notifications from multiple families?
 
-On Wed, 26 Jul 2023 22:31:41 +0800 you wrote:
-> Since commit 19e3a9c90c53 ("net: bridge: convert multicast to generic rhashtable")
-> this is not used, so can remove it.
+Can you share some info about your use case?
+
+> Example configs would be:
 > 
-> Signed-off-by: YueHaibing <yuehaibing@huawei.com>
-> ---
->  net/bridge/br_private.h | 1 -
->  1 file changed, 1 deletion(-)
+> {
+>     "yaml-specs-path": "/<path-to>/linux/Documentation/netlink/specs",
+>     "spec-args": {
+>         "ethtool.yaml": {
+>             "do": "rings-get",
+>             "json-params": {
+>                 "header": {
+>                     "dev-name": "eno1"
+>                 }
+>             }
+>         },
+>        "netdev.yaml": {
+>             "do": "dev-get",
+>             "json-params": {
+>             "ifindex": 3
+>             }
+>         }
+>     }
+> }
 
-Here is the summary with links:
-  - [net-next] bridge: Remove unused declaration br_multicast_set_hash_max()
-    https://git.kernel.org/netdev/net-next/c/4d66f235c790
+Why is the JSON preferable to writing a script to the same effect?
+It'd actually be shorter and more flexible.
+Maybe we should focus on packaging YNL as a python lib?
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+> OR
+> 
+> {
+>     "yaml-specs-path": "/<path-to>/linux/Documentation/netlink/specs",
+>     "spec-args": {
+>         "ethtool.yaml": {
+>             "subscribe": "monitor",
+>             "sleep": 10
+>         },
+>         "netdev.yaml": {
+>             "subscribe": "mgmt",
+>             "sleep": 5
+>         }
+>     }
+> }
 
-
+Could you also share the outputs the examples would produce?
 
