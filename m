@@ -1,34 +1,35 @@
-Return-Path: <netdev+bounces-22441-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22438-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1BD8776784F
-	for <lists+netdev@lfdr.de>; Sat, 29 Jul 2023 00:02:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7095C7677F7
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 23:59:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E65A71C20EF4
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 22:02:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7ED9B1C217DD
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 21:59:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6ECD91FB2F;
-	Fri, 28 Jul 2023 22:02:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CB081FB2C;
+	Fri, 28 Jul 2023 21:59:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 635F023B8
-	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 22:02:36 +0000 (UTC)
-Received: from inva020.nxp.com (inva020.nxp.com [92.121.34.13])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BFD32D61;
-	Fri, 28 Jul 2023 15:02:15 -0700 (PDT)
-Received: from inva020.nxp.com (localhost [127.0.0.1])
-	by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id D554B1A00F3;
-	Fri, 28 Jul 2023 23:53:34 +0200 (CEST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F7C01FB28
+	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 21:59:01 +0000 (UTC)
+X-Greylist: delayed 324 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 28 Jul 2023 14:59:00 PDT
+Received: from inva021.nxp.com (inva021.nxp.com [92.121.34.21])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EFBADC;
+	Fri, 28 Jul 2023 14:58:59 -0700 (PDT)
+Received: from inva021.nxp.com (localhost [127.0.0.1])
+	by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 8F9462010D4;
+	Fri, 28 Jul 2023 23:53:35 +0200 (CEST)
 Received: from smtp.na-rdc02.nxp.com (usphx01srsp001v.us-phx01.nxp.com [134.27.49.11])
-	by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id 7660F1A0086;
-	Fri, 28 Jul 2023 23:53:34 +0200 (CEST)
+	by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 56BED2000C8;
+	Fri, 28 Jul 2023 23:53:35 +0200 (CEST)
 Received: from right.am.freescale.net (right.am.freescale.net [10.81.116.134])
-	by usphx01srsp001v.us-phx01.nxp.com (Postfix) with ESMTP id 11D214058C;
+	by usphx01srsp001v.us-phx01.nxp.com (Postfix) with ESMTP id 0913B40553;
 	Fri, 28 Jul 2023 14:53:33 -0700 (MST)
 From: Li Yang <leoyang.li@nxp.com>
 To: Andrew Lunn <andrew@lunn.ch>,
@@ -39,12 +40,10 @@ To: Andrew Lunn <andrew@lunn.ch>,
 	David Bauer <mail@david-bauer.net>
 Cc: netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Li Yang <leoyang.li@nxp.com>,
-	Viorel Suman <viorel.suman@nxp.com>,
-	Wei Fang <wei.fang@nxp.com>
-Subject: [PATCH v3 1/2] net: phy: at803x: fix the wol setting functions
-Date: Fri, 28 Jul 2023 16:53:19 -0500
-Message-Id: <20230728215320.31801-2-leoyang.li@nxp.com>
+	Li Yang <leoyang.li@nxp.com>
+Subject: [PATCH v3 2/2] net: phy: at803x: remove set/get wol callbacks for AR8032
+Date: Fri, 28 Jul 2023 16:53:20 -0500
+Message-Id: <20230728215320.31801-3-leoyang.li@nxp.com>
 X-Mailer: git-send-email 2.25.1.377.g2d2118b
 In-Reply-To: <20230728215320.31801-1-leoyang.li@nxp.com>
 References: <20230728215320.31801-1-leoyang.li@nxp.com>
@@ -56,110 +55,35 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Virus-Scanned: ClamAV using ClamSMTP
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-In commit 7beecaf7d507 ("net: phy: at803x: improve the WOL feature"), it
-seems not correct to use a wol_en bit in a 1588 Control Register which is
-only available on AR8031/AR8033(share the same phy_id) to determine if WoL
-is enabled.  Change it back to use AT803X_INTR_ENABLE_WOL for determining
-the WoL status which is applicable on all chips supporting wol. Also update
-the at803x_set_wol() function to only update the 1588 register on chips
-having it.  After this change, disabling wol at probe from commit
-d7cd5e06c9dd ("net: phy: at803x: disable WOL at probe") is no longer
-needed.  So that part is removed.
+Since the AR8032 part does not support wol, remove related callbacks
+from it.
 
-Fixes: 7beecaf7d507 ("net: phy: at803x: improve the WOL feature")
+Fixes: 5800091a2061 ("net: phy: at803x: add support for AR8032 PHY")
 Signed-off-by: Li Yang <leoyang.li@nxp.com>
-Reviewed-by: Viorel Suman <viorel.suman@nxp.com>
-Reviewed-by: Wei Fang <wei.fang@nxp.com>
+Cc: David Bauer <mail@david-bauer.net>
 ---
- drivers/net/phy/at803x.c | 40 ++++++++++++++++++----------------------
- 1 file changed, 18 insertions(+), 22 deletions(-)
+ drivers/net/phy/at803x.c | 2 --
+ 1 file changed, 2 deletions(-)
 
 diff --git a/drivers/net/phy/at803x.c b/drivers/net/phy/at803x.c
-index c1f307d90518..1d61f7190367 100644
+index 1d61f7190367..ad4180addfb9 100644
 --- a/drivers/net/phy/at803x.c
 +++ b/drivers/net/phy/at803x.c
-@@ -459,21 +459,27 @@ static int at803x_set_wol(struct phy_device *phydev,
- 			phy_write_mmd(phydev, MDIO_MMD_PCS, offsets[i],
- 				      mac[(i * 2) + 1] | (mac[(i * 2)] << 8));
- 
--		/* Enable WOL function */
--		ret = phy_modify_mmd(phydev, MDIO_MMD_PCS, AT803X_PHY_MMD3_WOL_CTRL,
--				0, AT803X_WOL_EN);
--		if (ret)
--			return ret;
-+		/* Enable WOL function for 1588 */
-+		if (phydev->drv->phy_id == ATH8031_PHY_ID) {
-+			ret = phy_modify_mmd(phydev, MDIO_MMD_PCS,
-+					     AT803X_PHY_MMD3_WOL_CTRL,
-+					     0, AT803X_WOL_EN);
-+			if (ret)
-+				return ret;
-+		}
- 		/* Enable WOL interrupt */
- 		ret = phy_modify(phydev, AT803X_INTR_ENABLE, 0, AT803X_INTR_ENABLE_WOL);
- 		if (ret)
- 			return ret;
- 	} else {
--		/* Disable WoL function */
--		ret = phy_modify_mmd(phydev, MDIO_MMD_PCS, AT803X_PHY_MMD3_WOL_CTRL,
--				AT803X_WOL_EN, 0);
--		if (ret)
--			return ret;
-+		/* Disable WoL function for 1588 */
-+		if (phydev->drv->phy_id == ATH8031_PHY_ID) {
-+			ret = phy_modify_mmd(phydev, MDIO_MMD_PCS,
-+					     AT803X_PHY_MMD3_WOL_CTRL,
-+					     AT803X_WOL_EN, 0);
-+			if (ret)
-+				return ret;
-+		}
- 		/* Disable WOL interrupt */
- 		ret = phy_modify(phydev, AT803X_INTR_ENABLE, AT803X_INTR_ENABLE_WOL, 0);
- 		if (ret)
-@@ -508,11 +514,11 @@ static void at803x_get_wol(struct phy_device *phydev,
- 	wol->supported = WAKE_MAGIC;
- 	wol->wolopts = 0;
- 
--	value = phy_read_mmd(phydev, MDIO_MMD_PCS, AT803X_PHY_MMD3_WOL_CTRL);
-+	value = phy_read(phydev, AT803X_INTR_ENABLE);
- 	if (value < 0)
- 		return;
- 
--	if (value & AT803X_WOL_EN)
-+	if (value & AT803X_INTR_ENABLE_WOL)
- 		wol->wolopts |= WAKE_MAGIC;
- }
- 
-@@ -858,9 +864,6 @@ static int at803x_probe(struct phy_device *phydev)
- 	if (phydev->drv->phy_id == ATH8031_PHY_ID) {
- 		int ccr = phy_read(phydev, AT803X_REG_CHIP_CONFIG);
- 		int mode_cfg;
--		struct ethtool_wolinfo wol = {
--			.wolopts = 0,
--		};
- 
- 		if (ccr < 0)
- 			return ccr;
-@@ -876,13 +879,6 @@ static int at803x_probe(struct phy_device *phydev)
- 			priv->is_fiber = true;
- 			break;
- 		}
--
--		/* Disable WOL by default */
--		ret = at803x_set_wol(phydev, &wol);
--		if (ret < 0) {
--			phydev_err(phydev, "failed to disable WOL on probe: %d\n", ret);
--			return ret;
--		}
- 	}
- 
- 	return 0;
+@@ -2055,8 +2055,6 @@ static struct phy_driver at803x_driver[] = {
+ 	.flags			= PHY_POLL_CABLE_TEST,
+ 	.config_init		= at803x_config_init,
+ 	.link_change_notify	= at803x_link_change_notify,
+-	.set_wol		= at803x_set_wol,
+-	.get_wol		= at803x_get_wol,
+ 	.suspend		= at803x_suspend,
+ 	.resume			= at803x_resume,
+ 	/* PHY_BASIC_FEATURES */
 -- 
 2.25.1.377.g2d2118b
 
