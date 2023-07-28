@@ -1,140 +1,174 @@
-Return-Path: <netdev+bounces-22221-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22214-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B282176699A
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 12:00:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E9A67668E4
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 11:32:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D5A831C21181
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 10:00:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 499A2282593
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 09:32:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8236A1097D;
-	Fri, 28 Jul 2023 10:00:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 640BD10953;
+	Fri, 28 Jul 2023 09:32:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 733A711185
-	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 10:00:13 +0000 (UTC)
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2089.outbound.protection.outlook.com [40.107.244.89])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA81035B6;
-	Fri, 28 Jul 2023 03:00:11 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=PxsV2UpOMINQ2BMmzyIAgQjINKzjEGmfcGdx8IbO88DS1z5GRAvxSMNKxWEiCSS6eMiS+X/PZWFwx6eoB2W5iI8BkA4Ea08E00MeEvdGAtS3+Rw0xrIZTu6uRDzwItUQv92SA5VbVrSDpnoYxY3Q6EPSiYeFtjgP1aWeOJLtK5W1qnkN+CFbBsP611earqL5DEbvn3fb6QBb3GRRETqxyF6bx4BNJ2Ky2PvmKrGAZkCU6xLpAHOLmVBwz6bTGkrTgA4L6Q5CuMPwv8DdvA1973+2lNg1QQzB0Ikn1JgVnclomYZAdshRHfG8sRrGD7YTj0udrDgiojBjuVBV8rBEKw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=NYN2CntSlb53OrhuxxsqUPnGpZk1P9sMSX9EKaR75g0=;
- b=LLp2V6lTEnY7rmfRursvv8Jmz0RhcbQvEbgv+YsKxJDZlBD8LOmoMwHXpgesHvtJtTAv5Kp5vUz9nESU2qFwh+TiNnfsUPllok1K5JTh8zu8AXNQjY+j3IeB4J83xcSQYrDsyltVwt4ffdker466oOjZ9cA4Iu+XPxfrLFFHERdfe451e0QZUzfI00vQCkJZYhcrh66/wjiquUhOh3Ynrq+GXySkrXw/aTW9lQ+ni2i+natIN/SQfQfrBP/IyQnBMun/G0qvcHWr4VbF7zHj6KDkr6QBl8FwH3ZPBo1hoXDWm6fUt+To1TRwASTJ/FX5l9OBZ5C4aT0yTXiPmhPBYg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=NYN2CntSlb53OrhuxxsqUPnGpZk1P9sMSX9EKaR75g0=;
- b=irUKawbN93FkBpanDP+o4oRIrVUFvS2R8nZjp3MQQUdZdjHoLTyHtrM529N/cuWDaXqWrgC8RV4iit882+tIV25ANMvhfAlh3l8h/V29voCoAmQKXJi+hBMcrVRIiEBLd1VfqH8tASrWPss3J+Uw1dBQiB9wejrhN7753ifBu4b0jH0t3AcODvnpxT8eZJ13BwjNhps27GaFa5MbcExU90vbeG9qZ8SRSIT/g3TMtm/RoymiXNtbMXhyiQYvS7fAbP7hqjX19ONuOhSK6sGhcSy7Uyz6ElcPOgyoN+f1/QFfuGKp0rU41GJpueWiby3Hyp0CDKxG7dLyJwphOyZmKQ==
-Received: from DM5PR07CA0087.namprd07.prod.outlook.com (2603:10b6:4:ae::16) by
- PH0PR12MB7929.namprd12.prod.outlook.com (2603:10b6:510:284::5) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6631.35; Fri, 28 Jul 2023 10:00:09 +0000
-Received: from DM6NAM11FT071.eop-nam11.prod.protection.outlook.com
- (2603:10b6:4:ae:cafe::88) by DM5PR07CA0087.outlook.office365.com
- (2603:10b6:4:ae::16) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.29 via Frontend
- Transport; Fri, 28 Jul 2023 10:00:09 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- DM6NAM11FT071.mail.protection.outlook.com (10.13.173.48) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6631.35 via Frontend Transport; Fri, 28 Jul 2023 10:00:09 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Fri, 28 Jul 2023
- 02:59:55 -0700
-Received: from yaviefel (10.126.231.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37; Fri, 28 Jul
- 2023 02:59:52 -0700
-References: <20230728022142.2066980-1-rkannoth@marvell.com>
-User-agent: mu4e 1.8.11; emacs 28.2
-From: Petr Machata <petrm@nvidia.com>
-To: Ratheesh Kannoth <rkannoth@marvell.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>
-Subject: Re: [PATCH v2 net-next] dissector: Use 64bits for used_keys
-Date: Fri, 28 Jul 2023 11:30:24 +0200
-In-Reply-To: <20230728022142.2066980-1-rkannoth@marvell.com>
-Message-ID: <87mszgfjai.fsf@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 565DB10950
+	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 09:32:09 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 436E24204
+	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 02:32:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1690536726;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gcjUt618Z45nMTb+RFtsmBBBhq7ViXpq+z7I95/Kk+o=;
+	b=Aj23PC+VMiq6A7MXrtkCzCVHkCRZgmcHRjCJuaOLWPq6YfwUSKuUQOm9C4ybxrGifXrD8J
+	XyMplmNEfplWEuPhAgbdHe04NHX8D00uJd+nagH9ix9BWb6+cc5Wta4t2wsJX6oj3XcLyW
+	+hbfl6pogtgHKZD1tFNt5k2CLxFCI8A=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-398-VEABHKvvNl2YGsFGPQBdzQ-1; Fri, 28 Jul 2023 05:32:04 -0400
+X-MC-Unique: VEABHKvvNl2YGsFGPQBdzQ-1
+Received: by mail-ed1-f70.google.com with SMTP id 4fb4d7f45d1cf-5223854ef71so1222032a12.1
+        for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 02:32:04 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690536723; x=1691141523;
+        h=content-transfer-encoding:in-reply-to:references:to
+         :content-language:subject:cc:user-agent:mime-version:date:message-id
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=gcjUt618Z45nMTb+RFtsmBBBhq7ViXpq+z7I95/Kk+o=;
+        b=AHvmJtmJtUbGNExmQI2PEpczr9HTqSSWUeJxvPfeUYxHMqaFDTBJFkuVJlvu6eFvZc
+         vLT/ghlDJTpKj8PUpuNmDt5E0NhHOzx6GjvT0GKmcso8Lalt4HyLPxM4hB4uaqC5F+Td
+         fBNPSW2hx58U4Ktl6qdW0xQqWj3zRQn3snJFhO5dBwp73QfbhN5IMZSGF1/7vm1wU4Yn
+         M5FeY+QwPc3pzDpsBFfGjyViw5hVYT1J12dA3IzLBmDut2Lcu+c2Rmy2IO88110fNyfa
+         /BQHKh8sRYcdm6STaPazdfXmS0k202A70miNAY3cbR4oTtcrrUvJEP7W7YG4NNibxP7f
+         TsHQ==
+X-Gm-Message-State: ABy/qLbtU9S1BG/XYU0rONk3iHfwN6VEUcN3EIQJ+IycTpcE8srr9DR7
+	Y0SvTlJEXO4/TfOmc8rI+6/lw7fQKSHttTGyY2qdmpU+88I+Scmi6a0rT01UZdjiM/FeY8vSmW4
+	RyUZD1TADxWVR9CVK
+X-Received: by 2002:aa7:d616:0:b0:522:3081:ddb4 with SMTP id c22-20020aa7d616000000b005223081ddb4mr1368398edr.20.1690536723366;
+        Fri, 28 Jul 2023 02:32:03 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlGdL9m3DjLNN/ZU/lTc9TOFyIZ02cvDfIMMhRXp57SSjAnA34gcDPuPkMEe2O1hvcsTsletfg==
+X-Received: by 2002:aa7:d616:0:b0:522:3081:ddb4 with SMTP id c22-20020aa7d616000000b005223081ddb4mr1368388edr.20.1690536723082;
+        Fri, 28 Jul 2023 02:32:03 -0700 (PDT)
+Received: from [192.168.42.222] (194-45-78-10.static.kviknet.net. [194.45.78.10])
+        by smtp.gmail.com with ESMTPSA id x8-20020aa7d388000000b005228614c358sm1584021edq.88.2023.07.28.02.32.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 28 Jul 2023 02:32:02 -0700 (PDT)
+From: Jesper Dangaard Brouer <jbrouer@redhat.com>
+X-Google-Original-From: Jesper Dangaard Brouer <brouer@redhat.com>
+Message-ID: <db85d260-fdad-9b7c-cf7e-2e848151292d@redhat.com>
+Date: Fri, 28 Jul 2023 11:32:01 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.126.231.35]
-X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6NAM11FT071:EE_|PH0PR12MB7929:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0fa8eb04-38d0-4a83-0267-08db8f516d62
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	ea1A+VmaptUsEg8wA+r4DfZ0Z9rSnYknaRtlC0Q6GOMP9/Gl3EfvQKJgpwo8dL0qi4IjvDc2m0g994ixRUF09svIgedaBKvxxr3ymvK0sbjjnQpIu9FxFMkVKnXuO0CFrOcoLvUxEpp/7n3IretHoJt/3Ryf0rB+TQPAwMkuPckbDPXdbsR0EAvw2IOEHO7QU5e14V/dlTgE6lgxbLTQlAM0EdnirFLuB2Y/AiPIPF3KqzoOom9SUlC7ru8btnwFpYJA+RlPmZEiAO7ZKPDyIXzFlZz4UZHRpVpbE/7By/4MuAECQ4+kR9/eWzWYtQSy6xj9U5+51Px4B1W+SZKn/QdqlNdu8E4KWk3z+MolLEQs+rrCLtWGM0o/7ehKT7F9IkcscHa97kbDU/WLXFp1HEgeTuRxIX5L48PQqe82HtV65EyFy1rFECw7HZaOwDkZR438cvpy8Ja6u4Px47eez7sUavIAyzK8Knbn5Xk6g76g3L8KMDz97x9lB94Ya2W+didk4ucUcOffVL+LWzq/3odzQfJ0DeJUiz5bgwrHA2MUbg+gR5ZXOE7WBXlzEWEYadUy3IS+tU8wXhWcYxBbh6ARwl7RPozn6mGSHismi30oV3NmdpK1+kkyqzI7zqKcRFJ2tJPC8Kq4BlyqNY4cb3jBrjU2mXMw7KKuSC4UXb2AfpTwMFNw9y1O/SnVWWbQLNoClqbCy/UHB33SBTlIEZu1wiPgnmc147ub/AVepy7vLREU7kBd/efZHTShxfn4ThQIiB9vTAfd911Q7NMzuRUCL244zd9cKezdHqjaTDY=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(376002)(346002)(39860400002)(136003)(396003)(451199021)(82310400008)(46966006)(36840700001)(40470700004)(83380400001)(47076005)(40460700003)(36756003)(426003)(2906002)(36860700001)(86362001)(4744005)(2616005)(40480700001)(356005)(7636003)(82740400003)(41300700001)(316002)(4326008)(6916009)(966005)(26005)(8676002)(8936002)(54906003)(478600001)(70206006)(70586007)(6666004)(336012)(186003)(16526019)(5660300002);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Jul 2023 10:00:09.1913
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0fa8eb04-38d0-4a83-0267-08db8f516d62
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	DM6NAM11FT071.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB7929
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Cc: brouer@redhat.com, Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+ Larysa Zaremba <larysa.zaremba@intel.com>,
+ Yunsheng Lin <linyunsheng@huawei.com>,
+ Alexander Duyck <alexanderduyck@fb.com>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+ Simon Horman <simon.horman@corigine.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, qingfang.deng@siflower.com.cn
+Subject: Re: [PATCH net-next 9/9] net: skbuff: always try to recycle PP pages
+ directly when in softirq
+Content-Language: en-US
+To: Alexander Lobakin <aleksander.lobakin@intel.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+References: <20230727144336.1646454-1-aleksander.lobakin@intel.com>
+ <20230727144336.1646454-10-aleksander.lobakin@intel.com>
+In-Reply-To: <20230727144336.1646454-10-aleksander.lobakin@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
 
-Ratheesh Kannoth <rkannoth@marvell.com> writes:
 
-> As 32bit of dissector->used_keys are exhausted,
-> increase the size to 64bits.
->
-> This is base changes for ESP/AH flow dissector patch.
-> Please find patch and discussions at
-> https://lore.kernel.org/netdev/ZMDNjD46BvZ5zp5I@corigine.com/T/#t
->
-> Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
-> Reviewed-by: Petr Machata <petrm@nvidia.com>
+On 27/07/2023 16.43, Alexander Lobakin wrote:
+> Commit 8c48eea3adf3 ("page_pool: allow caching from safely localized
+> NAPI") allowed direct recycling of skb pages to their PP for some cases,
+> but unfortunately missed a couple of other majors.
+> For example, %XDP_DROP in skb mode. The netstack just calls kfree_skb(),
+> which unconditionally passes `false` as @napi_safe. Thus, all pages go
+> through ptr_ring and locks, although most of time we're actually inside
+> the NAPI polling this PP is linked with, so that it would be perfectly
+> safe to recycle pages directly.
 
-This makes it look like I reviewed the whole thing. I think I wrote
-this:
+The commit messages is hard to read. It would help me as the reader if
+you used a empty line between paragraphs, like in this location (same
+goes for other commit descs).
 
-	Reviewed-by: Petr Machata <petrm@nvidia.com> # for mlxsw
+> Let's address such. If @napi_safe is true, we're fine, don't change
+> anything for this path. But if it's false, check whether we are in the
+> softirq context. It will most likely be so and then if ->list_owner
+> is our current CPU, we're good to use direct recycling, even though
+> @napi_safe is false -- concurrent access is excluded. in_softirq()
+> protection is needed mostly due to we can hit this place in the
+> process context (not the hardirq though).
 
-Also, you either missed or ignored my proposal for subject line update.
-I do think that "net: flow_dissector:" would be a better prefix, because
-that's how the component is called, and it's in the net namespace. It's
-OK not to agree, but in that case please argue to that end.
+This patch make me a little nervous, as it can create hard-to-debug bugs
+if this isn't 100% correct.  (Thanks for previous patch that exclude
+hardirq via lockdep).
+
+> For the mentioned xdp-drop-skb-mode case, the improvement I got is
+> 3-4% in Mpps. As for page_pool stats, recycle_ring is now 0 and
+> alloc_slow counter doesn't change most of time, which means the
+> MM layer is not even called to allocate any new pages.
+> 
+> Suggested-by: Jakub Kicinski <kuba@kernel.org> # in_softirq()
+> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+> ---
+>   net/core/skbuff.c | 4 +++-
+>   1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+> index e701401092d7..5ba3948cceed 100644
+> --- a/net/core/skbuff.c
+> +++ b/net/core/skbuff.c
+> @@ -901,8 +901,10 @@ bool page_pool_return_skb_page(struct page *page, bool napi_safe)
+>   	/* Allow direct recycle if we have reasons to believe that we are
+>   	 * in the same context as the consumer would run, so there's
+>   	 * no possible race.
+> +	 * __page_pool_put_page() makes sure we're not in hardirq context
+> +	 * and interrupts are enabled prior to accessing the cache.
+>   	 */
+> -	if (napi_safe) {
+> +	if (napi_safe || in_softirq()) {
+
+I used to have in_serving_softirq() in PP to exclude process context
+that just disabled BH to do direct recycling (into a lockless array).
+This changed in kernel v6.3 commit 542bcea4be86 ("net: page_pool: use
+in_softirq() instead") to help threaded NAPI.  I guess, nothing blew up
+so I guess this was okay to relax this.
+
+>   		const struct napi_struct *napi = READ_ONCE(pp->p.napi);
+>   
+>   		allow_direct = napi &&
+
+AFAIK this in_softirq() will allow process context with disabled BH to
+also recycle directly into the PP lockless array.  With the additional
+checks (that are just outside above diff-context) that I assume makes
+sure CPU (smp_processor_id()) also match.  Is this safe?
+
+--Jesper
+
 
