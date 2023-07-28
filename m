@@ -1,236 +1,255 @@
-Return-Path: <netdev+bounces-22151-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22152-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06FA0766417
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 08:25:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D79B576645D
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 08:38:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8AFCE2825F5
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 06:25:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0580F1C217FB
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 06:38:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 768F9BA35;
-	Fri, 28 Jul 2023 06:25:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9B32BE40;
+	Fri, 28 Jul 2023 06:38:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A6DA1FAF
-	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 06:25:42 +0000 (UTC)
-Received: from mail-yw1-x1143.google.com (mail-yw1-x1143.google.com [IPv6:2607:f8b0:4864:20::1143])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8BFCA0;
-	Thu, 27 Jul 2023 23:25:40 -0700 (PDT)
-Received: by mail-yw1-x1143.google.com with SMTP id 00721157ae682-577497ec6c6so19553587b3.2;
-        Thu, 27 Jul 2023 23:25:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690525540; x=1691130340;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zJ7uCM9gCmC7Ec+PIxmYSly2Nv+UftyJKyYRxKcBUVA=;
-        b=K9Y/MMyD9/5jKIzEZ/V/aFDa8azmFWJIZhBSBmsqXY1q5rGJsWO1rjjmVzXBoL3NBW
-         X4+LFZYEg2OkaZOtDHdPauWx5VKj0EdTuPcl1VVwZgKd24Yr+vH7J6eKNC8OKn8W8V+J
-         S3UUC8UgdhkxmVhe3gycNurrRMNte7RMMNo3X7++pDxoWHZ5HJ7fRdiNMLlp0bB+wIDa
-         MMLigdB1YwOpPYgOn0bRn7ldv1ZL0JSXlMc283ViCV4DBYmcvzEkxTGcOdEP7a5/DxKZ
-         vo9G5A1rJQoEfgzNVXPO7f4OgfHeehx7uKobZz2r3YO2CxjBhtYEFQ6tJ0y+2EaS4z5n
-         su3Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690525540; x=1691130340;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zJ7uCM9gCmC7Ec+PIxmYSly2Nv+UftyJKyYRxKcBUVA=;
-        b=XSagOv6T0Wu6J/1Ik/viN1C1w7FGmYY8zj7ySent/35QLj5+wSVoW4uDGid2itdedH
-         yqUdr16OBNlE/1pqLasDoS1puHuZIpvkU59mVdYkc5IVWsE+d5vR6EuvBukXWJP+xMw5
-         ID0be+Hy3DaBEVCgCJK2yteDmQRJDMxKaMHsoH1U0krgeR5BrHu2/BOPOSL5VtGPlIHx
-         XpjZArUcA+nxmYMO4iLvP7NFA8/nHNyK6+Xu5chiTzqTJty/SnVVsMGWAiINlPd+UngK
-         98xr9m3k033pOcZkLsMIjLvLKbzrmobY03Y3vXDiaqxxc/rUD9DttLXuJlTHalcm5YLZ
-         rthA==
-X-Gm-Message-State: ABy/qLbvVpbzkNrsgev/CjQxEaPszCpJIrPH0VJOTFFTo/gFQ7otvRrO
-	p1BlJNNGAffxwxp6jkSBcY3KSPQI7FKL4RfirFY=
-X-Google-Smtp-Source: APBJJlGbJBxbMIsBz86uOE3YjHYLMuHaEEnEY+fVotWoJjYeOSf7FpwhrzqYGVClNvIMsEy4X2wQkro8l4ADRPuelDY=
-X-Received: by 2002:a81:4943:0:b0:583:78b8:f42e with SMTP id
- w64-20020a814943000000b0058378b8f42emr1093347ywa.42.1690525539847; Thu, 27
- Jul 2023 23:25:39 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA7992F35
+	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 06:38:39 +0000 (UTC)
+Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD39D3C24
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 23:38:08 -0700 (PDT)
+Received: from lelv0265.itg.ti.com ([10.180.67.224])
+	by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 36S6aWo4108548;
+	Fri, 28 Jul 2023 01:36:32 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1690526192;
+	bh=Xa3mV8uDoKOc/m3VZ//d94y15mSePbo/tXuV/Va/m7c=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=blQGGynYQzzeYtcVVoZ6HWXFCQ5vlm5B/2O0JcDTu/w1fUd8rbuXxJLORzl0Px9Dk
+	 EXB9xdZv3GDzJMB2iFh4YsqRggap8ji3qr1mDqTJlfVxEkohy/ZCx+wBfRhtDpN1F8
+	 4zlaOl5B3Hj8Ht115/2wvYZN7ChS4mBeF5jmA/4A=
+Received: from DFLE103.ent.ti.com (dfle103.ent.ti.com [10.64.6.24])
+	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 36S6aWuL013351
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Fri, 28 Jul 2023 01:36:32 -0500
+Received: from DFLE114.ent.ti.com (10.64.6.35) by DFLE103.ent.ti.com
+ (10.64.6.24) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Fri, 28
+ Jul 2023 01:36:32 -0500
+Received: from fllv0040.itg.ti.com (10.64.41.20) by DFLE114.ent.ti.com
+ (10.64.6.35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Fri, 28 Jul 2023 01:36:32 -0500
+Received: from [172.24.227.83] (ileaxei01-snat.itg.ti.com [10.180.69.5])
+	by fllv0040.itg.ti.com (8.15.2/8.15.2) with ESMTP id 36S6aSKi075959;
+	Fri, 28 Jul 2023 01:36:28 -0500
+Message-ID: <81d9887c-cd0a-cb90-957e-eeaa2ae94967@ti.com>
+Date: Fri, 28 Jul 2023 12:06:27 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230727125125.1194376-1-imagedong@tencent.com>
- <20230727125125.1194376-4-imagedong@tencent.com> <CANn89iKWTrgEp3QY34mNqVAx09fSxHUh+oHRTd6=aWurGS7qWA@mail.gmail.com>
- <CADxym3YhjMv3Xkts99fiajq-cR-BqxDayKFzFZ1L49BNfFXkdw@mail.gmail.com> <CADVnQynQ1Hw+Jh7pjdNw_Mo4tWZV8V_sA+L-o=O4uV+9Gv7Prg@mail.gmail.com>
-In-Reply-To: <CADVnQynQ1Hw+Jh7pjdNw_Mo4tWZV8V_sA+L-o=O4uV+9Gv7Prg@mail.gmail.com>
-From: Menglong Dong <menglong8.dong@gmail.com>
-Date: Fri, 28 Jul 2023 14:25:28 +0800
-Message-ID: <CADxym3Zqb2CCpJojGiT7gVL98GDdOmjxqLY6ApLeP2zZU1Kn3Q@mail.gmail.com>
-Subject: Re: [PATCH net-next 3/3] net: tcp: check timeout by
- icsk->icsk_timeout in tcp_retransmit_timer()
-To: Neal Cardwell <ncardwell@google.com>
-Cc: Eric Dumazet <edumazet@google.com>, davem@davemloft.net, kuba@kernel.org, 
-	pabeni@redhat.com, dsahern@kernel.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Menglong Dong <imagedong@tencent.com>, 
-	Yuchung Cheng <ycheng@google.com>, Soheil Hassas Yeganeh <soheil@google.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH v2 06/10] net: stmmac: Add Loongson HWIF entry
+Content-Language: en-US
+To: Feiyang Chen <chenfeiyang@loongson.cn>, <andrew@lunn.ch>,
+        <hkallweit1@gmail.com>, <peppe.cavallaro@st.com>,
+        <alexandre.torgue@foss.st.com>, <joabreu@synopsys.com>,
+        <chenhuacai@loongson.cn>
+CC: <linux@armlinux.org.uk>, <dongbiao@loongson.cn>,
+        <loongson-kernel@lists.loongnix.cn>, <netdev@vger.kernel.org>,
+        <loongarch@lists.linux.dev>, <chris.chenfeiyang@gmail.com>
+References: <cover.1690439335.git.chenfeiyang@loongson.cn>
+ <7cae63ede2792cb2a7189f251b282aecbb0945b1.1690439335.git.chenfeiyang@loongson.cn>
+From: Ravi Gunasekaran <r-gunasekaran@ti.com>
+In-Reply-To: <7cae63ede2792cb2a7189f251b282aecbb0945b1.1690439335.git.chenfeiyang@loongson.cn>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_MED,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Jul 28, 2023 at 12:44=E2=80=AFPM Neal Cardwell <ncardwell@google.co=
-m> wrote:
->
-> On Thu, Jul 27, 2023 at 7:57=E2=80=AFPM Menglong Dong <menglong8.dong@gma=
-il.com> wrote:
-> >
-> > On Fri, Jul 28, 2023 at 3:31=E2=80=AFAM Eric Dumazet <edumazet@google.c=
-om> wrote:
-> > >
-> > > On Thu, Jul 27, 2023 at 2:52=E2=80=AFPM <menglong8.dong@gmail.com> wr=
-ote:
-> > > >
-> > > > From: Menglong Dong <imagedong@tencent.com>
-> > > >
-> > > > In tcp_retransmit_timer(), a window shrunk connection will be regar=
-ded
-> > > > as timeout if 'tcp_jiffies32 - tp->rcv_tstamp > TCP_RTO_MAX'. This =
-is not
-> > > > right all the time.
-> > > >
-> > > > The retransmits will become zero-window probes in tcp_retransmit_ti=
-mer()
-> > > > if the 'snd_wnd=3D=3D0'. Therefore, the icsk->icsk_rto will come up=
- to
-> > > > TCP_RTO_MAX sooner or later.
-> > > >
-> > > > However, the timer is not precise enough, as it base on timer wheel=
-.
-> > > > Sorry that I am not good at timer, but I know the concept of time-w=
-heel.
-> > > > The longer of the timer, the rougher it will be. So the timeout is =
-not
-> > > > triggered after TCP_RTO_MAX, but 122877ms as I tested.
-> > > >
-> > > > Therefore, 'tcp_jiffies32 - tp->rcv_tstamp > TCP_RTO_MAX' is always=
- true
-> > > > once the RTO come up to TCP_RTO_MAX.
-> > > >
-> > > > Fix this by replacing the 'tcp_jiffies32' with '(u32)icsk->icsk_tim=
-eout',
-> > > > which is exact the timestamp of the timeout.
-> > > >
-> > > > Signed-off-by: Menglong Dong <imagedong@tencent.com>
-> > > > ---
-> > > >  net/ipv4/tcp_timer.c | 6 +++++-
-> > > >  1 file changed, 5 insertions(+), 1 deletion(-)
-> > > >
-> > > > diff --git a/net/ipv4/tcp_timer.c b/net/ipv4/tcp_timer.c
-> > > > index 470f581eedd4..3a20db15a186 100644
-> > > > --- a/net/ipv4/tcp_timer.c
-> > > > +++ b/net/ipv4/tcp_timer.c
-> > > > @@ -511,7 +511,11 @@ void tcp_retransmit_timer(struct sock *sk)
-> > > >                                             tp->snd_una, tp->snd_nx=
-t);
-> > > >                 }
-> > > >  #endif
-> > > > -               if (tcp_jiffies32 - tp->rcv_tstamp > TCP_RTO_MAX) {
-> > > > +               /* It's a little rough here, we regard any valid pa=
-cket that
-> > > > +                * update tp->rcv_tstamp as the reply of the retran=
-smitted
-> > > > +                * packet.
-> > > > +                */
-> > > > +               if ((u32)icsk->icsk_timeout - tp->rcv_tstamp > TCP_=
-RTO_MAX) {
-> > > >                         tcp_write_err(sk);
-> > > >                         goto out;
-> > > >                 }
-> > >
-> > >
-> > > Hmm, this looks like a net candidate, since this is unrelated to the
-> > > other patches ?
-> >
-> > Yeah, this patch can be standalone. However, considering the
-> > purpose of this series, it is necessary. Without this patch, the
-> > OOM probe will always timeout after a few minutes.
-> >
-> > I'm not sure if I express the problem clearly in the commit log.
-> > Let's explain it more.
-> >
-> > Let's mark the timestamp of the 10th timeout of the rtx timer
-> > as TS1. Now, the retransmission happens and the ACK of
-> > the retransmitted packet will update the tp->rcv_tstamp to
-> > TS1+rtt.
-> >
-> > The RTO now is TCP_RTO_MAX. So let's see what will
-> > happen in the 11th timeout. As we timeout after 122877ms,
-> > so tcp_jiffies32 now is "TS1+122877ms", and
-> > "tcp_jiffies32 - tp->rcv_tstamp" is
-> > "TS1+122877ms - (TS1+rtt)" -> "122877ms - rtt",
-> > which is always bigger than TCP_RTO_MAX, which is 120000ms.
-> >
-> > >
-> > > Neal, what do you think ?
->
-> Sorry, I am probably missing something here, but: what would ever make
-> this new proposed condition ((u32)icsk->icsk_timeout - tp->rcv_tstamp
-> > TCP_RTO_MAX) true? :-)
->
 
-If the snd_wnd is 0, we need to keep probing until the window
-is available. Meanwhile, any retransmission that don't have
-a corresponding ACK (see what we do in the 1st patch), which
-can be caused by the lost of the ACK or the lost of the retransmitted
-packet, can make the condition true, as the tp->rcv_tstamp can't be
-updated in time.
 
-This is a little strict here. In the tcp_probe_timer(), we are allowed to
-retransmit the probe0 packet for sysctl_tcp_retries2 times. But
-we don't allow packets to be lost here.
+On 7/27/23 12:48 PM, Feiyang Chen wrote:
+> Add a new entry to HWIF table for Loongson.
+> 
+> Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
+> ---
+>  drivers/net/ethernet/stmicro/stmmac/common.h  |  3 ++
+>  .../ethernet/stmicro/stmmac/dwmac1000_dma.c   |  6 +++
+>  drivers/net/ethernet/stmicro/stmmac/hwif.c    | 48 ++++++++++++++++++-
+>  .../net/ethernet/stmicro/stmmac/stmmac_main.c | 25 ++++++----
+>  include/linux/stmmac.h                        |  1 +
+>  5 files changed, 73 insertions(+), 10 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/common.h b/drivers/net/ethernet/stmicro/stmmac/common.h
+> index 16e67c18b6f7..267f9a7913ac 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/common.h
+> +++ b/drivers/net/ethernet/stmicro/stmmac/common.h
+> @@ -29,11 +29,13 @@
+>  /* Synopsys Core versions */
+>  #define	DWMAC_CORE_3_40		0x34
+>  #define	DWMAC_CORE_3_50		0x35
+> +#define	DWMAC_CORE_3_70		0x37
+>  #define	DWMAC_CORE_4_00		0x40
+>  #define DWMAC_CORE_4_10		0x41
+>  #define DWMAC_CORE_5_00		0x50
+>  #define DWMAC_CORE_5_10		0x51
+>  #define DWMAC_CORE_5_20		0x52
+> +#define DWLGMAC_CORE_1_00	0x10
+>  #define DWXGMAC_CORE_2_10	0x21
+>  #define DWXLGMAC_CORE_2_00	0x20
+>  
+> @@ -547,6 +549,7 @@ int dwmac1000_setup(struct stmmac_priv *priv);
+>  int dwmac4_setup(struct stmmac_priv *priv);
+>  int dwxgmac2_setup(struct stmmac_priv *priv);
+>  int dwxlgmac2_setup(struct stmmac_priv *priv);
+> +int dwmac_loongson_setup(struct stmmac_priv *priv);
+>  
+>  void stmmac_set_mac_addr(void __iomem *ioaddr, const u8 addr[6],
+>  			 unsigned int high, unsigned int low);
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
+> index 7aa450d6a81a..5da5f111d7e0 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
+> @@ -172,6 +172,12 @@ static void dwmac1000_dma_init_rx(struct stmmac_priv *priv,
+>  		       chan * DMA_CHAN_OFFSET);
+>  		writel(upper_32_bits(dma_rx_phy), ioaddr + DMA_RCV_BASE_ADDR_HI +
+>  		       chan * DMA_CHAN_OFFSET);
+> +		if (priv->plat->has_lgmac) {
+> +			writel(upper_32_bits(dma_rx_phy),
+> +			       ioaddr + DMA_RCV_BASE_ADDR_SHADOW1);
+> +			writel(upper_32_bits(dma_rx_phy),
+> +			       ioaddr + DMA_RCV_BASE_ADDR_SHADOW2);
+> +		}
+>  	} else {
+>  		/* RX descriptor base address list must be written into DMA CSR3 */
+>  		writel(lower_32_bits(dma_rx_phy), ioaddr + DMA_RCV_BASE_ADDR +
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/hwif.c b/drivers/net/ethernet/stmicro/stmmac/hwif.c
+> index b8ba8f2d8041..b376ac4f80d5 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/hwif.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/hwif.c
+> @@ -58,7 +58,8 @@ static int stmmac_dwmac1_quirks(struct stmmac_priv *priv)
+>  		dev_info(priv->device, "Enhanced/Alternate descriptors\n");
+>  
+>  		/* GMAC older than 3.50 has no extended descriptors */
+> -		if (priv->synopsys_id >= DWMAC_CORE_3_50) {
+> +		if (priv->synopsys_id >= DWMAC_CORE_3_50 ||
+> +		    priv->plat->has_lgmac) {>  			dev_info(priv->device, "Enabled extended descriptors\n");
+>  			priv->extend_desc = 1;
+>  		} else {
+> @@ -104,6 +105,7 @@ static const struct stmmac_hwif_entry {
+>  	bool gmac;
+>  	bool gmac4;
+>  	bool xgmac;
+> +	bool lgmac;
 
-> In your nicely explained scenario, your new expression,
-> icsk->icsk_timeout - tp->rcv_tstamp, will be:
->
->   icsk->icsk_timeout - tp->rcv_tstamp
-> =3D TS1 + 120 sec      - (TS1+rtt)
-> =3D 120 sec - RTT
->
-> AFAICT there is no way for that expression to be bigger than
-> TCP_RTO_MAX =3D 120 sec unless somehow RTT is negative. :-)
->
-> So AFAICT your expression ((u32)icsk->icsk_timeout - tp->rcv_tstamp >
-> TCP_RTO_MAX) will always be false, so rather than this patch we may as
-> well remove the if check and the body of the if block?
->
+Similar to Andrew's comment on dwmac_is_loongson, can lgmac also be
+renamed to some other name? 
 
-Hmm......as I explained above, the condition will be true
-if the real packet loss happens. And I think it is the origin
-design.
+I believe the 'gmac' and 'xgmac' refer to 1Gbps and 10Gbps which sounds generic,
+while 'lgmac' sounds vendor specific. 
 
-> To me such a change does not seem like a safe and clear bug fix for
-> the "net" branch but rather a riskier design change (appropriate for
-> "net-next" branch) that has connections retry forever when the
-> receiver retracts the window to zero, under the estimation that this
-> is preferable to having the connections die in such a case.
->
-> There might be apps that depend on the old behavior of having
-> connections die in such cases, so we might want to have this new
-> fail-faster behavior guarded by a sysctl in case some sites need to
-> revert to the older behavior? Not sure...
+>  	u32 min_id;
+>  	u32 dev_id;
+>  	const struct stmmac_regs_off regs;
 
-Yeah, the behavior here will be different for the users. I'm not
-sure if there are any users that rely on such behavior.
 
-What do you think, Eric? Do we need a sysctl here?
+[...]
 
-Thanks!
-Menglong Dong
+> +	}, {
+> +		.gmac = true,
+> +		.gmac4 = false,
+> +		.xgmac = false,
+> +		.lgmac = true,
+> +		.min_id = DWLGMAC_CORE_1_00,
+> +		.regs = {
+> +			.ptp_off = PTP_GMAC3_X_OFFSET,
+> +			.mmc_off = MMC_GMAC3_X_OFFSET,
+> +		},
+> +		.desc = NULL,
+> +		.dma = &dwmac1000_dma_ops,
+> +		.mac = &dwmac1000_ops,
+> +		.hwtimestamp = &stmmac_ptp,
+> +		.mode = NULL,
+> +		.tc = NULL,
+> +		.setup = dwmac_loongson_setup,
+> +		.quirks = stmmac_dwmac1_quirks,
+> +	}, {
+> +		.gmac = true,
+> +		.gmac4 = false,
+> +		.xgmac = false,
+> +		.lgmac = true,
+> +		.min_id = DWMAC_CORE_3_50,
+> +		.regs = {
+> +			.ptp_off = PTP_GMAC3_X_OFFSET,
+> +			.mmc_off = MMC_GMAC3_X_OFFSET,
+> +		},
+> +		.desc = NULL,
+> +		.dma = &dwmac1000_dma_ops,
+> +		.mac = &dwmac1000_ops,
+> +		.hwtimestamp = &stmmac_ptp,
+> +		.mode = NULL,
+> +		.tc = NULL,
+> +		.setup = dwmac1000_setup,
+> +		.quirks = stmmac_dwmac1_quirks,
+>  	},
+>  };
+>  
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> index e8619853b6d6..829de274e75d 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> @@ -3505,17 +3505,21 @@ static int stmmac_request_irq_multi_msi(struct net_device *dev)
+>  {
+>  	struct stmmac_priv *priv = netdev_priv(dev);
+>  	enum request_irq_err irq_err;
+> +	unsigned long flags = 0;
+>  	cpumask_t cpu_mask;
+>  	int irq_idx = 0;
+>  	char *int_name;
+>  	int ret;
+>  	int i;
+>  
+> +	if (priv->plat->has_lgmac)
+> +		flags |= IRQF_TRIGGER_RISING;
 
->
-> neal
+How about introducing a struct member such as "irq_flags"?
+
+> +
+>  	/* For common interrupt */
+>  	int_name = priv->int_name_mac;
+>  	sprintf(int_name, "%s:%s", dev->name, "mac");
+>  	ret = request_irq(dev->irq, stmmac_mac_interrupt,
+> -			  0, int_name, dev);
+> +			  flags, int_name, dev);
+
+[...]
+
+> diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
+> index 46bccc34814d..e21076f57205 100644
+> --- a/include/linux/stmmac.h
+> +++ b/include/linux/stmmac.h
+> @@ -344,5 +344,6 @@ struct plat_stmmacenet_data {
+>  	bool has_integrated_pcs;
+>  	const struct dwmac_regs *dwmac_regs;
+>  	bool dwmac_is_loongson;
+> +	int has_lgmac;
+>  };
+>  #endif
+
+-- 
+Regards,
+Ravi
 
