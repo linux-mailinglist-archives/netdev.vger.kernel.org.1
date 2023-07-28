@@ -1,173 +1,144 @@
-Return-Path: <netdev+bounces-22318-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22319-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D042767026
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 17:08:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 74D0F767028
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 17:09:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 36080282861
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 15:08:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 319E52827FC
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 15:09:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01E1013FF7;
-	Fri, 28 Jul 2023 15:08:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2403B13FFB;
+	Fri, 28 Jul 2023 15:09:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E85D813FF5
-	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 15:08:44 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9638E420C
-	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 08:08:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1690556922;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8OVP0vl6LhsH0mGe+FeioSrZgT4FlNIfqgRSSYLOSe4=;
-	b=fiA/wOqrI0wBFl2eU4UDkKt2WJkzP6M/i9BX0YygPKbcXt4egLyT39t/BfEvkGOqDyaJ1y
-	tFhhLIVYvjnnPr8Xe0b3Z9/hbxgsJMHr4XtTfakJnveTTIXQq1X1dna7IIdirKs8di0Pok
-	auZrst0fpAtnbqluzH7P4PROsHEtD60=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-386-k5yWZL7gP_2fyHna6_Ff6g-1; Fri, 28 Jul 2023 11:08:41 -0400
-X-MC-Unique: k5yWZL7gP_2fyHna6_Ff6g-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-3fa9a282fffso12043025e9.1
-        for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 08:08:40 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690556919; x=1691161719;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8OVP0vl6LhsH0mGe+FeioSrZgT4FlNIfqgRSSYLOSe4=;
-        b=CZ1vvDVb6b5UUsnWlBUIztW72Pzq9yBD4thWnKyzofgI2pE9dfxHcFB4EVex6CiHH8
-         kSMq+p/PL9+eFPHMNuyOCFEqfNvwKAd/xD+ZTkg3306HriDujTnRYd/UJUBd8RzqwOUd
-         9omt8s2Go+BJSPsXwtLC+9q+8vV8nMeZEMP/Eb2S657PPFkkJXaFTigUVTRE8nn83NxF
-         S0mUs9oZELoni2tefGsj9ZHIm+wjCXOdoQL0kc7aBed01qU4P0v2OJOit1M+3INqZlT+
-         OHFIhRiUd9yvs50HwNzv/WzrNHTXq+EosRm+oxZfiUUqyuorLK3e31LBZhI9UnjEN6Gb
-         VJow==
-X-Gm-Message-State: ABy/qLarTghYcc29842a51D4ReHcnaq2/xb2jOtzUmo9ME8T6Ln/00ur
-	PWYWuuVhEfF8E5OtMbGNb5PbruUPtHnwLrUmtHczeenF4+xIQVJZ9qm0BdChZ28UJulhxbWLX+b
-	RPkx3ATE/JMnEnAIZ
-X-Received: by 2002:a1c:f70e:0:b0:3fb:4055:1ddd with SMTP id v14-20020a1cf70e000000b003fb40551dddmr1928703wmh.28.1690556919123;
-        Fri, 28 Jul 2023 08:08:39 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlGIHBkmXFEaj2WtbNUc7EFExJgKzaUEFszJPKoF8ba8AGDE+DCkNuC6Xsrn8j0v7wM9gwj5LA==
-X-Received: by 2002:a1c:f70e:0:b0:3fb:4055:1ddd with SMTP id v14-20020a1cf70e000000b003fb40551dddmr1928691wmh.28.1690556918813;
-        Fri, 28 Jul 2023 08:08:38 -0700 (PDT)
-Received: from [192.168.1.67] (198.red-88-3-59.dynamicip.rima-tde.net. [88.3.59.198])
-        by smtp.gmail.com with ESMTPSA id j6-20020a05600c1c0600b003fc3b03caa5sm9355519wms.1.2023.07.28.08.08.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 28 Jul 2023 08:08:38 -0700 (PDT)
-Message-ID: <6eec84f3-f754-06d7-f20e-81cda36ea777@redhat.com>
-Date: Fri, 28 Jul 2023 17:08:37 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1677913FF5
+	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 15:09:05 +0000 (UTC)
+Received: from EUR02-DB5-obe.outbound.protection.outlook.com (mail-db5eur02on2093.outbound.protection.outlook.com [40.107.249.93])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 873652D5B;
+	Fri, 28 Jul 2023 08:09:04 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=inpI/HPjl3SeYVIvrkVUYmjwUc6tBL+IBy8wZ8KAXg5MahLjvtw5LCSfBDucqUVdTn2o4VARt8tsROiI+SWciGn+dH+C5/yJevtYp4u6ka6aQwdiTyxnM8ovvKRIHW/DhEDIc6Dy+Yr9/lgGIXfhdTJju4I2rfgQkkNsAIKd7fsXf+1XLajURXq5q2cPubKhvr5lkRZXK9FmPD+bPvMBj2zzN8h4Ykj4DeB9OYhBBtu4GUDM6Qb3RfgNHTotbo58nH25IqaIZ4Y4wVdqUHgoaFYI9KeeeGQfHqSw+0EeQbIPYwz44xUuBztlZxcGUyZ2lRo2aPeKUoFav6OagpdQ2w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=L45wPkt2pR42iFMWPd95a6vpooyNseyqRicIpQOVQ3c=;
+ b=PXTlFn7tqtr+ZLi2nXUIpdBXo2uxdhdDuSBPs7C4K8zKsY7Xkn8W4UU92Yi1EzAl/vwddf1T8ZlIP3h+2nU2iery7suMsifRaHdO36pFle0FcMML77mQpxYozBQQBNg9otjmNFeC89mRNQ7qRZelmpPccB40vnfgu6RV8z9JtwFBFRkPuGPFoAeDueKPAXjK7D0k7SvJGH4mXP0w6U9nM/7y3kRQg4QRWSkpwUWDtqkdts9PrFV5SXbYUtUCCR4ECUofUvdjvfMFutUx9MSRb1ouMPEUagH2HEqqXXlNd6V/XudqnMLOYvIJ3SlctoS44d3EFCXKYheIYCds/ho2Ug==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=softfail (sender ip
+ is 80.151.164.27) smtp.rcpttodomain=esd.eu smtp.mailfrom=esd.eu; dmarc=none
+ action=none header.from=esd.eu; dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=esdhannover.onmicrosoft.com; s=selector1-esdhannover-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=L45wPkt2pR42iFMWPd95a6vpooyNseyqRicIpQOVQ3c=;
+ b=JmIKOLZtUiBwCivivx93tS2C8ivhoNz4CsVN1XX9OiofhvkjknLpo8pw++LYP6IQzpYyKKDPlNslmI91GkWxdmoQ5Mc9blPe3BoLavJvOmo0qogTWbkiUY8og6y7Ijap+3SJ/Wut4dCL9Iqw2HEh5eUvdR+Kfb/uTBdbibnX3u8=
+Received: from DB8PR06CA0036.eurprd06.prod.outlook.com (2603:10a6:10:100::49)
+ by DB9PR03MB8376.eurprd03.prod.outlook.com (2603:10a6:10:397::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.29; Fri, 28 Jul
+ 2023 15:09:01 +0000
+Received: from DB8EUR06FT064.eop-eur06.prod.protection.outlook.com
+ (2603:10a6:10:100:cafe::1) by DB8PR06CA0036.outlook.office365.com
+ (2603:10a6:10:100::49) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.29 via Frontend
+ Transport; Fri, 28 Jul 2023 15:09:00 +0000
+X-MS-Exchange-Authentication-Results: spf=softfail (sender IP is
+ 80.151.164.27) smtp.mailfrom=esd.eu; dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=esd.eu;
+Received-SPF: SoftFail (protection.outlook.com: domain of transitioning esd.eu
+ discourages use of 80.151.164.27 as permitted sender)
+Received: from esd-s7.esd (80.151.164.27) by
+ DB8EUR06FT064.mail.protection.outlook.com (10.233.253.157) with Microsoft
+ SMTP Server id 15.20.6631.29 via Frontend Transport; Fri, 28 Jul 2023
+ 15:09:00 +0000
+Received: from esd-s20.esd.local (debby [10.0.0.190])
+	by esd-s7.esd (Postfix) with ESMTPS id 5B1ED7C16C5;
+	Fri, 28 Jul 2023 17:09:00 +0200 (CEST)
+Received: by esd-s20.esd.local (Postfix, from userid 2046)
+	id 4B3DD2E1819; Fri, 28 Jul 2023 17:09:00 +0200 (CEST)
+From: Frank Jungclaus <frank.jungclaus@esd.eu>
+To: linux-can@vger.kernel.org,
+	Marc Kleine-Budde <mkl@pengutronix.de>,
+	Wolfgang Grandegger <wg@grandegger.com>,
+	Vincent Mailhol <mailhol.vincent@wanadoo.fr>
+Cc: =?UTF-8?q?Stefan=20M=C3=A4tje?= <stefan.maetje@esd.eu>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Frank Jungclaus <frank.jungclaus@esd.eu>
+Subject: [PATCH 0/1] can: esd_usb: Add support for esd CAN-USB/3
+Date: Fri, 28 Jul 2023 17:08:56 +0200
+Message-Id: <20230728150857.2374886-1-frank.jungclaus@esd.eu>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [ovs-dev] [PATCH v2 net-next 3/5] selftests: openvswitch: add a
- test for ipv4 forwarding
-Content-Language: en-US
-To: Aaron Conole <aconole@redhat.com>, netdev@vger.kernel.org
-Cc: dev@openvswitch.org, linux-kernel@vger.kernel.org,
- Ilya Maximets <i.maximets@ovn.org>, Eric Dumazet <edumazet@google.com>,
- linux-kselftest@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>,
- "David S. Miller" <davem@davemloft.net>
-References: <20230728115940.578658-1-aconole@redhat.com>
- <20230728115940.578658-4-aconole@redhat.com>
-From: Adrian Moreno <amorenoz@redhat.com>
-In-Reply-To: <20230728115940.578658-4-aconole@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-	SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.6
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DB8EUR06FT064:EE_|DB9PR03MB8376:EE_
+Content-Type: text/plain
+X-MS-Office365-Filtering-Correlation-Id: 929b3343-63ea-4828-f222-08db8f7c92ff
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	sM7azyCZcyxwyL+fQr9MaOGy1qO5OH4RTdna3EvcFZlX/NMYuszYVhcAhI4GhCqhXHG9b6feNeh2caEccvdh268govrXPd0B/5EJX6yXu9qGJUBlqEdUgG35niZ9B8iEjFv14P3BGQ247N4h6fp3lVsU1Npu2DFuEg34xMe/c+5G0tVgEkfKkvk8y+IMxd6f5m1tr/CleLXVWJfFLRAaZVswkSLirwO37VuAzueteTOzPF982shTFBurSIUL5Old6GAgq1RFdrfij50UM+CyC7rbikKhYHJylsZKNS/vkU4t9KcW2C3Bvybxe1Dm8eugUNdQvAQEFBoNNhO8+KmbCvQc3q+1iABuBFJMXns/BNunir33JaeFFcBnd1Swi+IFaJj0MLho4gr4vkU2cvJCRHDROch3zWFBlVb4+CJZN6VecTcpPTKlsqGsutUXcmMb6m6Y5FBtFcPnlYq4pwiW41csVQ6AI92tkD4nEXmPZbe+KM13O7XNFsvE4HES/fOxZ3unDOqGWzv2XfSpxJztQ97qYxjUYg98UKd+TTEJGiMzPpGVDdi+PJp8FyaKlitXAqlZ3llVzIhE+Qlc0+ckmeUAVVAYDDt1hmdGO+tEjI+XSmzVEIl0NZJf+DPD6+OmhjgWgoI4GcImJAk5Ix3Ak0KnlBh2oQxkFdbbxBDuW6UFQqCy382f1gwQgFLyVFWfvGDSVzIOeKPcMHEueBuFHA==
+X-Forefront-Antispam-Report:
+	CIP:80.151.164.27;CTRY:DE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:esd-s7.esd;PTR:p5097a41b.dip0.t-ipconnect.de;CAT:NONE;SFS:(13230028)(4636009)(376002)(39840400004)(136003)(346002)(396003)(82310400008)(451199021)(36840700001)(46966006)(70206006)(70586007)(44832011)(4326008)(110136005)(54906003)(6666004)(40480700001)(356005)(41300700001)(81166007)(36756003)(83380400001)(2906002)(478600001)(2616005)(36860700001)(8936002)(5660300002)(8676002)(47076005)(6266002)(1076003)(26005)(316002)(336012)(42186006)(186003);DIR:OUT;SFP:1102;
+X-OriginatorOrg: esd.eu
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Jul 2023 15:09:00.6771
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 929b3343-63ea-4828-f222-08db8f7c92ff
+X-MS-Exchange-CrossTenant-Id: 5a9c3a1d-52db-4235-b74c-9fd851db2e6b
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=5a9c3a1d-52db-4235-b74c-9fd851db2e6b;Ip=[80.151.164.27];Helo=[esd-s7.esd]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DB8EUR06FT064.eop-eur06.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB9PR03MB8376
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+After having applied a vast number of improvements to the existing
+CAN-USB/2 driver here now is a new attempt to add support for the esd
+CAN-USB/3 CAN FD interface.
+
+Beside this patch there are the following to-do's left for follow-up
+patches:
+
+* In principle, the esd CAN-USB/3 supports Transmitter Delay
+Compensation (TDC), but currently only the automatic TDC mode is
+supported by this driver. An implementation for manual TDC
+configuration will follow.
+
+* Rework the code to no longer switch directly on the USB product IDs
+to handle different device setting for each supported USB
+device. Instead use the driver_info member within struct usb_device_id
+to hold / point to specific properties for each supported device.
+
+* Try to switch from synchronous send usb_bulk_msg() to asynchronous
+communication by means of usb_submit_urb() where it is feasible.
+
+Frank Jungclaus (1):
+  can: esd_usb: Add support for esd CAN-USB/3
+
+ drivers/net/can/usb/esd_usb.c | 275 ++++++++++++++++++++++++++++++----
+ 1 file changed, 244 insertions(+), 31 deletions(-)
 
 
-On 7/28/23 13:59, Aaron Conole wrote:
-> This is a simple ipv4 bidirectional connectivity test.
-> 
-> Signed-off-by: Aaron Conole <aconole@redhat.com>
-
-Reviewed-by: Adrian Moreno <amorenoz@redhat.com>
-
-> ---
->   .../selftests/net/openvswitch/openvswitch.sh  | 40 +++++++++++++++++++
->   1 file changed, 40 insertions(+)
-> 
-> diff --git a/tools/testing/selftests/net/openvswitch/openvswitch.sh b/tools/testing/selftests/net/openvswitch/openvswitch.sh
-> index 5cdacb3c8c92..5d60a9466dab 100755
-> --- a/tools/testing/selftests/net/openvswitch/openvswitch.sh
-> +++ b/tools/testing/selftests/net/openvswitch/openvswitch.sh
-> @@ -12,6 +12,7 @@ TRACING=0
->   
->   tests="
->   	arp_ping				eth-arp: Basic arp ping between two NS
-> +	connect_v4				ip4-xon: Basic ipv4 ping between two NS
->   	netlink_checks				ovsnl: validate netlink attrs and settings
->   	upcall_interfaces			ovs: test the upcall interfaces"
->   
-> @@ -192,6 +193,45 @@ test_arp_ping () {
->   	return 0
->   }
->   
-> +# connect_v4 test
-> +#  - client has 1500 byte MTU
-> +#  - server has 1500 byte MTU
-> +#  - use ICMP to ping in each direction
-> +test_connect_v4 () {
-> +
-> +	sbx_add "test_connect_v4" || return $?
-> +
-> +	ovs_add_dp "test_connect_v4" cv4 || return 1
-> +
-> +	info "create namespaces"
-> +	for ns in client server; do
-> +		ovs_add_netns_and_veths "test_connect_v4" "cv4" "$ns" \
-> +		    "${ns:0:1}0" "${ns:0:1}1" || return 1
-> +	done
-> +
-> +
-> +	ip netns exec client ip addr add 172.31.110.10/24 dev c1
-> +	ip netns exec client ip link set c1 up
-> +	ip netns exec server ip addr add 172.31.110.20/24 dev s1
-> +	ip netns exec server ip link set s1 up
-> +
-> +	# Add forwarding for ARP and ip packets - completely wildcarded
-> +	ovs_add_flow "test_connect_v4" cv4 \
-> +		'in_port(1),eth(),eth_type(0x0806),arp()' '2' || return 1
-> +	ovs_add_flow "test_connect_v4" cv4 \
-> +		'in_port(2),eth(),eth_type(0x0806),arp()' '1' || return 1
-> +	ovs_add_flow "test_connect_v4" cv4 \
-> +		'in_port(1),eth(),eth_type(0x0800),ipv4(src=172.31.110.10)' '2' || return 1
-> +	ovs_add_flow "test_connect_v4" cv4 \
-> +		'in_port(2),eth(),eth_type(0x0800),ipv4(src=172.31.110.20)' '1' || return 1
-> +
-> +	# do a ping
-> +	ovs_sbx "test_connect_v4" ip netns exec client ping 172.31.110.20 -c 3 || return 1
-> +
-> +	info "done..."
-> +	return 0
-> +}
-> +
->   # netlink_validation
->   # - Create a dp
->   # - check no warning with "old version" simulation
-
+base-commit: 68af900072c157c0cdce0256968edd15067e1e5a
 -- 
-Adrián Moreno
+2.25.1
 
 
