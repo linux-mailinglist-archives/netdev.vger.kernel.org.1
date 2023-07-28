@@ -1,106 +1,128 @@
-Return-Path: <netdev+bounces-22274-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22277-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79BE3766D4F
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 14:35:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24D07766D59
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 14:37:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A21E928277B
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 12:35:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D4C9728268A
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 12:37:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99D43107BF;
-	Fri, 28 Jul 2023 12:35:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A9D112B90;
+	Fri, 28 Jul 2023 12:36:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B764C8C9
-	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 12:35:13 +0000 (UTC)
-Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 052B9187
-	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 05:35:12 -0700 (PDT)
-Received: by mail-pf1-x42b.google.com with SMTP id d2e1a72fcca58-686ed1d2594so1984446b3a.2
-        for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 05:35:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1690547711; x=1691152511;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=eGcqxjwyY3pQ4csT4f4ZYFzUgFaDBasoFzgth4FA/MQ=;
-        b=Ayqc4/V4xCizMpmDFZrNnLTheMd/dzztR+ZfbaALYbnKWyd1UUFRzSS2w31dkd3zb2
-         gwRpSajc5oIiKbKk1/ap8bGKCB+oyif9jhi+zD1qdtAftb62WVTjkXSo1MdbtB+zRBT5
-         Fu3zGPAXEF0P38GF6Y0X0r79yC3+xQJhWbulItJtQnlJATpr8wSpbF+Aztf1AapQs27/
-         aG0xnZXIfvCmAhH2OBAawztFT/tQ8Cign6cGhMFqWstCob14Gi+Y6t4sVsUcZGMae5u2
-         DVbrfb6LJoQRgXx9hSxlGF6CvjbOS64rUlf/BRwdmlT+1WEL2akThtv20+bH/lF9/1zb
-         EoMA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690547711; x=1691152511;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=eGcqxjwyY3pQ4csT4f4ZYFzUgFaDBasoFzgth4FA/MQ=;
-        b=ZXuXjj0DKHxLZjVLUt1xZvyFcLDqY+8MuQf7JonhpWR/SxRHru91nPwXXxNqrFm+lH
-         cVrTSuqeSOEuOd/oeq1b5doGN/NKYkEaaiKxd3c75zW4K9fSGhZVikIFqCR1vaTldLvh
-         6FFqhKdlkc/7gmSHyavnFonQ/SdH66BGGtHKrkF9WN6YLzkgwCbmKf2+z8GFs5LSTckC
-         XFSpk3zzH1Su0PzYDPPZJTaEG2DaHnFDH+ASLr7ho6YWNffBUVBNPaOGtOZLu3ACV+z0
-         GZVvxQ3+H71jmFqO5rmjylHLN5LBO/Z6VvVgpfq9LGy1IEjtRzcNyklBFL5UX8mxhA6T
-         I16g==
-X-Gm-Message-State: ABy/qLbnCPbYfoewl3SKcgeHV+Lbz3nzUOMkgrV1tWwJJSH51F1dGtDz
-	VDwo6PtqEXwt9h2P+7BRbEOovmKbw29YF3rxIc4WZQ==
-X-Google-Smtp-Source: APBJJlG+md8nV+Q9MCGNmsY6Cl5UKO3sLRcVzXdaRiluSPg7b4tpcWZWbV3MxDY9ynKpupQ65y3JYRyqDlXWn8w5NLU=
-X-Received: by 2002:a17:902:830b:b0:1bb:90d7:5e01 with SMTP id
- bd11-20020a170902830b00b001bb90d75e01mr1329459plb.63.1690547711217; Fri, 28
- Jul 2023 05:35:11 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 146B012B8E;
+	Fri, 28 Jul 2023 12:36:56 +0000 (UTC)
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6ACB4187;
+	Fri, 28 Jul 2023 05:36:53 -0700 (PDT)
+Received: from canpemm500010.china.huawei.com (unknown [172.30.72.55])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RC6Xx59DVzVjnR;
+	Fri, 28 Jul 2023 20:35:13 +0800 (CST)
+Received: from [10.174.176.93] (10.174.176.93) by
+ canpemm500010.china.huawei.com (7.192.105.118) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Fri, 28 Jul 2023 20:36:50 +0800
+Message-ID: <27306a24-02dd-f2f9-7d9d-982479498e8d@huawei.com>
+Date: Fri, 28 Jul 2023 20:36:49 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230727-synquacer-net-v1-1-4d7f5c4cc8d9@kernel.org>
- <CAMj1kXH_4OEY58Nb9yGHTDvjfouJHKNVhReo0mMdD_aGWW_WGQ@mail.gmail.com>
- <6766e852-dfb9-4057-b578-33e7d6b9e08e@lunn.ch> <46853c47-b698-4d96-ba32-5b2802f2220a@sirena.org.uk>
-In-Reply-To: <46853c47-b698-4d96-ba32-5b2802f2220a@sirena.org.uk>
-From: Masahisa Kojima <masahisa.kojima@linaro.org>
-Date: Fri, 28 Jul 2023 21:35:00 +0900
-Message-ID: <CADQ0-X_pXKvUxLW23vEyH=9aZ6iLA2jOKz8QX6aqwQmxFcPY8Q@mail.gmail.com>
-Subject: Re: [PATCH] net: netsec: Ignore 'phy-mode' on SynQuacer in DT mode
-To: Mark Brown <broonie@kernel.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, Ard Biesheuvel <ardb@kernel.org>, 
-	Jassi Brar <jaswinder.singh@linaro.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.9.1
+Subject: Re: [PATCH bpf 1/2] net: introduce __sk_rmem_schedule() helper
+To: John Fastabend <john.fastabend@gmail.com>, Eric Dumazet
+	<edumazet@google.com>
+CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<jakub@cloudflare.com>, <dsahern@kernel.org>, <ast@kernel.org>,
+	<daniel@iogearbox.net>, <netdev@vger.kernel.org>, <bpf@vger.kernel.org>
+References: <20230726142029.2867663-1-liujian56@huawei.com>
+ <20230726142029.2867663-2-liujian56@huawei.com>
+ <CANn89i+DuhGRXj9U-iXcEA__j6jvV5FC+tLNkGBCSqMCPpuFaA@mail.gmail.com>
+ <64c2c272c111_831d20880@john.notmuch>
+From: "liujian (CE)" <liujian56@huawei.com>
+In-Reply-To: <64c2c272c111_831d20880@john.notmuch>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.176.93]
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ canpemm500010.china.huawei.com (7.192.105.118)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, 28 Jul 2023 at 20:43, Mark Brown <broonie@kernel.org> wrote:
->
-> On Fri, Jul 28, 2023 at 10:41:40AM +0200, Andrew Lunn wrote:
-> > > Wouldn't this break SynQuacers booting with firmware that lacks a
-> > > network driver? (I.e., u-boot?)
->
-> > > I am not sure why, but quite some effort has gone into porting u-boot
-> > > to this SoC as well.
->
-> > Agreed, Rather than PHY_INTERFACE_MODE_NA, please use the correct
-> > value.
->
-> Does anyone know off hand what the correct value is?  I only have access
-> to one of these in a remote test lab which makes everything more
-> painful.
 
-"rgmii-id" is correct, configured by board level.
-The latest EDK2 firmware was already modified to use the correct value
-for DT(Thank you, Ard).
-http://snapshots.linaro.org/components/kernel/leg-96boards-developerbox-edk2/100/
 
-Thanks,
-Masahisa Kojima
+On 2023/7/28 3:16, John Fastabend wrote:
+> Eric Dumazet wrote:
+>> On Wed, Jul 26, 2023 at 4:15 PM Liu Jian <liujian56@huawei.com> wrote:
+>>>
+>>> Compared with sk_wmem_schedule(), sk_rmem_schedule() not only performs
+>>> rmem accounting, but also checks skb_pfmemalloc. The __sk_rmem_schedule()
+>>> helper function is introduced here to perform only rmem accounting related
+>>> activities.
+>>>
+>>
+>> Why not care about pfmemalloc ? Why is it safe ?
+>>
+>> You need to give more details, or simply reuse the existing helper.
+I didn't think so much. I extracted this helper just to do rmem 
+accounting in bpf_tcp_ingress(), because I didn't see the pfmemalloc 
+flag set when alloc sk_msg in sk_msg_alloc(). And thanks for your review.
+> 
+> I would just use the existing helper. Seems it should be fine.
+ok, let's just leave it as it is. Thanks John.
+> 
+>>
+>>> Signed-off-by: Liu Jian <liujian56@huawei.com>
+>>> ---
+>>>   include/net/sock.h | 12 ++++++++----
+>>>   1 file changed, 8 insertions(+), 4 deletions(-)
+>>>
+>>> diff --git a/include/net/sock.h b/include/net/sock.h
+>>> index 2eb916d1ff64..58bf26c5c041 100644
+>>> --- a/include/net/sock.h
+>>> +++ b/include/net/sock.h
+>>> @@ -1617,16 +1617,20 @@ static inline bool sk_wmem_schedule(struct sock *sk, int size)
+>>>          return delta <= 0 || __sk_mem_schedule(sk, delta, SK_MEM_SEND);
+>>>   }
+>>>
+>>> -static inline bool
+>>> -sk_rmem_schedule(struct sock *sk, struct sk_buff *skb, int size)
+>>> +static inline bool __sk_rmem_schedule(struct sock *sk, int size)
+>>>   {
+>>>          int delta;
+>>>
+>>>          if (!sk_has_account(sk))
+>>>                  return true;
+>>>          delta = size - sk->sk_forward_alloc;
+>>> -       return delta <= 0 || __sk_mem_schedule(sk, delta, SK_MEM_RECV) ||
+>>> -               skb_pfmemalloc(skb);
+>>> +       return delta <= 0 || __sk_mem_schedule(sk, delta, SK_MEM_RECV);
+>>> +}
+>>> +
+>>> +static inline bool
+>>> +sk_rmem_schedule(struct sock *sk, struct sk_buff *skb, int size)
+>>> +{
+>>> +       return __sk_rmem_schedule(sk, size) || skb_pfmemalloc(skb);
+>>>   }
+>>>
+>>>   static inline int sk_unused_reserved_mem(const struct sock *sk)
+>>> --
+>>> 2.34.1
+>>>
+> 
+> 
 
