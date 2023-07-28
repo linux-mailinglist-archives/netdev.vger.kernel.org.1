@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-22113-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22114-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79605766177
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 03:46:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15A87766179
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 03:47:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3361D2825D8
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 01:46:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 50C071C217A7
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 01:47:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1F1115D1;
-	Fri, 28 Jul 2023 01:46:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 178C715D1;
+	Fri, 28 Jul 2023 01:47:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6E7D7C
-	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 01:46:55 +0000 (UTC)
-Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9ADCBF2
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 18:46:53 -0700 (PDT)
-Received: by mail-lf1-x12a.google.com with SMTP id 2adb3069b0e04-4fe0c566788so2835058e87.0
-        for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 18:46:53 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B93D7C
+	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 01:47:25 +0000 (UTC)
+Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4476EF2
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 18:47:22 -0700 (PDT)
+Received: by mail-lf1-x132.google.com with SMTP id 2adb3069b0e04-4fe216edaf7so57236e87.0
+        for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 18:47:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690508812; x=1691113612;
+        d=gmail.com; s=20221208; t=1690508840; x=1691113640;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=nxKgytFLxzXVyJZBJwebLIhb8nwv4d9rqhg53vYef1Y=;
-        b=qgDbTIJf7vNP10O6CyjC7aJa8EbZMGCRFIf9fRH0TWJups1odl5BlgLJKPp9GrPvxB
-         p3V0XvmQIOKGLBkVfuE6FhnxK/HOFsWMdi8MAB2woquak0c/9/ZO2mgDlaxfUM2ANO/T
-         aMlZjEzAQYwTWKCBeFQ4gVkzcp3FaA3kWsW/nyPOuQmFa+xIigB07msYsic5LHOKiG37
-         18Ay/bVKAs9GD5F7Lv3nQsULoB9oUlix2ItLt+ggZsN+zk1VeK3TeEzeCWqxfOyvdhgM
-         PwuLJbvVgiXL1XhG4RCGSpo1LQ13hrqSEM79GtRlSfuPH7wzIpN4oaodL7ycna9TUwc9
-         qq7w==
+        bh=Zm1gYbFDcg5j5Vi8V4yEePrlSrcnPZjYLr+SXH4vwOw=;
+        b=WdbaMnUWaFWX0g3sadRN5u1RF6/arT0wqY3EfBT8Lf64KvCTcJlOgT9kpBkr4/bk05
+         CVYb9yv5fmcxCrCR1zXEBydOl3gkEgWuOuKZyYIHWi/6C4XS0l1UGC4sgXB42Im/mV9F
+         5x6670+KAJgTPItGFnWdu/WAXZ6DLJvzS4eUR98Ak+XNuSva19N4Y+yWNO+n8HVPb6C0
+         etYm06H5rCrLegNBOm6fm2VpqRHmRt8gn48GgJw//sA5mDS7uCyokYE46mHVLyM1wvvl
+         x+lrwocNdUsS6ZMvS3oCpPuPyjYNCquNnePHzl/+tt7H0uJKRKCZ7JO43PfpVohXQ3tu
+         2dUA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690508812; x=1691113612;
+        d=1e100.net; s=20221208; t=1690508840; x=1691113640;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=nxKgytFLxzXVyJZBJwebLIhb8nwv4d9rqhg53vYef1Y=;
-        b=b+MiP0bsz8SFODa/I2Vi+rrJpZmnLRkoJrpqiuKXS88/h33DP1rE1VI6+ejcB9bG4s
-         pbWVy9xmluIsu1PGAfddv+FKXDrefYNua3fpFdAV9h08y9GuBwl05Z+UqviqamWi8Rnk
-         pcWNau7yebZzd2BLLmWGgnp/nXLJSO8zEEJWt7sdMIs569V/QyEpocditZEFRi1me1lY
-         lHDZwCU9W/+i2s9hUVGBvlnCOJGTA5DNkC8dUNchZiTvuIHfBRAPQI/LZOfigslp/Msf
-         WG4ejYliu0e6IPpdU58++x0g/5fY3hqiY0eZBdy9iem4TFKm/oDo5Th3KqnbHPeLxii0
-         ZYPg==
-X-Gm-Message-State: ABy/qLZoRKSVfVqqBzhl9jvce9ZCqa7IUSadMsqxxTkG66qWKeENfr0b
-	+NNOLLXrek3oAddyGoTfsc/dxH9HsRDJmBMD3Sg=
-X-Google-Smtp-Source: APBJJlGIArvhwpZZCRhnfuAR+rY9ZKw6xESIhjzfTfichxQnRgzkX5C4oTqzLUENfoH0WF2ZMdIfj6L/kML0zMcBB6U=
-X-Received: by 2002:a19:ca03:0:b0:4fb:8771:e898 with SMTP id
- a3-20020a19ca03000000b004fb8771e898mr490409lfg.15.1690508811655; Thu, 27 Jul
- 2023 18:46:51 -0700 (PDT)
+        bh=Zm1gYbFDcg5j5Vi8V4yEePrlSrcnPZjYLr+SXH4vwOw=;
+        b=ZGOsHqdv3aoDwykV1riThzmu1gWmsbDEZ0o9GPW44cUZdDsCaerFeJnXSuctzyFJeX
+         sDlCLy/zXVHbxBdTD2fc9VhNyekKyhVQtkNXDNmtLnDMmMFJ7G/gDFA7po3uBufH1Qna
+         NxZFUI77toZwEbJZJliNBl1ZasqxRfPN+CY9sQeJxnO3eI/A/wE9I20HgLMPqX1DXsU7
+         pfvmKTtWOst17K5FF/CLQE2ByvHD8Ayh/7AH7aBezAtqBxr0IZ1JdpYEKtDEEo+9jat0
+         hK9UnmEXY3t4Yr/R0zDb+lfJoDVReOC0218O/cnJ9gGYfQRgQh+lToUveiXOXUyFfRbK
+         A5ag==
+X-Gm-Message-State: ABy/qLa8f6ZpJm2xdAVg13GDXs24NtZcerOKBVWjP8k51gIsoiW/25q8
+	KNAbkXYShKJFiqbHIhDeR5UqzaNcr6+mQQB8Jh4=
+X-Google-Smtp-Source: APBJJlF3wfXSgmojSnvQ5m9sqGoPdSc5VNoFI4Nu07B1CKoKJNFr0spXOvZMfswk+r2Y5/hzGV3eZgmHioMhKLJ3ivs=
+X-Received: by 2002:ac2:58cb:0:b0:4f8:1e2a:1de1 with SMTP id
+ u11-20020ac258cb000000b004f81e2a1de1mr324875lfo.29.1690508840330; Thu, 27 Jul
+ 2023 18:47:20 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1690439335.git.chenfeiyang@loongson.cn> <0ec0ae938964697010b3d035b7885e4dda89b012.1690439335.git.chenfeiyang@loongson.cn>
- <38591e4c-c4f1-4b6e-a9fb-57f349735bb0@lunn.ch>
-In-Reply-To: <38591e4c-c4f1-4b6e-a9fb-57f349735bb0@lunn.ch>
+References: <cover.1690439335.git.chenfeiyang@loongson.cn> <f626f2e1b9ed10854e96963a14a6e793611bd86b.1690439335.git.chenfeiyang@loongson.cn>
+ <26015def-bee6-4427-9da4-ca27de8c1d87@lunn.ch>
+In-Reply-To: <26015def-bee6-4427-9da4-ca27de8c1d87@lunn.ch>
 From: Feiyang Chen <chris.chenfeiyang@gmail.com>
-Date: Fri, 28 Jul 2023 09:46:39 +0800
-Message-ID: <CACWXhK=mBiD4cBRWixiiPh4UVppLVH-TH5SA1Ab2MrBpQtGmvQ@mail.gmail.com>
-Subject: Re: [PATCH v2 08/10] net: stmmac: dwmac-loongson: Disable flow
- control for GMAC
+Date: Fri, 28 Jul 2023 09:47:08 +0800
+Message-ID: <CACWXhKmtJCQsPb2AoyxHEMzhxmanmYheM9dKAGdkf7M3fqa75g@mail.gmail.com>
+Subject: Re: [PATCH v2 09/10] net: stmmac: dwmac-loongson: Add 64-bit DMA and
+ multi-vector support
 To: Andrew Lunn <andrew@lunn.ch>
 Cc: Feiyang Chen <chenfeiyang@loongson.cn>, hkallweit1@gmail.com, peppe.cavallaro@st.com, 
 	alexandre.torgue@foss.st.com, joabreu@synopsys.com, chenhuacai@loongson.cn, 
@@ -82,20 +82,21 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Jul 27, 2023 at 6:36=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
+On Thu, Jul 27, 2023 at 6:38=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
 >
-> On Thu, Jul 27, 2023 at 03:18:51PM +0800, Feiyang Chen wrote:
-> > Loongson GMAC does not support Flow Control featurei. Use
+> > +     case DWMAC_CORE_3_50:
+> > +             fallthrough;
+> > +     case DWMAC_CORE_3_70:
 >
-> No i in feature.
+> You don't need fallthrough here.
 >
 
 Hi, Andrew,
 
-Sorry for the typo.
+OK.
 
 Thanks,
 Feiyang
 
->    Andrew
+>     Andrew
 
