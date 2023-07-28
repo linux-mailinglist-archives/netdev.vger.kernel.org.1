@@ -1,254 +1,264 @@
-Return-Path: <netdev+bounces-22316-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22317-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 404FD767021
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 17:07:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 48AFB767024
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 17:08:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ED8CF2822F3
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 15:07:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F19EF28280A
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 15:08:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1614514A94;
-	Fri, 28 Jul 2023 15:03:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F93B13FF5;
+	Fri, 28 Jul 2023 15:08:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0304115495
-	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 15:03:48 +0000 (UTC)
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90FE82115
-	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 08:03:41 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-56cf9a86277so21710807b3.3
-        for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 08:03:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690556621; x=1691161421;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=YnAw1rBXJ9A8tSxeUzSRBobIP1ItV7w7jQIdz6xgu4E=;
-        b=UPWSr0Z74+g+kR1ZH+4ywaznXdjbxImnoIM/4L19C9z/nHGSbj1ySrDbOoFSFIOaE/
-         hfEQTKWVHSMta97g0nMJk0TWb/uw/k2Qi42v28gIj+OhfQG1zRh4tUnjVdT9XT2/ydUE
-         eAKrta6YqJVumRbF51gvoZgq+Rfgd90q3m32ADqUobKxaAwzqoIIQ0QqMRglIMqFChxJ
-         UbYhWPlbjg7S2xOmRkuWGdoEM1IC+9WDb/QJPbyDUlthFEi5hUelRwUOdLq5ZkQDJvJA
-         P0achecZC9ejOh4KF+wKrgea2Jx6cDI8W9kC6X9FSslqLgpJZFs4kxBd6EOFhM6Rh/B5
-         8I/w==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0451311CA0
+	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 15:08:28 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A02CE3C28
+	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 08:08:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1690556905;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gRr5BONVtbzWtpOSxfQuykokzlwKEf5LYOHHxadZPWA=;
+	b=RAK5aXSGTJWlVlVd+ZOMMCfi4Wgn/A3sglqLrBGfKQoN2mpR33PlfGSztVYzy9LZ2TG/NN
+	Od1Xnnecqs/Z01iGTWvncgwuZot2kpitFxS8UOroYbgZdH+lmV+cT85B53Di4gSYoh27jH
+	n48GEiBrXFqNghzqVZAbw3V7Pq7ES1I=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-32-Xht2R3yEO2Saftw3kjrvoA-1; Fri, 28 Jul 2023 11:08:13 -0400
+X-MC-Unique: Xht2R3yEO2Saftw3kjrvoA-1
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-31758708b57so1384439f8f.1
+        for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 08:08:09 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690556621; x=1691161421;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=YnAw1rBXJ9A8tSxeUzSRBobIP1ItV7w7jQIdz6xgu4E=;
-        b=ZII7Q2JoV95YZqQ5z6iRWrDjI8/f7BlaACbRjfuYAuM0R/27ioWQFCE0kvv1gWS7cF
-         1pU7k6w5Paky/X92cSfDixSdLCW+aSTJDZn5s8mM4tx42n/PkXSxeAfUjr0x4F9oWM2C
-         O1G/Ljjdk4KzeFdarmo6WO6hqeiz1m8pIHl+m9m3Fp0wrjdYYOoQuTZ9Pk4U0LWaHQl6
-         jr0mqnWrKZ3D0V5J6mSqLTxyeOsvOAzkweMjiEADuq8n5TsaC/xu54cM+AM/vu+YQbuO
-         J/uCaF8cqfBL/MvlQYjGTIbTSsPetJcRKK/LNSYy63MNy1bzmt9bZw3AZvDM36sJQqcO
-         8i3g==
-X-Gm-Message-State: ABy/qLaVQbXlOYeWztlk52hdaMb9KJIu8BggTSKHT4HRMg62rZFEphDO
-	yvaYe92ZFtG+gnNyy+ufdbPieh1aNV7chw==
-X-Google-Smtp-Source: APBJJlHtMXE9UkNi+4tH+e1ZqM1qqtxiy63SBmo3CDU/ktmQQZtlpsqoPVPWi1wAVv58Cxts+BHco88HWi4K4A==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:690c:711:b0:583:591d:3d6c with SMTP
- id bs17-20020a05690c071100b00583591d3d6cmr14956ywb.0.1690556620818; Fri, 28
- Jul 2023 08:03:40 -0700 (PDT)
-Date: Fri, 28 Jul 2023 15:03:18 +0000
-In-Reply-To: <20230728150318.2055273-1-edumazet@google.com>
+        d=1e100.net; s=20221208; t=1690556888; x=1691161688;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=gRr5BONVtbzWtpOSxfQuykokzlwKEf5LYOHHxadZPWA=;
+        b=MpoZXFki1prsSunQSHucGKPwCsLV8bQS5Wsf7mLukWs+CL4/s0BMxVjqoGwjf3dguQ
+         TcoauJnQEU8SLbGtDdvDHQfDdGXPEZJs1fcbjoS8sB0rIxfDIZn/m2mtKdJlOATwB+dF
+         s6/8fiEjz7w5wvaBmXNwh+0MAhNlLbbFAK5wY0xNQzqlvs8m/eaJSetI4xGRpLB55YST
+         eVGTAJTcFS6XDWSog1vzipboJ6h1l2YymIvp/ST1jCG3sGTeWfdsKJ/4B+SpBIiKlXyB
+         ibW6T2/aW4LCx3Zv+puBmbNFVx4U7/97Dr8fgxh792pENeS+VpgVOm0MXcP8GXcc9cU3
+         /ARw==
+X-Gm-Message-State: ABy/qLbuuWOAgpI4kTCdBsiL6ZdCN3iaeNhNBMnWE6rwGbE1tIzCI5ny
+	q18tTrfRUApu/ICwQLjdA9IRZ7n2X16eXxopEwbIEDGfwDllH4icZKeg65YWZ27xH4h/sphczhX
+	yhYtHosOfE3dXuMJn
+X-Received: by 2002:a5d:658a:0:b0:314:1416:3be3 with SMTP id q10-20020a5d658a000000b0031414163be3mr2119905wru.70.1690556887871;
+        Fri, 28 Jul 2023 08:08:07 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlHDQpKetLM+AJNeRN4DNiG6HRo9Vh1XlHIRHofIKZCzScYmXNlC46bR+kl3uHUWrSGWoAz78A==
+X-Received: by 2002:a5d:658a:0:b0:314:1416:3be3 with SMTP id q10-20020a5d658a000000b0031414163be3mr2119878wru.70.1690556887518;
+        Fri, 28 Jul 2023 08:08:07 -0700 (PDT)
+Received: from [192.168.1.67] (198.red-88-3-59.dynamicip.rima-tde.net. [88.3.59.198])
+        by smtp.gmail.com with ESMTPSA id l7-20020adfe587000000b00314172ba213sm4991169wrm.108.2023.07.28.08.08.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 28 Jul 2023 08:08:07 -0700 (PDT)
+Message-ID: <88eff25c-0849-118d-de1e-6ac7f59c9fd4@redhat.com>
+Date: Fri, 28 Jul 2023 17:08:05 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20230728150318.2055273-1-edumazet@google.com>
-X-Mailer: git-send-email 2.41.0.585.gd2178a4bd4-goog
-Message-ID: <20230728150318.2055273-12-edumazet@google.com>
-Subject: [PATCH net 11/11] net: annotate data-races around sk->sk_priority
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
-	Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.6
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [ovs-dev] [PATCH v2 net-next 4/5] selftests: openvswitch: add
+ basic ct test case parsing
+Content-Language: en-US
+To: Aaron Conole <aconole@redhat.com>, netdev@vger.kernel.org
+Cc: dev@openvswitch.org, linux-kernel@vger.kernel.org,
+ Ilya Maximets <i.maximets@ovn.org>, Eric Dumazet <edumazet@google.com>,
+ linux-kselftest@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>
+References: <20230728115940.578658-1-aconole@redhat.com>
+ <20230728115940.578658-5-aconole@redhat.com>
+From: Adrian Moreno <amorenoz@redhat.com>
+In-Reply-To: <20230728115940.578658-5-aconole@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+	SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-sk_getsockopt() runs locklessly. This means sk->sk_priority
-can be read while other threads are changing its value.
 
-Other reads also happen without socket lock being held.
 
-Add missing annotations where needed.
+On 7/28/23 13:59, Aaron Conole wrote:
+> Forwarding via ct() action is an important use case for openvswitch, but
+> generally would require using a full ovs-vswitchd to get working. Add a
+> ct action parser for basic ct test case.
+> 
+> Signed-off-by: Aaron Conole <aconole@redhat.com>
 
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- net/core/sock.c        | 6 +++---
- net/ipv4/ip_output.c   | 4 ++--
- net/ipv4/ip_sockglue.c | 2 +-
- net/ipv4/raw.c         | 2 +-
- net/ipv4/tcp_ipv4.c    | 2 +-
- net/ipv6/raw.c         | 2 +-
- net/ipv6/tcp_ipv6.c    | 3 ++-
- net/packet/af_packet.c | 6 +++---
- 8 files changed, 14 insertions(+), 13 deletions(-)
+Reviewed-by: Adrian Moreno <amorenoz@redhat.com>
 
-diff --git a/net/core/sock.c b/net/core/sock.c
-index f11e19c7edfb46475b32cee3d1af1df45442f40c..6d4f28efe29a7f154948848b5bde377e781a9135 100644
---- a/net/core/sock.c
-+++ b/net/core/sock.c
-@@ -806,7 +806,7 @@ EXPORT_SYMBOL(sock_no_linger);
- void sock_set_priority(struct sock *sk, u32 priority)
- {
- 	lock_sock(sk);
--	sk->sk_priority = priority;
-+	WRITE_ONCE(sk->sk_priority, priority);
- 	release_sock(sk);
- }
- EXPORT_SYMBOL(sock_set_priority);
-@@ -1216,7 +1216,7 @@ int sk_setsockopt(struct sock *sk, int level, int optname,
- 		if ((val >= 0 && val <= 6) ||
- 		    sockopt_ns_capable(sock_net(sk)->user_ns, CAP_NET_RAW) ||
- 		    sockopt_ns_capable(sock_net(sk)->user_ns, CAP_NET_ADMIN))
--			sk->sk_priority = val;
-+			WRITE_ONCE(sk->sk_priority, val);
- 		else
- 			ret = -EPERM;
- 		break;
-@@ -1685,7 +1685,7 @@ int sk_getsockopt(struct sock *sk, int level, int optname,
- 		break;
- 
- 	case SO_PRIORITY:
--		v.val = sk->sk_priority;
-+		v.val = READ_ONCE(sk->sk_priority);
- 		break;
- 
- 	case SO_LINGER:
-diff --git a/net/ipv4/ip_output.c b/net/ipv4/ip_output.c
-index bcdbf448324a9c28ceff55764c54074763873296..54d2d3a2d850ed8eccb683c2012557c065d8bbab 100644
---- a/net/ipv4/ip_output.c
-+++ b/net/ipv4/ip_output.c
-@@ -184,7 +184,7 @@ int ip_build_and_send_pkt(struct sk_buff *skb, const struct sock *sk,
- 		ip_options_build(skb, &opt->opt, daddr, rt);
- 	}
- 
--	skb->priority = sk->sk_priority;
-+	skb->priority = READ_ONCE(sk->sk_priority);
- 	if (!skb->mark)
- 		skb->mark = READ_ONCE(sk->sk_mark);
- 
-@@ -528,7 +528,7 @@ int __ip_queue_xmit(struct sock *sk, struct sk_buff *skb, struct flowi *fl,
- 			     skb_shinfo(skb)->gso_segs ?: 1);
- 
- 	/* TODO : should we use skb->sk here instead of sk ? */
--	skb->priority = sk->sk_priority;
-+	skb->priority = READ_ONCE(sk->sk_priority);
- 	skb->mark = READ_ONCE(sk->sk_mark);
- 
- 	res = ip_local_out(net, sk, skb);
-diff --git a/net/ipv4/ip_sockglue.c b/net/ipv4/ip_sockglue.c
-index 8e97d8d4cc9d910a0cc29897be4820b53b019433..d41bce8927b2cca825a804dc113450b62262cc94 100644
---- a/net/ipv4/ip_sockglue.c
-+++ b/net/ipv4/ip_sockglue.c
-@@ -592,7 +592,7 @@ void __ip_sock_set_tos(struct sock *sk, int val)
- 	}
- 	if (inet_sk(sk)->tos != val) {
- 		inet_sk(sk)->tos = val;
--		sk->sk_priority = rt_tos2priority(val);
-+		WRITE_ONCE(sk->sk_priority, rt_tos2priority(val));
- 		sk_dst_reset(sk);
- 	}
- }
-diff --git a/net/ipv4/raw.c b/net/ipv4/raw.c
-index 7782ff5e65399b4d0c8ac5d25b8d999b0a1a2e71..cb381f5aa46438394cdec520a99f7a8bc67fcfb9 100644
---- a/net/ipv4/raw.c
-+++ b/net/ipv4/raw.c
-@@ -348,7 +348,7 @@ static int raw_send_hdrinc(struct sock *sk, struct flowi4 *fl4,
- 		goto error;
- 	skb_reserve(skb, hlen);
- 
--	skb->priority = sk->sk_priority;
-+	skb->priority = READ_ONCE(sk->sk_priority);
- 	skb->mark = sockc->mark;
- 	skb->tstamp = sockc->transmit_time;
- 	skb_dst_set(skb, &rt->dst);
-diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-index 894653be033a508d2169738ec32831438fbc614f..a59cc4b8386113577d966a3efce53a13f51e8b06 100644
---- a/net/ipv4/tcp_ipv4.c
-+++ b/net/ipv4/tcp_ipv4.c
-@@ -933,7 +933,7 @@ static void tcp_v4_send_ack(const struct sock *sk,
- 	ctl_sk->sk_mark = (sk->sk_state == TCP_TIME_WAIT) ?
- 			   inet_twsk(sk)->tw_mark : READ_ONCE(sk->sk_mark);
- 	ctl_sk->sk_priority = (sk->sk_state == TCP_TIME_WAIT) ?
--			   inet_twsk(sk)->tw_priority : sk->sk_priority;
-+			   inet_twsk(sk)->tw_priority : READ_ONCE(sk->sk_priority);
- 	transmit_time = tcp_transmit_time(sk);
- 	ip_send_unicast_reply(ctl_sk,
- 			      skb, &TCP_SKB_CB(skb)->header.h4.opt,
-diff --git a/net/ipv6/raw.c b/net/ipv6/raw.c
-index 39b7d727ba40793a61f2e02044666551dd091eda..49381f35b623c4fd717e44f7a6058965bb54a56f 100644
---- a/net/ipv6/raw.c
-+++ b/net/ipv6/raw.c
-@@ -614,7 +614,7 @@ static int rawv6_send_hdrinc(struct sock *sk, struct msghdr *msg, int length,
- 	skb_reserve(skb, hlen);
- 
- 	skb->protocol = htons(ETH_P_IPV6);
--	skb->priority = sk->sk_priority;
-+	skb->priority = READ_ONCE(sk->sk_priority);
- 	skb->mark = sockc->mark;
- 	skb->tstamp = sockc->transmit_time;
- 
-diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
-index 3ec563742ac4f2c630b961960adc3e5f26976d92..6e86721e1cdbb8d47b754a2675f6ab1643c7342c 100644
---- a/net/ipv6/tcp_ipv6.c
-+++ b/net/ipv6/tcp_ipv6.c
-@@ -1128,7 +1128,8 @@ static void tcp_v6_reqsk_send_ack(const struct sock *sk, struct sk_buff *skb,
- 			tcp_time_stamp_raw() + tcp_rsk(req)->ts_off,
- 			READ_ONCE(req->ts_recent), sk->sk_bound_dev_if,
- 			tcp_v6_md5_do_lookup(sk, &ipv6_hdr(skb)->saddr, l3index),
--			ipv6_get_dsfield(ipv6_hdr(skb)), 0, sk->sk_priority,
-+			ipv6_get_dsfield(ipv6_hdr(skb)), 0,
-+			READ_ONCE(sk->sk_priority),
- 			READ_ONCE(tcp_rsk(req)->txhash));
- }
- 
-diff --git a/net/packet/af_packet.c b/net/packet/af_packet.c
-index d9aa21a2b3a16c96416feca6b195769e6b9a91f7..a4631cb457a91f04b9acffcecbddc1624f423257 100644
---- a/net/packet/af_packet.c
-+++ b/net/packet/af_packet.c
-@@ -2050,7 +2050,7 @@ static int packet_sendmsg_spkt(struct socket *sock, struct msghdr *msg,
- 
- 	skb->protocol = proto;
- 	skb->dev = dev;
--	skb->priority = sk->sk_priority;
-+	skb->priority = READ_ONCE(sk->sk_priority);
- 	skb->mark = READ_ONCE(sk->sk_mark);
- 	skb->tstamp = sockc.transmit_time;
- 
-@@ -2585,7 +2585,7 @@ static int tpacket_fill_skb(struct packet_sock *po, struct sk_buff *skb,
- 
- 	skb->protocol = proto;
- 	skb->dev = dev;
--	skb->priority = po->sk.sk_priority;
-+	skb->priority = READ_ONCE(po->sk.sk_priority);
- 	skb->mark = READ_ONCE(po->sk.sk_mark);
- 	skb->tstamp = sockc->transmit_time;
- 	skb_setup_tx_timestamp(skb, sockc->tsflags);
-@@ -3061,7 +3061,7 @@ static int packet_snd(struct socket *sock, struct msghdr *msg, size_t len)
- 
- 	skb->protocol = proto;
- 	skb->dev = dev;
--	skb->priority = sk->sk_priority;
-+	skb->priority = READ_ONCE(sk->sk_priority);
- 	skb->mark = sockc.mark;
- 	skb->tstamp = sockc.transmit_time;
- 
+> ---
+> NOTE: 3 lines flag the line-length checkpatch warning, but there didnt
+>        seem to be a really good way of breaking the lines smaller.
+> 
+>   .../selftests/net/openvswitch/openvswitch.sh  | 68 +++++++++++++++++++
+>   .../selftests/net/openvswitch/ovs-dpctl.py    | 39 +++++++++++
+>   2 files changed, 107 insertions(+)
+> 
+> diff --git a/tools/testing/selftests/net/openvswitch/openvswitch.sh b/tools/testing/selftests/net/openvswitch/openvswitch.sh
+> index 5d60a9466dab..40a66c72af0f 100755
+> --- a/tools/testing/selftests/net/openvswitch/openvswitch.sh
+> +++ b/tools/testing/selftests/net/openvswitch/openvswitch.sh
+> @@ -12,6 +12,7 @@ TRACING=0
+>   
+>   tests="
+>   	arp_ping				eth-arp: Basic arp ping between two NS
+> +	ct_connect_v4				ip4-ct-xon: Basic ipv4 tcp connection using ct
+>   	connect_v4				ip4-xon: Basic ipv4 ping between two NS
+>   	netlink_checks				ovsnl: validate netlink attrs and settings
+>   	upcall_interfaces			ovs: test the upcall interfaces"
+> @@ -193,6 +194,73 @@ test_arp_ping () {
+>   	return 0
+>   }
+>   
+> +# ct_connect_v4 test
+> +#  - client has 1500 byte MTU
+> +#  - server has 1500 byte MTU
+> +#  - use ICMP to ping in each direction
+> +#  - only allow CT state stuff to pass through new in c -> s
+> +test_ct_connect_v4 () {
+> +
+> +	which nc >/dev/null 2>/dev/null || return $ksft_skip
+> +
+> +	sbx_add "test_ct_connect_v4" || return $?
+> +
+> +	ovs_add_dp "test_ct_connect_v4" ct4 || return 1
+> +	info "create namespaces"
+> +	for ns in client server; do
+> +		ovs_add_netns_and_veths "test_ct_connect_v4" "ct4" "$ns" \
+> +		    "${ns:0:1}0" "${ns:0:1}1" || return 1
+> +	done
+> +
+> +	ip netns exec client ip addr add 172.31.110.10/24 dev c1
+> +	ip netns exec client ip link set c1 up
+> +	ip netns exec server ip addr add 172.31.110.20/24 dev s1
+> +	ip netns exec server ip link set s1 up
+> +
+> +	# Add forwarding for ARP and ip packets - completely wildcarded
+> +	ovs_add_flow "test_ct_connect_v4" ct4 \
+> +		'in_port(1),eth(),eth_type(0x0806),arp()' '2' || return 1
+> +	ovs_add_flow "test_ct_connect_v4" ct4 \
+> +		'in_port(2),eth(),eth_type(0x0806),arp()' '1' || return 1
+> +	ovs_add_flow "test_ct_connect_v4" ct4 \
+> +		     'ct_state(-trk),eth(),eth_type(0x0800),ipv4()' \
+> +		     'ct(commit),recirc(0x1)' || return 1
+> +	ovs_add_flow "test_ct_connect_v4" ct4 \
+> +		     'recirc_id(0x1),ct_state(+trk+new),in_port(1),eth(),eth_type(0x0800),ipv4(src=172.31.110.10)' \
+> +		     '2' || return 1
+> +	ovs_add_flow "test_ct_connect_v4" ct4 \
+> +		     'recirc_id(0x1),ct_state(+trk+est),in_port(1),eth(),eth_type(0x0800),ipv4(src=172.31.110.10)' \
+> +		     '2' || return 1
+> +	ovs_add_flow "test_ct_connect_v4" ct4 \
+> +		     'recirc_id(0x1),ct_state(+trk+est),in_port(2),eth(),eth_type(0x0800),ipv4(dst=172.31.110.10)' \
+> +		     '1' || return 1
+> +	ovs_add_flow "test_ct_connect_v4" ct4 \
+> +		     'recirc_id(0x1),ct_state(+trk+inv),eth(),eth_type(0x0800),ipv4()' 'drop' || \
+> +		     return 1
+> +
+> +	# do a ping
+> +	ovs_sbx "test_ct_connect_v4" ip netns exec client ping 172.31.110.20 -c 3 || return 1
+> +
+> +	# create an echo server in 'server'
+> +	echo "server" | \
+> +		ovs_netns_spawn_daemon "test_ct_connect_v4" "server" \
+> +				nc -lvnp 4443
+> +	ovs_sbx "test_ct_connect_v4" ip netns exec client nc -i 1 -zv 172.31.110.20 4443 || return 1
+> +
+> +	# Now test in the other direction (should fail)
+> +	echo "client" | \
+> +		ovs_netns_spawn_daemon "test_ct_connect_v4" "client" \
+> +				nc -lvnp 4443
+> +	ovs_sbx "test_ct_connect_v4" ip netns exec client nc -i 1 -zv 172.31.110.10 4443
+> +	if [ $? == 0 ]; then
+> +	   info "ct connect to client was successful"
+> +	   return 1
+> +	fi
+> +
+> +	info "done..."
+> +	return 0
+> +}
+> +
+>   # connect_v4 test
+>   #  - client has 1500 byte MTU
+>   #  - server has 1500 byte MTU
+> diff --git a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
+> index 2b869e89c51d..6e258ab9e635 100644
+> --- a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
+> +++ b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
+> @@ -62,6 +62,15 @@ def macstr(mac):
+>       return outstr
+>   
+>   
+> +def strcspn(str1, str2):
+> +    tot = 0
+> +    for char in str1:
+> +        if str2.find(char) != -1:
+> +            return tot
+> +        tot += 1
+> +    return tot
+> +
+> +
+>   def strspn(str1, str2):
+>       tot = 0
+>       for char in str1:
+> @@ -496,6 +505,36 @@ class ovsactions(nla):
+>                       actstr = actstr[strspn(actstr, ", ") :]
+>                       parsed = True
+>   
+> +            if parse_starts_block(actstr, "ct(", False):
+> +                actstr = actstr[len("ct(") :]
+> +                ctact = ovsactions.ctact()
+> +
+> +                for scan in (
+> +                    ("commit", "OVS_CT_ATTR_COMMIT", None),
+> +                    ("force_commit", "OVS_CT_ATTR_FORCE_COMMIT", None),
+> +                    ("zone", "OVS_CT_ATTR_ZONE", int),
+> +                    ("mark", "OVS_CT_ATTR_MARK", int),
+> +                    ("helper", "OVS_CT_ATTR_HELPER", lambda x, y: str(x)),
+> +                    ("timeout", "OVS_CT_ATTR_TIMEOUT", lambda x, y: str(x)),
+> +                ):
+> +                    if actstr.startswith(scan[0]):
+> +                        actstr = actstr[len(scan[0]) :]
+> +                        if scan[2] is not None:
+> +                            if actstr[0] != "=":
+> +                                raise ValueError("Invalid ct attr")
+> +                            actstr = actstr[1:]
+> +                            pos = strcspn(actstr, ",)")
+> +                            datum = scan[2](actstr[:pos], 0)
+> +                            ctact["attrs"].append([scan[1], datum])
+> +                            actstr = actstr[pos:]
+> +                        else:
+> +                            ctact["attrs"].append([scan[1], None])
+> +                        actstr = actstr[strspn(actstr, ", ") :]
+> +
+> +                self["attrs"].append(["OVS_ACTION_ATTR_CT", ctact])
+> +                parsed = True
+> +
+> +            actstr = actstr[strspn(actstr, "), ") :]
+>               if not parsed:
+>                   raise ValueError("Action str: '%s' not supported" % actstr)
+>   
+
 -- 
-2.41.0.585.gd2178a4bd4-goog
+Adrián Moreno
 
 
