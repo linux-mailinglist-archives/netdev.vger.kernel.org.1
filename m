@@ -1,139 +1,140 @@
-Return-Path: <netdev+bounces-22213-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22221-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3E897668E3
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 11:31:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B282176699A
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 12:00:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8F23228231B
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 09:31:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D5A831C21181
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 10:00:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AB4410950;
-	Fri, 28 Jul 2023 09:31:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8236A1097D;
+	Fri, 28 Jul 2023 10:00:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FAB1D305
-	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 09:31:20 +0000 (UTC)
-Received: from smtpbguseast3.qq.com (smtpbguseast3.qq.com [54.243.244.52])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 319C21BC1
-	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 02:31:17 -0700 (PDT)
-X-QQ-mid: bizesmtp62t1690536469tz4fepbg
-Received: from smtpclient.apple ( [125.119.251.0])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Fri, 28 Jul 2023 17:27:47 +0800 (CST)
-X-QQ-SSF: 00400000000000O0Z000000A0000000
-X-QQ-FEAT: +ynUkgUhZJlkPFy+fa6uDnm+gZqteoXjrRIvkQSe92PfEUZkOl8JCX9dA2CEP
-	WmSaAZ6W9egFjTsFsATApGl7TMxqzsvkbCp0LHvFs5+135Qudb0QdIIK/OEmaoRcYVJCojd
-	YTSBciGgLpRmr00imcd3/AAHwHjMClaXhAPXnbEev7lL5n5P6R1khOse+LHwSEIaxIf3GVG
-	1PLhhAGkar/f2joCjjy4JXDmMMqncnoJqSjJW8i54Dps5JsA1tQMpbJ2Ng/u4s9yeNc56M5
-	9UqJZ1zq91FiiYovG9mjvTW6sBDpKVQN4L049LIIkK1v64pmMAYqFXlaDsQekganJMvBFQn
-	miu2TP73ZebhKv1LQdixeV4hXtKcifsTYzvlqRbZm03xsUAp+mY7nhIHCNLWA==
-X-QQ-GoodBg: 2
-X-BIZMAIL-ID: 2867555983614791962
-Content-Type: text/plain;
-	charset=utf-8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 733A711185
+	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 10:00:13 +0000 (UTC)
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2089.outbound.protection.outlook.com [40.107.244.89])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA81035B6;
+	Fri, 28 Jul 2023 03:00:11 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=PxsV2UpOMINQ2BMmzyIAgQjINKzjEGmfcGdx8IbO88DS1z5GRAvxSMNKxWEiCSS6eMiS+X/PZWFwx6eoB2W5iI8BkA4Ea08E00MeEvdGAtS3+Rw0xrIZTu6uRDzwItUQv92SA5VbVrSDpnoYxY3Q6EPSiYeFtjgP1aWeOJLtK5W1qnkN+CFbBsP611earqL5DEbvn3fb6QBb3GRRETqxyF6bx4BNJ2Ky2PvmKrGAZkCU6xLpAHOLmVBwz6bTGkrTgA4L6Q5CuMPwv8DdvA1973+2lNg1QQzB0Ikn1JgVnclomYZAdshRHfG8sRrGD7YTj0udrDgiojBjuVBV8rBEKw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=NYN2CntSlb53OrhuxxsqUPnGpZk1P9sMSX9EKaR75g0=;
+ b=LLp2V6lTEnY7rmfRursvv8Jmz0RhcbQvEbgv+YsKxJDZlBD8LOmoMwHXpgesHvtJtTAv5Kp5vUz9nESU2qFwh+TiNnfsUPllok1K5JTh8zu8AXNQjY+j3IeB4J83xcSQYrDsyltVwt4ffdker466oOjZ9cA4Iu+XPxfrLFFHERdfe451e0QZUzfI00vQCkJZYhcrh66/wjiquUhOh3Ynrq+GXySkrXw/aTW9lQ+ni2i+natIN/SQfQfrBP/IyQnBMun/G0qvcHWr4VbF7zHj6KDkr6QBl8FwH3ZPBo1hoXDWm6fUt+To1TRwASTJ/FX5l9OBZ5C4aT0yTXiPmhPBYg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=NYN2CntSlb53OrhuxxsqUPnGpZk1P9sMSX9EKaR75g0=;
+ b=irUKawbN93FkBpanDP+o4oRIrVUFvS2R8nZjp3MQQUdZdjHoLTyHtrM529N/cuWDaXqWrgC8RV4iit882+tIV25ANMvhfAlh3l8h/V29voCoAmQKXJi+hBMcrVRIiEBLd1VfqH8tASrWPss3J+Uw1dBQiB9wejrhN7753ifBu4b0jH0t3AcODvnpxT8eZJ13BwjNhps27GaFa5MbcExU90vbeG9qZ8SRSIT/g3TMtm/RoymiXNtbMXhyiQYvS7fAbP7hqjX19ONuOhSK6sGhcSy7Uyz6ElcPOgyoN+f1/QFfuGKp0rU41GJpueWiby3Hyp0CDKxG7dLyJwphOyZmKQ==
+Received: from DM5PR07CA0087.namprd07.prod.outlook.com (2603:10b6:4:ae::16) by
+ PH0PR12MB7929.namprd12.prod.outlook.com (2603:10b6:510:284::5) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6631.35; Fri, 28 Jul 2023 10:00:09 +0000
+Received: from DM6NAM11FT071.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:4:ae:cafe::88) by DM5PR07CA0087.outlook.office365.com
+ (2603:10b6:4:ae::16) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.29 via Frontend
+ Transport; Fri, 28 Jul 2023 10:00:09 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ DM6NAM11FT071.mail.protection.outlook.com (10.13.173.48) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6631.35 via Frontend Transport; Fri, 28 Jul 2023 10:00:09 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Fri, 28 Jul 2023
+ 02:59:55 -0700
+Received: from yaviefel (10.126.231.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37; Fri, 28 Jul
+ 2023 02:59:52 -0700
+References: <20230728022142.2066980-1-rkannoth@marvell.com>
+User-agent: mu4e 1.8.11; emacs 28.2
+From: Petr Machata <petrm@nvidia.com>
+To: Ratheesh Kannoth <rkannoth@marvell.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>
+Subject: Re: [PATCH v2 net-next] dissector: Use 64bits for used_keys
+Date: Fri, 28 Jul 2023 11:30:24 +0200
+In-Reply-To: <20230728022142.2066980-1-rkannoth@marvell.com>
+Message-ID: <87mszgfjai.fsf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3731.700.6\))
-Subject: Re: [PATCH net-next 2/2] net: phy: add keep_data_connection to struct
- phydev
-From: "mengyuanlou@net-swift.com" <mengyuanlou@net-swift.com>
-In-Reply-To: <20230726112956.147f2492@kernel.org>
-Date: Fri, 28 Jul 2023 17:27:37 +0800
-Cc: Andrew Lunn <andrew@lunn.ch>,
- "Russell King (Oracle)" <linux@armlinux.org.uk>,
- Simon Horman <simon.horman@corigine.com>,
- netdev@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>,
- Paolo Abeni <pabeni@redhat.com>,
- Eric Dumazet <edumazet@google.com>,
- Heiner Kallweit <hkallweit1@gmail.com>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <E7600051-05CD-4440-A1E3-E0F2AFA10266@net-swift.com>
-References: <20230724092544.73531-1-mengyuanlou@net-swift.com>
- <20207E0578DCE44C+20230724092544.73531-3-mengyuanlou@net-swift.com>
- <ZL+6kMqETdYL7QNF@corigine.com> <ZL/KIjjw3AZmQcGn@shell.armlinux.org.uk>
- <4B0F6878-3ABF-4F99-8CE3-F16608583EB4@net-swift.com>
- <21770a39-a0f4-485c-b6d1-3fd250536159@lunn.ch>
- <20230726090812.7ff5af72@kernel.org>
- <ba6f7147-6652-4858-b4bc-19b1e7dfa30c@lunn.ch>
- <20230726112956.147f2492@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-X-Mailer: Apple Mail (2.3731.700.6)
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtp:net-swift.com:qybglogicsvrgz:qybglogicsvrgz6a-1
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+MIME-Version: 1.0
+Content-Type: text/plain
+X-Originating-IP: [10.126.231.35]
+X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6NAM11FT071:EE_|PH0PR12MB7929:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0fa8eb04-38d0-4a83-0267-08db8f516d62
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	ea1A+VmaptUsEg8wA+r4DfZ0Z9rSnYknaRtlC0Q6GOMP9/Gl3EfvQKJgpwo8dL0qi4IjvDc2m0g994ixRUF09svIgedaBKvxxr3ymvK0sbjjnQpIu9FxFMkVKnXuO0CFrOcoLvUxEpp/7n3IretHoJt/3Ryf0rB+TQPAwMkuPckbDPXdbsR0EAvw2IOEHO7QU5e14V/dlTgE6lgxbLTQlAM0EdnirFLuB2Y/AiPIPF3KqzoOom9SUlC7ru8btnwFpYJA+RlPmZEiAO7ZKPDyIXzFlZz4UZHRpVpbE/7By/4MuAECQ4+kR9/eWzWYtQSy6xj9U5+51Px4B1W+SZKn/QdqlNdu8E4KWk3z+MolLEQs+rrCLtWGM0o/7ehKT7F9IkcscHa97kbDU/WLXFp1HEgeTuRxIX5L48PQqe82HtV65EyFy1rFECw7HZaOwDkZR438cvpy8Ja6u4Px47eez7sUavIAyzK8Knbn5Xk6g76g3L8KMDz97x9lB94Ya2W+didk4ucUcOffVL+LWzq/3odzQfJ0DeJUiz5bgwrHA2MUbg+gR5ZXOE7WBXlzEWEYadUy3IS+tU8wXhWcYxBbh6ARwl7RPozn6mGSHismi30oV3NmdpK1+kkyqzI7zqKcRFJ2tJPC8Kq4BlyqNY4cb3jBrjU2mXMw7KKuSC4UXb2AfpTwMFNw9y1O/SnVWWbQLNoClqbCy/UHB33SBTlIEZu1wiPgnmc147ub/AVepy7vLREU7kBd/efZHTShxfn4ThQIiB9vTAfd911Q7NMzuRUCL244zd9cKezdHqjaTDY=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(376002)(346002)(39860400002)(136003)(396003)(451199021)(82310400008)(46966006)(36840700001)(40470700004)(83380400001)(47076005)(40460700003)(36756003)(426003)(2906002)(36860700001)(86362001)(4744005)(2616005)(40480700001)(356005)(7636003)(82740400003)(41300700001)(316002)(4326008)(6916009)(966005)(26005)(8676002)(8936002)(54906003)(478600001)(70206006)(70586007)(6666004)(336012)(186003)(16526019)(5660300002);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Jul 2023 10:00:09.1913
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0fa8eb04-38d0-4a83-0267-08db8f516d62
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DM6NAM11FT071.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB7929
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
 
+Ratheesh Kannoth <rkannoth@marvell.com> writes:
 
-> 2023=E5=B9=B47=E6=9C=8827=E6=97=A5 02:29=EF=BC=8CJakub Kicinski =
-<kuba@kernel.org> =E5=86=99=E9=81=93=EF=BC=9A
->=20
-> On Wed, 26 Jul 2023 18:43:01 +0200 Andrew Lunn wrote:
->> On Wed, Jul 26, 2023 at 09:08:12AM -0700, Jakub Kicinski wrote:
->>> On Wed, 26 Jul 2023 10:54:25 +0200 Andrew Lunn wrote: =20
->>>> As far as i understand it, the host MAC is actually a switch, with =
-the
->>>> BMC connected to the second port of the switch. =20
->>>=20
->>> Not a learning switch (usually, sigh), but yes.
->>>=20
->>>> Does the BMC care about the PHY status?
->>>> Does it need to know about link status?  =20
->>>=20
->>> Yes, NIC sends link state notifications over the NCSI "link?" (which=20=
+> As 32bit of dissector->used_keys are exhausted,
+> increase the size to 64bits.
+>
+> This is base changes for ESP/AH flow dissector patch.
+> Please find patch and discussions at
+> https://lore.kernel.org/netdev/ZMDNjD46BvZ5zp5I@corigine.com/T/#t
+>
+> Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
+> Reviewed-by: Petr Machata <petrm@nvidia.com>
 
->>> is a separate RGMII?/RMII from NIC to the BMC). BMC can select which
->>> "channel" (NIC port) it uses based on PHY status. =20
->>=20
->> How do you define NIC when Linux is driving the hardware, not
->> firmware? In this case we have a MAC driver, a PCS driver, a PHY
->> driver and phylink gluing it all together. Which part of this is
->> sending link state notifications over the NCSI "Link?".
->=20
-> I've never seen a NCSI setup where Linux on the host controls the PHY.
-> So it's an open question.
->=20
-> The notifications are sent by the control FW on the NIC. There's a
-> handful of commands that need to be handled there - mostly getting MAC
-> address and configuring the filter. Commands are carried by
-> encapsulated Ethernet packets with magic ethertype, over the same RMII
-> as the data packets.
->=20
-> All of this is usually in FW so we should be able to shape the
-> implementation in the way we want...
->=20
-We certainly can do all phy operations in Fw when we are using NCSI.
+This makes it look like I reviewed the whole thing. I think I wrote
+this:
 
-I=E2=80=99m confused about what other network cards do when it's used in =
-both host os and BMC,
-Because I can not find any codes in ethernet for now.
+	Reviewed-by: Petr Machata <petrm@nvidia.com> # for mlxsw
 
-But this seems to go against the idea that we want to separate these =
-modules.
-
->>>> Does the NCSI core on the host need to know about the PHY? =20
->>>=20
->>> There is no NCSI core on the host.. Hosts are currently completely
->>> oblivious to NCSI. The NCSI we have in tree is for the BMC, Linux
->>> running on the BMC (e.g. OpenBMC). =20
->>=20
->> But in this case, it is not oblivious to NCSI, since the host is
->> controlling the PHY. This patch is about Linux on the host not
->> shutting down the PHY because it is also being used by the BMC.
->=20
-> Yup, we're entering a new territory with this device :S
->=20
-
+Also, you either missed or ignored my proposal for subject line update.
+I do think that "net: flow_dissector:" would be a better prefix, because
+that's how the component is called, and it's in the net namespace. It's
+OK not to agree, but in that case please argue to that end.
 
