@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-22138-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22136-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3EDAE766272
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 05:31:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39F6476626C
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 05:30:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DC5C21C2179D
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 03:31:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E1CF1282612
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 03:30:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76B881FDF;
-	Fri, 28 Jul 2023 03:30:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07A2D3D61;
+	Fri, 28 Jul 2023 03:30:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7DB8210C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D57921FDF
 	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 03:30:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 71A24C433C7;
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 661EDC433C9;
 	Fri, 28 Jul 2023 03:30:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1690515023;
-	bh=fOupbUfWIq1GHSvRkIH0Sw2V71Ryf2NHF4M/570Qf9o=;
+	bh=x4QQ4p1Ebd5vZQq4UPLo5lP0T3ZtqaiNlrSfm4u1hec=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=TRVGbxh6kq9P1QRY+pYFsUgXYOdhVoEsGiS2IgKCSjb+9loLpyl/iVSylI1xHroFF
-	 W4vrO7+QmLcALxvBz/p7Ce70fpd+sYFWfhpEZILlKelPDTshxJAdouV0e0aV3iruWM
-	 udCKlLaXAPSavVIXkIf/0PJ8DnBKtDJvVrdOu+gEbrQtgcK00vFM8CJSmN1ZUuxx4i
-	 VcKkaBjezbUbToQ3PJBPef6PD8FwAmR9flsfE/7+VID4TpAqpMkQZwctUvY3yEPbqx
-	 mm4ghBskGkUGHRZ4Ux48nH8Q2t6V+AqTabBD+Ow4LGKYC6JUCEoghcx3oxEpQSqml8
-	 8JIUd8pY8GThQ==
+	b=iVtFExw4s9yO6Gnbh4FbM3C0BdIjaBWJMhLQtGpMrx1f9Zc8UQ0lt+yh04JHIo7K0
+	 TrRqqGfLUnxOLHIwMpDCAzLJCxpkspp1MdTAuvXq5uc9c8EbdC7Joc5ez8ZxH6B28M
+	 OOxNS/yOsBxDKD802lWX75ZdHrVPDIFp/2Sjr0HdK18H/1SwuBP15ktr/TqyaM0+xe
+	 UQFNXPSQEjZGNZZjKFQZ2eJB4m24m7P9UUh/ZRcbbr9tAtAnRlhKc7o0n9/5lYCMHm
+	 K7YJ+THLEjJAFcQ/lZxuwkl1YDm2pZ+JWSH7kTs1BCnkpRYLybjPeDDAbtVQouBMgq
+	 euEBLVsRNVNmw==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4EDA0C691D7;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 44AA4C64459;
 	Fri, 28 Jul 2023 03:30:23 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -41,39 +41,35 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 net] net: flower: fix stack-out-of-bounds in
- fl_set_key_cfm()
+Subject: Re: [PATCH 1/1] net: dsa: fix value check in bcm_sf2_sw_probe()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <169051502331.18144.11048467979263137230.git-patchwork-notify@kernel.org>
+ <169051502327.18144.14328558908415752627.git-patchwork-notify@kernel.org>
 Date: Fri, 28 Jul 2023 03:30:23 +0000
-References: <20230726145815.943910-1-edumazet@google.com>
-In-Reply-To: <20230726145815.943910-1-edumazet@google.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, jhs@mojatatu.com,
- xiyou.wangcong@gmail.com, jiri@resnulli.us, netdev@vger.kernel.org,
- eric.dumazet@gmail.com, syzkaller@googlegroups.com, zdoychev@maxlinear.com,
- simon.horman@corigine.com, idosch@nvidia.com
+References: <20230726170506.16547-1-ruc_gongyuanjun@163.com>
+In-Reply-To: <20230726170506.16547-1-ruc_gongyuanjun@163.com>
+To: Yuanjun Gong <ruc_gongyuanjun@163.com>
+Cc: florian.fainelli@broadcom.com, andrew@lunn.ch, olteanv@gmail.com,
+ davem@davemloft.net, netdev@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 26 Jul 2023 14:58:15 +0000 you wrote:
-> Typical misuse of
+On Thu, 27 Jul 2023 01:05:06 +0800 you wrote:
+> in bcm_sf2_sw_probe(), check the return value of clk_prepare_enable()
+> and return the error code if clk_prepare_enable() returns an
+> unexpected value.
 > 
-> 	nla_parse_nested(array, XXX_MAX, ...);
-> 
-> array must be declared as
-> 
-> 	struct nlattr *array[XXX_MAX + 1];
+> Fixes: e9ec5c3bd238 ("net: dsa: bcm_sf2: request and handle clocks")
+> Signed-off-by: Yuanjun Gong <ruc_gongyuanjun@163.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - [v2,net] net: flower: fix stack-out-of-bounds in fl_set_key_cfm()
-    https://git.kernel.org/netdev/net/c/4d50e50045aa
+  - [1/1] net: dsa: fix value check in bcm_sf2_sw_probe()
+    https://git.kernel.org/netdev/net/c/dadc5b86cc94
 
 You are awesome, thank you!
 -- 
