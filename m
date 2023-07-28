@@ -1,135 +1,182 @@
-Return-Path: <netdev+bounces-22349-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22351-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2426B76718F
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 18:11:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26F5F7671C5
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 18:22:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D270D2821B4
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 16:11:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 39A891C21919
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 16:22:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB66F14A8B;
-	Fri, 28 Jul 2023 16:11:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B680B14AB7;
+	Fri, 28 Jul 2023 16:22:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C138B14012
-	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 16:11:10 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4871FC433C7;
-	Fri, 28 Jul 2023 16:10:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690560670;
-	bh=tjGuSrDwTbS2bQDCEbJvPIHSpBadcYgXq8DyDZNK8XU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=gyAzu+W+m+DUr2THVKr8nlypPSMO/0fSh5RLpztO0wYLpGqCdkGeG9LwczxcmgwFh
-	 1xsiWwYcgbX3PSQ2CIVG2rBb9D1JRNcAnfchiXceCXcI4a4Frro59/iv/kWqBzLW4O
-	 aDEpZE6AH3utAOsXGRNYIIh/UGblZeJpwXYsh2/4DoLWPJW6K6/qrimrbrkQTl41sz
-	 pfb15Sb49WK7O5dU14vI9hUNF+g44dcyEG6oEn4klzDM5xARx60q3qkBkxJ7cbepuZ
-	 jMvTa9PMJm0QNsb1YUchIAU+F66g+DsywJoKLaSb3mKTaOcZehRaF/9JYoBOzmscUm
-	 oSkxewggZst+w==
-Date: Fri, 28 Jul 2023 17:10:54 +0100
-From: Conor Dooley <conor@kernel.org>
-To: Miquel Raynal <miquel.raynal@bootlin.com>
-Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-	Varshini Rajendran <varshini.rajendran@microchip.com>,
-	robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
-	conor+dt@kernel.org, nicolas.ferre@microchip.com,
-	alexandre.belloni@bootlin.com, claudiu.beznea@microchip.com,
-	mturquette@baylibre.com, sboyd@kernel.org,
-	herbert@gondor.apana.org.au, davem@davemloft.net, vkoul@kernel.org,
-	andi.shyti@kernel.org, tglx@linutronix.de, maz@kernel.org,
-	lee@kernel.org, ulf.hansson@linaro.org, tudor.ambarus@linaro.org,
-	richard@nod.at, vigneshr@ti.com, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, linus.walleij@linaro.org,
-	sre@kernel.org, p.zabel@pengutronix.de, olivia@selenic.com,
-	a.zummo@towertech.it, radu_nicolae.pirea@upb.ro,
-	richard.genoud@gmail.com, gregkh@linuxfoundation.org,
-	lgirdwood@gmail.com, broonie@kernel.org, wim@linux-watchdog.org,
-	linux@roeck-us.net, linux@armlinux.org.uk,
-	durai.manickamkr@microchip.com, andrew@lunn.ch,
-	jerry.ray@microchip.com, andre.przywara@arm.com, mani@kernel.org,
-	alexandre.torgue@st.com, gregory.clement@bootlin.com, arnd@arndb.de,
-	rientjes@google.com, deller@gmx.de, 42.hyeyoo@gmail.com,
-	vbabka@suse.cz, mripard@kernel.org, mihai.sain@microchip.com,
-	codrin.ciubotariu@microchip.com, eugen.hristev@collabora.com,
-	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, linux-clk@vger.kernel.org,
-	linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org,
-	linux-i2c@vger.kernel.org, linux-mmc@vger.kernel.org,
-	linux-mtd@lists.infradead.org, netdev@vger.kernel.org,
-	linux-gpio@vger.kernel.org, linux-pm@vger.kernel.org,
-	linux-rtc@vger.kernel.org, linux-spi@vger.kernel.org,
-	linux-serial@vger.kernel.org, alsa-devel@alsa-project.org,
-	linux-usb@vger.kernel.org, linux-watchdog@vger.kernel.org
-Subject: Re: [PATCH v3 00/50] Add support for sam9x7 SoC family
-Message-ID: <20230728-perfectly-online-499ba99ce421@spud>
-References: <20230728102223.265216-1-varshini.rajendran@microchip.com>
- <c0792cfd-db4f-7153-0775-824912277908@linaro.org>
- <20230728-floss-stark-889158f968ea@spud>
- <20230728180443.55363550@xps-13>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA17D14014
+	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 16:22:36 +0000 (UTC)
+X-Greylist: delayed 350 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 28 Jul 2023 09:22:31 PDT
+Received: from out-109.mta0.migadu.com (out-109.mta0.migadu.com [91.218.175.109])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4E1B2D42
+	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 09:22:31 -0700 (PDT)
+Message-ID: <2c3bec7a-812c-0a65-f8c1-b9749430adba@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1690560999; h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+4d5dX2QpOs/NQAOKyRlBye3q/eaKn/kIqTx/3BJqMA=;
+	b=S05AXoOWkRtVDQgNWaAU61a0PxShD2p1OxKAwho6I33bMP7fQDFkZkX23n+ctKHnZCStqs
+	Ts4R+FVbXlgRYYQbVBvxeT1Cd1Z5TGGngWG7uEaYCyfWE3mg8P5zxV/T7pOh4r4ERI0fZ0
+	JCqPMJOh+BqLS6XHBsB5AoDSX8Trnyg=
+Date: Fri, 28 Jul 2023 09:16:32 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="JwCxVt0P/WwXvHk3"
-Content-Disposition: inline
-In-Reply-To: <20230728180443.55363550@xps-13>
+Reply-To: yonghong.song@linux.dev
+Subject: Re: [PATCH net] bpf: sockmap: Remove preempt_disable in
+ sock_map_sk_acquire
+Content-Language: en-US
+To: Jiri Olsa <olsajiri@gmail.com>, tglozar@redhat.com
+Cc: linux-kernel@vger.kernel.org, john.fastabend@gmail.com,
+ jakub@cloudflare.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+ bpf@vger.kernel.org
+References: <20230728064411.305576-1-tglozar@redhat.com>
+ <ZMOrEi3cNWGXp9ZS@krava>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yonghong Song <yonghong.song@linux.dev>
+In-Reply-To: <ZMOrEi3cNWGXp9ZS@krava>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
 
---JwCxVt0P/WwXvHk3
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jul 28, 2023 at 06:04:43PM +0200, Miquel Raynal wrote:
-> Hi Conor,
->=20
-> conor@kernel.org wrote on Fri, 28 Jul 2023 16:50:24 +0100:
->=20
-> > On Fri, Jul 28, 2023 at 01:32:12PM +0200, Krzysztof Kozlowski wrote:
-> > > On 28/07/2023 12:22, Varshini Rajendran wrote: =20
-> > > > This patch series adds support for the new SoC family - sam9x7.
-> > > >  - The device tree, configs and drivers are added
-> > > >  - Clock driver for sam9x7 is added
-> > > >  - Support for basic peripherals is added
-> > > >  - Target board SAM9X75 Curiosity is added
-> > > >  =20
-> > >=20
-> > > Your threading is absolutely broken making it difficult to review and=
- apply. =20
-> >=20
-> > I had a chat with Varshini today, they were trying to avoid sending the
-> > patches to a massive CC list, but didn't set any in-reply-to header.
-> > For the next submission whole series could be sent to the binding &
-> > platform maintainers and the individual patches additionally to their
-> > respective lists/maintainers. Does that sound okay to you, or do you
-> > think it should be broken up?
->=20
-> I usually prefer receiving the dt-bindings *and* the driver changes, so
-> I can give my feedback on the description side, as well as looking at
-> the implementation and see if that really matches what was discussed
-> with you :)
+On 7/28/23 4:48 AM, Jiri Olsa wrote:
+> On Fri, Jul 28, 2023 at 08:44:11AM +0200, tglozar@redhat.com wrote:
+>> From: Tomas Glozar <tglozar@redhat.com>
+>>
+>> Disabling preemption in sock_map_sk_acquire conflicts with GFP_ATOMIC
+>> allocation later in sk_psock_init_link on PREEMPT_RT kernels, since
+>> GFP_ATOMIC might sleep on RT (see bpf: Make BPF and PREEMPT_RT co-exist
+>> patchset notes for details).
+>>
+>> This causes calling bpf_map_update_elem on BPF_MAP_TYPE_SOCKMAP maps to
+>> BUG (sleeping function called from invalid context) on RT kernels.
+>>
+>> preempt_disable was introduced together with lock_sk and rcu_read_lock
+>> in commit 99ba2b5aba24e ("bpf: sockhash, disallow bpf_tcp_close and update
+>> in parallel"), probably to match disabled migration of BPF programs, and
+>> is no longer necessary.
+>>
+>> Remove preempt_disable to fix BUG in sock_map_update_common on RT.
+> 
+> FYI, I'm not sure it's related but I started to see following splat recently:
+> 
+> [  189.360689][  T658] =============================
+> [  189.361149][  T658] [ BUG: Invalid wait context ]
+> [  189.361588][  T658] 6.5.0-rc2+ #589 Tainted: G           OE
+> [  189.362174][  T658] -----------------------------
+> [  189.362660][  T658] test_progs/658 is trying to lock:
+> [  189.363176][  T658] ffff8881702652b8 (&psock->link_lock){....}-{3:3}, at: sock_map_update_common+0x1c4/0x340
+> [  189.364152][  T658] other info that might help us debug this:
+> [  189.364689][  T658] context-{5:5}
+> [  189.365021][  T658] 3 locks held by test_progs/658:
+> [  189.365508][  T658]  #0: ffff888177611a80 (sk_lock-AF_INET){+.+.}-{0:0}, at: sock_map_update_elem_sys+0x82/0x260
+> [  189.366503][  T658]  #1: ffffffff835a3180 (rcu_read_lock){....}-{1:3}, at: sock_map_update_elem_sys+0x78/0x260
+> [  189.367470][  T658]  #2: ffff88816cf19240 (&stab->lock){+...}-{2:2}, at: sock_map_update_common+0x12a/0x340
+> [  189.368420][  T658] stack backtrace:
+> [  189.368806][  T658] CPU: 0 PID: 658 Comm: test_progs Tainted: G           OE      6.5.0-rc2+ #589 98af30b3c42d747b51da05f1d0e4899e394be6c9
+> [  189.369889][  T658] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-1.fc38 04/01/2014
+> [  189.370736][  T658] Call Trace:
+> [  189.371063][  T658]  <TASK>
+> [  189.371365][  T658]  dump_stack_lvl+0xb2/0x120
+> [  189.371798][  T658]  __lock_acquire+0x9ad/0x2470
+> [  189.372243][  T658]  ? lock_acquire+0x104/0x350
+> [  189.372680][  T658]  lock_acquire+0x104/0x350
+> [  189.373104][  T658]  ? sock_map_update_common+0x1c4/0x340
+> [  189.373615][  T658]  ? find_held_lock+0x32/0x90
+> [  189.374074][  T658]  ? sock_map_update_common+0x12a/0x340
+> [  189.374587][  T658]  _raw_spin_lock_bh+0x38/0x80
+> [  189.375060][  T658]  ? sock_map_update_common+0x1c4/0x340
+> [  189.375571][  T658]  sock_map_update_common+0x1c4/0x340
+> [  189.376118][  T658]  sock_map_update_elem_sys+0x184/0x260
+> [  189.376704][  T658]  __sys_bpf+0x181f/0x2840
+> [  189.377147][  T658]  __x64_sys_bpf+0x1a/0x30
+> [  189.377556][  T658]  do_syscall_64+0x38/0x90
+> [  189.377980][  T658]  entry_SYSCALL_64_after_hwframe+0x6e/0xd8
+> [  189.378473][  T658] RIP: 0033:0x7fe52f47ab5d
+> 
+> the patch did not help with that
 
-Right, that is what I was suggesting. Respective maintainers would get
-the drivers *and* bindings for their subsystems - IOW, each patch is
-sent to what get_maintainer.pl outputs for it.
+I think the above splat is not related to this patch. In function
+sock_map_update_common func we have
+   raw_spin_lock_bh(&stab->lock);
 
---JwCxVt0P/WwXvHk3
-Content-Type: application/pgp-signature; name="signature.asc"
+   sock_map_add_link(psock, link, map, &stab->sks[idx]);
+     spin_lock_bh(&psock->link_lock);
+     ...
+     spin_unlock_bh(&psock->link_lock);
 
------BEGIN PGP SIGNATURE-----
+   raw_spin_unlock_bh(&stab->lock);
 
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZMPojgAKCRB4tDGHoIJi
-0kkfAP4ga1L8W2nIhESI6nBrFIrWddcSQtR9qdorSuJaMVMayQD8DIEJcInDpQKd
-xcNO0xMMpnCF1rhZL6BPvkIZHuZ5Ygk=
-=CpFU
------END PGP SIGNATURE-----
+I think you probably have CONFIG_PROVE_RAW_LOCK_NESTING turned on
+in your config.
 
---JwCxVt0P/WwXvHk3--
+In the above case, for RT kernel, spin_lock_bh will become
+'mutex' and it is sleepable, while raw_spin_lock_bh remains
+to be a spin lock. The warning is about potential
+locking violation with RT kernel.
+
+To fix the issue, you can convert spin_lock_bh to raw_spin_lock_bh
+to silence the warning.
+
+> 
+> jirka
+> 
+>>
+>> Signed-off-by: Tomas Glozar <tglozar@redhat.com>
+>> ---
+>>   net/core/sock_map.c | 2 --
+>>   1 file changed, 2 deletions(-)
+>>
+>> diff --git a/net/core/sock_map.c b/net/core/sock_map.c
+>> index 19538d628714..08ab108206bf 100644
+>> --- a/net/core/sock_map.c
+>> +++ b/net/core/sock_map.c
+>> @@ -115,7 +115,6 @@ static void sock_map_sk_acquire(struct sock *sk)
+>>   	__acquires(&sk->sk_lock.slock)
+>>   {
+>>   	lock_sock(sk);
+>> -	preempt_disable();
+>>   	rcu_read_lock();
+>>   }
+>>   
+>> @@ -123,7 +122,6 @@ static void sock_map_sk_release(struct sock *sk)
+>>   	__releases(&sk->sk_lock.slock)
+>>   {
+>>   	rcu_read_unlock();
+>> -	preempt_enable();
+>>   	release_sock(sk);
+>>   }
+>>   
+>> -- 
+>> 2.39.3
+>>
+>>
+> 
 
