@@ -1,482 +1,326 @@
-Return-Path: <netdev+bounces-22299-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22300-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E5C8766F6B
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 16:25:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F7DF766F7F
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 16:31:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 14F061C218EF
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 14:25:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 139C62827F3
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 14:31:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99BA113FE5;
-	Fri, 28 Jul 2023 14:25:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7288F5CB0;
+	Fri, 28 Jul 2023 14:31:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 872D213AD8
-	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 14:25:34 +0000 (UTC)
-Received: from mail-vs1-xe2c.google.com (mail-vs1-xe2c.google.com [IPv6:2607:f8b0:4864:20::e2c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B469D19B5
-	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 07:25:31 -0700 (PDT)
-Received: by mail-vs1-xe2c.google.com with SMTP id ada2fe7eead31-4475d891d0eso1386801137.0
-        for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 07:25:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690554331; x=1691159131;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=27aQYdk+GOHmVhE9sA46Z9rhTnBRw/hSKTLvVSeeasU=;
-        b=Li869wmuYJUds4SHPE1nGP+FSRK6La7TKX+0/sTkl+Q8GRqc8+9vG2ZtxhTFaI/zzg
-         rsjX3MaxSRBt3W/EQywpATzEAhUdQk4BKGqH7pf1EgVh72GgWymH+d6N+tjpelMi/kbn
-         sKUUsD+yCqrCZ+C7mdh0/xF/J5bWtHsTGZyPypEBRerrN0Ec085MoqXOlEFMgSb08Kw/
-         Pc+VQdm4QfaSn3g2fPKiXak4VKaXTDtwaopZADj9raeOdIwu1LNSscoaQUTv+3vdUvmY
-         SQ31Q6DHIGvkGUaQJ8Vee98be22keBYskX8so4Y3p8UdzY1JN8NGYNF8hCPvyFczN0p7
-         5q9g==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F0FB13FF1
+	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 14:31:15 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 451EC3A9A
+	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 07:31:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1690554672;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=FeGRjWxDaYUdtoK9jxbdP+48ZJkpz3RFiBrIfQMbJzQ=;
+	b=Bbvuv5Awvr4lMBatZcLPoqAcUkCH1QbRbX9rohhk/W/8IV6xaT9zmvn/qNT40HifzliV26
+	HOCoWFQWqaTyQ5PqR0LuXrQmjdJ1zGp1IS3obCHmWFprk/eP9zbzjCdNOM1/WvMqSMqQAh
+	B+Om1dGh2uKV7tevmk9HqoDRrpv4BNc=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-532-laWqgb6DMDKvILcjJF_BSw-1; Fri, 28 Jul 2023 10:31:10 -0400
+X-MC-Unique: laWqgb6DMDKvILcjJF_BSw-1
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-3f5df65fa35so14364815e9.3
+        for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 07:31:09 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690554331; x=1691159131;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=27aQYdk+GOHmVhE9sA46Z9rhTnBRw/hSKTLvVSeeasU=;
-        b=b0rVIrvtUO2phR3Qgk0IPmIZDCRlUb244pj2zMbCXhf5R2iFhGM6F4uYsanSxFzioG
-         oX5avR2GIZSbgTuMesjrwiUf8jWhEuUTW8DI52CHbQ7/bcpINUlIIRFkVCTAVJLQdgbv
-         CaG0sSZdXGLOXw1qiIct9bQoaMRJikpPood1YbNM0ZV75pypwCokiyN2E/GGBZW61jn0
-         2ae1Wc4ZorKHcjGpDitS+0zzFCkMN5nh+oxBx2eZoc67J9+68EpVcFmCKCmvanHWoH6c
-         K6+n+5Mbm1yMHwjpf9IXIG4AWAcV6+0vmLXprSoRg2ybW3Al7T9aF6XRPc1mmMXBA4O2
-         +Vzw==
-X-Gm-Message-State: ABy/qLaY5IPXIqpwBFX+3OmSJtaGW2C7xYskvcYJs04X+PHt+n6L68RY
-	iCCCphaOpstf6FwiPbAKO+N0YFpZ6LxHi/NotuBtow==
-X-Google-Smtp-Source: APBJJlHBt3CL4dgKyqNagt6YmHoaGEo00/grmbhMXEtc62vHLUWQmyTq4fzzYtkBalyq1iviWBZEWLZrXHCebyEyaTg=
-X-Received: by 2002:a67:bd10:0:b0:43f:3426:9e35 with SMTP id
- y16-20020a67bd10000000b0043f34269e35mr1090402vsq.12.1690554330570; Fri, 28
- Jul 2023 07:25:30 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1690554669; x=1691159469;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=FeGRjWxDaYUdtoK9jxbdP+48ZJkpz3RFiBrIfQMbJzQ=;
+        b=YYOMb9dzo+LtVTJe9i0Mw70DR0XnCOIpktQ012OkmGVIxLDnCdZV3tQEDS5SJidvdz
+         AvSoYRSEBh3h6BoLZqbaGF0WHj4TX9Za6UVE+726UUJgzKESqnxShKiVAp59OVFmSVKr
+         68VvvATVIxgX3VoCrgzdM4mnyhgPct73kuTJW5/8LRNfy+XTl9ctW4prMo+9XdRQxhwk
+         j7n8UrxfmxhZMjQe7QM9zKGDdIfmdR1oMCngdB34ckKzgkds+OB3adg3t+E2lQMkA5xx
+         lI82Koqb6qEkO5Bw6vhDnfF9w2zvk5c29CFOx8IQixb339Q2ptse/7on7DiNGmSj4t7H
+         wuWQ==
+X-Gm-Message-State: ABy/qLZn3cXrErKQbqAnO+zU7ZlSlJ9PA0/WVeUWVUtHICXdlAiAQDHO
+	yJqw96aKkhmQfqwo7MKQKRNyd0+pHueFac8TMrudECkUw/p0W4H7OqNjtu2lFPTZKfIAU6hp5Fi
+	v3yoYlS0ZhU4Vpu/s
+X-Received: by 2002:a7b:cd09:0:b0:3fb:a62d:1992 with SMTP id f9-20020a7bcd09000000b003fba62d1992mr1917314wmj.0.1690554668717;
+        Fri, 28 Jul 2023 07:31:08 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlHvR678AaOAPH0Ktddko3poH/AAsjmtvPyK2t555cXew7r0tr80sLKPjF+jQl7V+acgYsBVWQ==
+X-Received: by 2002:a7b:cd09:0:b0:3fb:a62d:1992 with SMTP id f9-20020a7bcd09000000b003fba62d1992mr1917286wmj.0.1690554668382;
+        Fri, 28 Jul 2023 07:31:08 -0700 (PDT)
+Received: from [192.168.1.67] (198.red-88-3-59.dynamicip.rima-tde.net. [88.3.59.198])
+        by smtp.gmail.com with ESMTPSA id m25-20020a7bcb99000000b003fc0505be19sm4227803wmi.37.2023.07.28.07.31.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 28 Jul 2023 07:31:07 -0700 (PDT)
+Message-ID: <990b0e22-63ad-f747-4ea2-0c3ba78b0b37@redhat.com>
+Date: Fri, 28 Jul 2023 16:31:06 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230727125125.1194376-1-imagedong@tencent.com>
- <20230727125125.1194376-4-imagedong@tencent.com> <CANn89iKWTrgEp3QY34mNqVAx09fSxHUh+oHRTd6=aWurGS7qWA@mail.gmail.com>
- <CADxym3YhjMv3Xkts99fiajq-cR-BqxDayKFzFZ1L49BNfFXkdw@mail.gmail.com>
- <CADVnQynQ1Hw+Jh7pjdNw_Mo4tWZV8V_sA+L-o=O4uV+9Gv7Prg@mail.gmail.com>
- <CADxym3Zqb2CCpJojGiT7gVL98GDdOmjxqLY6ApLeP2zZU1Kn3Q@mail.gmail.com> <CANn89i+WnwgpGy4v=aXsjThPBA2FQzWx9Y=ycXWWGLDdtDHBig@mail.gmail.com>
-In-Reply-To: <CANn89i+WnwgpGy4v=aXsjThPBA2FQzWx9Y=ycXWWGLDdtDHBig@mail.gmail.com>
-From: Neal Cardwell <ncardwell@google.com>
-Date: Fri, 28 Jul 2023 07:25:13 -0700
-Message-ID: <CADVnQy=OumgmsbsQ8QLhUiyUNN95Ay2guVjgGVVLH93QXanBSw@mail.gmail.com>
-Subject: Re: [PATCH net-next 3/3] net: tcp: check timeout by
- icsk->icsk_timeout in tcp_retransmit_timer()
-To: Eric Dumazet <edumazet@google.com>
-Cc: Menglong Dong <menglong8.dong@gmail.com>, davem@davemloft.net, kuba@kernel.org, 
-	pabeni@redhat.com, dsahern@kernel.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Menglong Dong <imagedong@tencent.com>, 
-	Yuchung Cheng <ycheng@google.com>, Soheil Hassas Yeganeh <soheil@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL,
-	USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH v2 net-next 5/5] selftests: openvswitch: add ct-nat test
+ case with ipv4
+Content-Language: en-US
+To: Aaron Conole <aconole@redhat.com>, netdev@vger.kernel.org
+Cc: dev@openvswitch.org, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Shuah Khan <shuah@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+ Eric Dumazet <edumazet@google.com>, "David S. Miller" <davem@davemloft.net>,
+ Pravin B Shelar <pshelar@ovn.org>, Ilya Maximets <i.maximets@ovn.org>
+References: <20230728115940.578658-1-aconole@redhat.com>
+ <20230728115940.578658-6-aconole@redhat.com>
+From: Adrian Moreno <amorenoz@redhat.com>
+In-Reply-To: <20230728115940.578658-6-aconole@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+	SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Jul 28, 2023 at 1:50=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> On Fri, Jul 28, 2023 at 8:25=E2=80=AFAM Menglong Dong <menglong8.dong@gma=
-il.com> wrote:
-> >
-> > On Fri, Jul 28, 2023 at 12:44=E2=80=AFPM Neal Cardwell <ncardwell@googl=
-e.com> wrote:
-> > >
-> > > On Thu, Jul 27, 2023 at 7:57=E2=80=AFPM Menglong Dong <menglong8.dong=
-@gmail.com> wrote:
-> > > >
-> > > > On Fri, Jul 28, 2023 at 3:31=E2=80=AFAM Eric Dumazet <edumazet@goog=
-le.com> wrote:
-> > > > >
-> > > > > On Thu, Jul 27, 2023 at 2:52=E2=80=AFPM <menglong8.dong@gmail.com=
-> wrote:
-> > > > > >
-> > > > > > From: Menglong Dong <imagedong@tencent.com>
-> > > > > >
-> > > > > > In tcp_retransmit_timer(), a window shrunk connection will be r=
-egarded
-> > > > > > as timeout if 'tcp_jiffies32 - tp->rcv_tstamp > TCP_RTO_MAX'. T=
-his is not
-> > > > > > right all the time.
-> > > > > >
-> > > > > > The retransmits will become zero-window probes in tcp_retransmi=
-t_timer()
-> > > > > > if the 'snd_wnd=3D=3D0'. Therefore, the icsk->icsk_rto will com=
-e up to
-> > > > > > TCP_RTO_MAX sooner or later.
-> > > > > >
-> > > > > > However, the timer is not precise enough, as it base on timer w=
-heel.
-> > > > > > Sorry that I am not good at timer, but I know the concept of ti=
-me-wheel.
-> > > > > > The longer of the timer, the rougher it will be. So the timeout=
- is not
-> > > > > > triggered after TCP_RTO_MAX, but 122877ms as I tested.
-> > > > > >
-> > > > > > Therefore, 'tcp_jiffies32 - tp->rcv_tstamp > TCP_RTO_MAX' is al=
-ways true
-> > > > > > once the RTO come up to TCP_RTO_MAX.
-> > > > > >
-> > > > > > Fix this by replacing the 'tcp_jiffies32' with '(u32)icsk->icsk=
-_timeout',
-> > > > > > which is exact the timestamp of the timeout.
-> > > > > >
-> > > > > > Signed-off-by: Menglong Dong <imagedong@tencent.com>
-> > > > > > ---
-> > > > > >  net/ipv4/tcp_timer.c | 6 +++++-
-> > > > > >  1 file changed, 5 insertions(+), 1 deletion(-)
-> > > > > >
-> > > > > > diff --git a/net/ipv4/tcp_timer.c b/net/ipv4/tcp_timer.c
-> > > > > > index 470f581eedd4..3a20db15a186 100644
-> > > > > > --- a/net/ipv4/tcp_timer.c
-> > > > > > +++ b/net/ipv4/tcp_timer.c
-> > > > > > @@ -511,7 +511,11 @@ void tcp_retransmit_timer(struct sock *sk)
-> > > > > >                                             tp->snd_una, tp->sn=
-d_nxt);
-> > > > > >                 }
-> > > > > >  #endif
-> > > > > > -               if (tcp_jiffies32 - tp->rcv_tstamp > TCP_RTO_MA=
-X) {
-> > > > > > +               /* It's a little rough here, we regard any vali=
-d packet that
-> > > > > > +                * update tp->rcv_tstamp as the reply of the re=
-transmitted
-> > > > > > +                * packet.
-> > > > > > +                */
-> > > > > > +               if ((u32)icsk->icsk_timeout - tp->rcv_tstamp > =
-TCP_RTO_MAX) {
-> > > > > >                         tcp_write_err(sk);
-> > > > > >                         goto out;
-> > > > > >                 }
-> > > > >
-> > > > >
-> > > > > Hmm, this looks like a net candidate, since this is unrelated to =
-the
-> > > > > other patches ?
-> > > >
-> > > > Yeah, this patch can be standalone. However, considering the
-> > > > purpose of this series, it is necessary. Without this patch, the
-> > > > OOM probe will always timeout after a few minutes.
-> > > >
-> > > > I'm not sure if I express the problem clearly in the commit log.
-> > > > Let's explain it more.
-> > > >
-> > > > Let's mark the timestamp of the 10th timeout of the rtx timer
-> > > > as TS1. Now, the retransmission happens and the ACK of
-> > > > the retransmitted packet will update the tp->rcv_tstamp to
-> > > > TS1+rtt.
-> > > >
-> > > > The RTO now is TCP_RTO_MAX. So let's see what will
-> > > > happen in the 11th timeout. As we timeout after 122877ms,
-> > > > so tcp_jiffies32 now is "TS1+122877ms", and
-> > > > "tcp_jiffies32 - tp->rcv_tstamp" is
-> > > > "TS1+122877ms - (TS1+rtt)" -> "122877ms - rtt",
-> > > > which is always bigger than TCP_RTO_MAX, which is 120000ms.
-> > > >
-> > > > >
-> > > > > Neal, what do you think ?
-> > >
-> > > Sorry, I am probably missing something here, but: what would ever mak=
-e
-> > > this new proposed condition ((u32)icsk->icsk_timeout - tp->rcv_tstamp
-> > > > TCP_RTO_MAX) true? :-)
-> > >
-> >
-> > If the snd_wnd is 0, we need to keep probing until the window
-> > is available. Meanwhile, any retransmission that don't have
-> > a corresponding ACK (see what we do in the 1st patch), which
-> > can be caused by the lost of the ACK or the lost of the retransmitted
-> > packet, can make the condition true, as the tp->rcv_tstamp can't be
-> > updated in time.
-> >
-> > This is a little strict here. In the tcp_probe_timer(), we are allowed =
-to
-> > retransmit the probe0 packet for sysctl_tcp_retries2 times. But
-> > we don't allow packets to be lost here.
-> >
-> > > In your nicely explained scenario, your new expression,
-> > > icsk->icsk_timeout - tp->rcv_tstamp, will be:
-> > >
-> > >   icsk->icsk_timeout - tp->rcv_tstamp
-> > > =3D TS1 + 120 sec      - (TS1+rtt)
-> > > =3D 120 sec - RTT
-> > >
-> > > AFAICT there is no way for that expression to be bigger than
-> > > TCP_RTO_MAX =3D 120 sec unless somehow RTT is negative. :-)
-> > >
-> > > So AFAICT your expression ((u32)icsk->icsk_timeout - tp->rcv_tstamp >
-> > > TCP_RTO_MAX) will always be false, so rather than this patch we may a=
-s
-> > > well remove the if check and the body of the if block?
-> > >
-> >
-> > Hmm......as I explained above, the condition will be true
-> > if the real packet loss happens. And I think it is the origin
-> > design.
-> >
-> > > To me such a change does not seem like a safe and clear bug fix for
-> > > the "net" branch but rather a riskier design change (appropriate for
-> > > "net-next" branch) that has connections retry forever when the
-> > > receiver retracts the window to zero, under the estimation that this
-> > > is preferable to having the connections die in such a case.
-> > >
-> > > There might be apps that depend on the old behavior of having
-> > > connections die in such cases, so we might want to have this new
-> > > fail-faster behavior guarded by a sysctl in case some sites need to
-> > > revert to the older behavior? Not sure...
-> >
-> > Yeah, the behavior here will be different for the users. I'm not
-> > sure if there are any users that rely on such behavior.
-> >
-> > What do you think, Eric? Do we need a sysctl here?
-> >
->
-> I honestly do not know what problem you want to solve.
->
-> As Neal pointed out, the new condition would not trigger,
-> so one can question about the whole piece of code,
-> what is its purpose exactly ?
->
-> When receiving WIN 0 acks, we should enter the so called probe0 state.
-> Maybe the real issue is that the 'receiver' will falsely send WIN X>0 ACK=
-S,
-> because win probe acks do not really ensure memory is available to
-> receive new packets ?
->
-> Maybe provide a packetdrill test to show what kind of issue you are facin=
-g...
->
-> In Google kernels, we have TCP_MAX_RTO reduced to 30 seconds, and the
-> following test runs fine.
->
-> // Test how sender reacts to unexpected arrival rwin of 0.
->
-> `../common/defaults.sh`
->
-> // Create a socket.
->     0 socket(..., SOCK_STREAM, IPPROTO_TCP) =3D 3
->    +0 setsockopt(3, SOL_SOCKET, SO_REUSEADDR, [1], 4) =3D 0
->    +0 bind(3, ..., ...) =3D 0
->    +0 listen(3, 1) =3D 0
->
-> // Establish a connection.
->   +.1 < S 0:0(0) win 65535 <mss 1000,nop,nop,sackOK,nop,wscale 6>
->    +0 > S. 0:0(0) ack 1 win 65535 <mss 1460,nop,nop,sackOK,nop,wscale 8>
->   +.1 < . 1:1(0) ack 1 win 457
->    +0 accept(3, ..., ...) =3D 4
->
->    +0 write(4, ..., 20000) =3D 20000
->    +0 > P. 1:10001(10000) ack 1
->   +.1 < . 1:1(0) ack 10001 win 0
->
-> // Send zwp since we received rwin of 0 and have data to send.
->   +.3 > . 10000:10000(0) ack 1
->   +.1 < . 1:1(0) ack 10001 win 0
->
->   +.6 > . 10000:10000(0) ack 1
->   +.1 < . 1:1(0) ack 10001 win 0
->
->  +1.2 > . 10000:10000(0) ack 1
->   +.1 < . 1:1(0) ack 10001 win 0
->
->  +2.4 > . 10000:10000(0) ack 1
->   +.1 < . 1:1(0) ack 10001 win  0
->
->  +4.8 > . 10000:10000(0) ack 1
->   +.1 < . 1:1(0) ack 10001 win  0
->
->  +9.6 > . 10000:10000(0) ack 1
->   +.1 < . 1:1(0) ack 10001 win  0
->
-> +19.2 > . 10000:10000(0) ack 1
->   +.1 < . 1:1(0) ack 10001 win 0
->
-> +30   > . 10000:10000(0) ack 1
->   +.1 < . 1:1(0) ack 10001 win 0
->
-> +30   > . 10000:10000(0) ack 1
->   +.1 < . 1:1(0) ack 10001 win 193
->
-> // Received non-zero window update. Send rest of the data.
->    +0 > P. 10001:20001(10000) ack 1
->   +.1 < . 1:1(0) ack 20001 win 457
-
-In that packetdrill case AFAICT that is the ZWP timer firing, and the
-sender sends a ZWP.
-
-I think maybe Menglong is looking more at something like the following
-scenario, where at the time the RTO timer fires the data sender finds
-the tp->snd_wnd is zero, so it sends a retransmit of the
-lowest-sequence data packet.
-
-Here is a packetdrill case and the tcpdump trace on an upstream
-net-next kernel... I have not worked out all the details at the end,
-but perhaps it can help move the discussion forward:
 
 
-~/packetdrill/gtests/net/tcp/receiver_window# cat rwin-rto-zero-window.pkt
-// Test how sender reacts to unexpected arrival rwin of 0.
+On 7/28/23 13:59, Aaron Conole wrote:
+> Building on the previous work, add a very simplistic NAT case
+> using ipv4.  This just tests dnat transformation
+> 
+> Signed-off-by: Aaron Conole <aconole@redhat.com>
+> ---
+>   .../selftests/net/openvswitch/openvswitch.sh  | 64 ++++++++++++++++
+>   .../selftests/net/openvswitch/ovs-dpctl.py    | 75 +++++++++++++++++++
+>   2 files changed, 139 insertions(+)
+> 
+> diff --git a/tools/testing/selftests/net/openvswitch/openvswitch.sh b/tools/testing/selftests/net/openvswitch/openvswitch.sh
+> index 40a66c72af0f..dced4f612a78 100755
+> --- a/tools/testing/selftests/net/openvswitch/openvswitch.sh
+> +++ b/tools/testing/selftests/net/openvswitch/openvswitch.sh
+> @@ -14,6 +14,7 @@ tests="
+>   	arp_ping				eth-arp: Basic arp ping between two NS
+>   	ct_connect_v4				ip4-ct-xon: Basic ipv4 tcp connection using ct
+>   	connect_v4				ip4-xon: Basic ipv4 ping between two NS
+> +	nat_connect_v4				ip4-nat-xon: Basic ipv4 tcp connection via NAT
+>   	netlink_checks				ovsnl: validate netlink attrs and settings
+>   	upcall_interfaces			ovs: test the upcall interfaces"
+>   
+> @@ -300,6 +301,69 @@ test_connect_v4 () {
+>   	return 0
+>   }
+>   
+> +# nat_connect_v4 test
+> +#  - client has 1500 byte MTU
+> +#  - server has 1500 byte MTU
+> +#  - use ICMP to ping in each direction
+> +#  - only allow CT state stuff to pass through new in c -> s
+> +test_nat_connect_v4 () {
+> +	which nc >/dev/null 2>/dev/null || return $ksft_skip
+> +
+> +	sbx_add "test_nat_connect_v4" || return $?
+> +
+> +	ovs_add_dp "test_nat_connect_v4" nat4 || return 1
+> +	info "create namespaces"
+> +	for ns in client server; do
+> +		ovs_add_netns_and_veths "test_nat_connect_v4" "nat4" "$ns" \
+> +		    "${ns:0:1}0" "${ns:0:1}1" || return 1
+> +	done
+> +
+> +	ip netns exec client ip addr add 172.31.110.10/24 dev c1
+> +	ip netns exec client ip link set c1 up
+> +	ip netns exec server ip addr add 172.31.110.20/24 dev s1
+> +	ip netns exec server ip link set s1 up
+> +
+> +	ip netns exec client ip route add default via 172.31.110.20
+> +
+> +	ovs_add_flow "test_nat_connect_v4" nat4 \
+> +		'in_port(1),eth(),eth_type(0x0806),arp()' '2' || return 1
+> +	ovs_add_flow "test_nat_connect_v4" nat4 \
+> +		'in_port(2),eth(),eth_type(0x0806),arp()' '1' || return 1
+> +	ovs_add_flow "test_nat_connect_v4" nat4 \
+> +		"ct_state(-trk),in_port(1),eth(),eth_type(0x0800),ipv4(dst=192.168.0.20)" \
+> +		"ct(commit,nat(dst=172.31.110.20)),recirc(0x1)"
+> +	ovs_add_flow "test_nat_connect_v4" nat4 \
+> +		"ct_state(-trk),in_port(2),eth(),eth_type(0x0800),ipv4()" \
+> +		"ct(commit,nat),recirc(0x2)"
+> +
+> +	ovs_add_flow "test_nat_connect_v4" nat4 \
+> +		"recirc_id(0x1),ct_state(+trk-inv),in_port(1),eth(),eth_type(0x0800),ipv4()" "2"
+> +	ovs_add_flow "test_nat_connect_v4" nat4 \
+> +		"recirc_id(0x2),ct_state(+trk-inv),in_port(2),eth(),eth_type(0x0800),ipv4()" "1"
+> +
+> +	# do a ping
+> +	ovs_sbx "test_nat_connect_v4" ip netns exec client ping 192.168.0.20 -c 3 || return 1
+> +
+> +	# create an echo server in 'server'
+> +	echo "server" | \
+> +		ovs_netns_spawn_daemon "test_nat_connect_v4" "server" \
+> +				nc -lvnp 4443
+> +	ovs_sbx "test_nat_connect_v4" ip netns exec client nc -i 1 -zv 192.168.0.20 4443 || return 1
+> +
+> +	# Now test in the other direction (should fail)
+> +	echo "client" | \
+> +		ovs_netns_spawn_daemon "test_nat_connect_v4" "client" \
+> +				nc -lvnp 4443
+> +	ovs_sbx "test_nat_connect_v4" ip netns exec client nc -i 1 -zv 172.31.110.10 4443
+> +	if [ $? == 0 ]; then
+> +	   info "connect to client was successful"
+> +	   return 1
+> +	fi
+> +
+> +	info "done..."
+> +	return 0
+> +}
+> +
+>   # netlink_validation
+>   # - Create a dp
+>   # - check no warning with "old version" simulation
+> diff --git a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
+> index 6e258ab9e635..258c9ef263d9 100644
+> --- a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
+> +++ b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
+> @@ -530,6 +530,81 @@ class ovsactions(nla):
+>                           else:
+>                               ctact["attrs"].append([scan[1], None])
+>                           actstr = actstr[strspn(actstr, ", ") :]
+> +                    # it seems strange to put this here, but nat() is a complex
+> +                    # sub-action and this lets it sit anywhere in the ct() action
+> +                    if actstr.startswith("nat"):
+> +                        actstr = actstr[3:]
+> +                        natact = ovsactions.ctact.natattr()
+> +
+> +                        if actstr.startswith("("):
+> +                            t = None
+> +                            actstr = actstr[1:]
+> +                            if actstr.startswith("src"):
+> +                                t = "OVS_NAT_ATTR_SRC"
+> +                                actstr = actstr[3:]
+> +                            elif actstr.startswith("dst"):
+> +                                t = "OVS_NAT_ATTR_DST"
+> +                                actstr = actstr[3:]
+> +
+> +                            actstr, ip_block_min = parse_extract_field(
+> +                                actstr, "=", "([0-9a-fA-F:\.\[]+)", str, False
+> +                            )
+> +                            actstr, ip_block_max = parse_extract_field(
+> +                                actstr, "-", "([0-9a-fA-F:\.\[]+)", str, False
+> +                            )
+> +
+> +                            # [XXXX:YYY::Z]:123
+> +                            # following RFC 3986
+> +                            # More complete parsing, ala RFC5952 isn't
+> +                            # supported.
+> +                            if actstr.startswith("]"):
+> +                                actstr = actstr[1:]
+> +                            if ip_block_min is not None and \
+> +                               ip_block_min.startswith("["):
+> +                                ip_block_min = ip_block_min[1:]
+> +                            if ip_block_max is not None and \
+> +                               ip_block_max.startswith("["):
+> +                                ip_block_max = ip_block_max[1:]
+> +
+> +                            actstr, proto_min = parse_extract_field(
+> +                                actstr, ":", "(\d+)", int, False
+> +                            )
+> +                            actstr, proto_max = parse_extract_field(
+> +                                actstr, "-", "(\d+)", int, False
+> +                            )
 
-`../common/defaults.sh`
+I'm still struggling to make this part work:
+On the one hand, ipv6 seems not fully supported by ovs-dpctl.py. If I try adding 
+an ipv6 flow I end up needing to add a function such as as the following and use 
+it to parse "ipv6()" field:
 
-// Create a socket.
-    0 socket(..., SOCK_STREAM, IPPROTO_TCP) =3D 3
-   +0 setsockopt(3, SOL_SOCKET, SO_REUSEADDR, [1], 4) =3D 0
-   +0 bind(3, ..., ...) =3D 0
-   +0 listen(3, 1) =3D 0
+def convert_ipv6(data):
+     ip, _, mask = data.partition('/')
+     max_ip = pow(2, 128) - 1
 
-// Establish a connection.
-  +.1 < S 0:0(0) win 65535 <mss 1000,nop,nop,sackOK,nop,wscale 6>
-   +0 > S. 0:0(0) ack 1 win 65535 <mss 1460,nop,nop,sackOK,nop,wscale 14>
-  +.1 < . 1:1(0) ack 1 win 457
-   +0 accept(3, ..., ...) =3D 4
+     if not ip:
+         ip = mask = 0
+     elif not mask:
+         mask = max
+     elif mask.isdigit():
+         mask = (max_ip << (128 - int(mask))) & max_ip
 
-   +0 write(4, ..., 20000) =3D 20000
-   +0 > P. 1:10001(10000) ack 1
+     return ipaddress.IPv6Address(ip).packed, ipaddress.IPv6Address(mask).packed
 
-// TLP
-  +.2 > . 10001:11001(1000) ack 1
-// Receiver has retracted rwin to 0
-// (perhaps from the 2023 proposed OOM code?).
-  +.1 < . 1:1(0) ack 1 win 0
+OTOH, trying to support ipv6 makes ct ip/port range parsing more complex, for 
+instance, this action: "ct(nat(src=10.0.0.240-10.0.0.254:32768-65535))"
 
-// RTO, and in tcp_retransmit_timer() we see the receiver window is zero,
-// so we take the special f (!tp->snd_wnd...) code path.
-  +.2 > . 1:1001(1000) ack 1
-  +.1 < . 1:1(0) ack 1 win 0
+fails, because it's parsed as:
+ip_block_min = 10.0.0.240
+ip_block_max = 10.0.0.254:32768
+proto_min = None
+proto_max = 65535
 
-  +.5 > . 1:1001(1000) ack 1
-  +.1 < . 1:1(0) ack 1 win 0
+I would say we could drop ipv6 support for nat() action, making it simpler to 
+parse or first detect if we're parsing ipv4 or ipv6 and use appropriate regexp 
+on each case. E.g: 
+https://github.com/openvswitch/ovs/blob/d460c473ebf9e9ab16da44cbfbb13a4911352195/python/ovs/flow/decoders.py#L430-L486
 
- +1.2 > . 1:1001(1000) ack 1
-  +.1 < . 1:1(0) ack 1 win 0
+Another approach would be to stop trying to be human friendly and use an easier 
+to parse syntax, something closer to key-value, e.g: 
+"ct(ip_block_min=10.0.0.240, ip_block_max=10.0.0.254, proto_min=32768, 
+proto_max=65535)". It'd be more verbose and not compatible with ovs tooling but 
+this is a testing tool afterall. WDYT?
 
- +2.4 > . 1:1001(1000) ack 1
-  +.1 < . 1:1(0) ack 1 win 0
 
- +4.8 > . 1:1001(1000) ack 1
-  +.1 < . 1:1(0) ack 1 win 0
+> +
+> +                            if t is not None:
+> +                                natact["attrs"].append([t, None])
+> +
+> +                                if ip_block_min is not None:
+> +                                    natact["attrs"].append(
+> +                                        ["OVS_NAT_ATTR_IP_MIN", ip_block_min]
+> +                                    )
+> +                                if ip_block_max is not None:
+> +                                    natact["attrs"].append(
+> +                                        ["OVS_NAT_ATTR_IP_MAX", ip_block_max]
+> +                                    )
+> +                                if proto_min is not None:
+> +                                    natact["attrs"].append(
+> +                                        ["OVS_NAT_ATTR_PROTO_MIN", proto_min]
+> +                                    )
+> +                                if proto_max is not None:
+> +                                    natact["attrs"].append(
+> +                                        ["OVS_NAT_ATTR_PROTO_MAX", proto_max]
+> +                                    )
+> +
+> +                            for natscan in (
+> +                                ("persist", "OVS_NAT_ATTR_PERSISTENT"),
 
- +9.6 > . 1:1001(1000) ack 1
-  +.1 < . 1:1(0) ack 1 win 0
+odp-util.c defines this flag as "persistent", not sure if you intend to keep it 
+compatible at all.
 
-+19.2 > . 1:1001(1000) ack 1
-  +.1 < . 1:1(0) ack 1 win 0
+> +                                ("hash", "OVS_NAT_ATTR_PROTO_HASH"),
+> +                                ("random", "OVS_NAT_ATTR_PROTO_RANDOM"),
+> +                            ):
+> +                                if actstr.startswith(natscan[0]):
+> +                                    actstr = actstr[len(natscan[0]) :]
+> +                                    natact["attrs"].append([natscan[1], None])
+> +                                    actstr = actstr[strspn(actstr, ", ") :]
+> +
+> +                        ctact["attrs"].append(["OVS_CT_ATTR_NAT", natact])
+> +                        actstr = actstr[strspn(actstr, ",) ") :]
+>   
+>                   self["attrs"].append(["OVS_ACTION_ATTR_CT", ctact])
+>                   parsed = True
 
-+38.4 > . 1:1001(1000) ack 1
-  +.1 < . 1:1(0) ack 1 win 0
+-- 
+Adrián Moreno
 
-+76.8 > . 1:1001(1000) ack 1
-  +.1 < . 1:1(0) ack 1 win 0
-
-+120 > . 1:1001(1000) ack 1
- +.1 < . 1:1(0) ack 1 win 0
-
-+120 > . 1:1001(1000) ack 1
- +.1 < . 1:1(0) ack 1001 win 1000
-
-// Received non-zero window update. Send more data.
-  +0 > P. 1001:3001(2000) ack 1
- +.1 < . 1:1(0) ack 3001 win 1000
-
-----------
-When I run that script on a net-next kernel I see the rounding up of
-the RTO to 122 secs rather than 120 secs, but for whatever reason the
-script does not cause the socket to die early...
-
-The tcpdump trace:
-
- tcpdump -ttt -n -i any port 8080 &
-
-->
-
-~/packetdrill/gtests/net/tcp/receiver_window#
-../../packetdrill/packetdrill rwin-rto-zero-window.pkt
- 00:01:01.370344 tun0  In  IP 192.0.2.1.51231 > 192.168.56.132.8080:
-Flags [S], seq 0, win 65535, options [mss
-1000,nop,nop,sackOK,nop,wscale 6], length 0
- 00:00:00.000096 tun0  Out IP 192.168.56.132.8080 > 192.0.2.1.51231:
-Flags [S.], seq 3847169154, ack 1, win 65535, options [mss
-1460,nop,nop,sackOK,nop,wscale 14], length 0
- 00:00:00.100277 tun0  In  IP 192.0.2.1.51231 > 192.168.56.132.8080:
-Flags [.], ack 1, win 457, length 0
- 00:00:00.000090 tun0  Out IP 192.168.56.132.8080 > 192.0.2.1.51231:
-Flags [P.], seq 1:2001, ack 1, win 4, length 2000: HTTP
- 00:00:00.000006 tun0  Out IP 192.168.56.132.8080 > 192.0.2.1.51231:
-Flags [P.], seq 2001:4001, ack 1, win 4, length 2000: HTTP
- 00:00:00.000003 tun0  Out IP 192.168.56.132.8080 > 192.0.2.1.51231:
-Flags [P.], seq 4001:6001, ack 1, win 4, length 2000: HTTP
- 00:00:00.000002 tun0  Out IP 192.168.56.132.8080 > 192.0.2.1.51231:
-Flags [P.], seq 6001:8001, ack 1, win 4, length 2000: HTTP
- 00:00:00.000001 tun0  Out IP 192.168.56.132.8080 > 192.0.2.1.51231:
-Flags [P.], seq 8001:10001, ack 1, win 4, length 2000: HTTP
- 00:00:00.209131 tun0  Out IP 192.168.56.132.8080 > 192.0.2.1.51231:
-Flags [.], seq 10001:11001, ack 1, win 4, length 1000: HTTP
- 00:00:00.100190 tun0  In  IP 192.0.2.1.51231 > 192.168.56.132.8080:
-Flags [.], ack 1, win 0, length 0
- 00:00:00.203824 tun0  Out IP 192.168.56.132.8080 > 192.0.2.1.51231:
-Flags [.], seq 1:1001, ack 1, win 4, length 1000: HTTP
- 00:00:00.100175 tun0  In  IP 192.0.2.1.51231 > 192.168.56.132.8080:
-Flags [.], ack 1, win 0, length 0
- 00:00:00.507835 tun0  Out IP 192.168.56.132.8080 > 192.0.2.1.51231:
-Flags [.], seq 1:1001, ack 1, win 4, length 1000: HTTP
- 00:00:00.100192 tun0  In  IP 192.0.2.1.51231 > 192.168.56.132.8080:
-Flags [.], ack 1, win 0, length 0
- 00:00:01.115858 tun0  Out IP 192.168.56.132.8080 > 192.0.2.1.51231:
-Flags [.], seq 1:1001, ack 1, win 4, length 1000: HTTP
- 00:00:00.100182 tun0  In  IP 192.0.2.1.51231 > 192.168.56.132.8080:
-Flags [.], ack 1, win 0, length 0
- 00:00:02.331747 tun0  Out IP 192.168.56.132.8080 > 192.0.2.1.51231:
-Flags [.], seq 1:1001, ack 1, win 4, length 1000: HTTP
- 00:00:00.100198 tun0  In  IP 192.0.2.1.51231 > 192.168.56.132.8080:
-Flags [.], ack 1, win 0, length 0
- 00:00:04.955980 tun0  Out IP 192.168.56.132.8080 > 192.0.2.1.51231:
-Flags [.], seq 1:1001, ack 1, win 4, length 1000: HTTP
- 00:00:00.100197 tun0  In  IP 192.0.2.1.51231 > 192.168.56.132.8080:
-Flags [.], ack 1, win 0, length 0
- 00:00:09.627985 tun0  Out IP 192.168.56.132.8080 > 192.0.2.1.51231:
-Flags [.], seq 1:1001, ack 1, win 4, length 1000: HTTP
- 00:00:00.100179 tun0  In  IP 192.0.2.1.51231 > 192.168.56.132.8080:
-Flags [.], ack 1, win 0, length 0
- 00:00:19.355725 tun0  Out IP 192.168.56.132.8080 > 192.0.2.1.51231:
-Flags [.], seq 1:1001, ack 1, win 4, length 1000: HTTP
- 00:00:00.100203 tun0  In  IP 192.0.2.1.51231 > 192.168.56.132.8080:
-Flags [.], ack 1, win 0, length 0
- 00:00:42.395633 tun0  Out IP 192.168.56.132.8080 > 192.0.2.1.51231:
-Flags [.], seq 1:1001, ack 1, win 4, length 1000: HTTP
- 00:00:00.100202 tun0  In  IP 192.0.2.1.51231 > 192.168.56.132.8080:
-Flags [.], ack 1, win 0, length 0
- 00:01:17.724059 tun0  Out IP 192.168.56.132.8080 > 192.0.2.1.51231:
-Flags [.], seq 1:1001, ack 1, win 4, length 1000: HTTP
- 00:00:00.100201 tun0  In  IP 192.0.2.1.51231 > 192.168.56.132.8080:
-Flags [.], ack 1, win 0, length 0
- 00:02:02.779516 tun0  Out IP 192.168.56.132.8080 > 192.0.2.1.51231:
-Flags [.], seq 1:1001, ack 1, win 4, length 1000: HTTP
- 00:00:00.100229 tun0  In  IP 192.0.2.1.51231 > 192.168.56.132.8080:
-Flags [.], ack 1, win 0, length 0
- 00:02:02.779828 tun0  Out IP 192.168.56.132.8080 > 192.0.2.1.51231:
-Flags [.], seq 1:1001, ack 1, win 4, length 1000: HTTP
- 00:00:00.100230 ?     In  IP 192.0.2.1.51231 > 192.168.56.132.8080:
-Flags [.], ack 1001, win 1000, length 0
- 00:00:00.000034 ?     Out IP 192.168.56.132.8080 > 192.0.2.1.51231:
-Flags [.], seq 11001:12001, ack 1, win 4, length 1000: HTTP
- 00:00:00.000005 ?     Out IP 192.168.56.132.8080 > 192.0.2.1.51231:
-Flags [.], seq 12001:13001, ack 1, win 4, length 1000: HTTP
-
-rwin-rto-zero-window.pkt:62: error handling packet: live packet field
-tcp_psh: expected: 1 (0x1) vs actual: 0 (0x0)
-script packet: 405.390244 P. 1001:3001(2000) ack 1
-actual packet: 405.390237 . 11001:13001(2000) ack 1 win 4
 
