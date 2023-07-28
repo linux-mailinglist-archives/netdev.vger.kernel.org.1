@@ -1,227 +1,180 @@
-Return-Path: <netdev+bounces-22238-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22239-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C6D6766A5B
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 12:25:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43EBF766A76
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 12:28:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2708528268E
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 10:25:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 272AE1C21827
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 10:28:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63F00125A1;
-	Fri, 28 Jul 2023 10:25:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BB1C125A9;
+	Fri, 28 Jul 2023 10:28:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57F8E1118B
-	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 10:25:49 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 000E64217
-	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 03:25:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1690539895;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HAWba4cN1kABxS+VBrOWpAMxCky09h9P/cCqvU2dr+c=;
-	b=Zs1P+nUMUw0ynmJ7okrfI5x2fuQiZX3MqLSPyPoP13eR1DodXgrs9gspj+LN7h5tThCZyS
-	OrnmUYfkYnmhk4FVTyKGyty9wwnWPuvSG26cNbcrJAHKdmzEk2THzDcylDZ/deQKaOHj4E
-	uPcR8kgkel0I+XEAPVA9sKvzPygIW1g=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-625-ltB0QWPTOH-Ff8dJu4BUdQ-1; Fri, 28 Jul 2023 06:24:54 -0400
-X-MC-Unique: ltB0QWPTOH-Ff8dJu4BUdQ-1
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-3fbfc766a78so10450945e9.3
-        for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 03:24:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690539893; x=1691144693;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HAWba4cN1kABxS+VBrOWpAMxCky09h9P/cCqvU2dr+c=;
-        b=F81L9kx52HvLnRDvbSqPGtW3M9210LMzHt8zVFDIZJZaSktpUpe7klS/6N6mgRyT8H
-         ugDwuP2qEefrGJA8JEZYRIGNK6Ow2IZw9ZVNkGcBnlQy8eM5tttiJHYzoI2zGKQG0tbw
-         ZxXl+nJP38w7cluefQ3obB/5IpSlU96gmexaitY1Kq5Uog6FqBJwQI2FN3JAO6mnuZGQ
-         6qHkU2ui0K21o3B59R3EzpGNTFK55T8v0pCvr71dXl1kFz+7g+aYwYnFB5DM+hUqxLKe
-         hePyYzOyJqTuTRcjYI3Gy7wFCitjaBkJBUrXR6Xjd6syCk12FY8DN3VgyIyr656ZLHiU
-         HRiQ==
-X-Gm-Message-State: ABy/qLYf9NBdn2HmgGudTDCCxfr8b87l52UDdHiVgRj2tfZs4hNyvlyr
-	DAJSsaFmvcA34SBoU8ZQxaLIQIiUZOMWpzcwhK8ZBV7JDEaettZu4dwHJqjN2PPC3gOCZo9cumP
-	nCAg4/giSGt2AQGhVavmRmdeFBEs=
-X-Received: by 2002:a1c:4c0e:0:b0:3fd:d763:448e with SMTP id z14-20020a1c4c0e000000b003fdd763448emr1315749wmf.21.1690539893142;
-        Fri, 28 Jul 2023 03:24:53 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlGzDmNzUaiLW6U5M1A2xnVUfk2+FW60ndIuKr8Hdh8tw28y5uhD5NXvLIKqQqUkOBpVWe68Ew==
-X-Received: by 2002:a1c:4c0e:0:b0:3fd:d763:448e with SMTP id z14-20020a1c4c0e000000b003fdd763448emr1315733wmf.21.1690539892708;
-        Fri, 28 Jul 2023 03:24:52 -0700 (PDT)
-Received: from [192.168.0.12] ([78.19.108.164])
-        by smtp.gmail.com with ESMTPSA id m22-20020a7bcb96000000b003f91e32b1ebsm6745542wmi.17.2023.07.28.03.24.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 28 Jul 2023 03:24:52 -0700 (PDT)
-Message-ID: <908e8567-05c8-fb94-5910-ecbee16eb842@redhat.com>
-Date: Fri, 28 Jul 2023 11:24:51 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6858910953
+	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 10:28:28 +0000 (UTC)
+Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2122.outbound.protection.outlook.com [40.107.101.122])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D304C4EEF;
+	Fri, 28 Jul 2023 03:28:13 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=SCi4s0UoiyZ8Hs693ndGErNsaBb9Cd16/q4cy3O9lT8Afg9+mCHTVd/GqLaWz/ySA5TnttX9kmKN6xMx/8F8z/wdXghlLeDN68uGs9NOefHCVJaX1y0/o0fodcTuI6+8scxnqMHzOFOQWKvvw/6E4HCyp3JC+4q9QyP8/5Q7aAAUFGSsCITKDalyzzDOEF5CtEzay6GOTSCd38m1qcaVmuK7cUeevX0DFn0yjDt0MpPUSvVsW3GdobvfiD3KkjkZh0x3AX0KxBGs3yWwIRDuGfb/LRua2BuxcbcCv0Sf6HpY6qvf3lIDTAFiKX42AsHnWrWMbCJfh1GEbWi1ZrBa8g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=/YMvU05XtULFryHDSWWRF/hnvXeK63u4sz9JN9Ug2hs=;
+ b=FNYaW7o90MFMWtxyTxP8xl3datNmdzrUinnJRXiBK3g2FlycEkLk6mRbTZzlTjek+kjPF8KArnSY+Ry9O1dEEsGp1czJCKVdO/EOgTEjolraoJ0k8mGzZ973d0aEkVZGPXH5QIQgalO3T54jyrNFLgOF4H5WbUeugHTKy8V+xZf0Ixa1DIu4hGyggPKbs6iyDpuI/eVirpDDpEGuK8U3Y2rN1+1uydSw2eNvScVziq1uC7ZHBNX+EX7e84d1pflPibAn1T5PTKsbjSIw5PRYukg0fag80gQptaALrfLoVOWmQ8YBqaXcl8gFJB0FJlX97JsFjP+N7+lh8Nyn3Mzdyg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
+ dkim=pass header.d=corigine.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=/YMvU05XtULFryHDSWWRF/hnvXeK63u4sz9JN9Ug2hs=;
+ b=qKiQtI+znZKmrPkfhP14XqWJ4MdWSDkiBxxWd/IQzB1BnEOzUDWXF0+wSsj6Is6zWsMM8znzHpuBblHDRd/7jVBpuKAj7GsNEaXxGhuzrYWyZKA8w2bAz5CcdJ7f9GfOA24T6ylPBWHP4aqVY8L+MAqaw2IK8IAFJNYiLGAtsMg=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=corigine.com;
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
+ by SA1PR13MB6099.namprd13.prod.outlook.com (2603:10b6:806:33f::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.29; Fri, 28 Jul
+ 2023 10:27:39 +0000
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::fde7:9821:f2d9:101d]) by PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::fde7:9821:f2d9:101d%7]) with mapi id 15.20.6631.026; Fri, 28 Jul 2023
+ 10:27:39 +0000
+Date: Fri, 28 Jul 2023 12:27:32 +0200
+From: Simon Horman <simon.horman@corigine.com>
+To: Yue Haibing <yuehaibing@huawei.com>
+Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, yoshfuji@linux-ipv6.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] ip6mr: Fix skb_under_panic in ip6mr_cache_report()
+Message-ID: <ZMOYFLiNrXAZ6MQC@corigine.com>
+References: <20230728100035.32092-1-yuehaibing@huawei.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230728100035.32092-1-yuehaibing@huawei.com>
+X-ClientProxiedBy: AM0PR04CA0081.eurprd04.prod.outlook.com
+ (2603:10a6:208:be::22) To PH0PR13MB4842.namprd13.prod.outlook.com
+ (2603:10b6:510:78::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.13.0
-Subject: Re: [PATCH net-next v2 0/2] tools/net/ynl: enable json configuration
-Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com
-References: <20230727120353.3020678-1-mtahhan@redhat.com>
- <20230727173753.6e044c13@kernel.org>
-From: Maryam Tahhan <mtahhan@redhat.com>
-In-Reply-To: <20230727173753.6e044c13@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|SA1PR13MB6099:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7a0de8ef-f156-4bf3-f65a-08db8f55445a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	72WEwC8z33jWOhUJT5XCVwwjnmRE+qkfZsRiTiB3mYeSkFpSg9yrJz495pgxyZXEjUT0TPW6+BqwCGReGfHlorcnKtI/1U7r26Q3oyc0PwBlkhxTKsOn8ZmYtoXITHpZxHPgNdYtOhu94PrS8Eo9VDi6zYhZwepJiNeHHG7W4rTKpWrAygcQvVPtSh7EypvAkSq7n8ACnDccsYYYtgBWOzM23x6XexG/+QGSsM/NbCf2paHtdjCdDJV/T+s2JSxU7tzGyWm33LgZx5JnNrgDiFjGY7ODZazy5TL2KOVhyX47ifEPiWL2bE8zBBqUgiH6FE6NVLGsExoN52NruMNCkxf5u1e3BA88W2s2xtghQIpG5S0DjgKkK1vA/lLCKo3ga8yuDuuAtnluiipI0y3gjEIbwyKnTijWHAdP4PplU1MU0tv9mKyb1MnIweqPvsRug2w7UqITRJHkpcz2LtxM7fC/7Bh2AKLhhCw55JACc7zmMDZiOVCE4ejyFI/TNn8TsvW7FLpkOszD5Ip60nMVCbgFrb3j1yrQ2f+MLpWnIRJoeqzxEMGBhn15HrsCl98XlJmCXiKvkBEH91MVuQasV23s2Yeg28j7OrOykaBtGmuwSJwBpmMvk7ykxUXNqkSEBu2lHrqM1joSluN6s8D03rxZEYn3+pGXD9EfC49iZcY=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(366004)(39840400004)(396003)(376002)(346002)(136003)(451199021)(6666004)(6486002)(6916009)(478600001)(6512007)(6506007)(5660300002)(4326008)(66556008)(66946007)(66476007)(2616005)(186003)(38100700002)(8936002)(8676002)(86362001)(41300700001)(2906002)(44832011)(316002)(36756003)(32563001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?s1Gv4X4/L5NsHe419FoWPh/Fisyc27geyV0qN2lbQyOno6ReqwuFXnFVlnuV?=
+ =?us-ascii?Q?oL1lHG5YwjPAw/sniwpCT8Mu8scyM7gmSs3Mwi4e0hvfLFuI5/Ge5hmJ8f6a?=
+ =?us-ascii?Q?nneU7ENZmj5v3l+MMs5nRbcRfxItCF1sTqerSr4XH3zSUFcQMXVAXGLCtvUz?=
+ =?us-ascii?Q?7pQC6etyAuJWbKmACak0IsVm5BAZH5zv/u+zPZVOcL0HuyVJNNNgQ7LamJfe?=
+ =?us-ascii?Q?pf+sCviV3qLWdQfni//XmS7P3YhZbWvg5nU90Er5fD5X9E6QRG1zeCFrsSXV?=
+ =?us-ascii?Q?BV5sAJK3WAXirkR0RD3yQpCMpiEeMIKdKrQt0VqqzB7EeLeNJuLR2AL3paYK?=
+ =?us-ascii?Q?AaFjVEsUXVq2FNm56ZM+IiZykTsBNAuoxDiELSrTmJgHjpgyZQgl98HzmoNc?=
+ =?us-ascii?Q?+tRwOi6ZsV5dXMAzqa+4j1KDAxkwpAW7FqVT9SnABJF271zE4KKsFpOD/Wx7?=
+ =?us-ascii?Q?XIFNHpHdpdrYkL1jcQP2fYJ3Fv4m1nr+LuqdE0ITDsTw1YcHfofT+FDVMWsi?=
+ =?us-ascii?Q?1Xrrul4dMW9Inx7w4uEv90dO/k6T6sRoSg00bMFxlAZcEYgpTA8CS9i6lQ7f?=
+ =?us-ascii?Q?ZIluhG+7QC9sg9OdWyOeLoKK9/B0wW/jCqITDnPMUgg80qe4e/iA9tQl/gCX?=
+ =?us-ascii?Q?J/9oGL4yMtuMN9+J8hvXIz8U1Qbo1MweVJZYHeWHYP3vMCKLcXJeJD0M0R9t?=
+ =?us-ascii?Q?oL1DxFEJUM579ikfWuEJqk+BXPeHbA+ivRtaj3NT9D2KvBngUJoSutUeY4IC?=
+ =?us-ascii?Q?t/OUbUKuE3c4Mtgq61m1rsoZXLsuhnwYdYaUttRZJf3uEQl1IvJ8mbSROwNn?=
+ =?us-ascii?Q?wD0LESwtBF5BsNcAzxmNbNj3g8IjMJVBtSRZnE3hF+p4Y/be37JOoKUNTlUu?=
+ =?us-ascii?Q?Og+cUrEokxApN5vWIRQWCydgr9/w0yYafkUZE8u5uJsT/+8yR6p/4qMpVnGB?=
+ =?us-ascii?Q?hiLnEdRFalP5kz92sVOZxUR99o6ro1PlApdRFlnu5aLXG9DSUjfzmZmcr8nd?=
+ =?us-ascii?Q?BZRzxeoXKDTP6JTLeqsUsmikAoCEWcxR0is+u1C7fm6l/IEkeUAiTzjt09mq?=
+ =?us-ascii?Q?gtmdFbfEOXysf/vqUl6UEU+nmqUJYgmvKJpAPi5JrPPfqiu+DgnLO2QawOUG?=
+ =?us-ascii?Q?6qSJvm4+T7zsRoks8pipMakuNkJ+Ed2mc/hobQYJHCGm+4uMbf/bkrxP+qhO?=
+ =?us-ascii?Q?DxVk6xAcoygX67bF3eqDNPlnvRunwMoVxhndZV/VoV/7d72g8sWwq7nxtXgH?=
+ =?us-ascii?Q?i7zSTRMg/KiM/ltiS9SJ1nNv70DlO4Fr6/uXV7CM5O13i2SrGm38W4wgNhIZ?=
+ =?us-ascii?Q?Sk/Vlm4dEkDvgNlc3x11JQVVefI6zzkI2ghAkG9ooWrC/VMhttCdksjjc+rC?=
+ =?us-ascii?Q?z326mEvovGj/cZ+lINvU9xa9rfKOgraKmlLwNdit5JyFWSQYHgD0cK1ldfng?=
+ =?us-ascii?Q?E7LCf64lZkuh+o/1U6vE/SrX9oDi0IrykEqoT/MY0y2LbDptTeQYZOPkKrwC?=
+ =?us-ascii?Q?hkowX5pzfuaGdpunLrVd1MjQ+vbv7VKZw7jdOAjWn7g/Iv8NHYG3T/GUgG9+?=
+ =?us-ascii?Q?oZaL/4YlgBPWuI5QoZdAn785PMwKH5r/rOLMQep6EsGZ/NNH8qbKvtRoplrM?=
+ =?us-ascii?Q?WLeXB3uiRSQWo3v9TuaOTeExScN/jG+AgPpbxSusz6tC3V2Nfz6LCu4p0VLW?=
+ =?us-ascii?Q?4GXL8A=3D=3D?=
+X-OriginatorOrg: corigine.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7a0de8ef-f156-4bf3-f65a-08db8f55445a
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Jul 2023 10:27:39.3933
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: O/zk41ZGJxPXhstYb81Ji+9nYGdPjAAVBTL8s2IWhIm27RcXRkHkj+yYj/5/5uDnYwEBPumQEnNTs0wMCVwe49Q/Lplrwznm6BLXUfh7KoY=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR13MB6099
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 28/07/2023 01:37, Jakub Kicinski wrote:
-> On Thu, 27 Jul 2023 08:03:29 -0400 Maryam Tahhan wrote:
->> Use a json configuration file to pass parameters to ynl to allow
->> for operations on multiple specs in one go. Additionally, check
->> this new configuration against a schema to validate it in the cli
->> module before parsing it and passing info to the ynl module.
-> Interesting. Is this related to Donald's comments about subscribing
-> to notifications from multiple families?
->
-> Can you share some info about your use case?
+On Fri, Jul 28, 2023 at 06:00:35PM +0800, Yue Haibing wrote:
+>  skbuff: skb_under_panic: text:ffffffff88771f69 len:56 put:-4
+>  head:ffff88805f86a800 data:ffff887f5f86a850 tail:0x88 end:0x2c0 dev:pim6reg
+>  ------------[ cut here ]------------
+>  kernel BUG at net/core/skbuff.c:192!
+>  invalid opcode: 0000 [#1] PREEMPT SMP KASAN
+>  CPU: 2 PID: 22968 Comm: kworker/2:11 Not tainted 6.5.0-rc3-00044-g0a8db05b571a #236
+>  Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
+>  Workqueue: ipv6_addrconf addrconf_dad_work
+>  RIP: 0010:skb_panic+0x152/0x1d0
+>  Call Trace:
+>   <TASK>
+>   skb_push+0xc4/0xe0
+>   ip6mr_cache_report+0xd69/0x19b0
+>   reg_vif_xmit+0x406/0x690
+>   dev_hard_start_xmit+0x17e/0x6e0
+>   __dev_queue_xmit+0x2d6a/0x3d20
+>   vlan_dev_hard_start_xmit+0x3ab/0x5c0
+>   dev_hard_start_xmit+0x17e/0x6e0
+>   __dev_queue_xmit+0x2d6a/0x3d20
+>   neigh_connected_output+0x3ed/0x570
+>   ip6_finish_output2+0x5b5/0x1950
+>   ip6_finish_output+0x693/0x11c0
+>   ip6_output+0x24b/0x880
+>   NF_HOOK.constprop.0+0xfd/0x530
+>   ndisc_send_skb+0x9db/0x1400
+>   ndisc_send_rs+0x12a/0x6c0
+>   addrconf_dad_completed+0x3c9/0xea0
+>   addrconf_dad_work+0x849/0x1420
+>   process_one_work+0xa22/0x16e0
+>   worker_thread+0x679/0x10c0
+>   ret_from_fork+0x28/0x60
+>   ret_from_fork_asm+0x11/0x20
+> 
+> When setup a vlan device on dev pim6reg, DAD ns packet may sent on reg_vif_xmit().
+> reg_vif_xmit()
+>     ip6mr_cache_report()
+>         skb_push(skb, -skb_network_offset(pkt));//skb_network_offset(pkt) is 4
+> And skb_push declar as this:
 
+nit: declar as this -> declared as
 
-Yes it's related. We are working towards using YNL as a netlink agent or 
-part of a netlink agent that's driven by YAML specs. We are
+> 	void *skb_push(struct sk_buff *skb, unsigned int len);
+> 		skb->data -= len;
+> 		//0xffff888f5f86a84c - 0xfffffffc = 0xffff887f5f86a850
+> skb->data is set to 0xffff887f5f86a850, which is invalid mem addr, lead to skb_push() fails.
+> 
+> Fixes: 14fb64e1f449 ("[IPV6] MROUTE: Support PIM-SM (SSM).")
+> Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
 
-trying to enable existing Kubernetes CNIs to integrate with DPUs via an 
-OPI [1] API without having to change these existing CNIs. In several
-
-cases these CNIs program the Kernel as both the control plane and the 
-fallback dataplane (for packets the DPU accelerator doesn't know what
-
-to do with). And so being able to monitor netlink state and reflect it 
-to the DPU accelerator (and vice versa) via an OPI API would be 
-extremely useful.
-
-
-We think the YAML part gives us a solid model that showcases the breadth 
-of what these CNIs program (via netlink) as well as a base for the grpc 
-protobufs that
-
-the OPI API would like to define/use.
-
-
->> Example configs would be:
->>
->> {
->>      "yaml-specs-path": "/<path-to>/linux/Documentation/netlink/specs",
->>      "spec-args": {
->>          "ethtool.yaml": {
->>              "do": "rings-get",
->>              "json-params": {
->>                  "header": {
->>                      "dev-name": "eno1"
->>                  }
->>              }
->>          },
->>         "netdev.yaml": {
->>              "do": "dev-get",
->>              "json-params": {
->>              "ifindex": 3
->>              }
->>          }
->>      }
->> }
-> Why is the JSON preferable to writing a script to the same effect?
-> It'd actually be shorter and more flexible.
-> Maybe we should focus on packaging YNL as a python lib?
-
-I guess you can write a script. The reasons I picked JSON were mainly:
-
--  Simplicity and Readability for both developers and non-developers/users.
-
-- With the JSON Schema Validation I could very quickly validate the 
-incoming configuration without too much logic in cli.py.
-
-- I thought of it as a stepping stone towards an agent configuration 
-file if YNL evolves to provide or be part of a netlink agent (driven by 
-yaml specs)...
-
-
->
->> OR
->>
->> {
->>      "yaml-specs-path": "/<path-to>/linux/Documentation/netlink/specs",
->>      "spec-args": {
->>          "ethtool.yaml": {
->>              "subscribe": "monitor",
->>              "sleep": 10
->>          },
->>          "netdev.yaml": {
->>              "subscribe": "mgmt",
->>              "sleep": 5
->>          }
->>      }
->> }
-> Could you also share the outputs the examples would produce?
->
-Right now the output is simple, an example would be for the first config 
-in the email:
-
-[ linux]# ./tools/net/ynl/cli.py --config ./tools/net/ynl/multi-do.json
-###############  ethtool.yaml  ###############
-
-{'header': {'dev-index': 3, 'dev-name': 'eno1'},
-  'rx': 512,
-  'rx-max': 8192,
-  'rx-push': 0,
-  'tx': 512,
-  'tx-max': 8192,
-  'tx-push': 0}
-###############  netdev.yaml  ###############
-
-{'ifindex': 3, 'xdp-features': {'xsk-zerocopy', 'redirect', 'basic'}}
-
-
-Or for the second config in the email (note: I just toggled the tx ring 
-descriptors on one of my NICs to trigger an ethtool notification):
-
-[root@nfvsdn-06 linux]# ./tools/net/ynl/cli.py --config 
-./tools/net/ynl/multi-ntf.json
-###############  ethtool.yaml  ###############
-
-[{'msg': {'header': {'dev-index': 3, 'dev-name': 'eno1'},
-           'rx': 512,
-           'rx-max': 8192,
-           'rx-push': 0,
-           'tx': 8192,
-           'tx-max': 8192,
-           'tx-push': 0},
-   'name': 'rings-ntf'}]
-###############  netdev.yaml  ###############
-
-[]
-
-At the moment (even with these changes) YNL subscribes-sleeps-checks for 
-notification for each family sequentially...
-I will be looking into enabling an agent like behaviour: subscribe to 
-notifications from multiple families and monitor (babysteps)....
-
-[1] https://opiproject.org/
-
-
+...
 
