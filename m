@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-22306-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22307-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D601767015
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 17:04:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35889767017
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 17:04:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 52FA2282752
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 15:04:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 65E6D1C203A2
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 15:04:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B88413FF5;
-	Fri, 28 Jul 2023 15:03:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CEDF1400F;
+	Fri, 28 Jul 2023 15:03:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F40EB13FEA
-	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 15:03:25 +0000 (UTC)
-Received: from mail-qt1-x849.google.com (mail-qt1-x849.google.com [IPv6:2607:f8b0:4864:20::849])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8A4B35A3
-	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 08:03:23 -0700 (PDT)
-Received: by mail-qt1-x849.google.com with SMTP id d75a77b69052e-403b134421cso16466401cf.0
-        for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 08:03:23 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3096913FEA
+	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 15:03:27 +0000 (UTC)
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD28A2115
+	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 08:03:25 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d11f35a0d5cso2100820276.1
+        for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 08:03:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690556603; x=1691161403;
+        d=google.com; s=20221208; t=1690556605; x=1691161405;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=u2/wDYaAN7h4XxxdM91DxAc5rbFseeRnOQQ3yh/2xlk=;
-        b=N2vp1LTWm5tKVfMplTAF2PKKxyTNrMjsUIY/lsK4NA7fBFTWoPiPYwCrI8itNfokwJ
-         5sSmBswq3yL676izf9SJa7m5SWRH2fGqieLqsGU6pOsmwqbSq9QI80Veog1y54h2i9xc
-         ntRJjlYqsaELO4AIT9OMgo21vVF4Gz0bDmodn3SkZdj6RnKSAkU85GUfVzBCX0KcVYqA
-         FrgFOYO9+Af4/7ErDlpovNmgWV8iX9SS8yEUq3YHbpW06Fn8uW7n7MtoymAUaxO/7y79
-         NPO7g+D1KbKaE9/VyNcj4/hiR6Xl3XN2UhSpcESoIPtbg7k9rAyOK4aTigwnREyOb9Pl
-         F+sg==
+        bh=WivKmFwTBCkD8KcanOuFIGWwOZjwU2z/l122KTLcH2o=;
+        b=rYh+sVsf53IQuR5wR0FEY9SDONZVb8H2JVAO+pR3w0RK/In6dQAccd6FWfSMld3w4T
+         JxiGUhyyjhlTnbESJY+19mkk+/JppLsI+VARu7h+lee5UIMW+yn7WySV3IfbY3t/nQ9o
+         eshd5FMixucBgrs4fwa8Th5V/783vcqp8A/+Erf/Ia9T/7gulNqWpVC6FH5y2uwT2Y1y
+         nSwENGUcE9hmifTERzUYzVJ4cBaCbrnFkQcGpBKX6GTGSmde1HEQLlB/RoEbtJtR7Wj6
+         c7eawGtFgo2MxaW8iNNPov2izo30lBm08b+50hjw073F/Q7RAC5gf2icbwwVPmPthPwC
+         tlQg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690556603; x=1691161403;
+        d=1e100.net; s=20221208; t=1690556605; x=1691161405;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=u2/wDYaAN7h4XxxdM91DxAc5rbFseeRnOQQ3yh/2xlk=;
-        b=lTY0MACQYj180KADHyohzYP5r3HNVghmyC/EkcDWmbAddHZz5OymG7bljNq6z5tKtY
-         gLvve4HbtH6EAtCbHLP7ZkOhChXtbn10RdkRqje/mtmYTBjxDFV4DHD73VxSR50RWhdH
-         q2sAhqiMmdlk2LL5BIgQNUoKThLbhuQ7UUF/tJGnLsLSBxAu1JCj+jyVWRLLB2wtWEee
-         xPITrmBWGLUlltYVMdR12aLbcUf/TVASEYIRq7RfrKrHPaeKCPXAAbamqijJ5XCfqyyy
-         sleWy6sWUg0wCMjcXvCisaEcBuOiROqqPEotycWSiU/o9+PZaPYV8BQ2Tm8vPV8WNA9f
-         q8Jg==
-X-Gm-Message-State: ABy/qLZH6BU4GzLjswhNqBWy9ZDbJCzV5LDaIkSniVLprCUGYY18jz8v
-	0NNP19ZPTgv/kmb+ICw2PMpvdx4k5+GbPA==
-X-Google-Smtp-Source: APBJJlGUNKSS2jJY12LOXU8/i1zvpGr4lxLYz+6+3VC+XTplsALaCIsqRyGPiVJxVTNSAr+kE9qFBP2MOxenpg==
+        bh=WivKmFwTBCkD8KcanOuFIGWwOZjwU2z/l122KTLcH2o=;
+        b=fLdZbk8tjgEKo7oC+Wlt3PS/t5KZEchISZSB6u2RIR9nrdo+XzMtk7P6qD5YbOGGV7
+         fawZcOyn0QFeVNq/OcQqqoglB+EhleSqSc9K/VVikHtanJsF6Syyf8I3u3OBwyrFgGcF
+         1awMpax9+z90LW+2nxUpCof9xhHUrbZcP3T3RX2zp/hYbg2taV19lhfVti1oHcw/vWWK
+         cC0vsRCsKS2Yy31SHOh6DcfNOhEgv+xvnyOe9VLvcPjp+8dAeJcItyJzwRwyf2wwyh28
+         5j/ehhxWO4nwxavV/wdtUsJ5rjrIszFdEgCJs75DTgPMGS6qT1eSPgkn9gekLnSKJbzm
+         67fQ==
+X-Gm-Message-State: ABy/qLbr2NtUezjWtFwtBmdeOn+pRLAQ+4mkYSojYXeYRPJ97JS3xzaa
+	mx7dHAzEp7GXNAvxtZZhypxqVuIyzMM0cQ==
+X-Google-Smtp-Source: APBJJlEJiHvByn/CXi1GQhfb6+OwpMtA45sJzp4MqUK7n1x/afUZv2yhnEwEtq7TRqqjza20G/4JaP0SDX9Z/g==
 X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:622a:1a85:b0:3ff:2517:172 with SMTP
- id s5-20020a05622a1a8500b003ff25170172mr15735qtc.0.1690556603121; Fri, 28 Jul
- 2023 08:03:23 -0700 (PDT)
-Date: Fri, 28 Jul 2023 15:03:08 +0000
+ (user=edumazet job=sendgmr) by 2002:a05:6902:1705:b0:cab:9746:ef0e with SMTP
+ id by5-20020a056902170500b00cab9746ef0emr9361ybb.12.1690556605011; Fri, 28
+ Jul 2023 08:03:25 -0700 (PDT)
+Date: Fri, 28 Jul 2023 15:03:09 +0000
 In-Reply-To: <20230728150318.2055273-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -62,14 +62,14 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20230728150318.2055273-1-edumazet@google.com>
 X-Mailer: git-send-email 2.41.0.585.gd2178a4bd4-goog
-Message-ID: <20230728150318.2055273-2-edumazet@google.com>
-Subject: [PATCH net 01/11] net: annotate data-races around sk->sk_reserved_mem
+Message-ID: <20230728150318.2055273-3-edumazet@google.com>
+Subject: [PATCH net 02/11] net: annotate data-race around sk->sk_txrehash
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
 Cc: Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
 	Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, Wei Wang <weiwan@google.com>
+	Eric Dumazet <edumazet@google.com>, Akhmat Karakotov <hmukos@yandex-team.ru>
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
@@ -78,50 +78,44 @@ X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-sk_getsockopt() runs locklessly. This means sk->sk_reserved_mem
+sk_getsockopt() runs locklessly. This means sk->sk_txrehash
 can be read while other threads are changing its value.
 
-Add missing annotations where they are needed.
+Other locations were handled in commit cb6cd2cec799
+("tcp: Change SYN ACK retransmit behaviour to account for rehash")
 
-Fixes: 2bb2f5fb21b0 ("net: add new socket option SO_RESERVE_MEM")
+Fixes: 26859240e4ee ("txhash: Add socket option to control TX hash rethink behavior")
 Signed-off-by: Eric Dumazet <edumazet@google.com>
-Cc: Wei Wang <weiwan@google.com>
+Cc: Akhmat Karakotov <hmukos@yandex-team.ru>
 ---
- net/core/sock.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+ net/core/sock.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
 diff --git a/net/core/sock.c b/net/core/sock.c
-index 9370fd50aa2c9d84b86651433c0df338a1518547..bd201d15e72aad4ea0b11941eaaa992de706634a 100644
+index bd201d15e72aad4ea0b11941eaaa992de706634a..adec93dda56af7314f4a63c77f3848441f0d41ae 100644
 --- a/net/core/sock.c
 +++ b/net/core/sock.c
-@@ -1007,7 +1007,7 @@ static void sock_release_reserved_memory(struct sock *sk, int bytes)
- 	bytes = round_down(bytes, PAGE_SIZE);
- 
- 	WARN_ON(bytes > sk->sk_reserved_mem);
--	sk->sk_reserved_mem -= bytes;
-+	WRITE_ONCE(sk->sk_reserved_mem, sk->sk_reserved_mem - bytes);
- 	sk_mem_reclaim(sk);
- }
- 
-@@ -1044,7 +1044,8 @@ static int sock_reserve_memory(struct sock *sk, int bytes)
- 	}
- 	sk->sk_forward_alloc += pages << PAGE_SHIFT;
- 
--	sk->sk_reserved_mem += pages << PAGE_SHIFT;
-+	WRITE_ONCE(sk->sk_reserved_mem,
-+		   sk->sk_reserved_mem + (pages << PAGE_SHIFT));
- 
- 	return 0;
- }
-@@ -1973,7 +1974,7 @@ int sk_getsockopt(struct sock *sk, int level, int optname,
+@@ -1534,7 +1534,9 @@ int sk_setsockopt(struct sock *sk, int level, int optname,
+ 		}
+ 		if ((u8)val == SOCK_TXREHASH_DEFAULT)
+ 			val = READ_ONCE(sock_net(sk)->core.sysctl_txrehash);
+-		/* Paired with READ_ONCE() in tcp_rtx_synack() */
++		/* Paired with READ_ONCE() in tcp_rtx_synack()
++		 * and sk_getsockopt().
++		 */
+ 		WRITE_ONCE(sk->sk_txrehash, (u8)val);
  		break;
  
- 	case SO_RESERVE_MEM:
--		v.val = sk->sk_reserved_mem;
-+		v.val = READ_ONCE(sk->sk_reserved_mem);
+@@ -1978,7 +1980,8 @@ int sk_getsockopt(struct sock *sk, int level, int optname,
  		break;
  
  	case SO_TXREHASH:
+-		v.val = sk->sk_txrehash;
++		/* Paired with WRITE_ONCE() in sk_setsockopt() */
++		v.val = READ_ONCE(sk->sk_txrehash);
+ 		break;
+ 
+ 	default:
 -- 
 2.41.0.585.gd2178a4bd4-goog
 
