@@ -1,99 +1,135 @@
-Return-Path: <netdev+bounces-22223-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22224-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 167287669A3
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 12:00:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE2A37669A8
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 12:02:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4C4E61C2180D
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 10:00:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 57842281DF7
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 10:02:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0398C11185;
-	Fri, 28 Jul 2023 10:00:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64C831118B;
+	Fri, 28 Jul 2023 10:01:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9A9F10977
-	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 10:00:54 +0000 (UTC)
-Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC8943AAA
-	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 03:00:41 -0700 (PDT)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1qPKGr-0011Mj-R4; Fri, 28 Jul 2023 18:00:30 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 28 Jul 2023 18:00:29 +0800
-Date: Fri, 28 Jul 2023 18:00:29 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Alexander H Duyck <alexander.duyck@gmail.com>
-Cc: Yuanjun Gong <ruc_gongyuanjun@163.com>, dsahern@kernel.org,
-	netdev@vger.kernel.org, steffen.klassert@secunet.com
-Subject: Re: [PATCH v2 1/1] net: ipv4: fix return value check in
- esp_remove_trailer()
-Message-ID: <ZMORvfKiMwxn6DlD@gondor.apana.org.au>
-References: <f6831ace-df6c-f0bd-188e-a2b23a75c1a8@kernel.org>
- <20230725064031.4472-1-ruc_gongyuanjun@163.com>
- <50201d64ba71669422c9bc2900179887d11a974e.camel@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A15610977
+	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 10:01:59 +0000 (UTC)
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3BA446A2;
+	Fri, 28 Jul 2023 03:01:55 -0700 (PDT)
+Received: from canpemm500007.china.huawei.com (unknown [172.30.72.53])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RC3683prdzVjn4;
+	Fri, 28 Jul 2023 18:00:16 +0800 (CST)
+Received: from localhost (10.174.179.215) by canpemm500007.china.huawei.com
+ (7.192.104.62) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Fri, 28 Jul
+ 2023 18:01:53 +0800
+From: Yue Haibing <yuehaibing@huawei.com>
+To: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <yoshfuji@linux-ipv6.org>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Yue Haibing
+	<yuehaibing@huawei.com>
+Subject: [PATCH] ip6mr: Fix skb_under_panic in ip6mr_cache_report()
+Date: Fri, 28 Jul 2023 18:00:35 +0800
+Message-ID: <20230728100035.32092-1-yuehaibing@huawei.com>
+X-Mailer: git-send-email 2.10.2.windows.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <50201d64ba71669422c9bc2900179887d11a974e.camel@gmail.com>
-X-Spam-Status: No, score=2.7 required=5.0 tests=BAYES_00,HELO_DYNAMIC_IPADDR2,
-	RCVD_IN_DNSWL_BLOCKED,RDNS_DYNAMIC,SPF_HELO_NONE,SPF_PASS,TVD_RCVD_IP,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.6
-X-Spam-Level: **
+Content-Type: text/plain
+X-Originating-IP: [10.174.179.215]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ canpemm500007.china.huawei.com (7.192.104.62)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Jul 25, 2023 at 10:44:50AM -0700, Alexander H Duyck wrote:
-> On Tue, 2023-07-25 at 14:40 +0800, Yuanjun Gong wrote:
-> > return an error number if an unexpected result is returned by
-> > pskb_tirm() in esp_remove_trailer().
-> > 
-> > Signed-off-by: Yuanjun Gong <ruc_gongyuanjun@163.com>
-> > ---
-> >  net/ipv4/esp4.c | 4 +++-
-> >  1 file changed, 3 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/net/ipv4/esp4.c b/net/ipv4/esp4.c
-> > index ba06ed42e428..b435e3fe4dc6 100644
-> > --- a/net/ipv4/esp4.c
-> > +++ b/net/ipv4/esp4.c
-> > @@ -732,7 +732,9 @@ static inline int esp_remove_trailer(struct sk_buff *skb)
-> >  		skb->csum = csum_block_sub(skb->csum, csumdiff,
-> >  					   skb->len - trimlen);
-> >  	}
-> > -	pskb_trim(skb, skb->len - trimlen);
-> > +	ret = pskb_trim(skb, skb->len - trimlen);
-> > +	if (ret)
-> > +		goto out;
-> >  
-> >  	ret = nexthdr[1];
-> >  
-> 
-> In what case would you encounter this error? From what I can tell it
-> looks like there are checks in the callers, specifically the call to
-> pskb_may_pull() at the start of esp_input() that will go through and
-> automatically eliminate all the potential reasons for this to fail. So
-> I am not sure what the point is in adding exception handling for an
-> exception that is already handled.
+ skbuff: skb_under_panic: text:ffffffff88771f69 len:56 put:-4
+ head:ffff88805f86a800 data:ffff887f5f86a850 tail:0x88 end:0x2c0 dev:pim6reg
+ ------------[ cut here ]------------
+ kernel BUG at net/core/skbuff.c:192!
+ invalid opcode: 0000 [#1] PREEMPT SMP KASAN
+ CPU: 2 PID: 22968 Comm: kworker/2:11 Not tainted 6.5.0-rc3-00044-g0a8db05b571a #236
+ Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
+ Workqueue: ipv6_addrconf addrconf_dad_work
+ RIP: 0010:skb_panic+0x152/0x1d0
+ Call Trace:
+  <TASK>
+  skb_push+0xc4/0xe0
+  ip6mr_cache_report+0xd69/0x19b0
+  reg_vif_xmit+0x406/0x690
+  dev_hard_start_xmit+0x17e/0x6e0
+  __dev_queue_xmit+0x2d6a/0x3d20
+  vlan_dev_hard_start_xmit+0x3ab/0x5c0
+  dev_hard_start_xmit+0x17e/0x6e0
+  __dev_queue_xmit+0x2d6a/0x3d20
+  neigh_connected_output+0x3ed/0x570
+  ip6_finish_output2+0x5b5/0x1950
+  ip6_finish_output+0x693/0x11c0
+  ip6_output+0x24b/0x880
+  NF_HOOK.constprop.0+0xfd/0x530
+  ndisc_send_skb+0x9db/0x1400
+  ndisc_send_rs+0x12a/0x6c0
+  addrconf_dad_completed+0x3c9/0xea0
+  addrconf_dad_work+0x849/0x1420
+  process_one_work+0xa22/0x16e0
+  worker_thread+0x679/0x10c0
+  ret_from_fork+0x28/0x60
+  ret_from_fork_asm+0x11/0x20
 
-Good point.  pskb_trim should never fail at this point because
-we've already made the packet completely writeable.
+When setup a vlan device on dev pim6reg, DAD ns packet may sent on reg_vif_xmit().
+reg_vif_xmit()
+    ip6mr_cache_report()
+        skb_push(skb, -skb_network_offset(pkt));//skb_network_offset(pkt) is 4
+And skb_push declar as this:
+	void *skb_push(struct sk_buff *skb, unsigned int len);
+		skb->data -= len;
+		//0xffff888f5f86a84c - 0xfffffffc = 0xffff887f5f86a850
+skb->data is set to 0xffff887f5f86a850, which is invalid mem addr, lead to skb_push() fails.
 
-Perhaps we could add a comment?
+Fixes: 14fb64e1f449 ("[IPV6] MROUTE: Support PIM-SM (SSM).")
+Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
+---
+ net/ipv6/ip6mr.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-Thanks,
+diff --git a/net/ipv6/ip6mr.c b/net/ipv6/ip6mr.c
+index cc3d5ad17257..ee9c2ff8b0e4 100644
+--- a/net/ipv6/ip6mr.c
++++ b/net/ipv6/ip6mr.c
+@@ -1051,9 +1051,9 @@ static int ip6mr_cache_report(const struct mr_table *mrt, struct sk_buff *pkt,
+ 	int ret;
+ 
+ #ifdef CONFIG_IPV6_PIMSM_V2
++	int nhoff = skb_network_offset(pkt);
+ 	if (assert == MRT6MSG_WHOLEPKT || assert == MRT6MSG_WRMIFWHOLE)
+-		skb = skb_realloc_headroom(pkt, -skb_network_offset(pkt)
+-						+sizeof(*msg));
++		skb = skb_realloc_headroom(pkt, -nhoff + sizeof(*msg));
+ 	else
+ #endif
+ 		skb = alloc_skb(sizeof(struct ipv6hdr) + sizeof(*msg), GFP_ATOMIC);
+@@ -1073,7 +1073,8 @@ static int ip6mr_cache_report(const struct mr_table *mrt, struct sk_buff *pkt,
+ 		   And all this only to mangle msg->im6_msgtype and
+ 		   to set msg->im6_mbz to "mbz" :-)
+ 		 */
+-		skb_push(skb, -skb_network_offset(pkt));
++		skb->data += nhoff;
++		skb->len  -= nhoff;
+ 
+ 		skb_push(skb, sizeof(*msg));
+ 		skb_reset_transport_header(skb);
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.34.1
+
 
