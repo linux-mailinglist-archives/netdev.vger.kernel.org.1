@@ -1,223 +1,207 @@
-Return-Path: <netdev+bounces-22352-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22353-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3E437671D5
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 18:30:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C8D987671DB
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 18:33:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E5BA21C218EA
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 16:30:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E76E51C21963
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 16:33:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9B77125D9;
-	Fri, 28 Jul 2023 16:30:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CB7212B8D;
+	Fri, 28 Jul 2023 16:33:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9CA21549D
-	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 16:30:08 +0000 (UTC)
-Received: from EUR04-HE1-obe.outbound.protection.outlook.com (mail-he1eur04on2084.outbound.protection.outlook.com [40.107.7.84])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C05330FA;
-	Fri, 28 Jul 2023 09:30:07 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDD4F15486
+	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 16:33:15 +0000 (UTC)
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2067.outbound.protection.outlook.com [40.107.100.67])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C3613C38
+	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 09:33:14 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=HRMvA6Yhc50kIrAvDdLMqEDs1VD3Swks8lUN3Zewr/PYp60qBPGdRwx5a33MlvsFvsN3SB4iFogUB1vk83vSNGPE1h1rrVVHcu1OzsTQfsMrloibm0nrw4egiwMdXMAGoYBXQl52c8RHsOvSGuVF6cKZP4dwKwlYehOGWWKK1uDimwpEK95zlmBgkr8Eul+GHkPr/Mjhi28udfFqIXJFPaHfR203N88ve82vwSZP1FstwZ9njjAspDT6wevaAZ9rKjOd1AuYndEkSRmHnjHWZDblDZ1IV9iv5hg9I33IKDYJ7WsR8yBQdBMD8G8RUL58xKy0FPVMuVbAfgvROL9ntg==
+ b=YVPSA1JwC33kgiRZw0yr80RTRj8vuhZ4bUoiNH8AN7CBM5eis0EFiMzhEzAMpv9tm0A4JoDcb1SyXhNOV5wYah2ReZIO8oNsczguZVP1olmUmABkQQZulPZ0LtoN3qoC860orhHQH+RmOpt6iYd8zkNNviCZ8jcR9+E405YL/QgcbOTURKDSwNYqT7vjHfx2YxrZzGlBLAc4o6bttihV70rSoIJ0LsnvGmggL8uY7r/X6wOfwRa0GiFy9GmL821LFVcCDs/BGh3rmBrUKR4HiIEdV77Z4Ee/pFCzEDvlM4FBeItI1GCjneVUG0Ucj136B4tIEdpJ7Z8NguGlpDav3Q==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=36d2jc9cZ1Pm+1+xvHQdeLIsW74rN05+z9bDj0qsIBo=;
- b=jdfoP5jZvZF0gu/oVaDQbVNim0txwT+/MItCvXNyybwNUKiIW3G1yrC6LRiUJfIpXAPFiZg5bBpvKps/VzXCTJqDRAHbcSu2qDLspGawmVef6csePHeLjh4u1uxK2mjhf7PtH/WKRm0jH5obtKJ8l8J2wVAaZHok1dn4ME6c0vUMxpYuS+v0qpf8VfrXB2wWGiQ6V1JmBRthQrgYtE7VoWmIihJd47nMrh5evIWB84WCpmUxSjlzI6cs81VAZhQOcAQi8l9y0vGavrIYZMqiTDoXRsA7ttKTp/8BWJmGGrm3RWJkVokmr2ITLD9bzW4l/Begf/o3b0jSDlDtwT2DDQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ bh=XEMyHWtZgCpo0xSdWKU/1OdQllMMyTqRT6k0XmZS8qA=;
+ b=PqZBzrYIbfVzAavTLGSGyd2vMdxXJeCdkYZqcMIO2EAol9IvV8wYSRgdyhOogIdw21s+Td91mNHr3Qy12YuMb7jt1SwliA/uH7FiwE/HRX58lKJgB2sU/UoE5CIqb5OXC9gprLZgFVdds2XoSIoKtcva5J0vBls3jK1Qaq6/dEBN751fGFFJ8YhZEUQ2fnM5LbPyjO96hUC3GfnPoYgSX3EZqsDihEVas8IqLm3YNztrPK9/mx37TAvRZB+GzdxfWi3Y+kYaR4ThL4irEfgzv0dItwBzkFHSXFsI1+5rV9ftx4+vM4R4jN4eGftCAe0xDwCg4sQcD+swbgO9nVYvxw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.118.232) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=36d2jc9cZ1Pm+1+xvHQdeLIsW74rN05+z9bDj0qsIBo=;
- b=DfV+PR+7ZfAdbfZbpQCGHA5kBde1wW1VqwXY75fU2hzdoS1iIvaOrO6VyBDLauLZZrcAMo0QR5shmTrGu7P2c1mYWBoLUNHUqPMvW3I0GPNPlpLikycKLG4ErPP3TEjjZD5npuzXe7H7Uy08dPRubANaWGbdXQF6lG1f7ev8AgQ=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AM6PR04MB4838.eurprd04.prod.outlook.com (2603:10a6:20b:4::16)
- by AS8PR04MB8914.eurprd04.prod.outlook.com (2603:10a6:20b:42d::6) with
+ bh=XEMyHWtZgCpo0xSdWKU/1OdQllMMyTqRT6k0XmZS8qA=;
+ b=azgyecYwfV+JmoQov3fHh/KBOuv8YKU4wDMCk6erN0L1DeXZw5x6BYBC07XgTkPH1D5aW1wDKOcs471y6sI2TSVGKUWvpC0lAjoVOuul6XD8cyXkn62OOiMb2hfzAHj4qPMMI1QrSOMykPCsHkr9GvCJ+gKr7gAsIv2XodgqOte7RAQIEhG4Q74hO1fAFcCrvfB1eBc4OtjTIdC7upWoCnCrh7dC4gZuHFCZoEJ0U0A5ZEI/fI+Z8KttZ2N6zo+z5Nbphe//qIQvhiys4Oiys7VCealyNzX4irsSqzG9mK0/+zYSDs1SnNghVqZQWmGl9Jx/49PMKgV1mQzOdu5iGQ==
+Received: from BN0PR03CA0012.namprd03.prod.outlook.com (2603:10b6:408:e6::17)
+ by MW4PR12MB7120.namprd12.prod.outlook.com (2603:10b6:303:222::10) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.29; Fri, 28 Jul
- 2023 16:30:04 +0000
-Received: from AM6PR04MB4838.eurprd04.prod.outlook.com
- ([fe80::d0d5:3604:98da:20b1]) by AM6PR04MB4838.eurprd04.prod.outlook.com
- ([fe80::d0d5:3604:98da:20b1%7]) with mapi id 15.20.6631.026; Fri, 28 Jul 2023
- 16:30:04 +0000
-Date: Fri, 28 Jul 2023 12:29:46 -0400
-From: Frank Li <Frank.li@nxp.com>
-To: Will Deacon <will@kernel.org>
-Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
-	Andrew Halaney <ahalaney@redhat.com>,
-	Shenwei Wang <shenwei.wang@nxp.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Shawn Guo <shawnguo@kernel.org>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Neil Armstrong <neil.armstrong@linaro.org>,
-	Kevin Hilman <khilman@baylibre.com>, Vinod Koul <vkoul@kernel.org>,
-	Chen-Yu Tsai <wens@csie.org>,
-	Jernej Skrabec <jernej.skrabec@gmail.com>,
-	Samuel Holland <samuel@sholland.org>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Fabio Estevam <festevam@gmail.com>,
-	NXP Linux Team <linux-imx@nxp.com>,
-	Jerome Brunet <jbrunet@baylibre.com>,
-	Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
-	Bhupesh Sharma <bhupesh.sharma@linaro.org>,
-	Nobuhiro Iwamatsu <nobuhiro1.iwamatsu@toshiba.co.jp>,
-	Simon Horman <simon.horman@corigine.com>,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
-	Wong Vee Khee <veekhee@apple.com>,
-	Revanth Kumar Uppala <ruppala@nvidia.com>,
-	Jochen Henneberg <jh@henneberg-systemdesign.com>,
-	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-amlogic@lists.infradead.org, imx@lists.linux.dev
-Subject: Re: [PATCH v2 net 2/2] net: stmmac: dwmac-imx: pause the TXC clock
- in fixed-link
-Message-ID: <ZMPs+sOIzWR0LmrP@lizhi-Precision-Tower-5810>
-References: <20230727152503.2199550-1-shenwei.wang@nxp.com>
- <20230727152503.2199550-3-shenwei.wang@nxp.com>
- <4govb566nypifbtqp5lcbsjhvoyble5luww3onaa2liinboguf@4kgihys6vhrg>
- <ZMPdKyOtpZKEMLsO@shell.armlinux.org.uk>
- <20230728153611.GH21718@willie-the-truck>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230728153611.GH21718@willie-the-truck>
-X-ClientProxiedBy: BY3PR05CA0040.namprd05.prod.outlook.com
- (2603:10b6:a03:39b::15) To AM6PR04MB4838.eurprd04.prod.outlook.com
- (2603:10a6:20b:4::16)
+ 2023 16:33:11 +0000
+Received: from BN8NAM11FT057.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:408:e6:cafe::5f) by BN0PR03CA0012.outlook.office365.com
+ (2603:10b6:408:e6::17) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.29 via Frontend
+ Transport; Fri, 28 Jul 2023 16:33:10 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.232) by
+ BN8NAM11FT057.mail.protection.outlook.com (10.13.177.49) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6631.35 via Frontend Transport; Fri, 28 Jul 2023 16:33:09 +0000
+Received: from drhqmail203.nvidia.com (10.126.190.182) by mail.nvidia.com
+ (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Fri, 28 Jul 2023
+ 09:32:51 -0700
+Received: from drhqmail203.nvidia.com (10.126.190.182) by
+ drhqmail203.nvidia.com (10.126.190.182) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.986.37; Fri, 28 Jul 2023 09:32:51 -0700
+Received: from vdi.nvidia.com (10.127.8.14) by mail.nvidia.com
+ (10.126.190.182) with Microsoft SMTP Server id 15.2.986.37 via Frontend
+ Transport; Fri, 28 Jul 2023 09:32:49 -0700
+From: Vlad Buslov <vladbu@nvidia.com>
+To: <davem@davemloft.net>, <kuba@kernel.org>, <edumazet@google.com>,
+	<pabeni@redhat.com>
+CC: <netdev@vger.kernel.org>, <amir.hanania@intel.com>,
+	<jeffrey.t.kirsher@intel.com>, <john.fastabend@gmail.com>,
+	<idosch@idosch.org>, Vlad Buslov <vladbu@nvidia.com>
+Subject: [PATCH net] vlan: Fix VLAN 0 memory leak
+Date: Fri, 28 Jul 2023 18:31:52 +0200
+Message-ID: <20230728163152.682078-1-vladbu@nvidia.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM6PR04MB4838:EE_|AS8PR04MB8914:EE_
-X-MS-Office365-Filtering-Correlation-Id: d5027379-098a-469c-d080-08db8f87e59f
+X-MS-TrafficTypeDiagnostic: BN8NAM11FT057:EE_|MW4PR12MB7120:EE_
+X-MS-Office365-Filtering-Correlation-Id: bbd158cc-ff79-4956-da69-08db8f8854a8
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	fNZBoCmB/AklSsVWxQczVXvmLsPz2hzoMvHm+2F/QLE41dv4Hp5gVy4DRRi0gQ8smJQnjdjVgy2YgU4URFfZo0cKR+3UkwYM5q1/1Mz3cm4OMil5/Sx4jGul5ipeSP7F5L0giLHN+r4TKyX8lZVpTrxzC2PVjprqxx4gQbJRulG52Xy2CMJXtfOUbWnaRGYn5qGalC34e/AJ1z6yYh1Rc0KpHtxDzqVQKtPD57t1z9aHgx3i0qecUpBpPD7k1a5DVCn0nhWQBeXXNFfcjLt2eYoFFXG1M7G5fH0DXN0aynLxMQ+I1xWq4FYBeym/w2Ed0p6r4IyYQnrf6nt3xn0233DAgrVzSfgRUImtcfc9s/bOgEmVOJeHkWc3e7MAeP5NZxeafiufVZxZ5eGRhXJHEUiV66Dwvdrm8Gr1JOd6NKuQ5LbNj2VRtdxS7sBkL28rKr/XHwqF+y58J//F8KMDCAA14nfyNlWTLJogOl6CCjeH9vM1lSqE4JCgHh2rclDKmlUW6OXCOxQXDw8h9GtL6+hvkJ71F4VsjGu6869sIlA/XUTAgltg9gOO6f36tTQFIiLuimaXr8u7fflXJM1/ZGpII5+RCJn1LSxk6ax/l1RRyKkjBGgM7DgQDZFKJPyP
+	OviYwejTQRrCXp3v+B0GdRN/EWo8bZt0jL1jWIUSzXGz/88G8yoFXxt+81M4yavyyhKTGIKQYQYt+0GzGyh1USLUc3PjmlgDp3dF6RJawDxvlBvRTh+JMNi0Ds1SisdnvXfSi5SPFVciEqVa7BTG7Tv2b6Rr2xovvk9JI9eHz9oh800R5ze9CNoWdOjjCsaUPHv2vriZGaM9vhAfuQgya86mPTYwnjNbjwDuvzvUgohZ6qGaD3L3Kylz2LawCQNgQlxhsFp/JREgXIzDYvWj7ONlolNFt6uqp5vjMFfHSGuoOmFSe3SR9tQvsIalZo0t1vV/ITdT/kVjzK4He3sP1/2g1X1AW6AXBVwCM10AKe+/NxMaeTOz9dJkKKja6cHOtx2hlQppZG7PWG8dG7K0w9EFBYjTwI8yHFY6a29QT+Pcin+ScLWPShFPPwi169nZPfEeST5nAG0726r6LHni4FvxzUyAlwYZxJ8SBtCQg0+v7NKrwkazqMXQBOo+cHb6ZBZ6qVy9Scy9xELiwNa8DAaU6qYplYZtm1Vi84AFKvM5Gou9Ay9eZtWknY326wCLvfVhqW9a4W4Xvf5KXr/Hjrsv0JDlknje8ph6oQLghGOA6q47CFru64nw5vdzvbJu4gN+CuhbLqNPiBkPyDeblKiPZh3hx86dstJQAN3o7Gh+Mb2gDJDHiDtTRzX5aDo76xdxBlN+4po8PVhJr6CiljBksTq5NehwrYY1Si3nhFjDbd/LZPwTQVQ1YPIpmTfKao9kIw5qXXfYCTsCnJ08JQ==
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM6PR04MB4838.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(7916004)(39860400002)(346002)(366004)(396003)(136003)(376002)(451199021)(83380400001)(86362001)(8936002)(5660300002)(6506007)(54906003)(966005)(6512007)(9686003)(478600001)(6666004)(6486002)(316002)(52116002)(4326008)(8676002)(66476007)(66556008)(66946007)(41300700001)(186003)(2906002)(7406005)(6916009)(26005)(7416002)(33716001)(38350700002)(38100700002)(67856001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?0JCEWwfr+l4iWIHTUlfdxXjua4I7Qz6br89mX0wXGLEvKdHR6oSmZMq37vnc?=
- =?us-ascii?Q?9qRx/yWtnxeVY2aYyW0NkQXMlX7NFPioc9zOdqUQR6EM7of98z1Om6OyYbTI?=
- =?us-ascii?Q?thHwqxEdoqI3rBXQ2dVurM+pQQhaCmxIK/R9cP5003x87Y2IR8ZTEKPGhMjh?=
- =?us-ascii?Q?8eKAoMNFTC5Oh9woHt5fnNtGwEm2E2KAZmF+AcAfu1Kp8ifOMkRNwJ8Lx56E?=
- =?us-ascii?Q?sA9zz+GSQSjYBUSqFLiC19DG/+zLeuYpRmiZid2YVgUZjudI5Z8vdpp9sDP8?=
- =?us-ascii?Q?OxSQnXp5RpU/MBaJsLY70eHNeOVse0Fj8VKl/G376gNah7PZ6jTwdBdovFLe?=
- =?us-ascii?Q?8T6FsTgOSRAha9gvwV2JKgASkl7VvX4ELihaLcMv/HDFSdMZVjF8BEWLxYBs?=
- =?us-ascii?Q?wmogMkIWF1OwvqBtRAQbDO5zMeOWosxlWKBUYVSrkFHJOG9v9OvVPPg193ad?=
- =?us-ascii?Q?2UAJ614GIx+XVyLipNj0/3NL1D8t14e/c/ZKDUHtkNIEGO+E569Of0HfGSVR?=
- =?us-ascii?Q?mkBiKuG0zzxrpulThf8obQkcyI6O81GlPbQeqiBT8NDQ6cSr//FJnq2tPiHM?=
- =?us-ascii?Q?SYu6P32fQCCGkBzBp/gEEs0ATgwK8fTL22p0Y3meQDnyFPDK0sHBL1DOQL6b?=
- =?us-ascii?Q?jtZWnBXslYyXgmt8kOryMxenlwn9DpFvp9azF8JCDzlGRRhn76z8VvEKss7w?=
- =?us-ascii?Q?accjGwmG0iJDr7lQKtCP44ySVXfbKVuoaRgnvSUV2ouyqG4m6HXKBoor28tn?=
- =?us-ascii?Q?ZzrvhtvMPBUO0vGRe5wlvp9/Vo2Ker7zH495o8azJ7Rsm0A+OH506LBXvEAk?=
- =?us-ascii?Q?BS1CU6WkR/g6AQS/E44BX4YMgiBbcEVH5zXtXILwMexjC9YlT+v39GJs8kZM?=
- =?us-ascii?Q?mZxKuBhMPETds/WS88zMXo/pahoqfRgrIQdELHx3xCIrhziTlNqaUeQa7TVz?=
- =?us-ascii?Q?X8FFjOEaASadETO565WTme/LpovYmaRyb6BEhSs1h3SNQXZlsIsPYQF/l7BR?=
- =?us-ascii?Q?oGMKMVnvlB0QzdigBJUwiux7va6cWDz9eRTB6Mz4kjhcKzAcCuEcbMKiyS4w?=
- =?us-ascii?Q?2etJdXtV5WJNruY9LcYPqwFO2xpNdohQ/+GfDlADt8FbcGZnzLiphZzhB5az?=
- =?us-ascii?Q?hi3Etttz16eYmVjPw5PvkzJv84CqAQgCdyi/d0G6iKO2tFkDUbS1+xNfTjL1?=
- =?us-ascii?Q?7T26/v5tG9AbYk8Gi8h91W5JSQn93Q5ZttMnRX6a6wYyY3Bab88h8P8Gbv62?=
- =?us-ascii?Q?j53Zz70Luz6EM4ceTo23QwonTLOnxuDyIk2m/R/qAAI2ybDBavzA1/AneZDj?=
- =?us-ascii?Q?p+WRYDkbwDx4GC/BerjYlwwpvH74Rmr/IOYQQBm2HCjlwBPbr/Z44qUwH2cx?=
- =?us-ascii?Q?tfDkWhokOcOYg6/Amxw9m++B11Qr1DFTAHSGdIZVSJmAHls802ebJdCog5U/?=
- =?us-ascii?Q?UESmdOCfUCl6fOP+2kRZyWNzI1dZUf9uLUl1+UN+QnmoRG7jcsoutrw9Km7T?=
- =?us-ascii?Q?0ihFpV38oyorqd4elMQ1bgjzp+BtOtVmHrZwanec8CGgwokskkz0ef3z0fOL?=
- =?us-ascii?Q?m4l859yJFTjR4OZ+YaI=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d5027379-098a-469c-d080-08db8f87e59f
-X-MS-Exchange-CrossTenant-AuthSource: AM6PR04MB4838.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Jul 2023 16:30:04.0288
+	CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(396003)(376002)(346002)(136003)(451199021)(82310400008)(40470700004)(36840700001)(46966006)(47076005)(110136005)(478600001)(54906003)(6666004)(7696005)(336012)(2616005)(70586007)(26005)(1076003)(426003)(2906002)(70206006)(316002)(8936002)(7636003)(5660300002)(8676002)(41300700001)(82740400003)(86362001)(356005)(36756003)(83380400001)(40480700001)(36860700001)(40460700003)(4326008)(107886003)(186003)(505234007);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Jul 2023 16:33:09.9702
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: XacQSG8hN98OLGu58MKydZSHGIT+HPx0m2rHYUGX74mD+zYRIscKCanqxYbUCkEVgkbv/QAfg9UxtvCNfkEPaA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB8914
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-Network-Message-Id: bbd158cc-ff79-4956-da69-08db8f8854a8
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BN8NAM11FT057.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB7120
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Jul 28, 2023 at 04:36:12PM +0100, Will Deacon wrote:
-> On Fri, Jul 28, 2023 at 04:22:19PM +0100, Russell King (Oracle) wrote:
-> > On Thu, Jul 27, 2023 at 01:36:45PM -0500, Andrew Halaney wrote:
-> > > I don't have any documentation for the registers here, and as you can
-> > > see I'm an amateur with respect to memory ordering based on my prior
-> > > comment.
-> > > 
-> > > But you:
-> > > 
-> > >     1. Read intf_reg_off into variable iface
-> > >     2. Write the RESET_SPEED for the appropriate mode to MAC_CTRL_REG
-> > >     3. wmb() to ensure that write goes through
-> > 
-> > I wonder about whether that wmb() is required. If the mapping is
-> > device-like rather than memory-like, the write should be committed
-> > before the read that regmap_update_bits() does according to the ARM
-> > memory model. Maybe a bit of information about where this barrier
-> > has come from would be good, and maybe getting it reviewed by the
-> > arm64 barrier specialist, Will Deacon. :)
-> > 
-> > wmb() is normally required to be paired with a rmb(), but we're not
-> > talking about system memory here, so I also wonder whether wmb() is
-> > the correct barrier to use.
-> 
-> Yes, I don't think wmb() is the right thing here. If you need to ensure
-> that the write to MAC_CTRL_REG has taken effect, then you'll need to go
-> through some device-specific sequence which probably involves reading
-> something back. If you just need things to arrive in order eventually,
-> the memory type already gives you that.
-> 
-> It's also worth pointing out that udelay() isn't necessarily ordered wrt
-> MMIO writes, so that usleep_range() might need some help as well.
+The referenced commit intended to fix memleak of VLAN 0 that is implicitly
+created on devices with NETIF_F_HW_VLAN_CTAG_FILTER feature. However, it
+doesn't take into account that the feature can be re-set during the
+netdevice lifetime which will cause memory leak if feature is disabled
+during the device deletion as illustrated by [0]. Fix the leak by
+unconditionally deleting VLAN 0 on NETDEV_DOWN event.
 
-Hi Deacon:
+[0]:
+> modprobe 8021q
+> ip l set dev eth2 up
+> ethtool -k eth2 | grep rx-vlan-filter
+rx-vlan-filter: on
+> ethtool -K eth2 rx-vlan-filter off
+> ip l set dev eth2 down
+> ip l set dev eth2 up
+> modprobe -r mlx5_ib
+> modprobe -r mlx5_core
+> echo scan > /sys/kernel/debug/kmemleak
+> cat /sys/kernel/debug/kmemleak
+unreferenced object 0xffff888165af1c00 (size 256):
+  comm "ip", pid 1847, jiffies 4294908816 (age 155.892s)
+  hex dump (first 32 bytes):
+    00 80 12 0c 81 88 ff ff 00 00 00 00 00 00 00 00  ................
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+  backtrace:
+    [<0000000081646e58>] kmalloc_trace+0x27/0xc0
+    [<0000000096c47f74>] vlan_vid_add+0x444/0x750
+    [<00000000a7304a26>] vlan_device_event+0x1f1/0x1f20 [8021q]
+    [<00000000a888adcb>] notifier_call_chain+0x97/0x240
+    [<000000005a6ebbb6>] __dev_notify_flags+0xe2/0x250
+    [<00000000d423db72>] dev_change_flags+0xfa/0x170
+    [<0000000048bc9621>] do_setlink+0x84b/0x3140
+    [<0000000087d26a73>] __rtnl_newlink+0x954/0x1550
+    [<00000000f767fdc2>] rtnl_newlink+0x5f/0x90
+    [<0000000093aed008>] rtnetlink_rcv_msg+0x336/0xa40
+    [<000000008d83ca71>] netlink_rcv_skb+0x12c/0x360
+    [<000000006227c8de>] netlink_unicast+0x438/0x710
+    [<00000000957f18cf>] netlink_sendmsg+0x7a0/0xc70
+    [<00000000768833ad>] sock_sendmsg+0xc5/0x190
+    [<0000000048d43666>] ____sys_sendmsg+0x534/0x6b0
+    [<00000000bd83c8d6>] ___sys_sendmsg+0xeb/0x170
+unreferenced object 0xffff888122bb9080 (size 32):
+  comm "ip", pid 1847, jiffies 4294908816 (age 155.892s)
+  hex dump (first 32 bytes):
+    a0 1c af 65 81 88 ff ff a0 1c af 65 81 88 ff ff  ...e.......e....
+    81 00 00 00 01 00 00 00 00 00 00 00 00 00 00 00  ................
+  backtrace:
+    [<0000000081646e58>] kmalloc_trace+0x27/0xc0
+    [<00000000174174bb>] vlan_vid_add+0x4fd/0x750
+    [<00000000a7304a26>] vlan_device_event+0x1f1/0x1f20 [8021q]
+    [<00000000a888adcb>] notifier_call_chain+0x97/0x240
+    [<000000005a6ebbb6>] __dev_notify_flags+0xe2/0x250
+    [<00000000d423db72>] dev_change_flags+0xfa/0x170
+    [<0000000048bc9621>] do_setlink+0x84b/0x3140
+    [<0000000087d26a73>] __rtnl_newlink+0x954/0x1550
+    [<00000000f767fdc2>] rtnl_newlink+0x5f/0x90
+    [<0000000093aed008>] rtnetlink_rcv_msg+0x336/0xa40
+    [<000000008d83ca71>] netlink_rcv_skb+0x12c/0x360
+    [<000000006227c8de>] netlink_unicast+0x438/0x710
+    [<00000000957f18cf>] netlink_sendmsg+0x7a0/0xc70
+    [<00000000768833ad>] sock_sendmsg+0xc5/0x190
+    [<0000000048d43666>] ____sys_sendmsg+0x534/0x6b0
+    [<00000000bd83c8d6>] ___sys_sendmsg+0xeb/0x170
 
-Does it means below pattern will be problem?
+Fixes: efc73f4bbc23 ("net: Fix memory leak - vlan_info struct")
+Signed-off-by: Vlad Buslov <vladbu@nvidia.com>
+---
+ net/8021q/vlan.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-1.writel()
-2.udelay()
-3.writel()
+diff --git a/net/8021q/vlan.c b/net/8021q/vlan.c
+index e40aa3e3641c..b3662119ddbc 100644
+--- a/net/8021q/vlan.c
++++ b/net/8021q/vlan.c
+@@ -384,8 +384,7 @@ static int vlan_device_event(struct notifier_block *unused, unsigned long event,
+ 			dev->name);
+ 		vlan_vid_add(dev, htons(ETH_P_8021Q), 0);
+ 	}
+-	if (event == NETDEV_DOWN &&
+-	    (dev->features & NETIF_F_HW_VLAN_CTAG_FILTER))
++	if (event == NETDEV_DOWN)
+ 		vlan_vid_del(dev, htons(ETH_P_8021Q), 0);
+ 
+ 	vlan_info = rtnl_dereference(dev->vlan_info);
+-- 
+2.39.2
 
-It may not wait enough time between 1 and 3. I think the above pattern
-is quite common in driver code.  I am not sure if usleep_range involve
-MMIO to get current counter, ARM may use cp15 to get local timer counter.
-
-In our system, readl() is quite slow because cross some bus bridge.
-even readl() can work, we don't know it is because delay by readl() itself.
-Or it works logically. Suppose readl() and writel() just guarantee memory
-access order. 
-
-Frank
-
-> Non-relaxed MMIO reads, however, _are_ ordered against a subsequent
-> udelay(), so if you add the readback then this might all work out.
-> 
-> I gave a (slightly dated) talk about some of this at ELC a while back:
-> 
-> https://www.youtube.com/watch?v=i6DayghhA8Q
-> 
-> which might help.
-> 
-> Will
 
