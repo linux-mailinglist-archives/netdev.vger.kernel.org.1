@@ -1,242 +1,168 @@
-Return-Path: <netdev+bounces-22158-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22168-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47F5E766583
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 09:41:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 790D1766623
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 10:01:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1978F1C217F6
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 07:41:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A7FE21C2040E
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 08:01:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CD58C8C0;
-	Fri, 28 Jul 2023 07:41:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83CF7C8DA;
+	Fri, 28 Jul 2023 07:58:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B7BE1844
-	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 07:41:53 +0000 (UTC)
-Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1B7BB6;
-	Fri, 28 Jul 2023 00:41:50 -0700 (PDT)
-Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
-	by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20230728074149euoutp02aa03f38d08b21dca519f3165493919e2~1_C1yISzF0427104271euoutp02S;
-	Fri, 28 Jul 2023 07:41:49 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20230728074149euoutp02aa03f38d08b21dca519f3165493919e2~1_C1yISzF0427104271euoutp02S
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1690530109;
-	bh=gb0miwVpBtIdFutOnqdv+X2fb1Y0tMg1ouc2sR7L3Os=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-	b=jP0fYcKVCJeYDv1Gx0jUCRduXfY4vnQsfFN/589lOAwqqHmnGo95sviSApP85HqL/
-	 b3N2mBa5tzSY5cdpqkjFos0iAVUm5SnHZIO0zPNk6R4D/CcfBpndnhSc1WHJDTctye
-	 vKJqYYTTS5KjUdaB6JnaFL/A8rqxgZ8sffzJ83hk=
-Received: from eusmges3new.samsung.com (unknown [203.254.199.245]) by
-	eucas1p2.samsung.com (KnoxPortal) with ESMTP id
-	20230728074148eucas1p2ae388ed7dc413903e0c928858d865465~1_C1hrfZu1594615946eucas1p28;
-	Fri, 28 Jul 2023 07:41:48 +0000 (GMT)
-Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
-	eusmges3new.samsung.com (EUCPMTA) with SMTP id 96.02.37758.C3173C46; Fri, 28
-	Jul 2023 08:41:48 +0100 (BST)
-Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
-	eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
-	20230728074148eucas1p119baa7ba630f26611d21a9a78aa4f48c~1_C1C-3SU2160921609eucas1p14;
-	Fri, 28 Jul 2023 07:41:48 +0000 (GMT)
-Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
-	eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
-	20230728074148eusmtrp2dbb0a376f74c12352732d7535784f5c4~1_C1CM1wD1226012260eusmtrp2G;
-	Fri, 28 Jul 2023 07:41:48 +0000 (GMT)
-X-AuditID: cbfec7f5-815ff7000002937e-2e-64c3713cfa1f
-Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
-	eusmgms1.samsung.com (EUCPMTA) with SMTP id 1D.4C.10549.C3173C46; Fri, 28
-	Jul 2023 08:41:48 +0100 (BST)
-Received: from CAMSVWEXC02.scsc.local (unknown [106.1.227.72]) by
-	eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
-	20230728074148eusmtip28b25f50dcc0ee88f4a41f3cc59f47298~1_C01TN9D2079920799eusmtip2G;
-	Fri, 28 Jul 2023 07:41:48 +0000 (GMT)
-Received: from localhost (106.210.248.223) by CAMSVWEXC02.scsc.local
-	(2002:6a01:e348::6a01:e348) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
-	Fri, 28 Jul 2023 08:41:47 +0100
-Date: Fri, 28 Jul 2023 09:41:46 +0200
-From: Joel Granados <j.granados@samsung.com>
-To: Luis Chamberlain <mcgrof@kernel.org>
-CC: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Catalin Marinas
-	<catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Heiko Carstens
-	<hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev
-	<agordeev@linux.ibm.com>, Kees Cook <keescook@chromium.org>, Iurii Zaikin
-	<yzaikin@google.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, <willy@infradead.org>, <josh@joshtriplett.org>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Sven Schnelle
-	<svens@linux.ibm.com>, <linux-arm-kernel@lists.infradead.org>,
-	<linux-kernel@vger.kernel.org>, <linux-s390@vger.kernel.org>,
-	<linux-fsdevel@vger.kernel.org>, <netdev@vger.kernel.org>
-Subject: Re: [PATCH 06/14] sysctl: Add size to register_sysctl
-Message-ID: <20230728074146.lwapkrfyn2kqvyec@localhost>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 796FB10786
+	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 07:58:59 +0000 (UTC)
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DDAA44B2
+	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 00:58:42 -0700 (PDT)
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1qPIMq-0008FT-F9
+	for netdev@vger.kernel.org; Fri, 28 Jul 2023 09:58:32 +0200
+Received: from dspam.blackshift.org (localhost [127.0.0.1])
+	by bjornoya.blackshift.org (Postfix) with SMTP id 635D11FD1BA
+	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 07:56:18 +0000 (UTC)
+Received: from hardanger.blackshift.org (unknown [172.20.34.65])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by bjornoya.blackshift.org (Postfix) with ESMTPS id F11831FD197;
+	Fri, 28 Jul 2023 07:56:16 +0000 (UTC)
+Received: from blackshift.org (localhost [::1])
+	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id 7c42827d;
+	Fri, 28 Jul 2023 07:56:16 +0000 (UTC)
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	linux-can@vger.kernel.org,
+	kernel@pengutronix.de
+Subject: [PATCH net-next 0/21] pull-request: can-next 2023-07-28
+Date: Fri, 28 Jul 2023 09:55:53 +0200
+Message-Id: <20230728075614.1014117-1-mkl@pengutronix.de>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg="pgp-sha512";
-	protocol="application/pgp-signature"; boundary="23prfwofjqduce7c"
-Content-Disposition: inline
-In-Reply-To: <ZMKQSqeKNcJCqkDB@bombadil.infradead.org>
-X-Originating-IP: [106.210.248.223]
-X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
-	CAMSVWEXC02.scsc.local (2002:6a01:e348::6a01:e348)
-X-Brightmail-Tracker: H4sIAAAAAAAAA2WSfUxTVxjGc3pvb2+ZxUtp4AwIfxRnnCBsIO4kitkMyW7mR1iMc+jm1tm7
-	QoC2aykwN2M7Kp9OG5eM0DmstVRWPrq2SGQgriXho3WUDdjUoQsCcRMaFK2COBz11s1k/z3P
-	e37P+5EcEhO6iDgyX17MqOSSQjERgXf0Lfo3bPmkV/qK3bAROXx/EWjybw+B5qzHADrl1+No
-	uu8mDw0bH3BR+Vk7gWYabAA9MSnQ5doiNNxxnIuck79yUffFQRyN/HCKQIYz5Ri6YpgGqM8U
-	gx74ZgGy2lt5SD+eiZYWVgBr567XY+iWhhZAf6P9Gafbv7vKoU1ODe1qWk9fm8minbZqgjaY
-	fwT0pW9beLTLcoSe6xkj6HvOxJxV+yK2SJnC/BJGlbb1w4i8iflKrrIqscx2uhdogRvWAD4J
-	qY0wsNiP14AIUkg1AahzjBCsuQ9goPGLsLkHYJ1hAXsW8d6aDkfOATjR04v/S43X9mCsOQ+g
-	L3iXG4rg1EvQN9XFC2mCSoH+2fGnrUTUOthj+JITCmBUOQGNN4ZWBpJkNLUVzvsPhBgB9Ro0
-	G8e4rI6Cg/VTeEhjVBnsPtuKh3CMiofnlslQmU9tgr/VtRHspknQbVnisfow9LZfezoKUo4I
-	6KquBaEspLJhx+T7LBMNb/e3h/kE+KTzdJj/CsBLy3d4rGkG0KoLclhqM9SPToUTb8CWxXqC
-	bRoJrwSi2D0j4cmOOowtC2BVhZCl18LmG7O4ASQZn7vM+Nxlxv8uY8sp0NQ1T/yvnAytZ2Yw
-	VmfBtrY53AR4NhDLaNRFMkadIWdKU9WSIrVGLks9qChygpW/7FvuD14ATbfvpnoAhwQesGYl
-	fPP75mEQh8sVckYsEnhzPFKhQCr59BCjUnyg0hQyag+IJ3FxrCA5a/CgkJJJipkChlEyqmev
-	HJIfp+UoL+78iXO9MIgyib0Vek6pu7Px7Xo8b4fhzuDcZ4PZh4JdZdZ8R8HwUKPrxN7jOSaF
-	YZK/50VXF7O9WPsI/WlpyCw44UnapkkTjWSMPtrmDax++DHarYxyZ2dVngSlfxwb2E/kPp7/
-	6L2Cq5PuusOxfLPC+c7m9AO6CxpLvH3U9kvty6sqdoi0PavpDenbY49KFrviz6MMozm6XTRh
-	q9wpW3AnBszCPQ+PLg0N7CtNF3i/7naUqBIGZNn6+TFruVhHtOKPc0t2JboSEtNz/TFr3vKs
-	Tf89IaZGurwpufNWWoNyf871JKfZMiP+vNAxcj8/8oV3Vbpqu+3NI1WXTSliXJ0neXU9plJL
-	/gF0vnQuRgQAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrPKsWRmVeSWpSXmKPExsVy+t/xe7o2hYdTDH5sEbHYePolm8Xjv4fY
-	LN4v62G0mHO+hcXi6bFH7BYXZn1jtWhevJ7N4vW8VYwW/xfkW5zpzrW4sK2P1WLT42usFnv2
-	nmSxuLxrDpvFhIXNzBY3JjxltDi2QMzi2+k3jBbL1q9lt2i5Y2rx+wdQwbKdfg5iHmvmrWH0
-	mN1wkcVjy8qbTB4LNpV6bF6h5XHrta3HplWdbB4TFh1g9Ng/dw27x+Yl9R7v911l8/i8SS6A
-	J0rPpii/tCRVISO/uMRWKdrQwkjP0NJCz8jEUs/Q2DzWyshUSd/OJiU1J7MstUjfLkEv49ov
-	jYI2uYqFl78xNzDul+hi5OSQEDCROPX8KUsXIxeHkMBSRom7h/6yQiRkJDZ+uQplC0v8udbF
-	BlH0kVFi/70njBDOVkaJ+5M+sIBUsQioSpx+spsdxGYT0JE4/+YOM4gtIqAhsW9CLxNIA7NA
-	M5vErHvngEZxcAgL2El8Oh8HUsMrYC6xaBbINpChp5kk1v5ZxgSREJQ4OfMJ2AJmgTKJZRPe
-	s4P0MgtISyz/xwES5hQwk7g+fR0bxKXKEgeX/GaHsGslPv99xjiBUXgWkkmzkEyahTAJIqwl
-	cePfSyYMYW2JZQtfM0PYthLr1r1nWcDIvopRJLW0ODc9t9hQrzgxt7g0L10vOT93EyMwNW07
-	9nPzDsZ5rz7qHWJk4mA8xKgC1Plow+oLjFIsefl5qUoivKcCDqUI8aYkVlalFuXHF5XmpBYf
-	YjQFhuJEZinR5Hxg0swriTc0MzA1NDGzNDC1NDNWEuf1LOhIFBJITyxJzU5NLUgtgulj4uCU
-	amCaxzk98CTjwqqCHptk3efN3yM279V58FdZinsKz4m7q3l6GOq2bX93sfuN6LSjt6/1dvAw
-	CF6ViPji+SpGTq796J4Svv6VEl8DNqy5LuPDuXK9dc4xS9YjBRslZVzjDu9vnsYRdU12sqr+
-	maL6Y+vqW5OWlHK2sLfmMnadPn125fxXObWHPE6eLNW6wv/2i7V0tM+582c41Pte3Ui5X7mc
-	2dbWv154ycsnBp9nZK222qee9alCdmfD2g/PL3SwJZZYLVrzIWy/0N6zH4PbmdhOXnKdIKU1
-	YZ7hyt/7Jsrtvs1q3jAp+ZtqxZcJVSo+a+sddb91HAl4ltUw+2NWLvt9ncayGcf1HxZai2ea
-	XH2uxFKckWioxVxUnAgAgo+3peIDAAA=
-X-CMS-MailID: 20230728074148eucas1p119baa7ba630f26611d21a9a78aa4f48c
-X-Msg-Generator: CA
-X-RootMTR: 20230726140659eucas1p2c3cd9f57dd13c71ddeb78d2480587e72
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20230726140659eucas1p2c3cd9f57dd13c71ddeb78d2480587e72
-References: <20230726140635.2059334-1-j.granados@samsung.com>
-	<CGME20230726140659eucas1p2c3cd9f57dd13c71ddeb78d2480587e72@eucas1p2.samsung.com>
-	<20230726140635.2059334-7-j.granados@samsung.com>
-	<ZMFexmOcfyORkRRs@bombadil.infradead.org>
-	<20230727122200.r5o2mj5qgah5yfwm@localhost>
-	<ZMKQSqeKNcJCqkDB@bombadil.infradead.org>
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:b01:1d::7b
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
---23prfwofjqduce7c
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Hello netdev-team,
 
-On Thu, Jul 27, 2023 at 08:42:02AM -0700, Luis Chamberlain wrote:
-> On Thu, Jul 27, 2023 at 02:22:00PM +0200, Joel Granados wrote:
-> > On Wed, Jul 26, 2023 at 10:58:30AM -0700, Luis Chamberlain wrote:
-> > > On Wed, Jul 26, 2023 at 04:06:26PM +0200, Joel Granados wrote:
-> > > > In order to remove the end element from the ctl_table struct arrays=
-, we
-> > > > replace the register_syctl function with a macro that will add the
-> > > > ARRAY_SIZE to the new register_sysctl_sz function. In this way the
-> > > > callers that are already using an array of ctl_table structs do not=
- have
-> > > > to change. We *do* change the callers that pass the ctl_table array=
- as a
-> > > > pointer.
-> > >=20
-> > > Thanks for doing this and this series!
-> > >=20
-> > > > Signed-off-by: Joel Granados <j.granados@samsung.com>
-> > > > ---
-> > > > diff --git a/include/linux/sysctl.h b/include/linux/sysctl.h
-> > > > index 0495c858989f..b1168ae281c9 100644
-> > > > --- a/include/linux/sysctl.h
-> > > > +++ b/include/linux/sysctl.h
-> > > > @@ -215,6 +215,9 @@ struct ctl_path {
-> > > >  	const char *procname;
-> > > >  };
-> > > > =20
-> > > > +#define register_sysctl(path, table)	\
-> > > > +	register_sysctl_sz(path, table, ARRAY_SIZE(table))
-> > > > +
-> > > >  #ifdef CONFIG_SYSCTL
-> > >=20
-> > > Wasn't it Greg who had suggested this? Maybe add Suggested-by with him
-> > > on it.
-> > Yes. I mentioned him in the cover letter and did not add the tag because
-> > I had not asked for permission to use it. I'll drop him a mail and
-> > include the suggested-by if he agrees.
->=20
-> FWIW, I never ask, if they ask for it, clearly they suggested it.
-I was following Documentation/process/submitting-patches.rst:
-"... Please note that this tag should not be added without the
-reporter's permission... ".
-In any case, Greg has already said yes :)
+this is a pull request of 21 patches for net-next/master.
 
->=20
-> > > Also, your cover letter and first few patches are not CC'd to the net=
-dev
-> > > list or others. What you want to do is collect all the email addresses
-> > > for this small patch series and add them to who you email for your
-> > > entire series, otherwise at times they won't be able to properly revi=
-ew
-> > > or understand the exact context of the changes. You want folks to do =
-less
-> > > work to review, not more.
-> > Here I wanted to avoid very big e-mail headers as I have received
-> > rejections from lists in the past. But I for this set, the number of
-> > e-mails is ok to just include everyone.
->=20
-> I hear that from time to time, if you have issues with adding folks on
-> the To address it may be an SMTP server issue, ie, corp email SMTP
-> server issues. To fix that I avoid corp email SMTP servers.
-My experience was more from the lists rejecting the e-mail because the
-header was too big. With that said, I'll look into SMTP alternatives to
-reduce possible errors
+The 1st patch is by Gerhard Uttenthaler, which adds Gerhard as the
+maintainer ems_pci driver.
 
->=20
->   Luis
+Peter Seiderer's patch removes a unused function from the peak_usb
+driver.
 
---=20
+The next 4 patches are by John Watts and add support for the sun4i_can
+driver on the Allwinner D1.
 
-Joel Granados
+Rob Herring's patch corrects the DT includes in various CAN drivers.
 
---23prfwofjqduce7c
-Content-Type: application/pgp-signature; name="signature.asc"
+Followed by 14 patches from me concerning the gs_usb driver. The first
+11 are various cleanups consisting of coding style improvements, error
+path printout cleanups, and removal of unneeded
+usb_kill_anchored_urbs(). The last 3 convert the driver to use NAPI to
+avoid out-of-order reception of CAN frames.
 
------BEGIN PGP SIGNATURE-----
+regards,
+Marc
 
-iQGzBAABCgAdFiEErkcJVyXmMSXOyyeQupfNUreWQU8FAmTDcToACgkQupfNUreW
-QU8ebwv/XlR1FEHFz9SLvGQjHETNnsFs3RVx30G5KCg+zWiSQoVJOlNktqeQbH35
-CmMfVi3M7mt/wJZ8MiyXFowzmGqVF7lNCpOYIH4s8ppDEylmxhowVw8QKFYLd74Q
-SksNllHUi2tmbhnpH+YuIDL1HTPt+p6ejYhq3kCFTB2DbibH+1uCiNMTYTov3Hq0
-/sLMgb7zpqQviJPX0rR0ctXcwY2w04MQmyAjN4ot8qskmckzvLmoP3ILVFdvbkb/
-/+zuPvocJZxuizrgxUNbpcz7m+4v0yzbTMl+xRl2RnGfHIKNU/jGmT2mDPVAoaOj
-bb9PqgILxfxkhh6arsoTPt0HjTihLhGiJnxSGzyCBJzGjpF98y5g6PU52t0JGid9
-0kX4/EPh31hklspwHaqbhRqWafJy6iU5xW2FkjFHOAPfdEtpRK9Ubwh8Roxa9KR9
-EUjgl6+Bgg0TvcSOjxgEK7HmeudqheOIU939bFeQFh6vs2KCnc3IdxOuhTtC3IHR
-B9dgJcCy
-=qAfE
------END PGP SIGNATURE-----
+---
 
---23prfwofjqduce7c--
+The following changes since commit 3d40aed862874db14e1dd41fd6f12636dcfdcc3e:
+
+  net: Explicitly include correct DT includes (2023-07-27 20:33:16 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/mkl/linux-can-next.git tags/linux-can-next-for-6.6-20230728
+
+for you to fetch changes up to 52be626ccbd7421f6124429b6d9fea9e31ae602f:
+
+  Merge patch series "can: gs_usb: convert to NAPI" (2023-07-28 09:46:15 +0200)
+
+----------------------------------------------------------------
+linux-can-next-for-6.6-20230728
+
+----------------------------------------------------------------
+Gerhard Uttenthaler (1):
+      MAINTAINERS: Add myself as maintainer of the ems_pci.c driver
+
+John Watts (4):
+      dt-bindings: net: can: Add support for Allwinner D1 CAN controller
+      riscv: dts: allwinner: d1: Add CAN controller nodes
+      can: sun4i_can: Add acceptance register quirk
+      can: sun4i_can: Add support for the Allwinner D1
+
+Marc Kleine-Budde (17):
+      Merge patch series "Add support for Allwinner D1 CAN controllers"
+      can: gs_usb: remove leading space from goto labels
+      can: gs_usb: gs_usb_probe(): align block comment
+      can: gs_usb: gs_usb_set_timestamp(): remove return statements form void function
+      can: gs_usb: uniformly use "parent" as variable name for struct gs_usb
+      can: gs_usb: gs_usb_receive_bulk_callback(): make use of netdev
+      can: gs_usb: gs_usb_receive_bulk_callback(): make use of stats
+      can: gs_usb: gs_usb_receive_bulk_callback(): count RX overflow errors also in case of OOM
+      can: gs_usb: gs_can_start_xmit(), gs_can_open(): clean up printouts in error path
+      can: gs_usb: gs_can_close(): don't complain about failed device reset during ndo_stop
+      can: gs_usb: gs_destroy_candev(): remove not needed usb_kill_anchored_urbs()
+      can: gs_usb: gs_usb_disconnect(): remove not needed usb_kill_anchored_urbs()
+      Merge patch series "can: gs_usb-cleanups: various clenaups"
+      can: rx-offload: rename rx_offload_get_echo_skb() -> can_rx_offload_get_echo_skb_queue_timestamp()
+      can: rx-offload: add can_rx_offload_get_echo_skb_queue_tail()
+      can: gs_usb: convert to NAPI/rx-offload to avoid OoO reception
+      Merge patch series "can: gs_usb: convert to NAPI"
+
+Peter Seiderer (1):
+      can: peak_usb: remove unused/legacy peak_usb_netif_rx() function
+
+Rob Herring (1):
+      can: Explicitly include correct DT includes, part 2
+
+ .../bindings/net/can/allwinner,sun4i-a10-can.yaml  |   6 +-
+ MAINTAINERS                                        |   7 +
+ arch/riscv/boot/dts/allwinner/sunxi-d1s-t113.dtsi  |  30 ++++
+ drivers/net/can/Kconfig                            |   4 +-
+ drivers/net/can/bxcan.c                            |   1 -
+ drivers/net/can/dev/rx-offload.c                   |  36 +++-
+ drivers/net/can/flexcan/flexcan-core.c             |   4 +-
+ drivers/net/can/ifi_canfd/ifi_canfd.c              |   1 -
+ drivers/net/can/m_can/m_can.c                      |   9 +-
+ drivers/net/can/m_can/m_can.h                      |   1 -
+ drivers/net/can/rcar/rcar_canfd.c                  |   1 -
+ drivers/net/can/sja1000/sja1000_platform.c         |   1 -
+ drivers/net/can/spi/mcp251xfd/mcp251xfd-tef.c      |   6 +-
+ drivers/net/can/sun4i_can.c                        |  23 ++-
+ drivers/net/can/ti_hecc.c                          |   5 +-
+ drivers/net/can/usb/Kconfig                        |   1 +
+ drivers/net/can/usb/gs_usb.c                       | 187 +++++++++++++--------
+ drivers/net/can/usb/peak_usb/pcan_usb_core.c       |  13 --
+ drivers/net/can/usb/peak_usb/pcan_usb_core.h       |   2 -
+ include/linux/can/rx-offload.h                     |  11 +-
+ 20 files changed, 225 insertions(+), 124 deletions(-)
+
+
 
