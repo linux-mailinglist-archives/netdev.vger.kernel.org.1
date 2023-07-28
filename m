@@ -1,77 +1,192 @@
-Return-Path: <netdev+bounces-22125-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22126-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02271766206
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 04:43:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4B9A766212
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 04:51:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AE6FF2825A8
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 02:43:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7EBBF282547
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 02:51:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86AB32714A;
-	Fri, 28 Jul 2023 02:43:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6F042714A;
+	Fri, 28 Jul 2023 02:51:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B66117EC;
-	Fri, 28 Jul 2023 02:43:12 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 35AECC433C9;
-	Fri, 28 Jul 2023 02:43:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690512192;
-	bh=pm8EEJ3QVFbZRsnnFWhbHs7DxRk67vj7nVk7xzm5K6A=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=JY3PNodbQLvsX/IukNSn5Vy8hxvOWmgmZbr57BdemunG/lL+U0h/YWYpcQqnNiRqs
-	 mxnwR/BO7w1OkCYLZx2dQtDyjf5FdlCcRWeHJLR3PL56T00W16VIjBaQiDOjdkh9/m
-	 aRtXi96h3XHUh1AXrzpgggQa2nBFAsKoUCLjV8crWrW8ThqmXF2PUbJb0vv40fCCkL
-	 BjGH0CVYHb7/4fpBAM3VQyp3+5BAQlznyNuwDqjJHO1CSxxiezQygfHrsqRDYgipl5
-	 Q+q38AFIpg3yybJUMpQaNW9jr5Jf2KT5UKwvNtjrIv1+Atw0zGmyxs3vDU3tsyopi6
-	 TE658BcOcHnzA==
-Date: Thu, 27 Jul 2023 19:43:11 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Anjali Kulkarni <anjali.k.kulkarni@oracle.com>
-Cc: Shuah Khan <skhan@linuxfoundation.org>, Naresh Kamboju
- <naresh.kamboju@linaro.org>, "open list:KERNEL SELFTEST FRAMEWORK"
- <linux-kselftest@vger.kernel.org>, open list
- <linux-kernel@vger.kernel.org>, "lkft-triage@lists.linaro.org"
- <lkft-triage@lists.linaro.org>, Netdev <netdev@vger.kernel.org>,
- clang-built-linux <llvm@lists.linux.dev>, Shuah Khan <shuah@kernel.org>,
- Anders Roxell <anders.roxell@linaro.org>, "David S. Miller"
- <davem@davemloft.net>, Liam Howlett <liam.howlett@oracle.com>
-Subject: Re: selftests: connector: proc_filter.c:48:20: error: invalid
- application of 'sizeof' to an incomplete type 'struct proc_input'
-Message-ID: <20230727194311.6a51f285@kernel.org>
-In-Reply-To: <DD53AFBE-F948-40F9-A980-2DA155236237@oracle.com>
-References: <CA+G9fYt=6ysz636XcQ=-KJp7vJcMZ=NjbQBrn77v7vnTcfP2cA@mail.gmail.com>
-	<E8C72537-4280-401A-B25D-9734D2756A6A@oracle.com>
-	<BB43F17E-EC00-4E72-BB3D-F4E6FA65F954@oracle.com>
-	<799d6088-e28f-f386-6a00-2291304171a2@linuxfoundation.org>
-	<DD53AFBE-F948-40F9-A980-2DA155236237@oracle.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B897119C
+	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 02:51:16 +0000 (UTC)
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C12CE2139;
+	Thu, 27 Jul 2023 19:51:13 -0700 (PDT)
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.96)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1qPDZ9-00008m-1J;
+	Fri, 28 Jul 2023 02:50:55 +0000
+Date: Fri, 28 Jul 2023 03:50:47 +0100
+From: Daniel Golle <daniel@makrotopia.org>
+To: Felix Fietkau <nbd@nbd.name>, Lorenzo Bianconi <lorenzo@kernel.org>,
+	Ryder Lee <ryder.lee@mediatek.com>,
+	Shayne Chen <shayne.chen@mediatek.com>,
+	Sean Wang <sean.wang@mediatek.com>, Kalle Valo <kvalo@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: [PATCH v2 1/2] dt-bindings: mt76: support setting per-band MAC
+ address
+Message-ID: <6e9cfac5758dd06429fadf6c1c70c569c86f3a95.1690512516.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Fri, 28 Jul 2023 01:38:40 +0000 Anjali Kulkarni wrote:
-> Jakub,
-> Do I need to revert the -f runtime filter option back to compile time
-> and commit with that disabled so the selftest compiles on a kernel on
-> which the new options are not defined?
+Introduce support for setting individual per-band MAC addresses using
+NVMEM cells by adding a 'bands' object with enumerated child nodes
+representing the 2.4 GHz, 5 GHz and 6 GHz bands.
 
-I'm not 100% sure myself on what's the expectations for building
-selftests against uAPI headers is..
+In case it is defined, call of_get_mac_address for the per-band child
+node, otherwise try with of_get_mac_address on the main device node and
+fall back to a random address like it used to be.
 
-I _think_ that you're supposed to add an -I$something to
-the CFLAGS in your Makefile. KHDR_INCLUDES maybe? So that the uAPI
-headers from the build get used (rendered by make headers).
+While at it, add MAC address related properties also for the main node
+and update example to use EEPROM via nvmem-cells instead of deprecated
+mediatek,mtd-eeprom property.
 
-Take a look at Documentation/dev-tools/kselftest.rst, I hope
-the answer is somewhere there.
+Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+---
+ .../bindings/net/wireless/mediatek,mt76.yaml  | 59 ++++++++++++++++++-
+ 1 file changed, 58 insertions(+), 1 deletion(-)
+
+diff --git a/Documentation/devicetree/bindings/net/wireless/mediatek,mt76.yaml b/Documentation/devicetree/bindings/net/wireless/mediatek,mt76.yaml
+index 252207adbc54c..2474f4f7e34b0 100644
+--- a/Documentation/devicetree/bindings/net/wireless/mediatek,mt76.yaml
++++ b/Documentation/devicetree/bindings/net/wireless/mediatek,mt76.yaml
+@@ -37,6 +37,12 @@ properties:
+     description:
+       MT7986 should contain 3 regions consys, dcm, and sku, in this order.
+ 
++  '#address-cells':
++    const: 1
++
++  '#size-cells':
++    const: 0
++
+   interrupts:
+     maxItems: 1
+ 
+@@ -72,13 +78,23 @@ properties:
+ 
+   ieee80211-freq-limit: true
+ 
++  address: true
++
++  local-mac-address: true
++
++  mac-address: true
++
+   nvmem-cells:
++    minItems: 1
+     items:
+       - description: NVMEM cell with EEPROM
++      - description: NVMEM cell with the MAC address
+ 
+   nvmem-cell-names:
++    minItems: 1
+     items:
+       - const: eeprom
++      - const: mac-address
+ 
+   mediatek,eeprom-data:
+     $ref: /schemas/types.yaml#/definitions/uint32-array
+@@ -213,6 +229,30 @@ properties:
+                     description:
+                       Half-dBm power delta for different numbers of antennas
+ 
++patternProperties:
++  '^band@[0-2]+$':
++    type: object
++    additionalProperties: false
++    properties:
++      reg:
++        maxItems: 1
++
++      address: true
++      local-mac-address: true
++      mac-address: true
++
++      nvmem-cells:
++        description: NVMEM cell with the MAC address
++
++      nvmem-cell-names:
++        items:
++          - const: mac-address
++
++    required:
++      - reg
++
++    unevaluatedProperties: false
++
+ required:
+   - compatible
+   - reg
+@@ -225,10 +265,13 @@ examples:
+       #address-cells = <3>;
+       #size-cells = <2>;
+       wifi@0,0 {
++        #address-cells = <1>;
++        #size-cells = <0>;
+         compatible = "mediatek,mt76";
+         reg = <0x0000 0 0 0 0>;
+         ieee80211-freq-limit = <5000000 6000000>;
+-        mediatek,mtd-eeprom = <&factory 0x8000>;
++        nvmem-cells = <&factory_eeprom>;
++        nvmem-cell-names = "eeprom";
+         big-endian;
+ 
+         led {
+@@ -257,6 +300,20 @@ examples:
+              };
+           };
+         };
++
++        band@0 {
++          /* 2.4 GHz */
++          reg = <0>;
++          nvmem-cells = <&macaddr 0x4>;
++          nvmem-cell-names = "mac-address";
++        };
++
++        band@1 {
++          /* 5 GHz */
++          reg = <1>;
++          nvmem-cells = <&macaddr 0xa>;
++          nvmem-cell-names = "mac-address";
++        };
+       };
+     };
+ 
+-- 
+2.41.0
 
