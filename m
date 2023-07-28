@@ -1,234 +1,174 @@
-Return-Path: <netdev+bounces-22324-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22325-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5455F76704E
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 17:15:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CCEF76706D
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 17:23:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 854A21C218B0
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 15:15:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C87BF282671
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 15:23:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E500D14010;
-	Fri, 28 Jul 2023 15:15:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B9F014012;
+	Fri, 28 Jul 2023 15:23:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2AD314005
-	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 15:15:09 +0000 (UTC)
-Received: from mail-ed1-x531.google.com (mail-ed1-x531.google.com [IPv6:2a00:1450:4864:20::531])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 721E12115
-	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 08:15:06 -0700 (PDT)
-Received: by mail-ed1-x531.google.com with SMTP id 4fb4d7f45d1cf-522462d8416so2872806a12.1
-        for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 08:15:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tessares.net; s=google; t=1690557305; x=1691162105;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=dUsoDe1aciZkS3SYBk+FJnom/bcWm6HUHz7xtg9wGVE=;
-        b=xlBQr91VrE+fcTMQtJeL8UehPRNRDcOoL3Jb7oeY/mrCveqo1mf708pc0eDYwfspAJ
-         A+kaOd3By9dV4yBq+KBkmUafQK3E1WIz9fm1vsVKJtrzZ69uoTGDsVyPg7Xo8lpzBMV7
-         F6TD0DCllb2LydrhPW33jZF0TgI2xFAg27NxhuBNndHVKqMobgm/+RCpx6Ngqg8YxKB7
-         b83oDwxzwWX8OZXxHIXZG598ch1mn5d3uloQxGo1tY0/gZEnwuPNS6xRJH8gYeGIarEo
-         Gc73xHWp4OAegZDVNbxQI5pzehlWrR/ANJAK/2Ze7/lopQhmjJV/Vq/9Qqv6X8RhKmbK
-         ZQvQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690557305; x=1691162105;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=dUsoDe1aciZkS3SYBk+FJnom/bcWm6HUHz7xtg9wGVE=;
-        b=Sb2hCYaLm5XPts1oTcFV6XIEEkFcY0/CIRK0y9pFVN268mCZ1jgwSX9CFbIes3EFWm
-         WDfdelwz1r3ZMqoVjLfmIFor+iJiBdsIE1G53VwUKZV8vwoqwu+fO6uhU9CS01iIidEM
-         yd2SOGKz6YLBmw5uRz+xXTUIXMr9tIjBL4JSYK9LvZk8QhrM2YsNkdVepZk4SuhWe1La
-         j/82uwuaj1IkrWUGatrvzwAbTa7TlYkbjGYbMXW2mJFXuIdnhbpLCWBK+TFTJcfdk7Dn
-         Xv0DUgd8SlFB4HcBH/dWm3lM9jQwmyMUOuQ2uC9mwC3K0B1noRzCO3XhYZDgSEIw7LoR
-         qnYg==
-X-Gm-Message-State: ABy/qLY7AXpzqg1ElAJpDDpt4NtZ/A5G5YMEf4FDpzMyR8nEZo/5tAkB
-	rtLOjkAFgpzrg8178F+/V9bmKA==
-X-Google-Smtp-Source: APBJJlGrx217B3+2JoDDsOR5Pe+xG2RV8Yfclk4WQBqChj/RTKdH94R2bDDyfq5dnAZDNu9v1WPHIA==
-X-Received: by 2002:aa7:c68f:0:b0:51e:24e1:c0e9 with SMTP id n15-20020aa7c68f000000b0051e24e1c0e9mr2023024edq.10.1690557304905;
-        Fri, 28 Jul 2023 08:15:04 -0700 (PDT)
-Received: from [10.44.2.5] ([81.246.10.41])
-        by smtp.gmail.com with ESMTPSA id ba4-20020a0564021ac400b00522572f323dsm1880856edb.16.2023.07.28.08.15.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 28 Jul 2023 08:15:04 -0700 (PDT)
-Message-ID: <1023fdeb-a45a-2e9e-cd2e-7e44e655e8fc@tessares.net>
-Date: Fri, 28 Jul 2023 17:15:03 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 897521C06
+	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 15:23:09 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (unknown [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B58F35B0;
+	Fri, 28 Jul 2023 08:23:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=zFaTvjva0ryo1dGvlmwD9YwRXLb5KCK4M2vuVLGCmtY=; b=R648ApYvuLp9TRmpig3RK00k45
+	iwo/6SoqI2MGew0WOsD/C0Pmrd8pPKAp71PCdAHyf3DtaYQsTPecUkOn3Ka5apKAjNYX6GLNVerk9
+	FFE1jTiLl2rSU5G3jkLo1oh6P7XcoETkQj9jfhD9f6wgdOzCB8UBP3/wJV0846kRjE/XAE2JhyHZH
+	17FIB6eRR571XIYccm02B92tb7uFK5y7rI/XX8k2I4Kqoh8AAR60xEZyV2pvw8TPmoHWD372yIBE8
+	vccayBxsZXU4StXzIKMWl3/WmbHP3Z2Iz5Jy/oCU3DexPI5jEKpOQOtuhgX3I+d6ZmBAypVpilYa/
+	+TG9D+Kw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:34660)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qPPIQ-0007Qe-2c;
+	Fri, 28 Jul 2023 16:22:26 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qPPIJ-00051L-6E; Fri, 28 Jul 2023 16:22:19 +0100
+Date: Fri, 28 Jul 2023 16:22:19 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Halaney <ahalaney@redhat.com>, Will Deacon <will@kernel.org>
+Cc: Shenwei Wang <shenwei.wang@nxp.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Shawn Guo <shawnguo@kernel.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	Kevin Hilman <khilman@baylibre.com>, Vinod Koul <vkoul@kernel.org>,
+	Chen-Yu Tsai <wens@csie.org>,
+	Jernej Skrabec <jernej.skrabec@gmail.com>,
+	Samuel Holland <samuel@sholland.org>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>,
+	NXP Linux Team <linux-imx@nxp.com>,
+	Jerome Brunet <jbrunet@baylibre.com>,
+	Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
+	Bhupesh Sharma <bhupesh.sharma@linaro.org>,
+	Nobuhiro Iwamatsu <nobuhiro1.iwamatsu@toshiba.co.jp>,
+	Simon Horman <simon.horman@corigine.com>,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
+	Wong Vee Khee <veekhee@apple.com>,
+	Revanth Kumar Uppala <ruppala@nvidia.com>,
+	Jochen Henneberg <jh@henneberg-systemdesign.com>,
+	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-amlogic@lists.infradead.org, imx@lists.linux.dev,
+	Frank Li <frank.li@nxp.com>
+Subject: Re: [PATCH v2 net 2/2] net: stmmac: dwmac-imx: pause the TXC clock
+ in fixed-link
+Message-ID: <ZMPdKyOtpZKEMLsO@shell.armlinux.org.uk>
+References: <20230727152503.2199550-1-shenwei.wang@nxp.com>
+ <20230727152503.2199550-3-shenwei.wang@nxp.com>
+ <4govb566nypifbtqp5lcbsjhvoyble5luww3onaa2liinboguf@4kgihys6vhrg>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [RFC bpf-next v5] bpf: Force to MPTCP
-Content-Language: en-GB
-To: Stanislav Fomichev <sdf@google.com>
-Cc: Paul Moore <paul@paul-moore.com>, Geliang Tang <geliang.tang@suse.com>,
- Alexei Starovoitov <ast@kernel.org>, bpf@vger.kernel.org,
- netdev@vger.kernel.org, mptcp@lists.linux.dev, apparmor@lists.ubuntu.com,
- linux-security-module@vger.kernel.org, selinux@vger.kernel.org,
- linux-kselftest@vger.kernel.org
-References: <3076188eb88cca9151a2d12b50ba1e870b11ce09.1689693294.git.geliang.tang@suse.com>
- <CAHC9VhS_LKdkEmm5_J5y34RpaRcTbg8==fpz8pMThDCjF6nYtQ@mail.gmail.com>
- <b41babb1-f0f2-dc2f-c2e3-1870107fbd9f@tessares.net>
- <ZMKxC+CFj4GbCklg@google.com>
-From: Matthieu Baerts <matthieu.baerts@tessares.net>
-In-Reply-To: <ZMKxC+CFj4GbCklg@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4govb566nypifbtqp5lcbsjhvoyble5luww3onaa2liinboguf@4kgihys6vhrg>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,RDNS_NONE,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Stanislav,
-
-On 27/07/2023 20:01, Stanislav Fomichev wrote:
-> On 07/27, Matthieu Baerts wrote:
->> Hi Paul, Stanislav,
->>
->> On 18/07/2023 18:14, Paul Moore wrote:
->>> On Tue, Jul 18, 2023 at 11:21 AM Geliang Tang <geliang.tang@suse.com> wrote:
->>>>
->>>> As is described in the "How to use MPTCP?" section in MPTCP wiki [1]:
->>>>
->>>> "Your app can create sockets with IPPROTO_MPTCP as the proto:
->>>> ( socket(AF_INET, SOCK_STREAM, IPPROTO_MPTCP); ). Legacy apps can be
->>>> forced to create and use MPTCP sockets instead of TCP ones via the
->>>> mptcpize command bundled with the mptcpd daemon."
->>>>
->>>> But the mptcpize (LD_PRELOAD technique) command has some limitations
->>>> [2]:
->>>>
->>>>  - it doesn't work if the application is not using libc (e.g. GoLang
->>>> apps)
->>>>  - in some envs, it might not be easy to set env vars / change the way
->>>> apps are launched, e.g. on Android
->>>>  - mptcpize needs to be launched with all apps that want MPTCP: we could
->>>> have more control from BPF to enable MPTCP only for some apps or all the
->>>> ones of a netns or a cgroup, etc.
->>>>  - it is not in BPF, we cannot talk about it at netdev conf.
->>>>
->>>> So this patchset attempts to use BPF to implement functions similer to
->>>> mptcpize.
->>>>
->>>> The main idea is add a hook in sys_socket() to change the protocol id
->>>> from IPPROTO_TCP (or 0) to IPPROTO_MPTCP.
->>>>
->>>> [1]
->>>> https://github.com/multipath-tcp/mptcp_net-next/wiki
->>>> [2]
->>>> https://github.com/multipath-tcp/mptcp_net-next/issues/79
->>>>
->>>> v5:
->>>>  - add bpf_mptcpify helper.
->>>>
->>>> v4:
->>>>  - use lsm_cgroup/socket_create
->>>>
->>>> v3:
->>>>  - patch 8: char cmd[128]; -> char cmd[256];
->>>>
->>>> v2:
->>>>  - Fix build selftests errors reported by CI
->>>>
->>>> Closes: https://github.com/multipath-tcp/mptcp_net-next/issues/79
->>>> Signed-off-by: Geliang Tang <geliang.tang@suse.com>
->>>> ---
->>>>  include/linux/bpf.h                           |   1 +
->>>>  include/linux/lsm_hook_defs.h                 |   2 +-
->>>>  include/linux/security.h                      |   6 +-
->>>>  include/uapi/linux/bpf.h                      |   7 +
->>>>  kernel/bpf/bpf_lsm.c                          |   2 +
->>>>  net/mptcp/bpf.c                               |  20 +++
->>>>  net/socket.c                                  |   4 +-
->>>>  security/apparmor/lsm.c                       |   8 +-
->>>>  security/security.c                           |   2 +-
->>>>  security/selinux/hooks.c                      |   6 +-
->>>>  tools/include/uapi/linux/bpf.h                |   7 +
->>>>  .../testing/selftests/bpf/prog_tests/mptcp.c  | 128 ++++++++++++++++--
->>>>  tools/testing/selftests/bpf/progs/mptcpify.c  |  17 +++
->>>>  13 files changed, 187 insertions(+), 23 deletions(-)
->>>>  create mode 100644 tools/testing/selftests/bpf/progs/mptcpify.c
->>>
->>> ...
->>>
->>>> diff --git a/security/security.c b/security/security.c
->>>> index b720424ca37d..bbebcddce420 100644
->>>> --- a/security/security.c
->>>> +++ b/security/security.c
->>>> @@ -4078,7 +4078,7 @@ EXPORT_SYMBOL(security_unix_may_send);
->>>>   *
->>>>   * Return: Returns 0 if permission is granted.
->>>>   */
->>>> -int security_socket_create(int family, int type, int protocol, int kern)
->>>> +int security_socket_create(int *family, int *type, int *protocol, int kern)
->>>>  {
->>>>         return call_int_hook(socket_create, 0, family, type, protocol, kern);
->>>>  }
->>>
->>> Using the LSM to change the protocol family is not something we want
->>> to allow.  I'm sorry, but you will need to take a different approach.
->>
->> @Paul: Thank you for your feedback. It makes sense and I understand.
->>
->> @Stanislav: Despite the fact the implementation was smaller and reusing
->> more code, it looks like we cannot go in the direction you suggested. Do
->> you think what Geliang suggested before in his v3 [1] can be accepted?
->>
->> (Note that the v3 is the same as the v1, only some fixes in the selftests.)
+On Thu, Jul 27, 2023 at 01:36:45PM -0500, Andrew Halaney wrote:
+> > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c
+> > index 53ee5a42c071..e7819960128e 100644
+> > --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c
+> > +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c
+> > @@ -40,6 +40,9 @@
+> >  #define DMA_BUS_MODE			0x00001000
+> >  #define DMA_BUS_MODE_SFT_RESET		(0x1 << 0)
+> >  #define RMII_RESET_SPEED		(0x3 << 14)
+> > +#define MII_RESET_SPEED			(0x2 << 14)
+> > +#define RGMII_RESET_SPEED		(0x0 << 14)
+> > +#define CTRL_SPEED_MASK			(0x3 << 14)
 > 
-> We have too many hooks in networking, so something that doesn't add
-> a new one is preferable :-(
+> GENMASK() would be cleaner, as well as BIT() usage, but I do see
+> the driver currently does shifts.. so /me shrugs
 
-Thank you for your reply and the explanation, I understand.
+BIT() is only useful for single-bit items, not for use with bitfields,
+and their use with bitfields just makes the whole thing perverse.
 
-> Moreover, we already have a 'socket init' hook, but it runs a bit late.
+#define CTRL_SPEED_MASK		GENMASK(15, 14)
+#define CTRL_SPEED_RGMII_RESET	0
+#define CTRL_SPEED_MII_RESET	2
+#define CTRL_SPEED_RMII_RESET	3
 
-Indeed. And we cannot move it before the creation of the socket.
+and then its use:
 
-> Is existing cgroup/sock completely unworkable? Is it possible to
-> expose some new bpf_upgrade_socket_to(IPPROTO_MPTCP) kfunc which would
-> call some new net_proto_family->upgrade_to(IPPROTO_MPTCP) to do the surgery?
-> Or is it too hacky?
+	FIELD_PREP(CTRL_SPEED_MASK, CTRL_SPEED_RGMII_RESET)
+or
+	FIELD_PREP(CTRL_SPEED_MASK, CTRL_SPEED_MII_RESET)
+or
+	FIELD_PREP(CTRL_SPEED_MASK, CTRL_SPEED_RMII_RESET)
 
-I cannot judge if it is too hacky or not but if you think it would be
-OK, please tell us :)
+alternatively:
 
-> Another option Alexei suggested is to add some fentry-like thing:
+        if (iface == MX93_GPR_ENET_QOS_INTF_SEL_RMII)
+                speed = CTRL_SPEED_RMII_RESET;
+        else (iface == MX93_GPR_ENET_QOS_INTF_SEL_MII)
+                speed = CTRL_SPEED_MII_RESET;
+	else
+		speed = CTRL_SPEED_RGMII_RESET;
+
+	old_ctrl = readl(dwmac->base_addr + MAC_CTRL_REG);
+	ctrl = old_ctrl & ~CTRL_SPEED_MASK;
+	ctrl |= FIELD_PREP(CTRL_SPEED_MASK, speed);
+	writel(ctrl, dwmac->base_addr + MAC_CTRL_REG);
+
+> I don't have any documentation for the registers here, and as you can
+> see I'm an amateur with respect to memory ordering based on my prior
+> comment.
 > 
-> noinline int update_socket_protocol(int protocol)
-> {
-> 	return protocol;
-> }
-> /* TODO: ^^^ add the above to mod_ret set */
+> But you:
 > 
-> int __sys_socket(int family, int type, int protocol)
-> {
-> 	...
-> 
-> 	protocol = update_socket_protocol(protocol);
-> 
-> 	...
-> }
-> 
-> But it's also too problem specific it seems? And it's not cgroup-aware.
+>     1. Read intf_reg_off into variable iface
+>     2. Write the RESET_SPEED for the appropriate mode to MAC_CTRL_REG
+>     3. wmb() to ensure that write goes through
 
-It looks like it is what Geliang did in his v6. If it is the only
-acceptable solution, I guess we can do without cgroup support. We can
-continue the discussions in his v6 if that's easier.
+I wonder about whether that wmb() is required. If the mapping is
+device-like rather than memory-like, the write should be committed
+before the read that regmap_update_bits() does according to the ARM
+memory model. Maybe a bit of information about where this barrier
+has come from would be good, and maybe getting it reviewed by the
+arm64 barrier specialist, Will Deacon. :)
 
-Cheers,
-Matt
+wmb() is normally required to be paired with a rmb(), but we're not
+talking about system memory here, so I also wonder whether wmb() is
+the correct barrier to use.
+
+Adding Will.
+
 -- 
-Tessares | Belgium | Hybrid Access Solutions
-www.tessares.net
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
