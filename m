@@ -1,28 +1,28 @@
-Return-Path: <netdev+bounces-22185-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22184-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89E5A76665D
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 10:07:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5551A76665B
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 10:06:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AF8011C217E9
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 08:07:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 64C771C21821
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 08:06:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 552471078B;
-	Fri, 28 Jul 2023 08:02:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0158101F0;
+	Fri, 28 Jul 2023 08:02:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48EABC8E2
-	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 08:02:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94BC0101EF
+	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 08:02:09 +0000 (UTC)
 Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B638B3C01;
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F7623AAF;
 	Fri, 28 Jul 2023 01:01:51 -0700 (PDT)
-Received: from kwepemm600007.china.huawei.com (unknown [172.30.72.57])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RC0PY1gKpzNmbb;
+Received: from kwepemm600007.china.huawei.com (unknown [172.30.72.55])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RC0PY5qLWzNmZ9;
 	Fri, 28 Jul 2023 15:58:25 +0800 (CST)
 Received: from localhost.localdomain (10.67.165.2) by
  kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
@@ -36,9 +36,9 @@ CC: <shenjian15@huawei.com>, <wangjie125@huawei.com>,
 	<liuyonglong@huawei.com>, <wangpeiyang1@huawei.com>, <shaojijie@huawei.com>,
 	<netdev@vger.kernel.org>, <stable@vger.kernel.org>,
 	<linux-kernel@vger.kernel.org>
-Subject: [PATCH net 1/6] net: hns3: fix side effects passed to min_t()
-Date: Fri, 28 Jul 2023 15:58:35 +0800
-Message-ID: <20230728075840.4022760-2-shaojijie@huawei.com>
+Subject: [PATCH net 2/6] net: hns3: restore user pause configure when disable autoneg
+Date: Fri, 28 Jul 2023 15:58:36 +0800
+Message-ID: <20230728075840.4022760-3-shaojijie@huawei.com>
 X-Mailer: git-send-email 2.30.0
 In-Reply-To: <20230728075840.4022760-1-shaojijie@huawei.com>
 References: <20230728075840.4022760-1-shaojijie@huawei.com>
@@ -60,39 +60,62 @@ X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Yonglong Liu <liuyonglong@huawei.com>
+From: Jian Shen <shenjian15@huawei.com>
 
-num_online_cpus() may call more than once when passing to min_t(),
-between calls, it may return different values, so move num_online_cpus()
-out of min_t().
+Restore the mac pause state to user configuration when autoneg is disabled
 
-Signed-off-by: Yonglong Liu <liuyonglong@huawei.com>
+Signed-off-by: Jian Shen <shenjian15@huawei.com>
+Signed-off-by: Peiyang Wang <wangpeiyang1@huawei.com>
 Signed-off-by: Jijie Shao <shaojijie@huawei.com>
 ---
- drivers/net/ethernet/hisilicon/hns3/hns3_enet.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c | 5 ++++-
+ drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_tm.c   | 2 +-
+ drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_tm.h   | 1 +
+ 3 files changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
-index 9f6890059666..823e6d2e85f5 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
-@@ -4757,6 +4757,7 @@ static int hns3_nic_alloc_vector_data(struct hns3_nic_priv *priv)
+diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
+index bf675c15fbb9..5594b8dd1e1d 100644
+--- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
++++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
+@@ -10915,9 +10915,12 @@ int hclge_cfg_flowctrl(struct hclge_dev *hdev)
+ 	u32 rx_pause, tx_pause;
+ 	u8 flowctl;
+ 
+-	if (!phydev->link || !phydev->autoneg)
++	if (!phydev->link)
+ 		return 0;
+ 
++	if (!phydev->autoneg)
++		return hclge_mac_pause_setup_hw(hdev);
++
+ 	local_advertising = linkmode_adv_to_lcl_adv_t(phydev->advertising);
+ 
+ 	if (phydev->pause)
+diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_tm.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_tm.c
+index de509e5751a7..c58c31221762 100644
+--- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_tm.c
++++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_tm.c
+@@ -1553,7 +1553,7 @@ static int hclge_bp_setup_hw(struct hclge_dev *hdev, u8 tc)
+ 	return 0;
+ }
+ 
+-static int hclge_mac_pause_setup_hw(struct hclge_dev *hdev)
++int hclge_mac_pause_setup_hw(struct hclge_dev *hdev)
  {
- 	struct hnae3_handle *h = priv->ae_handle;
- 	struct hns3_enet_tqp_vector *tqp_vector;
-+	u32 online_cpus = num_online_cpus();
- 	struct hnae3_vector_info *vector;
- 	struct pci_dev *pdev = h->pdev;
- 	u16 tqp_num = h->kinfo.num_tqps;
-@@ -4766,7 +4767,7 @@ static int hns3_nic_alloc_vector_data(struct hns3_nic_priv *priv)
+ 	bool tx_en, rx_en;
  
- 	/* RSS size, cpu online and vector_num should be the same */
- 	/* Should consider 2p/4p later */
--	vector_num = min_t(u16, num_online_cpus(), tqp_num);
-+	vector_num = min_t(u16, online_cpus, tqp_num);
- 
- 	vector = devm_kcalloc(&pdev->dev, vector_num, sizeof(*vector),
- 			      GFP_KERNEL);
+diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_tm.h b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_tm.h
+index 45dcfef3f90c..53eec6df5194 100644
+--- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_tm.h
++++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_tm.h
+@@ -245,6 +245,7 @@ int hclge_pfc_pause_en_cfg(struct hclge_dev *hdev, u8 tx_rx_bitmap,
+ 			   u8 pfc_bitmap);
+ int hclge_mac_pause_en_cfg(struct hclge_dev *hdev, bool tx, bool rx);
+ int hclge_pause_addr_cfg(struct hclge_dev *hdev, const u8 *mac_addr);
++int hclge_mac_pause_setup_hw(struct hclge_dev *hdev);
+ void hclge_pfc_rx_stats_get(struct hclge_dev *hdev, u64 *stats);
+ void hclge_pfc_tx_stats_get(struct hclge_dev *hdev, u64 *stats);
+ int hclge_tm_qs_shaper_cfg(struct hclge_vport *vport, int max_tx_rate);
 -- 
 2.30.0
 
