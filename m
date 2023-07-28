@@ -1,116 +1,127 @@
-Return-Path: <netdev+bounces-22332-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22333-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D89AC7670B7
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 17:37:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA7157670BD
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 17:38:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9377828278C
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 15:37:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 07C0B1C218FF
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 15:38:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 431A214A98;
-	Fri, 28 Jul 2023 15:36:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAFD714262;
+	Fri, 28 Jul 2023 15:36:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35A091401F
-	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 15:36:07 +0000 (UTC)
-Received: from mail-oi1-x233.google.com (mail-oi1-x233.google.com [IPv6:2607:f8b0:4864:20::233])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07026B5
-	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 08:36:07 -0700 (PDT)
-Received: by mail-oi1-x233.google.com with SMTP id 5614622812f47-3a5ad6087a1so1502953b6e.2
-        for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 08:36:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20221208.gappssmtp.com; s=20221208; t=1690558566; x=1691163366;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wAET9AIuuSytohoQkAuGEwlGHg61B9zRlti8aFOkjnE=;
-        b=bu5jAoFWna8XJVFKiq5tIgZtwOfFhcRljVgjxsmKO+8kRANQZs6AgVko9K+aAAeqnm
-         2RktRQXrgJD10/DE+3MBootgEyeK8YHEYJGNeR7egBSdurbN+/V777mlV395hpJYKduP
-         FQM+CiLS7kiM8aoulN9Wt60mnS36hNPzVo8ZiDmThjb0LW8f3i3EKt3XU80+2qAGZkYE
-         gyD+Nf5dKGo8+9RygcgH96v1/ehUz0AY68l2NkaYlT02TcE3flILutLQ5gxpTx7t5SPi
-         peKTwSAtgLi1IWyTAxlR2A4hTgO/a4fn2HzLaaGaYU/v330Ocp41o2SbB6BGroeAApDz
-         B2TA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690558566; x=1691163366;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=wAET9AIuuSytohoQkAuGEwlGHg61B9zRlti8aFOkjnE=;
-        b=iBmtTesQUJWeNUajvkMgfEIUMBs7hEudRrGR/u5LW93JAymFnIbVJCXt2oSREgcm2h
-         mg9TYdBZ2VNZWY0N6pOoBSQtWydkRrmmA/XBTFAVnytVbrOh9iKHiI+P/za9B2sRYEHU
-         qkW+ki1BUl4iNAdovOp0foqpdEZGDURchtBW9RZQmuGYKTuqCTXz07jLOv5hPMQEzERL
-         fjoJ88+wql37sLVYw8pzkuKvvUxVRazzekgsvtfwiRrJpchgUXFqAf6elQcglT6sybxb
-         EKV9ke7asKNBM2LJuPCsc96zNc+wDdn1QxbOz7tOGlgbtTHwvIwnusp9fACZfcDthFv+
-         qkVw==
-X-Gm-Message-State: ABy/qLa0Mp1qD5uT7d3wwB1Zh3ZP3Jocl8uX0dsszvUfPDZr5HWNlxQ+
-	fs7QLScgfnK+jJ2xSUm9muZ8zn04NQGKIL8A4Dk=
-X-Google-Smtp-Source: APBJJlE/1xvVOGg+8M3D/XznvK0xbVcDQfzNa9TRXc/GRvZ7BpebtitUSfoNh0Yhrtx3E3pxUXZS2g==
-X-Received: by 2002:a05:6808:1893:b0:3a3:63b8:fdc7 with SMTP id bi19-20020a056808189300b003a363b8fdc7mr3564077oib.38.1690558566249;
-        Fri, 28 Jul 2023 08:36:06 -0700 (PDT)
-Received: from rogue-one.tail33bf8.ts.net ([2804:14d:5c5e:44fb:81ef:7444:5901:c19d])
-        by smtp.gmail.com with ESMTPSA id u8-20020a544388000000b003a3b321712fsm1732893oiv.35.2023.07.28.08.36.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Jul 2023 08:36:06 -0700 (PDT)
-From: Pedro Tammela <pctammela@mojatatu.com>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	jhs@mojatatu.com,
-	xiyou.wangcong@gmail.com,
-	jiri@resnulli.us,
-	Pedro Tammela <pctammela@mojatatu.com>
-Subject: [PATCH net-next v2 5/5] net/sched: sch_qfq: warn about class in use while deleting
-Date: Fri, 28 Jul 2023 12:35:37 -0300
-Message-Id: <20230728153537.1865379-6-pctammela@mojatatu.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230728153537.1865379-1-pctammela@mojatatu.com>
-References: <20230728153537.1865379-1-pctammela@mojatatu.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7751C14ABE;
+	Fri, 28 Jul 2023 15:36:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD475C433C8;
+	Fri, 28 Jul 2023 15:36:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1690558582;
+	bh=g4K5vq4lPyGBYhqgJJE0//L14vL/7BRJwDrh2+NOlqk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=S0/2qOh9DNQM/zNi5r9udD62Tuu5Uosyrt7S4golN5beku3HBItbqx/hsmFGSsjso
+	 /K78hYySn6CsOKCp40tUlRsYRNgEQR/ZSeR3x2gxM6/SvBC/W1YQyj7muSEibPxpt4
+	 9fx5kaG5gptMsk367e7ditSVFDcX2XzKOQai8PgIupG70U0dRp3wNZW74zkoQPzZ/g
+	 DdsyYULweQssqFoRfX7p2gW8o4eVxrtPtFqJjxOjm0Ib1hFQBJULx5RV4D8BgBxHCD
+	 dMb7FJIYJfoGEcIG/KcIdeYFlcF4Pb77Kzu9Gez3zZTCGgrk3wvZLSiigrkx4o4R2s
+	 S/qZhlXIcMYCQ==
+Date: Fri, 28 Jul 2023 16:36:12 +0100
+From: Will Deacon <will@kernel.org>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Halaney <ahalaney@redhat.com>,
+	Shenwei Wang <shenwei.wang@nxp.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Shawn Guo <shawnguo@kernel.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	Kevin Hilman <khilman@baylibre.com>, Vinod Koul <vkoul@kernel.org>,
+	Chen-Yu Tsai <wens@csie.org>,
+	Jernej Skrabec <jernej.skrabec@gmail.com>,
+	Samuel Holland <samuel@sholland.org>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>,
+	NXP Linux Team <linux-imx@nxp.com>,
+	Jerome Brunet <jbrunet@baylibre.com>,
+	Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
+	Bhupesh Sharma <bhupesh.sharma@linaro.org>,
+	Nobuhiro Iwamatsu <nobuhiro1.iwamatsu@toshiba.co.jp>,
+	Simon Horman <simon.horman@corigine.com>,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
+	Wong Vee Khee <veekhee@apple.com>,
+	Revanth Kumar Uppala <ruppala@nvidia.com>,
+	Jochen Henneberg <jh@henneberg-systemdesign.com>,
+	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-amlogic@lists.infradead.org, imx@lists.linux.dev,
+	Frank Li <frank.li@nxp.com>
+Subject: Re: [PATCH v2 net 2/2] net: stmmac: dwmac-imx: pause the TXC clock
+ in fixed-link
+Message-ID: <20230728153611.GH21718@willie-the-truck>
+References: <20230727152503.2199550-1-shenwei.wang@nxp.com>
+ <20230727152503.2199550-3-shenwei.wang@nxp.com>
+ <4govb566nypifbtqp5lcbsjhvoyble5luww3onaa2liinboguf@4kgihys6vhrg>
+ <ZMPdKyOtpZKEMLsO@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZMPdKyOtpZKEMLsO@shell.armlinux.org.uk>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-Add extack to warn that delete was rejected because
-the class is still in use
+On Fri, Jul 28, 2023 at 04:22:19PM +0100, Russell King (Oracle) wrote:
+> On Thu, Jul 27, 2023 at 01:36:45PM -0500, Andrew Halaney wrote:
+> > I don't have any documentation for the registers here, and as you can
+> > see I'm an amateur with respect to memory ordering based on my prior
+> > comment.
+> > 
+> > But you:
+> > 
+> >     1. Read intf_reg_off into variable iface
+> >     2. Write the RESET_SPEED for the appropriate mode to MAC_CTRL_REG
+> >     3. wmb() to ensure that write goes through
+> 
+> I wonder about whether that wmb() is required. If the mapping is
+> device-like rather than memory-like, the write should be committed
+> before the read that regmap_update_bits() does according to the ARM
+> memory model. Maybe a bit of information about where this barrier
+> has come from would be good, and maybe getting it reviewed by the
+> arm64 barrier specialist, Will Deacon. :)
+> 
+> wmb() is normally required to be paired with a rmb(), but we're not
+> talking about system memory here, so I also wonder whether wmb() is
+> the correct barrier to use.
 
-Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
-Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
----
- net/sched/sch_qfq.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Yes, I don't think wmb() is the right thing here. If you need to ensure
+that the write to MAC_CTRL_REG has taken effect, then you'll need to go
+through some device-specific sequence which probably involves reading
+something back. If you just need things to arrive in order eventually,
+the memory type already gives you that.
 
-diff --git a/net/sched/sch_qfq.c b/net/sched/sch_qfq.c
-index 7addc15f01b5..1a25752f1a9a 100644
---- a/net/sched/sch_qfq.c
-+++ b/net/sched/sch_qfq.c
-@@ -543,8 +543,10 @@ static int qfq_delete_class(struct Qdisc *sch, unsigned long arg,
- 	struct qfq_sched *q = qdisc_priv(sch);
- 	struct qfq_class *cl = (struct qfq_class *)arg;
- 
--	if (qdisc_class_in_use(&cl->common))
-+	if (qdisc_class_in_use(&cl->common)) {
-+		NL_SET_ERR_MSG_MOD(extack, "QFQ class in use");
- 		return -EBUSY;
-+	}
- 
- 	sch_tree_lock(sch);
- 
--- 
-2.39.2
+It's also worth pointing out that udelay() isn't necessarily ordered wrt
+MMIO writes, so that usleep_range() might need some help as well.
+Non-relaxed MMIO reads, however, _are_ ordered against a subsequent
+udelay(), so if you add the readback then this might all work out.
 
+I gave a (slightly dated) talk about some of this at ELC a while back:
+
+https://www.youtube.com/watch?v=i6DayghhA8Q
+
+which might help.
+
+Will
 
