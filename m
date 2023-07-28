@@ -1,164 +1,200 @@
-Return-Path: <netdev+bounces-22411-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22412-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E7B7767599
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 20:39:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5DA77675A9
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 20:40:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D4FF32821B4
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 18:39:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C33D51C21571
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 18:40:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEDB21401A;
-	Fri, 28 Jul 2023 18:39:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7562E14294;
+	Fri, 28 Jul 2023 18:40:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D150BDDB0
-	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 18:39:28 +0000 (UTC)
-Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E2054489
-	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 11:39:26 -0700 (PDT)
-Received: by mail-pf1-x433.google.com with SMTP id d2e1a72fcca58-686f38692b3so2047585b3a.2
-        for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 11:39:26 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63CAF23B8
+	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 18:40:21 +0000 (UTC)
+Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 967D14C1F
+	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 11:39:57 -0700 (PDT)
+Received: by mail-pf1-x42a.google.com with SMTP id d2e1a72fcca58-6862842a028so1795367b3a.0
+        for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 11:39:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1690569566; x=1691174366;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=2flqKPY9mF456lzl7KZSlOozTCBExKcvkCqkGx9wsSE=;
-        b=hoBR/RW0WEdqNVVswTS/7PMr8na4eRwQGTuRVV/2gXcg/fpOfuif3lVi2AHeWpL5MZ
-         8FVYAenG0BPDSoD+acBSjJt67i+GHDSMk1LralzU7yF9zxqOG5m9ZVj/BVXBT8a1vpXd
-         E0Svba5qKjjmGVOgp/MrMG2FKBAjAt3KDr1kaRCea2YmLjo6tTa/nLIVuTOLYCEsFm4J
-         sEojsEc+nXPLnyWSXpGQSoJ5Mm6ULvYM/xvh0cJ8/tdLQvjIIis9nrimhXOF6pe/MzaO
-         yT4gAW/lyG+/BlmjmGBkeHK3KO9CDCVwYo9jlBDHw/9aL3tBp1CcPiVRqnpeYvb1r1C9
-         dOsw==
+        d=broadcom.com; s=google; t=1690569596; x=1691174396;
+        h=mime-version:message-id:date:subject:cc:to:from:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=0b1iRSBKicUocO8cOaL7TfYCL5E1KaOYY4J67wcNFoc=;
+        b=XuAbchiS8jK/DO6ffYmvS+zl8tl/UaqoECwz3rBZkQiJ5ybghjkQ7177qO8d43jGnA
+         GW5+Q+BZ6nEi+yRWR+IKmDksqXREUsq3C0ehUFW8sdU/mV6l3F9ekkZzXX/z7PPWx/PR
+         emXCb7AScQanbvWsfu8FVSe0mNaWGuplp/xUw=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690569566; x=1691174366;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2flqKPY9mF456lzl7KZSlOozTCBExKcvkCqkGx9wsSE=;
-        b=VTrXCJeWQ1S23ZPoFJWzIKfk57aWSclPVwozuLhZIiF5sT+H2faDGiG+pcC3k8YqLI
-         OjZTs3kOJKrsY19cbJXrQMa2bdEVf9IWhX7z4NXzM5XGo4TjJmuqWkq/+Zh6zEvc+Gt+
-         orCOBZppENSnqEso3k6wTgXZ8U3X/VtcRh6pjfE64Lyz4cm7ezsZd15Fq2ivn0ETcQM6
-         iwV4QBJeSpHUCKUwFST1cAoKuBoxYOLZ1zXfgUV7MDwj+Dp931Bk6I3qSR5vtjysIOzs
-         vS9Yqvg/KR9SALLR8hVnPLxiD2DB6mO9eyvocCaglYvzWBbd2AfQBAZeMK3ng0mG0v4Q
-         Gs3g==
-X-Gm-Message-State: ABy/qLbNK4ujyJq0YveOveCpbTaEQa9ogdAhVlEJ5XW/LehNRpb/2dTj
-	cgucHphIaKIPF6yd+uFcI3Ss4boXt96f6RS63h0=
-X-Google-Smtp-Source: APBJJlHg+nmPr0U2c+eIQr9bUSWzAzZD8+AsIqvrxWDqn+SqeHSWiNYJxTwFAdcBUodvt5dsdhGY2A==
-X-Received: by 2002:a05:6a20:96c9:b0:135:110c:c6de with SMTP id hq9-20020a056a2096c900b00135110cc6demr2662864pzc.6.1690569566294;
-        Fri, 28 Jul 2023 11:39:26 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-68-25-194.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.25.194])
-        by smtp.gmail.com with ESMTPSA id z136-20020a63338e000000b0056001f43726sm3807409pgz.92.2023.07.28.11.39.25
+        d=1e100.net; s=20221208; t=1690569596; x=1691174396;
+        h=mime-version:message-id:date:subject:cc:to:from:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=0b1iRSBKicUocO8cOaL7TfYCL5E1KaOYY4J67wcNFoc=;
+        b=UEyyTytMshVV7mCX3MlY1oXFW/miebfoKu4QIr3Ki/hECNXoi829jzMqF44RVS9X/K
+         NrrUO57mROlOmIpyd7bsDBRMogFyyE+OLvL643fb0QWHJJISAmqZR47k7R6ZFV/wi4t7
+         19hLVHHWqBhIelgLqXqIr+88UmjnXgwNLrX/vBgvzaGulEhwprKcdGgoB3baZ7AH4w6F
+         rlNzm8OCa2OvU64blZFhEgLACzhbOmklyeFD0hUeBSdbvcqV4rDX3DLokFx4B6xUlvbV
+         4HmkS/O3KlmJAzh80LABDVd0P+PDkXw4bSxFB2nLL36pEsiGeGI+O5mk9eCLL2WtrJYd
+         d2zA==
+X-Gm-Message-State: ABy/qLb3qNvv69RIFb6TvevPUoAy2y/9ymLRux2O4ovZyLYjruNOOINB
+	NSB2ZIeO+snk7OGLqmxBpAVWSOc/Kk7xLzEpcGMPMbJHjTs4dX49MwSlkHhiMm2feizpDujn3TG
+	D551et2X+e0wfghKkYUOGfhg12Cl5dJRCdY0VZR40K+iHairtcRnxCzTuwPxAMxupNr+DH6ZF9h
+	baAlmRM+rrEQ==
+X-Google-Smtp-Source: APBJJlEP+5c2FcBEgQ0SFdmOIu8doINpWDSNhItYXWtzz4+78Z7f16MzEVYToX3CxhVXRU2wk15vdQ==
+X-Received: by 2002:a05:6a20:3d1e:b0:134:37bb:89be with SMTP id y30-20020a056a203d1e00b0013437bb89bemr2525901pzi.57.1690569596491;
+        Fri, 28 Jul 2023 11:39:56 -0700 (PDT)
+Received: from fainelli-desktop.igp.broadcom.net ([192.19.223.252])
+        by smtp.gmail.com with ESMTPSA id e3-20020aa78243000000b006866a293e58sm3589470pfn.176.2023.07.28.11.39.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Jul 2023 11:39:25 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.95)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1qPSN1-001o9T-Vo;
-	Fri, 28 Jul 2023 15:39:23 -0300
-Date: Fri, 28 Jul 2023 15:39:23 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Long Li <longli@microsoft.com>
-Cc: Wei Hu <weh@microsoft.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	Ajay Sharma <sharmaajay@microsoft.com>,
-	"leon@kernel.org" <leon@kernel.org>,
-	KY Srinivasan <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	"wei.liu@kernel.org" <wei.liu@kernel.org>,
-	Dexuan Cui <decui@microsoft.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"vkuznets@redhat.com" <vkuznets@redhat.com>,
-	"ssengar@linux.microsoft.com" <ssengar@linux.microsoft.com>,
-	"shradhagupta@linux.microsoft.com" <shradhagupta@linux.microsoft.com>
-Subject: Re: [PATCH v4 1/1] RDMA/mana_ib: Add EQ interrupt support to mana ib
- driver.
-Message-ID: <ZMQLW4elDj0vV1ld@ziepe.ca>
-References: <20230728170749.1888588-1-weh@microsoft.com>
- <ZMP+MH7f/Vk9/J0b@ziepe.ca>
- <PH7PR21MB3263C134979B17F1C53D3E8DCE06A@PH7PR21MB3263.namprd21.prod.outlook.com>
- <ZMQCuQU+b/Ai9HcU@ziepe.ca>
- <PH7PR21MB326396D1782613FE406F616ACE06A@PH7PR21MB3263.namprd21.prod.outlook.com>
+        Fri, 28 Jul 2023 11:39:56 -0700 (PDT)
+From: Florian Fainelli <florian.fainelli@broadcom.com>
+To: netdev@vger.kernel.org
+Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
+	Doug Berger <opendmb@gmail.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH net-next] net: bcmgenet: Remove TX ring full logging
+Date: Fri, 28 Jul 2023 11:39:45 -0700
+Message-Id: <20230728183945.760531-1-florian.fainelli@broadcom.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <PH7PR21MB326396D1782613FE406F616ACE06A@PH7PR21MB3263.namprd21.prod.outlook.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="0000000000004b19320601906833"
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,MIME_NO_TEXT,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Jul 28, 2023 at 06:22:53PM +0000, Long Li wrote:
-> > Subject: Re: [PATCH v4 1/1] RDMA/mana_ib: Add EQ interrupt support to mana ib
-> > driver.
-> > 
-> > On Fri, Jul 28, 2023 at 05:51:46PM +0000, Long Li wrote:
-> > > > Subject: Re: [PATCH v4 1/1] RDMA/mana_ib: Add EQ interrupt support
-> > > > to mana ib driver.
-> > > >
-> > > > On Fri, Jul 28, 2023 at 05:07:49PM +0000, Wei Hu wrote:
-> > > > > Add EQ interrupt support for mana ib driver. Allocate EQs per
-> > > > > ucontext to receive interrupt. Attach EQ when CQ is created. Call
-> > > > > CQ interrupt handler when completion interrupt happens. EQs are
-> > > > > destroyed when ucontext is deallocated.
-> > > >
-> > > > It seems strange that interrupts would be somehow linked to a ucontext?
-> > > > interrupts are highly limited, you can DOS the entire system if
-> > > > someone abuses this.
-> > > >
-> > > > Generally I expect a properly functioning driver to use one interrupt per CPU
-> > core.
-> > >
-> > > Yes, MANA uses one interrupt per CPU. One interrupt is shared among
-> > > multiple EQs.
-> > 
-> > So you have another multiplexing layer between the interrupt and the EQ? That is
-> > alot of multiplexing layers..
-> > 
-> > > > You should tie the CQ to a shared EQ belong to the core that the CQ
-> > > > wants to have affinity to.
-> > >
-> > > The reason for using a separate EQ for a ucontext, is for preventing
-> > > DOS. If we use a shared EQ, a single ucontext can storm this shared EQ
-> > > affecting other users.
-> > 
-> > With a proper design it should not be possible. The CQ adds an entry to the EQ
-> > and that should be rate limited by the ability of userspace to schedule to re-arm
-> > the CQ.
-> 
-> I think DPDK user space can sometimes storm the EQ by arming the CQ
-> from user-mode.
+--0000000000004b19320601906833
+Content-Transfer-Encoding: 8bit
 
-Maybe maliciously you can do a blind re-arm, but nothing sane should
-do that.
+There is no need to spam the kernel log with such an indication, remove
+this message.
 
-> With a malicious DPDK user, this code can be abused to arm the CQ at
-> extremely high rate.
+Signed-off-by: Florian Fainelli <florian.fainelli@broadcom.com>
+---
+ drivers/net/ethernet/broadcom/genet/bcmgenet.c | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
 
-Again, the rate of CQ re-arm is limited by the ability of userspace to
-schedule, I'm reluctant to consider that a DOS vector. Doesn't your HW
-have EQ overflow recovery?
+diff --git a/drivers/net/ethernet/broadcom/genet/bcmgenet.c b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
+index 2b5761ad2f92..24bade875ca6 100644
+--- a/drivers/net/ethernet/broadcom/genet/bcmgenet.c
++++ b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
+@@ -2077,12 +2077,8 @@ static netdev_tx_t bcmgenet_xmit(struct sk_buff *skb, struct net_device *dev)
+ 
+ 	spin_lock(&ring->lock);
+ 	if (ring->free_bds <= (nr_frags + 1)) {
+-		if (!netif_tx_queue_stopped(txq)) {
++		if (!netif_tx_queue_stopped(txq))
+ 			netif_tx_stop_queue(txq);
+-			netdev_err(dev,
+-				   "%s: tx ring %d full when queue %d awake\n",
+-				   __func__, index, ring->queue);
+-		}
+ 		ret = NETDEV_TX_BUSY;
+ 		goto out;
+ 	}
+-- 
+2.34.1
 
-Frankly, stacking more layers of IRQ multiplexing doesn't seem like it
-should solve any problems, you are just shifting where the DOS can
-occure. Allowing userspace to create EQs is its own DOS direction,
-either you exhaust and DOS the number of EQs or you DOS the
-multiplexing layer between the interrupt and the EQ.
 
-Jason
+--0000000000004b19320601906833
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
+
+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
+riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
+QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
+UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
+M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
+Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
+14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
+a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
+XzCCBVgwggRAoAMCAQICDBP8P9hKRVySg3Qv5DANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
+RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
+UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAxMjE4MTFaFw0yNTA5MTAxMjE4MTFaMIGW
+MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
+BgNVBAoTDUJyb2FkY29tIEluYy4xGTAXBgNVBAMTEEZsb3JpYW4gRmFpbmVsbGkxLDAqBgkqhkiG
+9w0BCQEWHWZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tMIIBIjANBgkqhkiG9w0BAQEFAAOC
+AQ8AMIIBCgKCAQEA+oi3jMmHltY4LMUy8Up5+1zjd1iSgUBXhwCJLj1GJQF+GwP8InemBbk5rjlC
+UwbQDeIlOfb8xGqHoQFGSW8p9V1XUw+cthISLkycex0AJ09ufePshLZygRLREU0H4ecNPMejxCte
+KdtB4COST4uhBkUCo9BSy1gkl8DJ8j/BQ1KNUx6oYe0CntRag+EnHv9TM9BeXBBLfmMRnWNhvOSk
+nSmRX0J3d9/G2A3FIC6WY2XnLW7eAZCQPa1Tz3n2B5BGOxwqhwKLGLNu2SRCPHwOdD6e0drURF7/
+Vax85/EqkVnFNlfxtZhS0ugx5gn2pta7bTdBm1IG4TX+A3B1G57rVwIDAQABo4IB3jCCAdowDgYD
+VR0PAQH/BAQDAgWgMIGjBggrBgEFBQcBAQSBljCBkzBOBggrBgEFBQcwAoZCaHR0cDovL3NlY3Vy
+ZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAuY3J0MEEG
+CCsGAQUFBzABhjVodHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWdu
+MmNhMjAyMDBNBgNVHSAERjBEMEIGCisGAQQBoDIBKAowNDAyBggrBgEFBQcCARYmaHR0cHM6Ly93
+d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIwADBJBgNVHR8EQjBAMD6gPKA6
+hjhodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNy
+bDAoBgNVHREEITAfgR1mbG9yaWFuLmZhaW5lbGxpQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggr
+BgEFBQcDBDAfBgNVHSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQUUwwfJ6/F
+KL0fRdVROal/Lp4lAF0wDQYJKoZIhvcNAQELBQADggEBAKBgfteDc1mChZjKBY4xAplC6uXGyBrZ
+kNGap1mHJ+JngGzZCz+dDiHRQKGpXLxkHX0BvEDZLW6LGOJ83ImrW38YMOo3ZYnCYNHA9qDOakiw
+2s1RH00JOkO5SkYdwCHj4DB9B7KEnLatJtD8MBorvt+QxTuSh4ze96Jz3kEIoHMvwGFkgObWblsc
+3/YcLBmCgaWpZ3Ksev1vJPr5n8riG3/N4on8gO5qinmmr9Y7vGeuf5dmZrYMbnb+yCBalkUmZQwY
+NxADYvcRBA0ySL6sZpj8BIIhWiXiuusuBmt2Mak2eEv0xDbovE6Z6hYyl/ZnRadbgK/ClgbY3w+O
+AfUXEZ0xggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52
+LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwT
+/D/YSkVckoN0L+QwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIFw814cduyQdDPOk
+uK2kitnCWXCd7j+1dbl4mqHDh5eQMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcN
+AQkFMQ8XDTIzMDcyODE4Mzk1NlowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZI
+AWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEH
+MAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQCQNA4rE5bowbBBuvTyILW36dYU9jy7mpmQ
+b7P1xm2VvGhIRsdkTxQZUZ2LKRM7nOxvSJgqyYs4QjMP0LNqNoOnExbMtl2dOerPMl/cgk5drSa/
+eq0VwOLWrGfIGiGfUcNOjgzO2jtQ7sHsYjrxwMIGc1a7agLELHBOiHiadLhIftUs5XzsdV/3PN6K
+0fQ5atZuC0/SzN37/4GsuKSqubwOV8qfKTYsvid6OrzRXESdEtizXZSTBkn1xGxLEKV+yRP6oWpT
+5vbl/vbgpLA/5Kw3Xs5NkRJ/KrxamIzNlbGZcyAzWfX+6uB1RKAdsFN+BbjshTY7gYsDQ2M9H3Cc
+GQGx
+--0000000000004b19320601906833--
 
