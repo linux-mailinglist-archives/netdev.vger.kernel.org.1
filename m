@@ -1,71 +1,72 @@
-Return-Path: <netdev+bounces-22112-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22113-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B853A766174
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 03:46:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 79605766177
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 03:46:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6FFF028259F
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 01:46:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3361D2825D8
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 01:46:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51CFE15CC;
-	Fri, 28 Jul 2023 01:45:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1F1115D1;
+	Fri, 28 Jul 2023 01:46:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 438FC15C3
-	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 01:45:57 +0000 (UTC)
-Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B64C7F2
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 18:45:56 -0700 (PDT)
-Received: by mail-lf1-x12d.google.com with SMTP id 2adb3069b0e04-4fb863edcb6so2811745e87.0
-        for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 18:45:56 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6E7D7C
+	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 01:46:55 +0000 (UTC)
+Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9ADCBF2
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 18:46:53 -0700 (PDT)
+Received: by mail-lf1-x12a.google.com with SMTP id 2adb3069b0e04-4fe0c566788so2835058e87.0
+        for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 18:46:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690508755; x=1691113555;
+        d=gmail.com; s=20221208; t=1690508812; x=1691113612;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=2yyz+QOPnTCmJDH2mcI7Jd4URwi0CMO5PT6P34rUHZc=;
-        b=eUczXDLCXgtgG1jVtwtgDgj9HtNPXbYz69ZipKt6Q1D9mp0tcHF+vL9BeGSgVxujR0
-         CY7uUhgcXH3aJ7SiZre9jqU2/vrOb5sYvZ0qM4ffgV56O9YHlo015wykg47gzvalNoXD
-         /7/4qdbHl29Sdjd/MajN4SlPP12eg0q5ECt50OqycuFpMgVx6O0l/xEgsALYKZHe3nk2
-         d4crzOjUeAxutQwb++UJQYgJ1dziKyLgFy3XE6Iz1dmgiulhDgGk85qjqo7atCucPIvN
-         sEiSubmvjFXHsUiYUZ7s06O0eRzUQgZDPtHQpD3TO3B5s0cXLHsTx5Epfeer2go8UlYR
-         myow==
+        bh=nxKgytFLxzXVyJZBJwebLIhb8nwv4d9rqhg53vYef1Y=;
+        b=qgDbTIJf7vNP10O6CyjC7aJa8EbZMGCRFIf9fRH0TWJups1odl5BlgLJKPp9GrPvxB
+         p3V0XvmQIOKGLBkVfuE6FhnxK/HOFsWMdi8MAB2woquak0c/9/ZO2mgDlaxfUM2ANO/T
+         aMlZjEzAQYwTWKCBeFQ4gVkzcp3FaA3kWsW/nyPOuQmFa+xIigB07msYsic5LHOKiG37
+         18Ay/bVKAs9GD5F7Lv3nQsULoB9oUlix2ItLt+ggZsN+zk1VeK3TeEzeCWqxfOyvdhgM
+         PwuLJbvVgiXL1XhG4RCGSpo1LQ13hrqSEM79GtRlSfuPH7wzIpN4oaodL7ycna9TUwc9
+         qq7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690508755; x=1691113555;
+        d=1e100.net; s=20221208; t=1690508812; x=1691113612;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=2yyz+QOPnTCmJDH2mcI7Jd4URwi0CMO5PT6P34rUHZc=;
-        b=DGPYt5mS5WdYzS//MOvys6XSRXcAnRkPpw/35PZ13a325hSX6+gZokEJcvO1dDJ6PS
-         OcXYuzeOLo01TOlGFFKUuSEhP8yYzZ2myP9IgEBFeDfcVVIQNTa3pZh3vcmUX0mrCxuD
-         iNMkHluLg0thNJqPSHqYsBtroeV2qK+AA773JRdPszxqZ4n+s5/30tmHoOopaxIob2tW
-         9po+duT2SBN5QsxMaRKNuyoSTFrA4NdpMu3VnDtz+Z1xdaIES8xdpAa/oUCXT3xLZBt3
-         KwQ/23D+Q0l4rE4fNdwdt8zawDTmhgn5oP/siLxeLRLPQDF+abDnj6+TCKq01Pl9WAam
-         cJZg==
-X-Gm-Message-State: ABy/qLbAZZrBPJbCCgga7DmyLq1n808v6nT+DIpoRRGWpJXhJOXqg/fW
-	T5XhA//eZAxXMHiAqGxxKOKEnZOh6FnSjDOnnJQ=
-X-Google-Smtp-Source: APBJJlFTX51B17BAYAKagPQdYNaJLvIRaYq5TT3/2yqQbBl/G5EanVIn7evMpSOeq/634KLkr4sgPP8ZA3mX0/AU73s=
-X-Received: by 2002:a05:6512:ac2:b0:4fb:9631:4bb with SMTP id
- n2-20020a0565120ac200b004fb963104bbmr704018lfu.11.1690508754561; Thu, 27 Jul
- 2023 18:45:54 -0700 (PDT)
+        bh=nxKgytFLxzXVyJZBJwebLIhb8nwv4d9rqhg53vYef1Y=;
+        b=b+MiP0bsz8SFODa/I2Vi+rrJpZmnLRkoJrpqiuKXS88/h33DP1rE1VI6+ejcB9bG4s
+         pbWVy9xmluIsu1PGAfddv+FKXDrefYNua3fpFdAV9h08y9GuBwl05Z+UqviqamWi8Rnk
+         pcWNau7yebZzd2BLLmWGgnp/nXLJSO8zEEJWt7sdMIs569V/QyEpocditZEFRi1me1lY
+         lHDZwCU9W/+i2s9hUVGBvlnCOJGTA5DNkC8dUNchZiTvuIHfBRAPQI/LZOfigslp/Msf
+         WG4ejYliu0e6IPpdU58++x0g/5fY3hqiY0eZBdy9iem4TFKm/oDo5Th3KqnbHPeLxii0
+         ZYPg==
+X-Gm-Message-State: ABy/qLZoRKSVfVqqBzhl9jvce9ZCqa7IUSadMsqxxTkG66qWKeENfr0b
+	+NNOLLXrek3oAddyGoTfsc/dxH9HsRDJmBMD3Sg=
+X-Google-Smtp-Source: APBJJlGIArvhwpZZCRhnfuAR+rY9ZKw6xESIhjzfTfichxQnRgzkX5C4oTqzLUENfoH0WF2ZMdIfj6L/kML0zMcBB6U=
+X-Received: by 2002:a19:ca03:0:b0:4fb:8771:e898 with SMTP id
+ a3-20020a19ca03000000b004fb8771e898mr490409lfg.15.1690508811655; Thu, 27 Jul
+ 2023 18:46:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1690439335.git.chenfeiyang@loongson.cn> <a752f67c6cfe481a2329f1f4b477ff962c46f515.1690439335.git.chenfeiyang@loongson.cn>
- <30e8518e-4862-4aa5-afda-2f511dde2b44@lunn.ch>
-In-Reply-To: <30e8518e-4862-4aa5-afda-2f511dde2b44@lunn.ch>
+References: <cover.1690439335.git.chenfeiyang@loongson.cn> <0ec0ae938964697010b3d035b7885e4dda89b012.1690439335.git.chenfeiyang@loongson.cn>
+ <38591e4c-c4f1-4b6e-a9fb-57f349735bb0@lunn.ch>
+In-Reply-To: <38591e4c-c4f1-4b6e-a9fb-57f349735bb0@lunn.ch>
 From: Feiyang Chen <chris.chenfeiyang@gmail.com>
-Date: Fri, 28 Jul 2023 09:45:42 +0800
-Message-ID: <CACWXhKkYY_g6Eo3G3TVT-AzGRa-HP2fTu9biQ6OtpPh7_hh5HQ@mail.gmail.com>
-Subject: Re: [PATCH v2 05/10] net: stmmac: dwmac1000: Add Loongson register definitions
+Date: Fri, 28 Jul 2023 09:46:39 +0800
+Message-ID: <CACWXhK=mBiD4cBRWixiiPh4UVppLVH-TH5SA1Ab2MrBpQtGmvQ@mail.gmail.com>
+Subject: Re: [PATCH v2 08/10] net: stmmac: dwmac-loongson: Disable flow
+ control for GMAC
 To: Andrew Lunn <andrew@lunn.ch>
 Cc: Feiyang Chen <chenfeiyang@loongson.cn>, hkallweit1@gmail.com, peppe.cavallaro@st.com, 
 	alexandre.torgue@foss.st.com, joabreu@synopsys.com, chenhuacai@loongson.cn, 
@@ -81,25 +82,20 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Jul 27, 2023 at 5:13=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
+On Thu, Jul 27, 2023 at 6:36=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
 >
-> >  /* GMAC HW ADDR regs */
-> > -#define GMAC_ADDR_HIGH(reg)  ((reg > 15) ? 0x00000800 + (reg - 16) * 8=
- : \
-> > +#define GMAC_ADDR_HIGH(reg, x)       ((reg > 15) ? 0x00000800 + (reg -=
- 16) * 8 * (x) : \
-> >                                0x00000040 + (reg * 8))
+> On Thu, Jul 27, 2023 at 03:18:51PM +0800, Feiyang Chen wrote:
+> > Loongson GMAC does not support Flow Control featurei. Use
 >
-> please give x a more descriptive name.
+> No i in feature.
 >
 
 Hi, Andrew,
 
-The x is now related to the dwmac_is_loongson flag. I'll try to use
-another method.
+Sorry for the typo.
 
 Thanks,
 Feiyang
 
->        Andrew
+>    Andrew
 
