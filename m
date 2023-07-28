@@ -1,82 +1,85 @@
-Return-Path: <netdev+bounces-22206-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22209-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 967C77667F4
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 10:58:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD9E576680A
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 11:01:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 517DE282685
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 08:58:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9870728269A
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 09:01:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CAB6107AB;
-	Fri, 28 Jul 2023 08:58:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E5261095F;
+	Fri, 28 Jul 2023 09:00:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62066101D9
-	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 08:58:05 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9ABA1731;
-	Fri, 28 Jul 2023 01:58:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=XO04uRIxA4guTxkcu7RQ08+aVzvwwBtSGQVQXA0Q9qY=; b=YW8CDX+BSc+DoSsnuaaZktrZz2
-	kCfgSWqWG0mc07IWwSkwV/nAj+QpdmxsgqTPkwBQpN9FJJeOKZOXtYLxMm34DK5b+RHS6hbFKjZl5
-	b6AhT3lsOPdaQE5iBux5Jvos5RJvBE/gmISN4uj4lfahQnSkPejXnEpXUpgSPUiMtuTw=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qPJII-002WG8-IX; Fri, 28 Jul 2023 10:57:54 +0200
-Date: Fri, 28 Jul 2023 10:57:54 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jijie Shao <shaojijie@huawei.com>
-Cc: yisen.zhuang@huawei.com, salil.mehta@huawei.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	shenjian15@huawei.com, wangjie125@huawei.com,
-	liuyonglong@huawei.com, wangpeiyang1@huawei.com,
-	netdev@vger.kernel.org, stable@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net 5/6] net: hns3: fix wrong print link down up
-Message-ID: <7ce32389-550b-4beb-82b1-1b6183fdeabb@lunn.ch>
-References: <20230728075840.4022760-1-shaojijie@huawei.com>
- <20230728075840.4022760-6-shaojijie@huawei.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EF7C107AE
+	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 09:00:28 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 15F80C433BC;
+	Fri, 28 Jul 2023 09:00:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1690534828;
+	bh=OZLB1TlYuhOUluQEOXMdJljYbREOPCoaejaLskUJsro=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=KP31QNIhYbIcx4YnOIeBngeqJ/TqKNaQlTPAkwUcsyvMASu+cpPZhgtiFJU+vtHSG
+	 zCu/91fHASrD/iZSKBVWdQmg6n4GcOG5oHeYkdEYOmbtywJRgmON+lvhPc7tYkWitd
+	 W8FvanvoUfpVGBbN5uNCm/VT9NqeuCAaUoJiKIiTHwyiuIPuT/d+Zpk8XaGE2/OEEL
+	 jP3Rotg4WtxzPVDAJPLqd58HlXi8DEE0K3o+gIuZPCV5gyg/GvuH37ZFWoJdVFup75
+	 AVRDnhgel8UI5FpvSsN/ngRSutZ3bzMrWqLzM40XtPB2KOoR0fqy3pS3ltGcGwT6Gl
+	 UiHpQEjQ3cfug==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id ED0B2C39562;
+	Fri, 28 Jul 2023 09:00:27 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230728075840.4022760-6-shaojijie@huawei.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
+Subject: Re: [net-next v2 0/2] rxfh with custom RSS fixes
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169053482796.22021.4158483891713381939.git-patchwork-notify@kernel.org>
+Date: Fri, 28 Jul 2023 09:00:27 +0000
+References: <20230725205655.310165-1-jdamato@fastly.com>
+In-Reply-To: <20230725205655.310165-1-jdamato@fastly.com>
+To: Joe Damato <jdamato@fastly.com>
+Cc: netdev@vger.kernel.org, saeedm@nvidia.com, tariqt@nvidia.com,
+ ecree@solarflare.com, andrew@lunn.ch, kuba@kernel.org, davem@davemloft.net,
+ leon@kernel.org, pabeni@redhat.com, arnd@arndb.de,
+ linux-kernel@vger.kernel.org
 
-On Fri, Jul 28, 2023 at 03:58:39PM +0800, Jijie Shao wrote:
-> From: Peiyang Wang <wangpeiyang1@huawei.com>
+Hello:
+
+This series was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
+
+On Tue, 25 Jul 2023 20:56:53 +0000 you wrote:
+> Greetings:
 > 
-> This patch will fix a wrong print "device link down/up". Consider a case
-> that set autoneg to off with same speed and duplex configuration. The link
-> is always up while the phy state is set to PHY_UP and set back to
-> PHY_RUNNING later. It will print link down when the phy state is not
-> PHY_RUNNING. To avoid that, the condition should include PHY_UP.
+> Welcome to v2, now via net-next. No functional changes; only style
+> changes (see the summary below).
+> 
+> While attempting to get the RX flow hash key for a custom RSS context on
+> my mlx5 NIC, I got an error:
+> 
+> [...]
 
-Does this really happen? If autoneg is on, and there is link, it means
-the link peer is auto using auto-neg. If you turn auto-neg off, the
-link peer is not going to know what speed to use, and so the link will
-go down. The link will only come up again when you reconfigure the
-link peer to also not use auto-neg.
+Here is the summary with links:
+  - [net-next,v2,1/2] net: ethtool: Unify ETHTOOL_{G,S}RXFH rxnfc copy
+    https://git.kernel.org/netdev/net-next/c/801b27e88046
+  - [net-next,v2,2/2] net/mlx5: Fix flowhash key set/get for custom RSS
+    https://git.kernel.org/netdev/net-next/c/0212e5d915a2
 
-I don't see how you can turn auto-neg off and not loose the link.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-  Andrew
+
 
