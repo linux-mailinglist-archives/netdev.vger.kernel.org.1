@@ -1,105 +1,173 @@
-Return-Path: <netdev+bounces-22110-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22111-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83AB476616C
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 03:41:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 78C80766170
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 03:42:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 609501C2178A
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 01:41:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A995E1C217A4
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 01:42:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4200615C3;
-	Fri, 28 Jul 2023 01:41:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15D6C17D1;
+	Fri, 28 Jul 2023 01:42:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 331C715C1
-	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 01:41:32 +0000 (UTC)
-Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F840358B
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 18:41:31 -0700 (PDT)
-Received: by mail-lf1-x129.google.com with SMTP id 2adb3069b0e04-4fe21e7f3d1so8363e87.3
-        for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 18:41:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690508490; x=1691113290;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sQZDst5qjaEpnNLHre25dv9hzF5f2KbCPvv3bZhdA8M=;
-        b=E7GwpTEiXCWXp8CvDlE/e2MFibkDirRGzggEgGqz3YZAxhOwVJtb//aXRVjKhWoB8v
-         sJSqiihV23CXLrIF1uwXmf/MjUJKpPyqH3wunQUCjYi7w/8rRBcaTZ/tTQXf77uBzNfg
-         EqadLhb04SWm07uyZ0hE/O7rZO8oqe9azO5t81v+QOLLBiqrngZXYX3xJeiUfLzD4y/Y
-         8K/C+IBGfYWitjWeUy/IB2Ng/tuLIVjGrvrmJ0sqf6lm3helPmB1CIMn+p9xdJe+W87F
-         WsY/Uhi623LB8Gh3VT5nw2mjw9GjvbjvQVpme/LS6Brl0+YaKVJ/ZgxW6pRllr4nGKHi
-         AzBw==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A8597C
+	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 01:42:17 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8087F3588
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 18:42:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1690508534;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+B8/dh9FxUlYlsfj6c2Az3RVvE6Mk5Zpo699JVAL0Us=;
+	b=UCrkxbwTTj/NOaU+mujwbU4bv7w4azAAj/C59hBh27WyxcysgBHUHSyRfaLsD3OuoIZwwH
+	WSc6nro4Z7msCDddyTazjNwrr2lXBpgsMi/nevq+AfnBNHr9UqQ0HMt40nudfm1fg9RIQ4
+	AQU8Qm2qNYQShi4eKJ0VtgU+lskOwhM=
+Received: from mail-lf1-f69.google.com (mail-lf1-f69.google.com
+ [209.85.167.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-602-drkQDItZMtOwWo_Vz0VpIQ-1; Thu, 27 Jul 2023 21:42:12 -0400
+X-MC-Unique: drkQDItZMtOwWo_Vz0VpIQ-1
+Received: by mail-lf1-f69.google.com with SMTP id 2adb3069b0e04-4f76712f950so1420231e87.0
+        for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 18:42:12 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690508490; x=1691113290;
+        d=1e100.net; s=20221208; t=1690508531; x=1691113331;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=sQZDst5qjaEpnNLHre25dv9hzF5f2KbCPvv3bZhdA8M=;
-        b=JbAcPw6yycsOXGAMihCaiVlKOS7XM2lX1z9DOoVLKuHb25S7n/Fw+k+zeDLZQ/O0wT
-         WFWgmqnXsx+kiXn85Ib9+TZ7qjnGkcKkzNwNzWx9YHlWf4DfKNAezC4koPJzqWFcZhB1
-         jJO2CHgy17zt4ZwXkjzPdjrrsaZHLTBC/76fxD//0GRQHIVjfypyWG0ZOeLChj0lmLbR
-         dY3J9fcFSqrjIBBliVqecazxMyeV7Q7BJ8XHq2G84sc16OGPy4kYakktBVPBoJlRjumz
-         NiyENUNcylbgyvqllPMLuQv4gqwBacUvXngud5bO4utuOi+UqKaMDTeez+nveTv77M7Y
-         0OKg==
-X-Gm-Message-State: ABy/qLYQlvHJArhpOxI0g+lNX5eYLluoGJvUitZXEKPPSDI0tm7Skv+k
-	YskLaYbKws4ABwnjOQcEtaiq8GMf9PSWcH4vPPM=
-X-Google-Smtp-Source: APBJJlFuNSIT3DQIyoCdYBI8pbyqFOvtpvPqQAWD6q9xtgQtJXnh9HSdLOVh99FsJVU3EiolsIwUz+APhic3TrJzcYo=
-X-Received: by 2002:a05:6512:541:b0:4f9:cd02:4aec with SMTP id
- h1-20020a056512054100b004f9cd024aecmr525694lfl.29.1690508489684; Thu, 27 Jul
- 2023 18:41:29 -0700 (PDT)
+        bh=+B8/dh9FxUlYlsfj6c2Az3RVvE6Mk5Zpo699JVAL0Us=;
+        b=fUkAQ4l17BgMTo56jvdQ+o0RC+7e4Te/sTDe+Q6rklBdEdgHVZZN2rWP2Bbw4os8G/
+         /khilNDzwHlv1wWRH7wa1NTzjZkrMeuwoEJczjx4NWnp/1pdlTADBd1CyhvFklwnc5yB
+         iOMEiwyAmalAcjTPEfK75B+grb7YYRnYfOAKWFJIIuHvmFK3ZWG1sg45a3O8TSWGMfrX
+         J+ymhW6AGknlOn1y4DqlGYFVE8Jbj82tKYnFKr57U0X7s4Q9LyoO+HadmN7F0kcK4WE2
+         9fiDw53H6oFAOzJ/5kHExHOMmBETTpnGD34xVi9bPznSjdi8M22sVl/ROC3658L5BDKv
+         3Rcg==
+X-Gm-Message-State: ABy/qLYoB/sbx/MxioqfeA3DISi9p569zfsQZE2cFuJulXTPo8kgYXaE
+	bWx0h2O7nx1y2yp8lEb0rdO+7fXyWkdPJOp6iSaneYCtc8CqCGJ4izpmfMMBU7a5My+s/MZmOpT
+	YIRUayF7MMGjhObCFeqkivPE/CJDxMPTC
+X-Received: by 2002:a05:6512:1591:b0:4fb:893e:8ffc with SMTP id bp17-20020a056512159100b004fb893e8ffcmr676873lfb.17.1690508531486;
+        Thu, 27 Jul 2023 18:42:11 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlHY6/ERBGZV6AEAlBJS5xI4dIRaHz1bMCv6qrVkYLdcfZ1S0GvRrifqu9u3Yc1vreyW0L0NNEbcznbuvGQrl6o=
+X-Received: by 2002:a05:6512:1591:b0:4fb:893e:8ffc with SMTP id
+ bp17-20020a056512159100b004fb893e8ffcmr676854lfb.17.1690508531188; Thu, 27
+ Jul 2023 18:42:11 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1690439335.git.chenfeiyang@loongson.cn> <067f87d9785849c13f2f8733d457ffe8616a1aa0.1690439335.git.chenfeiyang@loongson.cn>
- <5b52d461-77e5-493a-a634-4c8a0637a0bc@lunn.ch>
-In-Reply-To: <5b52d461-77e5-493a-a634-4c8a0637a0bc@lunn.ch>
-From: Feiyang Chen <chris.chenfeiyang@gmail.com>
-Date: Fri, 28 Jul 2023 09:41:18 +0800
-Message-ID: <CACWXhKnqkjS7mG0N-=Htt1Ee8xTmb3EYfAOJpFta7C0076advQ@mail.gmail.com>
-Subject: Re: [PATCH v2 02/10] net: stmmac: dwmac1000: Allow platforms to
- choose some register offsets
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Feiyang Chen <chenfeiyang@loongson.cn>, hkallweit1@gmail.com, peppe.cavallaro@st.com, 
-	alexandre.torgue@foss.st.com, joabreu@synopsys.com, chenhuacai@loongson.cn, 
-	linux@armlinux.org.uk, dongbiao@loongson.cn, 
-	loongson-kernel@lists.loongnix.cn, netdev@vger.kernel.org, 
-	loongarch@lists.linux.dev
+References: <20230725130709.58207-1-gavinl@nvidia.com> <20230725130709.58207-3-gavinl@nvidia.com>
+ <f5823996fffad2f3c1862917772c182df74c74e7.camel@redhat.com>
+In-Reply-To: <f5823996fffad2f3c1862917772c182df74c74e7.camel@redhat.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Fri, 28 Jul 2023 09:42:00 +0800
+Message-ID: <CACGkMEs4wUh0TydcXSMR2GdBSTk+H-Tkbhn53BywEeiK9cA9Gg@mail.gmail.com>
+Subject: Re: [PATCH net-next V4 2/3] virtio_net: support per queue interrupt
+ coalesce command
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Gavin Li <gavinl@nvidia.com>, mst@redhat.com, xuanzhuo@linux.alibaba.com, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, ast@kernel.org, 
+	daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com, 
+	jiri@nvidia.com, dtatulea@nvidia.com, gavi@nvidia.com, 
+	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, bpf@vger.kernel.org, 
+	Heng Qi <hengqi@linux.alibaba.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Jul 27, 2023 at 5:10=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
+On Thu, Jul 27, 2023 at 9:28=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wro=
+te:
 >
-> > +#define _REGS                        (priv->plat->dwmac_regs)
+> On Tue, 2023-07-25 at 16:07 +0300, Gavin Li wrote:
+> > Add interrupt_coalesce config in send_queue and receive_queue to cache =
+user
+> > config.
 > >
-> > -/* Rx watchdog register */
-> > +/* DMA CRS Control and Status Register Mapping */
-> > +#define DMA_CHAN_OFFSET              (_REGS->addrs->chan_offset)
+> > Send per virtqueue interrupt moderation config to underlying device in
+> > order to have more efficient interrupt moderation and cpu utilization o=
+f
+> > guest VM.
+> >
+> > Additionally, address all the VQs when updating the global configuratio=
+n,
+> > as now the individual VQs configuration can diverge from the global
+> > configuration.
+> >
+> > Signed-off-by: Gavin Li <gavinl@nvidia.com>
+> > Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
+> > Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+> > Acked-by: Michael S. Tsirkin <mst@redhat.com>
 >
-> It is thought to be bad practice for a macro to access things not
-> passed to it. Please try to make a cleaner solution.
+> FTR, this patch is significantly different from the version previously
+> acked/reviewed, I'm unsure if all the reviewers are ok with the new
+> one.
+
+Good point, and I plan to review this no later than next Monday and
+offer my ack if necessary. Please hold this series now.
+
+Thanks
+
+>
+> [...]
+>
+> >  static int virtnet_set_coalesce(struct net_device *dev,
+> >                               struct ethtool_coalesce *ec,
+> >                               struct kernel_ethtool_coalesce *kernel_co=
+al,
+> >                               struct netlink_ext_ack *extack)
+> >  {
+> >       struct virtnet_info *vi =3D netdev_priv(dev);
+> > -     int ret, i, napi_weight;
+> > +     int ret, queue_number, napi_weight;
+> >       bool update_napi =3D false;
+> >
+> >       /* Can't change NAPI weight if the link is up */
+> >       napi_weight =3D ec->tx_max_coalesced_frames ? NAPI_POLL_WEIGHT : =
+0;
+> > -     if (napi_weight ^ vi->sq[0].napi.weight) {
+> > -             if (dev->flags & IFF_UP)
+> > -                     return -EBUSY;
+> > -             else
+> > -                     update_napi =3D true;
+> > +     for (queue_number =3D 0; queue_number < vi->max_queue_pairs; queu=
+e_number++) {
+> > +             ret =3D virtnet_should_update_vq_weight(dev->flags, napi_=
+weight,
+> > +                                                   vi->sq[queue_number=
+].napi.weight,
+> > +                                                   &update_napi);
+> > +             if (ret)
+> > +                     return ret;
+> > +
+> > +             if (update_napi) {
+> > +                     /* All queues that belong to [queue_number, queue=
+_count] will be
+> > +                      * updated for the sake of simplicity, which migh=
+t not be necessary
+>
+> It looks like the comment above still refers to the old code. Should
+> be:
+>         [queue_number, vi->max_queue_pairs]
+>
+> Otherwise LGTM, thanks!
+>
+> Paolo
 >
 
-Hi, Andrew,
-
-OK. I will try.
-
-Thanks,
-Feiyang
-
->        Andrew
 
