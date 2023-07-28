@@ -1,259 +1,123 @@
-Return-Path: <netdev+bounces-22350-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22345-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D71B276719D
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 18:12:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE12076716C
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 18:05:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C4532827D6
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 16:12:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1FD7A1C2193F
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 16:05:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8592714A98;
-	Fri, 28 Jul 2023 16:12:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAF6B1429E;
+	Fri, 28 Jul 2023 16:05:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A96A14012
-	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 16:12:04 +0000 (UTC)
-Received: from mgamail.intel.com (unknown [192.55.52.43])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5480FC
-	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 09:12:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1690560721; x=1722096721;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=6XO8YByLW8dxE5YOqdKPTTlu9HcvmVeDjDgu9q7kPJg=;
-  b=iaTMxOUgMQAKSyakY3t8dtPO+pVYZPrFtV9aWB+/sG85qIyGtF3f0MwA
-   RLtWui1rREmPaNGpp03YKqhxki2YT0Pr23I3rBE04q5fBNlVdYvEShlI2
-   cpE5ObcuJavFXZfQMhIYddGFTDGO0h856g/tmCppfEUEDEsMyCJvoiLuV
-   M6ASlIwgi9vD/SGPSP8aoIdjKEdGBzRrhhpXISLidxapWENyVW7BeCTT5
-   tipo8nQ53ckDSqHEPmdMOJwjF9/mEh8Fl0h1ZMlEDPQN1O3RSboLdsFjI
-   Bg9VdoatXjzPnOZ0mhWa8v/LUo2ZvMhkUk7V+fMzshv7J4DFZVld6+3RH
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10784"; a="454984413"
-X-IronPort-AV: E=Sophos;i="6.01,238,1684825200"; 
-   d="scan'208";a="454984413"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jul 2023 09:08:31 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10784"; a="841367149"
-X-IronPort-AV: E=Sophos;i="6.01,237,1684825200"; 
-   d="scan'208";a="841367149"
-Received: from lkp-server02.sh.intel.com (HELO 953e8cd98f7d) ([10.239.97.151])
-  by fmsmga002.fm.intel.com with ESMTP; 28 Jul 2023 09:08:24 -0700
-Received: from kbuild by 953e8cd98f7d with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1qPQ0t-0003Lv-0d;
-	Fri, 28 Jul 2023 16:08:23 +0000
-Date: Sat, 29 Jul 2023 00:01:51 +0800
-From: kernel test robot <lkp@intel.com>
-To: Shenwei Wang <shenwei.wang@nxp.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Shawn Guo <shawnguo@kernel.org>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Neil Armstrong <neil.armstrong@linaro.org>,
-	Kevin Hilman <khilman@baylibre.com>, Vinod Koul <vkoul@kernel.org>,
-	Chen-Yu Tsai <wens@csie.org>,
-	Jernej Skrabec <jernej.skrabec@gmail.com>,
-	Samuel Holland <samuel@sholland.org>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	netdev@vger.kernel.org, Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Fabio Estevam <festevam@gmail.com>,
-	NXP Linux Team <linux-imx@nxp.com>,
-	Jerome Brunet <jbrunet@baylibre.com>,
-	Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
-	Bhupesh Sharma <bhupesh.sharma@linaro.org>,
-	Nobuhiro Iwamatsu <nobuhiro1.iwamatsu@toshiba.co.jp>,
-	Simon Horman <simon.horman@corigine.com>,
-	Andrew Halaney <ahalaney@redhat.com>,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
-	Shenwei Wang <shenwei.wang@nxp.com>,
-	Wong Vee Khee <veekhee@apple.com>
-Subject: Re: [PATCH v2 net 1/2] net: stmmac: add new mode parameter for
- fix_mac_speed
-Message-ID: <202307282338.veVKQvK3-lkp@intel.com>
-References: <20230727152503.2199550-2-shenwei.wang@nxp.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AED4714283
+	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 16:05:10 +0000 (UTC)
+Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::229])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B32E53C1D;
+	Fri, 28 Jul 2023 09:05:06 -0700 (PDT)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 47AE9FF802;
+	Fri, 28 Jul 2023 16:04:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1690560303;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=DOwouwDm/Kasz+cImp4ZpLSYmghBWaSXArlXLO1rpH0=;
+	b=ljouRWt14CzNxKdUZLfGcvVcD/MG5DdymZazb90A1RiBoJhkZfx33QMCamA/nq64KgQViJ
+	5j94ziGUbCxvMyciw8LIg6YwFQkSf7yHDnrs3zIfxUjdSzdBKykEKG0kWvz/aV8i05xP78
+	mqj89PddP7bz5a6JA8nBI8sawR22k7xKkRbiJMjIfLhDef/HPbnKzJyS+UFodCJ+DT53ZN
+	A4VJB+/3Z1hacM8uhegA536VPmo5HTtstM9AcUBZ8j7k+5ooOrDw8+C3Kc1ufE3I2crSNT
+	VFHW+ZQvhNQgc6+HqrnlnydP17EiBNygti/FGEhzRdi0EfCxPi4SUnCrthjHlQ==
+Date: Fri, 28 Jul 2023 18:04:43 +0200
+From: Miquel Raynal <miquel.raynal@bootlin.com>
+To: Conor Dooley <conor@kernel.org>
+Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, Varshini Rajendran
+ <varshini.rajendran@microchip.com>, robh+dt@kernel.org,
+ krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+ nicolas.ferre@microchip.com, alexandre.belloni@bootlin.com,
+ claudiu.beznea@microchip.com, mturquette@baylibre.com, sboyd@kernel.org,
+ herbert@gondor.apana.org.au, davem@davemloft.net, vkoul@kernel.org,
+ andi.shyti@kernel.org, tglx@linutronix.de, maz@kernel.org, lee@kernel.org,
+ ulf.hansson@linaro.org, tudor.ambarus@linaro.org, richard@nod.at,
+ vigneshr@ti.com, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ linus.walleij@linaro.org, sre@kernel.org, p.zabel@pengutronix.de,
+ olivia@selenic.com, a.zummo@towertech.it, radu_nicolae.pirea@upb.ro,
+ richard.genoud@gmail.com, gregkh@linuxfoundation.org, lgirdwood@gmail.com,
+ broonie@kernel.org, wim@linux-watchdog.org, linux@roeck-us.net,
+ linux@armlinux.org.uk, durai.manickamkr@microchip.com, andrew@lunn.ch,
+ jerry.ray@microchip.com, andre.przywara@arm.com, mani@kernel.org,
+ alexandre.torgue@st.com, gregory.clement@bootlin.com, arnd@arndb.de,
+ rientjes@google.com, deller@gmx.de, 42.hyeyoo@gmail.com, vbabka@suse.cz,
+ mripard@kernel.org, mihai.sain@microchip.com,
+ codrin.ciubotariu@microchip.com, eugen.hristev@collabora.com,
+ devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, linux-clk@vger.kernel.org,
+ linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org,
+ linux-i2c@vger.kernel.org, linux-mmc@vger.kernel.org,
+ linux-mtd@lists.infradead.org, netdev@vger.kernel.org,
+ linux-gpio@vger.kernel.org, linux-pm@vger.kernel.org,
+ linux-rtc@vger.kernel.org, linux-spi@vger.kernel.org,
+ linux-serial@vger.kernel.org, alsa-devel@alsa-project.org,
+ linux-usb@vger.kernel.org, linux-watchdog@vger.kernel.org
+Subject: Re: [PATCH v3 00/50] Add support for sam9x7 SoC family
+Message-ID: <20230728180443.55363550@xps-13>
+In-Reply-To: <20230728-floss-stark-889158f968ea@spud>
+References: <20230728102223.265216-1-varshini.rajendran@microchip.com>
+	<c0792cfd-db4f-7153-0775-824912277908@linaro.org>
+	<20230728-floss-stark-889158f968ea@spud>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230727152503.2199550-2-shenwei.wang@nxp.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: miquel.raynal@bootlin.com
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Shenwei,
+Hi Conor,
 
-kernel test robot noticed the following build errors:
+conor@kernel.org wrote on Fri, 28 Jul 2023 16:50:24 +0100:
 
-[auto build test ERROR on net/main]
+> On Fri, Jul 28, 2023 at 01:32:12PM +0200, Krzysztof Kozlowski wrote:
+> > On 28/07/2023 12:22, Varshini Rajendran wrote: =20
+> > > This patch series adds support for the new SoC family - sam9x7.
+> > >  - The device tree, configs and drivers are added
+> > >  - Clock driver for sam9x7 is added
+> > >  - Support for basic peripherals is added
+> > >  - Target board SAM9X75 Curiosity is added
+> > >  =20
+> >=20
+> > Your threading is absolutely broken making it difficult to review and a=
+pply. =20
+>=20
+> I had a chat with Varshini today, they were trying to avoid sending the
+> patches to a massive CC list, but didn't set any in-reply-to header.
+> For the next submission whole series could be sent to the binding &
+> platform maintainers and the individual patches additionally to their
+> respective lists/maintainers. Does that sound okay to you, or do you
+> think it should be broken up?
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Shenwei-Wang/net-stmmac-add-new-mode-parameter-for-fix_mac_speed/20230727-232922
-base:   net/main
-patch link:    https://lore.kernel.org/r/20230727152503.2199550-2-shenwei.wang%40nxp.com
-patch subject: [PATCH v2 net 1/2] net: stmmac: add new mode parameter for fix_mac_speed
-config: x86_64-randconfig-x004-20230728 (https://download.01.org/0day-ci/archive/20230728/202307282338.veVKQvK3-lkp@intel.com/config)
-compiler: clang version 16.0.4 (https://github.com/llvm/llvm-project.git ae42196bc493ffe877a7e3dff8be32035dea4d07)
-reproduce: (https://download.01.org/0day-ci/archive/20230728/202307282338.veVKQvK3-lkp@intel.com/reproduce)
+I usually prefer receiving the dt-bindings *and* the driver changes, so
+I can give my feedback on the description side, as well as looking at
+the implementation and see if that really matches what was discussed
+with you :)
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202307282338.veVKQvK3-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
->> drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c:359:22: error: incompatible function pointer types assigning to 'void (*)(void *, uint, uint)' (aka 'void (*)(void *, unsigned int, unsigned int)') from 'void (void *, unsigned int)' [-Wincompatible-function-pointer-types]
-           data->fix_mac_speed = tegra_eqos_fix_speed;
-                               ^ ~~~~~~~~~~~~~~~~~~~~
-   1 error generated.
---
->> drivers/net/ethernet/stmicro/stmmac/dwmac-intel-plat.c:108:28: error: incompatible function pointer types assigning to 'void (*)(void *, uint, uint)' (aka 'void (*)(void *, unsigned int, unsigned int)') from 'void (*const)(void *, unsigned int)' [-Wincompatible-function-pointer-types]
-                           plat_dat->fix_mac_speed = dwmac->data->fix_mac_speed;
-                                                   ^ ~~~~~~~~~~~~~~~~~~~~~~~~~~
-   1 error generated.
-
-
-vim +359 drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c
-
-e6ea2d16fc615e Thierry Reding 2017-03-10  267  
-a884915f4cef94 Jisheng Zhang  2020-11-09  268  static int tegra_eqos_probe(struct platform_device *pdev,
-e6ea2d16fc615e Thierry Reding 2017-03-10  269  			    struct plat_stmmacenet_data *data,
-e6ea2d16fc615e Thierry Reding 2017-03-10  270  			    struct stmmac_resources *res)
-e6ea2d16fc615e Thierry Reding 2017-03-10  271  {
-1d4605e0aff9ff Ajay Gupta     2019-12-15  272  	struct device *dev = &pdev->dev;
-e6ea2d16fc615e Thierry Reding 2017-03-10  273  	struct tegra_eqos *eqos;
-e6ea2d16fc615e Thierry Reding 2017-03-10  274  	int err;
-e6ea2d16fc615e Thierry Reding 2017-03-10  275  
-e6ea2d16fc615e Thierry Reding 2017-03-10  276  	eqos = devm_kzalloc(&pdev->dev, sizeof(*eqos), GFP_KERNEL);
-a884915f4cef94 Jisheng Zhang  2020-11-09  277  	if (!eqos)
-a884915f4cef94 Jisheng Zhang  2020-11-09  278  		return -ENOMEM;
-e6ea2d16fc615e Thierry Reding 2017-03-10  279  
-e6ea2d16fc615e Thierry Reding 2017-03-10  280  	eqos->dev = &pdev->dev;
-e6ea2d16fc615e Thierry Reding 2017-03-10  281  	eqos->regs = res->addr;
-e6ea2d16fc615e Thierry Reding 2017-03-10  282  
-1d4605e0aff9ff Ajay Gupta     2019-12-15  283  	if (!is_of_node(dev->fwnode))
-1d4605e0aff9ff Ajay Gupta     2019-12-15  284  		goto bypass_clk_reset_gpio;
-1d4605e0aff9ff Ajay Gupta     2019-12-15  285  
-e6ea2d16fc615e Thierry Reding 2017-03-10  286  	eqos->clk_master = devm_clk_get(&pdev->dev, "master_bus");
-e6ea2d16fc615e Thierry Reding 2017-03-10  287  	if (IS_ERR(eqos->clk_master)) {
-e6ea2d16fc615e Thierry Reding 2017-03-10  288  		err = PTR_ERR(eqos->clk_master);
-e6ea2d16fc615e Thierry Reding 2017-03-10  289  		goto error;
-e6ea2d16fc615e Thierry Reding 2017-03-10  290  	}
-e6ea2d16fc615e Thierry Reding 2017-03-10  291  
-e6ea2d16fc615e Thierry Reding 2017-03-10  292  	err = clk_prepare_enable(eqos->clk_master);
-e6ea2d16fc615e Thierry Reding 2017-03-10  293  	if (err < 0)
-e6ea2d16fc615e Thierry Reding 2017-03-10  294  		goto error;
-e6ea2d16fc615e Thierry Reding 2017-03-10  295  
-e6ea2d16fc615e Thierry Reding 2017-03-10  296  	eqos->clk_slave = devm_clk_get(&pdev->dev, "slave_bus");
-e6ea2d16fc615e Thierry Reding 2017-03-10  297  	if (IS_ERR(eqos->clk_slave)) {
-e6ea2d16fc615e Thierry Reding 2017-03-10  298  		err = PTR_ERR(eqos->clk_slave);
-e6ea2d16fc615e Thierry Reding 2017-03-10  299  		goto disable_master;
-e6ea2d16fc615e Thierry Reding 2017-03-10  300  	}
-e6ea2d16fc615e Thierry Reding 2017-03-10  301  
-e6ea2d16fc615e Thierry Reding 2017-03-10  302  	data->stmmac_clk = eqos->clk_slave;
-e6ea2d16fc615e Thierry Reding 2017-03-10  303  
-e6ea2d16fc615e Thierry Reding 2017-03-10  304  	err = clk_prepare_enable(eqos->clk_slave);
-e6ea2d16fc615e Thierry Reding 2017-03-10  305  	if (err < 0)
-e6ea2d16fc615e Thierry Reding 2017-03-10  306  		goto disable_master;
-e6ea2d16fc615e Thierry Reding 2017-03-10  307  
-e6ea2d16fc615e Thierry Reding 2017-03-10  308  	eqos->clk_rx = devm_clk_get(&pdev->dev, "rx");
-e6ea2d16fc615e Thierry Reding 2017-03-10  309  	if (IS_ERR(eqos->clk_rx)) {
-e6ea2d16fc615e Thierry Reding 2017-03-10  310  		err = PTR_ERR(eqos->clk_rx);
-e6ea2d16fc615e Thierry Reding 2017-03-10  311  		goto disable_slave;
-e6ea2d16fc615e Thierry Reding 2017-03-10  312  	}
-e6ea2d16fc615e Thierry Reding 2017-03-10  313  
-e6ea2d16fc615e Thierry Reding 2017-03-10  314  	err = clk_prepare_enable(eqos->clk_rx);
-e6ea2d16fc615e Thierry Reding 2017-03-10  315  	if (err < 0)
-e6ea2d16fc615e Thierry Reding 2017-03-10  316  		goto disable_slave;
-e6ea2d16fc615e Thierry Reding 2017-03-10  317  
-e6ea2d16fc615e Thierry Reding 2017-03-10  318  	eqos->clk_tx = devm_clk_get(&pdev->dev, "tx");
-e6ea2d16fc615e Thierry Reding 2017-03-10  319  	if (IS_ERR(eqos->clk_tx)) {
-e6ea2d16fc615e Thierry Reding 2017-03-10  320  		err = PTR_ERR(eqos->clk_tx);
-e6ea2d16fc615e Thierry Reding 2017-03-10  321  		goto disable_rx;
-e6ea2d16fc615e Thierry Reding 2017-03-10  322  	}
-e6ea2d16fc615e Thierry Reding 2017-03-10  323  
-e6ea2d16fc615e Thierry Reding 2017-03-10  324  	err = clk_prepare_enable(eqos->clk_tx);
-e6ea2d16fc615e Thierry Reding 2017-03-10  325  	if (err < 0)
-e6ea2d16fc615e Thierry Reding 2017-03-10  326  		goto disable_rx;
-e6ea2d16fc615e Thierry Reding 2017-03-10  327  
-e6ea2d16fc615e Thierry Reding 2017-03-10  328  	eqos->reset = devm_gpiod_get(&pdev->dev, "phy-reset", GPIOD_OUT_HIGH);
-e6ea2d16fc615e Thierry Reding 2017-03-10  329  	if (IS_ERR(eqos->reset)) {
-e6ea2d16fc615e Thierry Reding 2017-03-10  330  		err = PTR_ERR(eqos->reset);
-e6ea2d16fc615e Thierry Reding 2017-03-10  331  		goto disable_tx;
-e6ea2d16fc615e Thierry Reding 2017-03-10  332  	}
-e6ea2d16fc615e Thierry Reding 2017-03-10  333  
-e6ea2d16fc615e Thierry Reding 2017-03-10  334  	usleep_range(2000, 4000);
-e6ea2d16fc615e Thierry Reding 2017-03-10  335  	gpiod_set_value(eqos->reset, 0);
-e6ea2d16fc615e Thierry Reding 2017-03-10  336  
-1a981c0586c038 Thierry Reding 2019-07-26  337  	/* MDIO bus was already reset just above */
-1a981c0586c038 Thierry Reding 2019-07-26  338  	data->mdio_bus_data->needs_reset = false;
-1a981c0586c038 Thierry Reding 2019-07-26  339  
-e6ea2d16fc615e Thierry Reding 2017-03-10  340  	eqos->rst = devm_reset_control_get(&pdev->dev, "eqos");
-e6ea2d16fc615e Thierry Reding 2017-03-10  341  	if (IS_ERR(eqos->rst)) {
-e6ea2d16fc615e Thierry Reding 2017-03-10  342  		err = PTR_ERR(eqos->rst);
-e6ea2d16fc615e Thierry Reding 2017-03-10  343  		goto reset_phy;
-e6ea2d16fc615e Thierry Reding 2017-03-10  344  	}
-e6ea2d16fc615e Thierry Reding 2017-03-10  345  
-e6ea2d16fc615e Thierry Reding 2017-03-10  346  	err = reset_control_assert(eqos->rst);
-e6ea2d16fc615e Thierry Reding 2017-03-10  347  	if (err < 0)
-e6ea2d16fc615e Thierry Reding 2017-03-10  348  		goto reset_phy;
-e6ea2d16fc615e Thierry Reding 2017-03-10  349  
-e6ea2d16fc615e Thierry Reding 2017-03-10  350  	usleep_range(2000, 4000);
-e6ea2d16fc615e Thierry Reding 2017-03-10  351  
-e6ea2d16fc615e Thierry Reding 2017-03-10  352  	err = reset_control_deassert(eqos->rst);
-e6ea2d16fc615e Thierry Reding 2017-03-10  353  	if (err < 0)
-e6ea2d16fc615e Thierry Reding 2017-03-10  354  		goto reset_phy;
-e6ea2d16fc615e Thierry Reding 2017-03-10  355  
-e6ea2d16fc615e Thierry Reding 2017-03-10  356  	usleep_range(2000, 4000);
-e6ea2d16fc615e Thierry Reding 2017-03-10  357  
-1d4605e0aff9ff Ajay Gupta     2019-12-15  358  bypass_clk_reset_gpio:
-e6ea2d16fc615e Thierry Reding 2017-03-10 @359  	data->fix_mac_speed = tegra_eqos_fix_speed;
-e6ea2d16fc615e Thierry Reding 2017-03-10  360  	data->init = tegra_eqos_init;
-e6ea2d16fc615e Thierry Reding 2017-03-10  361  	data->bsp_priv = eqos;
-029c1c2059e9c4 Jon Hunter     2022-07-06  362  	data->sph_disable = 1;
-e6ea2d16fc615e Thierry Reding 2017-03-10  363  
-e6ea2d16fc615e Thierry Reding 2017-03-10  364  	err = tegra_eqos_init(pdev, eqos);
-e6ea2d16fc615e Thierry Reding 2017-03-10  365  	if (err < 0)
-e6ea2d16fc615e Thierry Reding 2017-03-10  366  		goto reset;
-e6ea2d16fc615e Thierry Reding 2017-03-10  367  
-a884915f4cef94 Jisheng Zhang  2020-11-09  368  	return 0;
-e6ea2d16fc615e Thierry Reding 2017-03-10  369  reset:
-e6ea2d16fc615e Thierry Reding 2017-03-10  370  	reset_control_assert(eqos->rst);
-e6ea2d16fc615e Thierry Reding 2017-03-10  371  reset_phy:
-e6ea2d16fc615e Thierry Reding 2017-03-10  372  	gpiod_set_value(eqos->reset, 1);
-e6ea2d16fc615e Thierry Reding 2017-03-10  373  disable_tx:
-e6ea2d16fc615e Thierry Reding 2017-03-10  374  	clk_disable_unprepare(eqos->clk_tx);
-e6ea2d16fc615e Thierry Reding 2017-03-10  375  disable_rx:
-e6ea2d16fc615e Thierry Reding 2017-03-10  376  	clk_disable_unprepare(eqos->clk_rx);
-e6ea2d16fc615e Thierry Reding 2017-03-10  377  disable_slave:
-e6ea2d16fc615e Thierry Reding 2017-03-10  378  	clk_disable_unprepare(eqos->clk_slave);
-e6ea2d16fc615e Thierry Reding 2017-03-10  379  disable_master:
-e6ea2d16fc615e Thierry Reding 2017-03-10  380  	clk_disable_unprepare(eqos->clk_master);
-e6ea2d16fc615e Thierry Reding 2017-03-10  381  error:
-a884915f4cef94 Jisheng Zhang  2020-11-09  382  	return err;
-e6ea2d16fc615e Thierry Reding 2017-03-10  383  }
-e6ea2d16fc615e Thierry Reding 2017-03-10  384  
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Thanks,
+Miqu=C3=A8l
 
