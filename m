@@ -1,188 +1,174 @@
-Return-Path: <netdev+bounces-22240-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22241-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55FE6766AB9
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 12:33:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 126DA766AC1
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 12:34:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1167E28274B
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 10:33:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 42AD41C218C0
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 10:34:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E22A4D304;
-	Fri, 28 Jul 2023 10:33:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E3A7101FF;
+	Fri, 28 Jul 2023 10:34:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF65FC8CA
-	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 10:33:25 +0000 (UTC)
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2070a.outbound.protection.outlook.com [IPv6:2a01:111:f400:fe59::70a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8B863C06;
-	Fri, 28 Jul 2023 03:33:07 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=QygF2XtbF7B/Qb7OxQUK+6mO4ZENM9Z6xufCYChKmjle0yy8DrNXVz6dksL2z09zR3l9A+Z1OM6sLviPGdiY/sLta65kLM8DgilSO7LEeGAK4oqztrceXwPvpmxXTanZiOVbsXgxVjN5FWgXoaHFQDwpPDfIm9zhoG55jskBNCStSB3jTx5LDcoRqPIZ7YntY1837jF2JS+yM1fJ5Bsz1CXQlzr9qdWlyx+fksjEQOnCSy5mwWunwjPovk0WdEqE9SjL5dv4ssybcuKUuWJP1UOUqg9VEBT6l+NWkEBzYnJ0PAosMvd136c4y/jlE1MDobBJL2kLTDvoD9UA4dFHxg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=TXcGluViIPpRrioTylHhsvgGKF2Ehe6axA96lTV9yk4=;
- b=m26OpFkfPgZz+osQNHFooEZz+iVNyRtwrH/2Tr0rykTTwRcW2INv/iQ0AoaJwTCTjoOhPPiP9udTMxUSePXB0ezVeWNpJr/zsW9kXsZ2KwiuBwEBdrHga9WNsch6M6PrOAlR3OtdTVPAHdQfwxMJdLsM9oieRqYDKBlzcZZfAgwPvV7vMxTZmNTLqHYbjqEdsSnCH2B+Ow9GSvS5hUW2kt6c7PSvCEOTKIculuNgmhz2IAOuuQIw1mWa29IH8VzbwDuQ96mRGMF3NMZq3lK7mDPM1lkT9gHZEHE4hYdqwlbdLxUTp1e8JfH5iEEqlUJLRnhjYPz63RWQc70Wi5I5lg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
- dkim=pass header.d=corigine.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TXcGluViIPpRrioTylHhsvgGKF2Ehe6axA96lTV9yk4=;
- b=m0ijiTVRomzsDuxM1zZEkFvOYzUtAlxVYCRyQxTCDqxQ1s6gKJLLfrbSqcfoZu8vhsuMowtjlUqThLJkRjwIFjhzkgS6YUii7fD6jbNKcXKseafW/19TZkT1VIwTuYk70pYJgv9Of68/nDndOSyFxq+xNvHvaruWvJRFcXOvjG8=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=corigine.com;
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
- by CH2PR13MB3878.namprd13.prod.outlook.com (2603:10b6:610:93::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.29; Fri, 28 Jul
- 2023 10:32:49 +0000
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::fde7:9821:f2d9:101d]) by PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::fde7:9821:f2d9:101d%7]) with mapi id 15.20.6631.026; Fri, 28 Jul 2023
- 10:32:49 +0000
-Date: Fri, 28 Jul 2023 12:32:41 +0200
-From: Simon Horman <simon.horman@corigine.com>
-To: Sergey Shtylyov <s.shtylyov@omp.ru>
-Cc: Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-	Zheng Wang <zyytlz.wz@163.com>, lee@kernel.org,
-	linyunsheng@huawei.com, davem@davemloft.net, edumazet@google.com,
-	richardcochran@gmail.com, p.zabel@pengutronix.de,
-	geert+renesas@glider.be, magnus.damm@gmail.com,
-	yoshihiro.shimoda.uh@renesas.com, biju.das.jz@bp.renesas.com,
-	wsa+renesas@sang-engineering.com, netdev@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	hackerzheng666@gmail.com, 1395428693sheep@gmail.com,
-	alex000young@gmail.com
-Subject: Re: [PATCH v4] net: ravb: Fix possible UAF bug in ravb_remove
-Message-ID: <ZMOZSeUaVIaZzZph@corigine.com>
-References: <20230725030026.1664873-1-zyytlz.wz@163.com>
- <20230725201952.2f23bb3b@kernel.org>
- <9cfa70cca3cb1dd20bb2cab70a213e5a4dd28f89.camel@redhat.com>
- <607f4fe4-5a59-39dd-71c2-0cf769b48187@omp.ru>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <607f4fe4-5a59-39dd-71c2-0cf769b48187@omp.ru>
-X-ClientProxiedBy: AS4P251CA0014.EURP251.PROD.OUTLOOK.COM
- (2603:10a6:20b:5d2::14) To PH0PR13MB4842.namprd13.prod.outlook.com
- (2603:10b6:510:78::6)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32648C8CA
+	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 10:34:15 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (unknown [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 962705B98
+	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 03:34:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=GE/GiJ/Wr4BDnRbyetCqlvLJDFtA4s5+ouGWfwAgb7g=; b=NSpiIFMRAIdpYhCY0kr6jLQ4S0
+	hXJ6K9CJUD8pQJmG06KZx9rrtMx3RCUL2vwsQsRz1g69MjAB43cmgz5RzulKDJEKXNvG4NioSAfEC
+	5EOrDS5L78jTqjxjgjtJvktOsGeoexATVTm40to4To5bgpjalqR3HKM8UfnSVhBkdMIWX+s4PgV7o
+	fJ6dM3l3d2eIjnrHSk3O6ez6IRw5nnjNfL6Gxnx9nQdC5P3ho74KE00hm96eCu5JZULNzI7LvKZSB
+	VgqXuSUYw8uZiiAiqkeOZ8xEM7MOQS7vKIOy+XJanB6v+r+/SBDWFznaBnpUGLwGgJ+R7geWbTLMd
+	k/yAqcsg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:44822)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qPKnG-00077Z-2K;
+	Fri, 28 Jul 2023 11:33:58 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qPKnD-0004q7-Aw; Fri, 28 Jul 2023 11:33:55 +0100
+Date: Fri, 28 Jul 2023 11:33:55 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Jiawen Wu <jiawenwu@trustnetic.com>
+Cc: netdev@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
+	Jose.Abreu@synopsys.com, mengyuanlou@net-swift.com
+Subject: Re: [PATCH net-next 4/7] net: pcs: xpcs: adapt Wangxun NICs for
+ SGMII mode
+Message-ID: <ZMOZkzCqiUZP/uQ8@shell.armlinux.org.uk>
+References: <20230724102341.10401-1-jiawenwu@trustnetic.com>
+ <20230724102341.10401-5-jiawenwu@trustnetic.com>
+ <ZL5TujWbCDuFUXb2@shell.armlinux.org.uk>
+ <03cc01d9be9c$6e51cad0$4af56070$@trustnetic.com>
+ <ZL9+XZA8t1vaSVmG@shell.armlinux.org.uk>
+ <03f101d9bedd$763b06d0$62b11470$@trustnetic.com>
+ <ZL+cwbCd6eTU4sC8@shell.armlinux.org.uk>
+ <ZL+fF4365f0Q9QDD@shell.armlinux.org.uk>
+ <052c01d9c13b$edc25ef0$c9471cd0$@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|CH2PR13MB3878:EE_
-X-MS-Office365-Filtering-Correlation-Id: 70480a06-6ffd-4179-31c7-08db8f55fd4d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	DIxFgWA1bejLi0DGi0v2EluUg9ZryloKwR74kChQizDFSXlYcr95kcBLUcXqQupZ+3wQ5ckCvn44J172XYUyJAK/4g0kdkYV15ddCKyNv38V2I3TmUt0LchTCUQEo3Vu+24T+Lf5GxwcrXo0O5LP1rhyKRWK59aQnYmJa0wg7vLW8eA3xGn58Kt5lBdYKLVDKoOwCn6ivd47TZFCa3+Eh8dY/p/u4HEgyd96x7hlwMxRoErE7+uMFe/ayqfkNj+f6/ddvXpHk793iZHcsA1XBLrTXtJFakX10HdUsre0WAuildj4mVSZSHExjxkpss3lcoNenbUGnua55cOpMGUtcQmcR3O/E92gKW4DVV/ObJZ4VU27wgY3LKWI2xsacsLDtkNlV9pfnc32GGhlrXHltYjuxx6dx/FVfFc89jzyOmQ8QHI+pEJCtti/wUeI4jsEObUw93xRrADCISywqAKYBSJmuav/oWVjVlkHVlOKCBL/2cKhY31NCLZzkTkZiokjuImvosRDu+NtLlmlwK3fAZJxmZbCsr/pML8Pf3O4xclEcc8LWs30HjdoxT2cZxIxKGMOgRj8bn1hp6MhxJEmOzZpIO29ZC/F1uEE+tyRg1c=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(136003)(396003)(39840400004)(366004)(376002)(346002)(451199021)(6666004)(6486002)(83380400001)(478600001)(6506007)(53546011)(6512007)(966005)(66556008)(66476007)(4326008)(54906003)(38100700002)(186003)(2616005)(66946007)(6916009)(7416002)(44832011)(316002)(86362001)(8936002)(8676002)(41300700001)(2906002)(5660300002)(36756003);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?34g8gikSAchuxECgW1KsQeG1MWSctBh+rr9lXjikkQjUVNIPIshb1+izyMo/?=
- =?us-ascii?Q?ZETfTRThlpxaRrFeCpPPiNcTYgkUW/8OiBsQcjKpBn3vAgo0bOY1zewMFXrd?=
- =?us-ascii?Q?sVSYqkPAIU23PuCIMXCfuG+l6xwyy4rJDVoTL63NaISfZtspnPqJPrmWbnWD?=
- =?us-ascii?Q?vWGH72/wXuj95HcBB1SATH15eCA6GwTMt0BSIVs5zfcdI8KejRiZccqDxefd?=
- =?us-ascii?Q?/0OTC7Rh4tYzlF8ORuGktLU6cKo+/soetP7EQ4v1GprGOr++6RvJNlol3VoD?=
- =?us-ascii?Q?JXLgxSpwbVil+fyLiJU7PHWvC4ZlOUa3UVNCOqH1IFVQpcNlw6YkSYiGTeOW?=
- =?us-ascii?Q?Fj2fKy79g1sRNlBxdaDG8tJpus65Od2zgIzC1jPugtf+9TYnqsT0l9Lnpz+W?=
- =?us-ascii?Q?RGWnC8e715t4tdt+46DGrlh85w3ij9UPUpCZIkuciMgdMkE0Ycej3YrjbPwS?=
- =?us-ascii?Q?dvvv4YE1v+JJZK8M2Rq+Pj8iSOjjld4xPO8mtfO3mhsnXiNvqRH+Ztw9FEkD?=
- =?us-ascii?Q?aMqSR4gFlC/nG5uCHyPRR0GUTMeJHg92nPzbdK6TwLjr2F4oFlrpGqHH90Wb?=
- =?us-ascii?Q?v/Kn0bQmRrFmTP9b5gfEnz8uL7qXLG0dzr4+a/mZ6juFc2QGAKB86tIfme6d?=
- =?us-ascii?Q?O7YQbkmV1ZKieFa+K1Q4KDYc/22oYabViqeXyPtRvxaP+FS7CvnNMGJx560u?=
- =?us-ascii?Q?U/ZvHY6MAyAjq5mJewjsG4F7pzFAU4iY8++s/gkjwKRQhXml8FcdxtwSaWbr?=
- =?us-ascii?Q?6qhzPqHAkrFx+z+hVRyxlbAyH+CJdfAbGbFnS1ugWAu4it2rngLyBHpT+WMN?=
- =?us-ascii?Q?GYH/YCk3XRCosxh2Le5ge/k5/eqSvNd988/HcX47GsAFAKvlyG5BEX5rnKm2?=
- =?us-ascii?Q?/tqfB4u29yw3xiVm21Zjudj8/Va0ecd5YWhNj6oF9q+fU96y89oyPuWmrVab?=
- =?us-ascii?Q?0AOTmtXkG7ZISh3feC0dxPAvvTxMneba5gnYPtJVJUYjLcCdVcct+svQOw8N?=
- =?us-ascii?Q?MFwlsZoE6pVSx2niTQD+RCFf0MxtsUjM0QDwxRcC7CeVlCvPcv0wAqQDAlBC?=
- =?us-ascii?Q?jreCimU/k/3JBpE7BXMFKhMKIJj2io9oXGYlX21kgSnHwopAcGCp4J/X6Lm9?=
- =?us-ascii?Q?Y2uPLWvF4O8riMnW+ynKqAeZRWVGMapSrGSsVtjnCBHnLnE8WTHW2dpMyJt1?=
- =?us-ascii?Q?UfiG4Y3roZQwHsF4YtXTAU1TNKax8tSCsgDkDPCMkEow+juCFTQjefYImghi?=
- =?us-ascii?Q?6GGweWPSGamH6WbulAhpiJ/6coRrt5i5kOqh9fp7dkUZK0TSKttnP4xDZyhD?=
- =?us-ascii?Q?lSoMGs/CiC7VLg/MNDLJSGZ6kkCU852kgWAKUJzxo/QSmxQMkY1oodX7eDFq?=
- =?us-ascii?Q?HkAtPCZD8kvf1EOhBeSAOa7uZCvlmS0IQLqQl2T7q1TNwZgrodkC+V3ieLIN?=
- =?us-ascii?Q?qW9RWJFeJxwY9L6BBiIwPqAjx3rFRIuEO63t4KNoE7hrgr4H+gA5c19RBxjA?=
- =?us-ascii?Q?dnIGvKELdyYBF1bSNB97PjKBPXFekL1CMeR6gnHTLDbdk79Utl4O6SEnN50m?=
- =?us-ascii?Q?SKvfNcEex3cqO7vcm5zRbQLHUUoT/aUVVJa1+f5QEEJRePWvzIOUFD4MhCXQ?=
- =?us-ascii?Q?JE6AfoBDaRkVQMrsBp4+pLPxW/xnNrdL3unQ0bsWyuc9Myl7740aotQi4Dho?=
- =?us-ascii?Q?rv2u8w=3D=3D?=
-X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 70480a06-6ffd-4179-31c7-08db8f55fd4d
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Jul 2023 10:32:48.9809
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: YEGULMCnDIM9WrqCcJA1aAuXdj6ckq0lZu7RlHOMFhHMv8PZHUaAfhkFcSMYWetCknM0Wk38aB/73ee/1AnVj39FzpB8QiFf3b5Nt4JlL8E=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR13MB3878
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <052c01d9c13b$edc25ef0$c9471cd0$@trustnetic.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,RDNS_NONE,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Jul 27, 2023 at 09:48:41PM +0300, Sergey Shtylyov wrote:
-> Hello!
-> 
-> On 7/27/23 11:21 AM, Paolo Abeni wrote:
-> [...]
-> >>> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
-> >>> index 4d6b3b7d6abb..ce2da5101e51 100644
-> >>> --- a/drivers/net/ethernet/renesas/ravb_main.c
-> >>> +++ b/drivers/net/ethernet/renesas/ravb_main.c
-> >>> @@ -2885,6 +2885,9 @@ static int ravb_remove(struct platform_device *pdev)
-> >>>  	struct ravb_private *priv = netdev_priv(ndev);
-> >>>  	const struct ravb_hw_info *info = priv->info;
-> >>>  
-> >>> +	netif_carrier_off(ndev);
-> >>> +	netif_tx_disable(ndev);
-> >>> +	cancel_work_sync(&priv->work);
-> >>
-> >> Still racy, the carrier can come back up after canceling the work.
+On Fri, Jul 28, 2023 at 06:11:51PM +0800, Jiawen Wu wrote:
+> On Tuesday, July 25, 2023 6:08 PM, Russell King (Oracle) wrote:
+> > On Tue, Jul 25, 2023 at 10:58:25AM +0100, Russell King (Oracle) wrote:
+> > > > The information obtained from the IC designer is that "PHY/MAC side SGMII"
+> > > > is configured by experimentation. For these different kinds of NICs:
+> > > > 1) fiber + SFP-RJ45 module: PHY side SGMII
+> > > > 2) copper (pcs + external PHY): MAC side SGMII
+> > >
+> > > This makes no sense. a PHY on a RJ45 SFP module is just the same as a
+> > > PHY integrated into a board with the MAC.
 > > 
-> > I must admit I don't see how/when this driver sets the carrier on ?!?
-> 
->    The phylib code does it for this MAC driver, see the call tree of
-> phy_link_change(), on e.g. https://elixir.bootlin.com/linux/v6.5-rc3/source/...
-> 
-> >> But whatever, this is a non-issue in the first place.
 > > 
-> > Do you mean the UaF can't happen? I think that is real. 
-> 
->    Looks possible to me, at least now... and anyway, shouldn't we clean up
-> after ourselves if we call schedule_work()?However my current impression is
-> that cancel_work_sync() should be called from ravb_close(), after calling
-> phy_{stop|disconnect}()...
-> 
-> >> The fact that ravb_tx_timeout_work doesn't take any locks seems much
-> >> more suspicious.
+> > MAC ---- PCS <----- sgmii -----> PHY (whether on a board or SFP)
 > > 
-> > Indeed! But that should be a different patch, right?
+> > Control word flow:
+> >              <------------------ link, speed, duplex
+> > 	     ------------------> acknowledge (value = 0x4001)
+> > 
+> > Sometimes, it's possible to connect two MACs/PCSs together:
+> > 
+> > MAC ---- PCS <----- sgmii -----> PCS ---- MAC
+> > 
+> > and in this case, one PCS would need to be configured in "MAC" mode
+> > and the other would need to be configured in "PHY" mode because SGMII
+> > is fundamentally asymmetric.
+> > 
+> > Here is the definition of the control word sent by either end:
+> > 
+> > Bit	MAC->PHY	PHY->MAC
+> > 15	0: Reserved	Link status, 1 = link up
+> > 14	1: Acknowledge	Reserved for AN acknowledge
+> > 13	0: Reserved	0: Reserved
+> > 12	0: Reserved	Duplex mode 1 = full, 0 = half
+> > 11:10	0: Reserved	Speed 11 = Reserved 10=1G, 01=100M, 00=10M
+> > 9:1	0: Reserved	0: Reserved
+> > 0	1		1
+> > 
+> > So my guess would be that "PHY side SGMII" means the device generates
+> > the "PHY->MAC" format word whereas "MAC side SGMII" generates the
+> > "MAC->PHY" format word - and it's the latter that you want to be using
+> > both for Copper SFPs, which are no different from PHYs integrated onto
+> > the board connected with SGMII.
 > 
->    Yes.
+> There is a question about I2C MII read ops. I see that PHY in SFP-RJ45 module
+> is read by i2c_mii_read_default_c22(), but it limits the msgs[0].len=1.
 > 
-> > Waiting a little more for feedback from renesas.
+> A description in  the SFP-RJ45 datasheet shows:
+> The registers are accessible through the 2-wire serial CMOS EEPROM protocol
+> of the ATMEL AT24C01A or equivalent. The address of the PHY is 1010110x,
+> where x is the R/W bit. Each register's address is 000yyyyy, where yyyyy is the
+> binary equivalent of the register number. Write and read operations must send
+> or receive 16 bits of data, so the "multi-page" access protocol must be used.
 > 
->    Renesas historically hasn't shown much interest to reviewing the sh_eth/ravb
-> driver patches, so I took that task upon myself. I also happen to be a nominal
-> author of this driver... :-)
+> So the PHY register address should be written twice: first high 8 bits, second low
+> 8 bits. to read the register value.
+> 
+> Is there a problem with which driver?
 
-FWIIW, that matches my recollection.
-Although it may be out of date by now.
+No there isn't, and it conforms with the above.
+
+A read looks like this:
+
+      Address  Data                   Address  Data     Data
+Start 10101100 000yyyyy RepeatedStart 10101101 DDDDDDDD DDDDDDDD Stop
+                      or Stop followed
+		          by Start
+
+The terms "Address" and "Data" here are as per the I²C specification.
+You will notice that the first part has one byte of address and *one*
+byte of data to convey the register address. This is what the "1" you
+are referring to above is for.
+
+For completness, a write looks like this:
+
+      Address  Data     Data     Data
+Start 10101100 000yyyyy DDDDDDDD DDDDDDDD Stop
+
+Essentially, in all cases, when 0x56 is addressed with the data
+direction in write mode, the very first byte is _always_ the register
+address and the remainder contain the data. When the data direction is
+in read mode, the bytes are always data.
+
+The description you quote above is poor because it doesn't make it
+clear whether "read" and "write" apply to the bus transactions or to
+the device operations. However, I can assure you that what is
+implemented is correct, since this is the standard small 24xx memory
+device protocol, and I've been programming that on various
+microcontrollers and such like for the last 30 years.
+
+Are you seeing a problem with the data read or written to the PHY?
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
