@@ -1,187 +1,86 @@
-Return-Path: <netdev+bounces-22193-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22194-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8BB37766683
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 10:11:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B26876668C
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 10:12:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4652028246C
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 08:11:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CC5201C2182E
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 08:12:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C076D2EC;
-	Fri, 28 Jul 2023 08:11:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D17DD2F3;
+	Fri, 28 Jul 2023 08:12:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49967C2C0
-	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 08:11:34 +0000 (UTC)
-Received: from mx1.sberdevices.ru (mx1.sberdevices.ru [37.18.73.165])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB1AD10E;
-	Fri, 28 Jul 2023 01:11:31 -0700 (PDT)
-Received: from p-infra-ksmg-sc-msk01 (localhost [127.0.0.1])
-	by mx1.sberdevices.ru (Postfix) with ESMTP id 76AD3100004;
-	Fri, 28 Jul 2023 11:11:30 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 76AD3100004
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
-	s=mail; t=1690531890;
-	bh=7xjggaRnRosCBX2aIuVU9Xtjjt90LbPMaiwfpvmSaBU=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Content-Type:From;
-	b=quZZsbNFFWIIiHki+jG1xiRM9j1T9djGPPhNWufAzT9rcu/wPqC0SaFcRtaWhwKLG
-	 kPbmN6j/DIGc6ek1v48TOVMVESxLF6v3NqFrEHTyiYwW8YmQF22tipC1H9PHWElRGV
-	 vF/mmMYwQVl7rilr/KI3o+7n1zWRVLTtFZCCGBgv2PYN+HtyrJMdzZZSPucS0OEzdG
-	 iRZpcUOJux9gpULB9E5/4btoHwna7W4pylE//DohkPONqeUAk7fcwZWy/YiJJUNBLY
-	 3zYBxRgU0AnJcTIqH63NZ40H00yaeKrPHgpyvUUanZqWaExzu1uqTfD12aHzpBiCAO
-	 ydDlRJ6bPc39w==
-Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.sberdevices.ru (Postfix) with ESMTPS;
-	Fri, 28 Jul 2023 11:11:30 +0300 (MSK)
-Received: from [192.168.0.106] (100.64.160.123) by
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Fri, 28 Jul 2023 11:11:06 +0300
-Message-ID: <0d0e9b6e-fbdb-fd63-3f93-8a7249711dfc@sberdevices.ru>
-Date: Fri, 28 Jul 2023 11:05:56 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61955C2C0
+	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 08:12:02 +0000 (UTC)
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFA61448A
+	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 01:11:57 -0700 (PDT)
+Received: from dggpemm500016.china.huawei.com (unknown [172.30.72.53])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4RC0dM0qWMztRZw;
+	Fri, 28 Jul 2023 16:08:39 +0800 (CST)
+Received: from [10.67.108.26] (10.67.108.26) by dggpemm500016.china.huawei.com
+ (7.185.36.25) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Fri, 28 Jul
+ 2023 16:11:55 +0800
+Message-ID: <48ecd30c-fdb8-c987-7369-78664ea4f799@huawei.com>
+Date: Fri, 28 Jul 2023 16:11:44 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [PATCH net-next v4 0/4] vsock/virtio/vhost: MSG_ZEROCOPY
- preparations
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.9.0
+Subject: Re: [PATCH -next] net: bcmasp: Clean up redundant dev_err_probe()
 Content-Language: en-US
-From: Arseniy Krasnov <avkrasnov@sberdevices.ru>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-CC: Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella
-	<sgarzare@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Jason Wang <jasowang@redhat.com>, Bobby Eshleman
-	<bobby.eshleman@bytedance.com>, <kvm@vger.kernel.org>,
-	<virtualization@lists.linux-foundation.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <kernel@sberdevices.ru>, <oxffffaa@gmail.com>
-References: <20230727222627.1895355-1-AVKrasnov@sberdevices.ru>
- <20230728012845-mutt-send-email-mst@kernel.org>
- <eeefef14-2c92-a7a6-e58e-77dccbe38282@sberdevices.ru>
-In-Reply-To: <eeefef14-2c92-a7a6-e58e-77dccbe38282@sberdevices.ru>
-Content-Type: text/plain; charset="UTF-8"
+To: Simon Horman <simon.horman@corigine.com>
+CC: <justin.chen@broadcom.com>, <florian.fainelli@broadcom.com>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <bcm-kernel-feedback-list@broadcom.com>,
+	<netdev@vger.kernel.org>
+References: <20230727115551.2655840-1-chenjiahao16@huawei.com>
+ <ZMJx8JnLPBbsR1Up@corigine.com>
+From: "chenjiahao (C)" <chenjiahao16@huawei.com>
+In-Reply-To: <ZMJx8JnLPBbsR1Up@corigine.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [100.64.160.123]
-X-ClientProxiedBy: p-i-exch-sc-m02.sberdevices.ru (172.16.192.103) To
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
-X-KSMG-Rule-ID: 10
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Lua-Profiles: 178796 [Jul 22 2023]
-X-KSMG-AntiSpam-Version: 5.9.59.0
-X-KSMG-AntiSpam-Envelope-From: AVKrasnov@sberdevices.ru
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 525 525 723604743bfbdb7e16728748c3fa45e9eba05f7d, {Tracking_uf_ne_domains}, {Tracking_from_domain_doesnt_match_to}, FromAlignment: s, ApMailHostAddress: 100.64.160.123
-X-MS-Exchange-Organization-SCL: -1
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiPhishing: Clean, bases: 2023/07/23 10:45:00
-X-KSMG-LinksScanning: Clean, bases: 2023/07/23 10:46:00
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/07/23 08:49:00 #21663637
-X-KSMG-AntiVirus-Status: Clean, skipped
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.6
+X-Originating-IP: [10.67.108.26]
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ dggpemm500016.china.huawei.com (7.185.36.25)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
 
+On 2023/7/27 21:32, Simon Horman wrote:
+> On Thu, Jul 27, 2023 at 07:55:51PM +0800, Chen Jiahao wrote:
+>> Refering to platform_get_irq()'s definition, the return value has
+> nit: Refering -> Referring
 
-On 28.07.2023 11:00, Arseniy Krasnov wrote:
-> 
-> 
-> On 28.07.2023 08:45, Michael S. Tsirkin wrote:
->> On Fri, Jul 28, 2023 at 01:26:23AM +0300, Arseniy Krasnov wrote:
->>> Hello,
->>>
->>> this patchset is first of three parts of another big patchset for
->>> MSG_ZEROCOPY flag support:
->>> https://lore.kernel.org/netdev/20230701063947.3422088-1-AVKrasnov@sberdevices.ru/
->>
->> overall looks good. Two points I'd like to see addressed:
-> 
-> Thanks!
-> 
->> - what's the performance with all these changes - still same?
-> 
-> Yes, I perform quick tests and seems result are same. This is because last
-> implemented logic when I compare size of payload against 'num_max' is
-> for "emergency" case and not triggered in default environment. Anyway, I'll
-> perform retest at least in nested guest case.
+Thanks, I will fix this typo in v2 patch if needed.
 
-"default environment" is vanilla Qemu where queue size is 128 elements. To test
-this logic i rebuild Qemu with for example queue of 8 elements.
+Jiahao
 
-Thanks, Arseniy
-
-> 
->> - most systems have a copybreak scheme where buffers
->>   smaller than a given size are copied directly.
->>   This will address regression you see with small buffers -
->>   but need to find that value. we know it's between 4k and 32k :)
-> 
-> I see, You suggest to find this value and add this check for decision to
-> use zerocopy or copy ?
-> 
-> Thanks, Arseniy
-> 
+>
+>> already been checked, error message also been printed via
+>> dev_err_probe() if ret < 0. Calling dev_err_probe() one more time
+>> outside platform_get_irq() is obviously redundant.
 >>
+>> Removing dev_err_probe() outside platform_get_irq() to clean up
+>> above problem.
 >>
->>> During review of this series, Stefano Garzarella <sgarzare@redhat.com>
->>> suggested to split it for three parts to simplify review and merging:
->>>
->>> 1) virtio and vhost updates (for fragged skbs) <--- this patchset
->>> 2) AF_VSOCK updates (allows to enable MSG_ZEROCOPY mode and read
->>>    tx completions) and update for Documentation/.
->>> 3) Updates for tests and utils.
->>>
->>> This series enables handling of fragged skbs in virtio and vhost parts.
->>> Newly logic won't be triggered, because SO_ZEROCOPY options is still
->>> impossible to enable at this moment (next bunch of patches from big
->>> set above will enable it).
->>>
->>> I've included changelog to some patches anyway, because there were some
->>> comments during review of last big patchset from the link above.
->>>
->>> Head for this patchset is 9d0cd5d25f7d45bce01bbb3193b54ac24b3a60f3
->>>
->>> Link to v1:
->>> https://lore.kernel.org/netdev/20230717210051.856388-1-AVKrasnov@sberdevices.ru/
->>> Link to v2:
->>> https://lore.kernel.org/netdev/20230718180237.3248179-1-AVKrasnov@sberdevices.ru/
->>> Link to v3:
->>> https://lore.kernel.org/netdev/20230720214245.457298-1-AVKrasnov@sberdevices.ru/
->>>
->>> Changelog:
->>>  * Patchset rebased and tested on new HEAD of net-next (see hash above).
->>>  * See per-patch changelog after ---.
->>>
->>> Arseniy Krasnov (4):
->>>   vsock/virtio/vhost: read data from non-linear skb
->>>   vsock/virtio: support to send non-linear skb
->>>   vsock/virtio: non-linear skb handling for tap
->>>   vsock/virtio: MSG_ZEROCOPY flag support
->>>
->>>  drivers/vhost/vsock.c                   |  14 +-
->>>  include/linux/virtio_vsock.h            |   6 +
->>>  net/vmw_vsock/virtio_transport.c        |  79 +++++-
->>>  net/vmw_vsock/virtio_transport_common.c | 312 ++++++++++++++++++------
->>>  4 files changed, 330 insertions(+), 81 deletions(-)
->>>
->>> -- 
->>> 2.25.1
->>
+>> Signed-off-by: Chen Jiahao <chenjiahao16@huawei.com>
+> Reviewed-by: Simon Horman <simon.horman@corigine.com>
+>
 
