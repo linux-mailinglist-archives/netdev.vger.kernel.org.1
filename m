@@ -1,81 +1,128 @@
-Return-Path: <netdev+bounces-22464-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22465-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 488497678FB
-	for <lists+netdev@lfdr.de>; Sat, 29 Jul 2023 01:30:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 06EF2767929
+	for <lists+netdev@lfdr.de>; Sat, 29 Jul 2023 01:52:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A44B7281E0D
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 23:30:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A75E7282603
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 23:52:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63D23200BF;
-	Fri, 28 Jul 2023 23:30:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 425BE214E0;
+	Fri, 28 Jul 2023 23:52:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A975525C
-	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 23:30:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C9497C433C9;
-	Fri, 28 Jul 2023 23:30:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690587020;
-	bh=FWGOuJNnxQ8LB9TJesHkFzsgcZFxtmGm/CpqXJd8ZKA=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=jp97ag3wlFuxtpF5a4YX3rzTtqnUPDCRUsde2RyxeYUumvbkNFW1uDl2a7XgvHe+e
-	 oL5bYqFQTSirdBl8usT3ZM0kOdZu//BSc5Y1QA8aBAorgFfbkzAyFBxBg3QsH5ziH+
-	 LLGq8gtId+lh9KOisRVwk4B5zPoa96QBN3qUQJ/PP6p+Z4V6IfzVTAdnp6v+nt1xup
-	 1MHz9wE1CNpfZowr05Q8pciIa5jyBbDPixUV/4XBEdHtA2uwC57mrE0Y8DWHyG9Clh
-	 CL96fLSkTgvT67u9gYsljxyXnagAsbIv743S0i3VBIgxFoGoeOActgkMy0SjWsLvky
-	 DwuAOG97vYrqw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id AEB1BC4166F;
-	Fri, 28 Jul 2023 23:30:20 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 374CA525C
+	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 23:52:30 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22C5D422B
+	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 16:52:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1690588348;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=BY29vbVRSLrx1jOwy2KzcUw26TLcuFDuJxFn8li9iP8=;
+	b=JQgNYnXSwWJW/vpzPCbOk+CSwpjcAdZhwDKGA2oVkP2ML69oXbJAEUlVgA4OBLfHX1ZoyF
+	5LjwJf/KauVfNQ4W2RM690hvQ8OUwzVjsVu6LaUSuVWKrFW1YyAM1YhVSVJiMfVY1Ik63A
+	oA9Pe7oWMg/TmgVzZEMVg33fbN3b5tI=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-344-QF0H11mpOgSewz_eLPmuog-1; Fri, 28 Jul 2023 19:52:22 -0400
+X-MC-Unique: QF0H11mpOgSewz_eLPmuog-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3B356185A78B;
+	Fri, 28 Jul 2023 23:52:22 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.131])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id A857F400F36;
+	Fri, 28 Jul 2023 23:52:20 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <20230718160737.52c68c73@kernel.org>
+References: <20230718160737.52c68c73@kernel.org> <000000000000881d0606004541d1@google.com> <0000000000001416bb06004ebf53@google.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: dhowells@redhat.com,
+    syzbot <syzbot+f527b971b4bdc8e79f9e@syzkaller.appspotmail.com>,
+    bpf@vger.kernel.org, brauner@kernel.org, davem@davemloft.net,
+    dsahern@kernel.org, edumazet@google.com,
+    linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+    netdev@vger.kernel.org, pabeni@redhat.com,
+    syzkaller-bugs@googlegroups.com, viro@zeniv.linux.org.uk
+Subject: Re: [syzbot] [fs?] INFO: task hung in pipe_release (4)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH][next] net: ethernet: slicoss: remove redundant increment of
- pointer data
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169058702071.6177.8877758938708395588.git-patchwork-notify@kernel.org>
-Date: Fri, 28 Jul 2023 23:30:20 +0000
-References: <20230726164522.369206-1-colin.i.king@gmail.com>
-In-Reply-To: <20230726164522.369206-1-colin.i.king@gmail.com>
-To: Colin Ian King <colin.i.king@gmail.com>
-Cc: LinoSanfilippo@gmx.de, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
- kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <550502.1690588340.1@warthog.procyon.org.uk>
+Date: Sat, 29 Jul 2023 00:52:20 +0100
+Message-ID: <550503.1690588340@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
+Jakub Kicinski <kuba@kernel.org> wrote:
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+> Hi David, any ideas about this one? Looks like it triggers on fairly
+> recent upstream?
 
-On Wed, 26 Jul 2023 17:45:22 +0100 you wrote:
-> The pointer data is being incremented but this change to the pointer
-> is not used afterwards. The increment is redundant and can be removed.
-> 
-> Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
-> ---
->  drivers/net/ethernet/alacritech/slicoss.c | 4 +---
->  1 file changed, 1 insertion(+), 3 deletions(-)
+I've managed to reproduce it finally.  Instrumenting the pipe_lock/unlock
+functions, splice_to_socket() and pipe_release() seems to show that
+pipe_release() is being called whilst splice_to_socket() is still running.
 
-Here is the summary with links:
-  - [next] net: ethernet: slicoss: remove redundant increment of pointer data
-    https://git.kernel.org/netdev/net-next/c/3bdd85e2e350
+I *think* syzbot is arranging things such that splice_to_socket() takes a
+significant amount of time so that another thread can close the socket as it
+exits.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+In this sample logging, the pipe is created by pid 7101:
 
+[   66.205719] --pipe 7101
+[   66.209942] lock
+[   66.212526] locked
+[   66.215344] unlock
+[   66.218103] unlocked
+
+splice begins in 7101 also and locks the pipe:
+
+[   66.221057] ==>splice_to_socket() 7101
+[   66.225596] lock
+[   66.228177] locked
+
+but for some reason, pid 7100 then tries to release it:
+
+[   66.377781] release 7100
+
+and hangs on the __pipe_lock() call in pipe_release():
+
+[   66.381059] lock
+
+The syz reproducer does weird things with threading - and I'm wondering if
+there's a file struct refcount bug here.  Note that splice_to_socket() can't
+access the pipe file structs to alter the refcount, and the involved pipe
+isn't communicated to udp_sendmsg() in any way - so if there is a refcount
+bug, it must be somewhere in the VFS, the pipe driver or the splice
+infrastructure:-/.
+
+I'm also not sure what's going on inside udp_sendmsg() as yet.  It doesn't
+show a stack in /proc/7101/stacks, which means it doesn't hit a schedule().
+
+David
 
 
