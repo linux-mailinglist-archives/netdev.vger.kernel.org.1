@@ -1,102 +1,111 @@
-Return-Path: <netdev+bounces-22115-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22104-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 589FC76617A
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 03:47:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 13ECC766124
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 03:17:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 890111C21765
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 01:47:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 43CBB1C2173A
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 01:17:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 422AC15D1;
-	Fri, 28 Jul 2023 01:47:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFD1A15A9;
+	Fri, 28 Jul 2023 01:17:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3501915CC
-	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 01:47:54 +0000 (UTC)
-Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07104F2
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 18:47:53 -0700 (PDT)
-Received: by mail-lf1-x130.google.com with SMTP id 2adb3069b0e04-4f4b2bc1565so2777489e87.2
-        for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 18:47:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690508871; x=1691113671;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PFfPfZwjc+uNvV8mG9hFOuvKMgIeKkyutm2C1XzBtLY=;
-        b=HhuHcn6qYkMczeFbXyfGSN2yiGRIl02nrEuDfHYX0NIq2cz/I+mnzLPyBd3AvBjueJ
-         Mgkf+LPvXQzPC8+7ohkctiq8AkHzeuXKDaIUIHJUzEdBkz55OauhHD2kgDIsfdEyvV1A
-         uWHz4S6Yl2noHFvpYVlN76lWWRR869xgIHLZk6pbiZZoeoQyS1og7eI8M7Ghv9CCMAn/
-         Jfl8pwe2d/ARmD5AZcryaL3nPKpbBiSt37Cvnu1PqpI6fWohHNmVdG51/tcF4YqPuRH8
-         4BlbqZ7QBCfI+30ekZus/wKxGW9VMj4qeAVjTXm3obvvrdnNYd8lMPZdpdSSRRx4KBii
-         zznQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690508871; x=1691113671;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=PFfPfZwjc+uNvV8mG9hFOuvKMgIeKkyutm2C1XzBtLY=;
-        b=AnJW+CDolz2+rIBgX+xzLdzgLUeRTmpeTCNVWCDr1PFKBjAlmFxNk/BZOrqIcxkKmt
-         Fz0bkL0mkxlgtL7KyqP9r2BIJfGK/AXj8TNbYXh3aa31iW1pDD+z8bsyvyI8MWf76nuR
-         Ty9ifOzqpwnnLFtnnm+3Jw4fdswMxb4J4ld3H+p0a+fTjBllI7Vxt6l8x1nNri4xV7hO
-         pXMmy5ojPiV7Q3sbq9RFD0+4/0tqgwCKagFUWm3c/xgCFzpWbbyjfccKvsCzqEnmsX6Y
-         LOOilZXCZ+hWXMOK6gGXmCbCPGU/wzdOI3+fPP08U7qT9/tftu8bFFQTte6hzNYv7EJe
-         xUnA==
-X-Gm-Message-State: ABy/qLYt4ZRxT/bSQfKYWzmXDInRki2mWCt+1+tejIcvw/iB3HiK54LA
-	v5ImzU3QAUR1eUn3lN9k091FtVQLG6YEXh4aIPk=
-X-Google-Smtp-Source: APBJJlHZLbfjtYt0jmpSXISpjxl6oHIS7lr8GkyxK+CeCjm4AxDxmWLTcX0GdHKCKmuz+ioA7/gdeojbKQADmnSz/2I=
-X-Received: by 2002:a05:6512:444:b0:4fb:61ea:95dc with SMTP id
- y4-20020a056512044400b004fb61ea95dcmr582572lfk.7.1690508871000; Thu, 27 Jul
- 2023 18:47:51 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A4AF7C;
+	Fri, 28 Jul 2023 01:17:42 +0000 (UTC)
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDB0F30E1;
+	Thu, 27 Jul 2023 18:17:40 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.143])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4RBqW506BWz4f3n6l;
+	Fri, 28 Jul 2023 09:17:37 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.124.27])
+	by APP4 (Coremail) with SMTP id gCh0CgCnD7MuF8NklRzkOw--.24715S4;
+	Fri, 28 Jul 2023 09:17:36 +0800 (CST)
+From: Hou Tao <houtao@huaweicloud.com>
+To: bpf@vger.kernel.org
+Cc: netdev@vger.kernel.org,
+	"David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	=?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn.topel@gmail.com>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Alexei Starovoitov <alexei.starovoitov@gmail.com>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Song Liu <song@kernel.org>,
+	Hao Luo <haoluo@google.com>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	KP Singh <kpsingh@kernel.org>,
+	Stanislav Fomichev <sdf@google.com>,
+	Jiri Olsa <jolsa@kernel.org>,
+	houtao1@huawei.com
+Subject: [PATCH bpf-next 0/2] Remove unused fields in cpumap & devmap
+Date: Fri, 28 Jul 2023 09:49:40 +0800
+Message-Id: <20230728014942.892272-1-houtao@huaweicloud.com>
+X-Mailer: git-send-email 2.29.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1690439335.git.chenfeiyang@loongson.cn> <20aa37fdfd4b03b9614befe1c8f78ffc0ac5dead.1690439335.git.chenfeiyang@loongson.cn>
- <4a59ba65-a4f2-4cd1-8bfe-2ae3e4d0a778@lunn.ch>
-In-Reply-To: <4a59ba65-a4f2-4cd1-8bfe-2ae3e4d0a778@lunn.ch>
-From: Feiyang Chen <chris.chenfeiyang@gmail.com>
-Date: Fri, 28 Jul 2023 09:47:38 +0800
-Message-ID: <CACWXhK=-52i75jR6t6avFrEH+SFGKG4k6zXE5_59_av7nAQN0w@mail.gmail.com>
-Subject: Re: [PATCH v2 10/10] net: stmmac: dwmac-loongson: Add GNET support
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Feiyang Chen <chenfeiyang@loongson.cn>, hkallweit1@gmail.com, peppe.cavallaro@st.com, 
-	alexandre.torgue@foss.st.com, joabreu@synopsys.com, chenhuacai@loongson.cn, 
-	linux@armlinux.org.uk, dongbiao@loongson.cn, 
-	loongson-kernel@lists.loongnix.cn, netdev@vger.kernel.org, 
-	loongarch@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgCnD7MuF8NklRzkOw--.24715S4
+X-Coremail-Antispam: 1UD129KBjvdXoW7GryxJr4DJFW3XF1kXw15CFg_yoWxtFg_ur
+	W0kry8Xrs8A340vw1jyF1xWrWDtFyvvw4UAa90vF9rJr15tw4rXr48ury5Z34kX3s7uFWf
+	J345u3yDZF12qjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUb28YFVCjjxCrM7AC8VAFwI0_Xr0_Wr1l1xkIjI8I6I8E6xAIw20E
+	Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwV
+	A0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x02
+	67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
+	0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
+	x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
+	0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1l42xK82IY
+	c2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s
+	026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6rW5MIIYrxkI7VAKI48JMIIF
+	0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0x
+	vE42xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2
+	jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07UZ18PUUUUU=
+X-CM-SenderInfo: xkrx3t3r6k3tpzhluzxrxghudrp/
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
+	SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Jul 27, 2023 at 6:43=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
->
-> > +static void loongson_gnet_fix_speed(void *priv, unsigned int speed)
-> > +{
-> > +     struct net_device *ndev =3D (struct net_device *)(*(unsigned long=
- *)priv);
->
-> priv is a void *, so you don't need any casts.
->
+From: Hou Tao <houtao1@huawei.com>
 
-Hi, Andrew,
+Hi,
 
-OK.
+Patchset "Simplify xdp_do_redirect_map()/xdp_do_flush_map() and XDP
+maps" [0] changed per-map flush list to global per-cpu flush list
+for cpumap, devmap and xskmap, but it forgot to remove these unused
+fields from cpumap and devmap. So just remove these unused fields.
 
-Thanks,
-Feiyang
+Comments and suggestions are always welcome.
 
->      Andrew
+Regards,
+Tao
+
+[0]: https://lore.kernel.org/bpf/20191219061006.21980-1-bjorn.topel@gmail.com
+
+Hou Tao (2):
+  bpf, cpumap: Remove unused cmap field from bpf_cpu_map_entry
+  bpf, devmap: Remove unused dtab field from bpf_dtab_netdev
+
+ kernel/bpf/cpumap.c | 3 ---
+ kernel/bpf/devmap.c | 2 --
+ 2 files changed, 5 deletions(-)
+
+-- 
+2.29.2
+
 
