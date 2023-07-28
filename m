@@ -1,65 +1,71 @@
-Return-Path: <netdev+bounces-22281-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22282-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64196766DCC
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 15:02:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FEB4766DE3
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 15:14:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 308B11C218A0
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 13:02:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E1A5028275F
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 13:14:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1051F12B9B;
-	Fri, 28 Jul 2023 13:02:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC333134A5;
+	Fri, 28 Jul 2023 13:14:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F161F12B82
-	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 13:01:59 +0000 (UTC)
-Received: from mail-wr1-x42c.google.com (mail-wr1-x42c.google.com [IPv6:2a00:1450:4864:20::42c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57FB43AA5
-	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 06:01:57 -0700 (PDT)
-Received: by mail-wr1-x42c.google.com with SMTP id ffacd0b85a97d-313e742a787so1439025f8f.1
-        for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 06:01:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=6wind.com; s=google; t=1690549316; x=1691154116;
-        h=content-transfer-encoding:in-reply-to:organization:from
-         :content-language:references:cc:to:subject:reply-to:user-agent
-         :mime-version:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=K91+vIAjx+eJtOJKnpXBwW6BgbBkRzfMC9sOwU5+89E=;
-        b=bYmsdKG5T6tkHyD/Yl61CHji1fsmDvPCfL7AQIoa9WzpMLY5Jz3P62uGMpitlsU95g
-         UIyMxaa434F6CatdC2yH9ZMjhJ7+KXRkY4axAqbIvq3yWpgcemhiNspNBBtrBDxORios
-         2i8mN3mwjkUR1C85mfcomJvjl9K4pERyHcgZ9oKyNLYSBk4kZPHspuoS5rsJKoIs5ZAt
-         FjWiuiOUyhWV9abbCBvmTsrwZ8ngsIf8NVeAo4uz6X3ZV2pdbiypPTv/tF1axfLszatw
-         qsrP83cJ6FJ43iLYXQBc3b+R3lHuuZKkXbfuYyxgbvRWd2GBcrlitGE+T1YO1SLoeTem
-         /T8Q==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB88F101FE
+	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 13:14:13 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E78513A9A
+	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 06:14:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1690550051;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=pLiIZeTYjRO0s/LEHdCCleUVzGxQ50bQYg01pbBTxpo=;
+	b=g/lz25cr5ABIb2Oo8+q9xF+pYZ6ZtKp9bq8w/snQTQgPgplwJUuUBEYVxw9X1Zn2Jmx1FQ
+	+qToofApRuzJJhzHIBlYAVPRBoKFTKCEsPVJN+2uYpelFXwhs50kxdKImrjMLdY90nW6gW
+	ttVvvOfqw4w51ZkFfItH5QGk5rpfuFU=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-462-QDXMRimDMmqZ1jL2zVqg9Q-1; Fri, 28 Jul 2023 09:14:10 -0400
+X-MC-Unique: QDXMRimDMmqZ1jL2zVqg9Q-1
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-993d41cbc31so135268666b.1
+        for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 06:14:09 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690549316; x=1691154116;
-        h=content-transfer-encoding:in-reply-to:organization:from
-         :content-language:references:cc:to:subject:reply-to:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=K91+vIAjx+eJtOJKnpXBwW6BgbBkRzfMC9sOwU5+89E=;
-        b=VRwxG4VMdaUr3ObAKyRMhefcX1KM7oCEJ1GWjlxd10RM0P2LcUYWFK98cYMYW3YDUQ
-         g/KvrzDhQh6uDxaTYWzqR6GVEYmpe213pk4NrrrancXToj57NvfT73eumfl9oKWP4tUI
-         nhSwcyGU8BiO+yRfbQ6doyxA/q619YJYj9Ulxa2kk4HQxibz+OvrNTLcaT/qCKjlK3M/
-         p49ajQwBRAzZRhv5HNKC/s0nYX0vr+28CPPXtNfPHI+QK3C4T3hgRtOtULiba55haExY
-         +R/Me19rMA2EDaHl88t8c+i+V0za/mL8HhFVwX/RhaMI4YZR1vkButgeFfEvXjIkB1Gs
-         bS1g==
-X-Gm-Message-State: ABy/qLaBeDzXuXqcYJCm78AMCXvKWzrqVb4BzteDFPoeFC3BGOJLGdY3
-	mPMuy+WVU/SimZiY3EtXGxUstw==
-X-Google-Smtp-Source: APBJJlEKR73KOTfVePRnYPxwSUdSgFcnb1bYO5Z/6oMBSEOqnCWTXK9ZGX4HIRvWAAawskkTl5CtCg==
-X-Received: by 2002:a5d:4292:0:b0:313:e2e3:d431 with SMTP id k18-20020a5d4292000000b00313e2e3d431mr4408279wrq.12.1690549315688;
-        Fri, 28 Jul 2023 06:01:55 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:b41:c160:24d9:fc5f:8fea:8b? ([2a01:e0a:b41:c160:24d9:fc5f:8fea:8b])
-        by smtp.gmail.com with ESMTPSA id n6-20020a7bcbc6000000b003fb739d27aesm7042429wmi.35.2023.07.28.06.01.23
+        d=1e100.net; s=20221208; t=1690550049; x=1691154849;
+        h=content-transfer-encoding:in-reply-to:references:to
+         :content-language:subject:cc:user-agent:mime-version:date:message-id
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=pLiIZeTYjRO0s/LEHdCCleUVzGxQ50bQYg01pbBTxpo=;
+        b=UPrjX82crAuDt4+o36LxutR54dgWo4fd5/8miv3lsC6cTiS9PI3Jn3rvaeWW6zCAUU
+         J0bADZAS34Kfw34k4uzNHZCuUXcW5YhqvWs+Xth1QdQDeAJuNTIIcnTcD7wT/Mzb6TsR
+         +mU8kTZnfEVSNebkVhz0TLMtfsKhMC1cTfNC356vsQp8a4YVewIwdCr2lHnaAAyeb+JV
+         6tABx82g6U13CXnNZbpfWfAIOq7tUxoqHAqaw1tlFnrc6KcvLHprlcc4mUT6WE9aUhcy
+         z+Vfj3x89sS8GxAKuFbLUhc+lBQBUNjSLcVQPX0x0T8K2lmt4E+cNxOJizxpnNwLyDIL
+         EjKA==
+X-Gm-Message-State: ABy/qLbdvB/xgaSz5NauT0i3paH8660iKu4e3vgmWknqaZL3fWm4s7GO
+	GpyfDir9zRRe1DJVB+hf+NlgGW82U+b0w+xoWJkJ0b1hZYL2V06gcP4dqM8SxjdrfKv0SfVMTUz
+	5Z0j17c3XGJViqcIQ
+X-Received: by 2002:a17:906:d7:b0:973:fd02:a41f with SMTP id 23-20020a17090600d700b00973fd02a41fmr2819191eji.40.1690550048959;
+        Fri, 28 Jul 2023 06:14:08 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlHDJOGU2IgCXp9wkrtJWVk+oJ9oO/CC4frD4+EcqSZ/Vn3Qq/IBOHAWtlNyLSG8QImCON2ELQ==
+X-Received: by 2002:a17:906:d7:b0:973:fd02:a41f with SMTP id 23-20020a17090600d700b00973fd02a41fmr2819170eji.40.1690550048646;
+        Fri, 28 Jul 2023 06:14:08 -0700 (PDT)
+Received: from [192.168.42.222] (194-45-78-10.static.kviknet.net. [194.45.78.10])
+        by smtp.gmail.com with ESMTPSA id f5-20020a1709064dc500b0098f33157e7dsm2067557ejw.82.2023.07.28.06.14.06
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 28 Jul 2023 06:01:28 -0700 (PDT)
-Message-ID: <6b53e392-ca84-c50b-9d77-4f89e801d4f3@6wind.com>
-Date: Fri, 28 Jul 2023 15:01:18 +0200
+        Fri, 28 Jul 2023 06:14:07 -0700 (PDT)
+From: Jesper Dangaard Brouer <jbrouer@redhat.com>
+X-Google-Original-From: Jesper Dangaard Brouer <brouer@redhat.com>
+Message-ID: <d13bc032-6ad0-368d-42ab-c4965a22a2ba@redhat.com>
+Date: Fri, 28 Jul 2023 15:14:06 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,73 +74,113 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.13.0
-Reply-To: nicolas.dichtel@6wind.com
-Subject: Re: [PATCH net-next] ipv4/fib: send RTM_DELROUTE notify when flush
- fib
-To: Stephen Hemminger <stephen@networkplumber.org>,
- Hangbin Liu <liuhangbin@gmail.com>
-Cc: Ido Schimmel <idosch@idosch.org>, David Ahern <dsahern@kernel.org>,
- netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Thomas Haller <thaller@redhat.com>
-References: <ZLZnGkMxI+T8gFQK@shredder> <20230718085814.4301b9dd@hermes.local>
- <ZLjncWOL+FvtaHcP@Laptop-X1> <ZLlE5of1Sw1pMPlM@shredder>
- <ZLngmOaz24y5yLz8@Laptop-X1>
- <d6a204b1-e606-f6ad-660a-28cc5469be2e@kernel.org>
- <ZLobpQ7jELvCeuoD@Laptop-X1> <ZLzY42I/GjWCJ5Do@shredder>
- <ZL48xbowL8QQRr9s@Laptop-X1> <20230724084820.4aa133cc@hermes.local>
- <ZL+F6zUIXfyhevmm@Laptop-X1> <20230725093617.44887eb1@hermes.local>
+Cc: brouer@redhat.com, "atzin@redhat.com" <atzin@redhat.com>,
+ "linyunsheng@huawei.com" <linyunsheng@huawei.com>,
+ "saeed@kernel.org" <saeed@kernel.org>,
+ "ttoukan.linux@gmail.com" <ttoukan.linux@gmail.com>,
+ "maxtram95@gmail.com" <maxtram95@gmail.com>,
+ "jbrouer@redhat.com" <jbrouer@redhat.com>,
+ "kheib@redhat.com" <kheib@redhat.com>, "jbenc@redhat.com"
+ <jbenc@redhat.com>, "alexander.duyck@gmail.com" <alexander.duyck@gmail.com>,
+ "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
+ "ilias.apalodimas@linaro.org" <ilias.apalodimas@linaro.org>,
+ Saeed Mahameed <saeedm@nvidia.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "fmaurer@redhat.com" <fmaurer@redhat.com>,
+ "mkabat@redhat.com" <mkabat@redhat.com>, Tariq Toukan <tariqt@nvidia.com>,
+ "lorenzo@kernel.org" <lorenzo@kernel.org>
+Subject: Re: mlx5 XDP redirect leaking memory on kernel 6.3
 Content-Language: en-US
-From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Organization: 6WIND
-In-Reply-To: <20230725093617.44887eb1@hermes.local>
-Content-Type: text/plain; charset=UTF-8
+To: Dragos Tatulea <dtatulea@nvidia.com>,
+ "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>
+References: <d862a131-5e31-bd26-84f7-fd8764ca9d48@redhat.com>
+ <00ca7beb7fe054a3ba1a36c61c1e3b1314369f11.camel@nvidia.com>
+ <6d47e22e-f128-ec8f-bbdc-c030483a8783@redhat.com>
+ <cc918a244723bffe17f528fc1b9a82c0808a22be.camel@nvidia.com>
+ <324a5a08-3053-6ab6-d47e-7413d9f2f443@redhat.com>
+ <2023071357-unscrew-customary-fbae@gregkh>
+ <32726772de5996305d0cfd4b6948933c47cb7927.camel@nvidia.com>
+ <2023071705-senorita-unafraid-25b8@gregkh>
+ <99774260e7e0f5f21215d6f4b00c5d8a7102f4ce.camel@nvidia.com>
+In-Reply-To: <99774260e7e0f5f21215d6f4b00c5d8a7102f4ce.camel@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+	SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Le 25/07/2023 à 18:36, Stephen Hemminger a écrit :
-> On Tue, 25 Jul 2023 16:20:59 +0800
-> Hangbin Liu <liuhangbin@gmail.com> wrote:
-> 
->> On Mon, Jul 24, 2023 at 08:48:20AM -0700, Stephen Hemminger wrote:
->>> On Mon, 24 Jul 2023 16:56:37 +0800
->>> Hangbin Liu <liuhangbin@gmail.com> wrote:
->>>   
->>>> The NetworkManager keeps a cache of the routes. Missing/Wrong events mean that
->>>> the cache becomes inconsistent. The IPv4 will not send src route delete info
->>>> if it's bond to other device. While IPv6 only modify the src route instead of
->>>> delete it, and also no notify. So NetworkManager developers complained and
->>>> hope to have a consistent and clear notification about route modify/delete.  
->>>
->>> Read FRR they get it right. The routing daemons have to track kernel,
->>> and the semantics have been worked out for years.  
+
+Correction: mlx5 XDP redirect leaking memory on kernel 6.4
+  - Explained below
+
+On 17/07/2023 17.15, Dragos Tatulea wrote:
+> On Mon, 2023-07-17 at 16:42 +0200, gregkh@linuxfoundation.org wrote:
+>> On Mon, Jul 17, 2023 at 02:37:44PM +0000, Dragos Tatulea wrote:
+>>> On Thu, 2023-07-13 at 17:31 +0200, Greg KH wrote:
+>>>> On Thu, Jul 13, 2023 at 04:58:04PM +0200, Jesper Dangaard Brouer wrote:
+>>>>>
+>>>>>
+>>>>> On 13/07/2023 12.11, Dragos Tatulea wrote:
+>>>>>> Gi Jesper,
+>>>>>> On Thu, 2023-07-13 at 11:20 +0200, Jesper Dangaard Brouer wrote:
+>>>>>>> Hi Dragos,
+>>>>>>>
+>>>>>>> Below you promised to work on a fix for XDP redirect memory leak...
+>>>>>>> What is the status?
+>>>>>>>
+>>>>>> The fix got merged into net a week ago:
+>>>>>> https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git/commit/drivers/net/ethernet/mellanox/mlx5/core?id=7abd955a58fb0fcd4e756fa2065c03ae488fcfa7
+>>>>>>
+>>>>>> Just forgot to follow up on this thread. Sorry about that...
+>>>>>>
+>>>>>
+>>>>> Good to see it being fixed in net.git commit:
+>>>>>   7abd955a58fb ("net/mlx5e: RX, Fix page_pool page fragment tracking for XDP")
+>>>>>
+>>>>> This need to be backported into stable tree 6.3, but I can see 6.3.13 is
+>>>>> marked EOL (End-of-Life).
+>>>>> Can we still get this fix applied? (Cc. GregKH)
+>>>>
+>>>> <formletter>
+>>>>
+>>>> This is not the correct way to submit patches for inclusion in the
+>>>> stable kernel tree.  Please read:
+>>>>     
+>>>> https://www.kernel.org/doc/html/latest/process/stable-kernel-rules.html
+>>>> for how to do this properly.
+>>>>
+>>>> </formletter>
+[...]
+>>> to the stable submission rules or is it too late?
 >>
->> Yes, normally the routing daemon need to track kernel. On the other hand,
->> the kernel also need to make a clear feedback. The userspace developers may
->> not know the kernel code very well. The unclear/inconsistent notification
->> would make them confused.
-> 
-> Right, that should be addressed by clearer documentation of the semantics
-> and the rational.
-> 
-Frankly, it's quite complex, there are corner cases.
+[...]
+>> If you mean the "6.3.y" tree, yes, there is nothing to do here as that
+>> tree is end-of-life and you should have moved to the 6.4.y kernel tree
+>> at this point in time.
+>>
+>> What is preventing you from moving?
+>>
+> I am fine with the state of things. But Jesper was asking. I suppose
+> the answer to his question is "it's too late".
+I was looking for the answer "it is too late for 6.3.y".
 
-When an interface is set down, the routes associated to this interface should be
-removed. This is the simple part.
-But for ecmp routes, there are several cases:
- - if all nh use this interface: the routes are deleted by the kernel;
- - if only some nh uses this interface :
-   + if all other nh already point to a down interface: the route are deleted by
-the kernel;
-   + if at least one nh points to an up interface: the nh are temporarily disabled.
+This exercise is just to make Google searches and distro people (like
+myself and cc) aware that mlx5 XDP *redirect* is (intermediately) broken
+and we should remember to backport 7abd955a58fb ("net/mlx5e: RX, Fix
+page_pool page fragment tracking for XDP") to fix this.
 
-Managing a cache with this is not so obvious ;-)
+Looking at git details, I notice that I (and subject) were wrong. The
+buggy feature first landed in v6.4 and not v6.3.
+Thus, true subject "mlx5 XDP redirect leaking memory on kernel 6.4".
+Sorry for the stable confusion.  Greg will "automatically" pickup
+Dragos's fix commit for 6.4.y as it have correct fixes tag.  Guess, I
+damaged the Google search parameter, but I trying to correct it with
+this update.
 
-My two cents,
-Nicolas
+--Jesper
+
 
