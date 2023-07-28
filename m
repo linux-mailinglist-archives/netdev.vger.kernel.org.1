@@ -1,122 +1,160 @@
-Return-Path: <netdev+bounces-22340-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22341-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C305C7670FD
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 17:50:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A97C576711B
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 17:53:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F339D1C218C2
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 15:50:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7CEDB1C21160
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 15:53:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F4F114283;
-	Fri, 28 Jul 2023 15:50:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A0301428D;
+	Fri, 28 Jul 2023 15:53:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4F361426F
-	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 15:50:39 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C90EC433C9;
-	Fri, 28 Jul 2023 15:50:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690559439;
-	bh=FnMFqj/s49TzaM6yfmyNpQSSy8bKQ5ugm5trajmOYB4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=P35iWrPTULn82aCR/saWbIvbhgW9FBRWLcm7T6831r1mxA0XYv+wihRnJ+bpe/h3j
-	 SQI3nQMltLvs9348RcuJx3yB58okKZtFAr67/yunNdLCTQ2ZAlpKy0CNnGvyQUq65x
-	 UrAO5Epy3B3om7fYqnjZtzYBwh45VSZ631NEvGXKAPrDQSjTxJAjUh1rN7eW+yXxHJ
-	 eLRbo5WOQNZFnIGkYWrKLd8HdNhtbK4c/sT60Vc/9pvTSwX0j9KuCzgDlonRK7extE
-	 8tHwl7EsCsHE8lDYNbtsAppmrzbvldMf2em+uOSVDgypVZkFhhh5VSQPOOlCZKdviU
-	 v1FgZjXrTMz3A==
-Date: Fri, 28 Jul 2023 16:50:24 +0100
-From: Conor Dooley <conor@kernel.org>
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: Varshini Rajendran <varshini.rajendran@microchip.com>,
-	robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
-	conor+dt@kernel.org, nicolas.ferre@microchip.com,
-	alexandre.belloni@bootlin.com, claudiu.beznea@microchip.com,
-	mturquette@baylibre.com, sboyd@kernel.org,
-	herbert@gondor.apana.org.au, davem@davemloft.net, vkoul@kernel.org,
-	andi.shyti@kernel.org, tglx@linutronix.de, maz@kernel.org,
-	lee@kernel.org, ulf.hansson@linaro.org, tudor.ambarus@linaro.org,
-	miquel.raynal@bootlin.com, richard@nod.at, vigneshr@ti.com,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	linus.walleij@linaro.org, sre@kernel.org, p.zabel@pengutronix.de,
-	olivia@selenic.com, a.zummo@towertech.it, radu_nicolae.pirea@upb.ro,
-	richard.genoud@gmail.com, gregkh@linuxfoundation.org,
-	lgirdwood@gmail.com, broonie@kernel.org, wim@linux-watchdog.org,
-	linux@roeck-us.net, linux@armlinux.org.uk,
-	durai.manickamkr@microchip.com, andrew@lunn.ch,
-	jerry.ray@microchip.com, andre.przywara@arm.com, mani@kernel.org,
-	alexandre.torgue@st.com, gregory.clement@bootlin.com, arnd@arndb.de,
-	rientjes@google.com, deller@gmx.de, 42.hyeyoo@gmail.com,
-	vbabka@suse.cz, mripard@kernel.org, mihai.sain@microchip.com,
-	codrin.ciubotariu@microchip.com, eugen.hristev@collabora.com,
-	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, linux-clk@vger.kernel.org,
-	linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org,
-	linux-i2c@vger.kernel.org, linux-mmc@vger.kernel.org,
-	linux-mtd@lists.infradead.org, netdev@vger.kernel.org,
-	linux-gpio@vger.kernel.org, linux-pm@vger.kernel.org,
-	linux-rtc@vger.kernel.org, linux-spi@vger.kernel.org,
-	linux-serial@vger.kernel.org, alsa-devel@alsa-project.org,
-	linux-usb@vger.kernel.org, linux-watchdog@vger.kernel.org
-Subject: Re: [PATCH v3 00/50] Add support for sam9x7 SoC family
-Message-ID: <20230728-floss-stark-889158f968ea@spud>
-References: <20230728102223.265216-1-varshini.rajendran@microchip.com>
- <c0792cfd-db4f-7153-0775-824912277908@linaro.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E0BF134B0
+	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 15:53:36 +0000 (UTC)
+Received: from mgamail.intel.com (unknown [134.134.136.65])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54D17F2;
+	Fri, 28 Jul 2023 08:53:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1690559615; x=1722095615;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=oQf/S1ueoDews0oxh0qBtYpU3yruH6wicxcwWAyEZqk=;
+  b=gVFBZB/X8H1uLZyvAUHfGo6g8D13bqlScUwaMXO0mp1na1vAcC8mbaPO
+   BNBcZtTVE1+lSkWHwQ/di/Zb9q8aT6LG/8UIC1NT55Yi5EUDPmkKJ6kkd
+   9yZorTFHaRXxsArLVYdIS6Rozm/kGE+TdWSanzKubcj0+XUGKEY0iGlLl
+   9pAMMgc2AzFLfBcuB4bqFGRFGjyVKJTYQEl4pK05UHIYnOsYXkOq/9vR9
+   h/u7EtQ2ZJSsBvu7DlkRRhx0QCTdGn1xCkisLUWdBT5/L3zZKMf45QW9d
+   mH3gfCEH7eZWvQ/OczCromcW0ooPrqiw2Ch4lz0Oilwf9L7cvdEFwS3rp
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10784"; a="372246655"
+X-IronPort-AV: E=Sophos;i="6.01,237,1684825200"; 
+   d="scan'208";a="372246655"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jul 2023 08:53:34 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10784"; a="727512158"
+X-IronPort-AV: E=Sophos;i="6.01,237,1684825200"; 
+   d="scan'208";a="727512158"
+Received: from newjersey.igk.intel.com ([10.102.20.203])
+  by orsmga002.jf.intel.com with ESMTP; 28 Jul 2023 08:53:31 -0700
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Larysa Zaremba <larysa.zaremba@intel.com>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	Kees Cook <keescook@chromium.org>,
+	netdev@vger.kernel.org,
+	linux-hardening@vger.kernel.org,
+	intel-wired-lan@lists.osuosl.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next 0/3] virtchnl: fix fake 1-elem arrays
+Date: Fri, 28 Jul 2023 17:52:04 +0200
+Message-ID: <20230728155207.10042-1-aleksander.lobakin@intel.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="1Z+IvU8OCRbt7H1L"
-Content-Disposition: inline
-In-Reply-To: <c0792cfd-db4f-7153-0775-824912277908@linaro.org>
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
+6.5-rc1 started spitting warning splats when composing virtchnl
+messages, precisely on virtchnl_rss_key and virtchnl_lut:
 
---1Z+IvU8OCRbt7H1L
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+[   84.167709] memcpy: detected field-spanning write (size 52) of single
+field "vrk->key" at drivers/net/ethernet/intel/iavf/iavf_virtchnl.c:1095
+(size 1)
+[   84.169915] WARNING: CPU: 3 PID: 11 at drivers/net/ethernet/intel/
+iavf/iavf_virtchnl.c:1095 iavf_set_rss_key+0x123/0x140 [iavf]
+...
+[   84.191982] Call Trace:
+[   84.192439]  <TASK>
+[   84.192900]  ? __warn+0xc9/0x1a0
+[   84.193353]  ? iavf_set_rss_key+0x123/0x140 [iavf]
+[   84.193818]  ? report_bug+0x12c/0x1b0
+[   84.194266]  ? handle_bug+0x42/0x70
+[   84.194714]  ? exc_invalid_op+0x1a/0x50
+[   84.195149]  ? asm_exc_invalid_op+0x1a/0x20
+[   84.195592]  ? iavf_set_rss_key+0x123/0x140 [iavf]
+[   84.196033]  iavf_watchdog_task+0xb0c/0xe00 [iavf]
+...
+[   84.225476] memcpy: detected field-spanning write (size 64) of single
+field "vrl->lut" at drivers/net/ethernet/intel/iavf/iavf_virtchnl.c:1127
+(size 1)
+[   84.227190] WARNING: CPU: 27 PID: 1044 at drivers/net/ethernet/intel/
+iavf/iavf_virtchnl.c:1127 iavf_set_rss_lut+0x123/0x140 [iavf]
+...
+[   84.246601] Call Trace:
+[   84.247228]  <TASK>
+[   84.247840]  ? __warn+0xc9/0x1a0
+[   84.248263]  ? iavf_set_rss_lut+0x123/0x140 [iavf]
+[   84.248698]  ? report_bug+0x12c/0x1b0
+[   84.249122]  ? handle_bug+0x42/0x70
+[   84.249549]  ? exc_invalid_op+0x1a/0x50
+[   84.249970]  ? asm_exc_invalid_op+0x1a/0x20
+[   84.250390]  ? iavf_set_rss_lut+0x123/0x140 [iavf]
+[   84.250820]  iavf_watchdog_task+0xb16/0xe00 [iavf]
 
-On Fri, Jul 28, 2023 at 01:32:12PM +0200, Krzysztof Kozlowski wrote:
-> On 28/07/2023 12:22, Varshini Rajendran wrote:
-> > This patch series adds support for the new SoC family - sam9x7.
-> >  - The device tree, configs and drivers are added
-> >  - Clock driver for sam9x7 is added
-> >  - Support for basic peripherals is added
-> >  - Target board SAM9X75 Curiosity is added
-> >=20
->=20
-> Your threading is absolutely broken making it difficult to review and app=
-ly.
+Gustavo already tried to fix those back in 2021[0][1]. Unfortunately,
+a VM can run a different kernel than the host, meaning that those
+structures are sorta ABI.
+However, it is possible to have proper flex arrays + struct_size()
+calculations and still send the very same messages with the same sizes.
+The common rule is:
 
-I had a chat with Varshini today, they were trying to avoid sending the
-patches to a massive CC list, but didn't set any in-reply-to header.
-For the next submission whole series could be sent to the binding &
-platform maintainers and the individual patches additionally to their
-respective lists/maintainers. Does that sound okay to you, or do you
-think it should be broken up?
+elem[1] -> elem[]
+size = struct_size() + <difference between the old and the new msg size>
 
-Cheers,
-Conor.
+The "old" size in the current code is calculated 3 different ways for
+10 virtchnl structures total. Each commit addresses one of the ways
+cumulatively instead of per-structure.
 
+I was planning to send it to -net initially, but given that virtchnl was
+renamed from i40evf and got some fat style cleanup commits in the past,
+it's not very straightforward to even pick appropriate SHAs, not
+speaking of automatic portability. I may send manual backports for
+a couple of the latest supported kernels later on if anyone needs it
+at all.
 
---1Z+IvU8OCRbt7H1L
-Content-Type: application/pgp-signature; name="signature.asc"
+[0] https://lore.kernel.org/all/20210525230912.GA175802@embeddedor
+[1] https://lore.kernel.org/all/20210525231851.GA176647@embeddedor
 
------BEGIN PGP SIGNATURE-----
+Alexander Lobakin (3):
+  virtchnl: fix fake 1-elem arrays in structs allocated as `nents + 1` -
+    1
+  virtchnl: fix fake 1-elem arrays in structures allocated as `nents +
+    1`
+  virtchnl: fix fake 1-elem arrays for structures allocated as `nents`
 
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZMPjwAAKCRB4tDGHoIJi
-0t3wAQDbx8dLxPQPnIoDByHTBcuDjvFBZTpWUg4bhE01/+BpfQEArGia1WutY/7n
-UhhVDqMheWjj/xZNVFl/ZTTiVbw1vwI=
-=NVNa
------END PGP SIGNATURE-----
+ .../ethernet/intel/i40e/i40e_virtchnl_pf.c    |   9 +-
+ drivers/net/ethernet/intel/iavf/iavf.h        |   6 +-
+ drivers/net/ethernet/intel/iavf/iavf_client.c |   4 +-
+ drivers/net/ethernet/intel/iavf/iavf_client.h |   2 +-
+ .../net/ethernet/intel/iavf/iavf_virtchnl.c   |  75 +++++------
+ drivers/net/ethernet/intel/ice/ice_virtchnl.c |   2 +-
+ include/linux/avf/virtchnl.h                  | 127 +++++++++++-------
+ 7 files changed, 124 insertions(+), 101 deletions(-)
 
---1Z+IvU8OCRbt7H1L--
+-- 
+2.41.0
+
 
