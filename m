@@ -1,124 +1,170 @@
-Return-Path: <netdev+bounces-22447-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22448-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3235767895
-	for <lists+netdev@lfdr.de>; Sat, 29 Jul 2023 00:43:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC1E876789B
+	for <lists+netdev@lfdr.de>; Sat, 29 Jul 2023 00:47:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EAC221C2126A
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 22:43:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BF6D41C21217
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 22:47:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87C6B1BB5F;
-	Fri, 28 Jul 2023 22:43:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70E0F1FB39;
+	Fri, 28 Jul 2023 22:47:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BB65525C
-	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 22:43:32 +0000 (UTC)
-Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EA224498
-	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 15:43:28 -0700 (PDT)
-Received: by mail-pf1-x42f.google.com with SMTP id d2e1a72fcca58-686efdeabaeso1817190b3a.3
-        for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 15:43:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1690584208; x=1691189008;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=GqnEWXGBr+qgq+fw45Hld4bEOObqJbZc782zVcwCLuo=;
-        b=d7wBzlZ64gFtXkNExZkAf2L2TcCyfy5/7eWx6u6tzjV0OTM9I4iTra1tb8g18fz1tm
-         zjnf/3/RfFUj7Y1+OWcrLozJbIZ//yanLc+UeESbFh7sDGEufAtXK5yIIyWWJctPGV6f
-         JcvWOOS6ij4NmpSmEFiFReD739b975jhkp6GQ=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690584208; x=1691189008;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GqnEWXGBr+qgq+fw45Hld4bEOObqJbZc782zVcwCLuo=;
-        b=YOZJCUQg3BPLhN0L28IjbhoLW33Dr/LC+cDul+OkjnM54WZA12w1ds0Ky3Q1dw8SaZ
-         6oznYN/3QBVAUCka9fPsaXD5psR8BVgiC5TyLBkHgF1bnvKz2Si6hB8tKyP9FhXR9aOF
-         hCyU/ad1TF5sk+Rhf4kTQJZmXE7V1/Y+So5bYvc4DeOu+vU+doNTqBrh9oekbY+cx/CI
-         2edfpK6YZ/HZeIbJ0ltI2UCLgEXMeyAzYZeCibq+U/RbbQD19dPs+g7aRMI/GyVxh75Z
-         54TQs6nK/ldvW7iq513TSpP5q7YIeE2ttLj+l0HENWef3bjea1IWC2tVJmjuPe+URAsC
-         U2BA==
-X-Gm-Message-State: ABy/qLagOu8cGV3K7CJMOwimEbK6KtXS6aaidXYzMftcVpC6F/rewQX8
-	RS5JaWR9Ou1ul0CugJtYZ2DldA==
-X-Google-Smtp-Source: APBJJlEFOXYQokilR8cdjkWektv3laYms1B2ykj0+cKlup9KWlpd1V1VaF3ZUmqBbDxlUB7w2HGN7A==
-X-Received: by 2002:a05:6a20:3251:b0:133:bbe0:30bf with SMTP id hm17-20020a056a20325100b00133bbe030bfmr2705280pzc.13.1690584207864;
-        Fri, 28 Jul 2023 15:43:27 -0700 (PDT)
-Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id w24-20020a170902d71800b001b8052d58a0sm4053824ply.305.2023.07.28.15.43.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Jul 2023 15:43:27 -0700 (PDT)
-Date: Fri, 28 Jul 2023 15:43:26 -0700
-From: Kees Cook <keescook@chromium.org>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Larysa Zaremba <larysa.zaremba@intel.com>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	netdev@vger.kernel.org, linux-hardening@vger.kernel.org,
-	intel-wired-lan@lists.osuosl.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 1/3] virtchnl: fix fake 1-elem arrays in structs
- allocated as `nents + 1` - 1
-Message-ID: <202307281537.AC1ED9CA@keescook>
-References: <20230728155207.10042-1-aleksander.lobakin@intel.com>
- <20230728155207.10042-2-aleksander.lobakin@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61A751BB42
+	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 22:47:55 +0000 (UTC)
+Received: from out-100.mta0.migadu.com (out-100.mta0.migadu.com [91.218.175.100])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32CAC1BC1
+	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 15:47:51 -0700 (PDT)
+Message-ID: <791b919c-de82-6dc8-905a-520543f975cd@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1690584469;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=rVZMCx5Zounfu2IwD4zBIt/Lk5NqzK7Uhgpsb3XYxGU=;
+	b=miAD6XpnNrSPSzFemTiSEGLsOBUhb/xoNmXZEtVHXAsYbl7GcWaePtQyfPdWGvuVzUoPys
+	c3WVoRo/ghKGhO2pvBCu7WXk3WdeePVw0RywsLcBzajLcA6lRmauMJEwkzVv5Sgtb/xJoj
+	EnMV7xkteVq4ENQMSjMisc/CC7aMDXc=
+Date: Fri, 28 Jul 2023 15:47:40 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230728155207.10042-2-aleksander.lobakin@intel.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.6
+Subject: Re: [PATCH v4 bpf 2/2] bpf: selftests: add lwt redirect regression
+ test cases
+Content-Language: en-US
+To: Yan Zhai <yan@cloudflare.com>
+Cc: bpf@vger.kernel.org, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
+ Song Liu <song@kernel.org>, Yonghong Song <yhs@fb.com>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Mykola Lysenko <mykolal@fb.com>,
+ Shuah Khan <shuah@kernel.org>, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ kernel-team@cloudflare.com, Jordan Griege <jgriege@cloudflare.com>,
+ Markus Elfring <Markus.Elfring@web.de>, Jakub Sitnicki <jakub@cloudflare.com>
+References: <cover.1690332693.git.yan@cloudflare.com>
+ <9c4896b109a39c3fa088844addaa1737a84bbbb5.1690332693.git.yan@cloudflare.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <9c4896b109a39c3fa088844addaa1737a84bbbb5.1690332693.git.yan@cloudflare.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Jul 28, 2023 at 05:52:05PM +0200, Alexander Lobakin wrote:
-> The two most problematic virtchnl structures are virtchnl_rss_key and
-> virtchnl_rss_lut. Their "flex" arrays have the type of u8, thus, when
-> allocating / checking, the actual size is calculated as `sizeof +
-> nents - 1 byte`. But their sizeof() is not 1 byte larger than the size
-> of such structure with proper flex array, it's two bytes larger due to
-> the padding. That said, their size is always 1 byte larger unless
-> there are no tail elements -- then it's +2 bytes.
-> Add virtchnl_struct_size() macro which will handle this case (and later
-> other cases as well). Make its calling conv the same as we call
-> struct_size() to allow it to be drop-in, even though it's unlikely to
-> become possible to switch to generic API. The macro will calculate a
-> proper size of a structure with a flex array at the end, so that it
-> becomes transparent for the compilers, but add the difference from the
-> old values, so that the real size of sorta-ABI-messages doesn't change.
-> Use it on the allocation side in IAVF and the receiving side (defined
-> as static inline in virtchnl.h) for the mentioned two structures.
+On 7/25/23 6:09 PM, Yan Zhai wrote:
+> diff --git a/tools/testing/selftests/bpf/progs/test_lwt_redirect.c b/tools/testing/selftests/bpf/progs/test_lwt_redirect.c
+> new file mode 100644
+> index 000000000000..3674e101f68f
+> --- /dev/null
+> +++ b/tools/testing/selftests/bpf/progs/test_lwt_redirect.c
+> @@ -0,0 +1,66 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +#include <linux/bpf.h>
+> +#include <bpf/bpf_helpers.h>
+> +#include "bpf_tracing_net.h"
+> +
+> +/* We don't care about whether the packet can be received by network stack.
+> + * Just care if the packet is sent to the correct device at correct direction
+> + * and not panic the kernel.
+> + */
+> +static __always_inline int prepend_dummy_mac(struct __sk_buff *skb)
+> +{
 
-This all looks workable, but it's a unique solution in the kernel. That
-is fine, of course, but would it be easier to maintain/test if it went
-with the union style solutions?
+__always_inline is no longer a must for a long time.
 
-struct foo {
-	...
-	union {
-		type legacy_padding;
-		DECLARE_FLEX_ARRAY(type, member);
-	};
-};
+> +	char mac[] = {0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0xf,
+> +		      0xe, 0xd, 0xc, 0xb, 0xa, 0x08, 0x00};
+> +
+> +	if (bpf_skb_change_head(skb, ETH_HLEN, 0)) {
+> +		bpf_printk("%s: fail to change head", __func__);
 
-Then the size doesn't change and "member" can still be used. (i.e. no
-collateral changes needed.)
+Avoid using bpf_printk(). The bpf CI runs other tests also.
 
--Kees
+> +		return -1;
+> +	}
+> +
+> +	if (bpf_skb_store_bytes(skb, 0, mac, sizeof(mac), 0)) {
+> +		bpf_printk("%s: fail to update mac", __func__);
+> +		return -1;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +SEC("redir_ingress")
 
--- 
-Kees Cook
+Use SEC("lwt_xmit"). Then the libbpf will figure out the prog type.
+
+> +int test_lwt_redirect_in(struct __sk_buff *skb)
+> +{
+> +	if (prepend_dummy_mac(skb))
+> +		return BPF_DROP;
+> +
+> +	bpf_printk("Redirect skb to link %d ingress", skb->mark);
+> +	return bpf_redirect(skb->mark, BPF_F_INGRESS);
+> +}
+> +
+> +SEC("redir_egress")
+> +int test_lwt_redirect_out(struct __sk_buff *skb)
+> +{
+> +	if (prepend_dummy_mac(skb))
+> +		return BPF_DROP;
+> +
+> +	bpf_printk("Redirect skb to link %d egress", skb->mark);
+> +	return bpf_redirect(skb->mark, 0);
+> +}
+> +
+> +SEC("redir_egress_nomac")
+> +int test_lwt_redirect_out_nomac(struct __sk_buff *skb)
+> +{
+> +	int ret = bpf_redirect(skb->mark, 0);
+> +
+> +	bpf_printk("Redirect skb to link %d egress nomac: %d", skb->mark, ret);
+> +	return ret;
+> +}
+> +
+> +SEC("redir_ingress_nomac")
+> +int test_lwt_redirect_in_nomac(struct __sk_buff *skb)
+> +{
+> +	int ret = bpf_redirect(skb->mark, BPF_F_INGRESS);
+> +
+> +	bpf_printk("Redirect skb to link %d ingress nomac: %d", skb->mark, ret);
+> +	return ret;
+> +}
+> +
+> +char _license[] SEC("license") = "GPL";
+> diff --git a/tools/testing/selftests/bpf/test_lwt_redirect.sh b/tools/testing/selftests/bpf/test_lwt_redirect.sh
+> new file mode 100755
+> index 000000000000..1b7b78b48174
+> --- /dev/null
+> +++ b/tools/testing/selftests/bpf/test_lwt_redirect.sh
+
+This has to be written in the test_progs infrastructure in C. Only test_progs is 
+run by the BPF CI. Take a look at other tests in prog_tests/. For example, 
+tc_redirect.c and xdp_metadata.c which are having setup in netns/link/...etc. It 
+currently has helpers to add tc qdisc and filter but not adding route yet which 
+could be a useful addition.
+
+--
+pw-bot: cr
+
 
