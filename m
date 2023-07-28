@@ -1,142 +1,121 @@
-Return-Path: <netdev+bounces-22249-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22251-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D91A8766B0B
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 12:51:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 089D4766B33
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 13:00:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 167111C21895
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 10:51:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B79C728275E
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 11:00:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31598125CE;
-	Fri, 28 Jul 2023 10:50:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C29D6125AD;
+	Fri, 28 Jul 2023 11:00:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18480125B6;
-	Fri, 28 Jul 2023 10:50:57 +0000 (UTC)
-Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8E821FDA;
-	Fri, 28 Jul 2023 03:50:55 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.143])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4RC3ty5t5rz4f3nyP;
-	Fri, 28 Jul 2023 18:35:38 +0800 (CST)
-Received: from k01.huawei.com (unknown [10.67.174.197])
-	by APP2 (Coremail) with SMTP id Syh0CgDHp9X9mcNkeBG8Ow--.58627S2;
-	Fri, 28 Jul 2023 18:35:41 +0800 (CST)
-From: Xu Kuohai <xukuohai@huaweicloud.com>
-To: bpf@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: John Fastabend <john.fastabend@gmail.com>,
-	Jakub Sitnicki <jakub@cloudflare.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Daniel Borkmann <daniel@iogearbox.net>
-Subject: [PATCH bpf] bpf, sockmap: Fix bug that strp_done cannot be called
-Date: Fri, 28 Jul 2023 06:57:17 -0400
-Message-Id: <20230728105717.3978849-1-xukuohai@huaweicloud.com>
-X-Mailer: git-send-email 2.30.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B62F928F7
+	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 11:00:49 +0000 (UTC)
+Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B281B3A96;
+	Fri, 28 Jul 2023 04:00:44 -0700 (PDT)
+Received: by mail-pg1-x531.google.com with SMTP id 41be03b00d2f7-55acbe0c7e4so329255a12.0;
+        Fri, 28 Jul 2023 04:00:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1690542044; x=1691146844;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jAU8K3a8dHy/tuEIb7Zpcs7Yfdt1964yvfWu4jQqUuw=;
+        b=UrIAf3FUSIv8YxPhfTK3nLv5IcWt5sxAS/MbAn3DuvkbIaHb7LD1g2rsl9yDEOwdSh
+         3vY0iX48P3rU4dTxIJB9eIHtKllX7TF/TQCeOHzvgsz3cWjLPstf2rQNO1zJWaoQn/gT
+         UDXJsAlFDdBYgpQbSjyavgIMkKIzTkwmiiGHFsWFrOlEcyrmWSTfsQa90rXEFhKycdx3
+         sDsjhtBzBwTjeYOFc5jeJUg3L02N3lkPbPRcUAFljwl+lxlzHq8CKGg/m/bq7o/rlqbu
+         fBbHr2TW9PfmJwxLS25qzOzPs3WbUxIe2YYi58UyCNVMDhLqbq9r2TYFdyq5zGHKFDSJ
+         cKGA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690542044; x=1691146844;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=jAU8K3a8dHy/tuEIb7Zpcs7Yfdt1964yvfWu4jQqUuw=;
+        b=IjpXhcdGkyZp4rkFXUkal/ltjHfD51zA4CvXZfU4Neps6HSVyD8JqOMErV9auzUBB7
+         vFPSil6Gnyx9OYf54Odo9APLMa24LR7eXriSdhfIxrjIZe7NA2wVvhFAU43xzyGRO4yC
+         8I0zS+HSy+F/SZEPSzF8NRRejOvL5AYMux/9R3ntechNIND7Tjx+K8GpEAHzIrS0lejh
+         lCL91QPwoX5oII9mjSON9t0ioHci6rjqKmFwgQlg0+KxnmaWC1PleFDYwhl1sbDJ/RF8
+         nGgTOVBis1kEI4pyxFYRjY/0jf7pWPodcLSGhEJZdwx50pLruSAvhn31afzWd8kzz4eo
+         j2vw==
+X-Gm-Message-State: ABy/qLZ1UVbJLnGmVceew55538jTjYwMCclPnQE0z8o3vuYpA+IyfXjL
+	KzQK8BELnCVVrau7njjbKZ04GkYiA6Cs2uXKouE=
+X-Google-Smtp-Source: APBJJlFRUaRTonS8rZhdy8awwpxcfDvB90VkuyRkJuU4rORotvPAMG3r669s1DgV5c8fsVRmEz9c48FJa+0b7z7329Q=
+X-Received: by 2002:a17:90a:e4f:b0:267:f1dc:74ee with SMTP id
+ p15-20020a17090a0e4f00b00267f1dc74eemr1975393pja.2.1690542044042; Fri, 28 Jul
+ 2023 04:00:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:Syh0CgDHp9X9mcNkeBG8Ow--.58627S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7uFyxZr43KF18Jw4kAw43KFg_yoW8uw4kp3
-	WkC3y3CF4UCFWxZasxXF92yw1agw1DJFyjkryrZw13trnFkr15JF98KF1jyFn8tr4xGFy7
-	Jr4jgrsxC3W7XwUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUgCb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-	6I80ewAv7VC0I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-	Cjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCj
-	c4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4
-	CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1x
-	MIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Gr0_Zr
-	1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsG
-	vfC2KfnxnUUI43ZEXa7IUbPEf5UUUUU==
-X-CM-SenderInfo: 50xn30hkdlqx5xdzvxpfor3voofrz/
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,KHOP_HELO_FCRDNS,
-	MAY_BE_FORGED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+References: <20230727152503.2199550-1-shenwei.wang@nxp.com> <20230727152503.2199550-3-shenwei.wang@nxp.com>
+In-Reply-To: <20230727152503.2199550-3-shenwei.wang@nxp.com>
+From: Fabio Estevam <festevam@gmail.com>
+Date: Fri, 28 Jul 2023 08:00:32 -0300
+Message-ID: <CAOMZO5ANQmVbk_jy7qdVtzs3716FisT2c72W+3WZyu7FoAochw@mail.gmail.com>
+Subject: Re: [PATCH v2 net 2/2] net: stmmac: dwmac-imx: pause the TXC clock in fixed-link
+To: Shenwei Wang <shenwei.wang@nxp.com>, Andrew Lunn <andrew@lunn.ch>
+Cc: Russell King <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Shawn Guo <shawnguo@kernel.org>, 
+	Sascha Hauer <s.hauer@pengutronix.de>, Neil Armstrong <neil.armstrong@linaro.org>, 
+	Kevin Hilman <khilman@baylibre.com>, Vinod Koul <vkoul@kernel.org>, Chen-Yu Tsai <wens@csie.org>, 
+	Jernej Skrabec <jernej.skrabec@gmail.com>, Samuel Holland <samuel@sholland.org>, 
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Jose Abreu <joabreu@synopsys.com>, Pengutronix Kernel Team <kernel@pengutronix.de>, 
+	NXP Linux Team <linux-imx@nxp.com>, Jerome Brunet <jbrunet@baylibre.com>, 
+	Martin Blumenstingl <martin.blumenstingl@googlemail.com>, 
+	Bhupesh Sharma <bhupesh.sharma@linaro.org>, 
+	Nobuhiro Iwamatsu <nobuhiro1.iwamatsu@toshiba.co.jp>, Simon Horman <simon.horman@corigine.com>, 
+	Andrew Halaney <ahalaney@redhat.com>, Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, 
+	Wong Vee Khee <veekhee@apple.com>, Revanth Kumar Uppala <ruppala@nvidia.com>, 
+	Jochen Henneberg <jh@henneberg-systemdesign.com>, netdev@vger.kernel.org, 
+	linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	linux-amlogic@lists.infradead.org, imx@lists.linux.dev, 
+	Frank Li <frank.li@nxp.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Xu Kuohai <xukuohai@huawei.com>
+On Thu, Jul 27, 2023 at 12:25=E2=80=AFPM Shenwei Wang <shenwei.wang@nxp.com=
+> wrote:
 
-strp_done is only called when psock->progs.stream_parser is not NULL,
-but stream_parser was set to NULL by sk_psock_stop_strp(), called
-by sk_psock_drop() earlier. So, strp_done can never be called.
+>         struct plat_stmmacenet_data *plat_dat =3D priv;
+> @@ -317,8 +359,11 @@ static int imx_dwmac_probe(struct platform_device *p=
+dev)
+>         plat_dat->exit =3D imx_dwmac_exit;
+>         plat_dat->clks_config =3D imx_dwmac_clks_config;
+>         plat_dat->fix_mac_speed =3D imx_dwmac_fix_speed;
+> +       if (of_machine_is_compatible("fsl,imx93"))
+> +               plat_dat->fix_mac_speed =3D imx_dwmac_fix_speed_mx93;
 
-Introduce SK_PSOCK_RX_ENABLED to mark whether there is strp on psock.
-Change the condition for calling strp_done from judging whether
-stream_parser is set to judging whether this flag is set. This flag is
-only set once when strp_init() succeeds, and will never be cleared later.
+So you are forcing this on all imx93 boards, even if they don't use a SJA11=
+05.
 
-Fixes: c0d95d3380ee ("bpf, sockmap: Re-evaluate proto ops when psock is removed from sockmap")
-Signed-off-by: Xu Kuohai <xukuohai@huawei.com>
----
- include/linux/skmsg.h |  1 +
- net/core/skmsg.c      | 10 ++++++++--
- 2 files changed, 9 insertions(+), 2 deletions(-)
+Andrew Lunn gave the following feedback in v1:
 
-diff --git a/include/linux/skmsg.h b/include/linux/skmsg.h
-index 054d7911bfc9..959c5f4c4d19 100644
---- a/include/linux/skmsg.h
-+++ b/include/linux/skmsg.h
-@@ -62,6 +62,7 @@ struct sk_psock_progs {
- 
- enum sk_psock_state_bits {
- 	SK_PSOCK_TX_ENABLED,
-+	SK_PSOCK_RX_ENABLED,
- };
- 
- struct sk_psock_link {
-diff --git a/net/core/skmsg.c b/net/core/skmsg.c
-index a29508e1ff35..7c2764beeb04 100644
---- a/net/core/skmsg.c
-+++ b/net/core/skmsg.c
-@@ -1120,13 +1120,19 @@ static void sk_psock_strp_data_ready(struct sock *sk)
- 
- int sk_psock_init_strp(struct sock *sk, struct sk_psock *psock)
- {
-+	int ret;
-+
- 	static const struct strp_callbacks cb = {
- 		.rcv_msg	= sk_psock_strp_read,
- 		.read_sock_done	= sk_psock_strp_read_done,
- 		.parse_msg	= sk_psock_strp_parse,
- 	};
- 
--	return strp_init(&psock->strp, sk, &cb);
-+	ret = strp_init(&psock->strp, sk, &cb);
-+	if (!ret)
-+		sk_psock_set_state(psock, SK_PSOCK_RX_ENABLED);
-+
-+	return ret;
- }
- 
- void sk_psock_start_strp(struct sock *sk, struct sk_psock *psock)
-@@ -1154,7 +1160,7 @@ void sk_psock_stop_strp(struct sock *sk, struct sk_psock *psock)
- static void sk_psock_done_strp(struct sk_psock *psock)
- {
- 	/* Parser has been stopped */
--	if (psock->progs.stream_parser)
-+	if (sk_psock_test_state(psock, SK_PSOCK_RX_ENABLED))
- 		strp_done(&psock->strp);
- }
- #else
--- 
-2.30.2
+"The SJA1105 has the problem, so i would expect it to be involved in
+the solution. Otherwise, how is this going to work for other MAC
+drivers?
 
+Maybe you need to expose a common clock framework clock for the TXC
+clock line, which the SJA1105 can disable/enable? That then makes it
+clear what other MAC drivers need to do."
 
