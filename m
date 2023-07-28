@@ -1,268 +1,171 @@
-Return-Path: <netdev+bounces-22234-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22235-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6DFF766A26
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 12:23:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32562766A2E
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 12:23:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 794E42825C0
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 10:23:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DF9222825BA
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 10:23:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 535AD11C8E;
-	Fri, 28 Jul 2023 10:23:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C822811C8E;
+	Fri, 28 Jul 2023 10:23:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4790611196
-	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 10:23:04 +0000 (UTC)
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D16AB3A8C;
-	Fri, 28 Jul 2023 03:23:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1690539782; x=1722075782;
-  h=from:to:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=UoywkU2z5PUFwZqyn1H/+6DtaE/kYe+OTAC03fuk89g=;
-  b=BeXH80mcxznYo+DWNMtW9sR3im7fe7QY3Mnn40Lg4OAH69tfWjIS/30R
-   LrPVV9XPasECFJTnPINc7pA12gg0044hwh6ilbazMnyqSyepd+KN4ud4T
-   zvSBLLUKoxWdCU8CGKbReAru7dlSfIisCj/FGO3khAUZpx50nsPFT2OfN
-   1lW46y2RdNJpHp1ibfLZb28y3FZiAd4y1KVg8jefeUkhB3iA4/sGPph/+
-   jekJssQFxocOEbTsQNFGdxEg26CeVPmI1P2XRRIpMYBS6dDPcuFrANgc7
-   LAP+hISm9LzTvzw4cNtqkj6JdLJ+THdRQ2vO3fqw/b4jh698XKVb9yPlr
-   w==;
-X-IronPort-AV: E=Sophos;i="6.01,237,1684825200"; 
-   d="scan'208";a="227046811"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa2.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 28 Jul 2023 03:22:59 -0700
-Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21; Fri, 28 Jul 2023 03:22:55 -0700
-Received: from che-lt-i67070.amer.actel.com (10.10.115.15) by
- chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server id
- 15.1.2507.21 via Frontend Transport; Fri, 28 Jul 2023 03:22:30 -0700
-From: Varshini Rajendran <varshini.rajendran@microchip.com>
-To: <robh+dt@kernel.org>, <krzysztof.kozlowski+dt@linaro.org>,
-	<conor+dt@kernel.org>, <nicolas.ferre@microchip.com>,
-	<alexandre.belloni@bootlin.com>, <claudiu.beznea@microchip.com>,
-	<mturquette@baylibre.com>, <sboyd@kernel.org>, <herbert@gondor.apana.org.au>,
-	<davem@davemloft.net>, <vkoul@kernel.org>, <andi.shyti@kernel.org>,
-	<tglx@linutronix.de>, <maz@kernel.org>, <lee@kernel.org>,
-	<ulf.hansson@linaro.org>, <tudor.ambarus@linaro.org>,
-	<miquel.raynal@bootlin.com>, <richard@nod.at>, <vigneshr@ti.com>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<linus.walleij@linaro.org>, <sre@kernel.org>, <p.zabel@pengutronix.de>,
-	<olivia@selenic.com>, <a.zummo@towertech.it>, <radu_nicolae.pirea@upb.ro>,
-	<richard.genoud@gmail.com>, <gregkh@linuxfoundation.org>,
-	<lgirdwood@gmail.com>, <broonie@kernel.org>, <wim@linux-watchdog.org>,
-	<linux@roeck-us.net>, <linux@armlinux.org.uk>,
-	<durai.manickamkr@microchip.com>, <varshini.rajendran@microchip.com>,
-	<andrew@lunn.ch>, <jerry.ray@microchip.com>, <andre.przywara@arm.com>,
-	<mani@kernel.org>, <alexandre.torgue@st.com>, <gregory.clement@bootlin.com>,
-	<arnd@arndb.de>, <rientjes@google.com>, <deller@gmx.de>,
-	<42.hyeyoo@gmail.com>, <vbabka@suse.cz>, <mripard@kernel.org>,
-	<mihai.sain@microchip.com>, <codrin.ciubotariu@microchip.com>,
-	<eugen.hristev@collabora.com>, <devicetree@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-	<linux-clk@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-	<dmaengine@vger.kernel.org>, <linux-i2c@vger.kernel.org>,
-	<linux-mmc@vger.kernel.org>, <linux-mtd@lists.infradead.org>,
-	<netdev@vger.kernel.org>, <linux-gpio@vger.kernel.org>,
-	<linux-pm@vger.kernel.org>, <linux-rtc@vger.kernel.org>,
-	<linux-spi@vger.kernel.org>, <linux-serial@vger.kernel.org>,
-	<alsa-devel@alsa-project.org>, <linux-usb@vger.kernel.org>,
-	<linux-watchdog@vger.kernel.org>
-Subject: [PATCH v3 00/50] Add support for sam9x7 SoC family
-Date: Fri, 28 Jul 2023 15:52:23 +0530
-Message-ID: <20230728102223.265216-1-varshini.rajendran@microchip.com>
-X-Mailer: git-send-email 2.25.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA5A1125A1
+	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 10:23:30 +0000 (UTC)
+Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 781FAE47
+	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 03:23:28 -0700 (PDT)
+Received: by mail-ej1-x62e.google.com with SMTP id a640c23a62f3a-991da766865so276680566b.0
+        for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 03:23:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=tessares.net; s=google; t=1690539807; x=1691144607;
+        h=in-reply-to:from:content-language:references:cc:to:subject
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8jwkGGL1MqdXYG7XAtFH7zvDkqIKJJdlPfuokfX9jHQ=;
+        b=MWBYiJZX/JoGWa0HonD6OMRsNAtbSCC/yDjsTlY2Skx6LjqQ3ZAW0RUIssTbgzR5T/
+         wC3xDT4gah9hkBTRPjl5xqH2TgRRI8+3Xf+d/dgVBOQ8plXk1MtyjUtGGRYqvYOsl6IZ
+         cEi/SJ0F9j1Q0m+g2XpekBtpY7K7yuyFekIGlznZwMwVco+1czhIn1dxiOxos+/kJW/M
+         byzQFLw6h2ULls3Ds8qbsWfVqyNG5M89O0DndOafvZqcpeE+l6+VY4VuCtgM7z/HTXaa
+         HfqJR0WLPqIFUHoW5drsdIyZjkURKahi6TqIxeVMT0CQirUquhO0cvLvhfUEHFFfMMs7
+         VTLA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690539807; x=1691144607;
+        h=in-reply-to:from:content-language:references:cc:to:subject
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=8jwkGGL1MqdXYG7XAtFH7zvDkqIKJJdlPfuokfX9jHQ=;
+        b=VuEpHtVY8p6324ZCK+ZxG09iIaMv7G5Mdojje2xQINIjFzTYSN6mZ4N2Tm++O1Tmj/
+         OEsE8rSOWMfti4zdzuGd+oJoD+fRf0H3ozVG6XzPaGPl8dGIWIpyb587sUygz70z5xte
+         uWjJGyX9rd0Jfv1nZpHOp2Vv2H1OCnfIR3pMjPIHcm+yIv2WZeXfyt9c3qI0jpIRfaKD
+         OdKn0AI/NiWTAgyS9PPt85gynu/CsmTe9y0G7siJeBjFlMUA/+tDFd4JHtThoDva/+v/
+         xqHXzT7FqSwbTS2wGDv5MMDq4hLe0wrK7EKZaVoRWeg6lwBtQ6ZaKsQG7IUpdMsm2HrO
+         Iibg==
+X-Gm-Message-State: ABy/qLbo+3eFE1oJhO6YYXjgQyAdh/gtUxfZBWZHD3tVPv/NlDI8XBWS
+	OuDXuxphxScxKxcPvHZnlkNj8A==
+X-Google-Smtp-Source: APBJJlFCpvr/9pMh7wlBubZ+oh6Ho/OTW49Cc7r+LPCvZwU+DYcZ2wDayvegaluzgTtHghJn0sKa6g==
+X-Received: by 2002:a17:906:9bc2:b0:973:daa0:2f6 with SMTP id de2-20020a1709069bc200b00973daa002f6mr1598435ejc.3.1690539806789;
+        Fri, 28 Jul 2023 03:23:26 -0700 (PDT)
+Received: from [10.44.2.5] ([81.246.10.41])
+        by smtp.gmail.com with ESMTPSA id g2-20020a1709064e4200b00992025654c1sm1895488ejw.179.2023.07.28.03.23.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 28 Jul 2023 03:23:26 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="------------06RGyS9oa7z67b6faIPYSIqs"
+Message-ID: <5d240ea8-3fd9-5e43-1bcf-2923bfddee72@tessares.net>
+Date: Fri, 28 Jul 2023 12:23:25 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH net] net: dsa: fix older DSA drivers using phylink -
+ manual merge
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+ Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
+ Vladimir Oltean <olteanv@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ Stephen Rothwell <sfr@canb.auug.org.au>
+References: <E1qOflM-001AEz-D3@rmk-PC.armlinux.org.uk>
+Content-Language: en-GB
+From: Matthieu Baerts <matthieu.baerts@tessares.net>
+In-Reply-To: <E1qOflM-001AEz-D3@rmk-PC.armlinux.org.uk>
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-This patch series adds support for the new SoC family - sam9x7.
- - The device tree, configs and drivers are added
- - Clock driver for sam9x7 is added
- - Support for basic peripherals is added
- - Target board SAM9X75 Curiosity is added
+This is a multi-part message in MIME format.
+--------------06RGyS9oa7z67b6faIPYSIqs
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
- Changes in v3:
- --------------
+Hi Russell,
 
- - Fixed the DT documentation errors pointed out in v2.
- - Dropped Acked-by tag in tcb DT doc patch as it had to be adapted
-   according to sam9x7 correctly.
- - Picked by the previously missed tags.
- - Dropped this patch "dt-bindings: usb: generic-ehci: Document clock-names
-   property" as the warning was not found while validating DT-schema for
-   at91-sam9x75_curiosity.dtb.
- - Dropped redundant words in the commit message.
- - Fixed the CHECK_DTBS warnings validated against
-   at91-sam9x75_curiosity.dtb.
- - Renamed dt nodes according to naming convention.
- - Dropped unwanted status property in dts.
- - Removed nodes that are not in use from the board dts.
- - Removed spi DT doc patch from the series as it was already applied
-   and a fix patch was applied subsequently. Added a patch to remove the
-   compatible to adapt sam9x7.
- - Added sam9x7 compatibles in usb dt documentation.
+On 26/07/2023 16:45, Russell King (Oracle) wrote:
+> Older DSA drivers that do not provide an dsa_ops adjust_link method end
+> up using phylink. Unfortunately, a recent phylink change that requires
+> its supported_interfaces bitmap to be filled breaks these drivers
+> because the bitmap remains empty.
+> 
+> Rather than fixing each driver individually, fix it in the core code so
+> we have a sensible set of defaults.
+> 
+> Reported-by: Sergei Antonov <saproj@gmail.com>
+> Fixes: de5c9bf40c45 ("net: phylink: require supported_interfaces to be filled")
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
+FYI, we got a small conflict when merging 'net' in 'net-next' in the
+MPTCP tree due to this patch applied in 'net':
 
- Changes in v2:
- --------------
+  9945c1fb03a3 ("net: dsa: fix older DSA drivers using phylink")
 
- - Added sam9x7 specific compatibles in DT with fallbacks
- - Documented all the newly added DT compatible strings
- - Added device tree for the target board sam9x75 curiosity and
-   documented the same in the DT bindings documentation
- - Removed the dt nodes that are not supported at the moment
- - Removed the configs added by previous version that are not supported
-   at the moment
- - Fixed all the corrections in the commit message
- - Changed all the instances of copyright year to 2023
- - Added sam9x7 flag in PIT64B configuration
- - Moved macro definitions to header file
- - Added another divider in mck characteristics in the pmc driver
- - Fixed the memory leak in the pmc driver
- - Dropped patches that are no longer needed
- - Picked up Acked-by and Reviewed-by tags
+and this one from 'net-next':
 
+  a88dd7538461 ("net: dsa: remove legacy_pre_march2020 detection")
 
-Hari Prasath (1):
-  irqchip/atmel-aic5: Add support for sam9x7 aic
+----- Generic Message -----
+The best is to avoid conflicts between 'net' and 'net-next' trees but if
+they cannot be avoided when preparing patches, a note about how to fix
+them is much appreciated.
 
-Varshini Rajendran (49):
-  dt-bindings: microchip: atmel,at91rm9200-tcb: add sam9x60, sam9x7
-    compatible
-  dt-bindings: usb: ehci: Add atmel at91sam9g45-ehci compatible
-  dt-bindings: net: cdns,macb: add sam9x7 ethernet interface
-  dt-bindings: clk: at91: add sam9x7
-  dt-bindings: clk: at91: add sam9x7 clock controller
-  dt-bindings: reset: atmel,at91sam9260-reset: add sam9x7
-  dt-bindings: power: reset: atmel,sama5d2-shdwc: add sam9x7
-  dt-bindings: atmel-sysreg: add sam9x7
-  dt-bindings: crypto: add sam9x7 in Atmel AES
-  dt-bindings: crypto: add sam9x7 in Atmel SHA
-  dt-bindings: crypto: add sam9x7 in Atmel TDES
-  dt-bindings: dmaengine: at_xdmac: add compatible with microchip,sam9x7
-  dt-bindings: i2c: at91: Add sam9x7 compatible string
-  dt-bindings: mfd: at91: Add SAM9X7 compatible string
-  dt-bindings: atmel-gpbr: add microchip,sam9x7-gpbr
-  dt-bindings: atmel-matrix: add microchip,sam9x7-matrix
-  dt-bindings: atmel-smc: add microchip,sam9x7-smc
-  dt-bindings: atmel-ssc: add microchip,sam9x7-ssc
-  dt-bindings: sdhci-of-at91: add microchip,sam9x7-sdhci
-  dt-bindings: atmel-nand: add microchip,sam9x7-pmecc
-  dt-bindings: pinctrl: at91: add sam9x7
-  dt-bindings: rng: atmel,at91-trng: add sam9x7 TRNG
-  dt-bindings: rtc: at91rm9200: add sam9x7 compatible
-  dt-bindings: rtt: at91rm9260: add sam9x7 compatible
-  dt-bindings: serial: atmel,at91-usart: add compatible for sam9x7
-  dt-bindings: atmel-classd: add sam9x7 compatible
-  dt-bindings: usb: atmel: add sam9x7
-  dt-bindings: watchdog: sama5d4-wdt: add compatible for sam9x7-wdt
-  dt-bindings: irqchip/atmel-aic5: Add support for sam9x7 aic
-  spi: dt-bindings: atmel,at91rm9200-spi: remove 9x60 compatible from
-    list
-  ASoC: dt-bindings: microchip: add sam9x7
-  dt-bindings: usb: ehci: Add sam9x7
-  dt-bindings: usb: add sam9x7
-  ARM: at91: pm: add support for sam9x7 SoC family
-  ARM: at91: pm: add sam9x7 SoC init config
-  ARM: at91: add support in SoC driver for new sam9x7
-  clk: at91: clk-sam9x60-pll: re-factor to support individual core freq
-    outputs
-  clk: at91: sam9x7: add support for HW PLL freq dividers
-  clk: at91: sama7g5: move mux table macros to header file
-  clk: at91: sam9x7: Allow PLLs to be exported and referenced in DT
-  clk: at91: sam9x7: add sam9x7 pmc driver
-  power: reset: at91-poweroff: lookup for proper pmc dt node for sam9x7
-  power: reset: at91-reset: add reset support for sam9x7 SoC
-  power: reset: at91-reset: add sdhwc support for sam9x7 SoC
-  ARM: at91: Kconfig: add config flag for SAM9X7 SoC
-  ARM: configs: at91: enable config flags for sam9x7 SoC family
-  ARM: dts: at91: sam9x7: add device tree for SoC
-  dt-bindings: arm: add sam9x75 curiosity board
-  ARM: dts: at91: sam9x75_curiosity: add sam9x75 curiosity board
+The conflict has been resolved on our side[1] and the resolution we
+suggest is attached to this email. Please report any issues linked to
+this conflict resolution as it might be used by others. If you worked on
+the mentioned patches, don't hesitate to ACK this conflict resolution.
+---------------------------
 
- .../devicetree/bindings/arm/atmel-at91.yaml   |    6 +
- .../devicetree/bindings/arm/atmel-sysregs.txt |    7 +-
- .../bindings/clock/atmel,at91rm9200-pmc.yaml  |    1 +
- .../bindings/clock/atmel,at91sam9x5-sckc.yaml |    3 +
- .../crypto/atmel,at91sam9g46-aes.yaml         |    6 +-
- .../crypto/atmel,at91sam9g46-sha.yaml         |    6 +-
- .../crypto/atmel,at91sam9g46-tdes.yaml        |    6 +-
- .../devicetree/bindings/dma/atmel-xdma.txt    |    3 +-
- .../bindings/i2c/atmel,at91sam-i2c.yaml       |    4 +
- .../interrupt-controller/atmel,aic.txt        |    2 +-
- .../devicetree/bindings/mfd/atmel-flexcom.txt |    1 +
- .../devicetree/bindings/mfd/atmel-gpbr.txt    |    1 +
- .../devicetree/bindings/mfd/atmel-matrix.txt  |    1 +
- .../devicetree/bindings/mfd/atmel-smc.txt     |    1 +
- .../devicetree/bindings/misc/atmel-ssc.txt    |    1 +
- .../devicetree/bindings/mmc/sdhci-atmel.txt   |    4 +-
- .../devicetree/bindings/mtd/atmel-nand.txt    |    1 +
- .../devicetree/bindings/net/cdns,macb.yaml    |    6 +
- .../bindings/pinctrl/atmel,at91-pinctrl.txt   |    2 +
- .../power/reset/atmel,sama5d2-shdwc.yaml      |    3 +
- .../reset/atmel,at91sam9260-reset.yaml        |    4 +
- .../bindings/rng/atmel,at91-trng.yaml         |    4 +
- .../bindings/rtc/atmel,at91rm9200-rtc.yaml    |   18 +-
- .../bindings/rtc/atmel,at91sam9260-rtt.yaml   |    3 +
- .../bindings/serial/atmel,at91-usart.yaml     |    9 +
- .../soc/microchip/atmel,at91rm9200-tcb.yaml   |   21 +-
- .../bindings/sound/atmel,sama5d2-classd.yaml  |    7 +-
- .../sound/microchip,sama7g5-i2smcc.yaml       |   11 +-
- .../bindings/spi/atmel,at91rm9200-spi.yaml    |    1 -
- .../devicetree/bindings/usb/atmel-usb.txt     |   11 +-
- .../devicetree/bindings/usb/generic-ehci.yaml |    7 +
- .../devicetree/bindings/usb/generic-ohci.yaml |    6 +
- .../bindings/watchdog/atmel,sama5d4-wdt.yaml  |   15 +-
- arch/arm/boot/dts/microchip/Makefile          |    5 +
- .../dts/microchip/at91-sam9x75_curiosity.dts  |  311 +++++
- arch/arm/boot/dts/microchip/sam9x7.dtsi       | 1238 +++++++++++++++++
- arch/arm/configs/at91_dt_defconfig            |    1 +
- arch/arm/mach-at91/Kconfig                    |   23 +-
- arch/arm/mach-at91/Makefile                   |    1 +
- arch/arm/mach-at91/generic.h                  |    2 +
- arch/arm/mach-at91/pm.c                       |   35 +
- arch/arm/mach-at91/sam9x7.c                   |   34 +
- drivers/clk/at91/Makefile                     |    1 +
- drivers/clk/at91/clk-sam9x60-pll.c            |   50 +-
- drivers/clk/at91/pmc.h                        |   18 +
- drivers/clk/at91/sam9x60.c                    |    7 +
- drivers/clk/at91/sam9x7.c                     |  946 +++++++++++++
- drivers/clk/at91/sama7g5.c                    |   42 +-
- drivers/irqchip/irq-atmel-aic5.c              |   10 +
- drivers/power/reset/Kconfig                   |    4 +-
- drivers/power/reset/at91-sama5d2_shdwc.c      |    1 +
- drivers/soc/atmel/soc.c                       |   23 +
- drivers/soc/atmel/soc.h                       |    9 +
- include/dt-bindings/clock/at91.h              |    4 +
- 54 files changed, 2871 insertions(+), 76 deletions(-)
- create mode 100644 arch/arm/boot/dts/microchip/at91-sam9x75_curiosity.dts
- create mode 100644 arch/arm/boot/dts/microchip/sam9x7.dtsi
- create mode 100644 arch/arm/mach-at91/sam9x7.c
- create mode 100644 drivers/clk/at91/sam9x7.c
+Regarding this conflict, the two commits modify lines in the same
+context but they don't modify the same ones. I then took the
+modifications from both side.
 
+Rerere cache is available in [2].
+
+Cheers,
+Matt
+
+[1] https://github.com/multipath-tcp/mptcp_net-next/commit/8cbf72d9be3a
+[2] https://github.com/multipath-tcp/mptcp-upstream-rr-cache/commit/b0f1
 -- 
-2.25.1
+Tessares | Belgium | Hybrid Access Solutions
+www.tessares.net
+--------------06RGyS9oa7z67b6faIPYSIqs
+Content-Type: text/x-patch; charset=UTF-8;
+ name="8cbf72d9be3a6a2cda95e3db9d1fa3cc4b5f3924.patch"
+Content-Disposition: attachment;
+ filename="8cbf72d9be3a6a2cda95e3db9d1fa3cc4b5f3924.patch"
+Content-Transfer-Encoding: base64
 
+ZGlmZiAtLWNjIG5ldC9kc2EvcG9ydC5jCmluZGV4IGM2M2NiZmJlNjQ4OSwyZjYxOTVkN2I3
+NDEuLjI0MDE1ZTExMjU1ZgotLS0gYS9uZXQvZHNhL3BvcnQuYworKysgYi9uZXQvZHNhL3Bv
+cnQuYwpAQEAgLTE2ODYsOCAtMTcyMCwyMiArMTY4NiwxNSBAQEAgaW50IGRzYV9wb3J0X3Bo
+eWxpbmtfY3JlYXRlKHN0cnVjdCBkc2FfCiAgCWlmIChlcnIpCiAgCQltb2RlID0gUEhZX0lO
+VEVSRkFDRV9NT0RFX05BOwogIAotIAlpZiAoZHMtPm9wcy0+cGh5bGlua19nZXRfY2FwcykK
+IC0JLyogUHJlc2VuY2Ugb2YgcGh5bGlua19tYWNfbGlua19zdGF0ZSBvciBwaHlsaW5rX21h
+Y19hbl9yZXN0YXJ0IGlzCiAtCSAqIGFuIGluZGljYXRvciBvZiBhIGxlZ2FjeSBwaHlsaW5r
+IGRyaXZlci4KIC0JICovCiAtCWlmIChkcy0+b3BzLT5waHlsaW5rX21hY19saW5rX3N0YXRl
+IHx8CiAtCSAgICBkcy0+b3BzLT5waHlsaW5rX21hY19hbl9yZXN0YXJ0KQogLQkJZHAtPnBs
+X2NvbmZpZy5sZWdhY3lfcHJlX21hcmNoMjAyMCA9IHRydWU7CiAtCisgCWlmIChkcy0+b3Bz
+LT5waHlsaW5rX2dldF9jYXBzKSB7CiAgCQlkcy0+b3BzLT5waHlsaW5rX2dldF9jYXBzKGRz
+LCBkcC0+aW5kZXgsICZkcC0+cGxfY29uZmlnKTsKKyAJfSBlbHNlIHsKKyAJCS8qIEZvciBs
+ZWdhY3kgZHJpdmVycyAqLworIAkJX19zZXRfYml0KFBIWV9JTlRFUkZBQ0VfTU9ERV9JTlRF
+Uk5BTCwKKyAJCQkgIGRwLT5wbF9jb25maWcuc3VwcG9ydGVkX2ludGVyZmFjZXMpOworIAkJ
+X19zZXRfYml0KFBIWV9JTlRFUkZBQ0VfTU9ERV9HTUlJLAorIAkJCSAgZHAtPnBsX2NvbmZp
+Zy5zdXBwb3J0ZWRfaW50ZXJmYWNlcyk7CisgCX0KICAKICAJcGwgPSBwaHlsaW5rX2NyZWF0
+ZSgmZHAtPnBsX2NvbmZpZywgb2ZfZndub2RlX2hhbmRsZShkcC0+ZG4pLAogIAkJCSAgICBt
+b2RlLCAmZHNhX3BvcnRfcGh5bGlua19tYWNfb3BzKTsK
+
+--------------06RGyS9oa7z67b6faIPYSIqs--
 
