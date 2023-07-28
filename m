@@ -1,173 +1,105 @@
-Return-Path: <netdev+bounces-22111-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22112-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78C80766170
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 03:42:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B853A766174
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 03:46:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A995E1C217A4
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 01:42:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6FFF028259F
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 01:46:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15D6C17D1;
-	Fri, 28 Jul 2023 01:42:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51CFE15CC;
+	Fri, 28 Jul 2023 01:45:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A8597C
-	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 01:42:17 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8087F3588
-	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 18:42:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1690508534;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+B8/dh9FxUlYlsfj6c2Az3RVvE6Mk5Zpo699JVAL0Us=;
-	b=UCrkxbwTTj/NOaU+mujwbU4bv7w4azAAj/C59hBh27WyxcysgBHUHSyRfaLsD3OuoIZwwH
-	WSc6nro4Z7msCDddyTazjNwrr2lXBpgsMi/nevq+AfnBNHr9UqQ0HMt40nudfm1fg9RIQ4
-	AQU8Qm2qNYQShi4eKJ0VtgU+lskOwhM=
-Received: from mail-lf1-f69.google.com (mail-lf1-f69.google.com
- [209.85.167.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-602-drkQDItZMtOwWo_Vz0VpIQ-1; Thu, 27 Jul 2023 21:42:12 -0400
-X-MC-Unique: drkQDItZMtOwWo_Vz0VpIQ-1
-Received: by mail-lf1-f69.google.com with SMTP id 2adb3069b0e04-4f76712f950so1420231e87.0
-        for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 18:42:12 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 438FC15C3
+	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 01:45:57 +0000 (UTC)
+Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B64C7F2
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 18:45:56 -0700 (PDT)
+Received: by mail-lf1-x12d.google.com with SMTP id 2adb3069b0e04-4fb863edcb6so2811745e87.0
+        for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 18:45:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1690508755; x=1691113555;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2yyz+QOPnTCmJDH2mcI7Jd4URwi0CMO5PT6P34rUHZc=;
+        b=eUczXDLCXgtgG1jVtwtgDgj9HtNPXbYz69ZipKt6Q1D9mp0tcHF+vL9BeGSgVxujR0
+         CY7uUhgcXH3aJ7SiZre9jqU2/vrOb5sYvZ0qM4ffgV56O9YHlo015wykg47gzvalNoXD
+         /7/4qdbHl29Sdjd/MajN4SlPP12eg0q5ECt50OqycuFpMgVx6O0l/xEgsALYKZHe3nk2
+         d4crzOjUeAxutQwb++UJQYgJ1dziKyLgFy3XE6Iz1dmgiulhDgGk85qjqo7atCucPIvN
+         sEiSubmvjFXHsUiYUZ7s06O0eRzUQgZDPtHQpD3TO3B5s0cXLHsTx5Epfeer2go8UlYR
+         myow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690508531; x=1691113331;
+        d=1e100.net; s=20221208; t=1690508755; x=1691113555;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=+B8/dh9FxUlYlsfj6c2Az3RVvE6Mk5Zpo699JVAL0Us=;
-        b=fUkAQ4l17BgMTo56jvdQ+o0RC+7e4Te/sTDe+Q6rklBdEdgHVZZN2rWP2Bbw4os8G/
-         /khilNDzwHlv1wWRH7wa1NTzjZkrMeuwoEJczjx4NWnp/1pdlTADBd1CyhvFklwnc5yB
-         iOMEiwyAmalAcjTPEfK75B+grb7YYRnYfOAKWFJIIuHvmFK3ZWG1sg45a3O8TSWGMfrX
-         J+ymhW6AGknlOn1y4DqlGYFVE8Jbj82tKYnFKr57U0X7s4Q9LyoO+HadmN7F0kcK4WE2
-         9fiDw53H6oFAOzJ/5kHExHOMmBETTpnGD34xVi9bPznSjdi8M22sVl/ROC3658L5BDKv
-         3Rcg==
-X-Gm-Message-State: ABy/qLYoB/sbx/MxioqfeA3DISi9p569zfsQZE2cFuJulXTPo8kgYXaE
-	bWx0h2O7nx1y2yp8lEb0rdO+7fXyWkdPJOp6iSaneYCtc8CqCGJ4izpmfMMBU7a5My+s/MZmOpT
-	YIRUayF7MMGjhObCFeqkivPE/CJDxMPTC
-X-Received: by 2002:a05:6512:1591:b0:4fb:893e:8ffc with SMTP id bp17-20020a056512159100b004fb893e8ffcmr676873lfb.17.1690508531486;
-        Thu, 27 Jul 2023 18:42:11 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlHY6/ERBGZV6AEAlBJS5xI4dIRaHz1bMCv6qrVkYLdcfZ1S0GvRrifqu9u3Yc1vreyW0L0NNEbcznbuvGQrl6o=
-X-Received: by 2002:a05:6512:1591:b0:4fb:893e:8ffc with SMTP id
- bp17-20020a056512159100b004fb893e8ffcmr676854lfb.17.1690508531188; Thu, 27
- Jul 2023 18:42:11 -0700 (PDT)
+        bh=2yyz+QOPnTCmJDH2mcI7Jd4URwi0CMO5PT6P34rUHZc=;
+        b=DGPYt5mS5WdYzS//MOvys6XSRXcAnRkPpw/35PZ13a325hSX6+gZokEJcvO1dDJ6PS
+         OcXYuzeOLo01TOlGFFKUuSEhP8yYzZ2myP9IgEBFeDfcVVIQNTa3pZh3vcmUX0mrCxuD
+         iNMkHluLg0thNJqPSHqYsBtroeV2qK+AA773JRdPszxqZ4n+s5/30tmHoOopaxIob2tW
+         9po+duT2SBN5QsxMaRKNuyoSTFrA4NdpMu3VnDtz+Z1xdaIES8xdpAa/oUCXT3xLZBt3
+         KwQ/23D+Q0l4rE4fNdwdt8zawDTmhgn5oP/siLxeLRLPQDF+abDnj6+TCKq01Pl9WAam
+         cJZg==
+X-Gm-Message-State: ABy/qLbAZZrBPJbCCgga7DmyLq1n808v6nT+DIpoRRGWpJXhJOXqg/fW
+	T5XhA//eZAxXMHiAqGxxKOKEnZOh6FnSjDOnnJQ=
+X-Google-Smtp-Source: APBJJlFTX51B17BAYAKagPQdYNaJLvIRaYq5TT3/2yqQbBl/G5EanVIn7evMpSOeq/634KLkr4sgPP8ZA3mX0/AU73s=
+X-Received: by 2002:a05:6512:ac2:b0:4fb:9631:4bb with SMTP id
+ n2-20020a0565120ac200b004fb963104bbmr704018lfu.11.1690508754561; Thu, 27 Jul
+ 2023 18:45:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230725130709.58207-1-gavinl@nvidia.com> <20230725130709.58207-3-gavinl@nvidia.com>
- <f5823996fffad2f3c1862917772c182df74c74e7.camel@redhat.com>
-In-Reply-To: <f5823996fffad2f3c1862917772c182df74c74e7.camel@redhat.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Fri, 28 Jul 2023 09:42:00 +0800
-Message-ID: <CACGkMEs4wUh0TydcXSMR2GdBSTk+H-Tkbhn53BywEeiK9cA9Gg@mail.gmail.com>
-Subject: Re: [PATCH net-next V4 2/3] virtio_net: support per queue interrupt
- coalesce command
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Gavin Li <gavinl@nvidia.com>, mst@redhat.com, xuanzhuo@linux.alibaba.com, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, ast@kernel.org, 
-	daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com, 
-	jiri@nvidia.com, dtatulea@nvidia.com, gavi@nvidia.com, 
-	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, bpf@vger.kernel.org, 
-	Heng Qi <hengqi@linux.alibaba.com>
+References: <cover.1690439335.git.chenfeiyang@loongson.cn> <a752f67c6cfe481a2329f1f4b477ff962c46f515.1690439335.git.chenfeiyang@loongson.cn>
+ <30e8518e-4862-4aa5-afda-2f511dde2b44@lunn.ch>
+In-Reply-To: <30e8518e-4862-4aa5-afda-2f511dde2b44@lunn.ch>
+From: Feiyang Chen <chris.chenfeiyang@gmail.com>
+Date: Fri, 28 Jul 2023 09:45:42 +0800
+Message-ID: <CACWXhKkYY_g6Eo3G3TVT-AzGRa-HP2fTu9biQ6OtpPh7_hh5HQ@mail.gmail.com>
+Subject: Re: [PATCH v2 05/10] net: stmmac: dwmac1000: Add Loongson register definitions
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Feiyang Chen <chenfeiyang@loongson.cn>, hkallweit1@gmail.com, peppe.cavallaro@st.com, 
+	alexandre.torgue@foss.st.com, joabreu@synopsys.com, chenhuacai@loongson.cn, 
+	linux@armlinux.org.uk, dongbiao@loongson.cn, 
+	loongson-kernel@lists.loongnix.cn, netdev@vger.kernel.org, 
+	loongarch@lists.linux.dev
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-	version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Jul 27, 2023 at 9:28=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wro=
-te:
+On Thu, Jul 27, 2023 at 5:13=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
 >
-> On Tue, 2023-07-25 at 16:07 +0300, Gavin Li wrote:
-> > Add interrupt_coalesce config in send_queue and receive_queue to cache =
-user
-> > config.
-> >
-> > Send per virtqueue interrupt moderation config to underlying device in
-> > order to have more efficient interrupt moderation and cpu utilization o=
-f
-> > guest VM.
-> >
-> > Additionally, address all the VQs when updating the global configuratio=
-n,
-> > as now the individual VQs configuration can diverge from the global
-> > configuration.
-> >
-> > Signed-off-by: Gavin Li <gavinl@nvidia.com>
-> > Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
-> > Reviewed-by: Jiri Pirko <jiri@nvidia.com>
-> > Acked-by: Michael S. Tsirkin <mst@redhat.com>
+> >  /* GMAC HW ADDR regs */
+> > -#define GMAC_ADDR_HIGH(reg)  ((reg > 15) ? 0x00000800 + (reg - 16) * 8=
+ : \
+> > +#define GMAC_ADDR_HIGH(reg, x)       ((reg > 15) ? 0x00000800 + (reg -=
+ 16) * 8 * (x) : \
+> >                                0x00000040 + (reg * 8))
 >
-> FTR, this patch is significantly different from the version previously
-> acked/reviewed, I'm unsure if all the reviewers are ok with the new
-> one.
-
-Good point, and I plan to review this no later than next Monday and
-offer my ack if necessary. Please hold this series now.
-
-Thanks
-
->
-> [...]
->
-> >  static int virtnet_set_coalesce(struct net_device *dev,
-> >                               struct ethtool_coalesce *ec,
-> >                               struct kernel_ethtool_coalesce *kernel_co=
-al,
-> >                               struct netlink_ext_ack *extack)
-> >  {
-> >       struct virtnet_info *vi =3D netdev_priv(dev);
-> > -     int ret, i, napi_weight;
-> > +     int ret, queue_number, napi_weight;
-> >       bool update_napi =3D false;
-> >
-> >       /* Can't change NAPI weight if the link is up */
-> >       napi_weight =3D ec->tx_max_coalesced_frames ? NAPI_POLL_WEIGHT : =
-0;
-> > -     if (napi_weight ^ vi->sq[0].napi.weight) {
-> > -             if (dev->flags & IFF_UP)
-> > -                     return -EBUSY;
-> > -             else
-> > -                     update_napi =3D true;
-> > +     for (queue_number =3D 0; queue_number < vi->max_queue_pairs; queu=
-e_number++) {
-> > +             ret =3D virtnet_should_update_vq_weight(dev->flags, napi_=
-weight,
-> > +                                                   vi->sq[queue_number=
-].napi.weight,
-> > +                                                   &update_napi);
-> > +             if (ret)
-> > +                     return ret;
-> > +
-> > +             if (update_napi) {
-> > +                     /* All queues that belong to [queue_number, queue=
-_count] will be
-> > +                      * updated for the sake of simplicity, which migh=
-t not be necessary
->
-> It looks like the comment above still refers to the old code. Should
-> be:
->         [queue_number, vi->max_queue_pairs]
->
-> Otherwise LGTM, thanks!
->
-> Paolo
+> please give x a more descriptive name.
 >
 
+Hi, Andrew,
+
+The x is now related to the dwmac_is_loongson flag. I'll try to use
+another method.
+
+Thanks,
+Feiyang
+
+>        Andrew
 
