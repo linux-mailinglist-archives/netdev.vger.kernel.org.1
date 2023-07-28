@@ -1,88 +1,245 @@
-Return-Path: <netdev+bounces-22466-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22467-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA7E876792E
-	for <lists+netdev@lfdr.de>; Sat, 29 Jul 2023 01:57:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30B72767936
+	for <lists+netdev@lfdr.de>; Sat, 29 Jul 2023 01:59:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F183A1C21159
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 23:57:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D98E2282733
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 23:59:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E22120FB7;
-	Fri, 28 Jul 2023 23:57:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D134120FB7;
+	Fri, 28 Jul 2023 23:59:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70661525C
-	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 23:57:55 +0000 (UTC)
-Received: from out-65.mta0.migadu.com (out-65.mta0.migadu.com [IPv6:2001:41d0:1004:224b::41])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A18B1BD6
-	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 16:57:53 -0700 (PDT)
-Message-ID: <e79da177-361a-07fb-710a-967a19d5c7a9@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1690588670;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Vmm9PWjiIr44mtk0aK3RfwDQJ7qs4MHr/qIjINwktmM=;
-	b=dYK3bR4jfVJXnzSRaMfZqtnW4gFU6mfQxSiBrWTH7pkmIsrNZe3P7OS3MRTRmLB2PV/QqV
-	9N2vHep1i4010Eypia8/71Gglslv0Pb7EADYRUDwiM4izode8w4ZvoKo877JOqYSLuQQp5
-	bC4NKn6bn4uBus7aXZze2rnixJxZLd4=
-Date: Fri, 28 Jul 2023 16:57:43 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C45F1525C
+	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 23:59:02 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58882E60
+	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 16:59:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1690588741; x=1722124741;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=BZ86zRInLjXpKeWek27tCFgWnPHFTbj8E08By/n4jxI=;
+  b=SJKIPtlOuhPaAzhVEfkz4mYtv3BqBskHuSH6fPdA7UatWfXM4md76euR
+   g9BQZIqH81nveYsXggM0lQvSZoeI1LpUPaf3GMEVER3bMSumTDTCAEJe0
+   C/MbRU8zkKpzJT608Rbr2+XTAS1ewet3o4cggKuW+htS9rqw1+wlzxdAo
+   +qOdmJsEtTiGQcjVsIGqasHjqtjUlVgaW004KV6OgJlXxHXIGyBdwnfPI
+   1ZFhbCjlENBq/mPBeE3CUGgWb0quLQI3N3Qw6AZulPoDnl8iYaxFlzI0S
+   t+QwFEd0QWE+Ba+yQlV8INMm3nehogPfIzYRLcsZe5qmF390aeA+gZm11
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10785"; a="367591128"
+X-IronPort-AV: E=Sophos;i="6.01,238,1684825200"; 
+   d="scan'208";a="367591128"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jul 2023 16:58:37 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10785"; a="704750163"
+X-IronPort-AV: E=Sophos;i="6.01,238,1684825200"; 
+   d="scan'208";a="704750163"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by orsmga006.jf.intel.com with ESMTP; 28 Jul 2023 16:58:37 -0700
+Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Fri, 28 Jul 2023 16:58:36 -0700
+Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
+ fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Fri, 28 Jul 2023 16:58:36 -0700
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27 via Frontend Transport; Fri, 28 Jul 2023 16:58:36 -0700
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.175)
+ by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.27; Fri, 28 Jul 2023 16:58:36 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=g3LL78MWffpUWMQNV8jL2LIQp/6bxY4VA7YX32o+gRVwQGaCz8P98dKOV2LC6UkfcpiV5e/ELqUbs+VZx2fLOEGVW4wu4WlIPqgXFLQDgtLKQGsFW2rHl3bz0DbRig57LOitHd3WDQU5EMGW9/zfWruGLM55v9sOWWszLo3yGefNR1g5XJgjr03Vi8J2YjlxsPEDLobnh1/pKEYnL6Sw1+cDk2BJl+OVIFEuSU1/X5Le0HNYhSTMVfAkyEsjIm1032ME1tXz7QAE91RzT0N1J1fpQasfF0VGZwbnH+jnQQeSCfhsBv9KZJUZYe/UwJJ0BfH5Z5Z3cVa3F9ZjjGFDyw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=HWugL7gSFrogR8mM+RyBhy0dlZFyvfj1HDmY1cvS1gk=;
+ b=Z7IwRozEUX7WgKVOxPg1u/FTX/eS5kCYHk5P4QaURVOLOnlot6Ofsl6maAoCNtPVFYir1JpGOVR/W96rTBNSR0IrpLfX2kScjtokn9OIHtzDlYp5sONCpyeQFjl8nNGl2xe73bcyeQAMAdCoZoF2QFWy8oAeVZaLmX971vcddFiwG4w2oyjEmsT5nXNLyLez1mYGVGjrJgyczI7hFpVDyUZLHDEAewJvZI4Li8wiTMdA1616CepvNMIebNIw92701MqUElq7K06UYEI9Ykd8YXA3ABHhHivTWWNva2iWUwEFKApNLpBLLHcKbR5hiQl5ek7fcfdePgybtxgCzeXSzA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CO1PR11MB4914.namprd11.prod.outlook.com (2603:10b6:303:90::24)
+ by PH7PR11MB6906.namprd11.prod.outlook.com (2603:10b6:510:202::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.29; Fri, 28 Jul
+ 2023 23:58:34 +0000
+Received: from CO1PR11MB4914.namprd11.prod.outlook.com
+ ([fe80::8102:1089:3284:3494]) by CO1PR11MB4914.namprd11.prod.outlook.com
+ ([fe80::8102:1089:3284:3494%5]) with mapi id 15.20.6631.026; Fri, 28 Jul 2023
+ 23:58:34 +0000
+Message-ID: <3187ca51-d1cf-d175-5740-341ab9bc46d4@intel.com>
+Date: Fri, 28 Jul 2023 16:58:32 -0700
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Firefox/102.0 Thunderbird/102.13.0
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next v2] i40e: Clear stats after
+ deleting tc
+Content-Language: en-US
+To: Jedrzej Jagielski <jedrzej.jagielski@intel.com>,
+	<intel-wired-lan@lists.osuosl.org>
+CC: Grzegorz Szczurek <grzegorzx.szczurek@intel.com>,
+	<netdev@vger.kernel.org>, <anthony.l.nguyen@intel.com>
+References: <20230727084335.63856-1-jedrzej.jagielski@intel.com>
+From: Jesse Brandeburg <jesse.brandeburg@intel.com>
+In-Reply-To: <20230727084335.63856-1-jedrzej.jagielski@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4PR03CA0069.namprd03.prod.outlook.com
+ (2603:10b6:303:b6::14) To CO1PR11MB4914.namprd11.prod.outlook.com
+ (2603:10b6:303:90::24)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v2] bpf: Add length check for
- SK_DIAG_BPF_STORAGE_REQ_MAP_FD parsing
-Content-Language: en-US
-To: Paolo Abeni <pabeni@redhat.com>, Lin Ma <linma@zju.edu.cn>
-References: <20230725023330.422856-1-linma@zju.edu.cn>
- <c4ca108f891718188ea2a9560324d23de2740565.camel@redhat.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- ast@kernel.org, martin.lau@kernel.org, yhs@fb.com, void@manifault.com,
- andrii@kernel.org, houtao1@huawei.com, inwardvessel@gmail.com,
- kuniyu@amazon.com, songliubraving@fb.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <c4ca108f891718188ea2a9560324d23de2740565.camel@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PR11MB4914:EE_|PH7PR11MB6906:EE_
+X-MS-Office365-Filtering-Correlation-Id: 67b81033-d32a-456c-89a9-08db8fc68d4f
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: nTh+41+zaspTjJNvCfzwkoLVEX6pvAGimKsP3jKLcp9ZNN4Qjj7Fgh42LXAiClanjvi92yoQhtxjXgV6myDq5TZfMMWPVkZQsWzfgMsK/VXOKE0ikjWyUqUnV2999dxaVC5s7c98huOC9HTt/LNtY2aYeK7KbxTQlWMsx10Mr4j+h9bYaYW2qtHR4L2I4xMUN9ysSXnHx6SPPGNBHGnjuwcA0W+aeXvDzBKoGEnGrZihfKBzYMlwzTTGbNp1c1i59Z3WXh9WWy7iDR7jj8Dbgfk9x0pCf4XNywlrIZFGJfn3bEKzN8618QxSAx6XTWuSp948tUttGsoKjJ5aabfagBoqPSyALuj+eL+Hk+3M1Z3Wkw7SQJEw3/83d6IhhwpXPXGEzMr4RCduiUHZ4tk9j7k9BrF0FEM5L35Xf0rZO2YRA3xiYk+Roqkbag++B8aXAW+ab85H7ZT1uuIWAx0BRNOhJiwoR677Kcu0iMIjfNmLvkImUc4ry0bCojmumUTRgEXxWTfOzXDqj5REcDSkFHYStrrcZ/D+AYbVtsjxJPwMRE4bzIMTEknSNaK7DhzbhjrMItteC9Yrp75TT1t8kKcXZQSKEbjFGdKPdplfezlcaNLXn21Ai0xSELEcbPLb4YH3BM6JjskZ45X2/s+BwA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB4914.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(39860400002)(396003)(346002)(366004)(136003)(376002)(451199021)(5660300002)(31686004)(41300700001)(26005)(53546011)(38100700002)(86362001)(6512007)(478600001)(36756003)(4326008)(8676002)(8936002)(31696002)(66946007)(66556008)(316002)(186003)(66476007)(6506007)(107886003)(2906002)(2616005)(44832011)(83380400001)(82960400001)(6486002)(43740500002)(45980500001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?VUJ6WTVmdnJXcW9qa1lNWUlCUzFKblJFbHA0b1BZL2s0eTJXYTdEanJ0UlMw?=
+ =?utf-8?B?emtodmlzL1ZVeUQyUVV2WEJwT2Z5Rlg1eUx5bHo1dllSdmZUOXF0S1lhNVJN?=
+ =?utf-8?B?a1NyTjhNaS9YM2NQdkJrVERLZysreDhoM0JEeStuTWsvZ2JjK28vL0NJM0U5?=
+ =?utf-8?B?SFArbFlWMlp1bFlPTFpvbVVTb3hxSVg2QTBnSkZZRHZoNUM4U0RhZENZZW1I?=
+ =?utf-8?B?SnlUSTBBOVdBb1p2MHl4YVZBSDVTMEY0S2NGbEEzRy93eGJvQlZZcEhGNS94?=
+ =?utf-8?B?eFk0R2ZyakFEZEJLR1p1L0ExWVF2YjR4MGxUaWVSZmNZQ0I2N1dheVNCMHV1?=
+ =?utf-8?B?OUtUayszNkMxV1BCQ29XZmZqcU5uN3JjQnd2bVk1LzdmOEtRbittQytkRmha?=
+ =?utf-8?B?ai9RaFYycmxocW9CUFpvV3F1b2NGdGJtVGRCcVBXK2ExbExLK2xWMUc1Z3dQ?=
+ =?utf-8?B?RCttUFpNY3luL3pCTTRSK3ZaQytOQTVtN2pDclc1TlJselY1SG5JVU9waEc3?=
+ =?utf-8?B?dHE1ckdCbmplTndqMXBqb2tsVXdnQkduZHRYU29tdVdSQTgramtxdWh1Qkp6?=
+ =?utf-8?B?RFMvSWs2WTNNNmN6MnpCRXJKaU4yVnFEZDhzdjlLNVIwQ0xjN3pnUEYyTldw?=
+ =?utf-8?B?dXBXcnhBc3Nqc0FMbFhGRW1Sb21VVlBBWnNCRnJqSmtELzlwTGFoRHdBWFFx?=
+ =?utf-8?B?T0FFbkxUTjNlZkJOendWYUR6RjlHajNaR3RjdUdFc0N4cm5CejBwU1JSYWpD?=
+ =?utf-8?B?MHllZG11N0M4U2lqVGhKaTdtaUkyUmNMQlo0SHZyQ3JSZjloeDh2YVV5Z1FO?=
+ =?utf-8?B?MUEreE1zdUtwS3JjS3Y1Q085LzRWOVQzTWVmaTdYanRPYm41UVVxbDFoWHY5?=
+ =?utf-8?B?MTV5Q3VHdXNldHJOS2gxc1FJdk9xQlJZczNDUERnd29tNTkybVlBRUdWUDRU?=
+ =?utf-8?B?UHZ5cVhDKzM5Z1pnUEdib2RxWTRTZll3ZkhRbmN3eC9pU095enNocHpFYkx4?=
+ =?utf-8?B?YjJtalU3RU8vMTBtS292RUkrcGtWT3g4S0kyMGlFbDE0MnhQdnhkc3JyNitr?=
+ =?utf-8?B?NVdFcUgxbFZ0SmozTkVWZ3VlS1p0UUxPcXNDMlcrTjl2ampmT2orVFpQaDlp?=
+ =?utf-8?B?ZkN1YkdVSk9nQTNBaWF6TGluTDVpRzBFSkI0dFViVGtaZmVtZHFCMHdIQnox?=
+ =?utf-8?B?a21MOUlvcnRkRklES0w4bHlRYldHY3psYk1OODd1eUJYQVduQ0d2ZlUzbzlW?=
+ =?utf-8?B?QmgzU3JYUE5tZlliZVRDcTlld2dNNmVnMlY5eHZvWmN1Z3YzVmhCTy9Ma0tQ?=
+ =?utf-8?B?VlhSNmU1LzJKcGMwbDFKUkZjSXJQcTR1aGFyTENJcURZYlZlWnJ6TUE2U1lp?=
+ =?utf-8?B?bEt1UTlWUWRJWFRoYlFBdWc0TmRMUTgxK1g0K1V3OWRKNFJJdFlDa3B2UVNW?=
+ =?utf-8?B?cW9yMXdRL2ZVcjRIRUYvT1huRlMwNXpTQlIyanFVOG1qYzdDbkdURTI1UXZ3?=
+ =?utf-8?B?Q2dxL0hLQ3RZSmd5a3ZmM1RUdy8vTk5WVHEvbTIxYnpPQS9ma2FFTk9uRHlw?=
+ =?utf-8?B?VE1ZSDN0MCsrMUVldHVnTEpnMlgvL043eDhEMm5MMFpMOHJ4T0lKK3VDZHFP?=
+ =?utf-8?B?NjBiVmttLzlFT0pabmV2dFRaU1BGUXgvY1pWWDJ5NFEvMElPMUFDUFhMQXNY?=
+ =?utf-8?B?OEJGbXZRNGR1b0MyR2p4dVBMNEh4WTNBLzR6cWZzV1ZtN0lHcm53Z05zVEZa?=
+ =?utf-8?B?N05Db1hPeithc0xYcGNHaTRYdDNCVGZWeWVoTW9jNW15c0theFlmZVR2N3po?=
+ =?utf-8?B?TnhEM05ZSEhwajljM1RXM2QwQ0xUSzUxaCtaSUdNUDdVTUlscVhtMG9IbFdj?=
+ =?utf-8?B?RjBCZ2tub1dNNUYrNkNEZ3A5SXAyZC9TWmJURm5lUlQwcGRERENGbVZYQ1Rr?=
+ =?utf-8?B?MXM4Z2VJMnZ4V0RMZXN3RUN1bnh2RUJsZVdSZDR1VEx2NzBUcURJUjJ5QUpT?=
+ =?utf-8?B?QmN3ai9PWTd2NmlpM3JJZGhoOTJXUXN3UzY1L3Q1WXI3WVFVcG5SN1UxQTJs?=
+ =?utf-8?B?L29lVTl5a3k3OW1IM0h6SDRWSWhKdG9zWjZ0bEllTGFmZEdSbkd1VzJWMW9T?=
+ =?utf-8?B?ekw4dG1yZHAxdytqY25SZ2x4L3ZnSkx5Z1FCMHY1UC9nd3VqUlo5MWtyWUZV?=
+ =?utf-8?B?THc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 67b81033-d32a-456c-89a9-08db8fc68d4f
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB4914.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Jul 2023 23:58:34.1669
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 0lg4wOQoTQp4t9S8+VN0CAxY4/7GdCWB7K0h1+XkLVex81aFOEOxuxijobW/S3XO6BNmH6JMl3dOdfhI/LxvIOI3H10gybARkN7u9zmbbH8=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB6906
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 7/27/23 12:34 AM, Paolo Abeni wrote:
-> On Tue, 2023-07-25 at 10:33 +0800, Lin Ma wrote:
->> The nla_for_each_nested parsing in function bpf_sk_storage_diag_alloc
->> does not check the length of the nested attribute. This can lead to an
->> out-of-attribute read and allow a malformed nlattr (e.g., length 0) to
->> be viewed as a 4 byte integer.
->>
->> This patch adds an additional check when the nlattr is getting counted.
->> This makes sure the latter nla_get_u32 can access the attributes with
->> the correct length.
->>
->> Fixes: 1ed4d92458a9 ("bpf: INET_DIAG support in bpf_sk_storage")
->> Suggested-by: Jakub Kicinski <kuba@kernel.org>
->> Signed-off-by: Lin Ma <linma@zju.edu.cn>
+On 7/27/2023 1:43 AM, Jedrzej Jagielski wrote:
+> From: Grzegorz Szczurek <grzegorzx.szczurek@intel.com>
 > 
-> I guess this should go via the ebpf tree, right? Setting the delegate
-> accordingly.
+> There was an issue with ethtool stats that
+> have not been cleared after tc had been deleted.
+> Stats printed by ethtool -S remained the same despite
+> qdick had been removed, what is an unexpected behavior.
 
-Already applied to the bpf tree. Thanks.
-pw-bot seems not doing auto-reply for the bpf tree.
+qdisc
 
+> Stats should be reseted once qdick is removed.
+
+please reflow to 75 chars, please restate also as
+Stats should be reset once the qdisc is removed.
+
+> 
+> Fix this by resetting stats after deleting tc
+> by calling i40e_vsi_reset_stats() function after
+> distroying qdisc.
+
+destroying
+
+> 
+> Steps to reproduce:
+> 
+> 1) Add ingress rule
+> tc qdisc add dev <ethX> ingress
+> 
+> 2) Create qdisc and filter
+> tc qdisc add dev <ethX> root mqprio num_tc 4 map 0 0 0 0 1 2 2 3 queues 2@0 2@2 1@4 1@5 hw 1 mode channel
+> tc filter add dev <ethX> protocol ip parent ffff: prio 3 flower dst_ip <ip> ip_proto tcp dst_port 8300 skip_sw hw_tc 2
+> 
+> 3) Run iperf between client and SUT
+> iperf3 -s -p 8300
+> iperf3 -c <ip> -p 8300
+> 
+> 4) Check the ethtool stats
+> ethtool -S <ethX> | grep packets | column
+> 
+> 5) Delete filter and qdisc
+> tc filter del dev <ethX> parent ffff:
+> tc qdisc del dev <ethX> root
+> 
+> 6) Check the ethtool stats and see that they didn't change
+> ethtool -S <ethX> | grep packets | column
+> 
+> Signed-off-by: Grzegorz Szczurek <grzegorzx.szczurek@intel.com>
+> Signed-off-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+> ---
+> v2: Make the commit msg more detailed
+> ---
+>  drivers/net/ethernet/intel/i40e/i40e_main.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
+> index 29ad1797adce..e8e03ede1672 100644
+> --- a/drivers/net/ethernet/intel/i40e/i40e_main.c
+> +++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
+> @@ -5885,6 +5885,11 @@ static int i40e_vsi_config_tc(struct i40e_vsi *vsi, u8 enabled_tc)
+>  
+>  	/* Update the netdev TC setup */
+>  	i40e_vsi_config_netdev_tc(vsi, enabled_tc);
+> +
+> +	/* After destroying qdisc reset all stats of the vsi */
+> +	if (!vsi->mqprio_qopt.qopt.hw)
+> +		i40e_vsi_reset_stats(vsi);
+> +
+>  out:
+>  	return ret;
+>  }
 
 
