@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-22311-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22312-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB5A876701B
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 17:05:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60C3276701C
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 17:05:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 743E8280BDF
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 15:05:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 91C2F1C21951
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 15:05:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5C7A14279;
-	Fri, 28 Jul 2023 15:03:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E18214290;
+	Fri, 28 Jul 2023 15:03:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9C9014268
-	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 15:03:33 +0000 (UTC)
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58ABE3C28
-	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 08:03:32 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-c64ef5bde93so2136258276.0
-        for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 08:03:32 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 527ED14268
+	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 15:03:36 +0000 (UTC)
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DEE8420C
+	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 08:03:34 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-584126c65d1so24484557b3.3
+        for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 08:03:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690556611; x=1691161411;
+        d=google.com; s=20221208; t=1690556613; x=1691161413;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ft7NdQXHF3jUqk0jSagrDG7l3v2MbvEhxgBUX2E1pGA=;
-        b=cuSRGaSnmx+YpYER3yG8y5bvb9zWzZ8dBdCAXGnfSujfCTGHlVIX+RVMeJWd9vNrsM
-         kghS9yViiCMu6e5FWSl+GLXJT6Pnon63czhnWB4MQIauaYxs0WAmwbBARBQdoN9NJiYc
-         UkW4dC0qYVrwk0uIwPe/fOvimxNFDF2cVHo0qe9W25UG76FjXJ/RHJZDvdgdDkmAAgBZ
-         LjXjiwOyWQax8EAGOiaQNcCq7bMIeafoPCyvhnBIe7erwD1L/BPuoYGI6K01c1A4iiJN
-         XOUoTr/wh6bl+U8rr0DyjdiXsyKgB3OILfUl+BZn9tPplm/GxMMtRekqffTzNFKFf0Ig
-         BKEw==
+        bh=J55GrORTZK1MXE275mZW5dmPuzvAC44whDG7RcFuX2Q=;
+        b=of8tboTP6hHtgVqktnuIai+ca9PaT4wT1dmNot9MIYNdyrHcLakqQRQtXGwfT6O4Q+
+         VrDfEiSblP98g+2iTBxk5oy2XRBHrnc4JkH1D3NjNLhjLJF4kwoma/72vCbfwtxi5MZs
+         /AS1z/yv545ULZLBGnNA3IyySZ7zVOAiEK9w6zZXMkXFGtWEKdgVlzh2v1CNek4q7iGM
+         e1txzLwxZZRloL/8D0oMifXLxMaUD2OUL6tthDY+DxxXxy5pT8t5b5DU0SfpCOLE6lN5
+         HSSrUI4iH32KNnWdoXBCReFuP3jMacVm1dOiC1rXNeg9rPxX1qeJIpf2O1tlmsjdd5T9
+         /tnQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690556611; x=1691161411;
+        d=1e100.net; s=20221208; t=1690556613; x=1691161413;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ft7NdQXHF3jUqk0jSagrDG7l3v2MbvEhxgBUX2E1pGA=;
-        b=fzht9PBYK/6A5DZodKBYbq54g9Tlpkha8tOFqaHp34RXBM+iDmBOT0MYW2fnuZwO8Z
-         qH4iK30yQfDCgKmE/cKsftOWOLbzv2OpYAvt7FFUqfPaKwZKrxOWUggrqX3enjUqd2p/
-         km+BpWGRU6cVE3+zbzJdiZ5yWinbnpvRhbcLe1+NDm3NkgswxKEpTUYfPpMHbqrMxRX9
-         0+uMWeIkbuPUtkgctaxmSi7LK5q8H9hSQhP3V1cz25yXQEu2d/1a40t3+5S9XRqCa8y1
-         A03+GyemqpNI6amI/YSkwCS/hgN+zXR5kczDW5jnSjpQHRDxxD+AqQ1D2vEqiwO4AL6i
-         vPFA==
-X-Gm-Message-State: ABy/qLbtMd7f9ut+B5KJNzsFZbLgXihDxp8J+0/OsQm9Hm5I1Pf+sXh5
-	tYLVQt77uO5JUMdCYPsuy3mpcDI4UQcxIQ==
-X-Google-Smtp-Source: APBJJlFOgkK3fDFcCqCx8J6nDiXuJ6Egz7pY4UTuqmui4NOiVUcBPTCi1zv8Q1gm+1LwS/2GgdHEVt13RGkKYA==
+        bh=J55GrORTZK1MXE275mZW5dmPuzvAC44whDG7RcFuX2Q=;
+        b=Tpi1CUhNeR9MjDNqo4Jy/GI4DrStLkMogSz2JTWK5NcQxcVnXLpMgu3T+03ubfmCnB
+         kk4o45cp2lGLDdslZgTv0x2V3TMOyawEI77NGLQ2gRsFfiJ8a2Jobqg3u5XFXO7Q9X0/
+         VJ1i0MJsL6g0lVP5vgVs8GnllQWEWk+4Dac/fmw/az5kk3xg3/rSZNs/kG2tTJuy1uB5
+         2/bNWIx7uj61eFm3C2+0EJj4XdQJcVg557hkAbHYPBhDiE0PvvHI0R6vLmTwrr58GQlC
+         88i6JIsUyxNfvDVQL4TWaG3NIQ2/XfHBvbXK3+NcqOHTAVZxFfyNB7CLIwkkFuQNmGy1
+         O14w==
+X-Gm-Message-State: ABy/qLa1ZJzB6aCbYavyGWhgh8oYl3o7Ysc9NWY5QEv0N1V1D1d+q9um
+	SHCBJyI6OmCg8y5EkUtfElWdo2xZ+H+dqA==
+X-Google-Smtp-Source: APBJJlEiuIx5WUxaBtZJWUe/yTDgLzANqn4+2uzWXEaMsebOJ8aDvnpmDxSEXW9I7wjsvYCaOv2pGJO2MzJdew==
 X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:6902:160e:b0:d09:6ba9:69ec with SMTP
- id bw14-20020a056902160e00b00d096ba969ecmr10279ybb.4.1690556611648; Fri, 28
- Jul 2023 08:03:31 -0700 (PDT)
-Date: Fri, 28 Jul 2023 15:03:13 +0000
+ (user=edumazet job=sendgmr) by 2002:a81:4304:0:b0:584:43af:7b0d with SMTP id
+ q4-20020a814304000000b0058443af7b0dmr13203ywa.2.1690556613495; Fri, 28 Jul
+ 2023 08:03:33 -0700 (PDT)
+Date: Fri, 28 Jul 2023 15:03:14 +0000
 In-Reply-To: <20230728150318.2055273-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -62,8 +62,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20230728150318.2055273-1-edumazet@google.com>
 X-Mailer: git-send-email 2.41.0.585.gd2178a4bd4-goog
-Message-ID: <20230728150318.2055273-7-edumazet@google.com>
-Subject: [PATCH net 06/11] net: add missing READ_ONCE(sk->sk_sndbuf) annotation
+Message-ID: <20230728150318.2055273-8-edumazet@google.com>
+Subject: [PATCH net 07/11] net: add missing READ_ONCE(sk->sk_rcvbuf) annotation
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -79,27 +79,27 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
 In a prior commit, I forgot to change sk_getsockopt()
-when reading sk->sk_sndbuf locklessly.
+when reading sk->sk_rcvbuf locklessly.
 
-Fixes: e292f05e0df7 ("tcp: annotate sk->sk_sndbuf lockless reads")
+Fixes: ebb3b78db7bf ("tcp: annotate sk->sk_rcvbuf lockless reads")
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
  net/core/sock.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/net/core/sock.c b/net/core/sock.c
-index 264c99c190ac9a550d93b760d78f006b216fcb75..ca43f7a302199724ecf155e3c03add7c964fd3ef 100644
+index ca43f7a302199724ecf155e3c03add7c964fd3ef..96616eb3869db6a6c33be34909af017d7dea59b1 100644
 --- a/net/core/sock.c
 +++ b/net/core/sock.c
-@@ -1639,7 +1639,7 @@ int sk_getsockopt(struct sock *sk, int level, int optname,
- 		break;
- 
- 	case SO_SNDBUF:
--		v.val = sk->sk_sndbuf;
-+		v.val = READ_ONCE(sk->sk_sndbuf);
+@@ -1643,7 +1643,7 @@ int sk_getsockopt(struct sock *sk, int level, int optname,
  		break;
  
  	case SO_RCVBUF:
+-		v.val = sk->sk_rcvbuf;
++		v.val = READ_ONCE(sk->sk_rcvbuf);
+ 		break;
+ 
+ 	case SO_REUSEADDR:
 -- 
 2.41.0.585.gd2178a4bd4-goog
 
