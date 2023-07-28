@@ -1,80 +1,84 @@
-Return-Path: <netdev+bounces-22220-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22222-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27722766991
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 11:59:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B533E76699F
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 12:00:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 585041C21828
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 09:59:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E5B551C21816
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 10:00:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24DCF1097D;
-	Fri, 28 Jul 2023 09:59:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 618901097F;
+	Fri, 28 Jul 2023 10:00:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1929E101C9
-	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 09:59:51 +0000 (UTC)
-Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3B5935AB;
-	Fri, 28 Jul 2023 02:59:49 -0700 (PDT)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1qPKFe-0011KU-S0; Fri, 28 Jul 2023 17:59:15 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 28 Jul 2023 17:59:14 +0800
-Date: Fri, 28 Jul 2023 17:59:14 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Ard Biesheuvel <ardb@kernel.org>
-Cc: linux-crypto@vger.kernel.org, Eric Biggers <ebiggers@kernel.org>,
-	Kees Cook <keescook@chromium.org>, Haren Myneni <haren@us.ibm.com>,
-	Nick Terrell <terrelln@fb.com>, Minchan Kim <minchan@kernel.org>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-	Richard Weinberger <richard@nod.at>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	qat-linux@intel.com, linuxppc-dev@lists.ozlabs.org,
-	linux-mtd@lists.infradead.org, netdev@vger.kernel.org
-Subject: Re: [RFC PATCH 00/21] crypto: consolidate and clean up compression
- APIs
-Message-ID: <ZMORcmIA/urS8OI4@gondor.apana.org.au>
-References: <20230718125847.3869700-1-ardb@kernel.org>
- <ZMOQiPadP2jggZ2i@gondor.apana.org.au>
- <CAMj1kXFRAhoyRD8mGe4xKZ-xGord2vwPXHCM7O8DPOpYWcgnJw@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1819011185
+	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 10:00:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 7CAD5C433C9;
+	Fri, 28 Jul 2023 10:00:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1690538422;
+	bh=ZIcz/QLug4MnlRNXI4CQ6phjwPWDIizZBNVnXkgRYWE=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=SgqvEM5JS7Fi6F7g6KpyoR1eSK4KPZRUOyvBMBoTDiTfxVs9cJjfig2iiYPYIECAj
+	 jPHq0H8MQQM/qMlX/3WYnBjg1m4Smv61CoomLHQgntHCdh03e2FJk/VPz7+ns0aI89
+	 FGSAmq4tM9rrgOWnkTHqiTz6l7IF8MU15IcOnG5nH2/KcKQV8axMFi7Eqh/V8j27K2
+	 0uD6Qtv4r1wxr44neXUAyUtOapVrkNi+ITpGv9xIycBaL8ZBw52UpRdzc5xh38nmLe
+	 hxfxjLFDRlSVMbNwj3PDAcUQArnhjODZtb8GSxu73qnxNzjVI+zveqqDCYJfbYuIU4
+	 UPh3l/5R/XnAg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 5E0D9C64459;
+	Fri, 28 Jul 2023 10:00:22 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAMj1kXFRAhoyRD8mGe4xKZ-xGord2vwPXHCM7O8DPOpYWcgnJw@mail.gmail.com>
-X-Spam-Status: No, score=2.7 required=5.0 tests=BAYES_00,HELO_DYNAMIC_IPADDR2,
-	RCVD_IN_DNSWL_BLOCKED,RDNS_DYNAMIC,SPF_HELO_NONE,SPF_PASS,TVD_RCVD_IP,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.6
-X-Spam-Level: **
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2] dt-bindings: net: rockchip-dwmac: fix {tx|rx}-delay
+ defaults/range in schema
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169053842237.6578.2445331118496951237.git-patchwork-notify@kernel.org>
+Date: Fri, 28 Jul 2023 10:00:22 +0000
+References: <20230726070615.673564-1-eugen.hristev@collabora.com>
+In-Reply-To: <20230726070615.673564-1-eugen.hristev@collabora.com>
+To: Eugen Hristev <eugen.hristev@collabora.com>
+Cc: linux-kernel@vger.kernel.org, linux-rockchip@lists.infradead.org,
+ linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org,
+ netdev@vger.kernel.org, david.wu@rock-chips.com, heiko@sntech.de,
+ krzysztof.kozlowski+dt@linaro.org, kernel@collabora.com
 
-On Fri, Jul 28, 2023 at 11:57:42AM +0200, Ard Biesheuvel wrote:
->
-> So will IPcomp be able to simply assign those pages to the SKB afterwards?
+Hello:
 
-Yes that is the idea.  The network stack is very much in love with
-SG lists :)
+This patch was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-Thanks,
+On Wed, 26 Jul 2023 10:06:15 +0300 you wrote:
+> The range and the defaults are specified in the description instead of
+> being specified in the schema.
+> Fix it by adding the default value in the `default` field and specifying
+> the range as `minimum` and `maximum`.
+> 
+> Fixes: b331b8ef86f0 ("dt-bindings: net: convert rockchip-dwmac to json-schema")
+> Signed-off-by: Eugen Hristev <eugen.hristev@collabora.com>
+> 
+> [...]
+
+Here is the summary with links:
+  - [v2] dt-bindings: net: rockchip-dwmac: fix {tx|rx}-delay defaults/range in schema
+    https://git.kernel.org/netdev/net/c/5416d7925e6e
+
+You are awesome, thank you!
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
