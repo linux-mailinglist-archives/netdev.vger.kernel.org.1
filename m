@@ -1,29 +1,29 @@
-Return-Path: <netdev+bounces-22188-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22189-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A65E766668
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 10:07:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45B01766669
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 10:08:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 438FF283094
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 08:07:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 777351C217E8
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 08:08:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C92BA1095F;
-	Fri, 28 Jul 2023 08:02:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16F0F12B8A;
+	Fri, 28 Jul 2023 08:02:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE9F210944
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 088D412B71
 	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 08:02:13 +0000 (UTC)
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE4E33C0C;
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 658D630E0;
 	Fri, 28 Jul 2023 01:01:53 -0700 (PDT)
 Received: from kwepemm600007.china.huawei.com (unknown [172.30.72.53])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4RC0Pk5Hv0ztRcF;
-	Fri, 28 Jul 2023 15:58:34 +0800 (CST)
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RC0Pb6MhmzNm62;
+	Fri, 28 Jul 2023 15:58:27 +0800 (CST)
 Received: from localhost.localdomain (10.67.165.2) by
  kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
@@ -36,9 +36,9 @@ CC: <shenjian15@huawei.com>, <wangjie125@huawei.com>,
 	<liuyonglong@huawei.com>, <wangpeiyang1@huawei.com>, <shaojijie@huawei.com>,
 	<netdev@vger.kernel.org>, <stable@vger.kernel.org>,
 	<linux-kernel@vger.kernel.org>
-Subject: [PATCH net 5/6] net: hns3: fix wrong print link down up
-Date: Fri, 28 Jul 2023 15:58:39 +0800
-Message-ID: <20230728075840.4022760-6-shaojijie@huawei.com>
+Subject: [PATCH net 6/6] net: hns3: fix deadlock issue when externel_lb and reset are executed together
+Date: Fri, 28 Jul 2023 15:58:40 +0800
+Message-ID: <20230728075840.4022760-7-shaojijie@huawei.com>
 X-Mailer: git-send-email 2.30.0
 In-Reply-To: <20230728075840.4022760-1-shaojijie@huawei.com>
 References: <20230728075840.4022760-1-shaojijie@huawei.com>
@@ -60,34 +60,81 @@ X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Peiyang Wang <wangpeiyang1@huawei.com>
+From: Yonglong Liu <liuyonglong@huawei.com>
 
-This patch will fix a wrong print "device link down/up". Consider a case
-that set autoneg to off with same speed and duplex configuration. The link
-is always up while the phy state is set to PHY_UP and set back to
-PHY_RUNNING later. It will print link down when the phy state is not
-PHY_RUNNING. To avoid that, the condition should include PHY_UP.
+When externel_lb and reset are executed together, a deadlock may
+occur:
+[ 3147.217009] INFO: task kworker/u321:0:7 blocked for more than 120 seconds.
+[ 3147.230483] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+[ 3147.238999] task:kworker/u321:0  state:D stack:    0 pid:    7 ppid:     2 flags:0x00000008
+[ 3147.248045] Workqueue: hclge hclge_service_task [hclge]
+[ 3147.253957] Call trace:
+[ 3147.257093]  __switch_to+0x7c/0xbc
+[ 3147.261183]  __schedule+0x338/0x6f0
+[ 3147.265357]  schedule+0x50/0xe0
+[ 3147.269185]  schedule_preempt_disabled+0x18/0x24
+[ 3147.274488]  __mutex_lock.constprop.0+0x1d4/0x5dc
+[ 3147.279880]  __mutex_lock_slowpath+0x1c/0x30
+[ 3147.284839]  mutex_lock+0x50/0x60
+[ 3147.288841]  rtnl_lock+0x20/0x2c
+[ 3147.292759]  hclge_reset_prepare+0x68/0x90 [hclge]
+[ 3147.298239]  hclge_reset_subtask+0x88/0xe0 [hclge]
+[ 3147.303718]  hclge_reset_service_task+0x84/0x120 [hclge]
+[ 3147.309718]  hclge_service_task+0x2c/0x70 [hclge]
+[ 3147.315109]  process_one_work+0x1d0/0x490
+[ 3147.319805]  worker_thread+0x158/0x3d0
+[ 3147.324240]  kthread+0x108/0x13c
+[ 3147.328154]  ret_from_fork+0x10/0x18
 
-Signed-off-by: Peiyang Wang <wangpeiyang1@huawei.com>
+In externel_lb process, the hns3 driver call napi_disable()
+first, then the reset happen, then the restore process of the
+externel_lb will fail, and will not call napi_enable(). When
+doing externel_lb again, napi_disable() will be double call,
+cause a deadlock of rtnl_lock().
+
+This patch use the HNS3_NIC_STATE_DOWN state to protect the
+calling of napi_disable() and napi_enable() in externel_lb
+process, just as the usage in ndo_stop() and ndo_start().
+
+Fixes: 04b6ba143521 ("net: hns3: add support for external loopback test")
+Signed-off-by: Yonglong Liu <liuyonglong@huawei.com>
 Signed-off-by: Jijie Shao <shaojijie@huawei.com>
 ---
- drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ drivers/net/ethernet/hisilicon/hns3/hns3_enet.c | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-index a940e35aef29..1723d0fa49ee 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-@@ -3089,7 +3089,8 @@ static int hclge_get_mac_phy_link(struct hclge_dev *hdev, int *link_status)
- 	if (test_bit(HCLGE_STATE_DOWN, &hdev->state))
- 		return 0;
+diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
+index 823e6d2e85f5..7da54a5b81d1 100644
+--- a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
++++ b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
+@@ -5855,6 +5855,9 @@ void hns3_external_lb_prepare(struct net_device *ndev, bool if_running)
+ 	if (!if_running)
+ 		return;
  
--	if (phydev && (phydev->state != PHY_RUNNING || !phydev->link))
-+	if (phydev && ((phydev->state != PHY_UP &&
-+			phydev->state != PHY_RUNNING) || !phydev->link))
- 		return 0;
++	if (test_and_set_bit(HNS3_NIC_STATE_DOWN, &priv->state))
++		return;
++
+ 	netif_carrier_off(ndev);
+ 	netif_tx_disable(ndev);
  
- 	return hclge_get_mac_link_status(hdev, link_status);
+@@ -5883,7 +5886,16 @@ void hns3_external_lb_restore(struct net_device *ndev, bool if_running)
+ 	if (!if_running)
+ 		return;
+ 
+-	hns3_nic_reset_all_ring(priv->ae_handle);
++	if (hns3_nic_resetting(ndev))
++		return;
++
++	if (!test_bit(HNS3_NIC_STATE_DOWN, &priv->state))
++		return;
++
++	if (hns3_nic_reset_all_ring(priv->ae_handle))
++		return;
++
++	clear_bit(HNS3_NIC_STATE_DOWN, &priv->state);
+ 
+ 	for (i = 0; i < priv->vector_num; i++)
+ 		hns3_vector_enable(&priv->tqp_vector[i]);
 -- 
 2.30.0
 
