@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-22254-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22255-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9AC09766BC0
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 13:32:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E677766BCD
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 13:33:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3AA39282577
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 11:32:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7B9F31C2186A
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 11:33:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 342F6125DC;
-	Fri, 28 Jul 2023 11:32:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 361E2125DD;
+	Fri, 28 Jul 2023 11:33:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2709EC8C9
-	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 11:32:22 +0000 (UTC)
-Received: from mail-wm1-x32e.google.com (mail-wm1-x32e.google.com [IPv6:2a00:1450:4864:20::32e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0F0A30F5
-	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 04:32:18 -0700 (PDT)
-Received: by mail-wm1-x32e.google.com with SMTP id 5b1f17b1804b1-3fe078dcc3aso5614175e9.2
-        for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 04:32:18 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23BC3125D0
+	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 11:33:03 +0000 (UTC)
+Received: from mail-wr1-x42c.google.com (mail-wr1-x42c.google.com [IPv6:2a00:1450:4864:20::42c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28DEA3C0F
+	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 04:32:57 -0700 (PDT)
+Received: by mail-wr1-x42c.google.com with SMTP id ffacd0b85a97d-3178dd81ac4so412662f8f.3
+        for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 04:32:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1690543937; x=1691148737;
+        d=linaro.org; s=google; t=1690543975; x=1691148775;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=+F++azjWGXR/zzwHylDS5zKIIkHfazjhU13uoVBCItI=;
-        b=AMnkE9WuW7Szt2FbkP+Jy7gImGXicajY9/8nwcsWkrUwhvEUvP7ntHlB4esXk3K8U4
-         0i6OvKn+5MRV/VvX72hQyI3+TxZnb6cRN+AlFwW7eoAEroux8iHcBnUojCtWchKA78jl
-         SY5zsDpCGe7jFTiAVJefedCk62+1uRl1DCOGCwjHw3AcI7lBvwuS6yZmpan72Z124GkA
-         HzuwDVmYWrxvejLrwD5DxuP7Te8Jagm+rkOkbxUiWNpEVTWGGoMyhL+3cuwlWbXGDr0B
-         nKgA+tN0Fx8WjnGsZEpQTGxaPoJXDju/pS2BVUhj93heIIMcoWmwxaaXx1t90HNC7HAh
-         LaVA==
+        bh=bvt6gTVxDn+2sUGsn1CSbJgPH86R0eTVqQfCu4TXUDo=;
+        b=ihYG/3HHPl5FBpQ+akutSxXPgMXuWO0DzvVRM1SksGA8Z6z6pOdw0xIixvMEZJwJcd
+         4Z9oCv17ECKWSDIarWP03zMzkLYWgMwcwhoxSSaT5GUpRNxEjtRo4EY8oOokfuAmg2K3
+         X3bV9VHSl8t4uwTz1mse0RuhyVeDc9KRKdziDQTXDWRDJdS8WyXvQtCDSSpsLP63bbdW
+         cOiiI52GZVUebGyMsG2X5E6fYT0OIJFnxGAXUetZKDydkrF3Wl2/fb0Wxp0Z75TVQh6T
+         giWorb/o+3LTFwvzrenWwbszz2vm7NxrLdr+hhPHn+acqPkmYagZ70swmgFq3rn/3E7w
+         YSgg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690543937; x=1691148737;
+        d=1e100.net; s=20221208; t=1690543975; x=1691148775;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+F++azjWGXR/zzwHylDS5zKIIkHfazjhU13uoVBCItI=;
-        b=U3LlX5rs2f0Q7ji9a0sNchb+onVz7FzbkAjOn2E14b2BqjFYThtL1Yh6VpDEX5nADi
-         2y2PlyYJC1GGgcqX0ac/RJRBAz5OMJ4kltAHpSkyV5e+z7EQlIWge3/oXf2BH1CfdXME
-         xVEBfP8PBdzxKLWXhGEQqsTlNoH29yTWuHxYDqXqRDBKiFtWZdPe6I8fOvZ4VpvMww2+
-         TD/hGQ15SjrIm+51iwXQvO+IXZMkL22AdAFGUL6hY6CJLAAryMFy9YvppUZkGKbC+qMS
-         usyMnrfrWdbOgnlkMTbMdrqWdXxoovRMx1UdvKbfAmDZwW2xVuPHxm6ReyCtIfLJC89J
-         F4YQ==
-X-Gm-Message-State: ABy/qLazpxq/3N/KMZau43en/kXeHpcfeA0AtND5WEHJBkE+bhrimONh
-	Tx7TeOz7ros93kj9NxlB2DqbDQ==
-X-Google-Smtp-Source: APBJJlGEkskLn7KheQI/2hh6B8RIJum6fk3h7Nk91C/s4cct7x2FxIqw26uj1lGmelJK6ucVYjt8Ng==
-X-Received: by 2002:adf:e94f:0:b0:314:3611:3e54 with SMTP id m15-20020adfe94f000000b0031436113e54mr1907446wrn.9.1690543937250;
-        Fri, 28 Jul 2023 04:32:17 -0700 (PDT)
+        bh=bvt6gTVxDn+2sUGsn1CSbJgPH86R0eTVqQfCu4TXUDo=;
+        b=Fywk29sHdcln4eL+QI+p33TDyLPOivkRG2A7z5w32QoHWBXTZzxRBsd2VuLMrkLHXV
+         szL0wnOSVzj83GEW9jmswL8HeMIRUBnGQmZNgabc/j2SUeCxcZDTXnXeoL4XptrBd69l
+         vWb8wRHj6a+sBwezs1RNq1KcUvSX9peJsDhwoYNkdKLTJ5RDsgB6MLCXHPjkHcy1KOWr
+         DTSDVRioP79BqLaGARp96yoFWXIEr13Rh8yUuF4GN3Oj5Be3m1GOto9X7r8N8O7k7Nq4
+         tkrJ7BpTK+DuQlofol0BFM3d6KPrK8lWBfGoFsxEUTZjiW57pZmtDsb0EwmKwOBmTGZu
+         uETw==
+X-Gm-Message-State: ABy/qLaT+3WVLDbdrsmm5WF3oqi1dWvZ2t4LRxrNSr7dV0vwVhHLM3XD
+	O3nQkCSs5NriLxd4fxq8Tkbt1w==
+X-Google-Smtp-Source: APBJJlGzFqci86oHnzgj2vDsZF3+rlLFEk6DPLtkPGOiNL5NezUh1WtcFdshRpGeLkVsg8nMnAV0bg==
+X-Received: by 2002:a5d:554b:0:b0:317:6816:578c with SMTP id g11-20020a5d554b000000b003176816578cmr2003464wrw.5.1690543975603;
+        Fri, 28 Jul 2023 04:32:55 -0700 (PDT)
 Received: from [192.168.1.20] ([178.197.223.104])
-        by smtp.gmail.com with ESMTPSA id m14-20020adffa0e000000b003177e9b2e64sm4508524wrr.90.2023.07.28.04.32.13
+        by smtp.gmail.com with ESMTPSA id y8-20020adffa48000000b003159d2dabbasm4575839wrr.94.2023.07.28.04.32.50
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 28 Jul 2023 04:32:16 -0700 (PDT)
-Message-ID: <c0792cfd-db4f-7153-0775-824912277908@linaro.org>
-Date: Fri, 28 Jul 2023 13:32:12 +0200
+        Fri, 28 Jul 2023 04:32:55 -0700 (PDT)
+Message-ID: <75fb91cc-e505-7aa9-b90d-0b4d5c643b69@linaro.org>
+Date: Fri, 28 Jul 2023 13:32:50 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -115,8 +115,12 @@ On 28/07/2023 12:22, Varshini Rajendran wrote:
 >  - Support for basic peripherals is added
 >  - Target board SAM9X75 Curiosity is added
 > 
+>  Changes in v3:
+>  --------------
+> 
+>  - Fixed the DT documentation errors pointed out in v2.
 
-Your threading is absolutely broken making it difficult to review and apply.
+That's too generic. What changed?
 
 Best regards,
 Krzysztof
