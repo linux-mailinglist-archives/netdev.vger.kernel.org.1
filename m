@@ -1,137 +1,142 @@
-Return-Path: <netdev+bounces-22199-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22200-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBCED766721
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 10:29:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55DC9766735
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 10:33:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D8AEA1C21163
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 08:29:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 113E428271D
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 08:33:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48224101F3;
-	Fri, 28 Jul 2023 08:29:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2500AD305;
+	Fri, 28 Jul 2023 08:33:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DAC41844
-	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 08:29:56 +0000 (UTC)
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6566E3A9F
-	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 01:29:53 -0700 (PDT)
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-59-spQ2bcCCN6uK73WIrMkiVA-1; Fri, 28 Jul 2023 09:29:50 +0100
-X-MC-Unique: spQ2bcCCN6uK73WIrMkiVA-1
-Received: from AcuMS.Aculab.com (10.202.163.4) by AcuMS.aculab.com
- (10.202.163.4) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Fri, 28 Jul
- 2023 09:29:48 +0100
-Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
- id 15.00.1497.048; Fri, 28 Jul 2023 09:29:48 +0100
-From: David Laight <David.Laight@ACULAB.COM>
-To: 'Jijie Shao' <shaojijie@huawei.com>, "yisen.zhuang@huawei.com"
-	<yisen.zhuang@huawei.com>, "salil.mehta@huawei.com" <salil.mehta@huawei.com>,
-	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
-	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>
-CC: "shenjian15@huawei.com" <shenjian15@huawei.com>, "wangjie125@huawei.com"
-	<wangjie125@huawei.com>, "liuyonglong@huawei.com" <liuyonglong@huawei.com>,
-	"wangpeiyang1@huawei.com" <wangpeiyang1@huawei.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "stable@vger.kernel.org" <stable@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH net 1/6] net: hns3: fix side effects passed to min_t()
-Thread-Topic: [PATCH net 1/6] net: hns3: fix side effects passed to min_t()
-Thread-Index: AQHZwSodHT1OfdHQgUOtv3IG+DBXRa/O1ztQ
-Date: Fri, 28 Jul 2023 08:29:48 +0000
-Message-ID: <85e3c423aa5a400981ae5c53a29ee280@AcuMS.aculab.com>
-References: <20230728075840.4022760-1-shaojijie@huawei.com>
- <20230728075840.4022760-2-shaojijie@huawei.com>
-In-Reply-To: <20230728075840.4022760-2-shaojijie@huawei.com>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1985BC8CB
+	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 08:33:36 +0000 (UTC)
+Received: from mgamail.intel.com (unknown [192.55.52.151])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 926383A97
+	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 01:33:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1690533215; x=1722069215;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=Hnc0lMNk+anUERBMUxuJAA1oybg5268RVleOUAuDplc=;
+  b=E1SWMzCsyZLHAOGftB5FVgiQDcTh9QEMxdTea4NbElBzyGgOMfzlmm1Z
+   jGeDfbX3c5GWewQI1ykx2BDnNtv4Rre9JN8sCo9IGEClqAMxks00AyT4X
+   A7gQwq92AI7zLNePmrmvr+QJe1Ft9y6iKl5rDb5sD+9w8MI1g07SHFjDv
+   HhCoblVnpx2quxIaMcZCCngBNR+289QVSi+mmnoGZXRleAN9eKL1hEHnP
+   Ys3ZRoTBrqPuTltEoRYZZCJpw0KCL29fLwibSvr9/nPtTPGEvcWStDEpd
+   qdVwUvp0z/tYiehHMS3qkmcMOY0F8ZgyJP6Aq+mOreES8EhU0SzdFbeWd
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10784"; a="348822849"
+X-IronPort-AV: E=Sophos;i="6.01,236,1684825200"; 
+   d="scan'208";a="348822849"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jul 2023 01:32:03 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10784"; a="797361920"
+X-IronPort-AV: E=Sophos;i="6.01,236,1684825200"; 
+   d="scan'208";a="797361920"
+Received: from irvmail002.ir.intel.com ([10.43.11.120])
+  by fmsmga004.fm.intel.com with ESMTP; 28 Jul 2023 01:32:02 -0700
+Received: from rozewie.igk.intel.com (rozewie.igk.intel.com [10.211.8.69])
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id D4FE437E09;
+	Fri, 28 Jul 2023 09:32:01 +0100 (IST)
+From: Wojciech Drewek <wojciech.drewek@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	pmenzel@molgen.mpg.de
+Subject: [PATCH iwl-next v2] ice: Support untagged VLAN traffic in br offload
+Date: Fri, 28 Jul 2023 10:30:42 +0200
+Message-Id: <20230728083042.13326-1-wojciech.drewek@intel.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Jijie Shao
-> Sent: 28 July 2023 08:59
->=20
-> num_online_cpus() may call more than once when passing to min_t(),
-> between calls, it may return different values, so move num_online_cpus()
-> out of min_t().
+When driver receives SWITCHDEV_FDB_ADD_TO_DEVICE notification
+with vid = 1, it means that we have to offload untagged traffic.
+This is achieved by adding vlan metadata lookup.
 
-Nope, wrong bug:
-min() (and friends) are careful to only evaluate their arguments once.
-The bug is using min_t() - especially with a small type.
+Signed-off-by: Wojciech Drewek <wojciech.drewek@intel.com>
+---
+v2: remove unrelated changes, fix typos, add comment in
+    ice_eswitch_br_get_lkups_cnt
+---
+ drivers/net/ethernet/intel/ice/ice_eswitch_br.c | 10 +++++++---
+ drivers/net/ethernet/intel/ice/ice_eswitch_br.h |  9 ---------
+ 2 files changed, 7 insertions(+), 12 deletions(-)
 
-If/when the number of cpu hits 65536 the (u16) cast will convert
-it to zero.
-
-Looking at the code a lot of the local variables should be
-'unsigned int' not 'u16.
-Just because the domain of a value is small doesn't mean
-you should use a small type (unless you are saving space in
-a structure).
-
-=09David
-
->=20
-> Signed-off-by: Yonglong Liu <liuyonglong@huawei.com>
-> Signed-off-by: Jijie Shao <shaojijie@huawei.com>
-> ---
->  drivers/net/ethernet/hisilicon/hns3/hns3_enet.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->=20
-> diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
-> b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
-> index 9f6890059666..823e6d2e85f5 100644
-> --- a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
-> +++ b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
-> @@ -4757,6 +4757,7 @@ static int hns3_nic_alloc_vector_data(struct hns3_n=
-ic_priv *priv)
->  {
->  =09struct hnae3_handle *h =3D priv->ae_handle;
->  =09struct hns3_enet_tqp_vector *tqp_vector;
-> +=09u32 online_cpus =3D num_online_cpus();
->  =09struct hnae3_vector_info *vector;
->  =09struct pci_dev *pdev =3D h->pdev;
->  =09u16 tqp_num =3D h->kinfo.num_tqps;
-> @@ -4766,7 +4767,7 @@ static int hns3_nic_alloc_vector_data(struct hns3_n=
-ic_priv *priv)
->=20
->  =09/* RSS size, cpu online and vector_num should be the same */
->  =09/* Should consider 2p/4p later */
-> -=09vector_num =3D min_t(u16, num_online_cpus(), tqp_num);
-> +=09vector_num =3D min_t(u16, online_cpus, tqp_num);
->=20
->  =09vector =3D devm_kcalloc(&pdev->dev, vector_num, sizeof(*vector),
->  =09=09=09      GFP_KERNEL);
-> --
-> 2.30.0
-
+diff --git a/drivers/net/ethernet/intel/ice/ice_eswitch_br.c b/drivers/net/ethernet/intel/ice/ice_eswitch_br.c
+index 67bfd1f61cdd..5b425260b0eb 100644
+--- a/drivers/net/ethernet/intel/ice/ice_eswitch_br.c
++++ b/drivers/net/ethernet/intel/ice/ice_eswitch_br.c
+@@ -104,13 +104,18 @@ ice_eswitch_br_rule_delete(struct ice_hw *hw, struct ice_rule_query_data *rule)
+ static u16
+ ice_eswitch_br_get_lkups_cnt(u16 vid)
+ {
+-	return ice_eswitch_br_is_vid_valid(vid) ? 2 : 1;
++	/* if vid == 0 then we need only one lookup (ICE_MAC_OFOS),
++	 * otherwise we need both mac and vlan
++	 */
++	return vid == 0 ? 1 : 2;
+ }
+ 
+ static void
+ ice_eswitch_br_add_vlan_lkup(struct ice_adv_lkup_elem *list, u16 vid)
+ {
+-	if (ice_eswitch_br_is_vid_valid(vid)) {
++	if (vid == 1) {
++		ice_rule_add_vlan_metadata(&list[1]);
++	} else if (vid > 1) {
+ 		list[1].type = ICE_VLAN_OFOS;
+ 		list[1].h_u.vlan_hdr.vlan = cpu_to_be16(vid & VLAN_VID_MASK);
+ 		list[1].m_u.vlan_hdr.vlan = cpu_to_be16(0xFFFF);
+@@ -400,7 +405,6 @@ ice_eswitch_br_fdb_entry_create(struct net_device *netdev,
+ 	unsigned long event;
+ 	int err;
+ 
+-	/* untagged filtering is not yet supported */
+ 	if (!(bridge->flags & ICE_ESWITCH_BR_VLAN_FILTERING) && vid)
+ 		return;
+ 
+diff --git a/drivers/net/ethernet/intel/ice/ice_eswitch_br.h b/drivers/net/ethernet/intel/ice/ice_eswitch_br.h
+index 85a8fadb2928..cf7b0e5acfcb 100644
+--- a/drivers/net/ethernet/intel/ice/ice_eswitch_br.h
++++ b/drivers/net/ethernet/intel/ice/ice_eswitch_br.h
+@@ -103,15 +103,6 @@ struct ice_esw_br_vlan {
+ 		     struct ice_esw_br_fdb_work, \
+ 		     work)
+ 
+-static inline bool ice_eswitch_br_is_vid_valid(u16 vid)
+-{
+-	/* In trunk VLAN mode, for untagged traffic the bridge sends requests
+-	 * to offload VLAN 1 with pvid and untagged flags set. Since these
+-	 * flags are not supported, add a MAC filter instead.
+-	 */
+-	return vid > 1;
+-}
 -
-Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1=
-PT, UK
-Registration No: 1397386 (Wales)
+ void
+ ice_eswitch_br_offloads_deinit(struct ice_pf *pf);
+ int
+-- 
+2.40.1
 
 
