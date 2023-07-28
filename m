@@ -1,74 +1,79 @@
-Return-Path: <netdev+bounces-22157-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22158-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B0E9766571
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 09:35:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47F5E766583
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 09:41:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 43E271C217FF
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 07:35:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1978F1C217F6
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 07:41:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11134C2FB;
-	Fri, 28 Jul 2023 07:35:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CD58C8C0;
+	Fri, 28 Jul 2023 07:41:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 046E4C2C0
-	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 07:35:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B7BE1844
+	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 07:41:53 +0000 (UTC)
 Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDF772D5B;
-	Fri, 28 Jul 2023 00:35:40 -0700 (PDT)
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-	by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20230728073539euoutp024ce08c88b937ef44594e48c547dec293~199dW91ly3106331063euoutp02F;
-	Fri, 28 Jul 2023 07:35:39 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20230728073539euoutp024ce08c88b937ef44594e48c547dec293~199dW91ly3106331063euoutp02F
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1B7BB6;
+	Fri, 28 Jul 2023 00:41:50 -0700 (PDT)
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+	by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20230728074149euoutp02aa03f38d08b21dca519f3165493919e2~1_C1yISzF0427104271euoutp02S;
+	Fri, 28 Jul 2023 07:41:49 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20230728074149euoutp02aa03f38d08b21dca519f3165493919e2~1_C1yISzF0427104271euoutp02S
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1690529739;
-	bh=jUzBfACVBE6PRXtosK5veJt2pcwU2AhBbGaNBCP0R8M=;
+	s=mail20170921; t=1690530109;
+	bh=gb0miwVpBtIdFutOnqdv+X2fb1Y0tMg1ouc2sR7L3Os=;
 	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-	b=biG7FzOrlqlayuOGUKkhLs3BBNP5YHjKHrq9ooM+zrk0GJXPK/CPusfD6PUt0dN6j
-	 /7dgKeZ9rgRyvumFU2WK3Z8qz8AKHt+oCXLg0iC17CBw26xOPT/e23Rs32SdwKSuNu
-	 q8C5scIIXExYnuSYwIn3pKM5+QNgGQ//+dweL7pk=
+	b=jP0fYcKVCJeYDv1Gx0jUCRduXfY4vnQsfFN/589lOAwqqHmnGo95sviSApP85HqL/
+	 b3N2mBa5tzSY5cdpqkjFos0iAVUm5SnHZIO0zPNk6R4D/CcfBpndnhSc1WHJDTctye
+	 vKJqYYTTS5KjUdaB6JnaFL/A8rqxgZ8sffzJ83hk=
 Received: from eusmges3new.samsung.com (unknown [203.254.199.245]) by
-	eucas1p1.samsung.com (KnoxPortal) with ESMTP id
-	20230728073539eucas1p1decf1bbfd5d886005ea3252b6f8e2652~199dJor031741017410eucas1p1o;
-	Fri, 28 Jul 2023 07:35:39 +0000 (GMT)
+	eucas1p2.samsung.com (KnoxPortal) with ESMTP id
+	20230728074148eucas1p2ae388ed7dc413903e0c928858d865465~1_C1hrfZu1594615946eucas1p28;
+	Fri, 28 Jul 2023 07:41:48 +0000 (GMT)
 Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
-	eusmges3new.samsung.com (EUCPMTA) with SMTP id 50.B0.37758.BCF63C46; Fri, 28
-	Jul 2023 08:35:39 +0100 (BST)
+	eusmges3new.samsung.com (EUCPMTA) with SMTP id 96.02.37758.C3173C46; Fri, 28
+	Jul 2023 08:41:48 +0100 (BST)
 Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
-	eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
-	20230728073538eucas1p2982d41e7680ab7c3864e41aafab811e5~199c0NyvD2749527495eucas1p2U;
-	Fri, 28 Jul 2023 07:35:38 +0000 (GMT)
+	eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
+	20230728074148eucas1p119baa7ba630f26611d21a9a78aa4f48c~1_C1C-3SU2160921609eucas1p14;
+	Fri, 28 Jul 2023 07:41:48 +0000 (GMT)
 Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
 	eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
-	20230728073538eusmtrp227449068ccd63271a22a314a291265a8~199czmarN0886108861eusmtrp2n;
-	Fri, 28 Jul 2023 07:35:38 +0000 (GMT)
-X-AuditID: cbfec7f5-815ff7000002937e-1d-64c36fcb28c2
-Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
-	eusmgms1.samsung.com (EUCPMTA) with SMTP id 6A.2B.10549.ACF63C46; Fri, 28
-	Jul 2023 08:35:38 +0100 (BST)
+	20230728074148eusmtrp2dbb0a376f74c12352732d7535784f5c4~1_C1CM1wD1226012260eusmtrp2G;
+	Fri, 28 Jul 2023 07:41:48 +0000 (GMT)
+X-AuditID: cbfec7f5-815ff7000002937e-2e-64c3713cfa1f
+Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
+	eusmgms1.samsung.com (EUCPMTA) with SMTP id 1D.4C.10549.C3173C46; Fri, 28
+	Jul 2023 08:41:48 +0100 (BST)
 Received: from CAMSVWEXC02.scsc.local (unknown [106.1.227.72]) by
-	eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
-	20230728073538eusmtip12c211f8d94a72e1b9053d1e713e8076d~199cncDM92884028840eusmtip1U;
-	Fri, 28 Jul 2023 07:35:38 +0000 (GMT)
+	eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
+	20230728074148eusmtip28b25f50dcc0ee88f4a41f3cc59f47298~1_C01TN9D2079920799eusmtip2G;
+	Fri, 28 Jul 2023 07:41:48 +0000 (GMT)
 Received: from localhost (106.210.248.223) by CAMSVWEXC02.scsc.local
 	(2002:6a01:e348::6a01:e348) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
-	Fri, 28 Jul 2023 08:35:37 +0100
-Date: Fri, 28 Jul 2023 09:35:36 +0200
+	Fri, 28 Jul 2023 08:41:47 +0100
+Date: Fri, 28 Jul 2023 09:41:46 +0200
 From: Joel Granados <j.granados@samsung.com>
 To: Luis Chamberlain <mcgrof@kernel.org>
-CC: Joerg Reuter <jreuter@yaina.de>, Ralf Baechle <ralf@linux-mips.org>,
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	<willy@infradead.org>, <keescook@chromium.org>, <josh@joshtriplett.org>,
-	<linux-hams@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 09/14] ax.25: Update to register_net_sysctl_sz
-Message-ID: <20230728073536.egpe6to3s3pndi6r@localhost>
+CC: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Catalin Marinas
+	<catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Heiko Carstens
+	<hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev
+	<agordeev@linux.ibm.com>, Kees Cook <keescook@chromium.org>, Iurii Zaikin
+	<yzaikin@google.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, <willy@infradead.org>, <josh@joshtriplett.org>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>, Sven Schnelle
+	<svens@linux.ibm.com>, <linux-arm-kernel@lists.infradead.org>,
+	<linux-kernel@vger.kernel.org>, <linux-s390@vger.kernel.org>,
+	<linux-fsdevel@vger.kernel.org>, <netdev@vger.kernel.org>
+Subject: Re: [PATCH 06/14] sysctl: Add size to register_sysctl
+Message-ID: <20230728074146.lwapkrfyn2kqvyec@localhost>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,59 +81,61 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg="pgp-sha512";
-	protocol="application/pgp-signature"; boundary="qapdrkzqpsgeioz3"
+	protocol="application/pgp-signature"; boundary="23prfwofjqduce7c"
 Content-Disposition: inline
-In-Reply-To: <ZMKQ2OuFy1deZktP@bombadil.infradead.org>
+In-Reply-To: <ZMKQSqeKNcJCqkDB@bombadil.infradead.org>
 X-Originating-IP: [106.210.248.223]
 X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
 	CAMSVWEXC02.scsc.local (2002:6a01:e348::6a01:e348)
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrNKsWRmVeSWpSXmKPExsWy7djP87qn8w+nGLy9wmox53wLi8XTY4/Y
-	Lf4vyLf42cdtcaY71+LCtj5Wi2vb7zJZXN41h83ixoSnjBbHFohZfDv9htHi0h4Vi98/5rA5
-	8HrMbrjI4rFl5U0mjwWbSj02r9DyuPXa1mPTqk42j6Mr1zJ5vN93lc3j8yY5jzfTXjMFcEVx
-	2aSk5mSWpRbp2yVwZfTu3sFY8E6w4tL1D8wNjC38XYycHBICJhILZl1jArGFBFYwSmxY5tjF
-	yAVkf2GU+DCxhwnC+cwo8WTGF3aYjnVL+6ESyxklHk56zQhXda15MxuEs5VR4mLnJzaQFhYB
-	VYlbyw6BLWET0JE4/+YOM4gtIqAhsW9CL9goZoEmZonDK/6DNQgLOEk8nnCFFcTmFTCXaGz6
-	xghhC0qcnPmEpYuRA6ihQuLuA3cIU1pi+T8OEJNTwEyie7swxKHKEgeX/IY6ulbi1JZbYJsk
-	BO5xSpxqXcIGkXCR6DiygBHCFpZ4dXwLVIOMxP+d86EaJjNK7P/3gR3CWc0osazxKxNElbVE
-	y5UnUB2OEmd6drCCXCEhwCdx460gSJgZyJy0bTozRJhXoqNNCKJaTWL1vTcsExiVZyF5bBbC
-	Y7MQHpsFNkdHYsHuT2wYwtoSyxa+ZoawbSXWrXvPsoCRfRWjeGppcW56arFxXmq5XnFibnFp
-	Xrpecn7uJkZgmjz97/jXHYwrXn3UO8TIxMF4iFEFqPnRhtUXGKVY8vLzUpVEeE8FHEoR4k1J
-	rKxKLcqPLyrNSS0+xCjNwaIkzqttezJZSCA9sSQ1OzW1ILUIJsvEwSnVwJS94fCGmg2C4o61
-	jx0UjhkfE7SOrBQR469vnjvlnt1eHYOpp2by1cj3Bfy3jo2KiIrgclRQW9Iw7a+pG1/Vv8zy
-	NJHc2F6LPoOPV1OPP+tNaJj1NWRiPpOx41SvbOFpRdcCr69R7/GLWzBfidXz9gXVvQ1zFz/r
-	3qibvta89/cluziFmJ/TVFd5bHgXwST99J+3370+Qd+G6UqdsfMmaC+1SzJP7170kdXA0/zg
-	4q1eolf9NUpevKm9zuHldf3Qp8PLQwV6zz6a4HdJr8KcVbfDcu3JOrt9NRMPRvZOlpm9dfrD
-	uORPl1sEvHmK3zV9+F2s35uo//6TdsmZ4PQmu9M57dmyE63s5NZ8faqtxFKckWioxVxUnAgA
-	0RJrZQ4EAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprJKsWRmVeSWpSXmKPExsVy+t/xu7qn8g+nGBzs1bGYc76FxeLpsUfs
-	Fv8X5Fv87OO2ONOda3FhWx+rxbXtd5ksLu+aw2ZxY8JTRotjC8Qsvp1+w2hxaY+Kxe8fc9gc
-	eD1mN1xk8diy8iaTx4JNpR6bV2h53Hpt67FpVSebx9GVa5k83u+7yubxeZOcx5tpr5kCuKL0
-	bIryS0tSFTLyi0tslaINLYz0DC0t9IxMLPUMjc1jrYxMlfTtbFJSczLLUov07RL0MnY33WIp
-	eCNYMfP9FfYGxib+LkZODgkBE4l1S/uZQGwhgaWMEu//xkLEZSQ2frnKCmELS/y51sXWxcgF
-	VPORUeLo6S/MEM5WRolVk/eDVbEIqErcWnYIbBKbgI7E+Td3mEFsEQENiX0TeplAGpgFmpgl
-	Dq/4zwaSEBZwkng84QpYM6+AuURj0zdGiKlnmCQmrZ3ABJEQlDg58wkLiM0sUCbxvnEF0FQO
-	IFtaYvk/DhCTU8BMonu7MMSlyhIHl/xmh7BrJT7/fcY4gVF4FpJBs5AMmoUwCCKsJXHj30sm
-	DGFtiWULXzND2LYS69a9Z1nAyL6KUSS1tDg3PbfYUK84Mbe4NC9dLzk/dxMjMF1sO/Zz8w7G
-	ea8+6h1iZOJgPMSoAtT5aMPqC4xSLHn5ealKIrynAg6lCPGmJFZWpRblxxeV5qQWH2I0BYbi
-	RGYp0eR8YCLLK4k3NDMwNTQxszQwtTQzVhLn9SzoSBQSSE8sSc1OTS1ILYLpY+LglGpgso5e
-	xu7PlfglM2nB66VfRT8kvJwWuPjWodKFyiKXWCU0r3PO1VaocFpWs9hBk3XC2kUfn/28cbUj
-	5UuIFLOD8IxegwrtCc2f+sV/uNxkOzzhcmliYIlusveHyLkFJ8onHU3lirrIOC088bmhqqqL
-	hqjLy6jpjNxbhe8JXrD6OWN23CP2Ob9Psky7af3KSt3RK/nEac0514tknb9vT1I/Na/FbVlH
-	T1Jw49cp3x25pA5suHTM4KbWmSMvHr3Q/ae9sOtM+h2X4s7FH2rfavvwJ69tqHaJq6wX/zm/
-	9OGnG2wt5vIb19TOmbGqYI5sWYXp2VM/NszdvDPgoMqMR/X/nli9tdmbGt8n3v4+Z4LrWSWW
-	4oxEQy3mouJEAGLzvSKsAwAA
-X-CMS-MailID: 20230728073538eucas1p2982d41e7680ab7c3864e41aafab811e5
+X-Brightmail-Tracker: H4sIAAAAAAAAA2WSfUxTVxjGc3pvb2+ZxUtp4AwIfxRnnCBsIO4kitkMyW7mR1iMc+jm1tm7
+	QoC2aykwN2M7Kp9OG5eM0DmstVRWPrq2SGQgriXho3WUDdjUoQsCcRMaFK2COBz11s1k/z3P
+	e37P+5EcEhO6iDgyX17MqOSSQjERgXf0Lfo3bPmkV/qK3bAROXx/EWjybw+B5qzHADrl1+No
+	uu8mDw0bH3BR+Vk7gWYabAA9MSnQ5doiNNxxnIuck79yUffFQRyN/HCKQIYz5Ri6YpgGqM8U
+	gx74ZgGy2lt5SD+eiZYWVgBr567XY+iWhhZAf6P9Gafbv7vKoU1ODe1qWk9fm8minbZqgjaY
+	fwT0pW9beLTLcoSe6xkj6HvOxJxV+yK2SJnC/BJGlbb1w4i8iflKrrIqscx2uhdogRvWAD4J
+	qY0wsNiP14AIUkg1AahzjBCsuQ9goPGLsLkHYJ1hAXsW8d6aDkfOATjR04v/S43X9mCsOQ+g
+	L3iXG4rg1EvQN9XFC2mCSoH+2fGnrUTUOthj+JITCmBUOQGNN4ZWBpJkNLUVzvsPhBgB9Ro0
+	G8e4rI6Cg/VTeEhjVBnsPtuKh3CMiofnlslQmU9tgr/VtRHspknQbVnisfow9LZfezoKUo4I
+	6KquBaEspLJhx+T7LBMNb/e3h/kE+KTzdJj/CsBLy3d4rGkG0KoLclhqM9SPToUTb8CWxXqC
+	bRoJrwSi2D0j4cmOOowtC2BVhZCl18LmG7O4ASQZn7vM+Nxlxv8uY8sp0NQ1T/yvnAytZ2Yw
+	VmfBtrY53AR4NhDLaNRFMkadIWdKU9WSIrVGLks9qChygpW/7FvuD14ATbfvpnoAhwQesGYl
+	fPP75mEQh8sVckYsEnhzPFKhQCr59BCjUnyg0hQyag+IJ3FxrCA5a/CgkJJJipkChlEyqmev
+	HJIfp+UoL+78iXO9MIgyib0Vek6pu7Px7Xo8b4fhzuDcZ4PZh4JdZdZ8R8HwUKPrxN7jOSaF
+	YZK/50VXF7O9WPsI/WlpyCw44UnapkkTjWSMPtrmDax++DHarYxyZ2dVngSlfxwb2E/kPp7/
+	6L2Cq5PuusOxfLPC+c7m9AO6CxpLvH3U9kvty6sqdoi0PavpDenbY49KFrviz6MMozm6XTRh
+	q9wpW3AnBszCPQ+PLg0N7CtNF3i/7naUqBIGZNn6+TFruVhHtOKPc0t2JboSEtNz/TFr3vKs
+	Tf89IaZGurwpufNWWoNyf871JKfZMiP+vNAxcj8/8oV3Vbpqu+3NI1WXTSliXJ0neXU9plJL
+	/gF0vnQuRgQAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrPKsWRmVeSWpSXmKPExsVy+t/xe7o2hYdTDH5sEbHYePolm8Xjv4fY
+	LN4v62G0mHO+hcXi6bFH7BYXZn1jtWhevJ7N4vW8VYwW/xfkW5zpzrW4sK2P1WLT42usFnv2
+	nmSxuLxrDpvFhIXNzBY3JjxltDi2QMzi2+k3jBbL1q9lt2i5Y2rx+wdQwbKdfg5iHmvmrWH0
+	mN1wkcVjy8qbTB4LNpV6bF6h5XHrta3HplWdbB4TFh1g9Ng/dw27x+Yl9R7v911l8/i8SS6A
+	J0rPpii/tCRVISO/uMRWKdrQwkjP0NJCz8jEUs/Q2DzWyshUSd/OJiU1J7MstUjfLkEv49ov
+	jYI2uYqFl78xNzDul+hi5OSQEDCROPX8KUsXIxeHkMBSRom7h/6yQiRkJDZ+uQplC0v8udbF
+	BlH0kVFi/70njBDOVkaJ+5M+sIBUsQioSpx+spsdxGYT0JE4/+YOM4gtIqAhsW9CLxNIA7NA
+	M5vErHvngEZxcAgL2El8Oh8HUsMrYC6xaBbINpChp5kk1v5ZxgSREJQ4OfMJ2AJmgTKJZRPe
+	s4P0MgtISyz/xwES5hQwk7g+fR0bxKXKEgeX/GaHsGslPv99xjiBUXgWkkmzkEyahTAJIqwl
+	cePfSyYMYW2JZQtfM0PYthLr1r1nWcDIvopRJLW0ODc9t9hQrzgxt7g0L10vOT93EyMwNW07
+	9nPzDsZ5rz7qHWJk4mA8xKgC1Plow+oLjFIsefl5qUoivKcCDqUI8aYkVlalFuXHF5XmpBYf
+	YjQFhuJEZinR5Hxg0swriTc0MzA1NDGzNDC1NDNWEuf1LOhIFBJITyxJzU5NLUgtgulj4uCU
+	amCaxzk98CTjwqqCHptk3efN3yM279V58FdZinsKz4m7q3l6GOq2bX93sfuN6LSjt6/1dvAw
+	CF6ViPji+SpGTq796J4Svv6VEl8DNqy5LuPDuXK9dc4xS9YjBRslZVzjDu9vnsYRdU12sqr+
+	maL6Y+vqW5OWlHK2sLfmMnadPn125fxXObWHPE6eLNW6wv/2i7V0tM+582c41Pte3Ui5X7mc
+	2dbWv154ycsnBp9nZK222qee9alCdmfD2g/PL3SwJZZYLVrzIWy/0N6zH4PbmdhOXnKdIKU1
+	YZ7hyt/7Jsrtvs1q3jAp+ZtqxZcJVSo+a+sddb91HAl4ltUw+2NWLvt9ncayGcf1HxZai2ea
+	XH2uxFKckWioxVxUnAgAgo+3peIDAAA=
+X-CMS-MailID: 20230728074148eucas1p119baa7ba630f26611d21a9a78aa4f48c
 X-Msg-Generator: CA
-X-RootMTR: 20230726140703eucas1p2786577bcc67d5ae434671dac11870c60
+X-RootMTR: 20230726140659eucas1p2c3cd9f57dd13c71ddeb78d2480587e72
 X-EPHeader: CA
 CMS-TYPE: 201P
-X-CMS-RootMailID: 20230726140703eucas1p2786577bcc67d5ae434671dac11870c60
+X-CMS-RootMailID: 20230726140659eucas1p2c3cd9f57dd13c71ddeb78d2480587e72
 References: <20230726140635.2059334-1-j.granados@samsung.com>
-	<CGME20230726140703eucas1p2786577bcc67d5ae434671dac11870c60@eucas1p2.samsung.com>
-	<20230726140635.2059334-10-j.granados@samsung.com>
-	<ZMFfRR3PftnLHPlT@bombadil.infradead.org>
-	<20230727123112.yhgbxrhznrp6r3jt@localhost>
-	<ZMKQ2OuFy1deZktP@bombadil.infradead.org>
+	<CGME20230726140659eucas1p2c3cd9f57dd13c71ddeb78d2480587e72@eucas1p2.samsung.com>
+	<20230726140635.2059334-7-j.granados@samsung.com>
+	<ZMFexmOcfyORkRRs@bombadil.infradead.org>
+	<20230727122200.r5o2mj5qgah5yfwm@localhost>
+	<ZMKQSqeKNcJCqkDB@bombadil.infradead.org>
 X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
 	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS,
@@ -137,36 +144,74 @@ X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
---qapdrkzqpsgeioz3
+--23prfwofjqduce7c
 Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jul 27, 2023 at 08:44:24AM -0700, Luis Chamberlain wrote:
-> On Thu, Jul 27, 2023 at 02:31:12PM +0200, Joel Granados wrote:
-> > There are no deltas in this patch set. We start seeing the deltas when
-> > we start removing with the next 6 chunks. I'll try to make that more
-> > clear in the commit message.
+On Thu, Jul 27, 2023 at 08:42:02AM -0700, Luis Chamberlain wrote:
+> On Thu, Jul 27, 2023 at 02:22:00PM +0200, Joel Granados wrote:
+> > On Wed, Jul 26, 2023 at 10:58:30AM -0700, Luis Chamberlain wrote:
+> > > On Wed, Jul 26, 2023 at 04:06:26PM +0200, Joel Granados wrote:
+> > > > In order to remove the end element from the ctl_table struct arrays=
+, we
+> > > > replace the register_syctl function with a macro that will add the
+> > > > ARRAY_SIZE to the new register_sysctl_sz function. In this way the
+> > > > callers that are already using an array of ctl_table structs do not=
+ have
+> > > > to change. We *do* change the callers that pass the ctl_table array=
+ as a
+> > > > pointer.
+> > >=20
+> > > Thanks for doing this and this series!
+> > >=20
+> > > > Signed-off-by: Joel Granados <j.granados@samsung.com>
+> > > > ---
+> > > > diff --git a/include/linux/sysctl.h b/include/linux/sysctl.h
+> > > > index 0495c858989f..b1168ae281c9 100644
+> > > > --- a/include/linux/sysctl.h
+> > > > +++ b/include/linux/sysctl.h
+> > > > @@ -215,6 +215,9 @@ struct ctl_path {
+> > > >  	const char *procname;
+> > > >  };
+> > > > =20
+> > > > +#define register_sysctl(path, table)	\
+> > > > +	register_sysctl_sz(path, table, ARRAY_SIZE(table))
+> > > > +
+> > > >  #ifdef CONFIG_SYSCTL
+> > >=20
+> > > Wasn't it Greg who had suggested this? Maybe add Suggested-by with him
+> > > on it.
+> > Yes. I mentioned him in the cover letter and did not add the tag because
+> > I had not asked for permission to use it. I'll drop him a mail and
+> > include the suggested-by if he agrees.
 >=20
-> Indeed, even if no deltas are created it is importan then to say that.
-> If there are no deltas the "why" becomes more important. If the why is
-> to make it easier to apply subsequent patches, that must be said. When
-yes. The why for this patch set in particular is to make it easier to
-apply the sentinel removal patches.
+> FWIW, I never ask, if they ask for it, clearly they suggested it.
+I was following Documentation/process/submitting-patches.rst:
+"... Please note that this tag should not be added without the
+reporter's permission... ".
+In any case, Greg has already said yes :)
 
-I think the difficulty for me comes from having two whys: 1. The one for
-this patch set which is to make it easier to apply sentinel removal patches=
-=2E And 2.
-The one for the "big" patch (that actually removes the sentinels) which is =
-to
-reduce build time size and run time memory bloat.
-
-> you iterate your new series try to review the patches as if you were not
-> the person submitting them, and try to think of ways to make it easier
-> for the patch reviewer to do less work. The less work and easier patch
-> review is the better for them.
-Ack. For all these commits I'll try to weave in the two Whys to make the
-review process a bit easier.
+>=20
+> > > Also, your cover letter and first few patches are not CC'd to the net=
+dev
+> > > list or others. What you want to do is collect all the email addresses
+> > > for this small patch series and add them to who you email for your
+> > > entire series, otherwise at times they won't be able to properly revi=
+ew
+> > > or understand the exact context of the changes. You want folks to do =
+less
+> > > work to review, not more.
+> > Here I wanted to avoid very big e-mail headers as I have received
+> > rejections from lists in the past. But I for this set, the number of
+> > e-mails is ok to just include everyone.
+>=20
+> I hear that from time to time, if you have issues with adding folks on
+> the To address it may be an SMTP server issue, ie, corp email SMTP
+> server issues. To fix that I avoid corp email SMTP servers.
+My experience was more from the lists rejecting the e-mail because the
+header was too big. With that said, I'll look into SMTP alternatives to
+reduce possible errors
 
 >=20
 >   Luis
@@ -175,23 +220,23 @@ review process a bit easier.
 
 Joel Granados
 
---qapdrkzqpsgeioz3
+--23prfwofjqduce7c
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQGzBAABCgAdFiEErkcJVyXmMSXOyyeQupfNUreWQU8FAmTDb8YACgkQupfNUreW
-QU+p5Qv+Ny6GD1gN48hVrnGHM/gw/gd6W0YawMBGaag+E9wch++MavDe3IrOjoGY
-KUr3UrXl0hkqH2lCYK0jfELRuRzahODuBPAcsxZuyBAn+DdcxOevc40IIWCBl10r
-TMrvkJeXEWCe///Jzj61eRQnG6XKCZ0CkoUS+jsA2Gnc9SqExhp1cxT/hqTcg+4G
-O3lMTR13FxIO1yx1/qMWGMTm2lAJStVksJRhteW9oCKN3yIlp3dtSDi+OgzLYscN
-4u2MtE5BEFDTRRCu4JNZ6AzmBA6IyyYDN5LxZ+gh1rIzWiJBzmfB3Jfayaff00ba
-j9UmqKJmuMKTsJHJVKTNoeuXj/6kgdWO86NWbiA/wPenp8c7K/SFpQD9a7p33pPY
-A3fQknP0dtjXjJk9oY7czXgsM+o9lfzp7RgeGwb0c44VC2npK4boBpvgW3106bbJ
-gIuQgu+NyIgEKU2ugZxKXeJYa67pRuuuPde0zajzM/W9dzJP3n279THPrODfbN+q
-S++x+6T7
-=D9gN
+iQGzBAABCgAdFiEErkcJVyXmMSXOyyeQupfNUreWQU8FAmTDcToACgkQupfNUreW
+QU8ebwv/XlR1FEHFz9SLvGQjHETNnsFs3RVx30G5KCg+zWiSQoVJOlNktqeQbH35
+CmMfVi3M7mt/wJZ8MiyXFowzmGqVF7lNCpOYIH4s8ppDEylmxhowVw8QKFYLd74Q
+SksNllHUi2tmbhnpH+YuIDL1HTPt+p6ejYhq3kCFTB2DbibH+1uCiNMTYTov3Hq0
+/sLMgb7zpqQviJPX0rR0ctXcwY2w04MQmyAjN4ot8qskmckzvLmoP3ILVFdvbkb/
+/+zuPvocJZxuizrgxUNbpcz7m+4v0yzbTMl+xRl2RnGfHIKNU/jGmT2mDPVAoaOj
+bb9PqgILxfxkhh6arsoTPt0HjTihLhGiJnxSGzyCBJzGjpF98y5g6PU52t0JGid9
+0kX4/EPh31hklspwHaqbhRqWafJy6iU5xW2FkjFHOAPfdEtpRK9Ubwh8Roxa9KR9
+EUjgl6+Bgg0TvcSOjxgEK7HmeudqheOIU939bFeQFh6vs2KCnc3IdxOuhTtC3IHR
+B9dgJcCy
+=qAfE
 -----END PGP SIGNATURE-----
 
---qapdrkzqpsgeioz3--
+--23prfwofjqduce7c--
 
