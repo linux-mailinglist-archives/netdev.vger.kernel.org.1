@@ -1,121 +1,108 @@
-Return-Path: <netdev+bounces-22106-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22116-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36E94766128
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 03:18:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B629176617F
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 03:51:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E51662825BD
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 01:18:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E30971C21785
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 01:51:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AC5715A7;
-	Fri, 28 Jul 2023 01:17:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A520B17D1;
+	Fri, 28 Jul 2023 01:51:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A8E61FB6;
-	Fri, 28 Jul 2023 01:17:43 +0000 (UTC)
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C8661FC9;
-	Thu, 27 Jul 2023 18:17:42 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.143])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4RBqW65hyNz4f400D;
-	Fri, 28 Jul 2023 09:17:38 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.124.27])
-	by APP4 (Coremail) with SMTP id gCh0CgCnD7MuF8NklRzkOw--.24715S6;
-	Fri, 28 Jul 2023 09:17:39 +0800 (CST)
-From: Hou Tao <houtao@huaweicloud.com>
-To: bpf@vger.kernel.org
-Cc: netdev@vger.kernel.org,
-	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	=?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn.topel@gmail.com>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Alexei Starovoitov <alexei.starovoitov@gmail.com>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Song Liu <song@kernel.org>,
-	Hao Luo <haoluo@google.com>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	KP Singh <kpsingh@kernel.org>,
-	Stanislav Fomichev <sdf@google.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	houtao1@huawei.com
-Subject: [PATCH bpf-next 2/2] bpf, devmap: Remove unused dtab field from bpf_dtab_netdev
-Date: Fri, 28 Jul 2023 09:49:42 +0800
-Message-Id: <20230728014942.892272-3-houtao@huaweicloud.com>
-X-Mailer: git-send-email 2.29.2
-In-Reply-To: <20230728014942.892272-1-houtao@huaweicloud.com>
-References: <20230728014942.892272-1-houtao@huaweicloud.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 934D815D1
+	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 01:51:55 +0000 (UTC)
+Received: from mail-lj1-x22b.google.com (mail-lj1-x22b.google.com [IPv6:2a00:1450:4864:20::22b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 030D9F2
+	for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 18:51:54 -0700 (PDT)
+Received: by mail-lj1-x22b.google.com with SMTP id 38308e7fff4ca-2b9d07a8d84so1293881fa.3
+        for <netdev@vger.kernel.org>; Thu, 27 Jul 2023 18:51:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1690509112; x=1691113912;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=spl6msirgwM12Bz3dNNSl2svImPXOjpVr2B1RLvkZXY=;
+        b=DwhhtH676J+xnO7Ti6I5DxRcKK1/tNIiUspuBI2YPxQbBzWU23RspV7Z8ZIQ1Qn4WP
+         nzyVMC8VSYzI3UGV85rrIyEQ3RKhqyYcs1Q9Moy6o1muJnUi0SKzgiKh7lW9qn21TDjB
+         hwnreAuKolsWCAl/trzGZTbWEZVgicqIcztfZ9dh4x1idm4VMtQ7GDopkOpQISulzIwl
+         iw3g8RqM2xLBmnlqH0oC6WXQ7WD4R2yyGvdvXwIBAJSgPG79eTcHfaSp4kFNlBQA+Jky
+         GglqPSj6325MHZBm9xUJFLJu7zlz9eVJFr3DTrOAZHm4XgY99xUgfyibeb+cSc3kJC2B
+         hrdg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690509112; x=1691113912;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=spl6msirgwM12Bz3dNNSl2svImPXOjpVr2B1RLvkZXY=;
+        b=dFYx1uQFEmgIux8EpJ163pZadIA3fJXTpGQaXoRJdz8yuHGEg+g5iIYwpVXjpFUL3k
+         65NhwAE1txQjmDC26kxvENDXouB2tnvStYHeiwdOpGtvOqbGC4w8l0gKc50PPFNg3lAJ
+         z+Y9A8b7ltKx5mEJi1j17ganalWsqJhx8ceH2nk62NtkDQf05c149veVUgCkALbxXbui
+         De2IReBZXBuJtLtD0Oz3lQ3li3DIGjZwj/VosT2FTUxYLiZONJHp1wJ6h9SZ0rTd4Qwa
+         U+kZdAvsy+wFMPT/WNaPfhhNPvsLXjFl5ccIKoajIzs6gwm0n/I4MhAati/YX6PycZbZ
+         AdKQ==
+X-Gm-Message-State: ABy/qLaMaVJ1QYLur7kp8DQbisWfzuVa2Hp6papUKwZ+kkD4CIh3JRCw
+	2IymHjeeoxi82im5I4RH/PkY8awaZaUD5ww/iPg=
+X-Google-Smtp-Source: APBJJlELIy6CzI7EadvaDv1i5jG2qBH+5qOGvagZFAIrDNAR32mZVOSW6K2uYyaAw2I57TwBIT220Ok980xXve9eHKM=
+X-Received: by 2002:a2e:8816:0:b0:2b9:ac48:d7fe with SMTP id
+ x22-20020a2e8816000000b002b9ac48d7femr523226ljh.38.1690509111900; Thu, 27 Jul
+ 2023 18:51:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgCnD7MuF8NklRzkOw--.24715S6
-X-Coremail-Antispam: 1UD129KBjvdXoWrKFW8tF13ur45uFWxuF47XFb_yoWDXrc_Zw
-	40vryxCF4DGFn7XryUCFn3WFykKr1rKF109r1jqFZ3Jrn8Ww4Fvry8ZFy8ZrZ3WrZ7AFW3
-	AFn5WrsFgr43WjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUbfkYFVCjjxCrM7AC8VAFwI0_Wr0E3s1l1xkIjI8I6I8E6xAIw20E
-	Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l82xGYIkIc2x26280x7IE14v26r15M2
-	8IrcIa0xkI8VCY1x0267AKxVW5JVCq3wA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK
-	021l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r
-	4UJVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
-	GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx
-	0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWU
-	JVW8JwACjcxG0xvY0x0EwIxGrwACI402YVCY1x02628vn2kIc2xKxwCF04k20xvY0x0EwI
-	xGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480
-	Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_GFv_WrylIxkGc2Ij64vIr41lIxAIcVC0I7
-	IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Cr0_Gr1UMIIF0xvE42xK
-	8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I
-	0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUFa9-UUUUU
-X-CM-SenderInfo: xkrx3t3r6k3tpzhluzxrxghudrp/
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
-	SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-	version=3.4.6
+References: <cover.1690439335.git.chenfeiyang@loongson.cn> <373259d4ac9ac0b9e1e64ad96d60a9bbd35b85aa.1690439335.git.chenfeiyang@loongson.cn>
+ <51338bc8-92b0-4aab-92f8-1e5d178b05d7@lunn.ch>
+In-Reply-To: <51338bc8-92b0-4aab-92f8-1e5d178b05d7@lunn.ch>
+From: Feiyang Chen <chris.chenfeiyang@gmail.com>
+Date: Fri, 28 Jul 2023 09:51:40 +0800
+Message-ID: <CACWXhKm9Qu3CUjGpqa_5dx74MDVHODKVrsotTi0+V03zDBVqwg@mail.gmail.com>
+Subject: Re: [PATCH v2 03/10] net: stmmac: dwmac1000: Add multi-channel support
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Feiyang Chen <chenfeiyang@loongson.cn>, hkallweit1@gmail.com, peppe.cavallaro@st.com, 
+	alexandre.torgue@foss.st.com, joabreu@synopsys.com, chenhuacai@loongson.cn, 
+	linux@armlinux.org.uk, dongbiao@loongson.cn, 
+	loongson-kernel@lists.loongnix.cn, netdev@vger.kernel.org, 
+	loongarch@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Hou Tao <houtao1@huawei.com>
+On Thu, Jul 27, 2023 at 5:01=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
+>
+> On Thu, Jul 27, 2023 at 03:15:46PM +0800, Feiyang Chen wrote:
+> > Some platforms have dwmac1000 implementations that support multi-
+> > channel. Extend the functions to add multi-channel support.
+> >
+> > +     priv->plat->dwmac_is_loongson =3D false;
+>
+> I don't know this driver, so my comments could be wrong...
+>
+> Is this specific to loongson, or multi-channel? If you look at the
+> other bool in plat, they are all for features, not machines? Could
+> this actually be called priv->multi_chan_en ?
+>
 
-Commit 96360004b862 ("xdp: Make devmap flush_list common for all map
-instances") removes the use of bpf_dtab_netdev::dtab in bq_enqueue(),
-so just remove dtab from bpf_dtab_netdev.
+Hi, Andrew,
 
-Signed-off-by: Hou Tao <houtao1@huawei.com>
----
- kernel/bpf/devmap.c | 2 --
- 1 file changed, 2 deletions(-)
+It is specific to loongson. I think I can add some features instead of
+using dwmac_is_loongson.
 
-diff --git a/kernel/bpf/devmap.c b/kernel/bpf/devmap.c
-index 49cc0b5671c6..4d42f6ed6c11 100644
---- a/kernel/bpf/devmap.c
-+++ b/kernel/bpf/devmap.c
-@@ -65,7 +65,6 @@ struct xdp_dev_bulk_queue {
- struct bpf_dtab_netdev {
- 	struct net_device *dev; /* must be first member, due to tracepoint */
- 	struct hlist_node index_hlist;
--	struct bpf_dtab *dtab;
- 	struct bpf_prog *xdp_prog;
- 	struct rcu_head rcu;
- 	unsigned int idx;
-@@ -874,7 +873,6 @@ static struct bpf_dtab_netdev *__dev_map_alloc_node(struct net *net,
- 	}
- 
- 	dev->idx = idx;
--	dev->dtab = dtab;
- 	if (prog) {
- 		dev->xdp_prog = prog;
- 		dev->val.bpf_prog.id = prog->aux->id;
--- 
-2.29.2
+Thanks,
+Feiyang
 
+>      Andrew
 
