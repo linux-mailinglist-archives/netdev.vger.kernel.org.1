@@ -1,43 +1,43 @@
-Return-Path: <netdev+bounces-22177-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22179-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBD40766639
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 10:04:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 88EDC76664B
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 10:04:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A47DE282A68
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 08:04:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BA71C1C2174B
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 08:04:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74B38125A3;
-	Fri, 28 Jul 2023 07:59:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D24112B63;
+	Fri, 28 Jul 2023 07:59:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67F5611CB8
-	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 07:59:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51B95125D2
+	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 07:59:22 +0000 (UTC)
 Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3847E3A95
-	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 00:59:00 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B1743AA8
+	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 00:59:05 -0700 (PDT)
 Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
 	by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <mkl@pengutronix.de>)
-	id 1qPIMv-0008Ls-HX
-	for netdev@vger.kernel.org; Fri, 28 Jul 2023 09:58:37 +0200
+	id 1qPIMx-0008NR-0F
+	for netdev@vger.kernel.org; Fri, 28 Jul 2023 09:58:39 +0200
 Received: from dspam.blackshift.org (localhost [127.0.0.1])
-	by bjornoya.blackshift.org (Postfix) with SMTP id CEF931FD270
+	by bjornoya.blackshift.org (Postfix) with SMTP id DA6151FD272
 	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 07:56:20 +0000 (UTC)
 Received: from hardanger.blackshift.org (unknown [172.20.34.65])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(Client did not present a certificate)
-	by bjornoya.blackshift.org (Postfix) with ESMTPS id CF0EC1FD1D8;
+	by bjornoya.blackshift.org (Postfix) with ESMTPS id E951A1FD1DF;
 	Fri, 28 Jul 2023 07:56:18 +0000 (UTC)
 Received: from blackshift.org (localhost [::1])
-	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id 2a6496c4;
+	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id 5b617956;
 	Fri, 28 Jul 2023 07:56:17 +0000 (UTC)
 From: Marc Kleine-Budde <mkl@pengutronix.de>
 To: netdev@vger.kernel.org
@@ -46,9 +46,9 @@ Cc: davem@davemloft.net,
 	linux-can@vger.kernel.org,
 	kernel@pengutronix.de,
 	Marc Kleine-Budde <mkl@pengutronix.de>
-Subject: [PATCH net-next 12/21] can: gs_usb: gs_usb_receive_bulk_callback(): make use of netdev
-Date: Fri, 28 Jul 2023 09:56:05 +0200
-Message-Id: <20230728075614.1014117-13-mkl@pengutronix.de>
+Subject: [PATCH net-next 13/21] can: gs_usb: gs_usb_receive_bulk_callback(): make use of stats
+Date: Fri, 28 Jul 2023 09:56:06 +0200
+Message-Id: <20230728075614.1014117-14-mkl@pengutronix.de>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20230728075614.1014117-1-mkl@pengutronix.de>
 References: <20230728075614.1014117-1-mkl@pengutronix.de>
@@ -69,36 +69,42 @@ X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Make use the previously assigned variable netdev instead of using
-dev->netdev.
+Make use the previously assigned variable stats instead of using
+netdev->stats.
 
-Link: https://lore.kernel.org/all/20230718-gs_usb-cleanups-v1-5-c3b9154ec605@pengutronix.de
+Link: https://lore.kernel.org/all/20230718-gs_usb-cleanups-v1-6-c3b9154ec605@pengutronix.de
 Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
 ---
- drivers/net/can/usb/gs_usb.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/net/can/usb/gs_usb.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/drivers/net/can/usb/gs_usb.c b/drivers/net/can/usb/gs_usb.c
-index 441143ad740b..04cbe949c290 100644
+index 04cbe949c290..0d0a3405ba19 100644
 --- a/drivers/net/can/usb/gs_usb.c
 +++ b/drivers/net/can/usb/gs_usb.c
-@@ -565,7 +565,7 @@ static void gs_usb_receive_bulk_callback(struct urb *urb)
+@@ -594,8 +594,8 @@ static void gs_usb_receive_bulk_callback(struct urb *urb)
  
- 	if (hf->echo_id == -1) { /* normal rx */
- 		if (hf->flags & GS_CAN_FLAG_FD) {
--			skb = alloc_canfd_skb(dev->netdev, &cfd);
-+			skb = alloc_canfd_skb(netdev, &cfd);
- 			if (!skb)
- 				return;
+ 		gs_usb_set_timestamp(dev, skb, hf);
  
-@@ -578,7 +578,7 @@ static void gs_usb_receive_bulk_callback(struct urb *urb)
+-		netdev->stats.rx_packets++;
+-		netdev->stats.rx_bytes += hf->can_dlc;
++		stats->rx_packets++;
++		stats->rx_bytes += hf->can_dlc;
  
- 			memcpy(cfd->data, hf->canfd->data, cfd->len);
- 		} else {
--			skb = alloc_can_skb(dev->netdev, &cf);
-+			skb = alloc_can_skb(netdev, &cf);
- 			if (!skb)
- 				return;
+ 		netif_rx(skb);
+ 	} else { /* echo_id == hf->echo_id */
+@@ -619,9 +619,9 @@ static void gs_usb_receive_bulk_callback(struct urb *urb)
+ 		skb = dev->can.echo_skb[hf->echo_id];
+ 		gs_usb_set_timestamp(dev, skb, hf);
+ 
+-		netdev->stats.tx_packets++;
+-		netdev->stats.tx_bytes += can_get_echo_skb(netdev, hf->echo_id,
+-							   NULL);
++		stats->tx_packets++;
++		stats->tx_bytes += can_get_echo_skb(netdev, hf->echo_id,
++						    NULL);
+ 
+ 		gs_free_tx_context(txc);
  
 -- 
 2.40.1
