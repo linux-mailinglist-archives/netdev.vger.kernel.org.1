@@ -1,69 +1,51 @@
-Return-Path: <netdev+bounces-22190-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22193-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4FF1A76666A
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 10:08:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8BB37766683
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 10:11:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D645D282FA4
-	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 08:08:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4652028246C
+	for <lists+netdev@lfdr.de>; Fri, 28 Jul 2023 08:11:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D98610784;
-	Fri, 28 Jul 2023 08:04:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C076D2EC;
+	Fri, 28 Jul 2023 08:11:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 490E0C8DA
-	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 08:04:28 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C12F93C1F
-	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 01:04:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1690531464;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=IGBA6fnuIudF6i5KzHn0rjsJTaSucHSTzQ7LjZN+KaU=;
-	b=iyXKM+KA5rCo+rrEHt4zIhL3mtg9wAlN4i244z9+qkH1gdiquQO5y73MM97kR07gT042uH
-	EIL+81m/KCThxZB7ZmPul0mKyHU000GoWBH9OtQ6tZvXhuN3ohdp7D6mrEoCGLQ+7W1ilW
-	s9DyoS+5ozL4AJcXwY0ylcOxGXBSlmE=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-680-rRWIJMecNvm7D1stNJ8mAQ-1; Fri, 28 Jul 2023 04:04:23 -0400
-X-MC-Unique: rRWIJMecNvm7D1stNJ8mAQ-1
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-993d7ca4607so101416666b.1
-        for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 01:04:22 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690531462; x=1691136262;
-        h=content-transfer-encoding:subject:from:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=IGBA6fnuIudF6i5KzHn0rjsJTaSucHSTzQ7LjZN+KaU=;
-        b=dla8o9Q/hM7I2DPFPz4518eoO62bIdbjCte+zHF284kxbr0WUm/WHWGbrUhVzl7tCi
-         lCkcew7BOVBoDfa2Cniq0nLjdcPm543e7UZXzP9fDH9DDD6Ub58ijc/8mUmDPZnOyanu
-         5GnCFD4cZxSbQvMfW2ImdomW844b+MBzz+1JD7PPU6kqG2Q40Y6CFEVSp7nM5v8Y8BDV
-         TpLkuM+l9oD/Paz0VRK5F+6fDzqdfIq/KU+fNxLeLM0tVLE2SMylG87d6Ae/BeuPMk10
-         ALKO/Wi4mE80fbBW1U11sJhB/fv6oG4OjRFb81RXL0AcQDDPizv86bTRjom+heXPSNO4
-         1u8A==
-X-Gm-Message-State: ABy/qLZvD4/grrSIiB5FOh5BTgO61aoLkg6pQ6k5EWoRFK/bVsLcugLc
-	CxHJLukZr7zFGQ2DpBNUg2TqARjdXjAOXrJt+JwB8EC6LHrkil5qNvZpKs5Nrmz9qjOmL0Fvp86
-	lnRtAO5QEuU7SMjhw9NhKOYzZep+XbCqz1r5x27HjUEWzpxEWQ6eQKElrw11yEIJ/sKm3ug==
-X-Received: by 2002:a17:906:225a:b0:992:a90a:5d1f with SMTP id 26-20020a170906225a00b00992a90a5d1fmr1450630ejr.68.1690531461918;
-        Fri, 28 Jul 2023 01:04:21 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlG6GohJ7qviiqkntYWrBSjvGbRPYTdEQ/x/tgDJ0igBwfutsOwkq02O0PJ3L4ni0/+6Uk3H0A==
-X-Received: by 2002:a17:906:225a:b0:992:a90a:5d1f with SMTP id 26-20020a170906225a00b00992a90a5d1fmr1450610ejr.68.1690531461512;
-        Fri, 28 Jul 2023 01:04:21 -0700 (PDT)
-Received: from [192.168.149.71] (58.254.164.109.static.wline.lns.sme.cust.swisscom.ch. [109.164.254.58])
-        by smtp.gmail.com with ESMTPSA id lu20-20020a170906fad400b00993664a9987sm1743002ejb.103.2023.07.28.01.04.20
-        for <netdev@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 28 Jul 2023 01:04:21 -0700 (PDT)
-Message-ID: <1a471c1b-b78c-d646-6d9b-5bbb753a2a0b@redhat.com>
-Date: Fri, 28 Jul 2023 10:04:20 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49967C2C0
+	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 08:11:34 +0000 (UTC)
+Received: from mx1.sberdevices.ru (mx1.sberdevices.ru [37.18.73.165])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB1AD10E;
+	Fri, 28 Jul 2023 01:11:31 -0700 (PDT)
+Received: from p-infra-ksmg-sc-msk01 (localhost [127.0.0.1])
+	by mx1.sberdevices.ru (Postfix) with ESMTP id 76AD3100004;
+	Fri, 28 Jul 2023 11:11:30 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 76AD3100004
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
+	s=mail; t=1690531890;
+	bh=7xjggaRnRosCBX2aIuVU9Xtjjt90LbPMaiwfpvmSaBU=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Content-Type:From;
+	b=quZZsbNFFWIIiHki+jG1xiRM9j1T9djGPPhNWufAzT9rcu/wPqC0SaFcRtaWhwKLG
+	 kPbmN6j/DIGc6ek1v48TOVMVESxLF6v3NqFrEHTyiYwW8YmQF22tipC1H9PHWElRGV
+	 vF/mmMYwQVl7rilr/KI3o+7n1zWRVLTtFZCCGBgv2PYN+HtyrJMdzZZSPucS0OEzdG
+	 iRZpcUOJux9gpULB9E5/4btoHwna7W4pylE//DohkPONqeUAk7fcwZWy/YiJJUNBLY
+	 3zYBxRgU0AnJcTIqH63NZ40H00yaeKrPHgpyvUUanZqWaExzu1uqTfD12aHzpBiCAO
+	 ydDlRJ6bPc39w==
+Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.sberdevices.ru (Postfix) with ESMTPS;
+	Fri, 28 Jul 2023 11:11:30 +0300 (MSK)
+Received: from [192.168.0.106] (100.64.160.123) by
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Fri, 28 Jul 2023 11:11:06 +0300
+Message-ID: <0d0e9b6e-fbdb-fd63-3f93-8a7249711dfc@sberdevices.ru>
+Date: Fri, 28 Jul 2023 11:05:56 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,80 +53,135 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Content-Language: en-GB
-To: netdev@vger.kernel.org
-From: Mat Kowalski <mko@redhat.com>
-Subject: [PATCH] net:bonding:support balance-alb with openvswitch
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+ Thunderbird/102.7.1
+Subject: Re: [PATCH net-next v4 0/4] vsock/virtio/vhost: MSG_ZEROCOPY
+ preparations
+Content-Language: en-US
+From: Arseniy Krasnov <avkrasnov@sberdevices.ru>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+CC: Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella
+	<sgarzare@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Jason Wang <jasowang@redhat.com>, Bobby Eshleman
+	<bobby.eshleman@bytedance.com>, <kvm@vger.kernel.org>,
+	<virtualization@lists.linux-foundation.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <kernel@sberdevices.ru>, <oxffffaa@gmail.com>
+References: <20230727222627.1895355-1-AVKrasnov@sberdevices.ru>
+ <20230728012845-mutt-send-email-mst@kernel.org>
+ <eeefef14-2c92-a7a6-e58e-77dccbe38282@sberdevices.ru>
+In-Reply-To: <eeefef14-2c92-a7a6-e58e-77dccbe38282@sberdevices.ru>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [100.64.160.123]
+X-ClientProxiedBy: p-i-exch-sc-m02.sberdevices.ru (172.16.192.103) To
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
+X-KSMG-Rule-ID: 10
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 178796 [Jul 22 2023]
+X-KSMG-AntiSpam-Version: 5.9.59.0
+X-KSMG-AntiSpam-Envelope-From: AVKrasnov@sberdevices.ru
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 525 525 723604743bfbdb7e16728748c3fa45e9eba05f7d, {Tracking_uf_ne_domains}, {Tracking_from_domain_doesnt_match_to}, FromAlignment: s, ApMailHostAddress: 100.64.160.123
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean, bases: 2023/07/23 10:45:00
+X-KSMG-LinksScanning: Clean, bases: 2023/07/23 10:46:00
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/07/23 08:49:00 #21663637
+X-KSMG-AntiVirus-Status: Clean, skipped
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Commit d5410ac7b0ba ("net:bonding:support balance-alb interface with
-vlan to bridge") introduced a support for balance-alb mode for
-interfaces connected to the linux bridge by fixing missing matching of
-MAC entry in FDB. In our testing we discovered that it still does not
-work when the bond is connected to the OVS bridge as show in diagram
-below:
 
-eth1(mac:eth1_mac)--bond0(balance-alb,mac:eth0_mac)--eth0(mac:eth0_mac)
-                       |
-                     bond0.150(mac:eth0_mac)
-                               |
-                     ovs_bridge(ip:bridge_ip,mac:eth0_mac)
 
-This patch fixes it by checking not only if the device is a bridge but
-also if it is an openvswitch.
+On 28.07.2023 11:00, Arseniy Krasnov wrote:
+> 
+> 
+> On 28.07.2023 08:45, Michael S. Tsirkin wrote:
+>> On Fri, Jul 28, 2023 at 01:26:23AM +0300, Arseniy Krasnov wrote:
+>>> Hello,
+>>>
+>>> this patchset is first of three parts of another big patchset for
+>>> MSG_ZEROCOPY flag support:
+>>> https://lore.kernel.org/netdev/20230701063947.3422088-1-AVKrasnov@sberdevices.ru/
+>>
+>> overall looks good. Two points I'd like to see addressed:
+> 
+> Thanks!
+> 
+>> - what's the performance with all these changes - still same?
+> 
+> Yes, I perform quick tests and seems result are same. This is because last
+> implemented logic when I compare size of payload against 'num_max' is
+> for "emergency" case and not triggered in default environment. Anyway, I'll
+> perform retest at least in nested guest case.
 
-Signed-off-by: Mateusz Kowalski <mko@redhat.com>
----
-  drivers/net/bonding/bond_alb.c | 3 +--
-  include/linux/netdevice.h      | 5 +++++
-  2 files changed, 6 insertions(+), 2 deletions(-)
+"default environment" is vanilla Qemu where queue size is 128 elements. To test
+this logic i rebuild Qemu with for example queue of 8 elements.
 
-diff --git a/drivers/net/bonding/bond_alb.c b/drivers/net/bonding/bond_alb.c
-index b9dbad3a8af8..6f2ffcc4f19c 100644
---- a/drivers/net/bonding/bond_alb.c
-+++ b/drivers/net/bonding/bond_alb.c
-@@ -668,7 +668,7 @@ static struct slave *rlb_arp_xmit(struct sk_buff 
-*skb, struct bonding *bond)
+Thanks, Arseniy
 
-         dev = ip_dev_find(dev_net(bond->dev), arp->ip_src);
-         if (dev) {
--               if (netif_is_bridge_master(dev)) {
-+               if (netif_is_any_bridge_master(dev)) {
-                         dev_put(dev);
-                         return NULL;
-                 }
-@@ -1833,4 +1833,3 @@ void bond_alb_clear_vlan(struct bonding *bond, 
-unsigned short vlan_id)
-         if (bond->alb_info.rlb_enabled)
-                 rlb_clear_vlan(bond, vlan_id);
-  }
--
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index b828c7a75be2..d250a0b947f1 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -5102,6 +5102,11 @@ static inline bool netif_is_ovs_port(const struct 
-net_device *dev)
-         return dev->priv_flags & IFF_OVS_DATAPATH;
-  }
-
-+static inline bool netif_is_any_bridge_master(const struct net_device *dev)
-+{
-+       return netif_is_bridge_master(dev)) || netif_is_ovs_master(dev);
-+}
-+
-  static inline bool netif_is_any_bridge_port(const struct net_device *dev)
-  {
-         return netif_is_bridge_port(dev) || netif_is_ovs_port(dev);
--- 
-2.41.0
-
+> 
+>> - most systems have a copybreak scheme where buffers
+>>   smaller than a given size are copied directly.
+>>   This will address regression you see with small buffers -
+>>   but need to find that value. we know it's between 4k and 32k :)
+> 
+> I see, You suggest to find this value and add this check for decision to
+> use zerocopy or copy ?
+> 
+> Thanks, Arseniy
+> 
+>>
+>>
+>>> During review of this series, Stefano Garzarella <sgarzare@redhat.com>
+>>> suggested to split it for three parts to simplify review and merging:
+>>>
+>>> 1) virtio and vhost updates (for fragged skbs) <--- this patchset
+>>> 2) AF_VSOCK updates (allows to enable MSG_ZEROCOPY mode and read
+>>>    tx completions) and update for Documentation/.
+>>> 3) Updates for tests and utils.
+>>>
+>>> This series enables handling of fragged skbs in virtio and vhost parts.
+>>> Newly logic won't be triggered, because SO_ZEROCOPY options is still
+>>> impossible to enable at this moment (next bunch of patches from big
+>>> set above will enable it).
+>>>
+>>> I've included changelog to some patches anyway, because there were some
+>>> comments during review of last big patchset from the link above.
+>>>
+>>> Head for this patchset is 9d0cd5d25f7d45bce01bbb3193b54ac24b3a60f3
+>>>
+>>> Link to v1:
+>>> https://lore.kernel.org/netdev/20230717210051.856388-1-AVKrasnov@sberdevices.ru/
+>>> Link to v2:
+>>> https://lore.kernel.org/netdev/20230718180237.3248179-1-AVKrasnov@sberdevices.ru/
+>>> Link to v3:
+>>> https://lore.kernel.org/netdev/20230720214245.457298-1-AVKrasnov@sberdevices.ru/
+>>>
+>>> Changelog:
+>>>  * Patchset rebased and tested on new HEAD of net-next (see hash above).
+>>>  * See per-patch changelog after ---.
+>>>
+>>> Arseniy Krasnov (4):
+>>>   vsock/virtio/vhost: read data from non-linear skb
+>>>   vsock/virtio: support to send non-linear skb
+>>>   vsock/virtio: non-linear skb handling for tap
+>>>   vsock/virtio: MSG_ZEROCOPY flag support
+>>>
+>>>  drivers/vhost/vsock.c                   |  14 +-
+>>>  include/linux/virtio_vsock.h            |   6 +
+>>>  net/vmw_vsock/virtio_transport.c        |  79 +++++-
+>>>  net/vmw_vsock/virtio_transport_common.c | 312 ++++++++++++++++++------
+>>>  4 files changed, 330 insertions(+), 81 deletions(-)
+>>>
+>>> -- 
+>>> 2.25.1
+>>
 
