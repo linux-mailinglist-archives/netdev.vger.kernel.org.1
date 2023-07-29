@@ -1,57 +1,57 @@
-Return-Path: <netdev+bounces-22482-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22483-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA8D476799B
-	for <lists+netdev@lfdr.de>; Sat, 29 Jul 2023 02:33:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E5E776799C
+	for <lists+netdev@lfdr.de>; Sat, 29 Jul 2023 02:34:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7EB99282890
-	for <lists+netdev@lfdr.de>; Sat, 29 Jul 2023 00:33:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CE3AB1C219B8
+	for <lists+netdev@lfdr.de>; Sat, 29 Jul 2023 00:34:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FF7A392;
-	Sat, 29 Jul 2023 00:32:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B235917E3;
+	Sat, 29 Jul 2023 00:32:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D3AB1388
-	for <netdev@vger.kernel.org>; Sat, 29 Jul 2023 00:32:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A731617D3
+	for <netdev@vger.kernel.org>; Sat, 29 Jul 2023 00:32:36 +0000 (UTC)
 Received: from mgamail.intel.com (unknown [134.134.136.20])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8308EE48
-	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 17:32:30 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95877E48
+	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 17:32:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1690590750; x=1722126750;
+  t=1690590755; x=1722126755;
   h=subject:from:to:cc:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=nncBB3t31kM6LU5KqTMFn19BzefFMgkNXWv8PCy0hhA=;
-  b=JRR+Hd73R5UnTST5bsOKPjUk2JxGC5u++Sud0kBVa9pwrwZI39tQ0CVH
-   T8ygdPRXtBluR9gQF8BKIfroLAKUnub1UQBYaFVn+RV+mOrrvILQ4jPNU
-   lIYn+IOCX9Hbyczj9EdiaP8sl3v3ZPXRSuEQqDeu/TKeROxuO4M2ee8J0
-   pD3xkMVhwnqJujJZckcAdS/yXkFOaP4KykWzp7Lnxi7Bhr8/JL88DhANU
-   D+bjgbg3ZKcimGJ1xcBCMlFt6TcZTlruE7pFOVpDUNVUYS7qo5zXuEqIT
-   XXJdkfYEzWlhZ+ANcQ3hMTKmM/zNIzX8+Kswa/wpPdBC2oxM1lNR+l//z
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10785"; a="358742135"
+  bh=pN86Nb9ofYrUeAEZEQ/+GNk9EIeYvGrgheIHarCI7CA=;
+  b=LeYiuKhYPMX3Aoh8MhCRSMtTCm1cM3u1I9LrxJHEkKBqurXrC9Bl4iCo
+   XeksfQMUf1U53XzxkTI072p7CfYwF08+txo8bcV78DHhgGYvEHpQlozRA
+   mWVY4b2XMpkHi1bb6KP2CFVwW97mVNId9/mx8te1tH4gqCiHj1JyUx8s5
+   V8w7FiqM5Rev0V5f5I1Zt296HHf2qhLv8sxOp+mV3SE6YTdV49ZuzbvJv
+   MSOKLDDwINxAce8ilRH/Jt7k8Gb8L2DnLjCvYqlFGu6hrQm0ReAcz7ZgW
+   0RsWebcNK8OxHvILZOvsddMnkBCHSMb/M4FRyZ1FtKy3DFNmgGTM4FzyZ
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10785"; a="358742160"
 X-IronPort-AV: E=Sophos;i="6.01,238,1684825200"; 
-   d="scan'208";a="358742135"
+   d="scan'208";a="358742160"
 Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jul 2023 17:32:30 -0700
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jul 2023 17:32:35 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10785"; a="851403869"
+X-IronPort-AV: E=McAfee;i="6600,9927,10785"; a="851403913"
 X-IronPort-AV: E=Sophos;i="6.01,238,1684825200"; 
-   d="scan'208";a="851403869"
+   d="scan'208";a="851403913"
 Received: from anambiarhost.jf.intel.com ([10.166.29.163])
-  by orsmga004.jf.intel.com with ESMTP; 28 Jul 2023 17:32:30 -0700
-Subject: [net-next PATCH v1 5/9] netdev-genl: Add netlink framework
- functions for napi
+  by orsmga004.jf.intel.com with ESMTP; 28 Jul 2023 17:32:35 -0700
+Subject: [net-next PATCH v1 6/9] netdev-genl: spec: Add irq in netdev
+ netlink YAML spec
 From: Amritha Nambiar <amritha.nambiar@intel.com>
 To: netdev@vger.kernel.org, kuba@kernel.org, davem@davemloft.net
 Cc: sridhar.samudrala@intel.com, amritha.nambiar@intel.com
-Date: Fri, 28 Jul 2023 17:47:17 -0700
-Message-ID: <169059163779.3736.7602272507688648566.stgit@anambiarhost.jf.intel.com>
+Date: Fri, 28 Jul 2023 17:47:22 -0700
+Message-ID: <169059164289.3736.17134833730695570684.stgit@anambiarhost.jf.intel.com>
 In-Reply-To: <169059098829.3736.381753570945338022.stgit@anambiarhost.jf.intel.com>
 References: <169059098829.3736.381753570945338022.stgit@anambiarhost.jf.intel.com>
 User-Agent: StGit/unknown-version
@@ -71,292 +71,100 @@ X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Implement the netdev netlink framework functions for
-napi support. The netdev structure tracks all the napi
-instances and napi fields. The napi instances and associated
-queue[s] can be retrieved this way.
+Add support in netlink spec(netdev.yaml) for interrupt number
+among the NAPI attributes. Add code generated from the spec.
 
 Signed-off-by: Amritha Nambiar <amritha.nambiar@intel.com>
 ---
- net/core/netdev-genl.c |  253 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 251 insertions(+), 2 deletions(-)
+ Documentation/netlink/specs/netdev.yaml |    4 ++++
+ include/uapi/linux/netdev.h             |    1 +
+ tools/include/uapi/linux/netdev.h       |    1 +
+ tools/net/ynl/generated/netdev-user.c   |    6 ++++++
+ tools/net/ynl/generated/netdev-user.h   |    2 ++
+ 5 files changed, 14 insertions(+)
 
-diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
-index e35cfa3cd173..ca3ed6eb457b 100644
---- a/net/core/netdev-genl.c
-+++ b/net/core/netdev-genl.c
-@@ -8,6 +8,20 @@
+diff --git a/Documentation/netlink/specs/netdev.yaml b/Documentation/netlink/specs/netdev.yaml
+index 507cea4f2319..c7f72038184d 100644
+--- a/Documentation/netlink/specs/netdev.yaml
++++ b/Documentation/netlink/specs/netdev.yaml
+@@ -85,6 +85,10 @@ attribute-sets:
+         doc: list of tx queues associated with a napi
+         type: u32
+         multi-attr: true
++      -
++        name: irq
++        doc: The associated interrupt vector number for the napi
++        type: u32
+   -
+     name: napi
+     attributes:
+diff --git a/include/uapi/linux/netdev.h b/include/uapi/linux/netdev.h
+index bc06f692d9fd..17782585be72 100644
+--- a/include/uapi/linux/netdev.h
++++ b/include/uapi/linux/netdev.h
+@@ -52,6 +52,7 @@ enum {
+ 	NETDEV_A_NAPI_INFO_ENTRY_NAPI_ID = 1,
+ 	NETDEV_A_NAPI_INFO_ENTRY_RX_QUEUES,
+ 	NETDEV_A_NAPI_INFO_ENTRY_TX_QUEUES,
++	NETDEV_A_NAPI_INFO_ENTRY_IRQ,
  
- #include "netdev-genl-gen.h"
+ 	__NETDEV_A_NAPI_INFO_ENTRY_MAX,
+ 	NETDEV_A_NAPI_INFO_ENTRY_MAX = (__NETDEV_A_NAPI_INFO_ENTRY_MAX - 1)
+diff --git a/tools/include/uapi/linux/netdev.h b/tools/include/uapi/linux/netdev.h
+index bc06f692d9fd..17782585be72 100644
+--- a/tools/include/uapi/linux/netdev.h
++++ b/tools/include/uapi/linux/netdev.h
+@@ -52,6 +52,7 @@ enum {
+ 	NETDEV_A_NAPI_INFO_ENTRY_NAPI_ID = 1,
+ 	NETDEV_A_NAPI_INFO_ENTRY_RX_QUEUES,
+ 	NETDEV_A_NAPI_INFO_ENTRY_TX_QUEUES,
++	NETDEV_A_NAPI_INFO_ENTRY_IRQ,
  
-+struct netdev_nl_dump_ctx {
-+	int dev_entry_hash;
-+	int dev_entry_idx;
-+	int napi_idx;
-+};
-+
-+static inline struct netdev_nl_dump_ctx *
-+netdev_dump_ctx(struct netlink_callback *cb)
-+{
-+	NL_ASSERT_DUMP_CTX_FITS(struct netdev_nl_dump_ctx);
-+
-+	return (struct netdev_nl_dump_ctx *)cb->ctx;
-+}
-+
- static int
- netdev_nl_dev_fill(struct net_device *netdev, struct sk_buff *rsp,
- 		   u32 portid, u32 seq, int flags, u32 cmd)
-@@ -120,14 +134,249 @@ int netdev_nl_dev_get_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
- 	return skb->len;
- }
+ 	__NETDEV_A_NAPI_INFO_ENTRY_MAX,
+ 	NETDEV_A_NAPI_INFO_ENTRY_MAX = (__NETDEV_A_NAPI_INFO_ENTRY_MAX - 1)
+diff --git a/tools/net/ynl/generated/netdev-user.c b/tools/net/ynl/generated/netdev-user.c
+index e9a6c8cb5c68..74c24be5641c 100644
+--- a/tools/net/ynl/generated/netdev-user.c
++++ b/tools/net/ynl/generated/netdev-user.c
+@@ -51,6 +51,7 @@ struct ynl_policy_attr netdev_napi_info_entry_policy[NETDEV_A_NAPI_INFO_ENTRY_MA
+ 	[NETDEV_A_NAPI_INFO_ENTRY_NAPI_ID] = { .name = "napi-id", .type = YNL_PT_U32, },
+ 	[NETDEV_A_NAPI_INFO_ENTRY_RX_QUEUES] = { .name = "rx-queues", .type = YNL_PT_U32, },
+ 	[NETDEV_A_NAPI_INFO_ENTRY_TX_QUEUES] = { .name = "tx-queues", .type = YNL_PT_U32, },
++	[NETDEV_A_NAPI_INFO_ENTRY_IRQ] = { .name = "irq", .type = YNL_PT_U32, },
+ };
  
-+static int
-+netdev_nl_napi_fill_one(struct sk_buff *msg, struct napi_struct *napi)
-+{
-+	struct netdev_rx_queue *rx_queue, *rxq;
-+	struct netdev_queue *tx_queue, *txq;
-+	unsigned int rx_qid, tx_qid;
-+	struct nlattr *napi_info;
-+
-+	napi_info = nla_nest_start(msg, NETDEV_A_NAPI_NAPI_INFO);
-+	if (!napi_info)
-+		return -EMSGSIZE;
-+
-+	if (nla_put_u32(msg, NETDEV_A_NAPI_INFO_ENTRY_NAPI_ID, napi->napi_id))
-+		goto nla_put_failure;
-+
-+	list_for_each_entry_safe(rx_queue, rxq, &napi->napi_rxq_list, q_list) {
-+		rx_qid = get_netdev_rx_queue_index(rx_queue);
-+		if (nla_put_u32(msg, NETDEV_A_NAPI_INFO_ENTRY_RX_QUEUES, rx_qid))
-+			goto nla_put_failure;
-+	}
-+
-+	list_for_each_entry_safe(tx_queue, txq, &napi->napi_txq_list, q_list) {
-+		tx_qid = get_netdev_queue_index(tx_queue);
-+		if (nla_put_u32(msg, NETDEV_A_NAPI_INFO_ENTRY_TX_QUEUES, tx_qid))
-+			goto nla_put_failure;
-+	}
-+
-+	nla_nest_end(msg, napi_info);
-+	return 0;
-+nla_put_failure:
-+	nla_nest_cancel(msg, napi_info);
-+	return -EMSGSIZE;
-+}
-+
-+static int
-+netdev_nl_napi_fill(struct net_device *netdev, struct sk_buff *msg, int *start)
-+{
-+	struct napi_struct *napi, *n;
-+	int i = 0;
-+
-+	list_for_each_entry_safe(napi, n, &netdev->napi_list, dev_list) {
-+		if (i < *start) {
-+			i++;
-+			continue;
-+		}
-+		if (netdev_nl_napi_fill_one(msg, napi))
-+			return -EMSGSIZE;
-+		*start = ++i;
-+	}
-+	return 0;
-+}
-+
-+static int
-+netdev_nl_napi_prepare_fill(struct net_device *netdev, u32 portid, u32 seq,
-+			    int flags, u32 cmd)
-+{
-+	struct nlmsghdr *nlh;
-+	struct sk_buff *skb;
-+	bool last = false;
-+	int index = 0;
-+	void *hdr;
-+	int err;
-+
-+	while (!last) {
-+		int tmp_index = index;
-+
-+		skb = genlmsg_new(GENLMSG_DEFAULT_SIZE, GFP_KERNEL);
-+		if (!skb)
-+			return -ENOMEM;
-+
-+		hdr = genlmsg_put(skb, portid, seq, &netdev_nl_family,
-+				  flags | NLM_F_MULTI, cmd);
-+		if (!hdr) {
-+			err = -EMSGSIZE;
-+			goto nla_put_failure;
-+		}
-+		err = netdev_nl_napi_fill(netdev, skb, &index);
-+		if (!err)
-+			last = true;
-+		else if (err != -EMSGSIZE || tmp_index == index)
-+			goto nla_put_failure;
-+
-+		genlmsg_end(skb, hdr);
-+		err = genlmsg_unicast(dev_net(netdev), skb, portid);
-+		if (err)
-+			return err;
-+	}
-+
-+	skb = genlmsg_new(GENLMSG_DEFAULT_SIZE, GFP_KERNEL);
-+	if (!skb)
-+		return -ENOMEM;
-+	nlh = nlmsg_put(skb, portid, seq, NLMSG_DONE, 0, flags | NLM_F_MULTI);
-+	if (!nlh) {
-+		err = -EMSGSIZE;
-+		goto nla_put_failure;
-+	}
-+
-+	return genlmsg_unicast(dev_net(netdev), skb, portid);
-+
-+nla_put_failure:
-+	nlmsg_free(skb);
-+	return err;
-+}
-+
-+static int
-+netdev_nl_napi_info_fill(struct net_device *netdev, u32 portid, u32 seq,
-+			 int flags, u32 cmd)
-+{
-+	struct sk_buff *skb;
-+	void *hdr;
-+	int err;
-+
-+	skb = genlmsg_new(GENLMSG_DEFAULT_SIZE, GFP_KERNEL);
-+	if (!skb)
-+		return -ENOMEM;
-+
-+	hdr = genlmsg_put(skb, portid, seq, &netdev_nl_family, flags, cmd);
-+	if (!hdr) {
-+		err = -EMSGSIZE;
-+		goto err_free_msg;
-+	}
-+	if (nla_put_u32(skb, NETDEV_A_NAPI_IFINDEX, netdev->ifindex)) {
-+		genlmsg_cancel(skb, hdr);
-+		err = -EINVAL;
-+		goto err_free_msg;
-+	}
-+
-+	genlmsg_end(skb, hdr);
-+
-+	err = genlmsg_unicast(dev_net(netdev), skb, portid);
-+	if (err)
-+		return err;
-+
-+	return netdev_nl_napi_prepare_fill(netdev, portid, seq, flags, cmd);
-+
-+err_free_msg:
-+	nlmsg_free(skb);
-+	return err;
-+}
-+
- int netdev_nl_napi_get_doit(struct sk_buff *skb, struct genl_info *info)
- {
--	return -EOPNOTSUPP;
-+	struct net_device *netdev;
-+	u32 ifindex;
-+	int err;
-+
-+	if (GENL_REQ_ATTR_CHECK(info, NETDEV_A_NAPI_IFINDEX))
-+		return -EINVAL;
-+
-+	ifindex = nla_get_u32(info->attrs[NETDEV_A_NAPI_IFINDEX]);
-+
-+	rtnl_lock();
-+
-+	netdev = __dev_get_by_index(genl_info_net(info), ifindex);
-+	if (netdev)
-+		err = netdev_nl_napi_info_fill(netdev, info->snd_portid,
-+					       info->snd_seq, 0, info->genlhdr->cmd);
-+	else
-+		err = -ENODEV;
-+
-+	rtnl_unlock();
-+
-+	return err;
-+}
-+
-+static int
-+netdev_nl_napi_dump_entry(struct net_device *netdev, struct sk_buff *rsp,
-+			  struct netlink_callback *cb, int *start)
-+{
-+	int index = *start;
-+	int tmp_index = index;
-+	void *hdr;
-+	int err;
-+
-+	hdr = genlmsg_put(rsp, NETLINK_CB(cb->skb).portid, cb->nlh->nlmsg_seq,
-+			  &netdev_nl_family, NLM_F_MULTI, NETDEV_CMD_NAPI_GET);
-+	if (!hdr)
-+		return -EMSGSIZE;
-+
-+	if (nla_put_u32(rsp, NETDEV_A_NAPI_IFINDEX, netdev->ifindex))
-+		goto nla_put_failure;
-+
-+	err =  netdev_nl_napi_fill(netdev, rsp, &index);
-+	if (err && (err != -EMSGSIZE || tmp_index == index))
-+		goto nla_put_failure;
-+
-+	*start = index;
-+	genlmsg_end(rsp, hdr);
-+
-+	return err;
-+
-+nla_put_failure:
-+	genlmsg_cancel(rsp, hdr);
-+	return -EINVAL;
- }
+ struct ynl_policy_nest netdev_napi_info_entry_nest = {
+@@ -113,6 +114,11 @@ int netdev_napi_info_entry_parse(struct ynl_parse_arg *yarg,
+ 			n_rx_queues++;
+ 		} else if (type == NETDEV_A_NAPI_INFO_ENTRY_TX_QUEUES) {
+ 			n_tx_queues++;
++		} else if (type == NETDEV_A_NAPI_INFO_ENTRY_IRQ) {
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++			dst->_present.irq = 1;
++			dst->irq = mnl_attr_get_u32(attr);
+ 		}
+ 	}
  
- int netdev_nl_napi_get_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
- {
--	return -EOPNOTSUPP;
-+	struct netdev_nl_dump_ctx *ctx = netdev_dump_ctx(cb);
-+	struct net *net = sock_net(skb->sk);
-+	struct net_device *netdev;
-+	int idx = 0, s_idx, n_idx;
-+	int h, s_h;
-+	int err;
-+
-+	s_h = ctx->dev_entry_hash;
-+	s_idx = ctx->dev_entry_idx;
-+	n_idx = ctx->napi_idx;
-+
-+	rtnl_lock();
-+
-+	for (h = s_h; h < NETDEV_HASHENTRIES; h++, s_idx = 0) {
-+		struct hlist_head *head;
-+
-+		idx = 0;
-+		head = &net->dev_index_head[h];
-+		hlist_for_each_entry(netdev, head, index_hlist) {
-+			if (idx < s_idx)
-+				goto cont;
-+			err = netdev_nl_napi_dump_entry(netdev, skb, cb, &n_idx);
-+			if (err == -EMSGSIZE)
-+				goto out;
-+			n_idx = 0;
-+			if (err < 0)
-+				break;
-+cont:
-+			idx++;
-+		}
-+	}
-+
-+	rtnl_unlock();
-+
-+	return err;
-+
-+out:
-+	rtnl_unlock();
-+
-+	ctx->dev_entry_idx = idx;
-+	ctx->dev_entry_hash = h;
-+	ctx->napi_idx = n_idx;
-+	cb->seq = net->dev_base_seq;
-+
-+	return skb->len;
- }
+diff --git a/tools/net/ynl/generated/netdev-user.h b/tools/net/ynl/generated/netdev-user.h
+index 9274711bd862..a0833eb9a52f 100644
+--- a/tools/net/ynl/generated/netdev-user.h
++++ b/tools/net/ynl/generated/netdev-user.h
+@@ -23,6 +23,7 @@ const char *netdev_xdp_act_str(enum netdev_xdp_act value);
+ struct netdev_napi_info_entry {
+ 	struct {
+ 		__u32 napi_id:1;
++		__u32 irq:1;
+ 	} _present;
  
- static int netdev_genl_netdevice_event(struct notifier_block *nb,
+ 	__u32 napi_id;
+@@ -30,6 +31,7 @@ struct netdev_napi_info_entry {
+ 	__u32 *rx_queues;
+ 	unsigned int n_tx_queues;
+ 	__u32 *tx_queues;
++	__u32 irq;
+ };
+ 
+ /* ============== NETDEV_CMD_DEV_GET ============== */
 
 
