@@ -1,39 +1,47 @@
-Return-Path: <netdev+bounces-22496-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22498-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C840C767B5D
-	for <lists+netdev@lfdr.de>; Sat, 29 Jul 2023 03:51:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23CB9767B64
+	for <lists+netdev@lfdr.de>; Sat, 29 Jul 2023 03:56:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EFE6B1C2193F
-	for <lists+netdev@lfdr.de>; Sat, 29 Jul 2023 01:51:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DB27128283A
+	for <lists+netdev@lfdr.de>; Sat, 29 Jul 2023 01:56:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D73581A;
-	Sat, 29 Jul 2023 01:50:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E514781A;
+	Sat, 29 Jul 2023 01:56:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABE75A31
-	for <netdev@vger.kernel.org>; Sat, 29 Jul 2023 01:50:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 3F688C433D9;
-	Sat, 29 Jul 2023 01:50:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2BD27C
+	for <netdev@vger.kernel.org>; Sat, 29 Jul 2023 01:56:30 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DCF03C433C8;
+	Sat, 29 Jul 2023 01:56:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690595421;
-	bh=1Sh5/9xp6DddNN4KhSxvSnUfb5Iep7xLeylU3QWYXeo=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=XzXdtSe8Xe888DEc0wHGPS9P263OENXVeWfLvP+OLcbV54XZl9FCZNhmOTUEZg0Oc
-	 tG/pqvHSpWOLpR2Kbk0WP5n+/Rw3zUORefrHCwbYXUnPpLZc+Hg4Z9VpdyCuSrftxD
-	 JC8f1/Q/fePHNvtbBYWZRZMCCYMKJ3Z4DuCdJd3Fj6atLPQMgTuq7rlA2v//gnHA1k
-	 ihjvR1jjI47AkrBkGtuwGa3ZbKJOvI7/TIpFPllvY3XMQyuG1aaxMPmejnicn1I+mC
-	 7Wk3WCpwPy4dGBziqWZOdK2NhgxHdV7yvPYNJQ4tQFJ/g3bp4yJIpesTN9pSVLuFu8
-	 fCmQbpzEpNcQw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 229FFE1CF31;
-	Sat, 29 Jul 2023 01:50:21 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1690595790;
+	bh=jcdUwKvuh90JIYIzs5yww3XJ3AZuKlqOVLiM+rfhDvY=;
+	h=From:To:Cc:Subject:Date:From;
+	b=OxxvCAu/qlLJNG1dJSaGFDOK9MNE+fb7RIqU5rZIExGFdCmhd5MMoa0en5osM0TUy
+	 NaYnrL3QMNU+30f7qgbMFyiP8GmZuSK6P6MXL12rNieNNZgDReEk9YJOqWBhvnhfLm
+	 v/yxAfp7RBbSXgZwlIO6Z5TWTCN8dwSxRMEmWl8/kgtAO6M8Q+1dwEyrAHEkBTD7wb
+	 nMxNosJlsnTCvk5l491QfRi8xDDKkLASO7WU+t8OMju8qB8YbcnxKEIYFU3gdVc75G
+	 SS0peiaIXmPlUb9BvhQgHftcbyftr7AuHid2WOD5rFVw9H39wMV+8LVfdZDrtQn78d
+	 0hkvAnyxSUL5w==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	Jakub Kicinski <kuba@kernel.org>,
+	Stephen Hemminger <stephen@networkplumber.org>,
+	leon@kernel.org
+Subject: [PATCH net-next] net: make sure we never create ifindex = 0
+Date: Fri, 28 Jul 2023 18:56:23 -0700
+Message-ID: <20230729015623.17373-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -41,44 +49,43 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: ethernet: mtk_eth_soc: enable nft hw
- flowtable_offload for MT7988 SoC
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169059542113.13127.8969896072159084068.git-patchwork-notify@kernel.org>
-Date: Sat, 29 Jul 2023 01:50:21 +0000
-References: <5e86341b0220a49620dadc02d77970de5ded9efc.1690441576.git.lorenzo@kernel.org>
-In-Reply-To: <5e86341b0220a49620dadc02d77970de5ded9efc.1690441576.git.lorenzo@kernel.org>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: netdev@vger.kernel.org, nbd@nbd.name, john@phrozen.org,
- sean.wang@mediatek.com, Mark-MC.Lee@mediatek.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- lorenzo.bianconi@redhat.com, daniel@makrotopia.org
 
-Hello:
+Instead of allocating from 1 use proper xa_limit, to protect
+ourselves from IDs wrapping back to 0.
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Fixes: 759ab1edb56c ("net: store netdevs in an xarray")
+Reported-by: Stephen Hemminger <stephen@networkplumber.org>
+Link: https://lore.kernel.org/all/20230728162350.2a6d4979@hermes.local/
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+CC: leon@kernel.org
+---
+ net/core/dev.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-On Thu, 27 Jul 2023 09:07:28 +0200 you wrote:
-> Enable hw Packet Process Engine (PPE) for MT7988 SoC.
-> 
-> Tested-by: Daniel Golle <daniel@makrotopia.org>
-> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
-> ---
->  drivers/net/ethernet/mediatek/mtk_eth_soc.c |  3 +++
->  drivers/net/ethernet/mediatek/mtk_ppe.c     | 19 +++++++++++++++----
->  drivers/net/ethernet/mediatek/mtk_ppe.h     | 19 ++++++++++++++++++-
->  3 files changed, 36 insertions(+), 5 deletions(-)
-
-Here is the summary with links:
-  - [net-next] net: ethernet: mtk_eth_soc: enable nft hw flowtable_offload for MT7988 SoC
-    https://git.kernel.org/netdev/net-next/c/88efedf517e6
-
-You are awesome, thank you!
+diff --git a/net/core/dev.c b/net/core/dev.c
+index b58674774a57..2312ca67b95e 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -9587,7 +9587,8 @@ static int dev_index_reserve(struct net *net, u32 ifindex)
+ 
+ 	if (!ifindex)
+ 		err = xa_alloc_cyclic(&net->dev_by_index, &ifindex, NULL,
+-				      xa_limit_31b, &net->ifindex, GFP_KERNEL);
++				      XA_LIMIT(1, INT_MAX), &net->ifindex,
++				      GFP_KERNEL);
+ 	else
+ 		err = xa_insert(&net->dev_by_index, ifindex, NULL, GFP_KERNEL);
+ 	if (err < 0)
+@@ -11271,7 +11272,6 @@ static int __net_init netdev_init(struct net *net)
+ 	if (net->dev_index_head == NULL)
+ 		goto err_idx;
+ 
+-	net->ifindex = 1;
+ 	xa_init_flags(&net->dev_by_index, XA_FLAGS_ALLOC);
+ 
+ 	RAW_INIT_NOTIFIER_HEAD(&net->netdev_chain);
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.41.0
 
 
