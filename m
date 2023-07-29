@@ -1,169 +1,163 @@
-Return-Path: <netdev+bounces-22576-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22577-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 806127680E1
-	for <lists+netdev@lfdr.de>; Sat, 29 Jul 2023 20:04:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4207A7680E4
+	for <lists+netdev@lfdr.de>; Sat, 29 Jul 2023 20:07:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 970F71C208FD
-	for <lists+netdev@lfdr.de>; Sat, 29 Jul 2023 18:04:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6F1B51C20A95
+	for <lists+netdev@lfdr.de>; Sat, 29 Jul 2023 18:07:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0092A174C9;
-	Sat, 29 Jul 2023 18:04:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0307E174CB;
+	Sat, 29 Jul 2023 18:07:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF9A015BD;
-	Sat, 29 Jul 2023 18:04:30 +0000 (UTC)
-Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5193DE7A;
-	Sat, 29 Jul 2023 11:04:29 -0700 (PDT)
-Received: by mail-lj1-x22f.google.com with SMTP id 38308e7fff4ca-2b974031aeaso47416631fa.0;
-        Sat, 29 Jul 2023 11:04:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690653867; x=1691258667;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=K5zTJ2m7y4gUPHPHwEYR3KU4kKwzaZIM/2cgPL3RDIA=;
-        b=M2lZREb6f3m5/J3yggEV0YpjtZOqHpuL7AvHoDm3iAu9g6ry+ZnHop+roInlkEfEGv
-         5xUUFHWV141rwPCccFt4EdcNLGXm8zvkOVlps29wRkGZIEV6PASVfJqz76ZPoz5tMifX
-         9hk9gs7IgpUEMlMayt1yZ0Uu0DPxA1LYojqoyVKr3v1x0GE8qmwg4KodObhvoiIfBVkL
-         agwv+QeG7RkYvxinIwSMEyWExnwRK8LFbEvV7eD8lWi+ZT+lQ/rRd+2618Bhw9bZxn94
-         1nTkghnOZQ6qyM3WLhUAOn3DYxVNaO2TtShV1Rrndmelkj1ftAZCEIuIcoserIy1WpM1
-         BPzg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690653867; x=1691258667;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=K5zTJ2m7y4gUPHPHwEYR3KU4kKwzaZIM/2cgPL3RDIA=;
-        b=LIWkyfjTJWUvsxLCVTIN90D/CVTbpEjzf38O77ns5h3TMRvNM8AXHNrqr7I/7kK+v8
-         tPGEbXTzYuyqvj75V6tXgq1xJywHDsPVfK7R8qa9VIhg5WqmhSjGBiVAxU883dgBvBSI
-         fDyG/8lOqUX3s6WsgS+8UYUAIY/QRCSje3fF+EVCXK3sx0VtcRHfC6QIHsOe8gMa1jnT
-         +o+ZkKEEoYu8+nW0PazcSwbmZaYirQoaacdTTPhulDxXUdPS4D+qCZ0IL4wVunVK5DK6
-         dYhuBXBy4hPdTJU9t0ook/ceVJylajSJ6ZRV08dZzq4rZst1ZkPPp0OGVGDM6DiJVQYs
-         FZ2w==
-X-Gm-Message-State: ABy/qLbS2rTodlkrIjC4U69Jl1G8muogT8Uj/F/Ts+6sfj017cePQ5TV
-	zwgVqI7SxL+eGIUr/aTmNqI+7WwjsPvA2QCvEMc=
-X-Google-Smtp-Source: APBJJlEm83JwHBYnqV6b7FBIR3SRFxDWJ6rYq6OTRiXSBhRaERzeQ19BCZN38MMYIu5hnlC5x9ZdNpHfci2S1K/69kk=
-X-Received: by 2002:a2e:978f:0:b0:2b9:b066:66a4 with SMTP id
- y15-20020a2e978f000000b002b9b06666a4mr3871153lji.4.1690653867374; Sat, 29 Jul
- 2023 11:04:27 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E898410785
+	for <netdev@vger.kernel.org>; Sat, 29 Jul 2023 18:07:07 +0000 (UTC)
+Received: from mgamail.intel.com (unknown [134.134.136.126])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 792D310FF;
+	Sat, 29 Jul 2023 11:07:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1690654026; x=1722190026;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=tT3wP+FAPv+fZuu7vI6KFd2fqjjxbQbUxunSx/zWWXg=;
+  b=B5QDUrB7/rpS0ExBgE42qNj6+M3ujLq5gdDJwK8dVpm6OSNldoxg6tBB
+   hdi24DW9oCaWy3cP63LRHfMXWUOJOeuefO2oqalSpPTtpFz8gBpNQaN0i
+   vu6K0Z4tzLd7z28YnjhjSj0QMX7WJtVS3PPUbsJLjW54KeAHBWbKA1swu
+   B9bV6aL2TXENJzWLUg2OSLj/e+u2S4Y7xEc2aLzDUTpBK5eifa+CjbZk4
+   R8U3usfdc/yjMtwaTqZqXjA/g3szX8O4cTMErKYbv+VY+CBURu2GOibnB
+   BrTupbn1mr7bXPlcz7ybn3IYlaNVxUe68JylTRmoazhacCOaLG9eEW8N9
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10786"; a="353687289"
+X-IronPort-AV: E=Sophos;i="6.01,240,1684825200"; 
+   d="scan'208";a="353687289"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jul 2023 11:07:05 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10786"; a="727797369"
+X-IronPort-AV: E=Sophos;i="6.01,240,1684825200"; 
+   d="scan'208";a="727797369"
+Received: from lkp-server02.sh.intel.com (HELO 953e8cd98f7d) ([10.239.97.151])
+  by orsmga002.jf.intel.com with ESMTP; 29 Jul 2023 11:07:01 -0700
+Received: from kbuild by 953e8cd98f7d with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1qPoLE-0004EB-19;
+	Sat, 29 Jul 2023 18:07:00 +0000
+Date: Sun, 30 Jul 2023 02:06:57 +0800
+From: kernel test robot <lkp@intel.com>
+To: Daniel Golle <daniel@makrotopia.org>, Felix Fietkau <nbd@nbd.name>,
+	John Crispin <john@phrozen.org>, Sean Wang <sean.wang@mediatek.com>,
+	Mark Lee <Mark-MC.Lee@mediatek.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next] net: ethernet: mtk_eth_soc: support per-flow
+ accounting on MT7988
+Message-ID: <202307300133.j8MIsDCa-lkp@intel.com>
+References: <801c89963e95e5ce8f1ab7dbda894dd9da0125cc.1690638748.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230728173923.1318596-1-larysa.zaremba@intel.com>
- <20230728173923.1318596-13-larysa.zaremba@intel.com> <20230728215340.pf3qcfxh7g4x7s6a@MacBook-Pro-8.local>
- <64c53b1b29a66_e235c2942d@willemb.c.googlers.com.notmuch>
-In-Reply-To: <64c53b1b29a66_e235c2942d@willemb.c.googlers.com.notmuch>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Sat, 29 Jul 2023 11:04:16 -0700
-Message-ID: <CAADnVQ+vn0=1UT5_c628ovq+LzfrNFf0MxmZn++NqeUFJ-ykQw@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v4 12/21] xdp: Add checksum hint
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Larysa Zaremba <larysa.zaremba@intel.com>, bpf <bpf@vger.kernel.org>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yhs@fb.com>, John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
-	Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
-	David Ahern <dsahern@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Willem de Bruijn <willemb@google.com>, Jesper Dangaard Brouer <brouer@redhat.com>, 
-	Anatoly Burakov <anatoly.burakov@intel.com>, Alexander Lobakin <alexandr.lobakin@intel.com>, 
-	Magnus Karlsson <magnus.karlsson@gmail.com>, Maryam Tahhan <mtahhan@redhat.com>, 
-	xdp-hints@xdp-project.net, Network Development <netdev@vger.kernel.org>, 
-	Simon Horman <simon.horman@corigine.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <801c89963e95e5ce8f1ab7dbda894dd9da0125cc.1690638748.git.daniel@makrotopia.org>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,
+	SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sat, Jul 29, 2023 at 9:15=E2=80=AFAM Willem de Bruijn
-<willemdebruijn.kernel@gmail.com> wrote:
->
-> Alexei Starovoitov wrote:
-> > On Fri, Jul 28, 2023 at 07:39:14PM +0200, Larysa Zaremba wrote:
-> > >
-> > > +union xdp_csum_info {
-> > > +   /* Checksum referred to by ``csum_start + csum_offset`` is consid=
-ered
-> > > +    * valid, but was never calculated, TX device has to do this,
-> > > +    * starting from csum_start packet byte.
-> > > +    * Any preceding checksums are also considered valid.
-> > > +    * Available, if ``status =3D=3D XDP_CHECKSUM_PARTIAL``.
-> > > +    */
-> > > +   struct {
-> > > +           u16 csum_start;
-> > > +           u16 csum_offset;
-> > > +   };
-> > > +
-> >
-> > CHECKSUM_PARTIAL makes sense on TX, but this RX. I don't see in the abo=
-ve.
->
-> It can be observed on RX when packets are looped.
->
-> This may be observed even in XDP on veth.
+Hi Daniel,
 
-veth and XDP is a broken combination. GSO packets coming out of containers
-cannot be parsed properly by XDP.
-It was added mainly for testing. Just like "generic XDP".
-bpf progs at skb layer is much better fit for veth.
+kernel test robot noticed the following build errors:
 
-> > > +   /* Checksum, calculated over the whole packet.
-> > > +    * Available, if ``status & XDP_CHECKSUM_COMPLETE``.
-> > > +    */
-> > > +   u32 checksum;
-> >
-> > imo XDP RX should only support XDP_CHECKSUM_COMPLETE with u32 checksum
-> > or XDP_CHECKSUM_UNNECESSARY.
-> >
-> > > +};
-> > > +
-> > > +enum xdp_csum_status {
-> > > +   /* HW had parsed several transport headers and validated their
-> > > +    * checksums, same as ``CHECKSUM_UNNECESSARY`` in ``sk_buff``.
-> > > +    * 3 least significant bytes contain number of consecutive checks=
-ums,
-> > > +    * starting with the outermost, reported by hardware as valid.
-> > > +    * ``sk_buff`` checksum level (``csum_level``) notation is provid=
-ed
-> > > +    * for driver developers.
-> > > +    */
-> > > +   XDP_CHECKSUM_VALID_LVL0         =3D 1,    /* 1 outermost checksum=
- */
-> > > +   XDP_CHECKSUM_VALID_LVL1         =3D 2,    /* 2 outermost checksum=
-s */
-> > > +   XDP_CHECKSUM_VALID_LVL2         =3D 3,    /* 3 outermost checksum=
-s */
-> > > +   XDP_CHECKSUM_VALID_LVL3         =3D 4,    /* 4 outermost checksum=
-s */
-> > > +   XDP_CHECKSUM_VALID_NUM_MASK     =3D GENMASK(2, 0),
-> > > +   XDP_CHECKSUM_VALID              =3D XDP_CHECKSUM_VALID_NUM_MASK,
-> >
-> > I don't see what bpf prog suppose to do with these levels.
-> > The driver should pick between 3:
-> > XDP_CHECKSUM_UNNECESSARY, XDP_CHECKSUM_COMPLETE, XDP_CHECKSUM_NONE.
-> >
-> > No levels and no anything partial. please.
->
-> This levels business is an unfortunate side effect of
-> CHECKSUM_UNNECESSARY. For a packet with multiple checksum fields, what
-> does the boolean actually mean? With these levels, at least that is
-> well defined: the first N checksum fields.
+[auto build test ERROR on net-next/main]
 
-If I understand this correctly this is intel specific feature that
-other NICs don't have. skb layer also doesn't have such concept.
-The driver should say CHECKSUM_UNNECESSARY when it's sure
-or don't pretend that it checks the checksum and just say NONE.
+url:    https://github.com/intel-lab-lkp/linux/commits/Daniel-Golle/net-ethernet-mtk_eth_soc-support-per-flow-accounting-on-MT7988/20230729-215634
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/801c89963e95e5ce8f1ab7dbda894dd9da0125cc.1690638748.git.daniel%40makrotopia.org
+patch subject: [PATCH net-next] net: ethernet: mtk_eth_soc: support per-flow accounting on MT7988
+config: x86_64-allyesconfig (https://download.01.org/0day-ci/archive/20230730/202307300133.j8MIsDCa-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
+reproduce: (https://download.01.org/0day-ci/archive/20230730/202307300133.j8MIsDCa-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202307300133.j8MIsDCa-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   drivers/net/ethernet/mediatek/mtk_ppe.c: In function 'mtk_mib_entry_read':
+>> drivers/net/ethernet/mediatek/mtk_ppe.c:112:17: error: 'bytes_cnt_low' undeclared (first use in this function); did you mean 'byte_cnt_low'?
+     112 |                 bytes_cnt_low = cnt_r0;
+         |                 ^~~~~~~~~~~~~
+         |                 byte_cnt_low
+   drivers/net/ethernet/mediatek/mtk_ppe.c:112:17: note: each undeclared identifier is reported only once for each function it appears in
+>> drivers/net/ethernet/mediatek/mtk_ppe.c:113:17: error: 'bytes_cnt_high' undeclared (first use in this function); did you mean 'byte_cnt_high'?
+     113 |                 bytes_cnt_high = cnt_r1;
+         |                 ^~~~~~~~~~~~~~
+         |                 byte_cnt_high
+
+
+vim +112 drivers/net/ethernet/mediatek/mtk_ppe.c
+
+    92	
+    93	static int mtk_mib_entry_read(struct mtk_ppe *ppe, u16 index, u64 *bytes, u64 *packets)
+    94	{
+    95		u32 byte_cnt_low, byte_cnt_high, pkt_cnt_low, pkt_cnt_high;
+    96		u32 val, cnt_r0, cnt_r1, cnt_r2;
+    97		int ret;
+    98	
+    99		val = FIELD_PREP(MTK_PPE_MIB_SER_CR_ADDR, index) | MTK_PPE_MIB_SER_CR_ST;
+   100		ppe_w32(ppe, MTK_PPE_MIB_SER_CR, val);
+   101	
+   102		ret = mtk_ppe_mib_wait_busy(ppe);
+   103		if (ret)
+   104			return ret;
+   105	
+   106		cnt_r0 = readl(ppe->base + MTK_PPE_MIB_SER_R0);
+   107		cnt_r1 = readl(ppe->base + MTK_PPE_MIB_SER_R1);
+   108		cnt_r2 = readl(ppe->base + MTK_PPE_MIB_SER_R2);
+   109	
+   110		if (mtk_is_netsys_v3_or_greater(ppe->eth)) {
+   111			/* 64 bit for each counter */
+ > 112			bytes_cnt_low = cnt_r0;
+ > 113			bytes_cnt_high = cnt_r1;
+   114			pkt_cnt_low = cnt_r2;
+   115			pkt_cnt_high = readl(ppe->base + MTK_PPE_MIB_SER_R3);
+   116		} else {
+   117			/* 48 bit for each counter */
+   118			byte_cnt_low = FIELD_GET(MTK_PPE_MIB_SER_R0_BYTE_CNT_LOW, cnt_r0);
+   119			byte_cnt_high = FIELD_GET(MTK_PPE_MIB_SER_R1_BYTE_CNT_HIGH, cnt_r1);
+   120			pkt_cnt_low = FIELD_GET(MTK_PPE_MIB_SER_R1_PKT_CNT_LOW, cnt_r1);
+   121			pkt_cnt_high = FIELD_GET(MTK_PPE_MIB_SER_R2_PKT_CNT_HIGH, cnt_r2);
+   122		}
+   123	
+   124		*bytes = ((u64)byte_cnt_high << 32) | byte_cnt_low;
+   125		*packets = (pkt_cnt_high << 16) | pkt_cnt_low;
+   126	
+   127		return 0;
+   128	}
+   129	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
