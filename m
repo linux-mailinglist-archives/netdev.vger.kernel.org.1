@@ -1,98 +1,70 @@
-Return-Path: <netdev+bounces-22519-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22520-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 190B2767DF2
-	for <lists+netdev@lfdr.de>; Sat, 29 Jul 2023 12:00:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 268B5767DF4
+	for <lists+netdev@lfdr.de>; Sat, 29 Jul 2023 12:01:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C16C8281315
-	for <lists+netdev@lfdr.de>; Sat, 29 Jul 2023 10:00:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE3C8280365
+	for <lists+netdev@lfdr.de>; Sat, 29 Jul 2023 10:01:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D0C714261;
-	Sat, 29 Jul 2023 09:58:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 168341427F;
+	Sat, 29 Jul 2023 09:58:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DCC511C8F;
-	Sat, 29 Jul 2023 09:58:17 +0000 (UTC)
-Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05on20611.outbound.protection.outlook.com [IPv6:2a01:111:f400:7e1b::611])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9355129;
-	Sat, 29 Jul 2023 02:58:15 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06C7B168DF
+	for <netdev@vger.kernel.org>; Sat, 29 Jul 2023 09:58:25 +0000 (UTC)
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2118.outbound.protection.outlook.com [40.107.93.118])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09E2A129;
+	Sat, 29 Jul 2023 02:58:24 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=TK5E/NnDzEHI986XwzHzSvvNa3/ZCxnRnDK+24CfFvulKSpjG1Nnss+5Nn7GqgeVKtY+/y621I+Dde5wZnOVBrLhM/Dux12WMmk8Sqpiht1m+W9KdKVjPSXx84lVqTjikbekJ8xWIO74N6mdVGXQD35mxFeyd/gDlFdped9Gjp5YALbS4EARRS9yXx1PWy7G/9w8+UE1VzIuQcot8NfgAdsghiRT+vluQMSIb8NtEUh5JiCR3NKOPX454VYXMwJTRsyvDpbwfhAh7xAx37onYgx9QkcyW/T5ID+XXJbELVHy86FPhJ+I7hrEeYo7h+5RlqeoEkUgejhLHMlpt0v+iw==
+ b=kAjvWat6+C1BrnrTjBZafNDDBeL0M5bogd1ZgJrjpjq3Y+FMXWijzVMCbDFbbdPZAVai30QUyxWsayraCgE7qNggXnYiJG/EwpeXQ3w+cQQLxZeyc/hqRv5nMnMY2skaLrmIcdzBWXNO3PeF3GMKHbti38hp3tJa8RPoWm/vYT+nRynnswHXDlVqkKPEpk/zw0Tak1/yUPGJYVUJJQycewsG+8mClblrGnaH54mqeY+GiVHPvkLUw94WM8LzMKs7mKXS57oUDd33Uyx1GRWvfyYOTP6qJ0Do+d4zduujyHyDD8qrWa3kF62cIl5qqcyQXEeIg+VnH+XiBd/IZkJZFg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=fNR1Z0O8+imQ4xIF3S+4EWt9/8j7kXiMDTOLw5RsoM0=;
- b=kUkDSxU4jGQen6v9eiMJdJFj4exKUeVfKEbPWXUkREtOM82gTWzvClDMq806S5K9reu94NeKsV6HJKUiSD3MM6yb6GrZT8LICjpG8G33HbOwCplrukaodjBRe6ZPo7PonkNnhC4vSAkVRPX64PHlyC3IOpclVSiUyvEY8yFjwf3MUliJG4DFNBxbKKTg15eXunCS7OyiFunQY6VkqHla1MaoM4YPIuQFi94pOPQgj7BmqPUaWFkKsn5DWDB2LZDyiauRv8SEaagQwYzBEqySwrdk6/jai/r5pOqcVeDhX6c5KfhiCj5bTiVTGe3zkz8Zm7+/j5gNFX616iJwD534dg==
+ bh=0VaS0VXvkqFyy3/JYNGUDh9ejao0VPFJIBS3yDJ25/Y=;
+ b=GvDPOQJRyOzPbq9C6Nn6yBOwXZYXHIxbPZqlSAc7sTXwKgJHVH1V/ExcXfGPZAEzeop6t5WzfnDSfHIjT3U/I+Mjr2ZznxfF1mxwIoPSgOaTxwVy9d5baYAfM4CSSjQoKmFcD/elX3Y2CgWndf2v8DkMgXJSBdRD64ckyv0vxBYOa5t80+6LhpAiyidHq7RAqGKq2P9EEmDACXUfpQ5YifiEHsl5RiKvwsiIZcoOsvQZQHXsbyd6gL9d5Iy3pXR3sEhDDDhEgVkVGmS5M6JkS2Qaf9x9eAL7LJEzLXUmEQoRjnCia9A2W7t4PEmZPOOZdtHfWzRBU+lpFq5pXmuu7A==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=suse.com; dmarc=pass action=none header.from=suse.com;
- dkim=pass header.d=suse.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=selector1;
+ smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
+ dkim=pass header.d=corigine.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=fNR1Z0O8+imQ4xIF3S+4EWt9/8j7kXiMDTOLw5RsoM0=;
- b=M+T/9HmucdQBGrBB7SzhoQTk3BVluLQhR9Z7Kx1ew8laMW87dlNBAfWpP55VS/r+sTvgBwjTXV8Scw3Mde6AylmknFNDHZwBCzVZVFH7Q6dibOPjaW+oYsuPFi0gR8gukEsEqQqHHnetG2BP9b3qeogT7DQ99fyTwB3UiuWaVz3VjBTHfNadiQpjgtlBP7YJDgVkRbgQUkW7+5Wnraofe4opETcwn5gxwaqm838GVukp33UfpnGxFdTHA17G3wUtKZLP2HZZMcSU/au1kp1V6QjAsRJ8yhR6mVrxNhLSF7bikoDZXYanpfUmwwcgApItNJmFl7jKiLb8LpqDV0UZZg==
+ bh=0VaS0VXvkqFyy3/JYNGUDh9ejao0VPFJIBS3yDJ25/Y=;
+ b=JsbykddI5VkY6ZFSO931vQEmOyieYi5r2+IamB+1/6W6WkHPwfnQcyqvCi+/R9qjo70Ohef7zCrFJCrXPDTO7Ozu195uthYEjqdkivmcgMi95ht2Y5AZ1IMVJqfOMFH6bmI7OX19FTMq/umzJJ2xTWqHw24VyvJMYkAkX45VtYQ=
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=suse.com;
-Received: from HE1PR0402MB3497.eurprd04.prod.outlook.com (2603:10a6:7:83::14)
- by AS8PR04MB8417.eurprd04.prod.outlook.com (2603:10a6:20b:3f9::18) with
+ header.d=none;dmarc=none action=none header.from=corigine.com;
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
+ by SJ0PR13MB5676.namprd13.prod.outlook.com (2603:10b6:a03:403::9) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.39; Sat, 29 Jul
- 2023 09:58:11 +0000
-Received: from HE1PR0402MB3497.eurprd04.prod.outlook.com
- ([fe80::bf65:a49a:8861:4f92]) by HE1PR0402MB3497.eurprd04.prod.outlook.com
- ([fe80::bf65:a49a:8861:4f92%2]) with mapi id 15.20.6631.026; Sat, 29 Jul 2023
- 09:58:10 +0000
-From: Geliang Tang <geliang.tang@suse.com>
-To: Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Song Liu <song@kernel.org>,
-	Yonghong Song <yhs@fb.com>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>,
-	Stanislav Fomichev <sdf@google.com>,
-	Hao Luo <haoluo@google.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Florent Revest <revest@chromium.org>,
-	Brendan Jackman <jackmanb@chromium.org>,
-	Matthieu Baerts <matthieu.baerts@tessares.net>,
-	Mat Martineau <martineau@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	John Johansen <john.johansen@canonical.com>,
-	Paul Moore <paul@paul-moore.com>,
-	James Morris <jmorris@namei.org>,
-	"Serge E. Hallyn" <serge@hallyn.com>,
-	Stephen Smalley <stephen.smalley.work@gmail.com>,
-	Eric Paris <eparis@parisplace.org>,
-	Mykola Lysenko <mykolal@fb.com>,
-	Shuah Khan <shuah@kernel.org>
-Cc: Geliang Tang <geliang.tang@suse.com>,
-	bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	mptcp@lists.linux.dev,
-	apparmor@lists.ubuntu.com,
-	linux-security-module@vger.kernel.org,
-	selinux@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: [RFC bpf-next v7 6/6] selftests/bpf: Add mptcpify selftest
-Date: Sat, 29 Jul 2023 17:57:27 +0800
-Message-Id: <27a7ada7aa480301102cbe1f7ea1303bae52d705.1690624340.git.geliang.tang@suse.com>
-X-Mailer: git-send-email 2.35.3
-In-Reply-To: <cover.1690624340.git.geliang.tang@suse.com>
-References: <cover.1690624340.git.geliang.tang@suse.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SG2PR02CA0120.apcprd02.prod.outlook.com
- (2603:1096:4:92::36) To HE1PR0402MB3497.eurprd04.prod.outlook.com
- (2603:10a6:7:83::14)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.32; Sat, 29 Jul
+ 2023 09:58:22 +0000
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::fde7:9821:f2d9:101d]) by PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::fde7:9821:f2d9:101d%7]) with mapi id 15.20.6631.026; Sat, 29 Jul 2023
+ 09:58:22 +0000
+Date: Sat, 29 Jul 2023 11:58:14 +0200
+From: Simon Horman <simon.horman@corigine.com>
+To: Suman Ghosh <sumang@marvell.com>
+Cc: sgoutham@marvell.com, gakula@marvell.com, sbhatta@marvell.com,
+	hkelam@marvell.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, lcherian@marvell.com,
+	jerinj@marvell.com
+Subject: Re: [net-next PATCH V2] octeontx2-af: Tc flower offload support for
+ inner VLAN
+Message-ID: <ZMTitp4+oc3+/D1U@corigine.com>
+References: <20230727051252.2779804-1-sumang@marvell.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230727051252.2779804-1-sumang@marvell.com>
+X-ClientProxiedBy: AS4PR09CA0013.eurprd09.prod.outlook.com
+ (2603:10a6:20b:5e0::19) To PH0PR13MB4842.namprd13.prod.outlook.com
+ (2603:10b6:510:78::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -100,190 +72,215 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: HE1PR0402MB3497:EE_|AS8PR04MB8417:EE_
-X-MS-Office365-Filtering-Correlation-Id: a4582274-8b00-4965-3283-08db901a50fe
+X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|SJ0PR13MB5676:EE_
+X-MS-Office365-Filtering-Correlation-Id: 953fe6fd-0c0b-4bd8-3e8f-08db901a576e
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	YzKuQJspS18Gf5DkJegF9TSMZIM9c3BwqXZyss4vzJoWrDdv2jrKSUhWdhJ7C2np4fTSsr2TJrvvVeFU6uK+KYYIJjZYCPI6/6BCUAHWwXSkZGLRoi09PPQiyKvmJNJyZn61+dAOdjWX+Brp8OlUySUEvUjFV6VuJpGueLF63s1fMSPxe+ModmM4NH/bGNsy9VflVs7ezhwgsKi8uSnMzI6zzU/iDsaTVO4A2Sy73m101T15nvTWu5Zu24CrYiPJV9uc4RqoE62V4Bnj7/MJeTfyGdMf7mhyeA3+QPqHFZuRFw4wcttnCoW+He3beTfsphZYDG2UTi3TAWLI4vymvqomB0z59P7dE9ZzXIcyJQ1cwJtY3T4fcYwiaVgo2LwWRe+05sYwrvTfFtkNYd5gaeY7oqOHa/EaqfsVk+4MmM07UrGiq7Z4OYDXEEr1qYczGPTka8ULR+rV/BHLeWojhF38iLrkSmnkegTnWEr1akvKoLDn38EFLK1MFAnQ5LochhyE/JTMWdpL31X0wz9y1H3alU9i2z1RzuwVHvNC5M23BJHZf2Vc0cbhf73VSk9eKSQ4DHCQFO5qXZlrTYUezDsSc5kCkLFyQfOMbDpmf1o=
+	9IOl7384xg6m2x1jtlKm3tpUWnR7aBX/IAhxwvhB+H5aX68O058zwb+KS4DeHTd6lvT9+q4CVgwvgufwF0+mWtcU/+8+PGSFvM5n+SKiuEL+feyghcozq8BPwb4nUnTTb/8H2gNNjf7WQEOTebnH8qWblgCcyTeI2bLFevQRGfttegOpOTn0CaFfIrMWThDqjU5xVHFpdnBubvMdPHitfMO+eN8aKgTreLBB8l9ewZU3ywC0lT2KeYChdoBP+5GwSa9Xf1Pz/9HabjStMZd9oDwgZXqS9oSDSIqGlFXaAZe+Dp0bkOMTnTQPVYLDXTn6tDCwGBIEkIMjUf2e4CBhbdJ+sGOYk7ngC591kk5X+5slvRRzKjNSRa8rBmmvTyNTfMbBXwqecOP7I1l3p0gF+3WpCkJ8RBwLKRc2kuRpL2LLyHQgrm4dcU1h+E9j6OTMOV6vsZdZankWczU/MzGGIkZbL5/ODytKZHBiIVFCUrWugwLy2eVsW4c/CJE59jTaRnczxS9aIUXBMFdTyADhvOajmxfXqPcoKoxmurQU8/MVNjTc/ptIqoCLFxbdprCDGsySYdZqHoBnMEIfPjctMj0OiK/iV5eAt56MMnQ/Dwc=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:HE1PR0402MB3497.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(366004)(39860400002)(376002)(346002)(396003)(136003)(451199021)(6512007)(6486002)(36756003)(2616005)(6506007)(26005)(83380400001)(186003)(44832011)(66946007)(66556008)(7406005)(7416002)(921005)(110136005)(41300700001)(86362001)(66476007)(316002)(4326008)(5660300002)(8936002)(8676002)(38100700002)(2906002)(6666004)(478600001);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(376002)(39830400003)(366004)(346002)(136003)(451199021)(6506007)(478600001)(6666004)(6486002)(6512007)(36756003)(186003)(44832011)(2906002)(8676002)(2616005)(6916009)(316002)(41300700001)(7416002)(5660300002)(38100700002)(66946007)(4326008)(66476007)(66556008)(8936002)(86362001);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?fj6n3OSbb4PgC5kxdtyTQI9MN05ivysGKoVqH5mE5yQ7OeDdDoDqdHhxGYoK?=
- =?us-ascii?Q?R3JAnM2hlRVhyMn4HotFx6JRGvGeXcAAsuWE03aM2CDe9T1g+svqPNq1b4MA?=
- =?us-ascii?Q?rq6EWBY2QdC2R7DcIQYLlvPvs6LOsiDk8kepu3r9o7DklzyKbXxfIYQ3FIua?=
- =?us-ascii?Q?5ubUc2LVIc6lOi9CtwbXKXnLL3ZaEmtGySnDqsRWi17kFfcHYFXt/qPK6DM8?=
- =?us-ascii?Q?j8dkNUtVwuqjeLryKEbL10zKcNivotfRHXiR2hmBvBzBjK/zW1J1MDm3Z/Ng?=
- =?us-ascii?Q?PIJoyrGK8tyC4Xggl+H8rvj7q/+dNs2RiQql2WQFk9I6YrqU8RXkQqUuKa6h?=
- =?us-ascii?Q?DX7TbHinUM8YwtTmledhkKU0SvklXlEix8N4RNOW0AbofC+8QoedorJbtLqI?=
- =?us-ascii?Q?VKHIpZYqJ1SnVpJpMGkF6RszW13zs3PGTbhRm5UnVozIY4yjlD9Y75qTQ1vU?=
- =?us-ascii?Q?RMynDi7re3cl3lZCNNBj6ewK3LbF/RfO/o8ARHNtyNbwTi5kZy9QASOZIUA8?=
- =?us-ascii?Q?JkPWQUDoH4DZns3orAo7EU0NuNCjkZOeVuUjbFjtYALs46lBexmtXExSby9e?=
- =?us-ascii?Q?eFjybR6nCuj5HmPGP8j/xIfE6k3gPz5Wr1fbtPyBZvnsXKZeQp8BYEp366Ck?=
- =?us-ascii?Q?3bfOiQ0BDVLVruGy/nnJeBn9LWzA+Qxr81BpR5Q6L5qzUBBMPyDfdsJLXghZ?=
- =?us-ascii?Q?RwehTfoDF2bfb2d2nmHmkyVr3UZ2WN5lEB2g3gKMfvVjsbasu6Qm454oSHOX?=
- =?us-ascii?Q?dAHi1RLIbfEigQqqGf7hVzCGuK1mdE/KRUgds9Nsbl1Z8sFH3TtPBw7I8qSn?=
- =?us-ascii?Q?MgyaO3G0RLWD64quzNVyvr3FbtKVA4fTBWck1hz7TSu9BXa0hK7VumuBvmAy?=
- =?us-ascii?Q?sJItwL03iYMl7FF5vwmwpn0nZPFYktbg0jxKB7wCG0y43E5OfB4I9FS5lV5m?=
- =?us-ascii?Q?y6OwHDppya236KL8GyrB6LeaIMuEQnesegFl2xderWVegGNRPvPUsM7rriJL?=
- =?us-ascii?Q?WiHfVtmISggq+FWnHfKI8SPsmTueQiQcCkFv/us5sQrXjVzAd2vJEFPZoQj/?=
- =?us-ascii?Q?UY+hxNa/L7h7oZToJv/D/JA2hNizyFf73Hb+rR055aDYXCRwyOrtpYna/du4?=
- =?us-ascii?Q?CI1/VADPKXoqubIhmCYC1YYPcUAG+CHlPfYbZKeQijDDs3jqC+zN6cZliOv1?=
- =?us-ascii?Q?IJ98LqPtQC5jb3EOaGqIH7q0ArWxaJizM7wHwizcSSPAAkU7lqxtgeqFJH9c?=
- =?us-ascii?Q?sKr+1pnwv8Iuk1B8sq+mmFa1RiX59YuM2YlpaC5UusNUI5pA0sg+IiGQo+Kq?=
- =?us-ascii?Q?1gVbRgjr2y83PbaxOqAaX+N3XJZyCHT0Boh10bh/PP/ITEOAs0F3aXH24498?=
- =?us-ascii?Q?XodQW+X0ujdGhwfc2OgHtINDyD8FQwn7ntjJkANoZHLOiwW1/O4RjqWqvdMT?=
- =?us-ascii?Q?wWciqV/NZDLFM+xQ2WYRytG5GraiWBo/9fdBGMQ/cNt9JUHlEmrZI8uu/ZDk?=
- =?us-ascii?Q?MyslDylzbtAO4wuOfjfu4LPuUJ//DPiuGNf6oAV51VwtI7W3VuFb1Ev0iKuZ?=
- =?us-ascii?Q?Dj8RVK6CkzwbVQLT7KprnG0ouDdC6jU/NhO9Eqez?=
-X-OriginatorOrg: suse.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a4582274-8b00-4965-3283-08db901a50fe
-X-MS-Exchange-CrossTenant-AuthSource: HE1PR0402MB3497.eurprd04.prod.outlook.com
+	=?us-ascii?Q?Ib8pJXvF1oWqGqZaTecQ/nD8aveWhEm1fHyOg/oXP7Sw9R+oOvcVejij1a8D?=
+ =?us-ascii?Q?CVtJP2tGCgWZrFk3C9umMX7VWUynlLHUqFVyM2q1uNRzTwgHsgcF5heqGDbP?=
+ =?us-ascii?Q?XgDwoJUfi1UxNp28gu4/X3JdCZ/M0zVHygKi50ASyINlb/AjMtywC3j9URbO?=
+ =?us-ascii?Q?IFtU7n13t3hoMHZHx+qUGpqjNVsCRjYIgp3YnH66GDnsWrxk4tQYO49yASYg?=
+ =?us-ascii?Q?p3PSUcnDGCAdHbZYckLHRJ8Q4y7i6mCzOYgh3asLF0LTIntuum7+jDTfoQbb?=
+ =?us-ascii?Q?lGCEmnWr4PJ+wFmtq5AI0BT2vIL1/+J6qWkcbkoK+IyaOCjLFN6l8reay6X7?=
+ =?us-ascii?Q?h6CLst0S1dhwniPXK1AO91X+OKbfa8pFm9FmIhUgeH6fbajIizX3h7DCr4SW?=
+ =?us-ascii?Q?qJJusd3qqm9cqRy+GvSYFGCFTHPGhc0L7Bn6O2W3LC1H9TZLHFtDWhy/HOLi?=
+ =?us-ascii?Q?F92YNdKXvmItUm3iiqa87pxS1G/It4O+ERWjzFwQUFpc0Y1FUT0bsOVMyXTQ?=
+ =?us-ascii?Q?2Hl+RqyPsnxCpZc/NqM+lNuAcsz9qAR34HjXVuQo/tdsn6zoLZjhRCYfBO1n?=
+ =?us-ascii?Q?tNSvYT5PAkQnqZiRgBC2ASk0uscwBrY/tik34VcqTpEu/Aji3BfjPTWckhoc?=
+ =?us-ascii?Q?S47OGm+E0fzPlsUjNpRs7mtO/MII7upGnSK2YHudw/lidIxtjd4sC5IITyLH?=
+ =?us-ascii?Q?dz9tAbLrCoHcBeeVQGU/0OKwq8kdZH149Yp2BJ6rh//jpWBjiUkWIisL58Rg?=
+ =?us-ascii?Q?fNGAX2ZQOpTnp7uD+XeGnlQzpnyz2sjjqIr9zBtUfMpE1C/nkvu1qmi5U+M1?=
+ =?us-ascii?Q?C+22GkeK8XRjwrTuLpaTR54FVPMc1l0kzEYTExT++J/y1waJy53mlUlHnLVv?=
+ =?us-ascii?Q?Lqa1SDqjwaZUmheMlddn6Hvi8edBvr6KDRlVy9o3w/zdLpEzt+C/wDQNQhxI?=
+ =?us-ascii?Q?0TTceONHdhCBvyipl8NEiFRnVoo/yt6K3J0/ipP39NwMtuAAT4mUgiPp7kfA?=
+ =?us-ascii?Q?vdZLgzYNYaNNORidRFWUx/CA2z4+VEn2Defxo/8sVPtOzCy8s9JM6b3Upifq?=
+ =?us-ascii?Q?wG4FK2ed/FuyL3HcKSc2Ozh4B0+NVBX0aLzvpb6BvcCHPJeVRY4d4fxqZBkk?=
+ =?us-ascii?Q?bSrJa1eWjpmANIeK0Xa1QkvlGRX2rmvRLdOvQ1Jqv/PdqWrJZcfzn9A0SPdA?=
+ =?us-ascii?Q?rl1Kr0rPdJmYLw/He8X5DmU7IgoSkU/B3pItzihag1TaMyRmMaxiIHJL/mmK?=
+ =?us-ascii?Q?tgUlMS2ENdP6Y0RUNmev4WXuRE4YX//IrBDyjb2r7mQM01gHBdlUS+SQgXMK?=
+ =?us-ascii?Q?fiUa29bgHgqdZ02c80fVUCWk+AxlVFAC//nTrfNi0ABx8KbA5VxHHa8+smWW?=
+ =?us-ascii?Q?j6jWMdvgbvJS97pDJs3wc9S9ZerG3GM3xm6GUW/DkPyV9rdac1xVhQ0LhHRo?=
+ =?us-ascii?Q?FLAi8m9Oh9Wgx5Cn842UK9QMU3rurTFs8D0HcdccgsdFOipWYyJLmA+xIPE5?=
+ =?us-ascii?Q?bkiCqgJLbnYgpLRvGyYb1JclaUVd+yXDg/v0g4OAnM4gv4whovNrWo1dsF2o?=
+ =?us-ascii?Q?ZNP44RdSp3qtuMJb/jWXzzTcFtPcb5UX75PwU3z045psN6JkLcZmOlW9Vc5S?=
+ =?us-ascii?Q?eECPLwOZT7vIuBzfATZrIgcEEM1M6e97p+EySsIsfrqutpVw6W262y2HAOfk?=
+ =?us-ascii?Q?x98HaA=3D=3D?=
+X-OriginatorOrg: corigine.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 953fe6fd-0c0b-4bd8-3e8f-08db901a576e
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Jul 2023 09:58:10.7748
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Jul 2023 09:58:21.7835
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: f7a17af6-1c5c-4a36-aa8b-f5be247aa4ba
+X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: WDH64IBJT6Uqxut3kJxsdPzMXlYjjPe6hgCr1ngR6s5ItwZyy8BL+i6l61mHX1oxxfAFUne9PIbcypRx1xYNEA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB8417
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+X-MS-Exchange-CrossTenant-UserPrincipalName: k7tooZWkU6ozSnBhFOnSOFaXBqlnSgEBeHG1UbdHMdDaRiVEqEGgTAyuP+ZPKOZCjJTEQ2+11L9CEJ1loovUP1yUnXWxrzP+MTkdYTe42fw=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR13MB5676
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-This patch extends the MPTCP test base, add a selftest test_mptcpify()
-for the mptcpify case.
+On Thu, Jul 27, 2023 at 10:42:52AM +0530, Suman Ghosh wrote:
 
-Open and load the mptcpify test prog to mptcpify the TCP sockets
-dynamically, then use start_server() and connect_to_fd() to create a
-TCP socket, but actually what's created is an MPTCP socket, which can
-be verified through the outputs of 'ss' and 'nstat' commands.
+...
 
-Signed-off-by: Geliang Tang <geliang.tang@suse.com>
----
- .../testing/selftests/bpf/prog_tests/mptcp.c  | 94 +++++++++++++++++++
- 1 file changed, 94 insertions(+)
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c
+> index 1e6fc23eca4f..89836cd299e4 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c
+> +++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c
+> @@ -439,6 +439,64 @@ static int otx2_tc_parse_actions(struct otx2_nic *nic,
+>  	return 0;
+>  }
+>  
+> +static int otx2_tc_process_vlan(struct otx2_nic *nic, struct flow_msg *flow_spec,
+> +				struct flow_msg *flow_mask, struct flow_rule *rule,
+> +				struct npc_install_flow_req *req, bool is_inner)
+> +{
 
-diff --git a/tools/testing/selftests/bpf/prog_tests/mptcp.c b/tools/testing/selftests/bpf/prog_tests/mptcp.c
-index 4407bd5c9e9a..caab3aa6a162 100644
---- a/tools/testing/selftests/bpf/prog_tests/mptcp.c
-+++ b/tools/testing/selftests/bpf/prog_tests/mptcp.c
-@@ -6,6 +6,7 @@
- #include "cgroup_helpers.h"
- #include "network_helpers.h"
- #include "mptcp_sock.skel.h"
-+#include "mptcpify.skel.h"
- 
- char NS_TEST[32];
- 
-@@ -195,8 +196,101 @@ static void test_base(void)
- 	close(cgroup_fd);
- }
- 
-+static void send_byte(int fd)
-+{
-+	char b = 0x55;
-+
-+	ASSERT_EQ(write(fd, &b, sizeof(b)), 1, "send single byte");
-+}
-+
-+static int verify_mptcpify(void)
-+{
-+	char cmd[256];
-+	int err = 0;
-+
-+	snprintf(cmd, sizeof(cmd),
-+		 "ip netns exec %s ss -tOni | grep -q '%s'",
-+		 NS_TEST, "tcp-ulp-mptcp");
-+	if (!ASSERT_OK(system(cmd), "No tcp-ulp-mptcp found!"))
-+		err++;
-+
-+	snprintf(cmd, sizeof(cmd),
-+		 "ip netns exec %s nstat -asz %s | awk '%s' | grep -q '%s'",
-+		 NS_TEST, "MPTcpExtMPCapableSYNACKRX",
-+		 "NR==1 {next} {print $2}", "1");
-+	if (!ASSERT_OK(system(cmd), "No MPTcpExtMPCapableSYNACKRX found!"))
-+		err++;
-+
-+	return err;
-+}
-+
-+static int run_mptcpify(int cgroup_fd)
-+{
-+	int server_fd, client_fd, prog_fd, err = 0;
-+	struct mptcpify *mptcpify_skel;
-+
-+	mptcpify_skel = mptcpify__open_and_load();
-+	if (!ASSERT_OK_PTR(mptcpify_skel, "skel_open_load"))
-+		return -EIO;
-+
-+	err = mptcpify__attach(mptcpify_skel);
-+	if (!ASSERT_OK(err, "skel_attach"))
-+		goto out;
-+
-+	prog_fd = bpf_program__fd(mptcpify_skel->progs.mptcpify);
-+	if (!ASSERT_GE(prog_fd, 0, "bpf_program__fd")) {
-+		err = -EIO;
-+		goto out;
-+	}
-+
-+	/* without MPTCP */
-+	server_fd = start_server(AF_INET, SOCK_STREAM, NULL, 0, 0);
-+	if (!ASSERT_GE(server_fd, 0, "start_server")) {
-+		err = -EIO;
-+		goto out;
-+	}
-+
-+	client_fd = connect_to_fd(server_fd, 0);
-+	if (!ASSERT_GE(client_fd, 0, "connect to fd")) {
-+		err = -EIO;
-+		goto close_server;
-+	}
-+
-+	send_byte(client_fd);
-+	err += verify_mptcpify();
-+
-+	close(client_fd);
-+close_server:
-+	close(server_fd);
-+out:
-+	mptcpify__destroy(mptcpify_skel);
-+	return err;
-+}
-+
-+static void test_mptcpify(void)
-+{
-+	struct nstoken *nstoken = NULL;
-+	int cgroup_fd;
-+
-+	cgroup_fd = test__join_cgroup("/mptcpify");
-+	if (!ASSERT_GE(cgroup_fd, 0, "test__join_cgroup"))
-+		return;
-+
-+	nstoken = create_netns();
-+	if (!ASSERT_OK_PTR(nstoken, "create_netns"))
-+		goto fail;
-+
-+	ASSERT_OK(run_mptcpify(cgroup_fd), "run_mptcpify");
-+
-+fail:
-+	cleanup_netns(nstoken);
-+	close(cgroup_fd);
-+}
-+
- void test_mptcp(void)
- {
- 	if (test__start_subtest("base"))
- 		test_base();
-+	if (test__start_subtest("mptcpify"))
-+		test_mptcpify();
- }
--- 
-2.35.3
+Hi Suman,
 
+Most of the code in this function seems to be moved from elsewhere.
+It might make it slightly easier to review if there was a patch
+that moved that code, then another patch that modified to
+support the inner VLAN feature.
+
+> +	struct flow_match_vlan match;
+> +	u16 vlan_tci, vlan_tci_mask;
+> +
+> +	if (is_inner)
+> +		flow_rule_match_cvlan(rule, &match);
+> +	else
+> +		flow_rule_match_vlan(rule, &match);
+> +
+> +	if ((ntohs(match.key->vlan_tpid) != ETH_P_8021Q) &&
+> +	    (ntohs(match.key->vlan_tpid) != ETH_P_8021AD)) {
+
+I think eth_type_vlan() can be used here.
+
+> +		netdev_err(nic->netdev, "vlan tpid 0x%x not supported\n",
+> +			   ntohs(match.key->vlan_tpid));
+> +		return -EOPNOTSUPP;
+> +	}
+> +
+> +	if (!match.mask->vlan_id) {
+> +		struct flow_action_entry *act;
+> +		int i;
+> +
+> +		flow_action_for_each(i, act, &rule->action) {
+> +			if (act->id == FLOW_ACTION_DROP) {
+> +				netdev_err(nic->netdev,
+> +					   "vlan tpid 0x%x with vlan_id %d is not supported for DROP rule.\n",
+> +					   ntohs(match.key->vlan_tpid), match.key->vlan_id);
+> +				return -EOPNOTSUPP;
+> +			}
+> +		}
+> +	}
+> +
+> +	if (match.mask->vlan_id ||
+> +	    match.mask->vlan_dei ||
+> +	    match.mask->vlan_priority) {
+> +		vlan_tci = match.key->vlan_id |
+> +			   match.key->vlan_dei << 12 |
+> +			   match.key->vlan_priority << 13;
+> +
+> +		vlan_tci_mask = match.mask->vlan_id |
+> +				match.mask->vlan_dei << 12 |
+> +				match.mask->vlan_priority << 13;
+> +
+> +		if (is_inner) {
+> +			flow_spec->vlan_itci = htons(vlan_tci);
+> +			flow_mask->vlan_itci = htons(vlan_tci_mask);
+> +			req->features |= BIT_ULL(NPC_INNER_VID);
+> +		} else {
+> +			flow_spec->vlan_tci = htons(vlan_tci);
+> +			flow_mask->vlan_tci = htons(vlan_tci_mask);
+> +			req->features |= BIT_ULL(NPC_OUTER_VID);
+> +		}
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+>  static int otx2_tc_prepare_flow(struct otx2_nic *nic, struct otx2_tc_flow *node,
+>  				struct flow_cls_offload *f,
+>  				struct npc_install_flow_req *req)
+> @@ -458,6 +516,7 @@ static int otx2_tc_prepare_flow(struct otx2_nic *nic, struct otx2_tc_flow *node,
+>  	      BIT(FLOW_DISSECTOR_KEY_BASIC) |
+>  	      BIT(FLOW_DISSECTOR_KEY_ETH_ADDRS) |
+>  	      BIT(FLOW_DISSECTOR_KEY_VLAN) |
+> +	      BIT(FLOW_DISSECTOR_KEY_CVLAN) |
+>  	      BIT(FLOW_DISSECTOR_KEY_IPV4_ADDRS) |
+>  	      BIT(FLOW_DISSECTOR_KEY_IPV6_ADDRS) |
+>  	      BIT(FLOW_DISSECTOR_KEY_PORTS) |
+> @@ -564,47 +623,19 @@ static int otx2_tc_prepare_flow(struct otx2_nic *nic, struct otx2_tc_flow *node,
+>  	}
+>  
+>  	if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_VLAN)) {
+> -		struct flow_match_vlan match;
+> -		u16 vlan_tci, vlan_tci_mask;
+> -
+> -		flow_rule_match_vlan(rule, &match);
+> -
+> -		if (ntohs(match.key->vlan_tpid) != ETH_P_8021Q) {
+> -			netdev_err(nic->netdev, "vlan tpid 0x%x not supported\n",
+> -				   ntohs(match.key->vlan_tpid));
+> -			return -EOPNOTSUPP;
+> -		}
+> +		int ret;
+>  
+> -		if (!match.mask->vlan_id) {
+> -			struct flow_action_entry *act;
+> -			int i;
+> -
+> -			flow_action_for_each(i, act, &rule->action) {
+> -				if (act->id == FLOW_ACTION_DROP) {
+> -					netdev_err(nic->netdev,
+> -						   "vlan tpid 0x%x with vlan_id %d is not supported for DROP rule.\n",
+> -						   ntohs(match.key->vlan_tpid),
+> -						   match.key->vlan_id);
+> -					return -EOPNOTSUPP;
+> -				}
+> -			}
+> -		}
+> -
+> -		if (match.mask->vlan_id ||
+> -		    match.mask->vlan_dei ||
+> -		    match.mask->vlan_priority) {
+> -			vlan_tci = match.key->vlan_id |
+> -				   match.key->vlan_dei << 12 |
+> -				   match.key->vlan_priority << 13;
+> +		ret = otx2_tc_process_vlan(nic, flow_spec, flow_mask, rule, req, false);
+> +		if (ret)
+> +			return ret;
+> +	}
+>  
+> -			vlan_tci_mask = match.mask->vlan_id |
+> -					match.mask->vlan_dei << 12 |
+> -					match.mask->vlan_priority << 13;
+> +	if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_CVLAN)) {
+> +		int ret;
+>  
+> -			flow_spec->vlan_tci = htons(vlan_tci);
+> -			flow_mask->vlan_tci = htons(vlan_tci_mask);
+> -			req->features |= BIT_ULL(NPC_OUTER_VID);
+> -		}
+> +		ret = otx2_tc_process_vlan(nic, flow_spec, flow_mask, rule, req, true);
+> +		if (ret)
+> +			return ret;
+>  	}
+>  
+>  	if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_IPV4_ADDRS)) {
+> -- 
+> 2.25.1
+> 
+> 
 
