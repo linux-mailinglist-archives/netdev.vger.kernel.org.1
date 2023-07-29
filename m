@@ -1,117 +1,349 @@
-Return-Path: <netdev+bounces-22581-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22582-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD2367681CA
-	for <lists+netdev@lfdr.de>; Sat, 29 Jul 2023 22:21:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 266B8768208
+	for <lists+netdev@lfdr.de>; Sat, 29 Jul 2023 23:49:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 87B7A2821BD
-	for <lists+netdev@lfdr.de>; Sat, 29 Jul 2023 20:21:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 423641C20A3A
+	for <lists+netdev@lfdr.de>; Sat, 29 Jul 2023 21:49:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 582EA174EB;
-	Sat, 29 Jul 2023 20:21:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD9401772E;
+	Sat, 29 Jul 2023 21:49:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AD11174DC
-	for <netdev@vger.kernel.org>; Sat, 29 Jul 2023 20:21:23 +0000 (UTC)
-Received: from mgamail.intel.com (unknown [192.55.52.136])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E73CA11C
-	for <netdev@vger.kernel.org>; Sat, 29 Jul 2023 13:21:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1690662081; x=1722198081;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=OST7aykYo27Vqc4IzfrypFSyPsGOYMH1HgY5w/1ZOIs=;
-  b=HtA5QnPC/lh8ddDn4U75TBx3Bj2/XCkjj3lSErhEb0We9mFTH8sroPQH
-   eHZ0edokx1/jcLUsi66ZANlA8aO2TSuZts/KuykUEzEEIqhYAli9uTJlz
-   zBf7OAF7jwGr51Mc4UfCzRa+UfKFt1I/SWPuPFTuYECKW5Ty/fpNC6O5X
-   MkGZCrxwIt71igP8dQGMUw7WnaKXWm9Mf46nhq4D+kIc6U0Z+4sFr3fh0
-   ADZ2OsS1HSHydejgVdfOrcDB+WNH4I0qNzpdnIr8aCqLB6u4qQ6whGzAd
-   wIjC8npvnU2+28EhCwDIkskmcCiqfJOXoL34NKi6ND4mhTse49g7cdzfZ
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10786"; a="348392274"
-X-IronPort-AV: E=Sophos;i="6.01,240,1684825200"; 
-   d="scan'208";a="348392274"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jul 2023 13:21:21 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10786"; a="704932252"
-X-IronPort-AV: E=Sophos;i="6.01,240,1684825200"; 
-   d="scan'208";a="704932252"
-Received: from lkp-server02.sh.intel.com (HELO 953e8cd98f7d) ([10.239.97.151])
-  by orsmga006.jf.intel.com with ESMTP; 29 Jul 2023 13:21:18 -0700
-Received: from kbuild by 953e8cd98f7d with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1qPqRC-0004Hx-0K;
-	Sat, 29 Jul 2023 20:21:18 +0000
-Date: Sun, 30 Jul 2023 04:20:57 +0800
-From: kernel test robot <lkp@intel.com>
-To: Louis Peens <louis.peens@corigine.com>,
-	David Miller <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	Simon Horman <simon.horman@corigine.com>,
-	Yinjun Zhang <yinjun.zhang@corigine.com>,
-	Tianyu Yuan <tianyu.yuan@corigine.com>, oss-drivers@corigine.com
-Subject: Re: [PATCH net-next 05/12] nfp: introduce keepalive mechanism for
- multi-PF setup
-Message-ID: <202307300422.oPy5E1hB-lkp@intel.com>
-References: <20230724094821.14295-6-louis.peens@corigine.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2BB87C
+	for <netdev@vger.kernel.org>; Sat, 29 Jul 2023 21:49:36 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2E4D2733
+	for <netdev@vger.kernel.org>; Sat, 29 Jul 2023 14:49:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1690667374;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=9xoC7L2bOOoVu4fgnru97jFTPx3UfbeG/oW1+7jnOPk=;
+	b=LBNpB2fOOJtC8nSvSRBaDl/FlwBEBLM74jT0WIaAjDsjK4fQjSm51E6lu/IShHhZMgWa4x
+	ozNMYC5HlnZxmMRIID0nnLisgZmJAABJfoXo/BpyToTE4rZTA+U0z5dRS2tzmsLexNCRxt
+	W7wEqpcSbq3ZFoBRlFZMQNlPIuPlFrU=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-662-hWbhkitSMLSaI_dUnS9x_w-1; Sat, 29 Jul 2023 17:49:30 -0400
+X-MC-Unique: hWbhkitSMLSaI_dUnS9x_w-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 98B08858F1E;
+	Sat, 29 Jul 2023 21:49:29 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.131])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id D50992166B25;
+	Sat, 29 Jul 2023 21:49:27 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <20230718160737.52c68c73@kernel.org>
+References: <20230718160737.52c68c73@kernel.org> <000000000000881d0606004541d1@google.com> <0000000000001416bb06004ebf53@google.com>
+To: Jakub Kicinski <kuba@kernel.org>,
+    Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: dhowells@redhat.com,
+    syzbot <syzbot+f527b971b4bdc8e79f9e@syzkaller.appspotmail.com>,
+    bpf@vger.kernel.org, brauner@kernel.org, davem@davemloft.net,
+    dsahern@kernel.org, edumazet@google.com,
+    linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+    netdev@vger.kernel.org, pabeni@redhat.com,
+    syzkaller-bugs@googlegroups.com, viro@zeniv.linux.org.uk
+Subject: Endless loop in udp with MSG_SPLICE_READ - Re: [syzbot] [fs?] INFO: task hung in pipe_release (4)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230724094821.14295-6-louis.peens@corigine.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <792237.1690667367.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 29 Jul 2023 22:49:27 +0100
+Message-ID: <792238.1690667367@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Louis,
+Hi Jakub, Willem,
 
-kernel test robot noticed the following build warnings:
+I think I'm going to need your help with this one.
 
-[auto build test WARNING on net-next/main]
+> > syzbot has bisected this issue to:
+> > =
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Louis-Peens/nsp-generate-nsp-command-with-variable-nsp-major-version/20230724-180015
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20230724094821.14295-6-louis.peens%40corigine.com
-patch subject: [PATCH net-next 05/12] nfp: introduce keepalive mechanism for multi-PF setup
-config: openrisc-randconfig-r081-20230730 (https://download.01.org/0day-ci/archive/20230730/202307300422.oPy5E1hB-lkp@intel.com/config)
-compiler: or1k-linux-gcc (GCC) 12.3.0
-reproduce: (https://download.01.org/0day-ci/archive/20230730/202307300422.oPy5E1hB-lkp@intel.com/reproduce)
+> > commit 7ac7c987850c3ec617c778f7bd871804dc1c648d
+> > Author: David Howells <dhowells@redhat.com>
+> > Date:   Mon May 22 12:11:22 2023 +0000
+> > =
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202307300422.oPy5E1hB-lkp@intel.com/
+> >     udp: Convert udp_sendpage() to use MSG_SPLICE_PAGES
+> > =
 
-sparse warnings: (new ones prefixed by >>)
-   drivers/net/ethernet/netronome/nfp/nfp_main.c: note: in included file (through drivers/net/ethernet/netronome/nfp/nfp_net.h):
->> include/linux/io-64-nonatomic-hi-lo.h:22:16: sparse: sparse: cast truncates bits from constant value (6e66702e62656174 becomes 62656174)
+> > bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=3D15853bc=
+aa80000
+> > start commit:   3f01e9fed845 Merge tag 'linux-watchdog-6.5-rc2' of git=
+://w..
+> > git tree:       upstream
+> > final oops:     https://syzkaller.appspot.com/x/report.txt?x=3D17853bc=
+aa80000
+> > console output: https://syzkaller.appspot.com/x/log.txt?x=3D13853bcaa8=
+0000
+> > kernel config:  https://syzkaller.appspot.com/x/.config?x=3D150188feee=
+7071a7
+> > dashboard link: https://syzkaller.appspot.com/bug?extid=3Df527b971b4bd=
+c8e79f9e
+> > syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=3D12a86682=
+a80000
+> > C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=3D1520ab6ca8=
+0000
+> > =
 
-vim +22 include/linux/io-64-nonatomic-hi-lo.h
+> > Reported-by: syzbot+f527b971b4bdc8e79f9e@syzkaller.appspotmail.com
+> > Fixes: 7ac7c987850c ("udp: Convert udp_sendpage() to use MSG_SPLICE_PA=
+GES")
+> > =
 
-797a796a13df6b include/asm-generic/io-64-nonatomic-hi-lo.h Hitoshi Mitake 2012-02-07  18  
-3a044178cccfeb include/asm-generic/io-64-nonatomic-hi-lo.h Jason Baron    2014-07-04  19  static inline void hi_lo_writeq(__u64 val, volatile void __iomem *addr)
-797a796a13df6b include/asm-generic/io-64-nonatomic-hi-lo.h Hitoshi Mitake 2012-02-07  20  {
-797a796a13df6b include/asm-generic/io-64-nonatomic-hi-lo.h Hitoshi Mitake 2012-02-07  21  	writel(val >> 32, addr + 4);
-797a796a13df6b include/asm-generic/io-64-nonatomic-hi-lo.h Hitoshi Mitake 2012-02-07 @22  	writel(val, addr);
-797a796a13df6b include/asm-generic/io-64-nonatomic-hi-lo.h Hitoshi Mitake 2012-02-07  23  }
-3a044178cccfeb include/asm-generic/io-64-nonatomic-hi-lo.h Jason Baron    2014-07-04  24  
+> > For information about bisection process see: https://goo.gl/tpsmEJ#bis=
+ection
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+The issue that syzbot is triggering seems to be something to do with the
+calculations in the "if (copy <=3D 0) { ... }" chunk in __ip_append_data()=
+ when
+MSG_SPLICE_PAGES is in operation.
+
+What seems to happen is that the test program uses sendmsg() + MSG_MORE to
+loads a UDP packet with 1406 bytes of data to the MTU size (1434) and then
+splices in 8 extra bytes.
+
+	r3 =3D socket$inet_udp(0x2, 0x2, 0x0)
+	setsockopt$sock_int(r3, 0x1, 0x6, &(0x7f0000000140)=3D0x32, 0x4)
+	bind$inet(r3, &(0x7f0000000000)=3D{0x2, 0x0, @dev=3D{0xac, 0x14, 0x14, 0x=
+15}}, 0x10)
+	connect$inet(r3, &(0x7f0000000200)=3D{0x2, 0x0, @broadcast}, 0x10)
+	sendmmsg(r3, &(0x7f0000000180)=3D[{{0x0, 0x0, 0x0}}, {{0x0, 0xfffffffffff=
+ffed3, &(0x7f0000000940)=3D[{&(0x7f00000006c0)=3D'O', 0x57e}], 0x1}}], 0x4=
+000000000003bd, 0x8800)
+	write$binfmt_misc(r1, &(0x7f0000000440)=3DANY=3D[], 0x8)
+	splice(r0, 0x0, r2, 0x0, 0x4ffe0, 0x0)
+
+This results in some negative intermediate values turning up in the
+calculations - and this results in the remaining length being made longer
+from 8 to 14.
+
+I added some printks (patch attached), resulting in the attached traceline=
+s:
+
+	=3D=3D>splice_to_socket() 7099
+	udp_sendmsg(8,8)
+	__ip_append_data(copy=3D-6,len=3D8, mtu=3D1434 skblen=3D1434 maxfl=3D1428=
+)
+	pagedlen 14 =3D 14 - 0
+	copy -6 =3D 14 - 0 - 6 - 14
+	length 8 -=3D -6 + 0
+	__ip_append_data(copy=3D1414,len=3D14, mtu=3D1434 skblen=3D20 maxfl=3D142=
+8)
+	copy=3D1414 len=3D14
+	skb_splice_from_iter(8,14)
+	__ip_append_data(copy=3D1406,len=3D6, mtu=3D1434 skblen=3D28 maxfl=3D1428=
+)
+	copy=3D1406 len=3D6
+	skb_splice_from_iter(0,6)
+	__ip_append_data(copy=3D1406,len=3D6, mtu=3D1434 skblen=3D28 maxfl=3D1428=
+)
+	copy=3D1406 len=3D6
+	skb_splice_from_iter(0,6)
+	__ip_append_data(copy=3D1406,len=3D6, mtu=3D1434 skblen=3D28 maxfl=3D1428=
+)
+	copy=3D1406 len=3D6
+	skb_splice_from_iter(0,6)
+	__ip_append_data(copy=3D1406,len=3D6, mtu=3D1434 skblen=3D28 maxfl=3D1428=
+)
+	copy=3D1406 len=3D6
+	skb_splice_from_iter(0,6)
+	copy=3D1406 len=3D6
+	skb_splice_from_iter(0,6)
+	...
+
+'copy' gets calculated as -6 because the maxfraglen (maxfl=3D1428) is 8 by=
+tes
+less than the amount of data then in the packet (skblen=3D1434).
+
+'copy' gets recalculated part way down as -6 from datalen (14) - transhdrl=
+en
+(0) - fraggap (6) - pagedlen (14).
+
+datalen is 14 because it was length (8) + fraggap (6).
+
+Inside skb_splice_from_iter(), we eventually end up in an enless loop in w=
+hich
+msg_iter.count is 0 and the length to be copied is 6.  It always returns 0
+because there's nothing to copy, and so __ip_append_data() cycles round th=
+e
+loop endlessly.
+
+Any suggestion as to how to fix this?
+
+Thanks,
+David
+---
+
+Debug hang in pipe_release's pipe_lock
+---
+ fs/splice.c          |    3 +++
+ net/core/skbuff.c    |    7 +++++++
+ net/ipv4/ip_output.c |   24 ++++++++++++++++++++++++
+ net/ipv4/udp.c       |    3 +++
+ 4 files changed, 37 insertions(+)
+
+diff --git a/fs/splice.c b/fs/splice.c
+index 004eb1c4ce31..9ee82b818bd6 100644
+--- a/fs/splice.c
++++ b/fs/splice.c
+@@ -801,6 +801,8 @@ ssize_t splice_to_socket(struct pipe_inode_info *pipe,=
+ struct file *out,
+ 	size_t spliced =3D 0;
+ 	bool need_wakeup =3D false;
+ =
+
++	printk("=3D=3D>splice_to_socket() %u\n", current->pid);
++
+ 	pipe_lock(pipe);
+ =
+
+ 	while (len > 0) {
+@@ -911,6 +913,7 @@ ssize_t splice_to_socket(struct pipe_inode_info *pipe,=
+ struct file *out,
+ 	pipe_unlock(pipe);
+ 	if (need_wakeup)
+ 		wakeup_pipe_writers(pipe);
++	printk("<=3D=3Dsplice_to_socket() =3D %zd\n", spliced ?: ret);
+ 	return spliced ?: ret;
+ }
+ #endif
+diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+index a298992060e6..c3d60da9e3f7 100644
+--- a/net/core/skbuff.c
++++ b/net/core/skbuff.c
+@@ -6801,6 +6801,13 @@ ssize_t skb_splice_from_iter(struct sk_buff *skb, s=
+truct iov_iter *iter,
+ 	ssize_t spliced =3D 0, ret =3D 0;
+ 	unsigned int i;
+ =
+
++	static int __pcount;
++
++	if (__pcount < 6) {
++		printk("skb_splice_from_iter(%zu,%zd)\n", iter->count, maxsize);
++		__pcount++;
++	}
++
+ 	while (iter->count > 0) {
+ 		ssize_t space, nr, len;
+ 		size_t off;
+diff --git a/net/ipv4/ip_output.c b/net/ipv4/ip_output.c
+index 6e70839257f7..8c84a7d13627 100644
+--- a/net/ipv4/ip_output.c
++++ b/net/ipv4/ip_output.c
+@@ -1066,6 +1066,14 @@ static int __ip_append_data(struct sock *sk,
+ 		copy =3D mtu - skb->len;
+ 		if (copy < length)
+ 			copy =3D maxfraglen - skb->len;
++		if (flags & MSG_SPLICE_PAGES) {
++			static int __pcount;
++			if (__pcount < 6) {
++				printk("__ip_append_data(copy=3D%d,len=3D%d, mtu=3D%d skblen=3D%d max=
+fl=3D%d)\n",
++				       copy, length, mtu, skb->len, maxfraglen);
++				__pcount++;
++			}
++		}
+ 		if (copy <=3D 0) {
+ 			char *data;
+ 			unsigned int datalen;
+@@ -1112,6 +1120,10 @@ static int __ip_append_data(struct sock *sk,
+ 			else {
+ 				alloclen =3D fragheaderlen + transhdrlen;
+ 				pagedlen =3D datalen - transhdrlen;
++				if (flags & MSG_SPLICE_PAGES) {
++					printk("pagedlen %d =3D %d - %d\n",
++					       pagedlen, datalen, transhdrlen);
++				}
+ 			}
+ =
+
+ 			alloclen +=3D alloc_extra;
+@@ -1158,6 +1170,9 @@ static int __ip_append_data(struct sock *sk,
+ 			}
+ =
+
+ 			copy =3D datalen - transhdrlen - fraggap - pagedlen;
++			if (flags & MSG_SPLICE_PAGES)
++				printk("copy %d =3D %d - %d - %d - %d\n",
++				       copy, datalen, transhdrlen, fraggap, pagedlen);
+ 			if (copy > 0 && getfrag(from, data + transhdrlen, offset, copy, fragga=
+p, skb) < 0) {
+ 				err =3D -EFAULT;
+ 				kfree_skb(skb);
+@@ -1165,6 +1180,8 @@ static int __ip_append_data(struct sock *sk,
+ 			}
+ =
+
+ 			offset +=3D copy;
++			if (flags & MSG_SPLICE_PAGES)
++				printk("length %d -=3D %d + %d\n", length, copy, transhdrlen);
+ 			length -=3D copy + transhdrlen;
+ 			transhdrlen =3D 0;
+ 			exthdrlen =3D 0;
+@@ -1192,6 +1209,13 @@ static int __ip_append_data(struct sock *sk,
+ 			continue;
+ 		}
+ =
+
++		if (flags & MSG_SPLICE_PAGES) {
++			static int __qcount;
++			if (__qcount < 6) {
++				printk("copy=3D%d len=3D%d\n", copy, length);
++				__qcount++;
++			}
++		}
+ 		if (copy > length)
+ 			copy =3D length;
+ =
+
+diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+index 42a96b3547c9..bd3f4e62574b 100644
+--- a/net/ipv4/udp.c
++++ b/net/ipv4/udp.c
+@@ -1081,6 +1081,9 @@ int udp_sendmsg(struct sock *sk, struct msghdr *msg,=
+ size_t len)
+ 	if (msg->msg_flags & MSG_OOB) /* Mirror BSD error message compatibility =
+*/
+ 		return -EOPNOTSUPP;
+ =
+
++	if (msg->msg_flags & MSG_SPLICE_PAGES)
++		printk("udp_sendmsg(%zx,%zx)\n", msg->msg_iter.count, len);
++
+ 	getfrag =3D is_udplite ? udplite_getfrag : ip_generic_getfrag;
+ =
+
+ 	fl4 =3D &inet->cork.fl.u.ip4;
+
 
