@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-22523-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22524-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5B9B767E64
-	for <lists+netdev@lfdr.de>; Sat, 29 Jul 2023 13:01:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4CB56767E71
+	for <lists+netdev@lfdr.de>; Sat, 29 Jul 2023 13:07:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C91A01C20A94
-	for <lists+netdev@lfdr.de>; Sat, 29 Jul 2023 11:01:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A2A9D282497
+	for <lists+netdev@lfdr.de>; Sat, 29 Jul 2023 11:07:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DAED14261;
-	Sat, 29 Jul 2023 11:01:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A258B14272;
+	Sat, 29 Jul 2023 11:07:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1334F10F7
-	for <netdev@vger.kernel.org>; Sat, 29 Jul 2023 11:01:37 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36426C433C8;
-	Sat, 29 Jul 2023 11:01:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54D48210B
+	for <netdev@vger.kernel.org>; Sat, 29 Jul 2023 11:07:42 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4833C433C8;
+	Sat, 29 Jul 2023 11:07:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690628497;
-	bh=r4ub2sfb+3RGyLzoPfGridl9iQmattPqXfX7+exr16M=;
+	s=k20201202; t=1690628862;
+	bh=XFPsoApbITff+ah69P91loWYngnR4L+QvZBYUA6T7PQ=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=lGbKm1rMkfGoHjsONfO6cumIoG2Jf2qe4UP2rgQe6sDRG/jOdD/Kxr0mklt1tacfp
-	 cXbPigsXbB8SsTDdNWosUXxHM2wv020pbiaVX72aIgHv+HsBczN4TVb22kItJIGWTI
-	 H/LA7UYgfUbxyNHEKw7LbDxftDosNGj8zg2Q8AnM7c3IoB+jd2GSdF12UTrqzuUuuU
-	 YRn+0u9j2QGiXBoTo9Fm+BnHHp6oc1C/51sAd+aIxSAMxsvt+XM46aI+KkeVOD7ZiJ
-	 HfIkOOWjInK36k2T3kxTok9UIEW2viq4jeNhhXR2kT4p2xAFsAbuset+MaxswhAW+O
-	 NY7MR7iQaS5Jw==
-Date: Sat, 29 Jul 2023 13:01:32 +0200
+	b=hURT3ZJmTVlc3jtqKmW8N+ECl58CT4W3hl6NDn2ah/vakPW7Gym1dnPvu8zpeBy6T
+	 8WzjbuFyHe1PEt8aFUls7kfEQCQrv+a+ITy/QrndtsWVoVW9t7PrVK1gfTHMhq9n8a
+	 IYrhgjKWNwqNdH1F0yo2PazlAHcwp8BToy43YwhlBQPraHtfnVXOhTCQPbCa6mrfUF
+	 e8UCC1538yky3vBVAUl2or+Ncl0oKIpM5oqY9TmEwE2Z8t5W1FWUgRbXW+tw0ITE/g
+	 LEFKX2sr4CGTbLQ/ADYnE6RX0kwxgKihUDnt74j+y4lcD7Cl73NjWkTstg56gpe8Fv
+	 RWtrduuWvE4Wg==
+Date: Sat, 29 Jul 2023 13:07:38 +0200
 From: Simon Horman <horms@kernel.org>
-To: Lukasz Majewski <lukma@denx.de>
-Cc: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>
-Subject: Re: [PATCH] net: dsa: microchip: KSZ9477 register regmap alignment
- to 32 bit boundaries
-Message-ID: <ZMTxjP5dReD6+B3P@kernel.org>
-References: <20230727081342.3828601-1-lukma@denx.de>
+To: Konstantin Khorenko <khorenko@virtuozzo.com>
+Cc: Simon Horman <simon.horman@corigine.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Manish Chopra <manishc@marvell.com>,
+	Ariel Elior <aelior@marvell.com>,
+	David Miller <davem@davemloft.net>,
+	Sudarsana Kalluru <skalluru@marvell.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH v2 1/1] qed: Fix scheduling in a tasklet while getting
+ stats
+Message-ID: <ZMTy+lpSimgR66jh@kernel.org>
+References: <ZMJcDvPrz1pEBPft@corigine.com>
+ <20230727152609.1633966-1-khorenko@virtuozzo.com>
+ <20230727152609.1633966-2-khorenko@virtuozzo.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -54,34 +54,58 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230727081342.3828601-1-lukma@denx.de>
+In-Reply-To: <20230727152609.1633966-2-khorenko@virtuozzo.com>
 
-On Thu, Jul 27, 2023 at 10:13:42AM +0200, Lukasz Majewski wrote:
-> The commit (SHA1: 5c844d57aa7894154e49cf2fc648bfe2f1aefc1c) provided code
-> to apply "Module 6: Certain PHY registers must be written as pairs instead
-> of singly" errata for KSZ9477 as this chip for certain PHY registers
-> (0xN120 to 0xN13F, N=1,2,3,4,5) must be accesses as 32 bit words instead
-> of 16 or 8 bit access.
-> Otherwise, adjacent registers (no matter if reserved or not) are
-> overwritten with 0x0.
+On Thu, Jul 27, 2023 at 06:26:09PM +0300, Konstantin Khorenko wrote:
+> Here we've got to a situation when tasklet called usleep_range() in PTT
+> acquire logic, thus welcome to the "scheduling while atomic" BUG().
 > 
-> Without this patch some registers (e.g. 0x113c or 0x1134) required for 32
-> bit access are out of valid regmap ranges.
+>   BUG: scheduling while atomic: swapper/24/0/0x00000100
 > 
-> As a result, following error is observed and KSZ9477 is not properly
-> configured:
+>    [<ffffffffb41c6199>] schedule+0x29/0x70
+>    [<ffffffffb41c5512>] schedule_hrtimeout_range_clock+0xb2/0x150
+>    [<ffffffffb41c55c3>] schedule_hrtimeout_range+0x13/0x20
+>    [<ffffffffb41c3bcf>] usleep_range+0x4f/0x70
+>    [<ffffffffc08d3e58>] qed_ptt_acquire+0x38/0x100 [qed]
+>    [<ffffffffc08eac48>] _qed_get_vport_stats+0x458/0x580 [qed]
+>    [<ffffffffc08ead8c>] qed_get_vport_stats+0x1c/0xd0 [qed]
+>    [<ffffffffc08dffd3>] qed_get_protocol_stats+0x93/0x100 [qed]
+>                         qed_mcp_send_protocol_stats
+>             case MFW_DRV_MSG_GET_LAN_STATS:
+>             case MFW_DRV_MSG_GET_FCOE_STATS:
+>             case MFW_DRV_MSG_GET_ISCSI_STATS:
+>             case MFW_DRV_MSG_GET_RDMA_STATS:
+>    [<ffffffffc08e36d8>] qed_mcp_handle_events+0x2d8/0x890 [qed]
+>                         qed_int_assertion
+>                         qed_int_attentions
+>    [<ffffffffc08d9490>] qed_int_sp_dpc+0xa50/0xdc0 [qed]
+>    [<ffffffffb3aa7623>] tasklet_action+0x83/0x140
+>    [<ffffffffb41d9125>] __do_softirq+0x125/0x2bb
+>    [<ffffffffb41d560c>] call_softirq+0x1c/0x30
+>    [<ffffffffb3a30645>] do_softirq+0x65/0xa0
+>    [<ffffffffb3aa78d5>] irq_exit+0x105/0x110
+>    [<ffffffffb41d8996>] do_IRQ+0x56/0xf0
 > 
-> ksz-switch spi1.0: can't rmw 32bit reg 0x113c: -EIO
-> ksz-switch spi1.0: can't rmw 32bit reg 0x1134: -EIO
-> ksz-switch spi1.0 lan1 (uninitialized): failed to connect to PHY: -EIO
-> ksz-switch spi1.0 lan1 (uninitialized): error -5 setting up PHY for tree 0, switch 0, port 0
+> Fix this by making caller to provide the context whether it could be in
+> atomic context flow or not when getting stats from QED driver.
+> QED driver based on the context provided decide to schedule out or not
+> when acquiring the PTT BAR window.
 > 
+> We faced the BUG_ON() while getting vport stats, but according to the
+> code same issue could happen for fcoe and iscsi statistics as well, so
+> fixing them too.
 > 
-> The solution is to modify regmap_reg_range to allow accesses with 4 bytes
-> boundaries.
+> Fixes: 6c75424612a7 ("qed: Add support for NCSI statistics.")
+> Fixes: 1e128c81290a ("qed: Add support for hardware offloaded FCoE.")
+> Fixes: 2f2b2614e893 ("qed: Provide iSCSI statistics to management")
+> Cc: Sudarsana Kalluru <skalluru@marvell.com>
+> Cc: David Miller <davem@davemloft.net>
+> Cc: Manish Chopra <manishc@marvell.com>
 > 
-> Signed-off-by: Lukasz Majewski <lukma@denx.de>
+
+nit: no blank line here.
+
+> Signed-off-by: Konstantin Khorenko <khorenko@virtuozzo.com>
 
 Reviewed-by: Simon Horman <horms@kernel.org>
-
 
