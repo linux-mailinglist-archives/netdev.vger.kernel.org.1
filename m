@@ -1,96 +1,119 @@
-Return-Path: <netdev+bounces-22559-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22560-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDF3D76805B
-	for <lists+netdev@lfdr.de>; Sat, 29 Jul 2023 17:28:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CBE776806A
+	for <lists+netdev@lfdr.de>; Sat, 29 Jul 2023 17:50:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0A9621C20AA4
-	for <lists+netdev@lfdr.de>; Sat, 29 Jul 2023 15:28:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0F8E6282307
+	for <lists+netdev@lfdr.de>; Sat, 29 Jul 2023 15:50:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B8D2168D7;
-	Sat, 29 Jul 2023 15:27:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EADF9171A4;
+	Sat, 29 Jul 2023 15:50:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D6C01643E
-	for <netdev@vger.kernel.org>; Sat, 29 Jul 2023 15:27:58 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C1152D7E
-	for <netdev@vger.kernel.org>; Sat, 29 Jul 2023 08:27:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1690644476;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=lYrjzDXQBP1JQED32eZ0I4QHdIQUaEv+ENeIzB1hNE4=;
-	b=WdjB8yhDxiEzXEX/aiShto7cxw/LEuUHPHyMOysrKud6y27DN57j0O7mKYYZ6UbjJA/k6r
-	OOpuRdfd2OQ1mYlaxR/GfnBDvUZjOmkghUvy2qfT2SP6mWqwxCLN+v0+KYJfsrAtCMpgr1
-	1UZFbEO+aSBuleyztCtMEzd+MDxQqZE=
-Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-133-HJQnEaRMPCORiA55xTOVMA-1; Sat, 29 Jul 2023 11:27:52 -0400
-X-MC-Unique: HJQnEaRMPCORiA55xTOVMA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 34FDD3803507;
-	Sat, 29 Jul 2023 15:27:50 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.131])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 91BE1140E949;
-	Sat, 29 Jul 2023 15:27:48 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <550503.1690588340@warthog.procyon.org.uk>
-References: <550503.1690588340@warthog.procyon.org.uk> <20230718160737.52c68c73@kernel.org> <000000000000881d0606004541d1@google.com> <0000000000001416bb06004ebf53@google.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: dhowells@redhat.com,
-    syzbot <syzbot+f527b971b4bdc8e79f9e@syzkaller.appspotmail.com>,
-    bpf@vger.kernel.org, brauner@kernel.org, davem@davemloft.net,
-    dsahern@kernel.org, edumazet@google.com,
-    linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-    netdev@vger.kernel.org, pabeni@redhat.com,
-    syzkaller-bugs@googlegroups.com, viro@zeniv.linux.org.uk
-Subject: Re: [syzbot] [fs?] INFO: task hung in pipe_release (4)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEF0D134AF
+	for <netdev@vger.kernel.org>; Sat, 29 Jul 2023 15:50:25 +0000 (UTC)
+Received: from mail-lj1-x22a.google.com (mail-lj1-x22a.google.com [IPv6:2a00:1450:4864:20::22a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 614C030F3
+	for <netdev@vger.kernel.org>; Sat, 29 Jul 2023 08:50:24 -0700 (PDT)
+Received: by mail-lj1-x22a.google.com with SMTP id 38308e7fff4ca-2b95d5ee18dso46511831fa.1
+        for <netdev@vger.kernel.org>; Sat, 29 Jul 2023 08:50:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=starlabs-sg.20221208.gappssmtp.com; s=20221208; t=1690645822; x=1691250622;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=30y4dPv7gs7kNg9y3SZJ1cmeUrjIgllVXjlQ9SH5JtQ=;
+        b=5Lsqgx2TivlD1ba+rbGHcxfOXRF8stCPajLQpjO5tfA7UyiSe9aUKO1qFzw2DNqyeR
+         CEAXuAsBz13XK1U8n2fj6BUyH1+YgGW3+imZ4zrrVOgDkH4bKWoioKUIj5bEL1IrOPct
+         HPgPjC7mPgsPL7LLBX5tR5UBsPhjs6/xTlv7kAZFNPqmLoyHmjQgmAowq03jqseouvPs
+         kwYnDuC0PzNr5Gl8uas2dChik9VkXALbATlM6TTYQzCLhWpxCWFaQ6QI/XLH2ETjn1zd
+         vfpNMbhYj+NJcMCmMh2V/VwW/YN3iVos7lxSubufod4oh07qC7cWcZy1pqBzToCsaUYP
+         v+Yw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690645822; x=1691250622;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=30y4dPv7gs7kNg9y3SZJ1cmeUrjIgllVXjlQ9SH5JtQ=;
+        b=gffHnj+QhDqEE2EkFQXrTsumzgjuNXvs7F2aulFQx/DHX8+mJl6QrajoZJTkIWT/oh
+         jVyIgz/iWzydR+LXwKLY1b5QJpKnW02Q9PUSOWtDj/v3CnLCg5Km+AZuPc4n3I2eQtOt
+         S7UzQQjkqwkZ6tkHiaPNzJXKkYaJ4pOfMFOvlrps6mxKzvfl3Gk5QPTG+YOgpWSVPndn
+         8up2ih2vBCBoCl1sZHd1s+CfFynnqlf3Fv4LGpULl2izCOOQhyx6gmT58eWwc8LbQIwG
+         GkNkKVtHYDszm2bviPwsNOF4eDLKDNkM+I4viwhzvqHEKwGgxImxkVfPh7q8VO2Yt6/t
+         Zj+g==
+X-Gm-Message-State: ABy/qLYShwBDQQd3BkwmPyOLbhNCBrbZESO4QDk9rTu4W+KPuB7iYcif
+	qom8YJlVUZDIXfYANfxBekaxFXrnRKrHB3tRlqgf3JC84jjAbeLGBSaw
+X-Google-Smtp-Source: APBJJlHNXMCIOWoEMyRCNTYeOytfFeb3JIOX3E3eqybj8974jCbPJCc2Ps9upuf1+y7OIxU6XS32CX0Pbsj6ddz926M=
+X-Received: by 2002:a05:6512:159b:b0:4fe:19ef:8794 with SMTP id
+ bp27-20020a056512159b00b004fe19ef8794mr4077254lfb.28.1690645821882; Sat, 29
+ Jul 2023 08:50:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <713502.1690644467.1@warthog.procyon.org.uk>
-Date: Sat, 29 Jul 2023 16:27:47 +0100
-Message-ID: <713503.1690644467@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-	version=3.4.6
+References: <20230729123202.72406-1-jhs@mojatatu.com>
+In-Reply-To: <20230729123202.72406-1-jhs@mojatatu.com>
+From: M A Ramdhan <ramdhan@starlabs.sg>
+Date: Sat, 29 Jul 2023 22:49:45 +0700
+Message-ID: <CACSEBQS4w4ceHt4to98wmr-_ecN=-w=FTccgVSf3ydn36LdBFw@mail.gmail.com>
+Subject: Re: [PATCH net v2 0/3] net/sched Bind logic fixes for cls_fw, cls_u32
+ and cls_route
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: davem@davemloft.net, kuba@kernel.org, edumazet@google.com, 
+	pabeni@redhat.com, jiri@resnulli.us, xiyou.wangcong@gmail.com, 
+	netdev@vger.kernel.org, sec@valis.email, billy@starlabs.sg
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-David Howells <dhowells@redhat.com> wrote:
+On Sat, Jul 29, 2023 at 7:32=E2=80=AFPM Jamal Hadi Salim <jhs@mojatatu.com>=
+ wrote:
+>
+> From: valis <sec@valis.email>
+>
+> Three classifiers (cls_fw, cls_u32 and cls_route) always copy
+> tcf_result struct into the new instance of the filter on update.
+>
+> This causes a problem when updating a filter bound to a class,
+> as tcf_unbind_filter() is always called on the old instance in the
+> success path, decreasing filter_cnt of the still referenced class
+> and allowing it to be deleted, leading to a use-after-free.
+>
+> This patch set fixes this issue in all affected classifiers by no longer
+> copying the tcf_result struct from the old filter.
+>
+> v1 -> v2:
+>    - Resubmission and SOB by Jamal
+>
+> valis (3):
+>   net/sched: cls_u32: No longer copy tcf_result on update to avoid
+>     use-after-free
+>   net/sched: cls_fw: No longer copy tcf_result on update to avoid
+>     use-after-free
+>   net/sched: cls_route: No longer copy tcf_result on update to avoid
+>     use-after-free
+>
+>  net/sched/cls_fw.c    | 1 -
+>  net/sched/cls_route.c | 1 -
+>  net/sched/cls_u32.c   | 1 -
+>  3 files changed, 3 deletions(-)
+>
+For the series,
+Tested-by: M A Ramdhan <ramdhan@starlabs.sg>
+Reviewed-by: M A Ramdhan <ramdhan@starlabs.sg>
 
-> I've managed to reproduce it finally.  Instrumenting the pipe_lock/unlock
-> functions, splice_to_socket() and pipe_release() seems to show that
-> pipe_release() is being called whilst splice_to_socket() is still running.
-
-That's actually a bit of a red herring.  pipe_release() is so-called because
-it's called as the release file op for an end of the pipe.  It doesn't
-automatically free the pipe_inode_info struct - there's refcounting on that.
-
-So the problem is that udp_sendmsg() didn't return; pipe_release() hanging on
-the pipe_lock() is merely a noisy symptom thereof.
-
-David
-
+> --
+> 2.34.1
 
