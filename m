@@ -1,124 +1,203 @@
-Return-Path: <netdev+bounces-22556-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22557-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A14D376801E
-	for <lists+netdev@lfdr.de>; Sat, 29 Jul 2023 16:43:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 88A65768047
+	for <lists+netdev@lfdr.de>; Sat, 29 Jul 2023 17:13:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CD617282328
-	for <lists+netdev@lfdr.de>; Sat, 29 Jul 2023 14:43:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3E1AA1C20ACA
+	for <lists+netdev@lfdr.de>; Sat, 29 Jul 2023 15:13:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C54A01643C;
-	Sat, 29 Jul 2023 14:43:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBDD2168D0;
+	Sat, 29 Jul 2023 15:13:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B97413D60
-	for <netdev@vger.kernel.org>; Sat, 29 Jul 2023 14:43:12 +0000 (UTC)
-Received: from mail-oi1-x231.google.com (mail-oi1-x231.google.com [IPv6:2607:f8b0:4864:20::231])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3928A8
-	for <netdev@vger.kernel.org>; Sat, 29 Jul 2023 07:42:54 -0700 (PDT)
-Received: by mail-oi1-x231.google.com with SMTP id 5614622812f47-3a3b7fafd61so2401285b6e.2
-        for <netdev@vger.kernel.org>; Sat, 29 Jul 2023 07:42:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20221208.gappssmtp.com; s=20221208; t=1690641774; x=1691246574;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Pr1QJLPecn2SjxOV8mdymmpr/NJWO8o8w84tB5GduTM=;
-        b=jGz4/MLqsTcgz/M3JKvhwptKxqg/KcNBvedBPLSqO/MIS787PTA2pN0lFjq4jIixiq
-         A2Lz6FpE8tdcw3ieJiYe4mV9NCbJeTv7jCn2AWBC5UvaK85/z0lK4YWjpYEFSQrUocAH
-         oq7/LyLeULFWUvurttpbiNf8t11o9UPTpjmjdyYha7OK9kjl1lAEE3PrRcUrVz35lmb9
-         T/SkPhTagECcLeibehikilj4LM1W69iOm9YzIdFGQuxOpbcUZ5BdSE+4ovX4WdJ1PNAp
-         4LGnOPKWu5He+PF5FG1Cy2b3+ZxCZtakcEmZNUGjdvyXt/n2Qyml4Xy32qhhhB+FP7LE
-         4wXA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690641774; x=1691246574;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Pr1QJLPecn2SjxOV8mdymmpr/NJWO8o8w84tB5GduTM=;
-        b=R/sG0yYlVDzxMhVl62ATyr8TCN6zY6plmHbCn89A2hOw+D7NQHZlrqv1zQ8PQsVBqE
-         wHb5I9Aed1zxlz6iQw5t2tb2jISuKqPqB+IaqJjL0ykrbfzTT5sNkZ5zHlQdZy1gyMOG
-         cANHUCVJh++oyC48Vekr2XI3yNh0PYLu/4A2BxC5kHkMAkQB8E0nOVbQ9IDYXlNXHl4t
-         2juWrtzY26HiUYtjrU875uiOYxqsp8RUWElpm9dNcbkPy4TqZgcnC66LWQjSJDRbPfTT
-         bzSYqkQNPkkclV41Zb1r6xZW2e/2fGZVC4WHDoP0uigDX1ePkF575vOgfT+hQnWnKMxE
-         gVbw==
-X-Gm-Message-State: ABy/qLaValSzlPYDzz5kOdkrYdWIpRY3ltkpz7K1Bq/nAH48GUB0jYjB
-	CE5Wluz+s1+/v5uogESaFXmMcA==
-X-Google-Smtp-Source: APBJJlHs45OuRFQhfuflj2u5wLuYSwsL/9zoW92lrtSytf+bZA9KnJ0GTKYc8MUfRW8zGe2so+vLXw==
-X-Received: by 2002:a05:6808:140b:b0:3a4:3074:1fa9 with SMTP id w11-20020a056808140b00b003a430741fa9mr7286178oiv.34.1690641773993;
-        Sat, 29 Jul 2023 07:42:53 -0700 (PDT)
-Received: from ?IPV6:2804:14d:5c5e:44fb:437e:a800:f5ee:3cf2? ([2804:14d:5c5e:44fb:437e:a800:f5ee:3cf2])
-        by smtp.gmail.com with ESMTPSA id bk37-20020a0568081a2500b003a3fd014ccasm1289715oib.9.2023.07.29.07.42.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 29 Jul 2023 07:42:53 -0700 (PDT)
-Message-ID: <2d5ed496-3afb-34d0-007e-31c9eac4e849@mojatatu.com>
-Date: Sat, 29 Jul 2023 11:42:49 -0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEA2A168C9
+	for <netdev@vger.kernel.org>; Sat, 29 Jul 2023 15:13:27 +0000 (UTC)
+Received: from mgamail.intel.com (unknown [134.134.136.24])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3CB21BE5;
+	Sat, 29 Jul 2023 08:13:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1690643605; x=1722179605;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=qYNctRq7UP223cDLMDHpgil/19stlw90kyEgzmhtG2A=;
+  b=DLNw2FAjHuQCzzg/2YM7Fp6D4l/bqDETafKs96orm/6AB6dJzWD+5/zU
+   AzfsR+y3RBV9IJ6a948D5MNbgf2x46T18gX4zIsXN5JVxvhmu+vqeYO9j
+   7yA4YaIQ1trgUVj+OyDAAnRaMc9TpMmiE0zPVdi5G/kaWYgnPIbq0QPzQ
+   /CygSxVFvCgDmn9NdaUiejTdZZPr7bkgttIProEF6vn2unzZiXnn1eifc
+   2gDyh5yak4aFxsiJ0JS/ANNxhngjLyrMJHTw6+wFMtGAlIOgQA+49LErK
+   90sSpQoehDQe6H7WfHzew6EE3TFe1RwLWLAFOANL/6Ej/DeDNZxYbj98/
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10786"; a="371468529"
+X-IronPort-AV: E=Sophos;i="6.01,240,1684825200"; 
+   d="scan'208";a="371468529"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jul 2023 08:13:24 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10786"; a="727758995"
+X-IronPort-AV: E=Sophos;i="6.01,240,1684825200"; 
+   d="scan'208";a="727758995"
+Received: from lkp-server02.sh.intel.com (HELO 953e8cd98f7d) ([10.239.97.151])
+  by orsmga002.jf.intel.com with ESMTP; 29 Jul 2023 08:13:20 -0700
+Received: from kbuild by 953e8cd98f7d with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1qPld9-00046l-0a;
+	Sat, 29 Jul 2023 15:13:19 +0000
+Date: Sat, 29 Jul 2023 23:12:54 +0800
+From: kernel test robot <lkp@intel.com>
+To: Daniel Golle <daniel@makrotopia.org>, Felix Fietkau <nbd@nbd.name>,
+	John Crispin <john@phrozen.org>, Sean Wang <sean.wang@mediatek.com>,
+	Mark Lee <Mark-MC.Lee@mediatek.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net-next] net: ethernet: mtk_eth_soc: support per-flow
+ accounting on MT7988
+Message-ID: <202307292316.uxGTiSPC-lkp@intel.com>
+References: <801c89963e95e5ce8f1ab7dbda894dd9da0125cc.1690638748.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH net v2 0/3] net/sched Bind logic fixes for cls_fw, cls_u32
- and cls_route
-Content-Language: en-US
-To: Jamal Hadi Salim <jhs@mojatatu.com>, davem@davemloft.net,
- kuba@kernel.org, edumazet@google.com, pabeni@redhat.com
-Cc: jiri@resnulli.us, xiyou.wangcong@gmail.com, netdev@vger.kernel.org,
- sec@valis.email, ramdhan@starlabs.sg, billy@starlabs.sg
-References: <20230729123202.72406-1-jhs@mojatatu.com>
-From: Pedro Tammela <pctammela@mojatatu.com>
-In-Reply-To: <20230729123202.72406-1-jhs@mojatatu.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <801c89963e95e5ce8f1ab7dbda894dd9da0125cc.1690638748.git.daniel@makrotopia.org>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 29/07/2023 09:31, Jamal Hadi Salim wrote:
-> From: valis <sec@valis.email>
-> 
-> Three classifiers (cls_fw, cls_u32 and cls_route) always copy
-> tcf_result struct into the new instance of the filter on update.
-> 
-> This causes a problem when updating a filter bound to a class,
-> as tcf_unbind_filter() is always called on the old instance in the
-> success path, decreasing filter_cnt of the still referenced class
-> and allowing it to be deleted, leading to a use-after-free.
-> 
-> This patch set fixes this issue in all affected classifiers by no longer
-> copying the tcf_result struct from the old filter.
-> 
-> v1 -> v2:
->     - Resubmission and SOB by Jamal
-> 
-> valis (3):
->    net/sched: cls_u32: No longer copy tcf_result on update to avoid
->      use-after-free
->    net/sched: cls_fw: No longer copy tcf_result on update to avoid
->      use-after-free
->    net/sched: cls_route: No longer copy tcf_result on update to avoid
->      use-after-free
-> 
->   net/sched/cls_fw.c    | 1 -
->   net/sched/cls_route.c | 1 -
->   net/sched/cls_u32.c   | 1 -
->   3 files changed, 3 deletions(-)
-> 
-> --
-> 2.34.1
+Hi Daniel,
 
-For the series,
+kernel test robot noticed the following build errors:
 
-Reviewed-by: Pedro Tammela <pctammela@mojatatu.com>
-Tested-by: Pedro Tammela <pctammela@mojatatu.com>
+[auto build test ERROR on net-next/main]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Daniel-Golle/net-ethernet-mtk_eth_soc-support-per-flow-accounting-on-MT7988/20230729-215634
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/801c89963e95e5ce8f1ab7dbda894dd9da0125cc.1690638748.git.daniel%40makrotopia.org
+patch subject: [PATCH net-next] net: ethernet: mtk_eth_soc: support per-flow accounting on MT7988
+config: hexagon-randconfig-r023-20230729 (https://download.01.org/0day-ci/archive/20230729/202307292316.uxGTiSPC-lkp@intel.com/config)
+compiler: clang version 17.0.0 (https://github.com/llvm/llvm-project.git 4a5ac14ee968ff0ad5d2cc1ffa0299048db4c88a)
+reproduce: (https://download.01.org/0day-ci/archive/20230729/202307292316.uxGTiSPC-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202307292316.uxGTiSPC-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   In file included from drivers/net/ethernet/mediatek/mtk_ppe.c:5:
+   In file included from include/linux/io.h:13:
+   In file included from arch/hexagon/include/asm/io.h:334:
+   include/asm-generic/io.h:547:31: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     547 |         val = __raw_readb(PCI_IOBASE + addr);
+         |                           ~~~~~~~~~~ ^
+   include/asm-generic/io.h:560:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     560 |         val = __le16_to_cpu((__le16 __force)__raw_readw(PCI_IOBASE + addr));
+         |                                                         ~~~~~~~~~~ ^
+   include/uapi/linux/byteorder/little_endian.h:37:51: note: expanded from macro '__le16_to_cpu'
+      37 | #define __le16_to_cpu(x) ((__force __u16)(__le16)(x))
+         |                                                   ^
+   In file included from drivers/net/ethernet/mediatek/mtk_ppe.c:5:
+   In file included from include/linux/io.h:13:
+   In file included from arch/hexagon/include/asm/io.h:334:
+   include/asm-generic/io.h:573:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     573 |         val = __le32_to_cpu((__le32 __force)__raw_readl(PCI_IOBASE + addr));
+         |                                                         ~~~~~~~~~~ ^
+   include/uapi/linux/byteorder/little_endian.h:35:51: note: expanded from macro '__le32_to_cpu'
+      35 | #define __le32_to_cpu(x) ((__force __u32)(__le32)(x))
+         |                                                   ^
+   In file included from drivers/net/ethernet/mediatek/mtk_ppe.c:5:
+   In file included from include/linux/io.h:13:
+   In file included from arch/hexagon/include/asm/io.h:334:
+   include/asm-generic/io.h:584:33: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     584 |         __raw_writeb(value, PCI_IOBASE + addr);
+         |                             ~~~~~~~~~~ ^
+   include/asm-generic/io.h:594:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     594 |         __raw_writew((u16 __force)cpu_to_le16(value), PCI_IOBASE + addr);
+         |                                                       ~~~~~~~~~~ ^
+   include/asm-generic/io.h:604:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     604 |         __raw_writel((u32 __force)cpu_to_le32(value), PCI_IOBASE + addr);
+         |                                                       ~~~~~~~~~~ ^
+>> drivers/net/ethernet/mediatek/mtk_ppe.c:112:3: error: use of undeclared identifier 'bytes_cnt_low'; did you mean 'byte_cnt_low'?
+     112 |                 bytes_cnt_low = cnt_r0;
+         |                 ^~~~~~~~~~~~~
+         |                 byte_cnt_low
+   drivers/net/ethernet/mediatek/mtk_ppe.c:95:6: note: 'byte_cnt_low' declared here
+      95 |         u32 byte_cnt_low, byte_cnt_high, pkt_cnt_low, pkt_cnt_high;
+         |             ^
+>> drivers/net/ethernet/mediatek/mtk_ppe.c:113:3: error: use of undeclared identifier 'bytes_cnt_high'; did you mean 'byte_cnt_high'?
+     113 |                 bytes_cnt_high = cnt_r1;
+         |                 ^~~~~~~~~~~~~~
+         |                 byte_cnt_high
+   drivers/net/ethernet/mediatek/mtk_ppe.c:95:20: note: 'byte_cnt_high' declared here
+      95 |         u32 byte_cnt_low, byte_cnt_high, pkt_cnt_low, pkt_cnt_high;
+         |                           ^
+   6 warnings and 2 errors generated.
+
+
+vim +112 drivers/net/ethernet/mediatek/mtk_ppe.c
+
+    92	
+    93	static int mtk_mib_entry_read(struct mtk_ppe *ppe, u16 index, u64 *bytes, u64 *packets)
+    94	{
+    95		u32 byte_cnt_low, byte_cnt_high, pkt_cnt_low, pkt_cnt_high;
+    96		u32 val, cnt_r0, cnt_r1, cnt_r2;
+    97		int ret;
+    98	
+    99		val = FIELD_PREP(MTK_PPE_MIB_SER_CR_ADDR, index) | MTK_PPE_MIB_SER_CR_ST;
+   100		ppe_w32(ppe, MTK_PPE_MIB_SER_CR, val);
+   101	
+   102		ret = mtk_ppe_mib_wait_busy(ppe);
+   103		if (ret)
+   104			return ret;
+   105	
+   106		cnt_r0 = readl(ppe->base + MTK_PPE_MIB_SER_R0);
+   107		cnt_r1 = readl(ppe->base + MTK_PPE_MIB_SER_R1);
+   108		cnt_r2 = readl(ppe->base + MTK_PPE_MIB_SER_R2);
+   109	
+   110		if (mtk_is_netsys_v3_or_greater(ppe->eth)) {
+   111			/* 64 bit for each counter */
+ > 112			bytes_cnt_low = cnt_r0;
+ > 113			bytes_cnt_high = cnt_r1;
+   114			pkt_cnt_low = cnt_r2;
+   115			pkt_cnt_high = readl(ppe->base + MTK_PPE_MIB_SER_R3);
+   116		} else {
+   117			/* 48 bit for each counter */
+   118			byte_cnt_low = FIELD_GET(MTK_PPE_MIB_SER_R0_BYTE_CNT_LOW, cnt_r0);
+   119			byte_cnt_high = FIELD_GET(MTK_PPE_MIB_SER_R1_BYTE_CNT_HIGH, cnt_r1);
+   120			pkt_cnt_low = FIELD_GET(MTK_PPE_MIB_SER_R1_PKT_CNT_LOW, cnt_r1);
+   121			pkt_cnt_high = FIELD_GET(MTK_PPE_MIB_SER_R2_PKT_CNT_HIGH, cnt_r2);
+   122		}
+   123	
+   124		*bytes = ((u64)byte_cnt_high << 32) | byte_cnt_low;
+   125		*packets = (pkt_cnt_high << 16) | pkt_cnt_low;
+   126	
+   127		return 0;
+   128	}
+   129	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
