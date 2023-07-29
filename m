@@ -1,247 +1,295 @@
-Return-Path: <netdev+bounces-22579-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22580-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4016076812C
-	for <lists+netdev@lfdr.de>; Sat, 29 Jul 2023 21:06:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2D5C76818C
+	for <lists+netdev@lfdr.de>; Sat, 29 Jul 2023 21:50:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E3721C20A55
-	for <lists+netdev@lfdr.de>; Sat, 29 Jul 2023 19:06:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 504BA2821B5
+	for <lists+netdev@lfdr.de>; Sat, 29 Jul 2023 19:50:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB2AD174D2;
-	Sat, 29 Jul 2023 19:06:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D611F174E1;
+	Sat, 29 Jul 2023 19:50:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCABE168CD
-	for <netdev@vger.kernel.org>; Sat, 29 Jul 2023 19:06:28 +0000 (UTC)
-Received: from mail-vk1-xa2d.google.com (mail-vk1-xa2d.google.com [IPv6:2607:f8b0:4864:20::a2d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD97412A
-	for <netdev@vger.kernel.org>; Sat, 29 Jul 2023 12:06:26 -0700 (PDT)
-Received: by mail-vk1-xa2d.google.com with SMTP id 71dfb90a1353d-486453928a4so1266805e0c.0
-        for <netdev@vger.kernel.org>; Sat, 29 Jul 2023 12:06:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690657585; x=1691262385;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=9sH6Xr73mguNgUIemMRYrFHm4fd0fhVXE3pTXrDu6iY=;
-        b=fGdpgOawDWWavBGdQRoTiY5w9xJZikRc4+/lJQjmhaPSp0yWbZnKjly8qpjkiOl/bK
-         QP9gDcQ5/bsTQWRYqPoWoK/NkwCw+f90is7WuPB6AIY1mZFPIkOfHFQoNSOL4oaWFnry
-         dhMJH/BM/TWZ9bJCI/qgEZVEGJ9E8+cKrTh7JvoxKZDG/qxcjvMKplqivrKYdG5k8Uxo
-         zzJMLGb6WiRX0bHPmK4FTEc761tKDFjtzI0C1bY8R3A5i1M8kKwZC6xmCbSV4CVe6SQx
-         HBJ/dCLUiHkAYMBW+BI/vVCA18Ef83wqbhIom3U4+Bh2cs7ulA1jVWogjvZ5o0GhQD3O
-         5nVg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690657585; x=1691262385;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=9sH6Xr73mguNgUIemMRYrFHm4fd0fhVXE3pTXrDu6iY=;
-        b=Eol0eJMnmienDDZYzuGDRHgJBb1Y5+KrNOUdm/1cLTp+KfENK8ujrO9JR+w4SvbWyo
-         dxzvBRpgQMWFUw2byrJtZuJjhKFUUGvgNodeL5tR/iNfoOA/wB+Pyl2/G3xuyAjTgaJP
-         FqFTRBRnbs0HSDQ0r1kDZ6KJwTKjfTtYfFQ23g5+8k3E3E/VVPMKkXqk3KmyTUhbBm50
-         BK4PCMSpjaUc2gNbyhVI+M1hErf6qrX4AF5TjLUz7Juhm/3NA2viySvQ8l61qm1923n6
-         Pb4X6NqXmbZKUNfzWWiEVxwdh+uI+w9NWKL7zQ+ijmOPe0u1Gmw5pzwl++WuemRupkzk
-         LtNw==
-X-Gm-Message-State: ABy/qLaHcQg9hysQstBge0A9EQqU1u1WUabhXHGTmQliN1lXfCon5rF1
-	JTl173c1JwtuWQMFQi/4y5OvWZ0TRPmZlfGXQO03hJCJeHQ=
-X-Google-Smtp-Source: APBJJlEQrWP7nZMOLp4KQm3EmQypRREP0VH8DNWRO8V2hcJ4pFO+Ui/MwuWJb/r9eRGh0/ZuKFEXFYmR45bOAtXF0OQ=
-X-Received: by 2002:a1f:55c6:0:b0:486:556c:a0bb with SMTP id
- j189-20020a1f55c6000000b00486556ca0bbmr3590208vkb.9.1690657585396; Sat, 29
- Jul 2023 12:06:25 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C72F4174C7
+	for <netdev@vger.kernel.org>; Sat, 29 Jul 2023 19:50:23 +0000 (UTC)
+Received: from mgamail.intel.com (unknown [192.55.52.120])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38F5430DC;
+	Sat, 29 Jul 2023 12:50:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1690660222; x=1722196222;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=pEN/l2T0pXX3SCG6pSMoWpggXYi8jCMlcnO7Ryhir3E=;
+  b=LgxMkVJv9iIXcWonjwjJy2MgylTde8nZTf11c3xf0hdfXp4sOpURZmjU
+   ATdvMvWig4uytgpsON5bh5Ws0rwBcl1F7cnlkd/5wq+v2P5ST2dVLyHR4
+   /mw7bUWIpwrVw1uLt3WgUL4moMVqgUkDHPWTabQ1VHy5IKj6aBSTqCT01
+   sfPXo9HvT+ZXLwtnoH6sfScr/ATgaUutC7Y5kYfFu0H/pcBUE3sxPhGPY
+   am4PE7R1eJlITWSp8YTgvKy+beryiRiayTQKjkp/UFg7KWCGHVwVZVB8D
+   uMxSm/wrF4IduV82jrwSuox9weONqOYaQk+j9rXlxK5xWzadW4cIURFr9
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10786"; a="367670254"
+X-IronPort-AV: E=Sophos;i="6.01,240,1684825200"; 
+   d="scan'208";a="367670254"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jul 2023 12:50:21 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10786"; a="817846566"
+X-IronPort-AV: E=Sophos;i="6.01,240,1684825200"; 
+   d="scan'208";a="817846566"
+Received: from lkp-server02.sh.intel.com (HELO 953e8cd98f7d) ([10.239.97.151])
+  by FMSMGA003.fm.intel.com with ESMTP; 29 Jul 2023 12:50:18 -0700
+Received: from kbuild by 953e8cd98f7d with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1qPpxB-0004HD-25;
+	Sat, 29 Jul 2023 19:50:17 +0000
+Date: Sun, 30 Jul 2023 03:50:16 +0800
+From: kernel test robot <lkp@intel.com>
+To: Christian Marangi <ansuelsmth@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Yang Yingliang <yangyingliang@huawei.com>,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	Atin Bainada <hi@atinb.me>, linux-kernel@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org
+Subject: Re: [net-next PATCH v2 5/5] net: dsa: qca8k: use dsa_for_each macro
+ instead of for loop
+Message-ID: <202307300305.RJlPYbyQ-lkp@intel.com>
+References: <20230729115509.32601-5-ansuelsmth@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Ian Kumlien <ian.kumlien@gmail.com>
-Date: Sat, 29 Jul 2023 21:06:14 +0200
-Message-ID: <CAA85sZt-CamVe24=i=rtoU+oN5twF8sj4imCKR=Ode0ezM0Grg@mail.gmail.com>
-Subject: [6.4.7] pfifo_fast bug with ixgbe?
-To: Linux Kernel Network Developers <netdev@vger.kernel.org>, 
-	intel-wired-lan <intel-wired-lan@lists.osuosl.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230729115509.32601-5-ansuelsmth@gmail.com>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Had played with sysctl, forgot to change back to fq - so was running
-with pfifo_fast and this happened :)
+Hi Christian,
 
-[94875.282334] ------------[ cut here ]------------
-[94875.282347] NETDEV WATCHDOG: eno1 (ixgbe): transmit queue 6 timed out 8232 ms
-[94875.282424] WARNING: CPU: 2 PID: 0 at net/sched/sch_generic.c:525
-dev_watchdog (net/sched/sch_generic.c:525 (discriminator 3))
-[94875.282442] Modules linked in: chaoskey
-[94875.282454] CPU: 2 PID: 0 Comm: swapper/2 Not tainted 6.4.7 #383
-[94875.282464] Hardware name: Supermicro Super Server/A2SDi-12C-HLN4F,
-BIOS 1.7a 10/13/2022
-[94875.282469] RIP: 0010:dev_watchdog (net/sched/sch_generic.c:525
-(discriminator 3))
-[94875.282480] Code: ff ff ff 48 89 df c6 05 6c e1 f9 00 01 e8 d0 27
-fa ff 45 89 f8 44 89 f1 48 89 de 48 89 c2 48 c7 c7 20 7d 0c 9d e8 48
-9a 2a ff <0f> 0b e9 2a ff ff ff 90 55 53 48 89 fb 48 8b 6f 18 0f 1f 44
-00 00
-All code
-========
-   0: ff                    (bad)
-   1: ff                    (bad)
-   2: ff 48 89              decl   -0x77(%rax)
-   5: df c6                ffreep %st(6)
-   7: 05 6c e1 f9 00        add    $0xf9e16c,%eax
-   c: 01 e8                add    %ebp,%eax
-   e: d0 27                shlb   (%rdi)
-  10: fa                    cli
-  11: ff 45 89              incl   -0x77(%rbp)
-  14: f8                    clc
-  15: 44 89 f1              mov    %r14d,%ecx
-  18: 48 89 de              mov    %rbx,%rsi
-  1b: 48 89 c2              mov    %rax,%rdx
-  1e: 48 c7 c7 20 7d 0c 9d mov    $0xffffffff9d0c7d20,%rdi
-  25: e8 48 9a 2a ff        call   0xffffffffff2a9a72
-  2a:* 0f 0b                ud2    <-- trapping instruction
-  2c: e9 2a ff ff ff        jmp    0xffffffffffffff5b
-  31: 90                    nop
-  32: 55                    push   %rbp
-  33: 53                    push   %rbx
-  34: 48 89 fb              mov    %rdi,%rbx
-  37: 48 8b 6f 18          mov    0x18(%rdi),%rbp
-  3b: 0f 1f 44 00 00        nopl   0x0(%rax,%rax,1)
+kernel test robot noticed the following build errors:
 
-Code starting with the faulting instruction
-===========================================
-   0: 0f 0b                ud2
-   2: e9 2a ff ff ff        jmp    0xffffffffffffff31
-   7: 90                    nop
-   8: 55                    push   %rbp
-   9: 53                    push   %rbx
-   a: 48 89 fb              mov    %rdi,%rbx
-   d: 48 8b 6f 18          mov    0x18(%rdi),%rbp
-  11: 0f 1f 44 00 00        nopl   0x0(%rax,%rax,1)
-[94875.282488] RSP: 0018:ffffac3480150ea8 EFLAGS: 00010282
-[94875.282498] RAX: 0000000000000000 RBX: ffff8c7cc5aac000 RCX: 0000000000000027
-[94875.282504] RDX: ffff8c802fa9b408 RSI: 0000000000000001 RDI: ffff8c802fa9b400
-[94875.282510] RBP: ffff8c7cc5aac488 R08: 0000000000000000 R09: ffffac3480150d48
-[94875.282516] R10: 0000000000000003 R11: ffffffff9d347ec8 R12: ffff8c7cc5c08780
-[94875.282522] R13: ffff8c7cc5aac3dc R14: 0000000000000006 R15: 0000000000002028
-[94875.282528] FS:  0000000000000000(0000) GS:ffff8c802fa80000(0000)
-knlGS:0000000000000000
-[94875.282536] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[94875.282542] CR2: 00007fd2f57b9a94 CR3: 0000000103fda000 CR4: 00000000003526e0
-[94875.282548] Call Trace:
-[94875.282556]  <IRQ>
-[94875.282561] ? dev_watchdog (net/sched/sch_generic.c:525 (discriminator 3))
-[94875.282569] ? __warn (kernel/panic.c:673)
-[94875.282579] ? dev_watchdog (net/sched/sch_generic.c:525 (discriminator 3))
-[94875.282587] ? report_bug (lib/bug.c:180 lib/bug.c:219)
-[94875.282597] ? handle_bug (arch/x86/kernel/traps.c:324)
-[94875.282606] ? exc_invalid_op (arch/x86/kernel/traps.c:345 (discriminator 1))
-[94875.282615] ? asm_exc_invalid_op (./arch/x86/include/asm/idtentry.h:568)
-[94875.282628] ? dev_watchdog (net/sched/sch_generic.c:525 (discriminator 3))
-[94875.282635] ? dev_watchdog (net/sched/sch_generic.c:525 (discriminator 3))
-[94875.282642] ? pfifo_fast_reset (net/sched/sch_generic.c:496)
-[94875.282649] ? pfifo_fast_reset (net/sched/sch_generic.c:496)
-[94875.282656] call_timer_fn (./arch/x86/include/asm/jump_label.h:27
-./include/linux/jump_label.h:207 ./include/trace/events/timer.h:127
-kernel/time/timer.c:1701)
-[94875.282669] __run_timers.part.0 (kernel/time/timer.c:1752
-kernel/time/timer.c:2022)
-[94875.282682] ? __hrtimer_run_queues (./include/linux/seqlock.h:612
-kernel/time/hrtimer.c:1711 kernel/time/hrtimer.c:1749)
-[94875.282690] ? recalibrate_cpu_khz (./arch/x86/include/asm/msr.h:215
-arch/x86/kernel/tsc.c:1110)
-[94875.282699] ? ktime_get (kernel/time/timekeeping.c:292
-(discriminator 3) kernel/time/timekeeping.c:388 (discriminator 3)
-kernel/time/timekeeping.c:848 (discriminator 3))
-[94875.282709] run_timer_softirq (kernel/time/timer.c:2037)
-[94875.282720] __do_softirq (./arch/x86/include/asm/jump_label.h:27
-./include/linux/jump_label.h:207 ./include/trace/events/irq.h:142
-kernel/softirq.c:572)
-[94875.282732] irq_exit_rcu (kernel/softirq.c:445 kernel/softirq.c:650
-kernel/softirq.c:662)
-[94875.282743] sysvec_apic_timer_interrupt
-(arch/x86/kernel/apic/apic.c:1106 (discriminator 14))
-[94875.282755]  </IRQ>
-[94875.282759]  <TASK>
-[94875.282763] asm_sysvec_apic_timer_interrupt
-(./arch/x86/include/asm/idtentry.h:645)
-[94875.282775] RIP: 0010:cpuidle_enter_state (drivers/cpuidle/cpuidle.c:291)
-[94875.282787] Code: 00 e8 e2 01 fd fe e8 7d fa ff ff 8b 53 04 49 89
-c5 0f 1f 44 00 00 31 ff e8 5b 71 fc fe 45 84 ff 0f 85 60 02 00 00 fb
-45 85 f6 <0f> 88 8e 01 00 00 49 63 ce 4c 8b 14 24 48 8d 04 49 48 8d 14
-81 48
-All code
-========
-   0: 00 e8                add    %ch,%al
-   2: e2 01                loop   0x5
-   4: fd                    std
-   5: fe                    (bad)
-   6: e8 7d fa ff ff        call   0xfffffffffffffa88
-   b: 8b 53 04              mov    0x4(%rbx),%edx
-   e: 49 89 c5              mov    %rax,%r13
-  11: 0f 1f 44 00 00        nopl   0x0(%rax,%rax,1)
-  16: 31 ff                xor    %edi,%edi
-  18: e8 5b 71 fc fe        call   0xfffffffffefc7178
-  1d: 45 84 ff              test   %r15b,%r15b
-  20: 0f 85 60 02 00 00    jne    0x286
-  26: fb                    sti
-  27: 45 85 f6              test   %r14d,%r14d
-  2a:* 0f 88 8e 01 00 00    js     0x1be <-- trapping instruction
-  30: 49 63 ce              movslq %r14d,%rcx
-  33: 4c 8b 14 24          mov    (%rsp),%r10
-  37: 48 8d 04 49          lea    (%rcx,%rcx,2),%rax
-  3b: 48 8d 14 81          lea    (%rcx,%rax,4),%rdx
-  3f: 48                    rex.W
+[auto build test ERROR on net-next/main]
 
-Code starting with the faulting instruction
-===========================================
-   0: 0f 88 8e 01 00 00    js     0x194
-   6: 49 63 ce              movslq %r14d,%rcx
-   9: 4c 8b 14 24          mov    (%rsp),%r10
-   d: 48 8d 04 49          lea    (%rcx,%rcx,2),%rax
-  11: 48 8d 14 81          lea    (%rcx,%rax,4),%rdx
-  15: 48                    rex.W
-[94875.282794] RSP: 0018:ffffac34800a7e98 EFLAGS: 00000202
-[94875.282803] RAX: ffff8c802faabb80 RBX: ffff8c802fab6600 RCX: 0000000000000000
-[94875.282809] RDX: 0000000000000002 RSI: fffffff7a29adb93 RDI: 0000000000000000
-[94875.282814] RBP: 0000000000000002 R08: 0000000000000000 R09: 0000000040000000
-[94875.282820] R10: 0000000000000018 R11: 00000000000003d8 R12: ffffffff9d415480
-[94875.282825] R13: 00005649df803d70 R14: 0000000000000002 R15: 0000000000000000
-[94875.282835] ? cpuidle_enter_state (drivers/cpuidle/cpuidle.c:285)
-[94875.282848] cpuidle_enter (drivers/cpuidle/cpuidle.c:390)
-[94875.282857] do_idle (kernel/sched/idle.c:219 kernel/sched/idle.c:282)
-[94875.282868] cpu_startup_entry (kernel/sched/idle.c:378 (discriminator 1))
-[94875.282878] start_secondary (arch/x86/kernel/smpboot.c:288)
-[94875.282887] secondary_startup_64_no_verify (arch/x86/kernel/head_64.S:370)
-[94875.282900]  </TASK>
-[94875.282904] ---[ end trace 0000000000000000 ]---
+url:    https://github.com/intel-lab-lkp/linux/commits/Christian-Marangi/net-dsa-qca8k-make-learning-configurable-and-keep-off-if-standalone/20230729-195747
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20230729115509.32601-5-ansuelsmth%40gmail.com
+patch subject: [net-next PATCH v2 5/5] net: dsa: qca8k: use dsa_for_each macro instead of for loop
+config: x86_64-allyesconfig (https://download.01.org/0day-ci/archive/20230730/202307300305.RJlPYbyQ-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
+reproduce: (https://download.01.org/0day-ci/archive/20230730/202307300305.RJlPYbyQ-lkp@intel.com/reproduce)
 
-Which in turn ended up with:
-[94875.282948] ixgbe 0000:06:00.0 eno1: Reset adapter
-[94884.121100] rcu: INFO: rcu_preempt self-detected stall on CPU
-[94884.126957] rcu:     8-...!: (20999 ticks this GP)
-idle=1774/1/0x4000000000000000 softirq=987317/987317 fqs=625
-[94884.136888] rcu:     (t=21015 jiffies g=2224957 q=302 ncpus=12)
-[94884.142640] rcu: rcu_preempt kthread timer wakeup didn't happen for
-18517 jiffies! g2224957 f0x0 RCU_GP_WAIT_FQS(5) ->state=0x402
-[94884.154385] rcu:     Possible timer handling issue on cpu=4
-timer-softirq=784094
-[94884.161611] rcu: rcu_preempt kthread starved for 18540 jiffies!
-g2224957 f0x0 RCU_GP_WAIT_FQS(5) ->state=0x402 ->cpu=4
-[94884.172399] rcu:     Unless rcu_preempt kthread gets sufficient CPU
-time, OOM is now expected behavior.
-[94884.181621] rcu: RCU grace-period kthread stack dump:
-[94884.186909] rcu: Stack dump where RCU GP kthread last ran:
-[94947.192496] rcu: INFO: rcu_preempt self-detected stall on CPU
-[94947.198353] rcu:     8-....: (84001 ticks this GP)
-idle=1774/1/0x4000000000000000 softirq=987317/987317 fqs=16377
-[94947.208456] rcu:     (t=84088 jiffies g=2224957 q=828 ncpus=12)
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202307300305.RJlPYbyQ-lkp@intel.com/
 
-Eventually the watchdog kicked in and rebooted the machine
+All errors (new ones prefixed by >>):
+
+   drivers/net/dsa/qca/qca8k-8xxx.c: In function 'qca8k_setup':
+>> drivers/net/dsa/qca/qca8k-8xxx.c:1869:42: error: 'i' undeclared (first use in this function)
+    1869 |                 if (dsa_is_user_port(ds, i))
+         |                                          ^
+   drivers/net/dsa/qca/qca8k-8xxx.c:1869:42: note: each undeclared identifier is reported only once for each function it appears in
+
+
+vim +/i +1869 drivers/net/dsa/qca/qca8k-8xxx.c
+
+  1798	
+  1799	static int
+  1800	qca8k_setup(struct dsa_switch *ds)
+  1801	{
+  1802		struct qca8k_priv *priv = ds->priv;
+  1803		int cpu_port, ret, port;
+  1804		struct dsa_port *dp;
+  1805		u32 mask;
+  1806	
+  1807		cpu_port = qca8k_find_cpu_port(ds);
+  1808		if (cpu_port < 0) {
+  1809			dev_err(priv->dev, "No cpu port configured in both cpu port0 and port6");
+  1810			return cpu_port;
+  1811		}
+  1812	
+  1813		/* Parse CPU port config to be later used in phy_link mac_config */
+  1814		ret = qca8k_parse_port_config(priv);
+  1815		if (ret)
+  1816			return ret;
+  1817	
+  1818		ret = qca8k_setup_mdio_bus(priv);
+  1819		if (ret)
+  1820			return ret;
+  1821	
+  1822		ret = qca8k_setup_of_pws_reg(priv);
+  1823		if (ret)
+  1824			return ret;
+  1825	
+  1826		ret = qca8k_setup_mac_pwr_sel(priv);
+  1827		if (ret)
+  1828			return ret;
+  1829	
+  1830		ret = qca8k_setup_led_ctrl(priv);
+  1831		if (ret)
+  1832			return ret;
+  1833	
+  1834		qca8k_setup_pcs(priv, &priv->pcs_port_0, 0);
+  1835		qca8k_setup_pcs(priv, &priv->pcs_port_6, 6);
+  1836	
+  1837		/* Make sure MAC06 is disabled */
+  1838		ret = regmap_clear_bits(priv->regmap, QCA8K_REG_PORT0_PAD_CTRL,
+  1839					QCA8K_PORT0_PAD_MAC06_EXCHANGE_EN);
+  1840		if (ret) {
+  1841			dev_err(priv->dev, "failed disabling MAC06 exchange");
+  1842			return ret;
+  1843		}
+  1844	
+  1845		/* Enable CPU Port */
+  1846		ret = regmap_set_bits(priv->regmap, QCA8K_REG_GLOBAL_FW_CTRL0,
+  1847				      QCA8K_GLOBAL_FW_CTRL0_CPU_PORT_EN);
+  1848		if (ret) {
+  1849			dev_err(priv->dev, "failed enabling CPU port");
+  1850			return ret;
+  1851		}
+  1852	
+  1853		/* Enable MIB counters */
+  1854		ret = qca8k_mib_init(priv);
+  1855		if (ret)
+  1856			dev_warn(priv->dev, "mib init failed");
+  1857	
+  1858		/* Initial setup of all ports */
+  1859		dsa_switch_for_each_port(dp, ds) {
+  1860			port = dp->index;
+  1861	
+  1862			/* Disable forwarding by default on all ports */
+  1863			ret = qca8k_rmw(priv, QCA8K_PORT_LOOKUP_CTRL(port),
+  1864					QCA8K_PORT_LOOKUP_MEMBER, 0);
+  1865			if (ret)
+  1866				return ret;
+  1867	
+  1868			/* Disable MAC by default on all user ports */
+> 1869			if (dsa_is_user_port(ds, i))
+  1870				qca8k_port_set_status(priv, port, 0);
+  1871		}
+  1872	
+  1873		/* Enable QCA header mode on all cpu ports */
+  1874		dsa_switch_for_each_cpu_port(dp, ds) {
+  1875			port = dp->index;
+  1876	
+  1877			ret = qca8k_write(priv, QCA8K_REG_PORT_HDR_CTRL(port),
+  1878					  FIELD_PREP(QCA8K_PORT_HDR_CTRL_TX_MASK, QCA8K_PORT_HDR_CTRL_ALL) |
+  1879					  FIELD_PREP(QCA8K_PORT_HDR_CTRL_RX_MASK, QCA8K_PORT_HDR_CTRL_ALL));
+  1880			if (ret) {
+  1881				dev_err(priv->dev, "failed enabling QCA header mode on port %d", port);
+  1882				return ret;
+  1883			}
+  1884		}
+  1885	
+  1886		/* Forward all unknown frames to CPU port for Linux processing
+  1887		 * Notice that in multi-cpu config only one port should be set
+  1888		 * for igmp, unknown, multicast and broadcast packet
+  1889		 */
+  1890		ret = qca8k_write(priv, QCA8K_REG_GLOBAL_FW_CTRL1,
+  1891				  FIELD_PREP(QCA8K_GLOBAL_FW_CTRL1_IGMP_DP_MASK, BIT(cpu_port)) |
+  1892				  FIELD_PREP(QCA8K_GLOBAL_FW_CTRL1_BC_DP_MASK, BIT(cpu_port)) |
+  1893				  FIELD_PREP(QCA8K_GLOBAL_FW_CTRL1_MC_DP_MASK, BIT(cpu_port)) |
+  1894				  FIELD_PREP(QCA8K_GLOBAL_FW_CTRL1_UC_DP_MASK, BIT(cpu_port)));
+  1895		if (ret)
+  1896			return ret;
+  1897	
+  1898		/* CPU port gets connected to all user ports of the switch */
+  1899		ret = qca8k_rmw(priv, QCA8K_PORT_LOOKUP_CTRL(cpu_port),
+  1900				QCA8K_PORT_LOOKUP_MEMBER, dsa_user_ports(ds));
+  1901		if (ret)
+  1902			return ret;
+  1903	
+  1904		/* Setup connection between CPU port & user ports
+  1905		 * Individual user ports get connected to CPU port only
+  1906		 */
+  1907		dsa_switch_for_each_user_port(dp, ds) {
+  1908			port = dp->index;
+  1909	
+  1910			ret = qca8k_rmw(priv, QCA8K_PORT_LOOKUP_CTRL(port),
+  1911					QCA8K_PORT_LOOKUP_MEMBER,
+  1912					BIT(cpu_port));
+  1913			if (ret)
+  1914				return ret;
+  1915	
+  1916			ret = regmap_clear_bits(priv->regmap, QCA8K_PORT_LOOKUP_CTRL(port),
+  1917						QCA8K_PORT_LOOKUP_LEARN);
+  1918			if (ret)
+  1919				return ret;
+  1920	
+  1921			/* For port based vlans to work we need to set the
+  1922			 * default egress vid
+  1923			 */
+  1924			ret = qca8k_rmw(priv, QCA8K_EGRESS_VLAN(port),
+  1925					QCA8K_EGREES_VLAN_PORT_MASK(port),
+  1926					QCA8K_EGREES_VLAN_PORT(port, QCA8K_PORT_VID_DEF));
+  1927			if (ret)
+  1928				return ret;
+  1929	
+  1930			ret = qca8k_write(priv, QCA8K_REG_PORT_VLAN_CTRL0(port),
+  1931					  QCA8K_PORT_VLAN_CVID(QCA8K_PORT_VID_DEF) |
+  1932					  QCA8K_PORT_VLAN_SVID(QCA8K_PORT_VID_DEF));
+  1933			if (ret)
+  1934				return ret;
+  1935		}
+  1936	
+  1937		/* The port 5 of the qca8337 have some problem in flood condition. The
+  1938		 * original legacy driver had some specific buffer and priority settings
+  1939		 * for the different port suggested by the QCA switch team. Add this
+  1940		 * missing settings to improve switch stability under load condition.
+  1941		 * This problem is limited to qca8337 and other qca8k switch are not affected.
+  1942		 */
+  1943		if (priv->switch_id == QCA8K_ID_QCA8337)
+  1944			dsa_switch_for_each_available_port(dp, ds)
+  1945				qca8k_setup_hol_fixup(priv, dp->index);
+  1946	
+  1947		/* Special GLOBAL_FC_THRESH value are needed for ar8327 switch */
+  1948		if (priv->switch_id == QCA8K_ID_QCA8327) {
+  1949			mask = QCA8K_GLOBAL_FC_GOL_XON_THRES(288) |
+  1950			       QCA8K_GLOBAL_FC_GOL_XOFF_THRES(496);
+  1951			qca8k_rmw(priv, QCA8K_REG_GLOBAL_FC_THRESH,
+  1952				  QCA8K_GLOBAL_FC_GOL_XON_THRES_MASK |
+  1953				  QCA8K_GLOBAL_FC_GOL_XOFF_THRES_MASK,
+  1954				  mask);
+  1955		}
+  1956	
+  1957		/* Setup our port MTUs to match power on defaults */
+  1958		ret = qca8k_write(priv, QCA8K_MAX_FRAME_SIZE, ETH_FRAME_LEN + ETH_FCS_LEN);
+  1959		if (ret)
+  1960			dev_warn(priv->dev, "failed setting MTU settings");
+  1961	
+  1962		/* Flush the FDB table */
+  1963		qca8k_fdb_flush(priv);
+  1964	
+  1965		/* Set min a max ageing value supported */
+  1966		ds->ageing_time_min = 7000;
+  1967		ds->ageing_time_max = 458745000;
+  1968	
+  1969		/* Set max number of LAGs supported */
+  1970		ds->num_lag_ids = QCA8K_NUM_LAGS;
+  1971	
+  1972		return 0;
+  1973	}
+  1974	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
