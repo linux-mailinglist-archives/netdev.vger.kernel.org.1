@@ -1,116 +1,120 @@
-Return-Path: <netdev+bounces-22473-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22474-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 670DC76796B
-	for <lists+netdev@lfdr.de>; Sat, 29 Jul 2023 02:22:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E39B76796D
+	for <lists+netdev@lfdr.de>; Sat, 29 Jul 2023 02:24:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 73E1A1C2192C
-	for <lists+netdev@lfdr.de>; Sat, 29 Jul 2023 00:22:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DC0C42827C3
+	for <lists+netdev@lfdr.de>; Sat, 29 Jul 2023 00:24:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30C4C37E;
-	Sat, 29 Jul 2023 00:22:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D71AA380;
+	Sat, 29 Jul 2023 00:24:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25BD4198
-	for <netdev@vger.kernel.org>; Sat, 29 Jul 2023 00:22:43 +0000 (UTC)
-Received: from relay.hostedemail.com (smtprelay0013.hostedemail.com [216.40.44.13])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 616602680;
-	Fri, 28 Jul 2023 17:22:42 -0700 (PDT)
-Received: from omf10.hostedemail.com (a10.router.float.18 [10.200.18.1])
-	by unirelay02.hostedemail.com (Postfix) with ESMTP id 9B12312061F;
-	Sat, 29 Jul 2023 00:22:40 +0000 (UTC)
-Received: from [HIDDEN] (Authenticated sender: joe@perches.com) by omf10.hostedemail.com (Postfix) with ESMTPA id 9739432;
-	Sat, 29 Jul 2023 00:22:37 +0000 (UTC)
-Message-ID: <a19576f73036e772225140bb54f433caf0097e4f.camel@perches.com>
-Subject: Re: [PATCH v2] scripts: get_maintainer: steer people away from
- using file paths
-From: Joe Perches <joe@perches.com>
-To: Konstantin Ryabitsev <konstantin@linuxfoundation.org>, Andrew Lunn
-	 <andrew@lunn.ch>
-Cc: Jakub Kicinski <kuba@kernel.org>, Linus Torvalds
- <torvalds@linux-foundation.org>, Krzysztof Kozlowski
- <krzysztof.kozlowski@linaro.org>, geert@linux-m68k.org, 
- gregkh@linuxfoundation.org, netdev@vger.kernel.org,
- workflows@vger.kernel.org,  mario.limonciello@amd.com
-Date: Fri, 28 Jul 2023 17:22:36 -0700
-In-Reply-To: <20230728-egotism-icing-3d0bd0@meerkat>
-References: 
-	<CAHk-=whCE9cWmTXu54WFQ7x-aH8n=dhCux2h49=pYN=14ybkxg@mail.gmail.com>
-	 <20230726130318.099f96fc@kernel.org>
-	 <CAHk-=wjfC4tFnOC0Lk_GcU4buf+X-Jv965pWg+kMRkDb6hX6mw@mail.gmail.com>
-	 <20230726133648.54277d76@kernel.org>
-	 <CAHk-=whZHcergYrraQGgazmOGMbuPsDfRMBXjFLo1aEQPqH2xQ@mail.gmail.com>
-	 <20230726145721.52a20cb7@kernel.org> <20230726-june-mocha-ad6809@meerkat>
-	 <20230726171123.0d573f7c@kernel.org>
-	 <20230726-armless-ungodly-a3242f@meerkat>
-	 <1b96e465-0922-4c02-b770-4b1f27bebeb8@lunn.ch>
-	 <20230728-egotism-icing-3d0bd0@meerkat>
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C944837E
+	for <netdev@vger.kernel.org>; Sat, 29 Jul 2023 00:24:06 +0000 (UTC)
+Received: from mail-il1-x136.google.com (mail-il1-x136.google.com [IPv6:2607:f8b0:4864:20::136])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 594192680
+	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 17:24:05 -0700 (PDT)
+Received: by mail-il1-x136.google.com with SMTP id e9e14a558f8ab-345d2b936c2so1325415ab.0
+        for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 17:24:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linuxfoundation.org; s=google; t=1690590244; x=1691195044;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=HIeU+TWEJ9SHiH0PuMDlq+ijy5jWckAGkZXhCnVsnVY=;
+        b=WOgKTJT75jB4KqOF6kEnfq0vx2OflxgDsz+zH43o8dD+xHb4h3OFWUiB0EoxBuqsSz
+         poQX4LS/5mBeGowuzSOicZJ+aoc8o7CPNY1dBd+pgAi4t1Z+u9wi0/CdyrIWzv+oTiu+
+         lTcIgyEZ8PKn3xtZbbvRkJmudW9J0CSq6LsaQ=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690590244; x=1691195044;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=HIeU+TWEJ9SHiH0PuMDlq+ijy5jWckAGkZXhCnVsnVY=;
+        b=BFzZ5OWUWqxW+82YGnnAbTIsHCvfhHslPNg3KLIZUpTDkmMNKO81x8RONSDv1dmUNh
+         e2uv1DqNL+gFNAilkIOiJlPV+hOtoGkOVN+MYIMaFEhnKWLlt/cl8BoI0MuLmhcJlvg+
+         ZVZJqLjsgWN1FytfXgKxj9XSb8M5P4p7vxgqzx02eLawsr7K2psG9cibz96FvgarELwJ
+         WQBxtx48Z1P7pTgBYxlrzspBtn4uqkUNbBPbPlvFgq8xOCt/XDqnVzqgKAF8kmUEPs2z
+         9Hq9FBuGxPe8XLj5T+CRW8r+5MWOddv7z3F0oc+QDYhCeq+6wfs6EYHsPvc/jSCrBfoB
+         tVCQ==
+X-Gm-Message-State: ABy/qLZNTso6r9B7LKHgcZPCm0AveOJTJrbfldlYB1SLC3k1UKnKsvrP
+	E9o8l84qaLCU+T5WttC33bGUea3BG0QzY0JDBS4+yQ==
+X-Google-Smtp-Source: APBJJlFxzLDh4U/zUNgrcQ2hxtYq7pJ++OjUt0NgiNKY77A+Y8REpbsUiZgaUS+PiXRaDKHdpKlpUw==
+X-Received: by 2002:a92:dc51:0:b0:346:1919:7cb1 with SMTP id x17-20020a92dc51000000b0034619197cb1mr788138ilq.2.1690590244776;
+        Fri, 28 Jul 2023 17:24:04 -0700 (PDT)
+Received: from shuah-tx13.internal ([38.15.45.1])
+        by smtp.gmail.com with ESMTPSA id k25-20020a02a719000000b0042b4437d857sm1460925jam.106.2023.07.28.17.24.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 28 Jul 2023 17:24:04 -0700 (PDT)
+From: Shuah Khan <skhan@linuxfoundation.org>
+To: shuah@kernel.org,
+	Liam.Howlett@oracle.com,
+	anjali.k.kulkarni@oracle.com,
+	kuba@kernel.org
+Cc: Shuah Khan <skhan@linuxfoundation.org>,
+	davem@davemloft.net,
+	netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [RESEND PATCH v2] selftests:connector: Fix input argument error paths to skip
+Date: Fri, 28 Jul 2023 18:24:03 -0600
+Message-Id: <20230729002403.4278-1-skhan@linuxfoundation.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Rspamd-Queue-Id: 9739432
-X-Stat-Signature: 7gkuanj5xoc7qcjfcfz36obxgeao5xs4
-X-Spam-Status: No, score=-0.9 required=5.0 tests=BAYES_00,FORGED_SPF_HELO,
-	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,
-	SPF_NONE,T_SCC_BODY_TEXT_LINE,UNPARSEABLE_RELAY autolearn=no
-	autolearn_force=no version=3.4.6
-X-Rspamd-Server: rspamout01
-X-Session-Marker: 6A6F6540706572636865732E636F6D
-X-Session-ID: U2FsdGVkX1/mOlvdfqFchiId5QJNtKS3kzhjO8vsu4s=
-X-HE-Tag: 1690590157-822710
-X-HE-Meta: U2FsdGVkX1+FNPSwB11j+R1wv5Pxe7vaiubW5Wi1tA+AoCaaqbhADgPa2JldVgvi5mt27T8OmwOyKQxChZuxVniWz70LwwPoYgW26IU9AbNFvBrSIh4SlJBrqRhFksqSA3bOCkUMWppnpofJV7wsu8AHEmyvRtyc9jLQWnZkbBfHiHihBeyh8XvyAlG/Ir6eSWq0Ohs+VstIxoVmS7OPIfvMQxSMbzCRM71dnHHqbmISNhdjpTLUK5ztQeQyr64Pxdq8q0X9tNDSs+MsiwPDl74QyrF71UABKIeckzzZhGqXfsKbqfP7Uiy41EVDg1VnDULDt4fiB2MVPenvPk78HSflzxegK8s736AuJOdUBchWDnYWqk83m01FrWt9wJSM
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, 2023-07-28 at 16:29 -0400, Konstantin Ryabitsev wrote:
-> On Thu, Jul 27, 2023 at 01:00:15PM +0200, Andrew Lunn wrote:
-> > > Think as if instead of being Cc'd on patches, they got Bcc'd on them.
-> >=20
-> > And how does reply work? I assume it would only go to those in To: or
-> > Cc: ? Is there enough context in the headers in a reply for the system
-> > to figure out who to Bcc: the reply to?
->=20
-> I have actually solved a similar problem already as part of a different
-> project (bugbot). We associate a set of additional addresses with a threa=
-d and
-> can send any thread updates to those addresses.
->=20
-> It would require a bit more effort to adapt it so we properly handle boun=
-ces,
-> but effectively this does what you're asking about -- replies sent to a t=
-hread
-> will be sent out to all addresses we've associated with that thread (via
-> get_maintainer.pl). In a sense, this will create a miniature pseudo-maili=
-ng
-> list per each thread with its own set of subscribers.
->=20
-> I just need to make sure this doesn't fall over once we are hitting
-> LKML-levels of activity.
->=20
+Fix input argument parsing paths to skip from their error legs.
+This fix helps to avoid false test failure reports without running
+the test.
 
-How about whenever a single mailing list like
-	linux-patches@vger.kernel.org
-gets new 0/n without an in-reply-to header and m/n patches with
-only the single in-reply-to header of an 0/n patch or simply a
-single patch without an in-reply-to header, the cc list is
-automatically generated from a tool like get_maintainer and a
-From: <sender> line is added if necessary to the message body
-and the email forwarded to all cc's and linux-patches is removed
-from the email?
+Signed-off-by: Shuah Khan <skhan@linuxfoundation.org>
+---
+v2: Removed root check based on Anjali's review comments.
+Add netdev to RESEND
 
-I believe that would help solve most correctness of recipient
-list issues and then the linux-patches list would not need
-further involvement.
+ tools/testing/selftests/connector/proc_filter.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/tools/testing/selftests/connector/proc_filter.c b/tools/testing/selftests/connector/proc_filter.c
+index 4fe8c6763fd8..4a825b997666 100644
+--- a/tools/testing/selftests/connector/proc_filter.c
++++ b/tools/testing/selftests/connector/proc_filter.c
+@@ -248,7 +248,7 @@ int main(int argc, char *argv[])
+ 
+ 	if (argc > 2) {
+ 		printf("Expected 0(assume no-filter) or 1 argument(-f)\n");
+-		exit(1);
++		exit(KSFT_SKIP);
+ 	}
+ 
+ 	if (argc == 2) {
+@@ -256,7 +256,7 @@ int main(int argc, char *argv[])
+ 			filter = 1;
+ 		} else {
+ 			printf("Valid option : -f (for filter feature)\n");
+-			exit(1);
++			exit(KSFT_SKIP);
+ 		}
+ 	}
+ 
+-- 
+2.39.2
 
 
