@@ -1,83 +1,167 @@
-Return-Path: <netdev+bounces-22563-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22564-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8080C768086
-	for <lists+netdev@lfdr.de>; Sat, 29 Jul 2023 18:10:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76CA276808B
+	for <lists+netdev@lfdr.de>; Sat, 29 Jul 2023 18:15:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B64EA1C20A7E
-	for <lists+netdev@lfdr.de>; Sat, 29 Jul 2023 16:10:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A70E41C20AC3
+	for <lists+netdev@lfdr.de>; Sat, 29 Jul 2023 16:15:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 873EA171CC;
-	Sat, 29 Jul 2023 16:10:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DE41171BB;
+	Sat, 29 Jul 2023 16:15:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 027553D60
-	for <netdev@vger.kernel.org>; Sat, 29 Jul 2023 16:10:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 64B51C433C7;
-	Sat, 29 Jul 2023 16:10:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690647021;
-	bh=V6YVtnCFJuNH+7RK60cPen2/GIH6Vm7DE1dz27OC46U=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=GKfuFXtR25g5AGrIWHJZuBvuS7wngCkhwo8veYrkDP97UQgb7J+qngGnpP82CBO63
-	 cMS0N6Be7pwWdj9XISMiwpdD6o4Pg8TFPNNqG8ieaab4CqeiVXAjCV3knz78pK3FtT
-	 Wi1+QU5PIH4Up3GZ5Pkql8h0hYq+zmoTpaTA2jI8byLZJlN0RuHf68GAbw6WtcYWac
-	 sp1aK0baad+qhXo1pI7ogpkSCYvqHknE9Fv0Q/uLEpgCGh2cevZHpUAdIpXA/Y/41P
-	 DAJCbyivPk/pk3+RPaQrANNtIQxzSrDem2GnordAiAdGWxuDvclTQ95cF0KYiFyKiv
-	 sOnLcXnJNFZQQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 46D6AE21EC9;
-	Sat, 29 Jul 2023 16:10:21 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48D81F4FE;
+	Sat, 29 Jul 2023 16:15:26 +0000 (UTC)
+Received: from mail-qv1-xf30.google.com (mail-qv1-xf30.google.com [IPv6:2607:f8b0:4864:20::f30])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F17703A9A;
+	Sat, 29 Jul 2023 09:15:24 -0700 (PDT)
+Received: by mail-qv1-xf30.google.com with SMTP id 6a1803df08f44-6378cec43ddso17413076d6.2;
+        Sat, 29 Jul 2023 09:15:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1690647324; x=1691252124;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yhbwdeVAVLw7w1LdIyvCySYdGFtXHpX0EQ+J02OgF0U=;
+        b=dEGwFuN2TtPnnCqswhXXgKZbTaI/LyaH7uLwuU39srOhBfG/jFwEVr+Om8WABl+htd
+         e9QEjLvfWSEst536eH66pyk1vjjoy2jJ0ZMk4fC3j7pvV7hKX+jDpeEeEg1Mj8kIFhEr
+         P0XM46OkPvCVfL047wmCBuzSqx8e8YA7pzdUA9UyWUwZUwOSjRO+NFo8CUpBelXBJAXB
+         3owEvVYN0YG8WOIwVtDsvJa8AdmILqHfFMExCbmbnv9g691x9pa7tLzrYx3D67RNGj1P
+         w9gnxpdry6iloqAHZRSwbuv0+sQUp2YZz0dWXjvtDl9+yxZlfbvoFWLEXWOKBScwQZKH
+         dYHw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690647324; x=1691252124;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=yhbwdeVAVLw7w1LdIyvCySYdGFtXHpX0EQ+J02OgF0U=;
+        b=Seg1oihRIv8GVghM6dpePbYrYXp+9G7nLrthfJ6/WuifQ4KMFDktAgBzIlkQqFcM4o
+         jGPqNtSY8GdRFHjiAScm7k/bL4exIq/XjuhYWI6T+qSW3Zf/4cUNAGzQPrE1RQGmMnL9
+         osuIu4+b0XJX7tBw/XHF+4GVIYduFiLY1IzSiE1iqaIoQUy9Po1GEMGEM2YRoDsMgv8M
+         NxQZfCfx7Z2tSGay+JwEUflTwJrjCtw2RNvsOKBRCXFinpXOXDQt+Iw2G5xvqmaaxvOr
+         HP5tpdzzDXiDTWrTm+gbGUJU2SMdXNB4zEL3XfxaKm51oiG+tVD8kuiow4ir7ofhR753
+         QVbQ==
+X-Gm-Message-State: ABy/qLaUWJO4snfSanH/WR4MtkGZwazmqqVGfK0ZVJz042/zTmV4gApH
+	Ps7OhCvaeUFi5VrWfZs3Wej+Z2m1q70=
+X-Google-Smtp-Source: APBJJlGt0Qsc8iu579OjS3dPBYko4Mly73GH0w3PE/9NxRgWO3Bi5UCQgQDNCukiPFPvWPSJIgavVg==
+X-Received: by 2002:a0c:e287:0:b0:63c:d763:77b4 with SMTP id r7-20020a0ce287000000b0063cd76377b4mr5144562qvl.8.1690647323986;
+        Sat, 29 Jul 2023 09:15:23 -0700 (PDT)
+Received: from localhost (172.174.245.35.bc.googleusercontent.com. [35.245.174.172])
+        by smtp.gmail.com with ESMTPSA id p15-20020a0ccb8f000000b0063d06253995sm2152667qvk.22.2023.07.29.09.15.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 29 Jul 2023 09:15:23 -0700 (PDT)
+Date: Sat, 29 Jul 2023 12:15:23 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>, 
+ Larysa Zaremba <larysa.zaremba@intel.com>
+Cc: bpf@vger.kernel.org, 
+ ast@kernel.org, 
+ daniel@iogearbox.net, 
+ andrii@kernel.org, 
+ martin.lau@linux.dev, 
+ song@kernel.org, 
+ yhs@fb.com, 
+ john.fastabend@gmail.com, 
+ kpsingh@kernel.org, 
+ sdf@google.com, 
+ haoluo@google.com, 
+ jolsa@kernel.org, 
+ David Ahern <dsahern@gmail.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Willem de Bruijn <willemb@google.com>, 
+ Jesper Dangaard Brouer <brouer@redhat.com>, 
+ Anatoly Burakov <anatoly.burakov@intel.com>, 
+ Alexander Lobakin <alexandr.lobakin@intel.com>, 
+ Magnus Karlsson <magnus.karlsson@gmail.com>, 
+ Maryam Tahhan <mtahhan@redhat.com>, 
+ xdp-hints@xdp-project.net, 
+ netdev@vger.kernel.org, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ Simon Horman <simon.horman@corigine.com>
+Message-ID: <64c53b1b29a66_e235c2942d@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20230728215340.pf3qcfxh7g4x7s6a@MacBook-Pro-8.local>
+References: <20230728173923.1318596-1-larysa.zaremba@intel.com>
+ <20230728173923.1318596-13-larysa.zaremba@intel.com>
+ <20230728215340.pf3qcfxh7g4x7s6a@MacBook-Pro-8.local>
+Subject: Re: [PATCH bpf-next v4 12/21] xdp: Add checksum hint
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] net: stmmac: tegra: Properly allocate clock bulk data
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169064702128.23345.15655949504237032704.git-patchwork-notify@kernel.org>
-Date: Sat, 29 Jul 2023 16:10:21 +0000
-References: <20230726163200.2138394-1-thierry.reding@gmail.com>
-In-Reply-To: <20230726163200.2138394-1-thierry.reding@gmail.com>
-To: Thierry Reding <thierry.reding@gmail.com>
-Cc: peppe.cavallaro@st.com, alexandre.torgue@foss.st.com,
- joabreu@synopsys.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, jonathanh@nvidia.com,
- netdev@vger.kernel.org, linux-tegra@vger.kernel.org
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by David S. Miller <davem@davemloft.net>:
-
-On Wed, 26 Jul 2023 18:32:00 +0200 you wrote:
-> From: Thierry Reding <treding@nvidia.com>
+Alexei Starovoitov wrote:
+> On Fri, Jul 28, 2023 at 07:39:14PM +0200, Larysa Zaremba wrote:
+> >  
+> > +union xdp_csum_info {
+> > +	/* Checksum referred to by ``csum_start + csum_offset`` is considered
+> > +	 * valid, but was never calculated, TX device has to do this,
+> > +	 * starting from csum_start packet byte.
+> > +	 * Any preceding checksums are also considered valid.
+> > +	 * Available, if ``status == XDP_CHECKSUM_PARTIAL``.
+> > +	 */
+> > +	struct {
+> > +		u16 csum_start;
+> > +		u16 csum_offset;
+> > +	};
+> > +
 > 
-> The clock data is an array of struct clk_bulk_data, so make sure to
-> allocate enough memory.
+> CHECKSUM_PARTIAL makes sense on TX, but this RX. I don't see in the above.
+
+It can be observed on RX when packets are looped.
+
+This may be observed even in XDP on veth.
+ 
+> > +	/* Checksum, calculated over the whole packet.
+> > +	 * Available, if ``status & XDP_CHECKSUM_COMPLETE``.
+> > +	 */
+> > +	u32 checksum;
 > 
-> Fixes: d8ca113724e7 ("net: stmmac: tegra: Add MGBE support")
-> Signed-off-by: Thierry Reding <treding@nvidia.com>
+> imo XDP RX should only support XDP_CHECKSUM_COMPLETE with u32 checksum
+> or XDP_CHECKSUM_UNNECESSARY.
 > 
-> [...]
+> > +};
+> > +
+> > +enum xdp_csum_status {
+> > +	/* HW had parsed several transport headers and validated their
+> > +	 * checksums, same as ``CHECKSUM_UNNECESSARY`` in ``sk_buff``.
+> > +	 * 3 least significant bytes contain number of consecutive checksums,
+> > +	 * starting with the outermost, reported by hardware as valid.
+> > +	 * ``sk_buff`` checksum level (``csum_level``) notation is provided
+> > +	 * for driver developers.
+> > +	 */
+> > +	XDP_CHECKSUM_VALID_LVL0		= 1,	/* 1 outermost checksum */
+> > +	XDP_CHECKSUM_VALID_LVL1		= 2,	/* 2 outermost checksums */
+> > +	XDP_CHECKSUM_VALID_LVL2		= 3,	/* 3 outermost checksums */
+> > +	XDP_CHECKSUM_VALID_LVL3		= 4,	/* 4 outermost checksums */
+> > +	XDP_CHECKSUM_VALID_NUM_MASK	= GENMASK(2, 0),
+> > +	XDP_CHECKSUM_VALID		= XDP_CHECKSUM_VALID_NUM_MASK,
+> 
+> I don't see what bpf prog suppose to do with these levels.
+> The driver should pick between 3:
+> XDP_CHECKSUM_UNNECESSARY, XDP_CHECKSUM_COMPLETE, XDP_CHECKSUM_NONE.
+> 
+> No levels and no anything partial. please.
 
-Here is the summary with links:
-  - net: stmmac: tegra: Properly allocate clock bulk data
-    https://git.kernel.org/netdev/net/c/a0b1b2055be3
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+This levels business is an unfortunate side effect of
+CHECKSUM_UNNECESSARY. For a packet with multiple checksum fields, what
+does the boolean actually mean? With these levels, at least that is
+well defined: the first N checksum fields.
 
 
