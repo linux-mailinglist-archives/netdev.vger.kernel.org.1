@@ -1,163 +1,143 @@
-Return-Path: <netdev+bounces-22509-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22511-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ABE24767D9C
-	for <lists+netdev@lfdr.de>; Sat, 29 Jul 2023 11:19:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D02F767DBE
+	for <lists+netdev@lfdr.de>; Sat, 29 Jul 2023 11:52:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DCC721C215D9
-	for <lists+netdev@lfdr.de>; Sat, 29 Jul 2023 09:19:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 805A51C20F6C
+	for <lists+netdev@lfdr.de>; Sat, 29 Jul 2023 09:52:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E873F111A4;
-	Sat, 29 Jul 2023 09:19:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CB3E3FE6;
+	Sat, 29 Jul 2023 09:52:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3E45C2E3;
-	Sat, 29 Jul 2023 09:19:07 +0000 (UTC)
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2721D271D;
-	Sat, 29 Jul 2023 02:19:06 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.143])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4RCf8656D4z4f3prT;
-	Sat, 29 Jul 2023 17:19:02 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.124.27])
-	by APP4 (Coremail) with SMTP id gCh0CgCHLaGE2cRkf9BOPA--.1627S6;
-	Sat, 29 Jul 2023 17:19:03 +0800 (CST)
-From: Hou Tao <houtao@huaweicloud.com>
-To: bpf@vger.kernel.org
-Cc: netdev@vger.kernel.org,
-	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	=?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn.topel@gmail.com>,
-	=?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Alexei Starovoitov <alexei.starovoitov@gmail.com>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Song Liu <song@kernel.org>,
-	Hao Luo <haoluo@google.com>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	KP Singh <kpsingh@kernel.org>,
-	Stanislav Fomichev <sdf@google.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Pu Lehui <pulehui@huawei.com>,
-	houtao1@huawei.com
-Subject: [PATCH bpf 2/2] bpf, cpumap: Handle skb as well when clean up ptr_ring
-Date: Sat, 29 Jul 2023 17:51:07 +0800
-Message-Id: <20230729095107.1722450-3-houtao@huaweicloud.com>
-X-Mailer: git-send-email 2.29.2
-In-Reply-To: <20230729095107.1722450-1-houtao@huaweicloud.com>
-References: <20230729095107.1722450-1-houtao@huaweicloud.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29C8D7C
+	for <netdev@vger.kernel.org>; Sat, 29 Jul 2023 09:52:49 +0000 (UTC)
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2120.outbound.protection.outlook.com [40.107.223.120])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE94ADE;
+	Sat, 29 Jul 2023 02:52:48 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=dsjPi5t4dR0lqn+8Quw/2LFFugp7oiqapFd+BVzXpIdQ/g2v1ywN40jAJYY88bSRDFbpiy9qBGDd+XQJKi7eKl/JnDe5OLVLwYi0OiFSFf1Rcut6KBlfHo2gXGwpM6Y5zt9hSEjFU/dvHJRPZBEk96yWqckGZZi9vjVc0lwY2KGSOUJ1hvWqPSAPxNHVFgvxRA85MTIBjNGjqtvXoBtK3/MxfRBDNrSRfT1pfYSP1T76I7J3VvfdT9NO7I+fP1Ph2msFPKX5NX+3u1mohnu7ehHgZpjTFhiM2nh9i7+l9+uizaG2PmTD+gIEhLNIyZ+/mVPwUxtICTVD+FPDmrmt0w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=RnFiMUwGTwWw+qFE7yBDSNcoo21Is4uk64U5mw/8luM=;
+ b=oSzri/xuj1ypD4TCVWyfCAHWJJ5YC2mqKP4YoiHcj4qhUNBFVEm2IWBozCB/mzDy4hPaHxRGcAI4Sqpxnh28y3pMk8h88+sYXRKSKmphI2D9cXGSktUY5VbUgsb59Cwi3acSz/QFGPgfVQyxLWfLTNRF7PBc2QHxu65VPCsZAjsqMU7btdxzFi+eagYPSuC9tjCuv8z9T+hM5DwzOhnYYpJMyGOpPuP0bP7iZWzmAx3fRGarZQE3P4opOdgeP8PZD24HohUDdKU9PdHXgu5hvDmfZWfqeKJ8g59SX3qym70RXsVH/uhUuCdV/lJOTNtpGq+Dowx/mMAV43Rgf95wZg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
+ dkim=pass header.d=corigine.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=RnFiMUwGTwWw+qFE7yBDSNcoo21Is4uk64U5mw/8luM=;
+ b=ApvCHYcRvLe0ReUOGLfDkPvCUAcaRIN1ATgDyne4gy8NdUl4yBMMuQvgHKOCWJwl6GgvC+fxl5B9WG4sU73EGKRBqsYOhF9Q9v2CwgXtPemhtcD2bYMG//Ocw6BOOJxSc3BnIlys9EPAMFJGjr/mOviVEyhz+YOVFoKVO45aDp8=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=corigine.com;
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
+ by SJ0PR13MB5676.namprd13.prod.outlook.com (2603:10b6:a03:403::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.32; Sat, 29 Jul
+ 2023 09:52:44 +0000
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::fde7:9821:f2d9:101d]) by PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::fde7:9821:f2d9:101d%7]) with mapi id 15.20.6631.026; Sat, 29 Jul 2023
+ 09:52:44 +0000
+Date: Sat, 29 Jul 2023 11:52:38 +0200
+From: Simon Horman <simon.horman@corigine.com>
+To: Yang Li <yang.lee@linux.alibaba.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, jiri@resnulli.us, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Abaci Robot <abaci@linux.alibaba.com>
+Subject: Re: [PATCH net-next] team: Remove NULL check before dev_{put, hold}
+Message-ID: <ZMThZg+feS/PHE3x@corigine.com>
+References: <20230727005741.114069-1-yang.lee@linux.alibaba.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230727005741.114069-1-yang.lee@linux.alibaba.com>
+X-ClientProxiedBy: AS4P191CA0017.EURP191.PROD.OUTLOOK.COM
+ (2603:10a6:20b:5d9::7) To PH0PR13MB4842.namprd13.prod.outlook.com
+ (2603:10b6:510:78::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgCHLaGE2cRkf9BOPA--.1627S6
-X-Coremail-Antispam: 1UD129KBjvJXoW7Ww4xWr4UKw4DXry7uFy5twb_yoW8KrW7pr
-	4fKryUJr48X3ZFvay8Kan3try3Jan2g3WfJ3yFk34rZF15X39rWaykKayktFy5GrZ5Cr15
-	Jrs0qF95KayDJaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBYb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUXw
-	A2048vs2IY020Ec7CjxVAFwI0_Xr0E3s1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxS
-	w2x7M28EF7xvwVC0I7IYx2IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxV
-	W8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v2
-	6rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMc
-	Ij6xIIjxv20xvE14v26r1Y6r17McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_
-	Jr0_Gr1lF7xvr2IYc2Ij64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1l42xK82IYc2Ij64
-	vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8G
-	jcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6rW5MIIYrxkI7VAKI48JMIIF0xvE2I
-	x0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26F4j6r4UJwCI42IY6xAI
-	w20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x
-	0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU1o5l5UUUUU==
-X-CM-SenderInfo: xkrx3t3r6k3tpzhluzxrxghudrp/
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
-	SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-	version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|SJ0PR13MB5676:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7b13f918-d135-4dbc-d6da-08db90198e77
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	xXYVLffi6lqWx4Y2nZk513aHltjTv6SZjpHAl/6jpDL4zWsHBjIilnHpTqakaIJnHjHRi7xsHGTP5Qsdowh5l3uKx2Q/LWvw+HmMbswNShCa7thQnO6U0j3A3SMwcIDMK00CV+uapH0LQS0yfgQq2zbg7gqnGw6dpcXH4JoaOjsBoq4l41AYEERd0UwCN3ZsKSQkpiyeZlteXnHNKJ/LkAjxsR1afKRy/clJ41D2XFDnAKtS4qFgq8sccYSjUglIopz9uim7KmHzgKpgKT4S6jjI+s68lQD9oRBBelC2RrEbhUmkmMfbFSNzDwnZJ2YCWjuy2xcELmeamuOX9wUnEVjWp7oquhibNqyZkOY9zwJ1qxWLmm+0lgvfOJN0bt45lwpdZ1uZ8+wI7UDQvEkRhqzGQIo0QqRgsHvr9OmapM2ihyvtrqIdtt7kNTAfQrGvCisKp59mibd+zqVfnFWGhmqTq5kVWvAxavdnMCV7nleRsFMv6ShIbXFrGzmyJylpbUxuZnIzzuRqapgdKe+ryVMJEPqLmv1Iv/uKO2WSkA+rrhKrfrq870UAV6gI3zw3iACDc8B+1kVBvjlml24uXQ==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(376002)(39830400003)(366004)(346002)(136003)(451199021)(6506007)(478600001)(6666004)(6486002)(966005)(6512007)(36756003)(186003)(44832011)(4744005)(2906002)(8676002)(2616005)(6916009)(316002)(41300700001)(5660300002)(38100700002)(66946007)(4326008)(66476007)(66556008)(83380400001)(8936002)(86362001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?wBQ+BlpM2hw+QWmorlnUarrwyDy72jnpVfeQ/n9xZka6cSfg8KhBm/XNKipD?=
+ =?us-ascii?Q?yuIRiP3dTeVHJ8Dx6v4CDvHi1cBvhs1jmKWaodTq29F4ew9O5Hj2OFnAF2U5?=
+ =?us-ascii?Q?P9swg7854p8kG8zbc4R+djFk2VmUF8V02HYTyzL8qGx2oNWk0qUhFG6izTq4?=
+ =?us-ascii?Q?qqWoZodj9CNutNUOzAck9/hmVZ64pJZQ0xvSR2y8eRlue4G0KIE5ScD9V61J?=
+ =?us-ascii?Q?27ayLK6hyS25lcdgYttxWz4SRP2D3RkD7F41OAGeOPenwpobsX5+vpqavMIT?=
+ =?us-ascii?Q?g5UEbPIQS4BelcIBsOx2A3mSnMBwLiwWQCcVWQcSy6jA4vPDxsJY61vVY1Rn?=
+ =?us-ascii?Q?hWxX5h9qz0cNEdZ7AM0Uw+3fn2Eac5LRyud3p7PvuT8jPAQPwTVmGbTkSR6q?=
+ =?us-ascii?Q?h1ed0KuoBJbJXsAzcsbzdzUPBL12jpuBi2viflMBUhCRw8YxIQvOhzdJz3VE?=
+ =?us-ascii?Q?1OFtWRqOqSNa5g1221cLAxYmwh3/Aoi8GumslUmxCzvKFPI3p85e8ELN5WQg?=
+ =?us-ascii?Q?WDiFxcE4U8d3YWL7k+d4s8Mzrd93gl76SeU1mPP6OmzoH6PLmg5ikDdi7Npf?=
+ =?us-ascii?Q?xEum5hCy6SANpA4m1IXvsIpRMQ8Z2u8xgYvap65rJiJLlFgPkFBKlHOF33ri?=
+ =?us-ascii?Q?89PoIvQKqrWM/mWrLAu6awlExu/MlHVK0wdvmIExegQhYE4XlIaCOV4dzRPl?=
+ =?us-ascii?Q?i8tKJwge9YRMhCSerK8hdJvk8qM02Y6fJAr34NLXgT74iy3u++AEfc6lab89?=
+ =?us-ascii?Q?ohybPWG2274YRJoywFRcYu+qflqJ+CHuL6Ri0B/U9iQf4MabRWaH/kmDzIiP?=
+ =?us-ascii?Q?NuKMnysiDl4e4PIWiXfuzkzghATiux7pQsx6wlHugzJoPIc65kKlTBlMLow7?=
+ =?us-ascii?Q?sysoaicPQavZBMQb9XQFS+7r+xjsf1cljdC5ldwwwrsvTXKrAPc6b+0PhXue?=
+ =?us-ascii?Q?IxTRQEDYqXtT6OCtnJUDhUhmkxMfKpZjNetH3Byny69rdKNCCN+WjQn3KxMq?=
+ =?us-ascii?Q?5E/F7ZRN/xzQezhf1/OJHi2F84ERJzeIa1k+QOhBuGRldz9G41CdzDggr9HG?=
+ =?us-ascii?Q?gC5ghgKzt7OjNWSOwhXL6asWLjxdbPBT7LhAwQTE70ffOZyn+fcTYa78KHEe?=
+ =?us-ascii?Q?cC14QZIufW2GrdxdZCX5Lg9FVpJUT2AFSVvvxwZ0KM2Kw4CQRw+hLVQzTYu8?=
+ =?us-ascii?Q?FWk5LDfoffBBmaoVUhzl7ZCLJER+1pb/q5XmDlRreprKFBYX/10VKVkPU5Bx?=
+ =?us-ascii?Q?i+vykGuwaJGhbKgmlt2lS0bPk8jceoZvuYuXPn4zLUelCMgJrKVfdwr5rfYj?=
+ =?us-ascii?Q?FynoKwud8RKMoYhL2YcjsT8p40Qn+7ClGrCaAvciC9P8wX7To2QamrD/3TeC?=
+ =?us-ascii?Q?+wpRqmjDa4FVALIVj4yg4mnlVcVY4Y1IBoVqZ30svI075pSROd15oU4lykeE?=
+ =?us-ascii?Q?pXXot76Umd8qT8UUqPXzh5RiBvWIBGT4WleNZEOWhb+4LUWNrqd4ruDwNK9+?=
+ =?us-ascii?Q?ogjAb2JvSQF0cjr18gREThT9CsEIrJJWGZ3yQcqcRjT69wV3hep6uqu/VYyr?=
+ =?us-ascii?Q?2+bsjVQsTGa4J7geSfjmx4x2MNQR29ZTPmlRh0IZ3YM39EJgYIkJWZ/Fe/V6?=
+ =?us-ascii?Q?VcQstJ0VMB91mYP9bic3SgMO7XdX2j5Yw1mr5V9BkSvHD/3hEpeEeI594ept?=
+ =?us-ascii?Q?9rkVFA=3D=3D?=
+X-OriginatorOrg: corigine.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7b13f918-d135-4dbc-d6da-08db90198e77
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Jul 2023 09:52:44.4402
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 1wgYby5mezPutioPPxmlGHA4Pb2PFZd6Hrcd0mEFk6iix6gfuvBe3xuH/rJDebA6PTLPhVosJ5shgC+hAcka7wuSpHzFYF1Us2vOPDDkqBM=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR13MB5676
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Hou Tao <houtao1@huawei.com>
+On Thu, Jul 27, 2023 at 08:57:41AM +0800, Yang Li wrote:
+> The call netdev_{put, hold} of dev_{put, hold} will check NULL,
+> so there is no need to check before using dev_{put, hold},
+> remove it to silence the warning:
+> 
+> ./drivers/net/team/team.c:2325:3-10: WARNING: NULL check before dev_{put, hold} functions is not needed.
+> 
+> Reported-by: Abaci Robot <abaci@linux.alibaba.com>
+> Closes: https://bugzilla.openanolis.cn/show_bug.cgi?id=5991
+> Signed-off-by: Yang Li <yang.lee@linux.alibaba.com>
 
-The following warning was reported when running xdp_redirect_cpu with
-both skb-mode and stress-mode enabled:
-
-  ------------[ cut here ]------------
-  Incorrect XDP memory type (-2128176192) usage
-  WARNING: CPU: 7 PID: 1442 at net/core/xdp.c:405
-  Modules linked in:
-  CPU: 7 PID: 1442 Comm: kworker/7:0 Tainted: G  6.5.0-rc2+ #1
-  Hardware name: QEMU Standard PC (i440FX + PIIX, 1996)
-  Workqueue: events __cpu_map_entry_free
-  RIP: 0010:__xdp_return+0x1e4/0x4a0
-  ......
-  Call Trace:
-   <TASK>
-   ? show_regs+0x65/0x70
-   ? __warn+0xa5/0x240
-   ? __xdp_return+0x1e4/0x4a0
-   ......
-   xdp_return_frame+0x4d/0x150
-   __cpu_map_entry_free+0xf9/0x230
-   process_one_work+0x6b0/0xb80
-   worker_thread+0x96/0x720
-   kthread+0x1a5/0x1f0
-   ret_from_fork+0x3a/0x70
-   ret_from_fork_asm+0x1b/0x30
-   </TASK>
-
-The reason for the warning is twofold. One is due to the kthread
-cpu_map_kthread_run() is stopped prematurely. Another one is
-__cpu_map_ring_cleanup() doesn't handle skb mode and treats skbs in
-ptr_ring as XDP frames.
-
-Prematurely-stopped kthread will be fixed by the preceding patch and
-ptr_ring will be empty when __cpu_map_ring_cleanup() is called. But
-as the comments in __cpu_map_ring_cleanup() said, handling and freeing
-skbs in ptr_ring as well to "catch any broken behaviour gracefully".
-
-Fixes: 11941f8a8536 ("bpf: cpumap: Implement generic cpumap")
-Signed-off-by: Hou Tao <houtao1@huawei.com>
----
- kernel/bpf/cpumap.c | 14 ++++++++++----
- 1 file changed, 10 insertions(+), 4 deletions(-)
-
-diff --git a/kernel/bpf/cpumap.c b/kernel/bpf/cpumap.c
-index 08351e0863e5..ef28c64f1eb1 100644
---- a/kernel/bpf/cpumap.c
-+++ b/kernel/bpf/cpumap.c
-@@ -129,11 +129,17 @@ static void __cpu_map_ring_cleanup(struct ptr_ring *ring)
- 	 * invoked cpu_map_kthread_stop(). Catch any broken behaviour
- 	 * gracefully and warn once.
- 	 */
--	struct xdp_frame *xdpf;
-+	void *ptr;
- 
--	while ((xdpf = ptr_ring_consume(ring)))
--		if (WARN_ON_ONCE(xdpf))
--			xdp_return_frame(xdpf);
-+	while ((ptr = ptr_ring_consume(ring))) {
-+		WARN_ON_ONCE(1);
-+		if (unlikely(__ptr_test_bit(0, &ptr))) {
-+			__ptr_clear_bit(0, &ptr);
-+			kfree_skb(ptr);
-+			continue;
-+		}
-+		xdp_return_frame(ptr);
-+	}
- }
- 
- static void put_cpu_map_entry(struct bpf_cpu_map_entry *rcpu)
--- 
-2.29.2
+Reviewed-by: Simon Horman <simon.horman@corigine.com>
 
 
