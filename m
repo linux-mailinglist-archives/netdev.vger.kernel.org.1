@@ -1,57 +1,57 @@
-Return-Path: <netdev+bounces-22481-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22482-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBC0976799A
-	for <lists+netdev@lfdr.de>; Sat, 29 Jul 2023 02:33:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA8D476799B
+	for <lists+netdev@lfdr.de>; Sat, 29 Jul 2023 02:33:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 283A41C21982
-	for <lists+netdev@lfdr.de>; Sat, 29 Jul 2023 00:33:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7EB99282890
+	for <lists+netdev@lfdr.de>; Sat, 29 Jul 2023 00:33:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CB1164C;
-	Sat, 29 Jul 2023 00:32:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FF7A392;
+	Sat, 29 Jul 2023 00:32:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41418ECA
-	for <netdev@vger.kernel.org>; Sat, 29 Jul 2023 00:32:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D3AB1388
+	for <netdev@vger.kernel.org>; Sat, 29 Jul 2023 00:32:32 +0000 (UTC)
 Received: from mgamail.intel.com (unknown [134.134.136.20])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DA2C2135
-	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 17:32:25 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8308EE48
+	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 17:32:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1690590745; x=1722126745;
+  t=1690590750; x=1722126750;
   h=subject:from:to:cc:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=gDlfG5Y0zxxXm2SsfnjyAs6hq+ELU7wDDomhVeUPLHg=;
-  b=N6J/7bonRg4kpdViOxXGaSVtm1FqvxsnFFjve1d1qGKw4sYlFEbzC5Wy
-   1ijiVEk+Y5LIllGD1yRe4AurGpbt10g3XZq9vH5zZOfDmeBvxpPEHVrsj
-   PX7vubDcG2/M6Le4VdJ/2WChPwJQwTPzL1BzaLbLpx8MrWTzJ/aSC1djh
-   m3yNV2nPoTXfHhY99NAQCJhSJ0J5Bg2T7TgAqaANQfDYCLQIV8lkoGTU/
-   1JD2yuZBRmYV3TtADaTX+mUkLgwcwx/oUjMSPl7w5YyRo2WNZkg3EUoPM
-   yDAuCqdf+LwXyMagdxW4CGHoEnEFfMrb/XLwxerk/qJqY+8WOscy+LvV/
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10785"; a="358742094"
+  bh=nncBB3t31kM6LU5KqTMFn19BzefFMgkNXWv8PCy0hhA=;
+  b=JRR+Hd73R5UnTST5bsOKPjUk2JxGC5u++Sud0kBVa9pwrwZI39tQ0CVH
+   T8ygdPRXtBluR9gQF8BKIfroLAKUnub1UQBYaFVn+RV+mOrrvILQ4jPNU
+   lIYn+IOCX9Hbyczj9EdiaP8sl3v3ZPXRSuEQqDeu/TKeROxuO4M2ee8J0
+   pD3xkMVhwnqJujJZckcAdS/yXkFOaP4KykWzp7Lnxi7Bhr8/JL88DhANU
+   D+bjgbg3ZKcimGJ1xcBCMlFt6TcZTlruE7pFOVpDUNVUYS7qo5zXuEqIT
+   XXJdkfYEzWlhZ+ANcQ3hMTKmM/zNIzX8+Kswa/wpPdBC2oxM1lNR+l//z
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10785"; a="358742135"
 X-IronPort-AV: E=Sophos;i="6.01,238,1684825200"; 
-   d="scan'208";a="358742094"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jul 2023 17:32:25 -0700
+   d="scan'208";a="358742135"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jul 2023 17:32:30 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10785"; a="901478093"
+X-IronPort-AV: E=McAfee;i="6600,9927,10785"; a="851403869"
 X-IronPort-AV: E=Sophos;i="6.01,238,1684825200"; 
-   d="scan'208";a="901478093"
+   d="scan'208";a="851403869"
 Received: from anambiarhost.jf.intel.com ([10.166.29.163])
-  by orsmga005.jf.intel.com with ESMTP; 28 Jul 2023 17:32:24 -0700
-Subject: [net-next PATCH v1 4/9] net: Move kernel helpers for queue index
- outside sysfs
+  by orsmga004.jf.intel.com with ESMTP; 28 Jul 2023 17:32:30 -0700
+Subject: [net-next PATCH v1 5/9] netdev-genl: Add netlink framework
+ functions for napi
 From: Amritha Nambiar <amritha.nambiar@intel.com>
 To: netdev@vger.kernel.org, kuba@kernel.org, davem@davemloft.net
 Cc: sridhar.samudrala@intel.com, amritha.nambiar@intel.com
-Date: Fri, 28 Jul 2023 17:47:12 -0700
-Message-ID: <169059163270.3736.8406876462323444663.stgit@anambiarhost.jf.intel.com>
+Date: Fri, 28 Jul 2023 17:47:17 -0700
+Message-ID: <169059163779.3736.7602272507688648566.stgit@anambiarhost.jf.intel.com>
 In-Reply-To: <169059098829.3736.381753570945338022.stgit@anambiarhost.jf.intel.com>
 References: <169059098829.3736.381753570945338022.stgit@anambiarhost.jf.intel.com>
 User-Agent: StGit/unknown-version
@@ -71,80 +71,292 @@ X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-The kernel helpers for retrieving tx/rx queue index
-(get_netdev_queue_index and get_netdev_rx_queue_index)
-are restricted to sysfs, move this out for more usability.
-Also, replace BUG_ON with DEBUG_NET_WARN_ON_ONCE.
+Implement the netdev netlink framework functions for
+napi support. The netdev structure tracks all the napi
+instances and napi fields. The napi instances and associated
+queue[s] can be retrieved this way.
 
 Signed-off-by: Amritha Nambiar <amritha.nambiar@intel.com>
 ---
- include/linux/netdevice.h |   16 +++++++++++++---
- net/core/net-sysfs.c      |   11 -----------
- 2 files changed, 13 insertions(+), 14 deletions(-)
+ net/core/netdev-genl.c |  253 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 251 insertions(+), 2 deletions(-)
 
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index 7299872bfdff..7afbf346dfd1 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -2515,6 +2515,18 @@ struct netdev_queue *netdev_get_tx_queue(const struct net_device *dev,
- 	return &dev->_tx[index];
- }
+diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
+index e35cfa3cd173..ca3ed6eb457b 100644
+--- a/net/core/netdev-genl.c
++++ b/net/core/netdev-genl.c
+@@ -8,6 +8,20 @@
  
-+static inline
-+unsigned int get_netdev_queue_index(struct netdev_queue *queue)
+ #include "netdev-genl-gen.h"
+ 
++struct netdev_nl_dump_ctx {
++	int dev_entry_hash;
++	int dev_entry_idx;
++	int napi_idx;
++};
++
++static inline struct netdev_nl_dump_ctx *
++netdev_dump_ctx(struct netlink_callback *cb)
 +{
-+	struct net_device *dev = queue->dev;
-+	unsigned int i;
++	NL_ASSERT_DUMP_CTX_FITS(struct netdev_nl_dump_ctx);
 +
-+	i = queue - dev->_tx;
-+	DEBUG_NET_WARN_ON_ONCE(i >= dev->num_tx_queues);
-+
-+	return i;
++	return (struct netdev_nl_dump_ctx *)cb->ctx;
 +}
 +
- static inline struct netdev_queue *skb_get_tx_queue(const struct net_device *dev,
- 						    const struct sk_buff *skb)
- {
-@@ -3856,17 +3868,15 @@ __netif_get_rx_queue(struct net_device *dev, unsigned int rxq)
- 	return dev->_rx + rxq;
+ static int
+ netdev_nl_dev_fill(struct net_device *netdev, struct sk_buff *rsp,
+ 		   u32 portid, u32 seq, int flags, u32 cmd)
+@@ -120,14 +134,249 @@ int netdev_nl_dev_get_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
+ 	return skb->len;
  }
  
--#ifdef CONFIG_SYSFS
- static inline unsigned int get_netdev_rx_queue_index(
- 		struct netdev_rx_queue *queue)
++static int
++netdev_nl_napi_fill_one(struct sk_buff *msg, struct napi_struct *napi)
++{
++	struct netdev_rx_queue *rx_queue, *rxq;
++	struct netdev_queue *tx_queue, *txq;
++	unsigned int rx_qid, tx_qid;
++	struct nlattr *napi_info;
++
++	napi_info = nla_nest_start(msg, NETDEV_A_NAPI_NAPI_INFO);
++	if (!napi_info)
++		return -EMSGSIZE;
++
++	if (nla_put_u32(msg, NETDEV_A_NAPI_INFO_ENTRY_NAPI_ID, napi->napi_id))
++		goto nla_put_failure;
++
++	list_for_each_entry_safe(rx_queue, rxq, &napi->napi_rxq_list, q_list) {
++		rx_qid = get_netdev_rx_queue_index(rx_queue);
++		if (nla_put_u32(msg, NETDEV_A_NAPI_INFO_ENTRY_RX_QUEUES, rx_qid))
++			goto nla_put_failure;
++	}
++
++	list_for_each_entry_safe(tx_queue, txq, &napi->napi_txq_list, q_list) {
++		tx_qid = get_netdev_queue_index(tx_queue);
++		if (nla_put_u32(msg, NETDEV_A_NAPI_INFO_ENTRY_TX_QUEUES, tx_qid))
++			goto nla_put_failure;
++	}
++
++	nla_nest_end(msg, napi_info);
++	return 0;
++nla_put_failure:
++	nla_nest_cancel(msg, napi_info);
++	return -EMSGSIZE;
++}
++
++static int
++netdev_nl_napi_fill(struct net_device *netdev, struct sk_buff *msg, int *start)
++{
++	struct napi_struct *napi, *n;
++	int i = 0;
++
++	list_for_each_entry_safe(napi, n, &netdev->napi_list, dev_list) {
++		if (i < *start) {
++			i++;
++			continue;
++		}
++		if (netdev_nl_napi_fill_one(msg, napi))
++			return -EMSGSIZE;
++		*start = ++i;
++	}
++	return 0;
++}
++
++static int
++netdev_nl_napi_prepare_fill(struct net_device *netdev, u32 portid, u32 seq,
++			    int flags, u32 cmd)
++{
++	struct nlmsghdr *nlh;
++	struct sk_buff *skb;
++	bool last = false;
++	int index = 0;
++	void *hdr;
++	int err;
++
++	while (!last) {
++		int tmp_index = index;
++
++		skb = genlmsg_new(GENLMSG_DEFAULT_SIZE, GFP_KERNEL);
++		if (!skb)
++			return -ENOMEM;
++
++		hdr = genlmsg_put(skb, portid, seq, &netdev_nl_family,
++				  flags | NLM_F_MULTI, cmd);
++		if (!hdr) {
++			err = -EMSGSIZE;
++			goto nla_put_failure;
++		}
++		err = netdev_nl_napi_fill(netdev, skb, &index);
++		if (!err)
++			last = true;
++		else if (err != -EMSGSIZE || tmp_index == index)
++			goto nla_put_failure;
++
++		genlmsg_end(skb, hdr);
++		err = genlmsg_unicast(dev_net(netdev), skb, portid);
++		if (err)
++			return err;
++	}
++
++	skb = genlmsg_new(GENLMSG_DEFAULT_SIZE, GFP_KERNEL);
++	if (!skb)
++		return -ENOMEM;
++	nlh = nlmsg_put(skb, portid, seq, NLMSG_DONE, 0, flags | NLM_F_MULTI);
++	if (!nlh) {
++		err = -EMSGSIZE;
++		goto nla_put_failure;
++	}
++
++	return genlmsg_unicast(dev_net(netdev), skb, portid);
++
++nla_put_failure:
++	nlmsg_free(skb);
++	return err;
++}
++
++static int
++netdev_nl_napi_info_fill(struct net_device *netdev, u32 portid, u32 seq,
++			 int flags, u32 cmd)
++{
++	struct sk_buff *skb;
++	void *hdr;
++	int err;
++
++	skb = genlmsg_new(GENLMSG_DEFAULT_SIZE, GFP_KERNEL);
++	if (!skb)
++		return -ENOMEM;
++
++	hdr = genlmsg_put(skb, portid, seq, &netdev_nl_family, flags, cmd);
++	if (!hdr) {
++		err = -EMSGSIZE;
++		goto err_free_msg;
++	}
++	if (nla_put_u32(skb, NETDEV_A_NAPI_IFINDEX, netdev->ifindex)) {
++		genlmsg_cancel(skb, hdr);
++		err = -EINVAL;
++		goto err_free_msg;
++	}
++
++	genlmsg_end(skb, hdr);
++
++	err = genlmsg_unicast(dev_net(netdev), skb, portid);
++	if (err)
++		return err;
++
++	return netdev_nl_napi_prepare_fill(netdev, portid, seq, flags, cmd);
++
++err_free_msg:
++	nlmsg_free(skb);
++	return err;
++}
++
+ int netdev_nl_napi_get_doit(struct sk_buff *skb, struct genl_info *info)
  {
- 	struct net_device *dev = queue->dev;
- 	int index = queue - dev->_rx;
- 
--	BUG_ON(index >= dev->num_rx_queues);
-+	DEBUG_NET_WARN_ON_ONCE(index >= dev->num_rx_queues);
- 	return index;
+-	return -EOPNOTSUPP;
++	struct net_device *netdev;
++	u32 ifindex;
++	int err;
++
++	if (GENL_REQ_ATTR_CHECK(info, NETDEV_A_NAPI_IFINDEX))
++		return -EINVAL;
++
++	ifindex = nla_get_u32(info->attrs[NETDEV_A_NAPI_IFINDEX]);
++
++	rtnl_lock();
++
++	netdev = __dev_get_by_index(genl_info_net(info), ifindex);
++	if (netdev)
++		err = netdev_nl_napi_info_fill(netdev, info->snd_portid,
++					       info->snd_seq, 0, info->genlhdr->cmd);
++	else
++		err = -ENODEV;
++
++	rtnl_unlock();
++
++	return err;
++}
++
++static int
++netdev_nl_napi_dump_entry(struct net_device *netdev, struct sk_buff *rsp,
++			  struct netlink_callback *cb, int *start)
++{
++	int index = *start;
++	int tmp_index = index;
++	void *hdr;
++	int err;
++
++	hdr = genlmsg_put(rsp, NETLINK_CB(cb->skb).portid, cb->nlh->nlmsg_seq,
++			  &netdev_nl_family, NLM_F_MULTI, NETDEV_CMD_NAPI_GET);
++	if (!hdr)
++		return -EMSGSIZE;
++
++	if (nla_put_u32(rsp, NETDEV_A_NAPI_IFINDEX, netdev->ifindex))
++		goto nla_put_failure;
++
++	err =  netdev_nl_napi_fill(netdev, rsp, &index);
++	if (err && (err != -EMSGSIZE || tmp_index == index))
++		goto nla_put_failure;
++
++	*start = index;
++	genlmsg_end(rsp, hdr);
++
++	return err;
++
++nla_put_failure:
++	genlmsg_cancel(rsp, hdr);
++	return -EINVAL;
  }
--#endif
  
- int netif_get_num_default_rss_queues(void);
- 
-diff --git a/net/core/net-sysfs.c b/net/core/net-sysfs.c
-index 15e3f4606b5f..9b900d0b6513 100644
---- a/net/core/net-sysfs.c
-+++ b/net/core/net-sysfs.c
-@@ -1239,17 +1239,6 @@ static ssize_t tx_timeout_show(struct netdev_queue *queue, char *buf)
- 	return sysfs_emit(buf, fmt_ulong, trans_timeout);
- }
- 
--static unsigned int get_netdev_queue_index(struct netdev_queue *queue)
--{
--	struct net_device *dev = queue->dev;
--	unsigned int i;
--
--	i = queue - dev->_tx;
--	BUG_ON(i >= dev->num_tx_queues);
--
--	return i;
--}
--
- static ssize_t traffic_class_show(struct netdev_queue *queue,
- 				  char *buf)
+ int netdev_nl_napi_get_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
  {
+-	return -EOPNOTSUPP;
++	struct netdev_nl_dump_ctx *ctx = netdev_dump_ctx(cb);
++	struct net *net = sock_net(skb->sk);
++	struct net_device *netdev;
++	int idx = 0, s_idx, n_idx;
++	int h, s_h;
++	int err;
++
++	s_h = ctx->dev_entry_hash;
++	s_idx = ctx->dev_entry_idx;
++	n_idx = ctx->napi_idx;
++
++	rtnl_lock();
++
++	for (h = s_h; h < NETDEV_HASHENTRIES; h++, s_idx = 0) {
++		struct hlist_head *head;
++
++		idx = 0;
++		head = &net->dev_index_head[h];
++		hlist_for_each_entry(netdev, head, index_hlist) {
++			if (idx < s_idx)
++				goto cont;
++			err = netdev_nl_napi_dump_entry(netdev, skb, cb, &n_idx);
++			if (err == -EMSGSIZE)
++				goto out;
++			n_idx = 0;
++			if (err < 0)
++				break;
++cont:
++			idx++;
++		}
++	}
++
++	rtnl_unlock();
++
++	return err;
++
++out:
++	rtnl_unlock();
++
++	ctx->dev_entry_idx = idx;
++	ctx->dev_entry_hash = h;
++	ctx->napi_idx = n_idx;
++	cb->seq = net->dev_base_seq;
++
++	return skb->len;
+ }
+ 
+ static int netdev_genl_netdevice_event(struct notifier_block *nb,
 
 
