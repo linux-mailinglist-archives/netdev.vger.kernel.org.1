@@ -1,60 +1,152 @@
-Return-Path: <netdev+bounces-22529-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22530-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2A8E767EA1
-	for <lists+netdev@lfdr.de>; Sat, 29 Jul 2023 13:23:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4209B767EC2
+	for <lists+netdev@lfdr.de>; Sat, 29 Jul 2023 13:40:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B54381C20AAB
-	for <lists+netdev@lfdr.de>; Sat, 29 Jul 2023 11:23:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1CE011C20A93
+	for <lists+netdev@lfdr.de>; Sat, 29 Jul 2023 11:40:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 840F214A9C;
-	Sat, 29 Jul 2023 11:23:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1FBF14AAB;
+	Sat, 29 Jul 2023 11:40:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 718843C2A
-	for <netdev@vger.kernel.org>; Sat, 29 Jul 2023 11:23:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40ADDC433C8;
-	Sat, 29 Jul 2023 11:23:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690629805;
-	bh=CPTJ5Z6WlgW7UB/hlIq12BfQzW1KcHNN+l8dUL6xhNw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=efKJGx/rnSXr3xerEH42OfktHJyWwDhArspS+XP4lvt0nB5a2wM2+hnYoAIShLJ8V
-	 44PR1dwSO5XkBo55po1vO6BA1G3PQdw82Sq9CzUJkd5M2asySWO/Uqpwh9ewuGsWMg
-	 XPuET9u4hs6wmf/Me5J9XjkWdupvbWSAxJRyO0QgdLBQNbdb96miiXiCXLgjrbuO7w
-	 efE4dFbJ4TfFYiVr90Jbx/jXpGIRd4YzUSJpBpAYQuzY79gy+OH4PAW+b5cuLQCkAo
-	 uDMe0YdozNBbScWp50u6l1WGRu5IkbjZyqLtyiSHB9D/4QzQQCFjnmPpDMkswIpbhf
-	 gR5LeyAPdDP+Q==
-Date: Sat, 29 Jul 2023 13:23:22 +0200
-From: Simon Horman <horms@kernel.org>
-To: Yue Haibing <yuehaibing@huawei.com>
-Cc: jiri@resnulli.us, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] devlink: Remove unused extern declaration
- devlink_port_region_destroy()
-Message-ID: <ZMT2qukr6KbfZvKT@kernel.org>
-References: <20230728132113.32888-1-yuehaibing@huawei.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5C5A1400A
+	for <netdev@vger.kernel.org>; Sat, 29 Jul 2023 11:40:25 +0000 (UTC)
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B229E4B;
+	Sat, 29 Jul 2023 04:40:23 -0700 (PDT)
+Received: from dggpemm500005.china.huawei.com (unknown [172.30.72.54])
+	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4RCjD60fflzLnvl;
+	Sat, 29 Jul 2023 19:37:42 +0800 (CST)
+Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
+ (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Sat, 29 Jul
+ 2023 19:40:20 +0800
+Subject: Re: [PATCH net-next 2/9] net: skbuff: don't include
+ <net/page_pool/types.h> to <linux/skbuff.h>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Larysa Zaremba <larysa.zaremba@intel.com>, Alexander Duyck
+	<alexanderduyck@fb.com>, Jesper Dangaard Brouer <hawk@kernel.org>, Ilias
+ Apalodimas <ilias.apalodimas@linaro.org>, Simon Horman
+	<simon.horman@corigine.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+References: <20230727144336.1646454-1-aleksander.lobakin@intel.com>
+ <20230727144336.1646454-3-aleksander.lobakin@intel.com>
+ <f283dfa9-d599-7311-1c2f-4317c2f7957d@huawei.com>
+ <5ba84af2-51d1-de5d-14cc-752c08e5371f@intel.com>
+From: Yunsheng Lin <linyunsheng@huawei.com>
+Message-ID: <5830338c-d025-2fb8-46a6-58508493b2cf@huawei.com>
+Date: Sat, 29 Jul 2023 19:40:19 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.2.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230728132113.32888-1-yuehaibing@huawei.com>
+In-Reply-To: <5ba84af2-51d1-de5d-14cc-752c08e5371f@intel.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.69.30.204]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ dggpemm500005.china.huawei.com (7.185.36.74)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Fri, Jul 28, 2023 at 09:21:13PM +0800, Yue Haibing wrote:
-> devlink_port_region_destroy() is never implemented since
-> commit 544e7c33ec2f ("net: devlink: Add support for port regions").
+On 2023/7/28 21:58, Alexander Lobakin wrote:
+> From: Yunsheng Lin <linyunsheng@huawei.com>
+> Date: Fri, 28 Jul 2023 20:02:51 +0800
 > 
-> Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
+>> On 2023/7/27 22:43, Alexander Lobakin wrote:
+>>> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+>>
+>> ...
+>>
+>>> +bool page_pool_return_skb_page(struct page *page, bool napi_safe)
+>>
+>> Still having the 'page_pool_' prefix seems odd here when it is in the
+>> skbuff.c where most have skb_ or napi_ prefix, is it better to rename
+>> it to something like napi_return_page_pool_page()?
+> 
+> Given that how the function that goes next is named, maybe
+> skb_pp_return_page() (or skb_pp_put_page())?
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+skb_pp_put_page() seems better.
+
+And I like napi_pp_put_page() with 'napi_' prefix better as
+it does not take a skb as parameter and the naming is aligned
+with the 'napi_safe' parameter.
+
+> 
+>>
+>>> +{
+>>> +	struct napi_struct *napi;
+>>> +	struct page_pool *pp;
+>>> +	bool allow_direct;
+>>> +
+>>> +	page = compound_head(page);
+>>> +
+>>> +	/* page->pp_magic is OR'ed with PP_SIGNATURE after the allocation
+>>> +	 * in order to preserve any existing bits, such as bit 0 for the
+>>> +	 * head page of compound page and bit 1 for pfmemalloc page, so
+>>> +	 * mask those bits for freeing side when doing below checking,
+>>> +	 * and page_is_pfmemalloc() is checked in __page_pool_put_page()
+>>> +	 * to avoid recycling the pfmemalloc page.
+>>> +	 */
+>>> +	if (unlikely((page->pp_magic & ~0x3UL) != PP_SIGNATURE))
+>>> +		return false;
+>>> +
+>>> +	pp = page->pp;
+>>> +
+>>> +	/* Allow direct recycle if we have reasons to believe that we are
+>>> +	 * in the same context as the consumer would run, so there's
+>>> +	 * no possible race.
+>>> +	 */
+>>> +	napi = READ_ONCE(pp->p.napi);
+>>> +	allow_direct = napi_safe && napi &&
+>>> +		READ_ONCE(napi->list_owner) == smp_processor_id();
+>>> +
+>>> +	/* Driver set this to memory recycling info. Reset it on recycle.
+>>> +	 * This will *not* work for NIC using a split-page memory model.
+>>> +	 * The page will be returned to the pool here regardless of the
+>>> +	 * 'flipped' fragment being in use or not.
+>>> +	 */
+>>> +	page_pool_put_full_page(pp, page, allow_direct);
+>>> +
+>>> +	return true;
+>>> +}
+>>> +EXPORT_SYMBOL(page_pool_return_skb_page);
+>>> +
+>>>  static bool skb_pp_recycle(struct sk_buff *skb, void *data, bool napi_safe)
+> 
+> (this one)
+> 
+>>>  {
+>>>  	if (!IS_ENABLED(CONFIG_PAGE_POOL) || !skb->pp_recycle)
+
+We may need the 'IS_ENABLED(CONFIG_PAGE_POOL' checking in the newly
+moved function too.
+
+>>>
+> 
+> Thanks,
+> Olek
+> 
+> .
+> 
 
