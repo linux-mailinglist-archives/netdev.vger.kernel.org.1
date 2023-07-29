@@ -1,56 +1,59 @@
-Return-Path: <netdev+bounces-22477-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22478-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BEFBA767990
-	for <lists+netdev@lfdr.de>; Sat, 29 Jul 2023 02:32:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5613767992
+	for <lists+netdev@lfdr.de>; Sat, 29 Jul 2023 02:32:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F01D51C21989
-	for <lists+netdev@lfdr.de>; Sat, 29 Jul 2023 00:32:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2EDDE28285A
+	for <lists+netdev@lfdr.de>; Sat, 29 Jul 2023 00:32:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 215E919E;
-	Sat, 29 Jul 2023 00:32:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5031392;
+	Sat, 29 Jul 2023 00:32:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 135774432
-	for <netdev@vger.kernel.org>; Sat, 29 Jul 2023 00:32:05 +0000 (UTC)
-Received: from mgamail.intel.com (unknown [134.134.136.20])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A70E10CB
-	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 17:32:04 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA1E015BD
+	for <netdev@vger.kernel.org>; Sat, 29 Jul 2023 00:32:11 +0000 (UTC)
+Received: from mgamail.intel.com (unknown [192.55.52.43])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53E6CE48
+	for <netdev@vger.kernel.org>; Fri, 28 Jul 2023 17:32:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1690590724; x=1722126724;
-  h=subject:from:to:cc:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=j45U52sjHHcNPhHYfU0F+bO6u/i6o2cMAz+txxzsJXs=;
-  b=WPE13b+ri/bWppm2oGKC8Az/yENFQsxH89x3QCw8bU30Z144fDLXVTZY
-   i3eCwDfPTY+AdZEZP4dN2h6XIGvz0UX/nMH1S3vS62x1Zd6N57b30VdJ1
-   kF7O7ZpZ6nsrQmuQwYF7QYnECCdL+K0yXTxELH+Yws8/+2RIFbwl5Kdx5
-   4TJkYuoFsVkACuXnvNly8UeSbpi39Wka9b3vRy5rLYzwGJSY7bgCZddl/
-   9p3Z5c/XHPVuwcLX0zBxtH+dr+t1dZ+j4AOJODeXEO7kVQefrTIpiZva3
-   Nb1e5pmZd6P5bzthlE849FTnvl9mHJXw8RaS6Wnr3Mrl60Am/qZlmmtG6
+  t=1690590730; x=1722126730;
+  h=subject:from:to:cc:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=Anlup+/S8CMrAde87dR1WlNsa5+8g75mgxiqhK7v2Hs=;
+  b=USVqKv5MCUgDVznbdgx7DPApyho7vCVQiKxcKR+BoQAWD4+zeKRkzI9F
+   Q0Fz2iYkLkSK3Bwc+DG3PNehOiv6SiKZN/2Q0B+CfUW7PW0eKXdmdxYRL
+   egb+F17u9cZpry5U7xrHegfpjC+esZtBK8qBAFlK8SkB6d/tQeSMJ87WY
+   3SdTUlCAjEK/GgidklFhCSqnPHxPysdPPJzUnpDgbBatAtvdcSsRYZlSU
+   yaPV9yHNKFiuTUUrcXs+6u5hIE5msJ0I7DEyn4eKyZfFhXJR9P7RiJZig
+   WH61IQAjJceRubpbnX8SnH+P2ouXYPRx93IwzeN9kiHIdg1AKQ276++gP
    A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10785"; a="358742035"
+X-IronPort-AV: E=McAfee;i="6600,9927,10785"; a="455069297"
 X-IronPort-AV: E=Sophos;i="6.01,238,1684825200"; 
-   d="scan'208";a="358742035"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jul 2023 17:32:04 -0700
+   d="scan'208";a="455069297"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jul 2023 17:32:09 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10785"; a="851403786"
+X-IronPort-AV: E=McAfee;i="6600,9927,10785"; a="757358731"
 X-IronPort-AV: E=Sophos;i="6.01,238,1684825200"; 
-   d="scan'208";a="851403786"
+   d="scan'208";a="757358731"
 Received: from anambiarhost.jf.intel.com ([10.166.29.163])
-  by orsmga004.jf.intel.com with ESMTP; 28 Jul 2023 17:32:04 -0700
-Subject: [net-next PATCH v1 0/9] Introduce NAPI queues support
+  by orsmga008.jf.intel.com with ESMTP; 28 Jul 2023 17:32:09 -0700
+Subject: [net-next PATCH v1 1/9] net: Introduce new fields for napi and
+ queue associations
 From: Amritha Nambiar <amritha.nambiar@intel.com>
 To: netdev@vger.kernel.org, kuba@kernel.org, davem@davemloft.net
 Cc: sridhar.samudrala@intel.com, amritha.nambiar@intel.com
-Date: Fri, 28 Jul 2023 17:46:51 -0700
-Message-ID: <169059098829.3736.381753570945338022.stgit@anambiarhost.jf.intel.com>
+Date: Fri, 28 Jul 2023 17:46:56 -0700
+Message-ID: <169059161688.3736.18170697577939556255.stgit@anambiarhost.jf.intel.com>
+In-Reply-To: <169059098829.3736.381753570945338022.stgit@anambiarhost.jf.intel.com>
+References: <169059098829.3736.381753570945338022.stgit@anambiarhost.jf.intel.com>
 User-Agent: StGit/unknown-version
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -62,101 +65,168 @@ Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Introduce support for associating NAPI instances with
-corresponding RX and TX queue set. Add the capability
-to export NAPI information supported by the device.
-Extend the netdev_genl generic netlink family for netdev
-with NAPI data. The NAPI fields exposed are:
-- NAPI id
-- queue/queue-set (both RX and TX) associated with each
-  NAPI instance
-- Interrupt number associated with the NAPI instance
-- PID for the NAPI thread
+Add the napi pointer in netdev queue for tracking the napi
+instance for each queue. This achieves the queue<->napi mapping.
 
-This series only supports 'get' ability for retrieving
-certain NAPI attributes. The 'set' ability for setting
-queue[s] associated with a NAPI instance via netdev-genl
-will be submitted as a separate patch series.
+Introduce new napi fields 'napi_rxq_list' and 'napi_txq_list'
+for rx and tx queue set associated with the napi. Add functions
+to associate the queue with the napi and handle their removal
+as well. This lists the queue/queue-set on the corresponding
+irq line for each napi instance.
 
-Previous discussion at:
-https://lore.kernel.org/netdev/c8476530638a5f4381d64db0e024ed49c2db3b02.camel@gmail.com/T/#m00999652a8b4731fbdb7bf698d2e3666c65a60e7
 
-$ ./cli.py --spec netdev.yaml  --do napi-get --json='{"ifindex": 6}'
-
-[{'ifindex': 6},
- {'napi-info': [{'irq': 296,
-                 'napi-id': 390,
-                 'pid': 3475,
-                 'rx-queues': [5],
-                 'tx-queues': [5]},
-                {'irq': 295,
-                 'napi-id': 389,
-                 'pid': 3474,
-                 'rx-queues': [4],
-                 'tx-queues': [4]},
-                {'irq': 294,
-                 'napi-id': 388,
-                 'pid': 3473,
-                 'rx-queues': [3],
-                 'tx-queues': [3]},
-                {'irq': 293,
-                 'napi-id': 387,
-                 'pid': 3472,
-                 'rx-queues': [2],
-                 'tx-queues': [2]},
-                {'irq': 292,
-                 'napi-id': 386,
-                 'pid': 3471,
-                 'rx-queues': [1],
-                 'tx-queues': [1]},
-                {'irq': 291,
-                 'napi-id': 385,
-                 'pid': 3470,
-                 'rx-queues': [0],
-                 'tx-queues': [0]}]}]
- 
-RFC -> v1
-* Changed to separate 'napi_get' command
-* Added support to expose interrupt and PID for the NAPI
-* Used list of netdev queue structs
-* Split patches further and fixed code style and errors
-
+Signed-off-by: Amritha Nambiar <amritha.nambiar@intel.com>
 ---
+ include/linux/netdevice.h |   19 ++++++++++++++++
+ net/core/dev.c            |   52 +++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 71 insertions(+)
 
-Amritha Nambiar (9):
-      net: Introduce new fields for napi and queue associations
-      ice: Add support in the driver for associating napi with queue[s]
-      netdev-genl: spec: Extend netdev netlink spec in YAML for NAPI
-      net: Move kernel helpers for queue index outside sysfs
-      netdev-genl: Add netlink framework functions for napi
-      netdev-genl: spec: Add irq in netdev netlink YAML spec
-      net: Add NAPI IRQ support
-      netdev-genl: spec: Add PID in netdev netlink YAML spec
-      netdev-genl: Add PID for the NAPI thread
+diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+index 84c36a7f873f..7299872bfdff 100644
+--- a/include/linux/netdevice.h
++++ b/include/linux/netdevice.h
+@@ -342,6 +342,14 @@ struct gro_list {
+  */
+ #define GRO_HASH_BUCKETS	8
+ 
++/*
++ * napi queue container type
++ */
++enum queue_type {
++	NAPI_QUEUE_RX,
++	NAPI_QUEUE_TX,
++};
++
+ /*
+  * Structure for NAPI scheduling similar to tasklet but with weighting
+  */
+@@ -376,6 +384,8 @@ struct napi_struct {
+ 	/* control-path-only fields follow */
+ 	struct list_head	dev_list;
+ 	struct hlist_node	napi_hash_node;
++	struct list_head	napi_rxq_list;
++	struct list_head	napi_txq_list;
+ };
+ 
+ enum {
+@@ -651,6 +661,9 @@ struct netdev_queue {
+ 
+ 	unsigned long		state;
+ 
++	/* NAPI instance for the queue */
++	struct napi_struct      *napi;
++	struct list_head        q_list;
+ #ifdef CONFIG_BQL
+ 	struct dql		dql;
+ #endif
+@@ -796,6 +809,9 @@ struct netdev_rx_queue {
+ #ifdef CONFIG_XDP_SOCKETS
+ 	struct xsk_buff_pool            *pool;
+ #endif
++	struct list_head		q_list;
++	/* NAPI instance for the queue */
++	struct napi_struct		*napi;
+ } ____cacheline_aligned_in_smp;
+ 
+ /*
+@@ -2618,6 +2634,9 @@ static inline void *netdev_priv(const struct net_device *dev)
+  */
+ #define SET_NETDEV_DEVTYPE(net, devtype)	((net)->dev.type = (devtype))
+ 
++int netif_napi_add_queue(struct napi_struct *napi, unsigned int queue_index,
++			 enum queue_type type);
++
+ /* Default NAPI poll() weight
+  * Device drivers are strongly advised to not use bigger value
+  */
+diff --git a/net/core/dev.c b/net/core/dev.c
+index b58674774a57..875023ab614c 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -6389,6 +6389,42 @@ int dev_set_threaded(struct net_device *dev, bool threaded)
+ }
+ EXPORT_SYMBOL(dev_set_threaded);
+ 
++/**
++ * netif_napi_add_queue - Associate queue with the napi
++ * @napi: NAPI context
++ * @queue_index: Index of queue
++ * @queue_type: queue type as RX or TX
++ *
++ * Add queue with its corresponding napi context
++ */
++int netif_napi_add_queue(struct napi_struct *napi, unsigned int queue_index,
++			 enum queue_type type)
++{
++	struct net_device *dev = napi->dev;
++	struct netdev_rx_queue *rxq;
++	struct netdev_queue *txq;
++
++	if (!dev)
++		return -EINVAL;
++
++	switch (type) {
++	case NAPI_QUEUE_RX:
++		rxq = __netif_get_rx_queue(dev, queue_index);
++		rxq->napi = napi;
++		list_add_rcu(&rxq->q_list, &napi->napi_rxq_list);
++		break;
++	case NAPI_QUEUE_TX:
++		txq = netdev_get_tx_queue(dev, queue_index);
++		txq->napi = napi;
++		list_add_rcu(&txq->q_list, &napi->napi_txq_list);
++		break;
++	default:
++		return -EINVAL;
++	}
++	return 0;
++}
++EXPORT_SYMBOL(netif_napi_add_queue);
++
+ void netif_napi_add_weight(struct net_device *dev, struct napi_struct *napi,
+ 			   int (*poll)(struct napi_struct *, int), int weight)
+ {
+@@ -6424,6 +6460,9 @@ void netif_napi_add_weight(struct net_device *dev, struct napi_struct *napi,
+ 	 */
+ 	if (dev->threaded && napi_kthread_create(napi))
+ 		dev->threaded = 0;
++
++	INIT_LIST_HEAD(&napi->napi_rxq_list);
++	INIT_LIST_HEAD(&napi->napi_txq_list);
+ }
+ EXPORT_SYMBOL(netif_napi_add_weight);
+ 
+@@ -6485,6 +6524,18 @@ static void flush_gro_hash(struct napi_struct *napi)
+ 	}
+ }
+ 
++static void napi_del_queues(struct napi_struct *napi)
++{
++	struct netdev_rx_queue *rx_queue, *rxq;
++	struct netdev_queue *tx_queue, *txq;
++
++	list_for_each_entry_safe(rx_queue, rxq, &napi->napi_rxq_list, q_list)
++		list_del_rcu(&rx_queue->q_list);
++
++	list_for_each_entry_safe(tx_queue, txq, &napi->napi_txq_list, q_list)
++		list_del_rcu(&tx_queue->q_list);
++}
++
+ /* Must be called in process context */
+ void __netif_napi_del(struct napi_struct *napi)
+ {
+@@ -6502,6 +6553,7 @@ void __netif_napi_del(struct napi_struct *napi)
+ 		kthread_stop(napi->thread);
+ 		napi->thread = NULL;
+ 	}
++	napi_del_queues(napi);
+ }
+ EXPORT_SYMBOL(__netif_napi_del);
+ 
 
-
- Documentation/netlink/specs/netdev.yaml   |   54 ++++++
- drivers/net/ethernet/intel/ice/ice_lib.c  |   60 ++++++
- drivers/net/ethernet/intel/ice/ice_lib.h  |    4 
- drivers/net/ethernet/intel/ice/ice_main.c |    4 
- include/linux/netdevice.h                 |   41 ++++
- include/uapi/linux/netdev.h               |   20 ++
- net/core/dev.c                            |   53 ++++++
- net/core/net-sysfs.c                      |   11 -
- net/core/netdev-genl-gen.c                |   17 ++
- net/core/netdev-genl-gen.h                |    2 
- net/core/netdev-genl.c                    |  270 +++++++++++++++++++++++++++++
- tools/include/uapi/linux/netdev.h         |   20 ++
- tools/net/ynl/generated/netdev-user.c     |  232 +++++++++++++++++++++++++
- tools/net/ynl/generated/netdev-user.h     |   67 +++++++
- tools/net/ynl/ynl-gen-c.py                |    2 
- 15 files changed, 841 insertions(+), 16 deletions(-)
-
---
 
