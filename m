@@ -1,529 +1,257 @@
-Return-Path: <netdev+bounces-22598-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22599-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0F80768465
-	for <lists+netdev@lfdr.de>; Sun, 30 Jul 2023 10:07:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8BAC768487
+	for <lists+netdev@lfdr.de>; Sun, 30 Jul 2023 11:03:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1FC14281737
-	for <lists+netdev@lfdr.de>; Sun, 30 Jul 2023 08:06:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B53841C20A75
+	for <lists+netdev@lfdr.de>; Sun, 30 Jul 2023 09:03:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF574810;
-	Sun, 30 Jul 2023 08:05:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92B4D1364;
+	Sun, 30 Jul 2023 09:03:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9A4617C7
-	for <netdev@vger.kernel.org>; Sun, 30 Jul 2023 08:05:38 +0000 (UTC)
-Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59A0C1FE9
-	for <netdev@vger.kernel.org>; Sun, 30 Jul 2023 01:05:36 -0700 (PDT)
-Received: by mail-wm1-x32f.google.com with SMTP id 5b1f17b1804b1-3fe1fc8768aso1118115e9.1
-        for <netdev@vger.kernel.org>; Sun, 30 Jul 2023 01:05:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tessares.net; s=google; t=1690704335; x=1691309135;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=TCqeCrU2BUMxCmMmdaeVjNV60zHyKZc+fhAxY8XjBeU=;
-        b=VHrrFm9h1bH0Fa9QZgFGcYoLawQmLPjdabDyJZ7nxZJwnfeH9bQgILDFCp0d83jB7Q
-         EAXmG5b9uT/86Igj/oYHgUfrff0wLs+fFJ+Vlvo3jDksPdLUnwh6t4j60uK2aIDfXw6Q
-         +ocSCQTkbby0co6GhFa4K2Vz31GLq9FAkYvD7w20SS6Z/O9HCklDpw+NuceIhlKSbKM9
-         dSJoCc1yn7lDyF1jlkqe3J+NDf2h76MsGgZ4PZGFFCJ4kYSwCkrqPQVBVxpWMb0+zeRy
-         u11uMXMr+87PC3Vn9Wz7JKliN+IUotcXtTQicj2MqwEwuTVbHtqkQTCs8hclkIQY7rcw
-         ilPw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690704335; x=1691309135;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=TCqeCrU2BUMxCmMmdaeVjNV60zHyKZc+fhAxY8XjBeU=;
-        b=MZwO5BfxaiH0+GSWXIWW25HvHeqGVW/31gKr3L1tEe/ZL5CHxfW7LBdwTocyL+U+ws
-         72VLizbKKqQ5pNWuNgANx8TKMczd4obMzXg+qi85wuN6UbZcIqvv1ZbO/iOflkGmwW8C
-         cJKZIB2PIqJ3bQ0Qrv69T3OzTP3UQEKj25TOlkgd1MaSqPIrmnnZxW9LAd2BhHT0l+ED
-         qstc8ht0kKcRMPoyw0aQorHMRFczZFk7ZOngh7frQ5YCyV+kMhNz+/cfgOiTUr5eSPGx
-         xMyBt7u1gzL3T1Ljg4xWcLUT960MAHr5VR3qxLAzrcl52h9TECCYShjW6vyfc8EviIME
-         SBHg==
-X-Gm-Message-State: ABy/qLYanJlL+Q4VNcUtt8HP3rIXrdIC12vlqhxAyF9fYy/bz2xwlGBC
-	LJTX+jxfQFuR43wW7pKdwLGLYw==
-X-Google-Smtp-Source: APBJJlHyTb+EVBtZRde9K2uDHYFYTa8duWkyVEV5pxg38GbEiEuvYXV6psjgb5YmCyRiguSE4NZgiA==
-X-Received: by 2002:a7b:c8ca:0:b0:3fe:1deb:86 with SMTP id f10-20020a7bc8ca000000b003fe1deb0086mr686260wml.28.1690704334598;
-        Sun, 30 Jul 2023 01:05:34 -0700 (PDT)
-Received: from vdi08.nix.tessares.net (static.219.156.76.144.clients.your-server.de. [144.76.156.219])
-        by smtp.gmail.com with ESMTPSA id z7-20020a5d4407000000b0031766e99429sm9338684wrq.115.2023.07.30.01.05.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 30 Jul 2023 01:05:34 -0700 (PDT)
-From: Matthieu Baerts <matthieu.baerts@tessares.net>
-Date: Sun, 30 Jul 2023 10:05:18 +0200
-Subject: [PATCH net-next 4/4] selftests: mptcp: userspace_pm: unmute
- unexpected errors
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 852C3803
+	for <netdev@vger.kernel.org>; Sun, 30 Jul 2023 09:03:07 +0000 (UTC)
+Received: from mx1.sberdevices.ru (mx1.sberdevices.ru [37.18.73.165])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9BE0D1;
+	Sun, 30 Jul 2023 02:03:04 -0700 (PDT)
+Received: from p-infra-ksmg-sc-msk01 (localhost [127.0.0.1])
+	by mx1.sberdevices.ru (Postfix) with ESMTP id CC809100004;
+	Sun, 30 Jul 2023 12:03:01 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru CC809100004
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
+	s=mail; t=1690707781;
+	bh=MtL8wPniwo65aKavq2K+GHyI8+05gR+igtpRIHhgXG4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:From;
+	b=iLzsMWye/oaM7hTmDb4pot0WXAfidewjzU+HTPWSUWzZmAIimWsQGAonGqppYQvJ8
+	 uzY2oAlOVWQOrPj0AG9KrVdncUmt2GrQr7XgReIH3VcHu4iYAybVeHkv5Mr1HlqLjK
+	 UYcvhmGCfPSvJt4vkwbpdwTT0i+KH6sd6/yuBS2eOUytJjHMsOTSRxIsvqETRHRfp7
+	 ER7gZNaoCfZDiMksBp4SUKsYbPWu3Gw8zC/PjdV2I3QESCmf7TpSovxOJ3koZ4yzzY
+	 4TandjtWQaAeGbD3S6UGsLDSXoE3roqtcNBG2wo8UkT5X/eGYFUZFWV1LPm70TLx9i
+	 UQAs7lBAZ7xIg==
+Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.sberdevices.ru (Postfix) with ESMTPS;
+	Sun, 30 Jul 2023 12:03:01 +0300 (MSK)
+Received: from [192.168.0.106] (100.64.160.123) by
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Sun, 30 Jul 2023 12:02:21 +0300
+Message-ID: <9fa21e91-f92d-03a2-aac6-cfa378fb84eb@sberdevices.ru>
+Date: Sun, 30 Jul 2023 11:57:19 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: [PATCH net-next v4 0/4] vsock/virtio/vhost: MSG_ZEROCOPY
+ preparations
+To: "Michael S. Tsirkin" <mst@redhat.com>
+CC: Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella
+	<sgarzare@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Jason Wang <jasowang@redhat.com>, Bobby Eshleman
+	<bobby.eshleman@bytedance.com>, <kvm@vger.kernel.org>,
+	<virtualization@lists.linux-foundation.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <kernel@sberdevices.ru>, <oxffffaa@gmail.com>
+References: <20230727222627.1895355-1-AVKrasnov@sberdevices.ru>
+ <20230728012845-mutt-send-email-mst@kernel.org>
+Content-Language: en-US
+From: Arseniy Krasnov <avkrasnov@sberdevices.ru>
+In-Reply-To: <20230728012845-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20230730-upstream-net-next-20230728-mptcp-selftests-misc-v1-4-7e9cc530a9cd@tessares.net>
-References: <20230730-upstream-net-next-20230728-mptcp-selftests-misc-v1-0-7e9cc530a9cd@tessares.net>
-In-Reply-To: <20230730-upstream-net-next-20230728-mptcp-selftests-misc-v1-0-7e9cc530a9cd@tessares.net>
-To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Shuah Khan <shuah@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- Matthieu Baerts <matthieu.baerts@tessares.net>
-X-Mailer: b4 0.12.3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=18032;
- i=matthieu.baerts@tessares.net; h=from:subject:message-id;
- bh=H1E8l+IoCAAhEaKmjavXydAmcpLI1bfzXzQFw7v9eF0=;
- b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBkxhnJZCwoyc0XVy636KturOG4/ISQaXMiF8xKu
- XJ12gbqoiOJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZMYZyQAKCRD2t4JPQmmg
- czhmEADvYmhoAktbkVJ/mwqGZ3oWHGRafcSdxYZsE/KZYF4LxgLao7Ctaf17vTniPNnuH9ymOn8
- gUTZO3f6qsafnV4GEbmnrqri4n2E2mQIRsQGGsv1O8NluIZvk59mO/NvoWE0qMewNd48k6VrMl4
- D/BJvZtq0tOs1/Ju74GodHmyW/AVNg4p0rt8fsPDswUYR6Ga7s6oXifBSRH7Y5zGfUFsnLkgnd4
- OaSEXn5PbKZj3hFILrI445Co9v5/fBK4dViam5SU8ePIVOKWYj1/fQmVE+/TLexZ7QUiMb5AsKL
- OyZAVU/Bh5u56eQ46UpGq1hxoCTy+DvHd+A5HT9A1aG0zrTDdZkAyj/6mqi/r5UuXEc2Y7p8XjG
- /2JFohLLvRyVIP800sfksNsY13El83NV3t8Kx8TK4lorE2fPSitiHvOGBUD15WjWxDqcc0UStyC
- 8XMMoBuINzXM5jAE3IxuhUbWaUl8UrPovamIu0PB7qJH/l3BlajdDeCBhnnE27or4OhW+ErdlxN
- 3fo7lcypOJs74Hdlwmgme6QNDjP7pdqBEOqqBKv2FVFDqgIotLWv5px5kiKIIJgafVw7sNJ0i5I
- jASS2vAkSUbLtmWfh9+Y4n5RAhDHI3L6O6V1/QiDGg64KyWXasFcpmtMS7AsycvHol8/gcoOAFW
- 4JxXdknZzbOU20Q==
-X-Developer-Key: i=matthieu.baerts@tessares.net; a=openpgp;
- fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+X-Originating-IP: [100.64.160.123]
+X-ClientProxiedBy: p-i-exch-sc-m02.sberdevices.ru (172.16.192.103) To
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
+X-KSMG-Rule-ID: 10
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 178796 [Jul 22 2023]
+X-KSMG-AntiSpam-Version: 5.9.59.0
+X-KSMG-AntiSpam-Envelope-From: AVKrasnov@sberdevices.ru
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 525 525 723604743bfbdb7e16728748c3fa45e9eba05f7d, {Tracking_uf_ne_domains}, {Tracking_from_domain_doesnt_match_to}, FromAlignment: s, ApMailHostAddress: 100.64.160.123
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean, bases: 2023/07/23 10:45:00
+X-KSMG-LinksScanning: Clean, bases: 2023/07/23 10:46:00
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/07/23 08:49:00 #21663637
+X-KSMG-AntiVirus-Status: Clean, skipped
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-All pm_nl_ctl commands were muted. If there was an unexpected error with
-one of them, this was simply not visible in the logs, making the
-analysis very hard. It could also hide misuse of commands by mistake.
 
-Now the output is only muted when we do expect to have an error, e.g.
-when giving invalid arguments on purpose.
 
-Reviewed-by: Mat Martineau <martineau@kernel.org>
-Signed-off-by: Matthieu Baerts <matthieu.baerts@tessares.net>
----
- tools/testing/selftests/net/mptcp/userspace_pm.sh | 100 +++++++++++-----------
- 1 file changed, 50 insertions(+), 50 deletions(-)
+On 28.07.2023 08:45, Michael S. Tsirkin wrote:
+> On Fri, Jul 28, 2023 at 01:26:23AM +0300, Arseniy Krasnov wrote:
+>> Hello,
+>>
+>> this patchset is first of three parts of another big patchset for
+>> MSG_ZEROCOPY flag support:
+>> https://lore.kernel.org/netdev/20230701063947.3422088-1-AVKrasnov@sberdevices.ru/
+> 
+> overall looks good. Two points I'd like to see addressed:
+> - what's the performance with all these changes - still same?
 
-diff --git a/tools/testing/selftests/net/mptcp/userspace_pm.sh b/tools/testing/selftests/net/mptcp/userspace_pm.sh
-index 23f8959a8ea8..b25a3e33eb25 100755
---- a/tools/testing/selftests/net/mptcp/userspace_pm.sh
-+++ b/tools/testing/selftests/net/mptcp/userspace_pm.sh
-@@ -380,7 +380,7 @@ test_announce()
- 	:>"$server_evts"
- 	ip netns exec "$ns2"\
- 	   ./pm_nl_ctl ann 10.0.2.2 token "$client4_token" id $client_addr_id dev\
--	   ns2eth1 > /dev/null 2>&1
-+	   ns2eth1
- 	print_test "ADD_ADDR id:${client_addr_id} 10.0.2.2 (ns2) => ns1, reuse port"
- 	sleep 0.5
- 	verify_announce_event $server_evts $ANNOUNCED $server4_token "10.0.2.2" $client_addr_id \
-@@ -389,7 +389,7 @@ test_announce()
- 	# ADD_ADDR6 from the client to server machine reusing the subflow port
- 	:>"$server_evts"
- 	ip netns exec "$ns2" ./pm_nl_ctl ann\
--	   dead:beef:2::2 token "$client6_token" id $client_addr_id dev ns2eth1 > /dev/null 2>&1
-+	   dead:beef:2::2 token "$client6_token" id $client_addr_id dev ns2eth1
- 	print_test "ADD_ADDR6 id:${client_addr_id} dead:beef:2::2 (ns2) => ns1, reuse port"
- 	sleep 0.5
- 	verify_announce_event "$server_evts" "$ANNOUNCED" "$server6_token" "dead:beef:2::2"\
-@@ -399,7 +399,7 @@ test_announce()
- 	:>"$server_evts"
- 	client_addr_id=$((client_addr_id+1))
- 	ip netns exec "$ns2" ./pm_nl_ctl ann 10.0.2.2 token "$client4_token" id\
--	   $client_addr_id dev ns2eth1 port $new4_port > /dev/null 2>&1
-+	   $client_addr_id dev ns2eth1 port $new4_port
- 	print_test "ADD_ADDR id:${client_addr_id} 10.0.2.2 (ns2) => ns1, new port"
- 	sleep 0.5
- 	verify_announce_event "$server_evts" "$ANNOUNCED" "$server4_token" "10.0.2.2"\
-@@ -410,7 +410,7 @@ test_announce()
- 
- 	# ADD_ADDR from the server to client machine reusing the subflow port
- 	ip netns exec "$ns1" ./pm_nl_ctl ann 10.0.2.1 token "$server4_token" id\
--	   $server_addr_id dev ns1eth2 > /dev/null 2>&1
-+	   $server_addr_id dev ns1eth2
- 	print_test "ADD_ADDR id:${server_addr_id} 10.0.2.1 (ns1) => ns2, reuse port"
- 	sleep 0.5
- 	verify_announce_event "$client_evts" "$ANNOUNCED" "$client4_token" "10.0.2.1"\
-@@ -419,7 +419,7 @@ test_announce()
- 	# ADD_ADDR6 from the server to client machine reusing the subflow port
- 	:>"$client_evts"
- 	ip netns exec "$ns1" ./pm_nl_ctl ann dead:beef:2::1 token "$server6_token" id\
--	   $server_addr_id dev ns1eth2 > /dev/null 2>&1
-+	   $server_addr_id dev ns1eth2
- 	print_test "ADD_ADDR6 id:${server_addr_id} dead:beef:2::1 (ns1) => ns2, reuse port"
- 	sleep 0.5
- 	verify_announce_event "$client_evts" "$ANNOUNCED" "$client6_token" "dead:beef:2::1"\
-@@ -429,7 +429,7 @@ test_announce()
- 	:>"$client_evts"
- 	server_addr_id=$((server_addr_id+1))
- 	ip netns exec "$ns1" ./pm_nl_ctl ann 10.0.2.1 token "$server4_token" id\
--	   $server_addr_id dev ns1eth2 port $new4_port > /dev/null 2>&1
-+	   $server_addr_id dev ns1eth2 port $new4_port
- 	print_test "ADD_ADDR id:${server_addr_id} 10.0.2.1 (ns1) => ns2, new port"
- 	sleep 0.5
- 	verify_announce_event "$client_evts" "$ANNOUNCED" "$client4_token" "10.0.2.1"\
-@@ -490,7 +490,7 @@ test_remove()
- 	# RM_ADDR from the client to server machine
- 	:>"$server_evts"
- 	ip netns exec "$ns2" ./pm_nl_ctl rem token "$client4_token" id\
--	   $client_addr_id > /dev/null 2>&1
-+	   $client_addr_id
- 	print_test "RM_ADDR id:${client_addr_id} ns2 => ns1"
- 	sleep 0.5
- 	verify_remove_event "$server_evts" "$REMOVED" "$server4_token" "$client_addr_id"
-@@ -499,7 +499,7 @@ test_remove()
- 	:>"$server_evts"
- 	client_addr_id=$(( client_addr_id - 1 ))
- 	ip netns exec "$ns2" ./pm_nl_ctl rem token "$client4_token" id\
--	   $client_addr_id > /dev/null 2>&1
-+	   $client_addr_id
- 	print_test "RM_ADDR id:${client_addr_id} ns2 => ns1"
- 	sleep 0.5
- 	verify_remove_event "$server_evts" "$REMOVED" "$server4_token" "$client_addr_id"
-@@ -507,7 +507,7 @@ test_remove()
- 	# RM_ADDR6 from the client to server machine
- 	:>"$server_evts"
- 	ip netns exec "$ns2" ./pm_nl_ctl rem token "$client6_token" id\
--	   $client_addr_id > /dev/null 2>&1
-+	   $client_addr_id
- 	print_test "RM_ADDR6 id:${client_addr_id} ns2 => ns1"
- 	sleep 0.5
- 	verify_remove_event "$server_evts" "$REMOVED" "$server6_token" "$client_addr_id"
-@@ -517,7 +517,7 @@ test_remove()
- 
- 	# RM_ADDR from the server to client machine
- 	ip netns exec "$ns1" ./pm_nl_ctl rem token "$server4_token" id\
--	   $server_addr_id > /dev/null 2>&1
-+	   $server_addr_id
- 	print_test "RM_ADDR id:${server_addr_id} ns1 => ns2"
- 	sleep 0.5
- 	verify_remove_event "$client_evts" "$REMOVED" "$client4_token" "$server_addr_id"
-@@ -526,7 +526,7 @@ test_remove()
- 	:>"$client_evts"
- 	server_addr_id=$(( server_addr_id - 1 ))
- 	ip netns exec "$ns1" ./pm_nl_ctl rem token "$server4_token" id\
--	   $server_addr_id > /dev/null 2>&1
-+	   $server_addr_id
- 	print_test "RM_ADDR id:${server_addr_id} ns1 => ns2"
- 	sleep 0.5
- 	verify_remove_event "$client_evts" "$REMOVED" "$client4_token" "$server_addr_id"
-@@ -534,7 +534,7 @@ test_remove()
- 	# RM_ADDR6 from the server to client machine
- 	:>"$client_evts"
- 	ip netns exec "$ns1" ./pm_nl_ctl rem token "$server6_token" id\
--	   $server_addr_id > /dev/null 2>&1
-+	   $server_addr_id
- 	print_test "RM_ADDR6 id:${server_addr_id} ns1 => ns2"
- 	sleep 0.5
- 	verify_remove_event "$client_evts" "$REMOVED" "$client6_token" "$server_addr_id"
-@@ -610,18 +610,18 @@ test_subflows()
- 
- 	# Attempt to add a listener at 10.0.2.2:<subflow-port>
- 	ip netns exec "$ns2" ./pm_nl_ctl listen 10.0.2.2\
--	   "$client4_port" > /dev/null 2>&1 &
-+	   "$client4_port" &
- 	local listener_pid=$!
- 
- 	# ADD_ADDR from client to server machine reusing the subflow port
- 	ip netns exec "$ns2" ./pm_nl_ctl ann 10.0.2.2 token "$client4_token" id\
--	   $client_addr_id > /dev/null 2>&1
-+	   $client_addr_id
- 	sleep 0.5
- 
- 	# CREATE_SUBFLOW from server to client machine
- 	:>"$server_evts"
- 	ip netns exec "$ns1" ./pm_nl_ctl csf lip 10.0.2.1 lid 23 rip 10.0.2.2\
--	   rport "$client4_port" token "$server4_token" > /dev/null 2>&1
-+	   rport "$client4_port" token "$server4_token"
- 	sleep 0.5
- 	verify_subflow_events $server_evts $SUB_ESTABLISHED $server4_token $AF_INET "10.0.2.1" \
- 			      "10.0.2.2" "$client4_port" "23" "$client_addr_id" "ns1" "ns2"
-@@ -635,31 +635,31 @@ test_subflows()
- 	# DESTROY_SUBFLOW from server to client machine
- 	:>"$server_evts"
- 	ip netns exec "$ns1" ./pm_nl_ctl dsf lip 10.0.2.1 lport "$sport" rip 10.0.2.2 rport\
--	   "$client4_port" token "$server4_token" > /dev/null 2>&1
-+	   "$client4_port" token "$server4_token"
- 	sleep 0.5
- 	verify_subflow_events "$server_evts" "$SUB_CLOSED" "$server4_token" "$AF_INET" "10.0.2.1"\
- 			      "10.0.2.2" "$client4_port" "23" "$client_addr_id" "ns1" "ns2"
- 
- 	# RM_ADDR from client to server machine
- 	ip netns exec "$ns2" ./pm_nl_ctl rem id $client_addr_id token\
--	   "$client4_token" > /dev/null 2>&1
-+	   "$client4_token"
- 	sleep 0.5
- 
- 	# Attempt to add a listener at dead:beef:2::2:<subflow-port>
- 	ip netns exec "$ns2" ./pm_nl_ctl listen dead:beef:2::2\
--	   "$client6_port" > /dev/null 2>&1 &
-+	   "$client6_port" &
- 	listener_pid=$!
- 
- 	# ADD_ADDR6 from client to server machine reusing the subflow port
- 	:>"$server_evts"
- 	ip netns exec "$ns2" ./pm_nl_ctl ann dead:beef:2::2 token "$client6_token" id\
--	   $client_addr_id > /dev/null 2>&1
-+	   $client_addr_id
- 	sleep 0.5
- 
- 	# CREATE_SUBFLOW6 from server to client machine
- 	:>"$server_evts"
- 	ip netns exec "$ns1" ./pm_nl_ctl csf lip dead:beef:2::1 lid 23 rip\
--	   dead:beef:2::2 rport "$client6_port" token "$server6_token" > /dev/null 2>&1
-+	   dead:beef:2::2 rport "$client6_port" token "$server6_token"
- 	sleep 0.5
- 	verify_subflow_events "$server_evts" "$SUB_ESTABLISHED" "$server6_token" "$AF_INET6"\
- 			      "dead:beef:2::1" "dead:beef:2::2" "$client6_port" "23"\
-@@ -673,7 +673,7 @@ test_subflows()
- 	# DESTROY_SUBFLOW6 from server to client machine
- 	:>"$server_evts"
- 	ip netns exec "$ns1" ./pm_nl_ctl dsf lip dead:beef:2::1 lport "$sport" rip\
--	   dead:beef:2::2 rport "$client6_port" token "$server6_token" > /dev/null 2>&1
-+	   dead:beef:2::2 rport "$client6_port" token "$server6_token"
- 	sleep 0.5
- 	verify_subflow_events "$server_evts" "$SUB_CLOSED" "$server6_token" "$AF_INET6"\
- 			      "dead:beef:2::1" "dead:beef:2::2" "$client6_port" "23"\
-@@ -681,24 +681,24 @@ test_subflows()
- 
- 	# RM_ADDR from client to server machine
- 	ip netns exec "$ns2" ./pm_nl_ctl rem id $client_addr_id token\
--	   "$client6_token" > /dev/null 2>&1
-+	   "$client6_token"
- 	sleep 0.5
- 
- 	# Attempt to add a listener at 10.0.2.2:<new-port>
- 	ip netns exec "$ns2" ./pm_nl_ctl listen 10.0.2.2\
--	   $new4_port > /dev/null 2>&1 &
-+	   $new4_port &
- 	listener_pid=$!
- 
- 	# ADD_ADDR from client to server machine using a new port
- 	:>"$server_evts"
- 	ip netns exec "$ns2" ./pm_nl_ctl ann 10.0.2.2 token "$client4_token" id\
--	   $client_addr_id port $new4_port > /dev/null 2>&1
-+	   $client_addr_id port $new4_port
- 	sleep 0.5
- 
- 	# CREATE_SUBFLOW from server to client machine
- 	:>"$server_evts"
- 	ip netns exec "$ns1" ./pm_nl_ctl csf lip 10.0.2.1 lid 23 rip 10.0.2.2 rport\
--	   $new4_port token "$server4_token" > /dev/null 2>&1
-+	   $new4_port token "$server4_token"
- 	sleep 0.5
- 	verify_subflow_events "$server_evts" "$SUB_ESTABLISHED" "$server4_token" "$AF_INET"\
- 			      "10.0.2.1" "10.0.2.2" "$new4_port" "23"\
-@@ -712,32 +712,32 @@ test_subflows()
- 	# DESTROY_SUBFLOW from server to client machine
- 	:>"$server_evts"
- 	ip netns exec "$ns1" ./pm_nl_ctl dsf lip 10.0.2.1 lport "$sport" rip 10.0.2.2 rport\
--	   $new4_port token "$server4_token" > /dev/null 2>&1
-+	   $new4_port token "$server4_token"
- 	sleep 0.5
- 	verify_subflow_events "$server_evts" "$SUB_CLOSED" "$server4_token" "$AF_INET" "10.0.2.1"\
- 			      "10.0.2.2" "$new4_port" "23" "$client_addr_id" "ns1" "ns2"
- 
- 	# RM_ADDR from client to server machine
- 	ip netns exec "$ns2" ./pm_nl_ctl rem id $client_addr_id token\
--	   "$client4_token" > /dev/null 2>&1
-+	   "$client4_token"
- 
- 	# Capture events on the network namespace running the client
- 	:>"$client_evts"
- 
- 	# Attempt to add a listener at 10.0.2.1:<subflow-port>
- 	ip netns exec "$ns1" ./pm_nl_ctl listen 10.0.2.1\
--	   $app4_port > /dev/null 2>&1 &
-+	   $app4_port &
- 	listener_pid=$!
- 
- 	# ADD_ADDR from server to client machine reusing the subflow port
- 	ip netns exec "$ns1" ./pm_nl_ctl ann 10.0.2.1 token "$server4_token" id\
--	   $server_addr_id > /dev/null 2>&1
-+	   $server_addr_id
- 	sleep 0.5
- 
- 	# CREATE_SUBFLOW from client to server machine
- 	:>"$client_evts"
- 	ip netns exec "$ns2" ./pm_nl_ctl csf lip 10.0.2.2 lid 23 rip 10.0.2.1 rport\
--	   $app4_port token "$client4_token" > /dev/null 2>&1
-+	   $app4_port token "$client4_token"
- 	sleep 0.5
- 	verify_subflow_events $client_evts $SUB_ESTABLISHED $client4_token $AF_INET "10.0.2.2"\
- 			      "10.0.2.1" "$app4_port" "23" "$server_addr_id" "ns2" "ns1"
-@@ -750,31 +750,31 @@ test_subflows()
- 	# DESTROY_SUBFLOW from client to server machine
- 	:>"$client_evts"
- 	ip netns exec "$ns2" ./pm_nl_ctl dsf lip 10.0.2.2 lport "$sport" rip 10.0.2.1 rport\
--	   $app4_port token "$client4_token" > /dev/null 2>&1
-+	   $app4_port token "$client4_token"
- 	sleep 0.5
- 	verify_subflow_events "$client_evts" "$SUB_CLOSED" "$client4_token" "$AF_INET" "10.0.2.2"\
- 			      "10.0.2.1" "$app4_port" "23" "$server_addr_id" "ns2" "ns1"
- 
- 	# RM_ADDR from server to client machine
- 	ip netns exec "$ns1" ./pm_nl_ctl rem id $server_addr_id token\
--	   "$server4_token" > /dev/null 2>&1
-+	   "$server4_token"
- 	sleep 0.5
- 
- 	# Attempt to add a listener at dead:beef:2::1:<subflow-port>
- 	ip netns exec "$ns1" ./pm_nl_ctl listen dead:beef:2::1\
--	   $app6_port > /dev/null 2>&1 &
-+	   $app6_port &
- 	listener_pid=$!
- 
- 	# ADD_ADDR6 from server to client machine reusing the subflow port
- 	:>"$client_evts"
- 	ip netns exec "$ns1" ./pm_nl_ctl ann dead:beef:2::1 token "$server6_token" id\
--	   $server_addr_id > /dev/null 2>&1
-+	   $server_addr_id
- 	sleep 0.5
- 
- 	# CREATE_SUBFLOW6 from client to server machine
- 	:>"$client_evts"
- 	ip netns exec "$ns2" ./pm_nl_ctl csf lip dead:beef:2::2 lid 23 rip\
--	   dead:beef:2::1 rport $app6_port token "$client6_token" > /dev/null 2>&1
-+	   dead:beef:2::1 rport $app6_port token "$client6_token"
- 	sleep 0.5
- 	verify_subflow_events "$client_evts" "$SUB_ESTABLISHED" "$client6_token"\
- 			      "$AF_INET6" "dead:beef:2::2"\
-@@ -789,31 +789,31 @@ test_subflows()
- 	# DESTROY_SUBFLOW6 from client to server machine
- 	:>"$client_evts"
- 	ip netns exec "$ns2" ./pm_nl_ctl dsf lip dead:beef:2::2 lport "$sport" rip\
--	   dead:beef:2::1 rport $app6_port token "$client6_token" > /dev/null 2>&1
-+	   dead:beef:2::1 rport $app6_port token "$client6_token"
- 	sleep 0.5
- 	verify_subflow_events $client_evts $SUB_CLOSED $client6_token $AF_INET6 "dead:beef:2::2"\
- 			      "dead:beef:2::1" "$app6_port" "23" "$server_addr_id" "ns2" "ns1"
- 
- 	# RM_ADDR6 from server to client machine
- 	ip netns exec "$ns1" ./pm_nl_ctl rem id $server_addr_id token\
--	   "$server6_token" > /dev/null 2>&1
-+	   "$server6_token"
- 	sleep 0.5
- 
- 	# Attempt to add a listener at 10.0.2.1:<new-port>
- 	ip netns exec "$ns1" ./pm_nl_ctl listen 10.0.2.1\
--	   $new4_port > /dev/null 2>&1 &
-+	   $new4_port &
- 	listener_pid=$!
- 
- 	# ADD_ADDR from server to client machine using a new port
- 	:>"$client_evts"
- 	ip netns exec "$ns1" ./pm_nl_ctl ann 10.0.2.1 token "$server4_token" id\
--	   $server_addr_id port $new4_port > /dev/null 2>&1
-+	   $server_addr_id port $new4_port
- 	sleep 0.5
- 
- 	# CREATE_SUBFLOW from client to server machine
- 	:>"$client_evts"
- 	ip netns exec "$ns2" ./pm_nl_ctl csf lip 10.0.2.2 lid 23 rip 10.0.2.1 rport\
--	   $new4_port token "$client4_token" > /dev/null 2>&1
-+	   $new4_port token "$client4_token"
- 	sleep 0.5
- 	verify_subflow_events "$client_evts" "$SUB_ESTABLISHED" "$client4_token" "$AF_INET"\
- 			      "10.0.2.2" "10.0.2.1" "$new4_port" "23" "$server_addr_id" "ns2" "ns1"
-@@ -826,14 +826,14 @@ test_subflows()
- 	# DESTROY_SUBFLOW from client to server machine
- 	:>"$client_evts"
- 	ip netns exec "$ns2" ./pm_nl_ctl dsf lip 10.0.2.2 lport "$sport" rip 10.0.2.1 rport\
--	   $new4_port token "$client4_token" > /dev/null 2>&1
-+	   $new4_port token "$client4_token"
- 	sleep 0.5
- 	verify_subflow_events "$client_evts" "$SUB_CLOSED" "$client4_token" "$AF_INET" "10.0.2.2"\
- 			      "10.0.2.1" "$new4_port" "23" "$server_addr_id" "ns2" "ns1"
- 
- 	# RM_ADDR from server to client machine
- 	ip netns exec "$ns1" ./pm_nl_ctl rem id $server_addr_id token\
--	   "$server4_token" > /dev/null 2>&1
-+	   "$server4_token"
- }
- 
- test_subflows_v4_v6_mix()
-@@ -842,14 +842,14 @@ test_subflows_v4_v6_mix()
- 
- 	# Attempt to add a listener at 10.0.2.1:<subflow-port>
- 	ip netns exec "$ns1" ./pm_nl_ctl listen 10.0.2.1\
--	   $app6_port > /dev/null 2>&1 &
-+	   $app6_port &
- 	local listener_pid=$!
- 
- 	# ADD_ADDR4 from server to client machine reusing the subflow port on
- 	# the established v6 connection
- 	:>"$client_evts"
- 	ip netns exec "$ns1" ./pm_nl_ctl ann 10.0.2.1 token "$server6_token" id\
--	   $server_addr_id dev ns1eth2 > /dev/null 2>&1
-+	   $server_addr_id dev ns1eth2
- 	print_test "ADD_ADDR4 id:${server_addr_id} 10.0.2.1 (ns1) => ns2, reuse port"
- 	sleep 0.5
- 	verify_announce_event "$client_evts" "$ANNOUNCED" "$client6_token" "10.0.2.1"\
-@@ -858,7 +858,7 @@ test_subflows_v4_v6_mix()
- 	# CREATE_SUBFLOW from client to server machine
- 	:>"$client_evts"
- 	ip netns exec "$ns2" ./pm_nl_ctl csf lip 10.0.2.2 lid 23 rip 10.0.2.1 rport\
--	   $app6_port token "$client6_token" > /dev/null 2>&1
-+	   $app6_port token "$client6_token"
- 	sleep 0.5
- 	verify_subflow_events "$client_evts" "$SUB_ESTABLISHED" "$client6_token"\
- 			      "$AF_INET" "10.0.2.2" "10.0.2.1" "$app6_port" "23"\
-@@ -872,7 +872,7 @@ test_subflows_v4_v6_mix()
- 	# DESTROY_SUBFLOW from client to server machine
- 	:>"$client_evts"
- 	ip netns exec "$ns2" ./pm_nl_ctl dsf lip 10.0.2.2 lport "$sport" rip 10.0.2.1 rport\
--	   $app6_port token "$client6_token" > /dev/null 2>&1
-+	   $app6_port token "$client6_token"
- 	sleep 0.5
- 	verify_subflow_events "$client_evts" "$SUB_CLOSED" "$client6_token" \
- 			      "$AF_INET" "10.0.2.2" "10.0.2.1" "$app6_port" "23"\
-@@ -880,7 +880,7 @@ test_subflows_v4_v6_mix()
- 
- 	# RM_ADDR from server to client machine
- 	ip netns exec "$ns1" ./pm_nl_ctl rem id $server_addr_id token\
--	   "$server6_token" > /dev/null 2>&1
-+	   "$server6_token"
- 	sleep 0.5
- }
- 
-@@ -965,7 +965,7 @@ test_listener()
- 
- 	# Attempt to add a listener at 10.0.2.2:<subflow-port>
- 	ip netns exec $ns2 ./pm_nl_ctl listen 10.0.2.2\
--		$client4_port > /dev/null 2>&1 &
-+		$client4_port &
- 	local listener_pid=$!
- 
- 	sleep 0.5
-@@ -973,12 +973,12 @@ test_listener()
- 
- 	# ADD_ADDR from client to server machine reusing the subflow port
- 	ip netns exec $ns2 ./pm_nl_ctl ann 10.0.2.2 token $client4_token id\
--		$client_addr_id > /dev/null 2>&1
-+		$client_addr_id
- 	sleep 0.5
- 
- 	# CREATE_SUBFLOW from server to client machine
- 	ip netns exec $ns1 ./pm_nl_ctl csf lip 10.0.2.1 lid 23 rip 10.0.2.2\
--		rport $client4_port token $server4_token > /dev/null 2>&1
-+		rport $client4_port token $server4_token
- 	sleep 0.5
- 
- 	# Delete the listener from the client ns, if one was created
+Hello Michael,
 
--- 
-2.40.1
+here are results on the last version:
 
+There is some difference between these numbers and numbers from link
+(it was v3). Looks like new version of zerocopy become slower on big
+buffers. But anyway it is faster than copy mode in all cases (except
+<<<<<< marked line below, but I had same result for this testcase in v3
+before).
+
+I tried to find reason of this difference by switching to v3 version, but
+seems it is no easy - I get current results again. I guess reason maybe:
+1) My environment change - I perform this test in nested virtualization
+   mode, so host OS may also affect performance.
+2) My mistake in v3 :(
+
+Anyway:
+1) MSG_ZEROCOPY is still faster than copy as expected.
+
+2) I'v added column with benchmark on 'net-next' without MSG_ZEROCOPY
+   patchset. Seems it doesn't affect copy performance. Cases where we
+   have difference like 26 against 29 is not a big deal - final result
+   is unstable with some error, e.g. if you run again same test, you
+   can get opposite result like 29 against 26.
+
+2) Numbers below could be considered valid. This is newest measurement.
+
+
+G2H transmission (values are Gbit/s):
+
+   Core i7 with nested guest.
+
+*-------------------------------*-----------------------*
+|          |         |          |                       |
+| buf size |   copy  | zerocopy | copy w/o MSG_ZEROCOPY |
+|          |         |          |       patchset        |
+|          |         |          |                       |
+*-------------------------------*-----------------------*
+|   4KB    |    3    |    11    |           3           |
+*-------------------------------*-----------------------*
+|   32KB   |    9    |    70    |          10           |
+*-------------------------------*-----------------------*
+|   256KB  |   30    |   224    |          29           |
+*-------------------------------*-----------------------*
+|    1M    |   27    |   285    |          30           |
+*-------------------------------*-----------------------*
+|    8M    |   26    |   365    |          29           |
+*-------------------------------*-----------------------*
+
+
+H2G:
+
+   Core i7 with nested guest.
+
+*-------------------------------*-----------------------*
+|          |         |          |                       |
+| buf size |   copy  | zerocopy | copy w/o MSG_ZEROCOPY |
+|          |         |          |       patchset        |
+|          |         |          |                       |
+*-------------------------------*-----------------------*
+|   4KB    |   17    |    10    |          17           | <<<<<<
+*-------------------------------*-----------------------*
+|   32KB   |   30    |    61    |          31           |
+*-------------------------------*-----------------------*
+|   256KB  |   35    |   214    |          30           |
+*-------------------------------*-----------------------*
+|    1M    |   29    |   292    |          28           |
+*-------------------------------*-----------------------*
+|    8M    |   28    |   341    |          28           |
+*-------------------------------*-----------------------*
+
+Loopback:
+
+   Core i7 with nested guest.
+
+*-------------------------------*-----------------------*
+|          |         |          |                       |
+| buf size |   copy  | zerocopy | copy w/o MSG_ZEROCOPY |
+|          |         |          |       patchset        |
+|          |         |          |                       |
+*-------------------------------*-----------------------*
+|   4KB    |    8    |     7    |           8           |
+*-------------------------------*-----------------------*
+|   32KB   |   27    |    43    |          30           |
+*-------------------------------*-----------------------*
+|   256KB  |   38    |   100    |          39           |
+*-------------------------------*-----------------------*
+|    1M    |   37    |   141    |          39           |
+*-------------------------------*-----------------------*
+|    8M    |   40    |   201    |          36           |
+*-------------------------------*-----------------------*
+
+Thanks, Arseniy
+
+> - most systems have a copybreak scheme where buffers
+>   smaller than a given size are copied directly.
+>   This will address regression you see with small buffers -
+>   but need to find that value. we know it's between 4k and 32k :)
+> 
+> 
+>> During review of this series, Stefano Garzarella <sgarzare@redhat.com>
+>> suggested to split it for three parts to simplify review and merging:
+>>
+>> 1) virtio and vhost updates (for fragged skbs) <--- this patchset
+>> 2) AF_VSOCK updates (allows to enable MSG_ZEROCOPY mode and read
+>>    tx completions) and update for Documentation/.
+>> 3) Updates for tests and utils.
+>>
+>> This series enables handling of fragged skbs in virtio and vhost parts.
+>> Newly logic won't be triggered, because SO_ZEROCOPY options is still
+>> impossible to enable at this moment (next bunch of patches from big
+>> set above will enable it).
+>>
+>> I've included changelog to some patches anyway, because there were some
+>> comments during review of last big patchset from the link above.
+>>
+>> Head for this patchset is 9d0cd5d25f7d45bce01bbb3193b54ac24b3a60f3
+>>
+>> Link to v1:
+>> https://lore.kernel.org/netdev/20230717210051.856388-1-AVKrasnov@sberdevices.ru/
+>> Link to v2:
+>> https://lore.kernel.org/netdev/20230718180237.3248179-1-AVKrasnov@sberdevices.ru/
+>> Link to v3:
+>> https://lore.kernel.org/netdev/20230720214245.457298-1-AVKrasnov@sberdevices.ru/
+>>
+>> Changelog:
+>>  * Patchset rebased and tested on new HEAD of net-next (see hash above).
+>>  * See per-patch changelog after ---.
+>>
+>> Arseniy Krasnov (4):
+>>   vsock/virtio/vhost: read data from non-linear skb
+>>   vsock/virtio: support to send non-linear skb
+>>   vsock/virtio: non-linear skb handling for tap
+>>   vsock/virtio: MSG_ZEROCOPY flag support
+>>
+>>  drivers/vhost/vsock.c                   |  14 +-
+>>  include/linux/virtio_vsock.h            |   6 +
+>>  net/vmw_vsock/virtio_transport.c        |  79 +++++-
+>>  net/vmw_vsock/virtio_transport_common.c | 312 ++++++++++++++++++------
+>>  4 files changed, 330 insertions(+), 81 deletions(-)
+>>
+>> -- 
+>> 2.25.1
+> 
 
