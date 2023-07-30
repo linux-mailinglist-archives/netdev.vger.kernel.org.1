@@ -1,91 +1,66 @@
-Return-Path: <netdev+bounces-22649-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22650-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 382BF7686C0
-	for <lists+netdev@lfdr.de>; Sun, 30 Jul 2023 19:33:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4BA57686C7
+	for <lists+netdev@lfdr.de>; Sun, 30 Jul 2023 19:36:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E448E281630
-	for <lists+netdev@lfdr.de>; Sun, 30 Jul 2023 17:33:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0EDD41C2095D
+	for <lists+netdev@lfdr.de>; Sun, 30 Jul 2023 17:36:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF0E514F66;
-	Sun, 30 Jul 2023 17:33:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C30914F63;
+	Sun, 30 Jul 2023 17:36:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D45C9EAD1
-	for <netdev@vger.kernel.org>; Sun, 30 Jul 2023 17:33:08 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A959AB1
-	for <netdev@vger.kernel.org>; Sun, 30 Jul 2023 10:33:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1690738384;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bI2QpHgEFPQgVStqd/H0LujPseNDGo/AgJRr8NE58KI=;
-	b=cQaAbmCv1IuIpgtqbeVyTb13CR0FEISETWWoBznzoXIa4/FMcLhF9U2tkpnljFWkKAoK+d
-	NGTsmkd8XyKLkeAf4aFkTWm/07q52P145VwP2BRvKzmCxhx+koOvu6USRM+q4XJ/TRjbj/
-	6mKCEh/vDNjCM5+9Yt35r8ssJb4UiYk=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-125-3FQiQKGVOWy_qcO9uYKp8A-1; Sun, 30 Jul 2023 13:33:01 -0400
-X-MC-Unique: 3FQiQKGVOWy_qcO9uYKp8A-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A8A1B86F121;
-	Sun, 30 Jul 2023 17:33:00 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.131])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id E6A4A1415115;
-	Sun, 30 Jul 2023 17:32:58 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <64c6672f580e3_11d0042944e@willemb.c.googlers.com.notmuch>
-References: <64c6672f580e3_11d0042944e@willemb.c.googlers.com.notmuch> <20230718160737.52c68c73@kernel.org> <000000000000881d0606004541d1@google.com> <0000000000001416bb06004ebf53@google.com> <792238.1690667367@warthog.procyon.org.uk>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: dhowells@redhat.com, Jakub Kicinski <kuba@kernel.org>,
-    syzbot <syzbot+f527b971b4bdc8e79f9e@syzkaller.appspotmail.com>,
-    bpf@vger.kernel.org, brauner@kernel.org, davem@davemloft.net,
-    dsahern@kernel.org, edumazet@google.com,
-    linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-    netdev@vger.kernel.org, pabeni@redhat.com,
-    syzkaller-bugs@googlegroups.com, viro@zeniv.linux.org.uk
-Subject: Re: Endless loop in udp with MSG_SPLICE_READ - Re: [syzbot] [fs?] INFO: task hung in pipe_release (4)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 701B13D78
+	for <netdev@vger.kernel.org>; Sun, 30 Jul 2023 17:36:09 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3787AC433C8;
+	Sun, 30 Jul 2023 17:36:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1690738569;
+	bh=7/RMvvZZ9pn9dgxF0AMTjJduZ/wUal5j5NPsWKqFDZM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=hdvis+HXEgJbCSEe9NF6o6koxYgwI4OT+oJeEKCLEyGK+ou1v9o1tr1o43xtaS0vI
+	 o1ot7Sx2ZLvI+0xz4DPXGvujmqZpaIgnDZlrVUmFKZqCxqoZ4t+DhDrm4ALbn+7h79
+	 oomoPGVllAGJKIv0c0QLuM3JWEfdU+nAvcE16Rhp/xT3af/VVVNuziH9voZTLAIdcy
+	 mnU0UjvMjArpaWUBtsuMLVaVH/3rgkvLE5yAAdb+1ekMnVjKoE66bgWH0s6k/zuWAJ
+	 FPVJ9Tq6PllPYIqugIU1yzQW+B8VOtfBK61sRRCmbiqLtsUT7aGNE8h4xHxEdxAWcP
+	 Mmx+CwPapQA+Q==
+Date: Sun, 30 Jul 2023 19:36:05 +0200
+From: Simon Horman <horms@kernel.org>
+To: Yue Haibing <yuehaibing@huawei.com>
+Cc: dhowells@redhat.com, marc.dionne@auristor.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	linux-afs@lists.infradead.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] rxrpc: Remove unused function declarations
+Message-ID: <ZMafhd5Wvichtco2@kernel.org>
+References: <20230729122327.12668-1-yuehaibing@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <810480.1690738378.1@warthog.procyon.org.uk>
-Date: Sun, 30 Jul 2023 18:32:58 +0100
-Message-ID: <810481.1690738378@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230729122327.12668-1-yuehaibing@huawei.com>
 
-Willem de Bruijn <willemdebruijn.kernel@gmail.com> wrote:
+On Sat, Jul 29, 2023 at 08:23:27PM +0800, Yue Haibing wrote:
+> commit 3cec055c5695 ("rxrpc: Don't hold a ref for connection workqueue")
+> left behind these declarations.
 
-> The syzkaller repro runs in threaded mode, so syscalls should not be
-> interpreted in order.
+It may bot be important, but the while above commit seems for
+rxrpc_put_client_conn, perhaps for rxrpc_accept_incoming_calls it should
+be:
 
-I think they are actually ordered.  It's kind of weirdly done, though,
-flipping back and forth between threads and using futexes for synchronisation.
+248f219cb8bc ("rxrpc: Rewrite the data and ack handling code")
 
-David
+Patch looks otherwise fine by me.
 
+Reviewed-by: Simon Horman <horms@kernel.org>
 
