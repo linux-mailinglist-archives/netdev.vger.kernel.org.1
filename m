@@ -1,272 +1,211 @@
-Return-Path: <netdev+bounces-22618-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22619-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AEA79768529
-	for <lists+netdev@lfdr.de>; Sun, 30 Jul 2023 13:51:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E15F768533
+	for <lists+netdev@lfdr.de>; Sun, 30 Jul 2023 14:06:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6DC801C209E2
-	for <lists+netdev@lfdr.de>; Sun, 30 Jul 2023 11:51:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 350FC28182C
+	for <lists+netdev@lfdr.de>; Sun, 30 Jul 2023 12:06:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FDE61C2F;
-	Sun, 30 Jul 2023 11:50:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 303861C2F;
+	Sun, 30 Jul 2023 12:06:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B25A15BD;
-	Sun, 30 Jul 2023 11:50:23 +0000 (UTC)
-Received: from mail-io1-xd34.google.com (mail-io1-xd34.google.com [IPv6:2607:f8b0:4864:20::d34])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02A531BCA;
-	Sun, 30 Jul 2023 04:50:18 -0700 (PDT)
-Received: by mail-io1-xd34.google.com with SMTP id ca18e2360f4ac-79095499a17so60476739f.3;
-        Sun, 30 Jul 2023 04:50:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690717818; x=1691322618;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jfr1Y42UBgl3e0tdEuSJS6cxP3FzYxJ2E6D2Od/ZUJI=;
-        b=q34ZyETJxnkUKVtdAl87ZXCQRaPMBnMUnOOoxaJxzg+uQDfIJ2fFXCP4ggLtXfQgmL
-         U7JH9j+64DlOHzMa3hohOIPsVt+eEOxDerQTSkQObRrCVMa8PytKTWx+4lgb7tvkzCZG
-         8arhBnIhtje5LdTOUPKqDyOhvlw5v1RaG6GBnzvNImmtF7svcWZ2D9CsZq6QAhO4fxkJ
-         FaGpP0/9Rw+Iu6xSPBOT7NHeyVQBPG6H3CKWzaoRwqL6R00Res8y5RdpzbN6zdYvs3J6
-         Newe68YaSJui0oNP3tSxYDrVab4mqnjm2LAxp69rhItX5iW93R/Casml3udemOWjUsAN
-         TwUg==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22C5015BD
+	for <netdev@vger.kernel.org>; Sun, 30 Jul 2023 12:06:49 +0000 (UTC)
+Received: from mail-oi1-f205.google.com (mail-oi1-f205.google.com [209.85.167.205])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB0D3199F
+	for <netdev@vger.kernel.org>; Sun, 30 Jul 2023 05:06:47 -0700 (PDT)
+Received: by mail-oi1-f205.google.com with SMTP id 5614622812f47-3a3c77c9962so7359805b6e.1
+        for <netdev@vger.kernel.org>; Sun, 30 Jul 2023 05:06:47 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690717818; x=1691322618;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jfr1Y42UBgl3e0tdEuSJS6cxP3FzYxJ2E6D2Od/ZUJI=;
-        b=Ry95Q6OPxBbT9qnJBmzw+IBKK1AAvJ148D9UsR7dEDRp3gLH/msKcx0KkXc60RpdwB
-         GdtVWfJ80TMDxwl88OUqwhmPAs3fDi49dKVUDY6GPjn/9q+S+fNCE5XcG6uIhBrewExV
-         sjlbptliMovjNyLmpx00LSJgZIfaWu5DJFEqTZeA9HVlF2tWNGRwF+RB2UIGp5ZrfgkJ
-         2RMAUjV9tg/zrWESPd78BymMhRyl4EW8HIvKZUlb2zksiSmBjVPpY6bzH9noH2wkbsJU
-         Rb36JvUm1QCDR+kqKIotPRsxiqCyYDcZSOugVW7+MfbNZksmiEDwRY04dHrfPThN/Mz1
-         gXAw==
-X-Gm-Message-State: ABy/qLbfHWJGgq3+BoJLjp2aNK5W/9CuxOC3k5u13K7k1H53pICLK3Ih
-	XqV8pO+iY/XXBt7JT9jtMJ0=
-X-Google-Smtp-Source: APBJJlHYabs5d+521Nt3ZmEBSUfIhJwIRO3dedJjoRuAR1wcLTNZF6om6dhc5zYP+nd+ls+RoJ03Bw==
-X-Received: by 2002:a05:6602:392:b0:790:8b8a:e616 with SMTP id f18-20020a056602039200b007908b8ae616mr5560708iov.10.1690717818140;
-        Sun, 30 Jul 2023 04:50:18 -0700 (PDT)
-Received: from localhost.localdomain (bb219-74-209-211.singnet.com.sg. [219.74.209.211])
-        by smtp.gmail.com with ESMTPSA id z9-20020aa791c9000000b00640dbbd7830sm6044479pfa.18.2023.07.30.04.50.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 30 Jul 2023 04:50:17 -0700 (PDT)
-From: Leon Hwang <hffilwlqm@gmail.com>
-To: ast@kernel.org
-Cc: daniel@iogearbox.net,
-	john.fastabend@gmail.com,
-	andrii@kernel.org,
-	martin.lau@linux.dev,
-	song@kernel.org,
-	yonghong.song@linux.dev,
-	kpsingh@kernel.org,
-	sdf@google.com,
-	haoluo@google.com,
-	jolsa@kernel.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	hawk@kernel.org,
-	rostedt@goodmis.org,
-	mhiramat@kernel.org,
-	mykolal@fb.com,
-	shuah@kernel.org,
-	hffilwlqm@gmail.com,
-	tangyeechou@gmail.com,
-	kernel-patches-bot@fb.com,
-	bpf@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH bpf-next v4 2/2] selftests/bpf: Add testcase for xdp attaching failure tracepoint
-Date: Sun, 30 Jul 2023 19:49:51 +0800
-Message-ID: <20230730114951.74067-3-hffilwlqm@gmail.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230730114951.74067-1-hffilwlqm@gmail.com>
-References: <20230730114951.74067-1-hffilwlqm@gmail.com>
+        d=1e100.net; s=20221208; t=1690718806; x=1691323606;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=iTMAaKeEAOO9DuEhcqlyUmnqzeQDlUFNrBiZiQB1GNg=;
+        b=QGBpbyB/JtIecCEfP3u9E3pUcZJnsRdNp0f+WoY781C9GP6jZtXGEP6zDaDVWJEIjR
+         6oTI0AfxurmzvEkr8FaLLU37uQjH4FCbwES3RSgWosvk29ktGS3INUkZl4niKBHFYJym
+         zsnKNceoDCwOk58q9lwSQgy6Id1OCxJVVca5eZKUaD9Es8np+HYtzaGPjwHLHJFfccWX
+         m1F2fdrHBe+GS27kgrgEh7M3KbWLpZD1RuQN3Xgl2Pdtqhg+ZRoBC1/SfhFykaAI0Zud
+         hIvi3ISud4zYxIukhWaDT0XVSPGo5+xqQu7iXkFde47sEkUKlP0TJo9rgKaDNi/+QWUc
+         axjQ==
+X-Gm-Message-State: ABy/qLYFP2R/1mMwcm3jRDZaPD+F2LcbzMRa1p3B9jyEJWzePIxHUYax
+	1kklnUrwMFNsEvTS2gINtd4+LSUiS04JSauzfth8vhxRVrUn
+X-Google-Smtp-Source: APBJJlEJ6qabICT29ZCo5LlKsNEs0OHhWuTkZiuEn1Z5xffTFZQRXQuFC21BgKRknyBzFvjGb+oJFmyiyjBTM6KV89aIW3vRQVl+
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,HK_RANDOM_ENVFROM,
-	HK_RANDOM_FROM,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Received: by 2002:a05:6808:1888:b0:3a4:1082:9e5 with SMTP id
+ bi8-20020a056808188800b003a4108209e5mr13443587oib.2.1690718806773; Sun, 30
+ Jul 2023 05:06:46 -0700 (PDT)
+Date: Sun, 30 Jul 2023 05:06:46 -0700
+In-Reply-To: <0000000000008c5b8c05ff934a6c@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000e4969c0601b3257d@google.com>
+Subject: Re: [syzbot] [wireless?] KMSAN: uninit-value in ieee80211_rx_handlers
+From: syzbot <syzbot+be9c824e6f269d608288@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, glider@google.com, 
+	johannes@sipsolutions.net, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=0.8 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
+	SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Add a test case for the tracepoint of xdp attaching failure by bpf
-tracepoint when attach XDP to a device with invalid flags option.
+syzbot has found a reproducer for the following issue on:
 
-The bpf tracepoint retrieves error message from the tracepoint, and
-then put the error message to a perf buffer. The testing code receives
-error message from perf buffer, and then ASSERT "Invalid XDP flags for
-BPF link attachment".
+HEAD commit:    12214540ad87 Merge tag 'loongarch-fixes-6.5-1' of git://gi..
+git tree:       upstream
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=12e82519a80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=6271275e6c8ac3e0
+dashboard link: https://syzkaller.appspot.com/bug?extid=be9c824e6f269d608288
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12a5f4eea80000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=143b7009a80000
 
-Signed-off-by: Leon Hwang <hffilwlqm@gmail.com>
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/7e436d64cced/disk-12214540.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/100ff4913bc4/vmlinux-12214540.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/0a1e5a392dce/bzImage-12214540.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+be9c824e6f269d608288@syzkaller.appspotmail.com
+
+=====================================================
+BUG: KMSAN: uninit-value in ieee80211_rx_h_action net/mac80211/rx.c:3735 [inline]
+BUG: KMSAN: uninit-value in ieee80211_rx_handlers+0xc12c/0x10c00 net/mac80211/rx.c:4129
+ ieee80211_rx_h_action net/mac80211/rx.c:3735 [inline]
+ ieee80211_rx_handlers+0xc12c/0x10c00 net/mac80211/rx.c:4129
+ ieee80211_invoke_rx_handlers net/mac80211/rx.c:4164 [inline]
+ ieee80211_prepare_and_rx_handle+0x563e/0x9640 net/mac80211/rx.c:5006
+ ieee80211_rx_for_interface+0x88d/0x990 net/mac80211/rx.c:5091
+ __ieee80211_rx_handle_packet net/mac80211/rx.c:5248 [inline]
+ ieee80211_rx_list+0x5753/0x6580 net/mac80211/rx.c:5383
+ ieee80211_rx_napi+0x87/0x350 net/mac80211/rx.c:5406
+ ieee80211_rx include/net/mac80211.h:4949 [inline]
+ ieee80211_tasklet_handler+0x1a0/0x310 net/mac80211/main.c:316
+ tasklet_action_common+0x391/0xd30 kernel/softirq.c:780
+ tasklet_action+0x26/0x30 kernel/softirq.c:805
+ __do_softirq+0x1b7/0x78f kernel/softirq.c:553
+ do_softirq+0x9a/0xf0 kernel/softirq.c:454
+ __local_bh_enable_ip+0x99/0xa0 kernel/softirq.c:381
+ local_bh_enable+0x28/0x30 include/linux/bottom_half.h:33
+ __ieee80211_tx_skb_tid_band+0x276/0x560 net/mac80211/tx.c:6060
+ ieee80211_tx_skb_tid+0x203/0x290 net/mac80211/tx.c:6087
+ ieee80211_mgmt_tx+0x1cff/0x2070 net/mac80211/offchannel.c:965
+ rdev_mgmt_tx net/wireless/rdev-ops.h:758 [inline]
+ cfg80211_mlme_mgmt_tx+0x133b/0x1ba0 net/wireless/mlme.c:815
+ nl80211_tx_mgmt+0x1297/0x1840 net/wireless/nl80211.c:12633
+ genl_family_rcv_msg_doit net/netlink/genetlink.c:970 [inline]
+ genl_family_rcv_msg net/netlink/genetlink.c:1050 [inline]
+ genl_rcv_msg+0x1328/0x13c0 net/netlink/genetlink.c:1067
+ netlink_rcv_skb+0x371/0x650 net/netlink/af_netlink.c:2549
+ genl_rcv+0x40/0x60 net/netlink/genetlink.c:1078
+ netlink_unicast_kernel net/netlink/af_netlink.c:1339 [inline]
+ netlink_unicast+0xf28/0x1230 net/netlink/af_netlink.c:1365
+ netlink_sendmsg+0x122f/0x13d0 net/netlink/af_netlink.c:1914
+ sock_sendmsg_nosec net/socket.c:725 [inline]
+ sock_sendmsg net/socket.c:748 [inline]
+ ____sys_sendmsg+0x9c2/0xd60 net/socket.c:2494
+ ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2548
+ __sys_sendmsg net/socket.c:2577 [inline]
+ __do_sys_sendmsg net/socket.c:2586 [inline]
+ __se_sys_sendmsg net/socket.c:2584 [inline]
+ __x64_sys_sendmsg+0x307/0x490 net/socket.c:2584
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x41/0xc0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+
+Uninit was stored to memory at:
+ skb_copy_from_linear_data_offset include/linux/skbuff.h:4068 [inline]
+ skb_copy_bits+0x149/0xd30 net/core/skbuff.c:2744
+ skb_copy+0x47f/0xa00 net/core/skbuff.c:1936
+ mac80211_hwsim_tx_frame_no_nl+0x18db/0x2130 drivers/net/wireless/virtual/mac80211_hwsim.c:1836
+ mac80211_hwsim_tx+0x1baa/0x2ce0 drivers/net/wireless/virtual/mac80211_hwsim.c:2054
+ drv_tx net/mac80211/driver-ops.h:37 [inline]
+ ieee80211_tx_frags+0x5e7/0xd90 net/mac80211/tx.c:1737
+ __ieee80211_tx+0x46e/0x630 net/mac80211/tx.c:1791
+ ieee80211_tx+0x52e/0x570 net/mac80211/tx.c:1971
+ ieee80211_xmit+0x54a/0x5b0 net/mac80211/tx.c:2063
+ __ieee80211_tx_skb_tid_band+0x271/0x560 net/mac80211/tx.c:6059
+ ieee80211_tx_skb_tid+0x203/0x290 net/mac80211/tx.c:6087
+ ieee80211_mgmt_tx+0x1cff/0x2070 net/mac80211/offchannel.c:965
+ rdev_mgmt_tx net/wireless/rdev-ops.h:758 [inline]
+ cfg80211_mlme_mgmt_tx+0x133b/0x1ba0 net/wireless/mlme.c:815
+ nl80211_tx_mgmt+0x1297/0x1840 net/wireless/nl80211.c:12633
+ genl_family_rcv_msg_doit net/netlink/genetlink.c:970 [inline]
+ genl_family_rcv_msg net/netlink/genetlink.c:1050 [inline]
+ genl_rcv_msg+0x1328/0x13c0 net/netlink/genetlink.c:1067
+ netlink_rcv_skb+0x371/0x650 net/netlink/af_netlink.c:2549
+ genl_rcv+0x40/0x60 net/netlink/genetlink.c:1078
+ netlink_unicast_kernel net/netlink/af_netlink.c:1339 [inline]
+ netlink_unicast+0xf28/0x1230 net/netlink/af_netlink.c:1365
+ netlink_sendmsg+0x122f/0x13d0 net/netlink/af_netlink.c:1914
+ sock_sendmsg_nosec net/socket.c:725 [inline]
+ sock_sendmsg net/socket.c:748 [inline]
+ ____sys_sendmsg+0x9c2/0xd60 net/socket.c:2494
+ ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2548
+ __sys_sendmsg net/socket.c:2577 [inline]
+ __do_sys_sendmsg net/socket.c:2586 [inline]
+ __se_sys_sendmsg net/socket.c:2584 [inline]
+ __x64_sys_sendmsg+0x307/0x490 net/socket.c:2584
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x41/0xc0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+
+Uninit was created at:
+ slab_post_alloc_hook+0x12f/0xb70 mm/slab.h:767
+ slab_alloc_node mm/slub.c:3470 [inline]
+ kmem_cache_alloc_node+0x577/0xa80 mm/slub.c:3515
+ kmalloc_reserve+0x148/0x470 net/core/skbuff.c:559
+ __alloc_skb+0x318/0x740 net/core/skbuff.c:644
+ __netdev_alloc_skb+0x11a/0x6f0 net/core/skbuff.c:708
+ netdev_alloc_skb include/linux/skbuff.h:3212 [inline]
+ dev_alloc_skb include/linux/skbuff.h:3225 [inline]
+ ieee80211_mgmt_tx+0x1316/0x2070 net/mac80211/offchannel.c:907
+ rdev_mgmt_tx net/wireless/rdev-ops.h:758 [inline]
+ cfg80211_mlme_mgmt_tx+0x133b/0x1ba0 net/wireless/mlme.c:815
+ nl80211_tx_mgmt+0x1297/0x1840 net/wireless/nl80211.c:12633
+ genl_family_rcv_msg_doit net/netlink/genetlink.c:970 [inline]
+ genl_family_rcv_msg net/netlink/genetlink.c:1050 [inline]
+ genl_rcv_msg+0x1328/0x13c0 net/netlink/genetlink.c:1067
+ netlink_rcv_skb+0x371/0x650 net/netlink/af_netlink.c:2549
+ genl_rcv+0x40/0x60 net/netlink/genetlink.c:1078
+ netlink_unicast_kernel net/netlink/af_netlink.c:1339 [inline]
+ netlink_unicast+0xf28/0x1230 net/netlink/af_netlink.c:1365
+ netlink_sendmsg+0x122f/0x13d0 net/netlink/af_netlink.c:1914
+ sock_sendmsg_nosec net/socket.c:725 [inline]
+ sock_sendmsg net/socket.c:748 [inline]
+ ____sys_sendmsg+0x9c2/0xd60 net/socket.c:2494
+ ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2548
+ __sys_sendmsg net/socket.c:2577 [inline]
+ __do_sys_sendmsg net/socket.c:2586 [inline]
+ __se_sys_sendmsg net/socket.c:2584 [inline]
+ __x64_sys_sendmsg+0x307/0x490 net/socket.c:2584
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x41/0xc0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+
+CPU: 1 PID: 4993 Comm: syz-executor798 Not tainted 6.5.0-rc3-syzkaller-00283-g12214540ad87 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/12/2023
+=====================================================
+
+
 ---
- .../selftests/bpf/prog_tests/xdp_attach.c     | 65 +++++++++++++++++++
- .../bpf/progs/test_xdp_attach_fail.c          | 54 +++++++++++++++
- 2 files changed, 119 insertions(+)
- create mode 100644 tools/testing/selftests/bpf/progs/test_xdp_attach_fail.c
-
-diff --git a/tools/testing/selftests/bpf/prog_tests/xdp_attach.c b/tools/testing/selftests/bpf/prog_tests/xdp_attach.c
-index fa3cac5488f5d..8c1cde74e9cd6 100644
---- a/tools/testing/selftests/bpf/prog_tests/xdp_attach.c
-+++ b/tools/testing/selftests/bpf/prog_tests/xdp_attach.c
-@@ -1,5 +1,6 @@
- // SPDX-License-Identifier: GPL-2.0
- #include <test_progs.h>
-+#include "test_xdp_attach_fail.skel.h"
- 
- #define IFINDEX_LO 1
- #define XDP_FLAGS_REPLACE		(1U << 4)
-@@ -85,10 +86,74 @@ static void test_xdp_attach(const char *file)
- 	bpf_object__close(obj1);
- }
- 
-+#define ERRMSG_LEN 64
-+
-+struct xdp_errmsg {
-+	char msg[ERRMSG_LEN];
-+};
-+
-+static void on_xdp_errmsg(void *ctx, int cpu, void *data, __u32 size)
-+{
-+	struct xdp_errmsg *ctx_errmg = ctx, *tp_errmsg = data;
-+
-+	memcpy(&ctx_errmg->msg, &tp_errmsg->msg, ERRMSG_LEN);
-+}
-+
-+static const char tgt_errmsg[] = "Invalid XDP flags for BPF link attachment";
-+
-+static void test_xdp_attach_fail(const char *file)
-+{
-+	int err, fd_xdp;
-+	struct bpf_object *obj = NULL;
-+	struct test_xdp_attach_fail *skel = NULL;
-+	struct perf_buffer *pb = NULL;
-+	struct xdp_errmsg errmsg = {};
-+
-+	LIBBPF_OPTS(bpf_link_create_opts, opts);
-+
-+	skel = test_xdp_attach_fail__open_and_load();
-+	if (!ASSERT_OK_PTR(skel, "test_xdp_attach_fail__open_and_load"))
-+		goto out_close;
-+
-+	err = test_xdp_attach_fail__attach(skel);
-+	if (!ASSERT_EQ(err, 0, "test_xdp_attach_fail__attach"))
-+		goto out_close;
-+
-+	/* set up perf buffer */
-+	pb = perf_buffer__new(bpf_map__fd(skel->maps.xdp_errmsg_pb), 1,
-+			      on_xdp_errmsg, NULL, &errmsg, NULL);
-+	if (!ASSERT_OK_PTR(pb, "perf_buffer__new"))
-+		goto out_close;
-+
-+	err = bpf_prog_test_load(file, BPF_PROG_TYPE_XDP, &obj, &fd_xdp);
-+	if (!ASSERT_EQ(err, 0, "bpf_prog_test_load"))
-+		goto out_close;
-+
-+	opts.flags = 0xFF; // invalid flags to fail to attach XDP prog
-+	err = bpf_link_create(fd_xdp, IFINDEX_LO, BPF_XDP, &opts);
-+	if (!ASSERT_EQ(err, -EINVAL, "bpf_link_create"))
-+		goto out_close;
-+
-+	/* read perf buffer */
-+	err = perf_buffer__poll(pb, 100);
-+	if (!ASSERT_GT(err, -1, "perf_buffer__poll"))
-+		goto out_close;
-+
-+	ASSERT_STRNEQ((const char *) errmsg.msg, tgt_errmsg,
-+		      42 /* strlen(tgt_errmsg) */, "check error message");
-+
-+out_close:
-+	perf_buffer__free(pb);
-+	bpf_object__close(obj);
-+	test_xdp_attach_fail__destroy(skel);
-+}
-+
- void serial_test_xdp_attach(void)
- {
- 	if (test__start_subtest("xdp_attach"))
- 		test_xdp_attach("./test_xdp.bpf.o");
- 	if (test__start_subtest("xdp_attach_dynptr"))
- 		test_xdp_attach("./test_xdp_dynptr.bpf.o");
-+	if (test__start_subtest("xdp_attach_failed"))
-+		test_xdp_attach_fail("./xdp_dummy.bpf.o");
- }
-diff --git a/tools/testing/selftests/bpf/progs/test_xdp_attach_fail.c b/tools/testing/selftests/bpf/progs/test_xdp_attach_fail.c
-new file mode 100644
-index 0000000000000..d7149bbd95f75
---- /dev/null
-+++ b/tools/testing/selftests/bpf/progs/test_xdp_attach_fail.c
-@@ -0,0 +1,54 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright Leon Hwang */
-+
-+#include <linux/bpf.h>
-+#include <bpf/bpf_helpers.h>
-+
-+#define ERRMSG_LEN 64
-+
-+struct xdp_errmsg {
-+	char msg[ERRMSG_LEN];
-+};
-+
-+struct {
-+	__uint(type, BPF_MAP_TYPE_PERF_EVENT_ARRAY);
-+	__type(key, int);
-+	__type(value, int);
-+} xdp_errmsg_pb SEC(".maps");
-+
-+struct xdp_attach_error_ctx {
-+	unsigned long unused;
-+
-+	/*
-+	 * bpf does not support tracepoint __data_loc directly.
-+	 *
-+	 * Actually, this field is a 32 bit integer whose value encodes
-+	 * information on where to find the actual data. The first 2 bytes is
-+	 * the size of the data. The last 2 bytes is the offset from the start
-+	 * of the tracepoint struct where the data begins.
-+	 * -- https://github.com/iovisor/bpftrace/pull/1542
-+	 */
-+	__u32 msg; // __data_loc char[] msg;
-+};
-+
-+/*
-+ * Catch the error message at the tracepoint.
-+ */
-+
-+SEC("tp/xdp/bpf_xdp_link_attach_failed")
-+int tp__xdp__bpf_xdp_link_attach_failed(struct xdp_attach_error_ctx *ctx)
-+{
-+	struct xdp_errmsg errmsg;
-+	char *msg = (void *)(__u64) ((void *) ctx + (__u16) ctx->msg);
-+
-+	bpf_probe_read_kernel_str(&errmsg.msg, ERRMSG_LEN, msg);
-+	bpf_perf_event_output(ctx, &xdp_errmsg_pb, BPF_F_CURRENT_CPU, &errmsg,
-+			      ERRMSG_LEN);
-+	return 0;
-+}
-+
-+/*
-+ * Reuse the XDP program in xdp_dummy.c.
-+ */
-+
-+char LICENSE[] SEC("license") = "GPL";
--- 
-2.41.0
-
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
