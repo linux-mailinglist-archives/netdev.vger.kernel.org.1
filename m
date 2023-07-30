@@ -1,266 +1,150 @@
-Return-Path: <netdev+bounces-22588-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22589-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5562076843E
-	for <lists+netdev@lfdr.de>; Sun, 30 Jul 2023 09:42:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6D4D76843F
+	for <lists+netdev@lfdr.de>; Sun, 30 Jul 2023 09:44:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0CC07281BCC
-	for <lists+netdev@lfdr.de>; Sun, 30 Jul 2023 07:42:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F31CF1C20A70
+	for <lists+netdev@lfdr.de>; Sun, 30 Jul 2023 07:44:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51BD910E8;
-	Sun, 30 Jul 2023 07:42:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F907A34;
+	Sun, 30 Jul 2023 07:44:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EC30ECD
-	for <netdev@vger.kernel.org>; Sun, 30 Jul 2023 07:42:14 +0000 (UTC)
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72C64198E;
-	Sun, 30 Jul 2023 00:42:11 -0700 (PDT)
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36U5qDwt022951;
-	Sun, 30 Jul 2023 00:41:57 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding : content-type; s=pfpt0220;
- bh=8cOJ6cOAA4ybrS7ZFbk+iVKvbiv/5jVm7UQNTkBwcOE=;
- b=YwKzIy5E3TfyqcQ258iIn4z9MLV1yktXvZqfT3S0Gcq5/UKpIY7AQuy3XSjZLuEjk0Io
- MF+FgLre4GV9HdGXf0dW0xG8yr1Q5B/vzB0AKKIaq5LXo6VNj8tQL5sCmPxrzzvNOepV
- 0gVA2Nd4bei3FMbRZi9ddQHSo1tVCi/5pnis9tvGgqqAZNyG9Lu1DU0szi7PUXwz94pp
- X2J1TsIp4CL8O3JMI4mToKb3ttSCdoifYGjCPweZ6jg4ojzjv4/89DBF4TTcKoTPFbAt
- 8i8rOqQGFbHPUlOFFEeIEcN2cQX0zV/P9OTbiGIn57XCDdwq3jPKMPLXIittVUmIUn4z Kg== 
-Received: from dc5-exch01.marvell.com ([199.233.59.181])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3s504nj5wq-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Sun, 30 Jul 2023 00:41:57 -0700
-Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Sun, 30 Jul
- 2023 00:41:55 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Sun, 30 Jul 2023 00:41:55 -0700
-Received: from localhost.localdomain (unknown [10.28.36.166])
-	by maili.marvell.com (Postfix) with ESMTP id B2A3C3F706D;
-	Sun, 30 Jul 2023 00:41:51 -0700 (PDT)
-From: Suman Ghosh <sumang@marvell.com>
-To: <sgoutham@marvell.com>, <gakula@marvell.com>, <sbhatta@marvell.com>,
-        <hkelam@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <lcherian@marvell.com>,
-        <jerinj@marvell.com>, <simon.horman@corigine.com>
-CC: Suman Ghosh <sumang@marvell.com>
-Subject: [net-next PATCH 2/2] octeontx2-af: TC flower offload support for inner VLAN
-Date: Sun, 30 Jul 2023 13:11:34 +0530
-Message-ID: <20230730074134.2838427-3-sumang@marvell.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20230730074134.2838427-1-sumang@marvell.com>
-References: <20230730074134.2838427-1-sumang@marvell.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 744B4810
+	for <netdev@vger.kernel.org>; Sun, 30 Jul 2023 07:44:47 +0000 (UTC)
+Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C4551BD4
+	for <netdev@vger.kernel.org>; Sun, 30 Jul 2023 00:44:46 -0700 (PDT)
+Received: by mail-wm1-x336.google.com with SMTP id 5b1f17b1804b1-3fbc77e76abso32801495e9.1
+        for <netdev@vger.kernel.org>; Sun, 30 Jul 2023 00:44:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=tessares.net; s=google; t=1690703084; x=1691307884;
+        h=in-reply-to:from:references:cc:to:content-language:subject
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CVo3CfAiIbWB71Aa1pCPCFeo34GyO2aM4zhYiffV+Ms=;
+        b=54F3mc9lenPK1PumBnXc7qs5+G4KfmHN9WNbGeZTERPfIjsvRE0sH/oCAEcLT/x7+M
+         30IMaVtm5R6tX/Zyy+QEiq3BoZLSPkqLi2Hzo95F5ToambRYGK0LCxNJUeGXsTjtubZx
+         ZRnwGGxaW3qZFcfO3CEV3xIekblVPQyUey0PiawhWHz/EvR3zd650pUTU+OtQ7WMKnFp
+         nMRlwR8sZXxa1h7XUiPrt8bqRMRgFiKmd6rxG+y45h6X9taHkYlL6bCLQUpbzwX/p0In
+         0++6EbeErEmI1VFE5W/ZnINP+U8j4euj74ngEJWxFXoGx26gKJcj+zJVGvESKjH7xHI2
+         92gQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690703084; x=1691307884;
+        h=in-reply-to:from:references:cc:to:content-language:subject
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=CVo3CfAiIbWB71Aa1pCPCFeo34GyO2aM4zhYiffV+Ms=;
+        b=GFRaoAgUGCLNmRaVTxpvn/u3i6VBXU17bj8gzIPQnNB0Qqs5QwCGqjMnGPjCxevxp2
+         s3M3GSFVUOjHibXpDaZl/yNCJ6n8NnXdTavJG7BdVSsLdXIvAhjVViMIhTHryD8em4rL
+         09Qmud7aNbozv7EEu3dmHfgJNeRpmRaKqF8fQm/haIIfexJuUV2seCoOvWZ0XTRaa+tX
+         medsoGKOrxzqG3Xz62ubObAM0tnx9JMAvX2WC3zWJDJuza6ao4SeeXIDTL4AcBpYovQh
+         YuKL8DWN7ia2m5o0YT/yKFYX8aciWlloxpUO9jQcfu2iSr6C7GozHICjggKemGtn39Sh
+         t71g==
+X-Gm-Message-State: ABy/qLbfrIiJkh0w7chUQG41pED6DGNaa00M6hfH9MlTA4VbyoV8dXXE
+	u8OL3zx2eatrXkuZkvFXgnfkEg==
+X-Google-Smtp-Source: APBJJlGVnh0dt8CdW4cH8aiNqSYqTvvflLJc+P6IYRN5jWzLA7Ys9gdhEmdrhRI3dC71ag73R4NBjA==
+X-Received: by 2002:a7b:c34d:0:b0:3fb:be7c:d58a with SMTP id l13-20020a7bc34d000000b003fbbe7cd58amr4121302wmj.26.1690703084098;
+        Sun, 30 Jul 2023 00:44:44 -0700 (PDT)
+Received: from ?IPV6:2a02:578:8593:1200:ff63:f08b:38ba:2ce1? ([2a02:578:8593:1200:ff63:f08b:38ba:2ce1])
+        by smtp.gmail.com with ESMTPSA id g22-20020a7bc4d6000000b003fe1cdbc33dsm1311812wmk.9.2023.07.30.00.44.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 30 Jul 2023 00:44:43 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="------------zwp0fCzMyu0iFZNErjcJV0YJ"
+Message-ID: <c2cd0101-85b5-39fc-801f-8a3eb0f8a0cb@tessares.net>
+Date: Sun, 30 Jul 2023 09:44:42 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: rWRLFsfllKXxWwl0p2oAnokcDt16c7jj
-X-Proofpoint-GUID: rWRLFsfllKXxWwl0p2oAnokcDt16c7jj
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-07-27_10,2023-07-26_01,2023-05-22_02
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-	version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH net 08/11] net: annotate data-races around sk->sk_mark -
+ manual merge
+Content-Language: en-GB
+To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang
+ <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com,
+ Stephen Rothwell <sfr@canb.auug.org.au>
+References: <20230728150318.2055273-1-edumazet@google.com>
+ <20230728150318.2055273-9-edumazet@google.com>
+From: Matthieu Baerts <matthieu.baerts@tessares.net>
+In-Reply-To: <20230728150318.2055273-9-edumazet@google.com>
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-This patch extends current TC flower offload support to allow filters
-involving inner VLAN matching, to be offloaded to HW.
+This is a multi-part message in MIME format.
+--------------zwp0fCzMyu0iFZNErjcJV0YJ
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Signed-off-by: Suman Ghosh <sumang@marvell.com>
----
- .../net/ethernet/marvell/octeontx2/af/mbox.h  |  1 +
- .../net/ethernet/marvell/octeontx2/af/npc.h   |  3 ++
- .../marvell/octeontx2/af/rvu_debugfs.c        |  5 ++++
- .../marvell/octeontx2/af/rvu_npc_fs.c         | 13 +++++++++
- .../ethernet/marvell/octeontx2/nic/otx2_tc.c  | 28 +++++++++++++++----
- 5 files changed, 44 insertions(+), 6 deletions(-)
+Hello,
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-index ed66c5989102..382764f39702 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-@@ -1461,6 +1461,7 @@ struct flow_msg {
- 		u8 ip_flag;
- 		u8 next_header;
- 	};
-+	__be16 vlan_itci;
- };
- 
- struct npc_install_flow_req {
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/npc.h b/drivers/net/ethernet/marvell/octeontx2/af/npc.h
-index 9beeead56d7b..5b6a1b941ccc 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/npc.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/npc.h
-@@ -184,6 +184,7 @@ enum key_fields {
- 	NPC_VLAN_ETYPE_CTAG, /* 0x8100 */
- 	NPC_VLAN_ETYPE_STAG, /* 0x88A8 */
- 	NPC_OUTER_VID,
-+	NPC_INNER_VID,
- 	NPC_TOS,
- 	NPC_IPFRAG_IPV4,
- 	NPC_SIP_IPV4,
-@@ -229,6 +230,8 @@ enum key_fields {
- 	NPC_VLAN_TAG1,
- 	/* outer vlan tci for double tagged frame */
- 	NPC_VLAN_TAG2,
-+	/* inner vlan tci for double tagged frame */
-+	NPC_VLAN_TAG3,
- 	/* other header fields programmed to extract but not of our interest */
- 	NPC_UNKNOWN,
- 	NPC_KEY_FIELDS_MAX,
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
-index 3b26893efdf8..3d0825c0685a 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
-@@ -2787,6 +2787,11 @@ static void rvu_dbg_npc_mcam_show_flows(struct seq_file *s,
- 			seq_printf(s, "mask 0x%x\n",
- 				   ntohs(rule->mask.vlan_tci));
- 			break;
-+		case NPC_INNER_VID:
-+			seq_printf(s, "0x%x ", ntohs(rule->packet.vlan_itci));
-+			seq_printf(s, "mask 0x%x\n",
-+				   ntohs(rule->mask.vlan_itci));
-+			break;
- 		case NPC_TOS:
- 			seq_printf(s, "%d ", rule->packet.tos);
- 			seq_printf(s, "mask 0x%x\n", rule->mask.tos);
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
-index 9c365cc3e736..f2a7599aa9de 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
-@@ -20,6 +20,7 @@ static const char * const npc_flow_names[] = {
- 	[NPC_VLAN_ETYPE_CTAG] = "vlan ether type ctag",
- 	[NPC_VLAN_ETYPE_STAG] = "vlan ether type stag",
- 	[NPC_OUTER_VID]	= "outer vlan id",
-+	[NPC_INNER_VID]	= "inner vlan id",
- 	[NPC_TOS]	= "tos",
- 	[NPC_IPFRAG_IPV4] = "fragmented IPv4 header ",
- 	[NPC_SIP_IPV4]	= "ipv4 source ip",
-@@ -327,6 +328,8 @@ static void npc_handle_multi_layer_fields(struct rvu *rvu, int blkaddr, u8 intf)
- 	 */
- 	struct npc_key_field *vlan_tag1;
- 	struct npc_key_field *vlan_tag2;
-+	/* Inner VLAN TCI for double tagged frames */
-+	struct npc_key_field *vlan_tag3;
- 	u64 *features;
- 	u8 start_lid;
- 	int i;
-@@ -349,6 +352,7 @@ static void npc_handle_multi_layer_fields(struct rvu *rvu, int blkaddr, u8 intf)
- 	etype_tag2 = &key_fields[NPC_ETYPE_TAG2];
- 	vlan_tag1 = &key_fields[NPC_VLAN_TAG1];
- 	vlan_tag2 = &key_fields[NPC_VLAN_TAG2];
-+	vlan_tag3 = &key_fields[NPC_VLAN_TAG3];
- 
- 	/* if key profile programmed does not extract Ethertype at all */
- 	if (!etype_ether->nr_kws && !etype_tag1->nr_kws && !etype_tag2->nr_kws) {
-@@ -430,6 +434,12 @@ static void npc_handle_multi_layer_fields(struct rvu *rvu, int blkaddr, u8 intf)
- 		goto done;
- 	}
- 	*features |= BIT_ULL(NPC_OUTER_VID);
-+
-+	/* If key profile extracts inner vlan tci */
-+	if (vlan_tag3->nr_kws) {
-+		key_fields[NPC_INNER_VID] = *vlan_tag3;
-+		*features |= BIT_ULL(NPC_INNER_VID);
-+	}
- done:
- 	return;
- }
-@@ -512,6 +522,7 @@ do {									       \
- 	NPC_SCAN_HDR(NPC_ETYPE_TAG2, NPC_LID_LB, NPC_LT_LB_STAG_QINQ, 8, 2);
- 	NPC_SCAN_HDR(NPC_VLAN_TAG1, NPC_LID_LB, NPC_LT_LB_CTAG, 2, 2);
- 	NPC_SCAN_HDR(NPC_VLAN_TAG2, NPC_LID_LB, NPC_LT_LB_STAG_QINQ, 2, 2);
-+	NPC_SCAN_HDR(NPC_VLAN_TAG3, NPC_LID_LB, NPC_LT_LB_STAG_QINQ, 6, 2);
- 	NPC_SCAN_HDR(NPC_DMAC, NPC_LID_LA, la_ltype, la_start, 6);
- 	/* SMAC follows the DMAC(which is 6 bytes) */
- 	NPC_SCAN_HDR(NPC_SMAC, NPC_LID_LA, la_ltype, la_start + 6, 6);
-@@ -932,6 +943,8 @@ do {									      \
- 
- 	NPC_WRITE_FLOW(NPC_OUTER_VID, vlan_tci, ntohs(pkt->vlan_tci), 0,
- 		       ntohs(mask->vlan_tci), 0);
-+	NPC_WRITE_FLOW(NPC_INNER_VID, vlan_itci, ntohs(pkt->vlan_itci), 0,
-+		       ntohs(mask->vlan_itci), 0);
- 
- 	NPC_WRITE_FLOW(NPC_IPFRAG_IPV6, next_header, pkt->next_header, 0,
- 		       mask->next_header, 0);
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c
-index ba2a1e8a9b9c..29565680f6c4 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c
-@@ -447,10 +447,11 @@ static int otx2_tc_process_vlan(struct otx2_nic *nic, struct flow_msg *flow_spec
- 	u16 vlan_tci, vlan_tci_mask;
- 
- 	if (is_inner)
--		return -EOPNOTSUPP;
-+		flow_rule_match_cvlan(rule, &match);
-+	else
-+		flow_rule_match_vlan(rule, &match);
- 
--	flow_rule_match_vlan(rule, &match);
--	if ((ntohs(match.key->vlan_tpid) != ETH_P_8021Q)) {
-+	if (!eth_type_vlan(ntohs(match.key->vlan_tpid))) {
- 		netdev_err(nic->netdev, "vlan tpid 0x%x not supported\n",
- 			   ntohs(match.key->vlan_tpid));
- 		return -EOPNOTSUPP;
-@@ -480,9 +481,15 @@ static int otx2_tc_process_vlan(struct otx2_nic *nic, struct flow_msg *flow_spec
- 		vlan_tci_mask = match.mask->vlan_id |
- 				match.mask->vlan_dei << 12 |
- 				match.mask->vlan_priority << 13;
--		flow_spec->vlan_tci = htons(vlan_tci);
--		flow_mask->vlan_tci = htons(vlan_tci_mask);
--		req->features |= BIT_ULL(NPC_OUTER_VID);
-+		if (is_inner) {
-+			flow_spec->vlan_itci = htons(vlan_tci);
-+			flow_mask->vlan_itci = htons(vlan_tci_mask);
-+			req->features |= BIT_ULL(NPC_INNER_VID);
-+		} else {
-+			flow_spec->vlan_tci = htons(vlan_tci);
-+			flow_mask->vlan_tci = htons(vlan_tci_mask);
-+			req->features |= BIT_ULL(NPC_OUTER_VID);
-+		}
- 	}
- 
- 	return 0;
-@@ -507,6 +514,7 @@ static int otx2_tc_prepare_flow(struct otx2_nic *nic, struct otx2_tc_flow *node,
- 	      BIT(FLOW_DISSECTOR_KEY_BASIC) |
- 	      BIT(FLOW_DISSECTOR_KEY_ETH_ADDRS) |
- 	      BIT(FLOW_DISSECTOR_KEY_VLAN) |
-+	      BIT(FLOW_DISSECTOR_KEY_CVLAN) |
- 	      BIT(FLOW_DISSECTOR_KEY_IPV4_ADDRS) |
- 	      BIT(FLOW_DISSECTOR_KEY_IPV6_ADDRS) |
- 	      BIT(FLOW_DISSECTOR_KEY_PORTS) |
-@@ -620,6 +628,14 @@ static int otx2_tc_prepare_flow(struct otx2_nic *nic, struct otx2_tc_flow *node,
- 			return ret;
- 	}
- 
-+	if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_CVLAN)) {
-+		int ret;
-+
-+		ret = otx2_tc_process_vlan(nic, flow_spec, flow_mask, rule, req, true);
-+		if (ret)
-+			return ret;
-+	}
-+
- 	if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_IPV4_ADDRS)) {
- 		struct flow_match_ipv4_addrs match;
- 
+On 28/07/2023 17:03, Eric Dumazet wrote:
+> sk->sk_mark is often read while another thread could change the value.
+> 
+> Fixes: 4a19ec5800fc ("[NET]: Introducing socket mark socket option.")
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+
+FYI, we got a small conflict when merging 'net' in 'net-next' in the
+MPTCP tree due to this patch applied in 'net':
+
+  3c5b4d69c358 ("net: annotate data-races around sk->sk_mark")
+
+and this one from 'net-next':
+
+  b7f72a30e9ac ("xsk: introduce wrappers and helpers for supporting
+multi-buffer in Tx path")
+
+Regarding this conflict, this is a trivial context-based one: I simply
+took the modifications from the two versions.
+
+Rerere cache is available in [2].
+
+Cheers,
+Matt
+
+[1] https://github.com/multipath-tcp/mptcp_net-next/commit/083975145b2e
+[2] https://github.com/multipath-tcp/mptcp-upstream-rr-cache/commit/0616
 -- 
-2.25.1
+Tessares | Belgium | Hybrid Access Solutions
+www.tessares.net
+--------------zwp0fCzMyu0iFZNErjcJV0YJ
+Content-Type: text/x-patch; charset=UTF-8;
+ name="083975145b2e4fcb837c9c0d694b8967bfa91271.patch"
+Content-Disposition: attachment;
+ filename="083975145b2e4fcb837c9c0d694b8967bfa91271.patch"
+Content-Transfer-Encoding: base64
 
+ZGlmZiAtLWNjIG5ldC94ZHAveHNrLmMKaW5kZXggNGYxZTA1OTkxNDZlLGI4OWFkYjUyYTk3
+Ny4uZDRjY2ZmY2FiOTgyCi0tLSBhL25ldC94ZHAveHNrLmMKKysrIGIvbmV0L3hkcC94c2su
+YwpAQEAgLTY4MiwyMiAtNTA1LDExICs2ODIsMjIgQEBAIHN0YXRpYyBzdHJ1Y3Qgc2tfYnVm
+ZiAqeHNrX2J1aWxkX3NrYihzdAogIAogIAlza2ItPmRldiA9IGRldjsKICAJc2tiLT5wcmlv
+cml0eSA9IHhzLT5zay5za19wcmlvcml0eTsKLSAJc2tiLT5tYXJrID0geHMtPnNrLnNrX21h
+cms7CisgCXNrYi0+bWFyayA9IFJFQURfT05DRSh4cy0+c2suc2tfbWFyayk7CiAtCXNrYl9z
+aGluZm8oc2tiKS0+ZGVzdHJ1Y3Rvcl9hcmcgPSAodm9pZCAqKShsb25nKWRlc2MtPmFkZHI7
+CiAgCXNrYi0+ZGVzdHJ1Y3RvciA9IHhza19kZXN0cnVjdF9za2I7CiArCXhza19zZXRfZGVz
+dHJ1Y3Rvcl9hcmcoc2tiKTsKICAKICAJcmV0dXJuIHNrYjsKICsKICtmcmVlX2VycjoKICsJ
+aWYgKGVyciA9PSAtRUFHQUlOKSB7CiArCQl4c2tfY3FfY2FuY2VsX2xvY2tlZCh4cywgMSk7
+CiArCX0gZWxzZSB7CiArCQl4c2tfc2V0X2Rlc3RydWN0b3JfYXJnKHNrYik7CiArCQl4c2tf
+ZHJvcF9za2Ioc2tiKTsKICsJCXhza3FfY29uc19yZWxlYXNlKHhzLT50eCk7CiArCX0KICsK
+ICsJcmV0dXJuIEVSUl9QVFIoZXJyKTsKICB9CiAgCiAgc3RhdGljIGludCBfX3hza19nZW5l
+cmljX3htaXQoc3RydWN0IHNvY2sgKnNrKQo=
+
+--------------zwp0fCzMyu0iFZNErjcJV0YJ--
 
