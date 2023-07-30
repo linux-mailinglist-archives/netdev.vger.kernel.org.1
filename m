@@ -1,150 +1,206 @@
-Return-Path: <netdev+bounces-22589-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22590-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6D4D76843F
-	for <lists+netdev@lfdr.de>; Sun, 30 Jul 2023 09:44:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D35D5768442
+	for <lists+netdev@lfdr.de>; Sun, 30 Jul 2023 09:53:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F31CF1C20A70
-	for <lists+netdev@lfdr.de>; Sun, 30 Jul 2023 07:44:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 691E72815B9
+	for <lists+netdev@lfdr.de>; Sun, 30 Jul 2023 07:53:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F907A34;
-	Sun, 30 Jul 2023 07:44:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49E91A45;
+	Sun, 30 Jul 2023 07:53:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 744B4810
-	for <netdev@vger.kernel.org>; Sun, 30 Jul 2023 07:44:47 +0000 (UTC)
-Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C4551BD4
-	for <netdev@vger.kernel.org>; Sun, 30 Jul 2023 00:44:46 -0700 (PDT)
-Received: by mail-wm1-x336.google.com with SMTP id 5b1f17b1804b1-3fbc77e76abso32801495e9.1
-        for <netdev@vger.kernel.org>; Sun, 30 Jul 2023 00:44:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tessares.net; s=google; t=1690703084; x=1691307884;
-        h=in-reply-to:from:references:cc:to:content-language:subject
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CVo3CfAiIbWB71Aa1pCPCFeo34GyO2aM4zhYiffV+Ms=;
-        b=54F3mc9lenPK1PumBnXc7qs5+G4KfmHN9WNbGeZTERPfIjsvRE0sH/oCAEcLT/x7+M
-         30IMaVtm5R6tX/Zyy+QEiq3BoZLSPkqLi2Hzo95F5ToambRYGK0LCxNJUeGXsTjtubZx
-         ZRnwGGxaW3qZFcfO3CEV3xIekblVPQyUey0PiawhWHz/EvR3zd650pUTU+OtQ7WMKnFp
-         nMRlwR8sZXxa1h7XUiPrt8bqRMRgFiKmd6rxG+y45h6X9taHkYlL6bCLQUpbzwX/p0In
-         0++6EbeErEmI1VFE5W/ZnINP+U8j4euj74ngEJWxFXoGx26gKJcj+zJVGvESKjH7xHI2
-         92gQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690703084; x=1691307884;
-        h=in-reply-to:from:references:cc:to:content-language:subject
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=CVo3CfAiIbWB71Aa1pCPCFeo34GyO2aM4zhYiffV+Ms=;
-        b=GFRaoAgUGCLNmRaVTxpvn/u3i6VBXU17bj8gzIPQnNB0Qqs5QwCGqjMnGPjCxevxp2
-         s3M3GSFVUOjHibXpDaZl/yNCJ6n8NnXdTavJG7BdVSsLdXIvAhjVViMIhTHryD8em4rL
-         09Qmud7aNbozv7EEu3dmHfgJNeRpmRaKqF8fQm/haIIfexJuUV2seCoOvWZ0XTRaa+tX
-         medsoGKOrxzqG3Xz62ubObAM0tnx9JMAvX2WC3zWJDJuza6ao4SeeXIDTL4AcBpYovQh
-         YuKL8DWN7ia2m5o0YT/yKFYX8aciWlloxpUO9jQcfu2iSr6C7GozHICjggKemGtn39Sh
-         t71g==
-X-Gm-Message-State: ABy/qLbfrIiJkh0w7chUQG41pED6DGNaa00M6hfH9MlTA4VbyoV8dXXE
-	u8OL3zx2eatrXkuZkvFXgnfkEg==
-X-Google-Smtp-Source: APBJJlGVnh0dt8CdW4cH8aiNqSYqTvvflLJc+P6IYRN5jWzLA7Ys9gdhEmdrhRI3dC71ag73R4NBjA==
-X-Received: by 2002:a7b:c34d:0:b0:3fb:be7c:d58a with SMTP id l13-20020a7bc34d000000b003fbbe7cd58amr4121302wmj.26.1690703084098;
-        Sun, 30 Jul 2023 00:44:44 -0700 (PDT)
-Received: from ?IPV6:2a02:578:8593:1200:ff63:f08b:38ba:2ce1? ([2a02:578:8593:1200:ff63:f08b:38ba:2ce1])
-        by smtp.gmail.com with ESMTPSA id g22-20020a7bc4d6000000b003fe1cdbc33dsm1311812wmk.9.2023.07.30.00.44.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 30 Jul 2023 00:44:43 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="------------zwp0fCzMyu0iFZNErjcJV0YJ"
-Message-ID: <c2cd0101-85b5-39fc-801f-8a3eb0f8a0cb@tessares.net>
-Date: Sun, 30 Jul 2023 09:44:42 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3461D810
+	for <netdev@vger.kernel.org>; Sun, 30 Jul 2023 07:53:51 +0000 (UTC)
+Received: from wout3-smtp.messagingengine.com (wout3-smtp.messagingengine.com [64.147.123.19])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A193D1710;
+	Sun, 30 Jul 2023 00:53:46 -0700 (PDT)
+Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
+	by mailout.west.internal (Postfix) with ESMTP id 7F0CD32007E8;
+	Sun, 30 Jul 2023 03:53:42 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute4.internal (MEProxy); Sun, 30 Jul 2023 03:53:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:sender:subject
+	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+	:x-sasl-enc; s=fm3; t=1690703622; x=1690790022; bh=Ox8XX+DFWsQ+y
+	SWz/zYHcBXH3EUzbdJw0d8uXXlexl4=; b=oZ8GHy3nDWRG4gZOf4HimFHIjBhBp
+	Es57m/Kr3uq7Sr0dCq9FvyOh+jbRmaI32RhSOQyJGToHhKcFPu6na136YiLHotaz
+	y3ZOEcydv4tBK47Bm9IY22Ncup9G6qvwxCkXISwTz+aOI3AKu7iNG+5/u3wBSfke
+	+l8V5ffAvr7fH36c0W/RBWHoDX6dexp6bJ6YrqNQnBSdC8LHJ5J/zbmAMKiq2r8Z
+	deZGxtHsrtnAM+VqBsj59bOa5YslD9kfsdKoHB8IOteu7MjSmRjudsflcvi45tjm
+	+OIM6yRGq416GmzOY87L4/AfYes4eGnkHHe09eYQRYU442TyFlwFq1LUg==
+X-ME-Sender: <xms:BRfGZC_fnYWCtgM9pPaSyZ8E4-pvfmBPnv56Rzie0maO8HCmHggqhg>
+    <xme:BRfGZCtdBoSLgJ2fIsUr8SVDz4_bAPJFd0DACwjS3ocDei-RgIkD1Hh_6k-ep0pH_
+    iXPExtG6YQK3EY>
+X-ME-Received: <xmr:BRfGZIClbhMoHQZ0Ut2PrNNkSRibnx3Yf5dwmz3M72eRz1AcdMQSfIa4wK7S>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrjedtgddulecutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+    fjughrpeffhffvvefukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpefkughoucfu
+    tghhihhmmhgvlhcuoehiughoshgthhesihguohhstghhrdhorhhgqeenucggtffrrghtth
+    gvrhhnpeejgeevleffteffhfdtveegteekheeggefhvddvveeufedtgfeggedvueejhfel
+    leenucffohhmrghinhepuhhnihiighdrhhhrnecuvehluhhsthgvrhfuihiivgeptdenuc
+    frrghrrghmpehmrghilhhfrhhomhepihguohhstghhsehiughoshgthhdrohhrgh
+X-ME-Proxy: <xmx:BRfGZKfjsIUj47AYhL6Z-dUgtKjNxWNmhttuEPJtJiY90ia7JMlz-Q>
+    <xmx:BRfGZHO8EMV8ulwpH-t3ptVL-4Gyrz5exfy_J2xTqMiGGh-E2-747w>
+    <xmx:BRfGZEkrWuaaMB5PkY0A-qb_1zncCeXBcQaofKn8yVGje0TNQhRqDg>
+    <xmx:BhfGZCo8cjiZL94kqunOQNLSO4bBaepxyD65qB5nokg-W5Za8hMjbA>
+Feedback-ID: i494840e7:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
+ 30 Jul 2023 03:53:40 -0400 (EDT)
+Date: Sun, 30 Jul 2023 10:53:36 +0300
+From: Ido Schimmel <idosch@idosch.org>
+To: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>, petrm@nvidia.com,
+	razor@blackwall.org
+Cc: Ido Schimmel <idosch@nvidia.com>, netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Shuah Khan <shuah@kernel.org>
+Subject: Re: [PATCH v1 01/11] selftests: forwarding:
+ custom_multipath_hash.sh: add cleanup for SIGTERM sent by timeout
+Message-ID: <ZMYXABUN9OzfN5D3@shredder>
+References: <20230722003609.380549-1-mirsad.todorovac@alu.unizg.hr>
+ <ZLzj5oYrbHGvCMkq@shredder>
+ <0550924e-dce9-f90d-df8a-db810fd2499f@alu.unizg.hr>
+ <adc5e40d-d040-a65e-eb26-edf47dac5b02@alu.unizg.hr>
+ <ZL6OljQubhVtQjcD@shredder>
+ <cab8ea8a-98f4-ef9b-4215-e2a93cccaab1@alu.unizg.hr>
+ <ZMEQGIOQXv6so30x@shredder>
+ <a9b6d9f5-14ae-a931-ab7b-d31b5e40f5df@alu.unizg.hr>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH net 08/11] net: annotate data-races around sk->sk_mark -
- manual merge
-Content-Language: en-GB
-To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang
- <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
- netdev@vger.kernel.org, eric.dumazet@gmail.com,
- Stephen Rothwell <sfr@canb.auug.org.au>
-References: <20230728150318.2055273-1-edumazet@google.com>
- <20230728150318.2055273-9-edumazet@google.com>
-From: Matthieu Baerts <matthieu.baerts@tessares.net>
-In-Reply-To: <20230728150318.2055273-9-edumazet@google.com>
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a9b6d9f5-14ae-a931-ab7b-d31b5e40f5df@alu.unizg.hr>
+X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-This is a multi-part message in MIME format.
---------------zwp0fCzMyu0iFZNErjcJV0YJ
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+On Thu, Jul 27, 2023 at 09:26:03PM +0200, Mirsad Todorovac wrote:
+> marvin@defiant:~/linux/kernel/linux_torvalds$ grep "not ok" ../kselftest-6.5-rc3-net-forwarding-16.log
+> not ok 3 selftests: net/forwarding: bridge_mdb.sh # exit=1
 
-Hello,
+Other than one test case (see below), I believe this should be fixed by
+the patches I just pushed to the existing branch. My earlier fix was
+incomplete which is why it didn't solve the problem.
 
-On 28/07/2023 17:03, Eric Dumazet wrote:
-> sk->sk_mark is often read while another thread could change the value.
+> not ok 5 selftests: net/forwarding: bridge_mdb_max.sh # exit=1
+
+Should be fixed with the patches.
+
+> not ok 11 selftests: net/forwarding: bridge_vlan_mcast.sh # exit=1
+
+Nik, the relevant failure is this one:
+
+# TEST: Vlan mcast_startup_query_interval global option default value   [FAIL]
+# 	Wrong default mcast_startup_query_interval global vlan option value
+
+Any idea why the kernel will report "mcast_startup_query_interval" as
+3124 instead of 3125?
+
+# + jq -e '.[].vlans[] | select(.vlan == 10 and                                             .mcast_startup_query_interval == 3125) '
+# + echo -n '[{"ifname":"br0","vlans":[{"vlan":1,"mcast_snooping":1,"mcast_querier":0,"mcast_igmp_version":2,"mcast_mld_version":1,"mcast_last_member_count":2,"mcast_last_member_interval":100,"mcast_startup_query_count":2,"mcast_startup_query_interval":3124,"mcast_membership_interval":26000,"mcast_querier_interval":25500,"mcast_query_interval":12500,"mcast_query_response_interval":1000},{"vlan":10,"vlanEnd":11,"mcast_snooping":1,"mcast_querier":0,"mcast_igmp_version":2,"mcast_mld_version":1,"mcast_last_member_count":2,"mcast_last_member_interval":100,"mcast_startup_query_count":2,"mcast_startup_query_interval":3124,"mcast_membership_interval":26000,"mcast_querier_interval":25500,"mcast_query_interval":12500,"mcast_query_response_interval":1000}]}]'
+# + check_err 4 'Wrong default mcast_startup_query_interval global vlan option value'
+
+> not ok 26 selftests: net/forwarding: ip6_forward_instats_vrf.sh # exit=1
+
+Please run this one with +x so that we will get more info.
+
+> not ok 49 selftests: net/forwarding: mirror_gre_changes.sh # exit=1
+
+Petr, please take a look. Probably need to make the filters more
+specific. The failure is:
+
+# TEST: mirror to gretap: TTL change (skip_hw)                        [FAIL]
+# 	Expected to capture 10 packets, got 14.
+
+> not ok 84 selftests: net/forwarding: tc_flower_l2_miss.sh # exit=1
+
+Should be fixed with the patches.
+
+> marvin@defiant:~/linux/kernel/linux_torvalds$ grep -v "^# +" ../kselftest-6.5-rc3-net-forwarding-16.log | grep -A1 FAIL | grep -v -e -- | grep -v OK
+> # TEST: IPv6 (S, G) port group entries configuration tests            [FAIL]
+> # 	"temp" entry has an unpending group timer
+
+Not sure about this one. What is the output with the following diff?
+
+diff --git a/tools/testing/selftests/net/forwarding/bridge_mdb.sh b/tools/testing/selftests/net/forwarding/bridge_mdb.sh
+index 8493c3dfc01e..2b2a3b150861 100755
+--- a/tools/testing/selftests/net/forwarding/bridge_mdb.sh
++++ b/tools/testing/selftests/net/forwarding/bridge_mdb.sh
+@@ -628,6 +628,7 @@ __cfg_test_port_ip_sg()
+        bridge -d -s mdb show dev br0 vid 10 | grep "$grp_key" | \
+                grep -q "0.00"
+        check_fail $? "\"temp\" entry has an unpending group timer"
++       bridge -d -s mdb show dev br0 vid 10 | grep "$grp_key"
+        bridge mdb del dev br0 port $swp1 $grp_key vid 10
+ 
+        # Check error cases.
+
+> # TEST: IPv4 host entries forwarding tests                            [FAIL]
+> # 	Packet not locally received after adding a host entry
+> # TEST: IPv4 port group "exclude" entries forwarding tests            [FAIL]
+> # 	Packet from valid source not received on H2 after adding entry
+> # TEST: IPv4 port group "include" entries forwarding tests            [FAIL]
+> # 	Packet from valid source not received on H2 after adding entry
+> # TEST: IGMPv3 MODE_IS_INCLUDE tests                                  [FAIL]
+> # 	Source not add to source list
+> # TEST: ctl4: port: ngroups reporting                                 [FAIL]
+> # 	Couldn't add MDB entries
+> # TEST: ctl4: port maxgroups: reporting and treatment of 0            [FAIL]
+> # 	Adding 5 MDB entries failed but should have passed
+> # TEST: ctl4: port maxgroups: configure below ngroups                 [FAIL]
+> # 	dev veth1: Couldn't add MDB entries
+> # TEST: ctl4: port: ngroups reporting                                 [FAIL]
+> # 	Couldn't add MDB entries
+> # TEST: ctl4: port maxgroups: reporting and treatment of 0            [FAIL]
+> # 	Adding 5 MDB entries failed but should have passed
+> # TEST: ctl4: port maxgroups: configure below ngroups                 [FAIL]
+> # 	dev veth1 vid 10: Couldn't add MDB entries
+> # TEST: ctl4: port_vlan: ngroups reporting                            [FAIL]
+> # 	Couldn't add MDB entries
+> # TEST: ctl4: port_vlan: isolation of port and per-VLAN ngroups       [FAIL]
+> # 	Couldn't add MDB entries to VLAN 10
+> # TEST: ctl4: port_vlan maxgroups: reporting and treatment of 0       [FAIL]
+> # 	Adding 5 MDB entries failed but should have passed
+> # TEST: ctl4: port_vlan maxgroups: configure below ngroups            [FAIL]
+> # 	dev veth1 vid 10: Couldn't add MDB entries
+> # TEST: ctl4: port_vlan maxgroups: isolation of port and per-VLAN ngroups   [FAIL]
+> # 	Couldn't add 5 entries
+> # TEST: Vlan mcast_startup_query_interval global option default value   [FAIL]
+> # 	Wrong default mcast_startup_query_interval global vlan option value
+> # TEST: Ip6InHdrErrors                                                [FAIL]
+> # TEST: mirror to gretap: TTL change (skip_hw)                        [FAIL]
+> # 	Expected to capture 10 packets, got 14.
+> # TEST: L2 miss - Multicast (IPv4)                                    [FAIL]
+> # 	Unregistered multicast filter was not hit before adding MDB entry
+> marvin@defiant:~/linux/kernel/linux_torvalds$
 > 
-> Fixes: 4a19ec5800fc ("[NET]: Introducing socket mark socket option.")
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-
-FYI, we got a small conflict when merging 'net' in 'net-next' in the
-MPTCP tree due to this patch applied in 'net':
-
-  3c5b4d69c358 ("net: annotate data-races around sk->sk_mark")
-
-and this one from 'net-next':
-
-  b7f72a30e9ac ("xsk: introduce wrappers and helpers for supporting
-multi-buffer in Tx path")
-
-Regarding this conflict, this is a trivial context-based one: I simply
-took the modifications from the two versions.
-
-Rerere cache is available in [2].
-
-Cheers,
-Matt
-
-[1] https://github.com/multipath-tcp/mptcp_net-next/commit/083975145b2e
-[2] https://github.com/multipath-tcp/mptcp-upstream-rr-cache/commit/0616
--- 
-Tessares | Belgium | Hybrid Access Solutions
-www.tessares.net
---------------zwp0fCzMyu0iFZNErjcJV0YJ
-Content-Type: text/x-patch; charset=UTF-8;
- name="083975145b2e4fcb837c9c0d694b8967bfa91271.patch"
-Content-Disposition: attachment;
- filename="083975145b2e4fcb837c9c0d694b8967bfa91271.patch"
-Content-Transfer-Encoding: base64
-
-ZGlmZiAtLWNjIG5ldC94ZHAveHNrLmMKaW5kZXggNGYxZTA1OTkxNDZlLGI4OWFkYjUyYTk3
-Ny4uZDRjY2ZmY2FiOTgyCi0tLSBhL25ldC94ZHAveHNrLmMKKysrIGIvbmV0L3hkcC94c2su
-YwpAQEAgLTY4MiwyMiAtNTA1LDExICs2ODIsMjIgQEBAIHN0YXRpYyBzdHJ1Y3Qgc2tfYnVm
-ZiAqeHNrX2J1aWxkX3NrYihzdAogIAogIAlza2ItPmRldiA9IGRldjsKICAJc2tiLT5wcmlv
-cml0eSA9IHhzLT5zay5za19wcmlvcml0eTsKLSAJc2tiLT5tYXJrID0geHMtPnNrLnNrX21h
-cms7CisgCXNrYi0+bWFyayA9IFJFQURfT05DRSh4cy0+c2suc2tfbWFyayk7CiAtCXNrYl9z
-aGluZm8oc2tiKS0+ZGVzdHJ1Y3Rvcl9hcmcgPSAodm9pZCAqKShsb25nKWRlc2MtPmFkZHI7
-CiAgCXNrYi0+ZGVzdHJ1Y3RvciA9IHhza19kZXN0cnVjdF9za2I7CiArCXhza19zZXRfZGVz
-dHJ1Y3Rvcl9hcmcoc2tiKTsKICAKICAJcmV0dXJuIHNrYjsKICsKICtmcmVlX2VycjoKICsJ
-aWYgKGVyciA9PSAtRUFHQUlOKSB7CiArCQl4c2tfY3FfY2FuY2VsX2xvY2tlZCh4cywgMSk7
-CiArCX0gZWxzZSB7CiArCQl4c2tfc2V0X2Rlc3RydWN0b3JfYXJnKHNrYik7CiArCQl4c2tf
-ZHJvcF9za2Ioc2tiKTsKICsJCXhza3FfY29uc19yZWxlYXNlKHhzLT50eCk7CiArCX0KICsK
-ICsJcmV0dXJuIEVSUl9QVFIoZXJyKTsKICB9CiAgCiAgc3RhdGljIGludCBfX3hza19nZW5l
-cmljX3htaXQoc3RydWN0IHNvY2sgKnNrKQo=
-
---------------zwp0fCzMyu0iFZNErjcJV0YJ--
+> In case you want to pursue these failures, there is the complete test output log
+> here:
+> 
+> https://domac.alu.unizg.hr/~mtodorov/linux/selftests/net-forwarding/kselftest-6.5-rc3-net-forwarding-16.log.xz
+> 
+> Thanks again, great work!
+> 
+> Kind regards,
+> Mirsad
 
