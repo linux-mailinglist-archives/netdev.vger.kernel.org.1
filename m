@@ -1,266 +1,98 @@
-Return-Path: <netdev+bounces-22775-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22774-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 628F376925D
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 11:53:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0725276925A
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 11:52:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1DB00281498
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 09:53:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ED8D91C2098F
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 09:52:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AB0417AB5;
-	Mon, 31 Jul 2023 09:52:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7E8917AAF;
+	Mon, 31 Jul 2023 09:52:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1878A17AAF
-	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 09:52:58 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3F39173E
-	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 02:52:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1690797123;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=LHyoZhH8+rWHm75lx4Eud7s39jwS+scUBib6BLzaSL8=;
-	b=VSChxRh62whxY05aOLxyuW2MLNvINM1p0hjCqJpjbw1n+RS/CvO+/y/uZTigo1Tk94x1Ns
-	acf3curSSIOhiCmbPaB1/DHtL8qL84+8FdN3M8VK8UZ964zmJPWbrnqxCTp5jqvdQVhIiv
-	fyOxH9yTceencb1+IHd+b/TXpFY7Hv0=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-643-SLdgD_ENNBq7iud-n8JeJA-1; Mon, 31 Jul 2023 05:52:02 -0400
-X-MC-Unique: SLdgD_ENNBq7iud-n8JeJA-1
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-978a991c3f5so328917066b.0
-        for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 02:52:02 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690797121; x=1691401921;
-        h=content-transfer-encoding:in-reply-to:references:to
-         :content-language:subject:cc:user-agent:mime-version:date:message-id
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LHyoZhH8+rWHm75lx4Eud7s39jwS+scUBib6BLzaSL8=;
-        b=ETr1J61//m0A54OMCwBFkt1bQUk2Qy+PshXNe6mszZnBz44jG0myiAE6BjVHmc35NC
-         BVmGg9XbPTYJWzuXR/+aPaGusvSHuN43WELnSa6+SMbtL//rrS+J0eGRd4oDzYSygwMX
-         dmpTAFh9wrHb8HZDoXYHphzyhudarYwV9AdsYrwpq5BvmmhKlbv7Ebi2LAqcuhZz3hDC
-         MibGXJh0aQvDFb0Aaw1M8RCnSzbQWgWsFjOvCA3wLYZg+M7Nh9vWt7OO887qXMjLiCWK
-         4MbviQlRCFAVGKCUOud+0IvloyqF2MEx4ol903VqtL+xjTuwMIuCWzC+jZdS/gkHGf4h
-         85jw==
-X-Gm-Message-State: ABy/qLYkXNJMa4xGuYbp5mQvCl3hbLa7QuROoN7aWUFvDYbptZKBq6zI
-	oVl5xhTURbZH7u8Z/VDuzO5yDRdx61c2MQhtUnYncVut6RVBjTQ3zdUh0Vd7fHRWL1y3gbW9gl/
-	4ZswFdBTEEMhDnk3I
-X-Received: by 2002:a17:907:2712:b0:97e:aace:b6bc with SMTP id w18-20020a170907271200b0097eaaceb6bcmr6270391ejk.53.1690797121262;
-        Mon, 31 Jul 2023 02:52:01 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlF+lJ+udhTNe6nab3lH6QYmvgenXCWZfaeQwpPpwvLmoUQFAzutESgLYvoc3XHCIuvGqBOLtQ==
-X-Received: by 2002:a17:907:2712:b0:97e:aace:b6bc with SMTP id w18-20020a170907271200b0097eaaceb6bcmr6270377ejk.53.1690797120879;
-        Mon, 31 Jul 2023 02:52:00 -0700 (PDT)
-Received: from [192.168.42.222] (194-45-78-10.static.kviknet.net. [194.45.78.10])
-        by smtp.gmail.com with ESMTPSA id h15-20020a1709063c0f00b009929ab17be0sm5925438ejg.162.2023.07.31.02.51.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 31 Jul 2023 02:52:00 -0700 (PDT)
-From: Jesper Dangaard Brouer <jbrouer@redhat.com>
-X-Google-Original-From: Jesper Dangaard Brouer <brouer@redhat.com>
-Message-ID: <7c1d0b76-2898-89ea-eb0a-1151e0654de8@redhat.com>
-Date: Mon, 31 Jul 2023 11:51:58 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1DB463A2
+	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 09:52:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F469C433C9;
+	Mon, 31 Jul 2023 09:52:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1690797144;
+	bh=ZZaLyBm5ZDUCTizepLmPHUXNvZJng/oLcottkSvLjAQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=lBCZta+nBeq8pMk/k1dcjNLyGGS31sRQq/hg4CxDkmfKf7PisowNGpN3gnApRv5HZ
+	 7fPsnQ94cBwf4kD3SsccxgweYR63r3fgB+eT+1nAeUp/W4+dNJV3zRtCJvoDdFq8rh
+	 5S+38ZwwIz6WO4p8SIcBeW8GkT9y0NygAiigObgb0BIVpD+pxmW8LdqiP4Sn98u9wo
+	 7HToIL5oSpgQuWwqxcdFXUeuPSNH5fsEVXjTFRW/MwCiNQ5urdo/WH1WFmR5DnfKNS
+	 EYVwwJIMeFEEjn7k42UFLtoMxPD55Sd4EYl9KhgDW67WuUo/1axgW8A2hw/J15KOxA
+	 2c1agwlPQ3Jcg==
+Date: Mon, 31 Jul 2023 11:52:19 +0200
+From: Simon Horman <horms@kernel.org>
+To: Ido Schimmel <idosch@idosch.org>
+Cc: Vlad Buslov <vladbu@nvidia.com>, davem@davemloft.net, kuba@kernel.org,
+	edumazet@google.com, pabeni@redhat.com, netdev@vger.kernel.org,
+	amir.hanania@intel.com, jeffrey.t.kirsher@intel.com,
+	john.fastabend@gmail.com
+Subject: Re: [PATCH net] vlan: Fix VLAN 0 memory leak
+Message-ID: <ZMeEU/Aqq0ljY8NE@kernel.org>
+References: <20230728163152.682078-1-vladbu@nvidia.com>
+ <ZMaCB/Pek5c4baCn@shredder>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Cc: brouer@redhat.com, netdev@vger.kernel.org,
- "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@gmail.com>,
- =?UTF-8?Q?Toke_H=c3=b8iland-J=c3=b8rgensen?= <toke@redhat.com>,
- Martin KaFai Lau <martin.lau@linux.dev>,
- Alexei Starovoitov <alexei.starovoitov@gmail.com>,
- Andrii Nakryiko <andrii@kernel.org>, Song Liu <song@kernel.org>,
- Hao Luo <haoluo@google.com>, Yonghong Song <yonghong.song@linux.dev>,
- Daniel Borkmann <daniel@iogearbox.net>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@google.com>, Jiri Olsa <jolsa@kernel.org>,
- Pu Lehui <pulehui@huawei.com>, houtao1@huawei.com
-Subject: Re: [PATCH bpf 1/2] bpf, cpumap: Make sure kthread is running before
- map update returns
-Content-Language: en-US
-To: Hou Tao <houtao@huaweicloud.com>, bpf@vger.kernel.org
-References: <20230729095107.1722450-1-houtao@huaweicloud.com>
- <20230729095107.1722450-2-houtao@huaweicloud.com>
-In-Reply-To: <20230729095107.1722450-2-houtao@huaweicloud.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZMaCB/Pek5c4baCn@shredder>
 
-
-On 29/07/2023 11.51, Hou Tao wrote:
-> From: Hou Tao <houtao1@huawei.com>
+On Sun, Jul 30, 2023 at 06:30:15PM +0300, Ido Schimmel wrote:
+> On Fri, Jul 28, 2023 at 06:31:52PM +0200, Vlad Buslov wrote:
+> > The referenced commit intended to fix memleak of VLAN 0 that is implicitly
+> > created on devices with NETIF_F_HW_VLAN_CTAG_FILTER feature. However, it
+> > doesn't take into account that the feature can be re-set during the
+> > netdevice lifetime which will cause memory leak if feature is disabled
+> > during the device deletion as illustrated by [0]. Fix the leak by
+> > unconditionally deleting VLAN 0 on NETDEV_DOWN event.
 > 
-> The following warning was reported when running stress-mode enabled
-> xdp_redirect_cpu with some RT threads:
-
-Cool stress-mode test that leverage RT to provoke this.
-
+> Specifically, what happens is:
 > 
->    ------------[ cut here ]------------
->    WARNING: CPU: 4 PID: 65 at kernel/bpf/cpumap.c:135
->    CPU: 4 PID: 65 Comm: kworker/4:1 Not tainted 6.5.0-rc2+ #1
-
-As you mention RT, I want to mention that it also possible to change the
-sched prio on the kthread PID.
-
->    Hardware name: QEMU Standard PC (i440FX + PIIX, 1996)
->    Workqueue: events cpu_map_kthread_stop
->    RIP: 0010:put_cpu_map_entry+0xda/0x220
->    ......
->    Call Trace:
->     <TASK>
->     ? show_regs+0x65/0x70
->     ? __warn+0xa5/0x240
->     ......
->     ? put_cpu_map_entry+0xda/0x220
->     cpu_map_kthread_stop+0x41/0x60
->     process_one_work+0x6b0/0xb80
->     worker_thread+0x96/0x720
->     kthread+0x1a5/0x1f0
->     ret_from_fork+0x3a/0x70
->     ret_from_fork_asm+0x1b/0x30
->     </TASK>
+> > 
+> > [0]:
+> > > modprobe 8021q
+> > > ip l set dev eth2 up
 > 
-> The root cause is the same as commit 436901649731 ("bpf: cpumap: Fix memory
-> leak in cpu_map_update_elem"). The kthread is stopped prematurely by
-> kthread_stop() in cpu_map_kthread_stop(), and kthread() doesn't call
-> cpu_map_kthread_run() at all but XDP program has already queued some
-> frames or skbs into ptr_ring. So when __cpu_map_ring_cleanup() checks
-> the ptr_ring, it will find it was not emptied and report a warning.
+> VID 0 is created with reference count of 1
 > 
-> An alternative fix is to use __cpu_map_ring_cleanup() to drop these
-> pending frames or skbs when kthread_stop() returns -EINTR, but it may
-> confuse the user, because these frames or skbs have been handled
-> correctly by XDP program. So instead of dropping these frames or skbs,
-> just make sure the per-cpu kthread is running before
-> __cpu_map_entry_alloc() returns.
+> > > ethtool -k eth2 | grep rx-vlan-filter
+> > rx-vlan-filter: on
+> > > ethtool -K eth2 rx-vlan-filter off
+> > > ip l set dev eth2 down
 > 
-> After apply the fix, the error handle for kthread_stop() will be
-> unnecessary because it will always return 0, so just remove it.
+> Reference count is not dropped because the feature is off
 > 
-> Fixes: 6710e1126934 ("bpf: introduce new bpf cpu map type BPF_MAP_TYPE_CPUMAP")
-> Signed-off-by: Hou Tao <houtao1@huawei.com>
-
-Acked-by: Jesper Dangaard Brouer <hawk@kernel.org>
-
-Thanks for catching this!
-
-> ---
->   kernel/bpf/cpumap.c | 21 +++++++++++----------
->   1 file changed, 11 insertions(+), 10 deletions(-)
+> > > ip l set dev eth2 up
 > 
-> diff --git a/kernel/bpf/cpumap.c b/kernel/bpf/cpumap.c
-> index 0a16e30b16ef..08351e0863e5 100644
-> --- a/kernel/bpf/cpumap.c
-> +++ b/kernel/bpf/cpumap.c
-> @@ -28,6 +28,7 @@
->   #include <linux/sched.h>
->   #include <linux/workqueue.h>
->   #include <linux/kthread.h>
-> +#include <linux/completion.h>
->   #include <trace/events/xdp.h>
->   #include <linux/btf_ids.h>
->   
-> @@ -71,6 +72,7 @@ struct bpf_cpu_map_entry {
->   	struct rcu_head rcu;
->   
->   	struct work_struct kthread_stop_wq;
-> +	struct completion kthread_running;
->   };
->   
->   struct bpf_cpu_map {
-> @@ -151,7 +153,6 @@ static void put_cpu_map_entry(struct bpf_cpu_map_entry *rcpu)
->   static void cpu_map_kthread_stop(struct work_struct *work)
->   {
->   	struct bpf_cpu_map_entry *rcpu;
-> -	int err;
->   
->   	rcpu = container_of(work, struct bpf_cpu_map_entry, kthread_stop_wq);
->   
-> @@ -161,14 +162,7 @@ static void cpu_map_kthread_stop(struct work_struct *work)
->   	rcu_barrier();
->   
->   	/* kthread_stop will wake_up_process and wait for it to complete */
-> -	err = kthread_stop(rcpu->kthread);
-> -	if (err) {
-> -		/* kthread_stop may be called before cpu_map_kthread_run
-> -		 * is executed, so we need to release the memory related
-> -		 * to rcpu.
-> -		 */
-> -		put_cpu_map_entry(rcpu);
-> -	}
-> +	kthread_stop(rcpu->kthread);
->   }
->   
->   static void cpu_map_bpf_prog_run_skb(struct bpf_cpu_map_entry *rcpu,
-> @@ -296,11 +290,11 @@ static int cpu_map_bpf_prog_run(struct bpf_cpu_map_entry *rcpu, void **frames,
->   	return nframes;
->   }
->   
-> -
->   static int cpu_map_kthread_run(void *data)
->   {
->   	struct bpf_cpu_map_entry *rcpu = data;
->   
-> +	complete(&rcpu->kthread_running);
->   	set_current_state(TASK_INTERRUPTIBLE);
->   
+> Reference count is not increased because the feature is off. It could
+> have been increased if this line was preceded by:
+> 
+> ethtool -K eth2 rx-vlan-filter on
+> 
+> > > modprobe -r mlx5_ib
+> > > modprobe -r mlx5_core
+> 
+> Reference count is not dropped during NETDEV_DOWN because the feature is
+> off and NETDEV_UNREGISTER only dismantles upper VLAN devices, resulting
+> in VID 0 being leaked.
 
-Diff is missing next lines that show this is correct.
-I checked this manually and for other reviewers here are the next lines:
+Thanks Ido and Vlad,
 
-	set_current_state(TASK_INTERRUPTIBLE);
-
-	/* When kthread gives stop order, then rcpu have been disconnected
-	 * from map, thus no new packets can enter. Remaining in-flight
-	 * per CPU stored packets are flushed to this queue.  Wait honoring
-	 * kthread_stop signal until queue is empty.
-	 */
-	while (!kthread_should_stop() || !__ptr_ring_empty(rcpu->queue)) {
-
-The patch is correct in setting complete(&rcpu->kthread_running) before
-the while-loop, as the code also checks if ptr_ring is not empty.
-
-
->   	/* When kthread gives stop order, then rcpu have been disconnected
-> @@ -465,6 +459,7 @@ __cpu_map_entry_alloc(struct bpf_map *map, struct bpf_cpumap_val *value,
->   		goto free_ptr_ring;
->   
->   	/* Setup kthread */
-> +	init_completion(&rcpu->kthread_running);
->   	rcpu->kthread = kthread_create_on_node(cpu_map_kthread_run, rcpu, numa,
->   					       "cpumap/%d/map:%d", cpu,
->   					       map->id);
-> @@ -478,6 +473,12 @@ __cpu_map_entry_alloc(struct bpf_map *map, struct bpf_cpumap_val *value,
->   	kthread_bind(rcpu->kthread, cpu);
->   	wake_up_process(rcpu->kthread);
->   
-> +	/* Make sure kthread has been running, so kthread_stop() will not
-> +	 * stop the kthread prematurely and all pending frames or skbs
-> +	 * will be handled by the kthread before kthread_stop() returns.
-> +	 */
-> +	wait_for_completion(&rcpu->kthread_running);
-> +
->   	return rcpu;
->   
->   free_prog:
-
+perhaps it would be worth including the information added
+by Ido above in the patch description. Not a hard requirement
+from my side, just an idea.
 
