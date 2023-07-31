@@ -1,218 +1,169 @@
-Return-Path: <netdev+bounces-22825-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22826-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE6FB76969F
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 14:45:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8EE1F7696B6
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 14:47:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2DB3B2812E1
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 12:45:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BB7D91C20BA2
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 12:47:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C12E17FF9;
-	Mon, 31 Jul 2023 12:45:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B1EC17FF9;
+	Mon, 31 Jul 2023 12:47:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 779D98BEE;
-	Mon, 31 Jul 2023 12:45:17 +0000 (UTC)
-Received: from mail-vk1-xa34.google.com (mail-vk1-xa34.google.com [IPv6:2607:f8b0:4864:20::a34])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32FBD10E9;
-	Mon, 31 Jul 2023 05:45:11 -0700 (PDT)
-Received: by mail-vk1-xa34.google.com with SMTP id 71dfb90a1353d-486c9cd3b5eso147295e0c.0;
-        Mon, 31 Jul 2023 05:45:11 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CCD24429
+	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 12:47:41 +0000 (UTC)
+Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF2341992
+	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 05:47:19 -0700 (PDT)
+Received: by mail-lf1-x132.google.com with SMTP id 2adb3069b0e04-4fe1344b707so7074961e87.1
+        for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 05:47:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690807510; x=1691412310;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tXu315LpVUgW3NeK4ZN7zaVbOqwRNsL28izE46Z+rhc=;
-        b=DKcQ0QvrT7m4mgRhhxYB+ieT/YV8umqLn+Mv6NnfbqGq8ZzfEvvfYNE3Ef6k/e3yq7
-         a3sNInkZBmP9yY8R08v4ay8AIwHrWnLkjRrswlNZgAxIm3Qu1ln2L3X845YzZu8H2Xl7
-         EOLWJ10Ibyfx/Y7mTWtMIK3yNoQLXWa6UxTvuptt/iqQDDVa86v4NoOGfYx8bvH0XS2V
-         nzPlBeIwdcCn4LzCFSORUiLXapW5f39JrPyHC9JwM9CaaK4wGhBiWa/bDytQOFmWMbYO
-         k9WZJ6A1jVg/4ccVWcJh3r8mnGe4fjt3DX2qekvBA4+h7fjLHo49nkosXtqhvhFK38Vr
-         yZbA==
+        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1690807630; x=1691412430;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=kXU17iNNbbIDhaqUsJXffcy9Yn0j2qk78Fkd47KX3Ao=;
+        b=O+AO3KxoP/OWoe8Z0LT7yIk215OPbAHb7h3qNlEc3vc2+edKGouyHDo3B+veQn38em
+         Xin6LAXk72K1DER6WeeAytIvCGDZhuDSDXyi83lvucztwGss2liQnkYaU5xKLZ2x1N5N
+         Fc45go2Kom5RR2f8OlezRn6J95u/+S3Q9kyRD4/m6cSp6WhLnr6FWXAtTMpeLkAa4tRu
+         C27Ll5s9qRSHrQ7AZIHATdS/n7utbFgf5OVSuvn8/nkh5xCmngWLvC3LfQNd1Qra6tE8
+         nSWlxwG2xUK6TZEtTQnRZNNrfE/09MrLNOoOe0NZrDHDEK+v2l6DaI+E/sTDQmZQa/Zr
+         vWnA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690807510; x=1691412310;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=tXu315LpVUgW3NeK4ZN7zaVbOqwRNsL28izE46Z+rhc=;
-        b=KU5bnheMKqjtdbOMxh4w/HXkZamrjKFvAol3pOEcOPB2m3sVR1vpPEZ7oO674J+nbX
-         /VPMOkoQrzdL6lCu6vQo2tmzpnFxTw2cAbYG7FZQQ5r9dw7qTMrgcHVEenrDDUFSQ+hD
-         uJM2rK09AxCT0iEo2iVobs9aEUhIjdLBlfdYWK9f+29UODSLEuW9WuQ7cYBPPEfUI9Rl
-         kDr3+J9HWslirtzolTmWqaMrJjRmmrnLbTEXlJ2EVoS99OvY5hKK8pxAGDDA4UtbBVI6
-         UVgCZ7kMejPzFgpKB75beRrpTlaVkTYK6bwWXSlYZ+51IY5i8VVOmdebL7qGNIyj3d5/
-         ixjw==
-X-Gm-Message-State: ABy/qLZ86ylE3zyQysrHNHfZKlIWDIkU1JZ2lpU3iSPog46DLBPctuoA
-	UGEhXuyCTx0bMi5cTcbHDVc=
-X-Google-Smtp-Source: APBJJlFlxGLbEz8QK3kYhUSaUnesXmUR9TnqH+ZwVnxN6PnbiE2nC117pe2rd7X2Sxn3ohNB51t2+Q==
-X-Received: by 2002:a1f:bd55:0:b0:481:388e:b903 with SMTP id n82-20020a1fbd55000000b00481388eb903mr3678417vkf.10.1690807510190;
-        Mon, 31 Jul 2023 05:45:10 -0700 (PDT)
-Received: from localhost (172.174.245.35.bc.googleusercontent.com. [35.245.174.172])
-        by smtp.gmail.com with ESMTPSA id u11-20020a0cdd0b000000b0063600a119fcsm3732051qvk.37.2023.07.31.05.45.09
+        d=1e100.net; s=20221208; t=1690807630; x=1691412430;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kXU17iNNbbIDhaqUsJXffcy9Yn0j2qk78Fkd47KX3Ao=;
+        b=AX/g3x/YWbuYPqWCWIm36oJ6xUOAVkiztfnWisGuLoIvrguzfRTxmdZg41dUeGdEk1
+         qNkfYqdhxzvav5ly4YzuC7ZhXaGbT5KGw6BhYQFj5BMIL0X0g//nxQ8fXSAIez4v+q9d
+         OPQcJAZIiy6wZYnFbq2Wm35ca/yiCGsB6xFqg8T1pPIT50uXnZwk9OYc17kB0Hwiz1gg
+         aa6pFoSE5cgO0usgWhwl1/ephle6wwSLtlutjarP9Q7fYmDOkFGgrVTdaAR44I57x/WN
+         QFQ6tIWHDzEB6vok3buyztCcZ1xh/21K701Ef0Wo3eDk3iCHVq0TPvBeNirC66K66X4x
+         C/dA==
+X-Gm-Message-State: ABy/qLZaQFudvxjONqsjNhZDpBrYEKzDJVGQYikpafnAGPu1nzPEtYut
+	ykvOLyCdTxqQSDt+zF79bxuKpw==
+X-Google-Smtp-Source: APBJJlGNgTlYRMiUw8n7LHnhoRCFOsftxi/JjtHMlqb5cqiTWXWMfXBulmi9uaPy00z/Nrb22TUQAQ==
+X-Received: by 2002:ac2:5f9c:0:b0:4f9:92c7:401d with SMTP id r28-20020ac25f9c000000b004f992c7401dmr5834745lfe.30.1690807630454;
+        Mon, 31 Jul 2023 05:47:10 -0700 (PDT)
+Received: from localhost ([212.23.236.67])
+        by smtp.gmail.com with ESMTPSA id cw25-20020a170906c79900b009786c8249d6sm6121818ejb.175.2023.07.31.05.47.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 31 Jul 2023 05:45:09 -0700 (PDT)
-Date: Mon, 31 Jul 2023 08:45:09 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: David Howells <dhowells@redhat.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: dhowells@redhat.com, 
- Jakub Kicinski <kuba@kernel.org>, 
- syzbot <syzbot+f527b971b4bdc8e79f9e@syzkaller.appspotmail.com>, 
- bpf@vger.kernel.org, 
- brauner@kernel.org, 
- davem@davemloft.net, 
- dsahern@kernel.org, 
- edumazet@google.com, 
- linux-fsdevel@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- netdev@vger.kernel.org, 
- pabeni@redhat.com, 
- syzkaller-bugs@googlegroups.com, 
- viro@zeniv.linux.org.uk
-Message-ID: <64c7acd57270c_169cd129420@willemb.c.googlers.com.notmuch>
-In-Reply-To: <831028.1690791233@warthog.procyon.org.uk>
-References: <64c6672f580e3_11d0042944e@willemb.c.googlers.com.notmuch>
- <20230718160737.52c68c73@kernel.org>
- <000000000000881d0606004541d1@google.com>
- <0000000000001416bb06004ebf53@google.com>
- <792238.1690667367@warthog.procyon.org.uk>
- <831028.1690791233@warthog.procyon.org.uk>
-Subject: Re: Endless loop in udp with MSG_SPLICE_READ - Re: [syzbot] [fs?]
- INFO: task hung in pipe_release (4)
+        Mon, 31 Jul 2023 05:47:09 -0700 (PDT)
+Date: Mon, 31 Jul 2023 14:47:08 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
+	edumazet@google.com, moshe@nvidia.com, saeedm@nvidia.com,
+	idosch@nvidia.com, petrm@nvidia.com
+Subject: Re: [patch net-next v2 10/11] devlink: introduce dump selector attr
+ and use it for per-instance dumps
+Message-ID: <ZMetTPCZ59rVLNyQ@nanopsycho>
+References: <20230720121829.566974-1-jiri@resnulli.us>
+ <20230720121829.566974-11-jiri@resnulli.us>
+ <20230725114044.402450df@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230725114044.402450df@kernel.org>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-David Howells wrote:
-> Hi Willem,
-> 
-> Here's a reduced testcase.  I doesn't require anything special; the key is
-> that the amount of data placed in the packet by the send() - it's related to
-> the MTU size.  It needs to stuff in sufficient data to go over the
-> fragmentation limit (I think).
-> 
-> In this case, my interface's MTU is 8192.  send() is sticking in 8161 bytes of
-> data and then the output from the aforeposted debugging patch is:
-> 
-> 	==>splice_to_socket() 6630
-> 	udp_sendmsg(8,8)
-> 	__ip_append_data(copy=-1,len=8, mtu=8192 skblen=8189 maxfl=8188)
-> 	pagedlen 9 = 9 - 0
-> 	copy -1 = 9 - 0 - 1 - 9
-> 	length 8 -= -1 + 0
-> 	__ip_append_data(copy=8172,len=9, mtu=8192 skblen=20 maxfl=8188)
-> 	copy=8172 len=9
-> 	skb_splice_from_iter(8,9)
-> 	__ip_append_data(copy=8164,len=1, mtu=8192 skblen=28 maxfl=8188)
-> 	copy=8164 len=1
-> 	skb_splice_from_iter(0,1)
-> 	__ip_append_data(copy=8164,len=1, mtu=8192 skblen=28 maxfl=8188)
-> 	copy=8164 len=1
-> 	skb_splice_from_iter(0,1)
-> 	__ip_append_data(copy=8164,len=1, mtu=8192 skblen=28 maxfl=8188)
-> 	copy=8164 len=1
-> 	skb_splice_from_iter(0,1)
-> 	__ip_append_data(copy=8164,len=1, mtu=8192 skblen=28 maxfl=8188)
-> 	copy=8164 len=1
-> 	skb_splice_from_iter(0,1)
-> 	copy=8164 len=1
-> 	skb_splice_from_iter(0,1)
-> 
-> It looks like send() pushes 1 byte over the fragmentation limit, then the
-> splice sees -1 crop up, the length to be copied is increased by 1, but
-> insufficient data is available and we go into an endless loop.
-> 
-> ---
-> #define _GNU_SOURCE
-> #include <arpa/inet.h>
-> #include <fcntl.h>
-> #include <netinet/in.h>
-> #include <stdarg.h>
-> #include <stdbool.h>
-> #include <stdio.h>
-> #include <stdlib.h>
-> #include <string.h>
-> #include <unistd.h>
-> #include <sys/socket.h>
-> #include <sys/mman.h>
-> #include <sys/uio.h>
-> 
-> #define OSERROR(R, S) do { if ((long)(R) == -1L) { perror((S)); exit(1); } } while(0)
-> 
-> int main()
-> {
-> 	struct sockaddr_storage ss;
-> 	struct sockaddr_in sin;
-> 	void *buffer;
-> 	unsigned int tmp;
-> 	int pfd[2], sfd;
-> 	int res;
-> 
-> 	OSERROR(pipe(pfd), "pipe");
-> 
-> 	sfd = socket(AF_INET, SOCK_DGRAM, 0);
-> 	OSERROR(sfd, "socket/2");
-> 
-> 	memset(&sin, 0, sizeof(sin));
-> 	sin.sin_family = AF_INET;
-> 	sin.sin_port = htons(0);
-> 	sin.sin_addr.s_addr = htonl(0xc0a80601);
-> #warning you might want to set the address here - this is 192.168.6.1
-> 	OSERROR(connect(sfd, (struct sockaddr *)&sin, sizeof(sin)), "connect");
-> 
-> 	buffer = mmap(NULL, 1024*1024, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANON, -1, 0);
-> 	OSERROR(buffer, "mmap");
-> 
-> 	OSERROR(send(sfd, buffer, 8161, MSG_CONFIRM|MSG_MORE), "send");
-> #warning you need to adjust the length on the above line to match your MTU
-> 
-> 	OSERROR(write(pfd[1], buffer, 8), "write");
-> 
-> 	OSERROR(splice(pfd[0], 0, sfd, 0, 0x4ffe0ul, 0), "splice");
-> 	return 0;
-> }
+Tue, Jul 25, 2023 at 08:40:44PM CEST, kuba@kernel.org wrote:
+>On Thu, 20 Jul 2023 14:18:28 +0200 Jiri Pirko wrote:
+>> +static void devlink_nl_policy_cpy(struct nla_policy *policy, unsigned int attr)
+>> +{
+>> +	memcpy(&policy[attr], &devlink_nl_policy[attr], sizeof(*policy));
+>> +}
+>> +
+>> +static void devlink_nl_dump_selector_policy_init(const struct devlink_cmd *cmd,
+>> +						 struct nla_policy *policy)
+>> +{
+>> +	devlink_nl_policy_cpy(policy, DEVLINK_ATTR_BUS_NAME);
+>> +	devlink_nl_policy_cpy(policy, DEVLINK_ATTR_DEV_NAME);
+>> +}
+>> +
+>> +static int devlink_nl_start(struct netlink_callback *cb)
+>> +{
+>> +	struct devlink_nl_dump_state *state = devlink_dump_state(cb);
+>> +	const struct genl_dumpit_info *info = genl_dumpit_info(cb);
+>> +	struct nlattr **attrs = info->attrs;
+>> +	const struct devlink_cmd *cmd;
+>> +	struct nla_policy *policy;
+>> +	struct nlattr **selector;
+>> +	int err;
+>> +
+>> +	if (!attrs[DEVLINK_ATTR_DUMP_SELECTOR])
+>> +		return 0;
+>> +
+>> +	selector = kzalloc(sizeof(*selector) * (DEVLINK_ATTR_MAX + 1),
+>> +			   GFP_KERNEL);
+>> +	if (!selector)
+>> +		return -ENOMEM;
+>> +	policy = kzalloc(sizeof(*policy) * (DEVLINK_ATTR_MAX + 1), GFP_KERNEL);
+>> +	if (!policy) {
+>> +		kfree(selector);
+>> +		return -ENOMEM;
+>> +	}
+>> +
+>> +	cmd = devl_cmds[info->op.cmd];
+>> +	devlink_nl_dump_selector_policy_init(cmd, policy);
+>> +	err = nla_parse_nested(selector, DEVLINK_ATTR_MAX,
+>> +			       attrs[DEVLINK_ATTR_DUMP_SELECTOR],
+>> +			       policy, cb->extack);
+>> +	kfree(policy);
+>> +	if (err) {
+>> +		kfree(selector);
+>> +		return err;
+>> +	}
+>> +
+>> +	state->selector = selector;
+>> +	return 0;
+>> +}
+>
+>Why not declare a fully nested policy with just the two attrs?
 
-That's helpful.
+Not sure I follow. But the nest under DEVLINK_ATTR_DUMP_SELECTOR has
+its own policy, generated by devlink_nl_dump_selector_policy_init(). I
+did it this way instead of separate policy array for 2 reasons:
+1) We don't have duplicate and possibly conflicting policies for devlink
+   root and selector
+2) It is easy for specific object type to pass attrs that are included
+   in the policy initialization (see the health reporter extension later
+   in this patchset). There are couple of object to benefit from this,
+   for example "sb".
+3) It is I think a bit nicer for specific object type to pass array of
+   attrs, instead of a policy array that would be exported from netlink.c
 
-Is the MSG_CONFIRM needed to trigger this?
-
-Appending to a MSG_MORE datagram that previously fit within MTU, but
-no longer, triggers the copy from skb_prev to skb in if (fraggap).
-
-I did not see how that would cause issues, but maybe something in how
-that second skb is setup makes none of the cases in the while loop
-successfully append, yet also not fail and exit. It would be helpful
-to know which path it takes (I assume skb_splice_from_iter) and what
-that returns (0?).
-
-Is this indeed trivially sidestepped if downgrading from splicing to
-regular copying with fragmentation?
-
-@@ -1042,7 +1042,7 @@ static int __ip_append_data(struct sock *sk,
-                if (inet->hdrincl)
-                        return -EPERM;
-                if (rt->dst.dev->features & NETIF_F_SG &&
--                   getfrag == ip_generic_getfrag)
-+                   getfrag == ip_generic_getfrag && transhdrlen)
-
- 
+If you insist on separate policy arrays, I can do it though. I had it
+like that initially, I just decided to go this way for the 3 reasons
+listed above.
 
 
+>
+>Also - do you know of any userspace which would pass garbage attrs 
+>to the dumps? Do we really need to accept all attributes, or can
+>we trim the dump policies to what's actually supported?
+
+That's what this patch is doing. It only accepts what the kernel
+understands. It gives the object types (as for example health reporter)
+option to extend the attr set to accept them into selectors as well, if
+they know how to handle them.
+
+
+>-- 
+>pw-bot: cr
 
