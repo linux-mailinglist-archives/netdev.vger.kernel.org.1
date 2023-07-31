@@ -1,109 +1,150 @@
-Return-Path: <netdev+bounces-22827-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22828-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0CF897696CE
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 14:52:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CAE5076972C
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 15:08:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B4AA7281410
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 12:52:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 77A521C20BFF
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 13:08:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7CB718001;
-	Mon, 31 Jul 2023 12:52:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19C69182C2;
+	Mon, 31 Jul 2023 13:08:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9B768BF0
-	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 12:52:49 +0000 (UTC)
-Received: from mail-ej1-x630.google.com (mail-ej1-x630.google.com [IPv6:2a00:1450:4864:20::630])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE83D102
-	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 05:52:47 -0700 (PDT)
-Received: by mail-ej1-x630.google.com with SMTP id a640c23a62f3a-986d8332f50so653515466b.0
-        for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 05:52:47 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CAC74429
+	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 13:08:02 +0000 (UTC)
+Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11C311BD1
+	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 06:07:47 -0700 (PDT)
+Received: by mail-lf1-x12b.google.com with SMTP id 2adb3069b0e04-4fe389d6f19so1215952e87.3
+        for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 06:07:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1690807966; x=1691412766;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=SgWupkEBbqnmC5BhDfBs1OoeJgSS7QCp0zNoBZUCR1o=;
-        b=JxCOID2S9yCKbqXN8JxzKQmfeW63mQdl1uC2PDlT2vL5iZO7IrgTINsD/06xLK8+tR
-         pghxBYoMYNEiinApbO+EIHb6ylopiaDctjBY5Sb9gBIiHRpIaKE1gPIxsQP2RJ+slKOw
-         eE80F9WAf71fAPZHr5xaWx/VPRtUqtYZceR5bfGQTNe8l7CXNJAFamoCtqdim+c6mK0S
-         IN4S4/TnjiROJkU0HViwSmz/rrusAmWdk5YFOWMTISpF/an4buEYbm76n2WcWhB6Mk4R
-         MoMRmCq/DmvAMtWBIJuoOarAbIYUG5toiUAaZLQsISoFq5kHwuyZbNKhHlE3j7k98a75
-         QVzg==
+        d=linaro.org; s=google; t=1690808865; x=1691413665;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=sloIk4WWUeov37xdllLzD6j7lRUmJiAHMp2I8RnM0nQ=;
+        b=PXIv4WwQfZUPVLFdmtmO6wanYZ+Ol6lwdLMgNcjYxT4+ZPqxs1vC98OJfVI/kKv+Bp
+         ST/1YvhrXuSdz0U9bdNcG7TNHoDor8Cd67JVrK0Igz9dCCvFJ3DeAHky/y/zV68f7jnb
+         /CTpftBeqjrEpoD4Fy9Pq6/nCMBZLob334QXhnlOdXchs02ZrYO5HYY/DW002vpSwQ1N
+         LbfAphyjIITncn82tuK5vOnTYSfzjAq5LlTA1IrWISZgtPdHLAfBZGC7AlQzFZcOFWsT
+         tc/+hq8KF8lVA5DkC43KllU9fg0KeBJw5vHgP/4QIfij3QOntAT+kGm/3Fwj+ahdSRk5
+         t9zw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690807966; x=1691412766;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SgWupkEBbqnmC5BhDfBs1OoeJgSS7QCp0zNoBZUCR1o=;
-        b=QI2LUqUjn6NXrB9VkG9GszhZhHcd/j6bxkHwtxn7zj5mDBfWhdKvJbnhutFpRVcYKO
-         8KIM55ostIoQrH2nUcMteYhRs4CuEp5es7oITwcKMQNBUNiM0HEVPJu6v+kKNAsZwOrr
-         DxWP6FXC6SuTMO7o23qjbv7hw9nD0KSMblRHtdNHJ8JnCrA35BxpMmBxSgDFqvdk68Ug
-         uY/vAHOCGi9Ui5pvpdeHVpSb+JZ/ACYYo7yHd0u0iY7/w3sn5QgkpUJLPf5UEP2t6SK7
-         FyUNiX7GALczy2IOCDf7hIhY+73un47JEGak7sZkD1IwSwLBsZJw4pGKERolDf0+stv3
-         pi3w==
-X-Gm-Message-State: ABy/qLY4NuHjs8sIe49U0cTCjEuin3410qjbN/BOoT4FcoTYMB4QiGZY
-	BUMzrVi1oMhNK5olUVb7mb/kGg==
-X-Google-Smtp-Source: APBJJlFuc+oWqNgyJW9W9vlhQDVGA5aGOFdbPRpC6+jvlqZ1hZdSgcGWwPKIDN3s/fzLOgMA4nbQ5Q==
-X-Received: by 2002:a17:906:cc58:b0:993:e9b8:90ee with SMTP id mm24-20020a170906cc5800b00993e9b890eemr5992684ejb.18.1690807966142;
-        Mon, 31 Jul 2023 05:52:46 -0700 (PDT)
-Received: from localhost ([212.23.236.67])
-        by smtp.gmail.com with ESMTPSA id j13-20020a17090686cd00b0098884f86e41sm6064440ejy.123.2023.07.31.05.52.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 31 Jul 2023 05:52:45 -0700 (PDT)
-Date: Mon, 31 Jul 2023 14:52:44 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
-	edumazet@google.com, moshe@nvidia.com, saeedm@nvidia.com,
-	idosch@nvidia.com, petrm@nvidia.com
-Subject: Re: [patch net-next v2 11/11] devlink: extend health reporter dump
- selector by port index
-Message-ID: <ZMeunKZscNRQTssp@nanopsycho>
-References: <20230720121829.566974-1-jiri@resnulli.us>
- <20230720121829.566974-12-jiri@resnulli.us>
- <20230725114803.78e1ae00@kernel.org>
+        d=1e100.net; s=20221208; t=1690808865; x=1691413665;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=sloIk4WWUeov37xdllLzD6j7lRUmJiAHMp2I8RnM0nQ=;
+        b=RmB+Y9hB9o1+afIuDh3NPCFXMReBZ4bZMNasyvwgHubLcY6lXNMN3klCD/BafBx+3J
+         dnpusl2RBp70V8ZiTLdrFhL7PbY8GvFBN4Wb0ZiLWOo7pxRjrhhf3PKrRDFTwg+Ks+9h
+         XB2fq9Kxyoc5gawOjMPWXElu6GFEOnVxBfShjqHfU43/YYDAolz+HyAl34pnNYue+0Cv
+         g5YPdjofz/15NS/bGPgrxxAsQRteBgYUr8FnhLQogBFdQTFEdsIIYBIdugb6RNYbpUjt
+         Oh+zv/Vy3VfFXopaarGHNi06jfO2UkuMnL76JBGhcU31Q2xzRyRmjlYnQXXk/kvPJC5l
+         9o5A==
+X-Gm-Message-State: ABy/qLZDz+IM12veHvQrtltfjrDL1UMGND2gcGsLoPH9vReDRarSDFB5
+	NtvI78gNYsIAqoTyWjPrlwWkDvNBP0+1nRm3EMo/Y3pIIlhIiiH8ZI9vJw==
+X-Google-Smtp-Source: APBJJlF8otKcRiEBYT+w5swQvKj8Vmx/DdTyLNpFy7XON+JoUQyxVul5eQy7lVIbhbUN5//cv00xJntHIwYuqlbtBa8=
+X-Received: by 2002:a05:6512:358c:b0:4fe:3e89:fcb2 with SMTP id
+ m12-20020a056512358c00b004fe3e89fcb2mr141079lfr.34.1690808865288; Mon, 31 Jul
+ 2023 06:07:45 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230725114803.78e1ae00@kernel.org>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+References: <20230731-synquacer-net-v3-1-944be5f06428@kernel.org> <CAMj1kXF_AZ9bFWHPjDURkZUdAdrX0Qh2Q03FNYq99pfrJGtFjQ@mail.gmail.com>
+In-Reply-To: <CAMj1kXF_AZ9bFWHPjDURkZUdAdrX0Qh2Q03FNYq99pfrJGtFjQ@mail.gmail.com>
+From: Ilias Apalodimas <ilias.apalodimas@linaro.org>
+Date: Mon, 31 Jul 2023 16:07:09 +0300
+Message-ID: <CAC_iWjKL0ejVAeZfcY7unc2KeM73+_jzXdZ=cn0=XOrYMikfQw@mail.gmail.com>
+Subject: Re: [PATCH v3] net: netsec: Ignore 'phy-mode' on SynQuacer in DT mode
+To: Ard Biesheuvel <ardb@kernel.org>
+Cc: Mark Brown <broonie@kernel.org>, Jassi Brar <jaswinder.singh@linaro.org>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Tue, Jul 25, 2023 at 08:48:03PM CEST, kuba@kernel.org wrote:
->On Thu, 20 Jul 2023 14:18:29 +0200 Jiri Pirko wrote:
->> Introduce a possibility for devlink object to expose attributes it
->> supports for selection of dumped objects.
->> 
->> Use this by health reporter to indicate it supports port index based
->> selection of dump objects. Implement this selection mechanism in
->> devlink_nl_cmd_health_reporter_get_dump_one()
+On Mon, 31 Jul 2023 at 13:54, Ard Biesheuvel <ardb@kernel.org> wrote:
 >
->This patch is not very clean. IMHO implementing the filters by skipping
->is not going to scale to reasonably complex filters. Isn't it better to
+> On Mon, 31 Jul 2023 at 12:48, Mark Brown <broonie@kernel.org> wrote:
+> >
+> > As documented in acd7aaf51b20 ("netsec: ignore 'phy-mode' device
+> > property on ACPI systems") the SocioNext SynQuacer platform ships with
+> > firmware defining the PHY mode as RGMII even though the physical
+> > configuration of the PHY is for TX and RX delays.  Since bbc4d71d63549bc
+> > ("net: phy: realtek: fix rtl8211e rx/tx delay config") this has caused
+> > misconfiguration of the PHY, rendering the network unusable.
+> >
+> > This was worked around for ACPI by ignoring the phy-mode property but
+> > the system is also used with DT.  For DT instead if we're running on a
+> > SynQuacer force a working PHY mode, as well as the standard EDK2
+> > firmware with DT there are also some of these systems that use u-boot
+> > and might not initialise the PHY if not netbooting.  Newer firmware
+> > imagaes for at least EDK2 are available from Linaro so print a warning
+> > when doing this.
+> >
+> > Fixes: 533dd11a12f6 ("net: socionext: Add Synquacer NetSec driver")
+> > Signed-off-by: Mark Brown <broonie@kernel.org>
+>
+> Acked-by: Ard Biesheuvel <ardb@kernel.org>
+>
+> > ---
+> > Changes in v3:
+> > - Typo fixes.
+> > - Link to v2: https://lore.kernel.org/r/20230728-synquacer-net-v2-1-aea4d4f32b26@kernel.org
+> >
+> > Changes in v2:
+> > - Unlike ACPI force what appears to be the correct mode, there are
+> >   u-boot firmwares which might not configure the PHY.
+> > - Link to v1: https://lore.kernel.org/r/20230727-synquacer-net-v1-1-4d7f5c4cc8d9@kernel.org
+> > ---
+> >  drivers/net/ethernet/socionext/netsec.c | 11 +++++++++++
+> >  1 file changed, 11 insertions(+)
+> >
+> > diff --git a/drivers/net/ethernet/socionext/netsec.c b/drivers/net/ethernet/socionext/netsec.c
+> > index 2d7347b71c41..0dcd6a568b06 100644
+> > --- a/drivers/net/ethernet/socionext/netsec.c
+> > +++ b/drivers/net/ethernet/socionext/netsec.c
+> > @@ -1851,6 +1851,17 @@ static int netsec_of_probe(struct platform_device *pdev,
+> >                 return err;
+> >         }
+> >
+> > +       /*
+> > +        * SynQuacer is physically configured with TX and RX delays
+> > +        * but the standard firmware claimed otherwise for a long
+> > +        * time, ignore it.
+> > +        */
+> > +       if (of_machine_is_compatible("socionext,developer-box") &&
+> > +           priv->phy_interface != PHY_INTERFACE_MODE_RGMII_ID) {
+> > +               dev_warn(&pdev->dev, "Outdated firmware reports incorrect PHY mode, overriding\n");
+> > +               priv->phy_interface = PHY_INTERFACE_MODE_RGMII_ID;
+> > +       }
+> > +
+> >         priv->phy_np = of_parse_phandle(pdev->dev.of_node, "phy-handle", 0);
+> >         if (!priv->phy_np) {
+> >                 dev_err(&pdev->dev, "missing required property 'phy-handle'\n");
+> >
+> > ---
+> > base-commit: 5d0c230f1de8c7515b6567d9afba1f196fb4e2f4
+> > change-id: 20230727-synquacer-net-e241f34baceb
+> >
+> > Best regards,
+> > --
+> > Mark Brown <broonie@kernel.org>
+> >
 
-I'm not sure what do you mean by skipping? There is not skipping. In
-case PORT_INDEX is passed in the selector, only that specific port is
-processed. No scale issues I see. Am I missing something?
-
-
->add a .filter callback which will look at the about-to-be-dumped object
->and return true/false on whether it should be dumped?
-
-No, that would not scale. Passing the selector attrs to the dump
-callback it better, as the dump callback according to the attrs can
-reach only what is needed, knowing the internals. But perhaps I don't
-understand correctly your suggestion.
+Acked-by: Ilias Apalodimas <ilias.apalodimas@linaro.org>
 
