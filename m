@@ -1,94 +1,88 @@
-Return-Path: <netdev+bounces-22868-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22869-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 989C2769B07
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 17:45:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 23630769B0D
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 17:46:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 02AE3281351
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 15:45:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D0B11281468
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 15:46:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B72918C32;
-	Mon, 31 Jul 2023 15:45:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33E9A18C39;
+	Mon, 31 Jul 2023 15:46:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1A4F14F8E
-	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 15:45:32 +0000 (UTC)
-Received: from out1-smtp.messagingengine.com (out1-smtp.messagingengine.com [66.111.4.25])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1AF21738
-	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 08:45:28 -0700 (PDT)
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-	by mailout.nyi.internal (Postfix) with ESMTP id 99A375C0193;
-	Mon, 31 Jul 2023 11:45:27 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute5.internal (MEProxy); Mon, 31 Jul 2023 11:45:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:sender:subject
-	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-	:x-sasl-enc; s=fm3; t=1690818327; x=1690904727; bh=xkQXXzNX8GGnR
-	vN3zwpQkG167vWU6FTAGbhJJerYK7s=; b=uYmPsikaLSiZcV/l/+dqhm8LhEhcJ
-	IzvPrrlQbpNc2OJ/41isRY9oYAp8EKubA7bOJDPwbUQk8uEXoG1Yf3zmchlAYqLo
-	XFQrksJ3oAMcyFRVFuch8FF32ekWWYDJZCDEEqZAaT4vRn//suH49zXN3JuxaPTv
-	GlLRKzybNO4hp+ZL5wvgj2CJp4fETbtl+Ju06YZGa+qWz30jJSZN+r96+QqDX5cm
-	2enIRtPJxNZHdVfy2Xn/RVtFR4qPKiOlxUH9fpOgtImj82F9rFQWvkoMIDJhc9MJ
-	682mRi7SIb8A5zZrE0OC/wFLU1qDY3ebh+vPQBIfQwvAQrziwud/Gh6Hw==
-X-ME-Sender: <xms:FtfHZM5hDZcVIOU_wn0bJ80h-FNcBdkN7lFBFtHax3LFGA4vvAGaZQ>
-    <xme:FtfHZN7Ub2wsi0fvDTEMY5MQIcj-g49N3OQ8FFK-NwbHglmV9yw8mqe8scpAK776o
-    Q6In_umPgCfgGk>
-X-ME-Received: <xmr:FtfHZLdu5VxPP9LFk5kj-31lpjl0lQVxnrdRhpbw4_JYm1nkplk8t8AZ6ETL>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrjeeggdeilecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
-    fjughrpeffhffvvefukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpefkughoucfu
-    tghhihhmmhgvlhcuoehiughoshgthhesihguohhstghhrdhorhhgqeenucggtffrrghtth
-    gvrhhnpedvudefveekheeugeeftddvveefgfduieefudeifefgleekheegleegjeejgeeg
-    hfenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehiug
-    hoshgthhesihguohhstghhrdhorhhg
-X-ME-Proxy: <xmx:FtfHZBL6v7ZBn5sRjh4lf0o4OUiEdtpLoTPxOWVpzNRHx4gpkp4Rvg>
-    <xmx:FtfHZAJqRasHSfqJtWMhcnqwMO4eWqRRLzGXEY_q5lw0AHja3Pc9Ag>
-    <xmx:FtfHZCyLikAwP10YrYL1ODzhEWCDiylGBW9sBhXL86BsZQQewLf74Q>
-    <xmx:F9fHZJpSEA89Uot61OR2cDpgJxb3ju4OYmh7WWo3NFi0rNwoQrvfrg>
-Feedback-ID: i494840e7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 31 Jul 2023 11:45:25 -0400 (EDT)
-Date: Mon, 31 Jul 2023 18:45:23 +0300
-From: Ido Schimmel <idosch@idosch.org>
-To: Simon Horman <horms@kernel.org>
-Cc: Vlad Buslov <vladbu@nvidia.com>, davem@davemloft.net, kuba@kernel.org,
-	edumazet@google.com, pabeni@redhat.com, netdev@vger.kernel.org,
-	amir.hanania@intel.com, jeffrey.t.kirsher@intel.com,
-	john.fastabend@gmail.com
-Subject: Re: [PATCH net] vlan: Fix VLAN 0 memory leak
-Message-ID: <ZMfXExktiYeVEo/3@shredder>
-References: <20230728163152.682078-1-vladbu@nvidia.com>
- <ZMaCB/Pek5c4baCn@shredder>
- <ZMeEU/Aqq0ljY8NE@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D9B914F8E;
+	Mon, 31 Jul 2023 15:46:52 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EADB5C433C7;
+	Mon, 31 Jul 2023 15:46:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1690818412;
+	bh=1eeFumHYHRXLIgMFKFDtiP+XFlf/cVha1AjBL7OW2h0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=lVBb2wgpMWAU4CoacRqO60I6+C4ZmYgTclfwGTAxs5keS8Kki2ixajoJ+PDHXPomN
+	 jm3UCkIRFntmXEBwOoYydpUoVAB+1Qza7YSemJe+APgq4NoV6oqOrCQIpCIOmwKI+G
+	 GjJX3XaKnT0j3BFFnoazXdg7+GAYPBv9mmVQCV2rlJnxg7dps61lBzBpNU7Y83f2Ny
+	 a7Yan8qd6q3EpdWgBH3btDj5OIFmUtGlvvSs+Nj2LyRAwt8xYkBgsHQ/0Nd2BnFNKI
+	 GL+Q3Zj/c/uzzCmBU/fIPbu0QhosBMDsrajyvjCJvq0qVR+ePmdOxUFdAXflHHcyk9
+	 RN3zHAh16I/DA==
+Date: Mon, 31 Jul 2023 08:46:51 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jason Wang <jasowang@redhat.com>
+Cc: Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Christoph Hellwig
+ <hch@infradead.org>, virtualization@lists.linux-foundation.org, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, Daniel
+ Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org,
+ bpf@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>
+Subject: Re: [PATCH vhost v11 05/10] virtio_ring: introduce
+ virtqueue_dma_dev()
+Message-ID: <20230731084651.16ec0a96@kernel.org>
+In-Reply-To: <CACGkMEs5uc=ct8BsJzV2SEJzAGXqCP__yxo-MBa6d6JzDG4YOg@mail.gmail.com>
+References: <20230710034237.12391-1-xuanzhuo@linux.alibaba.com>
+	<20230710034237.12391-6-xuanzhuo@linux.alibaba.com>
+	<ZK/cxNHzI23I6efc@infradead.org>
+	<20230713104805-mutt-send-email-mst@kernel.org>
+	<ZLjSsmTfcpaL6H/I@infradead.org>
+	<20230720131928-mutt-send-email-mst@kernel.org>
+	<ZL6qPvd6X1CgUD4S@infradead.org>
+	<1690251228.3455179-1-xuanzhuo@linux.alibaba.com>
+	<20230725033321-mutt-send-email-mst@kernel.org>
+	<1690283243.4048996-1-xuanzhuo@linux.alibaba.com>
+	<1690524153.3603117-1-xuanzhuo@linux.alibaba.com>
+	<20230728080305.5fe3737c@kernel.org>
+	<CACGkMEs5uc=ct8BsJzV2SEJzAGXqCP__yxo-MBa6d6JzDG4YOg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZMeEU/Aqq0ljY8NE@kernel.org>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jul 31, 2023 at 11:52:19AM +0200, Simon Horman wrote:
-> perhaps it would be worth including the information added
-> by Ido above in the patch description. Not a hard requirement
-> from my side, just an idea.
+On Mon, 31 Jul 2023 09:23:29 +0800 Jason Wang wrote:
+> > I'd step back and ask you why do you want to use AF_XDP with virtio.
+> > Instead of bifurcating one virtio instance into different queues why
+> > not create a separate virtio instance?
+> 
+> I'm not sure I get this, but do you mean a separate virtio device that
+> owns AF_XDP queues only? If I understand it correctly, bifurcating is
+> one of the key advantages of AF_XDP. What's more, current virtio
+> doesn't support being split at queue (pair) level. And it may still
+> suffer from the yes/no DMA API issue.
 
-I agree (assuming my analysis is correct).
+I guess we should step even further back and ask Xuan what the use case
+is, because I'm not very sure. All we hear is "enable AF_XDP on virtio"
+but AF_XDP is barely used on real HW, so why?
+
+Bifurcating makes (used to make?) some sense in case of real HW when you
+had only one PCI function and had to subdivide it. Virtio is either a SW
+construct or offloaded to very capable HW, so either way cost of
+creating an extra instance for DPDK or whatever else is very low.
 
