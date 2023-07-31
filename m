@@ -1,54 +1,74 @@
-Return-Path: <netdev+bounces-22941-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22942-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0941576A21F
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 22:44:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 854AA76A225
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 22:47:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 60B46281638
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 20:44:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AEA011C20C93
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 20:47:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7958F1D30B;
-	Mon, 31 Jul 2023 20:44:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA71C1DDCE;
+	Mon, 31 Jul 2023 20:47:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4436C18C26;
-	Mon, 31 Jul 2023 20:44:31 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4900DC433C7;
-	Mon, 31 Jul 2023 20:44:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690836271;
-	bh=SHDr7peJpsqYjk1YYJ6lesA5un3+gzLXwV6kUuEgO5Y=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=U8HewhsYSrMKPEyBouvOQ4rYPL0pes3fz3WzgilKr4glU7Qi0/NKIaGTMucnXoBrR
-	 T9X/FNWZx6493vJqv9XEouBmUAR0DchqgHtsAYWz4T1WqgVRaeGKIsJIZPeo9VJlDr
-	 VGGwgDK2maHNF8L9U/X6nQkD9bcjepDe+bNdVY3lwxLYsyphIB7yGGSExsGnF/M1B2
-	 k3CcXjNFUw0UhQ2S1phVv45HguBh6vzSmr8RvgkXhl4KH7GnOyYS8h+paHAY/zEQWf
-	 v5Vh2C0lPasJg2xdGdwHgKHGjuMj72J7XVbJ68RyY1Nvj1J7hVwekm2mwZd69llU+H
-	 shPvKxmbuaWFg==
-Date: Mon, 31 Jul 2023 13:44:30 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Michael Chan <michael.chan@broadcom.com>
-Cc: Jesper Dangaard Brouer <hawk@kernel.org>, davem@davemloft.net,
- netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
- gospo@broadcom.com, bpf@vger.kernel.org, somnath.kotur@broadcom.com, Ilias
- Apalodimas <ilias.apalodimas@linaro.org>
-Subject: Re: [PATCH net-next 3/3] bnxt_en: Let the page pool manage the DMA
- mapping
-Message-ID: <20230731134430.5e7f9960@kernel.org>
-In-Reply-To: <CACKFLimJO7Wt90O_F3Nk375rABpAQvKBZhNmBkNzzehYHbk_jA@mail.gmail.com>
-References: <20230728231829.235716-1-michael.chan@broadcom.com>
-	<20230728231829.235716-4-michael.chan@broadcom.com>
-	<20230728174212.64000bdc@kernel.org>
-	<2eadb48b-2991-7458-16a6-51082ff3ec2c@kernel.org>
-	<20230731110008.26e8ce03@kernel.org>
-	<CACKFLinHWLMScGbYKZ+zNAn2iV1zqLkNVWDMQwJRZYd-yRiY7g@mail.gmail.com>
-	<20230731114427.0da1f73b@kernel.org>
-	<CACKFLimJO7Wt90O_F3Nk375rABpAQvKBZhNmBkNzzehYHbk_jA@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FEE118B01
+	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 20:47:36 +0000 (UTC)
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AB76171C
+	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 13:47:34 -0700 (PDT)
+Received: by mail-pj1-x102b.google.com with SMTP id 98e67ed59e1d1-267fabc8465so2875406a91.1
+        for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 13:47:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20221208.gappssmtp.com; s=20221208; t=1690836454; x=1691441254;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=z+N8fz5Ir7ydSzUQZRlDElzwdQfHkofh81oEjm5J2eQ=;
+        b=eflG+62yVwUvCdwpQDl6BccROGADuJt2YjF8NQj9CgfFzer7z/3uOiFZiHFxhlFwTs
+         5N+fqNBM0JwUtAE+5Wi2QCfPPB/UM4L7gLp5syjJJK/toNxbprpyLI3SDzQlL6YM+vQd
+         sfTTk18ak40xu2zLy2GmXOU7Q8wzI7t+iEgfWQiDLnVzqq8Gx8RT8fVEZaB0OCyE6+jk
+         g44tk6EDu8hoMnGVT3WP+ZnNhErLqfGf2/iTy7q9hgkuJxOczeMsj793uL5dI+aLnJxh
+         7gs2LY7GebrMyt0xDHFOcRDekvNWEOPJuqEyaw08sqDFAtZhFsDvHFaJl9WUTd1GdNiF
+         1KOg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690836454; x=1691441254;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=z+N8fz5Ir7ydSzUQZRlDElzwdQfHkofh81oEjm5J2eQ=;
+        b=SBYhbEEMU0nGbL1W3s2MyYdJKNHcivojV+/Lmeu9jwoc1cfYcxczKCoGwALFnYJK5M
+         XLZUknAuOjrMV6EuvAgjdE3xFu5Lw9IQ0Wg/0bjrMgayCjIY9d4jD2O6dTMFvVA/mEPF
+         ikZxU2lpNfRrs/ahfgCmc+2xLWf9L+MBdDNPrAN42OrvBY9lqVEsVgJcXsRr10nbL2Y7
+         CVwe5RTyROGFL5gF+hTYGVy2ehFNpMyaBekyZT7S2nxf+pGEPK+wa3wfWLvj7fbVdRAb
+         TXg3qm0EmfIENs8zPX43VmVD/ceNyCDotPzYVu4B07e/df9wi9grfyZXDW6BRRM4GD87
+         tOlQ==
+X-Gm-Message-State: ABy/qLarbRiiZOm7ly4YTuJkDU9ZXQEwwrdHGQtnsLfnDJNhScUQacoV
+	aZdO2X5l1Ek/BuTyPBYKftZgyQ==
+X-Google-Smtp-Source: APBJJlHNIHmtgxk3tUMdehvJxVZu5725AsYKc+b4qiEWYeeFatM/aSiinkWSrPjFpuNkg/0RG6kHOQ==
+X-Received: by 2002:a17:90a:4508:b0:262:df1d:8e16 with SMTP id u8-20020a17090a450800b00262df1d8e16mr9880052pjg.33.1690836454026;
+        Mon, 31 Jul 2023 13:47:34 -0700 (PDT)
+Received: from hermes.local (204-195-127-207.wavecable.com. [204.195.127.207])
+        by smtp.gmail.com with ESMTPSA id fz3-20020a17090b024300b00263cca08d95sm8181258pjb.55.2023.07.31.13.47.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 31 Jul 2023 13:47:33 -0700 (PDT)
+Date: Mon, 31 Jul 2023 13:47:32 -0700
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: "Limonciello, Mario" <mario.limonciello@amd.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, hayeswang@realtek.com,
+ edumazet@google.com, LKML <linux-kernel@vger.kernel.org>,
+ netdev@vger.kernel.org, davem@davemloft.net, linux-usb@vger.kernel.org,
+ pabeni@redhat.com, Paul Menzel <pmenzel@molgen.mpg.de>
+Subject: Re: Error 'netif_napi_add_weight() called with weight 256'
+Message-ID: <20230731134732.597cb2c0@hermes.local>
+In-Reply-To: <673bc252-2b34-6ef9-1765-9c7cac1e8658@amd.com>
+References: <0bfd445a-81f7-f702-08b0-bd5a72095e49@amd.com>
+	<20230731111330.5211e637@kernel.org>
+	<673bc252-2b34-6ef9-1765-9c7cac1e8658@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,41 +77,56 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Mon, 31 Jul 2023 13:20:04 -0700 Michael Chan wrote:
-> I think I am beginning to understand what the confusion is.  These 32K
-> page fragments within the page may not belong to the same (GRO)
-> packet.
+On Mon, 31 Jul 2023 13:23:47 -0500
+"Limonciello, Mario" <mario.limonciello@amd.com> wrote:
 
-Right.
-
-> So we cannot dma_sync the whole page at the same time.
-
-I wouldn't phrase it like that.
-
-> Without setting PP_FLAG_DMA_SYNC_DEV, the driver code should be
-> something like this:
+> On 7/31/2023 1:13 PM, Jakub Kicinski wrote:
+> > On Mon, 31 Jul 2023 11:02:40 -0500 Limonciello, Mario wrote:  
+> >> Hi,
+> >>
+> >> I noticed today with 6.5-rc4 and also on 6.1.42 that I'm getting an
+> >> error from an r8152 based dongle (Framework ethernet expansion card).
+> >>
+> >> netif_napi_add_weight() called with weight 256
+> >>
+> >> It seems that this message is likely introduced by
+> >> 8ded532cd1cbe ("r8152: switch to netif_napi_add_weight()")
+> >>
+> >> which if the card has support_2500full set will program the value to 256:
+> >>
+> >> 	netif_napi_add_weight(netdev, &tp->napi, r8152_poll,
+> >> 			      tp->support_2500full ? 256 : 64);
+> >>
+> >> It's err level from
+> >> 82dc3c63c692b ("net: introduce NAPI_POLL_WEIGHT")
+> >>
+> >> Why is this considered an error but the driver uses the bigger value?
+> >> Should it be downgraded to a warning?  
+> > 
+> > Could you double check that the warning wasn't there before? The code
+> > added by commit 195aae321c82 ("r8152: support new chips") in 5.13 looks
+> > very much equivalent.  
 > 
-> mapping = page_pool_get_dma_addr(page) + offset;
-> dma_sync_single_for_device(dev, mapping, BNXT_RX_PAGE_SIZE, bp->rx_dir);
+> Yeah; looking through the history I agree it was probably was there from 
+> the beginning of being introduced.
 > 
-> offset may be 0, 32K, etc.
+> 6.1 is the earliest kernel that is usable with this laptop (for other 
+> reasons).
 > 
-> Since the PP_FLAG_DMA_SYNC_DEV logic is not aware of this offset, we
-> actually must do our own dma_sync and not use PP_FLAG_DMA_SYNC_DEV in
-> this case.  Does that sound right?
+> > The custom weight is probably due to a misunderstanding. We have 200G
+> > adapters using the standard weight of 64, IDK why 2.5G adapter would
+> > need anything special.  
+> 
+> Perhaps Hayes Wang can comment on this (as the author of 195aae321c82).
+> 
 
-No, no, all I'm saying is that with the current code (in page pool)
-you can't be very intelligent about the sync'ing. Every time a page
-enters the pool - the whole page should be synced. But that's fine,
-it's still better to let page pool do the syncing than trying to
-do it manually in the driver (since freshly allocated pages do not 
-have to be synced).
-
-I think the confusion comes partially from the fact that the driver
-only ever deals with fragments (32k), but internally page pool does
-recycling in full pages (64k). And .max_len is part of the recycling
-machinery, so to speak, not part of the allocation machinery.
-
-tl;dr just set .max_len = PAGE_SIZE and all will be right.
+Large NAPI weights mean that one busy device (DOS attack) can starve the
+system. Really doubt that > 64 makes any visible difference in throughput.
 
