@@ -1,97 +1,99 @@
-Return-Path: <netdev+bounces-22663-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22664-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53C837689BC
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 03:59:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 44A107689E1
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 04:11:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5C2281C209A7
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 01:59:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7D6DA1C209AD
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 02:11:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E9A9626;
-	Mon, 31 Jul 2023 01:59:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09904629;
+	Mon, 31 Jul 2023 02:11:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14AB7362
-	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 01:59:51 +0000 (UTC)
-Received: from smtpbgeu2.qq.com (smtpbgeu2.qq.com [18.194.254.142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6856210C4
-	for <netdev@vger.kernel.org>; Sun, 30 Jul 2023 18:59:45 -0700 (PDT)
-X-QQ-mid:Yeas47t1690768711t187t28196
-Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [125.119.251.0])
-X-QQ-SSF:00400000000000F0FQF000000000000
-From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
-X-BIZMAIL-ID: 7600978693373363402
-To: "'Russell King \(Oracle\)'" <linux@armlinux.org.uk>
-Cc: <netdev@vger.kernel.org>,
-	<andrew@lunn.ch>,
-	<hkallweit1@gmail.com>,
-	<Jose.Abreu@synopsys.com>,
-	<mengyuanlou@net-swift.com>
-References: <20230724102341.10401-1-jiawenwu@trustnetic.com> <20230724102341.10401-5-jiawenwu@trustnetic.com> <ZL5TujWbCDuFUXb2@shell.armlinux.org.uk> <03cc01d9be9c$6e51cad0$4af56070$@trustnetic.com> <ZL9+XZA8t1vaSVmG@shell.armlinux.org.uk> <03f101d9bedd$763b06d0$62b11470$@trustnetic.com> <ZL+cwbCd6eTU4sC8@shell.armlinux.org.uk> <ZL+fF4365f0Q9QDD@shell.armlinux.org.uk> <052c01d9c13b$edc25ef0$c9471cd0$@trustnetic.com> <ZMOZkzCqiUZP/uQ8@shell.armlinux.org.uk>
-In-Reply-To: <ZMOZkzCqiUZP/uQ8@shell.armlinux.org.uk>
-Subject: RE: [PATCH net-next 4/7] net: pcs: xpcs: adapt Wangxun NICs for SGMII mode
-Date: Mon, 31 Jul 2023 09:58:30 +0800
-Message-ID: <059201d9c352$810e4170$832ac450$@trustnetic.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F02F3362
+	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 02:11:39 +0000 (UTC)
+Received: from out30-119.freemail.mail.aliyun.com (out30-119.freemail.mail.aliyun.com [115.124.30.119])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6148CF;
+	Sun, 30 Jul 2023 19:11:36 -0700 (PDT)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R161e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045176;MF=tonylu@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0VoXHPnX_1690769491;
+Received: from localhost(mailfrom:tonylu@linux.alibaba.com fp:SMTPD_---0VoXHPnX_1690769491)
+          by smtp.aliyun-inc.com;
+          Mon, 31 Jul 2023 10:11:32 +0800
+Date: Mon, 31 Jul 2023 10:11:24 +0800
+From: Tony Lu <tonylu@linux.alibaba.com>
+To: Yue Haibing <yuehaibing@huawei.com>
+Cc: kgraul@linux.ibm.com, wenjia@linux.ibm.com, jaka@linux.ibm.com,
+	alibuda@linux.alibaba.com, guwen@linux.alibaba.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, linux-s390@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] net/smc: Remove unused function declarations
+Message-ID: <ZMcYTNPFigmPF2ml@TONYMAC-ALIBABA.local>
+Reply-To: Tony Lu <tonylu@linux.alibaba.com>
+References: <20230729121929.17180-1-yuehaibing@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-X-Mailer: Microsoft Outlook 16.0
-Thread-Index: AQJQc7ZImbL9NUPTrDJxH1gVz1U29QHlV8ySAerVjK8CRWbPqwHK0atUAh0aDJIDPJCjsQIjPZH8Aekq2cAB9oGXjq5L1QeQ
-Content-Language: zh-cn
-X-QQ-SENDSIZE: 520
-Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz5a-1
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,FROM_EXCESS_BASE64,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,T_SPF_HELO_TEMPERROR,UNPARSEABLE_RELAY
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230729121929.17180-1-yuehaibing@huawei.com>
+X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-> No there isn't, and it conforms with the above.
->=20
-> A read looks like this:
->=20
->       Address  Data                   Address  Data     Data
-> Start 10101100 000yyyyy RepeatedStart 10101101 DDDDDDDD DDDDDDDD Stop
->                       or Stop followed
-> 		          by Start
->=20
-> The terms "Address" and "Data" here are as per the I=B2C =
-specification.
-> You will notice that the first part has one byte of address and *one*
-> byte of data to convey the register address. This is what the "1" you
-> are referring to above is for.
->=20
-> For completness, a write looks like this:
->=20
->       Address  Data     Data     Data
-> Start 10101100 000yyyyy DDDDDDDD DDDDDDDD Stop
->=20
-> Essentially, in all cases, when 0x56 is addressed with the data
-> direction in write mode, the very first byte is _always_ the register
-> address and the remainder contain the data. When the data direction is
-> in read mode, the bytes are always data.
->=20
-> The description you quote above is poor because it doesn't make it
-> clear whether "read" and "write" apply to the bus transactions or to
-> the device operations. However, I can assure you that what is
-> implemented is correct, since this is the standard small 24xx memory
-> device protocol, and I've been programming that on various
-> microcontrollers and such like for the last 30 years.
->=20
-> Are you seeing a problem with the data read or written to the PHY?
+On Sat, Jul 29, 2023 at 08:19:29PM +0800, Yue Haibing wrote:
+> commit f9aab6f2ce57 ("net/smc: immediate freeing in smc_lgr_cleanup_early()")
+> left behind smc_lgr_schedule_free_work_fast() declaration.
+> And since commit 349d43127dac ("net/smc: fix kernel panic caused by race of smc_sock")
+> smc_ib_modify_qp_reset() is not used anymore.
+> 
+> Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
 
-You are right, I misunderstood it. :(
+LGTM, thanks.
 
+Reviewed-by: Tony Lu <tonylu@linux.alibaba.com>
+
+> ---
+>  net/smc/smc_core.h | 1 -
+>  net/smc/smc_ib.h   | 1 -
+>  2 files changed, 2 deletions(-)
+> 
+> diff --git a/net/smc/smc_core.h b/net/smc/smc_core.h
+> index 1645fba0d2d3..3c1b31bfa1cf 100644
+> --- a/net/smc/smc_core.h
+> +++ b/net/smc/smc_core.h
+> @@ -539,7 +539,6 @@ int smc_vlan_by_tcpsk(struct socket *clcsock, struct smc_init_info *ini);
+>  
+>  void smc_conn_free(struct smc_connection *conn);
+>  int smc_conn_create(struct smc_sock *smc, struct smc_init_info *ini);
+> -void smc_lgr_schedule_free_work_fast(struct smc_link_group *lgr);
+>  int smc_core_init(void);
+>  void smc_core_exit(void);
+>  
+> diff --git a/net/smc/smc_ib.h b/net/smc/smc_ib.h
+> index 034295676e88..4df5f8c8a0a1 100644
+> --- a/net/smc/smc_ib.h
+> +++ b/net/smc/smc_ib.h
+> @@ -96,7 +96,6 @@ void smc_ib_destroy_queue_pair(struct smc_link *lnk);
+>  int smc_ib_create_queue_pair(struct smc_link *lnk);
+>  int smc_ib_ready_link(struct smc_link *lnk);
+>  int smc_ib_modify_qp_rts(struct smc_link *lnk);
+> -int smc_ib_modify_qp_reset(struct smc_link *lnk);
+>  int smc_ib_modify_qp_error(struct smc_link *lnk);
+>  long smc_ib_setup_per_ibdev(struct smc_ib_device *smcibdev);
+>  int smc_ib_get_memory_region(struct ib_pd *pd, int access_flags,
+> -- 
+> 2.34.1
 
