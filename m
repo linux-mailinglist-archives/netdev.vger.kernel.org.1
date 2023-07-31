@@ -1,208 +1,125 @@
-Return-Path: <netdev+bounces-22865-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22866-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16D1D769AB8
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 17:23:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 209C8769AEC
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 17:39:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9AB8828121C
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 15:23:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE4172812F3
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 15:39:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8E6718C2C;
-	Mon, 31 Jul 2023 15:23:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB9EB18C2F;
+	Mon, 31 Jul 2023 15:39:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D0B014F8E
-	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 15:23:43 +0000 (UTC)
-Received: from domac.alu.hr (domac.alu.unizg.hr [IPv6:2001:b68:2:2800::3])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C199610E3;
-	Mon, 31 Jul 2023 08:23:41 -0700 (PDT)
-Received: from localhost (localhost [127.0.0.1])
-	by domac.alu.hr (Postfix) with ESMTP id 8D6C96017F;
-	Mon, 31 Jul 2023 17:23:39 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
-	t=1690817019; bh=ISG2jRu84O8tN50xDVnUgYYjLOV7WKIkKxcodfIlYEQ=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=fv57DVGLvEzKk1Izt27ydCPEXF6Nuv/OV/xQUWoDiv3NvevfgD5aO2Hy0W7Q4tG7M
-	 Ttjj45mTWAcaCfhSWJFfjWrU/7orVtf+jR3UPn6HfCjSvZlCUbAQTyjcNlQobFF8fb
-	 xZiicfpv9IYWiKl/vZUIEEFTlKR2UvvCcUOtvKk1AmoyVMPOjoZm23PMMxSGz7PXKZ
-	 U4zCzxnvVDAiLTYQzlHXwGoCdAnyC3CrIj0WpgLR/YqpZ5rIsIXceCrLf5eoOeZkdQ
-	 Bm7Fj4LxCBgMXsslQmUZJ0Mgx1ZUFoqA+ht5lE11QxSvk/ZgCjliCKUSC5PZKNKbqF
-	 GtLmeAfP51aCQ==
-X-Virus-Scanned: Debian amavisd-new at domac.alu.hr
-Received: from domac.alu.hr ([127.0.0.1])
-	by localhost (domac.alu.hr [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 7cjOiumQGmcF; Mon, 31 Jul 2023 17:23:37 +0200 (CEST)
-Received: from [192.168.1.6] (unknown [94.250.191.183])
-	by domac.alu.hr (Postfix) with ESMTPSA id 3F9F560173;
-	Mon, 31 Jul 2023 17:23:37 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
-	t=1690817017; bh=ISG2jRu84O8tN50xDVnUgYYjLOV7WKIkKxcodfIlYEQ=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=LvP8vQ5XgRekhDcciWZXR/hj61jMzI3wku1bjiRW9kHavqUG5+hWdRaxm6y1wxupp
-	 h+9ybpFDqaYOjJDdgIwWMpOKM4cOU4885W3ueEdXYs3uRlAvGXDuL1oIJptppm7wDb
-	 qm/5PeYxS7HUaG9j4u9Ky70U7oKubIP/rT+6lFE/pVvaMLwmuOlq3KiACtsMPFFaWp
-	 +utPu3/rp0EyxKS04qzp8MSKiaGIiXGpCyWuETv1uHWDPcoRqvT9HqCB3IjxfNZSmV
-	 u25VD8ZcGLS47FPd5jbNO7e/wbrLx0jDqAcg/ZyGB8s+HSCQ/a4V4pqz/tZUldSbEC
-	 TCFlusaGUo1Aw==
-Message-ID: <bdc5e82b-596d-d531-7685-0d1e52f2d125@alu.unizg.hr>
-Date: Mon, 31 Jul 2023 17:23:37 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFBF718AFE
+	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 15:39:50 +0000 (UTC)
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA56AE0;
+	Mon, 31 Jul 2023 08:39:49 -0700 (PDT)
+Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36VE2WvD024128;
+	Mon, 31 Jul 2023 15:39:42 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=date : from : to :
+ cc : subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=qcppdkim1; bh=mqdgDMedgXDsMg8vog/VIYIJoUvfxDyZ66BXl2u6HuQ=;
+ b=g0fE7tOx4EndgYJqJ+FBpa4bQFAYy4AUt/FZPB3D8oe3WKxIkSlUxG54/tNGtIfHGxCa
+ gms6vbqoZsEMlYXqePPHfWpeRjx2r6uGwbjQmM2ClHEBhjZ2QnKh+znYN07nvCRYVHD4
+ kK81eKU1aIPP6lPh8NgPdG3sQWTJjlsPR3/ef3Jn1JiMwcYjOh4HNOVJ9xw6yVVf2iio
+ DeJMN9SddbUyacNlDhrTfdrtCUFHyYW+USFHG4tr5LALOXrp4YJ9dirRHTTaww4La1BY
+ GneeeHg7h/bwgTsCHL7oaJDj0lRXMFfj3Ctzvfrx98zGoY/BFTRDOAgbGNnX8A8ObOP1 fA== 
+Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3s6d8grsgy-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 31 Jul 2023 15:39:41 +0000
+Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
+	by NALASPPMTA05.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 36VFdes9000601
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 31 Jul 2023 15:39:40 GMT
+Received: from hu-bjorande-lv.qualcomm.com (10.49.16.6) by
+ nalasex01c.na.qualcomm.com (10.47.97.35) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Mon, 31 Jul 2023 08:39:40 -0700
+Date: Mon, 31 Jul 2023 08:39:38 -0700
+From: Bjorn Andersson <quic_bjorande@quicinc.com>
+To: Andrew Lunn <andrew@lunn.ch>
+CC: Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio
+	<konrad.dybcio@linaro.org>,
+        Chris Lew <quic_clew@quicinc.com>, Alex Elder
+	<elder@kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski
+	<kuba@kernel.org>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>,
+        <linux-remoteproc@vger.kernel.org>
+Subject: Re: [PATCH 2/4] soc: qcom: aoss: Add debugfs interface for sending
+ messages
+Message-ID: <20230731153938.GF1428172@hu-bjorande-lv.qualcomm.com>
+References: <20230731041013.2950307-1-quic_bjorande@quicinc.com>
+ <20230731041013.2950307-3-quic_bjorande@quicinc.com>
+ <21dfb855-8f44-4a4c-9dba-52eb5ae46b9b@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.1
-Subject: Re: [PATCH v1 01/11] selftests: forwarding: custom_multipath_hash.sh:
- add cleanup for SIGTERM sent by timeout
-Content-Language: en-US
-To: Ido Schimmel <idosch@idosch.org>
-Cc: petrm@nvidia.com, razor@blackwall.org, Ido Schimmel <idosch@nvidia.com>,
- netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>
-References: <0550924e-dce9-f90d-df8a-db810fd2499f@alu.unizg.hr>
- <adc5e40d-d040-a65e-eb26-edf47dac5b02@alu.unizg.hr>
- <ZL6OljQubhVtQjcD@shredder>
- <cab8ea8a-98f4-ef9b-4215-e2a93cccaab1@alu.unizg.hr>
- <ZMEQGIOQXv6so30x@shredder>
- <a9b6d9f5-14ae-a931-ab7b-d31b5e40f5df@alu.unizg.hr>
- <ZMYXABUN9OzfN5D3@shredder>
- <da3f4f4e-47a7-25be-fa61-aebeba1d8d0c@alu.unizg.hr>
- <ZMdouQRypZCGZhV0@shredder>
- <2f203995-5ae0-13bc-d1a6-997c2b36a2b8@alu.unizg.hr>
- <ZMei0VMIH/l1GzVM@shredder>
-From: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
-In-Reply-To: <ZMei0VMIH/l1GzVM@shredder>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <21dfb855-8f44-4a4c-9dba-52eb5ae46b9b@lunn.ch>
+X-Originating-IP: [10.49.16.6]
+X-ClientProxiedBy: nalasex01b.na.qualcomm.com (10.47.209.197) To
+ nalasex01c.na.qualcomm.com (10.47.97.35)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: xdBwbo7bfTmDlyBRAK8Mm44zJddJyOlv
+X-Proofpoint-GUID: xdBwbo7bfTmDlyBRAK8Mm44zJddJyOlv
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-07-31_08,2023-07-31_02,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 lowpriorityscore=0
+ bulkscore=0 suspectscore=0 impostorscore=0 spamscore=0 adultscore=0
+ phishscore=0 priorityscore=1501 clxscore=1011 mlxlogscore=961
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2306200000 definitions=main-2307310140
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 7/31/23 14:02, Ido Schimmel wrote:
-
->> NOTE: The error happened because two patches collided. This patch
->>
->> diff --git a/tools/testing/selftests/net/forwarding/lib.sh b/tools/testing/selftests/net/forwarding/lib.sh
->> index 975fc5168c6334..40a8c1541b7f81 100755
->> --- a/tools/testing/selftests/net/forwarding/lib.sh
->> +++ b/tools/testing/selftests/net/forwarding/lib.sh
->> @@ -30,6 +30,7 @@ REQUIRE_MZ=${REQUIRE_MZ:=yes}
->>   REQUIRE_MTOOLS=${REQUIRE_MTOOLS:=no}
->>   STABLE_MAC_ADDRS=${STABLE_MAC_ADDRS:=no}
->>   TCPDUMP_EXTRA_FLAGS=${TCPDUMP_EXTRA_FLAGS:=}
->> +TROUTE6=${TROUTE6:=traceroute6}
->>   relative_path="${BASH_SOURCE%/*}"
->>   if [[ "$relative_path" == "${BASH_SOURCE}" ]]; then
->>
->> and this patch
->>
->> diff --git a/tools/testing/selftests/net/forwarding/lib.sh b/tools/testing/selftests/net/forwarding/lib.sh
->> index 71f7c0c49677..5b0183013017 100755
->> --- a/tools/testing/selftests/net/forwarding/lib.sh
->> +++ b/tools/testing/selftests/net/forwarding/lib.sh
->> @@ -16,8 +16,6 @@ TEAMD=${TEAMD:=teamd}
->>   WAIT_TIME=${WAIT_TIME:=5}
->>   PAUSE_ON_FAIL=${PAUSE_ON_FAIL:=no}
->>   PAUSE_ON_CLEANUP=${PAUSE_ON_CLEANUP:=no}
->> -NETIF_TYPE=${NETIF_TYPE:=veth}
->> -NETIF_CREATE=${NETIF_CREATE:=yes}
->>   MCD=${MCD:=smcrouted}
->>   MC_CLI=${MC_CLI:=smcroutectl}
->>   PING_COUNT=${PING_COUNT:=10}
->> @@ -30,6 +28,20 @@ REQUIRE_MZ=${REQUIRE_MZ:=yes}
->>   REQUIRE_MTOOLS=${REQUIRE_MTOOLS:=no}
->>   STABLE_MAC_ADDRS=${STABLE_MAC_ADDRS:=no}
->>   TCPDUMP_EXTRA_FLAGS=${TCPDUMP_EXTRA_FLAGS:=}
->> +NETIF_TYPE=${NETIF_TYPE:=veth}
->> +NETIF_CREATE=${NETIF_CREATE:=yes}
->> +declare -A NETIFS=(
->> +       [p1]=veth0
->> +       [p2]=veth1
->> +       [p3]=veth2
->> +       [p4]=veth3
->> +       [p5]=veth4
->> +       [p6]=veth5
->> +       [p7]=veth6
->> +       [p8]=veth7
->> +       [p9]=veth8
->> +       [p10]=veth9
->> +)
->>
->>   relative_path="${BASH_SOURCE%/*}"
->>   if [[ "$relative_path" == "${BASH_SOURCE}" ]]; then
->>
->> are not compatible.
->>
->> I have applied the 'require_command $TROUTE6' patch manually.
->>
->> I suppose this is what you intended to have:
->>
->> # Can be overridden by the configuration file.
->> PING=${PING:=ping}
->> PING6=${PING6:=ping6}
->> MZ=${MZ:=mausezahn}
->> ARPING=${ARPING:=arping}
->> TEAMD=${TEAMD:=teamd}
->> WAIT_TIME=${WAIT_TIME:=5}
->> PAUSE_ON_FAIL=${PAUSE_ON_FAIL:=no}
->> PAUSE_ON_CLEANUP=${PAUSE_ON_CLEANUP:=no}
->> MCD=${MCD:=smcrouted}
->> MC_CLI=${MC_CLI:=smcroutectl}
->> PING_COUNT=${PING_COUNT:=10}
->> PING_TIMEOUT=${PING_TIMEOUT:=5}
->> WAIT_TIMEOUT=${WAIT_TIMEOUT:=20}
->> INTERFACE_TIMEOUT=${INTERFACE_TIMEOUT:=600}
->> LOW_AGEING_TIME=${LOW_AGEING_TIME:=1000}
->> REQUIRE_JQ=${REQUIRE_JQ:=yes}
->> REQUIRE_MZ=${REQUIRE_MZ:=yes}
->> REQUIRE_MTOOLS=${REQUIRE_MTOOLS:=no}
->> STABLE_MAC_ADDRS=${STABLE_MAC_ADDRS:=no}
->> TCPDUMP_EXTRA_FLAGS=${TCPDUMP_EXTRA_FLAGS:=}
->> TROUTE6=${TROUTE6:=traceroute6}
->> NETIF_TYPE=${NETIF_TYPE:=veth}
->> NETIF_CREATE=${NETIF_CREATE:=yes}
->> declare -A NETIFS=(
->>         [p1]=veth0
->>         [p2]=veth1
->>         [p3]=veth2
->>         [p4]=veth3
->>         [p5]=veth4
->>         [p6]=veth5
->>         [p7]=veth6
->>         [p8]=veth7
->>         [p9]=veth8
->>         [p10]=veth9
->> )
->>
->> relative_path="${BASH_SOURCE%/*}"
->> if [[ "$relative_path" == "${BASH_SOURCE}" ]]; then
->>          relative_path="."
->> fi
->> ------------------------------------------------
->>
->> Probably for the production patch you would like to have this fixed.
+On Mon, Jul 31, 2023 at 10:21:31AM +0200, Andrew Lunn wrote:
+> On Sun, Jul 30, 2023 at 09:10:11PM -0700, Bjorn Andersson wrote:
+> > From: Chris Lew <clew@codeaurora.org>
+> > 
+> > In addition to the normal runtime commands, the Always On Processor
+> > (AOP) provides a number of debug commands which can be used during
+> > system debugging for things such as preventing power collapse or placing
+> > floor votes for certain resources. Some of these are documented in the
+> > Robotics RB5 "Debug AOP ADB" linked below.
+> > 
+> > Provide a debugfs interface for the developer/tester to send these
+> > commands to the AOP.
 > 
-> No, I don't intend to submit the patch that automatically creates the
-> veth pairs. It is superseded by "selftests: forwarding: Skip test when
-> no interfaces are specified".
+> This sort of sending arbitrary binary blob commands is not liked,
+> since it allow user space closed source drivers. At minimum, please
+> provide a file per command, with the kernel marshalling parameters
+> into the binary format, and decoding any returned values.
+> 
 
-It is your call, but consider that the majority of testers will use the default setup
-and maybe grep "not ok" messages in the log, because the amount of logs is overwhelming.
+Thanks for your input Andrew, that is a valid concern.
 
-Knowing that there is "forwarding.config.sample" probably requires in-depth knowledge
-of the selftest net/forwarding bundle and maybe direct hint from the developers?
+The interface is in debugfs and as such wouldn't be suitable for closed
+source drivers, as in the majority of our shipping software debugfs
+isn't enabled.
 
-Kind regards,
-Mirsad
+Regards,
+Bjorn
 
