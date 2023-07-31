@@ -1,201 +1,266 @@
-Return-Path: <netdev+bounces-22773-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22775-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C5DD769242
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 11:49:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 628F376925D
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 11:53:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1E3842812DF
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 09:49:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1DB00281498
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 09:53:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59F5B17AAB;
-	Mon, 31 Jul 2023 09:49:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AB0417AB5;
+	Mon, 31 Jul 2023 09:52:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D1921774A
-	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 09:49:43 +0000 (UTC)
-Received: from mail-yw1-x1141.google.com (mail-yw1-x1141.google.com [IPv6:2607:f8b0:4864:20::1141])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0AF91728;
-	Mon, 31 Jul 2023 02:49:22 -0700 (PDT)
-Received: by mail-yw1-x1141.google.com with SMTP id 00721157ae682-5862a6ae535so7083227b3.0;
-        Mon, 31 Jul 2023 02:49:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690796962; x=1691401762;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ij1aV1fmuLlyqs7lKmMEeDIzZHYRrbZXBxEfq4EEuvo=;
-        b=oACT52WzGLPino7hBFYPcDzYfRg5+dAt3Z7rN2YCnE9zYuvYjI4avIqCwGh3XDH3c4
-         24kHbhbTJNcwibv4du9VQ2JKfzmqBhnXC7CySyW6+C/VKYHFsaNzQVeMIHR/hRuw+aOB
-         mnar+ZwKu7goyhIFjlguHw8LiRdVgrigvEh4DaTuE2OvP/Yz2oAu3MwidU6pNDUg8+1r
-         1MemsQVNeEY3rRHFhMJGdlzjXAJ+AmDpjOgv4e0rIXno2g3V9zV2gP3PiORVJ4zO+8MJ
-         mMxBihy8DF/ad0ml5FbA4QH+ynaqPJceTaBV3Wc1VgzAQgNpCIgpIm4QAmK3/A1QwBfC
-         Tm7w==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1878A17AAF
+	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 09:52:58 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3F39173E
+	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 02:52:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1690797123;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=LHyoZhH8+rWHm75lx4Eud7s39jwS+scUBib6BLzaSL8=;
+	b=VSChxRh62whxY05aOLxyuW2MLNvINM1p0hjCqJpjbw1n+RS/CvO+/y/uZTigo1Tk94x1Ns
+	acf3curSSIOhiCmbPaB1/DHtL8qL84+8FdN3M8VK8UZ964zmJPWbrnqxCTp5jqvdQVhIiv
+	fyOxH9yTceencb1+IHd+b/TXpFY7Hv0=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-643-SLdgD_ENNBq7iud-n8JeJA-1; Mon, 31 Jul 2023 05:52:02 -0400
+X-MC-Unique: SLdgD_ENNBq7iud-n8JeJA-1
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-978a991c3f5so328917066b.0
+        for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 02:52:02 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690796962; x=1691401762;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ij1aV1fmuLlyqs7lKmMEeDIzZHYRrbZXBxEfq4EEuvo=;
-        b=anwB2IVhn2oXRKc9y5voCepzQyNGp5BFw7pK+YcZ3FBL9g7T1NkxkO6E+h4yx2XTt8
-         nC1jmgjbgx1yJh7t36QWD5vY1aouvXsF4CbNHOPqkNvz24quH8/02FRbR22DpmyW5dk3
-         f45klQzqgz+p4UsDSejsuWDUi9aUHGOl1gvbdNvF5rpefR3EQWu67FupL81Su/pSjuLi
-         CLE0LLBPlkRLelpMZzD3KAO5lqFiCXHDGN/AojzUfkaf7uG1PWRkV/ELlVVKEWV5h9OO
-         ZRzqU/YTPP48Yql2WufwTOPGOyQXZnpEE3BItM2ptnFT0IhSKCzwPZ/8pUb1s51LzDWf
-         y9ZA==
-X-Gm-Message-State: ABy/qLZvRoQOk9371kj0nMLaSHE+5eSLqP65aVX6adPfln8j3HYlYgAi
-	mg+UuPKV5SnqP/cSkKQYerA59OPdYCgGYxMrzQw=
-X-Google-Smtp-Source: APBJJlFQMtAm05z6LaJtyfZIUM6HxyewJB6FcXrdRCnrtHER1wJkgVIc69uw1uXY3afJuAuz5iRdJLN0CchcGOa7keE=
-X-Received: by 2002:a25:8b04:0:b0:d2c:763d:1253 with SMTP id
- i4-20020a258b04000000b00d2c763d1253mr3841264ybl.46.1690796961681; Mon, 31 Jul
- 2023 02:49:21 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1690797121; x=1691401921;
+        h=content-transfer-encoding:in-reply-to:references:to
+         :content-language:subject:cc:user-agent:mime-version:date:message-id
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=LHyoZhH8+rWHm75lx4Eud7s39jwS+scUBib6BLzaSL8=;
+        b=ETr1J61//m0A54OMCwBFkt1bQUk2Qy+PshXNe6mszZnBz44jG0myiAE6BjVHmc35NC
+         BVmGg9XbPTYJWzuXR/+aPaGusvSHuN43WELnSa6+SMbtL//rrS+J0eGRd4oDzYSygwMX
+         dmpTAFh9wrHb8HZDoXYHphzyhudarYwV9AdsYrwpq5BvmmhKlbv7Ebi2LAqcuhZz3hDC
+         MibGXJh0aQvDFb0Aaw1M8RCnSzbQWgWsFjOvCA3wLYZg+M7Nh9vWt7OO887qXMjLiCWK
+         4MbviQlRCFAVGKCUOud+0IvloyqF2MEx4ol903VqtL+xjTuwMIuCWzC+jZdS/gkHGf4h
+         85jw==
+X-Gm-Message-State: ABy/qLYkXNJMa4xGuYbp5mQvCl3hbLa7QuROoN7aWUFvDYbptZKBq6zI
+	oVl5xhTURbZH7u8Z/VDuzO5yDRdx61c2MQhtUnYncVut6RVBjTQ3zdUh0Vd7fHRWL1y3gbW9gl/
+	4ZswFdBTEEMhDnk3I
+X-Received: by 2002:a17:907:2712:b0:97e:aace:b6bc with SMTP id w18-20020a170907271200b0097eaaceb6bcmr6270391ejk.53.1690797121262;
+        Mon, 31 Jul 2023 02:52:01 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlF+lJ+udhTNe6nab3lH6QYmvgenXCWZfaeQwpPpwvLmoUQFAzutESgLYvoc3XHCIuvGqBOLtQ==
+X-Received: by 2002:a17:907:2712:b0:97e:aace:b6bc with SMTP id w18-20020a170907271200b0097eaaceb6bcmr6270377ejk.53.1690797120879;
+        Mon, 31 Jul 2023 02:52:00 -0700 (PDT)
+Received: from [192.168.42.222] (194-45-78-10.static.kviknet.net. [194.45.78.10])
+        by smtp.gmail.com with ESMTPSA id h15-20020a1709063c0f00b009929ab17be0sm5925438ejg.162.2023.07.31.02.51.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 31 Jul 2023 02:52:00 -0700 (PDT)
+From: Jesper Dangaard Brouer <jbrouer@redhat.com>
+X-Google-Original-From: Jesper Dangaard Brouer <brouer@redhat.com>
+Message-ID: <7c1d0b76-2898-89ea-eb0a-1151e0654de8@redhat.com>
+Date: Mon, 31 Jul 2023 11:51:58 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230727125125.1194376-1-imagedong@tencent.com>
- <20230727125125.1194376-4-imagedong@tencent.com> <CANn89iKWTrgEp3QY34mNqVAx09fSxHUh+oHRTd6=aWurGS7qWA@mail.gmail.com>
- <CADxym3YhjMv3Xkts99fiajq-cR-BqxDayKFzFZ1L49BNfFXkdw@mail.gmail.com>
- <CADVnQynQ1Hw+Jh7pjdNw_Mo4tWZV8V_sA+L-o=O4uV+9Gv7Prg@mail.gmail.com>
- <CADxym3Zqb2CCpJojGiT7gVL98GDdOmjxqLY6ApLeP2zZU1Kn3Q@mail.gmail.com>
- <CANn89i+WnwgpGy4v=aXsjThPBA2FQzWx9Y=ycXWWGLDdtDHBig@mail.gmail.com>
- <CADVnQy=OumgmsbsQ8QLhUiyUNN95Ay2guVjgGVVLH93QXanBSw@mail.gmail.com> <CADVnQynwrvdoEH2d7VVNSG6vHg8BC5ikz+PApOOMG4Eo3MqSww@mail.gmail.com>
-In-Reply-To: <CADVnQynwrvdoEH2d7VVNSG6vHg8BC5ikz+PApOOMG4Eo3MqSww@mail.gmail.com>
-From: Menglong Dong <menglong8.dong@gmail.com>
-Date: Mon, 31 Jul 2023 17:49:10 +0800
-Message-ID: <CADxym3Y7kF9rT+PL6SE_tZFi2Q1CXqhz9e66F1kckcYtMmEkuQ@mail.gmail.com>
-Subject: Re: [PATCH net-next 3/3] net: tcp: check timeout by
- icsk->icsk_timeout in tcp_retransmit_timer()
-To: Neal Cardwell <ncardwell@google.com>, Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	dsahern@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Menglong Dong <imagedong@tencent.com>, Yuchung Cheng <ycheng@google.com>, 
-	Soheil Hassas Yeganeh <soheil@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Cc: brouer@redhat.com, netdev@vger.kernel.org,
+ "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@gmail.com>,
+ =?UTF-8?Q?Toke_H=c3=b8iland-J=c3=b8rgensen?= <toke@redhat.com>,
+ Martin KaFai Lau <martin.lau@linux.dev>,
+ Alexei Starovoitov <alexei.starovoitov@gmail.com>,
+ Andrii Nakryiko <andrii@kernel.org>, Song Liu <song@kernel.org>,
+ Hao Luo <haoluo@google.com>, Yonghong Song <yonghong.song@linux.dev>,
+ Daniel Borkmann <daniel@iogearbox.net>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@google.com>, Jiri Olsa <jolsa@kernel.org>,
+ Pu Lehui <pulehui@huawei.com>, houtao1@huawei.com
+Subject: Re: [PATCH bpf 1/2] bpf, cpumap: Make sure kthread is running before
+ map update returns
+Content-Language: en-US
+To: Hou Tao <houtao@huaweicloud.com>, bpf@vger.kernel.org
+References: <20230729095107.1722450-1-houtao@huaweicloud.com>
+ <20230729095107.1722450-2-houtao@huaweicloud.com>
+In-Reply-To: <20230729095107.1722450-2-houtao@huaweicloud.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sat, Jul 29, 2023 at 1:15=E2=80=AFAM Neal Cardwell <ncardwell@google.com=
-> wrote:
->
-> On Fri, Jul 28, 2023 at 7:25=E2=80=AFAM Neal Cardwell <ncardwell@google.c=
-om> wrote:
-> >
-> > On Fri, Jul 28, 2023 at 1:50=E2=80=AFAM Eric Dumazet <edumazet@google.c=
-om> wrote:
-> > >
-> > > On Fri, Jul 28, 2023 at 8:25=E2=80=AFAM Menglong Dong <menglong8.dong=
-@gmail.com> wrote:
-> > > >
-> > > > On Fri, Jul 28, 2023 at 12:44=E2=80=AFPM Neal Cardwell <ncardwell@g=
-oogle.com> wrote:
-> > > > >
-> > > > > On Thu, Jul 27, 2023 at 7:57=E2=80=AFPM Menglong Dong <menglong8.=
-dong@gmail.com> wrote:
-> > > > > >
-> > > > > > On Fri, Jul 28, 2023 at 3:31=E2=80=AFAM Eric Dumazet <edumazet@=
-google.com> wrote:
-> > > > > > >
-> > > > > > > On Thu, Jul 27, 2023 at 2:52=E2=80=AFPM <menglong8.dong@gmail=
-.com> wrote:
-> > > > > > > >
-> > > > > > > > From: Menglong Dong <imagedong@tencent.com>
-> > > > > > > >
-> > > > > > > > In tcp_retransmit_timer(), a window shrunk connection will =
-be regarded
-> > > > > > > > as timeout if 'tcp_jiffies32 - tp->rcv_tstamp > TCP_RTO_MAX=
-'. This is not
-> > > > > > > > right all the time.
-> > > > > > > >
-> > > > > > > > The retransmits will become zero-window probes in tcp_retra=
-nsmit_timer()
-> > > > > > > > if the 'snd_wnd=3D=3D0'. Therefore, the icsk->icsk_rto will=
- come up to
-> > > > > > > > TCP_RTO_MAX sooner or later.
-> > > > > > > >
-> > > > > > > > However, the timer is not precise enough, as it base on tim=
-er wheel.
-> > > > > > > > Sorry that I am not good at timer, but I know the concept o=
-f time-wheel.
-> > > > > > > > The longer of the timer, the rougher it will be. So the tim=
-eout is not
-> > > > > > > > triggered after TCP_RTO_MAX, but 122877ms as I tested.
-> > > > > > > >
-> > > > > > > > Therefore, 'tcp_jiffies32 - tp->rcv_tstamp > TCP_RTO_MAX' i=
-s always true
-> > > > > > > > once the RTO come up to TCP_RTO_MAX.
-> > > > > > > >
-> > > > > > > > Fix this by replacing the 'tcp_jiffies32' with '(u32)icsk->=
-icsk_timeout',
-> > > > > > > > which is exact the timestamp of the timeout.
-> > > > > > > >
-> > > > > > > > Signed-off-by: Menglong Dong <imagedong@tencent.com>
-> > > > > > > > ---
-> > > > > > > >  net/ipv4/tcp_timer.c | 6 +++++-
-> > > > > > > >  1 file changed, 5 insertions(+), 1 deletion(-)
-> > > > > > > >
-> > > > > > > > diff --git a/net/ipv4/tcp_timer.c b/net/ipv4/tcp_timer.c
-> > > > > > > > index 470f581eedd4..3a20db15a186 100644
-> > > > > > > > --- a/net/ipv4/tcp_timer.c
-> > > > > > > > +++ b/net/ipv4/tcp_timer.c
-> > > > > > > > @@ -511,7 +511,11 @@ void tcp_retransmit_timer(struct sock =
-*sk)
-> > > > > > > >                                             tp->snd_una, tp=
-->snd_nxt);
-> > > > > > > >                 }
-> > > > > > > >  #endif
-> > > > > > > > -               if (tcp_jiffies32 - tp->rcv_tstamp > TCP_RT=
-O_MAX) {
-> > > > > > > > +               /* It's a little rough here, we regard any =
-valid packet that
-> > > > > > > > +                * update tp->rcv_tstamp as the reply of th=
-e retransmitted
-> > > > > > > > +                * packet.
-> > > > > > > > +                */
-> > > > > > > > +               if ((u32)icsk->icsk_timeout - tp->rcv_tstam=
-p > TCP_RTO_MAX) {
-> > > > > > > >                         tcp_write_err(sk);
-> > > > > > > >                         goto out;
-> > > > > > > >                 }
->
-> One potential pre-existing issue with this logic: if the connection is
-> restarting from idle, then tp->rcv_tstamp could already be a long time
-> (minutes or hours) in the past even on the first RTO, in which case
-> the very first RTO that found a zero tp->snd_wnd  would find this
-> check returns true, and would destroy the connection immediately. This
-> seems extremely brittle.
->
-> AFAICT it would be safer to replace this logic with a call to the
-> standard tcp_write_timeout() logic that has a more robust check to see
-> if the connection should be destroyed.
 
-How about we check it with:
+On 29/07/2023 11.51, Hou Tao wrote:
+> From: Hou Tao <houtao1@huawei.com>
+> 
+> The following warning was reported when running stress-mode enabled
+> xdp_redirect_cpu with some RT threads:
 
-icsk->icsk_timeout - max(tp->retrans_stamp, tp->rcv_tstamp) > TCP_RTO_MAX
+Cool stress-mode test that leverage RT to provoke this.
 
-?
+> 
+>    ------------[ cut here ]------------
+>    WARNING: CPU: 4 PID: 65 at kernel/bpf/cpumap.c:135
+>    CPU: 4 PID: 65 Comm: kworker/4:1 Not tainted 6.5.0-rc2+ #1
 
-Therefore, we don't need to do a lot of modification. I have to
-say that the way we check here is rough, and a simple loss
-of the retransmitted packet or the ACK can cause the die
-of the socket.
+As you mention RT, I want to mention that it also possible to change the
+sched prio on the kthread PID.
 
-Maybe we need a more perfect way here? which may introduce
-a certain amount of modification.
+>    Hardware name: QEMU Standard PC (i440FX + PIIX, 1996)
+>    Workqueue: events cpu_map_kthread_stop
+>    RIP: 0010:put_cpu_map_entry+0xda/0x220
+>    ......
+>    Call Trace:
+>     <TASK>
+>     ? show_regs+0x65/0x70
+>     ? __warn+0xa5/0x240
+>     ......
+>     ? put_cpu_map_entry+0xda/0x220
+>     cpu_map_kthread_stop+0x41/0x60
+>     process_one_work+0x6b0/0xb80
+>     worker_thread+0x96/0x720
+>     kthread+0x1a5/0x1f0
+>     ret_from_fork+0x3a/0x70
+>     ret_from_fork_asm+0x1b/0x30
+>     </TASK>
+> 
+> The root cause is the same as commit 436901649731 ("bpf: cpumap: Fix memory
+> leak in cpu_map_update_elem"). The kthread is stopped prematurely by
+> kthread_stop() in cpu_map_kthread_stop(), and kthread() doesn't call
+> cpu_map_kthread_run() at all but XDP program has already queued some
+> frames or skbs into ptr_ring. So when __cpu_map_ring_cleanup() checks
+> the ptr_ring, it will find it was not emptied and report a warning.
+> 
+> An alternative fix is to use __cpu_map_ring_cleanup() to drop these
+> pending frames or skbs when kthread_stop() returns -EINTR, but it may
+> confuse the user, because these frames or skbs have been handled
+> correctly by XDP program. So instead of dropping these frames or skbs,
+> just make sure the per-cpu kthread is running before
+> __cpu_map_entry_alloc() returns.
+> 
+> After apply the fix, the error handle for kthread_stop() will be
+> unnecessary because it will always return 0, so just remove it.
+> 
+> Fixes: 6710e1126934 ("bpf: introduce new bpf cpu map type BPF_MAP_TYPE_CPUMAP")
+> Signed-off-by: Hou Tao <houtao1@huawei.com>
 
-BTW, should I split out this patch from this series?
+Acked-by: Jesper Dangaard Brouer <hawk@kernel.org>
 
->
-> neal
+Thanks for catching this!
+
+> ---
+>   kernel/bpf/cpumap.c | 21 +++++++++++----------
+>   1 file changed, 11 insertions(+), 10 deletions(-)
+> 
+> diff --git a/kernel/bpf/cpumap.c b/kernel/bpf/cpumap.c
+> index 0a16e30b16ef..08351e0863e5 100644
+> --- a/kernel/bpf/cpumap.c
+> +++ b/kernel/bpf/cpumap.c
+> @@ -28,6 +28,7 @@
+>   #include <linux/sched.h>
+>   #include <linux/workqueue.h>
+>   #include <linux/kthread.h>
+> +#include <linux/completion.h>
+>   #include <trace/events/xdp.h>
+>   #include <linux/btf_ids.h>
+>   
+> @@ -71,6 +72,7 @@ struct bpf_cpu_map_entry {
+>   	struct rcu_head rcu;
+>   
+>   	struct work_struct kthread_stop_wq;
+> +	struct completion kthread_running;
+>   };
+>   
+>   struct bpf_cpu_map {
+> @@ -151,7 +153,6 @@ static void put_cpu_map_entry(struct bpf_cpu_map_entry *rcpu)
+>   static void cpu_map_kthread_stop(struct work_struct *work)
+>   {
+>   	struct bpf_cpu_map_entry *rcpu;
+> -	int err;
+>   
+>   	rcpu = container_of(work, struct bpf_cpu_map_entry, kthread_stop_wq);
+>   
+> @@ -161,14 +162,7 @@ static void cpu_map_kthread_stop(struct work_struct *work)
+>   	rcu_barrier();
+>   
+>   	/* kthread_stop will wake_up_process and wait for it to complete */
+> -	err = kthread_stop(rcpu->kthread);
+> -	if (err) {
+> -		/* kthread_stop may be called before cpu_map_kthread_run
+> -		 * is executed, so we need to release the memory related
+> -		 * to rcpu.
+> -		 */
+> -		put_cpu_map_entry(rcpu);
+> -	}
+> +	kthread_stop(rcpu->kthread);
+>   }
+>   
+>   static void cpu_map_bpf_prog_run_skb(struct bpf_cpu_map_entry *rcpu,
+> @@ -296,11 +290,11 @@ static int cpu_map_bpf_prog_run(struct bpf_cpu_map_entry *rcpu, void **frames,
+>   	return nframes;
+>   }
+>   
+> -
+>   static int cpu_map_kthread_run(void *data)
+>   {
+>   	struct bpf_cpu_map_entry *rcpu = data;
+>   
+> +	complete(&rcpu->kthread_running);
+>   	set_current_state(TASK_INTERRUPTIBLE);
+>   
+
+Diff is missing next lines that show this is correct.
+I checked this manually and for other reviewers here are the next lines:
+
+	set_current_state(TASK_INTERRUPTIBLE);
+
+	/* When kthread gives stop order, then rcpu have been disconnected
+	 * from map, thus no new packets can enter. Remaining in-flight
+	 * per CPU stored packets are flushed to this queue.  Wait honoring
+	 * kthread_stop signal until queue is empty.
+	 */
+	while (!kthread_should_stop() || !__ptr_ring_empty(rcpu->queue)) {
+
+The patch is correct in setting complete(&rcpu->kthread_running) before
+the while-loop, as the code also checks if ptr_ring is not empty.
+
+
+>   	/* When kthread gives stop order, then rcpu have been disconnected
+> @@ -465,6 +459,7 @@ __cpu_map_entry_alloc(struct bpf_map *map, struct bpf_cpumap_val *value,
+>   		goto free_ptr_ring;
+>   
+>   	/* Setup kthread */
+> +	init_completion(&rcpu->kthread_running);
+>   	rcpu->kthread = kthread_create_on_node(cpu_map_kthread_run, rcpu, numa,
+>   					       "cpumap/%d/map:%d", cpu,
+>   					       map->id);
+> @@ -478,6 +473,12 @@ __cpu_map_entry_alloc(struct bpf_map *map, struct bpf_cpumap_val *value,
+>   	kthread_bind(rcpu->kthread, cpu);
+>   	wake_up_process(rcpu->kthread);
+>   
+> +	/* Make sure kthread has been running, so kthread_stop() will not
+> +	 * stop the kthread prematurely and all pending frames or skbs
+> +	 * will be handled by the kthread before kthread_stop() returns.
+> +	 */
+> +	wait_for_completion(&rcpu->kthread_running);
+> +
+>   	return rcpu;
+>   
+>   free_prog:
+
 
