@@ -1,155 +1,184 @@
-Return-Path: <netdev+bounces-22845-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22846-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F0EC769943
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 16:18:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E9A1769950
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 16:21:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 695161C20C03
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 14:18:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 55A392813D2
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 14:21:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7EC418B07;
-	Mon, 31 Jul 2023 14:18:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 251F818B0D;
+	Mon, 31 Jul 2023 14:21:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F8A114F92
-	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 14:18:36 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A06F8C433CC;
-	Mon, 31 Jul 2023 14:18:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690813116;
-	bh=roJWAQyv2E5qkTUrOOBL4JF3wGCSEwvRkjeyvGDMfgA=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=LJMq0mlLdbjKpQanOwpGJlkLgCigH2wg+fO3BVZxtnEV2DQwl/eUo1FpJyYmuwMqE
-	 HEG898Nl5MjGZngHWqLpaK+CfiiVDlRNwaoxRD+9t4IBC+vuQn19pMS2e9+I2/R+yl
-	 s4xPjn9HDHVeSeQWjhpfL54OyHWfiKBAcsN+7q4rcLKykjjZ04Pq8XqOS1XyWfR3bC
-	 KI8zPjPgKRfREnh52p23R4g4VwSnhjp1gxZyLLengURf37CMgjvgJmj8RsWkOe0rjq
-	 eCBChPkl/Gb89eyN+vT5YC9lA+NHRbjOYLqCl5/6Eboq85dSn9iCqHR8qnbBQV81pf
-	 ugTBFE4IcuwUA==
-Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2b9c66e2e36so50972131fa.1;
-        Mon, 31 Jul 2023 07:18:36 -0700 (PDT)
-X-Gm-Message-State: ABy/qLaWfLi81sQtXwlPWGvFUetn1S2S7PIwdwZxRwcf2YyulocScvPG
-	yq8DZ0gGPjXVaKJeAgiJhi+ENB7BKWA1diYNzkk=
-X-Google-Smtp-Source: APBJJlEvkn1wHuYbYL8ntPekVB8VTmJ6TTXSwPpnDfTAJ0HYisyFNw9wh3socjCfnvnSVFOES7Il26opS+oE9Y5+jpI=
-X-Received: by 2002:a2e:a27b:0:b0:2b9:aad7:9d89 with SMTP id
- k27-20020a2ea27b000000b002b9aad79d89mr5322200ljm.15.1690813114640; Mon, 31
- Jul 2023 07:18:34 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1980914F92
+	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 14:21:15 +0000 (UTC)
+Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2145F12D
+	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 07:21:14 -0700 (PDT)
+Received: by mail-pf1-x435.google.com with SMTP id d2e1a72fcca58-686ea67195dso3212662b3a.2
+        for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 07:21:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1690813273; x=1691418073;
+        h=mime-version:message-id:date:subject:cc:to:from:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=XCN/UrKZMKkfkRdbaNpbnd/TOnSSjJRTA1ES7lKnkbs=;
+        b=DB5MoKAqLrvk3viwTHjffGoAQjBur/flNioSdIRU22/bMyn5lVm9JSfVFQi3y8JtMR
+         NMCXHZzqhiDB8x61NTFUJAkVzSnXfKCA6h8F2c1qPE/vcE4lQVGYVRVW1zu50G2flqA6
+         e5EJ0d9HMLQIvTnfeUDHKKSNY4UsSOnS5ym4Q=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690813273; x=1691418073;
+        h=mime-version:message-id:date:subject:cc:to:from:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=XCN/UrKZMKkfkRdbaNpbnd/TOnSSjJRTA1ES7lKnkbs=;
+        b=LAizgktJsHhcVHLTPxymCxHiKPGVoJ58PfHDjegz0S9fe/+A7F3oh7cgodOcxWhS7z
+         fE0QWd6zCE3R40BpEgaonkoD9k63g75nNHnDASbIWz1OGwV5kUokSPJ8ji4WN4f8RVNn
+         U/a1SL3ArKKvERVFacNFlbqrAZTn3iKerBTqFaFRlETCDaeNOpwgfND8IIw1VPD9LNzP
+         Ok3fI425R9IhqW2g1qdgqKL9mqT0qwxw2qcY1GWNW7Db0Be2xlHfeORaYRHl+OgfNY8L
+         LS4cjGJAk4z97SEnLNYLH3JwqCJVbPRkPLtcKx0Gdd04eV9vDu8hjeldPjM434/bKirh
+         ANuQ==
+X-Gm-Message-State: ABy/qLYQDmqSNlVDpHgXeRtiyU1XRvTdOwnKdfr7kCCse45+ydEE6AvN
+	xalUhxjQUBlN1inT0vldoxJ17ogNUaWtEsWMW3E=
+X-Google-Smtp-Source: APBJJlEdWPJN4hsI9u6pUKgTmy1cRMBjEwclpMPyfXui6YayZQtoVHK5zaFbE5EnTIVZQkYHsijycw==
+X-Received: by 2002:a05:6a00:891:b0:64f:aea5:7b49 with SMTP id q17-20020a056a00089100b0064faea57b49mr12552230pfj.17.1690813273075;
+        Mon, 31 Jul 2023 07:21:13 -0700 (PDT)
+Received: from lvnvda5233.lvn.broadcom.net ([192.19.161.250])
+        by smtp.gmail.com with ESMTPSA id k12-20020aa790cc000000b00682c1db7551sm5509924pfk.49.2023.07.31.07.21.11
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 31 Jul 2023 07:21:12 -0700 (PDT)
+From: Michael Chan <michael.chan@broadcom.com>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	gospo@broadcom.com,
+	bpf@vger.kernel.org,
+	somnath.kotur@broadcom.com
+Subject: [PATCH net 0/2] bnxt_en: 2 XDP bug fixes
+Date: Mon, 31 Jul 2023 07:20:41 -0700
+Message-Id: <20230731142043.58855-1-michael.chan@broadcom.com>
+X-Mailer: git-send-email 2.32.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAAUqJDuRkHE8fPgZJGaKjUjd3QfGwzfumuJBmStPqBhubxyk_A@mail.gmail.com>
- <97730.1690408399@warthog.procyon.org.uk>
-In-Reply-To: <97730.1690408399@warthog.procyon.org.uk>
-From: Ard Biesheuvel <ardb@kernel.org>
-Date: Mon, 31 Jul 2023 16:18:22 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXHs_09b8UY7BsFQtxg1Rv6a3vfSRLFJT58Sn+MUevXi6g@mail.gmail.com>
-Message-ID: <CAMj1kXHs_09b8UY7BsFQtxg1Rv6a3vfSRLFJT58Sn+MUevXi6g@mail.gmail.com>
-Subject: Re: [PATCH] crypto: Fix missing initialisation affecting gcm-aes-s390
-To: David Howells <dhowells@redhat.com>
-Cc: =?UTF-8?B?T25kcmVqIE1vc27DocSNZWs=?= <omosnacek@gmail.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, Paolo Abeni <pabeni@redhat.com>, 
-	Sven Schnelle <svens@linux.ibm.com>, Harald Freudenberger <freude@linux.vnet.ibm.com>, 
-	Bagas Sanjaya <bagasdotme@gmail.com>, linux-crypto@vger.kernel.org, 
-	linux-s390@vger.kernel.org, netdev@vger.kernel.org, 
-	regressions@lists.linux.dev, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="0000000000009251a40601c92481"
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,MIME_NO_TEXT,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+	autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Wed, 26 Jul 2023 at 23:54, David Howells <dhowells@redhat.com> wrote:
->
->
-> Fix af_alg_alloc_areq() to initialise areq->first_rsgl.sgl.sgt.sgl to poi=
-nt
-> to the scatterlist array in areq->first_rsgl.sgl.sgl.
->
-> Without this, the gcm-aes-s390 driver will oops when it tries to do
-> gcm_walk_start() on req->dst because req->dst is set to the value of
-> areq->first_rsgl.sgl.sgl by _aead_recvmsg() calling
-> aead_request_set_crypt().
->
-> The problem comes if an empty ciphertext is passed: the loop in
-> af_alg_get_rsgl() just passes straight out and doesn't set areq->first_rs=
-gl
-> up.
->
-> This isn't a problem on x86_64 using gcmaes_crypt_by_sg() because, as far
-> as I can tell, that ignores req->dst and only uses req->src[*].
->
-> [*] Is this a bug in aesni-intel_glue.c?
->
+--0000000000009251a40601c92481
+Content-Transfer-Encoding: 8bit
 
-It uses req->src directly only for processing the additional
-authenticated data (AAD) which contributes to the MAC but not to the
-ciphertext. Conceptually, there is no dst only src for this part, and
-only the IPsec specific encapsulations of GCM and CCM etc do a plain
-memcpy of src to dst (if src and dst do not refer to the same
-scatterlist already). Otherwise, the AAD is not considered to be part
-of the output.
+The first patch fixes XDP page pool logic on systems with page size >=
+64K.  The second patch fixes the max_mtu setting when an XDP program
+supporting multi buffers is attached.
 
-The actual encryption logic does use both src and dst, but under the
-hood (inside the skcipher walk helpers)
+Michael Chan (1):
+  bnxt_en: Fix max_mtu setting for multi-buf XDP
+
+Somnath Kotur (1):
+  bnxt_en: Fix page pool logic for page size >= 64K
+
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 59 +++++++++++--------
+ drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c |  6 +-
+ 2 files changed, 39 insertions(+), 26 deletions(-)
+
+-- 
+2.30.1
 
 
+--0000000000009251a40601c92481
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
 
-> The s390x oops looks something like:
->
->  Unable to handle kernel pointer dereference in virtual kernel address sp=
-ace
->  Failing address: 0000000a00000000 TEID: 0000000a00000803
->  Fault in home space mode while using kernel ASCE.
->  AS:00000000a43a0007 R3:0000000000000024
->  Oops: 003b ilc:2 [#1] SMP
->  ...
->  Call Trace:
->   [<000003ff7fc3d47e>] gcm_walk_start+0x16/0x28 [aes_s390]
->   [<00000000a2a342f2>] crypto_aead_decrypt+0x9a/0xb8
->   [<00000000a2a60888>] aead_recvmsg+0x478/0x698
->   [<00000000a2e519a0>] sock_recvmsg+0x70/0xb0
->   [<00000000a2e51a56>] sock_read_iter+0x76/0xa0
->   [<00000000a273e066>] vfs_read+0x26e/0x2a8
->   [<00000000a273e8c4>] ksys_read+0xbc/0x100
->   [<00000000a311d808>] __do_syscall+0x1d0/0x1f8
->   [<00000000a312ff30>] system_call+0x70/0x98
->  Last Breaking-Event-Address:
->   [<000003ff7fc3e6b4>] gcm_aes_crypt+0x104/0xa68 [aes_s390]
->
-> Fixes: c1abe6f570af ("crypto: af_alg: Use extract_iter_to_sg() to create =
-scatterlists")
-> Reported-by: Ondrej Mosn=C3=A1=C4=8Dek <omosnacek@gmail.com>
-> Link: https://lore.kernel.org/r/CAAUqJDuRkHE8fPgZJGaKjUjd3QfGwzfumuJBmStP=
-qBhubxyk_A@mail.gmail.com/
-> Signed-off-by: David Howells <dhowells@redhat.com>
-> cc: Herbert Xu <herbert@gondor.apana.org.au>
-> cc: Sven Schnelle <svens@linux.ibm.com>
-> cc: Harald Freudenberger <freude@linux.vnet.ibm.com>
-> cc: "David S. Miller" <davem@davemloft.net>
-> cc: Paolo Abeni <pabeni@redhat.com>
-> cc: linux-crypto@vger.kernel.org
-> cc: linux-s390@vger.kernel.org
-> cc: regressions@lists.linux.dev
-> ---
->  crypto/af_alg.c |    1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/crypto/af_alg.c b/crypto/af_alg.c
-> index 06b15b9f661c..9ee8575d3b1a 100644
-> --- a/crypto/af_alg.c
-> +++ b/crypto/af_alg.c
-> @@ -1192,6 +1192,7 @@ struct af_alg_async_req *af_alg_alloc_areq(struct s=
-ock *sk,
->
->         areq->areqlen =3D areqlen;
->         areq->sk =3D sk;
-> +       areq->first_rsgl.sgl.sgt.sgl =3D areq->first_rsgl.sgl.sgl;
->         areq->last_rsgl =3D NULL;
->         INIT_LIST_HEAD(&areq->rsgl_list);
->         areq->tsgl =3D NULL;
->
+MIIQbQYJKoZIhvcNAQcCoIIQXjCCEFoCAQExDzANBglghkgBZQMEAgEFADALBgkqhkiG9w0BBwGg
+gg3EMIIFDTCCA/WgAwIBAgIQeEqpED+lv77edQixNJMdADANBgkqhkiG9w0BAQsFADBMMSAwHgYD
+VQQLExdHbG9iYWxTaWduIFJvb3QgQ0EgLSBSMzETMBEGA1UEChMKR2xvYmFsU2lnbjETMBEGA1UE
+AxMKR2xvYmFsU2lnbjAeFw0yMDA5MTYwMDAwMDBaFw0yODA5MTYwMDAwMDBaMFsxCzAJBgNVBAYT
+AkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBS
+MyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA
+vbCmXCcsbZ/a0fRIQMBxp4gJnnyeneFYpEtNydrZZ+GeKSMdHiDgXD1UnRSIudKo+moQ6YlCOu4t
+rVWO/EiXfYnK7zeop26ry1RpKtogB7/O115zultAz64ydQYLe+a1e/czkALg3sgTcOOcFZTXk38e
+aqsXsipoX1vsNurqPtnC27TWsA7pk4uKXscFjkeUE8JZu9BDKaswZygxBOPBQBwrA5+20Wxlk6k1
+e6EKaaNaNZUy30q3ArEf30ZDpXyfCtiXnupjSK8WU2cK4qsEtj09JS4+mhi0CTCrCnXAzum3tgcH
+cHRg0prcSzzEUDQWoFxyuqwiwhHu3sPQNmFOMwIDAQABo4IB2jCCAdYwDgYDVR0PAQH/BAQDAgGG
+MGAGA1UdJQRZMFcGCCsGAQUFBwMCBggrBgEFBQcDBAYKKwYBBAGCNxQCAgYKKwYBBAGCNwoDBAYJ
+KwYBBAGCNxUGBgorBgEEAYI3CgMMBggrBgEFBQcDBwYIKwYBBQUHAxEwEgYDVR0TAQH/BAgwBgEB
+/wIBADAdBgNVHQ4EFgQUljPR5lgXWzR1ioFWZNW+SN6hj88wHwYDVR0jBBgwFoAUj/BLf6guRSSu
+TVD6Y5qL3uLdG7wwegYIKwYBBQUHAQEEbjBsMC0GCCsGAQUFBzABhiFodHRwOi8vb2NzcC5nbG9i
+YWxzaWduLmNvbS9yb290cjMwOwYIKwYBBQUHMAKGL2h0dHA6Ly9zZWN1cmUuZ2xvYmFsc2lnbi5j
+b20vY2FjZXJ0L3Jvb3QtcjMuY3J0MDYGA1UdHwQvMC0wK6ApoCeGJWh0dHA6Ly9jcmwuZ2xvYmFs
+c2lnbi5jb20vcm9vdC1yMy5jcmwwWgYDVR0gBFMwUTALBgkrBgEEAaAyASgwQgYKKwYBBAGgMgEo
+CjA0MDIGCCsGAQUFBwIBFiZodHRwczovL3d3dy5nbG9iYWxzaWduLmNvbS9yZXBvc2l0b3J5LzAN
+BgkqhkiG9w0BAQsFAAOCAQEAdAXk/XCnDeAOd9nNEUvWPxblOQ/5o/q6OIeTYvoEvUUi2qHUOtbf
+jBGdTptFsXXe4RgjVF9b6DuizgYfy+cILmvi5hfk3Iq8MAZsgtW+A/otQsJvK2wRatLE61RbzkX8
+9/OXEZ1zT7t/q2RiJqzpvV8NChxIj+P7WTtepPm9AIj0Keue+gS2qvzAZAY34ZZeRHgA7g5O4TPJ
+/oTd+4rgiU++wLDlcZYd/slFkaT3xg4qWDepEMjT4T1qFOQIL+ijUArYS4owpPg9NISTKa1qqKWJ
+jFoyms0d0GwOniIIbBvhI2MJ7BSY9MYtWVT5jJO3tsVHwj4cp92CSFuGwunFMzCCA18wggJHoAMC
+AQICCwQAAAAAASFYUwiiMA0GCSqGSIb3DQEBCwUAMEwxIDAeBgNVBAsTF0dsb2JhbFNpZ24gUm9v
+dCBDQSAtIFIzMRMwEQYDVQQKEwpHbG9iYWxTaWduMRMwEQYDVQQDEwpHbG9iYWxTaWduMB4XDTA5
+MDMxODEwMDAwMFoXDTI5MDMxODEwMDAwMFowTDEgMB4GA1UECxMXR2xvYmFsU2lnbiBSb290IENB
+IC0gUjMxEzARBgNVBAoTCkdsb2JhbFNpZ24xEzARBgNVBAMTCkdsb2JhbFNpZ24wggEiMA0GCSqG
+SIb3DQEBAQUAA4IBDwAwggEKAoIBAQDMJXaQeQZ4Ihb1wIO2hMoonv0FdhHFrYhy/EYCQ8eyip0E
+XyTLLkvhYIJG4VKrDIFHcGzdZNHr9SyjD4I9DCuul9e2FIYQebs7E4B3jAjhSdJqYi8fXvqWaN+J
+J5U4nwbXPsnLJlkNc96wyOkmDoMVxu9bi9IEYMpJpij2aTv2y8gokeWdimFXN6x0FNx04Druci8u
+nPvQu7/1PQDhBjPogiuuU6Y6FnOM3UEOIDrAtKeh6bJPkC4yYOlXy7kEkmho5TgmYHWyn3f/kRTv
+riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
+QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
+UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
+M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
+Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
+14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
+a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
+XzCCBUwwggQ0oAMCAQICDF5AaMOe0cZvaJpCQjANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
+RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
+UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAwODIxMzhaFw0yNTA5MTAwODIxMzhaMIGO
+MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
+BgNVBAoTDUJyb2FkY29tIEluYy4xFTATBgNVBAMTDE1pY2hhZWwgQ2hhbjEoMCYGCSqGSIb3DQEJ
+ARYZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoC
+ggEBALhEmG7egFWvPKcrDxuNhNcn2oHauIHc8AzGhPyJxU4S6ZUjHM/psoNo5XxlMSRpYE7g7vLx
+J4NBefU36XTEWVzbEkAuOSuJTuJkm98JE3+wjeO+aQTbNF3mG2iAe0AZbAWyqFxZulWitE8U2tIC
+9mttDjSN/wbltcwuti7P57RuR+WyZstDlPJqUMm1rJTbgDqkF2pnvufc4US2iexnfjGopunLvioc
+OnaLEot1MoQO7BIe5S9H4AcCEXXcrJJiAtMCl47ARpyHmvQFQFFTrHgUYEd9V+9bOzY7MBIGSV1N
+/JfsT1sZw6HT0lJkSQefhPGpBniAob62DJP3qr11tu8CAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
+AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
+c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
+AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
+TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
+bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
+L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
+BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
+HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQU31rAyTdZweIF0tJTFYwfOv2w
+L4QwDQYJKoZIhvcNAQELBQADggEBACcuyaGmk0NSZ7Kio7O7WSZ0j0f9xXcBnLbJvQXFYM7JI5uS
+kw5ozATEN5gfmNIe0AHzqwoYjAf3x8Dv2w7HgyrxWdpjTKQFv5jojxa3A5LVuM8mhPGZfR/L5jSk
+5xc3llsKqrWI4ov4JyW79p0E99gfPA6Waixoavxvv1CZBQ4Stu7N660kTu9sJrACf20E+hdKLoiU
+hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
+E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
+aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
+EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIDhZzIc7bfeS9lxcn/ugH5EZ6z1YJoQi
+5Iil4Xmg4tcbMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMDcz
+MTE0MjExM1owaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
+ATANBgkqhkiG9w0BAQEFAASCAQCUuc/1EhHwL4ThfMP03NgTqYbm5Xa7Blu22knRIiD66uJHOCrt
+g5EGU6NeWiVxvUVmAEEoBKRJmAhoQIUqmAhgmEeWHcweV6panrEVdWv9FEH13lbSI4hdxqhrDRd1
+GrFxRy+AXpAevwSjet9PL7hAOZGIbrRCB3oW5QajBR3KPaECijsIk1L37Yfd0/4Db/F9Z1RMrNIX
+GeaYb47jYyM1Yt0WtZ1Sx1YpDMu0IWtDNEPGoDZsZ4KuMbsucPnvh2ACo8IxvPqbJmL0JIYBPhLR
+RTAnNYJnYZD8WXPmzx8iono8TiCg24o/MFBUqiWIqpmaxSY8ACxH4lZz5jnNh3mp
+--0000000000009251a40601c92481--
 
