@@ -1,115 +1,208 @@
-Return-Path: <netdev+bounces-22864-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22865-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A57A4769A9F
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 17:17:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16D1D769AB8
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 17:23:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CAA421C20C2A
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 15:17:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9AB8828121C
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 15:23:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73BC618C28;
-	Mon, 31 Jul 2023 15:16:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8E6718C2C;
+	Mon, 31 Jul 2023 15:23:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 670763C3F
-	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 15:16:58 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (unknown [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78F811703
-	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 08:16:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=HtZw09ZfN/qm3cJW6/ew7Q7QbvBXAckrD8yQ+RvhMTo=; b=QTS+m2u8id7jB2S6mrkds4VPFA
-	5gXjpbyK69idLB7B+LJwi87EgqnP9HSwu4RX8DLTNOJh6C7xvWTHG7BLyzNUtWki5WFxtpKgo1W/X
-	wxbZkzIRcbGsK21An6kdFCRpd62LrTUh8w/hhw/r2TdozTf3HLfsRYkS58UZlNTzul+poer2ykloD
-	Fsa4TeLl7V6sDZ2Fdvcu+bM4EvWEUMlvZoKJAF8dhPqkhLE7Vs4jxcPZqkOwBTrb1C7zzcSWRKOyF
-	F5bB4NMLzfOSIAupFcl2gCqAlRxKdAqge0AR0yJsnLOBZ7c0/1Cao1AkemuLXtTo1ZNRAR3VpQ9Wu
-	OSkDeFcg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:48650)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qQUdQ-0002kM-1d;
-	Mon, 31 Jul 2023 16:16:36 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qQUdM-00089X-8X; Mon, 31 Jul 2023 16:16:32 +0100
-Date: Mon, 31 Jul 2023 16:16:32 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Feiyang Chen <chris.chenfeiyang@gmail.com>
-Cc: Feiyang Chen <chenfeiyang@loongson.cn>, andrew@lunn.ch,
-	hkallweit1@gmail.com, peppe.cavallaro@st.com,
-	alexandre.torgue@foss.st.com, joabreu@synopsys.com,
-	chenhuacai@loongson.cn, dongbiao@loongson.cn,
-	loongson-kernel@lists.loongnix.cn, netdev@vger.kernel.org,
-	loongarch@lists.linux.dev
-Subject: Re: [PATCH v2 06/10] net: stmmac: Add Loongson HWIF entry
-Message-ID: <ZMfQUI1BOd1RWM4u@shell.armlinux.org.uk>
-References: <cover.1690439335.git.chenfeiyang@loongson.cn>
- <7cae63ede2792cb2a7189f251b282aecbb0945b1.1690439335.git.chenfeiyang@loongson.cn>
- <ZMOJNtClcAlWwZpP@shell.armlinux.org.uk>
- <CACWXhKmcFCHQsjc-7BU5VkNyJ70v6iEg2iQ11i-qS3VchvKCJA@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D0B014F8E
+	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 15:23:43 +0000 (UTC)
+Received: from domac.alu.hr (domac.alu.unizg.hr [IPv6:2001:b68:2:2800::3])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C199610E3;
+	Mon, 31 Jul 2023 08:23:41 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+	by domac.alu.hr (Postfix) with ESMTP id 8D6C96017F;
+	Mon, 31 Jul 2023 17:23:39 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
+	t=1690817019; bh=ISG2jRu84O8tN50xDVnUgYYjLOV7WKIkKxcodfIlYEQ=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=fv57DVGLvEzKk1Izt27ydCPEXF6Nuv/OV/xQUWoDiv3NvevfgD5aO2Hy0W7Q4tG7M
+	 Ttjj45mTWAcaCfhSWJFfjWrU/7orVtf+jR3UPn6HfCjSvZlCUbAQTyjcNlQobFF8fb
+	 xZiicfpv9IYWiKl/vZUIEEFTlKR2UvvCcUOtvKk1AmoyVMPOjoZm23PMMxSGz7PXKZ
+	 U4zCzxnvVDAiLTYQzlHXwGoCdAnyC3CrIj0WpgLR/YqpZ5rIsIXceCrLf5eoOeZkdQ
+	 Bm7Fj4LxCBgMXsslQmUZJ0Mgx1ZUFoqA+ht5lE11QxSvk/ZgCjliCKUSC5PZKNKbqF
+	 GtLmeAfP51aCQ==
+X-Virus-Scanned: Debian amavisd-new at domac.alu.hr
+Received: from domac.alu.hr ([127.0.0.1])
+	by localhost (domac.alu.hr [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id 7cjOiumQGmcF; Mon, 31 Jul 2023 17:23:37 +0200 (CEST)
+Received: from [192.168.1.6] (unknown [94.250.191.183])
+	by domac.alu.hr (Postfix) with ESMTPSA id 3F9F560173;
+	Mon, 31 Jul 2023 17:23:37 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
+	t=1690817017; bh=ISG2jRu84O8tN50xDVnUgYYjLOV7WKIkKxcodfIlYEQ=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=LvP8vQ5XgRekhDcciWZXR/hj61jMzI3wku1bjiRW9kHavqUG5+hWdRaxm6y1wxupp
+	 h+9ybpFDqaYOjJDdgIwWMpOKM4cOU4885W3ueEdXYs3uRlAvGXDuL1oIJptppm7wDb
+	 qm/5PeYxS7HUaG9j4u9Ky70U7oKubIP/rT+6lFE/pVvaMLwmuOlq3KiACtsMPFFaWp
+	 +utPu3/rp0EyxKS04qzp8MSKiaGIiXGpCyWuETv1uHWDPcoRqvT9HqCB3IjxfNZSmV
+	 u25VD8ZcGLS47FPd5jbNO7e/wbrLx0jDqAcg/ZyGB8s+HSCQ/a4V4pqz/tZUldSbEC
+	 TCFlusaGUo1Aw==
+Message-ID: <bdc5e82b-596d-d531-7685-0d1e52f2d125@alu.unizg.hr>
+Date: Mon, 31 Jul 2023 17:23:37 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CACWXhKmcFCHQsjc-7BU5VkNyJ70v6iEg2iQ11i-qS3VchvKCJA@mail.gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RDNS_NONE,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=no
-	autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.1
+Subject: Re: [PATCH v1 01/11] selftests: forwarding: custom_multipath_hash.sh:
+ add cleanup for SIGTERM sent by timeout
+Content-Language: en-US
+To: Ido Schimmel <idosch@idosch.org>
+Cc: petrm@nvidia.com, razor@blackwall.org, Ido Schimmel <idosch@nvidia.com>,
+ netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>
+References: <0550924e-dce9-f90d-df8a-db810fd2499f@alu.unizg.hr>
+ <adc5e40d-d040-a65e-eb26-edf47dac5b02@alu.unizg.hr>
+ <ZL6OljQubhVtQjcD@shredder>
+ <cab8ea8a-98f4-ef9b-4215-e2a93cccaab1@alu.unizg.hr>
+ <ZMEQGIOQXv6so30x@shredder>
+ <a9b6d9f5-14ae-a931-ab7b-d31b5e40f5df@alu.unizg.hr>
+ <ZMYXABUN9OzfN5D3@shredder>
+ <da3f4f4e-47a7-25be-fa61-aebeba1d8d0c@alu.unizg.hr>
+ <ZMdouQRypZCGZhV0@shredder>
+ <2f203995-5ae0-13bc-d1a6-997c2b36a2b8@alu.unizg.hr>
+ <ZMei0VMIH/l1GzVM@shredder>
+From: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
+In-Reply-To: <ZMei0VMIH/l1GzVM@shredder>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Jul 31, 2023 at 05:46:57PM +0800, Feiyang Chen wrote:
-> On Fri, Jul 28, 2023 at 5:24 PM Russell King (Oracle)
-> <linux@armlinux.org.uk> wrote:
-> >
-> > On Thu, Jul 27, 2023 at 03:18:06PM +0800, Feiyang Chen wrote:
-> > > diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> > > index e8619853b6d6..829de274e75d 100644
-> > > --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> > > +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> > > @@ -3505,17 +3505,21 @@ static int stmmac_request_irq_multi_msi(struct net_device *dev)
-> > >  {
-> > >       struct stmmac_priv *priv = netdev_priv(dev);
-> > >       enum request_irq_err irq_err;
-> > > +     unsigned long flags = 0;
-> > >       cpumask_t cpu_mask;
-> > >       int irq_idx = 0;
-> > >       char *int_name;
-> > >       int ret;
-> > >       int i;
-> > >
-> > > +     if (priv->plat->has_lgmac)
-> > > +             flags |= IRQF_TRIGGER_RISING;
-> >
-> > Can this be described in firmware?
-> >
-> 
-> Hi, Russell,
-> 
-> I'm not sure, could you explain what you mean?
+On 7/31/23 14:02, Ido Schimmel wrote:
 
-Modern systems describe the IRQ triggering in firmware for the OS
-such as DT. Does your implementation have any firmware that can
-do this kind of description for you (e.g. DT, ACPI?)
+>> NOTE: The error happened because two patches collided. This patch
+>>
+>> diff --git a/tools/testing/selftests/net/forwarding/lib.sh b/tools/testing/selftests/net/forwarding/lib.sh
+>> index 975fc5168c6334..40a8c1541b7f81 100755
+>> --- a/tools/testing/selftests/net/forwarding/lib.sh
+>> +++ b/tools/testing/selftests/net/forwarding/lib.sh
+>> @@ -30,6 +30,7 @@ REQUIRE_MZ=${REQUIRE_MZ:=yes}
+>>   REQUIRE_MTOOLS=${REQUIRE_MTOOLS:=no}
+>>   STABLE_MAC_ADDRS=${STABLE_MAC_ADDRS:=no}
+>>   TCPDUMP_EXTRA_FLAGS=${TCPDUMP_EXTRA_FLAGS:=}
+>> +TROUTE6=${TROUTE6:=traceroute6}
+>>   relative_path="${BASH_SOURCE%/*}"
+>>   if [[ "$relative_path" == "${BASH_SOURCE}" ]]; then
+>>
+>> and this patch
+>>
+>> diff --git a/tools/testing/selftests/net/forwarding/lib.sh b/tools/testing/selftests/net/forwarding/lib.sh
+>> index 71f7c0c49677..5b0183013017 100755
+>> --- a/tools/testing/selftests/net/forwarding/lib.sh
+>> +++ b/tools/testing/selftests/net/forwarding/lib.sh
+>> @@ -16,8 +16,6 @@ TEAMD=${TEAMD:=teamd}
+>>   WAIT_TIME=${WAIT_TIME:=5}
+>>   PAUSE_ON_FAIL=${PAUSE_ON_FAIL:=no}
+>>   PAUSE_ON_CLEANUP=${PAUSE_ON_CLEANUP:=no}
+>> -NETIF_TYPE=${NETIF_TYPE:=veth}
+>> -NETIF_CREATE=${NETIF_CREATE:=yes}
+>>   MCD=${MCD:=smcrouted}
+>>   MC_CLI=${MC_CLI:=smcroutectl}
+>>   PING_COUNT=${PING_COUNT:=10}
+>> @@ -30,6 +28,20 @@ REQUIRE_MZ=${REQUIRE_MZ:=yes}
+>>   REQUIRE_MTOOLS=${REQUIRE_MTOOLS:=no}
+>>   STABLE_MAC_ADDRS=${STABLE_MAC_ADDRS:=no}
+>>   TCPDUMP_EXTRA_FLAGS=${TCPDUMP_EXTRA_FLAGS:=}
+>> +NETIF_TYPE=${NETIF_TYPE:=veth}
+>> +NETIF_CREATE=${NETIF_CREATE:=yes}
+>> +declare -A NETIFS=(
+>> +       [p1]=veth0
+>> +       [p2]=veth1
+>> +       [p3]=veth2
+>> +       [p4]=veth3
+>> +       [p5]=veth4
+>> +       [p6]=veth5
+>> +       [p7]=veth6
+>> +       [p8]=veth7
+>> +       [p9]=veth8
+>> +       [p10]=veth9
+>> +)
+>>
+>>   relative_path="${BASH_SOURCE%/*}"
+>>   if [[ "$relative_path" == "${BASH_SOURCE}" ]]; then
+>>
+>> are not compatible.
+>>
+>> I have applied the 'require_command $TROUTE6' patch manually.
+>>
+>> I suppose this is what you intended to have:
+>>
+>> # Can be overridden by the configuration file.
+>> PING=${PING:=ping}
+>> PING6=${PING6:=ping6}
+>> MZ=${MZ:=mausezahn}
+>> ARPING=${ARPING:=arping}
+>> TEAMD=${TEAMD:=teamd}
+>> WAIT_TIME=${WAIT_TIME:=5}
+>> PAUSE_ON_FAIL=${PAUSE_ON_FAIL:=no}
+>> PAUSE_ON_CLEANUP=${PAUSE_ON_CLEANUP:=no}
+>> MCD=${MCD:=smcrouted}
+>> MC_CLI=${MC_CLI:=smcroutectl}
+>> PING_COUNT=${PING_COUNT:=10}
+>> PING_TIMEOUT=${PING_TIMEOUT:=5}
+>> WAIT_TIMEOUT=${WAIT_TIMEOUT:=20}
+>> INTERFACE_TIMEOUT=${INTERFACE_TIMEOUT:=600}
+>> LOW_AGEING_TIME=${LOW_AGEING_TIME:=1000}
+>> REQUIRE_JQ=${REQUIRE_JQ:=yes}
+>> REQUIRE_MZ=${REQUIRE_MZ:=yes}
+>> REQUIRE_MTOOLS=${REQUIRE_MTOOLS:=no}
+>> STABLE_MAC_ADDRS=${STABLE_MAC_ADDRS:=no}
+>> TCPDUMP_EXTRA_FLAGS=${TCPDUMP_EXTRA_FLAGS:=}
+>> TROUTE6=${TROUTE6:=traceroute6}
+>> NETIF_TYPE=${NETIF_TYPE:=veth}
+>> NETIF_CREATE=${NETIF_CREATE:=yes}
+>> declare -A NETIFS=(
+>>         [p1]=veth0
+>>         [p2]=veth1
+>>         [p3]=veth2
+>>         [p4]=veth3
+>>         [p5]=veth4
+>>         [p6]=veth5
+>>         [p7]=veth6
+>>         [p8]=veth7
+>>         [p9]=veth8
+>>         [p10]=veth9
+>> )
+>>
+>> relative_path="${BASH_SOURCE%/*}"
+>> if [[ "$relative_path" == "${BASH_SOURCE}" ]]; then
+>>          relative_path="."
+>> fi
+>> ------------------------------------------------
+>>
+>> Probably for the production patch you would like to have this fixed.
+> 
+> No, I don't intend to submit the patch that automatically creates the
+> veth pairs. It is superseded by "selftests: forwarding: Skip test when
+> no interfaces are specified".
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+It is your call, but consider that the majority of testers will use the default setup
+and maybe grep "not ok" messages in the log, because the amount of logs is overwhelming.
+
+Knowing that there is "forwarding.config.sample" probably requires in-depth knowledge
+of the selftest net/forwarding bundle and maybe direct hint from the developers?
+
+Kind regards,
+Mirsad
 
