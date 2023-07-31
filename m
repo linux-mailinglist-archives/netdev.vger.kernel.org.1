@@ -1,131 +1,126 @@
-Return-Path: <netdev+bounces-22956-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22957-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5071376A2F5
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 23:36:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D180F76A303
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 23:37:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 08E142814FF
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 21:35:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0FBA81C20D28
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 21:37:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C8AC1E50D;
-	Mon, 31 Jul 2023 21:35:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA4961E509;
+	Mon, 31 Jul 2023 21:37:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01384657
-	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 21:35:47 +0000 (UTC)
-Received: from mail-ed1-x536.google.com (mail-ed1-x536.google.com [IPv6:2a00:1450:4864:20::536])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E15CF210A
-	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 14:35:19 -0700 (PDT)
-Received: by mail-ed1-x536.google.com with SMTP id 4fb4d7f45d1cf-5223fbd54c6so7289944a12.3
-        for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 14:35:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google; t=1690839313; x=1691444113;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OoQ6AMqbH7T3p3Yr5Pye74Q6WCQZL+lK6DdYCEXr40o=;
-        b=YDtNwl2gvEdzUtsqGkrJjlUralI+dGLNS813sAQedgc5FSaOYZgvtEZA5Z6tcC5UzI
-         mAbX/ZGY5EoRq2jjO8qgvt2qAHUGcfWv5FM3ponM9TkB2ywUB90eka8w3BAjewqY0rnv
-         qprjOTgYL1vA4ZCIVQBHw0ksn9cr7Ls/qYsFA=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690839313; x=1691444113;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=OoQ6AMqbH7T3p3Yr5Pye74Q6WCQZL+lK6DdYCEXr40o=;
-        b=VHduM39uGd91Aq4BAwmmJlkKfkubqvbJPwUtUPLYTHEK2lzeu6DMvrWX6FAMG356Ly
-         gmNfSf0MKscjRAF5AnItkLPFHQnWzxURISXBaGWgdxspaHUNRuT05YgVIyVfmjMB2Qqc
-         uYpkY5qPNbIUQA5g6GqhNUgSxRGwTqkF0gKtxIFAye+5psYdHpgc99oag9xFQwUEj/Y1
-         r6uECRjGd+AbuLhAtlOc1fJoAOKXblVK2WjD+P3FYI7+BRhyUhhe73X7LzPkZbB3WAp3
-         SK1xMxPQVnSFjJdWoV5R6oSAbXIEQeZC4McXGejqx2m27iCZb6wE8LuBrixn1VbJ4PSw
-         4qFA==
-X-Gm-Message-State: ABy/qLZT1UyH5sQjpI6MyeivvBvusY2ETdFqZyCcJ/XCjQMbDb2HF1T0
-	coT/Ya6PpD8QqlCRAFowNpnbyRME4bfYUGK5fCH/Iw==
-X-Google-Smtp-Source: APBJJlFBfBMR6ifd3iBPqOfNdGmVDUsQS4R69cJOXFItn8JIAmskEdBDTXCgE3bDvE3zYTLX2ZEuz5+VLMSkWvgFjmg=
-X-Received: by 2002:aa7:d311:0:b0:522:4dd0:de6e with SMTP id
- p17-20020aa7d311000000b005224dd0de6emr825060edq.8.1690839312703; Mon, 31 Jul
- 2023 14:35:12 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE8761DDF8
+	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 21:37:29 +0000 (UTC)
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0CDF1BEC;
+	Mon, 31 Jul 2023 14:37:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=LddVCcT5Tl/w5tkU77QzXl+CGDu6387cGpG48tppgHc=; b=0Ynn7Y/7W6+gDCwSOAZ/hzNhAf
+	ncsnWc6Ebm0glt4s2jy+6ENEVw8CCnDcddcPxAeqCO1Vm6rOWP40UtXpk7WqdG3Sbb1q/3CucAmPZ
+	qDhNbMsdf3BrUSfNJ1r9+31fDwhdC1gU4CacjWVr4B82FZjG4LdFg30afj+w9oiGhUs73HGFs/v/L
+	xvY5hvk58sAfA5z4McMTW8BtxkIZN9OihahGe+3Vyzuv0tK0LxQraesPWqUx6J4ahrTelf12g654L
+	J2r7IbQOEmrqGnynl/sNARXbjYdGVcA+NX/WO2gi/nP8HJYhRloIot6akbGmFUUqoN7p6p9WZ0onF
+	W4rm/+EQ==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
+	id 1qQaZO-00HOoz-18;
+	Mon, 31 Jul 2023 21:36:50 +0000
+Date: Mon, 31 Jul 2023 14:36:50 -0700
+From: Luis Chamberlain <mcgrof@kernel.org>
+To: Joel Granados <joel.granados@gmail.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Iurii Zaikin <yzaikin@google.com>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Kees Cook <keescook@chromium.org>,
+	"D. Wythe" <alibuda@linux.alibaba.com>, mptcp@lists.linux.dev,
+	Jakub Kicinski <kuba@kernel.org>, Vasily Gorbik <gor@linux.ibm.com>,
+	Paolo Abeni <pabeni@redhat.com>, coreteam@netfilter.org,
+	Jan Karcher <jaka@linux.ibm.com>,
+	Alexander Aring <alex.aring@gmail.com>,
+	Will Deacon <will@kernel.org>,
+	Stefan Schmidt <stefan@datenfreihafen.org>,
+	Matthieu Baerts <matthieu.baerts@tessares.net>,
+	bridge@lists.linux-foundation.org,
+	linux-arm-kernel@lists.infradead.org,
+	Joerg Reuter <jreuter@yaina.de>, Julian Anastasov <ja@ssi.bg>,
+	David Ahern <dsahern@kernel.org>, netfilter-devel@vger.kernel.org,
+	Wen Gu <guwen@linux.alibaba.com>, linux-kernel@vger.kernel.org,
+	Santosh Shilimkar <santosh.shilimkar@oracle.com>,
+	linux-wpan@vger.kernel.org, lvs-devel@vger.kernel.org,
+	Karsten Graul <kgraul@linux.ibm.com>,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-sctp@vger.kernel.org, Tony Lu <tonylu@linux.alibaba.com>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Ralf Baechle <ralf@linux-mips.org>, Florian Westphal <fw@strlen.de>,
+	willy@infradead.org, Heiko Carstens <hca@linux.ibm.com>,
+	"David S. Miller" <davem@davemloft.net>, linux-rdma@vger.kernel.org,
+	Roopa Prabhu <roopa@nvidia.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Simon Horman <horms@verge.net.au>,
+	Mat Martineau <martineau@kernel.org>, josh@joshtriplett.org,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Eric Dumazet <edumazet@google.com>, linux-hams@vger.kernel.org,
+	Wenjia Zhang <wenjia@linux.ibm.com>, linux-fsdevel@vger.kernel.org,
+	linux-s390@vger.kernel.org, Xin Long <lucien.xin@gmail.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>, netdev@vger.kernel.org,
+	rds-devel@oss.oracle.com, Joel Granados <j.granados@samsung.com>
+Subject: Re: [PATCH v2 00/14] sysctl: Add a size argument to register
+ functions in sysctl
+Message-ID: <ZMgpck0rjqHR74sl@bombadil.infradead.org>
+References: <20230731071728.3493794-1-j.granados@samsung.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1690332693.git.yan@cloudflare.com> <e5d05e56bf41de82f10d33229b8a8f6b49290e98.1690332693.git.yan@cloudflare.com>
- <266ab56e-ae83-7ddc-618e-3af228df81bd@linux.dev>
-In-Reply-To: <266ab56e-ae83-7ddc-618e-3af228df81bd@linux.dev>
-From: Yan Zhai <yan@cloudflare.com>
-Date: Mon, 31 Jul 2023 16:35:01 -0500
-Message-ID: <CAO3-Pbon7tCdChnK9kZ4992C-AFPvE5gTDWre6dQT9npEMxS2Q@mail.gmail.com>
-Subject: Re: [PATCH v4 bpf 1/2] bpf: fix skb_do_redirect return values
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: bpf@vger.kernel.org, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yhs@fb.com>, John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
-	Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Mykola Lysenko <mykolal@fb.com>, 
-	Shuah Khan <shuah@kernel.org>, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, kernel-team@cloudflare.com, 
-	Jordan Griege <jgriege@cloudflare.com>, Markus Elfring <Markus.Elfring@web.de>, 
-	Jakub Sitnicki <jakub@cloudflare.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230731071728.3493794-1-j.granados@samsung.com>
+Sender: Luis Chamberlain <mcgrof@infradead.org>
+X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_EF,HEADER_FROM_DIFFERENT_DOMAINS,
 	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-	autolearn=unavailable autolearn_force=no version=3.4.6
+	autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Jul 28, 2023 at 5:02=E2=80=AFPM Martin KaFai Lau <martin.lau@linux.=
-dev> wrote:
->
-> On 7/25/23 6:08 PM, Yan Zhai wrote:
-> > skb_do_redirect returns various of values: error code (negative),
-> > 0 (success), and some positive status code, e.g. NET_XMIT_CN,
-> > NET_RX_DROP. Commit 3a0af8fd61f9 ("bpf: BPF for lightweight tunnel
-> > infrastructure") didn't check the return code correctly, so positive
-> > values are propagated back along call chain:
-> >
-> >    ip_finish_output2
-> >      -> bpf_xmit
-> >        -> run_lwt_bpf
-> >          -> skb_do_redirect
->
->  From looking at skb_do_redirect, the skb_do_redirect should have consume=
-d the
-> skb except for the -EAGAIN return value. afaik, -EAGAIN could only happen=
- by
-> using the bpf_redirect_peer helper. lwt does not have the bpf_redirect_pe=
-er
-> helper available, so there is no -EAGAIN case in lwt. iow, skb_do_redirec=
-t
-> should have always consumed the skb in lwt. or did I miss something?
->
-> If that is the case, it feels like the fix should be in run_lwt_bpf() and=
- the
-> "if (ret =3D=3D 0)" test in run_lwt_bpf() is unnecessary?
->
->                         ret =3D skb_do_redirect(skb);
->                         if (ret =3D=3D 0)
->                                 ret =3D BPF_REDIRECT;
->
->
-Just fixing skb redirect return code won't be sufficient. I realized
-there are other return paths that need to be treated, e.g. bpf reroute
-path also directly returns dev_queue_xmit status. I plan to check for
-LWTUNNEL_XMIT_CONTINUE (and change it to a value that does not
-conflict with NET_RX_DROP and NET_XMIT_DROP) in the next revision. On
-the other hand, the return value of NETDEV_TX_BUSY is another hassle.
-As Dan suggested, packets might not have been freed when this is
-returned from drivers. The caller of dev_queue_xmit might need to free
-skb when this happens.
+> Joel Granados (14):
+>   sysctl: Prefer ctl_table_header in proc_sysctl
+>   sysctl: Use ctl_table_header in list_for_each_table_entry
+>   sysctl: Add ctl_table_size to ctl_table_header
+>   sysctl: Add size argument to init_header
+>   sysctl: Add a size arg to __register_sysctl_table
+>   sysctl: Add size to register_sysctl
+>   sysctl: Add size arg to __register_sysctl_init
 
-Yan
+This is looking great thanks, I've taken the first 7 patches above
+to sysctl-next to get more exposure / testing and since we're already
+on rc4.
+
+Since the below patches involve more networking I'll wait to get
+more feedback from networking folks before merging them.
+
+>   sysctl: Add size to register_net_sysctl function
+>   ax.25: Update to register_net_sysctl_sz
+>   netfilter: Update to register_net_sysctl_sz
+>   networking: Update to register_net_sysctl_sz
+>   vrf: Update to register_net_sysctl_sz
+>   sysctl: SIZE_MAX->ARRAY_SIZE in register_net_sysctl
+>   sysctl: Use ctl_table_size as stopping criteria for list macro
+
+  Luis
 
