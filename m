@@ -1,63 +1,60 @@
-Return-Path: <netdev+bounces-22742-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22743-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CFE88769050
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 10:35:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 67C11769058
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 10:38:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 119582816FF
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 08:35:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 519ED1C20BCF
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 08:38:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57F5F6AA0;
-	Mon, 31 Jul 2023 08:35:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D17048835;
+	Mon, 31 Jul 2023 08:38:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C8B4610E
-	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 08:35:56 +0000 (UTC)
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A8A8171A;
-	Mon, 31 Jul 2023 01:35:54 -0700 (PDT)
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-99bdd262bb0so616459566b.3;
-        Mon, 31 Jul 2023 01:35:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690792552; x=1691397352;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=4PJHPNha1r6lB/KR755CQAVgQFdlXySMn0XXOuyb/Ww=;
-        b=atXavI1gfSyWdrhE9jDdsi9aDkMMaTHlA4O894Y2oynYHDWuQ7xuTNjriJU3eHjf3S
-         JAqk5V/CzJs8saEpvygQu9HinENKvaRUu1Kl3InPeBfvo1anPsIFeAwVn4cjz5V1YjHO
-         LVRG1f91azjE1EGVhoLrW299ukjnhA63ICxesG2wERR+AEGKDnfqgqCV/uODQMuIDwSF
-         V6U4x2kVFVQqtNmddsXY1QCWVXlkUxfBl4RNhp6rOKqQ1OqSRFNxJvmf+uszUMNGLWvJ
-         l2xglF6Nq9IlHWYOlJ0aILn+t/cCGbOy6lY3NHhaSL+lgXY4FCnIEnulF0WERM0HLDS0
-         bg7g==
-X-Gm-Message-State: ABy/qLaNBSVJj8ymYesIN6nOholmNFhReWxA//lp+cn0xd2rhhApZClI
-	uIe257B3Cfn3ywzBgr2eIKM=
-X-Google-Smtp-Source: APBJJlGCHHaP5fxhgRuMAllkyVYegPKimV2TwltZHLVKnH3V2OjHBUNgOVRnsiauiXbV7OFKqeJusA==
-X-Received: by 2002:a17:906:32d2:b0:99b:4378:a5ab with SMTP id k18-20020a17090632d200b0099b4378a5abmr5996886ejk.74.1690792552300;
-        Mon, 31 Jul 2023 01:35:52 -0700 (PDT)
-Received: from localhost (fwdproxy-cln-118.fbsv.net. [2a03:2880:31ff:76::face:b00c])
-        by smtp.gmail.com with ESMTPSA id lu44-20020a170906faec00b00992f309cfe8sm5859043ejb.178.2023.07.31.01.35.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 31 Jul 2023 01:35:51 -0700 (PDT)
-From: Breno Leitao <leitao@debian.org>
-To: rdunlap@infradead.org,
-	benjamin.poirier@gmail.com,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: leit@meta.com,
-	netdev@vger.kernel.org (open list:NETWORKING DRIVERS),
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net-next v2] netconsole: Enable compile time configuration
-Date: Mon, 31 Jul 2023 01:35:41 -0700
-Message-Id: <20230731083542.3665886-1-leitao@debian.org>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C279C6AA0
+	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 08:38:27 +0000 (UTC)
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EAB9B1AE;
+	Mon, 31 Jul 2023 01:38:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=kKpERaVXDKMd33dB8Z6172oH7fQHojYxOewfozLZ6UA=; b=koRyMNYcvjJcXhBaHMwydXCQnm
+	x+vQEB+Q5teWiOuoZj514M6zhQnZLud17ppXIay4DvRFSQJaEvq8rHJnz+1vCpOKITaLITXkLJHEO
+	EAYUe+R15N1eKMdl2+2+O9gg6j6f3RRiJpW3UBCe1MCVOs4Bx9zrAXYSKVZlEhCWflPFkgFqXp9jy
+	7OEuwmt7lri80b9yBHSsuc1ts2I6qjMs85kjOfb1RlmDMGYTgNga5NDHRAp+CD+RXiycBBBZaHXTN
+	CEJOfZT+r7rhsFZ4qbGhictyuLXB6JKD9qzhntzmW+AP4TLbiDtlxyvGtc/OaX36xc689Jc55AsRw
+	23cT4P6Q==;
+Received: from 2a02-8389-2341-5b80-39d3-4735-9a3c-88d8.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:39d3:4735:9a3c:88d8] helo=localhost)
+	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+	id 1qQOPq-00EYr6-0v;
+	Mon, 31 Jul 2023 08:38:10 +0000
+From: Christoph Hellwig <hch@lst.de>
+To: Luis Chamberlain <mcgrof@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Daniel Mack <daniel@zonque.org>,
+	Haojian Zhuang <haojian.zhuang@gmail.com>,
+	Robert Jarzmik <robert.jarzmik@free.fr>,
+	Ulf Hansson <ulf.hansson@linaro.org>,
+	Yangbo Lu <yangbo.lu@nxp.com>,
+	Joshua Kinard <kumba@gentoo.org>
+Cc: Daniel Vetter <daniel.vetter@ffwll.ch>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org (open list),
+	linux-mmc@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-rtc@vger.kernel.org,
+	linux-modules@vger.kernel.org
+Subject: require EXPORT_SYMBOL_GPL symbols for symbol_get
+Date: Mon, 31 Jul 2023 10:38:01 +0200
+Message-Id: <20230731083806.453036-1-hch@lst.de>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,83 +62,17 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_EF,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+	autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Enable netconsole features to be set at compilation time. Create two
-Kconfig options that allow users to set extended logs and release
-prepending features at compilation time.
+Hi all,
 
-Right now, the user needs to pass command line parameters to netconsole,
-such as "+"/"r" to enable extended logs and version prepending features.
-
-With these two options, the user could set the default values for the
-features at compile time, and don't need to pass it in the command line
-to get them enabled, simplifying the command line.
-
-Signed-off-by: Breno Leitao <leitao@debian.org>
----
-  v1 -> v2:
-	* Improvements in the Kconfig help section.
----
- drivers/net/Kconfig      | 22 ++++++++++++++++++++++
- drivers/net/netconsole.c |  5 +++++
- 2 files changed, 27 insertions(+)
-
-diff --git a/drivers/net/Kconfig b/drivers/net/Kconfig
-index 368c6f5b327e..2c7b4b634a8f 100644
---- a/drivers/net/Kconfig
-+++ b/drivers/net/Kconfig
-@@ -332,6 +332,28 @@ config NETCONSOLE_DYNAMIC
- 	  at runtime through a userspace interface exported using configfs.
- 	  See <file:Documentation/networking/netconsole.rst> for details.
- 
-+config NETCONSOLE_EXTENDED_LOG
-+	bool "Set kernel extended message as default"
-+	depends on NETCONSOLE
-+	default n
-+	help
-+	  Set extended log support for netconsole message. If this option is
-+	  set, log messages are transmitted with extended metadata header in a
-+	  format similar to /dev/kmsg.  See
-+	  <file:Documentation/networking/netconsole.rst> for details.
-+
-+config NETCONSOLE_PREPEND_RELEASE
-+	bool "Prepend kernel release version in the message"
-+	depends on NETCONSOLE_EXTENDED_LOG
-+	default n
-+	help
-+	  Set kernel release to be prepended to each netconsole message by
-+	  default. If this option is set, the kernel release is prepended into
-+	  the first field of every netconsole message, so, the netconsole
-+	  server/peer can easily identify what kernel release is logging each
-+	  message.  See <file:Documentation/networking/netconsole.rst> for
-+	  details.
-+
- config NETPOLL
- 	def_bool NETCONSOLE
- 
-diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
-index 87f18aedd3bd..8cadbcd699ae 100644
---- a/drivers/net/netconsole.c
-+++ b/drivers/net/netconsole.c
-@@ -181,6 +181,11 @@ static struct netconsole_target *alloc_param_target(char *target_config)
- 	if (!nt)
- 		goto fail;
- 
-+	if (IS_ENABLED(CONFIG_NETCONSOLE_EXTENDED_LOG))
-+		nt->extended = true;
-+	if (IS_ENABLED(CONFIG_NETCONSOLE_PREPEND_RELEASE))
-+		nt->release = true;
-+
- 	nt->np.name = "netconsole";
- 	strscpy(nt->np.dev_name, "eth0", IFNAMSIZ);
- 	nt->np.local_port = 6665;
--- 
-2.34.1
-
+this series changes symbol_get to only work on EXPORT_SYMBOL_GPL
+as nvidia is abusing the lack of this check to bypass restrictions
+on importing symbols from proprietary modules.
 
