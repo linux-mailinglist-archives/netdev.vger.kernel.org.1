@@ -1,158 +1,201 @@
-Return-Path: <netdev+bounces-22776-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22773-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9EC4476925F
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 11:53:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C5DD769242
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 11:49:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AB2691C20B8A
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 09:53:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1E3842812DF
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 09:49:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AD2C17ABC;
-	Mon, 31 Jul 2023 09:53:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59F5B17AAB;
+	Mon, 31 Jul 2023 09:49:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6048B1774E
-	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 09:53:26 +0000 (UTC)
-Received: from mail-lj1-x22d.google.com (mail-lj1-x22d.google.com [IPv6:2a00:1450:4864:20::22d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BE4FE5F
-	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 02:52:54 -0700 (PDT)
-Received: by mail-lj1-x22d.google.com with SMTP id 38308e7fff4ca-2b9c907bc68so53288741fa.2
-        for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 02:52:54 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D1921774A
+	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 09:49:43 +0000 (UTC)
+Received: from mail-yw1-x1141.google.com (mail-yw1-x1141.google.com [IPv6:2607:f8b0:4864:20::1141])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0AF91728;
+	Mon, 31 Jul 2023 02:49:22 -0700 (PDT)
+Received: by mail-yw1-x1141.google.com with SMTP id 00721157ae682-5862a6ae535so7083227b3.0;
+        Mon, 31 Jul 2023 02:49:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google; t=1690797172; x=1691401972;
-        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
-         :user-agent:references:from:to:cc:subject:date:message-id:reply-to;
-        bh=iS9ynVL/SnopVJ2vw9YOzxEVqWQLoL/quqMJip/rlSE=;
-        b=TJGih8nCWL5gxD2BWkapKv6qzLQgYlt7Dn6tUvA7zsBBkj0NosBGxU6y4wTEHIMu9b
-         QNhfWKg5PLY3Lopd3sj6iaUhOmghM4XdsG0krJt7pnnvs8nkdNgFXco002qJe6S1WLjL
-         4D5feAhqvaQ0OrqYsnoNvfQpn+ks1/c6mkHzU=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690797172; x=1691401972;
-        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
-         :user-agent:references:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20221208; t=1690796962; x=1691401762;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=iS9ynVL/SnopVJ2vw9YOzxEVqWQLoL/quqMJip/rlSE=;
-        b=ioEY8SzE7gamJi+X5AHLKy4K8/QX6wplaa5Qfe0oN47heEm173ZHRmtm30x9SZjNnc
-         OlAsFeHSYlXLjw5g2e/xZnhE+bsdE/A89srvRaSQ0GtGHqG/5Fffyaj8Muo+ZJZSnl6L
-         ywq214Roj/z2mrL1ga8XdAQ+90Cv1jWSSSK1ZS9MpoAm87uNqRaPbTto/+NHM+l5Nr+5
-         J2nsHpENOHHx55YGQIqsDU0t0Sws2GzgiRNpi61US4MoNrYrulC7pX0CrteWb1RlPdhu
-         I3GsVziAPnYw4gIJ6lymb0I4CUuvS+Mie0s75bMk/aRhiKEorhXtes2yECRfrOrPlAT9
-         bnCg==
-X-Gm-Message-State: ABy/qLYIeS2J4f+6Tjx//DRBu+x8HWRiVOCzGrHOf6ymkiNZIdmOlRiS
-	uxPkZETsmT9GLrZX3T03leutPQ==
-X-Google-Smtp-Source: APBJJlFIqs6ieNOIG6CV6VOvY4r1Ja1rFjHMIrHJIuZjzIq57jXM6bn1exmD7gtibtpDJrxd12r9Rg==
-X-Received: by 2002:a2e:8557:0:b0:2b9:4821:22b6 with SMTP id u23-20020a2e8557000000b002b9482122b6mr6184560ljj.10.1690797172186;
-        Mon, 31 Jul 2023 02:52:52 -0700 (PDT)
-Received: from cloudflare.com (79.184.136.135.ipv4.supernova.orange.pl. [79.184.136.135])
-        by smtp.gmail.com with ESMTPSA id q24-20020a17090622d800b0098d2f703408sm5858343eja.118.2023.07.31.02.52.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 31 Jul 2023 02:52:51 -0700 (PDT)
-References: <cover.1690332693.git.yan@cloudflare.com>
- <9c4896b109a39c3fa088844addaa1737a84bbbb5.1690332693.git.yan@cloudflare.com>
- <791b919c-de82-6dc8-905a-520543f975cd@linux.dev>
-User-agent: mu4e 1.6.10; emacs 28.2
-From: Jakub Sitnicki <jakub@cloudflare.com>
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: Yan Zhai <yan@cloudflare.com>, bpf@vger.kernel.org, Alexei Starovoitov
- <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko
- <andrii@kernel.org>, Song Liu <song@kernel.org>, Yonghong Song
- <yhs@fb.com>, John Fastabend <john.fastabend@gmail.com>, KP Singh
- <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo
- <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Mykola Lysenko
- <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linux-kselftest@vger.kernel.org, kernel-team@cloudflare.com, Jordan Griege
- <jgriege@cloudflare.com>, Markus Elfring <Markus.Elfring@web.de>
-Subject: Re: [PATCH v4 bpf 2/2] bpf: selftests: add lwt redirect regression
- test cases
-Date: Mon, 31 Jul 2023 11:48:40 +0200
-In-reply-to: <791b919c-de82-6dc8-905a-520543f975cd@linux.dev>
-Message-ID: <87edkoflvx.fsf@cloudflare.com>
+        bh=ij1aV1fmuLlyqs7lKmMEeDIzZHYRrbZXBxEfq4EEuvo=;
+        b=oACT52WzGLPino7hBFYPcDzYfRg5+dAt3Z7rN2YCnE9zYuvYjI4avIqCwGh3XDH3c4
+         24kHbhbTJNcwibv4du9VQ2JKfzmqBhnXC7CySyW6+C/VKYHFsaNzQVeMIHR/hRuw+aOB
+         mnar+ZwKu7goyhIFjlguHw8LiRdVgrigvEh4DaTuE2OvP/Yz2oAu3MwidU6pNDUg8+1r
+         1MemsQVNeEY3rRHFhMJGdlzjXAJ+AmDpjOgv4e0rIXno2g3V9zV2gP3PiORVJ4zO+8MJ
+         mMxBihy8DF/ad0ml5FbA4QH+ynaqPJceTaBV3Wc1VgzAQgNpCIgpIm4QAmK3/A1QwBfC
+         Tm7w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690796962; x=1691401762;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ij1aV1fmuLlyqs7lKmMEeDIzZHYRrbZXBxEfq4EEuvo=;
+        b=anwB2IVhn2oXRKc9y5voCepzQyNGp5BFw7pK+YcZ3FBL9g7T1NkxkO6E+h4yx2XTt8
+         nC1jmgjbgx1yJh7t36QWD5vY1aouvXsF4CbNHOPqkNvz24quH8/02FRbR22DpmyW5dk3
+         f45klQzqgz+p4UsDSejsuWDUi9aUHGOl1gvbdNvF5rpefR3EQWu67FupL81Su/pSjuLi
+         CLE0LLBPlkRLelpMZzD3KAO5lqFiCXHDGN/AojzUfkaf7uG1PWRkV/ELlVVKEWV5h9OO
+         ZRzqU/YTPP48Yql2WufwTOPGOyQXZnpEE3BItM2ptnFT0IhSKCzwPZ/8pUb1s51LzDWf
+         y9ZA==
+X-Gm-Message-State: ABy/qLZvRoQOk9371kj0nMLaSHE+5eSLqP65aVX6adPfln8j3HYlYgAi
+	mg+UuPKV5SnqP/cSkKQYerA59OPdYCgGYxMrzQw=
+X-Google-Smtp-Source: APBJJlFQMtAm05z6LaJtyfZIUM6HxyewJB6FcXrdRCnrtHER1wJkgVIc69uw1uXY3afJuAuz5iRdJLN0CchcGOa7keE=
+X-Received: by 2002:a25:8b04:0:b0:d2c:763d:1253 with SMTP id
+ i4-20020a258b04000000b00d2c763d1253mr3841264ybl.46.1690796961681; Mon, 31 Jul
+ 2023 02:49:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+References: <20230727125125.1194376-1-imagedong@tencent.com>
+ <20230727125125.1194376-4-imagedong@tencent.com> <CANn89iKWTrgEp3QY34mNqVAx09fSxHUh+oHRTd6=aWurGS7qWA@mail.gmail.com>
+ <CADxym3YhjMv3Xkts99fiajq-cR-BqxDayKFzFZ1L49BNfFXkdw@mail.gmail.com>
+ <CADVnQynQ1Hw+Jh7pjdNw_Mo4tWZV8V_sA+L-o=O4uV+9Gv7Prg@mail.gmail.com>
+ <CADxym3Zqb2CCpJojGiT7gVL98GDdOmjxqLY6ApLeP2zZU1Kn3Q@mail.gmail.com>
+ <CANn89i+WnwgpGy4v=aXsjThPBA2FQzWx9Y=ycXWWGLDdtDHBig@mail.gmail.com>
+ <CADVnQy=OumgmsbsQ8QLhUiyUNN95Ay2guVjgGVVLH93QXanBSw@mail.gmail.com> <CADVnQynwrvdoEH2d7VVNSG6vHg8BC5ikz+PApOOMG4Eo3MqSww@mail.gmail.com>
+In-Reply-To: <CADVnQynwrvdoEH2d7VVNSG6vHg8BC5ikz+PApOOMG4Eo3MqSww@mail.gmail.com>
+From: Menglong Dong <menglong8.dong@gmail.com>
+Date: Mon, 31 Jul 2023 17:49:10 +0800
+Message-ID: <CADxym3Y7kF9rT+PL6SE_tZFi2Q1CXqhz9e66F1kckcYtMmEkuQ@mail.gmail.com>
+Subject: Re: [PATCH net-next 3/3] net: tcp: check timeout by
+ icsk->icsk_timeout in tcp_retransmit_timer()
+To: Neal Cardwell <ncardwell@google.com>, Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	dsahern@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Menglong Dong <imagedong@tencent.com>, Yuchung Cheng <ycheng@google.com>, 
+	Soheil Hassas Yeganeh <soheil@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Jul 28, 2023 at 03:47 PM -07, Martin KaFai Lau wrote:
-> On 7/25/23 6:09 PM, Yan Zhai wrote:
-
-[...]
-
->> diff --git a/tools/testing/selftests/bpf/test_lwt_redirect.sh
->> b/tools/testing/selftests/bpf/test_lwt_redirect.sh
->> new file mode 100755
->> index 000000000000..1b7b78b48174
->> --- /dev/null
->> +++ b/tools/testing/selftests/bpf/test_lwt_redirect.sh
+On Sat, Jul 29, 2023 at 1:15=E2=80=AFAM Neal Cardwell <ncardwell@google.com=
+> wrote:
 >
-> This has to be written in the test_progs infrastructure in C. Only test_progs is
-> run by the BPF CI. Take a look at other tests in prog_tests/. For example,
-> tc_redirect.c and xdp_metadata.c which are having setup in netns/link/...etc. It
-> currently has helpers to add tc qdisc and filter but not adding route yet which
-> could be a useful addition.
+> On Fri, Jul 28, 2023 at 7:25=E2=80=AFAM Neal Cardwell <ncardwell@google.c=
+om> wrote:
+> >
+> > On Fri, Jul 28, 2023 at 1:50=E2=80=AFAM Eric Dumazet <edumazet@google.c=
+om> wrote:
+> > >
+> > > On Fri, Jul 28, 2023 at 8:25=E2=80=AFAM Menglong Dong <menglong8.dong=
+@gmail.com> wrote:
+> > > >
+> > > > On Fri, Jul 28, 2023 at 12:44=E2=80=AFPM Neal Cardwell <ncardwell@g=
+oogle.com> wrote:
+> > > > >
+> > > > > On Thu, Jul 27, 2023 at 7:57=E2=80=AFPM Menglong Dong <menglong8.=
+dong@gmail.com> wrote:
+> > > > > >
+> > > > > > On Fri, Jul 28, 2023 at 3:31=E2=80=AFAM Eric Dumazet <edumazet@=
+google.com> wrote:
+> > > > > > >
+> > > > > > > On Thu, Jul 27, 2023 at 2:52=E2=80=AFPM <menglong8.dong@gmail=
+.com> wrote:
+> > > > > > > >
+> > > > > > > > From: Menglong Dong <imagedong@tencent.com>
+> > > > > > > >
+> > > > > > > > In tcp_retransmit_timer(), a window shrunk connection will =
+be regarded
+> > > > > > > > as timeout if 'tcp_jiffies32 - tp->rcv_tstamp > TCP_RTO_MAX=
+'. This is not
+> > > > > > > > right all the time.
+> > > > > > > >
+> > > > > > > > The retransmits will become zero-window probes in tcp_retra=
+nsmit_timer()
+> > > > > > > > if the 'snd_wnd=3D=3D0'. Therefore, the icsk->icsk_rto will=
+ come up to
+> > > > > > > > TCP_RTO_MAX sooner or later.
+> > > > > > > >
+> > > > > > > > However, the timer is not precise enough, as it base on tim=
+er wheel.
+> > > > > > > > Sorry that I am not good at timer, but I know the concept o=
+f time-wheel.
+> > > > > > > > The longer of the timer, the rougher it will be. So the tim=
+eout is not
+> > > > > > > > triggered after TCP_RTO_MAX, but 122877ms as I tested.
+> > > > > > > >
+> > > > > > > > Therefore, 'tcp_jiffies32 - tp->rcv_tstamp > TCP_RTO_MAX' i=
+s always true
+> > > > > > > > once the RTO come up to TCP_RTO_MAX.
+> > > > > > > >
+> > > > > > > > Fix this by replacing the 'tcp_jiffies32' with '(u32)icsk->=
+icsk_timeout',
+> > > > > > > > which is exact the timestamp of the timeout.
+> > > > > > > >
+> > > > > > > > Signed-off-by: Menglong Dong <imagedong@tencent.com>
+> > > > > > > > ---
+> > > > > > > >  net/ipv4/tcp_timer.c | 6 +++++-
+> > > > > > > >  1 file changed, 5 insertions(+), 1 deletion(-)
+> > > > > > > >
+> > > > > > > > diff --git a/net/ipv4/tcp_timer.c b/net/ipv4/tcp_timer.c
+> > > > > > > > index 470f581eedd4..3a20db15a186 100644
+> > > > > > > > --- a/net/ipv4/tcp_timer.c
+> > > > > > > > +++ b/net/ipv4/tcp_timer.c
+> > > > > > > > @@ -511,7 +511,11 @@ void tcp_retransmit_timer(struct sock =
+*sk)
+> > > > > > > >                                             tp->snd_una, tp=
+->snd_nxt);
+> > > > > > > >                 }
+> > > > > > > >  #endif
+> > > > > > > > -               if (tcp_jiffies32 - tp->rcv_tstamp > TCP_RT=
+O_MAX) {
+> > > > > > > > +               /* It's a little rough here, we regard any =
+valid packet that
+> > > > > > > > +                * update tp->rcv_tstamp as the reply of th=
+e retransmitted
+> > > > > > > > +                * packet.
+> > > > > > > > +                */
+> > > > > > > > +               if ((u32)icsk->icsk_timeout - tp->rcv_tstam=
+p > TCP_RTO_MAX) {
+> > > > > > > >                         tcp_write_err(sk);
+> > > > > > > >                         goto out;
+> > > > > > > >                 }
+>
+> One potential pre-existing issue with this logic: if the connection is
+> restarting from idle, then tp->rcv_tstamp could already be a long time
+> (minutes or hours) in the past even on the first RTO, in which case
+> the very first RTO that found a zero tp->snd_wnd  would find this
+> check returns true, and would destroy the connection immediately. This
+> seems extremely brittle.
+>
+> AFAICT it would be safer to replace this logic with a call to the
+> standard tcp_write_timeout() logic that has a more robust check to see
+> if the connection should be destroyed.
 
-Can we help make the BPF CI better so that it also runs other tests in
-addition test_progs?
+How about we check it with:
 
-We have bpf selftests written in shell and even Python. These are
-sometimes the right tools for the job and make adding tests easier,
-IMHO. Network setup from C is verbose and tedious. Not to mention, hard
-to read through.
+icsk->icsk_timeout - max(tp->retrans_stamp, tp->rcv_tstamp) > TCP_RTO_MAX
 
-# ./run_kselftest.sh --list
-bpf:test_verifier
-bpf:test_tag
-bpf:test_maps
-bpf:test_lru_map
-bpf:test_lpm_map
-bpf:test_progs
-bpf:test_dev_cgroup
-bpf:test_sock
-bpf:test_sockmap
-bpf:get_cgroup_id_user
-bpf:test_cgroup_storage
-bpf:test_tcpnotify_user
-bpf:test_sysctl
-bpf:test_progs-no_alu32
-bpf:test_kmod.sh
-bpf:test_xdp_redirect.sh
-bpf:test_xdp_redirect_multi.sh
-bpf:test_xdp_meta.sh
-bpf:test_xdp_veth.sh
-bpf:test_offload.py
-bpf:test_sock_addr.sh
-bpf:test_tunnel.sh
-bpf:test_lwt_seg6local.sh
-bpf:test_lirc_mode2.sh
-bpf:test_skb_cgroup_id.sh
-bpf:test_flow_dissector.sh
-bpf:test_xdp_vlan_mode_generic.sh
-bpf:test_xdp_vlan_mode_native.sh
-bpf:test_lwt_ip_encap.sh
-bpf:test_tcp_check_syncookie.sh
-bpf:test_tc_tunnel.sh
-bpf:test_tc_edt.sh
-bpf:test_xdping.sh
-bpf:test_bpftool_build.sh
-bpf:test_bpftool.sh
-bpf:test_bpftool_metadata.sh
-bpf:test_doc_build.sh
-bpf:test_xsk.sh
-bpf:test_xdp_features.sh
+?
+
+Therefore, we don't need to do a lot of modification. I have to
+say that the way we check here is rough, and a simple loss
+of the retransmitted packet or the ACK can cause the die
+of the socket.
+
+Maybe we need a more perfect way here? which may introduce
+a certain amount of modification.
+
+BTW, should I split out this patch from this series?
+
+>
+> neal
 
