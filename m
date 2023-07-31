@@ -1,81 +1,89 @@
-Return-Path: <netdev+bounces-22899-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22900-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65E9C769D7B
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 19:00:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 77614769D9E
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 19:03:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 202BD2814B6
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 17:00:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AA8B5280EE8
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 17:03:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 057C719BD0;
-	Mon, 31 Jul 2023 17:00:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC87C19BD7;
+	Mon, 31 Jul 2023 17:03:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBE0A19BB2
-	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 17:00:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 3BFBDC433C9;
-	Mon, 31 Jul 2023 17:00:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D35F19BD8
+	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 17:03:42 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4157CC433CA;
+	Mon, 31 Jul 2023 17:03:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690822823;
-	bh=KwO0p4NhIoEp4lMsE+/NVJla/uPv/cqlzddEla2InPo=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=jEhX08it29WayZnArxLeUFNxoMqzoWKtDWuIbjZrKR+nCrdMKP5geT2K5ZcM736FZ
-	 RounWOoTBJruHw3x758ZCC8WAQ9wVFmDHPT2QQTg9ybPsIZV2q1jS9YZcDCN+COIEg
-	 e4xsADlxjI/5CTS6R5RwkDcx1aX1yLdQG1FvSBsPVNWkkowOrY8k6/oeRi4SpeGPrp
-	 QcQJ3uWwcrcDk5xVyqGsbYUgmCFKvXhhYnoDcSLLrTmF3100fx8Rm0BWRs47BmxkrZ
-	 2LIyMCrnPxSd9A2TlCU/2rjed20tGkkKzHwE3IxBy4dCWheJPtRRy9IG4p6M7EcISn
-	 J2R+X91fg1uDA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 221C6E96AD8;
-	Mon, 31 Jul 2023 17:00:23 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1690823022;
+	bh=BHKJOJ2tohKYMhbBN1dMeyRlyJh9OizTUmw+8ksIt/c=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=YJQ6TfheP/NEzwcZD3EDwNjtGIIu6Bu1hVTzjEw657o/yAyj/3UDvHlhy3QdH8Uow
+	 o3P/31dnfVwOPhj1sLbq/ZL1qFVhz/hA78CBYYlemS7RqoSlAc0UzHp4ikUfxlLE6j
+	 NdnR6NY1XezMVWKJS3mcIYE0Udlg8fRu4HvRwR/wJ+CkNmzwMmbqVmbezF+jXORNWs
+	 5tHzCLh3zjJO+sr5cEXgth68jGUfH/SXKPVZpozuwr44oJ4C8hqJcOZcW35sMNLCEW
+	 zKWcDFz0MBD41pL7zQg7rIU4UVNrctlkpZ/MHCF1HsPlk5vLFFGpDXdwSNf/YFueqr
+	 /jTR0S7vBZ4Yg==
+Date: Mon, 31 Jul 2023 10:03:41 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
+ edumazet@google.com, moshe@nvidia.com, saeedm@nvidia.com,
+ idosch@nvidia.com, petrm@nvidia.com
+Subject: Re: [patch net-next v2 10/11] devlink: introduce dump selector attr
+ and use it for per-instance dumps
+Message-ID: <20230731100341.4809a372@kernel.org>
+In-Reply-To: <ZMetTPCZ59rVLNyQ@nanopsycho>
+References: <20230720121829.566974-1-jiri@resnulli.us>
+	<20230720121829.566974-11-jiri@resnulli.us>
+	<20230725114044.402450df@kernel.org>
+	<ZMetTPCZ59rVLNyQ@nanopsycho>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH iproute2-next v2] ip: error out if iplink does not consume all
- options
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169082282313.13444.10817239556111817211.git-patchwork-notify@kernel.org>
-Date: Mon, 31 Jul 2023 17:00:23 +0000
-References: <20230731161920.741479-1-kuba@kernel.org>
-In-Reply-To: <20230731161920.741479-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: dsahern@gmail.com, stephen@networkplumber.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This patch was applied to iproute2/iproute2.git (main)
-by Stephen Hemminger <stephen@networkplumber.org>:
-
-On Mon, 31 Jul 2023 09:19:20 -0700 you wrote:
-> dummy does not define .parse_opt, which make ip ignore all
-> trailing arguments, for example:
+On Mon, 31 Jul 2023 14:47:08 +0200 Jiri Pirko wrote:
+> >Why not declare a fully nested policy with just the two attrs?  
 > 
->  # ip link add type dummy a b c d e f name cheese
+> Not sure I follow. But the nest under DEVLINK_ATTR_DUMP_SELECTOR has
+> its own policy, generated by devlink_nl_dump_selector_policy_init(). I
+> did it this way instead of separate policy array for 2 reasons:
+> 1) We don't have duplicate and possibly conflicting policies for devlink
+>    root and selector
+> 2) It is easy for specific object type to pass attrs that are included
+>    in the policy initialization (see the health reporter extension later
+>    in this patchset). There are couple of object to benefit from this,
+>    for example "sb".
+> 3) It is I think a bit nicer for specific object type to pass array of
+>    attrs, instead of a policy array that would be exported from netlink.c
 > 
-> will work just fine (and won't call the device "cheese").
-> Error out in this case with a clear error message:
+> If you insist on separate policy arrays, I can do it though.
+
+IMO the contents of the series do not justify the complexity.
+
+> I had it like that initially, I just decided to go this way for the 3 reasons
+> listed above.
 > 
-> [...]
+> >Also - do you know of any userspace which would pass garbage attrs 
+> >to the dumps? Do we really need to accept all attributes, or can
+> >we trim the dump policies to what's actually supported?  
+> 
+> That's what this patch is doing. It only accepts what the kernel
+> understands. It gives the object types (as for example health reporter)
+> option to extend the attr set to accept them into selectors as well, if
+> they know how to handle them.
 
-Here is the summary with links:
-  - [iproute2-next,v2] ip: error out if iplink does not consume all options
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=84ffffeb0a2f
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+I'm talking about the "outer" policy, the level at which
+DEVLINK_ATTR_DUMP_SELECTOR is defined.
 
