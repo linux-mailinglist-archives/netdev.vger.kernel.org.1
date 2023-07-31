@@ -1,103 +1,130 @@
-Return-Path: <netdev+bounces-22781-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22782-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75F9D76932B
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 12:32:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE20E76936A
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 12:48:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B053F1C20BCE
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 10:32:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E82872812C7
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 10:48:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D853F63CF;
-	Mon, 31 Jul 2023 10:32:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1CC711CBD;
+	Mon, 31 Jul 2023 10:48:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD14D18002
-	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 10:32:14 +0000 (UTC)
-Received: from madras.collabora.co.uk (madras.collabora.co.uk [IPv6:2a00:1098:0:82:1000:25:2eeb:e5ab])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78AFBE3;
-	Mon, 31 Jul 2023 03:32:13 -0700 (PDT)
-Received: from [192.168.1.100] (2-237-20-237.ip236.fastwebnet.it [2.237.20.237])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits))
-	(No client certificate requested)
-	(Authenticated sender: kholk11)
-	by madras.collabora.co.uk (Postfix) with ESMTPSA id 7F03E6606FCD;
-	Mon, 31 Jul 2023 11:32:11 +0100 (BST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1690799532;
-	bh=xoosHj1qmc0o7HoZ4wSQyUt8HIP0cBsbyMoDAT5q+g4=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=MstCsEWNQOdrkXbFZ5s2Yku4HVG5NMTLMlJFkDIwHkXuB3bRjyqFsOU/lvrIP+tNO
-	 D+LeQNZGY/dEsFzS3X92INL9/RxUdvq/P6+21BbpTQt7+9YZIKdhYhfxf0tO1Nbp0l
-	 rMh3qvkWVY6M21t6vnLKVwQRVe44U/JoGJbDDhiuNyYr9tsABBldGVspICjYJoR5lZ
-	 eo9rSumxAL2/EuGAVnZWjbc8E2iU7Wm9atwgmU9sCKC24XLEhfIIzql9X3+6VKg9lg
-	 v9OUuHkWnQ8ArqQ3FLOGVaVrDCsYAOOGGlt2iwvXmJtKU2LWe1/uQLMNv8s+dqj/Z9
-	 FqDVnuC1oyDGQ==
-Message-ID: <cae53693-80e9-2dcb-e222-511eb30ef74c@collabora.com>
-Date: Mon, 31 Jul 2023 12:32:09 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAFD94431
+	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 10:48:41 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE57DC433C7;
+	Mon, 31 Jul 2023 10:48:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1690800521;
+	bh=oNk8L5AIJtMIWh7kVldokACXw0Wm983RCwSZY11UU+A=;
+	h=From:Date:Subject:To:Cc:From;
+	b=ia8SJdUzrWij7F9w89Pjty6Ao6sfFlGKydNihv1ATial7l2f01N5rUJU/jsMw2CJO
+	 GAnObRbmDAT2N9lzB3ug9gHFSC3DFTxmqAb2LGSXHTorZbiiYvZBOeT9SfBZ5a7Ix/
+	 rmeKZN+08ujYC6Od4epwA4SAAYN2Kblz0LNaYO2A526wO0BP63qfB0JHr40Zvt/gH0
+	 1lRWA7eZ6meXE6arg/Jmm1IMOL8Ap2mVxK4GD4+2WvNwU2AspLGD3wDxCYjp0eSX+4
+	 gNr42mkqiO/6iSaz79Kmm9SJQYYh2c7w0HlJfxi0JYnx9ADy6VACmggu0hbne5py4J
+	 dJEy2vfXLxqUg==
+From: Mark Brown <broonie@kernel.org>
+Date: Mon, 31 Jul 2023 11:48:32 +0100
+Subject: [PATCH v3] net: netsec: Ignore 'phy-mode' on SynQuacer in DT mode
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH] dt-bindings: net: mediatek,net: fixup MAC binding
-Content-Language: en-US
-To: =?UTF-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>, Matthias Brugger
- <matthias.bgg@gmail.com>, Lorenzo Bianconi <lorenzo@kernel.org>,
- Felix Fietkau <nbd@nbd.name>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org, =?UTF-8?B?UmFmYcWCIE1pxYJlY2tp?=
- <rafal@milecki.pl>
-References: <20230729111045.1779-1-zajec5@gmail.com>
-From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-In-Reply-To: <20230729111045.1779-1-zajec5@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20230731-synquacer-net-v3-1-944be5f06428@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAH+Rx2QC/3WMQQ7CIBAAv9LsWUxZ0FZP/sN4oLC0REMVKrFp+
+ ndpT2ricSaZmSBScBThWEwQKLnoep9BbArQnfItMWcyA5YoygorFkf/eCpNgXkaGKHkVsgmiwZ
+ ycw9k3Wv9nS+ZOxeHPozrPvHF/jslzjiTprI7LbWuzeF0peDptu1DC8sq4Wde/+aYc0VKGmkFN
+ rj/yud5fgPcs5si6gAAAA==
+To: Jassi Brar <jaswinder.singh@linaro.org>, 
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Ard Biesheuvel <ardb@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Mark Brown <broonie@kernel.org>
+X-Mailer: b4 0.13-dev-099c9
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2536; i=broonie@kernel.org;
+ h=from:subject:message-id; bh=oNk8L5AIJtMIWh7kVldokACXw0Wm983RCwSZY11UU+A=;
+ b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBkx5GFMajA5DliNO2u5vKItnjruuSpMkQmEXKRw
+ NVcdiEylu6JATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCZMeRhQAKCRAk1otyXVSH
+ 0BeTB/9IUvCO8AZO4/d9ZU0jOMCPfXoTpl364HC5MSQbHZA6sqkkl1QZhlDjtvqRqsfwgdGyutY
+ 0W20etlwzK1LRCx493u/jF+okfDcfevmm76CR09Q2Za7rN4vz3oTRp8kT7lijn4oDQO8f1n4dsz
+ PkaOYyYHdX8VkLbS7uTTE01x+jc6fImOGFFRrMtZdFxWUvfJzSP76Rk6TSQ38QEYCuaNX5NEQgN
+ tA49PZLM2pglvhWsOsoz2DWBE9t3bSnVh7rfLSkGIrvzGvE7WLOJPs/unioQQ9G7nQeQK4ar+ds
+ taY8+GTl5jCb5AWotdU8jl/oiPPtckPpFK7Y6gLtv07EJn9G
+X-Developer-Key: i=broonie@kernel.org; a=openpgp;
+ fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 
-Il 29/07/23 13:10, Rafał Miłecki ha scritto:
-> From: Rafał Miłecki <rafal@milecki.pl>
-> 
-> 1. Use unevaluatedProperties
-> It's needed to allow ethernet-controller.yaml properties work correctly.
-> 
-> 2. Drop unneeded phy-handle/phy-mode
-> 
-> 3. Don't require phy-handle
-> Some SoCs may use fixed link.
-> 
-> For in-kernel MT7621 DTS files this fixes following errors:
-> arch/mips/boot/dts/ralink/mt7621-tplink-hc220-g5-v1.dtb: ethernet@1e100000: mac@0: 'fixed-link' does not match any of the regexes: 'pinctrl-[0-9]+'
->          From schema: Documentation/devicetree/bindings/net/mediatek,net.yaml
-> arch/mips/boot/dts/ralink/mt7621-tplink-hc220-g5-v1.dtb: ethernet@1e100000: mac@0: 'phy-handle' is a required property
->          From schema: Documentation/devicetree/bindings/net/mediatek,net.yaml
-> arch/mips/boot/dts/ralink/mt7621-tplink-hc220-g5-v1.dtb: ethernet@1e100000: mac@1: 'fixed-link' does not match any of the regexes: 'pinctrl-[0-9]+'
->          From schema: Documentation/devicetree/bindings/net/mediatek,net.yaml
-> arch/mips/boot/dts/ralink/mt7621-tplink-hc220-g5-v1.dtb: ethernet@1e100000: mac@1: 'phy-handle' is a required property
->          From schema: Documentation/devicetree/bindings/net/mediatek,net.yaml
-> 
-> Signed-off-by: Rafał Miłecki <rafal@milecki.pl>
+As documented in acd7aaf51b20 ("netsec: ignore 'phy-mode' device
+property on ACPI systems") the SocioNext SynQuacer platform ships with
+firmware defining the PHY mode as RGMII even though the physical
+configuration of the PHY is for TX and RX delays.  Since bbc4d71d63549bc
+("net: phy: realtek: fix rtl8211e rx/tx delay config") this has caused
+misconfiguration of the PHY, rendering the network unusable.
 
-Reviewed-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+This was worked around for ACPI by ignoring the phy-mode property but
+the system is also used with DT.  For DT instead if we're running on a
+SynQuacer force a working PHY mode, as well as the standard EDK2
+firmware with DT there are also some of these systems that use u-boot
+and might not initialise the PHY if not netbooting.  Newer firmware
+imagaes for at least EDK2 are available from Linaro so print a warning
+when doing this.
 
+Fixes: 533dd11a12f6 ("net: socionext: Add Synquacer NetSec driver")
+Signed-off-by: Mark Brown <broonie@kernel.org>
+---
+Changes in v3:
+- Typo fixes.
+- Link to v2: https://lore.kernel.org/r/20230728-synquacer-net-v2-1-aea4d4f32b26@kernel.org
+
+Changes in v2:
+- Unlike ACPI force what appears to be the correct mode, there are
+  u-boot firmwares which might not configure the PHY.
+- Link to v1: https://lore.kernel.org/r/20230727-synquacer-net-v1-1-4d7f5c4cc8d9@kernel.org
+---
+ drivers/net/ethernet/socionext/netsec.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/drivers/net/ethernet/socionext/netsec.c b/drivers/net/ethernet/socionext/netsec.c
+index 2d7347b71c41..0dcd6a568b06 100644
+--- a/drivers/net/ethernet/socionext/netsec.c
++++ b/drivers/net/ethernet/socionext/netsec.c
+@@ -1851,6 +1851,17 @@ static int netsec_of_probe(struct platform_device *pdev,
+ 		return err;
+ 	}
+ 
++	/*
++	 * SynQuacer is physically configured with TX and RX delays
++	 * but the standard firmware claimed otherwise for a long
++	 * time, ignore it.
++	 */
++	if (of_machine_is_compatible("socionext,developer-box") &&
++	    priv->phy_interface != PHY_INTERFACE_MODE_RGMII_ID) {
++		dev_warn(&pdev->dev, "Outdated firmware reports incorrect PHY mode, overriding\n");
++		priv->phy_interface = PHY_INTERFACE_MODE_RGMII_ID;
++	}
++
+ 	priv->phy_np = of_parse_phandle(pdev->dev.of_node, "phy-handle", 0);
+ 	if (!priv->phy_np) {
+ 		dev_err(&pdev->dev, "missing required property 'phy-handle'\n");
+
+---
+base-commit: 5d0c230f1de8c7515b6567d9afba1f196fb4e2f4
+change-id: 20230727-synquacer-net-e241f34baceb
+
+Best regards,
+-- 
+Mark Brown <broonie@kernel.org>
 
 
