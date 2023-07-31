@@ -1,182 +1,120 @@
-Return-Path: <netdev+bounces-22712-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22713-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61A3E768E95
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 09:22:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC600768EA5
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 09:27:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 91BDF1C20BB1
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 07:22:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C6A0D1C2087B
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 07:27:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55AF4612C;
-	Mon, 31 Jul 2023 07:18:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86CDB6112;
+	Mon, 31 Jul 2023 07:27:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 439086124
-	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 07:18:04 +0000 (UTC)
-Received: from mail-wm1-x329.google.com (mail-wm1-x329.google.com [IPv6:2a00:1450:4864:20::329])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2455B2D67;
-	Mon, 31 Jul 2023 00:17:59 -0700 (PDT)
-Received: by mail-wm1-x329.google.com with SMTP id 5b1f17b1804b1-3fbab0d0b88so35766965e9.0;
-        Mon, 31 Jul 2023 00:17:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690787878; x=1691392678;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=q2sRNbI2azaNM3epQYqeDbNNvVsnx+uOoBBxcjhRKfE=;
-        b=FX60aiiY2KctEUh+j9yuK0cGnmKW2WpFZ3k1hVMZjIYTseBraxngepIWNvfcXGsPq1
-         7xSVdY+8zc9yIZ57nKdT+hlUE0Ql178jQsRiH723XYn4HhHTr/pv49QmaTcNQ2XsUNAi
-         PWzt+UqFr/sg0NpYqkGyiJNK7oFd9qBYvtgDfg+keM7SyoPlJi+mcwnnV0qqy8UUXXH+
-         yEQM7BNRR98OhKiErQTxzAomz+aqzdV0nWU9PRrMuhWCCwSQ75cIObdPL85tLs8lZ4Tp
-         84iwFiXBPFqH6x90lqRFXFaxycKbeNqBugndgd7V/GFzGnSbrjoxW1nQKlMiaVkRQI3W
-         1DjQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690787878; x=1691392678;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=q2sRNbI2azaNM3epQYqeDbNNvVsnx+uOoBBxcjhRKfE=;
-        b=HDJUJ5lI3B1ru52ZusBW9FM5UVqAa9eE897G41o42Kj+842Ju+/VQsPjvDRaaBnJGg
-         /QyGOcdSqOx5ToD0N5XIPsMA/RPaKy3DAeVpMHuUCnZcnZau+6QkVicej0ibzOwUHAWu
-         ccOUR8EwLFd31gX9z3FhJ3jpiEVonnaCt/R+TnEL9b7wK0jWvbBLze3I2RUuWwYXPfXl
-         T6YlMDQTBo89L5tKZNkTQ3rVnhGCSy7nwLnP01mXyoTF+QRiGCDQA2Fapih3WAE61p56
-         zjyFwMmgMr7+mppwL/b7vLQcKxXZ+m88Bt5GQWo51Ilpg3VoUffASjtGalUD0wk0EIxZ
-         H49A==
-X-Gm-Message-State: ABy/qLZ0ZGwTE3qVopxwcKG79bf4z4ejDBFk6F+jj/rr6EWIdHBUnwzF
-	GdDYN3kC0MnYld2z/7ID8N8=
-X-Google-Smtp-Source: APBJJlGu0nMEMnREkxmuP9HbttYHTkOQMIO/9DuZ+oCLZJRAJKvQMp2PbLtUuafN9hLtmhCbZ6/OJw==
-X-Received: by 2002:a5d:60c1:0:b0:313:e88d:e6d3 with SMTP id x1-20020a5d60c1000000b00313e88de6d3mr10154506wrt.14.1690787877583;
-        Mon, 31 Jul 2023 00:17:57 -0700 (PDT)
-Received: from localhost ([165.225.194.214])
-        by smtp.gmail.com with ESMTPSA id k1-20020adff5c1000000b00313de682eb3sm12164837wrp.65.2023.07.31.00.17.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 31 Jul 2023 00:17:57 -0700 (PDT)
-From: Joel Granados <joel.granados@gmail.com>
-X-Google-Original-From: Joel Granados <j.granados@samsung.com>
-To: mcgrof@kernel.org
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Iurii Zaikin <yzaikin@google.com>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Kees Cook <keescook@chromium.org>,
-	"D. Wythe" <alibuda@linux.alibaba.com>,
-	mptcp@lists.linux.dev,
-	Jakub Kicinski <kuba@kernel.org>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	coreteam@netfilter.org,
-	Jan Karcher <jaka@linux.ibm.com>,
-	Alexander Aring <alex.aring@gmail.com>,
-	Will Deacon <will@kernel.org>,
-	Stefan Schmidt <stefan@datenfreihafen.org>,
-	Matthieu Baerts <matthieu.baerts@tessares.net>,
-	bridge@lists.linux-foundation.org,
-	linux-arm-kernel@lists.infradead.org,
-	Joerg Reuter <jreuter@yaina.de>,
-	Julian Anastasov <ja@ssi.bg>,
-	David Ahern <dsahern@kernel.org>,
-	netfilter-devel@vger.kernel.org,
-	Wen Gu <guwen@linux.alibaba.com>,
-	linux-kernel@vger.kernel.org,
-	Santosh Shilimkar <santosh.shilimkar@oracle.com>,
-	linux-wpan@vger.kernel.org,
-	lvs-devel@vger.kernel.org,
-	Karsten Graul <kgraul@linux.ibm.com>,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-sctp@vger.kernel.org,
-	Tony Lu <tonylu@linux.alibaba.com>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Ralf Baechle <ralf@linux-mips.org>,
-	Florian Westphal <fw@strlen.de>,
-	willy@infradead.org,
-	Heiko Carstens <hca@linux.ibm.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-rdma@vger.kernel.org,
-	Roopa Prabhu <roopa@nvidia.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Simon Horman <horms@verge.net.au>,
-	Mat Martineau <martineau@kernel.org>,
-	josh@joshtriplett.org,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Eric Dumazet <edumazet@google.com>,
-	linux-hams@vger.kernel.org,
-	Wenjia Zhang <wenjia@linux.ibm.com>,
-	linux-fsdevel@vger.kernel.org,
-	linux-s390@vger.kernel.org,
-	Xin Long <lucien.xin@gmail.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	netdev@vger.kernel.org,
-	rds-devel@oss.oracle.com,
-	Joel Granados <j.granados@samsung.com>,
-	Jani Nikula <jani.nikula@linux.intel.com>
-Subject: [PATCH v2 14/14] sysctl: Use ctl_table_size as stopping criteria for list macro
-Date: Mon, 31 Jul 2023 09:17:28 +0200
-Message-Id: <20230731071728.3493794-15-j.granados@samsung.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20230731071728.3493794-1-j.granados@samsung.com>
-References: <20230731071728.3493794-1-j.granados@samsung.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B0A91FA4
+	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 07:27:05 +0000 (UTC)
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B692C1703;
+	Mon, 31 Jul 2023 00:27:03 -0700 (PDT)
+Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36V7BwOK002128;
+	Mon, 31 Jul 2023 07:26:48 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=OGKgTUQdiOBkn8EITMnpjyPTwSnRGvYmwWmatLPbyzs=;
+ b=tC1IHoJor0t8foyGv9epTpmmX2M3zNlKapYStTMP5RVxBQde1QwPMQSgTOCZS+Iku8pI
+ 2Ekzaik9vA7QEqRWoT5RwSAmehyjU6ISm67ee5iIXmaNzEU9AuwfiiAQHl72wJBN2bcE
+ 4lflMmNowtz03UxxF8/tBw8ibjLwEBDh5yj/EOs1A26juTnXmm2sriDjJTbofABTGPNZ
+ O9+KwWDiyC80IvVZbDx8hIDAxxHeM5DS5omGHhdNptKEozzj0k16zlIUzPBN7g44jaMt
+ AytQqDaD/ASzaIyO0S1E+HvxdVI0H61kgxiXVk85KX7PRLZFRi3d/PHvQS1RpYgoJPPg OQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3s68bv0enp-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 31 Jul 2023 07:26:47 +0000
+Received: from m0353726.ppops.net (m0353726.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 36V7C1Sl002470;
+	Mon, 31 Jul 2023 07:26:47 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3s68bv0en0-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 31 Jul 2023 07:26:46 +0000
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 36V6dYB9015486;
+	Mon, 31 Jul 2023 07:26:45 GMT
+Received: from smtprelay01.wdc07v.mail.ibm.com ([172.16.1.68])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3s5e3mh6y6-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 31 Jul 2023 07:26:45 +0000
+Received: from smtpav04.wdc07v.mail.ibm.com (smtpav04.wdc07v.mail.ibm.com [10.39.53.231])
+	by smtprelay01.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 36V7QibZ34079068
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 31 Jul 2023 07:26:44 GMT
+Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id A85765805E;
+	Mon, 31 Jul 2023 07:26:44 +0000 (GMT)
+Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D457D58045;
+	Mon, 31 Jul 2023 07:26:41 +0000 (GMT)
+Received: from [9.171.26.13] (unknown [9.171.26.13])
+	by smtpav04.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Mon, 31 Jul 2023 07:26:41 +0000 (GMT)
+Message-ID: <67def28b-27cf-560d-8b33-d94a8b8a4d9d@linux.ibm.com>
+Date: Mon, 31 Jul 2023 09:26:40 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.13.0
+Subject: Re: [PATCH net-next] net/smc: Remove unused function declarations
+To: Yue Haibing <yuehaibing@huawei.com>, kgraul@linux.ibm.com,
+        jaka@linux.ibm.com, alibuda@linux.alibaba.com,
+        tonylu@linux.alibaba.com, guwen@linux.alibaba.com, davem@davemloft.net,
+        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+Cc: linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20230729121929.17180-1-yuehaibing@huawei.com>
+From: Wenjia Zhang <wenjia@linux.ibm.com>
+In-Reply-To: <20230729121929.17180-1-yuehaibing@huawei.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: uODoM8UPlxLbEVWzylmkl_fwteAOR5j1
+X-Proofpoint-ORIG-GUID: EZqHPi-9IKEEMVyy4IrcDAarHBtdvSRW
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-07-27_10,2023-07-26_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 mlxscore=0
+ clxscore=1011 malwarescore=0 mlxlogscore=999 impostorscore=0 adultscore=0
+ phishscore=0 lowpriorityscore=0 priorityscore=1501 bulkscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2306200000 definitions=main-2307310062
+X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
+	RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-This is a preparation commit to make it easy to remove the sentinel
-elements (empty end markers) from the ctl_table arrays. It both allows
-the systematic removal of the sentinels and adds the ctl_table_size
-variable to the stopping criteria of the list_for_each_table_entry macro
-that traverses all ctl_table arrays. Once all the sentinels are removed
-by subsequent commits, ctl_table_size will become the only stopping
-criteria in the macro. We don't actually remove any elements in this
-commit, but it sets things up to for the removal process to take place.
 
-By adding header->ctl_table_size as an additional stopping criteria for
-the list_for_each_table_entry macro, it will execute until it finds an
-"empty" ->procname or until the size runs out. Therefore if a ctl_table
-array with a sentinel is passed its size will be too big (by one
-element) but it will stop on the sentinel. On the other hand, if the
-ctl_table array without a sentinel is passed its size will be just write
-and there will be no need for a sentinel.
 
-Signed-off-by: Joel Granados <j.granados@samsung.com>
-Suggested-by: Jani Nikula <jani.nikula@linux.intel.com>
----
- fs/proc/proc_sysctl.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+On 29.07.23 14:19, Yue Haibing wrote:
+> commit f9aab6f2ce57 ("net/smc: immediate freeing in smc_lgr_cleanup_early()")
+> left behind smc_lgr_schedule_free_work_fast() declaration.
+> And since commit 349d43127dac ("net/smc: fix kernel panic caused by race of smc_sock")
+> smc_ib_modify_qp_reset() is not used anymore.
+> 
+> Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
 
-diff --git a/fs/proc/proc_sysctl.c b/fs/proc/proc_sysctl.c
-index 817bc51c58d8..504e847c2a3a 100644
---- a/fs/proc/proc_sysctl.c
-+++ b/fs/proc/proc_sysctl.c
-@@ -19,8 +19,9 @@
- #include <linux/kmemleak.h>
- #include "internal.h"
- 
--#define list_for_each_table_entry(entry, header) \
--	for ((entry) = (header->ctl_table); (entry)->procname; (entry)++)
-+#define list_for_each_table_entry(entry, header)	\
-+	entry = header->ctl_table;			\
-+	for (size_t i = 0 ; i < header->ctl_table_size && entry->procname; ++i, entry++)
- 
- static const struct dentry_operations proc_sys_dentry_operations;
- static const struct file_operations proc_sys_file_operations;
--- 
-2.30.2
+Thank you for the findings!
 
+Reviewed-by: Wenjia Zhang <wenjia@linux.ibm.com>
 
