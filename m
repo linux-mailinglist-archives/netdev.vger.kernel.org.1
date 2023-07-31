@@ -1,112 +1,156 @@
-Return-Path: <netdev+bounces-22920-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22921-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 877B676A05F
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 20:27:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1603E76A06E
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 20:30:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B71411C20C6F
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 18:27:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 41D231C20CF5
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 18:30:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 813131DDCC;
-	Mon, 31 Jul 2023 18:27:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41C2E1426B;
+	Mon, 31 Jul 2023 18:30:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74DE71DDCA
-	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 18:27:10 +0000 (UTC)
-Received: from mail-qt1-x835.google.com (mail-qt1-x835.google.com [IPv6:2607:f8b0:4864:20::835])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B95E510CE;
-	Mon, 31 Jul 2023 11:27:07 -0700 (PDT)
-Received: by mail-qt1-x835.google.com with SMTP id d75a77b69052e-403b3213d8aso29227601cf.0;
-        Mon, 31 Jul 2023 11:27:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690828027; x=1691432827;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dlds1JSHqdvGEcoD53cMNrPoiV5pobOGiP/ZwpDCtn0=;
-        b=P1aF1FixjZ4baIYKYQcJMUVQaSeaTglgrEdiuYk5riBlYLQpN+E+EYDI+6kbnReSwW
-         rzac9hbGX0DzvG8WeU3ewBjK3U6HX10Ih8FMGBve2TOiVsY8YuqzDXHUBxkpNiHo4HwG
-         bDvPKUO3p+BreKfyAg1KDl8W8wiKZ/79POOAAywzP+HLlmTiiB0x/Hm7Aooac3U+qBzk
-         KzAQd/2WYcm8j8V425Hepnc60xRDcXrPBB82JlKj7ybFl78LrajuCbuBdd5g5AvMmGJm
-         0WyUmekI1W7w3+i0ZgQjZblbhGeNeQWrBlnLWte33GTcyQ4BaVeAFPTKNIGXTFrVUJGZ
-         q3Fg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690828027; x=1691432827;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=dlds1JSHqdvGEcoD53cMNrPoiV5pobOGiP/ZwpDCtn0=;
-        b=Bi4duX0Wn1M3cPpqAu65AXw34AOUv+hyuJvNnAJWpJt0zf53GB9K1wjrDTtnjP5PIJ
-         uJVlaGng3FaKUEP53MEuW/KgXsUW6PfgAAZDH4C7UWJLO07VqjehoJi4Jlh7G/VSpG0M
-         pgS4nNCTI8NxhHME5kAO1n0AriZVmtGnbtrjAyoGGtYzZaGTcJmJxgZsH4rBNmoFyhuD
-         3opP1MuanXsfNvNTuVsKMTxrsMUP3rgaKo7sRF1nbM2RCgpxpeQjPQuVmrnk7yEa+Sc0
-         mWGQHOi1E/VsUERKeZSr7DuN87OzdmpCnKwZ3rgnEC85raVF6qMJGxnFOB9iFIFhL4WJ
-         GXQw==
-X-Gm-Message-State: ABy/qLZ3HpmkkVlm3IWHtsuycUwCwBygs+tOEzN6ohHHoboBJLErYpos
-	8A1+YOahz8VhCSaPO9hviKA=
-X-Google-Smtp-Source: APBJJlHExGsd6nGILbuTvECZzdZBY3jFS8hu+E6pTEriShJKCMmQSHY57RF73HuiIyswSqG7MoBXlg==
-X-Received: by 2002:ac8:7e94:0:b0:3ff:2923:48a with SMTP id w20-20020ac87e94000000b003ff2923048amr15303100qtj.3.1690828026873;
-        Mon, 31 Jul 2023 11:27:06 -0700 (PDT)
-Received: from localhost (172.174.245.35.bc.googleusercontent.com. [35.245.174.172])
-        by smtp.gmail.com with ESMTPSA id l6-20020ac84586000000b00400aa8592d1sm1916807qtn.36.2023.07.31.11.27.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 31 Jul 2023 11:27:06 -0700 (PDT)
-Date: Mon, 31 Jul 2023 14:27:06 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Gustavo Luiz Duarte <gustavold@gmail.com>, 
- netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- David Ahern <dsahern@kernel.org>, 
- Breno Leitao <leitao@debian.org>, 
- Willem de Bruijn <willemb@google.com>, 
- linux-kernel@vger.kernel.org, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Message-ID: <64c7fcfa3d428_17de01294e8@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20230731145713.178509-1-gustavold@gmail.com>
-References: <20230731145713.178509-1-gustavold@gmail.com>
-Subject: RE: [PATCH] net: ipmr: Call ipmr_ioctl() directly from
- ipmr_sk_ioctl()
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C34D91DDD3;
+	Mon, 31 Jul 2023 18:30:34 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 082BDC433C7;
+	Mon, 31 Jul 2023 18:30:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1690828234;
+	bh=azdNP8cF85m7UDvgXMTAEEGyM/wWyMIGFgmuwIc8ul0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=O1VpJucJ8qJ4G6AE1OKV3xdN/xK/FDklzv/nwqYZajcZtRy+LSUQU50X+sHs9AxvB
+	 xsU2buC2SUK4CZR3jjYJZtrydR9Bbqd9WCPwdG5zMYEjJLfGD0nXQIDtdar/ei7qKh
+	 Q4AFqyXfVyBH57dywLI4uw0Frcitouu9e42wpiwCGypovk04FOzCfl60zxzFG2eyak
+	 ANZHJkor5YlN+5saTB/xwrXYhgw16Q93h89m9IIkWKyhNAHwsbqX1ZrfONEa6iuY6k
+	 btG9dsvLFpB0/w7f/xaTE6xEYGtgYWH7rF7vGs2JSC6YVtwrN6iixwxcTNdpmmdRV2
+	 wiQHQ/+OXxCxw==
+Date: Mon, 31 Jul 2023 20:30:21 +0200
+From: Simon Horman <horms@kernel.org>
+To: Joel Granados <joel.granados@gmail.com>
+Cc: mcgrof@kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
+	Iurii Zaikin <yzaikin@google.com>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Kees Cook <keescook@chromium.org>,
+	"D. Wythe" <alibuda@linux.alibaba.com>, mptcp@lists.linux.dev,
+	Jakub Kicinski <kuba@kernel.org>, Vasily Gorbik <gor@linux.ibm.com>,
+	Paolo Abeni <pabeni@redhat.com>, coreteam@netfilter.org,
+	Jan Karcher <jaka@linux.ibm.com>,
+	Alexander Aring <alex.aring@gmail.com>,
+	Will Deacon <will@kernel.org>,
+	Stefan Schmidt <stefan@datenfreihafen.org>,
+	Matthieu Baerts <matthieu.baerts@tessares.net>,
+	bridge@lists.linux-foundation.org,
+	linux-arm-kernel@lists.infradead.org,
+	Joerg Reuter <jreuter@yaina.de>, Julian Anastasov <ja@ssi.bg>,
+	David Ahern <dsahern@kernel.org>, netfilter-devel@vger.kernel.org,
+	Wen Gu <guwen@linux.alibaba.com>, linux-kernel@vger.kernel.org,
+	Santosh Shilimkar <santosh.shilimkar@oracle.com>,
+	linux-wpan@vger.kernel.org, lvs-devel@vger.kernel.org,
+	Karsten Graul <kgraul@linux.ibm.com>,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-sctp@vger.kernel.org, Tony Lu <tonylu@linux.alibaba.com>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Ralf Baechle <ralf@linux-mips.org>, Florian Westphal <fw@strlen.de>,
+	willy@infradead.org, Heiko Carstens <hca@linux.ibm.com>,
+	"David S. Miller" <davem@davemloft.net>, linux-rdma@vger.kernel.org,
+	Roopa Prabhu <roopa@nvidia.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Simon Horman <horms@verge.net.au>,
+	Mat Martineau <martineau@kernel.org>, josh@joshtriplett.org,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Eric Dumazet <edumazet@google.com>, linux-hams@vger.kernel.org,
+	Wenjia Zhang <wenjia@linux.ibm.com>, linux-fsdevel@vger.kernel.org,
+	linux-s390@vger.kernel.org, Xin Long <lucien.xin@gmail.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>, netdev@vger.kernel.org,
+	rds-devel@oss.oracle.com, Joel Granados <j.granados@samsung.com>
+Subject: Re: [PATCH v2 03/14] sysctl: Add ctl_table_size to ctl_table_header
+Message-ID: <ZMf9vZpGE98oM9W2@kernel.org>
+References: <20230731071728.3493794-1-j.granados@samsung.com>
+ <20230731071728.3493794-4-j.granados@samsung.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230731071728.3493794-4-j.granados@samsung.com>
 
-Gustavo Luiz Duarte wrote:
-> Call ipmr_ioctl()/ip6mr_ioctl() directly from ipmr_sk_ioctl()/ip6mr_sk_ioctl()
-> and avoid sk_prot->ioctl function pointer indirection.
+On Mon, Jul 31, 2023 at 09:17:17AM +0200, Joel Granados wrote:
+> The new ctl_table_size element will hold the size of the ctl_table
+> arrays contained in the ctl_table_header. This value should eventually
+> be passed by the callers to the sysctl register infrastructure. And
+> while this commit introduces the variable, it does not set nor use it
+> because that requires case by case considerations for each caller.
 > 
-> Also, delete the sock_ioctl_inout() helper as it is no longer needed.
+> It provides two important things: (1) A place to put the
+> result of the ctl_table array calculation when it gets introduced for
+> each caller. And (2) the size that will be used as the additional
+> stopping criteria in the list_for_each_table_entry macro (to be added
+> when all the callers are migrated)
 > 
-> Signed-off-by: Gustavo Luiz Duarte <gustavold@gmail.com>
-> Suggested-by: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+> Signed-off-by: Joel Granados <j.granados@samsung.com>
 > ---
->  include/linux/mroute6.h | 33 ++++++++++++++++++++++++++-------
->  include/net/sock.h      |  2 --
->  net/core/sock.c         | 20 --------------------
->  net/ipv4/ipmr.c         | 33 ++++++++++++++++++++++++++-------
->  4 files changed, 52 insertions(+), 36 deletions(-)
+>  include/linux/sysctl.h | 14 ++++++++++++--
+>  1 file changed, 12 insertions(+), 2 deletions(-)
+> 
+> diff --git a/include/linux/sysctl.h b/include/linux/sysctl.h
+> index 59d451f455bf..33252ad58ebe 100644
+> --- a/include/linux/sysctl.h
+> +++ b/include/linux/sysctl.h
+> @@ -159,12 +159,22 @@ struct ctl_node {
+>  	struct ctl_table_header *header;
+>  };
+>  
+> -/* struct ctl_table_header is used to maintain dynamic lists of
+> -   struct ctl_table trees. */
+> +/**
+> + * struct ctl_table_header - maintains dynamic lists of struct ctl_table trees
+> + * @ctl_table: pointer to the first element in ctl_table array
+> + * @ctl_table_size: number of elements pointed by @ctl_table
+> + * @used: The entry will never be touched when equal to 0.
+> + * @count: Upped every time something is added to @inodes and downed every time
+> + *         something is removed from inodes
+> + * @nreg: When nreg drops to 0 the ctl_table_header will be unregistered.
+> + * @rcu: Delays the freeing of the inode. Introduced with "unfuck proc_sysctl ->d_compare()"
+> + *
+> + */
 
-The helper function does save some LoC, it seems.
+Hi Joel,
 
-My comment came during review of the series. Now that that is in,
-fine to leave as is, imho.
+Please consider also adding kernel doc entries for the other fields of
+struct ctl_table_header. According to ./scripts/kernel-doc -none
+they are:
+
+  unregistering
+  ctl_table_arg
+  root
+  set
+  parent
+  node
+  inodes
+
+
+>  struct ctl_table_header {
+>  	union {
+>  		struct {
+>  			struct ctl_table *ctl_table;
+> +			int ctl_table_size;
+>  			int used;
+>  			int count;
+>  			int nreg;
+> -- 
+> 2.30.2
+> 
 
