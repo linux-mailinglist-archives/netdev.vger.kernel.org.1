@@ -1,33 +1,33 @@
-Return-Path: <netdev+bounces-22973-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22974-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC01A76A419
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 00:23:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE72276A41E
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 00:24:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 19FFC2814CA
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 22:23:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DFBBA1C20D40
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 22:24:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8D191E537;
-	Mon, 31 Jul 2023 22:23:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02BB11E538;
+	Mon, 31 Jul 2023 22:24:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6F734A12
-	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 22:23:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC6214A12
+	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 22:24:33 +0000 (UTC)
 Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4549812B;
-	Mon, 31 Jul 2023 15:23:53 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0BA112B;
+	Mon, 31 Jul 2023 15:24:32 -0700 (PDT)
 Received: from local
 	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
 	 (Exim 4.96)
 	(envelope-from <daniel@makrotopia.org>)
-	id 1qQbIe-0002Rs-10;
-	Mon, 31 Jul 2023 22:23:37 +0000
-Date: Mon, 31 Jul 2023 23:23:16 +0100
+	id 1qQbJO-0002SO-38;
+	Mon, 31 Jul 2023 22:24:23 +0000
+Date: Mon, 31 Jul 2023 23:24:06 +0100
 From: Daniel Golle <daniel@makrotopia.org>
 To: Felix Fietkau <nbd@nbd.name>, Lorenzo Bianconi <lorenzo@kernel.org>,
 	Ryder Lee <ryder.lee@mediatek.com>,
@@ -45,9 +45,10 @@ To: Felix Fietkau <nbd@nbd.name>, Lorenzo Bianconi <lorenzo@kernel.org>,
 	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
 	linux-mediatek@lists.infradead.org
-Subject: [PATCH net-next v3 1/2] dt-bindings: mt76: support setting per-band
- MAC address
-Message-ID: <d3130584b64309da28a04826100643ff6239f9ca.1690841657.git.daniel@makrotopia.org>
+Subject: [PATCH v3 2/2] wifi: mt76: support per-band MAC addresses from OF
+ child nodes
+Message-ID: <c69fec6bd0b6e4e8a2a776cbc860fceb977fa4b6.1690841657.git.daniel@makrotopia.org>
+References: <d3130584b64309da28a04826100643ff6239f9ca.1690841657.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,140 +57,82 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <d3130584b64309da28a04826100643ff6239f9ca.1690841657.git.daniel@makrotopia.org>
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
 	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Introduce support for setting individual per-band MAC addresses using
-NVMEM cells by adding a 'bands' object with enumerated child nodes
-representing the 2.4 GHz, 5 GHz and 6 GHz bands.
+With dual-band-dual-congruent front-ends which appear as two independent
+radios it is desirable to assign a per-band MAC address from device-tree,
+eg. using nvmem-cells.
+Support specifying MAC-address related properties in band-specific child
+nodes, e.g.
+        wifi@0,0 {
+                reg = <0x0000 0 0 0 0>;
+                #addr-cells = <1>;
+                #size-cells = <0>;
 
-In case it is defined, call of_get_mac_address for the per-band child
-node, otherwise try with of_get_mac_address on the main device node and
-fall back to a random address like it used to be.
+                band@0 {
+                        /* 2.4 GHz */
+                        reg = <0>;
+                        nvmem-cells = <&macaddr 2>;
+                        nvmem-cell-names = "mac-address";
+                };
 
-While at it, add MAC address related properties also for the main node.
+                band@1 {
+                        /* 5 GHz */
+                        reg = <1>;
+                        nvmem-cells = <&macaddr 3>;
+                        nvmem-cell-names = "mac-address";
+                };
+        };
 
 Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+Tested-by: Shiji Yang <yangshiji66@outlook.com>
 ---
 Changes since v2:
- * drop items list with only a single item
+ * none
 
 Changes since v1:
- * add dt-bindings
+ * refactor and add missing of_node_put()
 
- .../bindings/net/wireless/mediatek,mt76.yaml  | 58 ++++++++++++++++++-
- 1 file changed, 57 insertions(+), 1 deletion(-)
+ drivers/net/wireless/mediatek/mt76/eeprom.c | 20 ++++++++++++++++++--
+ 1 file changed, 18 insertions(+), 2 deletions(-)
 
-diff --git a/Documentation/devicetree/bindings/net/wireless/mediatek,mt76.yaml b/Documentation/devicetree/bindings/net/wireless/mediatek,mt76.yaml
-index 252207adbc54c..7eafed53da1de 100644
---- a/Documentation/devicetree/bindings/net/wireless/mediatek,mt76.yaml
-+++ b/Documentation/devicetree/bindings/net/wireless/mediatek,mt76.yaml
-@@ -37,6 +37,12 @@ properties:
-     description:
-       MT7986 should contain 3 regions consys, dcm, and sku, in this order.
+diff --git a/drivers/net/wireless/mediatek/mt76/eeprom.c b/drivers/net/wireless/mediatek/mt76/eeprom.c
+index 36564930aef12..c2b3386cada1c 100644
+--- a/drivers/net/wireless/mediatek/mt76/eeprom.c
++++ b/drivers/net/wireless/mediatek/mt76/eeprom.c
+@@ -161,9 +161,25 @@ void
+ mt76_eeprom_override(struct mt76_phy *phy)
+ {
+ 	struct mt76_dev *dev = phy->dev;
+-	struct device_node *np = dev->dev->of_node;
++	struct device_node *np = dev->dev->of_node, *band_np;
++	bool found_mac = false;
++	u32 reg;
++	int ret;
++
++	for_each_child_of_node(np, band_np) {
++		ret = of_property_read_u32(band_np, "reg", &reg);
++		if (ret)
++			continue;
++
++		if (reg == phy->band_idx) {
++			found_mac = !of_get_mac_address(band_np, phy->macaddr);
++			of_node_put(band_np);
++			break;
++		}
++	}
  
-+  '#address-cells':
-+    const: 1
-+
-+  '#size-cells':
-+    const: 0
-+
-   interrupts:
-     maxItems: 1
+-	of_get_mac_address(np, phy->macaddr);
++	if (!found_mac)
++		of_get_mac_address(np, phy->macaddr);
  
-@@ -72,13 +78,23 @@ properties:
- 
-   ieee80211-freq-limit: true
- 
-+  address: true
-+
-+  local-mac-address: true
-+
-+  mac-address: true
-+
-   nvmem-cells:
-+    minItems: 1
-     items:
-       - description: NVMEM cell with EEPROM
-+      - description: NVMEM cell with the MAC address
- 
-   nvmem-cell-names:
-+    minItems: 1
-     items:
-       - const: eeprom
-+      - const: mac-address
- 
-   mediatek,eeprom-data:
-     $ref: /schemas/types.yaml#/definitions/uint32-array
-@@ -213,6 +229,29 @@ properties:
-                     description:
-                       Half-dBm power delta for different numbers of antennas
- 
-+patternProperties:
-+  '^band@[0-2]+$':
-+    type: object
-+    additionalProperties: false
-+    properties:
-+      reg:
-+        maxItems: 1
-+
-+      address: true
-+      local-mac-address: true
-+      mac-address: true
-+
-+      nvmem-cells:
-+        description: NVMEM cell with the MAC address
-+
-+      nvmem-cell-names:
-+        const: mac-address
-+
-+    required:
-+      - reg
-+
-+    unevaluatedProperties: false
-+
- required:
-   - compatible
-   - reg
-@@ -225,10 +264,13 @@ examples:
-       #address-cells = <3>;
-       #size-cells = <2>;
-       wifi@0,0 {
-+        #address-cells = <1>;
-+        #size-cells = <0>;
-         compatible = "mediatek,mt76";
-         reg = <0x0000 0 0 0 0>;
-         ieee80211-freq-limit = <5000000 6000000>;
--        mediatek,mtd-eeprom = <&factory 0x8000>;
-+        nvmem-cells = <&factory_eeprom>;
-+        nvmem-cell-names = "eeprom";
-         big-endian;
- 
-         led {
-@@ -257,6 +299,20 @@ examples:
-              };
-           };
-         };
-+
-+        band@0 {
-+          /* 2.4 GHz */
-+          reg = <0>;
-+          nvmem-cells = <&macaddr 0x4>;
-+          nvmem-cell-names = "mac-address";
-+        };
-+
-+        band@1 {
-+          /* 5 GHz */
-+          reg = <1>;
-+          nvmem-cells = <&macaddr 0xa>;
-+          nvmem-cell-names = "mac-address";
-+        };
-       };
-     };
- 
+ 	if (!is_valid_ether_addr(phy->macaddr)) {
+ 		eth_random_addr(phy->macaddr);
 -- 
 2.41.0
 
