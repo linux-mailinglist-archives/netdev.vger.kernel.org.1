@@ -1,120 +1,169 @@
-Return-Path: <netdev+bounces-22849-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22851-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C970769976
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 16:27:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1756B7699C8
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 16:41:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C975A1C20C01
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 14:27:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4B09F2814C0
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 14:41:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6387218B14;
-	Mon, 31 Jul 2023 14:27:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BF2818C0C;
+	Mon, 31 Jul 2023 14:41:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5861B4429
-	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 14:27:00 +0000 (UTC)
-Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE260B6
-	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 07:26:57 -0700 (PDT)
-Received: by mail-wr1-x431.google.com with SMTP id ffacd0b85a97d-314417861b9so3840102f8f.0
-        for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 07:26:57 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C67218B07
+	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 14:41:27 +0000 (UTC)
+Received: from mail-wr1-x42c.google.com (mail-wr1-x42c.google.com [IPv6:2a00:1450:4864:20::42c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E81098
+	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 07:41:26 -0700 (PDT)
+Received: by mail-wr1-x42c.google.com with SMTP id ffacd0b85a97d-3178fa77b27so3024994f8f.2
+        for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 07:41:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1690813616; x=1691418416;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=d0amng8ESj5Ivn3+1Qpwn6F8c5hSHQtHpqsKrSaqmyM=;
-        b=uc+fd4z3doK5zO6DlkUKmP75VP+YhckG31qRdKmzMx3SfzHxgEvUG4TZJe3y+phASO
-         Vt6Vj2SpM+mhoB8FlaaLfSg4GvJr5glzyru4hhZn2/OF34PIdvyQuuXIC2o82IDlbMkT
-         lvFY0u9O1qGNbQKhcLXSslU6Vjv6a+4hxvgmthJJEMVtsaJzdLjgk1j/Kq9rQ4lHsJTR
-         Ep8xhUPTxZj6UgC7aru352SW/OnJsGkG03+RxM49bagpvN9UyEQbzbEjYCKCq+GDPMFr
-         ipmS+4dk5mg5xGqNuajn9l1LXxr1F4Lh8OtGHZ3MAO2L7rx6TLAp98U/lDNOZOVNjYLy
-         fd2Q==
+        d=linaro.org; s=google; t=1690814485; x=1691419285;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Oqt2DFEc4IMcc2ugBSc+fA3oh1ZenLGhqZy4tnNtGls=;
+        b=LsZNGd1/ups2ximF1+eofMcwB4KdW73HLh1blYmTzKRU7BNqgCakk0onYpKk7LEwb7
+         zqWP65z3ufmkWZgdkEKp8i01ZP43ewJu8aEBP3MgnrVHA2zd08FmNo89FkGqbB1pqPhl
+         57+FKSLUP7OnjWilS9rDzim9LLWW2T7hoCVznHTy9eYHsX2pmxwoNq9g7ZuQbiBFbTBw
+         beeUMtl59W/TfKtP+PwDRv+Knh2gqwK2APgjDycjXN4aaC9wo7uE+RDQ6GRP17O9tGl7
+         are8MqkzmJ6JZmtUmPZbldWy2JZZD1H6c04+aBUG1Zc6Lwlj5ZGZ82pFXssGGHrM9kem
+         kSGA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690813616; x=1691418416;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=d0amng8ESj5Ivn3+1Qpwn6F8c5hSHQtHpqsKrSaqmyM=;
-        b=OWSI0Knu7oTOhurqe/A1Pp0t7XzIip08QntiuGwC0qetnnVFqYHCGSf/sZMUiI2amx
-         tkwfY6dJzArCR+ohVxkOBy8GFOpMRblw2WsKmuzye7vYWSc57CkeYz3Hi/ef4rPaK/sk
-         8Ojon2CFsKwmWSyeuWZ36+MFO6MtdXCz5ZFVurFx0esy4G9lDB++RCCkzzj3ttV06yKR
-         +SzJhB/IYm41DXI0Y2aBqLf+/gdqK9G0nceLVOawFhmdPZZZlBfRcZY+yDK5z5oGww8Y
-         Rf9/UByEp0D6rL34V8m5zHJ6xw5LMN6QBgsyVD5YYxFjE/zoUwA9WvzLmBFcBtj8rmZL
-         /9pQ==
-X-Gm-Message-State: ABy/qLaR+xPGg72wX6Zq7r42PZk5pa99eE38QUlAle+XWJtkol888mMO
-	f4K4KugIYVRlM9vYwC2cj4H/3A==
-X-Google-Smtp-Source: APBJJlGzCyI+U5RVUU8FDM+eBfMc+3uCEUPv/aNqKzgnlSN7kdoPm8KbQdY/Zxi8dDL10HtPb67Ihw==
-X-Received: by 2002:adf:f70c:0:b0:313:f61c:42b2 with SMTP id r12-20020adff70c000000b00313f61c42b2mr5302957wrp.69.1690813616290;
-        Mon, 31 Jul 2023 07:26:56 -0700 (PDT)
-Received: from localhost ([102.36.222.112])
-        by smtp.gmail.com with ESMTPSA id a8-20020adfed08000000b0031417b0d338sm13274552wro.87.2023.07.31.07.26.55
+        d=1e100.net; s=20221208; t=1690814485; x=1691419285;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Oqt2DFEc4IMcc2ugBSc+fA3oh1ZenLGhqZy4tnNtGls=;
+        b=iN23O3F2tE5f3LnpSMZGvxV1Uw1Se0HnJNMB3vQb3eiPpgpFCuaqtuxwg/A/6XmmJy
+         VE4fsG2JdU01M7ZNKiftfEbovyLym/7jJ44TAiAd5T4ocEX71iN/T97u+3wjyW3EpegK
+         +a0ePooJyWLKj3VnViOIhf1c2gTxTLuEYFE0nVdRB0nPovNDgQ8s/W84sltBLvCXQoQ9
+         GjEtJ2aM90I3ICeuBkynrhDFxWLLHFIv4bNJGgbIMCPtJa4YEuSkWYMdZm7PpqDMFxFg
+         UwHFpKIJiFdFhgO1UBBFiLAVJzff93Qyyk6TNlK1EQ+C33npA8sKwTccQtr/RqKjg+7D
+         92bQ==
+X-Gm-Message-State: ABy/qLbZnGWc/vSld8KUtnpE3jmAcrfs0Dz3oge8ILmkwTEvZ4gJZnTN
+	FkDMXU3xDYGIB60ZHkQfkEoaow==
+X-Google-Smtp-Source: APBJJlGYgAWdED1OMLeik9Hplb9eRIiHr1G3kcLMz3RzCktxRnJWE2r8PIDKupXpqeHCscu8gcYwXA==
+X-Received: by 2002:adf:f990:0:b0:314:1a09:6e71 with SMTP id f16-20020adff990000000b003141a096e71mr17470wrr.53.1690814484575;
+        Mon, 31 Jul 2023 07:41:24 -0700 (PDT)
+Received: from arrakeen.starnux.net ([2a01:e0a:982:cbb0:52eb:f6ff:feb3:451a])
+        by smtp.gmail.com with ESMTPSA id r18-20020adfce92000000b0031272fced4dsm13257372wrn.52.2023.07.31.07.41.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 31 Jul 2023 07:26:56 -0700 (PDT)
-Date: Mon, 31 Jul 2023 17:26:53 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Yan Zhai <yan@cloudflare.com>
-Cc: bpf@vger.kernel.org, Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
-	Yonghong Song <yhs@fb.com>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
-	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, kernel-team@cloudflare.com,
-	Jordan Griege <jgriege@cloudflare.com>,
-	Markus Elfring <Markus.Elfring@web.de>,
-	Jakub Sitnicki <jakub@cloudflare.com>
-Subject: Re: [PATCH v4 bpf 1/2] bpf: fix skb_do_redirect return values
-Message-ID: <38c61917-98b5-4ca0-b04e-64f956ace6e4@kadam.mountain>
-References: <cover.1690332693.git.yan@cloudflare.com>
- <e5d05e56bf41de82f10d33229b8a8f6b49290e98.1690332693.git.yan@cloudflare.com>
- <a76b300a-e472-4568-b734-37115927621d@moroto.mountain>
- <ZMEqYOOBc1ZNcEER@debian.debian>
- <bc3ec02d-4d4e-477a-b8a5-5245425326c6@kadam.mountain>
- <ZMFFbChK/66/8XZd@debian.debian>
- <8b681fe1-4cc6-4310-9f50-1cff868f8f7f@kadam.mountain>
+        Mon, 31 Jul 2023 07:41:24 -0700 (PDT)
+From: Neil Armstrong <neil.armstrong@linaro.org>
+Subject: [PATCH net-next v3 0/2] net: ethernet: dwmac: oxnas glue removal
+Date: Mon, 31 Jul 2023 16:41:09 +0200
+Message-Id: <20230731-topic-oxnas-upstream-remove-v3-0-a1bddb085629@linaro.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8b681fe1-4cc6-4310-9f50-1cff868f8f7f@kadam.mountain>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAXIx2QC/43OTQrCMBAF4KtI1o40CdaflfcQF5NmYgM1KZM0V
+ KR3N3QjbsTlmwffm5dIxJ6SOG9egqn45GOoQW83ousx3Am8rVmoRulGawk5jr6DOAdMMI0pM+E
+ DmB6xEGCr6GRPrSMiUQWDicAwhq6vRpiGoR5HJufndfIqAmUINGdxq03vU478XH8pcu3/mi0SG
+ tgbuz86K62V7jL4gBx3ke8rXNQHa3XzG1MVc6ZFoy3h8dB9YcuyvAEJPvCHMwEAAA==
+To: Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+ Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+ Rob Herring <robh+dt@kernel.org>, 
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
+ Conor Dooley <conor+dt@kernel.org>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+ linux-stm32@st-md-mailman.stormreply.com, 
+ linux-arm-kernel@lists.infradead.org, linux-oxnas@groups.io, 
+ devicetree@vger.kernel.org, Neil Armstrong <neil.armstrong@linaro.org>, 
+ Linus Walleij <linus.walleij@linaro.org>, Arnd Bergmann <arnd@arndb.de>, 
+ Daniel Golle <daniel@makrotopia.org>, Andy Shevchenko <andy@kernel.org>, 
+ Conor Dooley <conor.dooley@microchip.com>
+X-Mailer: b4 0.12.3
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2167;
+ i=neil.armstrong@linaro.org; h=from:subject:message-id;
+ bh=EGhiweLDmR0vbL0c7DXnBhobF+uKXvCF8L5qcGZ2JkY=;
+ b=owEBbQKS/ZANAwAKAXfc29rIyEnRAcsmYgBkx8gSrdIKH4E3PYyJ7kgGPfv2zB1PqlPEI4wclQcj
+ 8CQJ6aqJAjMEAAEKAB0WIQQ9U8YmyFYF/h30LIt33NvayMhJ0QUCZMfIEgAKCRB33NvayMhJ0YaXD/
+ 0apuCDXxe1YAYbDlWbvRhWL1ZiBafPZUn7bjMUNUaNlRgSDYKNNxpBz4Txhv6Dl2xnzzjCgOnSNZlv
+ TI1iYTyvjYXxphVNv/KEbZjewvJsFHsqydu9ChjdONrSebX1geFyJl5lxcHgefaABCTAWDGm6Q+jmF
+ OfFZ8+l0O+3QRCxxNleaZNcCHPMB+wNQBLkhbd1J9YcV7rs9Bup1xUQAXqYGqcDlLKi4serEwZp7Wj
+ vagAAvSnQ9J1ZXMOSSWj4royyI+fkBumpUYtczIzONxsP7BNsQeJG7fnJ5GkennftqrT6hzIu+Vm/Y
+ pPvdM+WgJROdGzwWxZxDOoI4MZZtyxq357qocRGyfG0j81Xp77zfX1XL94hCuT92hr1asLmPiyAi6+
+ LJbYj6x5KAQ3H+7A4FcLJbzCdgSloAGUwx2YBZE7AJYbr6Hl39S09V0Wv0rDwYOskm0iJj2ELYkSZr
+ XNIrZvICAh1LRvVS3owjBc0A4t4u8A4eZ+QtZgdS8i5Ex0MuWpvGees9KGCDUhooYMGFUJiy5U9w3J
+ bSQIec8+986xNY8wvTykHWr08X6M1NCLxRThJNY5kW3LQhn1d3hd683397PtLG07A1mHsu87DDOznM
+ 7jB5tLRHfapCqps3EG7sjwW2YPraTZrsS05Rq58CHp/H1GOuCsRr3sMVfOXQ==
+X-Developer-Key: i=neil.armstrong@linaro.org; a=openpgp;
+ fpr=89EC3D058446217450F22848169AB7B1A4CFF8AE
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
 	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-I'm not a networking person, but I was looking at some use after free
-static checker warnings.
+With [1] removing MPCore SMP support, this makes the OX820 barely usable,
+associated with a clear lack of maintainance, development and migration to
+dt-schema it's clear that Linux support for OX810 and OX820 should be removed.
 
-Apparently the rule with xmit functions is that if they return a value
-> 15 then that means the skb was not freed.  Otherwise it's supposed to
-be freed.  So like NETDEV_TX_BUSY is 0x10 so it's not freed.
+In addition, the OX810 hasn't been booted for years and isn't even present
+in an ARM config file.
 
-This is checked with using the dev_xmit_complete() function.  So I feel
-like it would make sense for LWTUNNEL_XMIT_CONTINUE to return higher
-than 15.
+For the OX820, lack of USB and SATA support makes the platform not usable
+in the current Linux support and relies on off-tree drivers hacked from the
+vendor (defunct for years) sources.
 
-Because that's the bug right?  The original code was assuming that
-everything besides LWTUNNEL_XMIT_DONE was freed.
+The last users are in the OpenWRT distribution, and today's removal means
+support will still be in stable 6.1 LTS kernel until end of 2026.
 
-regards,
-dan carpenter
+If someone wants to take over the development even with lack of SMP, I'll
+be happy to hand off maintainance.
+
+It has been a fun time adding support for this architecture, but it's time
+to get over!
+
+This patchset only removes net changes, and is derived from:
+https://lore.kernel.org/r/20230630-topic-oxnas-upstream-remove-v2-0-fb6ab3dea87c@linaro.org
+
+Signed-off-by: Neil Armstrong <neil.armstrong@linaro.org>
+---
+Changes in v3:
+- Removed applied changes
+- Added Andy's tags
+- Reduced for net
+- Link to v2: https://lore.kernel.org/r/20230630-topic-oxnas-upstream-remove-v2-0-fb6ab3dea87c@linaro.org
+
+Changes in v2:
+- s/maintainance/maintenance/
+- added acked/review tags
+- dropped already applied patches
+- drop RFC
+- Link to v1: https://lore.kernel.org/r/20230331-topic-oxnas-upstream-remove-v1-0-5bd58fd1dd1f@linaro.org
+
+---
+Neil Armstrong (2):
+      net: stmmac: dwmac-oxnas: remove obsolete dwmac glue driver
+      dt-bindings: net: oxnas-dwmac: remove obsolete bindings
+
+ .../devicetree/bindings/net/oxnas-dwmac.txt        |  41 ----
+ drivers/net/ethernet/stmicro/stmmac/Kconfig        |  11 -
+ drivers/net/ethernet/stmicro/stmmac/Makefile       |   1 -
+ drivers/net/ethernet/stmicro/stmmac/dwmac-oxnas.c  | 244 ---------------------
+ 4 files changed, 297 deletions(-)
+---
+base-commit: ec89391563792edd11d138a853901bce76d11f44
+change-id: 20230331-topic-oxnas-upstream-remove-a62e9d96feee
+
+Best regards,
+-- 
+Neil Armstrong <neil.armstrong@linaro.org>
 
 
