@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-22826-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22827-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8EE1F7696B6
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 14:47:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CF897696CE
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 14:52:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BB7D91C20BA2
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 12:47:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B4AA7281410
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 12:52:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B1EC17FF9;
-	Mon, 31 Jul 2023 12:47:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7CB718001;
+	Mon, 31 Jul 2023 12:52:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CCD24429
-	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 12:47:41 +0000 (UTC)
-Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF2341992
-	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 05:47:19 -0700 (PDT)
-Received: by mail-lf1-x132.google.com with SMTP id 2adb3069b0e04-4fe1344b707so7074961e87.1
-        for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 05:47:19 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9B768BF0
+	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 12:52:49 +0000 (UTC)
+Received: from mail-ej1-x630.google.com (mail-ej1-x630.google.com [IPv6:2a00:1450:4864:20::630])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE83D102
+	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 05:52:47 -0700 (PDT)
+Received: by mail-ej1-x630.google.com with SMTP id a640c23a62f3a-986d8332f50so653515466b.0
+        for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 05:52:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1690807630; x=1691412430;
+        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1690807966; x=1691412766;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=kXU17iNNbbIDhaqUsJXffcy9Yn0j2qk78Fkd47KX3Ao=;
-        b=O+AO3KxoP/OWoe8Z0LT7yIk215OPbAHb7h3qNlEc3vc2+edKGouyHDo3B+veQn38em
-         Xin6LAXk72K1DER6WeeAytIvCGDZhuDSDXyi83lvucztwGss2liQnkYaU5xKLZ2x1N5N
-         Fc45go2Kom5RR2f8OlezRn6J95u/+S3Q9kyRD4/m6cSp6WhLnr6FWXAtTMpeLkAa4tRu
-         C27Ll5s9qRSHrQ7AZIHATdS/n7utbFgf5OVSuvn8/nkh5xCmngWLvC3LfQNd1Qra6tE8
-         nSWlxwG2xUK6TZEtTQnRZNNrfE/09MrLNOoOe0NZrDHDEK+v2l6DaI+E/sTDQmZQa/Zr
-         vWnA==
+        bh=SgWupkEBbqnmC5BhDfBs1OoeJgSS7QCp0zNoBZUCR1o=;
+        b=JxCOID2S9yCKbqXN8JxzKQmfeW63mQdl1uC2PDlT2vL5iZO7IrgTINsD/06xLK8+tR
+         pghxBYoMYNEiinApbO+EIHb6ylopiaDctjBY5Sb9gBIiHRpIaKE1gPIxsQP2RJ+slKOw
+         eE80F9WAf71fAPZHr5xaWx/VPRtUqtYZceR5bfGQTNe8l7CXNJAFamoCtqdim+c6mK0S
+         IN4S4/TnjiROJkU0HViwSmz/rrusAmWdk5YFOWMTISpF/an4buEYbm76n2WcWhB6Mk4R
+         MoMRmCq/DmvAMtWBIJuoOarAbIYUG5toiUAaZLQsISoFq5kHwuyZbNKhHlE3j7k98a75
+         QVzg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690807630; x=1691412430;
+        d=1e100.net; s=20221208; t=1690807966; x=1691412766;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=kXU17iNNbbIDhaqUsJXffcy9Yn0j2qk78Fkd47KX3Ao=;
-        b=AX/g3x/YWbuYPqWCWIm36oJ6xUOAVkiztfnWisGuLoIvrguzfRTxmdZg41dUeGdEk1
-         qNkfYqdhxzvav5ly4YzuC7ZhXaGbT5KGw6BhYQFj5BMIL0X0g//nxQ8fXSAIez4v+q9d
-         OPQcJAZIiy6wZYnFbq2Wm35ca/yiCGsB6xFqg8T1pPIT50uXnZwk9OYc17kB0Hwiz1gg
-         aa6pFoSE5cgO0usgWhwl1/ephle6wwSLtlutjarP9Q7fYmDOkFGgrVTdaAR44I57x/WN
-         QFQ6tIWHDzEB6vok3buyztCcZ1xh/21K701Ef0Wo3eDk3iCHVq0TPvBeNirC66K66X4x
-         C/dA==
-X-Gm-Message-State: ABy/qLZaQFudvxjONqsjNhZDpBrYEKzDJVGQYikpafnAGPu1nzPEtYut
-	ykvOLyCdTxqQSDt+zF79bxuKpw==
-X-Google-Smtp-Source: APBJJlGNgTlYRMiUw8n7LHnhoRCFOsftxi/JjtHMlqb5cqiTWXWMfXBulmi9uaPy00z/Nrb22TUQAQ==
-X-Received: by 2002:ac2:5f9c:0:b0:4f9:92c7:401d with SMTP id r28-20020ac25f9c000000b004f992c7401dmr5834745lfe.30.1690807630454;
-        Mon, 31 Jul 2023 05:47:10 -0700 (PDT)
+        bh=SgWupkEBbqnmC5BhDfBs1OoeJgSS7QCp0zNoBZUCR1o=;
+        b=QI2LUqUjn6NXrB9VkG9GszhZhHcd/j6bxkHwtxn7zj5mDBfWhdKvJbnhutFpRVcYKO
+         8KIM55ostIoQrH2nUcMteYhRs4CuEp5es7oITwcKMQNBUNiM0HEVPJu6v+kKNAsZwOrr
+         DxWP6FXC6SuTMO7o23qjbv7hw9nD0KSMblRHtdNHJ8JnCrA35BxpMmBxSgDFqvdk68Ug
+         uY/vAHOCGi9Ui5pvpdeHVpSb+JZ/ACYYo7yHd0u0iY7/w3sn5QgkpUJLPf5UEP2t6SK7
+         FyUNiX7GALczy2IOCDf7hIhY+73un47JEGak7sZkD1IwSwLBsZJw4pGKERolDf0+stv3
+         pi3w==
+X-Gm-Message-State: ABy/qLY4NuHjs8sIe49U0cTCjEuin3410qjbN/BOoT4FcoTYMB4QiGZY
+	BUMzrVi1oMhNK5olUVb7mb/kGg==
+X-Google-Smtp-Source: APBJJlFuc+oWqNgyJW9W9vlhQDVGA5aGOFdbPRpC6+jvlqZ1hZdSgcGWwPKIDN3s/fzLOgMA4nbQ5Q==
+X-Received: by 2002:a17:906:cc58:b0:993:e9b8:90ee with SMTP id mm24-20020a170906cc5800b00993e9b890eemr5992684ejb.18.1690807966142;
+        Mon, 31 Jul 2023 05:52:46 -0700 (PDT)
 Received: from localhost ([212.23.236.67])
-        by smtp.gmail.com with ESMTPSA id cw25-20020a170906c79900b009786c8249d6sm6121818ejb.175.2023.07.31.05.47.09
+        by smtp.gmail.com with ESMTPSA id j13-20020a17090686cd00b0098884f86e41sm6064440ejy.123.2023.07.31.05.52.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 31 Jul 2023 05:47:09 -0700 (PDT)
-Date: Mon, 31 Jul 2023 14:47:08 +0200
+        Mon, 31 Jul 2023 05:52:45 -0700 (PDT)
+Date: Mon, 31 Jul 2023 14:52:44 +0200
 From: Jiri Pirko <jiri@resnulli.us>
 To: Jakub Kicinski <kuba@kernel.org>
 Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
 	edumazet@google.com, moshe@nvidia.com, saeedm@nvidia.com,
 	idosch@nvidia.com, petrm@nvidia.com
-Subject: Re: [patch net-next v2 10/11] devlink: introduce dump selector attr
- and use it for per-instance dumps
-Message-ID: <ZMetTPCZ59rVLNyQ@nanopsycho>
+Subject: Re: [patch net-next v2 11/11] devlink: extend health reporter dump
+ selector by port index
+Message-ID: <ZMeunKZscNRQTssp@nanopsycho>
 References: <20230720121829.566974-1-jiri@resnulli.us>
- <20230720121829.566974-11-jiri@resnulli.us>
- <20230725114044.402450df@kernel.org>
+ <20230720121829.566974-12-jiri@resnulli.us>
+ <20230725114803.78e1ae00@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,95 +75,35 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230725114044.402450df@kernel.org>
+In-Reply-To: <20230725114803.78e1ae00@kernel.org>
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
 	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Tue, Jul 25, 2023 at 08:40:44PM CEST, kuba@kernel.org wrote:
->On Thu, 20 Jul 2023 14:18:28 +0200 Jiri Pirko wrote:
->> +static void devlink_nl_policy_cpy(struct nla_policy *policy, unsigned int attr)
->> +{
->> +	memcpy(&policy[attr], &devlink_nl_policy[attr], sizeof(*policy));
->> +}
->> +
->> +static void devlink_nl_dump_selector_policy_init(const struct devlink_cmd *cmd,
->> +						 struct nla_policy *policy)
->> +{
->> +	devlink_nl_policy_cpy(policy, DEVLINK_ATTR_BUS_NAME);
->> +	devlink_nl_policy_cpy(policy, DEVLINK_ATTR_DEV_NAME);
->> +}
->> +
->> +static int devlink_nl_start(struct netlink_callback *cb)
->> +{
->> +	struct devlink_nl_dump_state *state = devlink_dump_state(cb);
->> +	const struct genl_dumpit_info *info = genl_dumpit_info(cb);
->> +	struct nlattr **attrs = info->attrs;
->> +	const struct devlink_cmd *cmd;
->> +	struct nla_policy *policy;
->> +	struct nlattr **selector;
->> +	int err;
->> +
->> +	if (!attrs[DEVLINK_ATTR_DUMP_SELECTOR])
->> +		return 0;
->> +
->> +	selector = kzalloc(sizeof(*selector) * (DEVLINK_ATTR_MAX + 1),
->> +			   GFP_KERNEL);
->> +	if (!selector)
->> +		return -ENOMEM;
->> +	policy = kzalloc(sizeof(*policy) * (DEVLINK_ATTR_MAX + 1), GFP_KERNEL);
->> +	if (!policy) {
->> +		kfree(selector);
->> +		return -ENOMEM;
->> +	}
->> +
->> +	cmd = devl_cmds[info->op.cmd];
->> +	devlink_nl_dump_selector_policy_init(cmd, policy);
->> +	err = nla_parse_nested(selector, DEVLINK_ATTR_MAX,
->> +			       attrs[DEVLINK_ATTR_DUMP_SELECTOR],
->> +			       policy, cb->extack);
->> +	kfree(policy);
->> +	if (err) {
->> +		kfree(selector);
->> +		return err;
->> +	}
->> +
->> +	state->selector = selector;
->> +	return 0;
->> +}
+Tue, Jul 25, 2023 at 08:48:03PM CEST, kuba@kernel.org wrote:
+>On Thu, 20 Jul 2023 14:18:29 +0200 Jiri Pirko wrote:
+>> Introduce a possibility for devlink object to expose attributes it
+>> supports for selection of dumped objects.
+>> 
+>> Use this by health reporter to indicate it supports port index based
+>> selection of dump objects. Implement this selection mechanism in
+>> devlink_nl_cmd_health_reporter_get_dump_one()
 >
->Why not declare a fully nested policy with just the two attrs?
+>This patch is not very clean. IMHO implementing the filters by skipping
+>is not going to scale to reasonably complex filters. Isn't it better to
 
-Not sure I follow. But the nest under DEVLINK_ATTR_DUMP_SELECTOR has
-its own policy, generated by devlink_nl_dump_selector_policy_init(). I
-did it this way instead of separate policy array for 2 reasons:
-1) We don't have duplicate and possibly conflicting policies for devlink
-   root and selector
-2) It is easy for specific object type to pass attrs that are included
-   in the policy initialization (see the health reporter extension later
-   in this patchset). There are couple of object to benefit from this,
-   for example "sb".
-3) It is I think a bit nicer for specific object type to pass array of
-   attrs, instead of a policy array that would be exported from netlink.c
-
-If you insist on separate policy arrays, I can do it though. I had it
-like that initially, I just decided to go this way for the 3 reasons
-listed above.
+I'm not sure what do you mean by skipping? There is not skipping. In
+case PORT_INDEX is passed in the selector, only that specific port is
+processed. No scale issues I see. Am I missing something?
 
 
->
->Also - do you know of any userspace which would pass garbage attrs 
->to the dumps? Do we really need to accept all attributes, or can
->we trim the dump policies to what's actually supported?
+>add a .filter callback which will look at the about-to-be-dumped object
+>and return true/false on whether it should be dumped?
 
-That's what this patch is doing. It only accepts what the kernel
-understands. It gives the object types (as for example health reporter)
-option to extend the attr set to accept them into selectors as well, if
-they know how to handle them.
-
-
->-- 
->pw-bot: cr
+No, that would not scale. Passing the selector attrs to the dump
+callback it better, as the dump callback according to the attrs can
+reach only what is needed, knowing the internals. But perhaps I don't
+understand correctly your suggestion.
 
