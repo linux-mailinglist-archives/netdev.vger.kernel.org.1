@@ -1,139 +1,328 @@
-Return-Path: <netdev+bounces-22862-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22863-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B76E769A78
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 17:10:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F05D7769A8B
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 17:14:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 378A21C20B65
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 15:10:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A31DF2815A3
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 15:14:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E550C18C22;
-	Mon, 31 Jul 2023 15:10:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D2E318C25;
+	Mon, 31 Jul 2023 15:14:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFD6718C14
-	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 15:10:29 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B807AC433D9;
-	Mon, 31 Jul 2023 15:10:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690816229;
-	bh=qU1aJBXLj8OvL5BxkBm/yTat5cqvXnPkIXeHqHxtlwk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=OUi3CJXsrDYDon8PZ1ZFtDc3ZImRViLGAkenIm/dbcms4NKyHjAAuhpbXQHSj1OwD
-	 fNvQc/0+GbtK2m1R/JtpN9raiFkubbDnJEbOuUW8/JOhH/vGXa+BD9MCTtvWsJTdNR
-	 pmZZt45Xr05z4noO+rU+tjw3vo4pQrQeMx674cyTQClhPifmxs1uICImowl4/yJUR6
-	 qhVXMOaOwVKXAQ4kAm/p3DrxZfKfa89TUcFwDy2msm6IvH0NOO8Ems7lfd+sVrpYOY
-	 584rNgS5xgX7asKgBGAddiKhp9vzYZAHQerYTuDIOvDFtAjhRPqOk8OKE9bN6u7ZP6
-	 62WhvKw+9pBCQ==
-Date: Mon, 31 Jul 2023 17:10:24 +0200
-From: Simon Horman <horms@kernel.org>
-To: Bjorn Andersson <quic_bjorande@quicinc.com>
-Cc: Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Chris Lew <quic_clew@quicinc.com>, Alex Elder <elder@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Mathieu Poirier <mathieu.poirier@linaro.org>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, linux-remoteproc@vger.kernel.org
-Subject: Re: [PATCH 1/4] soc: qcom: aoss: Move length requirements from caller
-Message-ID: <ZMfO4B5ZifxPv/sk@kernel.org>
-References: <20230731041013.2950307-1-quic_bjorande@quicinc.com>
- <20230731041013.2950307-2-quic_bjorande@quicinc.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C19718AFE
+	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 15:14:26 +0000 (UTC)
+Received: from domac.alu.hr (domac.alu.unizg.hr [161.53.235.3])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59FA8C3;
+	Mon, 31 Jul 2023 08:14:21 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+	by domac.alu.hr (Postfix) with ESMTP id 3B5856017F;
+	Mon, 31 Jul 2023 17:14:08 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
+	t=1690816448; bh=NxXGa4uFSywbb/jKA1tSuonK4wBF0KYvphWm5DL7A0w=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=aXW0WPeQ5HPxrL45CHWaPdqMcqpjc5BodOBvAFfaZoAj7DxSZFoV9FpF1z5XgJuGl
+	 kNV7tkUU0tzjCkJ6A/okTBe49QNJ465wBodMyoRq10iJxPDiQNgQQUqGYOBtY8NfTu
+	 p/n2Ub39fE9eKe/9Cd4iP0AmKmGBNnert6NKczlR3tTxUJnxpN7zjG5wRIjB3vtSda
+	 nVuV62oA1gtSBxGvuPMzOumVZPYh0ncnkgi339dXq05qLNWirBNonepJf1HxhqbPAZ
+	 4dnxMDDb3gaFyaQagpe+ediGT17wgic3ayaMWGriv9YmK6qd6xhRn7L46hiGghuHoZ
+	 0K4OSblLH3nqA==
+X-Virus-Scanned: Debian amavisd-new at domac.alu.hr
+Received: from domac.alu.hr ([127.0.0.1])
+	by localhost (domac.alu.hr [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id l8fhQsgxTSSd; Mon, 31 Jul 2023 17:14:05 +0200 (CEST)
+Received: from [192.168.1.6] (unknown [94.250.191.183])
+	by domac.alu.hr (Postfix) with ESMTPSA id A210260173;
+	Mon, 31 Jul 2023 17:13:37 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
+	t=1690816445; bh=NxXGa4uFSywbb/jKA1tSuonK4wBF0KYvphWm5DL7A0w=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=M7enfuT0YSo07VF+cbuN5tPGvdkVLFvCmCOcbsseoszOEmv9sD8AkSqyExnMWfKfx
+	 CFL6/Lb0q9ey+g5kyp2aYL3YvdL/MYGjGpAw4VVe//2IeWXrPU5VCFw1BRtcyZieV8
+	 CzMW2oJqYcSiadjaUWiMzAhrDU2+JoXpsVqt2CV4LQkH+665CmAQoyRomutiIA+q6O
+	 njL09R83gXhzTefEL2v1xNhUkOc7NBVm7c1ri3VmFtYCAqvanI4mIOaFxAIZAUxz2J
+	 LF+UokUMK9uFBZBq+f0f7ydaiy1oLqaOfFcWThBxeoU5SPUBKNfh9qh6AOuPSEx7GJ
+	 3tDazhxa+5LuA==
+Message-ID: <cadad022-b241-398d-c79d-187596356a72@alu.unizg.hr>
+Date: Mon, 31 Jul 2023 17:13:37 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230731041013.2950307-2-quic_bjorande@quicinc.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.1
+Subject: Re: [PATCH v1 01/11] selftests: forwarding: custom_multipath_hash.sh:
+ add cleanup for SIGTERM sent by timeout
+Content-Language: en-US
+To: Ido Schimmel <idosch@idosch.org>
+Cc: petrm@nvidia.com, razor@blackwall.org, Ido Schimmel <idosch@nvidia.com>,
+ netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>
+References: <0550924e-dce9-f90d-df8a-db810fd2499f@alu.unizg.hr>
+ <adc5e40d-d040-a65e-eb26-edf47dac5b02@alu.unizg.hr>
+ <ZL6OljQubhVtQjcD@shredder>
+ <cab8ea8a-98f4-ef9b-4215-e2a93cccaab1@alu.unizg.hr>
+ <ZMEQGIOQXv6so30x@shredder>
+ <a9b6d9f5-14ae-a931-ab7b-d31b5e40f5df@alu.unizg.hr>
+ <ZMYXABUN9OzfN5D3@shredder>
+ <da3f4f4e-47a7-25be-fa61-aebeba1d8d0c@alu.unizg.hr>
+ <ZMdouQRypZCGZhV0@shredder>
+ <2f203995-5ae0-13bc-d1a6-997c2b36a2b8@alu.unizg.hr>
+ <ZMei0VMIH/l1GzVM@shredder>
+From: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
+In-Reply-To: <ZMei0VMIH/l1GzVM@shredder>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Sun, Jul 30, 2023 at 09:10:10PM -0700, Bjorn Andersson wrote:
-> The existing implementation of qmp_send() requires the caller to provide
-> a buffer which is of word-aligned. The underlying reason for this is
-> that message ram only supports word accesses, but pushing this
-> requirement onto the clients results in the same boiler plate code
-> sprinkled in every call site.
+On 7/31/23 14:02, Ido Schimmel wrote:
+> On Mon, Jul 31, 2023 at 11:24:27AM +0200, Mirsad Todorovac wrote:
+>> I guess that means only three are left.
+>>
+>> # ./bridge_mdb.sh
+>> dev br0 port veth1 grp 239.1.1.1 src 192.0.2.1 temp filter_mode include proto static vid 10  259.99
+>> TEST: IPv4 (S, G) port group entries configuration tests            [FAIL]
+>> 	Entry has an unpending group timer after replace
+>> dev br0 port veth1 grp ff0e::1 src 2001:db8:1::1 temp filter_mode include proto static vid 10  259.99
+>> TEST: IPv6 (S, G) port group entries configuration tests            [FAIL]
+>> 	Entry has an unpending group timer after replace
 > 
-> By using a temporary buffer in qmp_send() we can hide the underlying
-> hardware limitations from the clients and allow them to pass their
-> NUL-terminates C string directly.
+> I suspect that what happens here is that you have a faster system
+> than me or a different HZ value (check CONFIG_HZ, mine is 1000). The
+> group membership time is probably 260.00 which is why grepping for
+> "0.00" works when it shouldn't. Can you try the patch below? No need to
+> run all the other tests.
 > 
-> Signed-off-by: Bjorn Andersson <quic_bjorande@quicinc.com>
-> ---
->  drivers/net/ipa/ipa_power.c        |  2 +-
->  drivers/remoteproc/qcom_q6v5.c     |  2 +-
->  drivers/soc/qcom/qcom_aoss.c       | 25 ++++++++++++-------------
->  include/linux/soc/qcom/qcom_aoss.h |  4 ++--
->  4 files changed, 16 insertions(+), 17 deletions(-)
+> diff --git a/tools/testing/selftests/net/forwarding/bridge_mdb.sh b/tools/testing/selftests/net/forwarding/bridge_mdb.sh
+> index 8493c3dfc01e..41c33a2de0a6 100755
+> --- a/tools/testing/selftests/net/forwarding/bridge_mdb.sh
+> +++ b/tools/testing/selftests/net/forwarding/bridge_mdb.sh
+> @@ -617,7 +617,7 @@ __cfg_test_port_ip_sg()
+>                  grep -q "permanent"
+>          check_err $? "Entry not added as \"permanent\" when should"
+>          bridge -d -s mdb show dev br0 vid 10 | grep "$grp_key" | \
+> -               grep -q "0.00"
+> +               grep -q " 0.00"
+>          check_err $? "\"permanent\" entry has a pending group timer"
+>          bridge mdb del dev br0 port $swp1 $grp_key vid 10
+>   
+> @@ -626,7 +626,7 @@ __cfg_test_port_ip_sg()
+>                  grep -q "temp"
+>          check_err $? "Entry not added as \"temp\" when should"
+>          bridge -d -s mdb show dev br0 vid 10 | grep "$grp_key" | \
+> -               grep -q "0.00"
+> +               grep -q " 0.00"
+>          check_fail $? "\"temp\" entry has an unpending group timer"
+>          bridge mdb del dev br0 port $swp1 $grp_key vid 10
+>   
+> @@ -659,7 +659,7 @@ __cfg_test_port_ip_sg()
+>                  grep -q "permanent"
+>          check_err $? "Entry not marked as \"permanent\" after replace"
+>          bridge -d -s mdb show dev br0 vid 10 | grep "$grp_key" | \
+> -               grep -q "0.00"
+> +               grep -q " 0.00"
+>          check_err $? "Entry has a pending group timer after replace"
+>   
+>          bridge mdb replace dev br0 port $swp1 $grp_key vid 10 temp
+> @@ -667,7 +667,7 @@ __cfg_test_port_ip_sg()
+>                  grep -q "temp"
+>          check_err $? "Entry not marked as \"temp\" after replace"
+>          bridge -d -s mdb show dev br0 vid 10 | grep "$grp_key" | \
+> -               grep -q "0.00"
+> +               grep -q " 0.00"
+>          check_fail $? "Entry has an unpending group timer after replace"
+>          bridge mdb del dev br0 port $swp1 $grp_key vid 10
+
+Congrats! This worked:
+
+root@defiant:tools/testing/selftests/net/forwarding# ./bridge_mdb.sh
+
+INFO: # Host entries configuration tests
+TEST: Common host entries configuration tests (IPv4)                [ OK ]
+TEST: Common host entries configuration tests (IPv6)                [ OK ]
+TEST: Common host entries configuration tests (L2)                  [ OK ]
+
+INFO: # Port group entries configuration tests - (*, G)
+TEST: Common port group entries configuration tests (IPv4 (*, G))   [ OK ]
+TEST: Common port group entries configuration tests (IPv6 (*, G))   [ OK ]
+TEST: IPv4 (*, G) port group entries configuration tests            [ OK ]
+TEST: IPv6 (*, G) port group entries configuration tests            [ OK ]
+
+INFO: # Port group entries configuration tests - (S, G)
+TEST: Common port group entries configuration tests (IPv4 (S, G))   [ OK ]
+TEST: Common port group entries configuration tests (IPv6 (S, G))   [ OK ]
+dev br0 port veth1 grp 239.1.1.1 src 192.0.2.1 temp filter_mode include proto static vid 10  259.99
+TEST: IPv4 (S, G) port group entries configuration tests            [ OK ]
+dev br0 port veth1 grp ff0e::1 src 2001:db8:1::1 temp filter_mode include proto static vid 10  259.99
+TEST: IPv6 (S, G) port group entries configuration tests            [ OK ]
+
+INFO: # Port group entries configuration tests - L2
+TEST: Common port group entries configuration tests (L2 (*, G))     [ OK ]
+TEST: L2 (*, G) port group entries configuration tests              [ OK ]
+
+INFO: # Large scale dump tests
+TEST: IPv4 large scale dump tests                                   [ OK ]
+TEST: IPv6 large scale dump tests                                   [ OK ]
+TEST: L2 large scale dump tests                                     [ OK ]
+
+INFO: # Forwarding tests
+TEST: IPv4 host entries forwarding tests                            [ OK ]
+TEST: IPv6 host entries forwarding tests                            [ OK ]
+TEST: L2 host entries forwarding tests                              [ OK ]
+TEST: IPv4 port group "exclude" entries forwarding tests            [ OK ]
+TEST: IPv6 port group "exclude" entries forwarding tests            [ OK ]
+TEST: IPv4 port group "include" entries forwarding tests            [ OK ]
+TEST: IPv6 port group "include" entries forwarding tests            [ OK ]
+TEST: L2 port entries forwarding tests                              [ OK ]
+
+INFO: # Control packets tests
+TEST: IGMPv3 MODE_IS_INCLUDE tests                                  [ OK ]
+TEST: MLDv2 MODE_IS_INCLUDE tests                                   [ OK ]
+root@defiant:tools/testing/selftests/net/forwarding#
+
+>> # ./bridge_vlan_mcast.sh
+>> TEST: Vlan mcast_startup_query_interval global option default value   [FAIL]
+>> 	Wrong default mcast_startup_query_interval global vlan option value
+>> # ./mirror_gre_changes.sh
+>> TEST: mirror to gretap: TTL change (skip_hw)                        [FAIL]
+>> 	Expected to capture 10 packets, got 15.
+>> TEST: mirror to ip6gretap: TTL change (skip_hw)                     [FAIL]
+>> 	Expected to capture 10 packets, got 13.
+>> WARN: Could not test offloaded functionality
 > 
-> diff --git a/drivers/net/ipa/ipa_power.c b/drivers/net/ipa/ipa_power.c
-> index 921eecf3eff6..26181eeed975 100644
-> --- a/drivers/net/ipa/ipa_power.c
-> +++ b/drivers/net/ipa/ipa_power.c
-> @@ -332,7 +332,7 @@ void ipa_power_retention(struct ipa *ipa, bool enable)
->  
->  	(void)snprintf(buf, sizeof(buf), fmt, enable ? '1' : '0');
->  
-> -	ret = qmp_send(power->qmp, buf, sizeof(buf));
-> +	ret = qmp_send(power->qmp, buf);
->  	if (ret)
->  		dev_err(power->dev, "error %d sending QMP %sable request\n",
->  			ret, enable ? "en" : "dis");
-> diff --git a/drivers/remoteproc/qcom_q6v5.c b/drivers/remoteproc/qcom_q6v5.c
-> index 192c7aa0e39e..8b41a73fa4d1 100644
-> --- a/drivers/remoteproc/qcom_q6v5.c
-> +++ b/drivers/remoteproc/qcom_q6v5.c
-> @@ -35,7 +35,7 @@ static int q6v5_load_state_toggle(struct qcom_q6v5 *q6v5, bool enable)
->  
->  	WARN_ON(ret >= Q6V5_LOAD_STATE_MSG_LEN);
->  
-> -	ret = qmp_send(q6v5->qmp, buf, sizeof(buf));
-> +	ret = qmp_send(q6v5->qmp, buf);
->  	if (ret)
->  		dev_err(q6v5->dev, "failed to toggle load state\n");
->  
-> diff --git a/drivers/soc/qcom/qcom_aoss.c b/drivers/soc/qcom/qcom_aoss.c
-> index e376c32cc16e..5e74332515cf 100644
-> --- a/drivers/soc/qcom/qcom_aoss.c
-> +++ b/drivers/soc/qcom/qcom_aoss.c
-> @@ -206,36 +206,35 @@ static bool qmp_message_empty(struct qmp *qmp)
->   * qmp_send() - send a message to the AOSS
->   * @qmp: qmp context
->   * @data: message to be sent
-> - * @len: length of the message
->   *
->   * Transmit @data to AOSS and wait for the AOSS to acknowledge the message.
-> - * @len must be a multiple of 4 and not longer than the mailbox size. Access is
-> - * synchronized by this implementation.
-> + * data must not be longer than the mailbox size. Access is synchronized by
-> + * this implementation.
->   *
->   * Return: 0 on success, negative errno on failure
->   */
-> -int qmp_send(struct qmp *qmp, const void *data, size_t len)
-> +int qmp_send(struct qmp *qmp, const void *data)
->  {
->  	long time_left;
-> +	char buf[QMP_MSG_LEN];
->  	int ret;
+> I hope Nik and Petr will find the time to look into those. If not, I
+> will check when I can.
 
-Hi Bjorn,
+Great. I will wait for the follow-up then ...
 
-please consider preserving reverse xmas tree - longest line to shortest -
-for local variable declarations in this Networking code.
+You can add:
 
-	char buf[QMP_MSG_LEN];
-	long time_left;
-	int ret;
+Tested-by: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
 
-...
+at your convenience. I think that it appropriate with the Code of Conduct.
 
+Kind regards,
+Mirsad
+
+
+>> NOTE: The error happened because two patches collided. This patch
+>>
+>> diff --git a/tools/testing/selftests/net/forwarding/lib.sh b/tools/testing/selftests/net/forwarding/lib.sh
+>> index 975fc5168c6334..40a8c1541b7f81 100755
+>> --- a/tools/testing/selftests/net/forwarding/lib.sh
+>> +++ b/tools/testing/selftests/net/forwarding/lib.sh
+>> @@ -30,6 +30,7 @@ REQUIRE_MZ=${REQUIRE_MZ:=yes}
+>>   REQUIRE_MTOOLS=${REQUIRE_MTOOLS:=no}
+>>   STABLE_MAC_ADDRS=${STABLE_MAC_ADDRS:=no}
+>>   TCPDUMP_EXTRA_FLAGS=${TCPDUMP_EXTRA_FLAGS:=}
+>> +TROUTE6=${TROUTE6:=traceroute6}
+>>   relative_path="${BASH_SOURCE%/*}"
+>>   if [[ "$relative_path" == "${BASH_SOURCE}" ]]; then
+>>
+>> and this patch
+>>
+>> diff --git a/tools/testing/selftests/net/forwarding/lib.sh b/tools/testing/selftests/net/forwarding/lib.sh
+>> index 71f7c0c49677..5b0183013017 100755
+>> --- a/tools/testing/selftests/net/forwarding/lib.sh
+>> +++ b/tools/testing/selftests/net/forwarding/lib.sh
+>> @@ -16,8 +16,6 @@ TEAMD=${TEAMD:=teamd}
+>>   WAIT_TIME=${WAIT_TIME:=5}
+>>   PAUSE_ON_FAIL=${PAUSE_ON_FAIL:=no}
+>>   PAUSE_ON_CLEANUP=${PAUSE_ON_CLEANUP:=no}
+>> -NETIF_TYPE=${NETIF_TYPE:=veth}
+>> -NETIF_CREATE=${NETIF_CREATE:=yes}
+>>   MCD=${MCD:=smcrouted}
+>>   MC_CLI=${MC_CLI:=smcroutectl}
+>>   PING_COUNT=${PING_COUNT:=10}
+>> @@ -30,6 +28,20 @@ REQUIRE_MZ=${REQUIRE_MZ:=yes}
+>>   REQUIRE_MTOOLS=${REQUIRE_MTOOLS:=no}
+>>   STABLE_MAC_ADDRS=${STABLE_MAC_ADDRS:=no}
+>>   TCPDUMP_EXTRA_FLAGS=${TCPDUMP_EXTRA_FLAGS:=}
+>> +NETIF_TYPE=${NETIF_TYPE:=veth}
+>> +NETIF_CREATE=${NETIF_CREATE:=yes}
+>> +declare -A NETIFS=(
+>> +       [p1]=veth0
+>> +       [p2]=veth1
+>> +       [p3]=veth2
+>> +       [p4]=veth3
+>> +       [p5]=veth4
+>> +       [p6]=veth5
+>> +       [p7]=veth6
+>> +       [p8]=veth7
+>> +       [p9]=veth8
+>> +       [p10]=veth9
+>> +)
+>>
+>>   relative_path="${BASH_SOURCE%/*}"
+>>   if [[ "$relative_path" == "${BASH_SOURCE}" ]]; then
+>>
+>> are not compatible.
+>>
+>> I have applied the 'require_command $TROUTE6' patch manually.
+>>
+>> I suppose this is what you intended to have:
+>>
+>> # Can be overridden by the configuration file.
+>> PING=${PING:=ping}
+>> PING6=${PING6:=ping6}
+>> MZ=${MZ:=mausezahn}
+>> ARPING=${ARPING:=arping}
+>> TEAMD=${TEAMD:=teamd}
+>> WAIT_TIME=${WAIT_TIME:=5}
+>> PAUSE_ON_FAIL=${PAUSE_ON_FAIL:=no}
+>> PAUSE_ON_CLEANUP=${PAUSE_ON_CLEANUP:=no}
+>> MCD=${MCD:=smcrouted}
+>> MC_CLI=${MC_CLI:=smcroutectl}
+>> PING_COUNT=${PING_COUNT:=10}
+>> PING_TIMEOUT=${PING_TIMEOUT:=5}
+>> WAIT_TIMEOUT=${WAIT_TIMEOUT:=20}
+>> INTERFACE_TIMEOUT=${INTERFACE_TIMEOUT:=600}
+>> LOW_AGEING_TIME=${LOW_AGEING_TIME:=1000}
+>> REQUIRE_JQ=${REQUIRE_JQ:=yes}
+>> REQUIRE_MZ=${REQUIRE_MZ:=yes}
+>> REQUIRE_MTOOLS=${REQUIRE_MTOOLS:=no}
+>> STABLE_MAC_ADDRS=${STABLE_MAC_ADDRS:=no}
+>> TCPDUMP_EXTRA_FLAGS=${TCPDUMP_EXTRA_FLAGS:=}
+>> TROUTE6=${TROUTE6:=traceroute6}
+>> NETIF_TYPE=${NETIF_TYPE:=veth}
+>> NETIF_CREATE=${NETIF_CREATE:=yes}
+>> declare -A NETIFS=(
+>>         [p1]=veth0
+>>         [p2]=veth1
+>>         [p3]=veth2
+>>         [p4]=veth3
+>>         [p5]=veth4
+>>         [p6]=veth5
+>>         [p7]=veth6
+>>         [p8]=veth7
+>>         [p9]=veth8
+>>         [p10]=veth9
+>> )
+>>
+>> relative_path="${BASH_SOURCE%/*}"
+>> if [[ "$relative_path" == "${BASH_SOURCE}" ]]; then
+>>          relative_path="."
+>> fi
+>> ------------------------------------------------
+>>
+>> Probably for the production patch you would like to have this fixed.
+> 
+> No, I don't intend to submit the patch that automatically creates the
+> veth pairs. It is superseded by "selftests: forwarding: Skip test when
+> no interfaces are specified".
 
