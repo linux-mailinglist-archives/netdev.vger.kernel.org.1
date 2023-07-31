@@ -1,188 +1,152 @@
-Return-Path: <netdev+bounces-22857-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22858-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88380769A31
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 16:58:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1414769A4E
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 17:05:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B899B1C20C3F
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 14:58:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8AE891C20C57
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 15:05:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F82918C18;
-	Mon, 31 Jul 2023 14:58:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4601918C1B;
+	Mon, 31 Jul 2023 15:05:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DEF818AFE
-	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 14:58:25 +0000 (UTC)
-Received: from EUR04-DB3-obe.outbound.protection.outlook.com (mail-db3eur04on2041.outbound.protection.outlook.com [40.107.6.41])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A24A120;
-	Mon, 31 Jul 2023 07:58:24 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=K2yY2eN5uaup1EJl7E5Xlv9ZALZSN00CS4B8QdyYxbw2y2pAFczE1ldesp7iPs/os+OT3CEeRud404lHmkBYslMXVhwz2gd8QKGXVl7wFzkKYB1rcN4DgjmHzetQdIyJupGDUtwx+P///u9NpeBM9o1cEhKkA46UnbaNKydtv/1gonL9eCHNoapbTt1vgjuIJQvRtsrdg50297/UClExZil5qT9vN5keV6ITapvmPvzsH8H/BHl2aJ9povjigXU/eSoeNBs6Un9MS+4wTrB3VNWdLGxgzEvYV9BePz5a4xDg98dZiKff0PaoIw34qRvH4MUQ7wu0XoXbosTJ/yFn9g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Dyan4Z/Pxj5N3ADMEm+8FP5qKTkuZfJuZ2DYbASgjrk=;
- b=i5ocDeQ3OKTUqUHmbm9NuqsxrpxePJaNRHDz5Pkh5H+9cxAxxJ3orEFQd5W12MSms5XDVHbggPh1vdbtPPJvfoZ6I3LGT2m4H1dp4npazKwzGU9lY12iwbSzRufjS5a49vr6NlzgKhcKLLdRUZPOPaw8XjdAITCQix+lcHnr+tL8E5bAE1c/v1mV7gcuEasLonx48j7SOvurQRe4WmhUi0ITxOHZvlxBkckfCPZHyf8AaevJDj8Tj1Oo6m0uD9JvS6pNEIUmeC2n7VdKDcdZ4A2qYT8oYgBAJoKl1xZjERmSgP/cDdvrD6/tLO/KKwhMRcpvL8mye+BRqlHSHBd8ew==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Dyan4Z/Pxj5N3ADMEm+8FP5qKTkuZfJuZ2DYbASgjrk=;
- b=com7aHH/DiU1GOHxjMTZY1NINBlMQT5ocPMvr/GnwQSl18pM5S9o7XLFViybkwgsBTntAkcYwOEKX5IbUKZxFqfCwuANZMncoNveF4ge88VOyO3vIMNlPiZahJzO/lK13Sa3bCEF6n7S3v1aqyw2CoRLGAoyjLlPgM8STCGVTb0=
-Received: from AM0PR04MB6289.eurprd04.prod.outlook.com (2603:10a6:208:145::23)
- by AM9PR04MB8729.eurprd04.prod.outlook.com (2603:10a6:20b:43c::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.29; Mon, 31 Jul
- 2023 14:58:21 +0000
-Received: from AM0PR04MB6289.eurprd04.prod.outlook.com
- ([fe80::75f9:a3c:a9ef:7bac]) by AM0PR04MB6289.eurprd04.prod.outlook.com
- ([fe80::75f9:a3c:a9ef:7bac%7]) with mapi id 15.20.6631.043; Mon, 31 Jul 2023
- 14:58:21 +0000
-From: Leo Li <leoyang.li@nxp.com>
-To: Andrew Lunn <andrew@lunn.ch>
-CC: Heiner Kallweit <hkallweit1@gmail.com>, Russell King
-	<linux@armlinux.org.uk>, "David S . Miller" <davem@davemloft.net>, Jakub
- Kicinski <kuba@kernel.org>, David Bauer <mail@david-bauer.net>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Viorel Suman
-	<viorel.suman@nxp.com>, Wei Fang <wei.fang@nxp.com>
-Subject: RE: [PATCH v3 1/2] net: phy: at803x: fix the wol setting functions
-Thread-Topic: [PATCH v3 1/2] net: phy: at803x: fix the wol setting functions
-Thread-Index: AQHZwZ33oD8fGtEVxE+PIFQQ7nRsG6/QZg0AgAOSwaA=
-Date: Mon, 31 Jul 2023 14:58:21 +0000
-Message-ID:
- <AM0PR04MB6289323F6F93E197103A225D8F05A@AM0PR04MB6289.eurprd04.prod.outlook.com>
-References: <20230728215320.31801-1-leoyang.li@nxp.com>
- <20230728215320.31801-2-leoyang.li@nxp.com>
- <8071d8c5-1da3-47a0-9da2-a64ee80db6e5@lunn.ch>
-In-Reply-To: <8071d8c5-1da3-47a0-9da2-a64ee80db6e5@lunn.ch>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: AM0PR04MB6289:EE_|AM9PR04MB8729:EE_
-x-ms-office365-filtering-correlation-id: a82c720c-748f-476d-cfe6-08db91d6955d
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- UsCRv2R1eKVSI50p10mkVo+28844n0U2hgp/26My4BEr/1RiXgSnqp0lrygmgxiDjNlNMb0meXi1sfIXgwVHcahtlLkg1ZKaD8C0JQbH6z6netvmGvcNc8FkehvrjPs4lBgO7W/gSKrMVAi+RParsRnRIEFP0+ovYgYNdFJpoIY+YBKn/K8KBvA4TKmGyXazdB7kvJvd+NT4AAMD0iOvfDXh6z6Sr7YdGlpnSEQTnGlBOkL5CSIkAaxW61YDpTksKF4Ixa/ILI2HKxYFlp26eBFMoThhip+lxLqUebt5LKRDWLYRHppKyOSiKPimizOLP7dJ6O/EQZSqV8ck0Z396LjH7xNIlcw05O1L9B0ft0LO+ou2DnhlMsUOhdJTf6dc9ptZ7uims403CCCbV8M4WjXCdMfYzvAHUineRn9tctcqcPguuFXIsZD8h4PqHNnsChu8b7ZSN/1+VcPVGzDB6zGqssJfjCECpdNbV7L+OwQ27+WM+VP6BE4M5oEqt3VjZr2c8eP5NAqaKN9nTCdKM0FD7EyMPzq2/xbgs0dpAPyXU+Sz+3P2/gDZUsDO9ieLmGJ5TRaoOo9ZAfPo1qbejsBDkj7DYuWCfSyFjLRp9kwpOYYA3YoBeZj1fYiOD556
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6289.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(136003)(396003)(346002)(39860400002)(366004)(376002)(451199021)(8936002)(8676002)(26005)(54906003)(41300700001)(316002)(6916009)(9686003)(4326008)(5660300002)(186003)(55236004)(52536014)(6506007)(7696005)(71200400001)(66476007)(66556008)(478600001)(66946007)(76116006)(66446008)(64756008)(53546011)(33656002)(86362001)(38070700005)(83380400001)(2906002)(38100700002)(122000001)(55016003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?3Yr80xewpWOmMjcbIpH1mx/HVDQRfC5lnYiUYvSgpIZmKKHNwH0hRillTWRY?=
- =?us-ascii?Q?Fz+9/ztM5E2bH7DTT2R+dbCyVtP6VaXcCLfjG92k2c/qcHc86QUDdHoETD+U?=
- =?us-ascii?Q?Pck7MoIdgt52Fq+3P04fN7ljThbqn297z5mTnOG7xiaCjqZfbfBFxQHfxKJK?=
- =?us-ascii?Q?xtN/FIiWmQlyldCaH5sO+J3qHv/hY4tl0Q2W+GcbL7wKwWY2/mBYk7LWdUf0?=
- =?us-ascii?Q?Q0WGq1+uai26ijYlM1VgLDAgU1KLpSeWDJbtqV28mpIU6+R9Fv4inkMD0y2X?=
- =?us-ascii?Q?bUVp5neWIz6U+Lhjym5hT245ByFdd+Ty/iDj7KMkhDQnhnL1LEJkoFkUuRXz?=
- =?us-ascii?Q?QCGWz+qvcOtER3vEtHInUfxXJvbNGiSFMmBPc6vTsg7c5LtBJsYVRTCNft8U?=
- =?us-ascii?Q?CYT1ft09zHsqDDNAtPXNYMENSPMA+2zFp81CI2WxDtOpj4ZovYcrbmy5Il1F?=
- =?us-ascii?Q?J6EKA8zfYz/lmrRU2UZ1pFDvDjl5Zxy8awryK+Kz4VQjPwBC7GrV7LA25SDR?=
- =?us-ascii?Q?vj0fTld8JaOVsgXcy7UP27FtZErBuHHSY3tP9/KU0iovJU5kpqD8eaTwsC2f?=
- =?us-ascii?Q?sIt/ch4fssDfPXXXjXnWQ2IAKFshK9pEJanOUaga55QbMwSzdO2z/wd6s26H?=
- =?us-ascii?Q?TGyG9fMzt2JzbCrDnnOlH3UeRsdqGBNI6WMkf3m6uzPhhLVJa/+Tk20dT6Lh?=
- =?us-ascii?Q?lX0NRw9roC3XRVgVsOQ9nM5n5PHjB9YOh4MqqstC0YvSzEGuOdXXKZ47g0IK?=
- =?us-ascii?Q?tHwfj9x9RgVOdL+z111Tjd0t8dkT5EHtXLJf5RTwqF12HAp1jP7eBKWn2eOn?=
- =?us-ascii?Q?rZzyzmLtUQkY0G73bm7Zlm8+ct4M2dCevLfEIuIdhFHX+s4o6syc2Phk4+tq?=
- =?us-ascii?Q?dzn0oAT11WpD/5GnFLixgn7pYHPLkliJwroKTgS5Z+mOap6RNs39bj/v7P82?=
- =?us-ascii?Q?BwtqAyGVLcbdOn6yw7iClNMoe2mOBiteQwo58+4wH7EP4SBZGMGHdpvn/cUG?=
- =?us-ascii?Q?yCASDDr7Tk8mejEodfSpHtLwjNgT8IU5OoXpyW1uoUAVRbqAtTLEH9/138b6?=
- =?us-ascii?Q?AUzAoCdDhMxZpSe9kiVZdOZ8+yr9eMCW4SQ9ofGf69HwYUv0t9QbsMLR704Y?=
- =?us-ascii?Q?jS0Hiq0l1F+7w6+DCCGhYorDUf+Rm+2YSBjCACA17vSKCY3K8mAzM1CzQLBn?=
- =?us-ascii?Q?S8qYLv1yez7Hns47eUsQ7BYMJK+5IPPbd0CyzaTNI0Ellp7/w7cE0u7WNDEA?=
- =?us-ascii?Q?Ga/fKlUVzGK0kVFlQKWp+JOjPVeMqEZ2q0rIcDmTTR+y/f/3NdG6DrraYOdD?=
- =?us-ascii?Q?hTybfNbQZwVWi+O2iOpc6ShrGTneGOv0bxEYkocK0eTErx3hVOv1NiAhQQ9Y?=
- =?us-ascii?Q?HDgqCmmiB2EdhieALfwPzycahayJSgAnDG1tmXXvazq3zu8C16EPp0D9zuWU?=
- =?us-ascii?Q?caUSc+ERiA3jI8QOV97YooMW8ldk++n1NNR5/M2lFABSZpJlZmy8ti4OKO2X?=
- =?us-ascii?Q?xyfiRO2jXREDmyUflMoBdiwwazikcgTTggvu5hF5Duh0DXGUUW7Ayo9uEymx?=
- =?us-ascii?Q?d158JPphPKBbdo8avAo=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3477C3C3F
+	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 15:05:12 +0000 (UTC)
+Received: from mail-ot1-x32d.google.com (mail-ot1-x32d.google.com [IPv6:2607:f8b0:4864:20::32d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C930B10D8;
+	Mon, 31 Jul 2023 08:05:10 -0700 (PDT)
+Received: by mail-ot1-x32d.google.com with SMTP id 46e09a7af769-6bc886d1504so2501856a34.0;
+        Mon, 31 Jul 2023 08:05:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1690815910; x=1691420710;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=u6m8JY8xlL5lafnW2mrv8zTKCgyIbG7vfy4wiqcsH9M=;
+        b=rUNj22zwZBzunn/Ajoq/i5m40v6g0aCboJZnvwEo4kIsNVkvJS6n+ZjgbTRcq0lBTG
+         Q2LbRbSblCWiuDUMnEB8QD9YGEg/47qwm1srgYQGyv0C5kPjkil57PK9O60q+t5o6xRz
+         Ias1ysIofuAubayAYm0CDiiGjRpUnsAIEgmhwTgtdpXijeFaehkt4bOiqLVorQnclk05
+         sh63gX1w4FwJlt9WhXISfyF3dF8hbphjeWjr4x4q47uu+F3cWue9re/LNjEvFxCtoDnf
+         rWgHjkLmuCTxx7lBZRAVzp6Tmx1u44URkRSXjCU5Bm5ZfgtFmHIFTL+m9hhjq3eHr8l0
+         QVuw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690815910; x=1691420710;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=u6m8JY8xlL5lafnW2mrv8zTKCgyIbG7vfy4wiqcsH9M=;
+        b=fSnGJ+Go6I+pteo1Zwm9Pwq/XIJrNGCbpibfAmhYKnmVyM8c5RLT6/7Lh29vxqp7yt
+         M5rGfZBCzh90EjwwPIZlT7eY2KXpSUNw9rltki3IIsr344gawShpgk6NaaI6AlEv3XQS
+         WqblW5JMVag45B2OaLfDb9AhwCHs14CI4qRiLcCr2H1HsbWdZukVM07eNsTAh+Otxhg+
+         B1UfQWl5dZ5U1oEwcCiHPErhfF4d8fQr9ryLChW2WxRAbkhLhPFvcC2KTogKECvfRjCg
+         Vtftt7asVrdd2d4r4GSxSTd2n4j9P83432pKTaSDo3YID0FXZRDNVVH6T9tSGnNEQceE
+         4jPA==
+X-Gm-Message-State: ABy/qLbsvgfQ07pkTbC8bfvuOjqdYGgJnlulUCqFchOBL/rUfSIykeeO
+	2SamLVjRUQOmeBxNhI6VnPrv5ixqPzlyU+pAZMM=
+X-Google-Smtp-Source: APBJJlHzJxErT5OwsIf3L0CIAEkHW1mfa5PTeh4zgx1s2WO25NgFeHjAtK94BgN2qYOHeThl/TN/0rbuvDCCIpD9Zfk=
+X-Received: by 2002:a05:6870:148b:b0:1b0:4fc5:2e4b with SMTP id
+ k11-20020a056870148b00b001b04fc52e4bmr12603538oab.9.1690815909642; Mon, 31
+ Jul 2023 08:05:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6289.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a82c720c-748f-476d-cfe6-08db91d6955d
-X-MS-Exchange-CrossTenant-originalarrivaltime: 31 Jul 2023 14:58:21.7820
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 4PUhKDXAQIkUvfPTMdI8kuDi/geKtzvNP6f5h42qVvduVAOmlBe+PIMaRQ9l7WDxdD8nHWMzZUwCXFOBkmCHKA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR04MB8729
+References: <2a4da319-a78a-7cb1-6f18-f59180de779f@gmail.com>
+In-Reply-To: <2a4da319-a78a-7cb1-6f18-f59180de779f@gmail.com>
+From: Sergio Paracuellos <sergio.paracuellos@gmail.com>
+Date: Mon, 31 Jul 2023 17:04:57 +0200
+Message-ID: <CAMhs-H-ZES+O07ZbY37xVWqQ0f4YmmR5mz6BGvv43iXz+me2Mg@mail.gmail.com>
+Subject: Re: MediaTek Frame Engine Ethernet: does it need any resets?
+To: =?UTF-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>
+Cc: Lorenzo Bianconi <lorenzo@kernel.org>, Felix Fietkau <nbd@nbd.name>, 
+	Matthias Brugger <matthias.bgg@gmail.com>, 
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
+	=?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>, 
+	Network Development <netdev@vger.kernel.org>, 
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, linux-mips@vger.kernel.org, 
+	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, 
+	linux-mediatek <linux-mediatek@lists.infradead.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+Hi Rafal,
 
+On Sat, Jul 29, 2023 at 1:55=E2=80=AFPM Rafa=C5=82 Mi=C5=82ecki <zajec5@gma=
+il.com> wrote:
+>
+> Hi,
+>
+> I'm trying to understand MediaTek's Ethernet controller resets.
+>
+> I noticed there is sth fishy when checking dts files. See following
+> errors:
+>
+> arch/mips/boot/dts/ralink/mt7621-tplink-hc220-g5-v1.dtb: ethernet@1e10000=
+0: resets: [[2, 6], [2, 23]] is too short
+>          From schema: Documentation/devicetree/bindings/net/mediatek,net.=
+yaml
+> arch/mips/boot/dts/ralink/mt7621-tplink-hc220-g5-v1.dtb: ethernet@1e10000=
+0: reset-names:1: 'gmac' was expected
+>          From schema: Documentation/devicetree/bindings/net/mediatek,net.=
+yaml
+> arch/mips/boot/dts/ralink/mt7621-tplink-hc220-g5-v1.dtb: ethernet@1e10000=
+0: reset-names: ['fe', 'eth'] is too short
+>          From schema: Documentation/devicetree/bindings/net/mediatek,net.=
+yaml
+> arch/mips/boot/dts/ralink/mt7621-tplink-hc220-g5-v1.dtb: ethernet@1e10000=
+0: Unevaluated properties are not allowed ('reset-names', 'resets' were une=
+xpected)
+>          From schema: Documentation/devicetree/bindings/net/mediatek,net.=
+yaml
+>
+>
+> 1. Binding mediatek,net.yaml
+> It says that when present, there must be 3 resets: fe, gmac, ppe
+>
+> 2. mt7621.dtsi
+> It specifies 2 resets: fe, eth
+>
+> 3. mt7622.dtsi
+> It doesn't specify any resets
+>
+> 4. mt7629.dtsi
+> It doesn't specify any resets
+>
+> 5. drivers/net/ethernet/mediatek/
+> I don't see any reset_control_* code at all
+>
+>
+> Can someone help me what's the actual case with resets? Are they needed?
+> Are they used?
 
-> -----Original Message-----
-> From: Andrew Lunn <andrew@lunn.ch>
-> Sent: Saturday, July 29, 2023 3:14 AM
-> To: Leo Li <leoyang.li@nxp.com>
-> Cc: Heiner Kallweit <hkallweit1@gmail.com>; Russell King
-> <linux@armlinux.org.uk>; David S . Miller <davem@davemloft.net>; Jakub
-> Kicinski <kuba@kernel.org>; David Bauer <mail@david-bauer.net>;
-> netdev@vger.kernel.org; linux-kernel@vger.kernel.org; Viorel Suman
-> <viorel.suman@nxp.com>; Wei Fang <wei.fang@nxp.com>
-> Subject: Re: [PATCH v3 1/2] net: phy: at803x: fix the wol setting functio=
-ns
->=20
-> On Fri, Jul 28, 2023 at 04:53:19PM -0500, Li Yang wrote:
-> > In commit 7beecaf7d507 ("net: phy: at803x: improve the WOL feature"),
-> > it seems not correct to use a wol_en bit in a 1588 Control Register
-> > which is only available on AR8031/AR8033(share the same phy_id) to
-> > determine if WoL is enabled.  Change it back to use
-> > AT803X_INTR_ENABLE_WOL for determining the WoL status which is
-> > applicable on all chips supporting wol. Also update the
-> > at803x_set_wol() function to only update the 1588 register on chips hav=
-ing
-> it.
->=20
-> Do chips which do not have the 1588 register not have WoL? Or WoL
-> hardware is always enabled, but you still need to enable the interrupt.
+At least for mt7621 bindings have been released after the ethernet
+driver. The driver uses directly register offset for reset through the
+system controller syscon [1].
 
-Some of them do and some don't, which is removed in the other patch from th=
-e series.  Since I don't find the register to enable it, I guess it always =
-enabled.
+Ideally reset_control APIs should be used since there is already a
+reset driver for mt7621 [2]. I don't know about the other SoCs.
 
->=20
-> Have you tested on a range of PHY? It might be better to split this patch=
- up a
-> bit. If it causes regressions, having smaller patches can make it easier =
-to find
-> which change broken it.
+Hope this helps.
 
-No, I only have AR8035 to test with.  Changes for other chips are according=
- to the datasheet.  It would be good if others having the hardware can test=
- it too.
+Best regards,
+    Sergio Paracuellos
 
-The problem right now on our board with AR8035 is that it gets the wrong Wo=
-L setting and fails to enter sleep:
-[  354.196156] Qualcomm Atheros AR8035 0x0000000008b96000:02: PM: dpm_run_c=
-allback(): mdio_bus_phy_suspend+0x0/0x110 returns -16
-[  354.196172] Qualcomm Atheros AR8035 0x0000000008b96000:02: PM: failed to=
- suspend: error -16
-
-Regards,
-Leo
+[1]: https://elixir.bootlin.com/linux/v6.5-rc3/source/drivers/net/ethernet/=
+mediatek/mtk_eth_soc.h#L495
+[2]: https://elixir.bootlin.com/linux/v6.5-rc3/source/drivers/clk/ralink/cl=
+k-mt7621.c
 
