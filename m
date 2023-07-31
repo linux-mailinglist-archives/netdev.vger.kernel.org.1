@@ -1,72 +1,155 @@
-Return-Path: <netdev+bounces-22739-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22740-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4AD75769006
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 10:23:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CB23B769008
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 10:24:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 07855281544
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 08:23:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 865332814F3
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 08:24:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D62311CA3;
-	Mon, 31 Jul 2023 08:23:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C407011CA5;
+	Mon, 31 Jul 2023 08:24:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1213611C98
-	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 08:22:59 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B08E2213B;
-	Mon, 31 Jul 2023 01:22:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=a2UzXH65pU6D+5RxuoqV0mU4KwvxcFu8nPejcDojQSQ=; b=UwJDP8wVdnTMyuNZaLfOYX61sN
-	dhXQOsNgIco1viC7mimNkQcfg6W1vDs94hfOOH/qxl2ENaMo5QQKKk59gydjyj9Gy0flLYqZAsXKd
-	Jk8tjhjkF6UMKvSl6RmcTxeSN2H2/uYtQ+SbE3X8io8N2TtSSBjizQetXpEUS5BaasUs=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qQOB0-002hKr-N2; Mon, 31 Jul 2023 10:22:50 +0200
-Date: Mon, 31 Jul 2023 10:22:50 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Ross Maynard <bids.7405@bigpond.com>
-Cc: Greg KH <gregkh@linuxfoundation.org>, linux-usb@vger.kernel.org,
-	netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
-	Oliver Neukum <oneukum@suse.com>
-Subject: Re: [PATCH v2] USB: zaurus: Add ID for A-300/B-500/C-700
-Message-ID: <556dcedc-b727-49b6-886f-5d485cf02713@lunn.ch>
-References: <69b5423b-2013-9fc9-9569-58e707d9bafb@bigpond.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B84802117
+	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 08:24:01 +0000 (UTC)
+Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5FA212D
+	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 01:23:59 -0700 (PDT)
+Received: by mail-lf1-x12a.google.com with SMTP id 2adb3069b0e04-4fb7dc16ff0so6749502e87.2
+        for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 01:23:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1690791838; x=1691396638;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=blXee+dDBQ47fnSeiUMVWE7fTOyc9C8HdxZlOvJbcv0=;
+        b=Ex3Bn7EExzLV4MN9C/nljzAJjFQ0zSVGSQ9Md9FbJrIf6utaec9gFlJwhCuHmHlWPA
+         z/wYprbtI9UOQfnUINErG0ap3FASEceipLsOyG4wfIf3urG/BHMSLh231sfK2CPk35Gu
+         B4j1Z23v6SDCEbv7BTR/eISuTukq1WA8VLx67QixBkz/9fsF2pEjQi96EtDxdmF7Flpd
+         EtjhGoHWdY+JNwr+mUIqRxGdp0qqaW0Cr/ITLKy/LxRZyGIDGCg7jISLCbMcgjijrDit
+         GzZvr5WIjtxBS7cFBceYXjZkArcXCIfs4NlQezsRzPlqeWlcABxi8BmPyc98BY1y96gH
+         bGhQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690791838; x=1691396638;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=blXee+dDBQ47fnSeiUMVWE7fTOyc9C8HdxZlOvJbcv0=;
+        b=AlOj187H2NlOQr+3/4qSuy7GJxin33PQ30XibbLoNntvjA0z7kNXmRbl6p1kCydIt6
+         yefru1OrZbqZQSIVIPOMgCplxdpsu/yMCqWVNaqo1TIjyZHHvink6ERA92NJzTdBud4T
+         NEdnknaneDH16X5MWduAqdCsIeAvG+m9cFW/RoIipQAOAxFHZEdK7/yrtyet4cgO5NML
+         Zn2r0yNHJDdagxkkNp+dJ5x7FMY1jYCtKGR7QXv8VVCxv7M+hUhQmab4JwgXv7Dea8rQ
+         UfVTNj8tAcbAvUUtoeaodhlogj1pnAOefJvvSuJnAlTHkEdEr2DP9z8xK+TUBuBCtNeE
+         28Gg==
+X-Gm-Message-State: ABy/qLZRLpn3PGU+UMcUooJgiWOUpdd0ZSryHlC274G0TV2H0Qgr4Qan
+	/nPe9JNNwOEKjzG9O0BTMkz4Xw==
+X-Google-Smtp-Source: APBJJlGKE2DVLe149kchpBqjbs1hE92ofyR6T5tdMJPbmCVveeORAYPo6+BcOsrUK12AR94Q9JRlZg==
+X-Received: by 2002:a19:9146:0:b0:4fb:7b4c:d38c with SMTP id y6-20020a199146000000b004fb7b4cd38cmr4754003lfj.60.1690791838163;
+        Mon, 31 Jul 2023 01:23:58 -0700 (PDT)
+Received: from [192.168.1.101] (abyk53.neoplus.adsl.tpnet.pl. [83.9.30.53])
+        by smtp.gmail.com with ESMTPSA id u23-20020ac24c37000000b004fcdea129basm1977429lfq.94.2023.07.31.01.23.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 31 Jul 2023 01:23:57 -0700 (PDT)
+Message-ID: <2c43966d-33da-107a-ff47-370e3e27a99a@linaro.org>
+Date: Mon, 31 Jul 2023 10:23:56 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <69b5423b-2013-9fc9-9569-58e707d9bafb@bigpond.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 4/4] soc: qcom: aoss: Tidy up qmp_send() callers
+Content-Language: en-US
+To: Bjorn Andersson <quic_bjorande@quicinc.com>,
+ Bjorn Andersson <andersson@kernel.org>, Chris Lew <quic_clew@quicinc.com>
+Cc: Alex Elder <elder@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Mathieu Poirier <mathieu.poirier@linaro.org>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+ linux-remoteproc@vger.kernel.org
+References: <20230731041013.2950307-1-quic_bjorande@quicinc.com>
+ <20230731041013.2950307-5-quic_bjorande@quicinc.com>
+From: Konrad Dybcio <konrad.dybcio@linaro.org>
+Autocrypt: addr=konrad.dybcio@linaro.org; keydata=
+ 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
+ izWDgYvmBE8=
+In-Reply-To: <20230731041013.2950307-5-quic_bjorande@quicinc.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Jul 31, 2023 at 03:42:04PM +1000, Ross Maynard wrote:
-> The SL-A300, B500/5600, and C700 devices no longer auto-load because of
-> "usbnet: Remove over-broad module alias from zaurus."
-> This patch adds IDs for those 3 devices.
+On 31.07.2023 06:10, Bjorn Andersson wrote:
+> With qmp_send() handling variable length messages and string formatting
+> he callers of qmp_send() can be cleaned up to not care about these
+> things.
 > 
-> Link: https://bugzilla.kernel.org/show_bug.cgi?id=217632
-> Fixes: 16adf5d07987 ("usbnet: Remove over-broad module alias from zaurus.")
-> Signed-off-by: Ross Maynard <bids.7405@bigpond.com>
-> Cc: stable@vger.kernel.org
+> Drop the QMP_MSG_LEN sized buffers and use the message formatting, as
+> appropriate.
+> 
+> Signed-off-by: Bjorn Andersson <quic_bjorande@quicinc.com>
+> ---
+If Alex is okay with that going through qcom:
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Reviewed-by: Konrad Dybcio <konrad.dybcio@linaro.org>
 
-    Andrew
+One nit below.
+
+[...]
+
+> -	snprintf(buf, sizeof(buf),
+> -		 "{class: volt_flr, event:zero_temp, res:%s, value:%s}",
+> -			qmp_cdev->name,
+> -			cdev_state ? "on" : "off");
+> -
+> -	ret = qmp_send(qmp_cdev->qmp, buf);
+> -
+> +	ret = qmp_send(qmp_cdev->qmp, "{class: volt_flr, event:zero_temp, res:%s, value:%s}",
+There's a space after the first colon but not after the subsequent
+ones.
+
+Konrad
 
