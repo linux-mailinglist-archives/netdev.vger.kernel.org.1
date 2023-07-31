@@ -1,128 +1,129 @@
-Return-Path: <netdev+bounces-22777-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22778-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0E77769273
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 11:55:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E03F476929F
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 12:00:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D16BE1C20B66
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 09:55:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9AEBF281630
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 10:00:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C808917AC3;
-	Mon, 31 Jul 2023 09:55:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7E9117AC4;
+	Mon, 31 Jul 2023 10:00:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB5811426B
-	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 09:55:36 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 011FDE54
-	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 02:55:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1690797314;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SQoMCvoY9z85LfglEVQlQxX/qlev/LvzY9LJJJIP4QE=;
-	b=eNfmdtAiiPbhxwaSs+RSdrVw7U2Js6yhousJ30vkY9HoWECQ+hJRFA9YVVkPRQZGZ5gVTE
-	ZTynFXCS6Gp7zZ+CvaoLEJwcf3I40BB5eaOBdTz4Hm9NZHv8xyAWqxSZuuTZtiHRfyYXDU
-	5K7HKgDe+TNYiRG7PDbdSrqDBh98VUE=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-581-B8v4MCWiOyiY2W909YJL0g-1; Mon, 31 Jul 2023 05:55:13 -0400
-X-MC-Unique: B8v4MCWiOyiY2W909YJL0g-1
-Received: by mail-ed1-f70.google.com with SMTP id 4fb4d7f45d1cf-522aa493673so1543998a12.0
-        for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 02:55:12 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690797312; x=1691402112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SQoMCvoY9z85LfglEVQlQxX/qlev/LvzY9LJJJIP4QE=;
-        b=L98hvYaXMkfUhF6sTysjHzAuoPZ0Ojc4bU1cXF0Avr+MuetxRjkvceQ0BDNpP8SCeO
-         1gHKvWmboCCS2k1TV7XawD2+tiTJ30q3cPqWsh0mJClwgQUHTBpEP6XTs7xGjJ5oFgnz
-         jcEnnVQ2mRHlSKJ6bz9ByV3bauQXZP68xBDpdIaDmhwDn0h3nc3ARE32vQXnqwwtmLlw
-         K+UmkzGgjHYEC85U5QbnjAI3cdSwQqBsVBRUwZcBdydpydjHzFnTELdg+YrsCh4ubJVI
-         oCxaKQWhZaQajR9mmIW1y02aT5ZVD/DJB7eJ94pe8LdvBX8+RBRA3UErNgAbIu93nrPr
-         RWaA==
-X-Gm-Message-State: ABy/qLb3Gj2n1YaM/Fsw/WITorb0D/kzoiUOpDTBq0M4rKkQ99/uDBiN
-	j7hVBuxrxJn6fb1UmrB/vzHLE8Jb4IfUbxKFXi3Au6qg5LfYsTjhcRfpIYnyivx5KljgzBXrltI
-	mp2APIbsfcUdXD9BG
-X-Received: by 2002:aa7:c443:0:b0:522:55bf:21af with SMTP id n3-20020aa7c443000000b0052255bf21afmr7246382edr.7.1690797311992;
-        Mon, 31 Jul 2023 02:55:11 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlE58TsNYsn/mQvr3qBZ6RLFnKbCrKdzPm+vWtUuE+xxgcoyQK4b4Cl5YZ1mF+9BK4pUUO0zZg==
-X-Received: by 2002:aa7:c443:0:b0:522:55bf:21af with SMTP id n3-20020aa7c443000000b0052255bf21afmr7246363edr.7.1690797311630;
-        Mon, 31 Jul 2023 02:55:11 -0700 (PDT)
-Received: from sgarzare-redhat (host-87-12-25-29.business.telecomitalia.it. [87.12.25.29])
-        by smtp.gmail.com with ESMTPSA id i23-20020aa7c717000000b0051bed21a635sm5234603edq.74.2023.07.31.02.55.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 31 Jul 2023 02:55:10 -0700 (PDT)
-Date: Mon, 31 Jul 2023 11:55:07 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Yue Haibing <yuehaibing@huawei.com>
-Cc: bryantan@vmware.com, vdasa@vmware.com, pv-drivers@vmware.com, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, 
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next] vsock: Remove unused function declarations
-Message-ID: <ftvs2ivhynszqi3ib3w4uccfx5ren5dgkjagoeuyasbjdd76ac@4rbyljp2xnof>
-References: <20230729122036.32988-1-yuehaibing@huawei.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01E6817AAB
+	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 10:00:30 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3578AC433C8;
+	Mon, 31 Jul 2023 10:00:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1690797630;
+	bh=XCQvNKE9hpAYSiyaw/udDhcxeHfFBfchLzpPzQ88kPw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=tk7S0+HEPzUlDT0NV8HEFWCeMMNs/Ut0Jl0zO0166GMfWAxuf1soVrttH9oZ5vUs3
+	 M9Pfdfa2XLuncjtmAhGOA+24jgHComfIjVDazWicnV/kTXcItdC463gmereD2Mp0Fd
+	 SknmabB7MwGcd8kqe824CVM/ID4y6BVr5NUEQsTM+kuo44LHV00jyCjO7hkD6lMPS3
+	 XXZMDhxeY2Ntc4qUT2FkInY6YLOz8oj7H+q6nsf5zPzvyv8XnaLC6WlaGqc7GWIaVL
+	 gdqXVSYNCkYPvI43CevbY7Yf+uMZNIVSw0KIlFBcMIkWTL9VwbpR2XlthFdjp7DLxQ
+	 UJ0lxKIsrbwLQ==
+Date: Mon, 31 Jul 2023 12:00:26 +0200
+From: Simon Horman <horms@kernel.org>
+To: Lin Ma <linma@zju.edu.cn>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, daniel.machon@microchip.com, petrm@nvidia.com,
+	peter.p.waskiewicz.jr@intel.com, jeffrey.t.kirsher@intel.com,
+	alexander.h.duyck@intel.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net v1] net: dcb: choose correct policy to parse
+ DCB_ATTR_BCN
+Message-ID: <ZMeGOiANXBqDTBWm@kernel.org>
+References: <20230731045216.3779420-1-linma@zju.edu.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230729122036.32988-1-yuehaibing@huawei.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+In-Reply-To: <20230731045216.3779420-1-linma@zju.edu.cn>
 
-On Sat, Jul 29, 2023 at 08:20:36PM +0800, Yue Haibing wrote:
->These are never implemented since introduction in
->commit d021c344051a ("VSOCK: Introduce VM Sockets")
->
->Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
->---
-> net/vmw_vsock/vmci_transport.h | 3 ---
-> 1 file changed, 3 deletions(-)
-
-Good catch ;-)
-
-I'd used "vsock/vmci:" as a prefix in the title.
-
-With or without:
-
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-
->
->diff --git a/net/vmw_vsock/vmci_transport.h b/net/vmw_vsock/vmci_transport.h
->index b7b072194282..dbda3ababa14 100644
->--- a/net/vmw_vsock/vmci_transport.h
->+++ b/net/vmw_vsock/vmci_transport.h
->@@ -116,9 +116,6 @@ struct vmci_transport {
-> 	spinlock_t lock; /* protects sk. */
+On Mon, Jul 31, 2023 at 12:52:16PM +0800, Lin Ma wrote:
+> The dcbnl_bcn_setcfg uses erroneous policy to parse tb[DCB_ATTR_BCN],
+> which is introduced in commit 859ee3c43812 ("DCB: Add support for DCB
+> BCN"). Please see the comment in below code
+> 
+> static int dcbnl_bcn_setcfg(...)
+> {
+>   ...
+>   ret = nla_parse_nested_deprecated(..., dcbnl_pfc_up_nest, .. )
+>   // !!! dcbnl_pfc_up_nest for attributes
+>   //  DCB_PFC_UP_ATTR_0 to DCB_PFC_UP_ATTR_ALL in enum dcbnl_pfc_up_attrs
+>   ...
+>   for (i = DCB_BCN_ATTR_RP_0; i <= DCB_BCN_ATTR_RP_7; i++) {
+>   // !!! DCB_BCN_ATTR_RP_0 to DCB_BCN_ATTR_RP_7 in enum dcbnl_bcn_attrs
+>     ...
+>     value_byte = nla_get_u8(data[i]);
+>     ...
+>   }
+>   ...
+>   for (i = DCB_BCN_ATTR_BCNA_0; i <= DCB_BCN_ATTR_RI; i++) {
+>   // !!! DCB_BCN_ATTR_BCNA_0 to DCB_BCN_ATTR_RI in enum dcbnl_bcn_attrs
+>   ...
+>     value_int = nla_get_u32(data[i]);
+>   ...
+>   }
+>   ...
+> }
+> 
+> That is, the nla_parse_nested_deprecated uses dcbnl_pfc_up_nest
+> attributes to parse nlattr defined in dcbnl_pfc_up_attrs. But the
+> following access code fetch each nlattr as dcbnl_bcn_attrs attributes.
+> By looking up the associated nla_policy for dcbnl_bcn_attrs. We can find
+> the beginning part of these two policies are "same".
+> 
+> static const struct nla_policy dcbnl_pfc_up_nest[...] = {
+> 	[DCB_PFC_UP_ATTR_0]   = {.type = NLA_U8},
+> 	[DCB_PFC_UP_ATTR_1]   = {.type = NLA_U8},
+> 	[DCB_PFC_UP_ATTR_2]   = {.type = NLA_U8},
+> 	[DCB_PFC_UP_ATTR_3]   = {.type = NLA_U8},
+> 	[DCB_PFC_UP_ATTR_4]   = {.type = NLA_U8},
+> 	[DCB_PFC_UP_ATTR_5]   = {.type = NLA_U8},
+> 	[DCB_PFC_UP_ATTR_6]   = {.type = NLA_U8},
+> 	[DCB_PFC_UP_ATTR_7]   = {.type = NLA_U8},
+> 	[DCB_PFC_UP_ATTR_ALL] = {.type = NLA_FLAG},
 > };
->
->-int vmci_transport_register(void);
->-void vmci_transport_unregister(void);
->-
-> int vmci_transport_send_wrote_bh(struct sockaddr_vm *dst,
-> 				 struct sockaddr_vm *src);
-> int vmci_transport_send_read_bh(struct sockaddr_vm *dst,
->-- 
->2.34.1
->
->
+> 
+> static const struct nla_policy dcbnl_bcn_nest[...] = {
+> 	[DCB_BCN_ATTR_RP_0]         = {.type = NLA_U8},
+> 	[DCB_BCN_ATTR_RP_1]         = {.type = NLA_U8},
+> 	[DCB_BCN_ATTR_RP_2]         = {.type = NLA_U8},
+> 	[DCB_BCN_ATTR_RP_3]         = {.type = NLA_U8},
+> 	[DCB_BCN_ATTR_RP_4]         = {.type = NLA_U8},
+> 	[DCB_BCN_ATTR_RP_5]         = {.type = NLA_U8},
+> 	[DCB_BCN_ATTR_RP_6]         = {.type = NLA_U8},
+> 	[DCB_BCN_ATTR_RP_7]         = {.type = NLA_U8},
+> 	[DCB_BCN_ATTR_RP_ALL]       = {.type = NLA_FLAG},
+> 	// from here is somewhat different
+> 	[DCB_BCN_ATTR_BCNA_0]       = {.type = NLA_U32},
+>         ...
+>         [DCB_BCN_ATTR_ALL]          = {.type = NLA_FLAG},
+> };
+> 
+> Therefore, the current code is buggy and this
+> nla_parse_nested_deprecated could overflow the dcbnl_pfc_up_nest and use
+> the adjacent nla_policy to parse attributes from DCB_BCN_ATTR_BCNA_0.
+> 
+> This patch use correct dcbnl_bcn_nest policy to parse the
+> tb[DCB_ATTR_BCN] nested TLV.
+> 
+> Fixes: 859ee3c43812 ("DCB: Add support for DCB BCN")
+> Signed-off-by: Lin Ma <linma@zju.edu.cn>
+
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
