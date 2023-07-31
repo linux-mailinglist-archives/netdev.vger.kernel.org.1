@@ -1,102 +1,111 @@
-Return-Path: <netdev+bounces-22833-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22834-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E002F7697DB
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 15:39:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1D037697E3
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 15:44:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C1CD71C20865
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 13:39:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 86F65281195
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 13:44:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B42C182DE;
-	Mon, 31 Jul 2023 13:39:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6853D18AE2;
+	Mon, 31 Jul 2023 13:44:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B7C58BF0
-	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 13:39:39 +0000 (UTC)
-Received: from mout.web.de (mout.web.de [212.227.17.11])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 176051709;
-	Mon, 31 Jul 2023 06:39:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
- s=s29768273; t=1690810750; x=1691415550; i=markus.elfring@web.de;
- bh=ttvtMSuPAlYyqFYQK2AIbrnJr1ZUEi8CEmpm3DAIRqA=;
- h=X-UI-Sender-Class:Date:To:Cc:References:Subject:From:In-Reply-To;
- b=C6LaAhV9xqn5hWkFPGhB1KMz/rRDveri8t1SnGzqgzWLTIPyJzbAD8mslnTaKCWY5nJUFeS
- PKY/2ZRdNjt2tA/J+6kTwIIz42OmzuzgS2rw0DnjuaTYVeEZiIGhL2Y/Uw3rMnq0rl01TML1F
- oZgDLARQ4mpFLFUI7wJ16JD0o316kOmHaU0x8dIdYgVNTHZauPu0xcwqW2E5JseOg4/tkqZE3
- pm5Zw8KKGmYvahBP1il72/dnJ9TAwKSAV6AjVRhfeEgPJytMYuHaBU2w4zLg4Av+6deNrkAUr
- Pbd5w1f0B6WzFqPPxXi62d/i7k7fcUm66HPYuJkjLGzbOszIFKhQ==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.21] ([94.31.90.83]) by smtp.web.de (mrweb106
- [213.165.67.124]) with ESMTPSA (Nemesis) id 1McIkg-1psEHy1q7I-00cWHJ; Mon, 31
- Jul 2023 15:39:10 +0200
-Message-ID: <fbda76a9-e1f3-d483-ab3d-3c904c54a5db@web.de>
-Date: Mon, 31 Jul 2023 15:39:07 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D60B8BF0
+	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 13:44:47 +0000 (UTC)
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3809D1709;
+	Mon, 31 Jul 2023 06:44:46 -0700 (PDT)
+Received: by mail-pj1-x1030.google.com with SMTP id 98e67ed59e1d1-25e847bb482so835202a91.1;
+        Mon, 31 Jul 2023 06:44:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1690811085; x=1691415885;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Sv4eEdzpRIyrH/+IfcFPu37k/d42alZPDTBwvhPALFI=;
+        b=Y4KZTJf6Zg4vd+GQMSfuZlbfhlt/uPZD/ssdSq5/j+48h4t+kiT5ixSs5Wk5Y0c3GI
+         WUXxVX1OA69hw9n2c1MDsyYCKAT61tO2bp9T0N0JhG7DRc3Mbh0Abpc69l9GrTNbzBAv
+         zJRWpX5aE/xeDuEW08utVJaESYyR7zVg0vQHKMVRGgC6OeMqKv97iuTPuX9OouHSQCwT
+         05w/0lHYYu2x4BLHmyR2PWPVILkarG/vv/oF1S6+SFLND5Gq2hSjcFQcAvnrTFqPCmEb
+         mZw/is82u6ExYSGtHh63NQxQdXAloVbkBcP5s4RQAnDkMT10tECPF2AdvdKdtG5wim6L
+         5lTA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690811085; x=1691415885;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Sv4eEdzpRIyrH/+IfcFPu37k/d42alZPDTBwvhPALFI=;
+        b=LUNVTHFbnuAT/jZ7Q7YKecmyD8DbBpyXQ8wJz1UEDy5oDSvraa1iVe3JS0Am/FxHN4
+         fLuJUW+musBZMq/ekxgP9uCb6qT3VsPsR2gqZjcYU6QtH6bkKo9rjCtEv7SQ10CfAY+d
+         z5rBxzSW+ZFb6gJjoom92vhPlJYaSafUbhY4Dieh57fq/tIz/KoFxAF6FY8ztjj1/q8K
+         9lpmkJ1Bcs1+75UmqkA1EdvG+uHEa7p2thEhGreokNUa6TdLUUAFcYSh/GqWRL0n9u+Y
+         5LWVjFsEz2Wm5OBCzckvw6JClsLO9/c6rK6CrTqy1mmlHfw6R+i1e9MtqU0ddfh5teWv
+         zndA==
+X-Gm-Message-State: ABy/qLbwbii0Wym1qo1DeGMDXacTgqAfHwwOcrh1KiAuooHwolVSv1f0
+	fvz+WOyB/PauXvMgJ51LJj+eVUDBWOI=
+X-Google-Smtp-Source: APBJJlGwSw362RvhOsN/krp5kQpm7PrncDbtm9pJqXyP9PAQ0wbCdJ/rJiKLdsCDXDotQyhiu/4Ymg==
+X-Received: by 2002:a17:90a:6c97:b0:263:730b:f568 with SMTP id y23-20020a17090a6c9700b00263730bf568mr6001069pjj.3.1690811085473;
+        Mon, 31 Jul 2023 06:44:45 -0700 (PDT)
+Received: from hoboy.vegasvil.org ([2601:640:8000:54:e2d5:5eff:fea5:802f])
+        by smtp.gmail.com with ESMTPSA id iw3-20020a170903044300b001b9dadf8bd2sm8607834plb.190.2023.07.31.06.44.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 31 Jul 2023 06:44:44 -0700 (PDT)
+Date: Mon, 31 Jul 2023 06:44:42 -0700
+From: Richard Cochran <richardcochran@gmail.com>
+To: Johannes Zink <j.zink@pengutronix.de>
+Cc: Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Russell King <linux@armlinux.org.uk>, patchwork-jzi@pengutronix.de,
+	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	kernel@pengutronix.de, kernel test robot <lkp@intel.com>
+Subject: Re: [PATCH v2] net: stmmac: correct MAC propagation delay
+Message-ID: <ZMe6ykS6s9a/en8r@hoboy.vegasvil.org>
+References: <20230719-stmmac_correct_mac_delay-v2-1-3366f38ee9a6@pengutronix.de>
+ <ZMGIuKVP7BEotbrn@hoboy.vegasvil.org>
+ <729dd79e-83aa-0237-1edd-1662a6ae28cd@pengutronix.de>
+ <ZMJy6yt4CL250x6Q@hoboy.vegasvil.org>
+ <de822fa6-16ca-381c-2cdf-7e983f29945b@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.1
-To: Lin Ma <linma@zju.edu.cn>, netdev@vger.kernel.org,
- kernel-janitors@vger.kernel.org,
- Alexander Duyck <alexander.h.duyck@intel.com>,
- Daniel Machon <daniel.machon@microchip.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Jeff Kirsher
- <jeffrey.t.kirsher@intel.com>, Paolo Abeni <pabeni@redhat.com>,
- Peter P Waskiewicz Jr <peter.p.waskiewicz.jr@intel.com>,
- Petr Machata <petrm@nvidia.com>
-Cc: LKML <linux-kernel@vger.kernel.org>
-References: <20230731045216.3779420-1-linma@zju.edu.cn>
-Subject: Re: [PATCH net] net: dcb: choose correct policy to parse DCB_ATTR_BCN
-Content-Language: en-GB
-From: Markus Elfring <Markus.Elfring@web.de>
-In-Reply-To: <20230731045216.3779420-1-linma@zju.edu.cn>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:0OfJ9W+77jg2PGV8ovoagdm+xbveR3piNs2dZqrQpSkt3kJQJRp
- zeyRikEJK7X5bqSf2AXDaaezzKVVOr4ewNLuPm6cXfvE6B9sbZmPQixnFEa6puJhGg4j8hX
- uIktx8/tol18hLActb0k3pm/B7mgHFWh8RP7Hs7bGt7gl5XbJo3OVFrxT8Lgn/RgK/bCeII
- WASDzGe0Sp4eUIwbMNz+g==
-UI-OutboundReport: notjunk:1;M01:P0:7zGnNaXZgcA=;j5WkJreH4B2tNvWLAh8Ev2hKDU9
- aFMI01eJNxomBWc0tEBBMkzgoV1eDWEqiCYXV5mfuFmhR9e1Nz/RKhzBSU+VnKDQ7+owq/Cwt
- TOWTeKpkfd4ml1bvQkx8CZTusnX/zrzSsP/yYK+N6Df0VcFIG7MbBCm7OZYxevj6VejKanMqq
- MlZiKN9IFJODFPQ41BwMmkeyUKjcDJ1C8Wx5ceycL//guV3tl0CIpBYXlvlV5XEfgsEuSyUm0
- XC2TR0VmYiJJiyOomD0TxsxcbE/bd9rU9TrZDwOZ9BvjR/AGehlm+QEEggN6PWuDDmTRAP90K
- lXYcprpC+urgs5EuDVRAjVLtX0KbqDjceKguk9jvD+/E6Wvk6EC00ZQpX6gcaqnKoKlAI9vqG
- d7yoGcaudjuIR9KKszm6Uy2r5k86GclEvW5w0dgBraSMNmHCmXztwE4Y2nInzu/exEkDDPHNO
- bj7o23O7x37j3Ck/qESM8bEpp/DkbzBVsNGBzhd9llPm4qN7RYUJ0SQueb2e29lXI1OuLmyjp
- 5xd4t5bjCDN4sZ/WJm4mc9to3o+FH9qUIPXTkn++lizYCeyxzTxEN24e5IbBFO8kH/BSLXIVA
- fJ482B5tm3sgnxjGMbazgSfIys5Q/e6Iqhasel6Rfj+TBFtR0V50WWC1roaBuPtJ181fzhLuG
- xm9+umEXJA35jOsrUt7fl92gz1kJstElW1yKS0dQ0L3yFvm7ELUegBWlJyUs2iFZPswLNoTCK
- BmeRkTeSVZfEhfrtCxM6P74t55G8Dd/XNP7fejdE3am3PCikSpxIyWzf9NYqYuuX/VGCMfzLd
- bNGlGqDfNl35+0AgxLAK6ifcExTx7G5TU6gN57X+RVxGfyoDmMzCBhw8jkGvCgV6zoguxFySF
- MmPdmCXrAm/K9mvUJsgoGZ9t2lhOI3Ij5RJ5T/pKi9XeOp66F+BXYgO782UddQTldK/ogyfAY
- Rzq/fTIiJuTp4pzSv62lFEzV8y4=
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <de822fa6-16ca-381c-2cdf-7e983f29945b@pengutronix.de>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-=E2=80=A6
-> This patch use correct dcbnl_bcn_nest policy to parse the
-> tb[DCB_ATTR_BCN] nested TLV.
+On Mon, Jul 31, 2023 at 09:00:29AM +0200, Johannes Zink wrote:
 
-Are imperative change descriptions still preferred?
+> I cannot tell for sure either, since I have datasheets for the i.MX8MP only.
+> Maybe Kurt has some insights here, as he has additional hardware available
+> for testing?
 
-See also:
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Do=
-cumentation/process/submitting-patches.rst?h=3Dv6.5-rc3#n94
+Maybe give the folks who make the dwc a call to clarify?
+ 
+> Nevertheless, I am going to add a guard to only use the correction codepath
+> on i.MX8MP in v3 for the time being, we can add other hardware later
+> trivially if they support doing this.
 
-Regards,
-Markus
+Sure.
+
+Thanks,
+Richard
 
