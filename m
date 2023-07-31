@@ -1,204 +1,163 @@
-Return-Path: <netdev+bounces-22675-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22678-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74BE6768AA8
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 06:11:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id F1784768AD8
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 06:53:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2C77F2814B7
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 04:11:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8FEE8281571
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 04:53:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86FC862D;
-	Mon, 31 Jul 2023 04:10:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 841D7651;
+	Mon, 31 Jul 2023 04:53:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C2E6EBC
-	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 04:10:36 +0000 (UTC)
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48AD3E43;
-	Sun, 30 Jul 2023 21:10:32 -0700 (PDT)
-Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36V2mVwh019004;
-	Mon, 31 Jul 2023 04:10:21 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding : content-type; s=qcppdkim1;
- bh=gPvnt16QGA4ObIxg6yNEmot12urHMc4SMSDvzpuJp88=;
- b=RlLkPPOkE5u5Rw76QJjAmaE+bjsmWEzfXxz1oqz/Q2Ixelqy6P5gdoX+95bRWboGgKIz
- TB6TIPWVSz+Cy4FnNZidaQL2gHYAGBDL7J2nWo5Et/vAE47sNYVN471tMr1Y9ZGjgzvg
- Z2F7oYnp1gKwrHn4cy4KQQU5WvpDGK7Ghv4Btno6+Vpw5to6IZikvRLEieVIlZQV0OkC
- ks2J1dGpluLR+EBaAFJt96U8TaTD+RbkaXfQ1cctY1odiU4cSWHZZE1yZPBuo1Qiav9O
- Y3BibykIVP7nlHDGByK43P62j+kfZQ8LHDTB9P2kvZeDdN+V4IQdmfv4e4vjTxXKn918 Rg== 
-Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3s4ueujk90-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 31 Jul 2023 04:10:21 +0000
-Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-	by NALASPPMTA05.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 36V4AKiS031498
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 31 Jul 2023 04:10:20 GMT
-Received: from hu-bjorande-lv.qualcomm.com (10.49.16.6) by
- nalasex01c.na.qualcomm.com (10.47.97.35) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Sun, 30 Jul 2023 21:10:20 -0700
-From: Bjorn Andersson <quic_bjorande@quicinc.com>
-To: Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio
-	<konrad.dybcio@linaro.org>,
-        Chris Lew <quic_clew@quicinc.com>
-CC: Alex Elder <elder@kernel.org>, "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Mathieu Poirier
-	<mathieu.poirier@linaro.org>,
-        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-arm-msm@vger.kernel.org>, <linux-remoteproc@vger.kernel.org>
-Subject: [PATCH 4/4] soc: qcom: aoss: Tidy up qmp_send() callers
-Date: Sun, 30 Jul 2023 21:10:13 -0700
-Message-ID: <20230731041013.2950307-5-quic_bjorande@quicinc.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20230731041013.2950307-1-quic_bjorande@quicinc.com>
-References: <20230731041013.2950307-1-quic_bjorande@quicinc.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78D16364
+	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 04:53:07 +0000 (UTC)
+Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [52.237.72.81])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0A974CA;
+	Sun, 30 Jul 2023 21:53:02 -0700 (PDT)
+Received: from localhost.localdomain (unknown [125.120.146.22])
+	by mail-app4 (Coremail) with SMTP id cS_KCgDXSa0GPsdkNEViCg--.52208S4;
+	Mon, 31 Jul 2023 12:52:23 +0800 (CST)
+From: Lin Ma <linma@zju.edu.cn>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	daniel.machon@microchip.com,
+	petrm@nvidia.com,
+	linma@zju.edu.cn,
+	peter.p.waskiewicz.jr@intel.com,
+	jeffrey.t.kirsher@intel.com,
+	alexander.h.duyck@intel.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net v1] net: dcb: choose correct policy to parse DCB_ATTR_BCN
+Date: Mon, 31 Jul 2023 12:52:16 +0800
+Message-Id: <20230731045216.3779420-1-linma@zju.edu.cn>
+X-Mailer: git-send-email 2.17.1
+X-CM-TRANSID:cS_KCgDXSa0GPsdkNEViCg--.52208S4
+X-Coremail-Antispam: 1UD129KBjvJXoWxWw1xKw1DWFW5XF43Ar17Awb_yoW5CF1Dpa
+	4vgrykCayUJ3sxGr4DuFZY9ayxWw1UCr4UGr1UWFyIyFy7tFn3K347GFyFgw10vF42vrZ7
+	ur1Y9343ta15X3JanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvj14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
+	Y2ka0xkIwI1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
+	xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43
+	MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I
+	0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWU
+	JVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUoO
+	J5UUUUU
+X-CM-SenderInfo: qtrwiiyqvtljo62m3hxhgxhubq/
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.49.16.6]
-X-ClientProxiedBy: nalasex01c.na.qualcomm.com (10.47.97.35) To
- nalasex01c.na.qualcomm.com (10.47.97.35)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: 7zMnZAXaYh_3srMd2w-mcsIwO6_BuxRf
-X-Proofpoint-ORIG-GUID: 7zMnZAXaYh_3srMd2w-mcsIwO6_BuxRf
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-07-27_10,2023-07-26_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 bulkscore=0
- phishscore=0 suspectscore=0 spamscore=0 lowpriorityscore=0 mlxlogscore=999
- malwarescore=0 mlxscore=0 adultscore=0 impostorscore=0 priorityscore=1501
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2306200000
- definitions=main-2307310038
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-With qmp_send() handling variable length messages and string formatting
-he callers of qmp_send() can be cleaned up to not care about these
-things.
+The dcbnl_bcn_setcfg uses erroneous policy to parse tb[DCB_ATTR_BCN],
+which is introduced in commit 859ee3c43812 ("DCB: Add support for DCB
+BCN"). Please see the comment in below code
 
-Drop the QMP_MSG_LEN sized buffers and use the message formatting, as
-appropriate.
+static int dcbnl_bcn_setcfg(...)
+{
+  ...
+  ret = nla_parse_nested_deprecated(..., dcbnl_pfc_up_nest, .. )
+  // !!! dcbnl_pfc_up_nest for attributes
+  //  DCB_PFC_UP_ATTR_0 to DCB_PFC_UP_ATTR_ALL in enum dcbnl_pfc_up_attrs
+  ...
+  for (i = DCB_BCN_ATTR_RP_0; i <= DCB_BCN_ATTR_RP_7; i++) {
+  // !!! DCB_BCN_ATTR_RP_0 to DCB_BCN_ATTR_RP_7 in enum dcbnl_bcn_attrs
+    ...
+    value_byte = nla_get_u8(data[i]);
+    ...
+  }
+  ...
+  for (i = DCB_BCN_ATTR_BCNA_0; i <= DCB_BCN_ATTR_RI; i++) {
+  // !!! DCB_BCN_ATTR_BCNA_0 to DCB_BCN_ATTR_RI in enum dcbnl_bcn_attrs
+  ...
+    value_int = nla_get_u32(data[i]);
+  ...
+  }
+  ...
+}
 
-Signed-off-by: Bjorn Andersson <quic_bjorande@quicinc.com>
+That is, the nla_parse_nested_deprecated uses dcbnl_pfc_up_nest
+attributes to parse nlattr defined in dcbnl_pfc_up_attrs. But the
+following access code fetch each nlattr as dcbnl_bcn_attrs attributes.
+By looking up the associated nla_policy for dcbnl_bcn_attrs. We can find
+the beginning part of these two policies are "same".
+
+static const struct nla_policy dcbnl_pfc_up_nest[...] = {
+	[DCB_PFC_UP_ATTR_0]   = {.type = NLA_U8},
+	[DCB_PFC_UP_ATTR_1]   = {.type = NLA_U8},
+	[DCB_PFC_UP_ATTR_2]   = {.type = NLA_U8},
+	[DCB_PFC_UP_ATTR_3]   = {.type = NLA_U8},
+	[DCB_PFC_UP_ATTR_4]   = {.type = NLA_U8},
+	[DCB_PFC_UP_ATTR_5]   = {.type = NLA_U8},
+	[DCB_PFC_UP_ATTR_6]   = {.type = NLA_U8},
+	[DCB_PFC_UP_ATTR_7]   = {.type = NLA_U8},
+	[DCB_PFC_UP_ATTR_ALL] = {.type = NLA_FLAG},
+};
+
+static const struct nla_policy dcbnl_bcn_nest[...] = {
+	[DCB_BCN_ATTR_RP_0]         = {.type = NLA_U8},
+	[DCB_BCN_ATTR_RP_1]         = {.type = NLA_U8},
+	[DCB_BCN_ATTR_RP_2]         = {.type = NLA_U8},
+	[DCB_BCN_ATTR_RP_3]         = {.type = NLA_U8},
+	[DCB_BCN_ATTR_RP_4]         = {.type = NLA_U8},
+	[DCB_BCN_ATTR_RP_5]         = {.type = NLA_U8},
+	[DCB_BCN_ATTR_RP_6]         = {.type = NLA_U8},
+	[DCB_BCN_ATTR_RP_7]         = {.type = NLA_U8},
+	[DCB_BCN_ATTR_RP_ALL]       = {.type = NLA_FLAG},
+	// from here is somewhat different
+	[DCB_BCN_ATTR_BCNA_0]       = {.type = NLA_U32},
+        ...
+        [DCB_BCN_ATTR_ALL]          = {.type = NLA_FLAG},
+};
+
+Therefore, the current code is buggy and this
+nla_parse_nested_deprecated could overflow the dcbnl_pfc_up_nest and use
+the adjacent nla_policy to parse attributes from DCB_BCN_ATTR_BCNA_0.
+
+This patch use correct dcbnl_bcn_nest policy to parse the
+tb[DCB_ATTR_BCN] nested TLV.
+
+Fixes: 859ee3c43812 ("DCB: Add support for DCB BCN")
+Signed-off-by: Lin Ma <linma@zju.edu.cn>
 ---
- drivers/net/ipa/ipa_power.c    |  5 +----
- drivers/remoteproc/qcom_q6v5.c |  8 +-------
- drivers/soc/qcom/qcom_aoss.c   | 14 ++++----------
- 3 files changed, 6 insertions(+), 21 deletions(-)
+ net/dcb/dcbnl.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ipa/ipa_power.c b/drivers/net/ipa/ipa_power.c
-index 26181eeed975..0eaa7a7f3343 100644
---- a/drivers/net/ipa/ipa_power.c
-+++ b/drivers/net/ipa/ipa_power.c
-@@ -324,15 +324,12 @@ void ipa_power_retention(struct ipa *ipa, bool enable)
- {
- 	static const char fmt[] = "{ class: bcm, res: ipa_pc, val: %c }";
- 	struct ipa_power *power = ipa->power;
--	char buf[36];	/* Exactly enough for fmt[]; size a multiple of 4 */
- 	int ret;
+diff --git a/net/dcb/dcbnl.c b/net/dcb/dcbnl.c
+index c0c438128575..2e6b8c8fd2de 100644
+--- a/net/dcb/dcbnl.c
++++ b/net/dcb/dcbnl.c
+@@ -980,7 +980,7 @@ static int dcbnl_bcn_setcfg(struct net_device *netdev, struct nlmsghdr *nlh,
+ 		return -EOPNOTSUPP;
  
- 	if (!power->qmp)
- 		return;		/* Not needed on this platform */
- 
--	(void)snprintf(buf, sizeof(buf), fmt, enable ? '1' : '0');
--
--	ret = qmp_send(power->qmp, buf);
-+	ret = qmp_send(power->qmp, fmt, enable ? '1' : '0');
+ 	ret = nla_parse_nested_deprecated(data, DCB_BCN_ATTR_MAX,
+-					  tb[DCB_ATTR_BCN], dcbnl_pfc_up_nest,
++					  tb[DCB_ATTR_BCN], dcbnl_bcn_nest,
+ 					  NULL);
  	if (ret)
- 		dev_err(power->dev, "error %d sending QMP %sable request\n",
- 			ret, enable ? "en" : "dis");
-diff --git a/drivers/remoteproc/qcom_q6v5.c b/drivers/remoteproc/qcom_q6v5.c
-index 8b41a73fa4d1..4ee5e67a9f03 100644
---- a/drivers/remoteproc/qcom_q6v5.c
-+++ b/drivers/remoteproc/qcom_q6v5.c
-@@ -23,19 +23,13 @@
- 
- static int q6v5_load_state_toggle(struct qcom_q6v5 *q6v5, bool enable)
- {
--	char buf[Q6V5_LOAD_STATE_MSG_LEN];
- 	int ret;
- 
- 	if (!q6v5->qmp)
- 		return 0;
- 
--	ret = snprintf(buf, sizeof(buf),
--		       "{class: image, res: load_state, name: %s, val: %s}",
-+	ret = qmp_send(q6v5->qmp, "{class: image, res: load_state, name: %s, val: %s}",
- 		       q6v5->load_state, enable ? "on" : "off");
--
--	WARN_ON(ret >= Q6V5_LOAD_STATE_MSG_LEN);
--
--	ret = qmp_send(q6v5->qmp, buf);
- 	if (ret)
- 		dev_err(q6v5->dev, "failed to toggle load state\n");
- 
-diff --git a/drivers/soc/qcom/qcom_aoss.c b/drivers/soc/qcom/qcom_aoss.c
-index b59c8681bcfe..4a4e12c7439a 100644
---- a/drivers/soc/qcom/qcom_aoss.c
-+++ b/drivers/soc/qcom/qcom_aoss.c
-@@ -266,7 +266,7 @@ EXPORT_SYMBOL(qmp_send);
- 
- static int qmp_qdss_clk_prepare(struct clk_hw *hw)
- {
--	static const char buf[QMP_MSG_LEN] = "{class: clock, res: qdss, val: 1}";
-+	static const char *buf = "{class: clock, res: qdss, val: 1}";
- 	struct qmp *qmp = container_of(hw, struct qmp, qdss_clk);
- 
- 	return qmp_send(qmp, buf);
-@@ -274,7 +274,7 @@ static int qmp_qdss_clk_prepare(struct clk_hw *hw)
- 
- static void qmp_qdss_clk_unprepare(struct clk_hw *hw)
- {
--	static const char buf[QMP_MSG_LEN] = "{class: clock, res: qdss, val: 0}";
-+	static const char *buf = "{class: clock, res: qdss, val: 0}";
- 	struct qmp *qmp = container_of(hw, struct qmp, qdss_clk);
- 
- 	qmp_send(qmp, buf);
-@@ -336,7 +336,6 @@ static int qmp_cdev_set_cur_state(struct thermal_cooling_device *cdev,
- 				  unsigned long state)
- {
- 	struct qmp_cooling_device *qmp_cdev = cdev->devdata;
--	char buf[QMP_MSG_LEN] = {};
- 	bool cdev_state;
- 	int ret;
- 
-@@ -346,13 +345,8 @@ static int qmp_cdev_set_cur_state(struct thermal_cooling_device *cdev,
- 	if (qmp_cdev->state == state)
- 		return 0;
- 
--	snprintf(buf, sizeof(buf),
--		 "{class: volt_flr, event:zero_temp, res:%s, value:%s}",
--			qmp_cdev->name,
--			cdev_state ? "on" : "off");
--
--	ret = qmp_send(qmp_cdev->qmp, buf);
--
-+	ret = qmp_send(qmp_cdev->qmp, "{class: volt_flr, event:zero_temp, res:%s, value:%s}",
-+		       qmp_cdev->name, cdev_state ? "on" : "off");
- 	if (!ret)
- 		qmp_cdev->state = cdev_state;
- 
+ 		return ret;
 -- 
-2.25.1
+2.17.1
 
 
