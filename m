@@ -1,80 +1,72 @@
-Return-Path: <netdev+bounces-22822-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22823-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA17B7695FD
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 14:19:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 75F9476961B
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 14:22:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A81EA1C20B19
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 12:19:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A345E1C20B76
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 12:22:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96068182CB;
-	Mon, 31 Jul 2023 12:19:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 808C0182CD;
+	Mon, 31 Jul 2023 12:22:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AE3C1800B
-	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 12:19:55 +0000 (UTC)
-Received: from mail-wm1-x334.google.com (mail-wm1-x334.google.com [IPv6:2a00:1450:4864:20::334])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86DDC171B
-	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 05:19:46 -0700 (PDT)
-Received: by mail-wm1-x334.google.com with SMTP id 5b1f17b1804b1-3fbc5d5742bso49499425e9.2
-        for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 05:19:46 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7529F8BF0
+	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 12:22:23 +0000 (UTC)
+Received: from mail-qv1-xf2c.google.com (mail-qv1-xf2c.google.com [IPv6:2607:f8b0:4864:20::f2c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B6C91FD6
+	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 05:21:57 -0700 (PDT)
+Received: by mail-qv1-xf2c.google.com with SMTP id 6a1803df08f44-63d30b90197so27672046d6.0
+        for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 05:21:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1690805985; x=1691410785;
+        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1690806115; x=1691410915;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=XM+dBkL9BOQB5M0QkPLLYoaZfMRgmlrJZ/IVtD0ioO0=;
-        b=K/ixDBtHAoED1QTZkzrM0HP35wmxU5en+ia0zc1sDJnLq2BhUN1mjgwFGR3x0mhUTm
-         H3OGTNuakXfxocEdqK1GhB3S8ynucvmwby3nWGTgvzmW49oBhpMPPdFAcSMbboxIRnU4
-         qKduZksCoD63Qc6ufiHOWoJc41ELb6Vq9XiC1ggxpI9Ch37s/vd9s1KhlnqneJ39yKbE
-         xvoRMFv7kumu57kjrYbkZp1tjuXo2Te+/Kf/dZlJ8g7PjBW+cB0Rj0SCLXWinfJmVqSV
-         OQMt2XyprtX9qNGZQKMuoaR7LapJai9uasZrHpbx8KCHwCsJpCf1oB9++nilbbY57J6n
-         FIlg==
+        bh=PFJKUlEi1dwMUzXqehE2/1K7AORG2mjzS4XpmVxhBIA=;
+        b=A5pFXRBjYDsIPfRtKNqnA+sL9R+KeLY8rZIGFbdoycC8ddlBm7FI0WdCLBrbY5cgjR
+         DNf3ZG4Clht8Bmgn13/TMCo+O/+giENhxIpGn1dPm5Q+kPalJAPflXNNiuoJsZOWtr81
+         gqDiIJpuAAdhbKYkaOcLcmwNNqVb+3zt2KcEH25Nq2D+FUKeEh1p8NJ6zEx91p/PM7OZ
+         YL/qS+2tkLGlMUsgAGPs1iRdlvstcsUTn3AtN+/aykqV9rYjmCMEtT/NV6u/ob2jGCk2
+         1o1pFhXAR6IPlZ3oTuvhOunQckSRe9Gdp4s9M57dUaVQKWzeISpEjrvmRUox8bGCAkqE
+         WCIg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690805985; x=1691410785;
+        d=1e100.net; s=20221208; t=1690806115; x=1691410915;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=XM+dBkL9BOQB5M0QkPLLYoaZfMRgmlrJZ/IVtD0ioO0=;
-        b=fdJp5H2WFoTjNnJyD+ZYjvNNkVeJBG27udugJaYygoWClUcPaT/1KW8EpFe1W+LWo+
-         0WVQAJO71zfxCYA3qD9GitCxGfOVyu+Ddbwyq9mj9oFWCpnbug3irXoM756ShQuVCyJZ
-         5/JJeMpnx/ON7xD75hrI48SJqbagOWld01gCriEZL0sp8pUbU40HJMw1Cbds6rtg92fK
-         gB4IUyhNa2MXtoWpYAt5fiPyXjBvIv/rlkNXGdosrRAUnI4D8oN3YHOdaBGu2pK6C3PW
-         qvCeE14EjPvTyym3hiZe1kFpsPA47JJHP/p8DOUhZXcZj8/GFzUynXVLbdLdgrNFi1TP
-         fKXA==
-X-Gm-Message-State: ABy/qLZOvzZGWc7ZldVh5xBKzyjiuuNTO1QakVDmtTLcCZfs1Dtg0DRt
-	9UDstF0gl/w5dlaOEZ5yHAiQWQ==
-X-Google-Smtp-Source: APBJJlEctlAU59sp6IeHDQnotTpHuuRt9EWdIcJSmwMi77Aq/AtVjK71uRjSDGZv/d1bBLLm+M5qIw==
-X-Received: by 2002:a7b:ca53:0:b0:3fb:415a:d07 with SMTP id m19-20020a7bca53000000b003fb415a0d07mr7933564wml.36.1690805984930;
-        Mon, 31 Jul 2023 05:19:44 -0700 (PDT)
+        bh=PFJKUlEi1dwMUzXqehE2/1K7AORG2mjzS4XpmVxhBIA=;
+        b=VDBQSF45NHYxIYA6Nx+jgVzpSspeI1zfA9FjtqUHnJG3ZJBJTIB1RR0vseKARKfl08
+         BfVZ9n8xviWXi35Fmhp8rq9ENg7Tr87lkH5uYCsL6flyc4vKZCPtri2aQ+jDWpaB0TPQ
+         SOwUBEVK7M0srTXXMokZ8iKljOzplyO7WQmZd7ZGckODEVsRPSZLalQwbFPGtmGUi8kU
+         jlwwkteQ9Z9w7ZzkXbxFT7wX8T8a2aEcUx79+LIW8tV2K6QH9J1mPXoOXqEKxFXk1QJL
+         6d117Mu+KcJf5xi59WFUnRwYnMDStZUMT52W+YThJX1vLlrUoPUtYYjDn7KnJrc87Cio
+         2cJw==
+X-Gm-Message-State: ABy/qLYT0f1T+H4NvhfyG5cXz3FWknDzX600pojkG3ZpG4Nl6uu7ZkeU
+	UsLTFz5dH5e3+ClTnnnPBuBQpQ==
+X-Google-Smtp-Source: APBJJlFfi8YyXXrC7sZHQB3hNf11hgMoW8nTgHCgbVr6dLrbdKY8y50Q14NAKQ0Pb1OzvxG6dbUOJQ==
+X-Received: by 2002:a05:6214:9a6:b0:63d:2a0b:3f79 with SMTP id du6-20020a05621409a600b0063d2a0b3f79mr9184306qvb.45.1690806115320;
+        Mon, 31 Jul 2023 05:21:55 -0700 (PDT)
 Received: from localhost ([212.23.236.67])
-        by smtp.gmail.com with ESMTPSA id x13-20020a05600c21cd00b003fe21c7386esm2247355wmj.45.2023.07.31.05.19.43
+        by smtp.gmail.com with ESMTPSA id d8-20020a37c408000000b00767b4fa5d96sm3222919qki.27.2023.07.31.05.21.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 31 Jul 2023 05:19:44 -0700 (PDT)
-Date: Mon, 31 Jul 2023 14:19:43 +0200
+        Mon, 31 Jul 2023 05:21:54 -0700 (PDT)
+Date: Mon, 31 Jul 2023 14:21:52 +0200
 From: Jiri Pirko <jiri@resnulli.us>
-To: "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>
-Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jonathan Lemon <jonathan.lemon@gmail.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	"Olech, Milena" <milena.olech@intel.com>,
-	"Michalik, Michal" <michal.michalik@intel.com>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	poros <poros@redhat.com>, mschmidt <mschmidt@redhat.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-clk@vger.kernel.org" <linux-clk@vger.kernel.org>,
-	Bart Van Assche <bvanassche@acm.org>
-Subject: Re: [PATCH 09/11] ice: implement dpll interface to control cgu
-Message-ID: <ZMem35OUQiQmB9Vd@nanopsycho>
-References: <20230720091903.297066-1-vadim.fedorenko@linux.dev>
- <20230720091903.297066-10-vadim.fedorenko@linux.dev>
- <ZLpuaxMJ+8rWAPwi@nanopsycho>
- <DM6PR11MB46571657F0DF87765DAB32FE9B06A@DM6PR11MB4657.namprd11.prod.outlook.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
+	edumazet@google.com, moshe@nvidia.com, saeedm@nvidia.com,
+	idosch@nvidia.com, petrm@nvidia.com
+Subject: Re: [patch net-next v2 08/11] devlink: introduce set of macros and
+ use it for split ops definitions
+Message-ID: <ZMenYPE5zrA2myAm@nanopsycho>
+References: <20230720121829.566974-1-jiri@resnulli.us>
+ <20230720121829.566974-9-jiri@resnulli.us>
+ <20230725103816.2be372b2@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,99 +75,33 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <DM6PR11MB46571657F0DF87765DAB32FE9B06A@DM6PR11MB4657.namprd11.prod.outlook.com>
+In-Reply-To: <20230725103816.2be372b2@kernel.org>
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,
 	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Sat, Jul 29, 2023 at 01:03:59AM CEST, arkadiusz.kubalewski@intel.com wrote:
->>From: Jiri Pirko <jiri@resnulli.us>
->>Sent: Friday, July 21, 2023 1:39 PM
->>
->>Thu, Jul 20, 2023 at 11:19:01AM CEST, vadim.fedorenko@linux.dev wrote:
->>>From: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+Tue, Jul 25, 2023 at 07:38:16PM CEST, kuba@kernel.org wrote:
+>On Thu, 20 Jul 2023 14:18:26 +0200 Jiri Pirko wrote:
+>> The split ops structures for all commands look pretty much the same.
+>> The are all using the same/similar callbacks.
+>> 
+>> Introduce a set of macros to make the code shorter and also avoid
+>> possible future copy&paste mistakes and inconsistencies.
+>> 
+>> Use this macros for already converted commands.
 >
+>If you want to use split ops extensively please use the nlspec
+>and generate the table automatically. Integrating closer with
+>the spec will have many benefits.
 
-[...]
+Yeah, I was thinging about it, it just didn't seem necessary. Okay, will
+check that out.
 
-
->>>+static int ice_dpll_cb_lock(struct ice_pf *pf, struct netlink_ext_ack
->>>*extack)
->>>+{
->>>+	int i;
->>>+
->>>+	for (i = 0; i < ICE_DPLL_LOCK_TRIES; i++) {
->>>+		if (!test_bit(ICE_FLAG_DPLL, pf->flags)) {
->>
->>And again, as I already told you, this flag checking is totally
->>pointless. See below my comment to ice_dpll_init()/ice_dpll_deinit().
->>
->
->This is not pointless, will explain below.
->
->>
->>
->
->[...]
->
-
-[...]
-
-
->>>+void ice_dpll_deinit(struct ice_pf *pf)
->>>+{
->>>+	bool cgu = ice_is_feature_supported(pf, ICE_F_CGU);
->>>+
->>>+	if (!test_bit(ICE_FLAG_DPLL, pf->flags))
->>>+		return;
->>>+	clear_bit(ICE_FLAG_DPLL, pf->flags);
->>>+
->>>+	ice_dpll_deinit_pins(pf, cgu);
->>>+	ice_dpll_deinit_dpll(pf, &pf->dplls.pps, cgu);
->>>+	ice_dpll_deinit_dpll(pf, &pf->dplls.eec, cgu);
->>>+	ice_dpll_deinit_info(pf);
->>>+	if (cgu)
->>>+		ice_dpll_deinit_worker(pf);
->>
->>Could you please order the ice_dpll_deinit() to be symmetrical to
->>ice_dpll_init()? Then, you can drop ICE_FLAG_DPLL flag entirely, as the
->>ice_dpll_periodic_work() function is the only reason why you need it
->>currently.
->>
->
->Not true.
->The feature flag is common approach in ice. If the feature was successfully
-
-The fact that something is common does not necessarily mean it is
-correct. 0 value argument.
-
-
->initialized the flag is set. It allows to determine if deinit of the feature
->is required on driver unload.
->
->Right now the check for the flag is not only in kworker but also in each
->callback, if the flag were cleared the data shall be not accessed by callbacks.
-
-Could you please draw me a scenario when this could actually happen?
-It is just a matter of ordering. Unregister dpll device/pins before you
-cleanup the related resources and you don't need this ridiculous flag.
-
-
->I know this is not required, but it helps on loading and unloading the driver,
->thanks to that, spam of pin-get dump is not slowing the driver load/unload.
-
-? Could you plese draw me a scenario how such thing may actually happen?
+Btw, does that mean that any split-ops usage would require generated
+code? If yes, could you please document that somewhere, probably near
+the struct?
 
 Thanks!
-
-
->
->>
->>>+	mutex_destroy(&pf->dplls.lock);
->>>+}
-
-
-[...]
 
