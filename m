@@ -1,135 +1,190 @@
-Return-Path: <netdev+bounces-22935-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22936-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36F4A76A1BA
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 22:09:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 268BD76A1CB
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 22:20:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D513528154E
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 20:09:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CB99A281496
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 20:20:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7E541DDDF;
-	Mon, 31 Jul 2023 20:09:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1617D1DDE1;
+	Mon, 31 Jul 2023 20:20:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91A9118C32
-	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 20:09:54 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1342EC433C8;
-	Mon, 31 Jul 2023 20:09:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690834194;
-	bh=Yv9eIR3jcIkEdTn0HOZVv1V441z6076tjCIjywPROTA=;
-	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
-	b=A+7XY4WXlGZjlbZ8kK78b2N8m9ugG5ke3EVSXIpiUChiK1UHAnPfDKp67wJut7d0j
-	 XkGlufl66qwTluGJFaQQ5nRC752ZGbOFy39Qu4jFvUt/+wDQc8aX/WdxFtuikmEbQN
-	 6jcplC8Iq4Fvky+uLxK6/VoFLaY4OnSu8KSiBh8+Mu1SEk4mRm4xQYSKiaYhE0QT6q
-	 468RUUdSFo/eEoi3nYtBRypUV9P0QQTV2WXq1zGWFpK6QPydJ25DKsh/JWujhYHfC5
-	 dNj7ZtJx6z60xEVKFIVRLZdL7FWoLGTnSP050apyh6SWGGHNq3Owytz+4EjVVYPeJj
-	 cmwJiVjaW854A==
-Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
-	id A5A98CE1066; Mon, 31 Jul 2023 13:09:53 -0700 (PDT)
-Date: Mon, 31 Jul 2023 13:09:53 -0700
-From: "Paul E. McKenney" <paulmck@kernel.org>
-To: Alan Huang <mmpgouride@gmail.com>
-Cc: Joel Fernandes <joel@joelfernandes.org>,
-	Eric Dumazet <edumazet@google.com>, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, rcu@vger.kernel.org,
-	roman.gushchin@linux.dev
-Subject: Re: Question about the barrier() in hlist_nulls_for_each_entry_rcu()
-Message-ID: <43d29007-3c59-4497-a1e5-26f182a7f4c5@paulmck-laptop>
-Reply-To: paulmck@kernel.org
-References: <E9CF24C7-3080-4720-B540-BAF03068336B@gmail.com>
- <1E0741E0-2BD9-4FA3-BA41-4E83315A10A8@joelfernandes.org>
- <1AF98387-B78C-4556-BE2E-E8F88ADACF8A@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0238A18C32
+	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 20:20:20 +0000 (UTC)
+Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F9D3133
+	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 13:20:19 -0700 (PDT)
+Received: by mail-lf1-x12e.google.com with SMTP id 2adb3069b0e04-4fe2503e3easo4780921e87.2
+        for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 13:20:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1690834817; x=1691439617;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=WnfhZm0CjGcmNMSsmnUZMmCdlFEkSIOAUZL3BZmePvU=;
+        b=MCrkjaJtFCvAK/LK/0GNtZws1iEK/6ay2YIfZ7oWWh/YPcTppKgZLwQUpMIKz2zVt1
+         D47UEQlajlKuxRDZgUM+9y1yuyy52hKbJBGmoBBBKh0kgFsKkevFnLwg/OiC0Rp4EJc/
+         /9vSxpe2SRHlAi4FgyzjG8JzKK43GGOLUShmk=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690834817; x=1691439617;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=WnfhZm0CjGcmNMSsmnUZMmCdlFEkSIOAUZL3BZmePvU=;
+        b=N+4Wy9tBtVC2oDr6q4EsAwEZmkQj3Q6CPWm4+sYhOyA1DdWcNqizS/H0pScJPuJ/ne
+         qsC3TilHM6KuosXWo9en+FYW6Wm9ZsGg23iblTu8FPWJBfGLlBmh5LcqdyaplfHZ6hxf
+         xhQ0zs1jKnV6YgXjKi2nSvEtsKd7siIM0YTea2cy0YHdNS34F1SUGyAO52f0SCwrgQ6j
+         rGFtRm1+mzpZfW6BBYzBBWnA2FdcdPJIyWeqe8MUFz8zXvGfnk+kokiMbIbU3X2t33Br
+         adILd/4+RBbcVB/QbC1vD1TN1t+fipAeUBdpMqiMFcwogIPMOIoHUB3LmBeRypzeuDMA
+         qsVg==
+X-Gm-Message-State: ABy/qLb5FatsbW00gyJVjMutRe1Tuqdu+W2oVk4kFibW+njt8mYgwwF7
+	TBxhkfSxrJNgOwQnfrG/hhP/AGMKFPy6OIcpYwae4w==
+X-Google-Smtp-Source: APBJJlGBNRELGu2F4zxD1/lwcyZ8TxNSri/pHb819iaTo56PoQrS5jYTEMde440/Tly2qqwWq2ZHdV+MoxbZMdoYkPk=
+X-Received: by 2002:a05:6512:3147:b0:4fb:772a:af12 with SMTP id
+ s7-20020a056512314700b004fb772aaf12mr547397lfi.21.1690834817287; Mon, 31 Jul
+ 2023 13:20:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <1AF98387-B78C-4556-BE2E-E8F88ADACF8A@gmail.com>
+References: <20230728231829.235716-1-michael.chan@broadcom.com>
+ <20230728231829.235716-4-michael.chan@broadcom.com> <20230728174212.64000bdc@kernel.org>
+ <2eadb48b-2991-7458-16a6-51082ff3ec2c@kernel.org> <20230731110008.26e8ce03@kernel.org>
+ <CACKFLinHWLMScGbYKZ+zNAn2iV1zqLkNVWDMQwJRZYd-yRiY7g@mail.gmail.com> <20230731114427.0da1f73b@kernel.org>
+In-Reply-To: <20230731114427.0da1f73b@kernel.org>
+From: Michael Chan <michael.chan@broadcom.com>
+Date: Mon, 31 Jul 2023 13:20:04 -0700
+Message-ID: <CACKFLimJO7Wt90O_F3Nk375rABpAQvKBZhNmBkNzzehYHbk_jA@mail.gmail.com>
+Subject: Re: [PATCH net-next 3/3] bnxt_en: Let the page pool manage the DMA mapping
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Jesper Dangaard Brouer <hawk@kernel.org>, davem@davemloft.net, netdev@vger.kernel.org, 
+	edumazet@google.com, pabeni@redhat.com, gospo@broadcom.com, 
+	bpf@vger.kernel.org, somnath.kotur@broadcom.com, 
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="000000000000b0e8a80601ce2858"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Fri, Jul 21, 2023 at 10:27:04PM +0800, Alan Huang wrote:
-> 
-> > 2023年7月21日 20:54，Joel Fernandes <joel@joelfernandes.org> 写道：
-> > 
-> > 
-> > 
-> >> On Jul 20, 2023, at 4:00 PM, Alan Huang <mmpgouride@gmail.com> wrote:
-> >> 
-> >> ﻿
-> >>> 2023年7月21日 03:22，Eric Dumazet <edumazet@google.com> 写道：
-> >>> 
-> >>>> On Thu, Jul 20, 2023 at 8:54 PM Alan Huang <mmpgouride@gmail.com> wrote:
-> >>>> 
-> >>>> Hi,
-> >>>> 
-> >>>> I noticed a commit c87a124a5d5e(“net: force a reload of first item in hlist_nulls_for_each_entry_rcu”)
-> >>>> and a related discussion [1].
-> >>>> 
-> >>>> After reading the whole discussion, it seems like that ptr->field was cached by gcc even with the deprecated
-> >>>> ACCESS_ONCE(), so my question is:
-> >>>> 
-> >>>>      Is that a compiler bug? If so, has this bug been fixed today, ten years later?
-> >>>> 
-> >>>>      What about READ_ONCE(ptr->field)?
-> >>> 
-> >>> Make sure sparse is happy.
-> >> 
-> >> It caused a problem without barrier(), and the deprecated ACCESS_ONCE() didn’t help:
-> >> 
-> >>   https://lore.kernel.org/all/519D19DA.50400@yandex-team.ru/
-> >> 
-> >> So, my real question is: With READ_ONCE(ptr->field), are there still some unusual cases where gcc 
-> >> decides not to reload ptr->field?
-> > 
-> > I am a bit doubtful there will be strong (any?) interest in replacing the barrier() with READ_ONCE() without any tangible reason, regardless of whether a gcc issue was fixed.
-> > 
-> > But hey, if you want to float the idea…
-> 
-> We already had the READ_ONCE() in rcu_deference_raw().
-> 
-> The barrier() here makes me think we need write code like below:
-> 	
-> 	READ_ONCE(head->first);
-> 	barrier();
-> 	READ_ONCE(head->first);
-> 
-> With READ_ONCE (or the deprecated ACCESS_ONCE),
-> I don’t think a compiler should cache the value of head->first.
+--000000000000b0e8a80601ce2858
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Apologies for the late reply!
+On Mon, Jul 31, 2023 at 11:44=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> w=
+rote:
+> Maybe I'm misunderstanding. Let me tell you how I think this works and
+> perhaps we should update the docs based on this discussion.
+>
+> Note that the max_len is applied to the full host page when the full
+> host page is returned. Not to fragments, and not at allocation.
+>
 
-If both are READ_ONCE(), you should not need the barrier().  Unless there
-is some other code not shown in your example that requires it, that is.
+I think I am beginning to understand what the confusion is.  These 32K
+page fragments within the page may not belong to the same (GRO)
+packet.  So we cannot dma_sync the whole page at the same time.
+Without setting PP_FLAG_DMA_SYNC_DEV, the driver code should be
+something like this:
 
-							Thanx, Paul
+mapping =3D page_pool_get_dma_addr(page) + offset;
+dma_sync_single_for_device(dev, mapping, BNXT_RX_PAGE_SIZE, bp->rx_dir);
 
-> > Thanks,
-> > 
-> > - Joel
-> > 
-> >> 
-> >>> 
-> >>> Do you have a patch for review ?
-> >> 
-> >> Possibly next month. :)
-> >> 
-> >>> 
-> >>> 
-> >>>> 
-> >>>> 
-> >>>> [1] https://lore.kernel.org/all/1369699930.3301.494.camel@edumazet-glaptop/
-> >>>> 
-> >>>> Thanks,
-> >>>> Alan
-> >> 
-> 
+offset may be 0, 32K, etc.
+
+Since the PP_FLAG_DMA_SYNC_DEV logic is not aware of this offset, we
+actually must do our own dma_sync and not use PP_FLAG_DMA_SYNC_DEV in
+this case.  Does that sound right?
+
+--000000000000b0e8a80601ce2858
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
+
+MIIQbQYJKoZIhvcNAQcCoIIQXjCCEFoCAQExDzANBglghkgBZQMEAgEFADALBgkqhkiG9w0BBwGg
+gg3EMIIFDTCCA/WgAwIBAgIQeEqpED+lv77edQixNJMdADANBgkqhkiG9w0BAQsFADBMMSAwHgYD
+VQQLExdHbG9iYWxTaWduIFJvb3QgQ0EgLSBSMzETMBEGA1UEChMKR2xvYmFsU2lnbjETMBEGA1UE
+AxMKR2xvYmFsU2lnbjAeFw0yMDA5MTYwMDAwMDBaFw0yODA5MTYwMDAwMDBaMFsxCzAJBgNVBAYT
+AkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBS
+MyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA
+vbCmXCcsbZ/a0fRIQMBxp4gJnnyeneFYpEtNydrZZ+GeKSMdHiDgXD1UnRSIudKo+moQ6YlCOu4t
+rVWO/EiXfYnK7zeop26ry1RpKtogB7/O115zultAz64ydQYLe+a1e/czkALg3sgTcOOcFZTXk38e
+aqsXsipoX1vsNurqPtnC27TWsA7pk4uKXscFjkeUE8JZu9BDKaswZygxBOPBQBwrA5+20Wxlk6k1
+e6EKaaNaNZUy30q3ArEf30ZDpXyfCtiXnupjSK8WU2cK4qsEtj09JS4+mhi0CTCrCnXAzum3tgcH
+cHRg0prcSzzEUDQWoFxyuqwiwhHu3sPQNmFOMwIDAQABo4IB2jCCAdYwDgYDVR0PAQH/BAQDAgGG
+MGAGA1UdJQRZMFcGCCsGAQUFBwMCBggrBgEFBQcDBAYKKwYBBAGCNxQCAgYKKwYBBAGCNwoDBAYJ
+KwYBBAGCNxUGBgorBgEEAYI3CgMMBggrBgEFBQcDBwYIKwYBBQUHAxEwEgYDVR0TAQH/BAgwBgEB
+/wIBADAdBgNVHQ4EFgQUljPR5lgXWzR1ioFWZNW+SN6hj88wHwYDVR0jBBgwFoAUj/BLf6guRSSu
+TVD6Y5qL3uLdG7wwegYIKwYBBQUHAQEEbjBsMC0GCCsGAQUFBzABhiFodHRwOi8vb2NzcC5nbG9i
+YWxzaWduLmNvbS9yb290cjMwOwYIKwYBBQUHMAKGL2h0dHA6Ly9zZWN1cmUuZ2xvYmFsc2lnbi5j
+b20vY2FjZXJ0L3Jvb3QtcjMuY3J0MDYGA1UdHwQvMC0wK6ApoCeGJWh0dHA6Ly9jcmwuZ2xvYmFs
+c2lnbi5jb20vcm9vdC1yMy5jcmwwWgYDVR0gBFMwUTALBgkrBgEEAaAyASgwQgYKKwYBBAGgMgEo
+CjA0MDIGCCsGAQUFBwIBFiZodHRwczovL3d3dy5nbG9iYWxzaWduLmNvbS9yZXBvc2l0b3J5LzAN
+BgkqhkiG9w0BAQsFAAOCAQEAdAXk/XCnDeAOd9nNEUvWPxblOQ/5o/q6OIeTYvoEvUUi2qHUOtbf
+jBGdTptFsXXe4RgjVF9b6DuizgYfy+cILmvi5hfk3Iq8MAZsgtW+A/otQsJvK2wRatLE61RbzkX8
+9/OXEZ1zT7t/q2RiJqzpvV8NChxIj+P7WTtepPm9AIj0Keue+gS2qvzAZAY34ZZeRHgA7g5O4TPJ
+/oTd+4rgiU++wLDlcZYd/slFkaT3xg4qWDepEMjT4T1qFOQIL+ijUArYS4owpPg9NISTKa1qqKWJ
+jFoyms0d0GwOniIIbBvhI2MJ7BSY9MYtWVT5jJO3tsVHwj4cp92CSFuGwunFMzCCA18wggJHoAMC
+AQICCwQAAAAAASFYUwiiMA0GCSqGSIb3DQEBCwUAMEwxIDAeBgNVBAsTF0dsb2JhbFNpZ24gUm9v
+dCBDQSAtIFIzMRMwEQYDVQQKEwpHbG9iYWxTaWduMRMwEQYDVQQDEwpHbG9iYWxTaWduMB4XDTA5
+MDMxODEwMDAwMFoXDTI5MDMxODEwMDAwMFowTDEgMB4GA1UECxMXR2xvYmFsU2lnbiBSb290IENB
+IC0gUjMxEzARBgNVBAoTCkdsb2JhbFNpZ24xEzARBgNVBAMTCkdsb2JhbFNpZ24wggEiMA0GCSqG
+SIb3DQEBAQUAA4IBDwAwggEKAoIBAQDMJXaQeQZ4Ihb1wIO2hMoonv0FdhHFrYhy/EYCQ8eyip0E
+XyTLLkvhYIJG4VKrDIFHcGzdZNHr9SyjD4I9DCuul9e2FIYQebs7E4B3jAjhSdJqYi8fXvqWaN+J
+J5U4nwbXPsnLJlkNc96wyOkmDoMVxu9bi9IEYMpJpij2aTv2y8gokeWdimFXN6x0FNx04Druci8u
+nPvQu7/1PQDhBjPogiuuU6Y6FnOM3UEOIDrAtKeh6bJPkC4yYOlXy7kEkmho5TgmYHWyn3f/kRTv
+riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
+QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
+UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
+M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
+Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
+14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
+a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
+XzCCBUwwggQ0oAMCAQICDF5AaMOe0cZvaJpCQjANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
+RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
+UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAwODIxMzhaFw0yNTA5MTAwODIxMzhaMIGO
+MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
+BgNVBAoTDUJyb2FkY29tIEluYy4xFTATBgNVBAMTDE1pY2hhZWwgQ2hhbjEoMCYGCSqGSIb3DQEJ
+ARYZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoC
+ggEBALhEmG7egFWvPKcrDxuNhNcn2oHauIHc8AzGhPyJxU4S6ZUjHM/psoNo5XxlMSRpYE7g7vLx
+J4NBefU36XTEWVzbEkAuOSuJTuJkm98JE3+wjeO+aQTbNF3mG2iAe0AZbAWyqFxZulWitE8U2tIC
+9mttDjSN/wbltcwuti7P57RuR+WyZstDlPJqUMm1rJTbgDqkF2pnvufc4US2iexnfjGopunLvioc
+OnaLEot1MoQO7BIe5S9H4AcCEXXcrJJiAtMCl47ARpyHmvQFQFFTrHgUYEd9V+9bOzY7MBIGSV1N
+/JfsT1sZw6HT0lJkSQefhPGpBniAob62DJP3qr11tu8CAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
+AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
+c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
+AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
+TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
+bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
+L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
+BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
+HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQU31rAyTdZweIF0tJTFYwfOv2w
+L4QwDQYJKoZIhvcNAQELBQADggEBACcuyaGmk0NSZ7Kio7O7WSZ0j0f9xXcBnLbJvQXFYM7JI5uS
+kw5ozATEN5gfmNIe0AHzqwoYjAf3x8Dv2w7HgyrxWdpjTKQFv5jojxa3A5LVuM8mhPGZfR/L5jSk
+5xc3llsKqrWI4ov4JyW79p0E99gfPA6Waixoavxvv1CZBQ4Stu7N660kTu9sJrACf20E+hdKLoiU
+hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
+E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
+aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
+EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEINMy5U5WZOLO6QQ9UEHSnh3bVRspN1gx
+bIxE4/aNCRrUMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMDcz
+MTIwMjAxN1owaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
+ATANBgkqhkiG9w0BAQEFAASCAQA14KtIOiq1lJ5FV51BqCuKPrxwDn+4vy2mhkTt8mSUxDcbbfOS
+P5uuPhed7z+EkgHPM7/e0cfak4gam+KJMPmsFv+AZc9aodocVvpQAb2W2sH/9caHJtPuXxWPYjrc
+OAtrrP6GN+PTISEqVQ1cI2HQWbzVE5fJYjMzWs3qzgOAhhCNwjKM2t7w+QNjjVRqnvz5UH5cBdfw
+5RgdQIB3mwe6xkDxt2bqzNyz+/aR3BwKuwOWDEqGgedLTKBcyB7Eis8LwE4ChZrGhA9RXuX9XqQG
+hdkpjdELyd259hDH1Fj3LSy4M7ftsCE7DXQd++4evT3qUOEkJN+n14SW8h/xI5Nj
+--000000000000b0e8a80601ce2858--
 
