@@ -1,51 +1,67 @@
-Return-Path: <netdev+bounces-22810-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22811-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64E0776950E
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 13:39:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C66C2769541
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 13:51:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 972261C20928
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 11:39:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E7B812814A9
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 11:51:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEB1A1801F;
-	Mon, 31 Jul 2023 11:38:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF760182A5;
+	Mon, 31 Jul 2023 11:51:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 845FF182A0
-	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 11:38:45 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8C6EC433C7;
-	Mon, 31 Jul 2023 11:38:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690803525;
-	bh=uidl4fUimwXietfKpV1dwJxCa9qfVHrQL0IdL98DeT0=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=MzWCUbpJ8t5gEacDnviEmMdxhTz08ixuHIau1xPcgUB6RbwYFCG66a3n8ZozsILt0
-	 Ija1zyy9L/P/hSQzlmWuE+06tSRjoV0KIHqo10PnmknbDv8l5Rn5zQADfeTPK75yOj
-	 jLfR6DwIgGj1TVFXCgZ9uNAaPLJ0gyqgdBhgMjR+yWUXE7PiinETPOAOvJ1/MMGuMD
-	 KdkJI6qlSP8+qv6xE178C/TDHzLfkB/CUIyM9tt+Q1FWtnsXGH+m9fb2l3l8oqdE9t
-	 zr+bOnQCQEaTGhnS6vQPrd3CHSjEyd85Fd2wC/vl4nVdhk8BhHvFW29iYXYlHz/tWQ
-	 ZaFKkRHP5NaOw==
-From: Leon Romanovsky <leon@kernel.org>
-To: Steffen Klassert <steffen.klassert@secunet.com>
-Cc: Leon Romanovsky <leonro@nvidia.com>,
-	"David S. Miller" <davem@davemloft.net>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E52BA18000
+	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 11:51:08 +0000 (UTC)
+Received: from mgamail.intel.com (unknown [192.55.52.120])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5179FF5;
+	Mon, 31 Jul 2023 04:51:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1690804267; x=1722340267;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=Tb8UcV3JNO0OnfuujH03nYZbaEtctQ46lfuTXXi+SFA=;
+  b=Ytr4rZTf1FCzn9k9D2o3YrV8wp1c07YVuW9dW0UmYDKR6zbU0xS/Q3iE
+   CThyI1zLgZRA0+d/wZVrbOxMHJXwOTlhLVOTsop86vGQxq1aMRtDmvfYx
+   VxbVibuX21GZlk+VIH2r6fE31B4UpFQJ7+tGpWhhSeOmQQP26eV3rxD9K
+   stkP3+YekaHbtvP9ZiBkeZTZanzAO+axaWTLMMhs9Gx8qBua18JrBQrzG
+   vBcgktZzM9l07/KT5Uwd0Uqy4HHwC56oAU0MamXcE53MRjuEUj1/srs21
+   jEHzSDDdnxnNRrT3VauE/RiM6f+/sNAb7r75NgqNMPyYL7vmIdNCVSyDD
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10787"; a="367889846"
+X-IronPort-AV: E=Sophos;i="6.01,244,1684825200"; 
+   d="scan'208";a="367889846"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2023 04:51:06 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10787"; a="731571981"
+X-IronPort-AV: E=Sophos;i="6.01,244,1684825200"; 
+   d="scan'208";a="731571981"
+Received: from pglc1085.png.intel.com ([10.221.100.47])
+  by fmsmga007.fm.intel.com with ESMTP; 31 Jul 2023 04:51:03 -0700
+From: Rohan G Thomas <rohan.g.thomas@intel.com>
+To: "David S . Miller" <davem@davemloft.net>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
 	Eric Dumazet <edumazet@google.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
 	Jakub Kicinski <kuba@kernel.org>,
-	netdev@vger.kernel.org,
 	Paolo Abeni <pabeni@redhat.com>,
-	Raed Salem <raeds@nvidia.com>
-Subject: [PATCH ipsec-rc 2/2] xfrm: don't skip free of empty state in acquire policy
-Date: Mon, 31 Jul 2023 14:38:27 +0300
-Message-ID: <f6883e3e9acc98bf7fe3ec74005d229a6b1c199f.1690803052.git.leon@kernel.org>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <cover.1690803052.git.leon@kernel.org>
-References: <cover.1690803052.git.leon@kernel.org>
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>
+Cc: netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Rohan G Thomas <rohan.g.thomas@intel.com>
+Subject: [PATCH net-next] net: stmmac: XGMAC support for mdio C22 addr > 3
+Date: Mon, 31 Jul 2023 19:50:41 +0800
+Message-Id: <20230731115041.13893-1-rohan.g.thomas@intel.com>
+X-Mailer: git-send-email 2.26.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,55 +69,108 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-From: Leon Romanovsky <leonro@nvidia.com>
+For XGMAC versions < 2.2 number of supported mdio C22 addresses is
+restricted to 3. From XGMAC version 2.2 there are no restrictions on
+the C22 addresses, it supports all valid mdio addresses(0 to 31).
 
-In destruction flow, the assignment of NULL to xso->dev
-caused to skip of xfrm_dev_state_free() call, which was
-called in xfrm_state_put(to_put) routine.
-
-Instead of open-coded variant of xfrm_dev_state_delete() and
-xfrm_dev_state_free(), let's use them directly.
-
-Fixes: f8a70afafc17 ("xfrm: add TX datapath support for IPsec packet offload mode")
-Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+Signed-off-by: Rohan G Thomas <rohan.g.thomas@intel.com>
 ---
- include/net/xfrm.h    | 1 +
- net/xfrm/xfrm_state.c | 8 ++------
- 2 files changed, 3 insertions(+), 6 deletions(-)
+ drivers/net/ethernet/stmicro/stmmac/common.h  |  1 +
+ .../net/ethernet/stmicro/stmmac/stmmac_mdio.c | 36 ++++++++++++-------
+ 2 files changed, 25 insertions(+), 12 deletions(-)
 
-diff --git a/include/net/xfrm.h b/include/net/xfrm.h
-index 151ca95dd08d..363c7d510554 100644
---- a/include/net/xfrm.h
-+++ b/include/net/xfrm.h
-@@ -1984,6 +1984,7 @@ static inline void xfrm_dev_state_free(struct xfrm_state *x)
- 		if (dev->xfrmdev_ops->xdo_dev_state_free)
- 			dev->xfrmdev_ops->xdo_dev_state_free(x);
- 		xso->dev = NULL;
-+		xso->type = XFRM_DEV_OFFLOAD_UNSPECIFIED;
- 		netdev_put(dev, &xso->dev_tracker);
- 	}
- }
-diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
-index 49e63eea841d..bda5327bf34d 100644
---- a/net/xfrm/xfrm_state.c
-+++ b/net/xfrm/xfrm_state.c
-@@ -1324,12 +1324,8 @@ xfrm_state_find(const xfrm_address_t *daddr, const xfrm_address_t *saddr,
- 			struct xfrm_dev_offload *xso = &x->xso;
+diff --git a/drivers/net/ethernet/stmicro/stmmac/common.h b/drivers/net/ethernet/stmicro/stmmac/common.h
+index 57f2137bbe9d..c67171975d5c 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/common.h
++++ b/drivers/net/ethernet/stmicro/stmmac/common.h
+@@ -35,6 +35,7 @@
+ #define DWMAC_CORE_5_10		0x51
+ #define DWMAC_CORE_5_20		0x52
+ #define DWXGMAC_CORE_2_10	0x21
++#define DWXGMAC_CORE_2_20	0x22
+ #define DWXLGMAC_CORE_2_00	0x20
  
- 			if (xso->type == XFRM_DEV_OFFLOAD_PACKET) {
--				xso->dev->xfrmdev_ops->xdo_dev_state_delete(x);
--				xso->dir = 0;
--				netdev_put(xso->dev, &xso->dev_tracker);
--				xso->dev = NULL;
--				xso->real_dev = NULL;
--				xso->type = XFRM_DEV_OFFLOAD_UNSPECIFIED;
-+				xfrm_dev_state_delete(x);
-+				xfrm_dev_state_free(x);
- 			}
- #endif
- 			x->km.state = XFRM_STATE_DEAD;
+ /* Device ID */
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c
+index 3db1cb0fd160..dd9e2fec5328 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c
+@@ -62,11 +62,16 @@ static void stmmac_xgmac2_c45_format(struct stmmac_priv *priv, int phyaddr,
+ static void stmmac_xgmac2_c22_format(struct stmmac_priv *priv, int phyaddr,
+ 				     int phyreg, u32 *hw_addr)
+ {
+-	u32 tmp;
++	u32 tmp = 0;
+ 
++	if (priv->synopsys_id < DWXGMAC_CORE_2_20) {
++		/* Until ver 2.20 XGMAC does not support C22 addr >= 4. Those
++		 * bits above bit 3 of XGMAC_MDIO_C22P register are reserved.
++		 */
++		tmp = readl(priv->ioaddr + XGMAC_MDIO_C22P);
++		tmp &= ~MII_XGMAC_C22P_MASK;
++	}
+ 	/* Set port as Clause 22 */
+-	tmp = readl(priv->ioaddr + XGMAC_MDIO_C22P);
+-	tmp &= ~MII_XGMAC_C22P_MASK;
+ 	tmp |= BIT(phyaddr);
+ 	writel(tmp, priv->ioaddr + XGMAC_MDIO_C22P);
+ 
+@@ -132,8 +137,9 @@ static int stmmac_xgmac2_mdio_read_c22(struct mii_bus *bus, int phyaddr,
+ 
+ 	priv = netdev_priv(ndev);
+ 
+-	/* HW does not support C22 addr >= 4 */
+-	if (phyaddr > MII_XGMAC_MAX_C22ADDR)
++	/* Until ver 2.20 XGMAC does not support C22 addr >= 4 */
++	if (priv->synopsys_id < DWXGMAC_CORE_2_20 &&
++	    phyaddr > MII_XGMAC_MAX_C22ADDR)
+ 		return -ENODEV;
+ 
+ 	stmmac_xgmac2_c22_format(priv, phyaddr, phyreg, &addr);
+@@ -209,8 +215,9 @@ static int stmmac_xgmac2_mdio_write_c22(struct mii_bus *bus, int phyaddr,
+ 
+ 	priv = netdev_priv(ndev);
+ 
+-	/* HW does not support C22 addr >= 4 */
+-	if (phyaddr > MII_XGMAC_MAX_C22ADDR)
++	/* Until ver 2.20 XGMAC does not support C22 addr >= 4 */
++	if (priv->synopsys_id < DWXGMAC_CORE_2_20 &&
++	    phyaddr > MII_XGMAC_MAX_C22ADDR)
+ 		return -ENODEV;
+ 
+ 	stmmac_xgmac2_c22_format(priv, phyaddr, phyreg, &addr);
+@@ -551,13 +558,18 @@ int stmmac_mdio_register(struct net_device *ndev)
+ 		new_bus->read_c45 = &stmmac_xgmac2_mdio_read_c45;
+ 		new_bus->write_c45 = &stmmac_xgmac2_mdio_write_c45;
+ 
+-		/* Right now only C22 phys are supported */
+-		max_addr = MII_XGMAC_MAX_C22ADDR + 1;
++		if (priv->synopsys_id < DWXGMAC_CORE_2_20) {
++			/* Right now only C22 phys are supported */
++			max_addr = MII_XGMAC_MAX_C22ADDR + 1;
+ 
+-		/* Check if DT specified an unsupported phy addr */
+-		if (priv->plat->phy_addr > MII_XGMAC_MAX_C22ADDR)
+-			dev_err(dev, "Unsupported phy_addr (max=%d)\n",
++			/* Check if DT specified an unsupported phy addr */
++			if (priv->plat->phy_addr > MII_XGMAC_MAX_C22ADDR)
++				dev_err(dev, "Unsupported phy_addr (max=%d)\n",
+ 					MII_XGMAC_MAX_C22ADDR);
++		} else {
++			/* XGMAC version 2.20 onwards support 32 phy addr */
++			max_addr = PHY_MAX_ADDR;
++		}
+ 	} else {
+ 		new_bus->read = &stmmac_mdio_read_c22;
+ 		new_bus->write = &stmmac_mdio_write_c22;
 -- 
-2.41.0
+2.19.0
 
 
