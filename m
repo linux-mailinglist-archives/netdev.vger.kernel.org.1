@@ -1,104 +1,119 @@
-Return-Path: <netdev+bounces-22666-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22668-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 293947689F7
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 04:25:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9B7D768A21
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 04:46:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D093E2810E3
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 02:25:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2B1E0281546
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 02:46:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F03E962F;
-	Mon, 31 Jul 2023 02:25:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E46E862F;
+	Mon, 31 Jul 2023 02:46:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5978629
-	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 02:25:00 +0000 (UTC)
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0DF3E4E
-	for <netdev@vger.kernel.org>; Sun, 30 Jul 2023 19:24:59 -0700 (PDT)
-Received: by mail-pj1-x102f.google.com with SMTP id 98e67ed59e1d1-268299d5d9fso2196982a91.1
-        for <netdev@vger.kernel.org>; Sun, 30 Jul 2023 19:24:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1690770299; x=1691375099;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2WJGbTzBWWyLthYKvFHYFfDGIjVylpKt1feyDxG3xoY=;
-        b=JZM+YnxhF57V3REfJ6Q/phNRJvycZOWrLWuMsmptcUSrCEPjSweMC7uEC+ywDAtrfl
-         PDF8Hz92PvsHUwdwED7I/shUd9wzE1IVDfo/OejXYkuVTBmgoQUgP4dXKjJLkyKXVWNz
-         3PRGEMdAJfTI5F4129d2cFvj+yAjts1Kgpk+aBnXWWW7idT0BjfbHfqDdS5o+wJpheDz
-         YliKkxuP2WdVOo+nC/ijKbaN1PJb4hMTOMMv/6Myqq1kQPIYnbBSjiNPtKXhqgCdb8Qx
-         TzWvTIMX3+TvdsI/yNUUQg1MZzegFgAZk71OG3n1ijx2ZpFnhK0a4Lzh2appZehDaITk
-         4veA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690770299; x=1691375099;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2WJGbTzBWWyLthYKvFHYFfDGIjVylpKt1feyDxG3xoY=;
-        b=YzRuaDNlj46VKJuXIyevTN7JzozEmv77gDFPdx/S2xfIhe8JODWdHariMTaEqErbsG
-         VdiW/d00+kVe1Oh9LWIKEFd57BbyCqpz2esWgl20/wzIpQyXkqOc/4pw3JAZ0ffEB6pU
-         ZwwF7fVK1xn/tM9FEZtR3ZscuWuv17BmJqhmzeZ7SBJhbsfEUHpzTjcqMgtT3wwcwvnJ
-         2SYtDYd1TN8YJsYowlRTgkpB7+97jNCCnz1OQZQwl0yBsQ/ol70Ud0AIdYIA2rq29Ne9
-         xC209xfil5ESvVMrCJHIg7L6sHW0wcSWjpZpi6EAfz6jGNnoU7A5CBeRpnqxLTU/oQcR
-         FZwA==
-X-Gm-Message-State: ABy/qLYfh1+61SD301tYlgs+RfAasSmEqMyBM72IA/jPf+AJ9VHp2N4s
-	32vpQ8GLxhdO1bnPlJxN1bmu+C1iNTTYvfIWVS7h
-X-Google-Smtp-Source: APBJJlEJ65CGI2+MsoymADeLmpN7lv9jLT77xSzuwL8zvJnrlqrMOy2zRhM179uVohKj3PjVe5q6QspU/YR0YoUXmWs=
-X-Received: by 2002:a17:90a:74cc:b0:268:3b8b:140d with SMTP id
- p12-20020a17090a74cc00b002683b8b140dmr6635192pjl.35.1690770299166; Sun, 30
- Jul 2023 19:24:59 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8AE3363;
+	Mon, 31 Jul 2023 02:46:29 +0000 (UTC)
+Received: from out30-118.freemail.mail.aliyun.com (out30-118.freemail.mail.aliyun.com [115.124.30.118])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94DD2E45;
+	Sun, 30 Jul 2023 19:46:23 -0700 (PDT)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R211e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045176;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0VoXLgUE_1690771579;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0VoXLgUE_1690771579)
+          by smtp.aliyun-inc.com;
+          Mon, 31 Jul 2023 10:46:20 +0800
+Message-ID: <1690770875.591743-2-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH vhost v11 05/10] virtio_ring: introduce virtqueue_dma_dev()
+Date: Mon, 31 Jul 2023 10:34:35 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Christoph Hellwig <hch@infradead.org>,
+ virtualization@lists.linux-foundation.org,
+ Jason Wang <jasowang@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric  Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Alexei  Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ netdev@vger.kernel.org,
+ bpf@vger.kernel.org,
+ "Michael S. Tsirkin" <mst@redhat.com>
+References: <20230710034237.12391-1-xuanzhuo@linux.alibaba.com>
+ <20230710034237.12391-6-xuanzhuo@linux.alibaba.com>
+ <ZK/cxNHzI23I6efc@infradead.org>
+ <20230713104805-mutt-send-email-mst@kernel.org>
+ <ZLjSsmTfcpaL6H/I@infradead.org>
+ <20230720131928-mutt-send-email-mst@kernel.org>
+ <ZL6qPvd6X1CgUD4S@infradead.org>
+ <1690251228.3455179-1-xuanzhuo@linux.alibaba.com>
+ <20230725033321-mutt-send-email-mst@kernel.org>
+ <1690283243.4048996-1-xuanzhuo@linux.alibaba.com>
+ <1690524153.3603117-1-xuanzhuo@linux.alibaba.com>
+ <20230728080305.5fe3737c@kernel.org>
+In-Reply-To: <20230728080305.5fe3737c@kernel.org>
+X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20230705114505.63274-1-maxime.coquelin@redhat.com>
-In-Reply-To: <20230705114505.63274-1-maxime.coquelin@redhat.com>
-From: Yongji Xie <xieyongji@bytedance.com>
-Date: Mon, 31 Jul 2023 10:24:47 +0800
-Message-ID: <CACycT3tVOKVvhTab7cbjFJsVk3vnWwqyaZ6pGvKmxO8jADj65Q@mail.gmail.com>
-Subject: Re: [PATCH] vduse: Use proper spinlock for IRQ injection
-To: Maxime Coquelin <maxime.coquelin@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
-	David Marchand <david.marchand@redhat.com>, Cindy Lu <lulu@redhat.com>, 
-	linux-kernel <linux-kernel@vger.kernel.org>, 
-	virtualization <virtualization@lists.linux-foundation.org>, Netdev <netdev@vger.kernel.org>, 
-	xuanzhuo@linux.alibaba.com, Eugenio Perez Martin <eperezma@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-On Wed, Jul 5, 2023 at 7:45=E2=80=AFPM Maxime Coquelin
-<maxime.coquelin@redhat.com> wrote:
+On Fri, 28 Jul 2023 08:03:05 -0700, Jakub Kicinski <kuba@kernel.org> wrote:
+> On Fri, 28 Jul 2023 14:02:33 +0800 Xuan Zhuo wrote:
+> > Hi guys, this topic is stuck again. How should I proceed with this work?
+> >
+> > Let me briefly summarize:
+> > 1. The problem with adding virtio_dma_{map, sync} api is that, for AF_XDP and
+> > the driver layer, we need to support these APIs. The current conclusion of
+> > AF_XDP is no.
+> >
+> > 2. Set dma_set_mask_and_coherent, then we can use DMA API uniformly inside
+> > driver. This idea seems to be inconsistent with the framework design of DMA. The
+> > conclusion is no.
+> >
+> > 3. We noticed that if the virtio device supports VIRTIO_F_ACCESS_PLATFORM, it
+> > uses DMA API. And this type of device is the future direction, so we only
+> > support DMA premapped for this type of virtio device. The problem with this
+> > solution is that virtqueue_dma_dev() only returns dev in some cases, because
+> > VIRTIO_F_ACCESS_PLATFORM is supported in such cases. Otherwise NULL is returned.
+> > This option is currently NO.
+> >
+> > So I'm wondering what should I do, from a DMA point of view, is there any
+> > solution in case of using DMA API?
 >
-> The IRQ injection work used spin_lock_irq() to protect the
-> scheduling of the softirq, but spin_lock_bh() should be
-> used.
->
-> With spin_lock_irq(), we noticed delay of more than 6
-> seconds between the time a NAPI polling work is scheduled
-> and the time it is executed.
->
-> Fixes: c8a6153b6c59 ("vduse: Introduce VDUSE - vDPA Device in Userspace")
-> Cc: xieyongji@bytedance.com
->
-> Suggested-by: Jason Wang <jasowang@redhat.com>
-> Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
+> I'd step back and ask you why do you want to use AF_XDP with virtio.
 
-Reviewed-by: Xie Yongji <xieyongji@bytedance.com>
+Or do you mean virtio vs virtio-net?
+All I did with virtio was to get the virtio-net to support AF_XDP.
 
-Thanks,
-Yongji
+> Instead of bifurcating one virtio instance into different queues
+
+That is not the key of our problem.
+
+Even though we have a device that only works with AF_XDP,
+it still has this DMA issues.
+
+I think the current way(v11, v12) is a good solution, the only problem is that
+if the device is old, we can not do dma with DMA APIs. Then we will not suppot
+AF_XDP. I don't think it matters. But Christoph was a little worried.
+
+Thanks.
+
+
+> why
+> not create a separate virtio instance?
+
+
+
+
 
