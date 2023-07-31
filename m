@@ -1,107 +1,116 @@
-Return-Path: <netdev+bounces-22823-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22824-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75F9476961B
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 14:22:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF2FE769681
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 14:39:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A345E1C20B76
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 12:22:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D83D828168C
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 12:39:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 808C0182CD;
-	Mon, 31 Jul 2023 12:22:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 654BE14F9B;
+	Mon, 31 Jul 2023 12:39:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7529F8BF0
-	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 12:22:23 +0000 (UTC)
-Received: from mail-qv1-xf2c.google.com (mail-qv1-xf2c.google.com [IPv6:2607:f8b0:4864:20::f2c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B6C91FD6
-	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 05:21:57 -0700 (PDT)
-Received: by mail-qv1-xf2c.google.com with SMTP id 6a1803df08f44-63d30b90197so27672046d6.0
-        for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 05:21:57 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F2BF4429;
+	Mon, 31 Jul 2023 12:39:03 +0000 (UTC)
+Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3521BBE;
+	Mon, 31 Jul 2023 05:39:02 -0700 (PDT)
+Received: by mail-pf1-x434.google.com with SMTP id d2e1a72fcca58-686c06b806cso3051131b3a.2;
+        Mon, 31 Jul 2023 05:39:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1690806115; x=1691410915;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=PFJKUlEi1dwMUzXqehE2/1K7AORG2mjzS4XpmVxhBIA=;
-        b=A5pFXRBjYDsIPfRtKNqnA+sL9R+KeLY8rZIGFbdoycC8ddlBm7FI0WdCLBrbY5cgjR
-         DNf3ZG4Clht8Bmgn13/TMCo+O/+giENhxIpGn1dPm5Q+kPalJAPflXNNiuoJsZOWtr81
-         gqDiIJpuAAdhbKYkaOcLcmwNNqVb+3zt2KcEH25Nq2D+FUKeEh1p8NJ6zEx91p/PM7OZ
-         YL/qS+2tkLGlMUsgAGPs1iRdlvstcsUTn3AtN+/aykqV9rYjmCMEtT/NV6u/ob2jGCk2
-         1o1pFhXAR6IPlZ3oTuvhOunQckSRe9Gdp4s9M57dUaVQKWzeISpEjrvmRUox8bGCAkqE
-         WCIg==
+        d=gmail.com; s=20221208; t=1690807141; x=1691411941;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=/NdBjknSuYCdIA7o+nHXDhfIAGLIzK4MLXsbrYki0JY=;
+        b=jkV7Ee1kEYOlbpc8lA0nglpIRWvqaFw6PLV18U2xqWzjggIudqTjPJBnmo55NnoZxC
+         e43VcJmBfO7t1Rld4jVt9yLVyfIiQvNuhe7u/ahsNXDniyb84agIFfIHYPTLrsZXQf6b
+         mZw4we3tYdq+CEoPX0d74esz6DdoNJgzj5n7PSgY93PcKL7WtIL7qB+YhOK+fneI/4wh
+         0SPjGvH4APNgT7mpvZd/M8j89tVhuNxIC1DXnxbP9kQBreLLp2ACojh8oj1Fes838Fm3
+         Ha5hVPmihBt37ypOk3O+cxEwszDTUoZ5IFHCmtpXUL7XSYkcfHMvSGG7dfpe1C22RjbD
+         i4Uw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690806115; x=1691410915;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PFJKUlEi1dwMUzXqehE2/1K7AORG2mjzS4XpmVxhBIA=;
-        b=VDBQSF45NHYxIYA6Nx+jgVzpSspeI1zfA9FjtqUHnJG3ZJBJTIB1RR0vseKARKfl08
-         BfVZ9n8xviWXi35Fmhp8rq9ENg7Tr87lkH5uYCsL6flyc4vKZCPtri2aQ+jDWpaB0TPQ
-         SOwUBEVK7M0srTXXMokZ8iKljOzplyO7WQmZd7ZGckODEVsRPSZLalQwbFPGtmGUi8kU
-         jlwwkteQ9Z9w7ZzkXbxFT7wX8T8a2aEcUx79+LIW8tV2K6QH9J1mPXoOXqEKxFXk1QJL
-         6d117Mu+KcJf5xi59WFUnRwYnMDStZUMT52W+YThJX1vLlrUoPUtYYjDn7KnJrc87Cio
-         2cJw==
-X-Gm-Message-State: ABy/qLYT0f1T+H4NvhfyG5cXz3FWknDzX600pojkG3ZpG4Nl6uu7ZkeU
-	UsLTFz5dH5e3+ClTnnnPBuBQpQ==
-X-Google-Smtp-Source: APBJJlFfi8YyXXrC7sZHQB3hNf11hgMoW8nTgHCgbVr6dLrbdKY8y50Q14NAKQ0Pb1OzvxG6dbUOJQ==
-X-Received: by 2002:a05:6214:9a6:b0:63d:2a0b:3f79 with SMTP id du6-20020a05621409a600b0063d2a0b3f79mr9184306qvb.45.1690806115320;
-        Mon, 31 Jul 2023 05:21:55 -0700 (PDT)
-Received: from localhost ([212.23.236.67])
-        by smtp.gmail.com with ESMTPSA id d8-20020a37c408000000b00767b4fa5d96sm3222919qki.27.2023.07.31.05.21.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 31 Jul 2023 05:21:54 -0700 (PDT)
-Date: Mon, 31 Jul 2023 14:21:52 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
-	edumazet@google.com, moshe@nvidia.com, saeedm@nvidia.com,
-	idosch@nvidia.com, petrm@nvidia.com
-Subject: Re: [patch net-next v2 08/11] devlink: introduce set of macros and
- use it for split ops definitions
-Message-ID: <ZMenYPE5zrA2myAm@nanopsycho>
-References: <20230720121829.566974-1-jiri@resnulli.us>
- <20230720121829.566974-9-jiri@resnulli.us>
- <20230725103816.2be372b2@kernel.org>
+        d=1e100.net; s=20221208; t=1690807141; x=1691411941;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=/NdBjknSuYCdIA7o+nHXDhfIAGLIzK4MLXsbrYki0JY=;
+        b=N0TZRmvtj7XV/6OsUxmqINhzqb7V7mdJ1g1wQXhsMLF/vjiuXFcBAqCYufMVjSqsi4
+         cY90Whxtm4cqJ/9jDeAAyElmdCptf7slwtrd5p3+sOK8XjrN5fGi78g7t7xKxn9VHGhC
+         E23p0WPuinzhFhRMr5TMzqwb+MrPPjCD7aCNl4vFfWu00zLvu02c7tPdc69kkeJOrXIR
+         d2riuI5ZM9MknxbKK5y4IGJxEuJq7UiC+JPOT3Ht8GhsrvWA3PrDCWQW+TU2R/ytfaxM
+         U+tC5k7WYTQBvQC3ufwdbUNRjcES9gavawnalw70EQ0hW8l03yinpYWm2sP7ITSQZhkC
+         uS/g==
+X-Gm-Message-State: ABy/qLbqDiAYCZlhRLHIqoTy28wiu0u+h1K4NWjyUkcCTPXsx1tV65bC
+	AC3drWBPx3nJ38XNewtR70w=
+X-Google-Smtp-Source: APBJJlEEHU57hychI0GDF4B7p2VLE3R3k67V3t9pCA7n48EeAfoQYQdom14VH9o21wZVfQmLXvkFGw==
+X-Received: by 2002:a05:6a20:440d:b0:13d:c70d:de62 with SMTP id ce13-20020a056a20440d00b0013dc70dde62mr2629107pzb.22.1690807141577;
+        Mon, 31 Jul 2023 05:39:01 -0700 (PDT)
+Received: from [192.168.1.12] (bb219-74-209-211.singnet.com.sg. [219.74.209.211])
+        by smtp.gmail.com with ESMTPSA id i8-20020a63a848000000b0055bf96b11d9sm8074510pgp.89.2023.07.31.05.38.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 31 Jul 2023 05:39:00 -0700 (PDT)
+Message-ID: <5de2fdca-5f62-74db-afec-8cb54ccd026f@gmail.com>
+Date: Mon, 31 Jul 2023 20:38:54 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230725103816.2be372b2@kernel.org>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.13.0
+Subject: Re: [PATCH bpf-next v4 0/2] bpf, xdp: Add tracepoint to xdp attaching
+ failure
+Content-Language: en-US
+To: Manjusaka <lizheao940510@gmail.com>
+Cc: ast@kernel.org, daniel@iogearbox.net, john.fastabend@gmail.com,
+ andrii@kernel.org, martin.lau@linux.dev, song@kernel.org,
+ yonghong.song@linux.dev, kpsingh@kernel.org, sdf@google.com,
+ haoluo@google.com, jolsa@kernel.org, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, hawk@kernel.org,
+ rostedt@goodmis.org, mhiramat@kernel.org, mykolal@fb.com, shuah@kernel.org,
+ tangyeechou@gmail.com, kernel-patches-bot@fb.com, bpf@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linux-trace-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+References: <20230730114951.74067-1-hffilwlqm@gmail.com>
+ <CAFYRFEw98BhpcLyFdwivLcy5M6hk3fDRcWZVtUytSw7kNUQXRQ@mail.gmail.com>
+From: Leon Hwang <hffilwlqm@gmail.com>
+In-Reply-To: <CAFYRFEw98BhpcLyFdwivLcy5M6hk3fDRcWZVtUytSw7kNUQXRQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,FREEMAIL_REPLY,
+	HK_RANDOM_ENVFROM,HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Tue, Jul 25, 2023 at 07:38:16PM CEST, kuba@kernel.org wrote:
->On Thu, 20 Jul 2023 14:18:26 +0200 Jiri Pirko wrote:
->> The split ops structures for all commands look pretty much the same.
->> The are all using the same/similar callbacks.
->> 
->> Introduce a set of macros to make the code shorter and also avoid
->> possible future copy&paste mistakes and inconsistencies.
->> 
->> Use this macros for already converted commands.
->
->If you want to use split ops extensively please use the nlspec
->and generate the table automatically. Integrating closer with
->the spec will have many benefits.
 
-Yeah, I was thinging about it, it just didn't seem necessary. Okay, will
-check that out.
 
-Btw, does that mean that any split-ops usage would require generated
-code? If yes, could you please document that somewhere, probably near
-the struct?
+On 2023/7/30 21:49, Manjusaka wrote:
+> This patch is very important to help us to debug the xdp program. At
+> the same time, we can make some monitoring tools to observe the kernel
+> status by using this trace event
+> 
+> 李者璈 & Zheaoli
+> 
+> Email: lizheao940510@gmail.com
+> Github: https://github.com/Zheaoli
+> 
 
-Thanks!
+Thank you for your feedback.
+
+I'm glad that it's helpful for you.
+
+Thanks,
+Leon
+
 
