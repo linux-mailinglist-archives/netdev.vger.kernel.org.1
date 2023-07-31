@@ -1,69 +1,122 @@
-Return-Path: <netdev+bounces-22881-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22882-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0D45769B62
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 17:54:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED8C5769BA8
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 18:01:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0D4571C2096E
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 15:54:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A72C6280CD0
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 16:01:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF03919BA7;
-	Mon, 31 Jul 2023 15:54:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9BE019BAA;
+	Mon, 31 Jul 2023 16:01:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 942A018B09
-	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 15:54:08 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE80DC433C8;
-	Mon, 31 Jul 2023 15:54:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690818848;
-	bh=s0kAjQJcavEtn4qvC3HzqyRFEFYgPphknK2SvtAotiA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Ai5cILmtb3ikR461b8t7idKX14GQLmt2bs/fBuBiOKhKc+OryJNDPvPleFOOZTVlc
-	 HmshJ1DkT3qyLODzm6f4SpXnv8+U3LBo31m3Z17rA+CIfHwe4gm2oKWJk87lCMsgSE
-	 VmSxUS9E53HwBkcY4fkB166eUYdM9KDAH1kkkkSsw4mBqgGOm94IcY/dOS2yfD9wWX
-	 ZcmsLKcbH55gYPozq7qpkWENSU79Fgm+QIrcahW9o5w469Pa9DjjKw0TGGEMKGVcZU
-	 lSJGonui4w8fDPFS/pUly4U4Y2r/1p/fY1Ku5X0siK5onBeTBT4SlU8QJaIN2oKqX1
-	 UQe/LZhANotNQ==
-Date: Mon, 31 Jul 2023 08:54:05 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Simon Horman <horms@kernel.org>
-Cc: Lin Ma <linma@zju.edu.cn>, michael.chan@broadcom.com,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- ajit.khaparde@broadcom.com, sriharsha.basavapatna@broadcom.com,
- somnath.kotur@broadcom.com, jesse.brandeburg@intel.com,
- anthony.l.nguyen@intel.com, saeedm@nvidia.com, leon@kernel.org,
- simon.horman@corigine.com, louis.peens@corigine.com,
- yinjun.zhang@corigine.com, huanhuan.wang@corigine.com, tglx@linutronix.de,
- bigeasy@linutronix.de, na.wang@corigine.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
- linux-rdma@vger.kernel.org, oss-drivers@corigine.com
-Subject: Re: [PATCH net-next v1] rtnetlink: remove redundant checks for
- nlattr IFLA_BRIDGE_MODE
-Message-ID: <20230731085405.7e61b348@kernel.org>
-In-Reply-To: <ZMdfznpH44i34QNw@kernel.org>
-References: <20230726080522.1064569-1-linma@zju.edu.cn>
-	<ZMdfznpH44i34QNw@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BADBB182DA
+	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 16:01:17 +0000 (UTC)
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C577197;
+	Mon, 31 Jul 2023 09:01:13 -0700 (PDT)
+Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36VE1VDB012426;
+	Mon, 31 Jul 2023 16:01:09 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=date : from : to :
+ cc : subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=qcppdkim1; bh=GcDKsKo8fbevrhIXLWWuXCyr22wPubcrOhkn7U4G2wU=;
+ b=Kirwau4+mmmj40StS9ofvIdsSfZNtnNXCWvUjcruVfyStwR+nQLEWk6PE2DuLxTcKkBi
+ YjSPjB4YnwwStDT2oDN3Gnp033JIjSvnwW/L2b161QCyO4vtN1LcL6SRgIhT2hYphFUi
+ V/iO/EqBAuPy1d0n3QtbAQvxoP8kf2k3Bu1bqDjY2Oekq/lRjxdSmoWe5bHA+G3k2qY4
+ PHxcKmg8KVMwWYl91Z7YHynE6zHpMUMLjKS/Xj3fg6+LcHKWN1KTUGZ/0Fx8OAdrAnYZ
+ t7rj+21qfZd5k3Ie8t2KIcXraaBDP0rbYAKYVRenhY+e1xNsME44L1zUZsXGLazPR8xc ZA== 
+Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3s4ucemhw3-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 31 Jul 2023 16:01:09 +0000
+Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
+	by NALASPPMTA05.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 36VG18IV027420
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 31 Jul 2023 16:01:08 GMT
+Received: from hu-bjorande-lv.qualcomm.com (10.49.16.6) by
+ nalasex01c.na.qualcomm.com (10.47.97.35) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Mon, 31 Jul 2023 09:01:07 -0700
+Date: Mon, 31 Jul 2023 09:01:06 -0700
+From: Bjorn Andersson <quic_bjorande@quicinc.com>
+To: Konrad Dybcio <konrad.dybcio@linaro.org>
+CC: Bjorn Andersson <andersson@kernel.org>, Chris Lew <quic_clew@quicinc.com>,
+        Alex Elder <elder@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+        "Jakub Kicinski" <kuba@kernel.org>,
+        Mathieu Poirier
+	<mathieu.poirier@linaro.org>,
+        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-arm-msm@vger.kernel.org>, <linux-remoteproc@vger.kernel.org>
+Subject: Re: [PATCH 2/4] soc: qcom: aoss: Add debugfs interface for sending
+ messages
+Message-ID: <20230731160106.GG1428172@hu-bjorande-lv.qualcomm.com>
+References: <20230731041013.2950307-1-quic_bjorande@quicinc.com>
+ <20230731041013.2950307-3-quic_bjorande@quicinc.com>
+ <93dd0930-8699-9995-c9ac-d361c4c385f1@linaro.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <93dd0930-8699-9995-c9ac-d361c4c385f1@linaro.org>
+X-Originating-IP: [10.49.16.6]
+X-ClientProxiedBy: nalasex01b.na.qualcomm.com (10.47.209.197) To
+ nalasex01c.na.qualcomm.com (10.47.97.35)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: nLjVhk4AKItdu-cZO103CU00SpJcGAhO
+X-Proofpoint-ORIG-GUID: nLjVhk4AKItdu-cZO103CU00SpJcGAhO
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-07-31_08,2023-07-31_02,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ bulkscore=0 priorityscore=1501 spamscore=0 phishscore=0 suspectscore=0
+ impostorscore=0 malwarescore=0 adultscore=0 clxscore=1015 mlxscore=0
+ mlxlogscore=793 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2306200000 definitions=main-2307310144
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Mon, 31 Jul 2023 09:16:30 +0200 Simon Horman wrote:
-> > Please apply the fix discussed at the link:
-> > https://lore.kernel.org/all/20230726075314.1059224-1-linma@zju.edu.cn/
-> > first before this one. =20
->=20
-> FWIIW, the patch at the link above seems to be in net-next now.
+On Mon, Jul 31, 2023 at 10:15:34AM +0200, Konrad Dybcio wrote:
+> On 31.07.2023 06:10, Bjorn Andersson wrote:
+> > From: Chris Lew <clew@codeaurora.org>
+> No QUIC email?
+> 
 
-I don't think it is.. =F0=9F=A7=90=EF=B8=8F
+That's the author and s-o-b address of the patch. mailmap will help you
+if you want to reach him.
+
+> [...]
+> 
+> 
+> > +static ssize_t qmp_debugfs_write(struct file *file, const char __user *userstr,
+> > +				 size_t len, loff_t *pos)
+> > +{
+> > +	struct qmp *qmp = file->private_data;
+> > +	char buf[QMP_MSG_LEN];
+> > +	int ret;
+> > +
+> > +	if (!len || len > QMP_MSG_LEN)
+> >=? Otherwise the last char may be overwritten by the NULL termination
+> couple lines below
+> 
+
+My mind had a '\0' accounted for in len as well, but you're right.
+
+Thanks,
+Bjorn
 
