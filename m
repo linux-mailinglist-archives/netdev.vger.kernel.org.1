@@ -1,117 +1,116 @@
-Return-Path: <netdev+bounces-22672-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22673-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2D5C768A93
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 06:07:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4DF2768A99
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 06:10:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 911E51C20A92
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 04:07:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C232281594
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 04:10:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 332F564E;
-	Mon, 31 Jul 2023 04:07:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7288164E;
+	Mon, 31 Jul 2023 04:10:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27F9062D
-	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 04:07:06 +0000 (UTC)
-Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32CA91B7;
-	Sun, 30 Jul 2023 21:07:01 -0700 (PDT)
-Received: by mail-pf1-x433.google.com with SMTP id d2e1a72fcca58-686ba97e4feso4110893b3a.0;
-        Sun, 30 Jul 2023 21:07:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690776420; x=1691381220;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=iecctykKTsm0q82UtUMIa1inbPuKOlOwMPntbBWiA7M=;
-        b=Qgw6X8PgM/yfApdep7jdZxiutuZFmm49igDyyAElEToLnI5m+Oe9Z3oV6VNYiJd3wL
-         M+N8yizMMU2TB4wmdiNwMJHWxemWNtsjoKSHjgJAJCAkUVPLRXm00JKXFXCHszONNvEO
-         1+HZ9gG+lB3lymrNLclKzCnF9dwSS8lhhC/WekeJumJ5NmJnPZEdxi3QWXLyJ83BPMb2
-         r503zWwhbKowRJ1pZRq+n8hcS5K3Q/X9utGazw2EEDHHNYrS+jUdhyaxm3nSDydo+3O7
-         K1cpmTpKgo7CgiHbzMY27x/uapjv5o+drleiRzxhILJEfLet1M/HOPtt3ywp6McGeKNN
-         O5UQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690776420; x=1691381220;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=iecctykKTsm0q82UtUMIa1inbPuKOlOwMPntbBWiA7M=;
-        b=WxGJ2sF6qmvZ8bRGUy/WbQfwR7MK2KajxiufeXowv/obzwxWtQBMmvXD6H1mMd+7Qv
-         eKeZevbknzUru1kIPIsIXf7YkZ/LL9LTyG4wpY/2s/pg/7WuYTNLgpB3D7j/x6qCI8mJ
-         oyvFt4ALPtdiHDFd7/aUY9UtzGPPuuI7ppkkfrCeFZ0WAzBuBpf9wjE/Nk0gYVuM7AF1
-         SGr1J3J567DC0ORM7CpyxIcGreoQUIb9qPbdeRK6SAChUPHXp2luWW/BEsPU0lzV8Tqh
-         PBoKAoNVgEQVP24DDEu2OiSNlR1m1SRt/dfU4w4Z8t6CvjJC8Ts4RsE0gomzMzeGUG9a
-         iDpA==
-X-Gm-Message-State: ABy/qLZeCqQCX37rUqFFKk1gP8+wIkMZeSMOQsnGdAyPyAvlMG8lyhGF
-	voUOl3Cn8BPDNdc4LxsAYboctFMv5WdVDw==
-X-Google-Smtp-Source: APBJJlFsfNmZA51+mk2lagnMloXlawPx77/7vQN8m1US4KkRz9j200XgJ1dxizafViZPekyxslNRmA==
-X-Received: by 2002:a05:6a20:3d8b:b0:130:f6bc:9146 with SMTP id s11-20020a056a203d8b00b00130f6bc9146mr10223204pzi.14.1690776420484;
-        Sun, 30 Jul 2023 21:07:00 -0700 (PDT)
-Received: from Laptop-X1 ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id n4-20020a637204000000b0054fe7736ac1sm7178398pgc.76.2023.07.30.21.06.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 30 Jul 2023 21:06:59 -0700 (PDT)
-Date: Mon, 31 Jul 2023 12:06:55 +0800
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Yang Li <yang.lee@linux.alibaba.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, jiri@resnulli.us, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Abaci Robot <abaci@linux.alibaba.com>
-Subject: Re: [PATCH net-next] team: Remove NULL check before dev_{put, hold}
-Message-ID: <ZMczX9ruN3yUsXQc@Laptop-X1>
-References: <20230727005741.114069-1-yang.lee@linux.alibaba.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6565D62D
+	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 04:10:35 +0000 (UTC)
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5021DE9;
+	Sun, 30 Jul 2023 21:10:30 -0700 (PDT)
+Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36V1oKJ2029737;
+	Mon, 31 Jul 2023 04:10:20 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding :
+ content-type; s=qcppdkim1;
+ bh=hynM0rrBEGiK6c4Xr6tP1yy2JtVdlWXVcqVf5JGtw8Y=;
+ b=WIXICMzwyA2nJzhAkfuGKRYM5ZgGPt6GnK2Q5bzbhSOyxiYVQf7J9AttYQ4m4r2COOpl
+ XznOfpKNnlYx+zRCwkqdMMrmloI5ai01tH70Rsg9UzhjiuWO4dsLASIhM0LrOmdcebTR
+ 10A2JS6j5k0Nd2zKjvC0SffIabE8p5R9CWfv/h8WKz2zrOoqBQl252Gf2BBsvvDj+zvH
+ eARvy3y/qqNwGh+TSOdJ8WXZIR4XRBhPNZL/x/jBDyqGXV4SaUiN+4sRNxCGtlQp9g5J
+ xTfKly2mb7sZagSFDIqd76mSf8vY/+9NeY3mnl3us5uCNFY4RegGTfa2gNMev9P734Xa ZQ== 
+Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3s4ueujk8x-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 31 Jul 2023 04:10:20 +0000
+Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
+	by NALASPPMTA01.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 36V4AJnV002496
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 31 Jul 2023 04:10:19 GMT
+Received: from hu-bjorande-lv.qualcomm.com (10.49.16.6) by
+ nalasex01c.na.qualcomm.com (10.47.97.35) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Sun, 30 Jul 2023 21:10:18 -0700
+From: Bjorn Andersson <quic_bjorande@quicinc.com>
+To: Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio
+	<konrad.dybcio@linaro.org>,
+        Chris Lew <quic_clew@quicinc.com>
+CC: Alex Elder <elder@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Mathieu Poirier
+	<mathieu.poirier@linaro.org>,
+        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-arm-msm@vger.kernel.org>, <linux-remoteproc@vger.kernel.org>
+Subject: [PATCH 0/4] soc: qcom: aoss: Introduce debugfs interface and cleanup things
+Date: Sun, 30 Jul 2023 21:10:09 -0700
+Message-ID: <20230731041013.2950307-1-quic_bjorande@quicinc.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230727005741.114069-1-yang.lee@linux.alibaba.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.49.16.6]
+X-ClientProxiedBy: nalasex01c.na.qualcomm.com (10.47.97.35) To
+ nalasex01c.na.qualcomm.com (10.47.97.35)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: zQHpUAUYv7ItDM_IsOjNlsdx3UZ3fWpA
+X-Proofpoint-ORIG-GUID: zQHpUAUYv7ItDM_IsOjNlsdx3UZ3fWpA
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-07-27_10,2023-07-26_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 bulkscore=0
+ phishscore=0 suspectscore=0 spamscore=0 lowpriorityscore=0 mlxlogscore=606
+ malwarescore=0 mlxscore=0 adultscore=0 impostorscore=0 priorityscore=1501
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2306200000
+ definitions=main-2307310038
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Jul 27, 2023 at 08:57:41AM +0800, Yang Li wrote:
-> The call netdev_{put, hold} of dev_{put, hold} will check NULL,
-> so there is no need to check before using dev_{put, hold},
-> remove it to silence the warning:
-> 
-> ./drivers/net/team/team.c:2325:3-10: WARNING: NULL check before dev_{put, hold} functions is not needed.
-> 
-> Reported-by: Abaci Robot <abaci@linux.alibaba.com>
-> Closes: https://bugzilla.openanolis.cn/show_bug.cgi?id=5991
-> Signed-off-by: Yang Li <yang.lee@linux.alibaba.com>
+The Always On Processor supports a number useful commands for affecting
+system resources during in various debug scenarious. Introduce a debugfs
+interface for allowing the debugger/tester to send these commands.
 
-Acked-by: Hangbin Liu <liuhangbin@gmail.com>
+While at it, let's make some improvements to the qmp_send() API.
 
-> ---
->  drivers/net/team/team.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/team/team.c b/drivers/net/team/team.c
-> index d3dc22509ea5..bc50fc3f6913 100644
-> --- a/drivers/net/team/team.c
-> +++ b/drivers/net/team/team.c
-> @@ -2321,8 +2321,7 @@ static struct team *team_nl_team_get(struct genl_info *info)
->  	ifindex = nla_get_u32(info->attrs[TEAM_ATTR_TEAM_IFINDEX]);
->  	dev = dev_get_by_index(net, ifindex);
->  	if (!dev || dev->netdev_ops != &team_netdev_ops) {
-> -		if (dev)
-> -			dev_put(dev);
-> +		dev_put(dev);
->  		return NULL;
->  	}
->  
-> -- 
-> 2.20.1.7.g153144c
-> 
+Bjorn Andersson (3):
+  soc: qcom: aoss: Move length requirements from caller
+  soc: qcom: aoss: Format string in qmp_send()
+  soc: qcom: aoss: Tidy up qmp_send() callers
+
+Chris Lew (1):
+  soc: qcom: aoss: Add debugfs interface for sending messages
+
+ drivers/net/ipa/ipa_power.c        |  5 +-
+ drivers/remoteproc/qcom_q6v5.c     |  8 +--
+ drivers/soc/qcom/qcom_aoss.c       | 82 +++++++++++++++++++++---------
+ include/linux/soc/qcom/qcom_aoss.h |  4 +-
+ 4 files changed, 61 insertions(+), 38 deletions(-)
+
+-- 
+2.25.1
+
 
