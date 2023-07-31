@@ -1,159 +1,172 @@
-Return-Path: <netdev+bounces-22680-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22681-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3EA13768AE1
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 06:58:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56C26768B55
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 07:42:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DD06B28138C
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 04:58:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 702DB1C20AA8
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 05:42:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8DC07ED;
-	Mon, 31 Jul 2023 04:58:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 697FB810;
+	Mon, 31 Jul 2023 05:42:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE198364
-	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 04:58:08 +0000 (UTC)
-Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C07319C;
-	Sun, 30 Jul 2023 21:58:06 -0700 (PDT)
-Received: from lelv0265.itg.ti.com ([10.180.67.224])
-	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 36V4viEh127545;
-	Sun, 30 Jul 2023 23:57:44 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1690779464;
-	bh=1Qlnu8KrG8HrUMi5RjI1swKLx9zRLOB4JSNqxVsnACQ=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=q3gtbPs79yVec19Ke5EPjOXZQtHEzF8JhOZOGCNdWFLP5YFB6Nuq0VIjlvsn5s8Su
-	 vRTtYlCOHcC9cSC9vLDSIpA+1KLwJ1BB7jqW5OFSxN/pogEd8Vb/WracL1ptLCP2dM
-	 8qj+/m5yX5ElnlVwue4QSuJD/6JoqXxLM7xfsMF0=
-Received: from DLEE112.ent.ti.com (dlee112.ent.ti.com [157.170.170.23])
-	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 36V4viKD027504
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Sun, 30 Jul 2023 23:57:44 -0500
-Received: from DLEE114.ent.ti.com (157.170.170.25) by DLEE112.ent.ti.com
- (157.170.170.23) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Sun, 30
- Jul 2023 23:57:44 -0500
-Received: from fllv0040.itg.ti.com (10.64.41.20) by DLEE114.ent.ti.com
- (157.170.170.25) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Sun, 30 Jul 2023 23:57:44 -0500
-Received: from [172.24.227.217] (ileaxei01-snat2.itg.ti.com [10.180.69.6])
-	by fllv0040.itg.ti.com (8.15.2/8.15.2) with ESMTP id 36V4vcW2101825;
-	Sun, 30 Jul 2023 23:57:38 -0500
-Message-ID: <ddb8233c-ad3b-ef2a-36c0-5986d0f1696c@ti.com>
-Date: Mon, 31 Jul 2023 10:27:37 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E9E37F3
+	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 05:42:11 +0000 (UTC)
+Received: from clamta20.bpe.bigpond.com (clamta20.bpe.bigpond.com [203.42.22.36])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18BCDE6A;
+	Sun, 30 Jul 2023 22:42:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=bigpond.com
+	; s=202303; h=Content-Type:MIME-Version:Date:Message-ID:To:Subject:From;
+	bh=RB+chPmKnAg5u6srg0dT76jjVkV17G3szFyN0GGa6zA=; b=nXeIzq0EmBgrUiJ0NZgrEF1oA+
+	YqA45sm7oDnx759lz+RgANiX97w1j1eEWzp0nhHV3K7drkoz4mEnBl92oJVKy1hMeV8+XKZbtTKa8
+	2m6U1htuplBnfNlW+z7Pq9kFIsOP47WztVaFZePNzjbsvRG/Y0N4GT7LMMzmbbqSf4IXliczHzTeb
+	wRUBx3bJQiL9IdNgK6sKCWBiQUb5J5dV9y+TaQjBYHk3vChjD4K+1kYycljXcKmSf/0XEzriVGCDH
+	RhfJ/J+vJ9Yi4KnaAL7q0HJkOKk5E4mFuyOXNQqOjDqWCQ0hlgOiGwVR7SGWRTx5PZjFSDhR5cwRV
+	hcH0rjnA==;
+Received: from claprdcmr06
+	 by claprdomr20 with esmtp
+	 (envelope-from <bids.7405@bigpond.com>)
+	 id 1qQLfS-000EZe-2y
+	 for ;
+	Mon, 31 Jul 2023 15:42:06 +1000
+Received: from [101.191.138.223] (helo=[10.0.0.38])
+	 by claprdcmr06 with esmtpa
+	(envelope-from <bids.7405@bigpond.com>)
+	id 1qQLfS-000EQk-2T;
+	Mon, 31 Jul 2023 15:42:06 +1000
+From: Ross Maynard <bids.7405@bigpond.com>
+Subject: [PATCH v2] USB: zaurus: Add ID for A-300/B-500/C-700
+To: Greg KH <gregkh@linuxfoundation.org>, linux-usb@vger.kernel.org,
+ netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org
+Cc: Oliver Neukum <oneukum@suse.com>
+Message-ID: <69b5423b-2013-9fc9-9569-58e707d9bafb@bigpond.com>
+Date: Mon, 31 Jul 2023 15:42:04 +1000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [EXTERNAL] Re: [PATCH v12 06/10] net: ti: icssg-prueth: Add ICSSG
- ethernet driver
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>, MD Danish Anwar <danishanwar@ti.com>
-CC: Randy Dunlap <rdunlap@infradead.org>, Roger Quadros <rogerq@kernel.org>,
-        Simon Horman <simon.horman@corigine.com>,
-        Vignesh Raghavendra
-	<vigneshr@ti.com>, Andrew Lunn <andrew@lunn.ch>,
-        Richard Cochran
-	<richardcochran@gmail.com>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Krzysztof
- Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Rob Herring
-	<robh+dt@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-        Eric Dumazet
-	<edumazet@google.com>,
-        "David S. Miller" <davem@davemloft.net>, <nm@ti.com>, <srk@ti.com>,
-        <linux-kernel@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <linux-omap@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>
-References: <20230727112827.3977534-1-danishanwar@ti.com>
- <20230727112827.3977534-7-danishanwar@ti.com>
- <20230728172419.702b4ac0@kernel.org>
-From: Md Danish Anwar <a0501179@ti.com>
-Organization: Texas Instruments
-In-Reply-To: <20230728172419.702b4ac0@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
-X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
+X-tce-id: bids.7405@bigpond.com
+X-tce-ares-id: e{4fd04bcb-085f-45d8-bcef-eae48b3b2713}1
+X-tce-spam-action: no action
+X-tce-spam-score: 0.0
+X-Cm-Analysis: v=2.4 cv=XK72CytE c=1 sm=1 tr=0 ts=64c749ae a=I+ymoOSk5yzZBOYXmf4WnA==:117 a=I+ymoOSk5yzZBOYXmf4WnA==:17 a=IkcTkHD0fZMA:10 a=ws7JD89P4LkA:10 a=VwQbUJbxAAAA:8 a=1IlZJK9HAAAA:8 a=zblBDeNr1pAM3S_0FrwA:9 a=QEXdDO2ut3YA:10 a=AjGcO6oz07-iQ99wixmX:22
+X-Cm-Envelope: MS4xfANFe97pK+FzezDbm1skrpAjpLUXoLR/qdyHvv5trtfXBk34EskU3dFShyq8E7zo8EeXSQ2lvxNZNo8EuSWwQIXsro0ivseEI6Y+QfaGiUP/+e/gocsi oG/NEjpjYhlOT0+GF9ebs5EUGnkgdAi6kD2WbisimVFqOsIoFRBbGfGRdouETI3jiVN0zN1HSDt4OA==
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+	FREEMAIL_FROM,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS,
 	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Jakub,
+The SL-A300, B500/5600, and C700 devices no longer auto-load because of
+"usbnet: Remove over-broad module alias from zaurus."
+This patch adds IDs for those 3 devices.
 
-On 29/07/23 5:54 am, Jakub Kicinski wrote:
-> On Thu, 27 Jul 2023 16:58:23 +0530 MD Danish Anwar wrote:
->> +static int emac_tx_complete_packets(struct prueth_emac *emac, int chn,
->> +				    int budget)
->> +{
->> +	struct net_device *ndev = emac->ndev;
->> +	struct cppi5_host_desc_t *desc_tx;
->> +	struct netdev_queue *netif_txq;
->> +	struct prueth_tx_chn *tx_chn;
->> +	unsigned int total_bytes = 0;
->> +	struct sk_buff *skb;
->> +	dma_addr_t desc_dma;
->> +	int res, num_tx = 0;
->> +	void **swdata;
->> +
->> +	tx_chn = &emac->tx_chns[chn];
->> +
->> +	while (budget) {
->> +		res = k3_udma_glue_pop_tx_chn(tx_chn->tx_chn, &desc_dma);
->> +		if (res == -ENODATA)
->> +			break;
-> 
-> You shouldn't limit the number of serviced packets to budget for Tx
-> NAPI.
-> 
-> https://docs.kernel.org/next/networking/napi.html#driver-api
-> 
->> +	skb->dev = ndev;
->> +	if (!netif_running(skb->dev)) {
->> +		dev_kfree_skb_any(skb);
->> +		return 0;
->> +	}
-> 
-> why do you check if the interface is running?
-> If a packet arrives, it means the interface is running..
-> 
+Link: https://bugzilla.kernel.org/show_bug.cgi?id=217632
+Fixes: 16adf5d07987 ("usbnet: Remove over-broad module alias from zaurus.")
+Signed-off-by: Ross Maynard <bids.7405@bigpond.com>
+Cc: stable@vger.kernel.org
+---
+v2: removed reported-by since bug reporter and patch author are the same person
 
-Sure, I will drop this if condition.
+ drivers/net/usb/cdc_ether.c | 21 +++++++++++++++++++++
+ drivers/net/usb/zaurus.c    | 21 +++++++++++++++++++++
+ 2 files changed, 42 insertions(+)
 
->> +drop_free_descs:
->> +	prueth_xmit_free(tx_chn, first_desc);
->> +drop_stop_q:
->> +	netif_tx_stop_queue(netif_txq);
-> 
-> Do not stop the queue on DMA errors. If the queue is empty nothing
-> will wake it up. Queue should only be stopped based on occupancy.
-> 
-
-Sure, I will try to make sure we only stop queue based on occupancy.
-
->> +	dev_kfree_skb_any(skb);
->> +
->> +	/* error */
->> +	ndev->stats.tx_dropped++;
->> +	netdev_err(ndev, "tx: error: %d\n", ret);
->> +
->> +	return ret;
-
--- 
-Thanks and Regards,
-Danish.
+--- a/drivers/net/usb/cdc_ether.c
++++ b/drivers/net/usb/cdc_ether.c
+@@ -616,6 +616,13 @@ static const struct usb_device_id	products[] = {
+ }, {
+ 	.match_flags	=   USB_DEVICE_ID_MATCH_INT_INFO
+ 			  | USB_DEVICE_ID_MATCH_DEVICE,
++	.idVendor		= 0x04DD,
++	.idProduct		= 0x8005,   /* A-300 */
++	ZAURUS_FAKE_INTERFACE,
++	.driver_info        = 0,
++}, {
++	.match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
++			  | USB_DEVICE_ID_MATCH_DEVICE,
+ 	.idVendor		= 0x04DD,
+ 	.idProduct		= 0x8006,	/* B-500/SL-5600 */
+ 	ZAURUS_MASTER_INTERFACE,
+@@ -623,12 +630,26 @@ static const struct usb_device_id	products[] = {
+ }, {
+ 	.match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
+ 			  | USB_DEVICE_ID_MATCH_DEVICE,
++	.idVendor		= 0x04DD,
++	.idProduct		= 0x8006,   /* B-500/SL-5600 */
++	ZAURUS_FAKE_INTERFACE,
++	.driver_info        = 0,
++}, {
++	.match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
++			  | USB_DEVICE_ID_MATCH_DEVICE,
+ 	.idVendor		= 0x04DD,
+ 	.idProduct		= 0x8007,	/* C-700 */
+ 	ZAURUS_MASTER_INTERFACE,
+ 	.driver_info		= 0,
+ }, {
+ 	.match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
++			  | USB_DEVICE_ID_MATCH_DEVICE,
++	.idVendor		= 0x04DD,
++	.idProduct		= 0x8007,   /* C-700 */
++	ZAURUS_FAKE_INTERFACE,
++	.driver_info        = 0,
++}, {
++	.match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
+ 		 | USB_DEVICE_ID_MATCH_DEVICE,
+ 	.idVendor               = 0x04DD,
+ 	.idProduct              = 0x9031,	/* C-750 C-760 */
+--- a/drivers/net/usb/zaurus.c
++++ b/drivers/net/usb/zaurus.c
+@@ -289,9 +289,23 @@ static const struct usb_device_id	products [] = {
+ 	.match_flags	=   USB_DEVICE_ID_MATCH_INT_INFO
+ 			  | USB_DEVICE_ID_MATCH_DEVICE,
+ 	.idVendor		= 0x04DD,
++	.idProduct		= 0x8005,	/* A-300 */
++	ZAURUS_FAKE_INTERFACE,
++	.driver_info = (unsigned long)&bogus_mdlm_info,
++}, {
++	.match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
++			  | USB_DEVICE_ID_MATCH_DEVICE,
++	.idVendor		= 0x04DD,
+ 	.idProduct		= 0x8006,	/* B-500/SL-5600 */
+ 	ZAURUS_MASTER_INTERFACE,
+ 	.driver_info = ZAURUS_PXA_INFO,
++}, {
++	.match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
++			  | USB_DEVICE_ID_MATCH_DEVICE,
++	.idVendor		= 0x04DD,
++	.idProduct		= 0x8006,	/* B-500/SL-5600 */
++	ZAURUS_FAKE_INTERFACE,
++	.driver_info = (unsigned long)&bogus_mdlm_info,
+ }, {
+ 	.match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
+ 	          | USB_DEVICE_ID_MATCH_DEVICE,
+@@ -301,6 +315,13 @@ static const struct usb_device_id	products [] = {
+ 	.driver_info = ZAURUS_PXA_INFO,
+ }, {
+ 	.match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
++			  | USB_DEVICE_ID_MATCH_DEVICE,
++	.idVendor		= 0x04DD,
++	.idProduct		= 0x8007,	/* C-700 */
++	ZAURUS_FAKE_INTERFACE,
++	.driver_info = (unsigned long)&bogus_mdlm_info,
++}, {
++	.match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
+ 		 | USB_DEVICE_ID_MATCH_DEVICE,
+ 	.idVendor               = 0x04DD,
+ 	.idProduct              = 0x9031,	/* C-750 C-760 */
 
