@@ -1,264 +1,181 @@
-Return-Path: <netdev+bounces-22728-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22729-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D52D1768FBA
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 10:13:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9470768FC9
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 10:14:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 04C961C20B5D
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 08:13:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 61596281661
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 08:14:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBFEF11C80;
-	Mon, 31 Jul 2023 08:13:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F4B411C94;
+	Mon, 31 Jul 2023 08:14:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C983F2117
-	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 08:13:12 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9F901FC1
-	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 01:12:45 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84623883D
+	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 08:14:22 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07EB41BF
+	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 01:14:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1690791164;
+	s=mimecast20190719; t=1690791241;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=2c/vsUe51aE0k9BbQvxW32USgWcCe8PJ604bKyDOMe8=;
-	b=HdytL9vMEkjJR+70IQMrWeHshn7cuFEkfP5B/gO39u4uLgXTqlqBBOXPDan2W/GmkTiS4E
-	sEpadICDOMSWPC0uMnu3YoNfjn/PurTwg+sgPl1PEU7YRgLH5efYtrBhn4DVsGuTAF0E2V
-	bDKxI2bQzM6SWjDiCKYIJyxPRYhV70g=
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
- [209.85.160.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-583-WKX4frAdOX2SwlPB_hx82A-1; Mon, 31 Jul 2023 04:12:43 -0400
-X-MC-Unique: WKX4frAdOX2SwlPB_hx82A-1
-Received: by mail-qt1-f200.google.com with SMTP id d75a77b69052e-4055b94c7c9so30845931cf.3
-        for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 01:12:43 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690791162; x=1691395962;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2c/vsUe51aE0k9BbQvxW32USgWcCe8PJ604bKyDOMe8=;
-        b=fuRKURWmukLTd3IA4LojFo6l0CzIFz6MvOSezh9gZLA/1Gqv+eKCUTeSCSt6KJlZkx
-         2+6tciApdiGOaG6HWMAU/YamqIZsbLpkEb8nmceai/lf111ZIcg06aIpBHc8tT0QqKT6
-         nlsCnEidD7pzgYWgfSNWb3Sr54m1mTECdyJRQ4c/M1PkmgwN7VrY/OQJaRqlJGvXaQHb
-         qnvtJhDEqFPbGnMrwTsGY88LgR9ZiLN0dqBRCUwkSrlFXjMxU3NH0Z7kOHWGz5lTsRI8
-         el4f8HAFyXXMlU/BprgAE7h+/8eYBnLkuQn/YK5kOe5MkRKOmSJmY49jFn13PhVznCHU
-         w4PA==
-X-Gm-Message-State: ABy/qLauymC97kMJvoyPCyikbBjVgAJD05XhJA6ZjKAd3XnTOAflJfRx
-	UYxfF9EgKL6ZoEeshcBjS9YsC+1Wh4YIYxIy9oG+0kGEVMiwSYposKYA+KN3YyZjZEMK0Y7HDh/
-	XhHcJBbq1BOHs5wsL
-X-Received: by 2002:a05:622a:190d:b0:403:e72d:de3b with SMTP id w13-20020a05622a190d00b00403e72dde3bmr10105467qtc.11.1690791162639;
-        Mon, 31 Jul 2023 01:12:42 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlEfihXxVxe2THySN65yC0X9qRZygsDhfZFLzNNVevm07rRDA8kf/DhsULumUW0tjBaqIEESdw==
-X-Received: by 2002:a05:622a:190d:b0:403:e72d:de3b with SMTP id w13-20020a05622a190d00b00403e72dde3bmr10105454qtc.11.1690791162339;
-        Mon, 31 Jul 2023 01:12:42 -0700 (PDT)
-Received: from [192.168.0.12] ([78.19.108.164])
-        by smtp.gmail.com with ESMTPSA id h5-20020ac85485000000b004055d45e420sm3307149qtq.56.2023.07.31.01.12.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 31 Jul 2023 01:12:41 -0700 (PDT)
-Message-ID: <7634af55-8a87-1b21-8ba6-8b1a8d245792@redhat.com>
-Date: Mon, 31 Jul 2023 09:12:39 +0100
+	bh=84A7MRcr6j0wpILuwXBGqg5ue7ADRIvAJFMR99EWls0=;
+	b=LyreYR9KwRhExweVWX6ygaQpJ55W1mBhhfad5k1c27SjXzccr+Hn1xoPIEO7agCszMamqF
+	JmaI22J4zZKoVdjr4k832v+TAUhIEA6Oki1VSKBqgHpp+bftWyrZXSEl9BXCQ64p8hDvSo
+	JGX8/R/6iR6FjYZTrCj/VKOeG3oyIiU=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-30-8IG60DfBNI6WHWTz4-XXtw-1; Mon, 31 Jul 2023 04:13:56 -0400
+X-MC-Unique: 8IG60DfBNI6WHWTz4-XXtw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 83470803470;
+	Mon, 31 Jul 2023 08:13:55 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.131])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id D687740C2063;
+	Mon, 31 Jul 2023 08:13:53 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <64c6672f580e3_11d0042944e@willemb.c.googlers.com.notmuch>
+References: <64c6672f580e3_11d0042944e@willemb.c.googlers.com.notmuch> <20230718160737.52c68c73@kernel.org> <000000000000881d0606004541d1@google.com> <0000000000001416bb06004ebf53@google.com> <792238.1690667367@warthog.procyon.org.uk>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: dhowells@redhat.com, Jakub Kicinski <kuba@kernel.org>,
+    syzbot <syzbot+f527b971b4bdc8e79f9e@syzkaller.appspotmail.com>,
+    bpf@vger.kernel.org, brauner@kernel.org, davem@davemloft.net,
+    dsahern@kernel.org, edumazet@google.com,
+    linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+    netdev@vger.kernel.org, pabeni@redhat.com,
+    syzkaller-bugs@googlegroups.com, viro@zeniv.linux.org.uk
+Subject: Re: Endless loop in udp with MSG_SPLICE_READ - Re: [syzbot] [fs?] INFO: task hung in pipe_release (4)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.13.0
-Subject: Re: [PATCH net-next v2 0/2] tools/net/ynl: enable json configuration
-Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, Donald Hunter <donhunte@redhat.com>,
- Billy McFall <bmcfall@redhat.com>
-References: <20230727120353.3020678-1-mtahhan@redhat.com>
- <20230727173753.6e044c13@kernel.org>
- <908e8567-05c8-fb94-5910-ecbee16eb842@redhat.com>
- <20230728084902.1dd524c5@kernel.org>
-From: Maryam Tahhan <mtahhan@redhat.com>
-In-Reply-To: <20230728084902.1dd524c5@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <831027.1690791233.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 31 Jul 2023 09:13:53 +0100
+Message-ID: <831028.1690791233@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
 	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 28/07/2023 16:49, Jakub Kicinski wrote:
-> On Fri, 28 Jul 2023 11:24:51 +0100 Maryam Tahhan wrote:
->> On 28/07/2023 01:37, Jakub Kicinski wrote:
->>> On Thu, 27 Jul 2023 08:03:29 -0400 Maryam Tahhan wrote:
->>>> Use a json configuration file to pass parameters to ynl to allow
->>>> for operations on multiple specs in one go. Additionally, check
->>>> this new configuration against a schema to validate it in the cli
->>>> module before parsing it and passing info to the ynl module.
->>> Interesting. Is this related to Donald's comments about subscribing
->>> to notifications from multiple families?
->>>
->>> Can you share some info about your use case?
->>
->> Yes it's related. We are working towards using YNL as a netlink agent or
->> part of a netlink agent that's driven by YAML specs. We are
->>
->> trying to enable existing Kubernetes CNIs to integrate with DPUs via an
->> OPI [1] API without having to change these existing CNIs. In several
->>
->> cases these CNIs program the Kernel as both the control plane and the
->> fallback dataplane (for packets the DPU accelerator doesn't know what
->> to do with). And so being able to monitor netlink state and reflect it
->> to the DPU accelerator (and vice versa) via an OPI API would be
->> extremely useful.
->>
->>
->> We think the YAML part gives us a solid model that showcases the breadth
->> of what these CNIs program (via netlink) as well as a base for the grpc
->> protobufs that the OPI API would like to define/use.
-> So agent on the host is listening to netlink and sending to DPU gRPC
-> requests? From what you're describing it sounds like you'd mostly want
-> to pass the notifications. The multi-command thing is to let the DPU
-> also make requests if it needs to do/know something specific?
+Hi Willem,
 
-Yes, this is pretty much the idea.
+Here's a reduced testcase.  I doesn't require anything special; the key is
+that the amount of data placed in the packet by the send() - it's related =
+to
+the MTU size.  It needs to stuff in sufficient data to go over the
+fragmentation limit (I think).
 
+In this case, my interface's MTU is 8192.  send() is sticking in 8161 byte=
+s of
+data and then the output from the aforeposted debugging patch is:
 
->
->>>> Example configs would be:
->>>>
->>>> {
->>>>       "yaml-specs-path": "/<path-to>/linux/Documentation/netlink/specs",
->>>>       "spec-args": {
->>>>           "ethtool.yaml": {
->>>>               "do": "rings-get",
->>>>               "json-params": {
->>>>                   "header": {
->>>>                       "dev-name": "eno1"
->>>>                   }
->>>>               }
->>>>           },
->>>>          "netdev.yaml": {
->>>>               "do": "dev-get",
->>>>               "json-params": {
->>>>               "ifindex": 3
->>>>               }
->>>>           }
->>>>       }
->>>> }
->>> Why is the JSON preferable to writing a script to the same effect?
->>> It'd actually be shorter and more flexible.
->>> Maybe we should focus on packaging YNL as a python lib?
->> I guess you can write a script. The reasons I picked JSON were mainly:
->>
->> -  Simplicity and Readability for both developers and non-developers/users.
->>
->> - With the JSON Schema Validation I could very quickly validate the
->> incoming configuration without too much logic in cli.py.
->>
->> - I thought of it as a stepping stone towards an agent configuration
->> file if YNL evolves to provide or be part of a netlink agent (driven by
->> yaml specs)...
-> Those are very valid. My worry is that:
->   - it's not a great fit for asynchronous stuff like notifications
->     (at least a simple version built directly from cli.py)
->   - we'd end up needing some flow control and/or transfer of values
->     at some point, and it will evolve into a full blown DSL
-Ok, I can look at a script and see what this looks like.
->
->>>> OR
->>>>
->>>> {
->>>>       "yaml-specs-path": "/<path-to>/linux/Documentation/netlink/specs",
->>>>       "spec-args": {
->>>>           "ethtool.yaml": {
->>>>               "subscribe": "monitor",
->>>>               "sleep": 10
->>>>           },
->>>>           "netdev.yaml": {
->>>>               "subscribe": "mgmt",
->>>>               "sleep": 5
->>>>           }
->>>>       }
->>>> }
->>> Could you also share the outputs the examples would produce?
->>>   
->> Right now the output is simple, an example would be for the first config
->> in the email:
->>
->> [ linux]# ./tools/net/ynl/cli.py --config ./tools/net/ynl/multi-do.json
->> ###############  ethtool.yaml  ###############
->>
->> {'header': {'dev-index': 3, 'dev-name': 'eno1'},
->>    'rx': 512,
->>    'rx-max': 8192,
->>    'rx-push': 0,
->>    'tx': 512,
->>    'tx-max': 8192,
->>    'tx-push': 0}
->> ###############  netdev.yaml  ###############
->>
->> {'ifindex': 3, 'xdp-features': {'xsk-zerocopy', 'redirect', 'basic'}}
-> My concern was that this will not be optimal for the receiver to parse.
-> Because the answer is not valid JSON. We'd need something like:
->
-> [
->   { "cmd-id": "some-identifier?".
->     "response": { ... }
->   },
->   { "cmd-id": "identifier-of-second-command".
->     "response": { ... }
->   }
-> ]
->
-Yeah - makes sense. I was only focused on the configuration part for 
-this patchset. This can be added.
+	=3D=3D>splice_to_socket() 6630
+	udp_sendmsg(8,8)
+	__ip_append_data(copy=3D-1,len=3D8, mtu=3D8192 skblen=3D8189 maxfl=3D8188=
+)
+	pagedlen 9 =3D 9 - 0
+	copy -1 =3D 9 - 0 - 1 - 9
+	length 8 -=3D -1 + 0
+	__ip_append_data(copy=3D8172,len=3D9, mtu=3D8192 skblen=3D20 maxfl=3D8188=
+)
+	copy=3D8172 len=3D9
+	skb_splice_from_iter(8,9)
+	__ip_append_data(copy=3D8164,len=3D1, mtu=3D8192 skblen=3D28 maxfl=3D8188=
+)
+	copy=3D8164 len=3D1
+	skb_splice_from_iter(0,1)
+	__ip_append_data(copy=3D8164,len=3D1, mtu=3D8192 skblen=3D28 maxfl=3D8188=
+)
+	copy=3D8164 len=3D1
+	skb_splice_from_iter(0,1)
+	__ip_append_data(copy=3D8164,len=3D1, mtu=3D8192 skblen=3D28 maxfl=3D8188=
+)
+	copy=3D8164 len=3D1
+	skb_splice_from_iter(0,1)
+	__ip_append_data(copy=3D8164,len=3D1, mtu=3D8192 skblen=3D28 maxfl=3D8188=
+)
+	copy=3D8164 len=3D1
+	skb_splice_from_iter(0,1)
+	copy=3D8164 len=3D1
+	skb_splice_from_iter(0,1)
 
+It looks like send() pushes 1 byte over the fragmentation limit, then the
+splice sees -1 crop up, the length to be copied is increased by 1, but
+insufficient data is available and we go into an endless loop.
 
->> Or for the second config in the email (note: I just toggled the tx ring
->> descriptors on one of my NICs to trigger an ethtool notification):
->>
->> [root@nfvsdn-06 linux]# ./tools/net/ynl/cli.py --config
->> ./tools/net/ynl/multi-ntf.json
->> ###############  ethtool.yaml  ###############
->>
->> [{'msg': {'header': {'dev-index': 3, 'dev-name': 'eno1'},
->>             'rx': 512,
->>             'rx-max': 8192,
->>             'rx-push': 0,
->>             'tx': 8192,
->>             'tx-max': 8192,
->>             'tx-push': 0},
->>     'name': 'rings-ntf'}]
->> ###############  netdev.yaml  ###############
->>
->> []
->>
->> At the moment (even with these changes) YNL subscribes-sleeps-checks for
->> notification for each family sequentially...
->> I will be looking into enabling an agent like behaviour: subscribe to
->> notifications from multiple families and monitor (babysteps)....
->>
->> [1] https://opiproject.org/
-> Modulo the nits it sounds fairly reasonable. Main question is how much
-> of that we put in the kernel tree, and how much lives elsewhere :S
-> If we have a dependency on gRPC at some point, for example, that may
-> be too much for kernel tools/
+---
+#define _GNU_SOURCE
+#include <arpa/inet.h>
+#include <fcntl.h>
+#include <netinet/in.h>
+#include <stdarg.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/socket.h>
+#include <sys/mman.h>
+#include <sys/uio.h>
 
-Yeah, that's a fair question. We would like to get all the gRPC stuff 
-into the OPI repos. In the Kernel tree we'd like to get the netlink
+#define OSERROR(R, S) do { if ((long)(R) =3D=3D -1L) { perror((S)); exit(1=
+); } } while(0)
 
-agent and the YAML specs.
+int main()
+{
+	struct sockaddr_storage ss;
+	struct sockaddr_in sin;
+	void *buffer;
+	unsigned int tmp;
+	int pfd[2], sfd;
+	int res;
 
-Thanks for the feedback. I will take it onboard.
+	OSERROR(pipe(pfd), "pipe");
 
->
+	sfd =3D socket(AF_INET, SOCK_DGRAM, 0);
+	OSERROR(sfd, "socket/2");
+
+	memset(&sin, 0, sizeof(sin));
+	sin.sin_family =3D AF_INET;
+	sin.sin_port =3D htons(0);
+	sin.sin_addr.s_addr =3D htonl(0xc0a80601);
+#warning you might want to set the address here - this is 192.168.6.1
+	OSERROR(connect(sfd, (struct sockaddr *)&sin, sizeof(sin)), "connect");
+
+	buffer =3D mmap(NULL, 1024*1024, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_AN=
+ON, -1, 0);
+	OSERROR(buffer, "mmap");
+
+	OSERROR(send(sfd, buffer, 8161, MSG_CONFIRM|MSG_MORE), "send");
+#warning you need to adjust the length on the above line to match your MTU
+
+	OSERROR(write(pfd[1], buffer, 8), "write");
+
+	OSERROR(splice(pfd[0], 0, sfd, 0, 0x4ffe0ul, 0), "splice");
+	return 0;
+}
 
 
