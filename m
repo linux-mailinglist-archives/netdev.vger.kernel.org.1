@@ -1,40 +1,40 @@
-Return-Path: <netdev+bounces-22743-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22745-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67C11769058
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 10:38:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A818B769065
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 10:39:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 519ED1C20BCF
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 08:38:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 51ACA28160B
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 08:39:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D17048835;
-	Mon, 31 Jul 2023 08:38:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB620134BE;
+	Mon, 31 Jul 2023 08:38:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C279C6AA0
-	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 08:38:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE6F6134A8
+	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 08:38:28 +0000 (UTC)
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EAB9B1AE;
-	Mon, 31 Jul 2023 01:38:25 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D4ACE5B;
+	Mon, 31 Jul 2023 01:38:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
-	Content-ID:Content-Description:In-Reply-To:References;
-	bh=kKpERaVXDKMd33dB8Z6172oH7fQHojYxOewfozLZ6UA=; b=koRyMNYcvjJcXhBaHMwydXCQnm
-	x+vQEB+Q5teWiOuoZj514M6zhQnZLud17ppXIay4DvRFSQJaEvq8rHJnz+1vCpOKITaLITXkLJHEO
-	EAYUe+R15N1eKMdl2+2+O9gg6j6f3RRiJpW3UBCe1MCVOs4Bx9zrAXYSKVZlEhCWflPFkgFqXp9jy
-	7OEuwmt7lri80b9yBHSsuc1ts2I6qjMs85kjOfb1RlmDMGYTgNga5NDHRAp+CD+RXiycBBBZaHXTN
-	CEJOfZT+r7rhsFZ4qbGhictyuLXB6JKD9qzhntzmW+AP4TLbiDtlxyvGtc/OaX36xc689Jc55AsRw
-	23cT4P6Q==;
+	MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
+	:Reply-To:Content-Type:Content-ID:Content-Description;
+	bh=NogRc+PV5Ggqg3zuB9ufDe2OOc/ycxdytdzIcHbUmmE=; b=LnBJRrWLCidFZOfw/o0WLM6JbO
+	a5PqWi1N1j5x3vvveGCItTRyv+xxUvBqQcPc44Y4kGy0bFdMyxp2Nc4ZsbNhzBa0ijkoTFO5NJga9
+	1QwdoNnOQO8JKPHZ7ATsJSdpMrnl7629LUiyiWPdrI6/UVssAOYdRi/Ncg2FbkF4+t/aiCgLWIYzS
+	W9x2f6EVNUpU/iuvwos6YmYMdJmRcdi5Ov3Kc7aa55xLGItypOxn7JPt1sCxoxknytEEbkW3ZQTt8
+	2YudLQf4mgBxSPBjoWnNGKIIiuBkeE698M9f3Qw5xIYicWrIQJF1amInOj3GDbUE2//dGJT7eA2KY
+	clnLosvA==;
 Received: from 2a02-8389-2341-5b80-39d3-4735-9a3c-88d8.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:39d3:4735:9a3c:88d8] helo=localhost)
 	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-	id 1qQOPq-00EYr6-0v;
-	Mon, 31 Jul 2023 08:38:10 +0000
+	id 1qQOPt-00EYrF-2B;
+	Mon, 31 Jul 2023 08:38:14 +0000
 From: Christoph Hellwig <hch@lst.de>
 To: Luis Chamberlain <mcgrof@kernel.org>,
 	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -51,10 +51,12 @@ Cc: Daniel Vetter <daniel.vetter@ffwll.ch>,
 	netdev@vger.kernel.org,
 	linux-rtc@vger.kernel.org,
 	linux-modules@vger.kernel.org
-Subject: require EXPORT_SYMBOL_GPL symbols for symbol_get
-Date: Mon, 31 Jul 2023 10:38:01 +0200
-Message-Id: <20230731083806.453036-1-hch@lst.de>
+Subject: [PATCH 1/5] ARM/pxa: use EXPORT_SYMBOL_GPL for sharpsl_battery_kick
+Date: Mon, 31 Jul 2023 10:38:02 +0200
+Message-Id: <20230731083806.453036-2-hch@lst.de>
 X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20230731083806.453036-1-hch@lst.de>
+References: <20230731083806.453036-1-hch@lst.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,9 +72,30 @@ X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi all,
+sharpsl_battery_kick is only used via symbol_get, which was only ever
+intended for very internal symbols like this one.  Use EXPORT_SYMBOL_GPL
+for it so that symbol_get can enforce only being used on
+EXPORT_SYMBOL_GPL symbols.
 
-this series changes symbol_get to only work on EXPORT_SYMBOL_GPL
-as nvidia is abusing the lack of this check to bypass restrictions
-on importing symbols from proprietary modules.
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ arch/arm/mach-pxa/sharpsl_pm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm/mach-pxa/sharpsl_pm.c b/arch/arm/mach-pxa/sharpsl_pm.c
+index d29bdcd5270e0f..08eec58632c988 100644
+--- a/arch/arm/mach-pxa/sharpsl_pm.c
++++ b/arch/arm/mach-pxa/sharpsl_pm.c
+@@ -216,7 +216,7 @@ void sharpsl_battery_kick(void)
+ {
+ 	schedule_delayed_work(&sharpsl_bat, msecs_to_jiffies(125));
+ }
+-EXPORT_SYMBOL(sharpsl_battery_kick);
++EXPORT_SYMBOL_GPL(sharpsl_battery_kick);
+ 
+ 
+ static void sharpsl_battery_thread(struct work_struct *private_)
+-- 
+2.39.2
+
 
