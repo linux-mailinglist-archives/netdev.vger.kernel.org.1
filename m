@@ -1,112 +1,86 @@
-Return-Path: <netdev+bounces-22894-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22895-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3EF8769D03
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 18:43:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C59A4769D0A
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 18:43:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E17BA1C20C7C
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 16:43:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 020BA1C20CC9
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 16:43:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD38418C20;
-	Mon, 31 Jul 2023 16:43:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 940D119BC8;
+	Mon, 31 Jul 2023 16:43:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B254219BB2
-	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 16:43:12 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68E36172A
-	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 09:42:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1690821769;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=hIrzg23zm5bnaFzI5icqMbN8fi6qCvhn7sNqGYL6Vo0=;
-	b=UP7dPjLJjKevcLI20P+UojdUYFSxzF+EWUrxRQ0GeG4sNH9wD50Qd+O4sVg5aLXIRxpYtg
-	tY9lS29/KiK5Tcb1nNQ47j/57p3mNNdfkjR21NUY9YV0KiQvXJh6hy7VJHyST3h8ayTU5+
-	JSfkXwXez6vIx7Mjm6esCXX4iWhJKjQ=
-Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-281-qnMNdh9GOoaMfomT5lE-dQ-1; Mon, 31 Jul 2023 12:42:48 -0400
-X-MC-Unique: qnMNdh9GOoaMfomT5lE-dQ-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1450638210A0;
-	Mon, 31 Jul 2023 16:42:47 +0000 (UTC)
-Received: from lacos-laptop-9.usersys.redhat.com (unknown [10.39.192.146])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id ABAD9401DA9;
-	Mon, 31 Jul 2023 16:42:45 +0000 (UTC)
-From: Laszlo Ersek <lersek@redhat.com>
-To: linux-kernel@vger.kernel.org,
-	lersek@redhat.com
-Cc: Eric Dumazet <edumazet@google.com>,
-	Lorenzo Colitti <lorenzo@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Pietro Borrello <borrello@diag.uniroma1.it>,
-	netdev@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH 2/2] net: tap_open(): set sk_uid from current_fsuid()
-Date: Mon, 31 Jul 2023 18:42:37 +0200
-Message-Id: <20230731164237.48365-3-lersek@redhat.com>
-In-Reply-To: <20230731164237.48365-1-lersek@redhat.com>
-References: <20230731164237.48365-1-lersek@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5447619BB2;
+	Mon, 31 Jul 2023 16:43:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7515FC433C7;
+	Mon, 31 Jul 2023 16:43:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1690821804;
+	bh=ZFs/BvicYu7gy4mLmfp20c2N/r8/MPwILXQgAwW+MKI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=fMHJ+meOYIn4z+hIkvHykH/WKCpJD69jhaMx0WAV5oDypdLxra9UEvoCC1GyQF9wb
+	 EJsQQqkUB+R+HujYW5LMTO9GoXGfXoh4fNPKw4PoCfO37v+BrpSDbT4M/DmzTP+nkb
+	 Zkp28fej6+ucZWzMVIw6QJS8JF/YCic7sQo1HXN5yX3qiLThsYTTuFXXOUvqXHRwjf
+	 QA+o4r7sIvG+14miuO9/yJnok2kIutdIxw+9iP1bYsMgapeezKz+G31ucorkAiqROX
+	 t+7UCP4YbYVcWsK1T25ZzlZzAlGGILEHJzTtWd2ukKsysLXekk9ifeYBvoQR+scBsw
+	 uyVouN5Tz9HkQ==
+Date: Mon, 31 Jul 2023 09:43:22 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>, Larysa Zaremba
+ <larysa.zaremba@intel.com>, bpf <bpf@vger.kernel.org>, Alexei Starovoitov
+ <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko
+ <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, Song Liu
+ <song@kernel.org>, Yonghong Song <yhs@fb.com>, John Fastabend
+ <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, Stanislav
+ Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa
+ <jolsa@kernel.org>, David Ahern <dsahern@gmail.com>, Willem de Bruijn
+ <willemb@google.com>, Jesper Dangaard Brouer <brouer@redhat.com>, Anatoly
+ Burakov <anatoly.burakov@intel.com>, Alexander Lobakin
+ <alexandr.lobakin@intel.com>, Magnus Karlsson <magnus.karlsson@gmail.com>,
+ Maryam Tahhan <mtahhan@redhat.com>, xdp-hints@xdp-project.net, Network
+ Development <netdev@vger.kernel.org>, Simon Horman
+ <simon.horman@corigine.com>
+Subject: Re: [PATCH bpf-next v4 12/21] xdp: Add checksum hint
+Message-ID: <20230731094322.0edd5c6b@kernel.org>
+In-Reply-To: <64c661de227c2_11bfb629493@willemb.c.googlers.com.notmuch>
+References: <20230728173923.1318596-1-larysa.zaremba@intel.com>
+	<20230728173923.1318596-13-larysa.zaremba@intel.com>
+	<20230728215340.pf3qcfxh7g4x7s6a@MacBook-Pro-8.local>
+	<64c53b1b29a66_e235c2942d@willemb.c.googlers.com.notmuch>
+	<CAADnVQ+vn0=1UT5_c628ovq+LzfrNFf0MxmZn++NqeUFJ-ykQw@mail.gmail.com>
+	<64c661de227c2_11bfb629493@willemb.c.googlers.com.notmuch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
-X-Spam-Status: No, score=-0.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,MIME_BASE64_TEXT,
-	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-	SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Q29tbWl0IDY2YjJjMzM4YWRjZSBpbml0aWFsaXplcyB0aGUgInNrX3VpZCIgZmllbGQgaW4gdGhl
-IHByb3RvY29sIHNvY2tldAooc3RydWN0IHNvY2spIGZyb20gdGhlICIvZGV2L3RhcFgiIGRldmlj
-ZSBub2RlJ3Mgb3duZXIgVUlELiBQZXIgb3JpZ2luYWwKY29tbWl0IDg2NzQxZWMyNTQ2MiAoIm5l
-dDogY29yZTogQWRkIGEgVUlEIGZpZWxkIHRvIHN0cnVjdCBzb2NrLiIsCjIwMTYtMTEtMDQpLCB0
-aGF0J3Mgd3Jvbmc6IHRoZSBpZGVhIGlzIHRvIGNhY2hlIHRoZSBVSUQgb2YgdGhlIHVzZXJzcGFj
-ZQpwcm9jZXNzIHRoYXQgY3JlYXRlcyB0aGUgc29ja2V0LiBDb21taXQgODY3NDFlYzI1NDYyIG1l
-bnRpb25zIHNvY2tldCgpIGFuZAphY2NlcHQoKTsgd2l0aCAidGFwIiwgdGhlIGFjdGlvbiB0aGF0
-IGNyZWF0ZXMgdGhlIHNvY2tldCBpcwpvcGVuKCIvZGV2L3RhcFgiKS4KClRoZXJlZm9yZSB0aGUg
-ZGV2aWNlIG5vZGUncyBvd25lciBVSUQgaXMgaXJyZWxldmFudC4gSW4gbW9zdCBjYXNlcywKIi9k
-ZXYvdGFwWCIgd2lsbCBiZSBvd25lZCBieSByb290LCBzbyBpbiBwcmFjdGljZSwgY29tbWl0IDY2
-YjJjMzM4YWRjZSBoYXMKbm8gb2JzZXJ2YWJsZSBlZmZlY3Q6CgotIGJlZm9yZSwgInNrX3VpZCIg
-d291bGQgYmUgemVybywgZHVlIHRvIHVuZGVmaW5lZCBiZWhhdmlvcgogIChDVkUtMjAyMy0xMDc2
-KSwKCi0gYWZ0ZXIsICJza191aWQiIHdvdWxkIGJlIHplcm8sIGR1ZSB0byAiL2Rldi90YXBYIiBi
-ZWluZyBvd25lZCBieSByb290LgoKV2hhdCBtYXR0ZXJzIGlzIHRoZSAoZnMpVUlEIG9mIHRoZSBw
-cm9jZXNzIHBlcmZvcm1pbmcgdGhlIG9wZW4oKSwgc28gY2FjaGUKdGhhdCBpbiAic2tfdWlkIi4K
-CkNjOiBFcmljIER1bWF6ZXQgPGVkdW1hemV0QGdvb2dsZS5jb20+CkNjOiBMb3JlbnpvIENvbGl0
-dGkgPGxvcmVuem9AZ29vZ2xlLmNvbT4KQ2M6IFBhb2xvIEFiZW5pIDxwYWJlbmlAcmVkaGF0LmNv
-bT4KQ2M6IFBpZXRybyBCb3JyZWxsbyA8Ym9ycmVsbG9AZGlhZy51bmlyb21hMS5pdD4KQ2M6IG5l
-dGRldkB2Z2VyLmtlcm5lbC5vcmcKQ2M6IHN0YWJsZUB2Z2VyLmtlcm5lbC5vcmcKRml4ZXM6IDY2
-YjJjMzM4YWRjZSAoInRhcDogdGFwX29wZW4oKTogY29ycmVjdGx5IGluaXRpYWxpemUgc29ja2V0
-IHVpZCIpCkJ1Z3ppbGxhOiBodHRwczovL2J1Z3ppbGxhLnJlZGhhdC5jb20vc2hvd19idWcuY2dp
-P2lkPTIxNzM0MzUKU2lnbmVkLW9mZi1ieTogTGFzemxvIEVyc2VrIDxsZXJzZWtAcmVkaGF0LmNv
-bT4KLS0tCiBkcml2ZXJzL25ldC90YXAuYyB8IDIgKy0KIDEgZmlsZSBjaGFuZ2VkLCAxIGluc2Vy
-dGlvbigrKSwgMSBkZWxldGlvbigtKQoKZGlmZiAtLWdpdCBhL2RyaXZlcnMvbmV0L3RhcC5jIGIv
-ZHJpdmVycy9uZXQvdGFwLmMKaW5kZXggOTEzN2ZiOGMxYzQyLi40OWQxZDZhY2Y5NWUgMTAwNjQ0
-Ci0tLSBhL2RyaXZlcnMvbmV0L3RhcC5jCisrKyBiL2RyaXZlcnMvbmV0L3RhcC5jCkBAIC01MzQs
-NyArNTM0LDcgQEAgc3RhdGljIGludCB0YXBfb3BlbihzdHJ1Y3QgaW5vZGUgKmlub2RlLCBzdHJ1
-Y3QgZmlsZSAqZmlsZSkKIAlxLT5zb2NrLnN0YXRlID0gU1NfQ09OTkVDVEVEOwogCXEtPnNvY2su
-ZmlsZSA9IGZpbGU7CiAJcS0+c29jay5vcHMgPSAmdGFwX3NvY2tldF9vcHM7Ci0Jc29ja19pbml0
-X2RhdGFfdWlkKCZxLT5zb2NrLCAmcS0+c2ssIGlub2RlLT5pX3VpZCk7CisJc29ja19pbml0X2Rh
-dGFfdWlkKCZxLT5zb2NrLCAmcS0+c2ssIGN1cnJlbnRfZnN1aWQoKSk7CiAJcS0+c2suc2tfd3Jp
-dGVfc3BhY2UgPSB0YXBfc29ja193cml0ZV9zcGFjZTsKIAlxLT5zay5za19kZXN0cnVjdCA9IHRh
-cF9zb2NrX2Rlc3RydWN0OwogCXEtPmZsYWdzID0gSUZGX1ZORVRfSERSIHwgSUZGX05PX1BJIHwg
-SUZGX1RBUDsK
+On Sun, 30 Jul 2023 09:13:02 -0400 Willem de Bruijn wrote:
+> > > This levels business is an unfortunate side effect of
+> > > CHECKSUM_UNNECESSARY. For a packet with multiple checksum fields, what
+> > > does the boolean actually mean? With these levels, at least that is
+> > > well defined: the first N checksum fields.  
+> >
+> > If I understand this correctly this is intel specific feature that
+> > other NICs don't have. skb layer also doesn't have such concept.
+> > The driver should say CHECKSUM_UNNECESSARY when it's sure
+> > or don't pretend that it checks the checksum and just say NONE.  
+> 
+> I did not know how much this was used, but quick grep for non constant
+> csum_level shows devices from at least six vendors.
 
+I thought it was a legacy thing from early VxLAN days.
+We used to leave outer UDP csum as 0 before LCO, and therefore couldn't
+convert outer to COMPLETE, so inner could not be offloaded/validated.
+Should not be all that relevant today.
 
