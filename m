@@ -1,99 +1,204 @@
-Return-Path: <netdev+bounces-22752-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22753-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F491769123
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 11:10:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A170769146
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 11:16:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E693828147C
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 09:10:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EA811281461
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 09:16:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04CC014F92;
-	Mon, 31 Jul 2023 09:10:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9E6414F9A;
+	Mon, 31 Jul 2023 09:16:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECDB7111D
-	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 09:10:52 +0000 (UTC)
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0596AF3;
-	Mon, 31 Jul 2023 02:10:49 -0700 (PDT)
-Received: from kwepemm600007.china.huawei.com (unknown [172.30.72.56])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4RDsrW01f2zrS4J;
-	Mon, 31 Jul 2023 17:09:46 +0800 (CST)
-Received: from [10.69.136.139] (10.69.136.139) by
- kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Mon, 31 Jul 2023 17:10:46 +0800
-Message-ID: <a21beff2-9f38-d354-6049-aed20c18c8d4@huawei.com>
-Date: Mon, 31 Jul 2023 17:10:45 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B334E81B
+	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 09:16:41 +0000 (UTC)
+Received: from EUR04-VI1-obe.outbound.protection.outlook.com (mail-vi1eur04on2044.outbound.protection.outlook.com [40.107.8.44])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A6F610B;
+	Mon, 31 Jul 2023 02:16:40 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=P79+cnwCnl6NgcAIG33z+8ZtQcFIRa+UurbRzfYQFyFFA0MaUM7Txhy9ggmb6y9M6uFtSGzIqyX184+a69O7szG+c2+2L/JM7zgdqj507opbIbrZIulcVUQMBoJoasJIJgGky/6ic7GU4MRuz5p2g/DLd9s5hpMJLNHMc1Hc3gawyIVWGy5M02h90Cq9t/CBSWZYptEDPENNOlcQhdVgrptf3VPdZzP24G9oJxQNtJJNBMzcCFaKtuVhSXqwds/aEfUQMnXR72pFAzisLxSI2eRNF+/3MYEg0HFtKdrz60wph8wzPl5uMdTxgR97EGDjxySyBegLkA4VZPq3SAyuLg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=o5KoFZiUbaqvuaaXiH0Mjo/SIiA63I0U16Rvyicwd+E=;
+ b=Dwr5yQfsoFihw457yiG9985I7qL5GKWvBT0DQOdj+c5KM8fo/9WmkrxOrkly/GPndrRfD+t/U6l4su65mNEv4CqWl7ybs+9cs0FIjQKxtceWsGYQjnBmLLiXzPxPz53iBjMamfiW9ZJF4NyixpKwBUFbtkuCb6h6rODLL1gHrH46tecSpO4v2uuxKLbuY9BWQy08t7Imn/EQ/p4kT9tW7KQeXDSh3a0u3310b84Qpkb7ssgO76SPSyjBr2G4dkRGW2a1GjOZ269JNBy38bRIv8hc2akPNOjqGBSrrSS5L+fiohN51PvIsNgrI9jRNOWl9bQranOWBwjbPL8t0h067Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oss.nxp.com; dmarc=pass action=none header.from=oss.nxp.com;
+ dkim=pass header.d=oss.nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=NXP1.onmicrosoft.com;
+ s=selector2-NXP1-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=o5KoFZiUbaqvuaaXiH0Mjo/SIiA63I0U16Rvyicwd+E=;
+ b=GtqqUWc+Z7v8FMk56TiNTbwEQlQpXPTPLaoyqF2svgQtrqDYNrMNtpFxQBQd99BQVtq4RRBqjXsrYjmLRuSZ08c2qraOmAt/KJmBzmbnZH+1ZAKHfSOlkVkZbQ7tqZ127xY3EemOx7aaiVlh3aRN6lOARsz9x4CdeH3OeFG+BFU=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=oss.nxp.com;
+Received: from AM9PR04MB8954.eurprd04.prod.outlook.com (2603:10a6:20b:409::7)
+ by DB8PR04MB7018.eurprd04.prod.outlook.com (2603:10a6:10:121::24) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.42; Mon, 31 Jul
+ 2023 09:16:37 +0000
+Received: from AM9PR04MB8954.eurprd04.prod.outlook.com
+ ([fe80::74e7:6384:dbdc:e936]) by AM9PR04MB8954.eurprd04.prod.outlook.com
+ ([fe80::74e7:6384:dbdc:e936%5]) with mapi id 15.20.6631.043; Mon, 31 Jul 2023
+ 09:16:36 +0000
+From: "Radu Pirea (NXP OSS)" <radu-nicolae.pirea@oss.nxp.com>
+To: andrew@lunn.ch,
+	hkallweit1@gmail.com,
+	linux@armlinux.org.uk,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	richardcochran@gmail.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	"Radu Pirea (NXP OSS)" <radu-nicolae.pirea@oss.nxp.com>
+Subject: [PATCH net-next v5 00/11] Add TJA1120 support
+Date: Mon, 31 Jul 2023 12:16:08 +0300
+Message-Id: <20230731091619.77961-1-radu-nicolae.pirea@oss.nxp.com>
+X-Mailer: git-send-email 2.34.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: AS4P189CA0044.EURP189.PROD.OUTLOOK.COM
+ (2603:10a6:20b:5dd::13) To AM9PR04MB8954.eurprd04.prod.outlook.com
+ (2603:10a6:20b:409::7)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 5/6] net: hns3: fix wrong print link down up
-To: Andrew Lunn <andrew@lunn.ch>
-CC: <yisen.zhuang@huawei.com>, <salil.mehta@huawei.com>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <shenjian15@huawei.com>, <wangjie125@huawei.com>,
-	<liuyonglong@huawei.com>, <wangpeiyang1@huawei.com>,
-	<netdev@vger.kernel.org>, <stable@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-References: <20230728075840.4022760-1-shaojijie@huawei.com>
- <20230728075840.4022760-6-shaojijie@huawei.com>
- <7ce32389-550b-4beb-82b1-1b6183fdeabb@lunn.ch>
- <2c6514a7-db97-f345-9bc4-affd4eba2dda@huawei.com>
- <73b41fe2-12dd-4fc0-a44d-f6f94e6541fc@lunn.ch>
- <ef5489f9-43b4-ee59-699b-3f54a30c00aa@huawei.com>
- <e7219114-774f-49d0-8985-8875fd351b60@lunn.ch>
-From: Jijie Shao <shaojijie@huawei.com>
-In-Reply-To: <e7219114-774f-49d0-8985-8875fd351b60@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.69.136.139]
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- kwepemm600007.china.huawei.com (7.193.23.208)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-5.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM9PR04MB8954:EE_|DB8PR04MB7018:EE_
+X-MS-Office365-Filtering-Correlation-Id: 641da765-827d-4517-6ae2-08db91a6d75f
+X-MS-Exchange-SharedMailbox-RoutingAgent-Processed: True
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	LFBvM/c6WomsQXjng5FuFy6Kcz3D+54j4uh6kCfogYPN1dwGUouGhe311fY3ztqgqEDiWL/QYwR5EwKj71gjq1eAeFIfLNdH/aBxw+KlYdeHhdR43QRaTyhfxN6FWk1CqVFZdwnY5wDCcg4CR/5Yhp0PedLl/vhLWBY65v4+1j5qi3ex8Q9KXAD/eBGZnsINSyu8MfpvOWhNNZW1UfZ6E5AhO9mOr6w+SWoifuK2kq9vFsLVAmuxDnK9kNq31LrUhdKIDxVYsv+DbWK7oYH185EorSsd44rMoE8EUOafS7DLg/6FeT42c9ZSQCYR4D+E1W0az8r05vxKPpTscLn/F5yFjsw0MGXlTCGWmVSIqf6k6imZGEWG75St5jqBLTlZ2lX50/mh0ENZ7yrSLejdzsAH007gyad1vPbZc4E3wiXlI44Acq+s7gUcLGWKaTsoDIKP1WyiQfVSGU9qsocsrCm2U3P54TZcTCTgpWYnPWB3bmAbEM1p8EvDRA3UUADx/xgLpwZLtbB5HLzeF0sj8VwGYMW4rIMMj7dFd++NyQbrIJR+pmfs4KVsmWGavxaam5utXUkyQvonNmF5Wtz2RDEcHQa60ZM0IRt8sjV+k9KMvxR9Kvr8LWEikyHwBiQb
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9PR04MB8954.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(376002)(396003)(136003)(39860400002)(346002)(366004)(451199021)(66476007)(86362001)(41300700001)(8676002)(8936002)(316002)(5660300002)(4326008)(7416002)(66946007)(66556008)(38350700002)(478600001)(2906002)(38100700002)(6666004)(6512007)(52116002)(6486002)(6506007)(1076003)(26005)(83380400001)(66574015)(186003)(2616005);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?WkV1uILUjlP2sb+Uwf/yzEVRlC5h2vJVsTdCkajLw5yYeTl5x9JS5/fVEw6K?=
+ =?us-ascii?Q?aeNs49TtIFCA61BxH6mujcB6zRk/U52bP6SDLoZ4b+tnzrkfgg7OmUhHAEAs?=
+ =?us-ascii?Q?KXmxJH9BOQ/TIJNjWpBKtXyrbN3VVS6XuxljsCpLmiR5JRWNa5dcyu8G6u8P?=
+ =?us-ascii?Q?ze6+wLW31cvKYwQ2BrDkzlIyMVmtItLVMAQO4FZNjiVpFrGVGFVzOuXcWQXx?=
+ =?us-ascii?Q?6baiosP/QtnLjUtuVKbzKIbT3LK3v+8AQqVDJbSzjQJMdIj0Un/MyXPrC9s0?=
+ =?us-ascii?Q?9WYvAyN97L0jf6X/10Azyiakx2vq+rQ6JVlXfipS/RzU5Ont0KlV78OjC6Hk?=
+ =?us-ascii?Q?pHjJ1gI+e2EcTygeDJBwh/y7IAcujvmDj/gp7ArW/m+SQmaHEPlGjyTmsWZv?=
+ =?us-ascii?Q?ylWBz7B0uBqT/ZPhXBMdno7YT2dpMLnL04qnT1zPE5QWFBpk9yqh0u4i8+rh?=
+ =?us-ascii?Q?qmMzt8IdRU+6ENlo2yn1mem5k85YoyH/epeyaBkDZ+mMB+7zeIeLjaGgKX7D?=
+ =?us-ascii?Q?eoeTxauXdn1Yv/ylSh0Db8rcTTTWqh205a0MIpwqSV0OMM7n7XLHh5FOrN8m?=
+ =?us-ascii?Q?yjGsd0J2+o5RFNIeMgE0pi6YGlsFn8+GEpmY0LInEHT1DnY16lsH52Ag6pO6?=
+ =?us-ascii?Q?wTcEn0SPkzESOAu96zaBtgU4BNVyed3jfrFncccqESfj8EfiMBVUraF6TYHS?=
+ =?us-ascii?Q?i81MX31nYUZ8vmOT0BiJR2sPo6klK8ZcHVMcE/lhQ7qxnluPdYnkDEyIt3gN?=
+ =?us-ascii?Q?yrcUgBGEv4BSp153Av+X5vegqUFFx0JADlj3Pflni2tb/Td40wj2WWk15K0B?=
+ =?us-ascii?Q?HNb0HfsU92iUIYrcaG7dU0qqVlghn/B1BBzsjZhOp/NvfxPbaC3CJt7kACVO?=
+ =?us-ascii?Q?AJEeuR/JsGL2xqV+yUNYwavt1vqB6hRpzfT20FA0/US90RQeg9AT6/xMv7nQ?=
+ =?us-ascii?Q?2vzDvKbGg9c7eTn1dmF4gwnIBuT2CQpEXdLCE/pSb7PrMWR+uBR9WRFaLgtR?=
+ =?us-ascii?Q?r3ij2bdVHDE6gH/c+L5lN7/2ASXVnMy/INyLaZBURmFqETK4a38xwdSplMjz?=
+ =?us-ascii?Q?WmHDY1DX+TlqcNmPeWL8Xk95ntbStrN0Zd1qBH/uGtPieRdP6eKbEYrhaW1A?=
+ =?us-ascii?Q?tFHYtwRpmWBYHnTlL6aidzNIJPdbvKYGgHeaxdO+qxkavhOxP2p8ArpuBeDl?=
+ =?us-ascii?Q?CGCfq8Ac829t2XNkoH/Q7tReTRvrON/3dgSO1gEbIpTNg+L+BkYwCr36jAUH?=
+ =?us-ascii?Q?gupmE6xc4q/xeSvjvgvAP5xRUEKfi5s6NueZgyHEasRqoAnxM0z6hyt7jf6C?=
+ =?us-ascii?Q?oZhasq3FTGWyDLBgFxTrtgse5BK6BnhlBMhcpUSYzDUZqAeIVfnVzVu/1Dsr?=
+ =?us-ascii?Q?Au6LwomxHwmrJl9042632oIc9g2vErrVicEIRqqo8pYhSJpXBbI2S22rnzV6?=
+ =?us-ascii?Q?Jc+6SEG74mQYksmxky7jpaa7q2uhaqrohEHuH/p0u4XXfiXPJU+I0PkuQtL5?=
+ =?us-ascii?Q?xYhLI5f7RnFEr9BmfKt4UObkgdhUOK7gXZ08F8LVZ/PSePFYY+k4rNBDDd/9?=
+ =?us-ascii?Q?B1Qo3i0/MkhwnQ3drAvm6UODzPd9gqdDIRyfQnkq6Zwq3MJfmdJS7WLS8aCd?=
+ =?us-ascii?Q?gg=3D=3D?=
+X-OriginatorOrg: oss.nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 641da765-827d-4517-6ae2-08db91a6d75f
+X-MS-Exchange-CrossTenant-AuthSource: AM9PR04MB8954.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Jul 2023 09:16:36.8781
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Oaj5e+dR0InW4qrcfJRudUSDuU7o5ItG0AN+qfRmU9Mxa2sAaqiYxaFxAQAeE7VOrKJTr2FSBWRlFgnd4CK77Bha4bBgr9WXVkDJCHcEKs4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR04MB7018
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
 	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+Hello everyone,
 
-on 2023/7/30 2:23, Andrew Lunn wrote:
->>      Now i wounder if you are fixing the wrong thing. Maybe you should be
->>      fixing the PHY so it does not report up and then down? You say 'very
->>      snall intervals', which should in fact be 1 second. So is the PHY
->>      reporting link for a number of poll intervals? 1min to 10 minutes?
->>
->>                Andrew
->>
->> Yes, according to the log records, the phy polls every second,
->> but the link status changes take time.
->> Generally, it takes 10 seconds for the phy to detect link down,
->> but occasionally it takes several minutes to detect link down,
-> What PHY driver is this?
->
-> It is not so clear what should actually happen with auto-neg turned
-> off. With it on, and the link going down, the PHY should react after
-> about 1 second. It is not supposed to react faster than that, although
-> some PHYs allow fast link down notification to be configured.
->
-> Have you checked 802.3 to see what it says about auto-neg off and link
-> down detection?
->
-> I personally would not suppress this behaviour in the MAC
-> driver. Otherwise you are going to have funny combinations of special
-> cases of a feature which very few people actually use, making your
-> maintenance costs higher.
->
-> 	    Andrew
-Thanks for your suggestion, We are analyzing this issue in depth.
+This patch series got bigger than I expected. It cleans up the
+next-c45-tja11xx driver and adds support for the TJA1120(1000BaseT1
+automotive phy).
+
+Master/slave custom implementation was replaced with the generic
+implementation (genphy_c45_config_aneg/genphy_c45_read_status).
+
+The TJA1120 and TJA1103 are a bit different when it comes to the PTP
+interface. The timestamp read procedure was changed, some addresses were
+changed and some bits were moved from one register to another. Adding
+TJA1120 support was tricky, and I tried not to duplicate the code. If
+something looks too hacky to you, I am open to suggestions.
+
+Cheers,
+Radu P
+
+Changes in v5:
+- replaced strncpy with strscpy
+- reseted -> reset
+
+Changes in v4:
+- rebased on top of net-next/main
+- dropped "net: phy: c45: detect 100BaseT1 and 1000BaseT1 PMA abilites".
+ Already part of upstream.
+
+Changes in v3:
+- merged "net: phy: nxp-c45-tja11xx: add *_reg_field functions" in
+ "net: phy: nxp-c45-tja11xx: prepare the ground for TJA1120"
+- rephrased the commit message for "net: phy: nxp-c45-tja11xx: remove RX
+ BIST frame counters"
+
+Changes in v2:
+- dropped "net: phy: nxp-c45-tja11xx: fix the PTP interrupt
+ enablig/disabling"
+- added error msgs to nxp_c45_set_reg_field and nxp_c45_clear_reg_field
+- used phy_err instead of phy_warn in nxp_c45_write_reg_field and
+ nxp_c45_read_reg_field
+- removed null checks for .driver_data and its fields
+- added 100BT1 and 1000BT1 features bit
+- replaced .features with .get_features
+- dropped changed on TJA1103 EXT TS behaviour
+- improved timestamp reading workarounds
+- merged patch "net: phy: nxp-c45-tja11xx: timestamp reading workaround for
+ TJA1120" to 9 and 12
+- implemented PCS reset workaround in link_change_notify callback
+
+Radu Pirea (NXP OSS) (11):
+  net: phy: nxp-c45-tja11xx: use phylib master/slave implementation
+  net: phy: nxp-c45-tja11xx: remove RX BIST frame counters
+  net: phy: nxp-c45-tja11xx: prepare the ground for TJA1120
+  net: phy: nxp-c45-tja11xx: use get_features
+  net: phy: nxp-c45-tja11xx: add TJA1120 support
+  net: phy: nxp-c45-tja11xx: enable LTC sampling on both ext_ts edges
+  net: phy: nxp-c45-tja11xx: read egress ts on TJA1120
+  net: phy: nxp-c45-tja11xx: handle FUSA irq
+  net: phy: nxp-c45-tja11xx: run cable test with the PHY in test mode
+  net: phy: nxp-c45-tja11xx: read ext trig ts on TJA1120
+  net: phy: nxp-c45-tja11xx: reset PCS if the link goes down
+
+ drivers/net/phy/Kconfig           |    2 +-
+ drivers/net/phy/nxp-c45-tja11xx.c | 1136 ++++++++++++++++++++++-------
+ 2 files changed, 864 insertions(+), 274 deletions(-)
+
+-- 
+2.34.1
+
 
