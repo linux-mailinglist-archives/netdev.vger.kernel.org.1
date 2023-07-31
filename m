@@ -1,104 +1,155 @@
-Return-Path: <netdev+bounces-22844-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22845-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF8DB769916
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 16:10:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F0EC769943
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 16:18:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D60AD1C2090D
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 14:10:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 695161C20C03
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 14:18:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AA3F18B01;
-	Mon, 31 Jul 2023 14:10:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7EC418B07;
+	Mon, 31 Jul 2023 14:18:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20082182DE
-	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 14:10:39 +0000 (UTC)
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4071618C;
-	Mon, 31 Jul 2023 07:10:35 -0700 (PDT)
-Received: from canpemm500007.china.huawei.com (unknown [172.30.72.55])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RF0Tb3KjxzVjvT;
-	Mon, 31 Jul 2023 22:08:51 +0800 (CST)
-Received: from localhost (10.174.179.215) by canpemm500007.china.huawei.com
- (7.192.104.62) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Mon, 31 Jul
- 2023 22:10:32 +0800
-From: Yue Haibing <yuehaibing@huawei.com>
-To: <marcelo.leitner@gmail.com>, <lucien.xin@gmail.com>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <yuehaibing@huawei.com>
-CC: <linux-sctp@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: [PATCH net-next] sctp: Remove unused function declarations
-Date: Mon, 31 Jul 2023 22:10:30 +0800
-Message-ID: <20230731141030.32772-1-yuehaibing@huawei.com>
-X-Mailer: git-send-email 2.10.2.windows.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F8A114F92
+	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 14:18:36 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A06F8C433CC;
+	Mon, 31 Jul 2023 14:18:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1690813116;
+	bh=roJWAQyv2E5qkTUrOOBL4JF3wGCSEwvRkjeyvGDMfgA=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=LJMq0mlLdbjKpQanOwpGJlkLgCigH2wg+fO3BVZxtnEV2DQwl/eUo1FpJyYmuwMqE
+	 HEG898Nl5MjGZngHWqLpaK+CfiiVDlRNwaoxRD+9t4IBC+vuQn19pMS2e9+I2/R+yl
+	 s4xPjn9HDHVeSeQWjhpfL54OyHWfiKBAcsN+7q4rcLKykjjZ04Pq8XqOS1XyWfR3bC
+	 KI8zPjPgKRfREnh52p23R4g4VwSnhjp1gxZyLLengURf37CMgjvgJmj8RsWkOe0rjq
+	 eCBChPkl/Gb89eyN+vT5YC9lA+NHRbjOYLqCl5/6Eboq85dSn9iCqHR8qnbBQV81pf
+	 ugTBFE4IcuwUA==
+Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2b9c66e2e36so50972131fa.1;
+        Mon, 31 Jul 2023 07:18:36 -0700 (PDT)
+X-Gm-Message-State: ABy/qLaWfLi81sQtXwlPWGvFUetn1S2S7PIwdwZxRwcf2YyulocScvPG
+	yq8DZ0gGPjXVaKJeAgiJhi+ENB7BKWA1diYNzkk=
+X-Google-Smtp-Source: APBJJlEvkn1wHuYbYL8ntPekVB8VTmJ6TTXSwPpnDfTAJ0HYisyFNw9wh3socjCfnvnSVFOES7Il26opS+oE9Y5+jpI=
+X-Received: by 2002:a2e:a27b:0:b0:2b9:aad7:9d89 with SMTP id
+ k27-20020a2ea27b000000b002b9aad79d89mr5322200ljm.15.1690813114640; Mon, 31
+ Jul 2023 07:18:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.174.179.215]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- canpemm500007.china.huawei.com (7.192.104.62)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+References: <CAAUqJDuRkHE8fPgZJGaKjUjd3QfGwzfumuJBmStPqBhubxyk_A@mail.gmail.com>
+ <97730.1690408399@warthog.procyon.org.uk>
+In-Reply-To: <97730.1690408399@warthog.procyon.org.uk>
+From: Ard Biesheuvel <ardb@kernel.org>
+Date: Mon, 31 Jul 2023 16:18:22 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXHs_09b8UY7BsFQtxg1Rv6a3vfSRLFJT58Sn+MUevXi6g@mail.gmail.com>
+Message-ID: <CAMj1kXHs_09b8UY7BsFQtxg1Rv6a3vfSRLFJT58Sn+MUevXi6g@mail.gmail.com>
+Subject: Re: [PATCH] crypto: Fix missing initialisation affecting gcm-aes-s390
+To: David Howells <dhowells@redhat.com>
+Cc: =?UTF-8?B?T25kcmVqIE1vc27DocSNZWs=?= <omosnacek@gmail.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, Paolo Abeni <pabeni@redhat.com>, 
+	Sven Schnelle <svens@linux.ibm.com>, Harald Freudenberger <freude@linux.vnet.ibm.com>, 
+	Bagas Sanjaya <bagasdotme@gmail.com>, linux-crypto@vger.kernel.org, 
+	linux-s390@vger.kernel.org, netdev@vger.kernel.org, 
+	regressions@lists.linux.dev, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-These declarations are never implemented since beginning of git history.
+On Wed, 26 Jul 2023 at 23:54, David Howells <dhowells@redhat.com> wrote:
+>
+>
+> Fix af_alg_alloc_areq() to initialise areq->first_rsgl.sgl.sgt.sgl to poi=
+nt
+> to the scatterlist array in areq->first_rsgl.sgl.sgl.
+>
+> Without this, the gcm-aes-s390 driver will oops when it tries to do
+> gcm_walk_start() on req->dst because req->dst is set to the value of
+> areq->first_rsgl.sgl.sgl by _aead_recvmsg() calling
+> aead_request_set_crypt().
+>
+> The problem comes if an empty ciphertext is passed: the loop in
+> af_alg_get_rsgl() just passes straight out and doesn't set areq->first_rs=
+gl
+> up.
+>
+> This isn't a problem on x86_64 using gcmaes_crypt_by_sg() because, as far
+> as I can tell, that ignores req->dst and only uses req->src[*].
+>
+> [*] Is this a bug in aesni-intel_glue.c?
+>
 
-Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
----
- include/net/sctp/sm.h      | 3 ---
- include/net/sctp/structs.h | 2 --
- 2 files changed, 5 deletions(-)
+It uses req->src directly only for processing the additional
+authenticated data (AAD) which contributes to the MAC but not to the
+ciphertext. Conceptually, there is no dst only src for this part, and
+only the IPsec specific encapsulations of GCM and CCM etc do a plain
+memcpy of src to dst (if src and dst do not refer to the same
+scatterlist already). Otherwise, the AAD is not considered to be part
+of the output.
 
-diff --git a/include/net/sctp/sm.h b/include/net/sctp/sm.h
-index f37c7a558d6d..64c42bd56bb2 100644
---- a/include/net/sctp/sm.h
-+++ b/include/net/sctp/sm.h
-@@ -156,7 +156,6 @@ sctp_state_fn_t sctp_sf_do_6_2_sack;
- sctp_state_fn_t sctp_sf_autoclose_timer_expire;
- 
- /* Prototypes for utility support functions.  */
--__u8 sctp_get_chunk_type(struct sctp_chunk *chunk);
- const struct sctp_sm_table_entry *sctp_sm_lookup_event(
- 					struct net *net,
- 					enum sctp_event_type event_type,
-@@ -166,8 +165,6 @@ int sctp_chunk_iif(const struct sctp_chunk *);
- struct sctp_association *sctp_make_temp_asoc(const struct sctp_endpoint *,
- 					     struct sctp_chunk *,
- 					     gfp_t gfp);
--__u32 sctp_generate_verification_tag(void);
--void sctp_populate_tie_tags(__u8 *cookie, __u32 curTag, __u32 hisTag);
- 
- /* Prototypes for chunk-building functions.  */
- struct sctp_chunk *sctp_make_init(const struct sctp_association *asoc,
-diff --git a/include/net/sctp/structs.h b/include/net/sctp/structs.h
-index 5c72d1864dd6..5a24d6d8522a 100644
---- a/include/net/sctp/structs.h
-+++ b/include/net/sctp/structs.h
-@@ -1122,8 +1122,6 @@ void sctp_outq_free(struct sctp_outq*);
- void sctp_outq_tail(struct sctp_outq *, struct sctp_chunk *chunk, gfp_t);
- int sctp_outq_sack(struct sctp_outq *, struct sctp_chunk *);
- int sctp_outq_is_empty(const struct sctp_outq *);
--void sctp_outq_restart(struct sctp_outq *);
--
- void sctp_retransmit(struct sctp_outq *q, struct sctp_transport *transport,
- 		     enum sctp_retransmit_reason reason);
- void sctp_retransmit_mark(struct sctp_outq *, struct sctp_transport *, __u8);
--- 
-2.34.1
+The actual encryption logic does use both src and dst, but under the
+hood (inside the skcipher walk helpers)
 
+
+
+> The s390x oops looks something like:
+>
+>  Unable to handle kernel pointer dereference in virtual kernel address sp=
+ace
+>  Failing address: 0000000a00000000 TEID: 0000000a00000803
+>  Fault in home space mode while using kernel ASCE.
+>  AS:00000000a43a0007 R3:0000000000000024
+>  Oops: 003b ilc:2 [#1] SMP
+>  ...
+>  Call Trace:
+>   [<000003ff7fc3d47e>] gcm_walk_start+0x16/0x28 [aes_s390]
+>   [<00000000a2a342f2>] crypto_aead_decrypt+0x9a/0xb8
+>   [<00000000a2a60888>] aead_recvmsg+0x478/0x698
+>   [<00000000a2e519a0>] sock_recvmsg+0x70/0xb0
+>   [<00000000a2e51a56>] sock_read_iter+0x76/0xa0
+>   [<00000000a273e066>] vfs_read+0x26e/0x2a8
+>   [<00000000a273e8c4>] ksys_read+0xbc/0x100
+>   [<00000000a311d808>] __do_syscall+0x1d0/0x1f8
+>   [<00000000a312ff30>] system_call+0x70/0x98
+>  Last Breaking-Event-Address:
+>   [<000003ff7fc3e6b4>] gcm_aes_crypt+0x104/0xa68 [aes_s390]
+>
+> Fixes: c1abe6f570af ("crypto: af_alg: Use extract_iter_to_sg() to create =
+scatterlists")
+> Reported-by: Ondrej Mosn=C3=A1=C4=8Dek <omosnacek@gmail.com>
+> Link: https://lore.kernel.org/r/CAAUqJDuRkHE8fPgZJGaKjUjd3QfGwzfumuJBmStP=
+qBhubxyk_A@mail.gmail.com/
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: Herbert Xu <herbert@gondor.apana.org.au>
+> cc: Sven Schnelle <svens@linux.ibm.com>
+> cc: Harald Freudenberger <freude@linux.vnet.ibm.com>
+> cc: "David S. Miller" <davem@davemloft.net>
+> cc: Paolo Abeni <pabeni@redhat.com>
+> cc: linux-crypto@vger.kernel.org
+> cc: linux-s390@vger.kernel.org
+> cc: regressions@lists.linux.dev
+> ---
+>  crypto/af_alg.c |    1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/crypto/af_alg.c b/crypto/af_alg.c
+> index 06b15b9f661c..9ee8575d3b1a 100644
+> --- a/crypto/af_alg.c
+> +++ b/crypto/af_alg.c
+> @@ -1192,6 +1192,7 @@ struct af_alg_async_req *af_alg_alloc_areq(struct s=
+ock *sk,
+>
+>         areq->areqlen =3D areqlen;
+>         areq->sk =3D sk;
+> +       areq->first_rsgl.sgl.sgt.sgl =3D areq->first_rsgl.sgl.sgl;
+>         areq->last_rsgl =3D NULL;
+>         INIT_LIST_HEAD(&areq->rsgl_list);
+>         areq->tsgl =3D NULL;
+>
 
