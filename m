@@ -1,195 +1,136 @@
-Return-Path: <netdev+bounces-22904-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22905-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F140769F6D
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 19:24:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3061B769F9E
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 19:42:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AE8CC1C208E1
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 17:24:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 139851C20C76
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 17:42:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 445771D2F7;
-	Mon, 31 Jul 2023 17:24:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00EBA1D2F9;
+	Mon, 31 Jul 2023 17:42:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3065918B18
-	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 17:24:48 +0000 (UTC)
-Received: from mgamail.intel.com (unknown [134.134.136.31])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0254B2;
-	Mon, 31 Jul 2023 10:24:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1690824286; x=1722360286;
-  h=message-id:date:subject:to:references:from:in-reply-to:
-   content-transfer-encoding:mime-version;
-  bh=/+LIvgG+mnYdL0gM8G2jDS+ZFaK6XeTAfbN3XaIq75I=;
-  b=Kiv0tN1XLEwT1EpRxfx0Xjyj6RzrDcoDArtfyW+wtbV4S7fs/xHOhwAZ
-   z/V4uqs78RwuLNOE7AHdqMysc5W2Zuz7G+u5BdHuD3JqxbkjvGRYnaHn6
-   tgqI+W8//20D7zlJtnNQEsioLgzAZwFt0Y1noFn7s38LJ91f0r/2uh6jx
-   /LT8bXKVHV6KN2jXTiSFJCZo63+OJQufFQCD5Z9nvWxqr0NJorD/kcTtV
-   3vxkFKDeojz9M+1hPktHWdEsR8s2s74WSF/UtVt0CWpixssL2bSVpYKAv
-   XBkLsqmr15zzlMLnzvtWG9wKZYNa6yN4qSw8bcpaCjqJ5o6E8IMLQSsVA
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="432905423"
-X-IronPort-AV: E=Sophos;i="6.01,245,1684825200"; 
-   d="scan'208";a="432905423"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2023 10:24:38 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="852120488"
-X-IronPort-AV: E=Sophos;i="6.01,245,1684825200"; 
-   d="scan'208";a="852120488"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by orsmga004.jf.intel.com with ESMTP; 31 Jul 2023 10:24:37 -0700
-Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Mon, 31 Jul 2023 10:24:37 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Mon, 31 Jul 2023 10:24:37 -0700
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27 via Frontend Transport; Mon, 31 Jul 2023 10:24:37 -0700
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.108)
- by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8C2B18B18
+	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 17:42:04 +0000 (UTC)
+Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EA5AC7;
+	Mon, 31 Jul 2023 10:42:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1690825323; x=1722361323;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=eL5D6LXJAo53y5XJzB17VKf8cV4Z9HiANksEo3Es+4g=;
+  b=dJ2zezi/1327b2aeca7e40Xm8FsOc64dUHeoo0SZWuxNlRPEeyrAqYsf
+   pY3i7N2E4hPN8uFgOXmdHxqSw/CkWsjQx+RAmPP+Njtx6CXANrmDKX+lZ
+   2Xake68ipa+wG/xlV/QkP/2D1D3mAFp7j4hToxyCcXJ6XqJxlNMlhWLfA
+   0=;
+X-IronPort-AV: E=Sophos;i="6.01,245,1684800000"; 
+   d="scan'208";a="145781549"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-pdx-2b-m6i4x-a893d89c.us-west-2.amazon.com) ([10.43.8.2])
+  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2023 17:42:00 +0000
+Received: from EX19MTAUWB002.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
+	by email-inbound-relay-pdx-2b-m6i4x-a893d89c.us-west-2.amazon.com (Postfix) with ESMTPS id C7DC740D5E;
+	Mon, 31 Jul 2023 17:41:59 +0000 (UTC)
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.27; Mon, 31 Jul 2023 10:24:36 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Z+0q6wb2Huwvf1nWNB/NlfmM6agzEfxNMBMoAvboiAK4OF0rtiqwd0tlluStquBbQ0mmmAOuzqE9ic7vY5FQ8+sGkzx+JUFgjDfGy8Y5k0MMDbFkPFozOuP9cUCwekv9c2deHbM9pdS4XelcEVyLq+ChfmJgRWcsaO6JziXJzbUuCEg4uPRKxwsYNpC+uZcrE8lkHIZySDNGJBnjJ9BkU8tOVIuidrEtOaZhT9nfpYFyz0z7C4lFxjlr18gEbqPWVZbPwhySPPBBS84RGd9vigTmCPFsk2NH70/OBY+6e8B1exevAy6DaboL9lFzcg66PKNhtLttaM6MTehfnMY/5g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=zYUu2Ipertw/xiH+KLYLxahLAjYATxkgjmmqvXtDytc=;
- b=iG11gwSXqSxa3wNkycZWV8cuLIfuzpurHMdaUZEvGRK1KIj7OvvqNZLqLPDeC+hqztx+5QO0HyWExFtv4Jw3OqD9LCE+36Ac+V5LQhXsyJINglfezjLnkj54b2FF6SytUAoCfOavJQ/JQ0G6XyqupdyEmIax3egD3z3DgDoggM42o9l3icn8YWDRGVy/x/pAa5rB6YWZav6urbxa7gz2W68xv9j/kjCZq2EDYYUaPbe/1zgoFomYZ+2xmFRLVjsMqYAseZo7KPmQ9ET7Skidt3u/YefXMxkgjaU7KaF1ExjEf/gf3TaxuGNFnq20rGC1biKWERuwLW6C4o/Fd+rMNQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CO1PR11MB4914.namprd11.prod.outlook.com (2603:10b6:303:90::24)
- by SJ0PR11MB5615.namprd11.prod.outlook.com (2603:10b6:a03:305::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.44; Mon, 31 Jul
- 2023 17:24:35 +0000
-Received: from CO1PR11MB4914.namprd11.prod.outlook.com
- ([fe80::9c1c:5c49:de36:1cda]) by CO1PR11MB4914.namprd11.prod.outlook.com
- ([fe80::9c1c:5c49:de36:1cda%3]) with mapi id 15.20.6631.042; Mon, 31 Jul 2023
- 17:24:35 +0000
-Message-ID: <1ff19823-beae-3e39-b3b8-2d8e7c94775f@intel.com>
-Date: Mon, 31 Jul 2023 10:24:32 -0700
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Firefox/102.0 Thunderbird/102.13.0
-Subject: Re: [net-next PATCH V2 2/2] octeontx2-af: TC flower offload support
- for inner VLAN
-Content-Language: en-US
-To: Suman Ghosh <sumang@marvell.com>, <sgoutham@marvell.com>,
-	<gakula@marvell.com>, <sbhatta@marvell.com>, <hkelam@marvell.com>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <lcherian@marvell.com>, <jerinj@marvell.com>,
-	<simon.horman@corigine.com>
-References: <20230730143107.2845172-1-sumang@marvell.com>
- <20230730143107.2845172-3-sumang@marvell.com>
-From: Jesse Brandeburg <jesse.brandeburg@intel.com>
-In-Reply-To: <20230730143107.2845172-3-sumang@marvell.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MW2PR16CA0028.namprd16.prod.outlook.com (2603:10b6:907::41)
- To CO1PR11MB4914.namprd11.prod.outlook.com (2603:10b6:303:90::24)
+ 15.2.1118.30; Mon, 31 Jul 2023 17:41:54 +0000
+Received: from 88665a182662.ant.amazon.com (10.106.100.27) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Mon, 31 Jul 2023 17:41:52 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <dan.carpenter@linaro.org>
+CC: <kuniyu@amazon.com>, <linux-kselftest@vger.kernel.org>,
+	<netdev@vger.kernel.org>
+Subject: Re: [bug report] selftest: Add test for SO_INCOMING_CPU.
+Date: Mon, 31 Jul 2023 10:41:43 -0700
+Message-ID: <20230731174143.99810-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <fe376760-33b6-4fc9-88e8-178e809af1ac@moroto.mountain>
+References: <fe376760-33b6-4fc9-88e8-178e809af1ac@moroto.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PR11MB4914:EE_|SJ0PR11MB5615:EE_
-X-MS-Office365-Filtering-Correlation-Id: 791aed22-abef-4a80-8d0e-08db91eb0288
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 0BUQRECNPcVMztCgIJp/L3sHgRQConiYYbtBqzS5pPtqArbSw55gbZDlI1rqaWXa8vVvndr7OsDB8EVhUAUd4R43gy72JV//r0huNkfPMgAq/yXSNKq3WI6Q5SthmL3l4ulGRVPeogGu6lylkoo8AmhH2WybdjQbt6TCaJ4j2EjUcm6bHNu06ME6UihMCscQuI9gmVlzKV3aPysxRepl7S5KhtHvKhm9rhV8uqwTC+hXyPpoKSB2X8kUMiNrTMpe1OcM7YNZ4KLhSDVjTIRZwr5V8NCEJA23CKIbZaJLRbccDMxr64j9yOv3SW4qhEM3mjX//n6jsn+6SGvKZ3JpPvxJWClaz9q6hfoxGctSyFf9qpSJRHVcqyiIqJ7dvBMfLRlQ+fDheq5zmb1oLL5MOYxEaswU1tRPaAIiwgdFih7yWm+WhlpWsz4nDPinQ0F8Jbw6TeziX5kmcd0QyILFuu4nDO800JwGQ6xrGyS9mJs8oesnyd4GXmyJsavuwgxqabIHNEa0hmqDrBOdMDDTxahW10NGCCDjHi5+D7AFvwAE24+0Cj931D/9lA1+8NFD+mHlkpsGi22LmQizOHOfsXDaiMGOvLh1s29sKom0CDZ6fCGIqmMWht+FXRCs0ZlxdDHw4SN1G8qryeCWueJpSgHerzvewJycKq4visN8lJQ=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB4914.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(396003)(136003)(39860400002)(376002)(366004)(346002)(451199021)(5660300002)(44832011)(7416002)(66946007)(2906002)(66556008)(66476007)(82960400001)(921005)(4744005)(316002)(8936002)(8676002)(41300700001)(31686004)(478600001)(31696002)(86362001)(6666004)(6486002)(6512007)(38100700002)(6506007)(26005)(53546011)(186003)(36756003)(2616005)(83380400001)(43740500002)(45980500001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?TVpUM3pPRXpSamZBRUlFQk1zQ3JpZVdhazI0TUVJaVA0WXFIbEFJMHp5bGlu?=
- =?utf-8?B?a1M4dkdqMDlFNGNXNEpiSnlMTGNINFRPQlFUOE5TNjN6US94bjRKWFhVU2lj?=
- =?utf-8?B?aVZPdExacmhoYUxYeTZCUWZwQ0s2UmZ1UkxPMEtWMlFiS01iaUZYbkhHbjVD?=
- =?utf-8?B?THlkS3lUQS8vZlNOSlRVRTZoeDNHOHFHejVGcW5IRWhXb1BHM29vOG9iRFNh?=
- =?utf-8?B?QUs3VlNoMkdkbVhNRDZGbGsrU2ZqckRyVGhWc0lXYktOdWpOMmJiTmI4dVNB?=
- =?utf-8?B?Q2VNT3hBZy9Gd3YrQ0JhWkRjd2FUU05tS21FWm4zL05qeWtXbzZieDhQTysw?=
- =?utf-8?B?ZUp6T2lrREtVVmJ2TEFMU3pvRzFuaytWRUNOZEthUTlic0RYcE9kQUtxWXdy?=
- =?utf-8?B?K0FDM25RcmN4bnVURXJhb0NBYVpidFhIUkMrcktOZWJ5alhjdzJGOWNMUm5t?=
- =?utf-8?B?VnJVb1hLQlp3SHBTYitpT2FxUmJvbGtQRldBaG5SNE15MlA2VWV4NzNpbmtn?=
- =?utf-8?B?bWJ2ZU9FVE1uWG1Nakd1OStFUFowMjJyQktCR3pPTEFhenUyT0NzNEllN2w1?=
- =?utf-8?B?MFFEU2VUYi9LbGlnbzVPWmhpaGJ5bGxYak1YOHpoZkhQSDJwV0JZRi85R3do?=
- =?utf-8?B?RjR1ZXlleWMvdnc2UHVrb3drQk1TNkFpV0dwSUdEQ2pCVjd1Rk9RNVFqL0ZT?=
- =?utf-8?B?NUlMdFovTXZGQ2NGbGJRYlU5ekphVXZrakRXb0d1T0V2U3duM3ZTNk5GQ2ow?=
- =?utf-8?B?Z20vNEhVbm1oZnF2NTVlNGdjUWpYZmZHaDZUM0lnZ0VQYndDeVB4cjRlTlBl?=
- =?utf-8?B?Um5veFFCWDNJM3ZUVEx2Q2JFTkVqYW1aRFdtUlM2S2MrK2JHYi9LSVozaFk5?=
- =?utf-8?B?OEpDUEtuR3p0dTlXbE90ZVVoN1A2ZzZmanlYbjlTOW5HakdPOEw2dUJpV3U4?=
- =?utf-8?B?TForSk1nS3ZnNnI5a29DQmFxTUsyMUFiYlIvOUZuVWttYnVxd3MwendiSHcz?=
- =?utf-8?B?YW9iNGhZb0w1NXV3eG1PbjVRQVl1UTV3QW1IMWxLbEFvQWZBQjFFNDJRekFG?=
- =?utf-8?B?dmJya3hVcG9hc21FYkIraENqb1RtYUN2eUtmMVJwSldNQVFhMWYxZzNYRUkz?=
- =?utf-8?B?R0hrWUpIZHBRK28xRmpHVzRHSHRuRmZzaHBPMGN2Y3dXTGJyNVg0UXlsS2Ew?=
- =?utf-8?B?b3JyVVBGcXJ3TU13b0pvL2xtQmJoRFlLVTVRcEVQdGtIOHZHcndkS2FBL3Bh?=
- =?utf-8?B?OGVFTldxMU8vY1c3eEd2NjRSUFZnQWhsRnBFWE40WU1yRTV1QzlQY1RoMUZF?=
- =?utf-8?B?T0dUSnRzcmxMdXFnMnVqTHJkWmdMMmRZKzNoeWRGK1VMS29lYko2bFBWNmpZ?=
- =?utf-8?B?WlhQYnZyL2x3Zy8vLzIrTmQvWGFjdzMwMVBBY1ZGTXhrblFEWkhMNHJCOGxR?=
- =?utf-8?B?YlRxbENIVHVzRVd0eWl0ZjBhNm5jb0NQcFVvODlZZDVyTWxiaktnT2diS3Fz?=
- =?utf-8?B?akNmWldkQ0JaL09RcTNaWi9tWHpOSVdjd0tUNkFwQTVYWm01MXFPYVJsUkNC?=
- =?utf-8?B?WHNvVis0bE5GMTY2ZlpOYzQ1dnliYkpGbWVtcEtzTU01QStrRS9vN0pnVXRj?=
- =?utf-8?B?QTR2Ty9GWkVlV2FRdGdabnJzd2orYmFHWXlDMWZFTUJGQ2txS2V3OFlaWG9x?=
- =?utf-8?B?bEF5aE1hUmVkTnF6YVdWM3JyNUc1VE8zMWxETWRZWmk1dE0ydlZQR05FdCtK?=
- =?utf-8?B?VnhFS1VaYy82ZUlpdGhJNUNIbXJ0VVdMNC9LRzZiTXRONzlaOVhuandodGwx?=
- =?utf-8?B?bE56Z1B2QjRlSDZIZG1aYVAyaWNLeW9SU0V5M0UzZjB5cXhSNmpGMm9ZUWt3?=
- =?utf-8?B?YW9FMHlTU0JxTlVnS09SZ3hrejN6WDdnUnkvN0cvS1JJd0JpYjVFSFZUc0hH?=
- =?utf-8?B?Z2gwczFzZlpUd0RHTVdxd2JNNmVwczB4Q3FQMVA4VVRSNmtIUFZEN0dwU2dD?=
- =?utf-8?B?dUVJNDJXd0pwbmxxMFlBQTkrQWgzOHBOTEx4WkpnZFZSRjY3bnFqNWZvSWJU?=
- =?utf-8?B?N2xiaWh1c0VoK2FaZTltSmh6TS85b3ViU004b1pOb2JIWTFKWkVxK0ZlLzZi?=
- =?utf-8?B?RVNnVHZhRmdmUzBXZnpBZXNhakVqUzN1bWlhdmlHNGl3VEMvNnZNeUIwdldN?=
- =?utf-8?B?Wmc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 791aed22-abef-4a80-8d0e-08db91eb0288
-X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB4914.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Jul 2023 17:24:35.0197
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 2/59/D78RyysjX9pI51W7JOZ/xRTTA2qS5i7GjMp95UPl0VQ3lvOnNhhL1oxadtNqC1TXvPoCw+7QHHwty48pWhlh18IfN+6v29b9HwsztA=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB5615
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.106.100.27]
+X-ClientProxiedBy: EX19D040UWA002.ant.amazon.com (10.13.139.113) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Precedence: Bulk
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,T_SCC_BODY_TEXT_LINE,T_SPF_PERMERROR autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 7/30/2023 7:31 AM, Suman Ghosh wrote:
-> This patch extends current TC flower offload support to allow filters
-> involving inner VLAN matching, to be offloaded to HW.
+Hi Dan,
+
+From:   Dan Carpenter <dan.carpenter@linaro.org>
+Date:   Mon, 31 Jul 2023 17:18:37 +0300
+> Hello Kuniyuki Iwashima,
 > 
-> Signed-off-by: Suman Ghosh <sumang@marvell.com>
+> The patch 6df96146b202: "selftest: Add test for SO_INCOMING_CPU."
+> from Oct 21, 2022 (linux-next), leads to the following Smatch static
+> checker warning:
+> 
+> 	./tools/testing/selftests/net/so_incoming_cpu.c:163 create_clients()
+> 	error: uninitialized symbol 'ret'.
+> 
+> ./tools/testing/selftests/net/so_incoming_cpu.c
+>     146 void create_clients(struct __test_metadata *_metadata,
+>     147                     FIXTURE_DATA(so_incoming_cpu) *self)
+>     148 {
+>     149         cpu_set_t cpu_set;
+>     150         int i, j, fd, ret;
+>     151 
+>     152         for (i = 0; i < NR_SERVER; i++) {
+>     153                 CPU_ZERO(&cpu_set);
+>     154 
+>     155                 CPU_SET(i, &cpu_set);
+>     156                 ASSERT_EQ(CPU_COUNT(&cpu_set), 1);
+>     157                 ASSERT_NE(CPU_ISSET(i, &cpu_set), 0);
+>     158 
+>     159                 /* Make sure SYN will be processed on the i-th CPU
+>     160                  * and finally distributed to the i-th listener.
+>     161                  */
+>     162                 sched_setaffinity(0, sizeof(cpu_set), &cpu_set);
+> 
+> Presumabley ret = sched_setaffinity() was intended.
 
-Use imperative mood please.
+Right, thanks for reporting.
+I'll post a patch.
 
-if you happened to change the patch for some other reason I might update
-the above text to:
-
-Extend the current TC flower offload support to enable filters matching
-inner VLAN, and support offload of those filters to hardware.
-
-Otherwise the code looks fine.
-
-Reviewed-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
+Thanks!
 
 
+> 
+> --> 163                 ASSERT_EQ(ret, 0);
+>     164 
+>     165                 for (j = 0; j < CLIENT_PER_SERVER; j++) {
+>     166                         fd  = socket(AF_INET, SOCK_STREAM, 0);
+>     167                         ASSERT_NE(fd, -1);
+>     168 
+>     169                         ret = connect(fd, &self->addr, self->addrlen);
+>     170                         ASSERT_EQ(ret, 0);
+>     171 
+>     172                         close(fd);
+>     173                 }
+>     174         }
+>     175 }
+> 
+> regards,
+> dan carpenter
 
