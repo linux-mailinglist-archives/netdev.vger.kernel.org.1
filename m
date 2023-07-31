@@ -1,161 +1,339 @@
-Return-Path: <netdev+bounces-22870-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22873-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2789769B0F
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 17:47:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90E66769B22
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 17:48:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7B627281473
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 15:47:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 26850281492
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 15:48:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D35418C39;
-	Mon, 31 Jul 2023 15:47:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 634A319BAE;
+	Mon, 31 Jul 2023 15:48:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4186918B09
-	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 15:47:25 +0000 (UTC)
-Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE854E57;
-	Mon, 31 Jul 2023 08:47:23 -0700 (PDT)
-Received: by mail-lf1-x136.google.com with SMTP id 2adb3069b0e04-4fe389d6f19so1553740e87.3;
-        Mon, 31 Jul 2023 08:47:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690818442; x=1691423242;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:subject:cc:to:from:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=ABZh1xz4n6wuJf1UZhlFRWHEBKIhLTjdbX5I0EQWrCs=;
-        b=fSwFWkvhfCC6nHRRWXxDB0k59t7O9AYCvs+ae07YpC7D6PcxOp7BdFPLNtWeGb4Fdz
-         wGHX0O86FGkl3r7hPwNaGSL8yPtLD0a995rOr64KRFzOodWqKD53z0pdEmXcS0ECkBHB
-         tVxaJy2KHqLL31jRxlsQz15+yuZx4/wcK0DeDJHMIJiecc3RFcZEt8e/kXd2duxPH2GJ
-         QJMFDXWWPuWw3+LPBncbkiax3Zs1LivJUK3j5uyssFaAgiNGgerQ6cNN1cWnS7o9dVr2
-         4iignrmbEAntlYFXzebve04wmC65Xv1oq3nEhFEibh37R77U0vR9xbSH+ldd1Ln/6f5G
-         D5+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690818442; x=1691423242;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:subject:cc:to:from:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ABZh1xz4n6wuJf1UZhlFRWHEBKIhLTjdbX5I0EQWrCs=;
-        b=f9y+iExwwdwYrJDSRXGJBIc82DSWEsv7UM02j+nYKjPlcay35MVTd0R9IsCdprv9Mq
-         P+czQG1z5gA5EKJaSllcjVvjExrsqFmRa/Q4x/fTY7VKmc5SYcuS/T/27uxLOaeb4ZIx
-         5xmVqr3D5GW41XgjjJkmZsXrUDXiO30N44nlASLFVPtrfTE6NIQK5cwfo7G+ZJAcpUo4
-         7OmvZV8V6TxILpXMfkjm0zd47zqCAQwXxOpCdtJX3+tYWKyi2Z47H1WJ6MMJ/sZx1OIX
-         2lt9Zve6oPrRXkZC8nrGGi9jAPnP4kA+WVks0WGDzUl95WpK22FMq+VTuebkNbrlP+Fa
-         /Azw==
-X-Gm-Message-State: ABy/qLYLU//2e/jWAjuU53oGv3W1KPCcm8m25t2xZ0EyNfkkce/J7Id/
-	ziK/mSLS4/ExLLiR+VC5+XE=
-X-Google-Smtp-Source: APBJJlHev/F2QvCssa3rzFT8WFT/xaYyjd6AmItAIopq/blmw1EN/cScn24nT8oET8fR0vJl1FcXDg==
-X-Received: by 2002:a19:4f54:0:b0:4fb:89f2:278e with SMTP id a20-20020a194f54000000b004fb89f2278emr149583lfk.68.1690818441527;
-        Mon, 31 Jul 2023 08:47:21 -0700 (PDT)
-Received: from akanner-r14. ([77.222.27.66])
-        by smtp.gmail.com with ESMTPSA id z21-20020a19f715000000b004fdc6f03c6dsm2119808lfe.37.2023.07.31.08.47.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 31 Jul 2023 08:47:20 -0700 (PDT)
-Message-ID: <64c7d788.190a0220.3c2cf.5d7f@mx.google.com>
-X-Google-Original-Message-ID: <ZMfXhFYDHKnqn7cX@akanner-r14.>
-Date: Mon, 31 Jul 2023 18:47:16 +0300
-From: Andrew Kanner <andrew.kanner@gmail.com>
-To: David Ahern <dsahern@gmail.com>
-Cc: Jesper Dangaard Brouer <jbrouer@redhat.com>,
-	Paolo Abeni <pabeni@redhat.com>, Jason Wang <jasowang@redhat.com>,
-	brouer@redhat.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-kernel-mentees@lists.linuxfoundation.org,
-	syzbot+f817490f5bd20541b90a@syzkaller.appspotmail.com,
-	John Fastabend <john.fastabend@gmail.com>
-Subject: Re: [PATCH v3] drivers: net: prevent tun_get_user() to exceed xdp
- size limits
-References: <20230725155403.796-1-andrew.kanner@gmail.com>
- <CACGkMEt=Cd8J995+0k=6MT1Pj=Fk9E_r2eZREptLt2osj_H-hA@mail.gmail.com>
- <ab722ec1-ae45-af1f-b869-e7339402c852@redhat.com>
- <179979e6-eb8a-0300-5445-999b9366250a@gmail.com>
- <0c06b067-349c-9fe2-2cc3-36c149fd5277@gmail.com>
- <CACGkMEsYzd1FphP-Ym9T9YjA9ZNBw7Mnw5xQ75dytQMJxDK3cg@mail.gmail.com>
- <220fc36ba1086c1390ba087d08561b61762c965a.camel@redhat.com>
- <3659ea35-8d03-aae7-53c0-09181bb1b69d@redhat.com>
- <64c30249.2e0a0220.f779a.1c31@mx.google.com>
- <cf1ef905-fa48-df3a-2d3c-37d7a1e79b8e@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42E4C19BA5
+	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 15:48:02 +0000 (UTC)
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2044.outbound.protection.outlook.com [40.107.93.44])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1B13A0
+	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 08:48:00 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=SxFAC/Z/+rpv12UqfyvWANI2E8//OFua0ezqmENE2G2Qx0r43KcRz0nfxN+HtFOnSaPIdlC4odwyo5XJrLAzF6iG351JdMnyECiDUPTHV6mieONo9hP+7PB51zTm5OZql9Zbqb8K/wxN454B38wuCMs5OnnVWq9+PWTuvvBXf1c5Ai/tdr7vVeMzWFiaVPN0FoTlpV5jj/vI5acMlWcxwdt+jFcUgXt6f1HxOAnC9sqNKKWYXmytoLidmA3Mt358M70pwOx/PU8dTBZR8nI5qGlLjp3CAiyMppK0TlXQubfR06NuYoG4V0peCpLoGt8L8q/2UhAOHMHKMG10LrJdIg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=v4GESxfDQbYI3hEA9LYPpt76/JbkguZBhfQVLYRHU3k=;
+ b=MDVQm5HBf/nvu6B6i3Vc4WtpVi0ZrsaJsgMYmDLqIEH47ZsRrPjUI8IebbGzSVpbLAtu7bfD1dd8ZMZ92F7mINwQAKIkzdQbRwKCulAP/9Fvxuugleug23FD/S2/zS6hkrW4EzNCy2oOy8I6GBEFAxVI9S4DClmnRn9zooVklPNOYUvU3XfmgUxxlavStPx+AoKiDMEe2kvdReYAFTCfj6bAvNCd0IdWtPcOvF/6Un9aCPmzeGeKQzGjdspjiGyWYxsvz/SQ/cLvrBRJloJSeKzaAGgw8vxYH6ZTIHHkugbnIQMefEwkXum+eaD6WaHp7xT3stEgLC8/dnarkFo5Cw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=v4GESxfDQbYI3hEA9LYPpt76/JbkguZBhfQVLYRHU3k=;
+ b=A3eX7ysWtbwY3zHPQja01KUZglWqdFoqS8RHz+WOQnntsJLZTxCpPJk/nNysll0NYfe2U85FlR0+dUsLVcDQpKqoM7JSwmhlFtiUF2pVWALvuCwIym0fbqmibb2rRKpDR+kkes97pOgGLjPyzlmrKKZWXMCkdlk1mf/uGwL4zjGoog9ifiu/NMKm7x+3OgsnlDTSJnO1Z0nAwUbGdWYDfgVA0REgxiRpe+d8fhLLpeA2+cKyliIUKFBylIpxP7lZeU6dmSNqh+UNirjvsmHT37teKHr37Y5WIKox5bnSR09p7q1dTo//zwCtUObh2a9+6Cki8VOQIIxTZgcGwGW2Qg==
+Received: from DM6PR11CA0060.namprd11.prod.outlook.com (2603:10b6:5:14c::37)
+ by CYXPR12MB9277.namprd12.prod.outlook.com (2603:10b6:930:d8::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.43; Mon, 31 Jul
+ 2023 15:47:58 +0000
+Received: from DM6NAM11FT073.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:5:14c:cafe::9b) by DM6PR11CA0060.outlook.office365.com
+ (2603:10b6:5:14c::37) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.42 via Frontend
+ Transport; Mon, 31 Jul 2023 15:47:58 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ DM6NAM11FT073.mail.protection.outlook.com (10.13.173.152) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6631.43 via Frontend Transport; Mon, 31 Jul 2023 15:47:58 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Mon, 31 Jul 2023
+ 08:47:50 -0700
+Received: from yaviefel.vdiclient.nvidia.com (10.126.231.35) by
+ rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.986.37; Mon, 31 Jul 2023 08:47:47 -0700
+From: Petr Machata <petrm@nvidia.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, <netdev@vger.kernel.org>
+CC: Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>,
+	Danielle Ratson <danieller@nvidia.com>, <mlxsw@nvidia.com>
+Subject: [PATCH net-next 2/8] selftests: router_bridge_1d: Add a new selftest
+Date: Mon, 31 Jul 2023 17:47:16 +0200
+Message-ID: <b81015db1af194b857632f476a04dd679b4f62e8.1690815746.git.petrm@nvidia.com>
+X-Mailer: git-send-email 2.41.0
+In-Reply-To: <cover.1690815746.git.petrm@nvidia.com>
+References: <cover.1690815746.git.petrm@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <cf1ef905-fa48-df3a-2d3c-37d7a1e79b8e@gmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Originating-IP: [10.126.231.35]
+X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6NAM11FT073:EE_|CYXPR12MB9277:EE_
+X-MS-Office365-Filtering-Correlation-Id: d3a1671e-e27d-4202-8d7e-08db91dd8387
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	iIhwhGPRxgNZ0lINVrSyrIdu/VU+LdEj+3sZa8SfjLd2KUiL9XZMJBw7biryVD6oP8HGSG+WmRmyHgfFz4SwGkhEBxExHIY+Gf+xlS3aozmai1B+/7isTCjm6OhipRaW1KnXF9U9okc5Te3cJsjOVaP4c8DqdJ2G5PisW/OzaQ0BkToRebyJI7dg+2pbs1xgRNyDADF9CBaY58AGhYGXLJJ22yxOK3ZSM7dHOlJGvVGuN+KawzPYVKAX8qeiEMlRBBKJeRsQm4+qjGmzftCnikGkOK3agTWfC97DBcNF4Thw7RqCD/eOgEcl+ToVQ27Y0juuCqdm7rVmrQ+haDo21NAlY3Hg6JO1FlXtjnu1AoRiqqJ1kyCJgPeaoBUqmlbVhSNQUOBLOpimTVEtw5d28tDoWU+bUDeVZDjXiBfz8AcDt4OfBClIurKriQTC695KupO9hnPArTjwjC6Ulj5t7vtL63zmeB9qHGtjG/cb0ceRJ3pdLVDpiIqb27usoY1IxZLtq9KfAHIWeJxedG9ZyQ7Zp41ayxknJUdWAqtozu2IvnxLmpOPwvddz/cjo0W+CQThKwsw6nbHLD3giuVNR2ViE98inDUovxU9Onmf4sl1T7cfJ9uPFtfzoquRwJufEUcUFqh3cRCochWgUb5iLOUe5akCx6gYBfm+gNq7lq2dtq1U1dhk1e1WYw3xV/BAqX9Vq5Ysy8QhjxivAkaFJnuoJQntCJAWHezwSlKU4iJSC+2lpNgpYn8K4IrkKMxe
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(376002)(136003)(346002)(39860400002)(396003)(451199021)(82310400008)(36840700001)(46966006)(40470700004)(2906002)(70206006)(70586007)(4326008)(5660300002)(110136005)(54906003)(41300700001)(316002)(16526019)(2616005)(6666004)(7696005)(8936002)(26005)(8676002)(336012)(186003)(107886003)(66574015)(426003)(36860700001)(47076005)(83380400001)(356005)(82740400003)(7636003)(478600001)(36756003)(40460700003)(40480700001)(86362001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Jul 2023 15:47:58.2149
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: d3a1671e-e27d-4202-8d7e-08db91dd8387
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DM6NAM11FT073.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYXPR12MB9277
+X-Spam-Status: No, score=0.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Jul 27, 2023 at 06:11:57PM -0600, David Ahern wrote:
-> On 7/27/23 5:48 PM, Andrew Kanner wrote:
-> > 
-> > Thanks, everyone.
-> > 
-> > If we summarize the discussion - there are 3 issues here:
-> > 1. tun_can_build_skb() doesn't count XDP_PACKET_HEADROOM (minor and
-> >    most trivial)
-> > 2. WARN_ON_ONCE from net/core/filter.c, which may be too strict / not
-> >    needed at all.
-> > 3. strange behaviour with reallocationg SKB (65007 -> 131072)
-> 
-> I believe that happens because of the current skb size and the need to
-> expand it to account for the XDP headroom makes the allocation go over
-> 64kB. Since tun is given the packet via a write call there are no header
-> markers to allocate separate space for headers and data (e.g. like TCP
-> does with 32kB data segments).
+Add a selftest to verify that routing through a 1d bridge works when VLAN
+upper of a physical port is used instead of a physical port. Also verify
+that when a port is attached to an already-configured bridge, the
+configuration is applied.
 
+Signed-off-by: Petr Machata <petrm@nvidia.com>
+Reviewed-by: Danielle Ratson <danieller@nvidia.com>
+---
+ .../testing/selftests/net/forwarding/Makefile |   1 +
+ .../net/forwarding/router_bridge_1d.sh        | 185 ++++++++++++++++++
+ 2 files changed, 186 insertions(+)
+ create mode 100755 tools/testing/selftests/net/forwarding/router_bridge_1d.sh
 
-Yes, this is exactly what you suspected. In pskb_expand_head() ->
-kmalloc_reserve() I have these values initially:
-(gdb) p *size
-$13 = 65408
-(gdb) p obj_size
-$16 = 65728
-
-and it will do:
-    data = kmalloc_reserve(&size, gfp_mask, NUMA_NO_NODE, NULL);
-...
-	obj_size = SKB_HEAD_ALIGN(*size);
-...
-	*size = obj_size = kmalloc_size_roundup(obj_size);
-
-(gdb) p *size
-$22 = 131072
-
-So this is kmalloc_size_roundup() doing this math with the following:
-   /* Above the smaller buckets, size is a multiple of page size. */                                                                                                                           │
-   if (size > KMALLOC_MAX_CACHE_SIZE)                                                                                                                                                          │
-      return PAGE_SIZE << get_order(size);
-
-> > 
-> > I can check these issues. I have to dive a little deeper with 2-3,
-> > most likely with kgdb and syzkaller repro. But seems this is not
-> > somewhat urgent and lives quite a long time without being noticed.
-> > 
-> > BTW: Attached the ftrace logs using the original syzkaller repro
-> > (starting with tun_get_user()). They answer Jesper's question about
-> > contiguous physical memory allocation (kmem_cache_alloc_node() /
-> > kmalloc_reserve()). But I'll check it one more time before submitting
-> > a new PATCH V4 or another patch / patch series.
-> > 
-> 
-
-I see no other bugs in math, so not sure wether it should be fixed. Is
-it ok and expected to roundup the memory allocation?
-
-
+diff --git a/tools/testing/selftests/net/forwarding/Makefile b/tools/testing/selftests/net/forwarding/Makefile
+index 2d8bb72762a4..96b6dcefbc65 100644
+--- a/tools/testing/selftests/net/forwarding/Makefile
++++ b/tools/testing/selftests/net/forwarding/Makefile
+@@ -64,6 +64,7 @@ TEST_PROGS = bridge_igmp.sh \
+ 	q_in_vni_ipv6.sh \
+ 	q_in_vni.sh \
+ 	router_bridge.sh \
++	router_bridge_1d.sh \
+ 	router_bridge_vlan.sh \
+ 	router_bridge_pvid_vlan_upper.sh \
+ 	router_bridge_vlan_upper_pvid.sh \
+diff --git a/tools/testing/selftests/net/forwarding/router_bridge_1d.sh b/tools/testing/selftests/net/forwarding/router_bridge_1d.sh
+new file mode 100755
+index 000000000000..6d51f2ca72a2
+--- /dev/null
++++ b/tools/testing/selftests/net/forwarding/router_bridge_1d.sh
+@@ -0,0 +1,185 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-2.0
++
++# +---------------------------------------------+      +----------------------+
++# | H1 (vrf)                                    |      |             H2 (vrf) |
++# |    + $h1.100            + $h1.200           |      |  + $h2               |
++# |    | 192.0.2.1/28       | 192.0.2.17/28     |      |  | 192.0.2.130/28    |
++# |    | 2001:db8:1::1/64   | 2001:db8:3::1/64  |      |  | 192.0.2.146/28    |
++# |    \_________ __________/                   |      |  | 2001:db8:2::2/64  |
++# |              V                              |      |  | 2001:db8:4::2/64  |
++# |              + $h1                          |      |  |                   |
++# +--------------|------------------------------+      +--|-------------------+
++#                |                                        |
++# +--------------|----------------------------------------|-------------------+
++# | SW           + $swp1                                  + $swp2             |
++# |              |                                          192.0.2.129/28    |
++# |              |                                          192.0.2.145/28    |
++# |              |                                          2001:db8:2::1/64  |
++# |      ________^___________________________               2001:db8:4::1/64  |
++# |     /                                    \                                |
++# | +---|------------------------------+ +---|------------------------------+ |
++# | |   + $swp1.100   BR1 (802.1d)     | |   + $swp1.200   BR2 (802.1d)     | |
++# | |                 192.0.2.2/28     | |                 192.0.2.18/28    | |
++# | |                 2001:db8:1::2/64 | |                 2001:db8:3::2/64 | |
++# | |                                  | |                                  | |
++# | +----------------------------------+ +----------------------------------+ |
++# +---------------------------------------------------------------------------+
++
++ALL_TESTS="
++	ping_ipv4
++	ping_ipv6
++	config_remaster
++	ping_ipv4
++	ping_ipv6
++"
++NUM_NETIFS=4
++source lib.sh
++
++h1_create()
++{
++	simple_if_init $h1
++	vlan_create $h1 100 v$h1 192.0.2.1/28 2001:db8:1::1/64
++	vlan_create $h1 200 v$h1 192.0.2.17/28 2001:db8:3::1/64
++	ip -4 route add 192.0.2.128/28 vrf v$h1 nexthop via 192.0.2.2
++	ip -4 route add 192.0.2.144/28 vrf v$h1 nexthop via 192.0.2.18
++	ip -6 route add 2001:db8:2::/64 vrf v$h1 nexthop via 2001:db8:1::2
++	ip -6 route add 2001:db8:4::/64 vrf v$h1 nexthop via 2001:db8:3::2
++}
++
++h1_destroy()
++{
++	ip -6 route del 2001:db8:4::/64 vrf v$h1
++	ip -6 route del 2001:db8:2::/64 vrf v$h1
++	ip -4 route del 192.0.2.144/28 vrf v$h1
++	ip -4 route del 192.0.2.128/28 vrf v$h1
++	vlan_destroy $h1 200
++	vlan_destroy $h1 100
++	simple_if_fini $h1
++}
++
++h2_create()
++{
++	simple_if_init $h2 192.0.2.130/28 2001:db8:2::2/64 \
++			   192.0.2.146/28 2001:db8:4::2/64
++	ip -4 route add 192.0.2.0/28 vrf v$h2 nexthop via 192.0.2.129
++	ip -4 route add 192.0.2.16/28 vrf v$h2 nexthop via 192.0.2.145
++	ip -6 route add 2001:db8:1::/64 vrf v$h2 nexthop via 2001:db8:2::1
++	ip -6 route add 2001:db8:3::/64 vrf v$h2 nexthop via 2001:db8:4::1
++}
++
++h2_destroy()
++{
++	ip -6 route del 2001:db8:3::/64 vrf v$h2
++	ip -6 route del 2001:db8:1::/64 vrf v$h2
++	ip -4 route del 192.0.2.16/28 vrf v$h2
++	ip -4 route del 192.0.2.0/28 vrf v$h2
++	simple_if_fini $h2 192.0.2.130/28 2001:db8:2::2/64 \
++			   192.0.2.146/28 2001:db8:4::2/64
++}
++
++router_create()
++{
++	ip link set dev $swp1 up
++
++	vlan_create $swp1 100
++	ip link add name br1 type bridge vlan_filtering 0
++	ip link set dev br1 address $(mac_get $swp1.100)
++	ip link set dev $swp1.100 master br1
++	__addr_add_del br1 add 192.0.2.2/28 2001:db8:1::2/64
++	ip link set dev br1 up
++
++	vlan_create $swp1 200
++	ip link add name br2 type bridge vlan_filtering 0
++	ip link set dev br2 address $(mac_get $swp1.200)
++	ip link set dev $swp1.200 master br2
++	__addr_add_del br2 add 192.0.2.18/28 2001:db8:3::2/64
++	ip link set dev br2 up
++
++	ip link set dev $swp2 up
++	__addr_add_del $swp2 add 192.0.2.129/28 2001:db8:2::1/64 \
++				 192.0.2.145/28 2001:db8:4::1/64
++}
++
++router_destroy()
++{
++	__addr_add_del $swp2 del 192.0.2.129/28 2001:db8:2::1/64 \
++				 192.0.2.145/28 2001:db8:4::1/64
++	ip link set dev $swp2 down
++
++	__addr_add_del br2 del 192.0.2.18/28 2001:db8:3::2/64
++	ip link set dev $swp1.200 nomaster
++	ip link del dev br2
++	vlan_destroy $swp1 200
++
++	__addr_add_del br1 del 192.0.2.2/28 2001:db8:1::2/64
++	ip link set dev $swp1.100 nomaster
++	ip link del dev br1
++	vlan_destroy $swp1 100
++
++	ip link set dev $swp1 down
++}
++
++config_remaster()
++{
++	log_info "Remaster bridge slaves"
++
++	ip link set dev $swp1.100 nomaster
++	ip link set dev $swp1.200 nomaster
++	sleep 2
++	ip link set dev $swp1.200 master br2
++	ip link set dev $swp1.100 master br1
++}
++
++setup_prepare()
++{
++	h1=${NETIFS[p1]}
++	swp1=${NETIFS[p2]}
++
++	swp2=${NETIFS[p3]}
++	h2=${NETIFS[p4]}
++
++	vrf_prepare
++
++	h1_create
++	h2_create
++
++	router_create
++
++	forwarding_enable
++}
++
++cleanup()
++{
++	pre_cleanup
++
++	forwarding_restore
++
++	router_destroy
++
++	h2_destroy
++	h1_destroy
++
++	vrf_cleanup
++}
++
++ping_ipv4()
++{
++	ping_test $h1 192.0.2.130 ": via 100"
++	ping_test $h1 192.0.2.146 ": via 200"
++}
++
++ping_ipv6()
++{
++	ping6_test $h1 2001:db8:2::2 ": via 100"
++	ping6_test $h1 2001:db8:4::2 ": via 200"
++}
++
++trap cleanup EXIT
++
++setup_prepare
++setup_wait
++
++tests_run
++
++exit $EXIT_STATUS
 -- 
-Andrew Kanner
+2.41.0
+
 
