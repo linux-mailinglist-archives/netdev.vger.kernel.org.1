@@ -1,61 +1,57 @@
-Return-Path: <netdev+bounces-22895-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22896-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C59A4769D0A
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 18:43:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EFBF7769D2C
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 18:52:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 020BA1C20CC9
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 16:43:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B37681C208B0
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 16:52:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 940D119BC8;
-	Mon, 31 Jul 2023 16:43:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C31819BC8;
+	Mon, 31 Jul 2023 16:52:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5447619BB2;
-	Mon, 31 Jul 2023 16:43:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7515FC433C7;
-	Mon, 31 Jul 2023 16:43:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CE9C8BEE
+	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 16:52:01 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E0D0C433C8;
+	Mon, 31 Jul 2023 16:52:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690821804;
-	bh=ZFs/BvicYu7gy4mLmfp20c2N/r8/MPwILXQgAwW+MKI=;
+	s=k20201202; t=1690822321;
+	bh=CGzW4Z4n87oXkmDgD3NYNy1uk7m9r4O9fbpQ0K4fcrw=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=fMHJ+meOYIn4z+hIkvHykH/WKCpJD69jhaMx0WAV5oDypdLxra9UEvoCC1GyQF9wb
-	 EJsQQqkUB+R+HujYW5LMTO9GoXGfXoh4fNPKw4PoCfO37v+BrpSDbT4M/DmzTP+nkb
-	 Zkp28fej6+ucZWzMVIw6QJS8JF/YCic7sQo1HXN5yX3qiLThsYTTuFXXOUvqXHRwjf
-	 QA+o4r7sIvG+14miuO9/yJnok2kIutdIxw+9iP1bYsMgapeezKz+G31ucorkAiqROX
-	 t+7UCP4YbYVcWsK1T25ZzlZzAlGGILEHJzTtWd2ukKsysLXekk9ifeYBvoQR+scBsw
-	 uyVouN5Tz9HkQ==
-Date: Mon, 31 Jul 2023 09:43:22 -0700
+	b=JwP2f6UiI/vu1DP9is9j8UII+ounDJXNS96unDEUTuoypnss/KVF645UcDhKT1oX+
+	 MxD72lxig3/MfG2acIqu6QYXzcHTRD5Gu2QeJ6BWlTu+W14gikM9dg20Pvkl4iGC+G
+	 Wb3fiR6p4u6l0Lw05mRLbxTf3rRvNlY/kN5F1TO9wnosooHIRdQdF2wn+c9Fk0QW8T
+	 sEteJiW0DkcJXo8tJiRf+5rIuQbj1/OEKValoXbf/8RXyTqb50vvXO7t4kezgIE4mw
+	 /TrUY9WAxRAxGCdWYmP88TLvkiq7acc2xKsWUdoHC2bewk8jBZdMPE/Ua1P2QOVY4t
+	 L2Af9fI3xDQMw==
+Date: Mon, 31 Jul 2023 09:51:59 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>, Larysa Zaremba
- <larysa.zaremba@intel.com>, bpf <bpf@vger.kernel.org>, Alexei Starovoitov
- <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko
- <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, Song Liu
- <song@kernel.org>, Yonghong Song <yhs@fb.com>, John Fastabend
- <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, Stanislav
- Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa
- <jolsa@kernel.org>, David Ahern <dsahern@gmail.com>, Willem de Bruijn
- <willemb@google.com>, Jesper Dangaard Brouer <brouer@redhat.com>, Anatoly
- Burakov <anatoly.burakov@intel.com>, Alexander Lobakin
- <alexandr.lobakin@intel.com>, Magnus Karlsson <magnus.karlsson@gmail.com>,
- Maryam Tahhan <mtahhan@redhat.com>, xdp-hints@xdp-project.net, Network
- Development <netdev@vger.kernel.org>, Simon Horman
- <simon.horman@corigine.com>
-Subject: Re: [PATCH bpf-next v4 12/21] xdp: Add checksum hint
-Message-ID: <20230731094322.0edd5c6b@kernel.org>
-In-Reply-To: <64c661de227c2_11bfb629493@willemb.c.googlers.com.notmuch>
-References: <20230728173923.1318596-1-larysa.zaremba@intel.com>
-	<20230728173923.1318596-13-larysa.zaremba@intel.com>
-	<20230728215340.pf3qcfxh7g4x7s6a@MacBook-Pro-8.local>
-	<64c53b1b29a66_e235c2942d@willemb.c.googlers.com.notmuch>
-	<CAADnVQ+vn0=1UT5_c628ovq+LzfrNFf0MxmZn++NqeUFJ-ykQw@mail.gmail.com>
-	<64c661de227c2_11bfb629493@willemb.c.googlers.com.notmuch>
+To: Md Danish Anwar <a0501179@ti.com>
+Cc: MD Danish Anwar <danishanwar@ti.com>, Randy Dunlap
+ <rdunlap@infradead.org>, Roger Quadros <rogerq@kernel.org>, Simon Horman
+ <simon.horman@corigine.com>, Vignesh Raghavendra <vigneshr@ti.com>, Andrew
+ Lunn <andrew@lunn.ch>, Richard Cochran <richardcochran@gmail.com>, Conor
+ Dooley <conor+dt@kernel.org>, Krzysztof Kozlowski
+ <krzysztof.kozlowski+dt@linaro.org>, Rob Herring <robh+dt@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, "David
+ S. Miller" <davem@davemloft.net>, <nm@ti.com>, <srk@ti.com>,
+ <linux-kernel@vger.kernel.org>, <devicetree@vger.kernel.org>,
+ <netdev@vger.kernel.org>, <linux-omap@vger.kernel.org>,
+ <linux-arm-kernel@lists.infradead.org>
+Subject: Re: [PATCH v12 06/10] net: ti: icssg-prueth: Add ICSSG ethernet
+ driver
+Message-ID: <20230731095159.3b7e3b75@kernel.org>
+In-Reply-To: <8790da4f-1378-410c-f637-f85ca4d34604@ti.com>
+References: <20230727112827.3977534-1-danishanwar@ti.com>
+	<20230727112827.3977534-7-danishanwar@ti.com>
+	<20230728172419.702b4ac0@kernel.org>
+	<8790da4f-1378-410c-f637-f85ca4d34604@ti.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,22 +61,53 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Sun, 30 Jul 2023 09:13:02 -0400 Willem de Bruijn wrote:
-> > > This levels business is an unfortunate side effect of
-> > > CHECKSUM_UNNECESSARY. For a packet with multiple checksum fields, what
-> > > does the boolean actually mean? With these levels, at least that is
-> > > well defined: the first N checksum fields.  
-> >
-> > If I understand this correctly this is intel specific feature that
-> > other NICs don't have. skb layer also doesn't have such concept.
-> > The driver should say CHECKSUM_UNNECESSARY when it's sure
-> > or don't pretend that it checks the checksum and just say NONE.  
+On Mon, 31 Jul 2023 16:49:59 +0530 Md Danish Anwar wrote:
+> There are five error handling cases in xmit().
 > 
-> I did not know how much this was used, but quick grep for non constant
-> csum_level shows devices from at least six vendors.
+> 1. DMA Mapping the linear buffer -- If we fail to map dma, we will return
+> NETDEV_TX_OK and goto drop_free_skb which will free the skb and drop the packet.
+> 
+> 2. Allocating descriptor for linear buffer -- If we fail to allocate descriptor
+> this means it is a occupancy issue and we will goto drop_stop_q_busy which will
+> stop queue and return NETDEV_TX_BUSY.
+> 
+> 3. Allocating descriptor when skb is fragmented. -- If we fail to allocate
+> descriptor when skb is fragmented, we will goto drop_stop_q which will stop the
+> queue, free the descriptor, free the skb, drop the packet and return NETDEV_TX_OK.
 
-I thought it was a legacy thing from early VxLAN days.
-We used to leave outer UDP csum as 0 before LCO, and therefore couldn't
-convert outer to COMPLETE, so inner could not be offloaded/validated.
-Should not be all that relevant today.
+This one should be BUSY, right? goto free_desc_stop_q_busy
+
+> 4. DMA mapping for fragment. -- If DMA mapping for fragment fails, we will go
+> to drop_free_descs which will free the descriptor, free the skb, drop the
+> packet and return NETDEV_TX_OK.
+> 
+> 5. Tx push failed. -- If tx push fails we will goto drop_free_descs which will
+> free the descriptor, free the skb, drop the packet and return.
+> 
+> We will only stop queue in case 2 and 3 where we failed to allocate descriptor.
+> In case 1, 4 and 5 we are encountering dma mapping error, so for these cases we
+> will not stop the queue.
+> 
+> Below will be my goto labels.
+> 
+> drop_stop_q:
+> 	netif_tx_stop_queue(netif_txq);
+> 
+> drop_free_descs:
+> 	prueth_xmit_free(tx_chn, first_desc);
+> 
+> drop_free_skb:
+> 	dev_kfree_skb_any(skb);
+> 
+> 	/* error */
+> 	ndev->stats.tx_dropped++;
+> 	netdev_err(ndev, "tx: error: %d\n", ret);
+> 
+> 	return ret;
+
+free_desc_stop_q_busy:
+ 	prueth_xmit_free(tx_chn, first_desc);
+> drop_stop_q_busy:
+> 	netif_tx_stop_queue(netif_txq);
+> 	return NETDEV_TX_BUSY;
 
