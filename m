@@ -1,151 +1,103 @@
-Return-Path: <netdev+bounces-22780-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22781-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78A317692D0
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 12:13:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75F9D76932B
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 12:32:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0AB4D2812DB
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 10:13:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B053F1C20BCE
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 10:32:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC7B317FE6;
-	Mon, 31 Jul 2023 10:13:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D853F63CF;
+	Mon, 31 Jul 2023 10:32:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE2A117744;
-	Mon, 31 Jul 2023 10:13:38 +0000 (UTC)
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECEDAE3;
-	Mon, 31 Jul 2023 03:13:36 -0700 (PDT)
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-99bfcf4c814so339718566b.0;
-        Mon, 31 Jul 2023 03:13:36 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690798415; x=1691403215;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=MCE5qRVpdCIKbrLA0MVnXkLR11xNVpzRW52JK1t8Hl4=;
-        b=i+oPgCtmwd/oNMe+7K4iY0i4ukVkOFpwCzUYTWtivNJri0aNDT9McTMxZeNRpeQGEP
-         SxKnJaAkJkqdFD9EnkffzwuA6e5fpYMo7dJXAoXpQYjuf8kBqnCJzr+eVHoigXh5a4up
-         ii8Po7DexJq7zLoKWCpFRdeqlUa2Emb4cf6Hn5qShE+J04K5GO2lRkU7IXf7YFy0Dy9t
-         QHnr/ywZEj3TKY4g/q9fsGTp3cyUgHlvkDz+TPrkx0rcLC/Hi2k65o5fb+QPLjIETbAa
-         u1CiDJkeNkt/tRalP4RanFARDRpMTBfKdbvbFFPVMADajEJ9wFxvPmu2htXtr8HdWRkq
-         dbiw==
-X-Gm-Message-State: ABy/qLbu8SrqQ5avvNp/jkXPFFA2QEZvhj63hhdcypwcyEZ0qF0yLNVk
-	fKjaPtdduizZtd0l3YTrj3Y=
-X-Google-Smtp-Source: APBJJlFARErXv7L48dVMZakbBdzXoKvqyy2gZ2NRTNuT/zjcchJMAEgti0oj85PtPUcuAzWQdnFtBA==
-X-Received: by 2002:a17:906:74c8:b0:992:9005:5ed5 with SMTP id z8-20020a17090674c800b0099290055ed5mr7480077ejl.32.1690798415227;
-        Mon, 31 Jul 2023 03:13:35 -0700 (PDT)
-Received: from gmail.com (fwdproxy-cln-007.fbsv.net. [2a03:2880:31ff:7::face:b00c])
-        by smtp.gmail.com with ESMTPSA id q26-20020a1709060e5a00b00992b50fbbe9sm5927789eji.90.2023.07.31.03.13.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 31 Jul 2023 03:13:34 -0700 (PDT)
-Date: Mon, 31 Jul 2023 03:13:33 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Stanislav Fomichev <sdf@google.com>
-Cc: asml.silence@gmail.com, axboe@kernel.dk, io-uring@vger.kernel.org,
-	netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
-	edumazet@google.com, pabeni@redhat.com,
-	linux-kernel@vger.kernel.org, leit@meta.com, bpf@vger.kernel.org,
-	ast@kernel.org, martin.lau@linux.dev
-Subject: Re: [PATCH 2/4] io_uring/cmd: Introduce SOCKET_URING_OP_GETSOCKOPT
-Message-ID: <ZMeJTRTEEcahEHLJ@gmail.com>
-References: <20230724142237.358769-1-leitao@debian.org>
- <20230724142237.358769-3-leitao@debian.org>
- <ZL61cIrQuo92Xzbu@google.com>
- <ZL+VfRiJQqrrLe/9@gmail.com>
- <ZMAAMKTaKSIKi1RW@google.com>
- <ZMP07KtOeJ09ejAd@gmail.com>
- <CAKH8qBsm7JGnO+SF7PELT7Ua+5=RA8sAWdnD0UBiG3TYh0djHA@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD14D18002
+	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 10:32:14 +0000 (UTC)
+Received: from madras.collabora.co.uk (madras.collabora.co.uk [IPv6:2a00:1098:0:82:1000:25:2eeb:e5ab])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78AFBE3;
+	Mon, 31 Jul 2023 03:32:13 -0700 (PDT)
+Received: from [192.168.1.100] (2-237-20-237.ip236.fastwebnet.it [2.237.20.237])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits))
+	(No client certificate requested)
+	(Authenticated sender: kholk11)
+	by madras.collabora.co.uk (Postfix) with ESMTPSA id 7F03E6606FCD;
+	Mon, 31 Jul 2023 11:32:11 +0100 (BST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1690799532;
+	bh=xoosHj1qmc0o7HoZ4wSQyUt8HIP0cBsbyMoDAT5q+g4=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=MstCsEWNQOdrkXbFZ5s2Yku4HVG5NMTLMlJFkDIwHkXuB3bRjyqFsOU/lvrIP+tNO
+	 D+LeQNZGY/dEsFzS3X92INL9/RxUdvq/P6+21BbpTQt7+9YZIKdhYhfxf0tO1Nbp0l
+	 rMh3qvkWVY6M21t6vnLKVwQRVe44U/JoGJbDDhiuNyYr9tsABBldGVspICjYJoR5lZ
+	 eo9rSumxAL2/EuGAVnZWjbc8E2iU7Wm9atwgmU9sCKC24XLEhfIIzql9X3+6VKg9lg
+	 v9OUuHkWnQ8ArqQ3FLOGVaVrDCsYAOOGGlt2iwvXmJtKU2LWe1/uQLMNv8s+dqj/Z9
+	 FqDVnuC1oyDGQ==
+Message-ID: <cae53693-80e9-2dcb-e222-511eb30ef74c@collabora.com>
+Date: Mon, 31 Jul 2023 12:32:09 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH] dt-bindings: net: mediatek,net: fixup MAC binding
+Content-Language: en-US
+To: =?UTF-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>, Matthias Brugger
+ <matthias.bgg@gmail.com>, Lorenzo Bianconi <lorenzo@kernel.org>,
+ Felix Fietkau <nbd@nbd.name>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org, =?UTF-8?B?UmFmYcWCIE1pxYJlY2tp?=
+ <rafal@milecki.pl>
+References: <20230729111045.1779-1-zajec5@gmail.com>
+From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+In-Reply-To: <20230729111045.1779-1-zajec5@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAKH8qBsm7JGnO+SF7PELT7Ua+5=RA8sAWdnD0UBiG3TYh0djHA@mail.gmail.com>
-X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FSL_HELO_FAKE,
-	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
-	autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Jul 28, 2023 at 11:07:10AM -0700, Stanislav Fomichev wrote:
-> On Fri, Jul 28, 2023 at 10:03 AM Breno Leitao <leitao@debian.org> wrote:
-> >
-> > Hello Stanislav,
-> >
-> > On Tue, Jul 25, 2023 at 10:02:40AM -0700, Stanislav Fomichev wrote:
-> > > On 07/25, Breno Leitao wrote:
-> > > > On Mon, Jul 24, 2023 at 10:31:28AM -0700, Stanislav Fomichev wrote:
-> > > > > On 07/24, Breno Leitao wrote:
-> > > > > > Add support for getsockopt command (SOCKET_URING_OP_GETSOCKOPT), where
-> > > > > > level is SOL_SOCKET. This is leveraging the sockptr_t infrastructure,
-> > > > > > where a sockptr_t is either userspace or kernel space, and handled as
-> > > > > > such.
-> > > > > >
-> > > > > > Function io_uring_cmd_getsockopt() is inspired by __sys_getsockopt().
-> > > > >
-> > > > > We probably need to also have bpf bits in the new
-> > > > > io_uring_cmd_getsockopt?
-> > > >
-> > > > It might be interesting to have the BPF hook for this function as
-> > > > well, but I would like to do it in a following patch, so, I can
-> > > > experiment with it better, if that is OK.
-> >
-> > I spent smoe time looking at the problem, and I understand we want to
-> > call something as BPF_CGROUP_RUN_PROG_{G,S}ETSOCKOPT() into
-> > io_uring_cmd_{g,s}etsockopt().
-> >
-> > Per the previous conversation with Williem,
-> > io_uring_cmd_{g,s}etsockopt() should use optval as a user pointer (void __user
-> > *optval), and optlen as a kernel integer (it comes as from the io_uring
-> > SQE), such as:
-> >
-> >         void __user *optval = u64_to_user_ptr(READ_ONCE(cmd->sqe->optval));
-> >         int optlen = READ_ONCE(cmd->sqe->optlen);
-> >
-> > Function BPF_CGROUP_RUN_PROG_GETSOCKOPT() calls
-> > __cgroup_bpf_run_filter_getsockopt() which expects userpointer for
-> > optlen and optval.
-> >
-> > At the same time BPF_CGROUP_RUN_PROG_GETSOCKOPT_KERN() expects kernel
-> > pointers for both optlen and optval.
-> >
-> > In this current patchset, it has user pointer for optval and kernel value
-> > for optlen. I.e., a third combination.  So, none of the functions would
-> > work properly, and we probably do not want to create another function.
-> >
-> > I am wondering if it is a good idea to move
-> > __cgroup_bpf_run_filter_getsockopt() to use sockptr_t, so, it will be
-> > able to adapt to any combination.
+Il 29/07/23 13:10, Rafał Miłecki ha scritto:
+> From: Rafał Miłecki <rafal@milecki.pl>
 > 
-> Yeah, I think it makes sense. However, note that the intent of that
-> optlen being a __user pointer is to possibly write some (updated)
-> value back into the userspace.
-> Presumably, you'll pass that updated optlen into some io_uring
-> completion queue? (maybe a stupid question, not super familiar with
-> io_uring)
+> 1. Use unevaluatedProperties
+> It's needed to allow ethernet-controller.yaml properties work correctly.
+> 
+> 2. Drop unneeded phy-handle/phy-mode
+> 
+> 3. Don't require phy-handle
+> Some SoCs may use fixed link.
+> 
+> For in-kernel MT7621 DTS files this fixes following errors:
+> arch/mips/boot/dts/ralink/mt7621-tplink-hc220-g5-v1.dtb: ethernet@1e100000: mac@0: 'fixed-link' does not match any of the regexes: 'pinctrl-[0-9]+'
+>          From schema: Documentation/devicetree/bindings/net/mediatek,net.yaml
+> arch/mips/boot/dts/ralink/mt7621-tplink-hc220-g5-v1.dtb: ethernet@1e100000: mac@0: 'phy-handle' is a required property
+>          From schema: Documentation/devicetree/bindings/net/mediatek,net.yaml
+> arch/mips/boot/dts/ralink/mt7621-tplink-hc220-g5-v1.dtb: ethernet@1e100000: mac@1: 'fixed-link' does not match any of the regexes: 'pinctrl-[0-9]+'
+>          From schema: Documentation/devicetree/bindings/net/mediatek,net.yaml
+> arch/mips/boot/dts/ralink/mt7621-tplink-hc220-g5-v1.dtb: ethernet@1e100000: mac@1: 'phy-handle' is a required property
+>          From schema: Documentation/devicetree/bindings/net/mediatek,net.yaml
+> 
+> Signed-off-by: Rafał Miłecki <rafal@milecki.pl>
 
-On io_uring proposal, the optlen is part of the SQE for setsockopt().
-You give a  userpointer (optval) and set the optlen in the SQE->optlen.
+Reviewed-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
 
-For getsockopt(), the optlen is returned as a result of the operation,
-in the CQE->res.
 
-If you need more detail about it, I documented this behaviour in the
-cover-letter (PS1):
-
-https://lore.kernel.org/all/20230724142237.358769-1-leitao@debian.org/
-
-Thanks for the feedback!
 
