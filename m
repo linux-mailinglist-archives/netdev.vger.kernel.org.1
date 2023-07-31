@@ -1,64 +1,56 @@
-Return-Path: <netdev+bounces-22765-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22766-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE02C76917F
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 11:20:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5F1B7691A2
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 11:24:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1C3BB1C2094A
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 09:20:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 150D21C20B6E
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 09:24:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 432E617740;
-	Mon, 31 Jul 2023 09:19:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99491174EE;
+	Mon, 31 Jul 2023 09:24:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32728111D
-	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 09:18:59 +0000 (UTC)
-Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBD402D77
-	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 02:18:29 -0700 (PDT)
-Received: by mail-lf1-x12e.google.com with SMTP id 2adb3069b0e04-4fe389d6f19so827187e87.3
-        for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 02:18:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1690795099; x=1691399899;
-        h=content-transfer-encoding:in-reply-to:organization:references:cc:to
-         :content-language:subject:reply-to:from:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Q+12FXMvr9ESJo689bLamp4E/dWbT1DX8iIWUzUEY94=;
-        b=Zr2w4Hhljr8LguATEiPtuaD7DaWFkoVMIE5v+jCbEI2GAdBZ+TU4wuBzoTYf4gZYH0
-         NMBPTsAQwHME1VcqEvbCCz46yCo7KYI9298u2Dyt8R2R2JRstMe3tgogrCYfXpb3ov4E
-         +jYwpoh7cjXt645E6KBNAhsuVvQtY5gKvzGXhePnUT5eZqL7wwFI3V9L0c3Om8mX0A0o
-         WO8e6oVwPpkKb6Epv1rdsQmQRRHU665MR2yV5OjqLVNR/VcMTIpIl63FcluGwEP6Qiqk
-         VcoiRBm7JfL+ELFCbFpxbJRppGkLOwx5Y8ZLrGUvKPFbBmqAMfFnmLbyJQ5WozcXD17N
-         Na0g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690795099; x=1691399899;
-        h=content-transfer-encoding:in-reply-to:organization:references:cc:to
-         :content-language:subject:reply-to:from:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Q+12FXMvr9ESJo689bLamp4E/dWbT1DX8iIWUzUEY94=;
-        b=YE4a2v5Z7ivs5o3b1VB9wHvaiGvKqtggED6zZzT5MOzLKJymSKBkrC3rHrQcwB7hxE
-         nVzuj1XcvfnZ9uFQB0kmHbAi3Tg82MdW+UJjxYXVOXGgcXkDO5LyI3yQtMRbEB2qSAha
-         8XNKFfEVTAt1e64B+dcukRcSymMJFOo6TAKBH3DlhKx94KU0sMFqTYR898WBWflq3Ylm
-         trt8keyzo7gzX8GgGIcD8UZZSiJKQdFkpg+b3XFKah/Gm3TfJnIC0K8KAh8YciH5vtnT
-         oG6IikrGbbqlqt0D9bDkROkIoWhym7z3FQTQhnLCVsj0ep7aVr9H5+tBtTw/92WKRPS1
-         RWrg==
-X-Gm-Message-State: ABy/qLb2gVklicn/OQRwBoqHOuaWtosBypNOiR/pf7GQZafavai0b16R
-	/Dh9eMRHe2O7rZDsiCG5d7zuUw==
-X-Google-Smtp-Source: APBJJlHp0uEk5QeTIS0JLVRxJ9SPwseAAkLAO8wGjA6IYWrdeKTLShhJh2CQzrlnwtja2nd327DCjw==
-X-Received: by 2002:a05:6512:ba5:b0:4f8:5885:61e with SMTP id b37-20020a0565120ba500b004f85885061emr6210929lfv.40.1690795099597;
-        Mon, 31 Jul 2023 02:18:19 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:982:cbb0:14b8:9aa7:6bf0:256d? ([2a01:e0a:982:cbb0:14b8:9aa7:6bf0:256d])
-        by smtp.gmail.com with ESMTPSA id q9-20020a1ce909000000b003fc04d13242sm13610289wmc.0.2023.07.31.02.18.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 31 Jul 2023 02:18:18 -0700 (PDT)
-Message-ID: <a139cc8c-1106-d478-ed3b-40fea800707e@linaro.org>
-Date: Mon, 31 Jul 2023 11:18:17 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D7D514F85
+	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 09:24:49 +0000 (UTC)
+Received: from domac.alu.hr (domac.alu.unizg.hr [IPv6:2001:b68:2:2800::3])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA0071FCA;
+	Mon, 31 Jul 2023 02:24:40 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+	by domac.alu.hr (Postfix) with ESMTP id F086F6017F;
+	Mon, 31 Jul 2023 11:24:37 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
+	t=1690795477; bh=LkfFeBRdv/EiJnFEypSxyrbE9TqdrljO0R0Su/jnKm8=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=ipJ4XoHkuLqw/vryVgWHk4rtZwdzao6FreVkphSRGsQ3aFVo+iQbRLY9S/viexub/
+	 O4MCvloxyXxuGeK/94KBEL14ZSvMXBUc4fqIEOwBc1IDmItZ/0bdybbcSwEQwQNHsa
+	 UqcdlK/hpkgjLlA6s/WYI7Fw794BbuWa6K2asgwOKEk/S6UAjf9PrmCnnWlO5tgvqJ
+	 YC3O2C6JGBYhUsybRb+7sdoxH2f4lU9EBISfmkSuVTxtMiGlZUxVW8T67i5VY8Nh25
+	 XhhIbfqq7wvt/YC21TjOwvqWgka+qzBrqqvgr1YPKqq4lJCfe97MztJY3DXW5qYs56
+	 3N1q5Q5eBdVdg==
+X-Virus-Scanned: Debian amavisd-new at domac.alu.hr
+Received: from domac.alu.hr ([127.0.0.1])
+	by localhost (domac.alu.hr [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id KX89WtKi1hOD; Mon, 31 Jul 2023 11:24:35 +0200 (CEST)
+Received: from [192.168.1.6] (unknown [94.250.191.183])
+	by domac.alu.hr (Postfix) with ESMTPSA id C9FF560182;
+	Mon, 31 Jul 2023 11:24:27 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
+	t=1690795475; bh=LkfFeBRdv/EiJnFEypSxyrbE9TqdrljO0R0Su/jnKm8=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=BP6T+IoFeVtMtBCpyHkzSvgZVMcAMwnq5LlGPOj9y/+gNnKdP6pxegH9amjbtgUA4
+	 b6QHdAmpbt1JeCTNZMe9k1WUxET5R30qgwqQ83nZ486jdRRsPP9hwTt7xIREfsAveG
+	 02LOO4dC5bKeZCg+l9uwco3ivDkQEtyDrKoMmBvYOdvT8rV2qWqfcQqSpkXgR2Pcx6
+	 CoQTxCurnyH7E4N87qjM7HxIsxFkdtG+h8u41AHmstseCm+dZWeWNN2T6PHaa8tuuL
+	 9QYlES7qB2XpPo+x/Ja7LkuKJp1aOdk35KED8zX0XAfx7PQLEyGhMLQhZtQB8vKExN
+	 w1XyvNe9yag0A==
+Message-ID: <2f203995-5ae0-13bc-d1a6-997c2b36a2b8@alu.unizg.hr>
+Date: Mon, 31 Jul 2023 11:24:27 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,78 +58,195 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-From: Neil Armstrong <neil.armstrong@linaro.org>
-Reply-To: neil.armstrong@linaro.org
-Subject: Re: [PATCH v2 0/5] bluetooth: qca: enable WCN7850 support
+ Thunderbird/102.13.1
+Subject: Re: [PATCH v1 01/11] selftests: forwarding: custom_multipath_hash.sh:
+ add cleanup for SIGTERM sent by timeout
 Content-Language: en-US
-To: "David S. Miller" <davem@davemloft.net>,
+To: Ido Schimmel <idosch@idosch.org>
+Cc: petrm@nvidia.com, razor@blackwall.org, Ido Schimmel <idosch@nvidia.com>,
+ netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
  Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>,
- Balakrishna Godavarthi <bgodavar@codeaurora.org>,
- Rocky Liao <rjliao@codeaurora.org>, Marcel Holtmann <marcel@holtmann.org>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Andy Gross
- <agross@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
- Konrad Dybcio <konrad.dybcio@linaro.org>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
- linux-arm-msm@vger.kernel.org, Rob Herring <robh@kernel.org>
-References: <20230620-topic-sm8550-upstream-bt-v2-0-98b0043d31a4@linaro.org>
-Organization: Linaro Developer Services
-In-Reply-To: <20230620-topic-sm8550-upstream-bt-v2-0-98b0043d31a4@linaro.org>
+ Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>
+References: <20230722003609.380549-1-mirsad.todorovac@alu.unizg.hr>
+ <ZLzj5oYrbHGvCMkq@shredder>
+ <0550924e-dce9-f90d-df8a-db810fd2499f@alu.unizg.hr>
+ <adc5e40d-d040-a65e-eb26-edf47dac5b02@alu.unizg.hr>
+ <ZL6OljQubhVtQjcD@shredder>
+ <cab8ea8a-98f4-ef9b-4215-e2a93cccaab1@alu.unizg.hr>
+ <ZMEQGIOQXv6so30x@shredder>
+ <a9b6d9f5-14ae-a931-ab7b-d31b5e40f5df@alu.unizg.hr>
+ <ZMYXABUN9OzfN5D3@shredder>
+ <da3f4f4e-47a7-25be-fa61-aebeba1d8d0c@alu.unizg.hr>
+ <ZMdouQRypZCGZhV0@shredder>
+From: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
+In-Reply-To: <ZMdouQRypZCGZhV0@shredder>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi,
+On 7/31/23 09:54, Ido Schimmel wrote:
+> Thanks for testing.
 
-On 27/06/2023 10:15, Neil Armstrong wrote:
-> This serie enables WCN7850 on the Qualcomm SM8550 QRD
-> reference platform.
-> 
-> The WCN7850 is close to the WCN6855 but uses different
-> firmware names.
+Not at all.
 
-Gentle ping,
+> On Sun, Jul 30, 2023 at 06:48:04PM +0200, Mirsad Todorovac wrote:
+>> not ok 26 selftests: net/forwarding: ip6_forward_instats_vrf.sh # exit=1
+> 
+> Regarding this one, in the log I don't see the require_command() that I
+> added in "selftests: forwarding: Set default IPv6 traceroute utility".
+> Also, at line 470 I see "ip vrf exec vveth0 2001:1:2::2" which is
+> another indication that you don't have the patch.
 
-Thanks,
-Neil
+This is correct.
 
-> 
-> Signed-off-by: Neil Armstrong <neil.armstrong@linaro.org>
-> ---
-> Changes in v2:
-> - Convert if/else and qca_is_*() macros by switch/case to simplify adding now BT SoCs
-> - Add bindings reviewed-by
-> - Link to v1: https://lore.kernel.org/r/20230620-topic-sm8550-upstream-bt-v1-0-4728564f8872@linaro.org
-> 
-> ---
-> Neil Armstrong (5):
->        dt-bindings: net: bluetooth: qualcomm: document WCN7850 chipset
->        bluetooth: qca: use switch case for soc type behavior
->        bluetooth: qca: add support for WCN7850
->        arm64: dts: qcom: sm8550: add UART14 nodes
->        arm64: dts: qcom: sm8550-qrd: add bluetooth support
-> 
->   .../bindings/net/bluetooth/qualcomm-bluetooth.yaml |  23 ++
->   arch/arm64/boot/dts/qcom/sm8550-qrd.dts            |  43 ++++
->   arch/arm64/boot/dts/qcom/sm8550.dtsi               |  30 +++
->   drivers/bluetooth/btqca.c                          |  82 +++++--
->   drivers/bluetooth/btqca.h                          |  30 +--
->   drivers/bluetooth/hci_qca.c                        | 250 ++++++++++++++++-----
->   6 files changed, 350 insertions(+), 108 deletions(-)
-> ---
-> base-commit: d4cee89031c80066ec461bb77b5e13a4f37d5fd2
-> change-id: 20230620-topic-sm8550-upstream-bt-dfc4305f9c14
-> 
-> Best regards,
+Now I have:
 
+root@defiant:tools/testing/selftests/net/forwarding# ./ip6_forward_instats_vrf.sh
+SKIP: traceroute6 not installed
+
+Mystery solved. This is much more useful output :-)
+
+Installed traceroute6 and now the test is OK:
+
+root@defiant:tools/testing/selftests/net/forwarding# ./ip6_forward_instats_vrf.sh
+TEST: ping6                                                         [ OK ]
+TEST: Ip6InTooBigErrors                                             [ OK ]
+TEST: Ip6InHdrErrors                                                [ OK ]
+TEST: Ip6InAddrErrors                                               [ OK ]
+TEST: Ip6InDiscards                                                 [ OK ]
+root@defiant:tools/testing/selftests/net/forwarding#
+
+I guess that means only three are left.
+
+# ./bridge_mdb.sh
+dev br0 port veth1 grp 239.1.1.1 src 192.0.2.1 temp filter_mode include proto static vid 10  259.99
+TEST: IPv4 (S, G) port group entries configuration tests            [FAIL]
+	Entry has an unpending group timer after replace
+dev br0 port veth1 grp ff0e::1 src 2001:db8:1::1 temp filter_mode include proto static vid 10  259.99
+TEST: IPv6 (S, G) port group entries configuration tests            [FAIL]
+	Entry has an unpending group timer after replace
+# ./bridge_vlan_mcast.sh
+TEST: Vlan mcast_startup_query_interval global option default value   [FAIL]
+	Wrong default mcast_startup_query_interval global vlan option value
+# ./mirror_gre_changes.sh
+TEST: mirror to gretap: TTL change (skip_hw)                        [FAIL]
+	Expected to capture 10 packets, got 15.
+TEST: mirror to ip6gretap: TTL change (skip_hw)                     [FAIL]
+	Expected to capture 10 packets, got 13.
+WARN: Could not test offloaded functionality
+#
+
+NOTE: The error happened because two patches collided. This patch
+
+diff --git a/tools/testing/selftests/net/forwarding/lib.sh b/tools/testing/selftests/net/forwarding/lib.sh
+index 975fc5168c6334..40a8c1541b7f81 100755
+--- a/tools/testing/selftests/net/forwarding/lib.sh
++++ b/tools/testing/selftests/net/forwarding/lib.sh
+@@ -30,6 +30,7 @@ REQUIRE_MZ=${REQUIRE_MZ:=yes}
+  REQUIRE_MTOOLS=${REQUIRE_MTOOLS:=no}
+  STABLE_MAC_ADDRS=${STABLE_MAC_ADDRS:=no}
+  TCPDUMP_EXTRA_FLAGS=${TCPDUMP_EXTRA_FLAGS:=}
++TROUTE6=${TROUTE6:=traceroute6}
+  
+  relative_path="${BASH_SOURCE%/*}"
+  if [[ "$relative_path" == "${BASH_SOURCE}" ]]; then
+
+and this patch
+
+diff --git a/tools/testing/selftests/net/forwarding/lib.sh b/tools/testing/selftests/net/forwarding/lib.sh
+index 71f7c0c49677..5b0183013017 100755
+--- a/tools/testing/selftests/net/forwarding/lib.sh
++++ b/tools/testing/selftests/net/forwarding/lib.sh
+@@ -16,8 +16,6 @@ TEAMD=${TEAMD:=teamd}
+  WAIT_TIME=${WAIT_TIME:=5}
+  PAUSE_ON_FAIL=${PAUSE_ON_FAIL:=no}
+  PAUSE_ON_CLEANUP=${PAUSE_ON_CLEANUP:=no}
+-NETIF_TYPE=${NETIF_TYPE:=veth}
+-NETIF_CREATE=${NETIF_CREATE:=yes}
+  MCD=${MCD:=smcrouted}
+  MC_CLI=${MC_CLI:=smcroutectl}
+  PING_COUNT=${PING_COUNT:=10}
+@@ -30,6 +28,20 @@ REQUIRE_MZ=${REQUIRE_MZ:=yes}
+  REQUIRE_MTOOLS=${REQUIRE_MTOOLS:=no}
+  STABLE_MAC_ADDRS=${STABLE_MAC_ADDRS:=no}
+  TCPDUMP_EXTRA_FLAGS=${TCPDUMP_EXTRA_FLAGS:=}
++NETIF_TYPE=${NETIF_TYPE:=veth}
++NETIF_CREATE=${NETIF_CREATE:=yes}
++declare -A NETIFS=(
++       [p1]=veth0
++       [p2]=veth1
++       [p3]=veth2
++       [p4]=veth3
++       [p5]=veth4
++       [p6]=veth5
++       [p7]=veth6
++       [p8]=veth7
++       [p9]=veth8
++       [p10]=veth9
++)
+
+  relative_path="${BASH_SOURCE%/*}"
+  if [[ "$relative_path" == "${BASH_SOURCE}" ]]; then
+
+are not compatible.
+
+I have applied the 'require_command $TROUTE6' patch manually.
+
+I suppose this is what you intended to have:
+
+# Can be overridden by the configuration file.
+PING=${PING:=ping}
+PING6=${PING6:=ping6}
+MZ=${MZ:=mausezahn}
+ARPING=${ARPING:=arping}
+TEAMD=${TEAMD:=teamd}
+WAIT_TIME=${WAIT_TIME:=5}
+PAUSE_ON_FAIL=${PAUSE_ON_FAIL:=no}
+PAUSE_ON_CLEANUP=${PAUSE_ON_CLEANUP:=no}
+MCD=${MCD:=smcrouted}
+MC_CLI=${MC_CLI:=smcroutectl}
+PING_COUNT=${PING_COUNT:=10}
+PING_TIMEOUT=${PING_TIMEOUT:=5}
+WAIT_TIMEOUT=${WAIT_TIMEOUT:=20}
+INTERFACE_TIMEOUT=${INTERFACE_TIMEOUT:=600}
+LOW_AGEING_TIME=${LOW_AGEING_TIME:=1000}
+REQUIRE_JQ=${REQUIRE_JQ:=yes}
+REQUIRE_MZ=${REQUIRE_MZ:=yes}
+REQUIRE_MTOOLS=${REQUIRE_MTOOLS:=no}
+STABLE_MAC_ADDRS=${STABLE_MAC_ADDRS:=no}
+TCPDUMP_EXTRA_FLAGS=${TCPDUMP_EXTRA_FLAGS:=}
+TROUTE6=${TROUTE6:=traceroute6}
+NETIF_TYPE=${NETIF_TYPE:=veth}
+NETIF_CREATE=${NETIF_CREATE:=yes}
+declare -A NETIFS=(
+        [p1]=veth0
+        [p2]=veth1
+        [p3]=veth2
+        [p4]=veth3
+        [p5]=veth4
+        [p6]=veth5
+        [p7]=veth6
+        [p8]=veth7
+        [p9]=veth8
+        [p10]=veth9
+)
+
+relative_path="${BASH_SOURCE%/*}"
+if [[ "$relative_path" == "${BASH_SOURCE}" ]]; then
+         relative_path="."
+fi
+------------------------------------------------
+
+Probably for the production patch you would like to have this fixed.
+
+Have a nice day.
+
+Kind regards,
+Mirsad
 
