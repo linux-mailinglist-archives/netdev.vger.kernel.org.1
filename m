@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-22960-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22961-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BAA676A319
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 23:40:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id F188276A31C
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 23:41:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8C2711C20D5B
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 21:40:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2ECCD1C20D2D
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 21:41:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E1131E51C;
-	Mon, 31 Jul 2023 21:40:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 329F41E52A;
+	Mon, 31 Jul 2023 21:40:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F3241DDD6
-	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 21:40:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 88AC2C43395;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1129B1E50B;
+	Mon, 31 Jul 2023 21:40:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 71CC6C433CC;
 	Mon, 31 Jul 2023 21:40:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1690839621;
-	bh=at8OvNbn8Q27R+M9mv9HqbrcnGKuN9m+SxRRQi127TU=;
+	bh=kt5xjvwpq3sc0kobAAU7Du6fClhn8IZqhVSwmf8tcY0=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=IlXmWE+cVcTJ3TH6ycNm+Z6W8jKl3i6oGSUGCLnRYN/8ikGxm0hovVeIpWh/1Po8D
-	 CtaCprM1UwbKlhCZ8L+8w/bPEzgHDPsqK9m1jJ0y1i/8BTLtVfI3itkCYirtj8bPyO
-	 Ecr8iTsGMGcDDmlb3Q0fCjQvtDUOeu6rhkWGlwd16m0HOmAAIZeqMq93XEAsi+nzfq
-	 O/MfrcDL/7kagc/y7eJcT9pUMXnStarP35oIt9JbyCLVA4TnonY40M/i72e2/+lHFi
-	 RE0jTGzT2QsWrN98O8Inz0Au4kzj+iTA33ljGjMoPc7brIGOPO8ScR5pcKkd7mL80o
-	 OyVwos8UxeHcA==
+	b=ki9RbAQAOWeQn9+qOt2JxoXvCj/l0zMd+OM+T7FW98v29dlBalWx0FPMtkFKyYOVb
+	 XsVec6irJ75v6s/emCKyKjod6vWt8OZHi2O6vwMPglNrJGgi+I2ebM4inKOpT0PLoe
+	 jsljutQ/cbyuXhTuOSkAZVnsIk2YcNwbJNG18b1K4P24BwZRQu+kMLCUKhTo3jhEtU
+	 Ftue/WG5ACbShTjbJx1rHDUOEQ7tNdLdp1yDhm0gtizI65YsT/3Zdkbg/0hzyZQQ3R
+	 2qjtnGJRqU6p4B5vw8uSK/Ki7VxKt1PoTP+e7ggfSk7UF/nwTsL6yRt1sFKzGDAUlm
+	 afuakEeU8a1tw==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 66C7DC595C5;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 5CDDEE96AC0;
 	Mon, 31 Jul 2023 21:40:21 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -41,38 +41,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] i40e: remove i40e_status
+Subject: Re: [PATCH net-next] tcp: Remove unused function declarations
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <169083962141.7301.9524010244985806750.git-patchwork-notify@kernel.org>
+ <169083962137.7301.4040424865826797881.git-patchwork-notify@kernel.org>
 Date: Mon, 31 Jul 2023 21:40:21 +0000
-References: <20230728171336.2446156-1-anthony.l.nguyen@intel.com>
-In-Reply-To: <20230728171336.2446156-1-anthony.l.nguyen@intel.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, netdev@vger.kernel.org, jan.sokolowski@intel.com,
- gurucharanx.g@intel.com
+References: <20230729122644.10648-1-yuehaibing@huawei.com>
+In-Reply-To: <20230729122644.10648-1-yuehaibing@huawei.com>
+To: Yue Haibing <yuehaibing@huawei.com>
+Cc: edumazet@google.com, davem@davemloft.net, kuba@kernel.org,
+ pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ bpf@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 28 Jul 2023 10:13:36 -0700 you wrote:
-> From: Jan Sokolowski <jan.sokolowski@intel.com>
+On Sat, 29 Jul 2023 20:26:44 +0800 you wrote:
+> commit 8a59f9d1e3d4 ("sock: Introduce sk->sk_prot->psock_update_sk_prot()")
+> left behind tcp_bpf_get_proto() declaration. And tcp_v4_tw_remember_stamp()
+> function is remove in ccb7c410ddc0 ("timewait_sock: Create and use getpeer op.").
+> Since commit 686989700cab ("tcp: simplify tcp_mark_skb_lost")
+> tcp_skb_mark_lost_uncond_verify() declaration is not used anymore.
 > 
-> Replace uses of i40e_status to as equivalent as possible error codes.
-> Remove enum i40e_status as it is no longer needed
-> 
-> Signed-off-by: Jan Sokolowski <jan.sokolowski@intel.com>
-> Tested-by: Gurucharan G <gurucharanx.g@intel.com> (A Contingent worker at Intel)
-> Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+> Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] i40e: remove i40e_status
-    https://git.kernel.org/netdev/net-next/c/230f3d53a547
+  - [net-next] tcp: Remove unused function declarations
+    https://git.kernel.org/netdev/net-next/c/68223f96997e
 
 You are awesome, thank you!
 -- 
