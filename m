@@ -1,97 +1,99 @@
-Return-Path: <netdev+bounces-22751-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22752-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA112769114
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 11:06:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F491769123
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 11:10:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F2B531C2091C
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 09:06:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E693828147C
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 09:10:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C687F14F86;
-	Mon, 31 Jul 2023 09:06:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04CC014F92;
+	Mon, 31 Jul 2023 09:10:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8A6E81B
-	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 09:06:33 +0000 (UTC)
-Received: from m12.mail.163.com (m12.mail.163.com [220.181.12.215])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2FF2BE9
-	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 02:06:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:Subject:Date:Message-Id; bh=HKLAeQRB/Ec2QFPy5+
-	iHXyg7ax3/7rAwaaA9udBEyyw=; b=Dg1wyNNG/o0UWvdCKe5bs1LASYeNyVJU06
-	FzmTq8msLiRUSW5XylCt3HY1HbbzCgPnpLBnDlPtFlTd0jY0h2ui3/Ugr6dRYk5E
-	2hBylB5q2HUr6fCG4GjI6ESMviePc46LchPWPEri3szGZDG/8ZaSjhmX05QhgS+w
-	PULe2AhgA=
-Received: from localhost.localdomain (unknown [202.112.113.212])
-	by zwqz-smtp-mta-g5-1 (Coremail) with SMTP id _____wD3CkRhecdkAsMnBw--.21953S4;
-	Mon, 31 Jul 2023 17:05:46 +0800 (CST)
-From: Yuanjun Gong <ruc_gongyuanjun@163.com>
-To: kuba@kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	Yuanjun Gong <ruc_gongyuanjun@163.com>
-Subject: [PATCH v2 1/1] net: korina: handle clk prepare error in korina_probe()
-Date: Mon, 31 Jul 2023 17:05:35 +0800
-Message-Id: <20230731090535.21416-1-ruc_gongyuanjun@163.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20230728162639.1c08f645@kernel.org>
-References: <20230728162639.1c08f645@kernel.org>
-X-CM-TRANSID:_____wD3CkRhecdkAsMnBw--.21953S4
-X-Coremail-Antispam: 1Uf129KBjvJXoW7XF48JF17uw43Ww1UXF4fXwb_yoW8Jr1Dpa
-	ykCa4F9r48A34UWw4UXr10qF9Ykan7KayUG3y8G395uw15Ar45ArykKF1rCF1v9rykJa1a
-	yr47Z3ZrAF4DCw7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0piy89_UUUUU=
-X-Originating-IP: [202.112.113.212]
-X-CM-SenderInfo: 5uxfsw5rqj53pdqm30i6rwjhhfrp/xtbBSQy95VaEIEqtaQAAsh
-X-Spam-Status: No, score=-0.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_BL,RCVD_IN_MSPIKE_L4,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECDB7111D
+	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 09:10:52 +0000 (UTC)
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0596AF3;
+	Mon, 31 Jul 2023 02:10:49 -0700 (PDT)
+Received: from kwepemm600007.china.huawei.com (unknown [172.30.72.56])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4RDsrW01f2zrS4J;
+	Mon, 31 Jul 2023 17:09:46 +0800 (CST)
+Received: from [10.69.136.139] (10.69.136.139) by
+ kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Mon, 31 Jul 2023 17:10:46 +0800
+Message-ID: <a21beff2-9f38-d354-6049-aed20c18c8d4@huawei.com>
+Date: Mon, 31 Jul 2023 17:10:45 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 5/6] net: hns3: fix wrong print link down up
+To: Andrew Lunn <andrew@lunn.ch>
+CC: <yisen.zhuang@huawei.com>, <salil.mehta@huawei.com>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <shenjian15@huawei.com>, <wangjie125@huawei.com>,
+	<liuyonglong@huawei.com>, <wangpeiyang1@huawei.com>,
+	<netdev@vger.kernel.org>, <stable@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+References: <20230728075840.4022760-1-shaojijie@huawei.com>
+ <20230728075840.4022760-6-shaojijie@huawei.com>
+ <7ce32389-550b-4beb-82b1-1b6183fdeabb@lunn.ch>
+ <2c6514a7-db97-f345-9bc4-affd4eba2dda@huawei.com>
+ <73b41fe2-12dd-4fc0-a44d-f6f94e6541fc@lunn.ch>
+ <ef5489f9-43b4-ee59-699b-3f54a30c00aa@huawei.com>
+ <e7219114-774f-49d0-8985-8875fd351b60@lunn.ch>
+From: Jijie Shao <shaojijie@huawei.com>
+In-Reply-To: <e7219114-774f-49d0-8985-8875fd351b60@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.69.136.139]
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ kwepemm600007.china.huawei.com (7.193.23.208)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-5.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-in korina_probe(), the return value of clk_prepare_enable()
-should be checked since it might fail. we can use
-devm_clk_get_optional_enabled() instead of devm_clk_get_optional()
-and clk_prepare_enable() to automatically handle the error.
 
-Fixes: e4cd854ec487 ("net: korina: Get mdio input clock via common clock framework")
-Signed-off-by: Yuanjun Gong <ruc_gongyuanjun@163.com>
----
- drivers/net/ethernet/korina.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/korina.c b/drivers/net/ethernet/korina.c
-index 2b9335cb4bb3..8537578e1cf1 100644
---- a/drivers/net/ethernet/korina.c
-+++ b/drivers/net/ethernet/korina.c
-@@ -1302,11 +1302,10 @@ static int korina_probe(struct platform_device *pdev)
- 	else if (of_get_ethdev_address(pdev->dev.of_node, dev) < 0)
- 		eth_hw_addr_random(dev);
- 
--	clk = devm_clk_get_optional(&pdev->dev, "mdioclk");
-+	clk = devm_clk_get_optional_enabled(&pdev->dev, "mdioclk");
- 	if (IS_ERR(clk))
- 		return PTR_ERR(clk);
- 	if (clk) {
--		clk_prepare_enable(clk);
- 		lp->mii_clock_freq = clk_get_rate(clk);
- 	} else {
- 		lp->mii_clock_freq = 200000000; /* max possible input clk */
--- 
-2.17.1
-
+on 2023/7/30 2:23, Andrew Lunn wrote:
+>>      Now i wounder if you are fixing the wrong thing. Maybe you should be
+>>      fixing the PHY so it does not report up and then down? You say 'very
+>>      snall intervals', which should in fact be 1 second. So is the PHY
+>>      reporting link for a number of poll intervals? 1min to 10 minutes?
+>>
+>>                Andrew
+>>
+>> Yes, according to the log records, the phy polls every second,
+>> but the link status changes take time.
+>> Generally, it takes 10 seconds for the phy to detect link down,
+>> but occasionally it takes several minutes to detect link down,
+> What PHY driver is this?
+>
+> It is not so clear what should actually happen with auto-neg turned
+> off. With it on, and the link going down, the PHY should react after
+> about 1 second. It is not supposed to react faster than that, although
+> some PHYs allow fast link down notification to be configured.
+>
+> Have you checked 802.3 to see what it says about auto-neg off and link
+> down detection?
+>
+> I personally would not suppress this behaviour in the MAC
+> driver. Otherwise you are going to have funny combinations of special
+> cases of a feature which very few people actually use, making your
+> maintenance costs higher.
+>
+> 	    Andrew
+Thanks for your suggestion, We are analyzing this issue in depth.
 
