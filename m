@@ -1,172 +1,226 @@
-Return-Path: <netdev+bounces-22681-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22679-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56C26768B55
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 07:42:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72104768ADB
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 06:53:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 702DB1C20AA8
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 05:42:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 255F1281570
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 04:53:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 697FB810;
-	Mon, 31 Jul 2023 05:42:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52F60364;
+	Mon, 31 Jul 2023 04:53:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E9E37F3
-	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 05:42:11 +0000 (UTC)
-Received: from clamta20.bpe.bigpond.com (clamta20.bpe.bigpond.com [203.42.22.36])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18BCDE6A;
-	Sun, 30 Jul 2023 22:42:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=bigpond.com
-	; s=202303; h=Content-Type:MIME-Version:Date:Message-ID:To:Subject:From;
-	bh=RB+chPmKnAg5u6srg0dT76jjVkV17G3szFyN0GGa6zA=; b=nXeIzq0EmBgrUiJ0NZgrEF1oA+
-	YqA45sm7oDnx759lz+RgANiX97w1j1eEWzp0nhHV3K7drkoz4mEnBl92oJVKy1hMeV8+XKZbtTKa8
-	2m6U1htuplBnfNlW+z7Pq9kFIsOP47WztVaFZePNzjbsvRG/Y0N4GT7LMMzmbbqSf4IXliczHzTeb
-	wRUBx3bJQiL9IdNgK6sKCWBiQUb5J5dV9y+TaQjBYHk3vChjD4K+1kYycljXcKmSf/0XEzriVGCDH
-	RhfJ/J+vJ9Yi4KnaAL7q0HJkOKk5E4mFuyOXNQqOjDqWCQ0hlgOiGwVR7SGWRTx5PZjFSDhR5cwRV
-	hcH0rjnA==;
-Received: from claprdcmr06
-	 by claprdomr20 with esmtp
-	 (envelope-from <bids.7405@bigpond.com>)
-	 id 1qQLfS-000EZe-2y
-	 for ;
-	Mon, 31 Jul 2023 15:42:06 +1000
-Received: from [101.191.138.223] (helo=[10.0.0.38])
-	 by claprdcmr06 with esmtpa
-	(envelope-from <bids.7405@bigpond.com>)
-	id 1qQLfS-000EQk-2T;
-	Mon, 31 Jul 2023 15:42:06 +1000
-From: Ross Maynard <bids.7405@bigpond.com>
-Subject: [PATCH v2] USB: zaurus: Add ID for A-300/B-500/C-700
-To: Greg KH <gregkh@linuxfoundation.org>, linux-usb@vger.kernel.org,
- netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org
-Cc: Oliver Neukum <oneukum@suse.com>
-Message-ID: <69b5423b-2013-9fc9-9569-58e707d9bafb@bigpond.com>
-Date: Mon, 31 Jul 2023 15:42:04 +1000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 479E1808
+	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 04:53:10 +0000 (UTC)
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66B83CA;
+	Sun, 30 Jul 2023 21:53:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1690779188; x=1722315188;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=jeIUIrsWmxHz4B3bxwIvr2XSM0C5ERFy2zSd3NWsp1o=;
+  b=NeapfpJsXugVqX7iZguvDSZfPjsLchJpkbxlWrLuJTOA2nBUfZ7WRTIP
+   95izBbg/pkmdzOKUqKBEWtEkoACjMxKveKvXedzbuTT5rR48JfYLykCzO
+   OJrCLxsOIQa3zQ09nmiDDCy1h47PKC3FkOs0E8EPpinK27tCQyLk2xvMX
+   ncfABMdnzpH5cIwHSo1rnuzxDU/AFqmZdpvpPJ3g4FPquLvi0Ji3I+RZI
+   EQvU9Gmx6K4kGZmfWB4S6E2rJT3dtdkdkiHTai+GCi/AUlt9mEzHwAuOo
+   0eIwy56Pl6CHWq82bqMnOjJvozh/3UFldajlXNy/NHTvpp7q6r4Tylfxx
+   A==;
+X-IronPort-AV: E=Sophos;i="6.01,243,1684825200"; 
+   d="scan'208";a="164061127"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa6.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 30 Jul 2023 21:53:07 -0700
+Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
+ chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.21; Sun, 30 Jul 2023 21:52:39 -0700
+Received: from che-dk-ungapp04lx.microchip.com (10.10.115.15) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server id
+ 15.1.2507.21 via Frontend Transport; Sun, 30 Jul 2023 21:52:36 -0700
+From: Vishvambar Panth S <vishvambarpanth.s@microchip.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <bryan.whitehead@microchip.com>, <UNGLinuxDriver@microchip.com>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <richardcochran@gmail.com>, Vishvambar Panth S
+	<vishvambarpanth.s@microchip.com>
+Subject: [PATCH net-next] net: lan743x: skip timestamping for non-PTP packets
+Date: Mon, 31 Jul 2023 18:24:18 +0530
+Message-ID: <20230731125418.75140-1-vishvambarpanth.s@microchip.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-tce-id: bids.7405@bigpond.com
-X-tce-ares-id: e{4fd04bcb-085f-45d8-bcef-eae48b3b2713}1
-X-tce-spam-action: no action
-X-tce-spam-score: 0.0
-X-Cm-Analysis: v=2.4 cv=XK72CytE c=1 sm=1 tr=0 ts=64c749ae a=I+ymoOSk5yzZBOYXmf4WnA==:117 a=I+ymoOSk5yzZBOYXmf4WnA==:17 a=IkcTkHD0fZMA:10 a=ws7JD89P4LkA:10 a=VwQbUJbxAAAA:8 a=1IlZJK9HAAAA:8 a=zblBDeNr1pAM3S_0FrwA:9 a=QEXdDO2ut3YA:10 a=AjGcO6oz07-iQ99wixmX:22
-X-Cm-Envelope: MS4xfANFe97pK+FzezDbm1skrpAjpLUXoLR/qdyHvv5trtfXBk34EskU3dFShyq8E7zo8EeXSQ2lvxNZNo8EuSWwQIXsro0ivseEI6Y+QfaGiUP/+e/gocsi oG/NEjpjYhlOT0+GF9ebs5EUGnkgdAi6kD2WbisimVFqOsIoFRBbGfGRdouETI3jiVN0zN1HSDt4OA==
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-	FREEMAIL_FROM,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,DATE_IN_FUTURE_06_12,
+	DKIMWL_WL_HIGH,DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-The SL-A300, B500/5600, and C700 devices no longer auto-load because of
-"usbnet: Remove over-broad module alias from zaurus."
-This patch adds IDs for those 3 devices.
+Currently all the RX packets are timestamped and the timestamp is appended
+to the RX packet for processing, this reduces RX throughput. This can be
+optimized by timestamping packets only when the PTP messages are received.
+The RX PTP Configuration register [PTP_RX_TS_CFG] specifies what are the
+PTP message types to be timestamped. The PTP_RX_TS_CFG_MSG_EN_ configures
+Sync, Delay_Req, Pdelay_Req, Pdelay_Resp Message types to be timestamped.
+The RX_CFG_B_TS_ALL_RX_ bit enables storing the timestamp for all RX
+frames, now this is cleared as only PTP packets will be timestamped. The
+RX_CFG_B_TS_DESCR_EN_ enables storing the timestamp in an extension
+descriptor. When PTP messages are received the timestamp will be stored
+in an extension descriptor of the RX packet.
 
-Link: https://bugzilla.kernel.org/show_bug.cgi?id=217632
-Fixes: 16adf5d07987 ("usbnet: Remove over-broad module alias from zaurus.")
-Signed-off-by: Ross Maynard <bids.7405@bigpond.com>
-Cc: stable@vger.kernel.org
+Test setup:  x86 PC with LAN7430 ---> x86 PC with i210 as partner
+
+Before:
+
+Connecting to host 192.168.10.3, port 5201
+Reverse mode, remote host 192.168.10.3 is sending
+[  5] local 192.168.10.10 port 54072 connected to 192.168.10.3 port 5201
+[ ID] Interval           Transfer     Bitrate
+[  5]   0.00-1.00   sec  97.7 MBytes   819 Mbits/sec
+[  5]   1.00-2.00   sec  97.6 MBytes   819 Mbits/sec
+[  5]   2.00-3.00   sec  97.7 MBytes   819 Mbits/sec
+[  5]   3.00-4.00   sec  97.7 MBytes   819 Mbits/sec
+[  5]   4.00-5.00   sec  97.7 MBytes   820 Mbits/sec
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[ ID] Interval           Transfer     Bitrate         Retr
+[  5]   0.00-5.05   sec   490 MBytes   814 Mbits/sec    0   sender
+[  5]   0.00-5.00   sec   488 MBytes   819 Mbits/sec        receiver
+
+iperf Done.
+
+After:
+
+Connecting to host 192.168.10.3, port 5201
+Reverse mode, remote host 192.168.10.3 is sending
+[  5] local 192.168.10.10 port 42438 connected to 192.168.10.3 port 5201
+[ ID] Interval           Transfer     Bitrate
+[  5]   0.00-1.00   sec   112 MBytes   941 Mbits/sec
+[  5]   1.00-2.00   sec   112 MBytes   941 Mbits/sec
+[  5]   2.00-3.00   sec   112 MBytes   941 Mbits/sec
+[  5]   3.00-4.00   sec   112 MBytes   941 Mbits/sec
+[  5]   4.00-5.00   sec   112 MBytes   941 Mbits/sec
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[ ID] Interval           Transfer     Bitrate         Retr
+[  5]   0.00-5.04   sec   563 MBytes   936 Mbits/sec    0   sender
+[  5]   0.00-5.00   sec   561 MBytes   941 Mbits/sec        receiver
+
+iperf Done.
+
+Signed-off-by: Vishvambar Panth S <vishvambarpanth.s@microchip.com>
 ---
-v2: removed reported-by since bug reporter and patch author are the same person
+ drivers/net/ethernet/microchip/lan743x_ethtool.c |  4 +++-
+ drivers/net/ethernet/microchip/lan743x_main.c    |  2 +-
+ drivers/net/ethernet/microchip/lan743x_main.h    |  5 ++++-
+ drivers/net/ethernet/microchip/lan743x_ptp.c     | 11 +++++++++++
+ 4 files changed, 19 insertions(+), 3 deletions(-)
 
- drivers/net/usb/cdc_ether.c | 21 +++++++++++++++++++++
- drivers/net/usb/zaurus.c    | 21 +++++++++++++++++++++
- 2 files changed, 42 insertions(+)
+diff --git a/drivers/net/ethernet/microchip/lan743x_ethtool.c b/drivers/net/ethernet/microchip/lan743x_ethtool.c
+index 2db5949b4c7e..01cb2e4cce82 100644
+--- a/drivers/net/ethernet/microchip/lan743x_ethtool.c
++++ b/drivers/net/ethernet/microchip/lan743x_ethtool.c
+@@ -1047,7 +1047,9 @@ static int lan743x_ethtool_get_ts_info(struct net_device *netdev,
+ 			    BIT(HWTSTAMP_TX_ON) |
+ 			    BIT(HWTSTAMP_TX_ONESTEP_SYNC);
+ 	ts_info->rx_filters = BIT(HWTSTAMP_FILTER_NONE) |
+-			      BIT(HWTSTAMP_FILTER_ALL);
++			      BIT(HWTSTAMP_FILTER_PTP_V2_EVENT) |
++			      BIT(HWTSTAMP_FILTER_PTP_V2_SYNC) |
++			      BIT(HWTSTAMP_FILTER_PTP_V2_DELAY_REQ);
+ 	return 0;
+ }
+ 
+diff --git a/drivers/net/ethernet/microchip/lan743x_main.c b/drivers/net/ethernet/microchip/lan743x_main.c
+index a36f6369f132..154f714f5b92 100644
+--- a/drivers/net/ethernet/microchip/lan743x_main.c
++++ b/drivers/net/ethernet/microchip/lan743x_main.c
+@@ -2938,7 +2938,7 @@ static int lan743x_rx_open(struct lan743x_rx *rx)
+ 		data |= RX_CFG_B_RX_PAD_2_;
+ 	data &= ~RX_CFG_B_RX_RING_LEN_MASK_;
+ 	data |= ((rx->ring_size) & RX_CFG_B_RX_RING_LEN_MASK_);
+-	data |= RX_CFG_B_TS_ALL_RX_;
++	data |= RX_CFG_B_TS_DESCR_EN_;
+ 	if (!(adapter->csr.flags & LAN743X_CSR_FLAG_IS_A0))
+ 		data |= RX_CFG_B_RDMABL_512_;
+ 
+diff --git a/drivers/net/ethernet/microchip/lan743x_main.h b/drivers/net/ethernet/microchip/lan743x_main.h
+index 52609fc13ad9..e1b01a899002 100644
+--- a/drivers/net/ethernet/microchip/lan743x_main.h
++++ b/drivers/net/ethernet/microchip/lan743x_main.h
+@@ -522,6 +522,9 @@
+ 	(((u32)(rx_latency)) & 0x0000FFFF)
+ #define PTP_CAP_INFO				(0x0A60)
+ #define PTP_CAP_INFO_TX_TS_CNT_GET_(reg_val)	(((reg_val) & 0x00000070) >> 4)
++#define PTP_RX_TS_CFG				(0x0A68)
++/* Config for Sync, Delay_Req, Pdelay_Req, Pdelay_Resp Message types */
++#define PTP_RX_TS_CFG_MSG_EN_			(0x000F)
+ 
+ #define PTP_TX_MOD				(0x0AA4)
+ #define PTP_TX_MOD_TX_PTP_SYNC_TS_INSERT_	(0x10000000)
+@@ -656,7 +659,7 @@
+ #define RX_CFG_A_RX_HP_WB_EN_			BIT(5)
+ 
+ #define RX_CFG_B(channel)			(0xC44 + ((channel) << 6))
+-#define RX_CFG_B_TS_ALL_RX_			BIT(29)
++#define RX_CFG_B_TS_DESCR_EN_			BIT(28)
+ #define RX_CFG_B_RX_PAD_MASK_			(0x03000000)
+ #define RX_CFG_B_RX_PAD_0_			(0x00000000)
+ #define RX_CFG_B_RX_PAD_2_			(0x02000000)
+diff --git a/drivers/net/ethernet/microchip/lan743x_ptp.c b/drivers/net/ethernet/microchip/lan743x_ptp.c
+index 39e1066ecd5f..74204f5bf8b0 100644
+--- a/drivers/net/ethernet/microchip/lan743x_ptp.c
++++ b/drivers/net/ethernet/microchip/lan743x_ptp.c
+@@ -1636,9 +1636,14 @@ static bool lan743x_ptp_is_enabled(struct lan743x_adapter *adapter)
+ static void lan743x_ptp_enable(struct lan743x_adapter *adapter)
+ {
+ 	struct lan743x_ptp *ptp = &adapter->ptp;
++	u32 data;
+ 
+ 	mutex_lock(&ptp->command_lock);
+ 
++	data = lan743x_csr_read(adapter, PTP_RX_TS_CFG);
++	data |= PTP_RX_TS_CFG_MSG_EN_;
++	lan743x_csr_write(adapter, PTP_RX_TS_CFG, data);
++
+ 	if (lan743x_ptp_is_enabled(adapter)) {
+ 		netif_warn(adapter, drv, adapter->netdev,
+ 			   "PTP already enabled\n");
+@@ -1652,6 +1657,7 @@ static void lan743x_ptp_enable(struct lan743x_adapter *adapter)
+ static void lan743x_ptp_disable(struct lan743x_adapter *adapter)
+ {
+ 	struct lan743x_ptp *ptp = &adapter->ptp;
++	u32 data;
+ 
+ 	mutex_lock(&ptp->command_lock);
+ 	if (!lan743x_ptp_is_enabled(adapter)) {
+@@ -1659,6 +1665,11 @@ static void lan743x_ptp_disable(struct lan743x_adapter *adapter)
+ 			   "PTP already disabled\n");
+ 		goto done;
+ 	}
++
++	data = lan743x_csr_read(adapter, PTP_RX_TS_CFG);
++	data &= ~PTP_RX_TS_CFG_MSG_EN_;
++	lan743x_csr_write(adapter, PTP_RX_TS_CFG, data);
++
+ 	lan743x_csr_write(adapter, PTP_CMD_CTL, PTP_CMD_CTL_PTP_DISABLE_);
+ 	lan743x_ptp_wait_till_cmd_done(adapter, PTP_CMD_CTL_PTP_ENABLE_);
+ done:
+-- 
+2.25.1
 
---- a/drivers/net/usb/cdc_ether.c
-+++ b/drivers/net/usb/cdc_ether.c
-@@ -616,6 +616,13 @@ static const struct usb_device_id	products[] = {
- }, {
- 	.match_flags	=   USB_DEVICE_ID_MATCH_INT_INFO
- 			  | USB_DEVICE_ID_MATCH_DEVICE,
-+	.idVendor		= 0x04DD,
-+	.idProduct		= 0x8005,   /* A-300 */
-+	ZAURUS_FAKE_INTERFACE,
-+	.driver_info        = 0,
-+}, {
-+	.match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
-+			  | USB_DEVICE_ID_MATCH_DEVICE,
- 	.idVendor		= 0x04DD,
- 	.idProduct		= 0x8006,	/* B-500/SL-5600 */
- 	ZAURUS_MASTER_INTERFACE,
-@@ -623,12 +630,26 @@ static const struct usb_device_id	products[] = {
- }, {
- 	.match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
- 			  | USB_DEVICE_ID_MATCH_DEVICE,
-+	.idVendor		= 0x04DD,
-+	.idProduct		= 0x8006,   /* B-500/SL-5600 */
-+	ZAURUS_FAKE_INTERFACE,
-+	.driver_info        = 0,
-+}, {
-+	.match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
-+			  | USB_DEVICE_ID_MATCH_DEVICE,
- 	.idVendor		= 0x04DD,
- 	.idProduct		= 0x8007,	/* C-700 */
- 	ZAURUS_MASTER_INTERFACE,
- 	.driver_info		= 0,
- }, {
- 	.match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
-+			  | USB_DEVICE_ID_MATCH_DEVICE,
-+	.idVendor		= 0x04DD,
-+	.idProduct		= 0x8007,   /* C-700 */
-+	ZAURUS_FAKE_INTERFACE,
-+	.driver_info        = 0,
-+}, {
-+	.match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
- 		 | USB_DEVICE_ID_MATCH_DEVICE,
- 	.idVendor               = 0x04DD,
- 	.idProduct              = 0x9031,	/* C-750 C-760 */
---- a/drivers/net/usb/zaurus.c
-+++ b/drivers/net/usb/zaurus.c
-@@ -289,9 +289,23 @@ static const struct usb_device_id	products [] = {
- 	.match_flags	=   USB_DEVICE_ID_MATCH_INT_INFO
- 			  | USB_DEVICE_ID_MATCH_DEVICE,
- 	.idVendor		= 0x04DD,
-+	.idProduct		= 0x8005,	/* A-300 */
-+	ZAURUS_FAKE_INTERFACE,
-+	.driver_info = (unsigned long)&bogus_mdlm_info,
-+}, {
-+	.match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
-+			  | USB_DEVICE_ID_MATCH_DEVICE,
-+	.idVendor		= 0x04DD,
- 	.idProduct		= 0x8006,	/* B-500/SL-5600 */
- 	ZAURUS_MASTER_INTERFACE,
- 	.driver_info = ZAURUS_PXA_INFO,
-+}, {
-+	.match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
-+			  | USB_DEVICE_ID_MATCH_DEVICE,
-+	.idVendor		= 0x04DD,
-+	.idProduct		= 0x8006,	/* B-500/SL-5600 */
-+	ZAURUS_FAKE_INTERFACE,
-+	.driver_info = (unsigned long)&bogus_mdlm_info,
- }, {
- 	.match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
- 	          | USB_DEVICE_ID_MATCH_DEVICE,
-@@ -301,6 +315,13 @@ static const struct usb_device_id	products [] = {
- 	.driver_info = ZAURUS_PXA_INFO,
- }, {
- 	.match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
-+			  | USB_DEVICE_ID_MATCH_DEVICE,
-+	.idVendor		= 0x04DD,
-+	.idProduct		= 0x8007,	/* C-700 */
-+	ZAURUS_FAKE_INTERFACE,
-+	.driver_info = (unsigned long)&bogus_mdlm_info,
-+}, {
-+	.match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
- 		 | USB_DEVICE_ID_MATCH_DEVICE,
- 	.idVendor               = 0x04DD,
- 	.idProduct              = 0x9031,	/* C-750 C-760 */
 
