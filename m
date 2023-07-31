@@ -1,51 +1,53 @@
-Return-Path: <netdev+bounces-22789-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22790-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D848B7694C8
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 13:28:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E96A77694CB
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 13:28:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 889912815F3
-	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 11:28:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A4FC42815FE
+	for <lists+netdev@lfdr.de>; Mon, 31 Jul 2023 11:28:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A40661800D;
-	Mon, 31 Jul 2023 11:28:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D9201800D;
+	Mon, 31 Jul 2023 11:28:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B1E517AAB
-	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 11:28:30 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F4ABC433C9;
-	Mon, 31 Jul 2023 11:28:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5E2618016
+	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 11:28:34 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F28B3C433C7;
+	Mon, 31 Jul 2023 11:28:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690802910;
-	bh=yWa0dDcwG6Nbgl6nLQjO5+oOccBSbimQN1Vs1Yz9KVc=;
-	h=From:To:Cc:Subject:Date:From;
-	b=XCEm4TD5qk/2EQMtpcWH7fxVBrvhjAKXoJPNoHzM6CEgsfsMuwgZIrq+K+jh6FxV8
-	 HNZ/D3BZ7o1xn20XDNNi9UgeWbVjjiYUa7sNHQV0TRKxl26uI417g+1qOoAmU5x/03
-	 NswuRQJF+St3RVsEDBqvS7JdAVVoy1gzlts0p0nz7aoQNtACUsP7OkEFwM/zqtDlG7
-	 xKvVeaUrKR6zDYLHoad+ybIf86El1VBAvk2iUkzjdrGrTzS/FqUPAKkEhoay+bodMQ
-	 veibgu6yz9F3X7uCFqGRxUpP/30oeSbT+g6lyBzFNv6TOywbP3jV45eQRAiEHZem2b
-	 sRwoftFafyxWQ==
+	s=k20201202; t=1690802914;
+	bh=a2b7y3jwDJBHxP3Nwz9b9O2lbE4PY6IpxDDjwH4Wn4g=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=Pc2kg+h98Z83mTMbciQogEVBYaEYCHCeQIwHCUcGxNj9R6eZGQe+8Djv6CKdnM3xm
+	 LYeEDcxhB9nBjaUnNCxooNHUwcNPB6eS7v4T4FTvD1xbCWsuo/Y+Blrw0o5Y+nafCw
+	 XUXCmG9Xir4dkWxHI87x7XhC9vB1T3sSmF83OKxIS42vbp+2W3/LqGqUALtvbEezkT
+	 QjjrQ6cOQClbbh2hVLst/u2qOiDqf6sq+YcaEvhyOgRkGnzsl3GTL0bsmLcNizrEq6
+	 ZQ2YhLnsZasyp1HB2RrgYw9oYptp6CbgKhXWR0bustFBU3lZ3hXkYHGNF/AFDSikr7
+	 cRpXaNQ/4W6jQ==
 From: Leon Romanovsky <leon@kernel.org>
 To: Jakub Kicinski <kuba@kernel.org>
-Cc: Leon Romanovsky <leonro@nvidia.com>,
+Cc: Jianbo Liu <jianbol@nvidia.com>,
 	Steffen Klassert <steffen.klassert@secunet.com>,
+	Leon Romanovsky <leonro@nvidia.com>,
 	Eric Dumazet <edumazet@google.com>,
-	Jianbo Liu <jianbol@nvidia.com>,
 	Mark Bloch <mbloch@nvidia.com>,
 	netdev@vger.kernel.org,
 	Paolo Abeni <pabeni@redhat.com>,
 	Saeed Mahameed <saeedm@nvidia.com>,
 	"David S . Miller" <davem@davemloft.net>,
 	Simon Horman <simon.horman@corigine.com>
-Subject: [PATCH net-next v1 00/13] mlx5 IPsec packet offload support in eswitch mode
-Date: Mon, 31 Jul 2023 14:28:11 +0300
-Message-ID: <cover.1690802064.git.leon@kernel.org>
+Subject: [PATCH net-next v1 01/13] net/mlx5e: Add function to get IPsec offload namespace
+Date: Mon, 31 Jul 2023 14:28:12 +0300
+Message-ID: <ac2982c34f1ed3288d4670cacfd7e1b87a8c96d9.1690802064.git.leon@kernel.org>
 X-Mailer: git-send-email 2.41.0
+In-Reply-To: <cover.1690802064.git.leon@kernel.org>
+References: <cover.1690802064.git.leon@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -54,78 +56,151 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Leon Romanovsky <leonro@nvidia.com>
+From: Jianbo Liu <jianbol@nvidia.com>
 
-Changelog:
-v1:
- * Fixed ipv6 flow steering table destination in IPsec initialization routine.
- * Removed Fixes line from "net/mlx5: Compare with..." patch as this fix
-   is required for this series only.
- * Added patch to enforce same order for HW and SW IPsec flows when TC
-   is involved, which is "host <-> IPsec <-> TC <-> "wire"/switch".
-v0: https://lore.kernel.org/all/cover.1689064922.git.leonro@nvidia.com
+Add function to get namespace in different directions. It will be
+extended for switchdev mode in later patch, but no functionality change
+for now.
 
--------------------------------------------------------------------------
-Hi,
+Signed-off-by: Jianbo Liu <jianbol@nvidia.com>
+Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+---
+ .../mellanox/mlx5/core/en_accel/ipsec_fs.c    | 46 +++++++++----------
+ 1 file changed, 22 insertions(+), 24 deletions(-)
 
-This series from Jianbo adds mlx5 IPsec packet offload support in eswitch
-offloaded mode.
-
-It works exactly like "regular" IPsec, nothing special, except
-now users can switch to switchdev before adding IPsec rules.
-
- devlink dev eswitch set pci/0000:06:00.0 mode switchdev
-
-Same configurations as here:
-https://lore.kernel.org/netdev/cover.1670005543.git.leonro@nvidia.com/
-Packet offload mode:
-  ip xfrm state offload packet dev <if-name> dir <in|out>
-  ip xfrm policy .... offload packet dev <if-name>
-Crypto offload mode:
-  ip xfrm state offload crypto dev <if-name> dir <in|out>
-or (backward compatibility)
-  ip xfrm state offload dev <if-name> dir <in|out>
-
-Thanks
-
-Jianbo Liu (13):
-  net/mlx5e: Add function to get IPsec offload namespace
-  net/mlx5e: Change the parameter of IPsec RX skb handle function
-  net/mlx5e: Prepare IPsec packet offload for switchdev mode
-  net/mlx5e: Refactor IPsec RX tables creation and destruction
-  net/mlx5e: Support IPsec packet offload for RX in switchdev mode
-  net/mlx5e: Handle IPsec offload for RX datapath in switchdev mode
-  net/mlx5e: Refactor IPsec TX tables creation
-  net/mlx5e: Support IPsec packet offload for TX in switchdev mode
-  net/mlx5: Compare with old_dest param to modify rule destination
-  net/mlx5e: Make IPsec offload work together with eswitch and TC
-  net/mlx5e: Modify and restore TC rules for IPSec TX rules
-  net/mlx5e: Add get IPsec offload stats for uplink representor
-  net/mlx5e: Make TC and IPsec offloads mutually exclusive on a netdev
-
- .../net/ethernet/mellanox/mlx5/core/Makefile  |   4 +
- .../ethernet/mellanox/mlx5/core/en/rep/tc.c   |  17 +-
- .../mellanox/mlx5/core/en_accel/ipsec.c       |   2 +
- .../mellanox/mlx5/core/en_accel/ipsec.h       |  65 +-
- .../mellanox/mlx5/core/en_accel/ipsec_fs.c    | 708 +++++++++++++-----
- .../mlx5/core/en_accel/ipsec_offload.c        |   5 +-
- .../mellanox/mlx5/core/en_accel/ipsec_rxtx.c  |  25 +-
- .../mellanox/mlx5/core/en_accel/ipsec_rxtx.h  |   6 +-
- .../net/ethernet/mellanox/mlx5/core/en_rep.c  |   1 +
- .../net/ethernet/mellanox/mlx5/core/en_rx.c   |   3 +-
- .../net/ethernet/mellanox/mlx5/core/en_tc.c   |  47 ++
- .../mellanox/mlx5/core/esw/ipsec_fs.c         | 325 ++++++++
- .../mellanox/mlx5/core/esw/ipsec_fs.h         |  67 ++
- .../net/ethernet/mellanox/mlx5/core/eswitch.h |  17 +
- .../mellanox/mlx5/core/eswitch_offloads.c     | 174 ++++-
- .../net/ethernet/mellanox/mlx5/core/fs_core.c |  14 +-
- include/linux/mlx5/driver.h                   |   2 +
- include/linux/mlx5/eswitch.h                  |   3 +
- include/linux/mlx5/fs.h                       |   2 +
- 19 files changed, 1270 insertions(+), 217 deletions(-)
- create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/esw/ipsec_fs.c
- create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/esw/ipsec_fs.h
-
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec_fs.c b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec_fs.c
+index 47baf983147f..7ec92f0cf1bd 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec_fs.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec_fs.c
+@@ -814,11 +814,20 @@ static void setup_fte_upper_proto_match(struct mlx5_flow_spec *spec, struct upsp
+ 	}
+ }
+ 
+-static int setup_modify_header(struct mlx5_core_dev *mdev, u32 val, u8 dir,
++static enum mlx5_flow_namespace_type ipsec_fs_get_ns(struct mlx5e_ipsec *ipsec, u8 dir)
++{
++	if (dir == XFRM_DEV_OFFLOAD_IN)
++		return MLX5_FLOW_NAMESPACE_KERNEL;
++
++	return MLX5_FLOW_NAMESPACE_EGRESS;
++}
++
++static int setup_modify_header(struct mlx5e_ipsec *ipsec, u32 val, u8 dir,
+ 			       struct mlx5_flow_act *flow_act)
+ {
++	enum mlx5_flow_namespace_type ns_type = ipsec_fs_get_ns(ipsec, dir);
+ 	u8 action[MLX5_UN_SZ_BYTES(set_add_copy_action_in_auto)] = {};
+-	enum mlx5_flow_namespace_type ns_type;
++	struct mlx5_core_dev *mdev = ipsec->mdev;
+ 	struct mlx5_modify_hdr *modify_hdr;
+ 
+ 	MLX5_SET(set_action_in, action, action_type, MLX5_ACTION_TYPE_SET);
+@@ -826,12 +835,10 @@ static int setup_modify_header(struct mlx5_core_dev *mdev, u32 val, u8 dir,
+ 	case XFRM_DEV_OFFLOAD_IN:
+ 		MLX5_SET(set_action_in, action, field,
+ 			 MLX5_ACTION_IN_FIELD_METADATA_REG_B);
+-		ns_type = MLX5_FLOW_NAMESPACE_KERNEL;
+ 		break;
+ 	case XFRM_DEV_OFFLOAD_OUT:
+ 		MLX5_SET(set_action_in, action, field,
+ 			 MLX5_ACTION_IN_FIELD_METADATA_REG_C_0);
+-		ns_type = MLX5_FLOW_NAMESPACE_EGRESS;
+ 		break;
+ 	default:
+ 		return -EINVAL;
+@@ -1024,26 +1031,16 @@ setup_pkt_transport_reformat(struct mlx5_accel_esp_xfrm_attrs *attrs,
+ 	return 0;
+ }
+ 
+-static int setup_pkt_reformat(struct mlx5_core_dev *mdev,
++static int setup_pkt_reformat(struct mlx5e_ipsec *ipsec,
+ 			      struct mlx5_accel_esp_xfrm_attrs *attrs,
+ 			      struct mlx5_flow_act *flow_act)
+ {
++	enum mlx5_flow_namespace_type ns_type = ipsec_fs_get_ns(ipsec, attrs->dir);
+ 	struct mlx5_pkt_reformat_params reformat_params = {};
++	struct mlx5_core_dev *mdev = ipsec->mdev;
+ 	struct mlx5_pkt_reformat *pkt_reformat;
+-	enum mlx5_flow_namespace_type ns_type;
+ 	int ret;
+ 
+-	switch (attrs->dir) {
+-	case XFRM_DEV_OFFLOAD_IN:
+-		ns_type = MLX5_FLOW_NAMESPACE_KERNEL;
+-		break;
+-	case XFRM_DEV_OFFLOAD_OUT:
+-		ns_type = MLX5_FLOW_NAMESPACE_EGRESS;
+-		break;
+-	default:
+-		return -EINVAL;
+-	}
+-
+ 	switch (attrs->mode) {
+ 	case XFRM_MODE_TRANSPORT:
+ 		ret = setup_pkt_transport_reformat(attrs, &reformat_params);
+@@ -1101,14 +1098,14 @@ static int rx_add_rule(struct mlx5e_ipsec_sa_entry *sa_entry)
+ 	setup_fte_esp(spec);
+ 	setup_fte_no_frags(spec);
+ 
+-	err = setup_modify_header(mdev, sa_entry->ipsec_obj_id | BIT(31),
++	err = setup_modify_header(ipsec, sa_entry->ipsec_obj_id | BIT(31),
+ 				  XFRM_DEV_OFFLOAD_IN, &flow_act);
+ 	if (err)
+ 		goto err_mod_header;
+ 
+ 	switch (attrs->type) {
+ 	case XFRM_DEV_OFFLOAD_PACKET:
+-		err = setup_pkt_reformat(mdev, attrs, &flow_act);
++		err = setup_pkt_reformat(ipsec, attrs, &flow_act);
+ 		if (err)
+ 			goto err_pkt_reformat;
+ 		break;
+@@ -1202,7 +1199,7 @@ static int tx_add_rule(struct mlx5e_ipsec_sa_entry *sa_entry)
+ 	case XFRM_DEV_OFFLOAD_PACKET:
+ 		if (attrs->reqid)
+ 			setup_fte_reg_c0(spec, attrs->reqid);
+-		err = setup_pkt_reformat(mdev, attrs, &flow_act);
++		err = setup_pkt_reformat(ipsec, attrs, &flow_act);
+ 		if (err)
+ 			goto err_pkt_reformat;
+ 		break;
+@@ -1259,15 +1256,16 @@ static int tx_add_policy(struct mlx5e_ipsec_pol_entry *pol_entry)
+ {
+ 	struct mlx5_accel_pol_xfrm_attrs *attrs = &pol_entry->attrs;
+ 	struct mlx5_core_dev *mdev = mlx5e_ipsec_pol2dev(pol_entry);
+-	struct mlx5e_ipsec_tx *tx = pol_entry->ipsec->tx;
++	struct mlx5e_ipsec *ipsec = pol_entry->ipsec;
+ 	struct mlx5_flow_destination dest[2] = {};
++	struct mlx5e_ipsec_tx *tx = ipsec->tx;
+ 	struct mlx5_flow_act flow_act = {};
+ 	struct mlx5_flow_handle *rule;
+ 	struct mlx5_flow_spec *spec;
+ 	struct mlx5_flow_table *ft;
+ 	int err, dstn = 0;
+ 
+-	ft = tx_ft_get_policy(mdev, pol_entry->ipsec, attrs->prio);
++	ft = tx_ft_get_policy(mdev, ipsec, attrs->prio);
+ 	if (IS_ERR(ft))
+ 		return PTR_ERR(ft);
+ 
+@@ -1291,7 +1289,7 @@ static int tx_add_policy(struct mlx5e_ipsec_pol_entry *pol_entry)
+ 		if (!attrs->reqid)
+ 			break;
+ 
+-		err = setup_modify_header(mdev, attrs->reqid,
++		err = setup_modify_header(ipsec, attrs->reqid,
+ 					  XFRM_DEV_OFFLOAD_OUT, &flow_act);
+ 		if (err)
+ 			goto err_mod_header;
+@@ -1331,7 +1329,7 @@ static int tx_add_policy(struct mlx5e_ipsec_pol_entry *pol_entry)
+ err_mod_header:
+ 	kvfree(spec);
+ err_alloc:
+-	tx_ft_put_policy(pol_entry->ipsec, attrs->prio);
++	tx_ft_put_policy(ipsec, attrs->prio);
+ 	return err;
+ }
+ 
 -- 
 2.41.0
 
