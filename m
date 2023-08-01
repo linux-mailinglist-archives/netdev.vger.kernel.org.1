@@ -1,137 +1,154 @@
-Return-Path: <netdev+bounces-23205-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23206-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 485D476B4E6
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 14:40:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A93C076B4F7
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 14:44:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F31D12819BB
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 12:40:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5342C28198E
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 12:44:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E291920F94;
-	Tue,  1 Aug 2023 12:40:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4982320FAA;
+	Tue,  1 Aug 2023 12:44:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D41771DDED
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 12:40:43 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6276D1FD0
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 05:40:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1690893641;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fdSmE0KsRkcAPc+N+tgRm738pW2M/sS8fQouKVDmKko=;
-	b=DolBgykFLYZXq6N/x1VDBmV105/wGFI5Zy/78w3BvpwJL0vME8QbAtHeg4dXLyUUAEYdda
-	8TQ+WE5X4hwE8wkO/QZEgHR1mhQw7DOJ46e6BbvOh4YzkrOWpEqCz5oq/UJkKOPRSgz8Z7
-	cM5d6C2hk9j1qeNxiuQVTulGf/TndQ0=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-192-1QObjjXDNfmEubEKL5L97Q-1; Tue, 01 Aug 2023 08:40:37 -0400
-X-MC-Unique: 1QObjjXDNfmEubEKL5L97Q-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4FA53185A792;
-	Tue,  1 Aug 2023 12:40:36 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.131])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 72517492B01;
-	Tue,  1 Aug 2023 12:40:34 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <64c7acd57270c_169cd129420@willemb.c.googlers.com.notmuch>
-References: <64c7acd57270c_169cd129420@willemb.c.googlers.com.notmuch> <64c6672f580e3_11d0042944e@willemb.c.googlers.com.notmuch> <20230718160737.52c68c73@kernel.org> <000000000000881d0606004541d1@google.com> <0000000000001416bb06004ebf53@google.com> <792238.1690667367@warthog.procyon.org.uk> <831028.1690791233@warthog.procyon.org.uk>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: dhowells@redhat.com, Jakub Kicinski <kuba@kernel.org>,
-    syzbot <syzbot+f527b971b4bdc8e79f9e@syzkaller.appspotmail.com>,
-    bpf@vger.kernel.org, brauner@kernel.org, davem@davemloft.net,
-    dsahern@kernel.org, edumazet@google.com,
-    linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-    netdev@vger.kernel.org, pabeni@redhat.com,
-    syzkaller-bugs@googlegroups.com, viro@zeniv.linux.org.uk
-Subject: Re: Endless loop in udp with MSG_SPLICE_READ - Re: [syzbot] [fs?] INFO: task hung in pipe_release (4)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EC20111E
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 12:44:21 +0000 (UTC)
+Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A77151FD2;
+	Tue,  1 Aug 2023 05:44:19 -0700 (PDT)
+Received: by mail-lf1-x135.google.com with SMTP id 2adb3069b0e04-4fe28f92d8eso4560058e87.1;
+        Tue, 01 Aug 2023 05:44:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1690893858; x=1691498658;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=o6luXjnOL4UWMb4FJX9zuO9FE/E5YxfEl36iSelVa4c=;
+        b=SlFkjkMfmEh0jUneuZW2U10pB6Q33WGnT0VGl4bR+6rW99eLlJ2wFCITS+0BZXTYgT
+         EkKcUv50/sv8/jtH07gjmwr/HK/9lc0zFHinorSzWU7qOVDKtuJFLJVoo662CYgLE0wd
+         W+RLD29pvKI1I3Hmz4JlpA1MHiKrJVldwX0gsoJGstZJOzNOa7516GIAMicdJtW4x9uc
+         Rt6DquwgjZWbT9mSJzbqFxrnIaq9Qt9yNy5gnF6bcooHRLEI+YZanjmLNUy9Qk+MHY/m
+         Gu1kw4SAafKmS/uKdnShHYrwQGfA/DXOvGDkT5wh7F4uin4q4zAiOgs4HdMF3WIAQi9T
+         qCog==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690893858; x=1691498658;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=o6luXjnOL4UWMb4FJX9zuO9FE/E5YxfEl36iSelVa4c=;
+        b=XNgpWCfzyyvIvcTEEmFyuGUkHLBov9qTMbcjaXgG1ZN4RX2Oow2odoV6imyKOesAEz
+         zMRbBcmWkclb9jixkdzno/HNIOa8ZvG+/dYunuUR5qLmYzlaQopWrMNt4Kw4TYam8NXQ
+         5ZtEJUsmkobBqh4upuHkHh5ZRgF5XV3rnOUhwqYN4IWXf7ssWq2mELpd4UZD8oHFibjb
+         fosMty23SY93VBPb0WENsqzwKEFvfyp/ifhGzkS4tDx00hvYZU46lP4E8saHBJ/jf9S0
+         ow6Ra2CTZB5pzltPKqgE6i2Ly8Xp4hpdFhN/Lvo+mdK73R1H+OTI9fs5vqYVpmm1t+q3
+         8VXA==
+X-Gm-Message-State: ABy/qLZBf/7l/CWo+G5YqsW2NcBRTAQRVGXr14hNOY6D80OtzBPRhlXY
+	upaOI+TZE/xB+EKAMAmU5Yk=
+X-Google-Smtp-Source: APBJJlHYhz66RVjuzfSMeHujrdx/3uLoId0vY1yuRrV230W6AQ6T4powR9bm4Ezjf/yVuw0wdqZ2bA==
+X-Received: by 2002:a05:6512:20c1:b0:4fd:faa3:2352 with SMTP id u1-20020a05651220c100b004fdfaa32352mr1871037lfr.14.1690893857660;
+        Tue, 01 Aug 2023 05:44:17 -0700 (PDT)
+Received: from [172.16.196.206] ([213.255.186.46])
+        by smtp.gmail.com with ESMTPSA id 3-20020ac24843000000b004fe2de20d88sm1401034lfy.232.2023.08.01.05.44.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 01 Aug 2023 05:44:17 -0700 (PDT)
+Message-ID: <ee0341fc-b621-b7c0-4312-be2ad3c29da6@gmail.com>
+Date: Tue, 1 Aug 2023 15:44:16 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1401695.1690893633.1@warthog.procyon.org.uk>
-Date: Tue, 01 Aug 2023 13:40:33 +0100
-Message-ID: <1401696.1690893633@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-	autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: [PATCH v8 7/8] net-next: mvpp2: relax return value check for IRQ
+ get
+Content-Language: en-US, en-GB
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Matti Vaittinen <matti.vaittinen@fi.rohmeurope.com>,
+ Marcin Wojtas <mw@semihalf.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <cover.1690890774.git.mazziesaccount@gmail.com>
+ <9738e169d83a96f18de417e62b3cf4c20f51f885.1690890774.git.mazziesaccount@gmail.com>
+ <ZMj7Cp3fhN7GmCZp@shell.armlinux.org.uk>
+From: Matti Vaittinen <mazziesaccount@gmail.com>
+In-Reply-To: <ZMj7Cp3fhN7GmCZp@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-The more I look at __ip_append_data(), the more I think the maths is wrong.
-In the bit that allocates a new skbuff:
+On 8/1/23 15:31, Russell King (Oracle) wrote:
+> On Tue, Aug 01, 2023 at 03:04:24PM +0300, Matti Vaittinen wrote:
+>> fwnode_irq_get[_byname]() were changed to not return 0 anymore.
+>>
+>> Drop check for return value 0.
+>>
+>> Signed-off-by: Matti Vaittinen <mazziesaccount@gmail.com>
+> 
+> Sorry, but I don't think you've properly considered the effects of your
+> patch.
 
-	if (copy <= 0) {
-	...
-		datalen = length + fraggap;
-		if (datalen > mtu - fragheaderlen)
-			datalen = maxfraglen - fragheaderlen;
-		fraglen = datalen + fragheaderlen;
-		pagedlen = 0;
-	...
-		if ((flags & MSG_MORE) &&
-		    !(rt->dst.dev->features&NETIF_F_SG))
-	...
-		else if (!paged &&
-			 (fraglen + alloc_extra < SKB_MAX_ALLOC ||
-			  !(rt->dst.dev->features & NETIF_F_SG)))
-	...
-		else {
-			alloclen = fragheaderlen + transhdrlen;
-			pagedlen = datalen - transhdrlen;
-		}
-	...
+Don't be sorry.
 
-In the MSG_SPLICE_READ but not MSG_MORE case, we go through that else clause.
-The values used here, a few lines further along:
+> 
+>> @@ -5833,7 +5833,7 @@ static int mvpp2_multi_queue_vectors_init(struct mvpp2_port *port,
+>>   			v->irq = of_irq_get_byname(port_node, irqname);
+>>   		else
+>>   			v->irq = fwnode_irq_get(port->fwnode, i);
+>> -		if (v->irq <= 0) {
+>> +		if (v->irq < 0) {
+> 
+> You're making this change based on the assumption that fwnode_irq_get()
+> has changed its return values, but I really don't think you've looked
+> at the code and considered the return value behaviour of the DT function
+> above. Reading it's documentation, it states that of_irq_get_byname()
+> may return 0 on IRQ mapping failure.
 
-		copy = datalen - transhdrlen - fraggap - pagedlen;
+You're correct. Thanks for spotting this! Seems like I really overlooked 
+the behaviour of the of_irq_get_byname().
 
-are constant over the intervening span.  This means that, provided the splice
-isn't going to exceed the MTU on the second fragment, the calculation of
-'copy' can then be simplified algebraically thus:
+> So, by making this change, you are allowing IRQ mapping failure in the
+> DT path to succeed rather than fail.
+> 
+>>   			ret = -EINVAL;
+>>   			goto err;
+>>   		}
+>> @@ -6764,7 +6764,7 @@ static int mvpp2_port_probe(struct platform_device *pdev,
+>>   		err = -EPROBE_DEFER;
+>>   		goto err_deinit_qvecs;
+>>   	}
+>> -	if (port->port_irq <= 0)
+>> +	if (port->port_irq < 0)
+> 
+> Exactly the same problem here, but...
+> 
+>>   		/* the link irq is optional */
+>>   		port->port_irq = 0;
+> 
+> this is less critical... but still wrong.
+> 
+> So, given that this patch is basically incorrect...
+> 
+> NAK.
+> 
 
-		copy = (length + fraggap) - transhdrlen - fraggap - pagedlen;
+-- 
+Matti Vaittinen
+Linux kernel developer at ROHM Semiconductors
+Oulu Finland
 
-		copy = length - transhdrlen - pagedlen;
-
-		copy = length - transhdrlen - (datalen - transhdrlen);
-
-		copy = length - transhdrlen - datalen + transhdrlen;
-
-		copy = length - datalen;
-
-		copy = length - (length + fraggap);
-
-		copy = length - length - fraggap;
-
-		copy = -fraggap;
-
-I think we might need to recalculate copy after the conditional call to
-getfrag().  Possibly we should skip that entirely for MSG_SPLICE_READ.  The
-root seems to be that we're subtracting pagedlen from datalen - but probably
-we shouldn't be doing getfrag() if pagedlen > 0.
-
-David
+~~ When things go utterly wrong vim users can always type :help! ~~
 
 
