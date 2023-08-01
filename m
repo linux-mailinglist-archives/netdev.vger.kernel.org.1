@@ -1,154 +1,225 @@
-Return-Path: <netdev+bounces-23341-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23342-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBC5C76BA00
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 18:53:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE5F776BA16
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 18:54:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 39D1D281AA0
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 16:53:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AE18F1C20FE1
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 16:54:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7601B200DA;
-	Tue,  1 Aug 2023 16:53:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F31720F83;
+	Tue,  1 Aug 2023 16:54:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 622C1200AC
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 16:53:55 +0000 (UTC)
-Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05on2073.outbound.protection.outlook.com [40.107.20.73])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 103A12114;
-	Tue,  1 Aug 2023 09:53:54 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=LQ/DEVNraQyf+RLWomRh2UFAssdI+2B8g5euZzAwVE/4NyA0LmDohEQdni1kvCn1PUQotFJzhXFKeTc5pZEW3n+3c+9J8cEDLJ2G+nyc/A6jgUlzPn+T87JpVuHGwy2s9tYCoaGvk3aJBkNVrWZhs7PzWhmSSmjP84ZX7Uwk7xlYA2XKihif4dbUWhgz2ouG9Z9lufrgAQK6Mukz+0pZ5gATKTA6qvVLNcSXaCpecVIxd0ROUqFOgF+pUNqfvGrZf3Hx4lWIp9FIXBhXCojBRc2G0Tz0b1+lYr7oMV00ZFF7ieIMIN5oyUL3/S0I7oaiGpZjQzcx6nrZHYVRPUD50Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=EKQUs0KNzJVUD2HOAXcz/OwWukfqP5igzI7Fqy9VsF8=;
- b=Wy1OFjWv2zzlcyDsNCH2Uho66QQLcpsfUIxZrPRXhFr6yBMZkGnzdo+CPlcbyKGXulQrtf5phU4FZ0OwDVNtiz6Vzw591mI2dtjq4ixu5lXF1MChcRtq1EdJiLS3vQ6VVetdVw17jvwkpskk/BI2r9kTpa1gye1xsQxEt5C58ZPFIS5lsfvGjliP/KhV14cxHhjjrrptv0I0bG6zxOTF16/9n1FBjGjmeHQNmAXLm8gf6BqilcIJmWKvOgIhlProbvl8fAbR6ymrgDvxeE1ZA6GG8ChM5owIoS9tNKkKKXd14cSnyg2DVDEQkBTVHHZ9RURAsFRwc9/5o5n0Y6ouzQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=EKQUs0KNzJVUD2HOAXcz/OwWukfqP5igzI7Fqy9VsF8=;
- b=Dt5ItyPK6qLg3u72OrwR0/cIogRcylYAtalyGYMBprZKREWKI08Tm5Rdh8HHaVmGN6J8TjLBkvYBx/0IqDmqs98MXj+MSQqnUWEezeUFkVzGAmJq97TClJK58DF0QgpqAinUBKYg/kJtyeJPeVf+T9MFW/+C5ZQo89V4PNVF2HM=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from DB8PR04MB6459.eurprd04.prod.outlook.com (2603:10a6:10:103::19)
- by VE1PR04MB7229.eurprd04.prod.outlook.com (2603:10a6:800:1a3::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.44; Tue, 1 Aug
- 2023 16:53:51 +0000
-Received: from DB8PR04MB6459.eurprd04.prod.outlook.com
- ([fe80::ceae:2c83:659e:a891]) by DB8PR04MB6459.eurprd04.prod.outlook.com
- ([fe80::ceae:2c83:659e:a891%5]) with mapi id 15.20.6631.043; Tue, 1 Aug 2023
- 16:53:51 +0000
-Date: Tue, 1 Aug 2023 19:53:44 +0300
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: Pedro Tammela <pctammela@mojatatu.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
-	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
-	linux-kernel@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
-	Muhammad Husaini Zulkifli <muhammad.husaini.zulkifli@intel.com>,
-	Peilin Ye <yepeilin.cs@gmail.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Zhengchao Shao <shaozhengchao@huawei.com>,
-	Maxim Georgiev <glipus@gmail.com>
-Subject: Re: [PATCH v2 net-next 9/9] selftests/tc-testing: verify that a
- qdisc can be grafted onto a taprio class
-Message-ID: <20230801165344.3rtleamaqxr2g27k@skbuf>
-References: <20230613215440.2465708-1-vladimir.oltean@nxp.com>
- <20230613215440.2465708-10-vladimir.oltean@nxp.com>
- <02c5d2f3-225f-fd56-6540-00a80326d07f@mojatatu.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <02c5d2f3-225f-fd56-6540-00a80326d07f@mojatatu.com>
-X-ClientProxiedBy: PA7P264CA0085.FRAP264.PROD.OUTLOOK.COM
- (2603:10a6:102:349::11) To DB8PR04MB6459.eurprd04.prod.outlook.com
- (2603:10a6:10:103::19)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CAE02CA5
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 16:54:50 +0000 (UTC)
+Received: from domac.alu.hr (domac.alu.unizg.hr [161.53.235.3])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85B702690;
+	Tue,  1 Aug 2023 09:54:47 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+	by domac.alu.hr (Postfix) with ESMTP id 0243F6017E;
+	Tue,  1 Aug 2023 18:54:45 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
+	t=1690908885; bh=Yx04bmdoZMNOkKPZgrflGP2jjq18mCy2PcLID61NEg4=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=ry2EiIzf4v6rJBWhXoyUNgQp/WI8xzniFrMPmXFfSDZPVTP5tuRv9Fv2l2KxfFU/o
+	 RTct1KQoeF5VSiLEshMAbjx4Q3HCDF1zRwwANTmQEohb806K6WWmh3SxuVEfg5P1dE
+	 s7+Ahb1BJU9WDP7iXTn5iSju68kZcLy1Mb4U5lFboZBRfxYQ6XKX9kX2iO7Ul17031
+	 Pbmr0pNKEE8AQ7JBVUBu/pjqlGRC5Pt5PFIw+T0G2vgWMMWBAn3w4SYMKLfWg9e9D4
+	 7aywMYclIkqHj/cp3nq9HPqB/c1fhKwnmWSca95zUEO9SsPzYek1tZ8E5dfilglfuv
+	 IRPSCUhJTvdAg==
+X-Virus-Scanned: Debian amavisd-new at domac.alu.hr
+Received: from domac.alu.hr ([127.0.0.1])
+	by localhost (domac.alu.hr [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id ExkLY74uPblc; Tue,  1 Aug 2023 18:54:42 +0200 (CEST)
+Received: from [192.168.1.6] (unknown [94.250.191.183])
+	by domac.alu.hr (Postfix) with ESMTPSA id 9CF676015F;
+	Tue,  1 Aug 2023 18:54:41 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
+	t=1690908882; bh=Yx04bmdoZMNOkKPZgrflGP2jjq18mCy2PcLID61NEg4=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=ZrNwC/6uMPdjMV2AavDStfBkqP0L9rUdwl6Nmilk31m4RABneeSgiUDTBa/CLdjOA
+	 rT2BbtzNwHsCg5cI4ulhiV+mKom/d7JNiciPtJ28Qa9NSJzsaLSIRmoi/pqNQAAzBE
+	 4LNy6MAL95Lz3oppS5T8K0j6TPCPDDt+rr5ViM35dT5avXJ+gSiIPPI+Q6c9FDpvEq
+	 K6xx7ss1T0xgZ4QDb59CAnKjN27xN4vK/t26LbfoxBmNkdwRtlEV6B3MANQECrVOhf
+	 K/jIvPo5u+cjdNEDrD3nP7fK4s3uhWq1AomqB6RAxvGTj8e+wVuZBqVqzyzgppqKsu
+	 foUZ4QJ1raobA==
+Message-ID: <304ba960-0214-82d4-05be-e5956baa64c7@alu.unizg.hr>
+Date: Tue, 1 Aug 2023 18:54:41 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DB8PR04MB6459:EE_|VE1PR04MB7229:EE_
-X-MS-Office365-Filtering-Correlation-Id: a098c188-531d-4555-3546-08db92afe079
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	SJ8aY9/gqbK7OkyxsIQlNWsuQL/DWIeIGEv+vTaJPg48ZpXdj0nOCxSEhlB6C13sXAMLqXDlMfAQS7ZxeFDc1N6pG4e1qjjNdK6GvgHQi0BFjSoDrh398/qcFKQoScZ4HykO7xlc51+hMLJSXWbyV82MXJ6nQVqOnh1N45vkePOUSnLbSAvyFTLf6QqirKvEMKjcMKy9OcqSBZmhwhiSWNNrKa3uOAkNsBqRq0aonqdE1BkCpBbxckPm+sYr5iagU70ZEJUQVTefEc/ZbBNiFmgNuoQXrUHrci6PCPamNzMnNSDOlQW6yUvz5HCdqOiSAnLMZgZ7Bq0YWlFgyqe8mdLExxMH/sD+5yq9cVLGFuf2GgQo0dWciQ5EVeVyiGF175W3Mh3QHI/chQwpl6/5ExtRoEalQk164xg+M2YjNNT/uJFhV8ypGQpldc19GlgeOUtpoL49kqzErTddjkBCQSqAs2Qg8s+eOShOeHrsORgX31KggV4GVjD8Z7SrIHd1fF3dddwUKqggNyGOgqZMJiTT7oOgXwb39RkCgfPekxLzOWtqGYBOw3IIgZvP4Zsx
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DB8PR04MB6459.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(7916004)(4636009)(136003)(346002)(39860400002)(396003)(366004)(376002)(451199021)(8676002)(33716001)(8936002)(38100700002)(86362001)(26005)(41300700001)(15650500001)(4744005)(2906002)(83380400001)(6506007)(1076003)(44832011)(186003)(5660300002)(7416002)(6916009)(4326008)(66476007)(66556008)(66946007)(6512007)(9686003)(54906003)(6666004)(478600001)(6486002)(316002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?SpIp6aoGO1L1E8gom1KFshFTBzYvxqqp8cK8hzkVNfLHte2GG2Ugpe8IfG/9?=
- =?us-ascii?Q?IrTdaRwPoqqOj4Aj2XoDdBEZ2TgyfcydosAig3jIWL4uh0VeAJtnl3iBY1lC?=
- =?us-ascii?Q?GTc+Sh5zjYSwsuTVpV3zktRjZqANsyPRot+Qe9KWvIxJYW0gZMTVJ7C/8XtL?=
- =?us-ascii?Q?3DsDjERqRebOVveMVl9YvMt6k1SFAlf9ljjlC1rQ6DK4bKToq0tHMypIJ/l4?=
- =?us-ascii?Q?YUhb6nJ+h2GUOkpcNJJnG0XBjvvCvEmuomD3qDd2kL4txdhSnPDWONRk1W47?=
- =?us-ascii?Q?r+q+9B5w4V35ue+bWIodbsxQQ6vXe1XQifh4k0dRoWfCG8hCADBdWg3CNWzO?=
- =?us-ascii?Q?rSqG4WYkhCTIGXDCm2S5Mrm53tyrDt+BbAodugb/PnWwIfx+OKQjxSABkqFd?=
- =?us-ascii?Q?E2lRIXbzX8Vkgq1EZJN8X3ICHsAL0nEYwiiYVYM6PspxY01Thy5XZzDEQXHI?=
- =?us-ascii?Q?72nyT386aqQzWvGYxKwymhqhO2P5dUtYohwd3Qog7SityZc3/BnortrPI7uI?=
- =?us-ascii?Q?0e4LpWEJPiA2XooZi/Ld1IoRWBIpiAFkEjAWshfKgPBU5NLGaM2OTKTnDIc1?=
- =?us-ascii?Q?CAYhCUl4G6AL89w+jlIxK5ixzTNK9CirRpWM0dXuJMEzouKJ8jGTUe3DpWzj?=
- =?us-ascii?Q?O8PFsFXmcMvY4728mpt054/S9eRbUkVN95ivLOvYJc26yJ7jfJV1Rrux0sA/?=
- =?us-ascii?Q?ST86ckBXuzIz2f4N2CGmsVhFGuhHydPWBp+kHrGyjI1N0Jm21FCp1+FI+kys?=
- =?us-ascii?Q?G58LbyfH1cOeao88rcDNN2ON0EC+QeXQXdGbt/71FSQAiHolw9ySkCu/yMmX?=
- =?us-ascii?Q?KUR1YNJNEuRQdIuQyILx3591FWYZ1eBTgtzTzN0DDuWhhWh64paLjtpzb2qF?=
- =?us-ascii?Q?ocbooVzBlfNqPCqd5bWL/u7vi+h9a4mHQ0Q2dnRR0asEMiPvWXlZbWlSxoeX?=
- =?us-ascii?Q?0d9druW7IR0R75q9nUl3adJoebl1GVSC3DsB6ctWlXDH3Zvj4hG81/CWJdNg?=
- =?us-ascii?Q?AgKq9SX+6AbKusEEzhuBIy6xPE/h0OG5J3/KeLSQMTLvjKgFNH2xZqmkxYGC?=
- =?us-ascii?Q?+3v9JoMHgnEDYTz11n0ys7zCSl/eCyOZ2QJCfM9SW3Jq9KDXvth6Zu1tb33V?=
- =?us-ascii?Q?mKEA9a49d+OBo9YCHX/tXKxOBfXqQ4woo94sgGSIPcx0E4ID188iA8el19VT?=
- =?us-ascii?Q?dbCLv5K+SZhQekes4H9T0K5BhhAaq/xBRxLW/IBimGY9LGPm5XNz1YfAGLfY?=
- =?us-ascii?Q?YmlgmniiArnNwI8wIDVlwXGcdwMgKz8zpDmQqpgLW1H8uZr2g31/nsd87uLf?=
- =?us-ascii?Q?twJQxhcJY8AmG9g4yuPB7V8BuAWNqdUNtcafGx2qI3u6OkL60LvwtlaO1feR?=
- =?us-ascii?Q?r3vyqZljdnVIlqbXV7MhSYvNMzkilvyJhbmeJ+A3H3fOb0IvGaGzs5uQ0PBX?=
- =?us-ascii?Q?3j7DVQpoB+7UIRPkAGzeMjtlAUi9vAFaDugGgdHUeZRDDwRCSpX6t+50Y47O?=
- =?us-ascii?Q?9XJVaebKzHaQfy5TKa+m6vT9N34GqekS6zyIJYGYoGx7HxiW//p5W15sZKL0?=
- =?us-ascii?Q?gveccAssSaDnFkgJjsa5QnY0s1pMUkhg25B/YqJfXkTgMZsqfAgaT1s61khs?=
- =?us-ascii?Q?tw=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a098c188-531d-4555-3546-08db92afe079
-X-MS-Exchange-CrossTenant-AuthSource: DB8PR04MB6459.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Aug 2023 16:53:51.4741
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: IOSLV3IWPCQxeGczcZCSpL+7t6q83XCRPRLChzaQnuKbpaTZ3bSOdgtmmgcVT9ssNFzjeGIKAnIpd9FTdovObw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VE1PR04MB7229
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.1
+Subject: Re: [PATCH v1 01/11] selftests: forwarding: custom_multipath_hash.sh:
+ add cleanup for SIGTERM sent by timeout
+Content-Language: en-US
+To: Petr Machata <petrm@nvidia.com>, Ido Schimmel <idosch@idosch.org>
+Cc: razor@blackwall.org, Ido Schimmel <idosch@nvidia.com>,
+ netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>
+References: <20230722003609.380549-1-mirsad.todorovac@alu.unizg.hr>
+ <ZLzj5oYrbHGvCMkq@shredder>
+ <0550924e-dce9-f90d-df8a-db810fd2499f@alu.unizg.hr>
+ <adc5e40d-d040-a65e-eb26-edf47dac5b02@alu.unizg.hr>
+ <ZL6OljQubhVtQjcD@shredder>
+ <cab8ea8a-98f4-ef9b-4215-e2a93cccaab1@alu.unizg.hr>
+ <ZMEQGIOQXv6so30x@shredder>
+ <a9b6d9f5-14ae-a931-ab7b-d31b5e40f5df@alu.unizg.hr>
+ <ZMYXABUN9OzfN5D3@shredder> <875y5zf27p.fsf@nvidia.com>
+From: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
+In-Reply-To: <875y5zf27p.fsf@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Jun 14, 2023 at 01:45:42PM -0300, Pedro Tammela wrote:
-> > +        "cmdUnderTest": "$TC qdisc replace dev $ETH handle 8002: parent 8001:8 cbs idleslope 20000 sendslope -980000 hicredit 30 locredit -1470",
-> > +        "expExitCode": "0",
-> > +        "verifyCmd": "$TC -d qdisc show dev $ETH",
-> > +        "matchPattern": "qdisc cbs 8002: parent 8001:8 hicredit 30 locredit -1470 sendslope -980000 idleslope 20000 offload 0",
+On 8/1/23 13:08, Petr Machata wrote:
 > 
-> Seems like this test is missing the 'refcnt 2' in the match pattern
+> Ido Schimmel <idosch@idosch.org> writes:
+> 
+>> On Thu, Jul 27, 2023 at 09:26:03PM +0200, Mirsad Todorovac wrote:
+>>> not ok 49 selftests: net/forwarding: mirror_gre_changes.sh # exit=1
+>>
+>> Petr, please take a look. Probably need to make the filters more
+>> specific. The failure is:
+>>
+>> # TEST: mirror to gretap: TTL change (skip_hw)                        [FAIL]
+>> # 	Expected to capture 10 packets, got 14.
+> 
+> Yeah, this reproduces easily on my laptop. The switches are somehow much
+> more quiet and do not really hit the issue.
+> 
+> Mirsad, can you please try this patch? It fixes the issue for me.
+> 
+>>From 77461c209eb0067dca7fdf4431a907b2a1ce8c6a Mon Sep 17 00:00:00 2001
+> Message-ID: <77461c209eb0067dca7fdf4431a907b2a1ce8c6a.1690887929.git.petrm@nvidia.com>
+> From: Petr Machata <petrm@nvidia.com>
+> Date: Tue, 1 Aug 2023 12:57:53 +0200
+> Subject: [PATCH net-next] selftests: mirror_gre_changes: Tighten up the TTL
+>   test match
+> To: <netdev@vger.kernel.org>
+> 
+> This test verifies whether the encapsulated packets have the correct
+> configured TTL. It does so by sending ICMP packets through the test
+> topology and mirroring them to a gretap netdevice. On a busy host
+> however, more than just the test ICMP packets may end up flowing
+> through the topology, get mirrored, and counted. This leads to
+> potential spurious failures as the test observes much more mirrored
+> packets than the sent test packets, and assumes a bug.
+> 
+> Fix this by tightening up the mirror action match. Change it from
+> matchall to a flower classifier matching on ICMP packets specifically.
+> 
+> Signed-off-by: Petr Machata <petrm@nvidia.com>
+> ---
+>   tools/testing/selftests/net/forwarding/mirror_gre_changes.sh | 3 ++-
+>   1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/tools/testing/selftests/net/forwarding/mirror_gre_changes.sh b/tools/testing/selftests/net/forwarding/mirror_gre_changes.sh
+> index aff88f78e339..5ea9d63915f7 100755
+> --- a/tools/testing/selftests/net/forwarding/mirror_gre_changes.sh
+> +++ b/tools/testing/selftests/net/forwarding/mirror_gre_changes.sh
+> @@ -72,7 +72,8 @@ test_span_gre_ttl()
+>   
+>   	RET=0
+>   
+> -	mirror_install $swp1 ingress $tundev "matchall $tcflags"
+> +	mirror_install $swp1 ingress $tundev \
+> +		"prot ip flower $tcflags ip_prot icmp"
+>   	tc filter add dev $h3 ingress pref 77 prot $prot \
+>   		flower skip_hw ip_ttl 50 action pass
+>   
 
-Makes sense. This is consistent with the idea of my patch set, which is
-that in offloaded taprio mode, each child Qdisc has a refcount elevated
-by the fact that it's attached to a netdev TX queue (hence the 2 here).
-I had copied this expected output from the "Graft cbs as child of software
-taprio" test a7bf (not sure why I didn't catch the failure), but there,
-the expected refcount of child Qdiscs is 1 (and thus, not shown).
+The problem seems to be fixed in the test run:
+
+root@defiant:tools/testing/selftests/net/forwarding# ./mirror_gre_changes.sh
+TEST: mirror to gretap: TTL change (skip_hw)                        [ OK ]
+TEST: mirror to ip6gretap: TTL change (skip_hw)                     [ OK ]
+TEST: mirror to gretap: tunnel down/up (skip_hw)                    [ OK ]
+TEST: mirror to ip6gretap: tunnel down/up (skip_hw)                 [ OK ]
+TEST: mirror to gretap: egress down/up (skip_hw)                    [ OK ]
+TEST: mirror to ip6gretap: egress down/up (skip_hw)                 [ OK ]
+TEST: mirror to gretap: remote address change (skip_hw)             [ OK ]
+TEST: mirror to ip6gretap: remote address change (skip_hw)          [ OK ]
+TEST: mirror to gretap: tunnel deleted (skip_hw)                    [ OK ]
+TEST: mirror to ip6gretap: tunnel deleted (skip_hw)                 [ OK ]
+TEST: mirror to gretap: underlay route removal (skip_hw)            [ OK ]
+TEST: mirror to ip6gretap: underlay route removal (skip_hw)         [ OK ]
+WARN: Could not test offloaded functionality
+root@defiant:tools/testing/selftests/net/forwarding#
+
+That leaves us with one more tests to fix:./bridge_vlan_mcast.sh
+
+# ./bridge_vlan_mcast.sh
+
+TEST: Vlan mcast_startup_query_interval global option default value   [FAIL]
+         Wrong default mcast_startup_query_interval global vlan option value
+
+
+[...]
+
++ bridge vlan global set vid 10 dev br0 mcast_snooping 1 mcast_last_member_interval 100
++ for current_test in ${TESTS:-$ALL_TESTS}
++ vlmc_startup_query_test
++ RET=0
+++ bridge -j vlan global show
++ local 'goutput=[{"ifname":"br0","vlans":[{"vlan":1,"mcast_snooping":1,"mcast_querier":0,"mcast_igmp_version":2,"mcast_mld_version":1,"mcast_last_member_count":2,"mcast_last_member_interval":100,"mcast_startup_query_count":2,"mcast_startup_query_
+interval":3124,"mcast_membership_interval":26000,"mcast_querier_interval":25500,"mcast_query_interval":12500,"mcast_query_response_interval":1000},{"vlan":10,"vlanEnd":11,"mcast_snooping":1,"mcast_querier":0,"mcast_igmp_version":2,"mcast_mld_versi
+on":1,"mcast_last_member_count":2,"mcast_last_member_interval":100,"mcast_startup_query_count":2,"mcast_startup_query_interval":3124,"mcast_membership_interval":26000,"mcast_querier_interval":25500,"mcast_query_interval":12500,"mcast_query_respons
+e_interval":1000}]}]'
++ jq -e '.[].vlans[] | select(.vlan == 10)'
++ echo -n '[{"ifname":"br0","vlans":[{"vlan":1,"mcast_snooping":1,"mcast_querier":0,"mcast_igmp_version":2,"mcast_mld_version":1,"mcast_last_member_count":2,"mcast_last_member_interval":100,"mcast_startup_query_count":2,"mcast_startup_query_interv
+al":3124,"mcast_membership_interval":26000,"mcast_querier_interval":25500,"mcast_query_interval":12500,"mcast_query_response_interval":1000},{"vlan":10,"vlanEnd":11,"mcast_snooping":1,"mcast_querier":0,"mcast_igmp_version":2,"mcast_mld_version":1,
+"mcast_last_member_count":2,"mcast_last_member_interval":100,"mcast_startup_query_count":2,"mcast_startup_query_interval":3124,"mcast_membership_interval":26000,"mcast_querier_interval":25500,"mcast_query_interval":12500,"mcast_query_response_inte
+rval":1000}]}]'
++ check_err 0 'Could not find vlan 10'\''s global options'
++ local err=0
++ local 'msg=Could not find vlan 10'\''s global options'
++ [[ 0 -eq 0 ]]
++ [[ 0 -ne 0 ]]
++ jq -e '.[].vlans[] | select(.vlan == 10 and                                       .mcast_startup_query_interval == 3125) '
++ echo -n '[{"ifname":"br0","vlans":[{"vlan":1,"mcast_snooping":1,"mcast_querier":0,"mcast_igmp_version":2,"mcast_mld_version":1,"mcast_last_member_count":2,"mcast_last_member_interval":100,"mcast_startup_query_count":2,"mcast_startup_query_interv
+al":3124,"mcast_membership_interval":26000,"mcast_querier_interval":25500,"mcast_query_interval":12500,"mcast_query_response_interval":1000},{"vlan":10,"vlanEnd":11,"mcast_snooping":1,"mcast_querier":0,"mcast_igmp_version":2,"mcast_mld_version":1,
+"mcast_last_member_count":2,"mcast_last_member_interval":100,"mcast_startup_query_count":2,"mcast_startup_query_interval":3124,"mcast_membership_interval":26000,"mcast_querier_interval":25500,"mcast_query_interval":12500,"mcast_query_response_inte
+rval":1000}]}]'
++ check_err 4 'Wrong default mcast_startup_query_interval global vlan option value'
++ local err=4
++ local 'msg=Wrong default mcast_startup_query_interval global vlan option value'
++ [[ 0 -eq 0 ]]
++ [[ 4 -ne 0 ]]
++ RET=4
++ retmsg='Wrong default mcast_startup_query_interval global vlan option value'
++ log_test 'Vlan mcast_startup_query_interval global option default value'
++ local 'test_name=Vlan mcast_startup_query_interval global option default value'
++ local opt_str=
++ [[ 1 -eq 2 ]]
++ [[ 4 -ne 0 ]]
++ EXIT_STATUS=1
++ printf 'TEST: %-60s  [FAIL]\n' 'Vlan mcast_startup_query_interval global option default value '
+TEST: Vlan mcast_startup_query_interval global option default value   [FAIL]
++ [[ ! -z Wrong default mcast_startup_query_interval global vlan option value ]]
++ printf '\t%s\n' 'Wrong default mcast_startup_query_interval global vlan option value'
+         Wrong default mcast_startup_query_interval global vlan option value
+
+[...]
+
+Hope this helps.
+
+Kind regards,
+Mirsad
 
