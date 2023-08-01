@@ -1,121 +1,242 @@
-Return-Path: <netdev+bounces-23425-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23426-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82A1176BEF0
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 23:05:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34F5776BEFB
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 23:10:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A4C9B1C21061
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 21:05:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DDF7828194F
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 21:10:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 372DC263AE;
-	Tue,  1 Aug 2023 21:05:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 361FF263D7;
+	Tue,  1 Aug 2023 21:10:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26CAE4DC77
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 21:05:04 +0000 (UTC)
-Received: from mail-ua1-x934.google.com (mail-ua1-x934.google.com [IPv6:2607:f8b0:4864:20::934])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6965129
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 14:05:02 -0700 (PDT)
-Received: by mail-ua1-x934.google.com with SMTP id a1e0cc1a2514c-79acc14c09eso666376241.1
-        for <netdev@vger.kernel.org>; Tue, 01 Aug 2023 14:05:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690923902; x=1691528702;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=098hRtjKd+IMXRBg9bD56pZsXHP5BacbQRyV55lQ/n4=;
-        b=U46oZyF2NGgOCj+FJFfWTWZZ55rviss3MR5EtFK2OEZZTDLCCZXSm75jFpakX8Zm4I
-         MUWGuPjqkyWWIltbNRnxrQKak3O+b6V2QUljcQV/SgST2odUnl31MZa5DjbrbFRi42If
-         z9qfD/39zNoFGx8vy7kqr6GAw4dleooPO1gR1fm+4KOIdIBDj+mDSRsasCcGW/PdLLjE
-         esZlSzG0KbnabbAaWUicCwG7GKURsw2bnPy4yig/W6T4iRCHZ8MwcNiqbzTX1EII9EBW
-         YR/xWsdeme2xstG6z499xPligaELLf8Kgstl163HZFokjYYiiN2rHhfWLA0qg64cqtpz
-         KjBA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690923902; x=1691528702;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=098hRtjKd+IMXRBg9bD56pZsXHP5BacbQRyV55lQ/n4=;
-        b=KOrpmDeL9PBBmV1fFpY5MG6lvgi4k6o/fdAvE0BkxbfS/AJGKIZrX/gLTGYMLNlS6u
-         Np0y7LJhwasSyVtFLW+S3oMeNFWZs7W20xLvjaxC8CikWbi9jpYHdKy7/a8JF/A1pHCO
-         7Ptflf5gwzCDjVqaV9CNo1OE3pJrEr3t5XDsAyT5fiozlsV69mUyL+KV/BWfDbiAJEaP
-         6Uu9r+12zNGuh9YUZDxPtSXHODaDVzLtqJ2EHdXytGe9uYD/ZnTowT5nT7YOvyewMG+o
-         NPOoE/NdhfVIGDtqfvUex3FbcgFFGSOXgabRF3CKlJj/XIXkxTdpd3mkekISiAHtXLZZ
-         5cXg==
-X-Gm-Message-State: ABy/qLYfrF7ABE2cPinvdtdaHv/ICXopepLfOzLd0YaLt8xRK/LDrEQT
-	j6pT9Nu86l4EJXQgnmEuhI4=
-X-Google-Smtp-Source: APBJJlE0WbdYYWNYnRefg/xjMGxLjyKTN6UVdNu280zr/Hbe9LD3L/yicOIJDuYttdcsUPzxU7KD9Q==
-X-Received: by 2002:a1f:3d4c:0:b0:481:372c:6ae4 with SMTP id k73-20020a1f3d4c000000b00481372c6ae4mr2744966vka.2.1690923901830;
-        Tue, 01 Aug 2023 14:05:01 -0700 (PDT)
-Received: from localhost (172.174.245.35.bc.googleusercontent.com. [35.245.174.172])
-        by smtp.gmail.com with ESMTPSA id f2-20020ac840c2000000b00404f8e9902dsm2690832qtm.2.2023.08.01.14.05.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Aug 2023 14:05:01 -0700 (PDT)
-Date: Tue, 01 Aug 2023 17:05:01 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Eric Dumazet <edumazet@google.com>, 
- "David S . Miller" <davem@davemloft.net>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>
-Cc: Willem de Bruijn <willemb@google.com>, 
- Tahsin Erdogan <trdgn@amazon.com>, 
- netdev@vger.kernel.org, 
- eric.dumazet@gmail.com, 
- Eric Dumazet <edumazet@google.com>
-Message-ID: <64c9737d36571_1d4d6f294b@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20230801205254.400094-1-edumazet@google.com>
-References: <20230801205254.400094-1-edumazet@google.com>
-Subject: RE: [PATCH v2 net-next 0/4] net: extend alloc_skb_with_frags() max
- size
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 291DE4DC77
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 21:10:20 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB3C4E7C
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 14:10:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1690924218;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=DI/Y27iYKk+GE2VbFkdqv51tvM927ZHMATm+vJN1hrs=;
+	b=GYywTFN0v4ou+W3UR3kEyOvmX9hRNUjoBe90DErDuztEWmY+4mMvhU2y1WXs53BJO1Rl5y
+	gjdNH6NSsr+bfvAeowfcy4v13GET2Jmo5sgwV6dYcdUiO6iTd8qr4w8pG01Gb2kUJDbbVf
+	9TMOq6NWf60bAaUiEidLEx2GcxE1Xfo=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-90-rpc81ftLN8q6r6O45lqd1A-1; Tue, 01 Aug 2023 17:10:13 -0400
+X-MC-Unique: rpc81ftLN8q6r6O45lqd1A-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DC98A856F66;
+	Tue,  1 Aug 2023 21:10:09 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.131])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 03F2240C6CCC;
+	Tue,  1 Aug 2023 21:10:07 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+To: netdev@vger.kernel.org,
+    Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+cc: dhowells@redhat.com,
+    syzbot+f527b971b4bdc8e79f9e@syzkaller.appspotmail.com,
+    bpf@vger.kernel.org, brauner@kernel.org, davem@davemloft.net,
+    dsahern@kernel.org, edumazet@google.com, kuba@kernel.org,
+    pabeni@redhat.com, axboe@kernel.dk, viro@zeniv.linux.org.uk,
+    linux-fsdevel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
+    linux-kernel@vger.kernel.org
+Subject: [PATCH net v2] udp: Fix __ip{,6}_append_data()'s handling of MSG_SPLICE_PAGES
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1569148.1690924207.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 01 Aug 2023 22:10:07 +0100
+Message-ID: <1569149.1690924207@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Eric Dumazet wrote:
-> alloc_skb_with_frags(), while being able to use high order allocations,
-> limits the payload size to PAGE_SIZE * MAX_SKB_FRAGS
-> 
-> Reviewing Tahsin Erdogan patch [1], it was clear to me we need
-> to remove this limitation.
-> 
-> [1] https://lore.kernel.org/netdev/20230731230736.109216-1-trdgn@amazon.com/
-> 
-> v2: Addressed Willem feedback on 1st patch.
-> 
-> Eric Dumazet (4):
->   net: allow alloc_skb_with_frags() to allocate bigger packets
->   net: tun: change tun_alloc_skb() to allow bigger paged allocations
->   net/packet: change packet_alloc_skb() to allow bigger paged
->     allocations
->   net: tap: change tap_alloc_skb() to allow bigger paged allocations
-> 
->  drivers/net/tap.c      |  4 ++-
->  drivers/net/tun.c      |  4 ++-
->  net/core/skbuff.c      | 56 +++++++++++++++++++-----------------------
->  net/packet/af_packet.c |  4 ++-
->  4 files changed, 34 insertions(+), 34 deletions(-)
+__ip_append_data() can get into an infinite loop when asked to splice into
+a partially-built UDP message that has more than the frag-limit data and u=
+p
+to the MTU limit.  Something like:
 
-For the series:
+        pipe(pfd);
+        sfd =3D socket(AF_INET, SOCK_DGRAM, 0);
+        connect(sfd, ...);
+        send(sfd, buffer, 8161, MSG_CONFIRM|MSG_MORE);
+        write(pfd[1], buffer, 8);
+        splice(pfd[0], 0, sfd, 0, 0x4ffe0ul, 0);
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+where the amount of data given to send() is dependent on the MTU size (in
+this instance an interface with an MTU of 8192).
 
-Thanks Eric
+The problem is that the calculation of the amount to copy in
+__ip_append_data() goes negative in two places, and, in the second place,
+this gets subtracted from the length remaining, thereby increasing it.
+
+This happens when pagedlen > 0 (which happens for MSG_ZEROCOPY and
+MSG_SPLICE_PAGES), the terms in:
+
+        copy =3D datalen - transhdrlen - fraggap - pagedlen;
+
+then mostly cancel when pagedlen is substituted for, leaving just -fraggap=
+.
+This causes:
+
+        length -=3D copy + transhdrlen;
+
+to increase the length to more than the amount of data in msg->msg_iter,
+which causes skb_splice_from_iter() to be unable to fill the request and i=
+t
+returns less than 'copied' - which means that length never gets to 0 and w=
+e
+never exit the loop.
+
+Fix this by:
+
+ (1) Insert a note about the dodgy calculation of 'copy'.
+
+ (2) If MSG_SPLICE_PAGES, clear copy if it is negative from the above
+     equation, so that 'offset' isn't regressed and 'length' isn't
+     increased, which will mean that length and thus copy should match the
+     amount left in the iterator.
+
+ (3) When handling MSG_SPLICE_PAGES, give a warning and return -EIO if
+     we're asked to splice more than is in the iterator.  It might be
+     better to not give the warning or even just give a 'short' write.
+
+The same problem occurs in __ip6_append_data(), except that there's a chec=
+k
+in there that errors out with EINVAL if copy < 0.  Fix this function in
+much the same way as the ipv4 variant but also skip the erroring out if
+copy < 0.
+
+[!] Note that this ought to also affect MSG_ZEROCOPY, but MSG_ZEROCOPY
+avoids the problem by simply assuming that everything asked for got copied=
+,
+not just the amount that was in the iterator.  This is a potential bug for
+the future.
+
+Fixes: 7ac7c987850c ("udp: Convert udp_sendpage() to use MSG_SPLICE_PAGES"=
+)
+Fixes: 6d8192bd69bb ("ip6, udp6: Support MSG_SPLICE_PAGES")
+Reported-by: syzbot+f527b971b4bdc8e79f9e@syzkaller.appspotmail.com
+Link: https://lore.kernel.org/r/000000000000881d0606004541d1@google.com/
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+cc: "David S. Miller" <davem@davemloft.net>
+cc: Eric Dumazet <edumazet@google.com>
+cc: Jakub Kicinski <kuba@kernel.org>
+cc: Paolo Abeni <pabeni@redhat.com>
+cc: David Ahern <dsahern@kernel.org>
+cc: Jens Axboe <axboe@kernel.dk>
+cc: Matthew Wilcox <willy@infradead.org>
+cc: netdev@vger.kernel.org
+---
+ver #2)
+ - Fix __ip6_append_data() also.
+
+ net/ipv4/ip_output.c  |    9 +++++++++
+ net/ipv6/ip6_output.c |   11 ++++++++++-
+ 2 files changed, 19 insertions(+), 1 deletion(-)
+    =
+
+diff --git a/net/ipv4/ip_output.c b/net/ipv4/ip_output.c
+index 6e70839257f7..91715603cf6e 100644
+--- a/net/ipv4/ip_output.c
++++ b/net/ipv4/ip_output.c
+@@ -1158,10 +1158,15 @@ static int __ip_append_data(struct sock *sk,
+ 			}
+ =
+
+ 			copy =3D datalen - transhdrlen - fraggap - pagedlen;
++			/* [!] NOTE: copy will be negative if pagedlen>0
++			 * because then the equation reduces to -fraggap.
++			 */
+ 			if (copy > 0 && getfrag(from, data + transhdrlen, offset, copy, fragga=
+p, skb) < 0) {
+ 				err =3D -EFAULT;
+ 				kfree_skb(skb);
+ 				goto error;
++			} else if (flags & MSG_SPLICE_PAGES) {
++				copy =3D 0;
+ 			}
+ =
+
+ 			offset +=3D copy;
+@@ -1209,6 +1214,10 @@ static int __ip_append_data(struct sock *sk,
+ 		} else if (flags & MSG_SPLICE_PAGES) {
+ 			struct msghdr *msg =3D from;
+ =
+
++			err =3D -EIO;
++			if (WARN_ON_ONCE(copy > msg->msg_iter.count))
++				goto error;
++
+ 			err =3D skb_splice_from_iter(skb, &msg->msg_iter, copy,
+ 						   sk->sk_allocation);
+ 			if (err < 0)
+diff --git a/net/ipv6/ip6_output.c b/net/ipv6/ip6_output.c
+index 1e8c90e97608..bc96559bbf0f 100644
+--- a/net/ipv6/ip6_output.c
++++ b/net/ipv6/ip6_output.c
+@@ -1693,7 +1693,10 @@ static int __ip6_append_data(struct sock *sk,
+ 			fraglen =3D datalen + fragheaderlen;
+ =
+
+ 			copy =3D datalen - transhdrlen - fraggap - pagedlen;
+-			if (copy < 0) {
++			/* [!] NOTE: copy may be negative if pagedlen>0
++			 * because then the equation may reduces to -fraggap.
++			 */
++			if (copy < 0 && !(flags & MSG_SPLICE_PAGES)) {
+ 				err =3D -EINVAL;
+ 				goto error;
+ 			}
+@@ -1744,6 +1747,8 @@ static int __ip6_append_data(struct sock *sk,
+ 				err =3D -EFAULT;
+ 				kfree_skb(skb);
+ 				goto error;
++			} else if (flags & MSG_SPLICE_PAGES) {
++				copy =3D 0;
+ 			}
+ =
+
+ 			offset +=3D copy;
+@@ -1791,6 +1796,10 @@ static int __ip6_append_data(struct sock *sk,
+ 		} else if (flags & MSG_SPLICE_PAGES) {
+ 			struct msghdr *msg =3D from;
+ =
+
++			err =3D -EIO;
++			if (WARN_ON_ONCE(copy > msg->msg_iter.count))
++				goto error;
++
+ 			err =3D skb_splice_from_iter(skb, &msg->msg_iter, copy,
+ 						   sk->sk_allocation);
+ 			if (err < 0)
 
 
