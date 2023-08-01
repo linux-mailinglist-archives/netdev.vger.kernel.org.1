@@ -1,67 +1,61 @@
-Return-Path: <netdev+bounces-23356-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23365-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CDDBA76BB4E
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 19:34:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D506A76BB72
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 19:38:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 115751C20FC9
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 17:34:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9785D280C16
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 17:38:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A55C2358F;
-	Tue,  1 Aug 2023 17:34:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FCFA23593;
+	Tue,  1 Aug 2023 17:37:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CB4F20F83
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 17:34:13 +0000 (UTC)
-Received: from mgamail.intel.com (unknown [192.55.52.115])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F00D610FF
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 10:34:11 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CC8023582
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 17:37:44 +0000 (UTC)
+Received: from mgamail.intel.com (unknown [192.55.52.43])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B23A5268C
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 10:37:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1690911251; x=1722447251;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=Uthn5xw6snMePinRMVVfxdcx+Ye/IcF/ZrorvHlBA+w=;
-  b=Wr4vRy5CbVKSKDad2yUYqDe+JyQB0NK+bQhB6XbBr1X+DQcDvGljTCts
-   M8swQcBjNlfU/34t/rrwJSTBkvcFsR+F0F1kFhlvFqwTT76uKfDbIr69P
-   Mbws/mDqrDqgeH8ICPmXEJXUOcGpFOMhhiB+cnx8+jgA9NDbUFVqD59RA
-   LTLIR/iSukA8YLuJqd5zAo/G6RxuxNIXUJgMcj6AwZwTM54GaGH8mu/M+
-   iLbE/vNMEeTzfLpK8w5vKXMoVn4veyAMDxv10PvPxst4RgK1FC30mRzEU
-   LFv2d9nu+gtReMQEtQuqbke3ZXDQKnnR6S30lOaxugvCStUB3EsRajY2Y
+  t=1690911454; x=1722447454;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=2IBki901Gydl5G4aZOyqvJsOBeTyXIbutpMAbu6Si3I=;
+  b=A/bivVve4yP94YmBkX8oVGOwwfzod3NGeMFQmPWbaJ2JHZxiPN/sWrcn
+   laNwyPpCTTWnoUboEoAOl26wCSPjFSmURk52HQKdf1guXngkoF+tih3vb
+   HQcxBY+Ynrr9O0kP7TmW3lCYZpMupQZe9BzEmcz8Y6KZ9o6w2fmcVriwG
+   RhgEhZile5iiBbLakyJTv2K6q9meiXG6huFThKdDsKPERMD0Tae28rmrW
+   FRC2r4QRoSVbd+LNwRDOeKSiyVu4Pv+SjV2qPOcjhv6ELdVw2FRWowtdh
+   lmSOuBhndI84yxVWLY5PeqV1VnUAubjxEE0VNTbYjUKsOTLMwRxAqU/dC
    A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10789"; a="369363572"
+X-IronPort-AV: E=McAfee;i="6600,9927,10789"; a="455740651"
 X-IronPort-AV: E=Sophos;i="6.01,247,1684825200"; 
-   d="scan'208";a="369363572"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Aug 2023 10:34:03 -0700
+   d="scan'208";a="455740651"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Aug 2023 10:37:34 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10789"; a="794273656"
+X-IronPort-AV: E=McAfee;i="6600,9927,10789"; a="798769689"
 X-IronPort-AV: E=Sophos;i="6.01,247,1684825200"; 
-   d="scan'208";a="794273656"
+   d="scan'208";a="798769689"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmsmga008.fm.intel.com with ESMTP; 01 Aug 2023 10:34:02 -0700
+  by fmsmga004.fm.intel.com with ESMTP; 01 Aug 2023 10:37:33 -0700
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
 To: davem@davemloft.net,
 	kuba@kernel.org,
 	pabeni@redhat.com,
 	edumazet@google.com,
 	netdev@vger.kernel.org
-Cc: Muhammad Husaini Zulkifli <muhammad.husaini.zulkifli@intel.com>,
-	anthony.l.nguyen@intel.com,
-	sasha.neftin@intel.com,
-	Naama Meir <naamax.meir@linux.intel.com>,
-	Simon Horman <horms@kernel.org>
-Subject: [PATCH net v2 2/2] igc: Modify the tx-usecs coalesce setting
-Date: Tue,  1 Aug 2023 10:27:42 -0700
-Message-Id: <20230801172742.3625719-3-anthony.l.nguyen@intel.com>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>
+Subject: [PATCH net-next 0/7][pull request] Intel Wired LAN Driver Updates 2023-08-01 (ice)
+Date: Tue,  1 Aug 2023 10:31:05 -0700
+Message-Id: <20230801173112.3625977-1-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.38.1
-In-Reply-To: <20230801172742.3625719-1-anthony.l.nguyen@intel.com>
-References: <20230801172742.3625719-1-anthony.l.nguyen@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,113 +63,66 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Muhammad Husaini Zulkifli <muhammad.husaini.zulkifli@intel.com>
+This series contains updates to ice driver only.
 
-This patch enables users to modify the tx-usecs parameter.
-The rx-usecs value will adhere to the same value as tx-usecs
-if the queue pair setting is enabled.
+Wojciech allows for LAG interfaces to be used for bridge offloads and
+adds support for untagged VLAN traffic to be used in them as well.
 
-How to test:
-User can set the coalesce value using ethtool command.
+Marcin tracks additional metadata for filtering rules to aid in proper
+differentiation of similar rules. He also renames some flags that
+do not entirely describe their representation.
 
-Example command:
-Set: ethtool -C <interface>
+Karol and Jan add additional waiting for firmware load on devices that
+require it.
 
-Previous output:
+Przemek refactors RSS implementation to clarify/simplify configurations.
 
-root@P12DYHUSAINI:~# ethtool -C enp170s0 tx-usecs 10
-netlink error: Invalid argument
+The following are changes since commit 01e6f8ad8d26ced14b0cf288c42e55d03a7c5070:
+  net: dsa: qca8k: use dsa_for_each macro instead of for loop
+and are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue 100GbE
 
-New output:
+Jan Sokolowski (1):
+  ice: add FW load wait
 
-root@P12DYHUSAINI:~# ethtool -C enp170s0 tx-usecs 10
-rx-usecs: 10
-rx-frames: n/a
-rx-usecs-irq: n/a
-rx-frames-irq: n/a
+Karol Kolacinski (1):
+  ice: Add get C827 PHY index function
 
-tx-usecs: 10
-tx-frames: n/a
-tx-usecs-irq: n/a
-tx-frames-irq: n/a
+Marcin Szycik (2):
+  ice: Add direction metadata
+  ice: Rename enum ice_pkt_flags values
 
-Fixes: 8c5ad0dae93c ("igc: Add ethtool support")
-Signed-off-by: Muhammad Husaini Zulkifli <muhammad.husaini.zulkifli@intel.com>
-Tested-by: Naama Meir <naamax.meir@linux.intel.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
- drivers/net/ethernet/intel/igc/igc_ethtool.c | 49 +++++++++++++++-----
- 1 file changed, 37 insertions(+), 12 deletions(-)
+Przemek Kitszel (1):
+  ice: clean up __ice_aq_get_set_rss_lut()
 
-diff --git a/drivers/net/ethernet/intel/igc/igc_ethtool.c b/drivers/net/ethernet/intel/igc/igc_ethtool.c
-index 62d925b26f2c..ed67d9061452 100644
---- a/drivers/net/ethernet/intel/igc/igc_ethtool.c
-+++ b/drivers/net/ethernet/intel/igc/igc_ethtool.c
-@@ -914,19 +914,44 @@ static int igc_ethtool_set_coalesce(struct net_device *netdev,
- 			adapter->flags &= ~IGC_FLAG_DMAC;
- 	}
- 
--	/* convert to rate of irq's per second */
--	if (ec->rx_coalesce_usecs && ec->rx_coalesce_usecs <= 3)
--		adapter->rx_itr_setting = ec->rx_coalesce_usecs;
--	else
--		adapter->rx_itr_setting = ec->rx_coalesce_usecs << 2;
-+	if (adapter->flags & IGC_FLAG_QUEUE_PAIRS) {
-+		u32 old_tx_itr, old_rx_itr;
-+
-+		/* This is to get back the original value before byte shifting */
-+		old_tx_itr = (adapter->tx_itr_setting <= 3) ?
-+			      adapter->tx_itr_setting : adapter->tx_itr_setting >> 2;
-+
-+		old_rx_itr = (adapter->rx_itr_setting <= 3) ?
-+			      adapter->rx_itr_setting : adapter->rx_itr_setting >> 2;
-+
-+		if (old_tx_itr != ec->tx_coalesce_usecs) {
-+			if (ec->tx_coalesce_usecs && ec->tx_coalesce_usecs <= 3)
-+				adapter->tx_itr_setting = ec->tx_coalesce_usecs;
-+			else
-+				adapter->tx_itr_setting = ec->tx_coalesce_usecs << 2;
-+
-+			adapter->rx_itr_setting = adapter->tx_itr_setting;
-+		} else if (old_rx_itr != ec->rx_coalesce_usecs) {
-+			if (ec->rx_coalesce_usecs && ec->rx_coalesce_usecs <= 3)
-+				adapter->rx_itr_setting = ec->rx_coalesce_usecs;
-+			else
-+				adapter->rx_itr_setting = ec->rx_coalesce_usecs << 2;
-+
-+			adapter->tx_itr_setting = adapter->rx_itr_setting;
-+		}
-+	} else {
-+		/* convert to rate of irq's per second */
-+		if (ec->rx_coalesce_usecs && ec->rx_coalesce_usecs <= 3)
-+			adapter->rx_itr_setting = ec->rx_coalesce_usecs;
-+		else
-+			adapter->rx_itr_setting = ec->rx_coalesce_usecs << 2;
- 
--	/* convert to rate of irq's per second */
--	if (adapter->flags & IGC_FLAG_QUEUE_PAIRS)
--		adapter->tx_itr_setting = adapter->rx_itr_setting;
--	else if (ec->tx_coalesce_usecs && ec->tx_coalesce_usecs <= 3)
--		adapter->tx_itr_setting = ec->tx_coalesce_usecs;
--	else
--		adapter->tx_itr_setting = ec->tx_coalesce_usecs << 2;
-+		/* convert to rate of irq's per second */
-+		if (ec->tx_coalesce_usecs && ec->tx_coalesce_usecs <= 3)
-+			adapter->tx_itr_setting = ec->tx_coalesce_usecs;
-+		else
-+			adapter->tx_itr_setting = ec->tx_coalesce_usecs << 2;
-+	}
- 
- 	for (i = 0; i < adapter->num_q_vectors; i++) {
- 		struct igc_q_vector *q_vector = adapter->q_vector[i];
+Wojciech Drewek (2):
+  ice: Accept LAG netdevs in bridge offloads
+  ice: Support untagged VLAN traffic in br offload
+
+ .../net/ethernet/intel/ice/ice_adminq_cmd.h   |  54 +++--
+ drivers/net/ethernet/intel/ice/ice_common.c   | 205 ++++++++++--------
+ drivers/net/ethernet/intel/ice/ice_common.h   |   5 +
+ .../net/ethernet/intel/ice/ice_eswitch_br.c   |  57 ++++-
+ .../net/ethernet/intel/ice/ice_eswitch_br.h   |   9 -
+ .../net/ethernet/intel/ice/ice_hw_autogen.h   |   3 +-
+ drivers/net/ethernet/intel/ice/ice_lib.c      |  20 +-
+ drivers/net/ethernet/intel/ice/ice_main.c     |  37 ++++
+ .../ethernet/intel/ice/ice_protocol_type.h    |   9 +-
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.h   |   3 +
+ drivers/net/ethernet/intel/ice/ice_switch.c   |  11 +-
+ drivers/net/ethernet/intel/ice/ice_switch.h   |   1 +
+ drivers/net/ethernet/intel/ice/ice_tc_lib.c   |  34 +--
+ drivers/net/ethernet/intel/ice/ice_type.h     |   9 +-
+ drivers/net/ethernet/intel/ice/ice_virtchnl.c |   6 +-
+ 15 files changed, 290 insertions(+), 173 deletions(-)
+
 -- 
 2.38.1
 
