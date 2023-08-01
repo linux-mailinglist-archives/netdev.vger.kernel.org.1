@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-23164-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23165-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C4B376B374
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 13:40:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A40276B375
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 13:40:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 56AF82810F1
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 11:40:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6B4E61C20DAA
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 11:40:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F42162150C;
-	Tue,  1 Aug 2023 11:38:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83B9C21D22;
+	Tue,  1 Aug 2023 11:38:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8F4E20FB4
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 11:38:29 +0000 (UTC)
-Received: from mail-qv1-xf32.google.com (mail-qv1-xf32.google.com [IPv6:2607:f8b0:4864:20::f32])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC65F1B0
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 04:38:28 -0700 (PDT)
-Received: by mail-qv1-xf32.google.com with SMTP id 6a1803df08f44-63d09d886a3so38710566d6.2
-        for <netdev@vger.kernel.org>; Tue, 01 Aug 2023 04:38:28 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7796320FB4
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 11:38:31 +0000 (UTC)
+Received: from mail-qk1-x736.google.com (mail-qk1-x736.google.com [IPv6:2607:f8b0:4864:20::736])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37D831B0
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 04:38:30 -0700 (PDT)
+Received: by mail-qk1-x736.google.com with SMTP id af79cd13be357-76571dae5feso455752185a.1
+        for <netdev@vger.kernel.org>; Tue, 01 Aug 2023 04:38:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20221208.gappssmtp.com; s=20221208; t=1690889907; x=1691494707;
+        d=mojatatu-com.20221208.gappssmtp.com; s=20221208; t=1690889909; x=1691494709;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ipZDLdA3pxeEaWJR7HGpFjoZ0xWBpJ/IjSjFORk3qBs=;
-        b=mgRGbzPwPfF9Rn4LwBVKw+GJXFnZqFtjrJpJJPLEoF4CDgXIY+5IWPRzoz/ywutUO4
-         3b4ygaGTF8eDOTA189ip+X4iY7df114dvxrLZ0QHUCscosTpO/rNuDP7L7yI/JyKOP3K
-         XZy97lAKcSE/hv5zav1KysW6YTxvY2FpYvUa8RAVMJoO28Vd8jkJk2j0zJo47NxB0fvQ
-         fz0Cz9GiRrmOP5I6R6BFabahZeO4gJ71MzuBm0rr4Z1s9INRawJmTi4wjtj/V7q14uIz
-         C+hAeYu/ONtVAse9dSmxg4+MOd59WMoq0niDi1kX5VjEuhXUr3VkGuasbugJC3XxCm/h
-         Nimg==
+        bh=0yEUgde+83Ie/CIdVOsUg/bpNgJ9RSPY4XMDhZVyzr4=;
+        b=mO5ADxfOd66HThxvZKPw1HzaycTi/55Y28bAHffoUcjazRN3EmY0bhZ5CYOH2BYE3r
+         zqeQXVoFv2lFdv0LznQjVntgQ3piidXFMm4u82gjBfDtZjq86W4RhpSHnOl8siY+pWok
+         4sM/7zEoQW3GrRox9Zidi3TiBzs6b6jjPaBm0LMWhTnMCCqaikTA9/ynVB7VC64i/Pv7
+         9NGzz28cb3F3xbQxdgHAPbVBN2SkhzaDMgYck64EpAn2ns5vkbL/mclrlPEWvgepxc9i
+         tU9RU5x1EVjwIa+ApA0a3t2LKHN8eg2lRL/kHGhQQw5qMQSJbcBYqLhvIXZoBMtWWbBp
+         FZ7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690889907; x=1691494707;
+        d=1e100.net; s=20221208; t=1690889909; x=1691494709;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ipZDLdA3pxeEaWJR7HGpFjoZ0xWBpJ/IjSjFORk3qBs=;
-        b=PW3yZo4AVGnXG8fDEo/T7KfpvWZDapfJVtH6Jyey8ELa+DGMCEc7tUsoaPrYlnjbwt
-         Uum6S+Q3piQoLDYWUFO9Qbg8xLBHLD6wvConksl8YgPJMi7ezsSBBns8B3w0v0UxEmY+
-         he1mNMAQdDWB8Yel2gFyxzz71Xi0reTU90O5R9CSD5/7URMn01u+3rsoFgw1tPkjddNA
-         YtQUMQcZBcqpTd3O81TYs6+unWr5xeqcUmqyGUvHidj1vXDDL/KONI1JRDTkGoEpG1i+
-         pAfH/l0kHKvrZZ+cgEkNruYlFZH4nI2tJ9SN2PV5/wkd+Jqblebx1AiXFAGQJR/5eOT4
-         Yp0A==
-X-Gm-Message-State: ABy/qLbmVTf3hRyONOSPTMZrwKHAf1EZY9Jmh1KFYw/s8zAoKB7RHX09
-	6x5LhmdffoYIG+0DeV5TWHcEc/nkYpTw+eIJ3p/FbA==
-X-Google-Smtp-Source: APBJJlH3AdK8HnWYtqat2eY0B4qP8URsXBkIjwy9MdbH5O2+pZxjUMNnejy1K4Z0haV3t4bZvV3CvA==
-X-Received: by 2002:a0c:e3d4:0:b0:63d:7aa8:b59f with SMTP id e20-20020a0ce3d4000000b0063d7aa8b59fmr3034521qvl.7.1690889907444;
-        Tue, 01 Aug 2023 04:38:27 -0700 (PDT)
+        bh=0yEUgde+83Ie/CIdVOsUg/bpNgJ9RSPY4XMDhZVyzr4=;
+        b=Uq6rvrj1Mey5mEBObAGNPscF2pDDEMDU9qqHHPhk9rJnazQbFLvpOXXKiNoAXCBcRO
+         kDw9vmyed33yzVn4W4S2M850E0hjFPoIjSU5thKHgLZpFPfzxlhs6gyeeJYu+4RaBjFz
+         JfuJcfzP6QbG07Wzjep9+hEFMon3slgt97iR1lPTqrdqJH0hDcFvAcnVkO7tioMxelPg
+         VppJ8Z3eaN95oAjFe9BxU+6gazsv2xb/399oKxiYJ1u6EOrOF5CYs+511Qlr7y5Nu+1O
+         mF4sfhKDQq47vAl1wNsac1j/AEDuN7iSXaHQqWcgxVU7Bm/A4mtBgKhtupPd2G6GYYtW
+         /1QQ==
+X-Gm-Message-State: ABy/qLZSINlNqj0ZedlUwuDNFKY5DivxI9RsgOHjgTTuu8xVqBMvSMv1
+	ShMK85P2fBBrVm3nXKLzhujULXoCOZHPnLkZr26xjA==
+X-Google-Smtp-Source: APBJJlFyY+gag9KoOYZxfQb8cyu9TVC3rqZDn/2tClxVNbw9bukTGqjmIt46OUw1R9EUGnJ+i3dXrQ==
+X-Received: by 2002:a05:6214:518f:b0:637:a75:2473 with SMTP id kl15-20020a056214518f00b006370a752473mr14605082qvb.7.1690889909030;
+        Tue, 01 Aug 2023 04:38:29 -0700 (PDT)
 Received: from majuu.waya ([142.114.148.137])
-        by smtp.gmail.com with ESMTPSA id j1-20020a0cf501000000b0063d26033b74sm4643738qvm.39.2023.08.01.04.38.26
+        by smtp.gmail.com with ESMTPSA id j1-20020a0cf501000000b0063d26033b74sm4643738qvm.39.2023.08.01.04.38.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Aug 2023 04:38:26 -0700 (PDT)
+        Tue, 01 Aug 2023 04:38:28 -0700 (PDT)
 From: Jamal Hadi Salim <jhs@mojatatu.com>
 To: netdev@vger.kernel.org
 Cc: deb.chatterjee@intel.com,
@@ -78,9 +78,9 @@ Cc: deb.chatterjee@intel.com,
 	toke@redhat.com,
 	mattyk@nvidia.com,
 	john.andy.fingerhut@intel.com
-Subject: [PATCH RFC v5 net-next 06/23] net: sched: act_api: Add support for preallocated dynamic action instances
-Date: Tue,  1 Aug 2023 07:37:50 -0400
-Message-Id: <20230801113807.85473-7-jhs@mojatatu.com>
+Subject: [PATCH RFC v5 net-next 07/23] net: introduce rcu_replace_pointer_rtnl
+Date: Tue,  1 Aug 2023 07:37:51 -0400
+Message-Id: <20230801113807.85473-8-jhs@mojatatu.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230801113807.85473-1-jhs@mojatatu.com>
 References: <20230801113807.85473-1-jhs@mojatatu.com>
@@ -97,23 +97,10 @@ X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-In P4, actions are assumed to pre exist and have an upper bound number of
-instances.
+We use rcu_replace_pointer(rcu_ptr, ptr, lockdep_rtnl_is_held()) throughout
+the P4TC infrastructure code.
 
-Add the necessary code to preallocate actions instances for dynamic actions.
-
-We add 2 new actions flags:
-- TCA_ACT_FLAGS_PREALLOC: Which tells if the actions instance was
-  preallocated.
-- TCA_ACT_FLAGS_UNUSED: Which tells if the actions instance was
-  preallocated but not used yet.
-
-The rule is that preallocated actions can't be deleted by the tc actions
-runtime commands and a dump or a get will only show preallocated actions
-instances which are being used (TCA_ACT_FLAGS_UNUSED == false).
-
-The preallocated actions will be deleted once the dynamic action kind to
-which they belong to is deleted.
+It may be useful for other use cases, so we create a helper.
 
 Co-developed-by: Victor Nogueira <victor@mojatatu.com>
 Signed-off-by: Victor Nogueira <victor@mojatatu.com>
@@ -121,118 +108,32 @@ Co-developed-by: Pedro Tammela <pctammela@mojatatu.com>
 Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
 Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
 ---
- include/net/act_api.h |  3 +++
- net/sched/act_api.c   | 46 ++++++++++++++++++++++++++++++++-----------
- 2 files changed, 38 insertions(+), 11 deletions(-)
+ include/linux/rtnetlink.h | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-diff --git a/include/net/act_api.h b/include/net/act_api.h
-index b83e058a3..a6331cc5d 100644
---- a/include/net/act_api.h
-+++ b/include/net/act_api.h
-@@ -68,6 +68,8 @@ struct tc_action {
- #define TCA_ACT_FLAGS_REPLACE	(1U << (TCA_ACT_FLAGS_USER_BITS + 2))
- #define TCA_ACT_FLAGS_NO_RTNL	(1U << (TCA_ACT_FLAGS_USER_BITS + 3))
- #define TCA_ACT_FLAGS_AT_INGRESS	(1U << (TCA_ACT_FLAGS_USER_BITS + 4))
-+#define TCA_ACT_FLAGS_PREALLOC	(1U << (TCA_ACT_FLAGS_USER_BITS + 5))
-+#define TCA_ACT_FLAGS_UNUSED	(1U << (TCA_ACT_FLAGS_USER_BITS + 6))
+diff --git a/include/linux/rtnetlink.h b/include/linux/rtnetlink.h
+index 3d6cf306c..971055e66 100644
+--- a/include/linux/rtnetlink.h
++++ b/include/linux/rtnetlink.h
+@@ -62,6 +62,18 @@ static inline bool lockdep_rtnl_is_held(void)
+ #define rcu_dereference_rtnl(p)					\
+ 	rcu_dereference_check(p, lockdep_rtnl_is_held())
  
- /* Update lastuse only if needed, to avoid dirtying a cache line.
-  * We use a temp variable to avoid fetching jiffies twice.
-@@ -202,6 +204,7 @@ int tcf_idr_create_from_flags(struct tc_action_net *tn, u32 index,
- 			      const struct tc_action_ops *ops, int bind,
- 			      u32 flags);
- void tcf_idr_insert_many(struct tc_action *actions[]);
-+void tcf_idr_insert_n(struct tc_action *actions[], const u32 n);
- void tcf_idr_cleanup(struct tc_action_net *tn, u32 index);
- int tcf_idr_check_alloc(struct tc_action_net *tn, u32 *index,
- 			struct tc_action **a, int bind);
-diff --git a/net/sched/act_api.c b/net/sched/act_api.c
-index 3ce586331..bc9fab75b 100644
---- a/net/sched/act_api.c
-+++ b/net/sched/act_api.c
-@@ -560,6 +560,8 @@ static int tcf_dump_walker(struct tcf_idrinfo *idrinfo, struct sk_buff *skb,
- 			continue;
- 		if (IS_ERR(p))
- 			continue;
-+		if (p->tcfa_flags & TCA_ACT_FLAGS_UNUSED)
-+			continue;
- 
- 		if (jiffy_since &&
- 		    time_after(jiffy_since,
-@@ -640,6 +642,9 @@ static int tcf_del_walker(struct tcf_idrinfo *idrinfo, struct sk_buff *skb,
- 	idr_for_each_entry_ul(idr, p, tmp, id) {
- 		if (IS_ERR(p))
- 			continue;
-+		if (p->tcfa_flags & TCA_ACT_FLAGS_PREALLOC)
-+			continue;
++/**
++ * rcu_replace_pointer_rtnl - replace an RCU pointer under rtnl_lock, returning
++ * its old value
++ * @rcu_ptr: RCU pointer, whose old value is returned
++ * @ptr: regular pointer
++ *
++ * Perform a replacement under rtnl_lock, where @rcu_ptr is an RCU-annotated
++ * pointer. The old value of @rcu_ptr is returned, and @rcu_ptr is set to @ptr
++ */
++#define rcu_replace_pointer_rtnl(rcu_ptr, ptr)			\
++	rcu_replace_pointer(rcu_ptr, ptr, lockdep_rtnl_is_held())
 +
- 		ret = tcf_idr_release_unsafe(p);
- 		if (ret == ACT_P_DELETED)
- 			module_put(ops->owner);
-@@ -1367,26 +1372,38 @@ static const struct nla_policy tcf_action_policy[TCA_ACT_MAX + 1] = {
- 	[TCA_ACT_HW_STATS]	= NLA_POLICY_BITFIELD32(TCA_ACT_HW_STATS_ANY),
- };
- 
-+static void tcf_idr_insert_1(struct tc_action *a)
-+{
-+	struct tcf_idrinfo *idrinfo;
-+
-+	idrinfo = a->idrinfo;
-+	mutex_lock(&idrinfo->lock);
-+	/* Replace ERR_PTR(-EBUSY) allocated by tcf_idr_check_alloc if
-+	 * it is just created, otherwise this is just a nop.
-+	 */
-+	idr_replace(&idrinfo->action_idr, a, a->tcfa_index);
-+	mutex_unlock(&idrinfo->lock);
-+}
-+
- void tcf_idr_insert_many(struct tc_action *actions[])
- {
- 	int i;
- 
- 	for (i = 0; i < TCA_ACT_MAX_PRIO; i++) {
--		struct tc_action *a = actions[i];
--		struct tcf_idrinfo *idrinfo;
--
--		if (!a)
-+		if (!actions[i])
- 			continue;
--		idrinfo = a->idrinfo;
--		mutex_lock(&idrinfo->lock);
--		/* Replace ERR_PTR(-EBUSY) allocated by tcf_idr_check_alloc if
--		 * it is just created, otherwise this is just a nop.
--		 */
--		idr_replace(&idrinfo->action_idr, a, a->tcfa_index);
--		mutex_unlock(&idrinfo->lock);
-+		tcf_idr_insert_1(actions[i]);
- 	}
- }
- 
-+void tcf_idr_insert_n(struct tc_action *actions[], const u32 n)
-+{
-+	int i;
-+
-+	for (i = 0; i < n; i++)
-+		tcf_idr_insert_1(actions[i]);
-+}
-+
- struct tc_action_ops *tc_action_load_ops(struct net *net, struct nlattr *nla,
- 					 bool police, bool rtnl_held,
- 					 struct netlink_ext_ack *extack)
-@@ -2033,6 +2050,13 @@ tca_action_gd(struct net *net, struct nlattr *nla, struct nlmsghdr *n,
- 			ret = PTR_ERR(act);
- 			goto err;
- 		}
-+		if (event == RTM_DELACTION &&
-+		    act->tcfa_flags & TCA_ACT_FLAGS_PREALLOC) {
-+			ret = -EINVAL;
-+			NL_SET_ERR_MSG_FMT(extack,
-+					   "Unable to delete preallocated action %s\n",
-+					   act->ops->kind);
-+		}
- 		attr_size += tcf_action_fill_size(act);
- 		actions[i - 1] = act;
- 	}
+ /**
+  * rtnl_dereference - fetch RCU pointer when updates are prevented by RTNL
+  * @p: The pointer to read, prior to dereferencing
 -- 
 2.34.1
 
