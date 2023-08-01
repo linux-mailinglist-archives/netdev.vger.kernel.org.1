@@ -1,205 +1,79 @@
-Return-Path: <netdev+bounces-23253-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23250-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E45F476B6F4
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 16:13:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 101F476B6D0
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 16:07:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C48591C20ED1
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 14:13:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 255D91C20E43
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 14:07:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8DD823BC4;
-	Tue,  1 Aug 2023 14:13:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28D1322F0E;
+	Tue,  1 Aug 2023 14:07:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A82C322F13
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 14:13:16 +0000 (UTC)
-Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3805273F;
-	Tue,  1 Aug 2023 07:12:41 -0700 (PDT)
-Received: from p-infra-ksmg-sc-msk02 (localhost [127.0.0.1])
-	by mx1.sberdevices.ru (Postfix) with ESMTP id D025F120006;
-	Tue,  1 Aug 2023 17:12:39 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru D025F120006
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
-	s=mail; t=1690899159;
-	bh=65FgcRTx26LZHNe8UJ3rutBm/GhTUW86J1RJsgpMT28=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:From;
-	b=pPoh05I/Q3JbQHwhnV6BKKtFG0Jhlt5Yw0hONtDZNSzUO3/HPzISgOj90FeiuTruS
-	 y6W4rc+t8VaFq8f6YYO4QCNa3kakxwtzYh3kBATvsmrN+E1addOYq3fJrPdvwRN8KP
-	 c3yYXCpsNJ0j8JiuDURAZnfq1eDoY2096hqAvh5pQGXzNA0z7N+u02lZFoa3NGjYOt
-	 QYq0ai2g2mEVpvS26f9Kz+DoeA0gO/7QyqwJD+UPJA9a+iIVGGJNWlhFxSrtRcajn+
-	 mPF8hFcg48Y3agwQUe++xwbRorJLMKC9+9Wr3rhkZck1h2frFrDou1Cu288TPh42ma
-	 mZUVLEczcPKqg==
-Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.sberdevices.ru (Postfix) with ESMTPS;
-	Tue,  1 Aug 2023 17:12:39 +0300 (MSK)
-Received: from [192.168.0.106] (100.64.160.123) by
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Tue, 1 Aug 2023 17:12:36 +0300
-Message-ID: <43991690-2b53-8211-8aad-693ae5c725e4@sberdevices.ru>
-Date: Tue, 1 Aug 2023 17:06:56 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D4B722F09
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 14:07:48 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D47826AA;
+	Tue,  1 Aug 2023 07:07:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=Y4/TFwx2v1KmTAjwi0Nux8sw+w03GEnDtkgQrS1mP7I=; b=JGUe7ZHns4LwnJudRSRDBbDtHU
+	UcYWtElj1AqS/G6jqLJ5v+oQtJvkPW2KItrw18VTFDA1L1PSUbnuQ2OgqQPxPO1uGU4Est66tvbYw
+	9lXaHvGiUJZtnx8l2ypLIV93FqXav27fLreMBSUCz7k3q3f30fWDB4mOVj0UP0v3KeDg=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qQq1r-002oC8-RP; Tue, 01 Aug 2023 16:07:15 +0200
+Date: Tue, 1 Aug 2023 16:07:15 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Anvesh Jain P <quic_ajainp@quicinc.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <simon.horman@corigine.com>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Hangbin Liu <liuhangbin@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Andy Ren <andy.ren@getcruise.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Venkata Rao Kakani <quic_vkakani@quicinc.com>,
+	Vagdhan Kumar <quic_vagdhank@quicinc.com>
+Subject: Re: [PATCH] net: export dev_change_name function
+Message-ID: <d88e4980-66e5-4ff2-a868-7f7450181925@lunn.ch>
+References: <20230801112101.15564-1-quic_ajainp@quicinc.com>
+ <447ba1fe-b20b-4ed0-97bc-4137b2ccfb37@lunn.ch>
+ <8c591002-308e-bdba-de5f-c96113230451@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [PATCH net-next v5 4/4] vsock/virtio: MSG_ZEROCOPY flag support
-Content-Language: en-US
-To: Paolo Abeni <pabeni@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
-	Stefano Garzarella <sgarzare@redhat.com>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang
-	<jasowang@redhat.com>, Bobby Eshleman <bobby.eshleman@bytedance.com>
-CC: <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<kernel@sberdevices.ru>, <oxffffaa@gmail.com>
-References: <20230730085905.3420811-1-AVKrasnov@sberdevices.ru>
- <20230730085905.3420811-5-AVKrasnov@sberdevices.ru>
- <8a7772a50a16fbbcb82fc0c5e09f9e31f3427e3d.camel@redhat.com>
- <1c9f9851-2228-c92b-ce3d-6a84d44e6628@sberdevices.ru>
- <00f2b7bdb18e0eaa42f0cca542a9530564615475.camel@redhat.com>
-From: Arseniy Krasnov <avkrasnov@sberdevices.ru>
-In-Reply-To: <00f2b7bdb18e0eaa42f0cca542a9530564615475.camel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [100.64.160.123]
-X-ClientProxiedBy: p-i-exch-sc-m02.sberdevices.ru (172.16.192.103) To
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
-X-KSMG-Rule-ID: 10
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Lua-Profiles: 178796 [Jul 22 2023]
-X-KSMG-AntiSpam-Version: 5.9.59.0
-X-KSMG-AntiSpam-Envelope-From: AVKrasnov@sberdevices.ru
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 525 525 723604743bfbdb7e16728748c3fa45e9eba05f7d, {Tracking_from_domain_doesnt_match_to}, FromAlignment: s, ApMailHostAddress: 100.64.160.123
-X-MS-Exchange-Organization-SCL: -1
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiPhishing: Clean
-X-KSMG-LinksScanning: Clean
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/07/23 08:49:00 #21663637
-X-KSMG-AntiVirus-Status: Clean, skipped
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8c591002-308e-bdba-de5f-c96113230451@quicinc.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+> CONFIG_RENAME_DEVICES is the module which needs "dev_change_name" API. Our
+> requirement is to change the network device name from kernel space.
 
+Can you give a link to this module. It is very unusual for the kernel
+to change the device name. Before accepting this patch, we probably
+want a better understanding of the big picture. Which is why we
+normally to use the user of an API.
 
-On 01.08.2023 17:04, Paolo Abeni wrote:
-> On Tue, 2023-08-01 at 16:36 +0300, Arseniy Krasnov wrote:
->>
->> On 01.08.2023 16:34, Paolo Abeni wrote:
->>> On Sun, 2023-07-30 at 11:59 +0300, Arseniy Krasnov wrote:
->>>> +static int virtio_transport_fill_skb(struct sk_buff *skb,
->>>> +				     struct virtio_vsock_pkt_info *info,
->>>> +				     size_t len,
->>>> +				     bool zcopy)
->>>> +{
->>>> +	if (zcopy) {
->>>> +		return __zerocopy_sg_from_iter(info->msg, NULL, skb,
->>>> +					      &info->msg->msg_iter,
->>>> +					      len);
->>>> +	} else {
->>>
->>>
->>> No need for an else statement after 'return'
->>>
->>>> +		void *payload;
->>>> +		int err;
->>>> +
->>>> +		payload = skb_put(skb, len);
->>>> +		err = memcpy_from_msg(payload, info->msg, len);
->>>> +		if (err)
->>>> +			return -1;
->>>> +
->>>> +		if (msg_data_left(info->msg))
->>>> +			return 0;
->>>> +
->>>
->>> This path does not update truesize, evem if it increases the skb len...
->>
->> Thanks, I'll fix it.
->>
->>>
->>>> +		return 0;
->>>> +	}
->>>> +}
->>>
->>> [...]
->>>
->>>> @@ -214,6 +251,70 @@ static u16 virtio_transport_get_type(struct sock *sk)
->>>>  		return VIRTIO_VSOCK_TYPE_SEQPACKET;
->>>>  }
->>>>  
->>>> +static struct sk_buff *virtio_transport_alloc_skb(struct vsock_sock *vsk,
->>>> +						  struct virtio_vsock_pkt_info *info,
->>>> +						  size_t payload_len,
->>>> +						  bool zcopy,
->>>> +						  u32 src_cid,
->>>> +						  u32 src_port,
->>>> +						  u32 dst_cid,
->>>> +						  u32 dst_port)
->>>> +{
->>>> +	struct sk_buff *skb;
->>>> +	size_t skb_len;
->>>> +
->>>> +	skb_len = VIRTIO_VSOCK_SKB_HEADROOM;
->>>> +
->>>> +	if (!zcopy)
->>>> +		skb_len += payload_len;
->>>> +
->>>> +	skb = virtio_vsock_alloc_skb(skb_len, GFP_KERNEL);
->>>> +	if (!skb)
->>>> +		return NULL;
->>>> +
->>>> +	virtio_transport_init_hdr(skb, info, src_cid, src_port,
->>>> +				  dst_cid, dst_port,
->>>> +				  payload_len);
->>>> +
->>>> +	/* Set owner here, because '__zerocopy_sg_from_iter()' uses
->>>> +	 * owner of skb without check to update 'sk_wmem_alloc'.
->>>> +	 */
->>>> +	if (vsk)
->>>> +		skb_set_owner_w(skb, sk_vsock(vsk));
->>>
->>> ... which can lead to bad things(TM) if the skb goes trough some later
->>> non trivial processing, due to the above skb_set_owner_w().
->>>
->>> Additionally can be the following condition be true:
->>>
->>> 	vsk == NULL && (info->msg && payload_len > 0) && zcopy
->>>
->>> ???
->>
->> No, vsk == NULL only when we reset connection, in that case both info->msg == NULL and payload_len == 0,
->> as this is control message without any data.
-> 
-> Perhaps a comment with possibly even a WARN_ON_ONCE(!<the above>) could
-> help ;)
-
-Ack
-
-Thanks, Arseniy
-
-> 
-> Thanks!
-> 
-> Paolo
-> 
+   Andrew
 
