@@ -1,79 +1,129 @@
-Return-Path: <netdev+bounces-23042-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23043-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBEAD76A76D
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 05:21:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 80BFB76A79F
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 05:47:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EC8991C20E12
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 03:21:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 11C0D2817B5
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 03:47:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E63E211A;
-	Tue,  1 Aug 2023 03:20:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30FBD1C15;
+	Tue,  1 Aug 2023 03:47:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26B4C139F
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 03:20:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id B971DC433CB;
-	Tue,  1 Aug 2023 03:20:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690860023;
-	bh=ahxgk78QsKZbjacZt3OFHUk3/T0+1TNsBU0moZ+CxpQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=t+KVYo1h4B5cFYn0SETqeHd+sF02rvQ50g3TZo3mg9T6axSsgtWs/f2jg6I/+2sh3
-	 Uom2B75t85Xb1pg2CfuQT9G0FDSHzsfy35xa5mQ3m7Z0/HVwYMNECuxIVASHeKVnO8
-	 kVj9E/Ek+fG4ugafi+3f2onfysKZvo3AEAmnSjfr+nOE+QhdNPtuxmBnhIeRDk+tt6
-	 1w2ib8h5IPTkJBJyFpq88vWOQh0HZCDonEyPW4Hc4mgPTPSb9zIKvbji1BONefbU+G
-	 GAANWOq0C9PDjJtWxes9Il7UYFV26AdpJ721K/akAoFhv4kPOID1CJfOCm9awvegjk
-	 1urgHYi/9htOA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 9F751C595C0;
-	Tue,  1 Aug 2023 03:20:23 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F0647E;
+	Tue,  1 Aug 2023 03:47:52 +0000 (UTC)
+Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 053A6F1;
+	Mon, 31 Jul 2023 20:47:52 -0700 (PDT)
+Received: by mail-pl1-x62f.google.com with SMTP id d9443c01a7336-1bbc64f9a91so44043925ad.0;
+        Mon, 31 Jul 2023 20:47:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1690861671; x=1691466471;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vUxkf2Zv+G34S/jIfFi7uVAJxAGamTOqdnNoeJx+ffw=;
+        b=rBdJE0KohdES+/eQJtWE9tY+02lsih5EdlQ2OW1jA2mTcX6X8lLJeiFdbXE/l3svf2
+         gV4BU4ZXR+ScMrT5EOaLnSt3IcOWn1vTMyw2ri/G0qdQjdNrqr3NFYj2kc9CcgHPYAyK
+         TOv6HM2R2+n0oQttQ7Q+bTQCSuTGl0WrjmK2k8bHglveCjiX3+tQJB22RRP5cnA569C4
+         EhtRxgLLwBEmRh/B2VOr2mmDkFAwsKQe3OXTmaRXMX8UjomfHlv7Zg1Clmwc86dxsMKf
+         1GZ8nBO0etF7X4X81p3cbRq8clIymTtkAMTYfK1hK3Ft/LN7xXPHEHz0Wstd3I0oPHJj
+         MMqw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690861671; x=1691466471;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=vUxkf2Zv+G34S/jIfFi7uVAJxAGamTOqdnNoeJx+ffw=;
+        b=azuz0XJlLW221Or9pdQSh0j/ypcWLzO5oxnHbSZ2NtQJPomKfuTZqv4YHrnu47/PCu
+         SviepD6GY0rVVO2hAzcnAMMio2qy1sZIhjj0HrM8lW3va74a8bGq2mR3ZW6o2JqoHWIQ
+         zKKPZ1xKcmQDwoCOAaqm4siQJKAs3Wabq4bCCT+rPuSRVUriczwG0bP7f1Ookyp4wjUH
+         QrUVJ6JCMVdBAWCo0mNTP4/XQEyrCjiM41ohXRzHKFwVK5z8TBURxazn61Xmn1Zr49ZX
+         moDonpHs3b+NX2kzVLPyf/jSZp7w9IaF/IAz04nCL5xdmI+0tofdgzonLxntPvHQAeSY
+         1TZQ==
+X-Gm-Message-State: ABy/qLaBoiom/QdV8lfj1yfzKB7abdc+t2Ca0okqNNlgZCspG6AyUcz3
+	lCA740AzJz01ErhFlmk2LGY=
+X-Google-Smtp-Source: APBJJlFwBPWYASRvfrTXZAmcvtp7LfRSmpw/K8/3r9DsyEHazSHMhtU1URaBGiGKA7hJZZ5TKt84jA==
+X-Received: by 2002:a17:902:b60a:b0:1b8:9b1d:9e24 with SMTP id b10-20020a170902b60a00b001b89b1d9e24mr10989029pls.22.1690861671233;
+        Mon, 31 Jul 2023 20:47:51 -0700 (PDT)
+Received: from localhost ([98.97.32.4])
+        by smtp.gmail.com with ESMTPSA id jg1-20020a17090326c100b001bb4f9d86ebsm9366145plb.23.2023.07.31.20.47.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 31 Jul 2023 20:47:50 -0700 (PDT)
+Date: Mon, 31 Jul 2023 20:47:49 -0700
+From: John Fastabend <john.fastabend@gmail.com>
+To: Xu Kuohai <xukuohai@huaweicloud.com>, 
+ Martin KaFai Lau <martin.lau@linux.dev>, 
+ Xu Kuohai <xukuohai@huaweicloud.com>, 
+ John Fastabend <john.fastabend@gmail.com>
+Cc: bpf@vger.kernel.org, 
+ netdev@vger.kernel.org, 
+ Jakub Sitnicki <jakub@cloudflare.com>, 
+ "David S . Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Daniel Borkmann <daniel@iogearbox.net>
+Message-ID: <64c8806537c3a_a427920846@john.notmuch>
+In-Reply-To: <6965ceb9-0b96-ce21-cc72-7d29b42544bd@huaweicloud.com>
+References: <20230728105649.3978774-1-xukuohai@huaweicloud.com>
+ <e2d06c78-1434-8322-1089-ba6355bb4c83@linux.dev>
+ <6965ceb9-0b96-ce21-cc72-7d29b42544bd@huaweicloud.com>
+Subject: Re: [PATCH bpf] bpf, sockmap: Fix map type error in sock_map_del_link
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net/hsr: Remove unused function declarations
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169086002364.11962.15301594077499918218.git-patchwork-notify@kernel.org>
-Date: Tue, 01 Aug 2023 03:20:23 +0000
-References: <20230729123456.36340-1-yuehaibing@huawei.com>
-In-Reply-To: <20230729123456.36340-1-yuehaibing@huawei.com>
-To: Yue Haibing <yuehaibing@huawei.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Sat, 29 Jul 2023 20:34:56 +0800 you wrote:
-> commit f421436a591d ("net/hsr: Add support for the High-availability Seamless Redundancy protocol (HSRv0)")
-> introducted these but never implemented.
+Xu Kuohai wrote:
+> On 8/1/2023 9:19 AM, Martin KaFai Lau wrote:
+> > On 7/28/23 3:56 AM, Xu Kuohai wrote:
+> >> sock_map_del_link() operates on both SOCKMAP and SOCKHASH, although
+> >> both types have member named "progs", the offset of "progs" member in
+> >> these two types is different, so "progs" should be accessed with the
+> >> real map type.
+> > 
+> > The patch makes sense to me. Can a test be written to trigger it?
+> > 
 > 
-> Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
-> ---
->  net/hsr/hsr_netlink.h | 2 --
->  1 file changed, 2 deletions(-)
+> Thank you for the review. I have a messy prog that triggers memleak
+> caused by this issue. I'll try to simplify it to a test.
+> 
+> > John, please review.
+> > 
+> > 
+> > .
+> 
+> 
 
-Here is the summary with links:
-  - [net-next] net/hsr: Remove unused function declarations
-    https://git.kernel.org/netdev/net-next/c/2f48401dd0f2
+Thanks good catch. One thing I don't see any tests for is deleting a
+socket from a sockmap and then trying to use it? My guess is almost
+no one deletes sockets from a map except on sock close. Maybe to
+reproduce,
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+ 1. connect a bunch of sockets to sockhash with verdict prog
+ 2. remove the sockets
+ 3. remove the sockhash
+ 4. that should leak the bpf ref cnt so we could check for the
+    prog still existing?
 
+Reviewed-by: John Fastabend <john.fastabend@gmail.com>
 
 
