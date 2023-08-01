@@ -1,337 +1,284 @@
-Return-Path: <netdev+bounces-23347-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23349-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D076176BAD5
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 19:10:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C82B176BAF3
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 19:17:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D247281A55
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 17:10:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 78313281B00
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 17:17:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AE422150D;
-	Tue,  1 Aug 2023 17:10:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E0BF21D4E;
+	Tue,  1 Aug 2023 17:17:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2753A2CA5
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 17:10:50 +0000 (UTC)
-Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05on2065.outbound.protection.outlook.com [40.107.22.65])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52DE52D5E;
-	Tue,  1 Aug 2023 10:10:21 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 375312CA5
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 17:17:50 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70F491716
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 10:17:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1690910268; x=1722446268;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=ux9st9WOFYfxc5xnDnfTlfZU8k5psJY2ekgFoRWh0J8=;
+  b=F04YdIDRbyk9oIAcjfL+fMCRYxb0uZuo5RR0p2HpazCKzrvj/2p9j+qO
+   zOc+UCirMjhMcVURSC22Bu+Kn8bkc3L6TCxPIfn8IVcJxJMbqs9LR2srC
+   VJEh98OMSPicvhqHXm6+KOc4Uu560x3geoGKVBW4f2Bc2KYx9nr2Eur7u
+   xA5oo5rbzSppD9CvuqU0C0NL3ffDnAKV3UjAynpAvMg/Of7EDTSiNquNi
+   B6yn7ZQtj/wxsqF2VT+9oUAwy9gorS15qI5XDEG62M4E2xCzkZnwIqrXq
+   RP+G+po+ijqowYW6AKMyLvCz4gv8+SxBbpOzZxLeZwzmpIwhz1iu/gmcE
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10789"; a="359407041"
+X-IronPort-AV: E=Sophos;i="6.01,247,1684825200"; 
+   d="scan'208";a="359407041"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Aug 2023 10:17:08 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10789"; a="842808072"
+X-IronPort-AV: E=Sophos;i="6.01,247,1684825200"; 
+   d="scan'208";a="842808072"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by fmsmga002.fm.intel.com with ESMTP; 01 Aug 2023 10:17:07 -0700
+Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Tue, 1 Aug 2023 10:17:07 -0700
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27 via Frontend Transport; Tue, 1 Aug 2023 10:17:07 -0700
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.169)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.27; Tue, 1 Aug 2023 10:17:07 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=IljHEqzM1m941FUnF33Q8dJpX6dO0fqQEiGa2RG3FC1YcgsnKzUZTj/NLWZnQRnwDPZlKi9jImlq/tdzdWqApxfG5lZPJSj1NCnt2kjIS0VhhcYVr8BAMmYHuujts3Xl0ghwo+LVKOAdAzDn8FFvN44ohlzumbWDm09N9jBOmmc2s38eljRiptR99kATc+tK4aAMov65qtwgztDkwkLZrk1SbMbaGZLelAO6ZtTjEyQrB8iYW3rjDDfKnENLM6NkInMOGHDA5lOeQnWNhFSJb3CtFsvO+JbJfiJ4tMs6u0A7LOeR6Ucwa5/RS/XoTmrefsEbwbghApP9Yt7JDM0gMQ==
+ b=GsIG6AmEsVMjZMxfASbnelcQquRXcUp+RbOQltA+XwAvwPCmAXwpVZ0ZScVBnUw9dOO9Qex8MoCFCpG755t6ITCOiKQd/axGMX0Yu9LluQv25IKZPsNlaqOmat42hIENtORP+UwsOOVgOZr21oB4ksSqY2bUOmoVMnD80bVYVgvxY1vKOagzE++vkOr/ggWI1Ziy6ANxQa0tyLBT/ptos088gBbvFsKVs52LMKpSu7mqsZEj4arbJL3VygR3F9syp7CL1/Ah0CnoCyyuH+3jOOUxTtqhhCN9Te7n/l0YDP+qd3DXUSm9YROHr/vb67s7IHe/JmHtcuTbF1MD2N5FuQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=n98rouop6UhW+bb2u1wEcn1y8x5ouUwyq2ao7OpYGTY=;
- b=buNxMiITH9B9LRH0jSjTddgKbdU5utFpntSwL2OZRvZ8jEoIatXrVkg5CKlAKTo6/qsueW7mcqRI1Mewp3IEAZJ+DX+VPukbzBBGaRtHssBYKAIIi9zfwNzXW17HXqtEaHstl71lT2NOq82OFq2c01YDwA7c3wS/r7Exi/DNeNz1hz9rAiZGkETtMNVEnQbX/dS9DuehO6yoBPC/7om944lp9xTg15iF6gSlpaLVWuwJpO3zpS3BoLVLnsbaQHQisiG/cbLQgd6IzCJ4VBQjqWUlXADxX6UmvWuKXS7aRz/Izs94dg73bBJ6rWWJrGLCL9/5fN4VV3puIfrhYIb5kQ==
+ bh=hbAMr1KlVBcY3xejFqEp1ZQIPuo/S9EggkGif5hsi94=;
+ b=U5oYHWoIEK6bPyxYpDd0ieX0ci3G8xEcBSM5hhxRK5KRz2ulBCRdgWoI4lecVLi7btW3t7/EunoMMRln1uKp+PO2Iq8jsopi03DBrnQirAGGj8YZd+w14HuH4PGtOsK/SwZLvWPRZIwYJzu5nr6fNnk6JIVhS1TKIa9IYVydmJYJKtWvxzUZaUfFenU/gIvD8+xDHHaw4tfnMYmy79b33UX9Gn0jLJHeaMTiwqw3zgUIWiJ1tQIVVyV4bOZBeY3U/6zcstgFDJG0hmqRXX9EsIzuk/3UHDTeETHk4kB8rnFudTH5Molk4Y9Xt9ThNTcSjbrLicrNukbpIOoy6oiBmQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=n98rouop6UhW+bb2u1wEcn1y8x5ouUwyq2ao7OpYGTY=;
- b=Y7pIe0S6TXTp3vciYa5iTCJ79YZLwYBH/OoUqRqxi/apf38MxSXXk64xomzW7tlHboFczyJom80SoA5x016M2U+FqvDA98UIZHipwH/YLM/sDw61RP+VNY/23l05lqlK4URQojZpMHh8YpWHxoXtY3BBaQNM7dNj6fIxG1Qb2Jw=
-Received: from PAXPR04MB9185.eurprd04.prod.outlook.com (2603:10a6:102:231::11)
- by VI1PR04MB7119.eurprd04.prod.outlook.com (2603:10a6:800:12e::24) with
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DM6PR11MB3625.namprd11.prod.outlook.com (2603:10b6:5:13a::21)
+ by MW5PR11MB5906.namprd11.prod.outlook.com (2603:10b6:303:1a0::21) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.45; Tue, 1 Aug
- 2023 17:10:07 +0000
-Received: from PAXPR04MB9185.eurprd04.prod.outlook.com
- ([fe80::d4ee:8daa:92f4:9671]) by PAXPR04MB9185.eurprd04.prod.outlook.com
- ([fe80::d4ee:8daa:92f4:9671%3]) with mapi id 15.20.6631.043; Tue, 1 Aug 2023
- 17:10:07 +0000
-From: Shenwei Wang <shenwei.wang@nxp.com>
-To: Johannes Zink <j.zink@pengutronix.de>, Russell King
-	<linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, Shawn Guo
-	<shawnguo@kernel.org>, Sascha Hauer <s.hauer@pengutronix.de>, Neil Armstrong
-	<neil.armstrong@linaro.org>, Kevin Hilman <khilman@baylibre.com>, Vinod Koul
-	<vkoul@kernel.org>, Chen-Yu Tsai <wens@csie.org>, Jernej Skrabec
-	<jernej.skrabec@gmail.com>, Samuel Holland <samuel@sholland.org>
-CC: Giuseppe Cavallaro <peppe.cavallaro@st.com>, Alexandre Torgue
-	<alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>, Fabio Estevam
-	<festevam@gmail.com>, dl-linux-imx <linux-imx@nxp.com>, Jerome Brunet
-	<jbrunet@baylibre.com>, Martin Blumenstingl
-	<martin.blumenstingl@googlemail.com>, Bhupesh Sharma
-	<bhupesh.sharma@linaro.org>, Nobuhiro Iwamatsu
-	<nobuhiro1.iwamatsu@toshiba.co.jp>, Simon Horman <simon.horman@corigine.com>,
-	Andrew Halaney <ahalaney@redhat.com>, Bartosz Golaszewski
-	<bartosz.golaszewski@linaro.org>, Wong Vee Khee <veekhee@apple.com>, Revanth
- Kumar Uppala <ruppala@nvidia.com>, Jochen Henneberg
-	<jh@henneberg-systemdesign.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-stm32@st-md-mailman.stormreply.com"
-	<linux-stm32@st-md-mailman.stormreply.com>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "linux-amlogic@lists.infradead.org"
-	<linux-amlogic@lists.infradead.org>, "imx@lists.linux.dev"
-	<imx@lists.linux.dev>, Frank Li <frank.li@nxp.com>
-Subject: RE: [EXT] Re: [PATCH v3 net 2/2] net: stmmac: dwmac-imx: pause the
- TXC clock in fixed-link
-Thread-Topic: [EXT] Re: [PATCH v3 net 2/2] net: stmmac: dwmac-imx: pause the
- TXC clock in fixed-link
-Thread-Index: AQHZw8rr+4AkxJNLt0GANB66N1LNC6/VZScAgABIh3A=
-Date: Tue, 1 Aug 2023 17:10:07 +0000
-Message-ID:
- <PAXPR04MB9185D7D3B088E4786A216044890AA@PAXPR04MB9185.eurprd04.prod.outlook.com>
-References: <20230731161929.2341584-1-shenwei.wang@nxp.com>
- <20230731161929.2341584-3-shenwei.wang@nxp.com>
- <bf2979c4-0b63-be53-b530-3d7385796534@pengutronix.de>
-In-Reply-To: <bf2979c4-0b63-be53-b530-3d7385796534@pengutronix.de>
-Accept-Language: en-US
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.42; Tue, 1 Aug
+ 2023 17:17:03 +0000
+Received: from DM6PR11MB3625.namprd11.prod.outlook.com
+ ([fe80::44ff:6a5:9aa4:124a]) by DM6PR11MB3625.namprd11.prod.outlook.com
+ ([fe80::44ff:6a5:9aa4:124a%7]) with mapi id 15.20.6631.043; Tue, 1 Aug 2023
+ 17:17:03 +0000
+Message-ID: <7a83e627-6e03-c447-77f8-1020973fa4a9@intel.com>
+Date: Tue, 1 Aug 2023 19:15:16 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [RFC net-next 1/2] overflow: add DECLARE_FLEX() for on-stack
+ allocs
 Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PAXPR04MB9185:EE_|VI1PR04MB7119:EE_
-x-ms-office365-filtering-correlation-id: e85803bb-2f6e-461e-a164-08db92b227d8
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- IZpfJpM7U4ZmSxubf0wv42RhSuyWDoPKt3uDnRWKjnuv370xLcLIQlHVd8MDsg6wMjyEEBsFDPEvm9T4xULxsjYejgAdUD+Kw0N+kQt4amo5H2ifBhXCC8LSZzZ4aE1K37+IcIF5eucXkbd1qZKTTzDp9HbAr8EPROwXlUJTehdXDznUUS5pMS7YzVpC/kKa6LKayAndB/p927fz/qQLnsVcvijypQ4HBAQs3MjTVsO5/Lf6lQEguHYfHgI3PzF25cY3rmRz7/yX+QRp8gmShkVNG2FsyD64SCIBFXt9E89BHYgaeGAvycrd5VKjec2zjx6sBrzdD5ZIpbN0v2ttXfzzudwrRDWpR3lBzZoGj4c6yZajZEb7KauOBnFrJeckiFqrE/OUmPxw4TVmnpQSVletwqeNXsGYZHvoFZQMu7L0Nw2RpTbkeoipgy/VhDE41wa2BrG6Lq0SUZh1xFZ7oZwmXZEiUQJXNlhmKt7uR259WiPkJH7s3/YbfnD0O8/1LCU8ufGG/adR0jLJYqIC/LcRMgkIHYIoE+LfBVKCiPqO51oJetQv/xJlrFGy3yTe6giW4PiTY0ZSuUeYwwVezqHgt75T2LU+j8Bi8tcslhonzSxUCfEaU7MllLRAgkpM
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB9185.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(136003)(376002)(346002)(396003)(39860400002)(366004)(451199021)(66946007)(66476007)(66446008)(64756008)(66556008)(4326008)(316002)(966005)(9686003)(83380400001)(2906002)(86362001)(38070700005)(7416002)(7406005)(44832011)(186003)(26005)(52536014)(5660300002)(55236004)(53546011)(6506007)(33656002)(122000001)(921005)(38100700002)(55016003)(41300700001)(8936002)(8676002)(7696005)(45080400002)(71200400001)(478600001)(54906003)(110136005)(76116006);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?ixxDJ2N+YLmD+UgTWq1zFdcM0FXW93PKIWsTjBVgKtvRuXPeduhv0AzuuRpR?=
- =?us-ascii?Q?D1QHKS0MYH87cO5+qjCqOhJ2bhZecNyuPH3ImoU1cirZYoK9joJbkmqf6NK/?=
- =?us-ascii?Q?rIYilWlGIpNRg7wPLHHBek92bW/oTtPHsz01uOiEB+R8poHMRSgbvJ/foIJt?=
- =?us-ascii?Q?l64Vg4UzGXfuDWKAlFKgAZfg5u9U7OYsZjJZEyeE0lyylyXokPzbbbsBXaQs?=
- =?us-ascii?Q?Xcvh1A4KP8FFiZLcoQEC7HCptGb7tAcFVihs751N2E0Ju3OMpcZuwoAXPi+x?=
- =?us-ascii?Q?tcmdWqtfHhHERWwxPhJp8hfdfDrsRIlsdRXEsizilCVlJeYkSHZvfiQAixXh?=
- =?us-ascii?Q?flSuR1tbwJ9qRFQpG1tz7OkuYU/VS+kypw9pDLcaJwrP1GoWo3c3oeWJ0UpG?=
- =?us-ascii?Q?RE/uwNDm5Rn3O4gMmMKXRJ/VL9tW4ZvKHfkEQLe9EtZ3MTyWI1dlE9MckG+J?=
- =?us-ascii?Q?/0gzUKUruX+rTV5V4LQGJuNlBCLFGtmDinQTJRiZR6mr536IgX0mlqFhsF3S?=
- =?us-ascii?Q?Pw7pqLtvz5cLkRQvz7J6pG1iQXFqv88bV0W4x+ioIuQ83+yZAeIAC8VcTRoh?=
- =?us-ascii?Q?JYbXyGj/LbReVJotXHcen8mIb0RXPn7ZLjJ5a3UfowYLH80USxFBpr8mbxSL?=
- =?us-ascii?Q?D0FP/Ll6wq3OWb+WRKWWN4rifPHZeIMYbGL3MQvn7CgeAR76zyqE7o90QgOI?=
- =?us-ascii?Q?gscOcvO2sarKQx73fULIjI6lOG8XCZqNFIgUmsU5R+UK63p/VIHdWVEU1gwb?=
- =?us-ascii?Q?PSdfiGCRq150zqyiwQ+oB3if39FUMLBl4tiuRD5fWZeio7bwCrvCNjolz2K5?=
- =?us-ascii?Q?xgFENqPiiWoljNeUrkT0agowMrunDDYj2F/KpWt3j3MNliOBFLOuCYMjLJBr?=
- =?us-ascii?Q?4Ujey379js7kEPFEoJY/eY/ZfXJMGYNWyLwWUyLcUM5szoxG8v+YR8LggTta?=
- =?us-ascii?Q?NpwqxW7FCrQ14v9aPWhRkPacqyElrZJQXOe2PHCEx+7VRn2Be99tyV/E5ZZG?=
- =?us-ascii?Q?bojOpNj+tqYCdVd3brVNcw6zIk50svfFQnCJFSmKZzQKaBqgWAGBBJOnVznR?=
- =?us-ascii?Q?ZMZr6SjATTKmsSJaMXlBeNxtho51GtrCuypsL2YmygsfD35LLJSY36wH0zMl?=
- =?us-ascii?Q?U//GJK1xxpqySpviq/1hAYJa1XcY5mcqMC0td27dgR36+0wMxeUOx8A4aLWG?=
- =?us-ascii?Q?l05GGzEzMWwk2j81WwVslhmNFcXVifsafdMeCqXCig8XL/fTbsole3nXtSQe?=
- =?us-ascii?Q?Mdvg6LW3WEOWGQvLMskrWEFNT3gc0CBRc2APTYWX6hKrIeieKoYCmirfSQv4?=
- =?us-ascii?Q?1sGtBgz8rw8WZpnpL3a61jZMkN7uIpXLigI6HZFqw7UAFnKbv3649hJwUVKq?=
- =?us-ascii?Q?1+2BJoT66cisft2JhhP/Ex7Vfbca7dfSEYmVwf+XzIL9qE2z6oKy5YyOF854?=
- =?us-ascii?Q?e+TEhBr84mtldktTD5rZoFV2IgsiPpqTBOzGRN1aE/OLockqU1xy0wfZyRHN?=
- =?us-ascii?Q?KTh/H5FcxDpqALNzB3/Sb8per351zQIrai/hJZ4zHr0q6st7H0FWquBt6ZEG?=
- =?us-ascii?Q?3qwW5hodlojhWy/UwXUdn3NMwMt1UnkAjPIqxbqE?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+CC: Kees Cook <keescook@chromium.org>, Jacob Keller
+	<jacob.e.keller@intel.com>, <intel-wired-lan@lists.osuosl.org>,
+	<netdev@vger.kernel.org>
+References: <20230801111923.118268-1-przemyslaw.kitszel@intel.com>
+ <20230801111923.118268-2-przemyslaw.kitszel@intel.com>
+ <d4d5324c-8d4b-b2e1-78c8-5c3015b5c03d@intel.com>
+ <47815c47-b8dc-6d37-b869-0fba22e3a71b@intel.com>
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+In-Reply-To: <47815c47-b8dc-6d37-b869-0fba22e3a71b@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: BE1P281CA0128.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:b10:7a::18) To DM6PR11MB3625.namprd11.prod.outlook.com
+ (2603:10b6:5:13a::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR11MB3625:EE_|MW5PR11MB5906:EE_
+X-MS-Office365-Filtering-Correlation-Id: 22940389-d22e-4bb1-58f1-08db92b31fb2
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: GuuB+UUKCG6pNMK7xyaC2lQtV8Bpbd1+orM1zRI8qWiHuVZSyUoQ/45rUMV/t6Fa+7ISMLTkUApWZzS9EoDSKBsEhBVWXYFSuISwYzWwE2Xn9PybEDecCtDQc2ehbpqbXshrJXeZQmDiwQRnVze9dQru1qtmetaVBVDJMGQ4bsxCnk77Snz+wnjCnr8Cx0Jt8xLyb2TAe3g0XtSeaXtOz+9wCM+0eYZknxCbAHz0vzOJNDewHndNaH6+kLT0UAzy6VYKSOycwBPU0EgqKGYzJFTmSFNL5O19/IStQhTu7+IUvrlKT3Hj/9yI/Csaor/d+v4LvTBcYilVXHkQuw0aNtMWUn6Uu2IO6RLN4X9NAxQvju7Rs6NSC9iewPCgdgixAKFD4D8lr5Ksd/QjrAnWBiKN8i+1W/0oEyjtJRyXB0dMyGEMkO2oSCFEUBN0n+Yf6LMuxU9QaxIgW4cu9inffxEWrY8Rx7rIqNl0FS0jkw4XiAtoiC1A+4Sg77CWlyOmPFmBFrDLaHo1VBBaqSWGm+B0ZzyJ7ZKE5n9jEs+zl8zxfDgLneQCi5+61SPvXTpl968ytdSTqyUFdLG2ItXFywyf3RbR7X9UHD04yiFN9fS+7Q6s9pX/dR/R8Rnanr8m2pUchkKGcfJkC+Y4bLOV9w==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB3625.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(366004)(39860400002)(346002)(396003)(136003)(376002)(451199021)(6512007)(6486002)(36756003)(53546011)(2616005)(26005)(6506007)(83380400001)(186003)(66946007)(66556008)(54906003)(37006003)(82960400001)(41300700001)(86362001)(38100700002)(31696002)(66476007)(6636002)(4326008)(5660300002)(8676002)(8936002)(6862004)(316002)(31686004)(2906002)(6666004)(478600001)(43740500002)(45980500001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?amhCRWlWeFphQ3Bvem5DS0RuSVpWNjNEekVZT0duU00rUkNTQWlacFl6ODBD?=
+ =?utf-8?B?UzNMTnBXM25YYXM0blFlTDJ1RXFxdHVlc2E4L2pGS21MU3pFdEpDRGlTK1Vt?=
+ =?utf-8?B?UklzSkhON3VrbUFtbWNXc2ZpVnVlNDhKblVDekR5RG4wOEFKZ1FPcjRLKzNV?=
+ =?utf-8?B?dXpScmZTK3hmQ1pveiszdENOQVArakpnZHFWRDNPNlprMWpoaWIxcU8xemxt?=
+ =?utf-8?B?KzFDSVZaL2hGSG1EaDYxaFpNVEtyRkFmckxqejhtV2FqRFFGeW96Vlh2NnVI?=
+ =?utf-8?B?UmY1TEZGYklCZCs0K0FFNlZDVWFxQ2NHMVhHcC9hOTVoNExqa3hhTVFVZjJ6?=
+ =?utf-8?B?d3MzWERINUdEWlkyTWE2b3B6MGFiUjJHcW1JZVZrZ0RiVE9GZTFtVHJWQnRp?=
+ =?utf-8?B?NkhQV092M0FvWHVOTlh1SzFPSVFaN3lWM2paUGZRaHVBa1RhcjlrUm1ORlFn?=
+ =?utf-8?B?VHk4REM4eFJ5NEx4MFdzOU9MMkJHaklHUXh1aE5FNTRlTFJBTFltekpXQy9P?=
+ =?utf-8?B?L0d1aWYzcVZ6cEdSWEUxTFBvZFZmL2xKMk02M0N0VTNLNTF6UE1EVkQzOG9r?=
+ =?utf-8?B?TjJPTFVzZURYdGhLSkc2enBNb3BwdnBxZjMvbWUvSlREa1JXSFFIVEZncE9i?=
+ =?utf-8?B?YzdPV0dZQ1hCZGFRUFpHQXRIY3hsNjQza2NFTmZyQVZVNGNUUS9IVE1EWUNJ?=
+ =?utf-8?B?emFJZCtTOGNWMXBVaWF5RlpFN01Qc244S3I4c2RwMTZBOGNBV2grci85RWlN?=
+ =?utf-8?B?WlNlZGJWL0MxV3hqUXMzRURoZklSVW5ENVhuWm9qRlR4cFJzZjVra3I2Tkwv?=
+ =?utf-8?B?LzlvbzZIRG54c09HODllM3RqUEMrUkdTdHJWTjRXaXVZTXdWaGgxc0IzbW5v?=
+ =?utf-8?B?TnRvVTJxZTFRNkVReXlxY2dzTkwwM1VybWJmWEpESEdybU1WaGVQTnNVcXJN?=
+ =?utf-8?B?bVBoaFlHTFBhUkVIdDltODNjeUZlTGZYOU1ONE1yMEMxZi91a2NHS3duRW4r?=
+ =?utf-8?B?QlBDVjVSb3RJSWJUS3hHb29KL204WndjdVAvMVVUTUZxaFBsd21LSFZrKysx?=
+ =?utf-8?B?d3hSblhtdS9uV2g5UzVZVHB2cTVhQkN5LzZhWTl6Y3IrUUNQNUg0Q0cvTUdp?=
+ =?utf-8?B?WktQVEpjN2pWdzdhcXRMS3VhM0s3TmxPNWFJMXh5c0hIQ3o3ekJCTnZvTURC?=
+ =?utf-8?B?aXNwcjZoYlZFYmtKcFBkMXhiTCtJYzI1R2tVRTlYRHJ5ZGxHdGVHYWF4cVl5?=
+ =?utf-8?B?TlF5aHQxQWFzNjgwM1FWWVYvTDdiTWJHQ1dKTHA0Z2huRmV3NW5mTnNtUDN6?=
+ =?utf-8?B?aHEzZE5QQ2RkNENyV1pmZ3o3RmJtRmR1SDFrcGYzTENUUEwxTWFQbUVpSDNC?=
+ =?utf-8?B?anFtaDRzMkxGdkZvYllYUzE1Wk5Ea3hzWEErOUhiV2t4QlFiZkwzVjZkZklU?=
+ =?utf-8?B?Q1BVSnprQjN0bDJ0T0pvOWZHRGdEUHdYNDUrU1NpQ2ZlSk9KUEJUcHlQNDQz?=
+ =?utf-8?B?WWQzb3BmdlhMT0MwY2VzLzk3Kzl6NVY2NEc1M1VaSWsrbjdrcGp1NjI5dGdz?=
+ =?utf-8?B?dGtHYVh0Y1l0UW0vN0FudURJZUhrUGdOdjhnZjhBOXNPT0VVaFBkWkJhbmdG?=
+ =?utf-8?B?b0s5ankwUVE5ZDlmUm5XcDViZm1qUDg1eEZZam5lYng3b2NSWHB5WS9CUy91?=
+ =?utf-8?B?SUg0UEkra04yVTAwM1FlTlVaSnNwSlArcUpoRHgvVXBZOUF1R28zK1IzcWRv?=
+ =?utf-8?B?czJqNU8rVFZWRTh4WXQwenZJVHNWRnZLL3VKU2t0ckxaVms2SVNmNmZNQ3pI?=
+ =?utf-8?B?NG5yUlhLSmFaOENHNlcxTUZENFF4L2U4djBFZ2FDaVdMTzdhZlU5UEJVS3VK?=
+ =?utf-8?B?aFNhV0p3NXhxZ1BKRmNlQ3gwRXVsanA0V1EvUllqOVpXcnBuNkpqQzlZN3ZG?=
+ =?utf-8?B?cno2dGs4akJBQXhsSlJiTmE1ODEzcXBYRDZUZ0NONUo4T0xVdlpoQUVtZEgy?=
+ =?utf-8?B?NWlDbXBtNDlFYjBNUmZtWk9MWlh0cUNYMzJOcjM0WlBPSHIxbElOVG1sOXlJ?=
+ =?utf-8?B?bFpyV3k4U3BCMHgyUkNWampHUnF2cHRZU3dBU1BmaHNzK1RRR3o4ZlVsVjE3?=
+ =?utf-8?B?MFZCSmFiY0t5aDlHZEVuc0ZneWZjam0yQWpaYzF6djZ3bm9sSElnbTMydmh5?=
+ =?utf-8?Q?IXCkRlXJSNROWr8Udx2ylNU=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 22940389-d22e-4bb1-58f1-08db92b31fb2
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB3625.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB9185.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e85803bb-2f6e-461e-a164-08db92b227d8
-X-MS-Exchange-CrossTenant-originalarrivaltime: 01 Aug 2023 17:10:07.2747
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Aug 2023 17:17:03.3986
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: H7+dkH60P7Wy49w0auOljUgiMga9DHGDnEvJNAnc3tzTvTjCehSXkGM3EtsHDB690VtnoFn9Todi3JREvfHpcQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB7119
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: WLG/Gkqtfbc5/7iHs8KJDy7Smy9PNZEMjj3HXaG9tUOL8581e6RxrKqHuTuF2p083UQDTIqgdZx/9GD04zDDebxIQOEn9YvQ/SMZULWfuDk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW5PR11MB5906
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Date: Tue, 1 Aug 2023 16:18:44 +0200
 
+> On 8/1/23 15:54, Alexander Lobakin wrote:
+>> From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+>> Date: Tue, 1 Aug 2023 13:19:22 +0200
+>>
+>>> Add DECLARE_FLEX() macro for on-stack allocations of structs with
+>>> flexible array member.
+>>>
+>>> Using underlying array for on-stack storage lets us to declare known
+>>> on compile-time structures without kzalloc().
+>>>
+>>> Actual usage for ice driver is in next patch of the series.
+>>>
+>>> Note that "struct" kw and "*" char is moved to the caller, to both:
+>>> have shorter macro name, and have more natural type specification
+>>> in the driver code (IOW not hiding an actual type of var).
+>>>
+>>> Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+>>> ---
+>>>   include/linux/overflow.h | 14 ++++++++++++++
+>>>   1 file changed, 14 insertions(+)
+>>>
+>>> diff --git a/include/linux/overflow.h b/include/linux/overflow.h
+>>> index f9b60313eaea..403b7ec120a2 100644
+>>> --- a/include/linux/overflow.h
+>>> +++ b/include/linux/overflow.h
+>>> @@ -309,4 +309,18 @@ static inline size_t __must_check
+>>> size_sub(size_t minuend, size_t subtrahend)
+>>>   #define struct_size_t(type, member, count)                    \
+>>>       struct_size((type *)NULL, member, count)
+>>>   +/**
+>>> + * DECLARE_FLEX() - Declare an on-stack instance of structure with
+>>> trailing
+>>> + * flexible array.
+>>> + * @type: Pointer to structure type, including "struct" keyword and
+>>> "*" char.
+>>> + * @name: Name for a (pointer) variable to create.
+>>> + * @member: Name of the array member.
+>>> + * @count: Number of elements in the array; must be compile-time const.
+>>> + *
+>>> + * Declare an instance of structure *@type with trailing flexible
+>>> array.
+>>> + */
+>>> +#define DECLARE_FLEX(type, name, member, count)                    \
+>>> +    u8 name##_buf[struct_size((type)NULL, member, count)]
+>>> __aligned(8) = {};\
+>>
+>> 1. You can use struct_size_t() instead of open-coding it.
+> 
+> with ptr param, not feasible, but otherwise, of course will do it (see
 
-> -----Original Message-----
-> From: Johannes Zink <j.zink@pengutronix.de>
-> Sent: Tuesday, August 1, 2023 7:48 AM
-> To: Shenwei Wang <shenwei.wang@nxp.com>; Russell King
-> <linux@armlinux.org.uk>; David S. Miller <davem@davemloft.net>; Eric
-> Dumazet <edumazet@google.com>; Jakub Kicinski <kuba@kernel.org>; Paolo
-> Abeni <pabeni@redhat.com>; Maxime Coquelin
-> <mcoquelin.stm32@gmail.com>; Shawn Guo <shawnguo@kernel.org>; Sascha
-> Hauer <s.hauer@pengutronix.de>; Neil Armstrong <neil.armstrong@linaro.org=
->;
-> Kevin Hilman <khilman@baylibre.com>; Vinod Koul <vkoul@kernel.org>; Chen-
-> Yu Tsai <wens@csie.org>; Jernej Skrabec <jernej.skrabec@gmail.com>; Samue=
-l
-> Holland <samuel@sholland.org>
-> Cc: Giuseppe Cavallaro <peppe.cavallaro@st.com>; Alexandre Torgue
-> <alexandre.torgue@foss.st.com>; Jose Abreu <joabreu@synopsys.com>;
-> Pengutronix Kernel Team <kernel@pengutronix.de>; Fabio Estevam
-> <festevam@gmail.com>; dl-linux-imx <linux-imx@nxp.com>; Jerome Brunet
-> <jbrunet@baylibre.com>; Martin Blumenstingl
-> <martin.blumenstingl@googlemail.com>; Bhupesh Sharma
-> <bhupesh.sharma@linaro.org>; Nobuhiro Iwamatsu
-> <nobuhiro1.iwamatsu@toshiba.co.jp>; Simon Horman
-> <simon.horman@corigine.com>; Andrew Halaney <ahalaney@redhat.com>;
-> Bartosz Golaszewski <bartosz.golaszewski@linaro.org>; Wong Vee Khee
-> <veekhee@apple.com>; Revanth Kumar Uppala <ruppala@nvidia.com>; Jochen
-> Henneberg <jh@henneberg-systemdesign.com>; netdev@vger.kernel.org; linux-
-> stm32@st-md-mailman.stormreply.com; linux-arm-kernel@lists.infradead.org;
-> linux-kernel@vger.kernel.org; linux-amlogic@lists.infradead.org;
-> imx@lists.linux.dev; Frank Li <frank.li@nxp.com>
-> Subject: [EXT] Re: [PATCH v3 net 2/2] net: stmmac: dwmac-imx: pause the T=
-XC
-> clock in fixed-link
->
-> Caution: This is an external email. Please take care when clicking links =
-or
-> opening attachments. When in doubt, report the message using the 'Report =
-this
-> email' button
->
->
-> Hi Shenwei,
->
-> thanks for your patch.
->
-> On 7/31/23 18:19, Shenwei Wang wrote:
-> > When using a fixed-link setup, certain devices like the SJA1105
-> > require a small pause in the TXC clock line to enable their internal
-> > tunable delay line (TDL).
->
-> If this is only required for some devices, is it safe to enforce this beh=
-aviour
-> unconditionally for any kind of fixed link devices connected to the MX93 =
-EQOS
-> or could this possibly break for other devices?
->
+struct_size_t(typeof(*(type)NULL), member, count)
 
-It won't impact normal devices. The link layer hasn't built up yet.
+Jokin :D
+
+> below)
+> 
+>> 2. Maybe use alignof(type) instead of 8? Some structures have larger
+>>     alignment requirements.
+> 
+> Sure, thanks!
+> 
+>>
+>>> +    type name = (type)&name##_buf
+>>
+>> In general, I still think DECLARE_FLEX(struct foo) is better than
+>> DECLARE_FLEX(struct foo *).
+> 
+> I have started with that version, and that would prevent your question
+> no. 1 :) So there is additional advantage to that.
+> 
+>> Looking at container_of(), struct_size_t()
+>> etc., they all take `type`, not `type *`, so even from the consistency
+>> perspective your solution is not optimal to me.
+> 
+> The two you have mentioned are "getter" macros. Random two from me, that
+> actually declare something are:
+> 
+> #define DEVICE_ATTR_RW(_name) \
+>     struct device_attribute dev_attr_##_name = __ATTR_RW(_name)
+> 
+> #define DECLARE_BITMAP(name, bits) \
+>     unsigned long name[BITS_TO_LONGS(bits)]
+> 
+> Even if they don't take @type param, they declare variable of some
+> non-pointer type.
+> 
+> Both variants have some logic that supports them, and some disadvantages:
+> ptr-arg: user declares sth as ptr, but it takes "a lot" of space
+> just-type-arg: user declares foo, but it's "*foo" actually, so "foo.bar"
+> does not work.
+
+Same as DECLARE_BITMAP() actually: it always declares an array, so that
+it's then __set_bit(FOO, bitmap), not __set_bit(FOO, &bitmap).
+
+One more argument for "just-type": yes, the name you pass to the macro
+is exported as a pointer, but you occupy the size of the type (plus tail
+elements), not a pointer, on the stack.
+
+> 
+> I have no strong opinion here, so will just switch to pure-type param.
+> 
+>> Thanks,
+>> Olek
+> 
 
 Thanks,
-Shenwei
-
-> Best regards
-> Johannes
->
-> >
-> > To satisfy this requirement, this patch temporarily disables the TX
-> > clock, and restarts it after a required period. This provides the
-> > required silent interval on the clock line for SJA1105 to complete the
-> > frequency transition and enable the internal TDLs.
-> >
-> > So far we have only enabled this feature on the i.MX93 platform.
-> >
-> > Signed-off-by: Shenwei Wang <shenwei.wang@nxp.com>
-> > Reviewed-by: Frank Li <frank.li@nxp.com>
-> > ---
-> >   .../net/ethernet/stmicro/stmmac/dwmac-imx.c   | 42 ++++++++++++++++++=
-+
-> >   1 file changed, 42 insertions(+)
-> >
-> > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c
-> > b/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c
-> > index 53ee5a42c071..2e4173d099f3 100644
-> > --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c
-> > +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c
-> > @@ -32,6 +32,7 @@
-> >   #define GPR_ENET_QOS_RGMII_EN               (0x1 << 21)
-> >
-> >   #define MX93_GPR_ENET_QOS_INTF_MODE_MASK    GENMASK(3, 0)
-> > +#define MX93_GPR_ENET_QOS_INTF_MASK          GENMASK(3, 1)
-> >   #define MX93_GPR_ENET_QOS_INTF_SEL_MII              (0x0 << 1)
-> >   #define MX93_GPR_ENET_QOS_INTF_SEL_RMII             (0x4 << 1)
-> >   #define MX93_GPR_ENET_QOS_INTF_SEL_RGMII    (0x1 << 1)
-> > @@ -40,6 +41,7 @@
-> >   #define DMA_BUS_MODE                        0x00001000
-> >   #define DMA_BUS_MODE_SFT_RESET              (0x1 << 0)
-> >   #define RMII_RESET_SPEED            (0x3 << 14)
-> > +#define CTRL_SPEED_MASK                      GENMASK(15, 14)
-> >
-> >   struct imx_dwmac_ops {
-> >       u32 addr_width;
-> > @@ -56,6 +58,7 @@ struct imx_priv_data {
-> >       struct regmap *intf_regmap;
-> >       u32 intf_reg_off;
-> >       bool rmii_refclk_ext;
-> > +     void __iomem *base_addr;
-> >
-> >       const struct imx_dwmac_ops *ops;
-> >       struct plat_stmmacenet_data *plat_dat; @@ -212,6 +215,42 @@
-> > static void imx_dwmac_fix_speed(void *priv, uint speed, uint mode)
-> >               dev_err(dwmac->dev, "failed to set tx rate %lu\n", rate);
-> >   }
-> >
-> > +static void imx_dwmac_fix_speed_mx93(void *priv, uint speed, uint
-> > +mode) {
-> > +     struct imx_priv_data *dwmac =3D priv;
-> > +     int ctrl, old_ctrl, iface;
-> > +
-> > +     imx_dwmac_fix_speed(priv, speed, mode);
-> > +
-> > +     if (!dwmac || mode !=3D MLO_AN_FIXED)
-> > +             return;
-> > +
-> > +     if (regmap_read(dwmac->intf_regmap, dwmac->intf_reg_off, &iface))
-> > +             return;
-> > +
-> > +     iface &=3D MX93_GPR_ENET_QOS_INTF_MASK;
-> > +     if (iface !=3D MX93_GPR_ENET_QOS_INTF_SEL_RGMII)
-> > +             return;
-> > +
-> > +     old_ctrl =3D readl(dwmac->base_addr + MAC_CTRL_REG);
-> > +     ctrl =3D old_ctrl & ~CTRL_SPEED_MASK;
-> > +     regmap_update_bits(dwmac->intf_regmap, dwmac->intf_reg_off,
-> > +                        MX93_GPR_ENET_QOS_INTF_MODE_MASK, 0);
-> > +     writel(ctrl, dwmac->base_addr + MAC_CTRL_REG);
-> > +
-> > +     /* Ensure the settings for CTRL are applied and avoid CPU/Compile=
-r
-> > +      * reordering.
-> > +      */
-> > +     wmb();
-> > +
-> > +     usleep_range(10, 20);
-> > +     iface |=3D MX93_GPR_ENET_QOS_CLK_GEN_EN;
-> > +     regmap_update_bits(dwmac->intf_regmap, dwmac->intf_reg_off,
-> > +                        MX93_GPR_ENET_QOS_INTF_MODE_MASK, iface);
-> > +
-> > +     writel(old_ctrl, dwmac->base_addr + MAC_CTRL_REG); }
-> > +
-> >   static int imx_dwmac_mx93_reset(void *priv, void __iomem *ioaddr)
-> >   {
-> >       struct plat_stmmacenet_data *plat_dat =3D priv; @@ -317,8 +356,11
-> > @@ static int imx_dwmac_probe(struct platform_device *pdev)
-> >       plat_dat->exit =3D imx_dwmac_exit;
-> >       plat_dat->clks_config =3D imx_dwmac_clks_config;
-> >       plat_dat->fix_mac_speed =3D imx_dwmac_fix_speed;
-> > +     if (of_machine_is_compatible("fsl,imx93"))
-> > +             plat_dat->fix_mac_speed =3D imx_dwmac_fix_speed_mx93;
-> >       plat_dat->bsp_priv =3D dwmac;
-> >       dwmac->plat_dat =3D plat_dat;
-> > +     dwmac->base_addr =3D stmmac_res.addr;
-> >
-> >       ret =3D imx_dwmac_clks_config(dwmac, true);
-> >       if (ret)
->
-> --
-> Pengutronix e.K.                | Johannes Zink                  |
-> Steuerwalder Str. 21            |
-> https://www.pe/
-> ngutronix.de%2F&data=3D05%7C01%7Cshenwei.wang%40nxp.com%7C761fbb75c
-> 1c24cfe091508db928d8ade%7C686ea1d3bc2b4c6fa92cd99c5c301635%7C0%7C
-> 0%7C638264908852977732%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjA
-> wMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%
-> 7C&sdata=3D2l2zNfIaNnRJENmERehNae8g%2F%2BQqlxD2YRx7ksY2X%2BE%3D&r
-> eserved=3D0    |
-> 31137 Hildesheim, Germany       | Phone: +49-5121-206917-0       |
-> Amtsgericht Hildesheim, HRA 2686| Fax:   +49-5121-206917-5555    |
-
+Olek
 
