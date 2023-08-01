@@ -1,64 +1,165 @@
-Return-Path: <netdev+bounces-23413-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23414-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 688F376BE4C
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 22:11:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B65B476BE50
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 22:12:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 87C55281B44
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 20:11:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 25D5C281ADF
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 20:12:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66E6C253D1;
-	Tue,  1 Aug 2023 20:11:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 284AF253D3;
+	Tue,  1 Aug 2023 20:12:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43DB54DC89
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 20:11:48 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9528C433C7;
-	Tue,  1 Aug 2023 20:11:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690920708;
-	bh=0gCBbS6tj9vwj7Q7yqVIWg0y6AxgBA6QkVD5cPt2Tag=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=q0P0AhH2PjRdCup+bz0QUvVga1KT6jxrbjnHmehAHcEAecETIY8mkdLDiLh4attCI
-	 f9MB6WbvBXVtrN9yNnSjVcRxvXzJ8qX5nn9JliUSjkWTd4qwP5OAIHJLgZvVJqs5b1
-	 6T0MXKzIV3sluCzHzpvLg1phbBgIEoU64tCRBH85OSqn/GRtZFYltvXqb0nptLgs1Y
-	 0gsg6150EML3ukOwdel8kE768dD3xNyan8C/5trWJhXWeE1X8ZXo5AsjqPFPvtMHtT
-	 mm51mQGwvuw/HsXP709M4K1j9RZM/bZEzYLqcLSJAYE71vveQeejwaSAKJ2GYPvhf9
-	 cY422eqtPAdEg==
-Date: Tue, 1 Aug 2023 13:11:46 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Eric Dumazet <edumazet@google.com>
-Cc: Yue Haibing <yuehaibing@huawei.com>, davem@davemloft.net,
- dsahern@kernel.org, pabeni@redhat.com, yoshfuji@linux-ipv6.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- simon.horman@corigine.com
-Subject: Re: [PATCH v3] ip6mr: Fix skb_under_panic in ip6mr_cache_report()
-Message-ID: <20230801131146.51a9aaf3@kernel.org>
-In-Reply-To: <CANn89iJO44CiUjftDZHEjOCy5Q3-PDB12uWTkrbA5JJNXMoeDA@mail.gmail.com>
-References: <20230801064318.34408-1-yuehaibing@huawei.com>
-	<CANn89iJO44CiUjftDZHEjOCy5Q3-PDB12uWTkrbA5JJNXMoeDA@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CCA3253D1
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 20:12:47 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9392FB1
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 13:12:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1690920765;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=eS079lTc6uMyHb9fOEpx+7PdtvoQL179wIlpAdqGQ6s=;
+	b=WQC6VgDYWXFipl5Wmqu7Op54MdhqGOi7sA/EPFPRZ9ZT6IE6gGbHVb9KPMHqfE00Azlb+B
+	OKTqnQGwKewR1InJfKHlcuFKGUiqRWJWxtZGbIwLJMvbyzHdOGLMozZghg8zLMLFAXtGnO
+	PvdI3vo5hVTELp2HYcUSeaaA4DSw0qo=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-594-loSXWq-lM_edaYjHQd4WLw-1; Tue, 01 Aug 2023 16:12:32 -0400
+X-MC-Unique: loSXWq-lM_edaYjHQd4WLw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 721B28C46F9;
+	Tue,  1 Aug 2023 20:11:56 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.131])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 7CC00112132D;
+	Tue,  1 Aug 2023 20:11:54 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <64c93109c084e_1c5e3529452@willemb.c.googlers.com.notmuch>
+References: <64c93109c084e_1c5e3529452@willemb.c.googlers.com.notmuch> <1420063.1690904933@warthog.procyon.org.uk>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: dhowells@redhat.com, netdev@vger.kernel.org,
+    syzbot+f527b971b4bdc8e79f9e@syzkaller.appspotmail.com,
+    bpf@vger.kernel.org, brauner@kernel.org, davem@davemloft.net,
+    dsahern@kernel.org, edumazet@google.com, kuba@kernel.org,
+    pabeni@redhat.com, axboe@kernel.dk, viro@zeniv.linux.org.uk,
+    linux-fsdevel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
+    linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] udp: Fix __ip_append_data()'s handling of MSG_SPLICE_PAGES
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1501752.1690920713.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 01 Aug 2023 21:11:53 +0100
+Message-ID: <1501753.1690920713@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Tue, 1 Aug 2023 09:51:29 +0200 Eric Dumazet wrote:
-> > -               skb_push(skb, -skb_network_offset(pkt));
-> > +               __skb_pull(skb, skb_network_offset(pkt));
-> >
-> >                 skb_push(skb, sizeof(*msg));
-> >                 skb_reset_transport_header(skb);  
-> 
-> Presumably this code has never been tested :/
+Willem de Bruijn <willemdebruijn.kernel@gmail.com> wrote:
 
-Could have been tested on 32bit, I wonder if there is more such bugs :S
+> __ip6_append_data probably needs the same.
+
+Now that's interesting.  __ip6_append_data() has a check for this and retu=
+rns
+-EINVAL in this case:
+
+		copy =3D datalen - transhdrlen - fraggap - pagedlen;
+		if (copy < 0) {
+			err =3D -EINVAL;
+			goto error;
+		}
+
+but should I bypass that check for MSG_SPLICE_PAGES?  It hits the check wh=
+en
+it should be able to get past it.  The code seems to go back to prehistori=
+c
+times, so I'm not sure why it's there.
+
+For an 8192 MTU, the breaking point is at a send of 8137 bytes.  The attac=
+hed
+test program iterates through different send sizes until it hits the point=
+.
+
+David
+---
+#define _GNU_SOURCE
+
+#include <arpa/inet.h>
+#include <fcntl.h>
+#include <netinet/ip6.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/socket.h>
+#include <sys/mman.h>
+#include <sys/uio.h>
+
+#define OSERROR(R, S) do { if ((long)(R) =3D=3D -1L) { perror((S)); exit(1=
+); } } while(0)
+
+int main()
+{
+	struct sockaddr_storage ss;
+	struct sockaddr_in6 sin6;
+	void *buffer;
+	unsigned int tmp;
+	int pfd[2], sfd;
+	int res, i;
+
+	OSERROR(pipe(pfd), "pipe");
+
+	sfd =3D socket(AF_INET6, SOCK_DGRAM, 0);
+	OSERROR(sfd, "socket/2");
+
+	memset(&sin6, 0, sizeof(sin6));
+	sin6.sin6_family =3D AF_INET6;
+	sin6.sin6_port =3D htons(7);
+#warning set dest IPv6 address below
+	sin6.sin6_addr.s6_addr32[0] =3D htonl(0x01020304);
+	sin6.sin6_addr.s6_addr32[1] =3D htonl(0x05060708);
+	sin6.sin6_addr.s6_addr32[2] =3D htonl(0x00000000);
+	sin6.sin6_addr.s6_addr32[3] =3D htonl(0x00000001);
+	OSERROR(connect(sfd, (struct sockaddr *)&sin6, sizeof(sin6)), "connect");
+
+	buffer =3D mmap(NULL, 1024*1024, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_AN=
+ON, -1, 0);
+	OSERROR(buffer, "mmap");
+
+	for (i =3D 1000; i < 65535; i++) {
+		printf("%d\n", i);
+		OSERROR(send(sfd, buffer, i, MSG_MORE), "send");
+
+		OSERROR(write(pfd[1], buffer, 8), "write");
+
+		OSERROR(splice(pfd[0], 0, sfd, 0, 0x4ffe0ul, 0), "splice");
+	}
+	return 0;
+}
+
 
