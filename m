@@ -1,63 +1,32 @@
-Return-Path: <netdev+bounces-23206-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23207-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A93C076B4F7
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 14:44:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF70676B502
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 14:48:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5342C28198E
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 12:44:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C5B3F1C20ED9
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 12:48:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4982320FAA;
-	Tue,  1 Aug 2023 12:44:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43A87214EA;
+	Tue,  1 Aug 2023 12:48:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EC20111E
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 12:44:21 +0000 (UTC)
-Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A77151FD2;
-	Tue,  1 Aug 2023 05:44:19 -0700 (PDT)
-Received: by mail-lf1-x135.google.com with SMTP id 2adb3069b0e04-4fe28f92d8eso4560058e87.1;
-        Tue, 01 Aug 2023 05:44:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690893858; x=1691498658;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=o6luXjnOL4UWMb4FJX9zuO9FE/E5YxfEl36iSelVa4c=;
-        b=SlFkjkMfmEh0jUneuZW2U10pB6Q33WGnT0VGl4bR+6rW99eLlJ2wFCITS+0BZXTYgT
-         EkKcUv50/sv8/jtH07gjmwr/HK/9lc0zFHinorSzWU7qOVDKtuJFLJVoo662CYgLE0wd
-         W+RLD29pvKI1I3Hmz4JlpA1MHiKrJVldwX0gsoJGstZJOzNOa7516GIAMicdJtW4x9uc
-         Rt6DquwgjZWbT9mSJzbqFxrnIaq9Qt9yNy5gnF6bcooHRLEI+YZanjmLNUy9Qk+MHY/m
-         Gu1kw4SAafKmS/uKdnShHYrwQGfA/DXOvGDkT5wh7F4uin4q4zAiOgs4HdMF3WIAQi9T
-         qCog==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690893858; x=1691498658;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=o6luXjnOL4UWMb4FJX9zuO9FE/E5YxfEl36iSelVa4c=;
-        b=XNgpWCfzyyvIvcTEEmFyuGUkHLBov9qTMbcjaXgG1ZN4RX2Oow2odoV6imyKOesAEz
-         zMRbBcmWkclb9jixkdzno/HNIOa8ZvG+/dYunuUR5qLmYzlaQopWrMNt4Kw4TYam8NXQ
-         5ZtEJUsmkobBqh4upuHkHh5ZRgF5XV3rnOUhwqYN4IWXf7ssWq2mELpd4UZD8oHFibjb
-         fosMty23SY93VBPb0WENsqzwKEFvfyp/ifhGzkS4tDx00hvYZU46lP4E8saHBJ/jf9S0
-         ow6Ra2CTZB5pzltPKqgE6i2Ly8Xp4hpdFhN/Lvo+mdK73R1H+OTI9fs5vqYVpmm1t+q3
-         8VXA==
-X-Gm-Message-State: ABy/qLZBf/7l/CWo+G5YqsW2NcBRTAQRVGXr14hNOY6D80OtzBPRhlXY
-	upaOI+TZE/xB+EKAMAmU5Yk=
-X-Google-Smtp-Source: APBJJlHYhz66RVjuzfSMeHujrdx/3uLoId0vY1yuRrV230W6AQ6T4powR9bm4Ezjf/yVuw0wdqZ2bA==
-X-Received: by 2002:a05:6512:20c1:b0:4fd:faa3:2352 with SMTP id u1-20020a05651220c100b004fdfaa32352mr1871037lfr.14.1690893857660;
-        Tue, 01 Aug 2023 05:44:17 -0700 (PDT)
-Received: from [172.16.196.206] ([213.255.186.46])
-        by smtp.gmail.com with ESMTPSA id 3-20020ac24843000000b004fe2de20d88sm1401034lfy.232.2023.08.01.05.44.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 01 Aug 2023 05:44:17 -0700 (PDT)
-Message-ID: <ee0341fc-b621-b7c0-4312-be2ad3c29da6@gmail.com>
-Date: Tue, 1 Aug 2023 15:44:16 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30208111E
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 12:48:37 +0000 (UTC)
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35B6510EA
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 05:48:36 -0700 (PDT)
+Received: from ptz.office.stw.pengutronix.de ([2a0a:edc0:0:900:1d::77] helo=[127.0.0.1])
+	by metis.ext.pengutronix.de with esmtp (Exim 4.92)
+	(envelope-from <j.zink@pengutronix.de>)
+	id 1qQonB-0004wo-0E; Tue, 01 Aug 2023 14:48:01 +0200
+Message-ID: <bf2979c4-0b63-be53-b530-3d7385796534@pengutronix.de>
+Date: Tue, 1 Aug 2023 14:47:46 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,90 +34,172 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [PATCH v8 7/8] net-next: mvpp2: relax return value check for IRQ
- get
-Content-Language: en-US, en-GB
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Matti Vaittinen <matti.vaittinen@fi.rohmeurope.com>,
- Marcin Wojtas <mw@semihalf.com>, "David S. Miller" <davem@davemloft.net>,
+ Thunderbird/102.13.1
+Subject: Re: [PATCH v3 net 2/2] net: stmmac: dwmac-imx: pause the TXC clock in
+ fixed-link
+Content-Language: en-US, de-DE
+To: Shenwei Wang <shenwei.wang@nxp.com>, Russell King
+ <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>,
  Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <cover.1690890774.git.mazziesaccount@gmail.com>
- <9738e169d83a96f18de417e62b3cf4c20f51f885.1690890774.git.mazziesaccount@gmail.com>
- <ZMj7Cp3fhN7GmCZp@shell.armlinux.org.uk>
-From: Matti Vaittinen <mazziesaccount@gmail.com>
-In-Reply-To: <ZMj7Cp3fhN7GmCZp@shell.armlinux.org.uk>
+ Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin
+ <mcoquelin.stm32@gmail.com>, Shawn Guo <shawnguo@kernel.org>,
+ Sascha Hauer <s.hauer@pengutronix.de>,
+ Neil Armstrong <neil.armstrong@linaro.org>,
+ Kevin Hilman <khilman@baylibre.com>, Vinod Koul <vkoul@kernel.org>,
+ Chen-Yu Tsai <wens@csie.org>, Jernej Skrabec <jernej.skrabec@gmail.com>,
+ Samuel Holland <samuel@sholland.org>
+Cc: Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>,
+ Pengutronix Kernel Team <kernel@pengutronix.de>,
+ Fabio Estevam <festevam@gmail.com>, NXP Linux Team <linux-imx@nxp.com>,
+ Jerome Brunet <jbrunet@baylibre.com>,
+ Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
+ Bhupesh Sharma <bhupesh.sharma@linaro.org>,
+ Nobuhiro Iwamatsu <nobuhiro1.iwamatsu@toshiba.co.jp>,
+ Simon Horman <simon.horman@corigine.com>,
+ Andrew Halaney <ahalaney@redhat.com>,
+ Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
+ Wong Vee Khee <veekhee@apple.com>, Revanth Kumar Uppala
+ <ruppala@nvidia.com>, Jochen Henneberg <jh@henneberg-systemdesign.com>,
+ netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ linux-amlogic@lists.infradead.org, imx@lists.linux.dev,
+ Frank Li <frank.li@nxp.com>
+References: <20230731161929.2341584-1-shenwei.wang@nxp.com>
+ <20230731161929.2341584-3-shenwei.wang@nxp.com>
+From: Johannes Zink <j.zink@pengutronix.de>
+In-Reply-To: <20230731161929.2341584-3-shenwei.wang@nxp.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:900:1d::77
+X-SA-Exim-Mail-From: j.zink@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 8/1/23 15:31, Russell King (Oracle) wrote:
-> On Tue, Aug 01, 2023 at 03:04:24PM +0300, Matti Vaittinen wrote:
->> fwnode_irq_get[_byname]() were changed to not return 0 anymore.
->>
->> Drop check for return value 0.
->>
->> Signed-off-by: Matti Vaittinen <mazziesaccount@gmail.com>
-> 
-> Sorry, but I don't think you've properly considered the effects of your
-> patch.
+Hi Shenwei,
 
-Don't be sorry.
+thanks for your patch.
+
+On 7/31/23 18:19, Shenwei Wang wrote:
+> When using a fixed-link setup, certain devices like the SJA1105 require a
+> small pause in the TXC clock line to enable their internal tunable
+> delay line (TDL).
+
+If this is only required for some devices, is it safe to enforce this behaviour 
+unconditionally for any kind of fixed link devices connected to the MX93 EQOS 
+or could this possibly break for other devices?
+
+Best regards
+Johannes
 
 > 
->> @@ -5833,7 +5833,7 @@ static int mvpp2_multi_queue_vectors_init(struct mvpp2_port *port,
->>   			v->irq = of_irq_get_byname(port_node, irqname);
->>   		else
->>   			v->irq = fwnode_irq_get(port->fwnode, i);
->> -		if (v->irq <= 0) {
->> +		if (v->irq < 0) {
+> To satisfy this requirement, this patch temporarily disables the TX clock,
+> and restarts it after a required period. This provides the required
+> silent interval on the clock line for SJA1105 to complete the frequency
+> transition and enable the internal TDLs.
 > 
-> You're making this change based on the assumption that fwnode_irq_get()
-> has changed its return values, but I really don't think you've looked
-> at the code and considered the return value behaviour of the DT function
-> above. Reading it's documentation, it states that of_irq_get_byname()
-> may return 0 on IRQ mapping failure.
-
-You're correct. Thanks for spotting this! Seems like I really overlooked 
-the behaviour of the of_irq_get_byname().
-
-> So, by making this change, you are allowing IRQ mapping failure in the
-> DT path to succeed rather than fail.
+> So far we have only enabled this feature on the i.MX93 platform.
 > 
->>   			ret = -EINVAL;
->>   			goto err;
->>   		}
->> @@ -6764,7 +6764,7 @@ static int mvpp2_port_probe(struct platform_device *pdev,
->>   		err = -EPROBE_DEFER;
->>   		goto err_deinit_qvecs;
->>   	}
->> -	if (port->port_irq <= 0)
->> +	if (port->port_irq < 0)
+> Signed-off-by: Shenwei Wang <shenwei.wang@nxp.com>
+> Reviewed-by: Frank Li <frank.li@nxp.com>
+> ---
+>   .../net/ethernet/stmicro/stmmac/dwmac-imx.c   | 42 +++++++++++++++++++
+>   1 file changed, 42 insertions(+)
 > 
-> Exactly the same problem here, but...
-> 
->>   		/* the link irq is optional */
->>   		port->port_irq = 0;
-> 
-> this is less critical... but still wrong.
-> 
-> So, given that this patch is basically incorrect...
-> 
-> NAK.
-> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c
+> index 53ee5a42c071..2e4173d099f3 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c
+> @@ -32,6 +32,7 @@
+>   #define GPR_ENET_QOS_RGMII_EN		(0x1 << 21)
+>   
+>   #define MX93_GPR_ENET_QOS_INTF_MODE_MASK	GENMASK(3, 0)
+> +#define MX93_GPR_ENET_QOS_INTF_MASK		GENMASK(3, 1)
+>   #define MX93_GPR_ENET_QOS_INTF_SEL_MII		(0x0 << 1)
+>   #define MX93_GPR_ENET_QOS_INTF_SEL_RMII		(0x4 << 1)
+>   #define MX93_GPR_ENET_QOS_INTF_SEL_RGMII	(0x1 << 1)
+> @@ -40,6 +41,7 @@
+>   #define DMA_BUS_MODE			0x00001000
+>   #define DMA_BUS_MODE_SFT_RESET		(0x1 << 0)
+>   #define RMII_RESET_SPEED		(0x3 << 14)
+> +#define CTRL_SPEED_MASK			GENMASK(15, 14)
+>   
+>   struct imx_dwmac_ops {
+>   	u32 addr_width;
+> @@ -56,6 +58,7 @@ struct imx_priv_data {
+>   	struct regmap *intf_regmap;
+>   	u32 intf_reg_off;
+>   	bool rmii_refclk_ext;
+> +	void __iomem *base_addr;
+>   
+>   	const struct imx_dwmac_ops *ops;
+>   	struct plat_stmmacenet_data *plat_dat;
+> @@ -212,6 +215,42 @@ static void imx_dwmac_fix_speed(void *priv, uint speed, uint mode)
+>   		dev_err(dwmac->dev, "failed to set tx rate %lu\n", rate);
+>   }
+>   
+> +static void imx_dwmac_fix_speed_mx93(void *priv, uint speed, uint mode)
+> +{
+> +	struct imx_priv_data *dwmac = priv;
+> +	int ctrl, old_ctrl, iface;
+> +
+> +	imx_dwmac_fix_speed(priv, speed, mode);
+> +
+> +	if (!dwmac || mode != MLO_AN_FIXED)
+> +		return;
+> +
+> +	if (regmap_read(dwmac->intf_regmap, dwmac->intf_reg_off, &iface))
+> +		return;
+> +
+> +	iface &= MX93_GPR_ENET_QOS_INTF_MASK;
+> +	if (iface != MX93_GPR_ENET_QOS_INTF_SEL_RGMII)
+> +		return;
+> +
+> +	old_ctrl = readl(dwmac->base_addr + MAC_CTRL_REG);
+> +	ctrl = old_ctrl & ~CTRL_SPEED_MASK;
+> +	regmap_update_bits(dwmac->intf_regmap, dwmac->intf_reg_off,
+> +			   MX93_GPR_ENET_QOS_INTF_MODE_MASK, 0);
+> +	writel(ctrl, dwmac->base_addr + MAC_CTRL_REG);
+> +
+> +	/* Ensure the settings for CTRL are applied and avoid CPU/Compiler
+> +	 * reordering.
+> +	 */
+> +	wmb();
+> +
+> +	usleep_range(10, 20);
+> +	iface |= MX93_GPR_ENET_QOS_CLK_GEN_EN;
+> +	regmap_update_bits(dwmac->intf_regmap, dwmac->intf_reg_off,
+> +			   MX93_GPR_ENET_QOS_INTF_MODE_MASK, iface);
+> +
+> +	writel(old_ctrl, dwmac->base_addr + MAC_CTRL_REG);
+> +}
+> +
+>   static int imx_dwmac_mx93_reset(void *priv, void __iomem *ioaddr)
+>   {
+>   	struct plat_stmmacenet_data *plat_dat = priv;
+> @@ -317,8 +356,11 @@ static int imx_dwmac_probe(struct platform_device *pdev)
+>   	plat_dat->exit = imx_dwmac_exit;
+>   	plat_dat->clks_config = imx_dwmac_clks_config;
+>   	plat_dat->fix_mac_speed = imx_dwmac_fix_speed;
+> +	if (of_machine_is_compatible("fsl,imx93"))
+> +		plat_dat->fix_mac_speed = imx_dwmac_fix_speed_mx93;
+>   	plat_dat->bsp_priv = dwmac;
+>   	dwmac->plat_dat = plat_dat;
+> +	dwmac->base_addr = stmmac_res.addr;
+>   
+>   	ret = imx_dwmac_clks_config(dwmac, true);
+>   	if (ret)
 
 -- 
-Matti Vaittinen
-Linux kernel developer at ROHM Semiconductors
-Oulu Finland
-
-~~ When things go utterly wrong vim users can always type :help! ~~
+Pengutronix e.K.                | Johannes Zink                  |
+Steuerwalder Str. 21            | https://www.pengutronix.de/    |
+31137 Hildesheim, Germany       | Phone: +49-5121-206917-0       |
+Amtsgericht Hildesheim, HRA 2686| Fax:   +49-5121-206917-5555    |
 
 
