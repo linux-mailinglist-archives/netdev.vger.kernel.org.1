@@ -1,111 +1,126 @@
-Return-Path: <netdev+bounces-23252-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23267-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE73C76B6EF
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 16:12:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B280776B748
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 16:23:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6443C281A57
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 14:11:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E87921C20F3D
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 14:23:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B9AE23BC0;
-	Tue,  1 Aug 2023 14:11:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4A6A23BDC;
+	Tue,  1 Aug 2023 14:23:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FE9122EED
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 14:11:57 +0000 (UTC)
-Received: from mail-qt1-x832.google.com (mail-qt1-x832.google.com [IPv6:2607:f8b0:4864:20::832])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E35511D
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 07:11:51 -0700 (PDT)
-Received: by mail-qt1-x832.google.com with SMTP id d75a77b69052e-40c72caec5cso328801cf.0
-        for <netdev@vger.kernel.org>; Tue, 01 Aug 2023 07:11:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690899110; x=1691503910;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pkC3KIklnTCY53hK9lBcQer2DPh4HPjr+bgJxfgI/K0=;
-        b=AWiRoEuYk0UGZeHx2qpOUsfJvYvsb9ItVBq1bBfWodqv8ZtmHcSr5U4SJH+F1o5vWI
-         K6iPs0qHJLgYXDC2w0OADuJPUFP1UEbCuEa7zAkE3mKud7uQly0y644nfeff9UA+hzRN
-         7uUZDuGz9fvLg+w3oFRAf8MffaUovWmFq72/mIu+dU6ms+nbXasl12aGs9/XvEI5qwnU
-         VSH1cgj6/KjWVNDXvD3quSoqJJNC1CERaEVyHfPr0JMOGtpjbMDtFV84czo6m4O7UCnr
-         aXou7ABUttpT7pdmUHdfZX3kY+ncNENW6E2OKNfk4afkRnrmzBRadF1EUSjKYnXClAE7
-         V7jQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690899110; x=1691503910;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=pkC3KIklnTCY53hK9lBcQer2DPh4HPjr+bgJxfgI/K0=;
-        b=EKWchudQt6Xchq5m/O4u5FSofEOl/oErift38Vzj0+jkgTMxV/khstzb96HYKJOSvm
-         GPxBqssZRJBMF5MpLZSjisFaSmIDXlrX1XA0qoND2H/UnFvrKUe8Zkh8AHQEk9T4vjfn
-         PKLgwdMxN7gamzfODUBYi6vkAbpTrSCnbtEThFHGKspVGcLgP1M1A4w1hPFX9YfAG75L
-         NBRvqBAUV6ZQ474jJ6jhaEcqArr03YwtwD+vJ0tvw32QOlcTb2ut1T8SWRjjrCQIKoEM
-         oWbbK84aFqtZNZpT3b/nYwqus52arH5zcxbTH87Y7C0OhiG2qcrnrI7yu/9dXXbJprfH
-         tj9A==
-X-Gm-Message-State: ABy/qLYWB8kZScRm9U4Efn+XwIBEPVh/hpYOKvrmrGVSeMhFb+M0VUhq
-	8Y0dqcaMQEAzzFezDhDdCXDIRMmhTnDwzFG7JeTksQ==
-X-Google-Smtp-Source: APBJJlFNN7TWoySV0L3/UDLWOkPxv6mhMd0pB7EJCklr4ZYuom2VaoZTG0odAsEuSbDFFTORdXlTxd8qkchCkWNlu7Q=
-X-Received: by 2002:a05:622a:15d0:b0:3f8:5b2:aef0 with SMTP id
- d16-20020a05622a15d000b003f805b2aef0mr825346qty.24.1690899110445; Tue, 01 Aug
- 2023 07:11:50 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 978A42151C
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 14:23:33 +0000 (UTC)
+Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E360210FA;
+	Tue,  1 Aug 2023 07:23:31 -0700 (PDT)
+Received: from p-infra-ksmg-sc-msk02 (localhost [127.0.0.1])
+	by mx1.sberdevices.ru (Postfix) with ESMTP id 75D63120016;
+	Tue,  1 Aug 2023 17:23:30 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 75D63120016
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
+	s=mail; t=1690899810;
+	bh=Dhl5VAnaWylNbHoKrXzioSowOtsINKSs8oGEKA4Q7pI=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
+	b=NcvrA8wpjg/MbNAyQwwpENo8S7bUvvQCVh+GezYVaOoQy2obioQ8d6B/ksIV6Wvn3
+	 r7EXKDHPEC7ypgbw4y1UVx+YjQycS2uwy2t9DeOuYkmo+djCbWVN0v2iP8ks/fd3Fw
+	 Al7LFCcTgscdqYAJx6oP8IZMgMa/K3MaLR83gl6pzgLzyxPEVl6+YZBHmCF3hvZKQW
+	 F6+xstEs+v+gH4BiqSBU9v1WdCE1EqojOP8Jh7Ys9XbCKgbx6d0FD11drTdqj1ZEKJ
+	 fh1wE26SF7wuT4houzipSd547/+yMTgRFdQt2L9cPMufYt005/AdYDoStSJ606Egnl
+	 7RoUppofJvR9g==
+Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.sberdevices.ru (Postfix) with ESMTPS;
+	Tue,  1 Aug 2023 17:23:30 +0300 (MSK)
+Received: from localhost.localdomain (100.64.160.123) by
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Tue, 1 Aug 2023 17:23:26 +0300
+From: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+To: Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella
+	<sgarzare@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang
+	<jasowang@redhat.com>, Bobby Eshleman <bobby.eshleman@bytedance.com>
+CC: <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<kernel@sberdevices.ru>, <oxffffaa@gmail.com>, <avkrasnov@sberdevices.ru>,
+	Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+Subject: [RFC PATCH v1 0/2] vsock: handle writes to shutdowned socket
+Date: Tue, 1 Aug 2023 17:17:25 +0300
+Message-ID: <20230801141727.481156-1-AVKrasnov@sberdevices.ru>
+X-Mailer: git-send-email 2.35.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230801112101.15564-1-quic_ajainp@quicinc.com>
- <447ba1fe-b20b-4ed0-97bc-4137b2ccfb37@lunn.ch> <8c591002-308e-bdba-de5f-c96113230451@quicinc.com>
-In-Reply-To: <8c591002-308e-bdba-de5f-c96113230451@quicinc.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 1 Aug 2023 16:11:39 +0200
-Message-ID: <CANn89iL3TTLJy0kbbxLZRyyRft66absBbh4x22KMKCag7ywOzg@mail.gmail.com>
-Subject: Re: [PATCH] net: export dev_change_name function
-To: Anvesh Jain P <quic_ajainp@quicinc.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, "David S . Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <simon.horman@corigine.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, 
-	Hangbin Liu <liuhangbin@gmail.com>, Jiri Pirko <jiri@resnulli.us>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, Andy Ren <andy.ren@getcruise.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Venkata Rao Kakani <quic_vkakani@quicinc.com>, 
-	Vagdhan Kumar <quic_vagdhank@quicinc.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [100.64.160.123]
+X-ClientProxiedBy: p-i-exch-sc-m02.sberdevices.ru (172.16.192.103) To
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
+X-KSMG-Rule-ID: 10
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 178796 [Jul 22 2023]
+X-KSMG-AntiSpam-Version: 5.9.59.0
+X-KSMG-AntiSpam-Envelope-From: AVKrasnov@sberdevices.ru
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 525 525 723604743bfbdb7e16728748c3fa45e9eba05f7d, {Tracking_uf_ne_domains}, {Tracking_from_domain_doesnt_match_to}, FromAlignment: s, ApMailHostAddress: 100.64.160.123
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean, bases: 2023/07/23 10:45:00
+X-KSMG-LinksScanning: Clean, bases: 2023/07/23 10:46:00
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/07/23 08:49:00 #21663637
+X-KSMG-AntiVirus-Status: Clean, skipped
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Aug 1, 2023 at 3:08=E2=80=AFPM Anvesh Jain P <quic_ajainp@quicinc.c=
-om> wrote:
->
->
->
-> On 8/1/2023 6:01 PM, Andrew Lunn wrote:
-> > On Tue, Aug 01, 2023 at 04:51:01PM +0530, Anvesh Jain P wrote:
-> >> export dev_change_name function to be used by other modules.
-> >>
-> >> Signed-off-by: Vagdhan Kumar <quic_vagdhank@quicinc.com>
-> >> Signed-off-by: Anvesh Jain P <quic_ajainp@quicinc.com>
-> >
-> > It would be normal to include a user of the API when exposing an API.
-> >
-> > What module needs to change the name of a device? At the moment, only
-> > user space can do this via netlink or an IOCTL.
-> >
-> >       Andrew
-> CONFIG_RENAME_DEVICES is the module which needs "dev_change_name" API.
-> Our requirement is to change the network device name from kernel space.
+Hello,
 
-We do not support out-of-tree code.
+this small patchset adds POSIX compliant behaviour on writes to the
+socket which was shutdowned with 'shutdown()' (both sides - local with
+SHUT_WR flag, peer - with SHUT_RD flag). According POSIX we must send
+SIGPIPE in such cases (but SIGPIPE is not send when MSG_NOSIGNAL is set).
 
-You will have to upstream this code first.
+First patch is implemented in the same way as net/ipv4/tcp.c:tcp_sendmsg_locked().
+It uses 'sk_stream_error()' function which handles EPIPE error. Another
+way is to use code from net/unix/af_unix.c:unix_stream_sendmsg() where
+same logic from 'sk_stream_error()' is implemented "from scratch", but
+it doesn't check 'sk_err' field. I think error from this field has more
+priority to be returned from syscall. So I guess it is better to reuse
+currently implemented 'sk_stream_error()' function.
+
+Test is also added.
+
+Head for this patchset is:
+https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/commit/?id=9d0cd5d25f7d45bce01bbb3193b54ac24b3a60f3
+
+Arseniy Krasnov (2):
+  vsock: send SIGPIPE on write to shutdowned socket
+  test/vsock: shutdowned socket test
+
+ net/vmw_vsock/af_vsock.c         |   3 +
+ tools/testing/vsock/vsock_test.c | 138 +++++++++++++++++++++++++++++++
+ 2 files changed, 141 insertions(+)
+
+-- 
+2.25.1
+
 
