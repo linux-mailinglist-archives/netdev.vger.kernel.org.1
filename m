@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-23419-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23420-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9BA9576BED2
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 22:53:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DBC5A76BED5
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 22:53:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C62BD1C210A4
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 20:53:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 96071281ADF
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 20:53:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B886D26B0E;
-	Tue,  1 Aug 2023 20:53:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CB0F26B6A;
+	Tue,  1 Aug 2023 20:53:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD5734DC77
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 20:53:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51C0B4DC77
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 20:53:03 +0000 (UTC)
 Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7EE711BFD
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 13:53:00 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d061f324d64so6309203276.1
-        for <netdev@vger.kernel.org>; Tue, 01 Aug 2023 13:53:00 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5126311D
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 13:53:02 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d0fff3cf2d7so6837605276.2
+        for <netdev@vger.kernel.org>; Tue, 01 Aug 2023 13:53:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690923179; x=1691527979;
+        d=google.com; s=20221208; t=1690923181; x=1691527981;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=8Ce38lInC3y1CKhKvDL0FKNpZbXqllhZkxY6jIapoJY=;
-        b=CAHrGqbLmdI9vj5+8/AIqWEKkFAxW+otBD2LoVE4fZTCHxZRUWvK5ScX0KHbzBUwKh
-         n21PFvzIxmEyv+Mj7/BKNPFCLO0U9LJVI0GLMX4Bs73FGcJHRLcdhC4tjS0pM5/F+6FM
-         HXqZXobrYCkw35beyu9Engjw0vBbp5vRzqDxbJODVOtLgNmEGztt9Q6AfBaPEwXS7tIC
-         4BblGzgcLXIJ2JH8jgLMU7Z5oEYrbAI/8ny8rJEG/6zYNks2irYGLVLR8X4dIFixhmTH
-         RKthZbPOESgIYFQEInotddhEX4N/mrL/Z+zXYyiKzta3jp7A9+U4/nL0/Il9WSSRgKGN
-         kSYQ==
+        bh=C+yit71oMsx680KafiyUWCZMFyhA9I6XCSFIZv1F378=;
+        b=bXD5gfj3eNqfEKm44vRZA2A4pXrXDXEUmoohw1l9afdyIU/p7VOrfqjuNXdHTGfMFy
+         VDIjp45X5DFVIpHr34eMQKAVrlsk5zXndndyJcHjO/BfnnFcX1muoJE4tXajvYsBFHz1
+         bEwQYTFwBPH+K0X+JX+iSq198U9oSFbPXlcdZ5fxDJ+O/LdQ/fo8/LIPGkp7BNFynTfE
+         6SB439T6oWXyKvGWJhDx+OM8RbG0PEfcBy24pm7h34OiLURcXW9bKDr5V1kzA45Io2OP
+         BhfbYvsvYtGNugVGFD2vrLGe18d03SjkjYg2u0VIb6c63TkNGW+BMDJdAZRt77kYCOIC
+         2Ijg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690923179; x=1691527979;
+        d=1e100.net; s=20221208; t=1690923181; x=1691527981;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8Ce38lInC3y1CKhKvDL0FKNpZbXqllhZkxY6jIapoJY=;
-        b=WAwyEsf/moN42DIeMGLVFtMXkVAkzdj+IkYWQvRLZR1EISM51GgPo3IJwbM8BGcoZr
-         CXN326XwVSfVn1wnR6s9CwDXBvNrz4p4Sut2EPF53342fLyiet6h34cx7QfmeGGbFuYn
-         8v3DOVeiMBUGrOq+pa/zkFC3mTgCqAl7YaD6pFiKksftl4k5/M1ZsXuy6KCGQk1syIbk
-         XvS2ZhSRXQrg8QFG1mENfPnQBHpa9x1elGeu8lMULSaSx6lgqyaph80UzezIo29kI6xA
-         tC5eh+YIQMmnByg+L40VakbkCPwnsJdWEn0nVNv9qr7XF7EAGtDxmGnfux4oppMmlSQ7
-         d3Sw==
-X-Gm-Message-State: ABy/qLY5Lipw2PPhFzJ6nrxyfZ0hppBiAQP7C2ZxP6Pfki0913Beh2rp
-	oUUnljbU3Uzs6rV4q6zOMqBdanQe6pqrCQ==
-X-Google-Smtp-Source: APBJJlG7bxzIDzzhCKcdtytTxOJLIE8cRqR8tpaeR2GWg5P7TenDsfRkTQ8mYcepSSY/cxHBxvjSch2ZrIVdhQ==
+        bh=C+yit71oMsx680KafiyUWCZMFyhA9I6XCSFIZv1F378=;
+        b=iWNG6elmTY9wNiCYo2q9MeyZwcWmnnVT1dOCIchATuKM2MgrgM4CLzl7iuf6o15ZCa
+         izt4+kgXkvmwvKWqwqxRHOxeFyazvgn1/l5fYagZDG8BOSHQm2GZqCtZVximI15gPTH3
+         r7NSyaymXGUYavxo8hh9f9S1vL2dmUdRE3+KTvA+DPq86G6K67mRv1/9spqgyCbMIokT
+         DCeDwGnzy8cAAqhw6BwsC0yP6ys/8kS6hBXFJTK4QxkHgDkA9MNvKcA9m3uKR1yfjBlD
+         eAmZidpEw5rqtblKAl7Rn9sT9sW95cnwqfKVf7HQKuAAsOHIRYXlzAOuofJ4pGLCVq1O
+         n5ww==
+X-Gm-Message-State: ABy/qLYsMCsxUalSgx+DgI5OONr9dJlhDaNztyIHCeMNwgjnpibnBDa9
+	CX9iACdFZILd6XRrZX7+fYgt2ObATSdtCA==
+X-Google-Smtp-Source: APBJJlFr7gwiNW/kz8b5JcnzIaxGXXjmZe0phpN+3IYBTnditADsQ2DYSqAKmsLmhn/uP1UHz6PQEVnt1tkytA==
 X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a25:c712:0:b0:d0c:1f08:5fef with SMTP id
- w18-20020a25c712000000b00d0c1f085fefmr84222ybe.12.1690923179814; Tue, 01 Aug
- 2023 13:52:59 -0700 (PDT)
-Date: Tue,  1 Aug 2023 20:52:52 +0000
+ (user=edumazet job=sendgmr) by 2002:a25:aaec:0:b0:d35:bf85:5aa0 with SMTP id
+ t99-20020a25aaec000000b00d35bf855aa0mr40983ybi.4.1690923181437; Tue, 01 Aug
+ 2023 13:53:01 -0700 (PDT)
+Date: Tue,  1 Aug 2023 20:52:53 +0000
 In-Reply-To: <20230801205254.400094-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -62,9 +62,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20230801205254.400094-1-edumazet@google.com>
 X-Mailer: git-send-email 2.41.0.585.gd2178a4bd4-goog
-Message-ID: <20230801205254.400094-3-edumazet@google.com>
-Subject: [PATCH v2 net-next 2/4] net: tun: change tun_alloc_skb() to allow
- bigger paged allocations
+Message-ID: <20230801205254.400094-4-edumazet@google.com>
+Subject: [PATCH v2 net-next 3/4] net/packet: change packet_alloc_skb() to
+ allow bigger paged allocations
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -78,34 +78,34 @@ X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-tun_alloc_skb() is currently calling sock_alloc_send_pskb()
+packet_alloc_skb() is currently calling sock_alloc_send_pskb()
 forcing order-0 page allocations.
 
-Switch to PAGE_ALLOC_COSTLY_ORDER, to increase max allocation size by 8x.
+Switch to PAGE_ALLOC_COSTLY_ORDER, to increase max size by 8x.
 
 Also add logic to increase the linear part if needed.
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 Cc: Tahsin Erdogan <trdgn@amazon.com>
 ---
- drivers/net/tun.c | 4 +++-
+ net/packet/af_packet.c | 4 +++-
  1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-index d75456adc62ac82a4f9da10c50c48266c5a9a0c0..8a48431e8c5b3c6435079f84577435d8cac0eacf 100644
---- a/drivers/net/tun.c
-+++ b/drivers/net/tun.c
-@@ -1526,8 +1526,10 @@ static struct sk_buff *tun_alloc_skb(struct tun_file *tfile,
+diff --git a/net/packet/af_packet.c b/net/packet/af_packet.c
+index 8e3ddec4c3d57e7492b55404db3119cbba6f6022..3b77d255d22d6d2ed23cfc50e69a32e9c7b94531 100644
+--- a/net/packet/af_packet.c
++++ b/net/packet/af_packet.c
+@@ -2927,8 +2927,10 @@ static struct sk_buff *packet_alloc_skb(struct sock *sk, size_t prepad,
  	if (prepad + len < PAGE_SIZE || !linear)
  		linear = len;
  
 +	if (len - linear > MAX_SKB_FRAGS * (PAGE_SIZE << PAGE_ALLOC_COSTLY_ORDER))
 +		linear = len - MAX_SKB_FRAGS * (PAGE_SIZE << PAGE_ALLOC_COSTLY_ORDER);
  	skb = sock_alloc_send_pskb(sk, prepad + linear, len - linear, noblock,
--				   &err, 0);
-+				   &err, PAGE_ALLOC_COSTLY_ORDER);
+-				   err, 0);
++				   err, PAGE_ALLOC_COSTLY_ORDER);
  	if (!skb)
- 		return ERR_PTR(err);
+ 		return NULL;
  
 -- 
 2.41.0.585.gd2178a4bd4-goog
