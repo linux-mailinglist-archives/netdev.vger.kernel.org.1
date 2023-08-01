@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-23162-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23163-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 633FA76B36B
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 13:39:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96BD276B370
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 13:39:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7797F1C20359
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 11:39:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 50D6E280E49
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 11:39:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 391EA214FE;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E0672150D;
 	Tue,  1 Aug 2023 11:38:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B9C746A0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92B222150B
 	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 11:38:28 +0000 (UTC)
-Received: from mail-qv1-xf30.google.com (mail-qv1-xf30.google.com [IPv6:2607:f8b0:4864:20::f30])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6B82E7A
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 04:38:25 -0700 (PDT)
-Received: by mail-qv1-xf30.google.com with SMTP id 6a1803df08f44-63d0d38ff97so24865066d6.1
-        for <netdev@vger.kernel.org>; Tue, 01 Aug 2023 04:38:25 -0700 (PDT)
+Received: from mail-qv1-xf32.google.com (mail-qv1-xf32.google.com [IPv6:2607:f8b0:4864:20::f32])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B35C1B0
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 04:38:27 -0700 (PDT)
+Received: by mail-qv1-xf32.google.com with SMTP id 6a1803df08f44-63d3583d0efso38381156d6.1
+        for <netdev@vger.kernel.org>; Tue, 01 Aug 2023 04:38:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20221208.gappssmtp.com; s=20221208; t=1690889904; x=1691494704;
+        d=mojatatu-com.20221208.gappssmtp.com; s=20221208; t=1690889906; x=1691494706;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=CApZ8mvmFQLHdcJUVcsE9K4VNDBv6pfouZIfcHkr5QI=;
-        b=VvtANBmeF7uzpQssvBjDX+js2IkrjnTCE16uzcBimSdVkoo79oGeABBhjNjnZJAkto
-         K9VwffrEsx8swuas0AAIG3fMumJB5O1hwg90kV7CvghvnROhcZNhK8ddaOZIhzX79dwh
-         ibtQpE9KL+nj/eZgu0TJuu86oJeYE3BWzue6cOwgfuuqhPScwDaIWZ6TVvIojtU+29z8
-         5Gwy1/OA3cln0LtyenwvjUsrytlUvEyx7lWrNM2bR4PkZR627XdyQJ1LDML0tnuGDOdx
-         kjkgwumH4Ze3JZHiYK9rRwBZiRzkQI6gP6td1autTV+gtkw0J9lp4K2kbGiG5lhDdRpO
-         mb8w==
+        bh=Lcubvgp2h2A7YrGcdAvcz8shDpuHOnRDCsGQOHEkabM=;
+        b=e9CVijgvlDel7QC86UPIcz8ZvXugWJsCV/XCSIatUpU7ByT9YlwQZ3L28Y179Q9dvw
+         y/Wkk9jSOq5KrJgmsjCs9/QqB4lm6m/niBznM8lkUwD2czEK3yB/QmrFUC0hvLHTew7r
+         XAZ/vmEc9tT4GsA8f/Ac8rw6leECnf7m5bmgMtNmElDkMpoxolzEwnZmSbvZUPSMPsKB
+         zto8TeFrdUGVlcXI3lVgmrO6nVisxE3/3FMvtDZ1K7nopl6pjatNnTyA1NtzYfSia48j
+         6rI/pFkvzgKnG9IoF+85jvkshRzGCKNKd1X7ElEfD3dR9vcSIu24hm+mHfr7YNyIQqKC
+         JbFQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690889904; x=1691494704;
+        d=1e100.net; s=20221208; t=1690889906; x=1691494706;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=CApZ8mvmFQLHdcJUVcsE9K4VNDBv6pfouZIfcHkr5QI=;
-        b=FmyWCrNd2dmO0wUbEpgCU9vu6puCG3Cxuetga1pDYtqUuxDABnF9t6kuRUoeFC6Xea
-         LxRLWfIl4QW9w80qNklwytlac2o3obYh4uSN5al3IHETCN9kuOD1DyK+eo82aDAeEKOj
-         TtG5osMQnKfmYSvuopQddB1dQ1CwXXwqqPr51CjtoZCFuQdMKhZx4mwClvX7IWnwGGPG
-         Q7l9gYxggWgQfXs4DdMJ1ZIsjwFj2AsxgAridF2ruROlHe1ZcbBzCN3lDj2AVVqgQkyj
-         hjT5++UhYDPWqjM3PBBIYfY/OTRgVHxX4QKTQNL2pidy2CvlPcpWXn8t/shjT9hTYMTl
-         ej+w==
-X-Gm-Message-State: ABy/qLb3G7gIhYWuhMDgGk0GSPHKEYDtl7B8CXcGPEQyWXB7OOUtM4Dr
-	B7H65CAAllnf2HhUaKWz56sxBNxBARvvt91FQkS8HA==
-X-Google-Smtp-Source: APBJJlGKEYyTrtjd/+PsIphkEZk3o5ZBIoBeBxfaIHv2G7gLzs+dBGsWqTN0O+37u+b3zvJTg5Mxug==
-X-Received: by 2002:a0c:ab46:0:b0:630:34f:80d5 with SMTP id i6-20020a0cab46000000b00630034f80d5mr15420966qvb.15.1690889904518;
-        Tue, 01 Aug 2023 04:38:24 -0700 (PDT)
+        bh=Lcubvgp2h2A7YrGcdAvcz8shDpuHOnRDCsGQOHEkabM=;
+        b=H5GUWJYx9pdVyAxbCQqcetTu248noao+Ofku/KV8MSP4BQLiCuBTweKrSKZKrwROzX
+         anIODjBSbqHGV8Eon24ZcYBW3tscKlhx2A2Gh81DRuzO2Tywegkjq+qA7oHkted3dLer
+         Tr0KhWLS+hacao96gAK2Y1RcaP0NkD4doZNsuaH5nveLj6HSuRyHr4Co37iAp13l6Nzd
+         eef8RTkxkpeZA+WuZBe+G6GjyR8P//XQvxJwPKbvZM5tz22LxWKpW7zMo2RjCKKZFBz0
+         OQ6tX2ZoQXAL/ks8Ssg3m38pCb8jRw6YxAESonQfRGRPQbGam/U5o/sJ3hz5cZUnH0wP
+         tmcw==
+X-Gm-Message-State: ABy/qLZWPIvxkMh7urA5Fqh39/+QL1KgX/CMEaNY6WbbnssjvY/QTwlx
+	PToPVtiRMMcV/WeT/qPC7WoNnKzPlmz6JL9+nOuk2w==
+X-Google-Smtp-Source: APBJJlEwpCfyRpg4piPPvnMWJN+kb4H60It9OJsSdxL9W/QqglFoMRLVSUCUeFGYUzRNaUBSxd3pnA==
+X-Received: by 2002:a0c:eeca:0:b0:63d:657:4cb9 with SMTP id h10-20020a0ceeca000000b0063d06574cb9mr12783371qvs.42.1690889906022;
+        Tue, 01 Aug 2023 04:38:26 -0700 (PDT)
 Received: from majuu.waya ([142.114.148.137])
-        by smtp.gmail.com with ESMTPSA id j1-20020a0cf501000000b0063d26033b74sm4643738qvm.39.2023.08.01.04.38.22
+        by smtp.gmail.com with ESMTPSA id j1-20020a0cf501000000b0063d26033b74sm4643738qvm.39.2023.08.01.04.38.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Aug 2023 04:38:23 -0700 (PDT)
+        Tue, 01 Aug 2023 04:38:25 -0700 (PDT)
 From: Jamal Hadi Salim <jhs@mojatatu.com>
 To: netdev@vger.kernel.org
 Cc: deb.chatterjee@intel.com,
@@ -78,9 +78,9 @@ Cc: deb.chatterjee@intel.com,
 	toke@redhat.com,
 	mattyk@nvidia.com,
 	john.andy.fingerhut@intel.com
-Subject: [PATCH RFC v5 net-next 04/23] net/sched: act_api: export generic tc action searcher
-Date: Tue,  1 Aug 2023 07:37:48 -0400
-Message-Id: <20230801113807.85473-5-jhs@mojatatu.com>
+Subject: [PATCH RFC v5 net-next 05/23] net/sched: act_api: add struct p4tc_action_ops as a parameter to lookup callback
+Date: Tue,  1 Aug 2023 07:37:49 -0400
+Message-Id: <20230801113807.85473-6-jhs@mojatatu.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230801113807.85473-1-jhs@mojatatu.com>
 References: <20230801113807.85473-1-jhs@mojatatu.com>
@@ -97,54 +97,45 @@ X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-In P4TC we need to query the tc actions directly in a net namespace.
-Therefore export __tcf_idr_search().
+For P4TC dynamic actions, we require information from struct tc_action_ops,
+specifically the action kind, to find and locate the dynamic action
+information for the lookup operation.
 
 Signed-off-by: Victor Nogueira <victor@mojatatu.com>
 Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
 Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
 ---
- include/net/act_api.h | 2 ++
- net/sched/act_api.c   | 6 +++---
- 2 files changed, 5 insertions(+), 3 deletions(-)
+ include/net/act_api.h | 3 ++-
+ net/sched/act_api.c   | 2 +-
+ 2 files changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/include/net/act_api.h b/include/net/act_api.h
-index 1fdf502a5..395b68865 100644
+index 395b68865..b83e058a3 100644
 --- a/include/net/act_api.h
 +++ b/include/net/act_api.h
-@@ -191,6 +191,8 @@ int tcf_generic_walker(struct tc_action_net *tn, struct sk_buff *skb,
- 		       const struct tc_action_ops *ops,
- 		       struct netlink_ext_ack *extack);
- int tcf_idr_search(struct tc_action_net *tn, struct tc_action **a, u32 index);
-+int __tcf_idr_search(struct net *net, const struct tc_action_ops *ops,
-+		     struct tc_action **a, u32 index);
- int tcf_idr_create(struct tc_action_net *tn, u32 index, struct nlattr *est,
- 		   struct tc_action **a, const struct tc_action_ops *ops,
- 		   int bind, bool cpustats, u32 flags);
+@@ -116,7 +116,8 @@ struct tc_action_ops {
+ 		       struct tcf_result *); /* called under RCU BH lock*/
+ 	int     (*dump)(struct sk_buff *, struct tc_action *, int, int);
+ 	void	(*cleanup)(struct tc_action *);
+-	int     (*lookup)(struct net *net, struct tc_action **a, u32 index);
++	int     (*lookup)(struct net *net, const struct tc_action_ops *ops,
++			  struct tc_action **a, u32 index);
+ 	int     (*init)(struct net *net, struct nlattr *nla,
+ 			struct nlattr *est, struct tc_action **act,
+ 			struct tcf_proto *tp,
 diff --git a/net/sched/act_api.c b/net/sched/act_api.c
-index c868ec0ea..bb8a00cc1 100644
+index bb8a00cc1..3ce586331 100644
 --- a/net/sched/act_api.c
 +++ b/net/sched/act_api.c
-@@ -719,9 +719,8 @@ static int __tcf_generic_walker(struct net *net, struct sk_buff *skb,
- 	return tcf_generic_walker(tn, skb, cb, type, ops, extack);
- }
- 
--static int __tcf_idr_search(struct net *net,
--			    const struct tc_action_ops *ops,
--			    struct tc_action **a, u32 index)
-+int __tcf_idr_search(struct net *net, const struct tc_action_ops *ops,
-+		     struct tc_action **a, u32 index)
- {
+@@ -725,7 +725,7 @@ int __tcf_idr_search(struct net *net, const struct tc_action_ops *ops,
  	struct tc_action_net *tn = net_generic(net, ops->net_id);
  
-@@ -730,6 +729,7 @@ static int __tcf_idr_search(struct net *net,
+ 	if (unlikely(ops->lookup))
+-		return ops->lookup(net, a, index);
++		return ops->lookup(net, ops, a, index);
  
  	return tcf_idr_search(tn, a, index);
  }
-+EXPORT_SYMBOL(__tcf_idr_search);
- 
- static int tcf_idr_delete_index(struct tcf_idrinfo *idrinfo, u32 index)
- {
 -- 
 2.34.1
 
