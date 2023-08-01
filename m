@@ -1,125 +1,116 @@
-Return-Path: <netdev+bounces-23326-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23323-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7A8276B8F6
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 17:46:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 93D9476B8EA
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 17:45:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7223F281B02
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 15:46:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4ECE3281AAC
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 15:45:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 959931ADFD;
-	Tue,  1 Aug 2023 15:45:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57BF41ADD6;
+	Tue,  1 Aug 2023 15:45:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AC3B1ADFA
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 15:45:22 +0000 (UTC)
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16FB4DA
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 08:45:21 -0700 (PDT)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <j.zink@pengutronix.de>)
-	id 1qQrY8-0003zK-QC; Tue, 01 Aug 2023 17:44:40 +0200
-Received: from [2a0a:edc0:0:1101:1d::39] (helo=dude03.red.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.94.2)
-	(envelope-from <j.zink@pengutronix.de>)
-	id 1qQrY5-000Q2g-5s; Tue, 01 Aug 2023 17:44:37 +0200
-Received: from localhost ([::1] helo=dude03.red.stw.pengutronix.de)
-	by dude03.red.stw.pengutronix.de with esmtp (Exim 4.94.2)
-	(envelope-from <j.zink@pengutronix.de>)
-	id 1qQrY4-00Bf3I-6O; Tue, 01 Aug 2023 17:44:36 +0200
-From: Johannes Zink <j.zink@pengutronix.de>
-Date: Tue, 01 Aug 2023 17:44:30 +0200
-Subject: [PATCH v3 2/2] net: stmmac: dwmac-imx: enable MAC propagation
- delay correction for i.MX8MP
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DB9F4DC8F;
+	Tue,  1 Aug 2023 15:45:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CCA1CC43391;
+	Tue,  1 Aug 2023 15:45:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1690904712;
+	bh=VEaLAWfjIhnDGSpVQ/9ljIaO+E4dOVi/Dh1KjH+8jgw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=EzN5c6CkRbdeXJgQUWFyAiXuNmcAlX3e8DSQ44aT3fzSoUzqtVO5l79tjMuItMQmW
+	 /YnUADAwNhMzU4IbzAFSgfe6F61DSqruE3po0+o6xgwKDwjlsQJJSAuOqh7MmAOvni
+	 bcySCw7rbxjES1O71Twq59QuzKgAT+nDxbs/5oPol76177763IUV3jdHXe6g+iTct+
+	 iGYbGTBuEz6fBH3ZBNDbXHN+5U5CXE3/7TubhFZBejqqBU9AEzh82Pf+QFdxc8q25G
+	 1aEYLKzOfIIHoCG0wj+CkGCD77oT8ycoTnGQQl2VcEps2GHvuMx6cg9OSNPsWZP3J0
+	 Ktci7jenX9MaA==
+Date: Tue, 1 Aug 2023 08:45:10 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: Christoph Hellwig <hch@infradead.org>,
+ virtualization@lists.linux-foundation.org, "David S.  Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo  Abeni
+ <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, Daniel  Borkmann
+ <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, John 
+ Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org,
+ bpf@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang
+ <jasowang@redhat.com>, Pavel Begunkov <asml.silence@gmail.com>
+Subject: Re: [PATCH vhost v11 05/10] virtio_ring: introduce
+ virtqueue_dma_dev()
+Message-ID: <20230801084510.1c2460b9@kernel.org>
+In-Reply-To: <1690858650.8698683-2-xuanzhuo@linux.alibaba.com>
+References: <20230710034237.12391-1-xuanzhuo@linux.alibaba.com>
+	<20230710034237.12391-6-xuanzhuo@linux.alibaba.com>
+	<ZK/cxNHzI23I6efc@infradead.org>
+	<20230713104805-mutt-send-email-mst@kernel.org>
+	<ZLjSsmTfcpaL6H/I@infradead.org>
+	<20230720131928-mutt-send-email-mst@kernel.org>
+	<ZL6qPvd6X1CgUD4S@infradead.org>
+	<1690251228.3455179-1-xuanzhuo@linux.alibaba.com>
+	<20230725033321-mutt-send-email-mst@kernel.org>
+	<1690283243.4048996-1-xuanzhuo@linux.alibaba.com>
+	<1690524153.3603117-1-xuanzhuo@linux.alibaba.com>
+	<20230728080305.5fe3737c@kernel.org>
+	<CACGkMEs5uc=ct8BsJzV2SEJzAGXqCP__yxo-MBa6d6JzDG4YOg@mail.gmail.com>
+	<20230731084651.16ec0a96@kernel.org>
+	<1690855424.7821567-1-xuanzhuo@linux.alibaba.com>
+	<20230731193606.25233ed9@kernel.org>
+	<1690858650.8698683-2-xuanzhuo@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Message-Id: <20230719-stmmac_correct_mac_delay-v3-2-61e63427735e@pengutronix.de>
-References: <20230719-stmmac_correct_mac_delay-v3-0-61e63427735e@pengutronix.de>
-In-Reply-To: <20230719-stmmac_correct_mac_delay-v3-0-61e63427735e@pengutronix.de>
-To: Giuseppe Cavallaro <peppe.cavallaro@st.com>, 
- Alexandre Torgue <alexandre.torgue@foss.st.com>, 
- Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
- Richard Cochran <richardcochran@gmail.com>, 
- Russell King <linux@armlinux.org.uk>
-Cc: patchwork-jzi@pengutronix.de, netdev@vger.kernel.org, 
- linux-stm32@st-md-mailman.stormreply.com, 
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
- kernel@pengutronix.de, Kurt Kanzenbach <kurt@linutronix.de>, 
- kernel test robot <lkp@intel.com>, Johannes Zink <j.zink@pengutronix.de>
-X-Mailer: b4 0.12.2
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: j.zink@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-As the i.MX8MP supports reading MAC propagation delay and correcting the
-Hardware timestamp counter for additional delays [1], enable the feature
-for this SoC.
+On Tue, 1 Aug 2023 10:57:30 +0800 Xuan Zhuo wrote:
+> > You have this working and benchmarked or this is just and idea?  
+> 
+> This is not just an idea. I said that has been used on large scale.
+> 
+> This is the library for the APP to use the AF_XDP. We has open it.
+> https://gitee.com/anolis/libxudp
+> 
+> This is the Alibaba version of the nginx. That has been opened, that supported
+> to work with the libray to use AF_XDP.
+> http://tengine.taobao.org/
+> 
+> I supported this on our kernel release Anolis/Alinux.
 
-This reduces phase error of the PPS output from the PTP Hardware Clock
-from approx 150ns to 100ns.
+Interesting!
 
-[1] i.MX8MP Reference Manual, rev.1 Section 11.7.2.5.3 "Timestamp
-correction"
+> The work was done about 2 years ago. You know, I pushed the first version to
+> enable AF_XDP on virtio-net about two years ago. I never thought the job would
+> be so difficult.
 
-Signed-off-by: Johannes Zink <j.zink@pengutronix.de>
----
- drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c | 5 +++++
- 1 file changed, 5 insertions(+)
+Me neither, but it is what it is.
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c
-index 92e06a96757a..645a9454a490 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c
-@@ -42,6 +42,7 @@
- 
- struct imx_dwmac_ops {
- 	u32 addr_width;
-+	u32 flags;
- 	bool mac_rgmii_txclk_auto_adj;
- 
- 	int (*fix_soc_reset)(void *priv, void __iomem *ioaddr);
-@@ -311,6 +312,9 @@ static int imx_dwmac_probe(struct platform_device *pdev)
- 		goto err_parse_dt;
- 	}
- 
-+	if (data->flags & STMMAC_FLAG_HWTSTAMP_CORRECT_LATENCY)
-+		plat_dat->flags |= STMMAC_FLAG_HWTSTAMP_CORRECT_LATENCY;
-+
- 	plat_dat->host_dma_width = dwmac->ops->addr_width;
- 	plat_dat->init = imx_dwmac_init;
- 	plat_dat->exit = imx_dwmac_exit;
-@@ -350,6 +354,7 @@ static struct imx_dwmac_ops imx8mp_dwmac_data = {
- 	.addr_width = 34,
- 	.mac_rgmii_txclk_auto_adj = false,
- 	.set_intf_mode = imx8mp_set_intf_mode,
-+	.flags = STMMAC_FLAG_HWTSTAMP_CORRECT_LATENCY,
- };
- 
- static struct imx_dwmac_ops imx8dxl_dwmac_data = {
+> The nic (virtio-net) of AliYun can reach 24,000,000PPS.
+> So I think there is no different with the real HW on the performance.
+> 
+> With the AF_XDP, the UDP pps is seven times that of the kernel udp stack.
 
--- 
-2.39.2
+UDP pps or QUIC pps? UDP with or without GSO?
 
+Do you have measurements of how much it saves in real world workloads?
+I'm asking mostly out of curiosity, not to question the use case.
+
+> > What about io_uring zero copy w/ pre-registered buffers.
+> > You'll get csum offload, GSO, all the normal perf features.  
+> 
+> We tried io-uring, but it was not suitable for our scenario.
+> 
+> Yes, now the AF_XDP does not support the csum offload and GSO.
+> This is indeed a small problem.
+
+Can you say more about io-uring suitability? It can do zero copy
+and recently-ish Pavel optimized it quite a bit.
 
