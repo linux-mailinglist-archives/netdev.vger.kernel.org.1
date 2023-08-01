@@ -1,30 +1,30 @@
-Return-Path: <netdev+bounces-23083-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23084-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3ED7676AACC
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 10:22:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E38EF76AACD
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 10:23:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A72B1C20DC0
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 08:22:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AED3D1C20E1B
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 08:23:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 601111ED36;
-	Tue,  1 Aug 2023 08:22:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE6DA1ED4B;
+	Tue,  1 Aug 2023 08:22:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5340D1EA9A
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 08:22:41 +0000 (UTC)
-Received: from out30-110.freemail.mail.aliyun.com (out30-110.freemail.mail.aliyun.com [115.124.30.110])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0BC9A0
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 01:22:39 -0700 (PDT)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R381e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045168;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0Voowt87_1690878155;
-Received: from localhost(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0Voowt87_1690878155)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A45B51EA9A
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 08:22:43 +0000 (UTC)
+Received: from out30-113.freemail.mail.aliyun.com (out30-113.freemail.mail.aliyun.com [115.124.30.113])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00850A0
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 01:22:41 -0700 (PDT)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R461e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046060;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0VoopI5K_1690878156;
+Received: from localhost(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0VoopI5K_1690878156)
           by smtp.aliyun-inc.com;
-          Tue, 01 Aug 2023 16:22:36 +0800
+          Tue, 01 Aug 2023 16:22:37 +0800
 From: Heng Qi <hengqi@linux.alibaba.com>
 To: "Michael S. Tsirkin" <mst@redhat.com>,
 	Jason Wang <jasowang@redhat.com>,
@@ -39,10 +39,12 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	Jesper Dangaard Brouer <hawk@kernel.org>,
 	John Fastabend <john.fastabend@gmail.com>,
 	Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Subject: [RFC PATCH 0/6] virtio-net: support dynamic coalescing moderation
-Date: Tue,  1 Aug 2023 16:22:29 +0800
-Message-Id: <20230801082235.21634-1-hengqi@linux.alibaba.com>
+Subject: [RFC PATCH 1/6] virtio-net: returns whether napi is complete
+Date: Tue,  1 Aug 2023 16:22:30 +0800
+Message-Id: <20230801082235.21634-2-hengqi@linux.alibaba.com>
 X-Mailer: git-send-email 2.19.1.6.gb485710b
+In-Reply-To: <20230801082235.21634-1-hengqi@linux.alibaba.com>
+References: <20230801082235.21634-1-hengqi@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,27 +59,43 @@ X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Now, virtio-net already supports per-queue moderation parameter
-setting. Based on this, we use the netdim library[1] of linux to support
-dynamic coalescing moderation for virtio-net.
+rx netdim needs to count the traffic during a complete napi process,
+and start updating and comparing samples to make decisions after
+the napi ends. Let virtqueue_napi_complete() return true if napi is done,
+otherwise vice versa.
 
-[1] https://docs.kernel.org/networking/net_dim.html
-
+Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
 ---
-On top of
-https://lore.kernel.org/all/20230731070656.96411-1-gavinl@nvidia.com/
+ drivers/net/virtio_net.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-Heng Qi (6):
-  virtio-net: returns whether napi is complete
-  virtio-net: separate rx/tx coalescing moderation cmds
-  virtio-net: extract virtqueue coalescig cmd for reuse
-  virtio-net: support rx netdim
-  virtio-net: support tx netdim
-  virtio-net: a tiny comment update
-
- drivers/net/virtio_net.c | 284 +++++++++++++++++++++++++++++++++------
- 1 file changed, 242 insertions(+), 42 deletions(-)
-
+diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+index 10eba113b5fa..30dd12e7d28f 100644
+--- a/drivers/net/virtio_net.c
++++ b/drivers/net/virtio_net.c
+@@ -407,7 +407,7 @@ static void virtqueue_napi_schedule(struct napi_struct *napi,
+ 	}
+ }
+ 
+-static void virtqueue_napi_complete(struct napi_struct *napi,
++static bool virtqueue_napi_complete(struct napi_struct *napi,
+ 				    struct virtqueue *vq, int processed)
+ {
+ 	int opaque;
+@@ -416,9 +416,13 @@ static void virtqueue_napi_complete(struct napi_struct *napi,
+ 	if (napi_complete_done(napi, processed)) {
+ 		if (unlikely(virtqueue_poll(vq, opaque)))
+ 			virtqueue_napi_schedule(napi, vq);
++		else
++			return true;
+ 	} else {
+ 		virtqueue_disable_cb(vq);
+ 	}
++
++	return false;
+ }
+ 
+ static void skb_xmit_done(struct virtqueue *vq)
 -- 
 2.19.1.6.gb485710b
 
