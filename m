@@ -1,186 +1,246 @@
-Return-Path: <netdev+bounces-23229-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23231-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C9EC76B5ED
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 15:34:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 007FB76B605
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 15:39:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4F7D41C203C1
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 13:34:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1E54B1C202ED
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 13:39:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3F5021D5E;
-	Tue,  1 Aug 2023 13:34:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A14C722EE0;
+	Tue,  1 Aug 2023 13:39:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5C621E503
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 13:34:15 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3744A1982
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 06:34:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1690896853;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=m3EuGMRXqXwIjso57QFZOBRIJwj3UoGAkDVIx/t2tOw=;
-	b=TnpUxnZvCk9mbJ4rn4MfsREhZv4SteSvZsDUTpnK8YvpCTXAv10JW7Zz9iicAzgMtK8F4J
-	IYhdpvIQJaNLnXJF/nWNFcvBMLczR204tBh7nRc0iRCn2MZjWq6vKhEeQ/C8rGO8HMNwxb
-	59BiD8Saow4SWgDgJqakA6V56bn4kQE=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-214-ikMTVVjBOoqAIMNO07_vLA-1; Tue, 01 Aug 2023 09:34:11 -0400
-X-MC-Unique: ikMTVVjBOoqAIMNO07_vLA-1
-Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-76cb9958d60so35646385a.0
-        for <netdev@vger.kernel.org>; Tue, 01 Aug 2023 06:34:11 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690896851; x=1691501651;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=m3EuGMRXqXwIjso57QFZOBRIJwj3UoGAkDVIx/t2tOw=;
-        b=EN6C5RhoGfvTMRs/2iVEcLrnyk/bu/y0UJnS8CUi5XiHLKRarXc3B57Jkl+LpYPsBK
-         RBLjXZKR02JUtop2Bfqh0VuTFBCYdAM+PDmsUtX2D0FxavV0eo7FMkmp4CNqHj5S4jNt
-         Vd3blAIo/4+xC+vJsLJBM/ycIygzWxBXhM9Nq8VUkynpbGpBLULgfU2iK6+/VfvrSCya
-         CZm9841nLfRaMzmj8sxDIJYF7sB1bcKlU/+3weGwcbUUg78DQweV1D2rqWIUtvFYzzcI
-         AxSNerbyzvjiTtJHeX3VUhl1EdVdxdxcA3UTwpmAP316qYMa+ByDvSS+uBYDg2kQxuAD
-         NnvA==
-X-Gm-Message-State: ABy/qLbgFvXMO1BJCIqvQs/kNW14PJJ/Ns+qLHPAJeSFxFnb6W0gWCeh
-	FLOmbPm+b+8yc59X82Y+unjVpM+ZG4Uc8+oKmkgSCjCri66HTQt+rAPf94uD98pk3bznmKbpCk3
-	2Gzyf5kuwghTXAojy
-X-Received: by 2002:a05:620a:430a:b0:767:346c:4b37 with SMTP id u10-20020a05620a430a00b00767346c4b37mr11487670qko.7.1690896851427;
-        Tue, 01 Aug 2023 06:34:11 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlF2f6rViFVq6s9ZoHhoK5v+BjyA/rYc7oOn3EuiWdiJ1W4rbVP76VwVvUC5Ka+gXuoKt2VQqA==
-X-Received: by 2002:a05:620a:430a:b0:767:346c:4b37 with SMTP id u10-20020a05620a430a00b00767346c4b37mr11487637qko.7.1690896851093;
-        Tue, 01 Aug 2023 06:34:11 -0700 (PDT)
-Received: from gerbillo.redhat.com (146-241-225-251.dyn.eolo.it. [146.241.225.251])
-        by smtp.gmail.com with ESMTPSA id op51-20020a05620a537300b00767dc4c539bsm4136811qkn.44.2023.08.01.06.34.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Aug 2023 06:34:10 -0700 (PDT)
-Message-ID: <8a7772a50a16fbbcb82fc0c5e09f9e31f3427e3d.camel@redhat.com>
-Subject: Re: [PATCH net-next v5 4/4] vsock/virtio: MSG_ZEROCOPY flag support
-From: Paolo Abeni <pabeni@redhat.com>
-To: Arseniy Krasnov <AVKrasnov@sberdevices.ru>, Stefan Hajnoczi
- <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>,  "Michael S. Tsirkin" <mst@redhat.com>, Jason
- Wang <jasowang@redhat.com>, Bobby Eshleman <bobby.eshleman@bytedance.com>
-Cc: kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, 
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- kernel@sberdevices.ru,  oxffffaa@gmail.com
-Date: Tue, 01 Aug 2023 15:34:07 +0200
-In-Reply-To: <20230730085905.3420811-5-AVKrasnov@sberdevices.ru>
-References: <20230730085905.3420811-1-AVKrasnov@sberdevices.ru>
-	 <20230730085905.3420811-5-AVKrasnov@sberdevices.ru>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A6611E503
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 13:39:13 +0000 (UTC)
+Received: from mgamail.intel.com (unknown [192.55.52.43])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A04A139;
+	Tue,  1 Aug 2023 06:39:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1690897152; x=1722433152;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=+TO5e6Us4EAz5kJeqnEB+U9+E4e07TBxdxvwJE/zpUU=;
+  b=RovEBeZ4WM4of4fh+rVv/hOmCK41wDziqwcD8G1yosHiL0YjHNDFHYsk
+   +xHEB5YyBI3W2K4ApTgnlOoFowV1Vqjo+BAPXve9PIFUE03qR+ULbu6cr
+   X+MP0as0RTxTz6RWEf/uuH7/isIxKTzxqIUTarGNGQxU4VLkdpQfcCqc8
+   vZgHaWgUktyOTxLv4Gtud1aQcjj0dZdUuI9+mA9YbCoqXiZsmEwxCuzjH
+   6aI2K26UHPVr6vGELbEdfp3q+WAiSeBb8ELVICJHA46TB3BVj76jsjiEI
+   surC9f7tmDAASWYI7UjIW+X8DNaXG9rPwqfokGJsOIScYlIzFJPS6FOz4
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10789"; a="455674476"
+X-IronPort-AV: E=Sophos;i="6.01,247,1684825200"; 
+   d="scan'208";a="455674476"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Aug 2023 06:38:25 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10789"; a="1059404660"
+X-IronPort-AV: E=Sophos;i="6.01,247,1684825200"; 
+   d="scan'208";a="1059404660"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by fmsmga005.fm.intel.com with ESMTP; 01 Aug 2023 06:38:24 -0700
+Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Tue, 1 Aug 2023 06:38:24 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27 via Frontend Transport; Tue, 1 Aug 2023 06:38:24 -0700
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.173)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.27; Tue, 1 Aug 2023 06:38:23 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Vl2KXiLtU0iXzt2LJ1KnMj0/C6YxkIhsG1xDj9T0ke3WDl4v3YuhT9OFi40Mhu/A1aZnHugVPIlsxTnGWIoKzFfPhmmf30sgafERC1Y0cVuoEbj0z0N3MiKojjMJPWf0slknZNetjq9K98mE9CoKGlxXWZmGHAgAQ5LH7QYVf0iFn+z+4byXY00BSOyyPDOzEwaM0BFXq1tkPvNpUArcicOVt/KVUf2eUNUNiXGEBP9N6OV/zKOAhp3XTAIfCYh/Is5s1PZqG2BxJUxGHV2ZKTZeyvWGwl+O14VSMdceRIn3Gi3dKIfhCIlE0/yWzi3whVVlvy/rCbol0NrQEkJ8Vw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=fb6ocbmU8xOA5u2Gd0I6md2ga77d08wx8ECeNwr+oOQ=;
+ b=gTHietDiZ1Q26DDJ63kX97/BQn/wAYY2jELFY/OHPkJjE/m7M8spGL2AHen83iOOxXH9Z9Lb3cubq5NRb6Iki1OhH0z5UPn+eWjAV6m3Nbf8kKr8HnLzvjAvwy3H69XHHvWeHFzSBX4vsZJm2FXg0IHVYWhSg4puJGJLEIztRYUNv2ew0axeiwBCKu41sPADwLXQlV738FaDSWKmsjjcgy/JcV/98ns9fOsJMWTwg6b5hFBZhe61fP9scREBBfNQ6d/uhpAGDdXrazQZmNQjQvAoL5QBXyrd/rXlNH2gX/59euWVNiGc3taGynSXAyw3JQV0WtA5IGiHcBQ2X/8Rtg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DM6PR11MB3625.namprd11.prod.outlook.com (2603:10b6:5:13a::21)
+ by PH7PR11MB8057.namprd11.prod.outlook.com (2603:10b6:510:24c::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.42; Tue, 1 Aug
+ 2023 13:38:20 +0000
+Received: from DM6PR11MB3625.namprd11.prod.outlook.com
+ ([fe80::44ff:6a5:9aa4:124a]) by DM6PR11MB3625.namprd11.prod.outlook.com
+ ([fe80::44ff:6a5:9aa4:124a%7]) with mapi id 15.20.6631.043; Tue, 1 Aug 2023
+ 13:38:19 +0000
+Message-ID: <0fe906a2-5ba1-f24a-efd8-7804ef0683b6@intel.com>
+Date: Tue, 1 Aug 2023 15:36:33 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH net-next 5/9] page_pool: don't use driver-set flags field
+ directly
+Content-Language: en-US
+To: Yunsheng Lin <linyunsheng@huawei.com>
+CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Larysa Zaremba <larysa.zaremba@intel.com>, Alexander Duyck
+	<alexanderduyck@fb.com>, Jesper Dangaard Brouer <hawk@kernel.org>, "Ilias
+ Apalodimas" <ilias.apalodimas@linaro.org>, Simon Horman
+	<simon.horman@corigine.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+References: <20230727144336.1646454-1-aleksander.lobakin@intel.com>
+ <20230727144336.1646454-6-aleksander.lobakin@intel.com>
+ <a0be882e-558a-9b1d-7514-0aad0080e08c@huawei.com>
+ <6f8147ec-b8ad-3905-5279-16817ed6f5ae@intel.com>
+ <a7782cf1-e04a-e274-6a87-4952008bcc0c@huawei.com>
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+In-Reply-To: <a7782cf1-e04a-e274-6a87-4952008bcc0c@huawei.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: FR3P281CA0167.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:a0::6) To DM6PR11MB3625.namprd11.prod.outlook.com
+ (2603:10b6:5:13a::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-	autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR11MB3625:EE_|PH7PR11MB8057:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0f06d3bf-3c49-43fb-d23e-08db92949188
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: +qsa9iqcPmaoMauqcaeB4DIMggQ5tB2cFOSAVOFVeVq2MnKNY+Ca5hUc7Y3coCStkVrxmcAkufK4kXyMxRipjS7XeSCxqh86K3f0qqQ9zvZ3OX+mYaueiCC5/loHach4m950MAZUumeUMgIxo797mr3OeJI5ZieK2/ncD3HbDhcMtwqvEWDXvjkqqJoYYpMaCzP8I3L9XQJ0fSb1/nZtY+HZ8/ilP3dCpKu+4WMUhRFBzyTURh0VpNgRVrpDMn+3b8/ETJ49H171YJDnBupfWh/dkKnCvdtYQXsu763nbc12IeS1cob8tfJuAwENYFpb2dLgLdLRD5ZIaCp4tnRBVECXwaMbbGY42+HzCTah72IgR0HmMXbxI1xBZnvvB3UwAPlTCGF3D/n+C9pWh0+9HBd3Ct4E6Iw3BG6zdPN+3QiGjv0Ks7ZDKnjT6pd5XJCYFXPR01qW3zID5cEUuzrNM0DRlpfKBTvAoU/U6HPsQGFLZcw/gktog1/i/kTfT8TsGM5pPpRR+kg2Oqq8hVGxr/9cZdVlS6vXflCQbT4lc299ob1TCts8oe9spsmJIstPFz7yIASbes7b+qu8xByOY9DphsCr/Z5txgFTyHiqv1hGDNu2g7Ec/wpzcMA1q7KE2Y74EF77vviJdNkEt4Ergw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB3625.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(396003)(346002)(376002)(39860400002)(136003)(366004)(451199021)(38100700002)(66476007)(31696002)(86362001)(8676002)(8936002)(31686004)(316002)(5660300002)(4326008)(6916009)(54906003)(7416002)(66946007)(66556008)(82960400001)(41300700001)(478600001)(2906002)(6666004)(36756003)(6512007)(6486002)(6506007)(26005)(83380400001)(186003)(53546011)(2616005)(45980500001)(43740500002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?YnV6MlJDU2ZpbDVCeDVUVzFpTlZCWWxzUFpKb2ZBQTJ6VVE0V3ZWMlV4WTdX?=
+ =?utf-8?B?YzJaY1pidWhaR2dYMjE5YzhjQTNKZEVUb2RpeFIwblpxNHdjaFVIaWtQQy9R?=
+ =?utf-8?B?YTZIUlR5Rmk1RjVYZFhVRkg4enFjTWFMYTlLbFBOVmw2aHZKV0ZGVmxuRHFx?=
+ =?utf-8?B?M1Fpc3U5S0Z3VXJNQXd4T3VsS0xuWExHbmNZaXlVU3QrUmlNS0RORnZLTk52?=
+ =?utf-8?B?YU83Q3JuRUN1T21GeHRBTlJhRXdsVkVXNzJkQ2NuWlExcVZpT2syeWRYampL?=
+ =?utf-8?B?ODlOZytsRUFWVUVFSm5wYXJ1dDhoMUdXbjIxYW5EanlPQmpXakFvM3lYSkFJ?=
+ =?utf-8?B?RktRbnJqUW1LRUpmZ0Y0cHVJYnJpelhsR1JhSzBMUmZTcUMzbzFmNUhZaXlw?=
+ =?utf-8?B?RHZ3UjhDUHR3cEh6Nm9VblNBOUtNZXRRSEI3dkNlSEhzekNJK0RkWUlCdUFi?=
+ =?utf-8?B?U01LUXdUaUlQSTJsNmd1ci9mcnF2cVk5S2wwaVZlWVZnckxkSFhQa1p2VVNS?=
+ =?utf-8?B?b1NqSlFGd1NsWDZJTldEdXFNN3FnZTk3c3hMN0tnc2t6azUrL3pNc1BnMG91?=
+ =?utf-8?B?R2s1ai9BV3FsOVhHQ09OZTVOZTMxZldHRUYyZG5Kb3NaNkVQWnVkM05lKy9U?=
+ =?utf-8?B?eGtNc0xkZW9jaW82TUdhMnhXS2FYMTNZb1diaXI3ZzVTa0NEYWJNYjFKTkJr?=
+ =?utf-8?B?TEtRQ0MxZlNTOW50QWtpeXJyd1h0VWpacHhTdEJlVnUxV3hBZjUvcmtXNUZq?=
+ =?utf-8?B?MlJBOWN1ZlBaRjFEdUFCcGZyTmVPdlN6UUp1aTl3bGNGSEFvTTdhZEEreTZE?=
+ =?utf-8?B?RjFaVnhUR3hJcVk5cUtWK0huYURGUFJTdFR0QldYamFVZ28wWXVBWUZhMWsr?=
+ =?utf-8?B?bGd5OWVnQlJndVd2ak85N3RJQVJDVXpQWWc3NGlDakZsbUJBNkZ0Rk9TNkhX?=
+ =?utf-8?B?dEZLbjZkTUF5MlQ5Tlc4cWdVckVjTC9zekZQdHcvR0Q1UEZmd2VtUlFZK2NB?=
+ =?utf-8?B?SEU3NkcwOU90VFVSOVpiUmhLRTZua1dmcHAyWlMrUGxQUnJaM2piNVYxOXBk?=
+ =?utf-8?B?U1JmaE9hSjdkODE0N1ptaUlYSFJwSmhLc0k3ays4Z3kxWUhwR1ZEa2xDaXl1?=
+ =?utf-8?B?eHhua1hzK09xekpBNERNa2M5eFBraUdINjBCcGc2c2FoSWFGSm9WRFBMR0sr?=
+ =?utf-8?B?RUdnWThkUmdRWElYelptTndwZTZiY1cyekp1S3JTbFJDN3l6SWczeUNPRjVS?=
+ =?utf-8?B?YnIxMi93aFZkeXp0RW05VGwrRUd6ZzZROTlVL0JwSDUxRS9WeklXQlUzZk0y?=
+ =?utf-8?B?dTY2RE9CdVl3UnlhTGlHbExUdXdsZHhHd0NTb3Y5UEtWdUpvekZEQ2lCWUgr?=
+ =?utf-8?B?VWppYncyWXVvdVpBbmVhZkQ4VzkyeW84S0JZU2JBbnMvajFSa1Jyb1pVV0NC?=
+ =?utf-8?B?V21JNlJiS0tTNWlNclZCU1RqcTdzN3RvWCtmdzhVWnRybkNqRWNLa2dEWm1F?=
+ =?utf-8?B?RkJGTmFMd2tzYXZqVGFYdWdueEdvNjcxOE5qcVN5NjA1ZWQvTHBEbm5QUURw?=
+ =?utf-8?B?cnYyRS95VFJEQnhtWGVEM1ZwV0NtWnZBSnJlcjRsODRSVmovVzYzRGpsbzM4?=
+ =?utf-8?B?UXJaMFFPSTBGN2Jta201cHJ5YU1oTzVXVW5wc3ZFeWtXNDVpN3Z0ZDgyL0h1?=
+ =?utf-8?B?azlNOUtvRmMrT2tabkdReEZBenBWSlZnUFNLWGN6NzVucXM4YjB5c0EwWVF2?=
+ =?utf-8?B?TkZUWjcyNjMzcW5RU2sxRjdKMFJJNnY3RVBrVG5qZTZsQXpvYXlZdmJYczFh?=
+ =?utf-8?B?aTlTNWJkeWlIZmQxNURMa0Q0ZzVUMVgzeElXbVAwaVc1R0tOc2RxVzJpZ3dS?=
+ =?utf-8?B?dW1Jck9JYkliWXBKK0JueWNyWnU1em8yL2ZkYThQdTk5ZDluTFNHa3daZk1K?=
+ =?utf-8?B?bjRqMUVXR0x1Ull1VzRWc01XQ05Lb0dJc0hONnZmeWR4U1c4RkhxeDM3dWVq?=
+ =?utf-8?B?TWVDSFl3NGc4dE95Zm9HWEZWa0RVT20rSlU5ZUoyNGVFUnAyOU1zRnVPSnVm?=
+ =?utf-8?B?bVZuazRnaUNYbVhLMnN5cEoxRDBOYXJyV1Z0Rk9aMVU2TzZhMTFEV1RSeEtu?=
+ =?utf-8?B?SzM3QVdlNUczNjRpNW16WDVJRHhoUVZmNThKZyt4bkd1YjEyNXB2Y0JGWDEr?=
+ =?utf-8?B?dUE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0f06d3bf-3c49-43fb-d23e-08db92949188
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB3625.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Aug 2023 13:38:19.8666
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: o4wOgvY0rxg2ddXypIKEzCREmbj+5SoPV+fbQ9FUAwFOqsG/pAEUzxXKNp2Yk3+B/8QD6Kpr7gJHPh5Wxkfomqb/4m6KOqRtKHB75Sxc8HU=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB8057
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sun, 2023-07-30 at 11:59 +0300, Arseniy Krasnov wrote:
-> +static int virtio_transport_fill_skb(struct sk_buff *skb,
-> +				     struct virtio_vsock_pkt_info *info,
-> +				     size_t len,
-> +				     bool zcopy)
-> +{
-> +	if (zcopy) {
-> +		return __zerocopy_sg_from_iter(info->msg, NULL, skb,
-> +					      &info->msg->msg_iter,
-> +					      len);
-> +	} else {
+From: Yunsheng Lin <linyunsheng@huawei.com>
+Date: Sat, 29 Jul 2023 19:40:32 +0800
 
+> On 2023/7/28 22:03, Alexander Lobakin wrote:
+>> From: Yunsheng Lin <linyunsheng@huawei.com>
+>> Date: Fri, 28 Jul 2023 20:36:50 +0800
+>>
+>>> On 2023/7/27 22:43, Alexander Lobakin wrote:
+>>>
+>>>>  
+>>>>  struct page_pool {
+>>>>  	struct page_pool_params p;
+>>>> -	long pad;
+>>>> +
+>>>> +	bool dma_map:1;				/* Perform DMA mapping */
+>>>> +	enum {
+>>>> +		PP_DMA_SYNC_ACT_DISABLED = 0,	/* Driver didn't ask to sync */
+>>>> +		PP_DMA_SYNC_ACT_DO,		/* Perform DMA sync ops */
+>>>> +	} dma_sync_act:1;
+>>>> +	bool page_frag:1;			/* Allow page fragments */
+>>>>  
+>>>
+>>> Isn't it more common or better to just remove the flags field in
+>>> 'struct page_pool_params' and pass the flags by parameter like
+>>> below, so that patch 4 is not needed?
+>>>
+>>> struct page_pool *page_pool_create(const struct page_pool_params *params,
+>>> 				   unsigned int	flags);
+>>
+>> You would need a separate patch to convert all the page_pool_create()
+>> users then either way.
+>> And it doesn't look really natural to me to pass both driver-set params
+>> and driver-set flags as separate function arguments. Someone may then
+>> think "why aren't flags just put in the params itself". The fact that
+>> Page Pool copies the whole params in the page_pool struct after
+>> allocating it is internals, page_pool_create() prototype however isn't.
+>> Thoughts?
+> 
+> It just seems odd to me that dma_map and page_frag is duplicated as we
+> seems to have the same info in the page_pool->p.flags.
 
-No need for an else statement after 'return'
+It's just because we copy the whole &page_pool_params passed by the
+driver. It doesn't look good to me to define a new structure and copy
+the values field-by-field just to avoid duplicating 3 bits :s
 
-> +		void *payload;
-> +		int err;
-> +
-> +		payload =3D skb_put(skb, len);
-> +		err =3D memcpy_from_msg(payload, info->msg, len);
-> +		if (err)
-> +			return -1;
-> +
-> +		if (msg_data_left(info->msg))
-> +			return 0;
-> +
+> 
+> What about:
+> In [PATCH net-next 4/9] page_pool: shrink &page_pool_params a tiny bit,
+> 'flags' is bit-field'ed with 'dma_dir', what about changing 'dma_dir'
+> to be bit-field'ed with 'dma_sync_act', so that page_pool->p.flags stays
+> the same as before, and 'dma_map' & 'page_frag' do not seems be really
+> needed as we have the same info in page_pool->p.flags?
 
-This path does not update truesize, evem if it increases the skb len...
+Not sure I follow :z ::dma_dir is also passed by the driver, so we can't
+drop it from the params struct.
 
-> +		return 0;
-> +	}
-> +}
+> 
+> 
+>>
+>> Thanks,
+>> Olek
+>>
+>> .
+>>
 
-[...]
-
-> @@ -214,6 +251,70 @@ static u16 virtio_transport_get_type(struct sock *sk=
-)
->  		return VIRTIO_VSOCK_TYPE_SEQPACKET;
->  }
-> =20
-> +static struct sk_buff *virtio_transport_alloc_skb(struct vsock_sock *vsk=
-,
-> +						  struct virtio_vsock_pkt_info *info,
-> +						  size_t payload_len,
-> +						  bool zcopy,
-> +						  u32 src_cid,
-> +						  u32 src_port,
-> +						  u32 dst_cid,
-> +						  u32 dst_port)
-> +{
-> +	struct sk_buff *skb;
-> +	size_t skb_len;
-> +
-> +	skb_len =3D VIRTIO_VSOCK_SKB_HEADROOM;
-> +
-> +	if (!zcopy)
-> +		skb_len +=3D payload_len;
-> +
-> +	skb =3D virtio_vsock_alloc_skb(skb_len, GFP_KERNEL);
-> +	if (!skb)
-> +		return NULL;
-> +
-> +	virtio_transport_init_hdr(skb, info, src_cid, src_port,
-> +				  dst_cid, dst_port,
-> +				  payload_len);
-> +
-> +	/* Set owner here, because '__zerocopy_sg_from_iter()' uses
-> +	 * owner of skb without check to update 'sk_wmem_alloc'.
-> +	 */
-> +	if (vsk)
-> +		skb_set_owner_w(skb, sk_vsock(vsk));
-
-... which can lead to bad things(TM) if the skb goes trough some later
-non trivial processing, due to the above skb_set_owner_w().
-
-Additionally can be the following condition be true:
-
-	vsk =3D=3D NULL && (info->msg && payload_len > 0) && zcopy
-
-???
-
-If so it looks like skb can go through __zerocopy_sg_from_iter() even
-without a prior skb_set_owner_w()...
-
-
-Cheers,
-
-Paolo
-
+Thanks,
+Olek
 
