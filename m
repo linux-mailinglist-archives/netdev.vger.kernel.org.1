@@ -1,64 +1,45 @@
-Return-Path: <netdev+bounces-23116-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23117-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0C1176B006
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 11:56:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68EC576B00A
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 11:57:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1ACE62816DE
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 09:56:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 23C5F281774
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 09:57:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B613200A9;
-	Tue,  1 Aug 2023 09:56:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AF1C200AA;
+	Tue,  1 Aug 2023 09:57:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FD29200A8
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 09:56:48 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 799071BD3;
-	Tue,  1 Aug 2023 02:56:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=4mbju1g6RNmlbP/1/oylEMdzcfQdrO1pUJukrXW1CBI=; b=n39m5J39r5h8mIoSEvn5mrzHok
-	etwHc2WZci3TX7mlDVDDDRVqKbzNq8cKrWdEoEWv3ZoMNGC83J3+VIa5CmdJvGBOTUQwuZId1C9Oy
-	BUZSTXFyiWkhpeUzHPRRtRQIr0bOKU9T2Xbct0M9o3oBCYsxEVt8ylgKA0xEZL6PFA3A=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qQm6u-002mlq-Vo; Tue, 01 Aug 2023 11:56:12 +0200
-Date: Tue, 1 Aug 2023 11:56:12 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Herve Codina <herve.codina@bootlin.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>, Lee Jones <lee@kernel.org>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Qiang Zhao <qiang.zhao@nxp.com>, Li Yang <leoyang.li@nxp.com>,
-	Liam Girdwood <lgirdwood@gmail.com>,
-	Mark Brown <broonie@kernel.org>, Jaroslav Kysela <perex@perex.cz>,
-	Takashi Iwai <tiwai@suse.com>,
-	Shengjiu Wang <shengjiu.wang@gmail.com>,
-	Xiubo Li <Xiubo.Lee@gmail.com>, Fabio Estevam <festevam@gmail.com>,
-	Nicolin Chen <nicoleotsuka@gmail.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Randy Dunlap <rdunlap@infradead.org>, netdev@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, alsa-devel@alsa-project.org,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH v2 20/28] net: wan: Add framer framework support
-Message-ID: <84d6431f-bb55-4224-a4a5-45d7036f1e38@lunn.ch>
-References: <20230726150225.483464-1-herve.codina@bootlin.com>
- <20230726150225.483464-21-herve.codina@bootlin.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EF87200A8
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 09:57:06 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A9DCC433C7;
+	Tue,  1 Aug 2023 09:57:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1690883825;
+	bh=9FY6QFn/zgOA97cCVuiCWjqBomFGV5Q4vBQBuoSs3mg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=sMe2ZQEdBvjFlnAwHkLLGPKi3ZBSRU10BB+lfHVrEbf6OO2e4c0X+djp/lunrENJN
+	 wwgxlQ8gjlJbK8++ppgrjenkdF6MnPFV9usWQ94YwfYlACfHcI5jieQkSTuzizKkX1
+	 Io+4FS2JplLvqGIXUu3uacYyzcOg8+w6yBHc2hguS7oW+WaqMkQmsco5yYSMJdszMo
+	 nnGQS9hEo6H9wbhhbxPSY+jpGYfKv/IqqvRJNZkFEspjETPYH7gDzkI71aGSa60dMM
+	 lMd7e/L4XLsU107XLb/2b4KJkhkbKPSV9gEAX4k0d7qJpyW8CAoWD+l5qfWKSvvsui
+	 fvfgm0viIFtug==
+Date: Tue, 1 Aug 2023 11:57:01 +0200
+From: Simon Horman <horms@kernel.org>
+To: Muhammad Husaini Zulkifli <muhammad.husaini.zulkifli@intel.com>
+Cc: intel-wired-lan@osuosl.org, davem@davemloft.net, kuba@kernel.org,
+	pabeni@redhat.com, edumazet@google.com, netdev@vger.kernel.org,
+	naamax.meir@linux.intel.com, anthony.l.nguyen@intel.com
+Subject: Re: [PATCH iwl-net v3 0/2] Enhance the tx-usecs coalesce setting
+ implementation
+Message-ID: <ZMjW7XeEqpoHhQFd@kernel.org>
+References: <20230801011518.25370-1-muhammad.husaini.zulkifli@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,24 +48,29 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230726150225.483464-21-herve.codina@bootlin.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+In-Reply-To: <20230801011518.25370-1-muhammad.husaini.zulkifli@intel.com>
 
-> +int framer_pm_runtime_get(struct framer *framer)
-> +{
-> +	int ret;
-> +
-> +	if (!framer)
-> +		return 0;
+On Tue, Aug 01, 2023 at 09:15:16AM +0800, Muhammad Husaini Zulkifli wrote:
+> The current tx-usecs coalesce setting implementation in the driver code is
+> improved by this patch series. The implementation of the current driver
+> code may have previously been a copy of the legacy code i210.
+> 
+> Patch 1:
+> Allow the user to see the tx-usecs colease setting's current value when
+> using the ethtool command. The previous value was 0.
+> 
+> Patch 2:
+> Give the user the ability to modify the tx-usecs colease setting's value.
+> Previously, it was restricted to rx-usecs.
+> 
+> V2 -> V3:
+> - Refactor the code, as Simon suggested, to make it more readable.
+> 
+> V1 -> V2:
+> - Split the patch file into two, like Anthony suggested.
 
-Can framer be a NULL pointer? This sort of test often covers up
-bugs. So either let it dereference the NULL pointer and opps, or
-return -EINVAL.
+Thanks for the refactoring.
 
-       Andrew
+Reviewed-by: Simon Horman <horms@kernel.org>
+
 
