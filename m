@@ -1,74 +1,77 @@
-Return-Path: <netdev+bounces-23124-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23123-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E80B76B052
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 12:05:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE47276B04D
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 12:05:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5F7CA1C20D9B
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 10:05:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 61AFD2817F6
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 10:05:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C93FA20F82;
-	Tue,  1 Aug 2023 10:05:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 537E0200CD;
+	Tue,  1 Aug 2023 10:05:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE5DD1F94D
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 10:05:25 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23F9892;
-	Tue,  1 Aug 2023 03:05:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=q+X3WCccFUeGIsOhlOlB9RAX5Dw3QmtY3X/0JwwsmSw=; b=fTXrG7XZDYijp/oK67zpTYJNOu
-	21yO8JAjmKqbe8n1C0lJBnSmyu+tcZDut3qwcSQel0tKTpDPKkBHbDcFCIZo1VBYP8/F3qFY3SwVv
-	Q+ozdrXiyFR8IEKG9XCcyFO4FcBraXRaKk7I1X5jRn2zbGKvoOdmDzyV70LYCS5xZxr4=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qQmFX-002mrF-NH; Tue, 01 Aug 2023 12:05:07 +0200
-Date: Tue, 1 Aug 2023 12:05:07 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Herve Codina <herve.codina@bootlin.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>, Lee Jones <lee@kernel.org>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Qiang Zhao <qiang.zhao@nxp.com>, Li Yang <leoyang.li@nxp.com>,
-	Liam Girdwood <lgirdwood@gmail.com>,
-	Mark Brown <broonie@kernel.org>, Jaroslav Kysela <perex@perex.cz>,
-	Takashi Iwai <tiwai@suse.com>,
-	Shengjiu Wang <shengjiu.wang@gmail.com>,
-	Xiubo Li <Xiubo.Lee@gmail.com>, Fabio Estevam <festevam@gmail.com>,
-	Nicolin Chen <nicoleotsuka@gmail.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Randy Dunlap <rdunlap@infradead.org>, netdev@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, alsa-devel@alsa-project.org,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH v2 21/28] dt-bindings: net: Add the Lantiq PEF2256
- E1/T1/J1 framer
-Message-ID: <1f5fbf0a-90fe-491a-91c6-31fefd4b786f@lunn.ch>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47CF11F94D
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 10:05:22 +0000 (UTC)
+Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::225])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A425C92;
+	Tue,  1 Aug 2023 03:05:18 -0700 (PDT)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 1DE551C0012;
+	Tue,  1 Aug 2023 10:05:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1690884315;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=CSVB+HORSFsnXDmjVg67aSWP2rANROm59byfAHhHD0Y=;
+	b=H3+g77sXqmhMiUD9cLYfYWHOIVyYaAAYK3S6orraq++QkO4KEPeDisG+ZrlTgTA5FpWvKu
+	69gaGhOPX+b8Lggqcv5DbCT0WtLbny4lOhHNeGu2Ndjj3nIYbC3SzM5ixLuleezrP3/GYL
+	5wvk9vgnF24HM+baeEJ3BmpWjahI4i5fge3JTVMe9EmMLUTtwb/ZAliplzCM5qZU13rsEO
+	7vUl/ArcrY7p6p8npXU92BVujGKBPxxWvqIuZHuk99NXtqsfCLiewRCtG+M4ycbXPoFd5/
+	22qw57nzEewvcaWgfHT2vgGimy6CmMvgiMnA62C50o4su4myL978d2bjQcLMjQ==
+Date: Tue, 1 Aug 2023 12:05:10 +0200
+From: Herve Codina <herve.codina@bootlin.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski
+ <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
+ Lee Jones <lee@kernel.org>, Linus Walleij <linus.walleij@linaro.org>, Qiang
+ Zhao <qiang.zhao@nxp.com>, Li Yang <leoyang.li@nxp.com>, Liam Girdwood
+ <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, Jaroslav Kysela
+ <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, Shengjiu Wang
+ <shengjiu.wang@gmail.com>, Xiubo Li <Xiubo.Lee@gmail.com>, Fabio Estevam
+ <festevam@gmail.com>, Nicolin Chen <nicoleotsuka@gmail.com>, Christophe
+ Leroy <christophe.leroy@csgroup.eu>, Randy Dunlap <rdunlap@infradead.org>,
+ netdev@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-gpio@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ alsa-devel@alsa-project.org, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH v2 08/28] soc: fsl: cpm1: qmc: Introduce available
+ timeslots masks
+Message-ID: <20230801120510.1ac862de@bootlin.com>
+In-Reply-To: <dd34fa03-0b34-44a4-9e70-9d9a69f95403@lunn.ch>
 References: <20230726150225.483464-1-herve.codina@bootlin.com>
- <20230726150225.483464-22-herve.codina@bootlin.com>
+	<20230726150225.483464-9-herve.codina@bootlin.com>
+	<dd34fa03-0b34-44a4-9e70-9d9a69f95403@lunn.ch>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230726150225.483464-22-herve.codina@bootlin.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: herve.codina@bootlin.com
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
 	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
@@ -76,20 +79,44 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-> +  clocks:
-> +    items:
-> +      - description: Master clock
-> +      - description: Receive System Clock
-> +      - description: Transmit System Clock
-> +
-> +  clock-names:
-> +    items:
-> +      - const: mclk
-> +      - const: sclkr
-> +      - const: sclkx
+On Tue, 1 Aug 2023 11:33:39 +0200
+Andrew Lunn <andrew@lunn.ch> wrote:
 
-Nit pick, but "Receive System Clock", but "sclkr'. Maybe "System Clock
-Receive" so you have the same word order?
+> On Wed, Jul 26, 2023 at 05:02:04PM +0200, Herve Codina wrote:
+> > Available timeslots masks define timeslots available for the related
+> > channel. These timeslots are defined by the QMC binding.
+> > 
+> > Timeslots used are initialized to available timeslots but can be a
+> > subset of available timeslots.
+> > This prepares the dynamic timeslots management (ie. changing timeslots
+> > at runtime).
+> > 
+> > Signed-off-by: Herve Codina <herve.codina@bootlin.com>
+> > ---
+> >  drivers/soc/fsl/qe/qmc.c | 8 ++++++--
+> >  1 file changed, 6 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/drivers/soc/fsl/qe/qmc.c b/drivers/soc/fsl/qe/qmc.c
+> > index 2d2a9d88ba6c..21ad7e79e7bd 100644
+> > --- a/drivers/soc/fsl/qe/qmc.c
+> > +++ b/drivers/soc/fsl/qe/qmc.c
+> > @@ -177,7 +177,9 @@ struct qmc_chan {
+> >  	struct qmc *qmc;
+> >  	void __iomem *s_param;
+> >  	enum qmc_mode mode;
+> > +	u64	tx_ts_mask_avail;
+> >  	u64	tx_ts_mask;
+> > +	u64	rx_ts_mask_avail;
+> >  	u64	rx_ts_mask;  
+> 
+> Is this for E1? So there is a maximum of 32 slots? A u32 would be
+> sufficient i think?
+> 
 
-	 Andrew
+The QMC can use up to 64 slots. So masks related to the QMC are on 64bits.
+These masks are not specific to the E1 framer but really related to the QMC
+capabilities.
+
+Regards,
+Hervé
 
