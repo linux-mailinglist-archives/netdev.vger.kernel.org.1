@@ -1,107 +1,137 @@
-Return-Path: <netdev+bounces-23208-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23210-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2AFCD76B537
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 14:54:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E6C2F76B545
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 14:57:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7AE942818CD
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 12:53:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A0FD7281861
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 12:57:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9295214FF;
-	Tue,  1 Aug 2023 12:53:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93E6221502;
+	Tue,  1 Aug 2023 12:57:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CE63111E
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 12:53:57 +0000 (UTC)
-Received: from mail-oi1-f198.google.com (mail-oi1-f198.google.com [209.85.167.198])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E42291FE5
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 05:53:54 -0700 (PDT)
-Received: by mail-oi1-f198.google.com with SMTP id 5614622812f47-3a7292a2a72so4574497b6e.1
-        for <netdev@vger.kernel.org>; Tue, 01 Aug 2023 05:53:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690894434; x=1691499234;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=kl63Gzb61Dydiu/7gl5BZvq7Fhlv/XlBdavmlXqdJ5s=;
-        b=HjHecENLu8D5IJUYgqbbyDAd6x1vArb5W79j5sFQH/IrmqdO8drGJtLyKHthLRMqbH
-         /uIBC26cgl5jTjJRC3uM1lKKredcfSW/L8p2dZYlDkJDRwHxg4vD76n62JqErNH+hSB4
-         n7oz8OlJi31TqR6IVHNRU+72IHeuLCL0D+AvuthRWFihWcEpHWwfcswVsV9Fwwazsmuz
-         CVlh+Gp4tXQlqI55Br7w6zJmsajbaRbRwrg9PRPRuDBryJJIvYcDz1gZm4MwdOE0R74W
-         ucyxO7PArg4uoO2icw/pqcm4aOxKZOPq65lmPfE6NtHzx3ThtaCnfZVxuKw9SsbcOjp8
-         uVYw==
-X-Gm-Message-State: ABy/qLaae+KWnpULgfKYozIvzjWOWufx4+4iXqQuKKJBklbAv4ApCbw5
-	0aDctK8Khjkc0V/16dUg6Z1ZYkgnldyvpNK3SXtn1VEU39Hd
-X-Google-Smtp-Source: APBJJlF3HUFaj3eoA8O4FcQaoYxY1IIGdKgTFUPzZiN4aLgBhuTBtJFeHII4iY1B9an2OEVtt28SEhCWcQZ+/lN8AJK3D0iBdNF3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85CA2111E
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 12:57:18 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (unknown [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3584E6;
+	Tue,  1 Aug 2023 05:57:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=A1UXyGi4tVO1CNUnpyY8C1O55E/6x79wyybqrcHbfvA=; b=0IC1RGg2Hm6kgEu7PxHbmxTU0D
+	h4LJEtklGDODfDxqL2zvXibphfmcLkhnLMgU90+1UpkswU7hCpTMnwdIqFZ66X7KG2ZWjWUk1udRh
+	AIjs13najytZS+5vLWfUkcs59o4/5QI4VE0ucL1cnJKiYdxOORrbtKxvtnryYUNaRwkcZ25TUwSDi
+	e6+btWY5g4lPajiNzOpQoRTulBSlMq1EaEqiY7RXswMvxBMbMHcHt9m3UwmtICalV3EREDwXtJLXV
+	dXHZurCfRd1AjEA7F8zW64y/dM6jBybCT5fSPMmAq3AKLU1fKA2xjL7nrEQJRhYcOLqvg5fO/RAMA
+	hhpXN4LA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:55550)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qQovd-00045o-14;
+	Tue, 01 Aug 2023 13:56:45 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qQovY-0000i5-6Y; Tue, 01 Aug 2023 13:56:40 +0100
+Date: Tue, 1 Aug 2023 13:56:40 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Johannes Zink <j.zink@pengutronix.de>
+Cc: Shenwei Wang <shenwei.wang@nxp.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Shawn Guo <shawnguo@kernel.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	Kevin Hilman <khilman@baylibre.com>, Vinod Koul <vkoul@kernel.org>,
+	Chen-Yu Tsai <wens@csie.org>,
+	Jernej Skrabec <jernej.skrabec@gmail.com>,
+	Samuel Holland <samuel@sholland.org>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>,
+	NXP Linux Team <linux-imx@nxp.com>,
+	Jerome Brunet <jbrunet@baylibre.com>,
+	Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
+	Bhupesh Sharma <bhupesh.sharma@linaro.org>,
+	Nobuhiro Iwamatsu <nobuhiro1.iwamatsu@toshiba.co.jp>,
+	Simon Horman <simon.horman@corigine.com>,
+	Andrew Halaney <ahalaney@redhat.com>,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
+	Wong Vee Khee <veekhee@apple.com>,
+	Revanth Kumar Uppala <ruppala@nvidia.com>,
+	Jochen Henneberg <jh@henneberg-systemdesign.com>,
+	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-amlogic@lists.infradead.org, imx@lists.linux.dev,
+	Frank Li <frank.li@nxp.com>
+Subject: Re: [PATCH v3 net 2/2] net: stmmac: dwmac-imx: pause the TXC clock
+ in fixed-link
+Message-ID: <ZMkBCGJrX/COB5+f@shell.armlinux.org.uk>
+References: <20230731161929.2341584-1-shenwei.wang@nxp.com>
+ <20230731161929.2341584-3-shenwei.wang@nxp.com>
+ <bf2979c4-0b63-be53-b530-3d7385796534@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6808:19a3:b0:3a4:2943:8f7 with SMTP id
- bj35-20020a05680819a300b003a4294308f7mr23752541oib.5.1690894434138; Tue, 01
- Aug 2023 05:53:54 -0700 (PDT)
-Date: Tue, 01 Aug 2023 05:53:54 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000001981210601dc0aa5@google.com>
-Subject: [syzbot] Monthly bluetooth report (Aug 2023)
-From: syzbot <syzbot+list513be271df212c03ceba@syzkaller.appspotmail.com>
-To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
-	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=0.8 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,
-	SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <bf2979c4-0b63-be53-b530-3d7385796534@pengutronix.de>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RDNS_NONE,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hello bluetooth maintainers/developers,
+On Tue, Aug 01, 2023 at 02:47:46PM +0200, Johannes Zink wrote:
+> Hi Shenwei,
+> 
+> thanks for your patch.
+> 
+> On 7/31/23 18:19, Shenwei Wang wrote:
+> > When using a fixed-link setup, certain devices like the SJA1105 require a
+> > small pause in the TXC clock line to enable their internal tunable
+> > delay line (TDL).
+> 
+> If this is only required for some devices, is it safe to enforce this
+> behaviour unconditionally for any kind of fixed link devices connected to
+> the MX93 EQOS or could this possibly break for other devices?
 
-This is a 31-day syzbot report for the bluetooth subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/bluetooth
+This same point has been raised by Andrew Halaney in message-id
+ <4govb566nypifbtqp5lcbsjhvoyble5luww3onaa2liinboguf@4kgihys6vhrg>
+and Fabio Estevam in message-id
+ <CAOMZO5ANQmVbk_jy7qdVtzs3716FisT2c72W+3WZyu7FoAochw@mail.gmail.com>
+but we don't seem to have any answer for it.
 
-During the period, 1 new issues were detected and 1 were fixed.
-In total, 23 issues are still open and 54 have been fixed so far.
+Also, the patch still uses wmb() between the write and the delay, and as
+Will Deacon pointed out in his message, message-id
+ <20230728153611.GH21718@willie-the-truck>
+this is not safe, yet still a new version was sent.
 
-Some of the still happening issues:
+It seems the author of these patches is pretty resistant to comments,
+and has shown that when I was requesting changes - it was an awful
+struggle to get changes made. I'm now of the opinion that I really
+can't be bothered to review these patches, precisely because feedback
+is clearly not welcome or if welcome, apparently acted upon.
 
-Ref Crashes Repro Title
-<1> 8070    Yes   possible deadlock in rfcomm_sk_state_change
-                  https://syzkaller.appspot.com/bug?extid=d7ce59b06b3eb14fd218
-<2> 4315    Yes   WARNING in hci_conn_timeout
-                  https://syzkaller.appspot.com/bug?extid=2446dd3cb07277388db6
-<3> 1974    Yes   possible deadlock in rfcomm_dlc_exists
-                  https://syzkaller.appspot.com/bug?extid=b69a625d06e8ece26415
-<4> 875     Yes   BUG: sleeping function called from invalid context in hci_cmd_sync_submit
-                  https://syzkaller.appspot.com/bug?extid=e7be5be00de0c3c2d782
-<5> 151     Yes   WARNING in call_timer_fn
-                  https://syzkaller.appspot.com/bug?extid=6fb78d577e89e69602f9
-<6> 84      No    possible deadlock in hci_unregister_dev
-                  https://syzkaller.appspot.com/bug?extid=c933391d8e4089f1f53e
-<7> 51      No    possible deadlock in discov_off
-                  https://syzkaller.appspot.com/bug?extid=f047480b1e906b46a3f4
-<8> 4       No    KASAN: slab-use-after-free Write in sco_conn_del
-                  https://syzkaller.appspot.com/bug?extid=6b9277cad941daf126a2
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
-
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
-
-You may send multiple commands in a single email message.
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
