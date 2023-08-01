@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-23167-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23168-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F14F76B377
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 13:41:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 599C576B37E
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 13:41:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 20E8A281733
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 11:41:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6DDF11C20CA6
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 11:41:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A369022EE0;
-	Tue,  1 Aug 2023 11:38:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E97622EEA;
+	Tue,  1 Aug 2023 11:38:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9040B20FB4
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 11:38:37 +0000 (UTC)
-Received: from mail-qk1-x731.google.com (mail-qk1-x731.google.com [IPv6:2607:f8b0:4864:20::731])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE527E4C
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 04:38:33 -0700 (PDT)
-Received: by mail-qk1-x731.google.com with SMTP id af79cd13be357-76595a7b111so391366485a.2
-        for <netdev@vger.kernel.org>; Tue, 01 Aug 2023 04:38:33 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4704120FB4
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 11:38:39 +0000 (UTC)
+Received: from mail-qv1-xf31.google.com (mail-qv1-xf31.google.com [IPv6:2607:f8b0:4864:20::f31])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6ADB11B0
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 04:38:35 -0700 (PDT)
+Received: by mail-qv1-xf31.google.com with SMTP id 6a1803df08f44-63cf9eddbc6so30971046d6.0
+        for <netdev@vger.kernel.org>; Tue, 01 Aug 2023 04:38:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20221208.gappssmtp.com; s=20221208; t=1690889912; x=1691494712;
+        d=mojatatu-com.20221208.gappssmtp.com; s=20221208; t=1690889914; x=1691494714;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=CNCAxubw/bZLBzFoTBKjQdMqFLRngntwtQyTFtcudec=;
-        b=b3iz5X3ZdoSioVJGjgvZ3EqW1kuq2/9aKT6Bv+iSCNOjDpJn6mb9WF+cGASbV3oAQ4
-         xVX7kHhgM78GXZn4xws3A4YNOwIRd3KlEZxZw16a35fa7SwF1/w6W30z57mOJp+vht/G
-         cruaU5fRh6NY1DJAG0zpMnvwDHXw7uTtancFUKjBnWJ0IVEn/a5k5QDG/fn60s3Ozf4o
-         1iwKzqV2fqs2ToghrCsxW1RiVeSGSPj4Ys8eoyzxRu1VvdjqmoNet3JyH3uT6AUaLGNQ
-         aWoOB4+0imvbP+ap27dgERenKTqC9QV2O841AE2SbL9Qt+J4Fwc22brV+9YfO5kamp7e
-         W02g==
+        bh=cl+f7C2cHaAmXsV9NI5ORe684Dt/o4KrSiPqiNfo6XU=;
+        b=IQ9gcba9gJyjGVeY1FZ8yJJ42Y+bJXraKZHFaWkhgYj0Vx/MlyXj2AUzXLJqYSLTOD
+         D1UJdm81PYGEve08uEUGUag1QoU1dvGPhLcW3C636i6SfoV6UVcwRtPpaxbA5MfUFafn
+         rP7w+1J5crGm46VUKwJ9jOsjJIA+5DUD8EoPWF8wqGDqdUIGSwJWvmDN2yFr5Oy4hs4a
+         P4bl9eDrPR5gYAM7ErwjaPXQsxvAtVCfXiCZO3YHpHBv2OgOss5UHfrWYy6yauy7Qtdh
+         4iPwXfgNVUqkoSoPmrJT/bB+Gr26vzUdv6OVQ2/J2ZjVDI3P2fkV2AF9LU67kcrvof86
+         d2VQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690889912; x=1691494712;
+        d=1e100.net; s=20221208; t=1690889914; x=1691494714;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=CNCAxubw/bZLBzFoTBKjQdMqFLRngntwtQyTFtcudec=;
-        b=O8cadCxSRn6WHjU38YwCGgA7eTWapsZICIWoqhaakY1cfzNVfxAqSZGtFcTnS+zNKs
-         cnztzofVp5tZ7G15vwC3GFZPdbRIt1v98R671P5OGCQOp9jQdtT4j7gNOSGh2OXYOG5b
-         8WPXM/s6dIXFbOzAveBkkqjLjxqemSEmmXoLeAnPr4T0ncUywH826m4QtkbVKgWu5XHS
-         SzMocmNt5RgUo8DQPcOZauMGWiZjEY/IY8ceqshUVUJasB/UQ8+5COJFEALRndktRoaS
-         ArwSy1qn8IT4fQIsh2/Nyztqc4M+KD1kHEpEuSLmEzcTwctIM5az1Ek2WfjKMLSD9MV1
-         PfMg==
-X-Gm-Message-State: ABy/qLYV4HhglOty1/JsPRxd/EEzmUzKv/idgcEFmLFDRv73FfbghMPB
-	6sy1cHUQ0JyuTwdRCuCPW6FFKI6reDNrX8sBSrZPgg==
-X-Google-Smtp-Source: APBJJlE/X4HbKq6dqx0jLQNq18jfVU7cs5hGpFnXqnufEO7KbObzU98elMqI/EKCTV0f5TD4BTDzUQ==
-X-Received: by 2002:ad4:410a:0:b0:637:2235:4a29 with SMTP id i10-20020ad4410a000000b0063722354a29mr10800994qvp.30.1690889912353;
-        Tue, 01 Aug 2023 04:38:32 -0700 (PDT)
+        bh=cl+f7C2cHaAmXsV9NI5ORe684Dt/o4KrSiPqiNfo6XU=;
+        b=ejK2oSJgErkgC0anHTf05zbIw23xLEuEwStOt2rlbuIGO7lyaGtsjIIuvy3SEuQGxA
+         +qXVXHthOfSi1Y2RWsYgx5RF+x8LOxeff9Guooc1Dms/iwuqtI//SexYxHIiQqTF+QKF
+         D/YQld82oXVFk1+qiDqpLNtoR1HjdRUx8djR/AkmR/34QeGvgAV+Rq6OMaY5j/5QbFnN
+         9kn9ASE4ijogb0n632Yf6wbMWImK/p89tOQ6BVRYo6BcVnCuc+NInptJsCz98GWFBWg0
+         /ZXJJE8DwtE+Eg+7sQyH3olzhFS92Q7O5PIXesUKNSaoG6llcVIdX57rnpaPBReAXecu
+         XhUg==
+X-Gm-Message-State: ABy/qLb5cwGGC0rRgUihFBkIsIk3MUALRkgioBNyvkYUGvx6vYaoZ8IR
+	PL+Lcl1RvLTlhO5evcRCs75S2ZSTbJnCq+tiIZO4HQ==
+X-Google-Smtp-Source: APBJJlFTXuMy/jI89zHgpOPu/xRET83rudgSdmB2vAk+bYM4vdTaZjgkYTDhuw2b7oA7VNTDYI9dJw==
+X-Received: by 2002:a0c:8e41:0:b0:639:d1f8:3e15 with SMTP id w1-20020a0c8e41000000b00639d1f83e15mr16474372qvb.23.1690889913826;
+        Tue, 01 Aug 2023 04:38:33 -0700 (PDT)
 Received: from majuu.waya ([142.114.148.137])
-        by smtp.gmail.com with ESMTPSA id j1-20020a0cf501000000b0063d26033b74sm4643738qvm.39.2023.08.01.04.38.30
+        by smtp.gmail.com with ESMTPSA id j1-20020a0cf501000000b0063d26033b74sm4643738qvm.39.2023.08.01.04.38.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Aug 2023 04:38:31 -0700 (PDT)
+        Tue, 01 Aug 2023 04:38:33 -0700 (PDT)
 From: Jamal Hadi Salim <jhs@mojatatu.com>
 To: netdev@vger.kernel.org
 Cc: deb.chatterjee@intel.com,
@@ -78,9 +78,9 @@ Cc: deb.chatterjee@intel.com,
 	toke@redhat.com,
 	mattyk@nvidia.com,
 	john.andy.fingerhut@intel.com
-Subject: [PATCH RFC v5 net-next 09/23] p4tc: add P4 data types
-Date: Tue,  1 Aug 2023 07:37:53 -0400
-Message-Id: <20230801113807.85473-10-jhs@mojatatu.com>
+Subject: [PATCH RFC v5 net-next 10/23] p4tc: add pipeline create, get, update, delete
+Date: Tue,  1 Aug 2023 07:37:54 -0400
+Message-Id: <20230801113807.85473-11-jhs@mojatatu.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230801113807.85473-1-jhs@mojatatu.com>
 References: <20230801113807.85473-1-jhs@mojatatu.com>
@@ -97,38 +97,82 @@ X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Introduce abstraction that represents P4 data types.
-This also introduces the Kconfig and Makefile which later patches use.
-Types could be little, host or big endian definitions. The abstraction also
-supports defining:
+__Introducing P4 TC Pipeline__
 
-a) bitstrings using P4 annotations that look like "bit<X>" where X
-   is the number of bits defined in a type
+This commit introduces P4 TC pipelines, which emulate the semantics of a
+P4 program/pipeline using the TC infrastructure.
 
-b) bitslices such that one can define in P4 as bit<8>[0-3] and
-   bit<16>[4-9]. A 4-bit slice from bits 0-3 and a 6-bit slice from bits
-   4-9 respectively.
+One can refer to P4 programs/pipelines using their names or their
+specific pipeline ids (pipeid)
 
-Each type has a bitsize, a name (for debugging purposes), an ID and
-methods/ops. The P4 types will be used by headers, dynamic actions
-nd other part of P4TC.
+CRUD (Create, Read/get, Update and Delete) commands apply on a pipeline.
 
-Each type has four ops:
+As an example, to create a P4 program/pipeline named aP4proggie with a
+single table in its pipeline, one would use the following command from user
+space tc:
 
-- validate_p4t: Which validates if a given value of a specific type
-  meets valid boundary conditions.
+tc p4template create pipeline/aP4proggie numtables 1
 
-- create_bitops: Which, given a bitsize, bitstart and bitend allocates and
-  returns a mask and a shift value. For example, if we have type
-  bit<8>[3-3] meaning bitstart = 3 and bitend = 3, we'll create a mask
-  which would only give us the fourth bit of a bit8 value, that is, 0x08.
-  Since we are interested in the fourth bit, the bit shift value will be 3.
+Note that, in the above command, the numtables is set as 1; the default
+is 0 because it is feasible to have a P4 program with no tables at all.
 
-- host_read : Which reads the value of a given type and transforms it to
-  host order
+The kernel issues each pipeline a pipeline ID which could be referenced.
+The control plane can specify an ID of choice, for example:
 
-- host_write : Which writes a provided host order value and transforms it
-  to the type's native order
+tc p4template create pipeline/aP4proggie pipeid 1 numtables 1
+
+Typically there is no good reason to specify the pipeid, but the choice
+is offered to the user.
+
+To Read pipeline aP4proggie attributes, one would retrieve those details as
+follows:
+
+tc p4template get pipeline/[aP4proggie] [pipeid 1]
+
+To Update aP4proggie pipeline from 1 to 10 tables, one would use the
+following command:
+
+tc p4template update pipeline/[aP4proggie] [pipeid 1] numtables 10
+
+Note that, in the above command, one could use the P4 program/pipeline
+name, id or both to specify which P4 program/pipeline to update.
+
+To Delete a P4 program/pipeline named aP4proggie
+with a pipeid of 1, one would use the following command:
+
+tc p4template del pipeline/[aP4proggie] [pipeid 1]
+
+Note that, in the above command, one could use the P4 program/pipeline
+name, id or both to specify which P4 program/pipeline to delete
+
+If one wished to dump all the created P4 programs/pipelines, one would
+use the following command:
+
+tc p4template get pipeline/
+
+__Pipeline Lifetime__
+
+After Create is issued, one can Read/get, Update and Delete; however
+the pipeline can only be put to use after it is "sealed".
+To seal a pipeline, one would issue the following command:
+
+tc p4template update pipeline/aP4proggie state ready
+
+Once the pipeline is sealed it cannot updated. It can be deleted and read.
+
+After a pipeline is sealed it can be put to use via the TC P4 classifier.
+For example:
+
+tc filter add dev $DEV ingress protocol any prio 6 p4 pname aP4proggie
+
+Instantiates aP4proggie in the ingress of $DEV. One could also attach it to
+a block of ports (example tc block 22) as such:
+
+tc filter add block 22 ingress protocol all prio 6 p4 pname aP4proggie
+
+Once the pipeline is attached to a device or block it cannot be deleted.
+It becomes Read-only from the control plane/user space.
+The pipeline can be deleted when there are no longer any users left.
 
 Co-developed-by: Victor Nogueira <victor@mojatatu.com>
 Signed-off-by: Victor Nogueira <victor@mojatatu.com>
@@ -136,204 +180,266 @@ Co-developed-by: Pedro Tammela <pctammela@mojatatu.com>
 Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
 Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
 ---
- include/net/p4tc_types.h    |   87 +++
- include/uapi/linux/p4tc.h   |   40 ++
- net/sched/Kconfig           |    8 +
- net/sched/Makefile          |    2 +
- net/sched/p4tc/Makefile     |    3 +
- net/sched/p4tc/p4tc_types.c | 1255 +++++++++++++++++++++++++++++++++++
- 6 files changed, 1395 insertions(+)
- create mode 100644 include/net/p4tc_types.h
- create mode 100644 include/uapi/linux/p4tc.h
- create mode 100644 net/sched/p4tc/Makefile
- create mode 100644 net/sched/p4tc/p4tc_types.c
+ include/net/p4tc.h             | 121 +++++++
+ include/uapi/linux/p4tc.h      |  64 ++++
+ include/uapi/linux/rtnetlink.h |   9 +
+ net/sched/p4tc/Makefile        |   2 +-
+ net/sched/p4tc/p4tc_pipeline.c | 604 +++++++++++++++++++++++++++++++++
+ net/sched/p4tc/p4tc_tmpl_api.c | 577 +++++++++++++++++++++++++++++++
+ security/selinux/nlmsgtab.c    |   6 +-
+ 7 files changed, 1381 insertions(+), 2 deletions(-)
+ create mode 100644 include/net/p4tc.h
+ create mode 100644 net/sched/p4tc/p4tc_pipeline.c
+ create mode 100644 net/sched/p4tc/p4tc_tmpl_api.c
 
-diff --git a/include/net/p4tc_types.h b/include/net/p4tc_types.h
+diff --git a/include/net/p4tc.h b/include/net/p4tc.h
 new file mode 100644
-index 000000000..232399533
+index 000000000..e95769da5
 --- /dev/null
-+++ b/include/net/p4tc_types.h
-@@ -0,0 +1,87 @@
++++ b/include/net/p4tc.h
+@@ -0,0 +1,121 @@
 +/* SPDX-License-Identifier: GPL-2.0 */
-+#ifndef __NET_P4TYPES_H
-+#define __NET_P4TYPES_H
-+
-+#include <linux/netlink.h>
-+#include <linux/pkt_cls.h>
-+#include <linux/types.h>
++#ifndef __NET_P4TC_H
++#define __NET_P4TC_H
 +
 +#include <uapi/linux/p4tc.h>
++#include <linux/workqueue.h>
++#include <net/sch_generic.h>
++#include <net/net_namespace.h>
++#include <linux/refcount.h>
++#include <linux/rhashtable.h>
++#include <linux/rhashtable-types.h>
 +
-+#define P4T_MAX_BITSZ 128
++#define P4TC_DEFAULT_NUM_TABLES P4TC_MINTABLES_COUNT
++#define P4TC_DEFAULT_MAX_RULES 1
++#define P4TC_PATH_MAX 3
 +
-+struct p4tc_type_mask_shift {
-+	void *mask;
-+	u8 shift;
++#define P4TC_KERNEL_PIPEID 0
++
++#define P4TC_PID_IDX 0
++
++struct p4tc_dump_ctx {
++	u32 ids[P4TC_PATH_MAX];
 +};
 +
-+struct p4tc_type;
-+struct p4tc_type_ops {
-+	int (*validate_p4t)(struct p4tc_type *container, void *value, u16 startbit,
-+			    u16 endbit, struct netlink_ext_ack *extack);
-+	struct p4tc_type_mask_shift *(*create_bitops)(u16 bitsz,
-+						      u16 bitstart,
-+						      u16 bitend,
-+						      struct netlink_ext_ack *extack);
-+	void (*host_read)(struct p4tc_type *container,
-+			  struct p4tc_type_mask_shift *mask_shift, void *sval,
-+			  void *dval);
-+	void (*host_write)(struct p4tc_type *container,
-+			   struct p4tc_type_mask_shift *mask_shift, void *sval,
-+			   void *dval);
-+	void (*print)(struct net *net, struct p4tc_type *container,
-+		      const char *prefix, void *val);
++struct p4tc_template_common;
++
++struct p4tc_nl_pname {
++	char                     *data;
++	bool                     passed;
 +};
 +
-+#define P4T_MAX_STR_SZ 32
-+struct p4tc_type {
-+	char name[P4T_MAX_STR_SZ];
-+	const struct p4tc_type_ops *ops;
-+	size_t container_bitsz;
-+	size_t bitsz;
-+	int typeid;
++struct p4tc_pipeline;
++struct p4tc_template_ops {
++	void (*init)(void);
++	struct p4tc_template_common *(*cu)(struct net *net, struct nlmsghdr *n,
++					   struct nlattr *nla,
++					   struct p4tc_nl_pname *nl_pname,
++					   u32 *ids,
++					   struct netlink_ext_ack *extack);
++	int (*put)(struct p4tc_pipeline *pipeline,
++		   struct p4tc_template_common *tmpl,
++		   struct netlink_ext_ack *extack);
++	int (*gd)(struct net *net, struct sk_buff *skb, struct nlmsghdr *n,
++		  struct nlattr *nla, struct p4tc_nl_pname *nl_pname, u32 *ids,
++		  struct netlink_ext_ack *extack);
++	int (*fill_nlmsg)(struct net *net, struct sk_buff *skb,
++			  struct p4tc_template_common *tmpl,
++			  struct netlink_ext_ack *extack);
++	int (*dump)(struct sk_buff *skb, struct p4tc_dump_ctx *ctx,
++		    struct nlattr *nla, char **p_name, u32 *ids,
++		    struct netlink_ext_ack *extack);
++	int (*dump_1)(struct sk_buff *skb, struct p4tc_template_common *common);
 +};
 +
-+struct p4tc_type *p4type_find_byid(int id);
-+bool p4tc_is_type_unsigned(int typeid);
++struct p4tc_template_common {
++	char                     name[TEMPLATENAMSZ];
++	struct p4tc_template_ops *ops;
++	u32                      p_id;
++	u32                      PAD0;
++};
 +
-+void p4t_copy(struct p4tc_type_mask_shift *dst_mask_shift,
-+	      struct p4tc_type *dst_t, void *dstv,
-+	      struct p4tc_type_mask_shift *src_mask_shift,
-+	      struct p4tc_type *src_t, void *srcv);
-+int p4t_cmp(struct p4tc_type_mask_shift *dst_mask_shift,
-+	    struct p4tc_type *dst_t, void *dstv,
-+	    struct p4tc_type_mask_shift *src_mask_shift,
-+	    struct p4tc_type *src_t, void *srcv);
-+void p4t_release(struct p4tc_type_mask_shift *mask_shift);
++extern const struct p4tc_template_ops p4tc_pipeline_ops;
 +
-+int p4tc_register_types(void);
-+void p4tc_unregister_types(void);
++struct p4tc_pipeline {
++	struct p4tc_template_common common;
++	struct rcu_head             rcu;
++	struct net                  *net;
++	refcount_t                  p_ctrl_ref;
++	u16                         num_tables;
++	u16                         curr_tables;
++	u8                          p_state;
++};
 +
-+#ifdef CONFIG_RETPOLINE
-+void __p4tc_type_host_read(const struct p4tc_type_ops *ops,
-+			   struct p4tc_type *container,
-+			   struct p4tc_type_mask_shift *mask_shift, void *sval,
-+			   void *dval);
-+void __p4tc_type_host_write(const struct p4tc_type_ops *ops,
-+			    struct p4tc_type *container,
-+			    struct p4tc_type_mask_shift *mask_shift, void *sval,
-+			    void *dval);
-+#else
-+static inline void __p4tc_type_host_read(const struct p4tc_type_ops *ops,
-+					 struct p4tc_type *container,
-+					 struct p4tc_type_mask_shift *mask_shift,
-+					 void *sval, void *dval)
++struct p4tc_pipeline_net {
++	struct idr pipeline_idr;
++};
++
++static inline bool p4tc_tmpl_msg_is_update(struct nlmsghdr *n)
 +{
-+	return ops->host_read(container, mask_shift, sval, dval);
++	return n->nlmsg_type == RTM_UPDATEP4TEMPLATE;
 +}
-+static inline void __p4tc_type_host_write(const struct p4tc_type_ops *ops,
-+					  struct p4tc_type *container,
-+					  struct p4tc_type_mask_shift *mask_shift,
-+					  void *sval, void *dval)
++
++int tcf_p4_tmpl_generic_dump(struct sk_buff *skb, struct p4tc_dump_ctx *ctx,
++			     struct idr *idr, int idx,
++			     struct netlink_ext_ack *extack);
++
++struct p4tc_pipeline *tcf_pipeline_find_byany(struct net *net,
++					      const char *p_name,
++					      const u32 pipeid,
++					      struct netlink_ext_ack *extack);
++struct p4tc_pipeline *tcf_pipeline_find_byid(struct net *net, const u32 pipeid);
++struct p4tc_pipeline *tcf_pipeline_find_get(struct net *net, const char *p_name,
++					    const u32 pipeid,
++					    struct netlink_ext_ack *extack);
++
++static inline bool tcf_pipeline_get(struct p4tc_pipeline *pipeline)
 +{
-+	return ops->host_write(container, mask_shift, sval, dval);
++	return refcount_inc_not_zero(&pipeline->p_ctrl_ref);
 +}
-+#endif
++
++void tcf_pipeline_put(struct p4tc_pipeline *pipeline);
++struct p4tc_pipeline *
++tcf_pipeline_find_byany_unsealed(struct net *net, const char *p_name,
++				 const u32 pipeid,
++				 struct netlink_ext_ack *extack);
++
++static inline int p4tc_action_destroy(struct tc_action **acts)
++{
++	int ret = 0;
++
++	if (acts) {
++		ret = tcf_action_destroy(acts, TCA_ACT_UNBIND);
++		kfree(acts);
++	}
++
++	return ret;
++}
++
++#define to_pipeline(t) ((struct p4tc_pipeline *)t)
 +
 +#endif
 diff --git a/include/uapi/linux/p4tc.h b/include/uapi/linux/p4tc.h
-new file mode 100644
-index 000000000..323ceb452
---- /dev/null
+index 323ceb452..da5704bfe 100644
+--- a/include/uapi/linux/p4tc.h
 +++ b/include/uapi/linux/p4tc.h
-@@ -0,0 +1,40 @@
-+/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
-+#ifndef __LINUX_P4TC_H
-+#define __LINUX_P4TC_H
-+
-+#define P4TC_MAX_KEYSZ 512
-+
-+enum {
-+	P4T_UNSPEC,
-+	P4T_U8 = 1,
-+	P4T_U16 = 2,
-+	P4T_U32 = 3,
-+	P4T_U64 = 4,
-+	P4T_STRING = 5,
-+	P4T_FLAG = 6,
-+	P4T_MSECS = 7,
-+	P4T_NESTED = 8,
-+	P4T_NESTED_ARRAY = 9,
-+	P4T_NUL_STRING = 10,
-+	P4T_BINARY = 11,
-+	P4T_S8 = 12,
-+	P4T_S16 = 13,
-+	P4T_S32 = 14,
-+	P4T_S64 = 15,
-+	P4T_BITFIELD32 = 16,
-+	P4T_MACADDR = 17,
-+	P4T_IPV4ADDR,
-+	P4T_BE16,
-+	P4T_BE32,
-+	P4T_BE64,
-+	P4T_U128,
-+	P4T_S128,
-+	P4T_PATH,
-+	P4T_BOOL,
-+	P4T_DEV,
-+	P4T_KEY,
-+	__P4T_MAX,
-+};
-+#define P4T_MAX (__P4T_MAX - 1)
-+
-+#endif
-diff --git a/net/sched/Kconfig b/net/sched/Kconfig
-index 4b95cb1ac..ea57a4c7b 100644
---- a/net/sched/Kconfig
-+++ b/net/sched/Kconfig
-@@ -676,6 +676,14 @@ config NET_EMATCH_IPT
- 	  To compile this code as a module, choose M here: the
- 	  module will be called em_ipt.
+@@ -2,8 +2,69 @@
+ #ifndef __LINUX_P4TC_H
+ #define __LINUX_P4TC_H
  
-+config NET_P4_TC
-+	bool "P4 TC support"
-+	select NET_CLS_ACT
-+	help
-+	  Say Y here if you want to use P4 features on top of TC.
-+	  The concept of Pipelines, Tables, metadata will be enabled
-+          with this option.
++#include <linux/types.h>
++#include <linux/pkt_sched.h>
 +
- config NET_CLS_ACT
- 	bool "Actions"
- 	select NET_CLS
-diff --git a/net/sched/Makefile b/net/sched/Makefile
-index b5fd49641..937b8f8a9 100644
---- a/net/sched/Makefile
-+++ b/net/sched/Makefile
-@@ -82,3 +82,5 @@ obj-$(CONFIG_NET_EMATCH_TEXT)	+= em_text.o
- obj-$(CONFIG_NET_EMATCH_CANID)	+= em_canid.o
- obj-$(CONFIG_NET_EMATCH_IPSET)	+= em_ipset.o
- obj-$(CONFIG_NET_EMATCH_IPT)	+= em_ipt.o
++/* pipeline header */
++struct p4tcmsg {
++	__u32 pipeid;
++	__u32 obj;
++};
 +
-+obj-$(CONFIG_NET_P4_TC)		+= p4tc/
++#define P4TC_MAXPIPELINE_COUNT 32
++#define P4TC_MAXTABLES_COUNT 32
++#define P4TC_MINTABLES_COUNT 0
++#define P4TC_MAXPARSE_KEYS 16
++#define P4TC_MAXMETA_SZ 128
++#define P4TC_MSGBATCH_SIZE 16
++
+ #define P4TC_MAX_KEYSZ 512
+ 
++#define TEMPLATENAMSZ 256
++#define PIPELINENAMSIZ TEMPLATENAMSZ
++
++/* Root attributes */
++enum {
++	P4TC_ROOT_UNSPEC,
++	P4TC_ROOT, /* nested messages */
++	P4TC_ROOT_PNAME, /* string */
++	__P4TC_ROOT_MAX,
++};
++#define P4TC_ROOT_MAX __P4TC_ROOT_MAX
++
++/* PIPELINE attributes */
++enum {
++	P4TC_PIPELINE_UNSPEC,
++	P4TC_PIPELINE_NUMTABLES, /* u16 */
++	P4TC_PIPELINE_STATE, /* u8 */
++	P4TC_PIPELINE_NAME, /* string only used for pipeline dump */
++	__P4TC_PIPELINE_MAX
++};
++#define P4TC_PIPELINE_MAX __P4TC_PIPELINE_MAX
++
++/* P4 Object types */
++enum {
++	P4TC_OBJ_UNSPEC,
++	P4TC_OBJ_PIPELINE,
++	__P4TC_OBJ_MAX,
++};
++#define P4TC_OBJ_MAX __P4TC_OBJ_MAX
++
++/* P4 attributes */
++enum {
++	P4TC_UNSPEC,
++	P4TC_PATH,
++	P4TC_PARAMS,
++	__P4TC_MAX,
++};
++#define P4TC_MAX __P4TC_MAX
++
++/* PIPELINE states */
++enum {
++	P4TC_STATE_NOT_READY,
++	P4TC_STATE_READY,
++};
++
+ enum {
+ 	P4T_UNSPEC,
+ 	P4T_U8 = 1,
+@@ -37,4 +98,7 @@ enum {
+ };
+ #define P4T_MAX (__P4T_MAX - 1)
+ 
++#define P4TC_RTA(r) \
++	((struct rtattr *)(((char *)(r)) + NLMSG_ALIGN(sizeof(struct p4tcmsg))))
++
+ #endif
+diff --git a/include/uapi/linux/rtnetlink.h b/include/uapi/linux/rtnetlink.h
+index 51c13cf9c..57523a899 100644
+--- a/include/uapi/linux/rtnetlink.h
++++ b/include/uapi/linux/rtnetlink.h
+@@ -194,6 +194,15 @@ enum {
+ 	RTM_GETTUNNEL,
+ #define RTM_GETTUNNEL	RTM_GETTUNNEL
+ 
++	RTM_CREATEP4TEMPLATE = 124,
++#define RTM_CREATEP4TEMPLATE	RTM_CREATEP4TEMPLATE
++	RTM_DELP4TEMPLATE,
++#define RTM_DELP4TEMPLATE	RTM_DELP4TEMPLATE
++	RTM_GETP4TEMPLATE,
++#define RTM_GETP4TEMPLATE	RTM_GETP4TEMPLATE
++	RTM_UPDATEP4TEMPLATE,
++#define RTM_UPDATEP4TEMPLATE	RTM_UPDATEP4TEMPLATE
++
+ 	__RTM_MAX,
+ #define RTM_MAX		(((__RTM_MAX + 3) & ~3) - 1)
+ };
 diff --git a/net/sched/p4tc/Makefile b/net/sched/p4tc/Makefile
-new file mode 100644
-index 000000000..dd1358c9e
---- /dev/null
+index dd1358c9e..0881a7563 100644
+--- a/net/sched/p4tc/Makefile
 +++ b/net/sched/p4tc/Makefile
-@@ -0,0 +1,3 @@
-+# SPDX-License-Identifier: GPL-2.0
-+
-+obj-y := p4tc_types.o
-diff --git a/net/sched/p4tc/p4tc_types.c b/net/sched/p4tc/p4tc_types.c
+@@ -1,3 +1,3 @@
+ # SPDX-License-Identifier: GPL-2.0
+ 
+-obj-y := p4tc_types.o
++obj-y := p4tc_types.o p4tc_tmpl_api.o p4tc_pipeline.o
+diff --git a/net/sched/p4tc/p4tc_pipeline.c b/net/sched/p4tc/p4tc_pipeline.c
 new file mode 100644
-index 000000000..28316dcb1
+index 000000000..084b6689e
 --- /dev/null
-+++ b/net/sched/p4tc/p4tc_types.c
-@@ -0,0 +1,1255 @@
++++ b/net/sched/p4tc/p4tc_pipeline.c
+@@ -0,0 +1,604 @@
 +// SPDX-License-Identifier: GPL-2.0-or-later
 +/*
-+ * net/sched/p4tc_types.c -  P4 datatypes
++ * net/sched/p4tc_pipeline.c	P4 TC PIPELINE
++ *
 + * Copyright (c) 2022-2023, Mojatatu Networks
 + * Copyright (c) 2022-2023, Intel Corporation.
 + * Authors:     Jamal Hadi Salim <jhs@mojatatu.com>
@@ -345,1247 +451,1202 @@ index 000000000..28316dcb1
 +#include <linux/kernel.h>
 +#include <linux/string.h>
 +#include <linux/errno.h>
++#include <linux/slab.h>
 +#include <linux/skbuff.h>
-+#include <linux/rtnetlink.h>
-+#include <linux/module.h>
 +#include <linux/init.h>
++#include <linux/kmod.h>
++#include <linux/err.h>
++#include <linux/module.h>
 +#include <net/net_namespace.h>
-+#include <net/netlink.h>
-+#include <net/pkt_sched.h>
++#include <net/sock.h>
++#include <net/sch_generic.h>
 +#include <net/pkt_cls.h>
-+#include <net/act_api.h>
++#include <net/p4tc.h>
++#include <net/netlink.h>
++#include <net/flow_offload.h>
 +#include <net/p4tc_types.h>
-+#include <linux/etherdevice.h>
 +
-+static DEFINE_IDR(p4tc_types_idr);
++static unsigned int pipeline_net_id;
++static struct p4tc_pipeline *root_pipeline;
 +
-+static void p4tc_types_put(void)
++static __net_init int pipeline_init_net(struct net *net)
 +{
-+	unsigned long tmp, typeid;
-+	struct p4tc_type *type;
++	struct p4tc_pipeline_net *pipe_net = net_generic(net, pipeline_net_id);
 +
-+	idr_for_each_entry_ul(&p4tc_types_idr, type, tmp, typeid) {
-+		idr_remove(&p4tc_types_idr, typeid);
-+		kfree(type);
++	idr_init(&pipe_net->pipeline_idr);
++
++	return 0;
++}
++
++static int __tcf_pipeline_put(struct p4tc_pipeline *pipeline,
++			      struct p4tc_template_common *template,
++			      struct netlink_ext_ack *extack);
++
++static void __net_exit pipeline_exit_net(struct net *net)
++{
++	struct p4tc_pipeline_net *pipe_net;
++	struct p4tc_pipeline *pipeline;
++	unsigned long pipeid, tmp;
++
++	rtnl_lock();
++	pipe_net = net_generic(net, pipeline_net_id);
++	idr_for_each_entry_ul(&pipe_net->pipeline_idr, pipeline, tmp, pipeid) {
++		__tcf_pipeline_put(pipeline, &pipeline->common, NULL);
++	}
++	idr_destroy(&pipe_net->pipeline_idr);
++	rtnl_unlock();
++}
++
++static struct pernet_operations pipeline_net_ops = {
++	.init = pipeline_init_net,
++	.pre_exit = pipeline_exit_net,
++	.id = &pipeline_net_id,
++	.size = sizeof(struct p4tc_pipeline_net),
++};
++
++static const struct nla_policy tc_pipeline_policy[P4TC_PIPELINE_MAX + 1] = {
++	[P4TC_PIPELINE_NUMTABLES] =
++		NLA_POLICY_RANGE(NLA_U16, P4TC_MINTABLES_COUNT, P4TC_MAXTABLES_COUNT),
++	[P4TC_PIPELINE_STATE] = { .type = NLA_U8 },
++};
++
++static void tcf_pipeline_destroy(struct p4tc_pipeline *pipeline)
++{
++	kfree(pipeline);
++}
++
++static void tcf_pipeline_destroy_rcu(struct rcu_head *head)
++{
++	struct p4tc_pipeline *pipeline;
++	struct net *net;
++
++	pipeline = container_of(head, struct p4tc_pipeline, rcu);
++
++	net = pipeline->net;
++	tcf_pipeline_destroy(pipeline);
++	put_net(net);
++}
++
++static void tcf_pipeline_teardown(struct p4tc_pipeline *pipeline,
++				  struct netlink_ext_ack *extack)
++{
++	struct net *net = pipeline->net;
++	struct p4tc_pipeline_net *pipe_net = net_generic(net, pipeline_net_id);
++	struct net *pipeline_net = maybe_get_net(net);
++
++	idr_remove(&pipe_net->pipeline_idr, pipeline->common.p_id);
++
++	/* If we are on netns cleanup we can't touch the pipeline_idr.
++	 * On pre_exit we will destroy the idr but never call into teardown
++	 * if filters are active which makes pipeline pointers dangle until
++	 * the filters ultimately destroy them.
++	 */
++	if (pipeline_net) {
++		idr_remove(&pipe_net->pipeline_idr, pipeline->common.p_id);
++		call_rcu(&pipeline->rcu, tcf_pipeline_destroy_rcu);
++	} else {
++		tcf_pipeline_destroy(pipeline);
 +	}
 +}
 +
-+struct p4tc_type *p4type_find_byid(int typeid)
++static int __tcf_pipeline_put(struct p4tc_pipeline *pipeline,
++			      struct p4tc_template_common *template,
++			      struct netlink_ext_ack *extack)
 +{
-+	return idr_find(&p4tc_types_idr, typeid);
++	/* The lifetime of the pipeline can be terminated in two cases:
++	 * - netns cleanup (system driven)
++	 * - pipeline delete (user driven)
++	 *
++	 * When the pipeline is referenced by one or more p4 classifiers we need
++	 * to make sure the pipeline and its components are alive while the classifier
++	 * is still visible by the datapath.
++	 * In the netns cleanup, we cannot destroy the pipeline in our netns exit callback
++	 * as the netdevs and filters are still visible in the datapath.
++	 * In such case, it's the filter's job to destroy the pipeline.
++	 *
++	 * To accommodate such scenario, whichever put call reaches '0' first will
++	 * destroy the pipeline and its components.
++	 *
++	 * On netns cleanup we guarantee no table entries operations are in flight.
++	 */
++	if (!refcount_dec_and_test(&pipeline->p_ctrl_ref)) {
++		NL_SET_ERR_MSG(extack, "Can't delete referenced pipeline");
++		return -EBUSY;
++	}
++
++	tcf_pipeline_teardown(pipeline, extack);
++
++	return 0;
 +}
 +
-+static struct p4tc_type *p4type_find_byname(const char *name)
++static inline int pipeline_try_set_state_ready(struct p4tc_pipeline *pipeline,
++					       struct netlink_ext_ack *extack)
 +{
-+	unsigned long tmp, typeid;
-+	struct p4tc_type *type;
++	if (pipeline->curr_tables != pipeline->num_tables) {
++		NL_SET_ERR_MSG(extack,
++			       "Must have all table defined to update state to ready");
++		return -EINVAL;
++	}
 +
-+	idr_for_each_entry_ul(&p4tc_types_idr, type, tmp, typeid) {
-+		if (!strncmp(type->name, name, P4T_MAX_STR_SZ))
-+			return type;
++	pipeline->p_state = P4TC_STATE_READY;
++	return true;
++}
++
++static inline bool pipeline_sealed(struct p4tc_pipeline *pipeline)
++{
++	return pipeline->p_state == P4TC_STATE_READY;
++}
++
++struct p4tc_pipeline *tcf_pipeline_find_byid(struct net *net, const u32 pipeid)
++{
++	struct p4tc_pipeline_net *pipe_net;
++
++	if (pipeid == P4TC_KERNEL_PIPEID)
++		return root_pipeline;
++
++	pipe_net = net_generic(net, pipeline_net_id);
++
++	return idr_find(&pipe_net->pipeline_idr, pipeid);
++}
++EXPORT_SYMBOL_GPL(tcf_pipeline_find_byid);
++
++static struct p4tc_pipeline *tcf_pipeline_find_byname(struct net *net,
++						      const char *name)
++{
++	struct p4tc_pipeline_net *pipe_net = net_generic(net, pipeline_net_id);
++	struct p4tc_pipeline *pipeline;
++	unsigned long tmp, id;
++
++	idr_for_each_entry_ul(&pipe_net->pipeline_idr, pipeline, tmp, id) {
++		/* Don't show kernel pipeline */
++		if (id == P4TC_KERNEL_PIPEID)
++			continue;
++		if (strncmp(pipeline->common.name, name, PIPELINENAMSIZ) == 0)
++			return pipeline;
 +	}
 +
 +	return NULL;
 +}
 +
-+bool p4tc_is_type_unsigned(int typeid)
++static struct p4tc_pipeline *tcf_pipeline_create(struct net *net,
++						 struct nlmsghdr *n,
++						 struct nlattr *nla,
++						 const char *p_name, u32 pipeid,
++						 struct netlink_ext_ack *extack)
 +{
-+	switch (typeid) {
-+	case P4T_U8:
-+	case P4T_U16:
-+	case P4T_U32:
-+	case P4T_U64:
-+	case P4T_U128:
-+	case P4T_BOOL:
++	struct p4tc_pipeline_net *pipe_net = net_generic(net, pipeline_net_id);
++	struct nlattr *tb[P4TC_PIPELINE_MAX + 1];
++	struct p4tc_pipeline *pipeline;
++	int ret = 0;
++
++	ret = nla_parse_nested(tb, P4TC_PIPELINE_MAX, nla, tc_pipeline_policy,
++			       extack);
++
++	if (ret < 0)
++		goto out;
++
++	pipeline = tcf_pipeline_find_byany(net, p_name, pipeid, NULL);
++	if (pipeid != P4TC_KERNEL_PIPEID && !IS_ERR(pipeline)) {
++		NL_SET_ERR_MSG(extack, "Pipeline exists");
++		ret = -EEXIST;
++		goto out;
++	}
++
++	pipeline = kzalloc(sizeof(*pipeline), GFP_KERNEL);
++	if (unlikely(!pipeline))
++		return ERR_PTR(-ENOMEM);
++
++	if (!p_name || p_name[0] == '\0') {
++		NL_SET_ERR_MSG(extack, "Must specify pipeline name");
++		ret = -EINVAL;
++		goto err;
++	}
++
++	strscpy(pipeline->common.name, p_name, PIPELINENAMSIZ);
++
++	if (pipeid) {
++		ret = idr_alloc_u32(&pipe_net->pipeline_idr, pipeline, &pipeid,
++				    pipeid, GFP_KERNEL);
++	} else {
++		pipeid = 1;
++		ret = idr_alloc_u32(&pipe_net->pipeline_idr, pipeline, &pipeid,
++				    UINT_MAX, GFP_KERNEL);
++	}
++
++	if (ret < 0) {
++		NL_SET_ERR_MSG(extack, "Unable to allocate pipeline id");
++		goto idr_rm;
++	}
++
++	pipeline->common.p_id = pipeid;
++
++	if (tb[P4TC_PIPELINE_NUMTABLES])
++		pipeline->num_tables =
++			nla_get_u16(tb[P4TC_PIPELINE_NUMTABLES]);
++	else
++		pipeline->num_tables = P4TC_DEFAULT_NUM_TABLES;
++
++	pipeline->p_state = P4TC_STATE_NOT_READY;
++
++	pipeline->net = net;
++
++	refcount_set(&pipeline->p_ctrl_ref, 1);
++
++	pipeline->common.ops = (struct p4tc_template_ops *)&p4tc_pipeline_ops;
++
++	return pipeline;
++
++idr_rm:
++	idr_remove(&pipe_net->pipeline_idr, pipeid);
++
++err:
++	kfree(pipeline);
++
++out:
++	return ERR_PTR(ret);
++}
++
++struct p4tc_pipeline *tcf_pipeline_find_byany(struct net *net,
++					      const char *p_name,
++					      const u32 pipeid,
++					      struct netlink_ext_ack *extack)
++{
++	struct p4tc_pipeline *pipeline = NULL;
++
++	if (pipeid) {
++		pipeline = tcf_pipeline_find_byid(net, pipeid);
++		if (!pipeline) {
++			NL_SET_ERR_MSG(extack, "Unable to find pipeline by id");
++			return ERR_PTR(-EINVAL);
++		}
++	} else {
++		if (p_name) {
++			pipeline = tcf_pipeline_find_byname(net, p_name);
++			if (!pipeline) {
++				NL_SET_ERR_MSG(extack,
++					       "Pipeline name not found");
++				return ERR_PTR(-EINVAL);
++			}
++		} else {
++			NL_SET_ERR_MSG(extack,
++				       "Must specify pipeline name or id");
++			return ERR_PTR(-EINVAL);
++		}
++	}
++
++	return pipeline;
++}
++
++struct p4tc_pipeline *tcf_pipeline_find_get(struct net *net, const char *p_name,
++					    const u32 pipeid,
++					    struct netlink_ext_ack *extack)
++{
++	struct p4tc_pipeline *pipeline =
++		tcf_pipeline_find_byany(net, p_name, pipeid, extack);
++
++	if (IS_ERR(pipeline))
++		return pipeline;
++
++	if (!tcf_pipeline_get(pipeline)) {
++		NL_SET_ERR_MSG(extack, "Pipeline is stale");
++		return ERR_PTR(-EINVAL);
++	}
++
++	return pipeline;
++}
++EXPORT_SYMBOL_GPL(tcf_pipeline_find_get);
++
++void tcf_pipeline_put(struct p4tc_pipeline *pipeline)
++{
++	__tcf_pipeline_put(pipeline, &pipeline->common, NULL);
++}
++EXPORT_SYMBOL_GPL(tcf_pipeline_put);
++
++struct p4tc_pipeline *
++tcf_pipeline_find_byany_unsealed(struct net *net, const char *p_name,
++				 const u32 pipeid,
++				 struct netlink_ext_ack *extack)
++{
++	struct p4tc_pipeline *pipeline =
++		tcf_pipeline_find_byany(net, p_name, pipeid, extack);
++	if (IS_ERR(pipeline))
++		return pipeline;
++
++	if (pipeline_sealed(pipeline)) {
++		NL_SET_ERR_MSG(extack, "Pipeline is sealed");
++		return ERR_PTR(-EINVAL);
++	}
++
++	return pipeline;
++}
++
++static struct p4tc_pipeline *
++tcf_pipeline_update(struct net *net, struct nlmsghdr *n, struct nlattr *nla,
++		    const char *p_name, const u32 pipeid,
++		    struct netlink_ext_ack *extack)
++{
++	struct nlattr *tb[P4TC_PIPELINE_MAX + 1];
++	struct p4tc_pipeline *pipeline;
++	u16 num_tables = 0;
++	int ret = 0;
++
++	ret = nla_parse_nested(tb, P4TC_PIPELINE_MAX, nla, tc_pipeline_policy,
++			       extack);
++
++	if (ret < 0)
++		goto out;
++
++	pipeline =
++		tcf_pipeline_find_byany_unsealed(net, p_name, pipeid, extack);
++	if (IS_ERR(pipeline))
++		return pipeline;
++
++	if (tb[P4TC_PIPELINE_NUMTABLES])
++		num_tables = nla_get_u16(tb[P4TC_PIPELINE_NUMTABLES]);
++
++	if (tb[P4TC_PIPELINE_STATE]) {
++		ret = pipeline_try_set_state_ready(pipeline, extack);
++		if (ret < 0)
++			goto out;
++	}
++
++	if (num_tables)
++		pipeline->num_tables = num_tables;
++
++	return pipeline;
++
++out:
++	return ERR_PTR(ret);
++}
++
++static struct p4tc_template_common *
++tcf_pipeline_cu(struct net *net, struct nlmsghdr *n, struct nlattr *nla,
++		struct p4tc_nl_pname *nl_pname, u32 *ids,
++		struct netlink_ext_ack *extack)
++{
++	u32 pipeid = ids[P4TC_PID_IDX];
++	struct p4tc_pipeline *pipeline;
++
++	switch (n->nlmsg_type) {
++	case RTM_CREATEP4TEMPLATE:
++		pipeline = tcf_pipeline_create(net, n, nla, nl_pname->data,
++					       pipeid, extack);
++		break;
++	case RTM_UPDATEP4TEMPLATE:
++		pipeline = tcf_pipeline_update(net, n, nla, nl_pname->data,
++					       pipeid, extack);
++		break;
++	default:
++		return ERR_PTR(-EOPNOTSUPP);
++	}
++
++	if (IS_ERR(pipeline))
++		goto out;
++
++	if (!nl_pname->passed)
++		strscpy(nl_pname->data, pipeline->common.name, PIPELINENAMSIZ);
++
++	if (!ids[P4TC_PID_IDX])
++		ids[P4TC_PID_IDX] = pipeline->common.p_id;
++
++out:
++	return (struct p4tc_template_common *)pipeline;
++}
++
++static int _tcf_pipeline_fill_nlmsg(struct sk_buff *skb,
++				    const struct p4tc_pipeline *pipeline)
++{
++	unsigned char *b = nlmsg_get_pos(skb);
++	struct nlattr *nest;
++
++	nest = nla_nest_start(skb, P4TC_PARAMS);
++	if (!nest)
++		goto out_nlmsg_trim;
++	if (nla_put_u16(skb, P4TC_PIPELINE_NUMTABLES, pipeline->num_tables))
++		goto out_nlmsg_trim;
++	if (nla_put_u8(skb, P4TC_PIPELINE_STATE, pipeline->p_state))
++		goto out_nlmsg_trim;
++
++	nla_nest_end(skb, nest);
++
++	return skb->len;
++
++out_nlmsg_trim:
++	nlmsg_trim(skb, b);
++	return -1;
++}
++
++static int tcf_pipeline_fill_nlmsg(struct net *net, struct sk_buff *skb,
++				   struct p4tc_template_common *template,
++				   struct netlink_ext_ack *extack)
++{
++	const struct p4tc_pipeline *pipeline = to_pipeline(template);
++
++	if (_tcf_pipeline_fill_nlmsg(skb, pipeline) <= 0) {
++		NL_SET_ERR_MSG(extack,
++			       "Failed to fill notification attributes for pipeline");
++		return -EINVAL;
++	}
++
++	return 0;
++}
++
++static int tcf_pipeline_del_one(struct p4tc_pipeline *pipeline,
++				struct netlink_ext_ack *extack)
++{
++	/* User driven pipeline put doesn't transfer the lifetime
++	 * of the pipeline to other ref holders. In case of unlocked
++	 * table entries, it shall never teardown the pipeline so
++	 * need to do an atomic transition here.
++	 *
++	 * System driven put will serialize with rtnl_lock and
++	 * table entries are guaranteed to not be in flight.
++	 */
++	if (!refcount_dec_if_one(&pipeline->p_ctrl_ref)) {
++		NL_SET_ERR_MSG(extack, "Pipeline in use");
++		return -EBUSY;
++	}
++
++	tcf_pipeline_teardown(pipeline, extack);
++
++	return 0;
++}
++
++static int tcf_pipeline_gd(struct net *net, struct sk_buff *skb,
++			   struct nlmsghdr *n, struct nlattr *nla,
++			   struct p4tc_nl_pname *nl_pname, u32 *ids,
++			   struct netlink_ext_ack *extack)
++{
++	unsigned char *b = nlmsg_get_pos(skb);
++	struct p4tc_template_common *tmpl;
++	struct p4tc_pipeline *pipeline;
++	u32 pipeid = ids[P4TC_PID_IDX];
++	int ret = 0;
++
++	if (n->nlmsg_type == RTM_DELP4TEMPLATE &&
++	    (n->nlmsg_flags & NLM_F_ROOT)) {
++		NL_SET_ERR_MSG(extack, "Pipeline flush not supported");
++		return -EOPNOTSUPP;
++	}
++
++	pipeline = tcf_pipeline_find_byany(net, nl_pname->data, pipeid, extack);
++	if (IS_ERR(pipeline))
++		return PTR_ERR(pipeline);
++
++	tmpl = (struct p4tc_template_common *)pipeline;
++	if (tcf_pipeline_fill_nlmsg(net, skb, tmpl, extack) < 0)
++		return -1;
++
++	if (!ids[P4TC_PID_IDX])
++		ids[P4TC_PID_IDX] = pipeline->common.p_id;
++
++	if (!nl_pname->passed)
++		strscpy(nl_pname->data, pipeline->common.name, PIPELINENAMSIZ);
++
++	if (n->nlmsg_type == RTM_DELP4TEMPLATE) {
++		ret = tcf_pipeline_del_one(pipeline, extack);
++		if (ret < 0)
++			goto out_nlmsg_trim;
++	}
++
++	return ret;
++
++out_nlmsg_trim:
++	nlmsg_trim(skb, b);
++	return ret;
++}
++
++static int tcf_pipeline_dump(struct sk_buff *skb, struct p4tc_dump_ctx *ctx,
++			     struct nlattr *nla, char **p_name, u32 *ids,
++			     struct netlink_ext_ack *extack)
++{
++	struct net *net = sock_net(skb->sk);
++	struct p4tc_pipeline_net *pipe_net;
++
++	pipe_net = net_generic(net, pipeline_net_id);
++
++	return tcf_p4_tmpl_generic_dump(skb, ctx, &pipe_net->pipeline_idr,
++					P4TC_PID_IDX, extack);
++}
++
++static int tcf_pipeline_dump_1(struct sk_buff *skb,
++			       struct p4tc_template_common *common)
++{
++	struct p4tc_pipeline *pipeline = to_pipeline(common);
++	unsigned char *b = nlmsg_get_pos(skb);
++	struct nlattr *param;
++
++	/* Don't show kernel pipeline in dump */
++	if (pipeline->common.p_id == P4TC_KERNEL_PIPEID)
++		return 1;
++
++	param = nla_nest_start(skb, P4TC_PARAMS);
++	if (!param)
++		goto out_nlmsg_trim;
++	if (nla_put_string(skb, P4TC_PIPELINE_NAME, pipeline->common.name))
++		goto out_nlmsg_trim;
++
++	nla_nest_end(skb, param);
++
++	return 0;
++
++out_nlmsg_trim:
++	nlmsg_trim(skb, b);
++	return -ENOMEM;
++}
++
++static int register_pipeline_pernet(void)
++{
++	return register_pernet_subsys(&pipeline_net_ops);
++}
++
++static void __tcf_pipeline_init(void)
++{
++	int pipeid = P4TC_KERNEL_PIPEID;
++
++	root_pipeline = kzalloc(sizeof(*root_pipeline), GFP_ATOMIC);
++	if (unlikely(!root_pipeline)) {
++		pr_err("Unable to register kernel pipeline\n");
++		return;
++	}
++
++	strscpy(root_pipeline->common.name, "kernel", PIPELINENAMSIZ);
++
++	root_pipeline->common.ops =
++		(struct p4tc_template_ops *)&p4tc_pipeline_ops;
++
++	root_pipeline->common.p_id = pipeid;
++
++	root_pipeline->p_state = P4TC_STATE_READY;
++}
++
++static void tcf_pipeline_init(void)
++{
++	if (register_pipeline_pernet() < 0)
++		pr_err("Failed to register per net pipeline IDR");
++
++	if (p4tc_register_types() < 0)
++		pr_err("Failed to register P4 types");
++
++	__tcf_pipeline_init();
++}
++
++const struct p4tc_template_ops p4tc_pipeline_ops = {
++	.init = tcf_pipeline_init,
++	.cu = tcf_pipeline_cu,
++	.fill_nlmsg = tcf_pipeline_fill_nlmsg,
++	.gd = tcf_pipeline_gd,
++	.put = __tcf_pipeline_put,
++	.dump = tcf_pipeline_dump,
++	.dump_1 = tcf_pipeline_dump_1,
++};
+diff --git a/net/sched/p4tc/p4tc_tmpl_api.c b/net/sched/p4tc/p4tc_tmpl_api.c
+new file mode 100644
+index 000000000..2ce7541b0
+--- /dev/null
++++ b/net/sched/p4tc/p4tc_tmpl_api.c
+@@ -0,0 +1,577 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ * net/sched/p4tc_api.c	P4 TC API
++ *
++ * Copyright (c) 2022-2023, Mojatatu Networks
++ * Copyright (c) 2022-2023, Intel Corporation.
++ * Authors:     Jamal Hadi Salim <jhs@mojatatu.com>
++ *              Victor Nogueira <victor@mojatatu.com>
++ *              Pedro Tammela <pctammela@mojatatu.com>
++ */
++
++#include <linux/types.h>
++#include <linux/kernel.h>
++#include <linux/string.h>
++#include <linux/errno.h>
++#include <linux/slab.h>
++#include <linux/skbuff.h>
++#include <linux/init.h>
++#include <linux/kmod.h>
++#include <linux/err.h>
++#include <linux/module.h>
++#include <net/net_namespace.h>
++#include <net/sock.h>
++#include <net/sch_generic.h>
++#include <net/pkt_cls.h>
++#include <net/p4tc.h>
++#include <net/netlink.h>
++#include <net/flow_offload.h>
++
++static const struct nla_policy p4tc_root_policy[P4TC_ROOT_MAX + 1] = {
++	[P4TC_ROOT] = { .type = NLA_NESTED },
++	[P4TC_ROOT_PNAME] = { .type = NLA_STRING, .len = PIPELINENAMSIZ },
++};
++
++static const struct nla_policy p4tc_policy[P4TC_MAX + 1] = {
++	[P4TC_PATH] = { .type = NLA_BINARY,
++			.len = P4TC_PATH_MAX * sizeof(u32) },
++	[P4TC_PARAMS] = { .type = NLA_NESTED },
++};
++
++static bool obj_is_valid(u32 obj)
++{
++	switch (obj) {
++	case P4TC_OBJ_PIPELINE:
 +		return true;
 +	default:
 +		return false;
 +	}
 +}
 +
-+void p4t_copy(struct p4tc_type_mask_shift *dst_mask_shift,
-+	      struct p4tc_type *dst_t, void *dstv,
-+	      struct p4tc_type_mask_shift *src_mask_shift,
-+	      struct p4tc_type *src_t, void *srcv)
-+{
-+	u64 readval[BITS_TO_U64(P4TC_MAX_KEYSZ)] = {0};
-+	const struct p4tc_type_ops *srco, *dsto;
++static const struct p4tc_template_ops *p4tc_ops[P4TC_OBJ_MAX] = {
++	[P4TC_OBJ_PIPELINE] = &p4tc_pipeline_ops,
++};
 +
-+	dsto = dst_t->ops;
-+	srco = src_t->ops;
-+
-+	__p4tc_type_host_read(srco, src_t, src_mask_shift, srcv,
-+			      &readval);
-+	__p4tc_type_host_write(dsto, dst_t, dst_mask_shift, &readval,
-+			       dstv);
-+}
-+
-+int p4t_cmp(struct p4tc_type_mask_shift *dst_mask_shift,
-+	    struct p4tc_type *dst_t, void *dstv,
-+	    struct p4tc_type_mask_shift *src_mask_shift,
-+	    struct p4tc_type *src_t, void *srcv)
-+{
-+	u64 a[BITS_TO_U64(P4TC_MAX_KEYSZ)] = {0};
-+	u64 b[BITS_TO_U64(P4TC_MAX_KEYSZ)] = {0};
-+	const struct p4tc_type_ops *srco, *dsto;
-+
-+	dsto = dst_t->ops;
-+	srco = src_t->ops;
-+
-+	__p4tc_type_host_read(dsto, dst_t, dst_mask_shift, dstv, a);
-+	__p4tc_type_host_read(srco, src_t, src_mask_shift, srcv, b);
-+
-+	return memcmp(a, b, sizeof(a));
-+}
-+
-+void p4t_release(struct p4tc_type_mask_shift *mask_shift)
-+{
-+	kfree(mask_shift->mask);
-+	kfree(mask_shift);
-+}
-+
-+static int p4t_validate_bitpos(u16 bitstart, u16 bitend, u16 maxbitstart,
-+			       u16 maxbitend, struct netlink_ext_ack *extack)
-+{
-+	if (bitstart > maxbitstart) {
-+		NL_SET_ERR_MSG_MOD(extack, "bitstart too high");
-+		return -EINVAL;
-+	}
-+
-+	if (bitend > maxbitend) {
-+		NL_SET_ERR_MSG_MOD(extack, "bitend too high");
-+		return -EINVAL;
-+	}
-+
-+	if (bitstart > bitend) {
-+		NL_SET_ERR_MSG_MOD(extack, "bitstart > bitend");
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
-+static int p4t_u32_validate(struct p4tc_type *container, void *value,
-+			    u16 bitstart, u16 bitend,
-+			    struct netlink_ext_ack *extack)
-+{
-+	u32 container_maxsz = U32_MAX;
-+	u32 *val = value;
-+	size_t maxval;
-+	int ret;
-+
-+	ret = p4t_validate_bitpos(bitstart, bitend, 31, 31, extack);
-+	if (ret < 0)
-+		return ret;
-+
-+	maxval = GENMASK(bitend, 0);
-+	if (val && (*val > container_maxsz || *val > maxval)) {
-+		NL_SET_ERR_MSG_MOD(extack, "U32 value out of range");
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
-+static struct p4tc_type_mask_shift *
-+p4t_u32_bitops(u16 bitsiz, u16 bitstart, u16 bitend,
-+	       struct netlink_ext_ack *extack)
-+{
-+	struct p4tc_type_mask_shift *mask_shift;
-+	u32 mask = GENMASK(bitend, bitstart);
-+	u32 *cmask;
-+
-+	mask_shift = kzalloc(sizeof(*mask_shift), GFP_KERNEL);
-+	if (!mask_shift)
-+		return ERR_PTR(-ENOMEM);
-+
-+	cmask = kzalloc(sizeof(u32), GFP_KERNEL);
-+	if (!cmask) {
-+		kfree(mask_shift);
-+		return ERR_PTR(-ENOMEM);
-+	}
-+
-+	*cmask = mask;
-+
-+	mask_shift->mask = cmask;
-+	mask_shift->shift = bitstart;
-+
-+	return mask_shift;
-+}
-+
-+static void p4t_u32_write(struct p4tc_type *container,
-+			  struct p4tc_type_mask_shift *mask_shift, void *sval,
-+			  void *dval)
-+{
-+	u32 maskedst = 0;
-+	u32 *dst = dval;
-+	u32 *src = sval;
-+	u8 shift = 0;
-+
-+	if (mask_shift) {
-+		u32 *dmask = mask_shift->mask;
-+
-+		maskedst = *dst & ~*dmask;
-+		shift = mask_shift->shift;
-+	}
-+
-+	*dst = maskedst | (*src << shift);
-+}
-+
-+static void p4t_u32_print(struct net *net, struct p4tc_type *container,
-+			  const char *prefix, void *val)
-+{
-+	u32 *v = val;
-+
-+	pr_info("%s 0x%x\n", prefix, *v);
-+}
-+
-+static void p4t_u32_hread(struct p4tc_type *container,
-+			  struct p4tc_type_mask_shift *mask_shift, void *sval,
-+			  void *dval)
-+{
-+	u32 *dst = dval;
-+	u32 *src = sval;
-+
-+	if (mask_shift) {
-+		u32 *smask = mask_shift->mask;
-+		u8 shift = mask_shift->shift;
-+
-+		*dst = (*src & *smask) >> shift;
-+	} else {
-+		*dst = *src;
-+	}
-+}
-+
-+static int p4t_s32_validate(struct p4tc_type *container, void *value,
-+			    u16 bitstart, u16 bitend,
-+			    struct netlink_ext_ack *extack)
-+{
-+	s32 minsz = S32_MIN, maxsz = S32_MAX;
-+	s32 *val = value;
-+
-+	if (val && (*val > maxsz || *val < minsz)) {
-+		NL_SET_ERR_MSG_MOD(extack, "S32 value out of range");
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
-+static void p4t_s32_hread(struct p4tc_type *container,
-+			  struct p4tc_type_mask_shift *mask_shift, void *sval,
-+			  void *dval)
-+{
-+	s32 *dst = dval;
-+	s32 *src = sval;
-+
-+	*dst = *src;
-+}
-+
-+static void p4t_s32_write(struct p4tc_type *container,
-+			  struct p4tc_type_mask_shift *mask_shift, void *sval,
-+			  void *dval)
-+{
-+	s32 *dst = dval;
-+	s32 *src = sval;
-+
-+	*dst = *src;
-+}
-+
-+static void p4t_s32_print(struct net *net, struct p4tc_type *container,
-+			  const char *prefix, void *val)
-+{
-+	s32 *v = val;
-+
-+	pr_info("%s %x\n", prefix, *v);
-+}
-+
-+static void p4t_s64_print(struct net *net, struct p4tc_type *container,
-+			  const char *prefix, void *val)
-+{
-+	s64 *v = val;
-+
-+	pr_info("%s 0x%llx\n", prefix, *v);
-+}
-+
-+static int p4t_be32_validate(struct p4tc_type *container, void *value,
-+			     u16 bitstart, u16 bitend,
++int tcf_p4_tmpl_generic_dump(struct sk_buff *skb, struct p4tc_dump_ctx *ctx,
++			     struct idr *idr, int idx,
 +			     struct netlink_ext_ack *extack)
 +{
-+	size_t container_maxsz = U32_MAX;
-+	__be32 *val_u32 = value;
-+	__u32 val = 0;
-+	size_t maxval;
++	unsigned char *b = nlmsg_get_pos(skb);
++	struct p4tc_template_common *common;
++	unsigned long id = 0;
++	unsigned long tmp;
++	int i = 0;
++
++	id = ctx->ids[idx];
++
++	idr_for_each_entry_continue_ul(idr, common, tmp, id) {
++		struct nlattr *count;
++		int ret;
++
++		if (i == P4TC_MSGBATCH_SIZE)
++			break;
++
++		count = nla_nest_start(skb, i + 1);
++		if (!count)
++			goto out_nlmsg_trim;
++		ret = common->ops->dump_1(skb, common);
++		if (ret < 0) {
++			goto out_nlmsg_trim;
++		} else if (ret) {
++			nla_nest_cancel(skb, count);
++			continue;
++		}
++		nla_nest_end(skb, count);
++
++		i++;
++	}
++
++	if (i == 0) {
++		if (!ctx->ids[idx])
++			NL_SET_ERR_MSG(extack,
++				       "There are no pipeline components");
++		return 0;
++	}
++
++	ctx->ids[idx] = id;
++
++	return skb->len;
++
++out_nlmsg_trim:
++	nlmsg_trim(skb, b);
++	return -ENOMEM;
++}
++
++static int tc_ctl_p4_tmpl_gd_1(struct net *net, struct sk_buff *skb,
++			       struct nlmsghdr *n, struct nlattr *arg,
++			       struct p4tc_nl_pname *nl_pname,
++			       struct netlink_ext_ack *extack)
++{
++	struct p4tcmsg *t = (struct p4tcmsg *)nlmsg_data(n);
++	struct nlattr *tb[P4TC_MAX + 1];
++	struct p4tc_template_ops *op;
++	u32 ids[P4TC_PATH_MAX] = {};
 +	int ret;
 +
-+	ret = p4t_validate_bitpos(bitstart, bitend, 31, 31, extack);
++	if (!obj_is_valid(t->obj)) {
++		NL_SET_ERR_MSG(extack, "Invalid object type");
++		return -EINVAL;
++	}
++
++	ret = nla_parse_nested(tb, P4TC_MAX, arg, p4tc_policy, extack);
 +	if (ret < 0)
 +		return ret;
 +
-+	if (value)
-+		val = be32_to_cpu(*val_u32);
++	ids[P4TC_PID_IDX] = t->pipeid;
 +
-+	maxval = GENMASK(bitend, 0);
-+	if (val && (val > container_maxsz || val > maxval)) {
-+		NL_SET_ERR_MSG_MOD(extack, "BE32 value out of range");
-+		return -EINVAL;
-+	}
++	op = (struct p4tc_template_ops *)p4tc_ops[t->obj];
 +
-+	return 0;
-+}
-+
-+static void p4t_be32_hread(struct p4tc_type *container,
-+			   struct p4tc_type_mask_shift *mask_shift, void *sval,
-+			   void *dval)
-+{
-+	__be32 *src = sval;
-+	u32 *dst = dval;
-+
-+	*dst = be32_to_cpu(*src);
-+}
-+
-+static void p4t_be32_write(struct p4tc_type *container,
-+			   struct p4tc_type_mask_shift *mask_shift, void *sval,
-+			   void *dval)
-+{
-+	__be32 *dst = dval;
-+	u32 *src = sval;
-+
-+	*dst = cpu_to_be32(*src);
-+}
-+
-+static void p4t_be32_print(struct net *net, struct p4tc_type *container,
-+			   const char *prefix, void *val)
-+{
-+	__be32 *v = val;
-+
-+	pr_info("%s 0x%x\n", prefix, *v);
-+}
-+
-+static void p4t_be64_hread(struct p4tc_type *container,
-+			   struct p4tc_type_mask_shift *mask_shift, void *sval,
-+			   void *dval)
-+{
-+	__be64 *src = sval;
-+	u64 *dst = dval;
-+
-+	*dst = be64_to_cpu(*src);
-+}
-+
-+static void p4t_be64_write(struct p4tc_type *container,
-+			   struct p4tc_type_mask_shift *mask_shift, void *sval,
-+			   void *dval)
-+{
-+	__be64 *dst = dval;
-+	u64 *src = sval;
-+
-+	*dst = cpu_to_be64(*src);
-+}
-+
-+static void p4t_be64_print(struct net *net, struct p4tc_type *container,
-+			   const char *prefix, void *val)
-+{
-+	__be64 *v = val;
-+
-+	pr_info("%s 0x%llx\n", prefix, *v);
-+}
-+
-+static int p4t_u16_validate(struct p4tc_type *container, void *value,
-+			    u16 bitstart, u16 bitend,
-+			    struct netlink_ext_ack *extack)
-+{
-+	u16 container_maxsz = U16_MAX;
-+	u16 *val = value;
-+	u16 maxval;
-+	int ret;
-+
-+	ret = p4t_validate_bitpos(bitstart, bitend, 15, 15, extack);
++	ret = op->gd(net, skb, n, tb[P4TC_PARAMS], nl_pname, ids, extack);
 +	if (ret < 0)
 +		return ret;
 +
-+	maxval = GENMASK(bitend, 0);
-+	if (val && (*val > container_maxsz || *val > maxval)) {
-+		NL_SET_ERR_MSG_MOD(extack, "U16 value out of range");
-+		return -EINVAL;
-+	}
++	if (!t->pipeid)
++		t->pipeid = ids[P4TC_PID_IDX];
 +
-+	return 0;
++	return ret;
 +}
 +
-+static struct p4tc_type_mask_shift *
-+p4t_u16_bitops(u16 bitsiz, u16 bitstart, u16 bitend,
-+	       struct netlink_ext_ack *extack)
++static int tc_ctl_p4_tmpl_gd_n(struct sk_buff *skb, struct nlmsghdr *n,
++			       char *p_name, struct nlattr *nla, int event,
++			       struct netlink_ext_ack *extack)
 +{
-+	struct p4tc_type_mask_shift *mask_shift;
-+	u16 mask = GENMASK(bitend, bitstart);
-+	u16 *cmask;
-+
-+	mask_shift = kzalloc(sizeof(*mask_shift), GFP_KERNEL);
-+	if (!mask_shift)
-+		return ERR_PTR(-ENOMEM);
-+
-+	cmask = kzalloc(sizeof(u16), GFP_KERNEL);
-+	if (!cmask) {
-+		kfree(mask_shift);
-+		return ERR_PTR(-ENOMEM);
-+	}
-+
-+	*cmask = mask;
-+
-+	mask_shift->mask = cmask;
-+	mask_shift->shift = bitstart;
-+
-+	return mask_shift;
-+}
-+
-+static void p4t_u16_write(struct p4tc_type *container,
-+			  struct p4tc_type_mask_shift *mask_shift, void *sval,
-+			  void *dval)
-+{
-+	u16 maskedst = 0;
-+	u16 *dst = dval;
-+	u16 *src = sval;
-+	u8 shift = 0;
-+
-+	if (mask_shift) {
-+		u16 *dmask = mask_shift->mask;
-+
-+		maskedst = *dst & ~*dmask;
-+		shift = mask_shift->shift;
-+	}
-+
-+	*dst = maskedst | (*src << shift);
-+}
-+
-+static void p4t_u16_print(struct net *net, struct p4tc_type *container,
-+			  const char *prefix, void *val)
-+{
-+	u16 *v = val;
-+
-+	pr_info("%s 0x%x\n", prefix, *v);
-+}
-+
-+static void p4t_u16_hread(struct p4tc_type *container,
-+			  struct p4tc_type_mask_shift *mask_shift, void *sval,
-+			  void *dval)
-+{
-+	u16 *dst = dval;
-+	u16 *src = sval;
-+
-+	if (mask_shift) {
-+		u16 *smask = mask_shift->mask;
-+		u8 shift = mask_shift->shift;
-+
-+		*dst = (*src & *smask) >> shift;
-+	} else {
-+		*dst = *src;
-+	}
-+}
-+
-+static int p4t_s16_validate(struct p4tc_type *container, void *value,
-+			    u16 bitstart, u16 bitend,
-+			    struct netlink_ext_ack *extack)
-+{
-+	s16 minsz = S16_MIN, maxsz = S16_MAX;
-+	s16 *val = value;
-+
-+	if (val && (*val > maxsz || *val < minsz)) {
-+		NL_SET_ERR_MSG_MOD(extack, "S16 value out of range");
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
-+static void p4t_s16_hread(struct p4tc_type *container,
-+			  struct p4tc_type_mask_shift *mask_shift, void *sval,
-+			  void *dval)
-+{
-+	s16 *dst = dval;
-+	s16 *src = sval;
-+
-+	*dst = *src;
-+}
-+
-+static void p4t_s16_write(struct p4tc_type *container,
-+			  struct p4tc_type_mask_shift *mask_shift, void *sval,
-+			  void *dval)
-+{
-+	s16 *dst = dval;
-+	s16 *src = sval;
-+
-+	*src = *dst;
-+}
-+
-+static void p4t_s16_print(struct net *net, struct p4tc_type *container,
-+			  const char *prefix, void *val)
-+{
-+	s16 *v = val;
-+
-+	pr_info("%s %d\n", prefix, *v);
-+}
-+
-+static int p4t_be16_validate(struct p4tc_type *container, void *value,
-+			     u16 bitstart, u16 bitend,
-+			     struct netlink_ext_ack *extack)
-+{
-+	u16 container_maxsz = U16_MAX;
-+	__be16 *val_u16 = value;
-+	size_t maxval;
-+	u16 val = 0;
-+	int ret;
-+
-+	ret = p4t_validate_bitpos(bitstart, bitend, 15, 15, extack);
-+	if (ret < 0)
-+		return ret;
-+
-+	if (value)
-+		val = be16_to_cpu(*val_u16);
-+
-+	maxval = GENMASK(bitend, 0);
-+	if (val && (val > container_maxsz || val > maxval)) {
-+		NL_SET_ERR_MSG_MOD(extack, "BE16 value out of range");
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
-+static void p4t_be16_hread(struct p4tc_type *container,
-+			   struct p4tc_type_mask_shift *mask_shift, void *sval,
-+			   void *dval)
-+{
-+	__be16 *src = sval;
-+	u16 *dst = dval;
-+
-+	*dst = be16_to_cpu(*src);
-+}
-+
-+static void p4t_be16_write(struct p4tc_type *container,
-+			   struct p4tc_type_mask_shift *mask_shift, void *sval,
-+			   void *dval)
-+{
-+	__be16 *dst = dval;
-+	u16 *src = sval;
-+
-+	*dst = cpu_to_be16(*src);
-+}
-+
-+static void p4t_be16_print(struct net *net, struct p4tc_type *container,
-+			   const char *prefix, void *val)
-+{
-+	__be16 *v = val;
-+
-+	pr_info("%s 0x%x\n", prefix, *v);
-+}
-+
-+static int p4t_u8_validate(struct p4tc_type *container, void *value,
-+			   u16 bitstart, u16 bitend,
-+			   struct netlink_ext_ack *extack)
-+{
-+	size_t container_maxsz = U8_MAX;
-+	u8 *val = value;
-+	u8 maxval;
-+	int ret;
-+
-+	ret = p4t_validate_bitpos(bitstart, bitend, 7, 7, extack);
-+	if (ret < 0)
-+		return ret;
-+
-+	maxval = GENMASK(bitend, 0);
-+	if (val && (*val > container_maxsz || *val > maxval)) {
-+		NL_SET_ERR_MSG_MOD(extack, "U8 value out of range");
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
-+static struct p4tc_type_mask_shift *
-+p4t_u8_bitops(u16 bitsiz, u16 bitstart, u16 bitend,
-+	      struct netlink_ext_ack *extack)
-+{
-+	struct p4tc_type_mask_shift *mask_shift;
-+	u8 mask = GENMASK(bitend, bitstart);
-+	u8 *cmask;
-+
-+	mask_shift = kzalloc(sizeof(*mask_shift), GFP_KERNEL);
-+	if (!mask_shift)
-+		return ERR_PTR(-ENOMEM);
-+
-+	cmask = kzalloc(sizeof(u8), GFP_KERNEL);
-+	if (!cmask) {
-+		kfree(mask_shift);
-+		return ERR_PTR(-ENOMEM);
-+	}
-+
-+	*cmask = mask;
-+
-+	mask_shift->mask = cmask;
-+	mask_shift->shift = bitstart;
-+
-+	return mask_shift;
-+}
-+
-+static void p4t_u8_write(struct p4tc_type *container,
-+			 struct p4tc_type_mask_shift *mask_shift, void *sval,
-+			 void *dval)
-+{
-+	u8 maskedst = 0;
-+	u8 *dst = dval;
-+	u8 *src = sval;
-+	u8 shift = 0;
-+
-+	if (mask_shift) {
-+		u8 *dmask = (u8 *)mask_shift->mask;
-+
-+		maskedst = *dst & ~*dmask;
-+		shift = mask_shift->shift;
-+	}
-+
-+	*dst = maskedst | (*src << shift);
-+}
-+
-+static void p4t_u8_print(struct net *net, struct p4tc_type *container,
-+			 const char *prefix, void *val)
-+{
-+	u8 *v = val;
-+
-+	pr_info("%s 0x%x\n", prefix, *v);
-+}
-+
-+static void p4t_u8_hread(struct p4tc_type *container,
-+			 struct p4tc_type_mask_shift *mask_shift, void *sval,
-+			 void *dval)
-+{
-+	u8 *dst = dval;
-+	u8 *src = sval;
-+
-+	if (mask_shift) {
-+		u8 *smask = mask_shift->mask;
-+		u8 shift = mask_shift->shift;
-+
-+		*dst = (*src & *smask) >> shift;
-+	} else {
-+		*dst = *src;
-+	}
-+}
-+
-+static int p4t_s8_validate(struct p4tc_type *container, void *value,
-+			   u16 bitstart, u16 bitend,
-+			   struct netlink_ext_ack *extack)
-+{
-+	s8 minsz = S8_MIN, maxsz = S8_MAX;
-+	s8 *val = value;
-+
-+	if (val && (*val > maxsz || *val < minsz)) {
-+		NL_SET_ERR_MSG_MOD(extack, "S8 value out of range");
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
-+static void p4t_s8_hread(struct p4tc_type *container,
-+			 struct p4tc_type_mask_shift *mask_shift, void *sval,
-+			 void *dval)
-+{
-+	s8 *dst = dval;
-+	s8 *src = sval;
-+
-+	*dst = *src;
-+}
-+
-+static void p4t_s8_print(struct net *net, struct p4tc_type *container,
-+			 const char *prefix, void *val)
-+{
-+	s8 *v = val;
-+
-+	pr_info("%s %d\n", prefix, *v);
-+}
-+
-+static int p4t_u64_validate(struct p4tc_type *container, void *value,
-+			    u16 bitstart, u16 bitend,
-+			    struct netlink_ext_ack *extack)
-+{
-+	u64 container_maxsz = U64_MAX;
-+	u8 *val = value;
-+	u64 maxval;
-+	int ret;
-+
-+	ret = p4t_validate_bitpos(bitstart, bitend, 63, 63, extack);
-+	if (ret < 0)
-+		return ret;
-+
-+	maxval = GENMASK_ULL(bitend, 0);
-+	if (val && (*val > container_maxsz || *val > maxval)) {
-+		NL_SET_ERR_MSG_MOD(extack, "U64 value out of range");
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
-+static struct p4tc_type_mask_shift *
-+p4t_u64_bitops(u16 bitsiz, u16 bitstart, u16 bitend,
-+	       struct netlink_ext_ack *extack)
-+{
-+	struct p4tc_type_mask_shift *mask_shift;
-+	u64 mask = GENMASK(bitend, bitstart);
-+	u64 *cmask;
-+
-+	mask_shift = kzalloc(sizeof(*mask_shift), GFP_KERNEL);
-+	if (!mask_shift)
-+		return ERR_PTR(-ENOMEM);
-+
-+	cmask = kzalloc(sizeof(u64), GFP_KERNEL);
-+	if (!cmask) {
-+		kfree(mask_shift);
-+		return ERR_PTR(-ENOMEM);
-+	}
-+
-+	*cmask = mask;
-+
-+	mask_shift->mask = cmask;
-+	mask_shift->shift = bitstart;
-+
-+	return mask_shift;
-+}
-+
-+static void p4t_u64_write(struct p4tc_type *container,
-+			  struct p4tc_type_mask_shift *mask_shift, void *sval,
-+			  void *dval)
-+{
-+	u64 maskedst = 0;
-+	u64 *dst = dval;
-+	u64 *src = sval;
-+	u8 shift = 0;
-+
-+	if (mask_shift) {
-+		u64 *dmask = (u64 *)mask_shift->mask;
-+
-+		maskedst = *dst & ~*dmask;
-+		shift = mask_shift->shift;
-+	}
-+
-+	*dst = maskedst | (*src << shift);
-+}
-+
-+static void p4t_u64_print(struct net *net, struct p4tc_type *container,
-+			  const char *prefix, void *val)
-+{
-+	u64 *v = val;
-+
-+	pr_info("%s 0x%llx\n", prefix, *v);
-+}
-+
-+static void p4t_u64_hread(struct p4tc_type *container,
-+			  struct p4tc_type_mask_shift *mask_shift, void *sval,
-+			  void *dval)
-+{
-+	u64 *dst = dval;
-+	u64 *src = sval;
-+
-+	if (mask_shift) {
-+		u64 *smask = mask_shift->mask;
-+		u8 shift = mask_shift->shift;
-+
-+		*dst = (*src & *smask) >> shift;
-+	} else {
-+		*dst = *src;
-+	}
-+}
-+
-+/* As of now, we are not allowing bitops for u128 */
-+static int p4t_u128_validate(struct p4tc_type *container, void *value,
-+			     u16 bitstart, u16 bitend,
-+			     struct netlink_ext_ack *extack)
-+{
-+	if (bitstart != 0 || bitend != 127) {
-+		NL_SET_ERR_MSG_MOD(extack,
-+				   "Only valid bit type larger than bit64 is bit128");
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
-+static void p4t_u128_hread(struct p4tc_type *container,
-+			   struct p4tc_type_mask_shift *mask_shift, void *sval,
-+			   void *dval)
-+{
-+	memcpy(sval, dval, sizeof(__u64) * 2);
-+}
-+
-+static void p4t_u128_write(struct p4tc_type *container,
-+			   struct p4tc_type_mask_shift *mask_shift, void *sval,
-+			   void *dval)
-+{
-+	memcpy(sval, dval, sizeof(__u64) * 2);
-+}
-+
-+static void p4t_u128_print(struct net *net, struct p4tc_type *container,
-+			   const char *prefix, void *val)
-+{
-+	u64 *v = val;
-+
-+	pr_info("%s[0-63] %16llx", prefix, v[0]);
-+	pr_info("%s[64-127] %16llx", prefix, v[1]);
-+}
-+
-+static int p4t_ipv4_validate(struct p4tc_type *container, void *value,
-+			     u16 bitstart, u16 bitend,
-+			     struct netlink_ext_ack *extack)
-+{
-+	/* Not allowing bit-slices for now */
-+	if (bitstart != 0 || bitend != 31) {
-+		NL_SET_ERR_MSG_MOD(extack, "Invalid bitstart or bitend");
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
-+static void p4t_ipv4_print(struct net *net, struct p4tc_type *container,
-+			   const char *prefix, void *val)
-+{
-+	u32 *v32h = val;
-+	__be32 v32;
-+	u8 *v;
-+
-+	v32 = cpu_to_be32(*v32h);
-+	v = (u8 *)&v32;
-+
-+	pr_info("%s %u.%u.%u.%u\n", prefix, v[0], v[1], v[2], v[3]);
-+}
-+
-+static int p4t_mac_validate(struct p4tc_type *container, void *value,
-+			    u16 bitstart, u16 bitend,
-+			    struct netlink_ext_ack *extack)
-+{
-+	if (bitstart != 0 || bitend != 47) {
-+		NL_SET_ERR_MSG_MOD(extack, "Invalid bitstart or bitend");
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
-+static void p4t_mac_print(struct net *net, struct p4tc_type *container,
-+			  const char *prefix, void *val)
-+{
-+	u8 *v = val;
-+
-+	pr_info("%s %02X:%02x:%02x:%02x:%02x:%02x\n", prefix, v[0], v[1], v[2],
-+		v[3], v[4], v[5]);
-+}
-+
-+static int p4t_dev_validate(struct p4tc_type *container, void *value,
-+			    u16 bitstart, u16 bitend,
-+			    struct netlink_ext_ack *extack)
-+{
-+	if (bitstart != 0 || bitend != 31) {
-+		NL_SET_ERR_MSG_MOD(extack, "Invalid start or endbit values");
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
-+static void p4t_dev_write(struct p4tc_type *container,
-+			  struct p4tc_type_mask_shift *mask_shift, void *sval,
-+			  void *dval)
-+{
-+	u32 *src = sval;
-+	u32 *dst = dval;
-+
-+	*dst = *src;
-+}
-+
-+static void p4t_dev_hread(struct p4tc_type *container,
-+			  struct p4tc_type_mask_shift *mask_shift, void *sval,
-+			  void *dval)
-+{
-+	u32 *src = sval;
-+	u32 *dst = dval;
-+
-+	*dst = *src;
-+}
-+
-+static void p4t_dev_print(struct net *net, struct p4tc_type *container,
-+			  const char *prefix, void *val)
-+{
-+	const u32 *ifindex = val;
-+	struct net_device *dev;
-+
-+	dev = dev_get_by_index_rcu(net, *ifindex);
-+
-+	pr_info("%s %s\n", prefix, dev->name);
-+}
-+
-+static void p4t_key_hread(struct p4tc_type *container,
-+			  struct p4tc_type_mask_shift *mask_shift, void *sval,
-+			  void *dval)
-+{
-+	memcpy(dval, sval, BITS_TO_BYTES(container->bitsz));
-+}
-+
-+static void p4t_key_write(struct p4tc_type *container,
-+			  struct p4tc_type_mask_shift *mask_shift, void *sval,
-+			  void *dval)
-+{
-+	memcpy(dval, sval, BITS_TO_BYTES(container->bitsz));
-+}
-+
-+static void p4t_key_print(struct net *net, struct p4tc_type *container,
-+			  const char *prefix, void *val)
-+{
-+	u16 bitstart = 0, bitend = 63;
-+	u64 *v = val;
++	struct p4tcmsg *t = (struct p4tcmsg *)nlmsg_data(n);
++	struct nlattr *tb[P4TC_MSGBATCH_SIZE + 1];
++	struct net *net = sock_net(skb->sk);
++	u32 portid = NETLINK_CB(skb).portid;
++	struct p4tc_nl_pname nl_pname;
++	struct p4tcmsg *t_new;
++	struct sk_buff *nskb;
++	struct nlmsghdr *nlh;
++	struct nlattr *pnatt;
++	struct nlattr *root;
++	int ret = 0;
 +	int i;
 +
-+	for (i = 0; i < BITS_TO_U64(container->bitsz); i++) {
-+		pr_info("%s[%u-%u] %16llx\n", prefix, bitstart, bitend, v[i]);
-+		bitstart += 64;
-+		bitend += 64;
-+	}
-+}
-+
-+static int p4t_key_validate(struct p4tc_type *container, void *value,
-+			    u16 bitstart, u16 bitend,
-+			    struct netlink_ext_ack *extack)
-+{
-+	if (p4t_validate_bitpos(bitstart, bitend, 0, P4TC_MAX_KEYSZ, extack))
-+		return -EINVAL;
-+
-+	return 0;
-+}
-+
-+static int p4t_bool_validate(struct p4tc_type *container, void *value,
-+			     u16 bitstart, u16 bitend,
-+			     struct netlink_ext_ack *extack)
-+{
-+	bool *val = value;
-+	int ret;
-+
-+	ret = p4t_validate_bitpos(bitstart, bitend, 31, 31, extack);
++	ret = nla_parse_nested(tb, P4TC_MSGBATCH_SIZE, nla, NULL, extack);
 +	if (ret < 0)
 +		return ret;
 +
-+	if (*val == true || *val == false)
-+		return 0;
-+
-+	return -EINVAL;
-+}
-+
-+static void p4t_bool_hread(struct p4tc_type *container,
-+			   struct p4tc_type_mask_shift *mask_shift, void *sval,
-+			   void *dval)
-+{
-+	bool *dst = dval;
-+	bool *src = sval;
-+
-+	*dst = *src;
-+}
-+
-+static void p4t_bool_write(struct p4tc_type *container,
-+			   struct p4tc_type_mask_shift *mask_shift, void *sval,
-+			   void *dval)
-+{
-+	bool *dst = dval;
-+	bool *src = sval;
-+
-+	*dst = *src;
-+}
-+
-+static void p4t_bool_print(struct net *net, struct p4tc_type *container,
-+			   const char *prefix, void *val)
-+{
-+	bool *v = val;
-+
-+	pr_info("%s %s", prefix, *v ? "true" : "false");
-+}
-+
-+static const struct p4tc_type_ops u8_ops = {
-+	.validate_p4t = p4t_u8_validate,
-+	.create_bitops = p4t_u8_bitops,
-+	.host_read = p4t_u8_hread,
-+	.host_write = p4t_u8_write,
-+	.print = p4t_u8_print,
-+};
-+
-+static const struct p4tc_type_ops u16_ops = {
-+	.validate_p4t = p4t_u16_validate,
-+	.create_bitops = p4t_u16_bitops,
-+	.host_read = p4t_u16_hread,
-+	.host_write = p4t_u16_write,
-+	.print = p4t_u16_print,
-+};
-+
-+static const struct p4tc_type_ops u32_ops = {
-+	.validate_p4t = p4t_u32_validate,
-+	.create_bitops = p4t_u32_bitops,
-+	.host_read = p4t_u32_hread,
-+	.host_write = p4t_u32_write,
-+	.print = p4t_u32_print,
-+};
-+
-+static const struct p4tc_type_ops u64_ops = {
-+	.validate_p4t = p4t_u64_validate,
-+	.create_bitops = p4t_u64_bitops,
-+	.host_read = p4t_u64_hread,
-+	.host_write = p4t_u64_write,
-+	.print = p4t_u64_print,
-+};
-+
-+static const struct p4tc_type_ops u128_ops = {
-+	.validate_p4t = p4t_u128_validate,
-+	.host_read = p4t_u128_hread,
-+	.host_write = p4t_u128_write,
-+	.print = p4t_u128_print,
-+};
-+
-+static const struct p4tc_type_ops s8_ops = {
-+	.validate_p4t = p4t_s8_validate,
-+	.host_read = p4t_s8_hread,
-+	.print = p4t_s8_print,
-+};
-+
-+static const struct p4tc_type_ops s16_ops = {
-+	.validate_p4t = p4t_s16_validate,
-+	.host_read = p4t_s16_hread,
-+	.host_write = p4t_s16_write,
-+	.print = p4t_s16_print,
-+};
-+
-+static const struct p4tc_type_ops s32_ops = {
-+	.validate_p4t = p4t_s32_validate,
-+	.host_read = p4t_s32_hread,
-+	.host_write = p4t_s32_write,
-+	.print = p4t_s32_print,
-+};
-+
-+static const struct p4tc_type_ops s64_ops = {
-+	.print = p4t_s64_print,
-+};
-+
-+static const struct p4tc_type_ops s128_ops = {};
-+
-+static const struct p4tc_type_ops be16_ops = {
-+	.validate_p4t = p4t_be16_validate,
-+	.create_bitops = p4t_u16_bitops,
-+	.host_read = p4t_be16_hread,
-+	.host_write = p4t_be16_write,
-+	.print = p4t_be16_print,
-+};
-+
-+static const struct p4tc_type_ops be32_ops = {
-+	.validate_p4t = p4t_be32_validate,
-+	.create_bitops = p4t_u32_bitops,
-+	.host_read = p4t_be32_hread,
-+	.host_write = p4t_be32_write,
-+	.print = p4t_be32_print,
-+};
-+
-+static const struct p4tc_type_ops be64_ops = {
-+	.validate_p4t = p4t_u64_validate,
-+	.host_read = p4t_be64_hread,
-+	.host_write = p4t_be64_write,
-+	.print = p4t_be64_print,
-+};
-+
-+static const struct p4tc_type_ops string_ops = {};
-+static const struct p4tc_type_ops nullstring_ops = {};
-+
-+static const struct p4tc_type_ops flag_ops = {};
-+static const struct p4tc_type_ops path_ops = {};
-+static const struct p4tc_type_ops msecs_ops = {};
-+static const struct p4tc_type_ops mac_ops = {
-+	.validate_p4t = p4t_mac_validate,
-+	.create_bitops = p4t_u64_bitops,
-+	.host_read = p4t_u64_hread,
-+	.host_write = p4t_u64_write,
-+	.print = p4t_mac_print,
-+};
-+
-+static const struct p4tc_type_ops ipv4_ops = {
-+	.validate_p4t = p4t_ipv4_validate,
-+	.host_read = p4t_be32_hread,
-+	.host_write = p4t_be32_write,
-+	.print = p4t_ipv4_print,
-+};
-+
-+static const struct p4tc_type_ops bool_ops = {
-+	.validate_p4t = p4t_bool_validate,
-+	.host_read = p4t_bool_hread,
-+	.host_write = p4t_bool_write,
-+	.print = p4t_bool_print,
-+};
-+
-+static const struct p4tc_type_ops dev_ops = {
-+	.validate_p4t = p4t_dev_validate,
-+	.host_read = p4t_dev_hread,
-+	.host_write = p4t_dev_write,
-+	.print = p4t_dev_print,
-+};
-+
-+static const struct p4tc_type_ops key_ops = {
-+	.validate_p4t = p4t_key_validate,
-+	.host_read = p4t_key_hread,
-+	.host_write = p4t_key_write,
-+	.print = p4t_key_print,
-+};
-+
-+#ifdef CONFIG_RETPOLINE
-+void __p4tc_type_host_read(const struct p4tc_type_ops *ops,
-+			   struct p4tc_type *container,
-+			   struct p4tc_type_mask_shift *mask_shift, void *sval,
-+			   void *dval)
-+{
-+	#define HREAD(cops) \
-+		if (ops == &cops) \
-+			return cops.host_read(container, mask_shift, sval, dval)
-+
-+	HREAD(u8_ops);
-+	HREAD(u16_ops);
-+	HREAD(u32_ops);
-+	HREAD(u64_ops);
-+	HREAD(u128_ops);
-+	HREAD(s8_ops);
-+	HREAD(s16_ops);
-+	HREAD(s32_ops);
-+	HREAD(be16_ops);
-+	HREAD(be32_ops);
-+	HREAD(mac_ops);
-+	HREAD(ipv4_ops);
-+	HREAD(bool_ops);
-+	HREAD(dev_ops);
-+	HREAD(key_ops);
-+
-+	return ops->host_read(container, mask_shift, sval, dval);
-+}
-+
-+void __p4tc_type_host_write(const struct p4tc_type_ops *ops,
-+			    struct p4tc_type *container,
-+			    struct p4tc_type_mask_shift *mask_shift, void *sval,
-+			    void *dval)
-+{
-+	#define HWRITE(cops) \
-+		if (ops == &cops) \
-+			return cops.host_write(container, mask_shift, sval, dval)
-+
-+	HWRITE(u8_ops);
-+	HWRITE(u16_ops);
-+	HWRITE(u32_ops);
-+	HWRITE(u64_ops);
-+	HWRITE(u128_ops);
-+	HWRITE(s16_ops);
-+	HWRITE(s32_ops);
-+	HWRITE(be16_ops);
-+	HWRITE(be32_ops);
-+	HWRITE(mac_ops);
-+	HWRITE(ipv4_ops);
-+	HWRITE(bool_ops);
-+	HWRITE(dev_ops);
-+	HWRITE(key_ops);
-+
-+	return ops->host_write(container, mask_shift, sval, dval);
-+}
-+#endif
-+
-+static int __p4tc_do_regtype(int typeid, size_t bitsz, size_t container_bitsz,
-+			     const char *t_name,
-+			     const struct p4tc_type_ops *ops)
-+{
-+	struct p4tc_type *type;
-+	int err;
-+
-+	if (typeid > P4T_MAX)
-+		return -EINVAL;
-+
-+	if (p4type_find_byid(typeid) || p4type_find_byname(t_name))
-+		return -EEXIST;
-+
-+	if (bitsz > P4T_MAX_BITSZ)
-+		return -E2BIG;
-+
-+	if (container_bitsz > P4T_MAX_BITSZ)
-+		return -E2BIG;
-+
-+	type = kzalloc(sizeof(*type), GFP_ATOMIC);
-+	if (!type)
++	nskb = alloc_skb(NLMSG_GOODSIZE, GFP_KERNEL);
++	if (!nskb)
 +		return -ENOMEM;
 +
-+	err = idr_alloc_u32(&p4tc_types_idr, type, &typeid, typeid, GFP_ATOMIC);
-+	if (err < 0)
-+		return err;
++	nlh = nlmsg_put(nskb, portid, n->nlmsg_seq, event, sizeof(*t),
++			n->nlmsg_flags);
++	if (!nlh) {
++		ret = -ENOMEM;
++		goto out;
++	}
 +
-+	strscpy(type->name, t_name, P4T_MAX_STR_SZ);
-+	type->typeid = typeid;
-+	type->bitsz = bitsz;
-+	type->container_bitsz = container_bitsz;
-+	type->ops = ops;
++	t_new = nlmsg_data(nlh);
++	t_new->pipeid = t->pipeid;
++	t_new->obj = t->obj;
 +
-+	return 0;
++	pnatt = nla_reserve(nskb, P4TC_ROOT_PNAME, PIPELINENAMSIZ);
++	if (!pnatt) {
++		ret = -ENOMEM;
++		goto out;
++	}
++
++	nl_pname.data = nla_data(pnatt);
++	if (!p_name) {
++		/* Filled up by the operation or forced failure */
++		memset(nl_pname.data, 0, PIPELINENAMSIZ);
++		nl_pname.passed = false;
++	} else {
++		strscpy(nl_pname.data, p_name, PIPELINENAMSIZ);
++		nl_pname.passed = true;
++	}
++
++	root = nla_nest_start(nskb, P4TC_ROOT);
++	for (i = 1; i < P4TC_MSGBATCH_SIZE + 1 && tb[i]; i++) {
++		struct nlattr *nest = nla_nest_start(nskb, i);
++
++		ret = tc_ctl_p4_tmpl_gd_1(net, nskb, nlh, tb[i], &nl_pname,
++					  extack);
++		if (n->nlmsg_flags & NLM_F_ROOT && event == RTM_DELP4TEMPLATE) {
++			if (ret <= 0)
++				goto out;
++		} else {
++			if (ret < 0)
++				goto out;
++		}
++		nla_nest_end(nskb, nest);
++	}
++	nla_nest_end(nskb, root);
++
++	nlmsg_end(nskb, nlh);
++
++	if (event == RTM_GETP4TEMPLATE)
++		return rtnl_unicast(nskb, net, portid);
++
++	return rtnetlink_send(nskb, net, portid, RTNLGRP_TC,
++			      n->nlmsg_flags & NLM_F_ECHO);
++out:
++	kfree_skb(nskb);
++	return ret;
 +}
 +
-+static inline int __p4tc_register_type(int typeid, size_t bitsz,
-+				       size_t container_bitsz,
-+				       const char *t_name,
-+				       const struct p4tc_type_ops *ops)
++static int tc_ctl_p4_tmpl_get(struct sk_buff *skb, struct nlmsghdr *n,
++			      struct netlink_ext_ack *extack)
 +{
-+	if (__p4tc_do_regtype(typeid, bitsz, container_bitsz, t_name, ops) <
-+	    0) {
-+		pr_err("Unable to allocate p4 type %s\n", t_name);
-+		p4tc_types_put();
-+		return -1;
++	struct nlattr *tb[P4TC_ROOT_MAX + 1];
++	char *p_name = NULL;
++	int ret;
++
++	ret = nlmsg_parse(n, sizeof(struct p4tcmsg), tb, P4TC_ROOT_MAX,
++			  p4tc_root_policy, extack);
++	if (ret < 0)
++		return ret;
++
++	if (NL_REQ_ATTR_CHECK(extack, NULL, tb, P4TC_ROOT)) {
++		NL_SET_ERR_MSG(extack,
++			       "Netlink P4TC template attributes missing");
++		return -EINVAL;
++	}
++
++	if (tb[P4TC_ROOT_PNAME])
++		p_name = nla_data(tb[P4TC_ROOT_PNAME]);
++
++	return tc_ctl_p4_tmpl_gd_n(skb, n, p_name, tb[P4TC_ROOT],
++				   RTM_GETP4TEMPLATE, extack);
++}
++
++static int tc_ctl_p4_tmpl_delete(struct sk_buff *skb, struct nlmsghdr *n,
++				 struct netlink_ext_ack *extack)
++{
++	struct nlattr *tb[P4TC_ROOT_MAX + 1];
++	char *p_name = NULL;
++	int ret;
++
++	if (!netlink_capable(skb, CAP_NET_ADMIN))
++		return -EPERM;
++
++	ret = nlmsg_parse(n, sizeof(struct p4tcmsg), tb, P4TC_ROOT_MAX,
++			  p4tc_root_policy, extack);
++	if (ret < 0)
++		return ret;
++
++	if (NL_REQ_ATTR_CHECK(extack, NULL, tb, P4TC_ROOT)) {
++		NL_SET_ERR_MSG(extack,
++			       "Netlink P4TC template attributes missing");
++		return -EINVAL;
++	}
++
++	if (tb[P4TC_ROOT_PNAME])
++		p_name = nla_data(tb[P4TC_ROOT_PNAME]);
++
++	return tc_ctl_p4_tmpl_gd_n(skb, n, p_name, tb[P4TC_ROOT],
++				   RTM_DELP4TEMPLATE, extack);
++}
++
++static int p4tc_template_put(struct net *net,
++			     struct p4tc_template_common *common,
++			     struct netlink_ext_ack *extack)
++{
++	/* Every created template is bound to a pipeline */
++	struct p4tc_pipeline *pipeline =
++		tcf_pipeline_find_byid(net, common->p_id);
++	return common->ops->put(pipeline, common, extack);
++}
++
++static struct p4tc_template_common *
++tcf_p4_tmpl_cu_1(struct sk_buff *skb, struct net *net, struct nlmsghdr *n,
++		 struct p4tc_nl_pname *nl_pname, struct nlattr *nla,
++		 struct netlink_ext_ack *extack)
++{
++	struct p4tcmsg *t = (struct p4tcmsg *)nlmsg_data(n);
++	struct p4tc_template_common *tmpl;
++	struct nlattr *tb[P4TC_MAX + 1];
++	struct p4tc_template_ops *op;
++	u32 ids[P4TC_PATH_MAX] = {};
++	int ret;
++
++	if (!obj_is_valid(t->obj)) {
++		NL_SET_ERR_MSG(extack, "Invalid object type");
++		ret = -EINVAL;
++		goto out;
++	}
++
++	ret = nla_parse_nested(tb, P4TC_MAX, nla, p4tc_policy, extack);
++	if (ret < 0)
++		goto out;
++
++	if (NL_REQ_ATTR_CHECK(extack, nla, tb, P4TC_PARAMS)) {
++		NL_SET_ERR_MSG(extack, "Must specify object attributes");
++		ret = -EINVAL;
++		goto out;
++	}
++
++	ids[P4TC_PID_IDX] = t->pipeid;
++
++	op = (struct p4tc_template_ops *)p4tc_ops[t->obj];
++	tmpl = op->cu(net, n, tb[P4TC_PARAMS], nl_pname, ids, extack);
++	if (IS_ERR(tmpl))
++		return tmpl;
++
++	ret = op->fill_nlmsg(net, skb, tmpl, extack);
++	if (ret < 0)
++		goto put;
++
++	if (!t->pipeid)
++		t->pipeid = ids[P4TC_PID_IDX];
++
++	return tmpl;
++
++put:
++	p4tc_template_put(net, tmpl, extack);
++
++out:
++	return ERR_PTR(ret);
++}
++
++static int tcf_p4_tmpl_cu_n(struct sk_buff *skb, struct nlmsghdr *n,
++			    struct nlattr *nla, char *p_name,
++			    struct netlink_ext_ack *extack)
++{
++	struct p4tc_template_common *tmpls[P4TC_MSGBATCH_SIZE];
++	struct p4tcmsg *t = (struct p4tcmsg *)nlmsg_data(n);
++	struct nlattr *tb[P4TC_MSGBATCH_SIZE + 1];
++	struct net *net = sock_net(skb->sk);
++	u32 portid = NETLINK_CB(skb).portid;
++	struct p4tc_nl_pname nl_pname;
++	struct p4tcmsg *t_new;
++	struct sk_buff *nskb;
++	struct nlmsghdr *nlh;
++	struct nlattr *pnatt;
++	struct nlattr *root;
++	int ret;
++	int i;
++
++	ret = nla_parse_nested(tb, P4TC_MSGBATCH_SIZE, nla, NULL, extack);
++	if (ret < 0)
++		return ret;
++
++	nskb = alloc_skb(NLMSG_GOODSIZE, GFP_KERNEL);
++	if (!nskb)
++		return -ENOMEM;
++
++	nlh = nlmsg_put(nskb, portid, n->nlmsg_seq, n->nlmsg_type,
++			sizeof(*t), n->nlmsg_flags);
++	if (!nlh)
++		goto out;
++
++	t_new = nlmsg_data(nlh);
++	if (!t_new) {
++		NL_SET_ERR_MSG(extack, "Message header is missing");
++		ret = -EINVAL;
++		goto out;
++	}
++	t_new->pipeid = t->pipeid;
++	t_new->obj = t->obj;
++
++	pnatt = nla_reserve(nskb, P4TC_ROOT_PNAME, PIPELINENAMSIZ);
++	if (!pnatt) {
++		ret = -ENOMEM;
++		goto out;
++	}
++
++	nl_pname.data = nla_data(pnatt);
++	if (!p_name) {
++		/* Filled up by the operation or forced failure */
++		memset(nl_pname.data, 0, PIPELINENAMSIZ);
++		nl_pname.passed = false;
++	} else {
++		strscpy(nl_pname.data, p_name, PIPELINENAMSIZ);
++		nl_pname.passed = true;
++	}
++
++	root = nla_nest_start(nskb, P4TC_ROOT);
++	if (!root) {
++		ret = -ENOMEM;
++		goto out;
++	}
++
++	/* XXX: See if we can use NLA_NESTED_ARRAY here */
++	for (i = 0; i < P4TC_MSGBATCH_SIZE && tb[i + 1]; i++) {
++		struct nlattr *nest = nla_nest_start(nskb, i + 1);
++
++		tmpls[i] = tcf_p4_tmpl_cu_1(nskb, net, nlh, &nl_pname,
++					    tb[i + 1], extack);
++		if (IS_ERR(tmpls[i])) {
++			ret = PTR_ERR(tmpls[i]);
++			goto undo_prev;
++		}
++
++		nla_nest_end(nskb, nest);
++	}
++	nla_nest_end(nskb, root);
++
++	if (!t_new->pipeid)
++		t_new->pipeid = ret;
++
++	nlmsg_end(nskb, nlh);
++
++	return rtnetlink_send(nskb, net, portid, RTNLGRP_TC,
++			      n->nlmsg_flags & NLM_F_ECHO);
++
++undo_prev:
++	if (!p4tc_tmpl_msg_is_update(n)) {
++		while (--i > 0) {
++			struct p4tc_template_common *tmpl = tmpls[i - 1];
++
++			p4tc_template_put(net, tmpl, extack);
++		}
++	}
++
++out:
++	kfree_skb(nskb);
++	return ret;
++}
++
++static int tc_ctl_p4_tmpl_cu(struct sk_buff *skb, struct nlmsghdr *n,
++			     struct netlink_ext_ack *extack)
++{
++	struct nlattr *tb[P4TC_ROOT_MAX + 1];
++	char *p_name = NULL;
++	int ret = 0;
++
++	if (!netlink_capable(skb, CAP_NET_ADMIN))
++		return -EPERM;
++
++	ret = nlmsg_parse(n, sizeof(struct p4tcmsg), tb, P4TC_ROOT_MAX,
++			  p4tc_root_policy, extack);
++	if (ret < 0)
++		return ret;
++
++	if (NL_REQ_ATTR_CHECK(extack, NULL, tb, P4TC_ROOT)) {
++		NL_SET_ERR_MSG(extack,
++			       "Netlink P4TC template attributes missing");
++		return -EINVAL;
++	}
++
++	if (tb[P4TC_ROOT_PNAME])
++		p_name = nla_data(tb[P4TC_ROOT_PNAME]);
++
++	return tcf_p4_tmpl_cu_n(skb, n, tb[P4TC_ROOT], p_name, extack);
++}
++
++static int tc_ctl_p4_tmpl_dump_1(struct sk_buff *skb, struct nlattr *arg,
++				 char *p_name, struct netlink_callback *cb)
++{
++	struct p4tc_dump_ctx *ctx = (void *)cb->ctx;
++	struct netlink_ext_ack *extack = cb->extack;
++	u32 portid = NETLINK_CB(cb->skb).portid;
++	const struct nlmsghdr *n = cb->nlh;
++	struct nlattr *tb[P4TC_MAX + 1];
++	struct p4tc_template_ops *op;
++	u32 ids[P4TC_PATH_MAX] = {};
++	struct p4tcmsg *t_new;
++	struct nlmsghdr *nlh;
++	struct nlattr *root;
++	struct p4tcmsg *t;
++	int ret;
++
++	ret = nla_parse_nested_deprecated(tb, P4TC_MAX, arg, p4tc_policy,
++					  extack);
++	if (ret < 0)
++		return ret;
++
++	t = (struct p4tcmsg *)nlmsg_data(n);
++	if (!obj_is_valid(t->obj)) {
++		NL_SET_ERR_MSG(extack, "Invalid object type");
++		return -EINVAL;
++	}
++
++	nlh = nlmsg_put(skb, portid, n->nlmsg_seq, n->nlmsg_type,
++			sizeof(*t), n->nlmsg_flags);
++	if (!nlh)
++		return -ENOSPC;
++
++	t_new = nlmsg_data(nlh);
++	t_new->pipeid = t->pipeid;
++	t_new->obj = t->obj;
++
++	root = nla_nest_start(skb, P4TC_ROOT);
++
++	ids[P4TC_PID_IDX] = t->pipeid;
++
++	op = (struct p4tc_template_ops *)p4tc_ops[t->obj];
++	ret = op->dump(skb, ctx, tb[P4TC_PARAMS], &p_name, ids, extack);
++	if (ret <= 0)
++		goto out;
++	nla_nest_end(skb, root);
++
++	if (p_name) {
++		if (nla_put_string(skb, P4TC_ROOT_PNAME, p_name)) {
++			ret = -1;
++			goto out;
++		}
++	}
++
++	if (!t_new->pipeid)
++		t_new->pipeid = ids[P4TC_PID_IDX];
++
++	nlmsg_end(skb, nlh);
++
++	return ret;
++
++out:
++	nlmsg_cancel(skb, nlh);
++	return ret;
++}
++
++static int tc_ctl_p4_tmpl_dump(struct sk_buff *skb, struct netlink_callback *cb)
++{
++	struct nlattr *tb[P4TC_ROOT_MAX + 1];
++	char *p_name = NULL;
++	int ret;
++
++	ret = nlmsg_parse(cb->nlh, sizeof(struct p4tcmsg), tb, P4TC_ROOT_MAX,
++			  p4tc_root_policy, cb->extack);
++	if (ret < 0)
++		return ret;
++
++	if (NL_REQ_ATTR_CHECK(cb->extack, NULL, tb, P4TC_ROOT)) {
++		NL_SET_ERR_MSG(cb->extack,
++			       "Netlink P4TC template attributes missing");
++		return -EINVAL;
++	}
++
++	if (tb[P4TC_ROOT_PNAME])
++		p_name = nla_data(tb[P4TC_ROOT_PNAME]);
++
++	return tc_ctl_p4_tmpl_dump_1(skb, tb[P4TC_ROOT], p_name, cb);
++}
++
++static int __init p4tc_template_init(void)
++{
++	u32 obj;
++
++	rtnl_register(PF_UNSPEC, RTM_CREATEP4TEMPLATE, tc_ctl_p4_tmpl_cu, NULL,
++		      0);
++	rtnl_register(PF_UNSPEC, RTM_UPDATEP4TEMPLATE, tc_ctl_p4_tmpl_cu, NULL,
++		      0);
++	rtnl_register(PF_UNSPEC, RTM_DELP4TEMPLATE, tc_ctl_p4_tmpl_delete, NULL,
++		      0);
++	rtnl_register(PF_UNSPEC, RTM_GETP4TEMPLATE, tc_ctl_p4_tmpl_get,
++		      tc_ctl_p4_tmpl_dump, 0);
++
++	for (obj = P4TC_OBJ_PIPELINE; obj < P4TC_OBJ_MAX; obj++) {
++		const struct p4tc_template_ops *op = p4tc_ops[obj];
++
++		if (!op)
++			continue;
++
++		if (!obj_is_valid(obj))
++			continue;
++
++		if (op->init)
++			op->init();
 +	}
 +
 +	return 0;
 +}
 +
-+#define p4tc_register_type(...)                            \
-+	do {                                               \
-+		if (__p4tc_register_type(__VA_ARGS__) < 0) \
-+			return -1;                         \
-+	} while (0)
-+
-+int p4tc_register_types(void)
-+{
-+	p4tc_register_type(P4T_U8, 8, 8, "u8", &u8_ops);
-+	p4tc_register_type(P4T_U16, 16, 16, "u16", &u16_ops);
-+	p4tc_register_type(P4T_U32, 32, 32, "u32", &u32_ops);
-+	p4tc_register_type(P4T_U64, 64, 64, "u64", &u64_ops);
-+	p4tc_register_type(P4T_U128, 128, 128, "u128", &u128_ops);
-+	p4tc_register_type(P4T_S8, 8, 8, "s8", &s8_ops);
-+	p4tc_register_type(P4T_BE16, 16, 16, "be16", &be16_ops);
-+	p4tc_register_type(P4T_BE32, 32, 32, "be32", &be32_ops);
-+	p4tc_register_type(P4T_BE64, 64, 64, "be64", &be64_ops);
-+	p4tc_register_type(P4T_S16, 16, 16, "s16", &s16_ops);
-+	p4tc_register_type(P4T_S32, 32, 32, "s32", &s32_ops);
-+	p4tc_register_type(P4T_S64, 64, 64, "s64", &s64_ops);
-+	p4tc_register_type(P4T_S128, 128, 128, "s128", &s128_ops);
-+	p4tc_register_type(P4T_STRING, P4T_MAX_STR_SZ * 4, P4T_MAX_STR_SZ * 4,
-+			   "string", &string_ops);
-+	p4tc_register_type(P4T_NUL_STRING, P4T_MAX_STR_SZ * 4,
-+			   P4T_MAX_STR_SZ * 4, "nullstr", &nullstring_ops);
-+	p4tc_register_type(P4T_FLAG, 32, 32, "flag", &flag_ops);
-+	p4tc_register_type(P4T_PATH, 0, 0, "path", &path_ops);
-+	p4tc_register_type(P4T_MSECS, 0, 0, "msecs", &msecs_ops);
-+	p4tc_register_type(P4T_MACADDR, 48, 64, "mac", &mac_ops);
-+	p4tc_register_type(P4T_IPV4ADDR, 32, 32, "ipv4", &ipv4_ops);
-+	p4tc_register_type(P4T_BOOL, 32, 32, "bool", &bool_ops);
-+	p4tc_register_type(P4T_DEV, 32, 32, "dev", &dev_ops);
-+	p4tc_register_type(P4T_KEY, P4TC_MAX_KEYSZ, P4TC_MAX_KEYSZ, "key",
-+			   &key_ops);
-+
-+	return 0;
-+}
-+
-+void p4tc_unregister_types(void)
-+{
-+	p4tc_types_put();
-+}
++subsys_initcall(p4tc_template_init);
+diff --git a/security/selinux/nlmsgtab.c b/security/selinux/nlmsgtab.c
+index 2ee7b4ed4..a88e35ab4 100644
+--- a/security/selinux/nlmsgtab.c
++++ b/security/selinux/nlmsgtab.c
+@@ -94,6 +94,10 @@ static const struct nlmsg_perm nlmsg_route_perms[] = {
+ 	{ RTM_NEWTUNNEL,	NETLINK_ROUTE_SOCKET__NLMSG_WRITE },
+ 	{ RTM_DELTUNNEL,	NETLINK_ROUTE_SOCKET__NLMSG_WRITE },
+ 	{ RTM_GETTUNNEL,	NETLINK_ROUTE_SOCKET__NLMSG_READ  },
++	{ RTM_CREATEP4TEMPLATE,	NETLINK_ROUTE_SOCKET__NLMSG_WRITE },
++	{ RTM_DELP4TEMPLATE,	NETLINK_ROUTE_SOCKET__NLMSG_WRITE },
++	{ RTM_GETP4TEMPLATE,	NETLINK_ROUTE_SOCKET__NLMSG_READ },
++	{ RTM_UPDATEP4TEMPLATE,	NETLINK_ROUTE_SOCKET__NLMSG_WRITE },
+ };
+ 
+ static const struct nlmsg_perm nlmsg_tcpdiag_perms[] = {
+@@ -176,7 +180,7 @@ int selinux_nlmsg_lookup(u16 sclass, u16 nlmsg_type, u32 *perm)
+ 		 * structures at the top of this file with the new mappings
+ 		 * before updating the BUILD_BUG_ON() macro!
+ 		 */
+-		BUILD_BUG_ON(RTM_MAX != (RTM_NEWTUNNEL + 3));
++		BUILD_BUG_ON(RTM_MAX != (RTM_CREATEP4TEMPLATE + 3));
+ 		err = nlmsg_perm(nlmsg_type, perm, nlmsg_route_perms,
+ 				 sizeof(nlmsg_route_perms));
+ 		break;
 -- 
 2.34.1
 
