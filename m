@@ -1,116 +1,192 @@
-Return-Path: <netdev+bounces-23323-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23328-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93D9476B8EA
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 17:45:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3625F76B903
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 17:49:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4ECE3281AAC
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 15:45:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6317A1C20F82
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 15:49:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57BF41ADD6;
-	Tue,  1 Aug 2023 15:45:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47FFE1ADE2;
+	Tue,  1 Aug 2023 15:49:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DB9F4DC8F;
-	Tue,  1 Aug 2023 15:45:12 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CCA1CC43391;
-	Tue,  1 Aug 2023 15:45:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690904712;
-	bh=VEaLAWfjIhnDGSpVQ/9ljIaO+E4dOVi/Dh1KjH+8jgw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=EzN5c6CkRbdeXJgQUWFyAiXuNmcAlX3e8DSQ44aT3fzSoUzqtVO5l79tjMuItMQmW
-	 /YnUADAwNhMzU4IbzAFSgfe6F61DSqruE3po0+o6xgwKDwjlsQJJSAuOqh7MmAOvni
-	 bcySCw7rbxjES1O71Twq59QuzKgAT+nDxbs/5oPol76177763IUV3jdHXe6g+iTct+
-	 iGYbGTBuEz6fBH3ZBNDbXHN+5U5CXE3/7TubhFZBejqqBU9AEzh82Pf+QFdxc8q25G
-	 1aEYLKzOfIIHoCG0wj+CkGCD77oT8ycoTnGQQl2VcEps2GHvuMx6cg9OSNPsWZP3J0
-	 Ktci7jenX9MaA==
-Date: Tue, 1 Aug 2023 08:45:10 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: Christoph Hellwig <hch@infradead.org>,
- virtualization@lists.linux-foundation.org, "David S.  Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo  Abeni
- <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, Daniel  Borkmann
- <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, John 
- Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org,
- bpf@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang
- <jasowang@redhat.com>, Pavel Begunkov <asml.silence@gmail.com>
-Subject: Re: [PATCH vhost v11 05/10] virtio_ring: introduce
- virtqueue_dma_dev()
-Message-ID: <20230801084510.1c2460b9@kernel.org>
-In-Reply-To: <1690858650.8698683-2-xuanzhuo@linux.alibaba.com>
-References: <20230710034237.12391-1-xuanzhuo@linux.alibaba.com>
-	<20230710034237.12391-6-xuanzhuo@linux.alibaba.com>
-	<ZK/cxNHzI23I6efc@infradead.org>
-	<20230713104805-mutt-send-email-mst@kernel.org>
-	<ZLjSsmTfcpaL6H/I@infradead.org>
-	<20230720131928-mutt-send-email-mst@kernel.org>
-	<ZL6qPvd6X1CgUD4S@infradead.org>
-	<1690251228.3455179-1-xuanzhuo@linux.alibaba.com>
-	<20230725033321-mutt-send-email-mst@kernel.org>
-	<1690283243.4048996-1-xuanzhuo@linux.alibaba.com>
-	<1690524153.3603117-1-xuanzhuo@linux.alibaba.com>
-	<20230728080305.5fe3737c@kernel.org>
-	<CACGkMEs5uc=ct8BsJzV2SEJzAGXqCP__yxo-MBa6d6JzDG4YOg@mail.gmail.com>
-	<20230731084651.16ec0a96@kernel.org>
-	<1690855424.7821567-1-xuanzhuo@linux.alibaba.com>
-	<20230731193606.25233ed9@kernel.org>
-	<1690858650.8698683-2-xuanzhuo@linux.alibaba.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 381FA1ADCA
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 15:49:04 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECF2B1AA
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 08:49:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1690904942;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=9kL1z+7hz4SUVFbyDmQbPtMivH0vJcYyOMwdaujfUNY=;
+	b=ExC0AdETW+8BouW046pjdrwgARvsb1ziK4dOtC6fU/eMZx+HD0TLXWd9gQvDEcTiGK08JD
+	Pf8goXorjx+H8FUHkPbH/LK7ek52iGFm85Z05+BTtL35KavRlvL8kmvUrxxRZsQGXF8/st
+	1RDaT5oiVLi1vD3TXkHrKUlRnWNrkrk=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-281-unL-_DaIMdaTsXBFHl9fdA-1; Tue, 01 Aug 2023 11:48:57 -0400
+X-MC-Unique: unL-_DaIMdaTsXBFHl9fdA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 206BD185A7AB;
+	Tue,  1 Aug 2023 15:48:56 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.131])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 302AE145414B;
+	Tue,  1 Aug 2023 15:48:54 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+To: netdev@vger.kernel.org,
+    Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+cc: dhowells@redhat.com,
+    syzbot+f527b971b4bdc8e79f9e@syzkaller.appspotmail.com,
+    bpf@vger.kernel.org, brauner@kernel.org, davem@davemloft.net,
+    dsahern@kernel.org, edumazet@google.com, kuba@kernel.org,
+    pabeni@redhat.com, axboe@kernel.dk, viro@zeniv.linux.org.uk,
+    linux-fsdevel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
+    linux-kernel@vger.kernel.org
+Subject: [PATCH net] udp: Fix __ip_append_data()'s handling of MSG_SPLICE_PAGES
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1420062.1690904933.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 01 Aug 2023 16:48:53 +0100
+Message-ID: <1420063.1690904933@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Tue, 1 Aug 2023 10:57:30 +0800 Xuan Zhuo wrote:
-> > You have this working and benchmarked or this is just and idea?  
-> 
-> This is not just an idea. I said that has been used on large scale.
-> 
-> This is the library for the APP to use the AF_XDP. We has open it.
-> https://gitee.com/anolis/libxudp
-> 
-> This is the Alibaba version of the nginx. That has been opened, that supported
-> to work with the libray to use AF_XDP.
-> http://tengine.taobao.org/
-> 
-> I supported this on our kernel release Anolis/Alinux.
+    =
 
-Interesting!
+__ip_append_data() can get into an infinite loop when asked to splice into
+a partially-built UDP message that has more than the frag-limit data and u=
+p
+to the MTU limit.  Something like:
 
-> The work was done about 2 years ago. You know, I pushed the first version to
-> enable AF_XDP on virtio-net about two years ago. I never thought the job would
-> be so difficult.
+        pipe(pfd);
+        sfd =3D socket(AF_INET, SOCK_DGRAM, 0);
+        connect(sfd, ...);
+        send(sfd, buffer, 8161, MSG_CONFIRM|MSG_MORE);
+        write(pfd[1], buffer, 8);
+        splice(pfd[0], 0, sfd, 0, 0x4ffe0ul, 0);
 
-Me neither, but it is what it is.
+where the amount of data given to send() is dependent on the MTU size (in
+this instance an interface with an MTU of 8192).
 
-> The nic (virtio-net) of AliYun can reach 24,000,000PPS.
-> So I think there is no different with the real HW on the performance.
-> 
-> With the AF_XDP, the UDP pps is seven times that of the kernel udp stack.
+The problem is that the calculation of the amount to copy in
+__ip_append_data() goes negative in two places, and, in the second place,
+this gets subtracted from the length remaining, thereby increasing it.
 
-UDP pps or QUIC pps? UDP with or without GSO?
+This happens when pagedlen > 0 (which happens for MSG_ZEROCOPY and
+MSG_SPLICE_PAGES), because the terms in:
 
-Do you have measurements of how much it saves in real world workloads?
-I'm asking mostly out of curiosity, not to question the use case.
+        copy =3D datalen - transhdrlen - fraggap - pagedlen;
 
-> > What about io_uring zero copy w/ pre-registered buffers.
-> > You'll get csum offload, GSO, all the normal perf features.  
-> 
-> We tried io-uring, but it was not suitable for our scenario.
-> 
-> Yes, now the AF_XDP does not support the csum offload and GSO.
-> This is indeed a small problem.
+then mostly cancel when pagedlen is substituted for, leaving just -fraggap=
+.
+This causes:
 
-Can you say more about io-uring suitability? It can do zero copy
-and recently-ish Pavel optimized it quite a bit.
+        length -=3D copy + transhdrlen;
+
+to increase the length to more than the amount of data in msg->msg_iter,
+which causes skb_splice_from_iter() to be unable to fill the request and i=
+t
+returns less than 'copied' - which means that length never gets to 0 and w=
+e
+never exit the loop.
+
+Fix this by:
+
+ (1) Insert a note about the dodgy calculation of 'copy'.
+
+ (2) If MSG_SPLICE_PAGES, clear copy if it is negative from the above
+     equation, so that 'offset' isn't regressed and 'length' isn't
+     increased, which will mean that length and thus copy should match the
+     amount left in the iterator.
+
+ (3) When handling MSG_SPLICE_PAGES, give a warning and return -EIO if
+     we're asked to splice more than is in the iterator.  It might be
+     better to not give the warning or even just give a 'short' write.
+
+[!] Note that this ought to also affect MSG_ZEROCOPY, but MSG_ZEROCOPY
+avoids the problem by simply assuming that everything asked for got copied=
+,
+not just the amount that was in the iterator.  This is a potential bug for
+the future.
+
+Fixes: 7ac7c987850c ("udp: Convert udp_sendpage() to use MSG_SPLICE_PAGES"=
+)
+Reported-by: syzbot+f527b971b4bdc8e79f9e@syzkaller.appspotmail.com
+Link: https://lore.kernel.org/r/000000000000881d0606004541d1@google.com/
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+cc: "David S. Miller" <davem@davemloft.net>
+cc: Eric Dumazet <edumazet@google.com>
+cc: Jakub Kicinski <kuba@kernel.org>
+cc: Paolo Abeni <pabeni@redhat.com>
+cc: David Ahern <dsahern@kernel.org>
+cc: Jens Axboe <axboe@kernel.dk>
+cc: netdev@vger.kernel.org
+---
+ net/ipv4/ip_output.c |    9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/net/ipv4/ip_output.c b/net/ipv4/ip_output.c
+index 6e70839257f7..91715603cf6e 100644
+--- a/net/ipv4/ip_output.c
++++ b/net/ipv4/ip_output.c
+@@ -1158,10 +1158,15 @@ static int __ip_append_data(struct sock *sk,
+ 			}
+ =
+
+ 			copy =3D datalen - transhdrlen - fraggap - pagedlen;
++			/* [!] NOTE: copy will be negative if pagedlen>0
++			 * because then the equation reduces to -fraggap.
++			 */
+ 			if (copy > 0 && getfrag(from, data + transhdrlen, offset, copy, fragga=
+p, skb) < 0) {
+ 				err =3D -EFAULT;
+ 				kfree_skb(skb);
+ 				goto error;
++			} else if (flags & MSG_SPLICE_PAGES) {
++				copy =3D 0;
+ 			}
+ =
+
+ 			offset +=3D copy;
+@@ -1209,6 +1214,10 @@ static int __ip_append_data(struct sock *sk,
+ 		} else if (flags & MSG_SPLICE_PAGES) {
+ 			struct msghdr *msg =3D from;
+ =
+
++			err =3D -EIO;
++			if (WARN_ON_ONCE(copy > msg->msg_iter.count))
++				goto error;
++
+ 			err =3D skb_splice_from_iter(skb, &msg->msg_iter, copy,
+ 						   sk->sk_allocation);
+ 			if (err < 0)
+
 
