@@ -1,125 +1,109 @@
-Return-Path: <netdev+bounces-23156-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23157-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4CA576B30B
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 13:22:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B75A776B330
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 13:27:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9E6A228184E
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 11:22:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 88FD21C20EA7
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 11:27:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADF0F20FA3;
-	Tue,  1 Aug 2023 11:21:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 694B720FA7;
+	Tue,  1 Aug 2023 11:27:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1C0D1DDFF
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 11:21:59 +0000 (UTC)
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0C2EC7;
-	Tue,  1 Aug 2023 04:21:38 -0700 (PDT)
-Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37189J0a015315;
-	Tue, 1 Aug 2023 11:21:27 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=from : to : cc :
- subject : date : message-id : mime-version : content-type; s=qcppdkim1;
- bh=jV34UgqeTpwbC4njYvTOZIRvfhzdVPO+PNcNHQuZut4=;
- b=dchElO3fhQItDkiLFxi4I7m4XG222fgJi36wtLIOdjOCqpvC0b+kw/BG3KkS9jEfU1oY
- 1iOzydwzrUJHM3JwxQEg5+UsVfVEfvx1E7jFxlsry9MSZ6/XOZL31m/0oLnOYxssbTcU
- s045hGYH3XlrLKOk8wwJykhvvPYPYoO3IIHFCiIEoHJfopeyY+pZFiq95kEmWLSoc86F
- q209a+HuohgYq2Cu4vnILqKycbYQlvltijz2rOLL2SXwa6vB9oDJAJfrzbiZCftSsYrz
- mFPz/pgMYWFTAE7Xvw8Y30sXS1QniqO3vZpXtm/kZIIOkMtUAb9oSgXJzvhWLAakHsAF Ew== 
-Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3s6a2vbga1-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 01 Aug 2023 11:21:27 +0000
-Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-	by NALASPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 371BLQrN010000
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 1 Aug 2023 11:21:26 GMT
-Received: from hu-ajainp-blr.qualcomm.com (10.80.80.8) by
- nalasex01c.na.qualcomm.com (10.47.97.35) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Tue, 1 Aug 2023 04:21:20 -0700
-From: Anvesh Jain P <quic_ajainp@quicinc.com>
-To: "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni
-	<pabeni@redhat.com>,
-        Simon Horman <simon.horman@corigine.com>,
-        "Kuniyuki
- Iwashima" <kuniyu@amazon.com>,
-        Hangbin Liu <liuhangbin@gmail.com>, Jiri Pirko
-	<jiri@resnulli.us>,
-        Heiner Kallweit <hkallweit1@gmail.com>,
-        Andy Ren
-	<andy.ren@getcruise.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        "Venkata Rao
- Kakani" <quic_vkakani@quicinc.com>,
-        Vagdhan Kumar
-	<quic_vagdhank@quicinc.com>,
-        Anvesh Jain P <quic_ajainp@quicinc.com>
-Subject: [PATCH] net: export dev_change_name function
-Date: Tue, 1 Aug 2023 16:51:01 +0530
-Message-ID: <20230801112101.15564-1-quic_ajainp@quicinc.com>
-X-Mailer: git-send-email 2.17.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A6A61DDFF
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 11:27:18 +0000 (UTC)
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF71A9B
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 04:27:16 -0700 (PDT)
+Received: from kwepemi500008.china.huawei.com (unknown [172.30.72.57])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4RFXmp0bsDztRh9;
+	Tue,  1 Aug 2023 19:23:54 +0800 (CST)
+Received: from huawei.com (10.90.53.73) by kwepemi500008.china.huawei.com
+ (7.221.188.139) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Tue, 1 Aug
+ 2023 19:27:14 +0800
+From: Ruan Jinjie <ruanjinjie@huawei.com>
+To: <sgoutham@marvell.com>, <lcherian@marvell.com>, <gakula@marvell.com>,
+	<jerinj@marvell.com>, <hkelam@marvell.com>, <sbhatta@marvell.com>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <richardcochran@gmail.com>, <netdev@vger.kernel.org>
+CC: <ruanjinjie@huawei.com>
+Subject: [PATCH net-next v2] octeontx2: Remove unnecessary ternary operators
+Date: Tue, 1 Aug 2023 19:26:38 +0800
+Message-ID: <20230801112638.317149-1-ruanjinjie@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-Originating-IP: [10.80.80.8]
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01c.na.qualcomm.com (10.47.97.35)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: 4gzdaoF0T6fEAtMd1JrRkhseghLmD9aN
-X-Proofpoint-GUID: 4gzdaoF0T6fEAtMd1JrRkhseghLmD9aN
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-08-01_06,2023-08-01_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 suspectscore=0
- priorityscore=1501 impostorscore=0 malwarescore=0 adultscore=0 bulkscore=0
- spamscore=0 phishscore=0 mlxscore=0 mlxlogscore=999 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2306200000
- definitions=main-2308010103
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+X-Originating-IP: [10.90.53.73]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ kwepemi500008.china.huawei.com (7.221.188.139)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-export dev_change_name function to be used by other modules.
+There are a little ternary operators, the true or false judgement
+of which is unnecessary in C language semantics. So remove it
+to clean Code.
 
-Signed-off-by: Vagdhan Kumar <quic_vagdhank@quicinc.com>
-Signed-off-by: Anvesh Jain P <quic_ajainp@quicinc.com>
+Signed-off-by: Ruan Jinjie <ruanjinjie@huawei.com>
+Reviewed-by: Simon Horman <horms@kernel.org>
 ---
- net/core/dev.c | 1 +
- 1 file changed, 1 insertion(+)
+v2:
+- Fix the subject prefix and commit message issue.
+---
+ drivers/net/ethernet/marvell/octeontx2/af/ptp.c      | 4 ++--
+ drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 69a3e544676c..1dad68e2950c 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -1254,6 +1254,7 @@ int dev_change_name(struct net_device *dev, const char *newname)
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/ptp.c b/drivers/net/ethernet/marvell/octeontx2/af/ptp.c
+index 0ee420a489fc..c55c2c441a1a 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/ptp.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/ptp.c
+@@ -61,12 +61,12 @@ static const struct pci_device_id ptp_id_table[];
  
- 	return err;
+ static bool is_ptp_dev_cnf10kb(struct ptp *ptp)
+ {
+-	return (ptp->pdev->subsystem_device == PCI_SUBSYS_DEVID_CNF10K_B_PTP) ? true : false;
++	return ptp->pdev->subsystem_device == PCI_SUBSYS_DEVID_CNF10K_B_PTP;
  }
-+EXPORT_SYMBOL(dev_change_name);
  
- /**
-  *	dev_set_alias - change ifalias of a device
-
-base-commit: 0a8db05b571ad5b8d5c8774a004c0424260a90bd
+ static bool is_ptp_dev_cn10k(struct ptp *ptp)
+ {
+-	return (ptp->pdev->device == PCI_DEVID_CN10K_PTP) ? true : false;
++	return ptp->pdev->device == PCI_DEVID_CN10K_PTP;
+ }
+ 
+ static bool cn10k_ptp_errata(struct ptp *ptp)
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+index 9551b422622a..61f62a6ec662 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+@@ -2027,7 +2027,7 @@ u16 otx2_select_queue(struct net_device *netdev, struct sk_buff *skb,
+ #endif
+ 	int txq;
+ 
+-	qos_enabled = (netdev->real_num_tx_queues > pf->hw.tx_queues) ? true : false;
++	qos_enabled = netdev->real_num_tx_queues > pf->hw.tx_queues;
+ 	if (unlikely(qos_enabled)) {
+ 		/* This smp_load_acquire() pairs with smp_store_release() in
+ 		 * otx2_qos_root_add() called from htb offload root creation
 -- 
-2.17.1
+2.34.1
 
 
