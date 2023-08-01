@@ -1,110 +1,70 @@
-Return-Path: <netdev+bounces-23224-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23225-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0080476B5CB
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 15:27:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8293A76B5D1
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 15:28:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2AB061C20EEC
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 13:27:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E813A28188F
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 13:28:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AA9721D30;
-	Tue,  1 Aug 2023 13:27:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53B8921D32;
+	Tue,  1 Aug 2023 13:28:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80AE4200A3
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 13:27:31 +0000 (UTC)
-Received: from mgamail.intel.com (unknown [134.134.136.100])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE12F1BEA;
-	Tue,  1 Aug 2023 06:27:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1690896449; x=1722432449;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=HZcKAeKxTyx+rq78woMXJgQhviYBmrn4ipC02JtpgmA=;
-  b=LwVrKV4bCAPHdUzmWj+x189hOXfMK8YiTWjNVeqITShg8mxKn9OGU5Pg
-   XavRCavW/I97/tlq3Y6b0q+Nn8DXyoG8jbtESniI81vcGJzlk6s1+lUy4
-   ciI2n05b9iw1X7x7dGmoRyRawV7B8zHxCVocTBe4ABmxkerpXDqjH6bW/
-   zFSRH95BmzGtD8eM+ilJAuG3OSmyxxyeQ8dS4OG+KhthMlDRuIbooP0Ls
-   hEEfoqoGdN8WLhoFRDcwEKOr0yL5jAjWn4uZNvhF3lMM1XUuL0cmRwvYl
-   WzIoBLw9nMcFyAOCf6/hUOpy5ezSVG8IO9e7LVRjd38GRxew7QOVpoUJg
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10789"; a="435623396"
-X-IronPort-AV: E=Sophos;i="6.01,247,1684825200"; 
-   d="scan'208";a="435623396"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Aug 2023 06:27:29 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10789"; a="728684723"
-X-IronPort-AV: E=Sophos;i="6.01,247,1684825200"; 
-   d="scan'208";a="728684723"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by orsmga002.jf.intel.com with ESMTP; 01 Aug 2023 06:27:29 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Tue, 1 Aug 2023 06:27:28 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27 via Frontend Transport; Tue, 1 Aug 2023 06:27:28 -0700
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.100)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.27; Tue, 1 Aug 2023 06:27:28 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 462CB200A3
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 13:28:53 +0000 (UTC)
+Received: from EUR04-VI1-obe.outbound.protection.outlook.com (mail-vi1eur04on2050.outbound.protection.outlook.com [40.107.8.50])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 695A2173F;
+	Tue,  1 Aug 2023 06:28:51 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=k59PMV27YVck06+r6rvHJjaYj9eBPOxzeLkSy+P/Bc4MiRP9FFM3JkqSsKWo8iabNkpxI3DJ3Vzm+4exx8JcAJREUTmZQpy1fVrIqEZ9K+zJ/RxIt23OU8H4r0lmuPSw1Ljs7fxo8UTFZ+/lHQPj5u88YiVVJxE7YUxgAy0Uul4ARKLhwn9a1qfgAGQrVNg/1b3CeUIzfBlzCXOIYI6PuaI7TaYWD0U9c6M1r2NehyRRtv3DiFX0DC4TNgIV9hTswwXAZBIesFQwjSaSqy+P0Zgd7kXd+12I1DlwF3JRdegCQBvF8BvEgPiqF2V5j7BeKovNjgXiQwxn7Y5Jr8HfNQ==
+ b=cwkI0RNc6GNbBIvcu69LD1RURsIizxDdKlnpIyrwYaTGdac37Ju2heZoWT0hZi3PB2rYzlU5HXPwinQlUP/ZHsDx+G1hSC8uPJl2+2EA6WxnIFx5EEw1fxKYmdT0j9g+cPFVXH2h8Z31FvxN3QzTn3GuvPv99tE9I9nLXAMEcW/ZfbPz6Bwgxzf7U3SbD5C8RcZzfCz4lA4TP3xIPAqL4xTYmsEDC34/1SsXv9WOUQlpT0qt0iEfTbJsBgXeZgk4RMli8VpXKicN4/UnVG2Mv9hObT91uOSd9AbooQd2AdHZ4CbkA6tTV4TA2TJDq6xP8rZDCKNvxFrPCk2QAFYbYg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=3o3smC/eZUzKoBWw3SxTj3q+fpTK9hbpN0VYrGGQOrk=;
- b=XsxFjSJlqiFmOzU53Q8vJE5RRy6R9kPPqVzJS0wsKfprZ15dPQsJB2a+blDW9OlyxoJKAIE1NGYWG65q/sViuyQMBOP7WqN1yfSNIVkzwfVk33ZxvgnhcjksOV9N62SCDrBUohSGNwzlVVy4Hq9P2uX+DNLoXq6VIA/2Uw68RC+EBRa6ZIxOa/9uWB3WbQVM2BWOOiq3dLl+tgSyrVOCsBveT7pEUqzIP5VjmPrCTwC4lLVKt9Gatan/ugz4qzlnNBZp+QZc46L+zjPJMInDbFKUZKT2m4zv6S5Si6z1Oh2R+IuXbSBbelHuw+hhPs2bMRctUPCBpb77b0y/iBhPYQ==
+ bh=jv5zDr8MLwWuKfbsDpqQ1TSqu2Wd3INGRtxWmzk79lw=;
+ b=faoxnKu2LPVXSai3Zw9GNN1O+U100CWX9oIVoP/azy4pKnoAOXffsRl+vUSCBJumHV3IatUSn20l+IXa6zOQ/8NROIzF6MAzs0+YQ8++CXGSmo6DvY1zzOIzgdrt4CcIIgPAm6cq6L2cqyaY0HY/uDHTiKqcTs4Exwnsx6BfJcZAksnwqvZA+5pngarujpr/0hykSpbv9inNBaWH02stvUFI2lGimmFVG6xQl7HPM6gpS1S/K2ufFLmVI4NJaDBZ2wAm91nyqTYmUA1OyPZlQGjQGV99xpjaQ27HkEgLgeGC1f1Oyv0A7yqUlalnWeCuuUGqBTNN7lRPcvPdnv9osg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=jv5zDr8MLwWuKfbsDpqQ1TSqu2Wd3INGRtxWmzk79lw=;
+ b=cBbCM0jBqxIqHpVUBWKrdanApWODeOLcYKA1QnM4Si1nejY/7mgvyrOVAKk27o25M5NvZ2uC/yIpwiTNJOikXub6tqxCYyIF+vPcvkzgL9XUU832K3d7Kv4WLLwDVXYnL1OeVLwb1OKOMBZ/4OfVMK6PEgLkWZsgJnew8tdv9Oc=
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DM6PR11MB3625.namprd11.prod.outlook.com (2603:10b6:5:13a::21)
- by PH0PR11MB4871.namprd11.prod.outlook.com (2603:10b6:510:30::12) with
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
+ by DUZPR04MB9966.eurprd04.prod.outlook.com (2603:10a6:10:4d9::9) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.42; Tue, 1 Aug
- 2023 13:27:26 +0000
-Received: from DM6PR11MB3625.namprd11.prod.outlook.com
- ([fe80::44ff:6a5:9aa4:124a]) by DM6PR11MB3625.namprd11.prod.outlook.com
- ([fe80::44ff:6a5:9aa4:124a%7]) with mapi id 15.20.6631.043; Tue, 1 Aug 2023
- 13:27:26 +0000
-Message-ID: <61965a16-55bf-2f81-8938-856f834d35bf@intel.com>
-Date: Tue, 1 Aug 2023 15:25:38 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH net-next 2/9] net: skbuff: don't include
- <net/page_pool/types.h> to <linux/skbuff.h>
-Content-Language: en-US
-To: Yunsheng Lin <linyunsheng@huawei.com>
-CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	Larysa Zaremba <larysa.zaremba@intel.com>, Alexander Duyck
-	<alexanderduyck@fb.com>, Jesper Dangaard Brouer <hawk@kernel.org>, "Ilias
- Apalodimas" <ilias.apalodimas@linaro.org>, Simon Horman
-	<simon.horman@corigine.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-References: <20230727144336.1646454-1-aleksander.lobakin@intel.com>
- <20230727144336.1646454-3-aleksander.lobakin@intel.com>
- <f283dfa9-d599-7311-1c2f-4317c2f7957d@huawei.com>
- <5ba84af2-51d1-de5d-14cc-752c08e5371f@intel.com>
- <5830338c-d025-2fb8-46a6-58508493b2cf@huawei.com>
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-In-Reply-To: <5830338c-d025-2fb8-46a6-58508493b2cf@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: BEXP281CA0015.DEUP281.PROD.OUTLOOK.COM (2603:10a6:b10::25)
- To DM6PR11MB3625.namprd11.prod.outlook.com (2603:10b6:5:13a::21)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.44; Tue, 1 Aug
+ 2023 13:28:48 +0000
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::6074:afac:3fae:6194]) by AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::6074:afac:3fae:6194%4]) with mapi id 15.20.6631.043; Tue, 1 Aug 2023
+ 13:28:48 +0000
+Date: Tue, 1 Aug 2023 16:28:44 +0300
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: Roger Quadros <rogerq@kernel.org>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, s-vadapalli@ti.com, srk@ti.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH] net: ethernet: ti: am65-cpsw-qos: Add Frame
+ Preemption MAC Merge support
+Message-ID: <20230801132844.o56h3bsx7zfwbeu6@skbuf>
+References: <20230725072338.20789-1-rogerq@kernel.org>
+ <20230801131418.bhcjtflj3iu77mmc@skbuf>
+ <0f18cf9e-9c5b-02dd-b396-729b9fecdfe7@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <0f18cf9e-9c5b-02dd-b396-729b9fecdfe7@kernel.org>
+X-ClientProxiedBy: AM8P190CA0007.EURP190.PROD.OUTLOOK.COM
+ (2603:10a6:20b:219::12) To AM0PR04MB6452.eurprd04.prod.outlook.com
+ (2603:10a6:208:16d::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -112,162 +72,130 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR11MB3625:EE_|PH0PR11MB4871:EE_
-X-MS-Office365-Filtering-Correlation-Id: d1963db2-3748-4ec1-4388-08db92930ba5
+X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|DUZPR04MB9966:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8d9c658c-59ff-4924-8a61-08db92933ce9
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: jthI3JtAVh9BLnQ2WeAqT17VTe2rseYgT7wDB9lLfabJHD/AdwcHPpin0o1J7yH51JCG2ShWEMrGP7t5HWBne/NbKwBea5IvEcbc6q03hCca7IgTU45lPpdeA7q3ZvhuaFfX6JXhQU05XS4NfQ03E9K0xwDroyo7wJtFvmMWWjmcyA1LZuN0Y9WQOBDgP4mLkzpktlXCgLZpIQd+F8Sg3ihEd+JU/2WQoxdsgtpP3Lykb03v4kAly5SfGohuGYc2Yg1Yr3j4lLDItMsk5YGlAl8WgY6cWkuE6g3rX/t5o7PNYM3enlFvx9a0maGf/QvcPjvfNtOSxHJH3/YAt0pV+YRPW+nbb5bYGWMQ2WXudXTTcn8PeXdtZ6XG5xUHprbHm7N22vgkODmGUVgDX7fYgSBUxyl/+GtPhiYUvTro43iv0JI49vnKWbFzKxGYwpueG9zk2QVOshXWvO3EdXsOxIgS8sXWq0U+7H2sMunR6pvCgiO/aZOz4Z3HHKMOb7o5uhjlYRT49qyQWHqKnPsK5WjamhvxnNzTafDdQxwq9LeMhY0L5Gsw5WatSx3BBnFmjfYxRS/GRzex32yAtJmpty2ge0VW/wriskHNwBJzhzhzzHopEYOlGzGoi2mdEheaxt/XsbBjkWxLbX/ptWP+bQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB3625.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(396003)(346002)(376002)(39860400002)(136003)(366004)(451199021)(38100700002)(66476007)(31696002)(86362001)(8676002)(8936002)(31686004)(316002)(5660300002)(4326008)(6916009)(54906003)(7416002)(66946007)(66556008)(82960400001)(41300700001)(478600001)(2906002)(6666004)(36756003)(6512007)(6486002)(6506007)(26005)(83380400001)(186003)(53546011)(2616005)(45980500001)(43740500002);DIR:OUT;SFP:1102;
+X-Microsoft-Antispam-Message-Info:
+	wiNMcwHAVrkgoZWjmLYy5SR3c8fy7Q0Kc4eoLI7mtjOfButXX+q0PzkwAxukD7NkrTui3+NLwY/fFRSiKTVXJjgef4JiLda56MQyYrnnwjOhLFF0tGDTIGl5/gT17lA2lD+WxEh2/pez6lY9Q93xVl6fw7v68IZagF1i0C4AEPxp5lFc7SVFpOmEd0zoph2gKKsdQg3pPnweaGeIw3GKUEifUKIuz5VxZgE2/fmF8xxCM4a1A3rfpFug62L98GkdNktTBH9rxLseEm97IePE0HrKleYwH3C3g6lWh4R7ffN/0av0HHIQGjH4Me/ehbOUdcXzwRGPYaOj7h4UXvED2RGxulFNBKJ1lxr7nWhAve6GD8HZyKdo/STa24pSyKH39w2MCb6HzhtbOFlUUOSyRJ7LwB3+dUav/7ImOFen6qZuTNuIs6N6vOowwkNwkcyvHh+/t+2UXWRQQ2dW3G8w6L2M8Qt9cacwr6lUJAerCwE/CzaWgaoiECo1gCCH0neG73DT1QQ8UY71SPEGsAtaH0i7akgwa4XwcBaxiJotIybzrgi456Zo+bnTJBTDDx8XSOtVFttHjdFy9oq2TRWWZQ==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(7916004)(376002)(396003)(39860400002)(346002)(136003)(366004)(451199021)(84970400001)(966005)(6512007)(9686003)(6666004)(6486002)(83380400001)(86362001)(186003)(38100700002)(33716001)(6506007)(1076003)(26005)(8936002)(5660300002)(41300700001)(8676002)(6916009)(66946007)(66556008)(2906002)(316002)(478600001)(66476007)(4326008)(44832011);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?MHNaWUo0QmwwaEd4dnJJelA0TnRQcm80SUZKZ21XVmlVSEFJSkdySnQzTXQ1?=
- =?utf-8?B?RVFRZmF6S0NmendibDRqYk5wblAwRThJL3Y1SDJhVDUwNldjZnF3WGJFYUJ5?=
- =?utf-8?B?OFJDY1p3UGJsZWd0aWl6OWIrSTRiS2UrbGRrejVqNWJnL0tVTEQ0NEJ0dlVQ?=
- =?utf-8?B?VXl0bEgyUEk0cjdsUzNGTGgxdk9xNlVjeU53KzFPVFBkaTlKQkgwaDJud241?=
- =?utf-8?B?ODFjcDl5VG1Gaml0akpRdDQxS3NYZUUrdzhuY0JqUDRodjBkckhUT0VLczZO?=
- =?utf-8?B?c3RLK0hRenBYZ0ZoUEV4Z0xmdDVpSU5oMklZcTFJYUNpOGJPT1EvbzhWWkRj?=
- =?utf-8?B?L0VoUmY4ekwyOTloZ3hjTjBGTG8wUTlDdnYyaFZBSVRaQXhzU3NMYzdTRUM4?=
- =?utf-8?B?TTAvMWYrQ3NiK3JuZktKSTJZUVZpay90UWpjdm9UYVNBeFo2b2JxWnpyRTUr?=
- =?utf-8?B?VVhFcElZbWJsK2VQenB3K2FEVlVkemdHMm9MUGIrRG9saTRoM0RzbWxEZjNw?=
- =?utf-8?B?K3pHUUdEM2Roc0xjK2NrajVmODB0ZWJOSHp3MG5vYmlEUy9wQ3M4bW9ydWNE?=
- =?utf-8?B?ZzVjSEpZdS9SMHgvbEQ2UnZuM1NKMzFaS1dDN0phQnJNSEdKVmNtNzhRcUZx?=
- =?utf-8?B?dERYaFFZaGYzMC9pM1FHaXd1NkM0ZWpSOTBTQkV0Uks3WVhNQ3h3cEw1Qjhj?=
- =?utf-8?B?TmxUKzhSTDBJUklzQnRzeVFNVHVORDJyOTVEQmtuVzlPYXNIUUJZVDRiV0F1?=
- =?utf-8?B?NEpib0RVZXRUT2hQSlB4bFNXdXJRUVFjQjAxQktqSjExZ2xQcHNwVlFYUXYy?=
- =?utf-8?B?ZGdHMk92d2d2UnBZblZvRnYzMnFiWUNzNHF2d1RqZDgzTzY3QVdZTlRQb2FV?=
- =?utf-8?B?K3cvV0tQdU9qWTdKelg5SGRxQURhNlF0M0ozVkdHcjNFSS9WY3NnU0VuRFli?=
- =?utf-8?B?aDB5UC96bjNXRENaMTdRZG9RcEFydjhrMEJLODlzSGpBejhPUGp2ZExOVVdR?=
- =?utf-8?B?ZklPMWJYOVB1eEFnSDAvNk1UZXRpVm8wTzdCQ2Q4bTEvTmNNbDgzVEtySEx1?=
- =?utf-8?B?QmNXL2g3YUR5NmVtMWpPc2JTQ2xjU0EwVDlsRWlYUmRWTk8xYzIrb2J6Y3dC?=
- =?utf-8?B?R3JmSE56QXBPWHc2K25jL3hYN3dvTGR1Tk1JT2ppR0Z1d2w2VzZOUUppalJq?=
- =?utf-8?B?ZDJEdXUrQ3RJVmZOMHliMjFSU1FDNndIR1NLaWtMcXhacDRrUi8zdFRYaStz?=
- =?utf-8?B?MHlBQ0t2SXhTZXJxdkdTb0ZLU1dMQXA5S3VOVHVFdXU0MzBkcmNucEdHOHFi?=
- =?utf-8?B?RStoTk4wTnh0VmE0Ni9wTEIzVDR4YW1NTC9Sc0JySVYrS0ZXU3NVMDVzamVJ?=
- =?utf-8?B?WlJzL09vNWR2Q2xPOFp5bm5taGliNUZKZSs0VWhBOFl6ays3TUFEWjRrS1Vl?=
- =?utf-8?B?QkdaNGNXK1Y2UlhhdUsrdFU4T2Q0UUxaQkpEWjFLMHF6eTJ1RjhuUS82RHkz?=
- =?utf-8?B?cUhtNWhQWG5ZYlRHSVg3QWQ5TFcyanpLNjRzMDRxNlVXNEFQcElDTUM0RUZX?=
- =?utf-8?B?VWRDU09qRmplMW5wQzB4RWJGaUt5ejBIWEo1cEl6d0FRQzVGenVSMFV0bXdr?=
- =?utf-8?B?VGpodm5ZZGt5cm10cUdSemFaV2xoUHVUOUxneVJhNDBRS2M2OWJ2TTViVjFT?=
- =?utf-8?B?L2swZ1NXUmJ1cElGSi9NNkJkdVFGRmRVOERTbDFVYVIrQ1NPQWdBZjlsQm96?=
- =?utf-8?B?cTIwbFNjQzMrVC9zcVlxeGRlUHl6UjZycWMrQi9lazkrZkEvR0UvYVM4Tngx?=
- =?utf-8?B?eWZQUmxFZk02cmFvTmplKzFxUzh5UjdJdFREQlNLNkNSTCtMWXFPcFVFdG93?=
- =?utf-8?B?cmc3eGV0UFcyeEdoY3B4RFpBWHJydDdxemx4SGF3enJFVW1DWk9lNk9WQyt6?=
- =?utf-8?B?bVB4WnN1ZDJ3Zk1Bc3ZNZDJWd3BuWjdBRW1xcExUWDFzbnAyKzNjOUNDWERu?=
- =?utf-8?B?VnQ2MXZ0UnhMYWl1aEZMWEpHM1IxQmdiU0F0VkJVS1FWSkxWdW9PZUtodjM3?=
- =?utf-8?B?emN1QjlHM0d2MUpiU20vQjJyT2hraXhaQWZaSTFYZFVMK3JrQXdocEFsWnNN?=
- =?utf-8?B?Mk5nbjRuRFpKR0tkZkhNVXZ5TGVrNlZHZVlrRnNnU2dMS09KUUtlWDNKWFpo?=
- =?utf-8?B?RVE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: d1963db2-3748-4ec1-4388-08db92930ba5
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB3625.namprd11.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?VGJhOHFZeGpWZU5wUGpUQk83VklxMWtMdTRyWHVqcG12UlgrNHVMSzU5L2Uz?=
+ =?utf-8?B?NHFrZmlsWmt2ejc4SDZjaHV1ODluNWZlUXh0NTVIUnhvdkJNVnhoWUNiTlRH?=
+ =?utf-8?B?RTVZbUV6UTc3aDYwUVdMRTd6L1NranN6bllGYWtCVXZiZ045YkI5R0REbU1Z?=
+ =?utf-8?B?QW53U3VlOGdLOHZxanc5SURKQ0xsRGlNbUdxbWpiUWs2emtHY3B5RjRmU1Bv?=
+ =?utf-8?B?T2JTdi8vZ0xZWENDU25NaEJLL04wNHFKVWZsdXJ4WlVlTi9jem1ER1dVU0x6?=
+ =?utf-8?B?VW4yVU9tUXA4SnlrQkVnNWs0bG9rOTF6cFU2c1ZmUGJ6Ky94eHlYeXdJRS9B?=
+ =?utf-8?B?ak9sWXNmcWtUaFR1aTJGTjN2TnhXNVlENDFFbEhNbTMzeDM4U2VhZVJaZGY4?=
+ =?utf-8?B?T0ljUmxIeGdEc3RwRnZOekZhN0psVHFvQlBxRVZqZk5PV3ZsWk5qaWpnbkpX?=
+ =?utf-8?B?UnpsY0ovbFZONHpDSjRWaktReUQ2OGZXc0F4OGJxdno5OXUvV0JabDYvNkdN?=
+ =?utf-8?B?OXVoMFVMRzA3OFI3aC96cXcrODM0WWhDaUhuK2dvR0g0Wk5mQzFpTXFraFFr?=
+ =?utf-8?B?M3F3YkMyK0VPaUdpM3lhbXJ3d2daQktmdkJJY2NRd0ExMEIxZmFZS3NNcjZK?=
+ =?utf-8?B?SlpPcUlFZUw4WkZmbCtwa2xJb3NsdS9FRGhhM1BkTzg3bE1JQklCQ3g2M29k?=
+ =?utf-8?B?T0RqTDZxVlNHMHN0NE9BOTRETmlDNWlJTUNPQkZMeDNYWEpLb2JseEdzazR3?=
+ =?utf-8?B?eXpjcnZobEpNcTh4ZUNiMG5FczNmbmVVenNYU2o4SVNLR3BEVFRNcGtqQWxi?=
+ =?utf-8?B?ZWJqTlV0cDRhSWdaMUpRNW9NdUNmMlNCRElEenlRZjFXVmZtZlhmaDg4NjNB?=
+ =?utf-8?B?ZDJlZ1pIVm9lcDg0V3RSQzljSlQ5SFRLa3dNaEYwOHEvQ3AwSVF4VWJyN0dB?=
+ =?utf-8?B?ZXhsbDNPRFl5b05vY0NaVmlDb1J3U3F3SGhJbW1hSVRtaWdsR0ZOZDNlMm9N?=
+ =?utf-8?B?bFNqUkcyc1hBUXhrOE5kTTBIa2MxTHVkMjlZeG8zQmhFYUJtRHdwbGlkN2Ft?=
+ =?utf-8?B?OW1xcjlUdkg2TUU1MG9ramJxcVlQNWRqblBuR05wcEIvZTdYNW1zcTZxTzRK?=
+ =?utf-8?B?bXg5VEUwb3NkWElrcWNQV1I0bDM0M25qbkxET28xRG9rMkg5OGdWTi9NVk5S?=
+ =?utf-8?B?eVVwRUdjV3E0ZTdweWMrVlRLakRRRTVBdGxVUXN4Vk9aVkp3ajQ4Q2xkMW5k?=
+ =?utf-8?B?YnpSdzBWcmw3WDkrYTdpWU5CRy82c1BIRFo2cmt3UUdCaDFRT1Jib093UVhT?=
+ =?utf-8?B?aDFMV0xTV0VWOUtCRktJT0lmMThNbGlvRUM3d1MrR0l2cjFRZmZWTm1YMkFi?=
+ =?utf-8?B?UmtMSnIrNVlNSnlwaE9WOTdmSWc1TCszTFYzZGM0TDhlN1hSb0lvWDk5Y2Jr?=
+ =?utf-8?B?OFFSMXBNaDRzMjhKWmErb2FrREtrQi9zc1UyVnZhcTFyRWRTMTN6UmxvUDJB?=
+ =?utf-8?B?eTFyMkdCOFpwWnliN094QnRNUXFNUWM3YnU0Q04xaW5hUWdMVmxCNWV3eCs4?=
+ =?utf-8?B?THBSYWMzTW5xWVhVTE41amFnbWhMdjZQeEpNN3hLRG9hNk5xZmhtT2EvRzAv?=
+ =?utf-8?B?dXBHZVdUVWRvU28wbUwxMEVMMlhvdUhYc0JaTVdqbGlTdUliZm5NbkFUaytu?=
+ =?utf-8?B?MklWRmU1cnJjdUJ6aXlIeEdKY2p6bDBqR3FMRUYvdURjSEI3ajJWRVJmQ1VI?=
+ =?utf-8?B?eVlWSnVuWGZ2V3F0VHVQQVkraXMyL24xWDJJNTFla1g1SDhnbkIzSVcwb3Ji?=
+ =?utf-8?B?UVk4RVkxcGdOWkhRYk44RFB6cXRlbm91QkwrOU0xZ0ZTSmVIQmIva25FUUdh?=
+ =?utf-8?B?MHBVd3I0eFRCaG5ocWhQbDBLZDlBNEZ0OEpGYXJlUEtaeWJsMUxtTWZVMlBK?=
+ =?utf-8?B?akZEOXJyRzA2NklHOFNPQzQrZ0JHc2FhTXdjcDg2VXJSSk9OV1VsRjZiMkdh?=
+ =?utf-8?B?YmdMbFR5Uk5ydkZieVVkdm5TMGhvUWowZHZBTDlZTkMxUnE3MElQVm9qSkMy?=
+ =?utf-8?B?UWsxUEE1L1FsSW5oSlRtWTZGUEZHNFBFTWdQZE1jTzgwUE9hYzF3djBLMjQ5?=
+ =?utf-8?B?T01Ra0dFaEYycFdibVVwSXFtUnlxdW9QdDJLU2NEQWxGYUtocmZRcHVnTVdW?=
+ =?utf-8?B?Rmc9PQ==?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8d9c658c-59ff-4924-8a61-08db92933ce9
+X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Aug 2023 13:27:25.9870
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Aug 2023 13:28:48.4170
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: UrgKbbHjsL4F/qnNriGbku4Fb1UVwpt2/xjMI158xVTEicKWKpZEttfKLqJBNIFWI9IesigAazS4ZZ5VuA5qC69wjBj6I+ulkPnrldGqk2Q=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB4871
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+X-MS-Exchange-CrossTenant-UserPrincipalName: OpqQKutb3hTEr+aQCXDIo4RAI762mJ6gEgreAZa9nzodGwqotgPwv/BAwz15VvMjyuQ//CiKTO92o7qYiSURug==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DUZPR04MB9966
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Yunsheng Lin <linyunsheng@huawei.com>
-Date: Sat, 29 Jul 2023 19:40:19 +0800
-
-> On 2023/7/28 21:58, Alexander Lobakin wrote:
->> From: Yunsheng Lin <linyunsheng@huawei.com>
->> Date: Fri, 28 Jul 2023 20:02:51 +0800
->>
->>> On 2023/7/27 22:43, Alexander Lobakin wrote:
->>>> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
->>>
->>> ...
->>>
->>>> +bool page_pool_return_skb_page(struct page *page, bool napi_safe)
->>>
->>> Still having the 'page_pool_' prefix seems odd here when it is in the
->>> skbuff.c where most have skb_ or napi_ prefix, is it better to rename
->>> it to something like napi_return_page_pool_page()?
->>
->> Given that how the function that goes next is named, maybe
->> skb_pp_return_page() (or skb_pp_put_page())?
+On Tue, Aug 01, 2023 at 04:19:30PM +0300, Roger Quadros wrote:
+> > Also:
+> > 
+> > ../drivers/net/ethernet/ti/am65-cpsw-qos.c:173:6: warning: no previous prototype for function 'am65_cpsw_iet_change_preemptible_tcs' [-Wmissing-prototypes]
+> > void am65_cpsw_iet_change_preemptible_tcs(struct am65_cpsw_port *port, u8 preemptible_tcs)
+> >      ^
+> > ../drivers/net/ethernet/ti/am65-cpsw-qos.c:173:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
+> > void am65_cpsw_iet_change_preemptible_tcs(struct am65_cpsw_port *port, u8 preemptible_tcs)
+> > ^
+> > static
+> > ../drivers/net/ethernet/ti/am65-cpsw-qos.c:179:6: warning: no previous prototype for function 'am65_cpsw_iet_link_state_update' [-Wmissing-prototypes]
+> > void am65_cpsw_iet_link_state_update(struct net_device *ndev)
+> >      ^
+> > ../drivers/net/ethernet/ti/am65-cpsw-qos.c:179:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
+> > void am65_cpsw_iet_link_state_update(struct net_device *ndev)
+> > ^
+> > static
+> > ../drivers/net/ethernet/ti/am65-cpsw-qos.c:699:33: error: redefinition of 'taprio'
+> >         struct tc_taprio_qopt_offload *taprio = type_data;
+> >                                        ^
+> > ../drivers/net/ethernet/ti/am65-cpsw-qos.c:697:33: note: previous definition is here
+> >         struct tc_taprio_qopt_offload *taprio = type_data;
+> >                                        ^
+> > 2 warnings and 1 error generated.
+> > make[7]: *** [../scripts/Makefile.build:243: drivers/net/ethernet/ti/am65-cpsw-qos.o] Error 1
+> > make[7]: *** Waiting for unfinished jobs....
 > 
-> skb_pp_put_page() seems better.
-> 
-> And I like napi_pp_put_page() with 'napi_' prefix better as
-> it does not take a skb as parameter and the naming is aligned
-> with the 'napi_safe' parameter.
+> I'm pretty sure there weren't any build errors for me.
+> Did you have and resolve conflicts when applying this patch?
 
-Ah, I see. Sounds reasonable. I'll pick napi_pp_put_page() for the next
-round, I like this one.
+Yup, part of it (the error) is to blame due to an auto-merge (conflict
+with 2d800bc500fb ("net/sched: taprio: replace tc_taprio_qopt_offload ::
+enable with a "cmd" enum")) which failed to do the right thing in
+am65_cpsw_setup_taprio():
 
-> 
->>
->>>
->>>> +{
->>>> +	struct napi_struct *napi;
->>>> +	struct page_pool *pp;
->>>> +	bool allow_direct;
->>>> +
->>>> +	page = compound_head(page);
->>>> +
->>>> +	/* page->pp_magic is OR'ed with PP_SIGNATURE after the allocation
->>>> +	 * in order to preserve any existing bits, such as bit 0 for the
->>>> +	 * head page of compound page and bit 1 for pfmemalloc page, so
->>>> +	 * mask those bits for freeing side when doing below checking,
->>>> +	 * and page_is_pfmemalloc() is checked in __page_pool_put_page()
->>>> +	 * to avoid recycling the pfmemalloc page.
->>>> +	 */
->>>> +	if (unlikely((page->pp_magic & ~0x3UL) != PP_SIGNATURE))
->>>> +		return false;
->>>> +
->>>> +	pp = page->pp;
->>>> +
->>>> +	/* Allow direct recycle if we have reasons to believe that we are
->>>> +	 * in the same context as the consumer would run, so there's
->>>> +	 * no possible race.
->>>> +	 */
->>>> +	napi = READ_ONCE(pp->p.napi);
->>>> +	allow_direct = napi_safe && napi &&
->>>> +		READ_ONCE(napi->list_owner) == smp_processor_id();
->>>> +
->>>> +	/* Driver set this to memory recycling info. Reset it on recycle.
->>>> +	 * This will *not* work for NIC using a split-page memory model.
->>>> +	 * The page will be returned to the pool here regardless of the
->>>> +	 * 'flipped' fragment being in use or not.
->>>> +	 */
->>>> +	page_pool_put_full_page(pp, page, allow_direct);
->>>> +
->>>> +	return true;
->>>> +}
->>>> +EXPORT_SYMBOL(page_pool_return_skb_page);
->>>> +
->>>>  static bool skb_pp_recycle(struct sk_buff *skb, void *data, bool napi_safe)
->>
->> (this one)
->>
->>>>  {
->>>>  	if (!IS_ENABLED(CONFIG_PAGE_POOL) || !skb->pp_recycle)
-> 
-> We may need the 'IS_ENABLED(CONFIG_PAGE_POOL' checking in the newly
-> moved function too.
+$ git b4 0f18cf9e-9c5b-02dd-b396-729b9fecdfe7@kernel.org
+Looking up https://lore.kernel.org/r/0f18cf9e-9c5b-02dd-b396-729b9fecdfe7%40kernel.org
+Grabbing thread from lore.kernel.org/all/0f18cf9e-9c5b-02dd-b396-729b9fecdfe7%40kernel.org/t.mbox.gz
+Analyzing 5 messages in the thread
+Checking attestation on all messages, may take a moment...
+---
+  ✓ [PATCH RFC] net: ethernet: ti: am65-cpsw-qos: Add Frame Preemption MAC Merge support
+  ---
+  ✓ Signed: DKIM/kernel.org
+---
+Total patches: 1
+---
+ Link: https://lore.kernel.org/r/20230725072338.20789-1-rogerq@kernel.org
+ Base: not specified
+Applying: net: ethernet: ti: am65-cpsw-qos: Add Frame Preemption MAC Merge support
+Using index info to reconstruct a base tree...
+M       drivers/net/ethernet/ti/am65-cpsw-nuss.c
+M       drivers/net/ethernet/ti/am65-cpsw-qos.c
+Falling back to patching base and 3-way merge...
+Auto-merging drivers/net/ethernet/ti/am65-cpsw-qos.c
+Auto-merging drivers/net/ethernet/ti/am65-cpsw-nuss.c
 
-The first person who noticed this, for sure we should have it!
-
-> 
->>>>
->>
->> Thanks,
->> Olek
->>
->> .
->>
-
-Thanks,
-Olek
+But part of it is legit, and I saw it with a W=1 C=1 build.
+am65_cpsw_iet_link_state_update() and am65_cpsw_iet_change_preemptible_tcs()
+should be static.
 
