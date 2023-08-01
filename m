@@ -1,221 +1,98 @@
-Return-Path: <netdev+bounces-23398-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23397-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8536376BC71
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 20:28:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E67276BC6F
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 20:28:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B63821C21052
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 18:28:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3EF3F1C21058
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 18:28:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E66112515E;
-	Tue,  1 Aug 2023 18:25:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 953BA2514C;
+	Tue,  1 Aug 2023 18:25:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8B6523BD0
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 18:25:56 +0000 (UTC)
-Received: from EUR03-DBA-obe.outbound.protection.outlook.com (mail-dbaeur03on2069.outbound.protection.outlook.com [40.107.104.69])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 427D53C24;
-	Tue,  1 Aug 2023 11:25:24 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=nTl0D2YE40DKwCxyx0cNKcBdTUshdX9fy47eQzLdIq1pBSf5Lel9og8W0HflrmjoASQJBn0OJ1D7w3G71LX55lreh3oOZEzYol7C1KspzzCXyReCt7O/TlK/y2p46HSX+EOzl0mOGyujJG2vby/m2jY6VAal8GiKNUK0V8Gl2RjVja/0DvdRbAqxu/i1KkyjtWUpa734ObcFFJXNkBMlgiqPSf/hwCItFaU2hKSgv+aCQONAo51KUkkGjb6O3415G9wM3ZtalDSbnTR2LpoJlsXE1bmAEHHInp5qjoOSc1Du1+EoCzKuSRsRQLlPubta6OBuF0F67pYZZ3gggv55EA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=FJOJWLJJSzjR9MCfwYjq0sWsA+KZ3LomuYdZ+8LGZeA=;
- b=H9jBv1gy+fZwddNfSKECAG6IVKaFXHHJ7R6y59rUMo4KJBeIMSo2uv/r/yvf9tyyRPI8uifRYplQolfUqaSjmxFyM02hyCtpIBQtdT3fuIIRwOqDiBM4EUTodh57C75aSM6r8S+RulyayrNyhdJ+vDfM4Teg/a4BI1ftuSCKv0dmuYw/eNaTyRs9mp2C53frwgDHS8YoS7fdiCFtYbA4YXwBuEBTlF/tHmcr6C5jBFfnaumoTrUV6MMR55pmBdJN/vEqt+6cTCls93Buag5TJWvnEgbs5nxi8rG27fJOWI02N2sNk8DVsr2757Z/McyugbPP2FWQia3VoWLKwOnCCg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=FJOJWLJJSzjR9MCfwYjq0sWsA+KZ3LomuYdZ+8LGZeA=;
- b=DAKP4trvVx0QuK5BE/FC6bQJnWAYODbSmWHzVUgafXy+ZEVB4qtjrBG3LmmMMdKmGzLCZXpziQZn85ovvChb4sX2ZOutm4xas/zX8FNjuQfMrTZ1CM4MeGJ8/wVXTnOUqaTuo1wCDxPtY+E+fa9hwEgVJo8+5EUf2wR1gCk8rpw=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
- by AM9PR04MB8796.eurprd04.prod.outlook.com (2603:10a6:20b:40b::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.29; Tue, 1 Aug
- 2023 18:24:55 +0000
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::6074:afac:3fae:6194]) by AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::6074:afac:3fae:6194%4]) with mapi id 15.20.6631.045; Tue, 1 Aug 2023
- 18:24:55 +0000
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Cong Wang <xiyou.wangcong@gmail.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
-	linux-kernel@vger.kernel.org,
-	intel-wired-lan@lists.osuosl.org,
-	Muhammad Husaini Zulkifli <muhammad.husaini.zulkifli@intel.com>,
-	Peilin Ye <yepeilin.cs@gmail.com>,
-	Pedro Tammela <pctammela@mojatatu.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Zhengchao Shao <shaozhengchao@huawei.com>,
-	Maxim Georgiev <glipus@gmail.com>
-Subject: [PATCH v3 net-next 10/10] selftests/tc-testing: verify that a qdisc can be grafted onto a taprio class
-Date: Tue,  1 Aug 2023 21:24:21 +0300
-Message-Id: <20230801182421.1997560-11-vladimir.oltean@nxp.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230801182421.1997560-1-vladimir.oltean@nxp.com>
-References: <20230801182421.1997560-1-vladimir.oltean@nxp.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: AM0PR03CA0030.eurprd03.prod.outlook.com
- (2603:10a6:208:14::43) To AM0PR04MB6452.eurprd04.prod.outlook.com
- (2603:10a6:208:16d::21)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 517A123BD0
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 18:25:31 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 801B4C433C7;
+	Tue,  1 Aug 2023 18:25:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1690914331;
+	bh=MEGB0fvf8E6pcjZgn0TbRDSQ1Y9b9+JJUC9Ir1Z7aTI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=K0JE0zTClBDnqIT4QdyHBdwSCMy9Cvl8XOiSelLFEQZasbnkOINid8BrObVLuOfVL
+	 XzpAeP1WNB41DmKVBWqE8O/GCu5nUHaXdyWARdUPq0p1aHvmChK85Y0vxR+K+YMo5J
+	 682F81nr+VL/wEQWNnqSP7SUC48jTgN6PCkl0Iqx6umQrlALjF5SR9/8oRw9bkwlT/
+	 hHXLXjhP1zpQItfMowtOgEHQ+HinyixeoaXRLdAj5JHESitsV67Mdfhb7jKpRcQZoQ
+	 mBgLCSJ8inrFZTfk9DaDGcPzzVUpoUqnbA3qXkaTbhwBT6LY1gXXAHg/7MfOLSZo+Y
+	 1UYjA/9SXeZuw==
+Date: Tue, 1 Aug 2023 11:25:30 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
+ edumazet@google.com, moshe@nvidia.com, saeedm@nvidia.com,
+ idosch@nvidia.com, petrm@nvidia.com
+Subject: Re: [patch net-next 1/8] ynl-gen-c.py: fix rendering of validate
+ field
+Message-ID: <20230801112530.277d3090@kernel.org>
+In-Reply-To: <20230801141907.816280-2-jiri@resnulli.us>
+References: <20230801141907.816280-1-jiri@resnulli.us>
+	<20230801141907.816280-2-jiri@resnulli.us>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|AM9PR04MB8796:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9bebd2f7-5672-4c3a-add3-08db92bc9aff
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	+fBg7O92Ub3d9UCAoLNyrZ+GRLPsrdw4Kxv13Kp+IOx3aR8LuJGtC+p95Ac3vQ/rYHfPHYZXe17Evs2riHh0sNWBVhebtOl+cq4NG0f3EWfTZS/bhB4vB9yCSp9NTWMQdqAAcs3Ch/9jcvCQll9UU198fmZ3BVR7TgsYeg00Ufcg6b+qbAcnMPTuek//WJysvhwICm2yuZsuMfXzs7dCqTAyiZpXKeYox95usF2TkpHfzwes+XImrScufuF1c8qoZITgNqdn5Cu7VxFxl/WRydA2lHgQoCShnQ+aHHC6QjEzSa4X1Wwb4T+EGa6qvrXlr/n3pdaB6CuLDahUUZ9B3wtht7+vTFcWPOJfXdFt0nSLt/v8Umr6zCt8rn820qrQQYKOR4sao0WZSqybEyARNWDFHy8xpl5O3KEiHS9DPua1WZ1LSpsCDatChKNyZCQFvQhhnWmh+AUCRe18KBHGPid7JTg4SDP/mFn4YbV7XA3OE/HB0pIbFD3xoLim5WnnicoshzX4m2YU97+G1XVQ7qfj+D/ij8u+V46ZlWnJzLEIwdKvsnzYVBNdrnkNi4oGM8XUaguruJU22EXnRkheB1JjG0qdw8kNx6WnWdA3NiPg4hjU1nZDeA3tOsCNgSJl
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(366004)(136003)(346002)(39860400002)(396003)(376002)(451199021)(15650500001)(38350700002)(2906002)(1076003)(6506007)(26005)(186003)(38100700002)(52116002)(316002)(83380400001)(2616005)(5660300002)(66946007)(44832011)(8676002)(36756003)(8936002)(6916009)(7416002)(54906003)(41300700001)(478600001)(6512007)(6666004)(6486002)(4326008)(66556008)(66476007)(86362001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?dk/9s3mSknKxrk5ZvFdry+eUpiA2JRh4XNJBbNoXADImJGzpczMGJUrxriES?=
- =?us-ascii?Q?PL8b9R3Kd0siBcOHsjeHEJ/obLxIze/8qFTLqI6pLVL4VdhWKgFxEBUSLr3r?=
- =?us-ascii?Q?uHRtSgji8+pF9RB6PA0EKPoC14IZ/HXZn+N2jWcI2y12Cdbe7s+QdKiah8v8?=
- =?us-ascii?Q?Wvo+wAbcOX8rzbmFKo6mJ83+T86A9+Y4yH5gSny1nKip96W2Pq4IS3F3mKvo?=
- =?us-ascii?Q?dsZ5IwokZ3X9Pi6QF9Zwo1aqgtKzNlL1PBbG0poKH+mEWM5TuzH/DR6wkogU?=
- =?us-ascii?Q?jKs8bkKEPAy8130nN3TfYxUcxEKOYZ3GhJl7XJ3VCMTDVx+XT1rRUbc8qhE1?=
- =?us-ascii?Q?SF6OnXlznBbIRp7j8U8wYEDJv2+a2rQUOhHBN+TXNbuzoLJ4OFDcuIhK1Ion?=
- =?us-ascii?Q?gBCk75RE8XgerNE3e9JGMBx31SOWyk0ll/iIh+gG0AosuJvHsldJB0FltDO4?=
- =?us-ascii?Q?G4vAOP2XyFdB02YUF0wXmNnvF67mMQIub6fb9iXxWi/SgGs1ugp3itw/4jnp?=
- =?us-ascii?Q?Lhy+OIjNRf7A17OyeGB2hy6kL9lrIGAFbHx3kG/vTYDaG7RxdZn8jOe4g/Dz?=
- =?us-ascii?Q?NizsQPOaghSED+0+Pc5omGW/UznckO7LlxPATw7Jj96lnNeClT6RtOVn81/l?=
- =?us-ascii?Q?VhhfuhkUtbP+20kd8RZkVGvH7E/jP2IgRp0hSuo8ctYZuxtCBMk8TbHcG/uS?=
- =?us-ascii?Q?u5PTOJA7WPbmvcUVxDO8/SpoG2Q974gOVRuyuBCfLeimonu/X/Sm9zc2Irux?=
- =?us-ascii?Q?Us6YaGFwSfGANW/wNbxKRIfrXOG69Gbr3SMec8a7JLC/EDnmdE2VDHwiO5HZ?=
- =?us-ascii?Q?MvWZLg9eIhZShXOjCuR9aSxzKFXUfqD9k6plCZXP2lzIPKdZwPJaJC5y/NAJ?=
- =?us-ascii?Q?VnxeF4PYp7NIAqSFC+YO3NJOB5fVEHS2OnwGTFGYNwgEOU1ly+Nfy8jpGVNe?=
- =?us-ascii?Q?PMIVmZ5G9XVnR3DuWrQNS8WeYRoRCvsWt0fsrNecLzvXycj/LhBO7ZM7FWwO?=
- =?us-ascii?Q?OiOcvMVRSQ6GlvsdzKphMp7dMYt5wQY1X/anv3VAQFXhLSDG1/ik1azpJX+j?=
- =?us-ascii?Q?lj2Utcaympr4fXXQBqKmjjqZyzl7pwK7UvAqzRxbDIJsq9wI/kK2uDqgmsko?=
- =?us-ascii?Q?1BJRSutct26Sbr0n+pO4YkNi58iX86JzBdsQ7Fb+/UiIrbuzJWePeO22QEnU?=
- =?us-ascii?Q?/+VNY1tzApbUqtUhEH404PTW0rGK3zfDFW3AtN1Z9W2JZWDMPo/ww0pHhXZW?=
- =?us-ascii?Q?ZriZp05DmSripRghkD9WMIF3TyXh/qqWCjzhhKmbvhpYkzvM9croIDSnDBWO?=
- =?us-ascii?Q?h3wazUFc960W2qwYRFmSt/gkj7V9NUD34Tpr/KPVoW0T3ceINxHrJrejmfUF?=
- =?us-ascii?Q?SUDD14sb/UpTo/iIzUqSRUG0Kw7k2boxgQx8bGczgM/kajSvmAv4p5Fj9cKn?=
- =?us-ascii?Q?yfYgfmQ7JXWAwNim5Wt/MwK8/2nu+Ye0d4hvsZrwXB8PbVs018aMpgw1S0at?=
- =?us-ascii?Q?q/0I0X6nhZMpPyy9brjDUrkIPH8EbQkTdurb5O1OUVUmG+LfS32BW/EWXx7I?=
- =?us-ascii?Q?Wb0KdRoMuggEnVXHp0CD+5knpLdbHcCpjSeESYBjvRvzTRZ0MyYf/H/9hdAG?=
- =?us-ascii?Q?Fw=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9bebd2f7-5672-4c3a-add3-08db92bc9aff
-X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Aug 2023 18:24:55.6351
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: /ME5Wx9E2vOwpyiQeidMeWV0TSaZWw+EayhVUD3IIUNY5MyAuw6pFwZ78Py4mWsftj386i0IVaEDiqz4ueousA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR04MB8796
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-The reason behind commit af7b29b1deaa ("Revert "net/sched: taprio: make
-qdisc_leaf() see the per-netdev-queue pfifo child qdiscs"") was that the
-patch it reverted caused a crash when attaching a CBS shaper to one of
-the taprio classes. Prevent that from happening again by adding a test
-case for it, which now passes correctly in both offload and software
-modes.
+On Tue,  1 Aug 2023 16:19:00 +0200 Jiri Pirko wrote:
+> From: Jiri Pirko <jiri@nvidia.com>
+> 
+> For split ops, do and dump has different value in validate field. Fix
+> the rendering so for do op, only "strict" is filled out and for dump op,
+> "strict" is prefixed by "dump-".
+> 
+> Signed-off-by: Jiri Pirko <jiri@nvidia.com>
+> ---
+>  tools/net/ynl/ynl-gen-c.py | 10 +++++++++-
+>  1 file changed, 9 insertions(+), 1 deletion(-)
+> 
+> diff --git a/tools/net/ynl/ynl-gen-c.py b/tools/net/ynl/ynl-gen-c.py
+> index 650be9b8b693..1c36d0c935da 100755
+> --- a/tools/net/ynl/ynl-gen-c.py
+> +++ b/tools/net/ynl/ynl-gen-c.py
+> @@ -1988,9 +1988,17 @@ def print_kernel_op_table(family, cw):
+>                  cw.block_start()
+>                  members = [('cmd', op.enum_name)]
+>                  if 'dont-validate' in op:
+> +                    dont_validate = []
+> +                    for x in op['dont-validate']:
+> +                        if op_mode == 'do' and x == 'dump':
+> +                            continue
+> +                        if op_mode == "dump" and x == 'strict':
+> +                            x = 'dump-' + x
+> +                        dont_validate.append(x)
+> +
+>                      members.append(('validate',
+>                                      ' | '.join([c_upper('genl-dont-validate-' + x)
+> -                                                for x in op['dont-validate']])), )
+> +                                                for x in dont_validate])), )
+>                  name = c_lower(f"{family.name}-nl-{op_name}-{op_mode}it")
+>                  if 'pre' in op[op_mode]:
+>                      members.append((cb_names[op_mode]['pre'], c_lower(op[op_mode]['pre'])))
 
-Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
-Reviewed-by: Pedro Tammela <pctammela@mojatatu.com>
----
-v2->v3: fix expected output for test 6a83 (missing "refcnt 2")
-v1->v2: patch is new
+I was hoping we can delete GENL_DONT_VALIDATE_DUMP_STRICT
+but there is one cmd (TIPC_NL_LINK_GET) which
+sets GENL_DONT_VALIDATE_STRICT and nothing about the dump.
 
- .../tc-testing/tc-tests/qdiscs/taprio.json    | 50 +++++++++++++++++++
- 1 file changed, 50 insertions(+)
-
-diff --git a/tools/testing/selftests/tc-testing/tc-tests/qdiscs/taprio.json b/tools/testing/selftests/tc-testing/tc-tests/qdiscs/taprio.json
-index 8dbed66a9acc..de51408544e2 100644
---- a/tools/testing/selftests/tc-testing/tc-tests/qdiscs/taprio.json
-+++ b/tools/testing/selftests/tc-testing/tc-tests/qdiscs/taprio.json
-@@ -179,5 +179,55 @@
-             "$TC qdisc del dev $ETH root",
-             "echo \"1\" > /sys/bus/netdevsim/del_device"
-         ]
-+    },
-+    {
-+        "id": "a7bf",
-+        "name": "Graft cbs as child of software taprio",
-+        "category": [
-+            "qdisc",
-+            "taprio",
-+            "cbs"
-+        ],
-+        "plugins": {
-+            "requires": "nsPlugin"
-+        },
-+        "setup": [
-+            "echo \"1 1 8\" > /sys/bus/netdevsim/new_device",
-+            "$TC qdisc replace dev $ETH handle 8001: parent root stab overhead 24 taprio num_tc 8 map 0 1 2 3 4 5 6 7 queues 1@0 1@1 1@2 1@3 1@4 1@5 1@6 1@7 base-time 0 sched-entry S ff 20000000 clockid CLOCK_TAI"
-+        ],
-+        "cmdUnderTest": "$TC qdisc replace dev $ETH handle 8002: parent 8001:8 cbs idleslope 20000 sendslope -980000 hicredit 30 locredit -1470",
-+        "expExitCode": "0",
-+        "verifyCmd": "$TC -d qdisc show dev $ETH",
-+        "matchPattern": "qdisc cbs 8002: parent 8001:8 hicredit 30 locredit -1470 sendslope -980000 idleslope 20000 offload 0",
-+        "matchCount": "1",
-+        "teardown": [
-+            "$TC qdisc del dev $ETH root",
-+            "echo \"1\" > /sys/bus/netdevsim/del_device"
-+        ]
-+    },
-+    {
-+        "id": "6a83",
-+        "name": "Graft cbs as child of offloaded taprio",
-+        "category": [
-+            "qdisc",
-+            "taprio",
-+            "cbs"
-+        ],
-+        "plugins": {
-+            "requires": "nsPlugin"
-+        },
-+        "setup": [
-+            "echo \"1 1 8\" > /sys/bus/netdevsim/new_device",
-+            "$TC qdisc replace dev $ETH handle 8001: parent root stab overhead 24 taprio num_tc 8 map 0 1 2 3 4 5 6 7 queues 1@0 1@1 1@2 1@3 1@4 1@5 1@6 1@7 base-time 0 sched-entry S ff 20000000 flags 0x2"
-+        ],
-+        "cmdUnderTest": "$TC qdisc replace dev $ETH handle 8002: parent 8001:8 cbs idleslope 20000 sendslope -980000 hicredit 30 locredit -1470",
-+        "expExitCode": "0",
-+        "verifyCmd": "$TC -d qdisc show dev $ETH",
-+        "matchPattern": "qdisc cbs 8002: parent 8001:8 refcnt 2 hicredit 30 locredit -1470 sendslope -980000 idleslope 20000 offload 0",
-+        "matchCount": "1",
-+        "teardown": [
-+            "$TC qdisc del dev $ETH root",
-+            "echo \"1\" > /sys/bus/netdevsim/del_device"
-+        ]
-     }
- ]
+To express something like that we should add dump-strict as
+an allowed flag explicitly rather than doing the auto-prepending
 -- 
-2.34.1
-
+pw-bot: cr
 
