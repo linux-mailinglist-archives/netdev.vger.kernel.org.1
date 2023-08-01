@@ -1,123 +1,92 @@
-Return-Path: <netdev+bounces-23064-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23065-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4ACB476A8E7
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 08:23:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4FB0E76A914
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 08:29:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7BC451C20DD3
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 06:23:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 893001C20DBB
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 06:29:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 317FD4A15;
-	Tue,  1 Aug 2023 06:22:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E2835667;
+	Tue,  1 Aug 2023 06:29:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B405F4C8C
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 06:22:50 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B5CFC4339A;
-	Tue,  1 Aug 2023 06:22:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690870970;
-	bh=kuEWnL9p9BoO9qyiypu88WnOmaK1A5r5Av53wC58X/4=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=sTAaCdjqqtaGw4jXqE8Zp1B4A46QbjBp0dXr631H/PgNlLVBuyCklYAGke2Wh0SrB
-	 V3LiY5YC3HRiuHhVcgPq7e69TY1EfVP0ql+l85qpEBSMzhf5uQV4tFTSYFr0fOcbD8
-	 YijqLZynDBoU/TqXA6ioHSRUf0zg2cPEPkzDJ9f3wj9kVA8/uPOlBzgCkQGQN9i6Pw
-	 MPgq4IbGoM20r5r/j6iwS46RTzkeZJdGrcnUb/gBr559dRO7FmwyUfLNRKW9oHmcfA
-	 G8TOEodJKvNN7nvplCEH4mTmHxXpQvq9abVmp9aoVl+hf+yq/awLxqUl2ijo8ewb5h
-	 wIgfwLXTr1gpA==
-From: "Jiri Slaby (SUSE)" <jirislaby@kernel.org>
-To: gregkh@linuxfoundation.org
-Cc: linux-serial@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"Jiri Slaby (SUSE)" <jirislaby@kernel.org>,
-	Max Staudt <max@enpas.org>,
-	Wolfgang Grandegger <wg@grandegger.com>,
-	Marc Kleine-Budde <mkl@pengutronix.de>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-	linux-can@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH 2/2] net: nfc: remove casts from tty->disc_data
-Date: Tue,  1 Aug 2023 08:22:37 +0200
-Message-ID: <20230801062237.2687-3-jirislaby@kernel.org>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230801062237.2687-1-jirislaby@kernel.org>
-References: <20230801062237.2687-1-jirislaby@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 624C3EA3
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 06:29:02 +0000 (UTC)
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E269F19AA;
+	Mon, 31 Jul 2023 23:28:32 -0700 (PDT)
+Received: from canpemm500007.china.huawei.com (unknown [172.30.72.56])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RFQ9r2JMzzVjrq;
+	Tue,  1 Aug 2023 14:26:40 +0800 (CST)
+Received: from [10.174.179.215] (10.174.179.215) by
+ canpemm500007.china.huawei.com (7.192.104.62) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Tue, 1 Aug 2023 14:28:22 +0800
+Subject: Re: [PATCH v2] ip6mr: Fix skb_under_panic in ip6mr_cache_report()
+To: Jakub Kicinski <kuba@kernel.org>
+CC: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
+	<pabeni@redhat.com>, <yoshfuji@linux-ipv6.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <simon.horman@corigine.com>
+References: <20230728121703.29572-1-yuehaibing@huawei.com>
+ <20230731200959.2019cb9c@kernel.org>
+From: YueHaibing <yuehaibing@huawei.com>
+Message-ID: <f91c3fd7-8d7a-7a91-8d16-935c90ef9b5d@huawei.com>
+Date: Tue, 1 Aug 2023 14:28:21 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.5.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+In-Reply-To: <20230731200959.2019cb9c@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.179.215]
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ canpemm500007.china.huawei.com (7.192.104.62)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-3.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-tty->disc_data is 'void *', so there is no need to cast from that.
-Therefore remove the casts and assign the pointer directly.
+On 2023/8/1 11:09, Jakub Kicinski wrote:
+> On Fri, 28 Jul 2023 20:17:03 +0800 Yue Haibing wrote:
+>>  #ifdef CONFIG_IPV6_PIMSM_V2
+>> +	int nhoff = skb_network_offset(pkt);
+>>  	if (assert == MRT6MSG_WHOLEPKT || assert == MRT6MSG_WRMIFWHOLE)
+>> -		skb = skb_realloc_headroom(pkt, -skb_network_offset(pkt)
+>> -						+sizeof(*msg));
+>> +		skb = skb_realloc_headroom(pkt, -nhoff + sizeof(*msg));
+> 
+> These changes look unnecessary. You can leave this code be (as ugly as
+> it is)...
+> 
+>>  	else
+>>  #endif
+>>  		skb = alloc_skb(sizeof(struct ipv6hdr) + sizeof(*msg), GFP_ATOMIC);
+>> @@ -1073,7 +1073,7 @@ static int ip6mr_cache_report(const struct mr_table *mrt, struct sk_buff *pkt,
+>>  		   And all this only to mangle msg->im6_msgtype and
+>>  		   to set msg->im6_mbz to "mbz" :-)
+>>  		 */
+>> -		skb_push(skb, -skb_network_offset(pkt));
+>> +		__skb_pull(skb, nhoff);
+> 
+> .. and just replace the push here with:
+> 
+>   __skb_pull(skb, skb_network_offset(pkt));
 
-Signed-off-by: Jiri Slaby (SUSE) <jirislaby@kernel.org>
-Cc: Max Staudt <max@enpas.org>
-Cc: Wolfgang Grandegger <wg@grandegger.com>
-Cc: Marc Kleine-Budde <mkl@pengutronix.de>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: linux-can@vger.kernel.org
-Cc: netdev@vger.kernel.org
----
- net/nfc/nci/uart.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/net/nfc/nci/uart.c b/net/nfc/nci/uart.c
-index cc8fa9e36159..082f94be0996 100644
---- a/net/nfc/nci/uart.c
-+++ b/net/nfc/nci/uart.c
-@@ -172,7 +172,7 @@ static int nci_uart_tty_open(struct tty_struct *tty)
-  */
- static void nci_uart_tty_close(struct tty_struct *tty)
- {
--	struct nci_uart *nu = (void *)tty->disc_data;
-+	struct nci_uart *nu = tty->disc_data;
- 
- 	/* Detach from the tty */
- 	tty->disc_data = NULL;
-@@ -204,7 +204,7 @@ static void nci_uart_tty_close(struct tty_struct *tty)
-  */
- static void nci_uart_tty_wakeup(struct tty_struct *tty)
- {
--	struct nci_uart *nu = (void *)tty->disc_data;
-+	struct nci_uart *nu = tty->disc_data;
- 
- 	if (!nu)
- 		return;
-@@ -298,7 +298,7 @@ static int nci_uart_default_recv_buf(struct nci_uart *nu, const u8 *data,
- static void nci_uart_tty_receive(struct tty_struct *tty, const u8 *data,
- 				 const char *flags, int count)
- {
--	struct nci_uart *nu = (void *)tty->disc_data;
-+	struct nci_uart *nu = tty->disc_data;
- 
- 	if (!nu || tty != nu->tty)
- 		return;
-@@ -325,7 +325,7 @@ static void nci_uart_tty_receive(struct tty_struct *tty, const u8 *data,
- static int nci_uart_tty_ioctl(struct tty_struct *tty, unsigned int cmd,
- 			      unsigned long arg)
- {
--	struct nci_uart *nu = (void *)tty->disc_data;
-+	struct nci_uart *nu = tty->disc_data;
- 	int err = 0;
- 
- 	switch (cmd) {
--- 
-2.41.0
-
+Thanks， will do this in v3.
+> 
 
