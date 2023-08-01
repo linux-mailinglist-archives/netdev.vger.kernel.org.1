@@ -1,176 +1,84 @@
-Return-Path: <netdev+bounces-23082-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23083-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5339476AACB
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 10:22:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3ED7676AACC
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 10:22:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DB1082817B5
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 08:22:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A72B1C20DC0
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 08:22:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 213061ED35;
-	Tue,  1 Aug 2023 08:22:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 601111ED36;
+	Tue,  1 Aug 2023 08:22:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15B531EA9A
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 08:22:22 +0000 (UTC)
-Received: from out1-smtp.messagingengine.com (out1-smtp.messagingengine.com [66.111.4.25])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 649AFA0;
-	Tue,  1 Aug 2023 01:22:18 -0700 (PDT)
-Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
-	by mailout.nyi.internal (Postfix) with ESMTP id 7FDD45C0199;
-	Tue,  1 Aug 2023 04:22:14 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute3.internal (MEProxy); Tue, 01 Aug 2023 04:22:14 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=cc
-	:cc:content-type:content-type:date:date:from:from:in-reply-to
-	:in-reply-to:message-id:mime-version:references:reply-to:sender
-	:subject:subject:to:to; s=fm3; t=1690878134; x=1690964534; bh=zL
-	gI/uNzK7BjtxKP7opAgWAxcQoVQdR3NkvIMGr2ag4=; b=KkavFvbilurztKhb/P
-	GxWPsALUC60a5BVFcbzzBcyTMNRym6j4aVO1i2o3k8eWeRyuhjNrZhEiNbTJsAhI
-	qGlspjNbTC6HppGbW3F8hYGMHyDN6QI0g7ZHlqfRvLq0oIQxIUKqt6y31YzoffFR
-	RMkl+SAFDUtnerSrKVyctf9CW0LBaTNuFms9OeouLGUXEq/vFkqRDIXlyXVTDljh
-	qAtSmX9gt0G1fmwy1BMMsFpQFfmTwvAK3eMji5ji/CcQ1IzVhc8Wc8KITuV39OwV
-	Fa9Q6CvUL8OYzzQXP9wj/OpEOruvQDntNkNFjOZXncBc9c/YjgZYMgzHjZi2hCTc
-	4Qlg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:sender:subject
-	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-	:x-sasl-enc; s=fm3; t=1690878134; x=1690964534; bh=zLgI/uNzK7Bjt
-	xKP7opAgWAxcQoVQdR3NkvIMGr2ag4=; b=W9XAsHYprgh+0uF2SpgOdRA4DhuA6
-	79GkChxs9BM77awMrc+SuP4lGjaGy5vfIILWUGEvfh+hs4NfD6H9yzlx/YB3ud49
-	gTIapQbWUEkliaxXKbwv4dvaUSMA95C0Is8L5KlJTV2UnriEd1WBaZm9fNr16OSU
-	AMggbG+OZ2WXckIRMILAbBeTEsuyTq6L6sbfMn6H2DEEKKa0Jhm8ujuvDkGV2GKT
-	F0s+A1wMH0sbLUWd5phRCFzUP0nTxDpf2XNiwPytz2e9af56eOHR+Kj5DTiI7xBF
-	wjwLU96IpaFSjordbNjBCFGVoujXKKdgwCl27TcuOiHDsUp92vuy6VBBA==
-X-ME-Sender: <xms:tsDIZKw8eceU2NZ8vqqqufK9l5lS8s8_p3X-c9kG7VZ-pdN_bgElJA>
-    <xme:tsDIZGR5pzkKGmILQcPauCaVmqRn5MDunXBzaAMp9Zn8FhTmTVJFef3ucZnQK8NIC
-    p_pSkB3Jsg6WA>
-X-ME-Received: <xmr:tsDIZMXf7pptWKy-fTeyonnkLRH8O-wCElabDSPuDkgLIgCDSOD12j-O-jnZv1VSjNC4K0-fMCHWWkNv9TwDEHwKnHZZnjR6n3W0uw>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrjeeigddtudcutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
-    fjughrpeffhffvvefukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpefirhgvghcu
-    mffjuceoghhrvghgsehkrhhorghhrdgtohhmqeenucggtffrrghtthgvrhhnpeehgedvve
-    dvleejuefgtdduudfhkeeltdeihfevjeekjeeuhfdtueefhffgheekteenucevlhhushht
-    vghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehgrhgvgheskhhrohgrhh
-    drtghomh
-X-ME-Proxy: <xmx:tsDIZAixP_kCg-X7zomnJoJGh-jC46C5ayj2Ha_PnQeC1r9-RbFkUA>
-    <xmx:tsDIZMBUz7hzlAEoU7KjKsiWYxsC5_Bit_5cswS85lRaWPIrGtDmtA>
-    <xmx:tsDIZBIyUhjyI4mqo5Dut9ysqQwArDYV2aZibd-E0fm2AcV55l6kmA>
-    <xmx:tsDIZGyyfQWnjaOpuB3valQ_BCMjrUdJOEExAxHKbspfVMHxkVEp1Q>
-Feedback-ID: i787e41f1:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 1 Aug 2023 04:22:13 -0400 (EDT)
-Date: Tue, 1 Aug 2023 10:22:11 +0200
-From: Greg KH <greg@kroah.com>
-To: Shaoying Xu <shaoyi@amazon.com>
-Cc: stable@vger.kernel.org, netdev@vger.kernel.org,
-	Lion <nnamrec@gmail.com>, Eric Dumazet <edumazet@google.com>,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Pedro Tammela <pctammela@mojatatu.com>,
-	Simon Horman <simon.horman@corigine.com>,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH 4.14,5.4] net/sched: sch_qfq: account for stab overhead
- in qfq_enqueue
-Message-ID: <2023080103-zigzagged-morse-2a0f@gregkh>
-References: <20230727204149.GA30816@dev-dsk-shaoyi-2b-b6ac9e9c.us-west-2.amazon.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5340D1EA9A
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 08:22:41 +0000 (UTC)
+Received: from out30-110.freemail.mail.aliyun.com (out30-110.freemail.mail.aliyun.com [115.124.30.110])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0BC9A0
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 01:22:39 -0700 (PDT)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R381e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045168;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0Voowt87_1690878155;
+Received: from localhost(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0Voowt87_1690878155)
+          by smtp.aliyun-inc.com;
+          Tue, 01 Aug 2023 16:22:36 +0800
+From: Heng Qi <hengqi@linux.alibaba.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	netdev@vger.kernel.org,
+	virtualization@lists.linux-foundation.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Subject: [RFC PATCH 0/6] virtio-net: support dynamic coalescing moderation
+Date: Tue,  1 Aug 2023 16:22:29 +0800
+Message-Id: <20230801082235.21634-1-hengqi@linux.alibaba.com>
+X-Mailer: git-send-email 2.19.1.6.gb485710b
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230727204149.GA30816@dev-dsk-shaoyi-2b-b6ac9e9c.us-west-2.amazon.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Jul 27, 2023 at 08:41:49PM +0000, Shaoying Xu wrote:
-> [ Upstream commit 3e337087c3b5805fe0b8a46ba622a962880b5d64 ]
-> 
-> Lion says:
-> -------
-> In the QFQ scheduler a similar issue to CVE-2023-31436
-> persists.
-> 
-> Consider the following code in net/sched/sch_qfq.c:
-> 
-> static int qfq_enqueue(struct sk_buff *skb, struct Qdisc *sch,
->                 struct sk_buff **to_free)
-> {
->      unsigned int len = qdisc_pkt_len(skb), gso_segs;
-> 
->     // ...
-> 
->      if (unlikely(cl->agg->lmax < len)) {
->          pr_debug("qfq: increasing maxpkt from %u to %u for class %u",
->               cl->agg->lmax, len, cl->common.classid);
->          err = qfq_change_agg(sch, cl, cl->agg->class_weight, len);
->          if (err) {
->              cl->qstats.drops++;
->              return qdisc_drop(skb, sch, to_free);
->          }
-> 
->     // ...
-> 
->      }
-> 
-> Similarly to CVE-2023-31436, "lmax" is increased without any bounds
-> checks according to the packet length "len". Usually this would not
-> impose a problem because packet sizes are naturally limited.
-> 
-> This is however not the actual packet length, rather the
-> "qdisc_pkt_len(skb)" which might apply size transformations according to
-> "struct qdisc_size_table" as created by "qdisc_get_stab()" in
-> net/sched/sch_api.c if the TCA_STAB option was set when modifying the qdisc.
-> 
-> A user may choose virtually any size using such a table.
-> 
-> As a result the same issue as in CVE-2023-31436 can occur, allowing heap
-> out-of-bounds read / writes in the kmalloc-8192 cache.
-> -------
-> 
-> We can create the issue with the following commands:
-> 
-> tc qdisc add dev $DEV root handle 1: stab mtu 2048 tsize 512 mpu 0 \
-> overhead 999999999 linklayer ethernet qfq
-> tc class add dev $DEV parent 1: classid 1:1 htb rate 6mbit burst 15k
-> tc filter add dev $DEV parent 1: matchall classid 1:1
-> ping -I $DEV 1.1.1.2
-> 
-> This is caused by incorrectly assuming that qdisc_pkt_len() returns a
-> length within the QFQ_MIN_LMAX < len < QFQ_MAX_LMAX.
-> 
-> Fixes: 462dbc9101ac ("pkt_sched: QFQ Plus: fair-queueing service at DRR cost")
-> Reported-by: Lion <nnamrec@gmail.com>
-> Reviewed-by: Eric Dumazet <edumazet@google.com>
-> Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
-> Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
-> Reviewed-by: Simon Horman <simon.horman@corigine.com>
-> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-> [Backport patch for stable kernels 4.14 and 5.4. Since QFQ_MAX_LMAX is not 
-> defined, replace it with 1UL << QFQ_MTU_SHIFT.]
-> Cc: <stable@vger.kernel.org> # 4.14, 5.4
-> Signed-off-by: Shaoying Xu <shaoyi@amazon.com>
-> 
-> ---
->  net/sched/sch_qfq.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
+Now, virtio-net already supports per-queue moderation parameter
+setting. Based on this, we use the netdim library[1] of linux to support
+dynamic coalescing moderation for virtio-net.
 
-Now queued up, thanks.
+[1] https://docs.kernel.org/networking/net_dim.html
 
-greg k-h
+---
+On top of
+https://lore.kernel.org/all/20230731070656.96411-1-gavinl@nvidia.com/
+
+Heng Qi (6):
+  virtio-net: returns whether napi is complete
+  virtio-net: separate rx/tx coalescing moderation cmds
+  virtio-net: extract virtqueue coalescig cmd for reuse
+  virtio-net: support rx netdim
+  virtio-net: support tx netdim
+  virtio-net: a tiny comment update
+
+ drivers/net/virtio_net.c | 284 +++++++++++++++++++++++++++++++++------
+ 1 file changed, 242 insertions(+), 42 deletions(-)
+
+-- 
+2.19.1.6.gb485710b
+
 
