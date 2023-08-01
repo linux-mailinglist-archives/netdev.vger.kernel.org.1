@@ -1,59 +1,59 @@
-Return-Path: <netdev+bounces-23439-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23440-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E85776BF93
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 23:54:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 924C476BF94
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 23:55:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 812061C21055
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 21:54:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4DE22281B84
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 21:55:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E39A026B9C;
-	Tue,  1 Aug 2023 21:54:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0652275A0;
+	Tue,  1 Aug 2023 21:54:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D200A214E9
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 21:54:24 +0000 (UTC)
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEFBC103
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 14:54:22 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d326cb4c97fso2500329276.0
-        for <netdev@vger.kernel.org>; Tue, 01 Aug 2023 14:54:22 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEA19214E9
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 21:54:30 +0000 (UTC)
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E954E103
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 14:54:27 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-583312344e7so75897357b3.1
+        for <netdev@vger.kernel.org>; Tue, 01 Aug 2023 14:54:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690926862; x=1691531662;
+        d=google.com; s=20221208; t=1690926867; x=1691531667;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=9t3UVTAg7ytzQSNnMwpet2CewMeyBk+4GY+nBj1yWYc=;
-        b=PVlmH0u5uWwrNIq7T4UBmZ1UBub9wl73NmrAtzvHNG9QyGe8k2BMLohhAgCN5cMss9
-         oPkS5D377/yJlgU1bH7gmqd2JDPlyLL3IWsyJbrCcDRID4WuW9fBe6o3SoatclppCAyL
-         iYnAsB6PQ3cmQFYihKAVcAh9mRr2cwaViJNO/40Gv3fyrZ9x652WqPMp4NLMmdFngX2B
-         j4uV3MMrizegKzTQMfHAjLVhbGwlhPIFiNDcbWaJRf6IQXT9VqYwUuIRLk/ZFHigfoVD
-         jv0u/rvfeWnu27aiHfkpqqmbvGfaTUwTlZ06bNsfRKFzydD0g0im0fWL/XpUUqufKtDN
-         ws6g==
+        bh=msnpB26+MQEepl2pGqvJWCJqBDtlSL8Bx7LknnGsunY=;
+        b=oFJok2XW5ntkyA2PTSs92XFcRJfxOd7VOwsQWKIdAXXSm2J7mHCBJ9EIbLmQIWTxfg
+         8X3og0LVumdD0pPn+1p2E1njGEjNij+BOqFFSREUYyKgfIBUOfSWWkT+iSgLwu6D3Yyr
+         vulBWR1WSGuX2zDkDtLgKQA2/QyszrDRkv9dtLiVWaRRGAWgTIX6dBvyIlgg+/qEV397
+         D4c55wJTUKPRxMNtB8k1kDKyYNd5XXfLsYKHI+f8iRD2A8EQx41JEDc2Ql2JY76yGWSY
+         SsQsYi9FSprR/BwLpo0jX48MD+GR7wHJb0O7JYghvyoMTQikbrvG7NBG+zjh5wUbzdNz
+         /AAA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690926862; x=1691531662;
+        d=1e100.net; s=20221208; t=1690926867; x=1691531667;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9t3UVTAg7ytzQSNnMwpet2CewMeyBk+4GY+nBj1yWYc=;
-        b=NfCazvwDSj2qCvyLpLwsjE1b2MqCXhE22gj52YpwEvcRdSfGfFxkgmZG+970r4A9GV
-         /oiJ35ztzLrjhLsc2h0Tcmw0xOzQKpnZ5/kdkbDvTgj7fUp+S1Zpo6/35uVHwxwpGB97
-         FsTjnM/XtYZDC2G2s9d0OZ/+oU5ce6tQJQ2OCmePB2Ctm/u9VA0qp90lxf7tGZ8ofd36
-         dDvIC6JxyE13Z+ctxYUnLnyhYNzTmRcwyTM1jgX4bY2kLRgs6XsrC8A0Wu9bNVsxjm04
-         NMqVchRb62wreoqW7HZSnF80AG9GB8oVL7PSPKWut9qo9ha1x8iZCLGNwaIWcMHOir8M
-         QxKg==
-X-Gm-Message-State: ABy/qLYZrdm5llRP//nWaLEY6lYHU8a39JdciQmm1i1Rnk982UmuRJG8
-	O3bhkDdJmV8PQ3B2+oZ/VOb+xrEbnggOQmNw2YXst4X5lg7DIa79Q/jOncc/9MMNa3ECr4R5p0Q
-	+dIlODjWpQZBV0WgRs7ltS7wRvaoJs2HuQP51Jqv5OGNY6lyObEz6uZ7orohVf4pz
-X-Google-Smtp-Source: APBJJlFQd5tGh+LJoU2J3smYQxNJcR358XLWMhcBeajA+s60x7q3mZydfud+MANjsTxM2YNMtb00BlyBqoIM
+        bh=msnpB26+MQEepl2pGqvJWCJqBDtlSL8Bx7LknnGsunY=;
+        b=WPBIFrB4sQlbEuY0q4+o8uq1blK2pGvse+EdWJl48iKc6L5hGW/HK2Vv5s7dfTJo/Z
+         QX70D9Phfdwpzs0k66K5USZtGFTRSuoM1cV3uINMWHglqUy6d4dNS3U9KtNcQ1jT79cy
+         /NAbVlv4g6gTAR9fAcxfAPKiuS8Ewd/IbZ4piwODg9aWwqlOoVPKTOL0UgoXanTqPywZ
+         3uGk9BkIxWAxz33q5ZVHrsmE9vCSPsAbg/0y/Q+KgYQQIqbUirqsamNa+8cVYERNdNkU
+         sDJaicClLTBfZaYXdsOIAvdlyFh0M9UQH2fGwCPWl91Q0isVvIMrAldJy937rmu8LCm7
+         w26Q==
+X-Gm-Message-State: ABy/qLYKX5dY9Y7x4mhE4n7tWQ312Akp7ehDyW69r/9oACdeVv/lE9VA
+	mbaAkLcZmqhPWgBnJw4PPqvP0MtcIoHDzYO+hcMv70w+vFysrYbRMoE0fWGYYGnVeA37Nv9xljc
+	Zhh9wgw/AI7qkntwaqhgvRbAjoLnwZBXgbi8EmrSQtGvZ1rvm8iRsRIVFZgNBdliQ
+X-Google-Smtp-Source: APBJJlHEfjIFzni8qOi9HOfFIgyY8LJ7WgaaCB6/j7SQsVHD5c+Ahztoj1mIkFmd79SF59ThIOFGYe+naTLl
 X-Received: from wrushilg.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:2168])
- (user=rushilg job=sendgmr) by 2002:a05:6902:160e:b0:d09:6ba9:69ec with SMTP
- id bw14-20020a056902160e00b00d096ba969ecmr101761ybb.4.1690926862127; Tue, 01
- Aug 2023 14:54:22 -0700 (PDT)
-Date: Tue,  1 Aug 2023 21:54:03 +0000
+ (user=rushilg job=sendgmr) by 2002:a81:eb14:0:b0:56c:e585:8b19 with SMTP id
+ n20-20020a81eb14000000b0056ce5858b19mr121242ywm.2.1690926866793; Tue, 01 Aug
+ 2023 14:54:26 -0700 (PDT)
+Date: Tue,  1 Aug 2023 21:54:04 +0000
 In-Reply-To: <20230801215405.2192259-1-rushilg@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -63,8 +63,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20230801215405.2192259-1-rushilg@google.com>
 X-Mailer: git-send-email 2.41.0.585.gd2178a4bd4-goog
-Message-ID: <20230801215405.2192259-2-rushilg@google.com>
-Subject: [PATCH net-next 1/4] gve: Control path for DQO-QPL
+Message-ID: <20230801215405.2192259-3-rushilg@google.com>
+Subject: [PATCH net-next 2/4] gve: Tx path for QPL
 From: Rushil Gupta <rushilg@google.com>
 To: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, 
 	willemb@google.com, edumazet@google.com, pabeni@redhat.com
@@ -78,397 +78,694 @@ X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Add checks, abi-changes and device options to support
-QPL mode for DQO in addition to GQI. Also, use
-pages-per-qpl supplied by device-option to control the
-size of the "queue-page-list".
+Each QPL page is divided into GVE_TX_BUFS_PER_PAGE_DQO buffers.
+When a packet needs to be transmitted, we break the packet into max
+GVE_TX_BUF_SIZE_DQO sized chunks and transmit each chunk using a TX
+descriptor.
+We allocate the TX buffers from the free list in dqo_tx.
+We store these TX buffer indices in an array in the pending_packet
+structure.
+
+The TX buffers are returned to the free list in dqo_compl after
+receiving packet completion or when removing packets from miss
+completions list.
 
 Signed-off-by: Rushil Gupta <rushilg@google.com>
 Reviewed-by: Willem de Bruijn <willemb@google.com>
 Signed-off-by: Praveen Kaligineedi <pkaligineedi@google.com>
 Signed-off-by: Bailey Forrest <bcf@google.com>
 ---
- drivers/net/ethernet/google/gve/gve.h        | 20 ++++-
- drivers/net/ethernet/google/gve/gve_adminq.c | 93 +++++++++++++++++---
- drivers/net/ethernet/google/gve/gve_adminq.h | 10 +++
- drivers/net/ethernet/google/gve/gve_main.c   | 20 +++--
- 4 files changed, 123 insertions(+), 20 deletions(-)
+ drivers/net/ethernet/google/gve/gve.h        |  83 +++-
+ drivers/net/ethernet/google/gve/gve_tx_dqo.c | 404 +++++++++++++++----
+ 2 files changed, 404 insertions(+), 83 deletions(-)
 
 diff --git a/drivers/net/ethernet/google/gve/gve.h b/drivers/net/ethernet/google/gve/gve.h
-index 4b425bf71ede..517a63b60cb9 100644
+index 517a63b60cb9..dee2db6f6750 100644
 --- a/drivers/net/ethernet/google/gve/gve.h
 +++ b/drivers/net/ethernet/google/gve/gve.h
-@@ -51,6 +51,12 @@
+@@ -57,6 +57,20 @@
+ /* Maximum TSO size supported on DQO */
+ #define GVE_DQO_TX_MAX	0x3FFFF
  
- #define GVE_GQ_TX_MIN_PKT_DESC_BYTES 182
- 
-+#define DQO_QPL_DEFAULT_TX_PAGES 512
-+#define DQO_QPL_DEFAULT_RX_PAGES 2048
++#define GVE_TX_BUF_SHIFT_DQO 11
 +
-+/* Maximum TSO size supported on DQO */
-+#define GVE_DQO_TX_MAX	0x3FFFF
++/* 2K buffers for DQO-QPL */
++#define GVE_TX_BUF_SIZE_DQO BIT(GVE_TX_BUF_SHIFT_DQO)
++#define GVE_TX_BUFS_PER_PAGE_DQO (PAGE_SIZE >> GVE_TX_BUF_SHIFT_DQO)
++#define GVE_MAX_TX_BUFS_PER_PKT (DIV_ROUND_UP(GVE_DQO_TX_MAX, GVE_TX_BUF_SIZE_DQO))
++
++/* If number of free/recyclable buffers are less than this threshold; driver
++ * allocs and uses a non-qpl page on the receive path of DQO QPL to free
++ * up buffers.
++ * Value is set big enough to post at least 3 64K LRO packet via 2K buffer to NIC.
++ */
++#define GVE_DQO_QPL_ONDEMAND_ALLOC_THRESHOLD 96
 +
  /* Each slot in the desc ring has a 1:1 mapping to a slot in the data ring */
  struct gve_rx_desc_queue {
  	struct gve_rx_desc *desc_ring; /* the descriptor ring */
-@@ -531,6 +537,7 @@ enum gve_queue_format {
- 	GVE_GQI_RDA_FORMAT		= 0x1,
- 	GVE_GQI_QPL_FORMAT		= 0x2,
- 	GVE_DQO_RDA_FORMAT		= 0x3,
-+	GVE_DQO_QPL_FORMAT		= 0x4,
- };
+@@ -334,8 +348,14 @@ struct gve_tx_pending_packet_dqo {
+ 	 * All others correspond to `skb`'s frags and should be unmapped with
+ 	 * `dma_unmap_page`.
+ 	 */
+-	DEFINE_DMA_UNMAP_ADDR(dma[MAX_SKB_FRAGS + 1]);
+-	DEFINE_DMA_UNMAP_LEN(len[MAX_SKB_FRAGS + 1]);
++	union {
++		struct {
++			DEFINE_DMA_UNMAP_ADDR(dma[MAX_SKB_FRAGS + 1]);
++			DEFINE_DMA_UNMAP_LEN(len[MAX_SKB_FRAGS + 1]);
++		};
++		s16 tx_qpl_buf_ids[GVE_MAX_TX_BUFS_PER_PKT];
++	};
++
+ 	u16 num_bufs;
  
- struct gve_priv {
-@@ -550,7 +557,8 @@ struct gve_priv {
- 	u16 num_event_counters;
- 	u16 tx_desc_cnt; /* num desc per ring */
- 	u16 rx_desc_cnt; /* num desc per ring */
--	u16 tx_pages_per_qpl; /* tx buffer length */
-+	u16 tx_pages_per_qpl; /* Suggested number of pages per qpl for TX queues by NIC */
-+	u16 rx_pages_per_qpl; /* Suggested number of pages per qpl for RX queues by NIC */
- 	u16 rx_data_slot_cnt; /* rx buffer length */
- 	u64 max_registered_pages;
- 	u64 num_registered_pages; /* num pages registered with NIC */
-@@ -808,11 +816,17 @@ static inline u32 gve_rx_idx_to_ntfy(struct gve_priv *priv, u32 queue_idx)
- 	return (priv->num_ntfy_blks / 2) + queue_idx;
- }
+ 	/* Linked list index to next element in the list, or -1 if none */
+@@ -390,6 +410,32 @@ struct gve_tx_ring {
+ 			 * set.
+ 			 */
+ 			u32 last_re_idx;
++
++			/* free running number of packet buf descriptors posted */
++			u16 posted_packet_desc_cnt;
++			/* free running number of packet buf descriptors completed */
++			u16 completed_packet_desc_cnt;
++
++			/* QPL fields */
++			struct {
++			       /* Linked list of gve_tx_buf_dqo. Index into
++				* tx_qpl_buf_next, or -1 if empty.
++				*
++				* This is a consumer list owned by the TX path. When it
++				* runs out, the producer list is stolen from the
++				* completion handling path
++				* (dqo_compl.free_tx_qpl_buf_head).
++				*/
++				s16 free_tx_qpl_buf_head;
++
++			       /* Free running count of the number of QPL tx buffers
++				* allocated
++				*/
++				u32 alloc_tx_qpl_buf_cnt;
++
++				/* Cached value of `dqo_compl.free_tx_qpl_buf_cnt` */
++				u32 free_tx_qpl_buf_cnt;
++			};
+ 		} dqo_tx;
+ 	};
  
-+static inline bool gve_is_qpl(struct gve_priv *priv)
+@@ -433,6 +479,24 @@ struct gve_tx_ring {
+ 			 * reached a specified timeout.
+ 			 */
+ 			struct gve_index_list timed_out_completions;
++
++			/* QPL fields */
++			struct {
++				/* Linked list of gve_tx_buf_dqo. Index into
++				 * tx_qpl_buf_next, or -1 if empty.
++				 *
++				 * This is the producer list, owned by the completion
++				 * handling path. When the consumer list
++				 * (dqo_tx.free_tx_qpl_buf_head) is runs out, this list
++				 * will be stolen.
++				 */
++				atomic_t free_tx_qpl_buf_head;
++
++				/* Free running count of the number of tx buffers
++				 * freed
++				 */
++				atomic_t free_tx_qpl_buf_cnt;
++			};
+ 		} dqo_compl;
+ 	} ____cacheline_aligned;
+ 	u64 pkt_done; /* free-running - total packets completed */
+@@ -459,6 +523,21 @@ struct gve_tx_ring {
+ 			s16 num_pending_packets;
+ 
+ 			u32 complq_mask; /* complq size is complq_mask + 1 */
++
++			/* QPL fields */
++			struct {
++				/* qpl assigned to this queue */
++				struct gve_queue_page_list *qpl;
++
++				/* Each QPL page is divided into TX bounce buffers
++				 * of size GVE_TX_BUF_SIZE_DQO. tx_qpl_buf_next is
++				 * an array to manage linked lists of TX buffers.
++				 * An entry j at index i implies that j'th buffer
++				 * is next on the list after i
++				 */
++				s16 *tx_qpl_buf_next;
++				u32 num_tx_qpl_bufs;
++			};
+ 		} dqo;
+ 	} ____cacheline_aligned;
+ 	struct netdev_queue *netdev_txq;
+diff --git a/drivers/net/ethernet/google/gve/gve_tx_dqo.c b/drivers/net/ethernet/google/gve/gve_tx_dqo.c
+index 3c09e66ba1ab..1e19b834a613 100644
+--- a/drivers/net/ethernet/google/gve/gve_tx_dqo.c
++++ b/drivers/net/ethernet/google/gve/gve_tx_dqo.c
+@@ -13,6 +13,89 @@
+ #include <linux/slab.h>
+ #include <linux/skbuff.h>
+ 
++/* Returns true if tx_bufs are available. */
++static bool gve_has_free_tx_qpl_bufs(struct gve_tx_ring *tx, int count)
 +{
-+	return priv->queue_format == GVE_GQI_QPL_FORMAT ||
-+		priv->queue_format == GVE_DQO_QPL_FORMAT;
++	int num_avail;
++
++	if (!tx->dqo.qpl)
++		return true;
++
++	num_avail = tx->dqo.num_tx_qpl_bufs -
++		(tx->dqo_tx.alloc_tx_qpl_buf_cnt -
++		 tx->dqo_tx.free_tx_qpl_buf_cnt);
++
++	if (count <= num_avail)
++		return true;
++
++	/* Update cached value from dqo_compl. */
++	tx->dqo_tx.free_tx_qpl_buf_cnt =
++		atomic_read_acquire(&tx->dqo_compl.free_tx_qpl_buf_cnt);
++
++	num_avail = tx->dqo.num_tx_qpl_bufs -
++		(tx->dqo_tx.alloc_tx_qpl_buf_cnt -
++		 tx->dqo_tx.free_tx_qpl_buf_cnt);
++
++	return count <= num_avail;
 +}
 +
- /* Returns the number of tx queue page lists
-  */
- static inline u32 gve_num_tx_qpls(struct gve_priv *priv)
- {
--	if (priv->queue_format != GVE_GQI_QPL_FORMAT)
-+	if (!gve_is_qpl(priv))
- 		return 0;
- 
- 	return priv->tx_cfg.num_queues + priv->num_xdp_queues;
-@@ -832,7 +846,7 @@ static inline u32 gve_num_xdp_qpls(struct gve_priv *priv)
-  */
- static inline u32 gve_num_rx_qpls(struct gve_priv *priv)
- {
--	if (priv->queue_format != GVE_GQI_QPL_FORMAT)
-+	if (!gve_is_qpl(priv))
- 		return 0;
- 
- 	return priv->rx_cfg.num_queues;
-diff --git a/drivers/net/ethernet/google/gve/gve_adminq.c b/drivers/net/ethernet/google/gve/gve_adminq.c
-index 252974202a3f..a16e7cf21911 100644
---- a/drivers/net/ethernet/google/gve/gve_adminq.c
-+++ b/drivers/net/ethernet/google/gve/gve_adminq.c
-@@ -39,7 +39,8 @@ void gve_parse_device_option(struct gve_priv *priv,
- 			     struct gve_device_option_gqi_rda **dev_op_gqi_rda,
- 			     struct gve_device_option_gqi_qpl **dev_op_gqi_qpl,
- 			     struct gve_device_option_dqo_rda **dev_op_dqo_rda,
--			     struct gve_device_option_jumbo_frames **dev_op_jumbo_frames)
-+			     struct gve_device_option_jumbo_frames **dev_op_jumbo_frames,
-+			     struct gve_device_option_dqo_qpl **dev_op_dqo_qpl)
- {
- 	u32 req_feat_mask = be32_to_cpu(option->required_features_mask);
- 	u16 option_length = be16_to_cpu(option->option_length);
-@@ -112,6 +113,22 @@ void gve_parse_device_option(struct gve_priv *priv,
- 		}
- 		*dev_op_dqo_rda = (void *)(option + 1);
- 		break;
-+	case GVE_DEV_OPT_ID_DQO_QPL:
-+		if (option_length < sizeof(**dev_op_dqo_qpl) ||
-+		    req_feat_mask != GVE_DEV_OPT_REQ_FEAT_MASK_DQO_QPL) {
-+			dev_warn(&priv->pdev->dev, GVE_DEVICE_OPTION_ERROR_FMT,
-+				 "DQO QPL", (int)sizeof(**dev_op_dqo_qpl),
-+				 GVE_DEV_OPT_REQ_FEAT_MASK_DQO_QPL,
-+				 option_length, req_feat_mask);
++static s16
++gve_alloc_tx_qpl_buf(struct gve_tx_ring *tx)
++{
++	s16 index;
++
++	index = tx->dqo_tx.free_tx_qpl_buf_head;
++
++	/* No TX buffers available, try to steal the list from the
++	 * completion handler.
++	 */
++	if (unlikely(index == -1)) {
++		tx->dqo_tx.free_tx_qpl_buf_head =
++			atomic_xchg(&tx->dqo_compl.free_tx_qpl_buf_head, -1);
++		index = tx->dqo_tx.free_tx_qpl_buf_head;
++
++		if (unlikely(index == -1))
++			return index;
++	}
++
++	/* Remove TX buf from free list */
++	tx->dqo_tx.free_tx_qpl_buf_head = tx->dqo.tx_qpl_buf_next[index];
++
++	return index;
++}
++
++static void
++gve_free_tx_qpl_bufs(struct gve_tx_ring *tx,
++		     struct gve_tx_pending_packet_dqo *pkt)
++{
++	s16 index;
++	int i;
++
++	if (!pkt->num_bufs)
++		return;
++
++	index = pkt->tx_qpl_buf_ids[0];
++	/* Create a linked list of buffers to be added to the free list */
++	for (i = 1; i < pkt->num_bufs; i++) {
++		tx->dqo.tx_qpl_buf_next[index] = pkt->tx_qpl_buf_ids[i];
++		index = pkt->tx_qpl_buf_ids[i];
++	}
++
++	while (true) {
++		s16 old_head = atomic_read_acquire(&tx->dqo_compl.free_tx_qpl_buf_head);
++
++		tx->dqo.tx_qpl_buf_next[index] = old_head;
++		if (atomic_cmpxchg(&tx->dqo_compl.free_tx_qpl_buf_head,
++				   old_head,
++				   pkt->tx_qpl_buf_ids[0]) == old_head) {
 +			break;
 +		}
-+
-+		if (option_length > sizeof(**dev_op_dqo_qpl)) {
-+			dev_warn(&priv->pdev->dev,
-+				 GVE_DEVICE_OPTION_TOO_BIG_FMT, "DQO QPL");
-+		}
-+		*dev_op_dqo_qpl = (void *)(option + 1);
-+		break;
- 	case GVE_DEV_OPT_ID_JUMBO_FRAMES:
- 		if (option_length < sizeof(**dev_op_jumbo_frames) ||
- 		    req_feat_mask != GVE_DEV_OPT_REQ_FEAT_MASK_JUMBO_FRAMES) {
-@@ -146,7 +163,8 @@ gve_process_device_options(struct gve_priv *priv,
- 			   struct gve_device_option_gqi_rda **dev_op_gqi_rda,
- 			   struct gve_device_option_gqi_qpl **dev_op_gqi_qpl,
- 			   struct gve_device_option_dqo_rda **dev_op_dqo_rda,
--			   struct gve_device_option_jumbo_frames **dev_op_jumbo_frames)
-+			   struct gve_device_option_jumbo_frames **dev_op_jumbo_frames,
-+			   struct gve_device_option_dqo_qpl **dev_op_dqo_qpl)
- {
- 	const int num_options = be16_to_cpu(descriptor->num_device_options);
- 	struct gve_device_option *dev_opt;
-@@ -166,7 +184,8 @@ gve_process_device_options(struct gve_priv *priv,
- 
- 		gve_parse_device_option(priv, descriptor, dev_opt,
- 					dev_op_gqi_rda, dev_op_gqi_qpl,
--					dev_op_dqo_rda, dev_op_jumbo_frames);
-+					dev_op_dqo_rda, dev_op_jumbo_frames,
-+					dev_op_dqo_qpl);
- 		dev_opt = next_opt;
- 	}
- 
-@@ -505,12 +524,24 @@ static int gve_adminq_create_tx_queue(struct gve_priv *priv, u32 queue_index)
- 
- 		cmd.create_tx_queue.queue_page_list_id = cpu_to_be32(qpl_id);
- 	} else {
-+		u16 comp_ring_size = 0;
-+		u32 qpl_id = 0;
-+
-+		if (priv->queue_format == GVE_DQO_RDA_FORMAT) {
-+			qpl_id = GVE_RAW_ADDRESSING_QPL_ID;
-+			comp_ring_size =
-+				priv->options_dqo_rda.tx_comp_ring_entries;
-+		} else {
-+			qpl_id = tx->dqo.qpl->id;
-+			comp_ring_size = priv->tx_desc_cnt;
-+		}
-+		cmd.create_tx_queue.queue_page_list_id = cpu_to_be32(qpl_id);
- 		cmd.create_tx_queue.tx_ring_size =
- 			cpu_to_be16(priv->tx_desc_cnt);
- 		cmd.create_tx_queue.tx_comp_ring_addr =
- 			cpu_to_be64(tx->complq_bus_dqo);
- 		cmd.create_tx_queue.tx_comp_ring_size =
--			cpu_to_be16(priv->options_dqo_rda.tx_comp_ring_entries);
-+			cpu_to_be16(comp_ring_size);
- 	}
- 
- 	return gve_adminq_issue_cmd(priv, &cmd);
-@@ -555,6 +586,18 @@ static int gve_adminq_create_rx_queue(struct gve_priv *priv, u32 queue_index)
- 		cmd.create_rx_queue.queue_page_list_id = cpu_to_be32(qpl_id);
- 		cmd.create_rx_queue.packet_buffer_size = cpu_to_be16(rx->packet_buffer_size);
- 	} else {
-+		u16 rx_buff_ring_entries = 0;
-+		u32 qpl_id = 0;
-+
-+		if (priv->queue_format == GVE_DQO_RDA_FORMAT) {
-+			qpl_id = GVE_RAW_ADDRESSING_QPL_ID;
-+			rx_buff_ring_entries =
-+				priv->options_dqo_rda.rx_buff_ring_entries;
-+		} else {
-+			qpl_id = rx->dqo.qpl->id;
-+			rx_buff_ring_entries = priv->rx_desc_cnt;
-+		}
-+		cmd.create_rx_queue.queue_page_list_id = cpu_to_be32(qpl_id);
- 		cmd.create_rx_queue.rx_ring_size =
- 			cpu_to_be16(priv->rx_desc_cnt);
- 		cmd.create_rx_queue.rx_desc_ring_addr =
-@@ -564,7 +607,7 @@ static int gve_adminq_create_rx_queue(struct gve_priv *priv, u32 queue_index)
- 		cmd.create_rx_queue.packet_buffer_size =
- 			cpu_to_be16(priv->data_buffer_size_dqo);
- 		cmd.create_rx_queue.rx_buff_ring_size =
--			cpu_to_be16(priv->options_dqo_rda.rx_buff_ring_entries);
-+			cpu_to_be16(rx_buff_ring_entries);
- 		cmd.create_rx_queue.enable_rsc =
- 			!!(priv->dev->features & NETIF_F_LRO);
- 	}
-@@ -675,9 +718,13 @@ gve_set_desc_cnt_dqo(struct gve_priv *priv,
- 		     const struct gve_device_option_dqo_rda *dev_op_dqo_rda)
- {
- 	priv->tx_desc_cnt = be16_to_cpu(descriptor->tx_queue_entries);
-+	priv->rx_desc_cnt = be16_to_cpu(descriptor->rx_queue_entries);
-+
-+	if (priv->queue_format == GVE_DQO_QPL_FORMAT)
-+		return 0;
-+
- 	priv->options_dqo_rda.tx_comp_ring_entries =
- 		be16_to_cpu(dev_op_dqo_rda->tx_comp_ring_entries);
--	priv->rx_desc_cnt = be16_to_cpu(descriptor->rx_queue_entries);
- 	priv->options_dqo_rda.rx_buff_ring_entries =
- 		be16_to_cpu(dev_op_dqo_rda->rx_buff_ring_entries);
- 
-@@ -687,7 +734,9 @@ gve_set_desc_cnt_dqo(struct gve_priv *priv,
- static void gve_enable_supported_features(struct gve_priv *priv,
- 					  u32 supported_features_mask,
- 					  const struct gve_device_option_jumbo_frames
--						  *dev_op_jumbo_frames)
-+					  *dev_op_jumbo_frames,
-+					  const struct gve_device_option_dqo_qpl
-+					  *dev_op_dqo_qpl)
- {
- 	/* Before control reaches this point, the page-size-capped max MTU from
- 	 * the gve_device_descriptor field has already been stored in
-@@ -699,6 +748,20 @@ static void gve_enable_supported_features(struct gve_priv *priv,
- 			 "JUMBO FRAMES device option enabled.\n");
- 		priv->dev->max_mtu = be16_to_cpu(dev_op_jumbo_frames->max_mtu);
- 	}
-+
-+	/* Override pages for qpl for DQO-QPL */
-+	if (dev_op_dqo_qpl) {
-+		dev_info(&priv->pdev->dev,
-+			 "DQO QPL device option enabled.\n");
-+		priv->tx_pages_per_qpl =
-+			be16_to_cpu(dev_op_dqo_qpl->tx_pages_per_qpl);
-+		priv->rx_pages_per_qpl =
-+			be16_to_cpu(dev_op_dqo_qpl->rx_pages_per_qpl);
-+		if (priv->tx_pages_per_qpl == 0)
-+			priv->tx_pages_per_qpl = DQO_QPL_DEFAULT_TX_PAGES;
-+		if (priv->rx_pages_per_qpl == 0)
-+			priv->rx_pages_per_qpl = DQO_QPL_DEFAULT_RX_PAGES;
 +	}
++
++	atomic_add(pkt->num_bufs, &tx->dqo_compl.free_tx_qpl_buf_cnt);
++	pkt->num_bufs = 0;
++}
++
+ /* Returns true if a gve_tx_pending_packet_dqo object is available. */
+ static bool gve_has_pending_packet(struct gve_tx_ring *tx)
+ {
+@@ -136,9 +219,40 @@ static void gve_tx_free_ring_dqo(struct gve_priv *priv, int idx)
+ 	kvfree(tx->dqo.pending_packets);
+ 	tx->dqo.pending_packets = NULL;
+ 
++	kvfree(tx->dqo.tx_qpl_buf_next);
++	tx->dqo.tx_qpl_buf_next = NULL;
++
++	if (tx->dqo.qpl) {
++		gve_unassign_qpl(priv, tx->dqo.qpl->id);
++		tx->dqo.qpl = NULL;
++	}
++
+ 	netif_dbg(priv, drv, priv->dev, "freed tx queue %d\n", idx);
  }
  
- int gve_adminq_describe_device(struct gve_priv *priv)
-@@ -707,6 +770,7 @@ int gve_adminq_describe_device(struct gve_priv *priv)
- 	struct gve_device_option_gqi_rda *dev_op_gqi_rda = NULL;
- 	struct gve_device_option_gqi_qpl *dev_op_gqi_qpl = NULL;
- 	struct gve_device_option_dqo_rda *dev_op_dqo_rda = NULL;
-+	struct gve_device_option_dqo_qpl *dev_op_dqo_qpl = NULL;
- 	struct gve_device_descriptor *descriptor;
- 	u32 supported_features_mask = 0;
- 	union gve_adminq_command cmd;
-@@ -733,13 +797,14 @@ int gve_adminq_describe_device(struct gve_priv *priv)
- 
- 	err = gve_process_device_options(priv, descriptor, &dev_op_gqi_rda,
- 					 &dev_op_gqi_qpl, &dev_op_dqo_rda,
--					 &dev_op_jumbo_frames);
-+					 &dev_op_jumbo_frames,
-+					 &dev_op_dqo_qpl);
- 	if (err)
- 		goto free_device_descriptor;
- 
- 	/* If the GQI_RAW_ADDRESSING option is not enabled and the queue format
- 	 * is not set to GqiRda, choose the queue format in a priority order:
--	 * DqoRda, GqiRda, GqiQpl. Use GqiQpl as default.
-+	 * DqoRda, DqoQpl, GqiRda, GqiQpl. Use GqiQpl as default.
- 	 */
- 	if (dev_op_dqo_rda) {
- 		priv->queue_format = GVE_DQO_RDA_FORMAT;
-@@ -747,7 +812,13 @@ int gve_adminq_describe_device(struct gve_priv *priv)
- 			 "Driver is running with DQO RDA queue format.\n");
- 		supported_features_mask =
- 			be32_to_cpu(dev_op_dqo_rda->supported_features_mask);
--	} else if (dev_op_gqi_rda) {
-+	} else if (dev_op_dqo_qpl) {
-+		priv->queue_format = GVE_DQO_QPL_FORMAT;
-+		dev_info(&priv->pdev->dev,
-+			 "Driver is running with DQO QPL queue format.\n");
-+		supported_features_mask =
-+			be32_to_cpu(dev_op_dqo_qpl->supported_features_mask);
-+	}  else if (dev_op_gqi_rda) {
- 		priv->queue_format = GVE_GQI_RDA_FORMAT;
- 		dev_info(&priv->pdev->dev,
- 			 "Driver is running with GQI RDA queue format.\n");
-@@ -798,7 +869,7 @@ int gve_adminq_describe_device(struct gve_priv *priv)
- 	priv->default_num_queues = be16_to_cpu(descriptor->default_num_queues);
- 
- 	gve_enable_supported_features(priv, supported_features_mask,
--				      dev_op_jumbo_frames);
-+				      dev_op_jumbo_frames, dev_op_dqo_qpl);
- 
- free_device_descriptor:
- 	dma_free_coherent(&priv->pdev->dev, PAGE_SIZE, descriptor,
-diff --git a/drivers/net/ethernet/google/gve/gve_adminq.h b/drivers/net/ethernet/google/gve/gve_adminq.h
-index f894beb3deaf..38a22279e863 100644
---- a/drivers/net/ethernet/google/gve/gve_adminq.h
-+++ b/drivers/net/ethernet/google/gve/gve_adminq.h
-@@ -109,6 +109,14 @@ struct gve_device_option_dqo_rda {
- 
- static_assert(sizeof(struct gve_device_option_dqo_rda) == 8);
- 
-+struct gve_device_option_dqo_qpl {
-+	__be32 supported_features_mask;
-+	__be16 tx_pages_per_qpl;
-+	__be16 rx_pages_per_qpl;
-+};
++static int gve_tx_qpl_buf_init(struct gve_tx_ring *tx)
++{
++	int num_tx_qpl_bufs = GVE_TX_BUFS_PER_PAGE_DQO *
++		tx->dqo.qpl->num_entries;
++	int i;
 +
-+static_assert(sizeof(struct gve_device_option_dqo_qpl) == 8);
++	tx->dqo.tx_qpl_buf_next = kvcalloc(num_tx_qpl_bufs,
++					   sizeof(tx->dqo.tx_qpl_buf_next[0]),
++					   GFP_KERNEL);
++	if (!tx->dqo.tx_qpl_buf_next)
++		return -ENOMEM;
 +
- struct gve_device_option_jumbo_frames {
- 	__be32 supported_features_mask;
- 	__be16 max_mtu;
-@@ -130,6 +138,7 @@ enum gve_dev_opt_id {
- 	GVE_DEV_OPT_ID_GQI_RDA = 0x2,
- 	GVE_DEV_OPT_ID_GQI_QPL = 0x3,
- 	GVE_DEV_OPT_ID_DQO_RDA = 0x4,
-+	GVE_DEV_OPT_ID_DQO_QPL = 0x7,
- 	GVE_DEV_OPT_ID_JUMBO_FRAMES = 0x8,
- };
++	tx->dqo.num_tx_qpl_bufs = num_tx_qpl_bufs;
++
++	/* Generate free TX buf list */
++	for (i = 0; i < num_tx_qpl_bufs - 1; i++)
++		tx->dqo.tx_qpl_buf_next[i] = i + 1;
++	tx->dqo.tx_qpl_buf_next[num_tx_qpl_bufs - 1] = -1;
++
++	atomic_set_release(&tx->dqo_compl.free_tx_qpl_buf_head, -1);
++	return 0;
++}
++
+ static int gve_tx_alloc_ring_dqo(struct gve_priv *priv, int idx)
+ {
+ 	struct gve_tx_ring *tx = &priv->tx[idx];
+@@ -155,7 +269,9 @@ static int gve_tx_alloc_ring_dqo(struct gve_priv *priv, int idx)
  
-@@ -139,6 +148,7 @@ enum gve_dev_opt_req_feat_mask {
- 	GVE_DEV_OPT_REQ_FEAT_MASK_GQI_QPL = 0x0,
- 	GVE_DEV_OPT_REQ_FEAT_MASK_DQO_RDA = 0x0,
- 	GVE_DEV_OPT_REQ_FEAT_MASK_JUMBO_FRAMES = 0x0,
-+	GVE_DEV_OPT_REQ_FEAT_MASK_DQO_QPL = 0x0,
- };
+ 	/* Queue sizes must be a power of 2 */
+ 	tx->mask = priv->tx_desc_cnt - 1;
+-	tx->dqo.complq_mask = priv->options_dqo_rda.tx_comp_ring_entries - 1;
++	tx->dqo.complq_mask = priv->queue_format == GVE_DQO_RDA_FORMAT ?
++		priv->options_dqo_rda.tx_comp_ring_entries - 1 :
++		tx->mask;
  
- enum gve_sup_feature_mask {
-diff --git a/drivers/net/ethernet/google/gve/gve_main.c b/drivers/net/ethernet/google/gve/gve_main.c
-index e6f1711d9be0..b40fafe1460a 100644
---- a/drivers/net/ethernet/google/gve/gve_main.c
-+++ b/drivers/net/ethernet/google/gve/gve_main.c
-@@ -31,7 +31,6 @@
+ 	/* The max number of pending packets determines the maximum number of
+ 	 * descriptors which maybe written to the completion queue.
+@@ -211,6 +327,15 @@ static int gve_tx_alloc_ring_dqo(struct gve_priv *priv, int idx)
+ 	if (!tx->q_resources)
+ 		goto err;
  
- // Minimum amount of time between queue kicks in msec (10 seconds)
- #define MIN_TX_TIMEOUT_GAP (1000 * 10)
--#define DQO_TX_MAX	0x3FFFF
++	if (gve_is_qpl(priv)) {
++		tx->dqo.qpl = gve_assign_tx_qpl(priv, idx);
++		if (!tx->dqo.qpl)
++			goto err;
++
++		if (gve_tx_qpl_buf_init(tx))
++			goto err;
++	}
++
+ 	gve_tx_add_to_block(priv, idx);
  
- char gve_driver_name[] = "gve";
- const char gve_version_str[] = GVE_VERSION;
-@@ -494,7 +493,7 @@ static int gve_setup_device_resources(struct gve_priv *priv)
- 		goto abort_with_stats_report;
- 	}
+ 	return 0;
+@@ -267,20 +392,27 @@ static u32 num_avail_tx_slots(const struct gve_tx_ring *tx)
+ 	return tx->mask - num_used;
+ }
  
--	if (priv->queue_format == GVE_DQO_RDA_FORMAT) {
-+	if (!gve_is_gqi(priv)) {
- 		priv->ptype_lut_dqo = kvzalloc(sizeof(*priv->ptype_lut_dqo),
- 					       GFP_KERNEL);
- 		if (!priv->ptype_lut_dqo) {
-@@ -1085,9 +1084,10 @@ static int gve_alloc_qpls(struct gve_priv *priv)
- 	int max_queues = priv->tx_cfg.max_queues + priv->rx_cfg.max_queues;
- 	int start_id;
- 	int i, j;
-+	int page_count;
- 	int err;
- 
--	if (priv->queue_format != GVE_GQI_QPL_FORMAT)
-+	if (!gve_is_qpl(priv))
++static bool gve_has_avail_slots_tx_dqo(struct gve_tx_ring *tx,
++				       int desc_count, int buf_count)
++{
++	return gve_has_pending_packet(tx) &&
++		   num_avail_tx_slots(tx) >= desc_count &&
++		   gve_has_free_tx_qpl_bufs(tx, buf_count);
++}
++
+ /* Stops the queue if available descriptors is less than 'count'.
+  * Return: 0 if stop is not required.
+  */
+-static int gve_maybe_stop_tx_dqo(struct gve_tx_ring *tx, int count)
++static int gve_maybe_stop_tx_dqo(struct gve_tx_ring *tx,
++				 int desc_count, int buf_count)
+ {
+-	if (likely(gve_has_pending_packet(tx) &&
+-		   num_avail_tx_slots(tx) >= count))
++	if (likely(gve_has_avail_slots_tx_dqo(tx, desc_count, buf_count)))
  		return 0;
  
- 	priv->qpls = kvcalloc(max_queues, sizeof(*priv->qpls), GFP_KERNEL);
-@@ -1095,17 +1095,25 @@ static int gve_alloc_qpls(struct gve_priv *priv)
- 		return -ENOMEM;
+ 	/* Update cached TX head pointer */
+ 	tx->dqo_tx.head = atomic_read_acquire(&tx->dqo_compl.hw_tx_head);
  
- 	start_id = gve_tx_start_qpl_id(priv);
-+	page_count = priv->tx_pages_per_qpl;
- 	for (i = start_id; i < start_id + gve_num_tx_qpls(priv); i++) {
- 		err = gve_alloc_queue_page_list(priv, i,
--						priv->tx_pages_per_qpl);
-+						page_count);
- 		if (err)
- 			goto free_qpls;
+-	if (likely(gve_has_pending_packet(tx) &&
+-		   num_avail_tx_slots(tx) >= count))
++	if (likely(gve_has_avail_slots_tx_dqo(tx, desc_count, buf_count)))
+ 		return 0;
+ 
+ 	/* No space, so stop the queue */
+@@ -295,8 +427,7 @@ static int gve_maybe_stop_tx_dqo(struct gve_tx_ring *tx, int count)
+ 	 */
+ 	tx->dqo_tx.head = atomic_read_acquire(&tx->dqo_compl.hw_tx_head);
+ 
+-	if (likely(!gve_has_pending_packet(tx) ||
+-		   num_avail_tx_slots(tx) < count))
++	if (likely(!gve_has_avail_slots_tx_dqo(tx, desc_count, buf_count)))
+ 		return -EBUSY;
+ 
+ 	netif_tx_start_queue(tx->netdev_txq);
+@@ -444,44 +575,16 @@ gve_tx_fill_general_ctx_desc(struct gve_tx_general_context_desc_dqo *desc,
+ 	};
+ }
+ 
+-/* Returns 0 on success, or < 0 on error.
+- *
+- * Before this function is called, the caller must ensure
+- * gve_has_pending_packet(tx) returns true.
+- */
+ static int gve_tx_add_skb_no_copy_dqo(struct gve_tx_ring *tx,
+-				      struct sk_buff *skb)
++				      struct sk_buff *skb,
++				      struct gve_tx_pending_packet_dqo *pkt,
++				      s16 completion_tag,
++				      u32 *desc_idx,
++				      bool is_gso)
+ {
+ 	const struct skb_shared_info *shinfo = skb_shinfo(skb);
+-	const bool is_gso = skb_is_gso(skb);
+-	u32 desc_idx = tx->dqo_tx.tail;
+-
+-	struct gve_tx_pending_packet_dqo *pkt;
+-	struct gve_tx_metadata_dqo metadata;
+-	s16 completion_tag;
+ 	int i;
+ 
+-	pkt = gve_alloc_pending_packet(tx);
+-	pkt->skb = skb;
+-	pkt->num_bufs = 0;
+-	completion_tag = pkt - tx->dqo.pending_packets;
+-
+-	gve_extract_tx_metadata_dqo(skb, &metadata);
+-	if (is_gso) {
+-		int header_len = gve_prep_tso(skb);
+-
+-		if (unlikely(header_len < 0))
+-			goto err;
+-
+-		gve_tx_fill_tso_ctx_desc(&tx->dqo.tx_ring[desc_idx].tso_ctx,
+-					 skb, &metadata, header_len);
+-		desc_idx = (desc_idx + 1) & tx->mask;
+-	}
+-
+-	gve_tx_fill_general_ctx_desc(&tx->dqo.tx_ring[desc_idx].general_ctx,
+-				     &metadata);
+-	desc_idx = (desc_idx + 1) & tx->mask;
+-
+ 	/* Note: HW requires that the size of a non-TSO packet be within the
+ 	 * range of [17, 9728].
+ 	 *
+@@ -490,6 +593,7 @@ static int gve_tx_add_skb_no_copy_dqo(struct gve_tx_ring *tx,
+ 	 * - Hypervisor won't allow MTU larger than 9216.
+ 	 */
+ 
++	pkt->num_bufs = 0;
+ 	/* Map the linear portion of skb */
+ 	{
+ 		u32 len = skb_headlen(skb);
+@@ -503,7 +607,7 @@ static int gve_tx_add_skb_no_copy_dqo(struct gve_tx_ring *tx,
+ 		dma_unmap_addr_set(pkt, dma[pkt->num_bufs], addr);
+ 		++pkt->num_bufs;
+ 
+-		gve_tx_fill_pkt_desc_dqo(tx, &desc_idx, skb, len, addr,
++		gve_tx_fill_pkt_desc_dqo(tx, desc_idx, skb, len, addr,
+ 					 completion_tag,
+ 					 /*eop=*/shinfo->nr_frags == 0, is_gso);
+ 	}
+@@ -522,10 +626,139 @@ static int gve_tx_add_skb_no_copy_dqo(struct gve_tx_ring *tx,
+ 		dma_unmap_addr_set(pkt, dma[pkt->num_bufs], addr);
+ 		++pkt->num_bufs;
+ 
+-		gve_tx_fill_pkt_desc_dqo(tx, &desc_idx, skb, len, addr,
++		gve_tx_fill_pkt_desc_dqo(tx, desc_idx, skb, len, addr,
+ 					 completion_tag, is_eop, is_gso);
  	}
  
- 	start_id = gve_rx_start_qpl_id(priv);
++	return 0;
++err:
++	for (i = 0; i < pkt->num_bufs; i++) {
++		if (i == 0) {
++			dma_unmap_single(tx->dev,
++					 dma_unmap_addr(pkt, dma[i]),
++					 dma_unmap_len(pkt, len[i]),
++					 DMA_TO_DEVICE);
++		} else {
++			dma_unmap_page(tx->dev,
++				       dma_unmap_addr(pkt, dma[i]),
++				       dma_unmap_len(pkt, len[i]),
++				       DMA_TO_DEVICE);
++		}
++	}
++	pkt->num_bufs = 0;
++	return -1;
++}
 +
-+	/* For GQI_QPL number of pages allocated have 1:1 relationship with
-+	 * number of descriptors. For DQO, number of pages required are
-+	 * more than descriptors (because of out of order completions).
-+	 */
-+	page_count = priv->queue_format == GVE_GQI_QPL_FORMAT ?
-+		priv->rx_data_slot_cnt : priv->rx_pages_per_qpl;
- 	for (i = start_id; i < start_id + gve_num_rx_qpls(priv); i++) {
- 		err = gve_alloc_queue_page_list(priv, i,
--						priv->rx_data_slot_cnt);
-+						page_count);
- 		if (err)
- 			goto free_qpls;
++/* Tx buffer i corresponds to
++ * qpl_page_id = i / GVE_TX_BUFS_PER_PAGE_DQO
++ * qpl_page_offset = (i % GVE_TX_BUFS_PER_PAGE_DQO) * GVE_TX_BUF_SIZE_DQO
++ */
++static void gve_tx_buf_get_addr(struct gve_tx_ring *tx,
++				s16 index,
++				void **va, dma_addr_t *dma_addr)
++{
++	int page_id = index >> (PAGE_SHIFT - GVE_TX_BUF_SHIFT_DQO);
++	int offset = (index & (GVE_TX_BUFS_PER_PAGE_DQO - 1)) << GVE_TX_BUF_SHIFT_DQO;
++
++	*va = page_address(tx->dqo.qpl->pages[page_id]) + offset;
++	*dma_addr = tx->dqo.qpl->page_buses[page_id] + offset;
++}
++
++static int gve_tx_add_skb_copy_dqo(struct gve_tx_ring *tx,
++				   struct sk_buff *skb,
++				   struct gve_tx_pending_packet_dqo *pkt,
++				   s16 completion_tag,
++				   u32 *desc_idx,
++				   bool is_gso)
++{
++	u32 copy_offset = 0;
++	dma_addr_t dma_addr;
++	u32 copy_len;
++	s16 index;
++	void *va;
++
++	/* Break the packet into buffer size chunks */
++	pkt->num_bufs = 0;
++	while (copy_offset < skb->len) {
++		index = gve_alloc_tx_qpl_buf(tx);
++		if (unlikely(index == -1))
++			goto err;
++
++		gve_tx_buf_get_addr(tx, index, &va, &dma_addr);
++		copy_len = min_t(u32, GVE_TX_BUF_SIZE_DQO,
++				 skb->len - copy_offset);
++		skb_copy_bits(skb, copy_offset, va, copy_len);
++
++		copy_offset += copy_len;
++		dma_sync_single_for_device(tx->dev, dma_addr,
++					   copy_len, DMA_TO_DEVICE);
++		gve_tx_fill_pkt_desc_dqo(tx, desc_idx, skb,
++					 copy_len,
++					 dma_addr,
++					 completion_tag,
++					 copy_offset == skb->len,
++					 is_gso);
++
++		pkt->tx_qpl_buf_ids[pkt->num_bufs] = index;
++		++tx->dqo_tx.alloc_tx_qpl_buf_cnt;
++		++pkt->num_bufs;
++	}
++
++	return 0;
++err:
++	/* Should not be here if gve_has_free_tx_qpl_bufs() check is correct */
++	gve_free_tx_qpl_bufs(tx, pkt);
++	return -ENOMEM;
++}
++
++/* Returns 0 on success, or < 0 on error.
++ *
++ * Before this function is called, the caller must ensure
++ * gve_has_pending_packet(tx) returns true.
++ */
++static int gve_tx_add_skb_dqo(struct gve_tx_ring *tx,
++			      struct sk_buff *skb)
++{
++	const bool is_gso = skb_is_gso(skb);
++	u32 desc_idx = tx->dqo_tx.tail;
++	struct gve_tx_pending_packet_dqo *pkt;
++	struct gve_tx_metadata_dqo metadata;
++	s16 completion_tag;
++
++	pkt = gve_alloc_pending_packet(tx);
++	pkt->skb = skb;
++	completion_tag = pkt - tx->dqo.pending_packets;
++
++	gve_extract_tx_metadata_dqo(skb, &metadata);
++	if (is_gso) {
++		int header_len = gve_prep_tso(skb);
++
++		if (unlikely(header_len < 0))
++			goto err;
++
++		gve_tx_fill_tso_ctx_desc(&tx->dqo.tx_ring[desc_idx].tso_ctx,
++					 skb, &metadata, header_len);
++		desc_idx = (desc_idx + 1) & tx->mask;
++	}
++
++	gve_tx_fill_general_ctx_desc(&tx->dqo.tx_ring[desc_idx].general_ctx,
++				     &metadata);
++	desc_idx = (desc_idx + 1) & tx->mask;
++
++	if (tx->dqo.qpl) {
++		if (gve_tx_add_skb_copy_dqo(tx, skb, pkt,
++					    completion_tag,
++					    &desc_idx, is_gso))
++			goto err;
++	}  else {
++		if (gve_tx_add_skb_no_copy_dqo(tx, skb, pkt,
++					       completion_tag,
++					       &desc_idx, is_gso))
++			goto err;
++	}
++
++	tx->dqo_tx.posted_packet_desc_cnt += pkt->num_bufs;
++
+ 	/* Commit the changes to our state */
+ 	tx->dqo_tx.tail = desc_idx;
+ 
+@@ -547,22 +780,7 @@ static int gve_tx_add_skb_no_copy_dqo(struct gve_tx_ring *tx,
+ 	return 0;
+ 
+ err:
+-	for (i = 0; i < pkt->num_bufs; i++) {
+-		if (i == 0) {
+-			dma_unmap_single(tx->dev,
+-					 dma_unmap_addr(pkt, dma[i]),
+-					 dma_unmap_len(pkt, len[i]),
+-					 DMA_TO_DEVICE);
+-		} else {
+-			dma_unmap_page(tx->dev,
+-				       dma_unmap_addr(pkt, dma[i]),
+-				       dma_unmap_len(pkt, len[i]),
+-				       DMA_TO_DEVICE);
+-		}
+-	}
+-
+ 	pkt->skb = NULL;
+-	pkt->num_bufs = 0;
+ 	gve_free_pending_packet(tx, pkt);
+ 
+ 	return -1;
+@@ -636,40 +854,56 @@ static int gve_try_tx_skb(struct gve_priv *priv, struct gve_tx_ring *tx,
+ 	int num_buffer_descs;
+ 	int total_num_descs;
+ 
+-	if (skb_is_gso(skb)) {
+-		/* If TSO doesn't meet HW requirements, attempt to linearize the
+-		 * packet.
+-		 */
+-		if (unlikely(!gve_can_send_tso(skb) &&
+-			     skb_linearize(skb) < 0)) {
+-			net_err_ratelimited("%s: Failed to transmit TSO packet\n",
+-					    priv->dev->name);
+-			goto drop;
+-		}
+-
+-		if (unlikely(ipv6_hopopt_jumbo_remove(skb)))
+-			goto drop;
++	if (tx->dqo.qpl) {
++		if (skb_is_gso(skb))
++			if (unlikely(ipv6_hopopt_jumbo_remove(skb)))
++				goto drop;
+ 
+-		num_buffer_descs = gve_num_buffer_descs_needed(skb);
++		/* We do not need to verify the number of buffers used per
++		 * packet or per segment in case of TSO as with 2K size buffers
++		 * none of the TX packet rules would be violated.
++		 *
++		 * gve_can_send_tso() checks that each TCP segment of gso_size is
++		 * not distributed over more than 9 SKB frags..
++		 */
++		num_buffer_descs = DIV_ROUND_UP(skb->len, GVE_TX_BUF_SIZE_DQO);
+ 	} else {
+-		num_buffer_descs = gve_num_buffer_descs_needed(skb);
++		if (skb_is_gso(skb)) {
++			/* If TSO doesn't meet HW requirements, attempt to linearize the
++			 * packet.
++			 */
++			if (unlikely(!gve_can_send_tso(skb) &&
++				     skb_linearize(skb) < 0)) {
++				net_err_ratelimited("%s: Failed to transmit TSO packet\n",
++						    priv->dev->name);
++				goto drop;
++			}
+ 
+-		if (unlikely(num_buffer_descs > GVE_TX_MAX_DATA_DESCS)) {
+-			if (unlikely(skb_linearize(skb) < 0))
++			if (unlikely(ipv6_hopopt_jumbo_remove(skb)))
+ 				goto drop;
+ 
+-			num_buffer_descs = 1;
++			num_buffer_descs = gve_num_buffer_descs_needed(skb);
++		} else {
++			num_buffer_descs = gve_num_buffer_descs_needed(skb);
++
++			if (unlikely(num_buffer_descs > GVE_TX_MAX_DATA_DESCS)) {
++				if (unlikely(skb_linearize(skb) < 0))
++					goto drop;
++
++				num_buffer_descs = 1;
++			}
+ 		}
  	}
-@@ -2051,7 +2059,7 @@ static int gve_init_priv(struct gve_priv *priv, bool skip_describe_device)
  
- 	/* Big TCP is only supported on DQ*/
- 	if (!gve_is_gqi(priv))
--		netif_set_tso_max_size(priv->dev, DQO_TX_MAX);
-+		netif_set_tso_max_size(priv->dev, GVE_DQO_TX_MAX);
+ 	/* Metadata + (optional TSO) + data descriptors. */
+ 	total_num_descs = 1 + skb_is_gso(skb) + num_buffer_descs;
+ 	if (unlikely(gve_maybe_stop_tx_dqo(tx, total_num_descs +
+-			GVE_TX_MIN_DESC_PREVENT_CACHE_OVERLAP))) {
++			GVE_TX_MIN_DESC_PREVENT_CACHE_OVERLAP,
++			num_buffer_descs))) {
+ 		return -1;
+ 	}
  
- 	priv->num_registered_pages = 0;
- 	priv->rx_copybreak = GVE_DEFAULT_RX_COPYBREAK;
+-	if (unlikely(gve_tx_add_skb_no_copy_dqo(tx, skb) < 0))
++	if (unlikely(gve_tx_add_skb_dqo(tx, skb) < 0))
+ 		goto drop;
+ 
+ 	netdev_tx_sent_queue(tx->netdev_txq, skb->len);
+@@ -817,7 +1051,11 @@ static void gve_handle_packet_completion(struct gve_priv *priv,
+ 			return;
+ 		}
+ 	}
+-	gve_unmap_packet(tx->dev, pending_packet);
++	tx->dqo_tx.completed_packet_desc_cnt += pending_packet->num_bufs;
++	if (tx->dqo.qpl)
++		gve_free_tx_qpl_bufs(tx, pending_packet);
++	else
++		gve_unmap_packet(tx->dev, pending_packet);
+ 
+ 	*bytes += pending_packet->skb->len;
+ 	(*pkts)++;
+@@ -875,12 +1113,16 @@ static void remove_miss_completions(struct gve_priv *priv,
+ 
+ 		remove_from_list(tx, &tx->dqo_compl.miss_completions,
+ 				 pending_packet);
+-		/* Unmap buffers and free skb but do not unallocate packet i.e.
++		/* Unmap/free TX buffers and free skb but do not unallocate packet i.e.
+ 		 * the completion tag is not freed to ensure that the driver
+ 		 * can take appropriate action if a corresponding valid
+ 		 * completion is received later.
+ 		 */
+-		gve_unmap_packet(tx->dev, pending_packet);
++		if (tx->dqo.qpl)
++			gve_free_tx_qpl_bufs(tx, pending_packet);
++		else
++			gve_unmap_packet(tx->dev, pending_packet);
++
+ 		/* This indicates the packet was dropped. */
+ 		dev_kfree_skb_any(pending_packet->skb);
+ 		pending_packet->skb = NULL;
 -- 
 2.41.0.585.gd2178a4bd4-goog
 
