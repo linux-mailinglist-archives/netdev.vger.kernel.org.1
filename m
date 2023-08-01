@@ -1,86 +1,86 @@
-Return-Path: <netdev+bounces-23089-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23090-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3969676AAD7
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 10:24:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5956C76AADA
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 10:24:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6A3BC1C20E1E
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 08:24:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 12D63281853
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 08:24:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D90DD200A3;
-	Tue,  1 Aug 2023 08:22:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B38E21ED37;
+	Tue,  1 Aug 2023 08:24:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE61C1FB40
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 08:22:48 +0000 (UTC)
-Received: from out30-99.freemail.mail.aliyun.com (out30-99.freemail.mail.aliyun.com [115.124.30.99])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CF92B1
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 01:22:47 -0700 (PDT)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R481e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045192;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0VoowtFL_1690878163;
-Received: from localhost(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0VoowtFL_1690878163)
-          by smtp.aliyun-inc.com;
-          Tue, 01 Aug 2023 16:22:43 +0800
-From: Heng Qi <hengqi@linux.alibaba.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	netdev@vger.kernel.org,
-	virtualization@lists.linux-foundation.org
-Cc: "David S. Miller" <davem@davemloft.net>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4075C1110
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 08:24:34 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 342C0C433C8;
+	Tue,  1 Aug 2023 08:24:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1690878274;
+	bh=gkk74t9As49XSJeT+8LUv0zRRxmwMv0p+C8NfbmPl7Y=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=AZBz4x7Y8V6Yp4RfkN8c+sBfGIsAeDXHsN2N7xNltclI6Y37r0oskt+G6j7xErJbj
+	 5NEXOYonN050QVNcZj8D3Wb2b9m6fl1Hr2Kvtpx+MQVpeadYQuV95XVSBBKKM30D1w
+	 eg/sBJMZ61btbOLDO2LZz4Uo9f7mcybxSlrd1MlM=
+Date: Tue, 1 Aug 2023 10:24:32 +0200
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Rishabh Bhatnagar <risbhat@amazon.com>
+Cc: lee@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Subject: [RFC PATCH 6/6] virtio-net: a tiny comment update
-Date: Tue,  1 Aug 2023 16:22:35 +0800
-Message-Id: <20230801082235.21634-7-hengqi@linux.alibaba.com>
-X-Mailer: git-send-email 2.19.1.6.gb485710b
-In-Reply-To: <20230801082235.21634-1-hengqi@linux.alibaba.com>
-References: <20230801082235.21634-1-hengqi@linux.alibaba.com>
+	Jamal Hadi Salim <jhs@mojatatu.com>
+Subject: Re: [PATCH 4.14] net/sched: cls_u32: Fix reference counter leak
+ leading to overflow
+Message-ID: <2023080102-certified-unrivaled-a048@gregkh>
+References: <20230727191554.21333-1-risbhat@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230727191554.21333-1-risbhat@amazon.com>
 
-Update a comment because virtio-net now supports both
-VIRTIO_NET_F_NOTF_COAL and VIRTIO_NET_F_VQ_NOTF_COAL.
+On Thu, Jul 27, 2023 at 07:15:54PM +0000, Rishabh Bhatnagar wrote:
+> From: Lee Jones <lee@kernel.org>
+> 
+> Upstream commit 04c55383fa5689357bcdd2c8036725a55ed632bc.
+> 
+> In the event of a failure in tcf_change_indev(), u32_set_parms() will
+> immediately return without decrementing the recently incremented
+> reference counter.  If this happens enough times, the counter will
+> rollover and the reference freed, leading to a double free which can be
+> used to do 'bad things'.
+> 
+> In order to prevent this, move the point of possible failure above the
+> point where the reference counter is incremented.  Also save any
+> meaningful return values to be applied to the return data at the
+> appropriate point in time.
+> 
+> This issue was caught with KASAN.
+> 
+> Fixes: 705c7091262d ("net: sched: cls_u32: no need to call tcf_exts_change for newly allocated struct")
+> Suggested-by: Eric Dumazet <edumazet@google.com>
+> Signed-off-by: Lee Jones <lee@kernel.org>
+> Reviewed-by: Eric Dumazet <edumazet@google.com>
+> Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
+> Signed-off-by: David S. Miller <davem@davemloft.net>
+> Signed-off-by: Rishabh Bhatnagar <risbhat@amazon.com>
+> ---
+>  net/sched/cls_u32.c | 21 ++++++++++++++-------
+>  1 file changed, 14 insertions(+), 7 deletions(-)
 
-Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
----
- drivers/net/virtio_net.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+We need a 4.19.y backport before we can apply a 4.14.y version, as you
+do not want to upgrade and have a regression.
 
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index d8e66460e37d..806a750ff515 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -3335,7 +3335,7 @@ static void virtnet_rx_dim_work(struct work_struct *work)
- static int virtnet_coal_params_supported(struct ethtool_coalesce *ec)
- {
- 	/* usecs coalescing is supported only if VIRTIO_NET_F_NOTF_COAL
--	 * feature is negotiated.
-+	 * or VIRTIO_NET_F_VQ_NOTF_COAL feature is negotiated.
- 	 */
- 	if (ec->rx_coalesce_usecs || ec->tx_coalesce_usecs)
- 		return -EOPNOTSUPP;
--- 
-2.19.1.6.gb485710b
+thanks,
 
+greg k-h
 
