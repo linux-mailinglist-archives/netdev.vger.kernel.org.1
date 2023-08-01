@@ -1,114 +1,138 @@
-Return-Path: <netdev+bounces-23343-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23344-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CBE476BA20
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 18:57:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D68E76BA26
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 18:58:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C3C301C20FE7
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 16:57:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CD32C1C20FEC
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 16:58:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62606214E9;
-	Tue,  1 Aug 2023 16:57:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0E82214E9;
+	Tue,  1 Aug 2023 16:58:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51E7D2CA5
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 16:57:49 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E986818D
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 09:57:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1690909067;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZKlr7hPRFIg1XM1Mg6RUtTCl8BMjdJxudj9aZC6n25E=;
-	b=gbEC7L20YggNALVmCH0RohDd0QzvwdQKuAcEZmErRhgbPwulpa4rJbGWc/rXmkdXQOm20m
-	3a3wLvb44+sBuIoRLKPl1RIPZgE4pqrvXSeGJO8loQV5m3CwPOPVJxc+5rSJQROIT7L79j
-	I8d6dZwH9ON4tfE/RGHXn63Z1jQvftw=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-651-z-DU3XkbPMy31HetIn3hYg-1; Tue, 01 Aug 2023 12:57:44 -0400
-X-MC-Unique: z-DU3XkbPMy31HetIn3hYg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 36A678007CE;
-	Tue,  1 Aug 2023 16:57:43 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.131])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 743114024F83;
-	Tue,  1 Aug 2023 16:57:41 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <64c93109c084e_1c5e3529452@willemb.c.googlers.com.notmuch>
-References: <64c93109c084e_1c5e3529452@willemb.c.googlers.com.notmuch> <1420063.1690904933@warthog.procyon.org.uk>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: dhowells@redhat.com, netdev@vger.kernel.org,
-    syzbot+f527b971b4bdc8e79f9e@syzkaller.appspotmail.com,
-    bpf@vger.kernel.org, brauner@kernel.org, davem@davemloft.net,
-    dsahern@kernel.org, edumazet@google.com, kuba@kernel.org,
-    pabeni@redhat.com, axboe@kernel.dk, viro@zeniv.linux.org.uk,
-    linux-fsdevel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
-    linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] udp: Fix __ip_append_data()'s handling of MSG_SPLICE_PAGES
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F6901ADE8
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 16:58:51 +0000 (UTC)
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2040.outbound.protection.outlook.com [40.107.236.40])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4275DA
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 09:58:48 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=KNzfAOmt8ZfIsuOUNr7lbxcDknpA+OItXR+32+ZY2UhHcMGN025YSsHh9jWhzMuKyxq9GWbIyKfY1VoddLluX/+g37tkPSPh2rPk7Q3a7BRBkDKo3gAosiwBH6X43lcBrSr/b/3PHzPPAiFlwmwPUYndbkyteqVefOJRGGnPuYQ724Eod9NiTcrS0vMQtViLIfjPA37OqXCQ9hiSLFvoZs6kOE+6ePn5m6ykz7Tk2QyTVkXkTA9vV7wgwIk04lq1kOsEM3/endutuIv0HTJpw3uKugKzSpcuGuQGHPGfLRsolAn+eYTOVsAkzilGeGEO6vtoKQvMyVk4zfeCdeLO5Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=b5wK+qryuOr6q5BYj3uT5Ebgr+vpv5yPu2opLy4lYIY=;
+ b=KTuJwMWSxFl9lievD28DuoiKQig5lWaFuBE2G5jwyasjMXiaVhHBmaR4CLx0qkfzSq3Z6nD7aHbQK9gtsIpAtqfGNSZBEPtvXlLL1vAJdzmnP+Eo/aKU56vTSQF4Mt3Q7Vr3U11rKtHakysamYv2lN/iOZUk920d91FXN9sr9jdmQJWzaDlsteBQChdE5gNSZzuK5L2fCMuoGsZYdRAoohRAmWEcnUG7BvkCRRSdTr/YQYvA5MikqofZwwQg3pUv8N9iCu08Yrq8Za/7z4M/94jGdyy7NWTYLF3ntfdtqoPc7SgL5fStHs2d2qMZIjbLjnNWr3E81GYDDcwENHxucA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=kernel.org smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=b5wK+qryuOr6q5BYj3uT5Ebgr+vpv5yPu2opLy4lYIY=;
+ b=3TVHW7V4J/fjJSxOb/lK0DpzHqezhtYK0b3V9QJY6KEqnipKkapS6w1Yk8FacS6lIgpoKIo+nmlfGqA/qG7Ql+6t19GH9UhruKuYDSsnp1DIqavUlr6VH4ody0EPP80Xht43RxlzkZpzxOYJtmeK3rGYWjcPJ8RlGiHo77fXf2s=
+Received: from CYZPR14CA0034.namprd14.prod.outlook.com (2603:10b6:930:a0::19)
+ by SA1PR12MB9246.namprd12.prod.outlook.com (2603:10b6:806:3ac::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.44; Tue, 1 Aug
+ 2023 16:58:46 +0000
+Received: from CY4PEPF0000EE36.namprd05.prod.outlook.com
+ (2603:10b6:930:a0:cafe::66) by CYZPR14CA0034.outlook.office365.com
+ (2603:10b6:930:a0::19) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.44 via Frontend
+ Transport; Tue, 1 Aug 2023 16:58:46 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ CY4PEPF0000EE36.mail.protection.outlook.com (10.167.242.42) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.6631.29 via Frontend Transport; Tue, 1 Aug 2023 16:58:45 +0000
+Received: from driver-dev1.pensando.io (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Tue, 1 Aug
+ 2023 11:58:43 -0500
+From: Brett Creeley <brett.creeley@amd.com>
+To: <kuba@kernel.org>, <davem@davemloft.net>, <netdev@vger.kernel.org>
+CC: <alex.williamson@redhat.com>, <brett.creeley@amd.com>,
+	<shannon.nelson@amd.com>
+Subject: [PATCH net-next] pds_core: Fix documentation for pds_client_register
+Date: Tue, 1 Aug 2023 09:58:33 -0700
+Message-ID: <20230801165833.1622-1-brett.creeley@amd.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1481563.1690909060.1@warthog.procyon.org.uk>
-Date: Tue, 01 Aug 2023 17:57:40 +0100
-Message-ID: <1481564.1690909060@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+Content-Type: text/plain
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE36:EE_|SA1PR12MB9246:EE_
+X-MS-Office365-Filtering-Correlation-Id: b70c55e3-3ddf-4d0a-1088-08db92b091f6
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	wr52JYmvbbqLI4OUtnxhW16R+XOFg8Gd/ELSeRcpvcK4wTR3w8b0IcLYnEyxH0xU8Yk/adJ1k2wUTklreg+Vca33SRiF7v1ovNm52+qabfMJpJ4jEN11TBu+wIVFSLTWTk97LiuGjP17/VlH41GCU+5oV3Xm76yxRwE97UquP9M+7oB7D19cMrZXTS2ouJNo3KUvxeOZzPffaynPh3GKgq7J9nBylW5BmXlKUQh4rebMdKpiNZBYSHX68pwvmjyxUQkRv3EbC112SVrpyCXsYx8lv84BpvtdEdRA1Bp8Z8Ew1B4DGcRe1qsrvjlmDEysMAcf2co2wnoTGwWF6x1ndrnWmivuvBq5QBHo+8t2Zesp5lMh1RkCtnGsLgmc6905oy7EHJMZ3ikXuiKf2VT4uqZeT0eO9llBfydripd6HBDR+uwyvtlz4MvMweZOpKj5U4LjQUSkmCQ+Suu1pL0LDPCGI02WoPOLqmucdaKdbIJfxbKBEEqo89Oj7yVU7h4UVkl9l5otq4XRIAmmncQqch5KAa0bba0JnJJCEO6vaX+4bHblraOvC95kp2k67TWm3Vn2ndtBzXb/5IWXmMYYBe7ZI7ESRigZ0AyE1UrH3EfS4ox+/RMwzA3iuDD66vzH356j5A1YR+x1prmUCUvIMTw0eyTGqUzzOyimj9IGucv7cVib4Hd75VcFIBbI82vh1CxNrLtLux/KcZwwE15Hu7ejEuU2yKXBifGyecGWQONaZGaVMvlscEPFs8/vhyrdS1wz+n6tbDwz5RcyDR0ZzQ==
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(346002)(376002)(39860400002)(136003)(396003)(451199021)(82310400008)(36840700001)(46966006)(40470700004)(36860700001)(70206006)(426003)(2616005)(47076005)(83380400001)(4744005)(4326008)(40480700001)(70586007)(6666004)(110136005)(316002)(478600001)(54906003)(186003)(16526019)(336012)(1076003)(26005)(44832011)(2906002)(86362001)(81166007)(36756003)(40460700003)(41300700001)(82740400003)(356005)(8676002)(8936002)(5660300002)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Aug 2023 16:58:45.1591
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: b70c55e3-3ddf-4d0a-1088-08db92b091f6
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CY4PEPF0000EE36.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB9246
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
 	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Willem de Bruijn <willemdebruijn.kernel@gmail.com> wrote:
+The documentation above pds_client_register states that it returns 0 on
+success and negative on error. However, it actually returns a positive
+client ID on success and negative on error. Fix the documentation to
+state exactly that.
 
-> copy -= -fraggap definitely seems off. You point out that it even can
-> turn length negative?
+Signed-off-by: Brett Creeley <brett.creeley@amd.com>
+Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
+---
+ drivers/net/ethernet/amd/pds_core/auxbus.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Yes.  See the logging I posted:
-
-	==>splice_to_socket() 6630
-	udp_sendmsg(8,8)
-	__ip_append_data(copy=-1,len=8, mtu=8192 skblen=8189 maxfl=8188)
-	pagedlen 9 = 9 - 0
-	copy -1 = 9 - 0 - 1 - 9
-	length 8 -= -1 + 0
-
-Since datalen and transhdrlen cancel, and fraggap is unsigned, if fraggap is
-non-zero, copy will be negative.
-
-> The WARN_ON_ONCE, if it can be reached, will be user triggerable.
-> Usually for those cases and when there is a viable return with error
-> path, that is preferable. But if you prefer to taunt syzbot, ok. We
-> can always remove this later.
-
-It shouldn't be possible for length to exceed msg->msg_iter.count (assuming
-there is a msg) coming from userspace; further, userspace can't directly
-specify MSG_SPLICE_PAGES.
-
-> __ip6_append_data probably needs the same.
-
-Good point.  The arrangement of the code is a bit different, but I think it's
-substantially the same in this regard.
-
-David
+diff --git a/drivers/net/ethernet/amd/pds_core/auxbus.c b/drivers/net/ethernet/amd/pds_core/auxbus.c
+index 561af8e5b3ea..6787a5fae908 100644
+--- a/drivers/net/ethernet/amd/pds_core/auxbus.c
++++ b/drivers/net/ethernet/amd/pds_core/auxbus.c
+@@ -11,7 +11,7 @@
+  * @pf_pdev:	ptr to the PF driver struct
+  * @devname:	name that includes service into, e.g. pds_core.vDPA
+  *
+- * Return: 0 on success, or
++ * Return: positive client ID (ci) on success, or
+  *         negative for error
+  */
+ int pds_client_register(struct pci_dev *pf_pdev, char *devname)
+-- 
+2.17.1
 
 
