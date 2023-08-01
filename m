@@ -1,137 +1,197 @@
-Return-Path: <netdev+bounces-23405-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23406-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD86376BD18
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 20:57:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 290CA76BD1E
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 20:59:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A4211C21002
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 18:57:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CD83A281B25
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 18:59:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7280A24166;
-	Tue,  1 Aug 2023 18:57:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3DF325145;
+	Tue,  1 Aug 2023 18:59:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67580200AC
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 18:57:45 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (unknown [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6629A10C1
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 11:57:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:Reply-To:Content-ID
-	:Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:
-	Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=VbILsHnal4xKBGioU0EAyYH9GfmXUZxWRJr/xsHB78I=; b=YbtdvS8nxTQyujUXjpddqC8Gqo
-	vfU5x18XFv9nkiGK8vCfJAvU5cxVbMqD3D6uBPsUuPSfyZrUPVI0hG8bfndHJSH20Y8HnospbZHWG
-	G8qV2Nw52bSxGpobWwaalC7+veWxRiKS+ry5PVcQQPwYnQKKp6V3UbswsfFPnVLqfNLMBpWHCn4vJ
-	0mnxB6kCE79FJ9TtUjZRMezj9el/KQ4XRFPP1E+1YJVUcqxD4tUSoLXzLxRiNiOoRwipqF/zfuDOQ
-	3LUagF0YPD0WV02YwMnX8hAgr8C6Y/y5nGhgUh+IZO58p9MBZ8Xh/jSJKgGHfK1+1DUASaAKQoB+e
-	SIyLLb3Q==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:46386 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1qQuYo-0004WC-1K;
-	Tue, 01 Aug 2023 19:57:34 +0100
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1qQuYo-001WX1-H2; Tue, 01 Aug 2023 19:57:34 +0100
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Frank Wunderlich <frank-w@public-files.de>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Eric Woudstra <ericwouds@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Subject: [PATCH RFC net-next] net: phy: move marking PHY on SFP module into
- SFP code
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF7DA2CA5
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 18:59:02 +0000 (UTC)
+Received: from HK2P15301CU002.outbound.protection.outlook.com (mail-eastasiaazon11020026.outbound.protection.outlook.com [52.101.128.26])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F0E630FD;
+	Tue,  1 Aug 2023 11:59:01 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=JjnZscF7dUCqSb8cpDlA1yo39YtArKzJkDA98vC2QAaCzFsPXsLmmEfdw6/I9RFGaZ8BIXvfcdKvJWan6/ZCHEqfV7ClKSy+QV3xe7IXGxcxHstsFTC2QnFrQlvEQ8vfRZJ5n97NHEtJzTK1gUiaJRa1OGd6VxVfeiKU82OwvncwcpjOoZ8e3pvswxVctknJc29PlvVZ+zzXn/n6A8mQ9Z+mczvHq+LJL9zRfOF1v6u24wy/+kk+meXX1Hnf2mfuNClOBNgq8lVaIYws+URwVdm9e1JATITK19/kzThYadxk0PBJRrbRRjacM9mjOndujIAj2mxDEPr7d/QNTFVArw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=yyZnRkjFcxuO72vSQ7sqL3MJqlLUkh1g7aKtHvzPwK0=;
+ b=n4esBWdtOOpfC2kk1wD5g0BnfaNQfv+6Wu5u1QM4Ulsji2PaO1HyJYVoftD3U32avl2L15ZWzXs+QLZXXPXHsNk/BZyFLbCJk1YEwpCZWdzsJIq1BQLp6WdiTV4JQbKxoK0QLKXHjHpAgXZiKzZBvS1ZY3lyEeiDdbBr0Jvxjv47ELx6upocxIRHY9CFjaLxLDuEx1CPqjgTpxDYa/7lmdJAiOQVSJDWTYxkmpb53JS/xrcJOMSg8RBW6ZFgXLEoFEXS8Fp/sRyWG6NgEzBuH/LObzYDk+69axmP9zaNhgChMWVU1ToDZJFXA3/1zzLpUYLlGOgRhnrP5fl4zj6d/A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microsoft.com; dmarc=pass action=none
+ header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=yyZnRkjFcxuO72vSQ7sqL3MJqlLUkh1g7aKtHvzPwK0=;
+ b=Is2WPE07rO8Fn/FynX/wqQAwx5qN3wfb0QyOPT13iYJUMRN5EBGZFHO2WIH6zLFBxaPZSgda4Q8rH71M+xH1YcuYQM7LnND0e1FscvfOjtlUhQ4IiQHNdZ3EPnOvdJiNkY6elKaLRrVPkijTMfRydoebH83LFVy/Bo2TEeHmivQ=
+Received: from PUZP153MB0788.APCP153.PROD.OUTLOOK.COM (2603:1096:301:fc::10)
+ by SEZP153MB0661.APCP153.PROD.OUTLOOK.COM (2603:1096:101:90::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6678.6; Tue, 1 Aug
+ 2023 18:58:55 +0000
+Received: from PUZP153MB0788.APCP153.PROD.OUTLOOK.COM
+ ([fe80::abe0:95e:5348:dd5a]) by PUZP153MB0788.APCP153.PROD.OUTLOOK.COM
+ ([fe80::abe0:95e:5348:dd5a%4]) with mapi id 15.20.6652.000; Tue, 1 Aug 2023
+ 18:58:55 +0000
+From: Souradeep Chakrabarti <schakrabarti@microsoft.com>
+To: Simon Horman <horms@kernel.org>, Souradeep Chakrabarti
+	<schakrabarti@linux.microsoft.com>
+CC: KY Srinivasan <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>,
+	"wei.liu@kernel.org" <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
+	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>, Long Li <longli@microsoft.com>, Ajay
+ Sharma <sharmaajay@microsoft.com>, "leon@kernel.org" <leon@kernel.org>,
+	"cai.huoqing@linux.dev" <cai.huoqing@linux.dev>,
+	"ssengar@linux.microsoft.com" <ssengar@linux.microsoft.com>, vkuznets
+	<vkuznets@redhat.com>, "tglx@linutronix.de" <tglx@linutronix.de>,
+	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+	"stable@vger.kernel.org" <stable@vger.kernel.org>
+Subject: RE: [EXTERNAL] Re: [PATCH V7 net] net: mana: Fix MANA VF unload when
+ hardware is
+Thread-Topic: [EXTERNAL] Re: [PATCH V7 net] net: mana: Fix MANA VF unload when
+ hardware is
+Thread-Index: AQHZxHPmLqz8YNs1vkSBwVqcY/Jzsa/VkZOAgAA5yLA=
+Date: Tue, 1 Aug 2023 18:58:54 +0000
+Message-ID:
+ <PUZP153MB0788A2C4FC7A76D2CDD021BCCC0AA@PUZP153MB0788.APCP153.PROD.OUTLOOK.COM>
+References:
+ <1690892953-25201-1-git-send-email-schakrabarti@linux.microsoft.com>
+ <ZMklUch+vfZBqfAr@kernel.org>
+In-Reply-To: <ZMklUch+vfZBqfAr@kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+msip_labels:
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=dbb12665-10db-4bbd-b9e7-2272f750161e;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2023-08-01T18:58:17Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microsoft.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PUZP153MB0788:EE_|SEZP153MB0661:EE_
+x-ms-office365-filtering-correlation-id: 992b8c53-22ff-4194-e1ea-08db92c15a7c
+x-ld-processed: 72f988bf-86f1-41af-91ab-2d7cd011db47,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ 06NYu8jpO0OA3Tb4+pf9U5CWOnlmChCfnLUKe9HJt6MH9p2AccBhO6LA4N4q4KYbsuGUkMZFAD98UxCHE7q7jDUJ4h3lpTgB7w+Saswt9WT8cg5vEuVveSoMoxyzx2QWG1C2kmJZySY1+89LXl1XUqvSmxjIoCyCfo3stf/LufKOKlEA0nXX/sTCfoKn8Uq/fAUXcB6R/x9GrDMC5CLY2WrVzlRJ6oFNsiskhM8ljgtgl8KVm178A16o6X8ILWNHhWwD4AN6Bs47dAAttfL7VZbmc47HQ7baw90+DSZGP45aYgdkjuIrWrCVEtg31oHP24IjCvbTtGi6sSG+G2m5rEFvVfmZmHG67lcnkKlDk+b8CmNQhNoqminTmxD6DtkC2p1b6tO5DDw4jR/gYYbmmUMlVtk9khzMltOCaCF/EHAJU3g1jDr2eTWPP0xJwlOYcJBOIgSxKqJ0dI3Q1EoE6C2/YwVCPOkT2gYcjWaOd/3G0njUttQJLypngXek2SdC1uDdFlIMxH26rJREbWdIU7uuDzknaYt7Ohg2jvxhjNcjH/se42x0WEu1aus6hBO0vdYi4pDg+3A6wDd+Aw21qn9m4KwFjcytghaVGmuks7oGnkMIHImt4fG7ltZNcVizLb8V0PxyzeVd6x/9Nn2NflHEVyby1ewFVVTMuAIS3Vw=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PUZP153MB0788.APCP153.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230028)(39860400002)(346002)(376002)(136003)(396003)(366004)(451199021)(66946007)(10290500003)(66556008)(66446008)(4326008)(64756008)(786003)(66476007)(316002)(71200400001)(76116006)(38070700005)(41300700001)(122000001)(54906003)(33656002)(7696005)(9686003)(110136005)(478600001)(8676002)(8936002)(7416002)(52536014)(5660300002)(82960400001)(55016003)(82950400001)(6506007)(86362001)(83380400001)(26005)(186003)(2906002)(8990500004)(38100700002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?XEUWnItZkNol4OUEuP5wlJsbxMB4eDry8XZ5KbM57kfRM0I/A74o/zk2Jj7Y?=
+ =?us-ascii?Q?2HF6jsSfmm7oO3vULBzReraJvyRgJOhYvvy3Sd1zknmw8S/Sb0QIg1nInG5a?=
+ =?us-ascii?Q?dCcj3rPNs/GrKLFiDQuHhZ2LLvGTVz9ax4SLezerP/2T9I+5h3u9r0rIp86r?=
+ =?us-ascii?Q?ozWy5PBYg4WFzDHYnPgjG6UUvFAJINqed00e01SR48haaWhlwEvP1q9GAC/E?=
+ =?us-ascii?Q?Re6p5vVzQYmDpTy+H3RpLf0Rwnkno0fIhqrQNNYHG5d2kQeT04i15Q6gn3km?=
+ =?us-ascii?Q?wLuGff648HTX+yfa29Q0COyN+hUVGSsAiBcaiqSuyv/DmD/LAAvXhv/teLxa?=
+ =?us-ascii?Q?vrHRty5OV3+yok3cDH9Cwxina6ITmjYSntBpuipa9yw7mgB3BvHlXONrLm0Q?=
+ =?us-ascii?Q?eolW/A3VqCrXORxlLyi1WMYdUrtAiksnE7x+GNkE3hoedgKaT9ZzTq8q+tmD?=
+ =?us-ascii?Q?siUyGgXP1rOOf6Mayh3/vi+o4O6cikS+SdXR2/ZBdld9EshfOnefBQ2t8GAQ?=
+ =?us-ascii?Q?+5k7I9xpY9SK3QyjjJnr3ZAThEVMfPV/srhMZVhIgrGLkhfEI0XECukWRBzn?=
+ =?us-ascii?Q?5ZC4Qwx+N/Sn5Ha3VBxucMYy7gSEpG8hQQDzCf40Xv+y7jYHwKe8rCUVbPF8?=
+ =?us-ascii?Q?fqemzR9RHw/VRW1wxU1z82CTziv0GmYnsKMoWX86GZYlqqueW1G0d/LF2UYY?=
+ =?us-ascii?Q?c9fWmoCb8UpJO4quqnoooUDdf58YA68Y8nMTb5rKTJZeBhOSXI7tO2H67ixA?=
+ =?us-ascii?Q?/HBaOIKdYoKynD9DHwSMYQr93adh0qFuTee6RIKT3xYPtOwCgc0bdm/s+2h7?=
+ =?us-ascii?Q?2U6rwun3K9Rda6ntw4TEkLMf45VYyOvWYCvQwv9m+vmjLIYVCnHK4VYNRfkH?=
+ =?us-ascii?Q?TPPsjuIMyaxPQ9Xu7f4heX/643TZ+UXLN0Qpo1dpkOT+XQCrWrGV/S10BoCc?=
+ =?us-ascii?Q?ylf7HqwgpWzVEsV4SS9bQHGTmXenBxU7fUiWEvc8lbLIAiufrT+hDJ2fb234?=
+ =?us-ascii?Q?gQAmrRa8qCWy/i0o4LLhzof/s1JkZOhWaDNDm8gIPGsu+0Mtvp7xEjMwHEAS?=
+ =?us-ascii?Q?lhPv6Suk1U47G5IT7sXd/jlCpfyrFkFcSkcdq1XPDOLqAOxaLeIG44lURFFX?=
+ =?us-ascii?Q?rKZ3tLF7iwYvbUYTrSzeLYaML6bhZ3yq3Oj8XArGnh5zLUNowC38wl+4xMbx?=
+ =?us-ascii?Q?iRr8xw4hTO2hIxj7tsgJ/sbvLnEWYSUGXcKezQ5hhDio/0opfAZ7fUMkpp5V?=
+ =?us-ascii?Q?k+I7X4lfsKHfnQLNw9crkfKrSQe/AXBIOOfE3TEIzncNa+UW6uijSyQ5JuG7?=
+ =?us-ascii?Q?JvJMMppBZ2YndpgNsYgeQdwNHJ3vQzDnDzhcu8mtRO52qvOkhSS46uCkotO9?=
+ =?us-ascii?Q?4ouuKPh7kqYdWE+8n0jBxroz6+nrudDTeDi7Unq8+5Qqi4veK/YID2Gj2Ef1?=
+ =?us-ascii?Q?8awRzjOojEqgPnR/II8EQXZj/xtg0o1BHAt6bfIcpRrlQ5XLZXkmbg1IxfaE?=
+ =?us-ascii?Q?LgjVP0EZl+l70KdEQLHlzUQpCYs3V6ObTsOE?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1qQuYo-001WX1-H2@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Tue, 01 Aug 2023 19:57:34 +0100
-X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RDNS_NONE,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.6
+X-OriginatorOrg: microsoft.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PUZP153MB0788.APCP153.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-Network-Message-Id: 992b8c53-22ff-4194-e1ea-08db92c15a7c
+X-MS-Exchange-CrossTenant-originalarrivaltime: 01 Aug 2023 18:58:54.7200
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: aOREfljvjFxid3xsw4/M9G7JnTK8KuWb8qnQdVjm8z7KsCAEYA/azMwFUfMQpXMi8q+I6v20lT4clC4WCb0qDP7Jro+5bL16OguFqdtyIxk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SEZP153MB0661
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE
+	autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Move marking the PHY as being on a SFP module into the SFP code between
-getting the PHY device (and thus initialising the phy_device structure)
-and registering the discovered device.
 
-This means that PHY drivers can use phy_on_sfp() in their match and
-get_features methods.
 
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
----
-Eric Woudstra has a SFP module that has a realtek PHY on that could
-be driven by the realtek PHY driver - except that the PHY is behind
-a Rollball access implementation that only supports clause 45 access.
-
-This is a work in progress, but it seems useful in these situations
-that drivers should know whether the PHY is on a module very early on,
-so that a particular PHY driver instance can choose whether or not to
-drive the instance, or maybe use a different PHY driver instance to
-drive it - thus allowing a separate set of function pointers for the
-clause-45 only accessable PHY.
-
-Some experimental patches can be found at:
-
-https://gist.github.com/ericwoud/d912301a93cd41b39621a65cc372a5c0#file-0000-oem-sfp-2-5g-t-patches-realtek-short-c
-
-and onward discussion prompted this patch. Ignore the first non-patch
-C file!
-
- drivers/net/phy/phy_device.c | 2 --
- drivers/net/phy/sfp.c        | 3 +++
- 2 files changed, 3 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
-index 61921d4dbb13..da544faf1661 100644
---- a/drivers/net/phy/phy_device.c
-+++ b/drivers/net/phy/phy_device.c
-@@ -1487,8 +1487,6 @@ int phy_attach_direct(struct net_device *dev, struct phy_device *phydev,
- 
- 		if (phydev->sfp_bus_attached)
- 			dev->sfp_bus = phydev->sfp_bus;
--		else if (dev->sfp_bus)
--			phydev->is_on_sfp_module = true;
- 	}
- 
- 	/* Some Ethernet drivers try to connect to a PHY device before
-diff --git a/drivers/net/phy/sfp.c b/drivers/net/phy/sfp.c
-index d855a18308d7..4ecfac227865 100644
---- a/drivers/net/phy/sfp.c
-+++ b/drivers/net/phy/sfp.c
-@@ -1763,6 +1763,9 @@ static int sfp_sm_probe_phy(struct sfp *sfp, int addr, bool is_c45)
- 		return PTR_ERR(phy);
- 	}
- 
-+	/* Mark this PHY as being on a SFP module */
-+	phy->is_on_sfp_module = true;
-+
- 	err = phy_device_register(phy);
- 	if (err) {
- 		phy_device_free(phy);
--- 
-2.30.2
-
+>-----Original Message-----
+>From: Simon Horman <horms@kernel.org>
+>Sent: Tuesday, August 1, 2023 9:01 PM
+>To: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
+>Cc: KY Srinivasan <kys@microsoft.com>; Haiyang Zhang
+><haiyangz@microsoft.com>; wei.liu@kernel.org; Dexuan Cui
+><decui@microsoft.com>; davem@davemloft.net; edumazet@google.com;
+>kuba@kernel.org; pabeni@redhat.com; Long Li <longli@microsoft.com>; Ajay
+>Sharma <sharmaajay@microsoft.com>; leon@kernel.org;
+>cai.huoqing@linux.dev; ssengar@linux.microsoft.com; vkuznets
+><vkuznets@redhat.com>; tglx@linutronix.de; linux-hyperv@vger.kernel.org;
+>netdev@vger.kernel.org; linux-kernel@vger.kernel.org; linux-
+>rdma@vger.kernel.org; Souradeep Chakrabarti
+><schakrabarti@microsoft.com>; stable@vger.kernel.org
+>Subject: [EXTERNAL] Re: [PATCH V7 net] net: mana: Fix MANA VF unload when
+>hardware is
+>
+>On Tue, Aug 01, 2023 at 05:29:13AM -0700, Souradeep Chakrabarti wrote:
+>
+>...
+>
+>Hi Souradeep,
+>
+>
+>> +	for (i =3D 0; i < apc->num_queues; i++) {
+>> +		txq =3D &apc->tx_qp[i].txq;
+>> +		while (skb =3D skb_dequeue(&txq->pending_skbs)) {
+>
+>W=3D1 builds with both clang-16 and gcc-12 complain that they would like a=
+n
+>extra set of parentheses around an assignment used as a truth value.
+Thanks for letting me know. I will fix it in next version.
+>
+>> +			mana_unmap_skb(skb, apc);
+>> +			dev_consume_skb_any(skb);
+>> +		}
+>> +		atomic_set(&txq->pending_sends, 0);
+>> +	}
+>>  	/* We're 100% sure the queues can no longer be woken up, because
+>>  	 * we're sure now mana_poll_tx_cq() can't be running.
+>>  	 */
+>> --
+>> 2.34.1
+>>
+>>
 
