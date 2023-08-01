@@ -1,107 +1,127 @@
-Return-Path: <netdev+bounces-23027-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23028-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B450176A6FD
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 04:31:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 51C6876A70A
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 04:36:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6E4002817FB
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 02:31:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0DBF928185D
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 02:35:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5AF0629;
-	Tue,  1 Aug 2023 02:31:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B683807;
+	Tue,  1 Aug 2023 02:35:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE8681FCF
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 02:31:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F803C433C7;
-	Tue,  1 Aug 2023 02:31:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690857080;
-	bh=mTxd6HdQzFWXD+l9R8aNLIJTw4K0Wg96Ajxe6Cwzwpw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=KAG52lTMe9zgens46rA1eqv/cVT1kaIN46yTHYubtyBonBbMQC7xVE46a34uehmga
-	 31kWSsZKowpkD2MbkHQGzvlDaG+VeKKeumaCEJFWx1l38kPGdAx445eNnJf9W1AQYI
-	 vl1/r2x6mzXlfvj/rLlL6MMd6XlCwD/U6U1THCHc1VAWGL2xf5wHhSbZVLSwvRh++6
-	 qvWYTtlQ7AU1tja7v7JykjmZIrgOWlpI+j7yAb/QqsX6cQwhYaaajdO0Sm2Xevw57D
-	 uta6SqTz1Cg2sKs9BKsapSAlYej0MqzS9/ntVSPABQsROacNQHjl3FFg0CgrRS4Rfe
-	 B8hTP27zKtI8g==
-Date: Mon, 31 Jul 2023 19:31:18 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: "Lin Ma" <linma@zju.edu.cn>
-Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- fw@strlen.de, yang.lee@linux.alibaba.com, jgg@ziepe.ca,
- markzhang@nvidia.com, phaddad@nvidia.com, yuancan@huawei.com,
- ohartoov@nvidia.com, chenzhongjin@huawei.com, aharonl@nvidia.com,
- leon@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-rdma@vger.kernel.org
-Subject: Re: [PATCH net v1 1/2] netlink: let len field used to parse
- type-not-care nested attrs
-Message-ID: <20230731193118.67d79f7b@kernel.org>
-In-Reply-To: <38179c76.f308d.189aed2db99.Coremail.linma@zju.edu.cn>
-References: <20230731121247.3972783-1-linma@zju.edu.cn>
-	<20230731120326.6bdd5bf9@kernel.org>
-	<38179c76.f308d.189aed2db99.Coremail.linma@zju.edu.cn>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F71A7E4
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 02:35:56 +0000 (UTC)
+Received: from mail-il1-x135.google.com (mail-il1-x135.google.com [IPv6:2607:f8b0:4864:20::135])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0FB41BF6
+	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 19:35:41 -0700 (PDT)
+Received: by mail-il1-x135.google.com with SMTP id e9e14a558f8ab-348de515667so22798615ab.1
+        for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 19:35:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1690857341; x=1691462141;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=C6AOWyDqc75GRxFgcgcfnofzEcWMYSjGod9lW80IX6E=;
+        b=QOnPQLplydDtl+ZM2qfc+7pKQXNbEw5TjbTITfXYsKhwU+Sjkbjy9A98NHFcWE6/6c
+         4pCHhZtChtWMR43J9OZOwArFE91MkORKqOwAyCdwNJBdqImDVHZNut/qBkRvNZccW2fC
+         g40kOmhOiA/vKb5UMUYbf10VBbDwLUYdy6blgzx4hLFG5TvLc1zWUFuICAoE189aFmKM
+         bNlUiln2Em5RFuqGTWJ1fjFwVDBAhl5PYu5vsWR6N5OF1owZkLHmmeQ4tZWzNnlCM8hF
+         pR57NObghRNCyhEXLm0VUlKgO2+yRya8vZ50SrrUoEWPlom6kTQfx2cdU9khA1Ey7b6I
+         TKDA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690857341; x=1691462141;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=C6AOWyDqc75GRxFgcgcfnofzEcWMYSjGod9lW80IX6E=;
+        b=OB/7U9RGF/0+zy3W6aCFyuLqZ/twka63EmPryQkTK11NqeXlMmDO3zLtAmymyxkKaQ
+         dtWQ6X+Rr+BrL6rwE4SrRiEcwj8ck/VaI4l5Z2oGCtfNOvggtwWxjsUpIpogg8VFndev
+         wMg0XjMBBUmjFq98Ywu7CdQIuR37e3rX9oRXlc6G3Nct7uu+PTPlaNjarAobGJ1S5ikl
+         7EVKTvY5xSSVkec0z4VxMckDW1ACvX+Kb2qIjbToIacH6S7nl6QDMAYVQlhdkUvtyhs+
+         aE/4D1kpvQA/52W7U6ujNrkgS2lRNIzrYaR85DKnDh6e1jeTrH0FXm9LeOYwEnTp/YmS
+         E4CQ==
+X-Gm-Message-State: ABy/qLahWRLI5W1+ixlWMNBAX5lMaBA9mOrBf6PiqObO02XMI3YpRqV+
+	HgfYMzjNmiNsUS2/FioCwzo=
+X-Google-Smtp-Source: APBJJlEYUv9I8KY/FXDFaBge/CfFbylJBABucKaeqnlXZu8MLKN4JUhY3ruYT2a0mxiYJEbiqq9SEQ==
+X-Received: by 2002:a92:c54e:0:b0:348:d89b:268 with SMTP id a14-20020a92c54e000000b00348d89b0268mr12457449ilj.7.1690857340893;
+        Mon, 31 Jul 2023 19:35:40 -0700 (PDT)
+Received: from ?IPV6:2601:282:800:7ed0:211e:b7c4:92fe:76f4? ([2601:282:800:7ed0:211e:b7c4:92fe:76f4])
+        by smtp.googlemail.com with ESMTPSA id c14-20020a02a60e000000b0041d859c5721sm3538656jam.64.2023.07.31.19.35.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 31 Jul 2023 19:35:40 -0700 (PDT)
+Message-ID: <5222d4e2-dd19-fc77-23f0-ce96684e9470@gmail.com>
+Date: Mon, 31 Jul 2023 20:35:39 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.13.0
+Subject: Re: [PATCH iproute2-next] tc: Classifier support for SPI field
+Content-Language: en-US
+To: Ratheesh Kannoth <rkannoth@marvell.com>,
+ "stephen@networkplumber.org" <stephen@networkplumber.org>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "davem@davemloft.net" <davem@davemloft.net>,
+ "kuba@kernel.org" <kuba@kernel.org>, Leon Romanovsky <leon@kernel.org>,
+ "edumazet@google.com" <edumazet@google.com>,
+ "pabeni@redhat.com" <pabeni@redhat.com>
+References: <20230725035016.505386-1-rkannoth@marvell.com>
+ <MWHPR1801MB19182545B1FEB05CAC9F7371D30AA@MWHPR1801MB1918.namprd18.prod.outlook.com>
+From: David Ahern <dsahern@gmail.com>
+In-Reply-To: <MWHPR1801MB19182545B1FEB05CAC9F7371D30AA@MWHPR1801MB1918.namprd18.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Tue, 1 Aug 2023 10:00:01 +0800 (GMT+08:00) Lin Ma wrote:
-> > > However, this is tedious and just like Leon said: add another layer of
-> > > cabal knowledge. The better solution should leverage the nla_policy and
-> > > discard nlattr whose length is invalid when doing parsing. That is, we
-> > > should defined a nested_policy for the X above like  
-> > 
-> > Hard no. Putting array index into attr type is an advanced case and the
-> > parsing code has to be able to deal with low level netlink details.  
+On 7/31/23 7:53 PM, Ratheesh Kannoth wrote:
+>> From: Ratheesh Kannoth <rkannoth@marvell.com>
+>> Sent: Tuesday, July 25, 2023 9:20 AM
+>> To: dsahern@gmail.com; stephen@networkplumber.org
+>> Cc: netdev@vger.kernel.org; Ratheesh Kannoth <rkannoth@marvell.com>
+>> Subject: [PATCH iproute2-next] tc: Classifier support for SPI field
+>>
+>> tc flower support for SPI field in ESP and AH packets.
+>>
+>> Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
+>> ---
+>>  include/uapi/linux/pkt_cls.h |  5 +++-
+>>  tc/f_flower.c                | 55 ++++++++++++++++++++++++++++++++++--
+>>  2 files changed, 57 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/include/uapi/linux/pkt_cls.h b/include/uapi/linux/pkt_cls.h index
+>> 7865f5a9..fce639a6 100644
+>> --- a/include/uapi/linux/pkt_cls.h
+>> +++ b/include/uapi/linux/pkt_cls.h
+>> @@ -594,6 +594,9 @@ enum {
+>>
+>>  	TCA_FLOWER_KEY_L2TPV3_SID,	/* be32 */
+>>
+>> +	TCA_FLOWER_KEY_SPI,		/* be32 */
+>> +	TCA_FLOWER_KEY_SPI_MASK,	/* be32 */
+>> +
+>>  	TCA_FLOWER_L2_MISS,		/* u8 */
+>>
+>>  	TCA_FLOWER_KEY_CFM,		/* nested */
 > 
-> Well, I just known that the type field for those attributes is used as array
-> index.
-> Hence, for this advanced case, could we define another NLA type, maybe 
-> NLA_NESTED_IDXARRAY enum? That may be much clearer against modifying existing
-> code.
+> As per https://lore.kernel.org/netdev/20230731120254.GB87829@unreal/T/#u  ,  I will move these fields to  end in the enum.  
+> Could you please discard https://patchwork.kernel.org/project/netdevbpf/patch/20230725035016.505386-1-rkannoth@marvell.com/  this  from netdev patchwork ?
 
-What if the value is of a complex type (nest)?  For 10th time, if
-someone does "interesting things" they must know what they're doing.
+you do not need to include uapi changes in an iproute2 patch; headers
+are sync'ed from the kernel.
 
-> > Higher level API should remove the nla_for_each_nested() completely
-> > which is rather hard to achieve here.  
-> 
-> By investigating the code uses nla_for_each_nested macro. There are basically
-> two scenarios:
-> 
-> 1. manually parse nested attributes whose type is not cared (the advance case
->    use type as index here).
-> 2. manually parse nested attributes for *one* specific type. Such code do
->    nla_type check.
-> 
-> From the API side, to completely remove nla_for_each_nested and avoid the
-> manual  parsing. I think we can choose two solutions.
-> 
-> Solution-1: add a parsing helper that receives a function pointer as an
->             argument, it will call this pointer after carefully verify the
->             type and length of an attribute.
-> 
-> Solution-2: add a parsing helper that traverses this nested twice, the first
->             time  to do counting size for allocating heap buffer (or stack
->             buffer from the caller if the max count is known). The second
->             time to fill this buffer with attribute pointers.
-> 
-> Which one is preferred? Please enlighten me about this and I can try to propose
-> a fix. (I personally like the solution-2 as it works like the existing parsers
-> like nla_parse) 
-
-Your initial fix was perfectly fine.
-
-We do need a solution for a normal multi-attr parse, but that's not 
-the case here.
 
