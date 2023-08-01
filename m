@@ -1,302 +1,112 @@
-Return-Path: <netdev+bounces-23051-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23052-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 896FA76A859
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 07:31:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A35A976A869
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 07:39:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 427171C20D53
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 05:31:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4A6CF2817DF
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 05:39:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C376D46A2;
-	Tue,  1 Aug 2023 05:31:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6543646AB;
+	Tue,  1 Aug 2023 05:39:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADC87A59;
-	Tue,  1 Aug 2023 05:31:30 +0000 (UTC)
-Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3114B2D61;
-	Mon, 31 Jul 2023 22:31:03 -0700 (PDT)
-Received: by mail-pf1-x42d.google.com with SMTP id d2e1a72fcca58-686f94328a4so3078278b3a.0;
-        Mon, 31 Jul 2023 22:31:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690867842; x=1691472642;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=nqWAF22RstBS1tGS4yV0AwAq4FB3FJTFpBhfM6sE4dE=;
-        b=SGjp1jBd6U+xAiBQVxPDidkD6EbzHrvMBp2VhYLTxu3exqJAEKzqU/Tb780Wrq3Ry0
-         tdsGApUrGOqtMVTRHB4iGcjRj9MhvwUCFdkSctlg+wPHlqNO3HyvYh8EULZLPz0+AjOt
-         xuYd0hMjkBILUV/DyHtrMwF0MYBo8tVAW8QFnbadZ63iXugnDEG0dM7VPb6LCj+ceNLE
-         vJR3ODRNJliIw11rbC0Y5ZUcjqLPjEz4UBP7BWQztCtxqNXbTPnvbmMirvy3CroTYp9t
-         mRC3PklfkjRBwt8yTzCiEg0hqtjJoBT6FojMhA4ihMjaNM4CDjeO6LR0EgDVr+8pLFTi
-         NSVw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690867842; x=1691472642;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nqWAF22RstBS1tGS4yV0AwAq4FB3FJTFpBhfM6sE4dE=;
-        b=G5x6J2J41NZtfy7N4ddf+l9V6BMsXXXb+BDP6m6nESP7sVG16lQk096d2gymz16VzK
-         /8OQmpY3QYlt2cF91ZHT2UHS3dwp8M49B4CxGdJ7M7u6CaPBrlQ8TpkD2lG9S7CKh1v7
-         +St/Jz18I92NF4Spi0qHBt672QbQoFknchttZHhWfpcm4RIjfywzHNP0TepAPrrOUX3D
-         fwxjwfgwU7nc/G5JKKMRf02A+bdzCB1oJMiED93iSycu9lDGYWbwCkvz0weolsfP9fob
-         /1kqUZwwP5DdQJRACK6W2R+4P5KQOX7JwImgT+Jh23SFNZ5UvhT41Xq1l52NFottCp89
-         HLbA==
-X-Gm-Message-State: ABy/qLb+LdPybXcPxnyO/9XZJbOW4w35T1RHa50CyYxXw96/nVGFanp/
-	bzdh7qzlQCPkOXCvaEqloYc=
-X-Google-Smtp-Source: APBJJlFievjHlQxWtYiAHh/QmASEiUYMImGOwyD0Iz4AYv5+vCanWbm/6XgiBdhS0kXxv1fpeukrKw==
-X-Received: by 2002:a05:6a00:16c8:b0:666:eaaf:a2af with SMTP id l8-20020a056a0016c800b00666eaafa2afmr13691945pfc.14.1690867841668;
-        Mon, 31 Jul 2023 22:30:41 -0700 (PDT)
-Received: from localhost (c-67-166-91-86.hsd1.wa.comcast.net. [67.166.91.86])
-        by smtp.gmail.com with ESMTPSA id ey14-20020a056a0038ce00b00686bdff1d6fsm8225653pfb.77.2023.07.31.22.30.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 31 Jul 2023 22:30:41 -0700 (PDT)
-Date: Tue, 1 Aug 2023 05:30:40 +0000
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Bobby Eshleman <bobby.eshleman@bytedance.com>,
-	linux-hyperv@vger.kernel.org, Stefan Hajnoczi <stefanha@redhat.com>,
-	kvm@vger.kernel.org,
-	VMware PV-Drivers Reviewers <pv-drivers@vmware.com>,
-	Simon Horman <simon.horman@corigine.com>,
-	virtualization@lists.linux-foundation.org,
-	Eric Dumazet <edumazet@google.com>,
-	Dan Carpenter <dan.carpenter@linaro.org>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Bryan Tan <bryantan@vmware.com>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Krasnov Arseniy <oxffffaa@gmail.com>,
-	Vishnu Dasa <vdasa@vmware.com>,
-	Jiang Wang <jiang.wang@bytedance.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>
-Subject: Re: [PATCH RFC net-next v5 00/14] virtio/vsock: support datagrams
-Message-ID: <ZMiYgDjm0IxXglP/@bullseye>
-References: <20230413-b4-vsock-dgram-v5-0-581bd37fdb26@bytedance.com>
- <20230727035004-mutt-send-email-mst@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5770763D
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 05:39:13 +0000 (UTC)
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E872DCF;
+	Mon, 31 Jul 2023 22:38:32 -0700 (PDT)
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3714r2IS005877;
+	Mon, 31 Jul 2023 22:38:23 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding :
+ content-type; s=pfpt0220; bh=3Ku+7wiW/5A9ElYRZNcxBtiU5KeGuVKEZQ+bgbeGDTo=;
+ b=fC74eaQLK7lnht5vXEawGTR3ZCO6fnP9IgRlHcla+hx6RlnWWT/es3g8qw3cdVNvZ5rY
+ AZPDfkzyeoUJ3YUrAUQOOPTiNNyys/Xn/02mSkEbawBXqK02r4ys9nQlSJlCAnu62wOl
+ NtKB/DiFxHtylioIRpwHD/q7SpQMHkAWnWwfkvl2kTsG7MAjsw08c9qaFb+9w0qh3ae2
+ N8rCR7X4SZdv719pWP9UBcw511mE+dDob0761n5ayw1sFd9qUNJHXcL++SxBAvByiYSL
+ ub9N6Iywh2nsfaT1qktj7CFCIxiPqR7Nguj4sXjwex1FXEPLdVMp7RPseoEYEmQ/H/uN EQ== 
+Received: from dc5-exch02.marvell.com ([199.233.59.182])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3s529k7hcv-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+	Mon, 31 Jul 2023 22:38:23 -0700
+Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Mon, 31 Jul
+ 2023 22:38:21 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Mon, 31 Jul 2023 22:38:21 -0700
+Received: from localhost.localdomain (unknown [10.28.36.166])
+	by maili.marvell.com (Postfix) with ESMTP id A7EB35B6944;
+	Mon, 31 Jul 2023 22:38:16 -0700 (PDT)
+From: Suman Ghosh <sumang@marvell.com>
+To: <sgoutham@marvell.com>, <gakula@marvell.com>, <sbhatta@marvell.com>,
+        <hkelam@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <lcherian@marvell.com>,
+        <jerinj@marvell.com>, <simon.horman@corigine.com>,
+        <jesse.brandeburg@intel.com>
+CC: Suman Ghosh <sumang@marvell.com>
+Subject: [net-next PATCH V3 0/2] octeontx2-af: TC flower offload changes
+Date: Tue, 1 Aug 2023 11:08:11 +0530
+Message-ID: <20230801053813.2857958-1-sumang@marvell.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230727035004-mutt-send-email-mst@kernel.org>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-GUID: OoA2_SSDt9mdHG0tWlGOiTwBFE2hs_er
+X-Proofpoint-ORIG-GUID: OoA2_SSDt9mdHG0tWlGOiTwBFE2hs_er
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-08-01_03,2023-07-31_02,2023-05-22_02
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Jul 27, 2023 at 03:51:42AM -0400, Michael S. Tsirkin wrote:
-> On Wed, Jul 19, 2023 at 12:50:04AM +0000, Bobby Eshleman wrote:
-> > Hey all!
-> > 
-> > This series introduces support for datagrams to virtio/vsock.
-> > 
-> > It is a spin-off (and smaller version) of this series from the summer:
-> >   https://lore.kernel.org/all/cover.1660362668.git.bobby.eshleman@bytedance.com/
-> > 
-> > Please note that this is an RFC and should not be merged until
-> > associated changes are made to the virtio specification, which will
-> > follow after discussion from this series.
-> > 
-> > Another aside, the v4 of the series has only been mildly tested with a
-> > run of tools/testing/vsock/vsock_test. Some code likely needs cleaning
-> > up, but I'm hoping to get some of the design choices agreed upon before
-> > spending too much time making it pretty.
-> > 
-> > This series first supports datagrams in a basic form for virtio, and
-> > then optimizes the sendpath for all datagram transports.
-> > 
-> > The result is a very fast datagram communication protocol that
-> > outperforms even UDP on multi-queue virtio-net w/ vhost on a variety
-> > of multi-threaded workload samples.
-> > 
-> > For those that are curious, some summary data comparing UDP and VSOCK
-> > DGRAM (N=5):
-> > 
-> > 	vCPUS: 16
-> > 	virtio-net queues: 16
-> > 	payload size: 4KB
-> > 	Setup: bare metal + vm (non-nested)
-> > 
-> > 	UDP: 287.59 MB/s
-> > 	VSOCK DGRAM: 509.2 MB/s
-> > 
-> > Some notes about the implementation...
-> > 
-> > This datagram implementation forces datagrams to self-throttle according
-> > to the threshold set by sk_sndbuf. It behaves similar to the credits
-> > used by streams in its effect on throughput and memory consumption, but
-> > it is not influenced by the receiving socket as credits are.
-> > 
-> > The device drops packets silently.
-> > 
-> > As discussed previously, this series introduces datagrams and defers
-> > fairness to future work. See discussion in v2 for more context around
-> > datagrams, fairness, and this implementation.
-> 
-> it's a big thread - can't you summarize here?
-> 
+This patchset includes minor code restructuring related to TC
+flower offload for outer vlan and adding support for TC inner
+vlan offload.
 
-Sure, no problem. I'll add that in the next rev. For the sake of readers
-here, the fairness of vsock streams and vsock datagrams per this
-implementation was experimentally demonstrated to be nearly equal.
+Patch #1 Code restructure to handle TC flower outer vlan offload
 
-Fairness was measured as a percentage reduction of throughput on an
-active and concurrent stream flow. The socket type under test (datagram
-or stream) was overprovisioned into a large pool of sockets and were
-exercised to maximum sending throughput. Each socket was given a unique
-port and single-threaded sender to avoid any scalability differences
-between datagrams and streams. Meanwhile, the throughput of a single,
-lone stream socket was measured before and throughout the lifetime the
-pool of sockets, to detect fairness as an amount of reduced throughput.
-It was demonstrated that there was no real difference in this fairness
-characteristic of datagrams and streams for vsock. In fact, datagrams
-faired better (that is, datagrams were nicer to streams than streams
-were to other streams), although the effect was not statistically
-significant. From the design perspective, the queuing policy is always
-FIFO regardless of socket type. Credits, despite being a perfect
-mechanism for synchronizing send and receive buffer sizes, have no
-effect on queuing fairness either.
+Patch #2 Add TC flower offload support for inner vlan
 
-> 
-> > Signed-off-by: Bobby Eshleman <bobby.eshleman@bytedance.com>
-> 
-> 
-> could you give a bit more motivation? which applications do
-> you have in mind? for example, on localhost loopback datagrams
-> are actually reliable and a bunch of apps came to depend
-> on that even if they shouldn't.
-> 
-> 
+Suman Ghosh (2):
+  octeontx2-af: Code restructure to handle TC outer VLAN offload
+  octeontx2-af: TC flower offload support for inner VLAN
 
-Our use case is sending various metrics from VMs to the host.
-Ultimately, we just like the performance numbers we get from this
-datagram implementation compared to what we get from UDP.
+v3 changes:
+	1. Fixed warning in file
+	drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c
+	2. Updated commit description for patch #2
 
-Currently the system is:
-  producers <-> UDS <-> guest proxy <-> UDP <-> host <-> UDS <-> consumers
-  ^-------- guest ----------------^ ^------------ host ------------------^
+v2 changes:
+	1. Fixed checkpatch errors in file
+	drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c
+	2. Updated cover letter subject
 
-And the numbers look really promising when using vsock dgram:
-  producers <-> UDS <-> guest proxy <-> VSOCK dgram <-> host <-> UDS <-> consumers
-  ^-------- guest ----------------^ ^------------ host ---------------------------^
+ .../net/ethernet/marvell/octeontx2/af/mbox.h  |   1 +
+ .../net/ethernet/marvell/octeontx2/af/npc.h   |   3 +
+ .../marvell/octeontx2/af/rvu_debugfs.c        |   5 +
+ .../marvell/octeontx2/af/rvu_npc_fs.c         |  13 +++
+ .../ethernet/marvell/octeontx2/nic/otx2_tc.c  | 105 +++++++++++-------
+ 5 files changed, 89 insertions(+), 38 deletions(-)
 
-The numbers also look really promising when using sockmap in lieu of the
-proxies.
+-- 
+2.25.1
 
-Best,
-Bobby
-
-> 
-> > ---
-> > Changes in v5:
-> > - teach vhost to drop dgram when a datagram exceeds the receive buffer
-> >   - now uses MSG_ERRQUEUE and depends on Arseniy's zerocopy patch:
-> > 	"vsock: read from socket's error queue"
-> > - replace multiple ->dgram_* callbacks with single ->dgram_addr_init()
-> >   callback
-> > - refactor virtio dgram skb allocator to reduce conflicts w/ zerocopy series
-> > - add _fallback/_FALLBACK suffix to dgram transport variables/macros
-> > - add WARN_ONCE() for table_size / VSOCK_HASH issue
-> > - add static to vsock_find_bound_socket_common
-> > - dedupe code in vsock_dgram_sendmsg() using module_got var
-> > - drop concurrent sendmsg() for dgram and defer to future series
-> > - Add more tests
-> >   - test EHOSTUNREACH in errqueue
-> >   - test stream + dgram address collision
-> > - improve clarity of dgram msg bounds test code
-> > - Link to v4: https://lore.kernel.org/r/20230413-b4-vsock-dgram-v4-0-0cebbb2ae899@bytedance.com
-> > 
-> > Changes in v4:
-> > - style changes
-> >   - vsock: use sk_vsock(vsk) in vsock_dgram_recvmsg instead of
-> >     &sk->vsk
-> >   - vsock: fix xmas tree declaration
-> >   - vsock: fix spacing issues
-> >   - virtio/vsock: virtio_transport_recv_dgram returns void because err
-> >     unused
-> > - sparse analysis warnings/errors
-> >   - virtio/vsock: fix unitialized skerr on destroy
-> >   - virtio/vsock: fix uninitialized err var on goto out
-> >   - vsock: fix declarations that need static
-> >   - vsock: fix __rcu annotation order
-> > - bugs
-> >   - vsock: fix null ptr in remote_info code
-> >   - vsock/dgram: make transport_dgram a fallback instead of first
-> >     priority
-> >   - vsock: remove redundant rcu read lock acquire in getname()
-> > - tests
-> >   - add more tests (message bounds and more)
-> >   - add vsock_dgram_bind() helper
-> >   - add vsock_dgram_connect() helper
-> > 
-> > Changes in v3:
-> > - Support multi-transport dgram, changing logic in connect/bind
-> >   to support VMCI case
-> > - Support per-pkt transport lookup for sendto() case
-> > - Fix dgram_allow() implementation
-> > - Fix dgram feature bit number (now it is 3)
-> > - Fix binding so dgram and connectible (cid,port) spaces are
-> >   non-overlapping
-> > - RCU protect transport ptr so connect() calls never leave
-> >   a lockless read of the transport and remote_addr are always
-> >   in sync
-> > - Link to v2: https://lore.kernel.org/r/20230413-b4-vsock-dgram-v2-0-079cc7cee62e@bytedance.com
-> > 
-> > ---
-> > Bobby Eshleman (13):
-> >       af_vsock: generalize vsock_dgram_recvmsg() to all transports
-> >       af_vsock: refactor transport lookup code
-> >       af_vsock: support multi-transport datagrams
-> >       af_vsock: generalize bind table functions
-> >       af_vsock: use a separate dgram bind table
-> >       virtio/vsock: add VIRTIO_VSOCK_TYPE_DGRAM
-> >       virtio/vsock: add common datagram send path
-> >       af_vsock: add vsock_find_bound_dgram_socket()
-> >       virtio/vsock: add common datagram recv path
-> >       virtio/vsock: add VIRTIO_VSOCK_F_DGRAM feature bit
-> >       vhost/vsock: implement datagram support
-> >       vsock/loopback: implement datagram support
-> >       virtio/vsock: implement datagram support
-> > 
-> > Jiang Wang (1):
-> >       test/vsock: add vsock dgram tests
-> > 
-> >  drivers/vhost/vsock.c                   |  64 ++-
-> >  include/linux/virtio_vsock.h            |  10 +-
-> >  include/net/af_vsock.h                  |  14 +-
-> >  include/uapi/linux/virtio_vsock.h       |   2 +
-> >  net/vmw_vsock/af_vsock.c                | 281 ++++++++++---
-> >  net/vmw_vsock/hyperv_transport.c        |  13 -
-> >  net/vmw_vsock/virtio_transport.c        |  26 +-
-> >  net/vmw_vsock/virtio_transport_common.c | 190 +++++++--
-> >  net/vmw_vsock/vmci_transport.c          |  60 +--
-> >  net/vmw_vsock/vsock_loopback.c          |  10 +-
-> >  tools/testing/vsock/util.c              | 141 ++++++-
-> >  tools/testing/vsock/util.h              |   6 +
-> >  tools/testing/vsock/vsock_test.c        | 680 ++++++++++++++++++++++++++++++++
-> >  13 files changed, 1320 insertions(+), 177 deletions(-)
-> > ---
-> > base-commit: 37cadc266ebdc7e3531111c2b3304fa01b2131e8
-> > change-id: 20230413-b4-vsock-dgram-3b6eba6a64e5
-> > 
-> > Best regards,
-> > -- 
-> > Bobby Eshleman <bobby.eshleman@bytedance.com>
-> 
-> _______________________________________________
-> Virtualization mailing list
-> Virtualization@lists.linux-foundation.org
-> https://lists.linuxfoundation.org/mailman/listinfo/virtualization
 
