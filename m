@@ -1,82 +1,115 @@
-Return-Path: <netdev+bounces-23013-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23014-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9214476A669
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 03:34:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4705876A676
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 03:41:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 71C821C20DA3
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 01:34:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 401DF1C20D8B
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 01:41:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42DD565B;
-	Tue,  1 Aug 2023 01:34:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC516A4F;
+	Tue,  1 Aug 2023 01:41:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3771A7E
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 01:34:40 +0000 (UTC)
-Received: from zg8tmtyylji0my4xnjqumte4.icoremail.net (zg8tmtyylji0my4xnjqumte4.icoremail.net [162.243.164.118])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 97184114;
-	Mon, 31 Jul 2023 18:34:38 -0700 (PDT)
-Received: from linma$zju.edu.cn ( [42.120.103.60] ) by
- ajax-webmail-mail-app4 (Coremail) ; Tue, 1 Aug 2023 09:34:17 +0800
- (GMT+08:00)
-X-Originating-IP: [42.120.103.60]
-Date: Tue, 1 Aug 2023 09:34:17 +0800 (GMT+08:00)
-X-CM-HeaderCharset: UTF-8
-From: "Lin Ma" <linma@zju.edu.cn>
-To: "Markus Elfring" <Markus.Elfring@web.de>
-Cc: netdev@vger.kernel.org, kernel-janitors@vger.kernel.org, 
-	"Alexander Duyck" <alexander.h.duyck@intel.com>, 
-	"Daniel Machon" <daniel.machon@microchip.com>, 
-	"David S. Miller" <davem@davemloft.net>, 
-	"Eric Dumazet" <edumazet@google.com>, 
-	"Jakub Kicinski" <kuba@kernel.org>, 
-	"Jeff Kirsher" <jeffrey.t.kirsher@intel.com>, 
-	"Paolo Abeni" <pabeni@redhat.com>, 
-	"Peter P Waskiewicz Jr" <peter.p.waskiewicz.jr@intel.com>, 
-	"Petr Machata" <petrm@nvidia.com>, 
-	LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net] net: dcb: choose correct policy to parse
- DCB_ATTR_BCN
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version XT5.0.14 build 20220622(41e5976f)
- Copyright (c) 2002-2023 www.mailtech.cn
- mispb-4df6dc2c-e274-4d1c-b502-72c5c3dfa9ce-zj.edu.cn
-In-Reply-To: <fbda76a9-e1f3-d483-ab3d-3c904c54a5db@web.de>
-References: <20230731045216.3779420-1-linma@zju.edu.cn>
- <fbda76a9-e1f3-d483-ab3d-3c904c54a5db@web.de>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B746C7E
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 01:41:20 +0000 (UTC)
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64F861988;
+	Mon, 31 Jul 2023 18:41:19 -0700 (PDT)
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36VMXrYG010378;
+	Mon, 31 Jul 2023 18:41:10 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding :
+ content-type; s=pfpt0220; bh=GxkItpsAbwiG+YRD3iuiGsE6HH2Xw12N4R604R5jrfI=;
+ b=ATCLGPyopzSwZOp4xB6OTsM9+nje2x1NU1aMNgf7O4IcbvnCeJJOtULAjcT2VeGUzFze
+ e7lDBtjzCW5tsLvD78XxfnfP1ohIAzfd12oAa2QA6jUYrnY0gkXDJUAp9ENyLwDMEoAd
+ 44qtOMWmJH2N0GeHmRsTGJ4CgTai5CwZLda0nUxR0/LQQVqKH2lYeYdLB172QlQVm6mC
+ fBCZZdsZ4P8WDm6g/XAU8WYLwQqwqKqXKV6Z6H+XVXgT0txyN7rlxTWqlDues4v5HG3U
+ XyiFAda6r4okqtDcTe1kovEDu8FWTgzV+tmW0ppwvetboXIsX7Ziap+mkV7d5aATa01M Mg== 
+Received: from dc5-exch01.marvell.com ([199.233.59.181])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3s529k70dm-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+	Mon, 31 Jul 2023 18:41:10 -0700
+Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Mon, 31 Jul
+ 2023 18:41:08 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Mon, 31 Jul 2023 18:41:08 -0700
+Received: from marvell-OptiPlex-7090.marvell.com (unknown [10.28.36.165])
+	by maili.marvell.com (Postfix) with ESMTP id 77A8E3F704B;
+	Mon, 31 Jul 2023 18:41:03 -0700 (PDT)
+From: Ratheesh Kannoth <rkannoth@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <sgoutham@marvell.com>, <lcherian@marvell.com>, <gakula@marvell.com>,
+        <jerinj@marvell.com>, <hkelam@marvell.com>, <sbhatta@marvell.com>,
+        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <jhs@mojatatu.com>, <xiyou.wangcong@gmail.com>,
+        <jiri@resnulli.us>, Ratheesh Kannoth <rkannoth@marvell.com>
+Subject: [PATCH v1 net-next 0/4] Packet classify by matching against SPI
+Date: Tue, 1 Aug 2023 07:10:57 +0530
+Message-ID: <20230801014101.2955887-1-rkannoth@marvell.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <3d159780.f2fb6.189aebb4a18.Coremail.linma@zju.edu.cn>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:cS_KCgB3fxcaYchkoKpqCg--.55514W
-X-CM-SenderInfo: qtrwiiyqvtljo62m3hxhgxhubq/1tbiAwQNEmTHEHoQmQAMsU
-X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
-	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
-	daVFxhVjvjDU=
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-GUID: gCp4vK7oN_7kMBgoruapCUum5upuQsUf
+X-Proofpoint-ORIG-GUID: gCp4vK7oN_7kMBgoruapCUum5upuQsUf
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-07-31_18,2023-07-31_02,2023-05-22_02
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-SGVsbG8gTWFya3VzLAoKPiAKPiDigKYKPiA+IFRoaXMgcGF0Y2ggdXNlIGNvcnJlY3QgZGNibmxf
-YmNuX25lc3QgcG9saWN5IHRvIHBhcnNlIHRoZQo+ID4gdGJbRENCX0FUVFJfQkNOXSBuZXN0ZWQg
-VExWLgo+IAo+IEFyZSBpbXBlcmF0aXZlIGNoYW5nZSBkZXNjcmlwdGlvbnMgc3RpbGwgcHJlZmVy
-cmVkPwo+IAo+IFNlZSBhbHNvOgo+IGh0dHBzOi8vZ2l0Lmtlcm5lbC5vcmcvcHViL3NjbS9saW51
-eC9rZXJuZWwvZ2l0L3RvcnZhbGRzL2xpbnV4LmdpdC90cmVlL0RvY3VtZW50YXRpb24vcHJvY2Vz
-cy9zdWJtaXR0aW5nLXBhdGNoZXMucnN0P2g9djYuNS1yYzMjbjk0Cj4gCj4gUmVnYXJkcywKPiBN
-YXJrdXMKClllYWgsIHRoYW5rcyBmb3IgcmVtaW5kaW5nIG1lLiBJIGhhdmVuJ3QgYmVlbiBwYXlp
-bmcgYXR0ZW50aW9uIHRvIHRoYXQgYW5kIEkgd2lsbCByZW1lbWJlciB0aGlzIGV2ZXIgc2luY2Uu
-IDpECgpSZWdhcmRzLApMaW4=
+1.  net: flow_dissector: Add IPSEC dissector.
+Flow dissector patch reads IPSEC headers (ESP or AH) header
+from packet and retrieves the SPI header.
+
+2. tc: flower: support for SPI.
+TC control path changes to pass SPI field from userspace to
+kernel.
+
+3. tc: flower: Enable offload support IPSEC SPI field.
+Next patch enables the HW support for classify offload for ESP/AH.
+This patch enables the HW offload control.
+
+4. octeontx2-pf: TC flower offload support for SPI field.
+HW offload support for classification in octeontx2 driver.
+
+ .../net/ethernet/marvell/octeontx2/af/mbox.h  |  4 ++
+ .../net/ethernet/marvell/octeontx2/af/npc.h   |  1 +
+ .../marvell/octeontx2/af/rvu_debugfs.c        |  4 ++
+ .../marvell/octeontx2/af/rvu_npc_fs.c         | 11 ++++
+ .../ethernet/marvell/octeontx2/nic/otx2_tc.c  | 27 ++++++++++
+ include/net/flow_dissector.h                  |  9 ++++
+ include/net/flow_offload.h                    |  6 +++
+ include/uapi/linux/pkt_cls.h                  |  3 ++
+ net/core/flow_dissector.c                     | 53 ++++++++++++++++++-
+ net/core/flow_offload.c                       |  7 +++
+ net/sched/cls_flower.c                        | 35 ++++++++++++
+ 11 files changed, 159 insertions(+), 1 deletion(-)
+
+---
+ChangeLog
+
+v0 -> v1: Fix new fields in the middle of UAPI exposed enum.
+
+--
+2.25.1
+
 
