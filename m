@@ -1,370 +1,161 @@
-Return-Path: <netdev+bounces-23441-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23442-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6593276BF98
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 23:55:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C40876BFAD
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 23:56:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 192882802A1
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 21:55:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A940A1C20750
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 21:56:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B22D0275BD;
-	Tue,  1 Aug 2023 21:54:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B42E275A0;
+	Tue,  1 Aug 2023 21:56:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7373214E9
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 21:54:32 +0000 (UTC)
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA7C02128
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 14:54:30 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-583fe0f84a5so75592207b3.3
-        for <netdev@vger.kernel.org>; Tue, 01 Aug 2023 14:54:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690926870; x=1691531670;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=OQ1HUSzhe0NrC4wPEN7+S9T9wzq32xlOC4xZEkatuLg=;
-        b=4WoOgldtTzqrt0Vy912PsZDEcKL05GB3Qd6NzF+H9V3KMXk1+ILDqpdP2avN9yECsH
-         q+fCEPsU54mhrJa0gHpBWm9zZjs1GLhUjpIi52CGgZUjSDPJ/7jR2EQpwxEeKrClA3Xu
-         To/EaAETfjfYWPTGLhxr4xPUMUV+Uu6lT/eOs6QDHg8IjPHN1ZtI9sNEP1oc5dzIThu9
-         HbBB+nYQyu6jdcLCnALttDABUKwPGzbQNOizTMvj1hIvt+T66qe+LghX49m8Bqj44eHI
-         RUYf4L1jx3CRHTeA0sPAgG9BPGq5R8ytJjky3XLsE+BDA0gZgjDAQ/KsjFGxrPSyeDeN
-         dqUQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690926870; x=1691531670;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OQ1HUSzhe0NrC4wPEN7+S9T9wzq32xlOC4xZEkatuLg=;
-        b=FeoIAMF1uuSPUVyzHSONo3vlOEYl+P8vIvOSoVfSkOlSg5jh6BetbKZqYTSmhRUv0E
-         y4WcTP6QBvbrivPZo434R80uQriwMkBEmDKCV8mrjqYPxF7KTPquDRqkw91DqNQm3KxZ
-         glyjHFISwZl9kLugPcm0LTbMr600y440O7iEcA/0MRoxugzC48f8eLF2VAZ0j1Iaw8lP
-         RGRV8yLvmSGgJfxfw8Lo2CXo4Zk4ig/gWyOL1B+ojnhzfbIa5sj5+KAcalS+mSytMXN/
-         bJ5w+6gUF361+RtgUQY3GGn30eTcmXVf8CUWnvMtc2DZJEnhmQAr/mmEbqnI/rgsuMyq
-         o49Q==
-X-Gm-Message-State: ABy/qLbhNVCnKtYs/nBc7ozfCphzc4NwGBR7wJVNDPUk6YqoeYWJf+SB
-	n4hPzYT3sA2F9zDNscrKKy2WRMvaNry+SZC7Oz6/j77NyyIcWFXVx5buIiapQxOJwS8IUNWIG+A
-	hNtKKHxfXA/2lW1iymJ8c2DeAdH1F6Gsq2t2FJOyRj2VonDlZoKHhubbxfxNO4oGm
-X-Google-Smtp-Source: APBJJlHCAYNfj11mkHeoUvWjv7hoZW9RlsOLBlTF/upfgLbhPZwp1FNPsV8EDD2f9cP/bkZnNkfzfni7kZt+
-X-Received: from wrushilg.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:2168])
- (user=rushilg job=sendgmr) by 2002:a81:ae02:0:b0:576:b244:5a4e with SMTP id
- m2-20020a81ae02000000b00576b2445a4emr128982ywh.10.1690926869742; Tue, 01 Aug
- 2023 14:54:29 -0700 (PDT)
-Date: Tue,  1 Aug 2023 21:54:05 +0000
-In-Reply-To: <20230801215405.2192259-1-rushilg@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DF80214E9
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 21:56:32 +0000 (UTC)
+Received: from sonic311-24.consmr.mail.gq1.yahoo.com (sonic311-24.consmr.mail.gq1.yahoo.com [98.137.65.205])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58E122122
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 14:56:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1690926946; bh=UXmKHAxI8FcpQqNUOkYn2/+u4cfxJmVRmsV+0atGSbE=; h=From:To:Cc:Subject:Date:In-Reply-To:References:From:Subject:Reply-To; b=kG7/otN36PLmNXYsYMsc8oh8w4eWuLjyowJlOd5olUv4HFT72/M//fH/9+9Q9M5YpIqwXoCIjXn2Dq5c7KJXC48AmFfB6PEgUL6eWRcFyCE7bjktQbdJGIOl2OFfi2HX9SLlSu/qOMWA05DLyL5F8q+fJxGUsvGLTp6gcJds0KB/3qHRRT7eIRRqbFJ9PB/SrIjvEPAEPPCOXMrlC5PTRLYEAUIlMorZ7oO2D14+Vw+Ghy6GVA7AeTUDbEISOoUesMERTKfKJ+tDq9f9YDjDWkGHwNSZ5sdIjx83OWPEs0aQHGKOWnw+a6J3guFLYYMEcttk4S/sgH4YjfAG8cQOVQ==
+X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1690926946; bh=hahUDcQ0Zy6qaUXUDw+7yszJcn30MyA7JPU1zj9wZ86=; h=X-Sonic-MF:From:To:Subject:Date:From:Subject; b=LTiy5f7ji7vYoRxrBtBe9dYp18oonQ01rT63UEtCiV0IfPezt+qVORAm/R4nrfs7F8Su9nK6jAnS++1o8iWGlJGY3pw7GPrXDklo2dcjLmJpEe2S5d381xBBpH5gdXKqXi3+xyKsBf2fINuEJPX9JU770Gl44Wo5SxI4k8UmzgKB7L+U9/KQYhOUG9Gg9PD/rMs4pqQdP7TxGlS74bGN81yQbX6o1FWo4SARt+4jTDVaH8a1lGxabQ/hi0JgjwVDUukK1Ij1pMLSJJeenzCG8PyOiQzfXPLbWn7MbO8ZcPKgUML71yeSQEt3H3lpKuayZ1cgj7PnlW93K0OzQDYGYg==
+X-YMail-OSG: CeB8NW4VM1kxgCRNT.137CFxcgks5EgRQ4FIH9uLQ.Gu.XFz.YCLWhmwoYgYH9r
+ Ne8ik7bvGbWLUf2aOchhmJuN5vQiVCZrcMeyD6g5SiaZIfzyH35EW6d6JOHpRG5T2PaY1wp6GxyV
+ nPQSTO9W1bhR_96gpVnumR8Z06G_JQLNCRik4ok5lwGSWj7FIEkETJxdIPr1u3MRz3kktbM7V52Y
+ ncn6iQNw3hfG_F1Q8FjmQkkOtfWCeHHEd0sG6Bsrh47dUQQEo3VMqYJ.86i2CXEGXju3sVEIpZkW
+ q5MLRSb32asq1cxFSThKUDiARSR2ubCe3ATupilZ4I5J4U9a73igyCt1eB2N9lsCH6wMc.Z8Gp.K
+ W23IDNrh1tuBOQlrBKrFDCAeYHr72VbjHZ_wEtzBKF87mpoH44WIuhNx.9Au5AbCdSmiMpJRx_yT
+ QQ.w3V9usUGSFJ5Kls2hP60oZGd1dUAUC17AF_dkv5L3gHGS9.6YlfFciM0ULZClBE1jGhN.L1Fc
+ bhDeE6suiTfcNR3SIYkSGB4OCWnI9XiosJlFqFzWJgZwMBOSLMpi8tewO.AoAXoql9bJtMUbzViK
+ L9nh9kHjwe4E1i.2XGOtF6RciN8R9zxEg813xyor1OfXOib40QdAFCEvDCca2QyrpChgtS6D1scJ
+ dwXiDSes74_4GFR.Pz9kmcGlD4WUXUw4HsYNNg85C6vjXz0JANf6X.i4xPS4DYDOitKTOk5i0Js3
+ TrTA5zte.Ljm_Drn3m_Jxx_yPpTjmgBMI042d6pHmt87zwy2NBkP1iGI_rq9rJOYR4qjrToybJqe
+ RT2AWxdEiO0z.vbO7xh2KU1tR2v_Ln.bhnq9DuHSJ9fV9F6GM8f4wR6b5.kKmbhrlytJenIwiVAH
+ LvfpBXCUxI5LnMx57NtnrC_HEkfg62ak5S1z6qGoMh0JDItld8iZB9Q7pHWKnfHwpI2XBEnL5Jm4
+ zyN07EyFKbQxO9yEIeoyvgUb4GZxpTKP4zyL9V6LHzMLxDucTzRqL2isTr4_USGfTeoYTekcVsCz
+ E8gmVKDyXlF_rWNEjYbK_MuL4dEMI7Ssnmuujv8itdpbURCirokMWNydO4dULojSV4FMt3IvWLtW
+ ua_Ep4vAYw1an2jNvqVHzadbmzUZS9lREwPufPSAQzNaW7HqwJJuWpvn9paOV2rOE5BCuDG9c3GS
+ wa24Ejg0f147i3kAZd7smmtj86vr5NqL.X23C1TEjaAtuDCIWcBQBZv1pbpEN7j7RUXzVI9zNEzK
+ ZyQpVI2ZfrtV0OpbCHtIaswFJaIRagIe8vHCa1nXMAYCeN7RrseNhKJ9MUJUlXk.0tHM3z4GErNu
+ YFtJRL2mIMj6nun1zEQX3unvLVlULYH8JXdZ3SLKbsCzCpPYNxf0k9G6nAqISVVmqPWNdMScSGpa
+ TCq_O64u2KCmvmDcUO6w.lvkr2YspCTUd77bbRojR65guTFwaAEDV_bTQAPkJHtICUs.LW_quuSh
+ jRdfpYbInps5qMZawhcqYqWoodKVTy3dXQuplZP2e.BCWbduwUBhxtcRlZ_Nz5Ji7Dy_H8tYhpPX
+ 7bbrBm9bcbXu3IzWNaZ7YRy4ndu_J02EUDkyBvxAyqNg.b4YEzVyn4gXXauv9zCo7DRifABHrpVH
+ L35KLWEws.ec4pov2YKAzexp3TsMxAUoRjUnmROpYf1tbYv7ylfJj_Qc.v1EmEBULqN7ff2YTo0_
+ Vbf3jt8dzqdu1PT0GeGwSkfwz00wK87jwlV5IhHXnwulH_PyK1nuxc2twjLLwNhYdSC7tY4W_Bn3
+ V_6j4OaE5bUpa6RDbQeRBVAP5kOyCoDhIQlIal1OIeFf5umn1oRX9NB9MEApvJR7Kb5OQN0IwycO
+ 2fEniVND1FPM7RIbCFQ7Tm64kp3BKH8p.DEQ9mdDO7XO9BNClcVjhr090_EFd1Z7UQSrJ.Rknk2F
+ H04b4Cj3_Yf5BFqq.A3NuANYWLgamoGD2ZkPqJdMAHRz_YIYttkCFi0liv8ZEAD3sfPTPZ9NKkVb
+ tGJ0hF5rZTMaSJng00owCRVUW.7ITvhzp7J8Rq3Vuhmj2Mglr6w6V0A.V27aQ252PovvECyccUzN
+ 4jvcUNf8nBh5SIf6w8Bq4RzWmDkLwyBifJC7DMoOuXNeIL_D0LrRlx0AeuFdn0_6NSS9rV7SKKyr
+ MzOhYxd.8oUt6Nf7Qgypt5y4xH.AF0HYctIs4x3sqTPDff0JU1PS_OTnwibczP81IlmU8gCtvqJN
+ wdtHPKGnUX44Ee6N92WiKr1ngcgrTrbzIpO5cIlsBNEg-
+X-Sonic-MF: <astrajoan@yahoo.com>
+X-Sonic-ID: 2980e2db-bdae-4ebc-80a7-121cc92a00dc
+Received: from sonic.gate.mail.ne1.yahoo.com by sonic311.consmr.mail.gq1.yahoo.com with HTTP; Tue, 1 Aug 2023 21:55:46 +0000
+Received: by hermes--production-gq1-7d844d8954-q6fhd (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID 2133038380f997b8027ffd392dd22e8f;
+          Tue, 01 Aug 2023 21:55:44 +0000 (UTC)
+From: Ziqi Zhao <astrajoan@yahoo.com>
+To: syzbot+622bba18029bcde672e1@syzkaller.appspotmail.com,
+	astrajoan@yahoo.com,
+	jani.nikula@linux.intel.com,
+	airlied@gmail.com,
+	daniel@ffwll.ch,
+	dri-devel@lists.freedesktop.org,
+	ivan.orlov0322@gmail.com,
+	maarten.lankhorst@linux.intel.com,
+	mripard@kernel.org,
+	skhan@linuxfoundation.org,
+	tzimmermann@suse.de
+Cc: davem@davemloft.net,
+	dsahern@kernel.org,
+	edumazet@google.com,
+	jacob.e.keller@intel.com,
+	jiri@nvidia.com,
+	kuba@kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	syzkaller-bugs@googlegroups.com
+Subject: [PATCH v2] drm/modes: Fix division by zero error
+Date: Tue,  1 Aug 2023 14:55:38 -0700
+Message-Id: <20230801215538.105255-1-astrajoan@yahoo.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <00000000000034cf5d05fea52dd4@google.com>
+References: <00000000000034cf5d05fea52dd4@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20230801215405.2192259-1-rushilg@google.com>
-X-Mailer: git-send-email 2.41.0.585.gd2178a4bd4-goog
-Message-ID: <20230801215405.2192259-4-rushilg@google.com>
-Subject: [PATCH net-next 3/4] gve: RX path for DQO-QPL
-From: Rushil Gupta <rushilg@google.com>
-To: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, 
-	willemb@google.com, edumazet@google.com, pabeni@redhat.com
-Cc: Rushil Gupta <rushilg@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>, 
-	Bailey Forrest <bcf@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.6
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-The RX path allocates the QPL page pool at queue creation, and
-tries to reuse these pages through page recycling. This patch
-ensures that on refill no non-QPL pages are posted to the device.
+In the bug reported by Syzbot, the variable `den == (1 << 22)` and
+`mode->vscan == (1 << 10)`, causing the multiplication to overflow and
+accidentally make `den == 0`. To prevent any chance of overflow, we
+replace `num` and `den` with 64-bit unsigned integers, and explicitly
+check if the divisor `den` will overflow. If so, we employ full 64-bit
+division with rounding; otherwise we keep the 64-bit to 32-bit division
+that could potentially be better optimized.
 
-To avoid the scenario where driver is running low on used buffers we
-added an ondemand allocation step where the driver allocates
-an internal page for SKB business to free up the QPL page in use.
+In order to minimize the performance overhead, the overflow check for
+`den` is wrapped with an `unlikely` condition. Please let me know if
+this usage is appropriate.
 
-gve_try_recycle_buf was moved to gve_rx_append_frags so that driver does
-not attempt to mark buffer as used if a non-qpl page was allocated
-ondemand.
-
-Signed-off-by: Rushil Gupta <rushilg@google.com>
-Reviewed-by: Willem de Bruijn <willemb@google.com>
-Signed-off-by: Praveen Kaligineedi <pkaligineedi@google.com>
-Signed-off-by: Bailey Forrest <bcf@google.com>
+Reported-by: syzbot+622bba18029bcde672e1@syzkaller.appspotmail.com
+Signed-off-by: Ziqi Zhao <astrajoan@yahoo.com>
 ---
- drivers/net/ethernet/google/gve/gve.h        |   9 ++
- drivers/net/ethernet/google/gve/gve_rx_dqo.c | 126 ++++++++++++++++---
- 2 files changed, 117 insertions(+), 18 deletions(-)
+V1 -> V2: address style comments suggested by Jani Nikula
+<jani.nikula@linux.intel.com>
 
-diff --git a/drivers/net/ethernet/google/gve/gve.h b/drivers/net/ethernet/google/gve/gve.h
-index dee2db6f6750..534714349b30 100644
---- a/drivers/net/ethernet/google/gve/gve.h
-+++ b/drivers/net/ethernet/google/gve/gve.h
-@@ -237,6 +237,15 @@ struct gve_rx_ring {
- 			 * which cannot be reused yet.
- 			 */
- 			struct gve_index_list used_buf_states;
-+
-+			/* index into queue page list */
-+			u32 next_qpl_page_idx;
-+
-+			/* qpl assigned to this queue */
-+			struct gve_queue_page_list *qpl;
-+
-+			/* track number of used buffers */
-+			u16 used_buf_states_cnt;
- 		} dqo;
- 	};
- 
-diff --git a/drivers/net/ethernet/google/gve/gve_rx_dqo.c b/drivers/net/ethernet/google/gve/gve_rx_dqo.c
-index e57b73eb70f6..2b9392a1f113 100644
---- a/drivers/net/ethernet/google/gve/gve_rx_dqo.c
-+++ b/drivers/net/ethernet/google/gve/gve_rx_dqo.c
-@@ -22,11 +22,13 @@ static int gve_buf_ref_cnt(struct gve_rx_buf_state_dqo *bs)
- }
- 
- static void gve_free_page_dqo(struct gve_priv *priv,
--			      struct gve_rx_buf_state_dqo *bs)
-+			      struct gve_rx_buf_state_dqo *bs,
-+			      bool free_page)
- {
- 	page_ref_sub(bs->page_info.page, bs->page_info.pagecnt_bias - 1);
--	gve_free_page(&priv->pdev->dev, bs->page_info.page, bs->addr,
--		      DMA_FROM_DEVICE);
-+	if (free_page)
-+		gve_free_page(&priv->pdev->dev, bs->page_info.page, bs->addr,
-+			      DMA_FROM_DEVICE);
- 	bs->page_info.page = NULL;
- }
- 
-@@ -130,12 +132,20 @@ gve_get_recycled_buf_state(struct gve_rx_ring *rx)
- 	 */
- 	for (i = 0; i < 5; i++) {
- 		buf_state = gve_dequeue_buf_state(rx, &rx->dqo.used_buf_states);
--		if (gve_buf_ref_cnt(buf_state) == 0)
-+		if (gve_buf_ref_cnt(buf_state) == 0) {
-+			rx->dqo.used_buf_states_cnt--;
- 			return buf_state;
-+		}
- 
- 		gve_enqueue_buf_state(rx, &rx->dqo.used_buf_states, buf_state);
- 	}
- 
-+	/* For QPL, we cannot allocate any new buffers and must
-+	 * wait for the existing ones to be available.
-+	 */
-+	if (rx->dqo.qpl)
-+		return NULL;
-+
- 	/* If there are no free buf states discard an entry from
- 	 * `used_buf_states` so it can be used.
- 	 */
-@@ -144,23 +154,39 @@ gve_get_recycled_buf_state(struct gve_rx_ring *rx)
- 		if (gve_buf_ref_cnt(buf_state) == 0)
- 			return buf_state;
- 
--		gve_free_page_dqo(rx->gve, buf_state);
-+		gve_free_page_dqo(rx->gve, buf_state, true);
- 		gve_free_buf_state(rx, buf_state);
- 	}
- 
- 	return NULL;
- }
- 
--static int gve_alloc_page_dqo(struct gve_priv *priv,
-+static int gve_alloc_page_dqo(struct gve_rx_ring *rx,
- 			      struct gve_rx_buf_state_dqo *buf_state)
- {
--	int err;
-+	struct gve_priv *priv = rx->gve;
-+	u32 idx;
- 
--	err = gve_alloc_page(priv, &priv->pdev->dev, &buf_state->page_info.page,
--			     &buf_state->addr, DMA_FROM_DEVICE, GFP_ATOMIC);
--	if (err)
--		return err;
-+	if (!rx->dqo.qpl) {
-+		int err;
- 
-+		err = gve_alloc_page(priv, &priv->pdev->dev,
-+				     &buf_state->page_info.page,
-+				     &buf_state->addr,
-+				     DMA_FROM_DEVICE, GFP_ATOMIC);
-+		if (err)
-+			return err;
-+	} else {
-+		idx = rx->dqo.next_qpl_page_idx;
-+		if (idx >= priv->rx_pages_per_qpl) {
-+			net_err_ratelimited("%s: Out of QPL pages\n",
-+					    priv->dev->name);
-+			return -ENOMEM;
-+		}
-+		buf_state->page_info.page = rx->dqo.qpl->pages[idx];
-+		buf_state->addr = rx->dqo.qpl->page_buses[idx];
-+		rx->dqo.next_qpl_page_idx++;
-+	}
- 	buf_state->page_info.page_offset = 0;
- 	buf_state->page_info.page_address =
- 		page_address(buf_state->page_info.page);
-@@ -195,9 +221,13 @@ static void gve_rx_free_ring_dqo(struct gve_priv *priv, int idx)
- 
- 	for (i = 0; i < rx->dqo.num_buf_states; i++) {
- 		struct gve_rx_buf_state_dqo *bs = &rx->dqo.buf_states[i];
--
-+		/* Only free page for RDA. QPL pages are freed in gve_main. */
- 		if (bs->page_info.page)
--			gve_free_page_dqo(priv, bs);
-+			gve_free_page_dqo(priv, bs, !rx->dqo.qpl);
-+	}
-+	if (rx->dqo.qpl) {
-+		gve_unassign_qpl(priv, rx->dqo.qpl->id);
-+		rx->dqo.qpl = NULL;
- 	}
- 
- 	if (rx->dqo.bufq.desc_ring) {
-@@ -229,7 +259,8 @@ static int gve_rx_alloc_ring_dqo(struct gve_priv *priv, int idx)
- 	int i;
- 
- 	const u32 buffer_queue_slots =
--		priv->options_dqo_rda.rx_buff_ring_entries;
-+		priv->queue_format == GVE_DQO_RDA_FORMAT ?
-+		priv->options_dqo_rda.rx_buff_ring_entries : priv->rx_desc_cnt;
- 	const u32 completion_queue_slots = priv->rx_desc_cnt;
- 
- 	netif_dbg(priv, drv, priv->dev, "allocating rx ring DQO\n");
-@@ -243,7 +274,9 @@ static int gve_rx_alloc_ring_dqo(struct gve_priv *priv, int idx)
- 	rx->ctx.skb_head = NULL;
- 	rx->ctx.skb_tail = NULL;
- 
--	rx->dqo.num_buf_states = min_t(s16, S16_MAX, buffer_queue_slots * 4);
-+	rx->dqo.num_buf_states = priv->queue_format == GVE_DQO_RDA_FORMAT ?
-+		min_t(s16, S16_MAX, buffer_queue_slots * 4) :
-+		priv->rx_pages_per_qpl;
- 	rx->dqo.buf_states = kvcalloc(rx->dqo.num_buf_states,
- 				      sizeof(rx->dqo.buf_states[0]),
- 				      GFP_KERNEL);
-@@ -275,6 +308,13 @@ static int gve_rx_alloc_ring_dqo(struct gve_priv *priv, int idx)
- 	if (!rx->dqo.bufq.desc_ring)
- 		goto err;
- 
-+	if (priv->queue_format != GVE_DQO_RDA_FORMAT) {
-+		rx->dqo.qpl = gve_assign_rx_qpl(priv, rx->q_num);
-+		if (!rx->dqo.qpl)
-+			goto err;
-+		rx->dqo.next_qpl_page_idx = 0;
-+	}
-+
- 	rx->q_resources = dma_alloc_coherent(hdev, sizeof(*rx->q_resources),
- 					     &rx->q_resources_bus, GFP_KERNEL);
- 	if (!rx->q_resources)
-@@ -352,7 +392,7 @@ void gve_rx_post_buffers_dqo(struct gve_rx_ring *rx)
- 			if (unlikely(!buf_state))
- 				break;
- 
--			if (unlikely(gve_alloc_page_dqo(priv, buf_state))) {
-+			if (unlikely(gve_alloc_page_dqo(rx, buf_state))) {
- 				u64_stats_update_begin(&rx->statss);
- 				rx->rx_buf_alloc_fail++;
- 				u64_stats_update_end(&rx->statss);
-@@ -415,6 +455,7 @@ static void gve_try_recycle_buf(struct gve_priv *priv, struct gve_rx_ring *rx,
- 
- mark_used:
- 	gve_enqueue_buf_state(rx, &rx->dqo.used_buf_states, buf_state);
-+	rx->dqo.used_buf_states_cnt++;
- }
- 
- static void gve_rx_skb_csum(struct sk_buff *skb,
-@@ -475,6 +516,43 @@ static void gve_rx_free_skb(struct gve_rx_ring *rx)
- 	rx->ctx.skb_tail = NULL;
- }
- 
-+static bool gve_rx_should_trigger_copy_ondemand(struct gve_rx_ring *rx)
-+{
-+	if (!rx->dqo.qpl)
-+		return false;
-+	if (rx->dqo.used_buf_states_cnt <
-+		     (rx->dqo.num_buf_states -
-+		     GVE_DQO_QPL_ONDEMAND_ALLOC_THRESHOLD))
-+		return false;
-+	return true;
-+}
-+
-+static int gve_rx_copy_ondemand(struct gve_rx_ring *rx,
-+				struct gve_rx_buf_state_dqo *buf_state,
-+				u16 buf_len)
-+{
-+	struct page *page = alloc_page(GFP_KERNEL);
-+	int num_frags;
-+
-+	if (!page)
-+		return -ENOMEM;
-+
-+	memcpy(page_address(page),
-+	       buf_state->page_info.page_address +
-+	       buf_state->page_info.page_offset,
-+	       buf_len);
-+	num_frags = skb_shinfo(rx->ctx.skb_tail)->nr_frags;
-+	skb_add_rx_frag(rx->ctx.skb_tail, num_frags, page,
-+			0, buf_len, PAGE_SIZE);
-+
-+	u64_stats_update_begin(&rx->statss);
-+	rx->rx_frag_alloc_cnt++;
-+	u64_stats_update_end(&rx->statss);
-+	/* Return unused buffer. */
-+	gve_enqueue_buf_state(rx, &rx->dqo.recycled_buf_states, buf_state);
-+	return 0;
-+}
-+
- /* Chains multi skbs for single rx packet.
-  * Returns 0 if buffer is appended, -1 otherwise.
+ drivers/gpu/drm/drm_modes.c | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/gpu/drm/drm_modes.c b/drivers/gpu/drm/drm_modes.c
+index ac9a406250c5..137101960690 100644
+--- a/drivers/gpu/drm/drm_modes.c
++++ b/drivers/gpu/drm/drm_modes.c
+@@ -1285,13 +1285,13 @@ EXPORT_SYMBOL(drm_mode_set_name);
   */
-@@ -502,12 +580,20 @@ static int gve_rx_append_frags(struct napi_struct *napi,
- 		rx->ctx.skb_head->truesize += priv->data_buffer_size_dqo;
- 	}
+ int drm_mode_vrefresh(const struct drm_display_mode *mode)
+ {
+-	unsigned int num, den;
++	u64 num, den;
  
-+	/* Trigger ondemand page allocation if we are running low on buffers */
-+	if (gve_rx_should_trigger_copy_ondemand(rx))
-+		return gve_rx_copy_ondemand(rx, buf_state, buf_len);
-+
- 	skb_add_rx_frag(rx->ctx.skb_tail, num_frags,
- 			buf_state->page_info.page,
- 			buf_state->page_info.page_offset,
- 			buf_len, priv->data_buffer_size_dqo);
- 	gve_dec_pagecnt_bias(&buf_state->page_info);
- 
-+	/* Advances buffer page-offset if page is partially used.
-+	 * Marks buffer as used if page is full.
-+	 */
-+	gve_try_recycle_buf(priv, rx, buf_state);
- 	return 0;
- }
- 
-@@ -561,8 +647,6 @@ static int gve_rx_dqo(struct napi_struct *napi, struct gve_rx_ring *rx,
- 						 priv)) != 0) {
- 			goto error;
- 		}
--
--		gve_try_recycle_buf(priv, rx, buf_state);
+ 	if (mode->htotal == 0 || mode->vtotal == 0)
  		return 0;
- 	}
  
-@@ -588,6 +672,12 @@ static int gve_rx_dqo(struct napi_struct *napi, struct gve_rx_ring *rx,
- 		goto error;
- 	rx->ctx.skb_tail = rx->ctx.skb_head;
+-	num = mode->clock;
+-	den = mode->htotal * mode->vtotal;
++	num = mul_u32_u32(mode->clock, 1000);
++	den = mul_u32_u32(mode->htotal, mode->vtotal);
  
-+	if (gve_rx_should_trigger_copy_ondemand(rx)) {
-+		if (gve_rx_copy_ondemand(rx, buf_state, buf_len) < 0)
-+			goto error;
-+		return 0;
-+	}
+ 	if (mode->flags & DRM_MODE_FLAG_INTERLACE)
+ 		num *= 2;
+@@ -1300,7 +1300,10 @@ int drm_mode_vrefresh(const struct drm_display_mode *mode)
+ 	if (mode->vscan > 1)
+ 		den *= mode->vscan;
+ 
+-	return DIV_ROUND_CLOSEST_ULL(mul_u32_u32(num, 1000), den);
++	if (unlikely(den > UINT_MAX))
++		return DIV64_U64_ROUND_CLOSEST(num, den);
 +
- 	skb_add_rx_frag(rx->ctx.skb_head, 0, buf_state->page_info.page,
- 			buf_state->page_info.page_offset, buf_len,
- 			priv->data_buffer_size_dqo);
++	return DIV_ROUND_CLOSEST_ULL(num, (u32) den);
+ }
+ EXPORT_SYMBOL(drm_mode_vrefresh);
+ 
 -- 
-2.41.0.585.gd2178a4bd4-goog
+2.34.1
 
 
