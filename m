@@ -1,129 +1,190 @@
-Return-Path: <netdev+bounces-23364-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23373-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 595E776BB70
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 19:38:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03BCC76BB81
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 19:41:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8A2461C20FF1
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 17:38:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B1659281BB4
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 17:41:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2786235B7;
-	Tue,  1 Aug 2023 17:36:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9660D23582;
+	Tue,  1 Aug 2023 17:39:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7F8F23586
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 17:36:39 +0000 (UTC)
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B4C12134;
-	Tue,  1 Aug 2023 10:36:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
-	:Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=PTHF39oHMx6VE63jxRUT6IwF0t0yHHtHwutR/mCVCgk=; b=zqR2EJf6+QTJmNUjyd3x0q6VcD
-	ookMmvswLITB4Jwjk0MzoEC2//VVIl16IMmOdtw8pgr1kY1MwZL6U6AOZIBFFwiCF7ghOcm9SgAI0
-	+bo9tllXEGcJ55aRFgRP9B4/c8jP8VCpTKkpQTFZy2cFUe2js6CJfRLo3txY8v8D40XRsYSIxKJcn
-	1Uwti/Y1q7HPJbxFDrVKbPiFrvSsj3aKT4OIT4NtRe2rUusv8THcOd9P+9zyffsUBp1BV4WrS7SGR
-	20yCBxxMRBrcvJKUGpgILWIlRSfpEUrtsxOQo0tVHo7wsk7OJWPZopRm0Y7a3EkUYdAXcp8pTUIZd
-	PI9bvn8w==;
-Received: from 2a02-8389-2341-5b80-39d3-4735-9a3c-88d8.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:39d3:4735:9a3c:88d8] helo=localhost)
-	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-	id 1qQtIM-002w9v-03;
-	Tue, 01 Aug 2023 17:36:30 +0000
-From: Christoph Hellwig <hch@lst.de>
-To: Luis Chamberlain <mcgrof@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Daniel Mack <daniel@zonque.org>,
-	Haojian Zhuang <haojian.zhuang@gmail.com>,
-	Robert Jarzmik <robert.jarzmik@free.fr>,
-	Ulf Hansson <ulf.hansson@linaro.org>,
-	Manuel Lauss <manuel.lauss@gmail.com>,
-	Yangbo Lu <yangbo.lu@nxp.com>,
-	Joshua Kinard <kumba@gentoo.org>
-Cc: Daniel Vetter <daniel.vetter@ffwll.ch>,
-	Arnd Bergmann <arnd@arndb.de>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org (open list),
-	linux-mmc@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-rtc@vger.kernel.org,
-	linux-modules@vger.kernel.org
-Subject: [PATCH 5/5] modules: only allow symbol_get of EXPORT_SYMBOL_GPL modules
-Date: Tue,  1 Aug 2023 19:35:44 +0200
-Message-Id: <20230801173544.1929519-6-hch@lst.de>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230801173544.1929519-1-hch@lst.de>
-References: <20230801173544.1929519-1-hch@lst.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AFD32CA5
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 17:39:26 +0000 (UTC)
+Received: from mgamail.intel.com (unknown [192.55.52.120])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A417E53;
+	Tue,  1 Aug 2023 10:39:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1690911565; x=1722447565;
+  h=from:to:cc:subject:in-reply-to:references:date:
+   message-id:mime-version:content-transfer-encoding;
+  bh=UonUIoBUCNktB5rB1/gE9ziHWmQHQrb//uJtkHY7PGw=;
+  b=lZuNKAh+9xnIyMr4GI1x5LN53eSdHufxbIcODJ8r5jGSeJ3ND9Kbb//q
+   LZhuqTUY8LFwFxnD9LOSsoYch3YwgfBWoahfpenW5f9aNUQtT0d/YBY4m
+   iFqEJew0HXvVmXpnhvOhhdrff7l6oMDWjAaOl0xXZKKzKFI2bgffceH+a
+   bzBlY0GaE+6/reJAgLDHHQPmxJuUc9WQRyY/OTV+Pmr1PvQUJiLJxduA7
+   oUyM/151hkLxXEmPoygcXEbUAfOgWGfNm5ttZWQWV05cJ6olK9zOtJmA4
+   gxtFdUZFhGcBoeUuQM7QSK5l3B3eCo6xF8OY4H6GRSRvOk9ImPFS8UdYX
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10789"; a="368270365"
+X-IronPort-AV: E=Sophos;i="6.01,247,1684825200"; 
+   d="scan'208";a="368270365"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Aug 2023 10:39:24 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.01,202,1684825200"; 
+   d="scan'208";a="872149547"
+Received: from vcostago-desk1.jf.intel.com (HELO vcostago-desk1) ([10.54.70.17])
+  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Aug 2023 10:39:26 -0700
+From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang
+ <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+ linux-kernel@vger.kernel.org, intel-wired-lan@lists.osuosl.org, Muhammad
+ Husaini Zulkifli <muhammad.husaini.zulkifli@intel.com>, Peilin Ye
+ <yepeilin.cs@gmail.com>, Pedro Tammela <pctammela@mojatatu.com>, Richard
+ Cochran <richardcochran@gmail.com>, Zhengchao Shao
+ <shaozhengchao@huawei.com>, Maxim Georgiev <glipus@gmail.com>
+Subject: Re: [PATCH v2 net-next 7/9] net: netdevsim: mimic tc-taprio offload
+In-Reply-To: <20230801164534.2nklcql2nh6x6p7y@skbuf>
+References: <20230613215440.2465708-1-vladimir.oltean@nxp.com>
+ <20230613215440.2465708-8-vladimir.oltean@nxp.com>
+ <877cs5twqn.fsf@intel.com> <20230801164534.2nklcql2nh6x6p7y@skbuf>
+Date: Tue, 01 Aug 2023 10:39:23 -0700
+Message-ID: <87o7jq64s4.fsf@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
-X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_EF,HEADER_FROM_DIFFERENT_DOMAINS,
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
 	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-It has recently come to my attention that nvidia is circumventing the
-protection added in 262e6ae7081d ("modules: inherit
-TAINT_PROPRIETARY_MODULE") by importing exports from their proprietary
-modules into an allegedly GPL licensed module and then rexporting them.
+Hi Vladimir,
 
-Given that symbol_get was only ever intended for tightly cooperating
-modules using very internal symbols it is logical to restrict it to
-being used on EXPORT_SYMBOL_GPL and prevent nvidia from costly DMCA
-Circumvention of Access Controls law suites.
+Vladimir Oltean <vladimir.oltean@nxp.com> writes:
 
-All symbols except for four used through symbol_get were already exported
-as EXPORT_SYMBOL_GPL, and the remaining four ones were switched over in
-the preparation patches.
+> On Wed, Jun 14, 2023 at 05:06:24PM -0700, Vinicius Costa Gomes wrote:
+>> > +static int nsim_setup_tc_taprio(struct net_device *dev,
+>> > +				struct tc_taprio_qopt_offload *offload)
+>> > +{
+>> > +	int err =3D 0;
+>> > +
+>> > +	switch (offload->cmd) {
+>> > +	case TAPRIO_CMD_REPLACE:
+>> > +	case TAPRIO_CMD_DESTROY:
+>> > +		break;
+>>=20
+>> I was thinking about how useful would proper validation of the
+>> parameters be? Thinking that we could detect "driver API" breakages
+>> earlier, and we want it documented that the drivers should check for the
+>> things that it supports.
+>>=20
+>> Makes sense?
+>
+> Sorry, I lack imagination as to what the netdevsim driver may check for.
+> The taprio offload parameters should always be valid, properly speaking,
+> otherwise the Qdisc wouldn't be passing them on to the driver. At least
+> that would be the intention. The rest are hardware specific checks for
+> hardware specific limitations. Here there is no hardware.
+>
 
-Fixes: 262e6ae7081d ("modules: inherit TAINT_PROPRIETARY_MODULE")
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
----
- kernel/module/main.c | 14 +++++++++++---
- 1 file changed, 11 insertions(+), 3 deletions(-)
+Trying to remember what was going through my mind when I said that.
 
-diff --git a/kernel/module/main.c b/kernel/module/main.c
-index 59b1d067e52890..c395af9eced114 100644
---- a/kernel/module/main.c
-+++ b/kernel/module/main.c
-@@ -1295,12 +1295,20 @@ void *__symbol_get(const char *symbol)
- 	};
- 
- 	preempt_disable();
--	if (!find_symbol(&fsa) || strong_try_module_get(fsa.owner)) {
--		preempt_enable();
--		return NULL;
-+	if (!find_symbol(&fsa))
-+		goto fail;
-+	if (fsa.license != GPL_ONLY) {
-+		pr_warn("failing symbol_get of non-GPLONLY symbol %s.\n",
-+			symbol);
-+		goto fail;
- 	}
-+	if (strong_try_module_get(fsa.owner))
-+		goto fail;
- 	preempt_enable();
- 	return (void *)kernel_symbol_value(fsa.sym);
-+fail:
-+	preempt_enable();
-+	return NULL;
- }
- EXPORT_SYMBOL_GPL(__symbol_get);
- 
--- 
-2.39.2
+What I seem to recall is something that would help us "keep honest":
+I was worrying about someone (perhaps myself ;-) sneaking a new feature
+in taprio and forgetting to update other drivers.
 
+I thought that adding a check for the existing parameters would help
+detect those kind of things. If anything unknown was there in the
+offload struct, netdevsim would complain loudly.
+
+Perhaps I was worrying too much. And the way to solve that is to keep
+active attention against that during review.
+
+> The parameters passed to TAPRIO_CMD_REPLACE are:
+>
+> struct tc_mqprio_qopt_offload mqprio:
+> 	struct tc_mqprio_qopt qopt: validated by taprio_parse_mqprio_opt() for f=
+lags 0x2
+> 	u16 mode: always set to TC_MQPRIO_MODE_DCB
+> 	u16 shaper: always set to TC_MQPRIO_SHAPER_DCB
+> 	u32 flags: always set to 0
+> 	u64 min_rate[TC_QOPT_MAX_QUEUE]: always set to [0,]
+> 	u64 max_rate[TC_QOPT_MAX_QUEUE]: always set to [0,]
+> 	unsigned long preemptible_tcs: always set to 0, because ethtool_dev_mm_s=
+upported() returns false
+>
+> ktime_t base_time: any value is valid
+>
+> u64 cycle_time: any value is valid
+>
+> u64 cycle_time_extension: any value <=3D cycle_time is valid. According t=
+o 802.1Q
+> 			  "Q.5 CycleTimeExtension variables", it's the maximum
+> 			  amount by which the penultimate cycle can be extended
+> 			  to avoid a very short cycle upon a ConfigChange event.
+> 			  But if CycleTimeExtension is larger than one CycleTime,
+> 			  then we're not even talking about the penultimate cycle
+> 			  anymore, but about ones previous to that?! Maybe this
+> 			  should be limited to 0 <=3D cycle_time_extension <=3D cycle_time
+> 			  by taprio, certainly not by offloading drivers.
+>
+
+Good point. I have to review 802.1Q, but from what I remember that
+sounds right, cycle_time_extension greater than cycle_time doesn't make
+much sense. Having a check for it in taprio itself sounds good.
+
+> u32 max_sdu[TC_MAX_QUEUE]: limited to a value <=3D dev->max_mtu by taprio
+>
+> size_t num_entries: any value is valid
+>
+> struct tc_taprio_sched_entry entries[]:
+> 	u8 command: will be either one of: TC_TAPRIO_CMD_SET_GATES, TC_TAPRIO_CM=
+D_SET_AND_HOLD
+> 		    or TC_TAPRIO_CMD_SET_AND_RELEASE. However 802.1Q "Table 8-7=E2=80=
+=94Gate operations"
+> 		    says "If frame preemption is not supported or not enabled (preempti=
+onActive is
+> 		    FALSE), this operation behaves the same as SetGateStates.". So I
+> 		    see no reason to enforce any restriction here either?
+>
+> 	u32 gate_mask: technically can have bits set, which correspond
+> 		       to traffic classes larger than dev->num_tc.
+> 		       Taprio can enforce this, so I wouldn't see
+> 		       drivers beginning to feel paranoid about it.
+> 		       Actually I had a patch about this:
+> 		       https://patchwork.kernel.org/project/netdevbpf/patch/20230130173=
+145.475943-15-vladimir.oltean@nxp.com/
+> 		       but I decided to drop it because I didn't have
+> 		       any strong case for it.
+> 	u32 interval: any value is valid. If the sum of entry intervals
+> 		      is less than the cycle_time, again that's taprio's
+> 		      problem to check for, in its netlink attribute
+> 		      validation method rather than offloading drivers.
+>
+
+Thank you for the time it took to give this amount of detail.
+
+
+Cheers,
+--=20
+Vinicius
 
