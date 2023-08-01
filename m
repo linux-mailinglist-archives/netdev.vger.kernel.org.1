@@ -1,92 +1,143 @@
-Return-Path: <netdev+bounces-23065-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23066-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4FB0E76A914
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 08:29:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5256776A94B
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 08:39:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 893001C20DBB
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 06:29:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6E87E28180A
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 06:39:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E2835667;
-	Tue,  1 Aug 2023 06:29:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79DB846B6;
+	Tue,  1 Aug 2023 06:39:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 624C3EA3
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 06:29:02 +0000 (UTC)
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E269F19AA;
-	Mon, 31 Jul 2023 23:28:32 -0700 (PDT)
-Received: from canpemm500007.china.huawei.com (unknown [172.30.72.56])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RFQ9r2JMzzVjrq;
-	Tue,  1 Aug 2023 14:26:40 +0800 (CST)
-Received: from [10.174.179.215] (10.174.179.215) by
- canpemm500007.china.huawei.com (7.192.104.62) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Tue, 1 Aug 2023 14:28:22 +0800
-Subject: Re: [PATCH v2] ip6mr: Fix skb_under_panic in ip6mr_cache_report()
-To: Jakub Kicinski <kuba@kernel.org>
-CC: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
-	<pabeni@redhat.com>, <yoshfuji@linux-ipv6.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <simon.horman@corigine.com>
-References: <20230728121703.29572-1-yuehaibing@huawei.com>
- <20230731200959.2019cb9c@kernel.org>
-From: YueHaibing <yuehaibing@huawei.com>
-Message-ID: <f91c3fd7-8d7a-7a91-8d16-935c90ef9b5d@huawei.com>
-Date: Tue, 1 Aug 2023 14:28:21 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.5.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E57B46B4
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 06:39:16 +0000 (UTC)
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BB4D98
+	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 23:39:13 -0700 (PDT)
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1qQj0d-00070v-4I; Tue, 01 Aug 2023 08:37:31 +0200
+Received: from pengutronix.de (unknown [172.20.34.65])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 76E8C20035C;
+	Tue,  1 Aug 2023 06:37:21 +0000 (UTC)
+Date: Tue, 1 Aug 2023 08:37:21 +0200
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Shenwei Wang <shenwei.wang@nxp.com>
+Cc: Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Shawn Guo <shawnguo@kernel.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	Kevin Hilman <khilman@baylibre.com>, Vinod Koul <vkoul@kernel.org>,
+	Chen-Yu Tsai <wens@csie.org>,
+	Jernej Skrabec <jernej.skrabec@gmail.com>,
+	Samuel Holland <samuel@sholland.org>,
+	Jose Abreu <joabreu@synopsys.com>, imx@lists.linux.dev,
+	Simon Horman <simon.horman@corigine.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Nobuhiro Iwamatsu <nobuhiro1.iwamatsu@toshiba.co.jp>,
+	Fabio Estevam <festevam@gmail.com>,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Jerome Brunet <jbrunet@baylibre.com>,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
+	Wong Vee Khee <veekhee@apple.com>,
+	NXP Linux Team <linux-imx@nxp.com>,
+	Andrew Halaney <ahalaney@redhat.com>,
+	Bhupesh Sharma <bhupesh.sharma@linaro.org>,
+	Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
+	Revanth Kumar Uppala <ruppala@nvidia.com>,
+	Jochen Henneberg <jh@henneberg-systemdesign.com>,
+	linux-amlogic@lists.infradead.org,
+	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Pengutronix Kernel Team <kernel@pengutronix.de>
+Subject: Re: [PATCH v3 net 1/2] net: stmmac: add new mode parameter for
+ fix_mac_speed
+Message-ID: <20230801-portside-prepaid-513f1f39f245-mkl@pengutronix.de>
+References: <20230731161929.2341584-1-shenwei.wang@nxp.com>
+ <20230731161929.2341584-2-shenwei.wang@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20230731200959.2019cb9c@kernel.org>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.179.215]
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- canpemm500007.china.huawei.com (7.192.104.62)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-3.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="bosuzfm7oov47gw7"
+Content-Disposition: inline
+In-Reply-To: <20230731161929.2341584-2-shenwei.wang@nxp.com>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:b01:1d::7b
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 2023/8/1 11:09, Jakub Kicinski wrote:
-> On Fri, 28 Jul 2023 20:17:03 +0800 Yue Haibing wrote:
->>  #ifdef CONFIG_IPV6_PIMSM_V2
->> +	int nhoff = skb_network_offset(pkt);
->>  	if (assert == MRT6MSG_WHOLEPKT || assert == MRT6MSG_WRMIFWHOLE)
->> -		skb = skb_realloc_headroom(pkt, -skb_network_offset(pkt)
->> -						+sizeof(*msg));
->> +		skb = skb_realloc_headroom(pkt, -nhoff + sizeof(*msg));
-> 
-> These changes look unnecessary. You can leave this code be (as ugly as
-> it is)...
-> 
->>  	else
->>  #endif
->>  		skb = alloc_skb(sizeof(struct ipv6hdr) + sizeof(*msg), GFP_ATOMIC);
->> @@ -1073,7 +1073,7 @@ static int ip6mr_cache_report(const struct mr_table *mrt, struct sk_buff *pkt,
->>  		   And all this only to mangle msg->im6_msgtype and
->>  		   to set msg->im6_mbz to "mbz" :-)
->>  		 */
->> -		skb_push(skb, -skb_network_offset(pkt));
->> +		__skb_pull(skb, nhoff);
-> 
-> .. and just replace the push here with:
-> 
->   __skb_pull(skb, skb_network_offset(pkt));
 
-Thanks， will do this in v3.
-> 
+--bosuzfm7oov47gw7
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On 31.07.2023 11:19:28, Shenwei Wang wrote:
+> A mode parameter has been added to the callback function of fix_mac_speed
+> to indicate the physical layer type.
+>=20
+> The mode can be one the following:
+> 	MLO_AN_PHY	- Conventional PHY
+> 	MLO_AN_FIXED	- Fixed-link mode
+> 	MLO_AN_INBAND	- In-band protocol
+>=20
+> Also use short version of 'uint' to replace the 'unsigned int' in the
+> function definitions.
+
+There are not many users of 'uint' in the kernel and it's not used in
+the stmmac driver so far. From my point of view I would not introduce
+it and stick to the standard 'unsigned int'.
+
+Just my 2 cent,
+Marc
+
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--bosuzfm7oov47gw7
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEDs2BvajyNKlf9TJQvlAcSiqKBOgFAmTIqBwACgkQvlAcSiqK
+BOi7Jgf/UaTFYSC4IuXT7k8VsP0wkBG1kcRP+yNZbLdHhdJNmRn2K0iTpv82c/8q
+ZYpLreaQqEKOb7TszFXyDCSS1Mssv66nj047Dc6LHrnW2VbY7P9LSCMsnSUaoh0a
+lkOknimCFo9HKbYqND+gh1y/o6Wz5PO36qbaBR1giHbUdB9+Ow0AlTR3V9KeMOb4
+OsXSR2ihf5LYXebKvn8StZSwICnzZ78eLFZJsxu0oEMJDnaxIM5VQb9MaCfPbZv8
+/Bco4yUWkcOqrMmHnL9TSVvgaNJLzxowhcbwA9rucxpS314AJAqil34OSnmnQeGW
+1+lihD2B9mQqxq0drsTeFh5UBcLxNA==
+=DXrv
+-----END PGP SIGNATURE-----
+
+--bosuzfm7oov47gw7--
 
