@@ -1,101 +1,203 @@
-Return-Path: <netdev+bounces-23136-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23137-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D580A76B1AD
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 12:24:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CC1976B1B3
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 12:26:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 119CC1C20DF5
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 10:24:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EBCEF281744
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 10:26:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDDCF20F92;
-	Tue,  1 Aug 2023 10:24:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4ADE20F93;
+	Tue,  1 Aug 2023 10:26:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2CF420F82
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 10:24:06 +0000 (UTC)
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::226])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 213871706;
-	Tue,  1 Aug 2023 03:24:04 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 7C9AFC0003;
-	Tue,  1 Aug 2023 10:24:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1690885443;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Rh049SisoIWliG3uyLlXHzxD5wRc/J6bqr8r19ynpGo=;
-	b=f9mqi/1Oxj+4XOaIlU22+7chRim64bLbHC89dhnq9NrYZHmPLGlNes8J8KY24lP6ZgYAlD
-	eD6x5iT8jEr2zsXSVJJPvtYx5/BCSTIVTF4upPsbtDnfanTrKZzsr/NZcmTGpMMRPsbiwu
-	MfI8n7wdawYwlc8X3XOv1bqEp5cuwBk81jBVGgET6qkiT/ubH6LAoCaSPNevEy1yMF9GlQ
-	BgQ3xYH3kfMmnr/GZ5pgzGZmS4ZwoDWBx5Za0/Ne59WHOdLeHgCl4tpOQtBywFMYlG7Rki
-	nuJbeHCb5FilfHYhV0dpg93ttgFZRXaEugYAZsyN24ghg5tiOBCl9ltTL4+hNA==
-Date: Tue, 1 Aug 2023 12:23:59 +0200
-From: Herve Codina <herve.codina@bootlin.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski
- <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
- Lee Jones <lee@kernel.org>, Linus Walleij <linus.walleij@linaro.org>, Qiang
- Zhao <qiang.zhao@nxp.com>, Li Yang <leoyang.li@nxp.com>, Liam Girdwood
- <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, Jaroslav Kysela
- <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, Shengjiu Wang
- <shengjiu.wang@gmail.com>, Xiubo Li <Xiubo.Lee@gmail.com>, Fabio Estevam
- <festevam@gmail.com>, Nicolin Chen <nicoleotsuka@gmail.com>, Christophe
- Leroy <christophe.leroy@csgroup.eu>, Randy Dunlap <rdunlap@infradead.org>,
- netdev@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-gpio@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- alsa-devel@alsa-project.org, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH v2 10/28] soc: fsl: cpm1: qmc: Introduce
- qmc_chan_setup_tsa*
-Message-ID: <20230801122359.6b22784c@bootlin.com>
-In-Reply-To: <252d6a49-4a97-4ecc-844e-f23bda55debf@lunn.ch>
-References: <20230726150225.483464-1-herve.codina@bootlin.com>
-	<20230726150225.483464-11-herve.codina@bootlin.com>
-	<252d6a49-4a97-4ecc-844e-f23bda55debf@lunn.ch>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C60AB200D6
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 10:26:13 +0000 (UTC)
+Received: from mgamail.intel.com (unknown [192.55.52.43])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73B2D1985
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 03:26:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1690885571; x=1722421571;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=RIb1wHjPrHAgVtR6AEmQEIK2gMj0xx9oH5XiuEZO7nk=;
+  b=lSkA0+oFGOBlX79lWpNe4goo14GUyCUzsSf3Q8gzokvfGR5H7pjyRzfr
+   nKhZ++hjhaN/rADDiypQD7j+kjyPG5ELNkyM+UITZxxVPFj/egkCeQdrM
+   z5MAo6tD6bJd4QSguJNGuCzqtcckUnTAmLxWuNpEKSJRZOdsYylYZKnF/
+   iSZgwWcvzpzOc06O0KcUU29/V/bwr0MEbN4Hi39p4wSnfr/VBuyxIvOby
+   gd+0UiraRitKP2Zo6ZeeQeEFa/sIGMOBYkycQIEzcM+LPtWKJp5w7VjAk
+   7PVJzxNXMnmc7zAHQmXlZDnM8SielT4I0TLbRFybrzHL3gwDM2fkOS936
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="455635129"
+X-IronPort-AV: E=Sophos;i="6.01,246,1684825200"; 
+   d="scan'208";a="455635129"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Aug 2023 03:26:11 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="758282063"
+X-IronPort-AV: E=Sophos;i="6.01,246,1684825200"; 
+   d="scan'208";a="758282063"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by orsmga008.jf.intel.com with ESMTP; 01 Aug 2023 03:26:10 -0700
+Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Tue, 1 Aug 2023 03:26:10 -0700
+Received: from fmsmsx601.amr.corp.intel.com (10.18.126.81) by
+ fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Tue, 1 Aug 2023 03:26:10 -0700
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27 via Frontend Transport; Tue, 1 Aug 2023 03:26:10 -0700
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.100)
+ by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.27; Tue, 1 Aug 2023 03:26:09 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Fdzl5fFe6QhY/GM86C5pdi2r2qhyNjzKpEbwja9e5rqCl7u1YeA4od8HE3JYA1STRwHq+28vsdZBWERzvwhf9JK64yEzzdrQUkigAWjbkxtx4+pp2DV635DrPrnif7kCb0PDmYowjmaz+XmuYnk5iovucBCSSMW5hF22S08LFtDsc2Vb2UXyVNt/wAzXM63ERNQ2wBlf3W4lzvQbgrB3PQbqye30rvdNrItcs7ydRXpv8s0Zkm1jYl8CcMM1Kdl4AgEfAKulWbZdThKGcc694E+bxW8pzTrFNyDU8F8JCdoTypaVuEXCBLDR1NhtEDqm8lxGQ+/H8XNuMJUgSW7Opg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=i+ZZdRT7qdJ4uUqI0yh67CnO4WkUUYVwWQMoKdGpJ7A=;
+ b=BkON148JUb3UKT++zKc6LBgOAuxaxRJJyHNF5FArczrMaHIh3ShiTC0AbSPjg3XLSsPRzcC9ij391svtIND+2wk6TIiBMTD40hj/Tbh8Z8hUJMxqHXKX/kQME2foeMT5tEqGQCc/kX5JuScQOKpCzhs+rct2nrbqwR+A65CI95azKjD3LoK+i3BPJy7z5/kaGDG62D2oDlk6Vu1PrJvJODt4RQRa0eMnA2mgczKkChGrZKQtAkNAy3f4RdT9pU1KBpDw045l8AXJIVlh1bYBD3NJ5f3R4PkKN1V8ennxiEmoc2cRmT6A26tvSkO3wVl2GiexzeaUOWRJHyCcLtEOEQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DM6PR11MB3674.namprd11.prod.outlook.com (2603:10b6:5:13d::11)
+ by CO1PR11MB5122.namprd11.prod.outlook.com (2603:10b6:303:95::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.29; Tue, 1 Aug
+ 2023 10:26:07 +0000
+Received: from DM6PR11MB3674.namprd11.prod.outlook.com
+ ([fe80::7f4:c05b:358b:79c4]) by DM6PR11MB3674.namprd11.prod.outlook.com
+ ([fe80::7f4:c05b:358b:79c4%7]) with mapi id 15.20.6631.034; Tue, 1 Aug 2023
+ 10:26:07 +0000
+Message-ID: <32847384-5513-3249-4b35-c81f6d1ee566@intel.com>
+Date: Tue, 1 Aug 2023 12:25:59 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.1
+Subject: Re: [PATCH] ice: split ice_aq_wait_for_event() func into two
+To: <intel-wired-lan@lists.osuosl.org>, Tony Nguyen
+	<anthony.l.nguyen@intel.com>
+CC: <netdev@vger.kernel.org>, Jacob Keller <jacob.e.keller@intel.com>, "Jesse
+ Brandeburg" <jesse.brandeburg@intel.com>
+References: <20230801101545.519944-1-przemyslaw.kitszel@intel.com>
+Content-Language: en-US
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+In-Reply-To: <20230801101545.519944-1-przemyslaw.kitszel@intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: FR0P281CA0124.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:97::13) To DM6PR11MB3674.namprd11.prod.outlook.com
+ (2603:10b6:5:13d::11)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: herve.codina@bootlin.com
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR11MB3674:EE_|CO1PR11MB5122:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3c68e99f-3a20-465c-a9c9-08db9279b764
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: o0oeCpgzaALKXXRXEOIX3aKfUHzuwPiPNnH/3WJkeNYNK7lJ1DxucWT+nF/vv4Ze2N/MR9odn6hjYnrghfwA1S7q0ZqwOzFMFYSU5MwaI5c+LdZNY3CII+zKQ71/nHBqR21XKzHes9skUg5dR+wUVK1fOh9CHqUE7n+3BQSpw3FtFjb1vOznnSIhr0b7R8kCTaAwl0XGTWPZ7dB+17IXWbmfuKLR0t2fLRasWAX2oa+XItjnkvTkZV+HWvZ70IrT2s67JRd+DhgGDqzd+VrSdSRG2C1C3LuUtlfmqTaMGv9S9fp5XDuY66vSDGAzX1T9pVdjpf1TmgogKqN6xibEoLWvOG741AcxI522EYZhwwL1ME547XiUahHO7cMRVdPx3POdIl572kUNQceCP9JGol6rB+2lsniClx/tHSQ+Fbfih6FymII3sARMHba9+BAUncvV3VM3g+wlZKnriFRqRMiSgou4MOlUTkqhtNwP6DwIz9Ebn7yRWJIem3t5DAlMa9i1+YeSbMnOJn+1mdoVuXSBFdg8+2PVybtUuhnjHun5PD2mUvWKXKUYBJgMo64KaA+5LclqsKZ0v/f3NiPrukTW5AVEQuyPiohdcyaKGS3t4vsmqcJNdvRj+2/BQBvvDnervizTWblPrzdNrZdT+Q==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB3674.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(136003)(39860400002)(366004)(376002)(346002)(396003)(451199021)(31696002)(6862004)(2906002)(26005)(6506007)(186003)(316002)(38100700002)(107886003)(2616005)(83380400001)(53546011)(66946007)(5660300002)(8676002)(6636002)(36756003)(8936002)(82960400001)(54906003)(41300700001)(478600001)(6512007)(6666004)(6486002)(66556008)(66476007)(4326008)(86362001)(37006003)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?UzIwRC9jb21xWVdmcXYxTE9wbDFUMWV4MEhzNG5LZTR0OUQvTHhMMDloSkhU?=
+ =?utf-8?B?NzExZWNIcGdDTC9pd3Z1eG1UZ28xK1pSdWVCSHRZbHY2MWZ6a3R4YWxqLzBF?=
+ =?utf-8?B?eEljRXZBZmR3ZmphcURka05NMWlVM3BDblgrT0JXYTc5bi9henhsQWw1Nlh1?=
+ =?utf-8?B?TmNrSzFEc3JzQXljNklWYlN4OUJWaGI2ZWd5ZjdPTmVPUVo3dWdFOFhWQ0tC?=
+ =?utf-8?B?TFljY2piQ1BTcnBESEN3ZTg1L3JDR1hjbTdCcExKWVkyYjUyWXEvQ3Q5VzBr?=
+ =?utf-8?B?VnJQQTV2Z2lwQzlsblZCRndlZzhjNzRKWXlQZ05MZWRIQUlKMjEzL0hJL1FY?=
+ =?utf-8?B?TFJ6T29OMHc2dGgxZ1ViUmYzNGxzcFdkMWtnSzl0ajQ1Nys2SkhEMkY0MXpq?=
+ =?utf-8?B?ZytZOFRGVk9ZUDBpVElrZ2hWOXpNY3J0cmc2VGo0MlBKUXFrMVpoQ0x6ZSs3?=
+ =?utf-8?B?ZFJTY0pJRFdjRUV6Zk1YVWJ6V1FUQ2paQTQ4TTFCdXZuMjZzUzlNYTBodXM2?=
+ =?utf-8?B?ZUFjbzJaWXZ2UitTZ05JNS9wazNPTUhOV25LREpLcldScXMrOXU4RUNDTjlG?=
+ =?utf-8?B?U0JPK21IZ0hIV1dLWXdmTUdrZGxwZEdOQWtXU1JIcDZUMEoxaWgrTmFtQnh2?=
+ =?utf-8?B?bVc1RlR4WlNpQnRDU2g4LzN3NitiNXpjUXNka0JqelRaV2UzOFRSeFpmeTlo?=
+ =?utf-8?B?N3E2NzBGNVZ3T1J6bHhOV1VnTjYxWGhjM0VhL2xZcURnU2VIMmZ2eWx3Q0xk?=
+ =?utf-8?B?WWxjbkVaUEVDTTdwMUlZTmtDdWgyQTI0bkI3dWFrbHdoYUp4V3FzajVVbzFY?=
+ =?utf-8?B?S0JnV241bERFY0lYUUcycjdxM0lpZXFYVnlMZU9oTE9VTHU3cnUxOGl3SHp2?=
+ =?utf-8?B?blhaVi9RaGYxOFEvaktrblpMbUlMbXNPcFQwSXQzNk00elRvNW83LzBFaHZC?=
+ =?utf-8?B?L2ZaOWk1Y1RZUkxWTFNYVmttTjhOaFFJZjZFTkR1dmtRRmgwV0QyWklMbWR0?=
+ =?utf-8?B?QmxxVGhreEtUMytBZHBtNWlQT3BWZk1BMjhSb29YTDJCZ05JTlpLaTAxNW1U?=
+ =?utf-8?B?UjUwc3ErRzMzVnloVXNtTllNMllyZkF4dmhwK2QzVFF2SnN1SFIvRkdYK0JF?=
+ =?utf-8?B?TGN3clpGcDUvMDBzanNxQ0p2OTcyWS8ra29hN2xsa1lUd0VJOUNiQzBPYUg4?=
+ =?utf-8?B?VXFRME5ROFk4SGpjeUgySWpkWjNPT0VKbGlsaERYUTVRNWNYbEdrL1J4MlZn?=
+ =?utf-8?B?OXlFdGZDOHVLRkJtbHBMSmpxQVpBVmphbXJqNDJUS3NORkt6bDZqYXljd002?=
+ =?utf-8?B?dGRoelZkQW05aTMxWTk0ZGk1UkZJUmNQSmtBeC9oajJuT3prUGdKMDJrTFhE?=
+ =?utf-8?B?bkoxR1JlL1Nza0pUeEpUNDFPL2h1dnVXdzBqQzdZM2xPVHhocEF3NXJ5QkhN?=
+ =?utf-8?B?R3RxaWd5Zk5pa2dqN2lUOWNrVFlKbDVwL3lNMW1sY01NcTV6WDNzKzNjR2Iv?=
+ =?utf-8?B?clh4Nmh2dGZKazNScVFUM0pIbVExcVhkYVR1bVpORGxtRnJiNDFJaGVaZ2ZU?=
+ =?utf-8?B?R2M2amwybmpZT1Y2YVFZSnJJZjJFTkhITnhMQWFjTXZUdkVYT3FsVXdiZVV5?=
+ =?utf-8?B?NlpJMFFzdFBTeDBwU3RLRkNPMDBWUVN3d2MwSGtuTmlYZ01OZGN3VDE4endi?=
+ =?utf-8?B?MVlFNXg5Q05Wd2lCRUQrL2crc1ZDUVFCV1JpZzZMQzVOeTRKc2VwYUU1dk1y?=
+ =?utf-8?B?dHJkK0xJd0pmZjI0UW5naE8xNUZpOTZ2L25yZU00ckZjbjNMOTV3ajI4VGFU?=
+ =?utf-8?B?eFZncHdWM04vWGJMTkJQcTNNMi91L1BaUlZkSFJyRHFRS2VGUm9PTHdEUkVI?=
+ =?utf-8?B?VmtNVXNFcThwaVoxRlRMckdDSGxzVzUwRlllOTl1SXljaTFTTzZkUENQWHlO?=
+ =?utf-8?B?SmhXZDhtM3lOZ0NLamhmZTVnWFpRVHBlclNQTlByanNtcmt3R3k3UVBkb0px?=
+ =?utf-8?B?aXowYURyc1VLWHR4YlYzUklKRGI2N1BDUU1MTncyVTlIZ2RlL3NyQVRxWlIy?=
+ =?utf-8?B?RHEzaSs1SjJ0QUJFVEg5TTFCdEJnNmxjS2tLTjVla2ZmRXlVY1EwNmFnYzRJ?=
+ =?utf-8?B?TDFYRGxyQUZIdHRQZjVRclgvaTVGek5tMFJYbWUrR3FMaXhPS2RuT0VGRnZu?=
+ =?utf-8?B?dlE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3c68e99f-3a20-465c-a9c9-08db9279b764
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB3674.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Aug 2023 10:26:07.1214
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: GhnXRY+aMfP7fJB3rUTKTU5Q5MQdxVPcNjv2YYqgnrOEu2pL1ZW7KN7aXXBlST6wohwlRP7khsaLFcQDBPG2ou1uncOrfA67mNDkrawYm3w=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR11MB5122
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, 1 Aug 2023 11:36:43 +0200
-Andrew Lunn <andrew@lunn.ch> wrote:
-
-> > +static inline void qmc_clrsetbits16(void __iomem *addr, u16 clr, u16 set)
-> > +{
-> > +	qmc_write16(addr, (qmc_read16(addr) & ~clr) | set);
-> > +}
-> > +  
+On 8/1/23 12:15, Przemek Kitszel wrote:
+> Mitigate race between registering on wait list and receiving
+> AQ Response from FW.
 > 
-> Please don't use inline in .c files. Let the compiler decide.
+> ice_aq_prep_for_event() should be called before sending AQ command,
+> ice_aq_wait_for_event() should be called after sending AQ command,
+> to wait for AQ Response.
 > 
->        Andrew
+> struct ice_aq_task is exposed to callers, what takes burden of memory
+> ownership out from AQ-wait family of functions.
+> 
+> Embed struct ice_rq_event_info event into struct ice_aq_task
+> (instead of it being a ptr), to remove some more code from the callers.
+> 
+> Additional fix: one of the checks in ice_aq_check_events() was off by one.
+> 
+> Please note, that this was found by reading the code,
+> an actual race has not yet materialized.
+> 
+> Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> ---
+>   drivers/net/ethernet/intel/ice/ice.h          | 21 +++-
+>   .../net/ethernet/intel/ice/ice_fw_update.c    | 45 +++++----
+>   drivers/net/ethernet/intel/ice/ice_main.c     | 98 +++++++++----------
+>   3 files changed, 92 insertions(+), 72 deletions(-)
+> 
 
-Ok, I will remove the inline in the next iteration.
-I will also remove the inline of all other similar functions (probably a
-separate patch in the series).
+Ouch, I've forgot to mention that it is for IWL-next, will send v2 
+tomorrow with proper tag :~
 
-Regards,
-Hervé
 
