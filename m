@@ -1,123 +1,297 @@
-Return-Path: <netdev+bounces-23298-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23299-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68CA976B7F2
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 16:48:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99A4976B802
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 16:50:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 22D1A281486
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 14:48:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F22CA2814C0
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 14:50:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83F354DC73;
-	Tue,  1 Aug 2023 14:47:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D829D4DC6E;
+	Tue,  1 Aug 2023 14:50:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 791494DC71
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 14:47:51 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45DFF1BD2
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 07:47:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1690901269;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=77SgUFl2HB6+f2EfWd7XLhBOxqcp2ZcmVefhFsJwvso=;
-	b=QDgCoXgr6o7BOudkBjM8QmgokrGtlWE+RvJACVtfbK9T9VlGo5AlPt60s1z0pJebhuAB/x
-	EWsPYgJUEtGdWZUwpzbAocXvy4SAx58cFserNd896pA60AMeb87Di6h3TmeReggSl67pqU
-	58HKIs47MSwjhnflGmM5hfBUm4quITc=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-615-CN4xJSqeOzmaJVv-cmpRsQ-1; Tue, 01 Aug 2023 10:47:44 -0400
-X-MC-Unique: CN4xJSqeOzmaJVv-cmpRsQ-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A8B201064C0D;
-	Tue,  1 Aug 2023 14:47:38 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.131])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 9DA8F492B01;
-	Tue,  1 Aug 2023 14:47:36 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <64c9174fda48e_1bf0a42945f@willemb.c.googlers.com.notmuch>
-References: <64c9174fda48e_1bf0a42945f@willemb.c.googlers.com.notmuch> <64c903b02b234_1b307829418@willemb.c.googlers.com.notmuch> <64c7acd57270c_169cd129420@willemb.c.googlers.com.notmuch> <64c6672f580e3_11d0042944e@willemb.c.googlers.com.notmuch> <20230718160737.52c68c73@kernel.org> <000000000000881d0606004541d1@google.com> <0000000000001416bb06004ebf53@google.com> <792238.1690667367@warthog.procyon.org.uk> <831028.1690791233@warthog.procyon.org.uk> <1401696.1690893633@warthog.procyon.org.uk> <1409099.1690899546@warthog.procyon.org.uk>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: dhowells@redhat.com, Jakub Kicinski <kuba@kernel.org>,
-    syzbot <syzbot+f527b971b4bdc8e79f9e@syzkaller.appspotmail.com>,
-    bpf@vger.kernel.org, brauner@kernel.org, davem@davemloft.net,
-    dsahern@kernel.org, edumazet@google.com,
-    linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-    netdev@vger.kernel.org, pabeni@redhat.com,
-    syzkaller-bugs@googlegroups.com, viro@zeniv.linux.org.uk
-Subject: Re: Endless loop in udp with MSG_SPLICE_READ - Re: [syzbot] [fs?] INFO: task hung in pipe_release (4)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C95DB815
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 14:50:52 +0000 (UTC)
+Received: from mgamail.intel.com (unknown [192.55.52.88])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52171122;
+	Tue,  1 Aug 2023 07:50:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1690901451; x=1722437451;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=rWm4JCgihsFm4r3h7JFxMUVneJGmmNknhKKkj+dNq/g=;
+  b=gPNkEp+pAHq9lE40YvXw6zPsmVsC89U3tfEFkpwnN2bk1Ijksfn0Eb1T
+   /OoD9BbrlKCChqq2+EBsV97BMLSzep1pUmQLBG9wlKeqgT4nivBG1JTCg
+   EJnj84ufaB7BJ834ODTU5aubYa1BiuFMFM3XCc5kONsuml7b5YtI04Vf4
+   gg68ebJDnCdk29y0Gu3asl8TjSJ7AvUdHT8PrPg/dRiR9qZIIePsOizxh
+   qixQoW3jq1lk/WE7zbW+cTViSbDpqE4nyfXgPwj4mv+k8Qu1sXJhdIcTC
+   bGTNP1eZLx1yjRokhOEeX//wM7fG29cLKXBbm6nJy4L0M5iEgCRU8L8aS
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10789"; a="400265783"
+X-IronPort-AV: E=Sophos;i="6.01,247,1684825200"; 
+   d="scan'208";a="400265783"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Aug 2023 07:50:50 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10789"; a="678692455"
+X-IronPort-AV: E=Sophos;i="6.01,247,1684825200"; 
+   d="scan'208";a="678692455"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by orsmga003.jf.intel.com with ESMTP; 01 Aug 2023 07:50:50 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Tue, 1 Aug 2023 07:50:49 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Tue, 1 Aug 2023 07:50:49 -0700
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27 via Frontend Transport; Tue, 1 Aug 2023 07:50:49 -0700
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.103)
+ by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.27; Tue, 1 Aug 2023 07:50:49 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=IEew9/cQEuMxWoD3I4jMfdxnNqfcMORzyYI5Q3YuMwnDOSb7Yb9ad/X/zj/9beQWaSDvGyIAFsuU1Bd/MmOk+joqksghVYI86YxwfQ5qSREnRQ4/sAD+mQTh7Sk4H9XQbHyaiTlwELvpy4kT67wAyf4A+uUvoO1Mh88xE4DwOHOrYGoFTegN/gGLr2YSHdyiPDDo76yvDtwSX/X4s2h08CwivvLnMZHIhwpPiVWWPT+HxZsFeE4LMTwAKh1o9Rg8h/twC2Dbsiv+XF3y5gdFxCeYqyLA9tKNpzS0A/jmz7w3Tkqi8P1LJrZFRXzVFB1wyA5bDONOfqKOXfhLWFqw0w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=3a+5jVGFgIqgx1+RiGGqZ9msUxrG8xL/hoov186ayI4=;
+ b=Sv5bcVWNZ+QSDDyA/zND5GAreCz0zdNsenJIn/sq93ahePdZgSm6/gDo7v9DK6gmxhrvV/g/GNlv/96NIf9V7wNk/3bDJ+BbWxnLUtytbzhDMmyc/skgd65NzMYBjCkjHN3jookBJRHnXHpsFMmA13kNdGllesMJfyEy2v74veajUUzhJ4Y6zznmaeThqrkLBAMgjn44lfySTWkxDDfO+6RwmIEbspfYP3YTe5o7mi5NBnwo8K2ivl/zqqpmt4q8VioIqKunnUTKyfIGau+9EzCuI/rTgoJfb1mrh91ND+KigcZQ/BsOQDIUtcS1MeHVnxhK5QGAuc5it9lBFswMew==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from DM6PR11MB4657.namprd11.prod.outlook.com (2603:10b6:5:2a6::7) by
+ CH3PR11MB8658.namprd11.prod.outlook.com (2603:10b6:610:1c5::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.39; Tue, 1 Aug
+ 2023 14:50:45 +0000
+Received: from DM6PR11MB4657.namprd11.prod.outlook.com
+ ([fe80::c3cd:b8d0:5231:33a8]) by DM6PR11MB4657.namprd11.prod.outlook.com
+ ([fe80::c3cd:b8d0:5231:33a8%5]) with mapi id 15.20.6631.043; Tue, 1 Aug 2023
+ 14:50:45 +0000
+From: "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>
+To: Jiri Pirko <jiri@resnulli.us>
+CC: Vadim Fedorenko <vadim.fedorenko@linux.dev>, Jakub Kicinski
+	<kuba@kernel.org>, Jonathan Lemon <jonathan.lemon@gmail.com>, Paolo Abeni
+	<pabeni@redhat.com>, "Olech, Milena" <milena.olech@intel.com>, "Michalik,
+ Michal" <michal.michalik@intel.com>, "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, poros <poros@redhat.com>, mschmidt
+	<mschmidt@redhat.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-clk@vger.kernel.org" <linux-clk@vger.kernel.org>, Bart Van Assche
+	<bvanassche@acm.org>
+Subject: RE: [PATCH 09/11] ice: implement dpll interface to control cgu
+Thread-Topic: [PATCH 09/11] ice: implement dpll interface to control cgu
+Thread-Index: AQHZuut81WSQCKaWlUanjhbbmuUufa/EGiaAgAu/VDCABANBgIABtWkA
+Date: Tue, 1 Aug 2023 14:50:44 +0000
+Message-ID: <DM6PR11MB4657C0DA91583D92697324BC9B0AA@DM6PR11MB4657.namprd11.prod.outlook.com>
+References: <20230720091903.297066-1-vadim.fedorenko@linux.dev>
+ <20230720091903.297066-10-vadim.fedorenko@linux.dev>
+ <ZLpuaxMJ+8rWAPwi@nanopsycho>
+ <DM6PR11MB46571657F0DF87765DAB32FE9B06A@DM6PR11MB4657.namprd11.prod.outlook.com>
+ <ZMem35OUQiQmB9Vd@nanopsycho>
+In-Reply-To: <ZMem35OUQiQmB9Vd@nanopsycho>
+Accept-Language: pl-PL, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM6PR11MB4657:EE_|CH3PR11MB8658:EE_
+x-ms-office365-filtering-correlation-id: 6528e0fc-bd1b-4f7d-ebcd-08db929eaf79
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: yPojwZFLDIYrFVkNY1uCsqUim1h82ZcmEv5aQYAmyRnrs5zYCTYkTpJnufTbkRiodltGOwbP/pQRk5h02+ELHVmEHx8A2iN7RFEP2IFeokADhzkrE4uj4WZ7Ld1I86+uNSlberGExzBTOX+hEuxC9rvRWAW0OLZT7PvAWTBZrh9qONuJghfgJ+vLmcG3kIotX0CkFm/myBqP/+ef8qRgopQjzrjvLY8m0WJvD6yG3zKELQt+LPdHlIq4Sn2xoSMlGbE8R1Z0TW+GevvGqaGR0jbSK0B6lHONENU1xZndN7FTppvEGqUAc3a/GevJBOyLTtF254juWSh9aaXxu9HzRLMiNEBrhRU68LHVuXjn2RRqrQx+F9rAW7K33a29k7G8eFZhT4JN0+jo9n6EwiF3Y/0twLRpdp6YMq/+2YLFkfl1dJqKbiHdaZLQiLUo834fOP04vJgatOxegv4vligJFUqQ8gbLHcp6OiuDTRuYEJs+cv+GmRT6AuHInYrhUdVovCbUEpjyw91K6iK+N1PHzT8dLb5gLabOFP6ppLgXRlHH2aEYfQsahHenqo4n7rrxYLiQpyEI7/lmywYgisSgjoYkChJpb9SvztdZWI7mZX4XHmDIs5r5IigRWm065DfJ
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB4657.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(396003)(346002)(376002)(39860400002)(136003)(366004)(451199021)(38100700002)(66476007)(86362001)(8676002)(8936002)(316002)(64756008)(5660300002)(4326008)(66446008)(6916009)(54906003)(7416002)(122000001)(33656002)(52536014)(76116006)(66946007)(66556008)(82960400001)(41300700001)(38070700005)(478600001)(2906002)(71200400001)(9686003)(7696005)(6506007)(26005)(83380400001)(186003)(55016003);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?6oSVZ93JBVDSL2GZaDVHXv1LJ6TLtcgFxoOFk92X98z06nwto9JlfutDcRxc?=
+ =?us-ascii?Q?E3OleFrKrCuVWRR1GC5qqIIqHQBytBqYJOLBUf7CiZadlGMkWjjelOJs4q4H?=
+ =?us-ascii?Q?9hLFRQ9XOuF4kA2E7ehJo2OhJuMgyfxEGBk8t3UIoqUfsn1/KJssuJGYfnpp?=
+ =?us-ascii?Q?25dULBPYzleONeD56YVrpcZ5UtGyBm3wGPHKNfxDuCBwWGujfptFWScIeYv7?=
+ =?us-ascii?Q?6ktzgFF6IQJ8BioxXFBC4OHPmoy74UwIXLGwWNq2FRifQ7Q6+pHXqh4JOP8A?=
+ =?us-ascii?Q?T80AmvMMpG5rGAoIPITpL84nB2WP9XdIy9iDDl1PoE1mfwKHgEkto/8CUnFE?=
+ =?us-ascii?Q?yzzVP2u5a4QzjqXbpI9e0m79Ul3FvzOYi/kXNOzp9TOM6V4HS7ovb/uokHvh?=
+ =?us-ascii?Q?gryb11dHO594aZbzFHge/7radq6xyCAuSUMF4O27kAqiHUGKA/A7NQV6D76Q?=
+ =?us-ascii?Q?SHxyA0LL4kEmIn+primUVK7SS47HAYnW8bfB9GHNk2MZXLBzSvvKhP0vbNeU?=
+ =?us-ascii?Q?HPLjU0wvT/kZ1KHUKmT3UiUv1CdzOkd5MF9Mi22powIojD7CsRxeDhueXmR1?=
+ =?us-ascii?Q?OoMIG/WsRSbyQFUcxO2UssdQCC0M1Bz5cVsPp5U77PWsd0d/BdqMMbQt1Jv1?=
+ =?us-ascii?Q?77xCoraLSLFEJ3pI2BXwb7XBbLEAuDGTBYDc0sAzeEMeQwLWG7VzUEDCZ/BC?=
+ =?us-ascii?Q?6lm8Ja33hNTd/T1gmtLwV8DfRDHEsWIVbEcXMDN3rUNNMqkyvGLHEF2q2EWT?=
+ =?us-ascii?Q?ImrnkbKGrfIEtUicvbG2/v19jb5O8yMlNWbyQXMnFfxlZVp/PT1WuTfS1UVu?=
+ =?us-ascii?Q?1pEh9GOZfaBtCHolaNIGhwAxjcsUgArL8MSkjkCShIdMcOkqwqgWuW7x2KIA?=
+ =?us-ascii?Q?tQNU2GAm5OixlpjRxVwzwAE86gxeS9HOZVWoVMNzWC9pLd7HQ5exvweMiw4v?=
+ =?us-ascii?Q?fye3eJbyoTmKoIjZHD1dvdFdZ6wgrHX6rpQsMRZko24FmHbBIrX6mriRtTao?=
+ =?us-ascii?Q?P/jeyRlOFAwC0DgG13mhRjeClcZK36qgn8ya3ud6Wg1gEoLyHbjsMTUaRo2r?=
+ =?us-ascii?Q?7liP1c+mfBQbUNh5wj8fsDWQUgiELd7SzgbM4/C+bYJJ8KEQIyrbFHT0K6F7?=
+ =?us-ascii?Q?2eL70b+Gsre8EFyYZpGYmPiDs2eQRpR4qzwOnwrZMyTpnI1789RzOVj1usiR?=
+ =?us-ascii?Q?HTO6EZAWJJeEAitqMKPUHhm7N5u4sNcW5jJT5bSyq3hf9b4GOX3MI22QtasX?=
+ =?us-ascii?Q?r68QBthi0y30yn0gCUcSLg54JxeKZOQAY/61Bkb94mbKABQzDDuPkd7vtcun?=
+ =?us-ascii?Q?JfBxAC9+UJDg+pyBNmH1EoIA26s7/IJdCw64567SKshL2/rRnlkKu8O8PtqX?=
+ =?us-ascii?Q?1nzalZGBmZZT4+T25geyJ1oQDVYDZqpnTdKnU0uoYVIadj9zasKciMK2/pWe?=
+ =?us-ascii?Q?pVZKSaeT5b0D2wdMeXhmg53rckp46A4B2NgIXBo/bhOWoIPSgEvIDAA1yAEx?=
+ =?us-ascii?Q?1IgVdHwmEcZiBk4hpNstGVIrNPVfnUdeTMrhc9NbOwMwzcOY5z5R5ofzZDm4?=
+ =?us-ascii?Q?9YXqzVmc9Z+B1MBOAdKmzUF/jmqHbTt4o18EvyJPuUxXJYu7+WmgIsvY0DsM?=
+ =?us-ascii?Q?YA=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1410189.1690901255.1@warthog.procyon.org.uk>
-Date: Tue, 01 Aug 2023 15:47:35 +0100
-Message-ID: <1410190.1690901255@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB4657.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6528e0fc-bd1b-4f7d-ebcd-08db929eaf79
+X-MS-Exchange-CrossTenant-originalarrivaltime: 01 Aug 2023 14:50:44.9418
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Ze52gx0UKV62KOmLJMZj19e2sLvTCe76IfxhPdtlYEZb0HxxE54kBsnyuTlLxBiqUVvL8+GFTkgNuMGcvhT/QEpFWAiEvQH2sOxu8TGwPDg=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB8658
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Willem de Bruijn <willemdebruijn.kernel@gmail.com> wrote:
+>From: Jiri Pirko <jiri@resnulli.us>
+>Sent: Monday, July 31, 2023 2:20 PM
+>
+>Sat, Jul 29, 2023 at 01:03:59AM CEST, arkadiusz.kubalewski@intel.com wrote=
+:
+>>>From: Jiri Pirko <jiri@resnulli.us>
+>>>Sent: Friday, July 21, 2023 1:39 PM
+>>>
+>>>Thu, Jul 20, 2023 at 11:19:01AM CEST, vadim.fedorenko@linux.dev wrote:
+>>>>From: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+>>
+>
+>[...]
+>
+>
+>>>>+static int ice_dpll_cb_lock(struct ice_pf *pf, struct netlink_ext_ack
+>>>>*extack)
+>>>>+{
+>>>>+	int i;
+>>>>+
+>>>>+	for (i =3D 0; i < ICE_DPLL_LOCK_TRIES; i++) {
+>>>>+		if (!test_bit(ICE_FLAG_DPLL, pf->flags)) {
+>>>
+>>>And again, as I already told you, this flag checking is totally
+>>>pointless. See below my comment to ice_dpll_init()/ice_dpll_deinit().
+>>>
+>>
+>>This is not pointless, will explain below.
+>>
+>>>
+>>>
+>>
+>>[...]
+>>
+>
+>[...]
+>
+>
+>>>>+void ice_dpll_deinit(struct ice_pf *pf)
+>>>>+{
+>>>>+	bool cgu =3D ice_is_feature_supported(pf, ICE_F_CGU);
+>>>>+
+>>>>+	if (!test_bit(ICE_FLAG_DPLL, pf->flags))
+>>>>+		return;
+>>>>+	clear_bit(ICE_FLAG_DPLL, pf->flags);
+>>>>+
+>>>>+	ice_dpll_deinit_pins(pf, cgu);
+>>>>+	ice_dpll_deinit_dpll(pf, &pf->dplls.pps, cgu);
+>>>>+	ice_dpll_deinit_dpll(pf, &pf->dplls.eec, cgu);
+>>>>+	ice_dpll_deinit_info(pf);
+>>>>+	if (cgu)
+>>>>+		ice_dpll_deinit_worker(pf);
+>>>
+>>>Could you please order the ice_dpll_deinit() to be symmetrical to
+>>>ice_dpll_init()? Then, you can drop ICE_FLAG_DPLL flag entirely, as the
+>>>ice_dpll_periodic_work() function is the only reason why you need it
+>>>currently.
+>>>
+>>
+>>Not true.
+>>The feature flag is common approach in ice. If the feature was successful=
+ly
+>
+>The fact that something is common does not necessarily mean it is
+>correct. 0 value argument.
+>
 
-> > I'm also not entirely sure what 'paged' means in this function.  Should it
-> > actually be set in the MSG_SPLICE_PAGES context?
-> 
-> I introduced it with MSG_ZEROCOPY. It sets up pagedlen to capture the
-> length that is not copied.
-> 
-> If the existing code would affect MSG_ZEROCOPY too, I expect syzbot
-> to have reported that previously.
+Like using functions that unwrap netlink attributes as unsigned when
+they are in fact enums with possibility of being signed?
 
-Ah...  I think it *should* affect MSG_ZEROCOPY also... but...  If you look at:
+This is about consistent approach in ice driver.
 
-		} else {
-			err = skb_zerocopy_iter_dgram(skb, from, copy);
-			if (err < 0)
-				goto error;
-		}
-		offset += copy;
-		length -= copy;
+>
+>>initialized the flag is set. It allows to determine if deinit of the feat=
+ure
+>>is required on driver unload.
+>>
+>>Right now the check for the flag is not only in kworker but also in each
+>>callback, if the flag were cleared the data shall be not accessed by
+>>callbacks.
+>
+>Could you please draw me a scenario when this could actually happen?
+>It is just a matter of ordering. Unregister dpll device/pins before you
+>cleanup the related resources and you don't need this ridiculous flag.
+>
 
-MSG_ZEROCOPY assumes that if it didn't return an error, then
-skb_zerocopy_iter_dgram() copied all the data requested - whether or not the
-iterator had sufficient data to copy.
+Flag allows to determine if dpll was successfully initialized and do proper
+deinit on rmmod only if it was initialized. That's all.
 
-If you look in __zerocopy_sg_from_iter(), it will drop straight out, returning
-0 if/when iov_iter_count() is/reaches 0, even if length is still > 0, just as
-skb_splice_from_iter() does.
+>
+>>I know this is not required, but it helps on loading and unloading the
+>>driver,
+>>thanks to that, spam of pin-get dump is not slowing the driver
+>>load/unload.
+>
+>? Could you plese draw me a scenario how such thing may actually happen?
 
-So there's a potential bug in the handling of MSG_ZEROCOPY - but one that you
-survive because it subtracts 'copy' from 'length', reducing it to zero, exits
-the loop and returns without looking at 'length' again.  The actual length to
-be transmitted is in the skbuff.
+First of all I said it is not required.
 
-> Since the arithmetic is so complicated and error prone, I would try
-> to structure a fix that is easy to reason about to only change
-> behavior for the MSG_SPLICE_PAGES case.
+I already draw you this with above sentence.
+You need spam pin-get asynchronously and unload driver, what is not clear?
+Basically mutex in dpll is a bottleneck, with multiple requests waiting for
+mutex there is low change of driver getting mutex when doing unregisters.
 
-Does that mean you want to have a go at that - or did you want me to try?
+We actually need to redesign the mutex in dpll core/netlink, but I guess af=
+ter
+initial submission.
 
-David
+Thank you!
+Arkadiusz
 
+>
+>Thanks!
+>
+>
+>>
+>>>
+>>>>+	mutex_destroy(&pf->dplls.lock);
+>>>>+}
+>
+>
+>[...]
 
