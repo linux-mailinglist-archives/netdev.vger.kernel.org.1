@@ -1,116 +1,203 @@
-Return-Path: <netdev+bounces-22995-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-22996-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0E3776A5B0
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 02:43:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 556F376A5B7
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 02:47:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 154AF1C208E0
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 00:43:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 062FE28175A
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 00:47:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A877E627;
-	Tue,  1 Aug 2023 00:43:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1097367;
+	Tue,  1 Aug 2023 00:47:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97B737E;
-	Tue,  1 Aug 2023 00:43:49 +0000 (UTC)
-Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C4261BC8;
-	Mon, 31 Jul 2023 17:43:29 -0700 (PDT)
-Received: by mail-pf1-x430.google.com with SMTP id d2e1a72fcca58-686e0213c0bso3505184b3a.1;
-        Mon, 31 Jul 2023 17:43:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690850609; x=1691455409;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=bhtZuHVuD/5ejYMblEMyj6RnAY5Q/SWusGE7WOY4wLk=;
-        b=RVDofTb81vwCNbApr9KlLqeCll9uBMlfud/WfmddUfEN0IK3PpETDcLv6Q8CrKqyGc
-         vrGsvn3wQYftFQ8P0nKXwzd4g/jbOqkt02t1/eY0RzKfpUTztKsHrxEJfGaUvEBoHnza
-         8oTL79e6ngOzRjUfNCcKD6awElo7WX7j9wnSP+2/XEusL/SbKzOD9YZ6R9Pc63GOWq3W
-         9s8APfiP/DHZEct6jOAEcxB3S5B93mptSEUqVTSi7uPzc6ZDsZP3Fv9AJK/bqsY+UKeS
-         xTw0ePYHH/dpFa9JmYBlfnqooLGD7NQpLva3ftfWSoB7LC/7+CUIcaXZ95Up8LkDp0I9
-         esNw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690850609; x=1691455409;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bhtZuHVuD/5ejYMblEMyj6RnAY5Q/SWusGE7WOY4wLk=;
-        b=gPMQnYJTM6uqDJNvFBYf387bSHGMd6uwWa4wdh9a/82k9FmTCtrXuDyQQrE8vqRfzm
-         d7+6odnztP2Dq3OWv7cGk/pI6nUzSwQxwSbSvO+o19y/9ppdYrCcZUT1tEqRzh9cxpcx
-         tNs6k/V2Lb0RgxCfM5LEsAB9dkoEx25Cib+XlKXFzsVajFdkqctPFSdpOw/GGysoWMms
-         cw4ResOJGfU9skNuOmTBV+DnnrFIuE0+SU+3Ths8kVYQDyA2TFN268b/snQuT8esgmOU
-         Ul+GQAJdFn3dl0TaUoo5a0wb9FbPkIPTEOd7jdEvh+gCqI5jAYvMgzqxo4NMuCpPi8ph
-         M4eQ==
-X-Gm-Message-State: ABy/qLbK77jsnYNytJe/qzLunvKPzqdKZJdXs3b4D6ESfgzpKYsrl23h
-	54eKsAQPe9NKjdtI/nvEY9U=
-X-Google-Smtp-Source: APBJJlEDasJjNH4eP//Am3nFp4ZsQ53OoZYJ+ckrfSoVwD3WviUA3efisvHN+OOYWAmDO2aQriVD0g==
-X-Received: by 2002:a05:6a20:4a06:b0:10f:f672:6e88 with SMTP id fr6-20020a056a204a0600b0010ff6726e88mr9441980pzb.4.1690850608691;
-        Mon, 31 Jul 2023 17:43:28 -0700 (PDT)
-Received: from MacBook-Pro-8.local ([2620:10d:c090:400::5:6cea])
-        by smtp.gmail.com with ESMTPSA id y15-20020a637d0f000000b00563b36264besm8688220pgc.85.2023.07.31.17.43.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 31 Jul 2023 17:43:28 -0700 (PDT)
-Date: Mon, 31 Jul 2023 17:43:23 -0700
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-To: Geliang Tang <geliang.tang@suse.com>
-Cc: Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
-	Yonghong Song <yhs@fb.com>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
-	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	Florent Revest <revest@chromium.org>,
-	Brendan Jackman <jackmanb@chromium.org>,
-	Matthieu Baerts <matthieu.baerts@tessares.net>,
-	Mat Martineau <martineau@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	John Johansen <john.johansen@canonical.com>,
-	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
-	"Serge E. Hallyn" <serge@hallyn.com>,
-	Stephen Smalley <stephen.smalley.work@gmail.com>,
-	Eric Paris <eparis@parisplace.org>, Mykola Lysenko <mykolal@fb.com>,
-	Shuah Khan <shuah@kernel.org>, bpf@vger.kernel.org,
-	netdev@vger.kernel.org, mptcp@lists.linux.dev,
-	apparmor@lists.ubuntu.com, linux-security-module@vger.kernel.org,
-	selinux@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [RFC bpf-next v7 0/6] bpf: Force to MPTCP
-Message-ID: <20230801004323.l2npfegkq3srzff3@MacBook-Pro-8.local>
-References: <cover.1690624340.git.geliang.tang@suse.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72FB67E
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 00:47:18 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57773C433C8;
+	Tue,  1 Aug 2023 00:47:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1690850837;
+	bh=HVCJWkm17XYYTeXMWqebimNK5wqYP92jp1ePEqqz6WM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=GJC6+TAlwS7zb7RSesSA/gdaCkV5gKSExFIeb8c1nsBsYuAb5JdO1yeuVxSZ/xkM8
+	 vkPIAbJCi3kMT7CBe6ujOyJNoPeOZexx0GWYlgxfE3oan+E/iCc0fN2YP/RRG7eRQ7
+	 3vsViss2fvIRbfjXOlxV2AXFmiaa/iuqd16LAmQQ6Vw2MZH5iyGOjMdIid/U7QVaJW
+	 ppYNN7JbK9ncQT58ka4q+br0PQY4+d7q9aSAoDAbDt+vl0FSAawAb8gjk+WUVbckv1
+	 EKl5nrZYx3rj34bKhyx7+8uoEBBk2dpy01giZc31s4C7adtlX6PSIAP25f4GKO2zOT
+	 KL59gzzGdbArg==
+Date: Mon, 31 Jul 2023 17:47:16 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Thinh Tran <thinhtr@linux.vnet.ibm.com>
+Cc: aelior@marvell.com, davem@davemloft.net, edumazet@google.com,
+ manishc@marvell.com, netdev@vger.kernel.org, pabeni@redhat.com,
+ skalluru@marvell.com, drc@linux.vnet.ibm.com, abdhalee@in.ibm.com,
+ simon.horman@corigine.com
+Subject: Re: [PATCH v4] bnx2x: Fix error recovering in switch configuration
+Message-ID: <20230731174716.0898ff62@kernel.org>
+In-Reply-To: <20230728211133.2240873-1-thinhtr@linux.vnet.ibm.com>
+References: <20220916195114.2474829-1-thinhtr@linux.vnet.ibm.com>
+	<20230728211133.2240873-1-thinhtr@linux.vnet.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1690624340.git.geliang.tang@suse.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Sat, Jul 29, 2023 at 05:57:21PM +0800, Geliang Tang wrote:
+On Fri, 28 Jul 2023 16:11:33 -0500 Thinh Tran wrote:
+> As the BCM57810 and other I/O adapters are connected
+> through a PCIe switch, the bnx2x driver causes unexpected
+> system hang/crash while handling PCIe switch errors, if
+> its error handler is called after other drivers' handlers.
 > 
-> The main idea is to add a hook in sys_socket() to change the protocol id
-> from IPPROTO_TCP (or 0) to IPPROTO_MPTCP.
+> In this case, after numbers of bnx2x_tx_timout(), the
+> bnx2x_nic_unload() is  called, frees up resources and
+> calls bnx2x_napi_disable(). Then when EEH calls its
+> error handler, the bnx2x_io_error_detected() and
+> bnx2x_io_slot_reset() also calling bnx2x_napi_disable()
+> and freeing the resources.
+> 
+> 
+> Signed-off-by: Thinh Tran <thinhtr@linux.vnet.ibm.com>
+> Reviewed-by: Manish Chopra <manishc@marvell.com>
+> Tested-by: Abdul Haleem <abdhalee@in.ibm.com>
+> Tested-by: David Christensen <drc@linux.vnet.ibm.com>
+> 
+> Reviewed-by: Simon Horman <simon.horman@corigine.com>
 
-I still think it's a hack, but its blast radius is nicely contained.
-And since I cannot propose any better I'm ok with it.
+nit: no empty lines between tags
 
-Patches 1-2 can be squashed into one.
-Just like patches 3-6 as a single patch for selftests.
+There should be a "---" line between the tags and changelog.
 
-But before proceeding I'd like an explicit ack from netdev maintainers.
+>   v4:
+>    - factoring common code into new function bnx2x_stop_nic()
+>      that disables and releases IRQs and NAPIs 
+>   v3:
+>     - no changes, just repatched to the latest driver level
+>     - updated the reviewed-by Manish in October, 2022
+> 
+>   v2:
+>    - Check the state of the NIC before calling disable nappi
+>      and freeing the IRQ
+>    - Prevent recurrence of TX timeout by turning off the carrier,
+>      calling netif_carrier_off() in bnx2x_tx_timeout()
+>    - Check and bail out early if fp->page_pool already freed
+>
+> ---
+>  drivers/net/ethernet/broadcom/bnx2x/bnx2x.h   |  2 ++
+
+> @@ -3095,14 +3097,8 @@ int bnx2x_nic_unload(struct bnx2x *bp, int unload_mode, bool keep_link)
+>  		if (!CHIP_IS_E1x(bp))
+>  			bnx2x_pf_disable(bp);
+>  
+> -		/* Disable HW interrupts, NAPI */
+> -		bnx2x_netif_stop(bp, 1);
+> -		/* Delete all NAPI objects */
+> -		bnx2x_del_all_napi(bp);
+> -		if (CNIC_LOADED(bp))
+> -			bnx2x_del_all_napi_cnic(bp);
+> -		/* Release IRQs */
+> -		bnx2x_free_irq(bp);
+
+Could you split the change into two patches - one factoring out the
+code into bnx2x_stop_nic() and the other adding the nic_stopped
+variable? First one should be pure code refactoring with no functional
+changes. That'd make the reviewing process easier.
+
+> +		/* Disable HW interrupts, delete NAPIs, Release IRQs */
+> +		bnx2x_stop_nic(bp);
+>  
+>  		/* Report UNLOAD_DONE to MCP */
+>  		bnx2x_send_unload_done(bp, false);
+> @@ -4987,6 +4983,12 @@ void bnx2x_tx_timeout(struct net_device *dev, unsigned int txqueue)
+>  {
+>  	struct bnx2x *bp = netdev_priv(dev);
+>  
+> +	/* Immediately indicate link as down */
+> +	bp->link_vars.link_up = 0;
+> +	bp->force_link_down = true;
+> +	netif_carrier_off(dev);
+> +	BNX2X_ERR("Indicating link is down due to Tx-timeout\n");
+
+Is this code move to make the shutdown more immediate?
+That could also be a separate patch.
+
+>  	/* We want the information of the dump logged,
+>  	 * but calling bnx2x_panic() would kill all chances of recovery.
+>  	 */
+> diff --git a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.h b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.h
+> index d8b1824c334d..f5ecbe8d604a 100644
+> --- a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.h
+> +++ b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.h
+> @@ -1015,6 +1015,9 @@ static inline void bnx2x_free_rx_sge_range(struct bnx2x *bp,
+>  {
+>  	int i;
+>  
+> +	if (!fp->page_pool.page)
+> +		return;
+> +
+>  	if (fp->mode == TPA_MODE_DISABLED)
+>  		return;
+>  
+> @@ -1399,5 +1402,20 @@ void bnx2x_set_os_driver_state(struct bnx2x *bp, u32 state);
+>   */
+>  int bnx2x_nvram_read(struct bnx2x *bp, u32 offset, u8 *ret_buf,
+>  		     int buf_size);
+> +static inline void bnx2x_stop_nic(struct bnx2x *bp)
+
+can't it live in bnx2x_cmn.c ? Why make it a static inline?
+
+> +{
+> +	if (!bp->nic_stopped) {
+> +		/* Disable HW interrupts, NAPI */
+> +		bnx2x_netif_stop(bp, 1);
+> +		/* Delete all NAPI objects */
+> +		bnx2x_del_all_napi(bp);
+> +		if (CNIC_LOADED(bp))
+> +			bnx2x_del_all_napi_cnic(bp);
+> +		/* Release IRQs */
+> +		bnx2x_free_irq(bp);
+> +		bp->nic_stopped = true;
+> +	}
+> +}
+> +
+>  
+
+nit: double new line
+
+> --- a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_vfpf.c
+> +++ b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_vfpf.c
+> @@ -529,13 +529,8 @@ void bnx2x_vfpf_close_vf(struct bnx2x *bp)
+>  	bnx2x_vfpf_finalize(bp, &req->first_tlv);
+>  
+>  free_irq:
+> -	/* Disable HW interrupts, NAPI */
+> -	bnx2x_netif_stop(bp, 0);
+
+This used to say 
+
+	bnx2x_netif_stop(bp, 0);
+
+but bnx2x_stop_nic() will do:
+
+	bnx2x_netif_stop(bp, 1);
+
+is it okay to shut down the HW here ? (whatever that entails)
+
+> -	/* Delete all NAPI objects */
+> -	bnx2x_del_all_napi(bp);
+> -
+> -	/* Release IRQs */
+> -	bnx2x_free_irq(bp);
+> +	/* Disable HW interrupts, delete NAPIs, Release IRQs */
+> +	bnx2x_stop_nic(bp);
+-- 
+pw-bot: cr
 
