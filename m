@@ -1,633 +1,292 @@
-Return-Path: <netdev+bounces-23006-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23000-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54DB076A60B
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 03:07:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F09A76A5EA
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 03:03:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E5EC42817B9
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 01:07:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AD6F0281731
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 01:03:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 618CE658;
-	Tue,  1 Aug 2023 01:06:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1F66643;
+	Tue,  1 Aug 2023 01:03:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E65F7E
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 01:06:42 +0000 (UTC)
-Received: from mgamail.intel.com (unknown [134.134.136.65])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5AF901FFD;
-	Mon, 31 Jul 2023 18:06:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1690851984; x=1722387984;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=TfM4Yqg18dpR3fm1fYfdsdZBHxZ2WEli4frkDuAW+vg=;
-  b=L55NtoZQx2Fh1WiDL/Sw7wr9Senn+CVgQUXBiHNuHQFfCGuA/f6hO0J1
-   Hi20yunsLsxe2tVpH+tc4GIvV5TNcK5mZ4i20jIcDOvfjwAUF1w3Sj5r0
-   ZWypySjkn+Enu9i/U3WgDfwOjlVtUOR84Udug6phJyQRSFrWBbgO7kkCl
-   gENAQY9efdEYKcnz5PKMOzhV8fPA9uPfGdZkrmqsFH3NnZnT8+OflDMzE
-   VzG6RAHHrcbkveVh7t++qisbT2+qFr96OGNZVEqo1zQQT9Nfovr3JpDLD
-   TbbcaaC9qnKnZc0p5apDThAHSjG9LnYxxfgNBBxQ6Q2cV/r1FGkU7IlcZ
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="372788425"
-X-IronPort-AV: E=Sophos;i="6.01,246,1684825200"; 
-   d="scan'208";a="372788425"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2023 18:04:21 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="818587732"
-X-IronPort-AV: E=Sophos;i="6.01,246,1684825200"; 
-   d="scan'208";a="818587732"
-Received: from unknown (HELO localhost.localdomain) ([10.226.216.116])
-  by FMSMGA003.fm.intel.com with ESMTP; 31 Jul 2023 18:04:16 -0700
-From: niravkumar.l.rabara@intel.com
-To: niravkumar.l.rabara@intel.com
-Cc: adrian.ho.yin.ng@intel.com,
-	andrew@lunn.ch,
-	conor+dt@kernel.org,
-	devicetree@vger.kernel.org,
-	dinguyen@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org,
-	linux-clk@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	mturquette@baylibre.com,
-	netdev@vger.kernel.org,
-	p.zabel@pengutronix.de,
-	richardcochran@gmail.com,
-	robh+dt@kernel.org,
-	sboyd@kernel.org,
-	wen.ping.teh@intel.com
-Subject: [PATCH v2 5/5] arm64: dts: agilex5: add initial support for Intel Agilex5 SoCFPGA
-Date: Tue,  1 Aug 2023 09:02:34 +0800
-Message-Id: <20230801010234.792557-6-niravkumar.l.rabara@intel.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20230801010234.792557-1-niravkumar.l.rabara@intel.com>
-References: <20230618132235.728641-1-niravkumar.l.rabara@intel.com>
- <20230801010234.792557-1-niravkumar.l.rabara@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91BA67E;
+	Tue,  1 Aug 2023 01:03:41 +0000 (UTC)
+Received: from mail-lj1-x232.google.com (mail-lj1-x232.google.com [IPv6:2a00:1450:4864:20::232])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 753FCE67;
+	Mon, 31 Jul 2023 18:03:39 -0700 (PDT)
+Received: by mail-lj1-x232.google.com with SMTP id 38308e7fff4ca-2b9bd59d465so76661941fa.3;
+        Mon, 31 Jul 2023 18:03:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1690851818; x=1691456618;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=N61DiLzqfWCfaoDxyjE2xBc7t2o0CIHZgALsIagDbeg=;
+        b=c+eMFfCZPp7YAmdNEiE1kYDHVCDzzJckp+4WDHt8+0o/je4x7DISIuKrVtNkIY9fmI
+         mixYW+wZL6+AJa3cB1GMVNpjUvFLt7R3RWsN5/Ey9zy97GsroIccVFwn1iU+CUTw4tAr
+         dTaBiUCIH++bVKQO9r/Ln207pWlYmbFfZb2JQyWhbO4WpXA4Brmrm8BhP4mFZ+RFBEmC
+         GvEpNTgsZi/V3z+wXS3+QvCxfXOg6YJpNz6RoZtps+pvJfQYMGpxP0pz9Fsu/3DjxJ+x
+         duncf3vYqV14H41DSD1E9FtPyeY8iyESN3Z6imbfJNcuHa+wknD5gJqdJD/VFVNQXKhs
+         ikeg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690851818; x=1691456618;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=N61DiLzqfWCfaoDxyjE2xBc7t2o0CIHZgALsIagDbeg=;
+        b=WQGpF2e4NUtrypKdHQ8nTFfnMEApud04cmTHLU2r7ks8jzMFkLKOgAeTdnwmfwG++f
+         mV6ACr8wqANkmSCh1Mtqf3wEdSOFCUPPdXJDFDfuYJJLcqKkKoJctJqUNe93yZAiHl+5
+         ZbMLZEIq5CiTym8JVT8Ziak+4tgrk+/H998G0YbS3QgjAmtNnfNGX592lVQOLCqgiYri
+         DWababLLmUOfCHCxm6MwBxlhjviIGTN1Pvxr4tnbKIASqj3Ewzcvzaqx8s1Q1+75BrgS
+         9qlK9ZKflM8MSVgHnhYI1exbAkm2vIRsWSeFn/RxHPOz77XkIuJOKnr46eVY9bFI0d4q
+         /v0A==
+X-Gm-Message-State: ABy/qLZlyY/ADtxv/eTT9wHnlgn9LVoeIvdASgP31zG+JX5imeaCkQrE
+	0PR/IV8YRBOrsZ35SLXLtrXL6xlhbbo+hGKf3hEb3tbaV5E=
+X-Google-Smtp-Source: APBJJlGYDu8MYvr1+1nrZ7WBvwBAvD2wijHjCSeHG3Zs9fikL7VCSMJbUS1UlvVTDj4vYpqhtVoQMXjLjvesrFI4t6Y=
+X-Received: by 2002:a2e:8290:0:b0:2b9:f31e:51ff with SMTP id
+ y16-20020a2e8290000000b002b9f31e51ffmr1030391ljg.37.1690851817525; Mon, 31
+ Jul 2023 18:03:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+References: <20230728173923.1318596-1-larysa.zaremba@intel.com>
+ <20230728173923.1318596-13-larysa.zaremba@intel.com> <20230728215340.pf3qcfxh7g4x7s6a@MacBook-Pro-8.local>
+ <64c53b1b29a66_e235c2942d@willemb.c.googlers.com.notmuch> <CAADnVQ+vn0=1UT5_c628ovq+LzfrNFf0MxmZn++NqeUFJ-ykQw@mail.gmail.com>
+ <64c661de227c2_11bfb629493@willemb.c.googlers.com.notmuch> <ZMeSUrOfhq9dWz6f@lincoln>
+In-Reply-To: <ZMeSUrOfhq9dWz6f@lincoln>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Mon, 31 Jul 2023 18:03:26 -0700
+Message-ID: <CAADnVQJPgpo7J0qVTQJYYocZ=Jnw=O5GfN2=PyAQ55+WWG_DVg@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v4 12/21] xdp: Add checksum hint
+To: Larysa Zaremba <larysa.zaremba@intel.com>
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, bpf <bpf@vger.kernel.org>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yhs@fb.com>, John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
+	Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
+	David Ahern <dsahern@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Willem de Bruijn <willemb@google.com>, Jesper Dangaard Brouer <brouer@redhat.com>, 
+	Anatoly Burakov <anatoly.burakov@intel.com>, Alexander Lobakin <alexandr.lobakin@intel.com>, 
+	Magnus Karlsson <magnus.karlsson@gmail.com>, Maryam Tahhan <mtahhan@redhat.com>, 
+	xdp-hints@xdp-project.net, Network Development <netdev@vger.kernel.org>, 
+	Simon Horman <simon.horman@corigine.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Niravkumar L Rabara <niravkumar.l.rabara@intel.com>
+On Mon, Jul 31, 2023 at 3:56=E2=80=AFAM Larysa Zaremba <larysa.zaremba@inte=
+l.com> wrote:
+>
+> On Sun, Jul 30, 2023 at 09:13:02AM -0400, Willem de Bruijn wrote:
+> > Alexei Starovoitov wrote:
+> > > On Sat, Jul 29, 2023 at 9:15=E2=80=AFAM Willem de Bruijn
+> > > <willemdebruijn.kernel@gmail.com> wrote:
+> > > >
+> > > > Alexei Starovoitov wrote:
+> > > > > On Fri, Jul 28, 2023 at 07:39:14PM +0200, Larysa Zaremba wrote:
+> > > > > >
+> > > > > > +union xdp_csum_info {
+> > > > > > +   /* Checksum referred to by ``csum_start + csum_offset`` is =
+considered
+> > > > > > +    * valid, but was never calculated, TX device has to do thi=
+s,
+> > > > > > +    * starting from csum_start packet byte.
+> > > > > > +    * Any preceding checksums are also considered valid.
+> > > > > > +    * Available, if ``status =3D=3D XDP_CHECKSUM_PARTIAL``.
+> > > > > > +    */
+> > > > > > +   struct {
+> > > > > > +           u16 csum_start;
+> > > > > > +           u16 csum_offset;
+> > > > > > +   };
+> > > > > > +
+> > > > >
+> > > > > CHECKSUM_PARTIAL makes sense on TX, but this RX. I don't see in t=
+he above.
+> > > >
+> > > > It can be observed on RX when packets are looped.
+> > > >
+> > > > This may be observed even in XDP on veth.
+> > >
+> > > veth and XDP is a broken combination. GSO packets coming out of conta=
+iners
+> > > cannot be parsed properly by XDP.
+> > > It was added mainly for testing. Just like "generic XDP".
+> > > bpf progs at skb layer is much better fit for veth.
+> >
+> > Ok. Still, seems forward looking and little cost to define the
+> > constant?
+> >
+>
+> +1
+> CHECKSUM_PARTIAL is mostly for testing and removing/adding it doesn't cha=
+nge
+> anything from the perspective of the user that does not use it, so I thin=
+k it is
+> worth having.
 
-Add the initial device tree files for Intel Agilex5 SoCFPGA platform.
+"little cost to define the constant".
+Not really. A constant in UAPI is a heavy burden.
 
-Reviewed-by: Dinh Nguyen <dinguyen@kernel.org>
-Signed-off-by: Niravkumar L Rabara <niravkumar.l.rabara@intel.com>
----
- arch/arm64/boot/dts/intel/Makefile            |   1 +
- .../arm64/boot/dts/intel/socfpga_agilex5.dtsi | 468 ++++++++++++++++++
- .../boot/dts/intel/socfpga_agilex5_socdk.dts  |  39 ++
- 3 files changed, 508 insertions(+)
- create mode 100644 arch/arm64/boot/dts/intel/socfpga_agilex5.dtsi
- create mode 100644 arch/arm64/boot/dts/intel/socfpga_agilex5_socdk.dts
+> > > > > > +   /* Checksum, calculated over the whole packet.
+> > > > > > +    * Available, if ``status & XDP_CHECKSUM_COMPLETE``.
+> > > > > > +    */
+> > > > > > +   u32 checksum;
+> > > > >
+> > > > > imo XDP RX should only support XDP_CHECKSUM_COMPLETE with u32 che=
+cksum
+> > > > > or XDP_CHECKSUM_UNNECESSARY.
+> > > > >
+> > > > > > +};
+> > > > > > +
+> > > > > > +enum xdp_csum_status {
+> > > > > > +   /* HW had parsed several transport headers and validated th=
+eir
+> > > > > > +    * checksums, same as ``CHECKSUM_UNNECESSARY`` in ``sk_buff=
+``.
+> > > > > > +    * 3 least significant bytes contain number of consecutive =
+checksums,
+> > > > > > +    * starting with the outermost, reported by hardware as val=
+id.
+> > > > > > +    * ``sk_buff`` checksum level (``csum_level``) notation is =
+provided
+> > > > > > +    * for driver developers.
+> > > > > > +    */
+> > > > > > +   XDP_CHECKSUM_VALID_LVL0         =3D 1,    /* 1 outermost ch=
+ecksum */
+> > > > > > +   XDP_CHECKSUM_VALID_LVL1         =3D 2,    /* 2 outermost ch=
+ecksums */
+> > > > > > +   XDP_CHECKSUM_VALID_LVL2         =3D 3,    /* 3 outermost ch=
+ecksums */
+> > > > > > +   XDP_CHECKSUM_VALID_LVL3         =3D 4,    /* 4 outermost ch=
+ecksums */
+> > > > > > +   XDP_CHECKSUM_VALID_NUM_MASK     =3D GENMASK(2, 0),
+> > > > > > +   XDP_CHECKSUM_VALID              =3D XDP_CHECKSUM_VALID_NUM_=
+MASK,
+> > > > >
+> > > > > I don't see what bpf prog suppose to do with these levels.
+> > > > > The driver should pick between 3:
+> > > > > XDP_CHECKSUM_UNNECESSARY, XDP_CHECKSUM_COMPLETE, XDP_CHECKSUM_NON=
+E.
+> > > > >
+> > > > > No levels and no anything partial. please.
+> > > >
+> > > > This levels business is an unfortunate side effect of
+> > > > CHECKSUM_UNNECESSARY. For a packet with multiple checksum fields, w=
+hat
+> > > > does the boolean actually mean? With these levels, at least that is
+> > > > well defined: the first N checksum fields.
+> > >
+> > > If I understand this correctly this is intel specific feature that
+> > > other NICs don't have. skb layer also doesn't have such concept.
+>
+> Please look into csum_level field in sk_buff. It is not the most used pro=
+perty
+> in the kernel networking code, but it is certainly 1. used by networking =
+stack
+> 2. set to non-zero value by many vendors.
+>
+> So you do not need to search yourself, I'll copy-paste the docs for
+> CHECKSUM_UNNECESSARY here:
+>
+>  *   %CHECKSUM_UNNECESSARY is applicable to following protocols:
+>  *
+>  *     - TCP: IPv6 and IPv4.
+>  *     - UDP: IPv4 and IPv6. A device may apply CHECKSUM_UNNECESSARY to a
+>  *       zero UDP checksum for either IPv4 or IPv6, the networking stack
+>  *       may perform further validation in this case.
+>  *     - GRE: only if the checksum is present in the header.
+>  *     - SCTP: indicates the CRC in SCTP header has been validated.
+>  *     - FCOE: indicates the CRC in FC frame has been validated.
+>  *
+>
+> Please, look at this:
+>
+>  *   &sk_buff.csum_level indicates the number of consecutive checksums fo=
+und in
+>  *   the packet minus one that have been verified as %CHECKSUM_UNNECESSAR=
+Y.
+>  *   For instance if a device receives an IPv6->UDP->GRE->IPv4->TCP packe=
+t
+>  *   and a device is able to verify the checksums for UDP (possibly zero)=
+,
+>  *   GRE (checksum flag is set) and TCP, &sk_buff.csum_level would be set=
+ to
+>  *   two. If the device were only able to verify the UDP checksum and not
+>  *   GRE, either because it doesn't support GRE checksum or because GRE
+>  *   checksum is bad, skb->csum_level would be set to zero (TCP checksum =
+is
+>  *   not considered in this case).
+>
+> From:
+> https://elixir.bootlin.com/linux/v6.5-rc4/source/include/linux/skbuff.h#L=
+115
+>
+> > > The driver should say CHECKSUM_UNNECESSARY when it's sure
+> > > or don't pretend that it checks the checksum and just say NONE.
+> >
+>
+> Well, in such case, most of the NICs that use CHECKSUM_UNNECESSARY would =
+have to
+> return CHECKSUM_NONE instead, because based on my quick search, they most=
+ly
+> return checksum level of 0 (no tunneling detected) or 1 (tunneling detect=
+ed),
+> so they only parse headers up to a certain depth, meaning it's not possib=
+le
+> to tell whether there isn't another CHECKSUM_UNNECESSARY-eligible header =
+hiding
+> in the payload, so those NIC cannot guarantee ALL the checksums present i=
+n the
+> packet are correct. So, by your logic, we should make e.g. AF_XDP user re=
+-check
+> already verified checksums themselves, because HW "doesn't pretend that i=
+t
+> checks the checksum and just says NONE".
+>
+> > I did not know how much this was used, but quick grep for non constant
+> > csum_level shows devices from at least six vendors.
+>
+> Yes, there are several vendors that set the csum_level, including broadco=
+m
+> (bnxt) and mellanox (mlx4 and mlx5).
+>
+> Also, CHECKSUM_UNNECESSARY is found in 100+ drivers/net/ethernet files,
+> while csum_level is in like 20, which means overwhelming majority of
+> CHECKSUM_UNNECESSARY NICs actually stay with the default checksum level o=
+f '0'
+> (they check only the outermost checksum - anything else needs to be verif=
+ied by
+> the networking stack).
 
-diff --git a/arch/arm64/boot/dts/intel/Makefile b/arch/arm64/boot/dts/intel/Makefile
-index c2a723838344..d39cfb723f5b 100644
---- a/arch/arm64/boot/dts/intel/Makefile
-+++ b/arch/arm64/boot/dts/intel/Makefile
-@@ -2,5 +2,6 @@
- dtb-$(CONFIG_ARCH_INTEL_SOCFPGA) += socfpga_agilex_n6000.dtb \
- 				socfpga_agilex_socdk.dtb \
- 				socfpga_agilex_socdk_nand.dtb \
-+				socfpga_agilex5_socdk.dtb \
- 				socfpga_n5x_socdk.dtb
- dtb-$(CONFIG_ARCH_KEEMBAY) += keembay-evm.dtb
-diff --git a/arch/arm64/boot/dts/intel/socfpga_agilex5.dtsi b/arch/arm64/boot/dts/intel/socfpga_agilex5.dtsi
-new file mode 100644
-index 000000000000..dcdaf7064953
---- /dev/null
-+++ b/arch/arm64/boot/dts/intel/socfpga_agilex5.dtsi
-@@ -0,0 +1,468 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Copyright (C) 2023, Intel Corporation
-+ */
-+
-+/dts-v1/;
-+#include <dt-bindings/reset/altr,rst-mgr-s10.h>
-+#include <dt-bindings/gpio/gpio.h>
-+#include <dt-bindings/interrupt-controller/arm-gic.h>
-+#include <dt-bindings/interrupt-controller/irq.h>
-+#include <dt-bindings/clock/intel,agilex5-clkmgr.h>
-+
-+/ {
-+	compatible = "intel,socfpga-agilex5";
-+	#address-cells = <2>;
-+	#size-cells = <2>;
-+
-+	reserved-memory {
-+		#address-cells = <2>;
-+		#size-cells = <2>;
-+		ranges;
-+
-+		service_reserved: svcbuffer@0 {
-+			compatible = "shared-dma-pool";
-+			reg = <0x0 0x80000000 0x0 0x2000000>;
-+			alignment = <0x1000>;
-+			no-map;
-+		};
-+	};
-+
-+	cpus {
-+		#address-cells = <1>;
-+		#size-cells = <0>;
-+
-+		cpu0: cpu@0 {
-+			compatible = "arm,cortex-a55";
-+			reg = <0x0>;
-+			device_type = "cpu";
-+			enable-method = "psci";
-+		};
-+
-+		cpu1: cpu@1 {
-+			compatible = "arm,cortex-a55";
-+			reg = <0x100>;
-+			device_type = "cpu";
-+			enable-method = "psci";
-+		};
-+
-+		cpu2: cpu@2 {
-+			compatible = "arm,cortex-a76";
-+			reg = <0x200>;
-+			device_type = "cpu";
-+			enable-method = "psci";
-+		};
-+
-+		cpu3: cpu@3 {
-+			compatible = "arm,cortex-a76";
-+			reg = <0x300>;
-+			device_type = "cpu";
-+			enable-method = "psci";
-+		};
-+	};
-+
-+	psci {
-+		compatible = "arm,psci-0.2";
-+		method = "smc";
-+	};
-+
-+	intc: interrupt-controller@1d000000 {
-+		compatible = "arm,gic-v3";
-+		reg = <0x0 0x1d000000 0 0x10000>,
-+			<0x0 0x1d060000 0 0x100000>;
-+		ranges;
-+		#interrupt-cells = <3>;
-+		#address-cells = <2>;
-+		#size-cells =<2>;
-+		interrupt-controller;
-+		#redistributor-regions = <1>;
-+		redistributor-stride = <0x0 0x20000>;
-+
-+		its: msi-controller@1d040000 {
-+			compatible = "arm,gic-v3-its";
-+			reg = <0x0 0x1d040000 0x0 0x20000>;
-+			msi-controller;
-+			#msi-cells = <1>;
-+		};
-+	};
-+
-+	/* Clock tree 5 main sources*/
-+	clocks {
-+		cb_intosc_hs_div2_clk: cb-intosc-hs-div2-clk {
-+			#clock-cells = <0>;
-+			compatible = "fixed-clock";
-+			clock-frequency = <0>;
-+		};
-+
-+		cb_intosc_ls_clk: cb-intosc-ls-clk {
-+			#clock-cells = <0>;
-+			compatible = "fixed-clock";
-+			clock-frequency = <0>;
-+		};
-+
-+		f2s_free_clk: f2s-free-clk {
-+			#clock-cells = <0>;
-+			compatible = "fixed-clock";
-+			clock-frequency = <0>;
-+		};
-+
-+		osc1: osc1 {
-+			#clock-cells = <0>;
-+			compatible = "fixed-clock";
-+			clock-frequency = <0>;
-+		};
-+
-+		qspi_clk: qspi-clk {
-+			#clock-cells = <0>;
-+			compatible = "fixed-clock";
-+			clock-frequency = <200000000>;
-+		};
-+	};
-+
-+	timer {
-+		compatible = "arm,armv8-timer";
-+		interrupt-parent = <&intc>;
-+		interrupts = <GIC_PPI 13 (GIC_CPU_MASK_SIMPLE(4) | IRQ_TYPE_LEVEL_LOW)>,
-+			     <GIC_PPI 14 (GIC_CPU_MASK_SIMPLE(4) | IRQ_TYPE_LEVEL_LOW)>,
-+			     <GIC_PPI 11 (GIC_CPU_MASK_SIMPLE(4) | IRQ_TYPE_LEVEL_LOW)>,
-+			     <GIC_PPI 10 (GIC_CPU_MASK_SIMPLE(4) | IRQ_TYPE_LEVEL_LOW)>;
-+	};
-+
-+	usbphy0: usbphy {
-+		#phy-cells = <0>;
-+		compatible = "usb-nop-xceiv";
-+	};
-+
-+	soc: soc@0 {
-+		compatible = "simple-bus";
-+		ranges = <0 0 0 0xffffffff>;
-+		#address-cells = <1>;
-+		#size-cells = <1>;
-+		device_type = "soc";
-+		interrupt-parent = <&intc>;
-+
-+		clkmgr: clock-controller@10d10000 {
-+			compatible = "intel,agilex5-clkmgr";
-+			reg = <0x10d10000 0x1000>;
-+			#clock-cells = <1>;
-+		};
-+
-+		i2c0: i2c@10c02800 {
-+			compatible = "snps,designware-i2c";
-+			reg = <0x10c02800 0x100>;
-+			#address-cells = <1>;
-+			#size-cells = <0>;
-+			interrupts = <GIC_SPI 103 IRQ_TYPE_LEVEL_HIGH>;
-+			resets = <&rst I2C0_RESET>;
-+			clocks = <&clkmgr AGILEX5_L4_SP_CLK>;
-+			status = "disabled";
-+		};
-+
-+		i2c1: i2c@10c02900 {
-+			compatible = "snps,designware-i2c";
-+			reg = <0x10c02900 0x100>;
-+			#address-cells = <1>;
-+			#size-cells = <0>;
-+			interrupts = <GIC_SPI 104 IRQ_TYPE_LEVEL_HIGH>;
-+			resets = <&rst I2C1_RESET>;
-+			clocks = <&clkmgr AGILEX5_L4_SP_CLK>;
-+			status = "disabled";
-+		};
-+
-+		i2c2: i2c@10c02a00 {
-+			compatible = "snps,designware-i2c";
-+			reg = <0x10c02a00 0x100>;
-+			#address-cells = <1>;
-+			#size-cells = <0>;
-+			interrupts = <GIC_SPI 105 IRQ_TYPE_LEVEL_HIGH>;
-+			resets = <&rst I2C2_RESET>;
-+			clocks = <&clkmgr AGILEX5_L4_SP_CLK>;
-+			status = "disabled";
-+		};
-+
-+		i2c3: i2c@10c02b00 {
-+			compatible = "snps,designware-i2c";
-+			reg = <0x10c02b00 0x100>;
-+			#address-cells = <1>;
-+			#size-cells = <0>;
-+			interrupts = <GIC_SPI 106 IRQ_TYPE_LEVEL_HIGH>;
-+			resets = <&rst I2C3_RESET>;
-+			clocks = <&clkmgr AGILEX5_L4_SP_CLK>;
-+			status = "disabled";
-+		};
-+
-+		i2c4: i2c@10c02c00 {
-+			compatible = "snps,designware-i2c";
-+			reg = <0x10c02c00 0x100>;
-+			#address-cells = <1>;
-+			#size-cells = <0>;
-+			interrupts = <GIC_SPI 107 IRQ_TYPE_LEVEL_HIGH>;
-+			resets = <&rst I2C4_RESET>;
-+			clocks = <&clkmgr AGILEX5_L4_SP_CLK>;
-+			status = "disabled";
-+		};
-+
-+		i3c0: i3c-master@10da0000 {
-+			compatible = "snps,dw-i3c-master-1.00a";
-+			reg = <0x10da0000 0x1000>;
-+			#address-cells = <3>;
-+			#size-cells = <0>;
-+			interrupts = <GIC_SPI 164 IRQ_TYPE_LEVEL_HIGH>;
-+			clocks = <&clkmgr AGILEX5_L4_MP_CLK>;
-+			status = "disabled";
-+		};
-+
-+		i3c1: i3c-master@10da1000 {
-+			compatible = "snps,dw-i3c-master-1.00a";
-+			reg = <0x10da1000 0x1000>;
-+			#address-cells = <3>;
-+			#size-cells = <0>;
-+			interrupts = <GIC_SPI 165 IRQ_TYPE_LEVEL_HIGH>;
-+			clocks = <&clkmgr AGILEX5_L4_MP_CLK>;
-+			status = "disabled";
-+		};
-+
-+		gpio1: gpio@10c03300 {
-+			compatible = "snps,dw-apb-gpio";
-+			reg = <0x10c03300 0x100>;
-+			#address-cells = <1>;
-+			#size-cells = <0>;
-+			resets = <&rst GPIO1_RESET>;
-+			status = "disabled";
-+
-+			portb: gpio-controller@0 {
-+				compatible = "snps,dw-apb-gpio-port";
-+				reg = <0>;
-+				gpio-controller;
-+				#gpio-cells = <2>;
-+				snps,nr-gpios = <24>;
-+				interrupt-controller;
-+				#interrupt-cells = <2>;
-+				interrupts = <GIC_SPI 111 IRQ_TYPE_LEVEL_HIGH>;
-+			};
-+		};
-+
-+		nand: nand-controller@10b80000 {
-+			compatible = "cdns,hp-nfc";
-+			reg = <0x10b80000 0x10000>,
-+					<0x10840000 0x10000>;
-+			reg-names = "reg", "sdma";
-+			#address-cells = <1>;
-+			#size-cells = <0>;
-+			interrupts = <GIC_SPI 97 IRQ_TYPE_LEVEL_HIGH>;
-+			clocks = <&clkmgr AGILEX5_NAND_NF_CLK>;
-+			cdns,board-delay-ps = <4830>;
-+			status = "disabled";
-+		};
-+
-+		ocram: sram@0 {
-+			compatible = "mmio-sram";
-+			reg = <0x00000000 0x80000>;
-+			ranges = <0 0 0x80000>;
-+			#address-cells = <1>;
-+			#size-cells = <1>;
-+		};
-+
-+		dmac0: dma-controller@10db0000 {
-+			compatible = "snps,axi-dma-1.01a";
-+			reg = <0x10db0000 0x500>;
-+			clocks = <&clkmgr AGILEX5_L4_MAIN_CLK>,
-+				 <&clkmgr AGILEX5_L4_MP_CLK>;
-+			clock-names = "core-clk", "cfgr-clk";
-+			interrupt-parent = <&intc>;
-+			interrupts = <GIC_SPI 86 IRQ_TYPE_LEVEL_HIGH>;
-+			#dma-cells = <1>;
-+			dma-channels = <4>;
-+			snps,dma-masters = <1>;
-+			snps,data-width = <2>;
-+			snps,block-size = <32767 32767 32767 32767>;
-+			snps,priority = <0 1 2 3>;
-+			snps,axi-max-burst-len = <8>;
-+		};
-+
-+		dmac1: dma-controller@10dc0000 {
-+			compatible = "snps,axi-dma-1.01a";
-+			reg = <0x10dc0000 0x500>;
-+			clocks = <&clkmgr AGILEX5_L4_MAIN_CLK>,
-+				 <&clkmgr AGILEX5_L4_MP_CLK>;
-+			clock-names = "core-clk", "cfgr-clk";
-+			interrupt-parent = <&intc>;
-+			interrupts = <GIC_SPI 171 IRQ_TYPE_LEVEL_HIGH>;
-+			#dma-cells = <1>;
-+			dma-channels = <4>;
-+			snps,dma-masters = <1>;
-+			snps,data-width = <2>;
-+			snps,block-size = <32767 32767 32767 32767>;
-+			snps,priority = <0 1 2 3>;
-+			snps,axi-max-burst-len = <8>;
-+		};
-+
-+		rst: rstmgr@10d11000 {
-+			compatible = "altr,stratix10-rst-mgr", "altr,rst-mgr";
-+			reg = <0x10d11000 0x1000>;
-+			#reset-cells = <1>;
-+		};
-+
-+		spi0: spi@10da4000 {
-+			compatible = "snps,dw-apb-ssi";
-+			reg = <0x10da4000 0x1000>;
-+			#address-cells = <1>;
-+			#size-cells = <0>;
-+			interrupts = <GIC_SPI 99 IRQ_TYPE_LEVEL_HIGH>;
-+			resets = <&rst SPIM0_RESET>;
-+			reset-names = "spi";
-+			reg-io-width = <4>;
-+			num-cs = <4>;
-+			clocks = <&clkmgr AGILEX5_L4_MAIN_CLK>;
-+			dmas = <&dmac0 2>, <&dmac0 3>;
-+			dma-names ="tx", "rx";
-+			status = "disabled";
-+
-+		};
-+
-+		spi1: spi@10da5000 {
-+			compatible = "snps,dw-apb-ssi";
-+			reg = <0x10da5000 0x1000>;
-+			#address-cells = <1>;
-+			#size-cells = <0>;
-+			interrupts = <GIC_SPI 100 IRQ_TYPE_LEVEL_HIGH>;
-+			resets = <&rst SPIM1_RESET>;
-+			reset-names = "spi";
-+			reg-io-width = <4>;
-+			num-cs = <4>;
-+			clocks = <&clkmgr AGILEX5_L4_MAIN_CLK>;
-+			status = "disabled";
-+		};
-+
-+		sysmgr: sysmgr@10d12000 {
-+			compatible = "altr,sys-mgr-s10","altr,sys-mgr";
-+			reg = <0x10d12000 0x500>;
-+		};
-+
-+		timer0: timer0@10c03000 {
-+			compatible = "snps,dw-apb-timer";
-+			reg = <0x10c03000 0x100>;
-+			interrupts = <GIC_SPI 113 IRQ_TYPE_LEVEL_HIGH>;
-+			clocks = <&clkmgr AGILEX5_L4_SP_CLK>;
-+			clock-names = "timer";
-+		};
-+
-+		timer1: timer1@10c03100 {
-+			compatible = "snps,dw-apb-timer";
-+			reg = <0x10c03100 0x100>;
-+			interrupts = <GIC_SPI 114 IRQ_TYPE_LEVEL_HIGH>;
-+			clocks = <&clkmgr AGILEX5_L4_SP_CLK>;
-+			clock-names = "timer";
-+		};
-+
-+		timer2: timer2@10d00000 {
-+			compatible = "snps,dw-apb-timer";
-+			reg = <0x10d00000 0x100>;
-+			interrupts = <GIC_SPI 115 IRQ_TYPE_LEVEL_HIGH>;
-+			clocks = <&clkmgr AGILEX5_L4_SP_CLK>;
-+			clock-names = "timer";
-+		};
-+
-+		timer3: timer3@10d00100 {
-+			compatible = "snps,dw-apb-timer";
-+			reg = <0x10d00100 0x100>;
-+			interrupts = <GIC_SPI 116 IRQ_TYPE_LEVEL_HIGH>;
-+			clocks = <&clkmgr AGILEX5_L4_SP_CLK>;
-+			clock-names = "timer";
-+		};
-+
-+		uart0: serial@10c02000 {
-+			compatible = "snps,dw-apb-uart";
-+			reg = <0x10c02000 0x100>;
-+			interrupts = <GIC_SPI 108 IRQ_TYPE_LEVEL_HIGH>;
-+			reg-shift = <2>;
-+			reg-io-width = <4>;
-+			resets = <&rst UART0_RESET>;
-+			status = "disabled";
-+			clocks = <&clkmgr AGILEX5_L4_SP_CLK>;
-+		};
-+
-+		uart1: serial@10c02100 {
-+			compatible = "snps,dw-apb-uart";
-+			reg = <0x10c02100 0x100>;
-+			interrupts = <GIC_SPI 109 IRQ_TYPE_LEVEL_HIGH>;
-+			reg-shift = <2>;
-+			reg-io-width = <4>;
-+			resets = <&rst UART1_RESET>;
-+			status = "disabled";
-+			clocks = <&clkmgr AGILEX5_L4_SP_CLK>;
-+		};
-+
-+		usb0: usb@10b00000 {
-+			compatible = "snps,dwc2";
-+			reg = <0x10b00000 0x40000>;
-+			interrupts = <GIC_SPI 93 IRQ_TYPE_LEVEL_HIGH>;
-+			phys = <&usbphy0>;
-+			phy-names = "usb2-phy";
-+			resets = <&rst USB0_RESET>, <&rst USB0_OCP_RESET>;
-+			reset-names = "dwc2", "dwc2-ecc";
-+			clocks = <&clkmgr AGILEX5_USB2OTG_HCLK>;
-+			clock-names = "otg";
-+			status = "disabled";
-+		};
-+
-+		watchdog0: watchdog@10d00200 {
-+			compatible = "snps,dw-wdt";
-+			reg = <0x10d00200 0x100>;
-+			interrupts = <GIC_SPI 117 IRQ_TYPE_LEVEL_HIGH>;
-+			resets = <&rst WATCHDOG0_RESET>;
-+			clocks = <&clkmgr AGILEX5_L4_SYS_FREE_CLK>;
-+			status = "disabled";
-+		};
-+
-+		watchdog1: watchdog@10d00300 {
-+			compatible = "snps,dw-wdt";
-+			reg = <0x10d00300 0x100>;
-+			interrupts = <GIC_SPI 118 IRQ_TYPE_LEVEL_HIGH>;
-+			resets = <&rst WATCHDOG1_RESET>;
-+			clocks = <&clkmgr AGILEX5_L4_SYS_FREE_CLK>;
-+			status = "disabled";
-+		};
-+
-+		watchdog2: watchdog@10d00400 {
-+			compatible = "snps,dw-wdt";
-+			reg = <0x10d00400 0x100>;
-+			interrupts = <GIC_SPI 125 IRQ_TYPE_LEVEL_HIGH>;
-+			resets = <&rst WATCHDOG2_RESET>;
-+			clocks = <&clkmgr AGILEX5_L4_SYS_FREE_CLK>;
-+			status = "disabled";
-+		};
-+
-+		watchdog3: watchdog@10d00500 {
-+			compatible = "snps,dw-wdt";
-+			reg = <0x10d00500 0x100>;
-+			interrupts = <GIC_SPI 126 IRQ_TYPE_LEVEL_HIGH>;
-+			resets = <&rst WATCHDOG3_RESET>;
-+			clocks = <&clkmgr AGILEX5_L4_SYS_FREE_CLK>;
-+			status = "disabled";
-+		};
-+
-+		watchdog4: watchdog@10d00600 {
-+			compatible = "snps,dw-wdt";
-+			reg = <0x10d00600 0x100>;
-+			interrupts = <GIC_SPI 175 IRQ_TYPE_LEVEL_HIGH>;
-+			resets = <&rst WATCHDOG4_RESET>;
-+			clocks = <&clkmgr AGILEX5_L4_SYS_FREE_CLK>;
-+			status = "disabled";
-+		};
-+
-+		qspi: spi@108d2000 {
-+			compatible = "intel,socfpga-qspi", "cdns,qspi-nor";
-+			reg = <0x108d2000 0x100>,
-+			      <0x10900000 0x100000>;
-+			#address-cells = <1>;
-+			#size-cells = <0>;
-+			interrupts = <GIC_SPI 3 IRQ_TYPE_LEVEL_HIGH>;
-+			cdns,fifo-depth = <128>;
-+			cdns,fifo-width = <4>;
-+			cdns,trigger-address = <0x00000000>;
-+			clocks = <&qspi_clk>;
-+			status = "disabled";
-+		};
-+	};
-+};
-diff --git a/arch/arm64/boot/dts/intel/socfpga_agilex5_socdk.dts b/arch/arm64/boot/dts/intel/socfpga_agilex5_socdk.dts
-new file mode 100644
-index 000000000000..c533e5a3a610
---- /dev/null
-+++ b/arch/arm64/boot/dts/intel/socfpga_agilex5_socdk.dts
-@@ -0,0 +1,39 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Copyright (C) 2023, Intel Corporation
-+ */
-+#include "socfpga_agilex5.dtsi"
-+
-+/ {
-+	model = "SoCFPGA Agilex5 SoCDK";
-+	compatible = "intel,socfpga-agilex5-socdk", "intel,socfpga-agilex5";
-+
-+	aliases {
-+		serial0 = &uart0;
-+	};
-+
-+	chosen {
-+		stdout-path = "serial0:115200n8";
-+	};
-+};
-+
-+&gpio1 {
-+	status = "okay";
-+};
-+
-+&osc1 {
-+	clock-frequency = <25000000>;
-+};
-+
-+&uart0 {
-+	status = "okay";
-+};
-+
-+&usb0 {
-+	status = "okay";
-+	disable-over-current;
-+};
-+
-+&watchdog0 {
-+	status = "okay";
-+};
--- 
-2.25.1
+No. What I'm saying is that XDP_CHECKSUM_UNNECESSARY should be
+equivalent to skb's CHECKSUM_UNNECESSARY with csum_level =3D 0.
+I'm well aware that some drivers are trying to be smart and put csum_level=
+=3D1.
+There is no use case for it in XDP.
+"But our HW supports it so XDP prog should read it" is the reason NOT
+to expose it to bpf in generic api.
 
+Either we're doing per-driver kfuncs and no common infra or common kfunc
+that covers 99% of the drivers. Which is CHECKSUM_UNNECESSARY && csum_level=
+ =3D 0
+
+It's not acceptable to present a generic api to xdp prog with multi level
+csum that only works on a specific HW. Next thing there will be new flags
+and MAX_CSUM_LEVEL in XDP features.
+Pretending to be generic while being HW specific is the worst interface.
 
