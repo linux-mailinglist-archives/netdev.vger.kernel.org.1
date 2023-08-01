@@ -1,156 +1,121 @@
-Return-Path: <netdev+bounces-23424-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23425-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB28D76BEDD
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 22:57:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82A1176BEF0
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 23:05:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6FA211C20FA7
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 20:57:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A4C9B1C21061
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 21:05:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0831D263AC;
-	Tue,  1 Aug 2023 20:57:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 372DC263AE;
+	Tue,  1 Aug 2023 21:05:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B07ED4DC77
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 20:57:52 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E32C1C433C7;
-	Tue,  1 Aug 2023 20:57:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690923472;
-	bh=MZpsgZkrTs9N2DXeSvVULBbBTbC/2zrygwHEmp8YujM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=k5zvTHcaV4FqvE9jjvKUtp/xndGtvumroKOColDoaHHgiuq4X1+XKbmp++w7LWLQ8
-	 cVR2WGZ3SHE7NWqWskw88lRJ8hO3IK6X4//+uqggtlZpbIgWBfl3cY43X4Lzee8cgm
-	 pEGPmTmWwovy18PICv9IEzeR9ywuTsxY5zOfhwg9R8UlHzgxExjVhO463h3Gdn+NMD
-	 nF+lycPEvbrtmpei2B3YOb06JSwAU7VwCx/lG6DIoFk70sACLCJtS0YwJ+ndkcd21x
-	 2p3JctnekTWlWkhLSYWsnmXkgc9sWJtmAfXpKjj2rbk9ikS37d0tdq8WmxayEsNAkc
-	 doM2vHgGHLIrQ==
-Date: Tue, 1 Aug 2023 21:57:43 +0100
-From: Conor Dooley <conor@kernel.org>
-To: niravkumar.l.rabara@intel.com
-Cc: adrian.ho.yin.ng@intel.com, andrew@lunn.ch, conor+dt@kernel.org,
-	devicetree@vger.kernel.org, dinguyen@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org, linux-clk@vger.kernel.org,
-	linux-kernel@vger.kernel.org, mturquette@baylibre.com,
-	netdev@vger.kernel.org, p.zabel@pengutronix.de,
-	richardcochran@gmail.com, robh+dt@kernel.org, sboyd@kernel.org,
-	wen.ping.teh@intel.com
-Subject: Re: [PATCH v2 3/5] dt-bindings: clock: add Intel Agilex5 clock
- manager
-Message-ID: <20230801-handball-glorifier-e55d44a2b638@spud>
-References: <20230618132235.728641-1-niravkumar.l.rabara@intel.com>
- <20230801010234.792557-1-niravkumar.l.rabara@intel.com>
- <20230801010234.792557-4-niravkumar.l.rabara@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26CAE4DC77
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 21:05:04 +0000 (UTC)
+Received: from mail-ua1-x934.google.com (mail-ua1-x934.google.com [IPv6:2607:f8b0:4864:20::934])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6965129
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 14:05:02 -0700 (PDT)
+Received: by mail-ua1-x934.google.com with SMTP id a1e0cc1a2514c-79acc14c09eso666376241.1
+        for <netdev@vger.kernel.org>; Tue, 01 Aug 2023 14:05:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1690923902; x=1691528702;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=098hRtjKd+IMXRBg9bD56pZsXHP5BacbQRyV55lQ/n4=;
+        b=U46oZyF2NGgOCj+FJFfWTWZZ55rviss3MR5EtFK2OEZZTDLCCZXSm75jFpakX8Zm4I
+         MUWGuPjqkyWWIltbNRnxrQKak3O+b6V2QUljcQV/SgST2odUnl31MZa5DjbrbFRi42If
+         z9qfD/39zNoFGx8vy7kqr6GAw4dleooPO1gR1fm+4KOIdIBDj+mDSRsasCcGW/PdLLjE
+         esZlSzG0KbnabbAaWUicCwG7GKURsw2bnPy4yig/W6T4iRCHZ8MwcNiqbzTX1EII9EBW
+         YR/xWsdeme2xstG6z499xPligaELLf8Kgstl163HZFokjYYiiN2rHhfWLA0qg64cqtpz
+         KjBA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690923902; x=1691528702;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=098hRtjKd+IMXRBg9bD56pZsXHP5BacbQRyV55lQ/n4=;
+        b=KOrpmDeL9PBBmV1fFpY5MG6lvgi4k6o/fdAvE0BkxbfS/AJGKIZrX/gLTGYMLNlS6u
+         Np0y7LJhwasSyVtFLW+S3oMeNFWZs7W20xLvjaxC8CikWbi9jpYHdKy7/a8JF/A1pHCO
+         7Ptflf5gwzCDjVqaV9CNo1OE3pJrEr3t5XDsAyT5fiozlsV69mUyL+KV/BWfDbiAJEaP
+         6Uu9r+12zNGuh9YUZDxPtSXHODaDVzLtqJ2EHdXytGe9uYD/ZnTowT5nT7YOvyewMG+o
+         NPOoE/NdhfVIGDtqfvUex3FbcgFFGSOXgabRF3CKlJj/XIXkxTdpd3mkekISiAHtXLZZ
+         5cXg==
+X-Gm-Message-State: ABy/qLYfrF7ABE2cPinvdtdaHv/ICXopepLfOzLd0YaLt8xRK/LDrEQT
+	j6pT9Nu86l4EJXQgnmEuhI4=
+X-Google-Smtp-Source: APBJJlE0WbdYYWNYnRefg/xjMGxLjyKTN6UVdNu280zr/Hbe9LD3L/yicOIJDuYttdcsUPzxU7KD9Q==
+X-Received: by 2002:a1f:3d4c:0:b0:481:372c:6ae4 with SMTP id k73-20020a1f3d4c000000b00481372c6ae4mr2744966vka.2.1690923901830;
+        Tue, 01 Aug 2023 14:05:01 -0700 (PDT)
+Received: from localhost (172.174.245.35.bc.googleusercontent.com. [35.245.174.172])
+        by smtp.gmail.com with ESMTPSA id f2-20020ac840c2000000b00404f8e9902dsm2690832qtm.2.2023.08.01.14.05.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 01 Aug 2023 14:05:01 -0700 (PDT)
+Date: Tue, 01 Aug 2023 17:05:01 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Eric Dumazet <edumazet@google.com>, 
+ "David S . Miller" <davem@davemloft.net>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Willem de Bruijn <willemb@google.com>, 
+ Tahsin Erdogan <trdgn@amazon.com>, 
+ netdev@vger.kernel.org, 
+ eric.dumazet@gmail.com, 
+ Eric Dumazet <edumazet@google.com>
+Message-ID: <64c9737d36571_1d4d6f294b@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20230801205254.400094-1-edumazet@google.com>
+References: <20230801205254.400094-1-edumazet@google.com>
+Subject: RE: [PATCH v2 net-next 0/4] net: extend alloc_skb_with_frags() max
+ size
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="UYgz3o3mOFvMlDjf"
-Content-Disposition: inline
-In-Reply-To: <20230801010234.792557-4-niravkumar.l.rabara@intel.com>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
+Eric Dumazet wrote:
+> alloc_skb_with_frags(), while being able to use high order allocations,
+> limits the payload size to PAGE_SIZE * MAX_SKB_FRAGS
+> 
+> Reviewing Tahsin Erdogan patch [1], it was clear to me we need
+> to remove this limitation.
+> 
+> [1] https://lore.kernel.org/netdev/20230731230736.109216-1-trdgn@amazon.com/
+> 
+> v2: Addressed Willem feedback on 1st patch.
+> 
+> Eric Dumazet (4):
+>   net: allow alloc_skb_with_frags() to allocate bigger packets
+>   net: tun: change tun_alloc_skb() to allow bigger paged allocations
+>   net/packet: change packet_alloc_skb() to allow bigger paged
+>     allocations
+>   net: tap: change tap_alloc_skb() to allow bigger paged allocations
+> 
+>  drivers/net/tap.c      |  4 ++-
+>  drivers/net/tun.c      |  4 ++-
+>  net/core/skbuff.c      | 56 +++++++++++++++++++-----------------------
+>  net/packet/af_packet.c |  4 ++-
+>  4 files changed, 34 insertions(+), 34 deletions(-)
 
---UYgz3o3mOFvMlDjf
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+For the series:
 
-On Tue, Aug 01, 2023 at 09:02:32AM +0800, niravkumar.l.rabara@intel.com wro=
-te:
-> From: Niravkumar L Rabara <niravkumar.l.rabara@intel.com>
->=20
-> Add clock ID definitions for Intel Agilex5 SoCFPGA.
-> The registers in Agilex5 handling the clock is named as clock manager.
->=20
-> Signed-off-by: Teh Wen Ping <wen.ping.teh@intel.com>
-> Reviewed-by: Dinh Nguyen <dinguyen@kernel.org>
-> Signed-off-by: Niravkumar L Rabara <niravkumar.l.rabara@intel.com>
-> ---
->  .../bindings/clock/intel,agilex5-clkmgr.yaml  |  41 +++++++
->  .../dt-bindings/clock/intel,agilex5-clkmgr.h  | 100 ++++++++++++++++++
->  2 files changed, 141 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/clock/intel,agilex5=
--clkmgr.yaml
->  create mode 100644 include/dt-bindings/clock/intel,agilex5-clkmgr.h
->=20
-> diff --git a/Documentation/devicetree/bindings/clock/intel,agilex5-clkmgr=
-=2Eyaml b/Documentation/devicetree/bindings/clock/intel,agilex5-clkmgr.yaml
-> new file mode 100644
-> index 000000000000..60e57a9fb939
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/clock/intel,agilex5-clkmgr.yaml
-> @@ -0,0 +1,41 @@
-> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/clock/intel,agilex5-clkmgr.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: Intel SoCFPGA Agilex5 clock manager
-> +
-> +maintainers:
-> +  - Dinh Nguyen <dinguyen@kernel.org>
-> +
-> +description:
-> +  The Intel Agilex5 Clock Manager is an integrated clock controller, whi=
-ch
-> +  generates and supplies clock to all the modules.
-> +
-> +properties:
-> +  compatible:
-> +    const: intel,agilex5-clkmgr
-> +
-> +  reg:
-> +    maxItems: 1
-> +
-> +  '#clock-cells':
-> +    const: 1
-> +
-> +required:
-> +  - compatible
-> +  - reg
-> +  - '#clock-cells'
-> +
-> +additionalProperties: false
-> +
-> +examples:
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
-> +  # Clock controller node:
+Thanks Eric
 
-This comment seems utterly pointless.
-Otherwise this looks okay to me.
-
-Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
-
-Thanks,
-Conor.
-
-> +  - |
-> +    clkmgr: clock-controller@10d10000 {
-> +      compatible =3D "intel,agilex5-clkmgr";
-> +      reg =3D <0x10d10000 0x1000>;
-> +      #clock-cells =3D <1>;
-> +    };
-> +...
-
---UYgz3o3mOFvMlDjf
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZMlxxwAKCRB4tDGHoIJi
-0po0AQDZnIwfegUcCT3iU12bMW+7Rzx574ajligwACkn70tY7QD7BqfnIx/HSMTi
-r+m16KOx6UHod5DfGI/YVENWzFoUfwo=
-=GoDZ
------END PGP SIGNATURE-----
-
---UYgz3o3mOFvMlDjf--
 
