@@ -1,48 +1,73 @@
-Return-Path: <netdev+bounces-23411-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23412-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4D0076BE23
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 21:51:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D4E1976BE36
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 21:58:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7DE87280DA4
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 19:51:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 89A03281419
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 19:58:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCA99253BC;
-	Tue,  1 Aug 2023 19:51:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95FC7253C6;
+	Tue,  1 Aug 2023 19:58:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D5C025170;
-	Tue,  1 Aug 2023 19:51:37 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7009C433C8;
-	Tue,  1 Aug 2023 19:51:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 674A125170;
+	Tue,  1 Aug 2023 19:58:30 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7976AC433C7;
+	Tue,  1 Aug 2023 19:58:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690919497;
-	bh=Vsh2EggMUIyZ6IFbT29YXmtzY2olDYuT+fH6QmapKVo=;
+	s=k20201202; t=1690919910;
+	bh=79BwIOnM6SioCje3neXfEamXafGIUojs9GGzwDzIaT8=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=LFF8Sp3Q4nScO4/C7Qz9kS8hTLttTL31YXFSdz5DUiZss3RPczW8uKfiKLw6+jg7+
-	 JlbdtNgSn8qFbmnW1t1i0a4h9kQl4/xtvAkzBCyUZl95dPpRBrtg27N4/wOwO7jQU4
-	 UQGphkldSKKi8jt34/xvVydUueUDMOrfNKcPF75ZwnCxlyHzMRZIFuZ+SxzZ1TE4G1
-	 k0ktFUrUzyVWZEKiumffOhZKI8Vidf8vu+DjZ4oVoJO5Qf7LO8YzurSETspAKFsL/8
-	 T2oj0GxdzAaUG1c3oV2/dwu3ykZt9LeEi0EgvJqjOpelqTTVa+cuXnpQN+UtqBSLH7
-	 mIPB1EHbpeqlA==
-Date: Tue, 1 Aug 2023 12:51:36 -0700
+	b=WaG0UuuiBslQIwwDoxSGmwylSNwUwUH7DIQ7eAy76ZMwNQxm6uzQTZe+DpR8IvAQD
+	 AR9sF34c6pu020pThaegFYojP886SrOpKscmfRnTNlEgNYWd06/PU127Un7orzG1/E
+	 9rUKbhIJY4SvTChDop2NC6sJMRkZgC9FxkLKSBCJ5AX8gdvgUcXJEF/V5ZaRjvw4ws
+	 g4igCCOm2Ui3wG63wvnwlKi2DoXv7gVow1xbUTW25ecmVHjRgzWHzoVjMTgMGAYnGS
+	 yrqItcGmOO8B2dQEyoty0KKnJhLztUcShDR3TUA3S9ggYOAW7cy5RY8WUi7dlpa5+q
+	 jNZZJhtmtcNHQ==
+Date: Tue, 1 Aug 2023 12:58:28 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Larysa Zaremba <larysa.zaremba@intel.com>
-Cc: Wei Fang <wei.fang@nxp.com>, <davem@davemloft.net>,
- <edumazet@google.com>, <pabeni@redhat.com>, <shenwei.wang@nxp.com>,
- <xiaoning.wang@nxp.com>, <ast@kernel.org>, <daniel@iogearbox.net>,
- <hawk@kernel.org>, <john.fastabend@gmail.com>, <netdev@vger.kernel.org>,
- <linux-imx@nxp.com>, <linux-kernel@vger.kernel.org>, <bpf@vger.kernel.org>
-Subject: Re: [PATCH V3 net-next] net: fec: add XDP_TX feature support
-Message-ID: <20230801125136.5d57e3ad@kernel.org>
-In-Reply-To: <ZMkl6HUYMGWXj87P@lincoln>
-References: <20230731060025.3117343-1-wei.fang@nxp.com>
-	<ZMkl6HUYMGWXj87P@lincoln>
+To: Shenwei Wang <shenwei.wang@nxp.com>
+Cc: Marc Kleine-Budde <mkl@pengutronix.de>, Russell King
+ <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Maxime
+ Coquelin <mcoquelin.stm32@gmail.com>, Shawn Guo <shawnguo@kernel.org>,
+ Sascha Hauer <s.hauer@pengutronix.de>, Neil Armstrong
+ <neil.armstrong@linaro.org>, Kevin Hilman <khilman@baylibre.com>, Vinod
+ Koul <vkoul@kernel.org>, Chen-Yu Tsai <wens@csie.org>, Jernej Skrabec
+ <jernej.skrabec@gmail.com>, Samuel Holland <samuel@sholland.org>, Jose
+ Abreu <joabreu@synopsys.com>, "imx@lists.linux.dev" <imx@lists.linux.dev>,
+ Simon Horman <simon.horman@corigine.com>, Alexandre Torgue
+ <alexandre.torgue@foss.st.com>, Giuseppe Cavallaro
+ <peppe.cavallaro@st.com>, Nobuhiro Iwamatsu
+ <nobuhiro1.iwamatsu@toshiba.co.jp>, Fabio Estevam <festevam@gmail.com>,
+ "linux-stm32@st-md-mailman.stormreply.com"
+ <linux-stm32@st-md-mailman.stormreply.com>, Jerome Brunet
+ <jbrunet@baylibre.com>, Bartosz Golaszewski
+ <bartosz.golaszewski@linaro.org>, Wong Vee Khee <veekhee@apple.com>,
+ dl-linux-imx <linux-imx@nxp.com>, Andrew Halaney <ahalaney@redhat.com>,
+ Bhupesh Sharma <bhupesh.sharma@linaro.org>, Martin Blumenstingl
+ <martin.blumenstingl@googlemail.com>, Revanth Kumar Uppala
+ <ruppala@nvidia.com>, Jochen Henneberg <jh@henneberg-systemdesign.com>,
+ "linux-amlogic@lists.infradead.org" <linux-amlogic@lists.infradead.org>,
+ "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>, "netdev@vger.kernel.org"
+ <netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+ <linux-kernel@vger.kernel.org>, Pengutronix Kernel Team
+ <kernel@pengutronix.de>
+Subject: Re: [EXT] Re: [PATCH v3 net 1/2] net: stmmac: add new mode
+ parameter for fix_mac_speed
+Message-ID: <20230801125828.209c5e88@kernel.org>
+In-Reply-To: <AS8PR04MB9176FC45B9663B5BF964F58A890AA@AS8PR04MB9176.eurprd04.prod.outlook.com>
+References: <20230731161929.2341584-1-shenwei.wang@nxp.com>
+	<20230731161929.2341584-2-shenwei.wang@nxp.com>
+	<20230801-portside-prepaid-513f1f39f245-mkl@pengutronix.de>
+	<AS8PR04MB9176FC45B9663B5BF964F58A890AA@AS8PR04MB9176.eurprd04.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,11 +77,64 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 1 Aug 2023 17:34:00 +0200 Larysa Zaremba wrote:
-> But I thought XDP-related code should go to bpf-next :/
-> Could somebody clarify this?
+On Tue, 1 Aug 2023 18:43:52 +0000 Shenwei Wang wrote:
+> Subject: RE: [EXT] Re: [PATCH v3 net 1/2] net: stmmac: add new mode parameter  for fix_mac_speed
 
-AFAIU pure driver XDP implementations end up flowing directly into
-net-next most of the time. If there are core changes or new API
-additions in the series - that's when bpf-next becomes important.
+Looks like new platform enablement, the correct tree to target this 
+at is net-next (i.e. [PATCH net-next]).
+
+> > -----Original Message-----
+> > From: Marc Kleine-Budde <mkl@pengutronix.de>
+> > Sent: Tuesday, August 1, 2023 1:37 AM
+> > To: Shenwei Wang <shenwei.wang@nxp.com>
+> > Cc: Russell King <linux@armlinux.org.uk>; David S. Miller
+> > <davem@davemloft.net>; Eric Dumazet <edumazet@google.com>; Jakub
+> > Kicinski <kuba@kernel.org>; Paolo Abeni <pabeni@redhat.com>; Maxime
+> > Coquelin <mcoquelin.stm32@gmail.com>; Shawn Guo <shawnguo@kernel.org>;
+> > Sascha Hauer <s.hauer@pengutronix.de>; Neil Armstrong
+> > <neil.armstrong@linaro.org>; Kevin Hilman <khilman@baylibre.com>; Vinod
+> > Koul <vkoul@kernel.org>; Chen-Yu Tsai <wens@csie.org>; Jernej Skrabec
+> > <jernej.skrabec@gmail.com>; Samuel Holland <samuel@sholland.org>; Jose
+> > Abreu <joabreu@synopsys.com>; imx@lists.linux.dev; Simon Horman
+> > <simon.horman@corigine.com>; Alexandre Torgue
+> > <alexandre.torgue@foss.st.com>; Giuseppe Cavallaro
+> > <peppe.cavallaro@st.com>; Nobuhiro Iwamatsu
+> > <nobuhiro1.iwamatsu@toshiba.co.jp>; Fabio Estevam <festevam@gmail.com>;
+> > linux-stm32@st-md-mailman.stormreply.com; Jerome Brunet
+> > <jbrunet@baylibre.com>; Bartosz Golaszewski
+> > <bartosz.golaszewski@linaro.org>; Wong Vee Khee <veekhee@apple.com>; dl-
+> > linux-imx <linux-imx@nxp.com>; Andrew Halaney <ahalaney@redhat.com>;
+> > Bhupesh Sharma <bhupesh.sharma@linaro.org>; Martin Blumenstingl
+> > <martin.blumenstingl@googlemail.com>; Revanth Kumar Uppala
+> > <ruppala@nvidia.com>; Jochen Henneberg <jh@henneberg-systemdesign.com>;
+> > linux-amlogic@lists.infradead.org; linux-arm-kernel@lists.infradead.org;
+> > netdev@vger.kernel.org; linux-kernel@vger.kernel.org; Pengutronix Kernel
+> > Team <kernel@pengutronix.de>
+> > Subject: [EXT] Re: [PATCH v3 net 1/2] net: stmmac: add new mode parameter
+> > for fix_mac_speed
+
+Why is this quote included? Please get a sane email client.
+
+> > On 31.07.2023 11:19:28, Shenwei Wang wrote:  
+> > > A mode parameter has been added to the callback function of
+> > > fix_mac_speed to indicate the physical layer type.
+> > >
+> > > The mode can be one the following:
+> > > 	MLO_AN_PHY	- Conventional PHY
+> > > 	MLO_AN_FIXED	- Fixed-link mode
+> > > 	MLO_AN_INBAND	- In-band protocol
+> > >
+> > > Also use short version of 'uint' to replace the 'unsigned int' in the
+> > > function definitions.  
+> > 
+> > There are not many users of 'uint' in the kernel and it's not used in the stmmac
+> > driver so far. From my point of view I would not introduce it and stick to the
+> > standard 'unsigned int'.
+> 
+> Using 'uint' makes the code look cleaner because adding one extra
+> parameter may cause some function declarations to span multiple
+> lines.  This change keeps function declarations compact on a single
+> line.
+
+Marc is right. Just do it.
 
