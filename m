@@ -1,231 +1,193 @@
-Return-Path: <netdev+bounces-23336-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23337-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A14B76B992
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 18:21:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 374D876B9AE
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 18:33:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CE9FC1C20F37
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 16:21:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 61DAE1C2102E
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 16:33:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 424F21ADFD;
-	Tue,  1 Aug 2023 16:21:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 564304DC89;
+	Tue,  1 Aug 2023 16:33:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D4A01ADED;
-	Tue,  1 Aug 2023 16:21:32 +0000 (UTC)
-Received: from mail-qv1-xf31.google.com (mail-qv1-xf31.google.com [IPv6:2607:f8b0:4864:20::f31])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 698AA10CC;
-	Tue,  1 Aug 2023 09:21:31 -0700 (PDT)
-Received: by mail-qv1-xf31.google.com with SMTP id 6a1803df08f44-63cf9eddbc6so32751086d6.0;
-        Tue, 01 Aug 2023 09:21:31 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48BFC2358A
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 16:33:27 +0000 (UTC)
+Received: from mail-qt1-x82c.google.com (mail-qt1-x82c.google.com [IPv6:2607:f8b0:4864:20::82c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A20301BF8
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 09:33:25 -0700 (PDT)
+Received: by mail-qt1-x82c.google.com with SMTP id d75a77b69052e-40a47e8e38dso327921cf.1
+        for <netdev@vger.kernel.org>; Tue, 01 Aug 2023 09:33:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690906890; x=1691511690;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+        d=google.com; s=20221208; t=1690907605; x=1691512405;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=nbSMI1pM5BL/Rcx+SHHHJQWHYkudnJt5P2sO7jyRONQ=;
-        b=QdY0LlPQGghBINvaX1uWUYE/O/3PckWYkfPeHstDW3clb6OfvvfaAx+hrbuSVee2es
-         7Cx/eGIYJzs3guQ8DKtDuPB8WVNMcsi4ouuxFDIpySEiJEFswH9eSasNpQ4/BIckoPw6
-         wmxT6g52yZN4GMSPRRVSrcHUiuqBn5gV6Hv6OmIBHUb0rKFjMtLY++zKtUAm7FTFdkx8
-         T7+glmhMRsIRQUyynThwuc6gV2+0UIeT5BK1DSsxa4IWeasTCDITICAg7vWxf7HC8ou9
-         LEUGVeSJHV0sEjqCncGvdbnSifUrIAtOt7AE4FFP0VWaVa6Ii9oJwrWz3hZm9u/fCrko
-         ssuw==
+        bh=N0pm/7mSEFM6SAPSjQtcSWVtcTtB7ZoI4+6ojzh/1PA=;
+        b=1Ikx9CWoeNwhRyUBm552J4cz0WHeCemYLNjewa+Jw9iHVHpFZfVOfY3YGio1C6kgaB
+         mctfcJEqa2KWhBvBK9vA20uB+b8wqsZTNlyhgQb3z+NZcE/QYSuwxVZIx1ZAFMht/ClM
+         PB4choMgnMEd1uUNsfcoLxpUM/lySGZ5vY+e8GPxPxKo6h6G0v6zkaAh7RFEh2lq54+O
+         jiJzFL1rW71GaFqJb0rThcjKxa0H7PAnGsAMnFgqJhC0djjIPrxBke4xUJXa2z2PgiVz
+         LCTgCHQ2PEu/TiW+7ylOJ/rRFB1YKrNcWt/6x3w7+mAv5QM8r+hzGyd5Mc56ImSXLDho
+         14Yg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690906890; x=1691511690;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=nbSMI1pM5BL/Rcx+SHHHJQWHYkudnJt5P2sO7jyRONQ=;
-        b=lRhoBFKbKV4rGintqFzfumKzUCkJQdXZI5rv15mLCCUH0oQFOq3VqTi4XGBGp5vqiN
-         +raCeuJxBAqFA6VHeVQe5JBI3WyMzcpDZBME54P4a258Sum52UoElDXm+TYiv3wU58wV
-         PZWikTbVHYUQZqMnjl7I/U4PMhDpFYDWsNMlYB5wdpAJpxKUKOMi7AUPTg07Iev4VA18
-         rPV1hRHC+/dfcFRlvoh0ffEmZw3xQ/ov3GsAaMm89noLnFs8T5mCi61fK0ne/F9NIFeC
-         PPxPK7he1TRe/cSwPKEDumOaNpb6gii4wTB006We5mfyqRwy5XklJFIgEXYqDC39Wi+K
-         /chQ==
-X-Gm-Message-State: ABy/qLYs/0cbcv96LAqRH5FiqSsuVwfgJ/NLL13+pLwmKngymB6mgOLc
-	5E76R1g7PKuycpgA7G5YYsE=
-X-Google-Smtp-Source: APBJJlEHVlSxvb372Wef6KVZVhEPeHYmFrRN3Wy8AwDZxmYQSxBbUKw2xNM8zeDFdQTtE3vpxs6e+Q==
-X-Received: by 2002:a05:6214:21a9:b0:635:f546:83d0 with SMTP id t9-20020a05621421a900b00635f54683d0mr15333418qvc.11.1690906890461;
-        Tue, 01 Aug 2023 09:21:30 -0700 (PDT)
-Received: from localhost (172.174.245.35.bc.googleusercontent.com. [35.245.174.172])
-        by smtp.gmail.com with ESMTPSA id s7-20020a0cb307000000b00637615a1f33sm4750978qve.20.2023.08.01.09.21.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Aug 2023 09:21:30 -0700 (PDT)
-Date: Tue, 01 Aug 2023 12:21:29 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: David Howells <dhowells@redhat.com>, 
- netdev@vger.kernel.org, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: dhowells@redhat.com, 
- syzbot+f527b971b4bdc8e79f9e@syzkaller.appspotmail.com, 
- bpf@vger.kernel.org, 
- brauner@kernel.org, 
- davem@davemloft.net, 
- dsahern@kernel.org, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- axboe@kernel.dk, 
- viro@zeniv.linux.org.uk, 
- linux-fsdevel@vger.kernel.org, 
- syzkaller-bugs@googlegroups.com, 
- linux-kernel@vger.kernel.org
-Message-ID: <64c93109c084e_1c5e3529452@willemb.c.googlers.com.notmuch>
-In-Reply-To: <1420063.1690904933@warthog.procyon.org.uk>
-References: <1420063.1690904933@warthog.procyon.org.uk>
-Subject: RE: [PATCH net] udp: Fix __ip_append_data()'s handling of
- MSG_SPLICE_PAGES
+        d=1e100.net; s=20221208; t=1690907605; x=1691512405;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=N0pm/7mSEFM6SAPSjQtcSWVtcTtB7ZoI4+6ojzh/1PA=;
+        b=M2KAqRRcoigPI+6D2QczaLOmSA8ZzzJGKqW4En5TXhJz+yHHXTKQLncZasfr6MnZS6
+         6MbdGr5YOV/uCUQoRTC3Cr+m6vXvbTerGq+ute0bWXYeRMq9VbYKJmYiAjTSKFeIfBTw
+         NI6QiWrIA4AbDfvvGl+h39Cijxhd0liz3vkX8qUj8eqL6vnVoRSHuTDjNbAyslSl55mZ
+         Pu8OWuFMdP+ikbiJBqHB9kwofEQmK/mCO6WCmmo3PPSC9E867qEP6DDKpIXgCHNdluUg
+         m7+ApNlOQn3YO+RJ238s38L8oMER2pPakeD4mHneXYfZqO2u2HV64bQWX246X/CFG0nz
+         +QoQ==
+X-Gm-Message-State: ABy/qLbTBWSUX7Rr8Juwcuz6QxKuIF9t8xACb7wo0t5Bn/tIymvjkGla
+	pFEbfvZSAxrs76GHG4hLnfRb2cCS5Wdh7gdVliYfuw==
+X-Google-Smtp-Source: APBJJlFBFBMLV1K+ohpofhSw34qK/PGOlAXVGMjKewOTXtdw3qyfzpJQiu7zf1xEh/iLy5JujiFdddgIAjC1lKS0vlE=
+X-Received: by 2002:a05:622a:104d:b0:403:9572:e37f with SMTP id
+ f13-20020a05622a104d00b004039572e37fmr701160qte.22.1690907604509; Tue, 01 Aug
+ 2023 09:33:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+MIME-Version: 1.0
+References: <20230801135455.268935-1-edumazet@google.com> <20230801135455.268935-2-edumazet@google.com>
+ <64c9285b927f8_1c2791294e4@willemb.c.googlers.com.notmuch>
+In-Reply-To: <64c9285b927f8_1c2791294e4@willemb.c.googlers.com.notmuch>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 1 Aug 2023 18:33:13 +0200
+Message-ID: <CANn89iJwP_Ar57Te0EG2fAjM=JNL+N0mYwnEZDrJME4nhe4WTg@mail.gmail.com>
+Subject: Re: [PATCH net-next 1/4] net: allow alloc_skb_with_frags() to
+ allocate bigger packets
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn <willemb@google.com>, 
+	Tahsin Erdogan <trdgn@amazon.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-David Howells wrote:
->     
-> __ip_append_data() can get into an infinite loop when asked to splice into
-> a partially-built UDP message that has more than the frag-limit data and up
-> to the MTU limit.  Something like:
-> 
->         pipe(pfd);
->         sfd = socket(AF_INET, SOCK_DGRAM, 0);
->         connect(sfd, ...);
->         send(sfd, buffer, 8161, MSG_CONFIRM|MSG_MORE);
->         write(pfd[1], buffer, 8);
->         splice(pfd[0], 0, sfd, 0, 0x4ffe0ul, 0);
-> 
-> where the amount of data given to send() is dependent on the MTU size (in
-> this instance an interface with an MTU of 8192).
-> 
-> The problem is that the calculation of the amount to copy in
-> __ip_append_data() goes negative in two places, and, in the second place,
-> this gets subtracted from the length remaining, thereby increasing it.
-> 
-> This happens when pagedlen > 0 (which happens for MSG_ZEROCOPY and
-> MSG_SPLICE_PAGES), because the terms in:
-> 
->         copy = datalen - transhdrlen - fraggap - pagedlen;
-> 
-> then mostly cancel when pagedlen is substituted for, leaving just -fraggap.
-> This causes:
-> 
->         length -= copy + transhdrlen;
-> 
-> to increase the length to more than the amount of data in msg->msg_iter,
-> which causes skb_splice_from_iter() to be unable to fill the request and it
-> returns less than 'copied' - which means that length never gets to 0 and we
-> never exit the loop.
-> 
-> Fix this by:
-> 
->  (1) Insert a note about the dodgy calculation of 'copy'.
-> 
->  (2) If MSG_SPLICE_PAGES, clear copy if it is negative from the above
->      equation, so that 'offset' isn't regressed and 'length' isn't
->      increased, which will mean that length and thus copy should match the
->      amount left in the iterator.
-> 
->  (3) When handling MSG_SPLICE_PAGES, give a warning and return -EIO if
->      we're asked to splice more than is in the iterator.  It might be
->      better to not give the warning or even just give a 'short' write.
-> 
-> [!] Note that this ought to also affect MSG_ZEROCOPY, but MSG_ZEROCOPY
-> avoids the problem by simply assuming that everything asked for got copied,
-> not just the amount that was in the iterator.  This is a potential bug for
-> the future.
-> 
-> Fixes: 7ac7c987850c ("udp: Convert udp_sendpage() to use MSG_SPLICE_PAGES")
-> Reported-by: syzbot+f527b971b4bdc8e79f9e@syzkaller.appspotmail.com
-> Link: https://lore.kernel.org/r/000000000000881d0606004541d1@google.com/
-> Signed-off-by: David Howells <dhowells@redhat.com>
-> cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-> cc: "David S. Miller" <davem@davemloft.net>
-> cc: Eric Dumazet <edumazet@google.com>
-> cc: Jakub Kicinski <kuba@kernel.org>
-> cc: Paolo Abeni <pabeni@redhat.com>
-> cc: David Ahern <dsahern@kernel.org>
-> cc: Jens Axboe <axboe@kernel.dk>
-> cc: netdev@vger.kernel.org
+On Tue, Aug 1, 2023 at 5:44=E2=80=AFPM Willem de Bruijn
+<willemdebruijn.kernel@gmail.com> wrote:
+>
+> Eric Dumazet wrote:
+> > Refactor alloc_skb_with_frags() to allow bigger packets allocations.
+> >
+> > Instead of assuming that only order-0 allocations will be attempted,
+> > use the caller supplied max order.
+> >
+> > Signed-off-by: Eric Dumazet <edumazet@google.com>
+> > Cc: Tahsin Erdogan <trdgn@amazon.com>
+> > ---
+> >  net/core/skbuff.c | 56 +++++++++++++++++++++--------------------------
+> >  1 file changed, 25 insertions(+), 31 deletions(-)
+> >
+> > diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+> > index a298992060e6efdecb87c7ffc8290eafe330583f..0ac70a0144a7c1f4e7824dd=
+c19980aee73e4c121 100644
+> > --- a/net/core/skbuff.c
+> > +++ b/net/core/skbuff.c
+> > @@ -6204,7 +6204,7 @@ EXPORT_SYMBOL_GPL(skb_mpls_dec_ttl);
+> >   *
+> >   * @header_len: size of linear part
+> >   * @data_len: needed length in frags
+> > - * @max_page_order: max page order desired.
+> > + * @order: max page order desired.
+> >   * @errcode: pointer to error code if any
+> >   * @gfp_mask: allocation mask
+> >   *
+> > @@ -6212,21 +6212,17 @@ EXPORT_SYMBOL_GPL(skb_mpls_dec_ttl);
+> >   */
+> >  struct sk_buff *alloc_skb_with_frags(unsigned long header_len,
+> >                                    unsigned long data_len,
+> > -                                  int max_page_order,
+> > +                                  int order,
+> >                                    int *errcode,
+> >                                    gfp_t gfp_mask)
+> >  {
+> > -     int npages =3D (data_len + (PAGE_SIZE - 1)) >> PAGE_SHIFT;
+> >       unsigned long chunk;
+> >       struct sk_buff *skb;
+> >       struct page *page;
+> > -     int i;
+> > +     int nr_frags =3D 0;
+> >
+> >       *errcode =3D -EMSGSIZE;
+> > -     /* Note this test could be relaxed, if we succeed to allocate
+> > -      * high order pages...
+> > -      */
+> > -     if (npages > MAX_SKB_FRAGS)
+> > +     if (unlikely(data_len > MAX_SKB_FRAGS * (PAGE_SIZE << order)))
+> >               return NULL;
+> >
+> >       *errcode =3D -ENOBUFS;
+> > @@ -6234,34 +6230,32 @@ struct sk_buff *alloc_skb_with_frags(unsigned l=
+ong header_len,
+> >       if (!skb)
+> >               return NULL;
+> >
+> > -     skb->truesize +=3D npages << PAGE_SHIFT;
+> > -
+> > -     for (i =3D 0; npages > 0; i++) {
+> > -             int order =3D max_page_order;
+> > -
+> > -             while (order) {
+> > -                     if (npages >=3D 1 << order) {
+> > -                             page =3D alloc_pages((gfp_mask & ~__GFP_D=
+IRECT_RECLAIM) |
+> > -                                                __GFP_COMP |
+> > -                                                __GFP_NOWARN,
+> > -                                                order);
+> > -                             if (page)
+> > -                                     goto fill_page;
+> > -                             /* Do not retry other high order allocati=
+ons */
+>
+> Is this heuristic to only try one type of compound pages and else
+> fall back onto regular pages still relevant? I don't know the story
+> behind it.
 
-Thanks for limiting this to MSG_SPLICE_PAGES.
+I keep doing high-order attempts without direct reclaim,
+they should be fine and we eventually fallback to order-2 pages
+if we have plenty of them.
 
-__ip6_append_data probably needs the same.
+Immediate fallback to order-0 seems pessimistic.
 
-I see your point that the
+>
+> > -                             order =3D 1;
+> > -                             max_page_order =3D 0;
+> > -                     }
+> > +     while (data_len) {
+> > +             if (nr_frags =3D=3D MAX_SKB_FRAGS - 1)
+> > +                     goto failure;
+> > +             while (order && data_len < (PAGE_SIZE << order))
+> >                       order--;
+>
+> Why decrement order on every iteration through the loop, not just when
+> alloc_pages fails?
 
-  if (copy > 0) {
-  } else {
-    copy = 0;
-  }
+Say we enter the function with initial @data_len =3D=3D 4000, and @order=3D=
+=3D3
 
-might apply to MSG_ZEROCOPY too. I'll take a look at that. For now
-this is a clear fix to a specific MSG_SPLICE_PAGES commit.
+We do not want to allocate/waste an order-3 page (32768 bytes on x86)
+while an order-0 one should be good enough to fit the expected
+payload.
 
-copy is recomputed on each iteration in the loop. The only fields it
-directly affects below this new line are offset and length. offset is
-only used in copy paths: "offset into linear skb".
-
-So this changes length, the number of bytes still to be written.
-
-copy -= -fraggap definitely seems off. You point out that it even can
-turn length negative?
-
-The WARN_ON_ONCE, if it can be reached, will be user triggerable.
-Usually for those cases and when there is a viable return with error
-path, that is preferable. But if you prefer to taunt syzbot, ok. We
-can always remove this later.
-
-> ---
->  net/ipv4/ip_output.c |    9 +++++++++
->  1 file changed, 9 insertions(+)
-> 
-> diff --git a/net/ipv4/ip_output.c b/net/ipv4/ip_output.c
-> index 6e70839257f7..91715603cf6e 100644
-> --- a/net/ipv4/ip_output.c
-> +++ b/net/ipv4/ip_output.c
-> @@ -1158,10 +1158,15 @@ static int __ip_append_data(struct sock *sk,
->  			}
->  
->  			copy = datalen - transhdrlen - fraggap - pagedlen;
-> +			/* [!] NOTE: copy will be negative if pagedlen>0
-> +			 * because then the equation reduces to -fraggap.
-> +			 */
->  			if (copy > 0 && getfrag(from, data + transhdrlen, offset, copy, fraggap, skb) < 0) {
->  				err = -EFAULT;
->  				kfree_skb(skb);
->  				goto error;
-> +			} else if (flags & MSG_SPLICE_PAGES) {
-> +				copy = 0;
->  			}
->  
->  			offset += copy;
-> @@ -1209,6 +1214,10 @@ static int __ip_append_data(struct sock *sk,
->  		} else if (flags & MSG_SPLICE_PAGES) {
->  			struct msghdr *msg = from;
->  
-> +			err = -EIO;
-> +			if (WARN_ON_ONCE(copy > msg->msg_iter.count))
-> +				goto error;
-> +
->  			err = skb_splice_from_iter(skb, &msg->msg_iter, copy,
->  						   sk->sk_allocation);
->  			if (err < 0)
-> 
-
-
+Same story if initial data_len =3D 33000:
+- We should allocate one order-3 page, and one order-0 one, instead of
+two order-3 pages.
 
