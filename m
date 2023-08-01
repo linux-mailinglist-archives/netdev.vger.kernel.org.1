@@ -1,165 +1,113 @@
-Return-Path: <netdev+bounces-23428-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23429-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 823D976BF13
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 23:18:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A651D76BF22
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 23:22:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A87551C20FC5
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 21:18:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D64A21C20FC5
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 21:22:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80F4E26B00;
-	Tue,  1 Aug 2023 21:18:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AD5E26B01;
+	Tue,  1 Aug 2023 21:22:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69ABB4DC94;
-	Tue,  1 Aug 2023 21:18:08 +0000 (UTC)
-Received: from mail-qt1-x82a.google.com (mail-qt1-x82a.google.com [IPv6:2607:f8b0:4864:20::82a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA651FF;
-	Tue,  1 Aug 2023 14:18:06 -0700 (PDT)
-Received: by mail-qt1-x82a.google.com with SMTP id d75a77b69052e-4039f7e1d3aso46544271cf.0;
-        Tue, 01 Aug 2023 14:18:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690924686; x=1691529486;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ENvvMC35pukF5ojzHyo5Z5dKspFSqXLPb4hIWaoW6Vs=;
-        b=QGxwPFTLr0Ijpw8NqwPoLwfTzsV1c/Sbv/icXJRj2I29nkPl4EEqdvtKXCT5JrQ3Tf
-         G4PEAh+sTunfJRQKlEtLHUdRZ2rvRo5MLKx8AM0lKHvxROlhiIu5cDcp9XNeu9PLgV00
-         VrprxXBcMILUoW52lfanhnu3EeQc9WOGOpBxedrNKqCuBYaZlThWTV1rPXWz58eD3MY8
-         8yutgXVMFc+vVgqhxXYmRrzar2zjHxiNVyXlqhGLE0Ev5CWHWb6smI0HMtONn7CJrIHP
-         8iyPj5S59sq6/4u4DRjCfGKlMwH6EBGdJpTKPO5CvrMTnd4q/2+sMft+ktoxAHNvt7/y
-         CdVg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690924686; x=1691529486;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=ENvvMC35pukF5ojzHyo5Z5dKspFSqXLPb4hIWaoW6Vs=;
-        b=jjErB7jh78sM6AZlVBZZkYLse/SjCthTHNkVIz3CDyPbL6tM5FqRfhxdUD97EmoiOZ
-         jvipcwiEAP2ImW1zOIu3sn4M1Y6iVxrGrG0pU4xQsXgf1xKplw+LBQSBkIIT+bvcUX86
-         jjNN4ObXK/bcags5OLhJWuuOCu35opuNE0GGdM0JzHg8nXyQLyO+uspj75JiTjl1+UC0
-         cXxkOxIIz/Rl5KtlFoTqxfznNdKLGDC/cwVhc2Hsx4ZedPo5QobXJNxpWvmARcsscxny
-         iwvMhBrnQ0sePDKBYMax7vH4apTcsecyL1AxAfw8w8SbKRFhc7uFtGnfC3fREVIqmOwV
-         XSqA==
-X-Gm-Message-State: ABy/qLbCCkaads/efIPSZmiS5Bkh1ZTTHpKp9kTVUzUNLwNx/OvuYEbO
-	IlqpMpqlUwaiSxWH8493gzg=
-X-Google-Smtp-Source: APBJJlEiyHcWyMP4Hr2e0zP22CuZJxyfOPV+G08QykQJpQeWRhVUDa+h8wGLidSMX6FgiNJMd/H17g==
-X-Received: by 2002:ac8:7d4b:0:b0:403:b6d2:8dc4 with SMTP id h11-20020ac87d4b000000b00403b6d28dc4mr17520144qtb.34.1690924685871;
-        Tue, 01 Aug 2023 14:18:05 -0700 (PDT)
-Received: from localhost (172.174.245.35.bc.googleusercontent.com. [35.245.174.172])
-        by smtp.gmail.com with ESMTPSA id q27-20020ac8411b000000b003f9efa2ddb4sm3363636qtl.66.2023.08.01.14.17.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Aug 2023 14:18:00 -0700 (PDT)
-Date: Tue, 01 Aug 2023 17:17:56 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: David Howells <dhowells@redhat.com>, 
- netdev@vger.kernel.org, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: dhowells@redhat.com, 
- syzbot+f527b971b4bdc8e79f9e@syzkaller.appspotmail.com, 
- bpf@vger.kernel.org, 
- brauner@kernel.org, 
- davem@davemloft.net, 
- dsahern@kernel.org, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- axboe@kernel.dk, 
- viro@zeniv.linux.org.uk, 
- linux-fsdevel@vger.kernel.org, 
- syzkaller-bugs@googlegroups.com, 
- linux-kernel@vger.kernel.org
-Message-ID: <64c97684ee5e3_1d7aa3294da@willemb.c.googlers.com.notmuch>
-In-Reply-To: <1569149.1690924207@warthog.procyon.org.uk>
-References: <1569149.1690924207@warthog.procyon.org.uk>
-Subject: RE: [PATCH net v2] udp: Fix __ip{,6}_append_data()'s handling of
- MSG_SPLICE_PAGES
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D0C41ADF4
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 21:22:34 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DAA92C3
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 14:22:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1690924952;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=MzRC37yNjV65GcpWLeg5IaHGjHuuIxo3iyZAS/bTmpk=;
+	b=HIAPfTl+4/HBmhQqJvaPHFbHB3dhRfZqOU2EVpO51JWYQfPIEe6W+7Q9O+M9sJef7ynGMS
+	peNm+DKUgUm8AUzhgo2RAndpB6wc6LM2PLveWf4KERsM40QbhohXqjjPuyug73rFZVT9uA
+	b9RB/xm6DTSeRfjYHc0rIDX6L/NgPqE=
+Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-122-Gam-80i0NfCuf3dA2ho7Eg-1; Tue, 01 Aug 2023 17:22:29 -0400
+X-MC-Unique: Gam-80i0NfCuf3dA2ho7Eg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 499343C11A01;
+	Tue,  1 Aug 2023 21:22:29 +0000 (UTC)
+Received: from RHTPC1VM0NT.redhat.com (unknown [10.22.8.217])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 59DA6F7855;
+	Tue,  1 Aug 2023 21:22:27 +0000 (UTC)
+From: Aaron Conole <aconole@redhat.com>
+To: netdev@vger.kernel.org
+Cc: dev@openvswitch.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Shuah Khan <shuah@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Pravin B Shelar <pshelar@ovn.org>,
+	Adrian Moreno <amorenoz@redhat.com>,
+	Ilya Maximets <i.maximets@ovn.org>
+Subject: [PATCH v3 net-next 0/5] selftests: openvswitch: add flow programming cases
+Date: Tue,  1 Aug 2023 17:22:21 -0400
+Message-Id: <20230801212226.909249-1-aconole@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-David Howells wrote:
-> __ip_append_data() can get into an infinite loop when asked to splice into
-> a partially-built UDP message that has more than the frag-limit data and up
-> to the MTU limit.  Something like:
-> 
->         pipe(pfd);
->         sfd = socket(AF_INET, SOCK_DGRAM, 0);
->         connect(sfd, ...);
->         send(sfd, buffer, 8161, MSG_CONFIRM|MSG_MORE);
->         write(pfd[1], buffer, 8);
->         splice(pfd[0], 0, sfd, 0, 0x4ffe0ul, 0);
-> 
-> where the amount of data given to send() is dependent on the MTU size (in
-> this instance an interface with an MTU of 8192).
-> 
-> The problem is that the calculation of the amount to copy in
-> __ip_append_data() goes negative in two places, and, in the second place,
-> this gets subtracted from the length remaining, thereby increasing it.
-> 
-> This happens when pagedlen > 0 (which happens for MSG_ZEROCOPY and
-> MSG_SPLICE_PAGES), the terms in:
-> 
->         copy = datalen - transhdrlen - fraggap - pagedlen;
-> 
-> then mostly cancel when pagedlen is substituted for, leaving just -fraggap.
-> This causes:
-> 
->         length -= copy + transhdrlen;
-> 
-> to increase the length to more than the amount of data in msg->msg_iter,
-> which causes skb_splice_from_iter() to be unable to fill the request and it
-> returns less than 'copied' - which means that length never gets to 0 and we
-> never exit the loop.
-> 
-> Fix this by:
-> 
->  (1) Insert a note about the dodgy calculation of 'copy'.
-> 
->  (2) If MSG_SPLICE_PAGES, clear copy if it is negative from the above
->      equation, so that 'offset' isn't regressed and 'length' isn't
->      increased, which will mean that length and thus copy should match the
->      amount left in the iterator.
-> 
->  (3) When handling MSG_SPLICE_PAGES, give a warning and return -EIO if
->      we're asked to splice more than is in the iterator.  It might be
->      better to not give the warning or even just give a 'short' write.
-> 
-> The same problem occurs in __ip6_append_data(), except that there's a check
-> in there that errors out with EINVAL if copy < 0.  Fix this function in
-> much the same way as the ipv4 variant but also skip the erroring out if
-> copy < 0.
+The openvswitch selftests currently contain a few cases for managing the
+datapath, which includes creating datapath instances, adding interfaces,
+and doing some basic feature / upcall tests.  This is useful to validate
+the control path.
 
-I don't think the two should be combined.
+Add the ability to program some of the more common flows with actions. This
+can be improved overtime to include regression testing, etc.
 
-Removing that branch actually opens up to new bugs, e.g., in MSG_ZEROCOPY.
+v2->v3:
+1. Dropped support for ipv6 in nat() case
+2. Fixed a spelling mistake in 2/5 commit message.
 
-Since the ipv6 stack is not subject to this bug in MSG_SPLICE_PAGES,
-I think v1 on its own is correct, and has the right Fixes tag.
+v1->v2:
+1. Fix issue when parsing ipv6 in the NAT action
+2. Fix issue calculating length during ctact parsing
+3. Fix error message when invalid bridge is passed
+4. Fold in Adrian's patch to support key masks
 
-If we think this IPv6 branch is mistaken and a bug, then that would
-have a different Fixes tag, going back to ancient history. But arguably
-safer to limit that net-next, if touching that at all.
 
-It makes sense to update MSG_SPLICE_PAGES in the IPv6 path to be
-equivalent to the IPv4 path, and to be correct if that branch is
-ever removed.
+Aaron Conole (4):
+  selftests: openvswitch: add an initial flow programming case
+  selftests: openvswitch: add a test for ipv4 forwarding
+  selftests: openvswitch: add basic ct test case parsing
+  selftests: openvswitch: add ct-nat test case with ipv4
+
+Adrian Moreno (1):
+  selftests: openvswitch: support key masks
+
+ .../selftests/net/openvswitch/openvswitch.sh  | 223 +++++++
+ .../selftests/net/openvswitch/ovs-dpctl.py    | 588 +++++++++++++++++-
+ 2 files changed, 787 insertions(+), 24 deletions(-)
+
+-- 
+2.40.1
+
 
