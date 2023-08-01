@@ -1,164 +1,116 @@
-Return-Path: <netdev+bounces-23311-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23313-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8FFF76B863
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 17:19:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BDA2476B871
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 17:20:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C3DD11C20F46
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 15:19:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EF7731C20F7B
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 15:20:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95E421ADEF;
-	Tue,  1 Aug 2023 15:17:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0760A20EA;
+	Tue,  1 Aug 2023 15:20:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A7531ADC8
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 15:17:14 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5AACA1B1
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 08:17:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1690903032;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WB7YSzuZEopRPaRceBHAHu4pQltOVPd1PptnTZTXhzA=;
-	b=Mu62Du6q1oKkS5D4XGuXXCNRjmJhBTzCNUOu79f+GNtSwtCncf7X1i+S43dEqsvx+UzOSY
-	0Zk7GZ19uwltwT3lDJ+qkWzkCLUTjP2AdkmnV7fe0w1yAn91E0LHdsTg6186ZxJCJqA8PW
-	VYuKiS4Z64Idqj+kaBUP0Ruqd/CevM4=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-58-NlWEHRCUN0-1Hutn946z8w-1; Tue, 01 Aug 2023 11:17:08 -0400
-X-MC-Unique: NlWEHRCUN0-1Hutn946z8w-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 86A43830DAC;
-	Tue,  1 Aug 2023 15:17:08 +0000 (UTC)
-Received: from antares.redhat.com (unknown [10.39.193.90])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 6AE3BC57964;
-	Tue,  1 Aug 2023 15:17:07 +0000 (UTC)
-From: Adrian Moreno <amorenoz@redhat.com>
-To: netdev@vger.kernel.org
-Cc: Adrian Moreno <amorenoz@redhat.com>,
-	aconole@redhat.com,
-	i.maximets@ovn.org,
-	eric@garver.life,
-	dev@openvswitch.org
-Subject: [RFC net-next v2 7/7] selftests: openvswitch: add explicit drop testcase
-Date: Tue,  1 Aug 2023 17:16:48 +0200
-Message-ID: <20230801151649.744695-8-amorenoz@redhat.com>
-In-Reply-To: <20230801151649.744695-1-amorenoz@redhat.com>
-References: <20230801151649.744695-1-amorenoz@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3D724DC90;
+	Tue,  1 Aug 2023 15:20:18 +0000 (UTC)
+Received: from out2-smtp.messagingengine.com (out2-smtp.messagingengine.com [66.111.4.26])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77EDB10F5;
+	Tue,  1 Aug 2023 08:20:17 -0700 (PDT)
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+	by mailout.nyi.internal (Postfix) with ESMTP id E7CC75C01DE;
+	Tue,  1 Aug 2023 11:20:15 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute5.internal (MEProxy); Tue, 01 Aug 2023 11:20:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
+	:cc:content-type:content-type:date:date:from:from:in-reply-to
+	:in-reply-to:message-id:mime-version:references:reply-to:sender
+	:subject:subject:to:to; s=fm2; t=1690903215; x=1690989615; bh=gJ
+	mKl0XnfNOfeViEaAye1ljmUyCgjpGGF5LwtdmY9m8=; b=kAI8OP+w7hRnTsNISf
+	Uz+0k1ByOl3+BgqmhHW9gkvOaahlgmnyQYuQXD0XvuiC9wbgMXM+fUWkkxp0+vZ2
+	HqA6h2rJh0ciY1zXNCldFw8QkHIcXqBNbAqm9ygVKkUkMFc1ohf4++NLc+6uUgXr
+	9WhZ/xhp1GqOI9MDlYiO7QkatBosPBRWgoCTCqEPVlZvjua1IweDyTJP77cMOZBn
+	dc86f1YG6SOXdeazIGGb/lBpPWrMObPdqseYvBMPzexLCojwScx7TusVPKSIiqNw
+	9oRic0LKT/n5BXIIAYJ/6zwEBYeTgKvmopa3VM/LGOT/SZX10vLcB8aPADrHMLvv
+	E1aA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:sender:subject
+	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+	:x-sasl-enc; s=fm3; t=1690903215; x=1690989615; bh=gJmKl0XnfNOfe
+	ViEaAye1ljmUyCgjpGGF5LwtdmY9m8=; b=U3O8+Gro+DkZxLXCtbWwh6i9IVZXB
+	hNHMFHthh6/il7yvHM4u1C6NOh/jSLpAXZA83VYSmVOmH0VLK+0Ydg2RUpg5Mlza
+	25wh7vqZVROnVgoCa8/9hXlYUCoNu7ZYbeaH5IFalx9vBv3a0kjP+5mx8IoSs4SW
+	xKGENUCVy1ZlWdxgXopgv+5KoPPexXR6Rz3CHmBzxLyAHM/Z+IPG6zdMTxSS1NxM
+	WWZ1jHC3yY0xfF6hV0/ycGiy+ozB5CVKmyBnoS6jDcPoW275+TOFxLYwVCYeyTSC
+	A2TNvuqCGz0ts8Frf0dbZjpMqSrMYEka4l4h5hHkGEeWbaGXavGsbFLDg==
+X-ME-Sender: <xms:riLJZLBKShiHEt2Jt0XrZxQlvbCqcP8vETNLGad1i2726e2Kq6t8og>
+    <xme:riLJZBgJ8thDWvPCaILDz5Q-jFTPISTjfStM7Kz6vFX8rQiSn_7sbTy_tOwm6tm1w
+    _S7RD1sLf6DEKh7Qg>
+X-ME-Received: <xmr:riLJZGnHufzWUOKIv0dzHj-Q4YwEoPHbYLQCgWYwXbhUu7pYs5Hvoi77dySZyueS9H3ugM3VYXbBzwN0qmefzMdBqy2Ocmc5exQzRes>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrjeeigdekgecutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenfg
+    hrlhcuvffnffculdefhedmnecujfgurhepfffhvfevuffkfhggtggujgesthdtsfdttddt
+    vdenucfhrhhomhepffgrnhhivghlucgiuhcuoegugihusegugihuuhhurdighiiiqeenuc
+    ggtffrrghtthgvrhhnpedvfeekteduudefieegtdehfeffkeeuudekheduffduffffgfeg
+    iedttefgvdfhvdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfh
+    hrohhmpegugihusegugihuuhhurdighiii
+X-ME-Proxy: <xmx:riLJZNyp8avT4hqkWtTi6P7QFYLejjQX1DmMAko_e6a1u1Y1cSuQnA>
+    <xmx:riLJZAS_lO_aF1M4T4pQrfMD4BAr65r2RhU0HQpogBNz8g4CQAtu9Q>
+    <xmx:riLJZAaJibbHNJLxn4HWL59zmo30xOjafDy0_v5LUPIbHJUB4m0gTA>
+    <xmx:ryLJZCBKkD_yXavyx1-3FGHLfr9nSP4AUF0aamOKeyb6FaHa2n4t1Q>
+Feedback-ID: i6a694271:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 1 Aug 2023 11:20:13 -0400 (EDT)
+Date: Tue, 1 Aug 2023 09:20:12 -0600
+From: Daniel Xu <dxu@dxuuu.xyz>
+To: Arnd Bergmann <arnd@kernel.org>
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>, 
+	Jozsef Kadlecsik <kadlec@netfilter.org>, Florian Westphal <fw@strlen.de>, Arnd Bergmann <arnd@arndb.de>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Alexei Starovoitov <ast@kernel.org>, netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bpf@vger.kernel.org
+Subject: Re: [PATCH] netfilter: bpf_link: avoid unused-function warning
+Message-ID: <z3gp6rcrlotwjwux7chza4vmbgv747v5jlr4xhuaad3y2yofsf@jjiju6zltbmh>
+References: <20230801150304.1980987-1-arnd@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230801150304.1980987-1-arnd@kernel.org>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Make ovs-dpctl.py support explicit drops as:
-"drop" -> implicit empty-action drop
-"drop(0)" -> explicit non-error action drop
-"drop(42)" -> explicit error action drop
+Hi Arnd,
 
-Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
----
- .../selftests/net/openvswitch/openvswitch.sh  | 25 +++++++++++++++++++
- .../selftests/net/openvswitch/ovs-dpctl.py    | 21 ++++++++++++----
- 2 files changed, 41 insertions(+), 5 deletions(-)
+On Tue, Aug 01, 2023 at 05:02:41PM +0200, Arnd Bergmann wrote:
+> From: Arnd Bergmann <arnd@arndb.de>
+> 
+> The newly added function is unused in some random configurations:
+> 
+> net/netfilter/nf_bpf_link.c:32:1: error: 'get_proto_defrag_hook' defined but not used [-Werror=unused-function]
+>    32 | get_proto_defrag_hook(struct bpf_nf_link *link,
+>       | ^~~~~~~~~~~~~~~~~~~~~
+> 
 
-diff --git a/tools/testing/selftests/net/openvswitch/openvswitch.sh b/tools/testing/selftests/net/openvswitch/openvswitch.sh
-index a10c345f40ef..c568ba1b7900 100755
---- a/tools/testing/selftests/net/openvswitch/openvswitch.sh
-+++ b/tools/testing/selftests/net/openvswitch/openvswitch.sh
-@@ -217,6 +217,31 @@ test_drop_reason() {
- 		return 1
- 	fi
- 
-+	# Drop UDP 6000 traffic with an explicit action and an error code.
-+	ovs_add_flow "test_drop_reason" dropreason \
-+		"in_port(1),eth(),eth_type(0x0800),ipv4(src=172.31.110.10,proto=17),udp(dst=6000)" \
-+                'drop(42)'
-+	# Drop UDP 7000 traffic with an explicit action with no error code.
-+	ovs_add_flow "test_drop_reason" dropreason \
-+		"in_port(1),eth(),eth_type(0x0800),ipv4(src=172.31.110.10,proto=17),udp(dst=7000)" \
-+                'drop(0)'
-+
-+	ovs_drop_record_and_run \
-+            "test_drop_reason" ip netns exec client nc -i 1 -zuv 172.31.110.20 6000
-+	ovs_drop_reason_count 0x30004 # OVS_DROP_EXPLICIT_ACTION_ERROR
-+	if [[ "$?" -ne "1" ]]; then
-+		info "Did not detect expected explicit error drops: $?"
-+		return 1
-+	fi
-+
-+	ovs_drop_record_and_run \
-+            "test_drop_reason" ip netns exec client nc -i 1 -zuv 172.31.110.20 7000
-+	ovs_drop_reason_count 0x30003 # OVS_DROP_EXPLICIT_ACTION
-+	if [[ "$?" -ne "1" ]]; then
-+		info "Did not detect expected explicit drops: $?"
-+		return 1
-+	fi
-+
- 	return 0
- }
- 
-diff --git a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
-index b5599a229ec8..1851bb15f12d 100644
---- a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
-+++ b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
-@@ -449,7 +449,7 @@ class ovsactions(nla):
-                 elif field[0] == "OVS_ACTION_ATTR_TRUNC":
-                     print_str += "trunc(%d)" % int(self.get_attr(field[0]))
-                 elif field[0] == "OVS_ACTION_ATTR_DROP":
--                    print_str += "drop"
-+                    print_str += "drop(%d)" % int(self.get_attr(field[0]))
-             elif field[1] == "flag":
-                 if field[0] == "OVS_ACTION_ATTR_CT_CLEAR":
-                     print_str += "ct_clear"
-@@ -471,10 +471,21 @@ class ovsactions(nla):
-         while len(actstr) != 0:
-             parsed = False
-             if actstr.startswith("drop"):
--                # for now, drops have no explicit action, so we
--                # don't need to set any attributes.  The final
--                # act of the processing chain will just drop the packet
--                return
-+                # If no reason is provided, the implicit drop is used (i.e no
-+                # action). If some reason is given, an explicit action is used.
-+                actstr, reason = parse_extract_field(
-+                    actstr,
-+                    "drop(",
-+                    "([0-9]+)",
-+                    lambda x: int(x, 0),
-+                    False,
-+                    None,
-+                )
-+                if reason is not None:
-+                    self["attrs"].append(["OVS_ACTION_ATTR_DROP", reason])
-+                    parsed = True
-+                else:
-+                    return
- 
-             elif parse_starts_block(actstr, "^(\d+)", False, True):
-                 actstr, output = parse_extract_field(
--- 
-2.41.0
+This was fixed in 81584c23f249 ("netfilter: bpf: Only define get_proto_defrag_hook() if necessary").
 
+Thanks,
+Daniel
 
