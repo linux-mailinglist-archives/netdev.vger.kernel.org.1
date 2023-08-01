@@ -1,68 +1,68 @@
-Return-Path: <netdev+bounces-23463-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23464-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43A0176C072
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 00:31:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E750276C078
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 00:35:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 189461C21129
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 22:31:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0A3311C2105F
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 22:35:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 297AA235B5;
-	Tue,  1 Aug 2023 22:31:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFFB64A08;
+	Tue,  1 Aug 2023 22:35:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D8F627729
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 22:31:13 +0000 (UTC)
-Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83E28E4E
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 15:31:12 -0700 (PDT)
-Received: by mail-pf1-x432.google.com with SMTP id d2e1a72fcca58-686f090316dso4219855b3a.2
-        for <netdev@vger.kernel.org>; Tue, 01 Aug 2023 15:31:12 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B245B440C
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 22:35:24 +0000 (UTC)
+Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBB541BF6
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 15:35:22 -0700 (PDT)
+Received: by mail-pl1-x62f.google.com with SMTP id d9443c01a7336-1bb9e6c2a90so49225915ad.1
+        for <netdev@vger.kernel.org>; Tue, 01 Aug 2023 15:35:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1690929072; x=1691533872;
+        d=chromium.org; s=google; t=1690929322; x=1691534122;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=5rI769blANvKakho//KZylc2H6HwF2kf18muyWtGVFE=;
-        b=S/mRkmfA0lmJMoq6lyuKbHLryPTrbrj6nCOzzsunS253TyR6O8d01K9JabxWlHKwgU
-         XQjqXimg+lQVrOaG3Ag0dTf5G4KwNryKCHUVHRQ70ZwVX3MsWtmwU8WO8JJW3pERGdWr
-         FFD/J8g17ysNh5AGszxYdGXbK8sSCpprcMm5E=
+        bh=eoE3c8ICemots41uvNCVYms50IlLZwpK4rs4AeMXx54=;
+        b=b8Dlc3rNrIoGeoB3AITiPCLmuLqATv0RcuCPd76wAPvqZRG/FLE/JudB8GxxwbyelX
+         6U5n5WKerZH663GTEe5YbkqXZm8XsC6h57C+FmmXEEljxgjdAEuDmIoO44ZXGoh+cPvQ
+         LdMyklUOsUHGQEyPJcqg0SQYQ1vXA1r4J19FU=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690929072; x=1691533872;
+        d=1e100.net; s=20221208; t=1690929322; x=1691534122;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=5rI769blANvKakho//KZylc2H6HwF2kf18muyWtGVFE=;
-        b=OVunPdbNhSy6SYyueSFiYezkD8eRs3bST0rWodqzw9aUL7u0SDK1sKAvOq1tXn1+6F
-         JxQJ56SdE7nCTKdYOj8v/FnfMl6KUaPk3yxA1JfRr6TdajmAJtaGHNZVv3YpmUaY4tWc
-         wI3sWBE6+3W7HfWU5RWFBL3vUdz2S0ZCtJNzkROzvF/d1mhnxu8k1RxYMwbRyvMixenh
-         vIcU3+HgPJM/xcP6609/6oraadJp7jHt8th/IMt5W3DNelXaC3EiodSyMmL+2rijahBN
-         Rn9R+x5Ki6+qXHc6daU/MP5z1qQNDWOv1FNsS8bcFiapqO0Fhd2g02n6A5zkZcroypmL
-         +eag==
-X-Gm-Message-State: ABy/qLb1bkZiPGQjl1xJlyNzl5Wq5VNSlYoeFKdIq4h/g7maskheFIeu
-	MqD545pAdowyhSzOvza80SqESw==
-X-Google-Smtp-Source: APBJJlEB8hJ/wfGV5TLpVSHRxwHvYwuuNQs9GxuXEQyZQxV8JwciDeGgwsHIx2ioq2H59TUVG6owXA==
-X-Received: by 2002:a17:902:f547:b0:1b8:b827:aa8e with SMTP id h7-20020a170902f54700b001b8b827aa8emr14471846plf.11.1690929071987;
-        Tue, 01 Aug 2023 15:31:11 -0700 (PDT)
+        bh=eoE3c8ICemots41uvNCVYms50IlLZwpK4rs4AeMXx54=;
+        b=VhzUUU/al1VJ6HDdmTLtdFH3+Duy3Bioix5lJxPlC7HBL9Z6lobXZF8dZIaYdUjDTB
+         mLxXgGTZx9TRvAQ9dUOAX8Vh1VxrR4BYmnh92ptW70jmr2z/jc+dteCj/o+7KrbRRtwY
+         O4+fnKxNhiVDnZY29VascRsbsCoLLiiWzvCiFoaWJzzX6vUHr1+/BUXvQE3ObX1Ii5IM
+         o4icbcpAy4/VOzXYKSIxB9unzD0rkAsU/hcW+eWgQLz6b5Q+H2om3csy8WrgE8qF1IGG
+         +F9Hc5RP4LNYnge1gJ262dkxBTkIRlM6H7TUhLLAd4ktvUSFqjWIq1722MRba8ue/vh6
+         bREw==
+X-Gm-Message-State: ABy/qLbwM0cYS+9ssnXNqXwBTrmWewxrwLJOaa50ghl5ZagiNP+7BdPI
+	93GYcS02i4t/6ZDk3KvO9nMbWA==
+X-Google-Smtp-Source: APBJJlElgraw/W6oH7KzSXHtGpfX8bqLl3oOYDzTdVMdq4PcdwrTVXZGZQ4aBsDaQXfyFx+MN3C5kQ==
+X-Received: by 2002:a17:903:1ce:b0:1b8:88c5:2d2f with SMTP id e14-20020a17090301ce00b001b888c52d2fmr16472861plh.64.1690929322430;
+        Tue, 01 Aug 2023 15:35:22 -0700 (PDT)
 Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id jn13-20020a170903050d00b001b895a17429sm10957681plb.280.2023.08.01.15.31.11
+        by smtp.gmail.com with ESMTPSA id j18-20020a170902759200b001ab2b4105ddsm5246480pll.60.2023.08.01.15.35.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Aug 2023 15:31:11 -0700 (PDT)
-Date: Tue, 1 Aug 2023 15:31:10 -0700
+        Tue, 01 Aug 2023 15:35:22 -0700 (PDT)
+Date: Tue, 1 Aug 2023 15:35:21 -0700
 From: Kees Cook <keescook@chromium.org>
 To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 Cc: Jacob Keller <jacob.e.keller@intel.com>,
 	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
 	Alexander Lobakin <aleksander.lobakin@intel.com>
-Subject: Re: [RFC net-next 1/2] overflow: add DECLARE_FLEX() for on-stack
- allocs
-Message-ID: <202308011403.E0A8D25CE@keescook>
+Subject: Re: [RFC net-next 2/2] ice: make use of DECLARE_FLEX() in
+ ice_switch.c
+Message-ID: <202308011532.A92CFB351@keescook>
 References: <20230801111923.118268-1-przemyslaw.kitszel@intel.com>
- <20230801111923.118268-2-przemyslaw.kitszel@intel.com>
+ <20230801111923.118268-3-przemyslaw.kitszel@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,7 +71,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230801111923.118268-2-przemyslaw.kitszel@intel.com>
+In-Reply-To: <20230801111923.118268-3-przemyslaw.kitszel@intel.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
 	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
@@ -79,109 +79,34 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Aug 01, 2023 at 01:19:22PM +0200, Przemek Kitszel wrote:
-> Add DECLARE_FLEX() macro for on-stack allocations of structs with
-> flexible array member.
-
-I like this idea!
-
-One terminology nit: I think this should be called "DEFINE_...", since
-it's a specific instantiation. Other macros in the kernel seem to confuse
-this a lot, though. Yay naming.
-
-> Using underlying array for on-stack storage lets us to declare known
-> on compile-time structures without kzalloc().
-
-Hmpf, this appears to immediately trip over any (future) use of
-__counted_by()[1] for these (since the counted-by member would be
-initialized to zero), but I think I have a solution. (See below.)
-
-> 
-> Actual usage for ice driver is in next patch of the series.
-> 
-> Note that "struct" kw and "*" char is moved to the caller, to both:
-> have shorter macro name, and have more natural type specification
-> in the driver code (IOW not hiding an actual type of var).
+On Tue, Aug 01, 2023 at 01:19:23PM +0200, Przemek Kitszel wrote:
+> Use DECLARE_FLEX() macro for 1-elem flex array members of ice_switch.c
 > 
 > Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 > ---
->  include/linux/overflow.h | 14 ++++++++++++++
->  1 file changed, 14 insertions(+)
+>  drivers/net/ethernet/intel/ice/ice_switch.c | 53 +++++----------------
+>  1 file changed, 12 insertions(+), 41 deletions(-)
 > 
-> diff --git a/include/linux/overflow.h b/include/linux/overflow.h
-> index f9b60313eaea..403b7ec120a2 100644
-> --- a/include/linux/overflow.h
-> +++ b/include/linux/overflow.h
-> @@ -309,4 +309,18 @@ static inline size_t __must_check size_sub(size_t minuend, size_t subtrahend)
->  #define struct_size_t(type, member, count)					\
->  	struct_size((type *)NULL, member, count)
->  
-> +/**
-> + * DECLARE_FLEX() - Declare an on-stack instance of structure with trailing
-> + * flexible array.
-> + * @type: Pointer to structure type, including "struct" keyword and "*" char.
-> + * @name: Name for a (pointer) variable to create.
-> + * @member: Name of the array member.
-> + * @count: Number of elements in the array; must be compile-time const.
-> + *
-> + * Declare an instance of structure *@type with trailing flexible array.
-> + */
-> +#define DECLARE_FLEX(type, name, member, count)					\
-> +	u8 name##_buf[struct_size((type)NULL, member, count)] __aligned(8) = {};\
-> +	type name = (type)&name##_buf
-> +
->  #endif /* __LINUX_OVERFLOW_H */
+> diff --git a/drivers/net/ethernet/intel/ice/ice_switch.c b/drivers/net/ethernet/intel/ice/ice_switch.c
+> index a7afb612fe32..41679cb6b548 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_switch.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_switch.c
+> @@ -1812,15 +1812,11 @@ ice_aq_alloc_free_vsi_list(struct ice_hw *hw, u16 *vsi_list_id,
+>  			   enum ice_sw_lkup_type lkup_type,
+>  			   enum ice_adminq_opc opc)
+>  {
+> -	struct ice_aqc_alloc_free_res_elem *sw_buf;
+> +	DECLARE_FLEX(struct ice_aqc_alloc_free_res_elem *, sw_buf, elem, 1);
+> +	u16 buf_len = struct_size(sw_buf, elem, 1);
 
-I was disappointed to discover that only global (static) initializers
-would work for a flex array member. :(
+With the macro I suggested, I think this line can become:
 
-i.e. this works:
+	u16 buf_len = __builtin_object_size(sw_buf, 1);
 
-struct foo {
-    unsigned long flags;
-    unsigned char count;
-    int array[] __counted_by(count);
-};
-
-struct foo global = {
-    .count = 1,
-    .array = { 0 },
-};
-
-But I can't do that on the stack. :P So, yes, it seems like the u8 array
-trick is needed.
-
-It looks like Alexander already suggested this, and I agree, instead of
-__aligned(8), please use "__aligned(_Alignof(type))".
-
-As for "*" or not, I would tend to agree that always requiring "*" when
-using the macro seems redundant.
-
-Initially I was struggling to make __counted_by work, but it seems we can
-use an initializer for that member, as long as we don't touch the flexible
-array member in the initializer. So we just need to add the counted-by
-member to the macro, and use a union to do the initialization. And if
-we take the address of the union (and not the struct within it), the
-compiler will see the correct object size with __builtin_object_size:
-
-#define DEFINE_FLEX(type, name, flex, counter, count) \
-    union { \
-        u8   bytes[struct_size_t(type, flex, count)]; \
-        type obj; \
-    } name##_u __aligned(_Alignof(type)) = { .obj.counter = count }; \
-    /* take address of whole union to get the correct __builtin_object_size */ \
-    type *name = (type *)&name##_u
-
-i.e. __builtin_object_size(name, 1) (as used by FORTIFY_SOURCE, etc)
-works correctly here, but breaks (sees a zero-sized flex array member)
-if this macro ends with:
-
-    type *name = &name##_u.obj
-
+but either is fine. (N.B. the "1" here is a bitfield, not the "1" size
+above).
 
 -Kees
-
-[1] https://git.kernel.org/linus/dd06e72e68bcb4070ef211be100d2896e236c8fb
 
 -- 
 Kees Cook
