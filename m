@@ -1,88 +1,103 @@
-Return-Path: <netdev+bounces-23021-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23022-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D956F76A69B
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 03:58:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 64A8F76A6A3
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 04:00:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9311428178B
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 01:58:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1E64428178D
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 02:00:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 696AEED0;
-	Tue,  1 Aug 2023 01:58:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32D80ED0;
+	Tue,  1 Aug 2023 02:00:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B86647E;
-	Tue,  1 Aug 2023 01:58:52 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 1DB95C433C8;
-	Tue,  1 Aug 2023 01:58:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690855132;
-	bh=/YKmEXb0/vW9TocEcNGoTalJ2qkpZWR+jmhHZQny6G0=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=GYVDLxh4Lma3f+d0kdq4ciAHK6NlnRMEL6ke8fA4MveQmUI//i0u4pGKiFJSb4QVI
-	 sCkmeR2XU1kB7awO4yQzNZ+1bLgVtgHgUTKlfWG2TZ9YTNod4RdzK8tzuD0SgAxLeY
-	 u8VIlb9H6vq2d25mv9b5OToBdf9rM39U7iAOEYYUIU0DwHYaUNTsqGsvpVtNBWJ+bt
-	 Sy43NWeLpDrKWMCqch+cB8NvWRIW0c5I8sM827RmxUgDcDICr8YzXWgCL7klQrntxU
-	 qcT0uRotv3gcdQb3rKRAmzhEX5+hWToeOR/myBKg4ujfRWcJGkrJJwxO+tzFdgHqrJ
-	 bL2eAXQEVKodA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 011E7C595C0;
-	Tue,  1 Aug 2023 01:58:52 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2744F7E
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 02:00:45 +0000 (UTC)
+Received: from zg8tmtyylji0my4xnjqumte4.icoremail.net (zg8tmtyylji0my4xnjqumte4.icoremail.net [162.243.164.118])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 76A7C1BE2;
+	Mon, 31 Jul 2023 19:00:41 -0700 (PDT)
+Received: from linma$zju.edu.cn ( [42.120.103.60] ) by
+ ajax-webmail-mail-app4 (Coremail) ; Tue, 1 Aug 2023 10:00:01 +0800
+ (GMT+08:00)
+X-Originating-IP: [42.120.103.60]
+Date: Tue, 1 Aug 2023 10:00:01 +0800 (GMT+08:00)
+X-CM-HeaderCharset: UTF-8
+From: "Lin Ma" <linma@zju.edu.cn>
+To: "Jakub Kicinski" <kuba@kernel.org>
+Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, 
+	fw@strlen.de, yang.lee@linux.alibaba.com, jgg@ziepe.ca, 
+	markzhang@nvidia.com, phaddad@nvidia.com, yuancan@huawei.com, 
+	ohartoov@nvidia.com, chenzhongjin@huawei.com, aharonl@nvidia.com, 
+	leon@kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org
+Subject: Re: [PATCH net v1 1/2] netlink: let len field used to parse
+ type-not-care nested attrs
+X-Priority: 3
+X-Mailer: Coremail Webmail Server Version XT5.0.14 build 20220622(41e5976f)
+ Copyright (c) 2002-2023 www.mailtech.cn
+ mispb-4df6dc2c-e274-4d1c-b502-72c5c3dfa9ce-zj.edu.cn
+In-Reply-To: <20230731120326.6bdd5bf9@kernel.org>
+References: <20230731121247.3972783-1-linma@zju.edu.cn>
+ <20230731120326.6bdd5bf9@kernel.org>
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=UTF-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH bpf-next 0/2] Remove unused fields in cpumap & devmap
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169085513200.17783.16957076223549181701.git-patchwork-notify@kernel.org>
-Date: Tue, 01 Aug 2023 01:58:52 +0000
-References: <20230728014942.892272-1-houtao@huaweicloud.com>
-In-Reply-To: <20230728014942.892272-1-houtao@huaweicloud.com>
-To: Hou Tao <houtao@huaweicloud.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, davem@davemloft.net,
- kuba@kernel.org, hawk@kernel.org, john.fastabend@gmail.com,
- bjorn.topel@gmail.com, martin.lau@linux.dev, alexei.starovoitov@gmail.com,
- andrii@kernel.org, song@kernel.org, haoluo@google.com,
- yonghong.song@linux.dev, daniel@iogearbox.net, kpsingh@kernel.org,
- sdf@google.com, jolsa@kernel.org, houtao1@huawei.com
+Message-ID: <38179c76.f308d.189aed2db99.Coremail.linma@zju.edu.cn>
+X-Coremail-Locale: zh_CN
+X-CM-TRANSID:cS_KCgBHTQoiZ8hkSOJqCg--.61766W
+X-CM-SenderInfo: qtrwiiyqvtljo62m3hxhgxhubq/1tbiAwUOEmTIYfoAqwAAsG
+X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
+	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
+	daVFxhVjvjDU=
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
-
-This series was applied to bpf/bpf-next.git (master)
-by Martin KaFai Lau <martin.lau@kernel.org>:
-
-On Fri, 28 Jul 2023 09:49:40 +0800 you wrote:
-> From: Hou Tao <houtao1@huawei.com>
-> 
-> Hi,
-> 
-> Patchset "Simplify xdp_do_redirect_map()/xdp_do_flush_map() and XDP
-> maps" [0] changed per-map flush list to global per-cpu flush list
-> for cpumap, devmap and xskmap, but it forgot to remove these unused
-> fields from cpumap and devmap. So just remove these unused fields.
-> 
-> [...]
-
-Here is the summary with links:
-  - [bpf-next,1/2] bpf, cpumap: Remove unused cmap field from bpf_cpu_map_entry
-    https://git.kernel.org/bpf/bpf-next/c/2d20bfc315eb
-  - [bpf-next,2/2] bpf, devmap: Remove unused dtab field from bpf_dtab_netdev
-    https://git.kernel.org/bpf/bpf-next/c/1ea66e89f68c
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+SGVsbG8gSmFrdWIsCgo+ID4gCj4gPiBIb3dldmVyLCB0aGlzIGlzIHRlZGlvdXMgYW5kIGp1c3Qg
+bGlrZSBMZW9uIHNhaWQ6IGFkZCBhbm90aGVyIGxheWVyIG9mCj4gPiBjYWJhbCBrbm93bGVkZ2Uu
+IFRoZSBiZXR0ZXIgc29sdXRpb24gc2hvdWxkIGxldmVyYWdlIHRoZSBubGFfcG9saWN5IGFuZAo+
+ID4gZGlzY2FyZCBubGF0dHIgd2hvc2UgbGVuZ3RoIGlzIGludmFsaWQgd2hlbiBkb2luZyBwYXJz
+aW5nLiBUaGF0IGlzLCB3ZQo+ID4gc2hvdWxkIGRlZmluZWQgYSBuZXN0ZWRfcG9saWN5IGZvciB0
+aGUgWCBhYm92ZSBsaWtlCj4gCj4gSGFyZCBuby4gUHV0dGluZyBhcnJheSBpbmRleCBpbnRvIGF0
+dHIgdHlwZSBpcyBhbiBhZHZhbmNlZCBjYXNlIGFuZCB0aGUKPiBwYXJzaW5nIGNvZGUgaGFzIHRv
+IGJlIGFibGUgdG8gZGVhbCB3aXRoIGxvdyBsZXZlbCBuZXRsaW5rIGRldGFpbHMuCgpXZWxsLCBJ
+IGp1c3Qga25vd24gdGhhdCB0aGUgdHlwZSBmaWVsZCBmb3IgdGhvc2UgYXR0cmlidXRlcyBpcyB1
+c2VkIGFzIGFycmF5CmluZGV4LgpIZW5jZSwgZm9yIHRoaXMgYWR2YW5jZWQgY2FzZSwgY291bGQg
+d2UgZGVmaW5lIGFub3RoZXIgTkxBIHR5cGUsIG1heWJlIApOTEFfTkVTVEVEX0lEWEFSUkFZIGVu
+dW0/IFRoYXQgbWF5IGJlIG11Y2ggY2xlYXJlciBhZ2FpbnN0IG1vZGlmeWluZyBleGlzdGluZwpj
+b2RlLgoKPiBIaWdoZXIgbGV2ZWwgQVBJIHNob3VsZCByZW1vdmUgdGhlIG5sYV9mb3JfZWFjaF9u
+ZXN0ZWQoKSBjb21wbGV0ZWx5Cj4gd2hpY2ggaXMgcmF0aGVyIGhhcmQgdG8gYWNoaWV2ZSBoZXJl
+LgoKQnkgaW52ZXN0aWdhdGluZyB0aGUgY29kZSB1c2VzIG5sYV9mb3JfZWFjaF9uZXN0ZWQgbWFj
+cm8uIFRoZXJlIGFyZSBiYXNpY2FsbHkKdHdvIHNjZW5hcmlvczoKCjEuIG1hbnVhbGx5IHBhcnNl
+IG5lc3RlZCBhdHRyaWJ1dGVzIHdob3NlIHR5cGUgaXMgbm90IGNhcmVkICh0aGUgYWR2YW5jZSBj
+YXNlCiAgIHVzZSB0eXBlIGFzIGluZGV4IGhlcmUpLgoyLiBtYW51YWxseSBwYXJzZSBuZXN0ZWQg
+YXR0cmlidXRlcyBmb3IgKm9uZSogc3BlY2lmaWMgdHlwZS4gU3VjaCBjb2RlIGRvCiAgIG5sYV90
+eXBlIGNoZWNrLgoKRnJvbSB0aGUgQVBJIHNpZGUsIHRvIGNvbXBsZXRlbHkgcmVtb3ZlIG5sYV9m
+b3JfZWFjaF9uZXN0ZWQgYW5kIGF2b2lkIHRoZQptYW51YWwgIHBhcnNpbmcuIEkgdGhpbmsgd2Ug
+Y2FuIGNob29zZSB0d28gc29sdXRpb25zLgoKU29sdXRpb24tMTogYWRkIGEgcGFyc2luZyBoZWxw
+ZXIgdGhhdCByZWNlaXZlcyBhIGZ1bmN0aW9uIHBvaW50ZXIgYXMgYW4KICAgICAgICAgICAgYXJn
+dW1lbnQsIGl0IHdpbGwgY2FsbCB0aGlzIHBvaW50ZXIgYWZ0ZXIgY2FyZWZ1bGx5IHZlcmlmeSB0
+aGUKICAgICAgICAgICAgdHlwZSBhbmQgbGVuZ3RoIG9mIGFuIGF0dHJpYnV0ZS4KClNvbHV0aW9u
+LTI6IGFkZCBhIHBhcnNpbmcgaGVscGVyIHRoYXQgdHJhdmVyc2VzIHRoaXMgbmVzdGVkIHR3aWNl
+LCB0aGUgZmlyc3QKICAgICAgICAgICAgdGltZSAgdG8gZG8gY291bnRpbmcgc2l6ZSBmb3IgYWxs
+b2NhdGluZyBoZWFwIGJ1ZmZlciAob3Igc3RhY2sKICAgICAgICAgICAgYnVmZmVyIGZyb20gdGhl
+IGNhbGxlciBpZiB0aGUgbWF4IGNvdW50IGlzIGtub3duKS4gVGhlIHNlY29uZAogICAgICAgICAg
+ICB0aW1lIHRvIGZpbGwgdGhpcyBidWZmZXIgd2l0aCBhdHRyaWJ1dGUgcG9pbnRlcnMuCgpXaGlj
+aCBvbmUgaXMgcHJlZmVycmVkPyBQbGVhc2UgZW5saWdodGVuIG1lIGFib3V0IHRoaXMgYW5kIEkg
+Y2FuIHRyeSB0byBwcm9wb3NlCmEgZml4LiAoSSBwZXJzb25hbGx5IGxpa2UgdGhlIHNvbHV0aW9u
+LTIgYXMgaXQgd29ya3MgbGlrZSB0aGUgZXhpc3RpbmcgcGFyc2VycwpsaWtlIG5sYV9wYXJzZSkg
+Cgo+IAo+IE5hY2tlZC1ieTogSmFrdWIgS2ljaW5za2kgPGt1YmFAa2VybmVsLm9yZz4KClRoYW5r
+cwpMaW4=
 
