@@ -1,110 +1,186 @@
-Return-Path: <netdev+bounces-23110-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23111-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4086276ADD7
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 11:34:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C81DD76AE1C
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 11:36:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7085E1C20DD3
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 09:33:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 26ECD281314
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 09:36:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 631151FB44;
-	Tue,  1 Aug 2023 09:33:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8656D1FB4F;
+	Tue,  1 Aug 2023 09:36:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 544D51FB30
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 09:33:57 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60AFB4200;
-	Tue,  1 Aug 2023 02:33:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=SNYkC/g1c+YfS8ZTo9JQVhuDkdGL5+kyeQ/yUz57+AY=; b=cpjULsYII+lR9kpuqlTcGQ64zN
-	YSf+oKkf8S3cxbtVU6PG3VprE3zGNQKRdFk4YRWAlLpSUWcI89OGnauzXWhFks7zwwPc6AgNlmSAM
-	XSkvQCdoANl7AS3AScQk7zhRMqAUCtHM+WmJjXGc08EE+CSOX31TtFFEZBL4KJbm/B6E=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qQll5-002mfV-Ob; Tue, 01 Aug 2023 11:33:39 +0200
-Date: Tue, 1 Aug 2023 11:33:39 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Herve Codina <herve.codina@bootlin.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>, Lee Jones <lee@kernel.org>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Qiang Zhao <qiang.zhao@nxp.com>, Li Yang <leoyang.li@nxp.com>,
-	Liam Girdwood <lgirdwood@gmail.com>,
-	Mark Brown <broonie@kernel.org>, Jaroslav Kysela <perex@perex.cz>,
-	Takashi Iwai <tiwai@suse.com>,
-	Shengjiu Wang <shengjiu.wang@gmail.com>,
-	Xiubo Li <Xiubo.Lee@gmail.com>, Fabio Estevam <festevam@gmail.com>,
-	Nicolin Chen <nicoleotsuka@gmail.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Randy Dunlap <rdunlap@infradead.org>, netdev@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, alsa-devel@alsa-project.org,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH v2 08/28] soc: fsl: cpm1: qmc: Introduce available
- timeslots masks
-Message-ID: <dd34fa03-0b34-44a4-9e70-9d9a69f95403@lunn.ch>
-References: <20230726150225.483464-1-herve.codina@bootlin.com>
- <20230726150225.483464-9-herve.codina@bootlin.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74DBE1F959
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 09:36:02 +0000 (UTC)
+Received: from mail-wr1-x42d.google.com (mail-wr1-x42d.google.com [IPv6:2a00:1450:4864:20::42d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B96FF1BD9;
+	Tue,  1 Aug 2023 02:35:59 -0700 (PDT)
+Received: by mail-wr1-x42d.google.com with SMTP id ffacd0b85a97d-31297125334so3670523f8f.0;
+        Tue, 01 Aug 2023 02:35:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1690882558; x=1691487358;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=VvT5J/1PJpb72S8f2nh5awbFCHxyuUpdf923ik/K8j4=;
+        b=ExXgh7eFyYEhKQs65FHri/ViJcpb8MfKCX9kbY13ZsJxBfJuzrlXbGUOa6PJHRnfVL
+         5KktONa25XH2j439bmJpT0Q4yTjYmX4D0DiBC4baDGrA30FHudWESCVxKcX9ypBipHeM
+         SQep1J2NOOI4y6MR1DOFPz5PzuY+E3qQVzADtwAIobtemnENQgZGsUJnpi/joyh4WivY
+         LIlCKOUJEek89CNVl+TOnj477K/qps7R9Z8rmn8+cL4kkeZWcXXI6KXXgTaf/3PYTlrh
+         pg5N0MEigdMBUTHFqQA2OwiMPdbJ/RuZNlJ9em5VweXgkSGFnwmWM0zlA01zCeSuodhm
+         IVHw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690882558; x=1691487358;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VvT5J/1PJpb72S8f2nh5awbFCHxyuUpdf923ik/K8j4=;
+        b=F92qiyd2ELRgN0C9Eqo0eeM6vKTrICn4XmoijAWyEoQuQNNBrYt5M0qDe75la1KrpA
+         kGUaFyKXnMeBS1lV3K3tT3Jo44uDxScFIzOVipqL5bzkZjO4g1/Jvgm5r6PtBbvZGpBT
+         rQo26uMD3DB1P3sgfZmENXsA0sCCUhHhfib6+4UOGxwd41+gKfs/G113vJrsZNwH63ev
+         etI9JvaJJLGBA5Ud8DEMCN4EZUL95PeS8MEDpuwGTjbJai074sXn90UCiZUyHoD/YVFu
+         cac4BZXifnjB5VxJHQtp4MZoxQ9D/ueu/xrQMI43orgJP4SxxC2GKnAkCKD5+TJP75Q0
+         csHg==
+X-Gm-Message-State: ABy/qLav90cpuWyUPIT+1eJucyRIfRKYtX/gjbqvvqQHsVAJC6bWGhG8
+	ufcGc9httUC6C/E201vQshg=
+X-Google-Smtp-Source: APBJJlFenT4lJzl0wyFu60kMYJMIoCsq+b5HauhGzk/5vhq31BmGRtO2EgfwE19ne+ER5DzuG/6KpA==
+X-Received: by 2002:a5d:6b8c:0:b0:30a:c681:fd2e with SMTP id n12-20020a5d6b8c000000b0030ac681fd2emr1793379wrx.22.1690882557942;
+        Tue, 01 Aug 2023 02:35:57 -0700 (PDT)
+Received: from localhost (0x934e1fc8.cust.fastspeed.dk. [147.78.31.200])
+        by smtp.gmail.com with ESMTPSA id p16-20020a5d68d0000000b003140f47224csm15519172wrw.15.2023.08.01.02.35.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 01 Aug 2023 02:35:57 -0700 (PDT)
+Date: Tue, 1 Aug 2023 11:35:55 +0200
+From: Joel Granados <joel.granados@gmail.com>
+To: Luis Chamberlain <mcgrof@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Iurii Zaikin <yzaikin@google.com>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Kees Cook <keescook@chromium.org>,
+	"D. Wythe" <alibuda@linux.alibaba.com>, mptcp@lists.linux.dev,
+	Jakub Kicinski <kuba@kernel.org>, Vasily Gorbik <gor@linux.ibm.com>,
+	Paolo Abeni <pabeni@redhat.com>, coreteam@netfilter.org,
+	Jan Karcher <jaka@linux.ibm.com>,
+	Alexander Aring <alex.aring@gmail.com>,
+	Will Deacon <will@kernel.org>,
+	Stefan Schmidt <stefan@datenfreihafen.org>,
+	Matthieu Baerts <matthieu.baerts@tessares.net>,
+	bridge@lists.linux-foundation.org,
+	linux-arm-kernel@lists.infradead.org,
+	Joerg Reuter <jreuter@yaina.de>, Julian Anastasov <ja@ssi.bg>,
+	David Ahern <dsahern@kernel.org>, netfilter-devel@vger.kernel.org,
+	Wen Gu <guwen@linux.alibaba.com>, linux-kernel@vger.kernel.org,
+	Santosh Shilimkar <santosh.shilimkar@oracle.com>,
+	linux-wpan@vger.kernel.org, lvs-devel@vger.kernel.org,
+	Karsten Graul <kgraul@linux.ibm.com>,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-sctp@vger.kernel.org, Tony Lu <tonylu@linux.alibaba.com>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Ralf Baechle <ralf@linux-mips.org>, Florian Westphal <fw@strlen.de>,
+	willy@infradead.org, Heiko Carstens <hca@linux.ibm.com>,
+	"David S. Miller" <davem@davemloft.net>, linux-rdma@vger.kernel.org,
+	Roopa Prabhu <roopa@nvidia.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Simon Horman <horms@verge.net.au>,
+	Mat Martineau <martineau@kernel.org>, josh@joshtriplett.org,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Eric Dumazet <edumazet@google.com>, linux-hams@vger.kernel.org,
+	Wenjia Zhang <wenjia@linux.ibm.com>, linux-fsdevel@vger.kernel.org,
+	linux-s390@vger.kernel.org, Xin Long <lucien.xin@gmail.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>, netdev@vger.kernel.org,
+	rds-devel@oss.oracle.com
+Subject: Re: [PATCH v2 00/14] sysctl: Add a size argument to register
+ functions in sysctl
+Message-ID: <20230801093555.wwl27a7wjm2oinxx@localhost>
+References: <20230731071728.3493794-1-j.granados@samsung.com>
+ <CGME20230731213734eucas1p2728233a3b9ecd360bbd0cb77f8a44002@eucas1p2.samsung.com>
+ <ZMgpck0rjqHR74sl@bombadil.infradead.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="ltg4mtomzaz4i2ki"
 Content-Disposition: inline
-In-Reply-To: <20230726150225.483464-9-herve.codina@bootlin.com>
+In-Reply-To: <ZMgpck0rjqHR74sl@bombadil.infradead.org>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Jul 26, 2023 at 05:02:04PM +0200, Herve Codina wrote:
-> Available timeslots masks define timeslots available for the related
-> channel. These timeslots are defined by the QMC binding.
-> 
-> Timeslots used are initialized to available timeslots but can be a
-> subset of available timeslots.
-> This prepares the dynamic timeslots management (ie. changing timeslots
-> at runtime).
-> 
-> Signed-off-by: Herve Codina <herve.codina@bootlin.com>
-> ---
->  drivers/soc/fsl/qe/qmc.c | 8 ++++++--
->  1 file changed, 6 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/soc/fsl/qe/qmc.c b/drivers/soc/fsl/qe/qmc.c
-> index 2d2a9d88ba6c..21ad7e79e7bd 100644
-> --- a/drivers/soc/fsl/qe/qmc.c
-> +++ b/drivers/soc/fsl/qe/qmc.c
-> @@ -177,7 +177,9 @@ struct qmc_chan {
->  	struct qmc *qmc;
->  	void __iomem *s_param;
->  	enum qmc_mode mode;
-> +	u64	tx_ts_mask_avail;
->  	u64	tx_ts_mask;
-> +	u64	rx_ts_mask_avail;
->  	u64	rx_ts_mask;
 
-Is this for E1? So there is a maximum of 32 slots? A u32 would be
-sufficient i think?
+--ltg4mtomzaz4i2ki
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-	   Andrew
+On Mon, Jul 31, 2023 at 02:36:50PM -0700, Luis Chamberlain wrote:
+> > Joel Granados (14):
+> >   sysctl: Prefer ctl_table_header in proc_sysctl
+> >   sysctl: Use ctl_table_header in list_for_each_table_entry
+> >   sysctl: Add ctl_table_size to ctl_table_header
+> >   sysctl: Add size argument to init_header
+> >   sysctl: Add a size arg to __register_sysctl_table
+> >   sysctl: Add size to register_sysctl
+> >   sysctl: Add size arg to __register_sysctl_init
+>=20
+> This is looking great thanks, I've taken the first 7 patches above
+> to sysctl-next to get more exposure / testing and since we're already
+> on rc4.
+Thx for the feedback.
+
+>=20
+> Since the below patches involve more networking I'll wait to get
+> more feedback from networking folks before merging them.
+Just FYI, these are all networking except for the last one. That one is
+actually just in sysctl and will set everything up for removing the
+sentinels.
+
+>=20
+> >   sysctl: Add size to register_net_sysctl function
+> >   ax.25: Update to register_net_sysctl_sz
+> >   netfilter: Update to register_net_sysctl_sz
+> >   networking: Update to register_net_sysctl_sz
+> >   vrf: Update to register_net_sysctl_sz
+> >   sysctl: SIZE_MAX->ARRAY_SIZE in register_net_sysctl
+> >   sysctl: Use ctl_table_size as stopping criteria for list macro
+>=20
+>   Luis
+
+--=20
+
+Joel Granados
+
+--ltg4mtomzaz4i2ki
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQGyBAABCgAdFiEErkcJVyXmMSXOyyeQupfNUreWQU8FAmTI0fkACgkQupfNUreW
+QU/TKwv3ZwfCMFKh+tMOXHzAsW3p+jp8IR2frQvlCy8j4amsnTB8wJmsjkpeuJ3p
+s6IFeYrPE0pDidKOwzYiA4JDZdYDgF1hevrQAuqDsLkKBHzW0Cr6dt21CIQx9uZR
+RwhONU/JHoW6MKmO2PlcOiSQiRAhX/OvUhtCgQPTbff3fT6EAu9twn0vfWcyy+H0
+mn6LM2go/DW2cgdm4oa1U+DqwpJiGCabLbQNfPa8Vx8g7CK2y2Azd5/obW6ryOxe
+QDPdmQdVjytDnDHSW2AEYe2bDympPHaaoDU79e4FPVXC15+UAgF+/ExfDUVq6ek4
+FG5Gjh7ev+i6vPYAUR4AuPtB3hwH+vDsSE6Vcd37iKn/mjg1fi0DHx7Wz1Be/n1o
+8iSbL0N6an0fzzKlOdfwQs1bytw+ssWZtxLIQ3MUhHvwj882OXkYCBRW4Aycgop7
+/H+zOm0K2Yluph2h+5qmhjkzUlTx2MNwfSs34wsvBNsbb1MGZQouIAAQowb+mTzS
+31kDDA8=
+=shIJ
+-----END PGP SIGNATURE-----
+
+--ltg4mtomzaz4i2ki--
 
