@@ -1,42 +1,57 @@
-Return-Path: <netdev+bounces-23069-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23070-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0961376A971
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 08:45:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BB2176A97A
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 08:48:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D4F1D1C20D5C
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 06:45:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 488E3281763
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 06:48:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EE636119;
-	Tue,  1 Aug 2023 06:45:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 313FC611A;
+	Tue,  1 Aug 2023 06:48:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FE7946B6
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 06:45:44 +0000 (UTC)
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8EC698;
-	Mon, 31 Jul 2023 23:45:42 -0700 (PDT)
-Received: from canpemm500007.china.huawei.com (unknown [172.30.72.54])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RFQYn3Z8vzVjw6;
-	Tue,  1 Aug 2023 14:43:57 +0800 (CST)
-Received: from localhost (10.174.179.215) by canpemm500007.china.huawei.com
- (7.192.104.62) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Tue, 1 Aug
- 2023 14:45:40 +0800
-From: Yue Haibing <yuehaibing@huawei.com>
-To: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <yoshfuji@linux-ipv6.org>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<simon.horman@corigine.com>, Yue Haibing <yuehaibing@huawei.com>
-Subject: [PATCH v3] ip6mr: Fix skb_under_panic in ip6mr_cache_report()
-Date: Tue, 1 Aug 2023 14:43:18 +0800
-Message-ID: <20230801064318.34408-1-yuehaibing@huawei.com>
-X-Mailer: git-send-email 2.10.2.windows.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2146CEA3
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 06:48:41 +0000 (UTC)
+Received: from mail.helmholz.de (mail.helmholz.de [217.6.86.34])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8D5B98
+	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 23:48:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=helmholz.de
+	; s=dkim1; h=Content-Type:MIME-Version:Message-ID:Date:Subject:CC:To:From:
+	Sender:Reply-To:Content-Transfer-Encoding:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=DDfKZAST0kBdA4G1Zj06EBEeG3//RNdqqNF0W9wlm6w=; b=JVGwLVev2GMY3Uuq446yK44MGz
+	8hauO+kaAfK9fCwNUmRr5UeYwrtFT67wnf77tXgpfPp4iBcoJlo8797kbkwFUIULlUh5K1kRDmXbg
+	0KgOJ4x32ShUuMQcxv1zALE7nxOpUnoFJwvmQyJtTn28xdL8ZjBm3K9Klv5dZeydbMDj1Z0mx1jYB
+	XLIDBxqmTqLj2gGtSIlNvX7rvGsoGVWQXCO5m6Hora64e0nysbMNuvuXtBIAiWNZdDEvg7F8pB6ZC
+	Td7H5zOpROAg0M+OP3gN7CI5irpx78JBc5G2+sQFOL0IDSBzD0674ZPF2TMcOEf20J8LGN3CSeodp
+	SAnT6v0Q==;
+Received: from [192.168.1.4] (port=16778 helo=SH-EX2013.helmholz.local)
+	by mail.helmholz.de with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384
+	(Exim 4.96)
+	(envelope-from <Ante.Knezic@helmholz.de>)
+	id 1qQjBL-0008GM-1R;
+	Tue, 01 Aug 2023 08:48:35 +0200
+Received: from linuxdev.helmholz.local (192.168.6.7) by
+ SH-EX2013.helmholz.local (192.168.1.4) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.48; Tue, 1 Aug 2023 08:48:34 +0200
+From: Ante Knezic <ante.knezic@helmholz.de>
+To: <netdev@vger.kernel.org>
+CC: <andrew@lunn.ch>, <f.fainelli@gmail.com>, <olteanv@gmail.com>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <linux-kernel@vger.kernel.org>, <linux@armlinux.org.uk>,
+	Ante Knezic <ante.knezic@helmholz.de>
+Subject: [PATCH net-next v5] net: dsa: mv88e6xxx: Add erratum 3.14 for 88E6390X and 88E6190X
+Date: Tue, 1 Aug 2023 08:48:15 +0200
+Message-ID: <20230801064815.25694-1-ante.knezic@helmholz.de>
+X-Mailer: git-send-email 2.11.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -44,83 +59,120 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-X-Originating-IP: [10.174.179.215]
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- canpemm500007.china.huawei.com (7.192.104.62)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+X-Originating-IP: [192.168.6.7]
+X-ClientProxiedBy: SH-EX2013.helmholz.local (192.168.1.4) To
+ SH-EX2013.helmholz.local (192.168.1.4)
+X-EXCLAIMER-MD-CONFIG: 2ae5875c-d7e5-4d7e-baa3-654d37918933
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
- skbuff: skb_under_panic: text:ffffffff88771f69 len:56 put:-4
- head:ffff88805f86a800 data:ffff887f5f86a850 tail:0x88 end:0x2c0 dev:pim6reg
- ------------[ cut here ]------------
- kernel BUG at net/core/skbuff.c:192!
- invalid opcode: 0000 [#1] PREEMPT SMP KASAN
- CPU: 2 PID: 22968 Comm: kworker/2:11 Not tainted 6.5.0-rc3-00044-g0a8db05b571a #236
- Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
- Workqueue: ipv6_addrconf addrconf_dad_work
- RIP: 0010:skb_panic+0x152/0x1d0
- Call Trace:
-  <TASK>
-  skb_push+0xc4/0xe0
-  ip6mr_cache_report+0xd69/0x19b0
-  reg_vif_xmit+0x406/0x690
-  dev_hard_start_xmit+0x17e/0x6e0
-  __dev_queue_xmit+0x2d6a/0x3d20
-  vlan_dev_hard_start_xmit+0x3ab/0x5c0
-  dev_hard_start_xmit+0x17e/0x6e0
-  __dev_queue_xmit+0x2d6a/0x3d20
-  neigh_connected_output+0x3ed/0x570
-  ip6_finish_output2+0x5b5/0x1950
-  ip6_finish_output+0x693/0x11c0
-  ip6_output+0x24b/0x880
-  NF_HOOK.constprop.0+0xfd/0x530
-  ndisc_send_skb+0x9db/0x1400
-  ndisc_send_rs+0x12a/0x6c0
-  addrconf_dad_completed+0x3c9/0xea0
-  addrconf_dad_work+0x849/0x1420
-  process_one_work+0xa22/0x16e0
-  worker_thread+0x679/0x10c0
-  ret_from_fork+0x28/0x60
-  ret_from_fork_asm+0x11/0x20
+Fixes XAUI/RXAUI lane alignment errors.
+Issue causes dropped packets when trying to communicate over
+fiber via SERDES lanes of port 9 and 10.
+Errata document applies only to 88E6190X and 88E6390X devices.
+Requires poking in undocumented registers.
 
-When setup a vlan device on dev pim6reg, DAD ns packet may sent on reg_vif_xmit().
-reg_vif_xmit()
-    ip6mr_cache_report()
-        skb_push(skb, -skb_network_offset(pkt));//skb_network_offset(pkt) is 4
-And skb_push declared as:
-	void *skb_push(struct sk_buff *skb, unsigned int len);
-		skb->data -= len;
-		//0xffff88805f86a84c - 0xfffffffc = 0xffff887f5f86a850
-skb->data is set to 0xffff887f5f86a850, which is invalid mem addr, lead to skb_push() fails.
-
-Fixes: 14fb64e1f449 ("[IPV6] MROUTE: Support PIM-SM (SSM).")
-Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
+Signed-off-by: Ante Knezic <ante.knezic@helmholz.de>
 ---
-v3: drop unnecessary nhoff change
-v2: Use __skb_pull() and fix commit log.
+V5 : No patch changes, repost due to missing CC
+V4 : Rework as suggested by Vladimir Oltean <olteanv@gmail.com>
+     and Russell King <linux@armlinux.org.uk>
+ * print error in case of failure to apply erratum
+ * use mdiobus_c45_write instead of mdiodev_c45_write
+ * use bool variable instead of embedding a chip pointer inside
+   pcs struct.
+V3 : Rework to fit the new phylink_pcs infrastructure
+V2 : Rework as suggested by Andrew Lunn <andrew@lun.ch> 
+ * make int lanes[] const 
+ * reorder prod_nums
+ * update commit message to indicate we are dealing with
+   undocumented Marvell registers and magic values
 ---
- net/ipv6/ip6mr.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/dsa/mv88e6xxx/pcs-639x.c | 45 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 45 insertions(+)
 
-diff --git a/net/ipv6/ip6mr.c b/net/ipv6/ip6mr.c
-index cc3d5ad17257..67a3b8f6e72b 100644
---- a/net/ipv6/ip6mr.c
-+++ b/net/ipv6/ip6mr.c
-@@ -1073,7 +1073,7 @@ static int ip6mr_cache_report(const struct mr_table *mrt, struct sk_buff *pkt,
- 		   And all this only to mangle msg->im6_msgtype and
- 		   to set msg->im6_mbz to "mbz" :-)
- 		 */
--		skb_push(skb, -skb_network_offset(pkt));
-+		__skb_pull(skb, skb_network_offset(pkt));
+diff --git a/drivers/net/dsa/mv88e6xxx/pcs-639x.c b/drivers/net/dsa/mv88e6xxx/pcs-639x.c
+index 98dd49dac421..ba373656bfe1 100644
+--- a/drivers/net/dsa/mv88e6xxx/pcs-639x.c
++++ b/drivers/net/dsa/mv88e6xxx/pcs-639x.c
+@@ -20,6 +20,7 @@ struct mv88e639x_pcs {
+ 	struct mdio_device mdio;
+ 	struct phylink_pcs sgmii_pcs;
+ 	struct phylink_pcs xg_pcs;
++	bool erratum_3_14;
+ 	bool supports_5g;
+ 	phy_interface_t interface;
+ 	unsigned int irq;
+@@ -205,13 +206,53 @@ static void mv88e639x_sgmii_pcs_pre_config(struct phylink_pcs *pcs,
+ 	mv88e639x_sgmii_pcs_control_pwr(mpcs, false);
+ }
  
- 		skb_push(skb, sizeof(*msg));
- 		skb_reset_transport_header(skb);
++static int mv88e6390_erratum_3_14(struct mv88e639x_pcs *mpcs)
++{
++	const int lanes[] = { MV88E6390_PORT9_LANE0, MV88E6390_PORT9_LANE1,
++		MV88E6390_PORT9_LANE2, MV88E6390_PORT9_LANE3,
++		MV88E6390_PORT10_LANE0, MV88E6390_PORT10_LANE1,
++		MV88E6390_PORT10_LANE2, MV88E6390_PORT10_LANE3 };
++	int err, i;
++
++	/* 88e6190x and 88e6390x errata 3.14:
++	 * After chip reset, SERDES reconfiguration or SERDES core
++	 * Software Reset, the SERDES lanes may not be properly aligned
++	 * resulting in CRC errors
++	 */
++
++	for (i = 0; i < ARRAY_SIZE(lanes); i++) {
++		err = mdiobus_c45_write(mpcs->mdio.bus, lanes[i],
++					MDIO_MMD_PHYXS,
++					0xf054, 0x400C);
++		if (err)
++			return err;
++
++		err = mdiobus_c45_write(mpcs->mdio.bus, lanes[i],
++					MDIO_MMD_PHYXS,
++					0xf054, 0x4000);
++		if (err)
++			return err;
++	}
++
++	return 0;
++}
++
+ static int mv88e639x_sgmii_pcs_post_config(struct phylink_pcs *pcs,
+ 					   phy_interface_t interface)
+ {
+ 	struct mv88e639x_pcs *mpcs = sgmii_pcs_to_mv88e639x_pcs(pcs);
++	int err;
+ 
+ 	mv88e639x_sgmii_pcs_control_pwr(mpcs, true);
+ 
++	if (mpcs->erratum_3_14) {
++		err = mv88e6390_erratum_3_14(mpcs);
++		if (err)
++			dev_err(mpcs->mdio.dev.parent,
++				"failed to apply erratum 3.14: %pe\n",
++				ERR_PTR(err));
++	}
++
+ 	return 0;
+ }
+ 
+@@ -524,6 +565,10 @@ static int mv88e6390_pcs_init(struct mv88e6xxx_chip *chip, int port)
+ 	mpcs->xg_pcs.ops = &mv88e6390_xg_pcs_ops;
+ 	mpcs->xg_pcs.neg_mode = true;
+ 
++	if (chip->info->prod_num == MV88E6XXX_PORT_SWITCH_ID_PROD_6190X ||
++	    chip->info->prod_num == MV88E6XXX_PORT_SWITCH_ID_PROD_6390X)
++		mpcs->erratum_3_14 = true;
++
+ 	err = mv88e639x_pcs_setup_irq(mpcs, chip, port);
+ 	if (err)
+ 		goto err_free;
 -- 
-2.34.1
+2.11.0
 
 
