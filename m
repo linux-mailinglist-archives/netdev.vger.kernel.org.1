@@ -1,88 +1,105 @@
-Return-Path: <netdev+bounces-23112-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23113-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECC0376AE47
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 11:37:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id F2C2376AE51
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 11:37:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 243981C20E1E
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 09:37:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 078A81C20E8F
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 09:37:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14C9B1FB4F;
-	Tue,  1 Aug 2023 09:37:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5C1F1F959;
+	Tue,  1 Aug 2023 09:37:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AD691F957
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 09:37:33 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B41384EE2;
-	Tue,  1 Aug 2023 02:37:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=FGgh4e/u0nE95gMrdCe+dqw90Rj4sKRfSKUYApsCC/Y=; b=RdyQXUNwnFn8Rqzex+Jjoy+yyd
-	QHP3O3jjTohOAQHBMujUjzyHmhPT8xwZ6KpDPRp6rZxJZLowUSZNFwpr4tweDnVkelcYwzQzbcQlj
-	oMdvQO3eW59xf8qUK3fEVnK/sB5kInWZgLAuB6zNNnKF9XS8A66IbhU4GxuCyMaNztCQ=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qQlo3-002mgr-Li; Tue, 01 Aug 2023 11:36:43 +0200
-Date: Tue, 1 Aug 2023 11:36:43 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Herve Codina <herve.codina@bootlin.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>, Lee Jones <lee@kernel.org>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Qiang Zhao <qiang.zhao@nxp.com>, Li Yang <leoyang.li@nxp.com>,
-	Liam Girdwood <lgirdwood@gmail.com>,
-	Mark Brown <broonie@kernel.org>, Jaroslav Kysela <perex@perex.cz>,
-	Takashi Iwai <tiwai@suse.com>,
-	Shengjiu Wang <shengjiu.wang@gmail.com>,
-	Xiubo Li <Xiubo.Lee@gmail.com>, Fabio Estevam <festevam@gmail.com>,
-	Nicolin Chen <nicoleotsuka@gmail.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Randy Dunlap <rdunlap@infradead.org>, netdev@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, alsa-devel@alsa-project.org,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH v2 10/28] soc: fsl: cpm1: qmc: Introduce
- qmc_chan_setup_tsa*
-Message-ID: <252d6a49-4a97-4ecc-844e-f23bda55debf@lunn.ch>
-References: <20230726150225.483464-1-herve.codina@bootlin.com>
- <20230726150225.483464-11-herve.codina@bootlin.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7A27200A6
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 09:37:49 +0000 (UTC)
+Received: from mail-wm1-x32b.google.com (mail-wm1-x32b.google.com [IPv6:2a00:1450:4864:20::32b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4AC4A1BC1
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 02:37:41 -0700 (PDT)
+Received: by mail-wm1-x32b.google.com with SMTP id 5b1f17b1804b1-3fe1e44fd2bso65225e9.0
+        for <netdev@vger.kernel.org>; Tue, 01 Aug 2023 02:37:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1690882659; x=1691487459;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3M62lzMT5M72GxSXvEGzGefCfJz1y5FFBC42WxQiRug=;
+        b=Vb8cFPoJb2P0ZwPLqiNLSgQaAng02a45/GY4JR1Pxif45PUI+o75l36LyoVfmsACr7
+         Ka2pa1g2ANFFVJ1g1nbyNcVuo1VXmwhCrC5n9y7/PpD10hn/VwNgY4/Bta3E+ioc8sUD
+         rb/O6ElNeClwTaU6dhtthc29U+Y+xlZbokIoeoOhNiQ16FJ/QgUuIqGmqAJEvxXfD8Go
+         lW9x26DElmw/Yu1UJWK3yjYPczwlvFH0LxvpvlnYkBRtRy0/pe4Y41uDlnhU67dyPI7C
+         HVZFDlduORA2AAJevm8Vb+nhwFP0kMfG8X+BfVjJzFDGJa4a3oeYvHZjOhwX385/Hasx
+         Jggw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690882659; x=1691487459;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=3M62lzMT5M72GxSXvEGzGefCfJz1y5FFBC42WxQiRug=;
+        b=gXM89PbO3KzEuLvjCeoMCHs1xmVQa9Wy4X827u7pym6l+L937G0+Wm0pltH4WSiyyz
+         Ej5rssK50prxjMtRN+A+Q9RjW85xYC3TFhU2hwUnSDQPEEJpfVWsr8I5H2tH/hcjvFwb
+         t7BQv5HRY7YqDu//EA9mJE7733MxEFWIQjwLFs7w6ycNhTM3xYqg4lNqyi8Jfl7pib7J
+         tLg+opi/ad/Xa40nYcOihyK02AY3UiWM1jjwWQImLWtjj0Zv3yqp941MmRAm6HDtF6ZQ
+         NpARHQrgO4fZuZ/dVD6a2GdlDcP2cebBwBicxw4L7uhUhQkdVzdWAX/ekWdd9q28ND4t
+         xfQw==
+X-Gm-Message-State: ABy/qLakrb4Sat1zyeuLsPucHOxgQSqNlIeicamfwPtGU0i2BEtmpqLx
+	DS1hkkMZMgLcLQxG+ZXwMgVpA7pQsVka9VB6ujYG3g==
+X-Google-Smtp-Source: APBJJlH4ZnN9CuymbZd5SjWQ7VukNUlycKzANvGo/BKrgrjAwCHW6tOHt810QbdF94ncNyVp96NaRDmZnIwYqTfw9Ng=
+X-Received: by 2002:a05:600c:1c90:b0:3f1:6fe9:4a95 with SMTP id
+ k16-20020a05600c1c9000b003f16fe94a95mr239758wms.4.1690882659519; Tue, 01 Aug
+ 2023 02:37:39 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230726150225.483464-11-herve.codina@bootlin.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+References: <20230731230736.109216-1-trdgn@amazon.com>
+In-Reply-To: <20230731230736.109216-1-trdgn@amazon.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 1 Aug 2023 11:37:27 +0200
+Message-ID: <CANn89iLV0iEeQy19wn+Vfmhpgr6srVpf3L+oBvuDyLRQXfoMug@mail.gmail.com>
+Subject: Re: [PATCH v2] tun: avoid high-order page allocation for packet header
+To: Tahsin Erdogan <trdgn@amazon.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Herbert Xu <herbert@gondor.apana.org.au>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-> +static inline void qmc_clrsetbits16(void __iomem *addr, u16 clr, u16 set)
-> +{
-> +	qmc_write16(addr, (qmc_read16(addr) & ~clr) | set);
-> +}
-> +
+On Tue, Aug 1, 2023 at 1:07=E2=80=AFAM Tahsin Erdogan <trdgn@amazon.com> wr=
+ote:
+>
+> When GSO is not enabled and a packet is transmitted via writev(), all
+> payload is treated as header which requires a contiguous memory allocatio=
+n.
+> This allocation request is harder to satisfy, and may even fail if there =
+is
+> enough fragmentation.
+>
+> Note that sendmsg() code path limits the linear copy length, so this chan=
+ge
+> makes writev() and sendmsg() more consistent.
+>
+> Signed-off-by: Tahsin Erdogan <trdgn@amazon.com>
+> ---
 
-Please don't use inline in .c files. Let the compiler decide.
+I will have to tweak one existing packetdrill test, nothing major.
 
-       Andrew
+Tested-by: Eric Dumazet <edumazet@google.com>
+Reviewed-by: Eric Dumazet <edumazet@google.com>
+
+Thanks.
 
