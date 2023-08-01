@@ -1,235 +1,277 @@
-Return-Path: <netdev+bounces-23122-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23128-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED41776B03B
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 12:03:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 221A376B08F
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 12:11:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B449B1C20D1A
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 10:03:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EF69B1C20DE7
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 10:11:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 480BB200D5;
-	Tue,  1 Aug 2023 10:03:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 916D220F81;
+	Tue,  1 Aug 2023 10:11:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B256200B5
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 10:03:20 +0000 (UTC)
-Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 602F7EE;
-	Tue,  1 Aug 2023 03:03:19 -0700 (PDT)
-Received: by mail-wm1-x32c.google.com with SMTP id 5b1f17b1804b1-3fe167d4a18so31975935e9.0;
-        Tue, 01 Aug 2023 03:03:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690884198; x=1691488998;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=6xzFd6kXeaygrI5Ej8/AL8nxngfv7zWbrLM3nGa6LwE=;
-        b=eXsvFh6BK+B4iuEJYMTnBcTL7rHnOTSND3P9MAnpkjJqEpLCdcVuq/3LHC8WhWxlOi
-         AYVHc0UleUBBoRaduveJnpBbMfklz/v7bfVQyhDeoiCpwWcDLTvnVdKzWsATvnXRFrIQ
-         4sxETc63wfFaT1bcwPenmbK5Cd68zjDF7/mwm/QlGSxaYKSqfPBfKA0mGUHtfQgxDKuN
-         bfckck3WXSVwZdpmMoaLqOAU0MAofGr+AO2UcfWw2DAsMdq42RxNJsTnAee8Lvikj6hM
-         UobnKUJtXdI2bFxeUV6lKnu0txtKROjJB89U3UM49XZz3hMCMQfPajpd2YztNuqg5bYr
-         w4qQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690884198; x=1691488998;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6xzFd6kXeaygrI5Ej8/AL8nxngfv7zWbrLM3nGa6LwE=;
-        b=FmxKcGxm0PfjF2A3o4YIU4YHqPa2Bb3ZtIwM4LFrKGxKPgIHiGQ0U9QFu0apKbbk7L
-         SIzblwYWgbHhCKloBctr2ZAVJrtelCQNpySQ3TpvXQYl7NRvp8xpinHgD7XtS4DyaIm3
-         ldCYRbGxCfUgQTyXBc9PjwXicwCu4JaQWsUYS3SxC5l6V07X/Q1b1DlTA5WrfF8pKokD
-         DzZpmRZH7Dvrx3Q7GkH0qRn89Xg6ETNC0X1hAo729a+OKdDDytLvfydGvJQQsYZA7BYj
-         UHq+GYSNvtUhMqy1CUuEsSSOdARtoq/JwaUAJ/9/cmXKPRoyBV23SjcpHSPxXNdLoKDx
-         n+cA==
-X-Gm-Message-State: ABy/qLZDBAo9OUQtBN6f2vaJVmGLsCQGz6NhSPLr2IRgTferO15u1Twh
-	g+EjizDozUAixlbWO2BBZ8I=
-X-Google-Smtp-Source: APBJJlHPT6WT6baqr5uMvSTuUS8XBMuz9v2AzEIRtzwB1vPwVdTIJR+TY0kuPM2KiW9G9XEqBLrTBg==
-X-Received: by 2002:a05:600c:214d:b0:3fe:20b6:41b2 with SMTP id v13-20020a05600c214d00b003fe20b641b2mr2182378wml.4.1690884197477;
-        Tue, 01 Aug 2023 03:03:17 -0700 (PDT)
-Received: from localhost (0x934e1fc8.cust.fastspeed.dk. [147.78.31.200])
-        by smtp.gmail.com with ESMTPSA id n1-20020a05600c4f8100b003fe15ac0934sm2670378wmq.1.2023.08.01.03.03.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Aug 2023 03:03:16 -0700 (PDT)
-Date: Tue, 1 Aug 2023 12:03:15 +0200
-From: Joel Granados <joel.granados@gmail.com>
-To: Simon Horman <horms@kernel.org>
-Cc: mcgrof@kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
-	Iurii Zaikin <yzaikin@google.com>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Kees Cook <keescook@chromium.org>,
-	"D. Wythe" <alibuda@linux.alibaba.com>, mptcp@lists.linux.dev,
-	Jakub Kicinski <kuba@kernel.org>, Vasily Gorbik <gor@linux.ibm.com>,
-	Paolo Abeni <pabeni@redhat.com>, coreteam@netfilter.org,
-	Jan Karcher <jaka@linux.ibm.com>,
-	Alexander Aring <alex.aring@gmail.com>,
-	Will Deacon <will@kernel.org>,
-	Stefan Schmidt <stefan@datenfreihafen.org>,
-	Matthieu Baerts <matthieu.baerts@tessares.net>,
-	bridge@lists.linux-foundation.org,
-	linux-arm-kernel@lists.infradead.org,
-	Joerg Reuter <jreuter@yaina.de>, Julian Anastasov <ja@ssi.bg>,
-	David Ahern <dsahern@kernel.org>, netfilter-devel@vger.kernel.org,
-	Wen Gu <guwen@linux.alibaba.com>, linux-kernel@vger.kernel.org,
-	Santosh Shilimkar <santosh.shilimkar@oracle.com>,
-	linux-wpan@vger.kernel.org, lvs-devel@vger.kernel.org,
-	Karsten Graul <kgraul@linux.ibm.com>,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-sctp@vger.kernel.org, Tony Lu <tonylu@linux.alibaba.com>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Ralf Baechle <ralf@linux-mips.org>, Florian Westphal <fw@strlen.de>,
-	willy@infradead.org, Heiko Carstens <hca@linux.ibm.com>,
-	"David S. Miller" <davem@davemloft.net>, linux-rdma@vger.kernel.org,
-	Roopa Prabhu <roopa@nvidia.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Simon Horman <horms@verge.net.au>,
-	Mat Martineau <martineau@kernel.org>, josh@joshtriplett.org,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Eric Dumazet <edumazet@google.com>, linux-hams@vger.kernel.org,
-	Wenjia Zhang <wenjia@linux.ibm.com>, linux-fsdevel@vger.kernel.org,
-	linux-s390@vger.kernel.org, Xin Long <lucien.xin@gmail.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>, netdev@vger.kernel.org,
-	rds-devel@oss.oracle.com
-Subject: Re: [PATCH v2 03/14] sysctl: Add ctl_table_size to ctl_table_header
-Message-ID: <20230801100315.ymcahsxu6qpw7kct@localhost>
-References: <20230731071728.3493794-1-j.granados@samsung.com>
- <20230731071728.3493794-4-j.granados@samsung.com>
- <ZMf9vZpGE98oM9W2@kernel.org>
- <CGME20230731190724eucas1p14cc08261cd20815797958bbebc0fafe7@eucas1p1.samsung.com>
- <ZMgGWm4sT+VqDZ3u@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 834D11DDFF
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 10:11:43 +0000 (UTC)
+Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86DA82136;
+	Tue,  1 Aug 2023 03:11:13 -0700 (PDT)
+Received: from lelv0265.itg.ti.com ([10.180.67.224])
+	by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 3719EZ4l108366;
+	Tue, 1 Aug 2023 04:14:35 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1690881275;
+	bh=zk0e9gVTV7UkuWlLNu0FV2sP27WiRrRdrMIHFAtC+zc=;
+	h=From:To:CC:Subject:Date;
+	b=cZ64hBD4rq4tX4nbnxBo6R0euMuwhubA/HiXydrt57cwmlWeXpLe+NkT+yfeGu6ba
+	 6ZI8pZ4I57PmPsBjLsZmnNagFaB/uSwewrBoCMNeEkKk2Xy2Jfc5yT8+FsjgAZPCZZ
+	 g6Rfl1LPct9VCTuFB6mHKMZgXkeHY/PwqCKavN4I=
+Received: from DLEE109.ent.ti.com (dlee109.ent.ti.com [157.170.170.41])
+	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 3719EZ0M028461
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Tue, 1 Aug 2023 04:14:35 -0500
+Received: from DLEE109.ent.ti.com (157.170.170.41) by DLEE109.ent.ti.com
+ (157.170.170.41) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Tue, 1
+ Aug 2023 04:14:35 -0500
+Received: from fllv0039.itg.ti.com (10.64.41.19) by DLEE109.ent.ti.com
+ (157.170.170.41) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Tue, 1 Aug 2023 04:14:35 -0500
+Received: from fllv0122.itg.ti.com (fllv0122.itg.ti.com [10.247.120.72])
+	by fllv0039.itg.ti.com (8.15.2/8.15.2) with ESMTP id 3719EZ9Q045195;
+	Tue, 1 Aug 2023 04:14:35 -0500
+Received: from localhost (uda0501179.dhcp.ti.com [172.24.227.217])
+	by fllv0122.itg.ti.com (8.14.7/8.14.7) with ESMTP id 3719EYdf015813;
+	Tue, 1 Aug 2023 04:14:34 -0500
+From: MD Danish Anwar <danishanwar@ti.com>
+To: Randy Dunlap <rdunlap@infradead.org>, Roger Quadros <rogerq@kernel.org>,
+        Simon Horman <simon.horman@corigine.com>,
+        Vignesh Raghavendra
+	<vigneshr@ti.com>, Andrew Lunn <andrew@lunn.ch>,
+        Richard Cochran
+	<richardcochran@gmail.com>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Krzysztof
+ Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Rob Herring
+	<robh+dt@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+        Jakub Kicinski
+	<kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        MD Danish Anwar <danishanwar@ti.com>
+CC: <nm@ti.com>, <srk@ti.com>, <linux-kernel@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-omap@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>
+Subject: [PATCH v13 00/10] Introduce ICSSG based ethernet Driver
+Date: Tue, 1 Aug 2023 14:44:18 +0530
+Message-ID: <20230801091428.1359979-1-danishanwar@ti.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="d62tnfuywe5q6aej"
-Content-Disposition: inline
-In-Reply-To: <ZMgGWm4sT+VqDZ3u@kernel.org>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+The Programmable Real-time Unit and Industrial Communication Subsystem
+Gigabit (PRU_ICSSG) is a low-latency microcontroller subsystem in the TI
+SoCs. This subsystem is provided for the use cases like the implementation
+of custom peripheral interfaces, offloading of tasks from the other
+processor cores of the SoC, etc.
 
---d62tnfuywe5q6aej
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+The subsystem includes many accelerators for data processing like
+multiplier and multiplier-accumulator. It also has peripherals like
+UART, MII/RGMII, MDIO, etc. Every ICSSG core includes two 32-bit
+load/store RISC CPU cores called PRUs.
 
-On Mon, Jul 31, 2023 at 09:07:06PM +0200, Simon Horman wrote:
-> On Mon, Jul 31, 2023 at 08:30:34PM +0200, Simon Horman wrote:
-> > On Mon, Jul 31, 2023 at 09:17:17AM +0200, Joel Granados wrote:
-> > > The new ctl_table_size element will hold the size of the ctl_table
-> > > arrays contained in the ctl_table_header. This value should eventually
-> > > be passed by the callers to the sysctl register infrastructure. And
-> > > while this commit introduces the variable, it does not set nor use it
-> > > because that requires case by case considerations for each caller.
-> > >=20
-> > > It provides two important things: (1) A place to put the
-> > > result of the ctl_table array calculation when it gets introduced for
-> > > each caller. And (2) the size that will be used as the additional
-> > > stopping criteria in the list_for_each_table_entry macro (to be added
-> > > when all the callers are migrated)
-> > >=20
-> > > Signed-off-by: Joel Granados <j.granados@samsung.com>
-> > > ---
-> > >  include/linux/sysctl.h | 14 ++++++++++++--
-> > >  1 file changed, 12 insertions(+), 2 deletions(-)
-> > >=20
-> > > diff --git a/include/linux/sysctl.h b/include/linux/sysctl.h
-> > > index 59d451f455bf..33252ad58ebe 100644
-> > > --- a/include/linux/sysctl.h
-> > > +++ b/include/linux/sysctl.h
-> > > @@ -159,12 +159,22 @@ struct ctl_node {
-> > >  	struct ctl_table_header *header;
-> > >  };
-> > > =20
-> > > -/* struct ctl_table_header is used to maintain dynamic lists of
-> > > -   struct ctl_table trees. */
-> > > +/**
-> > > + * struct ctl_table_header - maintains dynamic lists of struct ctl_t=
-able trees
-> > > + * @ctl_table: pointer to the first element in ctl_table array
-> > > + * @ctl_table_size: number of elements pointed by @ctl_table
-> > > + * @used: The entry will never be touched when equal to 0.
-> > > + * @count: Upped every time something is added to @inodes and downed=
- every time
-> > > + *         something is removed from inodes
-> > > + * @nreg: When nreg drops to 0 the ctl_table_header will be unregist=
-ered.
-> > > + * @rcu: Delays the freeing of the inode. Introduced with "unfuck pr=
-oc_sysctl ->d_compare()"
-> > > + *
-> > > + */
-> >=20
-> > Hi Joel,
-> >=20
-> > Please consider also adding kernel doc entries for the other fields of
-> > struct ctl_table_header. According to ./scripts/kernel-doc -none
-> > they are:
-> >=20
-> >   unregistering
-> >   ctl_table_arg
-> >   root
-> >   set
-> >   parent
-> >   node
-> >   inodes
->=20
-> Sorry, I now realise that I made the same comment on v1.
-> And I didn't see your response to that until after I wrote the above.
-np. I'll hold off adding this to the set until I get feedback from my
-proposal. I do this as I'm unsure about the contents of the docs.
+The above features allow it to be used for implementing custom firmware
+based peripherals like ethernet.
 
+This series adds the YAML documentation and the driver with basic EMAC
+support for TI AM654 Silicon Rev 2 SoC with the PRU_ICSSG Sub-system.
+running dual-EMAC firmware.
+This currently supports basic EMAC with 1Gbps and 100Mbps link. 10M and
+half-duplex modes are not yet supported because they require the support
+of an IEP, which will be added later.
+Advanced features like switch-dev and timestamping will be added later. 
 
->=20
-> >=20
-> >=20
-> > >  struct ctl_table_header {
-> > >  	union {
-> > >  		struct {
-> > >  			struct ctl_table *ctl_table;
-> > > +			int ctl_table_size;
-> > >  			int used;
-> > >  			int count;
-> > >  			int nreg;
-> > > --=20
-> > > 2.30.2
-> > >=20
+This is the v13 of the patch series [v1]. This version of the patchset 
+addresses comments made on v12.
 
---=20
+There series doesn't have any dependency.
 
-Joel Granados
+Changes from v12 to v13 :
+*) Rebased the series on latest net-next.
+*) Addressed Jakub's comments on ndo_xmit API. Now we will only stop queues
+   based on occupancy not on dma errors.
+*) Removed limiting the number of serviced packets to budget for Tx NAPI.
+   Now Tx NAPI will keep servicing packets.
+*) Removed netif_running() check when packet arrives.
+*) Introduced prototypes of APIs in the same patch where these APIs are added.
+   Dropped __maybe_unused tags as compiler only cares about prototypes
+   existing, not whether actual callers are in place. Now prototypes of these
+   APIs are present in the same patch where they are introduced but thes APIs
+   are called later (in patch 6).
 
---d62tnfuywe5q6aej
-Content-Type: application/pgp-signature; name="signature.asc"
+Changes from v11 to v12 :
+*) Rebased the series on latest net-next.
+*) Addressed Jakub's comments on ndo_xmit API.
+*) Added hooks to .get_rmon_stats for the driver. Now tx / rx bucket size 
+   and frame counts per bucket will be fetched by ethtool_rmon_stats instead
+   of ethtool -S.
+*) Added __maybe_unused tags to unused config and classifier APIs in patch
+   2,3 and 4. These tags are later removed in patch 6. 
 
------BEGIN PGP SIGNATURE-----
+Changes from v10 to v11 :
+*) Rebased the series on latest net-next.
+*) Split the ICSSG driver introduction patch into 9 different patches as
+   asked by Jakub.
+*) Introduced new patch(patch 8/10) to dump Standard network interface
+   staticstics via ndo_get_stats64. Now certain stats that are reported by
+   ICSSG hardware and are also part of struct rtnl_link_stats64, will be 
+   reported by ndo_get_stats64. While other stats that are not part of the
+   struct rtnl_link_stats64 will be reported by ethtool -S. These stats 
+   are not duplicated.
 
-iQGzBAABCgAdFiEErkcJVyXmMSXOyyeQupfNUreWQU8FAmTI2GIACgkQupfNUreW
-QU/jnAv/XiexP2W1Y950obHBDBGWwb2QRwk7qg172MXMjFQl6+imM/lk9f2BbUyv
-yHqtlJQeHzRDFmaanGI2f0Cd5i7XkupsNoINecjz4w7t3g4pgPxjYO+KRGJoQxRx
-zfGIkM/UKYfW53TJRg0P0b9t7XnQ+yew+ZAEULLKb23ElXZ+hFXMtH8K938NEqxz
-ETsCG4rlGIO3QMm0epmk4EaMr34faYtf8fzaY6T3PshcTq+vklW7M/gHjcMkICK5
-GZM7Ijb2sU5Xd4d8hkoSpPh8TErgjuNVU2LpzlzjyC25WFM0xpPnKRDB5ENGa4m4
-ZWu67LrebJoLjoE0vJUMMfZu9PCmvQp4Wijuc/ImQA4BA8hNwsarFhYlFMPp3Ixn
-AC51TcUplS956Laxzjd51ql75jba5ul88ZGiqnkNL+IXKOjceJSKM68lVQELv1Lq
-m9Il+S1C7xVBNvDQo9yE5jA7mdju9NyxvL2UXr4sZU7Gmp8qiY5Zw4H6T6dSQy8H
-ELxemNee
-=dUoN
------END PGP SIGNATURE-----
+Changes from v9 to v10 :
+*) Rebased the series on latest net-next.
+*) Moved 'ndev prueth->emac[mac] == emac' assignment to the end of function
+   prueth_netdev_init().
+*) In unsupported phy_mode switch case instead of returning -EINVAL, store
+   the error code in ret and 'goto free'
 
---d62tnfuywe5q6aej--
+Changes from v8 to v9 :
+*) Rebased the series on latest net-next.
+*) Fixed smatch and sparse warnings as pointed by Simon.
+*) Fixed leaky ndev in prueth_netdev_init() as asked by Simon.
+
+Changes from v7 to v8 :
+*) Rebased the series on 6.5-rc1.
+*) Fixed few formattings. 
+
+Changes from v6 to v7 :
+*) Added RB tag of Rob in patch 1 of this series.
+*) Addressed Simon's comment on patch 2 of the series.
+*) Rebased patchset on next-20230428 linux-next.
+
+Changes from v5 to v6 :
+*) Added RB tag of Andrew Lunn in patch 2 of this series.
+*) Addressed Rob's comment on patch 1 of the series.
+*) Rebased patchset on next-20230421 linux-next.
+
+Changes from v4 to v5 :
+*) Re-arranged properties section in ti,icssg-prueth.yaml file.
+*) Added requirement for minimum one ethernet port.
+*) Fixed some minor formatting errors as asked by Krzysztof.
+*) Dropped SGMII mode from enum mii_mode as SGMII mode is not currently
+   supported by the driver.
+*) Added switch-case block to handle different phy modes by ICSSG driver.
+
+Changes from v3 to v4 :
+*) Addressed Krzysztof's comments and fixed dt_binding_check errors in 
+   patch 1/2.
+*) Added interrupt-extended property in ethernet-ports properties section.
+*) Fixed comments in file icssg_switch_map.h according to the Linux coding
+   style in patch 2/2. Added Documentation of structures in patch 2/2.
+
+Changes from v2 to v3 :
+*) Addressed Rob and Krzysztof's comments on patch 1 of this series.
+   Fixed indentation. Removed description and pinctrl section from 
+   ti,icssg-prueth.yaml file.
+*) Addressed Krzysztof, Paolo, Randy, Andrew and Christophe's comments on 
+   patch 2 of this seires.
+*) Fixed blanklines in Kconfig and Makefile. Changed structures to const 
+   as suggested by Krzysztof.
+*) Fixed while loop logic in emac_tx_complete_packets() API as suggested 
+   by Paolo. Previously in the loop's last iteration 'budget' was 0 and 
+   napi_consume_skb would wrongly assume the caller is not in NAPI context
+   Now, budget won't be zero in last iteration of loop. 
+*) Removed inline functions addr_to_da1() and addr_to_da0() as asked by 
+   Andrew.
+*) Added dev_err_probe() instead of dev_err() as suggested by Christophe.
+*) In ti,icssg-prueth.yaml file, in the patternProperties section of 
+   ethernet-ports, kept the port name as "port" instead of "ethernet-port" 
+   as all other drivers were using "port". Will change it if is compulsory 
+   to use "ethernet-port".
+
+[v1] https://lore.kernel.org/all/20220506052433.28087-1-p-mohan@ti.com/
+[v2] https://lore.kernel.org/all/20220531095108.21757-1-p-mohan@ti.com/
+[v3] https://lore.kernel.org/all/20221223110930.1337536-1-danishanwar@ti.com/
+[v4] https://lore.kernel.org/all/20230206060708.3574472-1-danishanwar@ti.com/
+[v5] https://lore.kernel.org/all/20230210114957.2667963-1-danishanwar@ti.com/
+[v6] https://lore.kernel.org/all/20230424053233.2338782-1-danishanwar@ti.com/
+[v7] https://lore.kernel.org/all/20230502061650.2716736-1-danishanwar@ti.com/
+[v8] https://lore.kernel.org/all/20230710053550.89160-1-danishanwar@ti.com/
+[v9] https://lore.kernel.org/all/20230714094432.1834489-1-danishanwar@ti.com/
+[v10] https://lore.kernel.org/all/20230719082755.3399424-1-danishanwar@ti.com/
+[v11] https://lore.kernel.org/netdev/20230724112934.2637802-1-danishanwar@ti.com/
+[v12] https://lore.kernel.org/all/20230727112827.3977534-1-danishanwar@ti.com/
+
+Thanks and Regards,
+Md Danish Anwar
+
+MD Danish Anwar (9):
+  net: ti: icssg-prueth: Add Firmware Interface for ICSSG Ethernet
+    driver.
+  net: ti: icssg-prueth: Add mii helper apis and macros
+  net: ti: icssg-prueth: Add Firmware config and classification APIs.
+  net: ti: icssg-prueth: Add icssg queues APIs and macros
+  dt-bindings: net: Add ICSSG Ethernet
+  net: ti: icssg-prueth: Add ICSSG Stats
+  net: ti: icssg-prueth: Add Standard network staticstics
+  net: ti: icssg-prueth: Add ethtool ops for ICSSG Ethernet driver
+  net: ti: icssg-prueth: Add Power management support
+
+Roger Quadros (1):
+  net: ti: icssg-prueth: Add ICSSG ethernet driver
+
+ .../bindings/net/ti,icssg-prueth.yaml         |  184 ++
+ drivers/net/ethernet/ti/Kconfig               |   13 +
+ drivers/net/ethernet/ti/Makefile              |   10 +
+ .../net/ethernet/ti/icssg/icssg_classifier.c  |  367 ++++
+ drivers/net/ethernet/ti/icssg/icssg_config.c  |  450 ++++
+ drivers/net/ethernet/ti/icssg/icssg_config.h  |  200 ++
+ drivers/net/ethernet/ti/icssg/icssg_ethtool.c |  188 ++
+ drivers/net/ethernet/ti/icssg/icssg_mii_cfg.c |  120 ++
+ drivers/net/ethernet/ti/icssg/icssg_mii_rt.h  |  151 ++
+ drivers/net/ethernet/ti/icssg/icssg_prueth.c  | 1897 +++++++++++++++++
+ drivers/net/ethernet/ti/icssg/icssg_prueth.h  |  262 +++
+ drivers/net/ethernet/ti/icssg/icssg_queues.c  |   50 +
+ drivers/net/ethernet/ti/icssg/icssg_stats.c   |   57 +
+ drivers/net/ethernet/ti/icssg/icssg_stats.h   |  158 ++
+ .../net/ethernet/ti/icssg/icssg_switch_map.h  |  234 ++
+ 15 files changed, 4341 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/net/ti,icssg-prueth.yaml
+ create mode 100644 drivers/net/ethernet/ti/icssg/icssg_classifier.c
+ create mode 100644 drivers/net/ethernet/ti/icssg/icssg_config.c
+ create mode 100644 drivers/net/ethernet/ti/icssg/icssg_config.h
+ create mode 100644 drivers/net/ethernet/ti/icssg/icssg_ethtool.c
+ create mode 100644 drivers/net/ethernet/ti/icssg/icssg_mii_cfg.c
+ create mode 100644 drivers/net/ethernet/ti/icssg/icssg_mii_rt.h
+ create mode 100644 drivers/net/ethernet/ti/icssg/icssg_prueth.c
+ create mode 100644 drivers/net/ethernet/ti/icssg/icssg_prueth.h
+ create mode 100644 drivers/net/ethernet/ti/icssg/icssg_queues.c
+ create mode 100644 drivers/net/ethernet/ti/icssg/icssg_stats.c
+ create mode 100644 drivers/net/ethernet/ti/icssg/icssg_stats.h
+ create mode 100644 drivers/net/ethernet/ti/icssg/icssg_switch_map.h
+
+-- 
+2.34.1
+
 
