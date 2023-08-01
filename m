@@ -1,60 +1,150 @@
-Return-Path: <netdev+bounces-23107-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23108-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B06AB76AD72
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 11:29:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4549E76AD8D
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 11:30:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E0E8A1C2086B
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 09:29:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F02AF281008
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 09:30:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA8091F95E;
-	Tue,  1 Aug 2023 09:29:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBA1F1F955;
+	Tue,  1 Aug 2023 09:30:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A15906AAD
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 09:29:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79C59C433C7;
-	Tue,  1 Aug 2023 09:29:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690882165;
-	bh=kG7SZXNiyzexHlcARYSO8y3yfKIQTqbHV/gn8ppwj7w=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=qp1vf7zbWCj83RAWtH4zS6s5sN7zmoIO1oVXN/wXUdICldHhd+o/PzI0CwttdB09b
-	 6iuS57v6Uc1frELDjlWj/XRDZjNl+RpDh/Zv3ITCidaAY37rMgqy8dnm/5v675KirV
-	 t7Q7eMKwCg5NQdl4cww4n8izCutfzX9sInFZed/h+rmiAHjwZVIEBc8l55OOyxxyaf
-	 RourzjLYRlvCcBhbN5OUJJhLAJYhFVkTvMT1ZR6yDpQSGKWjqPEm0OhYVpupj0E6NX
-	 gjm6dxZ6vzNPfgLF8zDDXBueY+wmwgSwwYa/R53NBkyHFeqHWrn6as907XM2PhbaWb
-	 9tyLHq/4Ss5Mw==
-Date: Tue, 1 Aug 2023 11:29:21 +0200
-From: Simon Horman <horms@kernel.org>
-To: Yue Haibing <yuehaibing@huawei.com>
-Cc: marcelo.leitner@gmail.com, lucien.xin@gmail.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	linux-sctp@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] sctp: Remove unused function declarations
-Message-ID: <ZMjQceSII+1AukF1@kernel.org>
-References: <20230731141030.32772-1-yuehaibing@huawei.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E16841FB24
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 09:30:12 +0000 (UTC)
+Received: from mgamail.intel.com (unknown [134.134.136.24])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2260330FC;
+	Tue,  1 Aug 2023 02:30:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1690882209; x=1722418209;
+  h=from:to:cc:subject:in-reply-to:references:date:
+   message-id:mime-version;
+  bh=+ZeJP/xkyI2kTZxoz/E3PvGR0Hq4tjVxJSVN6RH3DV8=;
+  b=naRWqOLqdQwUa+Xp6A2dfSC8+UUimTc+StMR/A/RyWErR+h2gxTyTNIV
+   tHqOxQajXPeLKbsvXo05PnmMp6k9WWb7SCMo1nxxdpGvUtL920SrEZ/Mn
+   ARXdS0g6/KOhFV44tW37z4G5NwmMGWBC3WmBPwM7bAzXki0cqzDDpFkf2
+   266fQdxRFu93SH6U7KODTMTLa781rT9dPaN/lyjFInPq/C5TJGhVyPGwj
+   n7oCNjpG0AcV7zCLcU7FgQN34yukkESfZPsGQxSTe1+Ep7FgPPX35vYxr
+   P4uX35dXi0/a56adLu4iPNTXWhV8f6G74KX858vfKQ+Ii4DybhznA7Rru
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="371961912"
+X-IronPort-AV: E=Sophos;i="6.01,246,1684825200"; 
+   d="scan'208";a="371961912"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Aug 2023 02:30:07 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="798596374"
+X-IronPort-AV: E=Sophos;i="6.01,246,1684825200"; 
+   d="scan'208";a="798596374"
+Received: from igorban-mobl1.ccr.corp.intel.com (HELO localhost) ([10.252.36.188])
+  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Aug 2023 02:30:02 -0700
+From: Jani Nikula <jani.nikula@linux.intel.com>
+To: Ziqi Zhao <astrajoan@yahoo.com>, astrajoan@yahoo.com, airlied@gmail.com,
+ daniel@ffwll.ch, dri-devel@lists.freedesktop.org,
+ ivan.orlov0322@gmail.com, maarten.lankhorst@linux.intel.com,
+ mripard@kernel.org, skhan@linuxfoundation.org, tzimmermann@suse.de
+Cc: netdev@vger.kernel.org, dsahern@kernel.org,
+ syzkaller-bugs@googlegroups.com, linux-kernel@vger.kernel.org,
+ edumazet@google.com, jiri@nvidia.com, jacob.e.keller@intel.com,
+ kuba@kernel.org, pabeni@redhat.com, davem@davemloft.net,
+ syzbot+622bba18029bcde672e1@syzkaller.appspotmail.com
+Subject: Re: [PATCH] drm/modes: Fix division by zero error
+In-Reply-To: <20230721160749.8489-1-astrajoan@yahoo.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+References: <20230709011213.17890-1-astrajoan@yahoo.com>
+ <20230721160749.8489-1-astrajoan@yahoo.com>
+Date: Tue, 01 Aug 2023 12:30:00 +0300
+Message-ID: <87o7jrw1nr.fsf@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230731141030.32772-1-yuehaibing@huawei.com>
+Content-Type: text/plain
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Mon, Jul 31, 2023 at 10:10:30PM +0800, Yue Haibing wrote:
-> These declarations are never implemented since beginning of git history.
-> 
-> Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
+On Fri, 21 Jul 2023, Ziqi Zhao <astrajoan@yahoo.com> wrote:
+> In the bug reported by Syzbot, the variable `den == (1 << 22)` and
+> `mode->vscan == (1 << 10)`, causing the multiplication to overflow and
+> accidentally make `den == 0`. To prevent any chance of overflow, we
+> replace `num` and `den` with 64-bit unsigned integers, and explicitly
+> check if the divisor `den` will overflow. If so, we employ full 64-bit
+> division with rounding; otherwise we keep the 64-bit to 32-bit division
+> that could potentially be better optimized.
+>
+> In order to minimize the performance overhead, the overflow check for
+> `den` is wrapped with an `unlikely` condition. Please let me know if
+> this usage is appropriate.
+>
+> Reported-by: syzbot+622bba18029bcde672e1@syzkaller.appspotmail.com
+> Signed-off-by: Ziqi Zhao <astrajoan@yahoo.com>
+> ---
+>  drivers/gpu/drm/drm_modes.c | 11 +++++++----
+>  1 file changed, 7 insertions(+), 4 deletions(-)
+>
+> diff --git a/drivers/gpu/drm/drm_modes.c b/drivers/gpu/drm/drm_modes.c
+> index ac9a406250c5..aa98bd7b8bc9 100644
+> --- a/drivers/gpu/drm/drm_modes.c
+> +++ b/drivers/gpu/drm/drm_modes.c
+> @@ -1285,13 +1285,13 @@ EXPORT_SYMBOL(drm_mode_set_name);
+>   */
+>  int drm_mode_vrefresh(const struct drm_display_mode *mode)
+>  {
+> -	unsigned int num, den;
+> +	unsigned long long num, den;
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+I think making them u64 would be more clear.
 
+>  
+>  	if (mode->htotal == 0 || mode->vtotal == 0)
+>  		return 0;
+>  
+> -	num = mode->clock;
+> -	den = mode->htotal * mode->vtotal;
+> +	num = mul_u32_u32(mode->clock, 1000);
+> +	den = mul_u32_u32(mode->htotal, mode->vtotal);
+>  
+>  	if (mode->flags & DRM_MODE_FLAG_INTERLACE)
+>  		num *= 2;
+> @@ -1300,7 +1300,10 @@ int drm_mode_vrefresh(const struct drm_display_mode *mode)
+>  	if (mode->vscan > 1)
+>  		den *= mode->vscan;
+>  
+> -	return DIV_ROUND_CLOSEST_ULL(mul_u32_u32(num, 1000), den);
+> +	if (unlikely(den >> 32))
+
+More intuitively, den > UINT_MAX.
+
+> +		return div64_u64(num + (den >> 1), den);
+
+More intuitively, DIV64_U64_ROUND_CLOSEST(num, den).
+
+> +	else
+
+The else after a branch with return is unnecessary. Someone's going to
+send a patch to remove it later if you leave it in.
+
+BR,
+Jani.
+
+> +		return DIV_ROUND_CLOSEST_ULL(num, (unsigned int) den);
+>  }
+>  EXPORT_SYMBOL(drm_mode_vrefresh);
+
+-- 
+Jani Nikula, Intel Open Source Graphics Center
 
