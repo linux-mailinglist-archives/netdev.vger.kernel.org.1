@@ -1,129 +1,107 @@
-Return-Path: <netdev+bounces-23408-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23409-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11EAE76BDBE
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 21:29:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D334D76BE04
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 21:45:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A61941C20FB9
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 19:29:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1594A1C2104D
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 19:45:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 416ED2516B;
-	Tue,  1 Aug 2023 19:29:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06356253A9;
+	Tue,  1 Aug 2023 19:45:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C0CA1F95B;
-	Tue,  1 Aug 2023 19:29:08 +0000 (UTC)
-Received: from out5-smtp.messagingengine.com (out5-smtp.messagingengine.com [66.111.4.29])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B698D103;
-	Tue,  1 Aug 2023 12:29:07 -0700 (PDT)
-Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
-	by mailout.nyi.internal (Postfix) with ESMTP id 891CB5C00D1;
-	Tue,  1 Aug 2023 15:29:04 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute2.internal (MEProxy); Tue, 01 Aug 2023 15:29:04 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
-	:cc:content-type:content-type:date:date:from:from:in-reply-to
-	:in-reply-to:message-id:mime-version:references:reply-to:sender
-	:subject:subject:to:to; s=fm2; t=1690918144; x=1691004544; bh=50
-	K0rjAZpMOLnZsQS3es5SZ7R2JGHZMJS2+QIhOnXEc=; b=T9GkXm5gSU3tOXrp9E
-	36ZU/UZXuBRob2tmtMybh09WX2gr52fiBEgj86/KpJvPMt7JaiHDWo36mUPT6P2v
-	mNUtYOgMCsOeA8LCZMR9MfZexBqvuwl0MHyP3QYaU47l40L3o6vIkexRf9wW94HN
-	mUWUfczWXu+ls645LESj+SPKBOXKEp19EGb5GnX1YmWMwrO/wjl3s7Z4vA+YhF2A
-	fv+2SSmdPrVG4ixz31HsCVwgqRrZFGBgzBgqLB2Quoilr3mmLmx8XmF/m7TcO8Nu
-	mYUIZGfHAhYHWKQ2ok2EJBHYI4mi65kvEqhFaz9xbSEGQmOph1pvOdPzXmrYk0eW
-	Aj6Q==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:sender:subject
-	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-	:x-sasl-enc; s=fm3; t=1690918144; x=1691004544; bh=50K0rjAZpMOLn
-	ZsQS3es5SZ7R2JGHZMJS2+QIhOnXEc=; b=ysrqy/DPDf0EDgyHSuuTQzcKD6IEe
-	5Nsi0NaQcyAXZCHiWQOBtDspe1Ckg5vHX/sBUi8GbhHobW/XqZr+HGbHg3E/B1Wd
-	t4Ex+90CAKfXIJ61NGvdpDQkg0oaP+L9ycpf0MvqRmo6W65x4D2zIu3vvmgfkD/T
-	li4xwcjbfTP266cmlZZ0hkTHnC0wH1Dqlxe5hnSQDpK4NjIY05OqCTm5cA1zQtXx
-	PVtDdgYBshNCIqWFrXkaS9Q0ZEsBsE/EnKRBlX1XWIrVq1Ir9AGGKNJTVIusofx6
-	Ae4q3x/ObPB/VzNmp/+uZO9dzV+0T5JubSCz9jC+KlpwUfllOG+kdr0Fg==
-X-ME-Sender: <xms:AF3JZI6fiaI-pjU2nZvB6MIVZtW8ZcoxupuDdlAMacWqgeeCBnQxPA>
-    <xme:AF3JZJ6f0FxRdpyqu6juKKBhOYP9GE6a6RcH_IJCUOnelPycwe0Eg6gg-a6rIXoqU
-    qtxeZv4p0YUEGbnDA>
-X-ME-Received: <xmr:AF3JZHdCRBWRDfDjX-ktcCZFzKEztQ_sKbTg1HQURmKzbPIFrFzGOkcwQx_twWL87qAWAvVhZOD-Fe0Z9_8SxBrvjbcfyACQsdALoSc>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrjeeigddufeegucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    gfrhhlucfvnfffucdlfeehmdenucfjughrpeffhffvvefukfhfgggtuggjsehttdfstddt
-    tddvnecuhfhrohhmpeffrghnihgvlhcuighuuceougiguhesugiguhhuuhdrgiihiieqne
-    cuggftrfgrthhtvghrnhepvdefkeetuddufeeigedtheefffekuedukeehudffudfffffg
-    geeitdetgfdvhfdvnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilh
-    hfrhhomhepugiguhesugiguhhuuhdrgiihii
-X-ME-Proxy: <xmx:AF3JZNKiXh6XPsasb7_LWp1ls-nxuZtwkCqhldtR7rafO1d64ob4Zg>
-    <xmx:AF3JZMLDb2Zq3odcK6LbthBi2C3Y0_0NzQPyMuOvuAGkuikbxFUmwQ>
-    <xmx:AF3JZOxBNTvdS-eIePhnA-f47JroGxCypBhyZeYaBVm5LKixfXYE6A>
-    <xmx:AF3JZPZdCUZISi1hQuNEJMuTbjBQWjP_VPOUaK5Ir2b9zHRXyZtrwg>
-Feedback-ID: i6a694271:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 1 Aug 2023 15:29:03 -0400 (EDT)
-Date: Tue, 1 Aug 2023 13:29:01 -0600
-From: Daniel Xu <dxu@dxuuu.xyz>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Arnd Bergmann <arnd@kernel.org>, 
-	Pablo Neira Ayuso <pablo@netfilter.org>, Jozsef Kadlecsik <kadlec@netfilter.org>, 
-	Florian Westphal <fw@strlen.de>, "David S . Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, 
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org, Netdev <netdev@vger.kernel.org>, 
-	linux-kernel@vger.kernel.org, bpf@vger.kernel.org
-Subject: Re: [PATCH] netfilter: bpf_link: avoid unused-function warning
-Message-ID: <ewu46co43ldtnsedbaqvs4ihpebr7wxjbpum32iq4i766egpyu@bzocmghr636q>
-References: <20230801150304.1980987-1-arnd@kernel.org>
- <z3gp6rcrlotwjwux7chza4vmbgv747v5jlr4xhuaad3y2yofsf@jjiju6zltbmh>
- <b795ccdf-ad53-407e-ba01-a703e353b3fb@app.fastmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF3AB4DC6B
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 19:45:18 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2AE04C43395;
+	Tue,  1 Aug 2023 19:45:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1690919118;
+	bh=ti5LkQA5JhXyI0X9UAFrEqsRrWpYkoksPS0/FGqPOPA=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=NYOS3SyGQg0RV6QZJT2vvBBq5eCXOD9VzPgehd8IOVUND8/C5WrYKtHeM59LrOLyU
+	 WHuw39tdIhmBCDlHT7yS89UUvh7J2DWsKUDLqb46u3309RQ6LZF/H4qdvMJ+zdWdgc
+	 TUlaAoaKcebjdhM6iCr7GqMxjAGaT2hdM0lEmCYEsyseUYQtaXHWlU/5oil3ObF+/a
+	 QVc/RJ+HQzlABvuwsyYVqrKTj0rzn+kPz3oHVaD6Er23UxMiI91NlkgEjICCyEjLZK
+	 VLXLntrRizFb4Mo0R1K7lHOn3mw9wYY5QS04jedOKK0QtCdPlyObgx2QVwsS6vb3r5
+	 7Y38+iUJ1FgEg==
+Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-76c9e9642b1so309443585a.3;
+        Tue, 01 Aug 2023 12:45:18 -0700 (PDT)
+X-Gm-Message-State: ABy/qLYSNqr68pzU2l6N6+kxEBXrBM6CQMxO7xNKKqofdIe6NqIQlFxe
+	RnvZyOOmmr12xTT4/e/yQIJr8UTRJSV1l/WU5kA=
+X-Google-Smtp-Source: APBJJlGeJukdX/Bd3xELyMkrBtt+c36lWEfrvNJy2vE2YfgjJ6X14u/rvhfabm0vzEbYNueFaHmK3X7V+PlT0NoIBBM=
+X-Received: by 2002:ac8:7f94:0:b0:40f:d63c:dc5b with SMTP id
+ z20-20020ac87f94000000b0040fd63cdc5bmr3778461qtj.63.1690919117140; Tue, 01
+ Aug 2023 12:45:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b795ccdf-ad53-407e-ba01-a703e353b3fb@app.fastmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+References: <20230729123152.35132-1-yuehaibing@huawei.com> <ZMaJQMWO9HF32D84@tissot.1015granger.net>
+In-Reply-To: <ZMaJQMWO9HF32D84@tissot.1015granger.net>
+From: Anna Schumaker <anna@kernel.org>
+Date: Tue, 1 Aug 2023 15:45:01 -0400
+X-Gmail-Original-Message-ID: <CAFX2Jfm8RRLkWJfK+eO_bGPpGat6cY0EkkJ-DK=+e-=9H=MtKA@mail.gmail.com>
+Message-ID: <CAFX2Jfm8RRLkWJfK+eO_bGPpGat6cY0EkkJ-DK=+e-=9H=MtKA@mail.gmail.com>
+Subject: Re: [PATCH net-next] xprtrdma: Remove unused function declaration rpcrdma_bc_post_recv()
+To: Chuck Lever <chuck.lever@oracle.com>
+Cc: jlayton@kernel.org, neilb@suse.de, kolga@netapp.com, Dai.Ngo@oracle.com, 
+	tom@talpey.com, trond.myklebust@hammerspace.com, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	linux-nfs@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Aug 01, 2023 at 07:27:33PM +0200, Arnd Bergmann wrote:
-> On Tue, Aug 1, 2023, at 17:20, Daniel Xu wrote:
-> > Hi Arnd,
+On Sun, Jul 30, 2023 at 12:01=E2=80=AFPM Chuck Lever <chuck.lever@oracle.co=
+m> wrote:
+>
+> On Sat, Jul 29, 2023 at 08:31:52PM +0800, Yue Haibing wrote:
+> > rpcrdma_bc_post_recv() is never implemented since introduction in
+> > commit f531a5dbc451 ("xprtrdma: Pre-allocate backward rpc_rqst and send=
+/receive buffers").
 > >
-> > On Tue, Aug 01, 2023 at 05:02:41PM +0200, Arnd Bergmann wrote:
-> >> From: Arnd Bergmann <arnd@arndb.de>
-> >> 
-> >> The newly added function is unused in some random configurations:
-> >> 
-> >> net/netfilter/nf_bpf_link.c:32:1: error: 'get_proto_defrag_hook' defined but not used [-Werror=unused-function]
-> >>    32 | get_proto_defrag_hook(struct bpf_nf_link *link,
-> >>       | ^~~~~~~~~~~~~~~~~~~~~
-> >> 
+> > Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
+>
+> Reviewed-by: Chuck Lever <chuck.lever@oracle.com>
+>
+> Anna, can you take this one?
+
+Yep! Applying it now so it doesn't get lost!
+
+Anna
+
+>
+>
+> > ---
+> >  net/sunrpc/xprtrdma/xprt_rdma.h | 1 -
+> >  1 file changed, 1 deletion(-)
 > >
-> > This was fixed in 81584c23f249 ("netfilter: bpf: Only define 
-> > get_proto_defrag_hook() if necessary").
-> 
-> Ok, I guess this will be in tomorrow's linux-next then, right?
-> 
->     Arnd
-
-I'm not too familiar with the linux-next process, but chatgpt is telling
-me it should be.
-
-Thanks,
-Daniel
+> > diff --git a/net/sunrpc/xprtrdma/xprt_rdma.h b/net/sunrpc/xprtrdma/xprt=
+_rdma.h
+> > index 5e5ff6784ef5..da409450dfc0 100644
+> > --- a/net/sunrpc/xprtrdma/xprt_rdma.h
+> > +++ b/net/sunrpc/xprtrdma/xprt_rdma.h
+> > @@ -593,7 +593,6 @@ void xprt_rdma_cleanup(void);
+> >  int xprt_rdma_bc_setup(struct rpc_xprt *, unsigned int);
+> >  size_t xprt_rdma_bc_maxpayload(struct rpc_xprt *);
+> >  unsigned int xprt_rdma_bc_max_slots(struct rpc_xprt *);
+> > -int rpcrdma_bc_post_recv(struct rpcrdma_xprt *, unsigned int);
+> >  void rpcrdma_bc_receive_call(struct rpcrdma_xprt *, struct rpcrdma_rep=
+ *);
+> >  int xprt_rdma_bc_send_reply(struct rpc_rqst *rqst);
+> >  void xprt_rdma_bc_free_rqst(struct rpc_rqst *);
+> > --
+> > 2.34.1
+> >
+>
+> --
+> Chuck Lever
 
