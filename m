@@ -1,96 +1,68 @@
-Return-Path: <netdev+bounces-23127-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23129-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 613A476B062
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 12:07:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E89E76B096
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 12:13:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1DC26281838
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 10:07:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 60204281470
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 10:13:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3989420F80;
-	Tue,  1 Aug 2023 10:07:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A03E120F85;
+	Tue,  1 Aug 2023 10:13:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E7F31F94D
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 10:07:39 +0000 (UTC)
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14AA0CF;
-	Tue,  1 Aug 2023 03:07:36 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 67785C0007;
-	Tue,  1 Aug 2023 10:07:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1690884455;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QWt1iHAsmrfK3BwrkrMdjb6oetsmwYgFvyU2cU/2Gk8=;
-	b=j0ab26/LBkhJu/rDBUgxTxpfUHsrUu+mfwFrtSgmX9T5+Pk0LuHAPLV/9JflTk/bXN78Iw
-	GxNpsOf5oXmOU1WefL+SDb12OMzJALhot9d8BpXmrOJkwqiKU9u+qM4F6K1E5nj0lBfb7+
-	gLCrL+TlVu1b+Du7sMnHz75yki1Sho1tzxFptk2CFoK+gEUyxpzLNZKbZLUIg8VILRvTNC
-	jA293aUHVMzqAS7Ih35p4vP9mjBeznj8kVMegn7AU6mm6wBKKsHMvIdoaGgWGc0lnAr6VS
-	XUP/Egyc8NGdUCrdAPow0ErAFNIpObFqtVsobYB9grq6Ebj8meCevmKJMnRnDw==
-Date: Tue, 1 Aug 2023 12:07:30 +0200
-From: Herve Codina <herve.codina@bootlin.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski
- <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
- Lee Jones <lee@kernel.org>, Linus Walleij <linus.walleij@linaro.org>, Qiang
- Zhao <qiang.zhao@nxp.com>, Li Yang <leoyang.li@nxp.com>, Liam Girdwood
- <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, Jaroslav Kysela
- <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, Shengjiu Wang
- <shengjiu.wang@gmail.com>, Xiubo Li <Xiubo.Lee@gmail.com>, Fabio Estevam
- <festevam@gmail.com>, Nicolin Chen <nicoleotsuka@gmail.com>, Christophe
- Leroy <christophe.leroy@csgroup.eu>, Randy Dunlap <rdunlap@infradead.org>,
- netdev@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-gpio@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- alsa-devel@alsa-project.org, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH v2 06/28] net: wan: Add support for QMC HDLC
-Message-ID: <20230801120730.64e5b58e@bootlin.com>
-In-Reply-To: <80341a96-c40f-4a45-9bad-359a890edfc4@lunn.ch>
-References: <20230726150225.483464-1-herve.codina@bootlin.com>
-	<20230726150225.483464-7-herve.codina@bootlin.com>
-	<80341a96-c40f-4a45-9bad-359a890edfc4@lunn.ch>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FDDF1DDFF
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 10:13:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 194F3C433C8;
+	Tue,  1 Aug 2023 10:13:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1690884791;
+	bh=xWca8/ZDCMl2V9YZDxFKIMcLx/VDVMbkIg8pozefa/0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=HELxYlTmXFgNRdlMCXAvsW3Zp50iZoApeiTJgeUF17NXynBL82K+oCPIK2tXzw24R
+	 gJ1JK3thftEpXqzaJIoc0sbEmz3FXIm2Urud8diSNIgXHj8/y+ANAX+GJHgnIUfu/W
+	 99hhBv1w1/DjUQOltckn+Ts4KEX3A60fZijAXvACme8fbFBH8aXGmPBlgqxC9dGLW6
+	 4hm7ygJAhaUC07et11jRVVh1IrJFxG5yM6bnsnBxCgcS0UiToSwbVXXKPwPk44pxDy
+	 pxpv/QUMDt++HXyfPoQ2W6h9Jqay4/OX1tDh0Bsuk1MzEoKY7xXQ33EWVpJ1Px82a4
+	 CaO4LcqOZIVDg==
+Date: Tue, 1 Aug 2023 12:13:07 +0200
+From: Simon Horman <horms@kernel.org>
+To: Ruan Jinjie <ruanjinjie@huawei.com>
+Cc: aelior@marvell.com, skalluru@marvell.com, manishc@marvell.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, netdev@vger.kernel.org
+Subject: Re: [PATCH -next] bnx2x: Remove unnecessary ternary operators
+Message-ID: <ZMjas31vx/uiZzLV@kernel.org>
+References: <20230801020240.3342014-1-ruanjinjie@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: herve.codina@bootlin.com
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230801020240.3342014-1-ruanjinjie@huawei.com>
 
-On Tue, 1 Aug 2023 11:31:32 +0200
-Andrew Lunn <andrew@lunn.ch> wrote:
-
-> > +static inline struct qmc_hdlc *netdev_to_qmc_hdlc(struct net_device *netdev)
-> > +{
-> > +	return (struct qmc_hdlc *)dev_to_hdlc(netdev)->priv;  
+On Tue, Aug 01, 2023 at 10:02:40AM +0800, Ruan Jinjie wrote:
+> Ther are a little ternary operators, the true or false judgement
+> of which is unnecessary in C language semantics.
 > 
-> priv is a void *, so you don't need the cast.
-> 
+> Signed-off-by: Ruan Jinjie <ruanjinjie@huawei.com>
 
-Right, I will change in the next iteration.
+For non-bugfix Networking patches, it is appropriate to
+designate the target tree as 'net-next' rather than '-next'.
+(For bug fixes 'net' is appropriate).
 
-Regards,
-Hervé
+Link: https://docs.kernel.org/process/maintainer-netdev.html
+
+Otherwise, this looks fine to me.
+
+Reviewed-by: Simon Horman <horms@kernel.org>
+
 
