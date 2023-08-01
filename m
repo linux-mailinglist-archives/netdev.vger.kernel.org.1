@@ -1,162 +1,123 @@
-Return-Path: <netdev+bounces-23211-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23213-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E5F976B548
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 14:58:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4475076B57C
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 15:08:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 47A7E28197D
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 12:58:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7499B1C20EF4
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 13:08:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 526AC21508;
-	Tue,  1 Aug 2023 12:58:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA66121510;
+	Tue,  1 Aug 2023 13:08:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40CB11FB5F;
-	Tue,  1 Aug 2023 12:58:19 +0000 (UTC)
-Received: from mail-qv1-xf2c.google.com (mail-qv1-xf2c.google.com [IPv6:2607:f8b0:4864:20::f2c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F36551AA;
-	Tue,  1 Aug 2023 05:58:17 -0700 (PDT)
-Received: by mail-qv1-xf2c.google.com with SMTP id 6a1803df08f44-63d0228d32bso30796556d6.2;
-        Tue, 01 Aug 2023 05:58:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690894697; x=1691499497;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=52xtRMZBq0GtelXFCLGXXpjBQ9BYFSeOAKYA+Oh87s8=;
-        b=kvXqaj+XplVDOb28tqmrpexUF28oi70HOCK4+onfdTzh9FE74ILEwwwzWOm7u/dQ+W
-         fbafYj/o5j09MrGbiTty2jVcNKP/ilMf0vMOYgg/Zr1gRNhAVxMaK5xGPZ97gS1aSFPt
-         ESe6WsuIjE69o7F1KM0/2Ndnde/qqi+zSWO4Ulv+9a5TjxVdYeo47KZCa6QG7GlmR6a6
-         vyc2MEg7XSeR3wMxpZGUBKd31pBzT25OVd8ojchCX8BzZ3WlvMTXu7XTcWj1TAFg3Ac/
-         9T4fv5z0Xfo6Pg+ZXOdI3BquNpgqs3r0Qhx3yDmMVaeCchKFYpNIXLycnXndoWI08DPj
-         dFvg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690894697; x=1691499497;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=52xtRMZBq0GtelXFCLGXXpjBQ9BYFSeOAKYA+Oh87s8=;
-        b=lVA+PRvEgXvCpNWfd2CsOMtwn928gOkiHDJrYukmfhA1p9hLtTwgNMGuEaF34D5qGF
-         7lyAjE1vtdEVSXhyFW/KHolVP9rau2iZT8HQhBARTOnQn6C2sy7pS1zaE6MEoP+yHAYe
-         YihC5BKdTpkTLNm/8hRc6FKXwwqEfckUtyxA1hoOZ1S9Lf4NLsQTNuvH6ne+a4W5RLsd
-         gyaJfHZxGOumyQ+F1E+mSdUPQFMIcHiCIdrsnpc8UNOIsikoPp1SmYhGkVUKWxNK4O8o
-         4r+IzTpidUsySETfRtiyk+suoMJZeKtEkRZn9liRVjKepENnLZHroUffPlkQKpctb9YK
-         d9bA==
-X-Gm-Message-State: ABy/qLZj+4oHBdDXtG1ONorpBNiJ2VkCsDRCnTg91ZILoNFZucIXPhAR
-	NSO0uobMd3+aSLp/3SsDiBAuV/0j+ow=
-X-Google-Smtp-Source: APBJJlEIkqTRVKZLtG2Iljy/p50YykXPDd0qhhxO1UjmNJV6WTEQmOjO1bdp1USUVPMsmBVFFenkFw==
-X-Received: by 2002:ad4:5810:0:b0:636:14d4:4461 with SMTP id dd16-20020ad45810000000b0063614d44461mr9962767qvb.62.1690894696926;
-        Tue, 01 Aug 2023 05:58:16 -0700 (PDT)
-Received: from localhost (172.174.245.35.bc.googleusercontent.com. [35.245.174.172])
-        by smtp.gmail.com with ESMTPSA id w10-20020a0cb54a000000b0063d47a29e6fsm3944170qvd.55.2023.08.01.05.58.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Aug 2023 05:58:16 -0700 (PDT)
-Date: Tue, 01 Aug 2023 08:58:16 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: David Howells <dhowells@redhat.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: dhowells@redhat.com, 
- Jakub Kicinski <kuba@kernel.org>, 
- syzbot <syzbot+f527b971b4bdc8e79f9e@syzkaller.appspotmail.com>, 
- bpf@vger.kernel.org, 
- brauner@kernel.org, 
- davem@davemloft.net, 
- dsahern@kernel.org, 
- edumazet@google.com, 
- linux-fsdevel@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- netdev@vger.kernel.org, 
- pabeni@redhat.com, 
- syzkaller-bugs@googlegroups.com, 
- viro@zeniv.linux.org.uk
-Message-ID: <64c901683e0b6_1b28392946b@willemb.c.googlers.com.notmuch>
-In-Reply-To: <1401696.1690893633@warthog.procyon.org.uk>
-References: <64c7acd57270c_169cd129420@willemb.c.googlers.com.notmuch>
- <64c6672f580e3_11d0042944e@willemb.c.googlers.com.notmuch>
- <20230718160737.52c68c73@kernel.org>
- <000000000000881d0606004541d1@google.com>
- <0000000000001416bb06004ebf53@google.com>
- <792238.1690667367@warthog.procyon.org.uk>
- <831028.1690791233@warthog.procyon.org.uk>
- <1401696.1690893633@warthog.procyon.org.uk>
-Subject: Re: Endless loop in udp with MSG_SPLICE_READ - Re: [syzbot] [fs?]
- INFO: task hung in pipe_release (4)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF38A1FB5F
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 13:08:24 +0000 (UTC)
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7494B1BE3;
+	Tue,  1 Aug 2023 06:08:23 -0700 (PDT)
+Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 371BVD7P005056;
+	Tue, 1 Aug 2023 13:07:57 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=qcppdkim1;
+ bh=VwgUdH+MaufB/wU+nqiO/XxR/TljLIzlrOeWTeFK7N8=;
+ b=dSp+4izEPgDZfYPpWK8RfpGmZFi/W52zYtFpZQb32Tqr8ArnA2uTZBtPHA09mQTvUjAh
+ PhcWNFMeJxY40ZDAe8RoBq3Fhfiq/6SKAWqkeo7VJvPnHGp+ueY8MoyHwi5562UzcOY4
+ n9wMll7U1/9Bwdln2Yw7kfoowPBr4G2itqdn6QWpArmyCpviy5ZWAli0MpuXi4JtPb9O
+ 5kwyjeHZW2IjQNODi3/mBz1WrCZPnO6Afj8Wc1g53VE+ig0vFqMgQuXxTW09XaRmA0AW
+ KJ+PiGvvmFjOyoPecFPudkz7hRxFlIjyjhHMFglcC7wjTiVXUzRvXHqkKIrGNo1BFHID wQ== 
+Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3s6e9j2m6f-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 01 Aug 2023 13:07:57 +0000
+Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
+	by NALASPPMTA05.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 371D7uUx020324
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 1 Aug 2023 13:07:56 GMT
+Received: from [10.50.50.103] (10.80.80.8) by nalasex01c.na.qualcomm.com
+ (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.30; Tue, 1 Aug
+ 2023 06:07:51 -0700
+Message-ID: <8c591002-308e-bdba-de5f-c96113230451@quicinc.com>
+Date: Tue, 1 Aug 2023 18:37:49 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.1
+Subject: Re: [PATCH] net: export dev_change_name function
+Content-Language: en-US
+To: Andrew Lunn <andrew@lunn.ch>
+CC: "David S . Miller" <davem@davemloft.net>,
+        Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni
+	<pabeni@redhat.com>,
+        Simon Horman <simon.horman@corigine.com>,
+        "Kuniyuki
+ Iwashima" <kuniyu@amazon.com>,
+        Hangbin Liu <liuhangbin@gmail.com>, Jiri Pirko
+	<jiri@resnulli.us>,
+        Heiner Kallweit <hkallweit1@gmail.com>,
+        Andy Ren
+	<andy.ren@getcruise.com>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>,
+        Venkata Rao Kakani
+	<quic_vkakani@quicinc.com>,
+        Vagdhan Kumar <quic_vagdhank@quicinc.com>
+References: <20230801112101.15564-1-quic_ajainp@quicinc.com>
+ <447ba1fe-b20b-4ed0-97bc-4137b2ccfb37@lunn.ch>
+From: Anvesh Jain P <quic_ajainp@quicinc.com>
+In-Reply-To: <447ba1fe-b20b-4ed0-97bc-4137b2ccfb37@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+X-Originating-IP: [10.80.80.8]
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01c.na.qualcomm.com (10.47.97.35)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: sbk0xjos7k9BFLhwizpWoPSdaCfKsknr
+X-Proofpoint-GUID: sbk0xjos7k9BFLhwizpWoPSdaCfKsknr
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-08-01_08,2023-08-01_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 mlxscore=0
+ spamscore=0 priorityscore=1501 malwarescore=0 mlxlogscore=712
+ suspectscore=0 bulkscore=0 lowpriorityscore=0 impostorscore=0 phishscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2306200000 definitions=main-2308010118
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-David Howells wrote:
-> The more I look at __ip_append_data(), the more I think the maths is wrong.
-> In the bit that allocates a new skbuff:
-> 
-> 	if (copy <= 0) {
-> 	...
-> 		datalen = length + fraggap;
-> 		if (datalen > mtu - fragheaderlen)
-> 			datalen = maxfraglen - fragheaderlen;
-> 		fraglen = datalen + fragheaderlen;
-> 		pagedlen = 0;
-> 	...
-> 		if ((flags & MSG_MORE) &&
-> 		    !(rt->dst.dev->features&NETIF_F_SG))
-> 	...
-> 		else if (!paged &&
-> 			 (fraglen + alloc_extra < SKB_MAX_ALLOC ||
-> 			  !(rt->dst.dev->features & NETIF_F_SG)))
-> 	...
-> 		else {
-> 			alloclen = fragheaderlen + transhdrlen;
-> 			pagedlen = datalen - transhdrlen;
-> 		}
-> 	...
-> 
-> In the MSG_SPLICE_READ but not MSG_MORE case, we go through that else clause.
-> The values used here, a few lines further along:
-> 
-> 		copy = datalen - transhdrlen - fraggap - pagedlen;
-> 
-> are constant over the intervening span.  This means that, provided the splice
-> isn't going to exceed the MTU on the second fragment, the calculation of
-> 'copy' can then be simplified algebraically thus:
-> 
-> 		copy = (length + fraggap) - transhdrlen - fraggap - pagedlen;
-> 
-> 		copy = length - transhdrlen - pagedlen;
-> 
-> 		copy = length - transhdrlen - (datalen - transhdrlen);
-> 
-> 		copy = length - transhdrlen - datalen + transhdrlen;
-> 
-> 		copy = length - datalen;
-> 
-> 		copy = length - (length + fraggap);
-> 
-> 		copy = length - length - fraggap;
-> 
-> 		copy = -fraggap;
-> 
-> I think we might need to recalculate copy after the conditional call to
-> getfrag().  Possibly we should skip that entirely for MSG_SPLICE_READ.  The
-> root seems to be that we're subtracting pagedlen from datalen - but probably
-> we shouldn't be doing getfrag() if pagedlen > 0.
 
-q
 
+On 8/1/2023 6:01 PM, Andrew Lunn wrote:
+> On Tue, Aug 01, 2023 at 04:51:01PM +0530, Anvesh Jain P wrote:
+>> export dev_change_name function to be used by other modules.
+>>
+>> Signed-off-by: Vagdhan Kumar <quic_vagdhank@quicinc.com>
+>> Signed-off-by: Anvesh Jain P <quic_ajainp@quicinc.com>
+> 
+> It would be normal to include a user of the API when exposing an API.
+> 
+> What module needs to change the name of a device? At the moment, only
+> user space can do this via netlink or an IOCTL.
+> 
+>       Andrew
+CONFIG_RENAME_DEVICES is the module which needs "dev_change_name" API. 
+Our requirement is to change the network device name from kernel space.
 
