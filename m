@@ -1,167 +1,71 @@
-Return-Path: <netdev+bounces-23450-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23448-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3E8276C026
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 00:09:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 192DE76C020
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 00:08:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 102A61C210D4
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 22:09:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 494131C210D8
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 22:08:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC273275B8;
-	Tue,  1 Aug 2023 22:09:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED7EB275B6;
+	Tue,  1 Aug 2023 22:08:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1465275A8
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 22:09:45 +0000 (UTC)
-Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3BD926AA;
-	Tue,  1 Aug 2023 15:09:28 -0700 (PDT)
-Received: by mail-lj1-x236.google.com with SMTP id 38308e7fff4ca-2b9d3dacb33so67870921fa.1;
-        Tue, 01 Aug 2023 15:09:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690927767; x=1691532567;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dSpmN52R4zvJ1S+i6B6OGYZwzIS1/5yW5wWragBrFA0=;
-        b=XaniT5r6suwpR7jjJvcmJOh5zqRrMucOLpNrGei5m8doTVhDnRJgRnqGz4phmQsdLD
-         nzXezpAZXhLt7Ph6121T6v0zExcd2XJdiF0GOMSC9PuIx2pHAlbb9tPR/UWGlfRVH3wZ
-         ejpBzUQxLFfJHTa6zEpY1J3TZ7qAdMzgPMTQy7Y8kiCABW+2fACQY8cT8kIl2w3pw8Ht
-         oAHfupQqrwFQq+i7VgGvg209uSclzOJSLpWRYGz7WxUEQGpYd0qyJyv9t3HZsPlKCiTq
-         pkKAtjAliHu35zGMGRlAcA7QJwo7Azk84djCD7yXwzJZPfuSqbIRYDP5AxjDBsPqVIkL
-         4UwA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690927767; x=1691532567;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=dSpmN52R4zvJ1S+i6B6OGYZwzIS1/5yW5wWragBrFA0=;
-        b=UDQJqeacLJFC2QnxmBWeitBbtsbZj8Q2NUG0q3TRAsAu4CYQmrV5gnYWpPmffJbB3C
-         C4pwQSOOWvKHQAPdITFPmfPP2vEgV/W4914ATmIIrQCwaUGSH0320JX58GX+YXkiT2oT
-         VvmtaCEVtQnR5r/QYsQBo40n9VZ8UA7mXUXCI0xWGgz13jhQRDNCiKLf68ztPYqv/fYj
-         bEQZpwRXtyFeLcxFLcC7QLtChgN03srERkN+ajfueYb9VW1BxNQBx1kSIa0dCaiee1Y2
-         gHsZFyqmgO14n1+aX2WKYP4xrQK6xFRxknEkDsnTSe4rZv54jv3Xft05/ANocb7OhLnp
-         aK8w==
-X-Gm-Message-State: ABy/qLZK2wzYwfZAOUdNjJ8lkqRcOVenCmIEWd9WLUskekISFYJ9GAQ3
-	BYd0MY5GrB7BnYMzZ9VHLLs=
-X-Google-Smtp-Source: APBJJlERRP6xJs2BKH/KZpMsUDEY7EYHNGhvbI9dYp3bWCLckdTMj77kulkRDU1t+LxiGszftcRpFA==
-X-Received: by 2002:a05:651c:cf:b0:2b9:b067:9559 with SMTP id 15-20020a05651c00cf00b002b9b0679559mr3382679ljr.23.1690927766923;
-        Tue, 01 Aug 2023 15:09:26 -0700 (PDT)
-Received: from localhost.localdomain ([77.222.27.96])
-        by smtp.gmail.com with ESMTPSA id y18-20020a2e95d2000000b002b9ea00a7bbsm1391013ljh.60.2023.08.01.15.09.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Aug 2023 15:09:26 -0700 (PDT)
-From: Andrew Kanner <andrew.kanner@gmail.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	jasowang@redhat.com,
-	netdev@vger.kernel.org,
-	brouer@redhat.com,
-	dsahern@gmail.com,
-	jbrouer@redhat.com,
-	john.fastabend@gmail.com,
-	linux-kernel@vger.kernel.org
-Cc: linux-kernel-mentees@lists.linuxfoundation.org,
-	syzbot+f817490f5bd20541b90a@syzkaller.appspotmail.com,
-	Andrew Kanner <andrew.kanner@gmail.com>
-Subject: [PATCH v4 2/2] net: core: remove unnecessary frame_sz check in bpf_xdp_adjust_tail()
-Date: Wed,  2 Aug 2023 01:07:13 +0300
-Message-Id: <20230801220710.464-2-andrew.kanner@gmail.com>
-X-Mailer: git-send-email 2.39.3
-In-Reply-To: <20230801220710.464-1-andrew.kanner@gmail.com>
-References: <20230801220710.464-1-andrew.kanner@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBB2A275A8;
+	Tue,  1 Aug 2023 22:08:28 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E9F7C433C8;
+	Tue,  1 Aug 2023 22:08:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1690927708;
+	bh=Fprg9A7lqx6rZCFEElImiV0nfq2ndvAMquua7Y1GBYY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=VmtF1xVixlC/10SuowzThM4JnSZSyoXyeMnbPfptuZbeTUxYWK/VHQfsuEeEsuFzT
+	 xN7SdwW3xB1/LvEe/Ysdla9MnFDqFltreJv0u4N1uWW/6ZD2CWTuHKYxnGdh3QjbPw
+	 WgnfCbAve7ahVq3DLbGxj/JriRkOzYNv1uqba6jZwd9wF3Ko8PGRxRHWcoSBPZUdjL
+	 k8B5SvYOj5cONSg2muK3wzWASNO1R1cC6RKPdy2XgVCupYwvfYtxEiz52Y83CFTfED
+	 at7ot5/TcMBi26kaOhEUgAxt3OQiyksvAUfC5i2TouuUtZhyEkkIZCA2UMGn4kup3Y
+	 HWr6qnmWazCWA==
+Date: Tue, 1 Aug 2023 15:08:26 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Leon Hwang <hffilwlqm@gmail.com>
+Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net,
+ john.fastabend@gmail.com, andrii@kernel.org, martin.lau@linux.dev,
+ song@kernel.org, yonghong.song@linux.dev, kpsingh@kernel.org,
+ sdf@google.com, haoluo@google.com, jolsa@kernel.org, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, hawk@kernel.org,
+ rostedt@goodmis.org, mhiramat@kernel.org, mykolal@fb.com, shuah@kernel.org,
+ tangyeechou@gmail.com, kernel-patches-bot@fb.com,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linux-trace-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH bpf-next v5 1/2] bpf, xdp: Add tracepoint to xdp
+ attaching failure
+Message-ID: <20230801150826.6f617919@kernel.org>
+In-Reply-To: <20230801142621.7925-2-hffilwlqm@gmail.com>
+References: <20230801142621.7925-1-hffilwlqm@gmail.com>
+	<20230801142621.7925-2-hffilwlqm@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=1.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_SBL_CSS,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.6
-X-Spam-Level: *
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Syzkaller reported the following issue:
-=======================================
-Too BIG xdp->frame_sz = 131072
-WARNING: CPU: 0 PID: 5020 at net/core/filter.c:4121
-  ____bpf_xdp_adjust_tail net/core/filter.c:4121 [inline]
-WARNING: CPU: 0 PID: 5020 at net/core/filter.c:4121
-  bpf_xdp_adjust_tail+0x466/0xa10 net/core/filter.c:4103
-...
-Call Trace:
- <TASK>
- bpf_prog_4add87e5301a4105+0x1a/0x1c
- __bpf_prog_run include/linux/filter.h:600 [inline]
- bpf_prog_run_xdp include/linux/filter.h:775 [inline]
- bpf_prog_run_generic_xdp+0x57e/0x11e0 net/core/dev.c:4721
- netif_receive_generic_xdp net/core/dev.c:4807 [inline]
- do_xdp_generic+0x35c/0x770 net/core/dev.c:4866
- tun_get_user+0x2340/0x3ca0 drivers/net/tun.c:1919
- tun_chr_write_iter+0xe8/0x210 drivers/net/tun.c:2043
- call_write_iter include/linux/fs.h:1871 [inline]
- new_sync_write fs/read_write.c:491 [inline]
- vfs_write+0x650/0xe40 fs/read_write.c:584
- ksys_write+0x12f/0x250 fs/read_write.c:637
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x38/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
+On Tue,  1 Aug 2023 22:26:20 +0800 Leon Hwang wrote:
+> When error happens in dev_xdp_attach(), it should have a way to tell
+> users the error message like the netlink approach.
+> 
+> To avoid breaking uapi, adding a tracepoint in bpf_xdp_link_attach() is
+> an appropriate way to notify users the error message.
+> 
+> Hence, bpf libraries are able to retrieve the error message by this
+> tracepoint, and then report the error message to users.
 
-xdp->frame_sz > PAGE_SIZE check was introduced in commit c8741e2bfe87
-("xdp: Allow bpf_xdp_adjust_tail() to grow packet size"). But Jesper
-Dangaard Brouer <jbrouer@redhat.com> noted that after introducing the
-xdp_init_buff() which all XDP driver use - it's safe to remove this
-check. The original intend was to catch cases where XDP drivers have
-not been updated to use xdp.frame_sz, but that is not longer a concern
-(since xdp_init_buff).
-
-Running the initial syzkaller repro it was discovered that the
-contiguous physical memory allocation is used for both xdp paths in
-tun_get_user(), e.g. tun_build_skb() and tun_alloc_skb(). It was also
-stated by Jesper Dangaard Brouer <jbrouer@redhat.com> that XDP can
-work on higher order pages, as long as this is contiguous physical
-memory (e.g. a page).
-
-Reported-and-tested-by: syzbot+f817490f5bd20541b90a@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/all/000000000000774b9205f1d8a80d@google.com/T/
-Link: https://syzkaller.appspot.com/bug?extid=f817490f5bd20541b90a
-Link: https://lore.kernel.org/all/20230725155403.796-1-andrew.kanner@gmail.com/T/
-Fixes: 43b5169d8355 ("net, xdp: Introduce xdp_init_buff utility routine")
-Signed-off-by: Andrew Kanner <andrew.kanner@gmail.com>
----
- net/core/filter.c | 6 ------
- 1 file changed, 6 deletions(-)
-
-diff --git a/net/core/filter.c b/net/core/filter.c
-index 06ba0e56e369..28a59596987a 100644
---- a/net/core/filter.c
-+++ b/net/core/filter.c
-@@ -4116,12 +4116,6 @@ BPF_CALL_2(bpf_xdp_adjust_tail, struct xdp_buff *, xdp, int, offset)
- 	if (unlikely(data_end > data_hard_end))
- 		return -EINVAL;
- 
--	/* ALL drivers MUST init xdp->frame_sz, chicken check below */
--	if (unlikely(xdp->frame_sz > PAGE_SIZE)) {
--		WARN_ONCE(1, "Too BIG xdp->frame_sz = %d\n", xdp->frame_sz);
--		return -EINVAL;
--	}
--
- 	if (unlikely(data_end < xdp->data + ETH_HLEN))
- 		return -EINVAL;
- 
--- 
-2.39.3
-
+Whatevered-by: Jakub Kicinski <kuba@kernel.org> ?
 
