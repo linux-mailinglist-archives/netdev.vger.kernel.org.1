@@ -1,85 +1,69 @@
-Return-Path: <netdev+bounces-23436-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23437-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93C9D76BF85
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 23:50:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C84C176BF87
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 23:51:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AC5061C21028
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 21:50:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 08926281B76
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 21:51:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 319A126B7D;
-	Tue,  1 Aug 2023 21:50:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74A7526B7E;
+	Tue,  1 Aug 2023 21:51:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B954A263D7
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 21:50:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 2612AC433C9;
-	Tue,  1 Aug 2023 21:50:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32713263D7
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 21:51:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7081DC433C7;
+	Tue,  1 Aug 2023 21:51:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690926621;
-	bh=qg8R7Qj9T4gqti2LnGBxP2LG1W3NNHPhOHo+JMMtBHY=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=lV419Ir23v+Z9lw8JQsxLGh4XDrja7hgj1xZZfeQmOnxL434rzQnrlD8j8BqWd6Mk
-	 UeqF2KIinFgaoOY9p3g+3Fw/0MKKoXd/qUEIlhjOTMDPfvQ/oDrm8KzzBzr4VVWobf
-	 5S0phITd4aVoWCAU5fBniUhjKzwrXZivOBR7xDsn8Nnu5edLA/sTKB0Fzy11QGaBXs
-	 4bZtD1CCvGzwpfZA/ATdLDKUn7qvqcGpkVZZ5Hs2ZsN8ZsZOURfn0wIM6N8lK5f5Vd
-	 47ZGjmAwbSrUKuuQbdHtoxxlrz/o0/1xGo7NlqL86rmDPaKM2Tr6Wv0uCCeMDYm7iH
-	 pGHw/OD3m6ipA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 09650C691EF;
-	Tue,  1 Aug 2023 21:50:21 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1690926676;
+	bh=4dYL6EavnS6V/WEwMnlud6nMt53cQOrRwJGdMdREcSg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Ea86IZrl/0H6euUS4i9ji2lVI4hqosY13fdKD8VJiQOs/xLhRtHS5ZeUhYFiS+Vg4
+	 GrqrxzNevJoM9iBxCHbi+MYzYHdzRLcmrXkstsOihtbRkPiWZut6lS/JMxjUU1On7V
+	 Ef848XgqHAqcJw9hKurZL05cGCuB5Yv+vQMNzxRCYilxSGZe9b7+VwuPQqkI0fAXqr
+	 7CX7KP6d+Q1cM95rwTv/tzqZ41m8TtESjCOGaTrg6e8xTbmOkVeMI8HYCLbcwCRWDK
+	 MKdumOKc6bzBo6VXUQGoWMpI/XRSFwJ9trRH34fnvw/NAkoErCLsfsAj1fzsVz7DZ1
+	 NX8XKQgsThM3Q==
+Date: Tue, 1 Aug 2023 14:51:15 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Atul Raut <rauji.raut@gmail.com>
+Cc: Larysa Zaremba <larysa.zaremba@intel.com>, <avem@davemloft.net>,
+ <netdev@vger.kernel.org>, <pabeni@redhat.com>, <rafal@milecki.pl>,
+ <linux-kernel-mentees@lists.linuxfoundation.org>
+Subject: Re: [PATCH] net/macmace: Replace zero-length array with
+ DECLARE_FLEX_ARRAY() helper
+Message-ID: <20230801145115.153f3629@kernel.org>
+In-Reply-To: <ZMkSIfUEnvYvHyZx@lincoln>
+References: <20230730231442.15003-1-rauji.raut@gmail.com>
+	<20230731073801.GA87829@unreal>
+	<ZMkSIfUEnvYvHyZx@lincoln>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net: ll_temac: fix error checking of
- irq_of_parse_and_map()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169092662103.6936.6671891204915051164.git-patchwork-notify@kernel.org>
-Date: Tue, 01 Aug 2023 21:50:21 +0000
-References: <3d0aef75-06e0-45a5-a2a6-2cc4738d4143@moroto.mountain>
-In-Reply-To: <3d0aef75-06e0-45a5-a2a6-2cc4738d4143@moroto.mountain>
-To: Dan Carpenter <dan.carpenter@linaro.org>
-Cc: esben@geanix.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, michal.simek@amd.com,
- harini.katakam@amd.com, xuhaoyue1@hisilicon.com, huangjunxian6@hisilicon.com,
- yangyingliang@huawei.com, robh@kernel.org, netdev@vger.kernel.org,
- kernel-janitors@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Mon, 31 Jul 2023 10:42:32 +0300 you wrote:
-> Most kernel functions return negative error codes but some irq functions
-> return zero on error.  In this code irq_of_parse_and_map(), returns zero
-> and platform_get_irq() returns negative error codes.  We need to handle
-> both cases appropriately.
+On Tue, 1 Aug 2023 16:09:37 +0200 Larysa Zaremba wrote:
+> > > -	u8	data[1];
+> > > +	DECLARE_FLEX_ARRAY(u8, data);  
+> > 
+> > But data[1] is not zero-length array.
 > 
-> Fixes: 8425c41d1ef7 ("net: ll_temac: Extend support to non-device-tree platforms")
-> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
-> 
-> [...]
+> So, please, if you are certain that data should be a flexible array,
+> send v2 without calling data a zero-length array. Also, with such change, I 
+> think driver code could be improved in many places in the same patchset.
 
-Here is the summary with links:
-  - [net] net: ll_temac: fix error checking of irq_of_parse_and_map()
-    https://git.kernel.org/netdev/net/c/ef45e8400f5b
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Atul, you should respond to reviewers promptly. These are legit
+questions.
+On closer inspection the patch looks fine so to avoid clogging up 
+the review queue and wasting more time on it I'm just going to apply it.
 
