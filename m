@@ -1,30 +1,30 @@
-Return-Path: <netdev+bounces-23085-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23086-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90B9576AACE
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 10:23:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E83776AAD1
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 10:23:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 48F37281374
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 08:23:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 28F6528177B
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 08:23:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AE8F1F945;
-	Tue,  1 Aug 2023 08:22:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 329F21F951;
+	Tue,  1 Aug 2023 08:22:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1017C1EA9A
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 08:22:44 +0000 (UTC)
-Received: from out30-97.freemail.mail.aliyun.com (out30-97.freemail.mail.aliyun.com [115.124.30.97])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFAFCB1
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 01:22:42 -0700 (PDT)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R301e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046049;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0VoopI5u_1690878158;
-Received: from localhost(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0VoopI5u_1690878158)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24CF31EA9A
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 08:22:45 +0000 (UTC)
+Received: from out30-133.freemail.mail.aliyun.com (out30-133.freemail.mail.aliyun.com [115.124.30.133])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D425DF
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 01:22:44 -0700 (PDT)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R101e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046056;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0VoopI6T_1690878159;
+Received: from localhost(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0VoopI6T_1690878159)
           by smtp.aliyun-inc.com;
-          Tue, 01 Aug 2023 16:22:39 +0800
+          Tue, 01 Aug 2023 16:22:40 +0800
 From: Heng Qi <hengqi@linux.alibaba.com>
 To: "Michael S. Tsirkin" <mst@redhat.com>,
 	Jason Wang <jasowang@redhat.com>,
@@ -39,9 +39,9 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	Jesper Dangaard Brouer <hawk@kernel.org>,
 	John Fastabend <john.fastabend@gmail.com>,
 	Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Subject: [RFC PATCH 2/6] virtio-net: separate rx/tx coalescing moderation cmds
-Date: Tue,  1 Aug 2023 16:22:31 +0800
-Message-Id: <20230801082235.21634-3-hengqi@linux.alibaba.com>
+Subject: [RFC PATCH 3/6] virtio-net: extract virtqueue coalescig cmd for reuse
+Date: Tue,  1 Aug 2023 16:22:32 +0800
+Message-Id: <20230801082235.21634-4-hengqi@linux.alibaba.com>
 X-Mailer: git-send-email 2.19.1.6.gb485710b
 In-Reply-To: <20230801082235.21634-1-hengqi@linux.alibaba.com>
 References: <20230801082235.21634-1-hengqi@linux.alibaba.com>
@@ -59,70 +59,93 @@ X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-This patch separates the rx and tx global coalescing moderation
-commands to support netdim switches in subsequent patches.
+Extract commands to set virtqueue coalescing parameters for reuse
+by ethtool -Q and netdim.
 
 Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
 ---
- drivers/net/virtio_net.c | 30 +++++++++++++++++++++++++++---
- 1 file changed, 27 insertions(+), 3 deletions(-)
+ drivers/net/virtio_net.c | 54 +++++++++++++++++++++++++++++++---------
+ 1 file changed, 42 insertions(+), 12 deletions(-)
 
 diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index 30dd12e7d28f..9bf39024d53d 100644
+index 9bf39024d53d..91b284567c96 100644
 --- a/drivers/net/virtio_net.c
 +++ b/drivers/net/virtio_net.c
-@@ -3053,10 +3053,10 @@ static int virtnet_get_link_ksettings(struct net_device *dev,
+@@ -3129,6 +3129,42 @@ static int virtnet_send_ctrl_coal_vq_cmd(struct virtnet_info *vi,
  	return 0;
  }
  
--static int virtnet_send_notf_coal_cmds(struct virtnet_info *vi,
--				       struct ethtool_coalesce *ec)
-+static int virtnet_send_tx_notf_coal_cmds(struct virtnet_info *vi,
-+					  struct ethtool_coalesce *ec)
- {
--	struct scatterlist sgs_tx, sgs_rx;
-+	struct scatterlist sgs_tx;
- 
- 	vi->ctrl->coal_tx.tx_usecs = cpu_to_le32(ec->tx_coalesce_usecs);
- 	vi->ctrl->coal_tx.tx_max_packets = cpu_to_le32(ec->tx_max_coalesced_frames);
-@@ -3071,6 +3071,14 @@ static int virtnet_send_notf_coal_cmds(struct virtnet_info *vi,
- 	vi->intr_coal_tx.max_usecs = ec->tx_coalesce_usecs;
- 	vi->intr_coal_tx.max_packets = ec->tx_max_coalesced_frames;
- 
-+	return 0;
-+}
-+
-+static int virtnet_send_rx_notf_coal_cmds(struct virtnet_info *vi,
-+					  struct ethtool_coalesce *ec)
-+{
-+	struct scatterlist sgs_rx;
-+
- 	vi->ctrl->coal_rx.rx_usecs = cpu_to_le32(ec->rx_coalesce_usecs);
- 	vi->ctrl->coal_rx.rx_max_packets = cpu_to_le32(ec->rx_max_coalesced_frames);
- 	sg_init_one(&sgs_rx, &vi->ctrl->coal_rx, sizeof(vi->ctrl->coal_rx));
-@@ -3087,6 +3095,22 @@ static int virtnet_send_notf_coal_cmds(struct virtnet_info *vi,
- 	return 0;
- }
- 
-+static int virtnet_send_notf_coal_cmds(struct virtnet_info *vi,
-+				       struct ethtool_coalesce *ec)
++static int virtnet_send_tx_notf_coal_vq_cmd(struct virtnet_info *vi,
++					    u16 queue, u32 max_usecs,
++					    u32 max_packets)
 +{
 +	int err;
 +
-+	err = virtnet_send_tx_notf_coal_cmds(vi, ec);
++	err = virtnet_send_ctrl_coal_vq_cmd(vi, txq2vq(queue),
++					    max_usecs, max_packets);
 +	if (err)
 +		return err;
 +
-+	err = virtnet_send_rx_notf_coal_cmds(vi, ec);
-+	if (err)
-+		return err;
++	/* Save parameters */
++	vi->sq[queue].intr_coal.max_usecs = max_usecs;
++	vi->sq[queue].intr_coal.max_packets = max_packets;
 +
 +	return 0;
 +}
 +
- static int virtnet_send_ctrl_coal_vq_cmd(struct virtnet_info *vi,
- 					 u16 vqn, u32 max_usecs, u32 max_packets)
- {
++static int virtnet_send_rx_notf_coal_vq_cmd(struct virtnet_info *vi,
++					    u16 queue, u32 max_usecs,
++					    u32 max_packets)
++{
++	int err;
++
++	err = virtnet_send_ctrl_coal_vq_cmd(vi, rxq2vq(queue),
++					    max_usecs, max_packets);
++	if (err)
++		return err;
++
++	/* Save parameters */
++	vi->rq[queue].intr_coal.max_usecs = max_usecs;
++	vi->rq[queue].intr_coal.max_packets = max_packets;
++
++	return 0;
++}
++
+ static int virtnet_send_notf_coal_vq_cmds(struct virtnet_info *vi,
+ 					  struct ethtool_coalesce *ec,
+ 					  u16 queue)
+@@ -3136,25 +3172,19 @@ static int virtnet_send_notf_coal_vq_cmds(struct virtnet_info *vi,
+ 	int err;
+ 
+ 	if (ec->rx_coalesce_usecs || ec->rx_max_coalesced_frames) {
+-		err = virtnet_send_ctrl_coal_vq_cmd(vi, rxq2vq(queue),
+-						    ec->rx_coalesce_usecs,
+-						    ec->rx_max_coalesced_frames);
++		err = virtnet_send_rx_notf_coal_vq_cmd(vi, queue,
++						       ec->rx_coalesce_usecs,
++						       ec->rx_max_coalesced_frames);
+ 		if (err)
+ 			return err;
+-		/* Save parameters */
+-		vi->rq[queue].intr_coal.max_usecs = ec->rx_coalesce_usecs;
+-		vi->rq[queue].intr_coal.max_packets = ec->rx_max_coalesced_frames;
+ 	}
+ 
+ 	if (ec->tx_coalesce_usecs || ec->tx_max_coalesced_frames) {
+-		err = virtnet_send_ctrl_coal_vq_cmd(vi, txq2vq(queue),
+-						    ec->tx_coalesce_usecs,
+-						    ec->tx_max_coalesced_frames);
++		err = virtnet_send_tx_notf_coal_vq_cmd(vi, queue,
++						       ec->tx_coalesce_usecs,
++						       ec->tx_max_coalesced_frames);
+ 		if (err)
+ 			return err;
+-		/* Save parameters */
+-		vi->sq[queue].intr_coal.max_usecs = ec->tx_coalesce_usecs;
+-		vi->sq[queue].intr_coal.max_packets = ec->tx_max_coalesced_frames;
+ 	}
+ 
+ 	return 0;
 -- 
 2.19.1.6.gb485710b
 
