@@ -1,152 +1,175 @@
-Return-Path: <netdev+bounces-23334-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23335-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB53076B95B
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 18:06:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F04A76B987
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 18:18:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CEF8B1C20F6F
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 16:06:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9A957281869
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 16:17:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59E391ADF2;
-	Tue,  1 Aug 2023 16:06:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E4EB1ADFA;
+	Tue,  1 Aug 2023 16:17:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 468741ADD9
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 16:06:12 +0000 (UTC)
-Received: from EUR02-DB5-obe.outbound.protection.outlook.com (mail-db5eur02on2071.outbound.protection.outlook.com [40.107.249.71])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BF7E90;
-	Tue,  1 Aug 2023 09:06:09 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=D4ibUWoevjz+9/RPs+bzhPw6kGmoYsWIjFOCjgQ+/8kwi4qQH7Yn0ZJ8VfSldPmhHufwU+LwaoDfLwURQOkrAjexCzZZcyYdBxUrLwDK94fVCNhGSZAOr0P+ZtqWAfho9Gr/wQ80JDrTNO+fh/sGEw4+YhXRhPDRrxaU2kSlbJrzjrIqeVU64XWMI3G9ekyHNqj8jFnEZbu677+NrjMnzWSk+n1fmAynF8xUSExlsfZ8ukOPh59N/R/QywhDPplscg97ZgoqkLU70JFfmqbaRUmyAuIC64NLQ1ZAMKrywYFb8WhOOYtPVRzoBaFZvjOyKi80WvcLPuDwEB0b6M7M1g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=LmEyjhaL8WdQggIvGsDlx/Bs9VBS5+uXEwMeM6RQl48=;
- b=jUrL5YZJu2BtzH1+n1ZkeVfcBiDv21CIWDbwPFZW4H7CRsx6l/YvghZw59O0P4B89SWN2Ohk6nRZ+M/HhqQEe8Aq8+1++qGmRVr05Xr1c9hR9DKOaCasQMQ26801F9hbKbs2ow28qHhPdiz9AgkLJyW0Oms2XuJ+GRcceAYOwWPf8SwXXDP+Ss4ipLJUbMGOU9AnJ1fIa41y7+s+3j3SQaLqPzRxR84bq4ezel+KUMNBR/ejAENHO0ul+fSMdRAPM/q6zDwBrjGMJJz2WdYhE4WUUTR0NCYEsNThnXt9+Yth/tblTqhPn/Oub6yIonNl+l5wH/M/RCWhF1feQCX1uA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=LmEyjhaL8WdQggIvGsDlx/Bs9VBS5+uXEwMeM6RQl48=;
- b=SgBOxq6almSBxvhK4Am3uW4LJbv9M8RlMvIkIDMD/Bp/gOh57zYuhhFCJMgKoohmpzwCb3ym2kV821/+5UkqtEvH7AP2shwoAdlOvWAcbfO5B/i497yGR9J1dI2P+S0nTg1R+/lPbr24boHItE+Nz23+FK0BASknb3mAKLgyg2I=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
- by AS8PR04MB7605.eurprd04.prod.outlook.com (2603:10a6:20b:292::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.43; Tue, 1 Aug
- 2023 16:06:06 +0000
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::6074:afac:3fae:6194]) by AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::6074:afac:3fae:6194%4]) with mapi id 15.20.6631.043; Tue, 1 Aug 2023
- 16:06:06 +0000
-Date: Tue, 1 Aug 2023 19:06:02 +0300
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: Pedro Tammela <pctammela@mojatatu.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BD0B4DC61
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 16:17:57 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE215132
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 09:17:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1690906675;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=l5c5x2m4IYrem8PdNKSvmUfDJDtRMMxft9vUT5B0Fjk=;
+	b=c/4sNp7XaCKMR2OwETuIHdCdtjnzmlVvFVWQlY9o7RIdCK5itzNaQVBe3Vl+hBmImmeME9
+	fgSwkM/6OdR0P0RwAn4y2Z/JtaAAGjkwvReGL6U6aceaTqt55eY91NT4xOuBZ/fUwoXVJL
+	tGDhxA4v6HoNch3QPHa5B5kIWj28i/Y=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-160-Z7wB0Xg9O4G3eNulcJxnFQ-1; Tue, 01 Aug 2023 12:17:53 -0400
+X-MC-Unique: Z7wB0Xg9O4G3eNulcJxnFQ-1
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-3fd2209bde4so31387425e9.1
+        for <netdev@vger.kernel.org>; Tue, 01 Aug 2023 09:17:53 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690906672; x=1691511472;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=l5c5x2m4IYrem8PdNKSvmUfDJDtRMMxft9vUT5B0Fjk=;
+        b=hwpayWvWI65PPV494haHWAd/X7XlDuHEIpSD74Mn+Ljt2SMDudIvVcA/ljMEL/haMI
+         zaJQew1YdwxVsIwN5deYYtZN2MWDEazUpC78GGNOCP/oI9dDXwt4IdGMqKVg5Y8r7gUS
+         oDtG3KGgSlSXN08/6xyvcMi8lRWwdRs/YWXQRZvhKuzCSkFlIZX2QaVJvnnxx671Wryo
+         j4EVA++tTTRarXABSNs4a7H9YbGnaz6fUKu3jDdkA+yiKonx12iNsHi/p2y0/YQlgBB4
+         09uw9PnPXErFRdm/zAqmo6Uov5JpPZYJebPM4uIPHIpzAZ3b8Tv7ROhARZj2HFHcytOm
+         dEWg==
+X-Gm-Message-State: ABy/qLaxOxQ9E/4x99s+igxKKMUPIU1Va1HuF/svX708S1TGKXic+MXb
+	PAHSDUStFKmFiCaBvgxlYQUyIAsEXvxbMzudN18t5qGcWWnetk8kaeRg2DKAm4Z6wx8gxlmTLrL
+	MGgolt4OPZRbaVSVp
+X-Received: by 2002:a1c:f719:0:b0:3fe:188c:b684 with SMTP id v25-20020a1cf719000000b003fe188cb684mr2874890wmh.7.1690906672680;
+        Tue, 01 Aug 2023 09:17:52 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlHzGaEDuesnxEFzI0n611DuR5a4DRd8NJaxHoq6B/0W1UuZ3GQSQuSUE+vdJPZJwfyXDPDA7Q==
+X-Received: by 2002:a1c:f719:0:b0:3fe:188c:b684 with SMTP id v25-20020a1cf719000000b003fe188cb684mr2874878wmh.7.1690906672372;
+        Tue, 01 Aug 2023 09:17:52 -0700 (PDT)
+Received: from redhat.com ([2.52.21.81])
+        by smtp.gmail.com with ESMTPSA id l27-20020a05600c1d1b00b003fe1b3e0852sm4530904wms.0.2023.08.01.09.17.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 01 Aug 2023 09:17:51 -0700 (PDT)
+Date: Tue, 1 Aug 2023 12:17:47 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: Christoph Hellwig <hch@infradead.org>,
+	virtualization@lists.linux-foundation.org,
+	Jason Wang <jasowang@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
-	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
-	linux-kernel@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
-	Muhammad Husaini Zulkifli <muhammad.husaini.zulkifli@intel.com>,
-	Peilin Ye <yepeilin.cs@gmail.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Zhengchao Shao <shaozhengchao@huawei.com>,
-	Maxim Georgiev <glipus@gmail.com>
-Subject: Re: [PATCH v2 net-next 0/9] Improve the taprio qdisc's relationship
- with its children
-Message-ID: <20230801160602.t3wmgc2iisjj3xls@skbuf>
-References: <20230613215440.2465708-1-vladimir.oltean@nxp.com>
- <3b83fcf6-a5e8-26fb-8c8a-ec34ec4c3342@mojatatu.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3b83fcf6-a5e8-26fb-8c8a-ec34ec4c3342@mojatatu.com>
-X-ClientProxiedBy: AM0PR02CA0034.eurprd02.prod.outlook.com
- (2603:10a6:208:3e::47) To AM0PR04MB6452.eurprd04.prod.outlook.com
- (2603:10a6:208:16d::21)
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: Re: [PATCH vhost v11 05/10] virtio_ring: introduce
+ virtqueue_dma_dev()
+Message-ID: <20230801121543-mutt-send-email-mst@kernel.org>
+References: <20230710034237.12391-6-xuanzhuo@linux.alibaba.com>
+ <ZK/cxNHzI23I6efc@infradead.org>
+ <20230713104805-mutt-send-email-mst@kernel.org>
+ <ZLjSsmTfcpaL6H/I@infradead.org>
+ <20230720131928-mutt-send-email-mst@kernel.org>
+ <ZL6qPvd6X1CgUD4S@infradead.org>
+ <1690251228.3455179-1-xuanzhuo@linux.alibaba.com>
+ <20230725033321-mutt-send-email-mst@kernel.org>
+ <1690283243.4048996-1-xuanzhuo@linux.alibaba.com>
+ <1690524153.3603117-1-xuanzhuo@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|AS8PR04MB7605:EE_
-X-MS-Office365-Filtering-Correlation-Id: 56e603bd-7caf-4918-c007-08db92a93673
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	MhM/bD1l93SbdalIoRTSzDVE2TkhBkeitjuZYCvZLqUO2Uum4BKdKwkWEMqUO7MwBz9n7YfbAvmZA5y8xuq79DMg/7y37gNCB8K4IAYziExz8NP44nXJoRx5Y9UxNza+AE9Vh1MkTnMCPKyV0A/TeM3V6+i7qEg2q2lzeZqvbffIpozsZUrZNxoJobOkv/3K+/jGqGCGMwuHohr63GbXqVsc9SCaMmDw49UsbtVtEtuDlWTQXr6LzvoGSi7Lmu1WszJ8Tf336TQ3EJW6z9sA39t5vCwQh9TO5kNKJWM/qBIpU8inTVGDCZPmkxqqnOZDfSIheo5MPvUiZmWZQ1o7LEzHjfIjSu8yxll+r6O6xr0jWK9Gne/0njP2pD2nu2OiSj8nMiFSPG4LH2YVjnsX3gewnNrRjU+Rpmn5Nvq2QHW2PxaZGnv74TnDRXUL/+0asqj1C6tiVF30gtjLgPCO0vDD0tyf8XlVzkGdtkMV9HvMSKFdBhq/jhmggQGD1johcfvzCue9y5St5FSOYoYMqpU06r524bHkExMrwzqVW1mFMyJsA388OhY8HTeuVPZ7
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(7916004)(39860400002)(366004)(376002)(346002)(396003)(136003)(451199021)(44832011)(9686003)(6512007)(6486002)(53546011)(26005)(1076003)(6506007)(186003)(66946007)(66556008)(7416002)(54906003)(33716001)(41300700001)(86362001)(38100700002)(66476007)(6916009)(4326008)(5660300002)(8676002)(8936002)(316002)(2906002)(6666004)(478600001)(4744005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?9MKNEfI2z1LgHhjxzZ9L39w3pHZXa4Kwv086qFHIUsT1oYFghBUM0zOavwrP?=
- =?us-ascii?Q?zzhv8nAX23jUhP2mySXiNpGUBPOXHu7Fxm1en4oGeA/IXYlp3JVfuIlN4BN2?=
- =?us-ascii?Q?9VLsebpwG3JDkoDuBSfanbjCFhZo1jLcZq3kA9cT3WfFI0jz9yYtgbSqxzzv?=
- =?us-ascii?Q?nu9izqFNbq86a9hwWEvtmk7UVCs5s1CNp8wUU6tU+ZVbiD23QKklHJzqN6m+?=
- =?us-ascii?Q?kPBeZRW8rJecSr9Y0dv5CuunzIqT5sHBe8BYuTzndOTQ9ekGyBCTAZGW+aGU?=
- =?us-ascii?Q?qDiHH0+nvIFvXk4Yp3BDwRY39QHB5AL9jkS94fbcO0RsEez0DoMryTM2PWSd?=
- =?us-ascii?Q?237QUt4L5ZpB0kmfqWGjLDU/tTuBbd+r9sAP2pqf5viEpmSzCghazeEbK8Vq?=
- =?us-ascii?Q?lSawUN25ZkVDn0AYJjqsFwvojqZMIbAvgTpXsMZZmQ6il341Vrk2VGbQpqYz?=
- =?us-ascii?Q?VvcAkiNgZTjZ4O1jlBFh3pTExcdZ5u65Pf5pF6d6oMeRv6sF1ZnBegdC0iqI?=
- =?us-ascii?Q?uYxTqGRnQTPudv7qE8V1Z6Saen5JNLfBjxm1YUyXd+Jwrg01/zPHeEiHT2Xc?=
- =?us-ascii?Q?sPK1L1N8yZOzQ0M9khzHD5a8zSKEIJJVIfH5L/rx7IaZ2V5O8HsbGtBv6wL2?=
- =?us-ascii?Q?3oAVlruE6K6XiueCQFNT/tsHy0do4mb+OBNR5nXhN1ANWEeUJHsVVfRRwK95?=
- =?us-ascii?Q?9Qp8Ir8BbshZh5PavbQQdARvRKF56TiaaN2+ujkfxINO6pp2efskuLlWWm+4?=
- =?us-ascii?Q?yDvkCExjEMDXmb1Yp88EORzxLy9kAH2i2RK4S9Qb+KLJiY8s30w2sRh/bQdF?=
- =?us-ascii?Q?yClhxEVsa+XZi2tAiup+PD691C582rGMkC9d3qjL9EDvkRV7QxqwKSdqEUSn?=
- =?us-ascii?Q?cnByCZCbY6wxzLv6n0im4YdjlI6V5jOfFxpGRubZf+lmsHDY6fd/UCAbqLVw?=
- =?us-ascii?Q?euGDYmF2PK9w8ETAQ0gvDoANRes021d+FHDGL/8rwGX7XG2XoooW+Yz0kd3w?=
- =?us-ascii?Q?mdl5Ez188P1J/0FC/J/vKm7XVvIBXlLpYk6Qf02J27vZbzVW+BALzcWm+zMs?=
- =?us-ascii?Q?OINHW65FSjd1rAVY+/jmAPpm6xB2xkl+e/R0pjjYREyWYxxQr8Nb4qVdmjo+?=
- =?us-ascii?Q?laDLrshT2AajHtr+JBuMUpm4Zxk7q+XEDShWH84hsJXTlskG/7POxdZKQp2U?=
- =?us-ascii?Q?BWfKhLT4HACu9vxfnTioTLOlcpvAdE5+KuczVH1pLR14O2GA4rwIq6vKdTVw?=
- =?us-ascii?Q?cJJBuhjia2brvluhgiZ+Umz7vld8HyXRinEj5NY32WC6IDvfzfBPSXdc/mbS?=
- =?us-ascii?Q?nD+lgzKhZ35gi46UAd4syQesSF8ztJHodg5t5AuDiKxSXUk3kXJ+D4+IHVH1?=
- =?us-ascii?Q?vhHGxPGDU8+3Q3V9xIHOy7Y4a7zXARLnPWzOvztrSF+J6A2IegxR5KSICfbP?=
- =?us-ascii?Q?fOpLIW2HUn8enJ8rh+VcBtm3d0SvP9vlf1Ri6gjFebnTOVjsWDhEIHL9FMDq?=
- =?us-ascii?Q?MIQfr7s9lExCSVix07rIkHquNClMYrU5+ddWjsgb2PZDh2/u71EmGOOoyT/i?=
- =?us-ascii?Q?P9YuTCksh7j5s/7K1XH0I78R4qwFIIR8LXWjfpo7rbV4iVQWJU6rhPGIFP66?=
- =?us-ascii?Q?qg=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 56e603bd-7caf-4918-c007-08db92a93673
-X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Aug 2023 16:06:06.6463
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: fOsE7d+Bo9tT8KI1LW+dzUPx9t411OeSR7fj1NtnP8HEbB+d0zUaF2+aRMRYFV4+VWy0hjZyZcL3kteGmgaOrg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB7605
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1690524153.3603117-1-xuanzhuo@linux.alibaba.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Jun 14, 2023 at 01:47:25PM -0300, Pedro Tammela wrote:
-> On 13/06/2023 18:54, Vladimir Oltean wrote:
-> > [...]
+On Fri, Jul 28, 2023 at 02:02:33PM +0800, Xuan Zhuo wrote:
+> On Tue, 25 Jul 2023 19:07:23 +0800, Xuan Zhuo <xuanzhuo@linux.alibaba.com> wrote:
+> > On Tue, 25 Jul 2023 03:34:34 -0400, "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> > > On Tue, Jul 25, 2023 at 10:13:48AM +0800, Xuan Zhuo wrote:
+> > > > On Mon, 24 Jul 2023 09:43:42 -0700, Christoph Hellwig <hch@infradead.org> wrote:
+> > > > > On Thu, Jul 20, 2023 at 01:21:07PM -0400, Michael S. Tsirkin wrote:
+> > > > > > Well I think we can add wrappers like virtio_dma_sync and so on.
+> > > > > > There are NOP for non-dma so passing the dma device is harmless.
+> > > > >
+> > > > > Yes, please.
+> > > >
+> > > >
+> > > > I am not sure I got this fully.
+> > > >
+> > > > Are you mean this:
+> > > > https://lore.kernel.org/all/20230214072704.126660-8-xuanzhuo@linux.alibaba.com/
+> > > > https://lore.kernel.org/all/20230214072704.126660-9-xuanzhuo@linux.alibaba.com/
+> > > >
+> > > > Then the driver must do dma operation(map and sync) by these virtio_dma_* APIs.
+> > > > No care the device is non-dma device or dma device.
+> > >
+> > > yes
+> > >
+> > > > Then the AF_XDP must use these virtio_dma_* APIs for virtio device.
+> > >
+> > > We'll worry about AF_XDP when the patch is posted.
+> >
+> > YES.
+> >
+> > We discussed it. They voted 'no'.
+> >
+> > http://lore.kernel.org/all/20230424082856.15c1e593@kernel.org
 > 
-> Hi Vladimir,
-> Thanks for adding the tdc tests.
-> This series seem to have broken test 8471 in taprio but I don't see it fixed
-> here.
-> Do you plan to fix it in another patch?
->
+> 
+> Hi guys, this topic is stuck again. How should I proceed with this work?
+> 
+> Let me briefly summarize:
+> 1. The problem with adding virtio_dma_{map, sync} api is that, for AF_XDP and
+> the driver layer, we need to support these APIs. The current conclusion of
+> AF_XDP is no.
+> 
+> 2. Set dma_set_mask_and_coherent, then we can use DMA API uniformly inside
+> driver. This idea seems to be inconsistent with the framework design of DMA. The
+> conclusion is no.
+> 
+> 3. We noticed that if the virtio device supports VIRTIO_F_ACCESS_PLATFORM, it
+> uses DMA API. And this type of device is the future direction, so we only
+> support DMA premapped for this type of virtio device. The problem with this
+> solution is that virtqueue_dma_dev() only returns dev in some cases, because
+> VIRTIO_F_ACCESS_PLATFORM is supported in such cases. Otherwise NULL is returned.
+> This option is currently NO.
+> 
+> So I'm wondering what should I do, from a DMA point of view, is there any
+> solution in case of using DMA API?
+> 
+> Thank you
 
-Thanks for pointing it out. I'll be unbreaking it in the next version,
-as part of the patch that changes the "tc class show" output.
+
+I think it's ok at this point, Christoph just asked you
+to add wrappers for map/unmap for use in virtio code.
+Seems like a cosmetic change, shouldn't be hard.
+Otherwise I haven't seen significant comments.
+
+
+Christoph do I summarize what you are saying correctly?
+-- 
+MST
+
 
