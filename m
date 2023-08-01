@@ -1,104 +1,104 @@
-Return-Path: <netdev+bounces-23349-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23351-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C82B176BAF3
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 19:17:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8BFC676BB29
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 19:24:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 78313281B00
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 17:17:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A32A71C20FC3
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 17:24:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E0BF21D4E;
-	Tue,  1 Aug 2023 17:17:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A37122EEB;
+	Tue,  1 Aug 2023 17:24:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 375312CA5
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 17:17:50 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70F491716
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 10:17:48 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D2442CA5
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 17:24:53 +0000 (UTC)
+Received: from mgamail.intel.com (unknown [134.134.136.20])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A455E0
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 10:24:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1690910268; x=1722446268;
+  t=1690910684; x=1722446684;
   h=message-id:date:subject:to:cc:references:from:
    in-reply-to:content-transfer-encoding:mime-version;
-  bh=ux9st9WOFYfxc5xnDnfTlfZU8k5psJY2ekgFoRWh0J8=;
-  b=F04YdIDRbyk9oIAcjfL+fMCRYxb0uZuo5RR0p2HpazCKzrvj/2p9j+qO
-   zOc+UCirMjhMcVURSC22Bu+Kn8bkc3L6TCxPIfn8IVcJxJMbqs9LR2srC
-   VJEh98OMSPicvhqHXm6+KOc4Uu560x3geoGKVBW4f2Bc2KYx9nr2Eur7u
-   xA5oo5rbzSppD9CvuqU0C0NL3ffDnAKV3UjAynpAvMg/Of7EDTSiNquNi
-   B6yn7ZQtj/wxsqF2VT+9oUAwy9gorS15qI5XDEG62M4E2xCzkZnwIqrXq
-   RP+G+po+ijqowYW6AKMyLvCz4gv8+SxBbpOzZxLeZwzmpIwhz1iu/gmcE
+  bh=kl5oh7N3qE7T6nku3BE+F5b443Wn3IJv0MvBWW6qxV0=;
+  b=RYsNp8iT2iReAUdiPbOPFGaAmXJ7Ns6EyNnj84yo2/hGCFVgnTFmWq3S
+   4OMSIeaYMSrWbtMdnhk3GlQWGUXLhhLLXwlFPwlr6CwFPh6C1OhK4OGXl
+   +ztQoZWGzetVJzykZDhGq8zQJ6ftBq27DfwZ+/izE+6nmC7Uq5wCL1O1T
+   eNHHZTOIL+opmrTaJkPSsiJBE+miS5wfTVBIFQ/qW8cFfWxojTJBpi5kY
+   FAGvzItU7+YF08mkNC/P4a5sRR/VSfLQkiYAKABqt0yFkFQvELzJz46AY
+   vzEIDXB7vgLvs2FccA/dHkYYsLr34s+NXyxPU0pjGsMOIhsBDmgQGC6Ux
    g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10789"; a="359407041"
+X-IronPort-AV: E=McAfee;i="6600,9927,10789"; a="359410057"
 X-IronPort-AV: E=Sophos;i="6.01,247,1684825200"; 
-   d="scan'208";a="359407041"
+   d="scan'208";a="359410057"
 Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Aug 2023 10:17:08 -0700
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Aug 2023 10:23:50 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10789"; a="842808072"
+X-IronPort-AV: E=McAfee;i="6600,9927,10789"; a="842813957"
 X-IronPort-AV: E=Sophos;i="6.01,247,1684825200"; 
-   d="scan'208";a="842808072"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by fmsmga002.fm.intel.com with ESMTP; 01 Aug 2023 10:17:07 -0700
-Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+   d="scan'208";a="842813957"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by fmsmga002.fm.intel.com with ESMTP; 01 Aug 2023 10:23:50 -0700
+Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Tue, 1 Aug 2023 10:17:07 -0700
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ 15.1.2507.27; Tue, 1 Aug 2023 10:23:50 -0700
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27 via Frontend Transport; Tue, 1 Aug 2023 10:17:07 -0700
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.169)
- by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ 15.1.2507.27 via Frontend Transport; Tue, 1 Aug 2023 10:23:50 -0700
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.103)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.27; Tue, 1 Aug 2023 10:17:07 -0700
+ 15.1.2507.27; Tue, 1 Aug 2023 10:23:49 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=GsIG6AmEsVMjZMxfASbnelcQquRXcUp+RbOQltA+XwAvwPCmAXwpVZ0ZScVBnUw9dOO9Qex8MoCFCpG755t6ITCOiKQd/axGMX0Yu9LluQv25IKZPsNlaqOmat42hIENtORP+UwsOOVgOZr21oB4ksSqY2bUOmoVMnD80bVYVgvxY1vKOagzE++vkOr/ggWI1Ziy6ANxQa0tyLBT/ptos088gBbvFsKVs52LMKpSu7mqsZEj4arbJL3VygR3F9syp7CL1/Ah0CnoCyyuH+3jOOUxTtqhhCN9Te7n/l0YDP+qd3DXUSm9YROHr/vb67s7IHe/JmHtcuTbF1MD2N5FuQ==
+ b=Z1/SNHR3DpqqpeYmu2A91MddjwMMjPWHE71PgceIF04iUyEIgEBOcDMA1FWgEoO73030akflOyEB9QbzXZIwoXy2gBweDgHZmFb8iMz3G1pYTn2mf7Tl5GGrdb72ByNhQsUX2IoVm0LOoELy324eahtGa36vdR8frEHXmGVIDJbInEJOXkc+LS83s2EEyiEA1ZD+90Mfa5KyP47K16q2K1J8Yfxcht1E7Deecd/gGH0sqQiB69VNfOFB3G6idzqrp75BfScwo4MlAN4HH5rOOddxoXpMrJ5if2KIL8yTtTYLMfVa0thBIoCXWef2bkQKlvQ4qg12FHfouWghLrPFGQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=hbAMr1KlVBcY3xejFqEp1ZQIPuo/S9EggkGif5hsi94=;
- b=U5oYHWoIEK6bPyxYpDd0ieX0ci3G8xEcBSM5hhxRK5KRz2ulBCRdgWoI4lecVLi7btW3t7/EunoMMRln1uKp+PO2Iq8jsopi03DBrnQirAGGj8YZd+w14HuH4PGtOsK/SwZLvWPRZIwYJzu5nr6fNnk6JIVhS1TKIa9IYVydmJYJKtWvxzUZaUfFenU/gIvD8+xDHHaw4tfnMYmy79b33UX9Gn0jLJHeaMTiwqw3zgUIWiJ1tQIVVyV4bOZBeY3U/6zcstgFDJG0hmqRXX9EsIzuk/3UHDTeETHk4kB8rnFudTH5Molk4Y9Xt9ThNTcSjbrLicrNukbpIOoy6oiBmQ==
+ bh=sTr09zR93vQUTgsE7qsxAUlcthOLMn5v75EuCK++F8s=;
+ b=kz7VuydppmNyUu3qUbCQs2GTErmlvkvKcONz0NMWymTKSE4xOnwtcWPMVz1vgHK+XCYGaFcmfAuonMdxiavlght+CFcxDc7lUeBkopoE6DuRZoyLiqb0MR7IoDxu7ndj+baMkSqx5ZaKCWfJSmZFpgRNnHvRz1XXJglkVZcShrJX4waPq/aMs5tSILJ16IX2QxXDOT8TU4peMaL/lgcG7qQZcAFfdzlOFFWAXnlkSZPn/xtTREY5a4RPoGnLiYI3pl3KE2fWNjc4XSLiemoMclICuofC+fPyl43r6Hre4Wzuh2gsyuQsS6QqrAPYZrhU50ZnZaQbqfVJVVcbXD2o+A==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
  dkim=pass header.d=intel.com; arc=none
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=intel.com;
 Received: from DM6PR11MB3625.namprd11.prod.outlook.com (2603:10b6:5:13a::21)
- by MW5PR11MB5906.namprd11.prod.outlook.com (2603:10b6:303:1a0::21) with
+ by DM3PR11MB8757.namprd11.prod.outlook.com (2603:10b6:8:1af::7) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.42; Tue, 1 Aug
- 2023 17:17:03 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.33; Tue, 1 Aug
+ 2023 17:23:48 +0000
 Received: from DM6PR11MB3625.namprd11.prod.outlook.com
  ([fe80::44ff:6a5:9aa4:124a]) by DM6PR11MB3625.namprd11.prod.outlook.com
  ([fe80::44ff:6a5:9aa4:124a%7]) with mapi id 15.20.6631.043; Tue, 1 Aug 2023
- 17:17:03 +0000
-Message-ID: <7a83e627-6e03-c447-77f8-1020973fa4a9@intel.com>
-Date: Tue, 1 Aug 2023 19:15:16 +0200
+ 17:23:48 +0000
+Message-ID: <f18b3591-68b9-e375-1b25-810346d2304f@intel.com>
+Date: Tue, 1 Aug 2023 19:22:01 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.13.0
-Subject: Re: [RFC net-next 1/2] overflow: add DECLARE_FLEX() for on-stack
- allocs
+Subject: Re: [RFC net-next 2/2] ice: make use of DECLARE_FLEX() in
+ ice_switch.c
 Content-Language: en-US
 To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 CC: Kees Cook <keescook@chromium.org>, Jacob Keller
 	<jacob.e.keller@intel.com>, <intel-wired-lan@lists.osuosl.org>,
 	<netdev@vger.kernel.org>
 References: <20230801111923.118268-1-przemyslaw.kitszel@intel.com>
- <20230801111923.118268-2-przemyslaw.kitszel@intel.com>
- <d4d5324c-8d4b-b2e1-78c8-5c3015b5c03d@intel.com>
- <47815c47-b8dc-6d37-b869-0fba22e3a71b@intel.com>
+ <20230801111923.118268-3-przemyslaw.kitszel@intel.com>
+ <f68aa06c-c0bd-a614-914d-3e94ff8f4ba6@intel.com>
+ <0ac9d86b-c659-d4da-0838-7e0e447d2e49@intel.com>
 From: Alexander Lobakin <aleksander.lobakin@intel.com>
-In-Reply-To: <47815c47-b8dc-6d37-b869-0fba22e3a71b@intel.com>
+In-Reply-To: <0ac9d86b-c659-d4da-0838-7e0e447d2e49@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: BE1P281CA0128.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:b10:7a::18) To DM6PR11MB3625.namprd11.prod.outlook.com
+X-ClientProxiedBy: FR2P281CA0044.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:92::18) To DM6PR11MB3625.namprd11.prod.outlook.com
  (2603:10b6:5:13a::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -107,61 +107,61 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR11MB3625:EE_|MW5PR11MB5906:EE_
-X-MS-Office365-Filtering-Correlation-Id: 22940389-d22e-4bb1-58f1-08db92b31fb2
+X-MS-TrafficTypeDiagnostic: DM6PR11MB3625:EE_|DM3PR11MB8757:EE_
+X-MS-Office365-Filtering-Correlation-Id: fa18884c-c246-4446-4a09-08db92b4110f
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: GuuB+UUKCG6pNMK7xyaC2lQtV8Bpbd1+orM1zRI8qWiHuVZSyUoQ/45rUMV/t6Fa+7ISMLTkUApWZzS9EoDSKBsEhBVWXYFSuISwYzWwE2Xn9PybEDecCtDQc2ehbpqbXshrJXeZQmDiwQRnVze9dQru1qtmetaVBVDJMGQ4bsxCnk77Snz+wnjCnr8Cx0Jt8xLyb2TAe3g0XtSeaXtOz+9wCM+0eYZknxCbAHz0vzOJNDewHndNaH6+kLT0UAzy6VYKSOycwBPU0EgqKGYzJFTmSFNL5O19/IStQhTu7+IUvrlKT3Hj/9yI/Csaor/d+v4LvTBcYilVXHkQuw0aNtMWUn6Uu2IO6RLN4X9NAxQvju7Rs6NSC9iewPCgdgixAKFD4D8lr5Ksd/QjrAnWBiKN8i+1W/0oEyjtJRyXB0dMyGEMkO2oSCFEUBN0n+Yf6LMuxU9QaxIgW4cu9inffxEWrY8Rx7rIqNl0FS0jkw4XiAtoiC1A+4Sg77CWlyOmPFmBFrDLaHo1VBBaqSWGm+B0ZzyJ7ZKE5n9jEs+zl8zxfDgLneQCi5+61SPvXTpl968ytdSTqyUFdLG2ItXFywyf3RbR7X9UHD04yiFN9fS+7Q6s9pX/dR/R8Rnanr8m2pUchkKGcfJkC+Y4bLOV9w==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB3625.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(366004)(39860400002)(346002)(396003)(136003)(376002)(451199021)(6512007)(6486002)(36756003)(53546011)(2616005)(26005)(6506007)(83380400001)(186003)(66946007)(66556008)(54906003)(37006003)(82960400001)(41300700001)(86362001)(38100700002)(31696002)(66476007)(6636002)(4326008)(5660300002)(8676002)(8936002)(6862004)(316002)(31686004)(2906002)(6666004)(478600001)(43740500002)(45980500001);DIR:OUT;SFP:1102;
+X-Microsoft-Antispam-Message-Info: uk4HuCvncNghgljKVu7E27HuKFIhB6HSM8ZtebHUDCnG13nP1pF3xvzuvuhubjOJhJuje0BcHwNQc3AzTtZiGTLC+778gk8kElyxRE8KAsvHU4WF+O+UbdsHn4J98NBxm9tpaBqYixI4nrglo57eW9hSUlfFoNbSuK6/ock385b5g0oflisPPxvuzm/Px+RREIXXFlb0H2u5nD93XJJ9EaCrg/ZuJOcqaedIrRlq/zrAvh0GczA/VCPlPtVjYGrGdrtDsh+aul/XELrkVZaLwo8rfrXsTBOf1E1lQBEQjlO2LhY4ywGexbgsIaW6pYX+k6b+6ZSi1VKRtW9MRj3UZaaeCdvpSodS3ViZ2ite7kBnFzo/F9iIXXOGE++8HugFJD7GSuqC0ZCj9rcJAX1kgnd6dJacaIOCLV9guIEPyyG7kG+mnmzBhgLcwwj0Ippj0q/fY+DpPLQIqwYFInMo+VGdriVIpGV9Q7kc339NkcgoOk+ZZQYONknSdbJJnhlbJqm5D2SpgObnneqyVkaf5tBm3Xrk06qKP/HiJ8GzhdStyb1WFNU2DrOP28dMjzt4MMFZ8d5u0TP+ZAwvb9U9lMfBiDYjcvDXD2G3dhoYFlK9B34K05fZWnlNXtt5BzG86QaUbiEaMrdgu3iusY87CA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB3625.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(39860400002)(136003)(346002)(376002)(366004)(396003)(451199021)(31696002)(36756003)(86362001)(31686004)(186003)(53546011)(6506007)(82960400001)(66946007)(37006003)(5660300002)(2906002)(38100700002)(54906003)(6486002)(478600001)(2616005)(26005)(8936002)(8676002)(41300700001)(83380400001)(6636002)(6512007)(6862004)(66476007)(66556008)(6666004)(4326008)(316002)(45980500001)(43740500002);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?amhCRWlWeFphQ3Bvem5DS0RuSVpWNjNEekVZT0duU00rUkNTQWlacFl6ODBD?=
- =?utf-8?B?UzNMTnBXM25YYXM0blFlTDJ1RXFxdHVlc2E4L2pGS21MU3pFdEpDRGlTK1Vt?=
- =?utf-8?B?UklzSkhON3VrbUFtbWNXc2ZpVnVlNDhKblVDekR5RG4wOEFKZ1FPcjRLKzNV?=
- =?utf-8?B?dXpScmZTK3hmQ1pveiszdENOQVArakpnZHFWRDNPNlprMWpoaWIxcU8xemxt?=
- =?utf-8?B?KzFDSVZaL2hGSG1EaDYxaFpNVEtyRkFmckxqejhtV2FqRFFGeW96Vlh2NnVI?=
- =?utf-8?B?UmY1TEZGYklCZCs0K0FFNlZDVWFxQ2NHMVhHcC9hOTVoNExqa3hhTVFVZjJ6?=
- =?utf-8?B?d3MzWERINUdEWlkyTWE2b3B6MGFiUjJHcW1JZVZrZ0RiVE9GZTFtVHJWQnRp?=
- =?utf-8?B?NkhQV092M0FvWHVOTlh1SzFPSVFaN3lWM2paUGZRaHVBa1RhcjlrUm1ORlFn?=
- =?utf-8?B?VHk4REM4eFJ5NEx4MFdzOU9MMkJHaklHUXh1aE5FNTRlTFJBTFltekpXQy9P?=
- =?utf-8?B?L0d1aWYzcVZ6cEdSWEUxTFBvZFZmL2xKMk02M0N0VTNLNTF6UE1EVkQzOG9r?=
- =?utf-8?B?TjJPTFVzZURYdGhLSkc2enBNb3BwdnBxZjMvbWUvSlREa1JXSFFIVEZncE9i?=
- =?utf-8?B?YzdPV0dZQ1hCZGFRUFpHQXRIY3hsNjQza2NFTmZyQVZVNGNUUS9IVE1EWUNJ?=
- =?utf-8?B?emFJZCtTOGNWMXBVaWF5RlpFN01Qc244S3I4c2RwMTZBOGNBV2grci85RWlN?=
- =?utf-8?B?WlNlZGJWL0MxV3hqUXMzRURoZklSVW5ENVhuWm9qRlR4cFJzZjVra3I2Tkwv?=
- =?utf-8?B?LzlvbzZIRG54c09HODllM3RqUEMrUkdTdHJWTjRXaXVZTXdWaGgxc0IzbW5v?=
- =?utf-8?B?TnRvVTJxZTFRNkVReXlxY2dzTkwwM1VybWJmWEpESEdybU1WaGVQTnNVcXJN?=
- =?utf-8?B?bVBoaFlHTFBhUkVIdDltODNjeUZlTGZYOU1ONE1yMEMxZi91a2NHS3duRW4r?=
- =?utf-8?B?QlBDVjVSb3RJSWJUS3hHb29KL204WndjdVAvMVVUTUZxaFBsd21LSFZrKysx?=
- =?utf-8?B?d3hSblhtdS9uV2g5UzVZVHB2cTVhQkN5LzZhWTl6Y3IrUUNQNUg0Q0cvTUdp?=
- =?utf-8?B?WktQVEpjN2pWdzdhcXRMS3VhM0s3TmxPNWFJMXh5c0hIQ3o3ekJCTnZvTURC?=
- =?utf-8?B?aXNwcjZoYlZFYmtKcFBkMXhiTCtJYzI1R2tVRTlYRHJ5ZGxHdGVHYWF4cVl5?=
- =?utf-8?B?TlF5aHQxQWFzNjgwM1FWWVYvTDdiTWJHQ1dKTHA0Z2huRmV3NW5mTnNtUDN6?=
- =?utf-8?B?aHEzZE5QQ2RkNENyV1pmZ3o3RmJtRmR1SDFrcGYzTENUUEwxTWFQbUVpSDNC?=
- =?utf-8?B?anFtaDRzMkxGdkZvYllYUzE1Wk5Ea3hzWEErOUhiV2t4QlFiZkwzVjZkZklU?=
- =?utf-8?B?Q1BVSnprQjN0bDJ0T0pvOWZHRGdEUHdYNDUrU1NpQ2ZlSk9KUEJUcHlQNDQz?=
- =?utf-8?B?WWQzb3BmdlhMT0MwY2VzLzk3Kzl6NVY2NEc1M1VaSWsrbjdrcGp1NjI5dGdz?=
- =?utf-8?B?dGtHYVh0Y1l0UW0vN0FudURJZUhrUGdOdjhnZjhBOXNPT0VVaFBkWkJhbmdG?=
- =?utf-8?B?b0s5ankwUVE5ZDlmUm5XcDViZm1qUDg1eEZZam5lYng3b2NSWHB5WS9CUy91?=
- =?utf-8?B?SUg0UEkra04yVTAwM1FlTlVaSnNwSlArcUpoRHgvVXBZOUF1R28zK1IzcWRv?=
- =?utf-8?B?czJqNU8rVFZWRTh4WXQwenZJVHNWRnZLL3VKU2t0ckxaVms2SVNmNmZNQ3pI?=
- =?utf-8?B?NG5yUlhLSmFaOENHNlcxTUZENFF4L2U4djBFZ2FDaVdMTzdhZlU5UEJVS3VK?=
- =?utf-8?B?aFNhV0p3NXhxZ1BKRmNlQ3gwRXVsanA0V1EvUllqOVpXcnBuNkpqQzlZN3ZG?=
- =?utf-8?B?cno2dGs4akJBQXhsSlJiTmE1ODEzcXBYRDZUZ0NONUo4T0xVdlpoQUVtZEgy?=
- =?utf-8?B?NWlDbXBtNDlFYjBNUmZtWk9MWlh0cUNYMzJOcjM0WlBPSHIxbElOVG1sOXlJ?=
- =?utf-8?B?bFpyV3k4U3BCMHgyUkNWampHUnF2cHRZU3dBU1BmaHNzK1RRR3o4ZlVsVjE3?=
- =?utf-8?B?MFZCSmFiY0t5aDlHZEVuc0ZneWZjam0yQWpaYzF6djZ3bm9sSElnbTMydmh5?=
- =?utf-8?Q?IXCkRlXJSNROWr8Udx2ylNU=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 22940389-d22e-4bb1-58f1-08db92b31fb2
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?NEJYT2VyelkxUXFvSGpqOXR6a1lZdkdmVGp4UnRlYzBkdjNla0l1V2tCcFhH?=
+ =?utf-8?B?bkxJQ3BHSFFYeEtxRENJemgwVjQvM0ZRd0VldmtnK216QXEzQnMwaVZqajJr?=
+ =?utf-8?B?WFE1bWlRbVpTVExOM1VRKzhGYU1JeVppbDltTHdwRjdLZ2dxWTRMc0pOakRL?=
+ =?utf-8?B?bUpUU2prbUZ1ekF1WHFNdzF1azNPZUtCd0dVdDdkUzUxQ2hrZ2M5RWwxbE9n?=
+ =?utf-8?B?cGFzWk9ZMGRmcjVxVDEwRGpxWng3NVFSekhtYkpYWWxybE55UUJScnlqemJ5?=
+ =?utf-8?B?YmJRY1hBdzFhamgreXNrVnpySlBldG0zY2tSS3lrLzFUc01sR3o4aDdSYkQ0?=
+ =?utf-8?B?MnYwd2d2YWdyRUh4QjNyREx2OFl2OXFNUzNnS2VyMzRMR2hIeWFoc2pTL3FE?=
+ =?utf-8?B?dVhwNTZDSElVRkRhMHBRWXlTT0dFTWNlWGRCMUh5ZUVtNkUwKzRIN0EwUEZ0?=
+ =?utf-8?B?WlFWNkZOTk1XNzIyWlBGUWV3bllVTVlnMk1ZYlFWWlYydk93NVl2QmpGSXhl?=
+ =?utf-8?B?b3pjQm9uZE5SaHErOGZsc2gxY1FzUWpHbWZOdThsbUFmZENyc3N2SE1FUlRU?=
+ =?utf-8?B?clBMaDhaeVFHYUh0SVBWRmpiNWdLWE9Fd1N3ck91eTBYNHMyd2hsUnVQME8v?=
+ =?utf-8?B?OTI2cUxYQlNUSkNUWnVUcXRxUHVVT01EeVJmZ0N2ZFJUSjFZSW9NY0ZORjRH?=
+ =?utf-8?B?dVozUU5ncXBiM09ocVBYUksvQ3NSdE40eVVIZjBCRmliYjltLzFGQ0t4TDRI?=
+ =?utf-8?B?STNnWmoybG56ei9FWFVBVWN2UGR0bzJKNHJUM0h0Y08xSzJna3k2UnRxTG95?=
+ =?utf-8?B?Y0lHUVJCdWtDWEpEdDh0dXFHVDQrR1g5eDcrdDFoekJDOUZ5ZDlUeE83N0pH?=
+ =?utf-8?B?cG9vanVNY2M0NHJOeEdvcUlWUVFRMUdPZFNrZnpQcW9FOU1Xay9tRzBaSHpE?=
+ =?utf-8?B?RHRwVzVsN1cyOXowdEJKYW9PTE9GaTdyNVNQTXlKUCtlZFdXeXVCendWMWV4?=
+ =?utf-8?B?VUZFYnY3TDJtZkl6cHZTVVFlcm9kYmYxd2dVYTVWRXUzRjhVWVJxLzVDUjQv?=
+ =?utf-8?B?VmU4Z3prTjJvR3RrZWczckVJYU81NkF3Sml2enBtTWlXUHIwaDFRdk1CNlp1?=
+ =?utf-8?B?NU1ud1gzcUY2cW9KdW85MzRsa2h1M0wyNlpDTGFFSk1BNWxwc1JGYUFZajFO?=
+ =?utf-8?B?aWRPb2loUnhBWk9GWVNzcituSkVEUjYvN0RVeXo1VXRRbDBaN3lMbW41M05B?=
+ =?utf-8?B?OEFFL0JYaGxrU1hISEc5RWtnZjBOZExRNWVieGJ0b1dLaW55aEtzY2E5RUNn?=
+ =?utf-8?B?QkZGVFVlNFcxaWdPVFhaeGdvN0xuR2E2QnpISmNRbXR0YXpxYWEzSU1Oc09H?=
+ =?utf-8?B?MUovMXg3RkRnUWdCT2hVOTJwRHQwMDc4MnZsb1N6NHQvWUE5SFd0V1pFM2xR?=
+ =?utf-8?B?Y1FNWlB2RG8rcnZBVnhsYnpZWmY4UUdOc3lLRkpxUHNqRS92Rm93eGVod21G?=
+ =?utf-8?B?OHlyTTFFTDhSbjZDelU0am9WTGJ3RGRoczNseFpOL0hLMXBpbUxkb3ExRnRV?=
+ =?utf-8?B?WmVkQVJOVkFtVWlHYVppd29sV3R4MGMwU1hzeXMwN3drS0RNSUdBbjFwaGxZ?=
+ =?utf-8?B?TzVWR0U5SDBRQmdUVmR0clZtMVpMNy96L3QxZStSZVZhVG1ZK2UzelgvQlNL?=
+ =?utf-8?B?TWNSOGt3UmhVYklXYUdUODhXOUpnYmwwVnYwWUp1UHo5QW5JNUdhR0t6ZTVz?=
+ =?utf-8?B?T1BHNXZEYSsyY251Yi9XbEV4RWd0U2t2MW5VVk5PM3ArREswNGdqL1daLyty?=
+ =?utf-8?B?RmVqaUlQK3hhL1p3ek5nZDBlcnBHL1ZueFMwVkw1Y2xPY01sN0pCT1pRVnI3?=
+ =?utf-8?B?YjlZenlZaGZZbXNod2ZKVUl5VzJKTUZpTGdiRW9tMXJ6anhtSkVwYkVpa2Fo?=
+ =?utf-8?B?S08yNlUwZlJVSEdHaHhRVVRtZzZHR0FGc0RUNFF5NWdnUTVoS2lSQ0FHOUFk?=
+ =?utf-8?B?aXhoNG1HMHphWkVhQnpFWnpUN0pwcWxZeHl4RnlaeWFLR1VMMm50VDkvcWJ1?=
+ =?utf-8?B?Z05PWkxNZm5ETmVoYXllMlhpcVFMM1h1WFZhMUY0U0Fkemswb1g3MnE1RkRC?=
+ =?utf-8?B?RkFJOC9iTmh1OTRyZ1hNeEZkZ1AxT3k5YVJmV3lBWk1NYlB5eU1iWEZQOU1h?=
+ =?utf-8?Q?IKy+ZxSweXfwvTcttTWkz1s=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: fa18884c-c246-4446-4a09-08db92b4110f
 X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB3625.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Aug 2023 17:17:03.3986
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Aug 2023 17:23:48.3674
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: WLG/Gkqtfbc5/7iHs8KJDy7Smy9PNZEMjj3HXaG9tUOL8581e6RxrKqHuTuF2p083UQDTIqgdZx/9GD04zDDebxIQOEn9YvQ/SMZULWfuDk=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW5PR11MB5906
+X-MS-Exchange-CrossTenant-UserPrincipalName: RsqdGIU4sCv/x7vOQX5ze7hZUUjs1YmKhU7dXU550X6363+Q8w0uhMdFLQS5f2J/BbhZHs+hVACDASrQigxzL3Lx+dTg7jtelwJoCpo6TpE=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM3PR11MB8757
 X-OriginatorOrg: intel.com
 X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
@@ -172,112 +172,74 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
 From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Date: Tue, 1 Aug 2023 16:18:44 +0200
+Date: Tue, 1 Aug 2023 16:36:57 +0200
 
-> On 8/1/23 15:54, Alexander Lobakin wrote:
+> On 8/1/23 15:48, Alexander Lobakin wrote:
 >> From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
->> Date: Tue, 1 Aug 2023 13:19:22 +0200
+>> Date: Tue, 1 Aug 2023 13:19:23 +0200
+
+[...]
+
+>>> -        status = -EINVAL;
+>>> -        goto ice_aq_alloc_free_vsi_list_exit;
+>>> +        return -EINVAL;
+>>>       }
+>>>         if (opc == ice_aqc_opc_free_res)
 >>
->>> Add DECLARE_FLEX() macro for on-stack allocations of structs with
->>> flexible array member.
->>>
->>> Using underlying array for on-stack storage lets us to declare known
->>> on compile-time structures without kzalloc().
->>>
->>> Actual usage for ice driver is in next patch of the series.
->>>
->>> Note that "struct" kw and "*" char is moved to the caller, to both:
->>> have shorter macro name, and have more natural type specification
->>> in the driver code (IOW not hiding an actual type of var).
->>>
->>> Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
->>> ---
->>>   include/linux/overflow.h | 14 ++++++++++++++
->>>   1 file changed, 14 insertions(+)
->>>
->>> diff --git a/include/linux/overflow.h b/include/linux/overflow.h
->>> index f9b60313eaea..403b7ec120a2 100644
->>> --- a/include/linux/overflow.h
->>> +++ b/include/linux/overflow.h
->>> @@ -309,4 +309,18 @@ static inline size_t __must_check
->>> size_sub(size_t minuend, size_t subtrahend)
->>>   #define struct_size_t(type, member, count)                    \
->>>       struct_size((type *)NULL, member, count)
->>>   +/**
->>> + * DECLARE_FLEX() - Declare an on-stack instance of structure with
->>> trailing
->>> + * flexible array.
->>> + * @type: Pointer to structure type, including "struct" keyword and
->>> "*" char.
->>> + * @name: Name for a (pointer) variable to create.
->>> + * @member: Name of the array member.
->>> + * @count: Number of elements in the array; must be compile-time const.
->>> + *
->>> + * Declare an instance of structure *@type with trailing flexible
->>> array.
->>> + */
->>> +#define DECLARE_FLEX(type, name, member, count)                    \
->>> +    u8 name##_buf[struct_size((type)NULL, member, count)]
->>> __aligned(8) = {};\
+>> bloat-o-meter results would be nice to have in the commitmsg.
+> 
+> I will do next time, perhaps you could tell me if I get the results
+> right here:
+> 
+> ./scripts/bloat-o-meter ice_switch.o{ld,}
+> add/remove: 2/2 grow/shrink: 3/5 up/down: 560/-483 (77)
+> Function                                     old     new   delta
+> ice_create_vsi_list_rule                       -     241    +241
+> ice_remove_vsi_list_rule                     139     270    +131
+> ice_add_adv_rule                            6047    6139     +92
+> ice_add_sw_recipe                           2892    2972     +80
+> __pfx_ice_create_vsi_list_rule                 -      16     +16
+> ice_alloc_recipe                             124     113     -11
+> __pfx_ice_aq_alloc_free_vsi_list              16       -     -16
+> ice_free_res_cntr                            185     155     -30
+> ice_alloc_res_cntr                           154     124     -30
+> ice_add_update_vsi_list                     1037     994     -43
+> ice_add_vlan_internal                       1027     953     -74
+> ice_aq_alloc_free_vsi_list                   279       -    -279
+> Total: Before=42183, After=42260, chg +0.18%
+> 
+> My guess here is that compiler did different decisions about what to
+> inline where, what is biggest difference.
+
+77 bytes is very good result, because see below.
+
+> And biggest gain here is avoidance of heap allocs, perhaps that enables
+> gcc to shuffle things a bit too.
+
+Exactly, having the stack grown only by 77 bytes after avoiding -- how
+many? -- a lot of heap allocations sounds great.
+
+> Another guess is that b-o-m ignores heap bloat, so slight growth is
+> expected.
+
+BOM can't calculate any heap usage, it simply compares symbol sizes in
+object files.
+
+(BTW, passing /dev/null as the first "object file" is legit, in case you
+ just want to see sorted symbol sizes in your module or vmlinux)
+
+> 
+> Values reported for ice.ko are the same, with bigger base to compute the
+> percent off.
+> 
+>> [...]
 >>
->> 1. You can use struct_size_t() instead of open-coding it.
-> 
-> with ptr param, not feasible, but otherwise, of course will do it (see
-
-struct_size_t(typeof(*(type)NULL), member, count)
-
-Jokin :D
-
-> below)
-> 
->> 2. Maybe use alignof(type) instead of 8? Some structures have larger
->>     alignment requirements.
-> 
-> Sure, thanks!
-> 
->>
->>> +    type name = (type)&name##_buf
->>
->> In general, I still think DECLARE_FLEX(struct foo) is better than
->> DECLARE_FLEX(struct foo *).
-> 
-> I have started with that version, and that would prevent your question
-> no. 1 :) So there is additional advantage to that.
-> 
->> Looking at container_of(), struct_size_t()
->> etc., they all take `type`, not `type *`, so even from the consistency
->> perspective your solution is not optimal to me.
-> 
-> The two you have mentioned are "getter" macros. Random two from me, that
-> actually declare something are:
-> 
-> #define DEVICE_ATTR_RW(_name) \
->     struct device_attribute dev_attr_##_name = __ATTR_RW(_name)
-> 
-> #define DECLARE_BITMAP(name, bits) \
->     unsigned long name[BITS_TO_LONGS(bits)]
-> 
-> Even if they don't take @type param, they declare variable of some
-> non-pointer type.
-> 
-> Both variants have some logic that supports them, and some disadvantages:
-> ptr-arg: user declares sth as ptr, but it takes "a lot" of space
-> just-type-arg: user declares foo, but it's "*foo" actually, so "foo.bar"
-> does not work.
-
-Same as DECLARE_BITMAP() actually: it always declares an array, so that
-it's then __set_bit(FOO, bitmap), not __set_bit(FOO, &bitmap).
-
-One more argument for "just-type": yes, the name you pass to the macro
-is exported as a pointer, but you occupy the size of the type (plus tail
-elements), not a pointer, on the stack.
-
-> 
-> I have no strong opinion here, so will just switch to pure-type param.
-> 
 >> Thanks,
 >> Olek
 > 
+> Thank you too, also for our initial talk about on the topic.
+
+No problem, I really feel like this macro would be very useful.
 
 Thanks,
 Olek
