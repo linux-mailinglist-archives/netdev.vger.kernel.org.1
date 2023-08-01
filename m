@@ -1,217 +1,199 @@
-Return-Path: <netdev+bounces-23144-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23145-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C792576B21F
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 12:45:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34BEA76B26A
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 12:54:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 015221C20E81
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 10:45:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C409528184A
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 10:54:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5585200AC;
-	Tue,  1 Aug 2023 10:45:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8E81200DB;
+	Tue,  1 Aug 2023 10:54:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B95401E531
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 10:45:27 +0000 (UTC)
-Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::227])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E15A7F1;
-	Tue,  1 Aug 2023 03:45:23 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 779BD20005;
-	Tue,  1 Aug 2023 10:45:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1690886722;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZU6BOq2ROWRKKk0qgc0ZNhhDzXJUcmNvZZuf7GrZzjo=;
-	b=Oc6zt7+77zObe/f5CmDZ0M8Jgr8PHns5FKzn7jXnxNkGsS0tyLuEFojbJ3/S4jVcncnwQ+
-	+3rB0rL37KYriDQYcsbkjQ5hLwCekAnFOcoOb+blf6WeIcv/rf8dAW3VOUVo42pi733dbR
-	XTnnmJClvcpQhEraY3Tr2pnqwSWiQtyKeqZB/gZ5AD3NwfW2dfvnoGkvdcw+U9b3vOjWlm
-	+jUiku88t+6hEIP3nWtNEIA7dlNnbwYJwe41xd65oL8dJIH442XllAbkqGqP5oBAlSmhq/
-	bHRG5FSvDxxcqa5KwbMkOtT7Owd3+1XOrh4Rneg3dl6hIXg6s6SSWxwmAgnjvg==
-Date: Tue, 1 Aug 2023 12:45:17 +0200
-From: Herve Codina <herve.codina@bootlin.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski
- <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
- Lee Jones <lee@kernel.org>, Linus Walleij <linus.walleij@linaro.org>, Qiang
- Zhao <qiang.zhao@nxp.com>, Li Yang <leoyang.li@nxp.com>, Liam Girdwood
- <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, Jaroslav Kysela
- <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, Shengjiu Wang
- <shengjiu.wang@gmail.com>, Xiubo Li <Xiubo.Lee@gmail.com>, Fabio Estevam
- <festevam@gmail.com>, Nicolin Chen <nicoleotsuka@gmail.com>, Christophe
- Leroy <christophe.leroy@csgroup.eu>, Randy Dunlap <rdunlap@infradead.org>,
- netdev@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-gpio@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- alsa-devel@alsa-project.org, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH v2 26/28] ASoC: codecs: Add support for the framer codec
-Message-ID: <20230801124517.6b6009f5@bootlin.com>
-In-Reply-To: <2e253048-a36e-4fee-b2f4-22f19230cf54@lunn.ch>
-References: <20230726150225.483464-1-herve.codina@bootlin.com>
-	<20230726150225.483464-27-herve.codina@bootlin.com>
-	<2e253048-a36e-4fee-b2f4-22f19230cf54@lunn.ch>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 989FF46A0
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 10:54:13 +0000 (UTC)
+Received: from mgamail.intel.com (unknown [192.55.52.136])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7DEF7A8A
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 03:53:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1690887235; x=1722423235;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=R4XkrarTgZuo38V9iicKTMOiRb0ZWj5WdxYcBnYtuvM=;
+  b=FeHAq0ExL4rSaCY4HjsWjFcToIwX5MTBTvGILf1v1ORx5AVFYQYP7hAw
+   DQ7pxGGmnNv6CgQnutulFydu4eJiJuKllj3ATnYSH4fCQt2OF7D4Z8V/w
+   lp5MWC04H57rUOMOFDsgHRId5Ik+K2q60K0YeNYkaX6PDsL3ouQ9ahKk4
+   qpBs9IeeKbzfGt3ksRD0jAI1VkyHdK/4KiwSpg0oHOEEXuyDymrBfnFTt
+   aVCR2T0ZZLWcyLG+LJVvjJK/AOcPawXzwWm/1dwVhCqlZ1ZbtXHNrOyF7
+   LDQ6SbcdeqPVdhfdvP9oNCzeg8pb9+an0lgc6b5LF0QLayRAZ4//m1GfZ
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="348860162"
+X-IronPort-AV: E=Sophos;i="6.01,246,1684825200"; 
+   d="scan'208";a="348860162"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Aug 2023 03:52:52 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="678654752"
+X-IronPort-AV: E=Sophos;i="6.01,246,1684825200"; 
+   d="scan'208";a="678654752"
+Received: from lkp-server01.sh.intel.com (HELO d1ccc7e87e8f) ([10.239.97.150])
+  by orsmga003.jf.intel.com with ESMTP; 01 Aug 2023 03:52:45 -0700
+Received: from kbuild by d1ccc7e87e8f with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1qQmzc-0000D7-2c;
+	Tue, 01 Aug 2023 10:52:44 +0000
+Date: Tue, 1 Aug 2023 18:52:02 +0800
+From: kernel test robot <lkp@intel.com>
+To: Shenwei Wang <shenwei.wang@nxp.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Shawn Guo <shawnguo@kernel.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	Kevin Hilman <khilman@baylibre.com>, Vinod Koul <vkoul@kernel.org>,
+	Chen-Yu Tsai <wens@csie.org>,
+	Jernej Skrabec <jernej.skrabec@gmail.com>,
+	Samuel Holland <samuel@sholland.org>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>,
+	NXP Linux Team <linux-imx@nxp.com>,
+	Jerome Brunet <jbrunet@baylibre.com>,
+	Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
+	Bhupesh Sharma <bhupesh.sharma@linaro.org>,
+	Nobuhiro Iwamatsu <nobuhiro1.iwamatsu@toshiba.co.jp>,
+	Simon Horman <simon.horman@corigine.com>,
+	Andrew Halaney <ahalaney@redhat.com>,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
+	Shenwei Wang <shenwei.wang@nxp.com>,
+	Wong Vee Khee <veekhee@apple.com>
+Subject: Re: [PATCH v3 net 1/2] net: stmmac: add new mode parameter for
+ fix_mac_speed
+Message-ID: <202308011831.Ndat5994-lkp@intel.com>
+References: <20230731161929.2341584-2-shenwei.wang@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: herve.codina@bootlin.com
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230731161929.2341584-2-shenwei.wang@nxp.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, 1 Aug 2023 12:30:26 +0200
-Andrew Lunn <andrew@lunn.ch> wrote:
+Hi Shenwei,
 
-> On Wed, Jul 26, 2023 at 05:02:22PM +0200, Herve Codina wrote:
-> > The framer codec interracts with a framer.
-> > It allows to use some of the framer timeslots as audio channels to
-> > transport audio data over the framer E1/T1/J1 lines.
-> > It also reports line carrier detection events through the ALSA jack
-> > detection feature.
-> > 
-> > Signed-off-by: Herve Codina <herve.codina@bootlin.com>
-> > ---
-> >  sound/soc/codecs/Kconfig        |  15 ++
-> >  sound/soc/codecs/Makefile       |   2 +
-> >  sound/soc/codecs/framer-codec.c | 423 ++++++++++++++++++++++++++++++++
-> >  3 files changed, 440 insertions(+)
-> >  create mode 100644 sound/soc/codecs/framer-codec.c
-> > 
-> > diff --git a/sound/soc/codecs/Kconfig b/sound/soc/codecs/Kconfig
-> > index f99203ef9b03..a86cdac39b72 100644
-> > --- a/sound/soc/codecs/Kconfig
-> > +++ b/sound/soc/codecs/Kconfig
-> > @@ -110,6 +110,7 @@ config SND_SOC_ALL_CODECS
-> >  	imply SND_SOC_ES8328_I2C
-> >  	imply SND_SOC_ES7134
-> >  	imply SND_SOC_ES7241
-> > +	imply SND_SOC_FRAMER
-> >  	imply SND_SOC_GTM601
-> >  	imply SND_SOC_HDAC_HDMI
-> >  	imply SND_SOC_HDAC_HDA
-> > @@ -1043,6 +1044,20 @@ config SND_SOC_ES8328_SPI
-> >  	depends on SPI_MASTER
-> >  	select SND_SOC_ES8328
-> >  
-> > +config SND_SOC_FRAMER
-> > +	tristate "Framer codec"
-> > +	depends on GENERIC_FRAMER
-> > +	help
-> > +	  Enable support for the framer codec.
-> > +	  The framer codec uses the generic framer infrastructure to transport
-> > +	  some audio data over an analog E1/T1/J1 line.
-> > +	  This codec allows to use some of the time slots available on the TDM
-> > +	  bus on which the framer is connected to transport the audio data.
-> > +
-> > +	  To compile this driver as a module, choose M here: the module
-> > +	  will be called snd-soc-framer.
-> > +
-> > +
-> >  config SND_SOC_GTM601
-> >  	tristate 'GTM601 UMTS modem audio codec'
-> >  
-> > diff --git a/sound/soc/codecs/Makefile b/sound/soc/codecs/Makefile
-> > index 32dcc6de58bd..54667274a0f6 100644
-> > --- a/sound/soc/codecs/Makefile
-> > +++ b/sound/soc/codecs/Makefile
-> > @@ -116,6 +116,7 @@ snd-soc-es8326-objs := es8326.o
-> >  snd-soc-es8328-objs := es8328.o
-> >  snd-soc-es8328-i2c-objs := es8328-i2c.o
-> >  snd-soc-es8328-spi-objs := es8328-spi.o
-> > +snd-soc-framer-objs := framer-codec.o
-> >  snd-soc-gtm601-objs := gtm601.o
-> >  snd-soc-hdac-hdmi-objs := hdac_hdmi.o
-> >  snd-soc-hdac-hda-objs := hdac_hda.o
-> > @@ -499,6 +500,7 @@ obj-$(CONFIG_SND_SOC_ES8326)    += snd-soc-es8326.o
-> >  obj-$(CONFIG_SND_SOC_ES8328)	+= snd-soc-es8328.o
-> >  obj-$(CONFIG_SND_SOC_ES8328_I2C)+= snd-soc-es8328-i2c.o
-> >  obj-$(CONFIG_SND_SOC_ES8328_SPI)+= snd-soc-es8328-spi.o
-> > +obj-$(CONFIG_SND_SOC_FRAMER)	+= snd-soc-framer.o
-> >  obj-$(CONFIG_SND_SOC_GTM601)    += snd-soc-gtm601.o
-> >  obj-$(CONFIG_SND_SOC_HDAC_HDMI) += snd-soc-hdac-hdmi.o
-> >  obj-$(CONFIG_SND_SOC_HDAC_HDA) += snd-soc-hdac-hda.o
-> > diff --git a/sound/soc/codecs/framer-codec.c b/sound/soc/codecs/framer-codec.c
-> > new file mode 100644
-> > index 000000000000..52b4546a61ee
-> > --- /dev/null
-> > +++ b/sound/soc/codecs/framer-codec.c
-> > @@ -0,0 +1,423 @@
-> > +// SPDX-License-Identifier: GPL-2.0
-> > +//
-> > +// Framer ALSA SoC driver
-> > +//
-> > +// Copyright 2023 CS GROUP France
-> > +//
-> > +// Author: Herve Codina <herve.codina@bootlin.com>
-> > +
-> > +#include <linux/clk.h>
-> > +#include <linux/framer/framer.h>
-> > +#include <linux/module.h>
-> > +#include <linux/notifier.h>
-> > +#include <linux/platform_device.h>
-> > +#include <linux/slab.h>
-> > +#include <sound/jack.h>
-> > +#include <sound/pcm_params.h>
-> > +#include <sound/soc.h>
-> > +#include <sound/tlv.h>
-> > +
-> > +#define FRAMER_NB_CHANNEL	32
-> > +#define FRAMER_JACK_MASK (SND_JACK_LINEIN | SND_JACK_LINEOUT)
-> > +
-> > +struct framer_codec {
-> > +	struct framer *framer;
-> > +	struct device *dev;
-> > +	struct snd_soc_jack jack;
-> > +	struct notifier_block nb;
-> > +	struct work_struct carrier_work;
-> > +	int max_chan_playback;
-> > +	int max_chan_capture;
-> > +};
-> > +
-> > +static int framer_dai_set_tdm_slot(struct snd_soc_dai *dai, unsigned int tx_mask,
-> > +				   unsigned int rx_mask, int slots, int width)
-> > +{
-> > +	struct framer_codec *framer = snd_soc_component_get_drvdata(dai->component);
-> > +
-> > +	switch (width) {
-> > +	case 0:
-> > +		/* Not set -> default 8 */
-> > +	case 8:
-> > +		break;
-> > +	default:
-> > +		dev_err(dai->dev, "tdm slot width %d not supported\n", width);
-> > +		return -EINVAL;
-> > +	}
-> > +
-> > +	framer->max_chan_playback = hweight32(tx_mask);
-> > +	if (framer->max_chan_playback > FRAMER_NB_CHANNEL) {
-> > +		dev_err(dai->dev, "too much tx slots defined (mask = 0x%x) support max %d\n",  
-> 
-> "many", not "much".
-> 
-> Also, "supported".
+kernel test robot noticed the following build errors:
 
-Yes, will be fixed.
+[auto build test ERROR on net/main]
 
-Regards,
-Hervé
+url:    https://github.com/intel-lab-lkp/linux/commits/Shenwei-Wang/net-stmmac-add-new-mode-parameter-for-fix_mac_speed/20230801-002328
+base:   net/main
+patch link:    https://lore.kernel.org/r/20230731161929.2341584-2-shenwei.wang%40nxp.com
+patch subject: [PATCH v3 net 1/2] net: stmmac: add new mode parameter for fix_mac_speed
+config: s390-allyesconfig (https://download.01.org/0day-ci/archive/20230801/202308011831.Ndat5994-lkp@intel.com/config)
+compiler: s390-linux-gcc (GCC) 12.3.0
+reproduce: (https://download.01.org/0day-ci/archive/20230801/202308011831.Ndat5994-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202308011831.Ndat5994-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   drivers/net/ethernet/stmicro/stmmac/dwmac-sti.c: In function 'sti_dwmac_probe':
+>> drivers/net/ethernet/stmicro/stmmac/dwmac-sti.c:296:33: error: assignment to 'void (*)(void *, uint,  uint)' {aka 'void (*)(void *, unsigned int,  unsigned int)'} from incompatible pointer type 'void (*)(void *, unsigned int)' [-Werror=incompatible-pointer-types]
+     296 |         plat_dat->fix_mac_speed = data->fix_retime_src;
+         |                                 ^
+   cc1: some warnings being treated as errors
+
+
+vim +296 drivers/net/ethernet/stmicro/stmmac/dwmac-sti.c
+
+d15891ca1fdd7f Srinivas Kandagatla 2014-02-11  258  
+8387ee21f972de Joachim Eastwood    2015-07-29  259  static int sti_dwmac_probe(struct platform_device *pdev)
+d15891ca1fdd7f Srinivas Kandagatla 2014-02-11  260  {
+8387ee21f972de Joachim Eastwood    2015-07-29  261  	struct plat_stmmacenet_data *plat_dat;
+07ca3749cec2b8 Joachim Eastwood    2015-07-29  262  	const struct sti_dwmac_of_data *data;
+8387ee21f972de Joachim Eastwood    2015-07-29  263  	struct stmmac_resources stmmac_res;
+d15891ca1fdd7f Srinivas Kandagatla 2014-02-11  264  	struct sti_dwmac *dwmac;
+d15891ca1fdd7f Srinivas Kandagatla 2014-02-11  265  	int ret;
+d15891ca1fdd7f Srinivas Kandagatla 2014-02-11  266  
+149adedd7696cb Joachim Eastwood    2015-07-29  267  	data = of_device_get_match_data(&pdev->dev);
+149adedd7696cb Joachim Eastwood    2015-07-29  268  	if (!data) {
+149adedd7696cb Joachim Eastwood    2015-07-29  269  		dev_err(&pdev->dev, "No OF match data provided\n");
+149adedd7696cb Joachim Eastwood    2015-07-29  270  		return -EINVAL;
+149adedd7696cb Joachim Eastwood    2015-07-29  271  	}
+149adedd7696cb Joachim Eastwood    2015-07-29  272  
+8387ee21f972de Joachim Eastwood    2015-07-29  273  	ret = stmmac_get_platform_resources(pdev, &stmmac_res);
+8387ee21f972de Joachim Eastwood    2015-07-29  274  	if (ret)
+8387ee21f972de Joachim Eastwood    2015-07-29  275  		return ret;
+8387ee21f972de Joachim Eastwood    2015-07-29  276  
+83216e3988cd19 Michael Walle       2021-04-12  277  	plat_dat = stmmac_probe_config_dt(pdev, stmmac_res.mac);
+8387ee21f972de Joachim Eastwood    2015-07-29  278  	if (IS_ERR(plat_dat))
+8387ee21f972de Joachim Eastwood    2015-07-29  279  		return PTR_ERR(plat_dat);
+8387ee21f972de Joachim Eastwood    2015-07-29  280  
+d15891ca1fdd7f Srinivas Kandagatla 2014-02-11  281  	dwmac = devm_kzalloc(&pdev->dev, sizeof(*dwmac), GFP_KERNEL);
+d2ed0a7755fe14 Johan Hovold        2016-11-30  282  	if (!dwmac) {
+d2ed0a7755fe14 Johan Hovold        2016-11-30  283  		ret = -ENOMEM;
+d2ed0a7755fe14 Johan Hovold        2016-11-30  284  		goto err_remove_config_dt;
+d2ed0a7755fe14 Johan Hovold        2016-11-30  285  	}
+d15891ca1fdd7f Srinivas Kandagatla 2014-02-11  286  
+d15891ca1fdd7f Srinivas Kandagatla 2014-02-11  287  	ret = sti_dwmac_parse_data(dwmac, pdev);
+d15891ca1fdd7f Srinivas Kandagatla 2014-02-11  288  	if (ret) {
+d15891ca1fdd7f Srinivas Kandagatla 2014-02-11  289  		dev_err(&pdev->dev, "Unable to parse OF data\n");
+d2ed0a7755fe14 Johan Hovold        2016-11-30  290  		goto err_remove_config_dt;
+d15891ca1fdd7f Srinivas Kandagatla 2014-02-11  291  	}
+d15891ca1fdd7f Srinivas Kandagatla 2014-02-11  292  
+16b1adbb16c8a5 Joachim Eastwood    2015-07-29  293  	dwmac->fix_retime_src = data->fix_retime_src;
+16b1adbb16c8a5 Joachim Eastwood    2015-07-29  294  
+8387ee21f972de Joachim Eastwood    2015-07-29  295  	plat_dat->bsp_priv = dwmac;
+16b1adbb16c8a5 Joachim Eastwood    2015-07-29 @296  	plat_dat->fix_mac_speed = data->fix_retime_src;
+8387ee21f972de Joachim Eastwood    2015-07-29  297  
+b89cbfb01a2855 Joachim Eastwood    2016-11-04  298  	ret = clk_prepare_enable(dwmac->clk);
+8387ee21f972de Joachim Eastwood    2015-07-29  299  	if (ret)
+d2ed0a7755fe14 Johan Hovold        2016-11-30  300  		goto err_remove_config_dt;
+8387ee21f972de Joachim Eastwood    2015-07-29  301  
+0eebedc2fd284e Joachim Eastwood    2016-11-04  302  	ret = sti_dwmac_set_mode(dwmac);
+b89cbfb01a2855 Joachim Eastwood    2016-11-04  303  	if (ret)
+b89cbfb01a2855 Joachim Eastwood    2016-11-04  304  		goto disable_clk;
+b89cbfb01a2855 Joachim Eastwood    2016-11-04  305  
+b89cbfb01a2855 Joachim Eastwood    2016-11-04  306  	ret = stmmac_dvr_probe(&pdev->dev, plat_dat, &stmmac_res);
+b89cbfb01a2855 Joachim Eastwood    2016-11-04  307  	if (ret)
+b89cbfb01a2855 Joachim Eastwood    2016-11-04  308  		goto disable_clk;
+b89cbfb01a2855 Joachim Eastwood    2016-11-04  309  
+b89cbfb01a2855 Joachim Eastwood    2016-11-04  310  	return 0;
+b89cbfb01a2855 Joachim Eastwood    2016-11-04  311  
+b89cbfb01a2855 Joachim Eastwood    2016-11-04  312  disable_clk:
+b89cbfb01a2855 Joachim Eastwood    2016-11-04  313  	clk_disable_unprepare(dwmac->clk);
+d2ed0a7755fe14 Johan Hovold        2016-11-30  314  err_remove_config_dt:
+d2ed0a7755fe14 Johan Hovold        2016-11-30  315  	stmmac_remove_config_dt(pdev, plat_dat);
+0a9e22715ee384 Johan Hovold        2016-11-30  316  
+b89cbfb01a2855 Joachim Eastwood    2016-11-04  317  	return ret;
+d15891ca1fdd7f Srinivas Kandagatla 2014-02-11  318  }
+d15891ca1fdd7f Srinivas Kandagatla 2014-02-11  319  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
