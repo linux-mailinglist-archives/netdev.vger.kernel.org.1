@@ -1,441 +1,117 @@
-Return-Path: <netdev+bounces-23134-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23131-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81E1C76B1A8
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 12:23:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B3D476B15C
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 12:17:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3F0981C20E27
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 10:22:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B6D97281818
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 10:17:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A669F20F90;
-	Tue,  1 Aug 2023 10:22:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D858A20F87;
+	Tue,  1 Aug 2023 10:17:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9561C20F82
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 10:22:56 +0000 (UTC)
-Received: from mgamail.intel.com (unknown [192.55.52.151])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A249555AF
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 03:22:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1690885342; x=1722421342;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=O9RfXJX4TP06lynab0snbQmLxZB68gFqwKvCV+X9z6c=;
-  b=Xrusfg2ixtuhOfdIY2y40kjtPrWl5zGiPm+3rkJc7U2heuwulH3uxpqV
-   Rk3br9J731Wc4kO2YNyEIZMi1AoxFNP7EiA5vV16J0EmRuHOxHF+4Mq7V
-   M+Br2udqd7nzrQUFmdrYOly1CpQmQ9eiV42MQPxvSI6tjjRkTFWrDVBBe
-   5mieUYqoa4Yw6QpaCrikWQrMdXmqUvp8RHO6Wdy18Eb/NqetW7soea+Dy
-   WrKGUoH4oi84aZORtCW8ulI/lA+PTPJejdmNGY0czHuLj2+SFyEm02w/j
-   ZkVjB6qZFa1h/LRSFNUasFhvQWxNQwjH2O+5sKpTHlrAaPdcNkv4XBERj
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="349555345"
-X-IronPort-AV: E=Sophos;i="6.01,246,1684825200"; 
-   d="scan'208";a="349555345"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Aug 2023 03:19:27 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.01,202,1684825200"; 
-   d="scan'208";a="872019053"
-Received: from irvmail002.ir.intel.com ([10.43.11.120])
-  by fmsmga001.fm.intel.com with ESMTP; 01 Aug 2023 03:19:25 -0700
-Received: from pelor.igk.intel.com (pelor.igk.intel.com [10.123.220.13])
-	by irvmail002.ir.intel.com (Postfix) with ESMTP id A04FD33BE9;
-	Tue,  1 Aug 2023 11:19:22 +0100 (IST)
-From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-To: intel-wired-lan@lists.osuosl.org,
-	Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: netdev@vger.kernel.org,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Subject: [PATCH] ice: split ice_aq_wait_for_event() func into two
-Date: Tue,  1 Aug 2023 06:15:45 -0400
-Message-Id: <20230801101545.519944-1-przemyslaw.kitszel@intel.com>
-X-Mailer: git-send-email 2.40.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C830E1DDFF
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 10:17:15 +0000 (UTC)
+Received: from mail-qt1-x82a.google.com (mail-qt1-x82a.google.com [IPv6:2607:f8b0:4864:20::82a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A4DE2D79
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 03:16:44 -0700 (PDT)
+Received: by mail-qt1-x82a.google.com with SMTP id d75a77b69052e-40c72caec5cso260561cf.0
+        for <netdev@vger.kernel.org>; Tue, 01 Aug 2023 03:16:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1690884994; x=1691489794;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TZN9Ev39oJk78sdD2xFuDOdMnPsbmSFEY0jGkX/TZfs=;
+        b=73nIOlxPptDV21sESWCVMAR6SLbm5k0LKaJiE3ztg54DmwekJLjblbGBqzm3h09QHu
+         AcWJk4qzGieKWCBWLUremGY0iLXzASSMapZ+ZaDzkS1QkzfpTFlRVJR7dwDBrxR3ZFvJ
+         Ayq7XHl9VVuT1b1B0GCU7vv6BOqPiXRFbnpvUC37LxYz2afVSi4xkasF8rxGFDVJfHpK
+         XU09LcibSGYjS+FHcB6FeQKd+mqS/i29Kud5Dt8MaQX6gYpJk16rSOjk7CpNo40Mv8Wy
+         oet01eHTcf7iSo8CQF7LMVoKKHW3uRnbv5YnCdi5znln1GS2hMvU8q0ZlF1T7rDMEIZl
+         kb1Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690884994; x=1691489794;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=TZN9Ev39oJk78sdD2xFuDOdMnPsbmSFEY0jGkX/TZfs=;
+        b=S2IapnuQmbGjnYwIJyazWLANMnUSj6pwdmkbzzvkifUmNpqSNGDxJNLodmusYyQGoD
+         lA3dJILYVH5laTpM/ss4wPt8gSPZZlEqqmwWnrlkD83g8MZru7/xqtccEXoPHxwitQLT
+         dQTtIX3cBr4/OJo+iqkt0QXRWRTaVR4jAvLhx6OlylJfmhyuPWMNmJFkga581qtSEWDO
+         ic3pmoQ+D8WrVgLdbyiP530PkvkMZfnVrgdFsxMvFcUjrklwYE8BSa1PY6bvdH7GiQpr
+         U82181+a5nBTNou9tMZ6qEwMZ9UoEbwA5zoHM/jDlrze31/P8Dr7L68QJFbu/x7itRB7
+         kHnw==
+X-Gm-Message-State: ABy/qLZBGVY2oXtN70NK1SuBb9V0Lt0gguyNMncTpcAXxSmd4UO6Kj7h
+	MZy8DDKEe4UZyW3hPz3Fom7hh+hr252lhILtWuCjRQ==
+X-Google-Smtp-Source: APBJJlHkfcuesWAMGBbcUdF5JPr/MxcZAjwXVj1t5i3BfLfeO0MddaAxywCAexaR5x9uibEQV/Y/qpX2KAXoZIKo3vI=
+X-Received: by 2002:a05:622a:1493:b0:404:8218:83da with SMTP id
+ t19-20020a05622a149300b00404821883damr731987qtx.1.1690884994354; Tue, 01 Aug
+ 2023 03:16:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+References: <20230731230736.109216-1-trdgn@amazon.com> <CANn89iLV0iEeQy19wn+Vfmhpgr6srVpf3L+oBvuDyLRQXfoMug@mail.gmail.com>
+In-Reply-To: <CANn89iLV0iEeQy19wn+Vfmhpgr6srVpf3L+oBvuDyLRQXfoMug@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 1 Aug 2023 12:16:23 +0200
+Message-ID: <CANn89iLghUDUSbNv-QOgyJ4dv5DhXGL60caeuVMnHW4HZQVJmg@mail.gmail.com>
+Subject: Re: [PATCH v2] tun: avoid high-order page allocation for packet header
+To: Tahsin Erdogan <trdgn@amazon.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Herbert Xu <herbert@gondor.apana.org.au>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Mitigate race between registering on wait list and receiving
-AQ Response from FW.
+On Tue, Aug 1, 2023 at 11:37=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> On Tue, Aug 1, 2023 at 1:07=E2=80=AFAM Tahsin Erdogan <trdgn@amazon.com> =
+wrote:
+> >
+> > When GSO is not enabled and a packet is transmitted via writev(), all
+> > payload is treated as header which requires a contiguous memory allocat=
+ion.
+> > This allocation request is harder to satisfy, and may even fail if ther=
+e is
+> > enough fragmentation.
+> >
+> > Note that sendmsg() code path limits the linear copy length, so this ch=
+ange
+> > makes writev() and sendmsg() more consistent.
+> >
+> > Signed-off-by: Tahsin Erdogan <trdgn@amazon.com>
+> > ---
+>
+> I will have to tweak one existing packetdrill test, nothing major.
+>
+> Tested-by: Eric Dumazet <edumazet@google.com>
+> Reviewed-by: Eric Dumazet <edumazet@google.com>
 
-ice_aq_prep_for_event() should be called before sending AQ command,
-ice_aq_wait_for_event() should be called after sending AQ command,
-to wait for AQ Response.
+I have to take this back, sorry.
 
-struct ice_aq_task is exposed to callers, what takes burden of memory
-ownership out from AQ-wait family of functions.
+We need to change alloc_skb_with_frags() and tun.c to attempt
+high-order allocations,
+otherwise tun users sending very large buffers will regress.
+(Even if this _could_ fail as you pointed out if memory is tight/fragmented=
+)
 
-Embed struct ice_rq_event_info event into struct ice_aq_task
-(instead of it being a ptr), to remove some more code from the callers.
-
-Additional fix: one of the checks in ice_aq_check_events() was off by one.
-
-Please note, that this was found by reading the code,
-an actual race has not yet materialized.
-
-Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
----
- drivers/net/ethernet/intel/ice/ice.h          | 21 +++-
- .../net/ethernet/intel/ice/ice_fw_update.c    | 45 +++++----
- drivers/net/ethernet/intel/ice/ice_main.c     | 98 +++++++++----------
- 3 files changed, 92 insertions(+), 72 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/ice/ice.h b/drivers/net/ethernet/intel/ice/ice.h
-index 34be1cb1e28f..3ac645afbc8d 100644
---- a/drivers/net/ethernet/intel/ice/ice.h
-+++ b/drivers/net/ethernet/intel/ice/ice.h
-@@ -931,8 +931,25 @@ void ice_fdir_release_flows(struct ice_hw *hw);
- void ice_fdir_replay_flows(struct ice_hw *hw);
- void ice_fdir_replay_fltrs(struct ice_pf *pf);
- int ice_fdir_create_dflt_rules(struct ice_pf *pf);
--int ice_aq_wait_for_event(struct ice_pf *pf, u16 opcode, unsigned long timeout,
--			  struct ice_rq_event_info *event);
-+
-+enum ice_aq_task_state {
-+	ICE_AQ_TASK_NOT_PREPARED,
-+	ICE_AQ_TASK_WAITING,
-+	ICE_AQ_TASK_COMPLETE,
-+	ICE_AQ_TASK_CANCELED,
-+};
-+
-+struct ice_aq_task {
-+	struct hlist_node entry;
-+	struct ice_rq_event_info event;
-+	enum ice_aq_task_state state;
-+	u16 opcode;
-+};
-+
-+void ice_aq_prep_for_event(struct ice_pf *pf, struct ice_aq_task *task,
-+			   u16 opcode);
-+int ice_aq_wait_for_event(struct ice_pf *pf, struct ice_aq_task *task,
-+			  unsigned long timeout);
- int ice_open(struct net_device *netdev);
- int ice_open_internal(struct net_device *netdev);
- int ice_stop(struct net_device *netdev);
-diff --git a/drivers/net/ethernet/intel/ice/ice_fw_update.c b/drivers/net/ethernet/intel/ice/ice_fw_update.c
-index 3dc5662d62a6..319a2d6fe26c 100644
---- a/drivers/net/ethernet/intel/ice/ice_fw_update.c
-+++ b/drivers/net/ethernet/intel/ice/ice_fw_update.c
-@@ -293,16 +293,17 @@ ice_write_one_nvm_block(struct ice_pf *pf, u16 module, u32 offset,
- {
- 	u16 completion_module, completion_retval;
- 	struct device *dev = ice_pf_to_dev(pf);
--	struct ice_rq_event_info event;
-+	struct ice_aq_task task = {};
- 	struct ice_hw *hw = &pf->hw;
-+	struct ice_aq_desc *desc;
- 	u32 completion_offset;
- 	int err;
- 
--	memset(&event, 0, sizeof(event));
--
- 	dev_dbg(dev, "Writing block of %u bytes for module 0x%02x at offset %u\n",
- 		block_size, module, offset);
- 
-+	ice_aq_prep_for_event(pf, &task, ice_aqc_opc_nvm_write);
-+
- 	err = ice_aq_update_nvm(hw, module, offset, block_size, block,
- 				last_cmd, 0, NULL);
- 	if (err) {
-@@ -319,19 +320,20 @@ ice_write_one_nvm_block(struct ice_pf *pf, u16 module, u32 offset,
- 	 * is conservative and is intended to prevent failure to update when
- 	 * firmware is slow to respond.
- 	 */
--	err = ice_aq_wait_for_event(pf, ice_aqc_opc_nvm_write, 15 * HZ, &event);
-+	err = ice_aq_wait_for_event(pf, &task, 15 * HZ);
- 	if (err) {
- 		dev_err(dev, "Timed out while trying to flash module 0x%02x with block of size %u at offset %u, err %d\n",
- 			module, block_size, offset, err);
- 		NL_SET_ERR_MSG_MOD(extack, "Timed out waiting for firmware");
- 		return -EIO;
- 	}
- 
--	completion_module = le16_to_cpu(event.desc.params.nvm.module_typeid);
--	completion_retval = le16_to_cpu(event.desc.retval);
-+	desc = &task.event.desc;
-+	completion_module = le16_to_cpu(desc->params.nvm.module_typeid);
-+	completion_retval = le16_to_cpu(desc->retval);
- 
--	completion_offset = le16_to_cpu(event.desc.params.nvm.offset_low);
--	completion_offset |= event.desc.params.nvm.offset_high << 16;
-+	completion_offset = le16_to_cpu(desc->params.nvm.offset_low);
-+	completion_offset |= desc->params.nvm.offset_high << 16;
- 
- 	if (completion_module != module) {
- 		dev_err(dev, "Unexpected module_typeid in write completion: got 0x%x, expected 0x%x\n",
-@@ -363,8 +365,8 @@ ice_write_one_nvm_block(struct ice_pf *pf, u16 module, u32 offset,
- 	 */
- 	if (reset_level && last_cmd && module == ICE_SR_1ST_NVM_BANK_PTR) {
- 		if (hw->dev_caps.common_cap.pcie_reset_avoidance) {
--			*reset_level = (event.desc.params.nvm.cmd_flags &
--					ICE_AQC_NVM_RESET_LVL_M);
-+			*reset_level = desc->params.nvm.cmd_flags &
-+				       ICE_AQC_NVM_RESET_LVL_M;
- 			dev_dbg(dev, "Firmware reported required reset level as %u\n",
- 				*reset_level);
- 		} else {
-@@ -479,39 +481,41 @@ ice_erase_nvm_module(struct ice_pf *pf, u16 module, const char *component,
- {
- 	u16 completion_module, completion_retval;
- 	struct device *dev = ice_pf_to_dev(pf);
--	struct ice_rq_event_info event;
-+	struct ice_aq_task task = {};
- 	struct ice_hw *hw = &pf->hw;
-+	struct ice_aq_desc *desc;
- 	struct devlink *devlink;
- 	int err;
- 
- 	dev_dbg(dev, "Beginning erase of flash component '%s', module 0x%02x\n", component, module);
- 
--	memset(&event, 0, sizeof(event));
--
- 	devlink = priv_to_devlink(pf);
- 
- 	devlink_flash_update_timeout_notify(devlink, "Erasing", component, ICE_FW_ERASE_TIMEOUT);
- 
-+	ice_aq_prep_for_event(pf, &task, ice_aqc_opc_nvm_erase);
-+
- 	err = ice_aq_erase_nvm(hw, module, NULL);
- 	if (err) {
- 		dev_err(dev, "Failed to erase %s (module 0x%02x), err %d aq_err %s\n",
- 			component, module, err,
- 			ice_aq_str(hw->adminq.sq_last_status));
- 		NL_SET_ERR_MSG_MOD(extack, "Failed to erase flash module");
- 		err = -EIO;
- 		goto out_notify_devlink;
- 	}
- 
--	err = ice_aq_wait_for_event(pf, ice_aqc_opc_nvm_erase, ICE_FW_ERASE_TIMEOUT * HZ, &event);
-+	err = ice_aq_wait_for_event(pf, &task, ICE_FW_ERASE_TIMEOUT * HZ);
- 	if (err) {
- 		dev_err(dev, "Timed out waiting for firmware to respond with erase completion for %s (module 0x%02x), err %d\n",
- 			component, module, err);
- 		NL_SET_ERR_MSG_MOD(extack, "Timed out waiting for firmware");
- 		goto out_notify_devlink;
- 	}
- 
--	completion_module = le16_to_cpu(event.desc.params.nvm.module_typeid);
--	completion_retval = le16_to_cpu(event.desc.retval);
-+	desc = &task.event.desc;
-+	completion_module = le16_to_cpu(desc->params.nvm.module_typeid);
-+	completion_retval = le16_to_cpu(desc->retval);
- 
- 	if (completion_module != module) {
- 		dev_err(dev, "Unexpected module_typeid in erase completion for %s: got 0x%x, expected 0x%x\n",
-@@ -560,13 +564,13 @@ ice_switch_flash_banks(struct ice_pf *pf, u8 activate_flags,
- 		       u8 *emp_reset_available, struct netlink_ext_ack *extack)
- {
- 	struct device *dev = ice_pf_to_dev(pf);
--	struct ice_rq_event_info event;
-+	struct ice_aq_task task = {};
- 	struct ice_hw *hw = &pf->hw;
- 	u16 completion_retval;
- 	u8 response_flags;
- 	int err;
- 
--	memset(&event, 0, sizeof(event));
-+	ice_aq_prep_for_event(pf, &task, ice_aqc_opc_nvm_write_activate);
- 
- 	err = ice_nvm_write_activate(hw, activate_flags, &response_flags);
- 	if (err) {
-@@ -592,16 +596,15 @@ ice_switch_flash_banks(struct ice_pf *pf, u8 activate_flags,
- 		}
- 	}
- 
--	err = ice_aq_wait_for_event(pf, ice_aqc_opc_nvm_write_activate, 30 * HZ,
--				    &event);
-+	err = ice_aq_wait_for_event(pf, &task, 30 * HZ);
- 	if (err) {
- 		dev_err(dev, "Timed out waiting for firmware to switch active flash banks, err %d\n",
- 			err);
- 		NL_SET_ERR_MSG_MOD(extack, "Timed out waiting for firmware");
- 		return err;
- 	}
- 
--	completion_retval = le16_to_cpu(event.desc.retval);
-+	completion_retval = le16_to_cpu(task.event.desc.retval);
- 	if (completion_retval) {
- 		dev_err(dev, "Firmware failed to switch active flash banks aq_err %s\n",
- 			ice_aq_str((enum ice_aq_err)completion_retval));
-diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index a73895483e6c..7d2e50968277 100644
---- a/drivers/net/ethernet/intel/ice/ice_main.c
-+++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -1250,88 +1250,86 @@ ice_handle_link_event(struct ice_pf *pf, struct ice_rq_event_info *event)
- 	return status;
- }
- 
--enum ice_aq_task_state {
--	ICE_AQ_TASK_WAITING = 0,
--	ICE_AQ_TASK_COMPLETE,
--	ICE_AQ_TASK_CANCELED,
--};
--
--struct ice_aq_task {
--	struct hlist_node entry;
-+/**
-+ * ice_aq_prep_for_event - Prepare to wait for an AdminQ event from firmware
-+ * @pf: pointer to the PF private structure
-+ * @task: intermediate helper storage and identifier for waiting
-+ * @opcode: the opcode to wait for
-+ *
-+ * Prepares to wait for a specific AdminQ completion event on the ARQ for
-+ * a given PF. Actual wait would be done by a call to ice_aq_wait_for_event().
-+ *
-+ * Calls are separated to allow caller registering for event before sending
-+ * the command, which mitigates a race between registering and FW responding.
-+ *
-+ * To obtain only the descriptor contents, pass an task->event with null
-+ * msg_buf. If the complete data buffer is desired, allocate the
-+ * task->event.msg_buf with enough space ahead of time.
-+ */
-+void ice_aq_prep_for_event(struct ice_pf *pf, struct ice_aq_task *task,
-+			   u16 opcode)
-+{
-+	INIT_HLIST_NODE(&task->entry);
-+	task->opcode = opcode;
-+	task->state = ICE_AQ_TASK_WAITING;
- 
--	u16 opcode;
--	struct ice_rq_event_info *event;
--	enum ice_aq_task_state state;
--};
-+	spin_lock_bh(&pf->aq_wait_lock);
-+	hlist_add_head(&task->entry, &pf->aq_wait_list);
-+	spin_unlock_bh(&pf->aq_wait_lock);
-+}
- 
- /**
-  * ice_aq_wait_for_event - Wait for an AdminQ event from firmware
-  * @pf: pointer to the PF private structure
-- * @opcode: the opcode to wait for
-+ * @task: ptr prepared by ice_aq_prep_for_event()
-  * @timeout: how long to wait, in jiffies
-- * @event: storage for the event info
-  *
-  * Waits for a specific AdminQ completion event on the ARQ for a given PF. The
-  * current thread will be put to sleep until the specified event occurs or
-  * until the given timeout is reached.
-  *
-- * To obtain only the descriptor contents, pass an event without an allocated
-- * msg_buf. If the complete data buffer is desired, allocate the
-- * event->msg_buf with enough space ahead of time.
-- *
-  * Returns: zero on success, or a negative error code on failure.
-  */
--int ice_aq_wait_for_event(struct ice_pf *pf, u16 opcode, unsigned long timeout,
--			  struct ice_rq_event_info *event)
-+int ice_aq_wait_for_event(struct ice_pf *pf, struct ice_aq_task *task,
-+			  unsigned long timeout)
- {
-+	enum ice_aq_task_state *state = &task->state;
- 	struct device *dev = ice_pf_to_dev(pf);
--	struct ice_aq_task *task;
--	unsigned long start;
-+	unsigned long start = jiffies;
- 	long ret;
- 	int err;
- 
--	task = kzalloc(sizeof(*task), GFP_KERNEL);
--	if (!task)
--		return -ENOMEM;
--
--	INIT_HLIST_NODE(&task->entry);
--	task->opcode = opcode;
--	task->event = event;
--	task->state = ICE_AQ_TASK_WAITING;
--
--	spin_lock_bh(&pf->aq_wait_lock);
--	hlist_add_head(&task->entry, &pf->aq_wait_list);
--	spin_unlock_bh(&pf->aq_wait_lock);
--
--	start = jiffies;
--
--	ret = wait_event_interruptible_timeout(pf->aq_wait_queue, task->state,
-+	ret = wait_event_interruptible_timeout(pf->aq_wait_queue,
-+					       *state != ICE_AQ_TASK_WAITING,
- 					       timeout);
--	switch (task->state) {
-+	switch (*state) {
-+	case ICE_AQ_TASK_NOT_PREPARED:
-+		WARN(1, "call to %s without ice_aq_prep_for_event()", __func__);
-+		err = -EINVAL;
-+		break;
- 	case ICE_AQ_TASK_WAITING:
- 		err = ret < 0 ? ret : -ETIMEDOUT;
- 		break;
- 	case ICE_AQ_TASK_CANCELED:
- 		err = ret < 0 ? ret : -ECANCELED;
- 		break;
- 	case ICE_AQ_TASK_COMPLETE:
- 		err = ret < 0 ? ret : 0;
- 		break;
- 	default:
--		WARN(1, "Unexpected AdminQ wait task state %u", task->state);
-+		WARN(1, "Unexpected AdminQ wait task state %u", *state);
- 		err = -EINVAL;
- 		break;
- 	}
- 
- 	dev_dbg(dev, "Waited %u msecs (max %u msecs) for firmware response to op 0x%04x\n",
- 		jiffies_to_msecs(jiffies - start),
- 		jiffies_to_msecs(timeout),
--		opcode);
-+		task->opcode);
- 
- 	spin_lock_bh(&pf->aq_wait_lock);
- 	hlist_del(&task->entry);
- 	spin_unlock_bh(&pf->aq_wait_lock);
--	kfree(task);
- 
- 	return err;
- }
-@@ -1362,18 +1360,20 @@ static void ice_aq_check_events(struct ice_pf *pf, u16 opcode,
- 
- 	spin_lock_bh(&pf->aq_wait_lock);
- 	hlist_for_each_entry(task, &pf->aq_wait_list, entry) {
--		if (task->state || task->opcode != opcode)
-+		if (task->state != ICE_AQ_TASK_WAITING)
-+			continue;
-+		if (task->opcode != opcode)
- 			continue;
- 
--		memcpy(&task->event->desc, &event->desc, sizeof(event->desc));
--		task->event->msg_len = event->msg_len;
-+		memcpy(&task->event.desc, &event->desc, sizeof(event->desc));
-+		task->event.msg_len = event->msg_len;
- 
- 		/* Only copy the data buffer if a destination was set */
--		if (task->event->msg_buf &&
--		    task->event->buf_len > event->buf_len) {
--			memcpy(task->event->msg_buf, event->msg_buf,
-+		if (task->event.msg_buf &&
-+		    task->event.buf_len >= event->buf_len) {
-+			memcpy(task->event.msg_buf, event->msg_buf,
- 			       event->buf_len);
--			task->event->buf_len = event->buf_len;
-+			task->event.buf_len = event->buf_len;
- 		}
- 
- 		task->state = ICE_AQ_TASK_COMPLETE;
--- 
-2.40.1
-
+I am working to make the change in alloc_skb_with_frags() and in tun,
+we can apply your patch after this prereq.
 
