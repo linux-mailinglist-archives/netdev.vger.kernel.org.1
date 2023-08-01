@@ -1,230 +1,160 @@
-Return-Path: <netdev+bounces-23214-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23216-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5141076B582
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 15:10:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8840C76B591
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 15:12:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0B7D92818BB
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 13:10:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BA3691C20CCD
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 13:12:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D920A21510;
-	Tue,  1 Aug 2023 13:10:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03CC621D26;
+	Tue,  1 Aug 2023 13:11:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C54381FB5F
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 13:10:09 +0000 (UTC)
-Received: from mgamail.intel.com (unknown [134.134.136.100])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5AD981AA;
-	Tue,  1 Aug 2023 06:10:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1690895408; x=1722431408;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=xSBvbhDo5xLhCh8yBMhqTtyumNWk1osoSK883uav+w4=;
-  b=NYjc+lVkdfg4bfRb/RgtXuc2wFzbzQd5AjFwgWPzMFNEhdgcgckXnG05
-   MKx/+fmrHi8iOdbYeTakvdGKNxvb4Qh3bL0n/zewcqb7glb+N7PP2kNjd
-   Kc376cb2w/7X03lKkTNxRScyaIGMheUwjLx63GsYbJrCrw53yOmqKh88o
-   9TgOt3Eqg3/rdlSnyaQjHA/3343NYU/eEzKAjcEJgV3Kb6/p68wvaIprx
-   smmqENOL4MLa0H1TEQ+VkOYoqEBSljZz7o0Mh5+68EkzmdohlpEjkttUB
-   1YXRN4UPKdpbrZDfxfiAaWWWEW0voPENBau37jHWaG29QAWu/eeeHyId8
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10789"; a="435617931"
-X-IronPort-AV: E=Sophos;i="6.01,247,1684825200"; 
-   d="scan'208";a="435617931"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Aug 2023 06:10:07 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10789"; a="758331768"
-X-IronPort-AV: E=Sophos;i="6.01,247,1684825200"; 
-   d="scan'208";a="758331768"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by orsmga008.jf.intel.com with ESMTP; 01 Aug 2023 06:10:07 -0700
-Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Tue, 1 Aug 2023 06:10:07 -0700
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27 via Frontend Transport; Tue, 1 Aug 2023 06:10:07 -0700
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.169)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.27; Tue, 1 Aug 2023 06:10:06 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mjhGU0f/NMJnba3O2eovuyHZxCNUAv1+BEhSsDwEHt46Y5t0zKYWYBX3w02DEOWiLBJllG5UtVxbvx8bvXPhNeOTIAHX+bpHuv03NvgyofP0KOdVyR3gRWsUg0+Dx+dMLDblki1yIZkBAwaP7w70d1QXiRm/z0GGHolkXZrOlR8MzuYSw0CumhroFdNYBGIDq5a9NrSY4T12n9A7cCRIhd/5bchbTPnj/kENw97/uhYZ9Gq1nvYkUbBmnNjqDVPVkJwxV6zXG3SCIhsTO/vRfwbMFBQeEEEPoU4UFR1FNY+MGzTs9rpd/15/2Zk2xxCLNCsnO39+fvjLE+5vn0t6GA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=tDIDPVEhVHrJxtDs7rokQ2y+q2en5EEex92mJEhszYQ=;
- b=iLe4DvRNG+2C9S02nasNYfIv4LHqH1LTaGiiwCZ5cIm8mZWNZ/pxeuUWFOA7GVDlxjdemGIbYiJ1zoTHcawP5inrNMHXIchfF0GY5yP7+16IHl6aQPZHIbzTlKJVs02Tj3GtJh4uQKopq77XeC35lFsHfgPUMJIu2jd8f5ytnkKM8TrYOz+CjoZL8ZYlkS/HRcVge0DHSR5DDqBIxDsUR47+zkfNM5pWzuSliaPWAfMszKZbheChlRgk4sFO2Z8BrnU1jZf+a3usRI6Uf7TcAWmq4AWuLnQQCsLBTM92rswpf2Ki/j7veFRMxVmmFByujdZE0MBqirG7vwmoy9mzzA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DM6PR11MB3625.namprd11.prod.outlook.com (2603:10b6:5:13a::21)
- by DS7PR11MB6063.namprd11.prod.outlook.com (2603:10b6:8:76::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.29; Tue, 1 Aug
- 2023 13:10:04 +0000
-Received: from DM6PR11MB3625.namprd11.prod.outlook.com
- ([fe80::44ff:6a5:9aa4:124a]) by DM6PR11MB3625.namprd11.prod.outlook.com
- ([fe80::44ff:6a5:9aa4:124a%7]) with mapi id 15.20.6631.043; Tue, 1 Aug 2023
- 13:10:04 +0000
-Message-ID: <b63a8f5b-0bc3-3a27-416e-d0943cb0d147@intel.com>
-Date: Tue, 1 Aug 2023 15:08:17 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH net-next 1/3] virtchnl: fix fake 1-elem arrays in structs
- allocated as `nents + 1` - 1
-To: Kees Cook <keescook@chromium.org>
-CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Larysa Zaremba <larysa.zaremba@intel.com>, "Andy
- Shevchenko" <andriy.shevchenko@linux.intel.com>, "Gustavo A. R. Silva"
-	<gustavoars@kernel.org>, <netdev@vger.kernel.org>,
-	<linux-hardening@vger.kernel.org>, <intel-wired-lan@lists.osuosl.org>,
-	<linux-kernel@vger.kernel.org>
-References: <20230728155207.10042-1-aleksander.lobakin@intel.com>
- <20230728155207.10042-2-aleksander.lobakin@intel.com>
- <202307281537.AC1ED9CA@keescook>
-Content-Language: en-US
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-In-Reply-To: <202307281537.AC1ED9CA@keescook>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC4C11FB5F
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 13:11:47 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1EE3010FB
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 06:11:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1690895505;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=LZPGMYFD95A8uiN976D445h5APBCC9ED+naAIlPhoHg=;
+	b=hQ43lxZM6cRkz5ax2FAraNWDTLtHI/uSXqINPLLxNri/hmr9PIDattAmS7Ciucsks6I+OU
+	RBONoOf+O6Jxiru3HnhuylpbaGS0zMmHfa1od4v8mxbBEgjhhOB/cMz/ydqtH39GoTCvPy
+	tV/dB3ixJOfCe4M+01zguZawhcZeaCo=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-656-neApYJ12MfikKpygfZYw5g-1; Tue, 01 Aug 2023 09:11:44 -0400
+X-MC-Unique: neApYJ12MfikKpygfZYw5g-1
+Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-76c8e07cbe9so98328585a.1
+        for <netdev@vger.kernel.org>; Tue, 01 Aug 2023 06:11:43 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690895503; x=1691500303;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=LZPGMYFD95A8uiN976D445h5APBCC9ED+naAIlPhoHg=;
+        b=aLCaAyQA/CqN1mchcAf/6Y5iOQMVaDKjN+kCLxP7G4GUXWmm+wQWLTGJPPhYfVGVvj
+         Ebq365q1hZRGtoEBSwxlAi8LvCRUhTeqCm2MgA6HWM/riNI6WX20hJgVhaOe5ZKywtl/
+         qRa0NRaOki93CJjQnPuIyEZjPs044VW3kSm9Gu37gYghv6d97ZXpZ/mcqG5SGQtE2yVY
+         4/kESZpm81qSUnNCqGLxNaQxWSe6GmSoBA8N7MAQY5YWnSOrdYtSY+Y8AP3oGceT0iKG
+         4LSe9mBYTuwNTXqyyjoXCctF2udiKMJrbgCF0BkF8KhJvrsgOcUnMvV2WHjlhHk6N2cQ
+         i+nQ==
+X-Gm-Message-State: ABy/qLZqncIBb7tL8h4ZP8XrlDC6EW17YggKxk0TxuqPoIhRGxnUItRm
+	H0JUkeIPADr9R1/le5IhY6BAbwW7kbHoZPzV7xdzTeIqGTlLyewcRKH76iEDDwyhCXGlSYeuJ2T
+	zIyBxAUG1JxlIfCH/
+X-Received: by 2002:a05:620a:1a11:b0:767:a7c1:e776 with SMTP id bk17-20020a05620a1a1100b00767a7c1e776mr11186403qkb.2.1690895503112;
+        Tue, 01 Aug 2023 06:11:43 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlF4WPKBYnm5c1SYuFP+zCzJTJpn6DkKmUmEfzMFnNuT7F0grWUkB9zMAi1HQjUppRuuFnBO+g==
+X-Received: by 2002:a05:620a:1a11:b0:767:a7c1:e776 with SMTP id bk17-20020a05620a1a1100b00767a7c1e776mr11186374qkb.2.1690895502779;
+        Tue, 01 Aug 2023 06:11:42 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-225-251.dyn.eolo.it. [146.241.225.251])
+        by smtp.gmail.com with ESMTPSA id j27-20020a05620a001b00b00767d05117fesm4127068qki.36.2023.08.01.06.11.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 01 Aug 2023 06:11:42 -0700 (PDT)
+Message-ID: <8972ac7df2298d47e1b2f53b7f1b5d5941999580.camel@redhat.com>
+Subject: Re: [PATCH net-next v5 1/4] vsock/virtio/vhost: read data from
+ non-linear skb
+From: Paolo Abeni <pabeni@redhat.com>
+To: Arseniy Krasnov <AVKrasnov@sberdevices.ru>, Stefan Hajnoczi
+ <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>,  "Michael S. Tsirkin" <mst@redhat.com>, Jason
+ Wang <jasowang@redhat.com>, Bobby Eshleman <bobby.eshleman@bytedance.com>
+Cc: kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, 
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ kernel@sberdevices.ru,  oxffffaa@gmail.com
+Date: Tue, 01 Aug 2023 15:11:38 +0200
+In-Reply-To: <20230730085905.3420811-2-AVKrasnov@sberdevices.ru>
+References: <20230730085905.3420811-1-AVKrasnov@sberdevices.ru>
+	 <20230730085905.3420811-2-AVKrasnov@sberdevices.ru>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: BE0P281CA0008.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:b10:a::18) To DM6PR11MB3625.namprd11.prod.outlook.com
- (2603:10b6:5:13a::21)
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR11MB3625:EE_|DS7PR11MB6063:EE_
-X-MS-Office365-Filtering-Correlation-Id: df43824c-838e-4a5a-1458-08db92909eed
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: vRDQAoc/muY8oyV6jHdutziycwglsl/tDBsWJMusbPrx4WpG48rSJ1gg5QbNdtV78SJl3PgTIQEFJf+UY9kpHtsehpV4f/6GPCZ+HRnwda7R63+b+FbQeE3Ll3SZxCIG3EzmfTW2uNkXsEyBpdHUZufDtoQYi0Iei0pSoHpy6DBquRNaShDyw88k/pksH9Hg5wAQpwAM/CBJN+2iRNZ/PpOIiJRHvTtvFTLiNyVvorvAY9rjzn9GBNeLl55K3gwn3aBTg5A2PqiJ+Avwt0pHQxggOAHl/i/vKb6Do95hHLR1ZknaYMSZu/J2m6m47edqjx2tYxEC4YN5PLZrRUIkAIUuHZks+emPQlDWon5DBUhajSpy5JauyXd1ggUGKrEXF/+Ggrn/hgbzojsGxec/bTz0g4g3X45x2ADQf4nazrrwQ6ixsvWu4+QL1lQ4AyxoPY3gpmnRS+KqIV6jDTAkSHxbp9f9Fukh7oBy7mpm5SNvWa//meezL15+QcUQ00FWNyeuJ/GHiqyZ6BG1daH3keDDMxqOrl+VSsmvSX05Bq5pcgJfhoaw+i47U9fKBuzuBYcM6Bimb18pfOhCJaPfuX1O2g+Kvezo0Lyb3b1DVHWX88ga/Bm2nt/iNRH9y/m2xaEa91VpO1ei6+2Vdw+zl4gRDH51jBDVB7tOvo41B1M=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB3625.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(376002)(366004)(346002)(396003)(39860400002)(136003)(451199021)(83380400001)(36756003)(2906002)(86362001)(2616005)(31696002)(38100700002)(82960400001)(41300700001)(6512007)(4326008)(6916009)(316002)(26005)(8676002)(8936002)(31686004)(54906003)(6666004)(6486002)(66946007)(7416002)(478600001)(66556008)(66476007)(186003)(5660300002)(6506007)(81973001)(45980500001)(43740500002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?UWZabVJLSHowMVRsQjVKMEUzK0s4L3JMdEJtQit3M24xUWl0dXIwalBUTGpn?=
- =?utf-8?B?bkxRL3R3Y3lKMFZjWC80bnhDcS9DeWVpbGJoZlozQXF2MXdvRmVTR3lpclpQ?=
- =?utf-8?B?aU91VkVFNEhia0JVYXhFQW0zL1JvS0dZcTVqMUVNRk8vU01CZUNxY2s2dk40?=
- =?utf-8?B?M1ovUkpmYWJlQjdkaDV4L3p3dmZSQVJLNnRMMGdOd2h2K24yeHZPbTZWRjFZ?=
- =?utf-8?B?aXhNVEhwSDhJTlA0ZkROYk8yVElFSC9vcklLWU5Fc1dWQWRINEdzNnNjV3Bi?=
- =?utf-8?B?VkpORi9CeWtDTU9nZEFxdnd6NkdpRDhQL1ZJWEdBaTkraE0rNHJxYktOUUVQ?=
- =?utf-8?B?cGkwNEV3QmNmWmtod1JYQ1VlUnhpdjJLRzliNnNwVk5PckphTXZIR2JMUGFz?=
- =?utf-8?B?TlBYaUJPcFMyVU9KcForYnFLTFlkZkdkUmdaOFUxb1I2TEhOaG05OUdWT0Zk?=
- =?utf-8?B?RGVPc01oRStHb0NWU2Z3WVg2SlhQMk1xQmpNTjV0QXRwZERReHN1d0RaMnM0?=
- =?utf-8?B?ajhxY09CZEwyWGJDWjN5cy9RL3kxR3VyTDdVRWViUW9tRTA1QUJaQ3VJK0ll?=
- =?utf-8?B?ZGkyNGpPVERSTTQvRXZSUkIxQVUyUnBEMXVCcEg2amswUkdEakZZeWQwSFFR?=
- =?utf-8?B?MXkyRWRHb2ZkbVp1TFg2eDZQckZOYVM3WDN5QkhSUmQ3NnRxRmdxbExrcEtx?=
- =?utf-8?B?Uyt0aFUvclRRL1I5STExYUN5MGpnRWV6SjBHNzBaMjI1d3h1STdJQ3hGZWsv?=
- =?utf-8?B?UkoybVB0VXdRM3pOWFVMbEh5cnE3TGs5YnhwREFJQUd0YTFNbWV3UU9lZCtL?=
- =?utf-8?B?WmJjK04vZzliWGtvYjNveDg4NitISzhjMlFYM00wR0x5T1hnVjJCV3BKOTdW?=
- =?utf-8?B?TlZld0V2ZEJrN1k3a0NUM3hvclZ2MDlvTHJHVUZGdU5odTdNVTRBaERyRmlU?=
- =?utf-8?B?UnBCRjFZejZmTnlKMzVleUNjclFiQmxjOC9lNjFXd3NMTEdYRnFidzdGM1ls?=
- =?utf-8?B?WTJ0cVBDbnV5NS9PRnRDbEExZDVFbmRZTXZvZDhtcUYzaXgrczVMNFA0WHJR?=
- =?utf-8?B?ZnpsRWg1YmdFRXJ4TE1LRnJPb0pVZTRLa3lMUkltSFllRXp4ZUZ1SklkZ21L?=
- =?utf-8?B?M1JvNXVwaXpEb3JIblJvSFhYRnZ4SGorcGI1WE0vTXhsbmsycEEzNllwQmhJ?=
- =?utf-8?B?OFEyblliNWZlaWVCZjBZUEwyS3pPQVFVTkF3d01mVDFBRWpUNzJyWlB6MFNM?=
- =?utf-8?B?Q05ROVNkREdsVklQbkZqM0orWEFQc3prOC9UaFd6Yk5meHNOcFlGbHd1Ryts?=
- =?utf-8?B?Ui9ERGtkZHRwKzZTRlNaK0VZQzA5TzY5MTcvV3ZacGtxOTd2NzZjdXJGelFH?=
- =?utf-8?B?Mkhka0tVRUIwQzZEaXEwMFR0TCtQNXZ3cU55L0FsMWZCL09ibnFkdWlrRG4z?=
- =?utf-8?B?Y3lGZXkzaFhGNmp0d3FjM0doMDFzYU51QUxXeTBudEgzZ3NudEl5Tlk5NkQw?=
- =?utf-8?B?eXE5Yldld0M3eU1QNGVlS2RzNFBaZDN6aG1UYWl2VDhETkt4enhZM0RDLzdU?=
- =?utf-8?B?QU1JSXpLS0ZiOEJQcStaRDRwUmNOSzZ5VEVEZnkzbHdYTmhyNGlqNE9uMmdl?=
- =?utf-8?B?Ym83VXZmMk1sWmdQZDN4amZPRnpNVjkyRnpXQ0tXU3BzUGFtRTdoYUdBS0tx?=
- =?utf-8?B?NWJucXhEYUxMNVF3SlhVWlByS2IzTTVMdDNNR2J2OXNSNTk0WjJrRWRMczMw?=
- =?utf-8?B?ekN0bkpCeDd3bFFMN2Z1OGtFVkJhM3N6eEVxYnJsMnVhTWVCZktHOXQ3ZXlQ?=
- =?utf-8?B?ZXRHeFd3Ry81ckFtcnprZjNxRU1ZSTB6ZXdod2xFVVpFcERPWXJQYU5IRk1y?=
- =?utf-8?B?NVZhUzBzQ0MyY1RudjBWaXlEd2ZtSTY5OWVOeFVrZUFWbEFEZlVHTEkyL25k?=
- =?utf-8?B?aEpzbWJxQ3YwR1EzWFdkSWpaUEJVOFIySEk2cThaZ3Z2RmtsRUdaRU1jeE1J?=
- =?utf-8?B?Q3Y1MnJaWWhUaDZXajRwODVNaHlUVXhsR1dHL2xzdTdROUVNVWZudzJVWGhr?=
- =?utf-8?B?STlXOXdpOG9YbUxvZ1RnSUo5UVZpeDlDUmdxN2lsRkJmemYyTjFDaW5JM1JN?=
- =?utf-8?B?M29zeUwrVnNvVm8yNXJ0em1jbkxOMW9iQ2gxU0FKalRnWTlHRFdjWExRbDF4?=
- =?utf-8?B?cUE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: df43824c-838e-4a5a-1458-08db92909eed
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB3625.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Aug 2023 13:10:04.4522
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: fgf19QnWjSkDYNeWhCtCkHFe91D4Stkin04sSiXjrteyz5CDERcpy4T/WLp4I96QQnRExUWKVJ5CsDzxtT5KkeRzTVT+8GcR1h91ySv4rfg=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR11MB6063
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Kees Cook <keescook@chromium.org>
-Date: Fri, 28 Jul 2023 15:43:26 -0700
+On Sun, 2023-07-30 at 11:59 +0300, Arseniy Krasnov wrote:
+> This is preparation patch for MSG_ZEROCOPY support. It adds handling of
+> non-linear skbs by replacing direct calls of 'memcpy_to_msg()' with
+> 'skb_copy_datagram_iter()'. Main advantage of the second one is that it
+> can handle paged part of the skb by using 'kmap()' on each page, but if
+> there are no pages in the skb, it behaves like simple copying to iov
+> iterator. This patch also adds new field to the control block of skb -
+> this value shows current offset in the skb to read next portion of data
+> (it doesn't matter linear it or not). Idea behind this field is that
+> 'skb_copy_datagram_iter()' handles both types of skb internally - it
+> just needs an offset from which to copy data from the given skb. This
+> offset is incremented on each read from skb. This approach allows to
+> avoid special handling of non-linear skbs:
+> 1) We can't call 'skb_pull()' on it, because it updates 'data' pointer.
+> 2) We need to update 'data_len' also on each read from this skb.
 
-> On Fri, Jul 28, 2023 at 05:52:05PM +0200, Alexander Lobakin wrote:
->> The two most problematic virtchnl structures are virtchnl_rss_key and
->> virtchnl_rss_lut. Their "flex" arrays have the type of u8, thus, when
->> allocating / checking, the actual size is calculated as `sizeof +
->> nents - 1 byte`. But their sizeof() is not 1 byte larger than the size
->> of such structure with proper flex array, it's two bytes larger due to
->> the padding. That said, their size is always 1 byte larger unless
->> there are no tail elements -- then it's +2 bytes.
->> Add virtchnl_struct_size() macro which will handle this case (and later
->> other cases as well). Make its calling conv the same as we call
->> struct_size() to allow it to be drop-in, even though it's unlikely to
->> become possible to switch to generic API. The macro will calculate a
->> proper size of a structure with a flex array at the end, so that it
->> becomes transparent for the compilers, but add the difference from the
->> old values, so that the real size of sorta-ABI-messages doesn't change.
->> Use it on the allocation side in IAVF and the receiving side (defined
->> as static inline in virtchnl.h) for the mentioned two structures.
-> 
-> This all looks workable, but it's a unique solution in the kernel. That
-> is fine, of course, but would it be easier to maintain/test if it went
-> with the union style solutions?
-> 
-> struct foo {
-> 	...
-> 	union {
-> 		type legacy_padding;
-> 		DECLARE_FLEX_ARRAY(type, member);
-> 	};
-> };
-> 
-> Then the size doesn't change and "member" can still be used. (i.e. no
-> collateral changes needed.)
+It looks like the above sentence is a left-over from previous version
+as, as this patch does not touch data_len. And I think it contradicts
+the previous one, so it's a bit confusing.
 
-This wouldn't work unfortunately. I mean, you'd still need weird
-calculations.
-Speaking of e.g. virtchnl_rss_lut, it's always
-`struct_size(nents + 1) - 1`, you can't just use the pattern above and
-then struct_size(). Not only legacy padding is needed, but also
-calculation adjustments.
-Or did you mean define the structures as above and leave the
-calculations as they are? It makes me feel we can miss something that
-way. With the series, all the broken structures are processed in one
-place and I thought _this_ would be actually easier to maintain...
+> Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+> ---
+>  Changelog:
+>  v5(big patchset) -> v1:
+>   * Merge 'virtio_transport_common.c' and 'vhost/vsock.c' patches into
+>     this single patch.
+>   * Commit message update: grammar fix and remark that this patch is
+>     MSG_ZEROCOPY preparation.
+>   * Use 'min_t()' instead of comparison using '<>' operators.
+>  v1 -> v2:
+>   * R-b tag added.
+>  v3 -> v4:
+>   * R-b tag removed due to rebase:
+>     * Part for 'virtio_transport_stream_do_peek()' is changed.
+>     * Part for 'virtio_transport_seqpacket_do_peek()' is added.
+>   * Comments about sleep in 'memcpy_to_msg()' now describe sleep in
+>     'skb_copy_datagram_iter()'.
+>=20
+>  drivers/vhost/vsock.c                   | 14 +++++++----
+>  include/linux/virtio_vsock.h            |  1 +
+>  net/vmw_vsock/virtio_transport_common.c | 32 +++++++++++++++----------
+>  3 files changed, 29 insertions(+), 18 deletions(-)
+>=20
+> diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+> index 817d377a3f36..8c917be32b5d 100644
+> --- a/drivers/vhost/vsock.c
+> +++ b/drivers/vhost/vsock.c
+> @@ -114,6 +114,7 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock=
+,
+>  		struct sk_buff *skb;
+>  		unsigned out, in;
+>  		size_t nbytes;
+> +		u32 frag_off;
 
-> 
-> -Kees
-> 
+IMHO 'offset' would be a better name for both the variable and the CB
+field, as it can points both inside the skb frags, linear part or frag
+list.
 
-Thanks,
-Olek
+Otherwise LGTM, thanks!
+
+Paolo
+
 
