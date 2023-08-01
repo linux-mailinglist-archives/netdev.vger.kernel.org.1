@@ -1,132 +1,78 @@
-Return-Path: <netdev+bounces-23038-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23037-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5F4876A75C
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 05:15:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6604876A753
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 05:10:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0A9871C20E3A
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 03:15:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 484C61C20E10
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 03:10:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8EA81383;
-	Tue,  1 Aug 2023 03:15:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEA501375;
+	Tue,  1 Aug 2023 03:10:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A37B17E;
-	Tue,  1 Aug 2023 03:15:14 +0000 (UTC)
-Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4320B1BC7;
-	Mon, 31 Jul 2023 20:15:12 -0700 (PDT)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R251e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046050;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0Vojog7j_1690859708;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0Vojog7j_1690859708)
-          by smtp.aliyun-inc.com;
-          Tue, 01 Aug 2023 11:15:09 +0800
-Message-ID: <1690858650.8698683-2-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH vhost v11 05/10] virtio_ring: introduce virtqueue_dma_dev()
-Date: Tue, 1 Aug 2023 10:57:30 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Christoph Hellwig <hch@infradead.org>,
- virtualization@lists.linux-foundation.org,
- "David S.  Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Paolo  Abeni <pabeni@redhat.com>,
- Alexei Starovoitov <ast@kernel.org>,
- Daniel  Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John  Fastabend <john.fastabend@gmail.com>,
- netdev@vger.kernel.org,
- bpf@vger.kernel.org,
- "Michael S. Tsirkin" <mst@redhat.com>,
- Jason Wang <jasowang@redhat.com>
-References: <20230710034237.12391-1-xuanzhuo@linux.alibaba.com>
- <20230710034237.12391-6-xuanzhuo@linux.alibaba.com>
- <ZK/cxNHzI23I6efc@infradead.org>
- <20230713104805-mutt-send-email-mst@kernel.org>
- <ZLjSsmTfcpaL6H/I@infradead.org>
- <20230720131928-mutt-send-email-mst@kernel.org>
- <ZL6qPvd6X1CgUD4S@infradead.org>
- <1690251228.3455179-1-xuanzhuo@linux.alibaba.com>
- <20230725033321-mutt-send-email-mst@kernel.org>
- <1690283243.4048996-1-xuanzhuo@linux.alibaba.com>
- <1690524153.3603117-1-xuanzhuo@linux.alibaba.com>
- <20230728080305.5fe3737c@kernel.org>
- <CACGkMEs5uc=ct8BsJzV2SEJzAGXqCP__yxo-MBa6d6JzDG4YOg@mail.gmail.com>
- <20230731084651.16ec0a96@kernel.org>
- <1690855424.7821567-1-xuanzhuo@linux.alibaba.com>
- <20230731193606.25233ed9@kernel.org>
-In-Reply-To: <20230731193606.25233ed9@kernel.org>
-X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,UNPARSEABLE_RELAY,URIBL_BLOCKED,
-	USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E486A7E
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 03:10:00 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E40A1C433C8;
+	Tue,  1 Aug 2023 03:09:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1690859400;
+	bh=X6Z9QOKzikJGxKFX2tBf3wIQdI88JGKWEXi24Ybq4MA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=iIfIeVSu/c4UcRznqKtcdxa18wlnj6ChVSHG7EctmvUsjFt5BapHNNtlwbkJMhOfi
+	 idGdgH3pQzvmNXj7OI9N9IWV8kI1hur293KpzgusRRmQ08/0nsVuHciWtiIPdUKwNI
+	 +SKstyRjcz6u6KKccx3JDeD/FdwgkvcrX7qnj89BqtETiNd5ojEXD8Y8VEY4reu64B
+	 enGGr8yrpHakvkmIrapnuPG2KAYSrOB+XnBCBuVadIIVvP0RddBYDKdjJxj7iP7K5h
+	 yjRjLmYzhAGFHk4YbcdYWREx+KXVt9c9RN7Phj/XTW9qIWUrrE7eZG/61ZSpxT0Xbj
+	 oAZcdQLNpr8fA==
+Date: Mon, 31 Jul 2023 20:09:59 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Yue Haibing <yuehaibing@huawei.com>
+Cc: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
+ <pabeni@redhat.com>, <yoshfuji@linux-ipv6.org>, <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <simon.horman@corigine.com>
+Subject: Re: [PATCH v2] ip6mr: Fix skb_under_panic in ip6mr_cache_report()
+Message-ID: <20230731200959.2019cb9c@kernel.org>
+In-Reply-To: <20230728121703.29572-1-yuehaibing@huawei.com>
+References: <20230728121703.29572-1-yuehaibing@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, 31 Jul 2023 19:36:06 -0700, Jakub Kicinski <kuba@kernel.org> wrote:
-> On Tue, 1 Aug 2023 10:03:44 +0800 Xuan Zhuo wrote:
-> > > Virtio is either a SW
-> > > construct or offloaded to very capable HW, so either way cost of
-> > > creating an extra instance for DPDK or whatever else is very low.
-> >
-> > The extra instance is virtio-net?
-> >
-> > I think there is a gap. So let me give you a brief introduction of our case.
-> >
-> > Firstly, we donot use dpdk. We use the AF_XDP, because of that the AF_XDP is
-> > more simpler and easy to deploy for the nginx.
-> >
-> > We use the AF_XDP to speedup the UDP of the quic. By the library, the APP just
-> > needs some simple change.
-> >
-> > On the AliYun, the net driver is virtio-net. So we want the virtio-net support
-> > the AF_XDP.
-> >
-> > I guess what you mean is that we can speed up through the cooperation of devices
-> > and drivers, but our machines are public clouds, and we cannot change the
-> > back-end devices of virtio under normal circumstances.
-> >
-> > Here I do not know the different of the real hw and the virtio-net.
->
-> You have this working and benchmarked or this is just and idea?
+On Fri, 28 Jul 2023 20:17:03 +0800 Yue Haibing wrote:
+>  #ifdef CONFIG_IPV6_PIMSM_V2
+> +	int nhoff = skb_network_offset(pkt);
+>  	if (assert == MRT6MSG_WHOLEPKT || assert == MRT6MSG_WRMIFWHOLE)
+> -		skb = skb_realloc_headroom(pkt, -skb_network_offset(pkt)
+> -						+sizeof(*msg));
+> +		skb = skb_realloc_headroom(pkt, -nhoff + sizeof(*msg));
 
-This is not just an idea. I said that has been used on large scale.
+These changes look unnecessary. You can leave this code be (as ugly as
+it is)...
 
-This is the library for the APP to use the AF_XDP. We has open it.
-https://gitee.com/anolis/libxudp
+>  	else
+>  #endif
+>  		skb = alloc_skb(sizeof(struct ipv6hdr) + sizeof(*msg), GFP_ATOMIC);
+> @@ -1073,7 +1073,7 @@ static int ip6mr_cache_report(const struct mr_table *mrt, struct sk_buff *pkt,
+>  		   And all this only to mangle msg->im6_msgtype and
+>  		   to set msg->im6_mbz to "mbz" :-)
+>  		 */
+> -		skb_push(skb, -skb_network_offset(pkt));
+> +		__skb_pull(skb, nhoff);
 
-This is the Alibaba version of the nginx. That has been opened, that supported
-to work with the libray to use AF_XDP.
-http://tengine.taobao.org/
+.. and just replace the push here with:
 
-I supported this on our kernel release Anolis/Alinux.
-
-The work was done about 2 years ago. You know, I pushed the first version to
-enable AF_XDP on virtio-net about two years ago. I never thought the job would
-be so difficult.
-
-The nic (virtio-net) of AliYun can reach 24,000,000PPS.
-So I think there is no different with the real HW on the performance.
-
-With the AF_XDP, the UDP pps is seven times that of the kernel udp stack.
-
->
-> What about io_uring zero copy w/ pre-registered buffers.
-> You'll get csum offload, GSO, all the normal perf features.
-
-We tried io-uring, but it was not suitable for our scenario.
-
-Yes, now the AF_XDP does not support the csum offload and GSO.
-This is indeed a small problem.
-
-Thanks.
+  __skb_pull(skb, skb_network_offset(pkt));
+-- 
+pw-bot: cr
 
