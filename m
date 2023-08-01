@@ -1,257 +1,599 @@
-Return-Path: <netdev+bounces-23188-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23215-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C273276B43E
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 14:01:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6817676B58C
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 15:11:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 706802812AF
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 12:01:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1D49828145C
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 13:11:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 541A9214F4;
-	Tue,  1 Aug 2023 12:01:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2086221512;
+	Tue,  1 Aug 2023 13:11:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42BFC1F952
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 12:01:32 +0000 (UTC)
-Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0371C449D;
-	Tue,  1 Aug 2023 05:01:09 -0700 (PDT)
-Received: by mail-lf1-x12e.google.com with SMTP id 2adb3069b0e04-4fe216edaf7so4862283e87.0;
-        Tue, 01 Aug 2023 05:01:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690891265; x=1691496065;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=B0LjPdjjc4ZMKtqm7lOFvAlr5b1k31FiFS89qat9F8E=;
-        b=eWYh/cUys2QzHEjwByAFe+4BypeE4zktjixesBwnezhhHPfzCGxcE69Sy1+S0JBLGM
-         VfenZn1nm9R1Cq9WV/4H4SuKcJfd0I2lT1Fd2UFb4cAuo7GvK0FJzWsov3r5wdo7pSnj
-         GVBCaO/rk5/O4zdI9FKoRW5hwagE4yFByZ7gXs98hAnCUlbM+AjhgDbAoDHyLehwCUX2
-         QXYDkOSwu5UquWWPs2oHn6vJJV0Q3wlku2Stwq8rPu+f1ZIzIDRFEIrqOCF4JG2ATewW
-         RxIAbSVweepFELcR7pBWI9/PtlLVTBtZfU1nQHUJaWJZmJlUHOn+Cp014ikdbwTjOnVz
-         fJqA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690891265; x=1691496065;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=B0LjPdjjc4ZMKtqm7lOFvAlr5b1k31FiFS89qat9F8E=;
-        b=Nwg6fxRKQR/TgUJYsKcOjLFlEBVmkuI7S/iisbg6EX4ZfPubLpY9oIclcjCe2NbHhB
-         BHpkv2n6G9glg6+SOqt2nr+l32gRTNPAfW1XoKjRA4N7vtDxbBjgW9AL2yLeUO3FgItq
-         QNQW6+9Y+4UkX/YKINZsazPu7sznCw55LhZaE6KR6+VJMMJ4Sl4hip1KSJSQW0fz+Yrx
-         vaQCLyzoQonCeKKxAkTXeYRui9Is6Ym+c/7V0FL3qUfXwPoefTbA3NtkJHvD2vJ7rAlY
-         Jeatn66bL88vkpO3sfjnL3lHSl78Hhr/4r6f/u1y222kXaaktINfTdENv3S3t5qG7+On
-         TTLw==
-X-Gm-Message-State: ABy/qLbT8x3xN3VVExf5S6ZeOj0CswAV5B1cPVxTI7uIsZfX9wXCGyyV
-	4uMmeOgEk1kUKGN3LivRh3Q=
-X-Google-Smtp-Source: APBJJlHL4GqflpupMzaWBM7H2XZV1jRjRXbT87fu1NbZ8XZ2KVgP10+16KOTPj7YJAZIvQ4uvQXMSg==
-X-Received: by 2002:a05:6512:2010:b0:4fe:3724:fdb6 with SMTP id a16-20020a056512201000b004fe3724fdb6mr944608lfb.30.1690891264259;
-        Tue, 01 Aug 2023 05:01:04 -0700 (PDT)
-Received: from fedora ([213.255.186.46])
-        by smtp.gmail.com with ESMTPSA id j15-20020ac2550f000000b004fe432108aesm368553lfk.261.2023.08.01.05.01.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Aug 2023 05:01:03 -0700 (PDT)
-Date: Tue, 1 Aug 2023 15:00:51 +0300
-From: Matti Vaittinen <mazziesaccount@gmail.com>
-To: Matti Vaittinen <matti.vaittinen@fi.rohmeurope.com>,
-	Matti Vaittinen <mazziesaccount@gmail.com>
-Cc: Marcin Wojtas <mw@semihalf.com>, netdev@vger.kernel.org,
-	Andreas Klinger <ak@it-klinger.de>,
-	Jonathan =?iso-8859-1?Q?Neusch=E4fer?= <j.neuschaefer@gmx.net>,
-	openbmc@lists.ozlabs.org, linux-mips@vger.kernel.org,
-	Jonathan Cameron <jic23@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Paul Cercueil <paul@crapouillou.net>,
-	Lars-Peter Clausen <lars@metafoo.de>, linux-gpio@vger.kernel.org,
-	linux-iio@vger.kernel.org, Russell King <linux@armlinux.org.uk>,
-	linux-kernel@vger.kernel.org, Wolfram Sang <wsa@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, linux-i2c@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	Michael Hennerich <Michael.Hennerich@analog.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH v8 0/8] fix fwnode_irq_get[_byname()] returnvalue
-Message-ID: <cover.1690890774.git.mazziesaccount@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DACC1FB5F
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 13:11:44 +0000 (UTC)
+Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 572381AA;
+	Tue,  1 Aug 2023 06:11:42 -0700 (PDT)
+Received: from fllv0035.itg.ti.com ([10.64.41.0])
+	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 3719EmQv126140;
+	Tue, 1 Aug 2023 04:14:48 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1690881289;
+	bh=BmWAk/n+7pPGjyIgvg5Zs1Quow1AxjBc3ElgrgsXUjA=;
+	h=From:To:CC:Subject:Date:In-Reply-To:References;
+	b=F1bfIg5dtrdiuEK4JzJaHnjuPwhdPXbOW9qWKKFCLaGTtLkq4E8ztO60dQlWUqK/R
+	 RXiOs4I/TzQY5Dh41BVJzKKHDsryizGdxZW5sfiFatBPl3J/oJis4n4OHpgt2OspvC
+	 6UFRmbgtgtyTDeCPBGcH9lrqpPLLHlcRPZUgE34U=
+Received: from DFLE106.ent.ti.com (dfle106.ent.ti.com [10.64.6.27])
+	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 3719EmC0085651
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Tue, 1 Aug 2023 04:14:48 -0500
+Received: from DFLE109.ent.ti.com (10.64.6.30) by DFLE106.ent.ti.com
+ (10.64.6.27) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Tue, 1
+ Aug 2023 04:14:48 -0500
+Received: from fllv0040.itg.ti.com (10.64.41.20) by DFLE109.ent.ti.com
+ (10.64.6.30) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Tue, 1 Aug 2023 04:14:48 -0500
+Received: from fllv0122.itg.ti.com (fllv0122.itg.ti.com [10.247.120.72])
+	by fllv0040.itg.ti.com (8.15.2/8.15.2) with ESMTP id 3719Em6L037362;
+	Tue, 1 Aug 2023 04:14:48 -0500
+Received: from localhost (uda0501179.dhcp.ti.com [172.24.227.217])
+	by fllv0122.itg.ti.com (8.14.7/8.14.7) with ESMTP id 3719El5X015842;
+	Tue, 1 Aug 2023 04:14:48 -0500
+From: MD Danish Anwar <danishanwar@ti.com>
+To: Randy Dunlap <rdunlap@infradead.org>, Roger Quadros <rogerq@kernel.org>,
+        Simon Horman <simon.horman@corigine.com>,
+        Vignesh Raghavendra
+	<vigneshr@ti.com>, Andrew Lunn <andrew@lunn.ch>,
+        Richard Cochran
+	<richardcochran@gmail.com>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Krzysztof
+ Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Rob Herring
+	<robh+dt@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+        Jakub Kicinski
+	<kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        MD Danish Anwar <danishanwar@ti.com>
+CC: <nm@ti.com>, <srk@ti.com>, <linux-kernel@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-omap@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>
+Subject: [PATCH v13 02/10] net: ti: icssg-prueth: Add mii helper apis and macros
+Date: Tue, 1 Aug 2023 14:44:20 +0530
+Message-ID: <20230801091428.1359979-3-danishanwar@ti.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230801091428.1359979-1-danishanwar@ti.com>
+References: <20230801091428.1359979-1-danishanwar@ti.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="hQsyJyfrnR1cLwNR"
-Content-Disposition: inline
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+Add MII helper APIs and MACROs. These APIs and MACROs will be later used
+by ICSSG Ethernet driver. Also introduce icssg_prueth.h which has
+definition of prueth related structures.
 
---hQsyJyfrnR1cLwNR
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-The fwnode_irq_get() and the fwnode_irq_get_byname() may have returned
-zero if mapping the IRQ fails. This contradicts the
-fwnode_irq_get_byname() documentation. Furthermore, returning zero or
-errno on error is unepected and can easily lead to problems
-like:
-
-int probe(foo)
-{
-=2E..
-	ret =3D fwnode_irq_get_byname(...);
-	if (ret < 0)
-		return ret;
-=2E..
-}
-
-or
-
-int probe(foo)
-{
-=2E..
-	ret =3D fwnode_irq_get_byname(...);
-	if (ret <=3D 0)
-		return ret;
-=2E..
-}
-
-which are both likely to be wrong. First treats zero as successful call and
-misses the IRQ mapping failure. Second returns zero from probe even though
-it detects the IRQ mapping failure correvtly.
-
-Thus the fwnode_irq_get() and the fwnode_irq_get_byname() were changed to
-always return a negative errno upon failure.
-
-https://lore.kernel.org/all/fb7241d3-d1d1-1c37-919b-488d6d007484@gmail.com/
-
-This is a clean-up patch to adjust callers. Please note that callers
-were audited based on v6.4-rc2:
-
-fwnode_irq_get_byname():
-drivers/i2c/i2c-smbus.c
-drivers/iio/accel/adxl355_core.c
-drivers/iio/accel/kionix-kx022a.c
-drivers/iio/adc/ad4130.c
-drivers/iio/adc/max11410.c
-drivers/iio/addac/ad74115.c
-drivers/iio/gyro/fxas21002c_core.c
-drivers/iio/imu/adis16480.c
-drivers/iio/imu/bmi160/bmi160_core.c
-drivers/iio/imu/bmi160/bmi160_core.c
-
-fwnode_irq_get():
-drivers/gpio/gpio-dwapb.c
-drivers/iio/chemical/scd30_serial.c
-drivers/iio/proximity/mb1232.c
-drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
-drivers/net/mdio/fwnode_mdio.c
-drivers/pinctrl/pinctrl-ingenic.c
-drivers/pinctrl/pinctrl-microchip-sgpio.c
-drivers/pinctrl/pinctrl-pistachio.c
-
-and it seems to me these calls will be Ok after this clean-up. The
-i2c-smbus.c and kionix-kx022a.c will gain a functional change (bugfix?) as
-after this patch the probe will return -EINVAL should the IRQ mapping fail.
-The series will also adjust the return value check for zero to be omitted.
-
-NOTES:
-
-Changes are compile-tested only.
-
-drivers/pinctrl/nuvoton/pinctrl-wpcm450.c
-will also gain a functional change. The pinctrl-wpcm450.c change is easy
-to see - after this series the device-tree mapping failures will be
-handled as any other errors - probe will be aborted with -EINVAL. Other
-feasible option could be treating other errors in IRQ getting same way
-as the DT mapping failures - just silently skip the IRQ. Please see
-comment in the respective patch.
-
-drivers/iio/cdc/ad7150.c
-Changed logic so that all the IRQ getting errors jump to the same
-'no-IRQ' branch as the DT mapping error did.
-
-Revision history:
-v7 =3D> v8:
- - drop ptach 1/N which was merged during 6.4 development.
- - rebase on top of the v6.5-rc4.
-v6 =3D> v7:
- - re-ordered patches per subsystem
- - mvpp2 - added a patch for not shadowing the return value
-v5 =3D> v6:
- - iio: cdc: ad7150 - never abort probe if IRQ getting fails
-v4 =3D> v5:
- - Fix subject lines for mvpp2 and wpcm450
- - drop unnecessary irqno assignment from mb1232
- - add back the drivers/i2c/i2c-smbus.c change which was accidentally
-   dropped during v3 =3D> v4 work
-v3 =3D> v4:
- - Change also the fwnode_irq_get() as was suggested by Jonathan.
-Changelog v2 =3D> v3:
- - rebase/resend/add kx022a fix.
-Changelog v1 =3D> v2:
- - minor styling
-
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
 ---
+ drivers/net/ethernet/ti/icssg/icssg_mii_cfg.c | 120 +++++++++++
+ drivers/net/ethernet/ti/icssg/icssg_mii_rt.h  | 151 ++++++++++++++
+ drivers/net/ethernet/ti/icssg/icssg_prueth.h  | 197 ++++++++++++++++++
+ 3 files changed, 468 insertions(+)
+ create mode 100644 drivers/net/ethernet/ti/icssg/icssg_mii_cfg.c
+ create mode 100644 drivers/net/ethernet/ti/icssg/icssg_mii_rt.h
+ create mode 100644 drivers/net/ethernet/ti/icssg/icssg_prueth.h
 
-Matti Vaittinen (8):
-  iio: mb1232: relax return value check for IRQ get
-  iio: cdc: ad7150: relax return value check for IRQ get
-  pinctrl: wpcm450: relax return value check for IRQ get
-  pinctrl: ingenic: relax return value check for IRQ get
-  pinctrl: pistachio: relax return value check for IRQ get
-  i2c: i2c-smbus: fwnode_irq_get_byname() return value fix
-  net-next: mvpp2: relax return value check for IRQ get
-  net-next: mvpp2: don't shadow error
+diff --git a/drivers/net/ethernet/ti/icssg/icssg_mii_cfg.c b/drivers/net/ethernet/ti/icssg/icssg_mii_cfg.c
+new file mode 100644
+index 000000000000..92718ae40d7e
+--- /dev/null
++++ b/drivers/net/ethernet/ti/icssg/icssg_mii_cfg.c
+@@ -0,0 +1,120 @@
++// SPDX-License-Identifier: GPL-2.0
++/* Texas Instruments ICSSG Ethernet Driver
++ *
++ * Copyright (C) 2018-2022 Texas Instruments Incorporated - https://www.ti.com/
++ *
++ */
++
++#include <linux/etherdevice.h>
++#include <linux/regmap.h>
++#include <linux/types.h>
++
++#include "icssg_mii_rt.h"
++#include "icssg_prueth.h"
++
++void icssg_mii_update_ipg(struct regmap *mii_rt, int mii, u32 ipg)
++{
++	u32 val;
++
++	if (mii == ICSS_MII0) {
++		regmap_write(mii_rt, PRUSS_MII_RT_TX_IPG0, ipg);
++	} else {
++		regmap_read(mii_rt, PRUSS_MII_RT_TX_IPG0, &val);
++		regmap_write(mii_rt, PRUSS_MII_RT_TX_IPG1, ipg);
++		regmap_write(mii_rt, PRUSS_MII_RT_TX_IPG0, val);
++	}
++}
++
++void icssg_mii_update_mtu(struct regmap *mii_rt, int mii, int mtu)
++{
++	mtu += (ETH_HLEN + ETH_FCS_LEN);
++	if (mii == ICSS_MII0) {
++		regmap_update_bits(mii_rt,
++				   PRUSS_MII_RT_RX_FRMS0,
++				   PRUSS_MII_RT_RX_FRMS_MAX_FRM_MASK,
++				   (mtu - 1) << PRUSS_MII_RT_RX_FRMS_MAX_FRM_SHIFT);
++	} else {
++		regmap_update_bits(mii_rt,
++				   PRUSS_MII_RT_RX_FRMS1,
++				   PRUSS_MII_RT_RX_FRMS_MAX_FRM_MASK,
++				   (mtu - 1) << PRUSS_MII_RT_RX_FRMS_MAX_FRM_SHIFT);
++	}
++}
++
++void icssg_update_rgmii_cfg(struct regmap *miig_rt, struct prueth_emac *emac)
++{
++	u32 gig_en_mask, gig_val = 0, full_duplex_mask, full_duplex_val = 0;
++	int slice = prueth_emac_slice(emac);
++	u32 inband_en_mask, inband_val = 0;
++
++	gig_en_mask = (slice == ICSS_MII0) ? RGMII_CFG_GIG_EN_MII0 :
++					RGMII_CFG_GIG_EN_MII1;
++	if (emac->speed == SPEED_1000)
++		gig_val = gig_en_mask;
++	regmap_update_bits(miig_rt, RGMII_CFG_OFFSET, gig_en_mask, gig_val);
++
++	inband_en_mask = (slice == ICSS_MII0) ? RGMII_CFG_INBAND_EN_MII0 :
++					RGMII_CFG_INBAND_EN_MII1;
++	if (emac->speed == SPEED_10 && phy_interface_mode_is_rgmii(emac->phy_if))
++		inband_val = inband_en_mask;
++	regmap_update_bits(miig_rt, RGMII_CFG_OFFSET, inband_en_mask, inband_val);
++
++	full_duplex_mask = (slice == ICSS_MII0) ? RGMII_CFG_FULL_DUPLEX_MII0 :
++					   RGMII_CFG_FULL_DUPLEX_MII1;
++	if (emac->duplex == DUPLEX_FULL)
++		full_duplex_val = full_duplex_mask;
++	regmap_update_bits(miig_rt, RGMII_CFG_OFFSET, full_duplex_mask,
++			   full_duplex_val);
++}
++
++void icssg_miig_set_interface_mode(struct regmap *miig_rt, int mii, phy_interface_t phy_if)
++{
++	u32 val, mask, shift;
++
++	mask = mii == ICSS_MII0 ? ICSSG_CFG_MII0_MODE : ICSSG_CFG_MII1_MODE;
++	shift =  mii == ICSS_MII0 ? ICSSG_CFG_MII0_MODE_SHIFT : ICSSG_CFG_MII1_MODE_SHIFT;
++
++	val = MII_MODE_RGMII;
++	if (phy_if == PHY_INTERFACE_MODE_MII)
++		val = MII_MODE_MII;
++
++	val <<= shift;
++	regmap_update_bits(miig_rt, ICSSG_CFG_OFFSET, mask, val);
++	regmap_read(miig_rt, ICSSG_CFG_OFFSET, &val);
++}
++
++u32 icssg_rgmii_cfg_get_bitfield(struct regmap *miig_rt, u32 mask, u32 shift)
++{
++	u32 val;
++
++	regmap_read(miig_rt, RGMII_CFG_OFFSET, &val);
++	val &= mask;
++	val >>= shift;
++
++	return val;
++}
++
++u32 icssg_rgmii_get_speed(struct regmap *miig_rt, int mii)
++{
++	u32 shift = RGMII_CFG_SPEED_MII0_SHIFT, mask = RGMII_CFG_SPEED_MII0;
++
++	if (mii == ICSS_MII1) {
++		shift = RGMII_CFG_SPEED_MII1_SHIFT;
++		mask = RGMII_CFG_SPEED_MII1;
++	}
++
++	return icssg_rgmii_cfg_get_bitfield(miig_rt, mask, shift);
++}
++
++u32 icssg_rgmii_get_fullduplex(struct regmap *miig_rt, int mii)
++{
++	u32 shift = RGMII_CFG_FULLDUPLEX_MII0_SHIFT;
++	u32 mask = RGMII_CFG_FULLDUPLEX_MII0;
++
++	if (mii == ICSS_MII1) {
++		shift = RGMII_CFG_FULLDUPLEX_MII1_SHIFT;
++		mask = RGMII_CFG_FULLDUPLEX_MII1;
++	}
++
++	return icssg_rgmii_cfg_get_bitfield(miig_rt, mask, shift);
++}
+diff --git a/drivers/net/ethernet/ti/icssg/icssg_mii_rt.h b/drivers/net/ethernet/ti/icssg/icssg_mii_rt.h
+new file mode 100644
+index 000000000000..55a59bf5299c
+--- /dev/null
++++ b/drivers/net/ethernet/ti/icssg/icssg_mii_rt.h
+@@ -0,0 +1,151 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++
++/* PRU-ICSS MII_RT register definitions
++ *
++ * Copyright (C) 2015-2022 Texas Instruments Incorporated - https://www.ti.com
++ */
++
++#ifndef __NET_PRUSS_MII_RT_H__
++#define __NET_PRUSS_MII_RT_H__
++
++#include <linux/if_ether.h>
++#include <linux/phy.h>
++
++/* PRUSS_MII_RT Registers */
++#define PRUSS_MII_RT_RXCFG0		0x0
++#define PRUSS_MII_RT_RXCFG1		0x4
++#define PRUSS_MII_RT_TXCFG0		0x10
++#define PRUSS_MII_RT_TXCFG1		0x14
++#define PRUSS_MII_RT_TX_CRC0		0x20
++#define PRUSS_MII_RT_TX_CRC1		0x24
++#define PRUSS_MII_RT_TX_IPG0		0x30
++#define PRUSS_MII_RT_TX_IPG1		0x34
++#define PRUSS_MII_RT_PRS0		0x38
++#define PRUSS_MII_RT_PRS1		0x3c
++#define PRUSS_MII_RT_RX_FRMS0		0x40
++#define PRUSS_MII_RT_RX_FRMS1		0x44
++#define PRUSS_MII_RT_RX_PCNT0		0x48
++#define PRUSS_MII_RT_RX_PCNT1		0x4c
++#define PRUSS_MII_RT_RX_ERR0		0x50
++#define PRUSS_MII_RT_RX_ERR1		0x54
++
++/* PRUSS_MII_RT_RXCFG0/1 bits */
++#define PRUSS_MII_RT_RXCFG_RX_ENABLE		BIT(0)
++#define PRUSS_MII_RT_RXCFG_RX_DATA_RDY_MODE_DIS	BIT(1)
++#define PRUSS_MII_RT_RXCFG_RX_CUT_PREAMBLE	BIT(2)
++#define PRUSS_MII_RT_RXCFG_RX_MUX_SEL		BIT(3)
++#define PRUSS_MII_RT_RXCFG_RX_L2_EN		BIT(4)
++#define PRUSS_MII_RT_RXCFG_RX_BYTE_SWAP		BIT(5)
++#define PRUSS_MII_RT_RXCFG_RX_AUTO_FWD_PRE	BIT(6)
++#define PRUSS_MII_RT_RXCFG_RX_L2_EOF_SCLR_DIS	BIT(9)
++
++/* PRUSS_MII_RT_TXCFG0/1 bits */
++#define PRUSS_MII_RT_TXCFG_TX_ENABLE		BIT(0)
++#define PRUSS_MII_RT_TXCFG_TX_AUTO_PREAMBLE	BIT(1)
++#define PRUSS_MII_RT_TXCFG_TX_EN_MODE		BIT(2)
++#define PRUSS_MII_RT_TXCFG_TX_BYTE_SWAP		BIT(3)
++#define PRUSS_MII_RT_TXCFG_TX_MUX_SEL		BIT(8)
++#define PRUSS_MII_RT_TXCFG_PRE_TX_AUTO_SEQUENCE	BIT(9)
++#define PRUSS_MII_RT_TXCFG_PRE_TX_AUTO_ESC_ERR	BIT(10)
++#define PRUSS_MII_RT_TXCFG_TX_32_MODE_EN	BIT(11)
++#define PRUSS_MII_RT_TXCFG_TX_IPG_WIRE_CLK_EN	BIT(12)	/* SR2.0 onwards */
++
++#define PRUSS_MII_RT_TXCFG_TX_START_DELAY_SHIFT	16
++#define PRUSS_MII_RT_TXCFG_TX_START_DELAY_MASK	GENMASK(25, 16)
++
++#define PRUSS_MII_RT_TXCFG_TX_CLK_DELAY_SHIFT	28
++#define PRUSS_MII_RT_TXCFG_TX_CLK_DELAY_MASK	GENMASK(30, 28)
++
++/* PRUSS_MII_RT_TX_IPG0/1 bits */
++#define PRUSS_MII_RT_TX_IPG_IPG_SHIFT	0
++#define PRUSS_MII_RT_TX_IPG_IPG_MASK	GENMASK(9, 0)
++
++/* PRUSS_MII_RT_PRS0/1 bits */
++#define PRUSS_MII_RT_PRS_COL	BIT(0)
++#define PRUSS_MII_RT_PRS_CRS	BIT(1)
++
++/* PRUSS_MII_RT_RX_FRMS0/1 bits */
++#define PRUSS_MII_RT_RX_FRMS_MIN_FRM_SHIFT	0
++#define PRUSS_MII_RT_RX_FRMS_MIN_FRM_MASK	GENMASK(15, 0)
++
++#define PRUSS_MII_RT_RX_FRMS_MAX_FRM_SHIFT	16
++#define PRUSS_MII_RT_RX_FRMS_MAX_FRM_MASK	GENMASK(31, 16)
++
++/* Min/Max in MII_RT_RX_FRMS */
++/* For EMAC and Switch */
++#define PRUSS_MII_RT_RX_FRMS_MAX	(VLAN_ETH_FRAME_LEN + ETH_FCS_LEN)
++#define PRUSS_MII_RT_RX_FRMS_MIN_FRM	(64)
++
++/* for HSR and PRP */
++#define PRUSS_MII_RT_RX_FRMS_MAX_FRM_LRE	(PRUSS_MII_RT_RX_FRMS_MAX + \
++						 ICSS_LRE_TAG_RCT_SIZE)
++/* PRUSS_MII_RT_RX_PCNT0/1 bits */
++#define PRUSS_MII_RT_RX_PCNT_MIN_PCNT_SHIFT	0
++#define PRUSS_MII_RT_RX_PCNT_MIN_PCNT_MASK	GENMASK(3, 0)
++
++#define PRUSS_MII_RT_RX_PCNT_MAX_PCNT_SHIFT	4
++#define PRUSS_MII_RT_RX_PCNT_MAX_PCNT_MASK	GENMASK(7, 4)
++
++/* PRUSS_MII_RT_RX_ERR0/1 bits */
++#define PRUSS_MII_RT_RX_ERR_MIN_PCNT_ERR	BIT(0)
++#define PRUSS_MII_RT_RX_ERR_MAX_PCNT_ERR	BIT(1)
++#define PRUSS_MII_RT_RX_ERR_MIN_FRM_ERR		BIT(2)
++#define PRUSS_MII_RT_RX_ERR_MAX_FRM_ERR		BIT(3)
++
++#define ICSSG_CFG_OFFSET	0
++#define RGMII_CFG_OFFSET	4
++
++/* Constant to choose between MII0 and MII1 */
++#define ICSS_MII0	0
++#define ICSS_MII1	1
++
++/* ICSSG_CFG Register bits */
++#define ICSSG_CFG_SGMII_MODE	BIT(16)
++#define ICSSG_CFG_TX_PRU_EN	BIT(11)
++#define ICSSG_CFG_RX_SFD_TX_SOF_EN	BIT(10)
++#define ICSSG_CFG_RTU_PRU_PSI_SHARE_EN	BIT(9)
++#define ICSSG_CFG_IEP1_TX_EN	BIT(8)
++#define ICSSG_CFG_MII1_MODE	GENMASK(6, 5)
++#define ICSSG_CFG_MII1_MODE_SHIFT	5
++#define ICSSG_CFG_MII0_MODE	GENMASK(4, 3)
++#define ICSSG_CFG_MII0_MODE_SHIFT	3
++#define ICSSG_CFG_RX_L2_G_EN	BIT(2)
++#define ICSSG_CFG_TX_L2_EN	BIT(1)
++#define ICSSG_CFG_TX_L1_EN	BIT(0)
++
++enum mii_mode {
++	MII_MODE_MII = 0,
++	MII_MODE_RGMII
++};
++
++/* RGMII CFG Register bits */
++#define RGMII_CFG_INBAND_EN_MII0	BIT(16)
++#define RGMII_CFG_GIG_EN_MII0	BIT(17)
++#define RGMII_CFG_INBAND_EN_MII1	BIT(20)
++#define RGMII_CFG_GIG_EN_MII1	BIT(21)
++#define RGMII_CFG_FULL_DUPLEX_MII0	BIT(18)
++#define RGMII_CFG_FULL_DUPLEX_MII1	BIT(22)
++#define RGMII_CFG_SPEED_MII0	GENMASK(2, 1)
++#define RGMII_CFG_SPEED_MII1	GENMASK(6, 5)
++#define RGMII_CFG_SPEED_MII0_SHIFT	1
++#define RGMII_CFG_SPEED_MII1_SHIFT	5
++#define RGMII_CFG_FULLDUPLEX_MII0	BIT(3)
++#define RGMII_CFG_FULLDUPLEX_MII1	BIT(7)
++#define RGMII_CFG_FULLDUPLEX_MII0_SHIFT	3
++#define RGMII_CFG_FULLDUPLEX_MII1_SHIFT	7
++#define RGMII_CFG_SPEED_10M	0
++#define RGMII_CFG_SPEED_100M	1
++#define RGMII_CFG_SPEED_1G	2
++
++struct regmap;
++struct prueth_emac;
++
++void icssg_mii_update_ipg(struct regmap *mii_rt, int mii, u32 ipg);
++void icssg_mii_update_mtu(struct regmap *mii_rt, int mii, int mtu);
++void icssg_update_rgmii_cfg(struct regmap *miig_rt, struct prueth_emac *emac);
++u32 icssg_rgmii_cfg_get_bitfield(struct regmap *miig_rt, u32 mask, u32 shift);
++u32 icssg_rgmii_get_speed(struct regmap *miig_rt, int mii);
++u32 icssg_rgmii_get_fullduplex(struct regmap *miig_rt, int mii);
++void icssg_miig_set_interface_mode(struct regmap *miig_rt, int mii, phy_interface_t phy_if);
++
++#endif /* __NET_PRUSS_MII_RT_H__ */
+diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.h b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
+new file mode 100644
+index 000000000000..8512f19a9b4d
+--- /dev/null
++++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
+@@ -0,0 +1,197 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/* Texas Instruments ICSSG Ethernet driver
++ *
++ * Copyright (C) 2018-2022 Texas Instruments Incorporated - https://www.ti.com/
++ *
++ */
++
++#ifndef __NET_TI_ICSSG_PRUETH_H
++#define __NET_TI_ICSSG_PRUETH_H
++
++#include <linux/etherdevice.h>
++#include <linux/genalloc.h>
++#include <linux/if_vlan.h>
++#include <linux/interrupt.h>
++#include <linux/kernel.h>
++#include <linux/mfd/syscon.h>
++#include <linux/module.h>
++#include <linux/mutex.h>
++#include <linux/net_tstamp.h>
++#include <linux/of.h>
++#include <linux/of_irq.h>
++#include <linux/of_mdio.h>
++#include <linux/of_net.h>
++#include <linux/of_platform.h>
++#include <linux/phy.h>
++#include <linux/remoteproc/pruss.h>
++#include <linux/pruss_driver.h>
++#include <linux/ptp_clock_kernel.h>
++#include <linux/remoteproc.h>
++
++#include <linux/dma-mapping.h>
++#include <linux/dma/ti-cppi5.h>
++#include <linux/dma/k3-udma-glue.h>
++
++#include <net/devlink.h>
++
++#include "icssg_switch_map.h"
++
++#define ICSS_SLICE0	0
++#define ICSS_SLICE1	1
++
++#define ICSSG_MAX_RFLOWS	8	/* per slice */
++
++/* In switch mode there are 3 real ports i.e. 3 mac addrs.
++ * however Linux sees only the host side port. The other 2 ports
++ * are the switch ports.
++ * In emac mode there are 2 real ports i.e. 2 mac addrs.
++ * Linux sees both the ports.
++ */
++enum prueth_port {
++	PRUETH_PORT_HOST = 0,	/* host side port */
++	PRUETH_PORT_MII0,	/* physical port RG/SG MII 0 */
++	PRUETH_PORT_MII1,	/* physical port RG/SG MII 1 */
++	PRUETH_PORT_INVALID,	/* Invalid prueth port */
++};
++
++enum prueth_mac {
++	PRUETH_MAC0 = 0,
++	PRUETH_MAC1,
++	PRUETH_NUM_MACS,
++	PRUETH_MAC_INVALID,
++};
++
++struct prueth_tx_chn {
++	struct device *dma_dev;
++	struct napi_struct napi_tx;
++	struct k3_cppi_desc_pool *desc_pool;
++	struct k3_udma_glue_tx_channel *tx_chn;
++	struct prueth_emac *emac;
++	u32 id;
++	u32 descs_num;
++	unsigned int irq;
++	char name[32];
++};
++
++struct prueth_rx_chn {
++	struct device *dev;
++	struct device *dma_dev;
++	struct k3_cppi_desc_pool *desc_pool;
++	struct k3_udma_glue_rx_channel *rx_chn;
++	u32 descs_num;
++	unsigned int irq[ICSSG_MAX_RFLOWS];	/* separate irq per flow */
++	char name[32];
++};
++
++/* There are 4 Tx DMA channels, but the highest priority is CH3 (thread 3)
++ * and lower three are lower priority channels or threads.
++ */
++#define PRUETH_MAX_TX_QUEUES	4
++
++/* data for each emac port */
++struct prueth_emac {
++	bool fw_running;
++	struct prueth *prueth;
++	struct net_device *ndev;
++	u8 mac_addr[6];
++	struct napi_struct napi_rx;
++	u32 msg_enable;
++
++	int link;
++	int speed;
++	int duplex;
++
++	const char *phy_id;
++	struct device_node *phy_node;
++	phy_interface_t phy_if;
++	enum prueth_port port_id;
++
++	/* DMA related */
++	struct prueth_tx_chn tx_chns[PRUETH_MAX_TX_QUEUES];
++	struct completion tdown_complete;
++	atomic_t tdown_cnt;
++	struct prueth_rx_chn rx_chns;
++	int rx_flow_id_base;
++	int tx_ch_num;
++
++	spinlock_t lock;	/* serialize access */
++
++	unsigned long state;
++	struct completion cmd_complete;
++	/* Mutex to serialize access to firmware command interface */
++	struct mutex cmd_lock;
++	struct work_struct rx_mode_work;
++	struct workqueue_struct	*cmd_wq;
++
++	struct pruss_mem_region dram;
++};
++
++/**
++ * struct prueth_pdata - PRUeth platform data
++ * @fdqring_mode: Free desc queue mode
++ * @quirk_10m_link_issue: 10M link detect errata
++ */
++struct prueth_pdata {
++	enum k3_ring_mode fdqring_mode;
++	u32	quirk_10m_link_issue:1;
++};
++
++/**
++ * struct prueth - PRUeth structure
++ * @dev: device
++ * @pruss: pruss handle
++ * @pru: rproc instances of PRUs
++ * @rtu: rproc instances of RTUs
++ * @txpru: rproc instances of TX_PRUs
++ * @shram: PRUSS shared RAM region
++ * @sram_pool: MSMC RAM pool for buffers
++ * @msmcram: MSMC RAM region
++ * @eth_node: DT node for the port
++ * @emac: private EMAC data structure
++ * @registered_netdevs: list of registered netdevs
++ * @miig_rt: regmap to mii_g_rt block
++ * @mii_rt: regmap to mii_rt block
++ * @pru_id: ID for each of the PRUs
++ * @pdev: pointer to ICSSG platform device
++ * @pdata: pointer to platform data for ICSSG driver
++ * @icssg_hwcmdseq: seq counter or HWQ messages
++ * @emacs_initialized: num of EMACs/ext ports that are up/running
++ */
++struct prueth {
++	struct device *dev;
++	struct pruss *pruss;
++	struct rproc *pru[PRUSS_NUM_PRUS];
++	struct rproc *rtu[PRUSS_NUM_PRUS];
++	struct rproc *txpru[PRUSS_NUM_PRUS];
++	struct pruss_mem_region shram;
++	struct gen_pool *sram_pool;
++	struct pruss_mem_region msmcram;
++
++	struct device_node *eth_node[PRUETH_NUM_MACS];
++	struct prueth_emac *emac[PRUETH_NUM_MACS];
++	struct net_device *registered_netdevs[PRUETH_NUM_MACS];
++	struct regmap *miig_rt;
++	struct regmap *mii_rt;
++
++	enum pruss_pru_id pru_id[PRUSS_NUM_PRUS];
++	struct platform_device *pdev;
++	struct prueth_pdata pdata;
++	u8 icssg_hwcmdseq;
++
++	int emacs_initialized;
++};
++
++/* get PRUSS SLICE number from prueth_emac */
++static inline int prueth_emac_slice(struct prueth_emac *emac)
++{
++	switch (emac->port_id) {
++	case PRUETH_PORT_MII0:
++		return ICSS_SLICE0;
++	case PRUETH_PORT_MII1:
++		return ICSS_SLICE1;
++	default:
++		return -EINVAL;
++	}
++}
++
++#endif /* __NET_TI_ICSSG_PRUETH_H */
+-- 
+2.34.1
 
- drivers/i2c/i2c-smbus.c                         |  2 +-
- drivers/iio/cdc/ad7150.c                        | 10 +++++-----
- drivers/iio/proximity/mb1232.c                  |  7 ++-----
- drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c | 12 ++++++------
- drivers/pinctrl/nuvoton/pinctrl-wpcm450.c       |  2 --
- drivers/pinctrl/pinctrl-ingenic.c               |  2 --
- drivers/pinctrl/pinctrl-pistachio.c             |  6 ------
- 7 files changed, 14 insertions(+), 27 deletions(-)
-
-
-base-commit: 5d0c230f1de8c7515b6567d9afba1f196fb4e2f4
---=20
-2.40.1
-
-
---=20
-Matti Vaittinen, Linux device drivers
-ROHM Semiconductors, Finland SWDC
-Kiviharjunlenkki 1E
-90220 OULU
-FINLAND
-
-~~~ "I don't think so," said Rene Descartes. Just then he vanished ~~~
-Simon says - in Latin please.
-~~~ "non cogito me" dixit Rene Descarte, deinde evanescavit ~~~
-Thanks to Simon Glass for the translation =3D]=20
-
---hQsyJyfrnR1cLwNR
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEIx+f8wZb28fLKEhTeFA3/03aocUFAmTI8+0ACgkQeFA3/03a
-ocWq6AgArSM5A9chUh4M5+/vENizsF6p+0LbIPfIwCcHNYQHv4XehXim+Yv/RJkY
-Faie7r6CXkLdlbLi4glk2/WNiT2pKgBxm0/UbvGdsRe5kjMvS8CTPI3eJZFRXYuk
-eCvwYqPyXd7bVsvBZpqSMn1geHHmeabPjEaP5uyfABDmuM8YBRdmGLaE58EdQbIn
-hFJGWYgBGeVaQw4lDfmV8Qjsj1OFkqH0TY2LhgrEMefmIMU1tkGcr48m1shmUuNf
-IbqyYt4VUfzOG3j/mP5E+CTTE1icgSOOBcmflbXTJSjb/6EOwfhvti6w314CGZeX
-719Kq2PefFeoH1/0OUvKRWpDqM43ZA==
-=Q8AR
------END PGP SIGNATURE-----
-
---hQsyJyfrnR1cLwNR--
 
