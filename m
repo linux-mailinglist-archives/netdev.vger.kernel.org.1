@@ -1,103 +1,101 @@
-Return-Path: <netdev+bounces-23022-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23023-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64A8F76A6A3
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 04:00:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48D0076A6B6
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 04:04:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1E64428178D
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 02:00:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 216F21C20DF7
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 02:04:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32D80ED0;
-	Tue,  1 Aug 2023 02:00:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0ECFED3;
+	Tue,  1 Aug 2023 02:04:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2744F7E
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 02:00:45 +0000 (UTC)
-Received: from zg8tmtyylji0my4xnjqumte4.icoremail.net (zg8tmtyylji0my4xnjqumte4.icoremail.net [162.243.164.118])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 76A7C1BE2;
-	Mon, 31 Jul 2023 19:00:41 -0700 (PDT)
-Received: from linma$zju.edu.cn ( [42.120.103.60] ) by
- ajax-webmail-mail-app4 (Coremail) ; Tue, 1 Aug 2023 10:00:01 +0800
- (GMT+08:00)
-X-Originating-IP: [42.120.103.60]
-Date: Tue, 1 Aug 2023 10:00:01 +0800 (GMT+08:00)
-X-CM-HeaderCharset: UTF-8
-From: "Lin Ma" <linma@zju.edu.cn>
-To: "Jakub Kicinski" <kuba@kernel.org>
-Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, 
-	fw@strlen.de, yang.lee@linux.alibaba.com, jgg@ziepe.ca, 
-	markzhang@nvidia.com, phaddad@nvidia.com, yuancan@huawei.com, 
-	ohartoov@nvidia.com, chenzhongjin@huawei.com, aharonl@nvidia.com, 
-	leon@kernel.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org
-Subject: Re: [PATCH net v1 1/2] netlink: let len field used to parse
- type-not-care nested attrs
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version XT5.0.14 build 20220622(41e5976f)
- Copyright (c) 2002-2023 www.mailtech.cn
- mispb-4df6dc2c-e274-4d1c-b502-72c5c3dfa9ce-zj.edu.cn
-In-Reply-To: <20230731120326.6bdd5bf9@kernel.org>
-References: <20230731121247.3972783-1-linma@zju.edu.cn>
- <20230731120326.6bdd5bf9@kernel.org>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF91A7E
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 02:04:13 +0000 (UTC)
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94D371FC7
+	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 19:03:55 -0700 (PDT)
+Received: from kwepemi500008.china.huawei.com (unknown [172.30.72.55])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RFJHx3qdfzVjxH;
+	Tue,  1 Aug 2023 10:01:33 +0800 (CST)
+Received: from huawei.com (10.90.53.73) by kwepemi500008.china.huawei.com
+ (7.221.188.139) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Tue, 1 Aug
+ 2023 10:03:15 +0800
+From: Ruan Jinjie <ruanjinjie@huawei.com>
+To: <aelior@marvell.com>, <skalluru@marvell.com>, <manishc@marvell.com>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <netdev@vger.kernel.org>
+CC: <ruanjinjie@huawei.com>
+Subject: [PATCH -next] bnx2x: Remove unnecessary ternary operators
+Date: Tue, 1 Aug 2023 10:02:40 +0800
+Message-ID: <20230801020240.3342014-1-ruanjinjie@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <38179c76.f308d.189aed2db99.Coremail.linma@zju.edu.cn>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:cS_KCgBHTQoiZ8hkSOJqCg--.61766W
-X-CM-SenderInfo: qtrwiiyqvtljo62m3hxhgxhubq/1tbiAwUOEmTIYfoAqwAAsG
-X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
-	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
-	daVFxhVjvjDU=
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.90.53.73]
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ kwepemi500008.china.huawei.com (7.221.188.139)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-SGVsbG8gSmFrdWIsCgo+ID4gCj4gPiBIb3dldmVyLCB0aGlzIGlzIHRlZGlvdXMgYW5kIGp1c3Qg
-bGlrZSBMZW9uIHNhaWQ6IGFkZCBhbm90aGVyIGxheWVyIG9mCj4gPiBjYWJhbCBrbm93bGVkZ2Uu
-IFRoZSBiZXR0ZXIgc29sdXRpb24gc2hvdWxkIGxldmVyYWdlIHRoZSBubGFfcG9saWN5IGFuZAo+
-ID4gZGlzY2FyZCBubGF0dHIgd2hvc2UgbGVuZ3RoIGlzIGludmFsaWQgd2hlbiBkb2luZyBwYXJz
-aW5nLiBUaGF0IGlzLCB3ZQo+ID4gc2hvdWxkIGRlZmluZWQgYSBuZXN0ZWRfcG9saWN5IGZvciB0
-aGUgWCBhYm92ZSBsaWtlCj4gCj4gSGFyZCBuby4gUHV0dGluZyBhcnJheSBpbmRleCBpbnRvIGF0
-dHIgdHlwZSBpcyBhbiBhZHZhbmNlZCBjYXNlIGFuZCB0aGUKPiBwYXJzaW5nIGNvZGUgaGFzIHRv
-IGJlIGFibGUgdG8gZGVhbCB3aXRoIGxvdyBsZXZlbCBuZXRsaW5rIGRldGFpbHMuCgpXZWxsLCBJ
-IGp1c3Qga25vd24gdGhhdCB0aGUgdHlwZSBmaWVsZCBmb3IgdGhvc2UgYXR0cmlidXRlcyBpcyB1
-c2VkIGFzIGFycmF5CmluZGV4LgpIZW5jZSwgZm9yIHRoaXMgYWR2YW5jZWQgY2FzZSwgY291bGQg
-d2UgZGVmaW5lIGFub3RoZXIgTkxBIHR5cGUsIG1heWJlIApOTEFfTkVTVEVEX0lEWEFSUkFZIGVu
-dW0/IFRoYXQgbWF5IGJlIG11Y2ggY2xlYXJlciBhZ2FpbnN0IG1vZGlmeWluZyBleGlzdGluZwpj
-b2RlLgoKPiBIaWdoZXIgbGV2ZWwgQVBJIHNob3VsZCByZW1vdmUgdGhlIG5sYV9mb3JfZWFjaF9u
-ZXN0ZWQoKSBjb21wbGV0ZWx5Cj4gd2hpY2ggaXMgcmF0aGVyIGhhcmQgdG8gYWNoaWV2ZSBoZXJl
-LgoKQnkgaW52ZXN0aWdhdGluZyB0aGUgY29kZSB1c2VzIG5sYV9mb3JfZWFjaF9uZXN0ZWQgbWFj
-cm8uIFRoZXJlIGFyZSBiYXNpY2FsbHkKdHdvIHNjZW5hcmlvczoKCjEuIG1hbnVhbGx5IHBhcnNl
-IG5lc3RlZCBhdHRyaWJ1dGVzIHdob3NlIHR5cGUgaXMgbm90IGNhcmVkICh0aGUgYWR2YW5jZSBj
-YXNlCiAgIHVzZSB0eXBlIGFzIGluZGV4IGhlcmUpLgoyLiBtYW51YWxseSBwYXJzZSBuZXN0ZWQg
-YXR0cmlidXRlcyBmb3IgKm9uZSogc3BlY2lmaWMgdHlwZS4gU3VjaCBjb2RlIGRvCiAgIG5sYV90
-eXBlIGNoZWNrLgoKRnJvbSB0aGUgQVBJIHNpZGUsIHRvIGNvbXBsZXRlbHkgcmVtb3ZlIG5sYV9m
-b3JfZWFjaF9uZXN0ZWQgYW5kIGF2b2lkIHRoZQptYW51YWwgIHBhcnNpbmcuIEkgdGhpbmsgd2Ug
-Y2FuIGNob29zZSB0d28gc29sdXRpb25zLgoKU29sdXRpb24tMTogYWRkIGEgcGFyc2luZyBoZWxw
-ZXIgdGhhdCByZWNlaXZlcyBhIGZ1bmN0aW9uIHBvaW50ZXIgYXMgYW4KICAgICAgICAgICAgYXJn
-dW1lbnQsIGl0IHdpbGwgY2FsbCB0aGlzIHBvaW50ZXIgYWZ0ZXIgY2FyZWZ1bGx5IHZlcmlmeSB0
-aGUKICAgICAgICAgICAgdHlwZSBhbmQgbGVuZ3RoIG9mIGFuIGF0dHJpYnV0ZS4KClNvbHV0aW9u
-LTI6IGFkZCBhIHBhcnNpbmcgaGVscGVyIHRoYXQgdHJhdmVyc2VzIHRoaXMgbmVzdGVkIHR3aWNl
-LCB0aGUgZmlyc3QKICAgICAgICAgICAgdGltZSAgdG8gZG8gY291bnRpbmcgc2l6ZSBmb3IgYWxs
-b2NhdGluZyBoZWFwIGJ1ZmZlciAob3Igc3RhY2sKICAgICAgICAgICAgYnVmZmVyIGZyb20gdGhl
-IGNhbGxlciBpZiB0aGUgbWF4IGNvdW50IGlzIGtub3duKS4gVGhlIHNlY29uZAogICAgICAgICAg
-ICB0aW1lIHRvIGZpbGwgdGhpcyBidWZmZXIgd2l0aCBhdHRyaWJ1dGUgcG9pbnRlcnMuCgpXaGlj
-aCBvbmUgaXMgcHJlZmVycmVkPyBQbGVhc2UgZW5saWdodGVuIG1lIGFib3V0IHRoaXMgYW5kIEkg
-Y2FuIHRyeSB0byBwcm9wb3NlCmEgZml4LiAoSSBwZXJzb25hbGx5IGxpa2UgdGhlIHNvbHV0aW9u
-LTIgYXMgaXQgd29ya3MgbGlrZSB0aGUgZXhpc3RpbmcgcGFyc2VycwpsaWtlIG5sYV9wYXJzZSkg
-Cgo+IAo+IE5hY2tlZC1ieTogSmFrdWIgS2ljaW5za2kgPGt1YmFAa2VybmVsLm9yZz4KClRoYW5r
-cwpMaW4=
+Ther are a little ternary operators, the true or false judgement
+of which is unnecessary in C language semantics.
+
+Signed-off-by: Ruan Jinjie <ruanjinjie@huawei.com>
+---
+ drivers/net/ethernet/broadcom/bnx2x/bnx2x_sp.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_sp.c b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_sp.c
+index 542c69822649..8e04552d2216 100644
+--- a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_sp.c
++++ b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_sp.c
+@@ -890,7 +890,7 @@ static void bnx2x_set_one_mac_e2(struct bnx2x *bp,
+ 		(struct eth_classify_rules_ramrod_data *)(raw->rdata);
+ 	int rule_cnt = rule_idx + 1, cmd = elem->cmd_data.vlan_mac.cmd;
+ 	union eth_classify_rule_cmd *rule_entry = &data->rules[rule_idx];
+-	bool add = (cmd == BNX2X_VLAN_MAC_ADD) ? true : false;
++	bool add = cmd == BNX2X_VLAN_MAC_ADD;
+ 	unsigned long *vlan_mac_flags = &elem->cmd_data.vlan_mac.vlan_mac_flags;
+ 	u8 *mac = elem->cmd_data.vlan_mac.u.mac.mac;
+ 
+@@ -1075,7 +1075,7 @@ static void bnx2x_set_one_vlan_e2(struct bnx2x *bp,
+ 	int rule_cnt = rule_idx + 1;
+ 	union eth_classify_rule_cmd *rule_entry = &data->rules[rule_idx];
+ 	enum bnx2x_vlan_mac_cmd cmd = elem->cmd_data.vlan_mac.cmd;
+-	bool add = (cmd == BNX2X_VLAN_MAC_ADD) ? true : false;
++	bool add = cmd == BNX2X_VLAN_MAC_ADD;
+ 	u16 vlan = elem->cmd_data.vlan_mac.u.vlan.vlan;
+ 
+ 	/* Reset the ramrod data buffer for the first rule */
+@@ -1125,7 +1125,7 @@ static void bnx2x_set_one_vlan_mac_e2(struct bnx2x *bp,
+ 	int rule_cnt = rule_idx + 1;
+ 	union eth_classify_rule_cmd *rule_entry = &data->rules[rule_idx];
+ 	enum bnx2x_vlan_mac_cmd cmd = elem->cmd_data.vlan_mac.cmd;
+-	bool add = (cmd == BNX2X_VLAN_MAC_ADD) ? true : false;
++	bool add = cmd == BNX2X_VLAN_MAC_ADD;
+ 	u16 vlan = elem->cmd_data.vlan_mac.u.vlan_mac.vlan;
+ 	u8 *mac = elem->cmd_data.vlan_mac.u.vlan_mac.mac;
+ 	u16 inner_mac;
+-- 
+2.34.1
+
 
