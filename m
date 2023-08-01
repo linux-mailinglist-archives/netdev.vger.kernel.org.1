@@ -1,93 +1,76 @@
-Return-Path: <netdev+bounces-23290-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23292-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB92F76B7B6
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 16:36:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8333076B7BD
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 16:37:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A6B04281B70
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 14:36:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3AD34281B8C
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 14:37:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 837862358E;
-	Tue,  1 Aug 2023 14:32:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74BC12AE35;
+	Tue,  1 Aug 2023 14:33:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7250A23589;
-	Tue,  1 Aug 2023 14:32:21 +0000 (UTC)
-Received: from mail-qt1-x82f.google.com (mail-qt1-x82f.google.com [IPv6:2607:f8b0:4864:20::82f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97EE32D79;
-	Tue,  1 Aug 2023 07:31:49 -0700 (PDT)
-Received: by mail-qt1-x82f.google.com with SMTP id d75a77b69052e-409ae93bbd0so30092561cf.0;
-        Tue, 01 Aug 2023 07:31:49 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 658962AE31;
+	Tue,  1 Aug 2023 14:33:26 +0000 (UTC)
+Received: from mail-qt1-x830.google.com (mail-qt1-x830.google.com [IPv6:2607:f8b0:4864:20::830])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FC34210D;
+	Tue,  1 Aug 2023 07:33:23 -0700 (PDT)
+Received: by mail-qt1-x830.google.com with SMTP id d75a77b69052e-40fbf360a9cso12380361cf.3;
+        Tue, 01 Aug 2023 07:33:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690900304; x=1691505104;
+        d=gmail.com; s=20221208; t=1690900403; x=1691505203;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=qpvro3EfLxFN3z0F6AOvOpAWsKbp8qLvkGalM6MQnwg=;
-        b=MFkiI/tWUH7qTrlZQn3zI/pTGv+0QB7gj6ZEibl8JGYPABQQlnKoldTyMIITKYSwFn
-         4e3V20BhJvn9MEHh7M7VPClVQFSgrCrgprWFHpP7lX1l4ORyxD41Xf/YYuHrqNwuk6/J
-         DuWgujvvfB2tgQxh17fuGU/gOmYZS0zVMuAZrkRN4ASS7OJMM8tMsOb2lbTR3kc6JMRD
-         Cae/b3FD381orZ+3uWsKO+//gJXGNdL0WhqmKISdy4ziK/bk8/+HcZJ7I4i53XpJtXVk
-         eJmKAIm1dJyoytPqQrTK96T4I8WDhIObnVcK+em7FTvmvW+qIpKYaLlS32qfkcN20WrC
-         qzPg==
+        bh=nDo6NJS9VEeM84PmvihTXLobm68FopvExTulz0R8ct8=;
+        b=bLesp76m1APdrFxL8ln9YoiGW561rJNeGDmbfjKoeZME64ClpL81FGKHCoV/aGdEwm
+         SdZ/z3F6r9M2t3wJxb3bhcApWIOlWc93XPyR9Q2kiSU0Cirl0Z+l02t4D/wqA/sdKeoI
+         aMRG5XMpXp9y9IV11GB5+u3EtqKnWPxwxY9U+Perhepbl0Yc2PfGUK0obbbw/3yzZdIj
+         rq+NnUW+f18Q+33r9fjKXP8/jK55XnuGhGcJsWakaZt+AXr6ez5sZwFOtDKKC1l5aF56
+         +0oxrkKVIgUkCg/hsLULAe+zjJBR//ZkSwgG6OD4W3TOB71cOyXKIjrl/iXTlEX+2r/e
+         uL4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690900304; x=1691505104;
+        d=1e100.net; s=20221208; t=1690900403; x=1691505203;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=qpvro3EfLxFN3z0F6AOvOpAWsKbp8qLvkGalM6MQnwg=;
-        b=OF4lgxV9vLDYcU90RIEWmn68aapaG3W5cKIuc92r1kBo9BaHvtBtyLbILYZ3CeXzYj
-         hmerNcV3+glydXqNPdAVZwn1Gl5W1qcinnf+taCndSJ3QYE0PARbhQDXUhnYQ/jihWrJ
-         LZCAVjsx7Z9ng4A3SAlibtiNbD/pOszaBcfGN5Rmuyl3qjU4TshSovZ4wUrlbD39Ujcy
-         vDGoU8KwW1ne9TDFB21lZG4yTNqWTIh6xexd1YA8UfqHOdLXSiaEVIihzgOv7NU3+2x2
-         13afbiWsZSoHmFWCnflJIjX+/qQ+sJwfqCx27puvCQr8G4AdiJXGvo2Y3p4BcZLBA6b9
-         h6Rw==
-X-Gm-Message-State: ABy/qLZZn3S20zqtsRyV29kYL9JcZRuiHXTQz+WB8QJ9fRvTbg+mjHxz
-	xKyFLWGvREcNbrLrrwY0t60=
-X-Google-Smtp-Source: APBJJlGVe1mUE4psH/jKdYS9UhTvYS7XBodqk3vrPXjJaNRz/XmWvQxFBNBAmf44hGUQzNKRBXMz7Q==
-X-Received: by 2002:a05:622a:2cf:b0:40f:da50:4dbf with SMTP id a15-20020a05622a02cf00b0040fda504dbfmr706477qtx.1.1690900304510;
-        Tue, 01 Aug 2023 07:31:44 -0700 (PDT)
+        bh=nDo6NJS9VEeM84PmvihTXLobm68FopvExTulz0R8ct8=;
+        b=gci7JOjzECPA37lTFN+0eAoxSYNTO7o6WiRItzXRxLrMfq1pELYQa8ULMiK8T2DLdf
+         PEHUGTQMW+nLNr/aX33zrAwmAQCy8qXRQTX8g6Uxsz/lLhliBWae/3AA4YCtT6rN0gZB
+         WF5kJv9GrgW1K7yJP2yC9YwIs5eNZcpRpH2fLmA9G4NxlzLSEBGNia54soXzdQ/1SbNK
+         EI+W5paBVIUExxo30KgactjAAHwMVsMovYsC1l/ACUNInnGFAXhD+Bl2gdSI9uro+s9U
+         1NTBgIFmi8NlFg3+AkolEfq57MEBlAWk//a8/pF+r2EMuWRCkts9EPnEBbh93pNC/78L
+         pcBg==
+X-Gm-Message-State: ABy/qLaVLlj6r6fGbojMXT8k8e83aj77pG57mvcW9bi9Pyy4nyxHjnzA
+	fn7ANYqK6zNR/qLYHuj/8B4=
+X-Google-Smtp-Source: APBJJlEm7mnctVwlPoCJwXcjKYa8FLXeuIsxclWFmNJO0qK/1Fyl0MoAmtjmPUOx5Vzhh/eLbi2+6g==
+X-Received: by 2002:ac8:5701:0:b0:403:397c:9071 with SMTP id 1-20020ac85701000000b00403397c9071mr19155140qtw.63.1690900402664;
+        Tue, 01 Aug 2023 07:33:22 -0700 (PDT)
 Received: from localhost (172.174.245.35.bc.googleusercontent.com. [35.245.174.172])
-        by smtp.gmail.com with ESMTPSA id c27-20020ac8009b000000b004054b435f8csm4469242qtg.65.2023.08.01.07.31.44
+        by smtp.gmail.com with ESMTPSA id h10-20020ac85e0a000000b00406bf860430sm4420398qtx.11.2023.08.01.07.33.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Aug 2023 07:31:44 -0700 (PDT)
-Date: Tue, 01 Aug 2023 10:31:43 -0400
+        Tue, 01 Aug 2023 07:33:22 -0700 (PDT)
+Date: Tue, 01 Aug 2023 10:33:22 -0400
 From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: David Howells <dhowells@redhat.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: dhowells@redhat.com, 
- Jakub Kicinski <kuba@kernel.org>, 
- syzbot <syzbot+f527b971b4bdc8e79f9e@syzkaller.appspotmail.com>, 
- bpf@vger.kernel.org, 
- brauner@kernel.org, 
+To: Yue Haibing <yuehaibing@huawei.com>, 
  davem@davemloft.net, 
- dsahern@kernel.org, 
  edumazet@google.com, 
- linux-fsdevel@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- netdev@vger.kernel.org, 
- pabeni@redhat.com, 
- syzkaller-bugs@googlegroups.com, 
- viro@zeniv.linux.org.uk
-Message-ID: <64c9174fda48e_1bf0a42945f@willemb.c.googlers.com.notmuch>
-In-Reply-To: <1409099.1690899546@warthog.procyon.org.uk>
-References: <64c903b02b234_1b307829418@willemb.c.googlers.com.notmuch>
- <64c7acd57270c_169cd129420@willemb.c.googlers.com.notmuch>
- <64c6672f580e3_11d0042944e@willemb.c.googlers.com.notmuch>
- <20230718160737.52c68c73@kernel.org>
- <000000000000881d0606004541d1@google.com>
- <0000000000001416bb06004ebf53@google.com>
- <792238.1690667367@warthog.procyon.org.uk>
- <831028.1690791233@warthog.procyon.org.uk>
- <1401696.1690893633@warthog.procyon.org.uk>
- <1409099.1690899546@warthog.procyon.org.uk>
-Subject: Re: Endless loop in udp with MSG_SPLICE_READ - Re: [syzbot] [fs?]
- INFO: task hung in pipe_release (4)
+ kuba@kernel.org, 
+ pabeni@redhat.com
+Cc: netdev@vger.kernel.org, 
+ bpf@vger.kernel.org, 
+ Yue Haibing <yuehaibing@huawei.com>
+Message-ID: <64c917b26625_1bf0a42947f@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20230801133902.3660-1-yuehaibing@huawei.com>
+References: <20230801133902.3660-1-yuehaibing@huawei.com>
+Subject: RE: [PATCH net-next] udp: Remove unused function declaration
+ udp_bpf_get_proto()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -104,44 +87,11 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-David Howells wrote:
-> The attached seems to work.  I still think copy isn't correctly calculated in
-> some circumstances - as I showed, several terms in the maths cancel out,
-> including the length of the data.
-
-That arithmetic makes assumptions that are specific to a particular
-set of conditions (e.g., that pagedlen is non-zero).
-
-Since the arithmetic is so complicated and error prone, I would try
-to structure a fix that is easy to reason about to only change
-behavior for the MSG_SPLICE_PAGES case.
- 
-> I'm also not entirely sure what 'paged' means in this function.  Should it
-> actually be set in the MSG_SPLICE_PAGES context?
-
-I introduced it with MSG_ZEROCOPY. It sets up pagedlen to capture the
-length that is not copied.
-
-If the existing code would affect MSG_ZEROCOPY too, I expect syzbot
-to have reported that previously.
-
-> ---
-> udp: Fix __ip_addend_data()
+Yue Haibing wrote:
+> commit 8a59f9d1e3d4 ("sock: Introduce sk->sk_prot->psock_update_sk_prot()")
+> left behind this.
 > 
-> diff --git a/net/ipv4/ip_output.c b/net/ipv4/ip_output.c
-> index 6e70839257f7..54675a4f2c9f 100644
-> --- a/net/ipv4/ip_output.c
-> +++ b/net/ipv4/ip_output.c
-> @@ -1157,7 +1157,7 @@ static int __ip_append_data(struct sock *sk,
->  				pskb_trim_unique(skb_prev, maxfraglen);
->  			}
->  
-> -			copy = datalen - transhdrlen - fraggap - pagedlen;
-> +			copy = max_t(int, datalen - transhdrlen - fraggap - pagedlen, 0);
->  			if (copy > 0 && getfrag(from, data + transhdrlen, offset, copy, fraggap, skb) < 0) {
->  				err = -EFAULT;
->  				kfree_skb(skb);
-> 
+> Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
 
-
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
