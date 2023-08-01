@@ -1,92 +1,90 @@
-Return-Path: <netdev+bounces-23227-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23228-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0B1076B5E0
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 15:31:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7936176B5E3
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 15:32:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7AAE62819AF
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 13:31:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 33552281231
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 13:32:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D555521D4D;
-	Tue,  1 Aug 2023 13:31:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39F9F21D4D;
+	Tue,  1 Aug 2023 13:32:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA833200A3
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 13:31:09 +0000 (UTC)
-Received: from mail-qt1-x830.google.com (mail-qt1-x830.google.com [IPv6:2607:f8b0:4864:20::830])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 765CB173F
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 06:31:02 -0700 (PDT)
-Received: by mail-qt1-x830.google.com with SMTP id d75a77b69052e-407db3e9669so257521cf.1
-        for <netdev@vger.kernel.org>; Tue, 01 Aug 2023 06:31:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690896661; x=1691501461;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nsO+Zl7CUnASQXP0pNGTsohTGDW6byIjsx/QqCHb86M=;
-        b=5gjWQUE+sGzZJUk8GTBNFCY2Ukgx6UJk/M8SSHTXcRt2509TjEJ/WjPI5RKsHCVNAW
-         2LTuYOywqRolGqGCuu54wlTDlrslWqzjzb7KGVcAKKZ7ywpgaaZTliSPzNSsTHl+ats7
-         RJnG6m7Z+lnsV6GjWrrXLjbtjvzFZxLTDU81zurkRAvr8eH6/dIYOQgJKkgpnSy/dOtR
-         5+OHad0k3vx830SWafnBRC7ggC0olu4NBZnUn9VnLw+HCOQ2+x81tIvz8Srgba/ZFmfY
-         TB0kPhcvZd3hhF5KxmSe+4EmBftUaFowGjRHIx0D58zrLg/zIpoS6Fl0h2oGe0ZGSeaQ
-         bZ1g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690896661; x=1691501461;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nsO+Zl7CUnASQXP0pNGTsohTGDW6byIjsx/QqCHb86M=;
-        b=WVl8I1nHdEuTCTEzQxQyrxPcSkLbD7/8ayiukcnVBfqQgYlYqZ4Uw/1bKOgyI/ta6c
-         KoAgXgn55pcAzrgxeOzSBJwilUYvYeRDBZpCwJns+iajqtajyjMf53KuQeCuJ++R5vV0
-         fVOL20l9LLI6SHkg0bzvz+bt22fB3tVYTYH27ZF97Q5CxvzqhLpe6DsLdRj6nMJXixdN
-         E9LCub3gQBy3GVJVQCXrVsmKmKcGUQ1c7+eRE+oe3AG0dx4KMsWDMR6gCQ5Yt/onUeWu
-         DKKE+douuoOo0MtpdaIGT1LhvtbtnWQt7JdKy+VCYe5it4QzeDWVVO1yEShjAVyJS3B2
-         HueA==
-X-Gm-Message-State: ABy/qLYVtkZc/RPm3GsKWJ5bPkEByrXnh5X58qDw84H2H1sL0bLOdAWF
-	Rg54ypWvcFtGBK5m/Pexcs9Qq9qUbsDxsUQYF2fq/A==
-X-Google-Smtp-Source: APBJJlEqdUmI77KcWGZOQ5yXmFTXtucrwvbdJ6vPrG+TQqRszduBf4M+gW3Q8Pzz3v+94F5oF0OgckOE+YZTgaO5ZTE=
-X-Received: by 2002:ac8:7e8e:0:b0:403:b1e5:bcae with SMTP id
- w14-20020ac87e8e000000b00403b1e5bcaemr812745qtj.10.1690896661367; Tue, 01 Aug
- 2023 06:31:01 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EABE200A3
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 13:32:02 +0000 (UTC)
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3641F1982
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 06:32:00 -0700 (PDT)
+Received: from kwepemi500008.china.huawei.com (unknown [172.30.72.53])
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4RFbbM6fwsz1GDHv;
+	Tue,  1 Aug 2023 21:30:55 +0800 (CST)
+Received: from huawei.com (10.90.53.73) by kwepemi500008.china.huawei.com
+ (7.221.188.139) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Tue, 1 Aug
+ 2023 21:31:56 +0800
+From: Ruan Jinjie <ruanjinjie@huawei.com>
+To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <wei.fang@nxp.com>, <robh@kernel.org>,
+	<bhupesh.sharma@linaro.org>, <ruanjinjie@huawei.com>, <arnd@arndb.de>,
+	<netdev@vger.kernel.org>
+Subject: [PATCH net-next] cirrus: cs89x0: fix the return value handle and remove redundant dev_warn() for platform_get_irq()
+Date: Tue, 1 Aug 2023 21:31:21 +0800
+Message-ID: <20230801133121.416319-1-ruanjinjie@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230731230736.109216-1-trdgn@amazon.com> <CANn89iLV0iEeQy19wn+Vfmhpgr6srVpf3L+oBvuDyLRQXfoMug@mail.gmail.com>
- <CANn89iLghUDUSbNv-QOgyJ4dv5DhXGL60caeuVMnHW4HZQVJmg@mail.gmail.com> <64c905205b2f4_1b41af2947@willemb.c.googlers.com.notmuch>
-In-Reply-To: <64c905205b2f4_1b41af2947@willemb.c.googlers.com.notmuch>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 1 Aug 2023 15:30:50 +0200
-Message-ID: <CANn89i+-CQy3T-uLebzszGBv7m_CQ4DVeC2OORYn-6GpKgPZQA@mail.gmail.com>
-Subject: Re: [PATCH v2] tun: avoid high-order page allocation for packet header
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Tahsin Erdogan <trdgn@amazon.com>, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,ENV_AND_HDR_SPF_MATCH,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.90.53.73]
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ kwepemi500008.china.huawei.com (7.221.188.139)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Aug 1, 2023 at 3:14=E2=80=AFPM Willem de Bruijn
-<willemdebruijn.kernel@gmail.com> wrote:
->
->> This exactly same allocation logic also exists in packet_alloc_skb and
-> tap_alloc_skb. If changing one of them, perhaps should address convert
-> all at the same time, to keep behavior consistent.
+There is no possible for platform_get_irq() to return 0
+and the return value of platform_get_irq() is more sensible
+to show the error reason.
 
-Sure, I can take care of them as well.
+And there is no need to call the dev_warn() function directly to print
+a custom message when handling an error from platform_get_irq() function as
+it is going to display an appropriate error message in case of a failure.
+
+Signed-off-by: Ruan Jinjie <ruanjinjie@huawei.com>
+---
+ drivers/net/ethernet/cirrus/cs89x0.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/ethernet/cirrus/cs89x0.c b/drivers/net/ethernet/cirrus/cs89x0.c
+index 7c51fd9fc9be..d323c5c23521 100644
+--- a/drivers/net/ethernet/cirrus/cs89x0.c
++++ b/drivers/net/ethernet/cirrus/cs89x0.c
+@@ -1854,9 +1854,8 @@ static int __init cs89x0_platform_probe(struct platform_device *pdev)
+ 		return -ENOMEM;
+ 
+ 	dev->irq = platform_get_irq(pdev, 0);
+-	if (dev->irq <= 0) {
+-		dev_warn(&dev->dev, "interrupt resource missing\n");
+-		err = -ENXIO;
++	if (dev->irq < 0) {
++		err = dev->irq;
+ 		goto free;
+ 	}
+ 
+-- 
+2.34.1
+
 
