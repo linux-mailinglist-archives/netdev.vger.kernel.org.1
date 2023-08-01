@@ -1,518 +1,184 @@
-Return-Path: <netdev+bounces-23372-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23358-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B3D776BB80
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 19:40:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E09276BB50
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 19:35:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 515F5281774
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 17:40:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4F1FB1C20EE6
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 17:35:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A17C2590C;
-	Tue,  1 Aug 2023 17:37:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DEB723581;
+	Tue,  1 Aug 2023 17:34:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 397B9253C1
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 17:37:50 +0000 (UTC)
-Received: from mgamail.intel.com (unknown [192.55.52.43])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2811110EA
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 10:37:48 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F76521D59
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 17:34:32 +0000 (UTC)
+Received: from mgamail.intel.com (unknown [192.55.52.136])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED121E53
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 10:34:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1690911468; x=1722447468;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=AkKQu2/WfE1CIT/4Ii06/91auiwhkc3up80a04N3JKU=;
-  b=Odr1P6bl2Ig6Cm1glv3PVlK5vlXUD32RhwrEwO/oRQagWm5pgr0inNvU
-   aJWF0q2vujnVdDpAH3FcIXpOotTjGhEYTIDiXKkac7f2JA1oX/li4UYSA
-   x+oZkFMQazGXYEtvbb2N89Qga1tkvFn1fDNQj4fOPS2xDqKk2QLBI+c9I
-   iL0S7y9KDABhWQOKhEvLxWWIveddOGsHGfmUTF3weBWFgFuNzzwPECt+q
-   9cyzQMeRZe8WJWvDUZrxnh4LXzIr82SVvwTRMqVFky00Zgk+8DAckHF1O
-   oDGa0hgUR7BOe76Seym7vvHT+ux9g7Xb1h2QnrzYSO2Cw83C30dlZF/J6
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10789"; a="455740701"
+  t=1690911270; x=1722447270;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=xJvO2kDijNqLKyNTVVdftTv1uHJtqwbqEV9JSkKVkaI=;
+  b=Ib4vTrVDU3VR0EVqyLqxhIN3DBuclDBYOwpI7KAgejJw9d1YJUF4rYsD
+   60mlhuOCI/8t+Pe0bhm1VsHzLat6ePp0FxbeLfXrROTTonUdCFveTvOh2
+   1NP3/T3NUIVl6pmxcCNJTet8VdfqhZ8wahBIeQ/TtkWkJZxFnPPWEEcP/
+   Mt+qtfyXvZcDLbk9klA5xYddKFbGgQfsP7jfc15gEnkgG5871us6zmr2S
+   Ukrj8eUGQ+AO8Lv5yoLxxFq6UsTg93wvEKmiyNMXFkPPWBL4YiMa6EDdF
+   RiGPFnPn42rJOLB+rdYKfbKZAhKlbHuh06IlVcZpIONhoPBd2q0lzuh+R
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10789"; a="348970280"
 X-IronPort-AV: E=Sophos;i="6.01,247,1684825200"; 
-   d="scan'208";a="455740701"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Aug 2023 10:37:36 -0700
+   d="scan'208";a="348970280"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Aug 2023 10:34:30 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10789"; a="798769709"
+X-IronPort-AV: E=McAfee;i="6600,9927,10789"; a="975389009"
 X-IronPort-AV: E=Sophos;i="6.01,247,1684825200"; 
-   d="scan'208";a="798769709"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmsmga004.fm.intel.com with ESMTP; 01 Aug 2023 10:37:35 -0700
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	netdev@vger.kernel.org
-Cc: Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	anthony.l.nguyen@intel.com,
-	Simon Horman <simon.horman@corigine.com>,
-	Arpana Arland <arpanax.arland@intel.com>
-Subject: [PATCH net-next 7/7] ice: clean up __ice_aq_get_set_rss_lut()
-Date: Tue,  1 Aug 2023 10:31:12 -0700
-Message-Id: <20230801173112.3625977-8-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.38.1
-In-Reply-To: <20230801173112.3625977-1-anthony.l.nguyen@intel.com>
-References: <20230801173112.3625977-1-anthony.l.nguyen@intel.com>
+   d="scan'208";a="975389009"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by fmsmga006.fm.intel.com with ESMTP; 01 Aug 2023 10:34:29 -0700
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Tue, 1 Aug 2023 10:34:28 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Tue, 1 Aug 2023 10:34:27 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27 via Frontend Transport; Tue, 1 Aug 2023 10:34:27 -0700
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.172)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.27; Tue, 1 Aug 2023 10:34:27 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=FeUzGmO3lQP7Xipo4OCgxQOHnnR84JrbuxsnpftzmzdxDOqbxXSQ+HV1EgsVpMQPnw4slbKxOhZ91IPKbs80X9l+1tz0IRwixVtnNH19HPnWwoI2oj7p3ag+ESUbkeIQ4qWK+iQj6at4fJceMDr1lb1La3QY/3yEVpGx5GtBHKHRNShhJl+jCSN20EX58BO9cX5lmJ2PZFzO/UURR77I0MXyNX3PsViVDsReIEai/nyeRyCGEdScLA/WlnlZXVK4YSjI/hrW/GuYzvOT2gwB0LnZn+Trha8ZFRQVTzu077X20wt5CPWI2SChonLdhscDIeFj5OEupcNuoXxNV6I28g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=A++2UNk8u/vl/LEC3EpDZqZv5bEyz5wcCOSbHO/KtUo=;
+ b=BnQykNFAs2N7dDOQhj9zUxmqBoRjcGk6lJAavr16hbNmIUR9sJd9+sA3GiN6bNX5E0iSPcQSucTj1gw/zhMB89G4ovfb2LlqSI52c2c7drNepmldW4hSbxdHi3YefGcSboQGk7JLG56EEW3GA6wwr9IjBFjyx9dSkeFcFtmZEn8rA8GZ4BKBEGc0bhMSeUkyccRpZllFqZd0YMS3Abqq3OUqejeGw0Bpj+KkmC6TQC+XOSJwkHtCCqg+f9qB3ARJBftExolu0/4xiT0U9ePk11xTCwR+8gD1cPQmSi2sZgY5zo9Ge64jQl+l//tzqbYoDdrJ1A3COeK75GCiFwCvRw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from SA2PR11MB4921.namprd11.prod.outlook.com (2603:10b6:806:115::14)
+ by CY8PR11MB7241.namprd11.prod.outlook.com (2603:10b6:930:94::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.44; Tue, 1 Aug
+ 2023 17:34:26 +0000
+Received: from SA2PR11MB4921.namprd11.prod.outlook.com
+ ([fe80::2c53:803a:f26:b3b0]) by SA2PR11MB4921.namprd11.prod.outlook.com
+ ([fe80::2c53:803a:f26:b3b0%7]) with mapi id 15.20.6631.043; Tue, 1 Aug 2023
+ 17:34:25 +0000
+Message-ID: <a6615bf1-42c8-ed13-c9db-29b718d7fb6a@intel.com>
+Date: Tue, 1 Aug 2023 10:34:23 -0700
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Firefox/102.0 Thunderbird/102.13.0
+Subject: Re: [PATCH net-next] pds_core: Fix documentation for
+ pds_client_register
+Content-Language: en-US
+To: Brett Creeley <brett.creeley@amd.com>, <kuba@kernel.org>,
+	<davem@davemloft.net>, <netdev@vger.kernel.org>
+CC: <alex.williamson@redhat.com>, <shannon.nelson@amd.com>
+References: <20230801165833.1622-1-brett.creeley@amd.com>
+From: Jesse Brandeburg <jesse.brandeburg@intel.com>
+In-Reply-To: <20230801165833.1622-1-brett.creeley@amd.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4PR03CA0223.namprd03.prod.outlook.com
+ (2603:10b6:303:b9::18) To SA2PR11MB4921.namprd11.prod.outlook.com
+ (2603:10b6:806:115::14)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA2PR11MB4921:EE_|CY8PR11MB7241:EE_
+X-MS-Office365-Filtering-Correlation-Id: c5373692-53b7-4554-7722-08db92b58ccd
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: TUpqKShG/H1L3Fis/UKieeQOQx8YkQA4GHiPJ8yztY1lC/FM3YljFFFq1FRgKhT5FP8d8n4uSPbYzjh480XCpnurnn2DOMTprIc6y+kRH14CJRG6hGfPY4kFjNN3GhWRkRcr88gX/OwijAyrrgo0lJOljWdGWCGVjHeZEmU+ycSAwp5zPRNQhmYfsf0Lh8h8TybIh2xHTg2y0yCgBZwuzxdAyOKz3GSqHGk6JV3YMmn1PL0Oz4Q38ik1UEAwK+7ttiyLqFkKit2PK3ZLYP9GznYgLKwqJnCy0DIfnfWPq4gmrCVomwP4vjv0QsAK0p4xrZLRqZSwthb/40dBOU6KNczoMh+DHun21gon0VQ4cb8bYUVgrDAE7IlbjW+9G952poP+BLkLwBr3R4ZlC+OEJmGwHvYguyNhxoxJ3CoWctMLhR1x/ufHABVOP5vn0PTDMv0lPBgy4M8ScLf+1yPt/twlAZy3Yh+rQfbSOIkp2pzUChSjuL9DR18YSt9Ftcv1TSQSAHhRMcNhS26qMN1IP5hKZmF8cbY05BQCANIWlKsWMWUm/lpOPEt57d4fc6VAVvCLBeiQGnSgd9pyhDdLy65bfknZhtphj770zZY4Z1AqKvZhnT4+TdQ5YByRHLTJ51MKfXBtVJdj1EXFkPum0A==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA2PR11MB4921.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(376002)(396003)(366004)(346002)(136003)(39860400002)(451199021)(2906002)(4326008)(4744005)(2616005)(186003)(316002)(44832011)(38100700002)(31696002)(31686004)(41300700001)(478600001)(86362001)(6512007)(82960400001)(5660300002)(66476007)(66946007)(66556008)(53546011)(6506007)(26005)(8676002)(8936002)(36756003)(6486002)(43740500002)(45980500001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?UTFNZXM4ekFlZXN4d3Fud3hhTVNwYmdYMkFDdHVHVnBHeXF2bnpEcnZMeEc2?=
+ =?utf-8?B?Wmx2amJGM08zU3l6K1J2MHV0L2lIV3lKWHVaT1BORk5aOGptdDhrVWxpTWY1?=
+ =?utf-8?B?RVBWcnNaWWpJdXdCM2FXMVdpSHBqL0xKNFlkSFZKbzlCQ0dmVnFIT1lPT0FF?=
+ =?utf-8?B?YldFRXlaOEJSTEVMNnRjTFFlSTV5djh1MjBDdWZDRDR2dFlHalRGeWpSWkYy?=
+ =?utf-8?B?OThxMHlrV1VjK0tuQUJBLzFMeTZKVVdpczZhOUd0U2Y5MCsxQlNuS2hxQmVO?=
+ =?utf-8?B?V3JZMlkydGVKV1VqTWRJOE10WmFFWUlvVTlyZGh6U3hOR0Y0VkNrK3FqQ1c2?=
+ =?utf-8?B?dEl0MklQQWNhVUVNZjBpcFUwK0tsWDk5NUNVaEdzRlFERmQzTk5oMWtFL0Jn?=
+ =?utf-8?B?YU5XSnVVSUUyTTBKdm00OXJ4bW5NUkJkclpyWjkySEtvVFZTUEhGRkZqRlZI?=
+ =?utf-8?B?VS9CYkppenAvRlBmQXBpYWQrcFFEMU83UWxuMVk0ZlUwWnVxTVNKckxaR1Np?=
+ =?utf-8?B?RTlnR2VOTjhUZGpVY2wreTVBZ0h1cGNJUmlWWjhIMjl5WmtkRWJ4bVhLKzRI?=
+ =?utf-8?B?QlYvSUdmK2EyZW1CTGI4VGtxSCtPMkh0blIxNXlaWk9tOTlBYUp2dFNnYm1C?=
+ =?utf-8?B?dmZkM3hWTWE2b2VieEFBOEdxMVFHVEl4ME53QllMbU9xY2F1c1ZXWWppNDQv?=
+ =?utf-8?B?ZTF4MjN0MWZZdDkxZXB1RDVEZEZmRmRwbmNZbUJMRHlYdFZzUUU2K3YvT2M4?=
+ =?utf-8?B?RHYvQ3F2ZjdDREtFa1lwZGtXSkZWTlA1bTNuVkJqSlRXNFRWbzEvM1ZRQVpZ?=
+ =?utf-8?B?S1pFN3VtdmozMUcrdjFLby9RSThzOGJzakNWSkNxUDV1cWdVR1RUc1BxWnJI?=
+ =?utf-8?B?Zzl5R3dhN0ZROXZQdThCVjEzaEY3MWk2ZnZlQmc2bnpOc2Zya0tiUmppUnBr?=
+ =?utf-8?B?SmphcE1Fam5kZm5CdnVJY2pkR2xqTHQ3MjBiWXZqRHVDRmliOXZEcjkyYUpQ?=
+ =?utf-8?B?WG9UM0Foc0IxM0orMUF6aGRTTnl5SE8vcENRK2xoekxXYXBFaVVjL1lsT1Nv?=
+ =?utf-8?B?Q3A0VWFBWmxNdXA2MFphNzBhSVRobWcwZTdkOWJBRHdLYVJkMCtrQTVEOHZJ?=
+ =?utf-8?B?eHBtUGFrcXdIODk5RmJSdm81UkF1S0ZPYkJMZndiYmUwMDBFdE5mOVVQWEVL?=
+ =?utf-8?B?V0dhVkNKMDlXYllmQlg2RGV2SzhNV3FjOXBvQXdSV0cvV1RHSTV4RFZMTkE0?=
+ =?utf-8?B?R2gvVlcrMlplMUROaHF1Vlh2ZVdMWDJzMnY3TTlmcWgzSnRTbzNMcFY5ekRC?=
+ =?utf-8?B?ZE1BckZqQ3RBT05XS3l6Y2NZckg1cmU1RWZBMEZjcFZWNTIrbWtGVHpSME5y?=
+ =?utf-8?B?enBlZEhoZDhRSWsyQUhic0VFVHRpeEtvL0VwanJUQXRtT1N5M3k4YVpYMUpq?=
+ =?utf-8?B?S3RUbmYyMU93VXhFNUY4R3VxbndjTHMrbkxxZUJPYWp3MG5WQTdaME1HZVJx?=
+ =?utf-8?B?Rk5JOXQvb2RyUGEwWTVRcWErMzh5cmpWTE53MUY0Y1BQOEVpTnZxNG8ydXlH?=
+ =?utf-8?B?R2Iza2xCSEt0YXliNmhMQ3p3MVBOazJYZTFOQTNjL1NZejFtbS91Ykg2VE1C?=
+ =?utf-8?B?QkdNQ2oyNkFBT2Rqa210c2ZZNmFmcmpPNGltVEJaZmk0YnhjZW9wMGc5bk5E?=
+ =?utf-8?B?ZWE1NWJlUmxVZ0ZUeVJES2ZHaHh1VnUwMDNSWGRpRDcySnNKc09NQzRKblo1?=
+ =?utf-8?B?VHlFTEVKd3Zpd0IvR0w1bWtCYTM4eGFjNDBqaHkxK0o1SWthOVltbGVMTHFt?=
+ =?utf-8?B?d1ovL0grWXdNdkkxZ3dwcUlNa0MvKy9lZ3QrS0lmR2p5c2syVXlpcjJ2cGxN?=
+ =?utf-8?B?bW4wb25nR1JMd0szc25mY0FkNWNKQlFSZ2hvZndlbEovQktFWjlETWtreEFS?=
+ =?utf-8?B?OTZLN0dWUE5mWTdUdEFCSW5wN0s3UWcyTTV0QXdnTVRGRExYczlQak12MFd3?=
+ =?utf-8?B?OHFaejQ3eUV4MHh3anFFVnJzYURsK0xCbENHNHVwc04rWkNGOGM0cWowckgr?=
+ =?utf-8?B?ZXI1RnRjUHE0VE4zVDhCa29hS1h5WlZzQnoyOGpnQkM0bHQzczlxWnJvakJV?=
+ =?utf-8?B?OHBqZm5jS29BdWswOVBsWTdQTEhWQ013WWNSVlNubTdPQ2p1MzBVN2JkRkp4?=
+ =?utf-8?B?NkE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: c5373692-53b7-4554-7722-08db92b58ccd
+X-MS-Exchange-CrossTenant-AuthSource: SA2PR11MB4921.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Aug 2023 17:34:25.4994
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 6rIPm8ns1K3QAB1t0jq0X4xTwItAy8TlrTzyWsJLND7jMAL9nsvvl5M2sTZHQky5PcSSB7tuEu0kUYfICrMhG41Nui242P0CTcHQYHS1cE8=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR11MB7241
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
 	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+On 8/1/2023 9:58 AM, Brett Creeley wrote:
+> The documentation above pds_client_register states that it returns 0 on
+> success and negative on error. However, it actually returns a positive
+> client ID on success and negative on error. Fix the documentation to
+> state exactly that.
+> 
+> Signed-off-by: Brett Creeley <brett.creeley@amd.com>
+> Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
 
-Refactor __ice_aq_get_set_rss_lut() to improve reader experience and limit
-misuse scenarios (undesired LUT size for given LUT type).
-
-Allow only 3 RSS LUT type+size variants:
-PF LUT sized 2048, GLOBAL LUT sized 512, and VSI LUT sized 64, which were
-used on default flows prior to this commit.
-
-Prior to the change, code was mixing the meaning of @params->lut_size and
-@params->lut_type, flag assigning logic was cryptic, while long defines
-made everything harder to follow.
-
-Fix that by extracting some code out to separate helpers.
-Drop some of "shift by 0" statements that originated from Intel's
-internal HW documentation.
-
-Drop some redundant VSI masks (since ice_is_vsi_valid() gives "valid" for
-up to 0x300 VSIs).
-
-After sweeping all the defines out of struct ice_aqc_get_set_rss_lut,
-it fits into 7 lines.
-
-Finally apply some cleanup to the callsite
-(use of the new enums, tmp var for lengthy bit extraction).
-
-Note that flags for 128 and 64 sized VSI LUT are the same,
-and 64 is used everywhere in the code (updated to new enum here), it just
-happened that there was 128 in flag name.
-
-__ice_aq_get_set_rss_key() uses the same VSI valid bit, make constant
-common for it and __ice_aq_get_set_rss_lut().
-
-Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Reviewed-by: Simon Horman <simon.horman@corigine.com>
-Tested-by: Arpana Arland <arpanax.arland@intel.com> (A Contingent worker at Intel)
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
- .../net/ethernet/intel/ice/ice_adminq_cmd.h   |  53 +++----
- drivers/net/ethernet/intel/ice/ice_common.c   | 143 +++++++-----------
- .../net/ethernet/intel/ice/ice_hw_autogen.h   |   1 -
- drivers/net/ethernet/intel/ice/ice_lib.c      |  20 +--
- drivers/net/ethernet/intel/ice/ice_type.h     |   9 +-
- drivers/net/ethernet/intel/ice/ice_virtchnl.c |   6 +-
- 6 files changed, 99 insertions(+), 133 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
-index 1ad92f95d6bd..29f7a9852aec 100644
---- a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
-+++ b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
-@@ -1794,11 +1794,10 @@ struct ice_aqc_lldp_filter_ctrl {
- 	u8 reserved2[12];
- };
- 
-+#define ICE_AQC_RSS_VSI_VALID BIT(15)
-+
- /* Get/Set RSS key (indirect 0x0B04/0x0B02) */
- struct ice_aqc_get_set_rss_key {
--#define ICE_AQC_GSET_RSS_KEY_VSI_VALID	BIT(15)
--#define ICE_AQC_GSET_RSS_KEY_VSI_ID_S	0
--#define ICE_AQC_GSET_RSS_KEY_VSI_ID_M	(0x3FF << ICE_AQC_GSET_RSS_KEY_VSI_ID_S)
- 	__le16 vsi_id;
- 	u8 reserved[6];
- 	__le32 addr_high;
-@@ -1816,35 +1815,33 @@ struct ice_aqc_get_set_rss_keys {
- 	u8 extended_hash_key[ICE_AQC_GET_SET_RSS_KEY_DATA_HASH_KEY_SIZE];
- };
- 
--/* Get/Set RSS LUT (indirect 0x0B05/0x0B03) */
--struct ice_aqc_get_set_rss_lut {
--#define ICE_AQC_GSET_RSS_LUT_VSI_VALID	BIT(15)
--#define ICE_AQC_GSET_RSS_LUT_VSI_ID_S	0
--#define ICE_AQC_GSET_RSS_LUT_VSI_ID_M	(0x3FF << ICE_AQC_GSET_RSS_LUT_VSI_ID_S)
--	__le16 vsi_id;
--#define ICE_AQC_GSET_RSS_LUT_TABLE_TYPE_S	0
--#define ICE_AQC_GSET_RSS_LUT_TABLE_TYPE_M	\
--				(0x3 << ICE_AQC_GSET_RSS_LUT_TABLE_TYPE_S)
--
--#define ICE_AQC_GSET_RSS_LUT_TABLE_TYPE_VSI	 0
--#define ICE_AQC_GSET_RSS_LUT_TABLE_TYPE_PF	 1
--#define ICE_AQC_GSET_RSS_LUT_TABLE_TYPE_GLOBAL	 2
-+enum ice_lut_type {
-+	ICE_LUT_VSI = 0,
-+	ICE_LUT_PF = 1,
-+	ICE_LUT_GLOBAL = 2,
-+};
- 
--#define ICE_AQC_GSET_RSS_LUT_TABLE_SIZE_S	 2
--#define ICE_AQC_GSET_RSS_LUT_TABLE_SIZE_M	 \
--				(0x3 << ICE_AQC_GSET_RSS_LUT_TABLE_SIZE_S)
-+enum ice_lut_size {
-+	ICE_LUT_VSI_SIZE = 64,
-+	ICE_LUT_GLOBAL_SIZE = 512,
-+	ICE_LUT_PF_SIZE = 2048,
-+};
- 
--#define ICE_AQC_GSET_RSS_LUT_TABLE_SIZE_128	 128
--#define ICE_AQC_GSET_RSS_LUT_TABLE_SIZE_128_FLAG 0
--#define ICE_AQC_GSET_RSS_LUT_TABLE_SIZE_512	 512
--#define ICE_AQC_GSET_RSS_LUT_TABLE_SIZE_512_FLAG 1
--#define ICE_AQC_GSET_RSS_LUT_TABLE_SIZE_2K	 2048
--#define ICE_AQC_GSET_RSS_LUT_TABLE_SIZE_2K_FLAG	 2
-+/* enum ice_aqc_lut_flags combines constants used to fill
-+ * &ice_aqc_get_set_rss_lut ::flags, which is an amalgamation of global LUT ID,
-+ * LUT size and LUT type, last of which does not need neither shift nor mask.
-+ */
-+enum ice_aqc_lut_flags {
-+	ICE_AQC_LUT_SIZE_SMALL = 0, /* size = 64 or 128 */
-+	ICE_AQC_LUT_SIZE_512 = BIT(2),
-+	ICE_AQC_LUT_SIZE_2K = BIT(3),
- 
--#define ICE_AQC_GSET_RSS_LUT_GLOBAL_IDX_S	 4
--#define ICE_AQC_GSET_RSS_LUT_GLOBAL_IDX_M	 \
--				(0xF << ICE_AQC_GSET_RSS_LUT_GLOBAL_IDX_S)
-+	ICE_AQC_LUT_GLOBAL_IDX = GENMASK(7, 4),
-+};
- 
-+/* Get/Set RSS LUT (indirect 0x0B05/0x0B03) */
-+struct ice_aqc_get_set_rss_lut {
-+	__le16 vsi_id;
- 	__le16 flags;
- 	__le32 reserved;
- 	__le32 addr_high;
-diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
-index 97db71556b08..2953a6a7df05 100644
---- a/drivers/net/ethernet/intel/ice/ice_common.c
-+++ b/drivers/net/ethernet/intel/ice/ice_common.c
-@@ -3939,6 +3939,34 @@ ice_aq_sff_eeprom(struct ice_hw *hw, u16 lport, u8 bus_addr,
- 	return status;
- }
- 
-+static enum ice_lut_size ice_lut_type_to_size(enum ice_lut_type type)
-+{
-+	switch (type) {
-+	case ICE_LUT_VSI:
-+		return ICE_LUT_VSI_SIZE;
-+	case ICE_LUT_GLOBAL:
-+		return ICE_LUT_GLOBAL_SIZE;
-+	case ICE_LUT_PF:
-+		return ICE_LUT_PF_SIZE;
-+	}
-+	WARN_ONCE(1, "incorrect type passed");
-+	return ICE_LUT_VSI_SIZE;
-+}
-+
-+static enum ice_aqc_lut_flags ice_lut_size_to_flag(enum ice_lut_size size)
-+{
-+	switch (size) {
-+	case ICE_LUT_VSI_SIZE:
-+		return ICE_AQC_LUT_SIZE_SMALL;
-+	case ICE_LUT_GLOBAL_SIZE:
-+		return ICE_AQC_LUT_SIZE_512;
-+	case ICE_LUT_PF_SIZE:
-+		return ICE_AQC_LUT_SIZE_2K;
-+	}
-+	WARN_ONCE(1, "incorrect size passed");
-+	return 0;
-+}
-+
- /**
-  * __ice_aq_get_set_rss_lut
-  * @hw: pointer to the hardware structure
-@@ -3948,95 +3976,44 @@ ice_aq_sff_eeprom(struct ice_hw *hw, u16 lport, u8 bus_addr,
-  * Internal function to get (0x0B05) or set (0x0B03) RSS look up table
-  */
- static int
--__ice_aq_get_set_rss_lut(struct ice_hw *hw, struct ice_aq_get_set_rss_lut_params *params, bool set)
--{
--	u16 flags = 0, vsi_id, lut_type, lut_size, glob_lut_idx, vsi_handle;
--	struct ice_aqc_get_set_rss_lut *cmd_resp;
-+__ice_aq_get_set_rss_lut(struct ice_hw *hw,
-+			 struct ice_aq_get_set_rss_lut_params *params, bool set)
-+{
-+	u16 opcode, vsi_id, vsi_handle = params->vsi_handle, glob_lut_idx = 0;
-+	enum ice_lut_type lut_type = params->lut_type;
-+	struct ice_aqc_get_set_rss_lut *desc_params;
-+	enum ice_aqc_lut_flags flags;
-+	enum ice_lut_size lut_size;
- 	struct ice_aq_desc desc;
--	int status;
--	u8 *lut;
-+	u8 *lut = params->lut;
- 
--	if (!params)
--		return -EINVAL;
--
--	vsi_handle = params->vsi_handle;
--	lut = params->lut;
- 
--	if (!ice_is_vsi_valid(hw, vsi_handle) || !lut)
-+	if (!lut || !ice_is_vsi_valid(hw, vsi_handle))
- 		return -EINVAL;
- 
--	lut_size = params->lut_size;
--	lut_type = params->lut_type;
--	glob_lut_idx = params->global_lut_id;
--	vsi_id = ice_get_hw_vsi_num(hw, vsi_handle);
--
--	cmd_resp = &desc.params.get_set_rss_lut;
-+	lut_size = ice_lut_type_to_size(lut_type);
-+	if (lut_size > params->lut_size)
-+		return -EINVAL;
-+	else if (set && lut_size != params->lut_size)
-+		return -EINVAL;
- 
--	if (set) {
--		ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_set_rss_lut);
-+	opcode = set ? ice_aqc_opc_set_rss_lut : ice_aqc_opc_get_rss_lut;
-+	ice_fill_dflt_direct_cmd_desc(&desc, opcode);
-+	if (set)
- 		desc.flags |= cpu_to_le16(ICE_AQ_FLAG_RD);
--	} else {
--		ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_get_rss_lut);
--	}
- 
--	cmd_resp->vsi_id = cpu_to_le16(((vsi_id <<
--					 ICE_AQC_GSET_RSS_LUT_VSI_ID_S) &
--					ICE_AQC_GSET_RSS_LUT_VSI_ID_M) |
--				       ICE_AQC_GSET_RSS_LUT_VSI_VALID);
--
--	switch (lut_type) {
--	case ICE_AQC_GSET_RSS_LUT_TABLE_TYPE_VSI:
--	case ICE_AQC_GSET_RSS_LUT_TABLE_TYPE_PF:
--	case ICE_AQC_GSET_RSS_LUT_TABLE_TYPE_GLOBAL:
--		flags |= ((lut_type << ICE_AQC_GSET_RSS_LUT_TABLE_TYPE_S) &
--			  ICE_AQC_GSET_RSS_LUT_TABLE_TYPE_M);
--		break;
--	default:
--		status = -EINVAL;
--		goto ice_aq_get_set_rss_lut_exit;
--	}
-+	desc_params = &desc.params.get_set_rss_lut;
-+	vsi_id = ice_get_hw_vsi_num(hw, vsi_handle);
-+	desc_params->vsi_id = cpu_to_le16(vsi_id | ICE_AQC_RSS_VSI_VALID);
- 
--	if (lut_type == ICE_AQC_GSET_RSS_LUT_TABLE_TYPE_GLOBAL) {
--		flags |= ((glob_lut_idx << ICE_AQC_GSET_RSS_LUT_GLOBAL_IDX_S) &
--			  ICE_AQC_GSET_RSS_LUT_GLOBAL_IDX_M);
-+	if (lut_type == ICE_LUT_GLOBAL)
-+		glob_lut_idx = FIELD_PREP(ICE_AQC_LUT_GLOBAL_IDX,
-+					  params->global_lut_id);
- 
--		if (!set)
--			goto ice_aq_get_set_rss_lut_send;
--	} else if (lut_type == ICE_AQC_GSET_RSS_LUT_TABLE_TYPE_PF) {
--		if (!set)
--			goto ice_aq_get_set_rss_lut_send;
--	} else {
--		goto ice_aq_get_set_rss_lut_send;
--	}
-+	flags = lut_type | glob_lut_idx | ice_lut_size_to_flag(lut_size);
-+	desc_params->flags = cpu_to_le16(flags);
- 
--	/* LUT size is only valid for Global and PF table types */
--	switch (lut_size) {
--	case ICE_AQC_GSET_RSS_LUT_TABLE_SIZE_128:
--		break;
--	case ICE_AQC_GSET_RSS_LUT_TABLE_SIZE_512:
--		flags |= (ICE_AQC_GSET_RSS_LUT_TABLE_SIZE_512_FLAG <<
--			  ICE_AQC_GSET_RSS_LUT_TABLE_SIZE_S) &
--			 ICE_AQC_GSET_RSS_LUT_TABLE_SIZE_M;
--		break;
--	case ICE_AQC_GSET_RSS_LUT_TABLE_SIZE_2K:
--		if (lut_type == ICE_AQC_GSET_RSS_LUT_TABLE_TYPE_PF) {
--			flags |= (ICE_AQC_GSET_RSS_LUT_TABLE_SIZE_2K_FLAG <<
--				  ICE_AQC_GSET_RSS_LUT_TABLE_SIZE_S) &
--				 ICE_AQC_GSET_RSS_LUT_TABLE_SIZE_M;
--			break;
--		}
--		fallthrough;
--	default:
--		status = -EINVAL;
--		goto ice_aq_get_set_rss_lut_exit;
--	}
--
--ice_aq_get_set_rss_lut_send:
--	cmd_resp->flags = cpu_to_le16(flags);
--	status = ice_aq_send_cmd(hw, &desc, lut, lut_size, NULL);
--
--ice_aq_get_set_rss_lut_exit:
--	return status;
-+	return ice_aq_send_cmd(hw, &desc, lut, lut_size, NULL);
- }
- 
- /**
-@@ -4078,12 +4055,10 @@ static int
- __ice_aq_get_set_rss_key(struct ice_hw *hw, u16 vsi_id,
- 			 struct ice_aqc_get_set_rss_keys *key, bool set)
- {
--	struct ice_aqc_get_set_rss_key *cmd_resp;
-+	struct ice_aqc_get_set_rss_key *desc_params;
- 	u16 key_size = sizeof(*key);
- 	struct ice_aq_desc desc;
- 
--	cmd_resp = &desc.params.get_set_rss_key;
--
- 	if (set) {
- 		ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_set_rss_key);
- 		desc.flags |= cpu_to_le16(ICE_AQ_FLAG_RD);
-@@ -4091,10 +4066,8 @@ __ice_aq_get_set_rss_key(struct ice_hw *hw, u16 vsi_id,
- 		ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_get_rss_key);
- 	}
- 
--	cmd_resp->vsi_id = cpu_to_le16(((vsi_id <<
--					 ICE_AQC_GSET_RSS_KEY_VSI_ID_S) &
--					ICE_AQC_GSET_RSS_KEY_VSI_ID_M) |
--				       ICE_AQC_GSET_RSS_KEY_VSI_VALID);
-+	desc_params = &desc.params.get_set_rss_key;
-+	desc_params->vsi_id = cpu_to_le16(vsi_id | ICE_AQC_RSS_VSI_VALID);
- 
- 	return ice_aq_send_cmd(hw, &desc, key, key_size, NULL);
- }
-diff --git a/drivers/net/ethernet/intel/ice/ice_hw_autogen.h b/drivers/net/ethernet/intel/ice/ice_hw_autogen.h
-index fb590b4c1053..531cc2194741 100644
---- a/drivers/net/ethernet/intel/ice/ice_hw_autogen.h
-+++ b/drivers/net/ethernet/intel/ice/ice_hw_autogen.h
-@@ -491,7 +491,6 @@
- #define VSIQF_FD_CNT_FD_BCNT_M			ICE_M(0x3FFF, 16)
- #define VSIQF_FD_SIZE(_VSI)			(0x00462000 + ((_VSI) * 4))
- #define VSIQF_HKEY_MAX_INDEX			12
--#define VSIQF_HLUT_MAX_INDEX			15
- #define PFPM_APM				0x000B8080
- #define PFPM_APM_APME_M				BIT(0)
- #define PFPM_WUFC				0x0009DC00
-diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
-index 077f2e91ae1a..927518fcad51 100644
---- a/drivers/net/ethernet/intel/ice/ice_lib.c
-+++ b/drivers/net/ethernet/intel/ice/ice_lib.c
-@@ -907,6 +907,7 @@ static void ice_vsi_set_rss_params(struct ice_vsi *vsi)
- {
- 	struct ice_hw_common_caps *cap;
- 	struct ice_pf *pf = vsi->back;
-+	u16 max_rss_size;
- 
- 	if (!test_bit(ICE_FLAG_RSS_ENA, pf->flags)) {
- 		vsi->rss_size = 1;
-@@ -914,32 +915,31 @@ static void ice_vsi_set_rss_params(struct ice_vsi *vsi)
- 	}
- 
- 	cap = &pf->hw.func_caps.common_cap;
-+	max_rss_size = BIT(cap->rss_table_entry_width);
- 	switch (vsi->type) {
- 	case ICE_VSI_CHNL:
- 	case ICE_VSI_PF:
- 		/* PF VSI will inherit RSS instance of PF */
- 		vsi->rss_table_size = (u16)cap->rss_table_size;
- 		if (vsi->type == ICE_VSI_CHNL)
--			vsi->rss_size = min_t(u16, vsi->num_rxq,
--					      BIT(cap->rss_table_entry_width));
-+			vsi->rss_size = min_t(u16, vsi->num_rxq, max_rss_size);
- 		else
- 			vsi->rss_size = min_t(u16, num_online_cpus(),
--					      BIT(cap->rss_table_entry_width));
--		vsi->rss_lut_type = ICE_AQC_GSET_RSS_LUT_TABLE_TYPE_PF;
-+					      max_rss_size);
-+		vsi->rss_lut_type = ICE_LUT_PF;
- 		break;
- 	case ICE_VSI_SWITCHDEV_CTRL:
--		vsi->rss_table_size = ICE_VSIQF_HLUT_ARRAY_SIZE;
--		vsi->rss_size = min_t(u16, num_online_cpus(),
--				      BIT(cap->rss_table_entry_width));
--		vsi->rss_lut_type = ICE_AQC_GSET_RSS_LUT_TABLE_TYPE_VSI;
-+		vsi->rss_table_size = ICE_LUT_VSI_SIZE;
-+		vsi->rss_size = min_t(u16, num_online_cpus(), max_rss_size);
-+		vsi->rss_lut_type = ICE_LUT_VSI;
- 		break;
- 	case ICE_VSI_VF:
- 		/* VF VSI will get a small RSS table.
- 		 * For VSI_LUT, LUT size should be set to 64 bytes.
- 		 */
--		vsi->rss_table_size = ICE_VSIQF_HLUT_ARRAY_SIZE;
-+		vsi->rss_table_size = ICE_LUT_VSI_SIZE;
- 		vsi->rss_size = ICE_MAX_RSS_QS_PER_VF;
--		vsi->rss_lut_type = ICE_AQC_GSET_RSS_LUT_TABLE_TYPE_VSI;
-+		vsi->rss_lut_type = ICE_LUT_VSI;
- 		break;
- 	case ICE_VSI_LB:
- 		break;
-diff --git a/drivers/net/ethernet/intel/ice/ice_type.h b/drivers/net/ethernet/intel/ice/ice_type.h
-index e82f38c2a940..5e353b0cbe6f 100644
---- a/drivers/net/ethernet/intel/ice/ice_type.h
-+++ b/drivers/net/ethernet/intel/ice/ice_type.h
-@@ -1040,10 +1040,10 @@ enum ice_sw_fwd_act_type {
- };
- 
- struct ice_aq_get_set_rss_lut_params {
--	u16 vsi_handle;		/* software VSI handle */
--	u16 lut_size;		/* size of the LUT buffer */
--	u8 lut_type;		/* type of the LUT (i.e. VSI, PF, Global) */
- 	u8 *lut;		/* input RSS LUT for set and output RSS LUT for get */
-+	enum ice_lut_size lut_size; /* size of the LUT buffer */
-+	enum ice_lut_type lut_type; /* type of the LUT (i.e. VSI, PF, Global) */
-+	u16 vsi_handle;		/* software VSI handle */
- 	u8 global_lut_id;	/* only valid when lut_type is global */
- };
- 
-@@ -1145,9 +1145,6 @@ struct ice_aq_get_set_rss_lut_params {
- 
- #define ICE_SR_WORDS_IN_1KB		512
- 
--/* Hash redirection LUT for VSI - maximum array size */
--#define ICE_VSIQF_HLUT_ARRAY_SIZE	((VSIQF_HLUT_MAX_INDEX + 1) * 4)
--
- /* AQ API version for LLDP_FILTER_CONTROL */
- #define ICE_FW_API_LLDP_FLTR_MAJ	1
- #define ICE_FW_API_LLDP_FLTR_MIN	7
-diff --git a/drivers/net/ethernet/intel/ice/ice_virtchnl.c b/drivers/net/ethernet/intel/ice/ice_virtchnl.c
-index 625da88e7965..85d996531502 100644
---- a/drivers/net/ethernet/intel/ice/ice_virtchnl.c
-+++ b/drivers/net/ethernet/intel/ice/ice_virtchnl.c
-@@ -500,7 +500,7 @@ static int ice_vc_get_vf_res_msg(struct ice_vf *vf, u8 *msg)
- 	vfres->num_queue_pairs = vsi->num_txq;
- 	vfres->max_vectors = vf->pf->vfs.num_msix_per;
- 	vfres->rss_key_size = ICE_VSIQF_HKEY_ARRAY_SIZE;
--	vfres->rss_lut_size = ICE_VSIQF_HLUT_ARRAY_SIZE;
-+	vfres->rss_lut_size = ICE_LUT_VSI_SIZE;
- 	vfres->max_mtu = ice_vc_get_max_frame_size(vf);
- 
- 	vfres->vsi_res[0].vsi_id = vf->lan_vsi_num;
-@@ -962,7 +962,7 @@ static int ice_vc_config_rss_lut(struct ice_vf *vf, u8 *msg)
- 		goto error_param;
- 	}
- 
--	if (vrl->lut_entries != ICE_VSIQF_HLUT_ARRAY_SIZE) {
-+	if (vrl->lut_entries != ICE_LUT_VSI_SIZE) {
- 		v_ret = VIRTCHNL_STATUS_ERR_PARAM;
- 		goto error_param;
- 	}
-@@ -978,7 +978,7 @@ static int ice_vc_config_rss_lut(struct ice_vf *vf, u8 *msg)
- 		goto error_param;
- 	}
- 
--	if (ice_set_rss_lut(vsi, vrl->lut, ICE_VSIQF_HLUT_ARRAY_SIZE))
-+	if (ice_set_rss_lut(vsi, vrl->lut, ICE_LUT_VSI_SIZE))
- 		v_ret = VIRTCHNL_STATUS_ERR_ADMIN_QUEUE_ERROR;
- error_param:
- 	return ice_vc_send_msg_to_vf(vf, VIRTCHNL_OP_CONFIG_RSS_LUT, v_ret,
--- 
-2.38.1
+Reviewed-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
 
 
