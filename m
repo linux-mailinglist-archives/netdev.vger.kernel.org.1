@@ -1,85 +1,105 @@
-Return-Path: <netdev+bounces-23032-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23033-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DA0A76A71E
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 04:43:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4701F76A727
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 04:45:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BDF471C20CF6
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 02:43:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 558F51C20DC8
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 02:45:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68EF91104;
-	Tue,  1 Aug 2023 02:43:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 419EA1107;
+	Tue,  1 Aug 2023 02:45:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34EE87E;
-	Tue,  1 Aug 2023 02:43:38 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9319AC433C8;
-	Tue,  1 Aug 2023 02:43:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690857818;
-	bh=n4dsEw0hO1hhcpvbUzRfjMJlHkCbxkrsloRNUT6H/t4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=akFDDuctuT3hHiEMB/+rQBPuCORBi0BotJ2zv0hr8+Wuk4y98aTP6CmXMw6z7tc8v
-	 EL423fcpqi+iEBQYH7tcO8+SIRVpRo2F+x2CsiEQDr2AnrnBEbzBqkiq/IH4MqOrkQ
-	 17mCW9HJ70Mwb+iISagAUZix/g5dHrWRvX/XuRkUOrhstxgByzP5dnkbHVBByl5L1R
-	 CsPlzcwctPldJb77u/+Cs4VNzfoTovj+QB8JJOKxmmhnNePn83SFgoiv6UzPIcMun4
-	 3b4YyJoT8mG8OQ6xCNaVS0iGqWPhvOWyFQRjgGGsgTLZkzSm05xdpXa+4+/tAhmY6m
-	 gFrcg2qMBADWg==
-Date: Mon, 31 Jul 2023 19:43:36 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Leon Hwang <hffilwlqm@gmail.com>
-Cc: ast@kernel.org, daniel@iogearbox.net, john.fastabend@gmail.com,
- andrii@kernel.org, martin.lau@linux.dev, song@kernel.org,
- yonghong.song@linux.dev, kpsingh@kernel.org, sdf@google.com,
- haoluo@google.com, jolsa@kernel.org, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, hawk@kernel.org,
- rostedt@goodmis.org, mhiramat@kernel.org, mykolal@fb.com, shuah@kernel.org,
- tangyeechou@gmail.com, kernel-patches-bot@fb.com, bpf@vger.kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linux-trace-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH bpf-next v4 1/2] bpf, xdp: Add tracepoint to xdp
- attaching failure
-Message-ID: <20230731194336.5b4bd065@kernel.org>
-In-Reply-To: <20230730114951.74067-2-hffilwlqm@gmail.com>
-References: <20230730114951.74067-1-hffilwlqm@gmail.com>
-	<20230730114951.74067-2-hffilwlqm@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36ABA7E
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 02:45:17 +0000 (UTC)
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84875213C
+	for <netdev@vger.kernel.org>; Mon, 31 Jul 2023 19:44:51 -0700 (PDT)
+Received: from kwepemi500008.china.huawei.com (unknown [172.30.72.53])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4RFKDh4DJ7zrRtJ;
+	Tue,  1 Aug 2023 10:43:48 +0800 (CST)
+Received: from huawei.com (10.90.53.73) by kwepemi500008.china.huawei.com
+ (7.221.188.139) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Tue, 1 Aug
+ 2023 10:44:49 +0800
+From: Ruan Jinjie <ruanjinjie@huawei.com>
+To: <sgoutham@marvell.com>, <lcherian@marvell.com>, <gakula@marvell.com>,
+	<jerinj@marvell.com>, <hkelam@marvell.com>, <sbhatta@marvell.com>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <richardcochran@gmail.com>, <netdev@vger.kernel.org>
+CC: <ruanjinjie@huawei.com>
+Subject: [PATCH -next] octeontx2: Remove unnecessary ternary operators
+Date: Tue, 1 Aug 2023 10:44:13 +0800
+Message-ID: <20230801024413.3371379-1-ruanjinjie@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.90.53.73]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ kwepemi500008.china.huawei.com (7.221.188.139)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Sun, 30 Jul 2023 19:49:50 +0800 Leon Hwang wrote:
-> @@ -9472,6 +9473,7 @@ int bpf_xdp_link_attach(const union bpf_attr *attr, struct bpf_prog *prog)
->  	struct bpf_link_primer link_primer;
->  	struct bpf_xdp_link *link;
->  	struct net_device *dev;
-> +	struct netlink_ext_ack extack;
+Ther are a little ternary operators, the true or false judgement
+of which is unnecessary in C language semantics. So remove it
+to clean Code.
 
-This is not initialized. Also, while fixing that, move it up 
-to maintain the line order by decreasing line length.
+Signed-off-by: Ruan Jinjie <ruanjinjie@huawei.com>
+---
+ drivers/net/ethernet/marvell/octeontx2/af/ptp.c      | 4 ++--
+ drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
->  	int err, fd;
->  
->  	rtnl_lock();
-> @@ -9497,12 +9499,13 @@ int bpf_xdp_link_attach(const union bpf_attr *attr, struct bpf_prog *prog)
->  		goto unlock;
->  	}
->  
-> -	err = dev_xdp_attach_link(dev, NULL, link);
-> +	err = dev_xdp_attach_link(dev, &extack, link);
->  	rtnl_unlock();
->  
->  	if (err) {
->  		link->dev = NULL;
->  		bpf_link_cleanup(&link_primer);
-> +		trace_bpf_xdp_link_attach_failed(extack._msg);
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/ptp.c b/drivers/net/ethernet/marvell/octeontx2/af/ptp.c
+index 0ee420a489fc..c55c2c441a1a 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/ptp.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/ptp.c
+@@ -61,12 +61,12 @@ static const struct pci_device_id ptp_id_table[];
+ 
+ static bool is_ptp_dev_cnf10kb(struct ptp *ptp)
+ {
+-	return (ptp->pdev->subsystem_device == PCI_SUBSYS_DEVID_CNF10K_B_PTP) ? true : false;
++	return ptp->pdev->subsystem_device == PCI_SUBSYS_DEVID_CNF10K_B_PTP;
+ }
+ 
+ static bool is_ptp_dev_cn10k(struct ptp *ptp)
+ {
+-	return (ptp->pdev->device == PCI_DEVID_CN10K_PTP) ? true : false;
++	return ptp->pdev->device == PCI_DEVID_CN10K_PTP;
+ }
+ 
+ static bool cn10k_ptp_errata(struct ptp *ptp)
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+index 9551b422622a..61f62a6ec662 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+@@ -2027,7 +2027,7 @@ u16 otx2_select_queue(struct net_device *netdev, struct sk_buff *skb,
+ #endif
+ 	int txq;
+ 
+-	qos_enabled = (netdev->real_num_tx_queues > pf->hw.tx_queues) ? true : false;
++	qos_enabled = netdev->real_num_tx_queues > pf->hw.tx_queues;
+ 	if (unlikely(qos_enabled)) {
+ 		/* This smp_load_acquire() pairs with smp_store_release() in
+ 		 * otx2_qos_root_add() called from htb offload root creation
+-- 
+2.34.1
+
 
