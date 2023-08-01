@@ -1,83 +1,72 @@
-Return-Path: <netdev+bounces-23056-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23057-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 399C176A896
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 08:02:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0D6C76A89A
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 08:02:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DF2AC2813FE
-	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 06:01:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1E35E1C20DCC
+	for <lists+netdev@lfdr.de>; Tue,  1 Aug 2023 06:02:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE9B546B7;
-	Tue,  1 Aug 2023 06:01:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F38046B7;
+	Tue,  1 Aug 2023 06:02:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFAB3111A
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 06:01:57 +0000 (UTC)
-X-Greylist: delayed 16038 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 31 Jul 2023 23:01:54 PDT
-Received: from zg8tmtu5ljg5lje1ms4xmtka.icoremail.net (zg8tmtu5ljg5lje1ms4xmtka.icoremail.net [159.89.151.119])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 033F7E7D;
-	Mon, 31 Jul 2023 23:01:53 -0700 (PDT)
-Received: from linma$zju.edu.cn ( [42.120.103.60] ) by
- ajax-webmail-mail-app4 (Coremail) ; Tue, 1 Aug 2023 14:01:16 +0800
- (GMT+08:00)
-X-Originating-IP: [42.120.103.60]
-Date: Tue, 1 Aug 2023 14:01:16 +0800 (GMT+08:00)
-X-CM-HeaderCharset: UTF-8
-From: "Lin Ma" <linma@zju.edu.cn>
-To: "Dan Carpenter" <dan.carpenter@linaro.org>
-Cc: "Markus Elfring" <Markus.Elfring@web.de>, netdev@vger.kernel.org, 
-	kernel-janitors@vger.kernel.org, 
-	"Alexander Duyck" <alexander.h.duyck@intel.com>, 
-	"Daniel Machon" <daniel.machon@microchip.com>, 
-	"David S. Miller" <davem@davemloft.net>, 
-	"Eric Dumazet" <edumazet@google.com>, 
-	"Jakub Kicinski" <kuba@kernel.org>, 
-	"Jeff Kirsher" <jeffrey.t.kirsher@intel.com>, 
-	"Paolo Abeni" <pabeni@redhat.com>, 
-	"Peter P Waskiewicz Jr" <peter.p.waskiewicz.jr@intel.com>, 
-	"Petr Machata" <petrm@nvidia.com>, 
-	LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net] net: dcb: choose correct policy to parse
- DCB_ATTR_BCN
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version XT5.0.14 build 20220622(41e5976f)
- Copyright (c) 2002-2023 www.mailtech.cn
- mispb-4df6dc2c-e274-4d1c-b502-72c5c3dfa9ce-zj.edu.cn
-In-Reply-To: <d29e7d32-1684-4400-9907-f2f69092466d@kadam.mountain>
-References: <20230731045216.3779420-1-linma@zju.edu.cn>
- <fbda76a9-e1f3-d483-ab3d-3c904c54a5db@web.de>
- <3d159780.f2fb6.189aebb4a18.Coremail.linma@zju.edu.cn>
- <d29e7d32-1684-4400-9907-f2f69092466d@kadam.mountain>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD51C4A0E
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 06:02:06 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 178E1C433C8;
+	Tue,  1 Aug 2023 06:02:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1690869726;
+	bh=JiTXGLYJWPJsg2TfI3p8egkq8itI6r7RrUkb+0gpOKQ=;
+	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
+	b=m+rxfq4V/I0DfPvvwO/NW44g6r3HcAX81KglDqByLhm/0nfB6A8Jj54OQrHE6vJKl
+	 7KZOSe1AkHmbGGlvCzaQbyuchARp7aRcRQUBedNk/f38I3NyHg9N1pBd6D+iO0MvSy
+	 okOWvNZn9PNdqCjNEXHTPiI/hLJZmlgKDS3TqhRDzyDD3K/dAnUiTDcmWl0fnrmgrc
+	 EieY1XAhzOMUUxfsL7kHW0WuJili3BeHnTaYscztcp2JY9nxj2vqATJ3NC3ZxTm8DG
+	 z17YW0Fv4u+KGq4U/yYlVD6b9SbO5x4QYEAzIHEHF0ofddGndIEfT0ZaW7xdMQk2uU
+	 GgisnK/0dXEtQ==
+From: Kalle Valo <kvalo@kernel.org>
+To: Yue Haibing <yuehaibing@huawei.com>
+Cc: <johannes@sipsolutions.net>,  <davem@davemloft.net>,
+  <edumazet@google.com>,  <kuba@kernel.org>,  <pabeni@redhat.com>,
+  <nbd@nbd.name>,  <pagadala.yesu.anjaneyulu@intel.com>,
+  <linux-wireless@vger.kernel.org>,  <netdev@vger.kernel.org>,
+  <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] mac80211: mesh: Remove unused function declaration
+ mesh_ids_set_default()
+References: <20230731140712.1204-1-yuehaibing@huawei.com>
+Date: Tue, 01 Aug 2023 09:02:22 +0300
+In-Reply-To: <20230731140712.1204-1-yuehaibing@huawei.com> (Yue Haibing's
+	message of "Mon, 31 Jul 2023 22:07:12 +0800")
+Message-ID: <87jzufz4ep.fsf@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <5a361992.f3740.189afafbb36.Coremail.linma@zju.edu.cn>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:cS_KCgBHjAmtn8hku11sCg--.56218W
-X-CM-SenderInfo: qtrwiiyqvtljo62m3hxhgxhubq/1tbiAwUOEmTIYfoAqwAFsD
-X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
-	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
-	daVFxhVjvjDU=
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain
 
-SGVsbG8gRGFuLAoKPiAKPiBTaW1vbiByZXZpZXdlZCB0aGUgcGF0Y2ggYWxyZWFkeS4gIERvbid0
-IGxpc3RlbiB0byBNYXJrdXMuICBIZSdzIGJhbm5lZAo+IGZyb20gdmdlci4KPiAKPiBodHRwczov
-L2xvcmUua2VybmVsLm9yZy9hbGwvMjAyMzA3MzEyMy1wb3Nlci1wYW5oYW5kbGUtMWNiN0BncmVn
-a2gvCj4gCj4gcmVnYXJkcywKPiBkYW4gY2FycGVudGVyCgpPb29vb3BzLCBJIG5ldmVyIHRob3Vn
-aHQgb2YgaXQgbGlrZSB0aGlzLiBJIHdpbGwgdGFrZSBub3RlIG9mIHRoYXQgOikuCgpUaGFua3MK
-TGlu
+Yue Haibing <yuehaibing@huawei.com> writes:
+
+> Commit ccf80ddfe492 ("mac80211: mesh function and data structures definitions")
+> introducted this but never implemented.
+>
+> Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
+> ---
+>  net/mac80211/mesh.h | 1 -
+>  1 file changed, 1 deletion(-)
+
+The title should have "wifi:" but no need to resend because of this.
+
+-- 
+https://patchwork.kernel.org/project/linux-wireless/list/
+
+https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
 
