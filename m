@@ -1,196 +1,111 @@
-Return-Path: <netdev+bounces-23754-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23756-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B24F76D601
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 19:49:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D2D876D62C
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 19:55:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AD0451C21352
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 17:49:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 34430281D96
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 17:55:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22BD7100D3;
-	Wed,  2 Aug 2023 17:49:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37CB0100D6;
+	Wed,  2 Aug 2023 17:55:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14DCA100C7
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 17:49:20 +0000 (UTC)
-Received: from mail-qt1-x82a.google.com (mail-qt1-x82a.google.com [IPv6:2607:f8b0:4864:20::82a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 930F144B6
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 10:48:58 -0700 (PDT)
-Received: by mail-qt1-x82a.google.com with SMTP id d75a77b69052e-407db3e9669so22001cf.1
-        for <netdev@vger.kernel.org>; Wed, 02 Aug 2023 10:48:58 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CE48DF58
+	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 17:55:30 +0000 (UTC)
+Received: from mail-qv1-xf30.google.com (mail-qv1-xf30.google.com [IPv6:2607:f8b0:4864:20::f30])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3649F9C
+	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 10:55:25 -0700 (PDT)
+Received: by mail-qv1-xf30.google.com with SMTP id 6a1803df08f44-63cfe6e0c32so576236d6.1
+        for <netdev@vger.kernel.org>; Wed, 02 Aug 2023 10:55:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690998533; x=1691603333;
+        d=google.com; s=20221208; t=1690998924; x=1691603724;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ATBxTKtUEN3adqzZhNmXHivsXNy4yJoXN/eNj+na73o=;
-        b=gC1HmOeksBgVpmy9lCWqeuiYpUX0ZAZT6MkINWUs5XnpdeuIXlxX5sJjegO5h+3G+H
-         5BjTW2uYy+8I50Tv24IrTAyEmkT1TBcYQOuGBKiFOJHQ/cr/+4HYWxitoZWInb/cAfVm
-         VmbdfDAHZhC1pt3Pd43oZ0kItdaeLjYVbUzshGYQLeI5mHtd1p1zANaByjpoCWqj00EA
-         PVaC6qHPM5lAnyoYHFmIi6JjIQ6+zw67xJyN50T+IkH4cskvgCQV4vqvuijm1yCCHcbN
-         furuZhTVyCsJsl662jecIkATe3OF8XmBw8JaKL8CYUvizA96t9q7S51ieUWmKjro/sjf
-         If4Q==
+        bh=qoQ9QQBh3aNb5HAI8gb3WGWfLp4PhO0tFoxt1vgia60=;
+        b=Q6P7YDb36YHTIT0J9J3mRC0xO/oM72diYAGVE7wD9ZrpTSgrRwMkpx6qVc3FNK/2Pn
+         NUoLOyN5EysVLEw9KnReNoTXT1TQmvu/EeFjSPIPW4VXIHL3EQDOE7WQ3yXUa1FrC/q9
+         SLdeuv1arpwmrKZHc+UXMvhgn6GtH/o6AGUfCqeO5D8DLkc9oT1MlWzSXTycAZmzBBuY
+         3o5K/9EM7UZ1IoLeFl2zlLP+kQSS7ajteuX+ugpeIRpRriPMJeWFXa31Myc1VRBHmzPc
+         Sd1+kJajsbenswNhz61a/cWYqHt4VZPzpbfJ9epJWbFXZ/2d8xv7i2rW2Sf190ta7Xkt
+         Sc9Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690998533; x=1691603333;
+        d=1e100.net; s=20221208; t=1690998924; x=1691603724;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ATBxTKtUEN3adqzZhNmXHivsXNy4yJoXN/eNj+na73o=;
-        b=epFwbrYrcbKtyYHThWdjq13wxu6Ry64wok8kOAVZYGF15Xf0PnCKspXRbgR5rI+Ivd
-         Z3Y1uM7M53ckuWbQ8L6yL7hNDQtmEBV5maUwut7H8JuaYk7vowW9hpeh+NKXYL/BbdnL
-         5DwAf+Ivc/qc3UaMsKspjZ4npXzhvIdwql0scphlN3W+1YDqaSknhms5jxToZRonZsUm
-         voQw1Chj93hvRlRVOlNd0Uq3WwvHw0U/jIh1CnAFcMIxmsuHxZLqfJ9rlfQ8gEe/bE0F
-         UDBOtafGPr65C6RiXOq7TAH/TVJEDgkkneLN5xeVMRIPuQsoNFWzcWSjMm13XVHzpHcx
-         GSVw==
-X-Gm-Message-State: ABy/qLZAx7GwDKzikEnMX7B3hbLqLzsWygFAXlYva78cj9h91p6RBDfJ
-	o2ZWZ0tldJF/eGZCJEo2UZDNguGC+ThQ9d/0r0X9Pw==
-X-Google-Smtp-Source: APBJJlGvTM2nVQ4xfnp9oMNReDoQoZIyuC+cErLAFZMXyF9StpmZSOtmw1AqSDqQZcI/uc8WONGAlHyQPysuJGkA9BQ=
-X-Received: by 2002:a05:622a:1a28:b0:40f:db89:5246 with SMTP id
- f40-20020a05622a1a2800b0040fdb895246mr546108qtb.21.1690998533179; Wed, 02 Aug
- 2023 10:48:53 -0700 (PDT)
+        bh=qoQ9QQBh3aNb5HAI8gb3WGWfLp4PhO0tFoxt1vgia60=;
+        b=czmXEo7or7uL+JPJdaYB4pOlEWIMf+W8ZdMXVybIGTsd3IQ10ExXX3GXxo3cpwGbyk
+         BMGlJq8zcw+cns6PP1iJ6xKWPYr0lMlqSOQUNx2H0F/Nj/yLS7r57d9xPlASk59dSfoL
+         c8qnL5FJPUmV0b9hQKjsajT6kpMRKbWlEsvx2nVjMAJq5eXFKKTppCypYSclwKkxitYu
+         WicwoNp7xAvWbOU03S/E1/NKoZj3a2faavJg9e71qf7XmIvAOxWgNas4nkWYHdW1aXPR
+         QIApHCoyExWT0fyCRsHIBd1/ybPisGV9okuvk46g6YBdLFTa6/KsEKWs4uZJH/VdpuAE
+         97vQ==
+X-Gm-Message-State: ABy/qLYAJnYEr7nE9S3sR8j8Rx8UZ7Tcz8sdCRYNNSqFm4HYGgWUCYbP
+	r7e4FalRUVANG3xPpvCJjvJk+MzpxRYAXKn3xAsKXg==
+X-Google-Smtp-Source: APBJJlFXbcDAluXzkimyBCOpTg/tYoevL512peHPLiVSwrCaU15QF3ls/Tpp4KxMI08oy/Wr6Kb//rNAL8a2uSaqlHw=
+X-Received: by 2002:a05:6214:21a9:b0:63d:2369:6c41 with SMTP id
+ t9-20020a05621421a900b0063d23696c41mr20837155qvc.55.1690998924158; Wed, 02
+ Aug 2023 10:55:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230711011737.1969582-1-william.xuanziyang@huawei.com>
- <20230717-clubhouse-swinger-8f0fa23b0628-mkl@pengutronix.de>
- <CANn89iJ47sVXAEEryvODoGv-iUpT-ACTCSWQTmdtJ9Fqs0s40Q@mail.gmail.com>
- <1e0e6539-412a-cc8d-b104-e2921a099e48@huawei.com> <CANn89iKoTWHBGgMW-RyJHHeM0QuiN9De=eNWMM8VRom++n_o_g@mail.gmail.com>
- <3566e594-a9e5-8ba4-0f5a-d50086cebd82@huawei.com>
-In-Reply-To: <3566e594-a9e5-8ba4-0f5a-d50086cebd82@huawei.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 2 Aug 2023 19:48:41 +0200
-Message-ID: <CANn89iJ8jFxGo0d_8KnM2f=Xbh=iqb=+zcGn+U6PypuqNdWBUQ@mail.gmail.com>
-Subject: Re: [PATCH net v3] can: raw: fix receiver memory leak
-To: "Ziyang Xuan (William)" <william.xuanziyang@huawei.com>
-Cc: Marc Kleine-Budde <mkl@pengutronix.de>, socketcan@hartkopp.net, davem@davemloft.net, 
-	kuba@kernel.org, pabeni@redhat.com, linux-can@vger.kernel.org, 
-	netdev@vger.kernel.org, penguin-kernel@i-love.sakura.ne.jp
+References: <20230802-fix-dsp_cmx_send-cfi-failure-v1-1-2f2e79b0178d@kernel.org>
+In-Reply-To: <20230802-fix-dsp_cmx_send-cfi-failure-v1-1-2f2e79b0178d@kernel.org>
+From: Sami Tolvanen <samitolvanen@google.com>
+Date: Wed, 2 Aug 2023 10:54:47 -0700
+Message-ID: <CABCJKud-ve+6v5h1QeDwUm4q7XzuhMorDTwAGmsV4h-R+0MKxg@mail.gmail.com>
+Subject: Re: [PATCH] mISDN: Update parameter type of dsp_cmx_send()
+To: Nathan Chancellor <nathan@kernel.org>
+Cc: isdn@linux-pingi.de, netdev@vger.kernel.org, keescook@chromium.org, 
+	llvm@lists.linux.dev, patches@lists.linux.dev, 
+	kernel test robot <oliver.sang@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
 	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
 	T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-	autolearn=unavailable autolearn_force=no version=3.4.6
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Jul 19, 2023 at 9:49=E2=80=AFAM Ziyang Xuan (William)
-<william.xuanziyang@huawei.com> wrote:
->
->
->
-> =E5=9C=A8 2023/7/19 13:04, Eric Dumazet =E5=86=99=E9=81=93:
-> > On Wed, Jul 19, 2023 at 6:41=E2=80=AFAM Ziyang Xuan (William)
-> > <william.xuanziyang@huawei.com> wrote:
-> >>
-> >>> On Mon, Jul 17, 2023 at 9:27=E2=80=AFAM Marc Kleine-Budde <mkl@pengut=
-ronix.de> wrote:
-> >>>>
-> >>>> On 11.07.2023 09:17:37, Ziyang Xuan wrote:
-> >>>>> Got kmemleak errors with the following ltp can_filter testcase:
-> >>>>>
-> >>>>> for ((i=3D1; i<=3D100; i++))
-> >>>>> do
-> >>>>>         ./can_filter &
-> >>>>>         sleep 0.1
-> >>>>> done
-> >>>>>
-> >>>>> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> >>>>> [<00000000db4a4943>] can_rx_register+0x147/0x360 [can]
-> >>>>> [<00000000a289549d>] raw_setsockopt+0x5ef/0x853 [can_raw]
-> >>>>> [<000000006d3d9ebd>] __sys_setsockopt+0x173/0x2c0
-> >>>>> [<00000000407dbfec>] __x64_sys_setsockopt+0x61/0x70
-> >>>>> [<00000000fd468496>] do_syscall_64+0x33/0x40
-> >>>>> [<00000000b7e47d51>] entry_SYSCALL_64_after_hwframe+0x61/0xc6
-> >>>>>
-> >>>>> It's a bug in the concurrent scenario of unregister_netdevice_many(=
-)
-> >>>>> and raw_release() as following:
-> >>>>>
-> >>>>>              cpu0                                        cpu1
-> >>>>> unregister_netdevice_many(can_dev)
-> >>>>>   unlist_netdevice(can_dev) // dev_get_by_index() return NULL after=
- this
-> >>>>>   net_set_todo(can_dev)
-> >>>>>                                               raw_release(can_socke=
-t)
-> >>>>>                                                 dev =3D dev_get_by_=
-index(, ro->ifindex); // dev =3D=3D NULL
-> >>>>>                                                 if (dev) { // recei=
-vers in dev_rcv_lists not free because dev is NULL
-> >>>>>                                                   raw_disable_allfi=
-lters(, dev, );
-> >>>>>                                                   dev_put(dev);
-> >>>>>                                                 }
-> >>>>>                                                 ...
-> >>>>>                                                 ro->bound =3D 0;
-> >>>>>                                                 ...
-> >>>>>
-> >>>>> call_netdevice_notifiers(NETDEV_UNREGISTER, )
-> >>>>>   raw_notify(, NETDEV_UNREGISTER, )
-> >>>>>     if (ro->bound) // invalid because ro->bound has been set 0
-> >>>>>       raw_disable_allfilters(, dev, ); // receivers in dev_rcv_list=
-s will never be freed
-> >>>>>
-> >>>>> Add a net_device pointer member in struct raw_sock to record bound =
-can_dev,
-> >>>>> and use rtnl_lock to serialize raw_socket members between raw_bind(=
-), raw_release(),
-> >>>>> raw_setsockopt() and raw_notify(). Use ro->dev to decide whether to=
- free receivers in
-> >>>>> dev_rcv_lists.
-> >>>>>
-> >>>>> Fixes: 8d0caedb7596 ("can: bcm/raw/isotp: use per module netdevice =
-notifier")
-> >>>>> Signed-off-by: Ziyang Xuan <william.xuanziyang@huawei.com>
-> >>>>> Reviewed-by: Oliver Hartkopp <socketcan@hartkopp.net>
-> >>>>> Acked-by: Oliver Hartkopp <socketcan@hartkopp.net>
-> >>>>
-> >>>> Added to linux-can/testing.
-> >>>>
-> >>>
-> >>> This patch causes three syzbot LOCKDEP reports so far.
-> >>
-> >> Hello Eric,
-> >>
-> >> Is there reproducer? I want to understand the specific root cause.
-> >>
-> >
-> > No repro yet, but simply look at other functions in net/can/raw.c
-> >
-> > You must always take locks in the same order.
-> >
-> > raw_bind(), raw_setsockopt() use:
-> >
-> > rtnl_lock();
-> > lock_sock(sk);
-> >
-> > Therefore, raw_release() must _also_ use the same order, or risk deadlo=
-ck.
-> >
-> > Please build a LOCKDEP enabled kernel, and run your tests ?
->
-> I know now. This needs raw_bind() and raw_setsockopt() concurrent with ra=
-w_release().
-> And there is not the scenario in my current testcase. I did not get it. I=
- will try to
-> reproduce it and add the testcase.
->
-> Thank you for your patient explanation.
+Hi Nathan,
 
-Another syzbot report is firing because of your patch
+On Wed, Aug 2, 2023 at 10:40=E2=80=AFAM Nathan Chancellor <nathan@kernel.or=
+g> wrote:
+>
+> When booting a kernel with CONFIG_MISDN_DSP=3Dy and CONFIG_CFI_CLANG=3Dy,
+> there is a failure when dsp_cmx_send() is called indirectly from
+> call_timer_fn():
+>
+>   [    0.371412] CFI failure at call_timer_fn+0x2f/0x150 (target: dsp_cmx=
+_send+0x0/0x530; expected type: 0x92ada1e9)
+>
+> The function pointer prototype that call_timer_fn() expects is
+>
+>   void (*fn)(struct timer_list *)
+>
+> whereas dsp_cmx_send() has a parameter type of 'void *', which causes
+> the control flow integrity checks to fail because the parameter types do
+> not match.
+>
+> Change dsp_cmx_send()'s parameter type to be 'struct timer_list' to
+> match the expected prototype. The argument is unused anyways, so this
+> has no functional change, aside from avoiding the CFI failure.
 
-Apparently we store in ro->dev a pointer to a netdev without holding a
-refcount on it.
+Looks correct to me, thanks for fixing this!
+
+Reviewed-by: Sami Tolvanen <samitolvanen@google.com>
+
+Sami
 
