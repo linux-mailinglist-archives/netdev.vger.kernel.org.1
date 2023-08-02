@@ -1,74 +1,141 @@
-Return-Path: <netdev+bounces-23502-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23503-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FB0076C371
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 05:18:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B23176C391
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 05:33:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E93201C21189
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 03:18:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B79D01C21178
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 03:33:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 875B6A56;
-	Wed,  2 Aug 2023 03:18:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 428A6EA5;
+	Wed,  2 Aug 2023 03:33:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67E05A40
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 03:18:49 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87C2BC433C9;
-	Wed,  2 Aug 2023 03:18:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690946328;
-	bh=pPUw7iVxQvIYg97/YCPzTavNzCKbFieabBAhT15a2Uo=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=bkcncHKz/50NbkYBuFySUwMr+ehRZ3ht7OWpcR8GWtU9m5OJRSsRdhOZP45x0rMiD
-	 lyx9oHODYj1kNIMtZbddO5jGYdkgXmN1COwQMNkWLN4keMu4QdMN0RHqdPT7Sw3h2S
-	 8sw2tGvk5fH6inIRlp4Za54mZBfkfUTJizanswHdHaemnbxhroj9TkO1PS4gkVr3Jx
-	 knPz4E1dqyrHQVD38G0/LL6vyuxJIXJxePRJO5wvLBqeKNrFqEK83J7nxMFRCfFc/x
-	 1Fj9/5wRTGf13jfSNeHUBBWzT4cvZiFyuMndA0R43CY0RKi5Zfk1cQwBQpbL/1Njwk
-	 8ORqcl2mqQHyA==
-Message-ID: <cbefa473-2d48-5df9-f773-8bb6bdcd6be1@kernel.org>
-Date: Tue, 1 Aug 2023 21:18:47 -0600
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 342E4A40
+	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 03:33:45 +0000 (UTC)
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83FF52116;
+	Tue,  1 Aug 2023 20:33:42 -0700 (PDT)
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.96)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1qR2cD-00009M-09;
+	Wed, 02 Aug 2023 03:33:37 +0000
+Date: Wed, 2 Aug 2023 04:31:09 +0100
+From: Daniel Golle <daniel@makrotopia.org>
+To: netdev@vger.kernel.org, linux-mediatek@lists.infradead.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Felix Fietkau <nbd@nbd.name>, John Crispin <john@phrozen.org>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Mark Lee <Mark-MC.Lee@mediatek.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Subject: [PATCH net-next v3] net: ethernet: mtk_eth_soc: support per-flow
+ accounting on MT7988
+Message-ID: <37a0928fa8c1253b197884c68ce1f54239421ac5.1690946442.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.13.0
-Subject: Re: [PATCH v3] ip6mr: Fix skb_under_panic in ip6mr_cache_report()
-Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>, YueHaibing <yuehaibing@huawei.com>
-Cc: Eric Dumazet <edumazet@google.com>, davem@davemloft.net,
- pabeni@redhat.com, yoshfuji@linux-ipv6.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, simon.horman@corigine.com
-References: <20230801064318.34408-1-yuehaibing@huawei.com>
- <CANn89iJO44CiUjftDZHEjOCy5Q3-PDB12uWTkrbA5JJNXMoeDA@mail.gmail.com>
- <20230801131146.51a9aaf3@kernel.org>
- <0e3e2d6f-0e8d-ccb4-0750-928a568ccaaf@kernel.org>
- <cad2b715-14fc-8424-f85d-b5391e0110dc@huawei.com>
- <20230801191058.0664b1b8@kernel.org>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20230801191058.0664b1b8@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On 8/1/23 8:10 PM, Jakub Kicinski wrote:
-> On Wed, 2 Aug 2023 09:28:31 +0800 YueHaibing wrote:
->>> that pattern shows up a few times:  
->>
->> Ok, I will test and fix these if any.
-> 
-> Thanks, we may also want to add a 
->   DEBUG_NET_WARN_ON_ONCE(len > INT_MAX)
-> in skb_push() but perhaps that's an overkill.
-> Most of those cases are probably legit (skb_.*_offset()
-> can well be negative if headers were already pulled).
+NETSYS_V3 uses 64 bits for each counters while older SoCs are using
+48/40 bits for each counter.
+Support reading per-flow byte and package counters on NETSYS_V3.
 
-Yea, a lot of those could be legit, so it would be best to have a test
-case that shows it can be triggered and then any patch fixes it.
+Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+---
+v3: correct calculation, local variables
+v2: fix typo bytes_cnt_* -> byte_cnt_*
+
+drivers/net/ethernet/mediatek/mtk_eth_soc.c  |  1 +
+ drivers/net/ethernet/mediatek/mtk_ppe.c      | 21 +++++++++++++-------
+ drivers/net/ethernet/mediatek/mtk_ppe_regs.h |  2 ++
+ 3 files changed, 17 insertions(+), 7 deletions(-)
+
+diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.c b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
+index 05be702f19c5..1b89f800f6df 100644
+--- a/drivers/net/ethernet/mediatek/mtk_eth_soc.c
++++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
+@@ -5064,6 +5064,7 @@ static const struct mtk_soc_data mt7988_data = {
+ 	.version = 3,
+ 	.offload_version = 2,
+ 	.hash_offset = 4,
++	.has_accounting = true,
+ 	.foe_entry_size = MTK_FOE_ENTRY_V3_SIZE,
+ 	.txrx = {
+ 		.txd_size = sizeof(struct mtk_tx_dma_v2),
+diff --git a/drivers/net/ethernet/mediatek/mtk_ppe.c b/drivers/net/ethernet/mediatek/mtk_ppe.c
+index bf1ecb0c1c10..973370c3cb51 100644
+--- a/drivers/net/ethernet/mediatek/mtk_ppe.c
++++ b/drivers/net/ethernet/mediatek/mtk_ppe.c
+@@ -92,7 +92,6 @@ static int mtk_ppe_mib_wait_busy(struct mtk_ppe *ppe)
+ 
+ static int mtk_mib_entry_read(struct mtk_ppe *ppe, u16 index, u64 *bytes, u64 *packets)
+ {
+-	u32 byte_cnt_low, byte_cnt_high, pkt_cnt_low, pkt_cnt_high;
+ 	u32 val, cnt_r0, cnt_r1, cnt_r2;
+ 	int ret;
+ 
+@@ -107,12 +106,20 @@ static int mtk_mib_entry_read(struct mtk_ppe *ppe, u16 index, u64 *bytes, u64 *p
+ 	cnt_r1 = readl(ppe->base + MTK_PPE_MIB_SER_R1);
+ 	cnt_r2 = readl(ppe->base + MTK_PPE_MIB_SER_R2);
+ 
+-	byte_cnt_low = FIELD_GET(MTK_PPE_MIB_SER_R0_BYTE_CNT_LOW, cnt_r0);
+-	byte_cnt_high = FIELD_GET(MTK_PPE_MIB_SER_R1_BYTE_CNT_HIGH, cnt_r1);
+-	pkt_cnt_low = FIELD_GET(MTK_PPE_MIB_SER_R1_PKT_CNT_LOW, cnt_r1);
+-	pkt_cnt_high = FIELD_GET(MTK_PPE_MIB_SER_R2_PKT_CNT_HIGH, cnt_r2);
+-	*bytes = ((u64)byte_cnt_high << 32) | byte_cnt_low;
+-	*packets = (pkt_cnt_high << 16) | pkt_cnt_low;
++	if (mtk_is_netsys_v3_or_greater(ppe->eth)) {
++		/* 64 bit for each counter */
++		u32 cnt_r3 = readl(ppe->base + MTK_PPE_MIB_SER_R3);
++		*bytes = ((u64)cnt_r1 << 32) | cnt_r0;
++		*packets = ((u64)cnt_r3 << 32) | cnt_r2;
++	} else {
++		/* 48 bit byte counter, 40 bit packet counter */
++		u32 byte_cnt_low = FIELD_GET(MTK_PPE_MIB_SER_R0_BYTE_CNT_LOW, cnt_r0);
++		u32 byte_cnt_high = FIELD_GET(MTK_PPE_MIB_SER_R1_BYTE_CNT_HIGH, cnt_r1);
++		u32 pkt_cnt_low = FIELD_GET(MTK_PPE_MIB_SER_R1_PKT_CNT_LOW, cnt_r1);
++		u32 pkt_cnt_high = FIELD_GET(MTK_PPE_MIB_SER_R2_PKT_CNT_HIGH, cnt_r2);
++		*bytes = ((u64)byte_cnt_high << 32) | byte_cnt_low;
++		*packets = ((u64)pkt_cnt_high << 16) | pkt_cnt_low;
++	}
+ 
+ 	return 0;
+ }
+diff --git a/drivers/net/ethernet/mediatek/mtk_ppe_regs.h b/drivers/net/ethernet/mediatek/mtk_ppe_regs.h
+index a2e61b3eb006..3ce088eef0ef 100644
+--- a/drivers/net/ethernet/mediatek/mtk_ppe_regs.h
++++ b/drivers/net/ethernet/mediatek/mtk_ppe_regs.h
+@@ -163,6 +163,8 @@ enum {
+ #define MTK_PPE_MIB_SER_R2			0x348
+ #define MTK_PPE_MIB_SER_R2_PKT_CNT_HIGH		GENMASK(23, 0)
+ 
++#define MTK_PPE_MIB_SER_R3			0x34c
++
+ #define MTK_PPE_MIB_CACHE_CTL			0x350
+ #define MTK_PPE_MIB_CACHE_CTL_EN		BIT(0)
+ #define MTK_PPE_MIB_CACHE_CTL_FLUSH		BIT(2)
+-- 
+2.41.0
+
 
