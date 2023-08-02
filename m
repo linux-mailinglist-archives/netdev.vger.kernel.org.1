@@ -1,75 +1,70 @@
-Return-Path: <netdev+bounces-23814-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23815-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8380676DB26
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 01:00:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E131176DB69
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 01:18:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3D026281EA8
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 23:00:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9C7E5281EDA
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 23:18:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50D25154B8;
-	Wed,  2 Aug 2023 23:00:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBD2D134B6;
+	Wed,  2 Aug 2023 23:18:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44AFE10947
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 23:00:33 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (unknown [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4900D1704;
-	Wed,  2 Aug 2023 16:00:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=GtHyUyRhmZC/ndCTfFZSi0G5xoy+tfRuoFtXp1YsIVM=; b=JtvkveQpSmLkLcNOVxyh/y4nHb
-	eTYMyA6kStyZj5Yy/jFPb2xF7atWrkAKg1yr4gKtF8N8z1KdGkUi36hjqtQvmKvw6ONUqa/oTe+JD
-	kt6/EsmDPjRYPCMRIJEGusOt7SGcjY0ijKhia2F2Xyix5ogILECyKSBVNJ10l8l70oMpqbX/LjLH1
-	GGp1uZbfwA8mYOp/WHGLLALFPNi1u+TpE5W80l9dyHQzokAsEjgfyZ6lgHuQBp4SrblStNuUiisxc
-	D5qs27eB3aem//Yq4F4NcLvBO9yCrJASk7v3KcFR+aJfufpkez0Xb8sXT03tCjiNNDKzMUpiZyAot
-	VZVb8eyg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:42338)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qRKp8-0005zV-0u;
-	Thu, 03 Aug 2023 00:00:11 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qRKp0-0002HP-CR; Thu, 03 Aug 2023 00:00:02 +0100
-Date: Thu, 3 Aug 2023 00:00:02 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Michael Walle <mwalle@kernel.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC2C314AAE
+	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 23:18:39 +0000 (UTC)
+Received: from mgamail.intel.com (unknown [192.55.52.136])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 326C7FB;
+	Wed,  2 Aug 2023 16:18:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1691018317; x=1722554317;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=SnhoA5/+6/yFD18HW0GV1yHz1WPLSZnPwIv9nFl7vTg=;
+  b=EFsFrXTYXa2oWl1XWHZW2oKe+xJBavdMSKyqjqwze/3PK0HjOKOKO0Q/
+   efikLjYuGVTS2rnQyUa5MXNVt++stpy8Bn0Fs/Vs8UFpaJrIba9G0+s/D
+   LqoYyIPoEkHG/XwwtOFPrW3r72NKA9ViNZOaIX+E1t7zl1z5u47yP//PM
+   VzJgqbTub8qR8uYjcna4PC7mSPtoXyOvzIV56bHQ7i5mPArPdC+QOl5eo
+   KMCA11T1JIZrIbQONY9YjJYmzNLFF21hMKd4Kuq8lL1nXec0pf6gmtvJM
+   BaoYI5N3zkS2QRN8+AJJ+6oGB7QonkMiQnmKVko1J7raa6MrA6v3UPpH1
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10790"; a="349320358"
+X-IronPort-AV: E=Sophos;i="6.01,250,1684825200"; 
+   d="scan'208";a="349320358"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2023 16:18:36 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10790"; a="679262015"
+X-IronPort-AV: E=Sophos;i="6.01,250,1684825200"; 
+   d="scan'208";a="679262015"
+Received: from lkp-server01.sh.intel.com (HELO d1ccc7e87e8f) ([10.239.97.150])
+  by orsmga003.jf.intel.com with ESMTP; 02 Aug 2023 16:18:32 -0700
+Received: from kbuild by d1ccc7e87e8f with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1qRL6t-0001ZD-2w;
+	Wed, 02 Aug 2023 23:18:31 +0000
+Date: Thu, 3 Aug 2023 07:17:40 +0800
+From: kernel test robot <lkp@intel.com>
+To: Gerd Bayer <gbayer@linux.ibm.com>, Wenjia Zhang <wenjia@linux.ibm.com>,
+	Jan Karcher <jaka@linux.ibm.com>,
+	Tony Lu <tonylu@linux.alibaba.com>, Paolo Abeni <pabeni@redhat.com>
+Cc: oe-kbuild-all@lists.linux.dev, Karsten Graul <kgraul@linux.ibm.com>,
+	"D . Wythe" <alibuda@linux.alibaba.com>,
+	Wen Gu <guwen@linux.alibaba.com>,
+	"David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Yisen Zhuang <yisen.zhuang@huawei.com>,
-	Salil Mehta <salil.mehta@huawei.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
-	Xu Liang <lxu@maxlinear.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Simon Horman <simon.horman@corigine.com>
-Subject: Re: [PATCH net-next v3 02/11] net: phy: introduce
- phy_has_c45_registers()
-Message-ID: <ZMrf8goIsn3PDC2S@shell.armlinux.org.uk>
-References: <20230620-feature-c45-over-c22-v3-2-9eb37edf7be0@kernel.org>
- <7be8b305-f287-4e99-bddd-55646285c427@lunn.ch>
- <867ae3cc05439599d63e4712bca79e27@kernel.org>
- <cf999a14e51b7f2001d9830cc5e11016@kernel.org>
- <ZMkddjabRonGe7Eu@shell.armlinux.org.uk>
- <bce942b71db8c4b9bf741db517e7ca5f@kernel.org>
- <ZMkraPZvWWKhY8lT@shell.armlinux.org.uk>
- <b0e5fbe28757d755d814727181c09f32@kernel.org>
- <ZMp/B2U/qaI/VQDN@shell.armlinux.org.uk>
- <3fa8d14f0a989af971d61af01b13fd8b@kernel.org>
+	Jakub Kicinski <kuba@kernel.org>, linux-s390@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net 2/2] net/smc: Use correct buffer sizes when switching
+ between TCP and SMC
+Message-ID: <202308030722.dV3X9uUQ-lkp@intel.com>
+References: <20230802093313.1501605-3-gbayer@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,69 +73,103 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <3fa8d14f0a989af971d61af01b13fd8b@kernel.org>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RDNS_NONE,SPF_HELO_NONE,
-	SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.6
+In-Reply-To: <20230802093313.1501605-3-gbayer@linux.ibm.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Aug 02, 2023 at 07:11:27PM +0200, Michael Walle wrote:
-> I'm talking about
-> 
-> 	u32 mmd_mask = MDIO_DEVS_PMAPMD | MDIO_DEVS_AN;
-> 	if (!phydev->is_c45 ||
-> 	    (phydev->c45_ids.devices_in_package & mmd_mask) != mmd_mask)
-> 		return -ENODEV;
-> 
-> How should that look like after this series?
+Hi Gerd,
 
-In the case of the marvell10g driver, at least the 88x3310 can be
-accessed via clause 45 bus cycles _or_ the clause 45 indirect
-register access via clause 22. I'm not sure what the clause 22
-registers would contain, whether they contain valid values with
-the exception of the clause 45 indirect access registers because
-there's not enough information in the documentation, and I can't
-access the clause 22 registers on real hardware.
+kernel test robot noticed the following build errors:
 
-Another issue is this PHY has two different ID values. One is
-0x002b 0x09aa, the other is 0x0141 0x0daa. One or other of these
-values appears in the MMDs - in other words, they are not
-consistently used. This means it's impossible to guess what value
-may be in the clause 22 ID registers for this PHY.
+[auto build test ERROR on net-next/main]
+[also build test ERROR on linus/master v6.5-rc4 next-20230802]
+[cannot apply to net/main]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-However, given the way phylib works, the above effectively ensures
-that we detected the PHY using clause 45 accesses, and then goes on
-to verify that we do indeed have the PMAPMD MMD and the AN MMD.
-Effectively, it ensures that get_phy_c45_ids() was used to detect
-the device.
+url:    https://github.com/intel-lab-lkp/linux/commits/Gerd-Bayer/net-smc-Fix-setsockopt-and-sysctl-to-specify-same-buffer-size-again/20230802-193805
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20230802093313.1501605-3-gbayer%40linux.ibm.com
+patch subject: [PATCH net 2/2] net/smc: Use correct buffer sizes when switching between TCP and SMC
+config: nios2-randconfig-r006-20230731 (https://download.01.org/0day-ci/archive/20230803/202308030722.dV3X9uUQ-lkp@intel.com/config)
+compiler: nios2-linux-gcc (GCC) 12.3.0
+reproduce: (https://download.01.org/0day-ci/archive/20230803/202308030722.dV3X9uUQ-lkp@intel.com/reproduce)
 
-So, in effect, this code is ensuring that we discovered the PHY
-using clause 45 accesses, and that at a minimum the PHY also
-indicates that the PMAPMD and AN MMDs are implemented.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202308030722.dV3X9uUQ-lkp@intel.com/
 
-For the bcm84881 driver, it's a similar situation - that's only
-ever been used with a bus that supports _only_ clause 45 accesses.
-Even less idea whether the PHY could respond to clause 22 accesses
-as there is no information available on the PHY.
+All errors (new ones prefixed by >>):
 
-So, I'd suggest both of these are the same - returns -ENODEV if
-the bus doesn't support clause 45 transfers or if the two MMDs
-are not indicated.
+   net/smc/af_smc.c: In function 'smc_adjust_sock_bufsizes':
+>> net/smc/af_smc.c:465:27: error: 'possible_net_t' has no member named 'net'
+     465 |         nnet = nsk->sk_net.net;
+         |                           ^
 
-That said, it _can_ be simplified down to just testing the
-devices_in_package member, because that will only be non-zero if
-we successfully probed the PHY via some accessible way to the
-clause 45 registers. So:
 
-	if ((phydev->c45_ids.devices_in_package & mmd_mask) != mmd_mask)
-		return -ENODEV;
+vim +465 net/smc/af_smc.c
 
-is probably entirely sufficient in both cases.
+   438	
+   439	/* copy only relevant settings and flags of SOL_SOCKET level from smc to
+   440	 * clc socket (since smc is not called for these options from net/core)
+   441	 */
+   442	
+   443	#define SK_FLAGS_SMC_TO_CLC ((1UL << SOCK_URGINLINE) | \
+   444				     (1UL << SOCK_KEEPOPEN) | \
+   445				     (1UL << SOCK_LINGER) | \
+   446				     (1UL << SOCK_BROADCAST) | \
+   447				     (1UL << SOCK_TIMESTAMP) | \
+   448				     (1UL << SOCK_DBG) | \
+   449				     (1UL << SOCK_RCVTSTAMP) | \
+   450				     (1UL << SOCK_RCVTSTAMPNS) | \
+   451				     (1UL << SOCK_LOCALROUTE) | \
+   452				     (1UL << SOCK_TIMESTAMPING_RX_SOFTWARE) | \
+   453				     (1UL << SOCK_RXQ_OVFL) | \
+   454				     (1UL << SOCK_WIFI_STATUS) | \
+   455				     (1UL << SOCK_NOFCS) | \
+   456				     (1UL << SOCK_FILTER_LOCKED) | \
+   457				     (1UL << SOCK_TSTAMP_NEW))
+   458	
+   459	/* if set, use value set by setsockopt() - else use IPv4 or SMC sysctl value */
+   460	static void smc_adjust_sock_bufsizes(struct sock *nsk, struct sock *osk,
+   461					     unsigned long mask)
+   462	{
+   463		struct net *nnet;
+   464	
+ > 465		nnet = nsk->sk_net.net;
+   466	
+   467		nsk->sk_userlocks = osk->sk_userlocks;
+   468	
+   469		if (osk->sk_userlocks & SOCK_SNDBUF_LOCK) {
+   470			nsk->sk_sndbuf = osk->sk_sndbuf;
+   471		} else {
+   472			if (mask == SK_FLAGS_SMC_TO_CLC)
+   473				WRITE_ONCE(nsk->sk_sndbuf,
+   474					   READ_ONCE(nnet->ipv4.sysctl_tcp_wmem[1]));
+   475			else
+   476				WRITE_ONCE(nsk->sk_sndbuf,
+   477					   2 * READ_ONCE(nnet->smc.sysctl_wmem));
+   478		}
+   479		if (osk->sk_userlocks & SOCK_RCVBUF_LOCK) {
+   480			nsk->sk_rcvbuf = osk->sk_rcvbuf;
+   481		} else {
+   482			if (mask == SK_FLAGS_SMC_TO_CLC)
+   483				WRITE_ONCE(nsk->sk_rcvbuf,
+   484					   READ_ONCE(nnet->ipv4.sysctl_tcp_rmem[1]));
+   485			else
+   486				WRITE_ONCE(nsk->sk_rcvbuf,
+   487					   2 * READ_ONCE(nnet->smc.sysctl_rmem));
+   488		}
+   489	}
+   490	
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
