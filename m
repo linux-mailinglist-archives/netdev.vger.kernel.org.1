@@ -1,39 +1,67 @@
-Return-Path: <netdev+bounces-23795-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23796-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B11F276D93D
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 23:10:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 429EF76D94B
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 23:15:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6A8C3281DC0
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 21:10:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E25AC281DB8
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 21:15:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80FCC125AC;
-	Wed,  2 Aug 2023 21:10:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3C5A11CB6;
+	Wed,  2 Aug 2023 21:15:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F101111AD;
-	Wed,  2 Aug 2023 21:10:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id A16EDC433C8;
-	Wed,  2 Aug 2023 21:10:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691010621;
-	bh=U6fwEY6CTug5r3b9WDLABmO5cBrj/XDZhdVoueKrQtc=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Y2kTcAN3AYkOVOEGiwmAZkCCdIQ9M9IKrP+EDBGrQD9Ej//4M9AwTvVAUQCnYXhQM
-	 NvD/5tevUYJM9WqfvhkC2cseOVDORAh+RnmFQk/8fjlRXlWSSFuwERNeelqnojK8nQ
-	 OEBHMgdDM/L8ih49+XTb6rrSyTqsKZbHdFMoBl2uxdGaOwK9KtBxnTjkdvxTLhAV6r
-	 oTH7B3n5fAnpJ6x1m8nBpst8c3n9MHn6ZOKsaIOisT5nQyNeU4TdcAB1RVFyxazsXZ
-	 mjdsWBCVY9KRtdvFhBbuu/dKs+RuXGWZY1TZ/7ahklfVevr3SPanEy8/KLCmrneEFj
-	 +8QDeN634tY6Q==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 81E99E270D3;
-	Wed,  2 Aug 2023 21:10:21 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E83FB100AD
+	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 21:15:22 +0000 (UTC)
+Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94C612708;
+	Wed,  2 Aug 2023 14:15:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1691010922; x=1722546922;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=UGL2vJ6MLNe12v+8D3skuK9/dM3RwPLrOS4RD+wo23g=;
+  b=hmZCZGQEs8ejNPDN4BHJ31HO/3P2bsaI1lk+Yp4u9PgJMiqUtL3LXpUr
+   74mNoNdPNKfp0s4Ia58dKLvWxTcix/lcpKLkAvFEdG9pgpxUrUGfbFQpk
+   Oi648UdH8O6pzl06wI4KzaYIAagAS29lz84idQNUrdb5uCycw/WQ0OVbu
+   c=;
+X-IronPort-AV: E=Sophos;i="6.01,250,1684800000"; 
+   d="scan'208";a="348263066"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-pdx-2a-m6i4x-1197e3af.us-west-2.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2023 21:15:20 +0000
+Received: from EX19MTAUWB002.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
+	by email-inbound-relay-pdx-2a-m6i4x-1197e3af.us-west-2.amazon.com (Postfix) with ESMTPS id 8799310B9AD;
+	Wed,  2 Aug 2023 21:15:18 +0000 (UTC)
+Received: from EX19D002UWC004.ant.amazon.com (10.13.138.186) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Wed, 2 Aug 2023 21:15:18 +0000
+Received: from EX19MTAUWA001.ant.amazon.com (10.250.64.204) by
+ EX19D002UWC004.ant.amazon.com (10.13.138.186) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Wed, 2 Aug 2023 21:15:17 +0000
+Received: from dev-dsk-risbhat-2b-8bdc64cd.us-west-2.amazon.com
+ (10.189.73.169) by mail-relay.amazon.com (10.250.64.204) with Microsoft SMTP
+ Server id 15.2.1118.30 via Frontend Transport; Wed, 2 Aug 2023 21:15:17 +0000
+Received: by dev-dsk-risbhat-2b-8bdc64cd.us-west-2.amazon.com (Postfix, from userid 22673075)
+	id AE701E4C; Wed,  2 Aug 2023 21:15:17 +0000 (UTC)
+From: Rishabh Bhatnagar <risbhat@amazon.com>
+To: <gregkh@linuxfoundation.org>, <lee@kernel.org>
+CC: <davem@davemloft.net>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>,
+	<"stable@vger.kernel.orgstable"@vger.kernel.org>, Eric Dumazet
+	<edumazet@google.com>, Jamal Hadi Salim <jhs@mojatatu.com>, Rishabh Bhatnagar
+	<risbhat@amazon.com>
+Subject: [PATCH 4.19] net/sched: cls_u32: Fix reference counter leak leading to overflow
+Date: Wed, 2 Aug 2023 21:15:15 +0000
+Message-ID: <20230802211515.23078-1-risbhat@amazon.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -41,50 +69,87 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2] riscv,
- bpf: Adapt bpf trampoline to optimized riscv ftrace framework
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169101062152.23031.14952859291909120655.git-patchwork-notify@kernel.org>
-Date: Wed, 02 Aug 2023 21:10:21 +0000
-References: <20230721100627.2630326-1-pulehui@huaweicloud.com>
-In-Reply-To: <20230721100627.2630326-1-pulehui@huaweicloud.com>
-To: Pu Lehui <pulehui@huaweicloud.com>
-Cc: linux-riscv@lists.infradead.org, bpf@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bjorn@kernel.org,
- palmer@dabbelt.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
- martin.lau@linux.dev, song@kernel.org, yhs@fb.com, john.fastabend@gmail.com,
- kpsingh@kernel.org, sdf@google.com, haoluo@google.com, jolsa@kernel.org,
- guoren@kernel.org, suagrfillet@gmail.com, pulehui@huawei.com
+Content-Type: text/plain
+Precedence: Bulk
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
+From: Lee Jones <lee@kernel.org>
 
-This patch was applied to bpf/bpf-next.git (master)
-by Alexei Starovoitov <ast@kernel.org>:
+Upstream commit 04c55383fa5689357bcdd2c8036725a55ed632bc.
 
-On Fri, 21 Jul 2023 18:06:27 +0800 you wrote:
-> From: Pu Lehui <pulehui@huawei.com>
-> 
-> Commit 6724a76cff85 ("riscv: ftrace: Reduce the detour code size to
-> half") optimizes the detour code size of kernel functions to half with
-> T0 register and the upcoming DYNAMIC_FTRACE_WITH_DIRECT_CALLS of riscv
-> is based on this optimization, we need to adapt riscv bpf trampoline
-> based on this. One thing to do is to reduce detour code size of bpf
-> programs, and the second is to deal with the return address after the
-> execution of bpf trampoline. Meanwhile, we need to construct the frame
-> of parent function, otherwise we will miss one layer when unwinding.
-> The related tests have passed.
-> 
-> [...]
+In the event of a failure in tcf_change_indev(), u32_set_parms() will
+immediately return without decrementing the recently incremented
+reference counter.  If this happens enough times, the counter will
+rollover and the reference freed, leading to a double free which can be
+used to do 'bad things'.
 
-Here is the summary with links:
-  - [v2] riscv, bpf: Adapt bpf trampoline to optimized riscv ftrace framework
-    https://git.kernel.org/bpf/bpf-next/c/25ad10658dc1
+In order to prevent this, move the point of possible failure above the
+point where the reference counter is incremented.  Also save any
+meaningful return values to be applied to the return data at the
+appropriate point in time.
 
-You are awesome, thank you!
+This issue was caught with KASAN.
+
+Fixes: 705c7091262d ("net: sched: cls_u32: no need to call tcf_exts_change for newly allocated struct")
+Suggested-by: Eric Dumazet <edumazet@google.com>
+Signed-off-by: Lee Jones <lee@kernel.org>
+Reviewed-by: Eric Dumazet <edumazet@google.com>
+Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Rishabh Bhatnagar <risbhat@amazon.com>
+---
+ net/sched/cls_u32.c | 20 +++++++++++++-------
+ 1 file changed, 13 insertions(+), 7 deletions(-)
+
+diff --git a/net/sched/cls_u32.c b/net/sched/cls_u32.c
+index d30256ac3537..ee8ef606a8e9 100644
+--- a/net/sched/cls_u32.c
++++ b/net/sched/cls_u32.c
+@@ -778,11 +778,22 @@ static int u32_set_parms(struct net *net, struct tcf_proto *tp,
+ 			 struct netlink_ext_ack *extack)
+ {
+ 	int err;
++#ifdef CONFIG_NET_CLS_IND
++	int ifindex = -1;
++#endif
+ 
+ 	err = tcf_exts_validate(net, tp, tb, est, &n->exts, ovr, extack);
+ 	if (err < 0)
+ 		return err;
+ 
++#ifdef CONFIG_NET_CLS_IND
++	if (tb[TCA_U32_INDEV]) {
++		ifindex = tcf_change_indev(net, tb[TCA_U32_INDEV], extack);
++		if (ifindex < 0)
++			return -EINVAL;
++	}
++#endif
++
+ 	if (tb[TCA_U32_LINK]) {
+ 		u32 handle = nla_get_u32(tb[TCA_U32_LINK]);
+ 		struct tc_u_hnode *ht_down = NULL, *ht_old;
+@@ -814,13 +825,8 @@ static int u32_set_parms(struct net *net, struct tcf_proto *tp,
+ 	}
+ 
+ #ifdef CONFIG_NET_CLS_IND
+-	if (tb[TCA_U32_INDEV]) {
+-		int ret;
+-		ret = tcf_change_indev(net, tb[TCA_U32_INDEV], extack);
+-		if (ret < 0)
+-			return -EINVAL;
+-		n->ifindex = ret;
+-	}
++	if (ifindex >= 0)
++		n->ifindex = ifindex;
+ #endif
+ 	return 0;
+ }
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.40.1
 
 
