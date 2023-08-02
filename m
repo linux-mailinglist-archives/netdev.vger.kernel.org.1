@@ -1,36 +1,36 @@
-Return-Path: <netdev+bounces-23516-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23517-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0FD276C48A
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 07:04:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F0B476C48E
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 07:05:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E75FE1C211CB
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 05:04:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CD6091C211CC
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 05:05:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDFFFEC5;
-	Wed,  2 Aug 2023 05:04:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C21A810E2;
+	Wed,  2 Aug 2023 05:05:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDB1615AA
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 05:04:55 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26A01C433C8;
-	Wed,  2 Aug 2023 05:04:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1ED215AA
+	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 05:05:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14365C433CA;
+	Wed,  2 Aug 2023 05:05:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690952695;
-	bh=20F4xPeEvNj9IuAftI9KVAMz4n8aQOzO8rp3P7fmGNc=;
+	s=k20201202; t=1690952726;
+	bh=mqqkGVbU/w5XVGL8wNFiKBrpnoFsZ0U7xfNm17f7El4=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=o9z225Vuo0O0cdGOCNgMKn+dvOU5eE4KM84og9IwU8gxi8fE1GdcLi226AenlSZDC
-	 vyN968CCLHAicKjG2npw9QyTqf5V/7QZu14QhJGEr4DkIVbWKR7qYIecWtVJzw1T7W
-	 EnZjm9vb2bb4d/bdiRASxZ05afIqPnbs8yXhC0nYM0Bqua4+iLDZ9cA8LvkqcX7Vsn
-	 nvgxRUpo8d1lo4C+hmsSlHKapcKTwO2CsB0UjWlgs+UD3Vz5T/i3qPzZGITD2F2V4M
-	 J9k1qrzUxWHpKqpbPVEyzMjyozTZzMyYntlUSlqJqOkJYXnhkJgBP5a4azkS2YzVeZ
-	 YeliueNUPZC5Q==
-Date: Tue, 1 Aug 2023 23:05:59 -0600
+	b=aVODpFlGBTgJf/7xxXR6C30T6BZmJoEN3+kRYa79kTII0nnf6ub3clATPGufXTnTE
+	 P1eFFL1msnaqiFvcfvjhfbIWovhU1tqPpSdnflkPghhkn2lh+hZ5ZVoaHo2VaQypDj
+	 xV+96UEjZDU4q2/giYSW3dfh9wWNayYZcKuYJ63+9jB0uKPZfoy3MyJkKN7gxkmCO0
+	 55jVCANF0xJbgIXgoULvPYhOrsgUFYs10dSKWJ46Pm6V3nVYy/aB/0YZ8yNl8Isl/v
+	 AEa+nwN887eWcZeTNlqhP7f9DUeSP+L1HcCFO/w3mQm7W43LY4naJJaRTzU9eZdGCu
+	 sWK96H0/eRzpQ==
+Date: Tue, 1 Aug 2023 23:06:30 -0600
 From: "Gustavo A. R. Silva" <gustavoars@kernel.org>
 To: Jesse Brandeburg <jesse.brandeburg@intel.com>,
 	Tony Nguyen <anthony.l.nguyen@intel.com>,
@@ -41,9 +41,9 @@ Cc: netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
 	linux-kernel@vger.kernel.org,
 	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
 	linux-hardening@vger.kernel.org
-Subject: [PATCH 2/4][next] i40e: Replace one-element array with flex-array
- member in struct i40e_profile_segment
-Message-ID: <52da391229a45fe3dbd5c43167cdb0701a17a361.1690938732.git.gustavoars@kernel.org>
+Subject: [PATCH 3/4][next] i40e: Replace one-element array with flex-array
+ member in struct i40e_section_table
+Message-ID: <ddc1cde5fe6cb6a0865ae96d0d064298e343720d.1690938732.git.gustavoars@kernel.org>
 References: <cover.1690938732.git.gustavoars@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -56,7 +56,7 @@ Content-Disposition: inline
 In-Reply-To: <cover.1690938732.git.gustavoars@kernel.org>
 
 One-element and zero-length arrays are deprecated. So, replace
-one-element array in struct i40e_profile_segment with flexible-array
+one-element array in struct i40e_section_table with flexible-array
 member.
 
 This results in no differences in binary output.
@@ -68,18 +68,18 @@ Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/drivers/net/ethernet/intel/i40e/i40e_type.h b/drivers/net/ethernet/intel/i40e/i40e_type.h
-index c3d5fe12059a..f7a984304b65 100644
+index f7a984304b65..010261a10f56 100644
 --- a/drivers/net/ethernet/intel/i40e/i40e_type.h
 +++ b/drivers/net/ethernet/intel/i40e/i40e_type.h
-@@ -1487,7 +1487,7 @@ struct i40e_profile_segment {
- 	struct i40e_ddp_version version;
- 	char name[I40E_DDP_NAME_SIZE];
- 	u32 device_table_count;
--	struct i40e_device_id_entry device_table[1];
-+	struct i40e_device_id_entry device_table[];
- };
+@@ -1492,7 +1492,7 @@ struct i40e_profile_segment {
  
  struct i40e_section_table {
+ 	u32 section_count;
+-	u32 section_offset[1];
++	u32 section_offset[];
+ };
+ 
+ struct i40e_profile_section_header {
 -- 
 2.34.1
 
