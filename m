@@ -1,112 +1,99 @@
-Return-Path: <netdev+bounces-23572-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23574-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DE5A76C8C0
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 10:52:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81FC476C8D2
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 10:56:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2748F281C6B
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 08:52:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 337B6281C43
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 08:56:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 404295661;
-	Wed,  2 Aug 2023 08:52:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2207E5672;
+	Wed,  2 Aug 2023 08:56:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 340B35231
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 08:52:52 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE1A02701
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 01:52:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1690966370;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cn4kJjpkm69CQ0RSdkCnqj4AMkcoOLWrcrLXN+EI5z8=;
-	b=CRGsYIQLjXZ2OLxgInNaaxLS0DoHyPuGPLjphAuYxnv1nOpxSMBGHXkLGTOLLznEccxY+S
-	cQECqs6SO4Ncs/j64xmXQiGXNtKkGqCsEc3PR5SOovnKtnIYmy+H3hO5lUumwLF4OFneMX
-	eGgbMuBQKvg8T1iNtrB4N4CrcuMK5N0=
-Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com
- [209.85.208.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-600-ezbckxUZPcmGUg3BsfB20Q-1; Wed, 02 Aug 2023 04:52:48 -0400
-X-MC-Unique: ezbckxUZPcmGUg3BsfB20Q-1
-Received: by mail-lj1-f197.google.com with SMTP id 38308e7fff4ca-2b8405aace3so61064341fa.3
-        for <netdev@vger.kernel.org>; Wed, 02 Aug 2023 01:52:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690966366; x=1691571166;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=cn4kJjpkm69CQ0RSdkCnqj4AMkcoOLWrcrLXN+EI5z8=;
-        b=BlwFpiOcUvNEi37ob6dnf9WKXMLXvVK45sN2CifLUh/c6hZOCqUZ/LiouEyY0IoxBj
-         c8OpQ2bVhEFFd/JNRKHzN2BbWLy/oAFbSrDC+9tJo+nbysd8L9owc0XnGQIpdCdfkKcm
-         vNs7wSECvkFKq/KQ8y+JUVNugHWruxgODxDQyFNajestiZtoKfn3s87kx+fKsGjJAwW8
-         3DOT6Udim5JpK8P/WsmQkqxJCFaLTHJCWeZL8wcAvQRm/CnXKvLejaWPQtaiL/Iy2VcH
-         P0EhLPiqF7GPULPhSUpNuBpZs6uHmowrfCHSAU1MumVbaD3p5wo33oG9ZXwOqsoI7bGA
-         +7Aw==
-X-Gm-Message-State: ABy/qLZtbAS/4eofvx/y6ir3lXfnWeRr2cbG9uUFYXUQ2MrMUhZOkiuD
-	tfx/H3+uQpnmoOZwuFY665RglaSkKIsPcRP8XZUzzdCNiHRStcKkyU/U7KJFjYryw2/SxvLUY80
-	D9iM+zqaouKeLvhga3Wkb2F9LqlK19ypNYRbpsy8a2qE=
-X-Received: by 2002:a05:6512:ba7:b0:4f8:49a8:a0e2 with SMTP id b39-20020a0565120ba700b004f849a8a0e2mr5722514lfv.16.1690966365988;
-        Wed, 02 Aug 2023 01:52:45 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlHmAYhXgEfX/ZHs0nEJbO62OlfGK31XNo/obkKMuwsTFlv9NZBzpnPkC0s74alszt9tB93TIXdi/KBdWuoIyX4=
-X-Received: by 2002:a05:6512:ba7:b0:4f8:49a8:a0e2 with SMTP id
- b39-20020a0565120ba700b004f849a8a0e2mr5722503lfv.16.1690966365686; Wed, 02
- Aug 2023 01:52:45 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F37F410F8
+	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 08:56:19 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6FCCDC433C8;
+	Wed,  2 Aug 2023 08:56:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1690966579;
+	bh=zp23WPmkSwtuj1HRL8AUlLFN3VIgce2JGc1dndKSmno=;
+	h=Date:Cc:Subject:To:References:From:In-Reply-To:From;
+	b=orakVg71I/8oHfMw31ANzKFpHxnxrf4pElcswGPsomLQ+CgBfkx+e0dghScry6uIT
+	 PYpYRuluiWrT1wfwDsXNswJEtFucyxz6kLRKR1lFJ5QKBzjFIi0X00jLtiVpOUFfOq
+	 CZq4GmSC5nE91dAxlAc6UVec2LGlYDr1gsDRLYP4oAT/Q+LudD6I+J3dAkEpJIPlXW
+	 QpBOjou0voqnWeab+6g0exV7ARMGH3HUDCV1M8DeCRQAmEsb+8fNdsvKrEwvu96p5C
+	 ssl8M9/rq5StgkXVK6KKPZN/ET8OpLJ4PrHWVf7Uck7jrwr5LhzzPbQlk6Ta4ewCdP
+	 EAg2hChxkaOzg==
+Message-ID: <f586f586-5a24-4a01-7ac6-6e75b8738b49@kernel.org>
+Date: Wed, 2 Aug 2023 10:56:15 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230802075118.409395-1-idosch@nvidia.com> <20230802075118.409395-14-idosch@nvidia.com>
- <ZMoUPP53JWP7l2pG@dcaratti.users.ipa.redhat.com> <ZMoV1M7Jm51TPtBZ@shredder>
-In-Reply-To: <ZMoV1M7Jm51TPtBZ@shredder>
-From: Davide Caratti <dcaratti@redhat.com>
-Date: Wed, 2 Aug 2023 10:52:34 +0200
-Message-ID: <CAKa-r6uFNPa9TtY35LWypRr70Tzo1M+S=yJKea7p8oNjnixvzg@mail.gmail.com>
-Subject: Re: [PATCH net 13/17] selftests: forwarding: tc_tunnel_key: Make
- filters more specific
-To: Ido Schimmel <idosch@idosch.org>
-Cc: Ido Schimmel <idosch@nvidia.com>, netdev@vger.kernel.org, davem@davemloft.net, 
-	kuba@kernel.org, pabeni@redhat.com, edumazet@google.com, petrm@nvidia.com, 
-	razor@blackwall.org, mirsad.todorovac@alu.unizg.hr
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Cc: hawk@kernel.org, ilias.apalodimas@linaro.org, daniel@iogearbox.net,
+ ast@kernel.org, netdev@vger.kernel.org
+Subject: Re: [RFC PATCH net-next v2 1/2] net: veth: Page pool creation error
+ handling for existing pools only
+Content-Language: en-US
+To: Liang Chen <liangchen.linux@gmail.com>, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ linyunsheng@huawei.com
+References: <20230801061932.10335-1-liangchen.linux@gmail.com>
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <20230801061932.10335-1-liangchen.linux@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Aug 2, 2023 at 10:38=E2=80=AFAM Ido Schimmel <idosch@idosch.org> wr=
-ote:
->
-> On Wed, Aug 02, 2023 at 10:30:52AM +0200, Davide Caratti wrote:
 
-[...]
 
-> >
-> > hello Ido, my 2 cents:
-> >
-> > is it safe to match on the UDP protocol without changing the mausezahn
-> > command line? I see that it's generating generic IP packets at the
-> > moment (i.e. it does '-t ip'). Maybe it's more robust to change
-> > the test to generate ICMP and then match on the ICMP protocol?
->
-> My understanding of the test is that it's transmitting IP packets on the
-> VXLAN device and what $swp1 sees are the encapsulated packets (UDP).
->
+On 01/08/2023 08.19, Liang Chen wrote:
+> The failure handling procedure destroys page pools for all queues,
+> including those that haven't had their page pool created yet. this patch
+> introduces necessary adjustments to prevent potential risks and
+> inconsistency with the error handling behavior.
+> 
+> Signed-off-by: Liang Chen <liangchen.linux@gmail.com>
+> ---
+>   drivers/net/veth.c | 3 ++-
+>   1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/veth.c b/drivers/net/veth.c
+> index 614f3e3efab0..509e901da41d 100644
+> --- a/drivers/net/veth.c
+> +++ b/drivers/net/veth.c
+> @@ -1081,8 +1081,9 @@ static int __veth_napi_enable_range(struct net_device *dev, int start, int end)
+>   err_xdp_ring:
+>   	for (i--; i >= start; i--)
+>   		ptr_ring_cleanup(&priv->rq[i].xdp_ring, veth_ptr_free);
+> +	i = end;
+>   err_page_pool:
+> -	for (i = start; i < end; i++) {
+> +	for (i--; i >= start; i--) {
 
-Ah, right :) sorry for the noise!
+I'm not a fan of this coding style, that iterates backwards, but I can
+see you just inherited the existing style in this function.
 
-Acked-by: Davide Caratti <dcaratti@redhat.com>
+>   		page_pool_destroy(priv->rq[i].page_pool);
+>   		priv->rq[i].page_pool = NULL;
+>   	}
+
+The page_pool_destroy() call handles(exits) if called with NULL.
+So, I don't think this incorrect walking all (start to end) can trigger 
+an actual bug.
+
+Anyhow, I do think this is more correct, so you can append my ACK for 
+the real submission.
+
+Acked-by: Jesper Dangaard Brouer <hawk@kernel.org>
 
 
