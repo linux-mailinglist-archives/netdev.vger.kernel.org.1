@@ -1,91 +1,143 @@
-Return-Path: <netdev+bounces-23804-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23805-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 649D976D9BC
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 23:40:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2EA6976D9FD
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 23:52:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0FBD4281E8D
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 21:40:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DE3B6281DB9
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 21:52:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 479A012B9D;
-	Wed,  2 Aug 2023 21:40:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F131E134B6;
+	Wed,  2 Aug 2023 21:52:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC392D51F;
-	Wed,  2 Aug 2023 21:40:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 58895C433C7;
-	Wed,  2 Aug 2023 21:40:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691012423;
-	bh=NLSSRe4RVRV0fKoewTCaMcbMjSsMEN9rztajQMsWR2U=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=esycnZjyO0VbjW17K3U6sGAkEzCF+dRNGe4hD+KeQ4ImP+IQhHmvmvZARPoH+XNXs
-	 MsCJMYgKdRrUTCV208xUdg08KulgKKbrc3fsyZTKZ1+1VEuE6r9kGDo0xwSDqnKdrj
-	 2qhT2/evFQwN6oEo35S4duyZOiZNfG10og3yRd++S4qFSVeIGPzG7m8Z96N6Tcmh3Q
-	 FiWvXpGSdxVML/QTjDej3Kyisy3yOvURBAqz//gfdCTSDKAb+Ct9u7hxHe7IwQl2Fl
-	 L4YNh9BYpo/1Kc1DmFQacYkWHxfXiM9osnaneUzRAmEhZUetyh8chL5LAJd9rTGXfs
-	 HN0lvuxv5kRbw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 37263E270D3;
-	Wed,  2 Aug 2023 21:40:23 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E45ED10973
+	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 21:52:51 +0000 (UTC)
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id A077526A0;
+	Wed,  2 Aug 2023 14:52:48 -0700 (PDT)
+Received: from linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net (linux.microsoft.com [13.77.154.182])
+	by linux.microsoft.com (Postfix) with ESMTPSA id 0D41D238C43B;
+	Wed,  2 Aug 2023 14:52:48 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 0D41D238C43B
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1691013168;
+	bh=G2LmPikrqZm4cQi6ThuFHrDV8Pbzh+pa+aBYLSIVvvE=;
+	h=From:To:Cc:Subject:Date:From;
+	b=XVM9Y4LP0lCSgBkL4aBH046GoXGmZNTa8+x8fnmJ7ljBzGCFRXofBIXAS5SJFw4pX
+	 yboDlcke1xFXS17VNQACnSDMqJ+OwxGRRuEmLclB7DsWjPaS6QdtFUvf5j81obSCfv
+	 C2giAzGiR3+8N2elfdWLXOhv0/eTwTS/4ccABBGk=
+From: Sonia Sharma <sosha@linux.microsoft.com>
+To: linux-kernel@vger.kernel.org
+Cc: linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org,
+	sosha@microsoft.com,
+	kys@microsoft.com,
+	mikelley@microsoft.com,
+	haiyangz@microsoft.com,
+	wei.liu@kernel.org,
+	decui@microsoft.com,
+	longli@microsoft.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Subject: [PATCH v2 net] net: hv_netvsc: fix netvsc_send_completion to avoid multiple message length checks
+Date: Wed,  2 Aug 2023 14:52:41 -0700
+Message-Id: <1691013161-14054-1-git-send-email-sosha@linux.microsoft.com>
+X-Mailer: git-send-email 1.8.3.1
+X-Spam-Status: No, score=-17.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,
+	USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH bpf-next v5 0/2] bpf,
- xdp: Add tracepoint to xdp attaching failure
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169101242321.7476.5572550064226640292.git-patchwork-notify@kernel.org>
-Date: Wed, 02 Aug 2023 21:40:23 +0000
-References: <20230801142621.7925-1-hffilwlqm@gmail.com>
-In-Reply-To: <20230801142621.7925-1-hffilwlqm@gmail.com>
-To: Leon Hwang <hffilwlqm@gmail.com>
-Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net,
- john.fastabend@gmail.com, andrii@kernel.org, martin.lau@linux.dev,
- song@kernel.org, yonghong.song@linux.dev, kpsingh@kernel.org, sdf@google.com,
- haoluo@google.com, jolsa@kernel.org, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, hawk@kernel.org,
- rostedt@goodmis.org, mhiramat@kernel.org, mykolal@fb.com, shuah@kernel.org,
- tangyeechou@gmail.com, kernel-patches-bot@fb.com,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linux-trace-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
 
-Hello:
+From: Sonia Sharma <sonia.sharma@linux.microsoft.com>
 
-This series was applied to bpf/bpf-next.git (master)
-by Alexei Starovoitov <ast@kernel.org>:
+The switch statement in netvsc_send_completion() is incorrectly validating
+the length of incoming network packets by falling through to the next case.
+Avoid the fallthrough. Instead break after a case match and then process
+the complete() call.
 
-On Tue,  1 Aug 2023 22:26:19 +0800 you wrote:
-> This series introduces a new tracepoint in bpf_xdp_link_attach(). By
-> this tracepoint, error message will be captured when error happens in
-> dev_xdp_attach(), e.g. invalid attaching flags.
-> 
-> v4 -> v5:
-> * Initialise the extack variable.
-> * Fix code style issue of variable declaration lines.
-> 
-> [...]
+Signed-off-by: Sonia Sharma <sonia.sharma@linux.microsoft.com>
+---
+ drivers/net/hyperv/netvsc.c | 17 +++++++++--------
+ 1 file changed, 9 insertions(+), 8 deletions(-)
 
-Here is the summary with links:
-  - [bpf-next,v5,1/2] bpf, xdp: Add tracepoint to xdp attaching failure
-    https://git.kernel.org/bpf/bpf-next/c/bf4ea1d0b2cb
-  - [bpf-next,v5,2/2] selftests/bpf: Add testcase for xdp attaching failure tracepoint
-    https://git.kernel.org/bpf/bpf-next/c/7fedbf32fcc7
-
-You are awesome, thank you!
+diff --git a/drivers/net/hyperv/netvsc.c b/drivers/net/hyperv/netvsc.c
+index 82e9796c8f5e..347688dd2eb9 100644
+--- a/drivers/net/hyperv/netvsc.c
++++ b/drivers/net/hyperv/netvsc.c
+@@ -851,7 +851,7 @@ static void netvsc_send_completion(struct net_device *ndev,
+ 				   msglen);
+ 			return;
+ 		}
+-		fallthrough;
++		break;
+ 
+ 	case NVSP_MSG1_TYPE_SEND_RECV_BUF_COMPLETE:
+ 		if (msglen < sizeof(struct nvsp_message_header) +
+@@ -860,7 +860,7 @@ static void netvsc_send_completion(struct net_device *ndev,
+ 				   msglen);
+ 			return;
+ 		}
+-		fallthrough;
++		break;
+ 
+ 	case NVSP_MSG1_TYPE_SEND_SEND_BUF_COMPLETE:
+ 		if (msglen < sizeof(struct nvsp_message_header) +
+@@ -869,7 +869,7 @@ static void netvsc_send_completion(struct net_device *ndev,
+ 				   msglen);
+ 			return;
+ 		}
+-		fallthrough;
++		break;
+ 
+ 	case NVSP_MSG5_TYPE_SUBCHANNEL:
+ 		if (msglen < sizeof(struct nvsp_message_header) +
+@@ -878,10 +878,6 @@ static void netvsc_send_completion(struct net_device *ndev,
+ 				   msglen);
+ 			return;
+ 		}
+-		/* Copy the response back */
+-		memcpy(&net_device->channel_init_pkt, nvsp_packet,
+-		       sizeof(struct nvsp_message));
+-		complete(&net_device->channel_init_wait);
+ 		break;
+ 
+ 	case NVSP_MSG1_TYPE_SEND_RNDIS_PKT_COMPLETE:
+@@ -904,13 +900,18 @@ static void netvsc_send_completion(struct net_device *ndev,
+ 
+ 		netvsc_send_tx_complete(ndev, net_device, incoming_channel,
+ 					desc, budget);
+-		break;
++		return;
+ 
+ 	default:
+ 		netdev_err(ndev,
+ 			   "Unknown send completion type %d received!!\n",
+ 			   nvsp_packet->hdr.msg_type);
+ 	}
++
++	/* Copy the response back */
++	memcpy(&net_device->channel_init_pkt, nvsp_packet,
++			sizeof(struct nvsp_message));
++	complete(&net_device->channel_init_wait);
+ }
+ 
+ static u32 netvsc_get_next_send_section(struct netvsc_device *net_device)
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.25.1
 
 
