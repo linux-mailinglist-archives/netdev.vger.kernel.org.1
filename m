@@ -1,67 +1,74 @@
-Return-Path: <netdev+bounces-23671-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23672-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC5B376D118
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 17:09:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D82476D11C
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 17:09:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DD1711C212F2
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 15:09:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C39131C21308
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 15:09:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBDF4882D;
-	Wed,  2 Aug 2023 15:09:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 910438839;
+	Wed,  2 Aug 2023 15:09:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BFEF8BE3
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 15:09:15 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3C46C433C9;
-	Wed,  2 Aug 2023 15:09:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 885CA8BE3
+	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 15:09:44 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9AB2C433C8;
+	Wed,  2 Aug 2023 15:09:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690988954;
-	bh=l7L4Zg40wpvg7phjkfx5DUjxF1SbkFE+rcjcKObTNbk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=QDNposHknVlDeMRvEG/MDfZEnwJ71kGx1q+njzovP0cEra9ZXAQiEAh5s8mMjaPh/
-	 PA+ibKsLBc3S4Hfyr5lVG9Xo9Q8m+9ZUJFBTO5g5ynCNSPv93NA/ltLhK649RYfbZ6
-	 dyQzFJPy5/G4sw1tyONwGRfIalJEXGCg8ttcHPlpLWrnUA109Gj4c8vRrvirV46Awy
-	 0/39n+MfmhG8QoFtgMMzH1xLFTK943KXoQt4rshAidjus/9dEnkN/YYRbBj+cTJTtq
-	 uGAzhdXqCjKueKjesF7fbGPNONwtl4Pk1l2CYbwAIshuRDj6yEEtZ2mvDwvNTbjneC
-	 w1gtUZkfbq/Rw==
-Date: Wed, 2 Aug 2023 17:09:10 +0200
-From: Simon Horman <horms@kernel.org>
-To: Yue Haibing <yuehaibing@huawei.com>
-Cc: jmaloy@redhat.com, ying.xue@windriver.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	lucien.xin@gmail.com, netdev@vger.kernel.org,
-	tipc-discussion@lists.sourceforge.net
-Subject: Re: [PATCH net-next] tipc: Remove unused function declarations
-Message-ID: <ZMpxllF9qdtC6nVd@kernel.org>
-References: <20230802034659.39840-1-yuehaibing@huawei.com>
+	s=k20201202; t=1690988984;
+	bh=YrzpzPickNgUVSyYCQF1QK9PcxzGL14goCfH88SPDmM=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=tZrZmtsv2Yib0ypbJyfNiG6bsFTZpqAIE7UUFAA7bKoLpjJCyYCadyLcQZ8Z6ZEbM
+	 AQvatsj2ER4ibeGDmNYRIWKu4lA90hsXogAYOsuEl3t902AkaK62bfVIDjAnlw5xl9
+	 HCISTdN+KtjGSlMaUPtibVYBqBAnlT4tqnoNY53n42RI2vDK2EUAL4OzSL8CkaQtvl
+	 wtGDIyHOsQhZU/j4CZvthy+beOoT/R4Zt1IRwlcaXztoKYpF3cTRkgReIFdnN5RoBs
+	 O4wYhmJtPv+AKdkx+7vtsx4/XpUABuQqu0WvYWmPhmgGiVFhdeXwhxnlOu69oTHsSM
+	 5RTNWhNaK41tg==
+Message-ID: <e1cdc917-f18c-59df-0956-ffb1c16c2a9c@kernel.org>
+Date: Wed, 2 Aug 2023 09:09:42 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230802034659.39840-1-yuehaibing@huawei.com>
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.13.0
+Subject: Re: [PATCH net 4/6] tcp_metrics: annotate data-races around
+ tm->tcpm_vals[]
+Content-Language: en-US
+To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com,
+ Kuniyuki Iwashima <kuniyu@amazon.com>
+References: <20230802131500.1478140-1-edumazet@google.com>
+ <20230802131500.1478140-5-edumazet@google.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20230802131500.1478140-5-edumazet@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Aug 02, 2023 at 11:46:59AM +0800, Yue Haibing wrote:
-> Commit d50ccc2d3909 ("tipc: add 128-bit node identifier") declared but never
-> implemented tipc_node_id2hash().
-> Also commit 5c216e1d28c8 ("tipc: Allow run-time alteration of default link settings")
-> never implemented tipc_media_set_priority() and tipc_media_set_window(),
-> commit cad2929dc432 ("tipc: update a binding service via broadcast") only declared
-> tipc_named_bcast().
+On 8/2/23 7:14 AM, Eric Dumazet wrote:
+> tm->tcpm_vals[] values can be read or written locklessly.
 > 
-> Since commit be07f056396d ("tipc: simplify the finalize work queue")
-> tipc_sched_net_finalize() is removed and declaration is unused.
+> Add needed READ_ONCE()/WRITE_ONCE() to document this,
+> and force use of tcp_metric_get() and tcp_metric_set()
 > 
-> Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
+> Fixes: 51c5d0c4b169 ("tcp: Maintain dynamic metrics in local cache.")
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> ---
+>  net/ipv4/tcp_metrics.c | 23 ++++++++++++++---------
+>  1 file changed, 14 insertions(+), 9 deletions(-)
+> 
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Reviewed-by: David Ahern <dsahern@kernel.org>
+
+
 
