@@ -1,70 +1,50 @@
-Return-Path: <netdev+bounces-23815-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23816-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E131176DB69
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 01:18:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD2A976DB6F
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 01:20:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9C7E5281EDA
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 23:18:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7FE661C2120C
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 23:20:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBD2D134B6;
-	Wed,  2 Aug 2023 23:18:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B687156C0;
+	Wed,  2 Aug 2023 23:20:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC2C314AAE
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 23:18:39 +0000 (UTC)
-Received: from mgamail.intel.com (unknown [192.55.52.136])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 326C7FB;
-	Wed,  2 Aug 2023 16:18:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1691018317; x=1722554317;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=SnhoA5/+6/yFD18HW0GV1yHz1WPLSZnPwIv9nFl7vTg=;
-  b=EFsFrXTYXa2oWl1XWHZW2oKe+xJBavdMSKyqjqwze/3PK0HjOKOKO0Q/
-   efikLjYuGVTS2rnQyUa5MXNVt++stpy8Bn0Fs/Vs8UFpaJrIba9G0+s/D
-   LqoYyIPoEkHG/XwwtOFPrW3r72NKA9ViNZOaIX+E1t7zl1z5u47yP//PM
-   VzJgqbTub8qR8uYjcna4PC7mSPtoXyOvzIV56bHQ7i5mPArPdC+QOl5eo
-   KMCA11T1JIZrIbQONY9YjJYmzNLFF21hMKd4Kuq8lL1nXec0pf6gmtvJM
-   BaoYI5N3zkS2QRN8+AJJ+6oGB7QonkMiQnmKVko1J7raa6MrA6v3UPpH1
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10790"; a="349320358"
-X-IronPort-AV: E=Sophos;i="6.01,250,1684825200"; 
-   d="scan'208";a="349320358"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2023 16:18:36 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10790"; a="679262015"
-X-IronPort-AV: E=Sophos;i="6.01,250,1684825200"; 
-   d="scan'208";a="679262015"
-Received: from lkp-server01.sh.intel.com (HELO d1ccc7e87e8f) ([10.239.97.150])
-  by orsmga003.jf.intel.com with ESMTP; 02 Aug 2023 16:18:32 -0700
-Received: from kbuild by d1ccc7e87e8f with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1qRL6t-0001ZD-2w;
-	Wed, 02 Aug 2023 23:18:31 +0000
-Date: Thu, 3 Aug 2023 07:17:40 +0800
-From: kernel test robot <lkp@intel.com>
-To: Gerd Bayer <gbayer@linux.ibm.com>, Wenjia Zhang <wenjia@linux.ibm.com>,
-	Jan Karcher <jaka@linux.ibm.com>,
-	Tony Lu <tonylu@linux.alibaba.com>, Paolo Abeni <pabeni@redhat.com>
-Cc: oe-kbuild-all@lists.linux.dev, Karsten Graul <kgraul@linux.ibm.com>,
-	"D . Wythe" <alibuda@linux.alibaba.com>,
-	Wen Gu <guwen@linux.alibaba.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, linux-s390@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net 2/2] net/smc: Use correct buffer sizes when switching
- between TCP and SMC
-Message-ID: <202308030722.dV3X9uUQ-lkp@intel.com>
-References: <20230802093313.1501605-3-gbayer@linux.ibm.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F36FB134CD
+	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 23:20:47 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F7AEFB;
+	Wed,  2 Aug 2023 16:20:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=CRJ7vMQLW7U6UOyFgRLRFb67Q+Q0phGcYSZclE5+vFQ=; b=xW5rnJQqHP7YJJEY+we7/eIkS/
+	W1D/PiihhnJPxoJer0BsA4v4yHbwMSYEw3KWVC1LlwFLVsVymemB7RdgfOm3ZaYCgpuutbV5zlkKB
+	HZ4qSP+fS1ptPPMHwslE+pXSDRelVwu7fmUGp7Rgsj/7JGLobjhtyb0bfjD3MqF0lFFU=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qRL8r-002voa-Cl; Thu, 03 Aug 2023 01:20:33 +0200
+Date: Thu, 3 Aug 2023 01:20:33 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: nick.hawkins@hpe.com
+Cc: christophe.jaillet@wanadoo.fr, simon.horman@corigine.com,
+	verdun@hpe.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, robh+dt@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 4/5] net: hpe: Add GXP UMAC Driver
+Message-ID: <fb656c31-ecc3-408a-a719-cba65a6aa984@lunn.ch>
+References: <20230802201824.3683-1-nick.hawkins@hpe.com>
+ <20230802201824.3683-5-nick.hawkins@hpe.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,103 +53,291 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230802093313.1501605-3-gbayer@linux.ibm.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20230802201824.3683-5-nick.hawkins@hpe.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Gerd,
+> The MDIO(mdio0) interface from the primary MAC (umac0) is used for
+> external PHY status and configuration.
 
-kernel test robot noticed the following build errors:
+This is not necessarily true. Linux does not care where the PHYs are,
+they could be on a bit-banging bus, or if mdio1 also has external
+pins, on there. Or there might not be any PHYs are all, because the
+MAC is connected to an Ethernet switch etc.
 
-[auto build test ERROR on net-next/main]
-[also build test ERROR on linus/master v6.5-rc4 next-20230802]
-[cannot apply to net/main]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+The reference design is just a guide, the hardware designer is free to
+do something else.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Gerd-Bayer/net-smc-Fix-setsockopt-and-sysctl-to-specify-same-buffer-size-again/20230802-193805
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20230802093313.1501605-3-gbayer%40linux.ibm.com
-patch subject: [PATCH net 2/2] net/smc: Use correct buffer sizes when switching between TCP and SMC
-config: nios2-randconfig-r006-20230731 (https://download.01.org/0day-ci/archive/20230803/202308030722.dV3X9uUQ-lkp@intel.com/config)
-compiler: nios2-linux-gcc (GCC) 12.3.0
-reproduce: (https://download.01.org/0day-ci/archive/20230803/202308030722.dV3X9uUQ-lkp@intel.com/reproduce)
+> diff --git a/drivers/net/ethernet/hpe/Kconfig b/drivers/net/ethernet/hpe/Kconfig
+> new file mode 100644
+> index 000000000000..c04aa22ce02f
+> --- /dev/null
+> +++ b/drivers/net/ethernet/hpe/Kconfig
+> @@ -0,0 +1,32 @@
+> +config NET_VENDOR_HPE
+> +	bool "HPE device"
+> +	default y
+> +	depends on ARCH_HPE
+> +	help
+> +	  Say y here to support the HPE network devices.
+> +	  The GXP contains two Ethernet MACs that can be
+> +	  connected externally to several physical devices.
+> +	  From an external interface perspective the BMC
+> +	  provides two SERDES interface connections capable
+> +	  of either SGMII or 1000Base-X operation. The BMC
+> +	  also provides a RMII interface for sideband
+> +	  connections to external Ethernet controllers.
+> +
+> +if NET_VENDOR_HPE
+> +
+> +config GXP_UMAC
+> +	tristate "GXP UMAC support"
+> +	depends on ARCH_HPE
+> +	select CRC32
+> +	select MII
+> +	select PHYLIB
+> +	select GXP_UMAC_MDIO
+> +	help
+> +	  Say y here to support the GXP UMACs interface. The
+> +	  primary MAC (umac0) can be mapped to either
+> +	  SGMII/1000-BaseX SERDES interface. The secondary MAC
+> +	  (umac1) can be mapped to only the second
+> +	  SGMII/1000-Base X Serdes interface or it can be
+> +	  mapped for RMII sideband.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202308030722.dV3X9uUQ-lkp@intel.com/
+You also want to be able to build this driver with compile testing,
+same as the MDIO driver.
 
-All errors (new ones prefixed by >>):
+> +#include <linux/dma-mapping.h>
+> +#include <linux/etherdevice.h>
+> +#include <linux/ethtool.h>
+> +#include <linux/iopoll.h>
+> +#include <linux/module.h>
+> +#include <net/ncsi.h>
+> +#include <linux/of_device.h>
+> +#include <linux/of_mdio.h>
+> +#include <linux/of_net.h>
+> +#include <linux/phy.h>
+> +#include "gxp-umac.h"
+> +
+> +#define PHY_88E1514_COPPER_CONTROL_REG		0
+> +#define PHY_88E1514_PAGE_ADDRESS		22
+> +
+> +#define PHY_88E1514_GENERAL_CONTROL_REG1	20
 
-   net/smc/af_smc.c: In function 'smc_adjust_sock_bufsizes':
->> net/smc/af_smc.c:465:27: error: 'possible_net_t' has no member named 'net'
-     465 |         nnet = nsk->sk_net.net;
-         |                           ^
+Didn't i comment last time, that the MAC driver should never touch PHY
+registers? 
 
+> +
+> +#define DRV_MODULE_NAME		"gxp-umac"
+> +#define DRV_MODULE_VERSION	"0.1"
 
-vim +465 net/smc/af_smc.c
+Versions are pointless. Please Remove it.
 
-   438	
-   439	/* copy only relevant settings and flags of SOL_SOCKET level from smc to
-   440	 * clc socket (since smc is not called for these options from net/core)
-   441	 */
-   442	
-   443	#define SK_FLAGS_SMC_TO_CLC ((1UL << SOCK_URGINLINE) | \
-   444				     (1UL << SOCK_KEEPOPEN) | \
-   445				     (1UL << SOCK_LINGER) | \
-   446				     (1UL << SOCK_BROADCAST) | \
-   447				     (1UL << SOCK_TIMESTAMP) | \
-   448				     (1UL << SOCK_DBG) | \
-   449				     (1UL << SOCK_RCVTSTAMP) | \
-   450				     (1UL << SOCK_RCVTSTAMPNS) | \
-   451				     (1UL << SOCK_LOCALROUTE) | \
-   452				     (1UL << SOCK_TIMESTAMPING_RX_SOFTWARE) | \
-   453				     (1UL << SOCK_RXQ_OVFL) | \
-   454				     (1UL << SOCK_WIFI_STATUS) | \
-   455				     (1UL << SOCK_NOFCS) | \
-   456				     (1UL << SOCK_FILTER_LOCKED) | \
-   457				     (1UL << SOCK_TSTAMP_NEW))
-   458	
-   459	/* if set, use value set by setsockopt() - else use IPv4 or SMC sysctl value */
-   460	static void smc_adjust_sock_bufsizes(struct sock *nsk, struct sock *osk,
-   461					     unsigned long mask)
-   462	{
-   463		struct net *nnet;
-   464	
- > 465		nnet = nsk->sk_net.net;
-   466	
-   467		nsk->sk_userlocks = osk->sk_userlocks;
-   468	
-   469		if (osk->sk_userlocks & SOCK_SNDBUF_LOCK) {
-   470			nsk->sk_sndbuf = osk->sk_sndbuf;
-   471		} else {
-   472			if (mask == SK_FLAGS_SMC_TO_CLC)
-   473				WRITE_ONCE(nsk->sk_sndbuf,
-   474					   READ_ONCE(nnet->ipv4.sysctl_tcp_wmem[1]));
-   475			else
-   476				WRITE_ONCE(nsk->sk_sndbuf,
-   477					   2 * READ_ONCE(nnet->smc.sysctl_wmem));
-   478		}
-   479		if (osk->sk_userlocks & SOCK_RCVBUF_LOCK) {
-   480			nsk->sk_rcvbuf = osk->sk_rcvbuf;
-   481		} else {
-   482			if (mask == SK_FLAGS_SMC_TO_CLC)
-   483				WRITE_ONCE(nsk->sk_rcvbuf,
-   484					   READ_ONCE(nnet->ipv4.sysctl_tcp_rmem[1]));
-   485			else
-   486				WRITE_ONCE(nsk->sk_rcvbuf,
-   487					   2 * READ_ONCE(nnet->smc.sysctl_rmem));
-   488		}
-   489	}
-   490	
+> +#define NUMBER_OF_PORTS 2
+> +#define EXTERNAL_PORT 1
+> +#define INTERNAL_PORT 0
+> +
+> +struct umac_priv {
+> +	void __iomem *base;
+> +	int irq;
+> +	struct platform_device *pdev;
+> +	struct umac_tx_descs *tx_descs;
+> +	struct umac_rx_descs *rx_descs;
+> +	dma_addr_t tx_descs_dma_addr;
+> +	dma_addr_t rx_descs_dma_addr;
+> +	unsigned int tx_cur;
+> +	unsigned int tx_done;
+> +	unsigned int rx_cur;
+> +	struct napi_struct napi;
+> +	struct net_device *ndev;
+> +	struct phy_device *phy_dev;
+> +	struct phy_device *int_phy_dev;
+> +	struct ncsi_dev *ncsidev;
+> +	bool use_ncsi;
+> +};
+> +
+> +static void umac_get_drvinfo(struct net_device *ndev,
+> +			     struct ethtool_drvinfo *info)
+> +{
+> +	strscpy(info->driver, DRV_MODULE_NAME, sizeof(info->driver));
+> +	strscpy(info->version, DRV_MODULE_VERSION, sizeof(info->version));
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Please drop this. The kernel will then fill version with the actual
+kernel version, and i think git hash. That it useful, unlike your
+"0.1".
+
+> +static int umac_get_link_ksettings(struct net_device *ndev,
+> +				   struct ethtool_link_ksettings *cmd)
+> +{
+> +	phy_ethtool_ksettings_get(ndev->phydev, cmd);
+
+return what phy_ethtool_ksettings_get returns. Also, please use
+phy_ethtool_get_link_ksettings().
+
+> +	return phy_ethtool_ksettings_set(ndev->phydev, cmd);
+
+phy_ethtool_set_link_ksettings(). Please look at what helpers are
+available, and use them.
+
+> +static u32 umac_get_link(struct net_device *ndev)
+> +{
+> +	int err;
+> +
+> +	err = genphy_update_link(ndev->phydev);
+> +	if (err)
+> +		return ethtool_op_get_link(ndev);
+> +
+> +	return ndev->phydev->link;
+> +}
+
+Should not be needed. 
+
+> +static int umac_int_phy_init(struct umac_priv *umac)
+> +{
+> +	struct phy_device *phy_dev = umac->int_phy_dev;
+> +	unsigned int value;
+> +
+> +	value = phy_read(phy_dev, 0);
+> +	if (value & 0x4000)
+> +		pr_info("Internal PHY loopback is enabled - clearing\n");
+
+How is the PHY getting into loopback mode? The MAC driver should never
+touch the PHY, because you have no idea what the PHY actually is,
+unless it is internal. And i doubt you have licensed this PHY from
+Marvell to make it internal.
+
+> +static int umac_phy_fixup(struct phy_device *phy_dev)
+> +{
+> +	unsigned int value;
+> +
+> +	/* set phy mode to SGMII to copper */
+> +	/* set page to 18 by writing 18 to register 22 */
+> +	phy_write(phy_dev, PHY_88E1514_PAGE_ADDRESS, 18);
+> +	value = phy_read(phy_dev, PHY_88E1514_GENERAL_CONTROL_REG1);
+> +	value &= ~0x07;
+> +	value |= 0x01;
+> +	phy_write(phy_dev, PHY_88E1514_GENERAL_CONTROL_REG1, value);
+
+The PHY driver should do this, not the MAC. When you connect the MAC
+to the PHY, set the correct interface mode.
+
+> +static int umac_init_hw(struct net_device *ndev)
+> +{
+
+...
+
+> +		if (ndev->phydev->duplex)
+> +			value |= UMAC_CFG_FULL_DUPLEX;
+> +		else
+> +			value &= ~UMAC_CFG_FULL_DUPLEX;
+> +
+> +		if (ndev->phydev->speed == SPEED_1000) {
+> +			value &= ~UMAC_CFG_TX_CLK_EN;
+> +			value |= UMAC_CFG_GTX_CLK_EN;
+> +			value |= UMAC_CFG_GIGABIT_MODE;
+> +		} else {
+> +			value |= UMAC_CFG_TX_CLK_EN;
+> +			value &= ~UMAC_CFG_GTX_CLK_EN;
+> +			value &= ~UMAC_CFG_GIGABIT_MODE;
+> +		}
+> +	}
+
+It is only safe to access members of phydev inside the adjust_link
+callback. At that point, the members are guaranteed to the consistent.
+
+> +static int umac_open(struct net_device *ndev)
+> +{
+> +
+> +	netdev_info(ndev, "%s is OPENED\n", ndev->name);
+
+Don't spam the log. netdev_dbg(), or nothing.
+
+> +static int umac_init_mac_address(struct net_device *ndev)
+> +{
+> +	struct umac_priv *umac = netdev_priv(ndev);
+> +	struct platform_device *pdev = umac->pdev;
+> +	char addr[ETH_ALEN];
+> +	int err;
+> +
+> +	err = of_get_mac_address(pdev->dev.of_node, addr);
+> +	if (err)
+> +		netdev_err(ndev, "Failed to get address from device-tree: %d\n",
+> +			   err);
+> +
+> +	if (is_valid_ether_addr(addr)) {
+> +		dev_addr_set(ndev, addr);
+> +		netdev_info(ndev,
+> +			    "Read MAC address %pM from DTB\n", ndev->dev_addr);
+> +	} else {
+> +		eth_hw_addr_random(ndev);
+> +		netdev_info(ndev, "Generated random MAC address %pM\n",
+> +			    ndev->dev_addr);
+
+of_get_mac_address() should return an error if there is no MAC address
+available. If you get this far, the MAC address in DT, or the NVMEM is
+invalid. So you probably want to print an error message about the
+invalid MAC address and return -EINVAL.
+
+> +static void umac_adjust_link(struct net_device *ndev)
+> +{
+> +	struct umac_priv *umac = netdev_priv(ndev);
+> +	int value;
+> +
+> +	if (ndev->phydev->link) {
+> +		/* disable both clock */
+> +		value = readl(umac->base + UMAC_CONFIG_STATUS);
+> +		value &= 0xfffff9ff;
+> +		writel(value, umac->base + UMAC_CONFIG_STATUS);
+> +		udelay(2);
+> +
+> +		if (ndev->phydev->duplex)
+> +			value |= UMAC_CFG_FULL_DUPLEX;
+> +		else
+> +			value &= ~UMAC_CFG_FULL_DUPLEX;
+> +
+> +		switch (ndev->phydev->speed) {
+> +		case SPEED_1000:
+> +			value &= ~UMAC_CFG_TX_CLK_EN;
+> +			value |= UMAC_CFG_GTX_CLK_EN;
+> +			value |= UMAC_CFG_GIGABIT_MODE;
+> +			break;
+> +		case SPEED_100:
+> +			value |= UMAC_CFG_TX_CLK_EN;
+> +			value &= ~UMAC_CFG_GTX_CLK_EN;
+> +			value &= ~UMAC_CFG_GIGABIT_MODE;
+> +			break;
+> +		}
+
+What about SPEED_10? value will be random from whatever is on the
+stack, and you write it to UMAC_CONFIG_STATUS.
+
+> +		/* update duplex and gigabit_mode to umac */
+> +		writel(value, umac->base + UMAC_CONFIG_STATUS);
+> +		udelay(2);
+> +
+> +		netif_carrier_on(ndev);
+
+Should not be needed. phylib will do it for you.
+
+> +		netif_carrier_off(ndev);
+
+phylib will also do this.
+
+> +static int umac_setup_phy(struct net_device *ndev)
+> +{
+
+...
+
+> +				/* If the specified phy-handle has a fixed-link declaration, use the
+> +				 * fixed-link properties to set the configuration for the PHY
+> +				 */
+
+This is wrong. Look at other drivers using fixed link.
+
+     Andrew
 
