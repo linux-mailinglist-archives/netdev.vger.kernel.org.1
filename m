@@ -1,44 +1,39 @@
-Return-Path: <netdev+bounces-23587-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23588-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A285A76C982
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 11:32:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39D3E76C998
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 11:40:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D70E8281D07
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 09:32:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EFC0E281D2E
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 09:40:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECCEF6128;
-	Wed,  2 Aug 2023 09:32:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45A1663A9;
+	Wed,  2 Aug 2023 09:40:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2A895698
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 09:32:30 +0000 (UTC)
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AEC4B1724
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 02:32:28 -0700 (PDT)
-Received: from kwepemi500012.china.huawei.com (unknown [172.30.72.57])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4RG6DW5NQXzrS1M;
-	Wed,  2 Aug 2023 17:31:23 +0800 (CST)
-Received: from huawei.com (10.90.53.73) by kwepemi500012.china.huawei.com
- (7.221.188.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Wed, 2 Aug
- 2023 17:32:25 +0800
-From: Li Zetao <lizetao1@huawei.com>
-To: <lars.povlsen@microchip.com>, <Steen.Hegelund@microchip.com>,
-	<daniel.machon@microchip.com>, <UNGLinuxDriver@microchip.com>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>
-CC: <lizetao1@huawei.com>, <linux-arm-kernel@lists.infradead.org>,
-	<netdev@vger.kernel.org>
-Subject: [PATCH net-next] net: microchip: vcap api: Use ERR_CAST() in vcap_decode_rule()
-Date: Wed, 2 Aug 2023 17:31:56 +0800
-Message-ID: <20230802093156.975743-1-lizetao1@huawei.com>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0CB25683
+	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 09:40:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 5AC47C433C8;
+	Wed,  2 Aug 2023 09:40:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1690969221;
+	bh=bPpUbVJ8g+WfRXA8L/dbqhku1vmPtOZ22exFereT1AY=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=QSUj/c162+ie7S9gfe/Fu3ASh4GC3YpdvAnXOx3ZsC42Nt4cTDfEgb7VeOLUrOkop
+	 2NbM1KfuEKAMsYLgC5OOmVGbpAkqT78slxmulP6ZxqmMBfHPbnCYev1gXKOsyLCE3O
+	 GeNBu3cGCyOkoigjeUJ8/MxW8lYFoLp/dMjC1Mhjzhi6owotvM6IanGFKXnHgsSnc+
+	 fbFyqxKdWDgU62pjiRd2Y7p3oqJpC3JIrW528C7YtqzSBf6HhvUzNeM/mYjGrg3xur
+	 Q1TU4ItxSMM0uZX8AxCfP53MYPc1oFBf8hy9iw4pppS0hharQj2CQJnDhlEKNPg5Gb
+	 CxL+V4Io9D8jQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 34B11C6445A;
+	Wed,  2 Aug 2023 09:40:21 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -46,45 +41,68 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.90.53.73]
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- kwepemi500012.china.huawei.com (7.221.188.12)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Subject: Re: [PATCH v3] ip6mr: Fix skb_under_panic in ip6mr_cache_report()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169096922121.16759.10593210308395776255.git-patchwork-notify@kernel.org>
+Date: Wed, 02 Aug 2023 09:40:21 +0000
+References: <20230801064318.34408-1-yuehaibing@huawei.com>
+In-Reply-To: <20230801064318.34408-1-yuehaibing@huawei.com>
+To: Yue Haibing <yuehaibing@huawei.com>
+Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, yoshfuji@linux-ipv6.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ simon.horman@corigine.com
 
-There is a warning reported by coccinelle:
+Hello:
 
-./drivers/net/ethernet/microchip/vcap/vcap_api.c:2399:9-16: WARNING:
-ERR_CAST can be used with ri
+This patch was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-Use ERR_CAST instead of ERR_PTR + PTR_ERR to simplify the
-conversion process.
+On Tue, 1 Aug 2023 14:43:18 +0800 you wrote:
+> skbuff: skb_under_panic: text:ffffffff88771f69 len:56 put:-4
+>  head:ffff88805f86a800 data:ffff887f5f86a850 tail:0x88 end:0x2c0 dev:pim6reg
+>  ------------[ cut here ]------------
+>  kernel BUG at net/core/skbuff.c:192!
+>  invalid opcode: 0000 [#1] PREEMPT SMP KASAN
+>  CPU: 2 PID: 22968 Comm: kworker/2:11 Not tainted 6.5.0-rc3-00044-g0a8db05b571a #236
+>  Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
+>  Workqueue: ipv6_addrconf addrconf_dad_work
+>  RIP: 0010:skb_panic+0x152/0x1d0
+>  Call Trace:
+>   <TASK>
+>   skb_push+0xc4/0xe0
+>   ip6mr_cache_report+0xd69/0x19b0
+>   reg_vif_xmit+0x406/0x690
+>   dev_hard_start_xmit+0x17e/0x6e0
+>   __dev_queue_xmit+0x2d6a/0x3d20
+>   vlan_dev_hard_start_xmit+0x3ab/0x5c0
+>   dev_hard_start_xmit+0x17e/0x6e0
+>   __dev_queue_xmit+0x2d6a/0x3d20
+>   neigh_connected_output+0x3ed/0x570
+>   ip6_finish_output2+0x5b5/0x1950
+>   ip6_finish_output+0x693/0x11c0
+>   ip6_output+0x24b/0x880
+>   NF_HOOK.constprop.0+0xfd/0x530
+>   ndisc_send_skb+0x9db/0x1400
+>   ndisc_send_rs+0x12a/0x6c0
+>   addrconf_dad_completed+0x3c9/0xea0
+>   addrconf_dad_work+0x849/0x1420
+>   process_one_work+0xa22/0x16e0
+>   worker_thread+0x679/0x10c0
+>   ret_from_fork+0x28/0x60
+>   ret_from_fork_asm+0x11/0x20
+> 
+> [...]
 
-Signed-off-by: Li Zetao <lizetao1@huawei.com>
----
- drivers/net/ethernet/microchip/vcap/vcap_api.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Here is the summary with links:
+  - [v3] ip6mr: Fix skb_under_panic in ip6mr_cache_report()
+    https://git.kernel.org/netdev/net/c/30e0191b16e8
 
-diff --git a/drivers/net/ethernet/microchip/vcap/vcap_api.c b/drivers/net/ethernet/microchip/vcap/vcap_api.c
-index a418ad8e8770..a7b43f99bc80 100644
---- a/drivers/net/ethernet/microchip/vcap/vcap_api.c
-+++ b/drivers/net/ethernet/microchip/vcap/vcap_api.c
-@@ -2396,7 +2396,7 @@ struct vcap_rule *vcap_decode_rule(struct vcap_rule_internal *elem)
- 
- 	ri = vcap_dup_rule(elem, elem->state == VCAP_RS_DISABLED);
- 	if (IS_ERR(ri))
--		return ERR_PTR(PTR_ERR(ri));
-+		return ERR_CAST(ri);
- 
- 	if (ri->state == VCAP_RS_DISABLED)
- 		goto out;
+You are awesome, thank you!
 -- 
-2.34.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
