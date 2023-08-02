@@ -1,152 +1,124 @@
-Return-Path: <netdev+bounces-23520-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23521-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C55CD76C4F3
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 07:37:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E917C76C517
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 08:00:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F1B29281B84
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 05:37:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0609E1C211E0
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 06:00:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0471A15BA;
-	Wed,  2 Aug 2023 05:37:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 026CD15D4;
+	Wed,  2 Aug 2023 06:00:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB188110C
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 05:37:06 +0000 (UTC)
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7FCAFE4;
-	Tue,  1 Aug 2023 22:37:05 -0700 (PDT)
-Received: by linux.microsoft.com (Postfix, from userid 1099)
-	id E6B10238AF65; Tue,  1 Aug 2023 22:37:04 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com E6B10238AF65
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1690954624;
-	bh=llvx4mdfvSj5J9l9m59JQT19sx7YAHn2YDSG1Mqh4zg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=XXeucYayypWB4Kio0+xxOSHEZRvpMym5mJtcgLvrT2yZlil5eZM/tWaHJtEkIUWiP
-	 FF8Vo+uFbn0zN1C/cQslGXIeVX0ojBDCdxMUZstsuVdhBv0IvOOX96FOhvqpxx51wT
-	 0XNmljKGS06jFaD5DcQ/XkZQ6NFNWwgR/P0q/eio=
-Date: Tue, 1 Aug 2023 22:37:04 -0700
-From: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
-To: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>
-Cc: Souradeep Chakrabarti <schakrabarti@microsoft.com>,
-	Simon Horman <horms@kernel.org>, KY Srinivasan <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	"wei.liu@kernel.org" <wei.liu@kernel.org>,
-	Dexuan Cui <decui@microsoft.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	Long Li <longli@microsoft.com>,
-	Ajay Sharma <sharmaajay@microsoft.com>,
-	"leon@kernel.org" <leon@kernel.org>,
-	"cai.huoqing@linux.dev" <cai.huoqing@linux.dev>,
-	"ssengar@linux.microsoft.com" <ssengar@linux.microsoft.com>,
-	vkuznets <vkuznets@redhat.com>,
-	"tglx@linutronix.de" <tglx@linutronix.de>,
-	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	"stable@vger.kernel.org" <stable@vger.kernel.org>
-Subject: Re: [EXTERNAL] Re: [PATCH V7 net] net: mana: Fix MANA VF unload when
- hardware is
-Message-ID: <20230802053704.GA3488@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <1690892953-25201-1-git-send-email-schakrabarti@linux.microsoft.com>
- <ZMklUch+vfZBqfAr@kernel.org>
- <PUZP153MB0788A2C4FC7A76D2CDD021BCCC0AA@PUZP153MB0788.APCP153.PROD.OUTLOOK.COM>
- <CAH-L+nPsuoJfCQcJnpMWk5DPGev8f+YWi0K4V+fU=5-bxP5GVw@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8B4D15CD
+	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 06:00:13 +0000 (UTC)
+Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D896268D
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 23:00:08 -0700 (PDT)
+Received: by mail-lf1-x12b.google.com with SMTP id 2adb3069b0e04-4fe1c285690so9357897e87.3
+        for <netdev@vger.kernel.org>; Tue, 01 Aug 2023 23:00:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1690956006; x=1691560806;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=l3cBDFlmb0rLF7U5GOTszA6HHKFGynKk1sTqKDLZ/qc=;
+        b=GzLGd6zt9F36vIYWCCnW7JC4cohWO1OJumfTx8hZ7k1Js0REj9KbY4Iimnmg1WT8OF
+         TLPFyznT9cyeI8fi8odvIwHLQetGrRKNwempF5YxE3YPc7RgezWPE6wagjLjSjqxF669
+         6ZjKkCvFNFN6XGG5MDoKz1uqESXiiOfiGbq4sphDa0wwPvXipUSiZuF9SzNUsbMM9xHH
+         +skOsZPAmit/E7Iykx3eFUKIO2qgA55dhpFPUCksGZRvRKwTtWLLSReSXZyGWrEzv8wi
+         IkHvMLqe9Puo/SdThRI2c17qBPeMePB1tkjuvdCRG+WxO6LZuFUcqP446gLy4L21LHgu
+         qJBg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690956006; x=1691560806;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=l3cBDFlmb0rLF7U5GOTszA6HHKFGynKk1sTqKDLZ/qc=;
+        b=fkts863RmK+6aRLdgMg5xiOhpIqsYkM0avWUIayUHhOfYW9jwMx39fI20bFbAzFcbY
+         OFf68qlMogYtYAYkv4GubODaEAubY1z6826p7LmbZ8qCBfZOrnUwN4OLxNc1gL7uCBeH
+         tq35QnNsSBULj5lKkYNYcx7yLcpvFTvVUtBWCrDeuKkYNjqzE40blT60v9bmjqDaU6r1
+         DXTSANf4l/HMBDsuug4aJaiumyIEhj4qGTLC6Frvt6Iq9doa1khJd/SGNbeCkgp3pPzr
+         Jc9VOCRHuPiljBn3B3qNPTsu9pOOZBNuzUazYbYMUmimtoTXNalbxSiM72ivEHUFP6uQ
+         022g==
+X-Gm-Message-State: ABy/qLY7nSFzjZCwTDnxRSfd+GwkDraTuL+bGng1fleT2LlbmX0g8rsX
+	eYbiRDE49iDF+fZgypKo5JsAXw==
+X-Google-Smtp-Source: APBJJlFGk/uFoEFmSJSgr6va1DLUes/+N8hdaYJZu7fVLQH5vlglbTPNtnJ1o23FikkmSh62nEDj9Q==
+X-Received: by 2002:a05:6512:3291:b0:4fb:91c5:fd38 with SMTP id p17-20020a056512329100b004fb91c5fd38mr3437958lfe.0.1690956006505;
+        Tue, 01 Aug 2023 23:00:06 -0700 (PDT)
+Received: from localhost ([102.36.222.112])
+        by smtp.gmail.com with ESMTPSA id n22-20020a7bc5d6000000b003fe195cecb3sm735815wmk.38.2023.08.01.23.00.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 01 Aug 2023 23:00:06 -0700 (PDT)
+Date: Wed, 2 Aug 2023 09:00:03 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Ruan Jinjie <ruanjinjie@huawei.com>, yisen.zhuang@huawei.com,
+	salil.mehta@huawei.com, davem@davemloft.net, edumazet@google.com,
+	pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH -next] net: hisilicon: fix the return value handle and
+ remove redundant netdev_err() for platform_get_irq()
+Message-ID: <079063f5-e8e1-4a5f-8124-34d79d2fc9bd@kadam.mountain>
+References: <20230731073858.3633193-1-ruanjinjie@huawei.com>
+ <20230801144347.140cc06f@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAH-L+nPsuoJfCQcJnpMWk5DPGev8f+YWi0K4V+fU=5-bxP5GVw@mail.gmail.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Spam-Status: No, score=-17.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,
-	USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20230801144347.140cc06f@kernel.org>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Aug 02, 2023 at 10:57:52AM +0530, Kalesh Anakkur Purayil wrote:
-> Hi Souradeep,
+On Tue, Aug 01, 2023 at 02:43:47PM -0700, Jakub Kicinski wrote:
+> On Mon, 31 Jul 2023 15:38:58 +0800 Ruan Jinjie wrote:
+> > There is no possible for platform_get_irq() to return 0
+> > and the return value of platform_get_irq() is more sensible
+> > to show the error reason.
+> > 
+> > And there is no need to call the netdev_err() function directly to print
+> > a custom message when handling an error from platform_get_irq() function as
+> > it is going to display an appropriate error message in case of a failure.
+> > 
+> > Signed-off-by: Ruan Jinjie <ruanjinjie@huawei.com>
 > 
-> It looks like the subject line is not complete. I could see "net: mana: Fix
-> MANA VF unload when hardware is".
-> 
-> Is that correct?
-> 
-> Regards,
-> Kalesh
->
-Yes, it got truncated. Will fix it in next version. 
-> On Wed, Aug 2, 2023 at 12:29 AM Souradeep Chakrabarti <
-> schakrabarti@microsoft.com> wrote:
-> 
-> >
-> >
-> > >-----Original Message-----
-> > >From: Simon Horman <horms@kernel.org>
-> > >Sent: Tuesday, August 1, 2023 9:01 PM
-> > >To: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
-> > >Cc: KY Srinivasan <kys@microsoft.com>; Haiyang Zhang
-> > ><haiyangz@microsoft.com>; wei.liu@kernel.org; Dexuan Cui
-> > ><decui@microsoft.com>; davem@davemloft.net; edumazet@google.com;
-> > >kuba@kernel.org; pabeni@redhat.com; Long Li <longli@microsoft.com>; Ajay
-> > >Sharma <sharmaajay@microsoft.com>; leon@kernel.org;
-> > >cai.huoqing@linux.dev; ssengar@linux.microsoft.com; vkuznets
-> > ><vkuznets@redhat.com>; tglx@linutronix.de; linux-hyperv@vger.kernel.org;
-> > >netdev@vger.kernel.org; linux-kernel@vger.kernel.org; linux-
-> > >rdma@vger.kernel.org; Souradeep Chakrabarti
-> > ><schakrabarti@microsoft.com>; stable@vger.kernel.org
-> > >Subject: [EXTERNAL] Re: [PATCH V7 net] net: mana: Fix MANA VF unload when
-> > >hardware is
-> > >
-> > >On Tue, Aug 01, 2023 at 05:29:13AM -0700, Souradeep Chakrabarti wrote:
-> > >
-> > >...
-> > >
-> > >Hi Souradeep,
-> > >
-> > >
-> > >> +    for (i = 0; i < apc->num_queues; i++) {
-> > >> +            txq = &apc->tx_qp[i].txq;
-> > >> +            while (skb = skb_dequeue(&txq->pending_skbs)) {
-> > >
-> > >W=1 builds with both clang-16 and gcc-12 complain that they would like an
-> > >extra set of parentheses around an assignment used as a truth value.
-> > Thanks for letting me know. I will fix it in next version.
-> > >
-> > >> +                    mana_unmap_skb(skb, apc);
-> > >> +                    dev_consume_skb_any(skb);
-> > >> +            }
-> > >> +            atomic_set(&txq->pending_sends, 0);
-> > >> +    }
-> > >>      /* We're 100% sure the queues can no longer be woken up, because
-> > >>       * we're sure now mana_poll_tx_cq() can't be running.
-> > >>       */
-> > >> --
-> > >> 2.34.1
-> > >>
-> > >>
-> >
-> >
-> 
-> -- 
-> Regards,
-> Kalesh A P
+> Dan, with the sample of one patch from you I just applied I induce
+> that treating 0 as error and returning a -EINVAL in that case may
+> be preferable here?
 
+This patch is correct.
+
+Reviewed-by: Dan Carpenter <dan.carpenter@linaro.org>
+
+The comments for platform_get_irq() say it returns negatives on error
+and that's also how the code is implemented.
+
+Is zero an error code?  Historically, a lot of IRQ functions returned
+0 on error and some of those haven't been replaced with new functions
+that return negative error codes.  irq_of_parse_and_map() is an example
+of this.  I've been meaning to make a complete list but apparently
+that's the only one Smatch checks for.
+
+Is zero a valid IRQ?  In upstream code the answer is no and it never
+will be.  In this code the platform_get_irq_optional() will trigger a
+warning for that.
+	if (WARN(!ret, "0 is an invalid IRQ number\n"))
+However there are some old out of tree arches where zero is a valid IRQ.
+
+regards,
+dan carpenter
 
 
