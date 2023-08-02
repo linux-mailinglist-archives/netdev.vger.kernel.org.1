@@ -1,137 +1,146 @@
-Return-Path: <netdev+bounces-23787-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23791-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 213B276D86E
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 22:13:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 414C876D89D
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 22:23:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CC94B281DDA
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 20:13:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F001A281E18
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 20:23:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AF04111AE;
-	Wed,  2 Aug 2023 20:13:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31448125DA;
+	Wed,  2 Aug 2023 20:22:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E38810793
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 20:12:59 +0000 (UTC)
-Received: from wout5-smtp.messagingengine.com (wout5-smtp.messagingengine.com [64.147.123.21])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F4A7A2
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 13:12:58 -0700 (PDT)
-Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
-	by mailout.west.internal (Postfix) with ESMTP id BF8DC3200645;
-	Wed,  2 Aug 2023 16:12:56 -0400 (EDT)
-Received: from imap51 ([10.202.2.101])
-  by compute6.internal (MEProxy); Wed, 02 Aug 2023 16:12:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-type:content-type:date:date:from:from:in-reply-to
-	:in-reply-to:message-id:mime-version:references:reply-to:sender
-	:subject:subject:to:to; s=fm2; t=1691007176; x=1691093576; bh=5T
-	nAcmVt6xeZTYPKfAGH1vbQiUFJdbJWgnGsgJ7wcWg=; b=m94ebRBkDslDivdTuc
-	DraTGDmCUHdhh+LZx2L4LRD60E8LXbD0ufwvRb8NTkQiJP/+v+Ipc3aXkrgIMM00
-	iluk6N9Gnyv8zBuKagx8eOLAd68IF0S3YI/1IR40h5iTzSCmi5ZQbVUrj6OErLR+
-	AInFdF/XwVkiUW3lqECSoaR+jFcERStN6SHNGdIa9QOk0BxEoNqT/w+yyX0ij5gt
-	fsiSCE302jEkuExk4or8msx+uQWYrUKkJQGTnAdMZO8oWbWF1sCeICdQN7tA/91+
-	TSf12gvZDYMgqRkF/DeXRlfRY+zS5jvUdr6kaFqioVEtyKdxihKvxEjX/k08UINZ
-	suFQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:sender:subject
-	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-	:x-sasl-enc; s=fm3; t=1691007176; x=1691093576; bh=5TnAcmVt6xeZT
-	YPKfAGH1vbQiUFJdbJWgnGsgJ7wcWg=; b=EOvhSW6lVruxF/+WTFK7cT55ZG9ig
-	y3PvYAuBuXHA99Fn6/EKWWDjT4FMUEea+g9kH74SW5kMYvlhXOFBo9RIQ8wGybFN
-	fYI4vhx81BuYSBRoHB1ykU0eho/QST+4wOcu2LiD9L6UP64gg2njUZ8H/DAWwvuD
-	tk8wmaLaoORsRufBPWWdQxOTzSS8m4pPvzXgFrDF6umetTFTMdJ6CJKDrERhprLp
-	0ErZP1UR+QDuvHHRKjYKbbt91EkWIQ8QKLI72s4r0FGPZj5qS/mKz0h/mGFEzqMM
-	bM+eSyjxZQXs2q1wM0Qj1x3QRuVw55NKgyKD6V3epBLtglSDbyZIhMUeg==
-X-ME-Sender: <xms:x7jKZFSppcMM_IN8RelZHqMAmuAavxcZb_Q-i62oIPLK96Pvq2Ikuw>
-    <xme:x7jKZOysEF0lM1LxzXK4Plz4G62K2p1CIXmLR6vibv545SN93572uGJUDaD0tsGXu
-    jU_-rm4gWrOZYLZM68>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrkedtgdehtdcutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
-    fjughrpefofgggkfgjfhffhffvvefutgesthdtredtreertdenucfhrhhomhepfdetrhhn
-    ugcuuegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdruggvqeenucggtffrrghtth
-    gvrhhnpeffheeugeetiefhgeethfejgfdtuefggeejleehjeeutefhfeeggefhkedtkeet
-    ffenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrrh
-    hnugesrghrnhgusgdruggv
-X-ME-Proxy: <xmx:x7jKZK0AZqTqhH9-zljUVb5jOr1ia2n8PXRbvQZq9BuwoUZVwY5ktQ>
-    <xmx:x7jKZNAjaY6_483LAQUhf_EKfY_xMTnnbSAsFkF90YN8ZOrvWhgTbQ>
-    <xmx:x7jKZOjj9LjEOtj8mqYSIsFjPOhMPuuQ_Cq7BPyfbwZQP0WQAcCrYA>
-    <xmx:yLjKZHVu-u_FTa44NEfqiB5I_snD-uUtfLy24ip3Ng17tAnif3uadg>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-	id 10B43B60089; Wed,  2 Aug 2023 16:12:54 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.9.0-alpha0-624-g7714e4406d-fm-20230801.001-g7714e440
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DABC125CC
+	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 20:22:20 +0000 (UTC)
+Received: from mx0a-002e3701.pphosted.com (mx0a-002e3701.pphosted.com [148.163.147.86])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3BAF268F;
+	Wed,  2 Aug 2023 13:22:16 -0700 (PDT)
+Received: from pps.filterd (m0148663.ppops.net [127.0.0.1])
+	by mx0a-002e3701.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 372FVvh9010627;
+	Wed, 2 Aug 2023 20:21:55 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hpe.com; h=from : to : subject :
+ date : message-id; s=pps0720;
+ bh=G0kiRdSmBdyx4TfhxwwXuA3DkCJaC8w3wSHrV5TtevA=;
+ b=losdoeyMauHKGt0wydRV31KeTYN3hmJ9cixTbBQwjdm69XrvUe64/9Rnvvf0CrXjLvsR
+ gsTsHDYLUOvJejw5FHREL8c3pboJ3vWi3sRagLcNdr+swGk0gdRK3RhFoozYUSzAvo5l
+ 3aRK21DjB/zdx5QrWJKKkmp9pkE5iX3Opxi5D1peRcy08MiWJNCZV6RDJEUwlLL4Tl7h
+ p5Ay3BQCQF5dIbJHIcIZHVDJ6gpTuDxMqrAFaQWKGVssngsWRfgN6X4s/43u3MvOhnCi
+ 1X9opa5Xotm/F/NJhdRsiRr4tzEChpK3RMrm/e5hmg4q7gZHi0wlHg/Zz4gg5hb2+qL/ YQ== 
+Received: from p1lg14880.it.hpe.com ([16.230.97.201])
+	by mx0a-002e3701.pphosted.com (PPS) with ESMTPS id 3s7hb76myd-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 02 Aug 2023 20:21:55 +0000
+Received: from p1lg14886.dc01.its.hpecorp.net (unknown [10.119.18.237])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by p1lg14880.it.hpe.com (Postfix) with ESMTPS id D2B07800187;
+	Wed,  2 Aug 2023 20:21:53 +0000 (UTC)
+Received: from hpe.com (unknown [16.231.227.39])
+	by p1lg14886.dc01.its.hpecorp.net (Postfix) with ESMTP id 4656580E885;
+	Wed,  2 Aug 2023 20:21:52 +0000 (UTC)
+From: nick.hawkins@hpe.com
+To: christophe.jaillet@wanadoo.fr, simon.horman@corigine.com, andrew@lunn.ch,
+        verdun@hpe.com, nick.hawkins@hpe.com, davem@davemloft.net,
+        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+        robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
+        conor+dt@kernel.org, netdev@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH v2 0/5] ARM: Add GXP UMAC Support
+Date: Wed,  2 Aug 2023 15:18:19 -0500
+Message-Id: <20230802201824.3683-1-nick.hawkins@hpe.com>
+X-Mailer: git-send-email 2.17.1
+X-Proofpoint-GUID: x9Sy7t70ZgbTuaig2oIaHBpPQUSxddJI
+X-Proofpoint-ORIG-GUID: x9Sy7t70ZgbTuaig2oIaHBpPQUSxddJI
+X-HPE-SCL: -1
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-08-02_16,2023-08-01_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 malwarescore=0
+ phishscore=0 priorityscore=1501 spamscore=0 suspectscore=0 mlxlogscore=999
+ adultscore=0 impostorscore=0 mlxscore=0 clxscore=1011 lowpriorityscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2306200000
+ definitions=main-2308020178
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Message-Id: <5404bdbd-8567-463a-8d79-87248c928485@app.fastmail.com>
-In-Reply-To: <f19933ef-346c-e777-4b1e-f53291d90feb@linaro.org>
-References: <20230801133121.416319-1-ruanjinjie@huawei.com>
- <ZMoUjMGxhUZ9v2pT@kernel.org>
- <f19933ef-346c-e777-4b1e-f53291d90feb@linaro.org>
-Date: Wed, 02 Aug 2023 22:12:34 +0200
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Alex Elder" <elder@linaro.org>, "Simon Horman" <horms@kernel.org>,
- "Ruan Jinjie" <ruanjinjie@huawei.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
- "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
- "Paolo Abeni" <pabeni@redhat.com>, "Wei Fang" <wei.fang@nxp.com>,
- "Rob Herring" <robh@kernel.org>, bhupesh.sharma@linaro.org,
- Netdev <netdev@vger.kernel.org>
-Subject: Re: [PATCH net-next] cirrus: cs89x0: fix the return value handle and remove
- redundant dev_warn() for platform_get_irq()
-Content-Type: text/plain
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-On Wed, Aug 2, 2023, at 15:33, Alex Elder wrote:
-> On 8/2/23 3:32 AM, Simon Horman wrote:
->> On Tue, Aug 01, 2023 at 09:31:21PM +0800, Ruan Jinjie wrote:
->>> There is no possible for platform_get_irq() to return 0
->>> and the return value of platform_get_irq() is more sensible
->>> to show the error reason.
->>>
->>> And there is no need to call the dev_warn() function directly to print
->>> a custom message when handling an error from platform_get_irq() function as
->>> it is going to display an appropriate error message in case of a failure.
->>>
->>> Signed-off-by: Ruan Jinjie <ruanjinjie@huawei.com>
->
-> First, I agree that the dev_warn() is unnecessary.
->
-> On the "<" versus "<=" issue is something I've commented on before.
->
-> It's true that 0 is not (or should not be) a valid IRQ number.  But
-> at one time a several years back I couldn't convince myself that it
-> 100% could not happen.  I no longer remember the details, and it
-> might not have even been in this particular case (i.e., return
-> from platform_get_irq()).
->
-> I do see that a85a6c86c25be ("driver core: platform: Clarify that
-> IRQ 0 is invalid)" got added in 2020, and it added a WARN_ON()
-> in platform_get_irq_optional() before returning the IRQ number if
-> it's zero.  So in this case, if it *did* happen to return 0,
-> you'd at least get a warning.
+From: Nick Hawkins <nick.hawkins@hpe.com>
 
-Some of the older arm32 platforms used to start IRQ numbers at 0
-instead of 1, but those should all have been converted by now,
-and it's unlikely that the first interrupt would be the network
-controller on any of those that did.
+The GXP contains two Ethernet MACs that can be
+connected externally to several physical devices. From an external
+interface perspective the BMC provides two SERDES interface connections
+capable of either SGMII or 1000Base-X operation. The BMC also provides
+a RMII interface for sideband connections to external Ethernet controllers.
 
-      Arnd
+The primary MAC (umac0) can be mapped to either SGMII/1000-BaseX
+SERDES interface.  The secondary MAC (umac1) can be mapped to only
+the second SGMII/1000-Base X Serdes interface or it can be mapped for
+RMII sideband.
+
+The MDIO(mdio0) interface from the primary MAC (umac0) is used for
+external PHY status and configuration. The MDIO(mdio1) interface from
+the secondary MAC (umac1) is routed to the SGMII/100Base-X IP blocks
+on the two SERDES interface connections. In most cases the internal
+phy connects directly to the external phy.
+
+---
+
+Changes since v1:
+ *Corrected improper descriptions and use of | in yaml files
+ *Used reverse christmas tree format for network drivers
+ *Moved gxp-umac-mdio.c to /mdio/
+ *Fixed dependencies on both Kconfigs
+ *Added COMPILE_TEST to both Kconfigs
+ *Used devm_ functions where possible in both drivers
+ *Moved mac-address to inside of port in yaml files
+ *Exchanged listing individual yaml files for hpe,gxp*
+ *Restricted use of le32
+
+Nick Hawkins (5):
+  dt-bindings: net: Add HPE GXP UMAC MDIO
+  net: hpe: Add GXP UMAC MDIO
+  dt-bindings: net: Add HPE GXP UMAC
+  net: hpe: Add GXP UMAC Driver
+  MAINTAINERS: HPE: Add GXP UMAC Networking Files
+
+ .../bindings/net/hpe,gxp-umac-mdio.yaml       |  50 +
+ .../devicetree/bindings/net/hpe,gxp-umac.yaml | 112 +++
+ MAINTAINERS                                   |   2 +
+ drivers/net/ethernet/Kconfig                  |   1 +
+ drivers/net/ethernet/Makefile                 |   1 +
+ drivers/net/ethernet/hpe/Kconfig              |  32 +
+ drivers/net/ethernet/hpe/Makefile             |   1 +
+ drivers/net/ethernet/hpe/gxp-umac.c           | 889 ++++++++++++++++++
+ drivers/net/ethernet/hpe/gxp-umac.h           |  89 ++
+ drivers/net/mdio/Kconfig                      |  13 +
+ drivers/net/mdio/Makefile                     |   1 +
+ drivers/net/mdio/mdio-gxp-umac.c              | 142 +++
+ 12 files changed, 1333 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/net/hpe,gxp-umac-mdio.yaml
+ create mode 100644 Documentation/devicetree/bindings/net/hpe,gxp-umac.yaml
+ create mode 100644 drivers/net/ethernet/hpe/Kconfig
+ create mode 100644 drivers/net/ethernet/hpe/Makefile
+ create mode 100644 drivers/net/ethernet/hpe/gxp-umac.c
+ create mode 100644 drivers/net/ethernet/hpe/gxp-umac.h
+ create mode 100644 drivers/net/mdio/mdio-gxp-umac.c
+
+-- 
+2.17.1
+
 
