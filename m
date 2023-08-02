@@ -1,243 +1,74 @@
-Return-Path: <netdev+bounces-23478-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23479-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05CE276C195
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 02:44:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5198276C1A0
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 02:50:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 337FE281B93
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 00:44:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A8A81C210D7
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 00:50:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97552A5F;
-	Wed,  2 Aug 2023 00:43:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EBA2637;
+	Wed,  2 Aug 2023 00:50:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AE8D7E
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 00:43:22 +0000 (UTC)
-Received: from mail-yw1-x1130.google.com (mail-yw1-x1130.google.com [IPv6:2607:f8b0:4864:20::1130])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CEDD7213E
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 17:43:20 -0700 (PDT)
-Received: by mail-yw1-x1130.google.com with SMTP id 00721157ae682-5844bb9923eso73938867b3.0
-        for <netdev@vger.kernel.org>; Tue, 01 Aug 2023 17:43:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690937000; x=1691541800;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9+dkCMl278sLhB4ap7p8ERGG3uylKtSpSPJXUEE81kk=;
-        b=iTZ/KybJcHixAMy5sO4u3Lw5oNBeH8U/HtiF+BMRECc9dJp47T9r3LcL7bRcTFsg3z
-         2Pb/qJemJB5nmCNFNs12PoMWMss9HwRuP8y9Ej9JHrmdf77nWmnx7l2Hoeg3zSbIjfC/
-         HPUBQr0hYevedvzNPmvSZMNsJOVxjgNqT26gfaSPhoBEd0crWQgUGb15NgZY7zTuZCA1
-         +CJiutYHGPJZk3SIE3yDHMo1ObeotlaxzzhZq5Mbd4Tx2//uEuRF/ajfliOSQoxF3GlP
-         /CIOJrJjY+CivqnwdLmoLFgCW8cXUMLCfgfqvqEtUOR7fJND6n5aS6QMlFrDNiGLv61Q
-         yRlA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690937000; x=1691541800;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9+dkCMl278sLhB4ap7p8ERGG3uylKtSpSPJXUEE81kk=;
-        b=WypmySL5OWun7djDe3kojfZX7R75PqfenNRCsZq46uXwWDYYYDMSfRc2LlQCIoeThq
-         bvtGe3gR/nvwe+4t0y264qNMq5b5ZRa4SdPtly14G3jBV/XnwTUH8zcUWMzwGBTcdVwh
-         gpMJt2o1GiwXs1Zq92w6gTgcwhNQPiIs6HD2EoMSz9IMnuG1b/6Qai5eAmpwdo0opsoM
-         6ckQTPD9zZPd4p0Fcw+B/0MGd6YIWRFLeRgLjogUQe9aT3bJL1N/FbNEVKpRVenz0Vow
-         yQCSXajN7b2RNuKXO3Aary03ptAOmbC4FPbj53QhkxXq/1PFa6T3ltIqSusP4LkGUqkC
-         Y5qA==
-X-Gm-Message-State: ABy/qLaiCbahdPlX5JeaozFkmwaLI/+dY2cNAoemeDkYiTpJmhpw83ef
-	U2CDfH7kJVbZwCCt/ETSBBU=
-X-Google-Smtp-Source: APBJJlEubvSgX6v1iazkHBLNaOHYUoyxOfy1hZeDb+S0h0TO8n/5f6vEb59g0E+OODPwpGed7mkOuQ==
-X-Received: by 2002:a81:4e56:0:b0:57a:f72:ebf8 with SMTP id c83-20020a814e56000000b0057a0f72ebf8mr18338245ywb.28.1690936999967;
-        Tue, 01 Aug 2023 17:43:19 -0700 (PDT)
-Received: from kickker.attlocal.net ([2600:1700:6cf8:1240:b827:13ed:6fde:4670])
-        by smtp.gmail.com with ESMTPSA id t14-20020a81830e000000b0057a560a9832sm4196344ywf.1.2023.08.01.17.43.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Aug 2023 17:43:19 -0700 (PDT)
-From: thinker.li@gmail.com
-To: dsahern@kernel.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	martin.lau@linux.dev,
-	kernel-team@meta.com,
-	yhs@meta.com
-Cc: sinquersw@gmail.com,
-	kuifeng@meta.com,
-	Kui-Feng Lee <thinker.li@gmail.com>
-Subject: [PATCH net-next v5 2/2] selftests: fib_tests: Add a test case for IPv6 garbage collection
-Date: Tue,  1 Aug 2023 17:43:03 -0700
-Message-Id: <20230802004303.567266-3-thinker.li@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230802004303.567266-1-thinker.li@gmail.com>
-References: <20230802004303.567266-1-thinker.li@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 743467E
+	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 00:50:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6E75C433C7;
+	Wed,  2 Aug 2023 00:50:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1690937424;
+	bh=Nf6D7M2JP3L64dvYAmuuDauHNFli1OiiK/HYv1NiMK8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=LItWlg7nWUsfJK+UGBH1LD92k1qVtxKveiAAYGB1qovAcCvO3MQVEQmxw5dHfppJ1
+	 6cxC7P92achF+TR/3tYCWuN0aQOWNgz9vShnQWOijUJqfBn4vFqHj2qTzCs2OeCndt
+	 tk1djbY30O5fFyT5MJV8iQNpeGA7pUursXtTRsO9bATG4qqwvGBjOk6RX7C7jdYjf5
+	 5QK4fuxSgGFRYb0qmTW/HczcZf2EcwccjpsoNWnPW4YChVCXpKABcfJ1EJKpnolBYt
+	 RaqlDJxkkfZLAFo0pnhIWUkLnxmXoM6nzMYlYwW4IxA8tVy3o6gD0NyhUdL10ud90u
+	 86x6/A/ZN6HrA==
+Date: Tue, 1 Aug 2023 17:50:23 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: David Ahern <dsahern@kernel.org>
+Cc: "Nambiar, Amritha" <amritha.nambiar@intel.com>, netdev@vger.kernel.org,
+ davem@davemloft.net, sridhar.samudrala@intel.com
+Subject: Re: [net-next/RFC PATCH v1 1/4] net: Introduce new napi fields for
+ rx/tx queues
+Message-ID: <20230801175023.3eba3a6f@kernel.org>
+In-Reply-To: <802d3a2f-c2fb-2e11-b678-e8716ef93f12@kernel.org>
+References: <168564116688.7284.6877238631049679250.stgit@anambiarhost.jf.intel.com>
+	<168564134580.7284.16867711571036004706.stgit@anambiarhost.jf.intel.com>
+	<20230602230635.773b8f87@kernel.org>
+	<717fbdd6-9ef7-3ad6-0c29-d0f3798ced8e@intel.com>
+	<20230712141442.44989fa7@kernel.org>
+	<4c659729-32dc-491e-d712-2aa1bb99d26f@intel.com>
+	<20230712165326.71c3a8ad@kernel.org>
+	<20230728145908.2d94c01f@kernel.org>
+	<44c5024a-d533-0ae4-355a-c568b67b1964@intel.com>
+	<20230728160925.3a080631@kernel.org>
+	<802d3a2f-c2fb-2e11-b678-e8716ef93f12@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-From: Kui-Feng Lee <thinker.li@gmail.com>
+On Tue, 1 Aug 2023 18:26:26 -0600 David Ahern wrote:
+> I take it you have this path in mind as a means of creating
+> "specialized" queues (e.g., io_uring and Rx ZC).
 
-Add 1000 IPv6 routes with expiration time.  Wait for a few seconds
-to make sure they are removed correctly.
+TBH I've been thinking more about the huge page stuff and RSS context
+handling. Rx ZC should be a subset of what's needed for those cases.
 
-The expected output of the test looks like the following example.
+> Any slides or notes on the bigger picture?
 
-> Fib6 garbage collection test
->     TEST: ipv6 route garbage collection (0.000562s, 0.000566s) [ OK ]
-
-The first number is the GC time without additional permanent routes.
-The second number is the GC time with additional permanent routes.
-
-Signed-off-by: Kui-Feng Lee <thinker.li@gmail.com>
----
- tools/testing/selftests/net/fib_tests.sh | 101 ++++++++++++++++++++++-
- 1 file changed, 98 insertions(+), 3 deletions(-)
-
-diff --git a/tools/testing/selftests/net/fib_tests.sh b/tools/testing/selftests/net/fib_tests.sh
-index 35d89dfa6f11..ffd7a044f950 100755
---- a/tools/testing/selftests/net/fib_tests.sh
-+++ b/tools/testing/selftests/net/fib_tests.sh
-@@ -9,13 +9,16 @@ ret=0
- ksft_skip=4
- 
- # all tests in this script. Can be overridden with -t option
--TESTS="unregister down carrier nexthop suppress ipv6_notify ipv4_notify ipv6_rt ipv4_rt ipv6_addr_metric ipv4_addr_metric ipv6_route_metrics ipv4_route_metrics ipv4_route_v6_gw rp_filter ipv4_del_addr ipv4_mangle ipv6_mangle ipv4_bcast_neigh"
-+TESTS="unregister down carrier nexthop suppress ipv6_notify ipv4_notify \
-+       ipv6_rt ipv4_rt ipv6_addr_metric ipv4_addr_metric ipv6_route_metrics \
-+       ipv4_route_metrics ipv4_route_v6_gw rp_filter ipv4_del_addr \
-+       ipv4_mangle ipv6_mangle ipv4_bcast_neigh fib6_gc_test"
- 
- VERBOSE=0
- PAUSE_ON_FAIL=no
- PAUSE=no
--IP="ip -netns ns1"
--NS_EXEC="ip netns exec ns1"
-+IP="$(which ip) -netns ns1"
-+NS_EXEC="$(which ip) netns exec ns1"
- 
- which ping6 > /dev/null 2>&1 && ping6=$(which ping6) || ping6=$(which ping)
- 
-@@ -747,6 +750,97 @@ fib_notify_test()
- 	cleanup &> /dev/null
- }
- 
-+fib6_gc_test()
-+{
-+	echo
-+	echo "Fib6 garbage collection test"
-+
-+	STRACE=$(which strace)
-+	if [ -z "$STRACE" ]; then
-+	    echo "    SKIP: strace not found"
-+	    ret=$ksft_skip
-+	    return
-+	fi
-+
-+	EXPIRE=10
-+
-+	setup
-+
-+	set -e
-+
-+	# Check expiration of routes every 3 seconds (GC)
-+	$NS_EXEC sysctl -wq net.ipv6.route.gc_interval=300
-+
-+	$IP link add dummy_10 type dummy
-+	$IP link set dev dummy_10 up
-+	$IP -6 address add 2001:10::1/64 dev dummy_10
-+
-+	$NS_EXEC sysctl -wq net.ipv6.route.flush=1
-+
-+	# Temporary routes
-+	for i in $(seq 1 1000); do
-+	    # Expire route after $EXPIRE seconds
-+	    $IP -6 route add 2001:20::$i \
-+		via 2001:10::2 dev dummy_10 expires $EXPIRE
-+	done
-+	N_EXP=$($IP -6 route list |grep expires|wc -l)
-+	if [ $N_EXP -ne 1000 ]; then
-+		echo "FAIL: expected 1000 routes with expires, got $N_EXP"
-+		ret=1
-+	else
-+	    sleep $EXPIRE
-+	    REALTM_NP=$($NS_EXEC $STRACE -T sysctl \
-+		       -wq net.ipv6.route.flush=1 2>&1 | \
-+		       awk -- '/write\(.*"1\\n", 2\)/ { gsub("(.*<|>.*)", ""); print $0;}')
-+	    N_EXP_SLEEP=$($IP -6 route list |grep expires|wc -l)
-+
-+	    if [ $N_EXP_SLEEP -ne 0 ]; then
-+		echo "FAIL: expected 0 routes with expires, got $N_EXP_SLEEP"
-+		ret=1
-+	    else
-+		ret=0
-+	    fi
-+	fi
-+
-+	# Permanent routes
-+	for i in $(seq 1 5000); do
-+	    $IP -6 route add 2001:30::$i \
-+		via 2001:10::2 dev dummy_10
-+	done
-+	# Temporary routes
-+	for i in $(seq 1 1000); do
-+	    # Expire route after $EXPIRE seconds
-+	    $IP -6 route add 2001:20::$i \
-+		via 2001:10::2 dev dummy_10 expires $EXPIRE
-+	done
-+	N_EXP=$($IP -6 route list |grep expires|wc -l)
-+	if [ $N_EXP -ne 1000 ]; then
-+	    echo
-+	    "FAIL: expected 1000 routes with expires, got $N_EXP (5000 permanent routes)"
-+		ret=1
-+	else
-+	    sleep $EXPIRE
-+	    REALTM_P=$($NS_EXEC $STRACE -T sysctl \
-+		       -wq net.ipv6.route.flush=1 2>&1 | \
-+		       awk -- '/write\(.*"1\\n", 2\)/ { gsub("(.*<|>.*)", ""); print $0;}')
-+	    N_EXP_SLEEP=$($IP -6 route list |grep expires|wc -l)
-+
-+	    if [ $N_EXP_SLEEP -ne 0 ]; then
-+		echo "FAIL: expected 0 routes with expires," \
-+		     "got $N_EXP_SLEEP (5000 permanent routes)"
-+		ret=1
-+	    else
-+		ret=0
-+	    fi
-+	fi
-+
-+	set +e
-+
-+	log_test $ret 0 "ipv6 route garbage collection (${REALTM_NP}s, ${REALTM_P}s)"
-+
-+	cleanup &> /dev/null
-+}
-+
- fib_suppress_test()
- {
- 	echo
-@@ -2217,6 +2311,7 @@ do
- 	ipv4_mangle)			ipv4_mangle_test;;
- 	ipv6_mangle)			ipv6_mangle_test;;
- 	ipv4_bcast_neigh)		ipv4_bcast_neigh_test;;
-+	fib6_gc_test|ipv6_gc)		fib6_gc_test;;
- 
- 	help) echo "Test names: $TESTS"; exit 0;;
- 	esac
--- 
-2.34.1
-
+I don't have it well figured out, yet. The user space API is pretty
+easy, but shaping it in a way that makes driver's life manageable is
+more challenging.
 
