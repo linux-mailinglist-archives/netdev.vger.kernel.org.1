@@ -1,145 +1,194 @@
-Return-Path: <netdev+bounces-23657-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23659-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A00BE76CFCA
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 16:14:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7C8876CFFE
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 16:27:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 157D2281DB4
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 14:14:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 730E0281DFA
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 14:27:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E99A79F7;
-	Wed,  2 Aug 2023 14:14:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CF848468;
+	Wed,  2 Aug 2023 14:27:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 020227488
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 14:14:02 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F09C9C433C7;
-	Wed,  2 Aug 2023 14:13:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690985641;
-	bh=ixO3LW1/xG1Uw3thkOLsUVsmX4WxJS5JtOiOzZ6KopY=;
-	h=Date:Cc:Subject:To:References:From:In-Reply-To:From;
-	b=kAuYgegW0u5NM64phkQrrDrwF4h7B7xnXN7p6M/F8Cd2MBPO4F4ncJ0OmtVgZJd6n
-	 PpfcX8GuHc+9uqwDuCdBIgRYjUyPa+lqbOb+xeUHSAS1lcGeFoi3JpiWoN4Ag/trJS
-	 3Gssh3DwqDbyIPqIzi/ymfay+iI/x6/9y+t4vEd8SvqPUQXkFt17viu78FZyXoP0DF
-	 z/tX65EyO7MUu9U/wGTATJ/2GA1h0d2pcy6Jc4CE/g8tZnT6gDSk97ZTcMSSZ1Xpk3
-	 NzQmFE+TooPwhS+mlV7Yii3FF4Cqt8Y7D4f4kSl1sXBvMs0eAEqc75DJAVUZLUw0il
-	 aiV+0RKKtxCdA==
-Message-ID: <2cb34364-0d7c-cf0a-487f-c15ba6568ac8@kernel.org>
-Date: Wed, 2 Aug 2023 16:13:57 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80B7279CA
+	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 14:27:07 +0000 (UTC)
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2053.outbound.protection.outlook.com [40.107.220.53])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75A18271C
+	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 07:27:02 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=BrqLyi+0omi6DuW0FZMoRJJMSQ6LjH15lQroL+ay+WrgbS5WiJiJwh8xJtkquCqLWD5sspgR1pkfiaYfwwoO4oU64tsAW7ytbkfP4WBrAMJlkvDPp1wf80iHPDBEdAoRHRD+t4SXiIK5bv0Yn3h3M1mLlh8w2QZXsHaJsE+r2JZmIO54JkOeSIV2WBaQRCksBEG3qjxXvHPkV3qaKZAGF5Q8AOVmpiq91SHVO43NW2GmH+D9FCZZDq4WKIFOLRB6OCnep8fVvLX9IzVYCNuVHJFlfL7rRtEYTNIEf9C7c2WcXD3H6X+b+TyV3oECETBGZyMxiZHLpyQRe8FxlEi4GQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=xT1H1WeXRYy88Don2Bxgaudrc2nM2Sx+JlJ+GK1gGhM=;
+ b=A/FKe4PiA+IU6NjoQe48XjKKIDrmNRz923EmmxmUtYRzHOo71NrDPpojPN+AdXmSbT7Bp1KIkqaSMxkLJNFIuE0+oP5Ofu9qiDejREuBXL6PPi6uXGB8VdcOsF+f3d+osmyeMwB2E8wHdTTI45P9qfVRP4s67cuH9SUiypZ6mGQcq8qjZVbMDlqd6rGYBSrWq6j+7DMAVKHFSyIG/XmhOKbf0UJ4IyHUyE8def5GsZHQt0pBB8ojlEYstaA9xSSvA5IX6XA+DVn7c3KFn+O+1dWwctFUg03F6mXZVmBdJ/IsHNidEixXdJlfkSjHJQmanEaW3jn6orUyJpVAOobFOw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=alu.unizg.hr smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=xT1H1WeXRYy88Don2Bxgaudrc2nM2Sx+JlJ+GK1gGhM=;
+ b=De8Ak59kskmNFAhcX16nYtzAnJ3VokZKDDp+UVCQ8nQUtcLQKG22OXeLo/Vu/uM5Mv1COEzHuIJkFOsP9NZLFY2LUGHxft3Bl3Is/6705TxNKvE+DV5uebVwIrgoe7Z/AwnR7e/iefQM+4a4K1RUl3Qnoz+IzYdUEZ/u2kTPONkyIJOvA/B/kvMF+0w/QEHhz+xypuhgMRlYIq/hn4TWYhn6dha2hoDgdi3O99QyEf9PUSoJ5me/MQFIRuLVoQrtEkzcr48fgo1ODtfNaHXq7QttcforxxUpIQeytLPet3wqjWAyJOjRKLUHQotS66ocyqxluOmMq2Rk82Vr7oEWSw==
+Received: from MW4PR03CA0293.namprd03.prod.outlook.com (2603:10b6:303:b5::28)
+ by DM4PR12MB5793.namprd12.prod.outlook.com (2603:10b6:8:60::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.45; Wed, 2 Aug
+ 2023 14:27:00 +0000
+Received: from MWH0EPF000971E6.namprd02.prod.outlook.com
+ (2603:10b6:303:b5:cafe::7) by MW4PR03CA0293.outlook.office365.com
+ (2603:10b6:303:b5::28) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.44 via Frontend
+ Transport; Wed, 2 Aug 2023 14:26:59 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ MWH0EPF000971E6.mail.protection.outlook.com (10.167.243.74) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6652.20 via Frontend Transport; Wed, 2 Aug 2023 14:26:59 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Wed, 2 Aug 2023
+ 07:26:43 -0700
+Received: from yaviefel (10.126.231.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37; Wed, 2 Aug 2023
+ 07:26:39 -0700
+References: <20230802075118.409395-1-idosch@nvidia.com>
+ <20230802075118.409395-11-idosch@nvidia.com>
+ <20230802105243.nqwugrz5aof5fbbk@skbuf> <87fs51eig3.fsf@nvidia.com>
+ <ZMpadrHS4Sp3zE9F@shredder>
+User-agent: mu4e 1.8.11; emacs 28.2
+From: Petr Machata <petrm@nvidia.com>
+To: Ido Schimmel <idosch@idosch.org>
+CC: Petr Machata <petrm@nvidia.com>, <vladimir.oltean@nxp.com>, Ido Schimmel
+	<idosch@nvidia.com>, <netdev@vger.kernel.org>, <davem@davemloft.net>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <edumazet@google.com>,
+	<razor@blackwall.org>, <mirsad.todorovac@alu.unizg.hr>
+Subject: Re: [PATCH net 10/17] selftests: forwarding: ethtool_mm: Skip when
+ using veth pairs
+Date: Wed, 2 Aug 2023 16:22:35 +0200
+In-Reply-To: <ZMpadrHS4Sp3zE9F@shredder>
+Message-ID: <87y1itcyg2.fsf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Cc: linux-kernel-mentees@lists.linuxfoundation.org,
- syzbot+f817490f5bd20541b90a@syzkaller.appspotmail.com
-Subject: Re: [PATCH v4 1/2] drivers: net: prevent tun_build_skb() to exceed
- the packet size limit
-Content-Language: en-US
-To: Andrew Kanner <andrew.kanner@gmail.com>, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- jasowang@redhat.com, netdev@vger.kernel.org, dsahern@gmail.com,
- jbrouer@redhat.com, john.fastabend@gmail.com, linux-kernel@vger.kernel.org
-References: <20230801220710.464-1-andrew.kanner@gmail.com>
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <20230801220710.464-1-andrew.kanner@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-Originating-IP: [10.126.231.35]
+X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MWH0EPF000971E6:EE_|DM4PR12MB5793:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1396dd87-3125-4803-8df3-08db93648841
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	bFLmXadRHAWDODvm6qei5Uj8YZCA2bHG/RiHvEVyKh8N6ooX4cVrWXu3EPKPWR7FXTGLQ4xiAC+XgWzRreDLqN9qQ4iML7u6yO+wKV4rsVuACorJ/wZxuFhCs6xnFVSFpGbgU9G9UZNjUXNectY17cBp6WLisFUjVeh+D4nhjByIVgz0YKzK39J+C8zo5a0CvUs/UbOs7M6t8DsqWsXk24lItjiYmH449Dxr859gvTq9aBo8w3f/pmQdrZT4wgVslcMld07P+8TrdbNXnTCx6pB5sjYapWClSdiPM13Xrvw/topOo1TGUL+pC980KVt+X7wVDZzxRBuDQC9DkJ3paVyphVKS4Ql3D3MJD5uSaO3eJ3Ltl+Qx0f14qgeaRmA4KWShfBuzcYYv0DlqvfpH5Icy8v4PjN3qN8cyF1OiCukeVWiWmDPEdd9UCTW34xkrX64KvVyZvqOc+4etc6NYCxPoaDbX4b4go4EgKiQfuMO5Dk4TEVBw1W4lm8TK/pW0EqKdnZSs3jnbY4WiQ2c7FiDkePNcrM8RHvIrS2oHjLfWClh/eh4yeSPi6GbWLqTS8awaEM+FFaTd8qX5Hak4S/gB2EJnUQELZNFsP71re3i7mJYHGFFQFN1Wli4S/SSV7ZNnJz/ArQKb5L6BARUc65oZpTl/Zl+IrwjKeLvFke0Jf34TK4WLzgBBqVLHUmk29kPLjzwWd+/Ndf3uSIYo0YniJMjvp1iQma/v7If72h0=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(346002)(396003)(136003)(376002)(39860400002)(82310400008)(451199021)(36840700001)(40470700004)(46966006)(8936002)(8676002)(5660300002)(426003)(26005)(41300700001)(36860700001)(2906002)(83380400001)(47076005)(36756003)(40460700003)(336012)(16526019)(2616005)(40480700001)(478600001)(7636003)(54906003)(316002)(86362001)(82740400003)(356005)(70586007)(70206006)(6666004)(4326008)(6916009)(186003);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Aug 2023 14:26:59.3504
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1396dd87-3125-4803-8df3-08db93648841
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	MWH0EPF000971E6.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5793
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
 
+Ido Schimmel <idosch@idosch.org> writes:
 
-On 02/08/2023 00.07, Andrew Kanner wrote:
-> Using the syzkaller repro with reduced packet size it was discovered
-> that XDP_PACKET_HEADROOM is not checked in tun_can_build_skb(),
-> although pad may be incremented in tun_build_skb(). This may end up
-> with exceeding the PAGE_SIZE limit in tun_build_skb().
-> 
-> Fixes: 7df13219d757 ("tun: reserve extra headroom only when XDP is set")
-> Link: https://syzkaller.appspot.com/bug?extid=f817490f5bd20541b90a
-> Signed-off-by: Andrew Kanner <andrew.kanner@gmail.com>
-> ---
-> 
-> Notes:
->      v3 -> v4:
->      * fall back to v1, fixing only missing XDP_PACKET_HEADROOM in pad and
->        removing bpf_xdp_adjust_tail() check for frame_sz.
->      * added rcu read lock, noted by Jason Wang <jasowang@redhat.com> in v1
->      * I decided to leave the packet length check in tun_can_build_skb()
->        instead of moving to tun_build_skb() suggested by Jason Wang
->        <jasowang@redhat.com>. Otherwise extra packets will be dropped
->        without falling back to tun_alloc_skb(). And in the discussion of v3
->        Jesper Dangaard Brouer <jbrouer@redhat.com> noticed that XDP is ok
->        with a higher order pages if it's a contiguous physical memory
->        allocation, so falling to tun_alloc_skb() -> do_xdp_generic() should
->        be ok.
->      
->      v2 -> v3:
->      * attach the forgotten changelog
->      
->      v1 -> v2:
->      * merged 2 patches in 1, fixing both issues: WARN_ON_ONCE with
->        syzkaller repro and missing XDP_PACKET_HEADROOM in pad
->      * changed the title and description of the execution path, suggested
->        by Jason Wang <jasowang@redhat.com>
->      * move the limit check from tun_can_build_skb() to tun_build_skb() to
->        remove duplication and locking issue, and also drop the packet in
->        case of a failed check - noted by Jason Wang <jasowang@redhat.com>
-> 
->   drivers/net/tun.c | 11 ++++++++++-
->   1 file changed, 10 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-> index d75456adc62a..a1d04bc9485f 100644
-> --- a/drivers/net/tun.c
-> +++ b/drivers/net/tun.c
-> @@ -1582,6 +1582,9 @@ static void tun_rx_batched(struct tun_struct *tun, struct tun_file *tfile,
->   static bool tun_can_build_skb(struct tun_struct *tun, struct tun_file *tfile,
->   			      int len, int noblock, bool zerocopy)
->   {
-> +	struct bpf_prog *xdp_prog;
-> +	int pad = TUN_RX_PAD;
+> On Wed, Aug 02, 2023 at 02:27:49PM +0200, Petr Machata wrote:
+>> 
+>> Vladimir Oltean <vladimir.oltean@nxp.com> writes:
+>> 
+>> > @@ -266,6 +278,14 @@ setup_prepare()
+>> >  	h1=${NETIFS[p1]}
+>> >  	h2=${NETIFS[p2]}
+>> >
+>> > +	for netif in ${NETIFS[@]}; do
+>> > +		ethtool --show-mm $netif 2>&1 &> /dev/null
+>> > +		if [[ $? -ne 0 ]]; then
+>> > +			echo "SKIP: $netif does not support MAC Merge"
+>> > +			exit $ksft_skip
+>> > +		fi
+>> > +	done
+>> > +
+>> 
+>> Ido, if you decide to go this route, just hoist the loop to the global
+>> scope before registering the trap, then you don't need the hX_created
+>> business.
+>
+> I think the idea was to run this check after verifying that ethtool
+> supports MAC Merge in setup_prepare(). How about moving all these checks
+
+True, I missed that.
+
+> before doing any configuration and registering a trap handler?
+>
+> diff --git a/tools/testing/selftests/net/forwarding/ethtool_mm.sh b/tools/testing/selftests/net/forwarding/ethtool_mm.sh
+> index 4331e2161e8d..39e736f30322 100755
+> --- a/tools/testing/selftests/net/forwarding/ethtool_mm.sh
+> +++ b/tools/testing/selftests/net/forwarding/ethtool_mm.sh
+> @@ -258,11 +258,6 @@ h2_destroy()
+>  
+>  setup_prepare()
+>  {
+> -       check_ethtool_mm_support
+> -       check_tc_fp_support
+> -       require_command lldptool
+> -       bail_on_lldpad "autoconfigure the MAC Merge layer" "configure it manually"
+> -
+>         h1=${NETIFS[p1]}
+>         h2=${NETIFS[p2]}
+>  
+> @@ -278,7 +273,18 @@ cleanup()
+>         h1_destroy
+>  }
+>  
+> -skip_on_veth
+> +check_ethtool_mm_support
+> +check_tc_fp_support
+> +require_command lldptool
+> +bail_on_lldpad "autoconfigure the MAC Merge layer" "configure it manually"
 > +
->   	if ((tun->flags & TUN_TYPE_MASK) != IFF_TAP)
->   		return false;
->   
-> @@ -1594,7 +1597,13 @@ static bool tun_can_build_skb(struct tun_struct *tun, struct tun_file *tfile,
->   	if (zerocopy)
->   		return false;
->   
-> -	if (SKB_DATA_ALIGN(len + TUN_RX_PAD) +
-> +	rcu_read_lock();
-> +	xdp_prog = rcu_dereference(tun->xdp_prog);
-> +	if (xdp_prog)
-> +		pad += XDP_PACKET_HEADROOM;
-> +	rcu_read_unlock();
-> +
+> +for netif in ${NETIFS[@]}; do
+> +       ethtool --show-mm $netif 2>&1 &> /dev/null
+> +       if [[ $? -ne 0 ]]; then
+> +               echo "SKIP: $netif does not support MAC Merge"
+> +               exit $ksft_skip
+> +       fi
+> +done
+>  
+>  trap cleanup EXIT
+>
 
-Isolated seen, I guess, this is a correct fix to 7df13219d757.
-
-> +	if (SKB_DATA_ALIGN(len + pad) +
->   	    SKB_DATA_ALIGN(sizeof(struct skb_shared_info)) > PAGE_SIZE)
->   		return false;
->   
-
-Question to Jason Wang:
-Why fall back (to e.g. tun_alloc_skb()) when size is above PAGE_SIZE?
-
-AFAIK tun_build_skb() *can* create get larger packets than PAGE_SIZE
-from it's page_frag.  Is there a reason for this limitation?
-
-(To Andrew, I assume a change in this area is another patch).
-
---Jesper
-
-
-
+Looks good. These checks are usually placed right after sourcing the
+libraries, but I don't care much one way or another.
 
