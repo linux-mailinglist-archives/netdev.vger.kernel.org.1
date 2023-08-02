@@ -1,130 +1,193 @@
-Return-Path: <netdev+bounces-23542-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23543-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F10BE76C755
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 09:46:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0459876C76F
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 09:51:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B8D7A1C21204
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 07:46:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 60CD5281204
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 07:51:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 875A14C95;
-	Wed,  2 Aug 2023 07:46:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68E2B5254;
+	Wed,  2 Aug 2023 07:51:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7996F5224
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 07:46:31 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0792535A2
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 00:46:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1690962376;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=h0UDSjpYhDP6foyjtQosf3cDeLd01SyV7B6Zn77rW4I=;
-	b=hVlz3z9oubslwFeNNfP1fFqZuRqYGw7POGtZt/4+j9N0PvOqXix6iTAuT+NrtFQapRAMmF
-	kfpuCF6tC4i3WSc038+9VEanZn67ddivfGIu4Ya2dIJ8osEjAd7V83xMsfLJSEmVZAXWSb
-	C/aS+S211EQcDepzZeomwPoVZPvYHB4=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-524-Y_Au9zcgPeCw49zTX1235Q-1; Wed, 02 Aug 2023 03:46:14 -0400
-X-MC-Unique: Y_Au9zcgPeCw49zTX1235Q-1
-Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-76ca8263c45so483144285a.2
-        for <netdev@vger.kernel.org>; Wed, 02 Aug 2023 00:46:14 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690962374; x=1691567174;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=h0UDSjpYhDP6foyjtQosf3cDeLd01SyV7B6Zn77rW4I=;
-        b=b7SN6JFTzt5cF7wj6Z3V2cXnVxCD0wNn/6arsGDlfwFpnfKi6EH0JCJbRAj6BnpfQT
-         VWriyy0z8Zkgu8rw/9L/ZlsOmB7+cxEapril1/vpmq8fmEG3eBz8HWz2urEH5Nmae1kF
-         IdWxKyk+R/BJ+hqHBJ+XGaMffO5Ou9HfjbydoryCZr5xyisAkiwWfjI8r21kQDOsbWV5
-         rRV65Jkjbf79hw9xykLodfQLUFn7dfXUS7saUQF+gIBvtwMzsNaIDtwZbDAtuZoERMqp
-         lXqEmcPAF+9TVKijpogy/1W9En7QJES4AfQArHjYmOVxHQMnpsOcPbumAIlQRitV3H6C
-         6XAQ==
-X-Gm-Message-State: ABy/qLbmEs2y/owmpHifNUNmRBQYMQQfoBT3SXwrYiT+Z8chz/UFXW1G
-	G7wLjAhzM6mjsVmZcCAq45iui5WxOaQmaQjEiHa04O/DIgAeQCz25Od9iMfUUWihMeuDgAAI3Io
-	oW4/82NFo0aPLtA9l
-X-Received: by 2002:a05:620a:2ae7:b0:76c:a35d:ee7b with SMTP id bn39-20020a05620a2ae700b0076ca35dee7bmr10630794qkb.75.1690962374345;
-        Wed, 02 Aug 2023 00:46:14 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlFodtYusq4miD67/qZPAflmfAiVup1o7pJRX1yLg/dsHxa8uZugDcgzMDc/Lwni4Tbe0+BMww==
-X-Received: by 2002:a05:620a:2ae7:b0:76c:a35d:ee7b with SMTP id bn39-20020a05620a2ae700b0076ca35dee7bmr10630782qkb.75.1690962374098;
-        Wed, 02 Aug 2023 00:46:14 -0700 (PDT)
-Received: from sgarzare-redhat (host-82-57-51-214.retail.telecomitalia.it. [82.57.51.214])
-        by smtp.gmail.com with ESMTPSA id f10-20020a0ccc8a000000b0062439f05b87sm5270298qvl.45.2023.08.02.00.46.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Aug 2023 00:46:13 -0700 (PDT)
-Date: Wed, 2 Aug 2023 09:46:08 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Bobby Eshleman <bobby.eshleman@bytedance.com>, kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kernel@sberdevices.ru, 
-	oxffffaa@gmail.com
-Subject: Re: [RFC PATCH v1 1/2] vsock: send SIGPIPE on write to shutdowned
- socket
-Message-ID: <qgn26mgfotc7qxzp6ad7ezkdex6aqniv32c5tvehxh4hljsnvs@x7wvyvptizxx>
-References: <20230801141727.481156-1-AVKrasnov@sberdevices.ru>
- <20230801141727.481156-2-AVKrasnov@sberdevices.ru>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CAE45224
+	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 07:51:27 +0000 (UTC)
+Received: from mgamail.intel.com (unknown [192.55.52.115])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8E3E49FF;
+	Wed,  2 Aug 2023 00:51:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1690962684; x=1722498684;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=OjVi6oAFwGDJrW+uaOJzko/OOgjU1MnWnooOVf6WufE=;
+  b=Vy4hUO57geKPUeJKmFRuSE6y2SfMqIUZMMg//IKj7saO/SHKThDbJc0F
+   RrH+Gpq79z0P1+kTkX8lH+sORE+kzAKDZKDiqhPeHwnPRgs3szZH5TT6W
+   NdmixoLCzhDbDC5szrp1oA6z6QkgZLoQt/qnVreYsg6UzIEVBfUjBYtRS
+   FWkRHqsOzY0l2tIfO4+zO802/Gyy6nXWymmvSmAspKUjZ2prrF7JO3HL8
+   jBEuPRqCfkoqr5gnwPopNf2KqaGP9zP5FUNTfbAFGOpOr9a6c+kp1cVFG
+   ybtfP7T0l4znRYP2kEhNdwu5zM/EzLBjY2gLRO9lZzCsCLYqmM4J3+5F5
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10789"; a="369506963"
+X-IronPort-AV: E=Sophos;i="6.01,248,1684825200"; 
+   d="scan'208";a="369506963"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2023 00:51:24 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10789"; a="819099480"
+X-IronPort-AV: E=Sophos;i="6.01,248,1684825200"; 
+   d="scan'208";a="819099480"
+Received: from lkp-server01.sh.intel.com (HELO d1ccc7e87e8f) ([10.239.97.150])
+  by FMSMGA003.fm.intel.com with ESMTP; 02 Aug 2023 00:51:19 -0700
+Received: from kbuild by d1ccc7e87e8f with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1qR6da-00010l-1x;
+	Wed, 02 Aug 2023 07:51:18 +0000
+Date: Wed, 2 Aug 2023 15:50:22 +0800
+From: kernel test robot <lkp@intel.com>
+To: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>,
+	kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+	decui@microsoft.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, longli@microsoft.com,
+	sharmaajay@microsoft.com, leon@kernel.org, cai.huoqing@linux.dev,
+	ssengar@linux.microsoft.com, vkuznets@redhat.com,
+	tglx@linutronix.de, linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, schakrabarti@microsoft.com,
+	Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>,
+	stable@vger.kernel.org
+Subject: Re: [PATCH V7 net] net: mana: Fix MANA VF unload when hardware is
+Message-ID: <202308021532.8iYkExDh-lkp@intel.com>
+References: <1690892953-25201-1-git-send-email-schakrabarti@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230801141727.481156-2-AVKrasnov@sberdevices.ru>
+In-Reply-To: <1690892953-25201-1-git-send-email-schakrabarti@linux.microsoft.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Aug 01, 2023 at 05:17:26PM +0300, Arseniy Krasnov wrote:
->POSIX requires to send SIGPIPE on write to SOCK_STREAM socket which was
->shutdowned with SHUT_WR flag or its peer was shutdowned with SHUT_RD
->flag. Also we must not send SIGPIPE if MSG_NOSIGNAL flag is set.
->
->Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
->---
-> net/vmw_vsock/af_vsock.c | 3 +++
-> 1 file changed, 3 insertions(+)
->
->diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
->index 020cf17ab7e4..013b65241b65 100644
->--- a/net/vmw_vsock/af_vsock.c
->+++ b/net/vmw_vsock/af_vsock.c
->@@ -1921,6 +1921,9 @@ static int vsock_connectible_sendmsg(struct socket *sock, struct msghdr *msg,
-> 			err = total_written;
-> 	}
-> out:
->+	if (sk->sk_type == SOCK_STREAM)
->+		err = sk_stream_error(sk, msg->msg_flags, err);
+Hi Souradeep,
 
-Do you know why we don't need this for SOCK_SEQPACKET and SOCK_DGRAM?
+kernel test robot noticed the following build warnings:
 
-Thanks,
-Stefano
+[auto build test WARNING on net/main]
 
->+
-> 	release_sock(sk);
-> 	return err;
-> }
->-- 
->2.25.1
->
+url:    https://github.com/intel-lab-lkp/linux/commits/Souradeep-Chakrabarti/net-mana-Fix-MANA-VF-unload-when-hardware-is/20230801-203141
+base:   net/main
+patch link:    https://lore.kernel.org/r/1690892953-25201-1-git-send-email-schakrabarti%40linux.microsoft.com
+patch subject: [PATCH V7 net] net: mana: Fix MANA VF unload when hardware is
+config: x86_64-allyesconfig (https://download.01.org/0day-ci/archive/20230802/202308021532.8iYkExDh-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
+reproduce: (https://download.01.org/0day-ci/archive/20230802/202308021532.8iYkExDh-lkp@intel.com/reproduce)
 
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202308021532.8iYkExDh-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   drivers/net/ethernet/microsoft/mana/mana_en.c: In function 'mana_dealloc_queues':
+>> drivers/net/ethernet/microsoft/mana/mana_en.c:2398:24: warning: suggest parentheses around assignment used as truth value [-Wparentheses]
+    2398 |                 while (skb = skb_dequeue(&txq->pending_skbs)) {
+         |                        ^~~
+
+
+vim +2398 drivers/net/ethernet/microsoft/mana/mana_en.c
+
+  2345	
+  2346	static int mana_dealloc_queues(struct net_device *ndev)
+  2347	{
+  2348		struct mana_port_context *apc = netdev_priv(ndev);
+  2349		unsigned long timeout = jiffies + 120 * HZ;
+  2350		struct gdma_dev *gd = apc->ac->gdma_dev;
+  2351		struct mana_txq *txq;
+  2352		struct sk_buff *skb;
+  2353		int i, err;
+  2354		u32 tsleep;
+  2355	
+  2356		if (apc->port_is_up)
+  2357			return -EINVAL;
+  2358	
+  2359		mana_chn_setxdp(apc, NULL);
+  2360	
+  2361		if (gd->gdma_context->is_pf)
+  2362			mana_pf_deregister_filter(apc);
+  2363	
+  2364		/* No packet can be transmitted now since apc->port_is_up is false.
+  2365		 * There is still a tiny chance that mana_poll_tx_cq() can re-enable
+  2366		 * a txq because it may not timely see apc->port_is_up being cleared
+  2367		 * to false, but it doesn't matter since mana_start_xmit() drops any
+  2368		 * new packets due to apc->port_is_up being false.
+  2369		 *
+  2370		 * Drain all the in-flight TX packets.
+  2371		 * A timeout of 120 seconds for all the queues is used.
+  2372		 * This will break the while loop when h/w is not responding.
+  2373		 * This value of 120 has been decided here considering max
+  2374		 * number of queues.
+  2375		 */
+  2376	
+  2377		for (i = 0; i < apc->num_queues; i++) {
+  2378			txq = &apc->tx_qp[i].txq;
+  2379			tsleep = 1000;
+  2380			while (atomic_read(&txq->pending_sends) > 0 &&
+  2381			       time_before(jiffies, timeout)) {
+  2382				usleep_range(tsleep, tsleep + 1000);
+  2383				tsleep <<= 1;
+  2384			}
+  2385			if (atomic_read(&txq->pending_sends)) {
+  2386				err = pcie_flr(to_pci_dev(gd->gdma_context->dev));
+  2387				if (err) {
+  2388					netdev_err(ndev, "flr failed %d with %d pkts pending in txq %u\n",
+  2389						   err, atomic_read(&txq->pending_sends),
+  2390						   txq->gdma_txq_id);
+  2391				}
+  2392				break;
+  2393			}
+  2394		}
+  2395	
+  2396		for (i = 0; i < apc->num_queues; i++) {
+  2397			txq = &apc->tx_qp[i].txq;
+> 2398			while (skb = skb_dequeue(&txq->pending_skbs)) {
+  2399				mana_unmap_skb(skb, apc);
+  2400				dev_consume_skb_any(skb);
+  2401			}
+  2402			atomic_set(&txq->pending_sends, 0);
+  2403		}
+  2404		/* We're 100% sure the queues can no longer be woken up, because
+  2405		 * we're sure now mana_poll_tx_cq() can't be running.
+  2406		 */
+  2407	
+  2408		apc->rss_state = TRI_STATE_FALSE;
+  2409		err = mana_config_rss(apc, TRI_STATE_FALSE, false, false);
+  2410		if (err) {
+  2411			netdev_err(ndev, "Failed to disable vPort: %d\n", err);
+  2412			return err;
+  2413		}
+  2414	
+  2415		mana_destroy_vport(apc);
+  2416	
+  2417		return 0;
+  2418	}
+  2419	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
