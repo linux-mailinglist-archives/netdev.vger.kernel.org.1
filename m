@@ -1,343 +1,166 @@
-Return-Path: <netdev+bounces-23816-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23817-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD2A976DB6F
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 01:20:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E6D576DB85
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 01:30:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7FE661C2120C
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 23:20:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4A80E281244
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 23:30:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B687156C0;
-	Wed,  2 Aug 2023 23:20:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4761C15AF1;
+	Wed,  2 Aug 2023 23:30:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F36FB134CD
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 23:20:47 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F7AEFB;
-	Wed,  2 Aug 2023 16:20:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=CRJ7vMQLW7U6UOyFgRLRFb67Q+Q0phGcYSZclE5+vFQ=; b=xW5rnJQqHP7YJJEY+we7/eIkS/
-	W1D/PiihhnJPxoJer0BsA4v4yHbwMSYEw3KWVC1LlwFLVsVymemB7RdgfOm3ZaYCgpuutbV5zlkKB
-	HZ4qSP+fS1ptPPMHwslE+pXSDRelVwu7fmUGp7Rgsj/7JGLobjhtyb0bfjD3MqF0lFFU=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qRL8r-002voa-Cl; Thu, 03 Aug 2023 01:20:33 +0200
-Date: Thu, 3 Aug 2023 01:20:33 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: nick.hawkins@hpe.com
-Cc: christophe.jaillet@wanadoo.fr, simon.horman@corigine.com,
-	verdun@hpe.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, robh+dt@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 4/5] net: hpe: Add GXP UMAC Driver
-Message-ID: <fb656c31-ecc3-408a-a719-cba65a6aa984@lunn.ch>
-References: <20230802201824.3683-1-nick.hawkins@hpe.com>
- <20230802201824.3683-5-nick.hawkins@hpe.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35E7B134B6
+	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 23:30:01 +0000 (UTC)
+Received: from mgamail.intel.com (unknown [192.55.52.115])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A686B26A2;
+	Wed,  2 Aug 2023 16:29:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1691018998; x=1722554998;
+  h=from:to:cc:subject:in-reply-to:references:date:
+   message-id:mime-version;
+  bh=h99e192bzCZMzg/eEGhvy+QImTiT2HSo8oaY9XUpOy4=;
+  b=gLYydFd3v5JaFCp+cFMHGQbkRNePcOjRxqzfrWl+WuZiZ+e7kOmiMugk
+   nJdBrBWCv2sy3vSr2jwxEY2tIIJhaT3400moJYEgEIeM5YmHVY33P5+28
+   jc1w96+lj3e4xB1XYfcfTfhuu/FuhWm644MMOiI5StVsyiXys3NRu2sDy
+   TUn3hsvuVODRasVRTDbw+YXHbhCpTr/2h7/uDbiPG1MkZVK8Cg6ytzOkV
+   8ZfQB7IfTQQXsjyqqACEdwyuii2YFnVWrFuaxeZNbAs8oTvkX7+D77rVx
+   W1+Kg/PJ1lL9elWx/JQsFFAn7MzAwWLdpMckagJushs/UROgD7vIosDS8
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10790"; a="369727663"
+X-IronPort-AV: E=Sophos;i="6.01,250,1684825200"; 
+   d="scan'208";a="369727663"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2023 16:29:57 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10790"; a="819405156"
+X-IronPort-AV: E=Sophos;i="6.01,250,1684825200"; 
+   d="scan'208";a="819405156"
+Received: from rbappers-mobl2.amr.corp.intel.com (HELO vcostago-mobl3) ([10.209.84.112])
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2023 16:29:56 -0700
+From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang
+ <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+ linux-kernel@vger.kernel.org, intel-wired-lan@lists.osuosl.org, Muhammad
+ Husaini Zulkifli <muhammad.husaini.zulkifli@intel.com>, Peilin Ye
+ <yepeilin.cs@gmail.com>, Pedro Tammela <pctammela@mojatatu.com>, Richard
+ Cochran <richardcochran@gmail.com>, Zhengchao Shao
+ <shaozhengchao@huawei.com>, Maxim
+ Georgiev <glipus@gmail.com>
+Subject: Re: [PATCH v3 net-next 09/10] selftests/tc-testing: test that
+ taprio can only be attached as root
+In-Reply-To: <20230801182421.1997560-10-vladimir.oltean@nxp.com>
+References: <20230801182421.1997560-1-vladimir.oltean@nxp.com>
+ <20230801182421.1997560-10-vladimir.oltean@nxp.com>
+Date: Wed, 02 Aug 2023 16:29:55 -0700
+Message-ID: <87pm4510r0.fsf@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230802201824.3683-5-nick.hawkins@hpe.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+Content-Type: text/plain
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-> The MDIO(mdio0) interface from the primary MAC (umac0) is used for
-> external PHY status and configuration.
+Vladimir Oltean <vladimir.oltean@nxp.com> writes:
 
-This is not necessarily true. Linux does not care where the PHYs are,
-they could be on a bit-banging bus, or if mdio1 also has external
-pins, on there. Or there might not be any PHYs are all, because the
-MAC is connected to an Ethernet switch etc.
+> Check that the "Can only be attached as root qdisc" error message from
+> taprio is effective by attempting to attach it to a class of another
+> taprio qdisc. That operation should fail.
+>
+> In the bug that was squashed by change "net/sched: taprio: try again to
+> report q->qdiscs[] to qdisc_leaf()", grafting a child taprio to a root
+> software taprio would be misinterpreted as a change() to the root
+> taprio. Catch this by looking at whether the base-time of the root
+> taprio has changed to follow the base-time of the child taprio,
+> something which should have absolutely never happened assuming correct
+> semantics.
+>
 
-The reference design is just a guide, the hardware designer is free to
-do something else.
+This test is somehow flaky (all others are fine), 1 in ~4 times, it fails.
 
-> diff --git a/drivers/net/ethernet/hpe/Kconfig b/drivers/net/ethernet/hpe/Kconfig
-> new file mode 100644
-> index 000000000000..c04aa22ce02f
-> --- /dev/null
-> +++ b/drivers/net/ethernet/hpe/Kconfig
-> @@ -0,0 +1,32 @@
-> +config NET_VENDOR_HPE
-> +	bool "HPE device"
-> +	default y
-> +	depends on ARCH_HPE
-> +	help
-> +	  Say y here to support the HPE network devices.
-> +	  The GXP contains two Ethernet MACs that can be
-> +	  connected externally to several physical devices.
-> +	  From an external interface perspective the BMC
-> +	  provides two SERDES interface connections capable
-> +	  of either SGMII or 1000Base-X operation. The BMC
-> +	  also provides a RMII interface for sideband
-> +	  connections to external Ethernet controllers.
-> +
-> +if NET_VENDOR_HPE
-> +
-> +config GXP_UMAC
-> +	tristate "GXP UMAC support"
-> +	depends on ARCH_HPE
-> +	select CRC32
-> +	select MII
-> +	select PHYLIB
-> +	select GXP_UMAC_MDIO
-> +	help
-> +	  Say y here to support the GXP UMACs interface. The
-> +	  primary MAC (umac0) can be mapped to either
-> +	  SGMII/1000-BaseX SERDES interface. The secondary MAC
-> +	  (umac1) can be mapped to only the second
-> +	  SGMII/1000-Base X Serdes interface or it can be
-> +	  mapped for RMII sideband.
+Taking a look at the test I couldn't quickly find out the reason for the
+flakyness.
 
-You also want to be able to build this driver with compile testing,
-same as the MDIO driver.
+Here's the verbose output of one of the failures:
 
-> +#include <linux/dma-mapping.h>
-> +#include <linux/etherdevice.h>
-> +#include <linux/ethtool.h>
-> +#include <linux/iopoll.h>
-> +#include <linux/module.h>
-> +#include <net/ncsi.h>
-> +#include <linux/of_device.h>
-> +#include <linux/of_mdio.h>
-> +#include <linux/of_net.h>
-> +#include <linux/phy.h>
-> +#include "gxp-umac.h"
-> +
-> +#define PHY_88E1514_COPPER_CONTROL_REG		0
-> +#define PHY_88E1514_PAGE_ADDRESS		22
-> +
-> +#define PHY_88E1514_GENERAL_CONTROL_REG1	20
+vcgomes@otc-cfl-clr-30 ~/src/net-next/tools/testing/selftests/tc-testing $ sudo ./tdc.py -e 39b4 -v
+ -- ns/SubPlugin.__init__
+ns/SubPlugin.adjust_command
+adjust_command:  return command [/sbin/ip link add v0p0 type veth peer name v0p1]
+_exec_cmd:  command "/sbin/ip link add v0p0 type veth peer name v0p1"
+ns/SubPlugin.adjust_command
+adjust_command:  return command [/sbin/ip link set v0p0 up]
+_exec_cmd:  command "/sbin/ip link set v0p0 up"
+ns/SubPlugin.adjust_command
+adjust_command:  return command [/sbin/ip netns add tcut]
+_exec_cmd:  command "/sbin/ip netns add tcut"
+ns/SubPlugin.adjust_command
+adjust_command:  return command [/sbin/ip link set v0p1 netns tcut]
+_exec_cmd:  command "/sbin/ip link set v0p1 netns tcut"
+ns/SubPlugin.adjust_command
+adjust_command:  return command [/sbin/ip -n tcut link set v0p1 up]
+_exec_cmd:  command "/sbin/ip -n tcut link set v0p1 up"
+	====================
+=====> Test 39b4: Reject grafting taprio as child qdisc of software taprio
+-----> prepare stage
+ns/SubPlugin.adjust_command
+adjust_command:  stage is setup; inserting netns stuff in command [echo "1 1 8" > /sys/bus/netdevsim/new_device] list [['echo', '"1', '1', '8"', '>', '/sys/bus/netdevsim/new_device']]
+adjust_command:  return command [/sbin/ip netns exec tcut echo "1 1 8" > /sys/bus/netdevsim/new_device]
+command "/sbin/ip netns exec tcut echo "1 1 8" > /sys/bus/netdevsim/new_device"
+ns/SubPlugin.adjust_command
+adjust_command:  stage is setup; inserting netns stuff in command [/sbin/tc qdisc replace dev eth0 handle 8001: parent root stab overhead 24 taprio num_tc 8 map 0 1 2 3 4 5 6 7 queues 1@0 1@1 1@2 1@3 1@4 1@5 1@6 1@7 base-time 0 sched-entry S ff 20000000 clockid CLOCK_TAI] list [['/sbin/tc', 'qdisc', 'replace', 'dev', 'eth0', 'handle', '8001:', 'parent', 'root', 'stab', 'overhead', '24', 'taprio', 'num_tc', '8', 'map', '0', '1', '2', '3', '4', '5', '6', '7', 'queues', '1@0', '1@1', '1@2', '1@3', '1@4', '1@5', '1@6', '1@7', 'base-time', '0', 'sched-entry', 'S', 'ff', '20000000', 'clockid', 'CLOCK_TAI']]
+adjust_command:  return command [/sbin/ip netns exec tcut /sbin/tc qdisc replace dev eth0 handle 8001: parent root stab overhead 24 taprio num_tc 8 map 0 1 2 3 4 5 6 7 queues 1@0 1@1 1@2 1@3 1@4 1@5 1@6 1@7 base-time 0 sched-entry S ff 20000000 clockid CLOCK_TAI]
+command "/sbin/ip netns exec tcut /sbin/tc qdisc replace dev eth0 handle 8001: parent root stab overhead 24 taprio num_tc 8 map 0 1 2 3 4 5 6 7 queues 1@0 1@1 1@2 1@3 1@4 1@5 1@6 1@7 base-time 0 sched-entry S ff 20000000 clockid CLOCK_TAI"
+-----> execute stage
+ns/SubPlugin.adjust_command
+adjust_command:  stage is execute; inserting netns stuff in command [/sbin/tc qdisc replace dev eth0 parent 8001:7 taprio num_tc 8 map 0 1 2 3 4 5 6 7 queues 1@0 1@1 1@2 1@3 1@4 1@5 1@6 1@7 base-time 200 sched-entry S ff 20000000 clockid CLOCK_TAI] list [['/sbin/tc', 'qdisc', 'replace', 'dev', 'eth0', 'parent', '8001:7', 'taprio', 'num_tc', '8', 'map', '0', '1', '2', '3', '4', '5', '6', '7', 'queues', '1@0', '1@1', '1@2', '1@3', '1@4', '1@5', '1@6', '1@7', 'base-time', '200', 'sched-entry', 'S', 'ff', '20000000', 'clockid', 'CLOCK_TAI']]
+adjust_command:  return command [/sbin/ip netns exec tcut /sbin/tc qdisc replace dev eth0 parent 8001:7 taprio num_tc 8 map 0 1 2 3 4 5 6 7 queues 1@0 1@1 1@2 1@3 1@4 1@5 1@6 1@7 base-time 200 sched-entry S ff 20000000 clockid CLOCK_TAI]
+command "/sbin/ip netns exec tcut /sbin/tc qdisc replace dev eth0 parent 8001:7 taprio num_tc 8 map 0 1 2 3 4 5 6 7 queues 1@0 1@1 1@2 1@3 1@4 1@5 1@6 1@7 base-time 200 sched-entry S ff 20000000 clockid CLOCK_TAI"
+-----> verify stage
+ns/SubPlugin.adjust_command
+adjust_command:  stage is verify; inserting netns stuff in command [/sbin/tc -j qdisc show dev eth0 root | jq '.[].options.base_time'] list [['/sbin/tc', '-j', 'qdisc', 'show', 'dev', 'eth0', 'root', '|', 'jq', "'.[].options.base_time'"]]
+adjust_command:  return command [/sbin/ip netns exec tcut /sbin/tc -j qdisc show dev eth0 root | jq '.[].options.base_time']
+command "/sbin/ip netns exec tcut /sbin/tc -j qdisc show dev eth0 root | jq '.[].options.base_time'"
+-----> teardown stage
+ns/SubPlugin.adjust_command
+adjust_command:  stage is teardown; inserting netns stuff in command [/sbin/tc qdisc del dev eth0 root] list [['/sbin/tc', 'qdisc', 'del', 'dev', 'eth0', 'root']]
+adjust_command:  return command [/sbin/ip netns exec tcut /sbin/tc qdisc del dev eth0 root]
+command "/sbin/ip netns exec tcut /sbin/tc qdisc del dev eth0 root"
+ns/SubPlugin.adjust_command
+adjust_command:  stage is teardown; inserting netns stuff in command [echo "1" > /sys/bus/netdevsim/del_device] list [['echo', '"1"', '>', '/sys/bus/netdevsim/del_device']]
+adjust_command:  return command [/sbin/ip netns exec tcut echo "1" > /sys/bus/netdevsim/del_device]
+command "/sbin/ip netns exec tcut echo "1" > /sys/bus/netdevsim/del_device"
+ns/SubPlugin.post_suite
+ns/SubPlugin.adjust_command
+adjust_command:  return command [/sbin/ip netns delete tcut]
+_exec_cmd:  command "/sbin/ip netns delete tcut"
 
-Didn't i comment last time, that the MAC driver should never touch PHY
-registers? 
+All test results:
 
-> +
-> +#define DRV_MODULE_NAME		"gxp-umac"
-> +#define DRV_MODULE_VERSION	"0.1"
+1..1
+not ok 1 39b4 - Reject grafting taprio as child qdisc of software taprio
+	Could not match regex pattern. Verify command output:
+parse error: Objects must consist of key:value pairs at line 1, column 334
 
-Versions are pointless. Please Remove it.
 
-> +#define NUMBER_OF_PORTS 2
-> +#define EXTERNAL_PORT 1
-> +#define INTERNAL_PORT 0
-> +
-> +struct umac_priv {
-> +	void __iomem *base;
-> +	int irq;
-> +	struct platform_device *pdev;
-> +	struct umac_tx_descs *tx_descs;
-> +	struct umac_rx_descs *rx_descs;
-> +	dma_addr_t tx_descs_dma_addr;
-> +	dma_addr_t rx_descs_dma_addr;
-> +	unsigned int tx_cur;
-> +	unsigned int tx_done;
-> +	unsigned int rx_cur;
-> +	struct napi_struct napi;
-> +	struct net_device *ndev;
-> +	struct phy_device *phy_dev;
-> +	struct phy_device *int_phy_dev;
-> +	struct ncsi_dev *ncsidev;
-> +	bool use_ncsi;
-> +};
-> +
-> +static void umac_get_drvinfo(struct net_device *ndev,
-> +			     struct ethtool_drvinfo *info)
-> +{
-> +	strscpy(info->driver, DRV_MODULE_NAME, sizeof(info->driver));
-> +	strscpy(info->version, DRV_MODULE_VERSION, sizeof(info->version));
-
-Please drop this. The kernel will then fill version with the actual
-kernel version, and i think git hash. That it useful, unlike your
-"0.1".
-
-> +static int umac_get_link_ksettings(struct net_device *ndev,
-> +				   struct ethtool_link_ksettings *cmd)
-> +{
-> +	phy_ethtool_ksettings_get(ndev->phydev, cmd);
-
-return what phy_ethtool_ksettings_get returns. Also, please use
-phy_ethtool_get_link_ksettings().
-
-> +	return phy_ethtool_ksettings_set(ndev->phydev, cmd);
-
-phy_ethtool_set_link_ksettings(). Please look at what helpers are
-available, and use them.
-
-> +static u32 umac_get_link(struct net_device *ndev)
-> +{
-> +	int err;
-> +
-> +	err = genphy_update_link(ndev->phydev);
-> +	if (err)
-> +		return ethtool_op_get_link(ndev);
-> +
-> +	return ndev->phydev->link;
-> +}
-
-Should not be needed. 
-
-> +static int umac_int_phy_init(struct umac_priv *umac)
-> +{
-> +	struct phy_device *phy_dev = umac->int_phy_dev;
-> +	unsigned int value;
-> +
-> +	value = phy_read(phy_dev, 0);
-> +	if (value & 0x4000)
-> +		pr_info("Internal PHY loopback is enabled - clearing\n");
-
-How is the PHY getting into loopback mode? The MAC driver should never
-touch the PHY, because you have no idea what the PHY actually is,
-unless it is internal. And i doubt you have licensed this PHY from
-Marvell to make it internal.
-
-> +static int umac_phy_fixup(struct phy_device *phy_dev)
-> +{
-> +	unsigned int value;
-> +
-> +	/* set phy mode to SGMII to copper */
-> +	/* set page to 18 by writing 18 to register 22 */
-> +	phy_write(phy_dev, PHY_88E1514_PAGE_ADDRESS, 18);
-> +	value = phy_read(phy_dev, PHY_88E1514_GENERAL_CONTROL_REG1);
-> +	value &= ~0x07;
-> +	value |= 0x01;
-> +	phy_write(phy_dev, PHY_88E1514_GENERAL_CONTROL_REG1, value);
-
-The PHY driver should do this, not the MAC. When you connect the MAC
-to the PHY, set the correct interface mode.
-
-> +static int umac_init_hw(struct net_device *ndev)
-> +{
-
-...
-
-> +		if (ndev->phydev->duplex)
-> +			value |= UMAC_CFG_FULL_DUPLEX;
-> +		else
-> +			value &= ~UMAC_CFG_FULL_DUPLEX;
-> +
-> +		if (ndev->phydev->speed == SPEED_1000) {
-> +			value &= ~UMAC_CFG_TX_CLK_EN;
-> +			value |= UMAC_CFG_GTX_CLK_EN;
-> +			value |= UMAC_CFG_GIGABIT_MODE;
-> +		} else {
-> +			value |= UMAC_CFG_TX_CLK_EN;
-> +			value &= ~UMAC_CFG_GTX_CLK_EN;
-> +			value &= ~UMAC_CFG_GIGABIT_MODE;
-> +		}
-> +	}
-
-It is only safe to access members of phydev inside the adjust_link
-callback. At that point, the members are guaranteed to the consistent.
-
-> +static int umac_open(struct net_device *ndev)
-> +{
-> +
-> +	netdev_info(ndev, "%s is OPENED\n", ndev->name);
-
-Don't spam the log. netdev_dbg(), or nothing.
-
-> +static int umac_init_mac_address(struct net_device *ndev)
-> +{
-> +	struct umac_priv *umac = netdev_priv(ndev);
-> +	struct platform_device *pdev = umac->pdev;
-> +	char addr[ETH_ALEN];
-> +	int err;
-> +
-> +	err = of_get_mac_address(pdev->dev.of_node, addr);
-> +	if (err)
-> +		netdev_err(ndev, "Failed to get address from device-tree: %d\n",
-> +			   err);
-> +
-> +	if (is_valid_ether_addr(addr)) {
-> +		dev_addr_set(ndev, addr);
-> +		netdev_info(ndev,
-> +			    "Read MAC address %pM from DTB\n", ndev->dev_addr);
-> +	} else {
-> +		eth_hw_addr_random(ndev);
-> +		netdev_info(ndev, "Generated random MAC address %pM\n",
-> +			    ndev->dev_addr);
-
-of_get_mac_address() should return an error if there is no MAC address
-available. If you get this far, the MAC address in DT, or the NVMEM is
-invalid. So you probably want to print an error message about the
-invalid MAC address and return -EINVAL.
-
-> +static void umac_adjust_link(struct net_device *ndev)
-> +{
-> +	struct umac_priv *umac = netdev_priv(ndev);
-> +	int value;
-> +
-> +	if (ndev->phydev->link) {
-> +		/* disable both clock */
-> +		value = readl(umac->base + UMAC_CONFIG_STATUS);
-> +		value &= 0xfffff9ff;
-> +		writel(value, umac->base + UMAC_CONFIG_STATUS);
-> +		udelay(2);
-> +
-> +		if (ndev->phydev->duplex)
-> +			value |= UMAC_CFG_FULL_DUPLEX;
-> +		else
-> +			value &= ~UMAC_CFG_FULL_DUPLEX;
-> +
-> +		switch (ndev->phydev->speed) {
-> +		case SPEED_1000:
-> +			value &= ~UMAC_CFG_TX_CLK_EN;
-> +			value |= UMAC_CFG_GTX_CLK_EN;
-> +			value |= UMAC_CFG_GIGABIT_MODE;
-> +			break;
-> +		case SPEED_100:
-> +			value |= UMAC_CFG_TX_CLK_EN;
-> +			value &= ~UMAC_CFG_GTX_CLK_EN;
-> +			value &= ~UMAC_CFG_GIGABIT_MODE;
-> +			break;
-> +		}
-
-What about SPEED_10? value will be random from whatever is on the
-stack, and you write it to UMAC_CONFIG_STATUS.
-
-> +		/* update duplex and gigabit_mode to umac */
-> +		writel(value, umac->base + UMAC_CONFIG_STATUS);
-> +		udelay(2);
-> +
-> +		netif_carrier_on(ndev);
-
-Should not be needed. phylib will do it for you.
-
-> +		netif_carrier_off(ndev);
-
-phylib will also do this.
-
-> +static int umac_setup_phy(struct net_device *ndev)
-> +{
-
-...
-
-> +				/* If the specified phy-handle has a fixed-link declaration, use the
-> +				 * fixed-link properties to set the configuration for the PHY
-> +				 */
-
-This is wrong. Look at other drivers using fixed link.
-
-     Andrew
+Cheers,
+-- 
+Vinicius
 
