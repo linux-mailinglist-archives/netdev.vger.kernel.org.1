@@ -1,64 +1,75 @@
-Return-Path: <netdev+bounces-23813-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23814-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7286076DAF8
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 00:51:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8380676DB26
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 01:00:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2D790281BA8
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 22:50:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3D026281EA8
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 23:00:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCBD0134B6;
-	Wed,  2 Aug 2023 22:50:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50D25154B8;
+	Wed,  2 Aug 2023 23:00:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB11110956
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 22:50:56 +0000 (UTC)
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 921A89B;
-	Wed,  2 Aug 2023 15:50:55 -0700 (PDT)
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-686f8614ce5so300275b3a.3;
-        Wed, 02 Aug 2023 15:50:55 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691016655; x=1691621455;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DSZP6s8E87YIozKHHuno/d/txSVRFI7AHAk3fEQT3oo=;
-        b=QbZOKhR3PWBARSvzW1NZN7USu+BXZj4uutwyCwIutvUqKuNeJSvrER2r8Mlt2CmIEq
-         LhY5Qmf35B05TAGS0ITQQrvsiWiNhMWcBw+uo6QcfjnnAcxd7fhdKSASsfGhf+CYtUuV
-         CRf1lLjFluFu6KMs8hbaegRxh0zISof9jHIOSRsE58nphpjXsgsWp+n0PECvkvPTLfvE
-         Ueq94L44zfkbjyhE7+opy6sSrqKKAva7qk0mommmmrSHghFg0xQaCuhIVG7zbOhLUAJv
-         k7oofj6aySnB3oBelnjWChr6uS7t65k2m3Mu7oQFJMAIL1a92DYDa0SgFc71MtQadJjl
-         r1Eg==
-X-Gm-Message-State: ABy/qLZxp+Bd/Ccjm8Q0EtgYfRQ6HjD+v3ebI7fYgV2099VcY+cV0LG3
-	X6IIQXiOFAofXK1bBpD3pK8=
-X-Google-Smtp-Source: APBJJlEQyc/oGseiiXbsMGMZUszVgfMcxK3SQMnZu2T/xFQsiEwlYTiKIL/zNbyeM4OOfg2IpeyZfg==
-X-Received: by 2002:a05:6a20:a10e:b0:13d:b318:5c70 with SMTP id q14-20020a056a20a10e00b0013db3185c70mr13020943pzk.19.1691016655000;
-        Wed, 02 Aug 2023 15:50:55 -0700 (PDT)
-Received: from liuwe-devbox-debian-v2 ([20.69.120.36])
-        by smtp.gmail.com with ESMTPSA id x26-20020a62fb1a000000b00686e6e2b556sm11467645pfm.26.2023.08.02.15.50.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Aug 2023 15:50:54 -0700 (PDT)
-Date: Wed, 2 Aug 2023 22:50:48 +0000
-From: Wei Liu <wei.liu@kernel.org>
-To: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
-Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
-	decui@microsoft.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, longli@microsoft.com,
-	sharmaajay@microsoft.com, leon@kernel.org, cai.huoqing@linux.dev,
-	ssengar@linux.microsoft.com, vkuznets@redhat.com,
-	tglx@linutronix.de, linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org, schakrabarti@microsoft.com,
-	stable@vger.kernel.org
-Subject: Re: [PATCH V6 net] net: mana: Fix MANA VF unload when hardware is
-Message-ID: <ZMrdyFgwr9sL7BmZ@liuwe-devbox-debian-v2>
-References: <1690377336-1353-1-git-send-email-schakrabarti@linux.microsoft.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44AFE10947
+	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 23:00:33 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (unknown [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4900D1704;
+	Wed,  2 Aug 2023 16:00:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=GtHyUyRhmZC/ndCTfFZSi0G5xoy+tfRuoFtXp1YsIVM=; b=JtvkveQpSmLkLcNOVxyh/y4nHb
+	eTYMyA6kStyZj5Yy/jFPb2xF7atWrkAKg1yr4gKtF8N8z1KdGkUi36hjqtQvmKvw6ONUqa/oTe+JD
+	kt6/EsmDPjRYPCMRIJEGusOt7SGcjY0ijKhia2F2Xyix5ogILECyKSBVNJ10l8l70oMpqbX/LjLH1
+	GGp1uZbfwA8mYOp/WHGLLALFPNi1u+TpE5W80l9dyHQzokAsEjgfyZ6lgHuQBp4SrblStNuUiisxc
+	D5qs27eB3aem//Yq4F4NcLvBO9yCrJASk7v3KcFR+aJfufpkez0Xb8sXT03tCjiNNDKzMUpiZyAot
+	VZVb8eyg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:42338)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qRKp8-0005zV-0u;
+	Thu, 03 Aug 2023 00:00:11 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qRKp0-0002HP-CR; Thu, 03 Aug 2023 00:00:02 +0100
+Date: Thu, 3 Aug 2023 00:00:02 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Michael Walle <mwalle@kernel.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Yisen Zhuang <yisen.zhuang@huawei.com>,
+	Salil Mehta <salil.mehta@huawei.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
+	Xu Liang <lxu@maxlinear.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Simon Horman <simon.horman@corigine.com>
+Subject: Re: [PATCH net-next v3 02/11] net: phy: introduce
+ phy_has_c45_registers()
+Message-ID: <ZMrf8goIsn3PDC2S@shell.armlinux.org.uk>
+References: <20230620-feature-c45-over-c22-v3-2-9eb37edf7be0@kernel.org>
+ <7be8b305-f287-4e99-bddd-55646285c427@lunn.ch>
+ <867ae3cc05439599d63e4712bca79e27@kernel.org>
+ <cf999a14e51b7f2001d9830cc5e11016@kernel.org>
+ <ZMkddjabRonGe7Eu@shell.armlinux.org.uk>
+ <bce942b71db8c4b9bf741db517e7ca5f@kernel.org>
+ <ZMkraPZvWWKhY8lT@shell.armlinux.org.uk>
+ <b0e5fbe28757d755d814727181c09f32@kernel.org>
+ <ZMp/B2U/qaI/VQDN@shell.armlinux.org.uk>
+ <3fa8d14f0a989af971d61af01b13fd8b@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,32 +78,69 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1690377336-1353-1-git-send-email-schakrabarti@linux.microsoft.com>
-X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+In-Reply-To: <3fa8d14f0a989af971d61af01b13fd8b@kernel.org>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RDNS_NONE,SPF_HELO_NONE,
+	SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Jul 26, 2023 at 06:15:36AM -0700, Souradeep Chakrabarti wrote:
-> When unloading the MANA driver, mana_dealloc_queues() waits for the MANA
-> hardware to complete any inflight packets and set the pending send count
-> to zero. But if the hardware has failed, mana_dealloc_queues()
-> could wait forever.
+On Wed, Aug 02, 2023 at 07:11:27PM +0200, Michael Walle wrote:
+> I'm talking about
 > 
-> Fix this by adding a timeout to the wait. Set the timeout to 120 seconds,
-> which is a somewhat arbitrary value that is more than long enough for
-> functional hardware to complete any sends.
+> 	u32 mmd_mask = MDIO_DEVS_PMAPMD | MDIO_DEVS_AN;
+> 	if (!phydev->is_c45 ||
+> 	    (phydev->c45_ids.devices_in_package & mmd_mask) != mmd_mask)
+> 		return -ENODEV;
 > 
-> Cc: stable@vger.kernel.org
-> Fixes: ca9c54d2d6a5 ("net: mana: Add a driver for Microsoft Azure Network Adapter (MANA)")
-> 
-> Signed-off-by: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
+> How should that look like after this series?
 
-Hi Souradeep. The subject line of this patch seems to be cut off half
-way.
+In the case of the marvell10g driver, at least the 88x3310 can be
+accessed via clause 45 bus cycles _or_ the clause 45 indirect
+register access via clause 22. I'm not sure what the clause 22
+registers would contain, whether they contain valid values with
+the exception of the clause 45 indirect access registers because
+there's not enough information in the documentation, and I can't
+access the clause 22 registers on real hardware.
 
-Thanks,
-Wei.
+Another issue is this PHY has two different ID values. One is
+0x002b 0x09aa, the other is 0x0141 0x0daa. One or other of these
+values appears in the MMDs - in other words, they are not
+consistently used. This means it's impossible to guess what value
+may be in the clause 22 ID registers for this PHY.
+
+However, given the way phylib works, the above effectively ensures
+that we detected the PHY using clause 45 accesses, and then goes on
+to verify that we do indeed have the PMAPMD MMD and the AN MMD.
+Effectively, it ensures that get_phy_c45_ids() was used to detect
+the device.
+
+So, in effect, this code is ensuring that we discovered the PHY
+using clause 45 accesses, and that at a minimum the PHY also
+indicates that the PMAPMD and AN MMDs are implemented.
+
+For the bcm84881 driver, it's a similar situation - that's only
+ever been used with a bus that supports _only_ clause 45 accesses.
+Even less idea whether the PHY could respond to clause 22 accesses
+as there is no information available on the PHY.
+
+So, I'd suggest both of these are the same - returns -ENODEV if
+the bus doesn't support clause 45 transfers or if the two MMDs
+are not indicated.
+
+That said, it _can_ be simplified down to just testing the
+devices_in_package member, because that will only be non-zero if
+we successfully probed the PHY via some accessible way to the
+clause 45 registers. So:
+
+	if ((phydev->c45_ids.devices_in_package & mmd_mask) != mmd_mask)
+		return -ENODEV;
+
+is probably entirely sufficient in both cases.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
