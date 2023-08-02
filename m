@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-23683-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23684-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E38E76D1C3
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 17:23:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F23476D1C7
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 17:24:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 823B61C20853
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 15:23:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 707651C2131F
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 15:24:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30892DDB3;
-	Wed,  2 Aug 2023 15:21:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E5D6DF51;
+	Wed,  2 Aug 2023 15:21:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 253138C15
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 15:21:26 +0000 (UTC)
-Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 441994EF6
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03203DF4C
+	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 15:21:27 +0000 (UTC)
+Received: from mail-wr1-x432.google.com (mail-wr1-x432.google.com [IPv6:2a00:1450:4864:20::432])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C81024EFD
 	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 08:20:58 -0700 (PDT)
-Received: by mail-wr1-x42a.google.com with SMTP id ffacd0b85a97d-317715ec496so7112427f8f.3
+Received: by mail-wr1-x432.google.com with SMTP id ffacd0b85a97d-3177f520802so709607f8f.1
         for <netdev@vger.kernel.org>; Wed, 02 Aug 2023 08:20:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1690989639; x=1691594439;
+        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1690989641; x=1691594441;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ijBgMWxuFtml0C6g7UT+aYSZs/zH2hddHHLPUS4ODZ4=;
-        b=W7sQX946qKJ5oJGFudzxQ+yK0f/Y9W6x4kLCaZlSIEo7gtFrHptxKbsmfN6qcFO2Au
-         uzjyCiLDjrItORt1+ek8ERxKCb6YAMPmbTaTVHPygPHCEWXLeIFhz6xSEKViH28KD/Fe
-         VnV3XGV4p2Qy4OldqpmMU4Ij0pfduImbx2qgrtblcucfYaQsRuH5onBlE4BD/9S26KLw
-         3G1eaJU3+K+m3MMK616VGA5EIqu8YFPrCdljpmAWIzIE6mJYT1PVUShtaHiWd1Ss53dA
-         hUOwWqcoPQFCxmOv1fkbDYWxct1fRb/W/8KUR4fLQgpRO6zq1ZvrTlIBD1l9YX3aC3ad
-         LtaQ==
+        bh=6aG2vhvT3L7ndx5Y3qElr7N1jus2m24HM/CUdo9QK2c=;
+        b=smqkfGP7Pxz0yjF+bxDknWR5pRm9BESMeXK+Qz9iuVQKdoxWRpgIXALhn3Ojw3nndh
+         8vvnj7ZU1ecvqVciWkLF5gJUhpk3QGOnqiLrDLjBZFbadnn4UU0uqDv02XAjlxdNbvOx
+         U524HOjvZwyxmy31y3TWrqU0J/TEezNXx7NslPvIAuPwQOkWxGZOXyACYaEvbOVgSNFC
+         sls20X6Gjtgar7Ukix2mLFiqsSSXIkkxtY/AKobfIE2YOumXXOH0QkLGg6F3mrjiN57+
+         d6zNaQZ4VNd4uUmIcDw7aMU+nt2hRUaQy416lrjMTt73ZKi0W0DHoYH1oUQzZFN0kLpe
+         E6SQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690989639; x=1691594439;
+        d=1e100.net; s=20221208; t=1690989641; x=1691594441;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ijBgMWxuFtml0C6g7UT+aYSZs/zH2hddHHLPUS4ODZ4=;
-        b=FbZzynv4I2ZH25KKzdVSc3+xu2IG9k2/xAfwtEsWFB5y+rbRvqBf19zSNkwNbpBu/1
-         o0nRKQkFkZI5zpcBd/DQgf1cOEVxf991QLRxd3nhclW69h7iXS3fbcQYBpvrwNFaPnYI
-         HCSMA3Z4kDn3d2HzaxJziB+cguBqSATbYUR1byn63BXv/KjOBQ50PuHrxVbiHpGysMO6
-         gU2k7ztNbP6EPYFOKQ/uY5LC3b8khVHiOXHz75uV/4jKGJlatrFq323ZjFuZ5kpoX+pa
-         H5hIsfd6HK6eSbhp0R0A2rrvfbmmx+UT/wNFTlnLmzSSjeh0b5iHd7vEEYef5pannWh1
-         DsRg==
-X-Gm-Message-State: ABy/qLYkAh/G0KhOtcZQVMmuEaUQy8e/CIq9OZgE1ovs6wb8oH7Pc4hq
-	nXP6bkgy11OHn3D/DDdY7P7xD1NQCZillNBmiM4VBg==
-X-Google-Smtp-Source: APBJJlHtu8oigFNHu7V1TRKvwy12DBYEtNcg9iqq29h3hJzslQq6Ptdapx7q2G3f2PyevAwIJGD99A==
-X-Received: by 2002:a5d:484d:0:b0:317:55de:d8 with SMTP id n13-20020a5d484d000000b0031755de00d8mr5081499wrs.14.1690989639025;
-        Wed, 02 Aug 2023 08:20:39 -0700 (PDT)
+        bh=6aG2vhvT3L7ndx5Y3qElr7N1jus2m24HM/CUdo9QK2c=;
+        b=UgOXvodZ9a1zYMZ49gZV6ILNsRu+xAUsZx9Sl/zG2uBwujrwS+xJjCg9mnApQywqlO
+         JBsEWpVb4y6BX/93BlTu/mH4oFp8OTX7DIUVpH8SjVCijd+2phd0TREnhpxKF+VMk79x
+         Bql3mq5JmcoWOTq9/j4Ql6tp6R3ODldL8FIk4P38YXUEpP77cNL8LrGhTsd6FYYhGzGz
+         R/5xuqod9bgE2/BMYYQ9Imb7msEUFz9SUvPiwctszOvC/frEf+5NVdYrIxVuxQD4bvYr
+         VRjyUoy/hxIIePEGnThYXgOgJB+M0BFaAgVhCCQnYZmvC3kPmGC35eKzIKcIGIKRb8YJ
+         hYYQ==
+X-Gm-Message-State: ABy/qLaUgxAuHFHgtXANTDGttDrrqe4itjPMPoTpQwlVc5efhjySlqfk
+	AA39Dgx5xuDAUT2HqBavvLyeMg1q2mdirykHe1M7fQ==
+X-Google-Smtp-Source: APBJJlFHz0TyLR18anVrsH0huKv+DLXJ3b5uXdmxVAwayL8vWc7KhdMWDmAKqAhjL+nCtnO4HIOYHQ==
+X-Received: by 2002:a5d:65cc:0:b0:314:3c72:d1ba with SMTP id e12-20020a5d65cc000000b003143c72d1bamr5248711wrw.20.1690989640855;
+        Wed, 02 Aug 2023 08:20:40 -0700 (PDT)
 Received: from localhost ([212.23.236.67])
-        by smtp.gmail.com with ESMTPSA id f3-20020a5d50c3000000b00317909f9985sm14858917wrt.113.2023.08.02.08.20.37
+        by smtp.gmail.com with ESMTPSA id s21-20020a7bc395000000b003fe2ebf479fsm1881830wmj.36.2023.08.02.08.20.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Aug 2023 08:20:38 -0700 (PDT)
+        Wed, 02 Aug 2023 08:20:40 -0700 (PDT)
 From: Jiri Pirko <jiri@resnulli.us>
 To: netdev@vger.kernel.org
 Cc: kuba@kernel.org,
@@ -66,9 +66,9 @@ Cc: kuba@kernel.org,
 	saeedm@nvidia.com,
 	idosch@nvidia.com,
 	petrm@nvidia.com
-Subject: [patch net-next v2 08/11] devlink: include the generated netlink header
-Date: Wed,  2 Aug 2023 17:20:20 +0200
-Message-ID: <20230802152023.941837-9-jiri@resnulli.us>
+Subject: [patch net-next v2 09/11] devlink: rename couple of doit netlink callbacks to match generated names
+Date: Wed,  2 Aug 2023 17:20:21 +0200
+Message-ID: <20230802152023.941837-10-jiri@resnulli.us>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230802152023.941837-1-jiri@resnulli.us>
 References: <20230802152023.941837-1-jiri@resnulli.us>
@@ -87,55 +87,76 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 
 From: Jiri Pirko <jiri@nvidia.com>
 
-Put the newly added generated header to the include list. Un-static the
-pre-doit and post-doit functions as they are used in the generated
-files.
+The generated names of the doit netlink callback are missing "cmd" in
+their names. Fix the names and remove the original prototypes.
 
 Signed-off-by: Jiri Pirko <jiri@nvidia.com>
 ---
- net/devlink/devl_internal.h | 2 ++
- net/devlink/netlink.c       | 8 ++++----
- 2 files changed, 6 insertions(+), 4 deletions(-)
+ net/devlink/dev.c           | 4 ++--
+ net/devlink/devl_internal.h | 2 --
+ net/devlink/leftover.c      | 4 ++--
+ 3 files changed, 4 insertions(+), 6 deletions(-)
 
-diff --git a/net/devlink/devl_internal.h b/net/devlink/devl_internal.h
-index c67f074641d4..f5ad66d5773c 100644
---- a/net/devlink/devl_internal.h
-+++ b/net/devlink/devl_internal.h
-@@ -12,6 +12,8 @@
- #include <net/devlink.h>
- #include <net/net_namespace.h>
- 
-+#include "netlink_gen.h"
-+
- #define DEVLINK_REGISTERED XA_MARK_1
- 
- #define DEVLINK_RELOAD_STATS_ARRAY_SIZE \
-diff --git a/net/devlink/netlink.c b/net/devlink/netlink.c
-index 82a3238d5344..39e07a5a69af 100644
---- a/net/devlink/netlink.c
-+++ b/net/devlink/netlink.c
-@@ -109,8 +109,8 @@ devlink_get_from_attrs_lock(struct net *net, struct nlattr **attrs)
- 	return ERR_PTR(-ENODEV);
+diff --git a/net/devlink/dev.c b/net/devlink/dev.c
+index bf1d6f1bcfc7..2e120b3da220 100644
+--- a/net/devlink/dev.c
++++ b/net/devlink/dev.c
+@@ -196,7 +196,7 @@ void devlink_notify(struct devlink *devlink, enum devlink_command cmd)
+ 				msg, 0, DEVLINK_MCGRP_CONFIG, GFP_KERNEL);
  }
  
--static int devlink_nl_pre_doit(const struct genl_split_ops *ops,
--			       struct sk_buff *skb, struct genl_info *info)
-+int devlink_nl_pre_doit(const struct genl_split_ops *ops,
-+			struct sk_buff *skb, struct genl_info *info)
+-int devlink_nl_cmd_get_doit(struct sk_buff *skb, struct genl_info *info)
++int devlink_nl_get_doit(struct sk_buff *skb, struct genl_info *info)
  {
- 	struct devlink_linecard *linecard;
- 	struct devlink_port *devlink_port;
-@@ -167,8 +167,8 @@ static int devlink_nl_pre_doit(const struct genl_split_ops *ops,
+ 	struct devlink *devlink = info->user_ptr[0];
+ 	struct sk_buff *msg;
+@@ -804,7 +804,7 @@ devlink_nl_info_fill(struct sk_buff *msg, struct devlink *devlink,
  	return err;
  }
  
--static void devlink_nl_post_doit(const struct genl_split_ops *ops,
--				 struct sk_buff *skb, struct genl_info *info)
-+void devlink_nl_post_doit(const struct genl_split_ops *ops,
-+			  struct sk_buff *skb, struct genl_info *info)
+-int devlink_nl_cmd_info_get_doit(struct sk_buff *skb, struct genl_info *info)
++int devlink_nl_info_get_doit(struct sk_buff *skb, struct genl_info *info)
  {
- 	struct devlink *devlink;
- 
+ 	struct devlink *devlink = info->user_ptr[0];
+ 	struct sk_buff *msg;
+diff --git a/net/devlink/devl_internal.h b/net/devlink/devl_internal.h
+index f5ad66d5773c..419bc92da503 100644
+--- a/net/devlink/devl_internal.h
++++ b/net/devlink/devl_internal.h
+@@ -216,11 +216,9 @@ struct devlink_rate *
+ devlink_rate_node_get_from_info(struct devlink *devlink,
+ 				struct genl_info *info);
+ /* Devlink nl cmds */
+-int devlink_nl_cmd_get_doit(struct sk_buff *skb, struct genl_info *info);
+ int devlink_nl_cmd_reload(struct sk_buff *skb, struct genl_info *info);
+ int devlink_nl_cmd_eswitch_get_doit(struct sk_buff *skb, struct genl_info *info);
+ int devlink_nl_cmd_eswitch_set_doit(struct sk_buff *skb, struct genl_info *info);
+-int devlink_nl_cmd_info_get_doit(struct sk_buff *skb, struct genl_info *info);
+ int devlink_nl_cmd_flash_update(struct sk_buff *skb, struct genl_info *info);
+ int devlink_nl_cmd_selftests_get_doit(struct sk_buff *skb, struct genl_info *info);
+ int devlink_nl_cmd_selftests_run(struct sk_buff *skb, struct genl_info *info);
+diff --git a/net/devlink/leftover.c b/net/devlink/leftover.c
+index 8f42f1f45705..094cd0e8224e 100644
+--- a/net/devlink/leftover.c
++++ b/net/devlink/leftover.c
+@@ -6282,7 +6282,7 @@ const struct genl_small_ops devlink_nl_small_ops[56] = {
+ 	{
+ 		.cmd = DEVLINK_CMD_GET,
+ 		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
+-		.doit = devlink_nl_cmd_get_doit,
++		.doit = devlink_nl_get_doit,
+ 		.dumpit = devlink_nl_instance_iter_dumpit,
+ 		/* can be retrieved by unprivileged users */
+ 	},
+@@ -6536,7 +6536,7 @@ const struct genl_small_ops devlink_nl_small_ops[56] = {
+ 	{
+ 		.cmd = DEVLINK_CMD_INFO_GET,
+ 		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
+-		.doit = devlink_nl_cmd_info_get_doit,
++		.doit = devlink_nl_info_get_doit,
+ 		.dumpit = devlink_nl_instance_iter_dumpit,
+ 		/* can be retrieved by unprivileged users */
+ 	},
 -- 
 2.41.0
 
