@@ -1,175 +1,124 @@
-Return-Path: <netdev+bounces-23540-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23541-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43C9A76C706
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 09:37:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9B2576C721
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 09:39:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B46CF281C23
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 07:37:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A390D281BF9
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 07:39:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9AC6442A;
-	Wed,  2 Aug 2023 07:37:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BB3A46AC;
+	Wed,  2 Aug 2023 07:39:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB2D01869
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 07:37:06 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D501D30C1
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 00:37:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1690961821;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=Af46NJKmEBmqy5H958slGnADxdkvZPSFCpD9BIDom1E=;
-	b=K8ktEoXkDC0VHvlC8J18KFcIsNz1PRz4+xyG88/SDhQAvtCIr8ZI88Nkg4zOhuBtxMktyn
-	Ai0c9JBXyUJgMY6NjeY3BAw6aFH2VCoHZeyixIB/X6Y8E4Ox/6w2tRs+i3wBlhw6kgk1oQ
-	/tMf54ghoZvM1aqYEMYIcWwJIyjdT9A=
-Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-298-pNGBElBeMeG9lip0cBHItQ-1; Wed, 02 Aug 2023 03:36:55 -0400
-X-MC-Unique: pNGBElBeMeG9lip0cBHItQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C335E3828887;
-	Wed,  2 Aug 2023 07:36:53 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.131])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 1C433F7820;
-	Wed,  2 Aug 2023 07:36:51 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-To: netdev@vger.kernel.org,
-    Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-cc: dhowells@redhat.com,
-    syzbot+f527b971b4bdc8e79f9e@syzkaller.appspotmail.com,
-    bpf@vger.kernel.org, brauner@kernel.org, davem@davemloft.net,
-    dsahern@kernel.org, edumazet@google.com, kuba@kernel.org,
-    pabeni@redhat.com, axboe@kernel.dk, viro@zeniv.linux.org.uk,
-    linux-fsdevel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
-    linux-kernel@vger.kernel.org
-Subject: [PATCH net-next] udp6: Fix __ip6_append_data()'s handling of MSG_SPLICE_PAGES
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8099E1869
+	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 07:39:01 +0000 (UTC)
+Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 786634EE3;
+	Wed,  2 Aug 2023 00:38:34 -0700 (PDT)
+Received: by mail-lf1-x136.google.com with SMTP id 2adb3069b0e04-4fe1344b707so10394758e87.1;
+        Wed, 02 Aug 2023 00:38:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1690961912; x=1691566712;
+        h=content-transfer-encoding:in-reply-to:references:cc:to:from
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=hG6+YQ0tUDz48/03f7Nyeq0JCf007nOGlw47CxNzErA=;
+        b=ho6VKHchKIecptzcDesrpXEbSnhlh14yTzt1/ddoGIW7N+NJKZi73ac7qQaztLtMuQ
+         3QoiUN1MGh6hWVL2JPeX8ztzaEn3Ez2KIrW716wfFxX5mdvzgNtFce36FMNNd9p6NvMP
+         Rp/9tSbD6nj7pmSAP5/fmbUJOCs+OymiKh5WJGapFqJmksqITXhs51ukWWtqL1g/t6fP
+         JYAULICCKGSO4OEfZjnQ1bJUXw8ibs7fUQLGWYKNTk7V1g6d5OgWk01X9RfAg8lrdJm7
+         ibdC5h8BZ/EdZT0PVlni5KF4lldYS1rGS1+DXHd4Ma3i3tD2LelgmtvLlz/ARI1DRtt3
+         93tg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690961912; x=1691566712;
+        h=content-transfer-encoding:in-reply-to:references:cc:to:from
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=hG6+YQ0tUDz48/03f7Nyeq0JCf007nOGlw47CxNzErA=;
+        b=WpXmCVhdAwwTC9cHarq+daabZ+xapLUDaB4DxEpyIApQ58gyNJIJkjVoRyv7kLBHhS
+         oOLlP4xioIi0onH3p4qt8BMkzCGJ/iS9ld0tJ4WruJjxfb3VruAuk9D/l15O8dRWrjcG
+         HUDucE8stF/TrXxCUYyaaHFIUWnYTz9pr3eQU7i2dhF2tCRWWd0644SW9nAK0jY0eEmZ
+         H8WfdyfZo5XEPjWWg8qAfbw7DWU06UpdOIKIctjFkqhqkmX67EReqt5zChMxlqTrnvE+
+         E7w0HjeW39mLLaiZpn0WnIJ0X5zpyNFGJzOgLr/8eip7gqXK/6XeMZPuel5kSvTNG0Xk
+         LPrg==
+X-Gm-Message-State: ABy/qLZmxEUyblOZPNplT7/bqE4eOxI7kje/oTc8EmSjZ7mrS8KlPmfR
+	rvngA1hmLYkyARMx0aHP8gs=
+X-Google-Smtp-Source: APBJJlFyaHc0Ucy5XRq29FSH+BjvL/M0W/SK3cClfC4+ud7BbZuUQeiusKk9chXOhYjrMhIYGEFoKA==
+X-Received: by 2002:a05:6512:3711:b0:4f8:67aa:4f03 with SMTP id z17-20020a056512371100b004f867aa4f03mr3683942lfr.1.1690961911447;
+        Wed, 02 Aug 2023 00:38:31 -0700 (PDT)
+Received: from [192.168.26.149] (031011218106.poznan.vectranet.pl. [31.11.218.106])
+        by smtp.googlemail.com with ESMTPSA id x1-20020ac25dc1000000b004cc9042c9cfsm2169486lfq.158.2023.08.02.00.38.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 02 Aug 2023 00:38:31 -0700 (PDT)
+Message-ID: <285f419e-f8f2-c8da-6064-2a51e92ca3bc@gmail.com>
+Date: Wed, 2 Aug 2023 09:38:30 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1580951.1690961810.1@warthog.procyon.org.uk>
-Date: Wed, 02 Aug 2023 08:36:50 +0100
-Message-ID: <1580952.1690961810@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-	autolearn_force=no version=3.4.6
+User-Agent: Mozilla Thunderbird
+Subject: Re: ARM board lockups/hangs triggered by locks and mutexes
+Content-Language: en-US
+From: =?UTF-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
+ Will Deacon <will@kernel.org>, Waiman Long <longman@redhat.com>,
+ Boqun Feng <boqun.feng@gmail.com>, Daniel Lezcano
+ <daniel.lezcano@linaro.org>, Thomas Gleixner <tglx@linutronix.de>,
+ Florian Fainelli <f.fainelli@gmail.com>, linux-clk@vger.kernel.org,
+ "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>,
+ Network Development <netdev@vger.kernel.org>,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ OpenWrt Development List <openwrt-devel@lists.openwrt.org>,
+ bcm-kernel-feedback-list <bcm-kernel-feedback-list@broadcom.com>
+References: <CACna6rxpzDWE5-gnmpgMgfzPmmHvEGTZk4GJvJ8jLSMazh2bVA@mail.gmail.com>
+ <ZMmFeCBxhJOxZ575@shell.armlinux.org.uk>
+ <60a553a2-85f3-d8c6-b070-ecd3089c3c5e@gmail.com>
+In-Reply-To: <60a553a2-85f3-d8c6-b070-ecd3089c3c5e@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+	FREEMAIL_FROM,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-__ip6_append_data() can has a similar problem to __ip_append_data()[1] when
-asked to splice into a partially-built UDP message that has more than the
-frag-limit data and up to the MTU limit, but in the ipv6 case, it errors
-out with EINVAL.  This can be triggered with something like:
+On 2.08.2023 09:00, Rafał Miłecki wrote:
+> With your comment I decided to try CONFIG_PROVE_LOCKING anyway / again
+> and this time on 1 of my BCM53573 devices I got something very
+> interesting on the first boot.
+> 
+> FWIW following error:
+> Broadcom B53 (2) bcma_mdio-0-0:1e: failed to register switch: -517
+> is caused by invalid DT I sent fixes for just recently.
+> 
+> Please scroll through the first booting lines for the WARNING:
+> 
+> (...)
+> [    1.167234] bgmac_bcma bcma0:5: Found PHY addr: 30 (NOREGS)
+> [    1.173655] ------------[ cut here ]------------
+> [    1.178374] WARNING: CPU: 0 PID: 1 at kernel/locking/mutex.c:950 __mutex_lock+0x6b4/0x8a0
+> [    1.186721] DEBUG_LOCKS_WARN_ON(lock->magic != lock)
 
-        pipe(pfd);
-        sfd = socket(AF_INET6, SOCK_DGRAM, 0);
-        connect(sfd, ...);
-        send(sfd, buffer, 8137, MSG_CONFIRM|MSG_MORE);
-        write(pfd[1], buffer, 8);
-        splice(pfd[0], 0, sfd, 0, 0x4ffe0ul, 0);
+Ah, that mutex WARNING comes from my Tenda AC9 device which happens to
+use a hacky OpenWrt downstream b53 driver. That driver uses wrong API
+(it behaves as PHY driver instead of MDIO driver). It results in probing
+against PHY device which isn't properly initialized.
 
-where the amount of data given to send() is dependent on the MTU size (in
-this instance an interface with an MTU of 8192).
+Long story short: above WARNING is just a noise. Ignore it please. Sorry
+for that.
 
-The problem is that the calculation of the amount to copy in
-__ip6_append_data() goes negative in two places, but a check has been put
-in to give an error in this case.
-
-This happens because when pagedlen > 0 (which happens for MSG_ZEROCOPY and
-MSG_SPLICE_PAGES), the terms in:
-
-        copy = datalen - transhdrlen - fraggap - pagedlen;
-
-then mostly cancel when pagedlen is substituted for, leaving just -fraggap.
-
-Fix this by:
-
- (1) Insert a note about the dodgy calculation of 'copy'.
-
- (2) If MSG_SPLICE_PAGES, clear copy if it is negative from the above
-     equation, so that 'offset' isn't regressed and 'length' isn't
-     increased, which will mean that length and thus copy should match the
-     amount left in the iterator.
-
- (3) When handling MSG_SPLICE_PAGES, give a warning and return -EIO if
-     we're asked to splice more than is in the iterator.  It might be
-     better to not give the warning or even just give a 'short' write.
-
- (4) If MSG_SPLICE_PAGES, override the copy<0 check.
-
-[!] Note that this should also affect MSG_ZEROCOPY, but that will return
--EINVAL for the range of send sizes that requires the skbuff to be split.
-
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-cc: "David S. Miller" <davem@davemloft.net>
-cc: Eric Dumazet <edumazet@google.com>
-cc: Jakub Kicinski <kuba@kernel.org>
-cc: Paolo Abeni <pabeni@redhat.com>
-cc: David Ahern <dsahern@kernel.org>
-cc: Jens Axboe <axboe@kernel.dk>
-cc: Matthew Wilcox <willy@infradead.org>
-cc: netdev@vger.kernel.org
-Link: https://lore.kernel.org/r/000000000000881d0606004541d1@google.com/ [1]
----
- net/ipv6/ip6_output.c |   11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
-
-diff --git a/net/ipv6/ip6_output.c b/net/ipv6/ip6_output.c
-index 1e8c90e97608..bc96559bbf0f 100644
---- a/net/ipv6/ip6_output.c
-+++ b/net/ipv6/ip6_output.c
-@@ -1693,7 +1693,10 @@ static int __ip6_append_data(struct sock *sk,
- 			fraglen = datalen + fragheaderlen;
- 
- 			copy = datalen - transhdrlen - fraggap - pagedlen;
--			if (copy < 0) {
-+			/* [!] NOTE: copy may be negative if pagedlen>0
-+			 * because then the equation may reduces to -fraggap.
-+			 */
-+			if (copy < 0 && !(flags & MSG_SPLICE_PAGES)) {
- 				err = -EINVAL;
- 				goto error;
- 			}
-@@ -1744,6 +1747,8 @@ static int __ip6_append_data(struct sock *sk,
- 				err = -EFAULT;
- 				kfree_skb(skb);
- 				goto error;
-+			} else if (flags & MSG_SPLICE_PAGES) {
-+				copy = 0;
- 			}
- 
- 			offset += copy;
-@@ -1791,6 +1796,10 @@ static int __ip6_append_data(struct sock *sk,
- 		} else if (flags & MSG_SPLICE_PAGES) {
- 			struct msghdr *msg = from;
- 
-+			err = -EIO;
-+			if (WARN_ON_ONCE(copy > msg->msg_iter.count))
-+				goto error;
-+
- 			err = skb_splice_from_iter(skb, &msg->msg_iter, copy,
- 						   sk->sk_allocation);
- 			if (err < 0)
-
+Kernel compiled with CONFIG_PROVE_LOCKING still works fine on other
+devices and on Tenda AC9 after fixing PHY<->MDIO thing. That kernel
+option hides actual bug whatever it is.
 
