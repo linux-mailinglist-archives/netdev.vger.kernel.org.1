@@ -1,155 +1,200 @@
-Return-Path: <netdev+bounces-23797-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23798-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33BD376D96D
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 23:24:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0F0676D984
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 23:29:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D39CF281DDF
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 21:24:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7116E281EAB
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 21:29:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9493125C4;
-	Wed,  2 Aug 2023 21:24:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 923DD125D4;
+	Wed,  2 Aug 2023 21:29:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD027101FC
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 21:24:08 +0000 (UTC)
-Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11E8CAC;
-	Wed,  2 Aug 2023 14:24:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1691011447; x=1722547447;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=UGL2vJ6MLNe12v+8D3skuK9/dM3RwPLrOS4RD+wo23g=;
-  b=Ku1U123VDtKWrc6vTmdiowKBuBCaZ6iXvCNNQwZ/Mrai77BDapiNpnAU
-   HbH59f27LawLohhjOoa1Sy9BiF+RW4W/io0sxVSjL99OcG1rpMyNNZB4Y
-   6hyyad8Q56DFXB+SvaJBYTNhoD9app/sEMVNWxFmC/1TmPUShaILEU41T
-   0=;
-X-IronPort-AV: E=Sophos;i="6.01,250,1684800000"; 
-   d="scan'208";a="343285625"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-iad-1e-m6i4x-245b69b1.us-east-1.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2023 21:24:06 +0000
-Received: from EX19MTAUWC001.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
-	by email-inbound-relay-iad-1e-m6i4x-245b69b1.us-east-1.amazon.com (Postfix) with ESMTPS id 0E8A4344A1E;
-	Wed,  2 Aug 2023 21:24:04 +0000 (UTC)
-Received: from EX19D002UWC002.ant.amazon.com (10.13.138.166) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Wed, 2 Aug 2023 21:24:04 +0000
-Received: from EX19MTAUEA001.ant.amazon.com (10.252.134.203) by
- EX19D002UWC002.ant.amazon.com (10.13.138.166) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Wed, 2 Aug 2023 21:24:04 +0000
-Received: from dev-dsk-risbhat-2b-8bdc64cd.us-west-2.amazon.com
- (10.189.73.169) by mail-relay.amazon.com (10.252.134.102) with Microsoft SMTP
- Server id 15.2.1118.30 via Frontend Transport; Wed, 2 Aug 2023 21:24:03 +0000
-Received: by dev-dsk-risbhat-2b-8bdc64cd.us-west-2.amazon.com (Postfix, from userid 22673075)
-	id 85C4FE4C; Wed,  2 Aug 2023 21:24:03 +0000 (UTC)
-From: Rishabh Bhatnagar <risbhat@amazon.com>
-To: <gregkh@linuxfoundation.org>, <lee@kernel.org>
-CC: <davem@davemloft.net>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <stable@vger.kernel.org>, Eric Dumazet
-	<edumazet@google.com>, Jamal Hadi Salim <jhs@mojatatu.com>, Rishabh Bhatnagar
-	<risbhat@amazon.com>
-Subject: [PATCH 4.19] net/sched: cls_u32: Fix reference counter leak leading to overflow
-Date: Wed, 2 Aug 2023 21:23:55 +0000
-Message-ID: <20230802212355.27982-1-risbhat@amazon.com>
-X-Mailer: git-send-email 2.40.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55E5C101FC
+	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 21:29:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 452C0C433C8;
+	Wed,  2 Aug 2023 21:29:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1691011761;
+	bh=s5Dw8JAhBv9uOSsXCyz3+dkPe5gQVfLZ75VqV/yv0LE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=KpTuLIeDqDwUT5zzLPSj9dMfMPwqB6NB07gEGFDkfmm5hQkfIERn5Tb46wIx86a/t
+	 EDxFMTHRNMRYWHAgodmY67Y5L9JvVln7KNkh1i58i+Ufy+LmyI0ql1TaO+EMIG57KI
+	 xACefXuRYyqlHx2F0lczTCANaoVNR4PT5i2WXvszQRHUOLl/HJ/v7TIk68HYerpJJF
+	 V8qNQ0Xz5hAzIYG/sWTWk5zd7gUGbJRNAnuQdt8TKq/VLOcKjSS8zd099L+XbFLDoc
+	 tAlXWLgdAjiWbFYndzK6tEm12I7F+7/OVYFmdWxmZ/fHdfIbl9c6gPJVcBmz/XTn0R
+	 kJDgmaNvPMKaQ==
+Date: Wed, 2 Aug 2023 14:29:20 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: Yunsheng Lin <linyunsheng@huawei.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+ Larysa Zaremba <larysa.zaremba@intel.com>, Alexander Duyck
+ <alexanderduyck@fb.com>, Jesper Dangaard Brouer <hawk@kernel.org>, "Ilias
+ Apalodimas" <ilias.apalodimas@linaro.org>, Simon Horman
+ <simon.horman@corigine.com>, <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next 5/9] page_pool: don't use driver-set flags
+ field directly
+Message-ID: <20230802142920.4a777079@kernel.org>
+In-Reply-To: <0fe906a2-5ba1-f24a-efd8-7804ef0683b6@intel.com>
+References: <20230727144336.1646454-1-aleksander.lobakin@intel.com>
+	<20230727144336.1646454-6-aleksander.lobakin@intel.com>
+	<a0be882e-558a-9b1d-7514-0aad0080e08c@huawei.com>
+	<6f8147ec-b8ad-3905-5279-16817ed6f5ae@intel.com>
+	<a7782cf1-e04a-e274-6a87-4952008bcc0c@huawei.com>
+	<0fe906a2-5ba1-f24a-efd8-7804ef0683b6@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-Precedence: Bulk
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-From: Lee Jones <lee@kernel.org>
+On Tue, 1 Aug 2023 15:36:33 +0200 Alexander Lobakin wrote:
+> >> You would need a separate patch to convert all the page_pool_create()
+> >> users then either way.
+> >> And it doesn't look really natural to me to pass both driver-set params
+> >> and driver-set flags as separate function arguments. Someone may then
+> >> think "why aren't flags just put in the params itself". The fact that
+> >> Page Pool copies the whole params in the page_pool struct after
+> >> allocating it is internals, page_pool_create() prototype however isn't.
+> >> Thoughts? =20
+> >=20
+> > It just seems odd to me that dma_map and page_frag is duplicated as we
+> > seems to have the same info in the page_pool->p.flags. =20
+>=20
+> It's just because we copy the whole &page_pool_params passed by the
+> driver. It doesn't look good to me to define a new structure and copy
+> the values field-by-field just to avoid duplicating 3 bits :s
 
-Upstream commit 04c55383fa5689357bcdd2c8036725a55ed632bc.
+FWIW I'm tempted to do something like the patch below (an obvious move,
+I suspect). I want to add another pointer (netdev) to the params and=20
+I don't want it to eat up bytes in the first cache line.
+The patch is incomplete, we need to stash a one-bit indication in=20
+the first cache line to know init_callback is not present without
+having to look at @slow. I'll defer doing that cleanly until your
+patches land.
+With this in place we can move flags outside of @fast, and interpret
+it manually while copying all the other members in one go.
 
-In the event of a failure in tcf_change_indev(), u32_set_parms() will
-immediately return without decrementing the recently incremented
-reference counter.  If this happens enough times, the counter will
-rollover and the reference freed, leading to a double free which can be
-used to do 'bad things'.
+--->8-------------------------------
 
-In order to prevent this, move the point of possible failure above the
-point where the reference counter is incremented.  Also save any
-meaningful return values to be applied to the return data at the
-appropriate point in time.
+=46rom c1290e74c3ec54090a49d0c88ca9d56c3bede825 Mon Sep 17 00:00:00 2001
+From: Jakub Kicinski <kuba@kernel.org>
+Date: Wed, 2 Aug 2023 14:16:51 -0700
+Subject: [PATCH] net: page_pool: split the page_pool_params into fast and s=
+low
 
-This issue was caught with KASAN.
+struct page_pool is rather performance critical and we use
+16B of the first cache line to store 2 pointers used only
+by test code. Future patches will add more informational
+(non-fast path) attributes.
 
-Fixes: 705c7091262d ("net: sched: cls_u32: no need to call tcf_exts_change for newly allocated struct")
-Suggested-by: Eric Dumazet <edumazet@google.com>
-Signed-off-by: Lee Jones <lee@kernel.org>
-Reviewed-by: Eric Dumazet <edumazet@google.com>
-Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
-Signed-off-by: David S. Miller <davem@davemloft.net>
-Signed-off-by: Rishabh Bhatnagar <risbhat@amazon.com>
+It's convenient for the user of the API to not have to worry
+which fields are fast and which are slow path. Use struct
+groups to split the params into the two categories internally.
+
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- net/sched/cls_u32.c | 20 +++++++++++++-------
- 1 file changed, 13 insertions(+), 7 deletions(-)
+ include/net/page_pool.h | 31 +++++++++++++++++++------------
+ net/core/page_pool.c    |  7 ++++---
+ 2 files changed, 23 insertions(+), 15 deletions(-)
 
-diff --git a/net/sched/cls_u32.c b/net/sched/cls_u32.c
-index d30256ac3537..ee8ef606a8e9 100644
---- a/net/sched/cls_u32.c
-+++ b/net/sched/cls_u32.c
-@@ -778,11 +778,22 @@ static int u32_set_parms(struct net *net, struct tcf_proto *tp,
- 			 struct netlink_ext_ack *extack)
- {
- 	int err;
-+#ifdef CONFIG_NET_CLS_IND
-+	int ifindex = -1;
-+#endif
- 
- 	err = tcf_exts_validate(net, tp, tb, est, &n->exts, ovr, extack);
- 	if (err < 0)
- 		return err;
- 
-+#ifdef CONFIG_NET_CLS_IND
-+	if (tb[TCA_U32_INDEV]) {
-+		ifindex = tcf_change_indev(net, tb[TCA_U32_INDEV], extack);
-+		if (ifindex < 0)
-+			return -EINVAL;
-+	}
-+#endif
-+
- 	if (tb[TCA_U32_LINK]) {
- 		u32 handle = nla_get_u32(tb[TCA_U32_LINK]);
- 		struct tc_u_hnode *ht_down = NULL, *ht_old;
-@@ -814,13 +825,8 @@ static int u32_set_parms(struct net *net, struct tcf_proto *tp,
- 	}
- 
- #ifdef CONFIG_NET_CLS_IND
--	if (tb[TCA_U32_INDEV]) {
--		int ret;
--		ret = tcf_change_indev(net, tb[TCA_U32_INDEV], extack);
--		if (ret < 0)
--			return -EINVAL;
--		n->ifindex = ret;
--	}
-+	if (ifindex >= 0)
-+		n->ifindex = ifindex;
+diff --git a/include/net/page_pool.h b/include/net/page_pool.h
+index 73d4f786418d..f0267279a8cd 100644
+--- a/include/net/page_pool.h
++++ b/include/net/page_pool.h
+@@ -83,18 +83,22 @@ struct pp_alloc_cache {
+  * @offset:	DMA sync address offset for PP_FLAG_DMA_SYNC_DEV
+  */
+ struct page_pool_params {
+-	unsigned int	flags;
+-	unsigned int	order;
+-	unsigned int	pool_size;
+-	int		nid;
+-	struct device	*dev;
+-	struct napi_struct *napi;
+-	enum dma_data_direction dma_dir;
+-	unsigned int	max_len;
+-	unsigned int	offset;
++	struct_group_tagged(page_pool_params_fast, fast,
++		unsigned int	flags;
++		unsigned int	order;
++		unsigned int	pool_size;
++		int		nid;
++		struct device	*dev;
++		struct napi_struct *napi;
++		enum dma_data_direction dma_dir;
++		unsigned int	max_len;
++		unsigned int	offset;
++	);
++	struct_group_tagged(page_pool_params_slow, slow,
+ /* private: used by test code only */
+-	void (*init_callback)(struct page *page, void *arg);
+-	void *init_arg;
++		void (*init_callback)(struct page *page, void *arg);
++		void *init_arg;
++	);
+ };
+=20
+ #ifdef CONFIG_PAGE_POOL_STATS
+@@ -177,7 +181,7 @@ static inline u64 *page_pool_ethtool_stats_get(u64 *dat=
+a, void *stats)
  #endif
- 	return 0;
+=20
+ struct page_pool {
+-	struct page_pool_params p;
++	struct page_pool_params_fast p;
+=20
+ 	struct delayed_work release_dw;
+ 	void (*disconnect)(void *);
+@@ -236,6 +240,9 @@ struct page_pool {
+ 	refcount_t user_cnt;
+=20
+ 	u64 destroy_cnt;
++
++	/* Slow/Control-path information follows */
++	struct page_pool_params_slow slow;
+ };
+=20
+ struct page *page_pool_alloc_pages(struct page_pool *pool, gfp_t gfp);
+diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+index 5d615a169718..fc3f6878a002 100644
+--- a/net/core/page_pool.c
++++ b/net/core/page_pool.c
+@@ -173,7 +173,8 @@ static int page_pool_init(struct page_pool *pool,
+ {
+ 	unsigned int ring_qsize =3D 1024; /* Default */
+=20
+-	memcpy(&pool->p, params, sizeof(pool->p));
++	memcpy(&pool->p, &params->fast, sizeof(pool->p));
++	memcpy(&pool->slow, &params->slow, sizeof(pool->slow));
+=20
+ 	/* Validate only known flags were used */
+ 	if (pool->p.flags & ~(PP_FLAG_ALL))
+@@ -372,8 +373,8 @@ static void page_pool_set_pp_info(struct page_pool *poo=
+l,
+ {
+ 	page->pp =3D pool;
+ 	page->pp_magic |=3D PP_SIGNATURE;
+-	if (pool->p.init_callback)
+-		pool->p.init_callback(page, pool->p.init_arg);
++	if (pool->slow.init_callback)
++		pool->slow.init_callback(page, pool->slow.init_arg);
  }
--- 
-2.40.1
+=20
+ static void page_pool_clear_pp_info(struct page *page)
+--=20
+2.41.0
 
 
