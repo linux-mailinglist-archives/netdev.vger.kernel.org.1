@@ -1,59 +1,77 @@
-Return-Path: <netdev+bounces-23475-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23476-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5432476C189
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 02:34:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69E8D76C193
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 02:43:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 09AB5281C91
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 00:34:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 82AC01C20E7D
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 00:43:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F01A2636;
-	Wed,  2 Aug 2023 00:33:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF83B637;
+	Wed,  2 Aug 2023 00:43:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BA117E;
-	Wed,  2 Aug 2023 00:33:05 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E5AA1C433B6;
-	Wed,  2 Aug 2023 00:33:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690936384;
-	bh=Wlch2sI+yqlch/sZ5epjwgMCgxxtXXoxKq6bHwxtmKI=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=GtXb6J6anqT7O/CNatKlhwVefKlphKE4o1EV+4Iv19ajhwAjryuBEg2EXdB5IXKjY
-	 Jv3rv+8waoj2AYlrtq/kUADKtBrc6cX7EChpMsPVW7AN5yZjDZaogGMtH4H9l1mGQJ
-	 2OdV8jSZy7i8bn9QC6GURnfzsRODt6ZJoBMXvzEEl4ZYXC0XFT/jdrsGuftqSDFC5n
-	 82QtnIQSUEL/DQWek8bc7jT4gDATChnCN1wHASAB4QZsGTh+qA1oKZ1zclR63arWxG
-	 wDR1o/EMcoR8HW8U7CKKvjUcEuC9EzY2Kr86pJPKeN4nLuR0AH2FWe2bRlbU0LJ+HA
-	 5jBOo6q9ZAJ+A==
-From: Jakub Kicinski <kuba@kernel.org>
-To: ast@kernel.org
-Cc: netdev@vger.kernel.org,
-	bpf@vger.kernel.org,
-	hawk@kernel.org,
-	amritha.nambiar@intel.com,
-	aleksander.lobakin@intel.com,
-	Jakub Kicinski <kuba@kernel.org>,
-	daniel@iogearbox.net,
-	john.fastabend@gmail.com,
-	andrii@kernel.org,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D16E47E
+	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 00:43:19 +0000 (UTC)
+Received: from mail-yw1-x1136.google.com (mail-yw1-x1136.google.com [IPv6:2607:f8b0:4864:20::1136])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36A08213E
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 17:43:18 -0700 (PDT)
+Received: by mail-yw1-x1136.google.com with SMTP id 00721157ae682-583ae4818c8so70784547b3.3
+        for <netdev@vger.kernel.org>; Tue, 01 Aug 2023 17:43:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1690936997; x=1691541797;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=JaKiaM9L/tr/M3ADd4/fknorkY1s7BcBJwwSJwtKOq4=;
+        b=cQyj7cWdBsK8vhWLhKhNo6mabI9DC/zSEGjJwoYsYULDuY+NuScUxzCroj6PDJt9+z
+         uH7T9ImAq+p0xLPaPjVnB+4C4B5DeBfdk9d1407tWK4v/vhgyAJ3MHu+HgFYDfKrTYaP
+         D+GvPrBDFtgbldxoKi8uf07I5oBTKXFlU6C9qidVGE4UYu/fXbqwGKayM8kj3qavYrPH
+         HMVuHcbkddQJiQVc/NeOUVMF7mJLyliwpnu3drAPbJgsfGos5NbiuZC6zGG7VBi360uq
+         Qow9RGblIFK20OzkYFTVpgsDDcN0qgOW8nqSi8v8WOG0A24cIxXHhHdG9aMiR9gXKJJU
+         bq6A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690936997; x=1691541797;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=JaKiaM9L/tr/M3ADd4/fknorkY1s7BcBJwwSJwtKOq4=;
+        b=fOC1Yh9hgCkK5nHYZzJw5/8THWmzsPnmJk7EG+8RNITtAnXocFZTJKoNNyhuEAQqHw
+         fq2GdhsSRLtyAbsLjZzMeycRhhSrUWm9j16MlBI5jE69b/O2wEGmA7K/akpti92tMWrO
+         6+wE3zY+Cl1NJMNRwuWoYc/+6ZKBUcgIkM9mA21pdRyfyUmep12f4LErFOXkTuDzfN1r
+         1PoAOF2rrMub2wRSKi9wD6ySNu5AXUnRJDLHtPSLHdDijJz3FZyiGmuNPCVCIrJiwO0u
+         o+5ns/Gg5hFVy0itkQ0GMrz09R+jSRsTC5aQVcgILaGa2TxbtsX7uXoXXeZt14/3vWx/
+         mVtA==
+X-Gm-Message-State: AOJu0YwBcA0ZJwxW1WWh/Z18hAa2idihETAvqfZT7+J+MyGM50lNo6Wg
+	GhYTAPpHp17PJ6QOE+Lpjwk=
+X-Google-Smtp-Source: AGHT+IGygj56W751RJk0YN2zw0Dzbb4SiIpUTkyRMC+J5E1Rq9CjxrvUdJMtQOtSfSnSI1OiljDXOA==
+X-Received: by 2002:a0d:df0c:0:b0:565:c21d:8ec6 with SMTP id i12-20020a0ddf0c000000b00565c21d8ec6mr2021534ywe.6.1690936997288;
+        Tue, 01 Aug 2023 17:43:17 -0700 (PDT)
+Received: from kickker.attlocal.net ([2600:1700:6cf8:1240:b827:13ed:6fde:4670])
+        by smtp.gmail.com with ESMTPSA id t14-20020a81830e000000b0057a560a9832sm4196344ywf.1.2023.08.01.17.43.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 01 Aug 2023 17:43:16 -0700 (PDT)
+From: thinker.li@gmail.com
+To: dsahern@kernel.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
 	martin.lau@linux.dev,
-	song@kernel.org,
-	yonghong.song@linux.dev,
-	kpsingh@kernel.org,
-	sdf@google.com,
-	haoluo@google.com,
-	jolsa@kernel.org
-Subject: [PATCH bpf-next 3/3] net: invert the netdevice.h vs xdp.h dependency
-Date: Tue,  1 Aug 2023 17:32:46 -0700
-Message-ID: <20230802003246.2153774-4-kuba@kernel.org>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230802003246.2153774-1-kuba@kernel.org>
-References: <20230802003246.2153774-1-kuba@kernel.org>
+	kernel-team@meta.com,
+	yhs@meta.com
+Cc: sinquersw@gmail.com,
+	kuifeng@meta.com,
+	Kui-Feng Lee <thinker.li@gmail.com>
+Subject: [PATCH net-next v5 0/2] Remove expired routes with a separated list of routes.
+Date: Tue,  1 Aug 2023 17:43:01 -0700
+Message-Id: <20230802004303.567266-1-thinker.li@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,231 +79,136 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-xdp.h is far more specific and is included in only 67 other
-files vs netdevice.h's 1538 include sites.
-Make xdp.h include netdevice.h, instead of the other way around.
-This decreases the incremental allmodconfig builds size when
-xdp.h is touched from 5947 to 662 objects.
+From: Kui-Feng Lee <thinker.li@gmail.com>
 
-Move bpf_prog_run_xdp() to xdp.h, seems appropriate and filter.h
-is a mega-header in its own right so it's nice to avoid xdp.h
-getting included there as well.
+FIB6 GC walks trees of fib6_tables to remove expired routes. Walking a tree
+can be expensive if the number of routes in a table is big, even if most of
+them are permanent. Checking routes in a separated list of routes having
+expiration will avoid this potential issue.
 
-The only unfortunate part is that the typedef for xdp_features_t
-has to move to netdevice.h, since its embedded in struct netdevice.
+Background
+==========
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+The size of a Linux IPv6 routing table can become a big problem if not
+managed appropriately.  Now, Linux has a garbage collector to remove
+expired routes periodically.  However, this may lead to a situation in
+which the routing path is blocked for a long period due to an
+excessive number of routes.
+
+For example, years ago, there is a commit c7bb4b89033b ("ipv6: tcp:
+drop silly ICMPv6 packet too big messages").  The root cause is that
+malicious ICMPv6 packets were sent back for every small packet sent to
+them. These packets add routes with an expiration time that prompts
+the GC to periodically check all routes in the tables, including
+permanent ones.
+
+Why Route Expires
+=================
+
+Users can add IPv6 routes with an expiration time manually. However,
+the Neighbor Discovery protocol may also generate routes that can
+expire.  For example, Router Advertisement (RA) messages may create a
+default route with an expiration time. [RFC 4861] For IPv4, it is not
+possible to set an expiration time for a route, and there is no RA, so
+there is no need to worry about such issues.
+
+Create Routes with Expires
+==========================
+
+You can create routes with expires with the  command.
+
+For example,
+
+    ip -6 route add 2001:b000:591::3 via fe80::5054:ff:fe12:3457 \ 
+        dev enp0s3 expires 30
+
+The route that has been generated will be deleted automatically in 30
+seconds.
+
+GC of FIB6
+==========
+
+The function called fib6_run_gc() is responsible for performing
+garbage collection (GC) for the Linux IPv6 stack. It checks for the
+expiration of every route by traversing the trees of routing
+tables. The time taken to traverse a routing table increases with its
+size. Holding the routing table lock during traversal is particularly
+undesirable. Therefore, it is preferable to keep the lock for the
+shortest possible duration.
+
+Solution
+========
+
+The cause of the issue is keeping the routing table locked during the
+traversal of large trees. To solve this problem, we can create a separate
+list of routes that have expiration. This will prevent GC from checking
+permanent routes.
+
+Result
+======
+
+We conducted a test to measure the execution times of fib6_gc_timer_cb()
+and observed that it enhances the GC of FIB6. During the test, we added
+permanent routes with the following numbers: 1000, 3000, 6000, and
+9000. Additionally, we added a route with an expiration time.
+
+Here are the average execution times for the kernel without the patch.
+ - 120020 ns with 1000 permanent routes
+ - 308920 ns with 3000 ...
+ - 581470 ns with 6000 ...
+ - 855310 ns with 9000 ...
+
+The kernel with the patch consistently takes around 14000 ns to execute,
+regardless of the number of permanent routes that are installed.
+
+Major changes from v4:
+
+ - Detect existence of 'strace' in the test case.
+
+Major changes from v3:
+
+ - Fix the type of arg according to feedback.
+
+ - Add 1k temporary routes and 5K permanent routes in the test case.
+   Measure time spending on GC with strace.
+
+Major changes from v2:
+
+ - Remove unnecessary and incorrect sysctl restoring in the test case.
+
+Major changes from v1:
+
+ - Moved gc_link to avoid creating a hole in fib6_info.
+
+ - Moved fib6_set_expires*() and fib6_clean_expires*() to the header
+   file and inlined. And removed duplicated lines.
+
+ - Added a test case.
+
 ---
-CC: ast@kernel.org
-CC: daniel@iogearbox.net
-CC: john.fastabend@gmail.com
-CC: andrii@kernel.org
-CC: martin.lau@linux.dev
-CC: song@kernel.org
-CC: yonghong.song@linux.dev
-CC: kpsingh@kernel.org
-CC: sdf@google.com
-CC: haoluo@google.com
-CC: jolsa@kernel.org
-CC: hawk@kernel.org
-CC: bpf@vger.kernel.org
----
- include/linux/filter.h     | 17 -----------------
- include/linux/netdevice.h  | 11 ++++-------
- include/net/busy_poll.h    |  1 +
- include/net/xdp.h          | 27 ++++++++++++++++++++++++---
- include/trace/events/xdp.h |  1 +
- kernel/bpf/btf.c           |  1 +
- kernel/bpf/offload.c       |  1 +
- kernel/bpf/verifier.c      |  1 +
- 8 files changed, 33 insertions(+), 27 deletions(-)
+v1: https://lore.kernel.org/all/20230710203609.520720-1-kuifeng@meta.com/
+v2: https://lore.kernel.org/all/20230718180321.294721-1-kuifeng@meta.com/
+v3: https://lore.kernel.org/all/20230718183351.297506-1-kuifeng@meta.com/
+v4: https://lore.kernel.org/bpf/20230722052248.1062582-1-kuifeng@meta.com/
 
-diff --git a/include/linux/filter.h b/include/linux/filter.h
-index f5eabe3fa5e8..2d6fe30bad5f 100644
---- a/include/linux/filter.h
-+++ b/include/linux/filter.h
-@@ -774,23 +774,6 @@ DECLARE_STATIC_KEY_FALSE(bpf_master_redirect_enabled_key);
- 
- u32 xdp_master_redirect(struct xdp_buff *xdp);
- 
--static __always_inline u32 bpf_prog_run_xdp(const struct bpf_prog *prog,
--					    struct xdp_buff *xdp)
--{
--	/* Driver XDP hooks are invoked within a single NAPI poll cycle and thus
--	 * under local_bh_disable(), which provides the needed RCU protection
--	 * for accessing map entries.
--	 */
--	u32 act = __bpf_prog_run(prog, xdp, BPF_DISPATCHER_FUNC(xdp));
--
--	if (static_branch_unlikely(&bpf_master_redirect_enabled_key)) {
--		if (act == XDP_TX && netif_is_bond_slave(xdp->rxq->dev))
--			act = xdp_master_redirect(xdp);
--	}
--
--	return act;
--}
--
- void bpf_prog_change_xdp(struct bpf_prog *prev_prog, struct bpf_prog *prog);
- 
- static inline u32 bpf_prog_insn_size(const struct bpf_prog *prog)
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index 5563c8a210b5..d8ed85183fe4 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -40,7 +40,6 @@
- #include <net/dcbnl.h>
- #endif
- #include <net/netprio_cgroup.h>
--#include <net/xdp.h>
- 
- #include <linux/netdev_features.h>
- #include <linux/neighbour.h>
-@@ -76,8 +75,12 @@ struct udp_tunnel_nic_info;
- struct udp_tunnel_nic;
- struct bpf_prog;
- struct xdp_buff;
-+struct xdp_frame;
-+struct xdp_metadata_ops;
- struct xdp_md;
- 
-+typedef u32 xdp_features_t;
-+
- void synchronize_net(void);
- void netdev_set_default_ethtool_ops(struct net_device *dev,
- 				    const struct ethtool_ops *ops);
-@@ -1628,12 +1631,6 @@ struct net_device_ops {
- 						  bool cycles);
- };
- 
--struct xdp_metadata_ops {
--	int	(*xmo_rx_timestamp)(const struct xdp_md *ctx, u64 *timestamp);
--	int	(*xmo_rx_hash)(const struct xdp_md *ctx, u32 *hash,
--			       enum xdp_rss_hash_type *rss_type);
--};
--
- /**
-  * enum netdev_priv_flags - &struct net_device priv_flags
-  *
-diff --git a/include/net/busy_poll.h b/include/net/busy_poll.h
-index f90f0021f5f2..4dabeb6c76d3 100644
---- a/include/net/busy_poll.h
-+++ b/include/net/busy_poll.h
-@@ -16,6 +16,7 @@
- #include <linux/sched/clock.h>
- #include <linux/sched/signal.h>
- #include <net/ip.h>
-+#include <net/xdp.h>
- 
- /*		0 - Reserved to indicate value not set
-  *     1..NR_CPUS - Reserved for sender_cpu
-diff --git a/include/net/xdp.h b/include/net/xdp.h
-index d1c5381fc95f..4bd28c8679b8 100644
---- a/include/net/xdp.h
-+++ b/include/net/xdp.h
-@@ -6,8 +6,9 @@
- #ifndef __LINUX_NET_XDP_H__
- #define __LINUX_NET_XDP_H__
- 
-+#include <linux/filter.h>
- #include <linux/skbuff.h> /* skb_shared_info */
--#include <uapi/linux/netdev.h>
-+#include <linux/netdevice.h>
- #include <linux/bitfield.h>
- 
- /**
-@@ -45,8 +46,6 @@ enum xdp_mem_type {
- 	MEM_TYPE_MAX,
- };
- 
--typedef u32 xdp_features_t;
--
- /* XDP flags for ndo_xdp_xmit */
- #define XDP_XMIT_FLUSH		(1U << 0)	/* doorbell signal consumer */
- #define XDP_XMIT_FLAGS_MASK	XDP_XMIT_FLUSH
-@@ -443,6 +442,12 @@ enum xdp_rss_hash_type {
- 	XDP_RSS_TYPE_L4_IPV6_SCTP_EX = XDP_RSS_TYPE_L4_IPV6_SCTP | XDP_RSS_L3_DYNHDR,
- };
- 
-+struct xdp_metadata_ops {
-+	int	(*xmo_rx_timestamp)(const struct xdp_md *ctx, u64 *timestamp);
-+	int	(*xmo_rx_hash)(const struct xdp_md *ctx, u32 *hash,
-+			       enum xdp_rss_hash_type *rss_type);
-+};
-+
- #ifdef CONFIG_NET
- u32 bpf_xdp_metadata_kfunc_id(int id);
- bool bpf_dev_bound_kfunc_id(u32 btf_id);
-@@ -474,4 +479,20 @@ static inline void xdp_clear_features_flag(struct net_device *dev)
- 	xdp_set_features_flag(dev, 0);
- }
- 
-+static __always_inline u32 bpf_prog_run_xdp(const struct bpf_prog *prog,
-+					    struct xdp_buff *xdp)
-+{
-+	/* Driver XDP hooks are invoked within a single NAPI poll cycle and thus
-+	 * under local_bh_disable(), which provides the needed RCU protection
-+	 * for accessing map entries.
-+	 */
-+	u32 act = __bpf_prog_run(prog, xdp, BPF_DISPATCHER_FUNC(xdp));
-+
-+	if (static_branch_unlikely(&bpf_master_redirect_enabled_key)) {
-+		if (act == XDP_TX && netif_is_bond_slave(xdp->rxq->dev))
-+			act = xdp_master_redirect(xdp);
-+	}
-+
-+	return act;
-+}
- #endif /* __LINUX_NET_XDP_H__ */
-diff --git a/include/trace/events/xdp.h b/include/trace/events/xdp.h
-index c40fc97f9417..87d833591671 100644
---- a/include/trace/events/xdp.h
-+++ b/include/trace/events/xdp.h
-@@ -9,6 +9,7 @@
- #include <linux/filter.h>
- #include <linux/tracepoint.h>
- #include <linux/bpf.h>
-+#include <net/xdp.h>
- 
- #define __XDP_ACT_MAP(FN)	\
- 	FN(ABORTED)		\
-diff --git a/kernel/bpf/btf.c b/kernel/bpf/btf.c
-index ef9581a580e2..249657c466dd 100644
---- a/kernel/bpf/btf.c
-+++ b/kernel/bpf/btf.c
-@@ -29,6 +29,7 @@
- #include <net/netfilter/nf_bpf_link.h>
- 
- #include <net/sock.h>
-+#include <net/xdp.h>
- #include "../tools/lib/bpf/relo_core.h"
- 
- /* BTF (BPF Type Format) is the meta data format which describes
-diff --git a/kernel/bpf/offload.c b/kernel/bpf/offload.c
-index 8a26cd8814c1..3e4f2ec1af06 100644
---- a/kernel/bpf/offload.c
-+++ b/kernel/bpf/offload.c
-@@ -25,6 +25,7 @@
- #include <linux/rhashtable.h>
- #include <linux/rtnetlink.h>
- #include <linux/rwsem.h>
-+#include <net/xdp.h>
- 
- /* Protects offdevs, members of bpf_offload_netdev and offload members
-  * of all progs.
-diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
-index e7b1af016841..132f25dab931 100644
---- a/kernel/bpf/verifier.c
-+++ b/kernel/bpf/verifier.c
-@@ -26,6 +26,7 @@
- #include <linux/poison.h>
- #include <linux/module.h>
- #include <linux/cpumask.h>
-+#include <net/xdp.h>
- 
- #include "disasm.h"
- 
+Kui-Feng Lee (2):
+  net/ipv6: Remove expired routes with a separated list of routes.
+  selftests: fib_tests: Add a test case for IPv6 garbage collection
+
+ include/net/ip6_fib.h                    |  65 ++++++++++++---
+ net/ipv6/ip6_fib.c                       |  56 +++++++++++--
+ net/ipv6/route.c                         |   6 +-
+ tools/testing/selftests/net/fib_tests.sh | 101 ++++++++++++++++++++++-
+ 4 files changed, 203 insertions(+), 25 deletions(-)
+
 -- 
-2.41.0
+2.34.1
 
 
