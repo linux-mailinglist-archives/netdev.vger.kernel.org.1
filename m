@@ -1,213 +1,236 @@
-Return-Path: <netdev+bounces-23529-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23530-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4039176C5F4
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 08:57:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8879176C5F6
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 08:57:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7091D1C211C4
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 06:57:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AA9D91C211A4
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 06:57:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB5E11C11;
-	Wed,  2 Aug 2023 06:56:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E7B51865;
+	Wed,  2 Aug 2023 06:57:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF0442108
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 06:56:38 +0000 (UTC)
-Received: from mail-ej1-x629.google.com (mail-ej1-x629.google.com [IPv6:2a00:1450:4864:20::629])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6C4110CA
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 23:56:34 -0700 (PDT)
-Received: by mail-ej1-x629.google.com with SMTP id a640c23a62f3a-99bed101b70so802812466b.3
-        for <netdev@vger.kernel.org>; Tue, 01 Aug 2023 23:56:34 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CC3D46AC
+	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 06:57:49 +0000 (UTC)
+Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE4CF2102
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 23:57:25 -0700 (PDT)
+Received: by mail-ed1-x530.google.com with SMTP id 4fb4d7f45d1cf-5222a38c0a0so9443794a12.1
+        for <netdev@vger.kernel.org>; Tue, 01 Aug 2023 23:57:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fairphone.com; s=fair; t=1690959393; x=1691564193;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=H+R28WS7x8LspJqq60i9Q86zeOEpZyy8YfhBlD3WQG8=;
-        b=gWkTSl/pFKyx+EnVrXabCQyFPJxVutxQJerCJVUEALNi6bw3pApK4YY9vpTSEKz46T
-         /UVC5v+DWiVsYhstexuEnMNgY224Uz1AkT6b1GV4yx1g5tSDzKfM4RD+vatf7L050i7S
-         p1LVfpFppJmlQHbhjSYnKbdYONJFvIRXJZlMW8O8FsGg3iRvtV5/3tfK/DK+bZPox4ft
-         8P5AaX7CrvWB7GXUKXtB4CriNAgmZv6D5y9o/CE3xHHfc4cnZjJ5h1P2v2qrkDFRbjHS
-         gOBfcbmygiaMsxZoFxYTMaHNs6KW0sKYzcvjL556oL1VPfA9Di/YZkDzvMQA+wJXFWnw
-         thaA==
+        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1690959444; x=1691564244;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=HB8Dw00DZJ09mEmQijXfQQXA6sfh5AwCygh3j6F8AMc=;
+        b=lSzUBF6FWUxiw1oYdULIQmYbEwENFVJmgp4JHBGx1zI7B5KvQ4m1+HYCR3R505SGO+
+         Slnm+NLgpdt03o6b0L5LjdOksh6iuX/NfrVTmTR1r3wSyzLm1ZvZhs8JTUP/R0HGnXbt
+         +dId+PmCsdS9AeXUfXfuzB7uBR58pYzFlr4jLqg6SD6WkBW0X7fzWbq6Ap51X5SrY7f8
+         26Rfid8Vp4WklhfLbP86W/a8mULDm3JgxVAUpRVulNg8v5IMCFqe9SbxU29Q2s2n5LbS
+         BJ3qf3Q9gDvbLHRTwsNp/N0vzDrst27eU4f2XDPFe7aEPvC8jqnd3eLXFIifyDzPf3/W
+         8l9A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690959393; x=1691564193;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=H+R28WS7x8LspJqq60i9Q86zeOEpZyy8YfhBlD3WQG8=;
-        b=IZw2mimd88GuypGpXxVSBsRfK8wdkYcWtY0j7LsayJ7UaVmWBfGMgVCKnV9LsLNtRI
-         rpNMxqMiOC5RTPu7u0rMVkQ+cTReFNCZPA8CdfHdqqxidLBnPGWWi0FntoeV/yvQBf/g
-         v1oQnDHSujJHGAXhzljRAsyGdpiQ6gQjEzvbIs2zaNXGlhGF+sbYN5X2P4AtrGnUzzOS
-         I73JC3tRxZDX1Gavu3/uMsDQHH5rGAlOq4jwKEf+Me3SsHg16gIZsng6lYORvOP5F7pL
-         plGVnGyRAGOVLor34BU2X/fqP41z2su3mJvhBLqrdznmPAeS04ix7l9Kck8zyZdw6ec1
-         Bpwg==
-X-Gm-Message-State: ABy/qLalLEXDy+qqTeVIFIxrRZADs3y3sQ2rUKFiK3qvkUcPcgn4pvdj
-	I3QjB8LDn+PibUfC66wMJ3h1zg==
-X-Google-Smtp-Source: APBJJlFD+WPkkuECCxNhDWViglYWKxur4TnTo98/G0KkvQ2U5k16njzWWmmXzFzolzwsPOgtoAkE0A==
-X-Received: by 2002:a17:907:a058:b0:99b:bc51:8ca3 with SMTP id gz24-20020a170907a05800b0099bbc518ca3mr3779046ejc.1.1690959393270;
-        Tue, 01 Aug 2023 23:56:33 -0700 (PDT)
-Received: from [172.16.240.113] (144-178-202-138.static.ef-service.nl. [144.178.202.138])
-        by smtp.gmail.com with ESMTPSA id e1-20020a1709062c0100b0099bd5b72d93sm8567400ejh.43.2023.08.01.23.56.32
+        d=1e100.net; s=20221208; t=1690959444; x=1691564244;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HB8Dw00DZJ09mEmQijXfQQXA6sfh5AwCygh3j6F8AMc=;
+        b=Ug/LXrN9z/ulon1eSt+Vq8Ut8QKK/nwKupjUV8gsc86WIgvyOJsrwaDIVpEPsbcGpm
+         Cnmqf/tFIukPfmAQZeTumvlt5C7uYiEG0wJhxCEKrG1HqQTOt/fl38wJQR1XW29WG+zC
+         h7E0sflBksOXCBXORQXqFUBpBfnmaYT3cczaTrN/FJHJTAPKOMoCLndhz4/BKhmyoWRZ
+         vdIs7Ynj3u/FzZHdxp2jujmfGIvzGC00hQMSFkuz/5LhxfQoWHbwKt0PGVV1znzCty2d
+         /jaGJ+873Gfh6k8gw9vlOIu6dFjweh8Y091wvNzPWYo2WTqyEh/MnDukyNH2TnDEx6jt
+         p19A==
+X-Gm-Message-State: ABy/qLYk6pxfu7w3aGh9S6xyjG4ahYfmPsXQrUPM5SrJonEP5YCu/0sv
+	y9oiRHRV4fk/JuK9uhQWay/O+Q==
+X-Google-Smtp-Source: APBJJlGatQfPGX1zCA4O2oVLRP7VUG8QpcwUx9/zHINaPrjjZYEd6cJWoVD2Oc2hkHgdGZY7lcZQvQ==
+X-Received: by 2002:a17:906:3198:b0:98e:1156:1a35 with SMTP id 24-20020a170906319800b0098e11561a35mr3703590ejy.74.1690959444201;
+        Tue, 01 Aug 2023 23:57:24 -0700 (PDT)
+Received: from localhost ([212.23.236.67])
+        by smtp.gmail.com with ESMTPSA id mb5-20020a170906eb0500b00997cce73cc7sm8598409ejb.29.2023.08.01.23.57.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Aug 2023 23:56:33 -0700 (PDT)
-From: Luca Weiss <luca.weiss@fairphone.com>
-Date: Wed, 02 Aug 2023 08:56:29 +0200
-Subject: [PATCH v3 2/2] Bluetooth: btqca: Add WCN3988 support
+        Tue, 01 Aug 2023 23:57:23 -0700 (PDT)
+Date: Wed, 2 Aug 2023 08:57:22 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>
+Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jonathan Lemon <jonathan.lemon@gmail.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	"Olech, Milena" <milena.olech@intel.com>,
+	"Michalik, Michal" <michal.michalik@intel.com>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	poros <poros@redhat.com>, mschmidt <mschmidt@redhat.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-clk@vger.kernel.org" <linux-clk@vger.kernel.org>,
+	Bart Van Assche <bvanassche@acm.org>
+Subject: Re: [PATCH 09/11] ice: implement dpll interface to control cgu
+Message-ID: <ZMn+Uvu8B6IcCFoj@nanopsycho>
+References: <20230720091903.297066-1-vadim.fedorenko@linux.dev>
+ <20230720091903.297066-10-vadim.fedorenko@linux.dev>
+ <ZLpuaxMJ+8rWAPwi@nanopsycho>
+ <DM6PR11MB46571657F0DF87765DAB32FE9B06A@DM6PR11MB4657.namprd11.prod.outlook.com>
+ <ZMem35OUQiQmB9Vd@nanopsycho>
+ <DM6PR11MB4657C0DA91583D92697324BC9B0AA@DM6PR11MB4657.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20230802-fp4-bluetooth-v3-2-7c9e7a6e624b@fairphone.com>
-References: <20230802-fp4-bluetooth-v3-0-7c9e7a6e624b@fairphone.com>
-In-Reply-To: <20230802-fp4-bluetooth-v3-0-7c9e7a6e624b@fairphone.com>
-To: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>, 
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
- Marcel Holtmann <marcel@holtmann.org>, 
- Johan Hedberg <johan.hedberg@gmail.com>, 
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
- Andy Gross <agross@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
- Konrad Dybcio <konrad.dybcio@linaro.org>, 
- Conor Dooley <conor+dt@kernel.org>, 
- Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, 
- Rocky Liao <quic_rjliao@quicinc.com>
-Cc: ~postmarketos/upstreaming@lists.sr.ht, phone-devel@vger.kernel.org, 
- netdev@vger.kernel.org, devicetree@vger.kernel.org, 
- linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
- linux-arm-msm@vger.kernel.org, Luca Weiss <luca.weiss@fairphone.com>
-X-Mailer: b4 0.12.3
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <DM6PR11MB4657C0DA91583D92697324BC9B0AA@DM6PR11MB4657.namprd11.prod.outlook.com>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Add support for the Bluetooth chip codenamed APACHE which is part of
-WCN3988.
+Tue, Aug 01, 2023 at 04:50:44PM CEST, arkadiusz.kubalewski@intel.com wrote:
+>>From: Jiri Pirko <jiri@resnulli.us>
+>>Sent: Monday, July 31, 2023 2:20 PM
+>>
+>>Sat, Jul 29, 2023 at 01:03:59AM CEST, arkadiusz.kubalewski@intel.com wrote:
+>>>>From: Jiri Pirko <jiri@resnulli.us>
+>>>>Sent: Friday, July 21, 2023 1:39 PM
+>>>>
+>>>>Thu, Jul 20, 2023 at 11:19:01AM CEST, vadim.fedorenko@linux.dev wrote:
+>>>>>From: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+>>>
+>>
+>>[...]
+>>
+>>
+>>>>>+static int ice_dpll_cb_lock(struct ice_pf *pf, struct netlink_ext_ack
+>>>>>*extack)
+>>>>>+{
+>>>>>+	int i;
+>>>>>+
+>>>>>+	for (i = 0; i < ICE_DPLL_LOCK_TRIES; i++) {
+>>>>>+		if (!test_bit(ICE_FLAG_DPLL, pf->flags)) {
+>>>>
+>>>>And again, as I already told you, this flag checking is totally
+>>>>pointless. See below my comment to ice_dpll_init()/ice_dpll_deinit().
+>>>>
+>>>
+>>>This is not pointless, will explain below.
+>>>
+>>>>
+>>>>
+>>>
+>>>[...]
+>>>
+>>
+>>[...]
+>>
+>>
+>>>>>+void ice_dpll_deinit(struct ice_pf *pf)
+>>>>>+{
+>>>>>+	bool cgu = ice_is_feature_supported(pf, ICE_F_CGU);
+>>>>>+
+>>>>>+	if (!test_bit(ICE_FLAG_DPLL, pf->flags))
+>>>>>+		return;
+>>>>>+	clear_bit(ICE_FLAG_DPLL, pf->flags);
+>>>>>+
+>>>>>+	ice_dpll_deinit_pins(pf, cgu);
+>>>>>+	ice_dpll_deinit_dpll(pf, &pf->dplls.pps, cgu);
+>>>>>+	ice_dpll_deinit_dpll(pf, &pf->dplls.eec, cgu);
+>>>>>+	ice_dpll_deinit_info(pf);
+>>>>>+	if (cgu)
+>>>>>+		ice_dpll_deinit_worker(pf);
+>>>>
+>>>>Could you please order the ice_dpll_deinit() to be symmetrical to
+>>>>ice_dpll_init()? Then, you can drop ICE_FLAG_DPLL flag entirely, as the
+>>>>ice_dpll_periodic_work() function is the only reason why you need it
+>>>>currently.
+>>>>
+>>>
+>>>Not true.
+>>>The feature flag is common approach in ice. If the feature was successfully
+>>
+>>The fact that something is common does not necessarily mean it is
+>>correct. 0 value argument.
+>>
+>
+>Like using functions that unwrap netlink attributes as unsigned when
+>they are in fact enums with possibility of being signed?
 
-The firmware for this chip has a slightly different naming scheme
-compared to most others. For ROM Version 0x0200 we need to use
-apbtfw10.tlv + apnv10.bin and for ROM version 0x201 apbtfw11.tlv +
-apnv11.bin
+Looks this is bothering you, sorry about that.
 
-Signed-off-by: Luca Weiss <luca.weiss@fairphone.com>
----
- drivers/bluetooth/btqca.c   | 13 +++++++++++--
- drivers/bluetooth/btqca.h   | 12 ++++++++++--
- drivers/bluetooth/hci_qca.c | 12 ++++++++++++
- 3 files changed, 33 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
-index e7e58a956d15..6f2187fab55f 100644
---- a/drivers/bluetooth/btqca.c
-+++ b/drivers/bluetooth/btqca.c
-@@ -594,14 +594,20 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
- 	/* Firmware files to download are based on ROM version.
- 	 * ROM version is derived from last two bytes of soc_ver.
- 	 */
--	rom_ver = ((soc_ver & 0x00000f00) >> 0x04) | (soc_ver & 0x0000000f);
-+	if (soc_type == QCA_WCN3988)
-+		rom_ver = ((soc_ver & 0x00000f00) >> 0x05) | (soc_ver & 0x0000000f);
-+	else
-+		rom_ver = ((soc_ver & 0x00000f00) >> 0x04) | (soc_ver & 0x0000000f);
- 
- 	if (soc_type == QCA_WCN6750)
- 		qca_send_patch_config_cmd(hdev);
- 
- 	/* Download rampatch file */
- 	config.type = TLV_TYPE_PATCH;
--	if (qca_is_wcn399x(soc_type)) {
-+	if (soc_type == QCA_WCN3988) {
-+		snprintf(config.fwname, sizeof(config.fwname),
-+			 "qca/apbtfw%02x.tlv", rom_ver);
-+	} else if (qca_is_wcn399x(soc_type)) {
- 		snprintf(config.fwname, sizeof(config.fwname),
- 			 "qca/crbtfw%02x.tlv", rom_ver);
- 	} else if (soc_type == QCA_QCA6390) {
-@@ -636,6 +642,9 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
- 	if (firmware_name)
- 		snprintf(config.fwname, sizeof(config.fwname),
- 			 "qca/%s", firmware_name);
-+	else if (soc_type == QCA_WCN3988)
-+		snprintf(config.fwname, sizeof(config.fwname),
-+			 "qca/apnv%02x.bin", rom_ver);
- 	else if (qca_is_wcn399x(soc_type)) {
- 		if (le32_to_cpu(ver.soc_id) == QCA_WCN3991_SOC_ID) {
- 			snprintf(config.fwname, sizeof(config.fwname),
-diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
-index b884095bcd9d..fc6cf314eb0e 100644
---- a/drivers/bluetooth/btqca.h
-+++ b/drivers/bluetooth/btqca.h
-@@ -142,6 +142,7 @@ enum qca_btsoc_type {
- 	QCA_INVALID = -1,
- 	QCA_AR3002,
- 	QCA_ROME,
-+	QCA_WCN3988,
- 	QCA_WCN3990,
- 	QCA_WCN3998,
- 	QCA_WCN3991,
-@@ -162,8 +163,15 @@ int qca_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr);
- int qca_send_pre_shutdown_cmd(struct hci_dev *hdev);
- static inline bool qca_is_wcn399x(enum qca_btsoc_type soc_type)
- {
--	return soc_type == QCA_WCN3990 || soc_type == QCA_WCN3991 ||
--	       soc_type == QCA_WCN3998;
-+	switch (soc_type) {
-+	case QCA_WCN3988:
-+	case QCA_WCN3990:
-+	case QCA_WCN3991:
-+	case QCA_WCN3998:
-+		return true;
-+	default:
-+		return false;
-+	}
- }
- static inline bool qca_is_wcn6750(enum qca_btsoc_type soc_type)
- {
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index 9b785c947d96..011822519602 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -1874,6 +1874,17 @@ static const struct hci_uart_proto qca_proto = {
- 	.dequeue	= qca_dequeue,
- };
- 
-+static const struct qca_device_data qca_soc_data_wcn3988 __maybe_unused = {
-+	.soc_type = QCA_WCN3988,
-+	.vregs = (struct qca_vreg []) {
-+		{ "vddio", 15000  },
-+		{ "vddxo", 80000  },
-+		{ "vddrf", 300000 },
-+		{ "vddch0", 450000 },
-+	},
-+	.num_vregs = 4,
-+};
-+
- static const struct qca_device_data qca_soc_data_wcn3990 __maybe_unused = {
- 	.soc_type = QCA_WCN3990,
- 	.vregs = (struct qca_vreg []) {
-@@ -2398,6 +2409,7 @@ static const struct of_device_id qca_bluetooth_of_match[] = {
- 	{ .compatible = "qcom,qca6174-bt" },
- 	{ .compatible = "qcom,qca6390-bt", .data = &qca_soc_data_qca6390},
- 	{ .compatible = "qcom,qca9377-bt" },
-+	{ .compatible = "qcom,wcn3988-bt", .data = &qca_soc_data_wcn3988},
- 	{ .compatible = "qcom,wcn3990-bt", .data = &qca_soc_data_wcn3990},
- 	{ .compatible = "qcom,wcn3991-bt", .data = &qca_soc_data_wcn3991},
- 	{ .compatible = "qcom,wcn3998-bt", .data = &qca_soc_data_wcn3998},
+>
+>This is about consistent approach in ice driver.
+>
+>>
+>>>initialized the flag is set. It allows to determine if deinit of the feature
+>>>is required on driver unload.
+>>>
+>>>Right now the check for the flag is not only in kworker but also in each
+>>>callback, if the flag were cleared the data shall be not accessed by
+>>>callbacks.
+>>
+>>Could you please draw me a scenario when this could actually happen?
+>>It is just a matter of ordering. Unregister dpll device/pins before you
+>>cleanup the related resources and you don't need this ridiculous flag.
+>>
+>
+>Flag allows to determine if dpll was successfully initialized and do proper
+>deinit on rmmod only if it was initialized. That's all.
 
--- 
-2.41.0
+You are not answering my question. I asked about how the flag helps is
+you do unregister dpll devices/pins and you free related resources in
+the correct order. Because that is why you claim you need this flag.
 
+I'm tired of this. Keep your driver tangled for all I care, I'm trying
+to help you, obviously you are not interested.
+
+
+>
+>>
+>>>I know this is not required, but it helps on loading and unloading the
+>>>driver,
+>>>thanks to that, spam of pin-get dump is not slowing the driver
+>>>load/unload.
+>>
+>>? Could you plese draw me a scenario how such thing may actually happen?
+>
+>First of all I said it is not required.
+>
+>I already draw you this with above sentence.
+>You need spam pin-get asynchronously and unload driver, what is not clear?
+>Basically mutex in dpll is a bottleneck, with multiple requests waiting for
+>mutex there is low change of driver getting mutex when doing unregisters.
+
+How exactly your flag helps you in this scenario? It does not.
+
+
+>
+>We actually need to redesign the mutex in dpll core/netlink, but I guess after
+>initial submission.
+
+Why?
+
+
+>
+>Thank you!
+>Arkadiusz
+>
+>>
+>>Thanks!
+>>
+>>
+>>>
+>>>>
+>>>>>+	mutex_destroy(&pf->dplls.lock);
+>>>>>+}
+>>
+>>
+>>[...]
 
