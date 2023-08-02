@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-23523-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23524-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 431D276C56C
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 08:42:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9691C76C570
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 08:43:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EA118281CAE
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 06:41:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C84CC1C2118A
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 06:43:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1297D373;
-	Wed,  2 Aug 2023 06:41:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B57E8EBB;
+	Wed,  2 Aug 2023 06:43:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05FFBEBB
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 06:41:57 +0000 (UTC)
-Received: from mail-ej1-x643.google.com (mail-ej1-x643.google.com [IPv6:2a00:1450:4864:20::643])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 202542D55
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 23:41:52 -0700 (PDT)
-Received: by mail-ej1-x643.google.com with SMTP id a640c23a62f3a-99bdf08860dso124940466b.0
-        for <netdev@vger.kernel.org>; Tue, 01 Aug 2023 23:41:51 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8D0C10EC
+	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 06:43:02 +0000 (UTC)
+Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 266E130C0
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 23:42:39 -0700 (PDT)
+Received: by mail-ej1-x62c.google.com with SMTP id a640c23a62f3a-99bf1f632b8so745782266b.1
+        for <netdev@vger.kernel.org>; Tue, 01 Aug 2023 23:42:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1690958510; x=1691563310;
+        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1690958557; x=1691563357;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=sDOiuG0vkWfw9xL3HMTphBilrSkywllkCvYolakreYQ=;
-        b=ppzu8+bR8Xuggl7Vv9IzYUi6zBUrokirRoDnVGBroYY1NZ7MyhYMfvYFZH8926Ylw5
-         hDDRhCKzlYZ9Hgsg7KLvugAPKZieoecJobcyHUtMXr56Dr1vp04FXgSH2J2zQWEFBKkR
-         N6sDG4iBpI77azVLCrw6sYOcUmSwgiT7OfZzQ6a640atXkZkHENiN3HyB7xJiWnY3LX3
-         YLPrv+wO/Lzp11nsZ1e+WieKz09sp82zW918t3fPrP731FfbRURG2xaNIOTi/GlyJ5qY
-         j0E6mU2kCeq+BzVrmnbYBo8C9Zxzw4X9SzlP8QMaTQzQMJAp/b3iVgIyohY89To01JZf
-         6yJQ==
+        bh=Tk2a/DqsTI9h2aitSbqX+bRNnV4eF5KhVITnumZ09ps=;
+        b=yl9ZBiT/ZKGi7+AZrG5w0MUjfu7qnMaoTqZkA6lf1CkXRMvNmgiLMwqrZDUmrjf22f
+         v4AAhnHmOePFXp1JIvbFt52NW5YRevsMXV5f8QA/w5TM4fzT41QkBf56qJyZpne/J9ya
+         Mx5OOLkSW0JVkhS+6LQM41SXy8wp+jqnMaJZasRA0ehKSo7V/RJ5BNve4YfNiT0JYEYG
+         MD2IZV0VDuvu9xOWDv+0TOWyFpK7cI1IGTd04eTBN1BCPRc5b76pUfpVSlHqvhz2Urg3
+         yOlqbRp0kuexgSx5I3z+KQem6a7fk/SYDibYEY7brOOkgXfCNxomILSpsqhMM3BuaAtT
+         aA5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690958510; x=1691563310;
+        d=1e100.net; s=20221208; t=1690958557; x=1691563357;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=sDOiuG0vkWfw9xL3HMTphBilrSkywllkCvYolakreYQ=;
-        b=hwBHltNwrkQCyEnizX2eDP9JW1vPPtNz52xA+nkj5/qjEN6xoNeI+zzjLkUUM8OCVH
-         jPDUx97q5BAlOI7PJOf5E5PN5ExqdArZoROrx2AWdIz0XFIvD8LKBbqH/fUoSU0LylCY
-         ne1cDA9pnpmuoMrXs3DFF3g+NnnLz+2Rl/DKdtwXQ9lBLuiNRLsrjdkUbAQ/NNaGDOSW
-         VCtjXs8oL2ToqSvu2YjRFRGm4+ssSTJCzV2H/bkad6+CETMJjBYaJyA9i1EvxJf93Qay
-         FEw6gEIIPj2pYHG8Z81suImaUcr55kNrPf3o9GZ4eyyIC4p1fLNtF1QdavifY1JCcJws
-         aANg==
-X-Gm-Message-State: ABy/qLbksbeMI4rcg9j7MMyWrsT/XR/iTyIshlJy+TD23ddLbGsd6W/y
-	Iwid9ihSOP8+a7z1d/PjBc5TTQ==
-X-Google-Smtp-Source: APBJJlE3+kPEZxQIDU9yXUjw4SHRdKMGQ0EM9i2Jn/3ha7r8EN+aQ/WPCecGRETRFHmc3rD3dryLJg==
-X-Received: by 2002:a17:907:6daa:b0:99b:af5a:fc2c with SMTP id sb42-20020a1709076daa00b0099baf5afc2cmr5753191ejc.26.1690958510333;
-        Tue, 01 Aug 2023 23:41:50 -0700 (PDT)
+        bh=Tk2a/DqsTI9h2aitSbqX+bRNnV4eF5KhVITnumZ09ps=;
+        b=lR/t0H41ViiYHxQ+MLrmwlSPMcqL8hvFAHyaH+fVpOC5jTf9XlOQvOllQnCM1yfTE3
+         B7xnjtRxqdZ1Qq7FEWLEfWLyK0picmd6v4n9EI+QakHRRvs/xvlJj9twKDjdTWxw7hkt
+         acSom+Ir1BAoBzF8HJ9wZipOjGcI7S+GIA4NaRQGPTBKd9gEqDB/G0EOnvllV+tG31Qq
+         1/K5P50HTf800hHDYzYDCpoAulbZkOsdAyFmbpT5SFNVaM7vWnv9oUcT9GMQStyrnd+j
+         RFdtwackKa1B2S4vzZRMy+DsvGQrWlrOjbrJ3nr8qYM+2oFPEYEho9YYbm3KMicYn3Do
+         hh3Q==
+X-Gm-Message-State: ABy/qLbXmUYhXAbjHYcKEmxj9SyFwsGPoeiXJmCaVxuUX4DcW/rGYcCM
+	hCXLrlWL1iPXiRkvAej1+I/ekA==
+X-Google-Smtp-Source: APBJJlHqIfE9TeKiQbGHL0QAtE7hitbAIbu9x8hmrnK6K2g4CMCcHfnD6bTp2aYkGpMOhTwJ31Y6sQ==
+X-Received: by 2002:a17:906:212:b0:98d:f4a7:71cf with SMTP id 18-20020a170906021200b0098df4a771cfmr4063212ejd.62.1690958557617;
+        Tue, 01 Aug 2023 23:42:37 -0700 (PDT)
 Received: from localhost ([212.23.236.67])
-        by smtp.gmail.com with ESMTPSA id pk15-20020a170906d7af00b0099bd6026f45sm8577005ejb.198.2023.08.01.23.41.49
+        by smtp.gmail.com with ESMTPSA id w11-20020a1709064a0b00b0099bd0b5a2bcsm8657810eju.101.2023.08.01.23.42.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Aug 2023 23:41:49 -0700 (PDT)
-Date: Wed, 2 Aug 2023 08:41:48 +0200
+        Tue, 01 Aug 2023 23:42:37 -0700 (PDT)
+Date: Wed, 2 Aug 2023 08:42:36 +0200
 From: Jiri Pirko <jiri@resnulli.us>
 To: Jakub Kicinski <kuba@kernel.org>
 Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
 	edumazet@google.com, moshe@nvidia.com, saeedm@nvidia.com,
 	idosch@nvidia.com, petrm@nvidia.com
-Subject: Re: [patch net-next 1/8] ynl-gen-c.py: fix rendering of validate
- field
-Message-ID: <ZMn6rLwl8tL+RmNh@nanopsycho>
+Subject: Re: [patch net-next 2/8] ynl-gen-c.py: allow directional model for
+ kernel mode
+Message-ID: <ZMn63DQSLQAUw0cd@nanopsycho>
 References: <20230801141907.816280-1-jiri@resnulli.us>
- <20230801141907.816280-2-jiri@resnulli.us>
- <20230801112530.277d3090@kernel.org>
+ <20230801141907.816280-3-jiri@resnulli.us>
+ <20230801112703.2690f706@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,68 +75,21 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230801112530.277d3090@kernel.org>
+In-Reply-To: <20230801112703.2690f706@kernel.org>
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Tue, Aug 01, 2023 at 08:25:30PM CEST, kuba@kernel.org wrote:
->On Tue,  1 Aug 2023 16:19:00 +0200 Jiri Pirko wrote:
->> From: Jiri Pirko <jiri@nvidia.com>
->> 
->> For split ops, do and dump has different value in validate field. Fix
->> the rendering so for do op, only "strict" is filled out and for dump op,
->> "strict" is prefixed by "dump-".
->> 
->> Signed-off-by: Jiri Pirko <jiri@nvidia.com>
->> ---
->>  tools/net/ynl/ynl-gen-c.py | 10 +++++++++-
->>  1 file changed, 9 insertions(+), 1 deletion(-)
->> 
->> diff --git a/tools/net/ynl/ynl-gen-c.py b/tools/net/ynl/ynl-gen-c.py
->> index 650be9b8b693..1c36d0c935da 100755
->> --- a/tools/net/ynl/ynl-gen-c.py
->> +++ b/tools/net/ynl/ynl-gen-c.py
->> @@ -1988,9 +1988,17 @@ def print_kernel_op_table(family, cw):
->>                  cw.block_start()
->>                  members = [('cmd', op.enum_name)]
->>                  if 'dont-validate' in op:
->> +                    dont_validate = []
->> +                    for x in op['dont-validate']:
->> +                        if op_mode == 'do' and x == 'dump':
->> +                            continue
->> +                        if op_mode == "dump" and x == 'strict':
->> +                            x = 'dump-' + x
->> +                        dont_validate.append(x)
->> +
->>                      members.append(('validate',
->>                                      ' | '.join([c_upper('genl-dont-validate-' + x)
->> -                                                for x in op['dont-validate']])), )
->> +                                                for x in dont_validate])), )
->>                  name = c_lower(f"{family.name}-nl-{op_name}-{op_mode}it")
->>                  if 'pre' in op[op_mode]:
->>                      members.append((cb_names[op_mode]['pre'], c_lower(op[op_mode]['pre'])))
+Tue, Aug 01, 2023 at 08:27:03PM CEST, kuba@kernel.org wrote:
+>On Tue,  1 Aug 2023 16:19:01 +0200 Jiri Pirko wrote:
+>> Directional model is only considered in uapi mode. No reason to forbid
+>> directional model for kernel mode, so lift the limitation.
 >
->I was hoping we can delete GENL_DONT_VALIDATE_DUMP_STRICT
->but there is one cmd (TIPC_NL_LINK_GET) which
->sets GENL_DONT_VALIDATE_STRICT and nothing about the dump.
+>I mean, the reason is that it's not tested so this way
+>I don't get people sending "fixes" claiming stuff that's
+>not supported is broken :)
 
-I need GENL_DONT_VALIDATE_STRICT for devlink dump selectors as well. I
-don't want to break existing user that may pass garbage attributes.
-
->
->To express something like that we should add dump-strict as
->an allowed flag explicitly rather than doing the auto-prepending
-
-Yeah, that was an option. But strict means GENL_DONT_VALIDATE_STRICT
-for do and GENL_DONT_VALIDATE_DUMP_STRICT for dump. That is why I
-decided to go this way.
-
-I will add dump-strict if you prefer it, I don't care.
-
->-- 
->pw-bot: cr
+Got it, but I need it for devlink. Works fine as far as I can tell.
 
