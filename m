@@ -1,267 +1,274 @@
-Return-Path: <netdev+bounces-23498-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23499-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6398776C349
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 05:04:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 283A076C34E
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 05:07:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 80C211C210DF
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 03:04:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C67FE2810D1
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 03:07:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCA23A47;
-	Wed,  2 Aug 2023 03:04:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC9E9A44;
+	Wed,  2 Aug 2023 03:06:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C76E1A40;
-	Wed,  2 Aug 2023 03:04:13 +0000 (UTC)
-Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B85B272B;
-	Tue,  1 Aug 2023 20:04:11 -0700 (PDT)
-Received: by mail-pf1-x42d.google.com with SMTP id d2e1a72fcca58-686b643df5dso4517143b3a.1;
-        Tue, 01 Aug 2023 20:04:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690945450; x=1691550250;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2afhM0nZYzEtfKChrLu1PZLw4Km118Jq79AW9hzH33c=;
-        b=W0xBdSvO7y3PiJ5YCryMmqlKYyAzlrX0c/CkknRSuWa/qcy0ElubyvsJLQ+VVPAlEs
-         QJuR8Ghn6A99rxR+3ny6TsMtVXTsmJzpFDIUMU+DvOXro83w7Xtadf7zFJ4HusqKfi60
-         b7RiQ4a2aRvVCdd7DrBXfrNCgOgXj2NxqVMX4sKj7j7QbLIX6LqvYmNVN7+05Xl12lfg
-         VDjZCiVrVPi05arzhH75pw/I785yoWBQ112B/rERCjb9wjZVN54evwT5ClqyL5MmkAek
-         Q6YXIMINr9UKG94JRp9A4f2+u4/gn6SJyBAggXQ49/bh1oyiRDUK9lPayMd3N+ZfXDOn
-         jhoQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690945450; x=1691550250;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=2afhM0nZYzEtfKChrLu1PZLw4Km118Jq79AW9hzH33c=;
-        b=kdjxJ+qTnF+rM7ZS6TPMvMkwO+s8FdcTVE/iwXkJxZyeOg4RZBxdczU2AP4XKqCoZt
-         8zlobDggh/KC7DXeMvkQk8JqjORNMh2PqrGk2a1Yp8j1I3VXHeSbuwBQokQHgQMADPqS
-         TvznxyrFhJb4IcctCt2luinfF9FKN5Be3IFLZaNsnLJ/h/ABUNbzYrqPQOUgbcn1AgiL
-         MLC0AuHi5xyUIBBE9Llc++Vz+/awh4K98YrIff7fdJtNRAFHfhrhHDvjlcOVc9vctTJy
-         exBqUCaXjnW5jRebCA1bMckG20S0ixhs/67ZpqlDGbytKOVDKm8iaz/H9sFU8W4psh7n
-         BzpA==
-X-Gm-Message-State: ABy/qLZtXiz5dp2Jqb5pRrSxy4zxu3n0WxSzkApibArRLn0ZGp7XzlsK
-	uRlrgEao/uEIbnDSbClg8BA=
-X-Google-Smtp-Source: APBJJlE6RPN2t6sd1fl2nx74pX3gKiPPRu5toAxPMJSCMtzoBw7DE1DA59Wk1A+BT3zYMNW7LYaWtA==
-X-Received: by 2002:a05:6a20:9195:b0:135:38b5:7e58 with SMTP id v21-20020a056a20919500b0013538b57e58mr14731006pzd.37.1690945449534;
-        Tue, 01 Aug 2023 20:04:09 -0700 (PDT)
-Received: from localhost ([98.97.32.4])
-        by smtp.gmail.com with ESMTPSA id ji11-20020a170903324b00b001b8a897cd26sm11104289plb.195.2023.08.01.20.04.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Aug 2023 20:04:08 -0700 (PDT)
-Date: Tue, 01 Aug 2023 20:04:07 -0700
-From: John Fastabend <john.fastabend@gmail.com>
-To: Xu Kuohai <xukuohai@huaweicloud.com>, 
- bpf@vger.kernel.org, 
- netdev@vger.kernel.org
-Cc: John Fastabend <john.fastabend@gmail.com>, 
- Jakub Sitnicki <jakub@cloudflare.com>, 
- "David S . Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Daniel Borkmann <daniel@iogearbox.net>, 
- Alexei Starovoitov <ast@kernel.org>, 
- Cong Wang <cong.wang@bytedance.com>
-Message-ID: <64c9c7a788bad_2c0b20833@john.notmuch>
-In-Reply-To: <20230731134536.4058181-1-xukuohai@huaweicloud.com>
-References: <20230731134536.4058181-1-xukuohai@huaweicloud.com>
-Subject: RE: [PATCH bpf] bpf, sockmap: Fix NULL deref in sk_psock_backlog
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99F8AA40
+	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 03:06:58 +0000 (UTC)
+Received: from mgamail.intel.com (unknown [134.134.136.24])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8DC1EC;
+	Tue,  1 Aug 2023 20:06:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1690945616; x=1722481616;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=VdbY9viEmmNEyA62feM2hp05AxOS4gLQsjFActrG/rg=;
+  b=nM4b2iw6lMbMe5DdStOwefBpIpbIlOtnSwPY7TnWGQqTbogfwv1umBld
+   ZsxuVEAMGVhYMCY0LIff4l2v3LZQ9TIshSo1TPKkighy6YQ7lD3qs7h0n
+   M3a3vQLSXKM9i//vyjh2pXvAoevc+eIyUTlhUcCTuV/uCS/Cgmc3LH8AY
+   dW0Fu8C4Nx3Y2idXR1FspyA3sO1fEo27+5X4oFHVA1G34DtRDOidMq3lW
+   dASgIRy8/ApYg8rbTtMFzYQLlUo73Hzu5h2/3KZbKOC9eY3paa3XdrHlI
+   wmWWl56UrkAUH7mrQyZRJhuQDRj7of6nYC5WzKZDnCME6Rn0cZImar8Sy
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10789"; a="372195256"
+X-IronPort-AV: E=Sophos;i="6.01,248,1684825200"; 
+   d="scan'208";a="372195256"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Aug 2023 20:06:56 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10789"; a="722709073"
+X-IronPort-AV: E=Sophos;i="6.01,248,1684825200"; 
+   d="scan'208";a="722709073"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by orsmga007.jf.intel.com with ESMTP; 01 Aug 2023 20:06:54 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Tue, 1 Aug 2023 20:06:53 -0700
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27 via Frontend Transport; Tue, 1 Aug 2023 20:06:53 -0700
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.109)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.27; Tue, 1 Aug 2023 20:06:53 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=XUZUAg8UtP+nDv4gVepOSkp6cB3TEDF8MkrpIxYVNHrSpmXj9TiH7XM/5F0t/CXU1aVL1d5hxZnfwA1yBn4DXXTdDzPG/1rGXnA8SMfz2Z+Ir6W1RT3semXHPsAR32qL5nTtpt84CmZjHedAkIeydMdCS38YXmvF4pgCzees4buJUuy+cm/3oZOpUY1VjSGWxYMR9v/X8iv82DFN5CHbpdpChS5DUAG2dP6BHFlnjLPlYshh54/JkkPplr7+BKUPe0Urv6bCobjJf3zfnhxBYU1nD/N3RhY8RIx//OFjxgJSLI2gtqgyL+CJaTthDqijdSAZ+POdd9Q4CRif0+3bGA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=SM51G3uZXIaRApqOdWj5fYo+GT9yS17Tjd2IXvsD6Dk=;
+ b=DU+Nk8rR1Go3tdYDedCLGoSeEhgaIITEDmabNLBdH92X0oHBYGGBNlLXSFiaJDLiFfXon3XRIpZi7NNNYh9rl29ae9rkXi8XFJKX3dDS50OYe7dVB6hzlQGezOVCqMefH8HE4H28Qjorb9FBLHMrRwHxoxsTVr77Xnb54RVddFbN67tvvvJ7ITp7O2NhVuEyuSxwnI+ymIZYeVTja/ZEOkwESRDBx2hsqen/eUueOccP1Yy1EecuaAJ8t2+F6Wltelg5Se2SLWb9Uxec7UnUPEgbYBRIu30Q26hAQXlzaqzOxZV47PUqIrtFB8Mc2My5myX2hYdiVbf2IKAW8Y9A2g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from DM6PR11MB3291.namprd11.prod.outlook.com (2603:10b6:5:d::10) by
+ SA0PR11MB7160.namprd11.prod.outlook.com (2603:10b6:806:24b::8) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6631.45; Wed, 2 Aug 2023 03:06:51 +0000
+Received: from DM6PR11MB3291.namprd11.prod.outlook.com
+ ([fe80::cf83:5843:b3c9:10af]) by DM6PR11MB3291.namprd11.prod.outlook.com
+ ([fe80::cf83:5843:b3c9:10af%6]) with mapi id 15.20.6631.045; Wed, 2 Aug 2023
+ 03:06:51 +0000
+From: "Rabara, Niravkumar L" <niravkumar.l.rabara@intel.com>
+To: Conor Dooley <conor@kernel.org>
+CC: "Ng, Adrian Ho Yin" <adrian.ho.yin.ng@intel.com>, "andrew@lunn.ch"
+	<andrew@lunn.ch>, "conor+dt@kernel.org" <conor+dt@kernel.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"dinguyen@kernel.org" <dinguyen@kernel.org>,
+	"krzysztof.kozlowski+dt@linaro.org" <krzysztof.kozlowski+dt@linaro.org>,
+	"linux-clk@vger.kernel.org" <linux-clk@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "Turquette,
+ Mike" <mturquette@baylibre.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "p.zabel@pengutronix.de" <p.zabel@pengutronix.de>,
+	"richardcochran@gmail.com" <richardcochran@gmail.com>, "robh+dt@kernel.org"
+	<robh+dt@kernel.org>, "sboyd@kernel.org" <sboyd@kernel.org>,
+	"wen.ping.teh@intel.com" <wen.ping.teh@intel.com>
+Subject: RE: [PATCH v2 3/5] dt-bindings: clock: add Intel Agilex5 clock
+ manager
+Thread-Topic: [PATCH v2 3/5] dt-bindings: clock: add Intel Agilex5 clock
+ manager
+Thread-Index: AQHZxBQYoDLOJHXuDEWKBojhTKBqcq/V7XmAgABmtRA=
+Date: Wed, 2 Aug 2023 03:06:51 +0000
+Message-ID: <DM6PR11MB3291BD9E538528059D199EBCA20BA@DM6PR11MB3291.namprd11.prod.outlook.com>
+References: <20230618132235.728641-1-niravkumar.l.rabara@intel.com>
+ <20230801010234.792557-1-niravkumar.l.rabara@intel.com>
+ <20230801010234.792557-4-niravkumar.l.rabara@intel.com>
+ <20230801-handball-glorifier-e55d44a2b638@spud>
+In-Reply-To: <20230801-handball-glorifier-e55d44a2b638@spud>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM6PR11MB3291:EE_|SA0PR11MB7160:EE_
+x-ms-office365-filtering-correlation-id: 307e428c-a045-4d0b-3add-08db930584ed
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: WqqITs+CWbfwxWtsy5wywdgJx5caXgn5tIwLwp2UJubej0NUaFbaBjLFqawapS/Dg5tWM3NThSKPtqHtba8+iad9OR+4hD6Ac2iPZWhUZpdNf82hl0wHc/cH4NwViA0pwISvOXpT0uuY6NYC9NobdhJUipOhkWqF9CqZnG24ZXj+k6GWvhHZbEZ6EcoexyJI2fB+3DEHrAlfG+sc+t4QaiJ/O/6GiG09hvo2pYIPvkWmqO+pP3IStg2RFN+WgF49fDX86nTykWzE0oBbHZUkAOcb1e5j8hmiBwDxyI8eihS2N06GeORs5X0JpYOVZA218pBdLt4adGhAqu+s3P7I4PW7d1qawYA6Gd5fl1qDcjO/GqGMeBiYiZeNI/JcPfSGgU0PU/Q3KAZACrT6YnslT+HhRHsboqPoWKOHIQPYQoVHhD3X/wH2EBjVhyPGEfVdCIllixYL7FalicKxKeg71amnNiY4QkFWsHa6R1WjEpaTKQKHQR7V/RaUSqQ8LANVA0wI3jjg/MzdI+2bGNi9ucyV7lOod5YJicDUNEob3ZRK14az2N+NejfsYxWiNCyPMw/y9ETFvrIdJzN6BeqJfczEujLQAwfDmgnWdybb3yizRB/d6d/tYbBp+wl2tvJO0goVbfjTWaVHjbUFkeUUQA==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB3291.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(39860400002)(376002)(366004)(136003)(396003)(346002)(451199021)(55016003)(186003)(9686003)(966005)(316002)(86362001)(122000001)(478600001)(54906003)(38100700002)(66946007)(76116006)(66446008)(66556008)(66476007)(33656002)(71200400001)(64756008)(7696005)(4326008)(6916009)(53546011)(26005)(82960400001)(6506007)(41300700001)(107886003)(8936002)(8676002)(38070700005)(7416002)(83380400001)(52536014)(5660300002)(2906002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?6z8718pX6M0a3obiSYEoDAvNzz/Nh5jXEA/A4pB+vneXc+Q77uABuprxfHDi?=
+ =?us-ascii?Q?N1h9pAC/6/tpvHgMQWVlk4iYJoXuE9RxTLHg7273tlawKqKbfwHfGtyEeQeI?=
+ =?us-ascii?Q?RlQZrdF8uMI2j1iz3JohAL1Pnc0oQFL5bmb32r5gzOnmcifh/nRaNNTnrq7j?=
+ =?us-ascii?Q?0IJNVsBOU0CYszg44C5EXMB7TlpH8UHjIFcFtTcZ7NdwF7FkDJmOPWbbobRE?=
+ =?us-ascii?Q?Y25shWPz/l0P2VM6yK3EsINdCBRzFOvcDogVf9zf5lxIpmGPPjmKa/YiybL1?=
+ =?us-ascii?Q?lyzqMa7wNoJJUyUcyrmjV//9gZutG5+qdW4J916arYoGwzSC7jdHFR7002nK?=
+ =?us-ascii?Q?kQO3l/JrsyFe34v6qakMqwnONzH/ktHNC/kgls/fH8Ff5vduB97wKegxnaao?=
+ =?us-ascii?Q?t22Q+Zl583BMfn67ftSZGl6yJ1mW+xEvrDkX34jPEqhCmp92vIDq4WpZskFn?=
+ =?us-ascii?Q?Ku8GO7llC9HhPL2PEWl78b3dYju1rEfTO/c2WoYDTGismuy8IJX69sW1oqcz?=
+ =?us-ascii?Q?ZmGVLINbn866bBHf4494AIOTg4ermd9FsH0Kd29+DuMI9+2CvPPJOO++jcTw?=
+ =?us-ascii?Q?oBpLjqvWpy7bZPIy268liO/v0YT8n13PFGGbeFNFS61neylLWgrZ5nJt6dRM?=
+ =?us-ascii?Q?5fLQsEVlsd1M0P6vxKp8HhfRBHt6+tjr1WftZ8QGUO+BR2eq5s4cT0F8yrAF?=
+ =?us-ascii?Q?80C2UjVm28d5na6WQhC0esVggzHx29XrOurbyZcxUvpiWzWAsY84wUzerifj?=
+ =?us-ascii?Q?C28Sue5JK9tTmoL7mCBF/0xAcSv1FaF6/SbE63LFC20/l8X89s3DcjSS/JTM?=
+ =?us-ascii?Q?2XFYrzDcxZaz+RRjIvc22i6dRBHPqgktpCb7tltzySXNblnlotnplqzRGzZc?=
+ =?us-ascii?Q?ShHHVZeprFN0qw10YlbWUsqHpbB4mQkeIBvMh6M0A45xlxxswKWqdaj1B+W/?=
+ =?us-ascii?Q?4/Wf+9PmZbw/JmsMlSec/3PVJaWpXEr9VEXSbc9QumPuAyBt5moNpOVooFCk?=
+ =?us-ascii?Q?lvfGvV3BCF7uKyb7Z85iguMBxzBE5bwSRYxiNX/Ms84rFO1/j2v6jYYg9Iac?=
+ =?us-ascii?Q?hJzumrn55nEN+zRgCHm7IA/qyYFJQ9JG93tF7V2WCtYEMQ73uUo0VfiZ2q1P?=
+ =?us-ascii?Q?2nA2qTkIy+YdzD/+lh6WUTOzaZ4YloV0J7Jtra2mqF5gfGGQyy1IZvuLa9MY?=
+ =?us-ascii?Q?fW/IUv8iKRKQPLbsAyA6RDYaA0D5KHQk8sNwyFYJxcz6EYcd2U18aVIdYtm/?=
+ =?us-ascii?Q?N0NKFk8BhtK3q+y1O/etvoQMw5CpRqXkz6Pmz9tO/4R698G0lo4OTJ0mvsF9?=
+ =?us-ascii?Q?qbdTP99rl+RZ1xibbNdqEToKuTMqM8TqSVmTQYQEjsHujMVUI9lUfpVleJVc?=
+ =?us-ascii?Q?/xFon03YsBEt2kFHj+Fwk2ZEKu8oZGDQh/WtsTzRqzvvaLatF/LEICNLXz0I?=
+ =?us-ascii?Q?s7JSMNGZvrwc4JPaEsBAw96DVChxgeBcjjg2zebXeNVJ56zClIvcJ8Px9hwL?=
+ =?us-ascii?Q?sbNnwiyMKHfGww8ypTTbk2wWIDqfMSwgiPVtJ/bGCr9e94NzWqIEyi6pWKvg?=
+ =?us-ascii?Q?KFht5kvMTaHMb9MVOLehrIqZ4nuASmgBjLG4U/GLNJO9OXekce+1IRJzTI4A?=
+ =?us-ascii?Q?sQ=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB3291.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 307e428c-a045-4d0b-3add-08db930584ed
+X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Aug 2023 03:06:51.6944
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: vGglsKfIe+82bCnar0+CfpjlJD4hro3qMYcG+etw7X4sMe05hEidv0Tx10ZIYaSLYLwsjEN1AauwMzYNSwUf+S5f+it/eZq43s2VF4Oh1jw=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR11MB7160
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Xu Kuohai wrote:
-> From: Xu Kuohai <xukuohai@huawei.com>
-> 
-> sk_psock_backlog triggers a NULL dereference:
-> 
->  BUG: kernel NULL pointer dereference, address: 000000000000000e
->  #PF: supervisor read access in kernel mode
->  #PF: error_code(0x0000) - not-present page
->  PGD 0 P4D 0
->  Oops: 0000 [#1] PREEMPT SMP PTI
->  CPU: 0 PID: 70 Comm: kworker/0:3 Not tainted 6.5.0-rc2-00585-gb11bbbe4c66e #26
->  Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.15.0-0-g2dd4b9b3f840-p4
->  Workqueue: events sk_psock_backlog
->  RIP: 0010:0xffffffffc0205254
->  Code: 00 00 48 89 94 24 a0 00 00 00 41 5f 41 5e 41 5d 41 5c 5d 5b 41 5b 41 5a 41 59 41 50
->  RSP: 0018:ffffc90000acbcb8 EFLAGS: 00010246
->  RAX: ffffffff81c5ee10 RBX: ffff888018260000 RCX: 0000000000000001
->  RDX: 0000000000000003 RSI: ffffc90000acbd58 RDI: 0000000000000000
->  RBP: 0000000000000000 R08: 0000000000000003 R09: 0000000080100005
->  R10: 0000000000000001 R11: 0000000000000000 R12: 0000000000000003
->  R13: 0000000000000000 R14: 0000000000000021 R15: 0000000000000003
->  FS:  0000000000000000(0000) GS:ffff88803ea00000(0000) knlGS:0000000000000000
->  CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->  CR2: 000000000000000e CR3: 000000000b0de002 CR4: 0000000000170ef0
->  Call Trace:
->   <TASK>
->   ? __die+0x24/0x70
->   ? page_fault_oops+0x15d/0x480
->   ? fixup_exception+0x26/0x330
->   ? exc_page_fault+0x72/0x1d0
->   ? asm_exc_page_fault+0x26/0x30
->   ? __pfx_inet_sendmsg+0x10/0x10
->   ? 0xffffffffc0205254
->   ? inet_sendmsg+0x20/0x80
->   ? sock_sendmsg+0x8f/0xa0
->   ? __skb_send_sock+0x315/0x360
->   ? __pfx_sendmsg_unlocked+0x10/0x10
->   ? sk_psock_backlog+0xb4/0x300
->   ? process_one_work+0x292/0x560
->   ? worker_thread+0x53/0x3e0
->   ? __pfx_worker_thread+0x10/0x10
->   ? kthread+0x102/0x130
->   ? __pfx_kthread+0x10/0x10
->   ? ret_from_fork+0x34/0x50
->   ? __pfx_kthread+0x10/0x10
->   ? ret_from_fork_asm+0x1b/0x30
->   </TASK>
-> 
-> The bug flow is as follows:
-> 
-> thread 1                                   thread 2
-> 
-> sk_psock_backlog                           sock_close
->   sk_psock_handle_skb                        __sock_release
->     __skb_send_sock                            inet_release
->       sendmsg_unlocked                           tcp_close
->         sock_sendmsg                               lock_sock
->                                                      __tcp_close
->                                                    release_sock
->                                                  sock->sk = NULL // (1)
->           inet_sendmsg
->             sk = sock->sk // (2)
->             inet_send_prepare
->               inet_sk(sk)->inet_num // (3)
 
-We are doing a lot of hoping through calls here to find something we
-should already know. We know the psock we are sending has a protocol
-of tcp, udp, ... and could call the send directly instead of walking
-back into the sk_socket and so on. For tcp example we could simply
-call tcp_sendmsg(sk, msg, size).
 
-I haven't tried it yet, but I wonder if a lot of this logic gets
-easier to reason about if we have per protocol backlog logic. Its
-just a hunch at this point though.
+> -----Original Message-----
+> From: Conor Dooley <conor@kernel.org>
+> Sent: Wednesday, 2 August, 2023 4:58 AM
+> To: Rabara, Niravkumar L <niravkumar.l.rabara@intel.com>
+> Cc: Ng, Adrian Ho Yin <adrian.ho.yin.ng@intel.com>; andrew@lunn.ch;
+> conor+dt@kernel.org; devicetree@vger.kernel.org; dinguyen@kernel.org;
+> krzysztof.kozlowski+dt@linaro.org; linux-clk@vger.kernel.org; linux-
+> kernel@vger.kernel.org; Turquette, Mike <mturquette@baylibre.com>;
+> netdev@vger.kernel.org; p.zabel@pengutronix.de; richardcochran@gmail.com;
+> robh+dt@kernel.org; sboyd@kernel.org; wen.ping.teh@intel.com
+> Subject: Re: [PATCH v2 3/5] dt-bindings: clock: add Intel Agilex5 clock m=
+anager
+>=20
+> On Tue, Aug 01, 2023 at 09:02:32AM +0800, niravkumar.l.rabara@intel.com
+> wrote:
+> > From: Niravkumar L Rabara <niravkumar.l.rabara@intel.com>
+> >
+> > Add clock ID definitions for Intel Agilex5 SoCFPGA.
+> > The registers in Agilex5 handling the clock is named as clock manager.
+> >
+> > Signed-off-by: Teh Wen Ping <wen.ping.teh@intel.com>
+> > Reviewed-by: Dinh Nguyen <dinguyen@kernel.org>
+> > Signed-off-by: Niravkumar L Rabara <niravkumar.l.rabara@intel.com>
+> > ---
+> >  .../bindings/clock/intel,agilex5-clkmgr.yaml  |  41 +++++++
+> > .../dt-bindings/clock/intel,agilex5-clkmgr.h  | 100 ++++++++++++++++++
+> >  2 files changed, 141 insertions(+)
+> >  create mode 100644
+> > Documentation/devicetree/bindings/clock/intel,agilex5-clkmgr.yaml
+> >  create mode 100644 include/dt-bindings/clock/intel,agilex5-clkmgr.h
+> >
+> > diff --git
+> > a/Documentation/devicetree/bindings/clock/intel,agilex5-clkmgr.yaml
+> > b/Documentation/devicetree/bindings/clock/intel,agilex5-clkmgr.yaml
+> > new file mode 100644
+> > index 000000000000..60e57a9fb939
+> > --- /dev/null
+> > +++ b/Documentation/devicetree/bindings/clock/intel,agilex5-clkmgr.yam
+> > +++ l
+> > @@ -0,0 +1,41 @@
+> > +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause) %YAML 1.2
+> > +---
+> > +$id: http://devicetree.org/schemas/clock/intel,agilex5-clkmgr.yaml#
+> > +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> > +
+> > +title: Intel SoCFPGA Agilex5 clock manager
+> > +
+> > +maintainers:
+> > +  - Dinh Nguyen <dinguyen@kernel.org>
+> > +
+> > +description:
+> > +  The Intel Agilex5 Clock Manager is an integrated clock controller,
+> > +which
+> > +  generates and supplies clock to all the modules.
+> > +
+> > +properties:
+> > +  compatible:
+> > +    const: intel,agilex5-clkmgr
+> > +
+> > +  reg:
+> > +    maxItems: 1
+> > +
+> > +  '#clock-cells':
+> > +    const: 1
+> > +
+> > +required:
+> > +  - compatible
+> > +  - reg
+> > +  - '#clock-cells'
+> > +
+> > +additionalProperties: false
+> > +
+> > +examples:
+>=20
+> > +  # Clock controller node:
+>=20
+> This comment seems utterly pointless.
+> Otherwise this looks okay to me.
+>=20
+> Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
+>=20
+> Thanks,
+> Conor.
+>=20
 
-> 
-> sock->sk is set to NULL by thread 2 at time (1), then fetched by
-> thread 1 at time (2), and used by thread 1 to access memory at
-> time (3), resulting in NULL pointer dereference.
-> 
-> To fix it, add lock_sock back on the egress path for sk_psock_handle_skb.
-> 
-> Fixes: 799aa7f98d53 ("skmsg: Avoid lock_sock() in sk_psock_backlog()")
-> Signed-off-by: Xu Kuohai <xukuohai@huawei.com>
-> ---
->  net/core/skmsg.c | 44 ++++++++++++++++++++++++++++++++++----------
->  1 file changed, 34 insertions(+), 10 deletions(-)
-> 
-> diff --git a/net/core/skmsg.c b/net/core/skmsg.c
-> index 7c2764beeb04..8b758c51aa0d 100644
-> --- a/net/core/skmsg.c
-> +++ b/net/core/skmsg.c
-> @@ -609,15 +609,42 @@ static int sk_psock_skb_ingress_self(struct sk_psock *psock, struct sk_buff *skb
->  	return err;
->  }
->  
-> +static int sk_psock_handle_ingress_skb(struct sk_psock *psock,
-> +				       struct sk_buff *skb,
-> +				       u32 off, u32 len)
-> +{
-> +	if (sock_flag(psock->sk, SOCK_DEAD))
-> +		return -EIO;
+Removed in [PATCH v3 3/5].=20
 
-We didn't previously have the SOCK_DEAD check on ingress which
-looks fine because we will come along and flush the ingress
-queue when psock is being torn down. Adding it looks fine
-though because __tcp_close is flushing the sk_receive_queue
-and detaching the user from the socket so we have no way
-to read the data anyways. This will then abort the backlog
-which moves the psock destruct op along a bit faster.
+Thanks,
+Nirav
 
-> +	return sk_psock_skb_ingress(psock, skb, off, len);
-> +}
-> +
-> +static int sk_psock_handle_egress_skb(struct sk_psock *psock,
-> +				      struct sk_buff *skb,
-> +				      u32 off, u32 len)
-> +{
-> +	int ret;
-> +
-> +	lock_sock(psock->sk);
-> +
-> +	if (sock_flag(psock->sk, SOCK_DEAD))
-> +		ret = -EIO;
-
-OK, the sock_orphan() call from tcp_close adjudge_to_death block will set
-the SOCK_DEAD flag and ensure we abort the send here. EIO then forces
-backlog to abort. This looks correct to me.
-
-> +	else if (!sock_writeable(psock->sk))
-> +		ret = -EAGAIN;
-> +	else
-> +		ret = skb_send_sock_locked(psock->sk, skb, off, len);
-> +
-> +	release_sock(psock->sk);
-> +
-> +	return ret;
-> +}
-> +
->  static int sk_psock_handle_skb(struct sk_psock *psock, struct sk_buff *skb,
->  			       u32 off, u32 len, bool ingress)
->  {
-> -	if (!ingress) {
-> -		if (!sock_writeable(psock->sk))
-> -			return -EAGAIN;
-> -		return skb_send_sock(psock->sk, skb, off, len);
-> -	}
-> -	return sk_psock_skb_ingress(psock, skb, off, len);
-> +	if (ingress)
-> +		return sk_psock_handle_ingress_skb(psock, skb, off, len);
-> +	else
-> +		return sk_psock_handle_egress_skb(psock, skb, off, len);
->  }
->  
->  static void sk_psock_skb_state(struct sk_psock *psock,
-> @@ -660,10 +687,7 @@ static void sk_psock_backlog(struct work_struct *work)
->  		ingress = skb_bpf_ingress(skb);
->  		skb_bpf_redirect_clear(skb);
->  		do {
-> -			ret = -EIO;
-> -			if (!sock_flag(psock->sk, SOCK_DEAD))
-> -				ret = sk_psock_handle_skb(psock, skb, off,
-> -							  len, ingress);
-> +			ret = sk_psock_handle_skb(psock, skb, off, len, ingress);
->  			if (ret <= 0) {
->  				if (ret == -EAGAIN) {
->  					sk_psock_skb_state(psock, state, len, off);
-
-OK LGTM nice catch I left my commentary above that helped as I reviewed it. I
-guess we need more stress testing along this path all of our testing is on
-ingress path at the moment. Do you happen to have something coded up that
-stress tests the redirect send paths?
-
-Reviewed-by: John Fastabend <john.fastabend@gmail.com>
+> > +  - |
+> > +    clkmgr: clock-controller@10d10000 {
+> > +      compatible =3D "intel,agilex5-clkmgr";
+> > +      reg =3D <0x10d10000 0x1000>;
+> > +      #clock-cells =3D <1>;
+> > +    };
+> > +...
 
