@@ -1,287 +1,134 @@
-Return-Path: <netdev+bounces-23562-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23563-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A99D76C7C5
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 10:01:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92D9A76C7D8
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 10:03:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AFDD71C2122A
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 08:01:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4BBE3281D42
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 08:03:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5385B53A6;
-	Wed,  2 Aug 2023 08:01:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33AA053B1;
+	Wed,  2 Aug 2023 08:03:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 459241FB3
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 08:01:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 200A353A7
+	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 08:03:30 +0000 (UTC)
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2DAD10A
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 01:01:03 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1551E212A
+	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 01:03:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1690963262;
+	s=mimecast20190719; t=1690963401;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=oX2LNKOIHdzcvnsRpFJ7qJD3bKveDIMqdWllDVDTcVI=;
-	b=ADSwuRADFLW5WWoiH4B2cT7Xf1InnjDDRFetFK91C+phEo0r4o+Af0lelKR9fIOCEkQu0i
-	0TElJhiS4nR4LBEYQPksE1FZXzyGteQ09dgvFxhYzsqFeGNzKHZABbJzIZ9IHNFkn7Lejc
-	eLxu4ZY/YlfaW44QhtYlZgzsH3EZOu8=
-Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
- [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=Oo+8dg/DBj2V+G5oZvUMnojMP7aeWCXmA1VlhFSPE34=;
+	b=SXn6W5xWy8NeVTte4GPeviFPpf2UqFaOMoJD58BA5unExfin1QiHN7Bx30n2mntnThe6pO
+	HKLcdRogmd1E/GpxFp1HLd7N+E4h6iZ3ILh41epV4Gfcyftt4OfQQc73ja1yizO77Mor6r
+	PMBYc6c3XwjGlMNrzxJg6jw+RLHAaf4=
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-554-IFMuwZ39PN6eeq9PZvN3gQ-1; Wed, 02 Aug 2023 04:00:39 -0400
-X-MC-Unique: IFMuwZ39PN6eeq9PZvN3gQ-1
-Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-40fd444be73so19956281cf.3
-        for <netdev@vger.kernel.org>; Wed, 02 Aug 2023 01:00:39 -0700 (PDT)
+ us-mta-630-l4jOXHkmPuq-HgZlplOzEw-1; Wed, 02 Aug 2023 04:03:20 -0400
+X-MC-Unique: l4jOXHkmPuq-HgZlplOzEw-1
+Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-76cd4e1628eso2861785a.0
+        for <netdev@vger.kernel.org>; Wed, 02 Aug 2023 01:03:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690963239; x=1691568039;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=oX2LNKOIHdzcvnsRpFJ7qJD3bKveDIMqdWllDVDTcVI=;
-        b=ZZmgn8BVdsb51wLrdhIxMrrPmz5AcBpmXhYodaIgjAsDUAD42x9ZYqsuQ3j92VCXww
-         hDhmibNX1OS80aU0UKsyY3vSVyWafYZyRNmXsw/y+WYefXM3zS7aco15bYug/E47fgof
-         Y/LfuP/a1bu4YNGjfhEbctT4ogZ8aaBso+dFZvX9r26zfQSEYrLXtMI+Oz1SIzTkHDi1
-         Pu5fibSIQc5X+3bEHRVS5jHQh2Grz2+LDBMmeycKXTDlho9SZRLvGcf179u1yassxxpl
-         ewePJT5w/N7/YjwLfr7FZvKGTWNMjZ4rrRjwus1Mwrt6JHrTZdRL+vxgttSnH7xHY+n3
-         5UlQ==
-X-Gm-Message-State: ABy/qLYQpoENh7Efl3URARNLKjOwRvVxmlbDtKuBYICgFxzU3SuTJ1tv
-	Zw+CuMh6WgxcdX+4+MJfL3w4d7unv+8AO88+m1zVrwiSCnl6fdkwZFC6DmpAhHaghkNu0rJxJxo
-	p2V3jTPwDtQk94sL0
-X-Received: by 2002:a05:622a:208:b0:403:b12b:908d with SMTP id b8-20020a05622a020800b00403b12b908dmr22409157qtx.8.1690963239451;
-        Wed, 02 Aug 2023 01:00:39 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlGrOKV3rYZOQ8uyqLMK5NY1CIny88EL3WOMwRsqXwVgCP9aOiPOtdVkUVSrpY7PwwrzUZO25A==
-X-Received: by 2002:a05:622a:208:b0:403:b12b:908d with SMTP id b8-20020a05622a020800b00403b12b908dmr22409133qtx.8.1690963239236;
-        Wed, 02 Aug 2023 01:00:39 -0700 (PDT)
-Received: from sgarzare-redhat (host-82-57-51-214.retail.telecomitalia.it. [82.57.51.214])
-        by smtp.gmail.com with ESMTPSA id g8-20020ac87748000000b00401217aa51dsm5074523qtu.76.2023.08.02.01.00.36
+        d=1e100.net; s=20221208; t=1690963399; x=1691568199;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Oo+8dg/DBj2V+G5oZvUMnojMP7aeWCXmA1VlhFSPE34=;
+        b=FzGZvOLtWBTJ0glHV5itisdMm1dxoGZXZ3yKI6gLTnvMhRntAh+Ho9Kl4ibwetE322
+         Bgp2mbAEGSCbbO4NKVvtFdNfe6bpI2hwLXvpjLkwJF64WuLhkoOdl9C+39aHgJQyvRYD
+         OHL5FGJ9hpF5vuhzuLoS38WW1p8zfDn4ITJhU6i3D1YY7I8/e9fkLWCgUPln4RcwJ0Vw
+         49nRAnEDLrTusxXSTNvHymTggpt7Jzx/FT7U2aO2mIVQXtvqrP5GglsuKwIDBT/2Sv8R
+         jTCv1OpNDBylxwnT5+4PrK1A++5YKCLHX5OXiPhCIWlpw5Oz0u3lZuJtUZp9swhiQi3V
+         IAJQ==
+X-Gm-Message-State: ABy/qLZBj+z0DrghXs2dYTPvdC1K2SxD+Y/BzX1PnzeHvzq6U2JkGvHi
+	bd7oYXQNM2Gu9CyeYy4FL6Tma7NMZClJFVJUhUVu34r+D+S/siGoVcKjtGohU7jnBDdCjJNzhS8
+	cVz1UK4ul72d0dz7Z
+X-Received: by 2002:a05:620a:31aa:b0:767:7a4c:1b9e with SMTP id bi42-20020a05620a31aa00b007677a4c1b9emr15272963qkb.7.1690963399773;
+        Wed, 02 Aug 2023 01:03:19 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlFnNAWWhSXb/HktBSfXGFmabV1fvsy307saOx2MgChsfs7xTXLkVxm9csctRpjZ4apFAXP/zg==
+X-Received: by 2002:a05:620a:31aa:b0:767:7a4c:1b9e with SMTP id bi42-20020a05620a31aa00b007677a4c1b9emr15272941qkb.7.1690963399461;
+        Wed, 02 Aug 2023 01:03:19 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-233-7.dyn.eolo.it. [146.241.233.7])
+        by smtp.gmail.com with ESMTPSA id p12-20020a05620a132c00b0076c9cc1e107sm3299044qkj.54.2023.08.02.01.03.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Aug 2023 01:00:38 -0700 (PDT)
-Date: Wed, 2 Aug 2023 10:00:34 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Bobby Eshleman <bobby.eshleman@bytedance.com>, kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kernel@sberdevices.ru, 
-	oxffffaa@gmail.com
-Subject: Re: [RFC PATCH v1 2/2] test/vsock: shutdowned socket test
-Message-ID: <76yecufn7766obfi5zae5hpg6yrlestrqocnk56jgnukakkdds@rqbgbhh7xgck>
-References: <20230801141727.481156-1-AVKrasnov@sberdevices.ru>
- <20230801141727.481156-3-AVKrasnov@sberdevices.ru>
+        Wed, 02 Aug 2023 01:03:18 -0700 (PDT)
+Message-ID: <1b51c79c59cb3ec4be95e993be9be2e5d9441670.camel@redhat.com>
+Subject: Re: [RFC bpf-next v7 0/6] bpf: Force to MPTCP
+From: Paolo Abeni <pabeni@redhat.com>
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>, Geliang Tang
+	 <geliang.tang@suse.com>
+Cc: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
+ <daniel@iogearbox.net>,  Andrii Nakryiko <andrii@kernel.org>, Martin KaFai
+ Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,  Yonghong Song
+ <yhs@fb.com>, John Fastabend <john.fastabend@gmail.com>, KP Singh
+ <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo
+ <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, Florent Revest
+ <revest@chromium.org>, Brendan Jackman <jackmanb@chromium.org>, Matthieu
+ Baerts <matthieu.baerts@tessares.net>, Mat Martineau
+ <martineau@kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,  John
+ Johansen <john.johansen@canonical.com>, Paul Moore <paul@paul-moore.com>,
+ James Morris <jmorris@namei.org>,  "Serge E. Hallyn" <serge@hallyn.com>,
+ Stephen Smalley <stephen.smalley.work@gmail.com>, Eric Paris
+ <eparis@parisplace.org>, Mykola Lysenko <mykolal@fb.com>, Shuah Khan
+ <shuah@kernel.org>,  bpf@vger.kernel.org, netdev@vger.kernel.org,
+ mptcp@lists.linux.dev,  apparmor@lists.ubuntu.com,
+ linux-security-module@vger.kernel.org,  selinux@vger.kernel.org,
+ linux-kselftest@vger.kernel.org
+Date: Wed, 02 Aug 2023 10:03:12 +0200
+In-Reply-To: <20230801004323.l2npfegkq3srzff3@MacBook-Pro-8.local>
+References: <cover.1690624340.git.geliang.tang@suse.com>
+	 <20230801004323.l2npfegkq3srzff3@MacBook-Pro-8.local>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20230801141727.481156-3-AVKrasnov@sberdevices.ru>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
 	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.6
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Aug 01, 2023 at 05:17:27PM +0300, Arseniy Krasnov wrote:
->This adds two tests for 'shutdown()' call. It checks that SIGPIPE is
->sent when MSG_NOSIGNAL is not set and vice versa. Both flags SHUT_WR
->and SHUT_RD are tested.
->
->Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
->---
-> tools/testing/vsock/vsock_test.c | 138 +++++++++++++++++++++++++++++++
-> 1 file changed, 138 insertions(+)
->
->diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
->index 90718c2fd4ea..21d40a8d881c 100644
->--- a/tools/testing/vsock/vsock_test.c
->+++ b/tools/testing/vsock/vsock_test.c
->@@ -19,6 +19,7 @@
-> #include <time.h>
-> #include <sys/mman.h>
-> #include <poll.h>
->+#include <signal.h>
->
-> #include "timeout.h"
-> #include "control.h"
->@@ -1170,6 +1171,133 @@ static void test_seqpacket_msg_peek_server(const struct test_opts *opts)
-> 	return test_msg_peek_server(opts, true);
-> }
->
->+static bool have_sigpipe;
-                  ^
-We should define it as `volatile sig_atomic_t`:
+On Mon, 2023-07-31 at 17:43 -0700, Alexei Starovoitov wrote:
 
-the behavior is undefined if the signal handler refers to any object
-[CX] [Option Start]  other than errno [Option End]  with static storage
-duration other than by assigning a value to an object declared as
-volatile sig_atomic_t
+> I still think it's a hack, but its blast radius is nicely contained.
+> And since I cannot propose any better I'm ok with it.
+>=20
+> Patches 1-2 can be squashed into one.
+> Just like patches 3-6 as a single patch for selftests.
+>=20
+> But before proceeding I'd like an explicit ack from netdev maintainers.
 
-https://pubs.opengroup.org/onlinepubs/9699919799/functions/signal.html
+Just to state the obvious, I carry my personal bias on this topic due
+to my background ;)
 
-The rest LGTM!
+My perspective is quite similar to Alexei's one: the solution is not
+extremely elegant, but is very self-contained; it looks viable to me.
 
-Thanks,
-Stefano
+WRT the specific code, I think the additional checks on the 'protocol'
+value after the 'update_socket_protocol()' call should be dropped: the
+user space can already provide an arbitrary value there and the later
+code deal with that.
 
->+
->+static void sigpipe(int signo)
->+{
->+	have_sigpipe = true;
->+}
->+
->+static void test_stream_check_sigpipe(int fd)
->+{
->+	ssize_t res;
->+
->+	have_sigpipe = false;
->+
->+	res = send(fd, "A", 1, 0);
->+	if (res != -1) {
->+		fprintf(stderr, "expected send(2) failure, got %zi\n", res);
->+		exit(EXIT_FAILURE);
->+	}
->+
->+	if (!have_sigpipe) {
->+		fprintf(stderr, "SIGPIPE expected\n");
->+		exit(EXIT_FAILURE);
->+	}
->+
->+	have_sigpipe = false;
->+
->+	res = send(fd, "A", 1, MSG_NOSIGNAL);
->+	if (res != -1) {
->+		fprintf(stderr, "expected send(2) failure, got %zi\n", res);
->+		exit(EXIT_FAILURE);
->+	}
->+
->+	if (have_sigpipe) {
->+		fprintf(stderr, "SIGPIPE not expected\n");
->+		exit(EXIT_FAILURE);
->+	}
->+}
->+
->+static void test_stream_shutwr_client(const struct test_opts *opts)
->+{
->+	int fd;
->+
->+	struct sigaction act = {
->+		.sa_handler = sigpipe,
->+	};
->+
->+	sigaction(SIGPIPE, &act, NULL);
->+
->+	fd = vsock_stream_connect(opts->peer_cid, 1234);
->+	if (fd < 0) {
->+		perror("connect");
->+		exit(EXIT_FAILURE);
->+	}
->+
->+	if (shutdown(fd, SHUT_WR)) {
->+		perror("shutdown");
->+		exit(EXIT_FAILURE);
->+	}
->+
->+	test_stream_check_sigpipe(fd);
->+
->+	control_writeln("CLIENTDONE");
->+
->+	close(fd);
->+}
->+
->+static void test_stream_shutwr_server(const struct test_opts *opts)
->+{
->+	int fd;
->+
->+	fd = vsock_stream_accept(VMADDR_CID_ANY, 1234, NULL);
->+	if (fd < 0) {
->+		perror("accept");
->+		exit(EXIT_FAILURE);
->+	}
->+
->+	control_expectln("CLIENTDONE");
->+
->+	close(fd);
->+}
->+
->+static void test_stream_shutrd_client(const struct test_opts *opts)
->+{
->+	int fd;
->+
->+	struct sigaction act = {
->+		.sa_handler = sigpipe,
->+	};
->+
->+	sigaction(SIGPIPE, &act, NULL);
->+
->+	fd = vsock_stream_connect(opts->peer_cid, 1234);
->+	if (fd < 0) {
->+		perror("connect");
->+		exit(EXIT_FAILURE);
->+	}
->+
->+	control_expectln("SHUTRDDONE");
->+
->+	test_stream_check_sigpipe(fd);
->+
->+	control_writeln("CLIENTDONE");
->+
->+	close(fd);
->+}
->+
->+static void test_stream_shutrd_server(const struct test_opts *opts)
->+{
->+	int fd;
->+
->+	fd = vsock_stream_accept(VMADDR_CID_ANY, 1234, NULL);
->+	if (fd < 0) {
->+		perror("accept");
->+		exit(EXIT_FAILURE);
->+	}
->+
->+	if (shutdown(fd, SHUT_RD)) {
->+		perror("shutdown");
->+		exit(EXIT_FAILURE);
->+	}
->+
->+	control_writeln("SHUTRDDONE");
->+	control_expectln("CLIENTDONE");
->+
->+	close(fd);
->+}
->+
-> static struct test_case test_cases[] = {
-> 	{
-> 		.name = "SOCK_STREAM connection reset",
->@@ -1250,6 +1378,16 @@ static struct test_case test_cases[] = {
-> 		.run_client = test_seqpacket_msg_peek_client,
-> 		.run_server = test_seqpacket_msg_peek_server,
-> 	},
->+	{
->+		.name = "SOCK_STREAM SHUT_WR",
->+		.run_client = test_stream_shutwr_client,
->+		.run_server = test_stream_shutwr_server,
->+	},
->+	{
->+		.name = "SOCK_STREAM SHUT_RD",
->+		.run_client = test_stream_shutrd_client,
->+		.run_server = test_stream_shutrd_server,
->+	},
-> 	{},
-> };
->
->-- 
->2.25.1
->
+Cheers,
+
+Paolo
 
 
