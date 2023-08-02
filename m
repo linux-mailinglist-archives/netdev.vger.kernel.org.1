@@ -1,125 +1,116 @@
-Return-Path: <netdev+bounces-23535-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23534-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6A5176C60D
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 09:03:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C3D876C608
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 09:02:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F24F71C211EE
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 07:03:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 56FB028180F
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 07:02:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E07BD1C32;
-	Wed,  2 Aug 2023 07:03:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A45B1C08;
+	Wed,  2 Aug 2023 07:02:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2A821869
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 07:03:40 +0000 (UTC)
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D64411A;
-	Wed,  2 Aug 2023 00:03:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1690959820; x=1722495820;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=HBcKZkQo6iBBxU7/5FTWz6bVFSXBqx52n6fTE1HOn4c=;
-  b=cAEUGetbOgTjg/6JjshP+M1ezEkZTMNtPKqTzK6pGdWgGHufH65dLgTs
-   sByrPBdcONGjx5vXKQh4Ji02dWOx+MqKhD9CfFdSxhTFFOFj1tJSVgLXB
-   wpnOKaMYdR4hRz9yXk78KF1V/81jWthNevEosGZ7UM+gojXOiHAODxN2x
-   ND6Rm/+PyVhvNI8Rjg6aYUHMdMUvZHsvmhT7Aubc0xAVcRpmsqqW0vUC6
-   a2muM6arYUn69dHHnXLtVq0833AVqtkpBynlEEkkuRsNjszIPFpU/ZnR3
-   La+IJBEqRWf3en1hZa3cqPJZ41hEkd+e7Hi3bawcohv6wOI+2FnuszhLq
-   A==;
-X-IronPort-AV: E=Sophos;i="6.01,248,1684825200"; 
-   d="asc'?scan'208";a="227519945"
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa5.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 02 Aug 2023 00:02:55 -0700
-Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
- chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21; Wed, 2 Aug 2023 00:02:54 -0700
-Received: from wendy (10.10.115.15) by chn-vm-ex01.mchp-main.com
- (10.10.85.143) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.21 via Frontend
- Transport; Wed, 2 Aug 2023 00:02:51 -0700
-Date: Wed, 2 Aug 2023 08:02:15 +0100
-From: Conor Dooley <conor.dooley@microchip.com>
-To: <niravkumar.l.rabara@intel.com>
-CC: <adrian.ho.yin.ng@intel.com>, <andrew@lunn.ch>, <conor+dt@kernel.org>,
-	<devicetree@vger.kernel.org>, <dinguyen@kernel.org>,
-	<krzysztof.kozlowski+dt@linaro.org>, <linux-clk@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <mturquette@baylibre.com>,
-	<netdev@vger.kernel.org>, <p.zabel@pengutronix.de>,
-	<richardcochran@gmail.com>, <robh+dt@kernel.org>, <sboyd@kernel.org>,
-	<wen.ping.teh@intel.com>
-Subject: Re: [PATCH v3 3/5] dt-bindings: clock: add Intel Agilex5 clock
- manager
-Message-ID: <20230802-reuse-diffusion-d41ed8175390@wendy>
-References: <20230801010234.792557-4-niravkumar.l.rabara@intel.com>
- <20230802025842.1260345-1-niravkumar.l.rabara@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CDC31FB3
+	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 07:02:35 +0000 (UTC)
+Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBC4F10C1
+	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 00:02:33 -0700 (PDT)
+Received: by mail-lf1-x134.google.com with SMTP id 2adb3069b0e04-4fe0eb0ca75so10355705e87.2
+        for <netdev@vger.kernel.org>; Wed, 02 Aug 2023 00:02:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1690959752; x=1691564552;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=cgOdzisalacSxg9f54h9NNgc2I8j5Mgp5JlUQUftN5o=;
+        b=YeYI0pHioGI6TywvOHC/+1ZkPlcWi6xji1DlYE7XKBVrD990cP11u1TkmiKPxSrqbI
+         BkNN4SC6SpXGgwp8y7ideulaT0bhf5E08eZnUcswQ+VR5LvKtZoKSFDIkHEZFSy03o4F
+         B7WJyReyaFCpdogXZ2Em9Fozuc6rqUz6nR+Zp95eAyuOVXcfp/wSRmG8Nj5hAKSKHhip
+         J7cbj5NCoH7JXmb7dPo34mQR1EVAdec9vhvGIzFTRyzIBPCQIoT3G4FMHB2ze1qRIi7q
+         vdRySonbNR6mb/VQbJ981Jc/2KDx8h1erO4yjZAlKchAhN766cmnJQ3WPXR/lwkuhHf6
+         mweQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690959752; x=1691564552;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cgOdzisalacSxg9f54h9NNgc2I8j5Mgp5JlUQUftN5o=;
+        b=cBSbB6KI8+jK32nEciDtLMlfUMFpQ27tJWxbUdqBAyl7QLQr/EuvxYbrSYSXVf5PjS
+         xts9I3Xr3zpSdYiiue4R+PUt9CwFdmIRsaLMsINUbFFHPoScvuFBadTD/Fvfsntf7ArC
+         JH/B/r8tTXw2OaMCOk+EBDyB7YgZDVHIrkV14tAg28UVWXNE5zpQcNKQaFl44PkSO9IR
+         Z4y7vkch0IW/TBJ1jWEyxbjVe57t8uCj48HRyaV/QzHBETzgOYKB6GkuWI1WSn5Wpo9/
+         zYcJHlFiON1LYEgM3AN536Y9Y7baGvTQOYerNg+r76Y8n6VeoUbLuKJ0nyeFjNVuOVHG
+         3akQ==
+X-Gm-Message-State: ABy/qLbb2+ko8/nEy+NMiyqi8A/l9bRNGeiIWfXlFNd3IqODZlcjTTZL
+	2/Pm5o/rHCsm7PYt2allAf9UVw==
+X-Google-Smtp-Source: APBJJlFPudUuqEhbwM7IPvwo2VmeTaN5YXaq9tL94SJCe4NbEPi0aHrCTb0EQjeA1PflfuD8q4aOVw==
+X-Received: by 2002:ac2:4ec9:0:b0:4fd:cfeb:4785 with SMTP id p9-20020ac24ec9000000b004fdcfeb4785mr3593275lfr.53.1690959751669;
+        Wed, 02 Aug 2023 00:02:31 -0700 (PDT)
+Received: from localhost ([212.23.236.67])
+        by smtp.gmail.com with ESMTPSA id kf7-20020a17090776c700b009887f4e0291sm8586082ejc.27.2023.08.02.00.02.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Aug 2023 00:02:30 -0700 (PDT)
+Date: Wed, 2 Aug 2023 09:02:29 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
+	edumazet@google.com, moshe@nvidia.com, saeedm@nvidia.com,
+	idosch@nvidia.com, petrm@nvidia.com
+Subject: Re: [patch net-next v2 10/11] devlink: introduce dump selector attr
+ and use it for per-instance dumps
+Message-ID: <ZMn/he9LEorV97uy@nanopsycho>
+References: <20230720121829.566974-1-jiri@resnulli.us>
+ <20230720121829.566974-11-jiri@resnulli.us>
+ <20230725114044.402450df@kernel.org>
+ <ZMetTPCZ59rVLNyQ@nanopsycho>
+ <20230731100341.4809a372@kernel.org>
+ <ZMipQcNtycg6Zyaq@nanopsycho>
+ <20230801085301.3501fbbb@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="OSO5YEP0Vw7ttOq7"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230802025842.1260345-1-niravkumar.l.rabara@intel.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20230801085301.3501fbbb@kernel.org>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
---OSO5YEP0Vw7ttOq7
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Tue, Aug 01, 2023 at 05:53:01PM CEST, kuba@kernel.org wrote:
+>On Tue, 1 Aug 2023 08:42:09 +0200 Jiri Pirko wrote:
+>> >> >Also - do you know of any userspace which would pass garbage attrs 
+>> >> >to the dumps? Do we really need to accept all attributes, or can
+>> >> >we trim the dump policies to what's actually supported?    
+>> >> 
+>> >> That's what this patch is doing. It only accepts what the kernel
+>> >> understands. It gives the object types (as for example health reporter)
+>> >> option to extend the attr set to accept them into selectors as well, if
+>> >> they know how to handle them.  
+>> >
+>> >I'm talking about the "outer" policy, the level at which
+>> >DEVLINK_ATTR_DUMP_SELECTOR is defined.  
+>> 
+>> I don't follow :/ Could you please describe what exactly do you mean and
+>> want to see? Thanks!
+>
+>It's a bit obscured by the macros, but AFAICT you pass
+>devlink_nl_policy for the dumps, while the _only_ attribute
+>the kernel will interpret is DEVLINK_ATTR_DUMP_SELECTOR
+>and its insides.
 
-On Wed, Aug 02, 2023 at 10:58:42AM +0800, niravkumar.l.rabara@intel.com wro=
-te:
-> From: Niravkumar L Rabara <niravkumar.l.rabara@intel.com>
->=20
-> Add clock ID definitions for Intel Agilex5 SoCFPGA.
-> The registers in Agilex5 handling the clock is named as clock manager.
->=20
-> Signed-off-by: Teh Wen Ping <wen.ping.teh@intel.com>
-> Reviewed-by: Dinh Nguyen <dinguyen@kernel.org>
-> Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
-> Signed-off-by: Niravkumar L Rabara <niravkumar.l.rabara@intel.com>
+True, you are correct.
+Anyway with the split ops generation, this is going to be narrowed down,
+so possiblem garbage is ignored.
+Thanks!
 
-Damn, I was too late - you already sent a v3 :/
-
-However, there only seems to be a v3 of this one patch and it was sent
-in reply to the v2 series? The normal thing to do is resend the entire
-series, not just one patch, as a new thread. Not using a new thread may
-make it harder to apply & will also bury the email in people's mailboxes
-that use things like mutt. A single patch as a reply is also confusing,
-as the rest of the v3 looks like it is missing!
-
-Thanks,
-Conor.
-
---OSO5YEP0Vw7ttOq7
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZMn/dwAKCRB4tDGHoIJi
-0lCmAP0WWUZHTJW96EXutagjmv0LbA1yxMRnMa2fJHC2bx9AxgD/erXhYBujMC7m
-6Ddqgdja2kBhffi5buudrdW23rsr3Qs=
-=vX5G
------END PGP SIGNATURE-----
-
---OSO5YEP0Vw7ttOq7--
 
