@@ -1,111 +1,102 @@
-Return-Path: <netdev+bounces-23756-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23761-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D2D876D62C
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 19:55:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B256B76D6F9
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 20:40:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 34430281D96
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 17:55:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E5E071C211E5
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 18:40:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37CB0100D6;
-	Wed,  2 Aug 2023 17:55:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A86D0D2E8;
+	Wed,  2 Aug 2023 18:40:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CE48DF58
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 17:55:30 +0000 (UTC)
-Received: from mail-qv1-xf30.google.com (mail-qv1-xf30.google.com [IPv6:2607:f8b0:4864:20::f30])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3649F9C
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 10:55:25 -0700 (PDT)
-Received: by mail-qv1-xf30.google.com with SMTP id 6a1803df08f44-63cfe6e0c32so576236d6.1
-        for <netdev@vger.kernel.org>; Wed, 02 Aug 2023 10:55:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690998924; x=1691603724;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qoQ9QQBh3aNb5HAI8gb3WGWfLp4PhO0tFoxt1vgia60=;
-        b=Q6P7YDb36YHTIT0J9J3mRC0xO/oM72diYAGVE7wD9ZrpTSgrRwMkpx6qVc3FNK/2Pn
-         NUoLOyN5EysVLEw9KnReNoTXT1TQmvu/EeFjSPIPW4VXIHL3EQDOE7WQ3yXUa1FrC/q9
-         SLdeuv1arpwmrKZHc+UXMvhgn6GtH/o6AGUfCqeO5D8DLkc9oT1MlWzSXTycAZmzBBuY
-         3o5K/9EM7UZ1IoLeFl2zlLP+kQSS7ajteuX+ugpeIRpRriPMJeWFXa31Myc1VRBHmzPc
-         Sd1+kJajsbenswNhz61a/cWYqHt4VZPzpbfJ9epJWbFXZ/2d8xv7i2rW2Sf190ta7Xkt
-         Sc9Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690998924; x=1691603724;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qoQ9QQBh3aNb5HAI8gb3WGWfLp4PhO0tFoxt1vgia60=;
-        b=czmXEo7or7uL+JPJdaYB4pOlEWIMf+W8ZdMXVybIGTsd3IQ10ExXX3GXxo3cpwGbyk
-         BMGlJq8zcw+cns6PP1iJ6xKWPYr0lMlqSOQUNx2H0F/Nj/yLS7r57d9xPlASk59dSfoL
-         c8qnL5FJPUmV0b9hQKjsajT6kpMRKbWlEsvx2nVjMAJq5eXFKKTppCypYSclwKkxitYu
-         WicwoNp7xAvWbOU03S/E1/NKoZj3a2faavJg9e71qf7XmIvAOxWgNas4nkWYHdW1aXPR
-         QIApHCoyExWT0fyCRsHIBd1/ybPisGV9okuvk46g6YBdLFTa6/KsEKWs4uZJH/VdpuAE
-         97vQ==
-X-Gm-Message-State: ABy/qLYAJnYEr7nE9S3sR8j8Rx8UZ7Tcz8sdCRYNNSqFm4HYGgWUCYbP
-	r7e4FalRUVANG3xPpvCJjvJk+MzpxRYAXKn3xAsKXg==
-X-Google-Smtp-Source: APBJJlFXbcDAluXzkimyBCOpTg/tYoevL512peHPLiVSwrCaU15QF3ls/Tpp4KxMI08oy/Wr6Kb//rNAL8a2uSaqlHw=
-X-Received: by 2002:a05:6214:21a9:b0:63d:2369:6c41 with SMTP id
- t9-20020a05621421a900b0063d23696c41mr20837155qvc.55.1690998924158; Wed, 02
- Aug 2023 10:55:24 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D05F847C
+	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 18:40:35 +0000 (UTC)
+X-Greylist: delayed 2039 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 02 Aug 2023 11:40:33 PDT
+Received: from mx09lb.world4you.com (mx09lb.world4you.com [81.19.149.119])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 656DF19A4
+	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 11:40:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=engleder-embedded.com; s=dkim11; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=+IumxvxKi+iMawNAaFtZK2UTAxlSL2j77qZ9xPuW9H8=; b=CroP3RA+k/rOE7AQbNo4oTgRJa
+	34GSZMOuq76KLSYV52p0p+qQ9JYfD4HhTOcwk0hjF8Lu4mCdtOrFcdlrp/lcn6PEWevT8zJtHwv14
+	CPU4HT54usIODNpBFKQROn9PXoxvQYqYsogrXC809Fyzc+tkSVCnTsnDZjx2k8cJr+3s=;
+Received: from [88.117.54.85] (helo=[10.0.0.160])
+	by mx09lb.world4you.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <gerhard@engleder-embedded.com>)
+	id 1qRGEv-00028k-0j;
+	Wed, 02 Aug 2023 20:06:29 +0200
+Message-ID: <58b4f563-5bfc-65ed-c213-ae17724e5a33@engleder-embedded.com>
+Date: Wed, 2 Aug 2023 20:06:28 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230802-fix-dsp_cmx_send-cfi-failure-v1-1-2f2e79b0178d@kernel.org>
-In-Reply-To: <20230802-fix-dsp_cmx_send-cfi-failure-v1-1-2f2e79b0178d@kernel.org>
-From: Sami Tolvanen <samitolvanen@google.com>
-Date: Wed, 2 Aug 2023 10:54:47 -0700
-Message-ID: <CABCJKud-ve+6v5h1QeDwUm4q7XzuhMorDTwAGmsV4h-R+0MKxg@mail.gmail.com>
-Subject: Re: [PATCH] mISDN: Update parameter type of dsp_cmx_send()
-To: Nathan Chancellor <nathan@kernel.org>
-Cc: isdn@linux-pingi.de, netdev@vger.kernel.org, keescook@chromium.org, 
-	llvm@lists.linux.dev, patches@lists.linux.dev, 
-	kernel test robot <oliver.sang@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-	autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.9.0
+Subject: Re: [PATCH bpf-next 1/3] eth: add missing xdp.h includes in drivers
+To: Jakub Kicinski <kuba@kernel.org>, ast@kernel.org
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, hawk@kernel.org,
+ amritha.nambiar@intel.com, aleksander.lobakin@intel.com,
+ j.vosburgh@gmail.com, andy@greyhouse.net, shayagr@amazon.com,
+ akiyano@amazon.com, ioana.ciornei@nxp.com, claudiu.manoil@nxp.com,
+ vladimir.oltean@nxp.com, wei.fang@nxp.com, shenwei.wang@nxp.com,
+ xiaoning.wang@nxp.com, linux-imx@nxp.com, dmichail@fungible.com,
+ jeroendb@google.com, pkaligineedi@google.com, shailend@google.com,
+ jesse.brandeburg@intel.com, anthony.l.nguyen@intel.com,
+ horatiu.vultur@microchip.com, UNGLinuxDriver@microchip.com,
+ kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+ decui@microsoft.com, peppe.cavallaro@st.com, alexandre.torgue@foss.st.com,
+ joabreu@synopsys.com, mcoquelin.stm32@gmail.com, grygorii.strashko@ti.com,
+ longli@microsoft.com, sharmaajay@microsoft.com, daniel@iogearbox.net,
+ john.fastabend@gmail.com, simon.horman@corigine.com, leon@kernel.org,
+ linux-hyperv@vger.kernel.org
+References: <20230802003246.2153774-1-kuba@kernel.org>
+ <20230802003246.2153774-2-kuba@kernel.org>
+Content-Language: en-US
+From: Gerhard Engleder <gerhard@engleder-embedded.com>
+In-Reply-To: <20230802003246.2153774-2-kuba@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-AV-Do-Run: Yes
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H3,
+	RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Nathan,
+On 02.08.23 02:32, Jakub Kicinski wrote:
+> Handful of drivers currently expect to get xdp.h by virtue
+> of including netdevice.h. This will soon no longer be the case
+> so add explicit includes.
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-On Wed, Aug 2, 2023 at 10:40=E2=80=AFAM Nathan Chancellor <nathan@kernel.or=
-g> wrote:
->
-> When booting a kernel with CONFIG_MISDN_DSP=3Dy and CONFIG_CFI_CLANG=3Dy,
-> there is a failure when dsp_cmx_send() is called indirectly from
-> call_timer_fn():
->
->   [    0.371412] CFI failure at call_timer_fn+0x2f/0x150 (target: dsp_cmx=
-_send+0x0/0x530; expected type: 0x92ada1e9)
->
-> The function pointer prototype that call_timer_fn() expects is
->
->   void (*fn)(struct timer_list *)
->
-> whereas dsp_cmx_send() has a parameter type of 'void *', which causes
-> the control flow integrity checks to fail because the parameter types do
-> not match.
->
-> Change dsp_cmx_send()'s parameter type to be 'struct timer_list' to
-> match the expected prototype. The argument is unused anyways, so this
-> has no functional change, aside from avoiding the CFI failure.
+(...)
 
-Looks correct to me, thanks for fixing this!
+> diff --git a/drivers/net/ethernet/engleder/tsnep.h b/drivers/net/ethernet/engleder/tsnep.h
+> index 11b29f56aaf9..6e14c918e3fb 100644
+> --- a/drivers/net/ethernet/engleder/tsnep.h
+> +++ b/drivers/net/ethernet/engleder/tsnep.h
+> @@ -14,6 +14,7 @@
+>   #include <linux/net_tstamp.h>
+>   #include <linux/ptp_clock_kernel.h>
+>   #include <linux/miscdevice.h>
+> +#include <net/xdp.h>
 
-Reviewed-by: Sami Tolvanen <samitolvanen@google.com>
-
-Sami
+Reviewed-by: Gerhard Engleder <gerhard@engleder-embedded.com>
 
