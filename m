@@ -1,64 +1,64 @@
-Return-Path: <netdev+bounces-23527-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23528-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 023DF76C5E9
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 08:56:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C7F976C5F3
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 08:56:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A9D0D281746
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 06:56:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 81861281CA9
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 06:56:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89A7B185B;
-	Wed,  2 Aug 2023 06:56:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DB961C32;
+	Wed,  2 Aug 2023 06:56:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EB721111
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 06:56:36 +0000 (UTC)
-Received: from mail-ed1-x52e.google.com (mail-ed1-x52e.google.com [IPv6:2a00:1450:4864:20::52e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA1EC1AC
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 23:56:32 -0700 (PDT)
-Received: by mail-ed1-x52e.google.com with SMTP id 4fb4d7f45d1cf-5222c5d71b8so9158074a12.2
-        for <netdev@vger.kernel.org>; Tue, 01 Aug 2023 23:56:32 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 407191C11
+	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 06:56:37 +0000 (UTC)
+Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AAADEE71
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 23:56:34 -0700 (PDT)
+Received: by mail-ed1-x52d.google.com with SMTP id 4fb4d7f45d1cf-52256241b76so8437997a12.1
+        for <netdev@vger.kernel.org>; Tue, 01 Aug 2023 23:56:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fairphone.com; s=fair; t=1690959391; x=1691564191;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=jUzJB+BG9RWYTDdVbtJXTjUaZZLqj4Uowx0i8AONLTw=;
-        b=l4+MfpYfZRWgAvFL59TuqxRwKN3tBGtKvfwKpSyrfRyu+7nwyMrx9ILWQWLNKf32OG
-         FUtfn0xMrlGBtubo2AdyaBgxbz2yLFhQXM/dIbwDT/RowOhLwejXUk3a/OlXPawY5N+p
-         q/29IRT5KSR7Jq9s0cXptycUP7XEvN+vQfND0VLUFtzxxdAADqQX27UQya7N42KpLk/Z
-         rmrSsGjxpCjOlqn8F5+O9sEZMWHFFjAD46FGdFdfOtVQQWaKvWdzuE1MKSbfi98fD4cw
-         +sziTQw3Q1keXmQGtd+7cgMIQ8MQg+GQZ3ttgek9Jl563UPAC+VsLBy6lZCbDaYcJ/yA
-         b3JA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690959391; x=1691564191;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=fairphone.com; s=fair; t=1690959393; x=1691564193;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=jUzJB+BG9RWYTDdVbtJXTjUaZZLqj4Uowx0i8AONLTw=;
-        b=WA3Uc6bwlEF0e7F+VSWPXlUfVEeEa+c1C4/LOWF85+3JkvxkOkqvahUBnFyO+eRwZl
-         wF0JMBjYG7m8url1uM4VVWejVyX33RZ0W9q2ZFRQK3lwd9STxMcCFYlBtTJl9lSd7d67
-         HqzRivk5wWWaZKLb4IHt/Xr17mTRs6MDYNkoCsta8vFN/V80Ft5TMTLlPRVyK+6VB0yD
-         zp/nDZnWSGxSDqA+xIk75cM7NqPK2w0UTKLeAgsaxTiR8Au/L1zaO7929qSdGhd7uuVz
-         zp4yIwjL2D5WjHryiRWWD9ugjKvD9LCM6ghRVJNF2ll2c6RhEXWXb937zoSVfgj4Kz4N
-         81eg==
-X-Gm-Message-State: ABy/qLZvy9JJTQ/iAzfmBY1IT4gWbtFa9dy8EQt9Y/drpabMLdxfTMsb
-	gyB4GBOlkvMfJov7FM7ygfyMGw==
-X-Google-Smtp-Source: APBJJlGi5fmP0zp7K4DR2MMoxvj+mltvijlg3OwvuFffod4okhkoMLCJtNXJIomfMjOXylY05fNUEg==
-X-Received: by 2002:a17:907:1dca:b0:997:beca:f9db with SMTP id og10-20020a1709071dca00b00997becaf9dbmr4051637ejc.54.1690959391375;
-        Tue, 01 Aug 2023 23:56:31 -0700 (PDT)
+        bh=4WekZWN6r3kEo9Z2SWEpwzpGIFVoo4aO3LnnSXjlvYM=;
+        b=Ulwg9GG6JZoIzsSN6MyESOEZvt7zeBaPnm0vWVAkD7xUt3M5nLIKAgIvWxVvycxZxG
+         +Abs6pUOl2DfcjnX4E4uNwCvSnr1EpvHksoBD+jjf7p/MBXgXMVbKGzr4FGhPFGQJ4SE
+         vAQLwenEbU4EI/5xs4y80vz6dYaD+U0Qjb5pt3WI6GUCx9pAQcr/YxE/Znsbvym4yamo
+         Qeh8z0us0LpQm0CcC19yIfoWL9FelZuRyYXvcNBDtMxbmbhfgW7ovUO8F7uFdJVLRwbW
+         bMMEv56OMx8aMaO9IvdzHZ0TN5d8hibLudNMmUD6V8x6JXF0jnm24gOn4zpxO7pToaT+
+         xqYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690959393; x=1691564193;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4WekZWN6r3kEo9Z2SWEpwzpGIFVoo4aO3LnnSXjlvYM=;
+        b=Ps9u/x/tVu2eQJ0DDrJQ5hH5W3bazO1l+dlPL0X6CCgQtCNdPu2ONe24UCVnLSiwfU
+         nv+SDtT2jQONHciTbOViEh+1Mr3/6fhH331VxK3MN41Vis5SkQ78Hwn65tMPPc5rtaBs
+         fNAk80nhIBL6cbb1cDM9RVSci8NzgYgtBXO2DEtbOXZikN/R/objf0veGFtmm+OC0+6D
+         68QTBCrC/33eQBxrp4Rq70noFIObS4qcbMBQiMRqgSKhPC/WGQRmeX2PzuPak406cOHC
+         xKpabb7KWcthNN+6MyFfpLf5IkmfQ6nJVQs6s3iiy0uuMmHSM1TF+cgNp7mhLCeqCnG1
+         TS2w==
+X-Gm-Message-State: ABy/qLbql0d/BMZdLF+nJtcsIysmYkzTPv/9nJv0Xr+ri39x9ji2Z+BL
+	tf7wAvS2Aymh7O8GW7ZZSXUfQA==
+X-Google-Smtp-Source: APBJJlFGxq+aMT3PqHDgik/2AOf8hLDUHBWjDVKJBcTpdIfewNezftcZ0MjSF0LXzcYzfzYmQ/xYmw==
+X-Received: by 2002:a17:907:7631:b0:993:f9b2:93c1 with SMTP id jy17-20020a170907763100b00993f9b293c1mr4129777ejc.9.1690959392217;
+        Tue, 01 Aug 2023 23:56:32 -0700 (PDT)
 Received: from [172.16.240.113] (144-178-202-138.static.ef-service.nl. [144.178.202.138])
-        by smtp.gmail.com with ESMTPSA id e1-20020a1709062c0100b0099bd5b72d93sm8567400ejh.43.2023.08.01.23.56.30
+        by smtp.gmail.com with ESMTPSA id e1-20020a1709062c0100b0099bd5b72d93sm8567400ejh.43.2023.08.01.23.56.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Tue, 01 Aug 2023 23:56:31 -0700 (PDT)
 From: Luca Weiss <luca.weiss@fairphone.com>
-Subject: [PATCH v3 0/2] Add WCN3988 Bluetooth support for Fairphone 4
-Date: Wed, 02 Aug 2023 08:56:27 +0200
-Message-Id: <20230802-fp4-bluetooth-v3-0-7c9e7a6e624b@fairphone.com>
+Date: Wed, 02 Aug 2023 08:56:28 +0200
+Subject: [PATCH v3 1/2] dt-bindings: net: qualcomm: Add WCN3988
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,10 +67,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIABv+yWQC/32NQQ7CIBQFr9KwFvMLaLEr72FcAP0VkgoNtETT9
- O7SLk10OZO8eQtJGB0m0lYLiZhdcsEX4IeKGKv8A6nrChMGjINgNe1HQfUw4xTCZKnmZwUoG30
- xkpSNVgmpjsobW1Z+HoYix4i9e+0nt3th69IU4nv/zPVmf+VzTYGC4IBcNQiKXXvl4miDx6MJT
- 7LVMvtbYKXAO5QCupOQHL8L67p+AI7Xl8cFAQAA
+Message-Id: <20230802-fp4-bluetooth-v3-1-7c9e7a6e624b@fairphone.com>
+References: <20230802-fp4-bluetooth-v3-0-7c9e7a6e624b@fairphone.com>
+In-Reply-To: <20230802-fp4-bluetooth-v3-0-7c9e7a6e624b@fairphone.com>
 To: "David S. Miller" <davem@davemloft.net>, 
  Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
  Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>, 
@@ -96,55 +95,37 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Add support in the btqca/hci_qca driver for the WCN3988 and add it to
-the sm7225 Fairphone 4 devicetree.
+Add the compatible for the Bluetooth part of the Qualcomm WCN3988
+chipset.
 
-Devicetree patches go via Qualcomm tree, the rest via their respective
-trees.
-
---
-Previously with the RFC version I've had problems before with Bluetooth
-scanning failing like the following:
-
-  [bluetooth]# scan on
-  Failed to start discovery: org.bluez.Error.InProgress
-
-  [  202.371374] Bluetooth: hci0: Opcode 0x200b failed: -16
-
-This appears to only happen with driver built-in (=y) when the supported
-local commands list doesn't get updated in the Bluetooth core and
-use_ext_scan() returning false. I'll try to submit this separately since
-this now works well enough with =m. But in both cases (=y, =m) it's
-behaving a bit weirdly before (re-)setting the MAC address with "sudo
-btmgmt public-addr fo:oo:ba:ar"
-
+Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 Signed-off-by: Luca Weiss <luca.weiss@fairphone.com>
 ---
-Changes in v3:
-- Drop applied patches and resend
-- Link to v2: https://lore.kernel.org/r/20230421-fp4-bluetooth-v2-0-3de840d5483e@fairphone.com
+ Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml | 2 ++
+ 1 file changed, 2 insertions(+)
 
-Changes in v2:
-- Add pinctrl & 'tlmm 64' irq to uart node
-- Pick up tags
-- Link to v1: https://lore.kernel.org/r/20230421-fp4-bluetooth-v1-0-0430e3a7e0a2@fairphone.com
+diff --git a/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml b/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
+index 56cbb42b5aea..2735c6a4f336 100644
+--- a/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
++++ b/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
+@@ -19,6 +19,7 @@ properties:
+       - qcom,qca2066-bt
+       - qcom,qca6174-bt
+       - qcom,qca9377-bt
++      - qcom,wcn3988-bt
+       - qcom,wcn3990-bt
+       - qcom,wcn3991-bt
+       - qcom,wcn3998-bt
+@@ -111,6 +112,7 @@ allOf:
+         compatible:
+           contains:
+             enum:
++              - qcom,wcn3988-bt
+               - qcom,wcn3990-bt
+               - qcom,wcn3991-bt
+               - qcom,wcn3998-bt
 
----
-Luca Weiss (2):
-      dt-bindings: net: qualcomm: Add WCN3988
-      Bluetooth: btqca: Add WCN3988 support
-
- .../bindings/net/bluetooth/qualcomm-bluetooth.yaml          |  2 ++
- drivers/bluetooth/btqca.c                                   | 13 +++++++++++--
- drivers/bluetooth/btqca.h                                   | 12 ++++++++++--
- drivers/bluetooth/hci_qca.c                                 | 12 ++++++++++++
- 4 files changed, 35 insertions(+), 4 deletions(-)
----
-base-commit: 7093f04e534f48181e5d5fccbcf99c37ab96929a
-change-id: 20230421-fp4-bluetooth-b36a0e87b9c8
-
-Best regards,
 -- 
-Luca Weiss <luca.weiss@fairphone.com>
+2.41.0
 
 
