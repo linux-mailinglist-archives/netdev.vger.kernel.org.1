@@ -1,93 +1,62 @@
-Return-Path: <netdev+bounces-23739-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23724-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27AA576D567
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 19:33:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3725B76D535
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 19:28:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E787F1C213AF
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 17:33:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E2D14281E39
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 17:28:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2764134B6;
-	Wed,  2 Aug 2023 17:28:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C9F9100C8;
+	Wed,  2 Aug 2023 17:27:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9730713AF1
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 17:28:02 +0000 (UTC)
-Received: from mail-wm1-x332.google.com (mail-wm1-x332.google.com [IPv6:2a00:1450:4864:20::332])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5ACDF3A9F
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 10:27:36 -0700 (PDT)
-Received: by mail-wm1-x332.google.com with SMTP id 5b1f17b1804b1-3fe167d4a18so1191215e9.0
-        for <netdev@vger.kernel.org>; Wed, 02 Aug 2023 10:27:36 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1150F100AF
+	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 17:27:28 +0000 (UTC)
+Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DAED03C15
+	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 10:27:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=arista.com; s=google; t=1690997253; x=1691602053;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=T5ELzyVk/XA1aCrZBrMuYOfiLZ2aUjuTj3gKgPsL214=;
-        b=VeF8NquyO/p8eu707GC3eeuT3FhjPxlFNBsZOLoqNk8jLkUffJ1tsfYmp+ow/lHf7K
-         ESahpK8ztx8ZlrCe9s4869mbyBq+SP46GwwWLoIRA8hIRCtPcs97CtumxnFkRWf8BxqU
-         FQzZeUS6FDAt/y7NS4VNFsJC0Odn3lfmnnu1N/lfA2AXhAps67PUpSp4q0/R3zTCfi/S
-         HUw3yG8dcmFnwqURZZKObjty6tDJtxQUajjalgIlar0kec92Z4TKVUvlX5I7uA3ZzqqP
-         3sVZjUfRolQbaikcdAMJ0spIaUgW/09G7i4ZvbZJSOGaRxc/pjk8Gb6fbUwWjKzdRa7y
-         B9bw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690997253; x=1691602053;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=T5ELzyVk/XA1aCrZBrMuYOfiLZ2aUjuTj3gKgPsL214=;
-        b=Yf9YQ4bNkJKfM6yMTvfGBAdLMpuhCQo5UYtvAq3V74TV3BX2oDfn0ZhvZyG6pMfpvX
-         7NkQ9Op2qYi6AUeUjDSMJ5fHBpvOQrGeiC8LkzNU8SSB6YVeN+ve3Z6XGqQrgJM7DlFv
-         Nfkvv3NpNOmSeLMW4qhsjG0MVHkwCRme7p+WZxUjlGF1LV62Onz3KiTUbQy4zt+CCRuj
-         lg8/EYxqXQpeZQLTm5aZL0NwmyMqP6lUyF9BrjafVtqJ2XEFHbHdEocdU1DjRCC5VOum
-         B8gkX+GMuxR1uaNRzrVyn3t65cggFSQaD+qeNrnxp3NPPF8AmQCCnXAK7O1QCTq6KPnN
-         PbUw==
-X-Gm-Message-State: ABy/qLYYbD+6Ph3+jghn+BgbjoNQ4kRLF+fswwJSaiDO5CNZ7KzIXzcp
-	kfxv/kgctx4TotfZvGYjqlK8tA==
-X-Google-Smtp-Source: APBJJlH5idCr0u7kYS3Xt1Nc/PAEGp2DegQ+cidms0fu0pk2dg+dO+E4dnbR0Y0MkSuXQFOlST5uLQ==
-X-Received: by 2002:a1c:f202:0:b0:3fa:97b3:7ce0 with SMTP id s2-20020a1cf202000000b003fa97b37ce0mr5160054wmc.26.1690997253630;
-        Wed, 02 Aug 2023 10:27:33 -0700 (PDT)
-Received: from Mindolluin.ire.aristanetworks.com ([217.173.96.166])
-        by smtp.gmail.com with ESMTPSA id q5-20020a1ce905000000b003fbc0a49b57sm2221770wmc.6.2023.08.02.10.27.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Aug 2023 10:27:33 -0700 (PDT)
-From: Dmitry Safonov <dima@arista.com>
-To: David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>
-Cc: linux-kernel@vger.kernel.org,
-	Dmitry Safonov <dima@arista.com>,
-	Andy Lutomirski <luto@amacapital.net>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Bob Gilligan <gilligan@arista.com>,
-	Dan Carpenter <error27@gmail.com>,
-	David Laight <David.Laight@aculab.com>,
-	Dmitry Safonov <0x7f454c46@gmail.com>,
-	Donald Cassidy <dcassidy@redhat.com>,
-	Eric Biggers <ebiggers@kernel.org>,
-	"Eric W. Biederman" <ebiederm@xmission.com>,
-	Francesco Ruggeri <fruggeri05@gmail.com>,
-	"Gaillardetz, Dominik" <dgaillar@ciena.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-	Ivan Delalande <colona@arista.com>,
-	Leonard Crestez <cdleonard@gmail.com>,
-	Salam Noureddine <noureddine@arista.com>,
-	"Tetreault, Francois" <ftetreau@ciena.com>,
-	netdev@vger.kernel.org
-Subject: [PATCH v9 net-next 17/23] net/tcp: Add option for TCP-AO to (not) hash header
-Date: Wed,  2 Aug 2023 18:26:44 +0100
-Message-ID: <20230802172654.1467777-18-dima@arista.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230802172654.1467777-1-dima@arista.com>
-References: <20230802172654.1467777-1-dima@arista.com>
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1690997228; x=1722533228;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=UajZUZytyvHERwaG0SQM8QioXMeg/pinO87itKE00b8=;
+  b=lNG85xmdZPZ8f8ITtHi4b+/3upxObcwTcXMb7iPNwN3NSCKq4gUVTcRw
+   vJIVH9YfrAxCp1SjT+wGudvw5fC/Dk3tJIYkGokkJ8U+rNUI/7sd/SHXr
+   YxE/+9PE4FV/B0RpvJhaci2DhOj+Wl6LGfJHQW898JQqPXvvD/qBxg1dI
+   E=;
+X-IronPort-AV: E=Sophos;i="6.01,249,1684800000"; 
+   d="scan'208";a="20148809"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-iad-1a-m6i4x-617e30c2.us-east-1.amazon.com) ([10.25.36.214])
+  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2023 17:27:05 +0000
+Received: from EX19MTAUWC002.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan2.iad.amazon.com [10.40.163.34])
+	by email-inbound-relay-iad-1a-m6i4x-617e30c2.us-east-1.amazon.com (Postfix) with ESMTPS id 0F54E6734B;
+	Wed,  2 Aug 2023 17:27:04 +0000 (UTC)
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Wed, 2 Aug 2023 17:26:57 +0000
+Received: from 88665a182662.ant.amazon.com (10.142.140.92) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Wed, 2 Aug 2023 17:26:54 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <edumazet@google.com>
+CC: <davem@davemloft.net>, <dsahern@kernel.org>, <eric.dumazet@gmail.com>,
+	<kuba@kernel.org>, <kuniyu@amazon.com>, <netdev@vger.kernel.org>,
+	<pabeni@redhat.com>
+Subject: Re: [PATCH net 1/6] tcp_metrics: fix addr_same() helper
+Date: Wed, 2 Aug 2023 10:26:45 -0700
+Message-ID: <20230802172645.50191-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20230802131500.1478140-2-edumazet@google.com>
+References: <20230802131500.1478140-2-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -95,78 +64,55 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Originating-IP: [10.142.140.92]
+X-ClientProxiedBy: EX19D033UWC004.ant.amazon.com (10.13.139.225) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Precedence: Bulk
+X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,T_SCC_BODY_TEXT_LINE,T_SPF_PERMERROR autolearn=no
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Provide setsockopt() key flag that makes TCP-AO exclude hashing TCP
-header for peers that match the key. This is needed for interraction
-with middleboxes that may change TCP options, see RFC5925 (9.2).
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed,  2 Aug 2023 13:14:55 +0000
+> Because v4 and v6 families use separate inetpeer trees (respectively
+> net->ipv4.peers and net->ipv6.peers), inetpeer_addr_cmp(a, b) assumes
+> a & b share the same family.
+> 
+> tcp_metrics use a common hash table, where entries can have different
+> families.
+> 
+> We must therefore make sure to not call inetpeer_addr_cmp()
+> if the families do not match.
+> 
+> Fixes: d39d14ffa24c ("net: Add helper function to compare inetpeer addresses")
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Cc: David Ahern <dsahern@kernel.org>
 
-Co-developed-by: Francesco Ruggeri <fruggeri@arista.com>
-Signed-off-by: Francesco Ruggeri <fruggeri@arista.com>
-Co-developed-by: Salam Noureddine <noureddine@arista.com>
-Signed-off-by: Salam Noureddine <noureddine@arista.com>
-Signed-off-by: Dmitry Safonov <dima@arista.com>
-Acked-by: David Ahern <dsahern@kernel.org>
----
- include/uapi/linux/tcp.h | 5 +++++
- net/ipv4/tcp_ao.c        | 8 +++++---
- 2 files changed, 10 insertions(+), 3 deletions(-)
+Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
-diff --git a/include/uapi/linux/tcp.h b/include/uapi/linux/tcp.h
-index ca7ed18ce67b..3275ade3293a 100644
---- a/include/uapi/linux/tcp.h
-+++ b/include/uapi/linux/tcp.h
-@@ -354,6 +354,11 @@ struct tcp_diag_md5sig {
- #define TCP_AO_MAXKEYLEN	80
- 
- #define TCP_AO_KEYF_IFINDEX	(1 << 0)	/* L3 ifindex for VRF */
-+#define TCP_AO_KEYF_EXCLUDE_OPT	(1 << 1)	/* "Indicates whether TCP
-+						 *  options other than TCP-AO
-+						 *  are included in the MAC
-+						 *  calculation"
-+						 */
- 
- struct tcp_ao_add { /* setsockopt(TCP_AO_ADD_KEY) */
- 	struct __kernel_sockaddr_storage addr;	/* peer's address for the key */
-diff --git a/net/ipv4/tcp_ao.c b/net/ipv4/tcp_ao.c
-index 236c8cd1a0c7..0d10b437b0f9 100644
---- a/net/ipv4/tcp_ao.c
-+++ b/net/ipv4/tcp_ao.c
-@@ -565,7 +565,8 @@ int tcp_ao_hash_hdr(unsigned short int family, char *ao_hash,
- 		WARN_ON_ONCE(1);
- 		goto clear_hash;
- 	}
--	if (tcp_ao_hash_header(&hp, th, false,
-+	if (tcp_ao_hash_header(&hp, th,
-+			       !!(key->keyflags & TCP_AO_KEYF_EXCLUDE_OPT),
- 			       ao_hash, hash_offset, tcp_ao_maclen(key)))
- 		goto clear_hash;
- 	ahash_request_set_crypt(hp.req, NULL, hash_buf, 0);
-@@ -613,7 +614,8 @@ int tcp_ao_hash_skb(unsigned short int family,
- 		goto clear_hash;
- 	if (tcp_ao_hash_pseudoheader(family, sk, skb, &hp, skb->len))
- 		goto clear_hash;
--	if (tcp_ao_hash_header(&hp, th, false,
-+	if (tcp_ao_hash_header(&hp, th,
-+			       !!(key->keyflags & TCP_AO_KEYF_EXCLUDE_OPT),
- 			       ao_hash, hash_offset, tcp_ao_maclen(key)))
- 		goto clear_hash;
- 	if (tcp_sigpool_hash_skb_data(&hp, skb, th->doff << 2))
-@@ -1407,7 +1409,7 @@ static struct tcp_ao_info *setsockopt_ao_info(struct sock *sk)
- 	return ERR_PTR(-ESOCKTNOSUPPORT);
- }
- 
--#define TCP_AO_KEYF_ALL		(0)
-+#define TCP_AO_KEYF_ALL		(TCP_AO_KEYF_EXCLUDE_OPT)
- 
- static struct tcp_ao_key *tcp_ao_key_alloc(struct sock *sk,
- 					   struct tcp_ao_add *cmd)
--- 
-2.41.0
 
+> ---
+>  net/ipv4/tcp_metrics.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/net/ipv4/tcp_metrics.c b/net/ipv4/tcp_metrics.c
+> index 82f4575f9cd90049a5ad4c7329ad1ddc28fc1aa0..c4daf0aa2d4d9695e128b67df571d91d647a254d 100644
+> --- a/net/ipv4/tcp_metrics.c
+> +++ b/net/ipv4/tcp_metrics.c
+> @@ -78,7 +78,7 @@ static void tcp_metric_set(struct tcp_metrics_block *tm,
+>  static bool addr_same(const struct inetpeer_addr *a,
+>  		      const struct inetpeer_addr *b)
+>  {
+> -	return inetpeer_addr_cmp(a, b) == 0;
+> +	return (a->family == b->family) && !inetpeer_addr_cmp(a, b);
+>  }
+>  
+>  struct tcpm_hash_bucket {
+> -- 
+> 2.41.0.640.ga95def55d0-goog
 
