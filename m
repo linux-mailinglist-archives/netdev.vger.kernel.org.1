@@ -1,392 +1,355 @@
-Return-Path: <netdev+bounces-23585-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23586-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB88B76C977
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 11:27:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 246C276C97D
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 11:31:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C14DC1C21235
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 09:27:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 47F0F1C211FD
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 09:31:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D9356128;
-	Wed,  2 Aug 2023 09:27:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CE125698;
+	Wed,  2 Aug 2023 09:31:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D022568A
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 09:27:13 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D33B199F
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 02:27:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1690968430;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DCD/wbqNT6iBlcLGAqvvx86SGRTFevUmX9c0eZH2vTU=;
-	b=gDIs7DKDqXQ30T/j2v1DnwrembDXQV3aGCAf20uDAAvko2XIZh8BEygzxO+iJw7slsAFbG
-	K3FZ1DbY16qDO5RE7waCJ0Oq338P3svcJVp2VXNGrhC/1M8iHt92RLbdSf1cLtlZNxDfqU
-	RS13wJc9AtPwPdV3ilAx5X3crTbdDTI=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-292-Cd4KT6HeM1CS7tsSgNK7yQ-1; Wed, 02 Aug 2023 05:27:06 -0400
-X-MC-Unique: Cd4KT6HeM1CS7tsSgNK7yQ-1
-Received: by mail-ed1-f70.google.com with SMTP id 4fb4d7f45d1cf-52279f6305bso5040467a12.0
-        for <netdev@vger.kernel.org>; Wed, 02 Aug 2023 02:27:04 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690968421; x=1691573221;
-        h=content-transfer-encoding:in-reply-to:references:to
-         :content-language:subject:cc:user-agent:mime-version:date:message-id
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DCD/wbqNT6iBlcLGAqvvx86SGRTFevUmX9c0eZH2vTU=;
-        b=XNwjMe2ivfKm4gWU7tR7W/Qf5ZslXmRYXO7XMd6q2xy/HWs5U1dLs0JgCSqgJ8q5/I
-         fXbhGWsEEl9yMrzLPSui6JyGMP+TM70bapfe8Lf5vnGWHmhYbIpjNZ9hmVo0riNy9R0P
-         MwEJTkKjBwRNHZui/0FVi/MH3AtxEJjEFh4MtwWm6kissHp1bGwaQKV4mAB7wMAVA2WF
-         Zd51s8Xlcal+vZM4QSg8mYUQW/AoiZZNuQ5HULrSsOeyyPBPIJBO6ya65vPoUuLD0W5O
-         PYrl9rdMgwgBeMb6KsQ1wOY/2PEQ0dEyrOp9Gsv2DYfzxaBp51Q/dN1AF/4q18Y77L7F
-         jHrg==
-X-Gm-Message-State: ABy/qLbpY7j2eoVQHC6EooLXF7MfMJSYgePPbeWJjx0/02a0xUupdwlB
-	j+dIEQrTRdx6aLJnWTPLgYcqXgDqqQELcfwqDAC1JdYeAYZIoMupMgKnlRv+MVnyFlSjVAvap4i
-	or4fpX7Hp/P5uU7lR
-X-Received: by 2002:aa7:d5ca:0:b0:522:2019:2020 with SMTP id d10-20020aa7d5ca000000b0052220192020mr4133111eds.17.1690968421688;
-        Wed, 02 Aug 2023 02:27:01 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlEMUlAexT5aq1Ralm3oRm8CFZE9NJi4oAWH3IEHbx5D5vsLGXffbImAOSMR8JUVEYftgKBSNw==
-X-Received: by 2002:aa7:d5ca:0:b0:522:2019:2020 with SMTP id d10-20020aa7d5ca000000b0052220192020mr4133091eds.17.1690968421266;
-        Wed, 02 Aug 2023 02:27:01 -0700 (PDT)
-Received: from [192.168.42.222] (194-45-78-10.static.kviknet.net. [194.45.78.10])
-        by smtp.gmail.com with ESMTPSA id j9-20020aa7ca49000000b0051873c201a0sm8140530edt.26.2023.08.02.02.26.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 02 Aug 2023 02:27:00 -0700 (PDT)
-From: Jesper Dangaard Brouer <jbrouer@redhat.com>
-X-Google-Original-From: Jesper Dangaard Brouer <brouer@redhat.com>
-Message-ID: <3d0a8536-6a22-22e5-41c0-98c13dd7b802@redhat.com>
-Date: Wed, 2 Aug 2023 11:26:59 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 868A1568A
+	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 09:31:06 +0000 (UTC)
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14692E7
+	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 02:31:05 -0700 (PDT)
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37291ONS019973;
+	Wed, 2 Aug 2023 02:30:56 -0700
+Received: from nam04-bn8-obe.outbound.protection.outlook.com (mail-bn8nam04lp2044.outbound.protection.outlook.com [104.47.74.44])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3s767n2vsx-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 02 Aug 2023 02:30:55 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=oDfpN3rOHYsnhuaAQu4NtGAR6JwGNh/H6wmEO0nC/1DPSsyfazqOUf6zjS2n+ZtZ2GMk7DuyecQaCCdn0yDB4QJlxDbd8FE6K9+i8hmcts8hsONLSQtLBfpq4QyyOx+4zR2EUT1zo/SMDtYBxRWr8POyVV30m3Mecmt34+7TMwHBRUk36c53PYHUrCI2svrUsaRsZRAuPrha+POMK62Ux/1vNQJvBBHAM7VvFXfvObpJEhgK/Mg6a4XEoUohB2l+cyOceDcw6Y86/o6E2F/Ec4f04asdKaBRXDeKUgK7WpQRD0ZwLiUSuTqaD+GK5gfOHsc7l4ZhoHj+kZIMirs44A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=vCT/C7RlJ2LIT95AZLsGvUfPQrQTgp/e4PSXs+rQMc0=;
+ b=As81BScAZ1S9rsqWCNOgg7EYRu/uD1AVg4ch3iIXBsdrsdhAdpym5j3bBpvzJznXCNhdSmXwwZZwahftyXyQl1QCdlxj7v1byUwgT1NkdrNJPSWg5NH6WgYrOI9sBhKbXNZ3uevO/gztc6maFmLQfX5wqedGq11xvKj3t/VIjZ4j+yzxOVUwXmlq0HH2f05CBLEvCjur7cmYJkSKpzyihnYRT2u55yGzC29lcjcUEuxM8OlvvZQIe5v7qKEI9uzK2eZLHdApVEOzR2x5lYrQkM8WebUaZsQYXIcU+G9MnBnySR7vlTTpOYqVxq5aNtMX9KdQ2TNiRnQJazqEyVxCoQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
+ dkim=pass header.d=marvell.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=marvell.onmicrosoft.com; s=selector1-marvell-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=vCT/C7RlJ2LIT95AZLsGvUfPQrQTgp/e4PSXs+rQMc0=;
+ b=FuauuUvMyR34MP9s7p8ViSrcVsAMwp1vpd6qS6YXmxwMT0mI7voecLg4lE1FSkuTABEe8EMhX8E/Cuw2mIal02YpxDI1X9bUlyvbNJdCB/eyp4JQq0eQM4i5F523VFhT2gK87/FtTb/7jiH9RaduMeRhz9WSdPSBv2vRRg2Ep54=
+Received: from MWHPR1801MB1918.namprd18.prod.outlook.com
+ (2603:10b6:301:68::33) by DM8PR18MB4520.namprd18.prod.outlook.com
+ (2603:10b6:8:25::18) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.45; Wed, 2 Aug
+ 2023 09:30:51 +0000
+Received: from MWHPR1801MB1918.namprd18.prod.outlook.com
+ ([fe80::7441:799:fdc0:3bb6]) by MWHPR1801MB1918.namprd18.prod.outlook.com
+ ([fe80::7441:799:fdc0:3bb6%6]) with mapi id 15.20.6631.045; Wed, 2 Aug 2023
+ 09:30:50 +0000
+From: Ratheesh Kannoth <rkannoth@marvell.com>
+To: David Ahern <dsahern@gmail.com>,
+        "stephen@networkplumber.org"
+	<stephen@networkplumber.org>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "davem@davemloft.net"
+	<davem@davemloft.net>,
+        "kuba@kernel.org" <kuba@kernel.org>,
+        Leon Romanovsky
+	<leon@kernel.org>,
+        "edumazet@google.com" <edumazet@google.com>,
+        "pabeni@redhat.com" <pabeni@redhat.com>
+Subject: RE:  Re: [PATCH iproute2-next] tc: Classifier support for SPI field
+Thread-Topic: Re: [PATCH iproute2-next] tc: Classifier support for SPI field
+Thread-Index: AQHZxCLLrbSjDW9+6kO4fpPQWQlfj6/Wvu2Q
+Date: Wed, 2 Aug 2023 09:30:50 +0000
+Message-ID: 
+ <MWHPR1801MB1918C7804430B157CDE578C3D30BA@MWHPR1801MB1918.namprd18.prod.outlook.com>
+References: <20230725035016.505386-1-rkannoth@marvell.com>
+ <MWHPR1801MB19182545B1FEB05CAC9F7371D30AA@MWHPR1801MB1918.namprd18.prod.outlook.com>
+ <5222d4e2-dd19-fc77-23f0-ce96684e9470@gmail.com>
+ <MWHPR1801MB191863234AD01108DD846F88D30AA@MWHPR1801MB1918.namprd18.prod.outlook.com>
+ <079104c9-0076-568b-85b7-ff0d88af76ab@gmail.com>
+ <MWHPR1801MB1918FF429D8E360EE0C3D3FFD30AA@MWHPR1801MB1918.namprd18.prod.outlook.com>
+In-Reply-To: 
+ <MWHPR1801MB1918FF429D8E360EE0C3D3FFD30AA@MWHPR1801MB1918.namprd18.prod.outlook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-dg-rorf: true
+x-dg-ref: 
+ =?utf-8?B?UEcxbGRHRStQR0YwSUc1dFBTSmliMlI1TG5SNGRDSWdjRDBpWXpwY2RYTmxj?=
+ =?utf-8?B?bk5jY210aGJtNXZkR2hjWVhCd1pHRjBZVnh5YjJGdGFXNW5YREE1WkRnME9X?=
+ =?utf-8?B?STJMVE15WkRNdE5HRTBNQzA0TldWbExUWmlPRFJpWVRJNVpUTTFZbHh0YzJk?=
+ =?utf-8?B?elhHMXpaeTAwTW1WbU5HWmxNQzB6TVRFM0xURXhaV1V0WWpabU5TMDRNRE00?=
+ =?utf-8?B?Wm1KbU1tTTJNakpjWVcxbExYUmxjM1JjTkRKbFpqUm1aVEl0TXpFeE55MHhN?=
+ =?utf-8?B?V1ZsTFdJMlpqVXRPREF6T0daaVpqSmpOakl5WW05a2VTNTBlSFFpSUhONlBT?=
+ =?utf-8?B?STRNRFlpSUhROUlqRXpNek0xTkRReU1qUTRNakExTWpjd05DSWdhRDBpYkZG?=
+ =?utf-8?B?NkwxRlBiRXRuYURseFZsSnNXRlJHWmtwaFprSkpla1JqUFNJZ2FXUTlJaUln?=
+ =?utf-8?B?WW13OUlqQWlJR0p2UFNJeElpQmphVDBpWTBGQlFVRkZVa2hWTVZKVFVsVkdU?=
+ =?utf-8?B?a05uVlVGQlRqUlFRVUZDWjBwclZVWktUVmhhUVZjNFkzTnhaVUZXVkZkRFlu?=
+ =?utf-8?B?aDVlWEEwUWxaT1dVbGFRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVG?=
+ =?utf-8?B?QlFVaEJRVUZCUW5WRWQwRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZC?=
+ =?utf-8?B?UVVWQlFWRkZRa0ZCUVVGSk4zRlVjRUZEUVVGUlFVRkJRVUZCUVVGQlFVRktO?=
+ =?utf-8?B?RUZCUVVKb1FVZFJRVnBCUW5sQlIxVkJZM2RDZWtGQlFVRkJRVUZCUVVGQlFV?=
+ =?utf-8?B?RkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVG?=
+ =?utf-8?B?QlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZC?=
+ =?utf-8?B?UVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJR?=
+ =?utf-8?B?VUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFV?=
+ =?utf-8?B?RkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUlVGQlFVRkJRVUZCUVVG?=
+ =?utf-8?B?blFVRkJRVUZCYm1kQlFVRkhUVUZrVVVKNlFVaFJRV0ozUW5SQlJqaEJZMEZD?=
+ =?utf-8?B?YkVGSVNVRmpkMEoyUVVjMFFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJR?=
+ =?utf-8?B?VUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFV?=
+ =?utf-8?B?RkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVG?=
+ =?utf-8?B?QlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZC?=
+ =?utf-8?B?UVVGQlFVRkJRVUZCUVVGQlFVRkJaMEZCUVVGQlFVRkJRVUZCUVVGQlFWRkJR?=
+ =?utf-8?B?VUZCUVVGQlFVRkRRVUZCUVVGQlEyVkJRVUZCV1hkQ01VRklUVUZrUVVKMlFV?=
+ =?utf-8?B?Y3dRVmgzUW5kQlIyZEJZbmRDZFVGSFZVRmlaMEl4UVVjd1FWbG5RbXhCU0Vs?=
+ =?utf-8?B?QlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZC?=
+ =?utf-8?B?UVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJR?=
+ =?utf-8?B?VUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFV?=
+ =?utf-8?B?RkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVG?=
+ =?utf-8?B?QlFVRkJRVUpCUVVGQlFVRkJRVUZCU1VGQlFVRkJRVW8wUVVGQlFtcEJTRlZC?=
+ =?utf-8?B?WTNkQ01FRkhPRUZpVVVKbVFVaE5RV04zUW5WQlJqaEJXa0ZDYUVGSVRVRmhR?=
+ =?utf-8?B?VUptUVVoWlFVMUJRWGxCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFV?=
+ =?utf-8?Q?FBQUFB?=
+x-dg-refone: 
+ =?utf-8?B?UVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJR?=
+ =?utf-8?B?VUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFV?=
+ =?utf-8?B?RkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVG?=
+ =?utf-8?B?QlFVRkJRVUZCUVVGRlFVRkJRVUZCUVVGQlFXZEJRVUZCUVVGdVowRkJRVWRO?=
+ =?utf-8?B?UVdSUlFucEJTRkZCWW5kQ2RFRkdPRUZqZDBKNlFVYzBRVmgzUW5KQlIxVkJa?=
+ =?utf-8?B?VkZDTTBGSE9FRmpaMEpyUVVoTlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFV?=
+ =?utf-8?B?RkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVG?=
+ =?utf-8?B?QlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZC?=
+ =?utf-8?B?UVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJR?=
+ =?utf-8?B?VUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJVVUZCUVVGQlFVRkJRVU5CUVVGQlFV?=
+ =?utf-8?B?RkRaVUZCUVVGWmQwSXhRVWhOUVdSQlFuWkJSekJCV0hkQ2VrRklUVUZpWjBK?=
+ =?utf-8?B?bVFVYzBRV0ozUW10QlIxVkJZa0ZDY0VGSE1FRmhVVUl3UVVkVlFXTm5RbVpC?=
+ =?utf-8?B?U0ZsQlRVRkJlVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJR?=
+ =?utf-8?B?VUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFV?=
+ =?utf-8?B?RkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVG?=
+ =?utf-8?B?QlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUWtGQlFVRkJRVUZC?=
+ =?utf-8?B?UVVGSlFVRkJRVUZCU2pSQlFVRkNha0ZJVlVGamQwSXdRVWM0UVdKUlFtWkJT?=
+ =?utf-8?B?RTFCWTNkQ2RVRkdPRUZqZDBKM1FVZEZRVmwzUW14QlJqaEJaR2RCZDBGRVNV?=
+ =?utf-8?B?RkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVG?=
+ =?utf-8?B?QlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZC?=
+ =?utf-8?B?UVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJR?=
+ =?utf-8?B?VUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFV?=
+ =?utf-8?B?VkJRVUZCUVVGQlFVRkJaMEZCUVVGQlFXNW5RVUZCUjFGQllrRkNkMEZHT0VG?=
+ =?utf-8?B?amQwSnlRVWhyUVdOQlFteEJSamhCV1hkQ2IwRkhSVUZrUVVKbVFVY3dRVnBS?=
+ =?utf-8?B?UW5wQlNFMUJXVkZDYmtGSFZVRllkMEl5UVVSQlFVMW5RVUZCUVVGQlFVRkJR?=
+ =?utf-8?B?VUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFV?=
+ =?utf-8?B?RkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVG?=
+ =?utf-8?B?QlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZC?=
+ =?utf-8?B?UVVGQlFVRkJRVUZSUVVGQlFVRkJRVUZCUTBGQlFVRkJRVU5sUVVGQlFWcEJR?=
+ =?utf-8?B?bk5CU0VGQldIZENla0ZIZDBGWlVVSnFRVWR6UVZoM1FtcEJSMmRCV1ZGQ01F?=
+ =?utf-8?B?RkdPRUZpVVVKc1FVaE5RV04zUW1oQlIyTkJXbEZCUVVGQlFVRkJRVUZCUVVG?=
+ =?utf-8?B?QlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZC?=
+ =?utf-8?B?UVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJR?=
+ =?utf-8?B?VUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFV?=
+ =?utf-8?Q?FBQUFB?=
+x-dg-reftwo: 
+ =?utf-8?B?UVVGQlFVRkJRVUZCUVVGQ1FVRkJRVUZCUVVGQlFVbEJRVUZCUVVGS05FRkJR?=
+ =?utf-8?B?VUpyUVVkM1FXTkJRbVpCU0ZGQldsRkNhRUZITUVGamQwSm1RVWM0UVdKblFt?=
+ =?utf-8?B?eEJSMUZCWTJkQ2NFRklXVUZhVVVKbVFVZFpRV0ZSUW5OQlIxVkJRVUZCUVVG?=
+ =?utf-8?B?QlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZC?=
+ =?utf-8?B?UVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJR?=
+ =?utf-8?B?VUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFV?=
+ =?utf-8?B?RkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJSVUZCUVVGQlFVRkJRVUZuUVVG?=
+ =?utf-8?B?QlFVRkJibWRCUVVGSFZVRmlVVUpvUVVkclFXSkJRbVpCUjBWQldrRkNhMEZJ?=
+ =?utf-8?B?U1VGYVVVSjZRVWhOUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJR?=
+ =?utf-8?B?VUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFV?=
+ =?utf-8?B?RkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVG?=
+ =?utf-8?B?QlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZC?=
+ =?utf-8?B?UVVGQlFVRkJRVUZCUVVGRFVVRkJRVUZCUVVGQlFVRkJRVUZCUVZGQlFVRkJR?=
+ =?utf-8?B?VUZCUVVGRFFVRkJRVUZCUTJWQlFVRkJZbEZDYUVGSVNVRmtaMEpzUVVkM1FW?=
+ =?utf-8?B?aDNRbmRCU0VsQlluZENjVUZIVlVGWmQwSXdRVVk0UVdKblFtaEJSekJCV2xG?=
+ =?utf-8?B?Q2VrRkdPRUZaZDBKMlFVYzBRVnBuUW5CQlIxRkJXbEZDZFVGSVVVRmhVVUpv?=
+ =?utf-8?B?UVVkM1FWaDNRbWhCUjNkQlluZENkVUZIVlVGQlFVRkJRVUZCUVVGQlFVRkJR?=
+ =?utf-8?B?VUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFV?=
+ =?utf-8?B?RkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVG?=
+ =?utf-8?B?QlFVSkJRVUZCUVVGQlFVRkJTVUZCUVVGQlFVbzBRVUZCUW5SQlIwVkJZMmRD?=
+ =?utf-8?B?TWtGSFZVRmlRVUptUVVoQlFXTm5RblpCUjI5QldsRkNha0ZJVVVGWWQwSjFR?=
+ =?utf-8?B?VWRGUVdKUlFteEJTRTFCV0hkQ2VVRkhWVUZqZDBJd1FVaEpRV0ZSUW1wQlNG?=
+ =?utf-8?B?RkJXbEZDYTBGR09FRlpVVUp6UVVjNFFXSm5RbXhCUVVGQlFVRkJRVUZCUVVG?=
+ =?utf-8?B?QlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZC?=
+ =?utf-8?B?UVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJR?=
+ =?utf-8?B?VUZCUVVGQlFVRkJRVUZGUVVGQlFVRkJRVUZCUVdkQlFVRkJRVUZ1WjBGQlFV?=
+ =?utf-8?B?Y3dRVmxSUW5sQlNGbEJXbEZDYzBGR09FRmpRVUo1UVVjNFFXRm5RbXhCUjAx?=
+ =?utf-8?B?QlpFRkNaa0ZITkVGWlVVSjBRVWRWUVdOM1FtWkJTRWxCV2xGQ2VrRklVVUZq?=
+ =?utf-8?B?WjBKd1FVZE5RV1JCUW14QlIxRkJXSGRDYjBGSFZVRmxRVUpxUVVjNFFWcEJR?=
+ =?utf-8?B?bXhCU0UxQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFV?=
+ =?utf-8?B?RkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVG?=
+ =?utf-8?B?QlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlVVRkJRVUZCUVVGQlFVTkJRVUZC?=
+ =?utf-8?B?UVVGRFpVRkJRVUZpVVVKb1FVaEpRV1JuUW14QlIzZEJZa0ZDWmtGSFJVRmpa?=
+ =?utf-8?B?MEowUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFV?=
+ =?utf-8?Q?FBQUFB?=
+x-dg-refthree: 
+ =?utf-8?B?UVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJR?=
+ =?utf-8?B?VUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFV?=
+ =?utf-8?B?RkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVG?=
+ =?utf-8?B?QlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRa0ZCUVVGQlFVRkJRVUZK?=
+ =?utf-8?B?UVVGQlFVRkJTalJCUVVGQ2RFRkhSVUZqWjBJeVFVZFZRV0pCUW5OQlJqaEJX?=
+ =?utf-8?B?bmRDZGtGSE9FRmFkMEp6UVVkVlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFV?=
+ =?utf-8?B?RkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVG?=
+ =?utf-8?B?QlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZC?=
+ =?utf-8?B?UVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJR?=
+ =?utf-8?B?VUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVWQlFV?=
+ =?utf-8?B?RkJRVUZCUVVGQlowRkJRVUZCUVc1blFVRkJSekJCV1ZGQ2VVRklXVUZhVVVK?=
+ =?utf-8?B?elFVZDNRVmgzUW5kQlNFbEJZbmRDY1VGSFZVRlpkMEl3UVVZNFFWbDNRblpC?=
+ =?utf-8?B?UjFGQldsRkNla0ZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJR?=
+ =?utf-8?B?VUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFV?=
+ =?utf-8?B?RkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVG?=
+ =?utf-8?B?QlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZC?=
+ =?utf-8?B?UVVGQlFVRlJRVUZCUVVGQlFVRkJRMEZCUVVGQlFVTmxRVUZCUVdKUlFtaEJT?=
+ =?utf-8?B?RWxCWkdkQ2JFRkhkMEZpUVVKbVFVaEJRV05uUW5aQlIyOUJXbEZDYWtGSVVV?=
+ =?utf-8?B?RllkMEpxUVVjNFFWcEJRbXhCU0UxQldIZENhMEZIYTBGWmQwSXdRVUZCUVVG?=
+ =?utf-8?B?QlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZC?=
+ =?utf-8?B?UVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJR?=
+ =?utf-8?B?VUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFV?=
+ =?utf-8?B?RkJRVUZCUVVGQlFVRkJRVUZDUVVGQlFVRkJRVUZCUVVsQlFVRkJRVUZLTkVG?=
+ =?utf-8?B?QlFVSjBRVWRGUVdOblFqSkJSMVZCWWtGQ2MwRkdPRUZqUVVKNVFVYzRRV0Zu?=
+ =?utf-8?B?UW14QlIwMUJaRUZDWmtGSE5FRlpVVUowUVVkVlFXTjNRbVpCUjAxQlluZENk?=
+ =?utf-8?B?VUZIV1VGaFVVSnJRVWRWUVdKblFqQkJSMnRCV1ZGQ2MwRkdPRUZpVVVKb1FV?=
+ =?utf-8?B?aEpRV1JuUW14QlIzZEJZa0ZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVG?=
+ =?utf-8?B?QlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZC?=
+ =?utf-8?B?UVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlJVRkJRVUZCUVVGQlFVRm5R?=
+ =?utf-8?B?VUZCUVVGQmJtZEJRVUZITUVGWlVVSjVRVWhaUVZwUlFuTkJSM2RCV0hkQ2Qw?=
+ =?utf-8?B?RklTVUZpZDBKeFFVZFZRVmwzUWpCQlJqaEJZbWRDYUVGSE1FRmFVVUo2UVVZ?=
+ =?utf-8?B?NFFWbDNRblpCUnpSQldtZENjRUZIVVVGYVVVSjFRVWhSUVdGUlFtaEJSM2RC?=
+ =?utf-8?B?V0hkQ2RFRkhSVUZqWjBJeVFVZFZRV0pCUW5OQlJqaEJZbmRDZVVGR09FRlpV?=
+ =?utf-8?B?VUo1UVVjd1FVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFV?=
+ =?utf-8?Q?FBQUFB?=
+x-dg-reffour: 
+ =?utf-8?B?UVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVkZCUVVGQlFVRkJR?=
+ =?utf-8?B?VUZEUVVGQlFVRkJRMlZCUVVGQllsRkNhRUZJU1VGa1owSnNRVWQzUVdKQlFt?=
+ =?utf-8?B?WkJTRUZCWTJkQ2RrRkhiMEZhVVVKcVFVaFJRVmgzUW5WQlIwVkJZbEZDYkVG?=
+ =?utf-8?B?SVRVRllkMEpxUVVjNFFXSm5RbTFCUjJ0QldrRkNiRUZITkVGa1FVSndRVWRG?=
+ =?utf-8?B?UVdKQlFtWkJSekJCV1ZGQ2VVRklXVUZhVVVKelFVZDNRVmgzUW5aQlNFbEJX?=
+ =?utf-8?B?SGRDYmtGSE9FRmlkMEp1UVVkM1FWcFJRVUZCUVVGQlFVRkJRVUZCUVVGQlFV?=
+ =?utf-8?B?RkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVK?=
+ =?utf-8?B?QlFVRkJRVUZCUVVGQlNVRkJRVUZCUVVvMFFVRkJRblJCUjBWQlkyZENNa0ZI?=
+ =?utf-8?B?VlVGaVFVSnpRVVk0UVdOQlFubEJSemhCWVdkQ2JFRkhUVUZrUVVKbVFVYzBR?=
+ =?utf-8?B?VmxSUW5SQlIxVkJZM2RDWmtGSVNVRmFVVUo2UVVoUlFXTm5RbkJCUjAxQlpF?=
+ =?utf-8?B?RkNiRUZIVVVGWWQwSjBRVWRGUVdOblFqSkJSMVZCWWtGQ2MwRkJRVUZCUVVG?=
+ =?utf-8?B?QlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZC?=
+ =?utf-8?B?UVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJR?=
+ =?utf-8?B?VUZCUVVGQlFVRkZRVUZCUVVGQlFVRkJRV2RCUVVGQlFVRnVaMEZCUVVjd1FW?=
+ =?utf-8?B?bFJRbmxCU0ZsQldsRkNjMEZIZDBGWWQwSjNRVWhKUVdKM1FuRkJSMVZCV1hk?=
+ =?utf-8?B?Q01FRkdPRUZpWjBKb1FVY3dRVnBSUW5wQlJqaEJZMmRDYkVGSVRVRmtRVUo1?=
+ =?utf-8?B?UVVkclFWbDNRakJCUjFWQldrRkNaa0ZITUVGWlVVSjVRVWhaUVZwUlFuTkJS?=
+ =?utf-8?B?M2RCV0hkQ2RrRklTVUZZZDBKb1FVaEpRV0pSUVVGQlFVRkJRVUZCUVVGQlFV?=
+ =?utf-8?B?RkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVG?=
+ =?utf-8?B?QlFVRkJRVUZCUVVGQlFVRkJRVUZCVVVGQlFVRkJRVUZCUVVOQlFVRkJRVUZE?=
+ =?utf-8?B?WlVGQlFVRmlVVUpvUVVoSlFXUm5RbXhCUjNkQllrRkNaa0ZJVVVGYVVVSjVR?=
+ =?utf-8?B?VWN3UVdGUlFuVkJTRlZCWTNkQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFV?=
+ =?utf-8?B?RkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVG?=
+ =?utf-8?B?QlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZC?=
+ =?utf-8?B?UVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJR?=
+ =?utf-8?B?VUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFrRkJRVUZCUVVGQlFV?=
+ =?utf-8?B?RkpRVUZCUVVGQlNqUkJRVUZDZEVGSFJVRmpaMEl5UVVkVlFXSkJRbk5CUmpo?=
+ =?utf-8?B?QlpIZENka0ZJU1VGYVFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZC?=
+ =?utf-8?B?UVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJR?=
+ =?utf-8?B?VUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFV?=
+ =?utf-8?B?RkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVG?=
+ =?utf-8?B?QlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVVZC?=
+ =?utf-8?Q?QUFBQUFBQUFBZ0FBQUFBQSIvPjwvbWV0YT4=3D?=
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: MWHPR1801MB1918:EE_|DM8PR18MB4520:EE_
+x-ms-office365-filtering-correlation-id: eaf8b7ed-33b9-4da7-b16e-08db933b2950
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 
+ 25SGJN+qMLWJTKdruhTn4LPXyHcs3eIv9LOJVC++Hkc5fboZRIeQpxNMDlFYGTAAZMplHiI6ThJI14f6wLyocJnudJD+ZpHZvVah62IWPgoCwcq9KnYQbwOvzzmPuiBKJw6IwVOgucbVcYN+UsTpj2oxDwib8ZjrHVziQkIpgvlq8ztiaigCtT1HX0r0RbRDriGhdCPls1ZCiKfIzVPIxcuo5Y/7NaQvEQLnP9eWXNt5FD+pTI2MT/aNWfSIfRLLJEK5vhZDJrwi/sqbZFeVwpUDeMKdNSSvkK5nc3g0jcgKIofLpP9slckQqig1moItAzqS4Qig2QbbBxLM3CFGg3KOUeZBkCxcSWNfPyKgyuhwtsDbAIOYE2fthgFVE/oaolB2/sLPk4GvHBe1eGNXLQ7mku/Yuhit9fr2ySWWg4qjJ6+P+VFHpZuK0jm16HNWESoSS1cNu8SY659TcVY+njjI+MT+fhxBkfbwsrVRs7H3bgdabo2ieOaiwvx3dehV1GG4c2dNV6by0eHVQx9zGsuQ++Ab/NbCmqK2FzZgxZkw8lr7JFquOMLxjpchczEsR+6XWDhcp1Q1r05JB1IWDrha5vAM4uJ2hxVK+yPwej1P2FLY9Xo69eWqjSup4ki/V7KLkZkmH38zoT/a7iAFIg==
+x-forefront-antispam-report: 
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MWHPR1801MB1918.namprd18.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(346002)(376002)(366004)(136003)(396003)(39860400002)(451199021)(4744005)(33656002)(86362001)(478600001)(9686003)(966005)(71200400001)(7696005)(8676002)(8936002)(41300700001)(316002)(5660300002)(66556008)(4326008)(66476007)(66446008)(64756008)(52536014)(55016003)(110136005)(54906003)(2906002)(76116006)(38100700002)(66946007)(26005)(38070700005)(122000001)(186003)(6506007)(53546011)(55236004);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: 
+ =?utf-8?B?V3A3Sy9aTDhBalRGYk0yUWtTOXJWdUlucDhiRXZSb2Q3WjdJdXNVSEh3RXRn?=
+ =?utf-8?B?REFwd0EydGhxeDI0Z1N0dFlFMTZiSVpCRjNGd3hWZFVZYmF6M2FYNklrR0xF?=
+ =?utf-8?B?USthVEtjaWtaTVNJNnlZS29YNTd1dDNqUy9vQ2c0dTFHZWlWWGdKWXBtQnVy?=
+ =?utf-8?B?QXVUNGt1U2QzVzhJZWVleDhhRi9QRTgwQW9oK29MbTJLa2VrQzZYTHVjSllm?=
+ =?utf-8?B?cGZ4TXpCelc1eGNLVERUS21MV1doUUdpeFF1VFBhWDFXZ09NUlBTOVVjRFhn?=
+ =?utf-8?B?QVNyRVBydy96ZWx2VTN3RG9VUlFsQmFvV1M3VlE4dFFHSndWMkVTTnlHUUJC?=
+ =?utf-8?B?VzZsUUo0Vms0MVVKeEY4bFUyYmZMbjlaTWg3MTRDeHZzcGpHTWl2dTZiZUVE?=
+ =?utf-8?B?ZkxYY280N0Vwd3BEOG54TDYyR3NTSVhUVkZJMVpZNUFwWFl0NUU4b0srVzF0?=
+ =?utf-8?B?aG9TRHlxMUlPMnBvT0Z4M0NIbzJkTWw5clJiN2hySTF6NHltQ0YyQ3EwdmRO?=
+ =?utf-8?B?Vjgvc1V1bWtIeGErc1VXNUVPbnd5c1RGZmtaOUJBZ0VKQnRRV0hsZFZ2WDNq?=
+ =?utf-8?B?dUpIRlBwYUUwNU5NaTc4dHVuNVVoeTBmbzVvejZJVEplRHJSMVRLb0JRejdl?=
+ =?utf-8?B?WktTQWlIK1dZb1NCdXdwS1dQWGJNS3JoWVpCTnRWZ2ZVRVpaMHlyc0kxNS9N?=
+ =?utf-8?B?Tkt1SXBhaUF1b0dOdGQ1dVdXRmIzRU45V3ZYK2pVSDY1bHdlMkdzbk1qaUJC?=
+ =?utf-8?B?YnRheHFib3U3ZjdJVGJRTk5YNnNIWlg4bU1VOHF6MVVWdGtjbk5aVlMvZHRZ?=
+ =?utf-8?B?K0ZHTVZ3UEE3QkVFMlNzaUZsa0FqS2Z4UjhzUGVGY0F4c2FMSXYwWkJreXlp?=
+ =?utf-8?B?ZVhpSnFkS2ZnSGl5Q1o3aFE3QW8zbVRiREpwSWFpLzcrbytrZkhVdnpXUERP?=
+ =?utf-8?B?c0QxK3ViODNpamhpVFc5Y2ZLSFhuWHpSc3JadXdxQ1ovcXpFTi9PYkRsWFBT?=
+ =?utf-8?B?THp1ekM4SXhTTEFaUkl2QjYwUjl5bXRJaG9QK1g4OVN2T3dRS0NHOVh6MSth?=
+ =?utf-8?B?NEFJa0hDY3l5N2M2VnVzdTFRSlU4WmJpRStmeEpqbEd5NGVFcXlreVU2Mml6?=
+ =?utf-8?B?eDRFQmpEbUQ0cm0zMWhrMllPOU1QR3BnSTh1Q0xyMmdtam1EL1pOOEJaZUZu?=
+ =?utf-8?B?V25xMmh6dElvekxiSGErbmVMMVVqRlBxTGdVaXFTczVFNDNGTzJaeUFpNzJo?=
+ =?utf-8?B?UFdwTDRnQVhhWGprOUxFR2E4V054RG1aNFM0MkFsNHQxeU0xaWFXZEdoeEtQ?=
+ =?utf-8?B?MitHVmhUZklQVzU1VE9qQ1lVTU12SEUwZ250ei8rMngzQzlmbFlMVmd4UDln?=
+ =?utf-8?B?WEUzSFZtTHowSURwNWkra3Z0Y3JzVjkzUmkwY09peWM0UzBjZmJSSEpoQXh5?=
+ =?utf-8?B?WHFEVmJTMGk5T0xEVUhEY1pmWHdsa01QK21RQ3VnaTF5SjFqMWFQUVBwb0ZV?=
+ =?utf-8?B?ZytELys5RjdRTWUrUkRDQS9LUmpXaDRFcU00R2t0NGhHd1NOK2RUTExnN0sy?=
+ =?utf-8?B?MFBEaWZSeU11dXVYakdNTmtxZy9pM3F5YmdpQnNJRWorbFkrcU9MVXo0R1Ba?=
+ =?utf-8?B?Z2xXVlk2UkQ1bU8wZklUcHlzWTRXdUFhZHRvQmJXbWx1OUhqdmp2aCtIOU1q?=
+ =?utf-8?B?QW1qb21Rdnl0TVNlOUd0cGdsYVJOc1A0Qnhva0xIMnMyaUtQQXRJcVM3Mkp2?=
+ =?utf-8?B?RTVnaW5yekFQamtEcnhQL1hXQXBhQ0gvQi9kTURoelZOM0RaR2hWdDd2d2tH?=
+ =?utf-8?B?ZmNUWE9pcWwzWHYrYmtER3BrTUhBZ0xxYnBvYUV2ZnRORGpadDNSdHpsZzdX?=
+ =?utf-8?B?MkVjZ2ZuZm5GSEsyc01lcGp3MVE3UVlVSmd3SE1NTTVaYU5zOW1zaXZxK3pT?=
+ =?utf-8?B?SS9ZVk9MVEFDcFRIVnJHMXZOYVU4bDRBbUdZZGlOTXhURmU3c055Z3F3VmhG?=
+ =?utf-8?B?bzVYaEE4eGNRSGkzMjBCQ1hEdWVISlV2cFJNY3RzZGlib29QUnZ5eUI4ajNE?=
+ =?utf-8?B?NjBPd091RXFlOXlUYkY1SHc3YlNMVnNtVW45YythNXZtWUhiTXU3aFpTcnkr?=
+ =?utf-8?Q?q5eI8AQlUh7Hm5N/l8r4Z6eb7?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Cc: brouer@redhat.com, linux-imx@nxp.com, linux-kernel@vger.kernel.org,
- bpf@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>
-Subject: Re: [PATCH V3 net-next] net: fec: add XDP_TX feature support
-Content-Language: en-US
-To: Wei Fang <wei.fang@nxp.com>, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, shenwei.wang@nxp.com,
- xiaoning.wang@nxp.com, ast@kernel.org, daniel@iogearbox.net,
- hawk@kernel.org, john.fastabend@gmail.com, netdev@vger.kernel.org
-References: <20230731060025.3117343-1-wei.fang@nxp.com>
-In-Reply-To: <20230731060025.3117343-1-wei.fang@nxp.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-	SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-	version=3.4.6
+X-OriginatorOrg: marvell.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MWHPR1801MB1918.namprd18.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: eaf8b7ed-33b9-4da7-b16e-08db933b2950
+X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Aug 2023 09:30:50.8021
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: GURRff8lE1qSxRUZS7WqNX5eu+JWfAnukm7OlpavGX95FdaY4s2adDT4opYnQGde1iKTEb52QaUZurhUJLPcEg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM8PR18MB4520
+X-Proofpoint-GUID: zejg4sBGRiCIONQWWicHZ1rcWlDU2Xwi
+X-Proofpoint-ORIG-GUID: zejg4sBGRiCIONQWWicHZ1rcWlDU2Xwi
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-08-02_04,2023-08-01_01,2023-05-22_02
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-
-
-On 31/07/2023 08.00, Wei Fang wrote:
-> The XDP_TX feature is not supported before, and all the frames
-> which are deemed to do XDP_TX action actually do the XDP_DROP
-> action. So this patch adds the XDP_TX support to FEC driver.
-> 
-> I tested the performance of XDP_TX feature in XDP_DRV and XDP_SKB
-> modes on i.MX8MM-EVK and i.MX8MP-EVK platforms respectively, and
-> the test steps and results are as follows.
-> 
-> Step 1: Board A connects to the FEC port of the DUT and runs the
-> pktgen_sample03_burst_single_flow.sh script to generate and send
-> burst traffic to DUT. Note that the length of packet was set to
-> 64 bytes and the procotol of packet was UDP in my test scenario.
-> 
-> Step 2: The DUT runs the xdp2 program to transmit received UDP
-> packets back out on the same port where they were received.
-> 
-
-Below test result runs should have some more explaination, please.
-(more inline code comments below)
-
-> root@imx8mmevk:~# ./xdp2 eth0
-> proto 17:     150326 pkt/s
-> proto 17:     141920 pkt/s
-> proto 17:     147338 pkt/s
-> proto 17:     140783 pkt/s
-> proto 17:     150400 pkt/s
-> proto 17:     134651 pkt/s
-> proto 17:     134676 pkt/s
-> proto 17:     134959 pkt/s
-> proto 17:     148152 pkt/s
-> proto 17:     149885 pkt/s
-> 
-> root@imx8mmevk:~# ./xdp2 -S eth0
-> proto 17:     131094 pkt/s
-> proto 17:     134691 pkt/s
-> proto 17:     138930 pkt/s
-> proto 17:     129347 pkt/s
-> proto 17:     133050 pkt/s
-> proto 17:     132932 pkt/s
-> proto 17:     136628 pkt/s
-> proto 17:     132964 pkt/s
-> proto 17:     131265 pkt/s
-> proto 17:     135794 pkt/s
-> 
-> root@imx8mpevk:~# ./xdp2 eth0
-> proto 17:     135817 pkt/s
-> proto 17:     142776 pkt/s
-> proto 17:     142237 pkt/s
-> proto 17:     135673 pkt/s
-> proto 17:     139508 pkt/s
-> proto 17:     147340 pkt/s
-> proto 17:     133329 pkt/s
-> proto 17:     141171 pkt/s
-> proto 17:     146917 pkt/s
-> proto 17:     135488 pkt/s
-> 
-> root@imx8mpevk:~# ./xdp2 -S eth0
-> proto 17:     133150 pkt/s
-> proto 17:     133127 pkt/s
-> proto 17:     133538 pkt/s
-> proto 17:     133094 pkt/s
-> proto 17:     133690 pkt/s
-> proto 17:     133199 pkt/s
-> proto 17:     133905 pkt/s
-> proto 17:     132908 pkt/s
-> proto 17:     133292 pkt/s
-> proto 17:     133511 pkt/s
-> 
-
-For this driver, I would like to see a benchmark comparison between
-XDP_TX and XDP_REDIRECT.
-
-As below code does could create a situation where XDP_REDIRECT is just
-as fast as XDP_TX.  (Note, that I expect XDP_TX to be faster than
-XDP_REDIRECT.)
-
-> Signed-off-by: Wei Fang <wei.fang@nxp.com>
-> ---
-> V2 changes:
-> According to Jakub's comments, the V2 patch adds two changes.
-> 1. Call txq_trans_cond_update() in fec_enet_xdp_tx_xmit() to avoid
-> tx timeout as XDP shares the queues with kernel stack.
-> 2. Tx processing shouldn't call any XDP (or page pool) APIs if the
-> "budget" is 0.
-> 
-> V3 changes:
-> 1. Remove the second change in V2, because this change has been
-> separated into another patch and it has been submmitted to the
-> upstream [1].
-> [1] https://lore.kernel.org/r/20230725074148.2936402-1-wei.fang@nxp.com
-> ---
->   drivers/net/ethernet/freescale/fec.h      |  1 +
->   drivers/net/ethernet/freescale/fec_main.c | 80 ++++++++++++++++++-----
->   2 files changed, 65 insertions(+), 16 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/freescale/fec.h b/drivers/net/ethernet/freescale/fec.h
-> index 8f1edcca96c4..f35445bddc7a 100644
-> --- a/drivers/net/ethernet/freescale/fec.h
-> +++ b/drivers/net/ethernet/freescale/fec.h
-> @@ -547,6 +547,7 @@ enum {
->   enum fec_txbuf_type {
->   	FEC_TXBUF_T_SKB,
->   	FEC_TXBUF_T_XDP_NDO,
-> +	FEC_TXBUF_T_XDP_TX,
->   };
->   
->   struct fec_tx_buffer {
-> diff --git a/drivers/net/ethernet/freescale/fec_main.c b/drivers/net/ethernet/freescale/fec_main.c
-> index 14d0dc7ba3c9..2068fe95504e 100644
-> --- a/drivers/net/ethernet/freescale/fec_main.c
-> +++ b/drivers/net/ethernet/freescale/fec_main.c
-> @@ -75,6 +75,8 @@
->   
->   static void set_multicast_list(struct net_device *ndev);
->   static void fec_enet_itr_coal_set(struct net_device *ndev);
-> +static int fec_enet_xdp_tx_xmit(struct net_device *ndev,
-> +				struct xdp_buff *xdp);
->   
->   #define DRIVER_NAME	"fec"
->   
-> @@ -960,7 +962,8 @@ static void fec_enet_bd_init(struct net_device *dev)
->   					txq->tx_buf[i].skb = NULL;
->   				}
->   			} else {
-> -				if (bdp->cbd_bufaddr)
-> +				if (bdp->cbd_bufaddr &&
-> +				    txq->tx_buf[i].type == FEC_TXBUF_T_XDP_NDO)
->   					dma_unmap_single(&fep->pdev->dev,
->   							 fec32_to_cpu(bdp->cbd_bufaddr),
->   							 fec16_to_cpu(bdp->cbd_datlen),
-> @@ -1423,7 +1426,8 @@ fec_enet_tx_queue(struct net_device *ndev, u16 queue_id, int budget)
->   				break;
->   
->   			xdpf = txq->tx_buf[index].xdp;
-> -			if (bdp->cbd_bufaddr)
-> +			if (bdp->cbd_bufaddr &&
-> +			    txq->tx_buf[index].type == FEC_TXBUF_T_XDP_NDO)
->   				dma_unmap_single(&fep->pdev->dev,
->   						 fec32_to_cpu(bdp->cbd_bufaddr),
->   						 fec16_to_cpu(bdp->cbd_datlen),
-> @@ -1482,7 +1486,7 @@ fec_enet_tx_queue(struct net_device *ndev, u16 queue_id, int budget)
->   			/* Free the sk buffer associated with this last transmit */
->   			dev_kfree_skb_any(skb);
->   		} else {
-> -			xdp_return_frame(xdpf);
-> +			xdp_return_frame_rx_napi(xdpf);
->   
->   			txq->tx_buf[index].xdp = NULL;
->   			/* restore default tx buffer type: FEC_TXBUF_T_SKB */
-> @@ -1573,11 +1577,18 @@ fec_enet_run_xdp(struct fec_enet_private *fep, struct bpf_prog *prog,
->   		}
->   		break;
->   
-> -	default:
-> -		bpf_warn_invalid_xdp_action(fep->netdev, prog, act);
-> -		fallthrough;
-> -
->   	case XDP_TX:
-> +		err = fec_enet_xdp_tx_xmit(fep->netdev, xdp);
-
-You should pass along the "sync" length value to fec_enet_xdp_tx_xmit().
-Because we know DMA comes from same device (it is already DMA mapped
-to), then we can do a DMA sync "to_device" with only the sync length.
-
-> +		if (err) {
-
-Add an unlikely(err) or do like above case XDP_REDIRECT, where it takes
-the likely case "if (!err)" first.
-
-> +			ret = FEC_ENET_XDP_CONSUMED;
-> +			page = virt_to_head_page(xdp->data);
-> +			page_pool_put_page(rxq->page_pool, page, sync, true);
-> +		} else {
-> +			ret = FEC_ENET_XDP_TX;
-> +		}
-> +		break;
-> +
-> +	default:
->   		bpf_warn_invalid_xdp_action(fep->netdev, prog, act);
->   		fallthrough;
->   
-> @@ -3793,7 +3804,8 @@ fec_enet_xdp_get_tx_queue(struct fec_enet_private *fep, int index)
->   
->   static int fec_enet_txq_xmit_frame(struct fec_enet_private *fep,
->   				   struct fec_enet_priv_tx_q *txq,
-> -				   struct xdp_frame *frame)
-> +				   struct xdp_frame *frame,
-> +				   bool ndo_xmit)
-
-E.g add parameter dma_sync_len.
-
->   {
->   	unsigned int index, status, estatus;
->   	struct bufdesc *bdp;
-> @@ -3813,10 +3825,24 @@ static int fec_enet_txq_xmit_frame(struct fec_enet_private *fep,
->   
->   	index = fec_enet_get_bd_index(bdp, &txq->bd);
->   
-> -	dma_addr = dma_map_single(&fep->pdev->dev, frame->data,
-> -				  frame->len, DMA_TO_DEVICE);
-> -	if (dma_mapping_error(&fep->pdev->dev, dma_addr))
-> -		return -ENOMEM;
-> +	if (ndo_xmit) {
-> +		dma_addr = dma_map_single(&fep->pdev->dev, frame->data,
-> +					  frame->len, DMA_TO_DEVICE);
-> +		if (dma_mapping_error(&fep->pdev->dev, dma_addr))
-> +			return -ENOMEM;
-> +
-> +		txq->tx_buf[index].type = FEC_TXBUF_T_XDP_NDO;
-> +	} else {
-> +		struct page *page = virt_to_page(frame->data);
-> +
-> +		dma_addr = page_pool_get_dma_addr(page) + sizeof(*frame) +
-> +			   frame->headroom;
-> +		dma_sync_single_for_device(&fep->pdev->dev, dma_addr,
-> +					   frame->len, DMA_BIDIRECTIONAL);
-
-Optimization: use dma_sync_len here instead of frame->len.
-
-> +		txq->tx_buf[index].type = FEC_TXBUF_T_XDP_TX;
-> +	}
-> +
-> +	txq->tx_buf[index].xdp = frame;
->   
->   	status |= (BD_ENET_TX_INTR | BD_ENET_TX_LAST);
->   	if (fep->bufdesc_ex)
-> @@ -3835,9 +3861,6 @@ static int fec_enet_txq_xmit_frame(struct fec_enet_private *fep,
->   		ebdp->cbd_esc = cpu_to_fec32(estatus);
->   	}
->   
-> -	txq->tx_buf[index].type = FEC_TXBUF_T_XDP_NDO;
-> -	txq->tx_buf[index].xdp = frame;
-> -
->   	/* Make sure the updates to rest of the descriptor are performed before
->   	 * transferring ownership.
->   	 */
-> @@ -3863,6 +3886,31 @@ static int fec_enet_txq_xmit_frame(struct fec_enet_private *fep,
->   	return 0;
->   }
->   
-> +static int fec_enet_xdp_tx_xmit(struct net_device *ndev,
-> +				struct xdp_buff *xdp)
-> +{
-
-E.g add parameter dma_sync_len.
-
-> +	struct xdp_frame *xdpf = xdp_convert_buff_to_frame(xdp);
-
-XDP_TX can avoid this conversion to xdp_frame.
-It would requires some refactor of fec_enet_txq_xmit_frame().
-
-> +	struct fec_enet_private *fep = netdev_priv(ndev);
-> +	struct fec_enet_priv_tx_q *txq;
-> +	int cpu = smp_processor_id();
-> +	struct netdev_queue *nq;
-> +	int queue, ret;
-> +
-> +	queue = fec_enet_xdp_get_tx_queue(fep, cpu);
-> +	txq = fep->tx_queue[queue];
-> +	nq = netdev_get_tx_queue(fep->netdev, queue);
-> +
-> +	__netif_tx_lock(nq, cpu);
-
-It is sad that XDP_TX takes a lock for each frame.
-
-> +
-> +	/* Avoid tx timeout as XDP shares the queue with kernel stack */
-> +	txq_trans_cond_update(nq);
-> +	ret = fec_enet_txq_xmit_frame(fep, txq, xdpf, false);
-
-Add/pass parameter dma_sync_len to fec_enet_txq_xmit_frame().
-
-
-> +
-> +	__netif_tx_unlock(nq);
-> +
-> +	return ret;
-> +}
-> +
->   static int fec_enet_xdp_xmit(struct net_device *dev,
->   			     int num_frames,
->   			     struct xdp_frame **frames,
-> @@ -3885,7 +3933,7 @@ static int fec_enet_xdp_xmit(struct net_device *dev,
->   	/* Avoid tx timeout as XDP shares the queue with kernel stack */
->   	txq_trans_cond_update(nq);
->   	for (i = 0; i < num_frames; i++) {
-> -		if (fec_enet_txq_xmit_frame(fep, txq, frames[i]) < 0)
-> +		if (fec_enet_txq_xmit_frame(fep, txq, frames[i], true) < 0)
->   			break;
->   		sent_frames++;
->   	}
-
+PiBGcm9tOiBSYXRoZWVzaCBLYW5ub3RoDQo+IFNlbnQ6IFR1ZXNkYXksIEF1Z3VzdCAxLCAyMDIz
+IDg6MjAgQU0NCj4gVG86IERhdmlkIEFoZXJuIDxkc2FoZXJuQGdtYWlsLmNvbT47IHN0ZXBoZW5A
+bmV0d29ya3BsdW1iZXIub3JnDQo+IENjOiBuZXRkZXZAdmdlci5rZXJuZWwub3JnOyBkYXZlbUBk
+YXZlbWxvZnQubmV0OyBrdWJhQGtlcm5lbC5vcmc7DQo+IExlb24gUm9tYW5vdnNreSA8bGVvbkBr
+ZXJuZWwub3JnPjsgZWR1bWF6ZXRAZ29vZ2xlLmNvbTsNCj4gcGFiZW5pQHJlZGhhdC5jb20NCj4g
+U3ViamVjdDogUkU6IFJlOiBbUEFUQ0ggaXByb3V0ZTItbmV4dF0gdGM6IENsYXNzaWZpZXIgc3Vw
+cG9ydCBmb3IgU1BJIGZpZWxkDQo+IEdvdCBpdC4gVGhhbmtzIGEgbG90ICEhDQoNCkxpbnV4IGtl
+cm5lbCBwYXRjaGVzIG1lcmdlZCB0byBuZXQtbmV4dC4gDQpTaG91bGQgSSByZXB1c2ggaXByb3V0
+ZTItbmV4dCBwYXRjaCA/ICBodHRwczovL3BhdGNod29yay5rZXJuZWwub3JnL3Byb2plY3QvbmV0
+ZGV2YnBmL3BhdGNoLzIwMjMwNzI1MDM1MDE2LjUwNTM4Ni0xLXJrYW5ub3RoQG1hcnZlbGwuY29t
+LyANCkkgY291bGQgbm90IGZpbmQgdGhlIGFib3ZlIHBhdGNoIGluIHRoZSBsaXZlIHBhdGNoZXMg
+YmVpbmcgdHJhY2tlZCBodHRwczovL3BhdGNod29yay5rZXJuZWwub3JnL3Byb2plY3QvbmV0ZGV2
+YnBmL2xpc3QvIA0KDQotUmF0aGVlc2gNCg==
 
