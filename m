@@ -1,124 +1,130 @@
-Return-Path: <netdev+bounces-23541-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23542-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9B2576C721
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 09:39:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F10BE76C755
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 09:46:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A390D281BF9
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 07:39:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B8D7A1C21204
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 07:46:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BB3A46AC;
-	Wed,  2 Aug 2023 07:39:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 875A14C95;
+	Wed,  2 Aug 2023 07:46:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8099E1869
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 07:39:01 +0000 (UTC)
-Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 786634EE3;
-	Wed,  2 Aug 2023 00:38:34 -0700 (PDT)
-Received: by mail-lf1-x136.google.com with SMTP id 2adb3069b0e04-4fe1344b707so10394758e87.1;
-        Wed, 02 Aug 2023 00:38:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690961912; x=1691566712;
-        h=content-transfer-encoding:in-reply-to:references:cc:to:from
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=hG6+YQ0tUDz48/03f7Nyeq0JCf007nOGlw47CxNzErA=;
-        b=ho6VKHchKIecptzcDesrpXEbSnhlh14yTzt1/ddoGIW7N+NJKZi73ac7qQaztLtMuQ
-         3QoiUN1MGh6hWVL2JPeX8ztzaEn3Ez2KIrW716wfFxX5mdvzgNtFce36FMNNd9p6NvMP
-         Rp/9tSbD6nj7pmSAP5/fmbUJOCs+OymiKh5WJGapFqJmksqITXhs51ukWWtqL1g/t6fP
-         JYAULICCKGSO4OEfZjnQ1bJUXw8ibs7fUQLGWYKNTk7V1g6d5OgWk01X9RfAg8lrdJm7
-         ibdC5h8BZ/EdZT0PVlni5KF4lldYS1rGS1+DXHd4Ma3i3tD2LelgmtvLlz/ARI1DRtt3
-         93tg==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7996F5224
+	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 07:46:31 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0792535A2
+	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 00:46:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1690962376;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=h0UDSjpYhDP6foyjtQosf3cDeLd01SyV7B6Zn77rW4I=;
+	b=hVlz3z9oubslwFeNNfP1fFqZuRqYGw7POGtZt/4+j9N0PvOqXix6iTAuT+NrtFQapRAMmF
+	kfpuCF6tC4i3WSc038+9VEanZn67ddivfGIu4Ya2dIJ8osEjAd7V83xMsfLJSEmVZAXWSb
+	C/aS+S211EQcDepzZeomwPoVZPvYHB4=
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
+ [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-524-Y_Au9zcgPeCw49zTX1235Q-1; Wed, 02 Aug 2023 03:46:14 -0400
+X-MC-Unique: Y_Au9zcgPeCw49zTX1235Q-1
+Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-76ca8263c45so483144285a.2
+        for <netdev@vger.kernel.org>; Wed, 02 Aug 2023 00:46:14 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690961912; x=1691566712;
-        h=content-transfer-encoding:in-reply-to:references:cc:to:from
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=hG6+YQ0tUDz48/03f7Nyeq0JCf007nOGlw47CxNzErA=;
-        b=WpXmCVhdAwwTC9cHarq+daabZ+xapLUDaB4DxEpyIApQ58gyNJIJkjVoRyv7kLBHhS
-         oOLlP4xioIi0onH3p4qt8BMkzCGJ/iS9ld0tJ4WruJjxfb3VruAuk9D/l15O8dRWrjcG
-         HUDucE8stF/TrXxCUYyaaHFIUWnYTz9pr3eQU7i2dhF2tCRWWd0644SW9nAK0jY0eEmZ
-         H8WfdyfZo5XEPjWWg8qAfbw7DWU06UpdOIKIctjFkqhqkmX67EReqt5zChMxlqTrnvE+
-         E7w0HjeW39mLLaiZpn0WnIJ0X5zpyNFGJzOgLr/8eip7gqXK/6XeMZPuel5kSvTNG0Xk
-         LPrg==
-X-Gm-Message-State: ABy/qLZmxEUyblOZPNplT7/bqE4eOxI7kje/oTc8EmSjZ7mrS8KlPmfR
-	rvngA1hmLYkyARMx0aHP8gs=
-X-Google-Smtp-Source: APBJJlFyaHc0Ucy5XRq29FSH+BjvL/M0W/SK3cClfC4+ud7BbZuUQeiusKk9chXOhYjrMhIYGEFoKA==
-X-Received: by 2002:a05:6512:3711:b0:4f8:67aa:4f03 with SMTP id z17-20020a056512371100b004f867aa4f03mr3683942lfr.1.1690961911447;
-        Wed, 02 Aug 2023 00:38:31 -0700 (PDT)
-Received: from [192.168.26.149] (031011218106.poznan.vectranet.pl. [31.11.218.106])
-        by smtp.googlemail.com with ESMTPSA id x1-20020ac25dc1000000b004cc9042c9cfsm2169486lfq.158.2023.08.02.00.38.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 02 Aug 2023 00:38:31 -0700 (PDT)
-Message-ID: <285f419e-f8f2-c8da-6064-2a51e92ca3bc@gmail.com>
-Date: Wed, 2 Aug 2023 09:38:30 +0200
+        d=1e100.net; s=20221208; t=1690962374; x=1691567174;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=h0UDSjpYhDP6foyjtQosf3cDeLd01SyV7B6Zn77rW4I=;
+        b=b7SN6JFTzt5cF7wj6Z3V2cXnVxCD0wNn/6arsGDlfwFpnfKi6EH0JCJbRAj6BnpfQT
+         VWriyy0z8Zkgu8rw/9L/ZlsOmB7+cxEapril1/vpmq8fmEG3eBz8HWz2urEH5Nmae1kF
+         IdWxKyk+R/BJ+hqHBJ+XGaMffO5Ou9HfjbydoryCZr5xyisAkiwWfjI8r21kQDOsbWV5
+         rRV65Jkjbf79hw9xykLodfQLUFn7dfXUS7saUQF+gIBvtwMzsNaIDtwZbDAtuZoERMqp
+         lXqEmcPAF+9TVKijpogy/1W9En7QJES4AfQArHjYmOVxHQMnpsOcPbumAIlQRitV3H6C
+         6XAQ==
+X-Gm-Message-State: ABy/qLbmEs2y/owmpHifNUNmRBQYMQQfoBT3SXwrYiT+Z8chz/UFXW1G
+	G7wLjAhzM6mjsVmZcCAq45iui5WxOaQmaQjEiHa04O/DIgAeQCz25Od9iMfUUWihMeuDgAAI3Io
+	oW4/82NFo0aPLtA9l
+X-Received: by 2002:a05:620a:2ae7:b0:76c:a35d:ee7b with SMTP id bn39-20020a05620a2ae700b0076ca35dee7bmr10630794qkb.75.1690962374345;
+        Wed, 02 Aug 2023 00:46:14 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlFodtYusq4miD67/qZPAflmfAiVup1o7pJRX1yLg/dsHxa8uZugDcgzMDc/Lwni4Tbe0+BMww==
+X-Received: by 2002:a05:620a:2ae7:b0:76c:a35d:ee7b with SMTP id bn39-20020a05620a2ae700b0076ca35dee7bmr10630782qkb.75.1690962374098;
+        Wed, 02 Aug 2023 00:46:14 -0700 (PDT)
+Received: from sgarzare-redhat (host-82-57-51-214.retail.telecomitalia.it. [82.57.51.214])
+        by smtp.gmail.com with ESMTPSA id f10-20020a0ccc8a000000b0062439f05b87sm5270298qvl.45.2023.08.02.00.46.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Aug 2023 00:46:13 -0700 (PDT)
+Date: Wed, 2 Aug 2023 09:46:08 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Bobby Eshleman <bobby.eshleman@bytedance.com>, kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kernel@sberdevices.ru, 
+	oxffffaa@gmail.com
+Subject: Re: [RFC PATCH v1 1/2] vsock: send SIGPIPE on write to shutdowned
+ socket
+Message-ID: <qgn26mgfotc7qxzp6ad7ezkdex6aqniv32c5tvehxh4hljsnvs@x7wvyvptizxx>
+References: <20230801141727.481156-1-AVKrasnov@sberdevices.ru>
+ <20230801141727.481156-2-AVKrasnov@sberdevices.ru>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: ARM board lockups/hangs triggered by locks and mutexes
-Content-Language: en-US
-From: =?UTF-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
- Will Deacon <will@kernel.org>, Waiman Long <longman@redhat.com>,
- Boqun Feng <boqun.feng@gmail.com>, Daniel Lezcano
- <daniel.lezcano@linaro.org>, Thomas Gleixner <tglx@linutronix.de>,
- Florian Fainelli <f.fainelli@gmail.com>, linux-clk@vger.kernel.org,
- "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>,
- Network Development <netdev@vger.kernel.org>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- OpenWrt Development List <openwrt-devel@lists.openwrt.org>,
- bcm-kernel-feedback-list <bcm-kernel-feedback-list@broadcom.com>
-References: <CACna6rxpzDWE5-gnmpgMgfzPmmHvEGTZk4GJvJ8jLSMazh2bVA@mail.gmail.com>
- <ZMmFeCBxhJOxZ575@shell.armlinux.org.uk>
- <60a553a2-85f3-d8c6-b070-ecd3089c3c5e@gmail.com>
-In-Reply-To: <60a553a2-85f3-d8c6-b070-ecd3089c3c5e@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-	FREEMAIL_FROM,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20230801141727.481156-2-AVKrasnov@sberdevices.ru>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 2.08.2023 09:00, Rafał Miłecki wrote:
-> With your comment I decided to try CONFIG_PROVE_LOCKING anyway / again
-> and this time on 1 of my BCM53573 devices I got something very
-> interesting on the first boot.
-> 
-> FWIW following error:
-> Broadcom B53 (2) bcma_mdio-0-0:1e: failed to register switch: -517
-> is caused by invalid DT I sent fixes for just recently.
-> 
-> Please scroll through the first booting lines for the WARNING:
-> 
-> (...)
-> [    1.167234] bgmac_bcma bcma0:5: Found PHY addr: 30 (NOREGS)
-> [    1.173655] ------------[ cut here ]------------
-> [    1.178374] WARNING: CPU: 0 PID: 1 at kernel/locking/mutex.c:950 __mutex_lock+0x6b4/0x8a0
-> [    1.186721] DEBUG_LOCKS_WARN_ON(lock->magic != lock)
+On Tue, Aug 01, 2023 at 05:17:26PM +0300, Arseniy Krasnov wrote:
+>POSIX requires to send SIGPIPE on write to SOCK_STREAM socket which was
+>shutdowned with SHUT_WR flag or its peer was shutdowned with SHUT_RD
+>flag. Also we must not send SIGPIPE if MSG_NOSIGNAL flag is set.
+>
+>Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+>---
+> net/vmw_vsock/af_vsock.c | 3 +++
+> 1 file changed, 3 insertions(+)
+>
+>diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+>index 020cf17ab7e4..013b65241b65 100644
+>--- a/net/vmw_vsock/af_vsock.c
+>+++ b/net/vmw_vsock/af_vsock.c
+>@@ -1921,6 +1921,9 @@ static int vsock_connectible_sendmsg(struct socket *sock, struct msghdr *msg,
+> 			err = total_written;
+> 	}
+> out:
+>+	if (sk->sk_type == SOCK_STREAM)
+>+		err = sk_stream_error(sk, msg->msg_flags, err);
 
-Ah, that mutex WARNING comes from my Tenda AC9 device which happens to
-use a hacky OpenWrt downstream b53 driver. That driver uses wrong API
-(it behaves as PHY driver instead of MDIO driver). It results in probing
-against PHY device which isn't properly initialized.
+Do you know why we don't need this for SOCK_SEQPACKET and SOCK_DGRAM?
 
-Long story short: above WARNING is just a noise. Ignore it please. Sorry
-for that.
+Thanks,
+Stefano
 
-Kernel compiled with CONFIG_PROVE_LOCKING still works fine on other
-devices and on Tenda AC9 after fixing PHY<->MDIO thing. That kernel
-option hides actual bug whatever it is.
+>+
+> 	release_sock(sk);
+> 	return err;
+> }
+>-- 
+>2.25.1
+>
+
 
