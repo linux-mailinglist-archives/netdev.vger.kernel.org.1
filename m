@@ -1,119 +1,117 @@
-Return-Path: <netdev+bounces-23624-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23629-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61B6E76CC6F
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 14:16:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3304676CCAF
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 14:31:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 920521C21256
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 12:16:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DF72F281ABF
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 12:31:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67D8A6FDB;
-	Wed,  2 Aug 2023 12:16:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45E28125C4;
+	Wed,  2 Aug 2023 12:31:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CCDD187A
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 12:16:50 +0000 (UTC)
-Received: from mail-lf1-x162.google.com (mail-lf1-x162.google.com [IPv6:2a00:1450:4864:20::162])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BEF1126
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 05:16:48 -0700 (PDT)
-Received: by mail-lf1-x162.google.com with SMTP id 2adb3069b0e04-4fe2de785e7so6299094e87.1
-        for <netdev@vger.kernel.org>; Wed, 02 Aug 2023 05:16:48 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38C9E125AA
+	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 12:31:32 +0000 (UTC)
+Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A53F2720;
+	Wed,  2 Aug 2023 05:31:25 -0700 (PDT)
+Received: by mail-wr1-x430.google.com with SMTP id ffacd0b85a97d-3128fcd58f3so6864327f8f.1;
+        Wed, 02 Aug 2023 05:31:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=6wind.com; s=google; t=1690978606; x=1691583406;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=vI0xScBewLpP69CRTitC0lTT7+EQ4m3F00K4EPi3Rvc=;
-        b=Mbafs0baJURckkIHcwi0pOJ6UDeZzv5ZovlhZi8oTGUC/gXOxjLjfvTKqkXCbyMwZ2
-         nyWkDOXap24VDElJYdG7iUDsu5/SOsjsisMDT0uw2jO2uabGEd1E85G2cmEEXTH0mKDG
-         vuTSVqVwWTHZx7Z2b33jurtmq+2pFhvrRUkrBmx7pHsFWCCIoRdsrNhA/uSe5VhyoYJ5
-         1I8gO8XHCXjtCTegTEc+2IRSleM4wTcs+nYFTXMIzd4Jah3zhK61ruCvm2gWUJPXNQYg
-         p32aOmxkC7V1lMgxcbub+WERhjxwBB30A9Rgmn9i60a4ZjC2AXpchC0GKqaxYoumYjRr
-         wQkw==
+        d=gmail.com; s=20221208; t=1690979484; x=1691584284;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=M/m/gzewmCnAmIApz3YxUDPf30Sh/dA/f5p9pyqk5tg=;
+        b=MCHG2V9Qo/45YT02/1PeUF3/ROIo4tB7le3QDdH/gDTWQJEGR8ADc8EzIqx2OWjJxL
+         9UJDBTxx05zFF6tNdsQU5cGmqDSEWya4likKfLq/IUj6S9DjkAQ81DgGhCPpsMNu2IAt
+         7M1G+phvyTVzKvXTJEfcP2SjYORFoM3eIkdEG5+0Saz8d1lI7ANmhfb96p6wrDh3MGlB
+         r1phEHqoMz9nFD4FoG17Ggqyl8OfaDmvsUZag08zIh+0k/pUDDlz1w4uO9nBzFCHPHVL
+         G7OHSocTAWStxv5B7sgxhfkqMnzzJ4w+M1kbdcMjLq6+iXLFNIYek2E2dIrC/tmrOhuX
+         ZhKA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690978606; x=1691583406;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=vI0xScBewLpP69CRTitC0lTT7+EQ4m3F00K4EPi3Rvc=;
-        b=Kcm1pJ0ppG5BVQmyQzKS3YDZUF74v6s48mlsvzOqwnpv5QYBPnD3oipx2uDW6JfGiQ
-         9v96xQWICctRaU9ZSRStauDomGNEpADy+mD45ifTC3ftRktoErRGqEhprgJXs+9aO2yU
-         ZiclSlwGTUSREsx8FOHmOvcYzG7lW6G7usZBnPZdfEU9j98a9lWRR5ayY7JwoJ6vuuWR
-         EZzPPkX/54XnzLrrf3KlOu3Tkqo9LnYGPzQYoefMPh//heWjPWRFSKddRO8O+h8AIR9p
-         1MT5MV5ylaqQqVD/LMr9BmyoPCynBURbR06cJLu42z2tUGresFGakndHapP1N0+8pv29
-         KcRg==
-X-Gm-Message-State: ABy/qLb9H2StNPccKoIGfQnCdwK4WpX2i8MsUOgVZ0UxVyqJXdgWwn2D
-	kzUTpymAWqhYRZ6i+ZZcmUjdvdvKFDz3udunzaYSzqWWAhNTnQ==
-X-Google-Smtp-Source: APBJJlE48gCCETGUTzl7w+GwHpvtWhiyjXW+/IDQTPtJtflWvIY+F//loA9GYiYXlZQ2AkOWG4isovje9bGf
-X-Received: by 2002:ac2:58c9:0:b0:4f5:a181:97b8 with SMTP id u9-20020ac258c9000000b004f5a18197b8mr3787757lfo.25.1690978606213;
-        Wed, 02 Aug 2023 05:16:46 -0700 (PDT)
-Received: from smtpservice.6wind.com ([185.13.181.2])
-        by smtp-relay.gmail.com with ESMTP id a26-20020a17090640da00b00993ad4112f7sm1949585ejk.260.2023.08.02.05.16.46;
-        Wed, 02 Aug 2023 05:16:46 -0700 (PDT)
-X-Relaying-Domain: 6wind.com
-Received: from bretzel (bretzel.dev.6wind.com [10.17.1.57])
-	by smtpservice.6wind.com (Postfix) with ESMTPS id D8FFE60036;
-	Wed,  2 Aug 2023 14:16:45 +0200 (CEST)
-Received: from dichtel by bretzel with local (Exim 4.94.2)
-	(envelope-from <nicolas.dichtel@6wind.com>)
-	id 1qRAmT-00Cgt0-In; Wed, 02 Aug 2023 14:16:45 +0200
-From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-To: "David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Alexei Starovoitov <ast@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>
-Cc: netdev@vger.kernel.org,
-	bpf@vger.kernel.org,
-	Nicolas Dichtel <nicolas.dichtel@6wind.com>,
-	stable@vger.kernel.org
-Subject: [PATCH net] net: handle ARPHRD_PPP in dev_is_mac_header_xmit()
-Date: Wed,  2 Aug 2023 14:16:14 +0200
-Message-Id: <20230802121614.3024701-1-nicolas.dichtel@6wind.com>
-X-Mailer: git-send-email 2.39.2
+        d=1e100.net; s=20221208; t=1690979484; x=1691584284;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=M/m/gzewmCnAmIApz3YxUDPf30Sh/dA/f5p9pyqk5tg=;
+        b=OoyhCSLxO4myIHt/Bdg+nX9QSwc7wl+cFkMFE0z49PhUfu07QzHR520QTvTKCcbJ6b
+         QVC+4e+0m0VVrlrV7PWFwsFn0GDyKVPh1EPkF3vGhU+MKMff90WSc7J8nxL2ST6z0nzA
+         LE4F2fxj6d5bgR4Mj9xsZrSYo0uTN977b+L53eo32Dv8vYiSLUepaY9D/G8HmIeNniJv
+         q/tHc7957E8eo/LpYWiPiDsOTsINh0eALI1oRMtJwNECYuVFh82Gt1RJGRNmMp7YxxRl
+         hCBqLrFvZ5XRKi1zBb7oCJUQRL6HLjEcDJGD3kfmVEyfiQ+odt4tl4J9+zgYRe+aGJq8
+         BXTw==
+X-Gm-Message-State: ABy/qLbiUgdbSYpy0rsCQCVXFdIRR9bu1X9mShL7CDY6oDR1rzx1B39h
+	jzGxhthXu53YAR1uW3/K7Os=
+X-Google-Smtp-Source: APBJJlEhxGp8UzvRhk6wLS7gXVN8NGSRwfsL5WAcYURFG9K14NiU37a760PVMsWwLzEp7FSpGWRwtA==
+X-Received: by 2002:adf:fec4:0:b0:314:1aed:8f5f with SMTP id q4-20020adffec4000000b003141aed8f5fmr4960310wrs.34.1690979483752;
+        Wed, 02 Aug 2023 05:31:23 -0700 (PDT)
+Received: from akanner-r14. ([77.222.27.58])
+        by smtp.gmail.com with ESMTPSA id n6-20020a5d4206000000b00317a04131c5sm9907243wrq.57.2023.08.02.05.31.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Aug 2023 05:31:23 -0700 (PDT)
+Message-ID: <64ca4c9b.5d0a0220.2f302.b8de@mx.google.com>
+X-Google-Original-Message-ID: <ZMpJNh+PYy40FRnZ@akanner-r14.>
+Date: Wed, 2 Aug 2023 14:16:54 +0200
+From: Andrew Kanner <andrew.kanner@gmail.com>
+To: David Ahern <dsahern@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, jasowang@redhat.com, netdev@vger.kernel.org,
+	brouer@redhat.com, jbrouer@redhat.com, john.fastabend@gmail.com,
+	linux-kernel@vger.kernel.org,
+	linux-kernel-mentees@lists.linuxfoundation.org,
+	syzbot+f817490f5bd20541b90a@syzkaller.appspotmail.com
+Subject: Re: [PATCH v4 1/2] drivers: net: prevent tun_build_skb() to exceed
+ the packet size limit
+References: <20230801220710.464-1-andrew.kanner@gmail.com>
+ <3fa4d25d-7fea-d25b-fa83-4ada2c550725@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3fa4d25d-7fea-d25b-fa83-4ada2c550725@gmail.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-This kind of interface doesn't have a mac header. This patch fixes
-bpf_redirect() to a ppp interface.
+On Tue, Aug 01, 2023 at 07:07:39PM -0600, David Ahern wrote:
+> On 8/1/23 4:07 PM, Andrew Kanner wrote:
+> > @@ -1594,7 +1597,13 @@ static bool tun_can_build_skb(struct tun_struct *tun, struct tun_file *tfile,
+> >  	if (zerocopy)
+> >  		return false;
+> >  
+> > -	if (SKB_DATA_ALIGN(len + TUN_RX_PAD) +
+> > +	rcu_read_lock();
+> > +	xdp_prog = rcu_dereference(tun->xdp_prog);
+> > +	if (xdp_prog)
+> > +		pad += XDP_PACKET_HEADROOM;
+> > +	rcu_read_unlock();
+> 
+> 
+> since you do not care about the actual xdp_prog (only that one is set) I
+> believe you can use rcu_access_pointer here.
 
-CC: stable@vger.kernel.org
-Fixes: 27b29f63058d ("bpf: add bpf_redirect() helper")
-Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
----
- include/linux/if_arp.h | 1 +
- 1 file changed, 1 insertion(+)
+Good point. Thanks, David.
 
-diff --git a/include/linux/if_arp.h b/include/linux/if_arp.h
-index 1ed52441972f..8efbe29a6f0c 100644
---- a/include/linux/if_arp.h
-+++ b/include/linux/if_arp.h
-@@ -53,6 +53,7 @@ static inline bool dev_is_mac_header_xmit(const struct net_device *dev)
- 	case ARPHRD_NONE:
- 	case ARPHRD_RAWIP:
- 	case ARPHRD_PIMREG:
-+	case ARPHRD_PPP:
- 		return false;
- 	default:
- 		return true;
+I'll resend both as v5.
+
+The correct cc-list for PATCH 2/2 is also needed. It fixes
+net/core/filter.c instead of drivers/net/tun.c now.
+
+pw-bot: changes-requested
+
 -- 
-2.39.2
-
+Andrew Kanner
 
