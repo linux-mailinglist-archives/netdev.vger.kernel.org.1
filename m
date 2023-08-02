@@ -1,157 +1,404 @@
-Return-Path: <netdev+bounces-23495-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23496-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A57176C305
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 04:43:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 84D4E76C32A
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 04:56:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 46B2828146E
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 02:43:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 32980281B07
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 02:56:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57623A3D;
-	Wed,  2 Aug 2023 02:43:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE4CDA44;
+	Wed,  2 Aug 2023 02:55:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DCDE7E6;
-	Wed,  2 Aug 2023 02:43:20 +0000 (UTC)
-Received: from EUR03-DBA-obe.outbound.protection.outlook.com (mail-dbaeur03on2047.outbound.protection.outlook.com [40.107.104.47])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22D361BFD;
-	Tue,  1 Aug 2023 19:43:19 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9229AA3D;
+	Wed,  2 Aug 2023 02:55:56 +0000 (UTC)
+Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05on2081.outbound.protection.outlook.com [40.107.22.81])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E834911D;
+	Tue,  1 Aug 2023 19:55:53 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=RyZ8Xpr3tr3nd35BgWuo+p277WY3H9uXIgPEbkQJrjqWe31CCjz1foFnPE7DOHW9180J72OrMRlZIyLjDM4CLE+0aeYWaDrdEFrSkRwUaUALHEks30iue7vNIiidTKTWe9FRVh8nYCThOtjfx4b9xkkZxsB4pGp2TVmNbScIEvKghe2PG3fKtPqnTgzG1jwWgmZPHJeC0K/FT4fLsOitGma6qiKmxCikLYbawiiBZOmdhkS9W9MXUWYygwMnBeuZeQ8HGz8lFSBeqKrQdfvZQW/5yRVWSbdkbLS+gOWiJhxd/eZZ3tWI7Eu2SuY16tfILaBYnevomhnFv+u63t3ErA==
+ b=KU7kwchQ7m5NUJBQLUYuBjdwdPtqSWvhKSgpbouQCVKYk6JN+Uv/pNxio2b7iK8q2uBm2Q5ywgqEACWO8JmAvZrA4wiR/6jtT5Hnx7pDqW8pBG0Inu+YmT9xFsQSRrXGJr1amNjRuPCeBXHzyeKr5P/k/3zhKqkWA//mPXOU5sAOqlEpwcySgAQWJJJLexM453G5jfhxW1OX+KmUxN19tn6kT/DyxxMve5448pzEAaN8J7R9QCUjziKK1BnC2sWn6Y/YEeBFDAdKSjHlgqgV030X356zCWhsNGVH7gqz4nJ9JwiPMgNGg5ITLTYRJnCHZagVzLtKqX5MbXH1gCCWvQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=9JtlXZ36JouyBFOFuM9o4bzb6VjBwcrk4al28Co5Xjs=;
- b=f0cJj4Z8HSuYZz5EYl63OgRGprHtCL+1eZtTwe4avx49HIQCy2zRgWH86v6efP7pAdtnDcjqPAuyU+ui7ddVW37eRZR2Cs608oIJFGUEqUzQe7I/9CJqhafdPLiAvSjK83XebXnPw3wJaQgYLaqor3TJmkH25C0L97fu8gjPnecxUAgKP6tJ+Tq+Gl/q5DhirBxiG2N7KxqS4IxO5hgbT3k60onImOrt1Z/GnLvE5f7/BmM/gSqNWEPXJ3jY+QkDRsF5M+IxHpiIrb1MLL4s4c4wEu1880X9sVS9jORQDJwRlDPDdQa37xtp+oQ0QQ2yKTaVKTElZo7o1APGFmLJqg==
+ bh=+7WaR13L1Ab7xt4VRyVdr5+WZtindxaly4GUZocf1Jc=;
+ b=Oh2JJtSuetFINqqHdqNRlX7pXHmZpWaoS29//FDnpOvswhHeuv7UTDqcDEvnYXpX9gERvO+X2JkVkLog8eioV8Lppj8KqDHgmQ1OAJthkJ9V3bJ90cafoV1EWxqBMaeKlUKqjTHl7lJEqc/F3VHeF0yN87CY6ZjRf/yuVYKKkid7rmnPfcHNDd/ogzjRc2HQQItiBSluHmNT/1yu3dwJhY6TKXEKojnsNBbgl4A39y0lvW/GP1k508asQzDDD4h3J2BKH9ZQ/8y0nExprBy0THpEKIR7kJ9l4UAJ2VgIa7LL0OwD8hPsPjNAcrP9++LheDaf9oMhazDZOy34rKIFug==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=9JtlXZ36JouyBFOFuM9o4bzb6VjBwcrk4al28Co5Xjs=;
- b=K0TUP+s5op7RSwycZrNduV2qvECsBQd/QcgAAqUo2B0gep9D2TLm7FkT5346MyVSN1fnXnZVpGIqog2Lrp5MYFRwJYg4XwbQmkWAArNf6ZGQJvi6UCg/SCMyJbSeceZmdG6SHrUHUOk9zY4Zh/u19j9Kh1Q1zSNSVarDAgq9UB4=
+ bh=+7WaR13L1Ab7xt4VRyVdr5+WZtindxaly4GUZocf1Jc=;
+ b=auzJv0UVf9tpTmW7JibmlxrXQ22uE92Z0JuoNzXOAnb3wHiBfRtUoI1Zz80SU+HCDBT47DOZmIuZzdnD2Uf6u6saUuTffnXYHjCcFX6juAb2JmuqLBQRuVdtL0+0veRA9daacagxu6m4FCNK0gxd2IpzbQzu0VjKTEW4GKdZKQw=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
 Received: from AM5PR04MB3139.eurprd04.prod.outlook.com (2603:10a6:206:8::20)
- by AS8PR04MB9094.eurprd04.prod.outlook.com (2603:10a6:20b:445::22) with
+ by PAXPR04MB8734.eurprd04.prod.outlook.com (2603:10a6:102:21e::14) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.45; Wed, 2 Aug
- 2023 02:43:16 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.32; Wed, 2 Aug
+ 2023 02:55:51 +0000
 Received: from AM5PR04MB3139.eurprd04.prod.outlook.com
  ([fe80::2468:a15e:aa9b:7f8e]) by AM5PR04MB3139.eurprd04.prod.outlook.com
  ([fe80::2468:a15e:aa9b:7f8e%4]) with mapi id 15.20.6631.045; Wed, 2 Aug 2023
- 02:43:16 +0000
+ 02:55:51 +0000
 From: Wei Fang <wei.fang@nxp.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: "davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
-	<edumazet@google.com>, "pabeni@redhat.com" <pabeni@redhat.com>, Shenwei Wang
-	<shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, "ast@kernel.org"
-	<ast@kernel.org>, "daniel@iogearbox.net" <daniel@iogearbox.net>,
-	"hawk@kernel.org" <hawk@kernel.org>, "john.fastabend@gmail.com"
-	<john.fastabend@gmail.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, dl-linux-imx <linux-imx@nxp.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"bpf@vger.kernel.org" <bpf@vger.kernel.org>
-Subject: RE: [PATCH V3 net-next] net: fec: add XDP_TX feature support
-Thread-Topic: [PATCH V3 net-next] net: fec: add XDP_TX feature support
-Thread-Index: AQHZw3VFF5NSBizeREOxLxVc18wksa/V/2KAgABLGEA=
-Date: Wed, 2 Aug 2023 02:43:16 +0000
-Message-ID:
- <AM5PR04MB313902042437FD2D89A7677A880BA@AM5PR04MB3139.eurprd04.prod.outlook.com>
-References: <20230731060025.3117343-1-wei.fang@nxp.com>
- <20230801145723.7ddc2dba@kernel.org>
-In-Reply-To: <20230801145723.7ddc2dba@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: AM5PR04MB3139:EE_|AS8PR04MB9094:EE_
-x-ms-office365-filtering-correlation-id: 742df579-b87d-4436-cd29-08db93023937
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- Cb1mNr2EVluyP0p439Di7axCTZGmWLxD9NW5R/wrZlpxGzBViNgAC0kLACPHQiiNs5PEhoRaPJtKjJ1+KcVcXQZVLE21G6E7Yq3tQGQJa0OPo7+ecsNyuC8CY5nvLq6NbM0gEH5thi7QVENAdpvNgBTdsoN3Gey5X3Dc2n+7ijT8wMUUZV4o5fgv4MNKKySbLnq3qFPsikwZG7d6ld8TQt8aoYdEqikJ1sjrmXTebYNs7PJYqYGbWarazq34YsqHZegScHZT4UIFUp+QpiGquMerKVO6tVCGFAjWrrdHXohHvOYqaFRArqCQfxDziDL6dmT5xUWeljh94eJGWc4pd1mO24gS5HKMPDxvuFGKDznm8zDyFAqMf+CNoFvO6XTn83k7+xAZr7O0Oa7btoxdoRY61rszu92ZSjRFTxwzsJk0RWP+5xsEqlCjeoucl9ANo7wO73VJHOgqUfHG7LapSD1Pvlth4A5azR5lgVzeitxpnyLy0z1MxcVfNUE4BVhBlpRFl/gehOCs6mzL1UmKEZFcZXOzTijoh+ulf8466MvhDikirQCzT2KUEciRE3PU4KgAu7k5cYEHpghzahdZVEIQbU+H0ElAzVrQPVSFY4byOt80CsJVrpYfrXRjTiCJ
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM5PR04MB3139.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(376002)(366004)(136003)(396003)(346002)(451199021)(55016003)(186003)(9686003)(316002)(86362001)(478600001)(122000001)(54906003)(38100700002)(76116006)(71200400001)(66946007)(66556008)(66476007)(66446008)(33656002)(64756008)(7696005)(6916009)(4326008)(6506007)(41300700001)(26005)(52536014)(8676002)(5660300002)(8936002)(4744005)(2906002)(38070700005)(7416002)(44832011)(83380400001);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?OhV6Emw3PiPbLe4hFrUhkmiqXxlix3GLJ3xl52uhbAC+IafXAtmeKceyByBk?=
- =?us-ascii?Q?GKnqXyEb6DB4VwJ/1/qXQlkcXQsFLxws4wSWhp8dPAfUQxR2vQhduVtxZ+Nz?=
- =?us-ascii?Q?KuGmN+va6K3PCmSAdgVNTYRUouTwj0VPieFNKnK9c/8OmXeXon5Kedf8lyQ5?=
- =?us-ascii?Q?YeSZSH4iOMU9leGqyIWykWYQrgDqD5z8bmtKbzsSNFJLEPZ/U7xmCfayKWf0?=
- =?us-ascii?Q?bcPNyjUN0TL6z+F9JOYZB5jwQ9GWB9o18fSNClrm6wy4bO29WcJZdKTlgE/H?=
- =?us-ascii?Q?ne7HOLZEFbspkBU68jW5V3cJOFmBtnvMX8HhWUvCKIi82Q5yt7WpuwXPPyvk?=
- =?us-ascii?Q?Jsu7mVyMjx+JIxHcOg1gEi6csLRLzh30nnKZBclcvjCP42gorsUGMzDuDHtK?=
- =?us-ascii?Q?q7InCMLcNOKENi8iHQdjfO2j233BkvW2ZTgIfUP5Ls5XqM7RgjHI15sOXOIv?=
- =?us-ascii?Q?G1wGzlZXGbnlWegkgbKuej5C2sHMME/yVl+j+q/swpYp1kdYJuhCvA2wpEaq?=
- =?us-ascii?Q?9UwBjdCTsGimQPStYVKXyVs3+O9mtFpKNaI4k4snXGwR5fgTrMIDrpCiCrNL?=
- =?us-ascii?Q?JLEGu+x/QqBHpcMVN7s1bGrmCVX1vfZH4laP77hKYCPZO0xBBmGqoIGfsuOW?=
- =?us-ascii?Q?LgsYgJaObqg9SsPvCFfAZu+ReGf4tdamza9qxXtpy+N6r02FZq12ggdw6/7Y?=
- =?us-ascii?Q?oiTZ3fuJQnrQwsxeifrmHVvXktxRn5aNtbDbeTdbDWrOyJCjPEbgv4VivTf/?=
- =?us-ascii?Q?KSAKHHqjJaNDi8jYmnvq5o8rSlQ0O+rLdxPJUGqX8jPoox6Ai71q8QMcviA6?=
- =?us-ascii?Q?ZY9w5XB4e+2l0Ya5hFwj5jCrwQQEdGksBuGtQUvUd+mkykW2oFmVIAXE5tnF?=
- =?us-ascii?Q?OzE0PIjkPZe7lNscZT9F0n4nK4nvmCzv5zW/ERPMEVYL2wtOJpXrC7TKEtIU?=
- =?us-ascii?Q?iMpiVEKWqIpdGIDtjhE9T2J/VE88F6s9yd804EBhZtP2sbwm2yuoNIWQzKmV?=
- =?us-ascii?Q?hvJJ0ZYOgpvxkBhdjJ5afYa0bcWhLOwgtzWBjEqQ9tJrDBRwSDKYGA4h/Kl2?=
- =?us-ascii?Q?XTbTDQh9BC0R4eAzjX2Z0MvrVQRn4fwMhCZHGkZ338QED+EuCX3VH31dYTq0?=
- =?us-ascii?Q?SDc1fVe9f/L4SW9nZNP53MMmU6QpMard1feYOHyN/cmKh6kwml3fzBj3riBB?=
- =?us-ascii?Q?MmMonRV/M7TQUPTm5Y2F5fD6WjtW57jjOxSLecxzxme/ZbIWR4VARREs32zI?=
- =?us-ascii?Q?x1nGdvIdcQ1mUc635+bEikqg6Tv0MrYKZeC6Pb7SsO69R+pf+y5tStCOxnZC?=
- =?us-ascii?Q?K3Y3lGLXH5gYX7jdefkQZnsxpBh+KTmJbCe1X/TgQK1Rm+WI3LreONsLYW4s?=
- =?us-ascii?Q?UF+3vvmHz8SWhdrpD7M3eWx6ZFKK1mkDgq4WFltg27GJzveZSoT6KPsiF1bQ?=
- =?us-ascii?Q?Rv6H1PDMbFLqlef8w6FkBrZp5PbFzb6pvp9nf9M9zLiTmn6Yytlkm+8f4Pef?=
- =?us-ascii?Q?b+WbEPNKleaxkiJ/Kf+KgNJvCfyV4Qk10vQud12yaqC0UHE9tvU3KBgUi5ro?=
- =?us-ascii?Q?SJaTvI4PdHy7m5y0ZaI=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	shenwei.wang@nxp.com,
+	xiaoning.wang@nxp.com,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	hawk@kernel.org,
+	john.fastabend@gmail.com,
+	netdev@vger.kernel.org,
+	larysa.zaremba@intel.com
+Cc: linux-imx@nxp.com,
+	linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: [PATCH V4 net-next] net: fec: add XDP_TX feature support
+Date: Wed,  2 Aug 2023 10:48:57 +0800
+Message-Id: <20230802024857.3153756-1-wei.fang@nxp.com>
+X-Mailer: git-send-email 2.25.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SI2PR02CA0040.apcprd02.prod.outlook.com
+ (2603:1096:4:196::6) To AM5PR04MB3139.eurprd04.prod.outlook.com
+ (2603:10a6:206:8::20)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM5PR04MB3139:EE_|PAXPR04MB8734:EE_
+X-MS-Office365-Filtering-Correlation-Id: 36626516-e642-4260-442a-08db9303faf7
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	5gjEqDNaqX51UsdCZXBXXJ0qTL5PJNf6GRHstyDRHqoV/ejXKpZZhIPBzuMr9YKGEjf3OPj4t6HQGOzNqUWbxHawycm+eezbA+gBhe3JEBhH+3260f0Oy9x7V7d10jqtW9obWUnezhSf+8mR61ltjee1QYHFlWkExr+Xm/J+7q3j+KkEVuUqn3npB6nscH9E+vdgt3+Akm06OFxSquHI8U3F5ydza1C7s7ZQk+FckRytuv9Xz9D9gAf18ZNbFV4FBWgxNJnq/gMieBplJ0HfAW+T1fqY2LW2rLeBytyxvc/vYIAcqFd9DHe5U6/uh4wII/7CjlsdABRT7B60MzhBu3pHDiHN4uy/eBj5+B5WoxUL1YgnA/c9EJDjMGLXFFokOE7tgO7P4xOAvbK2wlTrMpda+Yj/KIp21nIf2ueiNnx9cdZOBV+l69ZM9k1eRw2eLHkvYDXFq75C3xqisXksJeC3PHbVDon0U8eoyUCJsckN4l6jtWHZ5s4vxLz+HilAKQ3MP/dsVu1VIS13VrfTT46J18RAL5PIG7SYPrFFeeAFmILkuOYv4G+DHN8IuMvZixju6X/LEHCEPzJ8Mz/ZIG2AUJV6VSGP0mdAdb3y3T3A9trIG7r3MGlF1qa3RiAA
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM5PR04MB3139.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(366004)(376002)(346002)(39860400002)(136003)(396003)(451199021)(316002)(2906002)(2616005)(83380400001)(4326008)(66556008)(66476007)(66946007)(966005)(52116002)(6512007)(6486002)(41300700001)(8676002)(478600001)(36756003)(86362001)(921005)(38100700002)(186003)(7416002)(38350700002)(44832011)(6506007)(8936002)(26005)(5660300002)(1076003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?WKt9n6+7oV6XlFsuKrbTfUEXYnlk14whCiXtAgcMuiBaGcrjbtKtPGGPH3/L?=
+ =?us-ascii?Q?XmTryaVIqId6HVAJFn3k8xY04ZsjmX/DUIeJ4fi8bpW4Lz+O2C/AKS3wuDc0?=
+ =?us-ascii?Q?Neass0MNaDt9PM/IBAD5k5Old3X4GBQdMSntQQkOWLy/0985DyWWuIvdQqPw?=
+ =?us-ascii?Q?w/3om2fuSX0LEr942VBpUq0ssWCy5wVSEsuHoJsINCf18SSavWBxp2IVH2fQ?=
+ =?us-ascii?Q?iADUoyl4qYdS2mpD8YW8cxmKz1DE2XOWc5ZTW5tOelYJuo3pxYZHyjvZKWHb?=
+ =?us-ascii?Q?jno30CcT4alfRJvF0jbR5v1qSmKP17zA1M3JcR/JETn/emR7LfDguELhwoN7?=
+ =?us-ascii?Q?aBroVl2mZZnIls6Ufz2kIPAZbi4b8bFEqkGHUH9R6O3PqEyD74h8SYGy57Ka?=
+ =?us-ascii?Q?mCY6UAOyaBJf0leNoC+jc2cFhbjojGwfoV6nQlYxaKzmGqerKvg4pseiijRs?=
+ =?us-ascii?Q?0SeD3ulFXnbQiDo0pdmQd/451pjpaIo7FdgqeRdXvz9KwRZcmPH5EbxU74OP?=
+ =?us-ascii?Q?tUmDt2IVkFpjUlyFqwe5yb18g2gl4ghIk5MULkKZBMlg94Id7RjP/hNh1On3?=
+ =?us-ascii?Q?MHCEQE4EUxRifk6fJDrcylEqlMTK4rrw9CC5TUUJATItF8eMri6n/rha8m3D?=
+ =?us-ascii?Q?CK7sVZSi5uNmwP+tJ529OerdLpvs4mziWJG6yD4znijF6nSaT5j9U2rx4V92?=
+ =?us-ascii?Q?fLutohlJ7S5Xzmjzl+FhT1w9oI2WBcQKa/vtRyhuzFv3xTmBrRcUzWAyu/28?=
+ =?us-ascii?Q?B0q4Q1ucvmwR1AjVUgM30+hZWGhHuV5RP0xm+ebqVlo71uYBiapyySPLwCwB?=
+ =?us-ascii?Q?HcetvYhLBMXVSeywBNZiBAJf9TchoUboiEv5U2Pnw3nCOzU47uuEU+Zxn/SS?=
+ =?us-ascii?Q?kNLtNomZOAof7gkCm6vFmNUmsJXlJHOfj0F4EzkWY5EDMM6JGxo21utkIuL8?=
+ =?us-ascii?Q?IZXeCPJy8ySfcT95Fv1iRJOmuhL+pJ9cf9zN1Hn1jHQqSiqPtorpvPFLEi6S?=
+ =?us-ascii?Q?d1wi09JVKe/xIeMgL+b4aBl1kFIhah5iUo0VpGaGzGbstz9qS0NLU3abw/H0?=
+ =?us-ascii?Q?FgUkjcEQv68VNapOEF4R+iDz3Fj0gzbPpMkZRY2UQYu1XkRB8hbCEChArKXX?=
+ =?us-ascii?Q?JgDYZdqIcj5tmOkQC+c7xLxW3lfy8yBlPxg9dMxJFTOmbL47x4y3nKL+NTsr?=
+ =?us-ascii?Q?8OjKVu2JUFIaGuM7iHFinuf+a3r+V+WTdL/RcYivs+Bw9ieH7Mn4/4Svp2z+?=
+ =?us-ascii?Q?FojLsXKd0HNjAkgRHYX4QO357QFMcIpz8xLjkSoZYIiZOdF8eC3aa4NHkjlF?=
+ =?us-ascii?Q?gbzBl2LWKVcmVi90UXzy3nK8VO55KSyKx3V/LhAq0xTFOB09zYdzyEeqpiOX?=
+ =?us-ascii?Q?avVCTr0udsG3T/zyf802kK5RmDwzwLQzZWamMUHuCMszx87E5uiDvxQG3jKZ?=
+ =?us-ascii?Q?PNGBaJs3dOpTjS2CvlPpIfMe6hOT9ie8r+PQpOpIWO3Vq8KX3np+3/m7aaXm?=
+ =?us-ascii?Q?zYwXzCKcdDh2HfTEfOqMkTidPAGblcfT6ULeIH239f6tqyljgDd0eFOsKykh?=
+ =?us-ascii?Q?ruf7uLaUgy7rvaxmz052uJzw6HIqXHFNOY5S2FOd?=
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-Network-Message-Id: 36626516-e642-4260-442a-08db9303faf7
 X-MS-Exchange-CrossTenant-AuthSource: AM5PR04MB3139.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 742df579-b87d-4436-cd29-08db93023937
-X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Aug 2023 02:43:16.2204
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Aug 2023 02:55:50.9822
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 5aTxNIMmm9ZFN8zvjujoh9PhKXvbtelQiTx1y2LbpD5Jninbs98Ns1zCFh6c8BQHTRa2nnkpqlf4HAbW8AJq1w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB9094
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: NO0t2It18Q+ecCOT/4mXViLxG2sJp2vdmBgzxzkxwgq+JlhI4UgxzelTB1fmMPLi43JGqOkxQmFZoCb/5bpIqg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR04MB8734
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-> -----Original Message-----
-> Subject: Re: [PATCH V3 net-next] net: fec: add XDP_TX feature support
->=20
-> On Mon, 31 Jul 2023 14:00:25 +0800 Wei Fang wrote:
-> >  	case XDP_TX:
-> > +		err =3D fec_enet_xdp_tx_xmit(fep->netdev, xdp);
-> > +		if (err) {
-> > +			ret =3D FEC_ENET_XDP_CONSUMED;
-> > +			page =3D virt_to_head_page(xdp->data);
-> > +			page_pool_put_page(rxq->page_pool, page, sync, true);
->=20
-> The error path should call trace_xdp_exception().
+The XDP_TX feature is not supported before, and all the frames
+which are deemed to do XDP_TX action actually do the XDP_DROP
+action. So this patch adds the XDP_TX support to FEC driver.
 
-Thanks for your reminder, it made me realize that the error processing of
-other XDP actions also needs to add exception tracing. I'll add the excepti=
-on
-tracing for XDP_TX in V4 patch, and add the tracing for other XDP actions i=
-n
-a separate patch.
+I tested the performance of XDP_TX feature in XDP_DRV and XDP_SKB
+modes on i.MX8MM-EVK and i.MX8MP-EVK platforms respectively, and
+the test steps and results are as follows.
+
+Step 1: Board A connects to the FEC port of the DUT and runs the
+pktgen_sample03_burst_single_flow.sh script to generate and send
+burst traffic to DUT. Note that the length of packet was set to
+64 bytes and the procotol of packet was UDP in my test scenario.
+
+Step 2: The DUT runs the xdp2 program to transmit received UDP
+packets back out on the same port where they were received.
+
+root@imx8mmevk:~# ./xdp2 eth0
+proto 17:     150326 pkt/s
+proto 17:     141920 pkt/s
+proto 17:     147338 pkt/s
+proto 17:     140783 pkt/s
+proto 17:     150400 pkt/s
+proto 17:     134651 pkt/s
+proto 17:     134676 pkt/s
+proto 17:     134959 pkt/s
+proto 17:     148152 pkt/s
+proto 17:     149885 pkt/s
+
+root@imx8mmevk:~# ./xdp2 -S eth0
+proto 17:     131094 pkt/s
+proto 17:     134691 pkt/s
+proto 17:     138930 pkt/s
+proto 17:     129347 pkt/s
+proto 17:     133050 pkt/s
+proto 17:     132932 pkt/s
+proto 17:     136628 pkt/s
+proto 17:     132964 pkt/s
+proto 17:     131265 pkt/s
+proto 17:     135794 pkt/s
+
+root@imx8mpevk:~# ./xdp2 eth0
+proto 17:     135817 pkt/s
+proto 17:     142776 pkt/s
+proto 17:     142237 pkt/s
+proto 17:     135673 pkt/s
+proto 17:     139508 pkt/s
+proto 17:     147340 pkt/s
+proto 17:     133329 pkt/s
+proto 17:     141171 pkt/s
+proto 17:     146917 pkt/s
+proto 17:     135488 pkt/s
+
+root@imx8mpevk:~# ./xdp2 -S eth0
+proto 17:     133150 pkt/s
+proto 17:     133127 pkt/s
+proto 17:     133538 pkt/s
+proto 17:     133094 pkt/s
+proto 17:     133690 pkt/s
+proto 17:     133199 pkt/s
+proto 17:     133905 pkt/s
+proto 17:     132908 pkt/s
+proto 17:     133292 pkt/s
+proto 17:     133511 pkt/s
+
+Signed-off-by: Wei Fang <wei.fang@nxp.com>
+Reviewed-by: Larysa Zaremba <larysa.zaremba@intel.com>
+---
+V2 changes:
+According to Jakub's comments, the V2 patch adds two changes.
+1. Call txq_trans_cond_update() in fec_enet_xdp_tx_xmit() to avoid
+tx timeout as XDP shares the queues with kernel stack.
+2. Tx processing shouldn't call any XDP (or page pool) APIs if the
+"budget" is 0.
+
+V3 changes:
+1. Remove the second change in V2, because this change has been
+separated into another patch and it has been submmitted to the
+upstream [1].
+[1] https://lore.kernel.org/r/20230725074148.2936402-1-wei.fang@nxp.com
+
+V4 changes:
+1. Based on Jakub's comments, add trace_xdp_exception() for the
+error path of XDP_TX.
+---
+ drivers/net/ethernet/freescale/fec.h      |  1 +
+ drivers/net/ethernet/freescale/fec_main.c | 82 ++++++++++++++++++-----
+ 2 files changed, 67 insertions(+), 16 deletions(-)
+
+diff --git a/drivers/net/ethernet/freescale/fec.h b/drivers/net/ethernet/freescale/fec.h
+index 8f1edcca96c4..f35445bddc7a 100644
+--- a/drivers/net/ethernet/freescale/fec.h
++++ b/drivers/net/ethernet/freescale/fec.h
+@@ -547,6 +547,7 @@ enum {
+ enum fec_txbuf_type {
+ 	FEC_TXBUF_T_SKB,
+ 	FEC_TXBUF_T_XDP_NDO,
++	FEC_TXBUF_T_XDP_TX,
+ };
+ 
+ struct fec_tx_buffer {
+diff --git a/drivers/net/ethernet/freescale/fec_main.c b/drivers/net/ethernet/freescale/fec_main.c
+index 14d0dc7ba3c9..c8484ef090e1 100644
+--- a/drivers/net/ethernet/freescale/fec_main.c
++++ b/drivers/net/ethernet/freescale/fec_main.c
+@@ -68,6 +68,7 @@
+ #include <soc/imx/cpuidle.h>
+ #include <linux/filter.h>
+ #include <linux/bpf.h>
++#include <linux/bpf_trace.h>
+ 
+ #include <asm/cacheflush.h>
+ 
+@@ -75,6 +76,8 @@
+ 
+ static void set_multicast_list(struct net_device *ndev);
+ static void fec_enet_itr_coal_set(struct net_device *ndev);
++static int fec_enet_xdp_tx_xmit(struct net_device *ndev,
++				struct xdp_buff *xdp);
+ 
+ #define DRIVER_NAME	"fec"
+ 
+@@ -960,7 +963,8 @@ static void fec_enet_bd_init(struct net_device *dev)
+ 					txq->tx_buf[i].skb = NULL;
+ 				}
+ 			} else {
+-				if (bdp->cbd_bufaddr)
++				if (bdp->cbd_bufaddr &&
++				    txq->tx_buf[i].type == FEC_TXBUF_T_XDP_NDO)
+ 					dma_unmap_single(&fep->pdev->dev,
+ 							 fec32_to_cpu(bdp->cbd_bufaddr),
+ 							 fec16_to_cpu(bdp->cbd_datlen),
+@@ -1423,7 +1427,8 @@ fec_enet_tx_queue(struct net_device *ndev, u16 queue_id, int budget)
+ 				break;
+ 
+ 			xdpf = txq->tx_buf[index].xdp;
+-			if (bdp->cbd_bufaddr)
++			if (bdp->cbd_bufaddr &&
++			    txq->tx_buf[index].type == FEC_TXBUF_T_XDP_NDO)
+ 				dma_unmap_single(&fep->pdev->dev,
+ 						 fec32_to_cpu(bdp->cbd_bufaddr),
+ 						 fec16_to_cpu(bdp->cbd_datlen),
+@@ -1482,7 +1487,7 @@ fec_enet_tx_queue(struct net_device *ndev, u16 queue_id, int budget)
+ 			/* Free the sk buffer associated with this last transmit */
+ 			dev_kfree_skb_any(skb);
+ 		} else {
+-			xdp_return_frame(xdpf);
++			xdp_return_frame_rx_napi(xdpf);
+ 
+ 			txq->tx_buf[index].xdp = NULL;
+ 			/* restore default tx buffer type: FEC_TXBUF_T_SKB */
+@@ -1573,11 +1578,19 @@ fec_enet_run_xdp(struct fec_enet_private *fep, struct bpf_prog *prog,
+ 		}
+ 		break;
+ 
+-	default:
+-		bpf_warn_invalid_xdp_action(fep->netdev, prog, act);
+-		fallthrough;
+-
+ 	case XDP_TX:
++		err = fec_enet_xdp_tx_xmit(fep->netdev, xdp);
++		if (err) {
++			ret = FEC_ENET_XDP_CONSUMED;
++			page = virt_to_head_page(xdp->data);
++			page_pool_put_page(rxq->page_pool, page, sync, true);
++			trace_xdp_exception(fep->netdev, prog, act);
++		} else {
++			ret = FEC_ENET_XDP_TX;
++		}
++		break;
++
++	default:
+ 		bpf_warn_invalid_xdp_action(fep->netdev, prog, act);
+ 		fallthrough;
+ 
+@@ -3793,7 +3806,8 @@ fec_enet_xdp_get_tx_queue(struct fec_enet_private *fep, int index)
+ 
+ static int fec_enet_txq_xmit_frame(struct fec_enet_private *fep,
+ 				   struct fec_enet_priv_tx_q *txq,
+-				   struct xdp_frame *frame)
++				   struct xdp_frame *frame,
++				   bool ndo_xmit)
+ {
+ 	unsigned int index, status, estatus;
+ 	struct bufdesc *bdp;
+@@ -3813,10 +3827,24 @@ static int fec_enet_txq_xmit_frame(struct fec_enet_private *fep,
+ 
+ 	index = fec_enet_get_bd_index(bdp, &txq->bd);
+ 
+-	dma_addr = dma_map_single(&fep->pdev->dev, frame->data,
+-				  frame->len, DMA_TO_DEVICE);
+-	if (dma_mapping_error(&fep->pdev->dev, dma_addr))
+-		return -ENOMEM;
++	if (ndo_xmit) {
++		dma_addr = dma_map_single(&fep->pdev->dev, frame->data,
++					  frame->len, DMA_TO_DEVICE);
++		if (dma_mapping_error(&fep->pdev->dev, dma_addr))
++			return -ENOMEM;
++
++		txq->tx_buf[index].type = FEC_TXBUF_T_XDP_NDO;
++	} else {
++		struct page *page = virt_to_page(frame->data);
++
++		dma_addr = page_pool_get_dma_addr(page) + sizeof(*frame) +
++			   frame->headroom;
++		dma_sync_single_for_device(&fep->pdev->dev, dma_addr,
++					   frame->len, DMA_BIDIRECTIONAL);
++		txq->tx_buf[index].type = FEC_TXBUF_T_XDP_TX;
++	}
++
++	txq->tx_buf[index].xdp = frame;
+ 
+ 	status |= (BD_ENET_TX_INTR | BD_ENET_TX_LAST);
+ 	if (fep->bufdesc_ex)
+@@ -3835,9 +3863,6 @@ static int fec_enet_txq_xmit_frame(struct fec_enet_private *fep,
+ 		ebdp->cbd_esc = cpu_to_fec32(estatus);
+ 	}
+ 
+-	txq->tx_buf[index].type = FEC_TXBUF_T_XDP_NDO;
+-	txq->tx_buf[index].xdp = frame;
+-
+ 	/* Make sure the updates to rest of the descriptor are performed before
+ 	 * transferring ownership.
+ 	 */
+@@ -3863,6 +3888,31 @@ static int fec_enet_txq_xmit_frame(struct fec_enet_private *fep,
+ 	return 0;
+ }
+ 
++static int fec_enet_xdp_tx_xmit(struct net_device *ndev,
++				struct xdp_buff *xdp)
++{
++	struct xdp_frame *xdpf = xdp_convert_buff_to_frame(xdp);
++	struct fec_enet_private *fep = netdev_priv(ndev);
++	struct fec_enet_priv_tx_q *txq;
++	int cpu = smp_processor_id();
++	struct netdev_queue *nq;
++	int queue, ret;
++
++	queue = fec_enet_xdp_get_tx_queue(fep, cpu);
++	txq = fep->tx_queue[queue];
++	nq = netdev_get_tx_queue(fep->netdev, queue);
++
++	__netif_tx_lock(nq, cpu);
++
++	/* Avoid tx timeout as XDP shares the queue with kernel stack */
++	txq_trans_cond_update(nq);
++	ret = fec_enet_txq_xmit_frame(fep, txq, xdpf, false);
++
++	__netif_tx_unlock(nq);
++
++	return ret;
++}
++
+ static int fec_enet_xdp_xmit(struct net_device *dev,
+ 			     int num_frames,
+ 			     struct xdp_frame **frames,
+@@ -3885,7 +3935,7 @@ static int fec_enet_xdp_xmit(struct net_device *dev,
+ 	/* Avoid tx timeout as XDP shares the queue with kernel stack */
+ 	txq_trans_cond_update(nq);
+ 	for (i = 0; i < num_frames; i++) {
+-		if (fec_enet_txq_xmit_frame(fep, txq, frames[i]) < 0)
++		if (fec_enet_txq_xmit_frame(fep, txq, frames[i], true) < 0)
+ 			break;
+ 		sent_frames++;
+ 	}
+-- 
+2.25.1
+
 
