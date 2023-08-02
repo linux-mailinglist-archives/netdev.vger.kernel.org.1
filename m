@@ -1,100 +1,148 @@
-Return-Path: <netdev+bounces-23485-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23486-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CC0076C236
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 03:28:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D71876C271
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 03:47:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F154A2819BB
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 01:28:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E345A1C21145
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 01:47:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D37A77FA;
-	Wed,  2 Aug 2023 01:28:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E5C5A29;
+	Wed,  2 Aug 2023 01:47:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C54D67E
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 01:28:35 +0000 (UTC)
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69A35210D;
-	Tue,  1 Aug 2023 18:28:34 -0700 (PDT)
-Received: from canpemm500007.china.huawei.com (unknown [172.30.72.57])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4RFvRW1Gx2ztRks;
-	Wed,  2 Aug 2023 09:25:11 +0800 (CST)
-Received: from [10.174.179.215] (10.174.179.215) by
- canpemm500007.china.huawei.com (7.192.104.62) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Wed, 2 Aug 2023 09:28:32 +0800
-Subject: Re: [PATCH v3] ip6mr: Fix skb_under_panic in ip6mr_cache_report()
-To: David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>, Eric
- Dumazet <edumazet@google.com>
-CC: <davem@davemloft.net>, <pabeni@redhat.com>, <yoshfuji@linux-ipv6.org>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<simon.horman@corigine.com>
-References: <20230801064318.34408-1-yuehaibing@huawei.com>
- <CANn89iJO44CiUjftDZHEjOCy5Q3-PDB12uWTkrbA5JJNXMoeDA@mail.gmail.com>
- <20230801131146.51a9aaf3@kernel.org>
- <0e3e2d6f-0e8d-ccb4-0750-928a568ccaaf@kernel.org>
-From: YueHaibing <yuehaibing@huawei.com>
-Message-ID: <cad2b715-14fc-8424-f85d-b5391e0110dc@huawei.com>
-Date: Wed, 2 Aug 2023 09:28:31 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.5.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61EF97E;
+	Wed,  2 Aug 2023 01:47:45 +0000 (UTC)
+Received: from out30-119.freemail.mail.aliyun.com (out30-119.freemail.mail.aliyun.com [115.124.30.119])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB673F1;
+	Tue,  1 Aug 2023 18:47:42 -0700 (PDT)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R581e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045176;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=15;SR=0;TI=SMTPD_---0VosmxL9_1690940857;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0VosmxL9_1690940857)
+          by smtp.aliyun-inc.com;
+          Wed, 02 Aug 2023 09:47:38 +0800
+Message-ID: <1690940214.7564142-1-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH vhost v11 05/10] virtio_ring: introduce virtqueue_dma_dev()
+Date: Wed, 2 Aug 2023 09:36:54 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Christoph Hellwig <hch@infradead.org>,
+ virtualization@lists.linux-foundation.org,
+ "David S.  Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Paolo  Abeni <pabeni@redhat.com>,
+ Alexei Starovoitov <ast@kernel.org>,
+ Daniel  Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John   Fastabend <john.fastabend@gmail.com>,
+ netdev@vger.kernel.org,
+ bpf@vger.kernel.org,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ Jason Wang <jasowang@redhat.com>,
+ Pavel Begunkov <asml.silence@gmail.com>
+References: <20230710034237.12391-1-xuanzhuo@linux.alibaba.com>
+ <20230710034237.12391-6-xuanzhuo@linux.alibaba.com>
+ <ZK/cxNHzI23I6efc@infradead.org>
+ <20230713104805-mutt-send-email-mst@kernel.org>
+ <ZLjSsmTfcpaL6H/I@infradead.org>
+ <20230720131928-mutt-send-email-mst@kernel.org>
+ <ZL6qPvd6X1CgUD4S@infradead.org>
+ <1690251228.3455179-1-xuanzhuo@linux.alibaba.com>
+ <20230725033321-mutt-send-email-mst@kernel.org>
+ <1690283243.4048996-1-xuanzhuo@linux.alibaba.com>
+ <1690524153.3603117-1-xuanzhuo@linux.alibaba.com>
+ <20230728080305.5fe3737c@kernel.org>
+ <CACGkMEs5uc=ct8BsJzV2SEJzAGXqCP__yxo-MBa6d6JzDG4YOg@mail.gmail.com>
+ <20230731084651.16ec0a96@kernel.org>
+ <1690855424.7821567-1-xuanzhuo@linux.alibaba.com>
+ <20230731193606.25233ed9@kernel.org>
+ <1690858650.8698683-2-xuanzhuo@linux.alibaba.com>
+ <20230801084510.1c2460b9@kernel.org>
+In-Reply-To: <20230801084510.1c2460b9@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,UNPARSEABLE_RELAY,URIBL_BLOCKED,
+	USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <0e3e2d6f-0e8d-ccb4-0750-928a568ccaaf@kernel.org>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.179.215]
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- canpemm500007.china.huawei.com (7.192.104.62)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-On 2023/8/2 8:52, David Ahern wrote:
-> On 8/1/23 2:11 PM, Jakub Kicinski wrote:
->> On Tue, 1 Aug 2023 09:51:29 +0200 Eric Dumazet wrote:
->>>> -               skb_push(skb, -skb_network_offset(pkt));
->>>> +               __skb_pull(skb, skb_network_offset(pkt));
->>>>
->>>>                 skb_push(skb, sizeof(*msg));
->>>>                 skb_reset_transport_header(skb);  
->>>
->>> Presumably this code has never been tested :/
->>
->> Could have been tested on 32bit, I wonder if there is more such bugs :S
-> 
-> that pattern shows up a few times:
+On Tue, 1 Aug 2023 08:45:10 -0700, Jakub Kicinski <kuba@kernel.org> wrote:
+> On Tue, 1 Aug 2023 10:57:30 +0800 Xuan Zhuo wrote:
+> > > You have this working and benchmarked or this is just and idea?
+> >
+> > This is not just an idea. I said that has been used on large scale.
+> >
+> > This is the library for the APP to use the AF_XDP. We has open it.
+> > https://gitee.com/anolis/libxudp
+> >
+> > This is the Alibaba version of the nginx. That has been opened, that su=
+pported
+> > to work with the libray to use AF_XDP.
+> > http://tengine.taobao.org/
+> >
+> > I supported this on our kernel release Anolis/Alinux.
+>
+> Interesting!
+>
+> > The work was done about 2 years ago. You know, I pushed the first versi=
+on to
+> > enable AF_XDP on virtio-net about two years ago. I never thought the jo=
+b would
+> > be so difficult.
+>
+> Me neither, but it is what it is.
+>
+> > The nic (virtio-net) of AliYun can reach 24,000,000PPS.
+> > So I think there is no different with the real HW on the performance.
+> >
+> > With the AF_XDP, the UDP pps is seven times that of the kernel udp stac=
+k.
+>
+> UDP pps or QUIC pps? UDP with or without GSO?
 
-Ok, I will test and fix these if any.
-> 
-> net/ipv4/ah4.c:	skb_push(skb, -skb_network_offset(skb));
-> net/ipv4/esp4.c:	skb_push(skb, -skb_network_offset(skb));
-> net/ipv4/esp4_offload.c:	skb_push(skb, -skb_network_offset(skb));
-> net/ipv4/esp4_offload.c:	skb_push(skb, -skb_network_offset(skb));
-> net/ipv4/xfrm4_tunnel.c:	skb_push(skb, -skb_network_offset(skb));
-> net/ipv6/ah6.c:	skb_push(skb, -skb_network_offset(skb));
-> net/ipv6/esp6.c:	skb_push(skb, -skb_network_offset(skb));
-> net/ipv6/esp6_offload.c:	skb_push(skb, -skb_network_offset(skb));
-> net/ipv6/esp6_offload.c:	skb_push(skb, -skb_network_offset(skb));
-> net/ipv6/ip6mr.c:		skb_push(skb, -skb_network_offset(pkt));
-> net/ipv6/mip6.c:	skb_push(skb, -skb_network_offset(skb));
-> net/ipv6/mip6.c:	skb_push(skb, -skb_network_offset(skb));
-> net/ipv6/xfrm6_tunnel.c:	skb_push(skb, -skb_network_offset(skb));
-> net/xfrm/xfrm_ipcomp.c:	skb_push(skb, -skb_network_offset(skb));
-> .
-> 
+UDP PPS without GSO.
+
+>
+> Do you have measurements of how much it saves in real world workloads?
+> I'm asking mostly out of curiosity, not to question the use case.
+
+YES=EF=BC=8Cthe result is affected by the request size, we can reach 10-40%.
+The smaller the request size, the lower the result.
+
+>
+> > > What about io_uring zero copy w/ pre-registered buffers.
+> > > You'll get csum offload, GSO, all the normal perf features.
+> >
+> > We tried io-uring, but it was not suitable for our scenario.
+> >
+> > Yes, now the AF_XDP does not support the csum offload and GSO.
+> > This is indeed a small problem.
+>
+> Can you say more about io-uring suitability? It can do zero copy
+> and recently-ish Pavel optimized it quite a bit.
+
+First, AF_XDP is also zero-copy. We also use XDP for a few things.
+
+And this was all about two years ago, so we have to say something about io-=
+uring
+two years ago.
+
+As far as I know, io-uring still use kernel udp stack, AF_XDP can
+skip all kernel stack directly to driver.
+
+So here, io-ring does not have too much advantage.
+
+Thanks.
+
 
