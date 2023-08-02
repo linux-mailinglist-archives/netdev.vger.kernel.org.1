@@ -1,194 +1,175 @@
-Return-Path: <netdev+bounces-23659-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23658-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7C8876CFFE
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 16:27:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5DCC676CFF7
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 16:25:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 730E0281DFA
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 14:27:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D8514281DE6
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 14:25:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CF848468;
-	Wed,  2 Aug 2023 14:27:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECE898468;
+	Wed,  2 Aug 2023 14:25:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80B7279CA
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 14:27:07 +0000 (UTC)
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2053.outbound.protection.outlook.com [40.107.220.53])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75A18271C
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 07:27:02 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=BrqLyi+0omi6DuW0FZMoRJJMSQ6LjH15lQroL+ay+WrgbS5WiJiJwh8xJtkquCqLWD5sspgR1pkfiaYfwwoO4oU64tsAW7ytbkfP4WBrAMJlkvDPp1wf80iHPDBEdAoRHRD+t4SXiIK5bv0Yn3h3M1mLlh8w2QZXsHaJsE+r2JZmIO54JkOeSIV2WBaQRCksBEG3qjxXvHPkV3qaKZAGF5Q8AOVmpiq91SHVO43NW2GmH+D9FCZZDq4WKIFOLRB6OCnep8fVvLX9IzVYCNuVHJFlfL7rRtEYTNIEf9C7c2WcXD3H6X+b+TyV3oECETBGZyMxiZHLpyQRe8FxlEi4GQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=xT1H1WeXRYy88Don2Bxgaudrc2nM2Sx+JlJ+GK1gGhM=;
- b=A/FKe4PiA+IU6NjoQe48XjKKIDrmNRz923EmmxmUtYRzHOo71NrDPpojPN+AdXmSbT7Bp1KIkqaSMxkLJNFIuE0+oP5Ofu9qiDejREuBXL6PPi6uXGB8VdcOsF+f3d+osmyeMwB2E8wHdTTI45P9qfVRP4s67cuH9SUiypZ6mGQcq8qjZVbMDlqd6rGYBSrWq6j+7DMAVKHFSyIG/XmhOKbf0UJ4IyHUyE8def5GsZHQt0pBB8ojlEYstaA9xSSvA5IX6XA+DVn7c3KFn+O+1dWwctFUg03F6mXZVmBdJ/IsHNidEixXdJlfkSjHJQmanEaW3jn6orUyJpVAOobFOw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=alu.unizg.hr smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xT1H1WeXRYy88Don2Bxgaudrc2nM2Sx+JlJ+GK1gGhM=;
- b=De8Ak59kskmNFAhcX16nYtzAnJ3VokZKDDp+UVCQ8nQUtcLQKG22OXeLo/Vu/uM5Mv1COEzHuIJkFOsP9NZLFY2LUGHxft3Bl3Is/6705TxNKvE+DV5uebVwIrgoe7Z/AwnR7e/iefQM+4a4K1RUl3Qnoz+IzYdUEZ/u2kTPONkyIJOvA/B/kvMF+0w/QEHhz+xypuhgMRlYIq/hn4TWYhn6dha2hoDgdi3O99QyEf9PUSoJ5me/MQFIRuLVoQrtEkzcr48fgo1ODtfNaHXq7QttcforxxUpIQeytLPet3wqjWAyJOjRKLUHQotS66ocyqxluOmMq2Rk82Vr7oEWSw==
-Received: from MW4PR03CA0293.namprd03.prod.outlook.com (2603:10b6:303:b5::28)
- by DM4PR12MB5793.namprd12.prod.outlook.com (2603:10b6:8:60::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.45; Wed, 2 Aug
- 2023 14:27:00 +0000
-Received: from MWH0EPF000971E6.namprd02.prod.outlook.com
- (2603:10b6:303:b5:cafe::7) by MW4PR03CA0293.outlook.office365.com
- (2603:10b6:303:b5::28) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.44 via Frontend
- Transport; Wed, 2 Aug 2023 14:26:59 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- MWH0EPF000971E6.mail.protection.outlook.com (10.167.243.74) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6652.20 via Frontend Transport; Wed, 2 Aug 2023 14:26:59 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Wed, 2 Aug 2023
- 07:26:43 -0700
-Received: from yaviefel (10.126.231.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37; Wed, 2 Aug 2023
- 07:26:39 -0700
-References: <20230802075118.409395-1-idosch@nvidia.com>
- <20230802075118.409395-11-idosch@nvidia.com>
- <20230802105243.nqwugrz5aof5fbbk@skbuf> <87fs51eig3.fsf@nvidia.com>
- <ZMpadrHS4Sp3zE9F@shredder>
-User-agent: mu4e 1.8.11; emacs 28.2
-From: Petr Machata <petrm@nvidia.com>
-To: Ido Schimmel <idosch@idosch.org>
-CC: Petr Machata <petrm@nvidia.com>, <vladimir.oltean@nxp.com>, Ido Schimmel
-	<idosch@nvidia.com>, <netdev@vger.kernel.org>, <davem@davemloft.net>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <edumazet@google.com>,
-	<razor@blackwall.org>, <mirsad.todorovac@alu.unizg.hr>
-Subject: Re: [PATCH net 10/17] selftests: forwarding: ethtool_mm: Skip when
- using veth pairs
-Date: Wed, 2 Aug 2023 16:22:35 +0200
-In-Reply-To: <ZMpadrHS4Sp3zE9F@shredder>
-Message-ID: <87y1itcyg2.fsf@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8DC679F8;
+	Wed,  2 Aug 2023 14:25:47 +0000 (UTC)
+Received: from mail-qv1-xf36.google.com (mail-qv1-xf36.google.com [IPv6:2607:f8b0:4864:20::f36])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68092271B;
+	Wed,  2 Aug 2023 07:25:42 -0700 (PDT)
+Received: by mail-qv1-xf36.google.com with SMTP id 6a1803df08f44-63d0f62705dso47127696d6.0;
+        Wed, 02 Aug 2023 07:25:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1690986341; x=1691591141;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qjGfCJHkpMI9k9iIwIjOnqVQQFNO/gdmK6q0Dzbrkgo=;
+        b=szoMmaSEm9MLeTWawWU5dNjYLMw23jK+nWPZ6yXPHDf7+dk2FlDMxC2+j5l/mTzpQq
+         hkF2eouNELYBI3+0zTlcRQbE7WihLyUZZ8bvvSl8Sn5asQcTQ1uy3V+AaHtkeypKLBud
+         7VVvW8/peW1t2tVBf0KwSrlqzywd6UwhmL1oHFzhR9RpxSp9X0Rmr5oMuFXgVx/4728Q
+         k6tnJ+RucHyInTiPtw2T5VTGcd/Y/acDGfV9zyJsGBSJ/6XuFuZL7+zKjk3IuBHI1YZ2
+         ARu5ipmcuKmrmnwK79xu5gq1JhA/N1RJsB35YIuh3TwpYRQFJex/zUF9op1s+75Xy1e1
+         8p9g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690986341; x=1691591141;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=qjGfCJHkpMI9k9iIwIjOnqVQQFNO/gdmK6q0Dzbrkgo=;
+        b=K9UO/2Y/tfBkjiqS4rP0PN6YTKE4a6yAt9xyvp6e0PpN/oAIb/uXNkpTyCPvquZP4j
+         k91WJaXhqIkGc7ve3PAHRCkwcV7JV/h28kl+7MmV+IZ5jybS8h6XIVLK4gdMzBhLmF6L
+         PLMRNMJ/CzQbiCJUTO6+9gVnDjIbQbmIryhdtz7Drjw2OlsNEAwIADyAXegT4tW7i1uQ
+         z4MQjRiToUZk5fHIIzv8f/WoL50+NYTpYdQ1VZWsw0NAJbzNL1tqC+G0ttpbrSsXFAx6
+         yX7Cd6fdp8JWrz1qT3TrbRQVYwon1v0vAbLznaOi7t7xsbKrphO+WUCyUd3IfDOgczs6
+         WKRw==
+X-Gm-Message-State: ABy/qLZ7YlaGmL1Hfy+Efi0vdECU/NjxBu8ge5zEIERrRwdGD1F1AaiH
+	wxC7sG1SBMCWKb88J5WdSHQ=
+X-Google-Smtp-Source: APBJJlHEFfN8kUg4HDOk2etMtixHMke1yb5c8y1W0MjgkKfRiR1LSGq0N7KZidGzYH/2qo4XG7S5sw==
+X-Received: by 2002:a0c:e401:0:b0:635:93fb:fbfa with SMTP id o1-20020a0ce401000000b0063593fbfbfamr13940074qvl.5.1690986341311;
+        Wed, 02 Aug 2023 07:25:41 -0700 (PDT)
+Received: from localhost (172.174.245.35.bc.googleusercontent.com. [35.245.174.172])
+        by smtp.gmail.com with ESMTPSA id i11-20020a0cf38b000000b0063d67548802sm3083544qvk.137.2023.08.02.07.25.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Aug 2023 07:25:41 -0700 (PDT)
+Date: Wed, 02 Aug 2023 10:25:40 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: David Howells <dhowells@redhat.com>, 
+ netdev@vger.kernel.org, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: dhowells@redhat.com, 
+ syzbot+f527b971b4bdc8e79f9e@syzkaller.appspotmail.com, 
+ bpf@vger.kernel.org, 
+ brauner@kernel.org, 
+ davem@davemloft.net, 
+ dsahern@kernel.org, 
+ edumazet@google.com, 
+ kuba@kernel.org, 
+ pabeni@redhat.com, 
+ axboe@kernel.dk, 
+ viro@zeniv.linux.org.uk, 
+ linux-fsdevel@vger.kernel.org, 
+ syzkaller-bugs@googlegroups.com, 
+ linux-kernel@vger.kernel.org
+Message-ID: <64ca6764b3c6b_294ce9294bc@willemb.c.googlers.com.notmuch>
+In-Reply-To: <1580952.1690961810@warthog.procyon.org.uk>
+References: <1580952.1690961810@warthog.procyon.org.uk>
+Subject: RE: [PATCH net-next] udp6: Fix __ip6_append_data()'s handling of
+ MSG_SPLICE_PAGES
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.126.231.35]
-X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MWH0EPF000971E6:EE_|DM4PR12MB5793:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1396dd87-3125-4803-8df3-08db93648841
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	bFLmXadRHAWDODvm6qei5Uj8YZCA2bHG/RiHvEVyKh8N6ooX4cVrWXu3EPKPWR7FXTGLQ4xiAC+XgWzRreDLqN9qQ4iML7u6yO+wKV4rsVuACorJ/wZxuFhCs6xnFVSFpGbgU9G9UZNjUXNectY17cBp6WLisFUjVeh+D4nhjByIVgz0YKzK39J+C8zo5a0CvUs/UbOs7M6t8DsqWsXk24lItjiYmH449Dxr859gvTq9aBo8w3f/pmQdrZT4wgVslcMld07P+8TrdbNXnTCx6pB5sjYapWClSdiPM13Xrvw/topOo1TGUL+pC980KVt+X7wVDZzxRBuDQC9DkJ3paVyphVKS4Ql3D3MJD5uSaO3eJ3Ltl+Qx0f14qgeaRmA4KWShfBuzcYYv0DlqvfpH5Icy8v4PjN3qN8cyF1OiCukeVWiWmDPEdd9UCTW34xkrX64KvVyZvqOc+4etc6NYCxPoaDbX4b4go4EgKiQfuMO5Dk4TEVBw1W4lm8TK/pW0EqKdnZSs3jnbY4WiQ2c7FiDkePNcrM8RHvIrS2oHjLfWClh/eh4yeSPi6GbWLqTS8awaEM+FFaTd8qX5Hak4S/gB2EJnUQELZNFsP71re3i7mJYHGFFQFN1Wli4S/SSV7ZNnJz/ArQKb5L6BARUc65oZpTl/Zl+IrwjKeLvFke0Jf34TK4WLzgBBqVLHUmk29kPLjzwWd+/Ndf3uSIYo0YniJMjvp1iQma/v7If72h0=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(346002)(396003)(136003)(376002)(39860400002)(82310400008)(451199021)(36840700001)(40470700004)(46966006)(8936002)(8676002)(5660300002)(426003)(26005)(41300700001)(36860700001)(2906002)(83380400001)(47076005)(36756003)(40460700003)(336012)(16526019)(2616005)(40480700001)(478600001)(7636003)(54906003)(316002)(86362001)(82740400003)(356005)(70586007)(70206006)(6666004)(4326008)(6916009)(186003);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Aug 2023 14:26:59.3504
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1396dd87-3125-4803-8df3-08db93648841
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	MWH0EPF000971E6.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5793
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.6
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+David Howells wrote:
+> __ip6_append_data() can has a similar problem to __ip_append_data()[1] when
+> asked to splice into a partially-built UDP message that has more than the
+> frag-limit data and up to the MTU limit, but in the ipv6 case, it errors
+> out with EINVAL.  This can be triggered with something like:
+> 
+>         pipe(pfd);
+>         sfd = socket(AF_INET6, SOCK_DGRAM, 0);
+>         connect(sfd, ...);
+>         send(sfd, buffer, 8137, MSG_CONFIRM|MSG_MORE);
+>         write(pfd[1], buffer, 8);
+>         splice(pfd[0], 0, sfd, 0, 0x4ffe0ul, 0);
+> 
+> where the amount of data given to send() is dependent on the MTU size (in
+> this instance an interface with an MTU of 8192).
+> 
+> The problem is that the calculation of the amount to copy in
+> __ip6_append_data() goes negative in two places, but a check has been put
+> in to give an error in this case.
+> 
+> This happens because when pagedlen > 0 (which happens for MSG_ZEROCOPY and
+> MSG_SPLICE_PAGES), the terms in:
+> 
+>         copy = datalen - transhdrlen - fraggap - pagedlen;
+> 
+> then mostly cancel when pagedlen is substituted for, leaving just -fraggap.
+> 
+> Fix this by:
+> 
+>  (1) Insert a note about the dodgy calculation of 'copy'.
+> 
+>  (2) If MSG_SPLICE_PAGES, clear copy if it is negative from the above
+>      equation, so that 'offset' isn't regressed and 'length' isn't
+>      increased, which will mean that length and thus copy should match the
+>      amount left in the iterator.
+> 
+>  (3) When handling MSG_SPLICE_PAGES, give a warning and return -EIO if
+>      we're asked to splice more than is in the iterator.  It might be
+>      better to not give the warning or even just give a 'short' write.
+> 
+>  (4) If MSG_SPLICE_PAGES, override the copy<0 check.
+> 
+> [!] Note that this should also affect MSG_ZEROCOPY, but that will return
+> -EINVAL for the range of send sizes that requires the skbuff to be split.
+> 
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+> cc: "David S. Miller" <davem@davemloft.net>
+> cc: Eric Dumazet <edumazet@google.com>
+> cc: Jakub Kicinski <kuba@kernel.org>
+> cc: Paolo Abeni <pabeni@redhat.com>
+> cc: David Ahern <dsahern@kernel.org>
+> cc: Jens Axboe <axboe@kernel.dk>
+> cc: Matthew Wilcox <willy@infradead.org>
+> cc: netdev@vger.kernel.org
+> Link: https://lore.kernel.org/r/000000000000881d0606004541d1@google.com/ [1]
 
-Ido Schimmel <idosch@idosch.org> writes:
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
-> On Wed, Aug 02, 2023 at 02:27:49PM +0200, Petr Machata wrote:
->> 
->> Vladimir Oltean <vladimir.oltean@nxp.com> writes:
->> 
->> > @@ -266,6 +278,14 @@ setup_prepare()
->> >  	h1=${NETIFS[p1]}
->> >  	h2=${NETIFS[p2]}
->> >
->> > +	for netif in ${NETIFS[@]}; do
->> > +		ethtool --show-mm $netif 2>&1 &> /dev/null
->> > +		if [[ $? -ne 0 ]]; then
->> > +			echo "SKIP: $netif does not support MAC Merge"
->> > +			exit $ksft_skip
->> > +		fi
->> > +	done
->> > +
->> 
->> Ido, if you decide to go this route, just hoist the loop to the global
->> scope before registering the trap, then you don't need the hX_created
->> business.
->
-> I think the idea was to run this check after verifying that ethtool
-> supports MAC Merge in setup_prepare(). How about moving all these checks
+I'm beginning to understand your point that the bug is older and copy
+should never end up equal to -fraglen. pagedlen includes all of
+datalen, which includes fraggap. This is wrong, as fraggap is always
+copied to skb->linear. Haven't really thought it through, but would
+this solve it as well?
 
-True, I missed that.
+                        else {
+                                alloclen = fragheaderlen + transhdrlen;
+-                               pagedlen = datalen - transhdrlen;
++                               pagedlen = datalen - transhdrlen - fraggap;
 
-> before doing any configuration and registering a trap handler?
->
-> diff --git a/tools/testing/selftests/net/forwarding/ethtool_mm.sh b/tools/testing/selftests/net/forwarding/ethtool_mm.sh
-> index 4331e2161e8d..39e736f30322 100755
-> --- a/tools/testing/selftests/net/forwarding/ethtool_mm.sh
-> +++ b/tools/testing/selftests/net/forwarding/ethtool_mm.sh
-> @@ -258,11 +258,6 @@ h2_destroy()
->  
->  setup_prepare()
->  {
-> -       check_ethtool_mm_support
-> -       check_tc_fp_support
-> -       require_command lldptool
-> -       bail_on_lldpad "autoconfigure the MAC Merge layer" "configure it manually"
-> -
->         h1=${NETIFS[p1]}
->         h2=${NETIFS[p2]}
->  
-> @@ -278,7 +273,18 @@ cleanup()
->         h1_destroy
->  }
->  
-> -skip_on_veth
-> +check_ethtool_mm_support
-> +check_tc_fp_support
-> +require_command lldptool
-> +bail_on_lldpad "autoconfigure the MAC Merge layer" "configure it manually"
-> +
-> +for netif in ${NETIFS[@]}; do
-> +       ethtool --show-mm $netif 2>&1 &> /dev/null
-> +       if [[ $? -ne 0 ]]; then
-> +               echo "SKIP: $netif does not support MAC Merge"
-> +               exit $ksft_skip
-> +       fi
-> +done
->  
->  trap cleanup EXIT
->
+After that copy no longer subtracts fraglen twice.
 
-Looks good. These checks are usually placed right after sourcing the
-libraries, but I don't care much one way or another.
+                        copy = datalen - transhdrlen - fraggap - pagedlen;
+
+But don't mean to delay these targeted fixes for MSG_SPLICE_PAGES any
+further.
 
