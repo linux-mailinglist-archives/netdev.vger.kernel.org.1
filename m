@@ -1,146 +1,137 @@
-Return-Path: <netdev+bounces-23749-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23755-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC45F76D5AD
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 19:40:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 134A776D619
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 19:51:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EC5AB1C20FD5
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 17:40:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6381C281D96
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 17:51:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D9AB100B0;
-	Wed,  2 Aug 2023 17:40:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 437A2100D3;
+	Wed,  2 Aug 2023 17:51:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECC33DF58;
-	Wed,  2 Aug 2023 17:40:39 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E21C5C433C7;
-	Wed,  2 Aug 2023 17:40:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690998039;
-	bh=4hVTE+i9pfxMJ2F33rRe90JktNk2rYBpP+Ie4qp/6l4=;
-	h=From:Date:Subject:To:Cc:From;
-	b=HPfWdXroeHcDcrpC5fkZfN4KTlRSZs9yzMI/sMX97S+GCtokJz7LftdBXVv+oHbcl
-	 uAU2H52CnhuYzec7rTBmcNFd+AT5Gw+12zgO6onJ2Jslf62kpseuKKntvM9i9AWIbp
-	 NXblaM82SWFBPeafHA+mtWaJagY1VAWap+4KLynWH6UnElnzXDz84MiOF4F93vmU9z
-	 Lsv4Z01gg34jUHlht1NL5EnIq9iQ/lWlw1EQucXGaJKq8TYB6lUFabrxJjRN53EGeP
-	 OnfW36l2J8xfxJ2DHm3SkrXI4x3U9fgtV8wyaIfr9SGATj49Qli6IIHROf0+sbS0qK
-	 5PaMEOpohlDJw==
-From: Nathan Chancellor <nathan@kernel.org>
-Date: Wed, 02 Aug 2023 10:40:29 -0700
-Subject: [PATCH] mISDN: Update parameter type of dsp_cmx_send()
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37F8B6D22
+	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 17:51:21 +0000 (UTC)
+Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11B7F4493
+	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 10:51:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1690998660; x=1722534660;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=e12M020t2vjtAELGmRLks74iLY0NL+L0KXl0O3TCzvI=;
+  b=vpanVQzdPxgvPR1C/zou0LAqqiLyiJ5Yx3lcS8XUn1PvEnXvcwS35V3y
+   oEPTJSoEin+z4PAdv9ZTnu9f/y84NIgcKrfUMgeTAKFyQzYJyqAFiu+oX
+   pjZdqlZV1VqOevcfnxcKHvFsRbR+bmJOK4219WFPn7DySHhvAtohFqtCq
+   Y=;
+X-IronPort-AV: E=Sophos;i="6.01,249,1684800000"; 
+   d="scan'208";a="20230333"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-iad-1d-m6i4x-25ac6bd5.us-east-1.amazon.com) ([10.25.36.210])
+  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2023 17:43:06 +0000
+Received: from EX19MTAUWC001.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan2.iad.amazon.com [10.40.163.34])
+	by email-inbound-relay-iad-1d-m6i4x-25ac6bd5.us-east-1.amazon.com (Postfix) with ESMTPS id 147C146DDC;
+	Wed,  2 Aug 2023 17:43:03 +0000 (UTC)
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Wed, 2 Aug 2023 17:42:57 +0000
+Received: from 88665a182662.ant.amazon.com (10.142.140.92) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Wed, 2 Aug 2023 17:42:54 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <edumazet@google.com>
+CC: <davem@davemloft.net>, <dsahern@kernel.org>, <eric.dumazet@gmail.com>,
+	<kuba@kernel.org>, <kuniyu@amazon.com>, <netdev@vger.kernel.org>,
+	<pabeni@redhat.com>
+Subject: Re: [PATCH net 5/6] tcp_metrics: annotate data-races around tm->tcpm_net
+Date: Wed, 2 Aug 2023 10:42:45 -0700
+Message-ID: <20230802174245.53590-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20230802131500.1478140-6-edumazet@google.com>
+References: <20230802131500.1478140-6-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20230802-fix-dsp_cmx_send-cfi-failure-v1-1-2f2e79b0178d@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAAyVymQC/x3MQQqEMAxA0atI1gZqFBGvIiK1TTWgVRpmEMS7W
- 1w++PwblJOwQl/ckPgvKkfMqMoC3Grjwig+G8hQbTpDGORCr+fk9mtSjh5dEAxWtl9iJN8Y6ub
- K2baGvDgT5/7bD+PzvI+Wm7luAAAA
-To: isdn@linux-pingi.de, netdev@vger.kernel.org
-Cc: keescook@chromium.org, samitolvanen@google.com, llvm@lists.linux.dev, 
- patches@lists.linux.dev, kernel test robot <oliver.sang@intel.com>, 
- Nathan Chancellor <nathan@kernel.org>
-X-Mailer: b4 0.13-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3446; i=nathan@kernel.org;
- h=from:subject:message-id; bh=4hVTE+i9pfxMJ2F33rRe90JktNk2rYBpP+Ie4qp/6l4=;
- b=owGbwMvMwCEmm602sfCA1DTG02pJDCmnpord7Q27f92HKWzldR65BfcMn4lFJczqeB4Zxz7bb
- LONZ3B8RykLgxgHg6yYIkv1Y9XjhoZzzjLeODUJZg4rE8gQBi5OAZjIzNOMDI030o6+6T63bsfV
- Nfn57TtWrdZXzl3atCNZqnPXwsTjEhsZGTbWXQ4+tZznD7uP3sJjiVVPVnvnhhov2inzNNXa4+r
- NQ8wA
-X-Developer-Key: i=nathan@kernel.org; a=openpgp;
- fpr=2437CB76E544CB6AB3D9DFD399739260CB6CB716
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.142.140.92]
+X-ClientProxiedBy: EX19D039UWA002.ant.amazon.com (10.13.139.32) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Precedence: Bulk
+X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,T_SCC_BODY_TEXT_LINE,T_SPF_PERMERROR autolearn=no
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-When booting a kernel with CONFIG_MISDN_DSP=y and CONFIG_CFI_CLANG=y,
-there is a failure when dsp_cmx_send() is called indirectly from
-call_timer_fn():
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed,  2 Aug 2023 13:14:59 +0000
+> tm->tcpm_net can be read or written locklessly.
+> 
+> Instead of changing write_pnet() and read_pnet() and potentially
+> hurt performance, add the needed READ_ONCE()/WRITE_ONCE()
+> in tm_net() and tcpm_new().
+> 
+> Fixes: 849e8a0ca8d5 ("tcp_metrics: Add a field tcpm_net and verify it matches on lookup")
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
 
-  [    0.371412] CFI failure at call_timer_fn+0x2f/0x150 (target: dsp_cmx_send+0x0/0x530; expected type: 0x92ada1e9)
+Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
-The function pointer prototype that call_timer_fn() expects is
 
-  void (*fn)(struct timer_list *)
-
-whereas dsp_cmx_send() has a parameter type of 'void *', which causes
-the control flow integrity checks to fail because the parameter types do
-not match.
-
-Change dsp_cmx_send()'s parameter type to be 'struct timer_list' to
-match the expected prototype. The argument is unused anyways, so this
-has no functional change, aside from avoiding the CFI failure.
-
-Reported-by: kernel test robot <oliver.sang@intel.com>
-Closes: https://lore.kernel.org/oe-lkp/202308020936.58787e6c-oliver.sang@intel.com
-Signed-off-by: Nathan Chancellor <nathan@kernel.org>
----
-I am not sure if there is an appropriate fixes tag for this, I see this
-area was modified by commit e313ac12eb13 ("mISDN: Convert timers to use
-timer_setup()") but I don't think it was the original source of the
-issue. It could also be commit cf68fffb66d6 ("add support for Clang
-CFI") but I think that just exposes the problem/makes it fatal.
-
-Also not sure who should take this or how soon it should go in, I'll let
-that to maintainers to figure out :)
----
- drivers/isdn/mISDN/dsp.h      | 2 +-
- drivers/isdn/mISDN/dsp_cmx.c  | 2 +-
- drivers/isdn/mISDN/dsp_core.c | 2 +-
- 3 files changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/isdn/mISDN/dsp.h b/drivers/isdn/mISDN/dsp.h
-index fa09d511a8ed..baf31258f5c9 100644
---- a/drivers/isdn/mISDN/dsp.h
-+++ b/drivers/isdn/mISDN/dsp.h
-@@ -247,7 +247,7 @@ extern void dsp_cmx_hardware(struct dsp_conf *conf, struct dsp *dsp);
- extern int dsp_cmx_conf(struct dsp *dsp, u32 conf_id);
- extern void dsp_cmx_receive(struct dsp *dsp, struct sk_buff *skb);
- extern void dsp_cmx_hdlc(struct dsp *dsp, struct sk_buff *skb);
--extern void dsp_cmx_send(void *arg);
-+extern void dsp_cmx_send(struct timer_list *arg);
- extern void dsp_cmx_transmit(struct dsp *dsp, struct sk_buff *skb);
- extern int dsp_cmx_del_conf_member(struct dsp *dsp);
- extern int dsp_cmx_del_conf(struct dsp_conf *conf);
-diff --git a/drivers/isdn/mISDN/dsp_cmx.c b/drivers/isdn/mISDN/dsp_cmx.c
-index 357b87592eb4..61cb45c5d0d8 100644
---- a/drivers/isdn/mISDN/dsp_cmx.c
-+++ b/drivers/isdn/mISDN/dsp_cmx.c
-@@ -1614,7 +1614,7 @@ static u16	dsp_count; /* last sample count */
- static int	dsp_count_valid; /* if we have last sample count */
- 
- void
--dsp_cmx_send(void *arg)
-+dsp_cmx_send(struct timer_list *arg)
- {
- 	struct dsp_conf *conf;
- 	struct dsp_conf_member *member;
-diff --git a/drivers/isdn/mISDN/dsp_core.c b/drivers/isdn/mISDN/dsp_core.c
-index 386084530c2f..fae95f166688 100644
---- a/drivers/isdn/mISDN/dsp_core.c
-+++ b/drivers/isdn/mISDN/dsp_core.c
-@@ -1195,7 +1195,7 @@ static int __init dsp_init(void)
- 	}
- 
- 	/* set sample timer */
--	timer_setup(&dsp_spl_tl, (void *)dsp_cmx_send, 0);
-+	timer_setup(&dsp_spl_tl, dsp_cmx_send, 0);
- 	dsp_spl_tl.expires = jiffies + dsp_tics;
- 	dsp_spl_jiffies = dsp_spl_tl.expires;
- 	add_timer(&dsp_spl_tl);
-
----
-base-commit: 5d0c230f1de8c7515b6567d9afba1f196fb4e2f4
-change-id: 20230802-fix-dsp_cmx_send-cfi-failure-2d4028b1ca63
-
-Best regards,
--- 
-Nathan Chancellor <nathan@kernel.org>
-
+> ---
+>  net/ipv4/tcp_metrics.c | 11 +++++++----
+>  1 file changed, 7 insertions(+), 4 deletions(-)
+> 
+> diff --git a/net/ipv4/tcp_metrics.c b/net/ipv4/tcp_metrics.c
+> index fd4ab7a51cef210005146dfbc3235a2db717a44f..4fd274836a48f73d0b1206adfa14c17c3b28bc30 100644
+> --- a/net/ipv4/tcp_metrics.c
+> +++ b/net/ipv4/tcp_metrics.c
+> @@ -40,7 +40,7 @@ struct tcp_fastopen_metrics {
+>  
+>  struct tcp_metrics_block {
+>  	struct tcp_metrics_block __rcu	*tcpm_next;
+> -	possible_net_t			tcpm_net;
+> +	struct net			*tcpm_net;
+>  	struct inetpeer_addr		tcpm_saddr;
+>  	struct inetpeer_addr		tcpm_daddr;
+>  	unsigned long			tcpm_stamp;
+> @@ -51,9 +51,10 @@ struct tcp_metrics_block {
+>  	struct rcu_head			rcu_head;
+>  };
+>  
+> -static inline struct net *tm_net(struct tcp_metrics_block *tm)
+> +static inline struct net *tm_net(const struct tcp_metrics_block *tm)
+>  {
+> -	return read_pnet(&tm->tcpm_net);
+> +	/* Paired with the WRITE_ONCE() in tcpm_new() */
+> +	return READ_ONCE(tm->tcpm_net);
+>  }
+>  
+>  static bool tcp_metric_locked(struct tcp_metrics_block *tm,
+> @@ -197,7 +198,9 @@ static struct tcp_metrics_block *tcpm_new(struct dst_entry *dst,
+>  		if (!tm)
+>  			goto out_unlock;
+>  	}
+> -	write_pnet(&tm->tcpm_net, net);
+> +	/* Paired with the READ_ONCE() in tm_net() */
+> +	WRITE_ONCE(tm->tcpm_net, net);
+> +
+>  	tm->tcpm_saddr = *saddr;
+>  	tm->tcpm_daddr = *daddr;
+>  
+> -- 
+> 2.41.0.640.ga95def55d0-goog
 
