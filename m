@@ -1,37 +1,32 @@
-Return-Path: <netdev+bounces-23662-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23663-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31CBA76D011
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 16:30:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B664B76D04C
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 16:41:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 630C51C213AA
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 14:30:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 69CA4281DA6
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 14:41:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78B106AA4;
-	Wed,  2 Aug 2023 14:30:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EC5C6FA1;
+	Wed,  2 Aug 2023 14:41:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83E588BE3
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 14:30:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C329EC433C7;
-	Wed,  2 Aug 2023 14:30:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690986622;
-	bh=omrJJb+W+ZQRsLgQkmzMuvL0MAff1nLVyAJPatK7Mbc=;
-	h=Date:Cc:Subject:To:References:From:In-Reply-To:From;
-	b=clltoR53tfkazZp/tZgf4XZNftETDrJjUKFE7tXcLSuSlVGXoHckd6ZgXEWSfksH3
-	 ucn8JTGwd3+1qIC/oS7Ijmo3JIpqldnIepM1qlRwqM9ONJLbPvqJIUnMbvi2umAGml
-	 ZgZgF3V5JW8WaGBb6JH7+fvnGsP0+rK8gjoBYLz7Kh5xiqoCuxYxADTEVfmTBbfVHf
-	 CTEoM1NJKhesMVXe8fy24h41i/mv2QQJB8Y8UM5JMW+TNMT3ulIMMGPLvi/fxkAdwy
-	 S6rv4Wvzybaf1DYqE40idFJJfVw8xU0wwbyNUHMyMWrhJWhN6rEK8lCst/GaIxP4Rl
-	 Oce3vmVPV1sTw==
-Message-ID: <d1b1c0cc-c542-e626-9f35-8ad0dabb56b0@kernel.org>
-Date: Wed, 2 Aug 2023 16:30:18 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A24728E1
+	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 14:41:17 +0000 (UTC)
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1401E0
+	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 07:41:11 -0700 (PDT)
+Received: from ptz.office.stw.pengutronix.de ([2a0a:edc0:0:900:1d::77] helo=[127.0.0.1])
+	by metis.ext.pengutronix.de with esmtp (Exim 4.92)
+	(envelope-from <j.zink@pengutronix.de>)
+	id 1qRD1e-0002R7-VB; Wed, 02 Aug 2023 16:40:35 +0200
+Message-ID: <49d52a10-20cf-9c5b-ebe3-07292664fe11@pengutronix.de>
+Date: Wed, 2 Aug 2023 16:40:21 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -39,158 +34,355 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Cc: Linux NetDev <netdev@vger.kernel.org>, Pengtao He <hepengtao@xiaomi.com>,
- Willem Bruijn <willemb@google.com>, Stanislav Fomichev <sdf@google.com>,
- Xiao Ma <xiaom@google.com>, Patrick Rohr <prohr@google.com>,
- Alexei Starovoitov <ast@kernel.org>, Dave Tucker <datucker@redhat.com>,
- Vincent Bernat <vincent@bernat.ch>, Marek Majkowski <marek@cloudflare.com>
-Subject: Re: Performance question: af_packet with bpf filter vs TX path
- skb_clone
-Content-Language: en-US
-To: Eric Dumazet <edumazet@google.com>, =?UTF-8?Q?Maciej_=c5=bbenczykowski?=
- <maze@google.com>
-References: <CANP3RGfRA3yfom8GOxUBZD4sBxiU2dWn9TKdR50d55WgENrGnQ@mail.gmail.com>
- <CANn89iJ+iWS_d3Vwg6k03mp4v_6OXHB1oS76A+9p1U7hGKdFng@mail.gmail.com>
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <CANn89iJ+iWS_d3Vwg6k03mp4v_6OXHB1oS76A+9p1U7hGKdFng@mail.gmail.com>
+ Thunderbird/102.13.1
+Subject: Re: [EXT] Re: [PATCH v3 net 2/2] net: stmmac: dwmac-imx: pause the
+ TXC clock in fixed-link
+Content-Language: en-US, de-DE
+To: Shenwei Wang <shenwei.wang@nxp.com>, Russell King
+ <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin
+ <mcoquelin.stm32@gmail.com>, Shawn Guo <shawnguo@kernel.org>,
+ Sascha Hauer <s.hauer@pengutronix.de>,
+ Neil Armstrong <neil.armstrong@linaro.org>,
+ Kevin Hilman <khilman@baylibre.com>, Vinod Koul <vkoul@kernel.org>,
+ Chen-Yu Tsai <wens@csie.org>, Jernej Skrabec <jernej.skrabec@gmail.com>,
+ Samuel Holland <samuel@sholland.org>
+Cc: Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>,
+ Pengutronix Kernel Team <kernel@pengutronix.de>,
+ Fabio Estevam <festevam@gmail.com>, dl-linux-imx <linux-imx@nxp.com>,
+ Jerome Brunet <jbrunet@baylibre.com>,
+ Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
+ Bhupesh Sharma <bhupesh.sharma@linaro.org>,
+ Nobuhiro Iwamatsu <nobuhiro1.iwamatsu@toshiba.co.jp>,
+ Simon Horman <simon.horman@corigine.com>,
+ Andrew Halaney <ahalaney@redhat.com>,
+ Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
+ Wong Vee Khee <veekhee@apple.com>, Revanth Kumar Uppala
+ <ruppala@nvidia.com>, Jochen Henneberg <jh@henneberg-systemdesign.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linux-stm32@st-md-mailman.stormreply.com"
+ <linux-stm32@st-md-mailman.stormreply.com>,
+ "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "linux-amlogic@lists.infradead.org" <linux-amlogic@lists.infradead.org>,
+ "imx@lists.linux.dev" <imx@lists.linux.dev>, Frank Li <frank.li@nxp.com>
+References: <20230731161929.2341584-1-shenwei.wang@nxp.com>
+ <20230731161929.2341584-3-shenwei.wang@nxp.com>
+ <bf2979c4-0b63-be53-b530-3d7385796534@pengutronix.de>
+ <PAXPR04MB9185D7D3B088E4786A216044890AA@PAXPR04MB9185.eurprd04.prod.outlook.com>
+ <e32c89e1-7385-105b-63c9-74f58c2253cb@pengutronix.de>
+ <PAXPR04MB91851BB5D1375AF0EF3C51B7890BA@PAXPR04MB9185.eurprd04.prod.outlook.com>
+From: Johannes Zink <j.zink@pengutronix.de>
+In-Reply-To: <PAXPR04MB91851BB5D1375AF0EF3C51B7890BA@PAXPR04MB9185.eurprd04.prod.outlook.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:900:1d::77
+X-SA-Exim-Mail-From: j.zink@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hi Maze,
+Hi Shenwei,
 
-Great to see you on the netdev list again. I want to kickstart this
-thread again, as I think it is a general netstack issue that should be
-solved (I was on vacation when thread was active).
-
-On 21/07/2023 20.14, Eric Dumazet wrote:
-> On Fri, Jul 21, 2023 at 7:55 PM Maciej Żenczykowski <maze@google.com> wrote:
->>
->> I've been asked to review:
->>    https://android-review.googlesource.com/c/platform/packages/modules/NetworkStack/+/2648779
->>
-
-So, this is blocking TCP zero-copy send feature, according to link.
-
->> where it comes to light that in Android due to background debugging of
->> connectivity problems
->> (of which there are *plenty* due to various types of buggy [primarily]
->> wifi networks)
->> we have a permanent AF_PACKET, ETH_P_ALL socket with a cBPF filter:
->>
-
-Many userspace programs/daemons have a permanent AF_PACKET (sock_raw 
-"tcpdump") socket running with a cBPF filter attached.
-
-Examples of programs:
-  - DHCP clients and servers.
-  - LLDP (Link Layer Discovery Protocol) daemons (Cc. Vincent)
-  - Path MTU daemons (https://github.com/cloudflare/pmtud/) (Cc Marek)
-  - etc.
-
->>     arp or (ip and udp port 68) or (icmp6 and ip6[40] >= 133 and ip6[40] <= 136)
->>
->> ie. it catches ARP, IPv4 DHCP and IPv6 ND (NS/NA/RS/RA)
->>
->> If I'm reading the kernel code right this appears to cause skb_clone()
->> to be called on *every* outgoing packet,
->> even though most packets will not be accepted by the filter.
->>
-
-So, you are saying the issue only occurs for TX ?
-
-Would it be an option to change your AF_PACKET socket to ignore outgoing 
-traffic?
-
-For some of the daemons (listed above) it might be possible to ignore
-outgoing packets, and thus not enable the TX hook and thus avoid the skb
-cloning.
-
-
->> (In the TX path the filter appears to get called *after* the clone,
->> I think that's unlike the RX path where the filter is called first)
->>
-
-I don't fully understand what you are saying here.
-Is the RX path affected or not?
-
-
->> Unfortunately, I don't think it's possible to eliminate the
->> functionality this socket provides.
->> We need to be able to log RX & TX of ARP/DHCP/ND for debugging /
->> bugreports / etc.
->> and they *really* should be in order wrt. to each other.
->> (and yeah, that means last few minutes history when an issue happens,
->> so not possible to simply enable it on demand)
->>
->> We could of course split the socket into 3 separate ones:
->> - ETH_P_ARP
->> - ETH_P_IP + cbpf udp dport=dhcp
->> - ETH_P_IPV6 + cbpf icmpv6 type=NS/NA/RS/RA
->>
->> But I don't think that will help - I believe we'll still get
->> skb_clone() for every outbound ipv4/ipv6 packet.
->>
-
-I assume this would not help, as it would travel same code path, to
-dev_queue_xmit_nit, right?
-
->> I have some ideas for what could be done to avoid the clone (with
->> existing kernel functionality)... but none of it is pretty...
->> Anyone have any smart ideas?
->>
->> Perhaps a way to move the clone past the af_packet packet_rcv run_filter?
->> Unfortunately packet_rcv() does a little bit of 'setup' before it
->> calls the filter - so this may be hard.
+On 8/2/23 16:27, Shenwei Wang wrote:
 > 
 > 
-> dev_queue_xmit_nit() also does some 'setup':
-> 
-> net_timestamp_set(skb2);  (This one could probably be moved into
-> af_packet, if packet is not dropped ?)
-> <sanitize mac, network, transport headers>
-> 
-
-Regarding AF_PACKET socket to ignore outgoing, I think the
-(ptype->ignore_outgoing) in top of dev_queue_xmit_nit() list-loop is
-doing that trick and thus avoids the skb_clone().
-
+>> -----Original Message-----
+>> From: Johannes Zink <j.zink@pengutronix.de>
+>> Sent: Wednesday, August 2, 2023 1:26 AM
+>> To: Shenwei Wang <shenwei.wang@nxp.com>; Russell King
+>> <linux@armlinux.org.uk>; David S. Miller <davem@davemloft.net>; Eric
+>> Dumazet <edumazet@google.com>; Jakub Kicinski <kuba@kernel.org>; Paolo
+>> Abeni <pabeni@redhat.com>; Maxime Coquelin
+>> <mcoquelin.stm32@gmail.com>; Shawn Guo <shawnguo@kernel.org>; Sascha
+>> Hauer <s.hauer@pengutronix.de>; Neil Armstrong <neil.armstrong@linaro.org>;
+>> Kevin Hilman <khilman@baylibre.com>; Vinod Koul <vkoul@kernel.org>; Chen-
+>> Yu Tsai <wens@csie.org>; Jernej Skrabec <jernej.skrabec@gmail.com>; Samuel
+>> Holland <samuel@sholland.org>
+>> Cc: Giuseppe Cavallaro <peppe.cavallaro@st.com>; Alexandre Torgue
+>> <alexandre.torgue@foss.st.com>; Jose Abreu <joabreu@synopsys.com>;
+>> Pengutronix Kernel Team <kernel@pengutronix.de>; Fabio Estevam
+>> <festevam@gmail.com>; dl-linux-imx <linux-imx@nxp.com>; Jerome Brunet
+>> <jbrunet@baylibre.com>; Martin Blumenstingl
+>> <martin.blumenstingl@googlemail.com>; Bhupesh Sharma
+>> <bhupesh.sharma@linaro.org>; Nobuhiro Iwamatsu
+>> <nobuhiro1.iwamatsu@toshiba.co.jp>; Simon Horman
+>> <simon.horman@corigine.com>; Andrew Halaney <ahalaney@redhat.com>;
+>> Bartosz Golaszewski <bartosz.golaszewski@linaro.org>; Wong Vee Khee
+>> <veekhee@apple.com>; Revanth Kumar Uppala <ruppala@nvidia.com>; Jochen
+>> Henneberg <jh@henneberg-systemdesign.com>; netdev@vger.kernel.org; linux-
+>> stm32@st-md-mailman.stormreply.com; linux-arm-kernel@lists.infradead.org;
+>> linux-kernel@vger.kernel.org; linux-amlogic@lists.infradead.org;
+>> imx@lists.linux.dev; Frank Li <frank.li@nxp.com>
+>> Subject: Re: [EXT] Re: [PATCH v3 net 2/2] net: stmmac: dwmac-imx: pause the
+>> TXC clock in fixed-link
 >>
->> Or an 'extra' early pre-filter hook [prot_hook.prefilter()] that has
->> very minimal
->> functionality... like match 2 bytes at an offset into the packet?
->> Maybe even not a hook at all, just adding a
->> prot_hook.prefilter{1,2}_u64_{offset,mask,value}
->> It doesn't have to be perfect, but if it could discard 99% of the
->> packets we don't care about...
->> (and leave filtering of the remaining 1% to the existing cbpf program)
->> that would already be a huge win?
-> 
-> Maybe if we can detect a cBPF filter does not access mac, network,
-> transport header,
-> we could run it earlier, before the clone().
-> 
-> So we could add
-> prot_hook.filter_can_run_from_dev_queue_xmit_nit_before_the_clone
-> 
-> Or maybe we can remove sanitization, because BPF should not do bad
-> things if these headers are garbage ?
->
-
-To Maze, have you looked at PoC coding what Eric suggested?
-(Prework that allows us to to move filter)
-
-
+>> Caution: This is an external email. Please take care when clicking links or
+>> opening attachments. When in doubt, report the message using the 'Report this
+>> email' button
 >>
->> Thoughts?
 >>
+>> Hi Shenwei,
+>>
+>> On 8/1/23 19:10, Shenwei Wang wrote:
+>>>
+>>>
+>>>> -----Original Message-----
+>>>> From: Johannes Zink <j.zink@pengutronix.de>
+>>>> Sent: Tuesday, August 1, 2023 7:48 AM
+>>>> To: Shenwei Wang <shenwei.wang@nxp.com>; Russell King
+>>>> <linux@armlinux.org.uk>; David S. Miller <davem@davemloft.net>; Eric
+>>>> Dumazet <edumazet@google.com>; Jakub Kicinski <kuba@kernel.org>;
+>>>> Paolo Abeni <pabeni@redhat.com>; Maxime Coquelin
+>>>> <mcoquelin.stm32@gmail.com>; Shawn Guo <shawnguo@kernel.org>;
+>> Sascha
+>>>> Hauer <s.hauer@pengutronix.de>; Neil Armstrong
+>>>> <neil.armstrong@linaro.org>; Kevin Hilman <khilman@baylibre.com>;
+>>>> Vinod Koul <vkoul@kernel.org>; Chen- Yu Tsai <wens@csie.org>; Jernej
+>>>> Skrabec <jernej.skrabec@gmail.com>; Samuel Holland
+>>>> <samuel@sholland.org>
+>>>> Cc: Giuseppe Cavallaro <peppe.cavallaro@st.com>; Alexandre Torgue
+>>>> <alexandre.torgue@foss.st.com>; Jose Abreu <joabreu@synopsys.com>;
+>>>> Pengutronix Kernel Team <kernel@pengutronix.de>; Fabio Estevam
+>>>> <festevam@gmail.com>; dl-linux-imx <linux-imx@nxp.com>; Jerome Brunet
+>>>> <jbrunet@baylibre.com>; Martin Blumenstingl
+>>>> <martin.blumenstingl@googlemail.com>; Bhupesh Sharma
+>>>> <bhupesh.sharma@linaro.org>; Nobuhiro Iwamatsu
+>>>> <nobuhiro1.iwamatsu@toshiba.co.jp>; Simon Horman
+>>>> <simon.horman@corigine.com>; Andrew Halaney <ahalaney@redhat.com>;
+>>>> Bartosz Golaszewski <bartosz.golaszewski@linaro.org>; Wong Vee Khee
+>>>> <veekhee@apple.com>; Revanth Kumar Uppala <ruppala@nvidia.com>;
+>>>> Jochen Henneberg <jh@henneberg-systemdesign.com>;
+>>>> netdev@vger.kernel.org; linux- stm32@st-md-mailman.stormreply.com;
+>>>> linux-arm-kernel@lists.infradead.org;
+>>>> linux-kernel@vger.kernel.org; linux-amlogic@lists.infradead.org;
+>>>> imx@lists.linux.dev; Frank Li <frank.li@nxp.com>
+>>>> Subject: [EXT] Re: [PATCH v3 net 2/2] net: stmmac: dwmac-imx: pause
+>>>> the TXC clock in fixed-link
+>>>>
+>>>> Caution: This is an external email. Please take care when clicking
+>>>> links or opening attachments. When in doubt, report the message using
+>>>> the 'Report this email' button
+>>>>
+>>>>
+>>>> Hi Shenwei,
+>>>>
+>>>> thanks for your patch.
+>>>>
+>>>> On 7/31/23 18:19, Shenwei Wang wrote:
+>>>>> When using a fixed-link setup, certain devices like the SJA1105
+>>>>> require a small pause in the TXC clock line to enable their internal
+>>>>> tunable delay line (TDL).
+>>>>
+>>>> If this is only required for some devices, is it safe to enforce this
+>>>> behaviour unconditionally for any kind of fixed link devices
+>>>> connected to the MX93 EQOS or could this possibly break for other devices?
+>>>>
+>>>
+>>> It won't impact normal devices. The link layer hasn't built up yet.
+>>>
+>>
+>> As Russel suggested in [1] - maybe you could rephrase your commit message for
+>> your v4 to point this out to future reviewers (apparently multiple people have
+>> had questions about this...)  and have this fact also recorded in the git log later
+>> on.
+>>
+> 
+> Okay.
+> 
+>> Also: does this only apply to i.MX93, or would we have to test and enable it on
+>> e.g. i.MX8MP as well?
+>>
+> 
+> Yes, it is required when the EQOS MAC is selected. However, this patch just enables
+> The feature on i.MX93.
 
-What are your plans for working on a solution for this?
+If this behaviour is required on all EQOS, I think the name 
+imx_dwmac_fix_speed_mx93() is misleading. It should either be 
+imx_dwmac_fix_speed() if applicable to all imx implementations, or 
+dwmac_fix_speed() (and moved to a non-gluecode file) if applicable for all 
+implementations in general.
 
---Jesper
+You can then add a second patch for enabling it for the i.mx93 in the gluecode 
+driver.
 
-Thread link[1] to people Cc'ed:
-  [1] 
-https://lore.kernel.org/all/CANP3RGfRA3yfom8GOxUBZD4sBxiU2dWn9TKdR50d55WgENrGnQ@mail.gmail.com/
+Johannes
+
+
+> 
+> Thanks,
+> Shenwei
+> 
+>> Thanks
+>> Johannes
+>>
+>> [1] ZMk/xqRP67zXHNrf@shell.armlinux.org.uk
+>>
+>>
+>>> Thanks,
+>>> Shenwei
+>>>
+>>>> Best regards
+>>>> Johannes
+>>>>
+>>>>>
+>>>>> To satisfy this requirement, this patch temporarily disables the TX
+>>>>> clock, and restarts it after a required period. This provides the
+>>>>> required silent interval on the clock line for SJA1105 to complete
+>>>>> the frequency transition and enable the internal TDLs.
+>>>>>
+>>>>> So far we have only enabled this feature on the i.MX93 platform.
+>>>>>
+>>>>> Signed-off-by: Shenwei Wang <shenwei.wang@nxp.com>
+>>>>> Reviewed-by: Frank Li <frank.li@nxp.com>
+>>>>> ---
+>>>>>     .../net/ethernet/stmicro/stmmac/dwmac-imx.c   | 42
+>> +++++++++++++++++++
+>>>>>     1 file changed, 42 insertions(+)
+>>>>>
+>>>>> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c
+>>>>> b/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c
+>>>>> index 53ee5a42c071..2e4173d099f3 100644
+>>>>> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c
+>>>>> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c
+>>>>> @@ -32,6 +32,7 @@
+>>>>>     #define GPR_ENET_QOS_RGMII_EN               (0x1 << 21)
+>>>>>
+>>>>>     #define MX93_GPR_ENET_QOS_INTF_MODE_MASK    GENMASK(3, 0)
+>>>>> +#define MX93_GPR_ENET_QOS_INTF_MASK          GENMASK(3, 1)
+>>>>>     #define MX93_GPR_ENET_QOS_INTF_SEL_MII              (0x0 << 1)
+>>>>>     #define MX93_GPR_ENET_QOS_INTF_SEL_RMII             (0x4 << 1)
+>>>>>     #define MX93_GPR_ENET_QOS_INTF_SEL_RGMII    (0x1 << 1)
+>>>>> @@ -40,6 +41,7 @@
+>>>>>     #define DMA_BUS_MODE                        0x00001000
+>>>>>     #define DMA_BUS_MODE_SFT_RESET              (0x1 << 0)
+>>>>>     #define RMII_RESET_SPEED            (0x3 << 14)
+>>>>> +#define CTRL_SPEED_MASK                      GENMASK(15, 14)
+>>>>>
+>>>>>     struct imx_dwmac_ops {
+>>>>>         u32 addr_width;
+>>>>> @@ -56,6 +58,7 @@ struct imx_priv_data {
+>>>>>         struct regmap *intf_regmap;
+>>>>>         u32 intf_reg_off;
+>>>>>         bool rmii_refclk_ext;
+>>>>> +     void __iomem *base_addr;
+>>>>>
+>>>>>         const struct imx_dwmac_ops *ops;
+>>>>>         struct plat_stmmacenet_data *plat_dat; @@ -212,6 +215,42 @@
+>>>>> static void imx_dwmac_fix_speed(void *priv, uint speed, uint mode)
+>>>>>                 dev_err(dwmac->dev, "failed to set tx rate %lu\n", rate);
+>>>>>     }
+>>>>>
+>>>>> +static void imx_dwmac_fix_speed_mx93(void *priv, uint speed, uint
+>>>>> +mode) {
+>>>>> +     struct imx_priv_data *dwmac = priv;
+>>>>> +     int ctrl, old_ctrl, iface;
+>>>>> +
+>>>>> +     imx_dwmac_fix_speed(priv, speed, mode);
+>>>>> +
+>>>>> +     if (!dwmac || mode != MLO_AN_FIXED)
+>>>>> +             return;
+>>>>> +
+>>>>> +     if (regmap_read(dwmac->intf_regmap, dwmac->intf_reg_off, &iface))
+>>>>> +             return;
+>>>>> +
+>>>>> +     iface &= MX93_GPR_ENET_QOS_INTF_MASK;
+>>>>> +     if (iface != MX93_GPR_ENET_QOS_INTF_SEL_RGMII)
+>>>>> +             return;
+>>>>> +
+>>>>> +     old_ctrl = readl(dwmac->base_addr + MAC_CTRL_REG);
+>>>>> +     ctrl = old_ctrl & ~CTRL_SPEED_MASK;
+>>>>> +     regmap_update_bits(dwmac->intf_regmap, dwmac->intf_reg_off,
+>>>>> +                        MX93_GPR_ENET_QOS_INTF_MODE_MASK, 0);
+>>>>> +     writel(ctrl, dwmac->base_addr + MAC_CTRL_REG);
+>>>>> +
+>>>>> +     /* Ensure the settings for CTRL are applied and avoid CPU/Compiler
+>>>>> +      * reordering.
+>>>>> +      */
+>>>>> +     wmb();
+>>>>> +
+>>>>> +     usleep_range(10, 20);
+>>>>> +     iface |= MX93_GPR_ENET_QOS_CLK_GEN_EN;
+>>>>> +     regmap_update_bits(dwmac->intf_regmap, dwmac->intf_reg_off,
+>>>>> +                        MX93_GPR_ENET_QOS_INTF_MODE_MASK, iface);
+>>>>> +
+>>>>> +     writel(old_ctrl, dwmac->base_addr + MAC_CTRL_REG); }
+>>>>> +
+>>>>>     static int imx_dwmac_mx93_reset(void *priv, void __iomem *ioaddr)
+>>>>>     {
+>>>>>         struct plat_stmmacenet_data *plat_dat = priv; @@ -317,8
+>>>>> +356,11 @@ static int imx_dwmac_probe(struct platform_device *pdev)
+>>>>>         plat_dat->exit = imx_dwmac_exit;
+>>>>>         plat_dat->clks_config = imx_dwmac_clks_config;
+>>>>>         plat_dat->fix_mac_speed = imx_dwmac_fix_speed;
+>>>>> +     if (of_machine_is_compatible("fsl,imx93"))
+>>>>> +             plat_dat->fix_mac_speed = imx_dwmac_fix_speed_mx93;
+>>>>>         plat_dat->bsp_priv = dwmac;
+>>>>>         dwmac->plat_dat = plat_dat;
+>>>>> +     dwmac->base_addr = stmmac_res.addr;
+>>>>>
+>>>>>         ret = imx_dwmac_clks_config(dwmac, true);
+>>>>>         if (ret)
+>>>>
+>>>> --
+>>>> Pengutronix e.K.                | Johannes Zink                  |
+>>>> Steuerwalder Str. 21            |
+>>>> https://www/
+>>>> .pe%2F&data=05%7C01%7Cshenwei.wang%40nxp.com%7Ccfd142f0d60a461
+>> ee01408
+>>>>
+>> db9321578d%7C686ea1d3bc2b4c6fa92cd99c5c301635%7C0%7C0%7C63826554
+>> 36335
+>>>>
+>> 61986%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luM
+>> zIiLCJ
+>>>>
+>> BTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=CV10o1M%2BOj
+>> DPOaH5C
+>>>> y%2Fka%2B0aOMs0IaVapMH7aa3RnTI%3D&reserved=0
+>>>>
+>> ngutronix.de%2F&data=05%7C01%7Cshenwei.wang%40nxp.com%7C761fbb75c
+>>>>
+>> 1c24cfe091508db928d8ade%7C686ea1d3bc2b4c6fa92cd99c5c301635%7C0%7C
+>>>>
+>> 0%7C638264908852977732%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjA
+>>>>
+>> wMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%
+>>>>
+>> 7C&sdata=2l2zNfIaNnRJENmERehNae8g%2F%2BQqlxD2YRx7ksY2X%2BE%3D&r
+>>>> eserved=0    |
+>>>> 31137 Hildesheim, Germany       | Phone: +49-5121-206917-0       |
+>>>> Amtsgericht Hildesheim, HRA 2686| Fax:   +49-5121-206917-5555    |
+>>>
+>>>
+>>
+>> --
+>> Pengutronix e.K.                | Johannes Zink                  |
+>> Steuerwalder Str. 21            |
+>> https://www.pe/
+>> ngutronix.de%2F&data=05%7C01%7Cshenwei.wang%40nxp.com%7Ccfd142f0d
+>> 60a461ee01408db9321578d%7C686ea1d3bc2b4c6fa92cd99c5c301635%7C0%7
+>> C0%7C638265543633561986%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLj
+>> AwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C
+>> %7C&sdata=yKzNPsHqD%2FxU%2FRmzLn4JSQjmuT9tU8SabLxHyGTTmms%3D&r
+>> eserved=0    |
+>> 31137 Hildesheim, Germany       | Phone: +49-5121-206917-0       |
+>> Amtsgericht Hildesheim, HRA 2686| Fax:   +49-5121-206917-5555    |
+> 
+> 
+
+-- 
+Pengutronix e.K.                | Johannes Zink                  |
+Steuerwalder Str. 21            | https://www.pengutronix.de/    |
+31137 Hildesheim, Germany       | Phone: +49-5121-206917-0       |
+Amtsgericht Hildesheim, HRA 2686| Fax:   +49-5121-206917-5555    |
 
 
