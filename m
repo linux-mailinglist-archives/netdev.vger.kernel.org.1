@@ -1,65 +1,163 @@
-Return-Path: <netdev+bounces-23751-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23752-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 170ED76D5E7
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 19:47:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 37BF876D5EF
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 19:48:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 47CF51C21344
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 17:47:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0CD3D1C21312
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 17:48:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13187100C6;
-	Wed,  2 Aug 2023 17:47:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04379100D3;
+	Wed,  2 Aug 2023 17:48:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05E12100C4;
-	Wed,  2 Aug 2023 17:47:43 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22D2CC433C8;
-	Wed,  2 Aug 2023 17:47:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690998463;
-	bh=kV9NfAwEiyRC6suvZbE0jpxaoqklhAtkhU0iiN3U7S8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=CEMIiX+wwTlL3uCSxU1l8G9VXsCpuXq8hyDVlZnhhkIKz2JpIuLqaD+0nV4bvVADc
-	 oyqtT5QFdccdh4r2tYLzDXQ6BIhdgN3WXFdgIpknr6ZI1WaEhtml/Gynui9cOMJpYt
-	 a3rbdk+xoiCYZIjshBxYaNUiS94JxcL9q/RBRBTvnbA5h8iEbTA/qyaAkBZdR6gQzi
-	 J6UFH9WyBs3GhIuxBXFZ0JRpMO3Hsbv/qyMvPMgRMl2ifks8RxPOpl2Mko5cSLYN8S
-	 G6EtfS9M0PHlLKRisHamCUTkIT+oZJ/BpHZpDzidJLwZCvI1ZVDHFgF1YOJv/vviDz
-	 fdW9PpIf/0XSg==
-Date: Wed, 2 Aug 2023 10:47:42 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Wei Fang <wei.fang@nxp.com>
-Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- shenwei.wang@nxp.com, xiaoning.wang@nxp.com, ast@kernel.org,
- daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com,
- netdev@vger.kernel.org, larysa.zaremba@intel.com, linux-imx@nxp.com,
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org
-Subject: Re: [PATCH V4 net-next] net: fec: add XDP_TX feature support
-Message-ID: <20230802104742.2f129238@kernel.org>
-In-Reply-To: <20230802024857.3153756-1-wei.fang@nxp.com>
-References: <20230802024857.3153756-1-wei.fang@nxp.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC926100A7
+	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 17:48:12 +0000 (UTC)
+Received: from sonic301-22.consmr.mail.gq1.yahoo.com (sonic301-22.consmr.mail.gq1.yahoo.com [98.137.64.148])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A405E210D
+	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 10:47:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1690998473; bh=OvuQPE46agxmaX4ufGOdmLd8LE0zMezBwedxqC/ssqw=; h=From:To:Cc:Subject:Date:In-Reply-To:References:From:Subject:Reply-To; b=M6aPuYefANa5Jsgpuq2nTXNRT5F3V7cBj53s61a4dPwDw4iHxsofdSskTnbQ7I8Tm7XwO0DfTj8LwEpGbRbkImF4fbrgQ0fKAMOEDfyr2fQXR1zv/IC5uazhNJb75P5ZMSs8E5Dpl5I1LDU9yq1mKL1QABWRh2PBaGX9Z9i+S/u9RX9Vxl6P4Efm4Jbajbfkbk6ys/jHbKrTKIAONGnNO0zSacS4jr4Ylu//2CrG3hHFlsRzEoz1f+7zxKWDeoAPnizzMrub78XDF70FJWgmjXt4ZqPBQxX9J23e8AL01d3sxExbwt1ABlKJtinNseyMlR/myafLsW2t+MszhB0UbQ==
+X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1690998473; bh=FvQKECw4HKjVLkGGj4p6k9A3opvxAU8ZaWBeQTbDO1Q=; h=X-Sonic-MF:From:To:Subject:Date:From:Subject; b=RDugM32pV+Uk12puK8hDM1B9hUbhh1TuHniH2Zp11e47BxZUft5DH8D5/04eD+B6v6HgQ05RMwHdR5eiRzNEQbG3XeicSFammzp+0XUvO+tdMuzn5qFt2AQtPEoAW2q6eM5KhQv11DNtaZNKhp4ukZQB9zxolIPns4+ld+IF5KPhX2nDSiRUP4Bhmmq0ApjCrKPjmeLwNjQVYnGyrdQX8M221Alj2Ihna9x8xQArHzxNxvWt/n9bMtkaD9KBuX3NmDPDg7m/TaY0NOpz0N79pEH/dmKGgBri/j/IjlfVTzLVhWX4ekXn3YfBJhKq1lYSMwQ9Wt7OW09lIrnnOu392Q==
+X-YMail-OSG: iWFIk8UVM1l6bIZ3uCO2wLC_eGhTV_F3Mf3yRyQRuLzxL8vZlHWqLcGDqxA.5Ss
+ AWUV2chj4Gs6Px1w4TkRgmc7BhS4N7uVk791I_rHXdyT2nDV2unT75MQBkQm7dGfyB8fIFdazhjh
+ eEifOlaslOa25.ARP8XKd8DRoQYEX7rDoPSJV5z6HnSqlxH.VNn69pGHyv7_EFwPeyyESy1wIhbs
+ DC7_T1OKGaZdDSZME9V2FDxu4dvEGq4tzEa7vfCpYxQCANJvzKfbpshyU76qN9xSOB9CCihAnBpA
+ 906mOM6Za1QtEXGbBO3erekoL4jZTUTPfWY7gVYKWalwLDSDLJ3.3Ptzc8UbpDCvzKf7tA6YArYM
+ rw8INImzeFoexHvo6XN6H0QsUcwLvBxU7rjJRZbUlN4OSHbW1Ly4aQD7fcmaMqkVBii6G1EjEAuT
+ gpLY5SBfO.KbY6WgsfaMxJM4PWaEIaxlBCWrTf1snJuLjyubAyoL70Dyedc7hMkRznGMNcDXKQcb
+ vGmkSNNAv8G8W1NNv3zJV0Lscdh9iaSWiFElyvq0xKHqtI.bSLuugnqW65yYjMPtVhGHlf_v9EGX
+ G2zu1Qj5HM8inwQXEpJz8YaQxmms6r9nHlXFNmKR.nvsjU636Mzn5xNWtZwY45JJvhqLd4Ye1WZG
+ UlM1HtMGwsAh7NULeOIpDUJkDvItV4nAehEFeSfX_JnBfElLtxmjztLeKyYnHVmXRyrNpjJPCKNI
+ v38i3uePHnU3opzX1iGJLim7L.KqApTKKW5Wuz3PRMhHNGq6HmhTfJYi.x6El59Gv7chg9yzMG1F
+ s44EdVk8EydIE0FTPri_EmXMi5ULKadRW3dLU3cDKpX7bJLTn6ErWjCG2ADyQrwKSTtzl3XEvMqE
+ eM6yhW7Uvm4FsxnWycxhZBPVF_SgGNsBfGVWbl_59vvFYcAtkr.bNoWYvf7CQUOueIfgu1n_IxGA
+ 4P1l6ZY4fyofTDm0Fi7PJgmqUmbCSiYsnfuJo7cWCsHezygmmsbg3EO7_FCYRYqgJ0IoJ2BKc.e9
+ FUoqFlkYpfvtbjDFVmS2KO5vF_y5NjTJtnseXzXFvnSANvnWOPS2FTAeWNPzv6I.l020iwyCg.RD
+ gF4sWosWkFF1_GUZaPv4hDXjyJUjv_zQMuukGgPssUxxanAssaPk4Tfyha5XkmqULvOLk6IOAUW6
+ SkRaq.DiSKUDwcpTjmo62Klvl4GuMfEgij5g6J_rBRbjWEwmEr4P1CqP8T0DtPKag7wyy9apGRrQ
+ V.Rsp1n2JIjxRn46KjugiTzvpyx51pLjqlSLfCxu_A52IL0y2yX8GA9PZLTGSV2gT1M6armcPnmG
+ aiHv5KjDcdNCbxy2kAkvfUTFqJBtIQrJzcFsXSIANdapyN3190L2JQtqYLZq_AQNERLngWS5ym8x
+ .wxdKjTHo4qOi73iULxEyK36kD0Yr1F2cx1NRu5ZWrOk9.a1XO_2cqzG3HE1s1JLmA5aP4CCcwSa
+ uUsQZeqMYWW8Y5ROi.yQgIe6yl_p5PZE6ae5dEuu0mLQAa8cH_uPR7m8vwtck7LhevGAzvFsnD4Q
+ v3Qj2CxgZC_Ea1ATbWEqYaDxZKFMJB3to6.xwHqsgrpFlrZ3d.Y3Pm89KvPWIFoClDej14xPSfqi
+ lb7PTS3ZiBV_W0OtqQ4egR3eEsQQYBhEthY97H1ITiHiBUXw5L5iw4aEsc4alqi7IuyhvQ6b1JNP
+ 6NdOzLj7yDIPKzhg55h9TGtjQaFsdpdyEIs5B8ZMda2dEDPR8_s3inl7WneRTZSi.hV08yVo3n4M
+ TgTlMfiUfL9x4SamrC5_rId53s8nG0nOskz_lwCJsNMjAx9WxfjFLE3xoevVwWtycpn0OgdWHcWP
+ CZWPFVE0SucP73Bz__pMWc2RE5ihlX4n3qXrpdb_nzKBvD3B16NUwzMg0Cn4h3qnBL126Vfi9E8g
+ Mc7KyOal2hrWXatGGV07grNs7LwGQu918KSrUVYWOEfRu07WuGs7ISN9Y18Xsyjspq4KphcHQzos
+ pdsRm_.SjXDxd.S85iefBphliQbOLEiHfybX6QaBL6AMFnBVj93wJR7_X_7t1oUvY5ARufoZlo3t
+ UOFZk73w8pO_FQrZC8SJ6swWB1kkgnD_Fjme6VGSQEyOSYRF_VFXyehwFrZV.uAX16jGzAmlMN17
+ v7Vmp1c8JLmSEmgePHFpo.d.6a4lCPS9ISKB.hGwWyLW8mnPvuYzgGcsJsGuOOvFT0uP5SVrE2Wv
+ lCkX9wNuQ44_axNWXaOUEerIwggYBk1iAMWTPnuhz7.bDLg--
+X-Sonic-MF: <astrajoan@yahoo.com>
+X-Sonic-ID: b2ff0c9c-1ec2-4d56-a5fe-eb4080422660
+Received: from sonic.gate.mail.ne1.yahoo.com by sonic301.consmr.mail.gq1.yahoo.com with HTTP; Wed, 2 Aug 2023 17:47:53 +0000
+Received: by hermes--production-gq1-7d844d8954-l5pzx (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID d660ccb3d71ff4bfca7672ad34843e29;
+          Wed, 02 Aug 2023 17:47:49 +0000 (UTC)
+From: Ziqi Zhao <astrajoan@yahoo.com>
+To: syzbot+622bba18029bcde672e1@syzkaller.appspotmail.com,
+	astrajoan@yahoo.com,
+	jani.nikula@linux.intel.com,
+	airlied@gmail.com,
+	daniel@ffwll.ch,
+	dri-devel@lists.freedesktop.org,
+	ivan.orlov0322@gmail.com,
+	maarten.lankhorst@linux.intel.com,
+	mripard@kernel.org,
+	skhan@linuxfoundation.org,
+	tzimmermann@suse.de
+Cc: davem@davemloft.net,
+	dsahern@kernel.org,
+	edumazet@google.com,
+	jacob.e.keller@intel.com,
+	jiri@nvidia.com,
+	kuba@kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	syzkaller-bugs@googlegroups.com
+Subject: [PATCH v3] drm/modes: Fix division by zero due to overflow
+Date: Wed,  2 Aug 2023 10:47:46 -0700
+Message-Id: <20230802174746.2256-1-astrajoan@yahoo.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <00000000000034cf5d05fea52dd4@google.com>
+References: <00000000000034cf5d05fea52dd4@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Wed,  2 Aug 2023 10:48:57 +0800 Wei Fang wrote:
-> The XDP_TX feature is not supported before, and all the frames
-> which are deemed to do XDP_TX action actually do the XDP_DROP
-> action. So this patch adds the XDP_TX support to FEC driver.
-> 
-> I tested the performance of XDP_TX feature in XDP_DRV and XDP_SKB
-> modes on i.MX8MM-EVK and i.MX8MP-EVK platforms respectively, and
-> the test steps and results are as follows.
+In the bug reported by Syzbot, the variable `den == (1 << 22)` and
+`mode->vscan == (1 << 10)`, causing the multiplication to overflow and
+accidentally make `den == 0`. To prevent any chance of overflow, we
+replace `num` and `den` with 64-bit unsigned integers, and explicitly
+check if the divisor `den` will overflow. If so, we employ full 64-bit
+division with rounding; otherwise we keep the 64-bit to 32-bit division
+that could potentially be better optimized.
 
-There were changes requested on v3, so marking it as
-pw-bot: changes-requested
+In order to minimize the performance overhead, the overflow check for
+`den` is wrapped with an `unlikely` condition. Please let me know if
+this usage is appropriate.
+
+Reported-by: syzbot+622bba18029bcde672e1@syzkaller.appspotmail.com
+Signed-off-by: Ziqi Zhao <astrajoan@yahoo.com>
+---
+V1 -> V2: address style comments suggested by Jani Nikula
+<jani.nikula@linux.intel.com>
+V2 -> V3: change title to include context on overflow causing the
+division by zero
+
+ drivers/gpu/drm/drm_modes.c | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/gpu/drm/drm_modes.c b/drivers/gpu/drm/drm_modes.c
+index ac9a406250c5..137101960690 100644
+--- a/drivers/gpu/drm/drm_modes.c
++++ b/drivers/gpu/drm/drm_modes.c
+@@ -1285,13 +1285,13 @@ EXPORT_SYMBOL(drm_mode_set_name);
+  */
+ int drm_mode_vrefresh(const struct drm_display_mode *mode)
+ {
+-	unsigned int num, den;
++	u64 num, den;
+ 
+ 	if (mode->htotal == 0 || mode->vtotal == 0)
+ 		return 0;
+ 
+-	num = mode->clock;
+-	den = mode->htotal * mode->vtotal;
++	num = mul_u32_u32(mode->clock, 1000);
++	den = mul_u32_u32(mode->htotal, mode->vtotal);
+ 
+ 	if (mode->flags & DRM_MODE_FLAG_INTERLACE)
+ 		num *= 2;
+@@ -1300,7 +1300,10 @@ int drm_mode_vrefresh(const struct drm_display_mode *mode)
+ 	if (mode->vscan > 1)
+ 		den *= mode->vscan;
+ 
+-	return DIV_ROUND_CLOSEST_ULL(mul_u32_u32(num, 1000), den);
++	if (unlikely(den > UINT_MAX))
++		return DIV64_U64_ROUND_CLOSEST(num, den);
++
++	return DIV_ROUND_CLOSEST_ULL(num, (u32) den);
+ }
+ EXPORT_SYMBOL(drm_mode_vrefresh);
+ 
+-- 
+2.34.1
+
 
