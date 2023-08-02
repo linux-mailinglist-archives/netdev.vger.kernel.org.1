@@ -1,127 +1,150 @@
-Return-Path: <netdev+bounces-23526-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23527-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5746D76C5B2
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 08:52:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 023DF76C5E9
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 08:56:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3198A1C21194
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 06:52:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A9D0D281746
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 06:56:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A4DE185B;
-	Wed,  2 Aug 2023 06:52:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89A7B185B;
+	Wed,  2 Aug 2023 06:56:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A3021111;
-	Wed,  2 Aug 2023 06:52:16 +0000 (UTC)
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCE962D53;
-	Tue,  1 Aug 2023 23:51:45 -0700 (PDT)
-Received: by mail-pl1-x62b.google.com with SMTP id d9443c01a7336-1bbd2761f1bso54462795ad.2;
-        Tue, 01 Aug 2023 23:51:45 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EB721111
+	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 06:56:36 +0000 (UTC)
+Received: from mail-ed1-x52e.google.com (mail-ed1-x52e.google.com [IPv6:2a00:1450:4864:20::52e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA1EC1AC
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 23:56:32 -0700 (PDT)
+Received: by mail-ed1-x52e.google.com with SMTP id 4fb4d7f45d1cf-5222c5d71b8so9158074a12.2
+        for <netdev@vger.kernel.org>; Tue, 01 Aug 2023 23:56:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690959102; x=1691563902;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=7ZOYz5tJWIm5wwiu4clNWQAkqTwhMrt2CWLKqUdg8b0=;
-        b=IzeHwt2JyZr1omnyxl/9LlDPoarPSoZBsZtf6OM5pnMbxIsuze+GLyevO8tgqGqZ/2
-         dK4ubBy95WuUpzappL98/g6mN2HXuvZw9m7kv6ySU2eYa3pQ3y7o3uRuxoEzVyApW56Y
-         HOeO9G+M8qSJkVOHsRIa2Ofvrl6n2Fz6Obb7I5fiJamdEE0ffosKXAwT+YZBDhGGMEcb
-         H6abgTo8k1KZJ5K9oKQntO/ARoDtc+Rerdvb+xQAIUsF76Atq3xe9JeoH1pfUWYpqeIz
-         g4N7+mgwH3CfTTBmcIfgO8/toINwvbh1V+3QtFzTzz5rigL8Ia3lGCGe8vDYzIIHl6I6
-         xhZg==
+        d=fairphone.com; s=fair; t=1690959391; x=1691564191;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=jUzJB+BG9RWYTDdVbtJXTjUaZZLqj4Uowx0i8AONLTw=;
+        b=l4+MfpYfZRWgAvFL59TuqxRwKN3tBGtKvfwKpSyrfRyu+7nwyMrx9ILWQWLNKf32OG
+         FUtfn0xMrlGBtubo2AdyaBgxbz2yLFhQXM/dIbwDT/RowOhLwejXUk3a/OlXPawY5N+p
+         q/29IRT5KSR7Jq9s0cXptycUP7XEvN+vQfND0VLUFtzxxdAADqQX27UQya7N42KpLk/Z
+         rmrSsGjxpCjOlqn8F5+O9sEZMWHFFjAD46FGdFdfOtVQQWaKvWdzuE1MKSbfi98fD4cw
+         +sziTQw3Q1keXmQGtd+7cgMIQ8MQg+GQZ3ttgek9Jl563UPAC+VsLBy6lZCbDaYcJ/yA
+         b3JA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690959102; x=1691563902;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7ZOYz5tJWIm5wwiu4clNWQAkqTwhMrt2CWLKqUdg8b0=;
-        b=ANURGCDyaETQAX4QJrBcWZQ3iQhl9MFMmNce/W4xagrfuqlEC83mXJm1d6X/7f1MLm
-         oU1rXSLq7Ib5koA3qyw0SVu/oolL7sZ5IysTShsWqXZIcxdna6K0PattyDS2Hn7bIr3y
-         HvxiOQMV6uZ039B6BZ8mLbH2X+rIfbsVllGTNgOvAlEh7PQXb1k+PZzEzUqtaKwE0doU
-         k4Bgo/zrKOGz0p9s5px9zkNYgEctNN5MVHyfX7tTPNxCmVj6qx/UitKLJkI6M4SQKVys
-         UwF2OmVni+10yGf/LGPvqygBhcGpgQfrnZwwSdwA3B1twZ3bH8hCG7b3z/GyRtFGch7A
-         s3XA==
-X-Gm-Message-State: ABy/qLYQZ5CTRhzuN73oqmVwy+sAV1PL8iraYZ72FSlpUVr+LjY1Ir9M
-	H5zQwYXivfFfqhR8j2/I6hA/JdaCI94D2I9W
-X-Google-Smtp-Source: APBJJlHPUMf6CpGNUzLl+072yFaIiU/Vjiu2Lyni6TT2M0vLzGFtjD/rY1bYh8RKhME4IwbsD7lD6g==
-X-Received: by 2002:a17:902:c20c:b0:1b8:adc:7c3d with SMTP id 12-20020a170902c20c00b001b80adc7c3dmr15322879pll.40.1690959102532;
-        Tue, 01 Aug 2023 23:51:42 -0700 (PDT)
-Received: from [10.22.68.111] ([122.11.166.8])
-        by smtp.gmail.com with ESMTPSA id g8-20020a1709029f8800b001a80ad9c599sm11496477plq.294.2023.08.01.23.51.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 01 Aug 2023 23:51:42 -0700 (PDT)
-Message-ID: <1483f6db-35a8-849b-9bda-00ad5aa81eff@gmail.com>
-Date: Wed, 2 Aug 2023 14:51:35 +0800
+        d=1e100.net; s=20221208; t=1690959391; x=1691564191;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=jUzJB+BG9RWYTDdVbtJXTjUaZZLqj4Uowx0i8AONLTw=;
+        b=WA3Uc6bwlEF0e7F+VSWPXlUfVEeEa+c1C4/LOWF85+3JkvxkOkqvahUBnFyO+eRwZl
+         wF0JMBjYG7m8url1uM4VVWejVyX33RZ0W9q2ZFRQK3lwd9STxMcCFYlBtTJl9lSd7d67
+         HqzRivk5wWWaZKLb4IHt/Xr17mTRs6MDYNkoCsta8vFN/V80Ft5TMTLlPRVyK+6VB0yD
+         zp/nDZnWSGxSDqA+xIk75cM7NqPK2w0UTKLeAgsaxTiR8Au/L1zaO7929qSdGhd7uuVz
+         zp4yIwjL2D5WjHryiRWWD9ugjKvD9LCM6ghRVJNF2ll2c6RhEXWXb937zoSVfgj4Kz4N
+         81eg==
+X-Gm-Message-State: ABy/qLZvy9JJTQ/iAzfmBY1IT4gWbtFa9dy8EQt9Y/drpabMLdxfTMsb
+	gyB4GBOlkvMfJov7FM7ygfyMGw==
+X-Google-Smtp-Source: APBJJlGi5fmP0zp7K4DR2MMoxvj+mltvijlg3OwvuFffod4okhkoMLCJtNXJIomfMjOXylY05fNUEg==
+X-Received: by 2002:a17:907:1dca:b0:997:beca:f9db with SMTP id og10-20020a1709071dca00b00997becaf9dbmr4051637ejc.54.1690959391375;
+        Tue, 01 Aug 2023 23:56:31 -0700 (PDT)
+Received: from [172.16.240.113] (144-178-202-138.static.ef-service.nl. [144.178.202.138])
+        by smtp.gmail.com with ESMTPSA id e1-20020a1709062c0100b0099bd5b72d93sm8567400ejh.43.2023.08.01.23.56.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 01 Aug 2023 23:56:31 -0700 (PDT)
+From: Luca Weiss <luca.weiss@fairphone.com>
+Subject: [PATCH v3 0/2] Add WCN3988 Bluetooth support for Fairphone 4
+Date: Wed, 02 Aug 2023 08:56:27 +0200
+Message-Id: <20230802-fp4-bluetooth-v3-0-7c9e7a6e624b@fairphone.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.13.0
-Subject: Re: [PATCH bpf-next v5 1/2] bpf, xdp: Add tracepoint to xdp attaching
- failure
-Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net,
- john.fastabend@gmail.com, andrii@kernel.org, martin.lau@linux.dev,
- song@kernel.org, yonghong.song@linux.dev, kpsingh@kernel.org,
- sdf@google.com, haoluo@google.com, jolsa@kernel.org, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, hawk@kernel.org,
- rostedt@goodmis.org, mhiramat@kernel.org, mykolal@fb.com, shuah@kernel.org,
- tangyeechou@gmail.com, kernel-patches-bot@fb.com,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linux-trace-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-References: <20230801142621.7925-1-hffilwlqm@gmail.com>
- <20230801142621.7925-2-hffilwlqm@gmail.com>
- <20230801150826.6f617919@kernel.org>
-From: Leon Hwang <hffilwlqm@gmail.com>
-In-Reply-To: <20230801150826.6f617919@kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,HK_RANDOM_ENVFROM,
-	HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-	version=3.4.6
+X-B4-Tracking: v=1; b=H4sIABv+yWQC/32NQQ7CIBQFr9KwFvMLaLEr72FcAP0VkgoNtETT9
+ O7SLk10OZO8eQtJGB0m0lYLiZhdcsEX4IeKGKv8A6nrChMGjINgNe1HQfUw4xTCZKnmZwUoG30
+ xkpSNVgmpjsobW1Z+HoYix4i9e+0nt3th69IU4nv/zPVmf+VzTYGC4IBcNQiKXXvl4miDx6MJT
+ 7LVMvtbYKXAO5QCupOQHL8L67p+AI7Xl8cFAQAA
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>, 
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
+ Marcel Holtmann <marcel@holtmann.org>, 
+ Johan Hedberg <johan.hedberg@gmail.com>, 
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+ Andy Gross <agross@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
+ Konrad Dybcio <konrad.dybcio@linaro.org>, 
+ Conor Dooley <conor+dt@kernel.org>, 
+ Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, 
+ Rocky Liao <quic_rjliao@quicinc.com>
+Cc: ~postmarketos/upstreaming@lists.sr.ht, phone-devel@vger.kernel.org, 
+ netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
+ linux-arm-msm@vger.kernel.org, Luca Weiss <luca.weiss@fairphone.com>, 
+ Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+X-Mailer: b4 0.12.3
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+Add support in the btqca/hci_qca driver for the WCN3988 and add it to
+the sm7225 Fairphone 4 devicetree.
 
+Devicetree patches go via Qualcomm tree, the rest via their respective
+trees.
 
-On 2/8/23 06:08, Jakub Kicinski wrote:
-> On Tue,  1 Aug 2023 22:26:20 +0800 Leon Hwang wrote:
->> When error happens in dev_xdp_attach(), it should have a way to tell
->> users the error message like the netlink approach.
->>
->> To avoid breaking uapi, adding a tracepoint in bpf_xdp_link_attach() is
->> an appropriate way to notify users the error message.
->>
->> Hence, bpf libraries are able to retrieve the error message by this
->> tracepoint, and then report the error message to users.
-> 
-> Whatevered-by: Jakub Kicinski <kuba@kernel.org> ?
+--
+Previously with the RFC version I've had problems before with Bluetooth
+scanning failing like the following:
 
-Oh, it's not responsible for libraries to retrieve the error message. It
-should be users' responsibility.
+  [bluetooth]# scan on
+  Failed to start discovery: org.bluez.Error.InProgress
 
-Sorry for the misguiding text.
+  [  202.371374] Bluetooth: hci0: Opcode 0x200b failed: -16
 
-In the previous patch[0], which changes uapi, it's able to back-propagate
-the error message from dev_xdp_attach() to userspace through BPF syscall.
-Then, tracepoint idea is suggested to avoid changing uapi. I do agree to
-implement a tracepoint to avoid changing uapi.
+This appears to only happen with driver built-in (=y) when the supported
+local commands list doesn't get updated in the Bluetooth core and
+use_ext_scan() returning false. I'll try to submit this separately since
+this now works well enough with =m. But in both cases (=y, =m) it's
+behaving a bit weirdly before (re-)setting the MAC address with "sudo
+btmgmt public-addr fo:oo:ba:ar"
 
-[0] bpf: Introduce user log
-https://lore.kernel.org/bpf/20230708040750.72570-1-hffilwlqm@gmail.com/
+Signed-off-by: Luca Weiss <luca.weiss@fairphone.com>
+---
+Changes in v3:
+- Drop applied patches and resend
+- Link to v2: https://lore.kernel.org/r/20230421-fp4-bluetooth-v2-0-3de840d5483e@fairphone.com
 
-Thanks,
-Leon
+Changes in v2:
+- Add pinctrl & 'tlmm 64' irq to uart node
+- Pick up tags
+- Link to v1: https://lore.kernel.org/r/20230421-fp4-bluetooth-v1-0-0430e3a7e0a2@fairphone.com
+
+---
+Luca Weiss (2):
+      dt-bindings: net: qualcomm: Add WCN3988
+      Bluetooth: btqca: Add WCN3988 support
+
+ .../bindings/net/bluetooth/qualcomm-bluetooth.yaml          |  2 ++
+ drivers/bluetooth/btqca.c                                   | 13 +++++++++++--
+ drivers/bluetooth/btqca.h                                   | 12 ++++++++++--
+ drivers/bluetooth/hci_qca.c                                 | 12 ++++++++++++
+ 4 files changed, 35 insertions(+), 4 deletions(-)
+---
+base-commit: 7093f04e534f48181e5d5fccbcf99c37ab96929a
+change-id: 20230421-fp4-bluetooth-b36a0e87b9c8
+
+Best regards,
+-- 
+Luca Weiss <luca.weiss@fairphone.com>
+
 
