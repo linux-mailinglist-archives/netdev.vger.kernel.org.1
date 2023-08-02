@@ -1,92 +1,62 @@
-Return-Path: <netdev+bounces-23752-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23753-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37BF876D5EF
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 19:48:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 97B1076D5F7
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 19:48:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0CD3D1C21312
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 17:48:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C8B771C2130D
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 17:48:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04379100D3;
-	Wed,  2 Aug 2023 17:48:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94D73100C6;
+	Wed,  2 Aug 2023 17:48:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC926100A7
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 17:48:12 +0000 (UTC)
-Received: from sonic301-22.consmr.mail.gq1.yahoo.com (sonic301-22.consmr.mail.gq1.yahoo.com [98.137.64.148])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A405E210D
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 10:47:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1690998473; bh=OvuQPE46agxmaX4ufGOdmLd8LE0zMezBwedxqC/ssqw=; h=From:To:Cc:Subject:Date:In-Reply-To:References:From:Subject:Reply-To; b=M6aPuYefANa5Jsgpuq2nTXNRT5F3V7cBj53s61a4dPwDw4iHxsofdSskTnbQ7I8Tm7XwO0DfTj8LwEpGbRbkImF4fbrgQ0fKAMOEDfyr2fQXR1zv/IC5uazhNJb75P5ZMSs8E5Dpl5I1LDU9yq1mKL1QABWRh2PBaGX9Z9i+S/u9RX9Vxl6P4Efm4Jbajbfkbk6ys/jHbKrTKIAONGnNO0zSacS4jr4Ylu//2CrG3hHFlsRzEoz1f+7zxKWDeoAPnizzMrub78XDF70FJWgmjXt4ZqPBQxX9J23e8AL01d3sxExbwt1ABlKJtinNseyMlR/myafLsW2t+MszhB0UbQ==
-X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1690998473; bh=FvQKECw4HKjVLkGGj4p6k9A3opvxAU8ZaWBeQTbDO1Q=; h=X-Sonic-MF:From:To:Subject:Date:From:Subject; b=RDugM32pV+Uk12puK8hDM1B9hUbhh1TuHniH2Zp11e47BxZUft5DH8D5/04eD+B6v6HgQ05RMwHdR5eiRzNEQbG3XeicSFammzp+0XUvO+tdMuzn5qFt2AQtPEoAW2q6eM5KhQv11DNtaZNKhp4ukZQB9zxolIPns4+ld+IF5KPhX2nDSiRUP4Bhmmq0ApjCrKPjmeLwNjQVYnGyrdQX8M221Alj2Ihna9x8xQArHzxNxvWt/n9bMtkaD9KBuX3NmDPDg7m/TaY0NOpz0N79pEH/dmKGgBri/j/IjlfVTzLVhWX4ekXn3YfBJhKq1lYSMwQ9Wt7OW09lIrnnOu392Q==
-X-YMail-OSG: iWFIk8UVM1l6bIZ3uCO2wLC_eGhTV_F3Mf3yRyQRuLzxL8vZlHWqLcGDqxA.5Ss
- AWUV2chj4Gs6Px1w4TkRgmc7BhS4N7uVk791I_rHXdyT2nDV2unT75MQBkQm7dGfyB8fIFdazhjh
- eEifOlaslOa25.ARP8XKd8DRoQYEX7rDoPSJV5z6HnSqlxH.VNn69pGHyv7_EFwPeyyESy1wIhbs
- DC7_T1OKGaZdDSZME9V2FDxu4dvEGq4tzEa7vfCpYxQCANJvzKfbpshyU76qN9xSOB9CCihAnBpA
- 906mOM6Za1QtEXGbBO3erekoL4jZTUTPfWY7gVYKWalwLDSDLJ3.3Ptzc8UbpDCvzKf7tA6YArYM
- rw8INImzeFoexHvo6XN6H0QsUcwLvBxU7rjJRZbUlN4OSHbW1Ly4aQD7fcmaMqkVBii6G1EjEAuT
- gpLY5SBfO.KbY6WgsfaMxJM4PWaEIaxlBCWrTf1snJuLjyubAyoL70Dyedc7hMkRznGMNcDXKQcb
- vGmkSNNAv8G8W1NNv3zJV0Lscdh9iaSWiFElyvq0xKHqtI.bSLuugnqW65yYjMPtVhGHlf_v9EGX
- G2zu1Qj5HM8inwQXEpJz8YaQxmms6r9nHlXFNmKR.nvsjU636Mzn5xNWtZwY45JJvhqLd4Ye1WZG
- UlM1HtMGwsAh7NULeOIpDUJkDvItV4nAehEFeSfX_JnBfElLtxmjztLeKyYnHVmXRyrNpjJPCKNI
- v38i3uePHnU3opzX1iGJLim7L.KqApTKKW5Wuz3PRMhHNGq6HmhTfJYi.x6El59Gv7chg9yzMG1F
- s44EdVk8EydIE0FTPri_EmXMi5ULKadRW3dLU3cDKpX7bJLTn6ErWjCG2ADyQrwKSTtzl3XEvMqE
- eM6yhW7Uvm4FsxnWycxhZBPVF_SgGNsBfGVWbl_59vvFYcAtkr.bNoWYvf7CQUOueIfgu1n_IxGA
- 4P1l6ZY4fyofTDm0Fi7PJgmqUmbCSiYsnfuJo7cWCsHezygmmsbg3EO7_FCYRYqgJ0IoJ2BKc.e9
- FUoqFlkYpfvtbjDFVmS2KO5vF_y5NjTJtnseXzXFvnSANvnWOPS2FTAeWNPzv6I.l020iwyCg.RD
- gF4sWosWkFF1_GUZaPv4hDXjyJUjv_zQMuukGgPssUxxanAssaPk4Tfyha5XkmqULvOLk6IOAUW6
- SkRaq.DiSKUDwcpTjmo62Klvl4GuMfEgij5g6J_rBRbjWEwmEr4P1CqP8T0DtPKag7wyy9apGRrQ
- V.Rsp1n2JIjxRn46KjugiTzvpyx51pLjqlSLfCxu_A52IL0y2yX8GA9PZLTGSV2gT1M6armcPnmG
- aiHv5KjDcdNCbxy2kAkvfUTFqJBtIQrJzcFsXSIANdapyN3190L2JQtqYLZq_AQNERLngWS5ym8x
- .wxdKjTHo4qOi73iULxEyK36kD0Yr1F2cx1NRu5ZWrOk9.a1XO_2cqzG3HE1s1JLmA5aP4CCcwSa
- uUsQZeqMYWW8Y5ROi.yQgIe6yl_p5PZE6ae5dEuu0mLQAa8cH_uPR7m8vwtck7LhevGAzvFsnD4Q
- v3Qj2CxgZC_Ea1ATbWEqYaDxZKFMJB3to6.xwHqsgrpFlrZ3d.Y3Pm89KvPWIFoClDej14xPSfqi
- lb7PTS3ZiBV_W0OtqQ4egR3eEsQQYBhEthY97H1ITiHiBUXw5L5iw4aEsc4alqi7IuyhvQ6b1JNP
- 6NdOzLj7yDIPKzhg55h9TGtjQaFsdpdyEIs5B8ZMda2dEDPR8_s3inl7WneRTZSi.hV08yVo3n4M
- TgTlMfiUfL9x4SamrC5_rId53s8nG0nOskz_lwCJsNMjAx9WxfjFLE3xoevVwWtycpn0OgdWHcWP
- CZWPFVE0SucP73Bz__pMWc2RE5ihlX4n3qXrpdb_nzKBvD3B16NUwzMg0Cn4h3qnBL126Vfi9E8g
- Mc7KyOal2hrWXatGGV07grNs7LwGQu918KSrUVYWOEfRu07WuGs7ISN9Y18Xsyjspq4KphcHQzos
- pdsRm_.SjXDxd.S85iefBphliQbOLEiHfybX6QaBL6AMFnBVj93wJR7_X_7t1oUvY5ARufoZlo3t
- UOFZk73w8pO_FQrZC8SJ6swWB1kkgnD_Fjme6VGSQEyOSYRF_VFXyehwFrZV.uAX16jGzAmlMN17
- v7Vmp1c8JLmSEmgePHFpo.d.6a4lCPS9ISKB.hGwWyLW8mnPvuYzgGcsJsGuOOvFT0uP5SVrE2Wv
- lCkX9wNuQ44_axNWXaOUEerIwggYBk1iAMWTPnuhz7.bDLg--
-X-Sonic-MF: <astrajoan@yahoo.com>
-X-Sonic-ID: b2ff0c9c-1ec2-4d56-a5fe-eb4080422660
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic301.consmr.mail.gq1.yahoo.com with HTTP; Wed, 2 Aug 2023 17:47:53 +0000
-Received: by hermes--production-gq1-7d844d8954-l5pzx (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID d660ccb3d71ff4bfca7672ad34843e29;
-          Wed, 02 Aug 2023 17:47:49 +0000 (UTC)
-From: Ziqi Zhao <astrajoan@yahoo.com>
-To: syzbot+622bba18029bcde672e1@syzkaller.appspotmail.com,
-	astrajoan@yahoo.com,
-	jani.nikula@linux.intel.com,
-	airlied@gmail.com,
-	daniel@ffwll.ch,
-	dri-devel@lists.freedesktop.org,
-	ivan.orlov0322@gmail.com,
-	maarten.lankhorst@linux.intel.com,
-	mripard@kernel.org,
-	skhan@linuxfoundation.org,
-	tzimmermann@suse.de
-Cc: davem@davemloft.net,
-	dsahern@kernel.org,
-	edumazet@google.com,
-	jacob.e.keller@intel.com,
-	jiri@nvidia.com,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	syzkaller-bugs@googlegroups.com
-Subject: [PATCH v3] drm/modes: Fix division by zero due to overflow
-Date: Wed,  2 Aug 2023 10:47:46 -0700
-Message-Id: <20230802174746.2256-1-astrajoan@yahoo.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <00000000000034cf5d05fea52dd4@google.com>
-References: <00000000000034cf5d05fea52dd4@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88350DF58
+	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 17:48:27 +0000 (UTC)
+Received: from smtp-fw-52002.amazon.com (smtp-fw-52002.amazon.com [52.119.213.150])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E95001A7
+	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 10:48:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1690998499; x=1722534499;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=LjGdhKnSEpz7GuoPqgGksur3IehHzd+SOqJE7JZW4eQ=;
+  b=qgWAUVd6OWNBxtIYk/K8eUxstPq61OMDdFV31v47xb3FPeSbWaLseiYH
+   RuDDOhuRgVp4lIU3QpCkg3I32zVwWNwE3jeWz0PuzSsPyQwj8Fq9OFllI
+   4/y/OpJC1Y/q2ElgFNYyrvd8shBgcTca+tKjDGqCHsyqBtwcSTc0kSdnq
+   A=;
+X-IronPort-AV: E=Sophos;i="6.01,249,1684800000"; 
+   d="scan'208";a="575717688"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-iad-1e-m6i4x-245b69b1.us-east-1.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-52002.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2023 17:48:18 +0000
+Received: from EX19MTAUWC001.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
+	by email-inbound-relay-iad-1e-m6i4x-245b69b1.us-east-1.amazon.com (Postfix) with ESMTPS id 3981434016F;
+	Wed,  2 Aug 2023 17:48:15 +0000 (UTC)
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Wed, 2 Aug 2023 17:48:02 +0000
+Received: from 88665a182662.ant.amazon.com (10.142.140.92) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Wed, 2 Aug 2023 17:48:00 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <edumazet@google.com>
+CC: <davem@davemloft.net>, <dsahern@kernel.org>, <eric.dumazet@gmail.com>,
+	<kuba@kernel.org>, <kuniyu@amazon.com>, <netdev@vger.kernel.org>,
+	<pabeni@redhat.com>, <ycheng@google.com>
+Subject: Re: [PATCH net 6/6] tcp_metrics: fix data-race in tcpm_suck_dst() vs fastopen
+Date: Wed, 2 Aug 2023 10:47:51 -0700
+Message-ID: <20230802174751.54502-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20230802131500.1478140-7-edumazet@google.com>
+References: <20230802131500.1478140-7-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -94,70 +64,94 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Originating-IP: [10.142.140.92]
+X-ClientProxiedBy: EX19D032UWB003.ant.amazon.com (10.13.139.165) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Precedence: Bulk
+X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,T_SCC_BODY_TEXT_LINE,T_SPF_PERMERROR autolearn=no
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-In the bug reported by Syzbot, the variable `den == (1 << 22)` and
-`mode->vscan == (1 << 10)`, causing the multiplication to overflow and
-accidentally make `den == 0`. To prevent any chance of overflow, we
-replace `num` and `den` with 64-bit unsigned integers, and explicitly
-check if the divisor `den` will overflow. If so, we employ full 64-bit
-division with rounding; otherwise we keep the 64-bit to 32-bit division
-that could potentially be better optimized.
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed,  2 Aug 2023 13:15:00 +0000
+> Whenever tcpm_new() reclaims an old entry, tcpm_suck_dst()
+> would overwrite data that could be read from tcp_fastopen_cache_get()
+> or tcp_metrics_fill_info().
+> 
+> We need to acquire fastopen_seqlock to maintain consistency.
+> 
+> For newly allocated objects, tcpm_new() can switch to kzalloc()
+> to avoid an extra fastopen_seqlock acquisition.
+> 
+> Fixes: 1fe4c481ba63 ("net-tcp: Fast Open client - cookie cache")
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Cc: Yuchung Cheng <ycheng@google.com>
 
-In order to minimize the performance overhead, the overflow check for
-`den` is wrapped with an `unlikely` condition. Please let me know if
-this usage is appropriate.
+Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
-Reported-by: syzbot+622bba18029bcde672e1@syzkaller.appspotmail.com
-Signed-off-by: Ziqi Zhao <astrajoan@yahoo.com>
----
-V1 -> V2: address style comments suggested by Jani Nikula
-<jani.nikula@linux.intel.com>
-V2 -> V3: change title to include context on overflow causing the
-division by zero
 
- drivers/gpu/drm/drm_modes.c | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/gpu/drm/drm_modes.c b/drivers/gpu/drm/drm_modes.c
-index ac9a406250c5..137101960690 100644
---- a/drivers/gpu/drm/drm_modes.c
-+++ b/drivers/gpu/drm/drm_modes.c
-@@ -1285,13 +1285,13 @@ EXPORT_SYMBOL(drm_mode_set_name);
-  */
- int drm_mode_vrefresh(const struct drm_display_mode *mode)
- {
--	unsigned int num, den;
-+	u64 num, den;
- 
- 	if (mode->htotal == 0 || mode->vtotal == 0)
- 		return 0;
- 
--	num = mode->clock;
--	den = mode->htotal * mode->vtotal;
-+	num = mul_u32_u32(mode->clock, 1000);
-+	den = mul_u32_u32(mode->htotal, mode->vtotal);
- 
- 	if (mode->flags & DRM_MODE_FLAG_INTERLACE)
- 		num *= 2;
-@@ -1300,7 +1300,10 @@ int drm_mode_vrefresh(const struct drm_display_mode *mode)
- 	if (mode->vscan > 1)
- 		den *= mode->vscan;
- 
--	return DIV_ROUND_CLOSEST_ULL(mul_u32_u32(num, 1000), den);
-+	if (unlikely(den > UINT_MAX))
-+		return DIV64_U64_ROUND_CLOSEST(num, den);
-+
-+	return DIV_ROUND_CLOSEST_ULL(num, (u32) den);
- }
- EXPORT_SYMBOL(drm_mode_vrefresh);
- 
--- 
-2.34.1
-
+> ---
+>  net/ipv4/tcp_metrics.c | 9 +++++----
+>  1 file changed, 5 insertions(+), 4 deletions(-)
+> 
+> diff --git a/net/ipv4/tcp_metrics.c b/net/ipv4/tcp_metrics.c
+> index 4fd274836a48f73d0b1206adfa14c17c3b28bc30..99ac5efe244d3c654deaa8f8c0fffeeb5d5597b1 100644
+> --- a/net/ipv4/tcp_metrics.c
+> +++ b/net/ipv4/tcp_metrics.c
+> @@ -93,6 +93,7 @@ static struct tcpm_hash_bucket	*tcp_metrics_hash __read_mostly;
+>  static unsigned int		tcp_metrics_hash_log __read_mostly;
+>  
+>  static DEFINE_SPINLOCK(tcp_metrics_lock);
+> +static DEFINE_SEQLOCK(fastopen_seqlock);
+>  
+>  static void tcpm_suck_dst(struct tcp_metrics_block *tm,
+>  			  const struct dst_entry *dst,
+> @@ -129,11 +130,13 @@ static void tcpm_suck_dst(struct tcp_metrics_block *tm,
+>  	tcp_metric_set(tm, TCP_METRIC_REORDERING,
+>  		       dst_metric_raw(dst, RTAX_REORDERING));
+>  	if (fastopen_clear) {
+> +		write_seqlock(&fastopen_seqlock);
+>  		tm->tcpm_fastopen.mss = 0;
+>  		tm->tcpm_fastopen.syn_loss = 0;
+>  		tm->tcpm_fastopen.try_exp = 0;
+>  		tm->tcpm_fastopen.cookie.exp = false;
+>  		tm->tcpm_fastopen.cookie.len = 0;
+> +		write_sequnlock(&fastopen_seqlock);
+>  	}
+>  }
+>  
+> @@ -194,7 +197,7 @@ static struct tcp_metrics_block *tcpm_new(struct dst_entry *dst,
+>  		}
+>  		tm = oldest;
+>  	} else {
+> -		tm = kmalloc(sizeof(*tm), GFP_ATOMIC);
+> +		tm = kzalloc(sizeof(*tm), GFP_ATOMIC);
+>  		if (!tm)
+>  			goto out_unlock;
+>  	}
+> @@ -204,7 +207,7 @@ static struct tcp_metrics_block *tcpm_new(struct dst_entry *dst,
+>  	tm->tcpm_saddr = *saddr;
+>  	tm->tcpm_daddr = *daddr;
+>  
+> -	tcpm_suck_dst(tm, dst, true);
+> +	tcpm_suck_dst(tm, dst, reclaim);
+>  
+>  	if (likely(!reclaim)) {
+>  		tm->tcpm_next = tcp_metrics_hash[hash].chain;
+> @@ -556,8 +559,6 @@ bool tcp_peer_is_proven(struct request_sock *req, struct dst_entry *dst)
+>  	return ret;
+>  }
+>  
+> -static DEFINE_SEQLOCK(fastopen_seqlock);
+> -
+>  void tcp_fastopen_cache_get(struct sock *sk, u16 *mss,
+>  			    struct tcp_fastopen_cookie *cookie)
+>  {
+> -- 
+> 2.41.0.640.ga95def55d0-goog
 
