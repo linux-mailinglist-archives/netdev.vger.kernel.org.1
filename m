@@ -1,176 +1,287 @@
-Return-Path: <netdev+bounces-23561-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23562-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 391A676C7AD
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 09:58:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A99D76C7C5
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 10:01:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E1FFF281D47
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 07:58:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AFDD71C2122A
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 08:01:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2ACF7482;
-	Wed,  2 Aug 2023 07:53:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5385B53A6;
+	Wed,  2 Aug 2023 08:01:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 962BD7476
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 07:53:23 +0000 (UTC)
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2057.outbound.protection.outlook.com [40.107.92.57])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86B4B4483
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 00:53:22 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=KfG4Oh66OY6zeUYX1Prs2abh1EHnZL3DAOzHRvc3c1SvCPjR/r7RPogZJKSI3e4n6ZPOEMlxIhoOJrsxJrhiDlb4ujJZaHzdgFXR13wJtB6/jW86Ufjvb3nLVR2cIfU8ZPXpieSIxWU6OsuAnAR7NJ027KtTVPaL5FD5MMqdCSFIpYrgncXtjig5AQLCW3X8EAg/xbByUlfe4X+q0fkwbPWd9UPtNWsxMyohZRZXA7FYWdF3YS+GK0TaPbgjz1xsio8yYelnt4SBqNJbalfeSVc//NqkJ02w0CJ/YfJcRGbQqHKzUcAep7LrdJviSFuVrXNGBJP8F4NXi7KSYyX7xA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=hY4LdH3HUJjXdfHMOCXvQlivPPQzWf2Vzu6e96uaQ48=;
- b=FSc29mzCBKL/x5/gr/YnTCVPbSU8YrtBnh8ADLzs3SkxMo4AM3aAC1jCDCqtMhf9tyMSXpBQJcSKnU3Ncb52PHozYPlegv60/MyajmthKjpEZZOA74NdyPP6jb7fBY3ty/8JR7vhHn7Htrpn+b7lHHbq8k/KI8a3LR7bXSjCnkVQrDwZAPCzpycObYV5eBUoDiMfPbAldr6vqopOIQf0ApCQG3gxVR/cl4FBgELeF3Ex79S7N4VpacXnoCwt//OQDfKh3ZLX3DzWcpvkAnLROU3wBMrMk3lebbSxjth5BzNShmWxMQed3I7zEXH28tm5OC6F27dATmU9XChcF0HFwA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=hY4LdH3HUJjXdfHMOCXvQlivPPQzWf2Vzu6e96uaQ48=;
- b=R5ruXfGJITrPIiHpMSg56EOCWDqqaZatYFyqkSelhL40tJlLDlyE3AnEC9cXO2x2BUu7Xdi7mbU/iQ82pspdoOW7XLjRKY49KAcY54FuTv/hKg6jVC7awU7x1mE4fxFpgR+Gz/6vFu+iYFZQ/pJRVDDIPul5bTbYhlGNNL9BwYI6ht67yhmmAbbK7O6UpMqSIQM5Rb5zao2WrjlDqGApyhEhMIb46e9XIShyW0V+6I8+Yk3np5pYawJUICx+opaObbXcJ+YrWzYt3JdGh7waLKhi03lOCvExzlBAA0BY6QnjzWueWMEQUbCGL2rt5ZbesIPblmD2faR2q+xzU91Riw==
-Received: from DM6PR07CA0090.namprd07.prod.outlook.com (2603:10b6:5:337::23)
- by IA1PR12MB7733.namprd12.prod.outlook.com (2603:10b6:208:423::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.43; Wed, 2 Aug
- 2023 07:53:20 +0000
-Received: from CY4PEPF0000EE30.namprd05.prod.outlook.com
- (2603:10b6:5:337:cafe::79) by DM6PR07CA0090.outlook.office365.com
- (2603:10b6:5:337::23) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.47 via Frontend
- Transport; Wed, 2 Aug 2023 07:53:20 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- CY4PEPF0000EE30.mail.protection.outlook.com (10.167.242.36) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6652.19 via Frontend Transport; Wed, 2 Aug 2023 07:53:20 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Wed, 2 Aug 2023
- 00:53:08 -0700
-Received: from dev-r-vrt-155.mtr.labs.mlnx (10.126.230.35) by
- rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.37; Wed, 2 Aug 2023 00:53:05 -0700
-From: Ido Schimmel <idosch@nvidia.com>
-To: <netdev@vger.kernel.org>
-CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<edumazet@google.com>, <petrm@nvidia.com>, <razor@blackwall.org>,
-	<mirsad.todorovac@alu.unizg.hr>, Ido Schimmel <idosch@nvidia.com>
-Subject: [PATCH net 17/17] selftests: forwarding: bridge_mdb: Make test more robust
-Date: Wed, 2 Aug 2023 10:51:18 +0300
-Message-ID: <20230802075118.409395-18-idosch@nvidia.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20230802075118.409395-1-idosch@nvidia.com>
-References: <20230802075118.409395-1-idosch@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 459241FB3
+	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 08:01:19 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2DAD10A
+	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 01:01:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1690963262;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=oX2LNKOIHdzcvnsRpFJ7qJD3bKveDIMqdWllDVDTcVI=;
+	b=ADSwuRADFLW5WWoiH4B2cT7Xf1InnjDDRFetFK91C+phEo0r4o+Af0lelKR9fIOCEkQu0i
+	0TElJhiS4nR4LBEYQPksE1FZXzyGteQ09dgvFxhYzsqFeGNzKHZABbJzIZ9IHNFkn7Lejc
+	eLxu4ZY/YlfaW44QhtYlZgzsH3EZOu8=
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
+ [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-554-IFMuwZ39PN6eeq9PZvN3gQ-1; Wed, 02 Aug 2023 04:00:39 -0400
+X-MC-Unique: IFMuwZ39PN6eeq9PZvN3gQ-1
+Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-40fd444be73so19956281cf.3
+        for <netdev@vger.kernel.org>; Wed, 02 Aug 2023 01:00:39 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690963239; x=1691568039;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=oX2LNKOIHdzcvnsRpFJ7qJD3bKveDIMqdWllDVDTcVI=;
+        b=ZZmgn8BVdsb51wLrdhIxMrrPmz5AcBpmXhYodaIgjAsDUAD42x9ZYqsuQ3j92VCXww
+         hDhmibNX1OS80aU0UKsyY3vSVyWafYZyRNmXsw/y+WYefXM3zS7aco15bYug/E47fgof
+         Y/LfuP/a1bu4YNGjfhEbctT4ogZ8aaBso+dFZvX9r26zfQSEYrLXtMI+Oz1SIzTkHDi1
+         Pu5fibSIQc5X+3bEHRVS5jHQh2Grz2+LDBMmeycKXTDlho9SZRLvGcf179u1yassxxpl
+         ewePJT5w/N7/YjwLfr7FZvKGTWNMjZ4rrRjwus1Mwrt6JHrTZdRL+vxgttSnH7xHY+n3
+         5UlQ==
+X-Gm-Message-State: ABy/qLYQpoENh7Efl3URARNLKjOwRvVxmlbDtKuBYICgFxzU3SuTJ1tv
+	Zw+CuMh6WgxcdX+4+MJfL3w4d7unv+8AO88+m1zVrwiSCnl6fdkwZFC6DmpAhHaghkNu0rJxJxo
+	p2V3jTPwDtQk94sL0
+X-Received: by 2002:a05:622a:208:b0:403:b12b:908d with SMTP id b8-20020a05622a020800b00403b12b908dmr22409157qtx.8.1690963239451;
+        Wed, 02 Aug 2023 01:00:39 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlGrOKV3rYZOQ8uyqLMK5NY1CIny88EL3WOMwRsqXwVgCP9aOiPOtdVkUVSrpY7PwwrzUZO25A==
+X-Received: by 2002:a05:622a:208:b0:403:b12b:908d with SMTP id b8-20020a05622a020800b00403b12b908dmr22409133qtx.8.1690963239236;
+        Wed, 02 Aug 2023 01:00:39 -0700 (PDT)
+Received: from sgarzare-redhat (host-82-57-51-214.retail.telecomitalia.it. [82.57.51.214])
+        by smtp.gmail.com with ESMTPSA id g8-20020ac87748000000b00401217aa51dsm5074523qtu.76.2023.08.02.01.00.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Aug 2023 01:00:38 -0700 (PDT)
+Date: Wed, 2 Aug 2023 10:00:34 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Bobby Eshleman <bobby.eshleman@bytedance.com>, kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kernel@sberdevices.ru, 
+	oxffffaa@gmail.com
+Subject: Re: [RFC PATCH v1 2/2] test/vsock: shutdowned socket test
+Message-ID: <76yecufn7766obfi5zae5hpg6yrlestrqocnk56jgnukakkdds@rqbgbhh7xgck>
+References: <20230801141727.481156-1-AVKrasnov@sberdevices.ru>
+ <20230801141727.481156-3-AVKrasnov@sberdevices.ru>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.126.230.35]
-X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE30:EE_|IA1PR12MB7733:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3f6d5761-baab-4f05-666f-08db932d8a3c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	IEc2hYnSQRbD1zoOMbNdGOLhQzVv43YGS2I30rYt+0zUod1VuHUs8AYHSEdS1tdEO/o2V+84+1aXC4v2WE1VOMcbTZM49KGV6wGO94eeqsLgOAHq6l+Z7z64KoAZO0qI9CzrN1GYh4LuKpzwwD6IKeZZvYlHzuMXG0jWJe/LsyMqLYDw5z5fFDjh0Zs1YZwokoUeDJohDEpyvUfGROe20MRrpalHU5/Di4HUqCGxXlOAGqx6NVf+A3ZSAv19G6nzRgk1nJzaPS/GzcCx035Gls2blBeev5ysQ5obUYH5MV8TSiz1dXi/djpSk9lsmhp33/HpE6AoPH20yKOJrYOWn8vpPE+yTwMpwYMECKwT6R3q4VQTynQ830YXiIm4QnDiRIK/Elqn4OjZXiIq+H84u3PJAgqoI/1p0Xf8BVDFnNILmsd75rYtlxaGR42K7OFouc9z5SALi5wLvE5a05on27yPBEaga5RQ3oEqbSC4xc/46jaOQqrEAP7dUDrYok4vyaWlrrwzUS123Ai8ZxB2QNwJap/Nud8a9Zndb0sWvWtWFY7tL8+Ri/Pqa+CFuLNXTXDJqay2MfYdcNNZgg8mBFsWUaHgPZTtIcQxJZ5lJKS5WblaGnjCCc0eMUKvwHYb0fwB+4BP1FHbwM4mWOb9/JH+jt6BarIh94nTp7z3LscyIXIJbYyZeRQjXz+Xi6naWKtUVN3PTOE3aRbxZ7KDP8bMyd3lhmZXKhfFP/DZDjHNfNJbK16G8oXvI7lHYyFMWoj5+5qK5QE8lgJ9u8c5fT7pTVcx1gjqvA75shYlZWw=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(346002)(39860400002)(396003)(376002)(136003)(451199021)(82310400008)(46966006)(40470700004)(36840700001)(4326008)(41300700001)(8936002)(5660300002)(6916009)(70586007)(70206006)(8676002)(40480700001)(2906002)(54906003)(478600001)(316002)(107886003)(6666004)(40460700003)(966005)(186003)(82740400003)(356005)(7636003)(1076003)(26005)(16526019)(47076005)(36756003)(2616005)(83380400001)(426003)(36860700001)(336012)(86362001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Aug 2023 07:53:20.3676
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3f6d5761-baab-4f05-666f-08db932d8a3c
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CY4PEPF0000EE30.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB7733
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.6
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20230801141727.481156-3-AVKrasnov@sberdevices.ru>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Some test cases check that the group timer is (or isn't) 0. Instead of
-grepping for "0.00" grep for " 0.00" as the former can also match
-"260.00" which is the default group membership interval.
+On Tue, Aug 01, 2023 at 05:17:27PM +0300, Arseniy Krasnov wrote:
+>This adds two tests for 'shutdown()' call. It checks that SIGPIPE is
+>sent when MSG_NOSIGNAL is not set and vice versa. Both flags SHUT_WR
+>and SHUT_RD are tested.
+>
+>Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+>---
+> tools/testing/vsock/vsock_test.c | 138 +++++++++++++++++++++++++++++++
+> 1 file changed, 138 insertions(+)
+>
+>diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
+>index 90718c2fd4ea..21d40a8d881c 100644
+>--- a/tools/testing/vsock/vsock_test.c
+>+++ b/tools/testing/vsock/vsock_test.c
+>@@ -19,6 +19,7 @@
+> #include <time.h>
+> #include <sys/mman.h>
+> #include <poll.h>
+>+#include <signal.h>
+>
+> #include "timeout.h"
+> #include "control.h"
+>@@ -1170,6 +1171,133 @@ static void test_seqpacket_msg_peek_server(const struct test_opts *opts)
+> 	return test_msg_peek_server(opts, true);
+> }
+>
+>+static bool have_sigpipe;
+                  ^
+We should define it as `volatile sig_atomic_t`:
 
-Fixes: b6d00da08610 ("selftests: forwarding: Add bridge MDB test")
-Reported-by: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
-Closes: https://lore.kernel.org/netdev/adc5e40d-d040-a65e-eb26-edf47dac5b02@alu.unizg.hr/
-Signed-off-by: Ido Schimmel <idosch@nvidia.com>
-Tested-by: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
----
- tools/testing/selftests/net/forwarding/bridge_mdb.sh | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+the behavior is undefined if the signal handler refers to any object
+[CX] [Option Start]  other than errno [Option End]  with static storage
+duration other than by assigning a value to an object declared as
+volatile sig_atomic_t
 
-diff --git a/tools/testing/selftests/net/forwarding/bridge_mdb.sh b/tools/testing/selftests/net/forwarding/bridge_mdb.sh
-index 4853b8e4f8d3..d0c6c499d5da 100755
---- a/tools/testing/selftests/net/forwarding/bridge_mdb.sh
-+++ b/tools/testing/selftests/net/forwarding/bridge_mdb.sh
-@@ -617,7 +617,7 @@ __cfg_test_port_ip_sg()
- 		grep -q "permanent"
- 	check_err $? "Entry not added as \"permanent\" when should"
- 	bridge -d -s mdb show dev br0 vid 10 | grep "$grp_key" | \
--		grep -q "0.00"
-+		grep -q " 0.00"
- 	check_err $? "\"permanent\" entry has a pending group timer"
- 	bridge mdb del dev br0 port $swp1 $grp_key vid 10
- 
-@@ -626,7 +626,7 @@ __cfg_test_port_ip_sg()
- 		grep -q "temp"
- 	check_err $? "Entry not added as \"temp\" when should"
- 	bridge -d -s mdb show dev br0 vid 10 | grep "$grp_key" | \
--		grep -q "0.00"
-+		grep -q " 0.00"
- 	check_fail $? "\"temp\" entry has an unpending group timer"
- 	bridge mdb del dev br0 port $swp1 $grp_key vid 10
- 
-@@ -659,7 +659,7 @@ __cfg_test_port_ip_sg()
- 		grep -q "permanent"
- 	check_err $? "Entry not marked as \"permanent\" after replace"
- 	bridge -d -s mdb show dev br0 vid 10 | grep "$grp_key" | \
--		grep -q "0.00"
-+		grep -q " 0.00"
- 	check_err $? "Entry has a pending group timer after replace"
- 
- 	bridge mdb replace dev br0 port $swp1 $grp_key vid 10 temp
-@@ -667,7 +667,7 @@ __cfg_test_port_ip_sg()
- 		grep -q "temp"
- 	check_err $? "Entry not marked as \"temp\" after replace"
- 	bridge -d -s mdb show dev br0 vid 10 | grep "$grp_key" | \
--		grep -q "0.00"
-+		grep -q " 0.00"
- 	check_fail $? "Entry has an unpending group timer after replace"
- 	bridge mdb del dev br0 port $swp1 $grp_key vid 10
- 
--- 
-2.40.1
+https://pubs.opengroup.org/onlinepubs/9699919799/functions/signal.html
+
+The rest LGTM!
+
+Thanks,
+Stefano
+
+>+
+>+static void sigpipe(int signo)
+>+{
+>+	have_sigpipe = true;
+>+}
+>+
+>+static void test_stream_check_sigpipe(int fd)
+>+{
+>+	ssize_t res;
+>+
+>+	have_sigpipe = false;
+>+
+>+	res = send(fd, "A", 1, 0);
+>+	if (res != -1) {
+>+		fprintf(stderr, "expected send(2) failure, got %zi\n", res);
+>+		exit(EXIT_FAILURE);
+>+	}
+>+
+>+	if (!have_sigpipe) {
+>+		fprintf(stderr, "SIGPIPE expected\n");
+>+		exit(EXIT_FAILURE);
+>+	}
+>+
+>+	have_sigpipe = false;
+>+
+>+	res = send(fd, "A", 1, MSG_NOSIGNAL);
+>+	if (res != -1) {
+>+		fprintf(stderr, "expected send(2) failure, got %zi\n", res);
+>+		exit(EXIT_FAILURE);
+>+	}
+>+
+>+	if (have_sigpipe) {
+>+		fprintf(stderr, "SIGPIPE not expected\n");
+>+		exit(EXIT_FAILURE);
+>+	}
+>+}
+>+
+>+static void test_stream_shutwr_client(const struct test_opts *opts)
+>+{
+>+	int fd;
+>+
+>+	struct sigaction act = {
+>+		.sa_handler = sigpipe,
+>+	};
+>+
+>+	sigaction(SIGPIPE, &act, NULL);
+>+
+>+	fd = vsock_stream_connect(opts->peer_cid, 1234);
+>+	if (fd < 0) {
+>+		perror("connect");
+>+		exit(EXIT_FAILURE);
+>+	}
+>+
+>+	if (shutdown(fd, SHUT_WR)) {
+>+		perror("shutdown");
+>+		exit(EXIT_FAILURE);
+>+	}
+>+
+>+	test_stream_check_sigpipe(fd);
+>+
+>+	control_writeln("CLIENTDONE");
+>+
+>+	close(fd);
+>+}
+>+
+>+static void test_stream_shutwr_server(const struct test_opts *opts)
+>+{
+>+	int fd;
+>+
+>+	fd = vsock_stream_accept(VMADDR_CID_ANY, 1234, NULL);
+>+	if (fd < 0) {
+>+		perror("accept");
+>+		exit(EXIT_FAILURE);
+>+	}
+>+
+>+	control_expectln("CLIENTDONE");
+>+
+>+	close(fd);
+>+}
+>+
+>+static void test_stream_shutrd_client(const struct test_opts *opts)
+>+{
+>+	int fd;
+>+
+>+	struct sigaction act = {
+>+		.sa_handler = sigpipe,
+>+	};
+>+
+>+	sigaction(SIGPIPE, &act, NULL);
+>+
+>+	fd = vsock_stream_connect(opts->peer_cid, 1234);
+>+	if (fd < 0) {
+>+		perror("connect");
+>+		exit(EXIT_FAILURE);
+>+	}
+>+
+>+	control_expectln("SHUTRDDONE");
+>+
+>+	test_stream_check_sigpipe(fd);
+>+
+>+	control_writeln("CLIENTDONE");
+>+
+>+	close(fd);
+>+}
+>+
+>+static void test_stream_shutrd_server(const struct test_opts *opts)
+>+{
+>+	int fd;
+>+
+>+	fd = vsock_stream_accept(VMADDR_CID_ANY, 1234, NULL);
+>+	if (fd < 0) {
+>+		perror("accept");
+>+		exit(EXIT_FAILURE);
+>+	}
+>+
+>+	if (shutdown(fd, SHUT_RD)) {
+>+		perror("shutdown");
+>+		exit(EXIT_FAILURE);
+>+	}
+>+
+>+	control_writeln("SHUTRDDONE");
+>+	control_expectln("CLIENTDONE");
+>+
+>+	close(fd);
+>+}
+>+
+> static struct test_case test_cases[] = {
+> 	{
+> 		.name = "SOCK_STREAM connection reset",
+>@@ -1250,6 +1378,16 @@ static struct test_case test_cases[] = {
+> 		.run_client = test_seqpacket_msg_peek_client,
+> 		.run_server = test_seqpacket_msg_peek_server,
+> 	},
+>+	{
+>+		.name = "SOCK_STREAM SHUT_WR",
+>+		.run_client = test_stream_shutwr_client,
+>+		.run_server = test_stream_shutwr_server,
+>+	},
+>+	{
+>+		.name = "SOCK_STREAM SHUT_RD",
+>+		.run_client = test_stream_shutrd_client,
+>+		.run_server = test_stream_shutrd_server,
+>+	},
+> 	{},
+> };
+>
+>-- 
+>2.25.1
+>
 
 
