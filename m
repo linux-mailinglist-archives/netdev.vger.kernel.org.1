@@ -1,98 +1,158 @@
-Return-Path: <netdev+bounces-23597-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23598-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A59D76CA72
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 12:06:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92BAF76CA88
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 12:11:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3CDAD1C20EDF
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 10:06:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A2F30281C86
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 10:10:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9F7C63C6;
-	Wed,  2 Aug 2023 10:06:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A18A63CD;
+	Wed,  2 Aug 2023 10:10:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDF0C6AA1
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 10:06:10 +0000 (UTC)
-Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94BE610D2
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 03:06:09 -0700 (PDT)
-Received: by mail-wm1-x336.google.com with SMTP id 5b1f17b1804b1-3fe12820bffso41850525e9.3
-        for <netdev@vger.kernel.org>; Wed, 02 Aug 2023 03:06:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690970768; x=1691575568;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=eBDOVrUpzIFbZzQrcbiGwS/yYS5ar/ORWcEmd0pJOmk=;
-        b=smT/kOMy8tlW27XeLcZIAZ50TQbt497n55jkvfKH6Q3m9L11aDOL+Hcq8wzbA7IulO
-         9k+rIINVvVJUVplwyiFWvHgXFPfrbTNUbrZ8yy9CuafWGfOdWVqYqfvkw1/NYy9zefrX
-         A+O7PR3ahqgezrd9qIGQgnRNunJNRvUMR6G44I1Nd/h7FVQCcpAgLU5yOxrbpBNEY/V7
-         ak6di7bc9vN60xGPHHcoi5bDgJTBvUfhY6VD+pKupjPbKkReSte6ZAoQCjiMlxqJG8/b
-         dOQp4337z7YNsmavZGgRcynAqQlMtg8QfsBAtK+EnGValWZH4Z5dbJToGgsmhqP/FlhF
-         +eoA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690970768; x=1691575568;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eBDOVrUpzIFbZzQrcbiGwS/yYS5ar/ORWcEmd0pJOmk=;
-        b=TSrHZ38fTfhqmgHJjPawuHlBERBM5PcER0zEQXrvwIpWDDPq/gs33vg4zmJ3iC8iYC
-         ETGuwHFDPqVvMuStgpYQYEkiHcqHV31Iwcw8AoKoNKIenl9Vs6za0moI9GRPKo49GY5t
-         JtFqbE/CP504Z6HM9c5d2gQptSV+V1R+qXQhZ9DhXoF01omfGgMikX6qQA47ZdtksVHm
-         jxqaSyApwtbqlyaS6/OI6c5YszAewy/Pa+lup6KGNjKMMeQVEp16jJGLkP+k+Pqp66rK
-         /qHgKfLDl8T6niktC3k77Qk3uFDMHcObncJD3eJj0wMoI31YjhupA5XDTYj/Z6tmEiM6
-         gcQQ==
-X-Gm-Message-State: ABy/qLb4kXEDJE0copvYHtUDzGM4ixPfan/QBvYCjf+gune/3TsCo3p3
-	+CoSdx98SNIZ8PlKF4aC4NU=
-X-Google-Smtp-Source: APBJJlF832W4ok/m5MgqUiMdfVV/fCQPKueuatB5TE9uw2KIm9ZcVOnvnWCAwbUmf9KvED1kui63fQ==
-X-Received: by 2002:a5d:464c:0:b0:317:7330:bd82 with SMTP id j12-20020a5d464c000000b003177330bd82mr4360383wrs.8.1690970767686;
-        Wed, 02 Aug 2023 03:06:07 -0700 (PDT)
-Received: from skbuf ([188.27.185.41])
-        by smtp.gmail.com with ESMTPSA id z1-20020adfd0c1000000b0031424f4ef1dsm18715961wrh.19.2023.08.02.03.06.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Aug 2023 03:06:07 -0700 (PDT)
-Date: Wed, 2 Aug 2023 13:06:05 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Kurt Kanzenbach <kurt@linutronix.de>
-Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next] net: dsa: hellcreek: Replace bogus comment
-Message-ID: <20230802100605.b2o2yafjsdflndpi@skbuf>
-References: <20230801131647.84697-1-kurt@linutronix.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BFBB63A3
+	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 10:10:57 +0000 (UTC)
+Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 418C9211B;
+	Wed,  2 Aug 2023 03:10:55 -0700 (PDT)
+From: Kurt Kanzenbach <kurt@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1690971052;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=O3flfNg7D3xDoacIyuCI9Tv6Ia0JzLVFeGS0pO9j6hc=;
+	b=lCcwn+4dDNiakaikCPd2NRCJcwoRItNDzrmThzLoywqqDYp7HfD1V9RNpnqmN11+0wX23O
+	do0T01D47qno0jZQbT2Aynk7OqfhvuqBKeW0KMajE8HH25docPlL9J++RyfSfxwjoVW9K0
+	EAfwd5jFfATDzdIiVx3u9Lm9zeQJbK+ZToxlVi3qUMUduOCeYOhno3JRa1xlh8iwFtMNpV
+	srZP6R/k+Z79S7rqpq1tPbEJymDc7WXJgWJz1t3V/TpxgF29bsp7QyfgqMH5zY8ZwHZYL5
+	cz2A724eTdfIHGmV3FiA7mLpnP3w+BsiViM31XMknAplqhHwpg2hlrsSl4mV/g==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1690971052;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=O3flfNg7D3xDoacIyuCI9Tv6Ia0JzLVFeGS0pO9j6hc=;
+	b=AA0b0nIT91SHfhSeCVwZv1JCnRBTwk9kar1m+JPxGBdwU5gHLHVW0umEXE6SihZK0R4R2X
+	YM5YnK1Esun1x2CA==
+To: Johannes Zink <j.zink@pengutronix.de>, Giuseppe Cavallaro
+ <peppe.cavallaro@st.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin
+ <mcoquelin.stm32@gmail.com>, Richard Cochran <richardcochran@gmail.com>,
+ Russell King <linux@armlinux.org.uk>
+Cc: patchwork-jzi@pengutronix.de, netdev@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ kernel@pengutronix.de, kernel test robot <lkp@intel.com>, Johannes Zink
+ <j.zink@pengutronix.de>
+Subject: Re: [PATCH v3 0/2] net: stmmac: correct MAC propagation delay
+In-Reply-To: <20230719-stmmac_correct_mac_delay-v3-0-61e63427735e@pengutronix.de>
+References: <20230719-stmmac_correct_mac_delay-v3-0-61e63427735e@pengutronix.de>
+Date: Wed, 02 Aug 2023 12:10:51 +0200
+Message-ID: <87fs51kb4k.fsf@kurt>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230801131647.84697-1-kurt@linutronix.de>
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha512; protocol="application/pgp-signature"
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Aug 01, 2023 at 03:16:47PM +0200, Kurt Kanzenbach wrote:
-> Replace bogus comment about matching the latched timestamp to one of the
-> received frames. That comment is probably copied from mv88e6xxx and true for
-> these switches. However, the hellcreek switch is configured to insert the
-> timestamp directly into the PTP packets.
-> 
-> While here, remove the other comments regarding the list splicing and locking as
-> well, because it doesn't add any value.
-> 
-> Signed-off-by: Kurt Kanzenbach <kurt@linutronix.de>
-> ---
+--=-=-=
+Content-Type: text/plain
 
-Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
+On Tue Aug 01 2023, Johannes Zink wrote:
+> ---
+> Changes in v3:
+> - work in Richard's review feedback. Thank you for reviewing my patch:
+>   - as some of the hardware may have no or invalid correction value
+>     registers: introduce feature switch which can be enabled in the glue
+>     code drivers depending on the actual hardware support
+>   - only enable the feature on the i.MX8MP for the time being, as the patch
+>     improves timing accuracy and is tested for this hardware
+> - Link to v2: https://lore.kernel.org/r/20230719-stmmac_correct_mac_delay-v2-1-3366f38ee9a6@pengutronix.de
+>
+> Changes in v2:
+> - fix builds for 32bit, this was found by the kernel build bot
+> 	Reported-by: kernel test robot <lkp@intel.com>
+> 	Closes: https://lore.kernel.org/oe-kbuild-all/202307200225.B8rmKQPN-lkp@intel.com/
+> - while at it also fix an overflow by shifting a u32 constant from macro by 10bits
+>   by casting the constant to u64
+> - Link to v1: https://lore.kernel.org/r/20230719-stmmac_correct_mac_delay-v1-1-768aa4d09334@pengutronix.de
+>
+> ---
+> Johannes Zink (2):
+>       net: stmmac: correct MAC propagation delay
+>       net: stmmac: dwmac-imx: enable MAC propagation delay correction for i.MX8MP
+
+Tested on imx8mp <-> TSN Switch <-> x86 with i225:
+
+Before your patch:
+
+|ptp4l -i eth0 -f configs/gPTP.cfg --summary_interval=5 -m
+|ptp4l[139.274]: rms    9 max   27 freq +29264 +/-  13 delay   347 +/-   2
+|ptp4l[171.279]: rms   10 max   24 freq +29257 +/-  13 delay   344 +/-   2
+|ptp4l[203.283]: rms   10 max   24 freq +29254 +/-  13 delay   347 +/-   2
+|ptp4l[235.288]: rms    9 max   24 freq +29255 +/-  13 delay   346 +/-   1
+|ptp4l[267.292]: rms    9 max   28 freq +29257 +/-  13 delay   347 +/-   2
+
+After:
+
+|ptp4l -i eth0 -f configs/gPTP.cfg --summary_interval=5 -m
+|ptp4l[214.186]: rms    9 max   29 freq +28868 +/-  16 delay   326 +/-   2
+|ptp4l[246.190]: rms    8 max   22 freq +28902 +/-  15 delay   329 +/-   2
+|ptp4l[278.194]: rms    9 max   24 freq +28930 +/-  15 delay   325 +/-   1
+|ptp4l[310.199]: rms    9 max   25 freq +28956 +/-  15 delay   327 +/-   3
+|ptp4l[342.203]: rms    9 max   27 freq +28977 +/-  14 delay   327 +/-   1
+
+And the derived register values:
+
+|[   15.864016] KURT: PTP_TS_INGR_CORR_NS: 3147483248 PTP_TS_INGR_CORR_SNS: 0
+|[   15.870862] KURT: PTP_TS_EGR_CORR_NS: 400 PTP_TS_EGR_CORR_SNS: 0
+|[   20.000962] KURT: PTP_TS_INGR_CORR_NS: 3147483636 PTP_TS_INGR_CORR_SNS: 0
+|[   20.007809] KURT: PTP_TS_EGR_CORR_NS: 12 PTP_TS_EGR_CORR_SNS: 0
+
+So, seems to work:
+
+Tested-by: Kurt Kanzenbach <kurt@linutronix.de> # imx8mp
+
+Thanks,
+Kurt
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAmTKK6sTHGt1cnRAbGlu
+dXRyb25peC5kZQAKCRDBk9HyqkZzgpH7D/9gvmG6+n49HSx1HFttoXKOeJBVJJO2
+BD3+idE7X5Uq6p5FErWUWpOgLRSYMrNTXYO3V/Z+MAaFoxiPm/mjnW0d5Angr2Hu
+8OW/krHNG8eupFVzJ7zVmdtY9Ct1bkcUCdOb6YEP53YMqbgnFogzrXL1Ym9PDuKL
+DcZjC4fLYZbpS+sqqEt7nPfHk6fWaSpGzLb7XsMFfH+xBQN4sA3XblSY9dmmiL98
+gNvCPkbpk6pRKwDpM46xefREyBOiocRbgtxbubuSI2t2858EbONQmam394axk52J
+qc/zf4LxGfAia8gtqtSqEMK+l4Xd3kkb1bKX1fFoZc2TLZExQDDUNC6UjAZwAl0n
+TMWi4g+qDKDFAcyszh3EQtRFx0LPj/HLmX9u9WTCt7DOP9MgKlNwMNuppTO6GT//
+yAw+0QYNyEebvge0z/ZkVn+zNZXCMSLyskkaa/CC4p9pjfp/IuUJyUhfnDIL+Svn
+2WoB2IU7AqKPDAeVJI/rx8LNftu8KgAL1Z7SKOYpW42nWPv7wH17W3hgil56YTk6
+mzAyIHWu90aFePMXrLrbPHoAdGJiHxLHIiwjkzzowInj7Pk/QiplYYtUaCJAZioh
+NMWO3PBMVdGInW6ys9pZsDSf8MI3diR2aU7g02k7A666pCrx1ugCaYnx9cks59cv
+18dkcDquyqvDMA==
+=4fSs
+-----END PGP SIGNATURE-----
+--=-=-=--
 
