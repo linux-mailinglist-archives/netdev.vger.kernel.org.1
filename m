@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-23656-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23657-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90ABB76CF4D
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 15:57:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A00BE76CFCA
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 16:14:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 537B2281DD5
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 13:57:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 157D2281DB4
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 14:14:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48EBB79F0;
-	Wed,  2 Aug 2023 13:57:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E99A79F7;
+	Wed,  2 Aug 2023 14:14:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E109A7488
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 13:57:00 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56FCBC433C8;
-	Wed,  2 Aug 2023 13:56:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 020227488
+	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 14:14:02 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F09C9C433C7;
+	Wed,  2 Aug 2023 14:13:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690984620;
-	bh=nVYITZ3442VbPOgOxFRsX45Sw7B8Dvf9MYJFP4+/ATE=;
+	s=k20201202; t=1690985641;
+	bh=ixO3LW1/xG1Uw3thkOLsUVsmX4WxJS5JtOiOzZ6KopY=;
 	h=Date:Cc:Subject:To:References:From:In-Reply-To:From;
-	b=YeJlWpjoSfqKczx6p8jnSI9ynNyBUJege1FBpTi5Hb5AF0a6RFt1m6IUpqNfKrBbp
-	 DRika2vTcRKhdwnFDtXH8LzxU1xZjKsJF8ryQcuMaVvAb/HJMWGHj9Os9wyDv5/AkA
-	 UDvej7uuS5Pg3Pu1n+rNsI1jYLddm+XowPLS4awZS+ueyI+3BWQwJ13IQr6/p1ta18
-	 01um6QQ1ViFMo2vFWdMeUGfKzS1WbY3gBA/dHucMMd41cPOvUvTx+kEm0V6fVNAhLy
-	 KyVl2CvtLnh85pm6VVv0XCGO5/RBXCWsp9ynxnu31TlELRz2Tqc68Qajw+KCumW1CL
-	 OPPC4UZoY5nvA==
-Message-ID: <3a66abd7-690e-c15a-54dd-a0719fd723a1@kernel.org>
-Date: Wed, 2 Aug 2023 15:56:55 +0200
+	b=kAuYgegW0u5NM64phkQrrDrwF4h7B7xnXN7p6M/F8Cd2MBPO4F4ncJ0OmtVgZJd6n
+	 PpfcX8GuHc+9uqwDuCdBIgRYjUyPa+lqbOb+xeUHSAS1lcGeFoi3JpiWoN4Ag/trJS
+	 3Gssh3DwqDbyIPqIzi/ymfay+iI/x6/9y+t4vEd8SvqPUQXkFt17viu78FZyXoP0DF
+	 z/tX65EyO7MUu9U/wGTATJ/2GA1h0d2pcy6Jc4CE/g8tZnT6gDSk97ZTcMSSZ1Xpk3
+	 NzQmFE+TooPwhS+mlV7Yii3FF4Cqt8Y7D4f4kSl1sXBvMs0eAEqc75DJAVUZLUw0il
+	 aiV+0RKKtxCdA==
+Message-ID: <2cb34364-0d7c-cf0a-487f-c15ba6568ac8@kernel.org>
+Date: Wed, 2 Aug 2023 16:13:57 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -42,94 +42,104 @@ User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.13.0
 Cc: linux-kernel-mentees@lists.linuxfoundation.org,
  syzbot+f817490f5bd20541b90a@syzkaller.appspotmail.com
-Subject: Re: [PATCH v4 2/2] net: core: remove unnecessary frame_sz check in
- bpf_xdp_adjust_tail()
+Subject: Re: [PATCH v4 1/2] drivers: net: prevent tun_build_skb() to exceed
+ the packet size limit
 Content-Language: en-US
 To: Andrew Kanner <andrew.kanner@gmail.com>, davem@davemloft.net,
  edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
  jasowang@redhat.com, netdev@vger.kernel.org, dsahern@gmail.com,
  jbrouer@redhat.com, john.fastabend@gmail.com, linux-kernel@vger.kernel.org
 References: <20230801220710.464-1-andrew.kanner@gmail.com>
- <20230801220710.464-2-andrew.kanner@gmail.com>
 From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <20230801220710.464-2-andrew.kanner@gmail.com>
+In-Reply-To: <20230801220710.464-1-andrew.kanner@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 
 
 On 02/08/2023 00.07, Andrew Kanner wrote:
-> Syzkaller reported the following issue:
-> =======================================
-> Too BIG xdp->frame_sz = 131072
-> WARNING: CPU: 0 PID: 5020 at net/core/filter.c:4121
->    ____bpf_xdp_adjust_tail net/core/filter.c:4121 [inline]
-> WARNING: CPU: 0 PID: 5020 at net/core/filter.c:4121
->    bpf_xdp_adjust_tail+0x466/0xa10 net/core/filter.c:4103
-> ...
-> Call Trace:
->   <TASK>
->   bpf_prog_4add87e5301a4105+0x1a/0x1c
->   __bpf_prog_run include/linux/filter.h:600 [inline]
->   bpf_prog_run_xdp include/linux/filter.h:775 [inline]
->   bpf_prog_run_generic_xdp+0x57e/0x11e0 net/core/dev.c:4721
->   netif_receive_generic_xdp net/core/dev.c:4807 [inline]
->   do_xdp_generic+0x35c/0x770 net/core/dev.c:4866
->   tun_get_user+0x2340/0x3ca0 drivers/net/tun.c:1919
->   tun_chr_write_iter+0xe8/0x210 drivers/net/tun.c:2043
->   call_write_iter include/linux/fs.h:1871 [inline]
->   new_sync_write fs/read_write.c:491 [inline]
->   vfs_write+0x650/0xe40 fs/read_write.c:584
->   ksys_write+0x12f/0x250 fs/read_write.c:637
->   do_syscall_x64 arch/x86/entry/common.c:50 [inline]
->   do_syscall_64+0x38/0xb0 arch/x86/entry/common.c:80
->   entry_SYSCALL_64_after_hwframe+0x63/0xcd
+> Using the syzkaller repro with reduced packet size it was discovered
+> that XDP_PACKET_HEADROOM is not checked in tun_can_build_skb(),
+> although pad may be incremented in tun_build_skb(). This may end up
+> with exceeding the PAGE_SIZE limit in tun_build_skb().
 > 
-> xdp->frame_sz > PAGE_SIZE check was introduced in commit c8741e2bfe87
-> ("xdp: Allow bpf_xdp_adjust_tail() to grow packet size"). But Jesper
-> Dangaard Brouer <jbrouer@redhat.com> noted that after introducing the
-> xdp_init_buff() which all XDP driver use - it's safe to remove this
-> check. The original intend was to catch cases where XDP drivers have
-> not been updated to use xdp.frame_sz, but that is not longer a concern
-> (since xdp_init_buff).
-> 
-> Running the initial syzkaller repro it was discovered that the
-> contiguous physical memory allocation is used for both xdp paths in
-> tun_get_user(), e.g. tun_build_skb() and tun_alloc_skb(). It was also
-> stated by Jesper Dangaard Brouer <jbrouer@redhat.com> that XDP can
-> work on higher order pages, as long as this is contiguous physical
-> memory (e.g. a page).
-> 
-> Reported-and-tested-by: syzbot+f817490f5bd20541b90a@syzkaller.appspotmail.com
-> Closes: https://lore.kernel.org/all/000000000000774b9205f1d8a80d@google.com/T/
+> Fixes: 7df13219d757 ("tun: reserve extra headroom only when XDP is set")
 > Link: https://syzkaller.appspot.com/bug?extid=f817490f5bd20541b90a
-> Link: https://lore.kernel.org/all/20230725155403.796-1-andrew.kanner@gmail.com/T/
-> Fixes: 43b5169d8355 ("net, xdp: Introduce xdp_init_buff utility routine")
 > Signed-off-by: Andrew Kanner <andrew.kanner@gmail.com>
 > ---
-
-Acked-by: Jesper Dangaard Brouer <hawk@kernel.org>
-
-You can include that ACK in V5.
-
->   net/core/filter.c | 6 ------
->   1 file changed, 6 deletions(-)
 > 
-> diff --git a/net/core/filter.c b/net/core/filter.c
-> index 06ba0e56e369..28a59596987a 100644
-> --- a/net/core/filter.c
-> +++ b/net/core/filter.c
-> @@ -4116,12 +4116,6 @@ BPF_CALL_2(bpf_xdp_adjust_tail, struct xdp_buff *, xdp, int, offset)
->   	if (unlikely(data_end > data_hard_end))
->   		return -EINVAL;
+> Notes:
+>      v3 -> v4:
+>      * fall back to v1, fixing only missing XDP_PACKET_HEADROOM in pad and
+>        removing bpf_xdp_adjust_tail() check for frame_sz.
+>      * added rcu read lock, noted by Jason Wang <jasowang@redhat.com> in v1
+>      * I decided to leave the packet length check in tun_can_build_skb()
+>        instead of moving to tun_build_skb() suggested by Jason Wang
+>        <jasowang@redhat.com>. Otherwise extra packets will be dropped
+>        without falling back to tun_alloc_skb(). And in the discussion of v3
+>        Jesper Dangaard Brouer <jbrouer@redhat.com> noticed that XDP is ok
+>        with a higher order pages if it's a contiguous physical memory
+>        allocation, so falling to tun_alloc_skb() -> do_xdp_generic() should
+>        be ok.
+>      
+>      v2 -> v3:
+>      * attach the forgotten changelog
+>      
+>      v1 -> v2:
+>      * merged 2 patches in 1, fixing both issues: WARN_ON_ONCE with
+>        syzkaller repro and missing XDP_PACKET_HEADROOM in pad
+>      * changed the title and description of the execution path, suggested
+>        by Jason Wang <jasowang@redhat.com>
+>      * move the limit check from tun_can_build_skb() to tun_build_skb() to
+>        remove duplication and locking issue, and also drop the packet in
+>        case of a failed check - noted by Jason Wang <jasowang@redhat.com>
+> 
+>   drivers/net/tun.c | 11 ++++++++++-
+>   1 file changed, 10 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+> index d75456adc62a..a1d04bc9485f 100644
+> --- a/drivers/net/tun.c
+> +++ b/drivers/net/tun.c
+> @@ -1582,6 +1582,9 @@ static void tun_rx_batched(struct tun_struct *tun, struct tun_file *tfile,
+>   static bool tun_can_build_skb(struct tun_struct *tun, struct tun_file *tfile,
+>   			      int len, int noblock, bool zerocopy)
+>   {
+> +	struct bpf_prog *xdp_prog;
+> +	int pad = TUN_RX_PAD;
+> +
+>   	if ((tun->flags & TUN_TYPE_MASK) != IFF_TAP)
+>   		return false;
 >   
-> -	/* ALL drivers MUST init xdp->frame_sz, chicken check below */
-> -	if (unlikely(xdp->frame_sz > PAGE_SIZE)) {
-> -		WARN_ONCE(1, "Too BIG xdp->frame_sz = %d\n", xdp->frame_sz);
-> -		return -EINVAL;
-> -	}
-> -
->   	if (unlikely(data_end < xdp->data + ETH_HLEN))
->   		return -EINVAL;
+> @@ -1594,7 +1597,13 @@ static bool tun_can_build_skb(struct tun_struct *tun, struct tun_file *tfile,
+>   	if (zerocopy)
+>   		return false;
 >   
+> -	if (SKB_DATA_ALIGN(len + TUN_RX_PAD) +
+> +	rcu_read_lock();
+> +	xdp_prog = rcu_dereference(tun->xdp_prog);
+> +	if (xdp_prog)
+> +		pad += XDP_PACKET_HEADROOM;
+> +	rcu_read_unlock();
+> +
+
+Isolated seen, I guess, this is a correct fix to 7df13219d757.
+
+> +	if (SKB_DATA_ALIGN(len + pad) +
+>   	    SKB_DATA_ALIGN(sizeof(struct skb_shared_info)) > PAGE_SIZE)
+>   		return false;
+>   
+
+Question to Jason Wang:
+Why fall back (to e.g. tun_alloc_skb()) when size is above PAGE_SIZE?
+
+AFAIK tun_build_skb() *can* create get larger packets than PAGE_SIZE
+from it's page_frag.  Is there a reason for this limitation?
+
+(To Andrew, I assume a change in this area is another patch).
+
+--Jesper
+
+
+
 
