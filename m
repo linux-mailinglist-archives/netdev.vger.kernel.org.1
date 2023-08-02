@@ -1,103 +1,176 @@
-Return-Path: <netdev+bounces-23765-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23766-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D50F776D75F
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 21:02:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3E8476D768
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 21:07:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C126281A06
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 19:02:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DBA4E1C211D2
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 19:07:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AB96100DA;
-	Wed,  2 Aug 2023 19:02:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE439101EC;
+	Wed,  2 Aug 2023 19:07:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EBB4D2E8
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 19:02:41 +0000 (UTC)
-Received: from mail-qk1-x735.google.com (mail-qk1-x735.google.com [IPv6:2607:f8b0:4864:20::735])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7983CC3
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 12:02:38 -0700 (PDT)
-Received: by mail-qk1-x735.google.com with SMTP id af79cd13be357-7658752ce2fso8004885a.1
-        for <netdev@vger.kernel.org>; Wed, 02 Aug 2023 12:02:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1691002957; x=1691607757;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2BmxVcSv1AUkEFvepEWrjrtduV9BdOX4+MifZ4oZNC0=;
-        b=mME1PPc3j2c58c+raSdfN8eZpLRxh29XZIsP6DcSJy1Lrdw1ey1afodbwKH+cuXPaK
-         KcybLP2GPJObLLYYnse9Auwa0nsHxWcMEmntI7IRMRJmea6OZEC2oQoiQ5SlRYTsOYxR
-         ljOlwrtE+HSOsSbbnLvtMkNibzd6OtHLOj6I++TlViGQKyPPodNnfR7CwpHNRGWtBVJo
-         Et5w/x4oyeER7Gr3aQ7xp14DmjDNJnDaNHTIFmdBxP4z3J1yNMVdSwco5Br79LrXoQoO
-         KHhvWFX9D7qG2hRJxHfoZxxBHDEiK7QIVQs5SZE6LrCmFVEOKUUscrTQQtsZ3Yk6j5KO
-         h+Eg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691002957; x=1691607757;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=2BmxVcSv1AUkEFvepEWrjrtduV9BdOX4+MifZ4oZNC0=;
-        b=T4CoeYoUiBlh4MEGV/hWShx13Y6+yVvz/YFzO8vsa78+GcBsNtEtTIaAMgWSThE5iN
-         lNa5+fn9obBJT0Cqvnx2dmOnXHoijdizRmm9XZ5YSx9ReVMLtvbFdh0Zq6+vXvAnfimn
-         JQLaBpCGlgGwat+coXvBi9o9W46j0KBNEflSbRuoCGDo6vwv6MQAkjwpchQuqf//VdyJ
-         80iNIi++23/sOCe/cKBqzufFa26wvTMbPi8ymEv6AM6iPPGy/rldcEwBEWKk82O410Bd
-         xgFdhQZ/neuC6/Lveppn5V995uH4P9XMCQPA2gb5FO20PPlSprg9GMCiM3eJ+7cBlkaY
-         vqtg==
-X-Gm-Message-State: ABy/qLZC7aRz6Az74n1PFVz7fA6yNC/supsaP9lr1FmhN9CvHrgq4C1k
-	1J0ifw4xckWgevYo8VuTHlMuLte3Obk=
-X-Google-Smtp-Source: APBJJlFMCFK27IYSaE0fyq6hY0z1QOZTAOq60SOYcYTdewXWr0wBNAucNVfjLAZtXqmFTp1nnhVUfw==
-X-Received: by 2002:a05:620a:1906:b0:767:47dd:15f with SMTP id bj6-20020a05620a190600b0076747dd015fmr17516243qkb.15.1691002957500;
-        Wed, 02 Aug 2023 12:02:37 -0700 (PDT)
-Received: from localhost (172.174.245.35.bc.googleusercontent.com. [35.245.174.172])
-        by smtp.gmail.com with ESMTPSA id o9-20020a05620a110900b0076c84240467sm4449878qkk.52.2023.08.02.12.02.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Aug 2023 12:02:37 -0700 (PDT)
-Date: Wed, 02 Aug 2023 15:02:36 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: davem@davemloft.net, 
- netdev@vger.kernel.org, 
- edumazet@google.com, 
- pabeni@redhat.com, 
- Maxim Krasnyansky <maxk@qti.qualcomm.com>, 
- Jason Wang <jasowang@redhat.com>
-Message-ID: <64caa84cd823c_2c74a029495@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20230802115526.7d2d7c4d@kernel.org>
-References: <20230802182843.4193099-1-kuba@kernel.org>
- <64caa3a09cbbb_2c6331294a6@willemb.c.googlers.com.notmuch>
- <20230802115526.7d2d7c4d@kernel.org>
-Subject: Re: [PATCH net] MAINTAINERS: update TUN/TAP maintainers
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F797D52F
+	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 19:07:43 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D7076C433C8;
+	Wed,  2 Aug 2023 19:07:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1691003263;
+	bh=0fw6RB4gYXf7dceIN213tkWhaI9QCwIhhC6CY/ovsZ0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=PLoWgvI7Wfc1z5MbADnwrre/gZrBEzzYkQ98VW6w1AK4+i4MlEerhiIEuQ6Qphjl9
+	 z9lrNgxBBjtmMUOg2BiDxEv1XZ0wgclHVPk465EJkF9gVGwIG6MtdXE6taVIH40kgK
+	 o0gwoLjrCscKlmriV823PmrKraMihUsGJjNcaiPze8D8TfazRgi+hvYdauVmdW2HK3
+	 9GKYQUOccnp2oHrtcSmpYUrYCXsFixtxSNg3Dml+s9HX5VBzYsdPfXcIZqF38Z/q2c
+	 IMSCRn1/IshFV/qJzWDST1gKERY86wtmGOOccsTHSuyw43pgub8oBuW3EPRZY0NgJj
+	 CS6/z+xoR8pkw==
+Date: Wed, 2 Aug 2023 21:07:35 +0200
+From: Simon Horman <horms@kernel.org>
+To: Ratheesh Kannoth <rkannoth@marvell.com>,
+	Dan Carpenter <dan.carpenter@linaro.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	sgoutham@marvell.com, lcherian@marvell.com, gakula@marvell.com,
+	jerinj@marvell.com, hkelam@marvell.com, sbhatta@marvell.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, jhs@mojatatu.com, xiyou.wangcong@gmail.com,
+	jiri@resnulli.us
+Subject: Re: [PATCH v1 net-next 2/4] tc: flower: support for SPI
+Message-ID: <ZMqpd2DyHz4O/v17@kernel.org>
+References: <20230801014101.2955887-1-rkannoth@marvell.com>
+ <20230801014101.2955887-3-rkannoth@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230801014101.2955887-3-rkannoth@marvell.com>
 
-Jakub Kicinski wrote:
-> On Wed, 02 Aug 2023 14:42:40 -0400 Willem de Bruijn wrote:
-> > >  W:	http://vtun.sourceforge.net/tun  
-> > 
-> > Should we drop this URL too?
++ Dan Carpenter
+
+On Tue, Aug 01, 2023 at 07:10:59AM +0530, Ratheesh Kannoth wrote:
+> tc flower rules support to classify ESP/AH
+> packets matching SPI field.
 > 
-> No preference here. I checked that it's online so I saw no obvious
-> reason to delete it right away. It may also be a good idea to read
-> thru the in-tree docs and check that they still make sense.
-> I'd rather leave those kind of cleanups to the new maintainers :)
+> Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
+> ---
+>  include/uapi/linux/pkt_cls.h |  3 +++
+>  net/sched/cls_flower.c       | 35 +++++++++++++++++++++++++++++++++++
+>  2 files changed, 38 insertions(+)
+> 
+> diff --git a/include/uapi/linux/pkt_cls.h b/include/uapi/linux/pkt_cls.h
+> index 7865f5a9885b..75506f157340 100644
+> --- a/include/uapi/linux/pkt_cls.h
+> +++ b/include/uapi/linux/pkt_cls.h
+> @@ -598,6 +598,9 @@ enum {
+>  
+>  	TCA_FLOWER_KEY_CFM,		/* nested */
+>  
+> +	TCA_FLOWER_KEY_SPI,		/* be32 */
+> +	TCA_FLOWER_KEY_SPI_MASK,	/* be32 */
+> +
+>  	__TCA_FLOWER_MAX,
+>  };
+>  
+> diff --git a/net/sched/cls_flower.c b/net/sched/cls_flower.c
+> index 8da9d039d964..eca260272845 100644
+> --- a/net/sched/cls_flower.c
+> +++ b/net/sched/cls_flower.c
+> @@ -72,6 +72,7 @@ struct fl_flow_key {
+>  	struct flow_dissector_key_num_of_vlans num_of_vlans;
+>  	struct flow_dissector_key_pppoe pppoe;
+>  	struct flow_dissector_key_l2tpv3 l2tpv3;
+> +	struct flow_dissector_key_ipsec ipsec;
+>  	struct flow_dissector_key_cfm cfm;
+>  } __aligned(BITS_PER_LONG / 8); /* Ensure that we can do comparisons as longs. */
+>  
+> @@ -726,6 +727,8 @@ static const struct nla_policy fl_policy[TCA_FLOWER_MAX + 1] = {
+>  	[TCA_FLOWER_KEY_PPPOE_SID]	= { .type = NLA_U16 },
+>  	[TCA_FLOWER_KEY_PPP_PROTO]	= { .type = NLA_U16 },
+>  	[TCA_FLOWER_KEY_L2TPV3_SID]	= { .type = NLA_U32 },
+> +	[TCA_FLOWER_KEY_SPI]		= { .type = NLA_U32 },
+> +	[TCA_FLOWER_KEY_SPI_MASK]	= { .type = NLA_U32 },
+>  	[TCA_FLOWER_L2_MISS]		= NLA_POLICY_MAX(NLA_U8, 1),
+>  	[TCA_FLOWER_KEY_CFM]		= { .type = NLA_NESTED },
+>  };
+> @@ -795,6 +798,24 @@ static void fl_set_key_val(struct nlattr **tb,
+>  		nla_memcpy(mask, tb[mask_type], len);
+>  }
+>  
+> +static int fl_set_key_spi(struct nlattr **tb, struct fl_flow_key *key,
+> +			  struct fl_flow_key *mask,
+> +			  struct netlink_ext_ack *extack)
+> +{
+> +	if (key->basic.ip_proto != IPPROTO_ESP &&
+> +	    key->basic.ip_proto != IPPROTO_AH) {
+> +		NL_SET_ERR_MSG(extack,
+> +			       "Protocol must be either ESP or AH");
+> +		return -EINVAL;
+> +	}
+> +
+> +	fl_set_key_val(tb, &key->ipsec.spi,
+> +		       TCA_FLOWER_KEY_SPI,
+> +		       &mask->ipsec.spi, TCA_FLOWER_KEY_SPI_MASK,
+> +		       sizeof(key->ipsec.spi));
+> +	return 0;
+> +}
+> +
+>  static int fl_set_key_port_range(struct nlattr **tb, struct fl_flow_key *key,
+>  				 struct fl_flow_key *mask,
+>  				 struct netlink_ext_ack *extack)
+> @@ -1894,6 +1915,12 @@ static int fl_set_key(struct net *net, struct nlattr **tb,
+>  			return ret;
+>  	}
+>  
+> +	if (tb[TCA_FLOWER_KEY_SPI]) {
+> +		ret = fl_set_key_spi(tb, key, mask, extack);
+> +		if (ret)
+> +			return ret;
+> +	}
+> +
 
-Ha, fair. Sounds good.
+Hi Dan,
+
+I'm seeing a warning from Smatch, which I think is a false positive,
+but I feel that I should raise. Perhaps you could take a look at it?
+
+net/sched/cls_flower.c:1918 fl_set_key() error: buffer overflow 'tb' 106 <= 108
+
+>  	if (tb[TCA_FLOWER_KEY_ENC_IPV4_SRC] ||
+>  	    tb[TCA_FLOWER_KEY_ENC_IPV4_DST]) {
+>  		key->enc_control.addr_type = FLOW_DISSECTOR_KEY_IPV4_ADDRS;
+> @@ -2066,6 +2093,8 @@ static void fl_init_dissector(struct flow_dissector *dissector,
+>  			     FLOW_DISSECTOR_KEY_PPPOE, pppoe);
+>  	FL_KEY_SET_IF_MASKED(mask, keys, cnt,
+>  			     FLOW_DISSECTOR_KEY_L2TPV3, l2tpv3);
+> +	FL_KEY_SET_IF_MASKED(mask, keys, cnt,
+> +			     FLOW_DISSECTOR_KEY_IPSEC, ipsec);
+>  	FL_KEY_SET_IF_MASKED(mask, keys, cnt,
+>  			     FLOW_DISSECTOR_KEY_CFM, cfm);
+>  
+> @@ -3364,6 +3393,12 @@ static int fl_dump_key(struct sk_buff *skb, struct net *net,
+>  				 sizeof(key->l2tpv3.session_id)))
+>  		goto nla_put_failure;
+>  
+> +	if (key->ipsec.spi &&
+> +	    fl_dump_key_val(skb, &key->ipsec.spi, TCA_FLOWER_KEY_SPI,
+> +			    &mask->ipsec.spi, TCA_FLOWER_KEY_SPI_MASK,
+> +			    sizeof(key->ipsec.spi)))
+> +		goto nla_put_failure;
+> +
+>  	if ((key->basic.ip_proto == IPPROTO_TCP ||
+>  	     key->basic.ip_proto == IPPROTO_UDP ||
+>  	     key->basic.ip_proto == IPPROTO_SCTP) &&
+> -- 
+> 2.25.1
+> 
+> 
 
