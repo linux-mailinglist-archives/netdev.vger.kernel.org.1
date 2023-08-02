@@ -1,132 +1,139 @@
-Return-Path: <netdev+bounces-23566-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23568-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C713576C855
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 10:31:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 16CE876C860
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 10:32:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A1D151C21240
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 08:31:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 483EB1C21288
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 08:32:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD3A515B0;
-	Wed,  2 Aug 2023 08:30:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 059DB53B9;
+	Wed,  2 Aug 2023 08:32:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0C5A567B
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 08:30:58 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D1EA1718
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 01:30:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1690965056;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=spT8fPKpBrur06PlvqJtfOWJsGk5XV9Ogm63QxBCjDI=;
-	b=DlqAGKEcAsaNxXDswEBdOgjDX7g6t+2sxII1nouXMx1rcnrOARihtGQePAufbwHBT5Ci3u
-	S1Kbm82RuJKtEAl+qlOm80ROjlZ6eteLRy2uf81dzJV3TaMFhH/uASq7PRexLFOLIRdzFJ
-	yIGKA3qOD+DssUIJrKw1qXLZenLmuN8=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-656-pCrBGRJoMCSGEqau_A7zpQ-1; Wed, 02 Aug 2023 04:30:55 -0400
-X-MC-Unique: pCrBGRJoMCSGEqau_A7zpQ-1
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-317a84a3ebeso335507f8f.0
-        for <netdev@vger.kernel.org>; Wed, 02 Aug 2023 01:30:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690965054; x=1691569854;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=spT8fPKpBrur06PlvqJtfOWJsGk5XV9Ogm63QxBCjDI=;
-        b=fx9+4zUNOUqIaAFIhVb4RgOMBIZ6V9hfECOSNkDZpFcyh6Hx9Yngtly7w3tfqwCEb7
-         DxrFt7pt7Rd6pdS2zQvyD7GhzZztfb0C5pEe40oe1bfXf35iAGry4XYMMEOjSCjjly+j
-         J3JhHqT1iLvhcwy//44qN3gT7Z11LcYjOHFr2+tTU/EBvFSDpfTS7tzLHIDhVtGXmJu0
-         gyCuLh28Q6nAWaa/UfWSoVXLCxhxy8F1hNI/tMFqKciiWZ9VifFp5VzxLPE+c95hcMT2
-         tqxFeVuR1/UxuohNAm8LVJTNPyYZRBv309FG1bKilTKdqtsLaDz05tefVlukqsxnhvX6
-         4IEw==
-X-Gm-Message-State: ABy/qLba8OiX2x+VWEjRmul+aLZ7Aab6abfCK+etIOAfgS5oD5AWRrYc
-	eNg/cRXQRsoHRUKf7kobzdVqlPRRLE31EREwkEK/iDNtZBw7vxVePX9/0QX63Pu6cwgG91ALWv1
-	GfT4APd9XMo0Mt3gR
-X-Received: by 2002:adf:e7c3:0:b0:314:1f0:5846 with SMTP id e3-20020adfe7c3000000b0031401f05846mr3834083wrn.19.1690965053881;
-        Wed, 02 Aug 2023 01:30:53 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlEj47SZeYxoccOiABA+KmMfcUrcXgKlvMiT/hmItGRVmgnRQkrrpjBTDyY0QM+uH8dra14NSA==
-X-Received: by 2002:adf:e7c3:0:b0:314:1f0:5846 with SMTP id e3-20020adfe7c3000000b0031401f05846mr3834062wrn.19.1690965053438;
-        Wed, 02 Aug 2023 01:30:53 -0700 (PDT)
-Received: from localhost ([81.56.90.2])
-        by smtp.gmail.com with ESMTPSA id u13-20020a5d514d000000b003172510d19dsm18409682wrt.73.2023.08.02.01.30.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Aug 2023 01:30:52 -0700 (PDT)
-Date: Wed, 2 Aug 2023 10:30:52 +0200
-From: Davide Caratti <dcaratti@redhat.com>
-To: Ido Schimmel <idosch@nvidia.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
-	pabeni@redhat.com, edumazet@google.com, petrm@nvidia.com,
-	razor@blackwall.org, mirsad.todorovac@alu.unizg.hr
-Subject: Re: [PATCH net 13/17] selftests: forwarding: tc_tunnel_key: Make
- filters more specific
-Message-ID: <ZMoUPP53JWP7l2pG@dcaratti.users.ipa.redhat.com>
-References: <20230802075118.409395-1-idosch@nvidia.com>
- <20230802075118.409395-14-idosch@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB5E5187A
+	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 08:32:19 +0000 (UTC)
+Received: from wout2-smtp.messagingengine.com (wout2-smtp.messagingengine.com [64.147.123.25])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 560B41718;
+	Wed,  2 Aug 2023 01:32:17 -0700 (PDT)
+Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
+	by mailout.west.internal (Postfix) with ESMTP id 6CE97320076F;
+	Wed,  2 Aug 2023 04:32:15 -0400 (EDT)
+Received: from imap51 ([10.202.2.101])
+  by compute6.internal (MEProxy); Wed, 02 Aug 2023 04:32:16 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-type:content-type:date:date:from:from:in-reply-to
+	:in-reply-to:message-id:mime-version:references:reply-to:sender
+	:subject:subject:to:to; s=fm2; t=1690965134; x=1691051534; bh=GB
+	G2iKqO5PLeYvfwEjwF9EfXGrregHJ1kfLxVcxwYlQ=; b=N3cPseisV9cVkV9zmd
+	+Bj0c3T/Wrqvr8HGhu48TPsFZYMroG0x1spK0Q6jRZaNc9snoFo+RkPuA/AgW9Bh
+	fOwYlNsmXg3nnpQRNWK7q8ABt1Lzgw+qMDxOA+CxZWfMFJvyOuHAk0OM1h8myV4i
+	7Xin9sSc4Il3SjgmNH7ALnR/lF4AUNbz3h8qGTrbcqS2M/QSkkzTPYJUBvGKM5zn
+	2hu4ZJlftWIr3+jEESpF15ZfcVU9T+CCczsa2l6H4TdW1xgstwKKwh+KhNS3+3K8
+	o+1T81F2DGqQj48bgi5LR5AfNwPOpIy4fFAfc4TsC+mNJYThYt8Zw+aWJrJraY3H
+	Us7A==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:sender:subject
+	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+	:x-sasl-enc; s=fm3; t=1690965134; x=1691051534; bh=GBG2iKqO5PLeY
+	vfwEjwF9EfXGrregHJ1kfLxVcxwYlQ=; b=jwgUEuAhEP3PhPlh0SzuL7yYo4p3Y
+	CCt6YczgNZOBt7AUJjrI+azaYJpjYNktLqYTftnnXtQsCAF6nlNq+m5aFLGEPSa8
+	qnAaEYgn+UTwoFcLZs3EuN7S4BhyBFjNs2eyN1HgvhHxliD760QqPtFRRUrmKNT4
+	e6UF1oPJmY2+eSQYoxHe3VreWcsQgv4iovxZpXhHhpoHoVTOccCgdcRSVNl0h30D
+	ZXmJqFXABqDiH3+VPUT25g6id0ORnjoZSMvzv9lHdKkvfvkjSudeYnC03S3V/gZt
+	jVRlfpfTNbOReO+IM7lVabZfAnIOUAv4G416kO3+ulLgN/bQMxeGGxexg==
+X-ME-Sender: <xms:jhTKZNGkWeckBUSDcHpvvaww6e8jBe8feKb-Va2PpKIVLISBMHAVaA>
+    <xme:jhTKZCUP4YE1W2XwGA5s_ScLBnflpk9xQUxNO_ayDj-wa_RW-xdEBmxxVCg0aZ3Js
+    1UGB6vZlkxu6y8or2A>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrjeekgddthecutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+    fjughrpefofgggkfgjfhffhffvvefutgesthdtredtreertdenucfhrhhomhepfdetrhhn
+    ugcuuegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdruggvqeenucggtffrrghtth
+    gvrhhnpeffheeugeetiefhgeethfejgfdtuefggeejleehjeeutefhfeeggefhkedtkeet
+    ffenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrrh
+    hnugesrghrnhgusgdruggv
+X-ME-Proxy: <xmx:jhTKZPII64Og5KUBH2mOQtXiTk5Pc6AyBlljraY3voghYifE5WV9xw>
+    <xmx:jhTKZDGnF7V2k4i28YgZ9G3aJc-4GxW7jzEGLErvHLJce-t2WS2L3A>
+    <xmx:jhTKZDX6tzb2XofG_Rp_t2u-b7cajc7LQVvYeX4wUINUxv41nP8oUA>
+    <xmx:jhTKZEvACZccrO8b7T7ax00lBYJ9lp-6kR4UZmBCS6COn6IMgOObQQ>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+	id 55E9AB6008D; Wed,  2 Aug 2023 04:32:14 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.9.0-alpha0-592-ga9d4a09b4b-fm-defalarms-20230725.001-ga9d4a09b
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230802075118.409395-14-idosch@nvidia.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Mime-Version: 1.0
+Message-Id: <599b845c-80d9-467c-b9ac-2ce844ee256e@app.fastmail.com>
+In-Reply-To: <20230801173544.1929519-3-hch@lst.de>
+References: <20230801173544.1929519-1-hch@lst.de>
+ <20230801173544.1929519-3-hch@lst.de>
+Date: Wed, 02 Aug 2023 10:31:54 +0200
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: "Christoph Hellwig" <hch@lst.de>, "Luis Chamberlain" <mcgrof@kernel.org>,
+ "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
+ "Daniel Mack" <daniel@zonque.org>,
+ "Haojian Zhuang" <haojian.zhuang@gmail.com>,
+ "Robert Jarzmik" <robert.jarzmik@free.fr>,
+ "Ulf Hansson" <ulf.hansson@linaro.org>,
+ "Manuel Lauss" <manuel.lauss@gmail.com>, "Yangbo Lu" <yangbo.lu@nxp.com>,
+ "Joshua Kinard" <kumba@gentoo.org>
+Cc: "Daniel Vetter" <daniel.vetter@ffwll.ch>,
+ linux-arm-kernel@lists.infradead.org,
+ "open list" <linux-kernel@vger.kernel.org>,
+ "linux-mmc @ vger . kernel . org" <linux-mmc@vger.kernel.org>,
+ Netdev <netdev@vger.kernel.org>, linux-rtc@vger.kernel.org,
+ linux-modules@vger.kernel.org
+Subject: Re: [PATCH 2/5] mmc: au1xmmc: force non-modular build and remove symbol_get
+ usage
+Content-Type: text/plain
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Aug 02, 2023 at 10:51:14AM +0300, Ido Schimmel wrote:
-> The test installs filters that match on various IP fragments (e.g., no
-> fragment, first fragment) and expects a certain amount of packets to hit
-> each filter. This is problematic as the filters are not specific enough
-> and can match IP packets (e.g., IGMP) generated by the stack, resulting
-> in failures [1].
+On Tue, Aug 1, 2023, at 19:35, Christoph Hellwig wrote:
+> au1xmmc is split somewhat awkwardly into the main mmc subsystem driver,
+> and callbacks in platform_data that sit under arch/mips/ and are
+> always built in.  The latter than call mmc_detect_change through
+> symbol_get.  Remove the use of symbol_get by requiring the driver
+> to be built in.  In the future the interrupt handlers for card
+> insert/eject detection should probably be moved into the main driver,
+> and which point it can be built modular again.
+>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-[...]
+Good idea.
 
-> --- a/tools/testing/selftests/net/forwarding/tc_tunnel_key.sh
-> +++ b/tools/testing/selftests/net/forwarding/tc_tunnel_key.sh
-> @@ -104,11 +104,14 @@ tunnel_key_nofrag_test()
->  	local i
->  
->  	tc filter add dev $swp1 ingress protocol ip pref 100 handle 100 \
-> -		flower ip_flags nofrag action drop
-> +		flower src_ip 192.0.2.1 dst_ip 192.0.2.2 ip_proto udp \
-> +		ip_flags nofrag action drop
->  	tc filter add dev $swp1 ingress protocol ip pref 101 handle 101 \
-> -		flower ip_flags firstfrag action drop
-> +		flower src_ip 192.0.2.1 dst_ip 192.0.2.2 ip_proto udp \
-> +		ip_flags firstfrag action drop
->  	tc filter add dev $swp1 ingress protocol ip pref 102 handle 102 \
-> -		flower ip_flags nofirstfrag action drop
-> +		flower src_ip 192.0.2.1 dst_ip 192.0.2.2 ip_proto udp \
-> +		ip_flags nofirstfrag action drop
+>  	  of Alcor Micro PCI-E card reader
+> 
+>  config MMC_AU1X
+> -	tristate "Alchemy AU1XX0 MMC Card Interface support"
+> +	bool "Alchemy AU1XX0 MMC Card Interface support"
+>  	depends on MIPS_ALCHEMY
+>  	help
 
+This needs a 
 
-hello Ido, my 2 cents:
+      depends on MMC=y
 
-is it safe to match on the UDP protocol without changing the mausezahn
-command line? I see that it's generating generic IP packets at the
-moment (i.e. it does '-t ip'). Maybe it's more robust to change
-the test to generate ICMP and then match on the ICMP protocol?
+otherwise you get a link failure with CONFIG_MMC=m and
+CONFIG_MMC_AU1X=y.
 
-thanks!
--- 
-davide
+With that fixed,
 
- 
-
+Reviewed-by: Arnd Bergmann <arnd@arndb.de>
 
