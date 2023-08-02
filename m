@@ -1,283 +1,179 @@
-Return-Path: <netdev+bounces-23614-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23615-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23FD976CB77
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 13:07:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7AF8F76CB8F
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 13:16:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B1C32281D80
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 11:07:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A8149281D29
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 11:16:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B59406D38;
-	Wed,  2 Aug 2023 11:07:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D55C6FBA;
+	Wed,  2 Aug 2023 11:16:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB1186AA5
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 11:07:46 +0000 (UTC)
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0220A123;
-	Wed,  2 Aug 2023 04:07:45 -0700 (PDT)
-Received: by linux.microsoft.com (Postfix, from userid 1099)
-	id C83E8238C421; Wed,  2 Aug 2023 04:07:43 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com C83E8238C421
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1690974463;
-	bh=ScNxCmRJAOBz8Wvq7+5zN9Yyd2Q/fLFs3kdGC6qTeBQ=;
-	h=From:To:Cc:Subject:Date:From;
-	b=IeHUZSfi7i7X8zhEiANUmT/3D1TYKi6tsDdvR/vZa50b/JzCp6Sh6u7f4TquTikmA
-	 urSK9wVw2c0pWniak4U1btsGyGE7jsu1sm8gIZXYkwWJ/Jsj2NLdzz1fNKDEqlL3H9
-	 ZyEsZjV/3TYhodLRzg7OE6Y8toSG1q1bY4vLK80Q=
-From: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
-To: kys@microsoft.com,
-	haiyangz@microsoft.com,
-	wei.liu@kernel.org,
-	decui@microsoft.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	longli@microsoft.com,
-	sharmaajay@microsoft.com,
-	leon@kernel.org,
-	cai.huoqing@linux.dev,
-	ssengar@linux.microsoft.com,
-	vkuznets@redhat.com,
-	tglx@linutronix.de,
-	linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Cc: schakrabarti@microsoft.com,
-	Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
-Subject: [PATCH V6 net-next] net: mana: Configure hwc timeout from hardware
-Date: Wed,  2 Aug 2023 04:07:40 -0700
-Message-Id: <1690974460-15660-1-git-send-email-schakrabarti@linux.microsoft.com>
-X-Mailer: git-send-email 1.8.3.1
-X-Spam-Status: No, score=-17.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,
-	USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 635C263DC;
+	Wed,  2 Aug 2023 11:16:22 +0000 (UTC)
+Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 044A52115;
+	Wed,  2 Aug 2023 04:16:20 -0700 (PDT)
+Received: by mail-ej1-x62d.google.com with SMTP id a640c23a62f3a-9923833737eso961739966b.3;
+        Wed, 02 Aug 2023 04:16:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1690974978; x=1691579778;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=1LEDgkbQVwyMApHrCW4foHYLU4LMYaivEbuRAOYhwfE=;
+        b=MnxbqOOvhJ95m47M/aqhVRseOYAdbuuWiqHBFWSg/c/NUYT0oIu/EjBhezQYr1JK0t
+         oVZxGMtABYf0uPk8mVv3gq8f/TC5AHPAVtb6qUSFnQRBlt9u/goShwbo/z0LJrcrhrd3
+         0nVzry552Ut4gpR6AMmp5e0fSjSScnhHPaYMzPbX4gdyCQc+YEbFp3+/0ia/7+78T/Lm
+         ylL7v4VgMOUjDkRo3H8rNuJiDe8m6ch5sbP3GpWYJHlcqwhDO3Slw7/PeXw3ZeO37nN0
+         j6nSey+dj02+tPYxQD+wh6TrknAV/YXfLhKjVFiLF8KPPrAMlbw2y3Avvu19QEJfVgto
+         R8mQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690974978; x=1691579778;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=1LEDgkbQVwyMApHrCW4foHYLU4LMYaivEbuRAOYhwfE=;
+        b=TxUPoG66os/Iv27aHF7ztxJdCa5HzsYPv63W0y2VMC+E7DTKf5S0rrDQa99t2yKtJp
+         lRVppa915jjNuauX/t8I3G/04S0BP2v84LQN6G4pToKjF6H1XhAQihd/YveIREyulwj4
+         nhxVkkgGaeRexnOvrf4NwLhw8E8UGUEmNJa0wZRw87KLGG8ZDHpcQMcs5qGHdk1X2hu0
+         neElqVY31JnTJBRvM0KewiwY1imNJg71/X7IG0xD3fJuVAqtk4+waV6dVK67Yx7SewaS
+         9A/dDGL03yzheAq0oGTErj5FtbQON+jRzQJ/Lc50eiRryCC1KnsON4U4MpHM0tlJUOFZ
+         tGyQ==
+X-Gm-Message-State: ABy/qLYlkL5ylsDYr8B686xzQuF9hIuqSwfkDNJ9l4XuQT+U6dtk6Fuz
+	Xfsv68XFTa+rNKMrKtXK9WM=
+X-Google-Smtp-Source: APBJJlGq9/b/LK7cDecBtJhJYmf3YB7Ady3vuK2p9XsCxws0cwpzEj53FJW780nNmw+8dGQ+4M+MwQ==
+X-Received: by 2002:a17:906:10cd:b0:99b:4bab:2839 with SMTP id v13-20020a17090610cd00b0099b4bab2839mr5612720ejv.55.1690974978178;
+        Wed, 02 Aug 2023 04:16:18 -0700 (PDT)
+Received: from ?IPV6:2620:10d:c096:310::2eef? ([2620:10d:c092:600::2:dbd1])
+        by smtp.gmail.com with ESMTPSA id lu44-20020a170906faec00b00992f309cfe8sm9020548ejb.178.2023.08.02.04.16.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 02 Aug 2023 04:16:17 -0700 (PDT)
+Message-ID: <260c7815-ca50-f6f5-9a37-7960a9a3b9eb@gmail.com>
+Date: Wed, 2 Aug 2023 12:12:38 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH vhost v11 05/10] virtio_ring: introduce
+ virtqueue_dma_dev()
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Jakub Kicinski <kuba@kernel.org>
+Cc: Christoph Hellwig <hch@infradead.org>,
+ virtualization@lists.linux-foundation.org,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org,
+ bpf@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>,
+ Jason Wang <jasowang@redhat.com>
+References: <20230710034237.12391-1-xuanzhuo@linux.alibaba.com>
+ <20230710034237.12391-6-xuanzhuo@linux.alibaba.com>
+ <ZK/cxNHzI23I6efc@infradead.org>
+ <20230713104805-mutt-send-email-mst@kernel.org>
+ <ZLjSsmTfcpaL6H/I@infradead.org>
+ <20230720131928-mutt-send-email-mst@kernel.org>
+ <ZL6qPvd6X1CgUD4S@infradead.org>
+ <1690251228.3455179-1-xuanzhuo@linux.alibaba.com>
+ <20230725033321-mutt-send-email-mst@kernel.org>
+ <1690283243.4048996-1-xuanzhuo@linux.alibaba.com>
+ <1690524153.3603117-1-xuanzhuo@linux.alibaba.com>
+ <20230728080305.5fe3737c@kernel.org>
+ <CACGkMEs5uc=ct8BsJzV2SEJzAGXqCP__yxo-MBa6d6JzDG4YOg@mail.gmail.com>
+ <20230731084651.16ec0a96@kernel.org>
+ <1690855424.7821567-1-xuanzhuo@linux.alibaba.com>
+ <20230731193606.25233ed9@kernel.org>
+ <1690858650.8698683-2-xuanzhuo@linux.alibaba.com>
+ <20230801084510.1c2460b9@kernel.org>
+ <1690940214.7564142-1-xuanzhuo@linux.alibaba.com>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <1690940214.7564142-1-xuanzhuo@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-At present hwc timeout value is a fixed value. This patch sets the hwc
-timeout from the hardware. It now uses a new hardware capability
-GDMA_DRV_CAP_FLAG_1_HWC_TIMEOUT_RECONFIG to query and set the value
-in hwc_timeout.
+On 8/2/23 02:36, Xuan Zhuo wrote:
+> On Tue, 1 Aug 2023 08:45:10 -0700, Jakub Kicinski <kuba@kernel.org> wrote:
+>> On Tue, 1 Aug 2023 10:57:30 +0800 Xuan Zhuo wrote:
+>>>> You have this working and benchmarked or this is just and idea?
+>>>
+>>> This is not just an idea. I said that has been used on large scale.
+>>>
+>>> This is the library for the APP to use the AF_XDP. We has open it.
+>>> https://gitee.com/anolis/libxudp
+>>>
+>>> This is the Alibaba version of the nginx. That has been opened, that supported
+>>> to work with the libray to use AF_XDP.
+>>> http://tengine.taobao.org/
+>>>
+>>> I supported this on our kernel release Anolis/Alinux.
+>>
+>> Interesting!
+>>
+>>> The work was done about 2 years ago. You know, I pushed the first version to
+>>> enable AF_XDP on virtio-net about two years ago. I never thought the job would
+>>> be so difficult.
+>>
+>> Me neither, but it is what it is.
+>>
+>>> The nic (virtio-net) of AliYun can reach 24,000,000PPS.
+>>> So I think there is no different with the real HW on the performance.
+>>>
+>>> With the AF_XDP, the UDP pps is seven times that of the kernel udp stack.
+>>
+>> UDP pps or QUIC pps? UDP with or without GSO?
+> 
+> UDP PPS without GSO.
+> 
+>>
+>> Do you have measurements of how much it saves in real world workloads?
+>> I'm asking mostly out of curiosity, not to question the use case.
+> 
+> YES，the result is affected by the request size, we can reach 10-40%.
+> The smaller the request size, the lower the result.
+> 
+>>
+>>>> What about io_uring zero copy w/ pre-registered buffers.
+>>>> You'll get csum offload, GSO, all the normal perf features.
+>>>
+>>> We tried io-uring, but it was not suitable for our scenario.
+>>>
+>>> Yes, now the AF_XDP does not support the csum offload and GSO.
+>>> This is indeed a small problem.
+>>
+>> Can you say more about io-uring suitability? It can do zero copy
+>> and recently-ish Pavel optimized it quite a bit.
+> 
+> First, AF_XDP is also zero-copy. We also use XDP for a few things.
+> 
+> And this was all about two years ago, so we have to say something about io-uring
+> two years ago.
+> 
+> As far as I know, io-uring still use kernel udp stack, AF_XDP can
+> skip all kernel stack directly to driver.
+> 
+> So here, io-ring does not have too much advantage.
 
-Signed-off-by: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
----
-V5 -> V6:
-* used msecs_to_jiffies() in wait_for_completion_timeout.
----
- .../net/ethernet/microsoft/mana/gdma_main.c   | 30 ++++++++++++++++++-
- .../net/ethernet/microsoft/mana/hw_channel.c  | 24 ++++++++++++++-
- include/net/mana/gdma.h                       | 20 ++++++++++++-
- include/net/mana/hw_channel.h                 |  5 ++++
- 4 files changed, 76 insertions(+), 3 deletions(-)
+Unfortunately I'd agree. Most of it is in the net stack. It can be
+optimised to a certain extent (IMHO far more modest than 7x) but would
+need extensive reworking, and I don't think I saw any appetite for that
 
-diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-index 8f3f78b68592..2e17ee3acfda 100644
---- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
-+++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-@@ -106,6 +106,25 @@ static int mana_gd_query_max_resources(struct pci_dev *pdev)
- 	return 0;
- }
- 
-+static int mana_gd_query_hwc_timeout(struct pci_dev *pdev, u32 *timeout_val)
-+{
-+	struct gdma_context *gc = pci_get_drvdata(pdev);
-+	struct gdma_query_hwc_timeout_resp resp = {};
-+	struct gdma_query_hwc_timeout_req req = {};
-+	int err;
-+
-+	mana_gd_init_req_hdr(&req.hdr, GDMA_QUERY_HWC_TIMEOUT,
-+			     sizeof(req), sizeof(resp));
-+	req.timeout_ms = *timeout_val;
-+	err = mana_gd_send_request(gc, sizeof(req), &req, sizeof(resp), &resp);
-+	if (err || resp.hdr.status)
-+		return err ? err : -EPROTO;
-+
-+	*timeout_val = resp.timeout_ms;
-+
-+	return 0;
-+}
-+
- static int mana_gd_detect_devices(struct pci_dev *pdev)
- {
- 	struct gdma_context *gc = pci_get_drvdata(pdev);
-@@ -879,8 +898,10 @@ int mana_gd_verify_vf_version(struct pci_dev *pdev)
- 	struct gdma_context *gc = pci_get_drvdata(pdev);
- 	struct gdma_verify_ver_resp resp = {};
- 	struct gdma_verify_ver_req req = {};
-+	struct hw_channel_context *hwc;
- 	int err;
- 
-+	hwc = gc->hwc.driver_data;
- 	mana_gd_init_req_hdr(&req.hdr, GDMA_VERIFY_VF_DRIVER_VERSION,
- 			     sizeof(req), sizeof(resp));
- 
-@@ -907,7 +928,14 @@ int mana_gd_verify_vf_version(struct pci_dev *pdev)
- 			err, resp.hdr.status);
- 		return err ? err : -EPROTO;
- 	}
--
-+	if (resp.pf_cap_flags1 & GDMA_DRV_CAP_FLAG_1_HWC_TIMEOUT_RECONFIG) {
-+		err = mana_gd_query_hwc_timeout(pdev, &hwc->hwc_timeout);
-+		if (err) {
-+			dev_err(gc->dev, "Failed to set the hwc timeout %d\n", err);
-+			return err;
-+		}
-+		dev_dbg(gc->dev, "set the hwc timeout to %u\n", hwc->hwc_timeout);
-+	}
- 	return 0;
- }
- 
-diff --git a/drivers/net/ethernet/microsoft/mana/hw_channel.c b/drivers/net/ethernet/microsoft/mana/hw_channel.c
-index 2bd1d74021f7..9d1cd3bfcf66 100644
---- a/drivers/net/ethernet/microsoft/mana/hw_channel.c
-+++ b/drivers/net/ethernet/microsoft/mana/hw_channel.c
-@@ -174,7 +174,25 @@ static void mana_hwc_init_event_handler(void *ctx, struct gdma_queue *q_self,
- 		complete(&hwc->hwc_init_eqe_comp);
- 		break;
- 
-+	case GDMA_EQE_HWC_SOC_RECONFIG_DATA:
-+		type_data.as_uint32 = event->details[0];
-+		type = type_data.type;
-+		val = type_data.value;
-+
-+		switch (type) {
-+		case HWC_DATA_CFG_HWC_TIMEOUT:
-+			hwc->hwc_timeout = val;
-+			break;
-+
-+		default:
-+			dev_warn(hwc->dev, "Received unknown reconfig type %u\n", type);
-+			break;
-+		}
-+
-+		break;
-+
- 	default:
-+		dev_warn(hwc->dev, "Received unknown gdma event %u\n", event->type);
- 		/* Ignore unknown events, which should never happen. */
- 		break;
- 	}
-@@ -696,6 +714,7 @@ int mana_hwc_create_channel(struct gdma_context *gc)
- 	gd->driver_data = hwc;
- 	hwc->gdma_dev = gd;
- 	hwc->dev = gc->dev;
-+	hwc->hwc_timeout = HW_CHANNEL_WAIT_RESOURCE_TIMEOUT_MS;
- 
- 	/* HWC's instance number is always 0. */
- 	gd->dev_id.as_uint32 = 0;
-@@ -770,6 +789,8 @@ void mana_hwc_destroy_channel(struct gdma_context *gc)
- 	hwc->gdma_dev->doorbell = INVALID_DOORBELL;
- 	hwc->gdma_dev->pdid = INVALID_PDID;
- 
-+	hwc->hwc_timeout = 0;
-+
- 	kfree(hwc);
- 	gc->hwc.driver_data = NULL;
- 	gc->hwc.gdma_context = NULL;
-@@ -825,7 +846,8 @@ int mana_hwc_send_request(struct hw_channel_context *hwc, u32 req_len,
- 		goto out;
- 	}
- 
--	if (!wait_for_completion_timeout(&ctx->comp_event, 30 * HZ)) {
-+	if (!wait_for_completion_timeout(&ctx->comp_event,
-+					 (msecs_to_jiffies(hwc->hwc_timeout) * HZ))) {
- 		dev_err(hwc->dev, "HWC: Request timed out!\n");
- 		err = -ETIMEDOUT;
- 		goto out;
-diff --git a/include/net/mana/gdma.h b/include/net/mana/gdma.h
-index 96c120160f15..88b6ef7ce1a6 100644
---- a/include/net/mana/gdma.h
-+++ b/include/net/mana/gdma.h
-@@ -33,6 +33,7 @@ enum gdma_request_type {
- 	GDMA_DESTROY_PD			= 30,
- 	GDMA_CREATE_MR			= 31,
- 	GDMA_DESTROY_MR			= 32,
-+	GDMA_QUERY_HWC_TIMEOUT		= 84, /* 0x54 */
- };
- 
- #define GDMA_RESOURCE_DOORBELL_PAGE	27
-@@ -57,6 +58,8 @@ enum gdma_eqe_type {
- 	GDMA_EQE_HWC_INIT_EQ_ID_DB	= 129,
- 	GDMA_EQE_HWC_INIT_DATA		= 130,
- 	GDMA_EQE_HWC_INIT_DONE		= 131,
-+	GDMA_EQE_HWC_SOC_RECONFIG	= 132,
-+	GDMA_EQE_HWC_SOC_RECONFIG_DATA	= 133,
- };
- 
- enum {
-@@ -531,10 +534,12 @@ enum {
-  * so the driver is able to reliably support features like busy_poll.
-  */
- #define GDMA_DRV_CAP_FLAG_1_NAPI_WKDONE_FIX BIT(2)
-+#define GDMA_DRV_CAP_FLAG_1_HWC_TIMEOUT_RECONFIG BIT(3)
- 
- #define GDMA_DRV_CAP_FLAGS1 \
- 	(GDMA_DRV_CAP_FLAG_1_EQ_SHARING_MULTI_VPORT | \
--	 GDMA_DRV_CAP_FLAG_1_NAPI_WKDONE_FIX)
-+	 GDMA_DRV_CAP_FLAG_1_NAPI_WKDONE_FIX | \
-+	 GDMA_DRV_CAP_FLAG_1_HWC_TIMEOUT_RECONFIG)
- 
- #define GDMA_DRV_CAP_FLAGS2 0
- 
-@@ -664,6 +669,19 @@ struct gdma_disable_queue_req {
- 	u32 alloc_res_id_on_creation;
- }; /* HW DATA */
- 
-+/* GDMA_QUERY_HWC_TIMEOUT */
-+struct gdma_query_hwc_timeout_req {
-+	struct gdma_req_hdr hdr;
-+	u32 timeout_ms;
-+	u32 reserved;
-+};
-+
-+struct gdma_query_hwc_timeout_resp {
-+	struct gdma_resp_hdr hdr;
-+	u32 timeout_ms;
-+	u32 reserved;
-+};
-+
- enum atb_page_size {
- 	ATB_PAGE_SIZE_4K,
- 	ATB_PAGE_SIZE_8K,
-diff --git a/include/net/mana/hw_channel.h b/include/net/mana/hw_channel.h
-index 6a757a6e2732..3d3b5c881bc1 100644
---- a/include/net/mana/hw_channel.h
-+++ b/include/net/mana/hw_channel.h
-@@ -23,6 +23,10 @@
- #define HWC_INIT_DATA_PF_DEST_RQ_ID	10
- #define HWC_INIT_DATA_PF_DEST_CQ_ID	11
- 
-+#define HWC_DATA_CFG_HWC_TIMEOUT 1
-+
-+#define HW_CHANNEL_WAIT_RESOURCE_TIMEOUT_MS 30000
-+
- /* Structures labeled with "HW DATA" are exchanged with the hardware. All of
-  * them are naturally aligned and hence don't need __packed.
-  */
-@@ -182,6 +186,7 @@ struct hw_channel_context {
- 
- 	u32 pf_dest_vrq_id;
- 	u32 pf_dest_vrcq_id;
-+	u32 hwc_timeout;
- 
- 	struct hwc_caller_ctx *caller_ctx;
- };
 -- 
-2.34.1
-
+Pavel Begunkov
 
