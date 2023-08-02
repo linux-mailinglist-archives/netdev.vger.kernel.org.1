@@ -1,128 +1,106 @@
-Return-Path: <netdev+bounces-23470-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23472-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2266376C178
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 02:26:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F2F876C183
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 02:33:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 465911C21130
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 00:26:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9B272281B12
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 00:33:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B3BC36B;
-	Wed,  2 Aug 2023 00:26:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E58DA637;
+	Wed,  2 Aug 2023 00:33:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE4747F
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 00:26:27 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E8269C433C9;
-	Wed,  2 Aug 2023 00:26:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A452A7E;
+	Wed,  2 Aug 2023 00:33:01 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D0FBFC433C8;
+	Wed,  2 Aug 2023 00:33:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1690935987;
-	bh=FRDta14x+I1PWkHXGZnBSnTYC19APGnHI3HxpdBTwBs=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=XnVx+XX9iLmgipVPcQeptmg1BWItONeGhcFT7NmHywNrD/4wApmxm0MklnNV+e5t6
-	 SSfhc7f7pE7QpdAqhzOgH6c7N4B4/vP875XYqxS9ZjKz/01uQdHXWtRkPM4WLktoQ5
-	 enRKmbWUHhT226fausfmB8eJAyauFeXlZhJIoxTR8KEcQtYz0CBiLL6pseUHgWjiqK
-	 UxpKpAMNHBQZ3LBgNpfTwYXupuoBG+VT8oa8JUNkiQlAzesGsTeBueOsoTSiVMpBsE
-	 sdHfTTeWlHz/5tcuBfLJIMXfbhE9UmXM0UMElvyC1DWecNxm7lOSgkr2mVIqUpXrnk
-	 DvHrBfj7P9SdA==
-Message-ID: <802d3a2f-c2fb-2e11-b678-e8716ef93f12@kernel.org>
-Date: Tue, 1 Aug 2023 18:26:26 -0600
+	s=k20201202; t=1690936381;
+	bh=OvcvmlOI76pkfpQXs2zFIh/F4GMcdY20CG84VmiF7EI=;
+	h=From:To:Cc:Subject:Date:From;
+	b=Exl77/RZ/iWnsw4gQeQAhwO/pd+ypXuPU6jH/JBJ2LmjHkNvNmBE/xWycY7JNOcji
+	 F21fZIjSm/87XJaTG4l5zsJ7A9CB8BYjNeV7tavR4L6K48EAM8/WMMGTTElJrz3I6r
+	 C777+vWgstH1LTVBDWj03JoiKKiyAXDcqvTxmEl553b+yPB3EfGviDteut3R8bXZ/e
+	 34zBT+MQrssf2svsvl56ldEib4nozr4dkkzFR7rRtWnj31onpfg7lbmS8MXqZ5GHgY
+	 ivrAP7xuZCm0TsRYBYyuFw8Y84rKShjPBwyumNJS2EyciixJ9/ZuxPiUbD1cFp4w41
+	 aqQvYuCr17MIw==
+From: Jakub Kicinski <kuba@kernel.org>
+To: ast@kernel.org
+Cc: netdev@vger.kernel.org,
+	bpf@vger.kernel.org,
+	hawk@kernel.org,
+	amritha.nambiar@intel.com,
+	aleksander.lobakin@intel.com,
+	Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH bpf-next 0/3] net: struct netdev_rx_queue and xdp.h reshuffling
+Date: Tue,  1 Aug 2023 17:32:43 -0700
+Message-ID: <20230802003246.2153774-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.13.0
-Subject: Re: [net-next/RFC PATCH v1 1/4] net: Introduce new napi fields for
- rx/tx queues
-Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>,
- "Nambiar, Amritha" <amritha.nambiar@intel.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, sridhar.samudrala@intel.com
-References: <168564116688.7284.6877238631049679250.stgit@anambiarhost.jf.intel.com>
- <168564134580.7284.16867711571036004706.stgit@anambiarhost.jf.intel.com>
- <20230602230635.773b8f87@kernel.org>
- <717fbdd6-9ef7-3ad6-0c29-d0f3798ced8e@intel.com>
- <20230712141442.44989fa7@kernel.org>
- <4c659729-32dc-491e-d712-2aa1bb99d26f@intel.com>
- <20230712165326.71c3a8ad@kernel.org> <20230728145908.2d94c01f@kernel.org>
- <44c5024a-d533-0ae4-355a-c568b67b1964@intel.com>
- <20230728160925.3a080631@kernel.org>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20230728160925.3a080631@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 7/28/23 5:09 PM, Jakub Kicinski wrote:
-> On Fri, 28 Jul 2023 15:37:14 -0700 Nambiar, Amritha wrote:
->> Hi Jakub, I have the next version of patches ready (I'll send that in a 
->> bit). I suggest if you could take a look at it and let me know your 
->> thoughts and then we can proceed from there.
-> 
-> Great, looking forward.
-> 
->> About dumping queues and NAPIs separately, are you thinking about having 
->> both per-NAPI and per-queue instances, or do you think only one will 
->> suffice. The plan was to follow this work with a 'set-napi' series, 
->> something like,
->> set-napi <napi_id> queues <q_id1, q_id2, ...>
->> to configure the queue[s] that are to be serviced by the napi instance.
->>
->> In this case, dumping the NAPIs would be beneficial especially when 
->> there are multiple queues on the NAPI.
->>
->> WRT per-queue, are there a set of parameters that needs to exposed 
->> besides what's already handled by ethtool...
-> 
-> Not much at this point, maybe memory model. Maybe stats if we want to
-> put stats in the same command. But the fact that sysfs has a bunch of
-> per queue attributes makes me think that sooner or later we'll want
-> queue as a full object in netlink. And starting out that way makes 
-> the whole API cleaner, at least in my opinion.
-> 
-> If we have another object which wants to refer to queues (e.g. page
-> pool) it's easier to express the topology when it's clear what is an
-> object and what's just an attribute.
-> 
->> Also, to configure a queue 
->> on a NAPI, set-queue <qid> <napi_id>, the existing NAPIs would have to 
->> be looked up from the queue parameters dumped.
-> 
-> The look up should not be much of a problem.
-> 
-> And don't you think that:
-> 
->   set-queue queue 1 napi-id 101
->   set-queue queue 2 napi-id 101
-> 
-> is more natural than:
-> 
->   set-napi napi-id 101 queues [1, 2]
-> 
-> Especially in presence of conflicts. If user tries:
-> 
->   set-napi napi-id 101 queues [1, 2]
->   set-napi napi-id 102 queues [1, 2]
-> 
-> Do both napis now serve those queues? May seem obvious to us, but
-> "philosophically" why does setting an attribute of object 102 change
-> attributes of object 101?
-> 
-> If we ever gain the ability to create queues it will be:
-> 
->   create-queue napi-id xyz
-> 
-> which also matches set-queue more nicely than napi base API.
-> 
+While poking at struct netdev_rx_queue I got annoyed by
+the huge rebuild times. I split it out from netdevice.h
+and then realized that it was the main reason we included
+xdp.h in there. So I removed that dependency as well.
 
-I take it you have this path in mind as a means of creating
-"specialized" queues (e.g., io_uring and Rx ZC). Any slides or notes on
-the bigger picture?
+This gives us very pleasant build times for both xdp.h
+and struct netdev_rx_queue changes.
+
+I'm sending this for bpf-next because I think it'd be easiest
+if it goes in there, and then bpf-next gets flushed soon after?
+I can also make a branch on merge-base for net-next and bpf-next..
+
+Jakub Kicinski (3):
+  eth: add missing xdp.h includes in drivers
+  net: move struct netdev_rx_queue out of netdevice.h
+  net: invert the netdevice.h vs xdp.h dependency
+
+ drivers/net/bonding/bond_main.c               |  1 +
+ drivers/net/ethernet/amazon/ena/ena_netdev.h  |  1 +
+ drivers/net/ethernet/engleder/tsnep.h         |  1 +
+ .../net/ethernet/freescale/dpaa2/dpaa2-eth.h  |  1 +
+ drivers/net/ethernet/freescale/enetc/enetc.h  |  1 +
+ drivers/net/ethernet/freescale/fec.h          |  1 +
+ .../ethernet/fungible/funeth/funeth_txrx.h    |  1 +
+ drivers/net/ethernet/google/gve/gve.h         |  1 +
+ drivers/net/ethernet/intel/igc/igc.h          |  1 +
+ .../ethernet/microchip/lan966x/lan966x_main.h |  1 +
+ drivers/net/ethernet/microsoft/mana/mana_en.c |  1 +
+ drivers/net/ethernet/stmicro/stmmac/stmmac.h  |  1 +
+ drivers/net/ethernet/ti/cpsw_priv.h           |  1 +
+ drivers/net/hyperv/hyperv_net.h               |  1 +
+ drivers/net/tap.c                             |  1 +
+ drivers/net/virtio_net.c                      |  1 +
+ include/linux/filter.h                        | 17 ------
+ include/linux/netdevice.h                     | 55 ++-----------------
+ include/net/busy_poll.h                       |  1 +
+ include/net/mana/mana.h                       |  2 +
+ include/net/netdev_rx_queue.h                 | 53 ++++++++++++++++++
+ include/net/xdp.h                             | 27 ++++++++-
+ include/trace/events/xdp.h                    |  1 +
+ kernel/bpf/btf.c                              |  1 +
+ kernel/bpf/offload.c                          |  1 +
+ kernel/bpf/verifier.c                         |  1 +
+ net/bpf/test_run.c                            |  1 +
+ net/core/dev.c                                |  1 +
+ net/core/net-sysfs.c                          |  1 +
+ net/xdp/xsk.c                                 |  1 +
+ 30 files changed, 108 insertions(+), 71 deletions(-)
+ create mode 100644 include/net/netdev_rx_queue.h
+
+-- 
+2.41.0
+
 
