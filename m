@@ -1,187 +1,134 @@
-Return-Path: <netdev+bounces-23654-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23653-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C720776CF22
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 15:47:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE72A76CF12
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 15:44:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AEEB71C212BC
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 13:47:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ED19B1C212C3
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 13:44:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43D9D79CF;
-	Wed,  2 Aug 2023 13:47:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8967A79CA;
+	Wed,  2 Aug 2023 13:44:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3246F746C
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 13:47:43 +0000 (UTC)
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2050.outbound.protection.outlook.com [40.107.223.50])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19B8B26B6
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 06:37:14 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=iW+9GrrRAbM9qEYZywHZ3lDkA1hRb86AkJbaSqTMbENO2YOa1M7e1P8hsZaJMPCYwSs14zBDA/7X70nPJI5HDUPhVhLkS5/rmelFeNkwCSCuV0rcsoBzluUPsCaPXsIuQnPrzt5yU9KX3giZRBQBT0neOaylqJiD/HYdjlv9Ah04hiCr6GwykQiV5phHdqmS0ynAoBJFIOm+ugd5Aaqw9OsF6ikw6QSUNoWq8E74F1IqpCAJnRUeL1N7DsEHvfTd1vgwRVp8L5dwEdDYZB2V7hPX28QJ56OS77VVNdvR0Bazo1aAXBdD4OzjX0BomtGDWAb5bvHNwds9AI7DbZUdaA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=8NiU11jYfOS6Tsol9IL4NJ8DFoe2tCO5dI1ApDdxRH4=;
- b=W85QZe4DZaV1BcsG8G3vZwe/eCz+eoUOmRdlGYXThduh/jV5gSGaFNIQCQaqV120G2cfRNco7kGWevplz0V+ZuuyOoFezv9OjUGSq+VqUQA/07ueNxF+lcDVbc2c7fcEPug972tiDcHsIdLUqY6wwqRMdRxOlgvZwmMnvz/BMBPlkKkr4NzNKbTcArh/i0VSL+c66Wk6Up/1PsMK2Ce89YH4NM/4NLYI8Q/UGOvkgJ7064giWe3NZslL2NPUYk0E70wPf95o03Tic8CaaTStRoPjtEcHATnlLiOQPPIts40V5y6dgSWuicyF1arrank2OBGrhkvzdlxSfEReg4Awfg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=blackwall.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8NiU11jYfOS6Tsol9IL4NJ8DFoe2tCO5dI1ApDdxRH4=;
- b=d/hjYHJ+0vZiszzqstmIRbPPlzDfkBhYsCndK8DZMWjEfHxnj3NsBQCrN8yufTbtHu7iJ+2qRCpoG38CXP3d6d83rG6oLijmoM7k7g3PbmE67JaI/6CuhrOpNKD3i+DW+Cnssbtv6f5VC4ZNllzsdSWP1HJaAoKj5GR1CJV48vX0CMRlmSOzNK2ydUS1z/f5nrWxX+lQGsV18kosH87vq+sMYSssAM3TnpPbZPDB/6rMcqvAKo4MFlCdB4P2RoX8EUDgX/61b1bZxmT647gTZsM/nbadWter+ziZRfdJLU1ADpxdsGGcPh0KrL7CMJo2CPpYrjLcNOA5aoD8F66Cpg==
-Received: from MW4PR03CA0287.namprd03.prod.outlook.com (2603:10b6:303:b5::22)
- by DS0PR12MB6416.namprd12.prod.outlook.com (2603:10b6:8:cb::6) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6652.19; Wed, 2 Aug 2023 13:37:12 +0000
-Received: from MWH0EPF000971E8.namprd02.prod.outlook.com
- (2603:10b6:303:b5:cafe::4f) by MW4PR03CA0287.outlook.office365.com
- (2603:10b6:303:b5::22) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.44 via Frontend
- Transport; Wed, 2 Aug 2023 13:37:12 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- MWH0EPF000971E8.mail.protection.outlook.com (10.167.243.68) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6652.19 via Frontend Transport; Wed, 2 Aug 2023 13:37:11 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Wed, 2 Aug 2023
- 06:36:58 -0700
-Received: from yaviefel (10.126.231.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37; Wed, 2 Aug 2023
- 06:36:55 -0700
-References: <20230801152138.132719-1-idosch@nvidia.com>
- <87sf91enuf.fsf@nvidia.com> <ZMpNRzXKIS7ZzSVN@shredder>
-User-agent: mu4e 1.8.11; emacs 28.2
-From: Petr Machata <petrm@nvidia.com>
-To: Ido Schimmel <idosch@idosch.org>
-CC: Petr Machata <petrm@nvidia.com>, Ido Schimmel <idosch@nvidia.com>,
-	<netdev@vger.kernel.org>, <dsahern@gmail.com>, <stephen@networkplumber.org>,
-	<razor@blackwall.org>
-Subject: Re: [PATCH iproute2-next] bridge: Add backup nexthop ID support
-Date: Wed, 2 Aug 2023 15:35:20 +0200
-In-Reply-To: <ZMpNRzXKIS7ZzSVN@shredder>
-Message-ID: <873511efbg.fsf@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7ECCE7485
+	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 13:44:47 +0000 (UTC)
+Received: from mail-yb1-xb32.google.com (mail-yb1-xb32.google.com [IPv6:2607:f8b0:4864:20::b32])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B631810B;
+	Wed,  2 Aug 2023 06:44:45 -0700 (PDT)
+Received: by mail-yb1-xb32.google.com with SMTP id 3f1490d57ef6-d3522283441so2592516276.0;
+        Wed, 02 Aug 2023 06:44:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1690983885; x=1691588685;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=b6fDSJ7bVl9DJhnNbJNn9yYS6U2XnMIL4S+YB5SBQAk=;
+        b=hDOx5C7VN0mq/HjTs9oW1B4yqomTKLOaqdZD6bHdepCmuTCB6L14J/XkUp3RIzIkg+
+         q1HviFSXJsEcOgCFm9sEqbLR+w0PEV2KhQPpLTbETV8jm8SD9AVCSVuhSP6Kc3vizO3f
+         IU+THNU4MVUI8aTYm4ieOZknBVn0naiCULw71TiB/CcJmf9DuGQfxP+m1FLNuU3VpmjE
+         K+skhtLoCbpPc07fJsjFCFG5ni9UPOUcjUUyY6C7TeqNwrbO31tJyxQ3udfKTV3LlnLT
+         mCYltnyJPxTdEHovcLda3eAbuWYqBJZPXzeqeKoo67A6GqVxR9Amk+S7xCe/ScqCGF1T
+         AUWw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690983885; x=1691588685;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=b6fDSJ7bVl9DJhnNbJNn9yYS6U2XnMIL4S+YB5SBQAk=;
+        b=ePtASu9zZOT2vIevLoe5kWeTNeLd0eX+H+LqhGMrjfM4eedBUfdhhGjqC+zLpAYk3x
+         O7LGQSHyP4F0IDpdRSnV+FNVhL8GJ4NDO1lXY5EtVp5ODYVnFPg19JLkzV8Sk2fGj2xd
+         I4tXPzlm/sI5SZQWISRZ6/Sv/sj3K82uMRcU+jDqAx4ZgYTm2qjBAtCGNWxlySqrVaS3
+         E4TV9fob0e3eEaJVSL0v884dQr5BJYjVEKu+LfVFXpc5XYbTqQ/sB76huV8uk6xHHWze
+         8xlnW+vp2oFESmjWRfobqJOxHsYq0v60n/HsbV42tAib06DNs/gsyUMuTbb7p7Ig7q1j
+         8pOQ==
+X-Gm-Message-State: ABy/qLaqFWgFm6tpgI8+gqZFCs7jch2wM8nwaX1C6nV842FMMBG03unx
+	2rd8qNwBuXZuDc4m/huQfamLKsExt6GCvLZs6fY=
+X-Google-Smtp-Source: APBJJlFnonWM+2t9C2r/SQ7DUhWsetbyvDkyYgz7tolRX/91Vht7ivli9q3ipM5ixFqVNTWlT49SJavv8BsSZfi2kWE=
+X-Received: by 2002:a25:ae12:0:b0:cb6:f035:391 with SMTP id
+ a18-20020a25ae12000000b00cb6f0350391mr12644017ybj.24.1690983884735; Wed, 02
+ Aug 2023 06:44:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.126.231.35]
-X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MWH0EPF000971E8:EE_|DS0PR12MB6416:EE_
-X-MS-Office365-Filtering-Correlation-Id: 076323ab-ee3e-432e-a0af-08db935d939c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	lQ4zkQMNgIvD4UCcjh+OpJIjE/bvv0m25o/VaPvz9dm88nU49MbcyvRDw9z+XCUg8qm0VaaO4E4ou6minunOwRKhwaIrm/cnP7TzFWrIkGWUsNQORuF5hGaQPOVA5A4vEG96etKC3/v52NGIOZp975ZJhNKtyxLb8j5wW0OoOKz8BGV9Fbu/+4hFRJyLPBjkTuiDEinfaWyDpj+CBCJz6PjxA8gtTvK4meWBmxFVGaPFKXaqs4nGIu3jLLhOGqDwBlvrpmACCZAHbJ/PztjQ5a0I/xo9At3sGWqGQuUrwWtdw0cR6vv6Pj/iGXhI/9x+1Dq86DlaVL5P600AtncT9aVHFAbZi063F0ZdXSOhVzKG/ZTLQ+sv9s034cl5/hmhIvEwkX5E4OxLJBGUdlcz1yW3r3LeYSQ1Mz2r5uMCHqsR0ntslP3SjZ6HsfaF4PcNu6yEDt0FvwJVPP3FcpKVFfbQxmnSiKmk5Vyzf0SUP3ciZOHMxAqA/5RrH+A/amULTeuat/21H7HuFBl77WWi6A+W4f8zDA2ny08MkaruRi0bfzZ4AavLKdzjCLm3ZCV/d6b9XZi3czbIGSrLu9gKPJP1pzZstKkTCBzE4vyoq3Pr2weeZn1kdP77FqZ+z2MnNZPORLYdYGBanVNDJPvcQ6lxIhzc+anOCy3WjNGH4WsBJwOHiCcMiHZcPfQglpermILFkqrFl3/StHVytdIdqU4iefMiCrZOIovF8imwrDGn/ZCEnHwXZQwG9Hn6e7Ox
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(396003)(136003)(346002)(376002)(39860400002)(82310400008)(451199021)(36840700001)(40470700004)(46966006)(70206006)(70586007)(86362001)(6916009)(6666004)(2906002)(4326008)(54906003)(40480700001)(36756003)(40460700003)(478600001)(83380400001)(82740400003)(426003)(47076005)(41300700001)(2616005)(7636003)(356005)(5660300002)(36860700001)(8676002)(8936002)(26005)(16526019)(316002)(336012)(186003);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Aug 2023 13:37:11.9251
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 076323ab-ee3e-432e-a0af-08db935d939c
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	MWH0EPF000971E8.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB6416
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.6
+References: <20230731141030.32772-1-yuehaibing@huawei.com>
+In-Reply-To: <20230731141030.32772-1-yuehaibing@huawei.com>
+From: Xin Long <lucien.xin@gmail.com>
+Date: Wed, 2 Aug 2023 09:44:17 -0400
+Message-ID: <CADvbK_e0n7Y28T6M=tX7htqp4HNdAnT_9FRBux_m46sgPXv9uQ@mail.gmail.com>
+Subject: Re: [PATCH net-next] sctp: Remove unused function declarations
+To: Yue Haibing <yuehaibing@huawei.com>
+Cc: marcelo.leitner@gmail.com, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, linux-sctp@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-
-Ido Schimmel <idosch@idosch.org> writes:
-
-> On Wed, Aug 02, 2023 at 11:55:26AM +0200, Petr Machata wrote:
->> 
->> Ido Schimmel <idosch@nvidia.com> writes:
->> 
->> > @@ -493,6 +499,10 @@ static int brlink_modify(int argc, char **argv)
->> >  			}
->> >  		} else if (strcmp(*argv, "nobackup_port") == 0) {
->> >  			backup_port_idx = 0;
->> > +		} else if (strcmp(*argv, "backup_nhid") == 0) {
->> > +			NEXT_ARG();
->> > +			if (get_s32(&backup_nhid, *argv, 0))
->> > +				invarg("invalid backup_nhid", *argv);
->> 
->> Not sure about that s32. NHID's are unsigned in general. I can add a
->> NHID of 0xffffffff just fine:
->> 
->> # ip nexthop add id 0xffffffff via 192.0.2.3 dev Xd
->> 
->> (Though ip nexthop show then loops endlessly probably because -1 is used
->> as a sentinel in the dump code. Oops!)
->> 
->> IMHO the tool should allow configuring this. You allow full u32 range
->> for the "ip" tool, no need for "bridge" to be arbitrarily limited.
+On Mon, Jul 31, 2023 at 10:10=E2=80=AFAM Yue Haibing <yuehaibing@huawei.com=
+> wrote:
 >
-> What about the diff below?
+> These declarations are never implemented since beginning of git history.
 >
-> diff --git a/bridge/link.c b/bridge/link.c
-> index c7ee5e760c08..4bf806c5be61 100644
-> --- a/bridge/link.c
-> +++ b/bridge/link.c
-> @@ -334,8 +334,9 @@ static int brlink_modify(int argc, char **argv)
->                 .ifm.ifi_family = PF_BRIDGE,
->         };
->         char *d = NULL;
-> +       bool backup_nhid_set = false;
-> +       __u32 backup_nhid;
->         int backup_port_idx = -1;
-> -       __s32 backup_nhid = -1;
->         __s8 neigh_suppress = -1;
->         __s8 neigh_vlan_suppress = -1;
->         __s8 learning = -1;
-> @@ -501,8 +502,9 @@ static int brlink_modify(int argc, char **argv)
->                         backup_port_idx = 0;
->                 } else if (strcmp(*argv, "backup_nhid") == 0) {
->                         NEXT_ARG();
-> -                       if (get_s32(&backup_nhid, *argv, 0))
-> +                       if (get_u32(&backup_nhid, *argv, 0))
->                                 invarg("invalid backup_nhid", *argv);
-> +                       backup_nhid_set = true;
->                 } else {
->                         usage();
->                 }
-> @@ -589,7 +591,7 @@ static int brlink_modify(int argc, char **argv)
->                 addattr32(&req.n, sizeof(req), IFLA_BRPORT_BACKUP_PORT,
->                           backup_port_idx);
->  
-> -       if (backup_nhid != -1)
-> +       if (backup_nhid_set)
->                 addattr32(&req.n, sizeof(req), IFLA_BRPORT_BACKUP_NHID,
->                           backup_nhid);
-
-Yep, that's what I had in mind.
-
-With that:
-Reviewed-by: Petr Machata <petrm@nvidia.com>
+> Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
+> ---
+>  include/net/sctp/sm.h      | 3 ---
+>  include/net/sctp/structs.h | 2 --
+>  2 files changed, 5 deletions(-)
+>
+> diff --git a/include/net/sctp/sm.h b/include/net/sctp/sm.h
+> index f37c7a558d6d..64c42bd56bb2 100644
+> --- a/include/net/sctp/sm.h
+> +++ b/include/net/sctp/sm.h
+> @@ -156,7 +156,6 @@ sctp_state_fn_t sctp_sf_do_6_2_sack;
+>  sctp_state_fn_t sctp_sf_autoclose_timer_expire;
+>
+>  /* Prototypes for utility support functions.  */
+> -__u8 sctp_get_chunk_type(struct sctp_chunk *chunk);
+>  const struct sctp_sm_table_entry *sctp_sm_lookup_event(
+>                                         struct net *net,
+>                                         enum sctp_event_type event_type,
+> @@ -166,8 +165,6 @@ int sctp_chunk_iif(const struct sctp_chunk *);
+>  struct sctp_association *sctp_make_temp_asoc(const struct sctp_endpoint =
+*,
+>                                              struct sctp_chunk *,
+>                                              gfp_t gfp);
+> -__u32 sctp_generate_verification_tag(void);
+> -void sctp_populate_tie_tags(__u8 *cookie, __u32 curTag, __u32 hisTag);
+>
+>  /* Prototypes for chunk-building functions.  */
+>  struct sctp_chunk *sctp_make_init(const struct sctp_association *asoc,
+> diff --git a/include/net/sctp/structs.h b/include/net/sctp/structs.h
+> index 5c72d1864dd6..5a24d6d8522a 100644
+> --- a/include/net/sctp/structs.h
+> +++ b/include/net/sctp/structs.h
+> @@ -1122,8 +1122,6 @@ void sctp_outq_free(struct sctp_outq*);
+>  void sctp_outq_tail(struct sctp_outq *, struct sctp_chunk *chunk, gfp_t)=
+;
+>  int sctp_outq_sack(struct sctp_outq *, struct sctp_chunk *);
+>  int sctp_outq_is_empty(const struct sctp_outq *);
+> -void sctp_outq_restart(struct sctp_outq *);
+> -
+>  void sctp_retransmit(struct sctp_outq *q, struct sctp_transport *transpo=
+rt,
+>                      enum sctp_retransmit_reason reason);
+>  void sctp_retransmit_mark(struct sctp_outq *, struct sctp_transport *, _=
+_u8);
+> --
+> 2.34.1
+>
+Acked-by: Xin Long <lucien.xin@gmail.com>
 
