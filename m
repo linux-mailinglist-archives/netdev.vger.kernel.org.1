@@ -1,98 +1,95 @@
-Return-Path: <netdev+bounces-23758-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23759-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31D6476D6B0
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 20:19:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF68176D6DE
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 20:28:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A2C5C281B8A
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 18:19:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 799D2281B8A
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 18:28:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF0E9101CF;
-	Wed,  2 Aug 2023 18:19:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 596CFFC07;
+	Wed,  2 Aug 2023 18:28:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3635F9F2
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 18:19:32 +0000 (UTC)
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F5B11717;
-	Wed,  2 Aug 2023 11:19:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=vugMJywOE93SV3kAUeXAKCse0EvFHhNIczoKtvubJlk=; b=HmiXdWkuy665ksIH7dQ/x8MHjh
-	MW3Wy1mYP9tpYf1o92JcSxtQsjNFnA/XfoG8hoB2E+mqtuVLQUppK1ytNeoi6RolTtsqQcKWqbTXx
-	kNJv1T0H15NDJ5f/KHhrJ4ir7GmO6A9MjnaXHU2KIzf9RsOq6UDI7NpTkNWziNVrXJevReydUKcUH
-	+gqX7NQsXg4o2vFc9kR3f6DbjSRvwp4Uf/dh/VIPDznS2rQN79k2fzXoRXu5r7VF3Ds0tYNOmi2iz
-	5sGT95xiM0xw7rOnRNQDdASeQVQnhrMlvBIVq1Ckt3FIIIzChAQShaj74K/DESZF03st36DsTGrIl
-	yqqNEIhw==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-	id 1qRGRJ-005cp8-0x;
-	Wed, 02 Aug 2023 18:19:17 +0000
-Date: Wed, 2 Aug 2023 11:19:17 -0700
-From: Luis Chamberlain <mcgrof@kernel.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Daniel Mack <daniel@zonque.org>,
-	Haojian Zhuang <haojian.zhuang@gmail.com>,
-	Robert Jarzmik <robert.jarzmik@free.fr>,
-	Ulf Hansson <ulf.hansson@linaro.org>,
-	Manuel Lauss <manuel.lauss@gmail.com>,
-	Yangbo Lu <yangbo.lu@nxp.com>, Joshua Kinard <kumba@gentoo.org>,
-	Daniel Vetter <daniel.vetter@ffwll.ch>,
-	Arnd Bergmann <arnd@arndb.de>, linux-arm-kernel@lists.infradead.org,
-	open list <linux-kernel@vger.kernel.org>, linux-mmc@vger.kernel.org,
-	netdev@vger.kernel.org, linux-rtc@vger.kernel.org,
-	linux-modules@vger.kernel.org
-Subject: Re: require EXPORT_SYMBOL_GPL symbols for symbol_get v2
-Message-ID: <ZMqeJT9Fv0zzw3/v@bombadil.infradead.org>
-References: <20230801173544.1929519-1-hch@lst.de>
- <ZMlEvr1Vo+475e5X@bombadil.infradead.org>
- <20230802115658.GA30268@lst.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F339F101F2
+	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 18:28:47 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DFA0EC433C8;
+	Wed,  2 Aug 2023 18:28:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1691000927;
+	bh=p8u7Z3mpL59awGuJFbyHMJhPBe2rS8NNyq5W9aJ93bU=;
+	h=From:To:Cc:Subject:Date:From;
+	b=imWvcxfrls0hotBvjeStd2r/Tsn8ULaa9O6vLxTGF2XNJCm1OID/JGTRxWMvK9MkX
+	 lx7I5igI95W4xYxNEqcogfxRBhuS05DvoB7vCab7tCmVhdm9LmkRcfbbzzDgvx0Maw
+	 JTONJXfo7I4Pc5SSResC0YCBWt/V0br4E1B3blQ2T2i5ZtEZP+rStMpO1D653DLKCK
+	 hmDnywaSaWb2yaUL4MCpxkAkZFZtQ3fdYHdul06Jg3IS+wGRDtE/jeXAN7fEIXOsRa
+	 iKxd+74vKO3qNu8Zu8XeAKyhOMvy+V+m+7Wx2RwbVBJSnd1/A42w2zK1WssSFUDFZ7
+	 bmIQz4BnKxujg==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	Jakub Kicinski <kuba@kernel.org>,
+	Maxim Krasnyansky <maxk@qti.qualcomm.com>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Jason Wang <jasowang@redhat.com>
+Subject: [PATCH net] MAINTAINERS: update TUN/TAP maintainers
+Date: Wed,  2 Aug 2023 11:28:43 -0700
+Message-ID: <20230802182843.4193099-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230802115658.GA30268@lst.de>
-Sender: Luis Chamberlain <mcgrof@infradead.org>
-X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_EF,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
 
-On Wed, Aug 02, 2023 at 01:56:58PM +0200, Christoph Hellwig wrote:
-> On Tue, Aug 01, 2023 at 10:45:34AM -0700, Luis Chamberlain wrote:
-> > On Tue, Aug 01, 2023 at 07:35:39PM +0200, Christoph Hellwig wrote:
-> > > Hi all,
-> > > 
-> > > this series changes symbol_get to only work on EXPORT_SYMBOL_GPL
-> > > as nvidia is abusing the lack of this check to bypass restrictions
-> > > on importing symbols from proprietary modules.
-> > 
-> > Reviewed-by: Luis Chamberlain <mcgrof@kernel.org>
-> > 
-> > Let me know if you want this to go through the modules tree or your own.
-> 
-> I don't think this would fit anywhere but the modules tree.
+Willem and Jason have agreed to take over the maintainer
+duties for TUN/TAP, thank you!
 
-OK sure!
+There's an existing entry for TUN/TAP which only covers
+the user mode Linux implementation.
+Since we haven't heard from Maxim on the list for almost
+a decade, extend that entry and take it over, rather than
+adding a new one.
 
-> Let me know if you want me to resend for the mmc dependency fixup or
-> if you want to squash it yourself.
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+CC: Maxim Krasnyansky <maxk@qti.qualcomm.com>
+CC: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+CC: Jason Wang <jasowang@redhat.com>
+---
+ MAINTAINERS | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-Applied, I squashed the depends on MMC=y as suggested by Arnd and pushed
-out to modules-next.`
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 20f6174d9747..39b3c6e66c2e 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -21673,11 +21673,14 @@ S:	Orphan
+ F:	drivers/net/ethernet/dec/tulip/
+ 
+ TUN/TAP driver
+-M:	Maxim Krasnyansky <maxk@qti.qualcomm.com>
++M:	Willem de Bruijn <willemdebruijn.kernel@gmail.com>
++M:	Jason Wang <jasowang@redhat.com>
+ S:	Maintained
+ W:	http://vtun.sourceforge.net/tun
+ F:	Documentation/networking/tuntap.rst
+ F:	arch/um/os-Linux/drivers/
++F:	drivers/net/tap.c
++F:	drivers/net/tun.c
+ 
+ TURBOCHANNEL SUBSYSTEM
+ M:	"Maciej W. Rozycki" <macro@orcam.me.uk>
+-- 
+2.41.0
 
-  Luis
 
