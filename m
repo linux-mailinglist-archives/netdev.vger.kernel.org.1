@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-23681-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23682-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C912D76D1C1
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 17:23:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98BF976D1C2
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 17:23:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9A6BD1C21337
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 15:23:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 787EC281C16
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 15:23:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D24CDD52F;
-	Wed,  2 Aug 2023 15:21:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42AC9D514;
+	Wed,  2 Aug 2023 15:21:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C580DD514
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 15:21:21 +0000 (UTC)
-Received: from mail-wr1-x442.google.com (mail-wr1-x442.google.com [IPv6:2a00:1450:4864:20::442])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 619454EE3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36D7FD527
+	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 15:21:23 +0000 (UTC)
+Received: from mail-wm1-x32e.google.com (mail-wm1-x32e.google.com [IPv6:2a00:1450:4864:20::32e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13E7A4EE7
 	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 08:20:55 -0700 (PDT)
-Received: by mail-wr1-x442.google.com with SMTP id ffacd0b85a97d-3175d5ca8dbso6180335f8f.2
+Received: by mail-wm1-x32e.google.com with SMTP id 5b1f17b1804b1-3fe2bc2702cso16626395e9.1
         for <netdev@vger.kernel.org>; Wed, 02 Aug 2023 08:20:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1690989635; x=1691594435;
+        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1690989637; x=1691594437;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=JjXfH+A0B1Bx2EXBFqrsTnqeGAmKJdYOCJ870ddFWlM=;
-        b=OJyCO89dG/jp45Eq1pxH6DcPys4ZnVsuIKAU3XnjshBMgBa3rN2EjukAfrOqrGAmMr
-         cZ522drGTmp+qx6DHgb58ER/vfVjLP0wNQCeSjdTMatq9Iy9LU5sw9/cuuP8jQ+Z9VOB
-         tE0oPyNJ6foMZxkD2bCejdNhjQBnU1rwYeOLFxYNaFsCig+N1oUfkG+Zu0SR9pV1T7h2
-         6sVJDBzAWRfuIM9FTFVbzpU13ONd8ProlnbQOujV5Z3eT5WuWDLOPMyK3Cyzu0rkqSZZ
-         7PlClFW1lg7rcT9f/oPyrcAIdTm5UEQArdN5j3WKrKF/8MAARyyp9giP7RvBGzetLwO4
-         FOPA==
+        bh=SObDBYoFomzzFPqCkfSUruqmSzpgvk3HNcTMlAHGFyM=;
+        b=KuQz4A93OEex6sM+NiAtOJFDKhEGnB4QFjTeQ4JY30EP9XfsgbO02IGcBe3v8dmtz6
+         lWtGaQsgUFKeixtQG7+oCxSOh7OfdKCtz4U9e9hvRKD4zDYjQQ/nvOsgaKQJzRB2f02Z
+         ULqLX3Du6XGyCEsbYhSlA4nzUhm7BpH3YyAyMwRHqIQnPUM3r+EjJ3O09Rj0er/s3Xkp
+         jDQiXYMP8uskWLYUJppXYWb613SdSEiT97FwD7BqcHcvW9yhcvWPqwuZzQgxJVODX0R+
+         wg4PZPMDXwBZ1jatqVOKOdbkpP3s6ZILblpWDB+B5aj8H3jz0B/rD3/GcxGxMSjp/HsP
+         mL7A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690989635; x=1691594435;
+        d=1e100.net; s=20221208; t=1690989637; x=1691594437;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=JjXfH+A0B1Bx2EXBFqrsTnqeGAmKJdYOCJ870ddFWlM=;
-        b=OO/uk5H/44K7Ch+FkKnWUTQ8XticyUu4VhrUvqtP4hcUT95bjuxIEj0K3bIYsHsaIv
-         XXV3DCsESE558kSm4Tetv9vo765KSwM4vIxm6FXgmGF6KoIOJ2wtB/0t7N3jBneyfa8N
-         BKbZGMFCTG6TIChUAtgD+wDHDdVRQZi4zWqKZxRmZ7lxLo36Xo+5CxIwXIeD3sQ+v3km
-         AlYlmAx7kkuITMB6cvLJRdgp09xveB+znbqj7GJOLq0wl3Iw/Z2E8dEiBkWoUI6TGaxe
-         org7HshXBasd6DPrRSo10KRrCQtl8Ut/hJKukcdOSGj9tAqtqdsMu/v2bFZx19OXcOdH
-         eXQw==
-X-Gm-Message-State: ABy/qLb1fmu2/qZZyg/WiKCOwcdtcJFeZWpWgR2PD2rnhKVS6Ew5hZZj
-	UYaIYBHuGtVT4hY8GC7N0UBRnnqyJkoCkFETHPbLrGCX
-X-Google-Smtp-Source: APBJJlFJnopw3C35I/Oe/BrmU97jjNMYQZ4vUNvyDbSnsmaYAjxs/0v7Xmqqw/DUzm8a/D93Ygr/gw==
-X-Received: by 2002:adf:f44c:0:b0:317:3f64:4901 with SMTP id f12-20020adff44c000000b003173f644901mr4922330wrp.41.1690989635711;
-        Wed, 02 Aug 2023 08:20:35 -0700 (PDT)
+        bh=SObDBYoFomzzFPqCkfSUruqmSzpgvk3HNcTMlAHGFyM=;
+        b=SeAJnf90X+U2ZzTVhNIwg/bBK6lR/4TAyh6JQhS4AM77etq3iCxLWqAXkM+w09hDU/
+         E9MaJ6jcSGucQECRoZyyQtb4hyZ6V9FnP484CWq5ZQOLXaXs0c9Pp3q7NlpxciNdEUDz
+         5E29ixxExsUQn49hp4IZXadYonJGDNKfBV7VgoMYJTF8k6CBnddoly3OBVoG3xdjwvpf
+         tf/BoXnBDYVFxsRWvW/9xs58CEeHzsWOxPK2o4lXEveIk0QelaGV9HfxUPcHd6XCyfIh
+         ZM7CPKF3omlH+3+4yoLMr6Vp0BrRRfbSf3kOrVl1WMzoORLvY8P49qGvC4yT5QNIfHh8
+         ZZCw==
+X-Gm-Message-State: ABy/qLbSehBCk9o6NKa5clwD9OcznejMlX/P2tlZddANjPYYIRDT15f1
+	TOJ62IY9TclJM1b8/x3S35d8chdGqt8FC308mQOQDg==
+X-Google-Smtp-Source: APBJJlFlNAxoAwn/VVMy85QJQwMmYqCn0x5B/7Gcm/Anjmix8XJ2Ikv0NKVfT3iiqO7YkMgJ6GwFlQ==
+X-Received: by 2002:a1c:f211:0:b0:3f4:d18f:b2fb with SMTP id s17-20020a1cf211000000b003f4d18fb2fbmr5374093wmc.8.1690989637224;
+        Wed, 02 Aug 2023 08:20:37 -0700 (PDT)
 Received: from localhost ([212.23.236.67])
-        by smtp.gmail.com with ESMTPSA id z17-20020adfec91000000b003179d7ed4f3sm11017711wrn.12.2023.08.02.08.20.34
+        by smtp.gmail.com with ESMTPSA id t22-20020a7bc3d6000000b003fe1ddd6ac0sm1963792wmj.35.2023.08.02.08.20.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Aug 2023 08:20:35 -0700 (PDT)
+        Wed, 02 Aug 2023 08:20:36 -0700 (PDT)
 From: Jiri Pirko <jiri@resnulli.us>
 To: netdev@vger.kernel.org
 Cc: kuba@kernel.org,
@@ -66,9 +66,9 @@ Cc: kuba@kernel.org,
 	saeedm@nvidia.com,
 	idosch@nvidia.com,
 	petrm@nvidia.com
-Subject: [patch net-next v2 06/11] netlink: specs: devlink: add info-get dump op
-Date: Wed,  2 Aug 2023 17:20:18 +0200
-Message-ID: <20230802152023.941837-7-jiri@resnulli.us>
+Subject: [patch net-next v2 07/11] devlink: add split ops generated according to spec
+Date: Wed,  2 Aug 2023 17:20:19 +0200
+Message-ID: <20230802152023.941837-8-jiri@resnulli.us>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230802152023.941837-1-jiri@resnulli.us>
 References: <20230802152023.941837-1-jiri@resnulli.us>
@@ -87,122 +87,172 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 
 From: Jiri Pirko <jiri@nvidia.com>
 
-Add missing dump op for info-get command and re-generate related
-devlink-user.[ch] code.
+Improve the existing devlink spec in order to serve as a source for
+generation of valid devlink split ops for the existing commands.
+Add the generated sources.
+
+Node that the policies are narrowed down only to the attributes that
+are actually parsed. The dont-validate-strict parsing policy makes sure
+that other possibly passed garbage attributes from userspace are
+ignored during validation.
 
 Signed-off-by: Jiri Pirko <jiri@nvidia.com>
 ---
 v1->v2:
-- new patch, spec split from the next one, adding forgotten changes
-  in devlink-user.[ch] code
+- fixed "for" typo
+- added note to patch description about narrowing down the policy
+- moved info-get dump op addition to a separate patch
+- regenerated files according to static policies change
 ---
- Documentation/netlink/specs/devlink.yaml |  4 +-
- tools/net/ynl/generated/devlink-user.c   | 53 ++++++++++++++++++++++++
- tools/net/ynl/generated/devlink-user.h   | 10 +++++
- 3 files changed, 66 insertions(+), 1 deletion(-)
+ Documentation/netlink/specs/devlink.yaml | 10 ++++
+ net/devlink/Makefile                     |  2 +-
+ net/devlink/netlink_gen.c                | 59 ++++++++++++++++++++++++
+ net/devlink/netlink_gen.h                | 29 ++++++++++++
+ 4 files changed, 99 insertions(+), 1 deletion(-)
+ create mode 100644 net/devlink/netlink_gen.c
+ create mode 100644 net/devlink/netlink_gen.h
 
 diff --git a/Documentation/netlink/specs/devlink.yaml b/Documentation/netlink/specs/devlink.yaml
-index 5d46ca966979..12699b7ce292 100644
+index 12699b7ce292..f6df0b3fd502 100644
 --- a/Documentation/netlink/specs/devlink.yaml
 +++ b/Documentation/netlink/specs/devlink.yaml
-@@ -194,7 +194,7 @@ operations:
+@@ -165,8 +165,13 @@ operations:
+       name: get
+       doc: Get devlink instances.
+       attribute-set: devlink
++      dont-validate:
++        - strict
++        - dump
+ 
+       do:
++        pre: devlink-nl-pre-doit
++        post: devlink-nl-post-doit
+         request:
+           value: 1
+           attributes: &dev-id-attrs
+@@ -189,8 +194,13 @@ operations:
+       name: info-get
+       doc: Get device information, like driver name, hardware and firmware versions etc.
+       attribute-set: devlink
++      dont-validate:
++        - strict
++        - dump
+ 
+       do:
++        pre: devlink-nl-pre-doit
++        post: devlink-nl-post-doit
          request:
            value: 51
            attributes: *dev-id-attrs
--        reply:
-+        reply: &info-get-reply
-           value: 51
-           attributes:
-             - bus-name
-@@ -204,3 +204,5 @@ operations:
-             - info-version-fixed
-             - info-version-running
-             - info-version-stored
-+      dump:
-+        reply: *info-get-reply
-diff --git a/tools/net/ynl/generated/devlink-user.c b/tools/net/ynl/generated/devlink-user.c
-index 939bd45feaca..8492789433b9 100644
---- a/tools/net/ynl/generated/devlink-user.c
-+++ b/tools/net/ynl/generated/devlink-user.c
-@@ -716,6 +716,59 @@ devlink_info_get(struct ynl_sock *ys, struct devlink_info_get_req *req)
- 	return NULL;
- }
+diff --git a/net/devlink/Makefile b/net/devlink/Makefile
+index ef91a76646a3..a087af581847 100644
+--- a/net/devlink/Makefile
++++ b/net/devlink/Makefile
+@@ -1,3 +1,3 @@
+ # SPDX-License-Identifier: GPL-2.0
  
-+/* DEVLINK_CMD_INFO_GET - dump */
-+void devlink_info_get_list_free(struct devlink_info_get_list *rsp)
-+{
-+	struct devlink_info_get_list *next = rsp;
+-obj-y := leftover.o core.o netlink.o dev.o health.o
++obj-y := leftover.o core.o netlink.o netlink_gen.o dev.o health.o
+diff --git a/net/devlink/netlink_gen.c b/net/devlink/netlink_gen.c
+new file mode 100644
+index 000000000000..32d8cbed0c30
+--- /dev/null
++++ b/net/devlink/netlink_gen.c
+@@ -0,0 +1,59 @@
++// SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-3-Clause)
++/* Do not edit directly, auto-generated from: */
++/*	Documentation/netlink/specs/devlink.yaml */
++/* YNL-GEN kernel source */
 +
-+	while ((void *)next != YNL_LIST_END) {
-+		unsigned int i;
++#include <net/netlink.h>
++#include <net/genetlink.h>
 +
-+		rsp = next;
-+		next = rsp->next;
++#include "netlink_gen.h"
 +
-+		free(rsp->obj.bus_name);
-+		free(rsp->obj.dev_name);
-+		free(rsp->obj.info_driver_name);
-+		free(rsp->obj.info_serial_number);
-+		for (i = 0; i < rsp->obj.n_info_version_fixed; i++)
-+			devlink_dl_info_version_free(&rsp->obj.info_version_fixed[i]);
-+		free(rsp->obj.info_version_fixed);
-+		for (i = 0; i < rsp->obj.n_info_version_running; i++)
-+			devlink_dl_info_version_free(&rsp->obj.info_version_running[i]);
-+		free(rsp->obj.info_version_running);
-+		for (i = 0; i < rsp->obj.n_info_version_stored; i++)
-+			devlink_dl_info_version_free(&rsp->obj.info_version_stored[i]);
-+		free(rsp->obj.info_version_stored);
-+		free(rsp);
-+	}
-+}
++#include <uapi/linux/devlink.h>
 +
-+struct devlink_info_get_list *devlink_info_get_dump(struct ynl_sock *ys)
-+{
-+	struct ynl_dump_state yds = {};
-+	struct nlmsghdr *nlh;
-+	int err;
-+
-+	yds.ys = ys;
-+	yds.alloc_sz = sizeof(struct devlink_info_get_list);
-+	yds.cb = devlink_info_get_rsp_parse;
-+	yds.rsp_cmd = DEVLINK_CMD_INFO_GET;
-+	yds.rsp_policy = &devlink_nest;
-+
-+	nlh = ynl_gemsg_start_dump(ys, ys->family_id, DEVLINK_CMD_INFO_GET, 1);
-+
-+	err = ynl_exec_dump(ys, nlh, &yds);
-+	if (err < 0)
-+		goto free_list;
-+
-+	return yds.first;
-+
-+free_list:
-+	devlink_info_get_list_free(yds.first);
-+	return NULL;
-+}
-+
- const struct ynl_family ynl_devlink_family =  {
- 	.name		= "devlink",
- };
-diff --git a/tools/net/ynl/generated/devlink-user.h b/tools/net/ynl/generated/devlink-user.h
-index a008b99b6e24..af65e2f2f529 100644
---- a/tools/net/ynl/generated/devlink-user.h
-+++ b/tools/net/ynl/generated/devlink-user.h
-@@ -207,4 +207,14 @@ void devlink_info_get_rsp_free(struct devlink_info_get_rsp *rsp);
- struct devlink_info_get_rsp *
- devlink_info_get(struct ynl_sock *ys, struct devlink_info_get_req *req);
- 
-+/* DEVLINK_CMD_INFO_GET - dump */
-+struct devlink_info_get_list {
-+	struct devlink_info_get_list *next;
-+	struct devlink_info_get_rsp obj __attribute__ ((aligned (8)));
++/* DEVLINK_CMD_GET - do */
++static const struct nla_policy devlink_get_nl_policy[DEVLINK_ATTR_DEV_NAME + 1] = {
++	[DEVLINK_ATTR_BUS_NAME] = { .type = NLA_NUL_STRING, },
++	[DEVLINK_ATTR_DEV_NAME] = { .type = NLA_NUL_STRING, },
 +};
 +
-+void devlink_info_get_list_free(struct devlink_info_get_list *rsp);
++/* DEVLINK_CMD_INFO_GET - do */
++static const struct nla_policy devlink_info_get_nl_policy[DEVLINK_ATTR_DEV_NAME + 1] = {
++	[DEVLINK_ATTR_BUS_NAME] = { .type = NLA_NUL_STRING, },
++	[DEVLINK_ATTR_DEV_NAME] = { .type = NLA_NUL_STRING, },
++};
 +
-+struct devlink_info_get_list *devlink_info_get_dump(struct ynl_sock *ys);
++/* Ops table for devlink */
++const struct genl_split_ops devlink_nl_ops[4] = {
++	{
++		.cmd		= DEVLINK_CMD_GET,
++		.validate	= GENL_DONT_VALIDATE_STRICT,
++		.pre_doit	= devlink_nl_pre_doit,
++		.doit		= devlink_nl_get_doit,
++		.post_doit	= devlink_nl_post_doit,
++		.policy		= devlink_get_nl_policy,
++		.maxattr	= DEVLINK_ATTR_DEV_NAME,
++		.flags		= GENL_CMD_CAP_DO,
++	},
++	{
++		.cmd		= DEVLINK_CMD_GET,
++		.validate	= GENL_DONT_VALIDATE_DUMP,
++		.dumpit		= devlink_nl_get_dumpit,
++		.flags		= GENL_CMD_CAP_DUMP,
++	},
++	{
++		.cmd		= DEVLINK_CMD_INFO_GET,
++		.validate	= GENL_DONT_VALIDATE_STRICT,
++		.pre_doit	= devlink_nl_pre_doit,
++		.doit		= devlink_nl_info_get_doit,
++		.post_doit	= devlink_nl_post_doit,
++		.policy		= devlink_info_get_nl_policy,
++		.maxattr	= DEVLINK_ATTR_DEV_NAME,
++		.flags		= GENL_CMD_CAP_DO,
++	},
++	{
++		.cmd		= DEVLINK_CMD_INFO_GET,
++		.validate	= GENL_DONT_VALIDATE_DUMP,
++		.dumpit		= devlink_nl_info_get_dumpit,
++		.flags		= GENL_CMD_CAP_DUMP,
++	},
++};
+diff --git a/net/devlink/netlink_gen.h b/net/devlink/netlink_gen.h
+new file mode 100644
+index 000000000000..11980e04a718
+--- /dev/null
++++ b/net/devlink/netlink_gen.h
+@@ -0,0 +1,29 @@
++/* SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-3-Clause) */
++/* Do not edit directly, auto-generated from: */
++/*	Documentation/netlink/specs/devlink.yaml */
++/* YNL-GEN kernel header */
 +
- #endif /* _LINUX_DEVLINK_GEN_H */
++#ifndef _LINUX_DEVLINK_GEN_H
++#define _LINUX_DEVLINK_GEN_H
++
++#include <net/netlink.h>
++#include <net/genetlink.h>
++
++#include <uapi/linux/devlink.h>
++
++/* Ops table for devlink */
++extern const struct genl_split_ops devlink_nl_ops[4];
++
++int devlink_nl_pre_doit(const struct genl_split_ops *ops, struct sk_buff *skb,
++			struct genl_info *info);
++void
++devlink_nl_post_doit(const struct genl_split_ops *ops, struct sk_buff *skb,
++		     struct genl_info *info);
++
++int devlink_nl_get_doit(struct sk_buff *skb, struct genl_info *info);
++int devlink_nl_get_dumpit(struct sk_buff *skb, struct netlink_callback *cb);
++int devlink_nl_info_get_doit(struct sk_buff *skb, struct genl_info *info);
++int devlink_nl_info_get_dumpit(struct sk_buff *skb,
++			       struct netlink_callback *cb);
++
++#endif /* _LINUX_DEVLINK_GEN_H */
 -- 
 2.41.0
 
