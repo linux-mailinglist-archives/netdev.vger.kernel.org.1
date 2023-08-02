@@ -1,337 +1,221 @@
-Return-Path: <netdev+bounces-23649-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23650-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2DC576CE97
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 15:27:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23AF276CEAA
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 15:30:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 84124281B80
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 13:27:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CD3BD281B6B
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 13:30:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A516748D;
-	Wed,  2 Aug 2023 13:27:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5677748E;
+	Wed,  2 Aug 2023 13:30:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B48A746C;
-	Wed,  2 Aug 2023 13:27:32 +0000 (UTC)
-Received: from mail-ot1-x334.google.com (mail-ot1-x334.google.com [IPv6:2607:f8b0:4864:20::334])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6755F2703;
-	Wed,  2 Aug 2023 06:27:29 -0700 (PDT)
-Received: by mail-ot1-x334.google.com with SMTP id 46e09a7af769-6bca5c71a6aso2868722a34.3;
-        Wed, 02 Aug 2023 06:27:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690982848; x=1691587648;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=18UwW1utuNkSoHzmJMuSebGfODEhO3h+VlQi/i83GtQ=;
-        b=QBHB50ZZY9uWbYiYv9cfESYNuHEparIb/B3qKl/Wgbds8A1R+kbDEeTJHYJnUdzFxb
-         /qv/JsgmT1T0GWal4u7rNPTqzEpydysjUQVQOxCvXUkfNarl3tabfGrSS83rq5w++dK4
-         BTBd1O6P0XbqYK5dCGb7P/Di99br5M+yxYaJsMN5Ix+L29pJscpZRFY8+Mb4GOjOx4kD
-         z1RSLmUmmxaozLgjPbzsD8RkIqx2021xasu2+qVZnKG1gWhsafZa3Tz0g7RL7JygJDBm
-         gILcwtofr1HeTxcFm2UQ1I2bSWnMaMX5RiQy6mAXAsvUZsUeL2tek3+3Ntaq0Q5uWImU
-         L6Yw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690982848; x=1691587648;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=18UwW1utuNkSoHzmJMuSebGfODEhO3h+VlQi/i83GtQ=;
-        b=PhZOmDbNM3cgNwRN2JtDkDzJcF72UGpfNDp4XrG5u0LfGFkZG0RXl3KfMfVlCt6fkC
-         PUUGKDQSGmQ8j+//n9PkWA5HEOpToJPfOkQCDLAG/I4cGst4HfJgeCvspu3vHlyf7jZi
-         2g3SuFAO4k4LM5xY4xO7L1ktCwImHKlmdxvycc60dWEy60Beeo+8zfZrT9PW69t0u6XB
-         FY5fiyA3DVUjJFF6q3V3U9A1WTPGTAkjMvu+CHitde7CnnhYPlijvN9uDh/dxcSYfRQ1
-         LmpJvrKY/DfRPp/qggoUfg9dd6UexKf9JtExwN234YBwBf0dg7fYNXYepZDDAMHwsPZG
-         aTrQ==
-X-Gm-Message-State: ABy/qLZyEr+vHRBH3qSDlU6zxMxyNRfgfolLSQjsIybf+N7kBJSqcRs4
-	Ii47cFK2hHhHpOe75mrZA/4=
-X-Google-Smtp-Source: APBJJlGXrxsoUEY85b11m2d2HEWtlpEksagOrkKx+pqr/8ovtQ3BWPA3oLZ/X2o+j9uMqxWgznmUsA==
-X-Received: by 2002:a05:6830:20d6:b0:6b9:67e4:eba7 with SMTP id z22-20020a05683020d600b006b967e4eba7mr17813623otq.23.1690982848526;
-        Wed, 02 Aug 2023 06:27:28 -0700 (PDT)
-Received: from localhost (172.174.245.35.bc.googleusercontent.com. [35.245.174.172])
-        by smtp.gmail.com with ESMTPSA id c24-20020ac86618000000b0040d6f2113efsm3354848qtp.58.2023.08.02.06.27.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Aug 2023 06:27:27 -0700 (PDT)
-Date: Wed, 02 Aug 2023 09:27:27 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>, 
- Larysa Zaremba <larysa.zaremba@intel.com>
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- bpf <bpf@vger.kernel.org>, 
- Alexei Starovoitov <ast@kernel.org>, 
- Daniel Borkmann <daniel@iogearbox.net>, 
- Andrii Nakryiko <andrii@kernel.org>, 
- Martin KaFai Lau <martin.lau@linux.dev>, 
- Song Liu <song@kernel.org>, 
- Yonghong Song <yhs@fb.com>, 
- John Fastabend <john.fastabend@gmail.com>, 
- KP Singh <kpsingh@kernel.org>, 
- Stanislav Fomichev <sdf@google.com>, 
- Hao Luo <haoluo@google.com>, 
- Jiri Olsa <jolsa@kernel.org>, 
- David Ahern <dsahern@gmail.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Willem de Bruijn <willemb@google.com>, 
- Jesper Dangaard Brouer <brouer@redhat.com>, 
- Anatoly Burakov <anatoly.burakov@intel.com>, 
- Alexander Lobakin <alexandr.lobakin@intel.com>, 
- Magnus Karlsson <magnus.karlsson@gmail.com>, 
- Maryam Tahhan <mtahhan@redhat.com>, 
- xdp-hints@xdp-project.net, 
- Network Development <netdev@vger.kernel.org>, 
- Simon Horman <simon.horman@corigine.com>
-Message-ID: <64ca59bfbb1cd_294ce929467@willemb.c.googlers.com.notmuch>
-In-Reply-To: <CAADnVQJPgpo7J0qVTQJYYocZ=Jnw=O5GfN2=PyAQ55+WWG_DVg@mail.gmail.com>
-References: <20230728173923.1318596-1-larysa.zaremba@intel.com>
- <20230728173923.1318596-13-larysa.zaremba@intel.com>
- <20230728215340.pf3qcfxh7g4x7s6a@MacBook-Pro-8.local>
- <64c53b1b29a66_e235c2942d@willemb.c.googlers.com.notmuch>
- <CAADnVQ+vn0=1UT5_c628ovq+LzfrNFf0MxmZn++NqeUFJ-ykQw@mail.gmail.com>
- <64c661de227c2_11bfb629493@willemb.c.googlers.com.notmuch>
- <ZMeSUrOfhq9dWz6f@lincoln>
- <CAADnVQJPgpo7J0qVTQJYYocZ=Jnw=O5GfN2=PyAQ55+WWG_DVg@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v4 12/21] xdp: Add checksum hint
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90252746C
+	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 13:30:40 +0000 (UTC)
+Received: from out3-smtp.messagingengine.com (out3-smtp.messagingengine.com [66.111.4.27])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E06151BF9
+	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 06:30:38 -0700 (PDT)
+Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
+	by mailout.nyi.internal (Postfix) with ESMTP id 9BD045C0114;
+	Wed,  2 Aug 2023 09:30:34 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute4.internal (MEProxy); Wed, 02 Aug 2023 09:30:34 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:sender:subject
+	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+	:x-sasl-enc; s=fm3; t=1690983034; x=1691069434; bh=Se4vkJiLMujX1
+	hWtC0LkiKZ1N+nHiXONUDKEUSkblLI=; b=fGOA9Sk4/cfeDlqQNF1vvqL2Y1bQf
+	wYqIP1XgqOKj9zMHlQlRgLaCC+VLGCLd7ErVgbHkT73I1a9VOW7377khx1j3vev7
+	AFK0Rep49f8mbRCd2u5wUlghnh94ho7yoiyhu9uwssw8eoztaH91iX/hXK4jrG4D
+	Z7GL4Ttwg9b8O4eT0zKABgu1ZKwjOMFi2q44xhdgwQSd0eIOvHXHtig1mSlhElIC
+	Qbgpy+N8FvUxeB/JR08GpVhLVsD2hXjfNa5UKE4RU6F+6PNdt+ZVmMXAwQBT1/bf
+	wuMMkoY0RNR/5FIGfq4QP9decZsXN5JsAiV5vHxoi60wxg6W3NtMJ028Q==
+X-ME-Sender: <xms:elrKZFcXjGzQe9VNBJ9PoxB6_e_xfCWPZmQXk3Y848hEEuSZ6_L8PA>
+    <xme:elrKZDM2yFK9jkxTTOz6M2gVTKc7UnDlD4bEjbSWqZVniSq7eBNyAKcEcm8x-5WR5
+    X7SsaIiA5H2KN0>
+X-ME-Received: <xmr:elrKZOg9VUjFuIKDzHZTnybi9G_-IF3Gdb2i4i11MBbVw7RTg-SDp4LjB4ihWMH1TbQG0_reFoz_3aJFctEl8DhMJzSOpQ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrjeekgdeihecutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+    fjughrpeffhffvvefukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpefkughoucfu
+    tghhihhmmhgvlhcuoehiughoshgthhesihguohhstghhrdhorhhgqeenucggtffrrghtth
+    gvrhhnpeehhfdtjedviefffeduuddvffegteeiieeguefgudffvdfftdefheeijedthfej
+    keenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuvehluhhsthgvrhfuihiivgeptd
+    enucfrrghrrghmpehmrghilhhfrhhomhepihguohhstghhsehiughoshgthhdrohhrgh
+X-ME-Proxy: <xmx:elrKZO83rej7jkaSslHPkmR85v0hMMBOLZC3hYDFgSc8olcOsCM5vA>
+    <xmx:elrKZBtPmcDwmB4u0y8y7x7yPZH-3ClBhZdVk6rbWvzzLMtIjS-jBA>
+    <xmx:elrKZNGMI5aF4hKwGSWpkQpgm3oNWtIkTMrjnZ_bbae8SdEReX_3QQ>
+    <xmx:elrKZC-zxzZue8PoCY3i8TeFkgUHvjd3-_cZ1CJQwuBxBOnc0vycqg>
+Feedback-ID: i494840e7:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 2 Aug 2023 09:30:33 -0400 (EDT)
+Date: Wed, 2 Aug 2023 16:30:30 +0300
+From: Ido Schimmel <idosch@idosch.org>
+To: Petr Machata <petrm@nvidia.com>, vladimir.oltean@nxp.com
+Cc: Ido Schimmel <idosch@nvidia.com>, netdev@vger.kernel.org,
+	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+	edumazet@google.com, razor@blackwall.org,
+	mirsad.todorovac@alu.unizg.hr
+Subject: Re: [PATCH net 10/17] selftests: forwarding: ethtool_mm: Skip when
+ using veth pairs
+Message-ID: <ZMpadrHS4Sp3zE9F@shredder>
+References: <20230802075118.409395-1-idosch@nvidia.com>
+ <20230802075118.409395-11-idosch@nvidia.com>
+ <20230802105243.nqwugrz5aof5fbbk@skbuf>
+ <87fs51eig3.fsf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87fs51eig3.fsf@nvidia.com>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Alexei Starovoitov wrote:
-> On Mon, Jul 31, 2023 at 3:56=E2=80=AFAM Larysa Zaremba <larysa.zaremba@=
-intel.com> wrote:
+On Wed, Aug 02, 2023 at 02:27:49PM +0200, Petr Machata wrote:
+> 
+> Vladimir Oltean <vladimir.oltean@nxp.com> writes:
+> 
+> > Hi Ido,
 > >
-> > On Sun, Jul 30, 2023 at 09:13:02AM -0400, Willem de Bruijn wrote:
-> > > Alexei Starovoitov wrote:
-> > > > On Sat, Jul 29, 2023 at 9:15=E2=80=AFAM Willem de Bruijn
-> > > > <willemdebruijn.kernel@gmail.com> wrote:
-> > > > >
-> > > > > Alexei Starovoitov wrote:
-> > > > > > On Fri, Jul 28, 2023 at 07:39:14PM +0200, Larysa Zaremba wrot=
-e:
-> > > > > > >
-> > > > > > > +union xdp_csum_info {
-> > > > > > > +   /* Checksum referred to by ``csum_start + csum_offset``=
- is considered
-> > > > > > > +    * valid, but was never calculated, TX device has to do=
- this,
-> > > > > > > +    * starting from csum_start packet byte.
-> > > > > > > +    * Any preceding checksums are also considered valid.
-> > > > > > > +    * Available, if ``status =3D=3D XDP_CHECKSUM_PARTIAL``=
-.
-> > > > > > > +    */
-> > > > > > > +   struct {
-> > > > > > > +           u16 csum_start;
-> > > > > > > +           u16 csum_offset;
-> > > > > > > +   };
-> > > > > > > +
-> > > > > >
-> > > > > > CHECKSUM_PARTIAL makes sense on TX, but this RX. I don't see =
-in the above.
-> > > > >
-> > > > > It can be observed on RX when packets are looped.
-> > > > >
-> > > > > This may be observed even in XDP on veth.
-> > > >
-> > > > veth and XDP is a broken combination. GSO packets coming out of c=
-ontainers
-> > > > cannot be parsed properly by XDP.
-> > > > It was added mainly for testing. Just like "generic XDP".
-> > > > bpf progs at skb layer is much better fit for veth.
-> > >
-> > > Ok. Still, seems forward looking and little cost to define the
-> > > constant?
-> > >
+> > On Wed, Aug 02, 2023 at 10:51:11AM +0300, Ido Schimmel wrote:
+> >> MAC Merge cannot be tested with veth pairs, resulting in failures:
+> >> 
+> >>  # ./ethtool_mm.sh
+> >>  [...]
+> >>  TEST: Manual configuration with verification: swp1 to swp2          [FAIL]
+> >>          Verification did not succeed
+> >> 
+> >> Fix by skipping the test when used with veth pairs.
+> >> 
+> >> Fixes: e6991384ace5 ("selftests: forwarding: add a test for MAC Merge layer")
+> >> Reported-by: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
+> >> Closes: https://lore.kernel.org/netdev/adc5e40d-d040-a65e-eb26-edf47dac5b02@alu.unizg.hr/
+> >> Signed-off-by: Ido Schimmel <idosch@nvidia.com>
+> >> Reviewed-by: Petr Machata <petrm@nvidia.com>
+> >> Tested-by: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
+> >> ---
 > >
-> > +1
-> > CHECKSUM_PARTIAL is mostly for testing and removing/adding it doesn't=
- change
-> > anything from the perspective of the user that does not use it, so I =
-think it is
-> > worth having.
-> =
+> > That will skip the selftest just for veth pairs. This will skip it for
+> > any device that doesn't support the MAC Merge layer:
+> >
+> > diff --git a/tools/testing/selftests/net/forwarding/ethtool_mm.sh b/tools/testing/selftests/net/forwarding/ethtool_mm.sh
+> > index c580ad623848..5432848a3c59 100755
+> > --- a/tools/testing/selftests/net/forwarding/ethtool_mm.sh
+> > +++ b/tools/testing/selftests/net/forwarding/ethtool_mm.sh
+> > @@ -224,6 +224,8 @@ h1_create()
+> >  		hw 1
+> >
+> >  	ethtool --set-mm $h1 pmac-enabled on tx-enabled off verify-enabled off
+> > +
+> > +	h1_created=yes
+> >  }
+> >
+> >  h2_create()
+> > @@ -236,10 +238,16 @@ h2_create()
+> >  		queues 1@0 1@1 1@2 1@3 \
+> >  		fp P E E E \
+> >  		hw 1
+> > +
+> > +	h2_created=yes
+> >  }
+> >
+> >  h1_destroy()
+> >  {
+> > +	if ! [[ $h1_created = yes ]]; then
+> > +		return
+> > +	fi
+> > +
+> >  	ethtool --set-mm $h1 pmac-enabled off tx-enabled off verify-enabled off
+> >
+> >  	tc qdisc del dev $h1 root
+> > @@ -249,6 +257,10 @@ h1_destroy()
+> >
+> >  h2_destroy()
+> >  {
+> > +	if ! [[ $h2_created = yes ]]; then
+> > +		return
+> > +	fi
+> > +
+> >  	tc qdisc del dev $h2 root
+> >
+> >  	ethtool --set-mm $h2 pmac-enabled off tx-enabled off verify-enabled off
+> > @@ -266,6 +278,14 @@ setup_prepare()
+> >  	h1=${NETIFS[p1]}
+> >  	h2=${NETIFS[p2]}
+> >
+> > +	for netif in ${NETIFS[@]}; do
+> > +		ethtool --show-mm $netif 2>&1 &> /dev/null
+> > +		if [[ $? -ne 0 ]]; then
+> > +			echo "SKIP: $netif does not support MAC Merge"
+> > +			exit $ksft_skip
+> > +		fi
+> > +	done
+> > +
+> 
+> Ido, if you decide to go this route, just hoist the loop to the global
+> scope before registering the trap, then you don't need tho hX_created
+> business.
 
-> "little cost to define the constant".
-> Not really. A constant in UAPI is a heavy burden.
-> =
+I think the idea was to run this check after verifying that ethtool
+supports MAC Merge in setup_prepare(). How about moving all these checks
+before doing any configuration and registering a trap handler?
 
-> > > > > > > +   /* Checksum, calculated over the whole packet.
-> > > > > > > +    * Available, if ``status & XDP_CHECKSUM_COMPLETE``.
-> > > > > > > +    */
-> > > > > > > +   u32 checksum;
-> > > > > >
-> > > > > > imo XDP RX should only support XDP_CHECKSUM_COMPLETE with u32=
- checksum
-> > > > > > or XDP_CHECKSUM_UNNECESSARY.
-> > > > > >
-> > > > > > > +};
-> > > > > > > +
-> > > > > > > +enum xdp_csum_status {
-> > > > > > > +   /* HW had parsed several transport headers and validate=
-d their
-> > > > > > > +    * checksums, same as ``CHECKSUM_UNNECESSARY`` in ``sk_=
-buff``.
-> > > > > > > +    * 3 least significant bytes contain number of consecut=
-ive checksums,
-> > > > > > > +    * starting with the outermost, reported by hardware as=
- valid.
-> > > > > > > +    * ``sk_buff`` checksum level (``csum_level``) notation=
- is provided
-> > > > > > > +    * for driver developers.
-> > > > > > > +    */
-> > > > > > > +   XDP_CHECKSUM_VALID_LVL0         =3D 1,    /* 1 outermos=
-t checksum */
-> > > > > > > +   XDP_CHECKSUM_VALID_LVL1         =3D 2,    /* 2 outermos=
-t checksums */
-> > > > > > > +   XDP_CHECKSUM_VALID_LVL2         =3D 3,    /* 3 outermos=
-t checksums */
-> > > > > > > +   XDP_CHECKSUM_VALID_LVL3         =3D 4,    /* 4 outermos=
-t checksums */
-> > > > > > > +   XDP_CHECKSUM_VALID_NUM_MASK     =3D GENMASK(2, 0),
-> > > > > > > +   XDP_CHECKSUM_VALID              =3D XDP_CHECKSUM_VALID_=
-NUM_MASK,
-> > > > > >
-> > > > > > I don't see what bpf prog suppose to do with these levels.
-> > > > > > The driver should pick between 3:
-> > > > > > XDP_CHECKSUM_UNNECESSARY, XDP_CHECKSUM_COMPLETE, XDP_CHECKSUM=
-_NONE.
-> > > > > >
-> > > > > > No levels and no anything partial. please.
-> > > > >
-> > > > > This levels business is an unfortunate side effect of
-> > > > > CHECKSUM_UNNECESSARY. For a packet with multiple checksum field=
-s, what
-> > > > > does the boolean actually mean? With these levels, at least tha=
-t is
-> > > > > well defined: the first N checksum fields.
-> > > >
-> > > > If I understand this correctly this is intel specific feature tha=
-t
-> > > > other NICs don't have. skb layer also doesn't have such concept.
-> >
-> > Please look into csum_level field in sk_buff. It is not the most used=
- property
-> > in the kernel networking code, but it is certainly 1. used by network=
-ing stack
-> > 2. set to non-zero value by many vendors.
-> >
-> > So you do not need to search yourself, I'll copy-paste the docs for
-> > CHECKSUM_UNNECESSARY here:
-> >
-> >  *   %CHECKSUM_UNNECESSARY is applicable to following protocols:
-> >  *
-> >  *     - TCP: IPv6 and IPv4.
-> >  *     - UDP: IPv4 and IPv6. A device may apply CHECKSUM_UNNECESSARY =
-to a
-> >  *       zero UDP checksum for either IPv4 or IPv6, the networking st=
-ack
-> >  *       may perform further validation in this case.
-> >  *     - GRE: only if the checksum is present in the header.
-> >  *     - SCTP: indicates the CRC in SCTP header has been validated.
-> >  *     - FCOE: indicates the CRC in FC frame has been validated.
-> >  *
-> >
-> > Please, look at this:
-> >
-> >  *   &sk_buff.csum_level indicates the number of consecutive checksum=
-s found in
-> >  *   the packet minus one that have been verified as %CHECKSUM_UNNECE=
-SSARY.
-> >  *   For instance if a device receives an IPv6->UDP->GRE->IPv4->TCP p=
-acket
-> >  *   and a device is able to verify the checksums for UDP (possibly z=
-ero),
-> >  *   GRE (checksum flag is set) and TCP, &sk_buff.csum_level would be=
- set to
-> >  *   two. If the device were only able to verify the UDP checksum and=
- not
-> >  *   GRE, either because it doesn't support GRE checksum or because G=
-RE
-> >  *   checksum is bad, skb->csum_level would be set to zero (TCP check=
-sum is
-> >  *   not considered in this case).
-> >
-> > From:
-> > https://elixir.bootlin.com/linux/v6.5-rc4/source/include/linux/skbuff=
-.h#L115
-> >
-> > > > The driver should say CHECKSUM_UNNECESSARY when it's sure
-> > > > or don't pretend that it checks the checksum and just say NONE.
-> > >
-> >
-> > Well, in such case, most of the NICs that use CHECKSUM_UNNECESSARY wo=
-uld have to
-> > return CHECKSUM_NONE instead, because based on my quick search, they =
-mostly
-> > return checksum level of 0 (no tunneling detected) or 1 (tunneling de=
-tected),
-> > so they only parse headers up to a certain depth, meaning it's not po=
-ssible
-> > to tell whether there isn't another CHECKSUM_UNNECESSARY-eligible hea=
-der hiding
-> > in the payload, so those NIC cannot guarantee ALL the checksums prese=
-nt in the
-> > packet are correct. So, by your logic, we should make e.g. AF_XDP use=
-r re-check
-> > already verified checksums themselves, because HW "doesn't pretend th=
-at it
-> > checks the checksum and just says NONE".
-> >
-> > > I did not know how much this was used, but quick grep for non const=
-ant
-> > > csum_level shows devices from at least six vendors.
-> >
-> > Yes, there are several vendors that set the csum_level, including bro=
-adcom
-> > (bnxt) and mellanox (mlx4 and mlx5).
-> >
-> > Also, CHECKSUM_UNNECESSARY is found in 100+ drivers/net/ethernet file=
-s,
-> > while csum_level is in like 20, which means overwhelming majority of
-> > CHECKSUM_UNNECESSARY NICs actually stay with the default checksum lev=
-el of '0'
-> > (they check only the outermost checksum - anything else needs to be v=
-erified by
-> > the networking stack).
-> =
+diff --git a/tools/testing/selftests/net/forwarding/ethtool_mm.sh b/tools/testing/selftests/net/forwarding/ethtool_mm.sh
+index 4331e2161e8d..39e736f30322 100755
+--- a/tools/testing/selftests/net/forwarding/ethtool_mm.sh
++++ b/tools/testing/selftests/net/forwarding/ethtool_mm.sh
+@@ -258,11 +258,6 @@ h2_destroy()
+ 
+ setup_prepare()
+ {
+-       check_ethtool_mm_support
+-       check_tc_fp_support
+-       require_command lldptool
+-       bail_on_lldpad "autoconfigure the MAC Merge layer" "configure it manually"
+-
+        h1=${NETIFS[p1]}
+        h2=${NETIFS[p2]}
+ 
+@@ -278,7 +273,18 @@ cleanup()
+        h1_destroy
+ }
+ 
+-skip_on_veth
++check_ethtool_mm_support
++check_tc_fp_support
++require_command lldptool
++bail_on_lldpad "autoconfigure the MAC Merge layer" "configure it manually"
++
++for netif in ${NETIFS[@]}; do
++       ethtool --show-mm $netif 2>&1 &> /dev/null
++       if [[ $? -ne 0 ]]; then
++               echo "SKIP: $netif does not support MAC Merge"
++               exit $ksft_skip
++       fi
++done
+ 
+ trap cleanup EXIT
 
-> No. What I'm saying is that XDP_CHECKSUM_UNNECESSARY should be
-> equivalent to skb's CHECKSUM_UNNECESSARY with csum_level =3D 0.
-> I'm well aware that some drivers are trying to be smart and put csum_le=
-vel=3D1.
-> There is no use case for it in XDP.
-> "But our HW supports it so XDP prog should read it" is the reason NOT
-> to expose it to bpf in generic api.
-> =
-
-> Either we're doing per-driver kfuncs and no common infra or common kfun=
-c
-> that covers 99% of the drivers. Which is CHECKSUM_UNNECESSARY && csum_l=
-evel =3D 0
-> =
-
-> It's not acceptable to present a generic api to xdp prog with multi lev=
-el
-> csum that only works on a specific HW. Next thing there will be new fla=
-gs
-> and MAX_CSUM_LEVEL in XDP features.
-> Pretending to be generic while being HW specific is the worst interface=
-.
-
-Ok. Agreed that without it we still cover 99% of the use cases. Fine to d=
-rop.
+> 
+> >  	h1_create
+> >  	h2_create
+> >  }
+> 
+> 
 
