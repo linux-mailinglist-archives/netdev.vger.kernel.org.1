@@ -1,86 +1,105 @@
-Return-Path: <netdev+bounces-23482-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23483-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9090E76C1BC
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 02:56:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9AC0876C1E3
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 03:07:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C0A3B1C21115
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 00:56:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 75B891C2111D
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 01:07:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D5FB7E8;
-	Wed,  2 Aug 2023 00:56:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2285B7F1;
+	Wed,  2 Aug 2023 01:07:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F4407E
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 00:56:47 +0000 (UTC)
-Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BF00E52;
-	Tue,  1 Aug 2023 17:56:45 -0700 (PDT)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R971e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046060;MF=yang.lee@linux.alibaba.com;NM=1;PH=DS;RN=11;SR=0;TI=SMTPD_---0VosmemA_1690937800;
-Received: from localhost(mailfrom:yang.lee@linux.alibaba.com fp:SMTPD_---0VosmemA_1690937800)
-          by smtp.aliyun-inc.com;
-          Wed, 02 Aug 2023 08:56:41 +0800
-From: Yang Li <yang.lee@linux.alibaba.com>
-To: madalin.bucur@nxp.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org
-Cc: sean.anderson@seco.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Yang Li <yang.lee@linux.alibaba.com>,
-	Abaci Robot <abaci@linux.alibaba.com>
-Subject: [PATCH net-next v2] net: fman: Remove duplicated include in mac.c
-Date: Wed,  2 Aug 2023 08:56:39 +0800
-Message-Id: <20230802005639.88395-1-yang.lee@linux.alibaba.com>
-X-Mailer: git-send-email 2.20.1.7.g153144c
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 172FD7E
+	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 01:07:43 +0000 (UTC)
+Received: from mail-il1-x12b.google.com (mail-il1-x12b.google.com [IPv6:2607:f8b0:4864:20::12b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33A4B12B;
+	Tue,  1 Aug 2023 18:07:42 -0700 (PDT)
+Received: by mail-il1-x12b.google.com with SMTP id e9e14a558f8ab-348dfefd1a4so31491525ab.1;
+        Tue, 01 Aug 2023 18:07:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1690938461; x=1691543261;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=s/fwGGoY0CBXI3KqyyOIfAkFvSeZq3jl3v4eWbf/W0A=;
+        b=W6bXsAVQfwRmTtN4NVDB/2ncV9wpTScZENedZ7g8lylW5JaJQzIQLjMGQU9ds2jaH1
+         MG4RB6FGRIwnXvj/IEXrxHWimcuJNZbOoMS04MqMhx9ZYMWxd3siFim2BJ4U76MC6lz/
+         rM4YwjnbCF5/90HpqsRRN3P96O7510vO45prO4WRYHfLlPUk/jaed3T5F4DNB8/Fyxhh
+         UUzZCo7YAxF4VBPWk4gYYs+/HgvZL/WG2kLzNJDbmReP1CmfUgXFv2nQB7k1UJ4gW3BX
+         EQe5igdlwLlZuIHCXn1mGTmJPlRI0g93NqmEQsV13x7Opzh1oChFfRz2sybs3ABdJ6b0
+         4gbg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690938461; x=1691543261;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=s/fwGGoY0CBXI3KqyyOIfAkFvSeZq3jl3v4eWbf/W0A=;
+        b=TzvZ/JBpAN8XfHmlwBjQ+ZjwKFmVVwWimGWkz7DvuaRS2GlF4pG+7lrLCmF+flYeUm
+         aojen9tizgM/UBbkpzq7keIJVppJ4o4Olu1RLmVhlliX1TpuODZlHiEXw8Ae+MXq6iep
+         XUehhSP5q+bWBKtE1AbcbSOSi30vnGucaAVJOgIjQhPn5fdlKdNF6zxSEsvTWWP1EFOL
+         +xIBJN9mXecS4IQ0Vh+dxYlJW785MsSuywkWQd3veK/nS9+VkPdtX+T0NormU5UFp9ZP
+         nXee6Yt4esENdGHWf0dxnOqJvtXEF7KTA0iGYR3TDSCCxnUbVB9b+ifaoAcrti55vdBv
+         OvDg==
+X-Gm-Message-State: ABy/qLbJ0g4jp68mKaQmx5F0Zy/8JVoye2PaTaYCuDEI0LqqFeCCWDmz
+	TZzv41PX5/U0z84NxVRu13s=
+X-Google-Smtp-Source: APBJJlHzcsws0HnhCWDSlqL8LQbx4JfHTGvaLjmVda6PJ0CL8Pz4baGK1PtFu7//xFpUWiQtQeLxPw==
+X-Received: by 2002:a05:6e02:f51:b0:346:5bd7:4a17 with SMTP id y17-20020a056e020f5100b003465bd74a17mr12677625ilj.17.1690938461267;
+        Tue, 01 Aug 2023 18:07:41 -0700 (PDT)
+Received: from ?IPV6:2601:282:800:7ed0:211e:b7c4:92fe:76f4? ([2601:282:800:7ed0:211e:b7c4:92fe:76f4])
+        by smtp.googlemail.com with ESMTPSA id a14-20020a92d58e000000b00348d41ffd13sm4164159iln.85.2023.08.01.18.07.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 01 Aug 2023 18:07:40 -0700 (PDT)
+Message-ID: <3fa4d25d-7fea-d25b-fa83-4ada2c550725@gmail.com>
+Date: Tue, 1 Aug 2023 19:07:39 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,UNPARSEABLE_RELAY,URIBL_BLOCKED,
-	USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.13.0
+Subject: Re: [PATCH v4 1/2] drivers: net: prevent tun_build_skb() to exceed
+ the packet size limit
+Content-Language: en-US
+To: Andrew Kanner <andrew.kanner@gmail.com>, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ jasowang@redhat.com, netdev@vger.kernel.org, brouer@redhat.com,
+ jbrouer@redhat.com, john.fastabend@gmail.com, linux-kernel@vger.kernel.org
+Cc: linux-kernel-mentees@lists.linuxfoundation.org,
+ syzbot+f817490f5bd20541b90a@syzkaller.appspotmail.com
+References: <20230801220710.464-1-andrew.kanner@gmail.com>
+From: David Ahern <dsahern@gmail.com>
+In-Reply-To: <20230801220710.464-1-andrew.kanner@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-./drivers/net/ethernet/freescale/fman/mac.c: linux/of_platform.h is included more than once.
+On 8/1/23 4:07 PM, Andrew Kanner wrote:
+> @@ -1594,7 +1597,13 @@ static bool tun_can_build_skb(struct tun_struct *tun, struct tun_file *tfile,
+>  	if (zerocopy)
+>  		return false;
+>  
+> -	if (SKB_DATA_ALIGN(len + TUN_RX_PAD) +
+> +	rcu_read_lock();
+> +	xdp_prog = rcu_dereference(tun->xdp_prog);
+> +	if (xdp_prog)
+> +		pad += XDP_PACKET_HEADROOM;
+> +	rcu_read_unlock();
 
-Reported-by: Abaci Robot <abaci@linux.alibaba.com>
-Closes: https://bugzilla.openanolis.cn/show_bug.cgi?id=6039
-Signed-off-by: Yang Li <yang.lee@linux.alibaba.com>
----
 
-change in v2:
---According to Simon's suggestion, make a slightly better prefix: net: fman: ...
-
- drivers/net/ethernet/freescale/fman/mac.c | 1 -
- 1 file changed, 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/freescale/fman/mac.c b/drivers/net/ethernet/freescale/fman/mac.c
-index b6c7c4c0b367..9767586b4eb3 100644
---- a/drivers/net/ethernet/freescale/fman/mac.c
-+++ b/drivers/net/ethernet/freescale/fman/mac.c
-@@ -12,7 +12,6 @@
- #include <linux/of_net.h>
- #include <linux/of_mdio.h>
- #include <linux/device.h>
--#include <linux/of_platform.h>
- #include <linux/phy.h>
- #include <linux/netdevice.h>
- #include <linux/phy_fixed.h>
--- 
-2.20.1.7.g153144c
-
+since you do not care about the actual xdp_prog (only that one is set) I
+believe you can use rcu_access_pointer here.
 
