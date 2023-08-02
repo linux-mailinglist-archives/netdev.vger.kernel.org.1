@@ -1,118 +1,170 @@
-Return-Path: <netdev+bounces-23602-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23605-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5597576CABF
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 12:23:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF0DB76CAF2
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 12:36:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B0BA0281B2C
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 10:23:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1C88C1C212A2
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 10:36:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 925856AA1;
-	Wed,  2 Aug 2023 10:23:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0D535230;
+	Wed,  2 Aug 2023 10:36:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8718B6FA1
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 10:23:31 +0000 (UTC)
-Received: from mail-il1-x12d.google.com (mail-il1-x12d.google.com [IPv6:2607:f8b0:4864:20::12d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15FC2270F
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 03:23:01 -0700 (PDT)
-Received: by mail-il1-x12d.google.com with SMTP id e9e14a558f8ab-3493d0f785dso210565ab.1
-        for <netdev@vger.kernel.org>; Wed, 02 Aug 2023 03:23:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690971748; x=1691576548;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7zqvW6wr7BEPFq+3v8Hlc3C1SZaHqvL4mtdvNsi7qag=;
-        b=pRjfbU+WjKYVi65kHXhSPKmI2JEZpFGFOh++GoIad6+ufhc6/BVSnfSAuARg+SE1h4
-         S6T8vj5y35WJAep+ng1fllTlVllplUaxvpF8iVQAmYwEln7pKS6pK70wHSn+7rj+0cDP
-         5pAeOS6MxHpCMQ1O3yE0TY8N5GjylijTJAuWWJHwzvTI4m/gapm+IUeHFPGXCYqm+b3K
-         QHdz2vkz85e/hCluUFDW/gnvz9TuASTrAwEmFrgDQKY164o1MK0cP+kBCRMLOsna0gNc
-         i+fSUh0zOLh4Skia/CHd0ucpyd0H88ZPVZSKTOB71Q25qFAsRatIEUQqIcxk300qvcIe
-         2gvA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690971748; x=1691576548;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7zqvW6wr7BEPFq+3v8Hlc3C1SZaHqvL4mtdvNsi7qag=;
-        b=UW+siN1quiRTItdH9xD9F8eYutnGVDEQ8qHNJ3EVld6FaGgfM9XCoahkLsDkKi3YLv
-         8b5lgSHV8HWIFoqY6Csu6+R1jr8WWzr/Ba8hVXUlM/TETFHaVSQY1InNYbYCpH7BCbOn
-         TQFp4T3E84D9RlgsZ8TtUuzB/xtqfMvhyfO4KQv1GI0AW8Qz9UmyexQkL9MP6VXbaeSp
-         rDwV0uxaeVfaFP9CXYXQQil6WdYr8AN77d9UElWnNVcOzNLFzMtqTl9OJNmIklYjvujL
-         LPwUsZiyEODdD7B2OzdXbQBr8T7ijUYTfGdFCz1K99wzmDCdQNXqkfiis03gqYNJ1MHB
-         bfwg==
-X-Gm-Message-State: ABy/qLYmMYOkkcVTxO7oUFTGZ6o/uLQX+NRlo3/DWAa8owQ435CpDH6b
-	lOYy9xo8ZCrRpEjV4NhuKK3ky5CH/GA9vOnfelhJYlbh1I6wkg6FCuIH7Q==
-X-Google-Smtp-Source: APBJJlHIQVJcnDsVtmr7eYAxK9guOERHKVL+k5fiUjBJrWU30nMVoXl9uCYDg85yhzXET0grHTtbfAgWh7S5MNcBbM4=
-X-Received: by 2002:a05:6e02:1562:b0:346:64c0:7648 with SMTP id
- k2-20020a056e02156200b0034664c07648mr1075427ilu.19.1690971748169; Wed, 02 Aug
- 2023 03:22:28 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D9FA63B3
+	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 10:36:13 +0000 (UTC)
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2049.outbound.protection.outlook.com [40.107.244.49])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AAE3E3C3C;
+	Wed,  2 Aug 2023 03:36:09 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=LR/UjfoLdx4LBVF9zpQWKVVYi4EtNyZf51ogLUrv8Bedc9zN2o9//3gyTtEajLtUTfZ4pKbrUvY0aycnNwWFjU/Bb8er++BnJBschpmqYEZChnoKdhvUudlUriB/MFWPGBkueXeoh4HJzW6y68xUSuFwJS7C/W5vlT1/pnGbi77YuTp3oVqBo7hyVcQVfVAYWkpbMPaIMytF0LpILIpIedhgn67GypVKabCU6i9wcxXXyTlmblU9fnWxX/vRGHsZqZeDrOVwj9kFFxCzTTRFuxkeMM/yK3L7XU5AF2bmPXr/8WoDk00xwXDTMIBtsVPbv3wo2DVUQ3hyAxFZiQkBfQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=FGhYpruplPF195TFVfvabAWZnSrETWnGzoh5M+JMsYY=;
+ b=JxlDrtQaPx5hm3NRlzaz/DJk92ZKuvsM/rSvvrP6/raPsFTjPBCWTiwfoKDW/FLCaonoJRgA4utpnSan4zijTrs6MsuEB925Dvv8PoqLbQ7vCNV1fjgUaO+/ufHxcM9L9ElZ2fYFPWntaGWrE7EhyYMBKREFXtXNDUgshKT7ToAmq9WhYd4m37P9b7IpzvKBwuDbAlWMHQqveejxQaX4trFdmPCOtXP0kENxgaavIIZwcYdqbIqD8U/XrGX8Au0YKP7EmCrCTVXOvexZSvVe3U7iheye8lxWEnh5JbZdIO5Sa63eb7AWnk5xpCJ+IbRDLl/4gcCUhznwVNk7A6d8iQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=FGhYpruplPF195TFVfvabAWZnSrETWnGzoh5M+JMsYY=;
+ b=ojJoKI0CSNtOXhekf44SK07hTdavEe0xx0x83scON/dNkafWzcUI+XYT7EnWVu0TdE4zvX33AMtW3/nbvz1bra7m1i5nwHmAwYF/uAzLYhCKpa7RJON4ezFyX9sJL9+qr7FWwGeddo9Ol9ED7+VYV7El5FM+hc2pbPbCYidelx9VdfbVLrKh1h4O8LQVTeaV/KmK6EsD11RvpGvZsl2MT7uS5eEdx9fphe1skVjX4WB0g4M+54EjCjK9uXOQp1NfEjVQD1tJEJudcI5Sil808BjPCKaKQ+K9SOjMI5vnsnTSGXxEtfJdaWgL/jrIrnooTvMYBcNHq6mz7RfxrQ4JVw==
+Received: from MW4PR04CA0094.namprd04.prod.outlook.com (2603:10b6:303:83::9)
+ by PH7PR12MB7283.namprd12.prod.outlook.com (2603:10b6:510:20a::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.45; Wed, 2 Aug
+ 2023 10:36:07 +0000
+Received: from MWH0EPF000989E9.namprd02.prod.outlook.com
+ (2603:10b6:303:83:cafe::d) by MW4PR04CA0094.outlook.office365.com
+ (2603:10b6:303:83::9) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.19 via Frontend
+ Transport; Wed, 2 Aug 2023 10:36:07 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ MWH0EPF000989E9.mail.protection.outlook.com (10.167.241.136) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6652.19 via Frontend Transport; Wed, 2 Aug 2023 10:36:06 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Wed, 2 Aug 2023
+ 03:35:50 -0700
+Received: from yaviefel (10.126.230.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37; Wed, 2 Aug 2023
+ 03:35:46 -0700
+References: <20230722003609.380549-1-mirsad.todorovac@alu.unizg.hr>
+ <ZLzj5oYrbHGvCMkq@shredder>
+ <0550924e-dce9-f90d-df8a-db810fd2499f@alu.unizg.hr>
+ <adc5e40d-d040-a65e-eb26-edf47dac5b02@alu.unizg.hr>
+ <ZL6OljQubhVtQjcD@shredder>
+ <cab8ea8a-98f4-ef9b-4215-e2a93cccaab1@alu.unizg.hr>
+ <ZMEQGIOQXv6so30x@shredder>
+ <a9b6d9f5-14ae-a931-ab7b-d31b5e40f5df@alu.unizg.hr>
+ <ZMYXABUN9OzfN5D3@shredder> <875y5zf27p.fsf@nvidia.com>
+ <304ba960-0214-82d4-05be-e5956baa64c7@alu.unizg.hr>
+User-agent: mu4e 1.8.11; emacs 28.2
+From: Petr Machata <petrm@nvidia.com>
+To: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
+CC: Petr Machata <petrm@nvidia.com>, Ido Schimmel <idosch@idosch.org>,
+	<razor@blackwall.org>, Ido Schimmel <idosch@nvidia.com>,
+	<netdev@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>,
+	"Eric Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>
+Subject: Re: [PATCH v1 01/11] selftests: forwarding:
+ custom_multipath_hash.sh: add cleanup for SIGTERM sent by timeout
+Date: Wed, 2 Aug 2023 12:33:37 +0200
+In-Reply-To: <304ba960-0214-82d4-05be-e5956baa64c7@alu.unizg.hr>
+Message-ID: <87o7jpenpd.fsf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230802092340.9640-1-edward.cree@amd.com>
-In-Reply-To: <20230802092340.9640-1-edward.cree@amd.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 2 Aug 2023 12:22:16 +0200
-Message-ID: <CANn89iK6MPMUiAoRQKo+qyKp4ia6q9oweMi5VSawYQHwv4+-ng@mail.gmail.com>
-Subject: Re: [RFC PATCH net] net-gro: restore check for NULL skb in napi_gro_frags
-To: edward.cree@amd.com
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	Edward Cree <ecree.xilinx@gmail.com>, netdev@vger.kernel.org, 
-	Martin Habets <habetsm.xilinx@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Originating-IP: [10.126.230.35]
+X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MWH0EPF000989E9:EE_|PH7PR12MB7283:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6e6c6e34-8131-47e6-9e6d-08db93444790
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	8Fqf7Ut4D4C6jit1PxHxF5qvI5T4mwICcAUXyvXmnhycvBKjNGfWs52qA5i7WkrD990jCKTbE96kP1BwbFF0dRhauFiLV7zeg6kMmqgJue2epYXdWfAxG8uVoAHTccO6bn1cLkTpyI3p10GoKs5H1iRZwhf/hN8A4/gLH7XWNe83/Uaj4/b4Pcg5ugleu8nnrHxvwZrmCm6KO+DKgiEnSbVm+hjAdnhuVm1FlGIqLvtVcAPWA64wlKUZIrS51enOvlC7CCEKusRxUWbvLm0XP4uKfmKlwVek8CCd0PFtoYw92ewAEj5KGMTHdwWZzinAOnAg9R5acR0o1mDKTjQ47ORaW/WssvTRPgKgvpAaKj9EbYQVEhk73qzmUaamqhmPXAMRbPC96mgtKa67Ysak5b81MsVnUU9xt/5UjiS6nGb5Yw/yoN6QKVJlx1kgO79eDDJEeZnRbwlQinB6b6n4XoIRs0qbuQG3VUb7MgszsRIQKtDCFI02RBG26rHdrbMYKqKmwwrC6L4VHMJkaRsVaPoTiXh5dQGI7TpcmaZVc/Vs03PuCY5xPqFYgV715dE6CEB78yWIvqIrTe9GxyuwaNsqWK7yOPfIHlLYDq/dftHDVWxWKumEkCMOsOpuUng889sxgdCHvXRiFu4wwD7Oh/7ahVT0eYit5SvuQHWjgciZs7FSb8boVDeHHjNdFP2hFUiH0BSeMx8to1ZYCGnB62+XTwti3PZqMk4Y+JcAk67kwncIgsd1/MCHl9UVoDRS
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(346002)(39860400002)(136003)(396003)(376002)(451199021)(82310400008)(36840700001)(40470700004)(46966006)(7416002)(8676002)(5660300002)(36860700001)(426003)(47076005)(82740400003)(83380400001)(2616005)(7636003)(356005)(41300700001)(316002)(336012)(186003)(8936002)(16526019)(53546011)(26005)(4326008)(6916009)(86362001)(70206006)(70586007)(2906002)(6666004)(40460700003)(36756003)(478600001)(54906003)(40480700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Aug 2023 10:36:06.9057
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6e6c6e34-8131-47e6-9e6d-08db93444790
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	MWH0EPF000989E9.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB7283
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Aug 2, 2023 at 11:42=E2=80=AFAM <edward.cree@amd.com> wrote:
+
+Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr> writes:
+
+> On 8/1/23 13:08, Petr Machata wrote:
+>> diff --git a/tools/testing/selftests/net/forwarding/mirror_gre_changes.sh
+>> b/tools/testing/selftests/net/forwarding/mirror_gre_changes.sh
+>> index aff88f78e339..5ea9d63915f7 100755
+>> --- a/tools/testing/selftests/net/forwarding/mirror_gre_changes.sh
+>> +++ b/tools/testing/selftests/net/forwarding/mirror_gre_changes.sh
+>> @@ -72,7 +72,8 @@ test_span_gre_ttl()
+>>     	RET=0
+>>   -	mirror_install $swp1 ingress $tundev "matchall $tcflags"
+>> +	mirror_install $swp1 ingress $tundev \
+>> +		"prot ip flower $tcflags ip_prot icmp"
+>>   	tc filter add dev $h3 ingress pref 77 prot $prot \
+>>   		flower skip_hw ip_ttl 50 action pass
+>>   
 >
-> From: Edward Cree <ecree.xilinx@gmail.com>
+> The problem seems to be fixed in the test run:
 >
-> Cited commit removed the check on the grounds that napi_gro_frags must
->  not be called by drivers if napi_get_frags failed.  But skb can also
->  be NULL if napi_frags_skb fails to pull the ethernet header ("dropping
->  impossible skb" message).  In this case return GRO_CONSUMED, as
->  otherwise continuing on would cause a NULL dereference panic in
->  dev_gro_receive().
->
-> Fixes: 1d11fa696733 ("net-gro: remove GRO_DROP")
-> Reviewed-by: Martin Habets <habetsm.xilinx@gmail.com>
-> Signed-off-by: Edward Cree <ecree.xilinx@gmail.com>
-> ---
-> An sfc customer has encountered this panic in the wild; we're still
->  investigating exactly how it happened (we have a reproducer) but it
->  seems wise to have the core handle this check rather than requiring
->  it in every driver.
+> root@defiant:tools/testing/selftests/net/forwarding# ./mirror_gre_changes.sh
+> TEST: mirror to gretap: TTL change (skip_hw)                        [ OK ]
+> TEST: mirror to ip6gretap: TTL change (skip_hw)                     [ OK ]
+> TEST: mirror to gretap: tunnel down/up (skip_hw)                    [ OK ]
+> TEST: mirror to ip6gretap: tunnel down/up (skip_hw)                 [ OK ]
+> TEST: mirror to gretap: egress down/up (skip_hw)                    [ OK ]
+> TEST: mirror to ip6gretap: egress down/up (skip_hw)                 [ OK ]
+> TEST: mirror to gretap: remote address change (skip_hw)             [ OK ]
+> TEST: mirror to ip6gretap: remote address change (skip_hw)          [ OK ]
+> TEST: mirror to gretap: tunnel deleted (skip_hw)                    [ OK ]
+> TEST: mirror to ip6gretap: tunnel deleted (skip_hw)                 [ OK ]
+> TEST: mirror to gretap: underlay route removal (skip_hw)            [ OK ]
+> TEST: mirror to ip6gretap: underlay route removal (skip_hw)         [ OK ]
+> WARN: Could not test offloaded functionality
+> root@defiant:tools/testing/selftests/net/forwarding#
 
-An ethernet driver feeding non-ethernet packets to the upper stacks
-seems weird to me,
-but given napi_frags_skb() does output a warning, I would say this
-patch would be acceptable until the real bug is fixed :/
-
-Note that eth_type_trans() does not double-check that at least
-ETH_HLEN bytes are present in skb->data
-
-skb_pull_inline(skb, ETH_HLEN);
-
-So eth_type_trans() would definitely crash.
-Not sure why a napi_gro_frags() enabled driver would be allowed to
-cook arbitrary packets with length <  ETH_HLEN
-
-Mixed feelings here, especially if for some reason the compiler would
-not inline napi_frags_skb().
+OK, I'll add your Tested-by, let it pass through our regression and send
+upstream.
 
