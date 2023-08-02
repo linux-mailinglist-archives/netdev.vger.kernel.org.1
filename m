@@ -1,119 +1,118 @@
-Return-Path: <netdev+bounces-23536-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23538-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8CFB276C616
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 09:05:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F94976C628
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 09:13:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 46E2E281BC2
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 07:05:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C4C0E2819AB
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 07:13:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 650321C35;
-	Wed,  2 Aug 2023 07:05:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94ECB1FBF;
+	Wed,  2 Aug 2023 07:13:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 589931848
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 07:05:04 +0000 (UTC)
-Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7121B1BF9
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 00:05:01 -0700 (PDT)
-Received: by mail-ej1-x62a.google.com with SMTP id a640c23a62f3a-99bf91956cdso588740666b.3
-        for <netdev@vger.kernel.org>; Wed, 02 Aug 2023 00:05:01 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 895151859
+	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 07:13:22 +0000 (UTC)
+Received: from mail-lj1-x232.google.com (mail-lj1-x232.google.com [IPv6:2a00:1450:4864:20::232])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E22D72116;
+	Wed,  2 Aug 2023 00:13:15 -0700 (PDT)
+Received: by mail-lj1-x232.google.com with SMTP id 38308e7fff4ca-2b9aa1d3029so97075721fa.2;
+        Wed, 02 Aug 2023 00:13:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1690959900; x=1691564700;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=srtztsOfRZHM5DByMvd5qNZ4d4L4TsJYOXXb3gpyLNg=;
-        b=JUdtQeOUbF/J36LHPbsRWP0VqA+oUCYFvrpaTsq2l/rOzt67R9NGJhTnQxxF02+LdE
-         TvcXPVUtZ8RVj5+Qc5NDr5yyB4/DXNpl2kB3uTadcmdBU+nzmNiFNFTtRlOZJG5AWS9i
-         /lhaJfaveyhpdl7QSPT3QZrNtny4qHmVrovWtVFE19IVs8dbibFCkfDULn8cnLbQjqgv
-         aXSLr30jRM5lrnk0+EQLNj4W6MGvZ6QJF0F41iqUPYVAXQiOVCwY7diED7J5qawgbCn+
-         42eFF9bwobBCtFNqA5U0+freQPL4ibjxutNUw0/LIRU0ghAxwsLagQ7EAjhQoQFkPV2L
-         Arlg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690959900; x=1691564700;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20221208; t=1690960394; x=1691565194;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=srtztsOfRZHM5DByMvd5qNZ4d4L4TsJYOXXb3gpyLNg=;
-        b=gdLg+AkdusnT6RN6Hmc2pKV5wJf4p5bC6uVITo4Pm40uBufIn+n5bmzxsGVIP0QpT9
-         4dwZRzYUIx6f84Vb3BT6sCscxLR2+xu2Xm0u8qmqOsYXwpdCQUuebk285Hy8WSe+CBsH
-         q/oix/bmI8+/pJnz4z+vdqOUEJrhPmn9nhHvz4NWTkSgv4H/aDB/KFMFHvPeniMzZuPY
-         6AwvOLWhHHK63DVLBP3tL1ERNeKCz8I2XwUEvfZ+zJQUP4w8n/NTjmtI1f4CihzgJGSs
-         gLNTvggvAgFzS39CPgKsQeKp8e8evcP8I1qhAwTPgDjHVuzNa0WRASAHIn2jPcSu7Eqa
-         svFQ==
-X-Gm-Message-State: ABy/qLbyZuUrvuAwEJK2FHjMtADAiKLN3yOLJ+081z6pwwPVgZkZkIr4
-	K6WiX3o4albsw2kxUkDBXBTmzw==
-X-Google-Smtp-Source: APBJJlFKvHX6CaVaIWDwJhrdlsairDgmqKfvU8+4Gtli3Iu3VlV8GRtfTCjEUQUIEWNYGOHFFwsRQw==
-X-Received: by 2002:a17:906:64cb:b0:994:19ed:e92b with SMTP id p11-20020a17090664cb00b0099419ede92bmr3897121ejn.20.1690959899606;
-        Wed, 02 Aug 2023 00:04:59 -0700 (PDT)
-Received: from localhost ([212.23.236.67])
-        by smtp.gmail.com with ESMTPSA id b10-20020a170906490a00b0099bd6ef67e8sm8751615ejq.78.2023.08.02.00.04.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Aug 2023 00:04:58 -0700 (PDT)
-Date: Wed, 2 Aug 2023 09:04:57 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
-	edumazet@google.com, moshe@nvidia.com, saeedm@nvidia.com,
-	idosch@nvidia.com, petrm@nvidia.com
-Subject: Re: [patch net-next v2 11/11] devlink: extend health reporter dump
- selector by port index
-Message-ID: <ZMoAGbFufprqV2FS@nanopsycho>
-References: <20230720121829.566974-1-jiri@resnulli.us>
- <20230720121829.566974-12-jiri@resnulli.us>
- <20230725114803.78e1ae00@kernel.org>
- <ZMeunKZscNRQTssp@nanopsycho>
- <20230731100632.02c02b76@kernel.org>
- <ZMirCXLlY6H2yVEq@nanopsycho>
- <20230801085644.7be5b2e4@kernel.org>
+        bh=2buEm2gDrf1fNgEA1fBvBUhdIcoSkeNWypy9BrDWZro=;
+        b=o/Z0yMvRj/sHbGhhlNrlERgGL/vkblmm6ZJLHQMACyDwmmKmNZYvTU/06maEeEpfRp
+         Qykwe/MywZjAj7CgMOPhkGkeYcF/+NkNb9nzn50MZU8ub6CiuIOy5wlQaHDZiG5zxPFm
+         hOwzsQe8rXq+FQKiuPeG7nEpdZeTr5wWh3uyQZddDw1dVz7T+jkLOZ44dHXGhKyahFF8
+         RSn7gC04V66HalFvzQXJfxycd+4lyPUNPP2wu9sArTQK6awUl2bONG+SgQvFn0/Nru7D
+         YNyTWzdXp1bb3ibxDzOjTS6ZOvdtOkGS6gwUlv+9CUSZEiKg1xeVsqCq30sD7eJNrEvF
+         I9bA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690960394; x=1691565194;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=2buEm2gDrf1fNgEA1fBvBUhdIcoSkeNWypy9BrDWZro=;
+        b=XUFzgcNj1+T+ja5Sme+MS7rFnPURiwiWAPyenGLL87LNjA6GW0opjGW+JzKm4M5A4t
+         /eF7odK+e4tWp4wRapv/vBd6omuW1fvEwP0ScDOzK3fyCl3xKCP+iDn4HEW7ofmNrf+D
+         xi91SNc6Q5Tki+R87S9sJ0nH8Pjj+6Ik1kZBr64iEdQXtTlR14qTMfgaBCgWMZ11GK/4
+         A5CnyqsSPdslVCNT0pDlIMpjWjerkHBP3DBlbxfZzMi4PIltHBYc7VDGBBIryHRdDWLg
+         EMu5Gek5SIEesNZ4orUfLxy23ffT6Qe37kPwdJWFKIK124NNxJ6HtqQvn20bCyHZreXn
+         h90g==
+X-Gm-Message-State: ABy/qLag+rMIB8Mh3pkcecgn+d3kM1MQau1zI/WW3M0E4B6vIu6b+QSv
+	xjjMtWQhcFOU5jGHdSwoU0jnrY+wwcpieVXhqKk=
+X-Google-Smtp-Source: APBJJlFxZVa5Xg7zcWRSLmy5da3OrRqJyEbYh7IorsIlR3vmcIxbFVhHJnD/w70xPRJB36NtVtlb3OCXjqI+33+VmtI=
+X-Received: by 2002:a05:651c:106:b0:2b5:80e0:f18e with SMTP id
+ a6-20020a05651c010600b002b580e0f18emr4150209ljb.3.1690960393778; Wed, 02 Aug
+ 2023 00:13:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230801085644.7be5b2e4@kernel.org>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+References: <20230801173544.1929519-1-hch@lst.de> <20230801173544.1929519-3-hch@lst.de>
+In-Reply-To: <20230801173544.1929519-3-hch@lst.de>
+From: Manuel Lauss <manuel.lauss@gmail.com>
+Date: Wed, 2 Aug 2023 09:12:37 +0200
+Message-ID: <CAOLZvyGAahsfqS0yMZDaHNVxLBC9QxKGEdW1TRfM_EgieCeORQ@mail.gmail.com>
+Subject: Re: [PATCH 2/5] mmc: au1xmmc: force non-modular build and remove
+ symbol_get usage
+To: Christoph Hellwig <hch@lst.de>
+Cc: Luis Chamberlain <mcgrof@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	Daniel Mack <daniel@zonque.org>, Haojian Zhuang <haojian.zhuang@gmail.com>, 
+	Robert Jarzmik <robert.jarzmik@free.fr>, Ulf Hansson <ulf.hansson@linaro.org>, 
+	Yangbo Lu <yangbo.lu@nxp.com>, Joshua Kinard <kumba@gentoo.org>, 
+	Daniel Vetter <daniel.vetter@ffwll.ch>, Arnd Bergmann <arnd@arndb.de>, 
+	linux-arm-kernel@lists.infradead.org, 
+	open list <linux-kernel@vger.kernel.org>, linux-mmc@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-rtc@vger.kernel.org, 
+	linux-modules@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Tue, Aug 01, 2023 at 05:56:44PM CEST, kuba@kernel.org wrote:
->On Tue, 1 Aug 2023 08:49:45 +0200 Jiri Pirko wrote:
->> >for_each_obj() {
->> >	if (obj_dump_filtered(obj, dump_info))  // < run filter
->> >		continue;                       // < skip object
->> >
->> >	dump_one(obj)  
->> 
->> I don't see how this would help. For example, passing PORT_INDEX, I know
->> exactly what object to reach, according to this PORT_INDEX. Why to
->> iterate over all of them and try the filter? Does not make sense to me.
->> 
->> Maybe we are each understanding this feature differently. This is about
->> passing keys which index the objects. It is always devlink handle,
->> sometimes port index and I see another example in shared buffer index.
->> That's about it. Basically user passes partial tuple of indexes.
->> Example:
->> devlink port show
->> the key is: bus_name/dev_name/port_index
->> user passes bus_name/dev_name, this is the selector, a partial key.
->> 
->> The sophisticated filtering is not a focus of this patchset. User can do
->> it putting bpf filter on the netlink socket.
+On Tue, Aug 1, 2023 at 7:36=E2=80=AFPM Christoph Hellwig <hch@lst.de> wrote=
+:
 >
->Okay, I was trying to be helpful, I don't want to argue for
->a particular implementation. IMO what's posted is too ugly
->to be merged, please restructure it.
+> au1xmmc is split somewhat awkwardly into the main mmc subsystem driver,
+> and callbacks in platform_data that sit under arch/mips/ and are
+> always built in.  The latter than call mmc_detect_change through
+> symbol_get.  Remove the use of symbol_get by requiring the driver
+> to be built in.  In the future the interrupt handlers for card
+> insert/eject detection should probably be moved into the main driver,
+> and which point it can be built modular again.
 
-Ugly in which sense? What exactly needs to be restructured?
+The carddetection stuff is entirely system-specific, I don't want the drive=
+r
+littered with board-custom stuff; I'm fine with it being built-in only.
 
+
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  arch/mips/alchemy/devboards/db1000.c |  8 +-------
+>  arch/mips/alchemy/devboards/db1200.c | 19 ++-----------------
+>  arch/mips/alchemy/devboards/db1300.c | 10 +---------
+>  drivers/mmc/host/Kconfig             |  4 ++--
+>  4 files changed, 6 insertions(+), 35 deletions(-)
+
+Ok For me.  If it matters:
+
+Acked-by: Manuel Lauss <manuel.lauss@gmail.com>
+
+Thanks!
+     Manuel
 
