@@ -1,38 +1,38 @@
-Return-Path: <netdev+bounces-23794-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23795-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B01B976D8AC
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 22:30:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B11F276D93D
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 23:10:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 72F7228111E
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 20:30:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6A8C3281DC0
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 21:10:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7957D51F;
-	Wed,  2 Aug 2023 20:30:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80FCC125AC;
+	Wed,  2 Aug 2023 21:10:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FF57125B7
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 20:30:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id E347FC433C9;
-	Wed,  2 Aug 2023 20:30:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F101111AD;
+	Wed,  2 Aug 2023 21:10:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A16EDC433C8;
+	Wed,  2 Aug 2023 21:10:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691008223;
-	bh=EmWbaenOMDMD6nYdMzBFCScTkic4CvjgRoEjkBg+bnE=;
+	s=k20201202; t=1691010621;
+	bh=U6fwEY6CTug5r3b9WDLABmO5cBrj/XDZhdVoueKrQtc=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=VvEEJn4ZP6H4Q7fIJSQjyMaGQyiLccK7NXIEXRuMbSrVtwDsqvcAejUc2tGH5pae6
-	 fMQ7pxeSQBIuhEwYHHI27EyCsNmhk9p7nA8AHCvgfG8Pk4s5A9vAWpy7qjVyLqHQtF
-	 R6FoA3B9ngUfgMdE7WBiuKHfMEEq7sv/pZFRiirj/+UK2XWO075tP5HAmzNLoJ58sD
-	 F5n6tRD2YRHmhFBwp9qCso2O/92w/PHOhwMmElhigy4x7WBM418XzRFgsas+oP2Gpr
-	 O9C6dRL9rgRlmmEbn2vnJW/kWRcdIWyjDNtrbApwfOAoyfxjKDfnM/AS4/65d2Rzil
-	 V0Jwvv2I4L/PQ==
+	b=Y2kTcAN3AYkOVOEGiwmAZkCCdIQ9M9IKrP+EDBGrQD9Ej//4M9AwTvVAUQCnYXhQM
+	 NvD/5tevUYJM9WqfvhkC2cseOVDORAh+RnmFQk/8fjlRXlWSSFuwERNeelqnojK8nQ
+	 OEBHMgdDM/L8ih49+XTb6rrSyTqsKZbHdFMoBl2uxdGaOwK9KtBxnTjkdvxTLhAV6r
+	 oTH7B3n5fAnpJ6x1m8nBpst8c3n9MHn6ZOKsaIOisT5nQyNeU4TdcAB1RVFyxazsXZ
+	 mjdsWBCVY9KRtdvFhBbuu/dKs+RuXGWZY1TZ/7ahklfVevr3SPanEy8/KLCmrneEFj
+	 +8QDeN634tY6Q==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C4843C6445B;
-	Wed,  2 Aug 2023 20:30:22 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 81E99E270D3;
+	Wed,  2 Aug 2023 21:10:21 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -41,47 +41,45 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v3 0/2] Add WCN3988 Bluetooth support for Fairphone 4
-From: patchwork-bot+bluetooth@kernel.org
+Subject: Re: [PATCH v2] riscv,
+ bpf: Adapt bpf trampoline to optimized riscv ftrace framework
+From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <169100822279.572.3966556819111433761.git-patchwork-notify@kernel.org>
-Date: Wed, 02 Aug 2023 20:30:22 +0000
-References: <20230802-fp4-bluetooth-v3-0-7c9e7a6e624b@fairphone.com>
-In-Reply-To: <20230802-fp4-bluetooth-v3-0-7c9e7a6e624b@fairphone.com>
-To: Luca Weiss <luca.weiss@fairphone.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
- marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
- agross@kernel.org, andersson@kernel.org, konrad.dybcio@linaro.org,
- conor+dt@kernel.org, quic_bgodavar@quicinc.com, quic_rjliao@quicinc.com,
- ~postmarketos/upstreaming@lists.sr.ht, phone-devel@vger.kernel.org,
- netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
- linux-arm-msm@vger.kernel.org, krzysztof.kozlowski@linaro.org
+ <169101062152.23031.14952859291909120655.git-patchwork-notify@kernel.org>
+Date: Wed, 02 Aug 2023 21:10:21 +0000
+References: <20230721100627.2630326-1-pulehui@huaweicloud.com>
+In-Reply-To: <20230721100627.2630326-1-pulehui@huaweicloud.com>
+To: Pu Lehui <pulehui@huaweicloud.com>
+Cc: linux-riscv@lists.infradead.org, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bjorn@kernel.org,
+ palmer@dabbelt.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
+ martin.lau@linux.dev, song@kernel.org, yhs@fb.com, john.fastabend@gmail.com,
+ kpsingh@kernel.org, sdf@google.com, haoluo@google.com, jolsa@kernel.org,
+ guoren@kernel.org, suagrfillet@gmail.com, pulehui@huawei.com
 
 Hello:
 
-This series was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+This patch was applied to bpf/bpf-next.git (master)
+by Alexei Starovoitov <ast@kernel.org>:
 
-On Wed, 02 Aug 2023 08:56:27 +0200 you wrote:
-> Add support in the btqca/hci_qca driver for the WCN3988 and add it to
-> the sm7225 Fairphone 4 devicetree.
+On Fri, 21 Jul 2023 18:06:27 +0800 you wrote:
+> From: Pu Lehui <pulehui@huawei.com>
 > 
-> Devicetree patches go via Qualcomm tree, the rest via their respective
-> trees.
-> 
-> --
-> Previously with the RFC version I've had problems before with Bluetooth
-> scanning failing like the following:
+> Commit 6724a76cff85 ("riscv: ftrace: Reduce the detour code size to
+> half") optimizes the detour code size of kernel functions to half with
+> T0 register and the upcoming DYNAMIC_FTRACE_WITH_DIRECT_CALLS of riscv
+> is based on this optimization, we need to adapt riscv bpf trampoline
+> based on this. One thing to do is to reduce detour code size of bpf
+> programs, and the second is to deal with the return address after the
+> execution of bpf trampoline. Meanwhile, we need to construct the frame
+> of parent function, otherwise we will miss one layer when unwinding.
+> The related tests have passed.
 > 
 > [...]
 
 Here is the summary with links:
-  - [v3,1/2] dt-bindings: net: qualcomm: Add WCN3988
-    https://git.kernel.org/bluetooth/bluetooth-next/c/d2a31b6f9701
-  - [v3,2/2] Bluetooth: btqca: Add WCN3988 support
-    https://git.kernel.org/bluetooth/bluetooth-next/c/f2e1dd87c9cd
+  - [v2] riscv, bpf: Adapt bpf trampoline to optimized riscv ftrace framework
+    https://git.kernel.org/bpf/bpf-next/c/25ad10658dc1
 
 You are awesome, thank you!
 -- 
