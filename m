@@ -1,287 +1,142 @@
-Return-Path: <netdev+bounces-23522-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23523-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 239FE76C543
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 08:26:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 431D276C56C
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 08:42:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 36BA41C211F2
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 06:26:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EA118281CAE
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 06:41:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E41D0184F;
-	Wed,  2 Aug 2023 06:26:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1297D373;
+	Wed,  2 Aug 2023 06:41:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D42E415CD
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 06:26:43 +0000 (UTC)
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D951119
-	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 23:26:38 -0700 (PDT)
-Received: from ptz.office.stw.pengutronix.de ([2a0a:edc0:0:900:1d::77] helo=[127.0.0.1])
-	by metis.ext.pengutronix.de with esmtp (Exim 4.92)
-	(envelope-from <j.zink@pengutronix.de>)
-	id 1qR5J2-0004uw-OL; Wed, 02 Aug 2023 08:26:00 +0200
-Message-ID: <e32c89e1-7385-105b-63c9-74f58c2253cb@pengutronix.de>
-Date: Wed, 2 Aug 2023 08:25:46 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05FFBEBB
+	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 06:41:57 +0000 (UTC)
+Received: from mail-ej1-x643.google.com (mail-ej1-x643.google.com [IPv6:2a00:1450:4864:20::643])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 202542D55
+	for <netdev@vger.kernel.org>; Tue,  1 Aug 2023 23:41:52 -0700 (PDT)
+Received: by mail-ej1-x643.google.com with SMTP id a640c23a62f3a-99bdf08860dso124940466b.0
+        for <netdev@vger.kernel.org>; Tue, 01 Aug 2023 23:41:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1690958510; x=1691563310;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=sDOiuG0vkWfw9xL3HMTphBilrSkywllkCvYolakreYQ=;
+        b=ppzu8+bR8Xuggl7Vv9IzYUi6zBUrokirRoDnVGBroYY1NZ7MyhYMfvYFZH8926Ylw5
+         hDDRhCKzlYZ9Hgsg7KLvugAPKZieoecJobcyHUtMXr56Dr1vp04FXgSH2J2zQWEFBKkR
+         N6sDG4iBpI77azVLCrw6sYOcUmSwgiT7OfZzQ6a640atXkZkHENiN3HyB7xJiWnY3LX3
+         YLPrv+wO/Lzp11nsZ1e+WieKz09sp82zW918t3fPrP731FfbRURG2xaNIOTi/GlyJ5qY
+         j0E6mU2kCeq+BzVrmnbYBo8C9Zxzw4X9SzlP8QMaTQzQMJAp/b3iVgIyohY89To01JZf
+         6yJQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690958510; x=1691563310;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sDOiuG0vkWfw9xL3HMTphBilrSkywllkCvYolakreYQ=;
+        b=hwBHltNwrkQCyEnizX2eDP9JW1vPPtNz52xA+nkj5/qjEN6xoNeI+zzjLkUUM8OCVH
+         jPDUx97q5BAlOI7PJOf5E5PN5ExqdArZoROrx2AWdIz0XFIvD8LKBbqH/fUoSU0LylCY
+         ne1cDA9pnpmuoMrXs3DFF3g+NnnLz+2Rl/DKdtwXQ9lBLuiNRLsrjdkUbAQ/NNaGDOSW
+         VCtjXs8oL2ToqSvu2YjRFRGm4+ssSTJCzV2H/bkad6+CETMJjBYaJyA9i1EvxJf93Qay
+         FEw6gEIIPj2pYHG8Z81suImaUcr55kNrPf3o9GZ4eyyIC4p1fLNtF1QdavifY1JCcJws
+         aANg==
+X-Gm-Message-State: ABy/qLbksbeMI4rcg9j7MMyWrsT/XR/iTyIshlJy+TD23ddLbGsd6W/y
+	Iwid9ihSOP8+a7z1d/PjBc5TTQ==
+X-Google-Smtp-Source: APBJJlE3+kPEZxQIDU9yXUjw4SHRdKMGQ0EM9i2Jn/3ha7r8EN+aQ/WPCecGRETRFHmc3rD3dryLJg==
+X-Received: by 2002:a17:907:6daa:b0:99b:af5a:fc2c with SMTP id sb42-20020a1709076daa00b0099baf5afc2cmr5753191ejc.26.1690958510333;
+        Tue, 01 Aug 2023 23:41:50 -0700 (PDT)
+Received: from localhost ([212.23.236.67])
+        by smtp.gmail.com with ESMTPSA id pk15-20020a170906d7af00b0099bd6026f45sm8577005ejb.198.2023.08.01.23.41.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 01 Aug 2023 23:41:49 -0700 (PDT)
+Date: Wed, 2 Aug 2023 08:41:48 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
+	edumazet@google.com, moshe@nvidia.com, saeedm@nvidia.com,
+	idosch@nvidia.com, petrm@nvidia.com
+Subject: Re: [patch net-next 1/8] ynl-gen-c.py: fix rendering of validate
+ field
+Message-ID: <ZMn6rLwl8tL+RmNh@nanopsycho>
+References: <20230801141907.816280-1-jiri@resnulli.us>
+ <20230801141907.816280-2-jiri@resnulli.us>
+ <20230801112530.277d3090@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.1
-Subject: Re: [EXT] Re: [PATCH v3 net 2/2] net: stmmac: dwmac-imx: pause the
- TXC clock in fixed-link
-To: Shenwei Wang <shenwei.wang@nxp.com>, Russell King
- <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin
- <mcoquelin.stm32@gmail.com>, Shawn Guo <shawnguo@kernel.org>,
- Sascha Hauer <s.hauer@pengutronix.de>,
- Neil Armstrong <neil.armstrong@linaro.org>,
- Kevin Hilman <khilman@baylibre.com>, Vinod Koul <vkoul@kernel.org>,
- Chen-Yu Tsai <wens@csie.org>, Jernej Skrabec <jernej.skrabec@gmail.com>,
- Samuel Holland <samuel@sholland.org>
-Cc: Giuseppe Cavallaro <peppe.cavallaro@st.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Jose Abreu <joabreu@synopsys.com>,
- Pengutronix Kernel Team <kernel@pengutronix.de>,
- Fabio Estevam <festevam@gmail.com>, dl-linux-imx <linux-imx@nxp.com>,
- Jerome Brunet <jbrunet@baylibre.com>,
- Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
- Bhupesh Sharma <bhupesh.sharma@linaro.org>,
- Nobuhiro Iwamatsu <nobuhiro1.iwamatsu@toshiba.co.jp>,
- Simon Horman <simon.horman@corigine.com>,
- Andrew Halaney <ahalaney@redhat.com>,
- Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
- Wong Vee Khee <veekhee@apple.com>, Revanth Kumar Uppala
- <ruppala@nvidia.com>, Jochen Henneberg <jh@henneberg-systemdesign.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-stm32@st-md-mailman.stormreply.com"
- <linux-stm32@st-md-mailman.stormreply.com>,
- "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "linux-amlogic@lists.infradead.org" <linux-amlogic@lists.infradead.org>,
- "imx@lists.linux.dev" <imx@lists.linux.dev>, Frank Li <frank.li@nxp.com>
-References: <20230731161929.2341584-1-shenwei.wang@nxp.com>
- <20230731161929.2341584-3-shenwei.wang@nxp.com>
- <bf2979c4-0b63-be53-b530-3d7385796534@pengutronix.de>
- <PAXPR04MB9185D7D3B088E4786A216044890AA@PAXPR04MB9185.eurprd04.prod.outlook.com>
-Content-Language: en-US, de-DE
-From: Johannes Zink <j.zink@pengutronix.de>
-In-Reply-To: <PAXPR04MB9185D7D3B088E4786A216044890AA@PAXPR04MB9185.eurprd04.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:900:1d::77
-X-SA-Exim-Mail-From: j.zink@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230801112530.277d3090@kernel.org>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Shenwei,
+Tue, Aug 01, 2023 at 08:25:30PM CEST, kuba@kernel.org wrote:
+>On Tue,  1 Aug 2023 16:19:00 +0200 Jiri Pirko wrote:
+>> From: Jiri Pirko <jiri@nvidia.com>
+>> 
+>> For split ops, do and dump has different value in validate field. Fix
+>> the rendering so for do op, only "strict" is filled out and for dump op,
+>> "strict" is prefixed by "dump-".
+>> 
+>> Signed-off-by: Jiri Pirko <jiri@nvidia.com>
+>> ---
+>>  tools/net/ynl/ynl-gen-c.py | 10 +++++++++-
+>>  1 file changed, 9 insertions(+), 1 deletion(-)
+>> 
+>> diff --git a/tools/net/ynl/ynl-gen-c.py b/tools/net/ynl/ynl-gen-c.py
+>> index 650be9b8b693..1c36d0c935da 100755
+>> --- a/tools/net/ynl/ynl-gen-c.py
+>> +++ b/tools/net/ynl/ynl-gen-c.py
+>> @@ -1988,9 +1988,17 @@ def print_kernel_op_table(family, cw):
+>>                  cw.block_start()
+>>                  members = [('cmd', op.enum_name)]
+>>                  if 'dont-validate' in op:
+>> +                    dont_validate = []
+>> +                    for x in op['dont-validate']:
+>> +                        if op_mode == 'do' and x == 'dump':
+>> +                            continue
+>> +                        if op_mode == "dump" and x == 'strict':
+>> +                            x = 'dump-' + x
+>> +                        dont_validate.append(x)
+>> +
+>>                      members.append(('validate',
+>>                                      ' | '.join([c_upper('genl-dont-validate-' + x)
+>> -                                                for x in op['dont-validate']])), )
+>> +                                                for x in dont_validate])), )
+>>                  name = c_lower(f"{family.name}-nl-{op_name}-{op_mode}it")
+>>                  if 'pre' in op[op_mode]:
+>>                      members.append((cb_names[op_mode]['pre'], c_lower(op[op_mode]['pre'])))
+>
+>I was hoping we can delete GENL_DONT_VALIDATE_DUMP_STRICT
+>but there is one cmd (TIPC_NL_LINK_GET) which
+>sets GENL_DONT_VALIDATE_STRICT and nothing about the dump.
 
-On 8/1/23 19:10, Shenwei Wang wrote:
-> 
-> 
->> -----Original Message-----
->> From: Johannes Zink <j.zink@pengutronix.de>
->> Sent: Tuesday, August 1, 2023 7:48 AM
->> To: Shenwei Wang <shenwei.wang@nxp.com>; Russell King
->> <linux@armlinux.org.uk>; David S. Miller <davem@davemloft.net>; Eric
->> Dumazet <edumazet@google.com>; Jakub Kicinski <kuba@kernel.org>; Paolo
->> Abeni <pabeni@redhat.com>; Maxime Coquelin
->> <mcoquelin.stm32@gmail.com>; Shawn Guo <shawnguo@kernel.org>; Sascha
->> Hauer <s.hauer@pengutronix.de>; Neil Armstrong <neil.armstrong@linaro.org>;
->> Kevin Hilman <khilman@baylibre.com>; Vinod Koul <vkoul@kernel.org>; Chen-
->> Yu Tsai <wens@csie.org>; Jernej Skrabec <jernej.skrabec@gmail.com>; Samuel
->> Holland <samuel@sholland.org>
->> Cc: Giuseppe Cavallaro <peppe.cavallaro@st.com>; Alexandre Torgue
->> <alexandre.torgue@foss.st.com>; Jose Abreu <joabreu@synopsys.com>;
->> Pengutronix Kernel Team <kernel@pengutronix.de>; Fabio Estevam
->> <festevam@gmail.com>; dl-linux-imx <linux-imx@nxp.com>; Jerome Brunet
->> <jbrunet@baylibre.com>; Martin Blumenstingl
->> <martin.blumenstingl@googlemail.com>; Bhupesh Sharma
->> <bhupesh.sharma@linaro.org>; Nobuhiro Iwamatsu
->> <nobuhiro1.iwamatsu@toshiba.co.jp>; Simon Horman
->> <simon.horman@corigine.com>; Andrew Halaney <ahalaney@redhat.com>;
->> Bartosz Golaszewski <bartosz.golaszewski@linaro.org>; Wong Vee Khee
->> <veekhee@apple.com>; Revanth Kumar Uppala <ruppala@nvidia.com>; Jochen
->> Henneberg <jh@henneberg-systemdesign.com>; netdev@vger.kernel.org; linux-
->> stm32@st-md-mailman.stormreply.com; linux-arm-kernel@lists.infradead.org;
->> linux-kernel@vger.kernel.org; linux-amlogic@lists.infradead.org;
->> imx@lists.linux.dev; Frank Li <frank.li@nxp.com>
->> Subject: [EXT] Re: [PATCH v3 net 2/2] net: stmmac: dwmac-imx: pause the TXC
->> clock in fixed-link
->>
->> Caution: This is an external email. Please take care when clicking links or
->> opening attachments. When in doubt, report the message using the 'Report this
->> email' button
->>
->>
->> Hi Shenwei,
->>
->> thanks for your patch.
->>
->> On 7/31/23 18:19, Shenwei Wang wrote:
->>> When using a fixed-link setup, certain devices like the SJA1105
->>> require a small pause in the TXC clock line to enable their internal
->>> tunable delay line (TDL).
->>
->> If this is only required for some devices, is it safe to enforce this behaviour
->> unconditionally for any kind of fixed link devices connected to the MX93 EQOS
->> or could this possibly break for other devices?
->>
-> 
-> It won't impact normal devices. The link layer hasn't built up yet.
-> 
+I need GENL_DONT_VALIDATE_STRICT for devlink dump selectors as well. I
+don't want to break existing user that may pass garbage attributes.
 
-As Russel suggested in [1] - maybe you could rephrase your commit message for 
-your v4 to point this out to future reviewers (apparently multiple people have 
-had questions about this...)  and have this fact also recorded in the git log 
-later on.
+>
+>To express something like that we should add dump-strict as
+>an allowed flag explicitly rather than doing the auto-prepending
 
-Also: does this only apply to i.MX93, or would we have to test and enable it on 
-e.g. i.MX8MP as well?
+Yeah, that was an option. But strict means GENL_DONT_VALIDATE_STRICT
+for do and GENL_DONT_VALIDATE_DUMP_STRICT for dump. That is why I
+decided to go this way.
 
-Thanks
-Johannes
+I will add dump-strict if you prefer it, I don't care.
 
-[1] ZMk/xqRP67zXHNrf@shell.armlinux.org.uk
-
-
-> Thanks,
-> Shenwei
-> 
->> Best regards
->> Johannes
->>
->>>
->>> To satisfy this requirement, this patch temporarily disables the TX
->>> clock, and restarts it after a required period. This provides the
->>> required silent interval on the clock line for SJA1105 to complete the
->>> frequency transition and enable the internal TDLs.
->>>
->>> So far we have only enabled this feature on the i.MX93 platform.
->>>
->>> Signed-off-by: Shenwei Wang <shenwei.wang@nxp.com>
->>> Reviewed-by: Frank Li <frank.li@nxp.com>
->>> ---
->>>    .../net/ethernet/stmicro/stmmac/dwmac-imx.c   | 42 +++++++++++++++++++
->>>    1 file changed, 42 insertions(+)
->>>
->>> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c
->>> b/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c
->>> index 53ee5a42c071..2e4173d099f3 100644
->>> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c
->>> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c
->>> @@ -32,6 +32,7 @@
->>>    #define GPR_ENET_QOS_RGMII_EN               (0x1 << 21)
->>>
->>>    #define MX93_GPR_ENET_QOS_INTF_MODE_MASK    GENMASK(3, 0)
->>> +#define MX93_GPR_ENET_QOS_INTF_MASK          GENMASK(3, 1)
->>>    #define MX93_GPR_ENET_QOS_INTF_SEL_MII              (0x0 << 1)
->>>    #define MX93_GPR_ENET_QOS_INTF_SEL_RMII             (0x4 << 1)
->>>    #define MX93_GPR_ENET_QOS_INTF_SEL_RGMII    (0x1 << 1)
->>> @@ -40,6 +41,7 @@
->>>    #define DMA_BUS_MODE                        0x00001000
->>>    #define DMA_BUS_MODE_SFT_RESET              (0x1 << 0)
->>>    #define RMII_RESET_SPEED            (0x3 << 14)
->>> +#define CTRL_SPEED_MASK                      GENMASK(15, 14)
->>>
->>>    struct imx_dwmac_ops {
->>>        u32 addr_width;
->>> @@ -56,6 +58,7 @@ struct imx_priv_data {
->>>        struct regmap *intf_regmap;
->>>        u32 intf_reg_off;
->>>        bool rmii_refclk_ext;
->>> +     void __iomem *base_addr;
->>>
->>>        const struct imx_dwmac_ops *ops;
->>>        struct plat_stmmacenet_data *plat_dat; @@ -212,6 +215,42 @@
->>> static void imx_dwmac_fix_speed(void *priv, uint speed, uint mode)
->>>                dev_err(dwmac->dev, "failed to set tx rate %lu\n", rate);
->>>    }
->>>
->>> +static void imx_dwmac_fix_speed_mx93(void *priv, uint speed, uint
->>> +mode) {
->>> +     struct imx_priv_data *dwmac = priv;
->>> +     int ctrl, old_ctrl, iface;
->>> +
->>> +     imx_dwmac_fix_speed(priv, speed, mode);
->>> +
->>> +     if (!dwmac || mode != MLO_AN_FIXED)
->>> +             return;
->>> +
->>> +     if (regmap_read(dwmac->intf_regmap, dwmac->intf_reg_off, &iface))
->>> +             return;
->>> +
->>> +     iface &= MX93_GPR_ENET_QOS_INTF_MASK;
->>> +     if (iface != MX93_GPR_ENET_QOS_INTF_SEL_RGMII)
->>> +             return;
->>> +
->>> +     old_ctrl = readl(dwmac->base_addr + MAC_CTRL_REG);
->>> +     ctrl = old_ctrl & ~CTRL_SPEED_MASK;
->>> +     regmap_update_bits(dwmac->intf_regmap, dwmac->intf_reg_off,
->>> +                        MX93_GPR_ENET_QOS_INTF_MODE_MASK, 0);
->>> +     writel(ctrl, dwmac->base_addr + MAC_CTRL_REG);
->>> +
->>> +     /* Ensure the settings for CTRL are applied and avoid CPU/Compiler
->>> +      * reordering.
->>> +      */
->>> +     wmb();
->>> +
->>> +     usleep_range(10, 20);
->>> +     iface |= MX93_GPR_ENET_QOS_CLK_GEN_EN;
->>> +     regmap_update_bits(dwmac->intf_regmap, dwmac->intf_reg_off,
->>> +                        MX93_GPR_ENET_QOS_INTF_MODE_MASK, iface);
->>> +
->>> +     writel(old_ctrl, dwmac->base_addr + MAC_CTRL_REG); }
->>> +
->>>    static int imx_dwmac_mx93_reset(void *priv, void __iomem *ioaddr)
->>>    {
->>>        struct plat_stmmacenet_data *plat_dat = priv; @@ -317,8 +356,11
->>> @@ static int imx_dwmac_probe(struct platform_device *pdev)
->>>        plat_dat->exit = imx_dwmac_exit;
->>>        plat_dat->clks_config = imx_dwmac_clks_config;
->>>        plat_dat->fix_mac_speed = imx_dwmac_fix_speed;
->>> +     if (of_machine_is_compatible("fsl,imx93"))
->>> +             plat_dat->fix_mac_speed = imx_dwmac_fix_speed_mx93;
->>>        plat_dat->bsp_priv = dwmac;
->>>        dwmac->plat_dat = plat_dat;
->>> +     dwmac->base_addr = stmmac_res.addr;
->>>
->>>        ret = imx_dwmac_clks_config(dwmac, true);
->>>        if (ret)
->>
->> --
->> Pengutronix e.K.                | Johannes Zink                  |
->> Steuerwalder Str. 21            |
->> https://www.pe/
->> ngutronix.de%2F&data=05%7C01%7Cshenwei.wang%40nxp.com%7C761fbb75c
->> 1c24cfe091508db928d8ade%7C686ea1d3bc2b4c6fa92cd99c5c301635%7C0%7C
->> 0%7C638264908852977732%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjA
->> wMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%
->> 7C&sdata=2l2zNfIaNnRJENmERehNae8g%2F%2BQqlxD2YRx7ksY2X%2BE%3D&r
->> eserved=0    |
->> 31137 Hildesheim, Germany       | Phone: +49-5121-206917-0       |
->> Amtsgericht Hildesheim, HRA 2686| Fax:   +49-5121-206917-5555    |
-> 
-> 
-
--- 
-Pengutronix e.K.                | Johannes Zink                  |
-Steuerwalder Str. 21            | https://www.pengutronix.de/    |
-31137 Hildesheim, Germany       | Phone: +49-5121-206917-0       |
-Amtsgericht Hildesheim, HRA 2686| Fax:   +49-5121-206917-5555    |
-
+>-- 
+>pw-bot: cr
 
