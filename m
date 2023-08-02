@@ -1,171 +1,165 @@
-Return-Path: <netdev+bounces-23665-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23664-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB57576D0B7
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 16:58:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2DA6276D0B5
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 16:57:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A86B21C20FFE
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 14:58:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CAE8E281DCC
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 14:57:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B8FB8486;
-	Wed,  2 Aug 2023 14:58:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAD5779F7;
+	Wed,  2 Aug 2023 14:57:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88C028460
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 14:58:05 +0000 (UTC)
-Received: from us-smtp-delivery-162.mimecast.com (us-smtp-delivery-162.mimecast.com [170.10.133.162])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F99C1FC3
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 07:58:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hp.com; s=mimecast20180716;
-	t=1690988281;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vXYtGyeDyghHLi1405pB5TkTgoWtkAh/lozF79fdnVU=;
-	b=QuY62RIikH7oZJDfnqdd0HPsi0Ntu40gGRMgxmeELLDSczJhMyUgnVfuVBb8C19vLsxWYK
-	bfwwnwNtPLoLOuUT7hm0/jishgkqauBvCB98LFmXKx52ujLT/Ob3fC7NtZijhWdTlafL4N
-	bVh25JelQaF/vv6+NnNj58a4dy4SoWg=
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com
- (mail-bn8nam11lp2168.outbound.protection.outlook.com [104.47.58.168]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-108-FrEmypWNP5yVjTm8YGTyvA-1; Wed, 02 Aug 2023 10:56:47 -0400
-X-MC-Unique: FrEmypWNP5yVjTm8YGTyvA-1
-Received: from SJ0PR84MB2088.NAMPRD84.PROD.OUTLOOK.COM (2603:10b6:a03:437::8)
- by DM3PR84MB3468.NAMPRD84.PROD.OUTLOOK.COM (2603:10b6:0:44::12) with
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A54DB33E5
+	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 14:57:44 +0000 (UTC)
+Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05on2076.outbound.protection.outlook.com [40.107.20.76])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5A3BE43
+	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 07:57:41 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=eRmbEYWcqooiZD9czvb8iHPdndA72Jr61RaQNsoKVK+NedqADfLSAZps22NHY1mu6PUI3slTGtNweJ5r2PAiZZ6x4cOpD4XKYhj/eukdzmVFNsW3XA6KLIYd6h5imiIAifveki4RwHNwdBRX38BKgWIM4UOfgoJFkURi22Zn4cwZaGju/CIg4DERdnVArz8q32IZH4Oh0oM2t/eAQ4j8ojxdElbp9FR8z04yl/T0tjdgO49oPQhNPfyZnQQbJwPh+h4IMxw7wg1It8yC3VzBOimFTQRBCxcUCI8uNFKiTBOUfIQKOnWrzMJourCFa+AEoGiusyfK4YqVm+oLmYuyaw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=L8t3bXBgVLyJgDRarkxx5NCKO/hu+1a2ocIhdH0zD+c=;
+ b=dLJ9Xk0S4hASELYRDg58PLMlADfhNW1g1IiOBdBJDr0/yV0oMXSt3d13HuzDLLhDDWiAevDvc7lrPx/Db75Rk5pF6aL+FYV2bMtvZQCIIuK0alnP1Bj8zCMIZshsE5iGjy3PDZkqEcmcWVXJnDLW5ikXz8nJ7cv4ONgYqGjCYEHRlh/Mf2o0ocU1ZeZUe1ZXVrLTo4ZZe5lIjfFq2mrGiLbpEPsrSP8nsFL0i5zyF+pyFoeAR4p0+jnvcaxxsiqJvoW+okK90nTgD22143YgKJwf2aR+//dfg+L5EyceWcMJlmOEYyY4A86rEIa+pClchJjyu/7KcF23pL3aquyK5w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=L8t3bXBgVLyJgDRarkxx5NCKO/hu+1a2ocIhdH0zD+c=;
+ b=ZlTFvhHSrIRnO+8nnnbYpI7PudYiXA68FTwtg4vpCan6+qMrVBa5LWKMxEFz/T325CTzwRUnAnokJRco0zRqLosbxXoASmTxOxl8BPyMlVlOHJCmyZIPlixT4yUPElojOlOE/FZdUmsRiPq+AjNXCJLPOZAomcWiBMvbGPGX6mg=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
+ by VI1PR04MB6799.eurprd04.prod.outlook.com (2603:10a6:803:130::8) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.45; Wed, 2 Aug
- 2023 14:56:43 +0000
-Received: from SJ0PR84MB2088.NAMPRD84.PROD.OUTLOOK.COM
- ([fe80::8cd0:b5a5:f173:60f7]) by SJ0PR84MB2088.NAMPRD84.PROD.OUTLOOK.COM
- ([fe80::8cd0:b5a5:f173:60f7%6]) with mapi id 15.20.6609.032; Wed, 2 Aug 2023
- 14:56:43 +0000
-From: "Gagniuc, Alexandru" <alexandru.gagniuc@hp.com>
-To: Alan Stern <stern@rowland.harvard.edu>
-CC: "linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "davem@davemloft.net"
-	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
-	"hayeswang@realtek.com" <hayeswang@realtek.com>, "jflf_kernel@gmx.com"
-	<jflf_kernel@gmx.com>, "bjorn@mork.no" <bjorn@mork.no>, "svenva@chromium.org"
-	<svenva@chromium.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "Zhang, Eniac" <eniac-xw.zhang@hp.com>,
-	"stable@vger.kernel.org" <stable@vger.kernel.org>
-Subject: Re: [PATCH v2] r8152: Suspend USB device before shutdown when WoL is
- enabled
-Thread-Topic: [PATCH v2] r8152: Suspend USB device before shutdown when WoL is
- enabled
-Thread-Index: AQHZumfGWALIKL1Qf0uRlSRmGE3IR6/BawiAgBXCwgU=
-Date: Wed, 2 Aug 2023 14:56:43 +0000
-Message-ID: <SJ0PR84MB2088F20891376312BA8D550A8F0BA@SJ0PR84MB2088.NAMPRD84.PROD.OUTLOOK.COM>
-References: <2c12d7a0-3edb-48b3-abf7-135e1a8838ca@rowland.harvard.edu>
- <20230719173756.380829-1-alexandru.gagniuc@hp.com>
- <3c4fd3d8-2b0b-492e-aacc-afafcea98417@rowland.harvard.edu>
-In-Reply-To: <3c4fd3d8-2b0b-492e-aacc-afafcea98417@rowland.harvard.edu>
-Accept-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-msip_labels: 
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SJ0PR84MB2088:EE_|DM3PR84MB3468:EE_
-x-ms-office365-filtering-correlation-id: 467dabf2-1995-4d99-c33f-08db9368afac
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0
-x-microsoft-antispam-message-info: sE4Qy+wvZmfFfAl4+TAiBGIYfqoJkRaXcOEKjOv+n5n4/9c6SynMSIqEL/ZI7jqvIvUA2APAJloXj9ySLUZUgQiniZkR3EF8USrkT+wQgHE88WM1AWSQ3py8K20zS7pMr3+WL2Hr61I7Sln/3M/m872nmESIbVgzqQkQQT+2q1POkZk8Jpc44DRSE7pZO5DbAwbzsZEoCZzqDd3yY8YGeQt5RBOHWPdG3q9xGGyMTmyFzNOomjyAePmiGmZIrteW9kf9i011RzshK+H0i/dV4dHFXbBVX/aJNZapz8+mpKjDCeLAtoQ47GGj5I3z/SAoB9pH9TvjcwGBas1FRykhewmf90WFiyq9/gcNOqfblxltRezDfZbJq+k3Ym/V/ImxK2zHV4yY5YAKPMX1w15WDErNeuxLBALwAQGCeZYe1nuiHwUY6XC41BCXU3awjBmjfggiiNBdTjv3e4kn2cVgW+13M9nSE3ibhgqRfSJ1W8JAutR9D+rEo7kT3v6Jcsj+/+KTvzLW6Yy0F2xdDHtpk9/31GaUyWKCe7T/swY7WwXOaYGmBHfjqhVVzJx+pKIQ30UUd0LI/psMurY2ZfW1UvUN0zILge0aZ1R/J5Bgvy43JFoCX5m3YrHZ+Qs03YV7
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ0PR84MB2088.NAMPRD84.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230028)(4636009)(346002)(39860400002)(366004)(136003)(396003)(376002)(451199021)(7416002)(5660300002)(41300700001)(15650500001)(83380400001)(122000001)(82960400001)(38100700002)(316002)(186003)(8676002)(8936002)(6506007)(26005)(38070700005)(4326008)(6916009)(86362001)(66946007)(66476007)(66446008)(64756008)(66556008)(52536014)(76116006)(2906002)(9686003)(91956017)(7696005)(71200400001)(33656002)(478600001)(54906003)(55016003);DIR:OUT;SFP:1102
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?iso-8859-1?Q?JQWqMX+VfP/zqeBz9FOeDVXpMjCKzejeD3P2w6LeYEobnwTzDY45S+m6fc?=
- =?iso-8859-1?Q?Cmu+42s/9jwDegw2+/UdHIwgMA7SftXTuQv2YezEgKQm/aa0OYXwb6Hs+A?=
- =?iso-8859-1?Q?nkY3G8R0KdTLx+5VArApd/9+FWN0aDEUCYF2/P+33/epExb5CoBbNUbuFI?=
- =?iso-8859-1?Q?p9nvyDGHMCj40F6CwBQyd5OgZghiQ+r4eBmI0Mh8rGDsy4OJ+pHngcBBsH?=
- =?iso-8859-1?Q?81+YkV6dGtaXRWeYFcVyjkLnoU9rDtPz1oBNH79/0KCr9lfdRa6val0wOz?=
- =?iso-8859-1?Q?24/i1z8JNcHT0XRn1WK/OlHccuvEZx+x8V45J3O3xU6VWxAZS3qTIuPrRY?=
- =?iso-8859-1?Q?7xEShDpJ+W0uUtJZwoFKHxA2cliQO49zC3rpeDvVCpmNTV7oYWfdpvpo8x?=
- =?iso-8859-1?Q?Io2DSFNg1K2ZEr9QRkLlElRIz31ZGI8SWyHDUHh/xBUit3Pkh53BkVJShX?=
- =?iso-8859-1?Q?O+qY08sFRAmT2yN6WqXYQV4JuyOBKaAxDWDnIVbFlu4Nzxjn1CK6AbM3lS?=
- =?iso-8859-1?Q?TNd7EK5Ca7SCVTO6w4Af2T+Oprs1LiPYEXtmY69Dwj4Y5DKLNQD1DQZM0i?=
- =?iso-8859-1?Q?CVaaw46hqFOu11fknU6Bkew0XKpSbpCnGxrptG4lONGFClMR/lNQhTleGS?=
- =?iso-8859-1?Q?eBogx76w+/rItm/K9OKhw6HprGgGwGOkgdVs2ycFtRlVzCjLIBqFJQQwKs?=
- =?iso-8859-1?Q?inTBSA0z2s+dBu/G7CXKuO8xM874uesTlKf0mdcw/JckRhLSE3DMYrZxLR?=
- =?iso-8859-1?Q?4H06kRSrix3oxZ9I4NaGdIB6TfgjUBXY1xxqub7NJw0CnIw6ekt0saRjtQ?=
- =?iso-8859-1?Q?/5ONRgj6N1XE1LCRuPeG/KA3nNdVNsj4iFXjoxk0B2DcWQTMzyxW4Qf/Pj?=
- =?iso-8859-1?Q?24oqWlcFgHUlbM9j84WQn0HvuckfANWRNW7FwLRNLeARVES4UvlEcHcqL7?=
- =?iso-8859-1?Q?05j/MNjDOlgED06skaXqgHjOLjFe/WCuKgFi1ceU+qG3vuqoryM9wzCXTe?=
- =?iso-8859-1?Q?I0I6EcsBHFVZLBecH9xZvlFYet5a2rQC86MzzI+b6H9C8SjJ9ubKBzZECP?=
- =?iso-8859-1?Q?AUfFxT7EqfVQzy6KaNuUuLpuxPHh9Um8nc70plz2VYwDP3XquRoLgO8EH1?=
- =?iso-8859-1?Q?YGynDj3vY55E4VibYmIgUcmSeADU6yrjTgox7xjPWGfDwHnhRWRCME/YMd?=
- =?iso-8859-1?Q?koJ450fKIf0cj+XFh8Ea6VNGu0SRvg94cz74KLqsjPERjMQtChgsF4vzpj?=
- =?iso-8859-1?Q?PxnNHh1oQV4pT7Os5ssRDJ/N30DlM9hDjT7yv+4ReZXs54ih6XcSaq1Tyw?=
- =?iso-8859-1?Q?CWYnXob1kljAcd5VEbhXlcVzAyb5IMKVEiMKGSOEZxXuEfa/gGe9IuBvDN?=
- =?iso-8859-1?Q?412vjghjUtukHTUF/CpIi7PJp5xLz8K/4oHVI3L/KGHASpPmR3v2B6jVMF?=
- =?iso-8859-1?Q?Zl4HL7q4Mqv9nmcws/j4Tul24GDn3Bq/sVD+j/hnYRT9iPb4MFi7hX/ihL?=
- =?iso-8859-1?Q?yScFt7iX+aMzZDfuDUOr8QnsuPHGFGkwSga32ECF8J+3oo5K4jGcEjbtJf?=
- =?iso-8859-1?Q?kwAejJ2nLS8vEyn0csmX124f4efFEgRgrZNvxMEvMFINdLY03j/4ym8P9k?=
- =?iso-8859-1?Q?k3+OMiKEiMF3oQzXiyAaeUvfylhhKMwg+S?=
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.44; Wed, 2 Aug
+ 2023 14:57:39 +0000
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::6074:afac:3fae:6194]) by AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::6074:afac:3fae:6194%4]) with mapi id 15.20.6631.045; Wed, 2 Aug 2023
+ 14:57:39 +0000
+Date: Wed, 2 Aug 2023 17:57:36 +0300
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: Ioana Ciornei <ioana.ciornei@nxp.com>,
+	Antoine Tenart <atenart@kernel.org>,
+	Alexander Duyck <alexander.duyck@gmail.com>
+Cc: netdev@vger.kernel.org
+Subject: netif_set_xps_queue() before register_netdev(): correct from an API
+ perspective?
+Message-ID: <20230802145736.gp4bbudizpk7elk3@skbuf>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-ClientProxiedBy: AS4P192CA0002.EURP192.PROD.OUTLOOK.COM
+ (2603:10a6:20b:5da::9) To AM0PR04MB6452.eurprd04.prod.outlook.com
+ (2603:10a6:208:16d::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: hp.com
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|VI1PR04MB6799:EE_
+X-MS-Office365-Filtering-Correlation-Id: fe16c9c3-335c-43c4-a9f5-08db9368d0b3
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	CzS8Hx3oSkmDBflEP0Bjeqf2SCLS8X5DiqNg/Iz8bXWcdr0g8eJbZSZTt6eaMZZNlr4kLpEImPeyurCOFUP7BLQRSrMX4BZVoISeNoTUGRW9ypTq6DGEdRmIt0cBzJXs9Q3396Ob45CpdWTG+877g7lmEsNrkGFXO2kHMpFzro/jIIgT2ZNBZ4L2T/B5nevZpyL6HgkK8e5rgIR+w8SQNPNk+5ke1YG6yuK0QTWP8iNSiELaMeRu9s6SyHI6A9M75KBAMdH5NR1zSBHZGPWgSBA4pxM7gPHYc6FGtaGqqq+Kzp6p18fLQOwMKMkHkmris7f+jXTYJ8d1eeuUYilGHHKTHrXor8jkWwQitWEM4cEvGicHHI3U/CYjFZWX+Mf170d2MvX71kbMJR0e6vIb4njAGQGt89RwOvz6pcFrJePrDM0KHsuDkCzPGhDS/vcVO+c2VQEEdI9WjAUK5ps02uJDXJMsbROoeoZCEk1vHVxr1eMkKHPep7y4YE8LSrNEkXUnczVUAH3qivwz6mMK5i+d3QlJQdBCSNx3ITRZaE4USHxPtR+Shh7Nw9/Fh0IdCT5b8JFfoo7UbyxFKV/UeJpJsytTQk7QQQcJQBqWPNATvFlO3x+Bb7mKwH3UUaOO
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(7916004)(366004)(396003)(136003)(39860400002)(346002)(376002)(451199021)(6512007)(9686003)(6666004)(5660300002)(186003)(44832011)(66946007)(66556008)(66476007)(4326008)(316002)(478600001)(110136005)(6486002)(41300700001)(8936002)(8676002)(6506007)(33716001)(26005)(38100700002)(86362001)(2906002)(83380400001)(1076003)(505234007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?bjYt9DywTatCYLmuYO/KuMPhi2EzvTLLEPn5sUNqrHk1+KXN2SbJacFc7oUX?=
+ =?us-ascii?Q?aXJ5XjmxKQuMl/aGpHyzBcaWmKQhBj51S9PuYApP/MKyRxkEFM9segLPNx98?=
+ =?us-ascii?Q?seOewtVmDPNSktzsEicwuJMG2EICib3080Gdycg5r2mxA0lCEXvqLdeBie3O?=
+ =?us-ascii?Q?0oHwRXQGEuJxCyZWoVFkedC1Lz0OD2WanCAqeSdvv+7IxC+fEXdsTNaiJHiK?=
+ =?us-ascii?Q?miG6nESIWaER4tDAGHpIPo2/OsVGIFEpmJ1pTGKPkdo02RcRjH2kfo+RrbBv?=
+ =?us-ascii?Q?pxKWewtf5S+22LUK3t02485RZOdcf35IZ2cdYSCXaqLd8yicRjdl5AQ9C0xt?=
+ =?us-ascii?Q?OjsKZ9I8GjhkTl+p9WbMR/X2/hnme7uU/iFyKT202SHBOCU/A4X0jX1XuI09?=
+ =?us-ascii?Q?QQkqtcXH68EeJ1dNOiW+4uHXEnIx9AOpbH6UE1iWI70hbiRzhdYLhWFei0Do?=
+ =?us-ascii?Q?xS0pvuxv72f7OCnXEnzvi3e3kFbRRQJRD1oJgH4D74RCRWdFmjI0sV7I1uhM?=
+ =?us-ascii?Q?s9P6qctkFWIkzBNMmEu/FXaYE5ViYotOHQthNY+xwFMgk21s8zWBIFS+rCNE?=
+ =?us-ascii?Q?Am2TkiHle5iH7kIGMLQ7Ed2T/UfdEk2XkJei7L7heVXxBwxq6XuiDnQBRTh5?=
+ =?us-ascii?Q?diF7bWykUsSZMN+C19qAh91DXeOobf13Pstjsfz9WFR1jHrlc/ogP+/ClB/E?=
+ =?us-ascii?Q?5DLRRL24NyN+vpfSuIGaNF3o6cAxnulkWYof19u1svriBzovXp+arfTi0QuO?=
+ =?us-ascii?Q?dZ4EoCwFBckSPRnoTrOb6fgiFJdXk+XESmD9krtj2U/Zg7dDDSqLP4SSH64E?=
+ =?us-ascii?Q?E+WwvbmbEukS9ZKell+Be6oK1HTNusR4F/y9r3EFb0LR0RMzP8e5Ao2JL/RK?=
+ =?us-ascii?Q?m8B31KcdqS4wLRk5ih6TojLc0FMBFtiTAtWs5uCDvPRD3qG6Fg35ISeq9QZd?=
+ =?us-ascii?Q?RMWNosF0pd5DlyHVHsgOAowUg6g3SvECjwyuKq5vgCpUJ6HaeXKbSBI0SzPF?=
+ =?us-ascii?Q?d526Eqak4GIXmnDYAP7kudvp90BrnQgXOsgpHo+3PUnz6XRpDD7CKwQBXJiN?=
+ =?us-ascii?Q?kIioRsHxWooI7sC97CSwn0feTADXksG1lFUlj0vlQON5PBo5WiVsVJ7l9jEp?=
+ =?us-ascii?Q?6y9oCCckp/fn/4YlFsnftE85kQx8jNqfnRSawTk0q80DtJBCqRcwJY3P8uFP?=
+ =?us-ascii?Q?WO4hAKxfZ+ZZpHjUmwHUmMBjZgz1pfq+AQBGM5h5PlA8OrRci0Tvr0u1z0Mg?=
+ =?us-ascii?Q?Oo3XdG7IZw0H5WBcWPif7qlznBaZn6m7yxAAKg+4ITclP6kJg+FVXK/1+DMR?=
+ =?us-ascii?Q?TYKAEIp/8uV7EPO74pFyXpephXtVc86XByNSFsRBEB8fYk4bgYFDcrDVyI2C?=
+ =?us-ascii?Q?H1i52Ay0ixPQniJ5X8csUJi/E9uGF+GqihOv3IrQrkaGU6Uuyg1cnVxE73Ep?=
+ =?us-ascii?Q?YpWga/Gwqyp5xv7zrmJlJfge8CkCiP7a3sQwXlRMlxQc5xr3TBXMv8xDgzdI?=
+ =?us-ascii?Q?UU/aWkqGyFxOpIaL7ryC6SfI7y/SwQrbDsrWkSjnMygP0j8Aa5Ha++4f7Ogq?=
+ =?us-ascii?Q?Le4YCWMDdgDVWBBVqcv29lWMtlBCSWZokSSL2uNEacffaGkqHg/Db/eBKQps?=
+ =?us-ascii?Q?NQ=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: fe16c9c3-335c-43c4-a9f5-08db9368d0b3
+X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SJ0PR84MB2088.NAMPRD84.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-Network-Message-Id: 467dabf2-1995-4d99-c33f-08db9368afac
-X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Aug 2023 14:56:43.6237
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Aug 2023 14:57:39.1403
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: ca7981a2-785a-463d-b82a-3db87dfc3ce6
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: f4v2qF4lTAx+16/qTPifYz4ZjfvO5rclUf3ZaM7PjGgpnAsOId6HHrCK20olFdS5W6EhDMlWdY20l/Bi7kRNra7/B972SGecnYCrumhcPVQ=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM3PR84MB3468
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: hp.com
-Content-Language: en-US
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	PDS_BAD_THREAD_QP_64,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,
-	RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-	autolearn=unavailable autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: mpmnPvoNXJ0ZLbwcSLWBmCMlwcl5w0LX7b3hLIHwLWLU04lDkPq3nY08NcZfRHEAor4Jxtk55eoDERHNX6Wgcg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB6799
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Jul 19, 2023 at 02:36:25PM -0400, Alan Stern wrote:=0A> On Wed, Jul=
- 19, 2023 at 05:37:56PM +0000, Alexandru Gagniuc wrote:=0A> > For Wake-on-L=
-AN to work from S5 (shutdown), the USB link must be put=0A> > in U3 state. =
-If it is not, and the host "disappears", the chip will=0A> > no longer resp=
-ond to WoL triggers.=0A> >=20=0A> > To resolve this, add a notifier block a=
-nd register it as a reboot=0A> > notifier. When WoL is enabled, work throug=
-h the usb_device struct to=0A> > get to the suspend function. Calling this =
-function puts the link in=0A> > the correct state for WoL to function.=0A>=
-=20=0A> How do you know that the link will _remain_ in the correct state?=
-=0A=0AThe objective is to get to xhci_set_link_state() with the USB_SS_PORT=
-_LS_U3=0Aargument. This is achieved through usb_port_suspend() in drivers/u=
-sb/host/hub.c,=0Aand the function is implemented in drivers/usb/host/xhci-h=
-ub.c.=0A=0AThis is the only path in the kernel that I am aware of for setti=
-ng the U3 link=0Astate. Given that it is part of the USB subsystem, I am fa=
-irly confident it will=0Ashow consistent behavior across platforms.=0A=20=
-=0A> That is, how do you know that the shutdown processing for the USB host=
-=20=0A> controller won't disable the link entirely, thereby preventing WoL =
-from=20=0A> working?=0A=0AWe are talking to the USB hub in order to set the=
- link state. I don't see how=0Aspecifics of the host controller would influ=
-ence behavior. I do expect a=0Acontroller which advertises S4/S5 in /proc/a=
-cpi/wakeup to not do anything that=0Awould sabotage this capability. Disabl=
-ing the link entirely would probalby=0Aviolate that promise.=0A=0AThink of =
-USB-C docks with a power button showing up as a HID class. The scenario=0Ah=
-erein would disable the power button. I would take that to be a bug in the =
-host=0Acontroller driver if the S4/S5 capability is advertised.=0A=0AAlex=
-=0A=0AP.S. I sincerely apologize for the delay in my reply. The corporate e=
-mail servers here=0Ahave "difficulties" with plaintext and  interleaved rep=
-lies.=0A
+Hi,
 
+When drivers/net/ethernet/freescale/dpaa2/ fails to probe (including -EPROBE_DEFER),
+I see lots of these:
+
+$ cat /sys/kernel/debug/kmemleak
+unreferenced object 0xffff042845fbdac0 (size 64):
+  comm "kworker/u16:1", pid 56, jiffies 4294893690 (age 859.844s)
+  hex dump (first 32 bytes):
+    01 00 00 00 14 00 00 00 00 00 00 00 00 00 00 00  ................
+    00 00 00 00 00 00 00 00 06 00 00 00 00 00 00 00  ................
+  backtrace:
+    [<ffffc754095a7dfc>] slab_post_alloc_hook+0xa4/0x330
+    [<ffffc754095a654c>] __kmem_cache_alloc_node+0x23c/0x308
+    [<ffffc7540952fec0>] __kmalloc_node+0xc0/0x240
+    [<ffffc7540a976934>] __netif_set_xps_queue+0x32c/0xa78
+    [<ffffc7540a9771e4>] netif_set_xps_queue+0x44/0x70
+    [<ffffc7540a1c3540>] update_xps+0xb0/0x158
+    [<ffffc7540a1c0290>] dpaa2_eth_probe+0xd10/0x1368
+    [<ffffc75409b1677c>] fsl_mc_driver_probe+0x2c/0x80
+    [<ffffc75409eb764c>] really_probe+0x13c/0x2f8
+    [<ffffc75409eb666c>] __driver_probe_device+0xac/0x140
+    [<ffffc75409eb7340>] driver_probe_device+0x48/0x218
+    [<ffffc75409eb71d8>] __device_attach_driver+0x128/0x158
+    [<ffffc75409eb33e4>] bus_for_each_drv+0x12c/0x160
+    [<ffffc75409eb63f4>] __device_attach+0xcc/0x1a0
+    [<ffffc75409eb64e8>] device_initial_probe+0x20/0x38
+    [<ffffc75409eb3620>] bus_probe_device+0xa0/0x118
+
+I see that netif_set_xps_queue() allocates dev->xps_maps[], which is
+eventually freed by reset_xps_maps() <- ... <- netif_reset_xps_queues_gt()
+from a number of call sites, including from unregister_netdevice_many_notify().
+
+This is nice, but dpaa2 (above) and emulex/benet/be_main.c call
+netif_set_xps_queue() prior to registering the net device. So no
+deregistration event will take place.
+
+How is the memory supposed to be freed in this case?
 
