@@ -1,258 +1,267 @@
-Return-Path: <netdev+bounces-23497-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23498-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CDEB076C33E
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 05:01:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6398776C349
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 05:04:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8074E281AC7
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 03:01:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 80C211C210DF
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 03:04:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1DB2A40;
-	Wed,  2 Aug 2023 03:01:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCA23A47;
+	Wed,  2 Aug 2023 03:04:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A60D5A3D
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 03:01:07 +0000 (UTC)
-Received: from mgamail.intel.com (unknown [134.134.136.24])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE892272B;
-	Tue,  1 Aug 2023 20:00:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1690945220; x=1722481220;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=E8bnxemkUhzO4A3F7jJiLKuutJCDU25f0xvfvEgLXWU=;
-  b=V8/OVVCzs3FG54tF1qAJbuWoxZ5txsJzYUo6hFx9anQweH7lgDLkF1R4
-   gLEtBlZKQjveYHWNoedT2Lc0NZ968XdXYAAEF4v9rEG5BDz7+tMlHwoVk
-   uNqpv3cHJCEsINC18qCZFNuTE6Qhx7HXVV4EGCCv84OGJIYA6InrctEN2
-   wJc/JmkSkvqBBf8UJRUdAzZ5oKMAAwPytp96s68psOZIZYal6yluHyxx4
-   BQat4aHtUG3iO9932/T5AUzL0P+4mNpfa6V91FWOR+puFxelfINe5Txcp
-   i/g7xZJO4ndMei7274dW3PSOF1dCEOlgfHlSFs0IQxhKjsDDqEVTfRBlV
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10789"; a="372194283"
-X-IronPort-AV: E=Sophos;i="6.01,248,1684825200"; 
-   d="scan'208";a="372194283"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Aug 2023 20:00:19 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10789"; a="902819821"
-X-IronPort-AV: E=Sophos;i="6.01,248,1684825200"; 
-   d="scan'208";a="902819821"
-Received: from unknown (HELO localhost.localdomain) ([10.226.216.116])
-  by orsmga005.jf.intel.com with ESMTP; 01 Aug 2023 20:00:14 -0700
-From: niravkumar.l.rabara@intel.com
-To: niravkumar.l.rabara@intel.com
-Cc: adrian.ho.yin.ng@intel.com,
-	andrew@lunn.ch,
-	conor+dt@kernel.org,
-	devicetree@vger.kernel.org,
-	dinguyen@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org,
-	linux-clk@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	mturquette@baylibre.com,
-	netdev@vger.kernel.org,
-	p.zabel@pengutronix.de,
-	richardcochran@gmail.com,
-	robh+dt@kernel.org,
-	sboyd@kernel.org,
-	wen.ping.teh@intel.com,
-	Conor Dooley <conor.dooley@microchip.com>
-Subject: [PATCH v3 3/5] dt-bindings: clock: add Intel Agilex5 clock manager
-Date: Wed,  2 Aug 2023 10:58:42 +0800
-Message-Id: <20230802025842.1260345-1-niravkumar.l.rabara@intel.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20230801010234.792557-4-niravkumar.l.rabara@intel.com>
-References: <20230801010234.792557-4-niravkumar.l.rabara@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C76E1A40;
+	Wed,  2 Aug 2023 03:04:13 +0000 (UTC)
+Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B85B272B;
+	Tue,  1 Aug 2023 20:04:11 -0700 (PDT)
+Received: by mail-pf1-x42d.google.com with SMTP id d2e1a72fcca58-686b643df5dso4517143b3a.1;
+        Tue, 01 Aug 2023 20:04:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1690945450; x=1691550250;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2afhM0nZYzEtfKChrLu1PZLw4Km118Jq79AW9hzH33c=;
+        b=W0xBdSvO7y3PiJ5YCryMmqlKYyAzlrX0c/CkknRSuWa/qcy0ElubyvsJLQ+VVPAlEs
+         QJuR8Ghn6A99rxR+3ny6TsMtVXTsmJzpFDIUMU+DvOXro83w7Xtadf7zFJ4HusqKfi60
+         b7RiQ4a2aRvVCdd7DrBXfrNCgOgXj2NxqVMX4sKj7j7QbLIX6LqvYmNVN7+05Xl12lfg
+         VDjZCiVrVPi05arzhH75pw/I785yoWBQ112B/rERCjb9wjZVN54evwT5ClqyL5MmkAek
+         Q6YXIMINr9UKG94JRp9A4f2+u4/gn6SJyBAggXQ49/bh1oyiRDUK9lPayMd3N+ZfXDOn
+         jhoQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690945450; x=1691550250;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=2afhM0nZYzEtfKChrLu1PZLw4Km118Jq79AW9hzH33c=;
+        b=kdjxJ+qTnF+rM7ZS6TPMvMkwO+s8FdcTVE/iwXkJxZyeOg4RZBxdczU2AP4XKqCoZt
+         8zlobDggh/KC7DXeMvkQk8JqjORNMh2PqrGk2a1Yp8j1I3VXHeSbuwBQokQHgQMADPqS
+         TvznxyrFhJb4IcctCt2luinfF9FKN5Be3IFLZaNsnLJ/h/ABUNbzYrqPQOUgbcn1AgiL
+         MLC0AuHi5xyUIBBE9Llc++Vz+/awh4K98YrIff7fdJtNRAFHfhrhHDvjlcOVc9vctTJy
+         exBqUCaXjnW5jRebCA1bMckG20S0ixhs/67ZpqlDGbytKOVDKm8iaz/H9sFU8W4psh7n
+         BzpA==
+X-Gm-Message-State: ABy/qLZtXiz5dp2Jqb5pRrSxy4zxu3n0WxSzkApibArRLn0ZGp7XzlsK
+	uRlrgEao/uEIbnDSbClg8BA=
+X-Google-Smtp-Source: APBJJlE6RPN2t6sd1fl2nx74pX3gKiPPRu5toAxPMJSCMtzoBw7DE1DA59Wk1A+BT3zYMNW7LYaWtA==
+X-Received: by 2002:a05:6a20:9195:b0:135:38b5:7e58 with SMTP id v21-20020a056a20919500b0013538b57e58mr14731006pzd.37.1690945449534;
+        Tue, 01 Aug 2023 20:04:09 -0700 (PDT)
+Received: from localhost ([98.97.32.4])
+        by smtp.gmail.com with ESMTPSA id ji11-20020a170903324b00b001b8a897cd26sm11104289plb.195.2023.08.01.20.04.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 01 Aug 2023 20:04:08 -0700 (PDT)
+Date: Tue, 01 Aug 2023 20:04:07 -0700
+From: John Fastabend <john.fastabend@gmail.com>
+To: Xu Kuohai <xukuohai@huaweicloud.com>, 
+ bpf@vger.kernel.org, 
+ netdev@vger.kernel.org
+Cc: John Fastabend <john.fastabend@gmail.com>, 
+ Jakub Sitnicki <jakub@cloudflare.com>, 
+ "David S . Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Daniel Borkmann <daniel@iogearbox.net>, 
+ Alexei Starovoitov <ast@kernel.org>, 
+ Cong Wang <cong.wang@bytedance.com>
+Message-ID: <64c9c7a788bad_2c0b20833@john.notmuch>
+In-Reply-To: <20230731134536.4058181-1-xukuohai@huaweicloud.com>
+References: <20230731134536.4058181-1-xukuohai@huaweicloud.com>
+Subject: RE: [PATCH bpf] bpf, sockmap: Fix NULL deref in sk_psock_backlog
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Niravkumar L Rabara <niravkumar.l.rabara@intel.com>
+Xu Kuohai wrote:
+> From: Xu Kuohai <xukuohai@huawei.com>
+> 
+> sk_psock_backlog triggers a NULL dereference:
+> 
+>  BUG: kernel NULL pointer dereference, address: 000000000000000e
+>  #PF: supervisor read access in kernel mode
+>  #PF: error_code(0x0000) - not-present page
+>  PGD 0 P4D 0
+>  Oops: 0000 [#1] PREEMPT SMP PTI
+>  CPU: 0 PID: 70 Comm: kworker/0:3 Not tainted 6.5.0-rc2-00585-gb11bbbe4c66e #26
+>  Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.15.0-0-g2dd4b9b3f840-p4
+>  Workqueue: events sk_psock_backlog
+>  RIP: 0010:0xffffffffc0205254
+>  Code: 00 00 48 89 94 24 a0 00 00 00 41 5f 41 5e 41 5d 41 5c 5d 5b 41 5b 41 5a 41 59 41 50
+>  RSP: 0018:ffffc90000acbcb8 EFLAGS: 00010246
+>  RAX: ffffffff81c5ee10 RBX: ffff888018260000 RCX: 0000000000000001
+>  RDX: 0000000000000003 RSI: ffffc90000acbd58 RDI: 0000000000000000
+>  RBP: 0000000000000000 R08: 0000000000000003 R09: 0000000080100005
+>  R10: 0000000000000001 R11: 0000000000000000 R12: 0000000000000003
+>  R13: 0000000000000000 R14: 0000000000000021 R15: 0000000000000003
+>  FS:  0000000000000000(0000) GS:ffff88803ea00000(0000) knlGS:0000000000000000
+>  CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>  CR2: 000000000000000e CR3: 000000000b0de002 CR4: 0000000000170ef0
+>  Call Trace:
+>   <TASK>
+>   ? __die+0x24/0x70
+>   ? page_fault_oops+0x15d/0x480
+>   ? fixup_exception+0x26/0x330
+>   ? exc_page_fault+0x72/0x1d0
+>   ? asm_exc_page_fault+0x26/0x30
+>   ? __pfx_inet_sendmsg+0x10/0x10
+>   ? 0xffffffffc0205254
+>   ? inet_sendmsg+0x20/0x80
+>   ? sock_sendmsg+0x8f/0xa0
+>   ? __skb_send_sock+0x315/0x360
+>   ? __pfx_sendmsg_unlocked+0x10/0x10
+>   ? sk_psock_backlog+0xb4/0x300
+>   ? process_one_work+0x292/0x560
+>   ? worker_thread+0x53/0x3e0
+>   ? __pfx_worker_thread+0x10/0x10
+>   ? kthread+0x102/0x130
+>   ? __pfx_kthread+0x10/0x10
+>   ? ret_from_fork+0x34/0x50
+>   ? __pfx_kthread+0x10/0x10
+>   ? ret_from_fork_asm+0x1b/0x30
+>   </TASK>
+> 
+> The bug flow is as follows:
+> 
+> thread 1                                   thread 2
+> 
+> sk_psock_backlog                           sock_close
+>   sk_psock_handle_skb                        __sock_release
+>     __skb_send_sock                            inet_release
+>       sendmsg_unlocked                           tcp_close
+>         sock_sendmsg                               lock_sock
+>                                                      __tcp_close
+>                                                    release_sock
+>                                                  sock->sk = NULL // (1)
+>           inet_sendmsg
+>             sk = sock->sk // (2)
+>             inet_send_prepare
+>               inet_sk(sk)->inet_num // (3)
 
-Add clock ID definitions for Intel Agilex5 SoCFPGA.
-The registers in Agilex5 handling the clock is named as clock manager.
+We are doing a lot of hoping through calls here to find something we
+should already know. We know the psock we are sending has a protocol
+of tcp, udp, ... and could call the send directly instead of walking
+back into the sk_socket and so on. For tcp example we could simply
+call tcp_sendmsg(sk, msg, size).
 
-Signed-off-by: Teh Wen Ping <wen.ping.teh@intel.com>
-Reviewed-by: Dinh Nguyen <dinguyen@kernel.org>
-Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
-Signed-off-by: Niravkumar L Rabara <niravkumar.l.rabara@intel.com>
----
- .../bindings/clock/intel,agilex5-clkmgr.yaml  |  40 +++++++
- .../dt-bindings/clock/intel,agilex5-clkmgr.h  | 100 ++++++++++++++++++
- 2 files changed, 140 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/clock/intel,agilex5-clkmgr.yaml
- create mode 100644 include/dt-bindings/clock/intel,agilex5-clkmgr.h
+I haven't tried it yet, but I wonder if a lot of this logic gets
+easier to reason about if we have per protocol backlog logic. Its
+just a hunch at this point though.
 
-diff --git a/Documentation/devicetree/bindings/clock/intel,agilex5-clkmgr.yaml b/Documentation/devicetree/bindings/clock/intel,agilex5-clkmgr.yaml
-new file mode 100644
-index 000000000000..d120b0da7f3d
---- /dev/null
-+++ b/Documentation/devicetree/bindings/clock/intel,agilex5-clkmgr.yaml
-@@ -0,0 +1,40 @@
-+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/clock/intel,agilex5-clkmgr.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: Intel SoCFPGA Agilex5 clock manager
-+
-+maintainers:
-+  - Dinh Nguyen <dinguyen@kernel.org>
-+
-+description:
-+  The Intel Agilex5 Clock Manager is an integrated clock controller, which
-+  generates and supplies clock to all the modules.
-+
-+properties:
-+  compatible:
-+    const: intel,agilex5-clkmgr
-+
-+  reg:
-+    maxItems: 1
-+
-+  '#clock-cells':
-+    const: 1
-+
-+required:
-+  - compatible
-+  - reg
-+  - '#clock-cells'
-+
-+additionalProperties: false
-+
-+examples:
-+  - |
-+    clkmgr: clock-controller@10d10000 {
-+      compatible = "intel,agilex5-clkmgr";
-+      reg = <0x10d10000 0x1000>;
-+      #clock-cells = <1>;
-+    };
-+...
-diff --git a/include/dt-bindings/clock/intel,agilex5-clkmgr.h b/include/dt-bindings/clock/intel,agilex5-clkmgr.h
-new file mode 100644
-index 000000000000..2f3a23b31c5c
---- /dev/null
-+++ b/include/dt-bindings/clock/intel,agilex5-clkmgr.h
-@@ -0,0 +1,100 @@
-+/* SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause */
-+/*
-+ * Copyright (C) 2023, Intel Corporation
-+ */
-+
-+#ifndef __DT_BINDINGS_INTEL_AGILEX5_CLKMGR_H
-+#define __DT_BINDINGS_INTEL_AGILEX5_CLKMGR_H
-+
-+/* fixed rate clocks */
-+#define AGILEX5_OSC1			0
-+#define AGILEX5_CB_INTOSC_HS_DIV2_CLK	1
-+#define AGILEX5_CB_INTOSC_LS_CLK	2
-+#define AGILEX5_F2S_FREE_CLK		3
-+
-+/* PLL clocks */
-+#define AGILEX5_MAIN_PLL_CLK		4
-+#define AGILEX5_MAIN_PLL_C0_CLK		5
-+#define AGILEX5_MAIN_PLL_C1_CLK		6
-+#define AGILEX5_MAIN_PLL_C2_CLK		7
-+#define AGILEX5_MAIN_PLL_C3_CLK		8
-+#define AGILEX5_PERIPH_PLL_CLK		9
-+#define AGILEX5_PERIPH_PLL_C0_CLK	10
-+#define AGILEX5_PERIPH_PLL_C1_CLK	11
-+#define AGILEX5_PERIPH_PLL_C2_CLK	12
-+#define AGILEX5_PERIPH_PLL_C3_CLK	13
-+#define AGILEX5_CORE0_FREE_CLK		14
-+#define AGILEX5_CORE1_FREE_CLK		15
-+#define AGILEX5_CORE2_FREE_CLK		16
-+#define AGILEX5_CORE3_FREE_CLK		17
-+#define AGILEX5_DSU_FREE_CLK		18
-+#define AGILEX5_BOOT_CLK		19
-+
-+/* fixed factor clocks */
-+#define AGILEX5_L3_MAIN_FREE_CLK	20
-+#define AGILEX5_NOC_FREE_CLK		21
-+#define AGILEX5_S2F_USR0_CLK		22
-+#define AGILEX5_NOC_CLK			23
-+#define AGILEX5_EMAC_A_FREE_CLK		24
-+#define AGILEX5_EMAC_B_FREE_CLK		25
-+#define AGILEX5_EMAC_PTP_FREE_CLK	26
-+#define AGILEX5_GPIO_DB_FREE_CLK	27
-+#define AGILEX5_S2F_USER0_FREE_CLK	28
-+#define AGILEX5_S2F_USER1_FREE_CLK	29
-+#define AGILEX5_PSI_REF_FREE_CLK	30
-+#define AGILEX5_USB31_FREE_CLK		31
-+
-+/* Gate clocks */
-+#define AGILEX5_CORE0_CLK		32
-+#define AGILEX5_CORE1_CLK		33
-+#define AGILEX5_CORE2_CLK		34
-+#define AGILEX5_CORE3_CLK		35
-+#define AGILEX5_MPU_CLK			36
-+#define AGILEX5_MPU_PERIPH_CLK		37
-+#define AGILEX5_MPU_CCU_CLK		38
-+#define AGILEX5_L4_MAIN_CLK		39
-+#define AGILEX5_L4_MP_CLK		40
-+#define AGILEX5_L4_SYS_FREE_CLK		41
-+#define AGILEX5_L4_SP_CLK		42
-+#define AGILEX5_CS_AT_CLK		43
-+#define AGILEX5_CS_TRACE_CLK		44
-+#define AGILEX5_CS_PDBG_CLK		45
-+#define AGILEX5_EMAC1_CLK		47
-+#define AGILEX5_EMAC2_CLK		48
-+#define AGILEX5_EMAC_PTP_CLK		49
-+#define AGILEX5_GPIO_DB_CLK		50
-+#define AGILEX5_S2F_USER0_CLK		51
-+#define AGILEX5_S2F_USER1_CLK		52
-+#define AGILEX5_PSI_REF_CLK		53
-+#define AGILEX5_USB31_SUSPEND_CLK	54
-+#define AGILEX5_EMAC0_CLK		46
-+#define AGILEX5_USB31_BUS_CLK_EARLY	55
-+#define AGILEX5_USB2OTG_HCLK		56
-+#define AGILEX5_SPIM_0_CLK		57
-+#define AGILEX5_SPIM_1_CLK		58
-+#define AGILEX5_SPIS_0_CLK		59
-+#define AGILEX5_SPIS_1_CLK		60
-+#define AGILEX5_DMA_CORE_CLK		61
-+#define AGILEX5_DMA_HS_CLK		62
-+#define AGILEX5_I3C_0_CORE_CLK		63
-+#define AGILEX5_I3C_1_CORE_CLK		64
-+#define AGILEX5_I2C_0_PCLK		65
-+#define AGILEX5_I2C_1_PCLK		66
-+#define AGILEX5_I2C_EMAC0_PCLK		67
-+#define AGILEX5_I2C_EMAC1_PCLK		68
-+#define AGILEX5_I2C_EMAC2_PCLK		69
-+#define AGILEX5_UART_0_PCLK		70
-+#define AGILEX5_UART_1_PCLK		71
-+#define AGILEX5_SPTIMER_0_PCLK		72
-+#define AGILEX5_SPTIMER_1_PCLK		73
-+#define AGILEX5_DFI_CLK			74
-+#define AGILEX5_NAND_NF_CLK		75
-+#define AGILEX5_NAND_BCH_CLK		76
-+#define AGILEX5_SDMMC_SDPHY_REG_CLK	77
-+#define AGILEX5_SDMCLK			78
-+#define AGILEX5_SOFTPHY_REG_PCLK	79
-+#define AGILEX5_SOFTPHY_PHY_CLK		80
-+#define AGILEX5_SOFTPHY_CTRL_CLK	81
-+#define AGILEX5_NUM_CLKS		82
-+
-+#endif	/* __DT_BINDINGS_INTEL_AGILEX5_CLKMGR_H */
--- 
-2.25.1
+> 
+> sock->sk is set to NULL by thread 2 at time (1), then fetched by
+> thread 1 at time (2), and used by thread 1 to access memory at
+> time (3), resulting in NULL pointer dereference.
+> 
+> To fix it, add lock_sock back on the egress path for sk_psock_handle_skb.
+> 
+> Fixes: 799aa7f98d53 ("skmsg: Avoid lock_sock() in sk_psock_backlog()")
+> Signed-off-by: Xu Kuohai <xukuohai@huawei.com>
+> ---
+>  net/core/skmsg.c | 44 ++++++++++++++++++++++++++++++++++----------
+>  1 file changed, 34 insertions(+), 10 deletions(-)
+> 
+> diff --git a/net/core/skmsg.c b/net/core/skmsg.c
+> index 7c2764beeb04..8b758c51aa0d 100644
+> --- a/net/core/skmsg.c
+> +++ b/net/core/skmsg.c
+> @@ -609,15 +609,42 @@ static int sk_psock_skb_ingress_self(struct sk_psock *psock, struct sk_buff *skb
+>  	return err;
+>  }
+>  
+> +static int sk_psock_handle_ingress_skb(struct sk_psock *psock,
+> +				       struct sk_buff *skb,
+> +				       u32 off, u32 len)
+> +{
+> +	if (sock_flag(psock->sk, SOCK_DEAD))
+> +		return -EIO;
 
+We didn't previously have the SOCK_DEAD check on ingress which
+looks fine because we will come along and flush the ingress
+queue when psock is being torn down. Adding it looks fine
+though because __tcp_close is flushing the sk_receive_queue
+and detaching the user from the socket so we have no way
+to read the data anyways. This will then abort the backlog
+which moves the psock destruct op along a bit faster.
+
+> +	return sk_psock_skb_ingress(psock, skb, off, len);
+> +}
+> +
+> +static int sk_psock_handle_egress_skb(struct sk_psock *psock,
+> +				      struct sk_buff *skb,
+> +				      u32 off, u32 len)
+> +{
+> +	int ret;
+> +
+> +	lock_sock(psock->sk);
+> +
+> +	if (sock_flag(psock->sk, SOCK_DEAD))
+> +		ret = -EIO;
+
+OK, the sock_orphan() call from tcp_close adjudge_to_death block will set
+the SOCK_DEAD flag and ensure we abort the send here. EIO then forces
+backlog to abort. This looks correct to me.
+
+> +	else if (!sock_writeable(psock->sk))
+> +		ret = -EAGAIN;
+> +	else
+> +		ret = skb_send_sock_locked(psock->sk, skb, off, len);
+> +
+> +	release_sock(psock->sk);
+> +
+> +	return ret;
+> +}
+> +
+>  static int sk_psock_handle_skb(struct sk_psock *psock, struct sk_buff *skb,
+>  			       u32 off, u32 len, bool ingress)
+>  {
+> -	if (!ingress) {
+> -		if (!sock_writeable(psock->sk))
+> -			return -EAGAIN;
+> -		return skb_send_sock(psock->sk, skb, off, len);
+> -	}
+> -	return sk_psock_skb_ingress(psock, skb, off, len);
+> +	if (ingress)
+> +		return sk_psock_handle_ingress_skb(psock, skb, off, len);
+> +	else
+> +		return sk_psock_handle_egress_skb(psock, skb, off, len);
+>  }
+>  
+>  static void sk_psock_skb_state(struct sk_psock *psock,
+> @@ -660,10 +687,7 @@ static void sk_psock_backlog(struct work_struct *work)
+>  		ingress = skb_bpf_ingress(skb);
+>  		skb_bpf_redirect_clear(skb);
+>  		do {
+> -			ret = -EIO;
+> -			if (!sock_flag(psock->sk, SOCK_DEAD))
+> -				ret = sk_psock_handle_skb(psock, skb, off,
+> -							  len, ingress);
+> +			ret = sk_psock_handle_skb(psock, skb, off, len, ingress);
+>  			if (ret <= 0) {
+>  				if (ret == -EAGAIN) {
+>  					sk_psock_skb_state(psock, state, len, off);
+
+OK LGTM nice catch I left my commentary above that helped as I reviewed it. I
+guess we need more stress testing along this path all of our testing is on
+ingress path at the moment. Do you happen to have something coded up that
+stress tests the redirect send paths?
+
+Reviewed-by: John Fastabend <john.fastabend@gmail.com>
 
