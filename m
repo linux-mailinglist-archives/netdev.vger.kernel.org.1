@@ -1,197 +1,184 @@
-Return-Path: <netdev+bounces-23778-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23779-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A432476D7D6
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 21:33:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA64876D7EF
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 21:37:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8069C1C21176
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 19:33:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 57EDB281C29
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 19:37:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E307D10945;
-	Wed,  2 Aug 2023 19:33:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 462DA10945;
+	Wed,  2 Aug 2023 19:37:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D544B101D0
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 19:33:41 +0000 (UTC)
-Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05on2059.outbound.protection.outlook.com [40.107.21.59])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6ED42198B;
-	Wed,  2 Aug 2023 12:33:40 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=UxXRcyW8qK0QKkuyX/IM65nCt0v2PE47hFhZ3PvUvMNCmTW/AjjraDfcx9AvKHHB5/YO/OEPAhqJ0H20J88H8BlMlLHg8veWmDXIR1cJL4HMp74GSaPsVqE0Kj7a8yRvfwY0SOksjlIb0NJc5MUkOsfBiZzKZEvQU7JUhUPLNXWO+WfmUxEzIrIbcbTRVBUfXNWzKXKRJj8cyS60AFhghZqxscrtlS21ysv/lf1oVW6SZ0pnCjhHNa5Sjkuoko0RPfppTDrRZtOGUQUWRBW4Awjki/QWsHHzRbAfaDxEILZcaHMjSxhcMTgpgrhrl6ocSAyxRV+WaaRfEib+MA6UjQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=95EC9okagLe5v+gNOZNiVLm2A6d2001g8HKDTdXcV/c=;
- b=POsxWQHpIzqcQVIltYRwQ6McaDceavyYbVJkd1sGDHIBmfFJlewtT26581k3R0DI/vTikcNQD/cf435m3i0mz+v2Xy8q5vSwLUM035Yk54QYjeXlhv2bQ/5W5vUHqVwgH03MSHm1pVNo6oINtFlA2XKp/GOhZazG/xIKKz56DR99UuOSHEJVJ8Yy17IExfwO/He6631xy2EguBcBVXFjT/F3v1LpwIolBg/tIv25l/I2pMBxarXU5kuxbs0wRRZtEYtRDfOX5PwVGMi4GXTngf7dTd0k8aqEJ8HnFpO+gW3D7cWneZxtNoHnJI8gnR1VJZ0I2bF74kQ34+H3/MPi7A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=95EC9okagLe5v+gNOZNiVLm2A6d2001g8HKDTdXcV/c=;
- b=H6QZk+szqY90dBE9I/y5+xivTsenOU0c9L/oOhtdKN8KD4nToEfX5dRhgmLpv/BGV3xz/1A2ejeRUbMfL2Txbd+Kfi7GLgEbYTfHuCxtdbflr1TVKG/NB85J9oHGmRsiFOYHSyGKOzjUdOHD8J6SqynAgHCQfq+2uplWURn4i1Y=
-Received: from PAXPR04MB9185.eurprd04.prod.outlook.com (2603:10a6:102:231::11)
- by PAXPR04MB9327.eurprd04.prod.outlook.com (2603:10a6:102:2b7::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.45; Wed, 2 Aug
- 2023 19:33:37 +0000
-Received: from PAXPR04MB9185.eurprd04.prod.outlook.com
- ([fe80::d4ee:8daa:92f4:9671]) by PAXPR04MB9185.eurprd04.prod.outlook.com
- ([fe80::d4ee:8daa:92f4:9671%3]) with mapi id 15.20.6631.045; Wed, 2 Aug 2023
- 19:33:37 +0000
-From: Shenwei Wang <shenwei.wang@nxp.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: Marc Kleine-Budde <mkl@pengutronix.de>, Russell King
-	<linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Maxime
- Coquelin <mcoquelin.stm32@gmail.com>, Shawn Guo <shawnguo@kernel.org>, Sascha
- Hauer <s.hauer@pengutronix.de>, Neil Armstrong <neil.armstrong@linaro.org>,
-	Kevin Hilman <khilman@baylibre.com>, Vinod Koul <vkoul@kernel.org>, Chen-Yu
- Tsai <wens@csie.org>, Jernej Skrabec <jernej.skrabec@gmail.com>, Samuel
- Holland <samuel@sholland.org>, Jose Abreu <joabreu@synopsys.com>,
-	"imx@lists.linux.dev" <imx@lists.linux.dev>, Simon Horman
-	<simon.horman@corigine.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>, Nobuhiro Iwamatsu
-	<nobuhiro1.iwamatsu@toshiba.co.jp>, Fabio Estevam <festevam@gmail.com>,
-	"linux-stm32@st-md-mailman.stormreply.com"
-	<linux-stm32@st-md-mailman.stormreply.com>, Jerome Brunet
-	<jbrunet@baylibre.com>, Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
-	Wong Vee Khee <veekhee@apple.com>, dl-linux-imx <linux-imx@nxp.com>, Andrew
- Halaney <ahalaney@redhat.com>, Bhupesh Sharma <bhupesh.sharma@linaro.org>,
-	Martin Blumenstingl <martin.blumenstingl@googlemail.com>, Revanth Kumar
- Uppala <ruppala@nvidia.com>, Jochen Henneberg
-	<jh@henneberg-systemdesign.com>, "linux-amlogic@lists.infradead.org"
-	<linux-amlogic@lists.infradead.org>, "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, Pengutronix Kernel Team
-	<kernel@pengutronix.de>
-Subject: RE: [EXT] Re: [PATCH v3 net 1/2] net: stmmac: add new mode parameter
- for fix_mac_speed
-Thread-Topic: [EXT] Re: [PATCH v3 net 1/2] net: stmmac: add new mode parameter
- for fix_mac_speed
-Thread-Index: AQHZw8rncXkT+tBv7kuTZDED3nHZB6/U/amAgADJUBCAABaEAIABiuKA
-Date: Wed, 2 Aug 2023 19:33:36 +0000
-Message-ID:
- <PAXPR04MB9185058330F81CA73EBFD944890BA@PAXPR04MB9185.eurprd04.prod.outlook.com>
-References: <20230731161929.2341584-1-shenwei.wang@nxp.com>
-	<20230731161929.2341584-2-shenwei.wang@nxp.com>
-	<20230801-portside-prepaid-513f1f39f245-mkl@pengutronix.de>
-	<AS8PR04MB9176FC45B9663B5BF964F58A890AA@AS8PR04MB9176.eurprd04.prod.outlook.com>
- <20230801125828.209c5e88@kernel.org>
-In-Reply-To: <20230801125828.209c5e88@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PAXPR04MB9185:EE_|PAXPR04MB9327:EE_
-x-ms-office365-filtering-correlation-id: 653b02aa-24f1-43e7-9ccc-08db938f5dff
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- xRxAMtncFDmUB9BKrvo+KSD3ft8t/qA9rfvziVZ8YGz0w1UPiqrulhTdDS/9x+IqwvWibLKqPjgC/XWV9z2lsGIDHMiW1VYaBIp8kZqdKkdhNJjE7HHokt02NeF+pHCCqFxcl5GDuoatmU3Tk5O6qhknqfMR/0cRCDufiRbj5EM1/m+4g/gbZssIjCOhlx8KkzQv+h6+Dgu5en3bOL7jChEKfbDRPe64ljQMkZmEaiTqROuxw9j87x2NdsHYmkwcDBpjgk07R5sB/r9VggIYNAZDxliSLKct+4Cs8JgxW5mM5zwVOLHpqlzya9Me0H0LksVKqoCmtG/JAOCK69rHbB1rAnADWVKurtfARyTH7cbhsIlT/3Q7W5kW8BoJPurMrDfd5d0aLeHf5rxTYuQJawPpRLFvodfWlJ4XdSw7R0idfTc98pKKgFB4VsA1tYj3J0tHpJ8ldsc4tva8FD7lhoZ52mmP8nXezzAFN0AZVk/PsqJmHAPeLZvoYe0jhPBwRHo6e9FgTgXUnKjmpzLEkdsmNXtfbVRXfB266jF7bM9MKrWPU6WFeOkbA7uuANEdEj+kLECAkJw5BoPkOga2fUavIDe0lgVho9cWeAICJaDBNk2oLic34CtW5qRjvvao
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB9185.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(376002)(346002)(396003)(39860400002)(366004)(136003)(451199021)(54906003)(71200400001)(8676002)(8936002)(7696005)(478600001)(76116006)(45080400002)(64756008)(6916009)(66476007)(316002)(66446008)(66946007)(66556008)(4326008)(83380400001)(9686003)(38100700002)(122000001)(41300700001)(55016003)(44832011)(7406005)(7416002)(55236004)(26005)(6506007)(5660300002)(53546011)(86362001)(2906002)(38070700005)(52536014)(186003)(33656002);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?Qjju14odn7ndoelrr+mgirvG02gqy+9s7hr9Wyon3qhApEmu+W8uNinR5U8U?=
- =?us-ascii?Q?gCO2UkDz1Idlu+e2OMBd+DNKlMsj5DpAxVsnZ4ZJkkux1QuAizj5qruxBZ1B?=
- =?us-ascii?Q?Y93IKPf9t+/WZQj0KJCMJkvbo3ARTUmII5zoKhpgaJNKc3PakhddzYKq4oH5?=
- =?us-ascii?Q?uvxsOP2wnRDkfD9aqjAa/D/wWfUjr3SADD86vyD5Y5O+U5ll4BCW+isEcf9x?=
- =?us-ascii?Q?66rmpy81H/S5b9qmZYYh+CBc/x4B3OQ2BvH5A215i8VegB5BQlEkfrJuDwja?=
- =?us-ascii?Q?xk5g8+/+Kf/piW7olv7cLo2EA72C95LvccubzmoClXCjFjYqoNzxiEqSFy+b?=
- =?us-ascii?Q?W0ozChPaVGJ+6JHXXIdGGBo6iuDS7OQ2MwAaL4YNHVm/8yGA9pIFGHFLy7TU?=
- =?us-ascii?Q?4GjRGEymBv8H+YdwgqL4xsZEhyPBg0REWPeY9TAHdD4IbbnQIDoZA8NYThlk?=
- =?us-ascii?Q?5xLXTCLfHF328laVTKO4esMd4ZX30mqu2gVF7GXQ4KxrhK5BVSs1GQgQlOET?=
- =?us-ascii?Q?xpXf2QKECiz9GNV70uTmMoAsNvLD1r+MFsLlZo4Evpy3sS2E55yBIusKWX0n?=
- =?us-ascii?Q?ymfcWTvXwvF2tfToYRhTEa+dXOzcpVqkIHOgjypqGT/25dg56WSw7h3a6h8P?=
- =?us-ascii?Q?9VwYHdFfnx/N5QlU0R7xR6hHTX8H0XYUwJyVXc/ooMvFq+5IT/tHIda20TJG?=
- =?us-ascii?Q?zg6E8RGMQldLzcGEsoUm23Wztc7tWe6hCg1yZ9hUTYy9jBt9D8YtmP4XUAnf?=
- =?us-ascii?Q?HuazWpNU1tG3e/JVwzgqy13/xDnBH6U7wPEmJ6GooKC0H6laS4RSPYEUCfmA?=
- =?us-ascii?Q?kSHIBaYb8Zl0K70nMXmJCZ8HNg1Z5HduaDLercWl6rQcWkcLPdvOBrUl4VAc?=
- =?us-ascii?Q?ZgO5dE6lGZRzeS41KJkFfumLCd4nU4WfVIs75lEZnMxksh3H+fryPwc/V/ZN?=
- =?us-ascii?Q?h/gW+VNXLdv3UBUouf4G9vC84CY5kMjTaS5CbYfjYzbZRoKpNRj1L33UErwQ?=
- =?us-ascii?Q?AQ9F1+0qsltL5xclu7rC60feNEwS6SN2zWONPgk3UCJmSgwhK+Er5tGWRgIw?=
- =?us-ascii?Q?/tjQyqIxL/C4CwwklpbhxgA42U12ttnCSjv6ndrxrnTcEyPCk+J4HqoDDpZL?=
- =?us-ascii?Q?7FgeUmdejvopQsYthFnU5VYqLSu/x4K/5A4IU/gYRt5ln8rv304TgMItOg1o?=
- =?us-ascii?Q?7otmWXoHLE5bGeH02OH+zHlDmelwJBLjfWOBpsyJyQInrNOAxVU96fP+n/vH?=
- =?us-ascii?Q?pX8CP7BVBDS6Z4S4djUFr60HhS+fktzB4Ndm56N/Ep8e6kR0xNVEBZYrXk74?=
- =?us-ascii?Q?8BEpbMBL9PGzX0VmejRcQbhwX6Fm82wXOL4iYHsJgyZIc728rrdxDXVnrLsk?=
- =?us-ascii?Q?gOrgB4VLot2oz8IxamhFuVjWvI5gedL//xcbIEsA1lj2MvjD+OcgjeBlEFVs?=
- =?us-ascii?Q?mwtCgGxSmmxiy78JWNgf6gAJl4ISenzVXQbAm8sGndkng7NLErAjwN+V/n0/?=
- =?us-ascii?Q?kOVVvZYRpUS4JOVbMdrGS3K7iaAeaw3/6J04nCPGrHA3frUlZJll30idF/sO?=
- =?us-ascii?Q?I6gw1uaq5xrqXuIQPk+laYZLBBG4udoXUpGbn481?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35204100D1
+	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 19:37:32 +0000 (UTC)
+Received: from mail-wm1-x334.google.com (mail-wm1-x334.google.com [IPv6:2a00:1450:4864:20::334])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0619A1990
+	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 12:37:29 -0700 (PDT)
+Received: by mail-wm1-x334.google.com with SMTP id 5b1f17b1804b1-3fe12820bffso2203605e9.3
+        for <netdev@vger.kernel.org>; Wed, 02 Aug 2023 12:37:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=arista.com; s=google; t=1691005047; x=1691609847;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ahAlRKVh2qqPAslZ51dpS/DWGGLvZdWXysgAY2PBxWs=;
+        b=kHXi2luD3prdey21xgxqSBbpnT13tSSTLJFJSZ8XwEY3EghTbdtyggJtm5Qb7Mqz07
+         nyyHNsQJikHRK1TTvv5wb/M6qvjg+8v2LFK0XfmDRF0jz81Gbq8IyTnOWfdhe5aijSlj
+         loriS7FaGm9r4Gt+kEnYa0sFCg4J5DVBOfhjvH0hgo8y8XSrGSUXYe0e0nMr7dhKoELr
+         qsRhSj0h3E/e60BI8YR3UmMjYRIGf3NHJv9igceVPxJ43bnY3pxD6NwduO2Kk/O1IiDM
+         tE5ACLuD3WcDva1LNDgR4d2pB6L/FnoAvztH+lvGKKU4/iowTk3s/IZWjDt0xbQbehEO
+         LWDw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691005047; x=1691609847;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ahAlRKVh2qqPAslZ51dpS/DWGGLvZdWXysgAY2PBxWs=;
+        b=h0DG1kXTGnUb9bY2IXKDUrVl4cfac0yCp10teNf/AmgCeQcA+54ynkocbPsi5BfbUG
+         iBwgv8lv5X1AQRk8mL89qiq0K+gA/onQYkGywOSXnXUszRXuupWslKnVHUxyTWIyVGKh
+         Ilmw3dIiHepVconwczjQ8+D4bqKIk8xSqAEizht0W05tDWMrcFgT7LHIQRsZCABtjf+3
+         xs6QSOhUJ7E4JPnS7pj0cINCGGgHRQ6lCJEQEJ5nbh2/SaUQeo2XHAlHV1jb6XIkrb1F
+         Kh7EBZteu91nHDCsRrgol67jBDp3JlrL27UTqAIJQP3c22NkKW5zeoH/RsYrGVND+3UP
+         Sw7A==
+X-Gm-Message-State: ABy/qLY3SBlW6HRUSaOSc40FsHE6xNG+Kg/ulWF0zV7Ue3957jGmmakY
+	0Ap7TJF3T6GGctg/5tD5Rh91Pg==
+X-Google-Smtp-Source: APBJJlHDi/3DhZH0eCqhL4+vU3nmScgw5Jce45AovH3P/oAJ2wOXJe7CrrVn8XcSPOeCamhp4RmTgw==
+X-Received: by 2002:a7b:c3d6:0:b0:3fb:ef86:e30 with SMTP id t22-20020a7bc3d6000000b003fbef860e30mr5341767wmj.10.1691005047437;
+        Wed, 02 Aug 2023 12:37:27 -0700 (PDT)
+Received: from [10.83.37.178] ([217.173.96.166])
+        by smtp.gmail.com with ESMTPSA id y8-20020a7bcd88000000b003fc015ae1e1sm2465321wmj.3.2023.08.02.12.37.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 02 Aug 2023 12:37:26 -0700 (PDT)
+Message-ID: <0c201b3e-fc3a-4cee-b056-8338da7261b9@arista.com>
+Date: Wed, 2 Aug 2023 20:37:19 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB9185.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 653b02aa-24f1-43e7-9ccc-08db938f5dff
-X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Aug 2023 19:33:36.9357
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: X6CWnXA5E9cNs/ZiGT3cjTIu7FNPd7iBE9ecq/GRmkWsq3lGBSuSkafFtVpihla4Mb3McDegMgyOD8L+aYBwcw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR04MB9327
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH v9 net-next 00/23] net/tcp: Add TCP-AO support
+Content-Language: en-US
+To: David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>,
+ Simon Horman <simon.horman@corigine.com>
+Cc: linux-kernel@vger.kernel.org, Andy Lutomirski <luto@amacapital.net>,
+ Ard Biesheuvel <ardb@kernel.org>, Bob Gilligan <gilligan@arista.com>,
+ Dan Carpenter <error27@gmail.com>, David Laight <David.Laight@aculab.com>,
+ Dmitry Safonov <0x7f454c46@gmail.com>, Donald Cassidy <dcassidy@redhat.com>,
+ Eric Biggers <ebiggers@kernel.org>, "Eric W. Biederman"
+ <ebiederm@xmission.com>, Francesco Ruggeri <fruggeri05@gmail.com>,
+ "Gaillardetz, Dominik" <dgaillar@ciena.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>,
+ Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+ Ivan Delalande <colona@arista.com>, Leonard Crestez <cdleonard@gmail.com>,
+ Salam Noureddine <noureddine@arista.com>,
+ "Tetreault, Francois" <ftetreau@ciena.com>, netdev@vger.kernel.org,
+ Steen Hegelund <Steen.Hegelund@microchip.com>,
+ Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org
+References: <20230802172654.1467777-1-dima@arista.com>
+From: Dmitry Safonov <dima@arista.com>
+In-Reply-To: <20230802172654.1467777-1-dima@arista.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
++Cc: Simon
 
+I've realized that he wasn't in Cc list, albeit provided valuable
+feedback in v8. Sorry about it, definitely going to Cc on next versions.
 
-> -----Original Message-----
-> From: Jakub Kicinski <kuba@kernel.org>
-> Sent: Tuesday, August 1, 2023 2:58 PM
-> To: Shenwei Wang <shenwei.wang@nxp.com>
-> > > Subject: [EXT] Re: [PATCH v3 net 1/2] net: stmmac: add new mode
-> > > parameter for fix_mac_speed
->=20
-> Why is this quote included? Please get a sane email client.
->=20
+On 8/2/23 18:26, Dmitry Safonov wrote:
+> Hi,
+> 
+> This is version 9 of TCP-AO support. It's based on net-next as
+> there's a trivial conflict with the commit dfa2f0483360 ("tcp: get rid
+> of sysctl_tcp_adv_win_scale").
+> 
+> Most of the changes in this version address Simon's reviews and polish
+> of patch set to please netdev/patchwork. I ran static analyzers over it,
+> there's currently only one warning introduced, which is Sparse's context
+> imbalance in tcp_sigpool_start(). I've spent some time trying to silence
+> it, here are my findings:
+> - __cond_acquires() is broken: refcount_dec_and_lock() produces Sparse warning
+> - tried __acquires() + __releases(), as in bpf_sk_storage_map_seq_find_next(),
+>   yet it doesn't silence Sparse
+> - I thought about moving rcu_read_unlock_bh() out of tcp_sigpool_start(),
+>   forcing the callers to call tcp_sigpool_end() even on error-paths, but:
+>   it feels wrong semantically and I'd have to initialize @c on error-case
+>   and check it in tcp_sigpool_end(). That feels even more wrong.
+> I've placed __cond_acquires() to tcp_sigpool_start() definition,
+> expecting that Sparse may be fixed in future to do proper thing.
+> Worth mentioning that it also complains about many other functions
+> including: sk_clone_lock(), sk_free_unlock_clone(), tcp_conn_request()
+> and etc.
+> 
+> Also, more checkpatch.pl warnings addressed, but yet I've left the ones
+> that are more personal preferences (i.e. 80 columns limit). Please, ping
+> me if you have a strong feeling about one of them.
+> 
+> Worth mentioning removing in-kernel wiring for TCP-AO key port matching:
+> it was restricted in uAPI and still it is. Removing from initial TCP-AO
+> implementation port matching as it can be added post-merge.
+> 
+> The following changes since commit 34093c9fa05df24558d1e2c5d32f7f93b2c97ee9:
+> 
+>   net: Remove duplicated include in mac.c (2023-08-02 11:42:47 +0100)
+> 
+> are available in the Git repository at:
+> 
+>   git@github.com:0x7f454c46/linux.git tcp-ao-v9
+> 
+> for you to fetch changes up to c1cf20fddf71a9ae9f07cb04a5a1efcce156c5ab:
+> 
+>   Documentation/tcp: Add TCP-AO documentation (2023-08-02 17:28:15 +0100)
+> 
+> ----------------------------------------------------------------
+> 
+> And another branch with selftests, that will be sent later separately:
+> 
+>   git@github.com:0x7f454c46/linux.git tcp-ao-v9-with-selftests
+> 
+> Thanks for your time and reviews,
+>          Dmitry
+> 
+> --- Changelog ---
+> 
+> Changes from v8:
+> - Based on net-next
+> - Now doing git request-pull, rather than GitHub URLs
+> - Fix tmp_key buffer leak, introduced in v7 (Simon)
+> - More checkpatch.pl warning fixes (even to the code that existed but
+>   was touched)
+> - More reverse Xmas tree declarations (Simon)
+> - static code analysis fixes
+> - Removed TCP-AO key port matching code
+> - Removed `inline' for for static functions in .c files to make
+>   netdev/source_inline happy (I didn't know it's a thing)
+> - Moved tcp_ao_do_lookup() to a commit that uses it (Simon)
+> - __tcp_ao_key_cmp(): prefixlen is bits, but memcmp() uses bytes
+> - Added TCP port matching limitation to Documentation/networking/tcp_ao.rst
+> 
+> Version 8: https://lore.kernel.org/all/20230719202631.472019-1-dima@arista.com/T/#u
 
-I have no idea. We are using Office Outlook.
+[..]
 
-Regards,
-Shenwei
+Thanks,
+          Dmitry
 
-> > > On 31.07.2023 11:19:28, Shenwei Wang wrote:
-> > > > A mode parameter has been added to the callback function of
-> > > > fix_mac_speed to indicate the physical layer type.
-> > > >
-> > > > The mode can be one the following:
-> > > >   MLO_AN_PHY      - Conventional PHY
-> > > >   MLO_AN_FIXED    - Fixed-link mode
-> > > >   MLO_AN_INBAND   - In-band protocol
-> > > >
-> > > > Also use short version of 'uint' to replace the 'unsigned int' in
-> > > > the function definitions.
-> > >
-> > > There are not many users of 'uint' in the kernel and it's not used
-> > > in the stmmac driver so far. From my point of view I would not
-> > > introduce it and stick to the standard 'unsigned int'.
-> >
-> > Using 'uint' makes the code look cleaner because adding one extra
-> > parameter may cause some function declarations to span multiple lines.
-> > This change keeps function declarations compact on a single line.
->=20
-> Marc is right. Just do it.
 
