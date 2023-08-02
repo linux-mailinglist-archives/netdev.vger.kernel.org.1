@@ -1,191 +1,68 @@
-Return-Path: <netdev+bounces-23711-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23713-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3C5276D401
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 18:48:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1774876D409
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 18:49:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AD6F4281D4D
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 16:48:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C3A9E281E3B
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 16:49:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C1C2D512;
-	Wed,  2 Aug 2023 16:48:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C080DDAF;
+	Wed,  2 Aug 2023 16:48:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D1A1C8F2
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 16:48:09 +0000 (UTC)
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69AA0173A;
-	Wed,  2 Aug 2023 09:48:07 -0700 (PDT)
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 372Gfuw1023825;
-	Wed, 2 Aug 2023 16:48:05 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=RYhl9o7SKKJztH3JmqXCvUi0CyeUsByFRM8iTudrnzA=;
- b=pOqNeVHqJ7Yp8Y0f9lVTtpwuFisK64YFdNtSp9S56CT0A7jqXCcXA88nvRzhET3kLacw
- +1gxiTT/6IcNScbX9Z7OXdhBFNFujjNW83brkY0cxkLHqdGK2mBBDEe+7u+nOOf2oN5c
- e9vRxEnx6DikaXBUJf0NZL2CvlA9cwiPoCvbC/QncCenVAWxWsZXPFgf9Ggu2u91PxKq
- L7nPtx4kDCptOZ8YXBq0nz0f8hIrBx0LBZ1QSq4uYtbVgIjXVRpPh0FybPyeoQPOBBZt
- opqelYv62ZQacajRUMp3M6PxhbvMi2+jn0NjmcfXYiCm+V6LHsIv5SkrzQMw6jYxAfE2 gw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3s7tvvr7gn-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 02 Aug 2023 16:48:04 +0000
-Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 372GhqkD031958;
-	Wed, 2 Aug 2023 16:48:04 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3s7tvvr7fs-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 02 Aug 2023 16:48:03 +0000
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 372F1GkG017116;
-	Wed, 2 Aug 2023 16:48:03 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3s5fajwprq-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 02 Aug 2023 16:48:02 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 372Gm0BC20185814
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 2 Aug 2023 16:48:00 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id F2EDC20043;
-	Wed,  2 Aug 2023 16:47:59 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2E81020040;
-	Wed,  2 Aug 2023 16:47:59 +0000 (GMT)
-Received: from [9.179.11.37] (unknown [9.179.11.37])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed,  2 Aug 2023 16:47:59 +0000 (GMT)
-Message-ID: <603d2672855d74e9bfc2619156f4ffe7976de4f5.camel@linux.ibm.com>
-Subject: Re: [PATCH net 2/2] net/smc: Use correct buffer sizes when
- switching between TCP and SMC
-From: Gerd Bayer <gbayer@linux.ibm.com>
-To: Tony Lu <tonylu@linux.alibaba.com>
-Cc: Wenjia Zhang <wenjia@linux.ibm.com>, Jan Karcher <jaka@linux.ibm.com>,
-        Paolo Abeni <pabeni@redhat.com>, Karsten Graul <kgraul@linux.ibm.com>,
-        "D .
- Wythe" <alibuda@linux.alibaba.com>,
-        Wen Gu <guwen@linux.alibaba.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        linux-s390@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Date: Wed, 02 Aug 2023 18:47:58 +0200
-In-Reply-To: <ZMpPjAaRzSRy-Vo_@TONYMAC-ALIBABA.local>
-References: <20230802093313.1501605-1-gbayer@linux.ibm.com>
-	 <20230802093313.1501605-3-gbayer@linux.ibm.com>
-	 <ZMpPjAaRzSRy-Vo_@TONYMAC-ALIBABA.local>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.4 (3.48.4-1.module_f38+17164+63eeee4a) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 934F7DDAD
+	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 16:48:33 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D9D8EC433CB;
+	Wed,  2 Aug 2023 16:48:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1690994913;
+	bh=Pdn2EtB/K/X3AmHuk5ox8AefKm9knP0sFeo3NYu+Yb0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=hIBCvG+wTP06Y0lUk+87/LHyaSYCg9BZabwl8+s2O4iVuO+S7lgKbLbPzPu4COcYL
+	 OYzCEsqxqQ0nXz6W0mKtdFW0XER54/HkWS86YZUDQJthVTDP27KOr/OVfOzbGsnxHG
+	 f1Sx8mA1A16GnoStSPSxY9SbvJDJuv5EdsUV/HXRmXtJ+8V2hx6bRb9H5JrJ/f0UVQ
+	 9j47BgG1z1CiRZ9x9t6zbmF5moVMSbsdC3DUHrLVhUqjZ+etIxuZwUOQQRoZXdCB/K
+	 UbaRES0STA3u6/CyT4XS9colYzQQAtLxO+jKMmOD2UUkSIq2tGob9VFzniZHpUHZPo
+	 00VhP/b/gKR4g==
+Date: Wed, 2 Aug 2023 18:48:28 +0200
+From: Simon Horman <horms@kernel.org>
+To: Li Zetao <lizetao1@huawei.com>
+Cc: lars.povlsen@microchip.com, Steen.Hegelund@microchip.com,
+	daniel.machon@microchip.com, UNGLinuxDriver@microchip.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, linux-arm-kernel@lists.infradead.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net-next] net: microchip: vcap api: Use ERR_CAST() in
+ vcap_decode_rule()
+Message-ID: <ZMqI3MOQQr80UFa+@kernel.org>
+References: <20230802093156.975743-1-lizetao1@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: zSPmUnJ3NkZEgtca34jLWGXJ_34EBbIf
-X-Proofpoint-ORIG-GUID: mUWuCCm1BoLhEp0umEXsTl4Akz6lPj6U
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-08-02_12,2023-08-01_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 spamscore=0
- priorityscore=1501 suspectscore=0 bulkscore=0 mlxscore=0 mlxlogscore=999
- phishscore=0 malwarescore=0 clxscore=1015 lowpriorityscore=0 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2306200000
- definitions=main-2308020146
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230802093156.975743-1-lizetao1@huawei.com>
 
-On Wed, 2023-08-02 at 20:43 +0800, Tony Lu wrote:
-> On Wed, Aug 02, 2023 at 11:33:13AM +0200, Gerd Bayer wrote:
-> > Tuning of the effective buffer size through setsockopts was working
-> > for
-> > SMC traffic only but not for TCP fall-back connections even before
-> > commit 0227f058aa29 ("net/smc: Unbind r/w buffer size from clcsock
-> > and
-> > make them tunable"). That change made it apparent that TCP fall-
-> > back
-> > connections would use net.smc.[rw]mem as buffer size instead of
-> > net.ipv4_tcp_[rw]mem.
-> >=20
-> > Amend the code that copies attributes between the (TCP) clcsock and
-> > the
-> > SMC socket and adjust buffer sizes appropriately:
-> > - Copy over sk_userlocks so that both sockets agree on whether
-> > tuning
-> > =C2=A0 via setsockopt is active.
-> > - When falling back to TCP use sk_sndbuf or sk_rcvbuf as specified
-> > with
-> > =C2=A0 setsockopt. Otherwise, use the sysctl value for TCP/IPv4.
-> > - Likewise, use either values from setsockopt or from sysctl for
-> > SMC
-> > =C2=A0 (duplicated) on successful SMC connect.
-> >=20
-> > In smc_tcp_listen_work() drop the explicit copy of buffer sizes as
-> > that
-> > is taken care of by the attribute copy.
-> >=20
-> > Fixes: 0227f058aa29 ("net/smc: Unbind r/w buffer size from clcsock
-> > and make them tunable")
-> > Signed-off-by: Gerd Bayer <gbayer@linux.ibm.com>
-> > Reviewed-by: Wenjia Zhang <wenjia@linux.ibm.com>
-> > Reviewed-by: Jan Karcher <jaka@linux.ibm.com>
->=20
-> Reviewed-by: Tony Lu <tonylu@linux.alibaba.com>
->=20
-> >=20
-> ^^^^ nit: a extra new line here.
-I'll clean that up.
+On Wed, Aug 02, 2023 at 05:31:56PM +0800, Li Zetao wrote:
+> There is a warning reported by coccinelle:
+> 
+> ./drivers/net/ethernet/microchip/vcap/vcap_api.c:2399:9-16: WARNING:
+> ERR_CAST can be used with ri
+> 
+> Use ERR_CAST instead of ERR_PTR + PTR_ERR to simplify the
+> conversion process.
+> 
+> Signed-off-by: Li Zetao <lizetao1@huawei.com>
 
-> > ---
-> > =C2=A0net/smc/af_smc.c | 76 ++++++++++++++++++++++++++++++++++---------=
--
-> > ----
-> > =C2=A01 file changed, 54 insertions(+), 22 deletions(-)
-> >=20
-> >=20
-[...]
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-> > +/* if set, use value set by setsockopt() - else use IPv4 or SMC
-> > sysctl value */
-> > +static void smc_adjust_sock_bufsizes(struct sock *nsk, struct sock
-> > *osk,
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 unsigned=
- long mask)
-> > +{
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct net *nnet;
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0nnet =3D nsk->sk_net.net;
->=20
-> Better to combine these two lines with existed helper.
->=20
-> struct net *net =3D sock_net(nsk);
-Yes, looks much cleaner.
-
-[...]
->=20
-
-Thank you Tony for your review and comments.
-I'll be sending out a v2 with your recommendations - but give people a
-little more time to look at this version.
-
-Thanks,
-Gerd
 
