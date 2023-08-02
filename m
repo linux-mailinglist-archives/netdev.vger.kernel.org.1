@@ -1,285 +1,197 @@
-Return-Path: <netdev+bounces-23777-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23778-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5AB7176D7B6
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 21:28:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A432476D7D6
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 21:33:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6AC711C21312
-	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 19:28:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8069C1C21176
+	for <lists+netdev@lfdr.de>; Wed,  2 Aug 2023 19:33:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 931C9107B7;
-	Wed,  2 Aug 2023 19:28:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E307D10945;
+	Wed,  2 Aug 2023 19:33:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FF3C101D0;
-	Wed,  2 Aug 2023 19:28:31 +0000 (UTC)
-Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B512D123;
-	Wed,  2 Aug 2023 12:28:29 -0700 (PDT)
-Received: by mail-pf1-x42e.google.com with SMTP id d2e1a72fcca58-686efa1804eso110975b3a.3;
-        Wed, 02 Aug 2023 12:28:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1691004509; x=1691609309;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=RRy8M68oQc9X6bkkx6C0tx5oJgeAp1XL44cqtKOQ9YM=;
-        b=P/n1Hwavlk7dIRxmjbdWknFVkgP/no5NrYBKpQB8kXDO6Rp+B961JuHUvjwUYKeuZe
-         J5+VWcmhfdDEQvMAr1o7KasluX5pMSTsi+tcArkNePaBhTG6zKLXLw8YTzVaqNJXmAc/
-         aE6/BiyzJXeo1cB9agV06nHOrICAZyGjz91J24nRGAyNkwtAQzx/NfKrjvcZpMn4rB9I
-         lq4C+saXrgyvi2l51ub60VmGE34Wl6zvHSbSuRVg0n5E+fjK3L2kPhm4PLpRpwZSLgt0
-         zsaxN/JpoTKMZirxR8g+qcBSzG5G4i/MPvKEw+lotPZ1D/UfWJFWeO8HasFYpIGzo/qA
-         +Nzw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691004509; x=1691609309;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RRy8M68oQc9X6bkkx6C0tx5oJgeAp1XL44cqtKOQ9YM=;
-        b=IC1TXg12XeU+TztkHaKHGZp15Wjhj1w+52nv2YKPdbp4O1zpveNA1oHSASq8yM363Q
-         6yudHov2JR8w1GCnZs5NcQBC+WyATJdR7YCw6BAxAAvkbOwD1X2q6V8TKyynMJx2cc5f
-         biv05gX/zOeKuOrLzFFbRiJRZMxvIUFcQotubbMFtM4gP1FhJHMRLk6YgPDQzBeXqm4l
-         vIYctOmGQAqfGp97+u/Lmg0fGOy7EdyBCjNoZ8IDwDPo+39njx1tcVBoUvKXIF8ag7JH
-         rsOx0NjhHfa5ceWtdm5IpBcMUnPj0cbW4E8lkcFQTf60VZtbPUFOgMu9U+q406yZCd6n
-         iB5Q==
-X-Gm-Message-State: ABy/qLYCcqaFsURRxWSa7TV190Z7BuQT2f/3OQnpbw1PE83qoZxCBd0V
-	RCaEwctnAtlcWvRc+UdhAQE=
-X-Google-Smtp-Source: APBJJlFcOt8XsDxMddgNHYI/97xi0AqQFqSkAwmzYD/6Xb/GI7pA7csj4Z0OL5bVwY/fT4kKcNLXYQ==
-X-Received: by 2002:a05:6a00:1a13:b0:687:20d6:fae5 with SMTP id g19-20020a056a001a1300b0068720d6fae5mr15225374pfv.24.1691004508981;
-        Wed, 02 Aug 2023 12:28:28 -0700 (PDT)
-Received: from localhost (ec2-52-8-182-0.us-west-1.compute.amazonaws.com. [52.8.182.0])
-        by smtp.gmail.com with ESMTPSA id s8-20020a639248000000b0055c090df2fasm11726494pgn.93.2023.08.02.12.28.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Aug 2023 12:28:28 -0700 (PDT)
-Date: Wed, 2 Aug 2023 19:28:27 +0000
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Bobby Eshleman <bobby.eshleman@bytedance.com>,
-	linux-hyperv@vger.kernel.org, Stefan Hajnoczi <stefanha@redhat.com>,
-	kvm@vger.kernel.org,
-	VMware PV-Drivers Reviewers <pv-drivers@vmware.com>,
-	Simon Horman <simon.horman@corigine.com>,
-	virtualization@lists.linux-foundation.org,
-	Eric Dumazet <edumazet@google.com>,
-	Dan Carpenter <dan.carpenter@linaro.org>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Bryan Tan <bryantan@vmware.com>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Krasnov Arseniy <oxffffaa@gmail.com>,
-	Vishnu Dasa <vdasa@vmware.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>
-Subject: Re: [PATCH RFC net-next v5 11/14] vhost/vsock: implement datagram
- support
-Message-ID: <ZMquW+6Rl6ZsYHad@bullseye>
-References: <20230413-b4-vsock-dgram-v5-0-581bd37fdb26@bytedance.com>
- <20230413-b4-vsock-dgram-v5-11-581bd37fdb26@bytedance.com>
- <20230726143850-mutt-send-email-mst@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D544B101D0
+	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 19:33:41 +0000 (UTC)
+Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05on2059.outbound.protection.outlook.com [40.107.21.59])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6ED42198B;
+	Wed,  2 Aug 2023 12:33:40 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=UxXRcyW8qK0QKkuyX/IM65nCt0v2PE47hFhZ3PvUvMNCmTW/AjjraDfcx9AvKHHB5/YO/OEPAhqJ0H20J88H8BlMlLHg8veWmDXIR1cJL4HMp74GSaPsVqE0Kj7a8yRvfwY0SOksjlIb0NJc5MUkOsfBiZzKZEvQU7JUhUPLNXWO+WfmUxEzIrIbcbTRVBUfXNWzKXKRJj8cyS60AFhghZqxscrtlS21ysv/lf1oVW6SZ0pnCjhHNa5Sjkuoko0RPfppTDrRZtOGUQUWRBW4Awjki/QWsHHzRbAfaDxEILZcaHMjSxhcMTgpgrhrl6ocSAyxRV+WaaRfEib+MA6UjQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=95EC9okagLe5v+gNOZNiVLm2A6d2001g8HKDTdXcV/c=;
+ b=POsxWQHpIzqcQVIltYRwQ6McaDceavyYbVJkd1sGDHIBmfFJlewtT26581k3R0DI/vTikcNQD/cf435m3i0mz+v2Xy8q5vSwLUM035Yk54QYjeXlhv2bQ/5W5vUHqVwgH03MSHm1pVNo6oINtFlA2XKp/GOhZazG/xIKKz56DR99UuOSHEJVJ8Yy17IExfwO/He6631xy2EguBcBVXFjT/F3v1LpwIolBg/tIv25l/I2pMBxarXU5kuxbs0wRRZtEYtRDfOX5PwVGMi4GXTngf7dTd0k8aqEJ8HnFpO+gW3D7cWneZxtNoHnJI8gnR1VJZ0I2bF74kQ34+H3/MPi7A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=95EC9okagLe5v+gNOZNiVLm2A6d2001g8HKDTdXcV/c=;
+ b=H6QZk+szqY90dBE9I/y5+xivTsenOU0c9L/oOhtdKN8KD4nToEfX5dRhgmLpv/BGV3xz/1A2ejeRUbMfL2Txbd+Kfi7GLgEbYTfHuCxtdbflr1TVKG/NB85J9oHGmRsiFOYHSyGKOzjUdOHD8J6SqynAgHCQfq+2uplWURn4i1Y=
+Received: from PAXPR04MB9185.eurprd04.prod.outlook.com (2603:10a6:102:231::11)
+ by PAXPR04MB9327.eurprd04.prod.outlook.com (2603:10a6:102:2b7::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.45; Wed, 2 Aug
+ 2023 19:33:37 +0000
+Received: from PAXPR04MB9185.eurprd04.prod.outlook.com
+ ([fe80::d4ee:8daa:92f4:9671]) by PAXPR04MB9185.eurprd04.prod.outlook.com
+ ([fe80::d4ee:8daa:92f4:9671%3]) with mapi id 15.20.6631.045; Wed, 2 Aug 2023
+ 19:33:37 +0000
+From: Shenwei Wang <shenwei.wang@nxp.com>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: Marc Kleine-Budde <mkl@pengutronix.de>, Russell King
+	<linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Maxime
+ Coquelin <mcoquelin.stm32@gmail.com>, Shawn Guo <shawnguo@kernel.org>, Sascha
+ Hauer <s.hauer@pengutronix.de>, Neil Armstrong <neil.armstrong@linaro.org>,
+	Kevin Hilman <khilman@baylibre.com>, Vinod Koul <vkoul@kernel.org>, Chen-Yu
+ Tsai <wens@csie.org>, Jernej Skrabec <jernej.skrabec@gmail.com>, Samuel
+ Holland <samuel@sholland.org>, Jose Abreu <joabreu@synopsys.com>,
+	"imx@lists.linux.dev" <imx@lists.linux.dev>, Simon Horman
+	<simon.horman@corigine.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>, Nobuhiro Iwamatsu
+	<nobuhiro1.iwamatsu@toshiba.co.jp>, Fabio Estevam <festevam@gmail.com>,
+	"linux-stm32@st-md-mailman.stormreply.com"
+	<linux-stm32@st-md-mailman.stormreply.com>, Jerome Brunet
+	<jbrunet@baylibre.com>, Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
+	Wong Vee Khee <veekhee@apple.com>, dl-linux-imx <linux-imx@nxp.com>, Andrew
+ Halaney <ahalaney@redhat.com>, Bhupesh Sharma <bhupesh.sharma@linaro.org>,
+	Martin Blumenstingl <martin.blumenstingl@googlemail.com>, Revanth Kumar
+ Uppala <ruppala@nvidia.com>, Jochen Henneberg
+	<jh@henneberg-systemdesign.com>, "linux-amlogic@lists.infradead.org"
+	<linux-amlogic@lists.infradead.org>, "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, Pengutronix Kernel Team
+	<kernel@pengutronix.de>
+Subject: RE: [EXT] Re: [PATCH v3 net 1/2] net: stmmac: add new mode parameter
+ for fix_mac_speed
+Thread-Topic: [EXT] Re: [PATCH v3 net 1/2] net: stmmac: add new mode parameter
+ for fix_mac_speed
+Thread-Index: AQHZw8rncXkT+tBv7kuTZDED3nHZB6/U/amAgADJUBCAABaEAIABiuKA
+Date: Wed, 2 Aug 2023 19:33:36 +0000
+Message-ID:
+ <PAXPR04MB9185058330F81CA73EBFD944890BA@PAXPR04MB9185.eurprd04.prod.outlook.com>
+References: <20230731161929.2341584-1-shenwei.wang@nxp.com>
+	<20230731161929.2341584-2-shenwei.wang@nxp.com>
+	<20230801-portside-prepaid-513f1f39f245-mkl@pengutronix.de>
+	<AS8PR04MB9176FC45B9663B5BF964F58A890AA@AS8PR04MB9176.eurprd04.prod.outlook.com>
+ <20230801125828.209c5e88@kernel.org>
+In-Reply-To: <20230801125828.209c5e88@kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PAXPR04MB9185:EE_|PAXPR04MB9327:EE_
+x-ms-office365-filtering-correlation-id: 653b02aa-24f1-43e7-9ccc-08db938f5dff
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ xRxAMtncFDmUB9BKrvo+KSD3ft8t/qA9rfvziVZ8YGz0w1UPiqrulhTdDS/9x+IqwvWibLKqPjgC/XWV9z2lsGIDHMiW1VYaBIp8kZqdKkdhNJjE7HHokt02NeF+pHCCqFxcl5GDuoatmU3Tk5O6qhknqfMR/0cRCDufiRbj5EM1/m+4g/gbZssIjCOhlx8KkzQv+h6+Dgu5en3bOL7jChEKfbDRPe64ljQMkZmEaiTqROuxw9j87x2NdsHYmkwcDBpjgk07R5sB/r9VggIYNAZDxliSLKct+4Cs8JgxW5mM5zwVOLHpqlzya9Me0H0LksVKqoCmtG/JAOCK69rHbB1rAnADWVKurtfARyTH7cbhsIlT/3Q7W5kW8BoJPurMrDfd5d0aLeHf5rxTYuQJawPpRLFvodfWlJ4XdSw7R0idfTc98pKKgFB4VsA1tYj3J0tHpJ8ldsc4tva8FD7lhoZ52mmP8nXezzAFN0AZVk/PsqJmHAPeLZvoYe0jhPBwRHo6e9FgTgXUnKjmpzLEkdsmNXtfbVRXfB266jF7bM9MKrWPU6WFeOkbA7uuANEdEj+kLECAkJw5BoPkOga2fUavIDe0lgVho9cWeAICJaDBNk2oLic34CtW5qRjvvao
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB9185.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(376002)(346002)(396003)(39860400002)(366004)(136003)(451199021)(54906003)(71200400001)(8676002)(8936002)(7696005)(478600001)(76116006)(45080400002)(64756008)(6916009)(66476007)(316002)(66446008)(66946007)(66556008)(4326008)(83380400001)(9686003)(38100700002)(122000001)(41300700001)(55016003)(44832011)(7406005)(7416002)(55236004)(26005)(6506007)(5660300002)(53546011)(86362001)(2906002)(38070700005)(52536014)(186003)(33656002);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?Qjju14odn7ndoelrr+mgirvG02gqy+9s7hr9Wyon3qhApEmu+W8uNinR5U8U?=
+ =?us-ascii?Q?gCO2UkDz1Idlu+e2OMBd+DNKlMsj5DpAxVsnZ4ZJkkux1QuAizj5qruxBZ1B?=
+ =?us-ascii?Q?Y93IKPf9t+/WZQj0KJCMJkvbo3ARTUmII5zoKhpgaJNKc3PakhddzYKq4oH5?=
+ =?us-ascii?Q?uvxsOP2wnRDkfD9aqjAa/D/wWfUjr3SADD86vyD5Y5O+U5ll4BCW+isEcf9x?=
+ =?us-ascii?Q?66rmpy81H/S5b9qmZYYh+CBc/x4B3OQ2BvH5A215i8VegB5BQlEkfrJuDwja?=
+ =?us-ascii?Q?xk5g8+/+Kf/piW7olv7cLo2EA72C95LvccubzmoClXCjFjYqoNzxiEqSFy+b?=
+ =?us-ascii?Q?W0ozChPaVGJ+6JHXXIdGGBo6iuDS7OQ2MwAaL4YNHVm/8yGA9pIFGHFLy7TU?=
+ =?us-ascii?Q?4GjRGEymBv8H+YdwgqL4xsZEhyPBg0REWPeY9TAHdD4IbbnQIDoZA8NYThlk?=
+ =?us-ascii?Q?5xLXTCLfHF328laVTKO4esMd4ZX30mqu2gVF7GXQ4KxrhK5BVSs1GQgQlOET?=
+ =?us-ascii?Q?xpXf2QKECiz9GNV70uTmMoAsNvLD1r+MFsLlZo4Evpy3sS2E55yBIusKWX0n?=
+ =?us-ascii?Q?ymfcWTvXwvF2tfToYRhTEa+dXOzcpVqkIHOgjypqGT/25dg56WSw7h3a6h8P?=
+ =?us-ascii?Q?9VwYHdFfnx/N5QlU0R7xR6hHTX8H0XYUwJyVXc/ooMvFq+5IT/tHIda20TJG?=
+ =?us-ascii?Q?zg6E8RGMQldLzcGEsoUm23Wztc7tWe6hCg1yZ9hUTYy9jBt9D8YtmP4XUAnf?=
+ =?us-ascii?Q?HuazWpNU1tG3e/JVwzgqy13/xDnBH6U7wPEmJ6GooKC0H6laS4RSPYEUCfmA?=
+ =?us-ascii?Q?kSHIBaYb8Zl0K70nMXmJCZ8HNg1Z5HduaDLercWl6rQcWkcLPdvOBrUl4VAc?=
+ =?us-ascii?Q?ZgO5dE6lGZRzeS41KJkFfumLCd4nU4WfVIs75lEZnMxksh3H+fryPwc/V/ZN?=
+ =?us-ascii?Q?h/gW+VNXLdv3UBUouf4G9vC84CY5kMjTaS5CbYfjYzbZRoKpNRj1L33UErwQ?=
+ =?us-ascii?Q?AQ9F1+0qsltL5xclu7rC60feNEwS6SN2zWONPgk3UCJmSgwhK+Er5tGWRgIw?=
+ =?us-ascii?Q?/tjQyqIxL/C4CwwklpbhxgA42U12ttnCSjv6ndrxrnTcEyPCk+J4HqoDDpZL?=
+ =?us-ascii?Q?7FgeUmdejvopQsYthFnU5VYqLSu/x4K/5A4IU/gYRt5ln8rv304TgMItOg1o?=
+ =?us-ascii?Q?7otmWXoHLE5bGeH02OH+zHlDmelwJBLjfWOBpsyJyQInrNOAxVU96fP+n/vH?=
+ =?us-ascii?Q?pX8CP7BVBDS6Z4S4djUFr60HhS+fktzB4Ndm56N/Ep8e6kR0xNVEBZYrXk74?=
+ =?us-ascii?Q?8BEpbMBL9PGzX0VmejRcQbhwX6Fm82wXOL4iYHsJgyZIc728rrdxDXVnrLsk?=
+ =?us-ascii?Q?gOrgB4VLot2oz8IxamhFuVjWvI5gedL//xcbIEsA1lj2MvjD+OcgjeBlEFVs?=
+ =?us-ascii?Q?mwtCgGxSmmxiy78JWNgf6gAJl4ISenzVXQbAm8sGndkng7NLErAjwN+V/n0/?=
+ =?us-ascii?Q?kOVVvZYRpUS4JOVbMdrGS3K7iaAeaw3/6J04nCPGrHA3frUlZJll30idF/sO?=
+ =?us-ascii?Q?I6gw1uaq5xrqXuIQPk+laYZLBBG4udoXUpGbn481?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230726143850-mutt-send-email-mst@kernel.org>
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB9185.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 653b02aa-24f1-43e7-9ccc-08db938f5dff
+X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Aug 2023 19:33:36.9357
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: X6CWnXA5E9cNs/ZiGT3cjTIu7FNPd7iBE9ecq/GRmkWsq3lGBSuSkafFtVpihla4Mb3McDegMgyOD8L+aYBwcw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR04MB9327
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Jul 26, 2023 at 02:40:22PM -0400, Michael S. Tsirkin wrote:
-> On Wed, Jul 19, 2023 at 12:50:15AM +0000, Bobby Eshleman wrote:
-> > This commit implements datagram support for vhost/vsock by teaching
-> > vhost to use the common virtio transport datagram functions.
-> > 
-> > If the virtio RX buffer is too small, then the transmission is
-> > abandoned, the packet dropped, and EHOSTUNREACH is added to the socket's
-> > error queue.
-> > 
-> > Signed-off-by: Bobby Eshleman <bobby.eshleman@bytedance.com>
-> 
-> EHOSTUNREACH?
-> 
-> 
-> > ---
-> >  drivers/vhost/vsock.c    | 62 +++++++++++++++++++++++++++++++++++++++++++++---
-> >  net/vmw_vsock/af_vsock.c |  5 +++-
-> >  2 files changed, 63 insertions(+), 4 deletions(-)
-> > 
-> > diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
-> > index d5d6a3c3f273..da14260c6654 100644
-> > --- a/drivers/vhost/vsock.c
-> > +++ b/drivers/vhost/vsock.c
-> > @@ -8,6 +8,7 @@
-> >   */
-> >  #include <linux/miscdevice.h>
-> >  #include <linux/atomic.h>
-> > +#include <linux/errqueue.h>
-> >  #include <linux/module.h>
-> >  #include <linux/mutex.h>
-> >  #include <linux/vmalloc.h>
-> > @@ -32,7 +33,8 @@
-> >  enum {
-> >  	VHOST_VSOCK_FEATURES = VHOST_FEATURES |
-> >  			       (1ULL << VIRTIO_F_ACCESS_PLATFORM) |
-> > -			       (1ULL << VIRTIO_VSOCK_F_SEQPACKET)
-> > +			       (1ULL << VIRTIO_VSOCK_F_SEQPACKET) |
-> > +			       (1ULL << VIRTIO_VSOCK_F_DGRAM)
-> >  };
-> >  
-> >  enum {
-> > @@ -56,6 +58,7 @@ struct vhost_vsock {
-> >  	atomic_t queued_replies;
-> >  
-> >  	u32 guest_cid;
-> > +	bool dgram_allow;
-> >  	bool seqpacket_allow;
-> >  };
-> >  
-> > @@ -86,6 +89,32 @@ static struct vhost_vsock *vhost_vsock_get(u32 guest_cid)
-> >  	return NULL;
-> >  }
-> >  
-> > +/* Claims ownership of the skb, do not free the skb after calling! */
-> > +static void
-> > +vhost_transport_error(struct sk_buff *skb, int err)
-> > +{
-> > +	struct sock_exterr_skb *serr;
-> > +	struct sock *sk = skb->sk;
-> > +	struct sk_buff *clone;
-> > +
-> > +	serr = SKB_EXT_ERR(skb);
-> > +	memset(serr, 0, sizeof(*serr));
-> > +	serr->ee.ee_errno = err;
-> > +	serr->ee.ee_origin = SO_EE_ORIGIN_NONE;
-> > +
-> > +	clone = skb_clone(skb, GFP_KERNEL);
-> > +	if (!clone)
-> > +		return;
-> > +
-> > +	if (sock_queue_err_skb(sk, clone))
-> > +		kfree_skb(clone);
-> > +
-> > +	sk->sk_err = err;
-> > +	sk_error_report(sk);
-> > +
-> > +	kfree_skb(skb);
-> > +}
-> > +
-> >  static void
-> >  vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
-> >  			    struct vhost_virtqueue *vq)
-> > @@ -160,9 +189,15 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
-> >  		hdr = virtio_vsock_hdr(skb);
-> >  
-> >  		/* If the packet is greater than the space available in the
-> > -		 * buffer, we split it using multiple buffers.
-> > +		 * buffer, we split it using multiple buffers for connectible
-> > +		 * sockets and drop the packet for datagram sockets.
-> >  		 */
-> 
-> won't this break things like recently proposed zerocopy?
-> I think splitup has to be supported for all types.
-> 
 
-Could you elaborate? Is there something about zerocopy that would
-prohibit the transport from dropping a datagram?
 
-> 
-> >  		if (payload_len > iov_len - sizeof(*hdr)) {
-> > +			if (le16_to_cpu(hdr->type) == VIRTIO_VSOCK_TYPE_DGRAM) {
-> > +				vhost_transport_error(skb, EHOSTUNREACH);
-> > +				continue;
-> > +			}
-> > +
-> >  			payload_len = iov_len - sizeof(*hdr);
-> >  
-> >  			/* As we are copying pieces of large packet's buffer to
-> > @@ -394,6 +429,7 @@ static bool vhost_vsock_more_replies(struct vhost_vsock *vsock)
-> >  	return val < vq->num;
-> >  }
-> >  
-> > +static bool vhost_transport_dgram_allow(u32 cid, u32 port);
-> >  static bool vhost_transport_seqpacket_allow(u32 remote_cid);
-> >  
-> >  static struct virtio_transport vhost_transport = {
-> > @@ -410,7 +446,8 @@ static struct virtio_transport vhost_transport = {
-> >  		.cancel_pkt               = vhost_transport_cancel_pkt,
-> >  
-> >  		.dgram_enqueue            = virtio_transport_dgram_enqueue,
-> > -		.dgram_allow              = virtio_transport_dgram_allow,
-> > +		.dgram_allow              = vhost_transport_dgram_allow,
-> > +		.dgram_addr_init          = virtio_transport_dgram_addr_init,
-> >  
-> >  		.stream_enqueue           = virtio_transport_stream_enqueue,
-> >  		.stream_dequeue           = virtio_transport_stream_dequeue,
-> > @@ -443,6 +480,22 @@ static struct virtio_transport vhost_transport = {
-> >  	.send_pkt = vhost_transport_send_pkt,
-> >  };
-> >  
-> > +static bool vhost_transport_dgram_allow(u32 cid, u32 port)
-> > +{
-> > +	struct vhost_vsock *vsock;
-> > +	bool dgram_allow = false;
-> > +
-> > +	rcu_read_lock();
-> > +	vsock = vhost_vsock_get(cid);
-> > +
-> > +	if (vsock)
-> > +		dgram_allow = vsock->dgram_allow;
-> > +
-> > +	rcu_read_unlock();
-> > +
-> > +	return dgram_allow;
-> > +}
-> > +
-> >  static bool vhost_transport_seqpacket_allow(u32 remote_cid)
-> >  {
-> >  	struct vhost_vsock *vsock;
-> > @@ -799,6 +852,9 @@ static int vhost_vsock_set_features(struct vhost_vsock *vsock, u64 features)
-> >  	if (features & (1ULL << VIRTIO_VSOCK_F_SEQPACKET))
-> >  		vsock->seqpacket_allow = true;
-> >  
-> > +	if (features & (1ULL << VIRTIO_VSOCK_F_DGRAM))
-> > +		vsock->dgram_allow = true;
-> > +
-> >  	for (i = 0; i < ARRAY_SIZE(vsock->vqs); i++) {
-> >  		vq = &vsock->vqs[i];
-> >  		mutex_lock(&vq->mutex);
-> > diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
-> > index e73f3b2c52f1..449ed63ac2b0 100644
-> > --- a/net/vmw_vsock/af_vsock.c
-> > +++ b/net/vmw_vsock/af_vsock.c
-> > @@ -1427,9 +1427,12 @@ int vsock_dgram_recvmsg(struct socket *sock, struct msghdr *msg,
-> >  		return prot->recvmsg(sk, msg, len, flags, NULL);
-> >  #endif
-> >  
-> > -	if (flags & MSG_OOB || flags & MSG_ERRQUEUE)
-> > +	if (unlikely(flags & MSG_OOB))
-> >  		return -EOPNOTSUPP;
-> >  
-> > +	if (unlikely(flags & MSG_ERRQUEUE))
-> > +		return sock_recv_errqueue(sk, msg, len, SOL_VSOCK, 0);
-> > +
-> >  	transport = vsk->transport;
-> >  
-> >  	/* Retrieve the head sk_buff from the socket's receive queue. */
-> > 
-> > -- 
-> > 2.30.2
-> 
-> _______________________________________________
-> Virtualization mailing list
-> Virtualization@lists.linux-foundation.org
-> https://lists.linuxfoundation.org/mailman/listinfo/virtualization
+> -----Original Message-----
+> From: Jakub Kicinski <kuba@kernel.org>
+> Sent: Tuesday, August 1, 2023 2:58 PM
+> To: Shenwei Wang <shenwei.wang@nxp.com>
+> > > Subject: [EXT] Re: [PATCH v3 net 1/2] net: stmmac: add new mode
+> > > parameter for fix_mac_speed
+>=20
+> Why is this quote included? Please get a sane email client.
+>=20
+
+I have no idea. We are using Office Outlook.
+
+Regards,
+Shenwei
+
+> > > On 31.07.2023 11:19:28, Shenwei Wang wrote:
+> > > > A mode parameter has been added to the callback function of
+> > > > fix_mac_speed to indicate the physical layer type.
+> > > >
+> > > > The mode can be one the following:
+> > > >   MLO_AN_PHY      - Conventional PHY
+> > > >   MLO_AN_FIXED    - Fixed-link mode
+> > > >   MLO_AN_INBAND   - In-band protocol
+> > > >
+> > > > Also use short version of 'uint' to replace the 'unsigned int' in
+> > > > the function definitions.
+> > >
+> > > There are not many users of 'uint' in the kernel and it's not used
+> > > in the stmmac driver so far. From my point of view I would not
+> > > introduce it and stick to the standard 'unsigned int'.
+> >
+> > Using 'uint' makes the code look cleaner because adding one extra
+> > parameter may cause some function declarations to span multiple lines.
+> > This change keeps function declarations compact on a single line.
+>=20
+> Marc is right. Just do it.
 
