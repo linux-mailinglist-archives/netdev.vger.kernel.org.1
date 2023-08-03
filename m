@@ -1,267 +1,112 @@
-Return-Path: <netdev+bounces-23910-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23912-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6787676E214
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 09:48:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3AE876E219
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 09:53:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 46D131C214B1
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 07:48:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C928B1C21496
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 07:53:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0207613AC4;
-	Thu,  3 Aug 2023 07:47:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5710113AE1;
+	Thu,  3 Aug 2023 07:53:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA0869440
-	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 07:47:57 +0000 (UTC)
-Received: from mail-qt1-x829.google.com (mail-qt1-x829.google.com [IPv6:2607:f8b0:4864:20::829])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D8974ED2
-	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 00:47:56 -0700 (PDT)
-Received: by mail-qt1-x829.google.com with SMTP id d75a77b69052e-40a47e8e38dso157411cf.1
-        for <netdev@vger.kernel.org>; Thu, 03 Aug 2023 00:47:56 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B018125A7
+	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 07:53:37 +0000 (UTC)
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 241BC30FA
+	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 00:53:36 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d13e11bb9ecso807185276.0
+        for <netdev@vger.kernel.org>; Thu, 03 Aug 2023 00:53:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691048875; x=1691653675;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HX2QjhAjm1VtIJ7aq9ETcIbROYuaT4rznxqM4xCkPNc=;
-        b=fsKM8DoTuZOfwAzvF0ApPYf/k3QnUZq6zjoVqUZ66DKlTqfk9ykOVtIpCTWOAmTvGx
-         GzUI4DgtRAELLR5d/EA5m9OQRDHAL9mu5XIB+hjPL5HYyjlxVqWFFM+GaVQ0PIt/ptW9
-         9+u4+TX2wnOxcAybwVOGP4xLrCwNTMgiYJBYqqEpQf+1jVVqHFEgpc80mUBCbWk0aWsd
-         6uyGbu3RiHdpJFAoQ0y5brfpm6PCsRZrKVk6xGnNpA/3CJ9llTZ7KqYOGsSHGEx+J8cu
-         Q12sYbRU6HcARk3EZYUQy8vF0cp0IdnVyNbt0lq9XLQcYI+BV2BBo2DPme4IyShYZ115
-         gQoQ==
+        d=google.com; s=20221208; t=1691049215; x=1691654015;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=/gVyBjjwCgArTjju3DiOXpFoM9IcmuTSEzVFwUclwEE=;
+        b=Xt4mxg6/SkCTPJYnERcSwExJhfhUU19g5ACqV2pZHHUrM6giP4U880jv78IH0W5gB4
+         eg5yMZv1s+vacTS18sKX+EnAPaRyBNkYF9A8kEn1Oa2B0LKflzC7V5cqs+WJ+9ZeRVPH
+         OIqJ3RUhIQHWqh2Ion3Watdnzxj+6Qb4QnB9rEBWGcWRMbe19k5ncJDQt74j2hWMX4E0
+         miXgmepn7ZIkTNsrx4WzrrIhhd+4QaX7tA9GBTdl8P3hD6IZw5iqaLwy6t+aznGgo4Hc
+         iiSQWiYIv0tzUO7lt9ze5inuQy0nVmfe4e2qDs4tni1XRvMQZYsxByJC2RzjrK0XWnKN
+         4lGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691048875; x=1691653675;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HX2QjhAjm1VtIJ7aq9ETcIbROYuaT4rznxqM4xCkPNc=;
-        b=k4hHVR3csos+RTVI9FbvrSGQc8fCbLQny1JkQ/64cEssLdZByGQJdGq6SqbLMBw37Z
-         jHubqL5XP/i8bUeKFaLoPge1+ESDaxI2SllY9VPkTFirjzk0THGf36XW82dGgSTIiUNv
-         OEGIqyVAkrV0uC37r36Fd8mxWd2qV8A8PqjSRua8I98PCyOE/a15TgkmWIU5PI4oRUKM
-         cdn35djCCv4bHnLm6K7s2p0LkKwd6TPB8b1b8dmBMi52mDVFI0x/CyzsL/LfzNHX72T7
-         39OV3pXTbxDm/P9ghXR1HxPR9bAkwC5QmZEF6VuHnQV3+0J9e7oSCMQFw6gSqJG+JFS9
-         QVWg==
-X-Gm-Message-State: ABy/qLY63faSMmSEU8UWiYm+R7GqzO0ksqL2/QWhzGgUyA1WgPAT6Iyf
-	WjxMfoYDZ4cSOLGszwElTbz7wuyjRNhY7F2Vjc8lLg==
-X-Google-Smtp-Source: APBJJlEvSoUL4BFDEsByLxH9z9PduXUo16Ko724GHnU1ikgKnpUSJIYzWcxXfB79sgXW5CD3nvoFVi7DjptAMpL6xTE=
-X-Received: by 2002:a05:622a:1aa2:b0:405:3a65:b3d6 with SMTP id
- s34-20020a05622a1aa200b004053a65b3d6mr1183790qtc.13.1691048874911; Thu, 03
- Aug 2023 00:47:54 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1691049215; x=1691654015;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=/gVyBjjwCgArTjju3DiOXpFoM9IcmuTSEzVFwUclwEE=;
+        b=lw3IBdy0kIE7HiLvJdygINWyVBnG0o8Yrqd/Vu4C8wpav7HbVqdnEzh/XrAD4aET/p
+         EZttqCWofZfdH/jN2zWrzpCOr0za8Pof9Fa5q55+hvanIADl1JhmFGDLnvNd79tSV6FQ
+         LgL2HCqBYyE00jEhXQR/CpwGT3SzuvP9mZq32iXUzYHnQbeEJkCC3VN+t2kPNAagAMzU
+         RcZ0HW7wQdWMahnB21Umrek1QRYDwpkLpWOmbV/jJ8sD1FaOGAbSBQq9Ekv5FXUnbUTW
+         8UJAsVLJVQI9NFimSDWmuCYNQrWywAJwutI8dHsBloJekEqyFOiwRBIPW9ca/S56AsAW
+         0AvQ==
+X-Gm-Message-State: ABy/qLbenw49dg2saMlseduNsUIY/UZuT3f8sy2uitx+zK+JDTgs+c1d
+	2ZLdp+uZBHO9pvR9iQ6TBp/r2SS3tm84TA==
+X-Google-Smtp-Source: APBJJlFmibGB312r44Hu/NJRdNaggwOBq9e+a1rCUrW81XIrxCrttLHuIjpSx26S5f9e8MhumDlOtFUaLFLBcg==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a05:6902:1616:b0:d12:d6e4:a08e with SMTP
+ id bw22-20020a056902161600b00d12d6e4a08emr157059ybb.5.1691049215428; Thu, 03
+ Aug 2023 00:53:35 -0700 (PDT)
+Date: Thu,  3 Aug 2023 07:53:34 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20230801100533.3350037-1-leitao@debian.org>
-In-Reply-To: <20230801100533.3350037-1-leitao@debian.org>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.41.0.640.ga95def55d0-goog
+Message-ID: <20230803075334.2321561-1-edumazet@google.com>
+Subject: [PATCH net-next] tcp/dccp: cache line align inet_hashinfo
 From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 3 Aug 2023 09:47:43 +0200
-Message-ID: <CANn89iKuHxUGphhDkKz2ZWS3YR3-BkieTb4b4gKMR9B7jxKpWQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v3] netconsole: Enable compile time configuration
-To: Breno Leitao <leitao@debian.org>
-Cc: rdunlap@infradead.org, benjamin.poirier@gmail.com, 
-	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	leit@meta.com, "open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>, 
-	open list <linux-kernel@vger.kernel.org>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-	autolearn=ham autolearn_force=no version=3.4.6
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Aug 1, 2023 at 12:06=E2=80=AFPM Breno Leitao <leitao@debian.org> wr=
-ote:
->
-> Enable netconsole features to be set at compilation time. Create two
-> Kconfig options that allow users to set extended logs and release
-> prepending features at compilation time.
->
-> Right now, the user needs to pass command line parameters to netconsole,
-> such as "+"/"r" to enable extended logs and version prepending features.
->
-> With these two options, the user could set the default values for the
-> features at compile time, and don't need to pass it in the command line
-> to get them enabled, simplifying the command line.
->
-> Signed-off-by: Breno Leitao <leitao@debian.org>
-> ---
->   v1 -> v2:
->         * Improvements in the Kconfig help section.
->   v2 -> v3:
->         * Honour the Kconfig settings when creating sysfs targets
->         * Add "by default" in a Kconfig help.
-> ---
->  drivers/net/Kconfig      | 22 ++++++++++++++++++++++
->  drivers/net/netconsole.c | 10 ++++++++++
->  2 files changed, 32 insertions(+)
->
-> diff --git a/drivers/net/Kconfig b/drivers/net/Kconfig
-> index 368c6f5b327e..55fb9509bcae 100644
-> --- a/drivers/net/Kconfig
-> +++ b/drivers/net/Kconfig
-> @@ -332,6 +332,28 @@ config NETCONSOLE_DYNAMIC
->           at runtime through a userspace interface exported using configf=
-s.
->           See <file:Documentation/networking/netconsole.rst> for details.
->
-> +config NETCONSOLE_EXTENDED_LOG
-> +       bool "Set kernel extended message by default"
-> +       depends on NETCONSOLE
-> +       default n
-> +       help
-> +         Set extended log support for netconsole message. If this option=
- is
-> +         set, log messages are transmitted with extended metadata header=
- in a
-> +         format similar to /dev/kmsg.  See
-> +         <file:Documentation/networking/netconsole.rst> for details.
-> +
-> +config NETCONSOLE_PREPEND_RELEASE
-> +       bool "Prepend kernel release version in the message by default"
-> +       depends on NETCONSOLE_EXTENDED_LOG
-> +       default n
-> +       help
-> +         Set kernel release to be prepended to each netconsole message b=
-y
-> +         default. If this option is set, the kernel release is prepended=
- into
-> +         the first field of every netconsole message, so, the netconsole
-> +         server/peer can easily identify what kernel release is logging =
-each
-> +         message.  See <file:Documentation/networking/netconsole.rst> fo=
-r
-> +         details.
-> +
->  config NETPOLL
->         def_bool NETCONSOLE
->
-> diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
-> index 87f18aedd3bd..e3b6155f4529 100644
-> --- a/drivers/net/netconsole.c
-> +++ b/drivers/net/netconsole.c
-> @@ -181,6 +181,11 @@ static struct netconsole_target *alloc_param_target(=
-char *target_config)
->         if (!nt)
->                 goto fail;
->
-> +       if (IS_ENABLED(CONFIG_NETCONSOLE_EXTENDED_LOG))
-> +               nt->extended =3D true;
-> +       if (IS_ENABLED(CONFIG_NETCONSOLE_PREPEND_RELEASE))
-> +               nt->release =3D true;
-> +
->         nt->np.name =3D "netconsole";
->         strscpy(nt->np.dev_name, "eth0", IFNAMSIZ);
->         nt->np.local_port =3D 6665;
-> @@ -681,6 +686,11 @@ static struct config_item *make_netconsole_target(st=
-ruct config_group *group,
->         nt->np.remote_port =3D 6666;
->         eth_broadcast_addr(nt->np.remote_mac);
->
-> +       if (IS_ENABLED(CONFIG_NETCONSOLE_EXTENDED_LOG))
-> +               nt->extended =3D true;
-> +       if (IS_ENABLED(CONFIG_NETCONSOLE_PREPEND_RELEASE))
-> +               nt->release =3D true;
-> +
+I have seen tcp_hashinfo starting at a non optimal location,
+forcing input handlers to pull two cache lines instead of one,
+and sharing a cache line that was dirtied more than necessary:
 
-Instead of duplicating these, what about adding a preliminary helper
-in a separate patch ?
+ffffffff83680600 b tcp_orphan_timer
+ffffffff83680628 b tcp_orphan_cache
+ffffffff8368062c b tcp_enable_tx_delay.__tcp_tx_delay_enabled
+ffffffff83680630 B tcp_hashinfo
+ffffffff83680680 b tcp_cong_list_lock
 
-Something like this:
+After this patch, ehash, ehash_locks, ehash_mask and ehash_locks_mask
+are located in a read-only cache line.
 
- drivers/net/netconsole.c |   45 ++++++++++++++++++++----------------------=
+Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- 1 file changed, 20 insertions(+), 25 deletions(-)
+ include/net/inet_hashtables.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
-index 87f18aedd3bd7b3da9d2481dc9898e94dd75917b..a022ceaa2e3c4783ca0ea61c1c7=
-b9f911d087abc
-100644
---- a/drivers/net/netconsole.c
-+++ b/drivers/net/netconsole.c
-@@ -167,26 +167,32 @@ static void netconsole_target_put(struct
-netconsole_target *nt)
-
- #endif /* CONFIG_NETCONSOLE_DYNAMIC */
-
-+/*
-+ * Allocate and initialize with defaults.
-+ * Note that these targets get their config_item fields zeroed-out.
-+ */
-+static struct netconsole_target *alloc_and_init(void)
-+{
-+       struct netconsole_target *nt =3D kzalloc(sizeof(*nt), GFP_KERNEL);
-+
-+       if (nt) {
-+               nt->np.name =3D "netconsole";
-+               strscpy(nt->np.dev_name, "eth0", IFNAMSIZ);
-+               nt->np.local_port =3D 6665;
-+               nt->np.remote_port =3D 6666;
-+               eth_broadcast_addr(nt->np.remote_mac);
-+       }
-+       return nt;
-+}
-+
- /* Allocate new target (from boot/module param) and setup netpoll for it *=
-/
- static struct netconsole_target *alloc_param_target(char *target_config)
+diff --git a/include/net/inet_hashtables.h b/include/net/inet_hashtables.h
+index 99bd823e97f624e37cf3abb8ac0ec7eef4552b61..74399d20b2184945f2b39bf3dfedb3ae63b500f7 100644
+--- a/include/net/inet_hashtables.h
++++ b/include/net/inet_hashtables.h
+@@ -177,7 +177,7 @@ struct inet_hashinfo {
+ 	struct inet_listen_hashbucket	*lhash2;
+ 
+ 	bool				pernet;
+-};
++} ____cacheline_aligned_in_smp;
+ 
+ static inline struct inet_hashinfo *tcp_or_dccp_get_hashinfo(const struct sock *sk)
  {
-+       struct netconsole_target *nt =3D alloc_and_init();
-        int err =3D -ENOMEM;
--       struct netconsole_target *nt;
+-- 
+2.41.0.640.ga95def55d0-goog
 
--       /*
--        * Allocate and initialize with defaults.
--        * Note that these targets get their config_item fields zeroed-out.
--        */
--       nt =3D kzalloc(sizeof(*nt), GFP_KERNEL);
-        if (!nt)
-                goto fail;
--
--       nt->np.name =3D "netconsole";
--       strscpy(nt->np.dev_name, "eth0", IFNAMSIZ);
--       nt->np.local_port =3D 6665;
--       nt->np.remote_port =3D 6666;
--       eth_broadcast_addr(nt->np.remote_mac);
--
-        if (*target_config =3D=3D '+') {
-                nt->extended =3D true;
-                target_config++;
-@@ -664,23 +670,12 @@ static const struct config_item_type
-netconsole_target_type =3D {
- static struct config_item *make_netconsole_target(struct config_group *gro=
-up,
-                                                  const char *name)
- {
-+       struct netconsole_target *nt =3D alloc_and_init();
-        unsigned long flags;
--       struct netconsole_target *nt;
-
--       /*
--        * Allocate and initialize with defaults.
--        * Target is disabled at creation (!enabled).
--        */
--       nt =3D kzalloc(sizeof(*nt), GFP_KERNEL);
-        if (!nt)
-                return ERR_PTR(-ENOMEM);
-
--       nt->np.name =3D "netconsole";
--       strscpy(nt->np.dev_name, "eth0", IFNAMSIZ);
--       nt->np.local_port =3D 6665;
--       nt->np.remote_port =3D 6666;
--       eth_broadcast_addr(nt->np.remote_mac);
--
-        /* Initialize the config_item member */
-        config_item_init_type_name(&nt->item, name, &netconsole_target_type=
-);
 
