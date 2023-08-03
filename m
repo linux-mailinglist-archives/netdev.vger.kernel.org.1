@@ -1,160 +1,160 @@
-Return-Path: <netdev+bounces-23956-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23959-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3876276E4A3
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 11:37:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 470C176E500
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 11:53:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E5896282088
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 09:37:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2775E1C21493
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 09:53:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17AB3156FD;
-	Thu,  3 Aug 2023 09:37:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3895D15ACB;
+	Thu,  3 Aug 2023 09:53:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06B4F7E
-	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 09:37:22 +0000 (UTC)
-Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1144C49C6
-	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 02:37:03 -0700 (PDT)
-Received: by mail-lj1-x235.google.com with SMTP id 38308e7fff4ca-2b9e6cc93d8so11305161fa.0
-        for <netdev@vger.kernel.org>; Thu, 03 Aug 2023 02:37:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=6wind.com; s=google; t=1691055422; x=1691660222;
-        h=content-transfer-encoding:in-reply-to:organization:from:references
-         :cc:to:content-language:subject:reply-to:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=gxxp4r3SLmVXwd7QLESwzGmLVMkeoSmrpwS9UI/62t0=;
-        b=acEQPoObNLR7tVSVXXSQ555mxs8lxpcIuwtpflobSdEj//y/UjbxT7u7RqLVm9Nv5R
-         svvVCLf67TqVuxI/XmGs7SVYWEOxye2vpfsairjf+RHTiQyTKSviu5Cz4gHwu28imxYj
-         YaIfm6Qc0Q96ToFQNd0mIb7o5eavaiCarDLXIzaqScTeyem5wPXI556/Jkxp+zfCkx1t
-         74iQpVKtBvrr45QgQBFOgUwu3VjnT/xmyS8NNPUv1qifkHq98NbivLvO3fc2rtWVvP1s
-         nVkJOtzIdIhhRd8ZVR1ciIrIIPwCpEpku4o1olb58Ute8EImuuet+KaCOosMGyz0/Gnm
-         tiFw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691055422; x=1691660222;
-        h=content-transfer-encoding:in-reply-to:organization:from:references
-         :cc:to:content-language:subject:reply-to:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gxxp4r3SLmVXwd7QLESwzGmLVMkeoSmrpwS9UI/62t0=;
-        b=NKqCYj8M+W3n0bxh2QCgn65bWOCI6gxKPK3zMjQUZA3jtqfDxA2d/1UhAFxXtf8Rvb
-         L8LEKzwlVOQxtymvnHCpQWnTYkQaQ4hRWkso2nsOaA8apO78IGONJixV0oOTUl1R9Av1
-         CmeWT4dTMfoDe/1WH7S8euyW9Er4j32EabnxHhIJOvc/8EQHTQo1zTgS1pfQFjxa5q2N
-         O4eT57S8dQ30Z+5Y+p9B0ZWMEok7JLflA0BQOJwsGtDxU2I0b6TeNrNadUerR0qwDoBJ
-         Q+7NUF5QrP7LkM4rNqJ9AZvDcDytdOUp1BNMKw+6/ywSJd0hZKuyn86RfLsPjfmmjWCr
-         2EAw==
-X-Gm-Message-State: ABy/qLbfxzuz8YpwJC7eRrGcpnX6J42nOvCoohI4pzI6eesVAlQrr/jw
-	Om0LJ+gtNpmOSUSU+2D2TdnmCQ==
-X-Google-Smtp-Source: APBJJlEs8YzTQttp3hUrbLEDyf9NAMl6vSv/PbMAAFVYnpx1fJeaxkw7Fehwg6kpmFFPc3sx7x40aA==
-X-Received: by 2002:a05:651c:106:b0:2b5:80e0:f18e with SMTP id a6-20020a05651c010600b002b580e0f18emr6697660ljb.3.1691055422157;
-        Thu, 03 Aug 2023 02:37:02 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:b41:c160:715:a86c:f2f5:a28? ([2a01:e0a:b41:c160:715:a86c:f2f5:a28])
-        by smtp.gmail.com with ESMTPSA id m14-20020a7bce0e000000b003fbc9b9699dsm3760781wmc.45.2023.08.03.02.37.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 03 Aug 2023 02:37:01 -0700 (PDT)
-Message-ID: <34f246ba-3ebc-1257-fe8d-5b7e0670a4a6@6wind.com>
-Date: Thu, 3 Aug 2023 11:37:00 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 262907E
+	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 09:53:04 +0000 (UTC)
+Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2080.outbound.protection.outlook.com [40.107.96.80])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7B9211F
+	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 02:53:02 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=DLxSZP5xejH/doJd71EacNJCsic7f2zTavxT4eJS5ZulWDJQEAw6fwQXuyCh0BegnW9HHncaKvh2beYy1mnPGkkTh8jumSGwK02BXhk1IKUoTUQs5yByH0OGSrlZHw0P4KRZVZckHT2KjNNyzK80naDUhETE4HNOcv+rETqR1o/D+P0SsAhWFL0/mtHYngpprwDACmfzgj5BtgwpwLidpnHyAwL9Bi6RqGmS/B1fm29rjotHXWH+DHsmd+D20GHwLqYZj3O4jQRlD6GE3thMHy8jn92K9Du76vNb3foDOrrOpTiPcZmdy7jXKcrvQwZDY+9aHHjV0TiZZrMvWkMqPQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=p2ckWdSFtIyZvSE+TJh0w1spCtJHVqneQrxA38ClQJ0=;
+ b=T2QjHk0oxrX4Ymq9KU5g67F0nb0llP7WRoGgkrSkSFSI1icMO623DU/ngX19zUFRs866+fZo54RuiUQ1k4FIBzaYDQ7imIwn0HO/VSHzRDEJdS+m14Nl7Qh5tGfPw4RwQpxfBNd7n93b86I41aG5RDWSCRq9ZmTpLL+yvADRF5D2KpINj6AW/HHipJtHDfIS6jbOKVALulP7Ccr+rdLLvYrladxP0LW+BxxNxCkJaqvXyJAUbm9SBIyuBrybsem/Ed27CSNjirtvR1hTJ5SKGsAIxyhUesyJcVElSuOpKWerzxFJJRsyMIyg+EQIEVCRb5J89bBLEMwGfcrWKrgORA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=blackwall.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=p2ckWdSFtIyZvSE+TJh0w1spCtJHVqneQrxA38ClQJ0=;
+ b=l705vrJ3svSDJGiB1ZUl9tgbCHaRWhZOXWn3IGD0Z3HDP0aHIxkG7W57MsjV9F3frLoCtEDDc/4MloFQPK4TdmqjdFYCCUvVeqvMO3knDogOgO59ievbUvY7rnVkGa8tCYV5cpya457YWC9jY8KrbEzgHJkLV4aYmiWHubv2JGX6771R/M5RMYAmmDdbZCKo0FjQ7lYtdkNGu/nLB4aNaTTx2lTezlAWCwZJm1A5xxcUsNOhcy49tW06e85g96X7uvAKwOjMgNMrxr+YJgl4SUlTTGLFuB9f7MJHaslnD+xCwS+4XMVf8YpVACOL5J853TNU7Sz18TqmcWhenUy8ww==
+Received: from CYXPR02CA0058.namprd02.prod.outlook.com (2603:10b6:930:cd::27)
+ by PH7PR12MB5829.namprd12.prod.outlook.com (2603:10b6:510:1d4::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.47; Thu, 3 Aug
+ 2023 09:53:01 +0000
+Received: from CY4PEPF0000E9D3.namprd03.prod.outlook.com
+ (2603:10b6:930:cd:cafe::83) by CYXPR02CA0058.outlook.office365.com
+ (2603:10b6:930:cd::27) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.20 via Frontend
+ Transport; Thu, 3 Aug 2023 09:53:00 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ CY4PEPF0000E9D3.mail.protection.outlook.com (10.167.241.146) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6652.19 via Frontend Transport; Thu, 3 Aug 2023 09:53:00 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Thu, 3 Aug 2023
+ 02:52:53 -0700
+Received: from yaviefel (10.126.230.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37; Thu, 3 Aug 2023
+ 02:52:51 -0700
+References: <20230802164115.866222-1-idosch@nvidia.com>
+User-agent: mu4e 1.8.11; emacs 28.2
+From: Petr Machata <petrm@nvidia.com>
+To: Ido Schimmel <idosch@nvidia.com>
+CC: <netdev@vger.kernel.org>, <stephen@networkplumber.org>,
+	<dsahern@gmail.com>, <petrm@nvidia.com>, <razor@blackwall.org>
+Subject: Re: [PATCH iproute2-next v2] bridge: Add backup nexthop ID support
+Date: Thu, 3 Aug 2023 11:49:57 +0200
+In-Reply-To: <20230802164115.866222-1-idosch@nvidia.com>
+Message-ID: <87tttgcv0v.fsf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Reply-To: nicolas.dichtel@6wind.com
-Subject: Re: [PATCH net v2] net: handle ARPHRD_PPP in dev_is_mac_header_xmit()
-Content-Language: en-US
-To: Guillaume Nault <gnault@redhat.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Eric Dumazet <edumazet@google.com>, Daniel Borkmann <daniel@iogearbox.net>,
- Alexei Starovoitov <ast@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org,
- bpf@vger.kernel.org, stable@vger.kernel.org,
- Siwar Zitouni <siwar.zitouni@6wind.com>
-References: <20230802122106.3025277-1-nicolas.dichtel@6wind.com>
- <ZMtpSdLUQx2A6bdx@debian>
-From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Organization: 6WIND
-In-Reply-To: <ZMtpSdLUQx2A6bdx@debian>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Originating-IP: [10.126.230.35]
+X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000E9D3:EE_|PH7PR12MB5829:EE_
+X-MS-Office365-Filtering-Correlation-Id: abe8bc55-5a5d-460f-13d5-08db94076c54
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	4Mk+7910zoPHiM6EQGYmQW8lkyHPNWYxwI84ePbrL7i4Ty3+iy7hGbvx/4lxgIYCoPCdtt5VQfuGrPGtuN7O77krbq1BRJVNPPt3KFf0gJ9JrGtn+f/9Oj2F+mOYf6uCFn8IAD+H+ncLa6W1LBZP7QnfkoP8F2eEJnI+Gl60h2/7OZfocZxugIj2vLPAMocwd3h0AV/RII8QRxOuKQVF+y1CFZbeYQML+DwDgcaz953deaF12a5Idh4uayFB3/wLUVhTz4PuZykrD4ShwZuP1swACF2RJF10fywHMcfPxjknCyyL3cfJT7tPzUfejhlObSD0bVrGFCbyEAEqrRQ9TfxkjZ/2ufgBFDzam/LsBa0VX7k9mRKNYG2k+A1iVGMoDfumFYfTO8YzjD7SQWSrpzZ7Os5N4UzO8r1s3/gDGwISqhifjgyEP+BStxQ+CItifarTK/HNSqvHrThl0g3JK8QpF1srzBKRc1FTdDDUQeBkwD+aY6DfDWgSD6XtEyRl/1iWsfpeRn6aad4rRnQErRH+QwUYIOnWRoUKDbsjyGun6iypd+XpwEGRd8XAL1SZGn/A4u8OGcrFhV70B7AU8PL6ZqrJt7ZxEhgMVUx7E8hvp5XzXJTIOnHBKLkkXXM2HYfRyOSO00kh6AgipXEfWYO7HkCD+LMMI6eLW2rKec7Rpm9EIH0qUx/DWehKkNAfffXKLVllsro9lY7qDU8yVF4tfZkYnf9oRsYhMxzWrkIn0ZsGNR+KIU+2VLUp1Fsz
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(136003)(396003)(346002)(39860400002)(376002)(451199021)(82310400008)(40470700004)(46966006)(36840700001)(40460700003)(16526019)(426003)(2616005)(26005)(186003)(336012)(47076005)(36860700001)(316002)(2906002)(6636002)(70586007)(70206006)(4326008)(5660300002)(6862004)(41300700001)(8676002)(8936002)(54906003)(37006003)(478600001)(40480700001)(356005)(7636003)(86362001)(36756003)(82740400003);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Aug 2023 09:53:00.5250
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: abe8bc55-5a5d-460f-13d5-08db94076c54
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CY4PEPF0000E9D3.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB5829
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Le 03/08/2023 à 10:46, Guillaume Nault a écrit :
-> On Wed, Aug 02, 2023 at 02:21:06PM +0200, Nicolas Dichtel wrote:
->> This kind of interface doesn't have a mac header.
-> 
-> Well, PPP does have a link layer header.
-It has a link layer, but not an ethernet header.
 
-> Do you instead mean that PPP automatically adds it?
-> 
->> This patch fixes bpf_redirect() to a ppp interface.
-> 
-> Can you give more details? Which kind of packets are you trying to
-> redirect to PPP interfaces?
-My ebpf program redirect an IP packet (eth / ip) from a physical ethernet device
-at ingress to a ppp device at egress. In this case, the bpf_redirect() function
-should remove the ethernet header from the packet before calling the xmit ppp
-function. Before my patch, the ppp xmit function adds a ppp header (protocol IP
-/ 0x0021) before the ethernet header. It results to a corrupted packet. After
-the patch, the ppp xmit function encapsulates the IP packet, as expected.
+Ido Schimmel <idosch@nvidia.com> writes:
 
-> 
-> To me this looks like a hack to work around the fact that
-> ppp_start_xmit() automatically adds a PPP header. Maybe that's the
-It's not an hack, it works like for other kind of devices managed by the
-function bpf_redirect() / dev_is_mac_header_xmit().
+> Extend the bridge and ip utilities to set and show the backup nexthop ID
+> bridge port attribute. A value of 0 (default) disables the feature, in
+> which case the attribute is not printed since it is not emitted by the
+> kernel.
+>
+> Example:
+>
+>  # bridge -d link show dev swp1 | grep -o "backup_nhid [0-9]*"
+>  # bridge -d -j -p link show dev swp1 | jq '.[]["backup_nhid"]'
+>  null
+>
+>  # bridge link set dev swp1 backup_nhid 10
+>  # bridge -d link show dev swp1 | grep -o "backup_nhid [0-9]*"
+>  backup_nhid 10
+>  # bridge -d -j -p link show dev swp1 | jq '.[]["backup_nhid"]'
+>  10
+>
+>  # bridge link set dev swp1 backup_nhid 0
+>  # bridge -d link show dev swp1 | grep -o "backup_nhid [0-9]*"
+>  # bridge -d -j -p link show dev swp1 | jq '.[]["backup_nhid"]'
+>  null
+>
+>  # ip -d link show dev swp1 | grep -o "backup_nhid [0-9]*"
+>  # ip -d -j -p lin show dev swp1 | jq '.[]["linkinfo"]["info_slave_data"]["backup_nhid"]'
+>  null
+>
+>  # ip link set dev swp1 type bridge_slave backup_nhid 10
+>  # ip -d link show dev swp1 | grep -o "backup_nhid [0-9]*"
+>  backup_nhid 10
+>  # ip -d -j -p lin show dev swp1 | jq '.[]["linkinfo"]["info_slave_data"]["backup_nhid"]'
+>  10
+>
+>  # ip link set dev swp1 type bridge_slave backup_nhid 0
+>  # ip -d link show dev swp1 | grep -o "backup_nhid [0-9]*"
+>  # ip -d -j -p lin show dev swp1 | jq '.[]["linkinfo"]["info_slave_data"]["backup_nhid"]'
+>  null
+>
+> Signed-off-by: Ido Schimmel <idosch@nvidia.com>
 
-Hope it's more clear.
-
-
-Regards,
-Nicolas
-
-> best we can do given the current state of ppp_generic.c, but the
-> commit message should be clear about what the real problem is and
-> why the patch takes this approach to fix or work around it.
-> 
->> CC: stable@vger.kernel.org
->> Fixes: 27b29f63058d ("bpf: add bpf_redirect() helper")
->> Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
->> Tested-by: Siwar Zitouni <siwar.zitouni@6wind.com>
->> ---
->>
->> v1 -> v2:
->>  - I forgot the 'Tested-by' tag in the v1 :/
->>
->>  include/linux/if_arp.h | 1 +
->>  1 file changed, 1 insertion(+)
->>
->> diff --git a/include/linux/if_arp.h b/include/linux/if_arp.h
->> index 1ed52441972f..8efbe29a6f0c 100644
->> --- a/include/linux/if_arp.h
->> +++ b/include/linux/if_arp.h
->> @@ -53,6 +53,7 @@ static inline bool dev_is_mac_header_xmit(const struct net_device *dev)
->>  	case ARPHRD_NONE:
->>  	case ARPHRD_RAWIP:
->>  	case ARPHRD_PIMREG:
->> +	case ARPHRD_PPP:
->>  		return false;
->>  	default:
->>  		return true;
->> -- 
->> 2.39.2
->>
->>
-> 
+Reviewed-by: Petr Machata <petrm@nvidia.com>
 
