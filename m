@@ -1,113 +1,62 @@
-Return-Path: <netdev+bounces-24203-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24202-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C811C76F396
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 21:41:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id F274776F394
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 21:41:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 81164282068
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 19:41:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ABACC28234D
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 19:41:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84E042593B;
-	Thu,  3 Aug 2023 19:41:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF51C2592F;
+	Thu,  3 Aug 2023 19:41:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72BC125178
-	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 19:41:22 +0000 (UTC)
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 924C93C3B
-	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 12:41:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1691091675; x=1722627675;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=6A9na0vZlLFGH8WLs5AunuicvqcJ/LkL555+PBSJWsw=;
-  b=ktA3Crlkgtdlh7+ZD6TYMaxGbttKd9UwRa5EW9llIOP3USc7yqIaNnI8
-   bjmC1qOisKKs5QZGIgNjCBevwJAr6V6OEJz7YfGKvJX0wqmjAbyxdleVS
-   hVhOYXX51+6DR8XRP8axj/aCZ1StxQdY/ddtVr9W9V0WNs7N8KHIPRORs
-   1yOolCHLXzThNkMwCgjmiMblsUUemfwvkLxZJ+O0BfWv1xKuH0Qw000VS
-   U6c+ccCa8bb7LZPSf59H+u2HgqfyweKQG6fjwUEZWPe9ZWkDFcR5Rdzbr
-   jLQ7I1WUfmobb5Mt3Vch0UjDNI8iBC0UNR4QkUfNp/2jJ4tY+12lDJOaA
-   g==;
-X-IronPort-AV: E=Sophos;i="6.01,252,1684825200"; 
-   d="scan'208";a="239674845"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa1.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 03 Aug 2023 12:41:15 -0700
-Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21; Thu, 3 Aug 2023 12:41:07 -0700
-Received: from localhost (10.10.115.15) by chn-vm-ex04.mchp-main.com
- (10.10.85.152) with Microsoft SMTP Server id 15.1.2507.21 via Frontend
- Transport; Thu, 3 Aug 2023 12:41:07 -0700
-Date: Thu, 3 Aug 2023 21:41:06 +0200
-From: Horatiu Vultur <horatiu.vultur@microchip.com>
-To: Zhu Wang <wangzhu9@huawei.com>
-CC: <UNGLinuxDriver@microchip.com>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<netdev@vger.kernel.org>
-Subject: Re: [PATCH -next] net: lan966x: Do not check 0 for
- platform_get_irq_byname()
-Message-ID: <20230803194106.cvzvgy6npx5ztupb@soft-dev3-1>
-References: <20230803082900.14921-1-wangzhu9@huawei.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A36FC25178
+	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 19:41:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56CB0C433CA;
+	Thu,  3 Aug 2023 19:41:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1691091677;
+	bh=Zc2Fnl9uLCazlZvghpF6ZZNgi6AQk+SX/wzfu6Cayvs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=e7Mi0+4LvXoMpCchq9a2gy1ktzO7J+cEiu5HgVrxiP1zrJK5sBNMpcLrXss8BouLB
+	 DiTn6UeTlUC/lnL7JO60AonktV4kvR0E8nBtiyQHkNvaT5gJbv9kRmy5wuRt71BlYr
+	 kdDxCfyHgFdPguXdQMNEKU37xUktSbRcySFsVBFa8OkSOo8r620jfi+N8pOrIrPS2v
+	 /rInMA3x81TrxuURbWSi2BeTNvRagn9NN5f3Dw4belGqiOXj5uWuC7XfteEd0KnexG
+	 96ssQDSt+Z7k/G7vKcmk1126wp9FvzAtCdaQz5ZFz3IWMUINNfhV4gCre9mss6eky/
+	 s/Drle4b9X0Rw==
+Date: Thu, 3 Aug 2023 21:41:11 +0200
+From: Simon Horman <horms@kernel.org>
+To: Yue Haibing <yuehaibing@huawei.com>
+Cc: yisen.zhuang@huawei.com, salil.mehta@huawei.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	lanhao@huawei.com, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next] net: hns3: Remove unused function declarations
+Message-ID: <ZMwC12FZrutH7tEa@kernel.org>
+References: <20230803135138.37456-1-yuehaibing@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230803082900.14921-1-wangzhu9@huawei.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+In-Reply-To: <20230803135138.37456-1-yuehaibing@huawei.com>
 
-The 08/03/2023 16:29, Zhu Wang wrote:
-> [Some people who received this message don't often get email from wangzhu9@huawei.com. Learn why this is important at https://aka.ms/LearnAboutSenderIdentification ]
+On Thu, Aug 03, 2023 at 09:51:38PM +0800, Yue Haibing wrote:
+> Commit 1e6e76101fd9 ("net: hns3: configure promisc mode for VF asynchronously")
+> left behind hclge_inform_vf_promisc_info() declaration.
+> And commit 68c0a5c70614 ("net: hns3: Add HNS3 IMP(Integrated Mgmt Proc) Cmd Interface Support")
+> declared but never implemented hclge_cmd_mdio_write() and hclge_cmd_mdio_read().
 > 
-> EXTERNAL EMAIL: Do not click links or open attachments unless you know the content is safe
-> 
-> Since platform_get_irq_byname() never returned zero, so it need not to
-> check whether it returned zero, it returned -EINVAL or -ENXIO when
-> failed, so we replace the return error code with the result it returned.
-> 
-> Signed-off-by: Zhu Wang <wangzhu9@huawei.com>
+> Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
 
-Reviewed-by: Horatiu Vultur <horatiu.vultur@microchip.com>
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-> ---
->  drivers/net/ethernet/microchip/lan966x/lan966x_main.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/microchip/lan966x/lan966x_main.c b/drivers/net/ethernet/microchip/lan966x/lan966x_main.c
-> index fbb0bb4594cd..824961ec1370 100644
-> --- a/drivers/net/ethernet/microchip/lan966x/lan966x_main.c
-> +++ b/drivers/net/ethernet/microchip/lan966x/lan966x_main.c
-> @@ -1108,8 +1108,8 @@ static int lan966x_probe(struct platform_device *pdev)
-> 
->         /* set irq */
->         lan966x->xtr_irq = platform_get_irq_byname(pdev, "xtr");
-> -       if (lan966x->xtr_irq <= 0)
-> -               return -EINVAL;
-> +       if (lan966x->xtr_irq < 0)
-> +               return lan966x->xtr_irq;
-> 
->         err = devm_request_threaded_irq(&pdev->dev, lan966x->xtr_irq, NULL,
->                                         lan966x_xtr_irq_handler, IRQF_ONESHOT,
-> --
-> 2.17.1
-> 
-
--- 
-/Horatiu
 
