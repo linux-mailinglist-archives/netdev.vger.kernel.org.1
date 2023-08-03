@@ -1,79 +1,39 @@
-Return-Path: <netdev+bounces-24193-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24192-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F02AC76F320
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 21:00:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 005EC76F31E
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 21:00:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A9BD2282246
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 19:00:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C39281C21637
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 19:00:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09B0B253CA;
-	Thu,  3 Aug 2023 19:00:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EA1A2517D;
+	Thu,  3 Aug 2023 19:00:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F21282418E
-	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 19:00:34 +0000 (UTC)
-Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B9802D45;
-	Thu,  3 Aug 2023 12:00:30 -0700 (PDT)
-Received: by mail-ej1-x62d.google.com with SMTP id a640c23a62f3a-99bed101b70so177599466b.3;
-        Thu, 03 Aug 2023 12:00:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1691089229; x=1691694029;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=fpJNHhs8hGi2yDC45xTTVL8bPEioZdZntYr6lajc9vM=;
-        b=k5NDFDrEg+9nNDfAkqK83fDOp8A5hffycEbrlbI1/HFSkoagQYZMmMPYLy72x3L1wF
-         JTyYZl2/V9SuoMJt9V3F/7xfyxu01MSFXa2Xhu/TtBD6BVVPbIYsb+0cN3OSQ4ZzY7qV
-         sLMQfRL+DlBOv9af5SFsYVhKt8Yrf8E+RH9PvIzTXoXF5B3MwM01l3mdjlPDFa94T/5x
-         XIi4lG512p/FVDpSvNiARyeXHw50IbimFnqlTAn/a/o63GlyqwYjJBdWDdtAbFGbfknY
-         PcDd53ab0QCfjsii/z7pcosDnLaQrDL9LBgq9QPpZCYn7XUPYkMAEojnEN9BefiQyZTN
-         77Dg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691089229; x=1691694029;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=fpJNHhs8hGi2yDC45xTTVL8bPEioZdZntYr6lajc9vM=;
-        b=hliGL4XMG/izhD1vc88sC/3AMnwPi5BEVOqy0h4xklm+8uTHpXUUSmaI887BJ3NK6O
-         1AqKAN1wkmWx2kB9NbYCg+ps2kSh3VQW3hWkJdJTLrPZa35lYYRdmv9F6pfPjib7Hb+U
-         aBKr9nAvXdgQ8QhHx7s8I339UDOM8SEM/Q9Y1nJhAvRBV3P4TgsJZWbNVzU+7RwIy3LK
-         kv5cWVi9MUJbRCNAAIZ25z6bX7KUhOHrTIveyi5MJLqG6IkArDPPWlF+vEZybeEjHdfk
-         NFN80W/o8p28qraKQ4CgF68RmOMK/UW4a2GTBAZXpusFrxU8y92fjI/6bADEjPe4Av5N
-         EVTQ==
-X-Gm-Message-State: ABy/qLaQCra+qoNC0DaP69C/xqa1EVABm1BOEeUnSpJuE8ckWQ29PXV0
-	6kbzbVSNNmr10KayXSenttw=
-X-Google-Smtp-Source: APBJJlErSeEumK9R9+wnkEORl7kuxFvXLYgJU3sv1JvX9YTgWXsr9PNifF6jZ1kMyJr/QPo0T+vz+w==
-X-Received: by 2002:a17:906:20d9:b0:994:47a0:c730 with SMTP id c25-20020a17090620d900b0099447a0c730mr8455282ejc.43.1691089228564;
-        Thu, 03 Aug 2023 12:00:28 -0700 (PDT)
-Received: from dev7.kernelcare.com ([2a01:4f8:201:23::2])
-        by smtp.gmail.com with ESMTPSA id d13-20020a1709063ecd00b00992a8a54f32sm182939ejj.139.2023.08.03.12.00.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Aug 2023 12:00:27 -0700 (PDT)
-From: Andrew Kanner <andrew.kanner@gmail.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	jasowang@redhat.com,
-	netdev@vger.kernel.org,
-	hawk@kernel.org,
-	jbrouer@redhat.com,
-	dsahern@gmail.com,
-	john.fastabend@gmail.com,
-	linux-kernel@vger.kernel.org
-Cc: linux-kernel-mentees@lists.linuxfoundation.org,
-	syzbot+f817490f5bd20541b90a@syzkaller.appspotmail.com,
-	Andrew Kanner <andrew.kanner@gmail.com>
-Subject: [PATCH net-next v5 1/2] drivers: net: prevent tun_build_skb() to exceed the packet size limit
-Date: Thu,  3 Aug 2023 20:59:48 +0200
-Message-Id: <20230803185947.2379988-1-andrew.kanner@gmail.com>
-X-Mailer: git-send-email 2.39.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 284892418E
+	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 19:00:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 86EB6C433CB;
+	Thu,  3 Aug 2023 19:00:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1691089225;
+	bh=8+HYmQJ9GRRXVK9utLM+h1h/UlUGv6oDrvEhBYmiyzM=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=CrhGrf15YuZ0ZtNww9cNCRhtWWeYF9E4H4dxBRpNkfOjMiDZ+3auKlRRPg/RyGOEv
+	 qZaZJ75CXkFXSWl7AmqxKGbIoc2Lcw9e+OgzViB+LfPg5iccRSVYpamTV1pCE1+zkx
+	 BE3sJc9fTxf7pMtQu/SA49kPKlAQ5wi6DOKFFe03SYsldmzgEX4iIb07SxBG3rUKxl
+	 K13/3Am3i2/RBG6HoB3uV3VKerr8JtjZBYZRwUVitQPHIitVOHmZBXb8xgGK4xSOlm
+	 2AQ3lFwa3F0b9cYqwZOBCQq7zwR/PJH7EPN8SsWoNUi5GOdPTPSqCK5gcMqY23MCv3
+	 /URKrP2ZKUIXQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6BC30C3274D;
+	Thu,  3 Aug 2023 19:00:25 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,79 +41,43 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Subject: Re: [PATCH net] MAINTAINERS: update TUN/TAP maintainers
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169108922543.22436.3567144743259850623.git-patchwork-notify@kernel.org>
+Date: Thu, 03 Aug 2023 19:00:25 +0000
+References: <20230802182843.4193099-1-kuba@kernel.org>
+In-Reply-To: <20230802182843.4193099-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, maxk@qti.qualcomm.com, willemdebruijn.kernel@gmail.com,
+ jasowang@redhat.com
 
-Using the syzkaller repro with reduced packet size it was discovered
-that XDP_PACKET_HEADROOM is not checked in tun_can_build_skb(),
-although pad may be incremented in tun_build_skb(). This may end up
-with exceeding the PAGE_SIZE limit in tun_build_skb().
+Hello:
 
-Jason Wang <jasowang@redhat.com> proposed to count XDP_PACKET_HEADROOM
-always (e.g. without rcu_access_pointer(tun->xdp_prog)) in
-tun_can_build_skb() since there's a window during which XDP program
-might be attached between tun_can_build_skb() and tun_build_skb().
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Fixes: 7df13219d757 ("tun: reserve extra headroom only when XDP is set")
-Link: https://syzkaller.appspot.com/bug?extid=f817490f5bd20541b90a
-Signed-off-by: Andrew Kanner <andrew.kanner@gmail.com>
----
+On Wed,  2 Aug 2023 11:28:43 -0700 you wrote:
+> Willem and Jason have agreed to take over the maintainer
+> duties for TUN/TAP, thank you!
+> 
+> There's an existing entry for TUN/TAP which only covers
+> the user mode Linux implementation.
+> Since we haven't heard from Maxim on the list for almost
+> a decade, extend that entry and take it over, rather than
+> adding a new one.
+> 
+> [...]
 
-Notes (akanner):
-    v5:
-      - always count XDP_PACKET_HEADROOM in tun_can_build_skb() as there's a
-        window between tun_can_build_skb() and tun_build_skb() and XDP
-        program might be attached there.
-      - rcu_read_lock/unlock() for tun->xdp_prog were completely removed and
-        there's no need to use rcu_access_pointer() instead which was noted
-        by David Ahern <dsahern@gmail.com>.
-    v4: https://lore.kernel.org/all/20230801220710.464-1-andrew.kanner@gmail.com/T/
-      - fall back to v1, fixing only missing XDP_PACKET_HEADROOM in pad
-        and removing bpf_xdp_adjust_tail() check for frame_sz.
-      - added rcu read lock, noted by Jason Wang <jasowang@redhat.com> in
-        v1
-      - I decided to leave the packet length check in tun_can_build_skb()
-        instead of moving to tun_build_skb() suggested by Jason Wang
-        <jasowang@redhat.com>. Otherwise extra packets will be dropped
-        without falling back to tun_alloc_skb(). And in the discussion of
-        v3 Jesper Dangaard Brouer <jbrouer@redhat.com> noticed that XDP is
-        ok with a higher order pages if it's a contiguous physical memory
-        allocation, so falling to tun_alloc_skb() -> do_xdp_generic()
-        should be ok.
-    v3: https://lore.kernel.org/all/20230725155403.796-1-andrew.kanner@gmail.com/T/
-      - attach the forgotten changelog
-    v2: https://lore.kernel.org/all/20230725153941.653-1-andrew.kanner@gmail.com/T/
-      - merged 2 patches in 1, fixing both issues: WARN_ON_ONCE with
-        syzkaller repro and missing XDP_PACKET_HEADROOM in pad
-      - changed the title and description of the execution path, suggested
-        by Jason Wang <jasowang@redhat.com>
-      - move the limit check from tun_can_build_skb() to tun_build_skb()
-        to remove duplication and locking issue, and also drop the packet
-        in case of a failed check - noted by Jason Wang
-        <jasowang@redhat.com>
-    v1: https://lore.kernel.org/all/20230724221326.384-1-andrew.kanner@gmail.com/T/
+Here is the summary with links:
+  - [net] MAINTAINERS: update TUN/TAP maintainers
+    https://git.kernel.org/netdev/net/c/0765c5f29335
 
- drivers/net/tun.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-index 25f0191df00b..100339bc8b04 100644
---- a/drivers/net/tun.c
-+++ b/drivers/net/tun.c
-@@ -1594,7 +1594,7 @@ static bool tun_can_build_skb(struct tun_struct *tun, struct tun_file *tfile,
- 	if (zerocopy)
- 		return false;
- 
--	if (SKB_DATA_ALIGN(len + TUN_RX_PAD) +
-+	if (SKB_DATA_ALIGN(len + TUN_RX_PAD + XDP_PACKET_HEADROOM) +
- 	    SKB_DATA_ALIGN(sizeof(struct skb_shared_info)) > PAGE_SIZE)
- 		return false;
- 
+You are awesome, thank you!
 -- 
-2.39.3
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
