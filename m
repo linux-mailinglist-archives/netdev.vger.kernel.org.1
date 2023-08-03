@@ -1,119 +1,80 @@
-Return-Path: <netdev+bounces-23967-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23968-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5884176E5B2
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 12:30:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B23A76E5D2
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 12:40:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 916C71C21488
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 10:30:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B8A46282063
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 10:40:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 930D68F7C;
-	Thu,  3 Aug 2023 10:30:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D65F14AAA;
+	Thu,  3 Aug 2023 10:40:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EF0218B02
-	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 10:30:24 +0000 (UTC)
-Received: from mgamail.intel.com (unknown [192.55.52.151])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 084A9211E;
-	Thu,  3 Aug 2023 03:30:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1691058623; x=1722594623;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=wUOrzPuQNyPoyunb8QgHpza+TDckszmU8J98EMridjM=;
-  b=KYADSan5HlINCdmOkoNAPY4yLO10FJpGBYy1JLBz4MgSLLkDdmJ8ccGj
-   mfTMslPQAQ3MEd+uewFDbwC5M2J2KBQCXNTTsghWi4+ToyJjaXJ5MGDLs
-   zJhAui3XoZI/HwmvWn6rISrnyYRHTvnoEOcrGAuUgCXVezsuq4Wl9CuLg
-   OYLBZ206jWHeSjR8VrjH1Qn0jfM2CvQMoWzu6uOrwCuPSU6pkDuUk4hIY
-   Hp1GoYlwzwavZlUPJ3ujwnQxGOxoCMMjtm2h7S3RjQ7w0yxmbH5cvH0UK
-   BqCmjtr/v9tmJIQ5uPCPSdTouoqn8/YnogZkrHbP5Puyq6JgrkW5Nw0/8
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10790"; a="350129234"
-X-IronPort-AV: E=Sophos;i="6.01,252,1684825200"; 
-   d="scan'208";a="350129234"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Aug 2023 03:30:21 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10790"; a="729514972"
-X-IronPort-AV: E=Sophos;i="6.01,252,1684825200"; 
-   d="scan'208";a="729514972"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by orsmga002.jf.intel.com with ESMTP; 03 Aug 2023 03:30:18 -0700
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Thu, 3 Aug 2023 03:30:18 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Thu, 3 Aug 2023 03:30:18 -0700
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27 via Frontend Transport; Thu, 3 Aug 2023 03:30:18 -0700
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.171)
- by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.27; Thu, 3 Aug 2023 03:30:17 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2971E8F7C
+	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 10:40:19 +0000 (UTC)
+Received: from EUR04-VI1-obe.outbound.protection.outlook.com (mail-vi1eur04on2058.outbound.protection.outlook.com [40.107.8.58])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A42E2D7B;
+	Thu,  3 Aug 2023 03:40:03 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=GtJE/hKNZWjLWQmkwgy4q0DnT74gSMvT09NsY0t0q/ffSl1QhsUxm/ED7Mo66y9x6JiIJ+TghTKEvmyP9WVGT06H78GWZbxCZm6Rw5SMO/7B787yepPyTqE3Hx0kUiVi0Jbb4efJL4coQT2B1oywSzGGoVd1uhQ9FUiiIF3NGPk5iyVBQ/ACUFrusm4j3zXDRxOMLtdtk7rYToH6g3u4Li6kuf8L9NuXr94I8lzIJvj/ND/9wSdDGSQDRNJ7G4Ql94YMpWlwDA+ffPaF9Ca8+SrBiAoe2BZIVu/v3BKPju2NBPexqwWKO24NE232O8ppEt2rNGNmUKPFmtOMmR8tKA==
+ b=FeZp3I/udfCPUXyGBMzLuTtzF2YB2fV6rCPWFPD6rI7kWjIECqusBceXB2NkDDerWifrudO4XzmD9nTtvqm55WgBCdscnZKeib900V1f5cmoiYxItklKnedEhuu2GQyu5Sn4ZmCAnwxevjIyEGdJ0Ui0HdZNZhmTo38CijJeLXliPx5EKY7aj3enlnGP+/gSrIO51Drlxcts0elei0NOpXUiJDRwkhKdu3s/Kwgko+yzdErdrgqGdQsQmLuJCVOBrXn6wwoI246i73Sz5/ISViD9dPXVp8ZBh0wLYimNlM1eWorLBXbW3aKTUsJkRf9jfkt33JyYZgYodR6PZcAEiw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=wVk2R4zQDwrxXvWRgnNwwZsbLsnf3ESIQPTqBvfcr3U=;
- b=i85/P0vEMPavpFkEn0NzYWbacqcSgtQBpXJ04m5EM0lV4TUsJW7X3HP+797FUq9bSlffSQMEU74nP1qGh3A9+k1wmA86LjvQjlkZxe13Etp4O+fS+Go8S/UMJzScsCiUAI1fymw/h4QnNLOi6KvbKuBqX3FrK6UXdk2Ov9h0qzP107kckgxf0JfuZW/y9abvBrUSxSh537McJ7vZHKr2GpqHVBe9HuV/1LDCqFHGcnC9jorzfyy1JrRPu1a7LsbwnwTgj8JnBNPEw67PFbUfgsNWEALw9QvfKsoFAFxxJCm4FVjOOai6vRRRsEM/hb+8S95O6Pa2tm8GwFpXklP62Q==
+ bh=WBKd576hAtnPTNZpZHXXsfKhR1ZJaoxSlMNESmHpsyg=;
+ b=nsmv7nax85OoONz+JDyogfuUri+OrbXX5cNi1LxV4JdZIz095BPa5s7RvDmvoq8zBF7bK+MdsdsIHN8A0mTWRE60+4eI8c2obljPRRqci5ug5FwTSlpTpdnRvFz7RF7ty5JOT9yXRfvI7Wxbhc2nHVmyHUZMXeJjX3IcIgkGddYaN2/TN4ILVWwNhXmTzKLigHX1N0pvP0vgV2HiXBpu8eHj8J4njNeU2FgbjBpEYdsIjor/3Y+fnwWbaZASNyV/xFgIWMMzELT5Kna45RnKoFwYPrx5Dm0njeJOjMgdJutcFIOezVToIAj9CH044SlwYbcgDQGCx8sPQW6kvQc6XQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=WBKd576hAtnPTNZpZHXXsfKhR1ZJaoxSlMNESmHpsyg=;
+ b=nrjbwbI2y6gzz6pwat7TbUPa37CdcpvOVviUlRpnpuMj2WmHalH7NcUxE9EBME47Bl8iNI8dr3tn/PqonKCvw7RsMi88ob5KuTtTWZftJle2EK+95yCv1OTPRAej1NVe8g5aFIwQKE87sz+MO1/+DxQdrrNkYCcwry/HIJYvMUE=
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CY5PR11MB6366.namprd11.prod.outlook.com (2603:10b6:930:3a::8)
- by DM4PR11MB5470.namprd11.prod.outlook.com (2603:10b6:5:39c::24) with
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
+ by DBBPR04MB7851.eurprd04.prod.outlook.com (2603:10a6:10:1e1::15) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.47; Thu, 3 Aug
- 2023 10:30:15 +0000
-Received: from CY5PR11MB6366.namprd11.prod.outlook.com
- ([fe80::f8a8:855c:2d19:9ac1]) by CY5PR11MB6366.namprd11.prod.outlook.com
- ([fe80::f8a8:855c:2d19:9ac1%7]) with mapi id 15.20.6631.046; Thu, 3 Aug 2023
- 10:30:15 +0000
-Date: Thu, 3 Aug 2023 11:29:58 +0100
-From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-To: Ard Biesheuvel <ardb@kernel.org>
-CC: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>, Herbert Xu
-	<herbert@gondor.apana.org.au>, Eric Biggers <ebiggers@kernel.org>, Kees Cook
-	<keescook@chromium.org>, Haren Myneni <haren@us.ibm.com>, Nick Terrell
-	<terrelln@fb.com>, Minchan Kim <minchan@kernel.org>, Sergey Senozhatsky
-	<senozhatsky@chromium.org>, Jens Axboe <axboe@kernel.dk>, Richard Weinberger
-	<richard@nod.at>, David Ahern <dsahern@kernel.org>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Steffen Klassert <steffen.klassert@secunet.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, qat-linux
-	<qat-linux@intel.com>, "linuxppc-dev@lists.ozlabs.org"
-	<linuxppc-dev@lists.ozlabs.org>, "linux-mtd@lists.infradead.org"
-	<linux-mtd@lists.infradead.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>
-Subject: Re: [RFC PATCH 01/21] crypto: scomp - Revert "add support for
- deflate rfc1950 (zlib)"
-Message-ID: <ZMuBpm2No70LqgZI@gcabiddu-mobl1.ger.corp.intel.com>
-References: <20230718125847.3869700-1-ardb@kernel.org>
- <20230718125847.3869700-2-ardb@kernel.org>
- <ZMt4nkfpdCXxAkr5@gcabiddu-mobl1.ger.corp.intel.com>
- <CAMj1kXGn70sGAHgOttKkC6n6jfVZ9Y61NZ9ffLmJV8MK2Kh8nQ@mail.gmail.com>
-Content-Type: text/plain; charset="us-ascii"
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.20; Thu, 3 Aug
+ 2023 10:39:59 +0000
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::6074:afac:3fae:6194]) by AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::6074:afac:3fae:6194%4]) with mapi id 15.20.6631.046; Thu, 3 Aug 2023
+ 10:39:59 +0000
+Date: Thu, 3 Aug 2023 13:39:55 +0300
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: Rob Herring <robh@kernel.org>
+Cc: Jianmin Lv <lvjianmin@loongson.cn>, Liu Peibao <liupeibao@loongson.cn>,
+	Bjorn Helgaas <helgaas@kernel.org>, linux-pci@vger.kernel.org,
+	netdev@vger.kernel.org, Bjorn Helgaas <bhelgaas@google.com>,
+	Claudiu Manoil <claudiu.manoil@nxp.com>,
+	Michael Walle <michael@walle.cc>, linux-kernel@vger.kernel.org,
+	Binbin Zhou <zhoubinbin@loongson.cn>,
+	Huacai Chen <chenhuacai@loongson.cn>
+Subject: Re: [PATCH pci] PCI: don't skip probing entire device if first fn OF
+ node has status = "disabled"
+Message-ID: <20230803103955.qsp2k7i46cytn53e@skbuf>
+References: <20230601163335.6zw4ojbqxz2ws6vx@skbuf>
+ <ZHjaq+TDW/RFcoxW@bhelgaas>
+ <20230601221532.2rfcda4sg5nl7pzp@skbuf>
+ <dc430271-8511-e6e4-041b-ede197e7665d@loongson.cn>
+ <7a7f78ae-7fd8-b68d-691c-609a38ab3161@loongson.cn>
+ <20230602101628.jkgq3cmwccgsfb4c@skbuf>
+ <87f2b231-2e16-e7b8-963b-fc86c407bc96@loongson.cn>
+ <20230604085500.ioaos3ydehvqq24i@skbuf>
+ <CAL_JsqLsVYiPLx2kcHkDQ4t=hQVCR7NHziDwi9cCFUFhx48Qow@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CAMj1kXGn70sGAHgOttKkC6n6jfVZ9Y61NZ9ffLmJV8MK2Kh8nQ@mail.gmail.com>
-Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 -
- Collinstown Industrial Park, Leixlip, County Kildare - Ireland
-X-ClientProxiedBy: FR2P281CA0006.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:a::16) To CY5PR11MB6366.namprd11.prod.outlook.com
- (2603:10b6:930:3a::8)
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAL_JsqLsVYiPLx2kcHkDQ4t=hQVCR7NHziDwi9cCFUFhx48Qow@mail.gmail.com>
+X-ClientProxiedBy: VE1PR03CA0012.eurprd03.prod.outlook.com
+ (2603:10a6:802:a0::24) To AM0PR04MB6452.eurprd04.prod.outlook.com
+ (2603:10a6:208:16d::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -121,68 +82,243 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY5PR11MB6366:EE_|DM4PR11MB5470:EE_
-X-MS-Office365-Filtering-Correlation-Id: f5644f60-862d-4ab8-cf5d-08db940ca069
+X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|DBBPR04MB7851:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1827fb4a-f9a1-4569-fccc-08db940dfc2f
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: LVAapvwTty3Y5x9A5HPOXg+hBOQjNW5QbdPCLuq7MhWzmq/GuZCsFWL2iUwxSzBHiltHoml5W1fH22Q7dxDqZup6fuYYv2ImOG2Y9e/n8pCNTbVUJwiKYDW/j1A3/suR1TY6vgJU4gKX4ET/N+bRehTPIlt9LZEUV5EO90z78dLIUfdxWJq1Sn6DRRVME3mE8JkCLaP1wTGlnfb1ylS3vO5YzXXed8zN9SQvxkbZ8gAXZE04At1LCIj+kXNI76IGdcyMOLCrEBBTtJiwHyyBgze0UaqaV5J3RlcKqceVoImtIRUX8DndkxdmED3s587bK1iKJ768UwRXPuyWwaofmOPSvEeJO0v7pAPhMi1BnhKj07Np1/N9JqQGiZ1AFrzMK8Ezp0MlgWUzXQ0kkbGFX0sjOQx5H2KbpXJLj9aMif+rTyR2YCqvMgW/dT8nf2plgrSXIna1pMQjTwP2VrJZDMEeBEBg99BoYTmi3WtKYTh1tOpZ82LtLIVJYZ0HrisUQYVW7fUyaEwmTrNbp9ssQmAhNx+hcIFSsXZ/mvRkKzT9vq+p0Q1t/P1s0HI/Fg7o
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR11MB6366.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(346002)(396003)(376002)(366004)(136003)(39860400002)(451199021)(36916002)(6666004)(6486002)(6512007)(41300700001)(38100700002)(82960400001)(6916009)(66476007)(66556008)(4326008)(66946007)(316002)(54906003)(478600001)(5660300002)(26005)(186003)(6506007)(8936002)(8676002)(7416002)(86362001)(4744005)(2906002)(44832011);DIR:OUT;SFP:1102;
+X-Microsoft-Antispam-Message-Info:
+	3flJbNJG7nlOZ10Rr/LroHK6WlZ/icLJuquxwNn4hX7/oZgse5tGViSU7P9FisuskHt6CkP/EctKE3X29yMV5Mf4nIlbgW4jUZGm6HZTWYIJaEcIzN5GWy1Ozpw8dbKfnGwZq939pQiTXHF4ZGr3SBPonWQazZ46/8Q0wf1UnywGm9oOZod0c57GDddr+Z4CAV/Ph9AAg8GgtM5OMQqg5PTS01rLSex6skQl5BdqFkeSdt3O0MlfuiFRiPru9sHWb0OX+BE0yG4+pRgvsvc1pkMPQnF0S4WJ0VcuScHwGj7gRinNCXzIb9jLDf+tA1LfU9r+XjBcBs9HMpzd0u5lRdjpbuikglYxlvU0cDnargCCGyxu/IDgEBhUmc0f40I7u7IhPzA/ayVs1yR3ITmUweRdVLDChm+YAYmiX4njYZNf9OTkNwEunNeSvOe90j6oMJCamzIGc+scSWNnzzF5EfJUawWTE1zCPryHFKYn1CWf33IHlM3ndQLrRoX89Wcnty/JzDz9tEC5R7JFK+ikoFLgIvaZbHkdsqwZUgKf0hlna54vO0NJDtwyXqJKGuUi
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(7916004)(4636009)(376002)(136003)(39860400002)(366004)(346002)(396003)(451199021)(1076003)(53546011)(6506007)(83380400001)(26005)(186003)(316002)(2906002)(66946007)(4326008)(66476007)(66556008)(5660300002)(6916009)(44832011)(7416002)(41300700001)(8676002)(8936002)(6486002)(6666004)(6512007)(9686003)(54906003)(478600001)(38100700002)(33716001)(86362001);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?/SaLdTM+a8wA9jvBsM/zFvBk9UPJzIDXLR5Woi8hMriMpXSnjAy+6qe5ooq2?=
- =?us-ascii?Q?i01lptc3BnbCSruWaqAYBo2tThD+WrX5xtb7EIbPgs3YUDfBAZ3ZHO+Se1KX?=
- =?us-ascii?Q?5ugnSzvAsKlZZK8paP3bu1MzAF+f2lXupiZVss8nbh3HNTEl4ISuCFV2pDhC?=
- =?us-ascii?Q?c9D5qGFfhJ8vVFT1dBT9uXuP0sLAUDWfBEUy+CFxfdw9XYRKVgsi08EigBwt?=
- =?us-ascii?Q?+oi2tKtUmzTtXtN6ara9JyqT6mSV5wQ07lFneJ6Y2Xjq3DQvZNRjHOVKH6al?=
- =?us-ascii?Q?Yv0dgA8UeJJ/Ii5iHLBXhgfnvPHZNlDwBWv19Ep6h8ZRGkh3wsCfBynk9bCd?=
- =?us-ascii?Q?QAahWpb2j99ljZcAvgyK1Q8WMK9JhIblx2LHXKU2YF/luQjJz9KIySFXrXGI?=
- =?us-ascii?Q?9hBLFGwLX3mCbm8hTw9q/d4/Ak1wDU8KPiV/qKhhiVLKYO9TUceT4i5plcJS?=
- =?us-ascii?Q?Y2lbpvg8UVRuq286gwIcKAX7fTPK0xx82spLtu7umqWh70ljzHJK5ukowt2n?=
- =?us-ascii?Q?RoamfIG/rZY+b9PNItgxcdScAwhcT3uK/VbRG8OkIXmLepyCcUWA8En5wO8e?=
- =?us-ascii?Q?ov2vNnE3gkWm/RbMeUrmMCfpaY70AWwPJjc9S5hjlIyVKpaYyk7MyjMeHj8N?=
- =?us-ascii?Q?zBcs7zxmuwYgwn2Ny/ZePB6+2oyDYcWVaYZNBQvOXvMSe1KPUL+VsrZFtKrT?=
- =?us-ascii?Q?o2ECzDKVyr/0SYF/vCSqzfR1eq/eZEYkPllVSp5JF46dJT+ncJW7GrZ9hyFS?=
- =?us-ascii?Q?7mxJsQPdiCRKGl1lFhzCsHW4K69W6JIr1Zyy/7kZc0ZSZ5cpz04j2y3o+ROA?=
- =?us-ascii?Q?Hh7yKLH33MIbSCtxNF8n80x2tG1KOiHmNyrqux97YYfLJD141pICajOCJohD?=
- =?us-ascii?Q?wbkWLTn2NiLL4qRom0oKvlNI9cuBTapqlyxD4NdtuCobw0YXuQlp61KAsPsI?=
- =?us-ascii?Q?9MK6nSgHD96EzkCN1JcftpfwPCTvMx6sq+tZ6Qbqb1Exq5AD0Z4X07H6+SgX?=
- =?us-ascii?Q?juE2p1m2AuwuXH7xA/4asZuJXnXRpc2K5o41wK/iJT27ZLqi59g60Uhw+h2W?=
- =?us-ascii?Q?IcB7KwZjhAHbKYmZbzRYRbuVEXiO1m5VWPa5X8sZgrzPBKcANfrbhJ1mz4BN?=
- =?us-ascii?Q?0nm2mZBPz9TzgQ+rZcvfHuSfUAOqLh908rI1wF8EsWVGRx3nvMGrfndMTEbQ?=
- =?us-ascii?Q?qNvVcuDECcsYwtzD/t6+GSvzIj9ZzU5UuVsX+Ypuj8WwDMPxDOjsi3zA+IMv?=
- =?us-ascii?Q?BPxUjnq6JdwovOSQiMdlpk+Qy9yjw5pJ/0zDdH+TWgRUKUieiYhsmsaLGhZs?=
- =?us-ascii?Q?7DU/QmC60AQoDFbTBgzFsKNwYjWvTASoAqoxiERczKe7OnMwQCXfmJBqZj7L?=
- =?us-ascii?Q?Y0bOzc7HWBHg92qnjzqX2DFLwWhN/zm1z4yZvmMhYJAWcOACdQmDvLk7TYIk?=
- =?us-ascii?Q?5RkAH6D0UazcOhxlUbwdM2somSy7HTLb8Q0tTKklllSVM0m/ADiUAOfxoDJi?=
- =?us-ascii?Q?fMG3oZ5ZZeUZmciz4wxGWQzpC0Lvpws2bom/5d31vC8QM1PPjHqaK9zZebT6?=
- =?us-ascii?Q?Cw88qeEtePr/idGjSji7c2qhsDbv86EPB1ZwQaxY2EWYRCc6uHrEm6CNkDde?=
- =?us-ascii?Q?IQ=3D=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: f5644f60-862d-4ab8-cf5d-08db940ca069
-X-MS-Exchange-CrossTenant-AuthSource: CY5PR11MB6366.namprd11.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?U2NqS1Z3TGdBRUFlMVlwTkNqcU1JSGdJQTNBVXM5cHU3Uk5uT05oVVRyQkxt?=
+ =?utf-8?B?RkppYU5MUG92YUJUOFBzUVdjVDhTQWJPQWNNZnhVVS9ZM1ZEZER1bXphdW5i?=
+ =?utf-8?B?QVAxWmZ5U0Z3TDJQZHNyVkRDWWhtSXNWcFRMRWJucmE0bnR3bFh0U2pqd1pv?=
+ =?utf-8?B?S2hiRlBmeDIydUpUbHdFY1FGM0xhOWZkdmQvREZjVVlrTlJUb3dOYzRaa2lY?=
+ =?utf-8?B?ZEJsZldTLzBUWk5rZ0pNVUR4OWM0SkVBWWdDYktISEE2L2RBTTl0cVJpTnh2?=
+ =?utf-8?B?NWltVmpRZFU4OWtHdnNKdHNCVVVKWCtqOUlGSVBMRTNRVll2SFRJRVVQelNG?=
+ =?utf-8?B?Uzg4Ulhlbjl1REZ3TUt0NFdnQk80aWhHalNYaUZ5c1NuTXNiRnhNYmVFMmJ6?=
+ =?utf-8?B?R0xyd3BHdWdzZ2NSbE5aMy9lN0ZickZJc1FCTEZualFDN1dwWTl0TXZEbFh2?=
+ =?utf-8?B?amdPSFMrYlEvS2xpVWcrMHB2b3VkRVl2VlJYMjY1WFMzMk9zekQxNkk5MWxz?=
+ =?utf-8?B?am9FT2EweGcrcmFoRm9TOWVWbVZLRTVMaGk1cVR3bTArbGg1SlJXbEVHYkpN?=
+ =?utf-8?B?YncwUEJyUEo2eGl3V1QvbmRsK1hCdE1mTFAwdFI0L0daRHhKR2J4YnUrOG9s?=
+ =?utf-8?B?VlNIOW0wZmlEbHFuSWFSeXpzUzZUM0xQSkpQcXlMOHMwSHV4Z05PWk9KWis4?=
+ =?utf-8?B?SG40SmhuV2o4Sjk4cG5EWDlxS0hjZUNiWGNNcWJvNkRxTldjWkR4MHAxSHh3?=
+ =?utf-8?B?b01iRzc0THlxdEVYWkJpT3g3d0hsL0pHZHFjK3VvUk9lV2lQWmFCbkZVcEhy?=
+ =?utf-8?B?RXplMzloZUp2NC9MM01ZYjlGVFFDMzljNXVIWjBCQWVrbE45NE1lSkl2NHBL?=
+ =?utf-8?B?SlA3VmZoZmZKek9PdjJvaDhzM2JhNFFZSlZuV3RnUUpRdUhQNytKZFdFNEZW?=
+ =?utf-8?B?bUk4eHNWOEUvbnhOc1Y4eS95TTU2OG5wU3U5R2tKL3lDbHRUSnozM2JKYXJ4?=
+ =?utf-8?B?eHY1UUxZYms0cGxKV05BQWducWdCbjFLRGJ3Z0FvQUloT09SMkJQU3ZOTjNw?=
+ =?utf-8?B?cEIvTjd6T29veVBuVXBFSW5Bd0pLYU9uWjNMU1hMM2FvbTkxeUF3WU1nT1ZO?=
+ =?utf-8?B?cCtNUEN5MnBKREdkK1NsVG1lK245Rm9iWjJmWFc4QW9rYmFCWUdiRGlkSVFB?=
+ =?utf-8?B?WjRnR0NvTjdTcTJRVlFDZUdJRnN0alBOUGxvVnJ5TDZFNldMajBQMjQzWWtU?=
+ =?utf-8?B?MVZyN0tuZDhzcExHdzZJUmlxaFVrd2dDNEVZYzlSZHhGdFFqYlcveG5odUV1?=
+ =?utf-8?B?a3Rhak0yQ1dWRnYrTVFHcU5NT0NQWlBhM2Z1Q2gvSUdJZkVHbnRteFNRZENK?=
+ =?utf-8?B?azhFc2dTWTk0NmxDbWZGZGY4RmR6NDFoWUtPcWZHa2FCTFFzaUtyNUFIdkw4?=
+ =?utf-8?B?OC9BNm5xOTZoeVM4QlpNRWI4Z0VBaXR2MEQwKzVYUVNLeDNOYlAyYVNrMEhy?=
+ =?utf-8?B?eG1MNUk2YVFCSmg2T3ZmZ3laRGdlN0YrRXlVR2pOMm5rMlNTa1JWZU90dXV3?=
+ =?utf-8?B?WVp5NDBxeFVZMmU0WFBZNWpvL0UxdWNKY05abzBKZ2lnOE9uL2c3L1doZy9S?=
+ =?utf-8?B?VEJHcEY1dkhNaUt4Q2dJVUNraEE0UUIwU0E0NTN4a2lBVTJJYVBjUjN6dTZk?=
+ =?utf-8?B?N245S2dyN3duaWFmSDNSM1RiNUlnckpjU3R2bVVNRm9PVWhZSlVrOUNWaDVu?=
+ =?utf-8?B?akFlait4WnpybjY2TUlaUy9helV5UGsxN3grMHN3WTdOTTRKUUZCQWNkQzh4?=
+ =?utf-8?B?NytscEtBOVNFQUMzdVdDSE1JRmMwSC95cmIxQ1FHaTJmYlNWQjRKNlZFMnRB?=
+ =?utf-8?B?SFdNSTBnS2IvMGhFbjRaWVcxcS9YQ0ppcWFFSDRWOTVRWlNwLy9iSmVVUHU0?=
+ =?utf-8?B?M3hCVEg1MjZ6K3VJdm5nZVNjTHRSQTQzZ0ZXazBzUi85RElJUkxUK1pnbUVT?=
+ =?utf-8?B?eGJQTmIzckYwRmVvVmlnRXpaeHFxalphSlFveFBXaTZ5UDFkMUVyQ24yWnlK?=
+ =?utf-8?B?UFlGaUJDcm5zNVlCR0FhT3lGakJtajAweCtCalhkS3BkV3BSVCtRWStJZXYx?=
+ =?utf-8?B?TzAyenk4TGZQaXh0VStaMTBoT1lEVEdVWWsvYVFQSk5ML2U3SFEzOGl4ZzZx?=
+ =?utf-8?B?REE9PQ==?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1827fb4a-f9a1-4569-fccc-08db940dfc2f
+X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Aug 2023 10:30:15.6576
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Aug 2023 10:39:59.2809
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: wC7Wmp/4s4q/YDb+xMBiQnhtPz4UklCuliYVrVuaTIpwGSuJHj1AvSl6OTVgWKAS9+FUytYOijSL0x0Uli5A++G1qevIrT+vgMqA43IDnNs=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB5470
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-UserPrincipalName: d6bm+s/xJwBUxfjaZr1n3uGaUmUiTFAqnuSsFkPgFynCIqgShf6W5a+Cq2NOjxZN8DtkCN/pz/U5wiVc982AOA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBBPR04MB7851
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Aug 03, 2023 at 11:59:00AM +0200, Ard Biesheuvel wrote:
-> Any clue why zlib_deflate was chosen in this case?
-I believe it was done for integrity.
-The output of zlib_deflate is raw deflate with an header and a footer
-defined in rfc1950. The footer contains a checksum which gets
-calculated over the uncompressed data during compression and checked
-after decompression.
+Hi Rob,
 
--- 
-Giovanni
+On Fri, Jun 16, 2023 at 11:57:43AM -0600, Rob Herring wrote:
+> On Sun, Jun 4, 2023 at 2:55 AM Vladimir Oltean <vladimir.oltean@nxp.com> wrote:
+> >
+> 
+> Sorry, just now seeing this as I've been out the last month.
+> 
+> > On Sat, Jun 03, 2023 at 10:35:50AM +0800, Jianmin Lv wrote:
+> > > > How about 3. handle of_device_is_available() in the probe function of
+> > > > the "loongson, pci-gmac" driver? Would that not work?
+> > > >
+> > > This way does work only for the specified device. There are other devices,
+> > > such as HDA, I2S, etc, which have shared pins. Then we have to add
+> > > of_device_is_available() checking to those drivers one by one. And we are
+> > > not sure if there are other devices in new generation chips in future. So
+> > > I'm afraid that the way you mentioned is not suitable for us.
+> 
+> If we decided that disabled devices should probe, then that is exactly
+> what will have to be done. The restriction (of shared pins) is in the
+> devices and is potentially per device, so it makes more sense for the
+> device's drivers to handle than the host bridge IMO. (Assuming the
+> core doesn't handle a per device property.)
+> 
+> 
+> > Got it, so you have more on-chip PCIe devices than the ones listed in
+> > loongson64-2k1000.dtsi, and you don't want to describe them in the
+> > device tree just to put status = "disabled" for those devices/functions
+> > that you don't want Linux to use - although you could, and it wouldn't
+> > be that hard or have unintended side effects.
+> >
+> > Though you need to admit, in case you had an on-chip multi-function PCIe
+> > device like the NXP ENETC, and you wanted Linux to not use function 0,
+> > the strategy you're suggesting here that is acceptable for Loongson
+> > would not have worked.
+> >
+> > I believe we need a bit of coordination from PCIe and device tree
+> > maintainers, to suggest what would be the encouraged best practices and
+> > ways to solve this regression for the ENETC.
+> 
+> I think we need to define what behavior is correct for 'status =
+> "disabled"'. For almost everywhere in DT, it is equivalent to the
+> device is not present. A not present device doesn't probe. There are
+> unfortunately cases where status got ignored/forgotten and PCI was one
+> of those. PCI is a bit different since there are 2 sources of
+> information about a device being present. The intent with PCI is DT
+> overrides what's discovered. For example, 'vendor-id' overrides what's
+> read from the h/w.
+> 
+> I think we can fix making the status per function simply by making
+> 'match_driver' be set based on the status. This would move the check
+> later to just before probing. That would not work for a case where
+> accessing the config registers is a problem. It doesn't sound like
+> that's a problem for Loongson based on the above response, but their
+> original solution did prevent that. This change would also mean the
+> PCI quirks would run. Perhaps the func0 memory clearing you need could
+> be run as a quirk instead?
+> 
+> Rob
+
+Sorry to return to this thread very late. I had lots of other stuff to
+take care of, and somehow *this* breakage had less priority :)
+
+So, first off, there's a confusion regarding the "func0 memory clearing"
+that could be run as a quirk instead. It's not memory clearing for fn 0,
+but memory clearing for all ENETC functions, regardless or not whether
+they have status = "disabled" or not in the device tree.
+
+That being said, I've implemented the workaround below in a quirk as
+you've said, and the quirks only get applied for those PCI functions
+which don't have status = "disabled" in the device tree. So, as things
+stand, it won't work.
+
+Also, the original patch on which we're commenting ("PCI: don't skip
+probing entire device if first fn OF node has status = "disabled"") is
+needed in any case, because of the other issue: the PCI core thinks that
+when fn 0 has status = "disabled", fn 1 .. 6 are also unavailable. False.
+
+From 9c3b88196a7c7e2b010d051c6d48faf36791e220 Mon Sep 17 00:00:00 2001
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+Date: Tue, 20 Jun 2023 16:31:07 +0300
+Subject: [PATCH] net: enetc: reimplement RFS/RSS memory clearing as PCI quirk
+
+Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+---
+ .../net/ethernet/freescale/enetc/enetc_pf.c   | 57 ++++++++++++++-----
+ 1 file changed, 43 insertions(+), 14 deletions(-)
+
+diff --git a/drivers/net/ethernet/freescale/enetc/enetc_pf.c b/drivers/net/ethernet/freescale/enetc/enetc_pf.c
+index 1416262d4296..b8f6f0799170 100644
+--- a/drivers/net/ethernet/freescale/enetc/enetc_pf.c
++++ b/drivers/net/ethernet/freescale/enetc/enetc_pf.c
+@@ -1242,18 +1242,6 @@ static int enetc_pf_probe(struct pci_dev *pdev,
+ 	if (err)
+ 		goto err_setup_cbdr;
+
+-	err = enetc_init_port_rfs_memory(si);
+-	if (err) {
+-		dev_err(&pdev->dev, "Failed to initialize RFS memory\n");
+-		goto err_init_port_rfs;
+-	}
+-
+-	err = enetc_init_port_rss_memory(si);
+-	if (err) {
+-		dev_err(&pdev->dev, "Failed to initialize RSS memory\n");
+-		goto err_init_port_rss;
+-	}
+-
+ 	if (node && !of_device_is_available(node)) {
+ 		dev_info(&pdev->dev, "device is disabled, skipping\n");
+ 		err = -ENODEV;
+@@ -1339,8 +1327,6 @@ static int enetc_pf_probe(struct pci_dev *pdev,
+ 	si->ndev = NULL;
+ 	free_netdev(ndev);
+ err_alloc_netdev:
+-err_init_port_rss:
+-err_init_port_rfs:
+ err_device_disabled:
+ err_setup_mac_addresses:
+ 	enetc_teardown_cbdr(&si->cbd_ring);
+@@ -1377,6 +1363,49 @@ static void enetc_pf_remove(struct pci_dev *pdev)
+ 	enetc_pci_remove(pdev);
+ }
+
++static void enetc_fixup_clear_rss_rfs(struct pci_dev *pdev)
++{
++	struct enetc_si *si;
++	struct enetc_pf *pf;
++	int err;
++
++	err = enetc_pci_probe(pdev, KBUILD_MODNAME, sizeof(*pf));
++	if (err)
++		goto out;
++
++	si = pci_get_drvdata(pdev);
++	if (!si->hw.port || !si->hw.global) {
++		err = -ENODEV;
++		goto out_pci_remove;
++	}
++
++	err = enetc_setup_cbdr(&pdev->dev, &si->hw, ENETC_CBDR_DEFAULT_SIZE,
++			       &si->cbd_ring);
++	if (err)
++		goto out_pci_remove;
++
++	err = enetc_init_port_rfs_memory(si);
++	if (err)
++		goto out_teardown_cbdr;
++
++	err = enetc_init_port_rss_memory(si);
++	if (err)
++		goto out_teardown_cbdr;
++
++out_teardown_cbdr:
++	enetc_teardown_cbdr(&si->cbd_ring);
++out_pci_remove:
++	enetc_pci_remove(pdev);
++out:
++	if (err) {
++		dev_err(&pdev->dev,
++			"Failed to apply PCI fixup for clearing RFS/RSS memories: %pe\n",
++			ERR_PTR(err));
++	}
++}
++DECLARE_PCI_FIXUP_FINAL(PCI_VENDOR_ID_FREESCALE, ENETC_DEV_ID_PF,
++			enetc_fixup_clear_rss_rfs);
++
+ static const struct pci_device_id enetc_pf_id_table[] = {
+ 	{ PCI_DEVICE(PCI_VENDOR_ID_FREESCALE, ENETC_DEV_ID_PF) },
+ 	{ 0, } /* End of table. */
+--
+2.34.1
+
 
