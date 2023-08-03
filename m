@@ -1,106 +1,71 @@
-Return-Path: <netdev+bounces-23851-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23852-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26AF376DDD5
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 04:06:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4CE876DDD9
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 04:07:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D5285281F17
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 02:06:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 62476281F55
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 02:07:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC28C2107;
-	Thu,  3 Aug 2023 02:06:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B1673D7C;
+	Thu,  3 Aug 2023 02:07:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB9F87F
-	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 02:06:47 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E8F77C433C8;
-	Thu,  3 Aug 2023 02:06:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 836DF7F
+	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 02:07:36 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A104CC433C7;
+	Thu,  3 Aug 2023 02:07:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691028407;
-	bh=F7jcE1coWI7butGrmgWnkAlL4JiykzmKbIjWoEuOFfU=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=XNGOVjuDkI1hr5qFgxFmEi+47j3P11mDX5WfgSm2O93/C/3X6yF+2XqLT6L8PmFS6
-	 Wokxv9wAKviJA9QyRQJYNoEihkgGwE6SpP7/IzOjgArKr47MJPuj2C360HB8ICNJL2
-	 TfQCqvTjvQa0PlkUWSgtucx+jc+8xXO5Ow+iv1brTyH0I4DGcB/14gek0GoqG1Ljxb
-	 GhEAAe1K4PFRPeDOS546w+LlAceYIs8ZyZTav1sOiQUG5rfV3XHoXbhRaJOB4Rk+uI
-	 IKr/1oqUkPnLWurxSOpl/xbILh49YlciTM4ZRUjNkiXxdqBIY0wXEMrELrRFd6Ol4u
-	 4r/MFCpxBibyA==
-Message-ID: <85c6c94e-1243-33ae-dadd-9bcdd7d328d1@kernel.org>
-Date: Wed, 2 Aug 2023 20:06:46 -0600
+	s=k20201202; t=1691028456;
+	bh=aik8cH2XF43pgGb9ZpqXmB3JGeEEzKxjYTCA21AGLdk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=X/GMCVBtRYzR+qRDcAHfrU8Clk/JaJLRqhadqtp2mAjmovNCraINJRf/N1SQETtx5
+	 VXIUvDtdnqgR9uKFJKIgxpbtaE2Ac6886lLg2+iaHo+mLm3LmPMBr69EsUDtSTURe2
+	 czcjdaa29AQr8C/J10vXvr5pOqB9vBeyOCBgwcY16UohFHaURQ3DRmdHD9PngD4Htl
+	 CHnHii8YWRquax4d0RfOaAH6ma7Q2MJ8jcsgyTsxHIaSoKlQe+Z3q0JBj2pYFs+DPW
+	 e6rGxQtBBrYgRIsTd/HIfPmfY8zfcF1B3YNC36W+RrLGjlUA5u5vep6C5yasgYfx6k
+	 QYUqG6LQuTe4Q==
+Date: Wed, 2 Aug 2023 19:07:34 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
+ edumazet@google.com, moshe@nvidia.com, saeedm@nvidia.com,
+ idosch@nvidia.com, petrm@nvidia.com
+Subject: Re: [patch net-next v2 00/11] devlink: use spec to generate split
+ ops
+Message-ID: <20230802190734.4a9f9c0a@kernel.org>
+In-Reply-To: <20230802152023.941837-1-jiri@resnulli.us>
+References: <20230802152023.941837-1-jiri@resnulli.us>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.13.0
-Subject: Re: [PATCH net-next v5 2/2] selftests: fib_tests: Add a test case for
- IPv6 garbage collection
-Content-Language: en-US
-To: thinker.li@gmail.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, netdev@vger.kernel.org, pabeni@redhat.com,
- martin.lau@linux.dev, kernel-team@meta.com, yhs@meta.com
-Cc: sinquersw@gmail.com, kuifeng@meta.com
-References: <20230802004303.567266-1-thinker.li@gmail.com>
- <20230802004303.567266-3-thinker.li@gmail.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20230802004303.567266-3-thinker.li@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On 8/1/23 6:43 PM, thinker.li@gmail.com wrote:
-\> @@ -747,6 +750,97 @@ fib_notify_test()
->  	cleanup &> /dev/null
->  }
->  
-> +fib6_gc_test()
-> +{
-> +	echo
-> +	echo "Fib6 garbage collection test"
-> +
-> +	STRACE=$(which strace)
-> +	if [ -z "$STRACE" ]; then
-> +	    echo "    SKIP: strace not found"
-> +	    ret=$ksft_skip
-> +	    return
-> +	fi
-> +
-> +	EXPIRE=10
-> +
-> +	setup
-> +
-> +	set -e
-> +
-> +	# Check expiration of routes every 3 seconds (GC)
-> +	$NS_EXEC sysctl -wq net.ipv6.route.gc_interval=300
-> +
-> +	$IP link add dummy_10 type dummy
-> +	$IP link set dev dummy_10 up
-> +	$IP -6 address add 2001:10::1/64 dev dummy_10
-> +
-> +	$NS_EXEC sysctl -wq net.ipv6.route.flush=1
-> +
-> +	# Temporary routes
-> +	for i in $(seq 1 1000); do
-> +	    # Expire route after $EXPIRE seconds
-> +	    $IP -6 route add 2001:20::$i \
-> +		via 2001:10::2 dev dummy_10 expires $EXPIRE
-> +	done
-> +	N_EXP=$($IP -6 route list |grep expires|wc -l)
-> +	if [ $N_EXP -ne 1000 ]; then
+On Wed,  2 Aug 2023 17:20:12 +0200 Jiri Pirko wrote:
+> This is an outcome of the discussion in the following thread:
+> https://lore.kernel.org/netdev/20230720121829.566974-1-jiri@resnulli.us/
+> It serves as a dependency on the linked selector patchset.
+> 
+> There is an existing spec for devlink used for userspace part
+> generation. There are two commands supported there.
+> 
+> This patchset extends the spec so kernel split ops code could
+> be generated from it.
 
-race condition here ... that you can install all 1000 routes and then
-run this command before any expire. 10 seconds is normally more than
-enough time, but on a loaded server it might not be. And really it does
-not matter. What matters is that you install routes with an expires and
-they disappear when expected - and I believe the flush below should not
-be needed to validate they have been removed.
+Looks good! But you need to reshuffle stuff in patches 7-10
+because there's a temporary build breakage. Some squashing,
+reordering and maybe splitting patch 10 should do?
 
-
+Feel free to post v3 without waiting the full 24h.
+-- 
+pw-bot: cr
 
