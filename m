@@ -1,90 +1,86 @@
-Return-Path: <netdev+bounces-24046-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24047-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C15CF76E99C
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 15:10:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CDA5A76E9A0
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 15:11:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7C87A282191
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 13:10:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 86E612814A2
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 13:11:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F3871F163;
-	Thu,  3 Aug 2023 13:10:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DCF01F163;
+	Thu,  3 Aug 2023 13:11:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D37C21ED51;
-	Thu,  3 Aug 2023 13:10:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 383D2C433C8;
-	Thu,  3 Aug 2023 13:10:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33EA71ED51
+	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 13:11:31 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0A311C433C8;
+	Thu,  3 Aug 2023 13:11:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691068221;
-	bh=zJq+7MHzjebZFTJ3+CcDRXVZzxlvDho72oqWr9mesO0=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=SVUCI//OsHkUay0eCPcq7hyihL/dnpSISjlvafir7TNzgKr6krpnN7O1CEzyX1cOs
-	 0qYKyC5EoL6LmYRC238BW9ddC2U6v53zUgb7LNimftPrKFNB6j36/smZKrrK9LVSLx
-	 MhGwBwAy/uS5ZCVkb2cYYj5xgOJxbpZLYVZpp32TbOlMTQh79TO+6wQXwADhEgS5rP
-	 MQFagNyOnOrCzAk43HZ1R6Xwzs1gnBAzp0pAEAVvX/7xLdQDby6iXttC6qnXMhBUdp
-	 xYSzobqnoSRFrxfB7zfHlB6BEjal51h5jgFmD9XPg7x8iv0qb/SRedoHy8tZaGI/vK
-	 pJ1b6NUqzoIRQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 1951CC41620;
-	Thu,  3 Aug 2023 13:10:21 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1691068291;
+	bh=NFgjhsYWKg2kV+IdSU2QgpqJ/xaClNZ3CuB7+zRizSM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=QItRHDP0Kz/gHLGpJUI7kH4nlfINPbSSuXKkXQAeJswaJN1lpxtIG0ydN0DoqQyw+
+	 4ktIX+sNgpp6y3H6P5s6X1YoxaFn9loWWSL+ebUxdGw5JGT8i8PaHHmvgWY5x7yfa2
+	 8fqHWuvaK4Tz2r6EJGjalQPqv7Bqv3CIxQHtFNw1rBJTwK66yNCtyv+ThOHyw/AiwZ
+	 uG0VqyjFKqWEhi/26P97oo4sS4D+HRlyTUw0vMN2sw1F/dB9LkdWRHjSbVMFWabbIK
+	 KlBti9mA5dUQqdGuk9H7OYp12UK1qeka+W2rnniWjxO7zUowFfsykM+cHSdiC0+2GH
+	 IEBBzezxejJLA==
+Date: Thu, 3 Aug 2023 16:11:26 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Marcin Szycik <marcin.szycik@linux.intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
+Subject: Re: [PATCH iwl-net] ice: Block switchdev mode when ADQ is acvite and
+ vice versa
+Message-ID: <20230803131126.GD53714@unreal>
+References: <20230801115235.67343-1-marcin.szycik@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] udp6: Fix __ip6_append_data()'s handling of
- MSG_SPLICE_PAGES
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169106822109.11210.4147932489626206535.git-patchwork-notify@kernel.org>
-Date: Thu, 03 Aug 2023 13:10:21 +0000
-References: <1580952.1690961810@warthog.procyon.org.uk>
-In-Reply-To: <1580952.1690961810@warthog.procyon.org.uk>
-To: David Howells <dhowells@redhat.com>
-Cc: netdev@vger.kernel.org, willemdebruijn.kernel@gmail.com,
- syzbot+f527b971b4bdc8e79f9e@syzkaller.appspotmail.com, bpf@vger.kernel.org,
- brauner@kernel.org, davem@davemloft.net, dsahern@kernel.org,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, axboe@kernel.dk,
- viro@zeniv.linux.org.uk, linux-fsdevel@vger.kernel.org,
- syzkaller-bugs@googlegroups.com, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230801115235.67343-1-marcin.szycik@linux.intel.com>
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Wed, 02 Aug 2023 08:36:50 +0100 you wrote:
-> __ip6_append_data() can has a similar problem to __ip_append_data()[1] when
-> asked to splice into a partially-built UDP message that has more than the
-> frag-limit data and up to the MTU limit, but in the ipv6 case, it errors
-> out with EINVAL.  This can be triggered with something like:
+On Tue, Aug 01, 2023 at 01:52:35PM +0200, Marcin Szycik wrote:
+> ADQ and switchdev are not supported simultaneously. Enabling both at the
+> same time can result in nullptr dereference.
 > 
->         pipe(pfd);
->         sfd = socket(AF_INET6, SOCK_DGRAM, 0);
->         connect(sfd, ...);
->         send(sfd, buffer, 8137, MSG_CONFIRM|MSG_MORE);
->         write(pfd[1], buffer, 8);
->         splice(pfd[0], 0, sfd, 0, 0x4ffe0ul, 0);
+> To prevent this, check if ADQ is active when changing devlink mode to
+> switchdev mode, and check if switchdev is active when enabling ADQ.
 > 
-> [...]
+> Fixes: fbc7b27af0f9 ("ice: enable ndo_setup_tc support for mqprio_qdisc")
+> Signed-off-by: Marcin Szycik <marcin.szycik@linux.intel.com>
+> ---
+>  drivers/net/ethernet/intel/ice/ice_eswitch.c | 5 +++++
+>  drivers/net/ethernet/intel/ice/ice_main.c    | 6 ++++++
+>  2 files changed, 11 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/intel/ice/ice_eswitch.c b/drivers/net/ethernet/intel/ice/ice_eswitch.c
+> index ad0a007b7398..2ea5aaceee11 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_eswitch.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_eswitch.c
+> @@ -538,6 +538,11 @@ ice_eswitch_mode_set(struct devlink *devlink, u16 mode,
+>  		break;
+>  	case DEVLINK_ESWITCH_MODE_SWITCHDEV:
+>  	{
+> +		if (ice_is_adq_active(pf)) {
+> +			dev_err(ice_pf_to_dev(pf), "switchdev cannot be configured - ADQ is active. Delete ADQ configs using TC and try again\n");
 
-Here is the summary with links:
-  - [net-next] udp6: Fix __ip6_append_data()'s handling of MSG_SPLICE_PAGES
-    https://git.kernel.org/netdev/net-next/c/ce650a166335
+It needs to be reported through netlink extack.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+> +			return -EOPNOTSUPP;
+> +		}
+> +
+>  		dev_info(ice_pf_to_dev(pf), "PF %d changed eswitch mode to switchdev",
+>  			 pf->hw.pf_id);
+>  		NL_SET_ERR_MSG_MOD(extack, "Changed eswitch mode to switchdev");
 
-
+Thanks
 
