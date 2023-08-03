@@ -1,121 +1,88 @@
-Return-Path: <netdev+bounces-23900-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23901-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01CE676E10A
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 09:14:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72A2A76E152
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 09:26:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AD5DC281F5B
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 07:14:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4BE471C20F99
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 07:26:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A59929440;
-	Thu,  3 Aug 2023 07:14:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23AD29444;
+	Thu,  3 Aug 2023 07:26:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A8FE8F78
-	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 07:14:30 +0000 (UTC)
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 405AF2D71
-	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 00:14:29 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-58440eb872aso7156947b3.3
-        for <netdev@vger.kernel.org>; Thu, 03 Aug 2023 00:14:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691046868; x=1691651668;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=lDdqPrRDqdMbZv149TiwZ7bESjJ5cNtj5K7U0z+veTk=;
-        b=J0Woy586ugLmFBHtAm4fZr9oC+K7nUE9IiOVgEtL5IlPSlMyPdOQ0dAN7ZDgMKLObp
-         YmQG1t/MtEv4LHpdilRg45hlz/zlbb6IS4IgjGw2fcqd4qCerBRuPhZfLIDZJnK6mrAw
-         kvNNMCeVS+vJpa1qp7NQpDctVQLKzghQcI4Zlzbg/+gufgR1SZlky1RWDUHXbfkLvvi8
-         UZm/bwJTOWhKNRHpiLhJpEIKzBrnpWWSiHCgIbPuYVOEpM93RgSQpbnmj3XaMr+bdCjk
-         se4fUoBnCdS368CDNsdXsmYdpFvUvSe94BRd8XZW9knN8RcdAGHZbQaIZ6EVZCvZXE8m
-         qwHQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691046868; x=1691651668;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=lDdqPrRDqdMbZv149TiwZ7bESjJ5cNtj5K7U0z+veTk=;
-        b=VJJq7hbg4n3TXTyJWP6JdUb8GAkGDzKC2NXSCNQDRZJBEP1mIJMwPhoHCPCsp/HEe2
-         fmQPJ8LAkW74C1lJn0Cpm1cSA8eZ0foIg42W6wOqtebszvZhOB42hO3vWfsjQV0ypMOY
-         W5Nft/3PjhykhJxewxHzh8dJp5wTd4AOHzGb+d4oc87CscBummZXhblkzagZKfLHlAd0
-         en2LdjEOWQzF4dqeil4oMARGExfsYo7eD3s7vyfI3ji69fy4RpZ2ZYviSo3ifp7jqJyW
-         OYdTK0j0Q8zl2Rh422oY7Q7SigbQpnELvP1aWIAnRQ0NdS3bpDRZeULAzCqOqjvDh1i5
-         sSfQ==
-X-Gm-Message-State: ABy/qLZ5KIt2msQrydwB3ir5Oo0rCbzFWq4abOmqq7NMkvmfKFfdyRIq
-	Z2yG31KKKZeZ5e+5LMZs6T6Ux8/F1AufBg==
-X-Google-Smtp-Source: APBJJlG/PF2P2WnrN72a9QuqnUxIj2HclxTotV5ItkJ9RlIVAsOvHkTFZesYwhWLQFN2NktHuhx2kJZ9YVnZcA==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a81:b104:0:b0:583:9913:f293 with SMTP id
- p4-20020a81b104000000b005839913f293mr161191ywh.1.1691046868440; Thu, 03 Aug
- 2023 00:14:28 -0700 (PDT)
-Date: Thu,  3 Aug 2023 07:14:26 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 181138F5D
+	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 07:25:59 +0000 (UTC)
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E573F0
+	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 00:25:58 -0700 (PDT)
+Received: from canpemm100004.china.huawei.com (unknown [172.30.72.57])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RGgKL1CflzNmpc;
+	Thu,  3 Aug 2023 15:22:30 +0800 (CST)
+Received: from hulk-vt.huawei.com (10.67.174.111) by
+ canpemm100004.china.huawei.com (7.192.105.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Thu, 3 Aug 2023 15:25:56 +0800
+From: Xiang Yang <xiangyang3@huawei.com>
+To: <matthieu.baerts@tessares.net>, <martineau@kernel.org>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>
+CC: <netdev@vger.kernel.org>, <mptcp@lists.linux.dev>, <xiangyang3@huawei.com>
+Subject: [PATCH -next] mptcp: fix the incorrect judgment for msk->cb_flags
+Date: Thu, 3 Aug 2023 07:24:38 +0000
+Message-ID: <20230803072438.1847500-1-xiangyang3@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.41.0.640.ga95def55d0-goog
-Message-ID: <20230803071426.2012024-1-edumazet@google.com>
-Subject: [PATCH net-next] net: vlan: update wrong comments
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.6
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.67.174.111]
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ canpemm100004.china.huawei.com (7.192.105.92)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-vlan_insert_tag() and friends do not allocate a new skb.
-However they might allocate a new skb->head.
-Update their comments to better describe their behavior.
+Coccicheck reports the error below:
+net/mptcp/protocol.c:3330:15-28: ERROR: test of a variable/field address
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
+Since the address of msk->cb_flags is used in __test_and_clear_bit, the
+address should not be NULL. The judgment for if (unlikely(msk->cb_flags))
+will always be true, we should check the real value of msk->cb_flags here.
+
+Fixes: 65a569b03ca8 ("mptcp: optimize release_cb for the common case")
+Signed-off-by: Xiang Yang <xiangyang3@huawei.com>
 ---
- include/linux/if_vlan.h | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ net/mptcp/protocol.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/include/linux/if_vlan.h b/include/linux/if_vlan.h
-index 6ba71957851e22829ec9f18cd29bea2d92dfa583..3028af87716e291cafcb4d67d89bc810344c9554 100644
---- a/include/linux/if_vlan.h
-+++ b/include/linux/if_vlan.h
-@@ -408,7 +408,7 @@ static inline int __vlan_insert_tag(struct sk_buff *skb,
-  * @mac_len: MAC header length including outer vlan headers
-  *
-  * Inserts the VLAN tag into @skb as part of the payload at offset mac_len
-- * Returns a VLAN tagged skb. If a new skb is created, @skb is freed.
-+ * Returns a VLAN tagged skb. This might change skb->head.
-  *
-  * Following the skb_unshare() example, in case of error, the calling function
-  * doesn't have to worry about freeing the original skb.
-@@ -437,7 +437,7 @@ static inline struct sk_buff *vlan_insert_inner_tag(struct sk_buff *skb,
-  * @vlan_tci: VLAN TCI to insert
-  *
-  * Inserts the VLAN tag into @skb as part of the payload
-- * Returns a VLAN tagged skb. If a new skb is created, @skb is freed.
-+ * Returns a VLAN tagged skb. This might change skb->head.
-  *
-  * Following the skb_unshare() example, in case of error, the calling function
-  * doesn't have to worry about freeing the original skb.
-@@ -457,7 +457,7 @@ static inline struct sk_buff *vlan_insert_tag(struct sk_buff *skb,
-  * @vlan_tci: VLAN TCI to insert
-  *
-  * Inserts the VLAN tag into @skb as part of the payload
-- * Returns a VLAN tagged skb. If a new skb is created, @skb is freed.
-+ * Returns a VLAN tagged skb. This might change skb->head.
-  *
-  * Following the skb_unshare() example, in case of error, the calling function
-  * doesn't have to worry about freeing the original skb.
+diff --git a/net/mptcp/protocol.c b/net/mptcp/protocol.c
+index 65ee949a8a44..fae31dab49c9 100644
+--- a/net/mptcp/protocol.c
++++ b/net/mptcp/protocol.c
+@@ -3327,7 +3327,7 @@ static void mptcp_release_cb(struct sock *sk)
+ 
+ 	if (__test_and_clear_bit(MPTCP_CLEAN_UNA, &msk->cb_flags))
+ 		__mptcp_clean_una_wakeup(sk);
+-	if (unlikely(&msk->cb_flags)) {
++	if (unlikely(msk->cb_flags)) {
+ 		/* be sure to set the current sk state before tacking actions
+ 		 * depending on sk_state, that is processing MPTCP_ERROR_REPORT
+ 		 */
 -- 
-2.41.0.640.ga95def55d0-goog
+2.34.1
 
 
