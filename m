@@ -1,160 +1,71 @@
-Return-Path: <netdev+bounces-24176-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24177-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2D9176F1AD
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 20:17:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 850DB76F1B1
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 20:17:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1B2DA1C21647
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 18:17:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3F5402822C9
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 18:17:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A34BA25900;
-	Thu,  3 Aug 2023 18:17:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59A5A25903;
+	Thu,  3 Aug 2023 18:17:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9537A24161
-	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 18:17:03 +0000 (UTC)
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07FE31704
-	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 11:17:01 -0700 (PDT)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ukl@pengutronix.de>)
-	id 1qRcsX-0005L1-1E; Thu, 03 Aug 2023 20:16:53 +0200
-Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.94.2)
-	(envelope-from <ukl@pengutronix.de>)
-	id 1qRcsQ-000tz3-N9; Thu, 03 Aug 2023 20:16:46 +0200
-Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
-	(envelope-from <ukl@pengutronix.de>)
-	id 1qRcsP-00ACyp-TG; Thu, 03 Aug 2023 20:16:45 +0200
-Date: Thu, 3 Aug 2023 20:16:40 +0200
-From: Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
-To: Ioana Ciornei <ciorneiioana@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Ioana Ciornei <ioana.ciornei@nxp.com>,
-	Alexandru Ardelean <alexandru.ardelean@analog.com>,
-	Andre Edich <andre.edich@microchip.com>,
-	Antoine Tenart <atenart@kernel.org>,
-	Baruch Siach <baruch@tkos.co.il>,
-	Christophe Leroy <christophe.leroy@c-s.fr>,
-	Divya Koppera <Divya.Koppera@microchip.com>,
-	Hauke Mehrtens <hauke@hauke-m.de>,
-	Jerome Brunet <jbrunet@baylibre.com>,
-	Kavya Sree Kotagiri <kavyasree.kotagiri@microchip.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Marco Felsch <m.felsch@pengutronix.de>, Marek Vasut <marex@denx.de>,
-	Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
-	Mathias Kresin <dev@kresin.me>, Maxim Kochetkov <fido_max@inbox.ru>,
-	Michael Walle <michael@walle.cc>,
-	Neil Armstrong <narmstrong@baylibre.com>,
-	Nisar Sayed <Nisar.Sayed@microchip.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	Philippe Schenker <philippe.schenker@toradex.com>,
-	Willy Liu <willy.liu@realtek.com>,
-	Yuiko Oshino <yuiko.oshino@microchip.com>
-Subject: Re: [PATCH net-next v2 02/19] net: phy: add a shutdown procedure
-Message-ID: <20230803181640.yzxsk2xphwryxww4@pengutronix.de>
-References: <20201101125114.1316879-1-ciorneiioana@gmail.com>
- <20201101125114.1316879-3-ciorneiioana@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0720F24161
+	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 18:17:34 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB1AEC433C8;
+	Thu,  3 Aug 2023 18:17:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1691086654;
+	bh=eFNBhBaVjqMLEN64GMvfHB1O2ZA4bHNQxw/O6nWVKVA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=hWDLwqkl9cba6rL1dO1czm4V39g6/zrqxlamrZx66fiU3LtcuQEyY3mHSI+Fa9HZI
+	 p+cXDuhV7XFg/KOdAtKiQKBnubgXAdivLmEOi9Un8Ie0ZQDxAvzy3eCgRzOrDCW1xK
+	 jlowrkuSXugor8/GLskdVyTDRpTIeqT/7J/MtOTwpMx+ZqYdUXvGxbc0IqVbqM9mgm
+	 5hlaakfSrINoy+Nh35ewnVCMaxJz64CuhylEV2Z6RKvvusyI3NLHK+TQqxmSykGxAf
+	 2XWHPB81AZHabBx1JW2591ozC2/lTsfCZt/2tIw1buHZ13YlkjN7LUr3CYhMcbTYD9
+	 NWrYgrBTOVDzQ==
+Date: Thu, 3 Aug 2023 21:17:30 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Ruan Jinjie <ruanjinjie@huawei.com>
+Cc: borisp@nvidia.com, saeedm@nvidia.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	linux-rdma@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next] net/mlx5: remove many unnecessary NULL values
+Message-ID: <20230803181730.GG53714@unreal>
+References: <20230801123854.375155-1-ruanjinjie@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="emeii36judbalvyq"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20201101125114.1316879-3-ciorneiioana@gmail.com>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ukl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+In-Reply-To: <20230801123854.375155-1-ruanjinjie@huawei.com>
 
+On Tue, Aug 01, 2023 at 08:38:54PM +0800, Ruan Jinjie wrote:
+> Ther are many pointers assigned first, which need not to be initialized, so
 
---emeii36judbalvyq
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Ther -> There
 
-Hello,
+> remove the NULL assignment.
 
-this patch became commit e2f016cf775129c050d6c79483073423db15c79a and is
-contained in v5.11-rc1.
+assignment -> assignments.
 
-It broke wake-on-lan on my NAS (an ARM machine with an Armada 370 SoC,
-armada-370-netgear-rn104.dts). The used phy driver is marvell.c. I only
-report it now as I just upgraded that machine from Debian 11 (with
-kernel 5.10.x) to Debian 12 (with kernel 6.1.x).
+> 
+> Signed-off-by: Ruan Jinjie <ruanjinjie@huawei.com>
+> ---
+>  drivers/net/ethernet/mellanox/mlx5/core/fpga/core.c   | 4 ++--
+>  drivers/net/ethernet/mellanox/mlx5/core/lib/hv_vhca.c | 2 +-
+>  2 files changed, 3 insertions(+), 3 deletions(-)
+> 
 
-Commenting out phy_disable_interrupts(...) in v6.1.41's phy_shutdown()
-fixes the problem for me.
-
-On Sun, Nov 01, 2020 at 02:50:57PM +0200, Ioana Ciornei wrote:
-> In case of a board which uses a shared IRQ we can easily end up with an
-> IRQ storm after a forced reboot.
->=20
-> For example, a 'reboot -f' will trigger a call to the .shutdown()
-> callbacks of all devices. Because phylib does not implement that hook,
-> the PHY is not quiesced, thus it can very well leave its IRQ enabled.
->=20
-> At the next boot, if that IRQ line is found asserted by the first PHY
-> driver that uses it, but _before_ the driver that is _actually_ keeping
-> the shared IRQ asserted is probed, the IRQ is not going to be
-> acknowledged, thus it will keep being fired preventing the boot process
-> of the kernel to continue. This is even worse when the second PHY driver
-> is a module.
->=20
-> To fix this, implement the .shutdown() callback and disable the
-> interrupts if these are used.
-
-I don't know how this should interact with wake-on-lan, but I would
-expect that there is a way to fix this without reintroducing the problem
-fixed by this change. However I cannot say if this needs fixing in the
-generic phy code or the phy driver. Any hints?
-=20
-> Note that we are still susceptible to IRQ storms if the previous kernel
-> exited with a panic or if the bootloader left the shared IRQ active, but
-> there is absolutely nothing we can do about these cases.
-
-I'd say the bootloader could handle that, knowing that for some machines
-changing the bootloader isn't an option.
-
-Best regards
-Uwe
-
---=20
-Pengutronix e.K.                           | Uwe Kleine-K=F6nig            |
-Industrial Linux Solutions                 | https://www.pengutronix.de/ |
-
---emeii36judbalvyq
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmTL7v4ACgkQj4D7WH0S
-/k43fQf+LtN8CtvFjSQCPcsJOwWkPa26gDEwrQDGnxYUjOqh3CdgKVV7zp577Cba
-/u8Jj55aA7bYCyBlC3AYsN6sqCR73+9WHEe6dukmV6neiPDWbtWpQ/4GuwESQCOT
-GuB2fszBc6pVN2NZbz4XOKiOraURewkw0+0n/P0dLyu2AyQP6NAzu0FoS4wim3v2
-4o7IUqfxF4FbVco7cbRxysCBddaKcmdkiTKACZrUXedU4YQDniU2r2kUEiuvtogg
-RifYN+rIVtg6TDU5/hMHEtNXWKvilblZlyC/RpSZDgQ2m0G+Fwqpx+XaVQ6BxYrW
-a676/8ncIKLgJAIjfVrdxjK1EEVXDw==
-=7n4Y
------END PGP SIGNATURE-----
-
---emeii36judbalvyq--
+Thanks,
+Reviewed-by: Leon Romanovsky <leonro@nvidia.com>
 
