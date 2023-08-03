@@ -1,32 +1,32 @@
-Return-Path: <netdev+bounces-24005-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24006-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83F7C76E6F3
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 13:33:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3EE2E76E6F4
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 13:33:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3D5BA28213B
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 11:33:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 704021C2157B
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 11:33:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56FD51F19A;
-	Thu,  3 Aug 2023 11:30:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B73218B1A;
+	Thu,  3 Aug 2023 11:30:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C7491DDEB
-	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 11:30:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F272A1EA74
+	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 11:30:52 +0000 (UTC)
 Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 45FF01982
-	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 04:30:23 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 330501981
+	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 04:30:51 -0700 (PDT)
 Received: from loongson.cn (unknown [112.20.109.245])
-	by gateway (Coremail) with SMTP id _____8AxXOrNj8tkN60PAA--.9088S3;
-	Thu, 03 Aug 2023 19:30:21 +0800 (CST)
+	by gateway (Coremail) with SMTP id _____8AxFvHpj8tkX60PAA--.36312S3;
+	Thu, 03 Aug 2023 19:30:49 +0800 (CST)
 Received: from localhost.localdomain (unknown [112.20.109.245])
-	by localhost.localdomain (Coremail) with SMTP id AQAAf8BxXSPJj8tkgx5HAA--.33765S6;
-	Thu, 03 Aug 2023 19:30:21 +0800 (CST)
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8AxTSPoj8tkyR5HAA--.34056S2;
+	Thu, 03 Aug 2023 19:30:49 +0800 (CST)
 From: Feiyang Chen <chenfeiyang@loongson.cn>
 To: andrew@lunn.ch,
 	hkallweit1@gmail.com,
@@ -41,9 +41,9 @@ Cc: Feiyang Chen <chenfeiyang@loongson.cn>,
 	netdev@vger.kernel.org,
 	loongarch@lists.linux.dev,
 	chris.chenfeiyang@gmail.com
-Subject: [PATCH v3 12/16] net: stmmac: dwmac-loongson: Add LS7A support
-Date: Thu,  3 Aug 2023 19:30:06 +0800
-Message-Id: <6bd06061b987815959a17b5ceb490dca4667ee76.1691047285.git.chenfeiyang@loongson.cn>
+Subject: [PATCH v3 13/16] net: stmmac: dwmac-loongson: Add 64-bit DMA and multi-vector support
+Date: Thu,  3 Aug 2023 19:30:34 +0800
+Message-Id: <48ceed6b5d7b32c2e46b79fa597466b9212f745e.1691047285.git.chenfeiyang@loongson.cn>
 X-Mailer: git-send-email 2.39.3
 In-Reply-To: <cover.1691047285.git.chenfeiyang@loongson.cn>
 References: <cover.1691047285.git.chenfeiyang@loongson.cn>
@@ -54,11 +54,11 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:AQAAf8BxXSPJj8tkgx5HAA--.33765S6
+X-CM-TRANSID:AQAAf8AxTSPoj8tkyR5HAA--.34056S2
 X-CM-SenderInfo: hfkh0wphl1t03j6o00pqjv00gofq/
-X-Coremail-Antispam: 1Uk129KBj93XoWxCFy5Kr15ur4xKF18XFy8tFc_yoWrXFWUpa
-	yfAFyaqr95Gry2gan5XFWUX3WY9rW2v348G3y2kryfuayYvr4Yqr15tryjvFyxAFZ5u3ya
-	gryjgFWvgF4Du3XCm3ZEXasCq-sJn29KB7ZKAUJUUUUf529EdanIXcx71UUUUU7KY7ZEXa
+X-Coremail-Antispam: 1Uk129KBj93XoWxWr1UWryrKryUWF1kXw4UJrc_yoWrWr17pF
+	ZxAa47KrW8Jr17Wan8Aw4DAF1YyrWav3y0grWakwnakayqkr9YqFyvqFWIvryxCrWkGF17
+	XF4DKF48W3WUJFXCm3ZEXasCq-sJn29KB7ZKAUJUUUUf529EdanIXcx71UUUUU7KY7ZEXa
 	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
 	0xBIdaVrnRJUUUm2b4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
 	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
@@ -80,140 +80,147 @@ X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Current dwmac-loongson only support LS2K in the "probed with PCI
-and configured with DT" manner. Add LS7A support on which the
-devices are fully PCI (non-DT).
+Set 64-Bit DMA for specific versions. Request allocation for multi-
+vector interrupts for DWLGMAC_CORE_1_00. If it fails, fallback to
+request allocation for single interrupts.
 
 Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
 ---
- .../ethernet/stmicro/stmmac/dwmac-loongson.c  | 79 ++++++++++---------
- 1 file changed, 43 insertions(+), 36 deletions(-)
+ .../ethernet/stmicro/stmmac/dwmac-loongson.c  | 83 ++++++++++++++++++-
+ 1 file changed, 81 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-index ff4fa74d2a11..c7790f73fe18 100644
+index c7790f73fe18..18bca996e1cb 100644
 --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
 +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-@@ -16,6 +16,10 @@ struct stmmac_pci_info {
- static void loongson_default_data(struct pci_dev *pdev,
- 				  struct plat_stmmacenet_data *plat)
- {
-+	/* Get bus_id, this can be overloaded later */
-+	plat->bus_id = (pci_domain_nr(pdev->bus) << 16) |
-+		       PCI_DEVID(pdev->bus->number, pdev->devfn);
-+
- 	plat->clk_csr = 2;	/* clk_csr_i = 20-35MHz & MDC = clk_csr_i/16 */
- 	plat->has_gmac = 1;
- 	plat->force_sf_dma_mode = 1;
-@@ -56,6 +60,9 @@ static int loongson_gmac_data(struct pci_dev *pdev,
- 	plat->dma_cfg->pbl = 32;
- 	plat->dma_cfg->pblx8 = true;
+@@ -6,11 +6,15 @@
+ #include <linux/pci.h>
+ #include <linux/dmi.h>
+ #include <linux/device.h>
++#include <linux/interrupt.h>
+ #include <linux/of_irq.h>
++#include "dwmac1000.h"
+ #include "stmmac.h"
  
-+	plat->clk_ref_rate = 125000000;
-+	plat->clk_ptp_rate = 125000000;
-+
+ struct stmmac_pci_info {
+ 	int (*setup)(struct pci_dev *pdev, struct plat_stmmacenet_data *plat);
++	int (*config)(struct pci_dev *pdev, struct plat_stmmacenet_data *plat,
++		      struct stmmac_resources *res);
+ };
+ 
+ static void loongson_default_data(struct pci_dev *pdev,
+@@ -66,14 +70,54 @@ static int loongson_gmac_data(struct pci_dev *pdev,
  	return 0;
  }
  
-@@ -72,13 +79,6 @@ static int loongson_dwmac_probe(struct pci_dev *pdev,
++static int loongson_gmac_config(struct pci_dev *pdev,
++				struct plat_stmmacenet_data *plat,
++				struct stmmac_resources *res)
++{
++	u32 version = readl(res->addr + GMAC_VERSION);
++
++	switch (version & 0xff) {
++	case DWLGMAC_CORE_1_00:
++		plat->multi_msi_en = 1;
++		plat->rx_queues_to_use = 8;
++		plat->tx_queues_to_use = 8;
++		plat->fix_channel_num = true;
++		break;
++	case DWMAC_CORE_3_50:
++	case DWMAC_CORE_3_70:
++		if (version & 0x00008000) {
++			plat->host_dma_width = 64;
++			plat->dma_cfg->dma64 = true;
++		}
++		break;
++	default:
++		break;
++	}
++
++	plat->dma_reset_times = 5;
++
++	return 0;
++}
++
+ static struct stmmac_pci_info loongson_gmac_pci_info = {
+ 	.setup = loongson_gmac_data,
++	.config = loongson_gmac_config,
+ };
+ 
++static u32 get_irq_type(struct device_node *np)
++{
++	struct of_phandle_args oirq;
++
++	if (np && of_irq_parse_one(np, 0, &oirq) == 0 && oirq.args_count == 2)
++		return oirq.args[1];
++
++	return IRQF_TRIGGER_RISING;
++}
++
+ static int loongson_dwmac_probe(struct pci_dev *pdev,
+ 				const struct pci_device_id *id)
+ {
+-	int ret, i, bus_id, phy_mode;
++	int ret, i, bus_id, phy_mode, ch_cnt, vecs;
+ 	struct plat_stmmacenet_data *plat;
+ 	struct stmmac_pci_info *info;
  	struct stmmac_resources res;
- 	struct device_node *np;
+@@ -170,12 +214,46 @@ static int loongson_dwmac_probe(struct pci_dev *pdev,
+ 		res.wol_irq = pdev->irq;
+ 	}
  
--	np = dev_of_node(&pdev->dev);
--
--	if (!np) {
--		pr_info("dwmac_loongson_pci: No OF node\n");
--		return -ENODEV;
--	}
--
- 	plat = devm_kzalloc(&pdev->dev, sizeof(*plat), GFP_KERNEL);
- 	if (!plat)
- 		return -ENOMEM;
-@@ -94,6 +94,7 @@ static int loongson_dwmac_probe(struct pci_dev *pdev,
- 	if (!plat->dma_cfg)
- 		return -ENOMEM;
- 
-+	np = dev_of_node(&pdev->dev);
- 	plat->mdio_node = of_get_child_by_name(np, "mdio");
- 	if (plat->mdio_node) {
- 		dev_info(&pdev->dev, "Found MDIO subnode\n");
-@@ -125,42 +126,48 @@ static int loongson_dwmac_probe(struct pci_dev *pdev,
+-	ret = stmmac_dvr_probe(&pdev->dev, plat, &res);
++	ret = info->config(pdev, plat, &res);
  	if (ret)
- 		goto err_disable_device;
+ 		goto err_disable_msi;
  
--	bus_id = of_alias_get_id(np, "ethernet");
--	if (bus_id >= 0)
--		plat->bus_id = bus_id;
-+	if (np) {
-+		bus_id = of_alias_get_id(np, "ethernet");
-+		if (bus_id >= 0)
-+			plat->bus_id = bus_id;
- 
--	phy_mode = device_get_phy_mode(&pdev->dev);
--	if (phy_mode < 0) {
--		dev_err(&pdev->dev, "phy_mode not found\n");
--		ret = phy_mode;
--		goto err_disable_device;
-+		phy_mode = device_get_phy_mode(&pdev->dev);
-+		if (phy_mode < 0) {
-+			dev_err(&pdev->dev, "phy_mode not found\n");
-+			ret = phy_mode;
-+			goto err_disable_device;
-+		}
-+		plat->phy_interface = phy_mode;
- 	}
--	plat->phy_interface = phy_mode;
- 
- 	pci_enable_msi(pdev);
- 
- 	memset(&res, 0, sizeof(res));
- 	res.addr = pcim_iomap_table(pdev)[0];
--
--	res.irq = of_irq_get_byname(np, "macirq");
--	if (res.irq < 0) {
--		dev_err(&pdev->dev, "IRQ macirq not found\n");
--		ret = -ENODEV;
--		goto err_disable_msi;
--	}
--
--	res.wol_irq = of_irq_get_byname(np, "eth_wake_irq");
--	if (res.wol_irq < 0) {
--		dev_info(&pdev->dev,
--			 "IRQ eth_wake_irq not found, using macirq\n");
--		res.wol_irq = res.irq;
--	}
--
--	res.lpi_irq = of_irq_get_byname(np, "eth_lpi");
--	if (res.lpi_irq < 0) {
--		dev_err(&pdev->dev, "IRQ eth_lpi not found\n");
--		ret = -ENODEV;
--		goto err_disable_msi;
-+	if (np) {
-+		res.irq = of_irq_get_byname(np, "macirq");
-+		if (res.irq < 0) {
-+			dev_err(&pdev->dev, "IRQ macirq not found\n");
-+			ret = -ENODEV;
-+			goto err_disable_msi;
-+		}
++	if (plat->multi_msi_en) {
++		ch_cnt = plat->rx_queues_to_use;
 +
-+		res.wol_irq = of_irq_get_byname(np, "eth_wake_irq");
-+		if (res.wol_irq < 0) {
++		pci_disable_msi(pdev);
++
++		res.irq = pci_irq_vector(pdev, 0);
++		res.wol_irq = res.irq;
++		vecs = roundup_pow_of_two(ch_cnt * 2 + 1);
++		if (pci_alloc_irq_vectors(pdev, vecs, vecs, PCI_IRQ_MSI) < 0) {
 +			dev_info(&pdev->dev,
-+				 "IRQ eth_wake_irq not found, using macirq\n");
-+			res.wol_irq = res.irq;
-+		}
++				 "MSI enable failed, Fallback to line interrupt\n");
++			plat->multi_msi_en = 0;
++		} else {
++			/* INT NAME | MAC | CH7 rx | CH7 tx | ... | CH0 rx | CH0 tx |
++			 * --------- ----- -------- --------  ...  -------- --------
++			 * IRQ NUM  |  0  |   1    |   2    | ... |   15   |   16   |
++			 */
++			for (i = 0; i < ch_cnt; i++) {
++				res.rx_irq[ch_cnt - 1 - i] = pci_irq_vector(pdev, 1 + i * 2);
++				res.tx_irq[ch_cnt - 1 - i] = pci_irq_vector(pdev, 2 + i * 2);
++			}
 +
-+		res.lpi_irq = of_irq_get_byname(np, "eth_lpi");
-+		if (res.lpi_irq < 0) {
-+			dev_err(&pdev->dev, "IRQ eth_lpi not found\n");
-+			ret = -ENODEV;
-+			goto err_disable_msi;
++			plat->control_value = GMAC_CONTROL_ACS;
++			plat->irq_flags = get_irq_type(np);
 +		}
-+	} else {
-+		res.irq = pdev->irq;
-+		res.wol_irq = pdev->irq;
++	}
++
++	ret = stmmac_dvr_probe(&pdev->dev, plat, &res);
++	if (ret)
++		goto err_free_irq_vectors;
++
+ 	return ret;
+ 
++err_free_irq_vectors:
++	if (plat->multi_msi_en)
++		pci_free_irq_vectors(pdev);
+ err_disable_msi:
+ 	pci_disable_msi(pdev);
+ err_disable_device:
+@@ -201,6 +279,7 @@ static void loongson_dwmac_remove(struct pci_dev *pdev)
+ 		break;
  	}
  
- 	ret = stmmac_dvr_probe(&pdev->dev, plat, &res);
++	pci_free_irq_vectors(pdev);
+ 	pci_disable_msi(pdev);
+ 	pci_disable_device(pdev);
+ }
 -- 
 2.39.3
 
