@@ -1,264 +1,118 @@
-Return-Path: <netdev+bounces-23928-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23929-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB63D76E293
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 10:12:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F9F476E2B9
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 10:16:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CDC251C2032E
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 08:12:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 502391C2140D
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 08:16:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8000E1427C;
-	Thu,  3 Aug 2023 08:11:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F19BA14297;
+	Thu,  3 Aug 2023 08:16:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71A462592
-	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 08:11:48 +0000 (UTC)
-Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::229])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9AE2530FF;
-	Thu,  3 Aug 2023 01:11:45 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 190CDFF808;
-	Thu,  3 Aug 2023 08:11:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1691050304;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=tpuTuRUPiNyH3n2jjGpwrnx1fmI9b2Ko2zyAHNgRosY=;
-	b=MBkGmMrkIRzCcm9qcngyjAaowvqDCU3fgHUsOk25u2vBbYmlDH+Hj2GrGAWIbTha00anRa
-	gu1s9i+xkIfhLxiohPHve2V1bBnrCFEQVmD8V97HwNhUmn/HcO80PjdKXdcYONjVjmTWKQ
-	HROgiT4nP7clJyC5O1RTrccH6n2NMzG/cPXmJfIRUBQ0Kcvi+WtxdE7whdaphg45Zysur7
-	GMAQ9yMloM7i6sflXwFqDhG7q4HD4c7tVbFfisp0P1ro0KFhjPLwyn/lYPonWAUaVX/TgD
-	clvRno6hkGHP98PBQnSEZarnxmGQcy+Pq49wDtkmQLabUhVRZo9qe9muvxZdlQ==
-Date: Thu, 3 Aug 2023 10:11:34 +0200
-From: Herve Codina <herve.codina@bootlin.com>
-To: Rob Herring <robh@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>, Krzysztof Kozlowski
- <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
- Lee Jones <lee@kernel.org>, Linus Walleij <linus.walleij@linaro.org>, Qiang
- Zhao <qiang.zhao@nxp.com>, Li Yang <leoyang.li@nxp.com>, Liam Girdwood
- <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, Jaroslav Kysela
- <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, Shengjiu Wang
- <shengjiu.wang@gmail.com>, Xiubo Li <Xiubo.Lee@gmail.com>, Fabio Estevam
- <festevam@gmail.com>, Nicolin Chen <nicoleotsuka@gmail.com>, Christophe
- Leroy <christophe.leroy@csgroup.eu>, Randy Dunlap <rdunlap@infradead.org>,
- netdev@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-gpio@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- alsa-devel@alsa-project.org, Thomas Petazzoni 
- <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH v2 21/28] dt-bindings: net: Add the Lantiq PEF2256
- E1/T1/J1 framer
-Message-ID: <20230803101134.6920805c@bootlin.com>
-In-Reply-To: <20230803004054.GA1593620-robh@kernel.org>
-References: <20230726150225.483464-1-herve.codina@bootlin.com>
-	<20230726150225.483464-22-herve.codina@bootlin.com>
-	<20230803004054.GA1593620-robh@kernel.org>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5BD18F4F
+	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 08:16:15 +0000 (UTC)
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72DEE5FC8
+	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 01:16:02 -0700 (PDT)
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1qRTUi-0002GF-Bh; Thu, 03 Aug 2023 10:15:40 +0200
+Received: from pengutronix.de (unknown [172.20.34.65])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 073C22022D2;
+	Thu,  3 Aug 2023 08:15:39 +0000 (UTC)
+Date: Thu, 3 Aug 2023 10:15:38 +0200
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: haibo.chen@nxp.com
+Cc: robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
+	conor+dt@kernel.org, shawnguo@kernel.org, s.hauer@pengutronix.de,
+	wg@grandegger.com, kernel@pengutronix.de, linux-imx@nxp.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, devicetree@vger.kernel.org,
+	linux-can@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v3 1/2] arm64: dts: imx93: add the Flex-CAN stop mode by
+ GPR
+Message-ID: <20230803-pureness-lilly-a285e530cc6c-mkl@pengutronix.de>
+References: <20230726112458.3524165-1-haibo.chen@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: herve.codina@bootlin.com
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="p2d3wquopx5arobx"
+Content-Disposition: inline
+In-Reply-To: <20230726112458.3524165-1-haibo.chen@nxp.com>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:b01:1d::7b
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Rob,
 
-On Wed, 2 Aug 2023 18:40:54 -0600
-Rob Herring <robh@kernel.org> wrote:
+--p2d3wquopx5arobx
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> On Wed, Jul 26, 2023 at 05:02:17PM +0200, Herve Codina wrote:
-> > The Lantiq PEF2256 is a framer and line interface component designed to
-> > fulfill all required interfacing between an analog E1/T1/J1 line and the
-> > digital PCM system highway/H.100 bus.
-> > 
-> > Signed-off-by: Herve Codina <herve.codina@bootlin.com>
-> > ---
-> >  .../bindings/net/lantiq,pef2256.yaml          | 226 ++++++++++++++++++
-> >  1 file changed, 226 insertions(+)
-> >  create mode 100644 Documentation/devicetree/bindings/net/lantiq,pef2256.yaml
-> > 
-> > diff --git a/Documentation/devicetree/bindings/net/lantiq,pef2256.yaml b/Documentation/devicetree/bindings/net/lantiq,pef2256.yaml
-> > new file mode 100644
-> > index 000000000000..b369a20d61b1
-> > --- /dev/null
-> > +++ b/Documentation/devicetree/bindings/net/lantiq,pef2256.yaml
-> > @@ -0,0 +1,226 @@
-> > +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> > +%YAML 1.2
-> > +---
-> > +$id: http://devicetree.org/schemas/net/lantiq,pef2256.yaml#
-> > +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> > +
-> > +title: Lantiq PEF2256
-> > +
-> > +maintainers:
-> > +  - Herve Codina <herve.codina@bootlin.com>
-> > +
-> > +description:
-> > +  The Lantiq PEF2256, also known as Infineon PEF2256 or FALC56, is a framer and
-> > +  line interface component designed to fulfill all required interfacing between
-> > +  an analog E1/T1/J1 line and the digital PCM system highway/H.100 bus.
-> > +
-> > +properties:
-> > +  compatible:
-> > +    items:
-> > +      - const: lantiq,pef2256
-> > +
-> > +  reg:
-> > +    maxItems: 1
-> > +
-> > +  clocks:
-> > +    items:
-> > +      - description: Master clock
-> > +      - description: Receive System Clock
-> > +      - description: Transmit System Clock
-> > +
-> > +  clock-names:
-> > +    items:
-> > +      - const: mclk
-> > +      - const: sclkr
-> > +      - const: sclkx
-> > +
-> > +  interrupts:
-> > +    maxItems: 1
-> > +
-> > +  reset-gpios:
-> > +    description:
-> > +      GPIO used to reset the device.
-> > +    maxItems: 1
-> > +
-> > +  '#framer-cells':  
-> 
-> Looks generic, but no such property is defined. You don't need something 
-> like this unless there are multiple providers and you need each 
-> provider to define the number of cells.
+On 26.07.2023 19:24:57, haibo.chen@nxp.com wrote:
+> From: Haibo Chen <haibo.chen@nxp.com>
+>=20
+> imx93 A0 chip use the internal q-channel handshake signal in LPCG
+> and CCM to automatically handle the Flex-CAN stop mode. But this
+> method meet issue when do the system PM stress test. IC can't fix
+> it easily. So in the new imx93 A1 chip, IC drop this method, and
+> involve back the old way=EF=BC=8Cuse the GPR method to trigger the Flex-C=
+AN
+> stop mode signal. Now NXP claim to drop imx93 A0, and only support
+> imx93 A1. So here add the stop mode through GPR.
+>=20
+> This patch also fix a typo for aonmix_ns_gpr.
+>=20
+> Signed-off-by: Haibo Chen <haibo.chen@nxp.com>
 
-With the framer infrastructure introduced in this series, multiple providers
-can be present. Some framer chips are dual or quad framers.
+Added both to linux-can/testing.
 
-With this pef2256 framer provider, consumers use "framer = <&pef2256>;"
-but with some others framer provider, we can have "framer = <&foo 1>;"
+Thanks,
+Marc
 
-That's the reason why I set '#framer-cells' in this first framer provider,
-even if the value is 0.
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
 
-> 
-> > +    const: 0
-> > +
-> > +  pinctrl:
-> > +    $ref: /schemas/pinctrl/pinctrl.yaml#
-> > +    additionalProperties: false
-> > +
-> > +    patternProperties:
-> > +      '-pins$':
-> > +        type: object
-> > +        $ref: /schemas/pinctrl/pincfg-node.yaml#
-> > +        additionalProperties: false
-> > +
-> > +        properties:
-> > +          pins:
-> > +            enum: [ RPA, RPB, RPC, RPD, XPA, XPB, XPC, XPD ]
-> > +
-> > +          function:
-> > +            enum: [ SYPR, RFM, RFMB, RSIGM, RSIG, DLR, FREEZE, RFSP, LOS,
-> > +                    SYPX, XFMS, XSIG, TCLK, XMFB, XSIGM, DLX, XCLK, XLT,
-> > +                    GPI, GPOH, GPOL ]
-> > +
-> > +        required:
-> > +          - pins
-> > +          - function
-> > +
-> > +  lantiq,data-rate-bps:
-> > +    $ref: /schemas/types.yaml#/definitions/uint32
-> > +    enum: [2048000, 4096000, 8192000, 16384000]
-> > +    default: 2048000
-> > +    description:
-> > +      Data rate (bit per seconds) on the system highway.
-> > +
-> > +  lantiq,clock-falling-edge:
-> > +    $ref: /schemas/types.yaml#/definitions/flag
-> > +    description:
-> > +      Data is sent on falling edge of the clock (and received on the rising
-> > +      edge). If 'clock-falling-edge' is not present, data is sent on the
-> > +      rising edge (and received on the falling edge).
-> > +
-> > +  lantiq,channel-phase:
-> > +    $ref: /schemas/types.yaml#/definitions/uint32
-> > +    enum: [0, 1, 2, 3, 4, 5, 6, 7]
-> > +    default: 0
-> > +    description:
-> > +      The pef2256 delivers a full frame (32 8bit time-slots in E1 and 24 8bit
-> > +      time-slots 8 8bit signaling in E1/J1) every 125us. This lead to a data
-> > +      rate of 2048000 bit/s. When lantiq,data-rate-bps is more than 2048000
-> > +      bit/s, the data (all 32 8bit) present in the frame are interleave with
-> > +      unused time-slots. The lantiq,channel-phase property allows to set the
-> > +      correct alignment of the interleave mechanism.
-> > +      For instance, suppose lantiq,data-rate-bps = 8192000 (ie 4*2048000), and
-> > +      lantiq,channel-phase = 2, the interleave schema with unused time-slots
-> > +      (nu) and used time-slots (XX) for TSi is
-> > +        nu nu XX nu nu nu XX nu nu nu XX nu
-> > +        <-- TSi --> <- TSi+1 -> <- TSi+2 ->
-> > +      With lantiq,data-rate-bps = 8192000, and lantiq,channel-phase = 1, the
-> > +      interleave schema is
-> > +        nu XX nu nu nu XX nu nu nu XX nu nu
-> > +        <-- TSi --> <- TSi+1 -> <- TSi+2 ->
-> > +      With lantiq,data-rate-bps = 4096000 (ie 2*2048000), and
-> > +      lantiq,channel-phase = 1, the interleave schema is
-> > +        nu    XX    nu    XX    nu    XX
-> > +        <-- TSi --> <- TSi+1 -> <- TSi+2 ->
-> > +
-> > +patternProperties:
-> > +  '^codec(-([0-9]|[1-2][0-9]|3[0-1]))?$':
-> > +    type: object
-> > +    $ref: /schemas/sound/dai-common.yaml
-> > +    unevaluatedProperties: false
-> > +    description:
-> > +      Codec provided by the pef2256. This codec allows to use some of the PCM
-> > +      system highway time-slots as audio channels to transport audio data over
-> > +      the E1/T1/J1 lines.
-> > +      The time-slots used by the codec must be set and so, the properties
-> > +      'dai-tdm-slot-num', 'dai-tdm-slot-width', 'dai-tdm-slot-tx-mask' and
-> > +      'dai-tdm-slot-rx-mask' must be present in the sound card node for
-> > +      sub-nodes that involve the codec. The codec uses 8bit time-slots.
-> > +      'dai-tdm-tdm-slot-with' must be set to 8.
-> > +      The tx and rx masks define the pef2256 time-slots assigned to the codec.
-> > +
-> > +    properties:
-> > +      compatible:
-> > +        const: lantiq,pef2256-codec
-> > +
-> > +      '#sound-dai-cells':
-> > +        const: 0
-> > +
-> > +      framer:
-> > +        $ref: /schemas/types.yaml#/definitions/phandle
-> > +        description:
-> > +          phandle to the framer node  
-> 
-> That's just the parent. Why do you need this?
+--p2d3wquopx5arobx
+Content-Type: application/pgp-signature; name="signature.asc"
 
-It is a mistake.
-You're right, as it simply refers the parent it is not needed.
-This 'framer' phandle will be removed in the next iteration.
+-----BEGIN PGP SIGNATURE-----
 
-Regards,
-Hervé
+iQEzBAABCgAdFiEEDs2BvajyNKlf9TJQvlAcSiqKBOgFAmTLYicACgkQvlAcSiqK
+BOiFPQf/VRYql3MNa/WmqW7jg6JhR4TiarD2pBqlpTAr2ED/rAmmxS09s08TD6l0
+rYL18J0Q3Q9qWfAvyiNtKUA5wg4/Z11D4ZghrynDlNF+D7kK8hLaNzCGQRhtviMd
+0cbZZVTq8q+2ZsREdKZij4hmGGTFVp0aBX+KSOjLaMR3GjcuusL8qjAqzaWSiRIz
+FNkH72i5nic+vC5rUtt+fo03NO4LtA2QPLxV8anU3puahX0X8gVNYnUdcrR+JYJp
+qZAMPVcj/DMmKbivTqvfNYLUBj8jS3acMwDpdX+bvcz5abb3EaZFwqwgxxG5Xz4E
+7vCvEJRahX3WgKLB9p6OsEMT2Cjtvw==
+=619W
+-----END PGP SIGNATURE-----
+
+--p2d3wquopx5arobx--
 
