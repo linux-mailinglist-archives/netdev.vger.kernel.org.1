@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-23986-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23987-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17DBE76E694
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 13:16:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 420C776E696
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 13:16:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C60CB2810FF
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 11:16:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 646351C2152D
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 11:16:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAAE11ED44;
-	Thu,  3 Aug 2023 11:13:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3D1018C05;
+	Thu,  3 Aug 2023 11:13:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFB9E1DDFD
-	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 11:13:56 +0000 (UTC)
-Received: from mail-ej1-x62f.google.com (mail-ej1-x62f.google.com [IPv6:2a00:1450:4864:20::62f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E86E10E
-	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 04:13:55 -0700 (PDT)
-Received: by mail-ej1-x62f.google.com with SMTP id a640c23a62f3a-991c786369cso112960466b.1
-        for <netdev@vger.kernel.org>; Thu, 03 Aug 2023 04:13:55 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97ED61DDFD
+	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 11:13:58 +0000 (UTC)
+Received: from mail-ej1-x644.google.com (mail-ej1-x644.google.com [IPv6:2a00:1450:4864:20::644])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28D46EA
+	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 04:13:57 -0700 (PDT)
+Received: by mail-ej1-x644.google.com with SMTP id a640c23a62f3a-99bf1f632b8so125112166b.1
+        for <netdev@vger.kernel.org>; Thu, 03 Aug 2023 04:13:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1691061234; x=1691666034;
+        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1691061235; x=1691666035;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=KDifvWqsoPhrv8/SIuKiKT64B/wL4sV2rAC12AosVps=;
-        b=JaXENHHI3DaVE61M7jXtZ8AcMaUuqDB3F76Y3HH6+RO7Ele+0sSJl8sColGFKypMjo
-         NQMDM/5JViGSoJAWKpQPCYO5MwQAceUZ9ljWKQ/JFL1dUcCLcuOVUd14xh3z59W1bDTG
-         DIkXNfdQdCcTGyKJyaZIZnAesfyztblFY2DsbBgRf4kCYzLnApORCBPqTwqNKPYTiD1p
-         4xnmuPz4Sprfid4hsmrAi2QGYGg9/pWnWXGevAs8PHnDcfvVuKd+GT3vpIdygN7k5Wye
-         uoAS2B/ygxG42fQIXT9IJx/H1jzaT7/zYc+ETz4e5a7s3t+YcEplDF0qOM4R1oHbdzjN
-         8nWw==
+        bh=JjXfH+A0B1Bx2EXBFqrsTnqeGAmKJdYOCJ870ddFWlM=;
+        b=QnuAj4p6o3ULtv73aEVNMrbBTx1qAUskvBfSOJBP9odukSxoADiDfcD692nK7NQPS8
+         q2gkjZH7Y5yV4UF7nlWAQqkCQ0KgY8cg6NnxOReTEf4rrUrQ1fnEcKvq4heEdkJ4/+zZ
+         LoxSI3jemIdEa+KXB32OoD99w/4m2XpFbL3vjxu2o7s4wfZ5UkmXo1GTMO+RP34szJOc
+         UMeMQwcEy344SxEYz2vKSiBT+5iyRYkTt1hP4M/93Pj3CyfyO0bcKc/9E6+Srs9jACE6
+         he5mEo1NPPf6vhg/A/MiMzrsgbHWJRhIwxrnT0ZCqx6BQyyMvO5UymJDIfn7Yme8K3/q
+         XzuQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691061234; x=1691666034;
+        d=1e100.net; s=20221208; t=1691061235; x=1691666035;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=KDifvWqsoPhrv8/SIuKiKT64B/wL4sV2rAC12AosVps=;
-        b=boGDETOr6vim/QZBch/Ln3tla0pt7v2UIQ5XXlqPSc1bBLYcpN3TMFaQO1jD0QgZyM
-         E7X3NAsxDlUJ8jONVxKg6xCVKyYE6Myjp9CcxGo49SuyO/X1xTX4A+vOglgDXEZkEejt
-         ZoFMMd8ci6gZAweA9qmfEYdXlrUkqZy1kvhC5YqDcCVGDpXEeXAEA0PQKy2zN0LrysyB
-         UUx2z8QOWi0nzEzO+/0Y3o/wEfVmwEe2Q5KgupomlIigh7e77rEn7OY17nnpPSDmi9Go
-         /R7b+6XZ2bmGbbqZg0/596eJ7I3ENC5UXWlicgyW/hEZqvPDW4Gvtz2f6cknKtIxGUaY
-         6RcA==
-X-Gm-Message-State: ABy/qLZETTDEZKInRoMRGvI7djgukXAi3CEvOURIn8xvoQDuY09jhql7
-	6ltOAOMZ1j21iATTgXUIIRNCxUikTkH7EPYVEipcxQ==
-X-Google-Smtp-Source: APBJJlF9MYgYhIoDkb+uV5COebkBbNjtWQLBkRa5lXyRch4iwBiTt+0L69wRSv1B4fcRaOL3MvFG6A==
-X-Received: by 2002:a17:906:3005:b0:993:dcca:9607 with SMTP id 5-20020a170906300500b00993dcca9607mr7296921ejz.2.1691061234148;
-        Thu, 03 Aug 2023 04:13:54 -0700 (PDT)
+        bh=JjXfH+A0B1Bx2EXBFqrsTnqeGAmKJdYOCJ870ddFWlM=;
+        b=djd9nwixlGk9wVJ3cSnfGzCHSuhwvpQrlf1HuhGDHW+1z4/POjTzgb2pVQUbqZYp1T
+         dZbzRWiZRpOyFFNm/NEo1JPy5GuWJ7vE22hhy1YJ1sv8HFWjGr9uW6nNuGsF/SO1tYW2
+         eYgHH0S/GoA27syV3Htow0BI2i+WCtY0lO/RJ1QuEE7YyyFw4Ai5k/LUaCDoHsrWRMKD
+         7QBQvWXAqPhgSsHfXG7NxLqfPy+pk14qu4S/Hh4i1bDbUqq5hs6AkWyk5sW60u4mmpTP
+         agEca7w1/aOtO8wuDmr8WQouORmpbrCoi8Ai/KrtymQEM9/mexIDOhjZsJwyRaZS08vW
+         JoWw==
+X-Gm-Message-State: ABy/qLYQnGUZ1kV3VEkMSHImeaGy1Rz4mvjEATX0fSPFnQwdW/FjOY0d
+	4XSyYUGkkQJIT4qxkyYRsufZLIB9XuYQ5YAEZCtbexk3
+X-Google-Smtp-Source: APBJJlFMPyNoqEvyxQPKCrRtoTAqi7HxD1UmyxbFvHrYeAw563lrPbEGTR+/zNU0+ASJTNVwq++eMA==
+X-Received: by 2002:a17:906:5da5:b0:99b:e5c3:2e45 with SMTP id n5-20020a1709065da500b0099be5c32e45mr6464351ejv.28.1691061235735;
+        Thu, 03 Aug 2023 04:13:55 -0700 (PDT)
 Received: from localhost ([212.23.236.67])
-        by smtp.gmail.com with ESMTPSA id m10-20020a17090607ca00b009931a3adf64sm10587342ejc.17.2023.08.03.04.13.53
+        by smtp.gmail.com with ESMTPSA id pw3-20020a17090720a300b00987e2f84768sm10308464ejb.0.2023.08.03.04.13.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Aug 2023 04:13:53 -0700 (PDT)
+        Thu, 03 Aug 2023 04:13:55 -0700 (PDT)
 From: Jiri Pirko <jiri@resnulli.us>
 To: netdev@vger.kernel.org
 Cc: kuba@kernel.org,
@@ -66,9 +66,9 @@ Cc: kuba@kernel.org,
 	saeedm@nvidia.com,
 	idosch@nvidia.com,
 	petrm@nvidia.com
-Subject: [patch net-next v3 08/12] devlink: un-static devlink_nl_pre/post_doit()
-Date: Thu,  3 Aug 2023 13:13:36 +0200
-Message-ID: <20230803111340.1074067-9-jiri@resnulli.us>
+Subject: [patch net-next v3 09/12] netlink: specs: devlink: add info-get dump op
+Date: Thu,  3 Aug 2023 13:13:37 +0200
+Message-ID: <20230803111340.1074067-10-jiri@resnulli.us>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230803111340.1074067-1-jiri@resnulli.us>
 References: <20230803111340.1074067-1-jiri@resnulli.us>
@@ -87,61 +87,122 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 
 From: Jiri Pirko <jiri@nvidia.com>
 
-To be prepared for the follow-up generated split ops addition,
-make the functions devlink_nl_pre_doit() and devlink_nl_post_doit()
-usable outside of netlink.c. Introduce temporary prototypes which are
-going to be removed once the generated header will be included.
+Add missing dump op for info-get command and re-generate related
+devlink-user.[ch] code.
 
 Signed-off-by: Jiri Pirko <jiri@nvidia.com>
 ---
-v2->v3:
-- new patch, split from "devlink: include the generated netlink header"
+v1->v2:
+- new patch, spec split from the next one, adding forgotten changes
+  in devlink-user.[ch] code
 ---
- net/devlink/devl_internal.h | 4 ++++
- net/devlink/netlink.c       | 8 ++++----
- 2 files changed, 8 insertions(+), 4 deletions(-)
+ Documentation/netlink/specs/devlink.yaml |  4 +-
+ tools/net/ynl/generated/devlink-user.c   | 53 ++++++++++++++++++++++++
+ tools/net/ynl/generated/devlink-user.h   | 10 +++++
+ 3 files changed, 66 insertions(+), 1 deletion(-)
 
-diff --git a/net/devlink/devl_internal.h b/net/devlink/devl_internal.h
-index 7d0a9dd1aceb..0befa1869fde 100644
---- a/net/devlink/devl_internal.h
-+++ b/net/devlink/devl_internal.h
-@@ -216,6 +216,10 @@ struct devlink_rate *
- devlink_rate_node_get_from_info(struct devlink *devlink,
- 				struct genl_info *info);
- /* Devlink nl cmds */
-+int devlink_nl_pre_doit(const struct genl_split_ops *ops,
-+			struct sk_buff *skb, struct genl_info *info);
-+void devlink_nl_post_doit(const struct genl_split_ops *ops,
-+			  struct sk_buff *skb, struct genl_info *info);
- int devlink_nl_get_doit(struct sk_buff *skb, struct genl_info *info);
- int devlink_nl_get_dumpit(struct sk_buff *skb, struct netlink_callback *cb);
- int devlink_nl_cmd_reload(struct sk_buff *skb, struct genl_info *info);
-diff --git a/net/devlink/netlink.c b/net/devlink/netlink.c
-index 624d0db7e229..98d5c6b0acd8 100644
---- a/net/devlink/netlink.c
-+++ b/net/devlink/netlink.c
-@@ -109,8 +109,8 @@ devlink_get_from_attrs_lock(struct net *net, struct nlattr **attrs)
- 	return ERR_PTR(-ENODEV);
+diff --git a/Documentation/netlink/specs/devlink.yaml b/Documentation/netlink/specs/devlink.yaml
+index 5d46ca966979..12699b7ce292 100644
+--- a/Documentation/netlink/specs/devlink.yaml
++++ b/Documentation/netlink/specs/devlink.yaml
+@@ -194,7 +194,7 @@ operations:
+         request:
+           value: 51
+           attributes: *dev-id-attrs
+-        reply:
++        reply: &info-get-reply
+           value: 51
+           attributes:
+             - bus-name
+@@ -204,3 +204,5 @@ operations:
+             - info-version-fixed
+             - info-version-running
+             - info-version-stored
++      dump:
++        reply: *info-get-reply
+diff --git a/tools/net/ynl/generated/devlink-user.c b/tools/net/ynl/generated/devlink-user.c
+index 939bd45feaca..8492789433b9 100644
+--- a/tools/net/ynl/generated/devlink-user.c
++++ b/tools/net/ynl/generated/devlink-user.c
+@@ -716,6 +716,59 @@ devlink_info_get(struct ynl_sock *ys, struct devlink_info_get_req *req)
+ 	return NULL;
  }
  
--static int devlink_nl_pre_doit(const struct genl_split_ops *ops,
--			       struct sk_buff *skb, struct genl_info *info)
-+int devlink_nl_pre_doit(const struct genl_split_ops *ops,
-+			struct sk_buff *skb, struct genl_info *info)
- {
- 	struct devlink_linecard *linecard;
- 	struct devlink_port *devlink_port;
-@@ -167,8 +167,8 @@ static int devlink_nl_pre_doit(const struct genl_split_ops *ops,
- 	return err;
- }
++/* DEVLINK_CMD_INFO_GET - dump */
++void devlink_info_get_list_free(struct devlink_info_get_list *rsp)
++{
++	struct devlink_info_get_list *next = rsp;
++
++	while ((void *)next != YNL_LIST_END) {
++		unsigned int i;
++
++		rsp = next;
++		next = rsp->next;
++
++		free(rsp->obj.bus_name);
++		free(rsp->obj.dev_name);
++		free(rsp->obj.info_driver_name);
++		free(rsp->obj.info_serial_number);
++		for (i = 0; i < rsp->obj.n_info_version_fixed; i++)
++			devlink_dl_info_version_free(&rsp->obj.info_version_fixed[i]);
++		free(rsp->obj.info_version_fixed);
++		for (i = 0; i < rsp->obj.n_info_version_running; i++)
++			devlink_dl_info_version_free(&rsp->obj.info_version_running[i]);
++		free(rsp->obj.info_version_running);
++		for (i = 0; i < rsp->obj.n_info_version_stored; i++)
++			devlink_dl_info_version_free(&rsp->obj.info_version_stored[i]);
++		free(rsp->obj.info_version_stored);
++		free(rsp);
++	}
++}
++
++struct devlink_info_get_list *devlink_info_get_dump(struct ynl_sock *ys)
++{
++	struct ynl_dump_state yds = {};
++	struct nlmsghdr *nlh;
++	int err;
++
++	yds.ys = ys;
++	yds.alloc_sz = sizeof(struct devlink_info_get_list);
++	yds.cb = devlink_info_get_rsp_parse;
++	yds.rsp_cmd = DEVLINK_CMD_INFO_GET;
++	yds.rsp_policy = &devlink_nest;
++
++	nlh = ynl_gemsg_start_dump(ys, ys->family_id, DEVLINK_CMD_INFO_GET, 1);
++
++	err = ynl_exec_dump(ys, nlh, &yds);
++	if (err < 0)
++		goto free_list;
++
++	return yds.first;
++
++free_list:
++	devlink_info_get_list_free(yds.first);
++	return NULL;
++}
++
+ const struct ynl_family ynl_devlink_family =  {
+ 	.name		= "devlink",
+ };
+diff --git a/tools/net/ynl/generated/devlink-user.h b/tools/net/ynl/generated/devlink-user.h
+index a008b99b6e24..af65e2f2f529 100644
+--- a/tools/net/ynl/generated/devlink-user.h
++++ b/tools/net/ynl/generated/devlink-user.h
+@@ -207,4 +207,14 @@ void devlink_info_get_rsp_free(struct devlink_info_get_rsp *rsp);
+ struct devlink_info_get_rsp *
+ devlink_info_get(struct ynl_sock *ys, struct devlink_info_get_req *req);
  
--static void devlink_nl_post_doit(const struct genl_split_ops *ops,
--				 struct sk_buff *skb, struct genl_info *info)
-+void devlink_nl_post_doit(const struct genl_split_ops *ops,
-+			  struct sk_buff *skb, struct genl_info *info)
- {
- 	struct devlink *devlink;
- 
++/* DEVLINK_CMD_INFO_GET - dump */
++struct devlink_info_get_list {
++	struct devlink_info_get_list *next;
++	struct devlink_info_get_rsp obj __attribute__ ((aligned (8)));
++};
++
++void devlink_info_get_list_free(struct devlink_info_get_list *rsp);
++
++struct devlink_info_get_list *devlink_info_get_dump(struct ynl_sock *ys);
++
+ #endif /* _LINUX_DEVLINK_GEN_H */
 -- 
 2.41.0
 
