@@ -1,190 +1,188 @@
-Return-Path: <netdev+bounces-23966-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23967-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 971B076E548
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 12:12:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5884176E5B2
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 12:30:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 522BD282062
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 10:12:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 916C71C21488
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 10:30:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4487815AEF;
-	Thu,  3 Aug 2023 10:12:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 930D68F7C;
+	Thu,  3 Aug 2023 10:30:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 391AA15488
-	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 10:12:12 +0000 (UTC)
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B21EF2D73;
-	Thu,  3 Aug 2023 03:12:07 -0700 (PDT)
-From: Kurt Kanzenbach <kurt@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1691057526;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=oiVoDpGFErenAPJYIoDQaO8WcyM2sxmCgiwrUKjcUok=;
-	b=WrrEOVdnOdB84MFc8v4Wyze4PgqymqxYOau1flFR77RrUsU7dXyjpLQUr/8TASETefRTAe
-	DRhIC/BOAHkvVVgHu/79Jp5upeNyLN3rjNaecg6XyMi8ytQw6Wg3B5ND5vrqF8OU20sjJ3
-	StQF6PjL5S5Kz/S0joxze54sY+2GQdlnh6/sqkVWhSeL98ZXIGqWcpZg+CQ0npIfk/a+9d
-	D9DTWArUlKnGh+10yzNMaMMF7rsF5hAklOl17pfjyxmx3wBSBO4T8/+7J9jS/EvNfDrg6F
-	FfaByrAXY7Wzjca2PpQJbq/yVsW+OWhnAPcC6nGoBwA3JOKBdsxgOlDcXBnNGA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1691057526;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=oiVoDpGFErenAPJYIoDQaO8WcyM2sxmCgiwrUKjcUok=;
-	b=HnUKr1KU3hzi8BqZfsmys2qqfOSq4KfZjvA95qh1zVmVn8ommVJRoyi3XHDwkVsWrISl9g
-	VQLjDPYOnfnrOIAA==
-To: Johannes Zink <j.zink@pengutronix.de>, Giuseppe Cavallaro
- <peppe.cavallaro@st.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Jose Abreu <joabreu@synopsys.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin
- <mcoquelin.stm32@gmail.com>, Richard Cochran <richardcochran@gmail.com>,
- Russell King <linux@armlinux.org.uk>
-Cc: patchwork-jzi@pengutronix.de, netdev@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- kernel@pengutronix.de, kernel test robot <lkp@intel.com>
-Subject: Re: [PATCH v3 0/2] net: stmmac: correct MAC propagation delay
-In-Reply-To: <9954c171-cb2d-83a4-6965-f5cb3a4a6166@pengutronix.de>
-References: <20230719-stmmac_correct_mac_delay-v3-0-61e63427735e@pengutronix.de>
- <87fs51kb4k.fsf@kurt>
- <9954c171-cb2d-83a4-6965-f5cb3a4a6166@pengutronix.de>
-Date: Thu, 03 Aug 2023 12:12:04 +0200
-Message-ID: <87a5v8a0zv.fsf@kurt>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EF0218B02
+	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 10:30:24 +0000 (UTC)
+Received: from mgamail.intel.com (unknown [192.55.52.151])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 084A9211E;
+	Thu,  3 Aug 2023 03:30:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1691058623; x=1722594623;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=wUOrzPuQNyPoyunb8QgHpza+TDckszmU8J98EMridjM=;
+  b=KYADSan5HlINCdmOkoNAPY4yLO10FJpGBYy1JLBz4MgSLLkDdmJ8ccGj
+   mfTMslPQAQ3MEd+uewFDbwC5M2J2KBQCXNTTsghWi4+ToyJjaXJ5MGDLs
+   zJhAui3XoZI/HwmvWn6rISrnyYRHTvnoEOcrGAuUgCXVezsuq4Wl9CuLg
+   OYLBZ206jWHeSjR8VrjH1Qn0jfM2CvQMoWzu6uOrwCuPSU6pkDuUk4hIY
+   Hp1GoYlwzwavZlUPJ3ujwnQxGOxoCMMjtm2h7S3RjQ7w0yxmbH5cvH0UK
+   BqCmjtr/v9tmJIQ5uPCPSdTouoqn8/YnogZkrHbP5Puyq6JgrkW5Nw0/8
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10790"; a="350129234"
+X-IronPort-AV: E=Sophos;i="6.01,252,1684825200"; 
+   d="scan'208";a="350129234"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Aug 2023 03:30:21 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10790"; a="729514972"
+X-IronPort-AV: E=Sophos;i="6.01,252,1684825200"; 
+   d="scan'208";a="729514972"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by orsmga002.jf.intel.com with ESMTP; 03 Aug 2023 03:30:18 -0700
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Thu, 3 Aug 2023 03:30:18 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Thu, 3 Aug 2023 03:30:18 -0700
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27 via Frontend Transport; Thu, 3 Aug 2023 03:30:18 -0700
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.171)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.27; Thu, 3 Aug 2023 03:30:17 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=GtJE/hKNZWjLWQmkwgy4q0DnT74gSMvT09NsY0t0q/ffSl1QhsUxm/ED7Mo66y9x6JiIJ+TghTKEvmyP9WVGT06H78GWZbxCZm6Rw5SMO/7B787yepPyTqE3Hx0kUiVi0Jbb4efJL4coQT2B1oywSzGGoVd1uhQ9FUiiIF3NGPk5iyVBQ/ACUFrusm4j3zXDRxOMLtdtk7rYToH6g3u4Li6kuf8L9NuXr94I8lzIJvj/ND/9wSdDGSQDRNJ7G4Ql94YMpWlwDA+ffPaF9Ca8+SrBiAoe2BZIVu/v3BKPju2NBPexqwWKO24NE232O8ppEt2rNGNmUKPFmtOMmR8tKA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=wVk2R4zQDwrxXvWRgnNwwZsbLsnf3ESIQPTqBvfcr3U=;
+ b=i85/P0vEMPavpFkEn0NzYWbacqcSgtQBpXJ04m5EM0lV4TUsJW7X3HP+797FUq9bSlffSQMEU74nP1qGh3A9+k1wmA86LjvQjlkZxe13Etp4O+fS+Go8S/UMJzScsCiUAI1fymw/h4QnNLOi6KvbKuBqX3FrK6UXdk2Ov9h0qzP107kckgxf0JfuZW/y9abvBrUSxSh537McJ7vZHKr2GpqHVBe9HuV/1LDCqFHGcnC9jorzfyy1JrRPu1a7LsbwnwTgj8JnBNPEw67PFbUfgsNWEALw9QvfKsoFAFxxJCm4FVjOOai6vRRRsEM/hb+8S95O6Pa2tm8GwFpXklP62Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CY5PR11MB6366.namprd11.prod.outlook.com (2603:10b6:930:3a::8)
+ by DM4PR11MB5470.namprd11.prod.outlook.com (2603:10b6:5:39c::24) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.47; Thu, 3 Aug
+ 2023 10:30:15 +0000
+Received: from CY5PR11MB6366.namprd11.prod.outlook.com
+ ([fe80::f8a8:855c:2d19:9ac1]) by CY5PR11MB6366.namprd11.prod.outlook.com
+ ([fe80::f8a8:855c:2d19:9ac1%7]) with mapi id 15.20.6631.046; Thu, 3 Aug 2023
+ 10:30:15 +0000
+Date: Thu, 3 Aug 2023 11:29:58 +0100
+From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+To: Ard Biesheuvel <ardb@kernel.org>
+CC: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>, Herbert Xu
+	<herbert@gondor.apana.org.au>, Eric Biggers <ebiggers@kernel.org>, Kees Cook
+	<keescook@chromium.org>, Haren Myneni <haren@us.ibm.com>, Nick Terrell
+	<terrelln@fb.com>, Minchan Kim <minchan@kernel.org>, Sergey Senozhatsky
+	<senozhatsky@chromium.org>, Jens Axboe <axboe@kernel.dk>, Richard Weinberger
+	<richard@nod.at>, David Ahern <dsahern@kernel.org>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Steffen Klassert <steffen.klassert@secunet.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, qat-linux
+	<qat-linux@intel.com>, "linuxppc-dev@lists.ozlabs.org"
+	<linuxppc-dev@lists.ozlabs.org>, "linux-mtd@lists.infradead.org"
+	<linux-mtd@lists.infradead.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+Subject: Re: [RFC PATCH 01/21] crypto: scomp - Revert "add support for
+ deflate rfc1950 (zlib)"
+Message-ID: <ZMuBpm2No70LqgZI@gcabiddu-mobl1.ger.corp.intel.com>
+References: <20230718125847.3869700-1-ardb@kernel.org>
+ <20230718125847.3869700-2-ardb@kernel.org>
+ <ZMt4nkfpdCXxAkr5@gcabiddu-mobl1.ger.corp.intel.com>
+ <CAMj1kXGn70sGAHgOttKkC6n6jfVZ9Y61NZ9ffLmJV8MK2Kh8nQ@mail.gmail.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <CAMj1kXGn70sGAHgOttKkC6n6jfVZ9Y61NZ9ffLmJV8MK2Kh8nQ@mail.gmail.com>
+Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 -
+ Collinstown Industrial Park, Leixlip, County Kildare - Ireland
+X-ClientProxiedBy: FR2P281CA0006.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:a::16) To CY5PR11MB6366.namprd11.prod.outlook.com
+ (2603:10b6:930:3a::8)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-	micalg=pgp-sha512; protocol="application/pgp-signature"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY5PR11MB6366:EE_|DM4PR11MB5470:EE_
+X-MS-Office365-Filtering-Correlation-Id: f5644f60-862d-4ab8-cf5d-08db940ca069
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: LVAapvwTty3Y5x9A5HPOXg+hBOQjNW5QbdPCLuq7MhWzmq/GuZCsFWL2iUwxSzBHiltHoml5W1fH22Q7dxDqZup6fuYYv2ImOG2Y9e/n8pCNTbVUJwiKYDW/j1A3/suR1TY6vgJU4gKX4ET/N+bRehTPIlt9LZEUV5EO90z78dLIUfdxWJq1Sn6DRRVME3mE8JkCLaP1wTGlnfb1ylS3vO5YzXXed8zN9SQvxkbZ8gAXZE04At1LCIj+kXNI76IGdcyMOLCrEBBTtJiwHyyBgze0UaqaV5J3RlcKqceVoImtIRUX8DndkxdmED3s587bK1iKJ768UwRXPuyWwaofmOPSvEeJO0v7pAPhMi1BnhKj07Np1/N9JqQGiZ1AFrzMK8Ezp0MlgWUzXQ0kkbGFX0sjOQx5H2KbpXJLj9aMif+rTyR2YCqvMgW/dT8nf2plgrSXIna1pMQjTwP2VrJZDMEeBEBg99BoYTmi3WtKYTh1tOpZ82LtLIVJYZ0HrisUQYVW7fUyaEwmTrNbp9ssQmAhNx+hcIFSsXZ/mvRkKzT9vq+p0Q1t/P1s0HI/Fg7o
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR11MB6366.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(346002)(396003)(376002)(366004)(136003)(39860400002)(451199021)(36916002)(6666004)(6486002)(6512007)(41300700001)(38100700002)(82960400001)(6916009)(66476007)(66556008)(4326008)(66946007)(316002)(54906003)(478600001)(5660300002)(26005)(186003)(6506007)(8936002)(8676002)(7416002)(86362001)(4744005)(2906002)(44832011);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?/SaLdTM+a8wA9jvBsM/zFvBk9UPJzIDXLR5Woi8hMriMpXSnjAy+6qe5ooq2?=
+ =?us-ascii?Q?i01lptc3BnbCSruWaqAYBo2tThD+WrX5xtb7EIbPgs3YUDfBAZ3ZHO+Se1KX?=
+ =?us-ascii?Q?5ugnSzvAsKlZZK8paP3bu1MzAF+f2lXupiZVss8nbh3HNTEl4ISuCFV2pDhC?=
+ =?us-ascii?Q?c9D5qGFfhJ8vVFT1dBT9uXuP0sLAUDWfBEUy+CFxfdw9XYRKVgsi08EigBwt?=
+ =?us-ascii?Q?+oi2tKtUmzTtXtN6ara9JyqT6mSV5wQ07lFneJ6Y2Xjq3DQvZNRjHOVKH6al?=
+ =?us-ascii?Q?Yv0dgA8UeJJ/Ii5iHLBXhgfnvPHZNlDwBWv19Ep6h8ZRGkh3wsCfBynk9bCd?=
+ =?us-ascii?Q?QAahWpb2j99ljZcAvgyK1Q8WMK9JhIblx2LHXKU2YF/luQjJz9KIySFXrXGI?=
+ =?us-ascii?Q?9hBLFGwLX3mCbm8hTw9q/d4/Ak1wDU8KPiV/qKhhiVLKYO9TUceT4i5plcJS?=
+ =?us-ascii?Q?Y2lbpvg8UVRuq286gwIcKAX7fTPK0xx82spLtu7umqWh70ljzHJK5ukowt2n?=
+ =?us-ascii?Q?RoamfIG/rZY+b9PNItgxcdScAwhcT3uK/VbRG8OkIXmLepyCcUWA8En5wO8e?=
+ =?us-ascii?Q?ov2vNnE3gkWm/RbMeUrmMCfpaY70AWwPJjc9S5hjlIyVKpaYyk7MyjMeHj8N?=
+ =?us-ascii?Q?zBcs7zxmuwYgwn2Ny/ZePB6+2oyDYcWVaYZNBQvOXvMSe1KPUL+VsrZFtKrT?=
+ =?us-ascii?Q?o2ECzDKVyr/0SYF/vCSqzfR1eq/eZEYkPllVSp5JF46dJT+ncJW7GrZ9hyFS?=
+ =?us-ascii?Q?7mxJsQPdiCRKGl1lFhzCsHW4K69W6JIr1Zyy/7kZc0ZSZ5cpz04j2y3o+ROA?=
+ =?us-ascii?Q?Hh7yKLH33MIbSCtxNF8n80x2tG1KOiHmNyrqux97YYfLJD141pICajOCJohD?=
+ =?us-ascii?Q?wbkWLTn2NiLL4qRom0oKvlNI9cuBTapqlyxD4NdtuCobw0YXuQlp61KAsPsI?=
+ =?us-ascii?Q?9MK6nSgHD96EzkCN1JcftpfwPCTvMx6sq+tZ6Qbqb1Exq5AD0Z4X07H6+SgX?=
+ =?us-ascii?Q?juE2p1m2AuwuXH7xA/4asZuJXnXRpc2K5o41wK/iJT27ZLqi59g60Uhw+h2W?=
+ =?us-ascii?Q?IcB7KwZjhAHbKYmZbzRYRbuVEXiO1m5VWPa5X8sZgrzPBKcANfrbhJ1mz4BN?=
+ =?us-ascii?Q?0nm2mZBPz9TzgQ+rZcvfHuSfUAOqLh908rI1wF8EsWVGRx3nvMGrfndMTEbQ?=
+ =?us-ascii?Q?qNvVcuDECcsYwtzD/t6+GSvzIj9ZzU5UuVsX+Ypuj8WwDMPxDOjsi3zA+IMv?=
+ =?us-ascii?Q?BPxUjnq6JdwovOSQiMdlpk+Qy9yjw5pJ/0zDdH+TWgRUKUieiYhsmsaLGhZs?=
+ =?us-ascii?Q?7DU/QmC60AQoDFbTBgzFsKNwYjWvTASoAqoxiERczKe7OnMwQCXfmJBqZj7L?=
+ =?us-ascii?Q?Y0bOzc7HWBHg92qnjzqX2DFLwWhN/zm1z4yZvmMhYJAWcOACdQmDvLk7TYIk?=
+ =?us-ascii?Q?5RkAH6D0UazcOhxlUbwdM2somSy7HTLb8Q0tTKklllSVM0m/ADiUAOfxoDJi?=
+ =?us-ascii?Q?fMG3oZ5ZZeUZmciz4wxGWQzpC0Lvpws2bom/5d31vC8QM1PPjHqaK9zZebT6?=
+ =?us-ascii?Q?Cw88qeEtePr/idGjSji7c2qhsDbv86EPB1ZwQaxY2EWYRCc6uHrEm6CNkDde?=
+ =?us-ascii?Q?IQ=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: f5644f60-862d-4ab8-cf5d-08db940ca069
+X-MS-Exchange-CrossTenant-AuthSource: CY5PR11MB6366.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Aug 2023 10:30:15.6576
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: wC7Wmp/4s4q/YDb+xMBiQnhtPz4UklCuliYVrVuaTIpwGSuJHj1AvSl6OTVgWKAS9+FUytYOijSL0x0Uli5A++G1qevIrT+vgMqA43IDnNs=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB5470
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
---=-=-=
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+On Thu, Aug 03, 2023 at 11:59:00AM +0200, Ard Biesheuvel wrote:
+> Any clue why zlib_deflate was chosen in this case?
+I believe it was done for integrity.
+The output of zlib_deflate is raw deflate with an header and a footer
+defined in rfc1950. The footer contains a checksum which gets
+calculated over the uncompressed data during compression and checked
+after decompression.
 
-On Wed Aug 02 2023, Johannes Zink wrote:
-> Hi Kurt,
->
-> On 8/2/23 12:10, Kurt Kanzenbach wrote:
->> On Tue Aug 01 2023, Johannes Zink wrote:
->>> ---
->>> Changes in v3:
->>> - work in Richard's review feedback. Thank you for reviewing my patch:
->>>    - as some of the hardware may have no or invalid correction value
->>>      registers: introduce feature switch which can be enabled in the gl=
-ue
->>>      code drivers depending on the actual hardware support
->>>    - only enable the feature on the i.MX8MP for the time being, as the =
-patch
->>>      improves timing accuracy and is tested for this hardware
->>> - Link to v2: https://lore.kernel.org/r/20230719-stmmac_correct_mac_del=
-ay-v2-1-3366f38ee9a6@pengutronix.de
->>>
->>> Changes in v2:
->>> - fix builds for 32bit, this was found by the kernel build bot
->>> 	Reported-by: kernel test robot <lkp@intel.com>
->>> 	Closes: https://lore.kernel.org/oe-kbuild-all/202307200225.B8rmKQPN-lk=
-p@intel.com/
->>> - while at it also fix an overflow by shifting a u32 constant from macr=
-o by 10bits
->>>    by casting the constant to u64
->>> - Link to v1: https://lore.kernel.org/r/20230719-stmmac_correct_mac_del=
-ay-v1-1-768aa4d09334@pengutronix.de
->>>
->>> ---
->>> Johannes Zink (2):
->>>        net: stmmac: correct MAC propagation delay
->>>        net: stmmac: dwmac-imx: enable MAC propagation delay correction =
-for i.MX8MP
->>=20
->> Tested on imx8mp <-> TSN Switch <-> x86 with i225:
->>=20
->> Before your patch:
->>=20
->> |ptp4l -i eth0 -f configs/gPTP.cfg --summary_interval=3D5 -m
->> |ptp4l[139.274]: rms    9 max   27 freq +29264 +/-  13 delay   347 +/-  =
- 2
->> |ptp4l[171.279]: rms   10 max   24 freq +29257 +/-  13 delay   344 +/-  =
- 2
->> |ptp4l[203.283]: rms   10 max   24 freq +29254 +/-  13 delay   347 +/-  =
- 2
->> |ptp4l[235.288]: rms    9 max   24 freq +29255 +/-  13 delay   346 +/-  =
- 1
->> |ptp4l[267.292]: rms    9 max   28 freq +29257 +/-  13 delay   347 +/-  =
- 2
->>=20
->> After:
->>=20
->> |ptp4l -i eth0 -f configs/gPTP.cfg --summary_interval=3D5 -m
->> |ptp4l[214.186]: rms    9 max   29 freq +28868 +/-  16 delay   326 +/-  =
- 2
->> |ptp4l[246.190]: rms    8 max   22 freq +28902 +/-  15 delay   329 +/-  =
- 2
->> |ptp4l[278.194]: rms    9 max   24 freq +28930 +/-  15 delay   325 +/-  =
- 1
->> |ptp4l[310.199]: rms    9 max   25 freq +28956 +/-  15 delay   327 +/-  =
- 3
->> |ptp4l[342.203]: rms    9 max   27 freq +28977 +/-  14 delay   327 +/-  =
- 1
->>=20
->> And the derived register values:
->>=20
->> |[   15.864016] KURT: PTP_TS_INGR_CORR_NS: 3147483248 PTP_TS_INGR_CORR_S=
-NS: 0
->> |[   15.870862] KURT: PTP_TS_EGR_CORR_NS: 400 PTP_TS_EGR_CORR_SNS: 0
->> |[   20.000962] KURT: PTP_TS_INGR_CORR_NS: 3147483636 PTP_TS_INGR_CORR_S=
-NS: 0
->> |[   20.007809] KURT: PTP_TS_EGR_CORR_NS: 12 PTP_TS_EGR_CORR_SNS: 0
->>=20
->> So, seems to work:
->>=20
->> Tested-by: Kurt Kanzenbach <kurt@linutronix.de> # imx8mp
->
-> Thank you for testing!
-> Johannes
-
-AFAICT from the manuals the MAC propagation delay should be corrected
-for the Intel TSN NIC(s) as well. I'll follow up with testing and a
-patch when this set is merged.
-
-Thanks,
-Kurt
-
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAmTLfXQTHGt1cnRAbGlu
-dXRyb25peC5kZQAKCRDBk9HyqkZzgnyCEACi9X3yHgUwGnbH1P7AlE8/gsS0phPA
-OxZwseaU0omYN84euiQcVKvwUC7jNQVGRFGT3TVKZgvkxoCcPLaseaJThJhPXqAo
-FCoIosjX6Xt0n2LnJo17DVvngEG9ZODRad5t0pBS17N/1sIBWVaSiKXuJfx66Gff
-gYPx+7YJdhJG9fG9WpQPNv7IMECdzEG90D/11SMUbUmHJt6Lat5BGI+E65ET3tCK
-lJyiSxaeroZ+qrHfIuqYdTCQxIh8A4RD7ZvPB9uSVu1cMEk5letxfD31N7TZ9Fe+
-XbijdVXbAEsgNUazpfLLSS+ltkLTPocWUDH+75JT1c23ihstR2cikH8YiWhvO+7y
-JbmUP1hZ68wMc6V6oHzhtSYf24GRyjNAgony24HrX3PTKHr5cdHRFvOLHD2YDZeb
-MhW4Pl2Uul87rMqMPzj2AWIVN9MOvl8I9DimcJ0UPpmiTWJc4Hvh/+maKfXrKziE
-XNneasrmNBxFAivp378veWbzsP+ftW3KBnTkM+dZDQhYaG8thlW4S9npAcowbMgX
-e8a0uCsgq8qOYs3JeGqhhV/nOq35nouXz7aKzVbXZsA/caDdJ+doZxO8UwDja7EC
-bJg+bMq0l1Tfw+ucjgniyjUOfAJiGKjj5WwAEFzd4ATLn12dZtbo/1HHxFEwlDSE
-35HOaQDKmHh9eQ==
-=UTxK
------END PGP SIGNATURE-----
---=-=-=--
+-- 
+Giovanni
 
