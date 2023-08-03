@@ -1,182 +1,111 @@
-Return-Path: <netdev+bounces-24189-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24190-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31AED76F2FC
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 20:49:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E0E0D76F30E
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 20:57:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 523EA1C2165B
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 18:49:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1CFE21C2166E
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 18:57:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDBE92418E;
-	Thu,  3 Aug 2023 18:49:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 501A225174;
+	Thu,  3 Aug 2023 18:57:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD56563BC
-	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 18:49:55 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (unknown [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BEE792D5A;
-	Thu,  3 Aug 2023 11:49:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=uflcrixw6nCghznSfpjIdEg8Z/0V2WwrsF757Ri68QM=; b=yZ4xfzN3KxRSxQXFgH5pEZ5UDS
-	ZKN0bp0nCAS+X+TZJW1kOMqfgeHntqkThktxc97CIl4mwO5l0tAEBLNQrT/a+1QKS+W1gkFBtFBaH
-	cFWM8c0u9tem1TxlvQZ1Bn1kiglukxknmU8+N2qnSkaaIGyssQTxO36q6I3283BBDkJHKxups7Chy
-	+OicRaaFOJFCLdM9P2LHorQAMT58tGG6j2cHVCCNlE6MbDYZq9X+xpL+16o0hZrjUsP2zSMqxyfB9
-	aNM/cIslnhJf8etVT36eotThMRVvTT7xVXsPijazTJAyik4+Zh0YP4CHxmpNEysWdfJy3bytoZx3x
-	9GMwE8CQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:46050)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qRdNy-0007Lp-0p;
-	Thu, 03 Aug 2023 19:49:22 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qRdNs-0003AM-NG; Thu, 03 Aug 2023 19:49:16 +0100
-Date: Thu, 3 Aug 2023 19:49:16 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Florian Fainelli <f.fainelli@gmail.com>
-Cc: Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>,
-	Ioana Ciornei <ciorneiioana@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Ioana Ciornei <ioana.ciornei@nxp.com>,
-	Alexandru Ardelean <alexandru.ardelean@analog.com>,
-	Andre Edich <andre.edich@microchip.com>,
-	Antoine Tenart <atenart@kernel.org>,
-	Baruch Siach <baruch@tkos.co.il>,
-	Christophe Leroy <christophe.leroy@c-s.fr>,
-	Divya Koppera <Divya.Koppera@microchip.com>,
-	Hauke Mehrtens <hauke@hauke-m.de>,
-	Jerome Brunet <jbrunet@baylibre.com>,
-	Kavya Sree Kotagiri <kavyasree.kotagiri@microchip.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Marco Felsch <m.felsch@pengutronix.de>, Marek Vasut <marex@denx.de>,
-	Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
-	Mathias Kresin <dev@kresin.me>, Maxim Kochetkov <fido_max@inbox.ru>,
-	Michael Walle <michael@walle.cc>,
-	Neil Armstrong <narmstrong@baylibre.com>,
-	Nisar Sayed <Nisar.Sayed@microchip.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	Philippe Schenker <philippe.schenker@toradex.com>,
-	Willy Liu <willy.liu@realtek.com>,
-	Yuiko Oshino <yuiko.oshino@microchip.com>
-Subject: Re: [PATCH net-next v2 02/19] net: phy: add a shutdown procedure
-Message-ID: <ZMv2rC8CACihovLl@shell.armlinux.org.uk>
-References: <20201101125114.1316879-1-ciorneiioana@gmail.com>
- <20201101125114.1316879-3-ciorneiioana@gmail.com>
- <20230803181640.yzxsk2xphwryxww4@pengutronix.de>
- <7e365fa4-7a50-382c-5a99-288a417a82a7@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 019ED63BC;
+	Thu,  3 Aug 2023 18:57:20 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02B82C433C8;
+	Thu,  3 Aug 2023 18:57:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1691089040;
+	bh=nN9RdtMuoDd4BD4OQl9XyjQwduTf3ta0lGqm9Vxh4KQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=HPYn2pVmAphcPEpAJXGdDTYA7do39vTJQkvqiYp2ELqMboQWxzOh3k0BCIjEuVzgV
+	 FmPGXmWBa31A1Z4bJTbmDiCqpP3YcREdbLhOYpFFkKYoxUHHMBfOfnLsUCpiHIMNJ4
+	 +/kvP4uVanX5VWycEZKyKXHe+HeT5bHpOd7ezDOZk++i9WezxeHRuq40IiQf9xmHVK
+	 /fZAwmWqvpXzWiPjYmEStznNW1PjK6iJbFzFt+M4qMDA2BuGP526VQ4NYMwCRiISnx
+	 ABfjTKjurAmj5+njMsYMmkJfL19g4YbZM3a48pHf4S1ZBF+yI6rQze/ve9+3T5kISM
+	 /annht/cjjyZw==
+Date: Thu, 3 Aug 2023 11:57:18 -0700
+From: Nathan Chancellor <nathan@kernel.org>
+To: Kees Cook <keescook@chromium.org>
+Cc: isdn@linux-pingi.de, netdev@vger.kernel.org, samitolvanen@google.com,
+	llvm@lists.linux.dev, patches@lists.linux.dev,
+	kernel test robot <oliver.sang@intel.com>
+Subject: Re: [PATCH] mISDN: Update parameter type of dsp_cmx_send()
+Message-ID: <20230803185718.GA2864317@dev-arch.thelio-3990X>
+References: <20230802-fix-dsp_cmx_send-cfi-failure-v1-1-2f2e79b0178d@kernel.org>
+ <202308021255.9A6328D@keescook>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <7e365fa4-7a50-382c-5a99-288a417a82a7@gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RDNS_NONE,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=no
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+In-Reply-To: <202308021255.9A6328D@keescook>
 
-On Thu, Aug 03, 2023 at 11:24:04AM -0700, Florian Fainelli wrote:
-> On 8/3/23 11:16, Uwe Kleine-König wrote:
-> > Hello,
+On Wed, Aug 02, 2023 at 12:59:12PM -0700, Kees Cook wrote:
+> On Wed, Aug 02, 2023 at 10:40:29AM -0700, Nathan Chancellor wrote:
+> > When booting a kernel with CONFIG_MISDN_DSP=y and CONFIG_CFI_CLANG=y,
+> > there is a failure when dsp_cmx_send() is called indirectly from
+> > call_timer_fn():
 > > 
-> > this patch became commit e2f016cf775129c050d6c79483073423db15c79a and is
-> > contained in v5.11-rc1.
+> >   [    0.371412] CFI failure at call_timer_fn+0x2f/0x150 (target: dsp_cmx_send+0x0/0x530; expected type: 0x92ada1e9)
 > > 
-> > It broke wake-on-lan on my NAS (an ARM machine with an Armada 370 SoC,
-> > armada-370-netgear-rn104.dts). The used phy driver is marvell.c. I only
-> > report it now as I just upgraded that machine from Debian 11 (with
-> > kernel 5.10.x) to Debian 12 (with kernel 6.1.x).
+> > The function pointer prototype that call_timer_fn() expects is
 > > 
-> > Commenting out phy_disable_interrupts(...) in v6.1.41's phy_shutdown()
-> > fixes the problem for me.
+> >   void (*fn)(struct timer_list *)
 > > 
-> > On Sun, Nov 01, 2020 at 02:50:57PM +0200, Ioana Ciornei wrote:
-> > > In case of a board which uses a shared IRQ we can easily end up with an
-> > > IRQ storm after a forced reboot.
-> > > 
-> > > For example, a 'reboot -f' will trigger a call to the .shutdown()
-> > > callbacks of all devices. Because phylib does not implement that hook,
-> > > the PHY is not quiesced, thus it can very well leave its IRQ enabled.
-> > > 
-> > > At the next boot, if that IRQ line is found asserted by the first PHY
-> > > driver that uses it, but _before_ the driver that is _actually_ keeping
-> > > the shared IRQ asserted is probed, the IRQ is not going to be
-> > > acknowledged, thus it will keep being fired preventing the boot process
-> > > of the kernel to continue. This is even worse when the second PHY driver
-> > > is a module.
-> > > 
-> > > To fix this, implement the .shutdown() callback and disable the
-> > > interrupts if these are used.
+> > whereas dsp_cmx_send() has a parameter type of 'void *', which causes
+> > the control flow integrity checks to fail because the parameter types do
+> > not match.
 > > 
-> > I don't know how this should interact with wake-on-lan, but I would
-> > expect that there is a way to fix this without reintroducing the problem
-> > fixed by this change. However I cannot say if this needs fixing in the
-> > generic phy code or the phy driver. Any hints?
+> > Change dsp_cmx_send()'s parameter type to be 'struct timer_list' to
+> > match the expected prototype. The argument is unused anyways, so this
+> > has no functional change, aside from avoiding the CFI failure.
+> > 
+> > Reported-by: kernel test robot <oliver.sang@intel.com>
+> > Closes: https://lore.kernel.org/oe-lkp/202308020936.58787e6c-oliver.sang@intel.com
+> > Signed-off-by: Nathan Chancellor <nathan@kernel.org>
+> > ---
+> > I am not sure if there is an appropriate fixes tag for this, I see this
+> > area was modified by commit e313ac12eb13 ("mISDN: Convert timers to use
+> > timer_setup()") but I don't think it was the original source of the
+> > issue. It could also be commit cf68fffb66d6 ("add support for Clang
+> > CFI") but I think that just exposes the problem/makes it fatal.
 > 
-> It depends upon what the PHY drivers and underlying hardware are capable and
-> willing to do. Some PHY drivers will shutdown the TX path completely since
-> you do not need that part to receive Wake-on-LAN packets and pass them up to
-> the PHY and/or MAC Wake-on-LAN matching logic. This would invite us to let
-> individual PHY drivers make a decision as to what they want to do in a
-> .shutdown() routine that would then need to be added to each and every
-> driver that wants to do something special. In the absence of said routine,
-> you could default to calling phy_disable_interrupts() unless the PHY has WoL
-> enabled?
+> Oh man. I missed one! How did I miss that one? I think "Fixes:
+> e313ac12eb13" is the most correct. That was the patch that went through
+> trying to fix all the prototypes, and _did_ fix all the _other_ prototypes
+> in there.
+
+Sounds reasonable to me. netdev folks, if you intend to take this, do
+you want a v2 or can you pick it up with
+
+Fixes: e313ac12eb13 ("mISDN: Convert timers to use timer_setup()")
+
+added on top?
+
+> Thanks for the patch!
 > 
-> phydev::wol_enabled reflects whether the PHY and/or the MAC has Wake-on-LAN
-> enabled which could you could key off to "nullify" what the shutdown does.
+> Reviewed-by: Kees Cook <keescook@chromium.org>
+> 
+> > 
+> > Also not sure who should take this or how soon it should go in, I'll let
+> > that to maintainers to figure out :)
+> 
+> If no one speaks up, I'll snag it, but since this got aimed at netdev, I
+> suspect someone may pick it up. :)
 
-If the shutdown method is being called, doesn't that imply that we're
-going to be hibernating rather than suspend-to-RAM - because suspend-to
-RAM doesn't involve powering down the system, whereas hibernating does.
+Sounds good, I do see it in the netdev patchwork, so we can watch it at
+least.
 
-I think the problem is that when placing the system into hibernate mode
-with WoL enabled, there are PHYs which use their interrupt pin to signal
-that a WoL event has happened. The problem comes with the aforementioned
-commit that the core PHY code now _always_ disables interrupts on the
-PHY, even if WoL is active and we're entering hibernate mode.
-
-That's clearly the wrong thing to be doing when people expect WoL to
-be able to wake their systems up from hibernate.
-
-The more I think about it, the more I'm coming to the conclusion that
-the blamed commit is wrong as it is coded today.
-
-It also occurs to me that systems need to cope with the PHY's INT signal
-being asserted through boot, because in the case of WoL-triggered resume
-from hibernate mode, the PHY's INT signal will be asserted _while_ the
-system is booting up (and remember, recovery from hibernate mode is
-essentially no different from a normal system boot with the exception
-that the kernel notices a special signature in the swap partition, and
-then reloads state from there.)
-
-So, boot has to cope properly with the PHY's interrupt being asserted
-in order for WoL from hibernate to work.
-
-It seems to me that a revert of the blamed commit is in order, and a
-different approach is needed?
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Cheers,
+Nathan
 
