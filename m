@@ -1,147 +1,101 @@
-Return-Path: <netdev+bounces-23825-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23826-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A90B476DCDA
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 02:45:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9EABF76DCE3
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 02:51:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 58C3C281DB2
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 00:45:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4842F281C06
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 00:51:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74B3D370;
-	Thu,  3 Aug 2023 00:45:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE2A9370;
+	Thu,  3 Aug 2023 00:51:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A35B7F
-	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 00:45:36 +0000 (UTC)
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id BF0EC19BE;
-	Wed,  2 Aug 2023 17:45:33 -0700 (PDT)
-Received: from linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net (linux.microsoft.com [13.77.154.182])
-	by linux.microsoft.com (Postfix) with ESMTPSA id 3054A238C442;
-	Wed,  2 Aug 2023 17:45:33 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 3054A238C442
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1691023533;
-	bh=wQ8f18Ed6SFDdEuacgxnss4bY0Gf8A4bX6O+cn6sJRs=;
-	h=From:To:Cc:Subject:Date:From;
-	b=VOCrdY7VN3RyFBgbRsKssN0Ar900Hi7x7mwR62MUmmr0DIeCyQFSYPVGTEgAftZvy
-	 LmiLMUTyAx+rC3mpXwNrqWuLMSnQEHYsS7P/Wu0kx/g4rUf9y1+aqCT/5fCiF7KC9r
-	 n7mDk8XFVaJjnmmTumcuCMuvsBrOQk9tzKKpyHUg=
-From: Sonia Sharma <sosha@linux.microsoft.com>
-To: linux-kernel@vger.kernel.org
-Cc: linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org,
-	sosha@microsoft.com,
-	kys@microsoft.com,
-	mikelley@microsoft.com,
-	haiyangz@microsoft.com,
-	wei.liu@kernel.org,
-	decui@microsoft.com,
-	longli@microsoft.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Subject: [PATCH v3 net] net: hv_netvsc: fix netvsc_send_completion to avoid multiple message length checks
-Date: Wed,  2 Aug 2023 17:45:28 -0700
-Message-Id: <1691023528-5270-1-git-send-email-sosha@linux.microsoft.com>
-X-Mailer: git-send-email 1.8.3.1
-X-Spam-Status: No, score=-17.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,
-	USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D369B7F
+	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 00:51:46 +0000 (UTC)
+Received: from out-71.mta1.migadu.com (out-71.mta1.migadu.com [95.215.58.71])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EAA426A6
+	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 17:51:45 -0700 (PDT)
+Message-ID: <a3da80bc-644b-69d7-675c-6af2d29b7f5c@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1691023903;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=9L+tSqbGpu9Raf+TEK2aP8ack3vgqGiDDt6KI+8o7Os=;
+	b=E8K7eI8+i9uyW4hivr+gUi/rFxffNNO3YZQzrqJauS6pP9ny7/9T73VzhsdqS2GfDayo8w
+	LdBIpmtP4h+kArxefL8Pam+E2u8K+vj08US/Kr0bnzK0ONOt3ATXJBTvVHgOCoz/b4gmUe
+	qLofUiXf2sq8yPrS41IzpjM1GoMyjrk=
+Date: Wed, 2 Aug 2023 17:51:35 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Subject: =?UTF-8?Q?Re=3a_=5bPATCH=5d_bpf=3a_bpf=5fstruct=5fops=3a_Remove_unn?=
+ =?UTF-8?Q?ecessary_=e2=80=980=e2=80=99_values_from_err?=
+Content-Language: en-US
+To: Li kunyu <kunyu@nfschina.com>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net,
+ andrii@kernel.org, song@kernel.org, yhs@fb.com, john.fastabend@gmail.com,
+ kpsingh@kernel.org, sdf@google.com, haoluo@google.com, jolsa@kernel.org
+References: <20230802012354.7404-1-kunyu@nfschina.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <20230802012354.7404-1-kunyu@nfschina.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-From: Sonia Sharma <sonia.sharma@linux.microsoft.com>
+On 8/1/23 6:23 PM, Li kunyu wrote:
+> err is assigned first, so it does not need to initialize the assignment.
+> 
+> Signed-off-by: Li kunyu <kunyu@nfschina.com>
+> ---
+>   kernel/bpf/bpf_struct_ops.c | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/kernel/bpf/bpf_struct_ops.c b/kernel/bpf/bpf_struct_ops.c
+> index d3f0a4825fa6..5b591fda5d62 100644
+> --- a/kernel/bpf/bpf_struct_ops.c
+> +++ b/kernel/bpf/bpf_struct_ops.c
+> @@ -376,7 +376,7 @@ static long bpf_struct_ops_map_update_elem(struct bpf_map *map, void *key,
+>   	const struct btf_type *t = st_ops->type;
+>   	struct bpf_tramp_links *tlinks = NULL;
+>   	void *udata, *kdata;
+> -	int prog_fd, err = 0;
+> +	int prog_fd, err;
 
-The switch statement in netvsc_send_completion() is incorrectly validating
-the length of incoming network packets by falling through to the next case.
-Avoid the fallthrough. Instead break after a case match and then process
-the complete() call.
+The "tlinks" init in two lines above is also not needed. While at the same 
+function, please take this chance to remove it together.
 
-Signed-off-by: Sonia Sharma <sonia.sharma@linux.microsoft.com>
----
-Changes in v3:
-* added return statement in default case as pointed by Michael Kelley..
----
- drivers/net/hyperv/netvsc.c | 18 ++++++++++--------
- 1 file changed, 10 insertions(+), 8 deletions(-)
+Please tag the subject with "bpf-next v2" in the next respin.
 
-diff --git a/drivers/net/hyperv/netvsc.c b/drivers/net/hyperv/netvsc.c
-index 82e9796c8f5e..0f7e4d377776 100644
---- a/drivers/net/hyperv/netvsc.c
-+++ b/drivers/net/hyperv/netvsc.c
-@@ -851,7 +851,7 @@ static void netvsc_send_completion(struct net_device *ndev,
- 				   msglen);
- 			return;
- 		}
--		fallthrough;
-+		break;
- 
- 	case NVSP_MSG1_TYPE_SEND_RECV_BUF_COMPLETE:
- 		if (msglen < sizeof(struct nvsp_message_header) +
-@@ -860,7 +860,7 @@ static void netvsc_send_completion(struct net_device *ndev,
- 				   msglen);
- 			return;
- 		}
--		fallthrough;
-+		break;
- 
- 	case NVSP_MSG1_TYPE_SEND_SEND_BUF_COMPLETE:
- 		if (msglen < sizeof(struct nvsp_message_header) +
-@@ -869,7 +869,7 @@ static void netvsc_send_completion(struct net_device *ndev,
- 				   msglen);
- 			return;
- 		}
--		fallthrough;
-+		break;
- 
- 	case NVSP_MSG5_TYPE_SUBCHANNEL:
- 		if (msglen < sizeof(struct nvsp_message_header) +
-@@ -878,10 +878,6 @@ static void netvsc_send_completion(struct net_device *ndev,
- 				   msglen);
- 			return;
- 		}
--		/* Copy the response back */
--		memcpy(&net_device->channel_init_pkt, nvsp_packet,
--		       sizeof(struct nvsp_message));
--		complete(&net_device->channel_init_wait);
- 		break;
- 
- 	case NVSP_MSG1_TYPE_SEND_RNDIS_PKT_COMPLETE:
-@@ -904,13 +900,19 @@ static void netvsc_send_completion(struct net_device *ndev,
- 
- 		netvsc_send_tx_complete(ndev, net_device, incoming_channel,
- 					desc, budget);
--		break;
-+		return;
- 
- 	default:
- 		netdev_err(ndev,
- 			   "Unknown send completion type %d received!!\n",
- 			   nvsp_packet->hdr.msg_type);
-+		return;
- 	}
-+
-+	/* Copy the response back */
-+	memcpy(&net_device->channel_init_pkt, nvsp_packet,
-+			sizeof(struct nvsp_message));
-+	complete(&net_device->channel_init_wait);
- }
- 
- static u32 netvsc_get_next_send_section(struct netvsc_device *net_device)
--- 
-2.25.1
+>   	void *image, *image_end;
+>   	u32 i;
+>   
+> @@ -818,7 +818,7 @@ static int bpf_struct_ops_map_link_update(struct bpf_link *link, struct bpf_map
+>   	struct bpf_struct_ops_map *st_map, *old_st_map;
+>   	struct bpf_map *old_map;
+>   	struct bpf_struct_ops_link *st_link;
+> -	int err = 0;
+> +	int err;
+>   
+>   	st_link = container_of(link, struct bpf_struct_ops_link, link);
+>   	st_map = container_of(new_map, struct bpf_struct_ops_map, map);
 
 
