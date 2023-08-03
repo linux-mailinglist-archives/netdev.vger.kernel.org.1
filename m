@@ -1,82 +1,82 @@
-Return-Path: <netdev+bounces-24019-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24020-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 379B176E78A
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 13:58:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A29A76E78B
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 13:59:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 59E481C20D43
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 11:58:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3EC781C20FAB
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 11:59:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD6AB1ED59;
-	Thu,  3 Aug 2023 11:57:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A20C1F168;
+	Thu,  3 Aug 2023 11:57:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7D741ED56
-	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 11:57:51 +0000 (UTC)
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2086.outbound.protection.outlook.com [40.107.223.86])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B78B3ABB
-	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 04:57:38 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC6F41ED56
+	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 11:57:52 +0000 (UTC)
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2051.outbound.protection.outlook.com [40.107.220.51])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E07C63C21
+	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 04:57:40 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=VYUTGcEqVQqzvugorbdYSUZYc7pLwbJAv1HPG5nJ6mftqMDorB2ddvcQs2Th+9wC4A9KgC6vjUhexE168R5lCSNBvk94mjA+WL9NDOfQCSFXRYSp+RrLj35k//vEKctPowCAkLoZTfvzUbUbbpPwkoOfTTwHeTAeiA18k5nkc6NWuie52bpYs838j82+hlJ3OSOwHSHsvjpw92dV+YkB+zYDhxSrndHN48Z4T2NljBowTjLu6PxN2mGcuQFfeDRVk+kl9eK1h7Lw3/NmM2MG2Gt5tDXNPc/FH+TIu/yl/Wao+z+vtXhhEe3FYgRXOmFSv9NAVuFqjnLsgEPRyrJJYg==
+ b=MVb7z3OWy1pdFBrD3SD5qkZWvCbvFDzTUDGWUhNE9sMzOHepG5Slj6WePVHLzhv1S0ErJmWl0kYv/f8OGI60NMhJhZQ2HxiVYTzqQrhJkHqQtDUUif9cO0z4DhKtJEcjA4m6sCNXz/Npi0bvKgTnm1m9OKqpkWIx1QuVNepy4UJox/4Fm/3XO+qvmnjsEvVPugzOfXK+ZnCCnDnrGoExPn6w3NiDLNeigdAj6wquIp7LCXkg70JbDhfMK/Q8/bs88wLMX/is7auvaanW4hfFHUnioT21cTaWE1XQsJdimVMvGVe1/CQ8pNzldl0RyPRLUnt5MtdakNGQ5QU+be2peQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=C3uh8ihJwHbdJFHEoz/qcJZNZRlDfT9zjV3VZiYcvOM=;
- b=lwYoyfSqBzlbnGHFGP+Xt1DYciUrZXmXhr/1DsaX7fOov0V7VXleYyF/E3hqNL6QGnsh+bSqW6Fy1nBOqLdEfkooLjrao0HFhS+f+jUEpC2i6+zjYTkeZ9Shw3KUmWdvUdz6SVaTNUmeOc7TiFXHQhrVj6bw0s9fciEy9ohXZW8qhj2F++eV5Um6+TSro/e7DhBGuE+flHtlBJPscH06HU+75ADcJiAyuSVvth8mqW4Z4AGQ2zeGsknGLnT8zv4r9rwcfZCyXXkDlDdduOCNvHHVPR2h2h/7juCYh+wUuOrsylPA3/aEoRBlIQBT86fOaNrn43rVkSZ0kcLE02DaMQ==
+ bh=Ub5/kr0aS3MvYijZxEEly0w2rrarfD/iSjeE/KY1ut4=;
+ b=mUP4d1+RLuM3jV52wgJ7TW1KfN1/BzXyKR+7LwgRaKKSzUWdE9q2pNznNDhBnxmh1qmUeQVYQ27y7UBdIG47yQrf1JRDpT+stsWUdr+Uzjl826HRUY0C2EIRNIr4U8PPZ76CfcB0/Rxrx6xbW1zRU3EC6/pSNhv0q6hvxlQqhznqq2oFQPJDiDxPRbDP63SInn12kEgME+8Yv5Ck1wX7i5kff1jTgIyOkjbrJ1X2T0iXJOZ+w0W5GbFZQnNftCaoJNJmjeknmKYc3Ovjalu8y+g5OqDsMUx5LRoUB4n92rh2Rwc/yXO3MizNm8a2SjeTQuRq9jyF9bbmCBSEEAnmpA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=davemloft.net smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=C3uh8ihJwHbdJFHEoz/qcJZNZRlDfT9zjV3VZiYcvOM=;
- b=xf8GNf7k8OfbuSUM+TaXdiR5XTDYNT1QyP1NHNxChrrFU/TJcLUgc/e7xjw/N8XupzGUfMM3FM14+bRclbojr6gAN8E1ENFvUJt6yYe8cHKIXjPMNpJsOR1xBWTFs/b9AusLlVDp0tAxIzFZU+Y9Tqz9R5WzHJhtWYuYB59/hxE=
-Received: from DM6PR21CA0016.namprd21.prod.outlook.com (2603:10b6:5:174::26)
- by BY5PR12MB4917.namprd12.prod.outlook.com (2603:10b6:a03:1d1::8) with
+ bh=Ub5/kr0aS3MvYijZxEEly0w2rrarfD/iSjeE/KY1ut4=;
+ b=0+uIN05/JFqzCKmOfuBkRjRIm5K7I5JCmjgka8HY+sxaCS4yn2Sx4bHwP2M9BMwMs2N6y0hBiSqt338gmyxYI5Pdyhx/xubZWh0/o1F9kMzTzALTX0D8mOUwpu3vVkchsr86NHUoouqLAhYcaXUwq0tgag9QKfqtn1sMT9HGtf0=
+Received: from MW4PR04CA0258.namprd04.prod.outlook.com (2603:10b6:303:88::23)
+ by MW6PR12MB8664.namprd12.prod.outlook.com (2603:10b6:303:23c::16) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.20; Thu, 3 Aug
- 2023 11:57:35 +0000
-Received: from CY4PEPF0000EDD6.namprd03.prod.outlook.com
- (2603:10b6:5:174:cafe::a1) by DM6PR21CA0016.outlook.office365.com
- (2603:10b6:5:174::26) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.5 via Frontend
- Transport; Thu, 3 Aug 2023 11:57:34 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.24; Thu, 3 Aug
+ 2023 11:57:37 +0000
+Received: from MWH0EPF000989E7.namprd02.prod.outlook.com
+ (2603:10b6:303:88:cafe::db) by MW4PR04CA0258.outlook.office365.com
+ (2603:10b6:303:88::23) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.19 via Frontend
+ Transport; Thu, 3 Aug 2023 11:57:37 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
 Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB03.amd.com; pr=C
-Received: from SATLEXMB03.amd.com (165.204.84.17) by
- CY4PEPF0000EDD6.mail.protection.outlook.com (10.167.241.210) with Microsoft
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ MWH0EPF000989E7.mail.protection.outlook.com (10.167.241.134) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6652.19 via Frontend Transport; Thu, 3 Aug 2023 11:57:34 +0000
-Received: from SATLEXMB08.amd.com (10.181.40.132) by SATLEXMB03.amd.com
- (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
+ 15.20.6652.20 via Frontend Transport; Thu, 3 Aug 2023 11:57:36 +0000
+Received: from SATLEXMB08.amd.com (10.181.40.132) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Thu, 3 Aug
- 2023 06:57:33 -0500
+ 2023 06:57:35 -0500
 Received: from SATLEXMB03.amd.com (10.181.40.144) by SATLEXMB08.amd.com
  (10.181.40.132) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Thu, 3 Aug
- 2023 04:57:33 -0700
+ 2023 04:57:34 -0700
 Received: from xcbecree41x.xilinx.com (10.180.168.240) by SATLEXMB03.amd.com
  (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27 via Frontend
- Transport; Thu, 3 Aug 2023 06:57:32 -0500
+ Transport; Thu, 3 Aug 2023 06:57:33 -0500
 From: <edward.cree@amd.com>
 To: <linux-net-drivers@amd.com>, <davem@davemloft.net>, <kuba@kernel.org>,
 	<edumazet@google.com>, <pabeni@redhat.com>
 CC: Edward Cree <ecree.xilinx@gmail.com>, <netdev@vger.kernel.org>,
 	<habetsm.xilinx@gmail.com>, Pieter Jansen van Vuuren
 	<pieter.jansen-van-vuuren@amd.com>
-Subject: [PATCH net-next 4/7] sfc: offload conntrack flow entries (match only) from CT zones
-Date: Thu, 3 Aug 2023 12:56:20 +0100
-Message-ID: <701ce0102383cdfd4c8f4e9610cd65aee864e203.1691063676.git.ecree.xilinx@gmail.com>
+Subject: [PATCH net-next 5/7] sfc: handle non-zero chain_index on TC rules
+Date: Thu, 3 Aug 2023 12:56:21 +0100
+Message-ID: <e32d4db869e1ce3a54eb3ba77a227d79e2149010.1691063676.git.ecree.xilinx@gmail.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <cover.1691063675.git.ecree.xilinx@gmail.com>
 References: <cover.1691063675.git.ecree.xilinx@gmail.com>
@@ -90,26 +90,26 @@ Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000EDD6:EE_|BY5PR12MB4917:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8dadfdb3-67a3-45ee-3050-08db9418d329
+X-MS-TrafficTypeDiagnostic: MWH0EPF000989E7:EE_|MW6PR12MB8664:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0052f3ee-3454-40df-20bc-08db9418d427
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	sdtBfrXEi/AJu1cgCUR9ctZ8Ja5cKD+8Y8tjR93O6nPy6/6/FuPxdEzYs5S8mcTXzoyArjCRKYqGcYR6bBqB79Cd5cd5N4U9M2W/KuH2l5aRYqc1vA26NCp9JAXbeQBLBJT4UAykxvZhsDe6nviAYs9FNERPm3whZE/yfaj423RLSIfyGkkIzXitYIUVjQdJe33CaeQYnQZI3GBwluaBNvr95QUq4p5t5U9ZXpTI81EhoTuYotce/DK1ahysuhH+LTxBxJ6THDq1ncQAQZ9Snofzvo+3OTx/FYqOf/iCk8TYEaYUDWWto3P8tvbGF/VrSLFbwIjpf+rfet56K6L9NBO1lCdlln8NRAAxRB68NE5H+V23/ekcgQf6h4lZvmEgKmxZxBjDPwsFDQxS9bBZkocW47OalD5KslnDMy73C4Rb5Ylv5btHOw/8JJwCIAqamE9ang7W9mEaaNOXRJEpHb0Vfxt8VzhH2dKD2KBbPS96ujHzLUMS5ahH7jZBb5mraBMwqNkrDqZu2UYLsdJ4IO8CMa+BQH3S1rGO5UjpfG8lW2qgYX77Ds38WxWzk/WoxGBPUBReSRXKF9M2eRvVklkxi52TJGoTDiIcYfgW9BZp21qFmFL01xQeWipfH1CtL7lJ2d3o6T3I2oSD3NZByEZH6cA+1B1Pi4jvhyUaEqWSr0WTHFaWS7IqIF3zrS6fL+WjnU+5b4mlyhLNnEk8fgeLigVWwApXWdZi+C7gmwrw/JMYAZDs9Dt76oL8xk4j5MzxhRCEkbZQY7eg4KO5rw==
+	mqGhE+W5DcSn+WP21Lh7GOHHdLEIP6bKf639xS4ZUefKxDnTS9LbhcRNZEaCR+iOKwIVoQmb4y8M1cqO37q8dXinmLu9WxGaL15DIv23lYiTkbEm8RF+LnML9m62Hh+xaH0L7p8u+jrh0Icbz1Tt1uOqlH/0HpcXlmsJTZgBmNv1PEdhJJDm8MzMI0tbqe7b57E7g7GkkqFFXRbEJ/HKJYN6qe/RZcHu6yYmfTVkCuaRjCjpNGDnXW6mqofHH2yATH5A6uK5K/MU7ZbXLeuTyDtt6g5NO3mV9IKmQueKy/51pwN5Znhl9po6V+tn2jkk+uyNZrdO3ODBEj2cH4cOm3dAsVRndt32cfBaHdFOLILT7GkUQKbp+YcwVymFkxyj9rf5EZgm+GXovDt3yGs30TcE4+0DGvj4QML5tqFN68wZD9Mg+mQTxkbdW0rfMv5Dfd05QuKShE1vmJrnKdF9eToYRq9qT1RU/aB8uMHv5sfsiAAlM1GMYnbkEe5OLK0WTs0j95Q3vMhE2MLz8YDW3g1S4JtCx96Ft4JCNacD2LWgCK/Fx+5n04EbUVfYYpnrY7xSaJl4rqF+OrI1o1lHffywk+H4gY8JZ5RCpx6WyJLfiDikbBA+lEBpCbMo2+MVRz9hyzpqoeSyFw8C7/2ogqDjdTlhLD4cRMw2zDUmDoPjXYhJXA5SCzKFiUQM/cNMjcfwEqkZn6OFWG6LYsJdjr6M5A/k2w5IDVRDYNXma+L3f2IIoQQphX7n98bRlz4PziNy67Cu9iaSVhCUEyeStw==
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB03.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(136003)(396003)(346002)(39860400002)(376002)(451199021)(82310400008)(40470700004)(46966006)(36840700001)(40460700003)(426003)(83380400001)(26005)(186003)(336012)(47076005)(36860700001)(316002)(2906002)(2876002)(70586007)(70206006)(4326008)(5660300002)(30864003)(41300700001)(8676002)(8936002)(6666004)(9686003)(54906003)(110136005)(478600001)(40480700001)(356005)(81166007)(55446002)(86362001)(36756003)(82740400003)(36900700001);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(376002)(136003)(346002)(396003)(39860400002)(82310400008)(451199021)(40470700004)(46966006)(36840700001)(9686003)(70206006)(70586007)(4326008)(6666004)(82740400003)(40480700001)(478600001)(316002)(356005)(110136005)(5660300002)(54906003)(81166007)(55446002)(41300700001)(40460700003)(8676002)(8936002)(26005)(86362001)(186003)(336012)(47076005)(426003)(30864003)(83380400001)(2876002)(2906002)(36860700001)(36756003)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Aug 2023 11:57:34.4781
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Aug 2023 11:57:36.0798
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8dadfdb3-67a3-45ee-3050-08db9418d329
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0052f3ee-3454-40df-20bc-08db9418d427
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB03.amd.com]
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	CY4PEPF0000EDD6.namprd03.prod.outlook.com
+	MWH0EPF000989E7.namprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4917
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW6PR12MB8664
 X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
 	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
@@ -119,582 +119,422 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 
 From: Edward Cree <ecree.xilinx@gmail.com>
 
-No handling yet for FLOW_ACTION_MANGLE (NAT or NAPT) actions.
+Map it to an 8-bit recirc_id for use by the hardware.
+Currently nothing in the driver is offloading 'goto chain' actions,
+ so these rules cannot yet be hit.
 
 Reviewed-by: Pieter Jansen van Vuuren <pieter.jansen-van-vuuren@amd.com>
 Signed-off-by: Edward Cree <ecree.xilinx@gmail.com>
 ---
- drivers/net/ethernet/sfc/tc.h           |   4 +-
- drivers/net/ethernet/sfc/tc_conntrack.c | 417 +++++++++++++++++++++++-
- drivers/net/ethernet/sfc/tc_conntrack.h |   3 +
- drivers/net/ethernet/sfc/tc_counters.c  |   8 +-
- drivers/net/ethernet/sfc/tc_counters.h  |   4 +
- 5 files changed, 429 insertions(+), 7 deletions(-)
+ drivers/net/ethernet/sfc/tc.c           | 169 ++++++++++++++++++++----
+ drivers/net/ethernet/sfc/tc.h           |  15 ++-
+ drivers/net/ethernet/sfc/tc_conntrack.c |   9 ++
+ drivers/net/ethernet/sfc/tc_conntrack.h |   3 +-
+ 4 files changed, 170 insertions(+), 26 deletions(-)
 
-diff --git a/drivers/net/ethernet/sfc/tc.h b/drivers/net/ethernet/sfc/tc.h
-index fc196eb897af..2aba9ca00618 100644
---- a/drivers/net/ethernet/sfc/tc.h
-+++ b/drivers/net/ethernet/sfc/tc.h
-@@ -18,12 +18,10 @@
- 
- #define IS_ALL_ONES(v)	(!(typeof (v))~(v))
- 
--#ifdef CONFIG_IPV6
- static inline bool efx_ipv6_addr_all_ones(struct in6_addr *addr)
- {
- 	return !memchr_inv(addr, 0xff, sizeof(*addr));
- }
--#endif
- 
- struct efx_tc_encap_action; /* see tc_encap_actions.h */
- 
-@@ -197,6 +195,7 @@ struct efx_tc_table_ct { /* TABLE_ID_CONNTRACK_TABLE */
-  * @encap_match_ht: Hashtable of TC encap matches
-  * @match_action_ht: Hashtable of TC match-action rules
-  * @ct_zone_ht: Hashtable of TC conntrack flowtable bindings
-+ * @ct_ht: Hashtable of TC conntrack flow entries
-  * @neigh_ht: Hashtable of neighbour watches (&struct efx_neigh_binder)
-  * @meta_ct: MAE table layout for conntrack table
-  * @reps_mport_id: MAE port allocated for representor RX
-@@ -230,6 +229,7 @@ struct efx_tc_state {
- 	struct rhashtable encap_match_ht;
- 	struct rhashtable match_action_ht;
- 	struct rhashtable ct_zone_ht;
-+	struct rhashtable ct_ht;
- 	struct rhashtable neigh_ht;
- 	struct efx_tc_table_ct meta_ct;
- 	u32 reps_mport_id, reps_mport_vport_id;
-diff --git a/drivers/net/ethernet/sfc/tc_conntrack.c b/drivers/net/ethernet/sfc/tc_conntrack.c
-index d67302715ec3..6729b3796a8b 100644
---- a/drivers/net/ethernet/sfc/tc_conntrack.c
-+++ b/drivers/net/ethernet/sfc/tc_conntrack.c
-@@ -21,6 +21,12 @@ static const struct rhashtable_params efx_tc_ct_zone_ht_params = {
- 	.head_offset	= offsetof(struct efx_tc_ct_zone, linkage),
+diff --git a/drivers/net/ethernet/sfc/tc.c b/drivers/net/ethernet/sfc/tc.c
+index 44a6fc30b722..181636d07024 100644
+--- a/drivers/net/ethernet/sfc/tc.c
++++ b/drivers/net/ethernet/sfc/tc.c
+@@ -97,6 +97,12 @@ static const struct rhashtable_params efx_tc_match_action_ht_params = {
+ 	.head_offset	= offsetof(struct efx_tc_flow_rule, linkage),
  };
  
-+static const struct rhashtable_params efx_tc_ct_ht_params = {
-+	.key_len	= offsetof(struct efx_tc_ct_entry, linkage),
++static const struct rhashtable_params efx_tc_recirc_ht_params = {
++	.key_len	= offsetof(struct efx_tc_recirc_id, linkage),
 +	.key_offset	= 0,
-+	.head_offset	= offsetof(struct efx_tc_ct_entry, linkage),
++	.head_offset	= offsetof(struct efx_tc_recirc_id, linkage),
 +};
 +
- static void efx_tc_ct_zone_free(void *ptr, void *arg)
+ static void efx_tc_free_action_set(struct efx_nic *efx,
+ 				   struct efx_tc_action_set *act, bool in_hw)
  {
- 	struct efx_tc_ct_zone *zone = ptr;
-@@ -34,24 +40,420 @@ static void efx_tc_ct_zone_free(void *ptr, void *arg)
- 	kfree(zone);
+@@ -576,12 +582,65 @@ static int efx_tc_flower_record_encap_match(struct efx_nic *efx,
+ 	return rc;
  }
  
-+static void efx_tc_ct_free(void *ptr, void *arg)
++static struct efx_tc_recirc_id *efx_tc_get_recirc_id(struct efx_nic *efx,
++						     u32 chain_index,
++						     struct net_device *net_dev)
 +{
-+	struct efx_tc_ct_entry *conn = ptr;
-+	struct efx_nic *efx = arg;
++	struct efx_tc_recirc_id *rid, *old;
++	int rc;
 +
-+	netif_err(efx, drv, efx->net_dev,
-+		  "tc ct_entry %lx still present at teardown\n",
-+		  conn->cookie);
-+
-+	/* We can release the counter, but we can't remove the CT itself
-+	 * from hardware because the table meta is already gone.
++	rid = kzalloc(sizeof(*rid), GFP_USER);
++	if (!rid)
++		return ERR_PTR(-ENOMEM);
++	rid->chain_index = chain_index;
++	/* We don't take a reference here, because it's implied - if there's
++	 * a rule on the net_dev that's been offloaded to us, then the net_dev
++	 * can't go away until the rule has been deoffloaded.
 +	 */
-+	efx_tc_flower_release_counter(efx, conn->cnt);
-+	kfree(conn);
++	rid->net_dev = net_dev;
++	old = rhashtable_lookup_get_insert_fast(&efx->tc->recirc_ht,
++						&rid->linkage,
++						efx_tc_recirc_ht_params);
++	if (old) {
++		/* don't need our new entry */
++		kfree(rid);
++		if (!refcount_inc_not_zero(&old->ref))
++			return ERR_PTR(-EAGAIN);
++		/* existing entry found */
++		rid = old;
++	} else {
++		rc = ida_alloc_range(&efx->tc->recirc_ida, 1, U8_MAX, GFP_USER);
++		if (rc < 0) {
++			rhashtable_remove_fast(&efx->tc->recirc_ht,
++					       &rid->linkage,
++					       efx_tc_recirc_ht_params);
++			kfree(rid);
++			return ERR_PTR(rc);
++		}
++		rid->fw_id = rc;
++		refcount_set(&rid->ref, 1);
++	}
++	return rid;
 +}
 +
- int efx_tc_init_conntrack(struct efx_nic *efx)
++static void efx_tc_put_recirc_id(struct efx_nic *efx, struct efx_tc_recirc_id *rid)
++{
++	if (!refcount_dec_and_test(&rid->ref))
++		return; /* still in use */
++	rhashtable_remove_fast(&efx->tc->recirc_ht, &rid->linkage,
++			       efx_tc_recirc_ht_params);
++	ida_free(&efx->tc->recirc_ida, rid->fw_id);
++	kfree(rid);
++}
++
+ static void efx_tc_delete_rule(struct efx_nic *efx, struct efx_tc_flow_rule *rule)
  {
- 	int rc;
+ 	efx_mae_delete_rule(efx, rule->fw_id);
  
- 	rc = rhashtable_init(&efx->tc->ct_zone_ht, &efx_tc_ct_zone_ht_params);
- 	if (rc < 0)
+ 	/* Release entries in subsidiary tables */
+ 	efx_tc_free_action_set_list(efx, &rule->acts, true);
++	if (rule->match.rid)
++		efx_tc_put_recirc_id(efx, rule->match.rid);
+ 	if (rule->match.encap)
+ 		efx_tc_flower_release_encap_match(efx, rule->match.encap);
+ 	rule->fw_id = MC_CMD_MAE_ACTION_RULE_INSERT_OUT_ACTION_RULE_ID_NULL;
+@@ -685,8 +744,17 @@ static int efx_tc_flower_replace_foreign(struct efx_nic *efx,
+ 	match.mask.ingress_port = ~0;
+ 
+ 	if (tc->common.chain_index) {
+-		NL_SET_ERR_MSG_MOD(extack, "No support for nonzero chain_index");
+-		return -EOPNOTSUPP;
++		struct efx_tc_recirc_id *rid;
++
++		rid = efx_tc_get_recirc_id(efx, tc->common.chain_index, net_dev);
++		if (IS_ERR(rid)) {
++			NL_SET_ERR_MSG_FMT_MOD(extack,
++					       "Failed to allocate a hardware recirculation ID for chain_index %u",
++					       tc->common.chain_index);
++			return PTR_ERR(rid);
++		}
++		match.rid = rid;
++		match.value.recirc_id = rid->fw_id;
+ 	}
+ 	match.mask.recirc_id = 0xff;
+ 
+@@ -706,12 +774,13 @@ static int efx_tc_flower_replace_foreign(struct efx_nic *efx,
+ 	if (!found) { /* We don't care. */
+ 		netif_dbg(efx, drv, efx->net_dev,
+ 			  "Ignoring foreign filter that doesn't egdev us\n");
+-		return -EOPNOTSUPP;
++		rc = -EOPNOTSUPP;
++		goto release;
+ 	}
+ 
+ 	rc = efx_mae_match_check_caps(efx, &match.mask, NULL);
+ 	if (rc)
 -		return rc;
-+		goto fail_ct_zone_ht;
-+	rc = rhashtable_init(&efx->tc->ct_ht, &efx_tc_ct_ht_params);
-+	if (rc < 0)
-+		goto fail_ct_ht;
- 	return 0;
-+fail_ct_ht:
-+	rhashtable_destroy(&efx->tc->ct_zone_ht);
-+fail_ct_zone_ht:
-+	return rc;
++		goto release;
+ 
+ 	if (efx_tc_match_is_encap(&match.mask)) {
+ 		enum efx_encap_type type;
+@@ -720,7 +789,8 @@ static int efx_tc_flower_replace_foreign(struct efx_nic *efx,
+ 		if (type == EFX_ENCAP_TYPE_NONE) {
+ 			NL_SET_ERR_MSG_MOD(extack,
+ 					   "Egress encap match on unsupported tunnel device");
+-			return -EOPNOTSUPP;
++			rc = -EOPNOTSUPP;
++			goto release;
+ 		}
+ 
+ 		rc = efx_mae_check_encap_type_supported(efx, type);
+@@ -728,25 +798,26 @@ static int efx_tc_flower_replace_foreign(struct efx_nic *efx,
+ 			NL_SET_ERR_MSG_FMT_MOD(extack,
+ 					       "Firmware reports no support for %s encap match",
+ 					       efx_tc_encap_type_name(type));
+-			return rc;
++			goto release;
+ 		}
+ 
+ 		rc = efx_tc_flower_record_encap_match(efx, &match, type,
+ 						      EFX_TC_EM_DIRECT, 0, 0,
+ 						      extack);
+ 		if (rc)
+-			return rc;
++			goto release;
+ 	} else {
+ 		/* This is not a tunnel decap rule, ignore it */
+ 		netif_dbg(efx, drv, efx->net_dev,
+ 			  "Ignoring foreign filter without encap match\n");
+-		return -EOPNOTSUPP;
++		rc = -EOPNOTSUPP;
++		goto release;
+ 	}
+ 
+ 	rule = kzalloc(sizeof(*rule), GFP_USER);
+ 	if (!rule) {
+ 		rc = -ENOMEM;
+-		goto out_free;
++		goto release;
+ 	}
+ 	INIT_LIST_HEAD(&rule->acts.list);
+ 	rule->cookie = tc->cookie;
+@@ -758,7 +829,7 @@ static int efx_tc_flower_replace_foreign(struct efx_nic *efx,
+ 			  "Ignoring already-offloaded rule (cookie %lx)\n",
+ 			  tc->cookie);
+ 		rc = -EEXIST;
+-		goto out_free;
++		goto release;
+ 	}
+ 
+ 	act = kzalloc(sizeof(*act), GFP_USER);
+@@ -916,15 +987,17 @@ static int efx_tc_flower_replace_foreign(struct efx_nic *efx,
+ 	/* We failed to insert the rule, so free up any entries we created in
+ 	 * subsidiary tables.
+ 	 */
++	if (match.rid)
++		efx_tc_put_recirc_id(efx, match.rid);
+ 	if (act)
+ 		efx_tc_free_action_set(efx, act, false);
+ 	if (rule) {
+-		rhashtable_remove_fast(&efx->tc->match_action_ht,
+-				       &rule->linkage,
+-				       efx_tc_match_action_ht_params);
++		if (!old)
++			rhashtable_remove_fast(&efx->tc->match_action_ht,
++					       &rule->linkage,
++					       efx_tc_match_action_ht_params);
+ 		efx_tc_free_action_set_list(efx, &rule->acts, false);
+ 	}
+-out_free:
+ 	kfree(rule);
+ 	if (match.encap)
+ 		efx_tc_flower_release_encap_match(efx, match.encap);
+@@ -986,19 +1059,45 @@ static int efx_tc_flower_replace(struct efx_nic *efx,
+ 		return -EOPNOTSUPP;
+ 	}
+ 
++	/* chain_index 0 is always recirc_id 0 (and does not appear in recirc_ht).
++	 * Conveniently, match.rid == NULL and match.value.recirc_id == 0 owing
++	 * to the initial memset(), so we don't need to do anything in that case.
++	 */
+ 	if (tc->common.chain_index) {
+-		NL_SET_ERR_MSG_MOD(extack, "No support for nonzero chain_index");
+-		return -EOPNOTSUPP;
++		struct efx_tc_recirc_id *rid;
++
++		/* Note regarding passed net_dev:
++		 * VFreps and PF can share chain namespace, as they have
++		 * distinct ingress_mports.  So we don't need to burn an
++		 * extra recirc_id if both use the same chain_index.
++		 * (Strictly speaking, we could give each VFrep its own
++		 * recirc_id namespace that doesn't take IDs away from the
++		 * PF, but that would require a bunch of additional IDAs -
++		 * one for each representor - and that's not likely to be
++		 * the main cause of recirc_id exhaustion anyway.)
++		 */
++		rid = efx_tc_get_recirc_id(efx, tc->common.chain_index,
++					   efx->net_dev);
++		if (IS_ERR(rid)) {
++			NL_SET_ERR_MSG_FMT_MOD(extack,
++					       "Failed to allocate a hardware recirculation ID for chain_index %u",
++					       tc->common.chain_index);
++			return PTR_ERR(rid);
++		}
++		match.rid = rid;
++		match.value.recirc_id = rid->fw_id;
+ 	}
+ 	match.mask.recirc_id = 0xff;
+ 
+ 	rc = efx_mae_match_check_caps(efx, &match.mask, extack);
+ 	if (rc)
+-		return rc;
++		goto release;
+ 
+ 	rule = kzalloc(sizeof(*rule), GFP_USER);
+-	if (!rule)
+-		return -ENOMEM;
++	if (!rule) {
++		rc = -ENOMEM;
++		goto release;
++	}
+ 	INIT_LIST_HEAD(&rule->acts.list);
+ 	rule->cookie = tc->cookie;
+ 	old = rhashtable_lookup_get_insert_fast(&efx->tc->match_action_ht,
+@@ -1008,8 +1107,8 @@ static int efx_tc_flower_replace(struct efx_nic *efx,
+ 		netif_dbg(efx, drv, efx->net_dev,
+ 			  "Already offloaded rule (cookie %lx)\n", tc->cookie);
+ 		NL_SET_ERR_MSG_MOD(extack, "Rule already offloaded");
+-		kfree(rule);
+-		return -EEXIST;
++		rc = -EEXIST;
++		goto release;
+ 	}
+ 
+ 	/* Parse actions */
+@@ -1327,12 +1426,15 @@ static int efx_tc_flower_replace(struct efx_nic *efx,
+ 	/* We failed to insert the rule, so free up any entries we created in
+ 	 * subsidiary tables.
+ 	 */
++	if (match.rid)
++		efx_tc_put_recirc_id(efx, match.rid);
+ 	if (act)
+ 		efx_tc_free_action_set(efx, act, false);
+ 	if (rule) {
+-		rhashtable_remove_fast(&efx->tc->match_action_ht,
+-				       &rule->linkage,
+-				       efx_tc_match_action_ht_params);
++		if (!old)
++			rhashtable_remove_fast(&efx->tc->match_action_ht,
++					       &rule->linkage,
++					       efx_tc_match_action_ht_params);
+ 		efx_tc_free_action_set_list(efx, &rule->acts, false);
+ 	}
+ 	kfree(rule);
+@@ -1702,6 +1804,16 @@ static void efx_tc_encap_match_free(void *ptr, void *__unused)
+ 	kfree(encap);
  }
  
++static void efx_tc_recirc_free(void *ptr, void *arg)
++{
++	struct efx_tc_recirc_id *rid = ptr;
++	struct efx_nic *efx = arg;
++
++	WARN_ON(refcount_read(&rid->ref));
++	ida_free(&efx->tc->recirc_ida, rid->fw_id);
++	kfree(rid);
++}
++
+ static void efx_tc_flow_free(void *ptr, void *arg)
+ {
+ 	struct efx_tc_flow_rule *rule = ptr;
+@@ -1751,6 +1863,10 @@ int efx_init_struct_tc(struct efx_nic *efx)
+ 	rc = efx_tc_init_conntrack(efx);
+ 	if (rc < 0)
+ 		goto fail_conntrack;
++	rc = rhashtable_init(&efx->tc->recirc_ht, &efx_tc_recirc_ht_params);
++	if (rc < 0)
++		goto fail_recirc_ht;
++	ida_init(&efx->tc->recirc_ida);
+ 	efx->tc->reps_filter_uc = -1;
+ 	efx->tc->reps_filter_mc = -1;
+ 	INIT_LIST_HEAD(&efx->tc->dflt.pf.acts.list);
+@@ -1763,6 +1879,8 @@ int efx_init_struct_tc(struct efx_nic *efx)
+ 	efx->tc->facts.reps.fw_id = MC_CMD_MAE_ACTION_SET_ALLOC_OUT_ACTION_SET_ID_NULL;
+ 	efx->extra_channel_type[EFX_EXTRA_CHANNEL_TC] = &efx_tc_channel_type;
+ 	return 0;
++fail_recirc_ht:
++	efx_tc_destroy_conntrack(efx);
+ fail_conntrack:
+ 	rhashtable_destroy(&efx->tc->match_action_ht);
+ fail_match_action_ht:
+@@ -1799,6 +1917,9 @@ void efx_fini_struct_tc(struct efx_nic *efx)
+ 	rhashtable_free_and_destroy(&efx->tc->encap_match_ht,
+ 				    efx_tc_encap_match_free, NULL);
+ 	efx_tc_fini_conntrack(efx);
++	rhashtable_free_and_destroy(&efx->tc->recirc_ht, efx_tc_recirc_free, efx);
++	WARN_ON(!ida_is_empty(&efx->tc->recirc_ida));
++	ida_destroy(&efx->tc->recirc_ida);
+ 	efx_tc_fini_counters(efx);
+ 	efx_tc_fini_encap_actions(efx);
+ 	mutex_unlock(&efx->tc->mutex);
+diff --git a/drivers/net/ethernet/sfc/tc.h b/drivers/net/ethernet/sfc/tc.h
+index 2aba9ca00618..af15020c8da7 100644
+--- a/drivers/net/ethernet/sfc/tc.h
++++ b/drivers/net/ethernet/sfc/tc.h
+@@ -45,7 +45,7 @@ struct efx_tc_action_set {
+ struct efx_tc_match_fields {
+ 	/* L1 */
+ 	u32 ingress_port;
+-	u8 recirc_id;
++	u8 recirc_id; /* mapped from (u32) TC chain_index to smaller space */
+ 	/* L2 (inner when encap) */
+ 	__be16 eth_proto;
+ 	__be16 vlan_tci[2], vlan_proto[2];
+@@ -115,10 +115,19 @@ struct efx_tc_encap_match {
+ 	struct efx_tc_encap_match *pseudo; /* Referenced pseudo EM if needed */
+ };
+ 
++struct efx_tc_recirc_id {
++	u32 chain_index;
++	struct net_device *net_dev;
++	struct rhash_head linkage;
++	refcount_t ref;
++	u8 fw_id; /* index allocated for use in the MAE */
++};
++
+ struct efx_tc_match {
+ 	struct efx_tc_match_fields value;
+ 	struct efx_tc_match_fields mask;
+ 	struct efx_tc_encap_match *encap;
++	struct efx_tc_recirc_id *rid;
+ };
+ 
+ struct efx_tc_action_set_list {
+@@ -197,6 +206,8 @@ struct efx_tc_table_ct { /* TABLE_ID_CONNTRACK_TABLE */
+  * @ct_zone_ht: Hashtable of TC conntrack flowtable bindings
+  * @ct_ht: Hashtable of TC conntrack flow entries
+  * @neigh_ht: Hashtable of neighbour watches (&struct efx_neigh_binder)
++ * @recirc_ht: Hashtable of recirculation ID mappings (&struct efx_tc_recirc_id)
++ * @recirc_ida: Recirculation ID allocator
+  * @meta_ct: MAE table layout for conntrack table
+  * @reps_mport_id: MAE port allocated for representor RX
+  * @reps_filter_uc: VNIC filter for representor unicast RX (promisc)
+@@ -231,6 +242,8 @@ struct efx_tc_state {
+ 	struct rhashtable ct_zone_ht;
+ 	struct rhashtable ct_ht;
+ 	struct rhashtable neigh_ht;
++	struct rhashtable recirc_ht;
++	struct ida recirc_ida;
+ 	struct efx_tc_table_ct meta_ct;
+ 	u32 reps_mport_id, reps_mport_vport_id;
+ 	s32 reps_filter_uc, reps_filter_mc;
+diff --git a/drivers/net/ethernet/sfc/tc_conntrack.c b/drivers/net/ethernet/sfc/tc_conntrack.c
+index 6729b3796a8b..54ed288543d0 100644
+--- a/drivers/net/ethernet/sfc/tc_conntrack.c
++++ b/drivers/net/ethernet/sfc/tc_conntrack.c
+@@ -73,6 +73,15 @@ int efx_tc_init_conntrack(struct efx_nic *efx)
+ 	return rc;
+ }
+ 
++/* Only call this in init failure teardown.
++ * Normal exit should fini instead as there may be entries in the table.
++ */
++void efx_tc_destroy_conntrack(struct efx_nic *efx)
++{
++	rhashtable_destroy(&efx->tc->ct_ht);
++	rhashtable_destroy(&efx->tc->ct_zone_ht);
++}
++
  void efx_tc_fini_conntrack(struct efx_nic *efx)
  {
  	rhashtable_free_and_destroy(&efx->tc->ct_zone_ht, efx_tc_ct_zone_free, NULL);
-+	rhashtable_free_and_destroy(&efx->tc->ct_ht, efx_tc_ct_free, efx);
-+}
-+
-+#define EFX_NF_TCP_FLAG(flg)	cpu_to_be16(be32_to_cpu(TCP_FLAG_##flg) >> 16)
-+
-+static int efx_tc_ct_parse_match(struct efx_nic *efx, struct flow_rule *fr,
-+				 struct efx_tc_ct_entry *conn)
-+{
-+	struct flow_dissector *dissector = fr->match.dissector;
-+	unsigned char ipv = 0;
-+	bool tcp = false;
-+
-+	if (flow_rule_match_key(fr, FLOW_DISSECTOR_KEY_CONTROL)) {
-+		struct flow_match_control fm;
-+
-+		flow_rule_match_control(fr, &fm);
-+		if (IS_ALL_ONES(fm.mask->addr_type))
-+			switch (fm.key->addr_type) {
-+			case FLOW_DISSECTOR_KEY_IPV4_ADDRS:
-+				ipv = 4;
-+				break;
-+			case FLOW_DISSECTOR_KEY_IPV6_ADDRS:
-+				ipv = 6;
-+				break;
-+			default:
-+				break;
-+			}
-+	}
-+
-+	if (!ipv) {
-+		netif_dbg(efx, drv, efx->net_dev,
-+			  "Conntrack missing ipv specification\n");
-+		return -EOPNOTSUPP;
-+	}
-+
-+	if (dissector->used_keys &
-+	    ~(BIT_ULL(FLOW_DISSECTOR_KEY_CONTROL) |
-+	      BIT_ULL(FLOW_DISSECTOR_KEY_BASIC) |
-+	      BIT_ULL(FLOW_DISSECTOR_KEY_IPV4_ADDRS) |
-+	      BIT_ULL(FLOW_DISSECTOR_KEY_IPV6_ADDRS) |
-+	      BIT_ULL(FLOW_DISSECTOR_KEY_PORTS) |
-+	      BIT_ULL(FLOW_DISSECTOR_KEY_TCP) |
-+	      BIT_ULL(FLOW_DISSECTOR_KEY_META))) {
-+		netif_dbg(efx, drv, efx->net_dev,
-+			  "Unsupported conntrack keys %#llx\n",
-+			  dissector->used_keys);
-+		return -EOPNOTSUPP;
-+	}
-+
-+	if (flow_rule_match_key(fr, FLOW_DISSECTOR_KEY_BASIC)) {
-+		struct flow_match_basic fm;
-+
-+		flow_rule_match_basic(fr, &fm);
-+		if (!IS_ALL_ONES(fm.mask->n_proto)) {
-+			netif_dbg(efx, drv, efx->net_dev,
-+				  "Conntrack eth_proto is not exact-match; mask %04x\n",
-+				   ntohs(fm.mask->n_proto));
-+			return -EOPNOTSUPP;
-+		}
-+		conn->eth_proto = fm.key->n_proto;
-+		if (conn->eth_proto != (ipv == 4 ? htons(ETH_P_IP)
-+						 : htons(ETH_P_IPV6))) {
-+			netif_dbg(efx, drv, efx->net_dev,
-+				  "Conntrack eth_proto is not IPv%u, is %04x\n",
-+				   ipv, ntohs(conn->eth_proto));
-+			return -EOPNOTSUPP;
-+		}
-+		if (!IS_ALL_ONES(fm.mask->ip_proto)) {
-+			netif_dbg(efx, drv, efx->net_dev,
-+				  "Conntrack ip_proto is not exact-match; mask %02x\n",
-+				   fm.mask->ip_proto);
-+			return -EOPNOTSUPP;
-+		}
-+		conn->ip_proto = fm.key->ip_proto;
-+		switch (conn->ip_proto) {
-+		case IPPROTO_TCP:
-+			tcp = true;
-+			break;
-+		case IPPROTO_UDP:
-+			break;
-+		default:
-+			netif_dbg(efx, drv, efx->net_dev,
-+				  "Conntrack ip_proto not TCP or UDP, is %02x\n",
-+				   conn->ip_proto);
-+			return -EOPNOTSUPP;
-+		}
-+	} else {
-+		netif_dbg(efx, drv, efx->net_dev,
-+			  "Conntrack missing eth_proto, ip_proto\n");
-+		return -EOPNOTSUPP;
-+	}
-+
-+	if (ipv == 4 && flow_rule_match_key(fr, FLOW_DISSECTOR_KEY_IPV4_ADDRS)) {
-+		struct flow_match_ipv4_addrs fm;
-+
-+		flow_rule_match_ipv4_addrs(fr, &fm);
-+		if (!IS_ALL_ONES(fm.mask->src)) {
-+			netif_dbg(efx, drv, efx->net_dev,
-+				  "Conntrack ipv4.src is not exact-match; mask %08x\n",
-+				   ntohl(fm.mask->src));
-+			return -EOPNOTSUPP;
-+		}
-+		conn->src_ip = fm.key->src;
-+		if (!IS_ALL_ONES(fm.mask->dst)) {
-+			netif_dbg(efx, drv, efx->net_dev,
-+				  "Conntrack ipv4.dst is not exact-match; mask %08x\n",
-+				   ntohl(fm.mask->dst));
-+			return -EOPNOTSUPP;
-+		}
-+		conn->dst_ip = fm.key->dst;
-+	} else if (ipv == 6 && flow_rule_match_key(fr, FLOW_DISSECTOR_KEY_IPV6_ADDRS)) {
-+		struct flow_match_ipv6_addrs fm;
-+
-+		flow_rule_match_ipv6_addrs(fr, &fm);
-+		if (!efx_ipv6_addr_all_ones(&fm.mask->src)) {
-+			netif_dbg(efx, drv, efx->net_dev,
-+				  "Conntrack ipv6.src is not exact-match; mask %pI6\n",
-+				   &fm.mask->src);
-+			return -EOPNOTSUPP;
-+		}
-+		conn->src_ip6 = fm.key->src;
-+		if (!efx_ipv6_addr_all_ones(&fm.mask->dst)) {
-+			netif_dbg(efx, drv, efx->net_dev,
-+				  "Conntrack ipv6.dst is not exact-match; mask %pI6\n",
-+				   &fm.mask->dst);
-+			return -EOPNOTSUPP;
-+		}
-+		conn->dst_ip6 = fm.key->dst;
-+	} else {
-+		netif_dbg(efx, drv, efx->net_dev,
-+			  "Conntrack missing IPv%u addrs\n", ipv);
-+		return -EOPNOTSUPP;
-+	}
-+
-+	if (flow_rule_match_key(fr, FLOW_DISSECTOR_KEY_PORTS)) {
-+		struct flow_match_ports fm;
-+
-+		flow_rule_match_ports(fr, &fm);
-+		if (!IS_ALL_ONES(fm.mask->src)) {
-+			netif_dbg(efx, drv, efx->net_dev,
-+				  "Conntrack ports.src is not exact-match; mask %04x\n",
-+				   ntohs(fm.mask->src));
-+			return -EOPNOTSUPP;
-+		}
-+		conn->l4_sport = fm.key->src;
-+		if (!IS_ALL_ONES(fm.mask->dst)) {
-+			netif_dbg(efx, drv, efx->net_dev,
-+				  "Conntrack ports.dst is not exact-match; mask %04x\n",
-+				   ntohs(fm.mask->dst));
-+			return -EOPNOTSUPP;
-+		}
-+		conn->l4_dport = fm.key->dst;
-+	} else {
-+		netif_dbg(efx, drv, efx->net_dev, "Conntrack missing L4 ports\n");
-+		return -EOPNOTSUPP;
-+	}
-+
-+	if (flow_rule_match_key(fr, FLOW_DISSECTOR_KEY_TCP)) {
-+		__be16 tcp_interesting_flags;
-+		struct flow_match_tcp fm;
-+
-+		if (!tcp) {
-+			netif_dbg(efx, drv, efx->net_dev,
-+				  "Conntrack matching on TCP keys but ipproto is not tcp\n");
-+			return -EOPNOTSUPP;
-+		}
-+		flow_rule_match_tcp(fr, &fm);
-+		tcp_interesting_flags = EFX_NF_TCP_FLAG(SYN) |
-+					EFX_NF_TCP_FLAG(RST) |
-+					EFX_NF_TCP_FLAG(FIN);
-+		/* If any of the tcp_interesting_flags is set, we always
-+		 * inhibit CT lookup in LHS (so SW can update CT table).
-+		 */
-+		if (fm.key->flags & tcp_interesting_flags) {
-+			netif_dbg(efx, drv, efx->net_dev,
-+				  "Unsupported conntrack tcp.flags %04x/%04x\n",
-+				   ntohs(fm.key->flags), ntohs(fm.mask->flags));
-+			return -EOPNOTSUPP;
-+		}
-+		/* Other TCP flags cannot be filtered at CT */
-+		if (fm.mask->flags & ~tcp_interesting_flags) {
-+			netif_dbg(efx, drv, efx->net_dev,
-+				  "Unsupported conntrack tcp.flags %04x/%04x\n",
-+				   ntohs(fm.key->flags), ntohs(fm.mask->flags));
-+			return -EOPNOTSUPP;
-+		}
-+	}
-+
-+	return 0;
-+}
-+
-+static int efx_tc_ct_replace(struct efx_tc_ct_zone *ct_zone,
-+			     struct flow_cls_offload *tc)
-+{
-+	struct flow_rule *fr = flow_cls_offload_flow_rule(tc);
-+	struct efx_tc_ct_entry *conn, *old;
-+	struct efx_nic *efx = ct_zone->efx;
-+	const struct flow_action_entry *fa;
-+	struct efx_tc_counter *cnt;
-+	int rc, i;
-+
-+	if (WARN_ON(!efx->tc))
-+		return -ENETDOWN;
-+	if (WARN_ON(!efx->tc->up))
-+		return -ENETDOWN;
-+
-+	conn = kzalloc(sizeof(*conn), GFP_USER);
-+	if (!conn)
-+		return -ENOMEM;
-+	conn->cookie = tc->cookie;
-+	old = rhashtable_lookup_get_insert_fast(&efx->tc->ct_ht,
-+						&conn->linkage,
-+						efx_tc_ct_ht_params);
-+	if (old) {
-+		netif_dbg(efx, drv, efx->net_dev,
-+			  "Already offloaded conntrack (cookie %lx)\n", tc->cookie);
-+		rc = -EEXIST;
-+		goto release;
-+	}
-+
-+	/* Parse match */
-+	conn->zone = ct_zone;
-+	rc = efx_tc_ct_parse_match(efx, fr, conn);
-+	if (rc)
-+		goto release;
-+
-+	/* Parse actions */
-+	flow_action_for_each(i, fa, &fr->action) {
-+		switch (fa->id) {
-+		case FLOW_ACTION_CT_METADATA:
-+			conn->mark = fa->ct_metadata.mark;
-+			if (memchr_inv(fa->ct_metadata.labels, 0, sizeof(fa->ct_metadata.labels))) {
-+				netif_dbg(efx, drv, efx->net_dev,
-+					  "Setting CT label not supported\n");
-+				rc = -EOPNOTSUPP;
-+				goto release;
-+			}
-+			break;
-+		default:
-+			netif_dbg(efx, drv, efx->net_dev,
-+				  "Unhandled action %u for conntrack\n", fa->id);
-+			rc = -EOPNOTSUPP;
-+			goto release;
-+		}
-+	}
-+
-+	/* fill in defaults for unmangled values */
-+	conn->nat_ip = conn->dnat ? conn->dst_ip : conn->src_ip;
-+	conn->l4_natport = conn->dnat ? conn->l4_dport : conn->l4_sport;
-+
-+	cnt = efx_tc_flower_allocate_counter(efx, EFX_TC_COUNTER_TYPE_CT);
-+	if (IS_ERR(cnt)) {
-+		rc = PTR_ERR(cnt);
-+		goto release;
-+	}
-+	conn->cnt = cnt;
-+
-+	rc = efx_mae_insert_ct(efx, conn);
-+	if (rc) {
-+		netif_dbg(efx, drv, efx->net_dev,
-+			  "Failed to insert conntrack, %d\n", rc);
-+		goto release;
-+	}
-+	mutex_lock(&ct_zone->mutex);
-+	list_add_tail(&conn->list, &ct_zone->cts);
-+	mutex_unlock(&ct_zone->mutex);
-+	return 0;
-+release:
-+	if (conn->cnt)
-+		efx_tc_flower_release_counter(efx, conn->cnt);
-+	if (!old)
-+		rhashtable_remove_fast(&efx->tc->ct_ht, &conn->linkage,
-+				       efx_tc_ct_ht_params);
-+	kfree(conn);
-+	return rc;
-+}
-+
-+/* Caller must follow with efx_tc_ct_remove_finish() after RCU grace period! */
-+static void efx_tc_ct_remove(struct efx_nic *efx, struct efx_tc_ct_entry *conn)
-+{
-+	int rc;
-+
-+	/* Remove it from HW */
-+	rc = efx_mae_remove_ct(efx, conn);
-+	/* Delete it from SW */
-+	rhashtable_remove_fast(&efx->tc->ct_ht, &conn->linkage,
-+			       efx_tc_ct_ht_params);
-+	if (rc) {
-+		netif_err(efx, drv, efx->net_dev,
-+			  "Failed to remove conntrack %lx from hw, rc %d\n",
-+			  conn->cookie, rc);
-+	} else {
-+		netif_dbg(efx, drv, efx->net_dev, "Removed conntrack %lx\n",
-+			  conn->cookie);
-+	}
-+}
-+
-+static void efx_tc_ct_remove_finish(struct efx_nic *efx, struct efx_tc_ct_entry *conn)
-+{
-+	/* Remove related CT counter.  This is delayed after the conn object we
-+	 * are working with has been successfully removed.  This protects the
-+	 * counter from being used-after-free inside efx_tc_ct_stats.
-+	 */
-+	efx_tc_flower_release_counter(efx, conn->cnt);
-+	kfree(conn);
-+}
-+
-+static int efx_tc_ct_destroy(struct efx_tc_ct_zone *ct_zone,
-+			     struct flow_cls_offload *tc)
-+{
-+	struct efx_nic *efx = ct_zone->efx;
-+	struct efx_tc_ct_entry *conn;
-+
-+	conn = rhashtable_lookup_fast(&efx->tc->ct_ht, &tc->cookie,
-+				      efx_tc_ct_ht_params);
-+	if (!conn) {
-+		netif_warn(efx, drv, efx->net_dev,
-+			   "Conntrack %lx not found to remove\n", tc->cookie);
-+		return -ENOENT;
-+	}
-+
-+	mutex_lock(&ct_zone->mutex);
-+	list_del(&conn->list);
-+	efx_tc_ct_remove(efx, conn);
-+	mutex_unlock(&ct_zone->mutex);
-+	synchronize_rcu();
-+	efx_tc_ct_remove_finish(efx, conn);
-+	return 0;
-+}
-+
-+static int efx_tc_ct_stats(struct efx_tc_ct_zone *ct_zone,
-+			   struct flow_cls_offload *tc)
-+{
-+	struct efx_nic *efx = ct_zone->efx;
-+	struct efx_tc_ct_entry *conn;
-+	struct efx_tc_counter *cnt;
-+
-+	rcu_read_lock();
-+	conn = rhashtable_lookup_fast(&efx->tc->ct_ht, &tc->cookie,
-+				      efx_tc_ct_ht_params);
-+	if (!conn) {
-+		netif_warn(efx, drv, efx->net_dev,
-+			   "Conntrack %lx not found for stats\n", tc->cookie);
-+		rcu_read_unlock();
-+		return -ENOENT;
-+	}
-+
-+	cnt = conn->cnt;
-+	spin_lock_bh(&cnt->lock);
-+	/* Report only last use */
-+	flow_stats_update(&tc->stats, 0, 0, 0, cnt->touched,
-+			  FLOW_ACTION_HW_STATS_DELAYED);
-+	spin_unlock_bh(&cnt->lock);
-+	rcu_read_unlock();
-+
-+	return 0;
- }
- 
- static int efx_tc_flow_block(enum tc_setup_type type, void *type_data,
- 			     void *cb_priv)
- {
-+	struct flow_cls_offload *tcb = type_data;
-+	struct efx_tc_ct_zone *ct_zone = cb_priv;
-+
-+	if (type != TC_SETUP_CLSFLOWER)
-+		return -EOPNOTSUPP;
-+
-+	switch (tcb->command) {
-+	case FLOW_CLS_REPLACE:
-+		return efx_tc_ct_replace(ct_zone, tcb);
-+	case FLOW_CLS_DESTROY:
-+		return efx_tc_ct_destroy(ct_zone, tcb);
-+	case FLOW_CLS_STATS:
-+		return efx_tc_ct_stats(ct_zone, tcb);
-+	default:
-+		break;
-+	};
-+
- 	return -EOPNOTSUPP;
- }
- 
-@@ -81,6 +483,8 @@ struct efx_tc_ct_zone *efx_tc_ct_register_zone(struct efx_nic *efx, u16 zone,
- 	}
- 	ct_zone->nf_ft = ct_ft;
- 	ct_zone->efx = efx;
-+	INIT_LIST_HEAD(&ct_zone->cts);
-+	mutex_init(&ct_zone->mutex);
- 	rc = nf_flow_table_offload_add_cb(ct_ft, efx_tc_flow_block, ct_zone);
- 	netif_dbg(efx, drv, efx->net_dev, "Adding new ct_zone for %u, rc %d\n",
- 		  zone, rc);
-@@ -98,11 +502,22 @@ struct efx_tc_ct_zone *efx_tc_ct_register_zone(struct efx_nic *efx, u16 zone,
- void efx_tc_ct_unregister_zone(struct efx_nic *efx,
- 			       struct efx_tc_ct_zone *ct_zone)
- {
-+	struct efx_tc_ct_entry *conn, *next;
-+
- 	if (!refcount_dec_and_test(&ct_zone->ref))
- 		return; /* still in use */
- 	nf_flow_table_offload_del_cb(ct_zone->nf_ft, efx_tc_flow_block, ct_zone);
- 	rhashtable_remove_fast(&efx->tc->ct_zone_ht, &ct_zone->linkage,
- 			       efx_tc_ct_zone_ht_params);
-+	mutex_lock(&ct_zone->mutex);
-+	list_for_each_entry(conn, &ct_zone->cts, list)
-+		efx_tc_ct_remove(efx, conn);
-+	synchronize_rcu();
-+	/* need to use _safe because efx_tc_ct_remove_finish() frees conn */
-+	list_for_each_entry_safe(conn, next, &ct_zone->cts, list)
-+		efx_tc_ct_remove_finish(efx, conn);
-+	mutex_unlock(&ct_zone->mutex);
-+	mutex_destroy(&ct_zone->mutex);
- 	netif_dbg(efx, drv, efx->net_dev, "Removed ct_zone for %u\n",
- 		  ct_zone->zone);
- 	kfree(ct_zone);
 diff --git a/drivers/net/ethernet/sfc/tc_conntrack.h b/drivers/net/ethernet/sfc/tc_conntrack.h
-index a3e518344cbc..ef5cf96c0649 100644
+index ef5cf96c0649..e75c8eb1965d 100644
 --- a/drivers/net/ethernet/sfc/tc_conntrack.h
 +++ b/drivers/net/ethernet/sfc/tc_conntrack.h
-@@ -22,6 +22,8 @@ struct efx_tc_ct_zone {
- 	refcount_t ref;
- 	struct nf_flowtable *nf_ft;
- 	struct efx_nic *efx;
-+	struct mutex mutex; /* protects cts list */
-+	struct list_head cts; /* list of efx_tc_ct_entry in this zone */
+@@ -26,8 +26,9 @@ struct efx_tc_ct_zone {
+ 	struct list_head cts; /* list of efx_tc_ct_entry in this zone */
  };
  
- /* create/teardown hashtables */
-@@ -45,6 +47,7 @@ struct efx_tc_ct_entry {
- 	struct efx_tc_ct_zone *zone;
- 	u32 mark;
- 	struct efx_tc_counter *cnt;
-+	struct list_head list; /* entry on zone->cts */
- };
+-/* create/teardown hashtables */
++/* create/uncreate/teardown hashtables */
+ int efx_tc_init_conntrack(struct efx_nic *efx);
++void efx_tc_destroy_conntrack(struct efx_nic *efx);
+ void efx_tc_fini_conntrack(struct efx_nic *efx);
  
- #endif /* CONFIG_SFC_SRIOV */
-diff --git a/drivers/net/ethernet/sfc/tc_counters.c b/drivers/net/ethernet/sfc/tc_counters.c
-index 979f49058a0c..0fafb47ea082 100644
---- a/drivers/net/ethernet/sfc/tc_counters.c
-+++ b/drivers/net/ethernet/sfc/tc_counters.c
-@@ -129,8 +129,8 @@ static void efx_tc_counter_work(struct work_struct *work)
- 
- /* Counter allocation */
- 
--static struct efx_tc_counter *efx_tc_flower_allocate_counter(struct efx_nic *efx,
--							     int type)
-+struct efx_tc_counter *efx_tc_flower_allocate_counter(struct efx_nic *efx,
-+						      int type)
- {
- 	struct efx_tc_counter *cnt;
- 	int rc, rc2;
-@@ -169,8 +169,8 @@ static struct efx_tc_counter *efx_tc_flower_allocate_counter(struct efx_nic *efx
- 	return ERR_PTR(rc > 0 ? -EIO : rc);
- }
- 
--static void efx_tc_flower_release_counter(struct efx_nic *efx,
--					  struct efx_tc_counter *cnt)
-+void efx_tc_flower_release_counter(struct efx_nic *efx,
-+				   struct efx_tc_counter *cnt)
- {
- 	int rc;
- 
-diff --git a/drivers/net/ethernet/sfc/tc_counters.h b/drivers/net/ethernet/sfc/tc_counters.h
-index 41e57f34b763..f18d71c13600 100644
---- a/drivers/net/ethernet/sfc/tc_counters.h
-+++ b/drivers/net/ethernet/sfc/tc_counters.h
-@@ -49,6 +49,10 @@ int efx_tc_init_counters(struct efx_nic *efx);
- void efx_tc_destroy_counters(struct efx_nic *efx);
- void efx_tc_fini_counters(struct efx_nic *efx);
- 
-+struct efx_tc_counter *efx_tc_flower_allocate_counter(struct efx_nic *efx,
-+						      int type);
-+void efx_tc_flower_release_counter(struct efx_nic *efx,
-+				   struct efx_tc_counter *cnt);
- struct efx_tc_counter_index *efx_tc_flower_get_counter_index(
- 				struct efx_nic *efx, unsigned long cookie,
- 				enum efx_tc_counter_type type);
+ struct efx_tc_ct_zone *efx_tc_ct_register_zone(struct efx_nic *efx, u16 zone,
 
