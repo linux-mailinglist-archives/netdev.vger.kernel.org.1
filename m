@@ -1,83 +1,69 @@
-Return-Path: <netdev+bounces-24104-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24106-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F27876EC6D
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 16:24:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC82276EC8B
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 16:33:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 14EFA280232
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 14:24:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DD5121C20777
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 14:33:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D46E21D5F;
-	Thu,  3 Aug 2023 14:24:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1546C24168;
+	Thu,  3 Aug 2023 14:32:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48BD83D8E;
-	Thu,  3 Aug 2023 14:24:32 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A0FCC433CA;
-	Thu,  3 Aug 2023 14:24:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF2FA23BC9
+	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 14:32:53 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A36FEC433C8;
+	Thu,  3 Aug 2023 14:32:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691072672;
-	bh=fZnCQHD+JnX8Uw0i/9Xy90bfMJI/UtsG/4uWhs4aEPQ=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=n0ogD1d1EEVA2bneQwO5xBlcoSGAhL5fG6B1mrXqBQ5A6bkCzfEeiMZnd4+ZmZgtx
-	 yLkhNx7Y/Tq2fqe5byrhtzjtUI4khWwKM0k+tvm77eAFq0clfUneZM8yJOrfUM9pd9
-	 lTUYedmgfD4QcU1wDoD9IjTBCOJHXUHvD9EpdPq6ZgMJt0CnvdKy93fLvdWlorgIQm
-	 nBmW6Q787wiP3FGxvNo5hDw+Wn7iUTnSzXWE4QXsYCD+fxSTTEuN0fliOOsCbWqXIU
-	 fzobQJKu0zgbdLxd/9gO7YwX4jZ4aMQOmv/V7N1THPtx5yPymW4/2m6reGkarJfRuF
-	 6/JU9ShBceVCA==
-Message-ID: <bd6c0dee-3f2c-3613-a5ff-42cc11268e49@kernel.org>
-Date: Thu, 3 Aug 2023 16:24:26 +0200
+	s=k20201202; t=1691073173;
+	bh=4HAkcAOwU6vcVH3gv5kqQeeKfI1WPDHGE5jrJywS7IQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=RE9OQTxKrfJxlS9hnrh9eGA+Umym9u72ceYORXR7rStKtk50mHPXu/f+e9Ag4mme/
+	 hsXAQj0fwJltADqY+dPDxMS2Qn0IqruTGT7ashw/FCH64wStsZPJjAx9ZQpr+Ml7dz
+	 D4dlcl6p18IPK2FWW87YE+lXlYYjcvXfnvrqAFdDS6IAWP9mxXq/jboMl7FYVrrx2+
+	 jgd1+XWAh1kulXj64OBQ6M3nFBFOIqv+KtpPt6ysWbRgfuVvKUIZ3TEkRUjL/LyCKC
+	 3paFpPzYSJE8x0CtRFdfIT7Iz+0jDkA642Ao8/614m372FB46bsjMWwkl/37nt1WTr
+	 Qi4stX6wE2QYg==
+Date: Thu, 3 Aug 2023 16:32:48 +0200
+From: Simon Horman <horms@kernel.org>
+To: Zhu Wang <wangzhu9@huawei.com>
+Cc: horatiu.vultur@microchip.com, UNGLinuxDriver@microchip.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, netdev@vger.kernel.org
+Subject: Re: [PATCH -next] net: lan966x: Do not check 0 for
+ platform_get_irq_byname()
+Message-ID: <ZMu6kDiHMD1TjMUW@kernel.org>
+References: <20230803082900.14921-1-wangzhu9@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH bpf-next v2 2/3] net: move struct netdev_rx_queue out of
- netdevice.h
-Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, amritha.nambiar@intel.com,
- aleksander.lobakin@intel.com, mst@redhat.com, jasowang@redhat.com,
- xuanzhuo@linux.alibaba.com, ast@kernel.org, daniel@iogearbox.net,
- andrii@kernel.org, martin.lau@linux.dev, song@kernel.org,
- yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
- sdf@google.com, haoluo@google.com, jolsa@kernel.org, bjorn@kernel.org,
- magnus.karlsson@intel.com, maciej.fijalkowski@intel.com,
- jonathan.lemon@gmail.com, gregkh@linuxfoundation.org, wangyufen@huawei.com,
- virtualization@lists.linux-foundation.org
-References: <20230803010230.1755386-1-kuba@kernel.org>
- <20230803010230.1755386-3-kuba@kernel.org>
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <20230803010230.1755386-3-kuba@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230803082900.14921-1-wangzhu9@huawei.com>
 
-
-
-On 03/08/2023 03.02, Jakub Kicinski wrote:
-> struct netdev_rx_queue is touched in only a few places
-> and having it defined in netdevice.h brings in the dependency
-> on xdp.h, because struct xdp_rxq_info gets embedded in
-> struct netdev_rx_queue.
+On Thu, Aug 03, 2023 at 04:29:00PM +0800, Zhu Wang wrote:
+> Since platform_get_irq_byname() never returned zero, so it need not to
+> check whether it returned zero, it returned -EINVAL or -ENXIO when
+> failed, so we replace the return error code with the result it returned.
 > 
-> In prep for removal of xdp.h from netdevice.h move all
-> the netdev_rx_queue stuff to a new header.
-> 
-> We could technically break the new header up to avoid
-> the sysfs.h include but it's so rarely included it
-> doesn't seem to be worth it at this point.
-> 
-> Reviewed-by: Amritha Nambiar<amritha.nambiar@intel.com>
-> Signed-off-by: Jakub Kicinski<kuba@kernel.org>
-> ---
+> Signed-off-by: Zhu Wang <wangzhu9@huawei.com>
 
-Acked-by: Jesper Dangaard Brouer <hawk@kernel.org>
+For non-bugfix Networking patches, it is appropriate to
+designate the target tree as 'net-next' rather than '-next'.
+(For bug fixes 'net' is appropriate).
+
+Link: https://docs.kernel.org/process/maintainer-netdev.html
+
+Otherwise, this looks fine to me.
+
+Reviewed-by: Simon Horman <horms@kernel.org>
 
