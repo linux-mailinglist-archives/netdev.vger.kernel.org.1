@@ -1,81 +1,138 @@
-Return-Path: <netdev+bounces-24036-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24038-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0FCC76E8F2
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 15:00:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E8AB276E939
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 15:04:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2E9131C2151E
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 13:00:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 24FDC1C209D9
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 13:04:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAFD81EA72;
-	Thu,  3 Aug 2023 13:00:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84DE41ED4C;
+	Thu,  3 Aug 2023 13:04:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B0FB15AC7
-	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 13:00:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id DD7E4C433C7;
-	Thu,  3 Aug 2023 13:00:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC9CE1E528
+	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 13:04:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1810C433C9;
+	Thu,  3 Aug 2023 13:04:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691067622;
-	bh=qee0L07NQXO46JN7ItvmxT+dkUH+JHAgABHZE8qWKP4=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=R0KzniUtxaH6Gm4Ogv1umBjHB0l4HeCArjzlR2X2553HkxdW5iZQdxXUmrMcqLBWa
-	 Yw+jNTsHVeFQvB9g8aMwN4ILrucad5h/Bj/rl2T/xeCulaD8KQvHU3SsNjKSENBrqX
-	 cnp9zmy9YqNlrh1drAkJ5IgHmrPd7tbO7/M1UzlhSixlIe2y14pt3QOpGEjEiITfsk
-	 2bEYWT9JkrjvGjY6LFvqrymYPyNu3V44J1lEVrzFGrxBf8xVZueiy9ZqQ/tEf4f9uq
-	 hM1KRxJwzkKV+8CED8nM4TQ7D684ONAJ1RoopRDcGoqDaMv+ZWaqnVB1R2CWKpaNV5
-	 c7m2Bi/bGY81Q==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C0A3EC3274D;
-	Thu,  3 Aug 2023 13:00:21 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1691067862;
+	bh=GTGT20iU3/7JnRQKndWC49V2rfiEkE19lS7NkxeDGvA=;
+	h=From:To:Cc:Subject:Date:From;
+	b=uF/LMjMtmOVUOnSHNKlzidjsC7G2scsrBOhpzAgJbNZjDWjFSLywwXDS5pABXWaBU
+	 vptJ+Uj8bhJmi+JLNmfsz6MElAtyDoRFdw3u3RQbncDi5ImHKyhnokbrv70SRXFB/D
+	 yef0yqDIHQjzle5YXLaa1igWJsKag3RqHDrES1Fx0+48jrqGc+WEk+62FfFfg8HGlg
+	 Ze1hHi8aZ9VVYwwx5bvNIceXxjcDVtjATTb96RjeZAMujXVMYJJ259LFOgz+3eypC8
+	 PrSjAO6NIEcSsL451PeAbogIsWGRnOIS9I9KBBGhPC2l69UIQz4LtSFnWu+TO3OhSM
+	 /gpLRjyERatSA==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: Alan Stern <stern@rowland.harvard.edu>,
+	syzbot+63ee658b9a100ffadbe2@syzkaller.appspotmail.com,
+	Oliver Neukum <oneukum@suse.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Sasha Levin <sashal@kernel.org>,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org,
+	linux-usb@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.4 1/4] net: usbnet: Fix WARNING in usbnet_start_xmit/usb_submit_urb
+Date: Thu,  3 Aug 2023 09:04:15 -0400
+Message-Id: <20230803130419.641865-1-sashal@kernel.org>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.4.7
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] drivers: net: xgene: Do not check for 0 return after
- calling platform_get_irq()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169106762178.3801.7881883856927565943.git-patchwork-notify@kernel.org>
-Date: Thu, 03 Aug 2023 13:00:21 +0000
-References: <20230802090657.969923-1-ruanjinjie@huawei.com>
-In-Reply-To: <20230802090657.969923-1-ruanjinjie@huawei.com>
-To: Ruan Jinjie <ruanjinjie@huawei.com>
-Cc: iyappan@os.amperecomputing.com, keyur@os.amperecomputing.com,
- quan@os.amperecomputing.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org
 
-Hello:
+From: Alan Stern <stern@rowland.harvard.edu>
 
-This patch was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+[ Upstream commit 5e1627cb43ddf1b24b92eb26f8d958a3f5676ccb ]
 
-On Wed, 2 Aug 2023 17:06:57 +0800 you wrote:
-> It is not possible for platform_get_irq() to return 0. Use the
-> return value from platform_get_irq().
-> 
-> Signed-off-by: Ruan Jinjie <ruanjinjie@huawei.com>
-> ---
->  drivers/net/ethernet/apm/xgene/xgene_enet_main.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+The syzbot fuzzer identified a problem in the usbnet driver:
 
-Here is the summary with links:
-  - [net-next] drivers: net: xgene: Do not check for 0 return after calling platform_get_irq()
-    https://git.kernel.org/netdev/net-next/c/c1e9e5e0b9cc
+usb 1-1: BOGUS urb xfer, pipe 3 != type 1
+WARNING: CPU: 0 PID: 754 at drivers/usb/core/urb.c:504 usb_submit_urb+0xed6/0x1880 drivers/usb/core/urb.c:504
+Modules linked in:
+CPU: 0 PID: 754 Comm: kworker/0:2 Not tainted 6.4.0-rc7-syzkaller-00014-g692b7dc87ca6 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/27/2023
+Workqueue: mld mld_ifc_work
+RIP: 0010:usb_submit_urb+0xed6/0x1880 drivers/usb/core/urb.c:504
+Code: 7c 24 18 e8 2c b4 5b fb 48 8b 7c 24 18 e8 42 07 f0 fe 41 89 d8 44 89 e1 4c 89 ea 48 89 c6 48 c7 c7 a0 c9 fc 8a e8 5a 6f 23 fb <0f> 0b e9 58 f8 ff ff e8 fe b3 5b fb 48 81 c5 c0 05 00 00 e9 84 f7
+RSP: 0018:ffffc9000463f568 EFLAGS: 00010086
+RAX: 0000000000000000 RBX: 0000000000000001 RCX: 0000000000000000
+RDX: ffff88801eb28000 RSI: ffffffff814c03b7 RDI: 0000000000000001
+RBP: ffff8881443b7190 R08: 0000000000000001 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000001 R12: 0000000000000003
+R13: ffff88802a77cb18 R14: 0000000000000003 R15: ffff888018262500
+FS:  0000000000000000(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000556a99c15a18 CR3: 0000000028c71000 CR4: 0000000000350ef0
+Call Trace:
+ <TASK>
+ usbnet_start_xmit+0xfe5/0x2190 drivers/net/usb/usbnet.c:1453
+ __netdev_start_xmit include/linux/netdevice.h:4918 [inline]
+ netdev_start_xmit include/linux/netdevice.h:4932 [inline]
+ xmit_one net/core/dev.c:3578 [inline]
+ dev_hard_start_xmit+0x187/0x700 net/core/dev.c:3594
+...
 
-You are awesome, thank you!
+This bug is caused by the fact that usbnet trusts the bulk endpoint
+addresses its probe routine receives in the driver_info structure, and
+it does not check to see that these endpoints actually exist and have
+the expected type and directions.
+
+The fix is simply to add such a check.
+
+Reported-and-tested-by: syzbot+63ee658b9a100ffadbe2@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/linux-usb/000000000000a56e9105d0cec021@google.com/
+Signed-off-by: Alan Stern <stern@rowland.harvard.edu>
+CC: Oliver Neukum <oneukum@suse.com>
+Link: https://lore.kernel.org/r/ea152b6d-44df-4f8a-95c6-4db51143dcc1@rowland.harvard.edu
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/net/usb/usbnet.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/drivers/net/usb/usbnet.c b/drivers/net/usb/usbnet.c
+index 283ffddda821d..2d14b0d78541a 100644
+--- a/drivers/net/usb/usbnet.c
++++ b/drivers/net/usb/usbnet.c
+@@ -1775,6 +1775,10 @@ usbnet_probe (struct usb_interface *udev, const struct usb_device_id *prod)
+ 	} else if (!info->in || !info->out)
+ 		status = usbnet_get_endpoints (dev, udev);
+ 	else {
++		u8 ep_addrs[3] = {
++			info->in + USB_DIR_IN, info->out + USB_DIR_OUT, 0
++		};
++
+ 		dev->in = usb_rcvbulkpipe (xdev, info->in);
+ 		dev->out = usb_sndbulkpipe (xdev, info->out);
+ 		if (!(info->flags & FLAG_NO_SETINT))
+@@ -1784,6 +1788,8 @@ usbnet_probe (struct usb_interface *udev, const struct usb_device_id *prod)
+ 		else
+ 			status = 0;
+ 
++		if (status == 0 && !usb_check_bulk_endpoints(udev, ep_addrs))
++			status = -EINVAL;
+ 	}
+ 	if (status >= 0 && dev->status)
+ 		status = init_status (dev, udev);
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.40.1
 
 
