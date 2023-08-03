@@ -1,118 +1,138 @@
-Return-Path: <netdev+bounces-23929-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23930-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F9F476E2B9
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 10:16:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8DD6F76E2DC
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 10:24:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 502391C2140D
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 08:16:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 33880281F4D
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 08:24:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F19BA14297;
-	Thu,  3 Aug 2023 08:16:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 231EB14A91;
+	Thu,  3 Aug 2023 08:24:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5BD18F4F
-	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 08:16:15 +0000 (UTC)
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72DEE5FC8
-	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 01:16:02 -0700 (PDT)
-Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
-	by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1qRTUi-0002GF-Bh; Thu, 03 Aug 2023 10:15:40 +0200
-Received: from pengutronix.de (unknown [172.20.34.65])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 073C22022D2;
-	Thu,  3 Aug 2023 08:15:39 +0000 (UTC)
-Date: Thu, 3 Aug 2023 10:15:38 +0200
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: haibo.chen@nxp.com
-Cc: robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
-	conor+dt@kernel.org, shawnguo@kernel.org, s.hauer@pengutronix.de,
-	wg@grandegger.com, kernel@pengutronix.de, linux-imx@nxp.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, devicetree@vger.kernel.org,
-	linux-can@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v3 1/2] arm64: dts: imx93: add the Flex-CAN stop mode by
- GPR
-Message-ID: <20230803-pureness-lilly-a285e530cc6c-mkl@pengutronix.de>
-References: <20230726112458.3524165-1-haibo.chen@nxp.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 127218836
+	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 08:24:01 +0000 (UTC)
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::221])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59A21DA;
+	Thu,  3 Aug 2023 01:23:59 -0700 (PDT)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id C2FEE240009;
+	Thu,  3 Aug 2023 08:23:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1691051037;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=SELzQVaBhYhBIwDx2p1Pj2orowZttNN9xEZBvwg3M2A=;
+	b=RVTarNgcL5Lqc7frx4gWP/ChoTOIAY8Fu3KgXKvID229jSKmin5+L8FZS/XNa16aJHi1KY
+	wz9mh3d+mtrD5kLKgg+Zutnd8XZuvlkIUEwQ0cq8fgICHjtlWk90qU3ll40vm9fQ6sgBYt
+	jWUNMx5+8UL1/5UQkRIHvpUOLwbvW975dS7ytocUjT10MoEBEQuXo1vdX9F/n3IbVI7f5J
+	fJGShMAO+3iod4LDPehoOxic7SeHcJ0ugCGHqhtjY6hpHJRwEvpXfWlNWLPRj5EpTue6Sy
+	CurrNWc3DoqhLfQa+toQI/c+59kPiyF9gaOcm6Gmn3Ns706aP03UhG8j19SsWw==
+Date: Thu, 3 Aug 2023 10:23:47 +0200
+From: Herve Codina <herve.codina@bootlin.com>
+To: Rob Herring <robh@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>, Krzysztof Kozlowski
+ <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
+ Lee Jones <lee@kernel.org>, Linus Walleij <linus.walleij@linaro.org>, Qiang
+ Zhao <qiang.zhao@nxp.com>, Li Yang <leoyang.li@nxp.com>, Liam Girdwood
+ <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, Jaroslav Kysela
+ <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, Shengjiu Wang
+ <shengjiu.wang@gmail.com>, Xiubo Li <Xiubo.Lee@gmail.com>, Fabio Estevam
+ <festevam@gmail.com>, Nicolin Chen <nicoleotsuka@gmail.com>, Christophe
+ Leroy <christophe.leroy@csgroup.eu>, Randy Dunlap <rdunlap@infradead.org>,
+ netdev@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-gpio@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ alsa-devel@alsa-project.org, Thomas Petazzoni 
+ <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH v2 27/28] dt-bindings: net: fsl,qmc-hdlc: Add framer
+ support
+Message-ID: <20230803102347.74706421@bootlin.com>
+In-Reply-To: <20230803004259.GA1598510-robh@kernel.org>
+References: <20230726150225.483464-1-herve.codina@bootlin.com>
+	<20230726150225.483464-28-herve.codina@bootlin.com>
+	<20230803004259.GA1598510-robh@kernel.org>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="p2d3wquopx5arobx"
-Content-Disposition: inline
-In-Reply-To: <20230726112458.3524165-1-haibo.chen@nxp.com>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:b01:1d::7b
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: herve.codina@bootlin.com
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+Hi Rob,
 
---p2d3wquopx5arobx
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Wed, 2 Aug 2023 18:42:59 -0600
+Rob Herring <robh@kernel.org> wrote:
 
-On 26.07.2023 19:24:57, haibo.chen@nxp.com wrote:
-> From: Haibo Chen <haibo.chen@nxp.com>
->=20
-> imx93 A0 chip use the internal q-channel handshake signal in LPCG
-> and CCM to automatically handle the Flex-CAN stop mode. But this
-> method meet issue when do the system PM stress test. IC can't fix
-> it easily. So in the new imx93 A1 chip, IC drop this method, and
-> involve back the old way=EF=BC=8Cuse the GPR method to trigger the Flex-C=
-AN
-> stop mode signal. Now NXP claim to drop imx93 A0, and only support
-> imx93 A1. So here add the stop mode through GPR.
->=20
-> This patch also fix a typo for aonmix_ns_gpr.
->=20
-> Signed-off-by: Haibo Chen <haibo.chen@nxp.com>
+> On Wed, Jul 26, 2023 at 05:02:23PM +0200, Herve Codina wrote:
+> > A framer can be connected to the QMC HDLC.
+> > If present, this framer is the interface between the TDM used by the QMC
+> > HDLC and the E1/T1 line.
+> > The QMC HDLC can use this framer to get information about the line and
+> > configure the line.
+> > 
+> > Add an optional framer property to reference the framer itself.
+> > 
+> > Signed-off-by: Herve Codina <herve.codina@bootlin.com>
+> > ---
+> >  Documentation/devicetree/bindings/net/fsl,qmc-hdlc.yaml | 5 +++++
+> >  1 file changed, 5 insertions(+)
+> > 
+> > diff --git a/Documentation/devicetree/bindings/net/fsl,qmc-hdlc.yaml b/Documentation/devicetree/bindings/net/fsl,qmc-hdlc.yaml
+> > index 8bb6f34602d9..bf29863ab419 100644
+> > --- a/Documentation/devicetree/bindings/net/fsl,qmc-hdlc.yaml
+> > +++ b/Documentation/devicetree/bindings/net/fsl,qmc-hdlc.yaml
+> > @@ -27,6 +27,11 @@ properties:
+> >        Should be a phandle/number pair. The phandle to QMC node and the QMC
+> >        channel to use.
+> >  
+> > +  framer:
+> > +    $ref: /schemas/types.yaml#/definitions/phandle  
+> 
+> Now you've defined this property twice. Please avoid doing that.
 
-Added both to linux-can/testing.
+I don't see what you mean.
 
-Thanks,
-Marc
+I previously defined the framer property at the framer-codec node as it is
+a framer consumer (it was a mistake because this framer-codec node is a child of
+the framer node but that's an other story).
 
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+Here, at the qmc-hdlc node, I define this property in order to use the framer as a
+consumer too.
 
---p2d3wquopx5arobx
-Content-Type: application/pgp-signature; name="signature.asc"
+What is wrong ?
 
------BEGIN PGP SIGNATURE-----
+Best regards,
+Hervé
 
-iQEzBAABCgAdFiEEDs2BvajyNKlf9TJQvlAcSiqKBOgFAmTLYicACgkQvlAcSiqK
-BOiFPQf/VRYql3MNa/WmqW7jg6JhR4TiarD2pBqlpTAr2ED/rAmmxS09s08TD6l0
-rYL18J0Q3Q9qWfAvyiNtKUA5wg4/Z11D4ZghrynDlNF+D7kK8hLaNzCGQRhtviMd
-0cbZZVTq8q+2ZsREdKZij4hmGGTFVp0aBX+KSOjLaMR3GjcuusL8qjAqzaWSiRIz
-FNkH72i5nic+vC5rUtt+fo03NO4LtA2QPLxV8anU3puahX0X8gVNYnUdcrR+JYJp
-qZAMPVcj/DMmKbivTqvfNYLUBj8jS3acMwDpdX+bvcz5abb3EaZFwqwgxxG5Xz4E
-7vCvEJRahX3WgKLB9p6OsEMT2Cjtvw==
-=619W
------END PGP SIGNATURE-----
-
---p2d3wquopx5arobx--
+> 
+> > +    description:
+> > +      phandle to the framer node
+> > +
+> >  required:
+> >    - compatible
+> >    - fsl,qmc-chan
+> > -- 
+> > 2.41.0
+> >   
 
