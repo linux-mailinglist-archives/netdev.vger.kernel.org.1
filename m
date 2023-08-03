@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-23979-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23978-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 220C676E681
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 13:14:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1695276E67D
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 13:13:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D06292820AB
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 11:14:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C542028204C
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 11:13:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1632D18AEB;
-	Thu,  3 Aug 2023 11:13:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0FB817FFE;
+	Thu,  3 Aug 2023 11:13:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 073C8182D1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2F948F7C
 	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 11:13:51 +0000 (UTC)
-Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09D6A196
-	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 04:13:44 -0700 (PDT)
-Received: by mail-ed1-x534.google.com with SMTP id 4fb4d7f45d1cf-51cff235226so1897141a12.0
-        for <netdev@vger.kernel.org>; Thu, 03 Aug 2023 04:13:44 -0700 (PDT)
+Received: from mail-ej1-x644.google.com (mail-ej1-x644.google.com [IPv6:2a00:1450:4864:20::644])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99CD0E75
+	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 04:13:46 -0700 (PDT)
+Received: by mail-ej1-x644.google.com with SMTP id a640c23a62f3a-99c10ba30afso422955166b.1
+        for <netdev@vger.kernel.org>; Thu, 03 Aug 2023 04:13:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1691061223; x=1691666023;
+        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1691061225; x=1691666025;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=jN4tj6ro1FneEJbRj7B8hPejpVe40Jja+XIMGYax1bc=;
-        b=ViZKaG35m/RVktKxjSfoMr1R/MpX8GeTflhXDjZIGsJ5TsweEND2OQBmVB/De2OyPl
-         xdPHVLCicERaK7Ghn2wJ5Dbs6SI9lZgMFnLalvzvqJIks/j3PF6SI0BKRVSNEEoNpwk1
-         O9uvzFgxHacSlB87eUmEmbiHr/1ouM3z1mF0YEeMXNjTPt59KplS6iOr2GHePDsAzZCN
-         9cCaitR3npys6RI2IvuaXrJ7i+Zi952M2n/yIM0cn9iVGdEEvJq8MRUaQlp0hKE0M0Fh
-         P1fSPe36NkycHfnC3G1S/B/7t/CfDwCTZE8l3zF6ehM5YQ6c5ZE4eeHNJqCpwKu3Xoj2
-         dgnQ==
+        bh=J0LhtMaDHhRm3mbnKfWT8/Dhmh40h6lBxv/BhmqqlQo=;
+        b=XkoPN3HjHRBwVJxQE1gkkobS8bzHGBfG7clAoAmoZTMWeEqghxm1EOZoXnxl8ME/1X
+         gXpqFgPrSzsA+Vg2At3W3nnWHfGf3zlIBhbR8uW4tdQwdFGKTGtv1gE8f6T1cBe101+T
+         ER8S65DIiQwjiRQPInKr9kjYjBNmybhC1wbou+VcD0F3IU5C3EIM6l3zMYd92J9onGAP
+         b8b/zZ6S7UvBKOPC8sP1IVjehyRp0/S9YmzoEiZVAzfw5Iiy8ZPXzp9srBpP0h0/Vkdt
+         D1tNV8mQSBrOuaINKoJZPotKk81bcGMbLyVonkmbtYMQS3aknOaK8N24jkdblvo2MtsL
+         jzKA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691061223; x=1691666023;
+        d=1e100.net; s=20221208; t=1691061225; x=1691666025;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=jN4tj6ro1FneEJbRj7B8hPejpVe40Jja+XIMGYax1bc=;
-        b=lG0L+xc0s4X/3hyz08hA2MTUn9SPJjZyQpjoP+XHiL9i9tcmFPt3IuSUrXy3wywXxb
-         kfrch9sZH3Yko/xpCLnzOhflio8VPnRnVTLM2NeJ4nZ0UgkFlihKIx/msBIM/id8/HpW
-         0ox2MWWwTAi18TtTX/pQEzYgSH8AFEjrdrq/dOvyK31/fJidUGdKn1+nmzgpLzen/vOc
-         mje+hisgEEWBJuBm15Osnu3I9Hi8uBnPXJOu8FCXIKtDjzl5Ub+MFOp3YSThY9vDZw/+
-         U9AfW164o8CrTmMy9S7DJaFxpDTzan2tBNJvg9kFAZnzl6V0cWPoEn/oNPlRoqm8V943
-         w3NQ==
-X-Gm-Message-State: AOJu0Yzk1uMbIB2L4VRVUluxTa2NdXgW75jQ49HiH8sef9sksjYcrbVb
-	ORfc7iT3gQ+j+G0hiZLQ39i0meQoKUw11mgcPpZutg==
-X-Google-Smtp-Source: AGHT+IFfKEDSdHtXB84nQN575Q7J6SQA2UgXD+6kQHjjqzA6iGfePKlJOeFdiGlYEK/nvI1HidGi5g==
-X-Received: by 2002:aa7:c694:0:b0:523:100b:70da with SMTP id n20-20020aa7c694000000b00523100b70damr953683edq.4.1691061223330;
-        Thu, 03 Aug 2023 04:13:43 -0700 (PDT)
+        bh=J0LhtMaDHhRm3mbnKfWT8/Dhmh40h6lBxv/BhmqqlQo=;
+        b=Qo573dLC5RjAmadYeHN4+LKdtF29+2KnxVlaRpSQIXTzPyckZZZ8QSFbs2nbg7TFSS
+         3e+EC7A8PG2hj6q3Gc5PKNMg5sWQPzpZ6Wp1feNA6Yz79FXAbET1ZCdlQ08IAArkfDWP
+         oYiePEgK7+L25ErV1NhiVfGa1gigFBcHbnRGwd623LeVTlY8sdbD3nUCcqvAPE6lF0Ld
+         Kn1KMnRaCuSZUEkrZuRRW1LciG4ejnEiyu7GMKqmTxOKuComAwQlr3/fTPWa53Zph7ch
+         apmd+6CRHdL6J5MV7Ib2CdbyDRrK8HYdDPZPJitgfZNAC985fRoWrvRMJnOsvUrpcVFN
+         2uCw==
+X-Gm-Message-State: ABy/qLaiM4ShgqMngTaQRPjS8CGUuF/NXEfAOILpbIAs+DRP05L1Eum1
+	YbXrB0SNkRlRYz8EGTYs1O4C8kQoMjHfC/E/PiBIT2Bs
+X-Google-Smtp-Source: APBJJlEX/gpQ+ZWPByGKB5SUDU6QnKKXNRvwXErm2eI1xMBVfyeNHKqfqZAcJ+mnEZEe0sC0WXdQnQ==
+X-Received: by 2002:a17:907:9686:b0:98d:ebb7:a8b0 with SMTP id hd6-20020a170907968600b0098debb7a8b0mr10858705ejc.14.1691061225152;
+        Thu, 03 Aug 2023 04:13:45 -0700 (PDT)
 Received: from localhost ([212.23.236.67])
-        by smtp.gmail.com with ESMTPSA id p4-20020a056402044400b00521d2f7459fsm10098432edw.49.2023.08.03.04.13.42
+        by smtp.gmail.com with ESMTPSA id gw19-20020a170906f15300b0097404f4a124sm10400868ejb.2.2023.08.03.04.13.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Aug 2023 04:13:42 -0700 (PDT)
+        Thu, 03 Aug 2023 04:13:44 -0700 (PDT)
 From: Jiri Pirko <jiri@resnulli.us>
 To: netdev@vger.kernel.org
 Cc: kuba@kernel.org,
@@ -66,9 +66,9 @@ Cc: kuba@kernel.org,
 	saeedm@nvidia.com,
 	idosch@nvidia.com,
 	petrm@nvidia.com
-Subject: [patch net-next v3 01/12] netlink: specs: add dump-strict flag for dont-validate property
-Date: Thu,  3 Aug 2023 13:13:29 +0200
-Message-ID: <20230803111340.1074067-2-jiri@resnulli.us>
+Subject: [patch net-next v3 02/12] ynl-gen-c.py: filter rendering of validate field values for split ops
+Date: Thu,  3 Aug 2023 13:13:30 +0200
+Message-ID: <20230803111340.1074067-3-jiri@resnulli.us>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230803111340.1074067-1-jiri@resnulli.us>
 References: <20230803111340.1074067-1-jiri@resnulli.us>
@@ -80,65 +80,52 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
 	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
 From: Jiri Pirko <jiri@nvidia.com>
 
-Allow user to specify GENL_DONT_VALIDATE_DUMP_STRICT flag for validation
-and add this flag to netlink spec schema.
+For split ops, do and dump has different meaningful values in
+validate field.
+
+Fix the rendering to allow the values per op type as follows:
+do: strict
+dump: dump, strict-dump
 
 Signed-off-by: Jiri Pirko <jiri@nvidia.com>
 ---
 v1->v2:
-- new patch
+- consider strict-dump flag newly added by the previous patch
+- re-phrased the commit message, altered the patch subject a bit
 ---
- Documentation/netlink/genetlink-c.yaml      | 2 +-
- Documentation/netlink/genetlink-legacy.yaml | 2 +-
- Documentation/netlink/genetlink.yaml        | 2 +-
- 3 files changed, 3 insertions(+), 3 deletions(-)
+ tools/net/ynl/ynl-gen-c.py | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/Documentation/netlink/genetlink-c.yaml b/Documentation/netlink/genetlink-c.yaml
-index 57d1c1c4918f..4c1f8c22627b 100644
---- a/Documentation/netlink/genetlink-c.yaml
-+++ b/Documentation/netlink/genetlink-c.yaml
-@@ -274,7 +274,7 @@ properties:
-               description: Kernel attribute validation flags.
-               type: array
-               items:
--                enum: [ strict, dump ]
-+                enum: [ strict, dump, dump-strict ]
-             do: &subop-type
-               description: Main command handler.
-               type: object
-diff --git a/Documentation/netlink/genetlink-legacy.yaml b/Documentation/netlink/genetlink-legacy.yaml
-index 43b769c98fb2..196076dfa309 100644
---- a/Documentation/netlink/genetlink-legacy.yaml
-+++ b/Documentation/netlink/genetlink-legacy.yaml
-@@ -321,7 +321,7 @@ properties:
-               description: Kernel attribute validation flags.
-               type: array
-               items:
--                enum: [ strict, dump ]
-+                enum: [ strict, dump, dump-strict ]
-             # Start genetlink-legacy
-             fixed-header: *fixed-header
-             # End genetlink-legacy
-diff --git a/Documentation/netlink/genetlink.yaml b/Documentation/netlink/genetlink.yaml
-index 1cbb448d2f1c..3d338c48bf21 100644
---- a/Documentation/netlink/genetlink.yaml
-+++ b/Documentation/netlink/genetlink.yaml
-@@ -243,7 +243,7 @@ properties:
-               description: Kernel attribute validation flags.
-               type: array
-               items:
--                enum: [ strict, dump ]
-+                enum: [ strict, dump, dump-strict ]
-             do: &subop-type
-               description: Main command handler.
-               type: object
+diff --git a/tools/net/ynl/ynl-gen-c.py b/tools/net/ynl/ynl-gen-c.py
+index 650be9b8b693..a3f70ca929fb 100755
+--- a/tools/net/ynl/ynl-gen-c.py
++++ b/tools/net/ynl/ynl-gen-c.py
+@@ -1988,9 +1988,17 @@ def print_kernel_op_table(family, cw):
+                 cw.block_start()
+                 members = [('cmd', op.enum_name)]
+                 if 'dont-validate' in op:
++                    dont_validate = []
++                    for x in op['dont-validate']:
++                        if op_mode == 'do' and x in ['dump', 'dump-strict']:
++                            continue
++                        if op_mode == "dump" and x == 'strict':
++                            continue
++                        dont_validate.append(x)
++
+                     members.append(('validate',
+                                     ' | '.join([c_upper('genl-dont-validate-' + x)
+-                                                for x in op['dont-validate']])), )
++                                                for x in dont_validate])), )
+                 name = c_lower(f"{family.name}-nl-{op_name}-{op_mode}it")
+                 if 'pre' in op[op_mode]:
+                     members.append((cb_names[op_mode]['pre'], c_lower(op[op_mode]['pre'])))
 -- 
 2.41.0
 
