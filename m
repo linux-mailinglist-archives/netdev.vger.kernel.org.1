@@ -1,71 +1,207 @@
-Return-Path: <netdev+bounces-24177-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24178-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 850DB76F1B1
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 20:17:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AFD3376F1B4
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 20:20:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3F5402822C9
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 18:17:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 657F12822E0
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 18:20:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59A5A25903;
-	Thu,  3 Aug 2023 18:17:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3562025907;
+	Thu,  3 Aug 2023 18:20:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0720F24161
-	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 18:17:34 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB1AEC433C8;
-	Thu,  3 Aug 2023 18:17:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691086654;
-	bh=eFNBhBaVjqMLEN64GMvfHB1O2ZA4bHNQxw/O6nWVKVA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=hWDLwqkl9cba6rL1dO1czm4V39g6/zrqxlamrZx66fiU3LtcuQEyY3mHSI+Fa9HZI
-	 p+cXDuhV7XFg/KOdAtKiQKBnubgXAdivLmEOi9Un8Ie0ZQDxAvzy3eCgRzOrDCW1xK
-	 jlowrkuSXugor8/GLskdVyTDRpTIeqT/7J/MtOTwpMx+ZqYdUXvGxbc0IqVbqM9mgm
-	 5hlaakfSrINoy+Nh35ewnVCMaxJz64CuhylEV2Z6RKvvusyI3NLHK+TQqxmSykGxAf
-	 2XWHPB81AZHabBx1JW2591ozC2/lTsfCZt/2tIw1buHZ13YlkjN7LUr3CYhMcbTYD9
-	 NWrYgrBTOVDzQ==
-Date: Thu, 3 Aug 2023 21:17:30 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Ruan Jinjie <ruanjinjie@huawei.com>
-Cc: borisp@nvidia.com, saeedm@nvidia.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	linux-rdma@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next] net/mlx5: remove many unnecessary NULL values
-Message-ID: <20230803181730.GG53714@unreal>
-References: <20230801123854.375155-1-ruanjinjie@huawei.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28A9524161
+	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 18:20:46 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.31])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EB20110;
+	Thu,  3 Aug 2023 11:20:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1691086844; x=1722622844;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=RWJzfm/Xt7VqAdgAmvEq0+En0/9OUFl34luIQe+uKMQ=;
+  b=IJ/XjaDpyF9Ld/bcgaA76OzlMm9gHd6blm1wBtjIKQ5YpYfrWnDDE0ks
+   sT/pESsw2FbyQHsnAAVhPWeYop7rBBk/AMIaQ02lKFgOhgJnmkktWmrGb
+   IUnRkNp+rtGBeya+dp9joBedaY/vltF9RCf/cfgSbdgD0Kt049wurK7Uo
+   1xSexxiq2WkWaa/U5jeRqND36MbltDtmmxBUynAINd53bnc4FQf05dcFN
+   Wvc5NqR9vvHap3dJG0qduWtk4Hei18ipTSRg/x3nfoXWttJa7hJ9WXaMC
+   XF7Iv7hLG/d17OpD+sXJVshwiXssnRqwscMvywxX3yOq980CQY55mW4G4
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10791"; a="433811781"
+X-IronPort-AV: E=Sophos;i="6.01,252,1684825200"; 
+   d="scan'208";a="433811781"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Aug 2023 11:20:43 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10791"; a="764784515"
+X-IronPort-AV: E=Sophos;i="6.01,252,1684825200"; 
+   d="scan'208";a="764784515"
+Received: from newjersey.igk.intel.com ([10.102.20.203])
+  by orsmga001.jf.intel.com with ESMTP; 03 Aug 2023 11:20:39 -0700
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Larysa Zaremba <larysa.zaremba@intel.com>,
+	Yunsheng Lin <linyunsheng@huawei.com>,
+	Alexander Duyck <alexanderduyck@fb.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	Simon Horman <simon.horman@corigine.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v3 0/6] page_pool: a couple of assorted optimizations
+Date: Thu,  3 Aug 2023 20:20:32 +0200
+Message-ID: <20230803182038.2646541-1-aleksander.lobakin@intel.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230801123854.375155-1-ruanjinjie@huawei.com>
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Tue, Aug 01, 2023 at 08:38:54PM +0800, Ruan Jinjie wrote:
-> Ther are many pointers assigned first, which need not to be initialized, so
+That initially was a spin-off of the IAVF PP series[0], but has grown
+(and shrunk) since then a bunch. In fact, it consists of three
+semi-independent blocks:
 
-Ther -> There
+* #1-2: Compile-time optimization. Split page_pool.h into 2 headers to
+  not overbloat the consumers not needing complex inline helpers and
+  then stop including it in skbuff.h at all. The first patch is also
+  prereq for the whole series.
+* #3: Improve cacheline locality for users of the Page Pool frag API.
+* #4-6: Use direct cache recycling more aggressively, when it is safe
+  obviously. In addition, make sure nobody wants to use Page Pool API
+  with disabled interrupts.
 
-> remove the NULL assignment.
+Patches #1 and #5 are authored by Yunsheng and Jakub respectively, with
+small modifications from my side as per ML discussions.
+For the perf numbers for #3-6, please see individual commit messages.
 
-assignment -> assignments.
+Also available on my GH with many more Page Pool goodies[1].
 
-> 
-> Signed-off-by: Ruan Jinjie <ruanjinjie@huawei.com>
-> ---
->  drivers/net/ethernet/mellanox/mlx5/core/fpga/core.c   | 4 ++--
->  drivers/net/ethernet/mellanox/mlx5/core/lib/hv_vhca.c | 2 +-
->  2 files changed, 3 insertions(+), 3 deletions(-)
-> 
+[0] https://lore.kernel.org/netdev/20230530150035.1943669-1-aleksander.lobakin@intel.com
+[1] https://github.com/alobakin/linux/commits/iavf-pp-frag
 
-Thanks,
-Reviewed-by: Leon Romanovsky <leonro@nvidia.com>
+Alexander Lobakin (4):
+  net: skbuff: don't include <net/page_pool/types.h> to <linux/skbuff.h>
+  page_pool: place frag_* fields in one cacheline
+  net: skbuff: avoid accessing page_pool if !napi_safe when returning
+    page
+  net: skbuff: always try to recycle PP pages directly when in softirq
+
+Jakub Kicinski (1):
+  page_pool: add a lockdep check for recycling in hardirq
+
+Yunsheng Lin (1):
+  page_pool: split types and declarations from page_pool.h
+
+ MAINTAINERS                                   |   2 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c     |   2 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c |   2 +-
+ drivers/net/ethernet/engleder/tsnep_main.c    |   1 +
+ drivers/net/ethernet/freescale/fec_main.c     |   1 +
+ .../net/ethernet/hisilicon/hns3/hns3_enet.c   |   1 +
+ .../net/ethernet/hisilicon/hns3/hns3_enet.h   |   2 +-
+ drivers/net/ethernet/marvell/mvneta.c         |   2 +-
+ drivers/net/ethernet/marvell/mvpp2/mvpp2.h    |   2 +-
+ .../net/ethernet/marvell/mvpp2/mvpp2_main.c   |   1 +
+ .../marvell/octeontx2/nic/otx2_common.c       |   1 +
+ .../ethernet/marvell/octeontx2/nic/otx2_pf.c  |   1 +
+ drivers/net/ethernet/mediatek/mtk_eth_soc.c   |   1 +
+ drivers/net/ethernet/mediatek/mtk_eth_soc.h   |   2 +-
+ .../ethernet/mellanox/mlx5/core/en/params.c   |   1 +
+ .../net/ethernet/mellanox/mlx5/core/en/trap.c |   1 -
+ .../net/ethernet/mellanox/mlx5/core/en/xdp.c  |   1 +
+ .../net/ethernet/mellanox/mlx5/core/en_main.c |   2 +-
+ .../net/ethernet/mellanox/mlx5/core/en_rx.c   |   2 +-
+ .../ethernet/mellanox/mlx5/core/en_stats.c    |   2 +-
+ .../ethernet/microchip/lan966x/lan966x_fdma.c |   1 +
+ .../ethernet/microchip/lan966x/lan966x_main.h |   2 +-
+ drivers/net/ethernet/socionext/netsec.c       |   2 +-
+ drivers/net/ethernet/stmicro/stmmac/stmmac.h  |   2 +-
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c |   1 +
+ drivers/net/ethernet/ti/cpsw.c                |   2 +-
+ drivers/net/ethernet/ti/cpsw_new.c            |   2 +-
+ drivers/net/ethernet/ti/cpsw_priv.c           |   2 +-
+ drivers/net/ethernet/wangxun/libwx/wx_lib.c   |   2 +-
+ drivers/net/veth.c                            |   2 +-
+ drivers/net/wireless/mediatek/mt76/mac80211.c |   1 -
+ drivers/net/wireless/mediatek/mt76/mt76.h     |   1 +
+ drivers/net/xen-netfront.c                    |   2 +-
+ include/linux/lockdep.h                       |   7 +
+ include/linux/skbuff.h                        |   5 +-
+ .../net/{page_pool.h => page_pool/helpers.h}  | 246 +-----------------
+ include/net/page_pool/types.h                 | 236 +++++++++++++++++
+ include/trace/events/page_pool.h              |   2 +-
+ net/bpf/test_run.c                            |   2 +-
+ net/core/page_pool.c                          |  43 +--
+ net/core/skbuff.c                             |  49 +++-
+ net/core/xdp.c                                |   2 +-
+ 42 files changed, 337 insertions(+), 307 deletions(-)
+ rename include/net/{page_pool.h => page_pool/helpers.h} (50%)
+ create mode 100644 include/net/page_pool/types.h
+
+---
+From v2[2]:
+* just rebase on top of Jakub's kdoc changes landed last minute.
+
+From v1[3]:
+* move the "avoid calling no-op DMA sync ops" piece out of the series --
+  will join some other or transform into something else (Jakub et al.);
+* #1: restore accidentally removed path in MAINTAINERS (Yunsheng);
+* #1: prefer `include/net/page_pool/` over `include/net/page_pool/*` in
+  MAINTAINERS (Yunsheng);
+* #2: rename page_pool_return_skb_page() to napi_pp_put_page() -- the old
+  name seems to not make any sense for some time already (Yunsheng);
+* #2: guard napi_pp_put_page() with CONFIG_PAGE_POOL in skbuff.c (to not
+  compile it when there are no users) (Yunsheng).
+
+From RFC v2[4]:
+* drop the dependency on the hybrid allocation series (and thus the
+  "RFC" prefix) -- it wasn't a strict dep and it's not in the trees yet;
+* add [slightly reworked] Yunsheng's patch which splits page_pool.h into
+  2 headers -- merge conflict hell otherwise.
+  Also fix a typo while nobody looks (Simon);
+* #3 (former #2): word the commitmsg a bit better, mention the main
+  reason for the change more clearly (Ilias);
+* add Jakub's hardirq assertion as a prereq for the last patch;
+* #9 (former #7): add comment mentioning that the hardirq case is not
+  checked due to the assertion checking it later (yes, it is illegal to
+  use Page Pool with the interrupts disabled or when in TH) (Jakub).
+
+From RFC v1[5]:
+* #1: move the entire function to skbuff.c, don't try to split it (Alex);
+* #2-4: new;
+* #5: use internal flags field added in #4 and don't modify driver-defined
+  structure (Alex, Jakub);
+* #6: new;
+* drop "add new NAPI state" as a redundant complication;
+* #7: replace the check for the new NAPI state to just in_softirq(), should
+  be fine (Jakub).
+
+[2] https://lore.kernel.org/netdev/20230803164014.993838-1-aleksander.lobakin@intel.com
+[3] https://lore.kernel.org/netdev/20230727144336.1646454-1-aleksander.lobakin@intel.com
+[4] https://lore.kernel.org/netdev/20230714170853.866018-1-aleksander.lobakin@intel.com
+[5] https://lore.kernel.org/netdev/20230629152305.905962-1-aleksander.lobakin@intel.com
+-- 
+2.41.0
+
 
