@@ -1,80 +1,39 @@
-Return-Path: <netdev+bounces-23973-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23975-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 489A476E647
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 13:03:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E200776E665
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 13:10:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 79ACB1C21432
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 11:03:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1E6511C2145F
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 11:10:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C99C4182AF;
-	Thu,  3 Aug 2023 11:03:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84F2915AFA;
+	Thu,  3 Aug 2023 11:10:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB98918003
-	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 11:03:03 +0000 (UTC)
-Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF01E3A95;
-	Thu,  3 Aug 2023 04:02:54 -0700 (PDT)
-Received: from fllv0035.itg.ti.com ([10.64.41.0])
-	by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 373B2S7m010391;
-	Thu, 3 Aug 2023 06:02:28 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1691060548;
-	bh=CoQHbB7ASV/+6Bp+MG8mFHgYRak2hFdXnN3fvXrjZeg=;
-	h=From:To:CC:Subject:Date:In-Reply-To:References;
-	b=HYbA4WIHBpEb8TA/Cte4BbfNV1sPAhQFOw56VMRPcGQh32mJjnWsMduppB516OEaF
-	 cyYf3gyX7ZxixgzPg6BMOwKm0WBPfHjBihME3KUqkFl35KqcR2GMZGo4b/jshAHQIQ
-	 5ZgxMc0n7zXh4fir/12uWQKKqpwMrF/0uwyVJGq4=
-Received: from DLEE104.ent.ti.com (dlee104.ent.ti.com [157.170.170.34])
-	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 373B2SQQ049893
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Thu, 3 Aug 2023 06:02:28 -0500
-Received: from DLEE114.ent.ti.com (157.170.170.25) by DLEE104.ent.ti.com
- (157.170.170.34) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Thu, 3
- Aug 2023 06:02:27 -0500
-Received: from lelv0326.itg.ti.com (10.180.67.84) by DLEE114.ent.ti.com
- (157.170.170.25) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Thu, 3 Aug 2023 06:02:27 -0500
-Received: from fllv0122.itg.ti.com (fllv0122.itg.ti.com [10.247.120.72])
-	by lelv0326.itg.ti.com (8.15.2/8.15.2) with ESMTP id 373B2R9V026296;
-	Thu, 3 Aug 2023 06:02:27 -0500
-Received: from localhost (uda0501179.dhcp.ti.com [172.24.227.217])
-	by fllv0122.itg.ti.com (8.14.7/8.14.7) with ESMTP id 373B2Qva022634;
-	Thu, 3 Aug 2023 06:02:27 -0500
-From: MD Danish Anwar <danishanwar@ti.com>
-To: Randy Dunlap <rdunlap@infradead.org>, Roger Quadros <rogerq@kernel.org>,
-        Simon Horman <simon.horman@corigine.com>,
-        Vignesh Raghavendra
-	<vigneshr@ti.com>, Andrew Lunn <andrew@lunn.ch>,
-        Richard Cochran
-	<richardcochran@gmail.com>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Krzysztof
- Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Rob Herring
-	<robh+dt@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-        Jakub Kicinski
-	<kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        MD Danish Anwar <danishanwar@ti.com>
-CC: <nm@ti.com>, <srk@ti.com>, <linux-kernel@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-omap@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>
-Subject: [PATCH 4/4] net: ti: icssg-prueth: am65x SR2.0 add 10M full duplex support
-Date: Thu, 3 Aug 2023 16:31:53 +0530
-Message-ID: <20230803110153.3309577-5-danishanwar@ti.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230803110153.3309577-1-danishanwar@ti.com>
-References: <20230803110153.3309577-1-danishanwar@ti.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BB9A8F7C
+	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 11:10:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id D040EC433CA;
+	Thu,  3 Aug 2023 11:10:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1691061020;
+	bh=ZM6srAz7iS9kwiZHQUQLWj1QVWOLIa8qIiy8vt/q1xc=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=rizXe8+Ucmv6dvWsNhwGwrTwv6pyqZx0xlYk7LMJG9RZ7L+A816JRYVbmxBJjx2O3
+	 cIYQsJuN5kqo5NPYCB/8KbB9Os6LnVUZTA8f0/MmVMrRsaYP1z2FmZBs2hli6zLL1m
+	 2kylR3ckXEr8JwZULYzQL/geaVMGHbECdEj94G4DlW9nlJM6vC8YDpsMVratB9/bw/
+	 IYCMk4RWlI1JuaVieZg2DI/8qLHUTv0mPuawPEh1jqyDRp1alZaNUbHQRH7/hsTdQA
+	 JjBLTTP20iFwjzUS3QmpGpoqWoBvy1/4MIwink+OPmvu8Ijho0/Z+bJVVK5IkIE3DW
+	 MzBnl5TLSELoQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id AF0DBC3274D;
+	Thu,  3 Aug 2023 11:10:20 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,167 +41,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Subject: Re: [PATCH net-next] tipc: Remove unused function declarations
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169106102071.8585.16493259766116573750.git-patchwork-notify@kernel.org>
+Date: Thu, 03 Aug 2023 11:10:20 +0000
+References: <20230802034659.39840-1-yuehaibing@huawei.com>
+In-Reply-To: <20230802034659.39840-1-yuehaibing@huawei.com>
+To: Yue Haibing <yuehaibing@huawei.com>
+Cc: jmaloy@redhat.com, ying.xue@windriver.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ lucien.xin@gmail.com, netdev@vger.kernel.org,
+ tipc-discussion@lists.sourceforge.net
 
-From: Grygorii Strashko <grygorii.strashko@ti.com>
+Hello:
 
-For AM65x SR2.0 it's required to enable IEP1 in raw 64bit mode which is
-used by PRU FW to monitor the link and apply w/a for 10M link issue.
-Note. No public errata available yet.
+This patch was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-Without this w/a the PRU FW will stuck if link state changes under TX
-traffic pressure.
+On Wed, 2 Aug 2023 11:46:59 +0800 you wrote:
+> Commit d50ccc2d3909 ("tipc: add 128-bit node identifier") declared but never
+> implemented tipc_node_id2hash().
+> Also commit 5c216e1d28c8 ("tipc: Allow run-time alteration of default link settings")
+> never implemented tipc_media_set_priority() and tipc_media_set_window(),
+> commit cad2929dc432 ("tipc: update a binding service via broadcast") only declared
+> tipc_named_bcast().
+> 
+> [...]
 
-Hence, add support for 10M full duplex for AM65x SR2.0:
- - add new IEP API to enable IEP, but without PTP support
- - add pdata quirk_10m_link_issue to enable 10M link issue w/a.
+Here is the summary with links:
+  - [net-next] tipc: Remove unused function declarations
+    https://git.kernel.org/netdev/net-next/c/c956910d5af1
 
-Signed-off-by: Grygorii Strashko <grygorii.strashko@ti.com>
-Signed-off-by: Vignesh Raghavendra <vigneshr@ti.com>
-Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
----
- drivers/net/ethernet/ti/icssg/icss_iep.c     | 26 ++++++++++++++++++++
- drivers/net/ethernet/ti/icssg/icss_iep.h     |  2 ++
- drivers/net/ethernet/ti/icssg/icssg_config.c |  6 +++++
- drivers/net/ethernet/ti/icssg/icssg_prueth.c | 17 +++++++++++--
- 4 files changed, 49 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/ti/icssg/icss_iep.c b/drivers/net/ethernet/ti/icssg/icss_iep.c
-index ee333cf14776..dfb836aef2e5 100644
---- a/drivers/net/ethernet/ti/icssg/icss_iep.c
-+++ b/drivers/net/ethernet/ti/icssg/icss_iep.c
-@@ -721,6 +721,32 @@ void icss_iep_put(struct icss_iep *iep)
- }
- EXPORT_SYMBOL_GPL(icss_iep_put);
- 
-+void icss_iep_init_fw(struct icss_iep *iep)
-+{
-+	/* start IEP for FW use in raw 64bit mode, no PTP support */
-+	iep->clk_tick_time = iep->def_inc;
-+	iep->cycle_time_ns = 0;
-+	iep->ops = NULL;
-+	iep->clockops_data = NULL;
-+	icss_iep_set_default_inc(iep, iep->def_inc);
-+	icss_iep_set_compensation_inc(iep, iep->def_inc);
-+	icss_iep_set_compensation_count(iep, 0);
-+	regmap_write(iep->map, ICSS_IEP_SYNC_PWIDTH_REG, iep->refclk_freq / 10); /* 100 ms pulse */
-+	regmap_write(iep->map, ICSS_IEP_SYNC0_PERIOD_REG, 0);
-+	if (iep->plat_data->flags & ICSS_IEP_SLOW_COMPEN_REG_SUPPORT)
-+		icss_iep_set_slow_compensation_count(iep, 0);
-+
-+	icss_iep_enable(iep);
-+	icss_iep_settime(iep, 0);
-+}
-+EXPORT_SYMBOL_GPL(icss_iep_init_fw);
-+
-+void icss_iep_exit_fw(struct icss_iep *iep)
-+{
-+	icss_iep_disable(iep);
-+}
-+EXPORT_SYMBOL_GPL(icss_iep_exit_fw);
-+
- int icss_iep_init(struct icss_iep *iep, const struct icss_iep_clockops *clkops,
- 		  void *clockops_data, u32 cycle_time_ns)
- {
-diff --git a/drivers/net/ethernet/ti/icssg/icss_iep.h b/drivers/net/ethernet/ti/icssg/icss_iep.h
-index 9c7f4d0a0916..803a4b714893 100644
---- a/drivers/net/ethernet/ti/icssg/icss_iep.h
-+++ b/drivers/net/ethernet/ti/icssg/icss_iep.h
-@@ -35,5 +35,7 @@ int icss_iep_exit(struct icss_iep *iep);
- int icss_iep_get_count_low(struct icss_iep *iep);
- int icss_iep_get_count_hi(struct icss_iep *iep);
- int icss_iep_get_ptp_clock_idx(struct icss_iep *iep);
-+void icss_iep_init_fw(struct icss_iep *iep);
-+void icss_iep_exit_fw(struct icss_iep *iep);
- 
- #endif /* __NET_TI_ICSS_IEP_H */
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_config.c b/drivers/net/ethernet/ti/icssg/icssg_config.c
-index ab648d3efe85..4c2b5d496670 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_config.c
-+++ b/drivers/net/ethernet/ti/icssg/icssg_config.c
-@@ -210,6 +210,9 @@ void icssg_config_ipg(struct prueth_emac *emac)
- 	case SPEED_100:
- 		icssg_mii_update_ipg(prueth->mii_rt, slice, MII_RT_TX_IPG_100M);
- 		break;
-+	case SPEED_10:
-+		icssg_mii_update_ipg(prueth->mii_rt, slice, MII_RT_TX_IPG_100M);
-+		break;
- 	default:
- 		/* Other links speeds not supported */
- 		netdev_err(emac->ndev, "Unsupported link speed\n");
-@@ -440,6 +443,9 @@ void icssg_config_set_speed(struct prueth_emac *emac)
- 	case SPEED_100:
- 		fw_speed = FW_LINK_SPEED_100M;
- 		break;
-+	case SPEED_10:
-+		fw_speed = FW_LINK_SPEED_10M;
-+		break;
- 	default:
- 		/* Other links speeds not supported */
- 		netdev_err(emac->ndev, "Unsupported link speed\n");
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-index 28a6deb8d4aa..40cb86872470 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-+++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-@@ -1131,7 +1131,6 @@ static int emac_phy_connect(struct prueth_emac *emac)
- 
- 	/* remove unsupported modes */
- 	phy_remove_link_mode(ndev->phydev, ETHTOOL_LINK_MODE_10baseT_Half_BIT);
--	phy_remove_link_mode(ndev->phydev, ETHTOOL_LINK_MODE_10baseT_Full_BIT);
- 	phy_remove_link_mode(ndev->phydev, ETHTOOL_LINK_MODE_100baseT_Half_BIT);
- 	phy_remove_link_mode(ndev->phydev, ETHTOOL_LINK_MODE_1000baseT_Half_BIT);
- 	phy_remove_link_mode(ndev->phydev, ETHTOOL_LINK_MODE_Pause_BIT);
-@@ -2081,13 +2080,20 @@ static int prueth_probe(struct platform_device *pdev)
- 		goto free_pool;
- 	}
- 
-+	if (prueth->pdata.quirk_10m_link_issue) {
-+		/* Enable IEP1 for FW in 64bit mode as W/A for 10M FD link detect issue under TX
-+		 * traffic.
-+		 */
-+		icss_iep_init_fw(prueth->iep1);
-+	}
-+
- 	/* setup netdev interfaces */
- 	if (eth0_node) {
- 		ret = prueth_netdev_init(prueth, eth0_node);
- 		if (ret) {
- 			dev_err_probe(dev, ret, "netdev init %s failed\n",
- 				      eth0_node->name);
--			goto netdev_exit;
-+			goto exit_iep;
- 		}
- 		prueth->emac[PRUETH_MAC0]->iep = prueth->iep0;
- 	}
-@@ -2158,6 +2164,10 @@ static int prueth_probe(struct platform_device *pdev)
- 		prueth_netdev_exit(prueth, eth_node);
- 	}
- 
-+exit_iep:
-+	if (prueth->pdata.quirk_10m_link_issue)
-+		icss_iep_exit_fw(prueth->iep1);
-+
- free_pool:
- 	gen_pool_free(prueth->sram_pool,
- 		      (unsigned long)prueth->msmcram.va, msmc_ram_size);
-@@ -2203,6 +2213,9 @@ static void prueth_remove(struct platform_device *pdev)
- 		prueth_netdev_exit(prueth, eth_node);
- 	}
- 
-+	if (prueth->pdata.quirk_10m_link_issue)
-+		icss_iep_exit_fw(prueth->iep1);
-+
- 	icss_iep_put(prueth->iep1);
- 	icss_iep_put(prueth->iep0);
- 
+You are awesome, thank you!
 -- 
-2.34.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
