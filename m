@@ -1,35 +1,35 @@
-Return-Path: <netdev+bounces-24040-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24041-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80F8C76E94B
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 15:05:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 46FD876E954
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 15:05:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 38EA22820EE
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 13:05:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 00DFF282135
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 13:05:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 494361ED5D;
-	Thu,  3 Aug 2023 13:04:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A051A1ED51;
+	Thu,  3 Aug 2023 13:04:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDFB41E528
-	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 13:04:41 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 29ED8C433C7;
-	Thu,  3 Aug 2023 13:04:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A40D1E528
+	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 13:04:49 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA118C433C7;
+	Thu,  3 Aug 2023 13:04:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691067881;
-	bh=LWzbhEDAkcUxT4vk5MFeu//No99X5Z72z+2vQyX8zFQ=;
+	s=k20201202; t=1691067889;
+	bh=86rL97Y8LGSMwqN4UB29phiH/7PV6r8NUnN8AezfSh8=;
 	h=From:To:Cc:Subject:Date:From;
-	b=egTh1qwbhDDz+mxMqe5xTEhKdo5bMxIJRQET/OIJpAOxaXWhZ5JvoVyNNmgQMloHi
-	 MKNF52PCBVzowz78NGXSPG719IEUQ0HEF4NdjfNeUVRVWKYcWOvLky+0gk5Bw8LKKK
-	 zJh9emqkVp4D+vHkx8jABzEKm8w29YrW1qXSrfbTclNO1KPRSNMEehsYf8pMUwJfv6
-	 WKeqZGOngNgq0mFw48qyZZELxNQwO+kC3KZ5fLeeJoYhnYcv1Kp+vLnOyPTwtJffgX
-	 kTTzmiJlvho0V3glUXeQTnOOfaXcIBvYJqVNznuac9FGzdt7eTX6HP9LptqEHtR+Qg
-	 w7iXmG7UIVygA==
+	b=qzBdAtG0+WQv9czSqYqQTtciTyODL/3rKsQvkDQNYGuRa7TwZ4sr7sls5ycSUMgUb
+	 YFgBDN5+7lETFfhRRCZ0BQ4Hzr6QnHdCvyw16xwv3inLYuvsAYcAPEF3DcChFQ9/Rh
+	 ZMMUNDmfv6WAIz9yKny41sM6m3A5ciHgsRFRiSBenYP8q1OslKi1gh0uL7Pg3mxKt/
+	 KG0a+Fk9aHrZurvPg0B9SvsdbI8MQ0bi6X9eyVCfVC+r7ElBL+P9tcdTsewPIerVe2
+	 wGkHNn2SbJ7eQjQK2jCePJ2nXk6QQILY33YTWfEshkklOpj52S8IJqsq9nA4aoVfJ4
+	 gJZB4A8U9ROrw==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -43,9 +43,9 @@ Cc: Alan Stern <stern@rowland.harvard.edu>,
 	pabeni@redhat.com,
 	netdev@vger.kernel.org,
 	linux-usb@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.15 1/3] net: usbnet: Fix WARNING in usbnet_start_xmit/usb_submit_urb
-Date: Thu,  3 Aug 2023 09:04:36 -0400
-Message-Id: <20230803130438.641988-1-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.10 1/3] net: usbnet: Fix WARNING in usbnet_start_xmit/usb_submit_urb
+Date: Thu,  3 Aug 2023 09:04:43 -0400
+Message-Id: <20230803130446.642038-1-sashal@kernel.org>
 X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -55,7 +55,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 5.15.123
+X-stable-base: Linux 5.10.188
 Content-Transfer-Encoding: 8bit
 
 From: Alan Stern <stern@rowland.harvard.edu>
@@ -109,10 +109,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 6 insertions(+)
 
 diff --git a/drivers/net/usb/usbnet.c b/drivers/net/usb/usbnet.c
-index e4fbb4d866064..566aa01ad2810 100644
+index 43d70348343b2..481a41d879b53 100644
 --- a/drivers/net/usb/usbnet.c
 +++ b/drivers/net/usb/usbnet.c
-@@ -1771,6 +1771,10 @@ usbnet_probe (struct usb_interface *udev, const struct usb_device_id *prod)
+@@ -1738,6 +1738,10 @@ usbnet_probe (struct usb_interface *udev, const struct usb_device_id *prod)
  	} else if (!info->in || !info->out)
  		status = usbnet_get_endpoints (dev, udev);
  	else {
@@ -123,7 +123,7 @@ index e4fbb4d866064..566aa01ad2810 100644
  		dev->in = usb_rcvbulkpipe (xdev, info->in);
  		dev->out = usb_sndbulkpipe (xdev, info->out);
  		if (!(info->flags & FLAG_NO_SETINT))
-@@ -1780,6 +1784,8 @@ usbnet_probe (struct usb_interface *udev, const struct usb_device_id *prod)
+@@ -1747,6 +1751,8 @@ usbnet_probe (struct usb_interface *udev, const struct usb_device_id *prod)
  		else
  			status = 0;
  
