@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-24172-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24171-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB4FD76F17C
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 20:10:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5183976F177
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 20:10:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8210D282209
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 18:10:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5DE3A1C20AF5
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 18:10:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74E422590A;
-	Thu,  3 Aug 2023 18:10:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD5FC25900;
+	Thu,  3 Aug 2023 18:10:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A362B18B17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A519E2419E
 	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 18:10:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 31075C433C9;
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 4A43CC433CB;
 	Thu,  3 Aug 2023 18:10:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1691086228;
-	bh=dT6lA5WXEKQHuA+50AX70sihSIdNAuX+ncVR3OXOWbs=;
+	bh=zrPIRxFjq0KdaitqvNccDNu+R+Bux2zXtbmruB/8WmU=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=GqO2S+1+9+tRUnBRGByo5wxZGqlfZvhLwYI0A2MZyOt17ZWMsg9AywD2ryExqf4YO
-	 SInKMOBxArnhrPnvcSc+vF0+pyeBQ+0zrLCU21c9mO1rQInVhy0NQ34jObISra5/WL
-	 WxICe63aBN83JSXuZ8eRBdmurJod4957RlnzMO3JwwrzOQKp0V3AiA+lWzu1RkZzL6
-	 a0FOwjIDbzwvjpn2E6Ub2HruEupvLP9r3jmv5G1FtCdWtEMWUm4tk5Lyl/n2IjfVJP
-	 IJn4zTz4l3vFINSC9Pi82XSNiSabEKmjbDTXeAS9iqkXJGi6V1zcMaLDPf61vzu61w
-	 1Zp9INUNtzUIA==
+	b=sBPGKDZYUjAozVrFwwCu+ghQp9b/5LXqVYfRPZBAsEqPXyb1WywfttbuMD4fhet1W
+	 HPQeXtgqBB1UnZbgKFcmKXHppdUXqt8s9+aBf3uJY23aQdIUwE756PizAGZrgs7yU/
+	 n787027yvd7SF7lyw12VK4oG8F+odPmgMxpuPcrAma3ObKO4z5LjGuJg/g8+eipBzl
+	 SItACUN7fTBpzDlnwm1mMdmU+uOM6S0VpFv22nYhFLGQ/Psc1Urbk+3Jhk+qbd2u1Y
+	 x0MRVUEqnAIa2eupDTJxkeucM0L3gBVXkvQmVq/5mMV082XtwCr8XfVylph2xD3XzU
+	 cAFr75qQm5wmg==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 04DC7C595C1;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 298C0C595C2;
 	Thu,  3 Aug 2023 18:10:28 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -41,53 +41,45 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 0/6] tcp_metrics: series of fixes
+Subject: Re: [PATCH] prestera: fix fallback to previous version on same major
+ version
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <169108622801.23543.2612432757380166324.git-patchwork-notify@kernel.org>
+ <169108622816.23543.13453786898223633114.git-patchwork-notify@kernel.org>
 Date: Thu, 03 Aug 2023 18:10:28 +0000
-References: <20230802131500.1478140-1-edumazet@google.com>
-In-Reply-To: <20230802131500.1478140-1-edumazet@google.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, eric.dumazet@gmail.com, dsahern@kernel.org,
- kuniyu@amazon.com
+References: <20230802092357.163944-1-jonas.gorski@bisdn.de>
+In-Reply-To: <20230802092357.163944-1-jonas.gorski@bisdn.de>
+To: Jonas Gorski <jonas.gorski@bisdn.de>
+Cc: taras.chornyi@plvision.eu, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, andrew@lunn.ch, vkochan@marvell.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
 Hello:
 
-This series was applied to netdev/net.git (main)
+This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed,  2 Aug 2023 13:14:54 +0000 you wrote:
-> This series contains a fix for addr_same() and various
-> data-race annotations.
+On Wed,  2 Aug 2023 11:23:56 +0200 you wrote:
+> When both supported and previous version have the same major version,
+> and the firmwares are missing, the driver ends in a loop requesting the
+> same (previous) version over and over again:
 > 
-> We still have to address races over tm->tcpm_saddr and
-> tm->tcpm_daddr later.
-> 
-> Eric Dumazet (6):
->   tcp_metrics: fix addr_same() helper
->   tcp_metrics: annotate data-races around tm->tcpm_stamp
->   tcp_metrics: annotate data-races around tm->tcpm_lock
->   tcp_metrics: annotate data-races around tm->tcpm_vals[]
->   tcp_metrics: annotate data-races around tm->tcpm_net
->   tcp_metrics: fix data-race in tcpm_suck_dst() vs fastopen
+>     [   76.327413] Prestera DX 0000:01:00.0: missing latest mrvl/prestera/mvsw_prestera_fw-v4.1.img firmware, fall-back to previous 4.0 version
+>     [   76.339802] Prestera DX 0000:01:00.0: missing latest mrvl/prestera/mvsw_prestera_fw-v4.0.img firmware, fall-back to previous 4.0 version
+>     [   76.352162] Prestera DX 0000:01:00.0: missing latest mrvl/prestera/mvsw_prestera_fw-v4.0.img firmware, fall-back to previous 4.0 version
+>     [   76.364502] Prestera DX 0000:01:00.0: missing latest mrvl/prestera/mvsw_prestera_fw-v4.0.img firmware, fall-back to previous 4.0 version
+>     [   76.376848] Prestera DX 0000:01:00.0: missing latest mrvl/prestera/mvsw_prestera_fw-v4.0.img firmware, fall-back to previous 4.0 version
+>     [   76.389183] Prestera DX 0000:01:00.0: missing latest mrvl/prestera/mvsw_prestera_fw-v4.0.img firmware, fall-back to previous 4.0 version
+>     [   76.401522] Prestera DX 0000:01:00.0: missing latest mrvl/prestera/mvsw_prestera_fw-v4.0.img firmware, fall-back to previous 4.0 version
+>     [   76.413860] Prestera DX 0000:01:00.0: missing latest mrvl/prestera/mvsw_prestera_fw-v4.0.img firmware, fall-back to previous 4.0 version
+>     [   76.426199] Prestera DX 0000:01:00.0: missing latest mrvl/prestera/mvsw_prestera_fw-v4.0.img firmware, fall-back to previous 4.0 version
+>     ...
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,1/6] tcp_metrics: fix addr_same() helper
-    https://git.kernel.org/netdev/net/c/e6638094d7af
-  - [net,2/6] tcp_metrics: annotate data-races around tm->tcpm_stamp
-    https://git.kernel.org/netdev/net/c/949ad62a5d53
-  - [net,3/6] tcp_metrics: annotate data-races around tm->tcpm_lock
-    https://git.kernel.org/netdev/net/c/285ce119a3c6
-  - [net,4/6] tcp_metrics: annotate data-races around tm->tcpm_vals[]
-    https://git.kernel.org/netdev/net/c/8c4d04f6b443
-  - [net,5/6] tcp_metrics: annotate data-races around tm->tcpm_net
-    https://git.kernel.org/netdev/net/c/d5d986ce42c7
-  - [net,6/6] tcp_metrics: fix data-race in tcpm_suck_dst() vs fastopen
-    https://git.kernel.org/netdev/net/c/ddf251fa2bc1
+  - prestera: fix fallback to previous version on same major version
+    https://git.kernel.org/netdev/net/c/b755c25fbcd5
 
 You are awesome, thank you!
 -- 
