@@ -1,64 +1,64 @@
-Return-Path: <netdev+bounces-24142-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24143-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA94A76EF6F
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 18:28:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1EAAD76EF71
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 18:28:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C4F3D1C215B3
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 16:28:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C41CB282259
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 16:28:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A68C24199;
-	Thu,  3 Aug 2023 16:27:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA80425158;
+	Thu,  3 Aug 2023 16:27:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89FDA24196
-	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 16:27:55 +0000 (UTC)
-Received: from mail-wr1-x42d.google.com (mail-wr1-x42d.google.com [IPv6:2a00:1450:4864:20::42d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C9233AA4
-	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 09:27:51 -0700 (PDT)
-Received: by mail-wr1-x42d.google.com with SMTP id ffacd0b85a97d-317c1845a07so872011f8f.2
-        for <netdev@vger.kernel.org>; Thu, 03 Aug 2023 09:27:51 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF3372417E
+	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 16:27:56 +0000 (UTC)
+Received: from mail-wm1-x32a.google.com (mail-wm1-x32a.google.com [IPv6:2a00:1450:4864:20::32a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34B8F3A97
+	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 09:27:53 -0700 (PDT)
+Received: by mail-wm1-x32a.google.com with SMTP id 5b1f17b1804b1-3fe2048c910so11683325e9.1
+        for <netdev@vger.kernel.org>; Thu, 03 Aug 2023 09:27:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tessares.net; s=google; t=1691080070; x=1691684870;
+        d=tessares.net; s=google; t=1691080071; x=1691684871;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=GwyK6Bv+hcPMKxglSicH9Zo5rWGFycFOmRoBBrYBtwk=;
-        b=nVf5cpBl66aqIXNE9mp7PBpSn04vjQNBytFglp9n2PJUdgGvMIzyOBlFIDx55z2c6l
-         UosZjIiqUTd4VJvFp+uC+8TkKxdQsrmyBnxTKHR+YVA2qKslZbbVBxVitvUFvAFWowm0
-         kegzR5vljiqloxiO08YNKk4DDnaKhbm0uhF5+fbUMrP0o/kXkMyqz9Ubv21Bb5RXAC5H
-         cuw2D6wv/55bIM/wJZmktecljrhqnM0S3DPU51xaFTkEAP90FnPfPqbX+FwVmU1Z0DfP
-         OcQ0xEXjVkZzzNIdbonGT+WId15gota3ge8Trxl9yR0k7FitTMA8eph3JqeJx7SAOMT8
-         99BA==
+        bh=8jMt6L2FmSlltwvcyjEZqwtyL1aI3zkjJCogSbPktKs=;
+        b=x0w/rjxJnVBmVbgGNo/kxrqp7ZOR0vgZhvYU2UJJOzYBlcQGR58n2VVhLQb1K0yB49
+         pm/cch1ViXDza5o26swt637wlroTwytiU4vZsvrtD4N4QrskCpCJcKJYzNNh/EMCdcur
+         QbmzHTXGBWJQbik0AOw8wlQG6i33+Yl6Ks8r3xIYvkztFZ9j8RwzQWbJhmMpzxyXXq5N
+         8WjQ2UazZUdY6yeCTHtT2qTqkJtGRG1NWHHSK1DM4VCTJCsDH/NW1D7GJE4iprznbHje
+         KxnDw56bOj+CgdrUF/EyxzZ38++JMGqfND2F9pVsww5zRFWwpZItSbmA8+5CZDGtacPv
+         yebQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691080070; x=1691684870;
+        d=1e100.net; s=20221208; t=1691080071; x=1691684871;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=GwyK6Bv+hcPMKxglSicH9Zo5rWGFycFOmRoBBrYBtwk=;
-        b=N36RNq9B/U3lWdREK9HGCOivMRLnh3rD66UkA+wclsAqIp+fiKq9X1mza51zxdLIYi
-         zcZTy+QaN/tNFWc2ynQ8KEyGvOYF+CNXp0XmJFtQGUb/l709MVX9h755QP/oQs79nipi
-         wxOGcMLipIPKfzAlvM6n+yfbnwfFQXJm3QU5oeJ9ZeSBVZdu+HHmk8GlVVhgTeu6Haql
-         1YlZsOqQhB4b1vTH/+hcp/4c/BNawa0VULv82HYSHEhscdbVw+tSAEfvlJ59B5502WB6
-         6YfnJhvbQF6wbF+7Ht6+MXEwY8Dgw5V8lAcaOXLB75t++dmt6xbHCBBK5W4A9/mYVw5M
-         9vsQ==
-X-Gm-Message-State: ABy/qLZhHrPvclbWatunuYuI4sKZu8+ShmYipISy/Mo2nNc6NQsFkatz
-	cie+Ymdk2gZb0JviejQsg3Kg0w==
-X-Google-Smtp-Source: APBJJlF3FZ/eBbFsCggo3JU70+7C7vjjNVaKf5HzLiG7UsMnz2F0AveDgWO+kWMUbv1rfJo/AfF75g==
-X-Received: by 2002:adf:fdd1:0:b0:317:5b76:826 with SMTP id i17-20020adffdd1000000b003175b760826mr7797679wrs.0.1691080070157;
-        Thu, 03 Aug 2023 09:27:50 -0700 (PDT)
+        bh=8jMt6L2FmSlltwvcyjEZqwtyL1aI3zkjJCogSbPktKs=;
+        b=FMUucXfpnRvKSX83Fo+LYqasW92YnUbYRll9wAGlaMfWOF2EZedt3xRcmmsWAKXZf1
+         xYGz77pMcPAEiqErwhz7Zd4x5gi729GzStWx3O+5C9izV8zYoDf+4mhURsemFKbO0cwj
+         gmOraI6Yxp9DaCnIGs7nfxJJoEIAbr9+alasaW+8mwlzkK+KQ8nx+06VqI+myeRlK3C6
+         cRb86wNxoqSuLZjVD7wbSUi2e4ydxLw7B4yB8NAwl9nEOso25afKd8wFeut4BSFT/xVw
+         YGeIXi5lrx4Pd0c4p5obs4ZXxx1rdvGPuqQIr5EhWdeCF+B6fCkr+kXHA7DjOo7KNapq
+         VhcQ==
+X-Gm-Message-State: ABy/qLb6vBPgxPwkzi5JZhI4RjuDopGDV9qEUHPMOXXkC+JjfPajCUo6
+	xh/nSmWcLIdvGJr/cpjw9zIV/w==
+X-Google-Smtp-Source: APBJJlHJZ4UCOk+6iZM6+xLDrngDmJxvytq/L41ApOb6PacLvDsqnNnt8VDvbd3bh55Hg7s1g7YWFw==
+X-Received: by 2002:adf:f043:0:b0:316:f5b1:98c with SMTP id t3-20020adff043000000b00316f5b1098cmr8589836wro.24.1691080071150;
+        Thu, 03 Aug 2023 09:27:51 -0700 (PDT)
 Received: from vdi08.nix.tessares.net (static.219.156.76.144.clients.your-server.de. [144.76.156.219])
-        by smtp.gmail.com with ESMTPSA id o10-20020a5d474a000000b003141a3c4353sm253167wrs.30.2023.08.03.09.27.49
+        by smtp.gmail.com with ESMTPSA id o10-20020a5d474a000000b003141a3c4353sm253167wrs.30.2023.08.03.09.27.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Aug 2023 09:27:49 -0700 (PDT)
+        Thu, 03 Aug 2023 09:27:50 -0700 (PDT)
 From: Matthieu Baerts <matthieu.baerts@tessares.net>
-Date: Thu, 03 Aug 2023 18:27:28 +0200
-Subject: [PATCH net 2/4] selftests: mptcp: join: fix 'implicit EP' test
+Date: Thu, 03 Aug 2023 18:27:29 +0200
+Subject: [PATCH net 3/4] mptcp: avoid bogus reset on fallback close
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,7 +67,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20230803-upstream-net-20230803-misc-fixes-6-5-v1-2-6671b1ab11cc@tessares.net>
+Message-Id: <20230803-upstream-net-20230803-misc-fixes-6-5-v1-3-6671b1ab11cc@tessares.net>
 References: <20230803-upstream-net-20230803-misc-fixes-6-5-v1-0-6671b1ab11cc@tessares.net>
 In-Reply-To: <20230803-upstream-net-20230803-misc-fixes-6-5-v1-0-6671b1ab11cc@tessares.net>
 To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
@@ -78,79 +78,63 @@ Cc: Andrea Claudi <aclaudi@redhat.com>, netdev@vger.kernel.org,
  linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
  Matthieu Baerts <matthieu.baerts@tessares.net>, stable@vger.kernel.org
 X-Mailer: b4 0.12.3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2208;
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1288;
  i=matthieu.baerts@tessares.net; h=from:subject:message-id;
- bh=wrR2/gFZisIGtMW223yr33GlqCWjTT9hge1zs/IjHvs=;
- b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBky9WCE7AUwHgx0yv1SzE8nz8k4s8zOOsGud318
- c9InvFUPBaJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZMvVggAKCRD2t4JPQmmg
- c9IFEADaaMgin0SaKj+n8cG1OGpW22NLO2EpUY5ZnXx3FXU3uRGomjXOkfZO+n3iLbt5DcJ2KpJ
- dbgxpG3JYbEyzI0D7nXIfAnrZMbOOtv2FG3pZYOi03BONYWwlUIEr3wXiugnFsYKusGC++aVcAy
- 37/thitzAnldc1Hih0il6WmMSbbOo7//l1ZT6QkoYzr521Ng0JMV7OmL27UCC34Z2/kyxa/kEg6
- nM86St3sAWSTCayygA3zKZYfdickJ7xwTi6rwJwe4+yCH4C7lmT2wmTFqpS+6m0w0ZeX9dxHnP+
- wltj5XiQqAxIduxAc2wiEaQ8HMDx/xny+XiF3Prhge9cxbCxtSW/fUhW2RPlqlHZ0VffmebbTJ+
- 6e4uw9IPT0qBDRa2kiMfmUAalyDBdYkO5QvpexHrOEt+eI42lI42tJ4yTS7tyoSFjE9sMUdiv3i
- n2uHj/8JDQu5X6WbQhBkaaN1NCPb0Rl9ruUPYH8V+EyWOGciL+CJITM5YdnftppRjZKg/pbE03d
- P9AXCC8zxFKzsumUzuPl/sMzBOtjkiwe+cxzNiwo7cQ5wpYx4lygSGm4qJMK11U7BP5vkzXSjib
- ER/U+4UGoQNZWv2L5d/hvzBpsMVD5RiNcyHRyKXQPlkgP9rAgbcFfN6dLSf4tNZ3+m2aJnbKj5l
- qIJsOUy1VR9loaA==
+ bh=12biSrwGtkvk41jCEN65DKfb20xXbhM8fYcweZf3BtY=;
+ b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBky9WC2uO13GQR6Uk7tHPxbxR21T6sS+xXFI1Ro
+ sRXVF4BsYuJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZMvVggAKCRD2t4JPQmmg
+ c4ReEADACIInPdd6u/8/kcSsZZjsF9iI9yoY4f3fm2Tqi0Mh8my2rGacspC4c9R82DuvfjYh0ut
+ /eEoqGDMDcaF8Eqcza+IndPBviG6zze6q4Krt8FNtbHI9hcuXBbmbxb4v9Y215My8XR+EptGxb8
+ 8/mSixbPVGYKiDLgyXkeztjhdU7vGshwMD5BxundrqsbIkmn2sRqlxm2uKILaT2bmfQZb2FJgLB
+ s/ZK7hLFgGt9Wmm6Pqnb3D/UAMjWERlcEoifd84BJGjYNCNYvth9yHoUbMhknrrlLSPPUspZl+y
+ /r8jfYLIALWVrxSm0zStmBRHASnnonref+rmeDjPwSrQK0EcYVbRaXD+dhkLLoi+EC+YwzhjuBo
+ l01qmS90KBB+qdVlSsUHai6Qs6O0/puZulr7hXAlj531qM3iteSONNVpiGZWlv5PwQOjj9F2/+8
+ EUJleiTZ4MOAjYPBszY+eu7u9Duidnx9NMLQmnw1b5dYyx0g/zeQeD0np405cv7OeTuNzNNTVbU
+ ClCZ4UNjgmyhj+GkRZqUDf5o8c2PkRrVs2bVZm1unsWt1yzRTJkBIc2txHfetivunfzKm7m08Rv
+ kqZ50sPA7PjH8o6NUxQ18bowaHZVnLHUmlQNmDa4VGdCN9HAawzhBvgfomCVbH0NwWcYRdC1cAi
+ 9y4SsYEABb1WMUA==
 X-Developer-Key: i=matthieu.baerts@tessares.net; a=openpgp;
  fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Andrea Claudi <aclaudi@redhat.com>
+From: Paolo Abeni <pabeni@redhat.com>
 
-mptcp_join 'implicit EP' test currently fails when using ip mptcp:
+Since the blamed commit, the MPTCP protocol unconditionally sends
+TCP resets on all the subflows on disconnect().
 
-  $ ./mptcp_join.sh -iI
-  <snip>
-  001 implicit EP    creation[fail] expected '10.0.2.2 10.0.2.2 id 1 implicit' found '10.0.2.2 id 1 rawflags 10 '
-  Error: too many addresses or duplicate one: -22.
-                     ID change is prevented[fail] expected '10.0.2.2 10.0.2.2 id 1 implicit' found '10.0.2.2 id 1 rawflags 10 '
-                     modif is allowed[fail] expected '10.0.2.2 10.0.2.2 id 1 signal' found '10.0.2.2 id 1 signal '
+That fits full-blown MPTCP sockets - to implement the fastclose
+mechanism - but causes unexpected corruption of the data stream,
+caught as sporadic self-tests failures.
 
-This happens because of two reasons:
-- iproute v6.3.0 does not support the implicit flag, fixed with
-  iproute2-next commit 3a2535a41854 ("mptcp: add support for implicit
-  flag")
-- pm_nl_check_endpoint wrongly expects the ip address to be repeated two
-  times in iproute output, and does not account for a final whitespace
-  in it.
-
-This fixes the issue trimming the whitespace in the output string and
-removing the double address in the expected string.
-
-Fixes: 69c6ce7b6eca ("selftests: mptcp: add implicit endpoint test case")
+Fixes: d21f83485518 ("mptcp: use fastclose on more edge scenarios")
 Cc: stable@vger.kernel.org
-Signed-off-by: Andrea Claudi <aclaudi@redhat.com>
+Tested-by: Matthieu Baerts <matthieu.baerts@tessares.net>
+Closes: https://github.com/multipath-tcp/mptcp_net-next/issues/419
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 Reviewed-by: Matthieu Baerts <matthieu.baerts@tessares.net>
 Signed-off-by: Matthieu Baerts <matthieu.baerts@tessares.net>
 ---
- tools/testing/selftests/net/mptcp/mptcp_join.sh | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ net/mptcp/protocol.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tools/testing/selftests/net/mptcp/mptcp_join.sh b/tools/testing/selftests/net/mptcp/mptcp_join.sh
-index 067fabc401f1..d01b73a8ed0f 100755
---- a/tools/testing/selftests/net/mptcp/mptcp_join.sh
-+++ b/tools/testing/selftests/net/mptcp/mptcp_join.sh
-@@ -796,10 +796,11 @@ pm_nl_check_endpoint()
- 	fi
+diff --git a/net/mptcp/protocol.c b/net/mptcp/protocol.c
+index 3317d1cca156..ac7c11a5cbe5 100644
+--- a/net/mptcp/protocol.c
++++ b/net/mptcp/protocol.c
+@@ -2335,7 +2335,7 @@ static void __mptcp_close_ssk(struct sock *sk, struct sock *ssk,
  
- 	if [ $ip_mptcp -eq 1 ]; then
-+		# get line and trim trailing whitespace
- 		line=$(ip -n $ns mptcp endpoint show $id)
-+		line="${line% }"
- 		# the dump order is: address id flags port dev
--		expected_line="$addr"
--		[ -n "$addr" ] && expected_line="$expected_line $addr"
-+		[ -n "$addr" ] && expected_line="$addr"
- 		expected_line="$expected_line $id"
- 		[ -n "$_flags" ] && expected_line="$expected_line ${_flags//","/" "}"
- 		[ -n "$dev" ] && expected_line="$expected_line $dev"
+ 	lock_sock_nested(ssk, SINGLE_DEPTH_NESTING);
+ 
+-	if (flags & MPTCP_CF_FASTCLOSE) {
++	if ((flags & MPTCP_CF_FASTCLOSE) && !__mptcp_check_fallback(msk)) {
+ 		/* be sure to force the tcp_disconnect() path,
+ 		 * to generate the egress reset
+ 		 */
 
 -- 
 2.40.1
