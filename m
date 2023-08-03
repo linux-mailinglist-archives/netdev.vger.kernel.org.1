@@ -1,243 +1,222 @@
-Return-Path: <netdev+bounces-24112-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24113-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D93676ED17
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 16:47:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71C4676ED1A
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 16:47:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 344A31C215A8
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 14:47:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2BA1A281FC4
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 14:47:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F17F1ED4A;
-	Thu,  3 Aug 2023 14:46:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 114791ED4F;
+	Thu,  3 Aug 2023 14:47:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D5158F54
-	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 14:46:35 +0000 (UTC)
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8277619B9;
-	Thu,  3 Aug 2023 07:46:32 -0700 (PDT)
-Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 373Eg8JZ011669;
-	Thu, 3 Aug 2023 14:46:30 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=avuefi9Jf8+2a1NB7rc28/ORuP+YUHSjQ/Bxn8++A4s=;
- b=i/DWsOZEHgsDxsvqQcqPcuaAx9FdNP2G4+i/pXZJY4nRIaa4Tqpk3C2RvSXMojwt+8i8
- LVXq/Soc5oEwXVJV1ocgVfb+g0roqXlOPG/JxYfLlQirOsbW1nvNNGogEZzNV+q4Bhm/
- 8yQkbcX3ssnz8TNuYlwCoTNXnd9FBXNl8kuYidaNrG5OxI1gl4MVeNTOr0KT0+MNzawp
- IFNTSi4q93ON+gcdQsBeZH7hRwadQVTRUkCFx3iS+XsekKlI9bwrIaJFVo7OBRyiKifd
- pAAWw9dy1POhCzcQjUgDrRAUTQhDvtjZBn7nbgxzynaLjM21iZb635mQ6ZbntgC6fzN7 IA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3s8e7wr591-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 03 Aug 2023 14:46:29 +0000
-Received: from m0353726.ppops.net (m0353726.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 373EgMkE012742;
-	Thu, 3 Aug 2023 14:46:29 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3s8e7wr587-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 03 Aug 2023 14:46:28 +0000
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 373DwmD9015480;
-	Thu, 3 Aug 2023 14:46:12 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3s5e3ne8qj-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 03 Aug 2023 14:46:12 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 373Ek8BM61538602
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 3 Aug 2023 14:46:08 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 050A420040;
-	Thu,  3 Aug 2023 14:46:08 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 9045020043;
-	Thu,  3 Aug 2023 14:46:07 +0000 (GMT)
-Received: from dilbert5.boeblingen.de.ibm.com (unknown [9.155.208.153])
-	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu,  3 Aug 2023 14:46:07 +0000 (GMT)
-From: Gerd Bayer <gbayer@linux.ibm.com>
-To: Wenjia Zhang <wenjia@linux.ibm.com>, Jan Karcher <jaka@linux.ibm.com>,
-        Tony Lu <tonylu@linux.alibaba.com>, Paolo Abeni <pabeni@redhat.com>
-Cc: Karsten Graul <kgraul@linux.ibm.com>,
-        "D . Wythe" <alibuda@linux.alibaba.com>,
-        Wen Gu <guwen@linux.alibaba.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        linux-s390@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH net v2 2/2] net/smc: Use correct buffer sizes when switching between TCP and SMC
-Date: Thu,  3 Aug 2023 16:46:05 +0200
-Message-ID: <20230803144605.477903-3-gbayer@linux.ibm.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230803144605.477903-1-gbayer@linux.ibm.com>
-References: <20230803144605.477903-1-gbayer@linux.ibm.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03C401ED4A
+	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 14:47:30 +0000 (UTC)
+Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 567554486
+	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 07:47:06 -0700 (PDT)
+Received: by mail-ed1-x532.google.com with SMTP id 4fb4d7f45d1cf-52256241c50so1358472a12.3
+        for <netdev@vger.kernel.org>; Thu, 03 Aug 2023 07:47:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1691074023; x=1691678823;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=gxipnLtqVUKoWWcohpI5k8sBVt55SuMlyUa48pm+jy0=;
+        b=c0hhME9iX1Vktk1Ltsm+O1vHEIVObpdV7/AZ5XiyXXcwhoCi/fjlsHeKIK8X2FaNK+
+         PXokgGfmJrAKGaFxn83mA7O6OSsMYirxR0PW6D0c3wjgKaprWAvuKNxpKdgL/R2lzZ7+
+         rAxUZLe7Ld+PbbCgnXoJoBQAaNQQFIMvZs+UI=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691074023; x=1691678823;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=gxipnLtqVUKoWWcohpI5k8sBVt55SuMlyUa48pm+jy0=;
+        b=aiTgEwRmwgAT8ANI0kJj3UVN8tBY/cgEjDB0ubH5DltAChAfnDeQZXDCichL+yveUt
+         vbSS5llNE3aKTtJat/QORs9/1qXlWSFi/ZgPZ32TScpwoXtaq538OanSXRTN+iiZ7IML
+         jXiQjLR5eE8vuehGkD30923rTDAQHAS9LqFAJVgT4AGNAzdcfpGvv2ETKpE3YODl3hOA
+         Raxjg7kitP862S99QtEwq1R/P4nFsk8rzChRwETFQfHSyN2Fq85lhEC7DZCA7NXAK5mf
+         cpKbI4upgB0oOYVGgKESlDnwiDuqwejlUzcLIXIvQQtegYeGv75tAJ893Ey/2vcZTt9R
+         N8dw==
+X-Gm-Message-State: ABy/qLbmWjVrw38EsagB8zsgnaVngOOkX/0Gu9yTD6SS38UEi3IUAQ4O
+	GJ2JnnfZtrjgYqyz7/HLdK598hBoHRg21tbC4SYpEw==
+X-Google-Smtp-Source: APBJJlG4Uof0yi+nwhfvap6PZJWxPfhvI0VnFh/NmqGga6GZzcjyfw4vulcqT3V+mdWYxAlm/YMI4iIYjU4f7ek7YpM=
+X-Received: by 2002:aa7:d48b:0:b0:522:580f:8c75 with SMTP id
+ b11-20020aa7d48b000000b00522580f8c75mr7645476edr.17.1691074022967; Thu, 03
+ Aug 2023 07:47:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: x2tMWBT83Fm1T3Qgq0ZgI2Do9MbS_gGc
-X-Proofpoint-ORIG-GUID: X53ZC6hFi7PrQEOgHQ0QVes4swtu3Ejv
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-08-03_14,2023-08-03_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 spamscore=0
- impostorscore=0 priorityscore=1501 mlxscore=0 adultscore=0 malwarescore=0
- mlxlogscore=999 bulkscore=0 lowpriorityscore=0 suspectscore=0 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2306200000
- definitions=main-2308030131
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+References: <20230727190726.1859515-1-kuba@kernel.org> <20230727190726.1859515-2-kuba@kernel.org>
+ <58c12dc4-87e2-5c91-5744-27777acfa631@embeddedor.com> <20230803072123.1fbd56db@kernel.org>
+In-Reply-To: <20230803072123.1fbd56db@kernel.org>
+From: Michael Chan <michael.chan@broadcom.com>
+Date: Thu, 3 Aug 2023 07:46:50 -0700
+Message-ID: <CACKFLinikvXmKcxr4kjWO9TPYxTd2cb5agT1j=w9Qyj5-24s5A@mail.gmail.com>
+Subject: Re: [PATCH net-next 1/2] eth: bnxt: fix one of the W=1 warnings about
+ fortified memcpy()
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "Gustavo A. R. Silva" <gustavo@embeddedor.com>, davem@davemloft.net, netdev@vger.kernel.org, 
+	edumazet@google.com, pabeni@redhat.com
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="00000000000076b94e060205da97"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Tuning of the effective buffer size through setsockopts was working for
-SMC traffic only but not for TCP fall-back connections even before
-commit 0227f058aa29 ("net/smc: Unbind r/w buffer size from clcsock and
-make them tunable"). That change made it apparent that TCP fall-back
-connections would use net.smc.[rw]mem as buffer size instead of
-net.ipv4_tcp_[rw]mem.
+--00000000000076b94e060205da97
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Amend the code that copies attributes between the (TCP) clcsock and the
-SMC socket and adjust buffer sizes appropriately:
-- Copy over sk_userlocks so that both sockets agree on whether tuning
-  via setsockopt is active.
-- When falling back to TCP use sk_sndbuf or sk_rcvbuf as specified with
-  setsockopt. Otherwise, use the sysctl value for TCP/IPv4.
-- Likewise, use either values from setsockopt or from sysctl for SMC
-  (duplicated) on successful SMC connect.
+On Thu, Aug 3, 2023 at 7:21=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wro=
+te:
+>
+> On Thu, 3 Aug 2023 07:08:13 -0600 Gustavo A. R. Silva wrote:
+> > In function 'fortify_memcpy_chk',
+> >      inlined from 'bnxt_hwrm_queue_cos2bw_qcfg' at drivers/net/ethernet=
+/broadcom/bnxt/bnxt_dcb.c:165:3:
+> > include/linux/fortify-string.h:592:25: warning: call to '__read_overflo=
+w2_field' declared with attribute warning: detected read beyond size of fie=
+ld (2nd
+> > parameter); maybe use struct_group()? [-Wattribute-warning]
+> >    592 |                         __read_overflow2_field(q_size_field, s=
+ize);
+> >        |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
+~~~~
+> >
+> > Here is a potential fix for that:
+> >
+> > diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.c b/drivers/ne=
+t/ethernet/broadcom/bnxt/bnxt_dcb.c
+> > index 31f85f3e2364..e2390d73b3f0 100644
+> > --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.c
+> > +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.c
+> > @@ -144,7 +144,7 @@ static int bnxt_hwrm_queue_cos2bw_qcfg(struct bnxt =
+*bp, struct ieee_ets *ets)
+> >          struct hwrm_queue_cos2bw_qcfg_output *resp;
+> >          struct hwrm_queue_cos2bw_qcfg_input *req;
+> >          struct bnxt_cos2bw_cfg cos2bw;
+> > -       void *data;
+> > +       struct bnxt_cos2bw_cfg *data;
+> >          int rc, i;
+> >
+> >          rc =3D hwrm_req_init(bp, req, HWRM_QUEUE_COS2BW_QCFG);
+> > @@ -158,11 +158,11 @@ static int bnxt_hwrm_queue_cos2bw_qcfg(struct bnx=
+t *bp, struct ieee_ets *ets)
+> >                  return rc;
+> >          }
+> >
+> > -       data =3D &resp->queue_id0 + offsetof(struct bnxt_cos2bw_cfg, qu=
+eue_id);
+> > +       data =3D (struct bnxt_cos2bw_cfg *)&resp->queue_id0;
+> >          for (i =3D 0; i < bp->max_tc; i++, data +=3D sizeof(cos2bw.cfg=
+)) {
+> >                  int tc;
+> >
+> > -               memcpy(&cos2bw.cfg, data, sizeof(cos2bw.cfg));
+> > +               memcpy(&cos2bw.cfg, &data->cfg, sizeof(cos2bw.cfg));
+> >                  if (i =3D=3D 0)
+> >                          cos2bw.queue_id =3D resp->queue_id0;
+>
+> Neat trick, but seems like casting to the destination type should
+> really be the last resort. There's only a handful of members in this
+> struct, IMHO assigning member by member is cleaner.
+> But I'll defer to Michael.
 
-In smc_tcp_listen_work() drop the explicit copy of buffer sizes as that
-is taken care of by the attribute copy.
+The way I plan to fix this is to change the auto-generated struct
+hwrm_queue_cos2bw_qcfg_output to have an array of substruct.  I think
+that will look the cleanest.  I'll post it later today or tomorrow.
 
-Fixes: 0227f058aa29 ("net/smc: Unbind r/w buffer size from clcsock and make them tunable")
-Signed-off-by: Gerd Bayer <gbayer@linux.ibm.com>
-Reviewed-by: Wenjia Zhang <wenjia@linux.ibm.com>
-Reviewed-by: Tony Lu <tonylu@linux.alibaba.com>
----
- net/smc/af_smc.c | 73 +++++++++++++++++++++++++++++++++---------------
- 1 file changed, 51 insertions(+), 22 deletions(-)
+--00000000000076b94e060205da97
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
 
-diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
-index 1fcf1e42474a..385e86bd6bdf 100644
---- a/net/smc/af_smc.c
-+++ b/net/smc/af_smc.c
-@@ -436,13 +436,60 @@ static int smc_bind(struct socket *sock, struct sockaddr *uaddr,
- 	return rc;
- }
- 
-+/* copy only relevant settings and flags of SOL_SOCKET level from smc to
-+ * clc socket (since smc is not called for these options from net/core)
-+ */
-+
-+#define SK_FLAGS_SMC_TO_CLC ((1UL << SOCK_URGINLINE) | \
-+			     (1UL << SOCK_KEEPOPEN) | \
-+			     (1UL << SOCK_LINGER) | \
-+			     (1UL << SOCK_BROADCAST) | \
-+			     (1UL << SOCK_TIMESTAMP) | \
-+			     (1UL << SOCK_DBG) | \
-+			     (1UL << SOCK_RCVTSTAMP) | \
-+			     (1UL << SOCK_RCVTSTAMPNS) | \
-+			     (1UL << SOCK_LOCALROUTE) | \
-+			     (1UL << SOCK_TIMESTAMPING_RX_SOFTWARE) | \
-+			     (1UL << SOCK_RXQ_OVFL) | \
-+			     (1UL << SOCK_WIFI_STATUS) | \
-+			     (1UL << SOCK_NOFCS) | \
-+			     (1UL << SOCK_FILTER_LOCKED) | \
-+			     (1UL << SOCK_TSTAMP_NEW))
-+
-+/* if set, use value set by setsockopt() - else use IPv4 or SMC sysctl value */
-+static void smc_adjust_sock_bufsizes(struct sock *nsk, struct sock *osk,
-+				     unsigned long mask)
-+{
-+	struct net *nnet = sock_net(nsk);
-+
-+	nsk->sk_userlocks = osk->sk_userlocks;
-+	if (osk->sk_userlocks & SOCK_SNDBUF_LOCK) {
-+		nsk->sk_sndbuf = osk->sk_sndbuf;
-+	} else {
-+		if (mask == SK_FLAGS_SMC_TO_CLC)
-+			WRITE_ONCE(nsk->sk_sndbuf,
-+				   READ_ONCE(nnet->ipv4.sysctl_tcp_wmem[1]));
-+		else
-+			WRITE_ONCE(nsk->sk_sndbuf,
-+				   2 * READ_ONCE(nnet->smc.sysctl_wmem));
-+	}
-+	if (osk->sk_userlocks & SOCK_RCVBUF_LOCK) {
-+		nsk->sk_rcvbuf = osk->sk_rcvbuf;
-+	} else {
-+		if (mask == SK_FLAGS_SMC_TO_CLC)
-+			WRITE_ONCE(nsk->sk_rcvbuf,
-+				   READ_ONCE(nnet->ipv4.sysctl_tcp_rmem[1]));
-+		else
-+			WRITE_ONCE(nsk->sk_rcvbuf,
-+				   2 * READ_ONCE(nnet->smc.sysctl_rmem));
-+	}
-+}
-+
- static void smc_copy_sock_settings(struct sock *nsk, struct sock *osk,
- 				   unsigned long mask)
- {
- 	/* options we don't get control via setsockopt for */
- 	nsk->sk_type = osk->sk_type;
--	nsk->sk_sndbuf = osk->sk_sndbuf;
--	nsk->sk_rcvbuf = osk->sk_rcvbuf;
- 	nsk->sk_sndtimeo = osk->sk_sndtimeo;
- 	nsk->sk_rcvtimeo = osk->sk_rcvtimeo;
- 	nsk->sk_mark = osk->sk_mark;
-@@ -453,26 +500,10 @@ static void smc_copy_sock_settings(struct sock *nsk, struct sock *osk,
- 
- 	nsk->sk_flags &= ~mask;
- 	nsk->sk_flags |= osk->sk_flags & mask;
-+
-+	smc_adjust_sock_bufsizes(nsk, osk, mask);
- }
- 
--#define SK_FLAGS_SMC_TO_CLC ((1UL << SOCK_URGINLINE) | \
--			     (1UL << SOCK_KEEPOPEN) | \
--			     (1UL << SOCK_LINGER) | \
--			     (1UL << SOCK_BROADCAST) | \
--			     (1UL << SOCK_TIMESTAMP) | \
--			     (1UL << SOCK_DBG) | \
--			     (1UL << SOCK_RCVTSTAMP) | \
--			     (1UL << SOCK_RCVTSTAMPNS) | \
--			     (1UL << SOCK_LOCALROUTE) | \
--			     (1UL << SOCK_TIMESTAMPING_RX_SOFTWARE) | \
--			     (1UL << SOCK_RXQ_OVFL) | \
--			     (1UL << SOCK_WIFI_STATUS) | \
--			     (1UL << SOCK_NOFCS) | \
--			     (1UL << SOCK_FILTER_LOCKED) | \
--			     (1UL << SOCK_TSTAMP_NEW))
--/* copy only relevant settings and flags of SOL_SOCKET level from smc to
-- * clc socket (since smc is not called for these options from net/core)
-- */
- static void smc_copy_sock_settings_to_clc(struct smc_sock *smc)
- {
- 	smc_copy_sock_settings(smc->clcsock->sk, &smc->sk, SK_FLAGS_SMC_TO_CLC);
-@@ -2479,8 +2510,6 @@ static void smc_tcp_listen_work(struct work_struct *work)
- 		sock_hold(lsk); /* sock_put in smc_listen_work */
- 		INIT_WORK(&new_smc->smc_listen_work, smc_listen_work);
- 		smc_copy_sock_settings_to_smc(new_smc);
--		new_smc->sk.sk_sndbuf = lsmc->sk.sk_sndbuf;
--		new_smc->sk.sk_rcvbuf = lsmc->sk.sk_rcvbuf;
- 		sock_hold(&new_smc->sk); /* sock_put in passive closing */
- 		if (!queue_work(smc_hs_wq, &new_smc->smc_listen_work))
- 			sock_put(&new_smc->sk);
--- 
-2.41.0
-
+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
+OnaLEot1MoQO7BIe5S9H4AcCEXXcrJJiAtMCl47ARpyHmvQFQFFTrHgUYEd9V+9bOzY7MBIGSV1N
+/JfsT1sZw6HT0lJkSQefhPGpBniAob62DJP3qr11tu8CAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
+AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
+c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
+AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
+TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
+bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
+L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
+BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
+HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQU31rAyTdZweIF0tJTFYwfOv2w
+L4QwDQYJKoZIhvcNAQELBQADggEBACcuyaGmk0NSZ7Kio7O7WSZ0j0f9xXcBnLbJvQXFYM7JI5uS
+kw5ozATEN5gfmNIe0AHzqwoYjAf3x8Dv2w7HgyrxWdpjTKQFv5jojxa3A5LVuM8mhPGZfR/L5jSk
+5xc3llsKqrWI4ov4JyW79p0E99gfPA6Waixoavxvv1CZBQ4Stu7N660kTu9sJrACf20E+hdKLoiU
+hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
+E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
+aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
+EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIJX6Va5rehGh5zqNgnyhk0yg/ua2Fapo
+uhwwFbR8s2AAMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMDgw
+MzE0NDcwM1owaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
+ATANBgkqhkiG9w0BAQEFAASCAQA1XoS0li4aelnCvrOyfrkGsIQXXbYYLZP8+XTCULBmZv20Ose5
+qrdHG1kn3TvHvclV/aErrnTWp7yNcBwgjZWFTQEkw8jljdN2QgOp628YuXYbtHJQpRlpIQoGFt4G
+u9kRvitV2cJUedXXPkkS3ciDGUE0DotV+2P/TxIpQxANdGRzb4AfXKFhWeGtWjCCdFqsdL0JmaWN
+zftnkt8rPA5DNxjYeTc0206QTEe4Cpug7Gt91jKoZq0MqgOx/IQ3iIn5Bgcez6n+ljGgxycmNKhn
+WhqTOwb7dd3XwChc0A/h0HEQ2FVDqFwjdjKRw+eD1KkUabcHJir7pgVrALMUO1Qg
+--00000000000076b94e060205da97--
 
