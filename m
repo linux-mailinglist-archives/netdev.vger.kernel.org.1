@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-24171-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24174-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5183976F177
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 20:10:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 75C2A76F187
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 20:11:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5DE3A1C20AF5
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 18:10:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A679C1C21632
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 18:11:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD5FC25900;
-	Thu,  3 Aug 2023 18:10:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58BB32591D;
+	Thu,  3 Aug 2023 18:10:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A519E2419E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6F142517A
 	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 18:10:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 4A43CC433CB;
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 45752C433CD;
 	Thu,  3 Aug 2023 18:10:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1691086228;
-	bh=zrPIRxFjq0KdaitqvNccDNu+R+Bux2zXtbmruB/8WmU=;
+	bh=Edj37ZXAi47TlAn4TH5nabu1ETrkr+hlACL2kN9s3dk=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=sBPGKDZYUjAozVrFwwCu+ghQp9b/5LXqVYfRPZBAsEqPXyb1WywfttbuMD4fhet1W
-	 HPQeXtgqBB1UnZbgKFcmKXHppdUXqt8s9+aBf3uJY23aQdIUwE756PizAGZrgs7yU/
-	 n787027yvd7SF7lyw12VK4oG8F+odPmgMxpuPcrAma3ObKO4z5LjGuJg/g8+eipBzl
-	 SItACUN7fTBpzDlnwm1mMdmU+uOM6S0VpFv22nYhFLGQ/Psc1Urbk+3Jhk+qbd2u1Y
-	 x0MRVUEqnAIa2eupDTJxkeucM0L3gBVXkvQmVq/5mMV082XtwCr8XfVylph2xD3XzU
-	 cAFr75qQm5wmg==
+	b=H4K+1oxO/Hz1ej7ljDwUGNJ756hzrryx4QOD10HKeGBOsBbpoWBDITD8nkNxg5Jgk
+	 sj8p75bpH1JOTXKjFaJNvqQShC+QVcz8SbobrIHePG9BXZTBjb2pOe7RP5BjofdZZb
+	 T+w2UlXErt7jyUOzIvRzg/bHxr1+vNFIDki3PwnhJWjoIkfjYhXUKUIxCtKLZKQmrQ
+	 TTJFRB0pxY9BFSMOCeEuo5QfM/vz6UbAHg4CTUDMyKqSwWFFaRgaWQnjk7ue8w21sQ
+	 6sf4+mF0sDDDuR4ZQ9a3mIJXTXJeURC5hBApaiHqU1zRZFdg7aoPzlX+FWDdSt7xls
+	 861zlAffnuXRQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 298C0C595C2;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 1E7BEC595C3;
 	Thu,  3 Aug 2023 18:10:28 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -41,45 +41,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] prestera: fix fallback to previous version on same major
- version
+Subject: Re: [PATCH net] test/vsock: remove vsock_perf executable on `make clean`
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <169108622816.23543.13453786898223633114.git-patchwork-notify@kernel.org>
+ <169108622810.23543.9767560286083111967.git-patchwork-notify@kernel.org>
 Date: Thu, 03 Aug 2023 18:10:28 +0000
-References: <20230802092357.163944-1-jonas.gorski@bisdn.de>
-In-Reply-To: <20230802092357.163944-1-jonas.gorski@bisdn.de>
-To: Jonas Gorski <jonas.gorski@bisdn.de>
-Cc: taras.chornyi@plvision.eu, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, andrew@lunn.ch, vkochan@marvell.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20230803085454.30897-1-sgarzare@redhat.com>
+In-Reply-To: <20230803085454.30897-1-sgarzare@redhat.com>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: netdev@vger.kernel.org, AVKrasnov@sberdevices.ru, pabeni@redhat.com,
+ linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed,  2 Aug 2023 11:23:56 +0200 you wrote:
-> When both supported and previous version have the same major version,
-> and the firmwares are missing, the driver ends in a loop requesting the
-> same (previous) version over and over again:
+On Thu,  3 Aug 2023 10:54:54 +0200 you wrote:
+> We forgot to add vsock_perf to the rm command in the `clean`
+> target, so now we have a left over after `make clean` in
+> tools/testing/vsock.
 > 
->     [   76.327413] Prestera DX 0000:01:00.0: missing latest mrvl/prestera/mvsw_prestera_fw-v4.1.img firmware, fall-back to previous 4.0 version
->     [   76.339802] Prestera DX 0000:01:00.0: missing latest mrvl/prestera/mvsw_prestera_fw-v4.0.img firmware, fall-back to previous 4.0 version
->     [   76.352162] Prestera DX 0000:01:00.0: missing latest mrvl/prestera/mvsw_prestera_fw-v4.0.img firmware, fall-back to previous 4.0 version
->     [   76.364502] Prestera DX 0000:01:00.0: missing latest mrvl/prestera/mvsw_prestera_fw-v4.0.img firmware, fall-back to previous 4.0 version
->     [   76.376848] Prestera DX 0000:01:00.0: missing latest mrvl/prestera/mvsw_prestera_fw-v4.0.img firmware, fall-back to previous 4.0 version
->     [   76.389183] Prestera DX 0000:01:00.0: missing latest mrvl/prestera/mvsw_prestera_fw-v4.0.img firmware, fall-back to previous 4.0 version
->     [   76.401522] Prestera DX 0000:01:00.0: missing latest mrvl/prestera/mvsw_prestera_fw-v4.0.img firmware, fall-back to previous 4.0 version
->     [   76.413860] Prestera DX 0000:01:00.0: missing latest mrvl/prestera/mvsw_prestera_fw-v4.0.img firmware, fall-back to previous 4.0 version
->     [   76.426199] Prestera DX 0000:01:00.0: missing latest mrvl/prestera/mvsw_prestera_fw-v4.0.img firmware, fall-back to previous 4.0 version
->     ...
+> Fixes: 8abbffd27ced ("test/vsock: vsock_perf utility")
+> Cc: AVKrasnov@sberdevices.ru
+> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - prestera: fix fallback to previous version on same major version
-    https://git.kernel.org/netdev/net/c/b755c25fbcd5
+  - [net] test/vsock: remove vsock_perf executable on `make clean`
+    https://git.kernel.org/netdev/net/c/3c50c8b24039
 
 You are awesome, thank you!
 -- 
