@@ -1,32 +1,32 @@
-Return-Path: <netdev+bounces-24023-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24025-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C5E176E7D2
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 14:07:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95F3276E7E4
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 14:07:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 19D512820F1
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 12:07:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BE1E31C21495
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 12:07:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF3DE1EA7C;
-	Thu,  3 Aug 2023 12:07:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CBAD1ED38;
+	Thu,  3 Aug 2023 12:07:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E448A1548D
-	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 12:07:02 +0000 (UTC)
-Received: from relmlie5.idc.renesas.com (relmlor1.renesas.com [210.160.252.171])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8D96730D1;
-	Thu,  3 Aug 2023 05:06:42 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01EAB1EA7C
+	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 12:07:08 +0000 (UTC)
+Received: from relmlie6.idc.renesas.com (relmlor2.renesas.com [210.160.252.172])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 01C412D7E;
+	Thu,  3 Aug 2023 05:07:02 -0700 (PDT)
 X-IronPort-AV: E=Sophos;i="6.01,252,1684767600"; 
-   d="scan'208";a="171804059"
+   d="scan'208";a="175485439"
 Received: from unknown (HELO relmlir5.idc.renesas.com) ([10.200.68.151])
-  by relmlie5.idc.renesas.com with ESMTP; 03 Aug 2023 21:06:33 +0900
+  by relmlie6.idc.renesas.com with ESMTP; 03 Aug 2023 21:06:33 +0900
 Received: from localhost.localdomain (unknown [10.166.15.32])
-	by relmlir5.idc.renesas.com (Postfix) with ESMTP id A203540065A4;
+	by relmlir5.idc.renesas.com (Postfix) with ESMTP id B7ED140031E0;
 	Thu,  3 Aug 2023 21:06:33 +0900 (JST)
 From: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
 To: s.shtylyov@omp.ru,
@@ -37,9 +37,9 @@ To: s.shtylyov@omp.ru,
 Cc: netdev@vger.kernel.org,
 	linux-renesas-soc@vger.kernel.org,
 	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
-Subject: [PATCH net-next 1/2] net: renesas: rswitch: Add runtime speed change support
-Date: Thu,  3 Aug 2023 21:06:20 +0900
-Message-Id: <20230803120621.1471440-2-yoshihiro.shimoda.uh@renesas.com>
+Subject: [PATCH net-next 2/2] net: renesas: rswitch: Add .[gs]et_link_ksettings support
+Date: Thu,  3 Aug 2023 21:06:21 +0900
+Message-Id: <20230803120621.1471440-3-yoshihiro.shimoda.uh@renesas.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230803120621.1471440-1-yoshihiro.shimoda.uh@renesas.com>
 References: <20230803120621.1471440-1-yoshihiro.shimoda.uh@renesas.com>
@@ -50,115 +50,33 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-	version=3.4.6
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-The latest SoC version can support runtime speed change. So,
-add detect SoC version by using soc_device_match() and then
-reconfigure the hardware of this and SerDes if needed.
+Add .[gs]et_link_ksettings support by using
+phy_ethtool_[gs]et_link_ksettings() functions.
 
 Signed-off-by: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
 ---
- drivers/net/ethernet/renesas/rswitch.c | 27 +++++++++++++++++++++++---
- drivers/net/ethernet/renesas/rswitch.h |  1 +
- 2 files changed, 25 insertions(+), 3 deletions(-)
+ drivers/net/ethernet/renesas/rswitch.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
 diff --git a/drivers/net/ethernet/renesas/rswitch.c b/drivers/net/ethernet/renesas/rswitch.c
-index 0ba7fb75d589..2c1c584f0ca4 100644
+index 2c1c584f0ca4..e1731f179d30 100644
 --- a/drivers/net/ethernet/renesas/rswitch.c
 +++ b/drivers/net/ethernet/renesas/rswitch.c
-@@ -20,6 +20,7 @@
- #include <linux/rtnetlink.h>
- #include <linux/slab.h>
- #include <linux/spinlock.h>
-+#include <linux/sys_soc.h>
+@@ -1664,6 +1664,8 @@ static int rswitch_get_ts_info(struct net_device *ndev, struct ethtool_ts_info *
  
- #include "rswitch.h"
- 
-@@ -1243,7 +1244,6 @@ static void rswitch_adjust_link(struct net_device *ndev)
- 	struct rswitch_device *rdev = netdev_priv(ndev);
- 	struct phy_device *phydev = ndev->phydev;
- 
--	/* Current hardware has a restriction not to change speed at runtime */
- 	if (phydev->link != rdev->etha->link) {
- 		phy_print_status(phydev);
- 		if (phydev->link)
-@@ -1252,13 +1252,23 @@ static void rswitch_adjust_link(struct net_device *ndev)
- 			phy_power_off(rdev->serdes);
- 
- 		rdev->etha->link = phydev->link;
-+
-+		if (!rdev->priv->etha_no_runtime_change &&
-+		    phydev->speed != rdev->etha->speed) {
-+			rdev->etha->speed = phydev->speed;
-+
-+			rswitch_etha_hw_init(rdev->etha, rdev->ndev->dev_addr);
-+			phy_set_speed(rdev->serdes, rdev->etha->speed);
-+		}
- 	}
- }
- 
- static void rswitch_phy_remove_link_mode(struct rswitch_device *rdev,
- 					 struct phy_device *phydev)
- {
--	/* Current hardware has a restriction not to change speed at runtime */
-+	if (!rdev->priv->etha_no_runtime_change)
-+		return;
-+
- 	switch (rdev->etha->speed) {
- 	case SPEED_2500:
- 		phy_remove_link_mode(phydev, ETHTOOL_LINK_MODE_1000baseT_Full_BIT);
-@@ -1347,7 +1357,8 @@ static int rswitch_ether_port_init_one(struct rswitch_device *rdev)
- 		err = rswitch_etha_hw_init(rdev->etha, rdev->ndev->dev_addr);
- 		if (err < 0)
- 			return err;
--		rdev->etha->operated = true;
-+		if (rdev->priv->etha_no_runtime_change)
-+			rdev->etha->operated = true;
- 	}
- 
- 	err = rswitch_mii_register(rdev);
-@@ -1853,8 +1864,14 @@ static int rswitch_init(struct rswitch_private *priv)
- 	return err;
- }
- 
-+static const struct soc_device_attribute rswitch_soc_match[]  = {
-+	{ .soc_id = "r8a779f0", .revision = "ES1.0" },
-+	{ /* Sentinel */ }
-+};
-+
- static int renesas_eth_sw_probe(struct platform_device *pdev)
- {
-+	const struct soc_device_attribute *attr;
- 	struct rswitch_private *priv;
- 	struct resource *res;
- 	int ret;
-@@ -1869,6 +1886,10 @@ static int renesas_eth_sw_probe(struct platform_device *pdev)
- 	if (!priv)
- 		return -ENOMEM;
- 
-+	attr = soc_device_match(rswitch_soc_match);
-+	if (attr)
-+		priv->etha_no_runtime_change = true;
-+
- 	priv->ptp_priv = rcar_gen4_ptp_alloc(pdev);
- 	if (!priv->ptp_priv)
- 		return -ENOMEM;
-diff --git a/drivers/net/ethernet/renesas/rswitch.h b/drivers/net/ethernet/renesas/rswitch.h
-index bb9ed971a97c..54f397effbc6 100644
---- a/drivers/net/ethernet/renesas/rswitch.h
-+++ b/drivers/net/ethernet/renesas/rswitch.h
-@@ -1011,6 +1011,7 @@ struct rswitch_private {
- 	struct rswitch_etha etha[RSWITCH_NUM_PORTS];
- 	struct rswitch_mfwd mfwd;
- 
-+	bool etha_no_runtime_change;
- 	bool gwca_halt;
+ static const struct ethtool_ops rswitch_ethtool_ops = {
+ 	.get_ts_info = rswitch_get_ts_info,
++	.get_link_ksettings = phy_ethtool_get_link_ksettings,
++	.set_link_ksettings = phy_ethtool_set_link_ksettings,
  };
  
+ static const struct of_device_id renesas_eth_sw_of_table[] = {
 -- 
 2.25.1
 
