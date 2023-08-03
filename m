@@ -1,118 +1,108 @@
-Return-Path: <netdev+bounces-23962-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23961-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3309376E51B
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 11:59:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8EF7476E518
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 11:59:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E06D2282053
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 09:59:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 602741C214A1
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 09:59:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 100AB15AD0;
-	Thu,  3 Aug 2023 09:59:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2297B15ACF;
+	Thu,  3 Aug 2023 09:59:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D0DE7E
-	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 09:59:14 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0CA82C433CA;
-	Thu,  3 Aug 2023 09:59:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691056754;
-	bh=BFZpJsShnV7chFQ6j5N/0sdSDzzhIsWCO5shMzIbM/I=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=f6TRORx24cAafVSY/2poXHwp7rxU18r1K2aJNN9yeq3kXCsxm4bI2hBcbOWs78KVq
-	 HbsTA9sypvIIASMxyhj7/G84fO4EmdSEPdg9FH9UcSSEbnyiCCJRfeB8B1PPag+lcX
-	 65F822tXdwVPsVCQ9ucJykAOer38/AAhlHNjDcCz8KVLUPFJoG38Kceta0YNqPbVq1
-	 xZix6QfzbGfdiNe1rLUvmc7v0ysdO5RNr/maVjx0nkLz0SbFY4UHNT3ZspfACC/bpr
-	 S3wuFm9JglB696Va/pFddQ/QMF7ATouYo1Lu24XYcnK0/xXuxQDBQ2oJw3amZw8Lze
-	 Mx7I9EZeHORjA==
-Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-4fe216edaf7so2366536e87.0;
-        Thu, 03 Aug 2023 02:59:13 -0700 (PDT)
-X-Gm-Message-State: ABy/qLYnLKdtOcro5OVRNu0JEpIgNXRgBJdjZoSkBF0QS5kSnaF/5wRm
-	TAGOuDzxCRpRXvENygYiK5MWrif6g9T6zmvA38Y=
-X-Google-Smtp-Source: APBJJlFw2V3wcRa5v0Vnt1fPUZW5N5QfqaQ6cwXmzUW+1y1w1ET8IiAveXFEKGiBw1l2gDcoGbIc2BvfscEj5e4U4I4=
-X-Received: by 2002:a05:6512:158b:b0:4fb:7624:85a5 with SMTP id
- bp11-20020a056512158b00b004fb762485a5mr3778949lfb.0.1691056752072; Thu, 03
- Aug 2023 02:59:12 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14B597E
+	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 09:59:08 +0000 (UTC)
+Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 613C62D73
+	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 02:59:04 -0700 (PDT)
+Received: by mail-ej1-x62d.google.com with SMTP id a640c23a62f3a-99c136ee106so108367066b.1
+        for <netdev@vger.kernel.org>; Thu, 03 Aug 2023 02:59:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1691056743; x=1691661543;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Vq+QbcdSS7H9wJSSy7McrCyPcqI2cyjBdsbzVxgntys=;
+        b=nc/7kxLSL02797Sifw5k+k4Gy6SxsJ53AzTDC81fOu0vcqKr624+PxAJi+FLne8Y8w
+         Blm2C+DwygFAlNFLBmwQ7EDOgfydpFby9sC7S8DW62ZIkVwoxne4R4Yn9KL2MBecLkEb
+         cc7GFaHG4IgY9VDm4COHp5xBkoiutjbAuTCY7Ou4c0C4EQmyIvLMmALcSZCHeE4At3bu
+         Mnsc7io8dkZQA0cE4Gil9XhGZEG0RMLUuvVTM9tRGr6qKriuFKfo0KyeQnhaiKj3nEaG
+         pJKrKXT4iXbGwXdJK0sLF/t9ch8wWqtq9n/hAy5tX6XKREyENfdFERyx9JV9W5M8k4RJ
+         7bAA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691056743; x=1691661543;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Vq+QbcdSS7H9wJSSy7McrCyPcqI2cyjBdsbzVxgntys=;
+        b=dUh6xK4MMvrcUp6vhb0GER3B8QXishFJkq3CKt1yGJVDzm7lrmFpD9uTLZ8BseiZT7
+         Gnfo6tvIO+MnxDJJrAc92TnTUZHEX4Rn2AA78cJQW1l5cz2Eip/3PDqjF2e5Crgg7ewF
+         XntXuuVu3ov1JPgchbo6hKOMd0mNJMBvCKg/0Y0H+rDiiz3Vi+grqv78AMagCGDsKAPx
+         BUWGm/cLJPKV5oEBgifghLWTE/g0iI1MDrQyk3gEP0LMnaMVXPw1J60pYUnf70ZWiInJ
+         tXrm1G8BYqCsLGqUaQvFIKfM3K6dq4tGxW9KATF6Jv78tDAhEDvu5t1Tdr6thOP2bQqE
+         ex1g==
+X-Gm-Message-State: ABy/qLakXVU8NgJmn+k7BPLn3Tb0kNnYMaS5KiKUaPUNrUCAs0CURt1j
+	56EjjS/bgiwhCFmdN/0o/rYhTw==
+X-Google-Smtp-Source: APBJJlFp4LqbTkmx+PeG8V0cWoKSQPKdbjGFxB5rUGNr3wCOT8Gsbvx0890WeH8a+y+rJdTGvHNicQ==
+X-Received: by 2002:a17:906:847b:b0:993:db29:d27d with SMTP id hx27-20020a170906847b00b00993db29d27dmr7962202ejc.34.1691056742781;
+        Thu, 03 Aug 2023 02:59:02 -0700 (PDT)
+Received: from localhost ([212.23.236.67])
+        by smtp.gmail.com with ESMTPSA id l6-20020a1709067d4600b00988f168811bsm10365860ejp.135.2023.08.03.02.59.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 03 Aug 2023 02:59:02 -0700 (PDT)
+Date: Thu, 3 Aug 2023 11:59:01 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jinjian Song <songjinjian@hotmail.com>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, davem@davemloft.net,
+	johannes@sipsolutions.net, ryazanov.s.a@gmail.com,
+	loic.poulain@linaro.org, ilpo.jarvinen@linux.intel.com,
+	ricardo.martinez@linux.intel.com,
+	chiranjeevi.rapolu@linux.intel.com, haijun.liu@mediatek.com,
+	edumazet@google.com, pabeni@redhat.com,
+	chandrashekar.devegowda@intel.com, m.chetan.kumar@linux.intel.com,
+	linuxwwan@intel.com, linuxwwan_5g@intel.com,
+	soumya.prakash.mishra@intel.com, jesse.brandeburg@intel.com,
+	danielwinkler@google.com, Jinjian Song <jinjian.song@fibocom.com>
+Subject: Re: [net-next 2/6] net: wwan: t7xx: Driver registers with Devlink
+ framework
+Message-ID: <ZMt6ZZxIHMrml0+E@nanopsycho>
+References: <20230803021812.6126-1-songjinjian@hotmail.com>
+ <MEYP282MB269720DC5940AEA0904569B3BB08A@MEYP282MB2697.AUSP282.PROD.OUTLOOK.COM>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230718125847.3869700-1-ardb@kernel.org> <20230718125847.3869700-2-ardb@kernel.org>
- <ZMt4nkfpdCXxAkr5@gcabiddu-mobl1.ger.corp.intel.com>
-In-Reply-To: <ZMt4nkfpdCXxAkr5@gcabiddu-mobl1.ger.corp.intel.com>
-From: Ard Biesheuvel <ardb@kernel.org>
-Date: Thu, 3 Aug 2023 11:59:00 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXGn70sGAHgOttKkC6n6jfVZ9Y61NZ9ffLmJV8MK2Kh8nQ@mail.gmail.com>
-Message-ID: <CAMj1kXGn70sGAHgOttKkC6n6jfVZ9Y61NZ9ffLmJV8MK2Kh8nQ@mail.gmail.com>
-Subject: Re: [RFC PATCH 01/21] crypto: scomp - Revert "add support for deflate
- rfc1950 (zlib)"
-To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	Eric Biggers <ebiggers@kernel.org>, Kees Cook <keescook@chromium.org>, 
-	Haren Myneni <haren@us.ibm.com>, Nick Terrell <terrelln@fb.com>, Minchan Kim <minchan@kernel.org>, 
-	Sergey Senozhatsky <senozhatsky@chromium.org>, Jens Axboe <axboe@kernel.dk>, 
-	Richard Weinberger <richard@nod.at>, David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Steffen Klassert <steffen.klassert@secunet.com>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, qat-linux <qat-linux@intel.com>, 
-	"linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>, 
-	"linux-mtd@lists.infradead.org" <linux-mtd@lists.infradead.org>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <MEYP282MB269720DC5940AEA0904569B3BB08A@MEYP282MB2697.AUSP282.PROD.OUTLOOK.COM>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello Giovanni,
+Thu, Aug 03, 2023 at 04:18:08AM CEST, songjinjian@hotmail.com wrote:
 
-On Thu, 3 Aug 2023 at 11:51, Giovanni Cabiddu
-<giovanni.cabiddu@intel.com> wrote:
->
-> Hi Ard,
->
-> On Tue, Jul 18, 2023 at 01:58:27PM +0100, Ard Biesheuvel wrote:
-> > This reverts commit a368f43d6e3a001e684e9191a27df384fbff12f5.
-> >
-> > "zlib-deflate" was introduced 6 years ago, but it does not have any
-> > users. So let's remove the generic implementation and the test vectors,
-> > but retain the "zlib-deflate" entry in the testmgr code to avoid
-> > introducing warning messages on systems that implement zlib-deflate in
-> > hardware.
-> >
-> > Note that RFC 1950 which forms the basis of this algorithm dates back to
-> > 1996, and predates RFC 1951, on which the existing IPcomp is based and
-> > which we have supported in the kernel since 2003. So it seems rather
-> > unlikely that we will ever grow the need to support zlib-deflate.
-> >
-> > Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
-> Support for zlib-deflate was added for [1] but that work was not
-> completed.
->
+[...]
 
-Any clue why zlib_deflate was chosen in this case?
+>+static const struct devlink_param t7xx_devlink_params[] = {
+>+	DEVLINK_PARAM_DRIVER(T7XX_DEVLINK_PARAM_ID_FASTBOOT,
+>+			     "fastboot", DEVLINK_PARAM_TYPE_BOOL,
+>+			     BIT(DEVLINK_PARAM_CMODE_DRIVERINIT),
+>+			     NULL, NULL, NULL),
 
-/me also notes that this is another occurrence of the antipattern
-where we use an asynchronous API and subsequently sleep on the
-completion.
+driver init params is there so the user could configure driver instance
+and then hit devlink reload in order to reinitialize with the new param
+values. In your case, it is a device command. Does not make any sense to
+have it as param.
 
-> Based on [2], either we leave this SW implementation or we remove the HW
-> implementations in the QAT [3] and in the Hisilicon Zip [4] drivers.
->
+NAK
 
-That would work for me as well - dead code is just busywork.
-
-> [1] https://patchwork.kernel.org/project/linux-btrfs/patch/1467083180-111750-1-git-send-email-weigang.li@intel.com/
-> [2] https://lore.kernel.org/lkml/ZIw%2Fjtxdg6O1O0j3@gondor.apana.org.au/
-> [3] https://elixir.bootlin.com/linux/latest/source/drivers/crypto/intel/qat/qat_common/qat_comp_algs.c#L457
-> [4] https://elixir.bootlin.com/linux/latest/source/drivers/crypto/hisilicon/zip/zip_crypto.c#L754
->
-> Regards,
->
-> --
-> Giovanni
 
