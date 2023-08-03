@@ -1,156 +1,203 @@
-Return-Path: <netdev+bounces-24146-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24147-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A891A76EF83
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 18:32:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 260D876EFB9
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 18:40:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6312F2822FC
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 16:32:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D4D66282299
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 16:40:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9CC21ED5B;
-	Thu,  3 Aug 2023 16:32:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A850A1F921;
+	Thu,  3 Aug 2023 16:40:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D71FA24185
-	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 16:32:33 +0000 (UTC)
-Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF6D030D3
-	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 09:32:31 -0700 (PDT)
-Received: by mail-ej1-x62e.google.com with SMTP id a640c23a62f3a-9923833737eso163280366b.3
-        for <netdev@vger.kernel.org>; Thu, 03 Aug 2023 09:32:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tessares.net; s=google; t=1691080350; x=1691685150;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=zZ4hM/q0HPwTItwRxcoCHVMnPlLGYXjnVrDNi3oJPwE=;
-        b=PJIfwjnPcq5K/eieK0jYsUg2wrAfml1/zyNkdsiMpk1rPDmxMtUCn7dwsENu/dqBW3
-         FoJLxM41Q9oW1PUyBKo2jG8xbpeZnvhLUTgDgb5DiUni2T0PZkqIKSYgWxQi/T83nl+t
-         pXIj8Gs+zAaxvvcc7Na8cryb/+eiYqbsOrlOoJVeASeEMfPnrW8kGcmCAT2GGsLY20xL
-         4hG9PxGQDlE5UhBvMESKsvNSZJGXRl0RdmLWgDgh7Sz8WL80tV22LoCaOvaB+82V+PnM
-         d3l4SWzwU1jKUZ8cOzQBr8bJBAZsSyGuXY4DTYtSakRmcSycNP11ZBTIar8nnEiN9fTU
-         OcBw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691080350; x=1691685150;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zZ4hM/q0HPwTItwRxcoCHVMnPlLGYXjnVrDNi3oJPwE=;
-        b=VqtVtgHPwje4GdjYCofLhERvyFNS1UQSWR2HnR8f7mYbjAlAqXbPbrw8RObfeBUYsi
-         /f10AFv1UYuNl22LXJqxtQixTxMTsa52s9O8vuIBAZ1bUekmBceq0BvQdDyiKFtRO+vH
-         c/jWogmeA1PWd+TqmW+5B/2NmQLoncZFejSl54fpKBa5ynOy7hcR11RvY6ktBAdAUsSi
-         R38kpDTmk7G0tXc/9/e7H2B+56kpXLmJih54A+13zsPDti3gnJKSCON8RoGYPFyi/8Cn
-         Frget6qXlzOewJOjyGWfK4tLRoky63kHHe0IL6QOLNubTSA/MtmwjLVG3r5zZN2h8u8I
-         mxJA==
-X-Gm-Message-State: ABy/qLY8WIBxbWJRVqsqss40StY4qeZzalS6aliwaqyAej0q83h8WZdB
-	LSVNxs0CnIz1aAXIJfvfO5Xslg==
-X-Google-Smtp-Source: APBJJlETHyKda7hW2GukYxbJ55rLLHE6UsKThSzEkBMfo1K5a1Rljp9JtErcdrxLF+jpDxF6Hhxk4A==
-X-Received: by 2002:a17:906:109e:b0:99b:cf7a:c8d4 with SMTP id u30-20020a170906109e00b0099bcf7ac8d4mr9009697eju.18.1691080350169;
-        Thu, 03 Aug 2023 09:32:30 -0700 (PDT)
-Received: from ?IPV6:2a02:578:8593:1200:ace8:eb44:12a0:888? ([2a02:578:8593:1200:ace8:eb44:12a0:888])
-        by smtp.gmail.com with ESMTPSA id l7-20020a1709066b8700b0099c53c4407dsm51247ejr.78.2023.08.03.09.32.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 03 Aug 2023 09:32:29 -0700 (PDT)
-Message-ID: <d3fa9b41-078b-4bb5-9f5c-d8768b787f4d@tessares.net>
-Date: Thu, 3 Aug 2023 18:32:15 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C73218B0A
+	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 16:40:34 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6A2730D2;
+	Thu,  3 Aug 2023 09:40:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1691080832; x=1722616832;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=j22spkz2bATHAhmdv4dTafnFwRCFnQH8T5EBXPqR8gk=;
+  b=iZlEc06t4vejqRAUhhfourc2EN+rW/UdzVd98brrPQQmBWTuxqnavJF0
+   mfN5J3/mabkv2M1ltr/736CjzI08K7DnEebaVyPtLp5OFfkYAPNzHES4/
+   SqlTyF81VNcNlKI2pRSOoQVJv3wmBJZw95CFNUzq9OLU3eXqjIGKDMjkS
+   OaqftFwB4n+5TSKep6uy8aQmIZ7d+G6wCpQf/o9ULD/c6caOQlEglt7Iv
+   DOmf4tHEw2Pt5XpdeAuq+fdlmNsu/P1oggBnHSkB6nYlAxYmJ40G5DwyT
+   HOcClvrXrVo78vZ+eyT0pLr93ESuYN+wL42YbRsEFS594By8d2NwabetT
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10791"; a="350229174"
+X-IronPort-AV: E=Sophos;i="6.01,252,1684825200"; 
+   d="scan'208";a="350229174"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Aug 2023 09:40:32 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10791"; a="723268843"
+X-IronPort-AV: E=Sophos;i="6.01,252,1684825200"; 
+   d="scan'208";a="723268843"
+Received: from newjersey.igk.intel.com ([10.102.20.203])
+  by orsmga007.jf.intel.com with ESMTP; 03 Aug 2023 09:40:28 -0700
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Larysa Zaremba <larysa.zaremba@intel.com>,
+	Yunsheng Lin <linyunsheng@huawei.com>,
+	Alexander Duyck <alexanderduyck@fb.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	Simon Horman <simon.horman@corigine.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v2 0/6] page_pool: a couple of assorted optimizations
+Date: Thu,  3 Aug 2023 18:40:08 +0200
+Message-ID: <20230803164014.993838-1-aleksander.lobakin@intel.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH -next] mptcp: fix the incorrect judgment for msk->cb_flags
-Content-Language: en-GB
-To: Xiang Yang <xiangyang3@huawei.com>, martineau@kernel.org,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-Cc: netdev@vger.kernel.org, mptcp@lists.linux.dev
-References: <20230803072438.1847500-1-xiangyang3@huawei.com>
-From: Matthieu Baerts <matthieu.baerts@tessares.net>
-Autocrypt: addr=matthieu.baerts@tessares.net; keydata=
- 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
-In-Reply-To: <20230803072438.1847500-1-xiangyang3@huawei.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Xiang Yang
+That initially was a spin-off of the IAVF PP series[0], but has grown
+(and shrunk) since then a bunch. In fact, it consists of three
+semi-independent blocks:
 
-On 03/08/2023 09:24, Xiang Yang wrote:
-> Coccicheck reports the error below:
-> net/mptcp/protocol.c:3330:15-28: ERROR: test of a variable/field address
-> 
-> Since the address of msk->cb_flags is used in __test_and_clear_bit, the
-> address should not be NULL. The judgment for if (unlikely(msk->cb_flags))
-> will always be true, we should check the real value of msk->cb_flags here.
-> 
-> Fixes: 65a569b03ca8 ("mptcp: optimize release_cb for the common case")
-> Signed-off-by: Xiang Yang <xiangyang3@huawei.com>
+* #1-2: Compile-time optimization. Split page_pool.h into 2 headers to
+  not overbloat the consumers not needing complex inline helpers and
+  then stop including it in skbuff.h at all. The first patch is also
+  prereq for the whole series.
+* #3: Improve cacheline locality for users of the Page Pool frag API.
+* #4-6: Use direct cache recycling more aggressively, when it is safe
+  obviously. In addition, make sure nobody wants to use Page Pool API
+  with disabled interrupts.
 
-This Coccicheck report was useful, the optimisation in place was not
-working. But there was no impact apart from testing more conditions
-where there were no reasons to.
+Patches #1 and #5 are authored by Yunsheng and Jakub respectively, with
+small modifications from my side as per ML discussions.
+For the perf numbers for #3-6, please see individual commit messages.
 
-The fix is then good to me but it should land in -net, not in net-next.
+Also available on my GH with many more Page Pool goodies[1].
 
-Reviewed-by: Matthieu Baerts <matthieu.baerts@tessares.net>
+[0] https://lore.kernel.org/netdev/20230530150035.1943669-1-aleksander.lobakin@intel.com
+[1] https://github.com/alobakin/linux/commits/iavf-pp-frag
 
-I don't know if it is needed to have a re-send just to change the subject.
+Alexander Lobakin (4):
+  net: skbuff: don't include <net/page_pool/types.h> to <linux/skbuff.h>
+  page_pool: place frag_* fields in one cacheline
+  net: skbuff: avoid accessing page_pool if !napi_safe when returning
+    page
+  net: skbuff: always try to recycle PP pages directly when in softirq
 
-Cheers,
-Matt
+Jakub Kicinski (1):
+  page_pool: add a lockdep check for recycling in hardirq
+
+Yunsheng Lin (1):
+  page_pool: split types and declarations from page_pool.h
+
+ MAINTAINERS                                   |   2 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c     |   2 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c |   2 +-
+ drivers/net/ethernet/engleder/tsnep_main.c    |   1 +
+ drivers/net/ethernet/freescale/fec_main.c     |   1 +
+ .../net/ethernet/hisilicon/hns3/hns3_enet.c   |   1 +
+ .../net/ethernet/hisilicon/hns3/hns3_enet.h   |   2 +-
+ drivers/net/ethernet/marvell/mvneta.c         |   2 +-
+ drivers/net/ethernet/marvell/mvpp2/mvpp2.h    |   2 +-
+ .../net/ethernet/marvell/mvpp2/mvpp2_main.c   |   1 +
+ .../marvell/octeontx2/nic/otx2_common.c       |   1 +
+ .../ethernet/marvell/octeontx2/nic/otx2_pf.c  |   1 +
+ drivers/net/ethernet/mediatek/mtk_eth_soc.c   |   1 +
+ drivers/net/ethernet/mediatek/mtk_eth_soc.h   |   2 +-
+ .../ethernet/mellanox/mlx5/core/en/params.c   |   1 +
+ .../net/ethernet/mellanox/mlx5/core/en/trap.c |   1 -
+ .../net/ethernet/mellanox/mlx5/core/en/xdp.c  |   1 +
+ .../net/ethernet/mellanox/mlx5/core/en_main.c |   2 +-
+ .../net/ethernet/mellanox/mlx5/core/en_rx.c   |   2 +-
+ .../ethernet/mellanox/mlx5/core/en_stats.c    |   2 +-
+ .../ethernet/microchip/lan966x/lan966x_fdma.c |   1 +
+ .../ethernet/microchip/lan966x/lan966x_main.h |   2 +-
+ drivers/net/ethernet/socionext/netsec.c       |   2 +-
+ drivers/net/ethernet/stmicro/stmmac/stmmac.h  |   2 +-
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c |   1 +
+ drivers/net/ethernet/ti/cpsw.c                |   2 +-
+ drivers/net/ethernet/ti/cpsw_new.c            |   2 +-
+ drivers/net/ethernet/ti/cpsw_priv.c           |   2 +-
+ drivers/net/ethernet/wangxun/libwx/wx_lib.c   |   2 +-
+ drivers/net/veth.c                            |   2 +-
+ drivers/net/wireless/mediatek/mt76/mac80211.c |   1 -
+ drivers/net/wireless/mediatek/mt76/mt76.h     |   1 +
+ drivers/net/xen-netfront.c                    |   2 +-
+ include/linux/lockdep.h                       |   7 +
+ include/linux/skbuff.h                        |   5 +-
+ include/net/page_pool/helpers.h               | 193 ++++++++++++++++
+ .../net/{page_pool.h => page_pool/types.h}    | 209 +-----------------
+ include/trace/events/page_pool.h              |   2 +-
+ net/bpf/test_run.c                            |   2 +-
+ net/core/page_pool.c                          |  43 +---
+ net/core/skbuff.c                             |  49 +++-
+ net/core/xdp.c                                |   2 +-
+ 42 files changed, 297 insertions(+), 267 deletions(-)
+ create mode 100644 include/net/page_pool/helpers.h
+ rename include/net/{page_pool.h => page_pool/types.h} (51%)
+
+---
+From v1[2]:
+* move the "avoid calling no-op DMA sync ops" piece out of the series --
+  will join some other or transform into something else (Jakub et al.);
+* #1: restore accidentally removed path in MAINTAINERS (Yunsheng);
+* #1: prefer `include/net/page_pool/` over `include/net/page_pool/*` in
+  MAINTAINERS (Yunsheng);
+* #2: rename page_pool_return_skb_page() to napi_pp_put_page() -- the old
+  name seems to not make any sense for some time already (Yunsheng);
+* #2: guard napi_pp_put_page() with CONFIG_PAGE_POOL in skbuff.c (to not
+  compile it when there are no users) (Yunsheng);
+
+From RFC v2[3]:
+* drop the dependency on the hybrid allocation series (and thus the
+  "RFC" prefix) -- it wasn't a strict dep and it's not in the trees yet;
+* add [slightly reworked] Yunsheng's patch which splits page_pool.h into
+  2 headers -- merge conflict hell otherwise.
+  Also fix a typo while nobody looks (Simon);
+* #3 (former #2): word the commitmsg a bit better, mention the main
+  reason for the change more clearly (Ilias);
+* add Jakub's hardirq assertion as a prereq for the last patch;
+* #9 (former #7): add comment mentioning that the hardirq case is not
+  checked due to the assertion checking it later (yes, it is illegal to
+  use Page Pool with the interrupts disabled or when in TH) (Jakub);
+
+From RFC v1[4]:
+* #1: move the entire function to skbuff.c, don't try to split it (Alex);
+* #2-4: new;
+* #5: use internal flags field added in #4 and don't modify driver-defined
+  structure (Alex, Jakub);
+* #6: new;
+* drop "add new NAPI state" as a redundant complication;
+* #7: replace the check for the new NAPI state to just in_softirq(), should
+  be fine (Jakub).
+
+[2] https://lore.kernel.org/netdev/20230727144336.1646454-1-aleksander.lobakin@intel.com
+[3] https://lore.kernel.org/netdev/20230714170853.866018-1-aleksander.lobakin@intel.com
+[4] https://lore.kernel.org/netdev/20230629152305.905962-1-aleksander.lobakin@intel.com
 -- 
-Tessares | Belgium | Hybrid Access Solutions
-www.tessares.net
+2.41.0
+
 
