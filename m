@@ -1,597 +1,336 @@
-Return-Path: <netdev+bounces-24195-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24196-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3C7676F351
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 21:18:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A6A9A76F366
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 21:28:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 213FE1C21681
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 19:18:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A5FD21C21664
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 19:28:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B462B2591C;
-	Thu,  3 Aug 2023 19:18:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31AF32591F;
+	Thu,  3 Aug 2023 19:28:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FAB11F934
-	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 19:18:40 +0000 (UTC)
-Received: from mail-vs1-xe29.google.com (mail-vs1-xe29.google.com [IPv6:2607:f8b0:4864:20::e29])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29DC3BA
-	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 12:18:37 -0700 (PDT)
-Received: by mail-vs1-xe29.google.com with SMTP id ada2fe7eead31-447be69ae43so490041137.0
-        for <netdev@vger.kernel.org>; Thu, 03 Aug 2023 12:18:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691090316; x=1691695116;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zs8bZOSE+m2BYzMiuNpcvoG8tmCnF87SZjJXGCP9qc0=;
-        b=6TlwIIhF5Opbz4od0LrnHMsK63j/4XfrW1Nirr/8D0P2tMxdLc5PzScCjENwdkhN5i
-         G5Yc2BJUCeG8LE987F93s14DZOWkJpqB5skSQyuqDcpdpsCqnyWj8BhALsxgO6VnrdaG
-         4eYNSl1B+nvbCZwgxKsqrVx5RoKULopFLbXuoggxSBqadHn9JLJlZI/BlN2/2zYVeUT2
-         eZ9Ke8v7oybH/gpk+39c3uVho1RRg1sFyg8hqrpt7qQ38/coa3/xR+HmsyNt75ihHoGo
-         JtpAJYSAZT1MNLNGSp3qH5UDNhVxuWw2mVcY9TIDNBQwb/qBExwWEP9V0bCRx2cOa3ig
-         zYhg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691090316; x=1691695116;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zs8bZOSE+m2BYzMiuNpcvoG8tmCnF87SZjJXGCP9qc0=;
-        b=aQUojPLc/LlGNvr64KFMlUG/Fch82bIknrjXPjkfosyg8r+chTu4V6CAuAB5JZDN61
-         PdL22qrchrH3PPnNqbMRYK5Jm0zWdtkzlXHwSGLbM3nBdXcVPVmwRKVO5RFIujhpCIt+
-         4vDy/229kb2dqP4f0pLLEK/1T80ADt0UkJxnDXngWQNOyH9XnJknn+YZB/BwWNYb44D0
-         zF4bABATuucrLa/n/OVb2Q9v/LgQFp9matn22NRXaMAeMpIyek/Zzndlbi0k6c8ns+wK
-         m7Ym52aYczUivG1/jlHMgjqZM58+vtD6eQoWQXlXv0HDg5ONKnCsR7rl+td0140P5QNS
-         2D8Q==
-X-Gm-Message-State: ABy/qLaZAerWd7waiiI29jeKVTADU95kGZoKB3Z+HxAt4Q/lFRWsvR+o
-	7pzG9d3iCltlovPS5GUpg12UrG9Ofh36oOmKvH9usw==
-X-Google-Smtp-Source: APBJJlFkDd6Y2hEL3jT//M2+EPxo43RHiNimr7wgll8xV9gEp3drcE1O1KIGIdRpRrcQ1+97vpqRqo7Pc8wwLBti3GE=
-X-Received: by 2002:a67:f756:0:b0:443:7eba:e22c with SMTP id
- w22-20020a67f756000000b004437ebae22cmr5460556vso.8.1691090315965; Thu, 03 Aug
- 2023 12:18:35 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2111A14AB6
+	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 19:28:47 +0000 (UTC)
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0DF3E1A8;
+	Thu,  3 Aug 2023 12:28:46 -0700 (PDT)
+Received: from UbuntuVM-18.efytirfs5hsengjwslc1ligxab.xx.internal.cloudapp.net (unknown [20.72.208.6])
+	by linux.microsoft.com (Postfix) with ESMTPSA id 29544207F5AF;
+	Thu,  3 Aug 2023 12:28:45 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 29544207F5AF
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1691090925;
+	bh=d/Q0tfkeWRaqXZbjrsVExBbWs12KQlVq15rFnfwJiBg=;
+	h=From:To:Cc:Subject:Date:From;
+	b=isi4Quf1AWk8mU9YL/qO/DvCjakYV3nqa7wyZgPloXIvrEoeS7FQoWqVDX0i9FmZQ
+	 0ksh37AtqX1ROZjF0f36O5CDiJjxtOVfDr0JU9sXAcpeGfiMAFVb/Kkv4qMtjHnMwk
+	 PutE8LMqyT1zASd7n2hujny/b8oGZrjG1Z/abVT0=
+From: Hardik Garg <hargar@linux.microsoft.com>
+To: stable@vger.kernel.org
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	shayd@nvidia.com,
+	saeedm@nvidia.com,
+	fred@cloudflare.com,
+	netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 6.1 5.15] net/mlx5: Free irqs only on shutdown callback
+Date: Thu,  3 Aug 2023 19:28:32 +0000
+Message-Id: <20230803192832.22966-1-hargar@linux.microsoft.com>
+X-Mailer: git-send-email 2.17.1
+X-Spam-Status: No, score=-18.7 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,ENV_AND_HDR_SPF_MATCH,HEXHASH_WORD,
+	RCVD_IN_DNSWL_MED,RCVD_IN_SBL,SPF_HELO_PASS,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+	autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20230802213338.2391025-1-rushilg@google.com> <20230802213338.2391025-2-rushilg@google.com>
- <55d763ec-fbaa-79dc-192e-c4c696a8a7de@intel.com>
-In-Reply-To: <55d763ec-fbaa-79dc-192e-c4c696a8a7de@intel.com>
-From: Rushil Gupta <rushilg@google.com>
-Date: Thu, 3 Aug 2023 12:18:24 -0700
-Message-ID: <CANzqiF4ZnyeGh=9-dGE0NpPYc8ES5XAe2aafutxmX6dAL_vWmA@mail.gmail.com>
-Subject: Re: [PATCH net-next 1/4] gve: Control path for DQO-QPL
-To: Jesse Brandeburg <jesse.brandeburg@intel.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, 
-	willemb@google.com, edumazet@google.com, pabeni@redhat.com, 
-	Praveen Kaligineedi <pkaligineedi@google.com>, Bailey Forrest <bcf@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-On Wed, Aug 2, 2023 at 6:56=E2=80=AFPM Jesse Brandeburg
-<jesse.brandeburg@intel.com> wrote:
->
-> On 8/2/2023 2:33 PM, Rushil Gupta wrote:
-> > Add checks, abi-changes and device options to support
-> > QPL mode for DQO in addition to GQI. Also, use
-> > pages-per-qpl supplied by device-option to control the
-> > size of the "queue-page-list".
->
-> That is some serious acronym soup there, maybe expand your acronyms upon
-> first use in the commit message? how are we to know what you mean?
+commit 9c2d08010963 ("net/mlx5: Free irqs only on shutdown callback")
+backport this v6.4 commit to v6.1 and v5.15
 
-I have provided the acronym explanations in the cover letter and .rst files=
-.
-However, I agree I should add them to the commit message as well. Will
-fix it in v2.
->
->
-> >
-> > Signed-off-by: Rushil Gupta <rushilg@google.com>
-> > Reviewed-by: Willem de Bruijn <willemb@google.com>
-> > Signed-off-by: Praveen Kaligineedi <pkaligineedi@google.com>
-> > Signed-off-by: Bailey Forrest <bcf@google.com>
-> > ---
-> >  drivers/net/ethernet/google/gve/gve.h        | 20 ++++-
-> >  drivers/net/ethernet/google/gve/gve_adminq.c | 93 +++++++++++++++++---
-> >  drivers/net/ethernet/google/gve/gve_adminq.h | 10 +++
-> >  drivers/net/ethernet/google/gve/gve_main.c   | 20 +++--
-> >  4 files changed, 123 insertions(+), 20 deletions(-)
-> >
-> > diff --git a/drivers/net/ethernet/google/gve/gve.h b/drivers/net/ethern=
-et/google/gve/gve.h
-> > index 4b425bf71ede..517a63b60cb9 100644
-> > --- a/drivers/net/ethernet/google/gve/gve.h
-> > +++ b/drivers/net/ethernet/google/gve/gve.h
-> > @@ -51,6 +51,12 @@
-> >
-> >  #define GVE_GQ_TX_MIN_PKT_DESC_BYTES 182
-> >
-> > +#define DQO_QPL_DEFAULT_TX_PAGES 512
-> > +#define DQO_QPL_DEFAULT_RX_PAGES 2048
-> > +
-> > +/* Maximum TSO size supported on DQO */
-> > +#define GVE_DQO_TX_MAX       0x3FFFF
-> > +
-> >  /* Each slot in the desc ring has a 1:1 mapping to a slot in the data =
-ring */
-> >  struct gve_rx_desc_queue {
-> >       struct gve_rx_desc *desc_ring; /* the descriptor ring */
-> > @@ -531,6 +537,7 @@ enum gve_queue_format {
-> >       GVE_GQI_RDA_FORMAT              =3D 0x1,
-> >       GVE_GQI_QPL_FORMAT              =3D 0x2,
-> >       GVE_DQO_RDA_FORMAT              =3D 0x3,
-> > +     GVE_DQO_QPL_FORMAT              =3D 0x4,
-> >  };
-> >
-> >  struct gve_priv {
-> > @@ -550,7 +557,8 @@ struct gve_priv {
-> >       u16 num_event_counters;
-> >       u16 tx_desc_cnt; /* num desc per ring */
-> >       u16 rx_desc_cnt; /* num desc per ring */
-> > -     u16 tx_pages_per_qpl; /* tx buffer length */
-> > +     u16 tx_pages_per_qpl; /* Suggested number of pages per qpl for TX=
- queues by NIC */
-> > +     u16 rx_pages_per_qpl; /* Suggested number of pages per qpl for RX=
- queues by NIC */
-> >       u16 rx_data_slot_cnt; /* rx buffer length */
-> >       u64 max_registered_pages;
-> >       u64 num_registered_pages; /* num pages registered with NIC */
-> > @@ -808,11 +816,17 @@ static inline u32 gve_rx_idx_to_ntfy(struct gve_p=
-riv *priv, u32 queue_idx)
-> >       return (priv->num_ntfy_blks / 2) + queue_idx;
-> >  }
-> >
-> > +static inline bool gve_is_qpl(struct gve_priv *priv)
-> > +{
-> > +     return priv->queue_format =3D=3D GVE_GQI_QPL_FORMAT ||
-> > +             priv->queue_format =3D=3D GVE_DQO_QPL_FORMAT;
-> > +}
-> > +
-> >  /* Returns the number of tx queue page lists
-> >   */
-> >  static inline u32 gve_num_tx_qpls(struct gve_priv *priv)
-> >  {
-> > -     if (priv->queue_format !=3D GVE_GQI_QPL_FORMAT)
-> > +     if (!gve_is_qpl(priv))
-> >               return 0;
-> >
-> >       return priv->tx_cfg.num_queues + priv->num_xdp_queues;
-> > @@ -832,7 +846,7 @@ static inline u32 gve_num_xdp_qpls(struct gve_priv =
-*priv)
-> >   */
-> >  static inline u32 gve_num_rx_qpls(struct gve_priv *priv)
-> >  {
-> > -     if (priv->queue_format !=3D GVE_GQI_QPL_FORMAT)
-> > +     if (!gve_is_qpl(priv))
-> >               return 0;
-> >
-> >       return priv->rx_cfg.num_queues;
-> > diff --git a/drivers/net/ethernet/google/gve/gve_adminq.c b/drivers/net=
-/ethernet/google/gve/gve_adminq.c
-> > index 252974202a3f..a16e7cf21911 100644
-> > --- a/drivers/net/ethernet/google/gve/gve_adminq.c
-> > +++ b/drivers/net/ethernet/google/gve/gve_adminq.c
-> > @@ -39,7 +39,8 @@ void gve_parse_device_option(struct gve_priv *priv,
-> >                            struct gve_device_option_gqi_rda **dev_op_gq=
-i_rda,
-> >                            struct gve_device_option_gqi_qpl **dev_op_gq=
-i_qpl,
-> >                            struct gve_device_option_dqo_rda **dev_op_dq=
-o_rda,
-> > -                          struct gve_device_option_jumbo_frames **dev_=
-op_jumbo_frames)
-> > +                          struct gve_device_option_jumbo_frames **dev_=
-op_jumbo_frames,
-> > +                          struct gve_device_option_dqo_qpl **dev_op_dq=
-o_qpl)
-> >  {
-> >       u32 req_feat_mask =3D be32_to_cpu(option->required_features_mask)=
-;
-> >       u16 option_length =3D be16_to_cpu(option->option_length);
-> > @@ -112,6 +113,22 @@ void gve_parse_device_option(struct gve_priv *priv=
-,
-> >               }
-> >               *dev_op_dqo_rda =3D (void *)(option + 1);
-> >               break;
-> > +     case GVE_DEV_OPT_ID_DQO_QPL:
-> > +             if (option_length < sizeof(**dev_op_dqo_qpl) ||
-> > +                 req_feat_mask !=3D GVE_DEV_OPT_REQ_FEAT_MASK_DQO_QPL)=
+Whenever a shutdown is invoked, free irqs only and keep mlx5_irq
+synthetic wrapper intact in order to avoid use-after-free on
+system shutdown.
+
+for example:
+==================================================================
+BUG: KASAN: use-after-free in _find_first_bit+0x66/0x80
+Read of size 8 at addr ffff88823fc0d318 by task kworker/u192:0/13608
+
+CPU: 25 PID: 13608 Comm: kworker/u192:0 Tainted: 
+G    B   W  O  6.1.21-cloudflare-kasan-2023.3.21 #1
+Hardware name: GIGABYTE R162-R2-GEN0/MZ12-HD2-CD, BIOS R14 05/03/2021
+Workqueue: mlx5e mlx5e_tx_timeout_work [mlx5_core]
+Call Trace:
+  <TASK>
+  dump_stack_lvl+0x34/0x48
+  print_report+0x170/0x473
+  ? _find_first_bit+0x66/0x80
+  kasan_report+0xad/0x130
+  ? _find_first_bit+0x66/0x80
+  _find_first_bit+0x66/0x80
+  mlx5e_open_channels+0x3c5/0x3a10 [mlx5_core]
+  ? console_unlock+0x2fa/0x430
+  ? _raw_spin_lock_irqsave+0x8d/0xf0
+  ? _raw_spin_unlock_irqrestore+0x42/0x80
+  ? preempt_count_add+0x7d/0x150
+  ? __wake_up_klogd.part.0+0x7d/0xc0
+  ? vprintk_emit+0xfe/0x2c0
+  ? mlx5e_trigger_napi_sched+0x40/0x40 [mlx5_core]
+  ? dev_attr_show.cold+0x35/0x35
+  ? devlink_health_do_dump.part.0+0x174/0x340
+  ? devlink_health_report+0x504/0x810
+  ? mlx5e_reporter_tx_timeout+0x29d/0x3a0 [mlx5_core]
+  ? mlx5e_tx_timeout_work+0x17c/0x230 [mlx5_core]
+  ? process_one_work+0x680/0x1050
+  mlx5e_safe_switch_params+0x156/0x220 [mlx5_core]
+  ? mlx5e_switch_priv_channels+0x310/0x310 [mlx5_core]
+  ? mlx5_eq_poll_irq_disabled+0xb6/0x100 [mlx5_core]
+  mlx5e_tx_reporter_timeout_recover+0x123/0x240 [mlx5_core]
+  ? __mutex_unlock_slowpath.constprop.0+0x2b0/0x2b0
+  devlink_health_reporter_recover+0xa6/0x1f0
+  devlink_health_report+0x2f7/0x810
+  ? vsnprintf+0x854/0x15e0
+  mlx5e_reporter_tx_timeout+0x29d/0x3a0 [mlx5_core]
+  ? mlx5e_reporter_tx_err_cqe+0x1a0/0x1a0 [mlx5_core]
+  ? mlx5e_tx_reporter_timeout_dump+0x50/0x50 [mlx5_core]
+  ? mlx5e_tx_reporter_dump_sq+0x260/0x260 [mlx5_core]
+  ? newidle_balance+0x9b7/0xe30
+  ? psi_group_change+0x6a7/0xb80
+  ? mutex_lock+0x96/0xf0
+  ? __mutex_lock_slowpath+0x10/0x10
+  mlx5e_tx_timeout_work+0x17c/0x230 [mlx5_core]
+  process_one_work+0x680/0x1050
+  worker_thread+0x5a0/0xeb0
+  ? process_one_work+0x1050/0x1050
+  kthread+0x2a2/0x340
+  ? kthread_complete_and_exit+0x20/0x20
+  ret_from_fork+0x22/0x30
+  </TASK>
+
+Freed by task 1:
+  kasan_save_stack+0x23/0x50
+  kasan_set_track+0x21/0x30
+  kasan_save_free_info+0x2a/0x40
+  ____kasan_slab_free+0x169/0x1d0
+  slab_free_freelist_hook+0xd2/0x190
+  __kmem_cache_free+0x1a1/0x2f0
+  irq_pool_free+0x138/0x200 [mlx5_core]
+  mlx5_irq_table_destroy+0xf6/0x170 [mlx5_core]
+  mlx5_core_eq_free_irqs+0x74/0xf0 [mlx5_core]
+  shutdown+0x194/0x1aa [mlx5_core]
+  pci_device_shutdown+0x75/0x120
+  device_shutdown+0x35c/0x620
+  kernel_restart+0x60/0xa0
+  __do_sys_reboot+0x1cb/0x2c0
+  do_syscall_64+0x3b/0x90
+  entry_SYSCALL_64_after_hwframe+0x4b/0xb5
+
+The buggy address belongs to the object at ffff88823fc0d300
+  which belongs to the cache kmalloc-192 of size 192
+The buggy address is located 24 bytes inside of
+  192-byte region [ffff88823fc0d300, ffff88823fc0d3c0)
+
+The buggy address belongs to the physical page:
+page:0000000010139587 refcount:1 mapcount:0 mapping:0000000000000000
+index:0x0 pfn:0x23fc0c
+head:0000000010139587 order:1 compound_mapcount:0 compound_pincount:0
+flags: 0x2ffff800010200(slab|head|node=0|zone=2|lastcpupid=0x1ffff)
+raw: 002ffff800010200 0000000000000000 dead000000000122 ffff88810004ca00
+raw: 0000000000000000 0000000000200020 00000001ffffffff 0000000000000000
+page dumped because: kasan: bad access detected
+
+Memory state around the buggy address:
+  ffff88823fc0d200: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+  ffff88823fc0d280: fb fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
+ >ffff88823fc0d300: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+                             ^
+  ffff88823fc0d380: fb fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
+  ffff88823fc0d400: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+==================================================================
+general protection fault, probably for non-canonical address
+0xdffffc005c40d7ac: 0000 [#1] PREEMPT SMP KASAN NOPTI
+KASAN: probably user-memory-access in range 
+[0x00000002e206bd60-0x00000002e206bd67]
+CPU: 25 PID: 13608 Comm: kworker/u192:0 Tainted: 
+G    B   W  O  6.1.21-cloudflare-kasan-2023.3.21 #1
+Hardware name: GIGABYTE R162-R2-GEN0/MZ12-HD2-CD, BIOS R14 05/03/2021
+Workqueue: mlx5e mlx5e_tx_timeout_work [mlx5_core]
+RIP: 0010:__alloc_pages+0x141/0x5c0
+Call Trace:
+  <TASK>
+  ? sysvec_apic_timer_interrupt+0xa0/0xc0
+  ? asm_sysvec_apic_timer_interrupt+0x16/0x20
+  ? __alloc_pages_slowpath.constprop.0+0x1ec0/0x1ec0
+  ? _raw_spin_unlock_irqrestore+0x3d/0x80
+  __kmalloc_large_node+0x80/0x120
+  ? kvmalloc_node+0x4e/0x170
+  __kmalloc_node+0xd4/0x150
+  kvmalloc_node+0x4e/0x170
+  mlx5e_open_channels+0x631/0x3a10 [mlx5_core]
+  ? console_unlock+0x2fa/0x430
+  ? _raw_spin_lock_irqsave+0x8d/0xf0
+  ? _raw_spin_unlock_irqrestore+0x42/0x80
+  ? preempt_count_add+0x7d/0x150
+  ? __wake_up_klogd.part.0+0x7d/0xc0
+  ? vprintk_emit+0xfe/0x2c0
+  ? mlx5e_trigger_napi_sched+0x40/0x40 [mlx5_core]
+  ? dev_attr_show.cold+0x35/0x35
+  ? devlink_health_do_dump.part.0+0x174/0x340
+  ? devlink_health_report+0x504/0x810
+  ? mlx5e_reporter_tx_timeout+0x29d/0x3a0 [mlx5_core]
+  ? mlx5e_tx_timeout_work+0x17c/0x230 [mlx5_core]
+  ? process_one_work+0x680/0x1050
+  mlx5e_safe_switch_params+0x156/0x220 [mlx5_core]
+  ? mlx5e_switch_priv_channels+0x310/0x310 [mlx5_core]
+  ? mlx5_eq_poll_irq_disabled+0xb6/0x100 [mlx5_core]
+  mlx5e_tx_reporter_timeout_recover+0x123/0x240 [mlx5_core]
+  ? __mutex_unlock_slowpath.constprop.0+0x2b0/0x2b0
+  devlink_health_reporter_recover+0xa6/0x1f0
+  devlink_health_report+0x2f7/0x810
+  ? vsnprintf+0x854/0x15e0
+  mlx5e_reporter_tx_timeout+0x29d/0x3a0 [mlx5_core]
+  ? mlx5e_reporter_tx_err_cqe+0x1a0/0x1a0 [mlx5_core]
+  ? mlx5e_tx_reporter_timeout_dump+0x50/0x50 [mlx5_core]
+  ? mlx5e_tx_reporter_dump_sq+0x260/0x260 [mlx5_core]
+  ? newidle_balance+0x9b7/0xe30
+  ? psi_group_change+0x6a7/0xb80
+  ? mutex_lock+0x96/0xf0
+  ? __mutex_lock_slowpath+0x10/0x10
+  mlx5e_tx_timeout_work+0x17c/0x230 [mlx5_core]
+  process_one_work+0x680/0x1050
+  worker_thread+0x5a0/0xeb0
+  ? process_one_work+0x1050/0x1050
+  kthread+0x2a2/0x340
+  ? kthread_complete_and_exit+0x20/0x20
+  ret_from_fork+0x22/0x30
+  </TASK>
+---[ end trace 0000000000000000  ]---
+RIP: 0010:__alloc_pages+0x141/0x5c0
+Code: e0 39 a3 96 89 e9 b8 22 01 32 01 83 e1 0f 48 89 fa 01 c9 48 c1 ea
+03 d3 f8 83 e0 03 89 44 24 6c 48 b8 00 00 00 00 00 fc ff df <80> 3c 02
+00 0f 85 fc 03 00 00 89 e8 4a 8b 14 f5 e0 39 a3 96 4c 89
+RSP: 0018:ffff888251f0f438 EFLAGS: 00010202
+RAX: dffffc0000000000 RBX: 1ffff1104a3e1e8b RCX: 0000000000000000
+RDX: 000000005c40d7ac RSI: 0000000000000003 RDI: 00000002e206bd60
+RBP: 0000000000052dc0 R08: ffff8882b0044218 R09: ffff8882b0045e8a
+R10: fffffbfff300fefc R11: ffff888167af4000 R12: 0000000000000003
+R13: 0000000000000000 R14: 00000000696c7070 R15: ffff8882373f4380
+FS:  0000000000000000(0000) GS:ffff88bf2be80000(0000)
+knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00005641d031eee8 CR3: 0000002e7ca14000 CR4: 0000000000350ee0
+Kernel panic - not syncing: Fatal exception
+Kernel Offset: 0x11000000 from 0xffffffff81000000 (relocation range:
+0xffffffff80000000-0xffffffffbfffffff)
+---[ end Kernel panic - not syncing: Fatal exception  ]---]
+
+Reported-by: Frederick Lawler <fred@cloudflare.com>
+Link: https://lore.kernel.org/netdev/be5b9271-7507-19c5-ded1-fa78f1980e69@cloudflare.com
+Signed-off-by: Shay Drory <shayd@nvidia.com>
+Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
+[hardik: Refer to the irqn member of the mlx5_irq struct, instead of
+ the msi_map, since we don't have upstream v6.4 commit 235a25fe28de
+ ("net/mlx5: Modify struct mlx5_irq to use struct msi_map")].
+[hardik: Refer to the pf_pool member of the mlx5_irq_table struct,
+ instead of pcif_pool, since we don't have upstream v6.4 commit
+ 8bebfd767909 ("net/mlx5: Improve naming of pci function vectors")].
+ 
+Signed-off-by: Hardik Garg <hargar@linux.microsoft.com>
+---
+ drivers/net/ethernet/mellanox/mlx5/core/eq.c  |  2 +-
+ .../ethernet/mellanox/mlx5/core/mlx5_irq.h    |  1 +
+ .../net/ethernet/mellanox/mlx5/core/pci_irq.c | 29 +++++++++++++++++++
+ 3 files changed, 31 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eq.c b/drivers/net/ethernet/mellanox/mlx5/core/eq.c
+index a0242dc15741..e112b5685b02 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/eq.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/eq.c
+@@ -1061,7 +1061,7 @@ void mlx5_core_eq_free_irqs(struct mlx5_core_dev *dev)
+ 	mutex_lock(&table->lock); /* sync with create/destroy_async_eq */
+ 	if (!mlx5_core_is_sf(dev))
+ 		clear_rmap(dev);
+-	mlx5_irq_table_destroy(dev);
++	mlx5_irq_table_free_irqs(dev);
+ 	mutex_unlock(&table->lock);
+ }
+ 
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/mlx5_irq.h b/drivers/net/ethernet/mellanox/mlx5/core/mlx5_irq.h
+index 23cb63fa4588..2e728e4e81fa 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/mlx5_irq.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/mlx5_irq.h
+@@ -14,6 +14,7 @@ int mlx5_irq_table_init(struct mlx5_core_dev *dev);
+ void mlx5_irq_table_cleanup(struct mlx5_core_dev *dev);
+ int mlx5_irq_table_create(struct mlx5_core_dev *dev);
+ void mlx5_irq_table_destroy(struct mlx5_core_dev *dev);
++void mlx5_irq_table_free_irqs(struct mlx5_core_dev *dev);
+ int mlx5_irq_table_get_num_comp(struct mlx5_irq_table *table);
+ int mlx5_irq_table_get_sfs_vec(struct mlx5_irq_table *table);
+ struct mlx5_irq_table *mlx5_irq_table_get(struct mlx5_core_dev *dev);
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c b/drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c
+index 662f1d55e30e..5e0f7d96aac5 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c
+@@ -591,6 +591,24 @@ static void irq_pools_destroy(struct mlx5_irq_table *table)
+ 	irq_pool_free(table->pf_pool);
+ }
+ 
++static void mlx5_irq_pool_free_irqs(struct mlx5_irq_pool *pool)
++{
++	struct mlx5_irq *irq;
++	unsigned long index;
++
++	xa_for_each(&pool->irqs, index, irq)
++		free_irq(irq->irqn, &irq->nh);
++}
++
++static void mlx5_irq_pools_free_irqs(struct mlx5_irq_table *table)
++{
++	if (table->sf_ctrl_pool) {
++		mlx5_irq_pool_free_irqs(table->sf_comp_pool);
++		mlx5_irq_pool_free_irqs(table->sf_ctrl_pool);
++	}
++	mlx5_irq_pool_free_irqs(table->pf_pool);
++}
++
+ /* irq_table API */
+ 
+ int mlx5_irq_table_init(struct mlx5_core_dev *dev)
+@@ -670,6 +688,17 @@ void mlx5_irq_table_destroy(struct mlx5_core_dev *dev)
+ 	pci_free_irq_vectors(dev->pdev);
+ }
+ 
++void mlx5_irq_table_free_irqs(struct mlx5_core_dev *dev)
++{
++	struct mlx5_irq_table *table = dev->priv.irq_table;
++
++	if (mlx5_core_is_sf(dev))
++		return;
++
++	mlx5_irq_pools_free_irqs(table);
++	pci_free_irq_vectors(dev->pdev);
++}
++
+ int mlx5_irq_table_get_sfs_vec(struct mlx5_irq_table *table)
  {
-> > +                     dev_warn(&priv->pdev->dev, GVE_DEVICE_OPTION_ERRO=
-R_FMT,
-> > +                              "DQO QPL", (int)sizeof(**dev_op_dqo_qpl)=
-,
-> > +                              GVE_DEV_OPT_REQ_FEAT_MASK_DQO_QPL,
-> > +                              option_length, req_feat_mask);
-> > +                     break;
-> > +             }
-> > +
-> > +             if (option_length > sizeof(**dev_op_dqo_qpl)) {
-> > +                     dev_warn(&priv->pdev->dev,
-> > +                              GVE_DEVICE_OPTION_TOO_BIG_FMT, "DQO QPL"=
-);
-> > +             }
-> > +             *dev_op_dqo_qpl =3D (void *)(option + 1);
-> > +             break;
-> >       case GVE_DEV_OPT_ID_JUMBO_FRAMES:
-> >               if (option_length < sizeof(**dev_op_jumbo_frames) ||
-> >                   req_feat_mask !=3D GVE_DEV_OPT_REQ_FEAT_MASK_JUMBO_FR=
-AMES) {
-> > @@ -146,7 +163,8 @@ gve_process_device_options(struct gve_priv *priv,
-> >                          struct gve_device_option_gqi_rda **dev_op_gqi_=
-rda,
-> >                          struct gve_device_option_gqi_qpl **dev_op_gqi_=
-qpl,
-> >                          struct gve_device_option_dqo_rda **dev_op_dqo_=
-rda,
-> > -                        struct gve_device_option_jumbo_frames **dev_op=
-_jumbo_frames)
-> > +                        struct gve_device_option_jumbo_frames **dev_op=
-_jumbo_frames,
-> > +                        struct gve_device_option_dqo_qpl **dev_op_dqo_=
-qpl)
-> >  {
-> >       const int num_options =3D be16_to_cpu(descriptor->num_device_opti=
-ons);
-> >       struct gve_device_option *dev_opt;
-> > @@ -166,7 +184,8 @@ gve_process_device_options(struct gve_priv *priv,
-> >
-> >               gve_parse_device_option(priv, descriptor, dev_opt,
-> >                                       dev_op_gqi_rda, dev_op_gqi_qpl,
-> > -                                     dev_op_dqo_rda, dev_op_jumbo_fram=
-es);
-> > +                                     dev_op_dqo_rda, dev_op_jumbo_fram=
-es,
-> > +                                     dev_op_dqo_qpl);
-> >               dev_opt =3D next_opt;
-> >       }
-> >
-> > @@ -505,12 +524,24 @@ static int gve_adminq_create_tx_queue(struct gve_=
-priv *priv, u32 queue_index)
-> >
-> >               cmd.create_tx_queue.queue_page_list_id =3D cpu_to_be32(qp=
-l_id);
-> >       } else {
-> > +             u16 comp_ring_size =3D 0;
-> > +             u32 qpl_id =3D 0;
->
-> these stack initializers are useless, you unconditionally overwrite both
-> values below.
-Will fix.
->
-> > +
-> > +             if (priv->queue_format =3D=3D GVE_DQO_RDA_FORMAT) {
-> > +                     qpl_id =3D GVE_RAW_ADDRESSING_QPL_ID;
-> > +                     comp_ring_size =3D
-> > +                             priv->options_dqo_rda.tx_comp_ring_entrie=
-s;
-> > +             } else {
-> > +                     qpl_id =3D tx->dqo.qpl->id;
-> > +                     comp_ring_size =3D priv->tx_desc_cnt;
-> > +             }
-> > +             cmd.create_tx_queue.queue_page_list_id =3D cpu_to_be32(qp=
-l_id);
-> >               cmd.create_tx_queue.tx_ring_size =3D
-> >                       cpu_to_be16(priv->tx_desc_cnt);
-> >               cmd.create_tx_queue.tx_comp_ring_addr =3D
-> >                       cpu_to_be64(tx->complq_bus_dqo);
-> >               cmd.create_tx_queue.tx_comp_ring_size =3D
-> > -                     cpu_to_be16(priv->options_dqo_rda.tx_comp_ring_en=
-tries);
-> > +                     cpu_to_be16(comp_ring_size);
-> >       }
-> >
-> >       return gve_adminq_issue_cmd(priv, &cmd);
-> > @@ -555,6 +586,18 @@ static int gve_adminq_create_rx_queue(struct gve_p=
-riv *priv, u32 queue_index)
-> >               cmd.create_rx_queue.queue_page_list_id =3D cpu_to_be32(qp=
-l_id);
-> >               cmd.create_rx_queue.packet_buffer_size =3D cpu_to_be16(rx=
-->packet_buffer_size);
-> >       } else {
-> > +             u16 rx_buff_ring_entries =3D 0;
-> > +             u32 qpl_id =3D 0;
->
-> same here
-Will fix.
->
-> > +
-> > +             if (priv->queue_format =3D=3D GVE_DQO_RDA_FORMAT) {
-> > +                     qpl_id =3D GVE_RAW_ADDRESSING_QPL_ID;
-> > +                     rx_buff_ring_entries =3D
-> > +                             priv->options_dqo_rda.rx_buff_ring_entrie=
-s;
-> > +             } else {
-> > +                     qpl_id =3D rx->dqo.qpl->id;
-> > +                     rx_buff_ring_entries =3D priv->rx_desc_cnt;
-> > +             }
-> > +             cmd.create_rx_queue.queue_page_list_id =3D cpu_to_be32(qp=
-l_id);
-> >               cmd.create_rx_queue.rx_ring_size =3D
-> >                       cpu_to_be16(priv->rx_desc_cnt);
-> >               cmd.create_rx_queue.rx_desc_ring_addr =3D
-> > @@ -564,7 +607,7 @@ static int gve_adminq_create_rx_queue(struct gve_pr=
-iv *priv, u32 queue_index)
-> >               cmd.create_rx_queue.packet_buffer_size =3D
-> >                       cpu_to_be16(priv->data_buffer_size_dqo);
-> >               cmd.create_rx_queue.rx_buff_ring_size =3D
-> > -                     cpu_to_be16(priv->options_dqo_rda.rx_buff_ring_en=
-tries);
-> > +                     cpu_to_be16(rx_buff_ring_entries);
-> >               cmd.create_rx_queue.enable_rsc =3D
-> >                       !!(priv->dev->features & NETIF_F_LRO);
-> >       }
-> > @@ -675,9 +718,13 @@ gve_set_desc_cnt_dqo(struct gve_priv *priv,
-> >                    const struct gve_device_option_dqo_rda *dev_op_dqo_r=
-da)
-> >  {
-> >       priv->tx_desc_cnt =3D be16_to_cpu(descriptor->tx_queue_entries);
-> > +     priv->rx_desc_cnt =3D be16_to_cpu(descriptor->rx_queue_entries);
-> > +
-> > +     if (priv->queue_format =3D=3D GVE_DQO_QPL_FORMAT)
-> > +             return 0;
-> > +
-> >       priv->options_dqo_rda.tx_comp_ring_entries =3D
-> >               be16_to_cpu(dev_op_dqo_rda->tx_comp_ring_entries);
-> > -     priv->rx_desc_cnt =3D be16_to_cpu(descriptor->rx_queue_entries);
-> >       priv->options_dqo_rda.rx_buff_ring_entries =3D
-> >               be16_to_cpu(dev_op_dqo_rda->rx_buff_ring_entries);
-> >
-> > @@ -687,7 +734,9 @@ gve_set_desc_cnt_dqo(struct gve_priv *priv,
-> >  static void gve_enable_supported_features(struct gve_priv *priv,
-> >                                         u32 supported_features_mask,
-> >                                         const struct gve_device_option_=
-jumbo_frames
-> > -                                               *dev_op_jumbo_frames)
-> > +                                       *dev_op_jumbo_frames,
-> > +                                       const struct gve_device_option_=
-dqo_qpl
-> > +                                       *dev_op_dqo_qpl)
-> >  {
-> >       /* Before control reaches this point, the page-size-capped max MT=
-U from
-> >        * the gve_device_descriptor field has already been stored in
-> > @@ -699,6 +748,20 @@ static void gve_enable_supported_features(struct g=
-ve_priv *priv,
-> >                        "JUMBO FRAMES device option enabled.\n");
-> >               priv->dev->max_mtu =3D be16_to_cpu(dev_op_jumbo_frames->m=
-ax_mtu);
-> >       }
-> > +
-> > +     /* Override pages for qpl for DQO-QPL */
-> > +     if (dev_op_dqo_qpl) {
-> > +             dev_info(&priv->pdev->dev,
-> > +                      "DQO QPL device option enabled.\n");
->
-> How does this message benefit the user?
->
-> > +             priv->tx_pages_per_qpl =3D
-> > +                     be16_to_cpu(dev_op_dqo_qpl->tx_pages_per_qpl);
-> > +             priv->rx_pages_per_qpl =3D
-> > +                     be16_to_cpu(dev_op_dqo_qpl->rx_pages_per_qpl);
-> > +             if (priv->tx_pages_per_qpl =3D=3D 0)
-> > +                     priv->tx_pages_per_qpl =3D DQO_QPL_DEFAULT_TX_PAG=
-ES;
-> > +             if (priv->rx_pages_per_qpl =3D=3D 0)
-> > +                     priv->rx_pages_per_qpl =3D DQO_QPL_DEFAULT_RX_PAG=
-ES;
-> > +     }
-> >  }
-> >
-> >  int gve_adminq_describe_device(struct gve_priv *priv)
-> > @@ -707,6 +770,7 @@ int gve_adminq_describe_device(struct gve_priv *pri=
-v)
-> >       struct gve_device_option_gqi_rda *dev_op_gqi_rda =3D NULL;
-> >       struct gve_device_option_gqi_qpl *dev_op_gqi_qpl =3D NULL;
-> >       struct gve_device_option_dqo_rda *dev_op_dqo_rda =3D NULL;
-> > +     struct gve_device_option_dqo_qpl *dev_op_dqo_qpl =3D NULL;
-> >       struct gve_device_descriptor *descriptor;
-> >       u32 supported_features_mask =3D 0;
-> >       union gve_adminq_command cmd;
-> > @@ -733,13 +797,14 @@ int gve_adminq_describe_device(struct gve_priv *p=
-riv)
-> >
-> >       err =3D gve_process_device_options(priv, descriptor, &dev_op_gqi_=
-rda,
-> >                                        &dev_op_gqi_qpl, &dev_op_dqo_rda=
-,
-> > -                                      &dev_op_jumbo_frames);
-> > +                                      &dev_op_jumbo_frames,
-> > +                                      &dev_op_dqo_qpl);
-> >       if (err)
-> >               goto free_device_descriptor;
-> >
-> >       /* If the GQI_RAW_ADDRESSING option is not enabled and the queue =
-format
-> >        * is not set to GqiRda, choose the queue format in a priority or=
-der:
-> > -      * DqoRda, GqiRda, GqiQpl. Use GqiQpl as default.
-> > +      * DqoRda, DqoQpl, GqiRda, GqiQpl. Use GqiQpl as default.
-> >        */
-> >       if (dev_op_dqo_rda) {
-> >               priv->queue_format =3D GVE_DQO_RDA_FORMAT;
-> > @@ -747,7 +812,13 @@ int gve_adminq_describe_device(struct gve_priv *pr=
-iv)
-> >                        "Driver is running with DQO RDA queue format.\n"=
-);
-> >               supported_features_mask =3D
-> >                       be32_to_cpu(dev_op_dqo_rda->supported_features_ma=
-sk);
-> > -     } else if (dev_op_gqi_rda) {
-> > +     } else if (dev_op_dqo_qpl) {
-> > +             priv->queue_format =3D GVE_DQO_QPL_FORMAT;
-> > +             dev_info(&priv->pdev->dev,
-> > +                      "Driver is running with DQO QPL queue format.\n"=
-);
->
-> I feel like at best these should have been dev_dbg, or at worst just
-> removed. Messages should always add value for the user if they're printed=
-.
-This message (and one you pointed above) seems to be convention for
-the driver code whenever a new format or device-option is added.
-But I agree with you in principle that logging messages are not adding
-any value here. Will remove.
->
-> > +             supported_features_mask =3D
-> > +                     be32_to_cpu(dev_op_dqo_qpl->supported_features_ma=
-sk);
-> > +     }  else if (dev_op_gqi_rda) {
-> >               priv->queue_format =3D GVE_GQI_RDA_FORMAT;
-> >               dev_info(&priv->pdev->dev,
-> >                        "Driver is running with GQI RDA queue format.\n"=
-);
-> > @@ -798,7 +869,7 @@ int gve_adminq_describe_device(struct gve_priv *pri=
-v)
-> >       priv->default_num_queues =3D be16_to_cpu(descriptor->default_num_=
-queues);
-> >
-> >       gve_enable_supported_features(priv, supported_features_mask,
-> > -                                   dev_op_jumbo_frames);
-> > +                                   dev_op_jumbo_frames, dev_op_dqo_qpl=
-);
-> >
-> >  free_device_descriptor:
-> >       dma_free_coherent(&priv->pdev->dev, PAGE_SIZE, descriptor,
-> > diff --git a/drivers/net/ethernet/google/gve/gve_adminq.h b/drivers/net=
-/ethernet/google/gve/gve_adminq.h
-> > index f894beb3deaf..38a22279e863 100644
-> > --- a/drivers/net/ethernet/google/gve/gve_adminq.h
-> > +++ b/drivers/net/ethernet/google/gve/gve_adminq.h
-> > @@ -109,6 +109,14 @@ struct gve_device_option_dqo_rda {
-> >
-> >  static_assert(sizeof(struct gve_device_option_dqo_rda) =3D=3D 8);
-> >
-> > +struct gve_device_option_dqo_qpl {
-> > +     __be32 supported_features_mask;
-> > +     __be16 tx_pages_per_qpl;
-> > +     __be16 rx_pages_per_qpl;
-> > +};
-> > +
-> > +static_assert(sizeof(struct gve_device_option_dqo_qpl) =3D=3D 8);
-> > +
-> >  struct gve_device_option_jumbo_frames {
-> >       __be32 supported_features_mask;
-> >       __be16 max_mtu;
-> > @@ -130,6 +138,7 @@ enum gve_dev_opt_id {
-> >       GVE_DEV_OPT_ID_GQI_RDA =3D 0x2,
-> >       GVE_DEV_OPT_ID_GQI_QPL =3D 0x3,
-> >       GVE_DEV_OPT_ID_DQO_RDA =3D 0x4,
-> > +     GVE_DEV_OPT_ID_DQO_QPL =3D 0x7,
-> >       GVE_DEV_OPT_ID_JUMBO_FRAMES =3D 0x8,
-> >  };
-> >
-> > @@ -139,6 +148,7 @@ enum gve_dev_opt_req_feat_mask {
-> >       GVE_DEV_OPT_REQ_FEAT_MASK_GQI_QPL =3D 0x0,
-> >       GVE_DEV_OPT_REQ_FEAT_MASK_DQO_RDA =3D 0x0,
-> >       GVE_DEV_OPT_REQ_FEAT_MASK_JUMBO_FRAMES =3D 0x0,
-> > +     GVE_DEV_OPT_REQ_FEAT_MASK_DQO_QPL =3D 0x0,
->
->
-> Maybe this makes sense to others, but an enum full of defines where all
-> values are zero? Why are we even writing code?
+ 	if (table->sf_comp_pool)
+-- 
+2.34.1
 
-If there=E2=80=99s a bug that breaks the DQO-QPL feature, we need to set a =
-bug
-bit in this mask GVE_DEV_OPT_REQ_FEAT_MASK_DQO_QPL.
-That is why it is 0 to begin with. Although, I can see why it can be
-considered useless.
->
-> >  };
-> >
-> >  enum gve_sup_feature_mask {
-> > diff --git a/drivers/net/ethernet/google/gve/gve_main.c b/drivers/net/e=
-thernet/google/gve/gve_main.c
-> > index e6f1711d9be0..b40fafe1460a 100644
-> > --- a/drivers/net/ethernet/google/gve/gve_main.c
-> > +++ b/drivers/net/ethernet/google/gve/gve_main.c
-> > @@ -31,7 +31,6 @@
-> >
-> >  // Minimum amount of time between queue kicks in msec (10 seconds)
-> >  #define MIN_TX_TIMEOUT_GAP (1000 * 10)
-> > -#define DQO_TX_MAX   0x3FFFF
-> >
-> >  char gve_driver_name[] =3D "gve";
-> >  const char gve_version_str[] =3D GVE_VERSION;
-> > @@ -494,7 +493,7 @@ static int gve_setup_device_resources(struct gve_pr=
-iv *priv)
-> >               goto abort_with_stats_report;
-> >       }
-> >
-> > -     if (priv->queue_format =3D=3D GVE_DQO_RDA_FORMAT) {
-> > +     if (!gve_is_gqi(priv)) {
-> >               priv->ptype_lut_dqo =3D kvzalloc(sizeof(*priv->ptype_lut_=
-dqo),
-> >                                              GFP_KERNEL);
-> >               if (!priv->ptype_lut_dqo) {
-> > @@ -1085,9 +1084,10 @@ static int gve_alloc_qpls(struct gve_priv *priv)
-> >       int max_queues =3D priv->tx_cfg.max_queues + priv->rx_cfg.max_que=
-ues;
-> >       int start_id;
-> >       int i, j;
-> > +     int page_count;
->
-> RCT please
->
-> >       int err;
-> >
-> > -     if (priv->queue_format !=3D GVE_GQI_QPL_FORMAT)
-> > +     if (!gve_is_qpl(priv))
-> >               return 0;
-> >
-> >       priv->qpls =3D kvcalloc(max_queues, sizeof(*priv->qpls), GFP_KERN=
-EL);
-> > @@ -1095,17 +1095,25 @@ static int gve_alloc_qpls(struct gve_priv *priv=
-)
-> >               return -ENOMEM;
-> >
-> >       start_id =3D gve_tx_start_qpl_id(priv);
-> > +     page_count =3D priv->tx_pages_per_qpl;
-> >       for (i =3D start_id; i < start_id + gve_num_tx_qpls(priv); i++) {
-> >               err =3D gve_alloc_queue_page_list(priv, i,
-> > -                                             priv->tx_pages_per_qpl);
-> > +                                             page_count);
-> >               if (err)
-> >                       goto free_qpls;
-> >       }
-> >
-> >       start_id =3D gve_rx_start_qpl_id(priv);
-> > +
-> > +     /* For GQI_QPL number of pages allocated have 1:1 relationship wi=
-th
-> > +      * number of descriptors. For DQO, number of pages required are
-> > +      * more than descriptors (because of out of order completions).
-> > +      */
-> > +     page_count =3D priv->queue_format =3D=3D GVE_GQI_QPL_FORMAT ?
-> > +             priv->rx_data_slot_cnt : priv->rx_pages_per_qpl;
-> >       for (i =3D start_id; i < start_id + gve_num_rx_qpls(priv); i++) {
-> >               err =3D gve_alloc_queue_page_list(priv, i,
-> > -                                             priv->rx_data_slot_cnt);
-> > +                                             page_count);
-> >               if (err)
-> >                       goto free_qpls;
-> >       }
-> > @@ -2051,7 +2059,7 @@ static int gve_init_priv(struct gve_priv *priv, b=
-ool skip_describe_device)
-> >
-> >       /* Big TCP is only supported on DQ*/
-> >       if (!gve_is_gqi(priv))
-> > -             netif_set_tso_max_size(priv->dev, DQO_TX_MAX);
-> > +             netif_set_tso_max_size(priv->dev, GVE_DQO_TX_MAX);
-> >
-> >       priv->num_registered_pages =3D 0;
-> >       priv->rx_copybreak =3D GVE_DEFAULT_RX_COPYBREAK;
->
+
 
