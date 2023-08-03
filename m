@@ -1,133 +1,148 @@
-Return-Path: <netdev+bounces-24014-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24015-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD2D176E775
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 13:55:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C356776E782
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 13:57:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 87D38281D6B
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 11:55:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7DBD428208A
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 11:57:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 543B71DDF6;
-	Thu,  3 Aug 2023 11:55:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9363F1E501;
+	Thu,  3 Aug 2023 11:57:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 455701DDC5
-	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 11:55:54 +0000 (UTC)
-Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D2332D43
-	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 04:55:53 -0700 (PDT)
-Received: by mail-lj1-x236.google.com with SMTP id 38308e7fff4ca-2b9e6cc93d8so13393741fa.0
-        for <netdev@vger.kernel.org>; Thu, 03 Aug 2023 04:55:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1691063751; x=1691668551;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=VuvtjFHgGZRCUW+TNZUXEj9FboRSSdVikwCBlQKozb8=;
-        b=um8DGDDrx5jcxCuTnwU8y2C9BiWgz53J9iDsEnoEdXrb0rSzV1cLiTvubypdDEOIAE
-         Yt2RZ6OhGqtwH5OjJNKQR52a/HN3QUtQAZK+O7uuyEmExqjLHd36yQR2X5ZaIkJf+N3T
-         LAhHijUjDZE3OvU3mNygRNESoWgaBx9h9UKUZxTh/KTN3o41kZe/ERuLXn3R0tu3UKKD
-         tp7OPRNqMF1fLQ2sMMnMwnCe9nlZR1VfqAN3LlkQW6hlYQKV9Z7gXtzEuoF5GjI1gowh
-         Yl7zJNDyPi/ZwuSC2nwMTz4EdWT61gt2K99z7imvQyTZuScsiaQCd2BTk2AOFZDp3pKD
-         Pq9w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691063751; x=1691668551;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VuvtjFHgGZRCUW+TNZUXEj9FboRSSdVikwCBlQKozb8=;
-        b=l1b29/qkwQu7sy9evYNSZ0WjVrAD6muUd+CowWoBhaDzWlhoRVnbZmPgEJHlCiLTSn
-         a1kadLcWLeRJ1nTPa+pjsuCIzSjxnDqPaYEWwkDcRJ0OZwoGl9hrw54lebq064tlBYwr
-         kx9+Pys+uMjP9PyYKxgG2i1150n+JtKDLjoO8a4HIsmV1bTp7ukSe038HaM2+8kqNM5e
-         X/9JsDbJYgWx2ZELhtWlo7ddaGhrHnRaiJTZm8aSxB/Sw6EsuVXPUMtj8kYY+5CUdYDb
-         cD/lhn58iOw+J1wrC+FURYvkkEI1k/Wynu00Bfd5HKzU/5IInlJ/h5LZLH6bXqY67VCl
-         7DkA==
-X-Gm-Message-State: ABy/qLZiBsCRyr08pyWdiO6Jb5pIFt1PLfydGTz//wNcmCz+1Hz8wDvc
-	+6WW9xccPeb38+CJmkr3R4WGGw==
-X-Google-Smtp-Source: APBJJlFWGoIUMSgVABFfyRwhqKQbCqOPZkTHFobX4YNdNaIU5YKQKCbMlGlBuMrTUW5rYLsNQ6PJVA==
-X-Received: by 2002:a2e:889a:0:b0:2b9:df53:4c2a with SMTP id k26-20020a2e889a000000b002b9df534c2amr8022168lji.20.1691063751522;
-        Thu, 03 Aug 2023 04:55:51 -0700 (PDT)
-Received: from localhost (h3221.n1.ips.mtn.co.ug. [41.210.178.33])
-        by smtp.gmail.com with ESMTPSA id ov38-20020a170906fc2600b009929ab17bdfsm10330191ejb.168.2023.08.03.04.55.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Aug 2023 04:55:50 -0700 (PDT)
-Date: Thu, 3 Aug 2023 14:55:46 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Simon Horman <horms@kernel.org>
-Cc: Ratheesh Kannoth <rkannoth@marvell.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, sgoutham@marvell.com,
-	lcherian@marvell.com, gakula@marvell.com, jerinj@marvell.com,
-	hkelam@marvell.com, sbhatta@marvell.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us
-Subject: Re: [PATCH v1 net-next 2/4] tc: flower: support for SPI
-Message-ID: <664b202a-d126-4708-a2af-94f768fe3abd@kadam.mountain>
-References: <20230801014101.2955887-1-rkannoth@marvell.com>
- <20230801014101.2955887-3-rkannoth@marvell.com>
- <ZMqpd2DyHz4O/v17@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 864D01548D
+	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 11:57:28 +0000 (UTC)
+Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2050.outbound.protection.outlook.com [40.107.101.50])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A11330C4
+	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 04:57:26 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=i8+0gA9gT1EYRc5Teafp5nSewEQn68E02Zrfq0OCnj8Dqog9N93/MUKcUOXcp5JP9gSmN13fGZqeE7teU4AEkdP6MwJPzrQPxVTCSP7lyef3G+7u/QC83DXHfqWY2CXYNXD634y65qZTbCkvf9zwNMjaJTWkkiA/Vwu4tWEvV1oNuOpmjvyHKSO7wrGW07NkNo6gF7iuHEPZ+7DNhR2Cf1V7t12sk/MztvVEhJWicYvX5cSk4A+py5FecKYWOpQ11r3Wutyu0UqOdhMcNWWKfRNgrz1EgmfOMF3VtasWNI8Qm5pzGpwRnYTNO/fsCtefiRRtgqIk1W31kqMzZDpgyw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=bJEZBjda/7je8RwNZgj3garNr138305ikfBo4JH6X/U=;
+ b=IpoUjYskffuirJDsfJgSyk1XkHmbahj3XkQLsl3nMmmW/hC2yTAzxKJsAqu3kGstfLZSfCaosrwl9rzIkUi6Hoqlh8VHq6v9HxSOkEW+RvRj3xOndDXYdbx90dI1If2nwclNoCPQMc+GFKkhXL9GTE/2s/mQvSjQP/xkiWNcH2Rlu5CBVuq0zkrNinTC61F3JfdiGBgox65vg5rlds1BIrCE3ajYJTnGRlyu+T6oXJ8rvxk74IrTXrphP5ARwSUKsl1PWhumEMVt0U5DchEe9eFVApC3WJ5TUdcOHlnmmkAncTK5es3rQZMGh8AdlKWA8qoo0sTotESNQU8iw/YL0Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=davemloft.net smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=bJEZBjda/7je8RwNZgj3garNr138305ikfBo4JH6X/U=;
+ b=qjfXpivTN9fNrqHWMCLuJ5/Xu2F2xKOSy0h7JR72MVyTfWnN6HFMg5Q+JEQDcPcTakkkPY+SJsg7T5K+b5a0O8l0NVn7sIG3273DQf8E/OyjYDpJYpCMY3BnkQGFu2O0iOTBN+NRORv3XpXthhOIG5yXnpHz+fj/vziliKJHn4A=
+Received: from CY5PR13CA0055.namprd13.prod.outlook.com (2603:10b6:930:11::7)
+ by IA1PR12MB6187.namprd12.prod.outlook.com (2603:10b6:208:3e5::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.47; Thu, 3 Aug
+ 2023 11:57:22 +0000
+Received: from CY4PEPF0000EDD1.namprd03.prod.outlook.com
+ (2603:10b6:930:11:cafe::68) by CY5PR13CA0055.outlook.office365.com
+ (2603:10b6:930:11::7) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.19 via Frontend
+ Transport; Thu, 3 Aug 2023 11:57:21 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB03.amd.com; pr=C
+Received: from SATLEXMB03.amd.com (165.204.84.17) by
+ CY4PEPF0000EDD1.mail.protection.outlook.com (10.167.241.205) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.6652.19 via Frontend Transport; Thu, 3 Aug 2023 11:57:21 +0000
+Received: from SATLEXMB07.amd.com (10.181.41.45) by SATLEXMB03.amd.com
+ (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Thu, 3 Aug
+ 2023 06:57:20 -0500
+Received: from SATLEXMB03.amd.com (10.181.40.144) by SATLEXMB07.amd.com
+ (10.181.41.45) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Thu, 3 Aug
+ 2023 04:57:20 -0700
+Received: from xcbecree41x.xilinx.com (10.180.168.240) by SATLEXMB03.amd.com
+ (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27 via Frontend
+ Transport; Thu, 3 Aug 2023 06:57:19 -0500
+From: <edward.cree@amd.com>
+To: <linux-net-drivers@amd.com>, <davem@davemloft.net>, <kuba@kernel.org>,
+	<edumazet@google.com>, <pabeni@redhat.com>
+CC: Edward Cree <ecree.xilinx@gmail.com>, <netdev@vger.kernel.org>,
+	<habetsm.xilinx@gmail.com>
+Subject: [PATCH net-next 0/7] sfc: basic conntrack offload
+Date: Thu, 3 Aug 2023 12:56:16 +0100
+Message-ID: <cover.1691063675.git.ecree.xilinx@gmail.com>
+X-Mailer: git-send-email 2.27.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZMqpd2DyHz4O/v17@kernel.org>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000EDD1:EE_|IA1PR12MB6187:EE_
+X-MS-Office365-Filtering-Correlation-Id: a3368b30-f633-464e-fbec-08db9418cb5c
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	NCEnUzGqX6Bi+hEt0r3Z2xBdQQd1uoaWSfqW5KYFs2TEpCy2DeWSRzZRPw3CGtBIbNDjaD0/gYDo6GUBeQFeugj06uWgtyny9EO6pqbQVafauyxuqD1mgniuXPZc9CkUxKdrAeGkNNQRVH/0f6wJSBpGqH9ZcgRqZb321p81xo/4HRUFPcfwtXcwiFpIgcfCsE5WmCq9vxIXxUZ5FcHJwcIt0smweNCeTfrSqbNeX5qPeF0GZe9Wc/LkczUo+zz/3vx6hyI4qxfJGMbXGrtbWgsGqFv0Hfno2dILZ27RfiA7G/2rJEyVZr2pkxmIarZAqN8XEaCvNkMgeHnb7ruhgSABYiz5ZuH3dkzEX2ipFqpP/vLQHKOPxd5YsaPJczhJUfLaaXUn62uBCokTxZTDki3gHRf2O660YoYIzy504mBWiahXBLZMEXaa0V6i0uWH+v6tl2F/4aGJPyQlL8BpxbfyRWEuy3KevBeV2ArssLXa2BcBxtGvoPex8IQ5wf2NuVy4nrq9MZMZ5X75Om8Md0phjUcOmZ0Y8p55gBKlg3LtMOb1/NDSAdaDBpq2RoJJfqbVo8Y7+skbjvWxLKJEcwIkdYSFIFxTrlnrI44ocqNOIG83WTWhliD9lP9faqgmWykZXlnFS+6zCG/OvPXQF8Z3+gIi2OChrNr8qgkyWEPWurDC8wgWNJX9I6ZINH8EnZRgTRnWd0yTjMgZPEIQGbfqLZEKaFEyuKw+JMxwtutT5/JPtYevouQ0TWg8zMK2F0QmRm1I6c1igKO/msR0lw==
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB03.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(396003)(136003)(376002)(346002)(39860400002)(82310400008)(451199021)(36840700001)(40470700004)(46966006)(82740400003)(40460700003)(426003)(83380400001)(26005)(186003)(336012)(47076005)(36860700001)(316002)(2906002)(2876002)(70586007)(70206006)(4326008)(5660300002)(41300700001)(8676002)(8936002)(6666004)(9686003)(54906003)(110136005)(478600001)(40480700001)(356005)(81166007)(36756003)(55446002)(86362001)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Aug 2023 11:57:21.3957
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: a3368b30-f633-464e-fbec-08db9418cb5c
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB03.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CY4PEPF0000EDD1.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB6187
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Aug 02, 2023 at 09:07:35PM +0200, Simon Horman wrote:
-> + Dan Carpenter
-> 
-> On Tue, Aug 01, 2023 at 07:10:59AM +0530, Ratheesh Kannoth wrote:
-> > @@ -1894,6 +1915,12 @@ static int fl_set_key(struct net *net, struct nlattr **tb,
-> >  			return ret;
-> >  	}
-> >  
-> > +	if (tb[TCA_FLOWER_KEY_SPI]) {
-> > +		ret = fl_set_key_spi(tb, key, mask, extack);
-> > +		if (ret)
-> > +			return ret;
-> > +	}
-> > +
-> 
-> Hi Dan,
-> 
-> I'm seeing a warning from Smatch, which I think is a false positive,
-> but I feel that I should raise. Perhaps you could take a look at it?
-> 
-> net/sched/cls_flower.c:1918 fl_set_key() error: buffer overflow 'tb' 106 <= 108
-> 
+From: Edward Cree <ecree.xilinx@gmail.com>
 
-You're using the cross function database, right?  What happens is that
-when someone adds a new type of net link attribute, it takes a rebuild
-for the database to sync up.
+Support offloading tracked connections and matching against them in
+ TC chains on the PF and on representors.
+Later patch serieses will add NAT and conntrack-on-tunnel-netdevs;
+ keep it simple for now.
 
-I can't think of a good way to fix this.  This information is passed as
-a BUF_SIZE.  Each database rebuild passes the BUF_SIZE one call further
-down the call tree.
+Edward Cree (7):
+  sfc: add MAE table machinery for conntrack table
+  sfc: functions to register for conntrack zone offload
+  sfc: functions to insert/remove conntrack entries to MAE hardware
+  sfc: offload conntrack flow entries (match only) from CT zones
+  sfc: handle non-zero chain_index on TC rules
+  sfc: conntrack state matches in TC rules
+  sfc: offload left-hand side rules for conntrack
 
-$ smdb fl_set_key | grep BUF_SIZE
-net/sched/cls_flower.c |            fl_change |           fl_set_key |           BUF_SIZE |  1 |              tb | 864
-net/sched/cls_flower.c |      fl_tmplt_create |           fl_set_key |           BUF_SIZE |  1 |              tb | 864
-
-This is a flaw in how Smatch works, and theoretically it affects
-everything, but in practical terms it affect netlink attribute tables
-the most.  Other places are not modified as often or they pass the size
-as a parameter.  I could modify check_index_overflow.c to silence
-warnings where it's a netlink attribute table and the offset is less
-than __TCA_FLOWER_MAX.
-
-regards,
-dan carpenter
+ drivers/net/ethernet/sfc/Makefile       |   2 +-
+ drivers/net/ethernet/sfc/bitfield.h     |   2 +
+ drivers/net/ethernet/sfc/mae.c          | 827 +++++++++++++++++++++++-
+ drivers/net/ethernet/sfc/mae.h          |  12 +
+ drivers/net/ethernet/sfc/mcdi.h         |  14 +
+ drivers/net/ethernet/sfc/tc.c           | 532 ++++++++++++++-
+ drivers/net/ethernet/sfc/tc.h           |  86 ++-
+ drivers/net/ethernet/sfc/tc_conntrack.c | 533 +++++++++++++++
+ drivers/net/ethernet/sfc/tc_conntrack.h |  55 ++
+ drivers/net/ethernet/sfc/tc_counters.c  |   8 +-
+ drivers/net/ethernet/sfc/tc_counters.h  |   4 +
+ 11 files changed, 2038 insertions(+), 37 deletions(-)
+ create mode 100644 drivers/net/ethernet/sfc/tc_conntrack.c
+ create mode 100644 drivers/net/ethernet/sfc/tc_conntrack.h
 
 
