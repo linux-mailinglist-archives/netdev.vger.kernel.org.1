@@ -1,165 +1,147 @@
-Return-Path: <netdev+bounces-23824-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23825-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E752376DCD2
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 02:44:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A90B476DCDA
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 02:45:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A1E9D281EBA
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 00:44:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 58C3C281DB2
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 00:45:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE20B370;
-	Thu,  3 Aug 2023 00:44:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74B3D370;
+	Thu,  3 Aug 2023 00:45:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB1997F
-	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 00:44:01 +0000 (UTC)
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 095231FF0;
-	Wed,  2 Aug 2023 17:43:58 -0700 (PDT)
-Received: from canpemm500006.china.huawei.com (unknown [172.30.72.53])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4RGVSF4ZQfzrRhC;
-	Thu,  3 Aug 2023 08:42:53 +0800 (CST)
-Received: from [10.174.179.200] (10.174.179.200) by
- canpemm500006.china.huawei.com (7.192.105.130) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Thu, 3 Aug 2023 08:43:56 +0800
-Subject: Re: [PATCH net v3] can: raw: fix receiver memory leak
-To: Eric Dumazet <edumazet@google.com>
-CC: Marc Kleine-Budde <mkl@pengutronix.de>, <socketcan@hartkopp.net>,
-	<davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<linux-can@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<penguin-kernel@i-love.sakura.ne.jp>
-References: <20230711011737.1969582-1-william.xuanziyang@huawei.com>
- <20230717-clubhouse-swinger-8f0fa23b0628-mkl@pengutronix.de>
- <CANn89iJ47sVXAEEryvODoGv-iUpT-ACTCSWQTmdtJ9Fqs0s40Q@mail.gmail.com>
- <1e0e6539-412a-cc8d-b104-e2921a099e48@huawei.com>
- <CANn89iKoTWHBGgMW-RyJHHeM0QuiN9De=eNWMM8VRom++n_o_g@mail.gmail.com>
- <3566e594-a9e5-8ba4-0f5a-d50086cebd82@huawei.com>
- <CANn89iJ8jFxGo0d_8KnM2f=Xbh=iqb=+zcGn+U6PypuqNdWBUQ@mail.gmail.com>
-From: "Ziyang Xuan (William)" <william.xuanziyang@huawei.com>
-Message-ID: <df3afb62-061e-a40f-b872-c9eb414455bb@huawei.com>
-Date: Thu, 3 Aug 2023 08:43:56 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A35B7F
+	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 00:45:36 +0000 (UTC)
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id BF0EC19BE;
+	Wed,  2 Aug 2023 17:45:33 -0700 (PDT)
+Received: from linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net (linux.microsoft.com [13.77.154.182])
+	by linux.microsoft.com (Postfix) with ESMTPSA id 3054A238C442;
+	Wed,  2 Aug 2023 17:45:33 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 3054A238C442
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1691023533;
+	bh=wQ8f18Ed6SFDdEuacgxnss4bY0Gf8A4bX6O+cn6sJRs=;
+	h=From:To:Cc:Subject:Date:From;
+	b=VOCrdY7VN3RyFBgbRsKssN0Ar900Hi7x7mwR62MUmmr0DIeCyQFSYPVGTEgAftZvy
+	 LmiLMUTyAx+rC3mpXwNrqWuLMSnQEHYsS7P/Wu0kx/g4rUf9y1+aqCT/5fCiF7KC9r
+	 n7mDk8XFVaJjnmmTumcuCMuvsBrOQk9tzKKpyHUg=
+From: Sonia Sharma <sosha@linux.microsoft.com>
+To: linux-kernel@vger.kernel.org
+Cc: linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org,
+	sosha@microsoft.com,
+	kys@microsoft.com,
+	mikelley@microsoft.com,
+	haiyangz@microsoft.com,
+	wei.liu@kernel.org,
+	decui@microsoft.com,
+	longli@microsoft.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Subject: [PATCH v3 net] net: hv_netvsc: fix netvsc_send_completion to avoid multiple message length checks
+Date: Wed,  2 Aug 2023 17:45:28 -0700
+Message-Id: <1691023528-5270-1-git-send-email-sosha@linux.microsoft.com>
+X-Mailer: git-send-email 1.8.3.1
+X-Spam-Status: No, score=-17.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,
+	USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <CANn89iJ8jFxGo0d_8KnM2f=Xbh=iqb=+zcGn+U6PypuqNdWBUQ@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.179.200]
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- canpemm500006.china.huawei.com (7.192.105.130)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
->>> On Wed, Jul 19, 2023 at 6:41 AM Ziyang Xuan (William)
->>> <william.xuanziyang@huawei.com> wrote:
->>>>
->>>>> On Mon, Jul 17, 2023 at 9:27 AM Marc Kleine-Budde <mkl@pengutronix.de> wrote:
->>>>>>
->>>>>> On 11.07.2023 09:17:37, Ziyang Xuan wrote:
->>>>>>> Got kmemleak errors with the following ltp can_filter testcase:
->>>>>>>
->>>>>>> for ((i=1; i<=100; i++))
->>>>>>> do
->>>>>>>         ./can_filter &
->>>>>>>         sleep 0.1
->>>>>>> done
->>>>>>>
->>>>>>> ==============================================================
->>>>>>> [<00000000db4a4943>] can_rx_register+0x147/0x360 [can]
->>>>>>> [<00000000a289549d>] raw_setsockopt+0x5ef/0x853 [can_raw]
->>>>>>> [<000000006d3d9ebd>] __sys_setsockopt+0x173/0x2c0
->>>>>>> [<00000000407dbfec>] __x64_sys_setsockopt+0x61/0x70
->>>>>>> [<00000000fd468496>] do_syscall_64+0x33/0x40
->>>>>>> [<00000000b7e47d51>] entry_SYSCALL_64_after_hwframe+0x61/0xc6
->>>>>>>
->>>>>>> It's a bug in the concurrent scenario of unregister_netdevice_many()
->>>>>>> and raw_release() as following:
->>>>>>>
->>>>>>>              cpu0                                        cpu1
->>>>>>> unregister_netdevice_many(can_dev)
->>>>>>>   unlist_netdevice(can_dev) // dev_get_by_index() return NULL after this
->>>>>>>   net_set_todo(can_dev)
->>>>>>>                                               raw_release(can_socket)
->>>>>>>                                                 dev = dev_get_by_index(, ro->ifindex); // dev == NULL
->>>>>>>                                                 if (dev) { // receivers in dev_rcv_lists not free because dev is NULL
->>>>>>>                                                   raw_disable_allfilters(, dev, );
->>>>>>>                                                   dev_put(dev);
->>>>>>>                                                 }
->>>>>>>                                                 ...
->>>>>>>                                                 ro->bound = 0;
->>>>>>>                                                 ...
->>>>>>>
->>>>>>> call_netdevice_notifiers(NETDEV_UNREGISTER, )
->>>>>>>   raw_notify(, NETDEV_UNREGISTER, )
->>>>>>>     if (ro->bound) // invalid because ro->bound has been set 0
->>>>>>>       raw_disable_allfilters(, dev, ); // receivers in dev_rcv_lists will never be freed
->>>>>>>
->>>>>>> Add a net_device pointer member in struct raw_sock to record bound can_dev,
->>>>>>> and use rtnl_lock to serialize raw_socket members between raw_bind(), raw_release(),
->>>>>>> raw_setsockopt() and raw_notify(). Use ro->dev to decide whether to free receivers in
->>>>>>> dev_rcv_lists.
->>>>>>>
->>>>>>> Fixes: 8d0caedb7596 ("can: bcm/raw/isotp: use per module netdevice notifier")
->>>>>>> Signed-off-by: Ziyang Xuan <william.xuanziyang@huawei.com>
->>>>>>> Reviewed-by: Oliver Hartkopp <socketcan@hartkopp.net>
->>>>>>> Acked-by: Oliver Hartkopp <socketcan@hartkopp.net>
->>>>>>
->>>>>> Added to linux-can/testing.
->>>>>>
->>>>>
->>>>> This patch causes three syzbot LOCKDEP reports so far.
->>>>
->>>> Hello Eric,
->>>>
->>>> Is there reproducer? I want to understand the specific root cause.
->>>>
->>>
->>> No repro yet, but simply look at other functions in net/can/raw.c
->>>
->>> You must always take locks in the same order.
->>>
->>> raw_bind(), raw_setsockopt() use:
->>>
->>> rtnl_lock();
->>> lock_sock(sk);
->>>
->>> Therefore, raw_release() must _also_ use the same order, or risk deadlock.
->>>
->>> Please build a LOCKDEP enabled kernel, and run your tests ?
->>
->> I know now. This needs raw_bind() and raw_setsockopt() concurrent with raw_release().
->> And there is not the scenario in my current testcase. I did not get it. I will try to
->> reproduce it and add the testcase.
->>
->> Thank you for your patient explanation.
-> 
-> Another syzbot report is firing because of your patch
-> 
-> Apparently we store in ro->dev a pointer to a netdev without holding a
-> refcount on it.
-> .
-Hello Eric,
+From: Sonia Sharma <sonia.sharma@linux.microsoft.com>
 
-Is there a syzbot link or reproducer can be provided?
+The switch statement in netvsc_send_completion() is incorrectly validating
+the length of incoming network packets by falling through to the next case.
+Avoid the fallthrough. Instead break after a case match and then process
+the complete() call.
 
-Thank you!
-William Xuan
-> 
+Signed-off-by: Sonia Sharma <sonia.sharma@linux.microsoft.com>
+---
+Changes in v3:
+* added return statement in default case as pointed by Michael Kelley..
+---
+ drivers/net/hyperv/netvsc.c | 18 ++++++++++--------
+ 1 file changed, 10 insertions(+), 8 deletions(-)
+
+diff --git a/drivers/net/hyperv/netvsc.c b/drivers/net/hyperv/netvsc.c
+index 82e9796c8f5e..0f7e4d377776 100644
+--- a/drivers/net/hyperv/netvsc.c
++++ b/drivers/net/hyperv/netvsc.c
+@@ -851,7 +851,7 @@ static void netvsc_send_completion(struct net_device *ndev,
+ 				   msglen);
+ 			return;
+ 		}
+-		fallthrough;
++		break;
+ 
+ 	case NVSP_MSG1_TYPE_SEND_RECV_BUF_COMPLETE:
+ 		if (msglen < sizeof(struct nvsp_message_header) +
+@@ -860,7 +860,7 @@ static void netvsc_send_completion(struct net_device *ndev,
+ 				   msglen);
+ 			return;
+ 		}
+-		fallthrough;
++		break;
+ 
+ 	case NVSP_MSG1_TYPE_SEND_SEND_BUF_COMPLETE:
+ 		if (msglen < sizeof(struct nvsp_message_header) +
+@@ -869,7 +869,7 @@ static void netvsc_send_completion(struct net_device *ndev,
+ 				   msglen);
+ 			return;
+ 		}
+-		fallthrough;
++		break;
+ 
+ 	case NVSP_MSG5_TYPE_SUBCHANNEL:
+ 		if (msglen < sizeof(struct nvsp_message_header) +
+@@ -878,10 +878,6 @@ static void netvsc_send_completion(struct net_device *ndev,
+ 				   msglen);
+ 			return;
+ 		}
+-		/* Copy the response back */
+-		memcpy(&net_device->channel_init_pkt, nvsp_packet,
+-		       sizeof(struct nvsp_message));
+-		complete(&net_device->channel_init_wait);
+ 		break;
+ 
+ 	case NVSP_MSG1_TYPE_SEND_RNDIS_PKT_COMPLETE:
+@@ -904,13 +900,19 @@ static void netvsc_send_completion(struct net_device *ndev,
+ 
+ 		netvsc_send_tx_complete(ndev, net_device, incoming_channel,
+ 					desc, budget);
+-		break;
++		return;
+ 
+ 	default:
+ 		netdev_err(ndev,
+ 			   "Unknown send completion type %d received!!\n",
+ 			   nvsp_packet->hdr.msg_type);
++		return;
+ 	}
++
++	/* Copy the response back */
++	memcpy(&net_device->channel_init_pkt, nvsp_packet,
++			sizeof(struct nvsp_message));
++	complete(&net_device->channel_init_wait);
+ }
+ 
+ static u32 netvsc_get_next_send_section(struct netvsc_device *net_device)
+-- 
+2.25.1
+
 
