@@ -1,142 +1,176 @@
-Return-Path: <netdev+bounces-24050-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24052-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB5FA76E9F0
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 15:20:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 910D776E9F8
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 15:22:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F09371C21565
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 13:20:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C1EBB1C211D3
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 13:22:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DED2A1F175;
-	Thu,  3 Aug 2023 13:20:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AED51F176;
+	Thu,  3 Aug 2023 13:22:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8D2B1F169;
-	Thu,  3 Aug 2023 13:20:39 +0000 (UTC)
-Received: from mgamail.intel.com (unknown [192.55.52.93])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 995AF134;
-	Thu,  3 Aug 2023 06:20:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1691068838; x=1722604838;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=YxMDdwofIrNP7i680TZcMe4YpznNLpYvBUEHi/vv6ZU=;
-  b=chQlEsz3YvURUnA90Upe+DKjRF8xiGFoUB8xWW+T6oLEl382w49oCFY5
-   UA9YCFwHVDYEbdmETAori5GDJLoUqNXHM8bPDz/woi/yWddh/9Mz926IA
-   StiuH6lNqstlQai6YQJd5AwqArQxJzV+AbeO3fnA82kGk+EtrN3/cK/VA
-   bneJnEn+VOGUvgQ20Ziq3091Cr37UlKQG7Bst1f74Zgx3K0kJJFbpW2qt
-   eVI3bi5V5df+J0CFktNSxOGpp07PJlu5eVbj+xDk3xnFyWSAY+v96JFK6
-   XaCIQ41K0OMGTAFaBQRi8B/0KbqQBSJFYB+1s3tLTIU+KYQ09ckuhS2gK
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10791"; a="367323726"
-X-IronPort-AV: E=Sophos;i="6.01,252,1684825200"; 
-   d="scan'208";a="367323726"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Aug 2023 06:18:35 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10791"; a="853250382"
-X-IronPort-AV: E=Sophos;i="6.01,252,1684825200"; 
-   d="scan'208";a="853250382"
-Received: from lkp-server01.sh.intel.com (HELO d1ccc7e87e8f) ([10.239.97.150])
-  by orsmga004.jf.intel.com with ESMTP; 03 Aug 2023 06:18:27 -0700
-Received: from kbuild by d1ccc7e87e8f with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1qRYDi-00027j-1M;
-	Thu, 03 Aug 2023 13:18:26 +0000
-Date: Thu, 3 Aug 2023 21:17:43 +0800
-From: kernel test robot <lkp@intel.com>
-To: Geliang Tang <geliang.tang@suse.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
-	Yonghong Song <yhs@fb.com>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
-	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	Florent Revest <revest@chromium.org>,
-	Brendan Jackman <jackmanb@chromium.org>,
-	Matthieu Baerts <matthieu.baerts@tessares.net>,
-	Mat Martineau <martineau@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	John Johansen <john.johansen@canonical.com>,
-	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
-	"Serge E. Hallyn" <serge@hallyn.com>,
-	Stephen Smalley <stephen.smalley.work@gmail.com>,
-	Eric Paris <eparis@parisplace.org>, Mykola Lysenko <mykolal@fb.com>,
-	Shuah Khan <skhan@linuxfoundation.org>
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	Geliang Tang <geliang.tang@suse.com>, bpf@vger.kernel.org
-Subject: Re: [PATCH bpf-next v8 1/4] bpf: Add update_socket_protocol hook
-Message-ID: <202308032054.aq4D9VOg-lkp@intel.com>
-References: <120b307aacd1791fac016d33e112069ffb7db21a.1691047403.git.geliang.tang@suse.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F4AA1E528
+	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 13:22:06 +0000 (UTC)
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id EFEDFE46;
+	Thu,  3 Aug 2023 06:22:02 -0700 (PDT)
+Authenticated-By: 
+X-SpamFilter-By: ArmorX SpamTrap 5.77 with qID 373DLOonC021118, This message is accepted by code: ctloc85258
+Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
+	by rtits2.realtek.com.tw (8.15.2/2.81/5.90) with ESMTPS id 373DLOonC021118
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=FAIL);
+	Thu, 3 Aug 2023 21:21:24 +0800
+Received: from RTEXMBS03.realtek.com.tw (172.21.6.96) by
+ RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.32; Thu, 3 Aug 2023 21:20:47 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXMBS03.realtek.com.tw (172.21.6.96) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.7; Thu, 3 Aug 2023 21:20:46 +0800
+Received: from RTEXMBS04.realtek.com.tw ([fe80::e138:e7f1:4709:ff4d]) by
+ RTEXMBS04.realtek.com.tw ([fe80::e138:e7f1:4709:ff4d%5]) with mapi id
+ 15.01.2375.007; Thu, 3 Aug 2023 21:20:46 +0800
+From: Justin Lai <justinlai0215@realtek.com>
+To: Jiri Pirko <jiri@resnulli.us>
+CC: "kuba@kernel.org" <kuba@kernel.org>,
+        "davem@davemloft.net"
+	<davem@davemloft.net>,
+        "edumazet@google.com" <edumazet@google.com>,
+        "pabeni@redhat.com" <pabeni@redhat.com>,
+        "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>,
+        "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+Subject: RE: [PATCH] net/ethernet/realtek: Add Realtek automotive PCIe driver
+Thread-Topic: [PATCH] net/ethernet/realtek: Add Realtek automotive PCIe driver
+Thread-Index: AQHZxeQMA/4O5CExTkOPXZ48NozVXK/XvyuAgADLZRA=
+Date: Thu, 3 Aug 2023 13:20:46 +0000
+Message-ID: <14e094a861204bf0a744848cb30db635@realtek.com>
+References: <20230803082513.6523-1-justinlai0215@realtek.com>
+ <ZMtr+WbURFaynK15@nanopsycho>
+In-Reply-To: <ZMtr+WbURFaynK15@nanopsycho>
+Accept-Language: zh-TW, en-US
+Content-Language: zh-TW
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-originating-ip: [172.21.210.185]
+x-kse-serverinfo: RTEXMBS03.realtek.com.tw, 9
+x-kse-antispam-interceptor-info: fallback
+x-kse-antivirus-interceptor-info: fallback
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <120b307aacd1791fac016d33e112069ffb7db21a.1691047403.git.geliang.tang@suse.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+X-KSE-AntiSpam-Interceptor-Info: fallback
+X-KSE-ServerInfo: RTEXH36505.realtek.com.tw, 9
+X-KSE-AntiSpam-Interceptor-Info: fallback
+X-KSE-Antivirus-Interceptor-Info: fallback
+X-KSE-AntiSpam-Interceptor-Info: fallback
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Geliang,
+Hi, Jiri Pirko
 
-kernel test robot noticed the following build warnings:
+Our device is multi-function, one of which is netdev and the other is chara=
+cter device. For character devices, we have some custom functions that must=
+ use copy_from_user or copy_to_user to pass data.
 
-[auto build test WARNING on bpf-next/master]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Geliang-Tang/bpf-Add-update_socket_protocol-hook/20230803-153209
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git master
-patch link:    https://lore.kernel.org/r/120b307aacd1791fac016d33e112069ffb7db21a.1691047403.git.geliang.tang%40suse.com
-patch subject: [PATCH bpf-next v8 1/4] bpf: Add update_socket_protocol hook
-config: nios2-randconfig-r006-20230731 (https://download.01.org/0day-ci/archive/20230803/202308032054.aq4D9VOg-lkp@intel.com/config)
-compiler: nios2-linux-gcc (GCC) 12.3.0
-reproduce: (https://download.01.org/0day-ci/archive/20230803/202308032054.aq4D9VOg-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202308032054.aq4D9VOg-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
->> net/socket.c:1648: warning: This comment starts with '/**', but isn't a kernel-doc comment. Refer Documentation/doc-guide/kernel-doc.rst
-    *      A hook for bpf progs to attach to and update socket protocol.
+-----Original Message-----
+From: Jiri Pirko <jiri@resnulli.us>=20
+Sent: Thursday, August 3, 2023 4:57 PM
+To: Justin Lai <justinlai0215@realtek.com>
+Cc: kuba@kernel.org; davem@davemloft.net; edumazet@google.com; pabeni@redha=
+t.com; linux-kernel@vger.kernel.org; netdev@vger.kernel.org
+Subject: Re: [PATCH] net/ethernet/realtek: Add Realtek automotive PCIe driv=
+er
 
 
-vim +1648 net/socket.c
+External mail.
 
-  1646	
-  1647	/**
-> 1648	 *	A hook for bpf progs to attach to and update socket protocol.
-  1649	 *
-  1650	 *	A static noinline declaration here could cause the compiler to
-  1651	 *	optimize away the function. A global noinline declaration will
-  1652	 *	keep the definition, but may optimize away the callsite.
-  1653	 *	Therefore, __weak is needed to ensure that the call is still
-  1654	 *	emitted, by telling the compiler that we don't know what the
-  1655	 *	function might eventually be.
-  1656	 *
-  1657	 *	__diag_* below are needed to dismiss the missing prototype warning.
-  1658	 */
-  1659	
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+
+Thu, Aug 03, 2023 at 10:25:13AM CEST, justinlai0215@realtek.com wrote:
+>This patch is to add the ethernet device driver for the PCIe interface=20
+>of Realtek Automotive Ethernet Switch, applicable to RTL9054, RTL9068, RTL=
+9072, RTL9075, RTL9068, RTL9071.
+>
+>Signed-off-by: justinlai0215 <justinlai0215@realtek.com>
+
+[...]
+
+
+>+
+>+static long rtase_swc_ioctl(struct file *p_file, unsigned int cmd,=20
+>+unsigned long arg)
+
+There are *MANY* thing wrong in this patch spotted just during 5 minutes sk=
+imming over the code, but this definitelly tops all of them.
+I didn't see so obvious kernel bypass attempt for a long time. Ugh, you can=
+'t be serious :/
+
+I suggest to you take couple of rounds of consulting the patch with some sk=
+illed upstream developer internaly before you make another submission in or=
+der not not to waste time of reviewers.
+
+
+>+{
+>+      long rc =3D 0;
+>+      struct rtase_swc_cmd_t sw_cmd;
+>+
+>+      (void)p_file;
+>+
+>+      if (rtase_swc_device.init_flag =3D=3D 1u) {
+>+              rc =3D -ENXIO;
+>+              goto out;
+>+      }
+>+
+>+      rc =3D (s64)(copy_from_user(&sw_cmd, (void *)arg, sizeof(struct=20
+>+ rtase_swc_cmd_t)));
+>+
+>+      if (rc !=3D 0) {
+>+              SWC_DRIVER_INFO("rtase_swc copy_from_user failed.");
+>+      } else {
+>+              switch (cmd) {
+>+              case SWC_CMD_REG_GET:
+>+                      rtase_swc_reg_get(&sw_cmd);
+>+                      rc =3D (s64)(copy_to_user((void *)arg, &sw_cmd,
+>+                                              sizeof(struct rtase_swc_cmd=
+_t)));
+>+                      break;
+>+
+>+              case SWC_CMD_REG_SET:
+>+                      rtase_swc_reg_set(&sw_cmd);
+>+                      rc =3D (s64)(copy_to_user((void *)arg, &sw_cmd,
+>+                                              sizeof(struct rtase_swc_cmd=
+_t)));
+>+                      break;
+>+
+>+              default:
+>+                      rc =3D -ENOTTY;
+>+                      break;
+>+              }
+>+      }
+>+
+>+out:
+>+      return rc;
+>+}
+
+[...]
+
+------Please consider the environment before printing this e-mail.
 
