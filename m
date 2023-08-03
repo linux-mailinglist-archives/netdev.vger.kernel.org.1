@@ -1,148 +1,139 @@
-Return-Path: <netdev+bounces-23916-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23917-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 006A676E274
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 10:07:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D7F376E27B
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 10:08:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 323301C21495
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 08:07:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CF0A91C21511
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 08:08:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C26DA14263;
-	Thu,  3 Aug 2023 08:07:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 970B414271;
+	Thu,  3 Aug 2023 08:08:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B60B89440
-	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 08:07:23 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 405A85B9E
-	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 01:07:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1691050040;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jthayd5ui56Fpxqb9t3oQzEYmi7UMCMbE1ASe7GtkgY=;
-	b=LMe/BuKCSYiuwFscQ8KkvFfptCLN8CpE5q8mj/kq6wro8u8v9bbBCzTfw4S4VTTe+PaTHf
-	2mkrmuQtHInwM8D0wod7j+POP/007BA3wwpt+hXCBd/DYHZg+ynxHDodMZz5B+jaUiw5T5
-	NXc8i7T6dxiwmpTqVw1lUX+MI8CDIEc=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-518-hvSYrUyhNW6ZMlWy_m78Tw-1; Thu, 03 Aug 2023 04:07:18 -0400
-X-MC-Unique: hvSYrUyhNW6ZMlWy_m78Tw-1
-Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-76ca3baaec8so14662485a.1
-        for <netdev@vger.kernel.org>; Thu, 03 Aug 2023 01:07:18 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691050038; x=1691654838;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=jthayd5ui56Fpxqb9t3oQzEYmi7UMCMbE1ASe7GtkgY=;
-        b=mIxi/v13DfWne2OUefhMX6JWIowHiw81cLAaatZwTWtdr0u8ThO2lcbPMlSyuZsma4
-         Mi3hv2bJiNZkNWUAviJve5Ry7UJTFlBqmeL4bmBSbXjr1mXruzgKNmdtLXEjWyiFfH8X
-         mILQxRywn3S1EB2/ud/4kV9iDf/CbdMaGUPhKjmokwkUMKQNOBGMTHocHJAqLvTTZM/R
-         yoZ2M0cLgBIyzm43B9qYpGD/bfuIhDfwadw4kPvecU4a2b9GJBo1p32wAuHOsCRxFq3i
-         NAfoauywDAjbOM48WB3YbsTdj87+e4x97UPkB7/QV3AqFFfcEZUYro80dbSxKffM+S+C
-         hyDA==
-X-Gm-Message-State: ABy/qLadmeBgWCi7nwYeMfTmOTlbYm1OwXjXZlQ4uBIAlyfcjCR2+f5/
-	r/fhK/GBXJ1uwRhnEuEgpBkPg7dJI3hXl+NabFi5D98jJcafvh/w96Y79CXliLf1qfo6rC+ESGB
-	Toe+Hty0wHDU1sHwG
-X-Received: by 2002:a05:620a:4402:b0:767:e5ae:85cf with SMTP id v2-20020a05620a440200b00767e5ae85cfmr20789793qkp.5.1691050038478;
-        Thu, 03 Aug 2023 01:07:18 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlFViPhNhnNp9SBe9EOo0iTO871MZ55RotErSLZwYTVfkCRo/1er0GobsFumxfa1ZKbpiUUQug==
-X-Received: by 2002:a05:620a:4402:b0:767:e5ae:85cf with SMTP id v2-20020a05620a440200b00767e5ae85cfmr20789778qkp.5.1691050038153;
-        Thu, 03 Aug 2023 01:07:18 -0700 (PDT)
-Received: from gerbillo.redhat.com (146-241-226-226.dyn.eolo.it. [146.241.226.226])
-        by smtp.gmail.com with ESMTPSA id d8-20020a37c408000000b00767b4fa5d96sm5645884qki.27.2023.08.03.01.07.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Aug 2023 01:07:17 -0700 (PDT)
-Message-ID: <9916825da00d375a33abdcb0aa773c5520a307e1.camel@redhat.com>
-Subject: Re: [net-next 2/2] selftests: seg6: add selftest for NEXT-C-SID
- flavor in SRv6 End.X behavior
-From: Paolo Abeni <pabeni@redhat.com>
-To: Andrea Mayer <andrea.mayer@uniroma2.it>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, David Ahern <dsahern@kernel.org>, Shuah Khan
- <shuah@kernel.org>,  linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
- linux-kselftest@vger.kernel.org
-Cc: Stefano Salsano <stefano.salsano@uniroma2.it>, Paolo Lungaroni
-	 <paolo.lungaroni@uniroma2.it>, Ahmed Abdelsalam <ahabdels.dev@gmail.com>, 
-	Hangbin Liu <liuhangbin@gmail.com>
-Date: Thu, 03 Aug 2023 10:07:14 +0200
-In-Reply-To: <20230731175117.17376-3-andrea.mayer@uniroma2.it>
-References: <20230731175117.17376-1-andrea.mayer@uniroma2.it>
-	 <20230731175117.17376-3-andrea.mayer@uniroma2.it>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BD2713AFD
+	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 08:08:41 +0000 (UTC)
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3D355FE6
+	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 01:08:36 -0700 (PDT)
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1qRTNr-0000S9-A0
+	for netdev@vger.kernel.org; Thu, 03 Aug 2023 10:08:35 +0200
+Received: from dspam.blackshift.org (localhost [127.0.0.1])
+	by bjornoya.blackshift.org (Postfix) with SMTP id 0FA55202248
+	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 08:08:34 +0000 (UTC)
+Received: from hardanger.blackshift.org (unknown [172.20.34.65])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by bjornoya.blackshift.org (Postfix) with ESMTPS id C454420222D;
+	Thu,  3 Aug 2023 08:08:32 +0000 (UTC)
+Received: from blackshift.org (localhost [::1])
+	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id 67af3b46;
+	Thu, 3 Aug 2023 08:08:32 +0000 (UTC)
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	linux-can@vger.kernel.org,
+	kernel@pengutronix.de
+Subject: [PATCH net-next 0/9] pull-request: can-next 2023-08-03
+Date: Thu,  3 Aug 2023 10:08:21 +0200
+Message-Id: <20230803080830.1386442-1-mkl@pengutronix.de>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:b01:1d::7b
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, 2023-07-31 at 19:51 +0200, Andrea Mayer wrote:
-> From: Paolo Lungaroni <paolo.lungaroni@uniroma2.it>
->=20
-> This selftest is designed for testing the support of NEXT-C-SID flavor
-> for SRv6 End.X behavior. It instantiates a virtual network composed of
-> several nodes: hosts and SRv6 routers. Each node is realized using a
-> network namespace that is properly interconnected to others through veth
-> pairs, according to the topology depicted in the selftest script file.
-> The test considers SRv6 routers implementing IPv4/IPv6 L3 VPNs leveraged
-> by hosts for communicating with each other. Such routers i) apply
-> different SRv6 Policies to the traffic received from connected hosts,
-> considering the IPv4 or IPv6 protocols; ii) use the NEXT-C-SID
-> compression mechanism for encoding several SRv6 segments within a single
-> 128-bit SID address, referred to as a Compressed SID (C-SID) container.
->=20
-> The NEXT-C-SID is provided as a "flavor" of the SRv6 End.X behavior,
-> enabling it to properly process the C-SID containers. The correct
-> execution of the enabled NEXT-C-SID SRv6 End.X behavior is verified
-> through reachability tests carried out between hosts belonging to the
-> same VPN.
->=20
-> Signed-off-by: Andrea Mayer <andrea.mayer@uniroma2.it>
-> Signed-off-by: Paolo Lungaroni <paolo.lungaroni@uniroma2.it>
+Hello netdev-team,
 
-The patches LGTM, but there is a minor issues WRT the tag area. Since
-this patch contains a
+this is a pull request of 9 patches for net-next/master.
 
-From: Paolo Lungaroni <paolo.lungaroni@uniroma2.it>
+The 1st patch is by Ruan Jinjie, targets the flexcan driver, and
+cleans up the error handling of platform_get_irq() in the
+flexcan_probe() function.
 
-tag, Paolo's sob should come first.
+Markus Schneider-Pargmann contributes 6 patches for the tcan4x5x M_CAN
+driver, consisting of some cleanups, and adding support for the
+tcan4552/4553 chips.
 
-According to the the newly created shell script comments, it looks like
-the patch as been co developed by both Paolo abd Andrea.
+Another patch by Ruan Jinjie, that cleans up the error path of
+platform_get_irq() in the c_can_plat_probe() function of the C_CAN
+platform driver.
 
-In that case the correct tag sequence would be:
+The last patch is by Frank Jungclaus and adds support for the
+CAN-USB/3 and CAN FD to the ESD USB CAN driver.
 
-SoB Paolo
-Co-devel Andrea
-SoB Andrea
+regards,
+Marc
 
-Since the above is relevant for correct patch authorship attribution I
-suggest to address that in a new revision.
+---
 
-BTW, I a really appreciate the descriptive-but-not-too-verbose commit
-message!
+The following changes since commit 2b3082c6ef3b0104d822f6f18d2afbe5fc9a5c2c:
 
-Thanks,
+  net: flow_dissector: Use 64bits for used_keys (2023-07-31 09:11:24 +0100)
 
-Paolo
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/mkl/linux-can-next.git tags/linux-can-next-for-6.6-20230803
+
+for you to fetch changes up to 806e95aee5440a9fbe155c3822e1422ba6a90478:
+
+  Merge patch "can: esd_usb: Add support for esd CAN-USB/3" (2023-08-03 09:24:33 +0200)
+
+----------------------------------------------------------------
+linux-can-next-for-6.6-20230803
+
+----------------------------------------------------------------
+Frank Jungclaus (1):
+      can: esd_usb: Add support for esd CAN-USB/3
+
+Marc Kleine-Budde (2):
+      Merge patch series "can: tcan4x5x: Introduce tcan4552/4553"
+      Merge patch "can: esd_usb: Add support for esd CAN-USB/3"
+
+Markus Schneider-Pargmann (6):
+      dt-bindings: can: tcan4x5x: Add tcan4552 and tcan4553 variants
+      can: tcan4x5x: Remove reserved register 0x814 from writable table
+      can: tcan4x5x: Check size of mram configuration
+      can: tcan4x5x: Rename ID registers to match datasheet
+      can: tcan4x5x: Add support for tcan4552/4553
+      can: tcan4x5x: Add error messages in probe
+
+Ruan Jinjie (2):
+      can: flexcan: fix the return value handle for platform_get_irq()
+      can: c_can: Do not check for 0 return after calling platform_get_irq()
+
+ .../devicetree/bindings/net/can/tcan4x5x.txt       |  11 +-
+ drivers/net/can/c_can/c_can_platform.c             |   4 +-
+ drivers/net/can/flexcan/flexcan-core.c             |  12 +-
+ drivers/net/can/m_can/m_can.c                      |  16 ++
+ drivers/net/can/m_can/m_can.h                      |   1 +
+ drivers/net/can/m_can/tcan4x5x-core.c              | 142 +++++++++--
+ drivers/net/can/m_can/tcan4x5x-regmap.c            |   1 -
+ drivers/net/can/usb/esd_usb.c                      | 275 ++++++++++++++++++---
+ 8 files changed, 397 insertions(+), 65 deletions(-)
+
 
 
