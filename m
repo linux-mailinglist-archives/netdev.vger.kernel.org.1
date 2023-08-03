@@ -1,336 +1,151 @@
-Return-Path: <netdev+bounces-24196-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24197-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6A9A76F366
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 21:28:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 893B176F367
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 21:29:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A5FD21C21664
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 19:28:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B721D1C21629
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 19:29:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31AF32591F;
-	Thu,  3 Aug 2023 19:28:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B75D625920;
+	Thu,  3 Aug 2023 19:29:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2111A14AB6
-	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 19:28:47 +0000 (UTC)
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0DF3E1A8;
-	Thu,  3 Aug 2023 12:28:46 -0700 (PDT)
-Received: from UbuntuVM-18.efytirfs5hsengjwslc1ligxab.xx.internal.cloudapp.net (unknown [20.72.208.6])
-	by linux.microsoft.com (Postfix) with ESMTPSA id 29544207F5AF;
-	Thu,  3 Aug 2023 12:28:45 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 29544207F5AF
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1691090925;
-	bh=d/Q0tfkeWRaqXZbjrsVExBbWs12KQlVq15rFnfwJiBg=;
-	h=From:To:Cc:Subject:Date:From;
-	b=isi4Quf1AWk8mU9YL/qO/DvCjakYV3nqa7wyZgPloXIvrEoeS7FQoWqVDX0i9FmZQ
-	 0ksh37AtqX1ROZjF0f36O5CDiJjxtOVfDr0JU9sXAcpeGfiMAFVb/Kkv4qMtjHnMwk
-	 PutE8LMqyT1zASd7n2hujny/b8oGZrjG1Z/abVT0=
-From: Hardik Garg <hargar@linux.microsoft.com>
-To: stable@vger.kernel.org
-Cc: davem@davemloft.net,
-	kuba@kernel.org,
-	shayd@nvidia.com,
-	saeedm@nvidia.com,
-	fred@cloudflare.com,
-	netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 6.1 5.15] net/mlx5: Free irqs only on shutdown callback
-Date: Thu,  3 Aug 2023 19:28:32 +0000
-Message-Id: <20230803192832.22966-1-hargar@linux.microsoft.com>
-X-Mailer: git-send-email 2.17.1
-X-Spam-Status: No, score=-18.7 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,ENV_AND_HDR_SPF_MATCH,HEXHASH_WORD,
-	RCVD_IN_DNSWL_MED,RCVD_IN_SBL,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-	autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F52514AB6
+	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 19:29:46 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 98713C433C7;
+	Thu,  3 Aug 2023 19:29:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1691090986;
+	bh=SzD6mLWXBeRO+za53POXhdBCgv8KiAzF/i4NjDRIS8k=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=N0i+JQtBNRBqg3BZOsF012kHvX6aeQoV7b5HpqRsPTW8rqYNjmweL+fpQ/3wGLxAN
+	 aZ7j7i0Zcah44YMxFHZCTL8peJL1nLbv0du0/DE/iNwrtRMtGS7nStLQfGfpV6Tl5N
+	 gEkUfIOuZziEO01aUc+4LQtLFsY6TfJ+FjdW4ih2hFOe7gXmouosSkOC+dUVHE0SXQ
+	 ERWlYXOsDd5dX8jVwdBXBTIeU0bL7DDe5tpGeeS1ctUPdOfzei7FUSSaXoKselhJn/
+	 hyJzkxhlJkhaluBldQ7F181vMR5AK87LmcVGCxNE23WNeTdYi/EqBcoNG6+wKmYRzZ
+	 4MRsMCq52/K4A==
+Date: Thu, 3 Aug 2023 21:29:38 +0200
+From: Simon Horman <horms@kernel.org>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Claudiu Manoil <claudiu.manoil@nxp.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	UNGLinuxDriver@microchip.com,
+	Colin Foster <colin.foster@in-advantage.com>
+Subject: Re: [PATCH net] net: dsa: ocelot: call dsa_tag_8021q_unregister()
+ under rtnl_lock() on driver remove
+Message-ID: <ZMwAImhL8nH+6KLf@kernel.org>
+References: <20230803134253.2711124-1-vladimir.oltean@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230803134253.2711124-1-vladimir.oltean@nxp.com>
 
-commit 9c2d08010963 ("net/mlx5: Free irqs only on shutdown callback")
-backport this v6.4 commit to v6.1 and v5.15
+On Thu, Aug 03, 2023 at 04:42:53PM +0300, Vladimir Oltean wrote:
+> When the tagging protocol in current use is "ocelot-8021q" and we unbind
+> the driver, we see this splat:
+> 
+> $ echo '0000:00:00.2' > /sys/bus/pci/drivers/fsl_enetc/unbind
+> mscc_felix 0000:00:00.5 swp0: left promiscuous mode
+> sja1105 spi2.0: Link is Down
+> DSA: tree 1 torn down
+> mscc_felix 0000:00:00.5 swp2: left promiscuous mode
+> sja1105 spi2.2: Link is Down
+> DSA: tree 3 torn down
+> fsl_enetc 0000:00:00.2 eno2: left promiscuous mode
+> mscc_felix 0000:00:00.5: Link is Down
+> ------------[ cut here ]------------
+> RTNL: assertion failed at net/dsa/tag_8021q.c (409)
+> WARNING: CPU: 1 PID: 329 at net/dsa/tag_8021q.c:409 dsa_tag_8021q_unregister+0x12c/0x1a0
+> Modules linked in:
+> CPU: 1 PID: 329 Comm: bash Not tainted 6.5.0-rc3+ #771
+> pc : dsa_tag_8021q_unregister+0x12c/0x1a0
+> lr : dsa_tag_8021q_unregister+0x12c/0x1a0
+> Call trace:
+>  dsa_tag_8021q_unregister+0x12c/0x1a0
+>  felix_tag_8021q_teardown+0x130/0x150
+>  felix_teardown+0x3c/0xd8
+>  dsa_tree_teardown_switches+0xbc/0xe0
+>  dsa_unregister_switch+0x168/0x260
+>  felix_pci_remove+0x30/0x60
+>  pci_device_remove+0x4c/0x100
+>  device_release_driver_internal+0x188/0x288
+>  device_links_unbind_consumers+0xfc/0x138
+>  device_release_driver_internal+0xe0/0x288
+>  device_driver_detach+0x24/0x38
+>  unbind_store+0xd8/0x108
+>  drv_attr_store+0x30/0x50
+> ---[ end trace 0000000000000000 ]---
+> ------------[ cut here ]------------
+> RTNL: assertion failed at net/8021q/vlan_core.c (376)
+> WARNING: CPU: 1 PID: 329 at net/8021q/vlan_core.c:376 vlan_vid_del+0x1b8/0x1f0
+> CPU: 1 PID: 329 Comm: bash Tainted: G        W          6.5.0-rc3+ #771
+> pc : vlan_vid_del+0x1b8/0x1f0
+> lr : vlan_vid_del+0x1b8/0x1f0
+>  dsa_tag_8021q_unregister+0x8c/0x1a0
+>  felix_tag_8021q_teardown+0x130/0x150
+>  felix_teardown+0x3c/0xd8
+>  dsa_tree_teardown_switches+0xbc/0xe0
+>  dsa_unregister_switch+0x168/0x260
+>  felix_pci_remove+0x30/0x60
+>  pci_device_remove+0x4c/0x100
+>  device_release_driver_internal+0x188/0x288
+>  device_links_unbind_consumers+0xfc/0x138
+>  device_release_driver_internal+0xe0/0x288
+>  device_driver_detach+0x24/0x38
+>  unbind_store+0xd8/0x108
+>  drv_attr_store+0x30/0x50
+> DSA: tree 0 torn down
+> 
+> This was somewhat not so easy to spot, because "ocelot-8021q" is not the
+> default tagging protocol, and thus, not everyone who tests the unbinding
+> path may have switched to it beforehand. The default
+> felix_tag_npi_teardown() does not require rtnl_lock() to be held.
+> 
+> Fixes: 7c83a7c539ab ("net: dsa: add a second tagger for Ocelot switches based on tag_8021q")
+> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+> ---
+>  drivers/net/dsa/ocelot/felix.c | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/drivers/net/dsa/ocelot/felix.c b/drivers/net/dsa/ocelot/felix.c
+> index fd7eb4a52918..9a3e5ec16972 100644
+> --- a/drivers/net/dsa/ocelot/felix.c
+> +++ b/drivers/net/dsa/ocelot/felix.c
+> @@ -1619,8 +1619,10 @@ static void felix_teardown(struct dsa_switch *ds)
+>  	struct felix *felix = ocelot_to_felix(ocelot);
+>  	struct dsa_port *dp;
+>  
+> +	rtnl_lock();
+>  	if (felix->tag_proto_ops)
+>  		felix->tag_proto_ops->teardown(ds);
+> +	rtnl_unlock();
 
-Whenever a shutdown is invoked, free irqs only and keep mlx5_irq
-synthetic wrapper intact in order to avoid use-after-free on
-system shutdown.
+Hi Vladimir,
 
-for example:
-==================================================================
-BUG: KASAN: use-after-free in _find_first_bit+0x66/0x80
-Read of size 8 at addr ffff88823fc0d318 by task kworker/u192:0/13608
+I am curious to know if RTNL could be taken in
+felix_tag_8021q_teardown() instead.
 
-CPU: 25 PID: 13608 Comm: kworker/u192:0 Tainted: 
-G    B   W  O  6.1.21-cloudflare-kasan-2023.3.21 #1
-Hardware name: GIGABYTE R162-R2-GEN0/MZ12-HD2-CD, BIOS R14 05/03/2021
-Workqueue: mlx5e mlx5e_tx_timeout_work [mlx5_core]
-Call Trace:
-  <TASK>
-  dump_stack_lvl+0x34/0x48
-  print_report+0x170/0x473
-  ? _find_first_bit+0x66/0x80
-  kasan_report+0xad/0x130
-  ? _find_first_bit+0x66/0x80
-  _find_first_bit+0x66/0x80
-  mlx5e_open_channels+0x3c5/0x3a10 [mlx5_core]
-  ? console_unlock+0x2fa/0x430
-  ? _raw_spin_lock_irqsave+0x8d/0xf0
-  ? _raw_spin_unlock_irqrestore+0x42/0x80
-  ? preempt_count_add+0x7d/0x150
-  ? __wake_up_klogd.part.0+0x7d/0xc0
-  ? vprintk_emit+0xfe/0x2c0
-  ? mlx5e_trigger_napi_sched+0x40/0x40 [mlx5_core]
-  ? dev_attr_show.cold+0x35/0x35
-  ? devlink_health_do_dump.part.0+0x174/0x340
-  ? devlink_health_report+0x504/0x810
-  ? mlx5e_reporter_tx_timeout+0x29d/0x3a0 [mlx5_core]
-  ? mlx5e_tx_timeout_work+0x17c/0x230 [mlx5_core]
-  ? process_one_work+0x680/0x1050
-  mlx5e_safe_switch_params+0x156/0x220 [mlx5_core]
-  ? mlx5e_switch_priv_channels+0x310/0x310 [mlx5_core]
-  ? mlx5_eq_poll_irq_disabled+0xb6/0x100 [mlx5_core]
-  mlx5e_tx_reporter_timeout_recover+0x123/0x240 [mlx5_core]
-  ? __mutex_unlock_slowpath.constprop.0+0x2b0/0x2b0
-  devlink_health_reporter_recover+0xa6/0x1f0
-  devlink_health_report+0x2f7/0x810
-  ? vsnprintf+0x854/0x15e0
-  mlx5e_reporter_tx_timeout+0x29d/0x3a0 [mlx5_core]
-  ? mlx5e_reporter_tx_err_cqe+0x1a0/0x1a0 [mlx5_core]
-  ? mlx5e_tx_reporter_timeout_dump+0x50/0x50 [mlx5_core]
-  ? mlx5e_tx_reporter_dump_sq+0x260/0x260 [mlx5_core]
-  ? newidle_balance+0x9b7/0xe30
-  ? psi_group_change+0x6a7/0xb80
-  ? mutex_lock+0x96/0xf0
-  ? __mutex_lock_slowpath+0x10/0x10
-  mlx5e_tx_timeout_work+0x17c/0x230 [mlx5_core]
-  process_one_work+0x680/0x1050
-  worker_thread+0x5a0/0xeb0
-  ? process_one_work+0x1050/0x1050
-  kthread+0x2a2/0x340
-  ? kthread_complete_and_exit+0x20/0x20
-  ret_from_fork+0x22/0x30
-  </TASK>
-
-Freed by task 1:
-  kasan_save_stack+0x23/0x50
-  kasan_set_track+0x21/0x30
-  kasan_save_free_info+0x2a/0x40
-  ____kasan_slab_free+0x169/0x1d0
-  slab_free_freelist_hook+0xd2/0x190
-  __kmem_cache_free+0x1a1/0x2f0
-  irq_pool_free+0x138/0x200 [mlx5_core]
-  mlx5_irq_table_destroy+0xf6/0x170 [mlx5_core]
-  mlx5_core_eq_free_irqs+0x74/0xf0 [mlx5_core]
-  shutdown+0x194/0x1aa [mlx5_core]
-  pci_device_shutdown+0x75/0x120
-  device_shutdown+0x35c/0x620
-  kernel_restart+0x60/0xa0
-  __do_sys_reboot+0x1cb/0x2c0
-  do_syscall_64+0x3b/0x90
-  entry_SYSCALL_64_after_hwframe+0x4b/0xb5
-
-The buggy address belongs to the object at ffff88823fc0d300
-  which belongs to the cache kmalloc-192 of size 192
-The buggy address is located 24 bytes inside of
-  192-byte region [ffff88823fc0d300, ffff88823fc0d3c0)
-
-The buggy address belongs to the physical page:
-page:0000000010139587 refcount:1 mapcount:0 mapping:0000000000000000
-index:0x0 pfn:0x23fc0c
-head:0000000010139587 order:1 compound_mapcount:0 compound_pincount:0
-flags: 0x2ffff800010200(slab|head|node=0|zone=2|lastcpupid=0x1ffff)
-raw: 002ffff800010200 0000000000000000 dead000000000122 ffff88810004ca00
-raw: 0000000000000000 0000000000200020 00000001ffffffff 0000000000000000
-page dumped because: kasan: bad access detected
-
-Memory state around the buggy address:
-  ffff88823fc0d200: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-  ffff88823fc0d280: fb fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
- >ffff88823fc0d300: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-                             ^
-  ffff88823fc0d380: fb fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
-  ffff88823fc0d400: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-==================================================================
-general protection fault, probably for non-canonical address
-0xdffffc005c40d7ac: 0000 [#1] PREEMPT SMP KASAN NOPTI
-KASAN: probably user-memory-access in range 
-[0x00000002e206bd60-0x00000002e206bd67]
-CPU: 25 PID: 13608 Comm: kworker/u192:0 Tainted: 
-G    B   W  O  6.1.21-cloudflare-kasan-2023.3.21 #1
-Hardware name: GIGABYTE R162-R2-GEN0/MZ12-HD2-CD, BIOS R14 05/03/2021
-Workqueue: mlx5e mlx5e_tx_timeout_work [mlx5_core]
-RIP: 0010:__alloc_pages+0x141/0x5c0
-Call Trace:
-  <TASK>
-  ? sysvec_apic_timer_interrupt+0xa0/0xc0
-  ? asm_sysvec_apic_timer_interrupt+0x16/0x20
-  ? __alloc_pages_slowpath.constprop.0+0x1ec0/0x1ec0
-  ? _raw_spin_unlock_irqrestore+0x3d/0x80
-  __kmalloc_large_node+0x80/0x120
-  ? kvmalloc_node+0x4e/0x170
-  __kmalloc_node+0xd4/0x150
-  kvmalloc_node+0x4e/0x170
-  mlx5e_open_channels+0x631/0x3a10 [mlx5_core]
-  ? console_unlock+0x2fa/0x430
-  ? _raw_spin_lock_irqsave+0x8d/0xf0
-  ? _raw_spin_unlock_irqrestore+0x42/0x80
-  ? preempt_count_add+0x7d/0x150
-  ? __wake_up_klogd.part.0+0x7d/0xc0
-  ? vprintk_emit+0xfe/0x2c0
-  ? mlx5e_trigger_napi_sched+0x40/0x40 [mlx5_core]
-  ? dev_attr_show.cold+0x35/0x35
-  ? devlink_health_do_dump.part.0+0x174/0x340
-  ? devlink_health_report+0x504/0x810
-  ? mlx5e_reporter_tx_timeout+0x29d/0x3a0 [mlx5_core]
-  ? mlx5e_tx_timeout_work+0x17c/0x230 [mlx5_core]
-  ? process_one_work+0x680/0x1050
-  mlx5e_safe_switch_params+0x156/0x220 [mlx5_core]
-  ? mlx5e_switch_priv_channels+0x310/0x310 [mlx5_core]
-  ? mlx5_eq_poll_irq_disabled+0xb6/0x100 [mlx5_core]
-  mlx5e_tx_reporter_timeout_recover+0x123/0x240 [mlx5_core]
-  ? __mutex_unlock_slowpath.constprop.0+0x2b0/0x2b0
-  devlink_health_reporter_recover+0xa6/0x1f0
-  devlink_health_report+0x2f7/0x810
-  ? vsnprintf+0x854/0x15e0
-  mlx5e_reporter_tx_timeout+0x29d/0x3a0 [mlx5_core]
-  ? mlx5e_reporter_tx_err_cqe+0x1a0/0x1a0 [mlx5_core]
-  ? mlx5e_tx_reporter_timeout_dump+0x50/0x50 [mlx5_core]
-  ? mlx5e_tx_reporter_dump_sq+0x260/0x260 [mlx5_core]
-  ? newidle_balance+0x9b7/0xe30
-  ? psi_group_change+0x6a7/0xb80
-  ? mutex_lock+0x96/0xf0
-  ? __mutex_lock_slowpath+0x10/0x10
-  mlx5e_tx_timeout_work+0x17c/0x230 [mlx5_core]
-  process_one_work+0x680/0x1050
-  worker_thread+0x5a0/0xeb0
-  ? process_one_work+0x1050/0x1050
-  kthread+0x2a2/0x340
-  ? kthread_complete_and_exit+0x20/0x20
-  ret_from_fork+0x22/0x30
-  </TASK>
----[ end trace 0000000000000000  ]---
-RIP: 0010:__alloc_pages+0x141/0x5c0
-Code: e0 39 a3 96 89 e9 b8 22 01 32 01 83 e1 0f 48 89 fa 01 c9 48 c1 ea
-03 d3 f8 83 e0 03 89 44 24 6c 48 b8 00 00 00 00 00 fc ff df <80> 3c 02
-00 0f 85 fc 03 00 00 89 e8 4a 8b 14 f5 e0 39 a3 96 4c 89
-RSP: 0018:ffff888251f0f438 EFLAGS: 00010202
-RAX: dffffc0000000000 RBX: 1ffff1104a3e1e8b RCX: 0000000000000000
-RDX: 000000005c40d7ac RSI: 0000000000000003 RDI: 00000002e206bd60
-RBP: 0000000000052dc0 R08: ffff8882b0044218 R09: ffff8882b0045e8a
-R10: fffffbfff300fefc R11: ffff888167af4000 R12: 0000000000000003
-R13: 0000000000000000 R14: 00000000696c7070 R15: ffff8882373f4380
-FS:  0000000000000000(0000) GS:ffff88bf2be80000(0000)
-knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00005641d031eee8 CR3: 0000002e7ca14000 CR4: 0000000000350ee0
-Kernel panic - not syncing: Fatal exception
-Kernel Offset: 0x11000000 from 0xffffffff81000000 (relocation range:
-0xffffffff80000000-0xffffffffbfffffff)
----[ end Kernel panic - not syncing: Fatal exception  ]---]
-
-Reported-by: Frederick Lawler <fred@cloudflare.com>
-Link: https://lore.kernel.org/netdev/be5b9271-7507-19c5-ded1-fa78f1980e69@cloudflare.com
-Signed-off-by: Shay Drory <shayd@nvidia.com>
-Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
-[hardik: Refer to the irqn member of the mlx5_irq struct, instead of
- the msi_map, since we don't have upstream v6.4 commit 235a25fe28de
- ("net/mlx5: Modify struct mlx5_irq to use struct msi_map")].
-[hardik: Refer to the pf_pool member of the mlx5_irq_table struct,
- instead of pcif_pool, since we don't have upstream v6.4 commit
- 8bebfd767909 ("net/mlx5: Improve naming of pci function vectors")].
- 
-Signed-off-by: Hardik Garg <hargar@linux.microsoft.com>
----
- drivers/net/ethernet/mellanox/mlx5/core/eq.c  |  2 +-
- .../ethernet/mellanox/mlx5/core/mlx5_irq.h    |  1 +
- .../net/ethernet/mellanox/mlx5/core/pci_irq.c | 29 +++++++++++++++++++
- 3 files changed, 31 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eq.c b/drivers/net/ethernet/mellanox/mlx5/core/eq.c
-index a0242dc15741..e112b5685b02 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/eq.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/eq.c
-@@ -1061,7 +1061,7 @@ void mlx5_core_eq_free_irqs(struct mlx5_core_dev *dev)
- 	mutex_lock(&table->lock); /* sync with create/destroy_async_eq */
- 	if (!mlx5_core_is_sf(dev))
- 		clear_rmap(dev);
--	mlx5_irq_table_destroy(dev);
-+	mlx5_irq_table_free_irqs(dev);
- 	mutex_unlock(&table->lock);
- }
- 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/mlx5_irq.h b/drivers/net/ethernet/mellanox/mlx5/core/mlx5_irq.h
-index 23cb63fa4588..2e728e4e81fa 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/mlx5_irq.h
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/mlx5_irq.h
-@@ -14,6 +14,7 @@ int mlx5_irq_table_init(struct mlx5_core_dev *dev);
- void mlx5_irq_table_cleanup(struct mlx5_core_dev *dev);
- int mlx5_irq_table_create(struct mlx5_core_dev *dev);
- void mlx5_irq_table_destroy(struct mlx5_core_dev *dev);
-+void mlx5_irq_table_free_irqs(struct mlx5_core_dev *dev);
- int mlx5_irq_table_get_num_comp(struct mlx5_irq_table *table);
- int mlx5_irq_table_get_sfs_vec(struct mlx5_irq_table *table);
- struct mlx5_irq_table *mlx5_irq_table_get(struct mlx5_core_dev *dev);
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c b/drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c
-index 662f1d55e30e..5e0f7d96aac5 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c
-@@ -591,6 +591,24 @@ static void irq_pools_destroy(struct mlx5_irq_table *table)
- 	irq_pool_free(table->pf_pool);
- }
- 
-+static void mlx5_irq_pool_free_irqs(struct mlx5_irq_pool *pool)
-+{
-+	struct mlx5_irq *irq;
-+	unsigned long index;
-+
-+	xa_for_each(&pool->irqs, index, irq)
-+		free_irq(irq->irqn, &irq->nh);
-+}
-+
-+static void mlx5_irq_pools_free_irqs(struct mlx5_irq_table *table)
-+{
-+	if (table->sf_ctrl_pool) {
-+		mlx5_irq_pool_free_irqs(table->sf_comp_pool);
-+		mlx5_irq_pool_free_irqs(table->sf_ctrl_pool);
-+	}
-+	mlx5_irq_pool_free_irqs(table->pf_pool);
-+}
-+
- /* irq_table API */
- 
- int mlx5_irq_table_init(struct mlx5_core_dev *dev)
-@@ -670,6 +688,17 @@ void mlx5_irq_table_destroy(struct mlx5_core_dev *dev)
- 	pci_free_irq_vectors(dev->pdev);
- }
- 
-+void mlx5_irq_table_free_irqs(struct mlx5_core_dev *dev)
-+{
-+	struct mlx5_irq_table *table = dev->priv.irq_table;
-+
-+	if (mlx5_core_is_sf(dev))
-+		return;
-+
-+	mlx5_irq_pools_free_irqs(table);
-+	pci_free_irq_vectors(dev->pdev);
-+}
-+
- int mlx5_irq_table_get_sfs_vec(struct mlx5_irq_table *table)
- {
- 	if (table->sf_comp_pool)
--- 
-2.34.1
-
-
+>  
+>  	dsa_switch_for_each_available_port(dp, ds)
+>  		ocelot_deinit_port(ocelot, dp->index);
+> -- 
+> 2.34.1
+> 
+> 
 
