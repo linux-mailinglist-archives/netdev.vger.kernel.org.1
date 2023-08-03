@@ -1,72 +1,89 @@
-Return-Path: <netdev+bounces-23860-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23861-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35E0C76DE39
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 04:28:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6AD1E76DE3B
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 04:30:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 658591C2143B
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 02:28:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 24732281F39
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 02:30:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E9A86D1B;
-	Thu,  3 Aug 2023 02:28:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE8271861;
+	Thu,  3 Aug 2023 02:30:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EC8263C6
-	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 02:28:29 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E4F7C433C8;
-	Thu,  3 Aug 2023 02:28:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 680F08C09;
+	Thu,  3 Aug 2023 02:30:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id C0AEFC433C7;
+	Thu,  3 Aug 2023 02:30:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691029708;
-	bh=FXTbCOtpzqEtg7/Hp4beVHozA7mFfXL0qrmn1JFW1Os=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ey+F6cMJL70yF3u6tqN4pr1K0xl/7UpaLlcgrQ7U8HOnBaAbi9sHTr3rWGw4/XdX+
-	 P+KY8/IC3QBzhOyXCNSFmGotFdIvtLPFGt/N0hCvDCrKj2JZu4Zbt38sbHq8npQWQw
-	 W5mQkoy4fF61L3sX7GN5X7U235JJK+VMZGP/CrxncJa99Px+ks6pISMku6tGlc/P9F
-	 qmlv4iz6Kn1Hc09YAzS5n8FgWQPfac9A3GLgTptqIu3mKAQWpM2oPBmGGW1MbwVY0b
-	 xYcReu7Cy+e6SABmCq4WJbi2++jQRw2ADGGU9OX7eg0nuKn+L9zIpaTniZQzxbVvT0
-	 j2UudJE5qJ8iQ==
-Date: Wed, 2 Aug 2023 19:28:27 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
- netdev@vger.kernel.org, Karol Kolacinski <karol.kolacinski@intel.com>,
- Michal Michalik <michal.michalik@intel.com>, Jan Sokolowski
- <jan.sokolowski@intel.com>, Pucha Himasekhar Reddy
- <himasekharx.reddy.pucha@intel.com>
-Subject: Re: [PATCH net-next 5/7] ice: Add get C827 PHY index function
-Message-ID: <20230802192827.6fdf36ae@kernel.org>
-In-Reply-To: <20230801173112.3625977-6-anthony.l.nguyen@intel.com>
-References: <20230801173112.3625977-1-anthony.l.nguyen@intel.com>
-	<20230801173112.3625977-6-anthony.l.nguyen@intel.com>
+	s=k20201202; t=1691029821;
+	bh=aOYpkIHh/DPbsxHUKna75zI7rjpRLM5Mkvu+b1TwdCc=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=cf3SYePTjJjzCoHKr6jzywybKWLiWijzqWO7GEKNzaQbRKy3Citemkb0V/D3DEUzc
+	 JIWxXQxMaVLkAdJcmiIQgIp7lZX3X6gC+LPG1ZPumf62DB4l0yO1LkDbSSFZgUxamV
+	 qerPnacB/KZwef5wuFQr/Plij9BUyydZquQTmaDhoQUuQUUzpF9TEc1AL0Yjx2uSeN
+	 HPwf8cCtMmCFKIzdYWhAgznNN7vbskpk+5tB4Z9vCl/F4LmuLrAr60E8R+UHYfxc/N
+	 oVFnTQRYdNMKBJpb8Cw8HYqNBJIDm5EVhFMdZwxAZl8idm1n7NEGTaUOOZZUkj6saZ
+	 M6NpmDs7zWDtQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 9E318E270D1;
+	Thu,  3 Aug 2023 02:30:21 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] udp: Fix __ip_append_data()'s handling of
+ MSG_SPLICE_PAGES
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169102982164.22584.2159457611636116632.git-patchwork-notify@kernel.org>
+Date: Thu, 03 Aug 2023 02:30:21 +0000
+References: <1420063.1690904933@warthog.procyon.org.uk>
+In-Reply-To: <1420063.1690904933@warthog.procyon.org.uk>
+To: David Howells <dhowells@redhat.com>
+Cc: netdev@vger.kernel.org, willemdebruijn.kernel@gmail.com,
+ syzbot+f527b971b4bdc8e79f9e@syzkaller.appspotmail.com, bpf@vger.kernel.org,
+ brauner@kernel.org, davem@davemloft.net, dsahern@kernel.org,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, axboe@kernel.dk,
+ viro@zeniv.linux.org.uk, linux-fsdevel@vger.kernel.org,
+ syzkaller-bugs@googlegroups.com, linux-kernel@vger.kernel.org
 
-On Tue,  1 Aug 2023 10:31:10 -0700 Tony Nguyen wrote:
-> +bool ice_is_pf_c827(struct ice_hw *hw);
->  int ice_init_hw(struct ice_hw *hw);
->  void ice_deinit_hw(struct ice_hw *hw);
->  int ice_check_reset(struct ice_hw *hw);
-> @@ -94,6 +95,10 @@ ice_aq_get_phy_caps(struct ice_port_info *pi, bool qual_mods, u8 report_mode,
->  		    struct ice_aqc_get_phy_caps_data *caps,
->  		    struct ice_sq_cd *cd);
->  int
-> +ice_aq_get_netlist_node(struct ice_hw *hw, struct ice_aqc_get_link_topo *cmd,
-> +			u8 *node_part_number, u16 *node_handle);
+Hello:
 
-doesn't seem like this one needs to be declared in the header?
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-> +bool ice_is_pf_c827(struct ice_hw *hw);
+On Tue, 01 Aug 2023 16:48:53 +0100 you wrote:
+> __ip_append_data() can get into an infinite loop when asked to splice into
+> a partially-built UDP message that has more than the frag-limit data and up
+> to the MTU limit.  Something like:
+> 
+>         pipe(pfd);
+>         sfd = socket(AF_INET, SOCK_DGRAM, 0);
+>         connect(sfd, ...);
+>         send(sfd, buffer, 8161, MSG_CONFIRM|MSG_MORE);
+>         write(pfd[1], buffer, 8);
+>         splice(pfd[0], 0, sfd, 0, 0x4ffe0ul, 0);
+> 
+> [...]
 
-and this one is declared twice
+Here is the summary with links:
+  - [net] udp: Fix __ip_append_data()'s handling of MSG_SPLICE_PAGES
+    https://git.kernel.org/netdev/net/c/0f71c9caf267
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
