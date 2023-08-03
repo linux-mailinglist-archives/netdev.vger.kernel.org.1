@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-24012-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24013-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D96F76E748
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 13:47:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EAF876E76E
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 13:52:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9E8591C21481
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 11:47:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 206E1281EEF
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 11:52:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 249F51DDC5;
-	Thu,  3 Aug 2023 11:47:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C05F1DDEB;
+	Thu,  3 Aug 2023 11:52:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1524E1548D
-	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 11:47:42 +0000 (UTC)
-Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2AAEAE53;
-	Thu,  3 Aug 2023 04:47:41 -0700 (PDT)
-Received: by mail-ej1-x62d.google.com with SMTP id a640c23a62f3a-9923833737eso121973566b.3;
-        Thu, 03 Aug 2023 04:47:41 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F66518AE3
+	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 11:52:23 +0000 (UTC)
+Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B434FE6F;
+	Thu,  3 Aug 2023 04:52:18 -0700 (PDT)
+Received: by mail-lf1-x132.google.com with SMTP id 2adb3069b0e04-4fe2de785e7so1553861e87.1;
+        Thu, 03 Aug 2023 04:52:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1691063259; x=1691668059;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        d=gmail.com; s=20221208; t=1691063537; x=1691668337;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=uCIhJJ2hQzGyb6KTmj3+r2054kWgm3yg50ej7a2QDQc=;
-        b=csXKjk2uhcfAg18dyTPk/RSzhNTWvubZIkepX1Mj3atVktKxOrnvv2YG36KoACoDNC
-         cny9ht4allynSHcLQQ6ciTN8i8LPccQRSd11vfi8IHmkUB6to8/GFYqbVUp4B8Ak6kk6
-         twCtl4BfxAgLsPpRxML7vLOq0u7wGQzuMesOoc7Kx+VlkPtdnNMdWEewM9LKFaejDUVB
-         4qZbE64kk18Jcyh8H5Knp5wcFoOR8GkbVyVk2qu3wHkCP+ZE3A+CjAlP6einWWRpoDF+
-         k86qVzOyoRWv48h49pVjr+5EKlk4xNSxVuEAaYeNtq2jaV70WfIi8IZn2tQ9qZJH+M+H
-         cQ9w==
+        bh=BvfpzHNvraxrRTuqY8Qx7g7HYM0fDeaGxzfbp5eLMZY=;
+        b=KiVP/jJm3Mv4SHlqquH9+PvoWiGwU4w43ceFJW+SVvK1dooJfh1HtQVCCsJQst7wzj
+         191CRtHrTNxg7iyvORcNn2rvdqjIWavgBms97K9kq+ivY7hQBtW/gaNz7ofp6M4HmzDp
+         DN9yCDbGGKmz3sasKBFiPHuKJsi7q4UTfEvnu7OtDbPzlu0GNWeat1z15W8VMrK6IgeF
+         fukNf2GCSLYup8R12ZkJ91letJnvIZj0cOvIjwCJowcA9pf2qg0wwLpsUWhoRwraXB7b
+         nPBtBqfrJwIl9MtUIf+caGzToRM49uz3+yMd49z6r0Z2LaPUC08ZW+V351CEdLPjMVui
+         TSng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691063259; x=1691668059;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20221208; t=1691063537; x=1691668337;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=uCIhJJ2hQzGyb6KTmj3+r2054kWgm3yg50ej7a2QDQc=;
-        b=Sd4Dx+TeTG4/BmrWHjkCLk7FlsDUWcD5Y2suFzXQRnkLPEstp0TW7c6PTNOEmMqWIM
-         4VHMbjXsLclDy9ZIeocDL5PpcQIrNKq/YZ9ooBpUKqzGaij4pLibYKSBDrs2NAbGlEBj
-         +Gv53Pm46w1i3w6ZX6mnz9pyVt/Gog+4MUkBLRzUG0UlEWaif2TMnEYoOU3z2u3W2PRh
-         smyrt56OB6eSgBvsTvKPURAfeOX5q8zyHKMgmOEeCYPnua0JCMsC7SOScBQcHsqYlvT1
-         UZ9bGaiNBfOvaWTWDvgatllVc5CB2TxEyowGY9cIzIhY8Mpk0ohVBbsLKvxmSrMnoF3P
-         b5Sg==
-X-Gm-Message-State: ABy/qLZMtC/RyulAl0OtPWr4helf1d6cANlQIUeEYMrOIPvm81AAbkMa
-	PgoPblcy+LUIWBKMwvp1Ph1K6FS5G/Y=
-X-Google-Smtp-Source: APBJJlEuLtlzLF7ZRSWqZTPsnYH5PMw8werL0IhJsaRD6sunTyQymk/YX8Sx+fiBHSP3tF/19IR7Yw==
-X-Received: by 2002:a17:906:8a58:b0:991:d5ad:f1b1 with SMTP id gx24-20020a1709068a5800b00991d5adf1b1mr7306166ejc.47.1691063259192;
-        Thu, 03 Aug 2023 04:47:39 -0700 (PDT)
+        bh=BvfpzHNvraxrRTuqY8Qx7g7HYM0fDeaGxzfbp5eLMZY=;
+        b=K495OK/KaDCx9EXwCpc9fmDck8bojipxqCqN79q9VxOAiHZPF41Njkt5GhVQ2eH0xm
+         ap0EL+WOE+sTT5gqxqpMxZtOEOSL0gyaQx/QU1FMStC2xDtDjtVfd3oiUfcqhgJETAOl
+         HGTrRNziHDpDIqUGnvqRSyFyCEF7kQ2Ag7jbizihKDqdfDvnFA9LbxtfT8hRvCz9pFWk
+         hxGT2gqtwduZ62G8tpSWgIn2QidbhglqEFzkAFyCrAIRdFm3Ios+oy5H+GuFm0TA2WOt
+         tZJkvT6OnxEbOCmxSHFoERijUE4s1teVHOJSq9iamhUs8b9ghFaRmXIT5lBd6FSf+Ewe
+         IK8A==
+X-Gm-Message-State: ABy/qLbowS5LEJyHN32NKp291M2B+Voh2lPTL4vQbqiwl5QUFCPflZkS
+	NcKOpwo+3Vcup95KYR/Rjhg=
+X-Google-Smtp-Source: APBJJlFCc7jU7XPSLQb+MCmbbcT8NiK3hMDPzGpNm10epcXYfUELg5To/dMsKpdwiHJYRmJAXj+7bQ==
+X-Received: by 2002:ac2:4d97:0:b0:4fb:829b:197c with SMTP id g23-20020ac24d97000000b004fb829b197cmr6396758lfe.52.1691063536736;
+        Thu, 03 Aug 2023 04:52:16 -0700 (PDT)
 Received: from [192.168.0.103] ([77.126.7.132])
-        by smtp.gmail.com with ESMTPSA id sb9-20020a170906edc900b00992ae4cf3c1sm10325742ejb.186.2023.08.03.04.47.36
+        by smtp.gmail.com with ESMTPSA id lt5-20020a170906fa8500b0098f99048053sm10663624ejb.148.2023.08.03.04.52.14
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 03 Aug 2023 04:47:38 -0700 (PDT)
-Message-ID: <852cef0c-2c1a-fdcd-4ee9-4a0bca3f54c5@gmail.com>
-Date: Thu, 3 Aug 2023 14:47:35 +0300
+        Thu, 03 Aug 2023 04:52:16 -0700 (PDT)
+Message-ID: <006fc25b-497b-7de0-1d69-b7be66ab31b3@gmail.com>
+Date: Thu, 3 Aug 2023 14:52:13 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,6 +67,7 @@ MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
  Thunderbird/102.13.0
 Subject: Re: [PATCH net-next v10 08/16] tls: Inline do_tcp_sendpages()
+Content-Language: en-US
 To: Jakub Kicinski <kuba@kernel.org>
 Cc: David Howells <dhowells@redhat.com>, netdev@vger.kernel.org,
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
@@ -96,94 +97,34 @@ References: <ecbb5d7e-7238-28e2-1a17-686325e2bb50@gmail.com>
  <20230705091914.5bee12f8@kernel.org>
  <bbdce803-0f23-7d3f-f75a-2bc3cfb794af@gmail.com>
  <20230725173036.442ba8ba@kernel.org>
-Content-Language: en-US
+ <e9c41176-829a-af5a-65d2-78a2f414cd04@gmail.com>
+ <20230726130819.6cc6aa0c@kernel.org>
 From: Tariq Toukan <ttoukan.linux@gmail.com>
-In-Reply-To: <20230725173036.442ba8ba@kernel.org>
+In-Reply-To: <20230726130819.6cc6aa0c@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-	NORMAL_HTTP_TO_IP,NUMERIC_HTTP_ADDR,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,WEIRD_PORT autolearn=ham
-	autolearn_force=no version=3.4.6
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
 
 
-On 26/07/2023 3:30, Jakub Kicinski wrote:
-> On Sun, 23 Jul 2023 09:35:56 +0300 Tariq Toukan wrote:
->> Hi Jakub, David,
+On 26/07/2023 23:08, Jakub Kicinski wrote:
+> On Wed, 26 Jul 2023 22:20:42 +0300 Tariq Toukan wrote:
+>>> There is a small bug in this commit, we should always set SPLICE.
+>>> But I don't see how that'd cause the warning you're seeing.
+>>> Does your build have CONFIG_DEBUG_VM enabled?
 >>
->> We repro the issue on the server side using this client command:
->> $ wrk -b2.2.2.2 -t4 -c1000 -d5 --timeout 5s
->> https://2.2.2.3:20443/256000b.img
+>> No.
 >>
->> Port 20443 is configured with:
->>       ssl_ciphers ECDHE-RSA-AES128-GCM-SHA256;
->>       sendfile    off;
->>
->>
->> Important:
->> 1. Couldn't repro with files smaller than 40KB.
->> 2. Couldn't repro with "sendfile    on;"
->>
->> In addition, we collected the vmcore (forced by panic_on_warn), it can
->> be downloaded from here:
->> https://drive.google.com/file/d/1Fi2dzgq6k2hb2L_kwyntRjfLF6_RmbxB/view?usp=sharing
+>> # CONFIG_DEBUG_VM is not set
+>> # CONFIG_DEBUG_VM_PGTABLE is not set
 > 
-> This has no symbols :(
-> 
-> There is a small bug in this commit, we should always set SPLICE.
-> But I don't see how that'd cause the warning you're seeing.
-> Does your build have CONFIG_DEBUG_VM enabled?
-> 
-> -->8-------------------------
-> 
-> From: Jakub Kicinski <kuba@kernel.org>
-> Date: Tue, 25 Jul 2023 17:03:25 -0700
-> Subject: net: tls: set MSG_SPLICE_PAGES consistently
-> 
-> We used to change the flags for the last segment, because
-> non-last segments had the MSG_SENDPAGE_NOTLAST flag set.
-> That flag is no longer a thing so remove the setting.
-> 
-> Since flags most likely don't have MSG_SPLICE_PAGES set
-> this avoids passing parts of the sg as splice and parts
-> as non-splice.
-> 
-> ... tags ...
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
->   net/tls/tls_main.c | 3 ---
->   1 file changed, 3 deletions(-)
-> 
-> diff --git a/net/tls/tls_main.c b/net/tls/tls_main.c
-> index b6896126bb92..4a8ee2f6badb 100644
-> --- a/net/tls/tls_main.c
-> +++ b/net/tls/tls_main.c
-> @@ -139,9 +139,6 @@ int tls_push_sg(struct sock *sk,
->   
->   	ctx->splicing_pages = true;
->   	while (1) {
-> -		if (sg_is_last(sg))
-> -			msg.msg_flags = flags;
-> -
->   		/* is sending application-limited? */
->   		tcp_rate_check_app_limited(sk);
->   		p = sg_page(sg);
+> Try testing v6.3 with DEBUG_VM enabled or just remove the IS_ENABLED()
+> from: https://github.com/torvalds/linux/blob/v6.4/net/ipv4/tcp.c#L1051
 
-Hi Jakub,
-
-When applying this patch, repro disappears! :)
-Apparently it is related to the warning.
-Please go on and submit it.
-
-Tested-by: Tariq Toukan <tariqt@nvidia.com>
-
-We are going to run more comprehensive tests, I'll let you know if we 
-find anything unusual.
-
-Regards,
-Tariq
+Tested. It doesn't repro.
 
