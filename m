@@ -1,91 +1,165 @@
-Return-Path: <netdev+bounces-23823-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23824-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B67676DCCA
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 02:43:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E752376DCD2
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 02:44:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 060FB281E61
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 00:43:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A1E9D281EBA
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 00:44:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E8B3370;
-	Thu,  3 Aug 2023 00:43:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE20B370;
+	Thu,  3 Aug 2023 00:44:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D224C7F
-	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 00:43:02 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34502C433C7;
-	Thu,  3 Aug 2023 00:43:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691023382;
-	bh=sMyYGYV+daQEXu9U9KfwcmU+VhaGsKxq6qGTUSsc7zE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=LwZ1fEjUSF7n8qH0OoGZ45G5krqCTBLcBT/ZlJjYQ3FUQ8kOkXXqFRApZzPxnEKNw
-	 oSHphqh4MxgJ/g0LZYDhvTo1EPwjAhp4mxbThhMBU0kldTAuUfaw8UEASJrgKfOElz
-	 6aK+3SX6CxDu9AKt97NoLq/Brr1GnyPgW88jyrkPLQNd1DloZxFL+zREjqheUcL6v1
-	 odBrjHOLdu5jNqcMdlZ97KzHxiM8bYQ43DLho6dCs6buh8OgtOM0q5oQZ7yR0+jwlb
-	 BOfbk64j7YuyGWwD4uIR0Z7caVQdt93ng74Q8rRjNh5621MX76STDEb20XifLJnKi5
-	 cxDiGF1P78n5Q==
-Received: (nullmailer pid 1600519 invoked by uid 1000);
-	Thu, 03 Aug 2023 00:42:59 -0000
-Date: Wed, 2 Aug 2023 18:42:59 -0600
-From: Rob Herring <robh@kernel.org>
-To: Herve Codina <herve.codina@bootlin.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, Lee Jones <lee@kernel.org>, Linus Walleij <linus.walleij@linaro.org>, Qiang Zhao <qiang.zhao@nxp.com>, Li Yang <leoyang.li@nxp.com>, Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, Shengjiu Wang <shengjiu.wang@gmail.com>, Xiubo Li <Xiubo.Lee@gmail.com>, Fabio Estevam <festevam@gmail.com>, Nicolin Chen <nicoleotsuka@gmail.com>, Christophe Leroy <christophe.leroy@csgroup.eu>, Randy Dunlap <rdunlap@infradead.org>, netdev@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, linux-arm-kernel@lists.infradead.org, alsa-devel@alsa-project.org, Thomas Petazzoni 
- <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH v2 27/28] dt-bindings: net: fsl,qmc-hdlc: Add framer
- support
-Message-ID: <20230803004259.GA1598510-robh@kernel.org>
-References: <20230726150225.483464-1-herve.codina@bootlin.com>
- <20230726150225.483464-28-herve.codina@bootlin.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB1997F
+	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 00:44:01 +0000 (UTC)
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 095231FF0;
+	Wed,  2 Aug 2023 17:43:58 -0700 (PDT)
+Received: from canpemm500006.china.huawei.com (unknown [172.30.72.53])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4RGVSF4ZQfzrRhC;
+	Thu,  3 Aug 2023 08:42:53 +0800 (CST)
+Received: from [10.174.179.200] (10.174.179.200) by
+ canpemm500006.china.huawei.com (7.192.105.130) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Thu, 3 Aug 2023 08:43:56 +0800
+Subject: Re: [PATCH net v3] can: raw: fix receiver memory leak
+To: Eric Dumazet <edumazet@google.com>
+CC: Marc Kleine-Budde <mkl@pengutronix.de>, <socketcan@hartkopp.net>,
+	<davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<linux-can@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<penguin-kernel@i-love.sakura.ne.jp>
+References: <20230711011737.1969582-1-william.xuanziyang@huawei.com>
+ <20230717-clubhouse-swinger-8f0fa23b0628-mkl@pengutronix.de>
+ <CANn89iJ47sVXAEEryvODoGv-iUpT-ACTCSWQTmdtJ9Fqs0s40Q@mail.gmail.com>
+ <1e0e6539-412a-cc8d-b104-e2921a099e48@huawei.com>
+ <CANn89iKoTWHBGgMW-RyJHHeM0QuiN9De=eNWMM8VRom++n_o_g@mail.gmail.com>
+ <3566e594-a9e5-8ba4-0f5a-d50086cebd82@huawei.com>
+ <CANn89iJ8jFxGo0d_8KnM2f=Xbh=iqb=+zcGn+U6PypuqNdWBUQ@mail.gmail.com>
+From: "Ziyang Xuan (William)" <william.xuanziyang@huawei.com>
+Message-ID: <df3afb62-061e-a40f-b872-c9eb414455bb@huawei.com>
+Date: Thu, 3 Aug 2023 08:43:56 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230726150225.483464-28-herve.codina@bootlin.com>
+In-Reply-To: <CANn89iJ8jFxGo0d_8KnM2f=Xbh=iqb=+zcGn+U6PypuqNdWBUQ@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.179.200]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ canpemm500006.china.huawei.com (7.192.105.130)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Wed, Jul 26, 2023 at 05:02:23PM +0200, Herve Codina wrote:
-> A framer can be connected to the QMC HDLC.
-> If present, this framer is the interface between the TDM used by the QMC
-> HDLC and the E1/T1 line.
-> The QMC HDLC can use this framer to get information about the line and
-> configure the line.
+>>> On Wed, Jul 19, 2023 at 6:41 AM Ziyang Xuan (William)
+>>> <william.xuanziyang@huawei.com> wrote:
+>>>>
+>>>>> On Mon, Jul 17, 2023 at 9:27 AM Marc Kleine-Budde <mkl@pengutronix.de> wrote:
+>>>>>>
+>>>>>> On 11.07.2023 09:17:37, Ziyang Xuan wrote:
+>>>>>>> Got kmemleak errors with the following ltp can_filter testcase:
+>>>>>>>
+>>>>>>> for ((i=1; i<=100; i++))
+>>>>>>> do
+>>>>>>>         ./can_filter &
+>>>>>>>         sleep 0.1
+>>>>>>> done
+>>>>>>>
+>>>>>>> ==============================================================
+>>>>>>> [<00000000db4a4943>] can_rx_register+0x147/0x360 [can]
+>>>>>>> [<00000000a289549d>] raw_setsockopt+0x5ef/0x853 [can_raw]
+>>>>>>> [<000000006d3d9ebd>] __sys_setsockopt+0x173/0x2c0
+>>>>>>> [<00000000407dbfec>] __x64_sys_setsockopt+0x61/0x70
+>>>>>>> [<00000000fd468496>] do_syscall_64+0x33/0x40
+>>>>>>> [<00000000b7e47d51>] entry_SYSCALL_64_after_hwframe+0x61/0xc6
+>>>>>>>
+>>>>>>> It's a bug in the concurrent scenario of unregister_netdevice_many()
+>>>>>>> and raw_release() as following:
+>>>>>>>
+>>>>>>>              cpu0                                        cpu1
+>>>>>>> unregister_netdevice_many(can_dev)
+>>>>>>>   unlist_netdevice(can_dev) // dev_get_by_index() return NULL after this
+>>>>>>>   net_set_todo(can_dev)
+>>>>>>>                                               raw_release(can_socket)
+>>>>>>>                                                 dev = dev_get_by_index(, ro->ifindex); // dev == NULL
+>>>>>>>                                                 if (dev) { // receivers in dev_rcv_lists not free because dev is NULL
+>>>>>>>                                                   raw_disable_allfilters(, dev, );
+>>>>>>>                                                   dev_put(dev);
+>>>>>>>                                                 }
+>>>>>>>                                                 ...
+>>>>>>>                                                 ro->bound = 0;
+>>>>>>>                                                 ...
+>>>>>>>
+>>>>>>> call_netdevice_notifiers(NETDEV_UNREGISTER, )
+>>>>>>>   raw_notify(, NETDEV_UNREGISTER, )
+>>>>>>>     if (ro->bound) // invalid because ro->bound has been set 0
+>>>>>>>       raw_disable_allfilters(, dev, ); // receivers in dev_rcv_lists will never be freed
+>>>>>>>
+>>>>>>> Add a net_device pointer member in struct raw_sock to record bound can_dev,
+>>>>>>> and use rtnl_lock to serialize raw_socket members between raw_bind(), raw_release(),
+>>>>>>> raw_setsockopt() and raw_notify(). Use ro->dev to decide whether to free receivers in
+>>>>>>> dev_rcv_lists.
+>>>>>>>
+>>>>>>> Fixes: 8d0caedb7596 ("can: bcm/raw/isotp: use per module netdevice notifier")
+>>>>>>> Signed-off-by: Ziyang Xuan <william.xuanziyang@huawei.com>
+>>>>>>> Reviewed-by: Oliver Hartkopp <socketcan@hartkopp.net>
+>>>>>>> Acked-by: Oliver Hartkopp <socketcan@hartkopp.net>
+>>>>>>
+>>>>>> Added to linux-can/testing.
+>>>>>>
+>>>>>
+>>>>> This patch causes three syzbot LOCKDEP reports so far.
+>>>>
+>>>> Hello Eric,
+>>>>
+>>>> Is there reproducer? I want to understand the specific root cause.
+>>>>
+>>>
+>>> No repro yet, but simply look at other functions in net/can/raw.c
+>>>
+>>> You must always take locks in the same order.
+>>>
+>>> raw_bind(), raw_setsockopt() use:
+>>>
+>>> rtnl_lock();
+>>> lock_sock(sk);
+>>>
+>>> Therefore, raw_release() must _also_ use the same order, or risk deadlock.
+>>>
+>>> Please build a LOCKDEP enabled kernel, and run your tests ?
+>>
+>> I know now. This needs raw_bind() and raw_setsockopt() concurrent with raw_release().
+>> And there is not the scenario in my current testcase. I did not get it. I will try to
+>> reproduce it and add the testcase.
+>>
+>> Thank you for your patient explanation.
 > 
-> Add an optional framer property to reference the framer itself.
+> Another syzbot report is firing because of your patch
 > 
-> Signed-off-by: Herve Codina <herve.codina@bootlin.com>
-> ---
->  Documentation/devicetree/bindings/net/fsl,qmc-hdlc.yaml | 5 +++++
->  1 file changed, 5 insertions(+)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/fsl,qmc-hdlc.yaml b/Documentation/devicetree/bindings/net/fsl,qmc-hdlc.yaml
-> index 8bb6f34602d9..bf29863ab419 100644
-> --- a/Documentation/devicetree/bindings/net/fsl,qmc-hdlc.yaml
-> +++ b/Documentation/devicetree/bindings/net/fsl,qmc-hdlc.yaml
-> @@ -27,6 +27,11 @@ properties:
->        Should be a phandle/number pair. The phandle to QMC node and the QMC
->        channel to use.
->  
-> +  framer:
-> +    $ref: /schemas/types.yaml#/definitions/phandle
+> Apparently we store in ro->dev a pointer to a netdev without holding a
+> refcount on it.
+> .
+Hello Eric,
 
-Now you've defined this property twice. Please avoid doing that.
+Is there a syzbot link or reproducer can be provided?
 
-> +    description:
-> +      phandle to the framer node
-> +
->  required:
->    - compatible
->    - fsl,qmc-chan
-> -- 
-> 2.41.0
+Thank you!
+William Xuan
 > 
 
