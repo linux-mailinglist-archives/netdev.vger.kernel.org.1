@@ -1,120 +1,264 @@
-Return-Path: <netdev+bounces-23927-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23928-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6DA976E292
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 10:12:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB63D76E293
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 10:12:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 015B81C2151E
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 08:12:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CDC251C2032E
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 08:12:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB6D114A83;
-	Thu,  3 Aug 2023 08:10:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8000E1427C;
+	Thu,  3 Aug 2023 08:11:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B05732592
-	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 08:10:12 +0000 (UTC)
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 858A744A7
-	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 01:10:11 -0700 (PDT)
-Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
-	by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1qRTPK-0001FS-6M; Thu, 03 Aug 2023 10:10:06 +0200
-Received: from pengutronix.de (unknown [172.20.34.65])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 449F92022B4;
-	Thu,  3 Aug 2023 08:10:05 +0000 (UTC)
-Date: Thu, 3 Aug 2023 10:10:04 +0200
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Frank Jungclaus <frank.jungclaus@esd.eu>
-Cc: linux-can@vger.kernel.org, Wolfgang Grandegger <wg@grandegger.com>,
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
-	Stefan =?utf-8?B?TcOkdGpl?= <stefan.maetje@esd.eu>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 0/1] can: esd_usb: Add support for esd CAN-USB/3
-Message-ID: <20230803-champion-shrewdly-2eb7dfa82f84-mkl@pengutronix.de>
-References: <20230728150857.2374886-1-frank.jungclaus@esd.eu>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71A462592
+	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 08:11:48 +0000 (UTC)
+Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::229])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9AE2530FF;
+	Thu,  3 Aug 2023 01:11:45 -0700 (PDT)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 190CDFF808;
+	Thu,  3 Aug 2023 08:11:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1691050304;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=tpuTuRUPiNyH3n2jjGpwrnx1fmI9b2Ko2zyAHNgRosY=;
+	b=MBkGmMrkIRzCcm9qcngyjAaowvqDCU3fgHUsOk25u2vBbYmlDH+Hj2GrGAWIbTha00anRa
+	gu1s9i+xkIfhLxiohPHve2V1bBnrCFEQVmD8V97HwNhUmn/HcO80PjdKXdcYONjVjmTWKQ
+	HROgiT4nP7clJyC5O1RTrccH6n2NMzG/cPXmJfIRUBQ0Kcvi+WtxdE7whdaphg45Zysur7
+	GMAQ9yMloM7i6sflXwFqDhG7q4HD4c7tVbFfisp0P1ro0KFhjPLwyn/lYPonWAUaVX/TgD
+	clvRno6hkGHP98PBQnSEZarnxmGQcy+Pq49wDtkmQLabUhVRZo9qe9muvxZdlQ==
+Date: Thu, 3 Aug 2023 10:11:34 +0200
+From: Herve Codina <herve.codina@bootlin.com>
+To: Rob Herring <robh@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>, Krzysztof Kozlowski
+ <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
+ Lee Jones <lee@kernel.org>, Linus Walleij <linus.walleij@linaro.org>, Qiang
+ Zhao <qiang.zhao@nxp.com>, Li Yang <leoyang.li@nxp.com>, Liam Girdwood
+ <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, Jaroslav Kysela
+ <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, Shengjiu Wang
+ <shengjiu.wang@gmail.com>, Xiubo Li <Xiubo.Lee@gmail.com>, Fabio Estevam
+ <festevam@gmail.com>, Nicolin Chen <nicoleotsuka@gmail.com>, Christophe
+ Leroy <christophe.leroy@csgroup.eu>, Randy Dunlap <rdunlap@infradead.org>,
+ netdev@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-gpio@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ alsa-devel@alsa-project.org, Thomas Petazzoni 
+ <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH v2 21/28] dt-bindings: net: Add the Lantiq PEF2256
+ E1/T1/J1 framer
+Message-ID: <20230803101134.6920805c@bootlin.com>
+In-Reply-To: <20230803004054.GA1593620-robh@kernel.org>
+References: <20230726150225.483464-1-herve.codina@bootlin.com>
+	<20230726150225.483464-22-herve.codina@bootlin.com>
+	<20230803004054.GA1593620-robh@kernel.org>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="mnl7qleuvjby3bph"
-Content-Disposition: inline
-In-Reply-To: <20230728150857.2374886-1-frank.jungclaus@esd.eu>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:b01:1d::7b
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: herve.codina@bootlin.com
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+Hi Rob,
 
---mnl7qleuvjby3bph
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Wed, 2 Aug 2023 18:40:54 -0600
+Rob Herring <robh@kernel.org> wrote:
 
-On 28.07.2023 17:08:56, Frank Jungclaus wrote:
-> After having applied a vast number of improvements to the existing
-> CAN-USB/2 driver here now is a new attempt to add support for the esd
-> CAN-USB/3 CAN FD interface.
->=20
-> Beside this patch there are the following to-do's left for follow-up
-> patches:
->=20
-> * In principle, the esd CAN-USB/3 supports Transmitter Delay
-> Compensation (TDC), but currently only the automatic TDC mode is
-> supported by this driver. An implementation for manual TDC
-> configuration will follow.
->=20
-> * Rework the code to no longer switch directly on the USB product IDs
-> to handle different device setting for each supported USB
-> device. Instead use the driver_info member within struct usb_device_id
-> to hold / point to specific properties for each supported device.
->=20
-> * Try to switch from synchronous send usb_bulk_msg() to asynchronous
-> communication by means of usb_submit_urb() where it is feasible.
+> On Wed, Jul 26, 2023 at 05:02:17PM +0200, Herve Codina wrote:
+> > The Lantiq PEF2256 is a framer and line interface component designed to
+> > fulfill all required interfacing between an analog E1/T1/J1 line and the
+> > digital PCM system highway/H.100 bus.
+> > 
+> > Signed-off-by: Herve Codina <herve.codina@bootlin.com>
+> > ---
+> >  .../bindings/net/lantiq,pef2256.yaml          | 226 ++++++++++++++++++
+> >  1 file changed, 226 insertions(+)
+> >  create mode 100644 Documentation/devicetree/bindings/net/lantiq,pef2256.yaml
+> > 
+> > diff --git a/Documentation/devicetree/bindings/net/lantiq,pef2256.yaml b/Documentation/devicetree/bindings/net/lantiq,pef2256.yaml
+> > new file mode 100644
+> > index 000000000000..b369a20d61b1
+> > --- /dev/null
+> > +++ b/Documentation/devicetree/bindings/net/lantiq,pef2256.yaml
+> > @@ -0,0 +1,226 @@
+> > +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> > +%YAML 1.2
+> > +---
+> > +$id: http://devicetree.org/schemas/net/lantiq,pef2256.yaml#
+> > +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> > +
+> > +title: Lantiq PEF2256
+> > +
+> > +maintainers:
+> > +  - Herve Codina <herve.codina@bootlin.com>
+> > +
+> > +description:
+> > +  The Lantiq PEF2256, also known as Infineon PEF2256 or FALC56, is a framer and
+> > +  line interface component designed to fulfill all required interfacing between
+> > +  an analog E1/T1/J1 line and the digital PCM system highway/H.100 bus.
+> > +
+> > +properties:
+> > +  compatible:
+> > +    items:
+> > +      - const: lantiq,pef2256
+> > +
+> > +  reg:
+> > +    maxItems: 1
+> > +
+> > +  clocks:
+> > +    items:
+> > +      - description: Master clock
+> > +      - description: Receive System Clock
+> > +      - description: Transmit System Clock
+> > +
+> > +  clock-names:
+> > +    items:
+> > +      - const: mclk
+> > +      - const: sclkr
+> > +      - const: sclkx
+> > +
+> > +  interrupts:
+> > +    maxItems: 1
+> > +
+> > +  reset-gpios:
+> > +    description:
+> > +      GPIO used to reset the device.
+> > +    maxItems: 1
+> > +
+> > +  '#framer-cells':  
+> 
+> Looks generic, but no such property is defined. You don't need something 
+> like this unless there are multiple providers and you need each 
+> provider to define the number of cells.
 
-Added to linux-can-next/testing.
+With the framer infrastructure introduced in this series, multiple providers
+can be present. Some framer chips are dual or quad framers.
 
-Thanks,
-Marc
+With this pef2256 framer provider, consumers use "framer = <&pef2256>;"
+but with some others framer provider, we can have "framer = <&foo 1>;"
 
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+That's the reason why I set '#framer-cells' in this first framer provider,
+even if the value is 0.
 
---mnl7qleuvjby3bph
-Content-Type: application/pgp-signature; name="signature.asc"
+> 
+> > +    const: 0
+> > +
+> > +  pinctrl:
+> > +    $ref: /schemas/pinctrl/pinctrl.yaml#
+> > +    additionalProperties: false
+> > +
+> > +    patternProperties:
+> > +      '-pins$':
+> > +        type: object
+> > +        $ref: /schemas/pinctrl/pincfg-node.yaml#
+> > +        additionalProperties: false
+> > +
+> > +        properties:
+> > +          pins:
+> > +            enum: [ RPA, RPB, RPC, RPD, XPA, XPB, XPC, XPD ]
+> > +
+> > +          function:
+> > +            enum: [ SYPR, RFM, RFMB, RSIGM, RSIG, DLR, FREEZE, RFSP, LOS,
+> > +                    SYPX, XFMS, XSIG, TCLK, XMFB, XSIGM, DLX, XCLK, XLT,
+> > +                    GPI, GPOH, GPOL ]
+> > +
+> > +        required:
+> > +          - pins
+> > +          - function
+> > +
+> > +  lantiq,data-rate-bps:
+> > +    $ref: /schemas/types.yaml#/definitions/uint32
+> > +    enum: [2048000, 4096000, 8192000, 16384000]
+> > +    default: 2048000
+> > +    description:
+> > +      Data rate (bit per seconds) on the system highway.
+> > +
+> > +  lantiq,clock-falling-edge:
+> > +    $ref: /schemas/types.yaml#/definitions/flag
+> > +    description:
+> > +      Data is sent on falling edge of the clock (and received on the rising
+> > +      edge). If 'clock-falling-edge' is not present, data is sent on the
+> > +      rising edge (and received on the falling edge).
+> > +
+> > +  lantiq,channel-phase:
+> > +    $ref: /schemas/types.yaml#/definitions/uint32
+> > +    enum: [0, 1, 2, 3, 4, 5, 6, 7]
+> > +    default: 0
+> > +    description:
+> > +      The pef2256 delivers a full frame (32 8bit time-slots in E1 and 24 8bit
+> > +      time-slots 8 8bit signaling in E1/J1) every 125us. This lead to a data
+> > +      rate of 2048000 bit/s. When lantiq,data-rate-bps is more than 2048000
+> > +      bit/s, the data (all 32 8bit) present in the frame are interleave with
+> > +      unused time-slots. The lantiq,channel-phase property allows to set the
+> > +      correct alignment of the interleave mechanism.
+> > +      For instance, suppose lantiq,data-rate-bps = 8192000 (ie 4*2048000), and
+> > +      lantiq,channel-phase = 2, the interleave schema with unused time-slots
+> > +      (nu) and used time-slots (XX) for TSi is
+> > +        nu nu XX nu nu nu XX nu nu nu XX nu
+> > +        <-- TSi --> <- TSi+1 -> <- TSi+2 ->
+> > +      With lantiq,data-rate-bps = 8192000, and lantiq,channel-phase = 1, the
+> > +      interleave schema is
+> > +        nu XX nu nu nu XX nu nu nu XX nu nu
+> > +        <-- TSi --> <- TSi+1 -> <- TSi+2 ->
+> > +      With lantiq,data-rate-bps = 4096000 (ie 2*2048000), and
+> > +      lantiq,channel-phase = 1, the interleave schema is
+> > +        nu    XX    nu    XX    nu    XX
+> > +        <-- TSi --> <- TSi+1 -> <- TSi+2 ->
+> > +
+> > +patternProperties:
+> > +  '^codec(-([0-9]|[1-2][0-9]|3[0-1]))?$':
+> > +    type: object
+> > +    $ref: /schemas/sound/dai-common.yaml
+> > +    unevaluatedProperties: false
+> > +    description:
+> > +      Codec provided by the pef2256. This codec allows to use some of the PCM
+> > +      system highway time-slots as audio channels to transport audio data over
+> > +      the E1/T1/J1 lines.
+> > +      The time-slots used by the codec must be set and so, the properties
+> > +      'dai-tdm-slot-num', 'dai-tdm-slot-width', 'dai-tdm-slot-tx-mask' and
+> > +      'dai-tdm-slot-rx-mask' must be present in the sound card node for
+> > +      sub-nodes that involve the codec. The codec uses 8bit time-slots.
+> > +      'dai-tdm-tdm-slot-with' must be set to 8.
+> > +      The tx and rx masks define the pef2256 time-slots assigned to the codec.
+> > +
+> > +    properties:
+> > +      compatible:
+> > +        const: lantiq,pef2256-codec
+> > +
+> > +      '#sound-dai-cells':
+> > +        const: 0
+> > +
+> > +      framer:
+> > +        $ref: /schemas/types.yaml#/definitions/phandle
+> > +        description:
+> > +          phandle to the framer node  
+> 
+> That's just the parent. Why do you need this?
 
------BEGIN PGP SIGNATURE-----
+It is a mistake.
+You're right, as it simply refers the parent it is not needed.
+This 'framer' phandle will be removed in the next iteration.
 
-iQEzBAABCgAdFiEEDs2BvajyNKlf9TJQvlAcSiqKBOgFAmTLYNkACgkQvlAcSiqK
-BOh2sggAnAGz1M4KfiRrh9tkmgT2qgWFsGhBI7h/PW4bjdefDIfGw6VJPttbmZ/0
-pHOsTJFtd835y6W3jJ+IMgegM0aNzDN06bGv/dUCYRk6EFZi/vJ2LhqrMYTll0KQ
-VpaHl2LC2T0BFsHA/811MsPPGMpcJbmNlga87RTAuy0xeYb+piKfhp75a71X7fWC
-nUCT5OBXA/M6g6ZsO1EfBGFLST75ESTfGPHPQXwun0ZVG/qCerjunHRulMujSAwf
-iGXQZUscjKkptQ/dOCUx3kpV1aOib0I3AGX7/Bvebq+0ZNOikNmhy/A80dOu5+XP
-ZNXpQeoWVZessXBd6Ny61dxCDpECtw==
-=hic3
------END PGP SIGNATURE-----
-
---mnl7qleuvjby3bph--
+Regards,
+Hervé
 
