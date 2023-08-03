@@ -1,91 +1,71 @@
-Return-Path: <netdev+bounces-24124-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24126-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C58DD76EDD0
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 17:17:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8E8D76EE0B
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 17:27:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 035321C215A5
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 15:17:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6C1862821AA
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 15:27:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BADC322EEB;
-	Thu,  3 Aug 2023 15:17:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FB13200CC;
+	Thu,  3 Aug 2023 15:27:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4F6318B0D
-	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 15:17:05 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A334BC433C8;
-	Thu,  3 Aug 2023 15:17:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691075825;
-	bh=LNlFY8r0rZ0GR1yOKg9X0+pzM4ebRtAw7S93DLMNDwc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Fd+kbFpuW4Nw3RZmyDiTaptdo5jcre+w5/5LkJpXMrj8+2+9EWTgtsXCVTeesQfBA
-	 lbvEaWr4jwNb54qE4I642udRoZf33ic0WxMHqbtENr969acnlOKblUSAIWWbqMKQ5R
-	 RQusVCsXUtC5dia1TgEwo9GxFh89HWvDOA79sllcQLWwKBg75iAQlAE2x+72L5cNUc
-	 28x+lxRj048TqTtOWvCUIKY/Md57whq1B54XxhQTTa8b4xQKt1uIAh/5Gbz2WfVS1m
-	 rzXuL2nWOch03zQejFWi2kdHZkgtXyC2UYPenzsBqr0zo6yINasUyNQx0t3XiO2XmS
-	 0eG+tDCpR2uYQ==
-Date: Thu, 3 Aug 2023 17:16:59 +0200
-From: Simon Horman <horms@kernel.org>
-To: MD Danish Anwar <danishanwar@ti.com>
-Cc: Randy Dunlap <rdunlap@infradead.org>, Roger Quadros <rogerq@kernel.org>,
-	Vignesh Raghavendra <vigneshr@ti.com>, Andrew Lunn <andrew@lunn.ch>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Rob Herring <robh+dt@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1160B6FA2
+	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 15:27:08 +0000 (UTC)
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [IPv6:2a0a:51c0:0:237:300::1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED443180
+	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 08:27:03 -0700 (PDT)
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+	(envelope-from <fw@breakpoint.cc>)
+	id 1qRaEA-00066O-B4; Thu, 03 Aug 2023 17:27:02 +0200
+From: Florian Westphal <fw@strlen.de>
+To: <netdev@vger.kernel.org>
+Cc: sbrivio@redhat.com,
+	"David S. Miller" <davem@davemloft.net>,
+	dsahern@kernel.org,
 	Eric Dumazet <edumazet@google.com>,
-	"David S. Miller" <davem@davemloft.net>, nm@ti.com, srk@ti.com,
-	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
-	netdev@vger.kernel.org, linux-omap@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH 2/4] net: ti: icss-iep: Add IEP driver
-Message-ID: <ZMvE63ooNyoRZK/y@kernel.org>
-References: <20230803110153.3309577-1-danishanwar@ti.com>
- <20230803110153.3309577-3-danishanwar@ti.com>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	shuah@kernel.org,
+	Florian Westphal <fw@strlen.de>
+Subject: [PATCH net 0/2] tunnels: fix ipv4 pmtu icmp checksum
+Date: Thu,  3 Aug 2023 17:26:48 +0200
+Message-ID: <20230803152653.29535-1-fw@strlen.de>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230803110153.3309577-3-danishanwar@ti.com>
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_MED,SPF_HELO_PASS,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Thu, Aug 03, 2023 at 04:31:51PM +0530, MD Danish Anwar wrote:
-> From: Roger Quadros <rogerq@ti.com>
-> 
-> Add a driver for Industrial Ethernet Peripheral (IEP) block of PRUSS to
-> support timestamping of ethernet packets and thus support PTP and PPS
-> for PRU ethernet ports.
-> 
-> Signed-off-by: Roger Quadros <rogerq@ti.com>
-> Signed-off-by: Lokesh Vutla <lokeshvutla@ti.com>
-> Signed-off-by: Murali Karicheri <m-karicheri2@ti.com>
-> Signed-off-by: Vignesh Raghavendra <vigneshr@ti.com>
-> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
+The checksum of the generated ipv4 icmp pmtud message is
+only correct if the skb that causes the icmp error generation
+is linear.
 
-...
+Fix this and add a selftest for this.
 
-> +static int icss_iep_pps_enable(struct icss_iep *iep, int on)
-> +{
-> +	int ret = 0;
-> +	struct timespec64 ts;
-> +	struct ptp_clock_request rq;
-> +	unsigned long flags;
-> +	u64 ns;
+Florian Westphal (2):
+  tunnels: fix kasan splat when generating ipv4 pmtu error
+  selftests: net: test vxlan pmtu exceptions with tcp
 
-For networking code, please arrange local variables in reverse xmas tree
-order - longest line to shortest.
+ net/ipv4/ip_tunnel_core.c           |  2 +-
+ tools/testing/selftests/net/pmtu.sh | 35 +++++++++++++++++++++++++++++
+ 2 files changed, 36 insertions(+), 1 deletion(-)
 
-https://github.com/ecree-solarflare/xmastree is your friend here.
+-- 
+2.41.0
 
-...
 
