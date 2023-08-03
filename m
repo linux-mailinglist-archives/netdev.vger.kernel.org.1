@@ -1,39 +1,49 @@
-Return-Path: <netdev+bounces-24173-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24175-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF7BA76F186
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 20:11:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2335F76F192
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 20:14:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9AF322822E5
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 18:11:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 52B291C21224
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 18:14:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27F4825915;
-	Thu,  3 Aug 2023 18:10:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CFBB25901;
+	Thu,  3 Aug 2023 18:14:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A90322517B
-	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 18:10:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 41177C433C8;
-	Thu,  3 Aug 2023 18:10:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691086228;
-	bh=JQ7oC/6/r2+aJtlBU9MJELICSmE7bgUSZdhahmPBdqI=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=RV43oF2lW/2NJ3cQXHiQ1qTcOej2LxtDs+5gS7bHrgmBf3pBR+AGHCQsXClrNn9lN
-	 AEQ/zjx6c0OVxm8BuV33JTse8buxWoOnTcuXHSWmPTkFbOyt9swMo4PsRYEXzB1cFL
-	 vSc8a0EM/Rd4QDWU991+cI6Sq6HFX7MD2eXsQ/AX8VLIuZ03BYkPQmOSuliCQ1qQJ0
-	 GSGBT5nwVQwtxWZLidobi2ZQKKVqXJFFwnyp7O1vMS0uRKjvZ3AiSXREOgA9zAk5vw
-	 FfaBR4+4njA+G2GaWsqcgQA5yKK7sq8jkqEdP+OXVgCHQ5gyiKVNt0CNJ781uCFuTu
-	 Az57vMrAxmrHg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 0F87EC43168;
-	Thu,  3 Aug 2023 18:10:28 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 028E824161
+	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 18:14:52 +0000 (UTC)
+Received: from out-122.mta1.migadu.com (out-122.mta1.migadu.com [IPv6:2001:41d0:203:375::7a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2C4B110
+	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 11:14:50 -0700 (PDT)
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1691086489;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=ltTUhuKm9ofoFkjvCQJ7syFdAhDqM+nZ1aeHnQ0WYL4=;
+	b=Y2FTabbECaxji0yG29+toYqGUaDBv4Np6aig1uS2JzEf8HE57BZb6HUGXRW2OmBubn2Psd
+	bBpkBKpcEZBSyCKB+dij4r+g1ze4NyukXYvcPnHpSplOLwUkKIZFCTNISQORhqVGwAnfv3
+	tt1S/ksG9QAPx2H+wx3q+wDiDU/4LXo=
+From: Martin KaFai Lau <martin.lau@linux.dev>
+To: davem@davemloft.net
+Cc: kuba@kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	daniel@iogearbox.net,
+	andrii@kernel.org,
+	ast@kernel.org,
+	netdev@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: pull-request: bpf 2023-08-03
+Date: Thu,  3 Aug 2023 11:14:29 -0700
+Message-Id: <20230803181429.994607-1-martin.lau@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -41,39 +51,71 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: pull-request: wireless-2023-08-03
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169108622806.23543.11800053914524862324.git-patchwork-notify@kernel.org>
-Date: Thu, 03 Aug 2023 18:10:28 +0000
-References: <20230803140058.57476C433C9@smtp.kernel.org>
-In-Reply-To: <20230803140058.57476C433C9@smtp.kernel.org>
-To: Kalle Valo <kvalo@kernel.org>
-Cc: netdev@vger.kernel.org, linux-wireless@vger.kernel.org
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
+Hi David, hi Jakub, hi Paolo, hi Eric,
 
-This pull request was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+The following pull-request contains BPF updates for your *net* tree.
 
-On Thu,  3 Aug 2023 14:00:58 +0000 (UTC) you wrote:
-> Hi,
-> 
-> here's a pull request to net tree, more info below. Please let me know if there
-> are any problems.
-> 
-> Kalle
-> 
-> [...]
+We've added 5 non-merge commits during the last 7 day(s) which contain
+a total of 3 files changed, 37 insertions(+), 20 deletions(-).
 
-Here is the summary with links:
-  - pull-request: wireless-2023-08-03
-    https://git.kernel.org/netdev/net/c/0d48a84b31f5
+The main changes are:
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+1) Disable preemption in perf_event_output helpers code from Jiri Olsa
 
+2) Add length check for SK_DIAG_BPF_STORAGE_REQ_MAP_FD parsing from Lin Ma
 
+3) Multiple warning splat fixes in cpumap from Hou Tao
+
+Thanks a lot!
+
+Also thanks to reporters, reviewers and testers of commits in this pull-request:
+
+Hou Tao, Jakub Kicinski, Jesper Dangaard Brouer, Oleg Popov, Pu Lehui
+
+----------------------------------------------------------------
+
+The following changes since commit 284779dbf4e98753458708783af8c35630674a21:
+
+  net: stmmac: Apply redundant write work around on 4.xx too (2023-07-25 11:03:55 +0200)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git tags/for-netdev
+
+for you to fetch changes up to 4c9fbff54297471d4e2bbfe9c27e80067c722eae:
+
+  Merge branch 'Two fixes for cpu-map' (2023-07-31 15:45:38 -0700)
+
+----------------------------------------------------------------
+pull-request: bpf 2023-08-03
+
+----------------------------------------------------------------
+Alexei Starovoitov (1):
+      Merge branch 'bpf-disable-preemption-in-perf_event_output-helpers-code'
+
+Hou Tao (2):
+      bpf, cpumap: Make sure kthread is running before map update returns
+      bpf, cpumap: Handle skb as well when clean up ptr_ring
+
+Jiri Olsa (2):
+      bpf: Disable preemption in bpf_perf_event_output
+      bpf: Disable preemption in bpf_event_output
+
+Lin Ma (1):
+      bpf: Add length check for SK_DIAG_BPF_STORAGE_REQ_MAP_FD parsing
+
+Martin KaFai Lau (1):
+      Merge branch 'Two fixes for cpu-map'
+
+ kernel/bpf/cpumap.c       | 35 +++++++++++++++++++++--------------
+ kernel/trace/bpf_trace.c  | 17 ++++++++++++-----
+ net/core/bpf_sk_storage.c |  5 ++++-
+ 3 files changed, 37 insertions(+), 20 deletions(-)
 
