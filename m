@@ -1,326 +1,305 @@
-Return-Path: <netdev+bounces-23906-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23907-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CCE7176E185
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 09:33:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9239F76E1A6
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 09:36:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CA7AE1C214A9
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 07:33:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3C26928203F
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 07:36:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 915D613AEB;
-	Thu,  3 Aug 2023 07:31:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DA58125A5;
+	Thu,  3 Aug 2023 07:36:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7710413AE7;
-	Thu,  3 Aug 2023 07:31:58 +0000 (UTC)
-Received: from EUR01-HE1-obe.outbound.protection.outlook.com (mail-he1eur01on2057.outbound.protection.outlook.com [40.107.13.57])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A181D46B5;
-	Thu,  3 Aug 2023 00:31:54 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=TcfNmCKG00gaZ009jvHNpqgk9gmRdZLucdjbUaw0GFEgMUT2wSMGPnQYVL1gqGSDeFtRE3zs0r3ldOcS9tI6bBA5F23L6OHxxwMFW3qSw6rlXpL4z0fnr9txF4MykZdnvCw+Ah2qIl5lUufNmThp5yZI5P69Oz0S+hus7+unJ7kK+ZuRe71bPZaVZV5S4p6Awlb/QpRKvcMCCQOPf75nobB/Io/G18YB0BqDa9tKj3/TBCAfgTS9RmhjlzWUFSGqS/hk8sn6UMxoSdHRN72IAGzs+syqJL8Ia3qwaQydi1HA6YwUZ6VdEGdVdauq5ACEwb6uMU4hhETkbjpuXvBw7w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=IxXqoum9NhQcoERuGhzIEPoRQjesqfpaFmgm/mh4i4c=;
- b=Zq2SZ6ZwMvgOdsH506kgZtm9sx9xT8nZOS7Z6ACyO1StWGOHzAfwDt1NFvIRolsTzHvXjt9WwjJeSK6L+gcGAcsYmwA2wsKqdTBV9ssDF0t8KxWzUumMHMvkcifsbxmfUIwcrocfkt+JmkpnimWJogBJ2w9nBQ5hRlqV0B7F+vYoh3aIRFnJNaDkZcODIZVMdT40l3tLcrA4aDTl54wOlXspZAJQ/zNLJU4vEBsx62OuT+HEWqNc1FSpHP7JCR5hWJRQHyzFgud3OKKvqSH8klxIlC69kvfKquvOc6A/R3c7qtw/mEhWGrdtTemR8CUzwnAVhAVAr8GKZPHzaaiBaw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=suse.com; dmarc=pass action=none header.from=suse.com;
- dkim=pass header.d=suse.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=IxXqoum9NhQcoERuGhzIEPoRQjesqfpaFmgm/mh4i4c=;
- b=Id97hJRs9LRUvdjvjvgnzM3zJlWekemCMWlaJt8ZoT/1nIYcptjkwFlvMeksMXsgD7t1+ybYk8gggkEOZp6Wkl525eQFOBfHNjB+gSbTqxHnvIVCtnE15SPtblUI0t/lNKgjIEUuqbiVf1K+14Z4EBNv0Amb2nWxpTSOr93u39ZzE8jEi+orDNKVNke2QkBeg0z8VtroY76WIFgCGt7sxIyjC9waocvoL+2s/hKCwTxqdzk+OJ0514mNm/G5QkrA3UQrkBWI1cfyzb8lqavHkkXTIH0NW+yAxWVWBvvgEIzfc07tvY80qpJixCfL5/3Qqo/itPgIFkTnoAF+vReUmw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=suse.com;
-Received: from HE1PR0402MB3497.eurprd04.prod.outlook.com (2603:10a6:7:83::14)
- by AM9PR04MB8571.eurprd04.prod.outlook.com (2603:10a6:20b:436::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.20; Thu, 3 Aug
- 2023 07:31:21 +0000
-Received: from HE1PR0402MB3497.eurprd04.prod.outlook.com
- ([fe80::bf65:a49a:8861:4f92]) by HE1PR0402MB3497.eurprd04.prod.outlook.com
- ([fe80::bf65:a49a:8861:4f92%2]) with mapi id 15.20.6631.045; Thu, 3 Aug 2023
- 07:31:21 +0000
-From: Geliang Tang <geliang.tang@suse.com>
-To: Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Song Liu <song@kernel.org>,
-	Yonghong Song <yhs@fb.com>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>,
-	Stanislav Fomichev <sdf@google.com>,
-	Hao Luo <haoluo@google.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Florent Revest <revest@chromium.org>,
-	Brendan Jackman <jackmanb@chromium.org>,
-	Matthieu Baerts <matthieu.baerts@tessares.net>,
-	Mat Martineau <martineau@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	John Johansen <john.johansen@canonical.com>,
-	Paul Moore <paul@paul-moore.com>,
-	James Morris <jmorris@namei.org>,
-	"Serge E. Hallyn" <serge@hallyn.com>,
-	Stephen Smalley <stephen.smalley.work@gmail.com>,
-	Eric Paris <eparis@parisplace.org>,
-	Mykola Lysenko <mykolal@fb.com>,
-	Shuah Khan <shuah@kernel.org>
-Cc: Geliang Tang <geliang.tang@suse.com>,
-	bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	mptcp@lists.linux.dev,
-	apparmor@lists.ubuntu.com,
-	linux-security-module@vger.kernel.org,
-	selinux@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH bpf-next v8 4/4] selftests/bpf: Add mptcpify test
-Date: Thu,  3 Aug 2023 15:30:42 +0800
-Message-Id: <4b95511da1a9dfd1a55734e32b7b6510739a7ab7.1691047403.git.geliang.tang@suse.com>
-X-Mailer: git-send-email 2.35.3
-In-Reply-To: <cover.1691047403.git.geliang.tang@suse.com>
-References: <cover.1691047403.git.geliang.tang@suse.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: TYAPR01CA0036.jpnprd01.prod.outlook.com
- (2603:1096:404:28::24) To HE1PR0402MB3497.eurprd04.prod.outlook.com
- (2603:10a6:7:83::14)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4059911C8C
+	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 07:36:22 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B14273C16
+	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 00:36:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1691048179;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=y5lW9yJGd0tTOcYr5wtydcMH3ilaH7qpJMhJhFacpac=;
+	b=IECSsSaG8dRhDV382ziXcVSnCCXufa74UG0MiGBghHux0jmTvqZngQK5vXiu2duo+6nGje
+	3NRmGinbFNlbwqmtVFETx/HZrD8yhPrmquaoNR+7cAqr7BEuqoTKU7Pt/wRY1T2jseutW4
+	zxEkybif/iIKlF0HsRT5+zGOiSADaZM=
+Received: from mail-lf1-f69.google.com (mail-lf1-f69.google.com
+ [209.85.167.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-618-vvBcbSMTNDyaaeW8lDqW9A-1; Thu, 03 Aug 2023 03:36:18 -0400
+X-MC-Unique: vvBcbSMTNDyaaeW8lDqW9A-1
+Received: by mail-lf1-f69.google.com with SMTP id 2adb3069b0e04-4fe08e088d5so628498e87.2
+        for <netdev@vger.kernel.org>; Thu, 03 Aug 2023 00:36:18 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691048177; x=1691652977;
+        h=content-transfer-encoding:in-reply-to:references:to
+         :content-language:subject:cc:user-agent:mime-version:date:message-id
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=y5lW9yJGd0tTOcYr5wtydcMH3ilaH7qpJMhJhFacpac=;
+        b=aFCXfeNlC/aixr6Rvp9TkIuEFqUidd4lfMprZ6CAGT71tu2FHhniMNhe9YcvdzkZTD
+         CzNnkqbGibPO+1rWaCQWJTu1iGXYHrHrheoQ40mkRDHoao0waGi5GpbJBiSCd7lrs7cr
+         ft7jfhDdsUu/c/HkXGp+BpWuPxzno4KK+z5kMFLbXVaFuVdMfZC8iqzS4Rh35xGsYqeg
+         fYhJ8vdTO2+OsgOWh8Ll+Vsnw0p4Mxs9xFIC/o7+H64L3041md7rfyy7ejty9cIFGpNP
+         9/D3aU5TeEEWSnsAHqifinEnfqowkBI+DcJdttDx2iScheagJvlChNXRszNKjoB17037
+         HuCQ==
+X-Gm-Message-State: ABy/qLZTPwF4DPjjboLOhax4OiJmP/aD27crC9ogd3qUDv9k036VuEik
+	Ml+B9jJw/HP20phWH6YaPDVHeOXPjgzcNu28vwu2H4F6bZPYQfzPEml7grgIVzyqrGABkvIJD2D
+	E98aV9PtSRpDEW1sT
+X-Received: by 2002:a05:6512:5cf:b0:4f9:547c:a3cc with SMTP id o15-20020a05651205cf00b004f9547ca3ccmr5247254lfo.14.1691048176975;
+        Thu, 03 Aug 2023 00:36:16 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlHk7khmdMhPIrJx41CkIsKhng1gZd/TgR+/xDOjScGe95JF1N3aEbzr0qwR3nW3Rsl3nXk3Ig==
+X-Received: by 2002:a05:6512:5cf:b0:4f9:547c:a3cc with SMTP id o15-20020a05651205cf00b004f9547ca3ccmr5247235lfo.14.1691048176425;
+        Thu, 03 Aug 2023 00:36:16 -0700 (PDT)
+Received: from [192.168.42.222] (194-45-78-10.static.kviknet.net. [194.45.78.10])
+        by smtp.gmail.com with ESMTPSA id c12-20020a056402120c00b0052241b8fd0bsm9589115edw.29.2023.08.03.00.36.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 03 Aug 2023 00:36:15 -0700 (PDT)
+From: Jesper Dangaard Brouer <jbrouer@redhat.com>
+X-Google-Original-From: Jesper Dangaard Brouer <brouer@redhat.com>
+Message-ID: <1bf41ea8-5131-7d54-c373-00c1fbcac095@redhat.com>
+Date: Thu, 3 Aug 2023 09:36:14 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: HE1PR0402MB3497:EE_|AM9PR04MB8571:EE_
-X-MS-Office365-Filtering-Correlation-Id: ca065f5a-b85f-498e-7cd8-08db93f3a1eb
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	obDaF79jR3fErVYYvkxiHpwtIa7G4N3LFe0LEkAwxpmBIXOLI5bdoHMz95M/RValjz9BR4g7NQpy2mY3p5XcRV0a3vjFooW/3rusHffypxjYIaELyqPV7IHrC05iawGZO/VGVlAcFyr4mHKyEWvK95kKOFJ/dD2SGEIAZVTevspbbqgh0ynD+hKQjbn/ARenW0d7pS2Ax9PtN3U0FSp3HLEbHTK8eVuWRVz9JLZD2IZLWGLztFMWeJEmrJ13tu3P9XXz/u9z2FHMsbhCZKWwkAzJ78KT4+HJ+F0LqPc9XIRIpmkyBHpkRNIyRsxSdE4j2pbIAeU9rbYGVhnSPuOZPqynrWCNIx6cKT9h8iCo5Cdn7l8GLUdJUiLmahsVGvxpFkEKEZEnu+mlDOKTUC5XFEu+eiewF/qXzjidGXCH2itBm07nXHlUQKC8miztgeAXONBqU9fpMujYtHxMRmMnG4Obte7nI+OMmB2TTqaJfyGR7Hd4MsiEytgyT2kNDlUwt67qRN84V9cb0FgVhK4LUStIzIQcEALautCXGYLMEmtAaJ8I97DNwKk5+t47JKXDVH6aFFTLfcAm8vNx1eDWpZ8l6g6JyMz6Sk+HBQhZNxEDrhI81aPIEJW9ZNuvh8OeHOQdCJcbIDHhF3WaORydR80o4RtQBPzcevypr0HV2Tydigqz7FMhytA1yl7BMBCF
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:HE1PR0402MB3497.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(376002)(346002)(366004)(39860400002)(396003)(136003)(451199021)(6666004)(110136005)(6486002)(41300700001)(478600001)(7416002)(5660300002)(8936002)(8676002)(7406005)(186003)(4326008)(6512007)(316002)(66476007)(26005)(6506007)(66556008)(66946007)(2616005)(2906002)(83380400001)(44832011)(36756003)(38100700002)(921005)(86362001)(13296009);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?93xKlZa/wwapV+1dspy1fJhHV7ciQskSQVIep2rWEkHdnTGYZu7qqyx+ZLu0?=
- =?us-ascii?Q?7ykBZj4Ohm9foEmaUOyyBLTych0LB+tT11+QHjmocB7lP50D9jAqex/2B3Bl?=
- =?us-ascii?Q?8WT7mwvfdgAIu0jRnKPk085kfatEcnty/9VrbwF9a2MXOrBLAiffHa3v6JYW?=
- =?us-ascii?Q?HYEqp4CcziHF6MGtjUFCjGb2P62AGxA8JpeuuaOGaq7l3BYzd3XYwYuiyhbW?=
- =?us-ascii?Q?iipF5uMD3osoB0xNmzeYGXOoRcyIzKyg7a9FVm2iIVa9PmrphsMcR6fhQLCq?=
- =?us-ascii?Q?gYODR1TFe/vMFWt7T86MuRrhlhgmqwuBuBMEwKlojaKbGk+3GrxGDvmf1y4Y?=
- =?us-ascii?Q?Z+qrG0dAGu5aZNLbpdLh9/icEHWuuqzss7zKvP9jbDsfDnVo4YZezOYRSIgd?=
- =?us-ascii?Q?DJ11yK449Gq8lpydo8U2h1bw4/CVEbFAjWVVbxifBHGlWoVqZpRjAPdfcZrJ?=
- =?us-ascii?Q?105GLOVIAa7nj2/KF5BAj44WTOViAlnM1KFdQktPYj4yEGQ1Nr/8f5Z4rWaD?=
- =?us-ascii?Q?xVD69DpfCctAMZ074sP6ZRk47LARv1JkiPw/nVhVZiIDI6j/MMDGoo6JgHUK?=
- =?us-ascii?Q?h5NT3yLpTh4fpLytO1QkgQYnetKYyz6JjhvhSpQ44sID97+ag7oi8U2tcH9p?=
- =?us-ascii?Q?ZgL/fV8ylWKLGc6knzW7f7WgKKRYw8pvs/scmElkhQXJDLQiyMRsIvD+6MFD?=
- =?us-ascii?Q?YtAqV2Ud6EWUWJfLr7/hqjXm82bjWDa3/kWZAS2M64swEP5JMvEE4gtFqjds?=
- =?us-ascii?Q?jgb1y3ZsJNMwsb5dxNpzy76dZz3vXR9WiBAaiCqpqtT5k7PbOINUVRcHXAwV?=
- =?us-ascii?Q?uHiSJscTa6EjDwtJKaWYzKZru4p2xNrVAvog+mHh0Y9mTINTGKKV+Zs/ySaq?=
- =?us-ascii?Q?r1RcOEvxVBcVmBUMTKrWsnfd0OcwykNGXhDQXFd4jJ6rEqmAIeJwmii2K5Jj?=
- =?us-ascii?Q?wZSP/rxGO2ZlTnaXDtZLecDo5n+CJ1VzfvrvBCHbLUI75sidUL+2merGjLTf?=
- =?us-ascii?Q?SZlZqkXv3gNbDp5CHSxaH2pxHIfwaJ2eibQeNSP7tXjvgrO9ougW5TmzGhOP?=
- =?us-ascii?Q?A+A1cAIZHsXwtp052AW219cXtyQ9ieXnuld1jfA1agaPv4ajVSnfwP+BSwX/?=
- =?us-ascii?Q?ldkV+/CuIgs70qRkgRUlunMtXqcRq5HdDxUsB9QyDH+VDUOY7TtnVu3Qt0Ql?=
- =?us-ascii?Q?sWF8gAAKkEDdA7eaM8xQ09S4EpHwdkGeqQvtAYrwIoj/qYVHhzdxY4dOKuF6?=
- =?us-ascii?Q?vm08PeB7Jw64xGg/s7BB3Smil2lwcCjUczrcNMhH3r+F9yr9ABEL7Rr7v8OF?=
- =?us-ascii?Q?mPaep4R2iHOXiyXU939Tmfd+48kXFt5Oaenju1D213qo7ukTJSdnDitcdPKD?=
- =?us-ascii?Q?zm7P5hfvVzatI9656Yzl0rn/K7u8aYTJbuWowRPwj6ktsNeHLvXgS45l9+rJ?=
- =?us-ascii?Q?CiXT1Ri0pqpqmZokuWWBJF1hT9lPr8pd7AFZ9AqRN52Lqw6KewBLutXYJMNC?=
- =?us-ascii?Q?+POJPpemffpza0ZUl7n560TRagbxI/kbP1s6Gi9qFpzXjUDECKAviuf9LMq7?=
- =?us-ascii?Q?fqFSdJDO02mMAEQTFeyUPhYEQmPVEPB00zHEy/Zy?=
-X-OriginatorOrg: suse.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ca065f5a-b85f-498e-7cd8-08db93f3a1eb
-X-MS-Exchange-CrossTenant-AuthSource: HE1PR0402MB3497.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Aug 2023 07:31:20.9640
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: f7a17af6-1c5c-4a36-aa8b-f5be247aa4ba
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 2OMMfRJ1e9oC13G1Dof9Ec5krmXNHTlf3uODEaJ4CKNq0to9jdy2dlf11n3XAeAYKuJC8N+lNAY7oTvShdkdWg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR04MB8571
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Cc: brouer@redhat.com, "davem@davemloft.net" <davem@davemloft.net>,
+ "edumazet@google.com" <edumazet@google.com>,
+ "pabeni@redhat.com" <pabeni@redhat.com>, Shenwei Wang
+ <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>,
+ "ast@kernel.org" <ast@kernel.org>,
+ "daniel@iogearbox.net" <daniel@iogearbox.net>,
+ "hawk@kernel.org" <hawk@kernel.org>,
+ "john.fastabend@gmail.com" <john.fastabend@gmail.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ dl-linux-imx <linux-imx@nxp.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "bpf@vger.kernel.org" <bpf@vger.kernel.org>, Andrew Lunn <andrew@lunn.ch>
+Subject: Re: [PATCH V3 net-next] net: fec: add XDP_TX feature support
+Content-Language: en-US
+To: Wei Fang <wei.fang@nxp.com>, Jakub Kicinski <kuba@kernel.org>,
+ Jesper Dangaard Brouer <jbrouer@redhat.com>
+References: <20230731060025.3117343-1-wei.fang@nxp.com>
+ <20230802104706.5ce541e9@kernel.org>
+ <AM5PR04MB313985C61D92E183238809138808A@AM5PR04MB3139.eurprd04.prod.outlook.com>
+In-Reply-To: <AM5PR04MB313985C61D92E183238809138808A@AM5PR04MB3139.eurprd04.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Implement a new test program mptcpify: if the family is AF_INET or
-AF_INET6, the type is SOCK_STREAM, and the protocol ID is 0 or
-IPPROTO_TCP, set it to IPPROTO_MPTCP. It will be hooked in
-update_socket_protocol().
 
-Extend the MPTCP test base, add a selftest test_mptcpify() for the
-mptcpify case. Open and load the mptcpify test prog to mptcpify the
-TCP sockets dynamically, then use start_server() and connect_to_fd()
-to create a TCP socket, but actually what's created is an MPTCP
-socket, which can be verified through the outputs of 'ss' and 'nstat'
-commands.
 
-Signed-off-by: Geliang Tang <geliang.tang@suse.com>
----
- .../testing/selftests/bpf/prog_tests/mptcp.c  | 94 +++++++++++++++++++
- tools/testing/selftests/bpf/progs/mptcpify.c  | 25 +++++
- 2 files changed, 119 insertions(+)
- create mode 100644 tools/testing/selftests/bpf/progs/mptcpify.c
+On 03/08/2023 05.58, Wei Fang wrote:
+>>>   		} else {
+>>> -			xdp_return_frame(xdpf);
+>>> +			xdp_return_frame_rx_napi(xdpf);
+>>
+>> If you implement Jesper's syncing suggestions, I think you can use
+>>
+>> 	page_pool_put_page(pool, page, 0, true);
 
-diff --git a/tools/testing/selftests/bpf/prog_tests/mptcp.c b/tools/testing/selftests/bpf/prog_tests/mptcp.c
-index 4407bd5c9e9a..caab3aa6a162 100644
---- a/tools/testing/selftests/bpf/prog_tests/mptcp.c
-+++ b/tools/testing/selftests/bpf/prog_tests/mptcp.c
-@@ -6,6 +6,7 @@
- #include "cgroup_helpers.h"
- #include "network_helpers.h"
- #include "mptcp_sock.skel.h"
-+#include "mptcpify.skel.h"
- 
- char NS_TEST[32];
- 
-@@ -195,8 +196,101 @@ static void test_base(void)
- 	close(cgroup_fd);
- }
- 
-+static void send_byte(int fd)
-+{
-+	char b = 0x55;
-+
-+	ASSERT_EQ(write(fd, &b, sizeof(b)), 1, "send single byte");
-+}
-+
-+static int verify_mptcpify(void)
-+{
-+	char cmd[256];
-+	int err = 0;
-+
-+	snprintf(cmd, sizeof(cmd),
-+		 "ip netns exec %s ss -tOni | grep -q '%s'",
-+		 NS_TEST, "tcp-ulp-mptcp");
-+	if (!ASSERT_OK(system(cmd), "No tcp-ulp-mptcp found!"))
-+		err++;
-+
-+	snprintf(cmd, sizeof(cmd),
-+		 "ip netns exec %s nstat -asz %s | awk '%s' | grep -q '%s'",
-+		 NS_TEST, "MPTcpExtMPCapableSYNACKRX",
-+		 "NR==1 {next} {print $2}", "1");
-+	if (!ASSERT_OK(system(cmd), "No MPTcpExtMPCapableSYNACKRX found!"))
-+		err++;
-+
-+	return err;
-+}
-+
-+static int run_mptcpify(int cgroup_fd)
-+{
-+	int server_fd, client_fd, prog_fd, err = 0;
-+	struct mptcpify *mptcpify_skel;
-+
-+	mptcpify_skel = mptcpify__open_and_load();
-+	if (!ASSERT_OK_PTR(mptcpify_skel, "skel_open_load"))
-+		return -EIO;
-+
-+	err = mptcpify__attach(mptcpify_skel);
-+	if (!ASSERT_OK(err, "skel_attach"))
-+		goto out;
-+
-+	prog_fd = bpf_program__fd(mptcpify_skel->progs.mptcpify);
-+	if (!ASSERT_GE(prog_fd, 0, "bpf_program__fd")) {
-+		err = -EIO;
-+		goto out;
-+	}
-+
-+	/* without MPTCP */
-+	server_fd = start_server(AF_INET, SOCK_STREAM, NULL, 0, 0);
-+	if (!ASSERT_GE(server_fd, 0, "start_server")) {
-+		err = -EIO;
-+		goto out;
-+	}
-+
-+	client_fd = connect_to_fd(server_fd, 0);
-+	if (!ASSERT_GE(client_fd, 0, "connect to fd")) {
-+		err = -EIO;
-+		goto close_server;
-+	}
-+
-+	send_byte(client_fd);
-+	err += verify_mptcpify();
-+
-+	close(client_fd);
-+close_server:
-+	close(server_fd);
-+out:
-+	mptcpify__destroy(mptcpify_skel);
-+	return err;
-+}
-+
-+static void test_mptcpify(void)
-+{
-+	struct nstoken *nstoken = NULL;
-+	int cgroup_fd;
-+
-+	cgroup_fd = test__join_cgroup("/mptcpify");
-+	if (!ASSERT_GE(cgroup_fd, 0, "test__join_cgroup"))
-+		return;
-+
-+	nstoken = create_netns();
-+	if (!ASSERT_OK_PTR(nstoken, "create_netns"))
-+		goto fail;
-+
-+	ASSERT_OK(run_mptcpify(cgroup_fd), "run_mptcpify");
-+
-+fail:
-+	cleanup_netns(nstoken);
-+	close(cgroup_fd);
-+}
-+
- void test_mptcp(void)
- {
- 	if (test__start_subtest("base"))
- 		test_base();
-+	if (test__start_subtest("mptcpify"))
-+		test_mptcpify();
- }
-diff --git a/tools/testing/selftests/bpf/progs/mptcpify.c b/tools/testing/selftests/bpf/progs/mptcpify.c
-new file mode 100644
-index 000000000000..9cf1febe982d
---- /dev/null
-+++ b/tools/testing/selftests/bpf/progs/mptcpify.c
-@@ -0,0 +1,25 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright (c) 2023, SUSE. */
-+
-+#include <linux/bpf.h>
-+#include <bpf/bpf_tracing.h>
-+
-+char _license[] SEC("license") = "GPL";
-+
-+#define	AF_INET		2
-+#define	AF_INET6	10
-+#define	SOCK_STREAM	1
-+#define	IPPROTO_TCP	6
-+#define	IPPROTO_MPTCP	262
-+
-+SEC("fmod_ret/update_socket_protocol")
-+int BPF_PROG(mptcpify, int family, int type, int protocol)
-+{
-+	if ((family == AF_INET || family == AF_INET6) &&
-+	    type == SOCK_STREAM &&
-+	    (!protocol || protocol == IPPROTO_TCP)) {
-+		return IPPROTO_MPTCP;
-+	}
-+
-+	return protocol;
-+}
--- 
-2.35.3
+To Jakub, using 0 here you are trying to bypass the DMA-sync (which is
+valid as driver knows XDP_TX have already done the sync).
+The code will still call into DMA-sync calls with zero as size, so
+wonder if we should detect size zero and skip that call?
+(I mean is this something page_pool should support.)
+
+diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+index 7ca456bfab71..778d061e4f2c 100644
+--- a/net/core/page_pool.c
++++ b/net/core/page_pool.c
+@@ -323,7 +323,8 @@ static void page_pool_dma_sync_for_device(struct 
+page_pool *pool,
+         dma_addr_t dma_addr = page_pool_get_dma_addr(page);
+
+         dma_sync_size = min(dma_sync_size, pool->p.max_len);
+-       dma_sync_single_range_for_device(pool->p.dev, dma_addr,
++       if (dma_sync_size)
++               dma_sync_single_range_for_device(pool->p.dev, dma_addr,
+                                          pool->p.offset, dma_sync_size,
+                                          pool->p.dma_dir);
+
+
+
+>>
+>> for XDP_TX here to avoid the DMA sync on page recycle.
+> 
+> I tried Jasper's syncing suggestion and used page_pool_put_page() to recycle
+> pages, but the results does not seem to improve the performance of XDP_TX,
+
+The optimization will only have effect on those devices which have
+dev->dma_coherent=false else DMA function [1] (e.g.
+dma_direct_sync_single_for_device) will skip the sync calls.
+
+  [1] 
+https://elixir.bootlin.com/linux/v6.5-rc4/source/kernel/dma/direct.h#L63
+
+(Cc. Andrew Lunn)
+Does any of the imx generations have dma-noncoherent memory?
+
+And does any of these use the fec NIC driver?
+
+> it even degrades the speed.
+
+Could be low runs simply be a variation between your test runs?
+
+The specific device (imx8mpevk) this was tested on, clearly have
+dma_coherent=true, or else we would have seen a difference.
+But the code change should not have any overhead for the
+dma_coherent=true case, the only extra overhead is the extra empty DMA
+sync call with size zero (as discussed in top).
+
+> 
+> The result of the current modification.
+> root@imx8mpevk:~# ./xdp2 eth0
+> proto 17:     260180 pkt/s
+
+These results are *significantly* better than reported in patch-1.
+What happened?!?
+
+e.g.
+  root@imx8mpevk:~# ./xdp2 eth0
+  proto 17:     135817 pkt/s
+  proto 17:     142776 pkt/s
+
+> proto 17:     260373 pkt/s
+> proto 17:     260363 pkt/s
+> proto 17:     259036 pkt/s
+> proto 17:     260180 pkt/s
+> proto 17:     260048 pkt/s
+> proto 17:     260029 pkt/s
+> proto 17:     260133 pkt/s
+> proto 17:     260021 pkt/s
+> proto 17:     260203 pkt/s
+> proto 17:     260293 pkt/s
+> proto 17:     259418 pkt/s
+> 
+> After using the sync suggestion, the result shows as follow.
+> root@imx8mpevk:~# ./xdp2 eth0
+> proto 17:     255956 pkt/s
+> proto 17:     255841 pkt/s
+> proto 17:     255835 pkt/s
+> proto 17:     255381 pkt/s
+> proto 17:     255736 pkt/s
+> proto 17:     255779 pkt/s
+> proto 17:     254135 pkt/s
+> proto 17:     255584 pkt/s
+> proto 17:     255855 pkt/s
+> proto 17:     255664 pkt/s
+> 
+> Below are my changes, I don't know what cause it. Based on the results,
+> it's better to keep the current modification.
+> 
+> diff --git a/drivers/net/ethernet/freescale/fec_main.c b/drivers/net/ethernet/freescale/fec_main.c
+> index d5fda24a4c52..415c0cb83f84 100644
+> --- a/drivers/net/ethernet/freescale/fec_main.c
+> +++ b/drivers/net/ethernet/freescale/fec_main.c
+> @@ -77,7 +77,8 @@
+>   static void set_multicast_list(struct net_device *ndev);
+>   static void fec_enet_itr_coal_set(struct net_device *ndev);
+>   static int fec_enet_xdp_tx_xmit(struct net_device *ndev,
+> -                               struct xdp_buff *xdp);
+> +                               struct xdp_buff *xdp,
+> +                               u32 dma_sync_len);
+> 
+>   #define DRIVER_NAME    "fec"
+> 
+> @@ -1487,7 +1488,14 @@ fec_enet_tx_queue(struct net_device *ndev, u16 queue_id, int budget)
+>                          /* Free the sk buffer associated with this last transmit */
+>                          dev_kfree_skb_any(skb);
+>                  } else {
+> -                       xdp_return_frame_rx_napi(xdpf);
+> +                       if (txq->tx_buf[index].type == FEC_TXBUF_T_XDP_NDO)
+> +                               xdp_return_frame_rx_napi(xdpf);
+> +                       else {
+> +                               struct page *page;
+> +
+> +                               page = virt_to_head_page(xdpf->data);
+> +                               page_pool_put_page(page->pp, page, 0, true);
+> +                       }
+> 
+>                          txq->tx_buf[index].xdp = NULL;
+>                          /* restore default tx buffer type: FEC_TXBUF_T_SKB */
+> @@ -1557,7 +1565,8 @@ fec_enet_run_xdp(struct fec_enet_private *fep, struct bpf_prog *prog,
+>          act = bpf_prog_run_xdp(prog, xdp);
+> 
+>          /* Due xdp_adjust_tail: DMA sync for_device cover max len CPU touch */
+> -       sync = xdp->data_end - xdp->data_hard_start - FEC_ENET_XDP_HEADROOM;
+> +       sync = xdp->data_end - xdp->data;
+>          sync = max(sync, len);
+> 
+>          switch (act) {
+> @@ -1579,7 +1588,7 @@ fec_enet_run_xdp(struct fec_enet_private *fep, struct bpf_prog *prog,
+>                  break;
+> 
+>          case XDP_TX:
+> -               err = fec_enet_xdp_tx_xmit(fep->netdev, xdp);
+> +               err = fec_enet_xdp_tx_xmit(fep->netdev, xdp, sync);
+>                  if (unlikely(err)) {
+>                          ret = FEC_ENET_XDP_CONSUMED;
+>                          page = virt_to_head_page(xdp->data);
+> @@ -3807,6 +3816,7 @@ fec_enet_xdp_get_tx_queue(struct fec_enet_private *fep, int index)
+>   static int fec_enet_txq_xmit_frame(struct fec_enet_private *fep,
+>                                     struct fec_enet_priv_tx_q *txq,
+>                                     struct xdp_frame *frame,
+> +                                  u32 dma_sync_len,
+>                                     bool ndo_xmit)
+>   {
+>          unsigned int index, status, estatus;
+> @@ -3840,7 +3850,7 @@ static int fec_enet_txq_xmit_frame(struct fec_enet_private *fep,
+>                  dma_addr = page_pool_get_dma_addr(page) + sizeof(*frame) +
+>                             frame->headroom;
+>                  dma_sync_single_for_device(&fep->pdev->dev, dma_addr,
+> -                                          frame->len, DMA_BIDIRECTIONAL);
+> +                                          dma_sync_len, DMA_BIDIRECTIONAL);
+>                  txq->tx_buf[index].type = FEC_TXBUF_T_XDP_TX;
+>          }
+> 
+> @@ -3889,7 +3899,8 @@ static int fec_enet_txq_xmit_frame(struct fec_enet_private *fep,
+>   }
+> 
+>   static int fec_enet_xdp_tx_xmit(struct net_device *ndev,
+> -                               struct xdp_buff *xdp)
+> +                               struct xdp_buff *xdp,
+> +                               u32 dma_sync_len)
+>   {
+>          struct xdp_frame *xdpf = xdp_convert_buff_to_frame(xdp);
+>          struct fec_enet_private *fep = netdev_priv(ndev);
+> @@ -3909,7 +3920,7 @@ static int fec_enet_xdp_tx_xmit(struct net_device *ndev,
+> 
+>          /* Avoid tx timeout as XDP shares the queue with kernel stack */
+>          txq_trans_cond_update(nq);
+> -       ret = fec_enet_txq_xmit_frame(fep, txq, xdpf, false);
+> +       ret = fec_enet_txq_xmit_frame(fep, txq, xdpf, dma_sync_len, false);
+> 
+>          __netif_tx_unlock(nq);
+> 
+> @@ -3938,7 +3949,7 @@ static int fec_enet_xdp_xmit(struct net_device *dev,
+>          /* Avoid tx timeout as XDP shares the queue with kernel stack */
+>          txq_trans_cond_update(nq);
+>          for (i = 0; i < num_frames; i++) {
+> -               if (fec_enet_txq_xmit_frame(fep, txq, frames[i], true) < 0)
+> +               if (fec_enet_txq_xmit_frame(fep, txq, frames[i], 0, true) < 0)
+>                          break;
+>                  sent_frames++;
+>          }
+> 
 
 
