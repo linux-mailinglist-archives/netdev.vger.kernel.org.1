@@ -1,169 +1,631 @@
-Return-Path: <netdev+bounces-23996-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23999-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D58C76E6DD
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 13:30:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BC1A676E6E3
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 13:31:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5D2D91C21484
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 11:30:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DE5701C2152A
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 11:31:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B243F18B14;
-	Thu,  3 Aug 2023 11:29:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EDBF1ED44;
+	Thu,  3 Aug 2023 11:29:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A552918AED
-	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 11:29:30 +0000 (UTC)
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E217A1981;
-	Thu,  3 Aug 2023 04:29:24 -0700 (PDT)
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-99357737980so119851166b.2;
-        Thu, 03 Aug 2023 04:29:24 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691062163; x=1691666963;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qVUTi9M5sLcie6yIGG2nnYWviv8Jo0VEzp70AMTqbEE=;
-        b=iFrKy0sETDaCuaQaqWt7dGy/PZ4/MU2p4PGFUMklXBtb+IKdJp7tbIeA1Mn7vcoE/9
-         caWe7boyfiaXeIyqu5hZN9e5diARiTkU4+RjVhDLwUc3QN7zf2fYQ/XyqQr8a95j1iG9
-         6an7wCd7AkD/EuIRuQcLAeV+tED8s6zQlZHokyCPH+wF7ZuFYOiHoBebE7z2P58nyw9a
-         fwqj84+PxlZsWCYFTHwe8BQYTRMVhA68ztGCbBqIR9sE3jduUKJlpe0w909MXgXA717x
-         kemQKsMDtc+Z4Mx1O5Nx0AueJl7A8286qkOaNX5dUR90P9EbzPZnafVhaWZ7vKln7DUM
-         JF4g==
-X-Gm-Message-State: ABy/qLbtFpbwQq1WCItr2C1+01eQmcFU/VP2mnV57925ptSD2DxrE5Qe
-	hOSqV55DlzjZuPAVV/kBaS4=
-X-Google-Smtp-Source: APBJJlE7c/wOwf/5XM2UVblac3j3wiFTw268rQNvK5rBO5aS7rWUiJ9mRnWYQUHlF2uTZL8gS4gcqQ==
-X-Received: by 2002:a17:906:5198:b0:973:fd02:a41f with SMTP id y24-20020a170906519800b00973fd02a41fmr8429104ejk.40.1691062163118;
-        Thu, 03 Aug 2023 04:29:23 -0700 (PDT)
-Received: from gmail.com (fwdproxy-cln-008.fbsv.net. [2a03:2880:31ff:8::face:b00c])
-        by smtp.gmail.com with ESMTPSA id se9-20020a170906ce4900b0099364d9f0e6sm10389437ejb.117.2023.08.03.04.29.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Aug 2023 04:29:22 -0700 (PDT)
-Date: Thu, 3 Aug 2023 04:29:20 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Eric Dumazet <edumazet@google.com>
-Cc: rdunlap@infradead.org, benjamin.poirier@gmail.com,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	leit@meta.com,
-	"open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next v3] netconsole: Enable compile time configuration
-Message-ID: <ZMuPkMlg1/kfRyXk@gmail.com>
-References: <20230801100533.3350037-1-leitao@debian.org>
- <CANn89iKuHxUGphhDkKz2ZWS3YR3-BkieTb4b4gKMR9B7jxKpWQ@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CA131ED39
+	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 11:29:40 +0000 (UTC)
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4AD851990
+	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 04:29:36 -0700 (PDT)
+Received: from loongson.cn (unknown [112.20.109.245])
+	by gateway (Coremail) with SMTP id _____8AxZ+ifj8tk6KwPAA--.534S3;
+	Thu, 03 Aug 2023 19:29:35 +0800 (CST)
+Received: from localhost.localdomain (unknown [112.20.109.245])
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8DxzM6dj8tkKx5HAA--.52441S2;
+	Thu, 03 Aug 2023 19:29:33 +0800 (CST)
+From: Feiyang Chen <chenfeiyang@loongson.cn>
+To: andrew@lunn.ch,
+	hkallweit1@gmail.com,
+	peppe.cavallaro@st.com,
+	alexandre.torgue@foss.st.com,
+	joabreu@synopsys.com,
+	chenhuacai@loongson.cn
+Cc: Feiyang Chen <chenfeiyang@loongson.cn>,
+	linux@armlinux.org.uk,
+	dongbiao@loongson.cn,
+	loongson-kernel@lists.loongnix.cn,
+	netdev@vger.kernel.org,
+	loongarch@lists.linux.dev,
+	chris.chenfeiyang@gmail.com
+Subject: [PATCH v3 04/16] net: stmmac: dwmac1000: Add 64-bit DMA support
+Date: Thu,  3 Aug 2023 19:29:24 +0800
+Message-Id: <fdcf0180a8ae0791bfbc7edb033f0d0cbd8f25ac.1691047285.git.chenfeiyang@loongson.cn>
+X-Mailer: git-send-email 2.39.3
+In-Reply-To: <cover.1691047285.git.chenfeiyang@loongson.cn>
+References: <cover.1691047285.git.chenfeiyang@loongson.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANn89iKuHxUGphhDkKz2ZWS3YR3-BkieTb4b4gKMR9B7jxKpWQ@mail.gmail.com>
-X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FSL_HELO_FAKE,
-	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H3,
-	RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=no autolearn_force=no version=3.4.6
+X-CM-TRANSID:AQAAf8DxzM6dj8tkKx5HAA--.52441S2
+X-CM-SenderInfo: hfkh0wphl1t03j6o00pqjv00gofq/
+X-Coremail-Antispam: 1Uk129KBj9fXoWfCw4rGw43Xr1xtrWDWw1UCFX_yoW8Zw13Zo
+	ZrtFn3JayrJw1kXrZrKr1ktFy2qFnxW3s7C3y7C395u3yIvwn0q347Z3yrAw4Yyr1Fqay7
+	Z3W8JFZrZFW7tr1Dl-sFpf9Il3svdjkaLaAFLSUrUUUUeb8apTn2vfkv8UJUUUU8wcxFpf
+	9Il3svdxBIdaVrn0xqx4xG64xvF2IEw4CE5I8CrVC2j2Jv73VFW2AGmfu7bjvjm3AaLaJ3
+	UjIYCTnIWjp_UUUYZ7kC6x804xWl14x267AKxVWUJVW8JwAFc2x0x2IEx4CE42xK8VAvwI
+	8IcIk0rVWrJVCq3wAFIxvE14AKwVWUXVWUAwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xG
+	Y2AK021l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14
+	v26F4j6r4UJwA2z4x0Y4vEx4A2jsIE14v26r4UJVWxJr1l84ACjcxK6I8E87Iv6xkF7I0E
+	14v26r4UJVWxJr1ln4kS14v26r126r1DM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6x
+	kI12xvs2x26I8E6xACxx1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v2
+	6rWY6Fy7McIj6I8E87Iv67AKxVW8JVWxJwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2
+	Ij64vIr41lc7CjxVAaw2AFwI0_JF0_Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Y
+	z7v_Jr0_Gr1l4IxYO2xFxVAFwI0_JF0_Jw1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x
+	8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE
+	2Ix0cI8IcVAFwI0_Ar0_tr1lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42
+	xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8JVWxJwCI42IY6I8E87Iv6xkF
+	7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUVWrXDUUUU
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Aug 03, 2023 at 09:47:43AM +0200, Eric Dumazet wrote:
-> On Tue, Aug 1, 2023 at 12:06 PM Breno Leitao <leitao@debian.org> wrote:
-> >
-> > Enable netconsole features to be set at compilation time. Create two
-> > Kconfig options that allow users to set extended logs and release
-> > prepending features at compilation time.
-> >
-> > Right now, the user needs to pass command line parameters to netconsole,
-> > such as "+"/"r" to enable extended logs and version prepending features.
-> >
-> > With these two options, the user could set the default values for the
-> > features at compile time, and don't need to pass it in the command line
-> > to get them enabled, simplifying the command line.
-> >
-> > Signed-off-by: Breno Leitao <leitao@debian.org>
-> > ---
-> >   v1 -> v2:
-> >         * Improvements in the Kconfig help section.
-> >   v2 -> v3:
-> >         * Honour the Kconfig settings when creating sysfs targets
-> >         * Add "by default" in a Kconfig help.
-> > ---
-> >  drivers/net/Kconfig      | 22 ++++++++++++++++++++++
-> >  drivers/net/netconsole.c | 10 ++++++++++
-> >  2 files changed, 32 insertions(+)
-> >
-> > diff --git a/drivers/net/Kconfig b/drivers/net/Kconfig
-> > index 368c6f5b327e..55fb9509bcae 100644
-> > --- a/drivers/net/Kconfig
-> > +++ b/drivers/net/Kconfig
-> > @@ -332,6 +332,28 @@ config NETCONSOLE_DYNAMIC
-> >           at runtime through a userspace interface exported using configfs.
-> >           See <file:Documentation/networking/netconsole.rst> for details.
-> >
-> > +config NETCONSOLE_EXTENDED_LOG
-> > +       bool "Set kernel extended message by default"
-> > +       depends on NETCONSOLE
-> > +       default n
-> > +       help
-> > +         Set extended log support for netconsole message. If this option is
-> > +         set, log messages are transmitted with extended metadata header in a
-> > +         format similar to /dev/kmsg.  See
-> > +         <file:Documentation/networking/netconsole.rst> for details.
-> > +
-> > +config NETCONSOLE_PREPEND_RELEASE
-> > +       bool "Prepend kernel release version in the message by default"
-> > +       depends on NETCONSOLE_EXTENDED_LOG
-> > +       default n
-> > +       help
-> > +         Set kernel release to be prepended to each netconsole message by
-> > +         default. If this option is set, the kernel release is prepended into
-> > +         the first field of every netconsole message, so, the netconsole
-> > +         server/peer can easily identify what kernel release is logging each
-> > +         message.  See <file:Documentation/networking/netconsole.rst> for
-> > +         details.
-> > +
-> >  config NETPOLL
-> >         def_bool NETCONSOLE
-> >
-> > diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
-> > index 87f18aedd3bd..e3b6155f4529 100644
-> > --- a/drivers/net/netconsole.c
-> > +++ b/drivers/net/netconsole.c
-> > @@ -181,6 +181,11 @@ static struct netconsole_target *alloc_param_target(char *target_config)
-> >         if (!nt)
-> >                 goto fail;
-> >
-> > +       if (IS_ENABLED(CONFIG_NETCONSOLE_EXTENDED_LOG))
-> > +               nt->extended = true;
-> > +       if (IS_ENABLED(CONFIG_NETCONSOLE_PREPEND_RELEASE))
-> > +               nt->release = true;
-> > +
-> >         nt->np.name = "netconsole";
-> >         strscpy(nt->np.dev_name, "eth0", IFNAMSIZ);
-> >         nt->np.local_port = 6665;
-> > @@ -681,6 +686,11 @@ static struct config_item *make_netconsole_target(struct config_group *group,
-> >         nt->np.remote_port = 6666;
-> >         eth_broadcast_addr(nt->np.remote_mac);
-> >
-> > +       if (IS_ENABLED(CONFIG_NETCONSOLE_EXTENDED_LOG))
-> > +               nt->extended = true;
-> > +       if (IS_ENABLED(CONFIG_NETCONSOLE_PREPEND_RELEASE))
-> > +               nt->release = true;
-> > +
-> 
-> Instead of duplicating these, what about adding a preliminary helper
-> in a separate patch ?
+Some platforms have dwmac1000 implementations that support 64-bit
+DMA. Add and extend the functions to add 64-bit DMA support.
 
-That is a good idea, I will update.
+Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
+---
+ drivers/net/ethernet/stmicro/stmmac/Makefile  |   2 +-
+ .../net/ethernet/stmicro/stmmac/chain_mode.c  |  24 ++-
+ drivers/net/ethernet/stmicro/stmmac/common.h  |   1 +
+ drivers/net/ethernet/stmicro/stmmac/descs.h   |   7 +
+ .../net/ethernet/stmicro/stmmac/descs_com.h   |  47 +++++-
+ .../ethernet/stmicro/stmmac/dwmac1000_dma.c   |  32 +++-
+ .../net/ethernet/stmicro/stmmac/enh_desc.c    |  21 ++-
+ drivers/net/ethernet/stmicro/stmmac/hwif.c    |   5 +-
+ .../net/ethernet/stmicro/stmmac/ring_mode64.c | 159 ++++++++++++++++++
+ include/linux/stmmac.h                        |   1 +
+ 10 files changed, 277 insertions(+), 22 deletions(-)
+ create mode 100644 drivers/net/ethernet/stmicro/stmmac/ring_mode64.c
 
-Thanks!
+diff --git a/drivers/net/ethernet/stmicro/stmmac/Makefile b/drivers/net/ethernet/stmicro/stmmac/Makefile
+index 7dd3d388068b..10f32ded2bd9 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/Makefile
++++ b/drivers/net/ethernet/stmicro/stmmac/Makefile
+@@ -6,7 +6,7 @@ stmmac-objs:= stmmac_main.o stmmac_ethtool.o stmmac_mdio.o ring_mode.o	\
+ 	      mmc_core.o stmmac_hwtstamp.o stmmac_ptp.o dwmac4_descs.o	\
+ 	      dwmac4_dma.o dwmac4_lib.o dwmac4_core.o dwmac5.o hwif.o \
+ 	      stmmac_tc.o dwxgmac2_core.o dwxgmac2_dma.o dwxgmac2_descs.o \
+-	      stmmac_xdp.o \
++	      stmmac_xdp.o ring_mode64.o \
+ 	      $(stmmac-y)
+ 
+ stmmac-$(CONFIG_STMMAC_SELFTESTS) += stmmac_selftests.o
+diff --git a/drivers/net/ethernet/stmicro/stmmac/chain_mode.c b/drivers/net/ethernet/stmicro/stmmac/chain_mode.c
+index a95866871f3e..f363a2fb56f0 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/chain_mode.c
++++ b/drivers/net/ethernet/stmicro/stmmac/chain_mode.c
+@@ -36,6 +36,9 @@ static int jumbo_frm(struct stmmac_tx_queue *tx_q, struct sk_buff *skb,
+ 	des2 = dma_map_single(priv->device, skb->data,
+ 			      bmax, DMA_TO_DEVICE);
+ 	desc->des2 = cpu_to_le32(des2);
++	if (priv->plat->dma_cfg->dma64)
++		desc->des3 = cpu_to_le32(upper_32_bits(des2));
++
+ 	if (dma_mapping_error(priv->device, des2))
+ 		return -1;
+ 	tx_q->tx_skbuff_dma[entry].buf = des2;
+@@ -54,12 +57,16 @@ static int jumbo_frm(struct stmmac_tx_queue *tx_q, struct sk_buff *skb,
+ 					      (skb->data + bmax * i),
+ 					      bmax, DMA_TO_DEVICE);
+ 			desc->des2 = cpu_to_le32(des2);
++			if (priv->plat->dma_cfg->dma64)
++				desc->des3 = cpu_to_le32(upper_32_bits(des2));
+ 			if (dma_mapping_error(priv->device, des2))
+ 				return -1;
+ 			tx_q->tx_skbuff_dma[entry].buf = des2;
+ 			tx_q->tx_skbuff_dma[entry].len = bmax;
+ 			stmmac_prepare_tx_desc(priv, desc, 0, bmax, csum,
+-					STMMAC_CHAIN_MODE, 1, false, skb->len);
++					       STMMAC_CHAIN_MODE,
++					       !priv->plat->dma_cfg->dma64,
++					       false, skb->len);
+ 			len -= bmax;
+ 			i++;
+ 		} else {
+@@ -67,6 +74,8 @@ static int jumbo_frm(struct stmmac_tx_queue *tx_q, struct sk_buff *skb,
+ 					      (skb->data + bmax * i), len,
+ 					      DMA_TO_DEVICE);
+ 			desc->des2 = cpu_to_le32(des2);
++			if (priv->plat->dma_cfg->dma64)
++				desc->des3 = cpu_to_le32(upper_32_bits(des2));
+ 			if (dma_mapping_error(priv->device, des2))
+ 				return -1;
+ 			tx_q->tx_skbuff_dma[entry].buf = des2;
+@@ -110,7 +119,12 @@ static void init_dma_chain(struct stmmac_priv *priv, void *des,
+ 		struct dma_extended_desc *p = (struct dma_extended_desc *)des;
+ 		for (i = 0; i < (size - 1); i++) {
+ 			dma_phy += sizeof(struct dma_extended_desc);
+-			p->basic.des3 = cpu_to_le32((unsigned int)dma_phy);
++			if (priv->plat->dma_cfg->dma64) {
++				p->des6 = cpu_to_le32((unsigned int)dma_phy);
++				p->des7 = cpu_to_le32(upper_32_bits(dma_phy));
++			} else {
++				p->basic.des3 = cpu_to_le32((unsigned int)dma_phy);
++			}
+ 			p++;
+ 		}
+ 		p->basic.des3 = cpu_to_le32((unsigned int)phy_addr);
+@@ -130,6 +144,9 @@ static void refill_desc3(struct stmmac_rx_queue *rx_q, struct dma_desc *p)
+ {
+ 	struct stmmac_priv *priv = rx_q->priv_data;
+ 
++	if (priv->plat->dma_cfg->dma64)
++		return;
++
+ 	if (priv->hwts_rx_en && !priv->extend_desc)
+ 		/* NOTE: Device will overwrite des3 with timestamp value if
+ 		 * 1588-2002 time stamping is enabled, hence reinitialize it
+@@ -146,6 +163,9 @@ static void clean_desc3(struct stmmac_tx_queue *tx_q, struct dma_desc *p)
+ 	struct stmmac_priv *priv = tx_q->priv_data;
+ 	unsigned int entry = tx_q->dirty_tx;
+ 
++	if (priv->plat->dma_cfg->dma64)
++		return;
++
+ 	if (tx_q->tx_skbuff_dma[entry].last_segment && !priv->extend_desc &&
+ 	    priv->hwts_tx_en)
+ 		/* NOTE: Device will overwrite des3 with timestamp value if
+diff --git a/drivers/net/ethernet/stmicro/stmmac/common.h b/drivers/net/ethernet/stmicro/stmmac/common.h
+index 16e67c18b6f7..90a7784f71cb 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/common.h
++++ b/drivers/net/ethernet/stmicro/stmmac/common.h
+@@ -563,6 +563,7 @@ void stmmac_dwmac4_set_mac(void __iomem *ioaddr, bool enable);
+ void dwmac_dma_flush_tx_fifo(void __iomem *ioaddr);
+ 
+ extern const struct stmmac_mode_ops ring_mode_ops;
++extern const struct stmmac_mode_ops ring_mode64_ops;
+ extern const struct stmmac_mode_ops chain_mode_ops;
+ extern const struct stmmac_desc_ops dwmac4_desc_ops;
+ 
+diff --git a/drivers/net/ethernet/stmicro/stmmac/descs.h b/drivers/net/ethernet/stmicro/stmmac/descs.h
+index 49d6a866244f..223b77f0271c 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/descs.h
++++ b/drivers/net/ethernet/stmicro/stmmac/descs.h
+@@ -56,6 +56,9 @@
+ #define ERDES1_BUFFER2_SIZE_SHIFT	16
+ #define	ERDES1_DISABLE_IC		BIT(31)
+ 
++#define	E64RDES1_BUFFER1_SIZE_MASK	GENMASK(13, 0)
++#define	E64RDES1_BUFFER2_SIZE_MASK	GENMASK(29, 16)
++
+ /* Normal transmit descriptor defines */
+ /* TDES0 */
+ #define	TDES0_DEFERRED			BIT(0)
+@@ -122,6 +125,10 @@
+ #define	ETDES1_BUFFER2_SIZE_MASK	GENMASK(28, 16)
+ #define	ETDES1_BUFFER2_SIZE_SHIFT	16
+ 
++#define	E64TDES1_BUFFER1_SIZE_MASK	GENMASK(13, 0)
++#define	E64TDES1_BUFFER2_SIZE_MASK	GENMASK(28, 15)
++#define	E64TDES1_BUFFER2_SIZE_SHIFT	15
++
+ /* Extended Receive descriptor definitions */
+ #define	ERDES4_IP_PAYLOAD_TYPE_MASK	GENMASK(6, 2)
+ #define	ERDES4_IP_HDR_ERR		BIT(3)
+diff --git a/drivers/net/ethernet/stmicro/stmmac/descs_com.h b/drivers/net/ethernet/stmicro/stmmac/descs_com.h
+index 40f7f2da9c5e..24f27088f7c8 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/descs_com.h
++++ b/drivers/net/ethernet/stmicro/stmmac/descs_com.h
+@@ -20,12 +20,18 @@
+ 
+ /* Enhanced descriptors */
+ static inline void ehn_desc_rx_set_on_ring(struct dma_desc *p, int end,
+-					   int bfsize)
++					   int bfsize, bool dma64)
+ {
+-	if (bfsize == BUF_SIZE_16KiB)
+-		p->des1 |= cpu_to_le32((BUF_SIZE_8KiB
+-				<< ERDES1_BUFFER2_SIZE_SHIFT)
+-			   & ERDES1_BUFFER2_SIZE_MASK);
++	if (bfsize == BUF_SIZE_16KiB) {
++		if (dma64)
++			p->des1 |= cpu_to_le32((BUF_SIZE_8KiB
++					<< ERDES1_BUFFER2_SIZE_SHIFT)
++				   & E64RDES1_BUFFER2_SIZE_MASK);
++		else
++			p->des1 |= cpu_to_le32((BUF_SIZE_8KiB
++					<< ERDES1_BUFFER2_SIZE_SHIFT)
++				   & ERDES1_BUFFER2_SIZE_MASK);
++	}
+ 
+ 	if (end)
+ 		p->des1 |= cpu_to_le32(ERDES1_END_RING);
+@@ -39,7 +45,7 @@ static inline void enh_desc_end_tx_desc_on_ring(struct dma_desc *p, int end)
+ 		p->des0 &= cpu_to_le32(~ETDES0_END_RING);
+ }
+ 
+-static inline void enh_set_tx_desc_len_on_ring(struct dma_desc *p, int len)
++static inline void enh_set_tx_desc32_len_on_ring(struct dma_desc *p, int len)
+ {
+ 	if (unlikely(len > BUF_SIZE_4KiB)) {
+ 		p->des1 |= cpu_to_le32((((len - BUF_SIZE_4KiB)
+@@ -50,6 +56,27 @@ static inline void enh_set_tx_desc_len_on_ring(struct dma_desc *p, int len)
+ 		p->des1 |= cpu_to_le32((len & ETDES1_BUFFER1_SIZE_MASK));
+ }
+ 
++static inline void enh_set_tx_desc64_len_on_ring(struct dma_desc *p, int len)
++{
++	if (unlikely(len > BUF_SIZE_4KiB)) {
++		p->des1 |= cpu_to_le32((((len - BUF_SIZE_8KiB)
++					<< E64TDES1_BUFFER2_SIZE_SHIFT)
++			    & E64TDES1_BUFFER2_SIZE_MASK) | (BUF_SIZE_8KiB
++			    & E64TDES1_BUFFER1_SIZE_MASK));
++	} else {
++		p->des1 |= cpu_to_le32((len & E64TDES1_BUFFER1_SIZE_MASK));
++	}
++}
++
++static inline void enh_set_tx_desc_len_on_ring(struct dma_desc *p, int len,
++					       bool dma64)
++{
++	if (dma64)
++		enh_set_tx_desc64_len_on_ring(p, len);
++	else
++		enh_set_tx_desc32_len_on_ring(p, len);
++}
++
+ /* Normal descriptors */
+ static inline void ndesc_rx_set_on_ring(struct dma_desc *p, int end, int bfsize)
+ {
+@@ -98,9 +125,13 @@ static inline void enh_desc_end_tx_desc_on_chain(struct dma_desc *p)
+ 	p->des0 |= cpu_to_le32(ETDES0_SECOND_ADDRESS_CHAINED);
+ }
+ 
+-static inline void enh_set_tx_desc_len_on_chain(struct dma_desc *p, int len)
++static inline void enh_set_tx_desc_len_on_chain(struct dma_desc *p, int len,
++						bool dma64)
+ {
+-	p->des1 |= cpu_to_le32(len & ETDES1_BUFFER1_SIZE_MASK);
++	if (dma64)
++		p->des1 |= cpu_to_le32(len & E64TDES1_BUFFER1_SIZE_MASK);
++	else
++		p->des1 |= cpu_to_le32(len & ETDES1_BUFFER1_SIZE_MASK);
+ }
+ 
+ /* Normal descriptors */
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
+index 4cec78180556..4773779b7be5 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
+@@ -112,6 +112,9 @@ static void dwmac1000_dma_init(struct stmmac_priv *priv, void __iomem *ioaddr,
+ 
+ 	/* Mask interrupts by writing to CSR7 */
+ 	writel(mask, ioaddr + DMA_INTR_ENA);
++
++	if (dma_cfg->dma64)
++		writel(0x100, ioaddr + DMA_FUNC_CONFIG);
+ }
+ 
+ static void dwmac1000_dma_init_channel(struct stmmac_priv *priv,
+@@ -168,11 +171,25 @@ static void dwmac1000_dma_init_rx(struct stmmac_priv *priv,
+ 				  struct stmmac_dma_cfg *dma_cfg,
+ 				  dma_addr_t dma_rx_phy, u32 chan)
+ {
++	const struct dwmac_dma_addrs *addrs = priv->plat->dwmac_regs->addrs;
+ 	u32 offset = priv->plat->dwmac_regs->addrs->chan_offset;
+-	u32 addr = priv->plat->dwmac_regs->addrs->rcv_base_addr;
+ 
+-	/* RX descriptor base address list must be written into DMA CSR3 */
+-	writel(lower_32_bits(dma_rx_phy), ioaddr + addr + chan * offset);
++	if (dma_cfg->dma64) {
++		writel(lower_32_bits(dma_rx_phy), ioaddr + addrs->rcv_base_addr +
++		       chan * offset);
++		writel(upper_32_bits(dma_rx_phy), ioaddr + addrs->rcv_base_addr +
++		       0x4 + chan * offset);
++		if (addrs->rcv_base_addr_shadow1)
++			writel(upper_32_bits(dma_rx_phy),
++			       ioaddr + addrs->rcv_base_addr_shadow1);
++		if (addrs->rcv_base_addr_shadow2)
++			writel(upper_32_bits(dma_rx_phy),
++			       ioaddr + addrs->rcv_base_addr_shadow2);
++	} else {
++		/* RX descriptor base address list must be written into DMA CSR3 */
++		writel(lower_32_bits(dma_rx_phy), ioaddr + addrs->rcv_base_addr +
++		       chan * offset);
++	}
+ }
+ 
+ static void dwmac1000_dma_init_tx(struct stmmac_priv *priv,
+@@ -183,8 +200,13 @@ static void dwmac1000_dma_init_tx(struct stmmac_priv *priv,
+ 	u32 offset = priv->plat->dwmac_regs->addrs->chan_offset;
+ 	u32 addr = priv->plat->dwmac_regs->addrs->tx_base_addr;
+ 
+-	/* TX descriptor base address list must be written into DMA CSR4 */
+-	writel(lower_32_bits(dma_tx_phy), ioaddr + addr + chan * offset);
++	if (dma_cfg->dma64) {
++		writel(lower_32_bits(dma_tx_phy), ioaddr + addr + chan * offset);
++		writel(upper_32_bits(dma_tx_phy), ioaddr + addr + 0x4 + chan * offset);
++	} else {
++		/* TX descriptor base address list must be written into DMA CSR4 */
++		writel(lower_32_bits(dma_tx_phy), ioaddr + addr + chan * offset);
++	}
+ }
+ 
+ static u32 dwmac1000_configure_fc(u32 csr6, int rxfifosz)
+diff --git a/drivers/net/ethernet/stmicro/stmmac/enh_desc.c b/drivers/net/ethernet/stmicro/stmmac/enh_desc.c
+index 1932a3a8e03c..ee07006c97c1 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/enh_desc.c
++++ b/drivers/net/ethernet/stmicro/stmmac/enh_desc.c
+@@ -11,6 +11,7 @@
+ #include <linux/stmmac.h>
+ #include "common.h"
+ #include "descs_com.h"
++#include "stmmac.h"
+ 
+ static int enh_desc_get_tx_status(struct net_device_stats *stats,
+ 				  struct stmmac_extra_stats *x,
+@@ -81,7 +82,10 @@ static int enh_desc_get_tx_status(struct net_device_stats *stats,
+ 
+ static int enh_desc_get_tx_len(struct stmmac_priv *priv, struct dma_desc *p)
+ {
+-	return (le32_to_cpu(p->des1) & ETDES1_BUFFER1_SIZE_MASK);
++	if (priv->plat->dma_cfg->dma64)
++		return (le32_to_cpu(p->des1) & E64TDES1_BUFFER1_SIZE_MASK);
++	else
++		return (le32_to_cpu(p->des1) & ETDES1_BUFFER1_SIZE_MASK);
+ }
+ 
+ static int enh_desc_coe_rdes0(int ipc_err, int type, int payload_err)
+@@ -263,12 +267,15 @@ static void enh_desc_init_rx_desc(struct stmmac_priv *priv, struct dma_desc *p,
+ 	p->des0 |= cpu_to_le32(RDES0_OWN);
+ 
+ 	bfsize1 = min(bfsize, BUF_SIZE_8KiB);
+-	p->des1 |= cpu_to_le32(bfsize1 & ERDES1_BUFFER1_SIZE_MASK);
++	if (priv->plat->dma_cfg->dma64)
++		p->des1 |= cpu_to_le32(bfsize1 & E64RDES1_BUFFER1_SIZE_MASK);
++	else
++		p->des1 |= cpu_to_le32(bfsize1 & ERDES1_BUFFER1_SIZE_MASK);
+ 
+ 	if (mode == STMMAC_CHAIN_MODE)
+ 		ehn_desc_rx_set_on_chain(p);
+ 	else
+-		ehn_desc_rx_set_on_ring(p, end, bfsize);
++		ehn_desc_rx_set_on_ring(p, end, bfsize, priv->plat->dma_cfg->dma64);
+ 
+ 	if (disable_rx_ic)
+ 		p->des1 |= cpu_to_le32(ERDES1_DISABLE_IC);
+@@ -321,9 +328,9 @@ static void enh_desc_prepare_tx_desc(struct stmmac_priv *priv, struct dma_desc *
+ 	unsigned int tdes0 = le32_to_cpu(p->des0);
+ 
+ 	if (mode == STMMAC_CHAIN_MODE)
+-		enh_set_tx_desc_len_on_chain(p, len);
++		enh_set_tx_desc_len_on_chain(p, len, priv->plat->dma_cfg->dma64);
+ 	else
+-		enh_set_tx_desc_len_on_ring(p, len);
++		enh_set_tx_desc_len_on_ring(p, len, priv->plat->dma_cfg->dma64);
+ 
+ 	if (is_fs)
+ 		tdes0 |= ETDES0_FIRST_SEGMENT;
+@@ -445,11 +452,15 @@ static void enh_desc_set_addr(struct stmmac_priv *priv, struct dma_desc *p,
+ 			      dma_addr_t addr)
+ {
+ 	p->des2 = cpu_to_le32(addr);
++	if (priv->plat->dma_cfg->dma64)
++		p->des3 = cpu_to_le32(upper_32_bits(addr));
+ }
+ 
+ static void enh_desc_clear(struct stmmac_priv *priv, struct dma_desc *p)
+ {
+ 	p->des2 = 0;
++	if (priv->plat->dma_cfg->dma64)
++		p->des3 = 0;
+ }
+ 
+ const struct stmmac_desc_ops enh_desc_ops = {
+diff --git a/drivers/net/ethernet/stmicro/stmmac/hwif.c b/drivers/net/ethernet/stmicro/stmmac/hwif.c
+index 93cead5613e3..c5768bbec38e 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/hwif.c
++++ b/drivers/net/ethernet/stmicro/stmmac/hwif.c
+@@ -46,7 +46,10 @@ static void stmmac_dwmac_mode_quirk(struct stmmac_priv *priv)
+ 	} else {
+ 		dev_info(priv->device, "Ring mode enabled\n");
+ 		priv->mode = STMMAC_RING_MODE;
+-		mac->mode = &ring_mode_ops;
++		if (priv->plat->dma_cfg->dma64)
++			mac->mode = &ring_mode64_ops;
++		else
++			mac->mode = &ring_mode_ops;
+ 	}
+ }
+ 
+diff --git a/drivers/net/ethernet/stmicro/stmmac/ring_mode64.c b/drivers/net/ethernet/stmicro/stmmac/ring_mode64.c
+new file mode 100644
+index 000000000000..ab23f1498b20
+--- /dev/null
++++ b/drivers/net/ethernet/stmicro/stmmac/ring_mode64.c
+@@ -0,0 +1,159 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*******************************************************************************
++  Specialised functions for managing Ring mode
++
++  It defines all the functions used to handle the normal/enhanced
++  descriptors in case of the DMA is configured to work in chained or
++  in ring mode.
++
++  Based on code taken from ring_mode.c which is:
++
++  Copyright(C) 2011  STMicroelectronics Ltd
++
++  Author: Giuseppe Cavallaro <peppe.cavallaro@st.com>
++*******************************************************************************/
++
++#include "stmmac.h"
++
++static int jumbo_frm(struct stmmac_tx_queue *tx_q, struct sk_buff *skb,
++		     int csum)
++{
++	unsigned int nopaged_len = skb_headlen(skb);
++	struct stmmac_priv *priv = tx_q->priv_data;
++	unsigned int entry = tx_q->cur_tx;
++	struct dma_extended_desc *edesc;
++	unsigned int bmax, len, des2;
++	struct dma_desc *desc;
++
++	if (priv->extend_desc) {
++		edesc = tx_q->dma_etx + entry;
++		desc = (struct dma_desc *)edesc;
++	} else {
++		desc = tx_q->dma_tx + entry;
++	}
++
++	bmax = BUF_SIZE_8KiB;
++
++	len = nopaged_len - bmax * 2;
++
++	if (nopaged_len > bmax * 2) {
++		des2 = dma_map_single(priv->device, skb->data, bmax * 2,
++				      DMA_TO_DEVICE);
++		desc->des2 = cpu_to_le32(des2);
++		desc->des3 = cpu_to_le32(upper_32_bits(des2));
++		if (dma_mapping_error(priv->device, des2))
++			return -1;
++
++		tx_q->tx_skbuff_dma[entry].buf = des2;
++		tx_q->tx_skbuff_dma[entry].len = bmax * 2;
++		tx_q->tx_skbuff_dma[entry].is_jumbo = true;
++
++		edesc->des6 = cpu_to_le32(des2 + bmax);
++		edesc->des7 = cpu_to_le32(upper_32_bits(des2 + bmax));
++		stmmac_prepare_tx_desc(priv, desc, 1, bmax, csum,
++				       STMMAC_RING_MODE, 1, false, skb->len);
++
++		tx_q->tx_skbuff[entry] = NULL;
++		entry = STMMAC_GET_ENTRY(entry, priv->dma_conf.dma_tx_size);
++		edesc = tx_q->dma_etx + entry;
++		desc = &edesc->basic;
++
++		des2 = dma_map_single(priv->device, skb->data + bmax, len,
++				      DMA_TO_DEVICE);
++		desc->des2 = cpu_to_le32(des2);
++		desc->des3 = cpu_to_le32(upper_32_bits(des2));
++		if (dma_mapping_error(priv->device, des2))
++			return -1;
++		tx_q->tx_skbuff_dma[entry].buf = des2;
++		tx_q->tx_skbuff_dma[entry].len = len;
++		tx_q->tx_skbuff_dma[entry].is_jumbo = true;
++
++		edesc->des6 = cpu_to_le32(des2 + bmax);
++		edesc->des7 = cpu_to_le32(upper_32_bits(des2 + bmax));
++		stmmac_prepare_tx_desc(priv, desc, 0, len, csum,
++				       STMMAC_RING_MODE, 1, !skb_is_nonlinear(skb),
++				       skb->len);
++	} else {
++		des2 = dma_map_single(priv->device, skb->data,
++				      nopaged_len, DMA_TO_DEVICE);
++		desc->des2 = cpu_to_le32(des2);
++		desc->des3 = cpu_to_le32(upper_32_bits(des2));
++		if (dma_mapping_error(priv->device, des2))
++			return -1;
++		tx_q->tx_skbuff_dma[entry].buf = des2;
++		tx_q->tx_skbuff_dma[entry].len = nopaged_len;
++		tx_q->tx_skbuff_dma[entry].is_jumbo = true;
++		edesc->des6 = cpu_to_le32(des2 + bmax);
++		edesc->des7 = cpu_to_le32(upper_32_bits(des2 + bmax));
++		stmmac_prepare_tx_desc(priv, desc, 1, nopaged_len, csum,
++				       STMMAC_RING_MODE, 1, !skb_is_nonlinear(skb),
++				       skb->len);
++	}
++
++	tx_q->cur_tx = entry;
++
++	return entry;
++}
++
++static unsigned int is_jumbo_frm(int len, int enh_desc)
++{
++	unsigned int ret = 0;
++
++	if (len >= BUF_SIZE_4KiB)
++		ret = 1;
++
++	return ret;
++}
++
++static void refill_desc3(struct stmmac_rx_queue *rx_q, struct dma_desc *p)
++{
++	struct dma_extended_desc *edesc = (struct dma_extended_desc *)p;
++	struct stmmac_priv *priv = rx_q->priv_data;
++
++	/* Fill DES3 in case of RING mode */
++	if (priv->dma_conf.dma_buf_sz >= BUF_SIZE_8KiB) {
++		edesc->des6 = cpu_to_le32(le32_to_cpu(edesc->basic.des2) +
++					  BUF_SIZE_8KiB);
++		edesc->des7 = cpu_to_le32(le32_to_cpu(edesc->basic.des3));
++	}
++}
++
++/* In ring mode we need to fill the desc3 because it is used as buffer */
++static void init_desc3(struct dma_desc *p)
++{
++	struct dma_extended_desc *edesc = (struct dma_extended_desc *)p;
++
++	edesc->des6 = cpu_to_le32(le32_to_cpu(edesc->basic.des2) +
++				  BUF_SIZE_8KiB);
++	edesc->des7 = cpu_to_le32(le32_to_cpu(edesc->basic.des3));
++}
++
++static void clean_desc3(struct stmmac_tx_queue *tx_q, struct dma_desc *p)
++{
++	struct dma_extended_desc *edesc = (struct dma_extended_desc *)p;
++	unsigned int entry = tx_q->dirty_tx;
++
++	if (unlikely(tx_q->tx_skbuff_dma[entry].is_jumbo)) {
++		edesc->des6 = 0;
++		edesc->des7 = 0;
++	}
++}
++
++static int set_16kib_bfsize(int mtu)
++{
++	int ret = 0;
++
++	if (unlikely(mtu >= BUF_SIZE_8KiB))
++		ret = BUF_SIZE_16KiB;
++
++	return ret;
++}
++
++const struct stmmac_mode_ops ring_mode64_ops = {
++	.is_jumbo_frm = is_jumbo_frm,
++	.jumbo_frm = jumbo_frm,
++	.refill_desc3 = refill_desc3,
++	.init_desc3 = init_desc3,
++	.clean_desc3 = clean_desc3,
++	.set_16kib_bfsize = set_16kib_bfsize,
++};
+diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
+index ab979efd57bf..7aca9171b3a8 100644
+--- a/include/linux/stmmac.h
++++ b/include/linux/stmmac.h
+@@ -98,6 +98,7 @@ struct stmmac_dma_cfg {
+ 	bool eame;
+ 	bool multi_msi_en;
+ 	bool dche;
++	bool dma64;
+ };
+ 
+ #define AXI_BLEN	7
+-- 
+2.39.3
+
 
