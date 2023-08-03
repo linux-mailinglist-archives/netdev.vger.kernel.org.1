@@ -1,57 +1,63 @@
-Return-Path: <netdev+bounces-24206-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24207-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5ABC76F3B8
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 21:58:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A42276F3CA
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 22:04:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7958128217F
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 19:58:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 750531C21561
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 20:04:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70F0B2593C;
-	Thu,  3 Aug 2023 19:58:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F28DF2593F;
+	Thu,  3 Aug 2023 20:04:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62D1363BC
-	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 19:58:28 +0000 (UTC)
-Received: from omta36.uswest2.a.cloudfilter.net (omta36.uswest2.a.cloudfilter.net [35.89.44.35])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96342420F
-	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 12:58:26 -0700 (PDT)
-Received: from eig-obgw-5003a.ext.cloudfilter.net ([10.0.29.159])
-	by cmsmtp with ESMTP
-	id RZnpqiQ5zEoVsReSnqPoeb; Thu, 03 Aug 2023 19:58:26 +0000
-Received: from gator4166.hostgator.com ([108.167.133.22])
-	by cmsmtp with ESMTPS
-	id ReSnqp40UKJKAReSnqK30f; Thu, 03 Aug 2023 19:58:25 +0000
-X-Authority-Analysis: v=2.4 cv=E9reGIRl c=1 sm=1 tr=0 ts=64cc06e1
- a=1YbLdUo/zbTtOZ3uB5T3HA==:117 a=WzbPXH4gqzPVN0x6HrNMNA==:17
- a=OWjo9vPv0XrRhIrVQ50Ab3nP57M=:19 a=dLZJa+xiwSxG16/P+YVxDGlgEgI=:19
- a=jrvim2RH1L3wMXzH:21 a=IkcTkHD0fZMA:10 a=UttIx32zK-AA:10 a=wYkD_t78qR0A:10
- a=nOJuxIDNmBreB4syKN0A:9 a=QEXdDO2ut3YA:10 a=HTSSj-r2zjXQe2K4smQw:22
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=embeddedor.com; s=default; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=jWguheqDRFk5ih57FOhs7hR8F8ynpVmSMPNMK7J4pks=; b=IgSMGjszOK21o+fsP3lRpJU/Ac
-	aD3ll1ltbgH9c8fL3mKv/GI83ZFaSukEZZmhabwvRm7K+ytX3pk8VYxJ7Dg4gfu16tHmiYfbwpFLl
-	9vh6qFxe5P83alkhPriJp1W4bponvk/FghBzlWxlJiTaBNtHvY0Gf8c8kTClQA9HDABsqyuZxrum4
-	J8WU0Rq+McTC7Ejw3OmO4uTDQ3SpbmJ1aTEDQTygskiCP7nd9PGts6vSuNDft2t5xO7ySVuiHjsNa
-	7sC8PyAXWrVr8k7dZCQ7jL475wqPlkG/GjKgAfkthuzz0UNj48YJCH7MA+uh9U7PS7y/g/2kDorxA
-	qfu8YUqw==;
-Received: from 187-162-21-192.static.axtel.net ([187.162.21.192]:43556 helo=[192.168.15.8])
-	by gator4166.hostgator.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.96)
-	(envelope-from <gustavo@embeddedor.com>)
-	id 1qReSm-001vr8-1j;
-	Thu, 03 Aug 2023 14:58:24 -0500
-Message-ID: <c332844d-d0d9-8443-b119-3943532c15d1@embeddedor.com>
-Date: Thu, 3 Aug 2023 13:59:30 -0600
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E535363BC
+	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 20:04:12 +0000 (UTC)
+Received: from mail-il1-x129.google.com (mail-il1-x129.google.com [IPv6:2607:f8b0:4864:20::129])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB7154215
+	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 13:04:10 -0700 (PDT)
+Received: by mail-il1-x129.google.com with SMTP id e9e14a558f8ab-3493862cfb1so5288665ab.1
+        for <netdev@vger.kernel.org>; Thu, 03 Aug 2023 13:04:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1691093050; x=1691697850;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=yB7u195mr9vI+1R+T35BIrWCfcUHOGaguPdO3WgU8Hg=;
+        b=FX6VrcdCRsO7IYpPLgNTX9CWjDX604dXCbleAfdAM9yGyY8aTs7iE9Tzq95eYSaaak
+         IC4OIRDEQfQokcJFBdXefQ+RTCJ+kU4T8FBKULSaKu72wIZl9KNqR9IoWoN1RfbbfXfA
+         4+Id+ebKe53dZBuVbCrOfBe6kyvGJnvuKFRc7gF5MdmkQjqhDiFMkfiDeiRblgS36zdA
+         BuCnXJQuv+zS3VE/nbdTFIwPLmM+96noVxXTtrZEKXhFQB+PLmZkTG/Rs4DJ9WYViGbJ
+         BVwFJ9SYk/tAc+0rMwNcxW9dIMsZjzlWloR/VuvmO2AXDUWki/PxkoGT3kEWusMmtX4s
+         xi1A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691093050; x=1691697850;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=yB7u195mr9vI+1R+T35BIrWCfcUHOGaguPdO3WgU8Hg=;
+        b=c8GuyJPyBJrZOPRi8ZEpRVsmnBkNoSHeFrAyWXxqI6pmTt3sLbIY0cRiyWeyUu39XJ
+         TNWkkMQ4CZoA91Vc6GBJHEemkHae/7U19HNmQyP0YXFS0cF6BW3gVDHH+ymePnpCRoaY
+         gu3QX/lhAVCqTFQ43PtFYYkg1ypDjnS94tI1cxgDoVojpsEEoOi9sBo4PeJLnRhDNO99
+         hPboe4RVuuIlrnaPMU6jFZkJv8eVFnpZIVFnRA6RDdtwDQpTAr6dmR19G+v2mMyEi4i0
+         wAKbu4hbavpMirsw4Xo85Ts840BWaHixVbDDFk1cJLBLWx6LOhhwoBVhqfHlYoogOQHW
+         v9YA==
+X-Gm-Message-State: ABy/qLbGyw9mV4bKobC3He28qyJRQCl5KsR1l3oSyxfLa4N39Mb4hrL/
+	wAWqo9ClzCCGB+Z345gu2IB2hsTypcE=
+X-Google-Smtp-Source: APBJJlEUjwXOlgEAMt4MFK3fqtYvBqn+dthBwkNUl8Bc3YEc+jRHBqytzcVKz8QBMgbRUnm+qjV3mg==
+X-Received: by 2002:a05:6e02:c72:b0:348:c940:184c with SMTP id f18-20020a056e020c7200b00348c940184cmr18137848ilj.11.1691093049978;
+        Thu, 03 Aug 2023 13:04:09 -0700 (PDT)
+Received: from ?IPV6:2600:1700:6cf8:1240:c07f:1e98:63f3:8107? ([2600:1700:6cf8:1240:c07f:1e98:63f3:8107])
+        by smtp.gmail.com with ESMTPSA id g95-20020a25a4e8000000b00d0dfab2e86csm139227ybi.37.2023.08.03.13.04.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 03 Aug 2023 13:04:09 -0700 (PDT)
+Message-ID: <6390faf3-5b91-2534-0d53-b5bfb213c6c9@gmail.com>
+Date: Thu, 3 Aug 2023 13:04:07 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,62 +66,100 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.13.0
-Subject: Re: [PATCH net-next 1/2] eth: bnxt: fix one of the W=1 warnings about
- fortified memcpy()
+Subject: Re: [PATCH net-next v5 2/2] selftests: fib_tests: Add a test case for
+ IPv6 garbage collection
 Content-Language: en-US
-To: Michael Chan <michael.chan@broadcom.com>, Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com
-References: <20230727190726.1859515-1-kuba@kernel.org>
- <20230727190726.1859515-2-kuba@kernel.org>
- <58c12dc4-87e2-5c91-5744-27777acfa631@embeddedor.com>
- <20230803072123.1fbd56db@kernel.org>
- <CACKFLinikvXmKcxr4kjWO9TPYxTd2cb5agT1j=w9Qyj5-24s5A@mail.gmail.com>
-From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-In-Reply-To: <CACKFLinikvXmKcxr4kjWO9TPYxTd2cb5agT1j=w9Qyj5-24s5A@mail.gmail.com>
+To: David Ahern <dsahern@kernel.org>, thinker.li@gmail.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ netdev@vger.kernel.org, pabeni@redhat.com, martin.lau@linux.dev,
+ kernel-team@meta.com, yhs@meta.com
+Cc: kuifeng@meta.com
+References: <20230802004303.567266-1-thinker.li@gmail.com>
+ <20230802004303.567266-3-thinker.li@gmail.com>
+ <85c6c94e-1243-33ae-dadd-9bcdd7d328d1@kernel.org>
+ <65a8a91f-65af-e948-1386-fc7d0d413b77@gmail.com>
+ <94946d6e-6ca1-84b2-fc4f-619390f9c4fe@kernel.org>
+From: Kui-Feng Lee <sinquersw@gmail.com>
+In-Reply-To: <94946d6e-6ca1-84b2-fc4f-619390f9c4fe@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - embeddedor.com
-X-BWhitelist: no
-X-Source-IP: 187.162.21.192
-X-Source-L: No
-X-Exim-ID: 1qReSm-001vr8-1j
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
-X-Source-Sender: 187-162-21-192.static.axtel.net ([192.168.15.8]) [187.162.21.192]:43556
-X-Source-Auth: gustavo@embeddedor.com
-X-Email-Count: 3
-X-Org: HG=hgshared;ORG=hostgator;
-X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
-X-Local-Domain: yes
-X-CMAE-Envelope: MS4xfHYb1wwsFlho6dbhEpGQ+wy0AeQqoNgIg/HGbYHysciU/Hwv2uh5W6OQF3tq49PFUspepZvD+a5Xrms5lJGWIWNgPhkT2VeLZmCrjequckWEMFsePwXi
- UozFajpMM/vvAE5/otUN9LKYjxWwivZ82PD3el81KDcMPMIxJ81KtvzYd7aFgC7jGICEQaOZTdXrXh6yrDJTp2v2grBBEKSil1E=
+Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
 
 
-On 8/3/23 08:46, Michael Chan wrote:
+On 8/3/23 12:49, David Ahern wrote:
+> On 8/2/23 10:09 PM, Kui-Feng Lee wrote:
+>>
+>>
+>> On 8/2/23 19:06, David Ahern wrote:
+>>> On 8/1/23 6:43 PM, thinker.li@gmail.com wrote:
+>>> \> @@ -747,6 +750,97 @@ fib_notify_test()
+>>>>        cleanup &> /dev/null
+>>>>    }
+>>>>    +fib6_gc_test()
+>>>> +{
+>>>> +    echo
+>>>> +    echo "Fib6 garbage collection test"
+>>>> +
+>>>> +    STRACE=$(which strace)
+>>>> +    if [ -z "$STRACE" ]; then
+>>>> +        echo "    SKIP: strace not found"
+>>>> +        ret=$ksft_skip
+>>>> +        return
+>>>> +    fi
+>>>> +
+>>>> +    EXPIRE=10
+>>>> +
+>>>> +    setup
+>>>> +
+>>>> +    set -e
+>>>> +
+>>>> +    # Check expiration of routes every 3 seconds (GC)
+>>>> +    $NS_EXEC sysctl -wq net.ipv6.route.gc_interval=300
+>>>> +
+>>>> +    $IP link add dummy_10 type dummy
+>>>> +    $IP link set dev dummy_10 up
+>>>> +    $IP -6 address add 2001:10::1/64 dev dummy_10
+>>>> +
+>>>> +    $NS_EXEC sysctl -wq net.ipv6.route.flush=1
+>>>> +
+>>>> +    # Temporary routes
+>>>> +    for i in $(seq 1 1000); do
+>>>> +        # Expire route after $EXPIRE seconds
+>>>> +        $IP -6 route add 2001:20::$i \
+>>>> +        via 2001:10::2 dev dummy_10 expires $EXPIRE
+>>>> +    done
+>>>> +    N_EXP=$($IP -6 route list |grep expires|wc -l)
+>>>> +    if [ $N_EXP -ne 1000 ]; then
+>>>
+>>> race condition here ... that you can install all 1000 routes and then
+>>> run this command before any expire. 10 seconds is normally more than
+>>> enough time, but on a loaded server it might not be. And really it does
+>>> not matter. What matters is that you install routes with an expires and
+>>> they disappear when expected - and I believe the flush below should not
+>>> be needed to validate they have been removed.
+>>
+>> Without the flush below, the result will be very unpredictable or need
+>> to wait longer, at least two gc_interval seconds. We can
+>> shorten gc_interval to 10s, but we need to wait for 20s to make it
+>> certain. It is more predictable with the flush.
+>>
+>> About race condition, I will remove the check.  Just like what you said,
+>> it is not necessary.
 > 
-> The way I plan to fix this is to change the auto-generated struct
-> hwrm_queue_cos2bw_qcfg_output to have an array of substruct.  I think
-> that will look the cleanest.  I'll post it later today or tomorrow.
-
-Will that also fix the -Wstringop-overflow warning I mentioned in my
-previous reply?
-
-drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.c:133:17: warning: writing 12 bytes into a region of size 1 [-Wstringop-overflow=]
-
---
-Gustavo
-
+> you do not need to measure how long it takes to remove expired routes in
+> a selftest; you are only testing that in fact the expired routes are
+> removed.
+> 
+> EXPIRES=1
+> install routes
+> # wait 2x expires time for removal
+> sleep 2
+> verify routes are removed.
+Got it!
 
