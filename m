@@ -1,98 +1,108 @@
-Return-Path: <netdev+bounces-23885-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23886-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 124DA76DF8F
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 07:08:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E553276DFF8
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 08:01:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 08F101C21439
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 05:08:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D9E851C2143B
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 06:01:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 803163D8E;
-	Thu,  3 Aug 2023 05:08:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7176A846A;
+	Thu,  3 Aug 2023 06:01:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72ADC23D3
-	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 05:08:12 +0000 (UTC)
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3DB09B;
-	Wed,  2 Aug 2023 22:08:10 -0700 (PDT)
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-31792ac0fefso437636f8f.2;
-        Wed, 02 Aug 2023 22:08:10 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62E516FA5
+	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 06:01:41 +0000 (UTC)
+Received: from mail-wr1-x441.google.com (mail-wr1-x441.google.com [IPv6:2a00:1450:4864:20::441])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F252E6F
+	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 23:01:37 -0700 (PDT)
+Received: by mail-wr1-x441.google.com with SMTP id ffacd0b85a97d-31751d7d96eso465529f8f.1
+        for <netdev@vger.kernel.org>; Wed, 02 Aug 2023 23:01:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1691042496; x=1691647296;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=BXS/R9KsztjgvQfMuTAvGWJQZ7kBz1HCrKMvOwOo/Gk=;
+        b=yzJjrpUsZQgB8Uibucc7a+73iDhWXAHttm9gq3qJue8LTUGaLwOuDugg2Alf9tmmnT
+         rVrbGVn8Phqz5/g+7RvAlGAJyG6MQCfwu4HfhdHju+FXieLkrgHmIxY8Zgn9cfXRcIyU
+         yu5Z5lt98/fx92CwYpVqwrCvB7sGWSFVDKgbslnftIh9TT6U1WpNCf1/JnBA3WAX31PZ
+         0sAm//m/emsYAI0XOonHdyp1JzYelvZzpxzzRHO/aglTaybLzEI1E2qDcy9yDgJkRBMF
+         e0bHuLgcg0wx3c2ILjte/mZOhLcNLyXzj9haYwhXH3/1NtgtiCGQK5FB+K/itp5q14PN
+         /ykQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691039289; x=1691644089;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SX9ntrLJV/kdBv0dEu2PYDIqC3ArssiACUgrlWgmu38=;
-        b=j/51yOVEpLFyCPEgIGuismIyO76hfkTWDJm4WuJ8GE+CyxasgBHNwC/ijEdm67ARVY
-         RaBPzaDsU0a0ltZlZ+zp1gLClmzQlc9THVDg7QPHnSvyZN3BG9QpcuK8/sieCblzVJjz
-         lZ3YVbp0D4feCktxrUjljplhdfiJXPZ61PsgcFa6UZNITbEbsSKInU4ala7IgqH3Da3f
-         g92ibT3neEq1dOi8aofT1t+ixG4jnxSaGGjiH/90NfWGd/S376GhxeCafqsAIypNWimr
-         8foQ9UWtrt/OaodA4/Fp6RKwDNgt3wvzVldOXzkd/rsees2J0RagL++pnGjCACyIoCAP
-         mHtw==
-X-Gm-Message-State: ABy/qLbtQUjNmL/LCP2Y2YV8C5eYVakn2y2hDRtOfst4fdfvTeSgzdAQ
-	BVM3N60w7d98SipP/gsqDqw=
-X-Google-Smtp-Source: APBJJlFGK05xKr5kgiQuhfZEeaHfYOC+R2n278bG3Giy5r4TIqwnklypZtNl06OPuv39L0x4dV5Z7w==
-X-Received: by 2002:a5d:4c43:0:b0:317:60ae:2ef5 with SMTP id n3-20020a5d4c43000000b0031760ae2ef5mr6347351wrt.31.1691039289025;
-        Wed, 02 Aug 2023 22:08:09 -0700 (PDT)
-Received: from [192.168.1.58] (185-219-167-24-static.vivo.cz. [185.219.167.24])
-        by smtp.gmail.com with ESMTPSA id r6-20020adfce86000000b003179b3fd837sm13528311wrn.33.2023.08.02.22.08.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 02 Aug 2023 22:08:08 -0700 (PDT)
-Message-ID: <6808de4a-6002-e8bc-5921-06b5938dc69e@kernel.org>
-Date: Thu, 3 Aug 2023 07:08:07 +0200
+        d=1e100.net; s=20221208; t=1691042496; x=1691647296;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BXS/R9KsztjgvQfMuTAvGWJQZ7kBz1HCrKMvOwOo/Gk=;
+        b=e7PA3p2z2R1IPZttj3b3hY0xW5wsgKspApdSWc0YBPA7PVbk23ltx8JJ5vXdvfQHqu
+         E0Zh6pALbAutSGWVeuF+xC2l2Q/Ld+FBcMui7sqRAKDZUoNgdbmJuugUU0yLmbW2BrKV
+         8+vVbjbhUz9plWu7fpnfh8/JrVeIZvUavbUius2LpnXv0/K8eXpZGqiBwI0DL8ANwxcw
+         rATszVESBX1/IdXwc0NFhoKoayQTDmoAM98z/AcsvpUSPChn5yDR77tUQF3Jj1lU19K1
+         zF8jty4SkdK+t0lGc6G1ZP3DRa1I2blmvtagFVQF8ZevD8e6bSCeMmU7kVu37FzBx7+D
+         PUsg==
+X-Gm-Message-State: ABy/qLYsGvMkTb802npu9rtBC82p3dED0ehbJmCgzuajcyOQq3PUlwzr
+	Bk9zTsv79ZEON+CJf7dBVXCQmg==
+X-Google-Smtp-Source: APBJJlFf8R6G1o5y/Z22aDZHXnusJ6BrqR0Uyo/WQLipK0IzgGitW7yfhfIlueiqCMcbj9Cn7+We4g==
+X-Received: by 2002:a5d:4292:0:b0:317:6816:5792 with SMTP id k18-20020a5d4292000000b0031768165792mr6418621wrq.50.1691042495801;
+        Wed, 02 Aug 2023 23:01:35 -0700 (PDT)
+Received: from localhost ([212.23.236.67])
+        by smtp.gmail.com with ESMTPSA id l7-20020a5d5607000000b003143cb109d5sm20809246wrv.14.2023.08.02.23.01.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Aug 2023 23:01:35 -0700 (PDT)
+Date: Thu, 3 Aug 2023 08:01:34 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
+	edumazet@google.com, moshe@nvidia.com, saeedm@nvidia.com,
+	idosch@nvidia.com, petrm@nvidia.com
+Subject: Re: [patch net-next v2 00/11] devlink: use spec to generate split ops
+Message-ID: <ZMtCvitU6o2e41up@nanopsycho>
+References: <20230802152023.941837-1-jiri@resnulli.us>
+ <20230802190734.4a9f9c0a@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.1
-Subject: Re: [PATCH 2/2] net: nfc: remove casts from tty->disc_data
-Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: gregkh@linuxfoundation.org, linux-serial@vger.kernel.org,
- linux-kernel@vger.kernel.org, Max Staudt <max@enpas.org>,
- Wolfgang Grandegger <wg@grandegger.com>,
- Marc Kleine-Budde <mkl@pengutronix.de>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>,
- Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
- linux-can@vger.kernel.org, netdev@vger.kernel.org
-References: <20230801062237.2687-1-jirislaby@kernel.org>
- <20230801062237.2687-3-jirislaby@kernel.org>
- <20230802120755.10849c9a@kernel.org>
-From: Jiri Slaby <jirislaby@kernel.org>
-In-Reply-To: <20230802120755.10849c9a@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no
-	version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230802190734.4a9f9c0a@kernel.org>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 02. 08. 23, 21:07, Jakub Kicinski wrote:
-> On Tue,  1 Aug 2023 08:22:37 +0200 Jiri Slaby (SUSE) wrote:
->> tty->disc_data is 'void *', so there is no need to cast from that.
->> Therefore remove the casts and assign the pointer directly.
-> 
-> Which tree are these expected to flow thru?
+Thu, Aug 03, 2023 at 04:07:34AM CEST, kuba@kernel.org wrote:
+>On Wed,  2 Aug 2023 17:20:12 +0200 Jiri Pirko wrote:
+>> This is an outcome of the discussion in the following thread:
+>> https://lore.kernel.org/netdev/20230720121829.566974-1-jiri@resnulli.us/
+>> It serves as a dependency on the linked selector patchset.
+>> 
+>> There is an existing spec for devlink used for userspace part
+>> generation. There are two commands supported there.
+>> 
+>> This patchset extends the spec so kernel split ops code could
+>> be generated from it.
+>
+>Looks good! But you need to reshuffle stuff in patches 7-10
+>because there's a temporary build breakage. Some squashing,
+>reordering and maybe splitting patch 10 should do?
 
-The intention was through the tty tree. But I don't mind either way -- 
-it's up to you Greg.
+I was very careful not to cause any breakage. Will double check, fix the
+2 nits and send v3.
 
-thanks,
--- 
-js
-suse labs
+Thanks!
 
+>
+>Feel free to post v3 without waiting the full 24h.
+>-- 
+>pw-bot: cr
 
