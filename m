@@ -1,95 +1,83 @@
-Return-Path: <netdev+bounces-24103-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24104-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B0CD76EC55
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 16:21:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F27876EC6D
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 16:24:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 340E8282279
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 14:21:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 14EFA280232
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 14:24:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22A0E23BCD;
-	Thu,  3 Aug 2023 14:21:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D46E21D5F;
+	Thu,  3 Aug 2023 14:24:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0427C1F93A
-	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 14:21:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39BF1C433C8;
-	Thu,  3 Aug 2023 14:21:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48BD83D8E;
+	Thu,  3 Aug 2023 14:24:32 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A0FCC433CA;
+	Thu,  3 Aug 2023 14:24:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691072484;
-	bh=ogXR4tBfbvDt56hWyYjrB/Y2m0ixGBj//Z9eIHMQls0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=uCicPtZvRu2WkzaACqECBgE/7AyP1KR/ut7Bxlp/9+mr8tsBAPxvaIQnzJP0DvFVN
-	 u9tf/X78IlM+nQO7BPGOyvqw4HyYhpyVpGe+l+jWQwLlzSCb4t3MB5qIk22ryz8JBp
-	 DI/Hg4xAQWah7u+xtIOWCjsPnfwHH+25Hg/XEH4xeIYPHJpjSGeFTMvvxB1ewkqnjh
-	 ar6B0msplDGQaKKtNGJXoodASPETKbZwM/JdK1ltq0VDgGnCahLJ88XdWZf6Ttm5+c
-	 8YtiNFuAGWDKUcedfFXW2HMH0r3tgrStXrq9wYwpvs6UEpGeL2Qf+6aqt8hR/G3v42
-	 D495rfY6Uqctg==
-Date: Thu, 3 Aug 2023 07:21:23 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, michael.chan@broadcom.com
-Subject: Re: [PATCH net-next 1/2] eth: bnxt: fix one of the W=1 warnings
- about fortified memcpy()
-Message-ID: <20230803072123.1fbd56db@kernel.org>
-In-Reply-To: <58c12dc4-87e2-5c91-5744-27777acfa631@embeddedor.com>
-References: <20230727190726.1859515-1-kuba@kernel.org>
-	<20230727190726.1859515-2-kuba@kernel.org>
-	<58c12dc4-87e2-5c91-5744-27777acfa631@embeddedor.com>
+	s=k20201202; t=1691072672;
+	bh=fZnCQHD+JnX8Uw0i/9Xy90bfMJI/UtsG/4uWhs4aEPQ=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=n0ogD1d1EEVA2bneQwO5xBlcoSGAhL5fG6B1mrXqBQ5A6bkCzfEeiMZnd4+ZmZgtx
+	 yLkhNx7Y/Tq2fqe5byrhtzjtUI4khWwKM0k+tvm77eAFq0clfUneZM8yJOrfUM9pd9
+	 lTUYedmgfD4QcU1wDoD9IjTBCOJHXUHvD9EpdPq6ZgMJt0CnvdKy93fLvdWlorgIQm
+	 nBmW6Q787wiP3FGxvNo5hDw+Wn7iUTnSzXWE4QXsYCD+fxSTTEuN0fliOOsCbWqXIU
+	 fzobQJKu0zgbdLxd/9gO7YwX4jZ4aMQOmv/V7N1THPtx5yPymW4/2m6reGkarJfRuF
+	 6/JU9ShBceVCA==
+Message-ID: <bd6c0dee-3f2c-3613-a5ff-42cc11268e49@kernel.org>
+Date: Thu, 3 Aug 2023 16:24:26 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH bpf-next v2 2/3] net: move struct netdev_rx_queue out of
+ netdevice.h
+Content-Language: en-US
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, amritha.nambiar@intel.com,
+ aleksander.lobakin@intel.com, mst@redhat.com, jasowang@redhat.com,
+ xuanzhuo@linux.alibaba.com, ast@kernel.org, daniel@iogearbox.net,
+ andrii@kernel.org, martin.lau@linux.dev, song@kernel.org,
+ yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
+ sdf@google.com, haoluo@google.com, jolsa@kernel.org, bjorn@kernel.org,
+ magnus.karlsson@intel.com, maciej.fijalkowski@intel.com,
+ jonathan.lemon@gmail.com, gregkh@linuxfoundation.org, wangyufen@huawei.com,
+ virtualization@lists.linux-foundation.org
+References: <20230803010230.1755386-1-kuba@kernel.org>
+ <20230803010230.1755386-3-kuba@kernel.org>
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <20230803010230.1755386-3-kuba@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On Thu, 3 Aug 2023 07:08:13 -0600 Gustavo A. R. Silva wrote:
-> In function 'fortify_memcpy_chk',
->      inlined from 'bnxt_hwrm_queue_cos2bw_qcfg' at drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.c:165:3:
-> include/linux/fortify-string.h:592:25: warning: call to '__read_overflow2_field' declared with attribute warning: detected read beyond size of field (2nd 
-> parameter); maybe use struct_group()? [-Wattribute-warning]
->    592 |                         __read_overflow2_field(q_size_field, size);
->        |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> 
-> Here is a potential fix for that:
-> 
-> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.c
-> index 31f85f3e2364..e2390d73b3f0 100644
-> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.c
-> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.c
-> @@ -144,7 +144,7 @@ static int bnxt_hwrm_queue_cos2bw_qcfg(struct bnxt *bp, struct ieee_ets *ets)
->          struct hwrm_queue_cos2bw_qcfg_output *resp;
->          struct hwrm_queue_cos2bw_qcfg_input *req;
->          struct bnxt_cos2bw_cfg cos2bw;
-> -       void *data;
-> +       struct bnxt_cos2bw_cfg *data;
->          int rc, i;
-> 
->          rc = hwrm_req_init(bp, req, HWRM_QUEUE_COS2BW_QCFG);
-> @@ -158,11 +158,11 @@ static int bnxt_hwrm_queue_cos2bw_qcfg(struct bnxt *bp, struct ieee_ets *ets)
->                  return rc;
->          }
-> 
-> -       data = &resp->queue_id0 + offsetof(struct bnxt_cos2bw_cfg, queue_id);
-> +       data = (struct bnxt_cos2bw_cfg *)&resp->queue_id0;
->          for (i = 0; i < bp->max_tc; i++, data += sizeof(cos2bw.cfg)) {
->                  int tc;
-> 
-> -               memcpy(&cos2bw.cfg, data, sizeof(cos2bw.cfg));
-> +               memcpy(&cos2bw.cfg, &data->cfg, sizeof(cos2bw.cfg));
->                  if (i == 0)
->                          cos2bw.queue_id = resp->queue_id0;
 
-Neat trick, but seems like casting to the destination type should
-really be the last resort. There's only a handful of members in this
-struct, IMHO assigning member by member is cleaner.
-But I'll defer to Michael.
+
+On 03/08/2023 03.02, Jakub Kicinski wrote:
+> struct netdev_rx_queue is touched in only a few places
+> and having it defined in netdevice.h brings in the dependency
+> on xdp.h, because struct xdp_rxq_info gets embedded in
+> struct netdev_rx_queue.
+> 
+> In prep for removal of xdp.h from netdevice.h move all
+> the netdev_rx_queue stuff to a new header.
+> 
+> We could technically break the new header up to avoid
+> the sysfs.h include but it's so rarely included it
+> doesn't seem to be worth it at this point.
+> 
+> Reviewed-by: Amritha Nambiar<amritha.nambiar@intel.com>
+> Signed-off-by: Jakub Kicinski<kuba@kernel.org>
+> ---
+
+Acked-by: Jesper Dangaard Brouer <hawk@kernel.org>
 
