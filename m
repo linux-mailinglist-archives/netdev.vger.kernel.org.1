@@ -1,174 +1,293 @@
-Return-Path: <netdev+bounces-23914-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23913-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0FEA76E258
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 10:03:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 911EE76E257
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 10:02:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EA23B1C214BD
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 08:03:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 31A74282027
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 08:02:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 542E914276;
-	Thu,  3 Aug 2023 08:02:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2325713AFD;
+	Thu,  3 Aug 2023 08:02:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40D0C13AFD
-	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 08:02:52 +0000 (UTC)
-Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 650301BF
-	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 01:02:50 -0700 (PDT)
-Received: by mail-ed1-x535.google.com with SMTP id 4fb4d7f45d1cf-5230ac6dbc5so669036a12.3
-        for <netdev@vger.kernel.org>; Thu, 03 Aug 2023 01:02:50 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 109929440
+	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 08:02:46 +0000 (UTC)
+Received: from mail-lj1-x232.google.com (mail-lj1-x232.google.com [IPv6:2a00:1450:4864:20::232])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52324DF
+	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 01:02:42 -0700 (PDT)
+Received: by mail-lj1-x232.google.com with SMTP id 38308e7fff4ca-2b974031aeaso9708961fa.0
+        for <netdev@vger.kernel.org>; Thu, 03 Aug 2023 01:02:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tessares.net; s=google; t=1691049769; x=1691654569;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=oyeiaJJUGAnaCqsFNjqE65OIC0yesXPouF4fyxelTrg=;
-        b=NxwhbTnp9xOzxdetcqaAdaX/wdTxeGr952XttQKrMwniWc9O/qxD6tD0WWkHgod3lk
-         nvA10uVuunkzixZB2du8FmhhcMLcsdQRvGrj5NsNgDGnXBBsCrT3+D1p6vA/7pwtX7zg
-         8MGLOEEe0fMrvbNqIdVvPJ/xDO8J+XtYGiGkR50nRoB2GoOFN/r1e/C4uZ5YJgfMBYYq
-         T+uzVaKKTJT/vQsLiiPT5u9hIrrC3ybM/+0eLEnXCJZ5dMkd68K8kLkUh4A9hjTyLJ+0
-         2TRqAV9ZfCDYTMqDnMYa2oh4U9CKft+Qa65Eu7FyU0BXmvH/e8fvcMOPJhhjwvN7QsN/
-         FIew==
+        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1691049760; x=1691654560;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=sWjI4XbkdglCN8ZQ+xl/2dRug01IAQ+rZAOGhdrF4Ds=;
+        b=QURGvvcGEVr4NsJwaPPk0f8L+qWGFsRIW9kJE6x1NLrHzXTekeX+1xXxtFhw4vPGrp
+         SDA8rpH6xkOQoydND3q8Qi8H3GzflEgEPP85x3WbxNu3AytURbjwWiCcG5kTpfCEvnmI
+         ExELbZ43a8zZOPsoyYrGl1iC19dfiX9GDL8Phd8AfqV5V7vjhBeMdoJ+lVTCoEh1rU1c
+         fOA6U5xBevZhEkEWBPtv4eLnJZ+bBipcIooK3sRK8zN3PEDrbd9MFQSdQfDUpvONU4fq
+         uuKX2f8rXCK2sVkAHvESCs8L7n8ZV2DIgE01wfFfqPFy3whp1ywqQ0Jo2Sn8LcMSPnZv
+         jTkg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691049769; x=1691654569;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=oyeiaJJUGAnaCqsFNjqE65OIC0yesXPouF4fyxelTrg=;
-        b=hrTpt82ejZ4FUKWzOFtgQWpCq0656IEVKAef9VdbnK8ock4UMm9XdcCLAAVny63DaT
-         rswa7nL6gyX1g1QXpQ/8HWOsdZ8L7MJfoTfCqGt6EM8rA4v8puWcqCG5tOirGF5mtRRu
-         D24raTi2qSGMhDrJ4TUXjaG79bB6RAQ8pISzPyZOXqhhKZ203ItuHmSSCIlPjvPnSAO8
-         qhbxLjRbppst//s1RGZJnUrxdck8r6+b8EuIKVdny0Qtfwm2niU81Dka4iOecWIab3y+
-         vBJqjEJ8Fk5J51Wi8UNp/szFwT8aorg0eTgOFF02CroccpofdwBZ609NFKavNNLRP8To
-         eQXw==
-X-Gm-Message-State: ABy/qLZ7sBtdGpVXtj52jmBPoabffu8CeG+8Zo+G/yvHPz9+H4dZgU7x
-	EJdVCS/8I/+pQ8Bzl/kT22UsDg==
-X-Google-Smtp-Source: APBJJlG/zXuNQVHI6sqTDl/HdxE/zJkMFbko/Sk+XHrssrUl1Ye5fGLe5SAEJjzorQTBzeZUfc7j+g==
-X-Received: by 2002:aa7:d3d8:0:b0:522:28fa:3009 with SMTP id o24-20020aa7d3d8000000b0052228fa3009mr6862340edr.13.1691049768861;
-        Thu, 03 Aug 2023 01:02:48 -0700 (PDT)
-Received: from ?IPV6:2a02:578:8593:1200:ace8:eb44:12a0:888? ([2a02:578:8593:1200:ace8:eb44:12a0:888])
-        by smtp.gmail.com with ESMTPSA id ay9-20020a056402202900b005223d76a3e3sm9669924edb.85.2023.08.03.01.02.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 03 Aug 2023 01:02:48 -0700 (PDT)
-Message-ID: <94791e4f-98d4-454b-ae1d-3f61ac2b46d1@tessares.net>
-Date: Thu, 3 Aug 2023 10:02:32 +0200
+        d=1e100.net; s=20221208; t=1691049760; x=1691654560;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sWjI4XbkdglCN8ZQ+xl/2dRug01IAQ+rZAOGhdrF4Ds=;
+        b=QvTGTyA+wSW2qtZfke3nj/IqVOttBJ5ePpGXBdgUcEF30xLmJVEUmPnEf/IUAHe3mp
+         aa7TisoO4TWm0IQUEkz9h8ivo+BOmQyB/ER/gsHNWY0MRasdRP53c2uQcYWux9NqiduO
+         JBttaaXk4MaBXr73wLgtxjuP0Ludg+yzUl0QZVrp0hut/SWa59qcs11kG+tOGNBfYU7q
+         z0p9MZbU4VRXbckmnnxHRwCdyr0T/GrtzJgGyttAXaF0Hrfu1GS/8Z7LGOlkhrKLNmUF
+         Um9uSfdwHBxyU4c78gBiskm+y4Kntb7KrIPPGaZj3EU0O7zt6UixEyWK9Ukab3Ms4jfE
+         acnA==
+X-Gm-Message-State: ABy/qLY0pFR6XrdXL4dMegDwwZXG9AAqibx9Aw/yy9erT4bt+vgio+/j
+	idw3T/YV25QY9wDTxYjduztWcg==
+X-Google-Smtp-Source: APBJJlFG3nyJLz++ssYp8bbbyIAy60WW2BTl3Sv6RDcrxGf3ztv8ov0tc9h4az4k3zbOiGeUjMteew==
+X-Received: by 2002:a2e:9f50:0:b0:2b9:ad7d:a144 with SMTP id v16-20020a2e9f50000000b002b9ad7da144mr6855771ljk.11.1691049760407;
+        Thu, 03 Aug 2023 01:02:40 -0700 (PDT)
+Received: from localhost ([212.23.236.67])
+        by smtp.gmail.com with ESMTPSA id t12-20020a7bc3cc000000b003fbc30825fbsm3547854wmj.39.2023.08.03.01.02.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 03 Aug 2023 01:02:39 -0700 (PDT)
+Date: Thu, 3 Aug 2023 10:02:38 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>
+Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jonathan Lemon <jonathan.lemon@gmail.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	"Olech, Milena" <milena.olech@intel.com>,
+	"Michalik, Michal" <michal.michalik@intel.com>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	poros <poros@redhat.com>, mschmidt <mschmidt@redhat.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-clk@vger.kernel.org" <linux-clk@vger.kernel.org>,
+	Bart Van Assche <bvanassche@acm.org>
+Subject: Re: [PATCH 09/11] ice: implement dpll interface to control cgu
+Message-ID: <ZMtfHn8es60MSMj+@nanopsycho>
+References: <20230720091903.297066-1-vadim.fedorenko@linux.dev>
+ <20230720091903.297066-10-vadim.fedorenko@linux.dev>
+ <ZLpuaxMJ+8rWAPwi@nanopsycho>
+ <DM6PR11MB46571657F0DF87765DAB32FE9B06A@DM6PR11MB4657.namprd11.prod.outlook.com>
+ <ZMem35OUQiQmB9Vd@nanopsycho>
+ <DM6PR11MB4657C0DA91583D92697324BC9B0AA@DM6PR11MB4657.namprd11.prod.outlook.com>
+ <ZMn+Uvu8B6IcCFoj@nanopsycho>
+ <DM6PR11MB46575671FF8CB35795EAA0669B0BA@DM6PR11MB4657.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf-next v8 1/4] bpf: Add update_socket_protocol hook
-Content-Language: en-GB
-To: Geliang Tang <geliang.tang@suse.com>, Alexei Starovoitov
- <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
- <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
- Yonghong Song <yhs@fb.com>, John Fastabend <john.fastabend@gmail.com>,
- KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
- Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
- Florent Revest <revest@chromium.org>, Brendan Jackman
- <jackmanb@chromium.org>, Mat Martineau <martineau@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- John Johansen <john.johansen@canonical.com>, Paul Moore
- <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
- "Serge E. Hallyn" <serge@hallyn.com>,
- Stephen Smalley <stephen.smalley.work@gmail.com>,
- Eric Paris <eparis@parisplace.org>, Mykola Lysenko <mykolal@fb.com>,
- Shuah Khan <shuah@kernel.org>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, mptcp@lists.linux.dev,
- apparmor@lists.ubuntu.com, linux-security-module@vger.kernel.org,
- selinux@vger.kernel.org, linux-kselftest@vger.kernel.org
-References: <cover.1691047403.git.geliang.tang@suse.com>
- <120b307aacd1791fac016d33e112069ffb7db21a.1691047403.git.geliang.tang@suse.com>
-From: Matthieu Baerts <matthieu.baerts@tessares.net>
-Autocrypt: addr=matthieu.baerts@tessares.net; keydata=
- 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
-In-Reply-To: <120b307aacd1791fac016d33e112069ffb7db21a.1691047403.git.geliang.tang@suse.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <DM6PR11MB46575671FF8CB35795EAA0669B0BA@DM6PR11MB4657.namprd11.prod.outlook.com>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Geliang,
+Wed, Aug 02, 2023 at 05:48:43PM CEST, arkadiusz.kubalewski@intel.com wrote:
+>>From: Jiri Pirko <jiri@resnulli.us>
+>>Sent: Wednesday, August 2, 2023 8:57 AM
+>>
+>>Tue, Aug 01, 2023 at 04:50:44PM CEST, arkadiusz.kubalewski@intel.com wrote:
+>>>>From: Jiri Pirko <jiri@resnulli.us>
+>>>>Sent: Monday, July 31, 2023 2:20 PM
+>>>>
+>>>>Sat, Jul 29, 2023 at 01:03:59AM CEST, arkadiusz.kubalewski@intel.com
+>>>>wrote:
+>>>>>>From: Jiri Pirko <jiri@resnulli.us>
+>>>>>>Sent: Friday, July 21, 2023 1:39 PM
+>>>>>>
+>>>>>>Thu, Jul 20, 2023 at 11:19:01AM CEST, vadim.fedorenko@linux.dev wrote:
+>>>>>>>From: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+>>>>>
+>>>>
+>>>>[...]
+>>>>
+>>>>
+>>>>>>>+static int ice_dpll_cb_lock(struct ice_pf *pf, struct netlink_ext_ack
+>>>>>>>*extack)
+>>>>>>>+{
+>>>>>>>+	int i;
+>>>>>>>+
+>>>>>>>+	for (i = 0; i < ICE_DPLL_LOCK_TRIES; i++) {
+>>>>>>>+		if (!test_bit(ICE_FLAG_DPLL, pf->flags)) {
+>>>>>>
+>>>>>>And again, as I already told you, this flag checking is totally
+>>>>>>pointless. See below my comment to ice_dpll_init()/ice_dpll_deinit().
+>>>>>>
+>>>>>
+>>>>>This is not pointless, will explain below.
+>>>>>
+>>>>>>
+>>>>>>
+>>>>>
+>>>>>[...]
+>>>>>
+>>>>
+>>>>[...]
+>>>>
+>>>>
+>>>>>>>+void ice_dpll_deinit(struct ice_pf *pf)
+>>>>>>>+{
+>>>>>>>+	bool cgu = ice_is_feature_supported(pf, ICE_F_CGU);
+>>>>>>>+
+>>>>>>>+	if (!test_bit(ICE_FLAG_DPLL, pf->flags))
+>>>>>>>+		return;
+>>>>>>>+	clear_bit(ICE_FLAG_DPLL, pf->flags);
+>>>>>>>+
+>>>>>>>+	ice_dpll_deinit_pins(pf, cgu);
+>>>>>>>+	ice_dpll_deinit_dpll(pf, &pf->dplls.pps, cgu);
+>>>>>>>+	ice_dpll_deinit_dpll(pf, &pf->dplls.eec, cgu);
+>>>>>>>+	ice_dpll_deinit_info(pf);
+>>>>>>>+	if (cgu)
+>>>>>>>+		ice_dpll_deinit_worker(pf);
+>>>>>>
+>>>>>>Could you please order the ice_dpll_deinit() to be symmetrical to
+>>>>>>ice_dpll_init()? Then, you can drop ICE_FLAG_DPLL flag entirely, as the
+>>>>>>ice_dpll_periodic_work() function is the only reason why you need it
+>>>>>>currently.
+>>>>>>
+>>>>>
+>>>>>Not true.
+>>>>>The feature flag is common approach in ice. If the feature was
+>>>>>successfully
+>>>>
+>>>>The fact that something is common does not necessarily mean it is
+>>>>correct. 0 value argument.
+>>>>
+>>>
+>>>Like using functions that unwrap netlink attributes as unsigned when
+>>>they are in fact enums with possibility of being signed?
+>>
+>>Looks this is bothering you, sorry about that.
+>>
+>
+>Just poining out.
+>
+>>
+>>>
+>>>This is about consistent approach in ice driver.
+>>>
+>>>>
+>>>>>initialized the flag is set. It allows to determine if deinit of the
+>>>>>feature
+>>>>>is required on driver unload.
+>>>>>
+>>>>>Right now the check for the flag is not only in kworker but also in each
+>>>>>callback, if the flag were cleared the data shall be not accessed by
+>>>>>callbacks.
+>>>>
+>>>>Could you please draw me a scenario when this could actually happen?
+>>>>It is just a matter of ordering. Unregister dpll device/pins before you
+>>>>cleanup the related resources and you don't need this ridiculous flag.
+>>>>
+>>>
+>>>Flag allows to determine if dpll was successfully initialized and do
+>>>proper
+>>>deinit on rmmod only if it was initialized. That's all.
+>>
+>>You are not answering my question. I asked about how the flag helps is
+>>you do unregister dpll devices/pins and you free related resources in
+>>the correct order. Because that is why you claim you need this flag.
+>>
+>
+>I do not claim such thing, actually opposite, I said it helps a bit
+>but the reason for existence is different, yet you are still trying to
+>imply me this.
+>
+>>I'm tired of this. Keep your driver tangled for all I care, I'm trying
+>>to help you, obviously you are not interested.
+>>
+>
+>With review you are doing great job and many thanks for that.
+>
+>Already said it multiple times, the main reason of flag existence is not a
+>use in the callback but to determine successful dpll initialization.
 
-On 03/08/2023 09:30, Geliang Tang wrote:
-> Add a hook named update_socket_protocol in __sys_socket(), for bpf
-> progs to attach to and update socket protocol. One user case is to
-> force legacy TCP apps to create and use MPTCP sockets instead of
-> TCP ones.
-> 
-> Define a mod_ret set named bpf_mptcp_fmodret_ids, add the hook
-> update_socket_protocol into this set, and register it in
-> bpf_mptcp_kfunc_init().
+So use it only for this, nothing else. Use it only to check during
+cleanup that you need to do the cleanup as init was previously done.
 
-Thank you for having looked at that!
 
-Because it is related to MPTCP:
+>As there is no need to call unregister on anything if it was not successfully
+>registered.
+>
+>>
+>>>
+>>>>
+>>>>>I know this is not required, but it helps on loading and unloading the
+>>>>>driver,
+>>>>>thanks to that, spam of pin-get dump is not slowing the driver
+>>>>>load/unload.
+>>>>
+>>>>? Could you plese draw me a scenario how such thing may actually happen?
+>>>
+>>>First of all I said it is not required.
+>>>
+>>>I already draw you this with above sentence.
+>>>You need spam pin-get asynchronously and unload driver, what is not clear?
+>>>Basically mutex in dpll is a bottleneck, with multiple requests waiting
+>>>for
+>>>mutex there is low change of driver getting mutex when doing unregisters.
+>>
+>>How exactly your flag helps you in this scenario? It does not.
+>>
+>
+>In this scenario it helps because it fails the callbacks when dpll subsystem
+>was partially initialized and callbacks can be already invoked, but in fact
+>the dpll initialization is not yet finished in the driver, and there will always
+>be the time between first and second dpll registration where we might wait for
+>the mutex to become available on dpll core part.
 
-Acked-by: Matthieu Baerts <matthieu.baerts@tessares.net>
+Draw it to me, please, where exatly there is a problem. I'm still
+convinced that with the proper ordering of init/cleanup flows,
+you'll get all you need, without any flag use.
 
-I don't know if your scripts to apply patches support the "Closes" tag
-but just in case:
 
-Closes: https://github.com/multipath-tcp/mptcp_net-next/issues/79
+>
+>>
+>>>
+>>>We actually need to redesign the mutex in dpll core/netlink, but I guess
+>>>after
+>>>initial submission.
+>>
+>>Why?
+>>
+>
+>The global mutex for accessing the data works just fine, but it is slow.
+>Maybe we could improve this by using rwlock instead.
 
-Cheers,
-Matt
--- 
-Tessares | Belgium | Hybrid Access Solutions
-www.tessares.net
+"it is slow" is quite vague description of what's wrong with the
+locking.
+
+
+>
+>Thank you!
+>Arkadiusz
+>
+>>
+>>>
+>>>Thank you!
+>>>Arkadiusz
+>>>
+>>>>
+>>>>Thanks!
+>>>>
+>>>>
+>>>>>
+>>>>>>
+>>>>>>>+	mutex_destroy(&pf->dplls.lock);
+>>>>>>>+}
+>>>>
+>>>>
+>>>>[...]
 
