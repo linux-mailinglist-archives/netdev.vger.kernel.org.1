@@ -1,158 +1,182 @@
-Return-Path: <netdev+bounces-24188-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24189-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CB4C76F2F3
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 20:47:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 31AED76F2FC
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 20:49:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3D3CE1C2165B
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 18:46:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 523EA1C2165B
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 18:49:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF3F224174;
-	Thu,  3 Aug 2023 18:46:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDBE92418E;
+	Thu,  3 Aug 2023 18:49:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A05B62416F
-	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 18:46:56 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C15FF49C5;
-	Thu,  3 Aug 2023 11:46:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1691088389; x=1722624389;
-  h=from:to:cc:subject:in-reply-to:references:date:
-   message-id:mime-version;
-  bh=3gq1m1Q2ya0GLFc6+cnheSBbzbHrqHzRXeNNrsdtKU4=;
-  b=bD0zXqidljWnSMboyHAikSW3KU6ayRRDiboKmLZy2GbDWfkzuR9BI/YI
-   SHGnCThzjnIttRD5BZnN3uv6xM2lnH1xUSGrxNyQs3+MfDaB5MakXgmsY
-   dE6eZvxLSJA7GMq6NwhPLaBPtKHjKMKInaTm7LAoAM1OuIvmJo7LPuWwt
-   V6mdY1YZ69OTmyGY03h9DNeDw+M4BGg6invLN/DyYAisKVrKIewPP+BCw
-   ws1n44I+LGXXrqdWhhhCaDaT58W0tofhlkqKsh8mGaPD9Iq5FcnpAmtRT
-   xFLjAjWdYcL7Z1hMLJOVPICIas/yo+Avm70hngHt+/8SnkUXBxIaSIhRs
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10791"; a="350269092"
-X-IronPort-AV: E=Sophos;i="6.01,252,1684825200"; 
-   d="scan'208";a="350269092"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Aug 2023 11:43:18 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10791"; a="1060414875"
-X-IronPort-AV: E=Sophos;i="6.01,252,1684825200"; 
-   d="scan'208";a="1060414875"
-Received: from cgahan-mobl.amr.corp.intel.com (HELO vcostago-mobl3) ([10.212.253.5])
-  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Aug 2023 11:43:17 -0700
-From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang
- <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
- linux-kernel@vger.kernel.org, intel-wired-lan@lists.osuosl.org, Muhammad
- Husaini Zulkifli <muhammad.husaini.zulkifli@intel.com>, Peilin Ye
- <yepeilin.cs@gmail.com>, Pedro Tammela <pctammela@mojatatu.com>, Richard
- Cochran <richardcochran@gmail.com>, Zhengchao Shao
- <shaozhengchao@huawei.com>, Maxim Georgiev <glipus@gmail.com>
-Subject: Re: [PATCH v3 net-next 09/10] selftests/tc-testing: test that
- taprio can only be attached as root
-In-Reply-To: <20230803143347.7hhn27hzjymdvvw6@skbuf>
-References: <20230801182421.1997560-1-vladimir.oltean@nxp.com>
- <20230801182421.1997560-10-vladimir.oltean@nxp.com>
- <87pm4510r0.fsf@intel.com> <20230803143347.7hhn27hzjymdvvw6@skbuf>
-Date: Thu, 03 Aug 2023 11:43:16 -0700
-Message-ID: <87il9w0xx7.fsf@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD56563BC
+	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 18:49:55 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (unknown [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BEE792D5A;
+	Thu,  3 Aug 2023 11:49:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=uflcrixw6nCghznSfpjIdEg8Z/0V2WwrsF757Ri68QM=; b=yZ4xfzN3KxRSxQXFgH5pEZ5UDS
+	ZKN0bp0nCAS+X+TZJW1kOMqfgeHntqkThktxc97CIl4mwO5l0tAEBLNQrT/a+1QKS+W1gkFBtFBaH
+	cFWM8c0u9tem1TxlvQZ1Bn1kiglukxknmU8+N2qnSkaaIGyssQTxO36q6I3283BBDkJHKxups7Chy
+	+OicRaaFOJFCLdM9P2LHorQAMT58tGG6j2cHVCCNlE6MbDYZq9X+xpL+16o0hZrjUsP2zSMqxyfB9
+	aNM/cIslnhJf8etVT36eotThMRVvTT7xVXsPijazTJAyik4+Zh0YP4CHxmpNEysWdfJy3bytoZx3x
+	9GMwE8CQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:46050)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qRdNy-0007Lp-0p;
+	Thu, 03 Aug 2023 19:49:22 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qRdNs-0003AM-NG; Thu, 03 Aug 2023 19:49:16 +0100
+Date: Thu, 3 Aug 2023 19:49:16 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Florian Fainelli <f.fainelli@gmail.com>
+Cc: Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>,
+	Ioana Ciornei <ciorneiioana@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Ioana Ciornei <ioana.ciornei@nxp.com>,
+	Alexandru Ardelean <alexandru.ardelean@analog.com>,
+	Andre Edich <andre.edich@microchip.com>,
+	Antoine Tenart <atenart@kernel.org>,
+	Baruch Siach <baruch@tkos.co.il>,
+	Christophe Leroy <christophe.leroy@c-s.fr>,
+	Divya Koppera <Divya.Koppera@microchip.com>,
+	Hauke Mehrtens <hauke@hauke-m.de>,
+	Jerome Brunet <jbrunet@baylibre.com>,
+	Kavya Sree Kotagiri <kavyasree.kotagiri@microchip.com>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Marco Felsch <m.felsch@pengutronix.de>, Marek Vasut <marex@denx.de>,
+	Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
+	Mathias Kresin <dev@kresin.me>, Maxim Kochetkov <fido_max@inbox.ru>,
+	Michael Walle <michael@walle.cc>,
+	Neil Armstrong <narmstrong@baylibre.com>,
+	Nisar Sayed <Nisar.Sayed@microchip.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	Philippe Schenker <philippe.schenker@toradex.com>,
+	Willy Liu <willy.liu@realtek.com>,
+	Yuiko Oshino <yuiko.oshino@microchip.com>
+Subject: Re: [PATCH net-next v2 02/19] net: phy: add a shutdown procedure
+Message-ID: <ZMv2rC8CACihovLl@shell.armlinux.org.uk>
+References: <20201101125114.1316879-1-ciorneiioana@gmail.com>
+ <20201101125114.1316879-3-ciorneiioana@gmail.com>
+ <20230803181640.yzxsk2xphwryxww4@pengutronix.de>
+ <7e365fa4-7a50-382c-5a99-288a417a82a7@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <7e365fa4-7a50-382c-5a99-288a417a82a7@gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RDNS_NONE,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=no
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Vladimir Oltean <vladimir.oltean@nxp.com> writes:
+On Thu, Aug 03, 2023 at 11:24:04AM -0700, Florian Fainelli wrote:
+> On 8/3/23 11:16, Uwe Kleine-König wrote:
+> > Hello,
+> > 
+> > this patch became commit e2f016cf775129c050d6c79483073423db15c79a and is
+> > contained in v5.11-rc1.
+> > 
+> > It broke wake-on-lan on my NAS (an ARM machine with an Armada 370 SoC,
+> > armada-370-netgear-rn104.dts). The used phy driver is marvell.c. I only
+> > report it now as I just upgraded that machine from Debian 11 (with
+> > kernel 5.10.x) to Debian 12 (with kernel 6.1.x).
+> > 
+> > Commenting out phy_disable_interrupts(...) in v6.1.41's phy_shutdown()
+> > fixes the problem for me.
+> > 
+> > On Sun, Nov 01, 2020 at 02:50:57PM +0200, Ioana Ciornei wrote:
+> > > In case of a board which uses a shared IRQ we can easily end up with an
+> > > IRQ storm after a forced reboot.
+> > > 
+> > > For example, a 'reboot -f' will trigger a call to the .shutdown()
+> > > callbacks of all devices. Because phylib does not implement that hook,
+> > > the PHY is not quiesced, thus it can very well leave its IRQ enabled.
+> > > 
+> > > At the next boot, if that IRQ line is found asserted by the first PHY
+> > > driver that uses it, but _before_ the driver that is _actually_ keeping
+> > > the shared IRQ asserted is probed, the IRQ is not going to be
+> > > acknowledged, thus it will keep being fired preventing the boot process
+> > > of the kernel to continue. This is even worse when the second PHY driver
+> > > is a module.
+> > > 
+> > > To fix this, implement the .shutdown() callback and disable the
+> > > interrupts if these are used.
+> > 
+> > I don't know how this should interact with wake-on-lan, but I would
+> > expect that there is a way to fix this without reintroducing the problem
+> > fixed by this change. However I cannot say if this needs fixing in the
+> > generic phy code or the phy driver. Any hints?
+> 
+> It depends upon what the PHY drivers and underlying hardware are capable and
+> willing to do. Some PHY drivers will shutdown the TX path completely since
+> you do not need that part to receive Wake-on-LAN packets and pass them up to
+> the PHY and/or MAC Wake-on-LAN matching logic. This would invite us to let
+> individual PHY drivers make a decision as to what they want to do in a
+> .shutdown() routine that would then need to be added to each and every
+> driver that wants to do something special. In the absence of said routine,
+> you could default to calling phy_disable_interrupts() unless the PHY has WoL
+> enabled?
+> 
+> phydev::wol_enabled reflects whether the PHY and/or the MAC has Wake-on-LAN
+> enabled which could you could key off to "nullify" what the shutdown does.
 
-> Hi Vinicius,
->
-> On Wed, Aug 02, 2023 at 04:29:55PM -0700, Vinicius Costa Gomes wrote:
->> Vladimir Oltean <vladimir.oltean@nxp.com> writes:
->> This test is somehow flaky (all others are fine), 1 in ~4 times, it fails.
->> 
->> Taking a look at the test I couldn't quickly find out the reason for the
->> flakyness.
->> 
->> Here's the verbose output of one of the failures:
->> 
->> vcgomes@otc-cfl-clr-30 ~/src/net-next/tools/testing/selftests/tc-testing $ sudo ./tdc.py -e 39b4 -v
->> All test results:
->> 
->> 1..1
->> not ok 1 39b4 - Reject grafting taprio as child qdisc of software taprio
->> 	Could not match regex pattern. Verify command output:
->> parse error: Objects must consist of key:value pairs at line 1, column 334
->
-> Interesting. I'm not seeing this, and I re-ran it a few times. The error
-> message seems to come from jq, as if it's not able to parse something.
->
-> Sorry, I only have caveman debugging techniques. Could you remove the
-> pipe into jq and rerun a few times, see what it prints when it fails?
->
-> diff --git a/tools/testing/selftests/tc-testing/tc-tests/qdiscs/taprio.json b/tools/testing/selftests/tc-testing/tc-tests/qdiscs/taprio.json
-> index de51408544e2..bb6be1f78e31 100644
-> --- a/tools/testing/selftests/tc-testing/tc-tests/qdiscs/taprio.json
-> +++ b/tools/testing/selftests/tc-testing/tc-tests/qdiscs/taprio.json
-> @@ -148,8 +148,8 @@
->          ],
->          "cmdUnderTest": "$TC qdisc replace dev $ETH parent 8001:7 taprio num_tc 8 map 0 1 2 3 4 5 6 7 queues 1@0 1@1 1@2 1@3 1@4 1@5 1@6 1@7 base-time 200 sched-entry S ff 20000000 clockid CLOCK_TAI",
->          "expExitCode": "2",
-> -        "verifyCmd": "$TC -j qdisc show dev $ETH root | jq '.[].options.base_time'",
-> -        "matchPattern": "0",
-> +        "verifyCmd": "$TC -j qdisc show dev $ETH root",
-> +        "matchPattern": "\\[{\"kind\":\"taprio\",\"handle\":\"8001:\",\"root\":true,\"refcnt\":9,\"options\":{\"tc\":0,\"map\":\\[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0\\],\"queues\":\\[\\],\"clockid\":\"TAI\",\"base_time\":0,\"cycle_time\":20000000,\"cycle_time_extension\":0,\"schedule\":\\[{\"index\":0,\"cmd\":\"S\",\"gatemask\":\"0xff\",\"interval\":20000000}\\],\"max-sdu\":\\[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0\\],\"fp\":\\[\"E\",\"E\",\"E\",\"E\",\"E\",\"E\",\"E\",\"E\",\"E\",\"E\",\"E\",\"E\",\"E\",\"E\",\"E\",\"E\"\\]}}\\]",
->          "matchCount": "1",
->          "teardown": [
->              "$TC qdisc del dev $ETH root",
+If the shutdown method is being called, doesn't that imply that we're
+going to be hibernating rather than suspend-to-RAM - because suspend-to
+RAM doesn't involve powering down the system, whereas hibernating does.
 
-Hmmm, I think that this test discovered another bug (perhaps even two).
-When it fails here's the json I get (edited for clarity):
+I think the problem is that when placing the system into hibernate mode
+with WoL enabled, there are PHYs which use their interrupt pin to signal
+that a WoL event has happened. The problem comes with the aforementioned
+commit that the core PHY code now _always_ disables interrupts on the
+PHY, even if WoL is active and we're entering hibernate mode.
 
-[{"kind":"taprio","handle":"8001:","root":true,"refcnt":9,
-  "options":{
-        "tc":0,
-        "map":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        "queues":[],
-        "clockid":"TAI",
-        "base_time":0,
-        "cycle_time":0,
-        "cycle_time_extension":0,
-        {
-                "base_time":0,
-                "cycle_time":20000000,
-                "cycle_time_extension":0,
-                "schedule":[{"index":0,"cmd":"S","gatemask":"0xff","interval":20000000}]
-        }}}]
+That's clearly the wrong thing to be doing when people expect WoL to
+be able to wake their systems up from hibernate.
 
-Thinking out loud: If I am reading this right, there's no "oper"
-schedule, only an "admin" schedule. So the first bug is probably a
-taprio bug when deciding if it should create an "open" vs. "admin"
-schedule.
+The more I think about it, the more I'm coming to the conclusion that
+the blamed commit is wrong as it is coded today.
 
-The second bug seems to be in the way that q_taprio in iproute2
-handles the admin schedule, is just an object inside another, which
-seems to be invalid.
+It also occurs to me that systems need to cope with the PHY's INT signal
+being asserted through boot, because in the case of WoL-triggered resume
+from hibernate mode, the PHY's INT signal will be asserted _while_ the
+system is booting up (and remember, recovery from hibernate mode is
+essentially no different from a normal system boot with the exception
+that the kernel notices a special signature in the swap partition, and
+then reloads state from there.)
 
-Does it make sense?
+So, boot has to cope properly with the PHY's interrupt being asserted
+in order for WoL from hibernate to work.
 
+It seems to me that a revert of the blamed commit is in order, and a
+different approach is needed?
 
-Cheers,
 -- 
-Vinicius
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
