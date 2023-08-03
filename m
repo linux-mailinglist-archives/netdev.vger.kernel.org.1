@@ -1,150 +1,104 @@
-Return-Path: <netdev+bounces-23893-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23887-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF9BA76E078
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 08:44:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB01B76E02E
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 08:27:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7D16D281F9A
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 06:44:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ECB0E1C21465
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 06:27:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53FBD8F5A;
-	Thu,  3 Aug 2023 06:44:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 160628F59;
+	Thu,  3 Aug 2023 06:27:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F4D88BE5
-	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 06:44:52 +0000 (UTC)
-Received: from mail-qt1-x834.google.com (mail-qt1-x834.google.com [IPv6:2607:f8b0:4864:20::834])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB97530FB
-	for <netdev@vger.kernel.org>; Wed,  2 Aug 2023 23:44:26 -0700 (PDT)
-Received: by mail-qt1-x834.google.com with SMTP id d75a77b69052e-4036bd4fff1so205541cf.0
-        for <netdev@vger.kernel.org>; Wed, 02 Aug 2023 23:44:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691045066; x=1691649866;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=o+YG3aOyTJDDAoo3IjkxzD7O5Fuj1vrET3mxUDhOF2c=;
-        b=gSI+0eHwGzcTFtF32NXHFmvR6Y1VPoyZJ4BIrWk7q2h/Y0lGhYBgHBbX2BCoG3AxK/
-         CcT6VR4H9QOkqm8QZ7E2WEAm4/wjAls/kiaSFmlSpEBWZuFMkQBE88ycsqRsEXx8ZcY8
-         k6oSxiS+JOeAGycc+RyGAIzS183fUpXxf34SHDRZqo2nx0hLvyvuRjyPB3TN1ReKVmuK
-         uDt4JeL56mfBBLPWRAijhz0XqWZ0ybFYxu3wSvQ4jK4lFoLKn6Hj7n8TBuPNbUbS1M+3
-         8vZEKekdNNMY/XrjuzL3Uy5aWwNwbcDm9OuS+/RUMQ287CeEeEpmLcircpIZnQRF3yMg
-         CBUg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691045066; x=1691649866;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=o+YG3aOyTJDDAoo3IjkxzD7O5Fuj1vrET3mxUDhOF2c=;
-        b=QA3IWATFWdu5MXLjZ8hHhxAAUiEiXbdKp1fth6S6hmaTs+sJ1VAYeoeQVfvQG7rppa
-         OgTrsNut3Ok3iJI3M8bijHn1IFM5n7Duux+Nsk9itywiiUpO6jHWPw3/AVm6arquvNp0
-         XUXTzv/9aGrQSF8gMSuF4autO0JZffMLvPcixjYDl0agVkcLBSCaH5hu4s2RNkxm/7IT
-         NUv5siFlVVsecX6K1XbLI3ePGQQyRKGHEed3VTfUaa2XO0/M/vyX6vssbSC4Rkhok23U
-         xLBz3NWytYnUKceX4C9Vo0Qso4GKKzL3DSAWKJY/Ri+/Lk8U6LXcETuaLYI9w53RkjYh
-         2tHQ==
-X-Gm-Message-State: ABy/qLaIqXTIa32tbQZ2cfW8KLCUpB6orFRUykFlWUnT8mvXteyPh64f
-	NurkwQjENtQ3GOqivYcWhrqshf6+VdhN2FkS9YUIpg==
-X-Google-Smtp-Source: APBJJlH/9mCCM6V7LHpYfn1YKKuuvFpGOgjwrD8veNIHYHlu27TXjGhTj/6POxA0JgeTI1pw2TGTDkGHkz5JVvz9DZ8=
-X-Received: by 2002:ac8:5913:0:b0:3ef:5f97:258f with SMTP id
- 19-20020ac85913000000b003ef5f97258fmr1539930qty.16.1691045065923; Wed, 02 Aug
- 2023 23:44:25 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECF168F4D;
+	Thu,  3 Aug 2023 06:27:25 +0000 (UTC)
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F13810FB;
+	Wed,  2 Aug 2023 23:27:24 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.143])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4RGf5g20vqz4f3lVJ;
+	Thu,  3 Aug 2023 14:27:19 +0800 (CST)
+Received: from k01.huawei.com (unknown [10.67.174.197])
+	by APP2 (Coremail) with SMTP id Syh0CgA3F9XFSMtkSiGJPQ--.23823S2;
+	Thu, 03 Aug 2023 14:27:18 +0800 (CST)
+From: Xu Kuohai <xukuohai@huaweicloud.com>
+To: bpf@vger.kernel.org,
+	netdev@vger.kernel.org,
+	John Fastabend <john.fastabend@gmail.com>
+Cc: Jakub Sitnicki <jakub@cloudflare.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Cong Wang <cong.wang@bytedance.com>
+Subject: [PATCH bpf v2 0/3] two bug fixes for sockmap
+Date: Thu,  3 Aug 2023 02:48:35 -0400
+Message-Id: <20230803064838.108784-1-xukuohai@huaweicloud.com>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230803042214.38309-1-kuniyu@amazon.com>
-In-Reply-To: <20230803042214.38309-1-kuniyu@amazon.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 3 Aug 2023 08:44:14 +0200
-Message-ID: <CANn89iJbn2+KADkS_PJYvsm_hkSuxrp_TpYHcMDcdq71=VCSZQ@mail.gmail.com>
-Subject: Re: [PATCH v2 net] tcp: Enable header prediction for active open
- connections with MD5.
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, 
-	YOSHIFUJI Hideaki <yoshfuji@linux-ipv6.org>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:Syh0CgA3F9XFSMtkSiGJPQ--.23823S2
+X-Coremail-Antispam: 1UD129KBjvdXoWruFy3Ary8Wr1fWF47XF4fKrg_yoW3Arg_u3
+	y8Kr95XFyxXFnxGFWruFZ3tFWkKFWDJrn5Cas8try7Ca1xZr18WFsY9FyfJ348WayFvr1x
+	tFn3W3yFqr1aqjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUb28YFVCjjxCrM7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E6xAIw20E
+	Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwV
+	A0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8IcVCY1x02
+	67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
+	0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
+	x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
+	0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1l42xK82IY
+	c2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s
+	026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF
+	0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0x
+	vE42xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2
+	jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07UWE__UUUUU=
+X-CM-SenderInfo: 50xn30hkdlqx5xdzvxpfor3voofrz/
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Aug 3, 2023 at 6:22=E2=80=AFAM Kuniyuki Iwashima <kuniyu@amazon.com=
-> wrote:
->
-> TCP socket saves the minimum required header length in tcp_header_len
-> of struct tcp_sock, and later the value is used in __tcp_fast_path_on()
-> to generate a part of TCP header in tcp_sock(sk)->pred_flags.
->
-> In tcp_rcv_established(), if the incoming packet has the same pattern
-> with pred_flags, we enter the fast path and skip full option parsing.
->
-> The MD5 option is parsed in tcp_v[46]_rcv(), so we need not parse it
-> again later in tcp_rcv_established() unless other options exist.  Thus,
-> MD5 should add TCPOLEN_MD5SIG_ALIGNED to tcp_header_len and avoid the
-> slow path.
->
-> For passive open connections with MD5, we add TCPOLEN_MD5SIG_ALIGNED
-> to tcp_header_len in tcp_create_openreq_child() after 3WHS.
->
-> On the other hand, we do it in tcp_connect_init() for active open
-> connections.  However, the value is overwritten while processing
-> SYN+ACK or crossed SYN in tcp_rcv_synsent_state_process().
->
->   1) SYN+ACK
->
->     tcp_rcv_synsent_state_process
->       tp->tcp_header_len =3D sizeof(struct tcphdr) or
->                            sizeof(struct tcphdr) + TCPOLEN_TSTAMP_ALIGNED
->       tcp_finish_connect
->         __tcp_fast_path_on
->       tcp_send_ack
->
->   2) Crossed SYN and the following ACK
->
->     tcp_rcv_synsent_state_process
->       tp->tcp_header_len =3D sizeof(struct tcphdr) or
->                            sizeof(struct tcphdr) + TCPOLEN_TSTAMP_ALIGNED
->       tcp_set_state(sk, TCP_SYN_RECV)
->       tcp_send_synack
->
->     -- ACK received --
->     tcp_v4_rcv
->       tcp_v4_do_rcv
->         tcp_rcv_state_process
->           tcp_fast_path_on
->             __tcp_fast_path_on
->
-> So these two cases will have the wrong value in pred_flags and never
-> go into the fast path.
->
-> Let's add TCPOLEN_MD5SIG_ALIGNED in tcp_rcv_synsent_state_process()
-> to enable header prediction for active open connections.
+From: Xu Kuohai <xukuohai@huawei.com>
 
-I do not think we want to slow down fast path (no MD5), for 'header
-prediction' of MD5 flows,
-considering how slow MD5 is anyway (no GSO/GRO), and add yet another
-ugly #ifdef CONFIG_TCP_MD5SIG
-in already convoluted code base.
+Two bug fixes and a test case for sockmap.
 
-The case of cross-syn is kind of hilarious, if you ask me.
+v2:
+add a test case
 
->
-> Fixes: cfb6eeb4c860 ("[TCP]: MD5 Signature Option (RFC2385) support.")
+v1:
+https://lore.kernel.org/bpf/20230728105649.3978774-1-xukuohai@huaweicloud.com/
+https://lore.kernel.org/bpf/20230728105717.3978849-1-xukuohai@huaweicloud.com
 
-This would be net-next material anyway, unless you show a huge
-improvement after this patch,
-which I doubt very much.
-Or maybe the real intent is not fully expressed in your changelog ?
+
+Xu Kuohai (3):
+  bpf, sockmap: Fix map type error in sock_map_del_link
+  bpf, sockmap: Fix bug that strp_done cannot be called
+  selftests/bpf: Add sockmap test for redirecting partial skb data
+
+ include/linux/skmsg.h                         |  1 +
+ net/core/skmsg.c                              | 10 ++-
+ net/core/sock_map.c                           | 10 +--
+ .../selftests/bpf/prog_tests/sockmap_listen.c | 77 +++++++++++++++++++
+ .../selftests/bpf/progs/test_sockmap_listen.c | 14 ++++
+ 5 files changed, 105 insertions(+), 7 deletions(-)
+
+-- 
+2.30.2
+
 
