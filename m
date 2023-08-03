@@ -1,44 +1,66 @@
-Return-Path: <netdev+bounces-24033-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24034-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 882E276E8AA
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 14:44:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2AA9F76E8D9
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 14:53:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 41E18282140
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 12:44:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 12EFB1C214B7
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 12:53:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1445718C01;
-	Thu,  3 Aug 2023 12:44:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC8ED1DDC2;
+	Thu,  3 Aug 2023 12:53:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D0AF182C8
-	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 12:44:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30983C433C7;
-	Thu,  3 Aug 2023 12:44:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E86614287;
+	Thu,  3 Aug 2023 12:53:47 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4BBEC433C8;
+	Thu,  3 Aug 2023 12:53:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691066668;
-	bh=Qa08Sovz6o8T3mM+xjYv01SqyLaMJRW6NaTElrl6PfA=;
+	s=k20201202; t=1691067227;
+	bh=r4FB9C3DbyML50THOYSEoMjiyY77SgxV2l1qtwpxE3Q=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Oh3qfx+eWUdmbRQx49bfsbR/o7LqbWqXNTbtquu2W2PTq+LUqRfXYsD/qhhyaQ4Ny
-	 xVDd/cG9qA6G/RH7sByktRpHoZCykx0QRO4qUtr1eedajfHQ8Lpm9Gs8IosWf45MLq
-	 ZDPdnEtvA2LJEm912WRZ9mCEqyUqaIg4j/ARQnrJol+G6yimoLIRwf+WKwQa6eTFsD
-	 9RHTCBLIEBHwoD8gfF5rs/uCB6q7ipLSAMQ/4gli89qFLHKThrwJsJ3sJ5LIPP3o10
-	 4Bnwip49mkijbemjIa0ziZDmMZ/dvC7XphG1tBtgOV2M/RoMwD59IH1aUM+PfsANGU
-	 hde+OpfcTH6Xg==
-Date: Thu, 3 Aug 2023 14:44:24 +0200
+	b=nN0wvvfqkt0Oh2vmUhgUKxgefq2fjGdBl3Xc1C0D1Hv1tbt26iNf+M/ps2GN9QKkh
+	 Zzp8aOGK4IJdtlp78ZHErfGc3btpdICVz9a69a8tzFGauOoN8QRlkjiHUSFeerQaeC
+	 MdNTQg6Pa+W0RXdTbE4nmWBys5er8hvo3aWE9i+uJVTn1EuIMDRakpkWVWdIvGwVBR
+	 u39lif0pHj6/7hYmNeWAWnbvQigCf8NtUwdzAMM1pCGbXbsHLQuRd/S3zTD7E8ZVlf
+	 34m/8LH+0HMVIBO9P+jMC2OqUTOdeAPbVnnepr2zeM4fkSbPChud+iiZ1nHCngAz2C
+	 OoZ/H55FwCmhw==
+Date: Thu, 3 Aug 2023 14:53:38 +0200
 From: Simon Horman <horms@kernel.org>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
+To: Geliang Tang <geliang.tang@suse.com>
+Cc: Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
+	Yonghong Song <yhs@fb.com>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	Florent Revest <revest@chromium.org>,
+	Brendan Jackman <jackmanb@chromium.org>,
+	Matthieu Baerts <matthieu.baerts@tessares.net>,
+	Mat Martineau <martineau@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, eric.dumazet@gmail.com
-Subject: Re: [PATCH net-next] net: vlan: update wrong comments
-Message-ID: <ZMuhKP/KoIAgU1/r@kernel.org>
-References: <20230803071426.2012024-1-edumazet@google.com>
+	John Johansen <john.johansen@canonical.com>,
+	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
+	"Serge E. Hallyn" <serge@hallyn.com>,
+	Stephen Smalley <stephen.smalley.work@gmail.com>,
+	Eric Paris <eparis@parisplace.org>, Mykola Lysenko <mykolal@fb.com>,
+	Shuah Khan <shuah@kernel.org>, bpf@vger.kernel.org,
+	netdev@vger.kernel.org, mptcp@lists.linux.dev,
+	apparmor@lists.ubuntu.com, linux-security-module@vger.kernel.org,
+	selinux@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH bpf-next v8 1/4] bpf: Add update_socket_protocol hook
+Message-ID: <ZMujUofDnb8wMb36@kernel.org>
+References: <cover.1691047403.git.geliang.tang@suse.com>
+ <120b307aacd1791fac016d33e112069ffb7db21a.1691047403.git.geliang.tang@suse.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -47,15 +69,49 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230803071426.2012024-1-edumazet@google.com>
+In-Reply-To: <120b307aacd1791fac016d33e112069ffb7db21a.1691047403.git.geliang.tang@suse.com>
 
-On Thu, Aug 03, 2023 at 07:14:26AM +0000, Eric Dumazet wrote:
-> vlan_insert_tag() and friends do not allocate a new skb.
-> However they might allocate a new skb->head.
-> Update their comments to better describe their behavior.
+On Thu, Aug 03, 2023 at 03:30:39PM +0800, Geliang Tang wrote:
+> Add a hook named update_socket_protocol in __sys_socket(), for bpf
+> progs to attach to and update socket protocol. One user case is to
+> force legacy TCP apps to create and use MPTCP sockets instead of
+> TCP ones.
 > 
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Define a mod_ret set named bpf_mptcp_fmodret_ids, add the hook
+> update_socket_protocol into this set, and register it in
+> bpf_mptcp_kfunc_init().
+> 
+> Signed-off-by: Geliang Tang <geliang.tang@suse.com>
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+...
 
+> diff --git a/net/socket.c b/net/socket.c
+> index 2b0e54b2405c..586a437d7a5e 100644
+> --- a/net/socket.c
+> +++ b/net/socket.c
+> @@ -1644,11 +1644,36 @@ struct file *__sys_socket_file(int family, int type, int protocol)
+>  	return sock_alloc_file(sock, flags, NULL);
+>  }
+>  
+> +/**
+
+Hi Geliang Tang,
+
+nit: The format of the text below is not in kernel doc format,
+     so it is probably better if the comment begins with '/*'
+     rather than '/**'.
+
+> + *	A hook for bpf progs to attach to and update socket protocol.
+> + *
+> + *	A static noinline declaration here could cause the compiler to
+> + *	optimize away the function. A global noinline declaration will
+> + *	keep the definition, but may optimize away the callsite.
+> + *	Therefore, __weak is needed to ensure that the call is still
+> + *	emitted, by telling the compiler that we don't know what the
+> + *	function might eventually be.
+> + *
+> + *	__diag_* below are needed to dismiss the missing prototype warning.
+> + */
+
+...
 
