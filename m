@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-23978-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23982-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1695276E67D
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 13:13:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3CD476E68A
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 13:15:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C542028204C
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 11:13:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9E00028207F
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 11:15:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0FB817FFE;
-	Thu,  3 Aug 2023 11:13:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94B3F1ADF1;
+	Thu,  3 Aug 2023 11:13:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2F948F7C
-	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 11:13:51 +0000 (UTC)
-Received: from mail-ej1-x644.google.com (mail-ej1-x644.google.com [IPv6:2a00:1450:4864:20::644])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99CD0E75
-	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 04:13:46 -0700 (PDT)
-Received: by mail-ej1-x644.google.com with SMTP id a640c23a62f3a-99c10ba30afso422955166b.1
-        for <netdev@vger.kernel.org>; Thu, 03 Aug 2023 04:13:46 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8954E19BAD
+	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 11:13:53 +0000 (UTC)
+Received: from mail-ed1-x52e.google.com (mail-ed1-x52e.google.com [IPv6:2a00:1450:4864:20::52e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFF09213F
+	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 04:13:47 -0700 (PDT)
+Received: by mail-ed1-x52e.google.com with SMTP id 4fb4d7f45d1cf-52227884855so1063789a12.1
+        for <netdev@vger.kernel.org>; Thu, 03 Aug 2023 04:13:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1691061225; x=1691666025;
+        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1691061226; x=1691666026;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=J0LhtMaDHhRm3mbnKfWT8/Dhmh40h6lBxv/BhmqqlQo=;
-        b=XkoPN3HjHRBwVJxQE1gkkobS8bzHGBfG7clAoAmoZTMWeEqghxm1EOZoXnxl8ME/1X
-         gXpqFgPrSzsA+Vg2At3W3nnWHfGf3zlIBhbR8uW4tdQwdFGKTGtv1gE8f6T1cBe101+T
-         ER8S65DIiQwjiRQPInKr9kjYjBNmybhC1wbou+VcD0F3IU5C3EIM6l3zMYd92J9onGAP
-         b8b/zZ6S7UvBKOPC8sP1IVjehyRp0/S9YmzoEiZVAzfw5Iiy8ZPXzp9srBpP0h0/Vkdt
-         D1tNV8mQSBrOuaINKoJZPotKk81bcGMbLyVonkmbtYMQS3aknOaK8N24jkdblvo2MtsL
-         jzKA==
+        bh=Xm8m68R8BaH37vwbMbGP10geA0/w5IB1ToC+Q7Nn46w=;
+        b=YEKo9jJLNLOvgyugG03qDkMOoC6GLR69SLJNnQHo8RfAlUh+Vu+q+ch06WONoHuZ+V
+         Ee9gMquRu6ALOsHGi1LqFLgHqfoPQ7MUAHNCushg7TFoHcNFilgUzY/A4QIrhZC9pwIi
+         ma+4zOaBrfkVez9MM+YBUQEtWAnHrUaRBTvJKbCd1Z79HbYWT81PPLOWpxOrBNv9zp4m
+         TIoFBA35xSBdRyzAUF89sDaFwYvncdldE5T/Uocu0+racdz8u5Y79eT5e8bcp8JfhImJ
+         NEiok7yI7PGM4TgJgubX+XLbUQiYN2nsL8D6gqHtoosz9aKPxVmqWXGuk4s5XM9z6T47
+         itlQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691061225; x=1691666025;
+        d=1e100.net; s=20221208; t=1691061226; x=1691666026;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=J0LhtMaDHhRm3mbnKfWT8/Dhmh40h6lBxv/BhmqqlQo=;
-        b=Qo573dLC5RjAmadYeHN4+LKdtF29+2KnxVlaRpSQIXTzPyckZZZ8QSFbs2nbg7TFSS
-         3e+EC7A8PG2hj6q3Gc5PKNMg5sWQPzpZ6Wp1feNA6Yz79FXAbET1ZCdlQ08IAArkfDWP
-         oYiePEgK7+L25ErV1NhiVfGa1gigFBcHbnRGwd623LeVTlY8sdbD3nUCcqvAPE6lF0Ld
-         Kn1KMnRaCuSZUEkrZuRRW1LciG4ejnEiyu7GMKqmTxOKuComAwQlr3/fTPWa53Zph7ch
-         apmd+6CRHdL6J5MV7Ib2CdbyDRrK8HYdDPZPJitgfZNAC985fRoWrvRMJnOsvUrpcVFN
-         2uCw==
-X-Gm-Message-State: ABy/qLaiM4ShgqMngTaQRPjS8CGUuF/NXEfAOILpbIAs+DRP05L1Eum1
-	YbXrB0SNkRlRYz8EGTYs1O4C8kQoMjHfC/E/PiBIT2Bs
-X-Google-Smtp-Source: APBJJlEX/gpQ+ZWPByGKB5SUDU6QnKKXNRvwXErm2eI1xMBVfyeNHKqfqZAcJ+mnEZEe0sC0WXdQnQ==
-X-Received: by 2002:a17:907:9686:b0:98d:ebb7:a8b0 with SMTP id hd6-20020a170907968600b0098debb7a8b0mr10858705ejc.14.1691061225152;
-        Thu, 03 Aug 2023 04:13:45 -0700 (PDT)
+        bh=Xm8m68R8BaH37vwbMbGP10geA0/w5IB1ToC+Q7Nn46w=;
+        b=Kh/pui1Nm/syvRFggRaXIj9XnYGHMQ2gsVDGTdDO8nvnjyu8DBfXx1GsKxqiHTpCzz
+         82vtSGGOcP+2EL3+LyElF7I9GENSn6Hl2pYGTghM5dBDlHZUvdsDG6rII0IJXyOgmxvJ
+         k7Ih5Fzv+PVPgYEUfBwWPbL9/r2xA8eWCNawC6n+OK/u0Kkfmx2clW0UDcxhYkRnxoiG
+         EU3Ng4/RC+riiuJzgNA/eifpyivbAPfSIMJm1zcoYh4bn27iyUhHqMNk7c3sSXe71NAP
+         P5nSQIaGWhZk1Ok0owk+IIyAX+ve5ovvIGgTU3uNwNrZAVK23W4mktGk7mPdID9R/Ds4
+         bC7Q==
+X-Gm-Message-State: ABy/qLatScdrc7J2j1S8/YvMfVThO6nnuvwY3lLbjNrKGycQOfgyzdDD
+	HoSHLB4gZQItwLLxzpyHQ1UwSpBd0K7B6oL+aEvLIA==
+X-Google-Smtp-Source: APBJJlEt0Cqgv7xx6DpKbWuPNXQyfcy2oZpYPVD5AbGTnreMl2LMn04TMvlnKrqzKu5P69w8e6i78g==
+X-Received: by 2002:aa7:cf01:0:b0:522:455d:6f6f with SMTP id a1-20020aa7cf01000000b00522455d6f6fmr7760947edy.34.1691061226561;
+        Thu, 03 Aug 2023 04:13:46 -0700 (PDT)
 Received: from localhost ([212.23.236.67])
-        by smtp.gmail.com with ESMTPSA id gw19-20020a170906f15300b0097404f4a124sm10400868ejb.2.2023.08.03.04.13.44
+        by smtp.gmail.com with ESMTPSA id s11-20020aa7c54b000000b0051df54c6a27sm9992230edr.56.2023.08.03.04.13.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Aug 2023 04:13:44 -0700 (PDT)
+        Thu, 03 Aug 2023 04:13:46 -0700 (PDT)
 From: Jiri Pirko <jiri@resnulli.us>
 To: netdev@vger.kernel.org
 Cc: kuba@kernel.org,
@@ -66,9 +66,9 @@ Cc: kuba@kernel.org,
 	saeedm@nvidia.com,
 	idosch@nvidia.com,
 	petrm@nvidia.com
-Subject: [patch net-next v3 02/12] ynl-gen-c.py: filter rendering of validate field values for split ops
-Date: Thu,  3 Aug 2023 13:13:30 +0200
-Message-ID: <20230803111340.1074067-3-jiri@resnulli.us>
+Subject: [patch net-next v3 03/12] ynl-gen-c.py: allow directional model for kernel mode
+Date: Thu,  3 Aug 2023 13:13:31 +0200
+Message-ID: <20230803111340.1074067-4-jiri@resnulli.us>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230803111340.1074067-1-jiri@resnulli.us>
 References: <20230803111340.1074067-1-jiri@resnulli.us>
@@ -87,45 +87,33 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 
 From: Jiri Pirko <jiri@nvidia.com>
 
-For split ops, do and dump has different meaningful values in
-validate field.
-
-Fix the rendering to allow the values per op type as follows:
-do: strict
-dump: dump, strict-dump
+Directional model limitation is only applicable for uapi mode.
+For kernel mode, the code is generated correctly using right cmd values
+for do/dump requests. Lift the limitation.
 
 Signed-off-by: Jiri Pirko <jiri@nvidia.com>
 ---
+v2->v3:
+- fixed double space issue
 v1->v2:
-- consider strict-dump flag newly added by the previous patch
-- re-phrased the commit message, altered the patch subject a bit
+- re-phrased the patch description
 ---
- tools/net/ynl/ynl-gen-c.py | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+ tools/net/ynl/ynl-gen-c.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/tools/net/ynl/ynl-gen-c.py b/tools/net/ynl/ynl-gen-c.py
-index 650be9b8b693..a3f70ca929fb 100755
+index a3f70ca929fb..2ea6af892b68 100755
 --- a/tools/net/ynl/ynl-gen-c.py
 +++ b/tools/net/ynl/ynl-gen-c.py
-@@ -1988,9 +1988,17 @@ def print_kernel_op_table(family, cw):
-                 cw.block_start()
-                 members = [('cmd', op.enum_name)]
-                 if 'dont-validate' in op:
-+                    dont_validate = []
-+                    for x in op['dont-validate']:
-+                        if op_mode == 'do' and x in ['dump', 'dump-strict']:
-+                            continue
-+                        if op_mode == "dump" and x == 'strict':
-+                            continue
-+                        dont_validate.append(x)
-+
-                     members.append(('validate',
-                                     ' | '.join([c_upper('genl-dont-validate-' + x)
--                                                for x in op['dont-validate']])), )
-+                                                for x in dont_validate])), )
-                 name = c_lower(f"{family.name}-nl-{op_name}-{op_mode}it")
-                 if 'pre' in op[op_mode]:
-                     members.append((cb_names[op_mode]['pre'], c_lower(op[op_mode]['pre'])))
+@@ -2317,7 +2317,7 @@ def main():
+         return
+ 
+     supported_models = ['unified']
+-    if args.mode == 'user':
++    if args.mode in ['user', 'kernel']:
+         supported_models += ['directional']
+     if parsed.msg_id_model not in supported_models:
+         print(f'Message enum-model {parsed.msg_id_model} not supported for {args.mode} generation')
 -- 
 2.41.0
 
