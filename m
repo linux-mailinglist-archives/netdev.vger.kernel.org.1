@@ -1,92 +1,86 @@
-Return-Path: <netdev+bounces-24131-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24132-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F94676EEA5
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 17:50:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5600076EEA6
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 17:50:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CACEC282256
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 15:50:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 10297282234
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 15:50:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA9F723BF9;
-	Thu,  3 Aug 2023 15:50:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C15AE23BFF;
+	Thu,  3 Aug 2023 15:50:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACB31182C8
-	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 15:50:02 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 408922109;
-	Thu,  3 Aug 2023 08:50:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=bajgnuKTGlG0RtP4bwkiUS04QrRESVaCChAJs0W23Eo=; b=y8JmzLyUCI5yi3iS8gD55qA0O5
-	+zQPDSo4EhRJ+CnOBCpcogYWwXnw/l64T1Rzx71B4mDm4pqr4UujbztoVnNX7mFnhm4s5kypAsH8P
-	9ncC4FpwjtlCb26X9870ENwSicYe4a1O3QOuAY9rkiUGnCvI0kWdGvm3SXim8Kd0v5dQ=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qRaa9-00305O-OZ; Thu, 03 Aug 2023 17:49:45 +0200
-Date: Thu, 3 Aug 2023 17:49:45 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: justinlai0215 <justinlai0215@realtek.com>, kuba@kernel.org,
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH] net/ethernet/realtek: Add Realtek automotive PCIe driver
-Message-ID: <87194ec9-476a-471b-a5b5-d70e8a2cbcd5@lunn.ch>
-References: <20230803082513.6523-1-justinlai0215@realtek.com>
- <ZMtr+WbURFaynK15@nanopsycho>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A62C182C8;
+	Thu,  3 Aug 2023 15:50:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 037D9C433C9;
+	Thu,  3 Aug 2023 15:50:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1691077822;
+	bh=1MwiL4otavjcKt/Qk1VABOkNTQFCqDDe9I/0ikejFLc=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=pGyTci8TaOdKemx0Cpo5P/UMGs4nDkAv1yrLLrLiOfIt6/voSno/teRHzrOeGyU1E
+	 XOVKI0BWeJLUdIzM8UgQg4Yo91nlWldRgl9bT0ZNdIxy1nlWyibeFwHna4/hcOF5JZ
+	 eDkM88++w6fdQFEK1cdxS3aRfGzKec3897WXIrVdLdv6bSHOTinhQnQKLivNamjtlK
+	 /HtVKy38Uq/Gv54JojKoVz0gZJO6Dh4dJHpydgvVd69rKyZcXfYDTsB2fUbwu0BEhk
+	 1UsokQ6H9+yLHYuhXx5nxbwVD1HUUaq6fahtdpGsevb8ZsWeD10DFFN8sTjUAn7K6N
+	 +jPYEg9kkahqQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D909EC43168;
+	Thu,  3 Aug 2023 15:50:21 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZMtr+WbURFaynK15@nanopsycho>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH bpf-next v2 0/3] net: struct netdev_rx_queue and xdp.h
+ reshuffling
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169107782188.9546.10766689854084289247.git-patchwork-notify@kernel.org>
+Date: Thu, 03 Aug 2023 15:50:21 +0000
+References: <20230803010230.1755386-1-kuba@kernel.org>
+In-Reply-To: <20230803010230.1755386-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: ast@kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org,
+ hawk@kernel.org, amritha.nambiar@intel.com, aleksander.lobakin@intel.com
 
-On Thu, Aug 03, 2023 at 10:57:29AM +0200, Jiri Pirko wrote:
-> Thu, Aug 03, 2023 at 10:25:13AM CEST, justinlai0215@realtek.com wrote:
-> >This patch is to add the ethernet device driver for the PCIe interface of Realtek Automotive Ethernet Switch,
-> >applicable to RTL9054, RTL9068, RTL9072, RTL9075, RTL9068, RTL9071.
-> >
-> >Signed-off-by: justinlai0215 <justinlai0215@realtek.com>
+Hello:
+
+This series was applied to bpf/bpf-next.git (master)
+by Martin KaFai Lau <martin.lau@kernel.org>:
+
+On Wed,  2 Aug 2023 18:02:27 -0700 you wrote:
+> While poking at struct netdev_rx_queue I got annoyed by
+> the huge rebuild times. I split it out from netdevice.h
+> and then realized that it was the main reason we included
+> xdp.h in there. So I removed that dependency as well.
+> 
+> This gives us very pleasant build times for both xdp.h
+> and struct netdev_rx_queue changes.
 > 
 > [...]
-> 
-> 
-> >+
-> >+static long rtase_swc_ioctl(struct file *p_file, unsigned int cmd, unsigned long arg)
-> 
-> There are *MANY* thing wrong in this patch spotted just during 5 minutes
-> skimming over the code, but this definitelly tops all of them.
-> I didn't see so obvious kernel bypass attempt for a long time. Ugh, you
-> can't be serious :/
-> 
-> I suggest to you take couple of rounds of consulting the patch with
-> some skilled upstream developer internaly before you make another
-> submission in order not not to waste time of reviewers.
 
-I have to agree with Jiri here. This 'vendor crap' driver has no
-chance of being merged as is. You need to reach out to some
-experienced mainline driver developers to help you rewrite it to
-mainline quality.
+Here is the summary with links:
+  - [bpf-next,v2,1/3] eth: add missing xdp.h includes in drivers
+    https://git.kernel.org/bpf/bpf-next/c/92272ec4107e
+  - [bpf-next,v2,2/3] net: move struct netdev_rx_queue out of netdevice.h
+    https://git.kernel.org/bpf/bpf-next/c/49e47a5b6145
+  - [bpf-next,v2,3/3] net: invert the netdevice.h vs xdp.h dependency
+    https://git.kernel.org/bpf/bpf-next/c/680ee0456a57
 
-    Andrew
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
----
-pw-bot: cr
+
 
