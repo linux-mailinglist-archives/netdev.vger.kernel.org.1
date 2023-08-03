@@ -1,97 +1,189 @@
-Return-Path: <netdev+bounces-24011-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24012-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BC1676E717
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 13:39:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D96F76E748
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 13:47:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5E7F81C21553
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 11:39:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9E8591C21481
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 11:47:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDC5018C09;
-	Thu,  3 Aug 2023 11:39:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 249F51DDC5;
+	Thu,  3 Aug 2023 11:47:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37B1718B13
-	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 11:39:30 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7FEA2C433C8;
-	Thu,  3 Aug 2023 11:39:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691062770;
-	bh=+K+JAySmTUowlnbVqwziUzl1bReyozbO+guU69SBB34=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=JlYDs6lFk2yG8HjpZ+tB0KD7LsTCBbRdO5X913YeGZAw29/Ll4XDRdKd67yEHeySo
-	 2iri4L99AmVgfL9ksUqXWmReepqQcmD3efTrPAVK/iEXrniQkNPfxrt8jmPRyXo+jd
-	 ApetWp+/RnZD7U7n//UNQVeg9V2L+z1+rviLwKM2ZtsVf+sxrOvnHm++AhN5T+rcN3
-	 uSOBcnV+Z2LNeowhLurCC/yahz0xh+UAYL09oK54M3pL18q5g9REQOoWowm/hBd0gX
-	 TedKkdEzQhjtS6pTsxvdrkPlFxSKakZe3XywqEuXi89KCN409oFgliIa/AFqzHozpw
-	 NwpP8487pzJMg==
-Date: Thu, 3 Aug 2023 13:39:25 +0200
-From: Simon Horman <horms@kernel.org>
-To: nick.hawkins@hpe.com
-Cc: christophe.jaillet@wanadoo.fr, simon.horman@corigine.com,
-	andrew@lunn.ch, verdun@hpe.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
-	conor+dt@kernel.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 2/5] net: hpe: Add GXP UMAC MDIO
-Message-ID: <ZMuR7XKm9Jelh0Sq@kernel.org>
-References: <20230802201824.3683-1-nick.hawkins@hpe.com>
- <20230802201824.3683-3-nick.hawkins@hpe.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1524E1548D
+	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 11:47:42 +0000 (UTC)
+Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2AAEAE53;
+	Thu,  3 Aug 2023 04:47:41 -0700 (PDT)
+Received: by mail-ej1-x62d.google.com with SMTP id a640c23a62f3a-9923833737eso121973566b.3;
+        Thu, 03 Aug 2023 04:47:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1691063259; x=1691668059;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=uCIhJJ2hQzGyb6KTmj3+r2054kWgm3yg50ej7a2QDQc=;
+        b=csXKjk2uhcfAg18dyTPk/RSzhNTWvubZIkepX1Mj3atVktKxOrnvv2YG36KoACoDNC
+         cny9ht4allynSHcLQQ6ciTN8i8LPccQRSd11vfi8IHmkUB6to8/GFYqbVUp4B8Ak6kk6
+         twCtl4BfxAgLsPpRxML7vLOq0u7wGQzuMesOoc7Kx+VlkPtdnNMdWEewM9LKFaejDUVB
+         4qZbE64kk18Jcyh8H5Knp5wcFoOR8GkbVyVk2qu3wHkCP+ZE3A+CjAlP6einWWRpoDF+
+         k86qVzOyoRWv48h49pVjr+5EKlk4xNSxVuEAaYeNtq2jaV70WfIi8IZn2tQ9qZJH+M+H
+         cQ9w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691063259; x=1691668059;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=uCIhJJ2hQzGyb6KTmj3+r2054kWgm3yg50ej7a2QDQc=;
+        b=Sd4Dx+TeTG4/BmrWHjkCLk7FlsDUWcD5Y2suFzXQRnkLPEstp0TW7c6PTNOEmMqWIM
+         4VHMbjXsLclDy9ZIeocDL5PpcQIrNKq/YZ9ooBpUKqzGaij4pLibYKSBDrs2NAbGlEBj
+         +Gv53Pm46w1i3w6ZX6mnz9pyVt/Gog+4MUkBLRzUG0UlEWaif2TMnEYoOU3z2u3W2PRh
+         smyrt56OB6eSgBvsTvKPURAfeOX5q8zyHKMgmOEeCYPnua0JCMsC7SOScBQcHsqYlvT1
+         UZ9bGaiNBfOvaWTWDvgatllVc5CB2TxEyowGY9cIzIhY8Mpk0ohVBbsLKvxmSrMnoF3P
+         b5Sg==
+X-Gm-Message-State: ABy/qLZMtC/RyulAl0OtPWr4helf1d6cANlQIUeEYMrOIPvm81AAbkMa
+	PgoPblcy+LUIWBKMwvp1Ph1K6FS5G/Y=
+X-Google-Smtp-Source: APBJJlEuLtlzLF7ZRSWqZTPsnYH5PMw8werL0IhJsaRD6sunTyQymk/YX8Sx+fiBHSP3tF/19IR7Yw==
+X-Received: by 2002:a17:906:8a58:b0:991:d5ad:f1b1 with SMTP id gx24-20020a1709068a5800b00991d5adf1b1mr7306166ejc.47.1691063259192;
+        Thu, 03 Aug 2023 04:47:39 -0700 (PDT)
+Received: from [192.168.0.103] ([77.126.7.132])
+        by smtp.gmail.com with ESMTPSA id sb9-20020a170906edc900b00992ae4cf3c1sm10325742ejb.186.2023.08.03.04.47.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 03 Aug 2023 04:47:38 -0700 (PDT)
+Message-ID: <852cef0c-2c1a-fdcd-4ee9-4a0bca3f54c5@gmail.com>
+Date: Thu, 3 Aug 2023 14:47:35 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230802201824.3683-3-nick.hawkins@hpe.com>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH net-next v10 08/16] tls: Inline do_tcp_sendpages()
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: David Howells <dhowells@redhat.com>, netdev@vger.kernel.org,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ David Ahern <dsahern@kernel.org>, Matthew Wilcox <willy@infradead.org>,
+ Al Viro <viro@zeniv.linux.org.uk>, Christoph Hellwig <hch@infradead.org>,
+ Jens Axboe <axboe@kernel.dk>, Jeff Layton <jlayton@kernel.org>,
+ Christian Brauner <brauner@kernel.org>,
+ Chuck Lever III <chuck.lever@oracle.com>,
+ Linus Torvalds <torvalds@linux-foundation.org>,
+ linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-mm@kvack.org, Boris Pismenny <borisp@nvidia.com>,
+ John Fastabend <john.fastabend@gmail.com>, Gal Pressman <gal@nvidia.com>,
+ ranro@nvidia.com, samiram@nvidia.com, drort@nvidia.com,
+ Tariq Toukan <tariqt@nvidia.com>
+References: <ecbb5d7e-7238-28e2-1a17-686325e2bb50@gmail.com>
+ <4c49176f-147a-4283-f1b1-32aac7b4b996@gmail.com>
+ <20230522121125.2595254-1-dhowells@redhat.com>
+ <20230522121125.2595254-9-dhowells@redhat.com>
+ <2267272.1686150217@warthog.procyon.org.uk>
+ <5a9d4ffb-a569-3f60-6ac8-070ab5e5f5ad@gmail.com>
+ <776549.1687167344@warthog.procyon.org.uk>
+ <7337a904-231d-201d-397a-7bbe7cae929f@gmail.com>
+ <20230630102143.7deffc30@kernel.org>
+ <f0538006-6641-eaf6-b7b5-b3ef57afc652@gmail.com>
+ <20230705091914.5bee12f8@kernel.org>
+ <bbdce803-0f23-7d3f-f75a-2bc3cfb794af@gmail.com>
+ <20230725173036.442ba8ba@kernel.org>
+Content-Language: en-US
+From: Tariq Toukan <ttoukan.linux@gmail.com>
+In-Reply-To: <20230725173036.442ba8ba@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-1.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+	NORMAL_HTTP_TO_IP,NUMERIC_HTTP_ADDR,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,WEIRD_PORT autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Wed, Aug 02, 2023 at 03:18:21PM -0500, nick.hawkins@hpe.com wrote:
-> From: Nick Hawkins <nick.hawkins@hpe.com>
+
+
+On 26/07/2023 3:30, Jakub Kicinski wrote:
+> On Sun, 23 Jul 2023 09:35:56 +0300 Tariq Toukan wrote:
+>> Hi Jakub, David,
+>>
+>> We repro the issue on the server side using this client command:
+>> $ wrk -b2.2.2.2 -t4 -c1000 -d5 --timeout 5s
+>> https://2.2.2.3:20443/256000b.img
+>>
+>> Port 20443 is configured with:
+>>       ssl_ciphers ECDHE-RSA-AES128-GCM-SHA256;
+>>       sendfile    off;
+>>
+>>
+>> Important:
+>> 1. Couldn't repro with files smaller than 40KB.
+>> 2. Couldn't repro with "sendfile    on;"
+>>
+>> In addition, we collected the vmcore (forced by panic_on_warn), it can
+>> be downloaded from here:
+>> https://drive.google.com/file/d/1Fi2dzgq6k2hb2L_kwyntRjfLF6_RmbxB/view?usp=sharing
 > 
-> The GXP contains two Universal Ethernet MACs that can be
-> connected externally to several physical devices. From an external
-> interface perspective the BMC provides two SERDES interface connections
-> capable of either SGMII or 1000Base-X operation. The BMC also provides
-> a RMII interface for sideband connections to external Ethernet controllers.
+> This has no symbols :(
 > 
-> The primary MAC (umac0) can be mapped to either SGMII/1000-BaseX
-> SERDES interface.  The secondary MAC (umac1) can be mapped to only
-> the second SGMII/1000-Base X Serdes interface or it can be mapped for
-> RMII sideband.
+> There is a small bug in this commit, we should always set SPLICE.
+> But I don't see how that'd cause the warning you're seeing.
+> Does your build have CONFIG_DEBUG_VM enabled?
 > 
-> The MDIO(mdio0) interface from the primary MAC (umac0) is used for
-> external PHY status and configuration. The MDIO(mdio1) interface from
-> the secondary MAC (umac1) is routed to the SGMII/100Base-X IP blocks
-> on the two SERDES interface connections.
+> -->8-------------------------
 > 
-> Signed-off-by: Nick Hawkins <nick.hawkins@hpe.com>
+> From: Jakub Kicinski <kuba@kernel.org>
+> Date: Tue, 25 Jul 2023 17:03:25 -0700
+> Subject: net: tls: set MSG_SPLICE_PAGES consistently
+> 
+> We used to change the flags for the last segment, because
+> non-last segments had the MSG_SENDPAGE_NOTLAST flag set.
+> That flag is no longer a thing so remove the setting.
+> 
+> Since flags most likely don't have MSG_SPLICE_PAGES set
+> this avoids passing parts of the sg as splice and parts
+> as non-splice.
+> 
+> ... tags ...
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+>   net/tls/tls_main.c | 3 ---
+>   1 file changed, 3 deletions(-)
+> 
+> diff --git a/net/tls/tls_main.c b/net/tls/tls_main.c
+> index b6896126bb92..4a8ee2f6badb 100644
+> --- a/net/tls/tls_main.c
+> +++ b/net/tls/tls_main.c
+> @@ -139,9 +139,6 @@ int tls_push_sg(struct sock *sk,
+>   
+>   	ctx->splicing_pages = true;
+>   	while (1) {
+> -		if (sg_is_last(sg))
+> -			msg.msg_flags = flags;
+> -
+>   		/* is sending application-limited? */
+>   		tcp_rate_check_app_limited(sk);
+>   		p = sg_page(sg);
 
-...
+Hi Jakub,
 
-> diff --git a/drivers/net/ethernet/Kconfig b/drivers/net/ethernet/Kconfig
-> index 5a274b99f299..b4921b84be51 100644
-> --- a/drivers/net/ethernet/Kconfig
-> +++ b/drivers/net/ethernet/Kconfig
-> @@ -80,6 +80,7 @@ source "drivers/net/ethernet/fujitsu/Kconfig"
->  source "drivers/net/ethernet/fungible/Kconfig"
->  source "drivers/net/ethernet/google/Kconfig"
->  source "drivers/net/ethernet/hisilicon/Kconfig"
-> +source "drivers/net/ethernet/hpe/Kconfig"
->  source "drivers/net/ethernet/huawei/Kconfig"
->  source "drivers/net/ethernet/i825xx/Kconfig"
->  source "drivers/net/ethernet/ibm/Kconfig"
+When applying this patch, repro disappears! :)
+Apparently it is related to the warning.
+Please go on and submit it.
 
-Hi Nick,
+Tested-by: Tariq Toukan <tariqt@nvidia.com>
 
-I think this hunk belongs in [PATCH v2 4/5] net: hpe: Add GXP UMAC Driver.
-As it is that patch where drivers/net/ethernet/hpe/Kconfig is added.
-And as things stands, the above caused a build failure.
+We are going to run more comprehensive tests, I'll let you know if we 
+find anything unusual.
+
+Regards,
+Tariq
 
