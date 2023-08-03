@@ -1,75 +1,70 @@
-Return-Path: <netdev+bounces-24061-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24062-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9AA2676EA32
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 15:26:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC65F76EA33
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 15:27:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5496D281CAF
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 13:26:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 09A6B1C21337
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 13:27:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CCEB1F179;
-	Thu,  3 Aug 2023 13:26:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF0F41F19C;
+	Thu,  3 Aug 2023 13:26:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2ED5917FF6
-	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 13:26:01 +0000 (UTC)
-Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B291F2D73
-	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 06:25:34 -0700 (PDT)
-Received: by mail-lf1-x135.google.com with SMTP id 2adb3069b0e04-4f4b2bc1565so1710457e87.2
-        for <netdev@vger.kernel.org>; Thu, 03 Aug 2023 06:25:34 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3D3218B17
+	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 13:26:22 +0000 (UTC)
+Received: from mail-ed1-x543.google.com (mail-ed1-x543.google.com [IPv6:2a00:1450:4864:20::543])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E11C273B
+	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 06:26:18 -0700 (PDT)
+Received: by mail-ed1-x543.google.com with SMTP id 4fb4d7f45d1cf-51e429e1eabso1205374a12.2
+        for <netdev@vger.kernel.org>; Thu, 03 Aug 2023 06:26:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1691069133; x=1691673933;
+        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1691069176; x=1691673976;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=vX1yN9Ixci8IcrltYrGugFYIQgxWeNIjdcjZ6DOu8VQ=;
-        b=h/MIjuBQXoq05U76MfpTugGQ2wCdqSY2kmw1KLU/UJEdzS10EiaxXnFcx2Pa7UrOSD
-         AIdCBmmrf7qeZ6zxosxhoZDak+n9PRiRcPhbj3ppia9szhEYOj+bPU8Q3ynsT9auiKVK
-         bilo4hSsuRixPhCcUfMKS7ScmLB2xhU0OewQ7YaFDgOGscEG9PF6S02hIUyj0YCl4d/0
-         8E50basgRjz16AUTCMOcy0un1MvywpRWGbmieM4MoOdbzczAP7HttoF1rcd5SJFlwayl
-         QKz9PBAvpCCXGNNFCwO7My9CTJWBD4sXyC/1hqzH0Zr7jUfd8CTxYNMMFoKSDakuW0Pv
-         sC1w==
+        bh=tsfLa50d0LTbTXWGIG9cWCrDi/9kxGjI71wE6S3Ncd0=;
+        b=IoDOJWgnq1g0EZJtytRQIX8dk7lTzTaSp4bYaSLV0C5R85mxcwHWG/Z0hTtTK2HeyJ
+         F/PAv+8ZuyKmrnJ4cOs/k4w17cs1tM/jo58yeEHU4SD5xbIt0rX6gVJrvijp4QTncqIJ
+         /YRuy98ENiQxc8R3it4TkDdPQl57pGKzfGNs+apma+QzCD8WeX1XU5PepK6Qce5Ku8CG
+         Lik2txXBHL9OZYwsR+A1IbsANVCvPOdWpD7dVKSCb3qEW7KpJ9cRowLVAFaypBOZn+W6
+         e4D2D/QF704pracRnmkptpthLJ2D3qLjzYXTNJrns85mt/OIYsxiHjhXRoqFavehFCvn
+         O0Mg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691069133; x=1691673933;
+        d=1e100.net; s=20221208; t=1691069176; x=1691673976;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=vX1yN9Ixci8IcrltYrGugFYIQgxWeNIjdcjZ6DOu8VQ=;
-        b=Qwv/lQMWtJ0S0siR7+CBK14lFmgc8tuZr01bWQGuqLznzhTtCmcAIF9T8DsLg1w2jh
-         dU1AVHdAtWsqW1wxoArS2w8aaH/ylwBsnjtSdpPz0DKeUVO+J3i1YWGUPYxLOlUEqiYD
-         9jCE8F13BxqMXY+p2yYj0THJDsqPP07wF/0TCJ0gkn4g/iNhv/z/JztHh8hksoaVenR9
-         cWlQu9ohNIz9RXSSDZNsuI/TMGFsj+skRoJl+qJZDmjZDS9Qd9vslAqBwpRYbHZ4wa6b
-         HyeWjBCErsQaLM31Tt8sICZSlpgEl/ygsRnFHNZXLlaypwJizHNW0l3W8W3Lk1tTDOoi
-         uuRQ==
-X-Gm-Message-State: ABy/qLZaYxCf7VZeiUa8E2PSniWF6S8o4BpSlLWk0ChJ4rjYjvIHlMXo
-	YXvbUIc8nrUUnqidAn5ieG3gfA==
-X-Google-Smtp-Source: APBJJlHYeqEwy6KD1OxnrtjOYODMuMnIXYbY4rZvxsbyH+nY0Epj5By3KPyjIh40xnsMlFIvZF5QuA==
-X-Received: by 2002:a19:4f1a:0:b0:4fd:c0dd:d54b with SMTP id d26-20020a194f1a000000b004fdc0ddd54bmr7273358lfb.65.1691069132854;
-        Thu, 03 Aug 2023 06:25:32 -0700 (PDT)
-Received: from localhost (h3221.n1.ips.mtn.co.ug. [41.210.178.33])
-        by smtp.gmail.com with ESMTPSA id t10-20020a17090616ca00b0098d486d2bdfsm10574938ejd.177.2023.08.03.06.25.31
+        bh=tsfLa50d0LTbTXWGIG9cWCrDi/9kxGjI71wE6S3Ncd0=;
+        b=g33n9IyCiJWNNWxlEn1zpu0DPDaQQKX5MOltSbLtHAJtKnLXg1YhF982nE7bsB2lUi
+         RH1+SE6wEzKzU8RsHHuGcYcVP16jgXpcK3pYFcDOPeEiG8JEjNuGkmsnq8WFv1NjpYim
+         s4JfuIL02F8UuyLPNUcGQusswfnpL5RmNquiubEt0m4I8KvwAI3v0b8FUAp/S/ZMgVuC
+         Y+PJWqN/EAy96yckXy7KsCZSphIBBKDEpcJBNrTomAYfz63xTR6uv7MqT1dZBEuoDj0/
+         ebY/irQs/kf/v9SL5FiInQfnbfYar20qCveLAdZUEcttiOqhTcBTnbkFFs8AspYIDrON
+         EgHQ==
+X-Gm-Message-State: ABy/qLaSqHZoGmUJFtq38mNAkh/XAyJ2kVohzqkh3k+RMTKY0BA8DI7s
+	L2Knxbc0mDjm3RwJGIND1vWgjQ==
+X-Google-Smtp-Source: APBJJlHDFRJQKUaRPC6zjQ12Grp104tPB3KJmKbvY+QD51uwRYjZpcZCH1rkAtq5qzoHXh22xgUpug==
+X-Received: by 2002:aa7:c0d2:0:b0:522:d6f4:c0eb with SMTP id j18-20020aa7c0d2000000b00522d6f4c0ebmr6632791edp.40.1691069176497;
+        Thu, 03 Aug 2023 06:26:16 -0700 (PDT)
+Received: from localhost ([212.23.236.67])
+        by smtp.gmail.com with ESMTPSA id ay9-20020a056402202900b005223d76a3e3sm10039636edb.85.2023.08.03.06.26.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Aug 2023 06:25:32 -0700 (PDT)
-Date: Thu, 3 Aug 2023 16:25:28 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Simon Horman <horms@kernel.org>
-Cc: Ratheesh Kannoth <rkannoth@marvell.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, sgoutham@marvell.com,
-	lcherian@marvell.com, gakula@marvell.com, jerinj@marvell.com,
-	hkelam@marvell.com, sbhatta@marvell.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us
-Subject: Re: [PATCH v1 net-next 2/4] tc: flower: support for SPI
-Message-ID: <15ea5ace-db96-4839-8376-b885cf32c6d5@kadam.mountain>
-References: <20230801014101.2955887-1-rkannoth@marvell.com>
- <20230801014101.2955887-3-rkannoth@marvell.com>
- <ZMqpd2DyHz4O/v17@kernel.org>
- <664b202a-d126-4708-a2af-94f768fe3abd@kadam.mountain>
+        Thu, 03 Aug 2023 06:26:15 -0700 (PDT)
+Date: Thu, 3 Aug 2023 15:26:14 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Marcin Szycik <marcin.szycik@linux.intel.com>,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
+Subject: Re: [PATCH iwl-net] ice: Block switchdev mode when ADQ is acvite and
+ vice versa
+Message-ID: <ZMuq9ph8HY6uAiGk@nanopsycho>
+References: <20230801115235.67343-1-marcin.szycik@linux.intel.com>
+ <20230803131126.GD53714@unreal>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,76 +73,53 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <664b202a-d126-4708-a2af-94f768fe3abd@kadam.mountain>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-	autolearn_force=no version=3.4.6
+In-Reply-To: <20230803131126.GD53714@unreal>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Done.  :)  That false positive has been bothering me for a while so it's
-nice to have it fixed.  I'll test this out for a bit before pushing.
+Thu, Aug 03, 2023 at 03:11:26PM CEST, leon@kernel.org wrote:
+>On Tue, Aug 01, 2023 at 01:52:35PM +0200, Marcin Szycik wrote:
+>> ADQ and switchdev are not supported simultaneously. Enabling both at the
+>> same time can result in nullptr dereference.
+>> 
+>> To prevent this, check if ADQ is active when changing devlink mode to
+>> switchdev mode, and check if switchdev is active when enabling ADQ.
+>> 
+>> Fixes: fbc7b27af0f9 ("ice: enable ndo_setup_tc support for mqprio_qdisc")
+>> Signed-off-by: Marcin Szycik <marcin.szycik@linux.intel.com>
+>> ---
+>>  drivers/net/ethernet/intel/ice/ice_eswitch.c | 5 +++++
+>>  drivers/net/ethernet/intel/ice/ice_main.c    | 6 ++++++
+>>  2 files changed, 11 insertions(+)
+>> 
+>> diff --git a/drivers/net/ethernet/intel/ice/ice_eswitch.c b/drivers/net/ethernet/intel/ice/ice_eswitch.c
+>> index ad0a007b7398..2ea5aaceee11 100644
+>> --- a/drivers/net/ethernet/intel/ice/ice_eswitch.c
+>> +++ b/drivers/net/ethernet/intel/ice/ice_eswitch.c
+>> @@ -538,6 +538,11 @@ ice_eswitch_mode_set(struct devlink *devlink, u16 mode,
+>>  		break;
+>>  	case DEVLINK_ESWITCH_MODE_SWITCHDEV:
+>>  	{
+>> +		if (ice_is_adq_active(pf)) {
+>> +			dev_err(ice_pf_to_dev(pf), "switchdev cannot be configured - ADQ is active. Delete ADQ configs using TC and try again\n");
 
-regards,
-dan carpenter
+Does this provide sufficient hint to the user? I mean, what's ADQ and
+how it is related to TC objects? Please be more precise.
 
-diff --git a/check_index_overflow.c b/check_index_overflow.c
-index 19ea4354029b..644310ae837c 100644
---- a/check_index_overflow.c
-+++ b/check_index_overflow.c
-@@ -160,6 +160,43 @@ free:
- 	return ret;
- }
- 
-+static unsigned long __TCA_FLOWER_MAX(void)
-+{
-+	struct symbol *sym;
-+	struct ident *id;
-+	sval_t sval;
-+
-+	id = built_in_ident("__TCA_FLOWER_MAX");
-+	sym = lookup_symbol(id, NS_SYMBOL);
-+	if (!sym)
-+		return 0;
-+	if (!get_value(sym->initializer, &sval))
-+		return 0;
-+	return sval.value;
-+}
-+
-+static bool is_out_of_sync_nla_tb(struct expression *array_expr, struct expression *offset)
-+{
-+	sval_t sval;
-+	char *type;
-+
-+	if (option_project != PROJ_KERNEL)
-+		return false;
-+
-+	if (!get_value(offset, &sval))
-+		return false;
-+	type = type_to_str(get_type(array_expr));
-+	if (!type)
-+		return false;
-+	if (strcmp(type, "struct nlattr**") != 0)
-+		return false;
-+
-+	if (sval.uvalue >= __TCA_FLOWER_MAX())
-+		return false;
-+
-+	return true;
-+}
-+
- static int is_subtract(struct expression *expr)
- {
- 	struct expression *tmp;
-@@ -286,6 +323,9 @@ static int should_warn(struct expression *expr)
- 	if (common_false_positives(array_expr, max))
- 		return 0;
- 
-+	if (is_out_of_sync_nla_tb(array_expr, offset))
-+		return 0;
-+
- 	if (impossibly_high_comparison(offset))
- 		return 0;
- 
+
+>
+>It needs to be reported through netlink extack.
+>
+>> +			return -EOPNOTSUPP;
+>> +		}
+>> +
+>>  		dev_info(ice_pf_to_dev(pf), "PF %d changed eswitch mode to switchdev",
+>>  			 pf->hw.pf_id);
+>>  		NL_SET_ERR_MSG_MOD(extack, "Changed eswitch mode to switchdev");
+>
+>Thanks
+>
 
