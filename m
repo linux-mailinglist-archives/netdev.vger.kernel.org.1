@@ -1,146 +1,86 @@
-Return-Path: <netdev+bounces-24129-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24130-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53EEE76EE18
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 17:28:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 951C676EE64
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 17:43:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0ECA4282210
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 15:28:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 600801C215D2
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 15:43:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2135723BE7;
-	Thu,  3 Aug 2023 15:27:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94CEF23BF5;
+	Thu,  3 Aug 2023 15:43:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8B486FA2
-	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 15:27:45 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 41F12C433C9;
-	Thu,  3 Aug 2023 15:27:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691076465;
-	bh=HebtrT+FvWTW4Qoj0iQhJkBGJFGGesCcCI9C4O78+z4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=lHwXWs3kLCI9fnfkK3skYvdL16N5zzLxymEl2WJN9faARVEwjCMphRqQmNovlCTjP
-	 aRoqR8SFLQg05lc4G1+hv3cstBURlzL32mXYRrCSWbFh4TPWYinymAlrTQeNsAykdY
-	 fgyLgGQyXa90TLBVfT/QUB31WJcYxZkT7DN3UQQHq61fSzXgkgOiDOZJ30Rm1ra8XG
-	 jWNjDiDqMjlRUQ8qDI/h4081wptQIQrLvYcDJfWaH5VqiNrzPFhUtq0cq3UZPRDncT
-	 xsoURIoGOABkepVtDRP24Pra5Iy+gEYUXwenAfNRuqqHmNevOkR2zIuLtGucXm7sd6
-	 GFUDlzLFsyQnQ==
-Date: Thu, 3 Aug 2023 16:27:39 +0100
-From: Conor Dooley <conor@kernel.org>
-To: MD Danish Anwar <danishanwar@ti.com>
-Cc: Randy Dunlap <rdunlap@infradead.org>, Roger Quadros <rogerq@kernel.org>,
-	Simon Horman <simon.horman@corigine.com>,
-	Vignesh Raghavendra <vigneshr@ti.com>, Andrew Lunn <andrew@lunn.ch>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Rob Herring <robh+dt@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	"David S. Miller" <davem@davemloft.net>, nm@ti.com, srk@ti.com,
-	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
-	netdev@vger.kernel.org, linux-omap@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH 1/4] dt-bindings: net: Add ICSS IEP
-Message-ID: <20230803-guacamole-buddy-d8179f11615e@spud>
-References: <20230803110153.3309577-1-danishanwar@ti.com>
- <20230803110153.3309577-2-danishanwar@ti.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A46423BF1
+	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 15:43:01 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9107C2684
+	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 08:42:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=jCAiSqaGsyEXa1saYHFC6ILd7caWomJV0vmU/Co95go=; b=oHoffxjPgEK2XvtWGF3dqqI5Ul
+	UFyFK3spxyTbQAf62BCTcK0dOTMtUSP/M9KXLggvtFBzljGxWz8vISUXOXJDU/OKM5Zu8uDhkKryF
+	QO8/8hIisPdM0SCw5ZpCCtGNyFxb3YsoOqOUSUxqTSj80n78n5IhSgzkKCDnpW1BnVDE=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qRaT3-00302X-LV; Thu, 03 Aug 2023 17:42:25 +0200
+Date: Thu, 3 Aug 2023 17:42:25 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Feiyang Chen <chenfeiyang@loongson.cn>, hkallweit1@gmail.com,
+	peppe.cavallaro@st.com, alexandre.torgue@foss.st.com,
+	joabreu@synopsys.com, chenhuacai@loongson.cn, dongbiao@loongson.cn,
+	loongson-kernel@lists.loongnix.cn, netdev@vger.kernel.org,
+	loongarch@lists.linux.dev, chris.chenfeiyang@gmail.com
+Subject: Re: [PATCH v3 13/16] net: stmmac: dwmac-loongson: Add 64-bit DMA and
+ multi-vector support
+Message-ID: <9d13989c-fc79-404c-a88b-94e5ed7f97d0@lunn.ch>
+References: <cover.1691047285.git.chenfeiyang@loongson.cn>
+ <48ceed6b5d7b32c2e46b79fa597466b9212f745e.1691047285.git.chenfeiyang@loongson.cn>
+ <ZMu3wTCzffo1EgNY@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="Szg8jUrBoYIrXJg5"
-Content-Disposition: inline
-In-Reply-To: <20230803110153.3309577-2-danishanwar@ti.com>
-
-
---Szg8jUrBoYIrXJg5
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <ZMu3wTCzffo1EgNY@shell.armlinux.org.uk>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Thu, Aug 03, 2023 at 04:31:50PM +0530, MD Danish Anwar wrote:
-> From: Md Danish Anwar <danishanwar@ti.com>
->=20
-> Add DT binding documentation for ICSS IEP module.
->=20
-> Signed-off-by: Md Danish Anwar <danishanwar@ti.com>
-> ---
->  .../devicetree/bindings/net/ti,icss-iep.yaml  | 37 +++++++++++++++++++
->  1 file changed, 37 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/net/ti,icss-iep.yaml
->=20
-> diff --git a/Documentation/devicetree/bindings/net/ti,icss-iep.yaml b/Doc=
-umentation/devicetree/bindings/net/ti,icss-iep.yaml
-> new file mode 100644
-> index 000000000000..79cd72b330a6
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/net/ti,icss-iep.yaml
-> @@ -0,0 +1,37 @@
-> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/net/ti,icss-iep.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: Texas Instruments ICSS Industrial Ethernet Peripheral (IEP) module
-> +
-> +maintainers:
-> +  - Md Danish Anwar <danishanwar@ti.com>
-> +
-> +properties:
-> +  compatible:
-> +    enum:
-> +      - ti,am654-icss-iep   # for K3 AM65x, J721E and AM64x SoCs
+> > +static u32 get_irq_type(struct device_node *np)
+> > +{
+> > +	struct of_phandle_args oirq;
+> > +
+> > +	if (np && of_irq_parse_one(np, 0, &oirq) == 0 && oirq.args_count == 2)
+> > +		return oirq.args[1];
+> > +
+> > +	return IRQF_TRIGGER_RISING;
+> > +}
+> > +
+> 
+> I do wish that there was some IRQ maintainer I could bounce this over to
+> for them to comment on, because I don't believe that this should be
+> necessary in any driver - the irq subsystem should configure the IRQ
+> accordingly before the driver is probed.
 
-No. ti,am654-icss-iep is for am654. You should really have compatibles
-specific to the SoC - is there a reason why this has not been done?
+I agree with you, this is very likely to be wrong.
 
+Feiyang, please look at other drivers and copy with they do.
 
-> +
-> +  reg:
-> +    maxItems: 1
-> +
-> +  clocks:
-> +    maxItems: 1
-> +    description: phandle to the IEP source clock
-> +
-> +required:
-> +  - compatible
-> +  - reg
-> +  - clocks
-> +
-> +additionalProperties: false
-> +
-> +examples:
-> +  - |
-> +    icssg0_iep0: iep@2e000 {
-> +        compatible =3D "ti,am654-icss-iep";
-> +        reg =3D <0x2e000 0x1000>;
-> +        clocks =3D <&icssg0_iepclk_mux>;
-> +    };
-> --=20
-> 2.34.1
->=20
-
---Szg8jUrBoYIrXJg5
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZMvHagAKCRB4tDGHoIJi
-0oA9AQDxymufAtPzH28krZy4nohqru7kyIVsevPrc8ILMh3a3gD+Jg9SDu9c/zGg
-fLRLWoHQPXwuRfHpkz8sKhEz/SClMQ0=
-=AJJT
------END PGP SIGNATURE-----
-
---Szg8jUrBoYIrXJg5--
+	Andrew
 
