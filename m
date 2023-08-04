@@ -1,234 +1,171 @@
-Return-Path: <netdev+bounces-24535-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24536-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99346770798
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 20:10:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45C067707A4
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 20:14:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CCCF91C21929
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 18:10:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EA192280ED3
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 18:14:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D42E1BEF2;
-	Fri,  4 Aug 2023 18:10:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1213C1BEFA;
+	Fri,  4 Aug 2023 18:14:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38D5D1BEEB
-	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 18:10:19 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 242AB4EFF;
-	Fri,  4 Aug 2023 11:09:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1691172586; x=1722708586;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=JYbJI31cwo+RigUWawBNvS2aigw53NUE36nekyyrrfw=;
-  b=Z0dspC3xVYV4WEpcyafqjW7g5EkjT9vx+rUf+JBFqZrlBsSCVBQmRjkP
-   NpDPOWirGLbrpq55h5oU7i7FK2yxejcL7f5Ck4VDi0ptPb5Z5SfiO2zFt
-   VVCqqVZZCRQ15+mis7GY9Ti8omVLZO/iTVIl88ecwJIDW2u+6tDclTbVH
-   qp8wTW6nZBCyG7xFoR80Lh3gnAIpwsuP/B9INZ3J1kmC2jCmniIp8Eeel
-   Z2/ljrdlXN2F72qfXcUzGoqriCLY++7de6tEe4CiM6V+V+vjJtVyDRNg0
-   L2kN//iFewbhw1BAwBM6+z8o2iaZWc/uiUugfH3Zr2RyuMuJHAFGmFgeo
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10792"; a="369110910"
-X-IronPort-AV: E=Sophos;i="6.01,255,1684825200"; 
-   d="scan'208";a="369110910"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Aug 2023 11:09:10 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10792"; a="844169763"
-X-IronPort-AV: E=Sophos;i="6.01,255,1684825200"; 
-   d="scan'208";a="844169763"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by fmsmga002.fm.intel.com with ESMTP; 04 Aug 2023 11:09:09 -0700
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Fri, 4 Aug 2023 11:09:09 -0700
-Received: from orsmsx602.amr.corp.intel.com (10.22.229.15) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Fri, 4 Aug 2023 11:09:09 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27 via Frontend Transport; Fri, 4 Aug 2023 11:09:09 -0700
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.169)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.27; Fri, 4 Aug 2023 11:09:09 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=WmcUdu/Jga2VXtgUtdzBth9Jspd4O2QNp5RYO7qpF2x7BnKJn2XpZwlLr/3upg1lGgCh+BWjfW8AaQoxxqyKCgY9gtjnjHj/lbBCbgVUO3Hv23KTiQ/JgEWij0MJ+2SWO7kerViA5xrRd+n0+v15p9L41fy+P8klkVvGIrXGPK5dWZYg6V42SYmKFwvw8aGkPZt3pgWKn0+AFPuRMxPk7MsJKdAszRKXdpG+wC4piNDS6kk29V1+edVEbjYC5eFEJQGNmZwmWVXUSXnpDara/wEnmK7NMZXQpTD/H/aJd9lt1iwsSkFubBH51+fUzGzRewx2rQoF6oV6+/3KpU7PAA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=3RFE7oPhd6XHP29t5JA1iNU9ENFvbSeIhHJEjvEQ1FE=;
- b=L/qBIgJZHvH8dyQdUd/coNZhm1ayr/HAACk3DdujpNWAJ3r1QgsSg6lcX828WOYgHAJzCxHzlywxt7CgkRTtKfJ/bRvikin8HRIN2Cjb84H7XBHR4+R+cqtNs1Xy3Ab3Y/ojBRm4TpYEiNcsSgB0sKVhQs2DES19mu+5iBpnmlzqUkkX5A6y3nq7JN2PSzbNdVGfdS1W2FM+c3KArZ38IvuYXdUuZAuIDl02aBeX3r/6VPSDnDLQksLdyyiWMjRaWANgU5SWfF2FmveW1zoB6VCK7HRLhYoYcSpkbfj7zhrZ40AJh0HiQnYnjBMoHKh5Xgu+5gHzjvg+4Mjnr2DbjQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DM6PR11MB3625.namprd11.prod.outlook.com (2603:10b6:5:13a::21)
- by CO1PR11MB5042.namprd11.prod.outlook.com (2603:10b6:303:99::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.20; Fri, 4 Aug
- 2023 18:09:07 +0000
-Received: from DM6PR11MB3625.namprd11.prod.outlook.com
- ([fe80::44ff:6a5:9aa4:124a]) by DM6PR11MB3625.namprd11.prod.outlook.com
- ([fe80::44ff:6a5:9aa4:124a%7]) with mapi id 15.20.6631.046; Fri, 4 Aug 2023
- 18:09:07 +0000
-Message-ID: <bbf73a71-7ef3-3c43-18aa-bcdeb470a125@intel.com>
-Date: Fri, 4 Aug 2023 20:09:00 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH net-next 0/3] virtchnl: fix fake 1-elem arrays
-Content-Language: en-US
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Larysa Zaremba <larysa.zaremba@intel.com>, "Andy
- Shevchenko" <andriy.shevchenko@linux.intel.com>, "Gustavo A. R. Silva"
-	<gustavoars@kernel.org>, Kees Cook <keescook@chromium.org>,
-	<netdev@vger.kernel.org>, <linux-hardening@vger.kernel.org>,
-	<intel-wired-lan@lists.osuosl.org>, <linux-kernel@vger.kernel.org>
-References: <20230728155207.10042-1-aleksander.lobakin@intel.com>
- <88dce445-180c-72d9-c7a5-f0a18a18c747@intel.com>
- <2e163fb1-492e-8a1f-9df1-270c652e9799@intel.com>
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-In-Reply-To: <2e163fb1-492e-8a1f-9df1-270c652e9799@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: FR0P281CA0115.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:a8::14) To DM6PR11MB3625.namprd11.prod.outlook.com
- (2603:10b6:5:13a::21)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F30DC1BEEE
+	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 18:14:42 +0000 (UTC)
+Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3339149FF
+	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 11:14:40 -0700 (PDT)
+Received: by mail-lf1-x134.google.com with SMTP id 2adb3069b0e04-4f58444a410so261e87.0
+        for <netdev@vger.kernel.org>; Fri, 04 Aug 2023 11:14:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1691172878; x=1691777678;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cdZCwFa36JO7BjsIbThExqBKcO0c7z5StX355eJbFLg=;
+        b=B4vuBvEhpk4Vafi4VodSqggfnJv5xvaegTgwDg1KmoR+wxH9QfrK75UPXgOtgto3z+
+         IyK/IeaRS6PagqSGvjBmNgTv10I+HqxxTRXJr/hiURPtBhtuFd/bXer5ZoyO4Ozt3sfA
+         FXJufW5eM8TcNYvxg/wFI29rrKPs7irClTgKVcPi8uYjbqGzEea0w91nIfomJaI2XSd3
+         Yv+TzxLSwT6hOjVfSu4eZr5Fqttuc3zkjRvvt1LYoWW5U8zQr6jVng6BMzSjsmOxNCOI
+         pULdwRDrVOeKIsHetyWai2aZeOqYGcJ9QDMLX548Zv5Is6p7TRXQIic+Bs/cde+IFaOZ
+         yN3g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691172878; x=1691777678;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=cdZCwFa36JO7BjsIbThExqBKcO0c7z5StX355eJbFLg=;
+        b=b5ZOlvpSkh/v0SbnPrKXPsmRwz/CMpS018R0b1nTdV5YvkmhbqBulbnrXS9ecmoPBG
+         Z5PHB5Bn6HcOCxKDOMQ3BlWHbAZjY8l6VrpLG8i3FDw81SQB00NwaQrpO6JQi2m3tDUX
+         nZjmHKK8AuseHIDX1h5J38T8tGRTduN7j8R1v8p8/KVXUks18/lEUCd7C8vZZOrCfUhQ
+         /1p+ew/osq60Srqp/sIrFIqvS2hybvOOgh6MeAYZeSAqNyFUKQKZgujMURqvZUL/y/md
+         BZijlMMY0tRG+w1YGu6QyROo1jMJTklSYPphWXyZuW7y5+1jL3xXdEsEB3pQStL4y1ws
+         PMWQ==
+X-Gm-Message-State: AOJu0Yw9n8E9XFpZMFuvB9lWUIJUZ/G9ucA5uBDGSvlFiaU4IBWJHHfA
+	FAYenorhteMKwgqx71qd1BxLua+/taBgyGYvkoXNn+yV/RysEM1XbEY=
+X-Google-Smtp-Source: AGHT+IEymirBKkbuOvMuquqrRLiBptCAS+xzd4xHI2CiNUt73PeaxC9xk3HwrkjRk/5C/MCL+dgCbYpQxaY72s5/ClI=
+X-Received: by 2002:ac2:44cb:0:b0:4fe:3b86:ce7d with SMTP id
+ d11-20020ac244cb000000b004fe3b86ce7dmr6508lfm.7.1691172877916; Fri, 04 Aug
+ 2023 11:14:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR11MB3625:EE_|CO1PR11MB5042:EE_
-X-MS-Office365-Filtering-Correlation-Id: bf9c4798-738d-452e-f2b2-08db9515e4c5
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: bXA1G9boFjLM9YuN9CTB4FH6WfrNmGUHG812qrEte1VYdesH3owzZ6xAR2/SIWH4LUos/e32KNy3OdvMpsA2Y0VKbeaGfjD72FzUz5Fj2iAAIFJ6qGGQ7LieHYRA388O/1SlOO8gz0E8aKylStG6PbeQGKfQlNcpXt/sZFGCy1xQWf8713AtOAKzS5qDES6HTFIlwd5kT7eJKlpr94sH3OjvgcCR/38pdx7tODfT6ZWiXluU+etote/98cec9LM0BXcx9I4PlBIX6GI1WW3HflCsSeoBUA2Peh0P2z52fp4jbEE86jLVhvnEI1gdNhQq9bx3B0PwqhK/pFPyeGt44vLho0yyoZoRf/9rqsYWe0vdeRRy0cUWZ4J+es90nsTr/MwlYc8xW/G0HcRzR6Wi6MS3czZjHGS0vdCvnQnkz18GO6M/Vw/zCt4fsIHGiF2QcU6y4H3ZuSG/POQWiuOExqiCAKqUqmRYV6TXAKudeThEiISadhRz+OJreSXvm5E7+PBwutX1Q8PsqRnO56UcPvbmSt2rHP9Skr7U8KniVK8CuSDKks7ZmJSkh3W36CVrAeaAK23/YxnA9OtOVmt/JjA0t0TSicKkiRb9llK/NXYESzLiX3NmPKr6QQkN6LUlK0P/r2Iw+DTX9uhiNYquHA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB3625.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(39860400002)(136003)(346002)(366004)(376002)(396003)(451199021)(1800799003)(186006)(83380400001)(2616005)(53546011)(26005)(6506007)(8676002)(316002)(2906002)(66556008)(6636002)(5660300002)(66946007)(66476007)(4326008)(7416002)(41300700001)(8936002)(6486002)(6512007)(6666004)(6862004)(37006003)(54906003)(478600001)(38100700002)(82960400001)(36756003)(31696002)(86362001)(31686004)(45980500001)(43740500002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?VTlTUjdaYW9YWE5LS1JnQkdONVdaT1piQXp1ajcyVkpyQ01lbDhRNUllcnIx?=
- =?utf-8?B?dTRVcVo3V2J2TlVHOWFXak9NQVlxZ0FlaHhYdnNWVFdSVHJRRTRXWUYyVmpY?=
- =?utf-8?B?V0lqMlMwb2p6M0ZzN0hEUVBPOTVpN24xVkJnczRKNmdBLzNDUHZyNnJUU1Rs?=
- =?utf-8?B?TlZ6MytnRFB5cUQ2cENoSFdMbXB4T2loM3pHK0xtRGtCWGlOOTg3eFZzQ1Bn?=
- =?utf-8?B?WGt0RjQ3SGtldnMySTFJTUJBT1dnVEpZemZRNVpKY29Jc2VXTmZZMFkrQjlx?=
- =?utf-8?B?dVNSeDh0ZVJaSGtOL2lSVzhwSURIdzl6U0twdG94RjVDOTVma2R4a3BJOXNt?=
- =?utf-8?B?b0pWQkpvM0VCSE9NVEVlWllMSUQ4SkJ6eW1GQXFWNFQxVWl6RmNGeUlna21O?=
- =?utf-8?B?MFZjeHNLK3lCWjA0L2pud0tYMGZDN1Z1T2lXNm9Xdk0rYzZRdkhVZG1TeEdl?=
- =?utf-8?B?WitGU0oxcFI3TkVpTzVzSG5XMjVkbzZ6TGUxWVpma3Zrd2ovNDFWcnd1NGJ4?=
- =?utf-8?B?Q1N1aXNCcXJISjdDZk1PYjdqREc5d1AwNFZWa3FldFRGdlFFRy9uOFJIa3Mr?=
- =?utf-8?B?a3RRU0ltRjVHQzJQUWdHTjZYaXI5NzAyV2h3cjRCQU51a0xJc1lGQm51dThk?=
- =?utf-8?B?WE5SZnEzZ20rSnEvbHNlZXVCS09TMkF4QTdKUFNEVjF6OVBLeGdMbnoxWHBI?=
- =?utf-8?B?Y1UrTjRwbzZVS2xVOHRsdDIzWWRjYkFhUnNORmw3V0ZLdUdWWkFJWHoycENV?=
- =?utf-8?B?ek5JUUp1eFNNTExucUlNWUduMTRUaGdWRXY5NXR4bVMvbWpiRk5PTUpET3h5?=
- =?utf-8?B?WVE5cVdTMWNEeEVkZmlWRHpTZTVFYmUvSGR3UVVzRXE0QklCd3BtZy9rRDFu?=
- =?utf-8?B?ZWMwKzh0OFdhUUZ1aWNEbHcxZVUzSFB3S2NQV1diMGlCL0QzT2FXdVRPeGZJ?=
- =?utf-8?B?ejM2QnQ4RlRiU2MvZS9qdDdGYVJSTzJ1OUhZTGRTS0s0Q2lHOGN2UTdneDBj?=
- =?utf-8?B?Q0psVVpBL2tIeXUrdjQ5OXpzem5TTUxPVENRL0dNNzhZZ0FDUTFkTVV1Qmpv?=
- =?utf-8?B?VWFNNHZhV1pBNE9tM0JoMTYzUVd1MzlodzBMUStKSUNXTVQvZkp3cXlLVmFT?=
- =?utf-8?B?NjVMSUR5enJOV2JzclR4blNIY2dxYldWbURTaW95cjJ6enNqdjN3b0U5aXFo?=
- =?utf-8?B?eGJoMFAwZHY3NjV0bjRsb2pGTE5WRnVnWkNJK1JGb3Bwek1XTXZKVUsyblB0?=
- =?utf-8?B?K1ZyZkg4eU91WUFSNFAvMmlBbk9HRmNLNHhmUEdvcUErNkpqQzRndzJldjJY?=
- =?utf-8?B?bkN0eXZONHVGS1d5UENkVVFQUTNGY21uOHdTZjA0UlRQaTNkdlJTREtXMk5T?=
- =?utf-8?B?SXBsbDBpU2lpVVlFck5pRWE1THhLbFYydEZ1MFpDSm9JcTUyQTlpeEVLMnNo?=
- =?utf-8?B?UlhzQ25CSzRVSkpUbjdvZ0lPaVNFQWZpckVNUlJxRDlFN05ZdnV4K3A3cjFR?=
- =?utf-8?B?NDZ2RXEzdmJ4dmVCNmlKV2M2c3lrOU9RSFBZWGJWWkR0SmNzdVNMMEFMSnkx?=
- =?utf-8?B?RlQ2aXh4Q0pFb2kxNTdaNUZmaHNmaDJuQThhNFB1TXRFblF3WGJnR09sSkRN?=
- =?utf-8?B?dmtPMTV2QnNsaGYwNXJaVmlUTzFMNk9qbWFRV1V0bkJWeURTbmdHbWZzVVlU?=
- =?utf-8?B?VlQ2SEtpanJJdkZhZ0VtK0V2RGF0a0VnaVdWdkcrby9QcHlmZFpSVXJvTzkv?=
- =?utf-8?B?WlpBaGgyN2V3OE1GcndWZE0zN0dWM2ZmNDFGdS90WWh6MzQraW5ZbWFqV281?=
- =?utf-8?B?Rm45bnZzZExvRVdKcXk1OXI0WHIxTjZpZFRsaGt2NGJDV2s1T3cvS2lncTFr?=
- =?utf-8?B?Vjc4ZE5XS1NNV2Z6akZiamQ3Y2NaVTBTYldvN20zV0ZLUzdCVVZ2eTZDTmNZ?=
- =?utf-8?B?cW5BRkJmS3B4Y3ZJRVl0NkNRNEpnSjc2QU9XTFRkZTJ6amJwZ2I2N0ZUY0to?=
- =?utf-8?B?NnRIZFl3V2ptNUN4TXBRTWJoT2pYOEZtMjVtZ0FtcjlNNm9CVjZTM1FkemE5?=
- =?utf-8?B?eUJpNEhOTGNsamdpR2ZCRFBOOWRHdTMwejVGZEhoa1J1M0VzMmZXVFhtSk1u?=
- =?utf-8?B?MERUa0dVV2U2cHpGTm56RVNPVjVnRHBnd25iTm9Zd1laQ3NBWWUyNUFPcTNV?=
- =?utf-8?B?OWc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: bf9c4798-738d-452e-f2b2-08db9515e4c5
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB3625.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Aug 2023 18:09:07.0419
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: +UadK2P0G1JTB11+e5/cj411rip7eYi44dC92WGXj6Eip9uKb+o3b6Wnwdb4bL42gm5blOwQHoxdfgyJO3b43UAjCBHCyZ9VFh9W7puOyCU=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR11MB5042
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+References: <20230804144616.3938718-1-edumazet@google.com> <20230804144616.3938718-7-edumazet@google.com>
+In-Reply-To: <20230804144616.3938718-7-edumazet@google.com>
+From: Soheil Hassas Yeganeh <soheil@google.com>
+Date: Fri, 4 Aug 2023 14:14:01 -0400
+Message-ID: <CACSApva+Yvejq25dwCi7JjodLkuCi9_K+bCb3to0iyND6CnZVw@mail.gmail.com>
+Subject: Re: [PATCH net-next 6/6] tcp: set TCP_DEFER_ACCEPT locklessly
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-Date: Fri, 4 Aug 2023 11:07:14 -0700
+On Fri, Aug 4, 2023 at 10:46=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> rskq_defer_accept field can be read/written without
+> the need of holding the socket lock.
+>
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
 
-> On 8/4/2023 9:38 AM, Alexander Lobakin wrote:
->> From: Alexander Lobakin <aleksander.lobakin@intel.com>
->> Date: Fri, 28 Jul 2023 17:52:04 +0200
->>
->>> 6.5-rc1 started spitting warning splats when composing virtchnl
->>> messages, precisely on virtchnl_rss_key and virtchnl_lut:
->>>
->>> [   84.167709] memcpy: detected field-spanning write (size 52) of single
->>> field "vrk->key" at drivers/net/ethernet/intel/iavf/iavf_virtchnl.c:1095
->>> (size 1)
->>> [   84.169915] WARNING: CPU: 3 PID: 11 at drivers/net/ethernet/intel/
->>> iavf/iavf_virtchnl.c:1095 iavf_set_rss_key+0x123/0x140 [iavf]
->>
->> [...]
->>
->>>   .../ethernet/intel/i40e/i40e_virtchnl_pf.c    |   9 +-
->>>   drivers/net/ethernet/intel/iavf/iavf.h        |   6 +-
->>>   drivers/net/ethernet/intel/iavf/iavf_client.c |   4 +-
->>>   drivers/net/ethernet/intel/iavf/iavf_client.h |   2 +-
->>>   .../net/ethernet/intel/iavf/iavf_virtchnl.c   |  75 +++++------
->>>   drivers/net/ethernet/intel/ice/ice_virtchnl.c |   2 +-
->>>   include/linux/avf/virtchnl.h                  | 127 +++++++++++-------
->>>   7 files changed, 124 insertions(+), 101 deletions(-)
->>>
->>
->> Tony, could you please take it via your next tree? I'd like the
->> validation to make sure more different host <-> guest pairs work.
->>
->> (with Kees' tags, assuming he reviewed and approved the whole series, I
->>   asked about #2 already)
->>
->> Thanks,
->> Olek
-> 
-> Ok, will apply it today. For the future if you want it through IWL, can
+Acked-by: Soheil Hassas Yeganeh <soheil@google.com>
 
-Great, thanks!
+Very nice series! Thank you!  I doulbechecked every field and they are
+all READ_ONCE/WRITE_ONCE paired.
 
-> you tag it with the iwl-* target (and have IWL in the To)? Since this
-> had 'net-next' and was 'To' netdev maintainers, I took it that you
-> wanted it taken through netdev.
-
-Sure, I know, just for some reason targeted this directly to net at
-first, but then realized it would be better for this to go via IWL
-:clownface:
-
-> 
-> Thanks,
-> Tony
-
-Thanks,
-Olek
+> ---
+>  net/ipv4/tcp.c           | 13 ++++++-------
+>  net/ipv4/tcp_input.c     |  2 +-
+>  net/ipv4/tcp_minisocks.c |  2 +-
+>  3 files changed, 8 insertions(+), 9 deletions(-)
+>
+> diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+> index 5c71b4fe11d1c34456976d60eb8742641111dd62..4fbc7ff8c53c05cbef3d10852=
+7239c7ec8c1363e 100644
+> --- a/net/ipv4/tcp.c
+> +++ b/net/ipv4/tcp.c
+> @@ -3479,6 +3479,12 @@ int do_tcp_setsockopt(struct sock *sk, int level, =
+int optname,
+>                 else
+>                         WRITE_ONCE(tp->linger2, val * HZ);
+>                 return 0;
+> +       case TCP_DEFER_ACCEPT:
+> +               /* Translate value in seconds to number of retransmits */
+> +               WRITE_ONCE(icsk->icsk_accept_queue.rskq_defer_accept,
+> +                          secs_to_retrans(val, TCP_TIMEOUT_INIT / HZ,
+> +                                          TCP_RTO_MAX / HZ));
+> +               return 0;
+>         }
+>
+>         sockopt_lock_sock(sk);
+> @@ -3584,13 +3590,6 @@ int do_tcp_setsockopt(struct sock *sk, int level, =
+int optname,
+>                         tp->save_syn =3D val;
+>                 break;
+>
+> -       case TCP_DEFER_ACCEPT:
+> -               /* Translate value in seconds to number of retransmits */
+> -               WRITE_ONCE(icsk->icsk_accept_queue.rskq_defer_accept,
+> -                          secs_to_retrans(val, TCP_TIMEOUT_INIT / HZ,
+> -                                          TCP_RTO_MAX / HZ));
+> -               break;
+> -
+>         case TCP_WINDOW_CLAMP:
+>                 err =3D tcp_set_window_clamp(sk, val);
+>                 break;
+> diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+> index f445f5a7c0ebf5f7ab2b2402357f3749d954c0e8..972c3b16369589293eb15febe=
+52e72d5c596b032 100644
+> --- a/net/ipv4/tcp_input.c
+> +++ b/net/ipv4/tcp_input.c
+> @@ -6325,7 +6325,7 @@ static int tcp_rcv_synsent_state_process(struct soc=
+k *sk, struct sk_buff *skb,
+>                 if (fastopen_fail)
+>                         return -1;
+>                 if (sk->sk_write_pending ||
+> -                   icsk->icsk_accept_queue.rskq_defer_accept ||
+> +                   READ_ONCE(icsk->icsk_accept_queue.rskq_defer_accept) =
+||
+>                     inet_csk_in_pingpong_mode(sk)) {
+>                         /* Save one ACK. Data will be ready after
+>                          * several ticks, if write_pending is set.
+> diff --git a/net/ipv4/tcp_minisocks.c b/net/ipv4/tcp_minisocks.c
+> index c8f2aa0033871ed3f8b6b045c2cbca6e88bf2b61..32a70e3530db3247986ab5cb0=
+8c8a46babf86ad6 100644
+> --- a/net/ipv4/tcp_minisocks.c
+> +++ b/net/ipv4/tcp_minisocks.c
+> @@ -794,7 +794,7 @@ struct sock *tcp_check_req(struct sock *sk, struct sk=
+_buff *skb,
+>                 return sk;
+>
+>         /* While TCP_DEFER_ACCEPT is active, drop bare ACK. */
+> -       if (req->num_timeout < inet_csk(sk)->icsk_accept_queue.rskq_defer=
+_accept &&
+> +       if (req->num_timeout < READ_ONCE(inet_csk(sk)->icsk_accept_queue.=
+rskq_defer_accept) &&
+>             TCP_SKB_CB(skb)->end_seq =3D=3D tcp_rsk(req)->rcv_isn + 1) {
+>                 inet_rsk(req)->acked =3D 1;
+>                 __NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPDEFERACCEPTDRO=
+P);
+> --
+> 2.41.0.640.ga95def55d0-goog
+>
 
