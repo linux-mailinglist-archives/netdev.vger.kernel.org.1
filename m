@@ -1,140 +1,292 @@
-Return-Path: <netdev+bounces-24353-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24354-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96C2676FEA8
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 12:43:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 17C7476FEB5
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 12:44:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 027C02825A4
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 10:43:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C43BF2810DF
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 10:44:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17DAB8C0B;
-	Fri,  4 Aug 2023 10:43:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC6ECA943;
+	Fri,  4 Aug 2023 10:44:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D0638473
-	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 10:43:01 +0000 (UTC)
-Received: from mail-qt1-x836.google.com (mail-qt1-x836.google.com [IPv6:2607:f8b0:4864:20::836])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4ED2546B2
-	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 03:43:00 -0700 (PDT)
-Received: by mail-qt1-x836.google.com with SMTP id d75a77b69052e-40a47e8e38dso196291cf.1
-        for <netdev@vger.kernel.org>; Fri, 04 Aug 2023 03:43:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691145779; x=1691750579;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NOJqrwX6eBicRAoTwudqPPw7DL3KcgjyNYI7qHOK9jg=;
-        b=tlDzk8p3Qd9BVW31GLzRyv7ZUcMDB7K713VYP+7kXiputkHlQwiVDYUvytqQGIfBEr
-         wbu6z7qPS0jGXDpZHsGjn1/qIr0Gf6TQ8o+iAVGfZjBtaRo4IWQYLaavW6VxGV+5NEw8
-         IxWKqgrg+d1tqij+SWc8kCIJ0vrVzJMFyPt87YDo1FsVaP3rjl/qhtn0Y6mUKgUZECwh
-         ur1HjcQqWFG+0rJUeOxaMEcaSa/Hz9J7WZaOoP+VomunEFcbhhuv08S8B6Gps3ZsiSf8
-         FsHdkK+ccYJdcTueG2B9B0K1H3T/fp01FB/EeMAB24UK6fJXgWjhz/zQFXjCzb/8dUK+
-         K7bw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691145779; x=1691750579;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=NOJqrwX6eBicRAoTwudqPPw7DL3KcgjyNYI7qHOK9jg=;
-        b=RTgUfmQPGf+yQed2uXEP0eO9WA4xgyW9FfdVat6pXgTTxGbP77HQxuwt0HsbTCtKor
-         Pb+KBak3fy1gm2lTwsXSXaTgI11kFuLNgJKOIM+YyRwcS1mVmtAXCC1bHLbMhtTU1pzm
-         HukvPNneDe8WBvD4nVcJvibfws4uyR1earnBN0wW+RBgogHkj08FPZxT5fU04hKyfAWS
-         inX7OO+J3OyJZUhCyYlycx69+RBffC2jMCrGmkE0SJDrnq2zM5ZMAOSBfRX/Wrh7iRoR
-         LSlDYTPVw/vM+BFV6W6Mv/Se3IXCZjvA8Ix5mo6ckjFjPp6NIMWXVJmqsGCF4sd67Z0C
-         LlFw==
-X-Gm-Message-State: AOJu0Yy0e81Px7fab4hqH56Nc3moewR5MRYed16Uft70PHEzlx8QqGBl
-	x7nKBfj4WcSnXyeBgN63mavIi6Vb3NK4i2HmYNC6oL3KiYzKgjV+VBYmGQ==
-X-Google-Smtp-Source: AGHT+IFrBg8TcAuKoTvcaWHA2QYZfg6pTqYF4x1vjZo0zej0AbfU2Xw2p0Mm2/elqdxoiA0GmcgX0loLYmVkvwMJ9XE=
-X-Received: by 2002:ac8:5902:0:b0:403:b6ff:c0b with SMTP id
- 2-20020ac85902000000b00403b6ff0c0bmr186859qty.6.1691145779225; Fri, 04 Aug
- 2023 03:42:59 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0FBD5250
+	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 10:44:48 +0000 (UTC)
+Received: from wout4-smtp.messagingengine.com (wout4-smtp.messagingengine.com [64.147.123.20])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78AE349C3;
+	Fri,  4 Aug 2023 03:44:46 -0700 (PDT)
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+	by mailout.west.internal (Postfix) with ESMTP id 3E07932004CE;
+	Fri,  4 Aug 2023 06:44:44 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute5.internal (MEProxy); Fri, 04 Aug 2023 06:44:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=cc
+	:cc:content-type:content-type:date:date:from:from:in-reply-to
+	:in-reply-to:message-id:mime-version:references:reply-to:sender
+	:subject:subject:to:to; s=fm3; t=1691145883; x=1691232283; bh=5K
+	VBfdwlrDZxwIIRGmoNBH6YnC5ESzexzoRqpWv1xrc=; b=PSk2cUnCKp09Of3fvU
+	qz5XQYWc9vxPZVNdH4EvpfykSMhDLSR9zcTbPJvR2emN//qavArtK/ojYCdeUFfu
+	iMTuYreM+XagnocVW3TArZvG2ebdMZVAd+Udpaku7X/uOqxl7/QeMmoM0DVfnnMO
+	syUXYyrfPwdMt9NoGpuJ0l4hkzn+pvOiUj5ZVzGIeTlTidkJx1tJ53VYtdWmcXxI
+	S8JxiZE5AZOjsF6EMzOQQSYdFMVjibcjf2B6TOajS6frM3iLRvUGZdZBMQatUx4A
+	G2NdlAwLkvquvbsWv5rDaMs3uU6vrBWhvQr2ew5pV1wXvVgf0C5ayL4bgSFLIgVZ
+	WMoA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:sender:subject
+	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+	:x-sasl-enc; s=fm3; t=1691145883; x=1691232283; bh=5KVBfdwlrDZxw
+	IIRGmoNBH6YnC5ESzexzoRqpWv1xrc=; b=0e3bPJeKn0a2ZrFzwCDRobdZWJE9T
+	aOWjgmFZtQzxJo7quRkqIaNVSLPGLwXdkidCR5QYng+j1iNUVTLSgwBpCgesza9U
+	+rPNKryiTZJnv97OBLrUxItmjZYHKG8Xu5XmYjmJgJwwtsm/Sj5CyHEhEkuQ3OEF
+	eIXEJkq4TcWJPObpmhFAK7DiqAqAYTCECEfzLcol4JVCGFHRyZSTrNYjSjDknEo6
+	NRKWbH7icmUZnZHG1Rx2zjoM3EwyViKZmmx1syMn4mLaSNu6rr7DI1lBHae22i22
+	St5fUxjwQEoPFkq11mQTKRBdBT2gNoDc3K6eomMRatFh9LydNCzge7Rmg==
+X-ME-Sender: <xms:m9bMZA6Kwvx2uu0t4ZMZ8EUkGMopMIMFRt9DgZ6MXS-F4gNe8wtfTg>
+    <xme:m9bMZB54uxczWpnE0DrSmyVq0Yi4wdfZLypagi3f-dXbbvRYfwW0gkMXxg7lxWnWO
+    86MGsnMuAFY1Q>
+X-ME-Received: <xmr:m9bMZPdwxT_4EkRhwF0YfrGpxSwhmpYTbSNgcVfFb4nvLB837ogq7zMx8MMGumnao3Q47dwP54ROrrv-3MBkObmj3OG7ru8eZDmj0w>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrkeeggdeftdcutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+    fjughrpeffhffvvefukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpefirhgvghcu
+    mffjuceoghhrvghgsehkrhhorghhrdgtohhmqeenucggtffrrghtthgvrhhnpeegheeuhe
+    fgtdeluddtleekfeegjeetgeeikeehfeduieffvddufeefleevtddtvdenucffohhmrghi
+    nhepkhgvrhhnvghlrdhorhhgnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpe
+    hmrghilhhfrhhomhepghhrvghgsehkrhhorghhrdgtohhm
+X-ME-Proxy: <xmx:m9bMZFJvJiW70aCFvidR3yCLgjAXt8XTSIRNFgbqKvFY61owkER0dw>
+    <xmx:m9bMZELWPFFwKqrA9jbLOpOago6nj933UCk_Oj0Kp8CocX0UiyFRTw>
+    <xmx:m9bMZGwiJYEtuGou0SkB2XvQqOO-7XOosyNCuLyYNaM3gQp1KAHSkQ>
+    <xmx:m9bMZJAA3_JEasiVknHDnpG69XVCbjILMy7ezuPldI-LibBCSED4gw>
+Feedback-ID: i787e41f1:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 4 Aug 2023 06:44:42 -0400 (EDT)
+Date: Fri, 4 Aug 2023 12:44:39 +0200
+From: Greg KH <greg@kroah.com>
+To: Hardik Garg <hargar@linux.microsoft.com>
+Cc: stable@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+	shayd@nvidia.com, saeedm@nvidia.com, fred@cloudflare.com,
+	netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 6.1 5.15] net/mlx5: Free irqs only on shutdown callback
+Message-ID: <2023080429-shelf-truce-7fed@gregkh>
+References: <20230803192832.22966-1-hargar@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <202308041649468563730@zte.com.cn>
-In-Reply-To: <202308041649468563730@zte.com.cn>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 4 Aug 2023 12:42:48 +0200
-Message-ID: <CANn89i+FTKRkgVodoQaCXH632rXx04AEe2_dJkqPiCEdtG0zQA@mail.gmail.com>
-Subject: Re: [PATCH] udp_tunnel_nic: add net device refcount tracker
-To: yang.yang29@zte.com.cn
-Cc: davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230803192832.22966-1-hargar@linux.microsoft.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Aug 4, 2023 at 10:50=E2=80=AFAM <yang.yang29@zte.com.cn> wrote:
->
-> From: xu xin <xu.xin16@zte.com.cn>
->
-> Add net device refcount tracker to udp_tunnel_nic.c.
->
-> Signed-off-by: xu xin <xu.xin16@zte.com.cn>
-> Reviewed-by: Yang Yang <yang.yang29@zte.com.cn>
-> Cc: Kuang Mingfu <kuang.mingfu@zte.com.cn>
-> ---
->  net/ipv4/udp_tunnel_nic.c | 7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
->
-> diff --git a/net/ipv4/udp_tunnel_nic.c b/net/ipv4/udp_tunnel_nic.c
-> index 029219749785..ce8f5c82b0a1 100644
-> --- a/net/ipv4/udp_tunnel_nic.c
-> +++ b/net/ipv4/udp_tunnel_nic.c
-> @@ -55,6 +55,9 @@ struct udp_tunnel_nic {
->   */
->  static struct workqueue_struct *udp_tunnel_nic_workqueue;
->
-> +/* To track netdev_hold and netdev_put */
-> +static netdevice_tracker udp_tunnel_nic_devtracker;
+On Thu, Aug 03, 2023 at 07:28:32PM +0000, Hardik Garg wrote:
+> commit 9c2d08010963 ("net/mlx5: Free irqs only on shutdown callback")
+> backport this v6.4 commit to v6.1 and v5.15
+> 
+> Whenever a shutdown is invoked, free irqs only and keep mlx5_irq
+> synthetic wrapper intact in order to avoid use-after-free on
+> system shutdown.
+> 
+> for example:
+> ==================================================================
+> BUG: KASAN: use-after-free in _find_first_bit+0x66/0x80
+> Read of size 8 at addr ffff88823fc0d318 by task kworker/u192:0/13608
+> 
+> CPU: 25 PID: 13608 Comm: kworker/u192:0 Tainted: 
+> G    B   W  O  6.1.21-cloudflare-kasan-2023.3.21 #1
+> Hardware name: GIGABYTE R162-R2-GEN0/MZ12-HD2-CD, BIOS R14 05/03/2021
+> Workqueue: mlx5e mlx5e_tx_timeout_work [mlx5_core]
+> Call Trace:
+>   <TASK>
+>   dump_stack_lvl+0x34/0x48
+>   print_report+0x170/0x473
+>   ? _find_first_bit+0x66/0x80
+>   kasan_report+0xad/0x130
+>   ? _find_first_bit+0x66/0x80
+>   _find_first_bit+0x66/0x80
+>   mlx5e_open_channels+0x3c5/0x3a10 [mlx5_core]
+>   ? console_unlock+0x2fa/0x430
+>   ? _raw_spin_lock_irqsave+0x8d/0xf0
+>   ? _raw_spin_unlock_irqrestore+0x42/0x80
+>   ? preempt_count_add+0x7d/0x150
+>   ? __wake_up_klogd.part.0+0x7d/0xc0
+>   ? vprintk_emit+0xfe/0x2c0
+>   ? mlx5e_trigger_napi_sched+0x40/0x40 [mlx5_core]
+>   ? dev_attr_show.cold+0x35/0x35
+>   ? devlink_health_do_dump.part.0+0x174/0x340
+>   ? devlink_health_report+0x504/0x810
+>   ? mlx5e_reporter_tx_timeout+0x29d/0x3a0 [mlx5_core]
+>   ? mlx5e_tx_timeout_work+0x17c/0x230 [mlx5_core]
+>   ? process_one_work+0x680/0x1050
+>   mlx5e_safe_switch_params+0x156/0x220 [mlx5_core]
+>   ? mlx5e_switch_priv_channels+0x310/0x310 [mlx5_core]
+>   ? mlx5_eq_poll_irq_disabled+0xb6/0x100 [mlx5_core]
+>   mlx5e_tx_reporter_timeout_recover+0x123/0x240 [mlx5_core]
+>   ? __mutex_unlock_slowpath.constprop.0+0x2b0/0x2b0
+>   devlink_health_reporter_recover+0xa6/0x1f0
+>   devlink_health_report+0x2f7/0x810
+>   ? vsnprintf+0x854/0x15e0
+>   mlx5e_reporter_tx_timeout+0x29d/0x3a0 [mlx5_core]
+>   ? mlx5e_reporter_tx_err_cqe+0x1a0/0x1a0 [mlx5_core]
+>   ? mlx5e_tx_reporter_timeout_dump+0x50/0x50 [mlx5_core]
+>   ? mlx5e_tx_reporter_dump_sq+0x260/0x260 [mlx5_core]
+>   ? newidle_balance+0x9b7/0xe30
+>   ? psi_group_change+0x6a7/0xb80
+>   ? mutex_lock+0x96/0xf0
+>   ? __mutex_lock_slowpath+0x10/0x10
+>   mlx5e_tx_timeout_work+0x17c/0x230 [mlx5_core]
+>   process_one_work+0x680/0x1050
+>   worker_thread+0x5a0/0xeb0
+>   ? process_one_work+0x1050/0x1050
+>   kthread+0x2a2/0x340
+>   ? kthread_complete_and_exit+0x20/0x20
+>   ret_from_fork+0x22/0x30
+>   </TASK>
+> 
+> Freed by task 1:
+>   kasan_save_stack+0x23/0x50
+>   kasan_set_track+0x21/0x30
+>   kasan_save_free_info+0x2a/0x40
+>   ____kasan_slab_free+0x169/0x1d0
+>   slab_free_freelist_hook+0xd2/0x190
+>   __kmem_cache_free+0x1a1/0x2f0
+>   irq_pool_free+0x138/0x200 [mlx5_core]
+>   mlx5_irq_table_destroy+0xf6/0x170 [mlx5_core]
+>   mlx5_core_eq_free_irqs+0x74/0xf0 [mlx5_core]
+>   shutdown+0x194/0x1aa [mlx5_core]
+>   pci_device_shutdown+0x75/0x120
+>   device_shutdown+0x35c/0x620
+>   kernel_restart+0x60/0xa0
+>   __do_sys_reboot+0x1cb/0x2c0
+>   do_syscall_64+0x3b/0x90
+>   entry_SYSCALL_64_after_hwframe+0x4b/0xb5
+> 
+> The buggy address belongs to the object at ffff88823fc0d300
+>   which belongs to the cache kmalloc-192 of size 192
+> The buggy address is located 24 bytes inside of
+>   192-byte region [ffff88823fc0d300, ffff88823fc0d3c0)
+> 
+> The buggy address belongs to the physical page:
+> page:0000000010139587 refcount:1 mapcount:0 mapping:0000000000000000
+> index:0x0 pfn:0x23fc0c
+> head:0000000010139587 order:1 compound_mapcount:0 compound_pincount:0
+> flags: 0x2ffff800010200(slab|head|node=0|zone=2|lastcpupid=0x1ffff)
+> raw: 002ffff800010200 0000000000000000 dead000000000122 ffff88810004ca00
+> raw: 0000000000000000 0000000000200020 00000001ffffffff 0000000000000000
+> page dumped because: kasan: bad access detected
+> 
+> Memory state around the buggy address:
+>   ffff88823fc0d200: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+>   ffff88823fc0d280: fb fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
+>  >ffff88823fc0d300: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+>                              ^
+>   ffff88823fc0d380: fb fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
+>   ffff88823fc0d400: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+> ==================================================================
+> general protection fault, probably for non-canonical address
+> 0xdffffc005c40d7ac: 0000 [#1] PREEMPT SMP KASAN NOPTI
+> KASAN: probably user-memory-access in range 
+> [0x00000002e206bd60-0x00000002e206bd67]
+> CPU: 25 PID: 13608 Comm: kworker/u192:0 Tainted: 
+> G    B   W  O  6.1.21-cloudflare-kasan-2023.3.21 #1
+> Hardware name: GIGABYTE R162-R2-GEN0/MZ12-HD2-CD, BIOS R14 05/03/2021
+> Workqueue: mlx5e mlx5e_tx_timeout_work [mlx5_core]
+> RIP: 0010:__alloc_pages+0x141/0x5c0
+> Call Trace:
+>   <TASK>
+>   ? sysvec_apic_timer_interrupt+0xa0/0xc0
+>   ? asm_sysvec_apic_timer_interrupt+0x16/0x20
+>   ? __alloc_pages_slowpath.constprop.0+0x1ec0/0x1ec0
+>   ? _raw_spin_unlock_irqrestore+0x3d/0x80
+>   __kmalloc_large_node+0x80/0x120
+>   ? kvmalloc_node+0x4e/0x170
+>   __kmalloc_node+0xd4/0x150
+>   kvmalloc_node+0x4e/0x170
+>   mlx5e_open_channels+0x631/0x3a10 [mlx5_core]
+>   ? console_unlock+0x2fa/0x430
+>   ? _raw_spin_lock_irqsave+0x8d/0xf0
+>   ? _raw_spin_unlock_irqrestore+0x42/0x80
+>   ? preempt_count_add+0x7d/0x150
+>   ? __wake_up_klogd.part.0+0x7d/0xc0
+>   ? vprintk_emit+0xfe/0x2c0
+>   ? mlx5e_trigger_napi_sched+0x40/0x40 [mlx5_core]
+>   ? dev_attr_show.cold+0x35/0x35
+>   ? devlink_health_do_dump.part.0+0x174/0x340
+>   ? devlink_health_report+0x504/0x810
+>   ? mlx5e_reporter_tx_timeout+0x29d/0x3a0 [mlx5_core]
+>   ? mlx5e_tx_timeout_work+0x17c/0x230 [mlx5_core]
+>   ? process_one_work+0x680/0x1050
+>   mlx5e_safe_switch_params+0x156/0x220 [mlx5_core]
+>   ? mlx5e_switch_priv_channels+0x310/0x310 [mlx5_core]
+>   ? mlx5_eq_poll_irq_disabled+0xb6/0x100 [mlx5_core]
+>   mlx5e_tx_reporter_timeout_recover+0x123/0x240 [mlx5_core]
+>   ? __mutex_unlock_slowpath.constprop.0+0x2b0/0x2b0
+>   devlink_health_reporter_recover+0xa6/0x1f0
+>   devlink_health_report+0x2f7/0x810
+>   ? vsnprintf+0x854/0x15e0
+>   mlx5e_reporter_tx_timeout+0x29d/0x3a0 [mlx5_core]
+>   ? mlx5e_reporter_tx_err_cqe+0x1a0/0x1a0 [mlx5_core]
+>   ? mlx5e_tx_reporter_timeout_dump+0x50/0x50 [mlx5_core]
+>   ? mlx5e_tx_reporter_dump_sq+0x260/0x260 [mlx5_core]
+>   ? newidle_balance+0x9b7/0xe30
+>   ? psi_group_change+0x6a7/0xb80
+>   ? mutex_lock+0x96/0xf0
+>   ? __mutex_lock_slowpath+0x10/0x10
+>   mlx5e_tx_timeout_work+0x17c/0x230 [mlx5_core]
+>   process_one_work+0x680/0x1050
+>   worker_thread+0x5a0/0xeb0
+>   ? process_one_work+0x1050/0x1050
+>   kthread+0x2a2/0x340
+>   ? kthread_complete_and_exit+0x20/0x20
+>   ret_from_fork+0x22/0x30
+>   </TASK>
+> ---[ end trace 0000000000000000  ]---
+> RIP: 0010:__alloc_pages+0x141/0x5c0
+> Code: e0 39 a3 96 89 e9 b8 22 01 32 01 83 e1 0f 48 89 fa 01 c9 48 c1 ea
+> 03 d3 f8 83 e0 03 89 44 24 6c 48 b8 00 00 00 00 00 fc ff df <80> 3c 02
+> 00 0f 85 fc 03 00 00 89 e8 4a 8b 14 f5 e0 39 a3 96 4c 89
+> RSP: 0018:ffff888251f0f438 EFLAGS: 00010202
+> RAX: dffffc0000000000 RBX: 1ffff1104a3e1e8b RCX: 0000000000000000
+> RDX: 000000005c40d7ac RSI: 0000000000000003 RDI: 00000002e206bd60
+> RBP: 0000000000052dc0 R08: ffff8882b0044218 R09: ffff8882b0045e8a
+> R10: fffffbfff300fefc R11: ffff888167af4000 R12: 0000000000000003
+> R13: 0000000000000000 R14: 00000000696c7070 R15: ffff8882373f4380
+> FS:  0000000000000000(0000) GS:ffff88bf2be80000(0000)
+> knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 00005641d031eee8 CR3: 0000002e7ca14000 CR4: 0000000000350ee0
+> Kernel panic - not syncing: Fatal exception
+> Kernel Offset: 0x11000000 from 0xffffffff81000000 (relocation range:
+> 0xffffffff80000000-0xffffffffbfffffff)
+> ---[ end Kernel panic - not syncing: Fatal exception  ]---]
+> 
+> Reported-by: Frederick Lawler <fred@cloudflare.com>
+> Link: https://lore.kernel.org/netdev/be5b9271-7507-19c5-ded1-fa78f1980e69@cloudflare.com
+> Signed-off-by: Shay Drory <shayd@nvidia.com>
+> Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
+> [hardik: Refer to the irqn member of the mlx5_irq struct, instead of
+>  the msi_map, since we don't have upstream v6.4 commit 235a25fe28de
+>  ("net/mlx5: Modify struct mlx5_irq to use struct msi_map")].
+> [hardik: Refer to the pf_pool member of the mlx5_irq_table struct,
+>  instead of pcif_pool, since we don't have upstream v6.4 commit
+>  8bebfd767909 ("net/mlx5: Improve naming of pci function vectors")].
 
-This looks wrong.
+Now queued up, thanks.
 
-> +
->  static const char *udp_tunnel_nic_tunnel_type_name(unsigned int type)
->  {
->         switch (type) {
-> @@ -825,7 +828,7 @@ static int udp_tunnel_nic_register(struct net_device =
-*dev)
->         }
->
->         utn->dev =3D dev;
-> -       dev_hold(dev);
-> +       netdev_hold(dev, &udp_tunnel_nic_devtracker, GFP_KERNEL);
-
-This is wrong. You need a separate netdevice_tracker per netdev_hold()
-
-For instance, this would need to be in "(struct udp_tunnel_nic)->dev_tracke=
-r"
-
-
->         dev->udp_tunnel_nic =3D utn;
->
->         if (!(info->flags & UDP_TUNNEL_NIC_INFO_OPEN_ONLY))
-> @@ -879,7 +882,7 @@ udp_tunnel_nic_unregister(struct net_device *dev, str=
-uct udp_tunnel_nic *utn)
->         udp_tunnel_nic_free(utn);
->  release_dev:
->         dev->udp_tunnel_nic =3D NULL;
-> -       dev_put(dev);
-> +       netdev_put(dev, &udp_tunnel_nic_devtracker);
->  }
->
->  static int
-> --
-> 2.15.2
+greg k-h
 
