@@ -1,218 +1,107 @@
-Return-Path: <netdev+bounces-24600-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24601-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2983E770C31
-	for <lists+netdev@lfdr.de>; Sat,  5 Aug 2023 00:59:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7874F770C44
+	for <lists+netdev@lfdr.de>; Sat,  5 Aug 2023 01:13:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5B07D1C216B6
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 22:59:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A7D881C215D4
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 23:13:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 203A61DA52;
-	Fri,  4 Aug 2023 22:59:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55D75253A3;
+	Fri,  4 Aug 2023 23:13:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD9F1BA2C
-	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 22:59:53 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA654C433C7;
-	Fri,  4 Aug 2023 22:59:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691189993;
-	bh=s3YvTO7sNMNEGf/PBzDD9w8pXTJcenkaISj8LBXzNfc=;
-	h=From:To:Cc:Subject:Date:From;
-	b=aDIgSFXzqUk8tC7IhLW74O3JU26Ym3h07KVDQTmL86h2UEBbQPCETkZzXS7+YIEB5
-	 g4ZtMP5+9zY1DQVBGva6k/T9wmNFpxv0/ILMh+tLwnc2TDYKAFdErqeQWgdZAVAPU8
-	 WQt4kHldtiBTnMRvAgbZsat8RR9abbTrh4ta26m8p3j2folgKTA63IRM8h+J4FYJiB
-	 d805tIFeVjC7BmsT3VALeAQvMrdEh0htXmBTJiyIr9aoTrjjB/9HkBjyaQkUUG03eV
-	 pnGbEc0RxZztc/2rq9zNcFlw3juF12UP/I07WKjuA2sp3c8pWIilikYzcRyYTwTIqt
-	 6M4v+kLMmNXEA==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	Jakub Kicinski <kuba@kernel.org>,
-	borisp@nvidia.com,
-	john.fastabend@gmail.com,
-	dirk.vandermerwe@netronome.com,
-	Tariq Toukan <tariqt@nvidia.com>
-Subject: [PATCH net] net: tls: avoid discarding data on record close
-Date: Fri,  4 Aug 2023 15:59:51 -0700
-Message-ID: <20230804225951.754789-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.41.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A28B1BEE3
+	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 23:13:53 +0000 (UTC)
+Received: from out-117.mta0.migadu.com (out-117.mta0.migadu.com [91.218.175.117])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D4E8E60
+	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 16:13:51 -0700 (PDT)
+Message-ID: <626eb8ca-858b-680c-64ea-3d2b0a7d7908@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1691190829;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5TbdFkKHnpHT+mEjg5xeWjaXSnAKns2iDiOkkob2h7U=;
+	b=XbrMJK5QzfLhT9mtwlITuBYk2hu5URead0WvQjY+DJFBL5YNVT1KYSITfNpWwXc/pQiLky
+	DuzPfrATq3CEYEqoaGRHluG+xopEP97jX0+FHQikpc4pkUzpD3+MpIUm937qmaBMew9eGz
+	RERhTgUhwFIRTEMrmgciHVTCmmzCZG8=
+Date: Fri, 4 Aug 2023 16:13:44 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Subject: Re: [PATCH net-next] tcp/dccp: cache line align inet_hashinfo
+Content-Language: en-US
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com
+References: <20230803075334.2321561-1-edumazet@google.com>
+ <169113782026.32170.17783946876020996348.git-patchwork-notify@kernel.org>
+ <CANn89iKhp6ghj6-+n9RXvP-Bc33kOdSMSTM1KQj=WSQ2DhgPWQ@mail.gmail.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <CANn89iKhp6ghj6-+n9RXvP-Bc33kOdSMSTM1KQj=WSQ2DhgPWQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-TLS records end with a 16B tag. For TLS device offload we only
-need to make space for this tag in the stream, the device will
-generate and replace it with the actual calculated tag.
+On 8/4/23 1:33 PM, Eric Dumazet wrote:
+> On Fri, Aug 4, 2023 at 10:30 AM <patchwork-bot+netdevbpf@kernel.org> wrote:
+>>
+>> Hello:
+>>
+>> This patch was applied to netdev/net-next.git (main)
+>> by David S. Miller <davem@davemloft.net>:
+>>
+>> On Thu,  3 Aug 2023 07:53:34 +0000 you wrote:
+>>> I have seen tcp_hashinfo starting at a non optimal location,
+>>> forcing input handlers to pull two cache lines instead of one,
+>>> and sharing a cache line that was dirtied more than necessary:
+>>>
+>>> ffffffff83680600 b tcp_orphan_timer
+>>> ffffffff83680628 b tcp_orphan_cache
+>>> ffffffff8368062c b tcp_enable_tx_delay.__tcp_tx_delay_enabled
+>>> ffffffff83680630 B tcp_hashinfo
+>>> ffffffff83680680 b tcp_cong_list_lock
+>>>
+>>> [...]
+>>
+>> Here is the summary with links:
+>>    - [net-next] tcp/dccp: cache line align inet_hashinfo
+>>      https://git.kernel.org/netdev/net-next/c/6f5ca184cbef
+>>
+>> You are awesome, thank you!
+>> --
+>> Deet-doot-dot, I am a bot.
+>> https://korg.docs.kernel.org/patchwork/pwbot.html
+>>
+>>
+> 
+> Thanks !
+> 
+> Apparently this misalignment came with
+> 
+> commit cae3873c5b3a4fcd9706fb461ff4e91bdf1f0120
+> Author: Martin KaFai Lau <kafai@fb.com>
+> Date:   Wed May 11 17:06:05 2022 -0700
+> 
+>      net: inet: Retire port only listening_hash
 
-Long time ago the code would just re-reference the head frag
-which mostly worked but was suboptimal because it prevented TCP
-from combining the record into a single skb frag. I'm not sure
-if it was correct as the first frag may be shorter than the tag.
-
-The commit under fixes tried to replace that with using the page
-frag and if the allocation failed rolling back the data, if record
-was long enough. It achieves better fragment coalescing but is
-also buggy.
-
-We don't roll back the iterator, so unless we're at the end of
-send we'll skip the data we designated as tag and start the
-next record as if the rollback never happened.
-There's also the possibility that the record was constructed
-with MSG_MORE and the data came from a different syscall and
-we already told the user space that we "got it".
-
-Allocate a single dummy page and use it as fallback.
-
-Found by code inspection, and proven by forcing allocation
-failures.
-
-Fixes: e7b159a48ba6 ("net/tls: remove the record tail optimization")
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-CC: borisp@nvidia.com
-CC: john.fastabend@gmail.com
-CC: dirk.vandermerwe@netronome.com
-CC: Tariq Toukan <tariqt@nvidia.com>
-
-Tariq, this is the "another bug" I mentioned yesterday.
-The fix won't help the bug you were reporting, tho.
----
- net/tls/tls_device.c | 64 +++++++++++++++++++++++---------------------
- 1 file changed, 33 insertions(+), 31 deletions(-)
-
-diff --git a/net/tls/tls_device.c b/net/tls/tls_device.c
-index 2021fe557e50..529101eb20bd 100644
---- a/net/tls/tls_device.c
-+++ b/net/tls/tls_device.c
-@@ -52,6 +52,8 @@ static LIST_HEAD(tls_device_list);
- static LIST_HEAD(tls_device_down_list);
- static DEFINE_SPINLOCK(tls_device_lock);
- 
-+static struct page *dummy_page;
-+
- static void tls_device_free_ctx(struct tls_context *ctx)
- {
- 	if (ctx->tx_conf == TLS_HW) {
-@@ -312,36 +314,33 @@ static int tls_push_record(struct sock *sk,
- 	return tls_push_sg(sk, ctx, offload_ctx->sg_tx_data, 0, flags);
- }
- 
--static int tls_device_record_close(struct sock *sk,
--				   struct tls_context *ctx,
--				   struct tls_record_info *record,
--				   struct page_frag *pfrag,
--				   unsigned char record_type)
-+static void tls_device_record_close(struct sock *sk,
-+				    struct tls_context *ctx,
-+				    struct tls_record_info *record,
-+				    struct page_frag *pfrag,
-+				    unsigned char record_type)
- {
- 	struct tls_prot_info *prot = &ctx->prot_info;
--	int ret;
-+	struct page_frag dummy_tag_frag;
- 
- 	/* append tag
- 	 * device will fill in the tag, we just need to append a placeholder
- 	 * use socket memory to improve coalescing (re-using a single buffer
- 	 * increases frag count)
--	 * if we can't allocate memory now, steal some back from data
-+	 * if we can't allocate memory now use the dummy page
- 	 */
--	if (likely(skb_page_frag_refill(prot->tag_size, pfrag,
--					sk->sk_allocation))) {
--		ret = 0;
--		tls_append_frag(record, pfrag, prot->tag_size);
--	} else {
--		ret = prot->tag_size;
--		if (record->len <= prot->overhead_size)
--			return -ENOMEM;
-+	if (unlikely(pfrag->size - pfrag->offset < prot->tag_size) &&
-+	    !skb_page_frag_refill(prot->tag_size, pfrag, sk->sk_allocation)) {
-+		dummy_tag_frag.page = dummy_page;
-+		dummy_tag_frag.offset = 0;
-+		pfrag = &dummy_tag_frag;
- 	}
-+	tls_append_frag(record, pfrag, prot->tag_size);
- 
- 	/* fill prepend */
- 	tls_fill_prepend(ctx, skb_frag_address(&record->frags[0]),
- 			 record->len - prot->overhead_size,
- 			 record_type);
--	return ret;
- }
- 
- static int tls_create_new_record(struct tls_offload_context_tx *offload_ctx,
-@@ -541,18 +540,8 @@ static int tls_push_data(struct sock *sk,
- 
- 		if (done || record->len >= max_open_record_len ||
- 		    (record->num_frags >= MAX_SKB_FRAGS - 1)) {
--			rc = tls_device_record_close(sk, tls_ctx, record,
--						     pfrag, record_type);
--			if (rc) {
--				if (rc > 0) {
--					size += rc;
--				} else {
--					size = orig_size;
--					destroy_record(record);
--					ctx->open_record = NULL;
--					break;
--				}
--			}
-+			tls_device_record_close(sk, tls_ctx, record,
-+						pfrag, record_type);
- 
- 			rc = tls_push_record(sk,
- 					     tls_ctx,
-@@ -1450,14 +1439,26 @@ int __init tls_device_init(void)
- {
- 	int err;
- 
--	destruct_wq = alloc_workqueue("ktls_device_destruct", 0, 0);
--	if (!destruct_wq)
-+	dummy_page = alloc_page(GFP_KERNEL);
-+	if (!dummy_page)
- 		return -ENOMEM;
- 
-+	destruct_wq = alloc_workqueue("ktls_device_destruct", 0, 0);
-+	if (!destruct_wq) {
-+		err = -ENOMEM;
-+		goto err_free_dummy;
-+	}
-+
- 	err = register_netdevice_notifier(&tls_dev_notifier);
- 	if (err)
--		destroy_workqueue(destruct_wq);
-+		goto err_destroy_wq;
- 
-+	return 0;
-+
-+err_destroy_wq:
-+	destroy_workqueue(destruct_wq);
-+err_free_dummy:
-+	put_page(dummy_page);
- 	return err;
- }
- 
-@@ -1466,4 +1467,5 @@ void __exit tls_device_cleanup(void)
- 	unregister_netdevice_notifier(&tls_dev_notifier);
- 	destroy_workqueue(destruct_wq);
- 	clean_acked_data_flush();
-+	put_page(dummy_page);
- }
--- 
-2.41.0
+Ah. Thanks for the fix. TIL.
 
 
