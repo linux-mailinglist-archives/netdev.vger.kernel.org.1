@@ -1,102 +1,128 @@
-Return-Path: <netdev+bounces-24462-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24463-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 058FF7703DD
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 17:04:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 203097703E8
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 17:06:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 04C371C2185F
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 15:04:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 50F491C2167C
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 15:06:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70777CA75;
-	Fri,  4 Aug 2023 15:04:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B91DCA77;
+	Fri,  4 Aug 2023 15:06:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63BF5CA6E
-	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 15:04:48 +0000 (UTC)
-Received: from mail-qt1-x833.google.com (mail-qt1-x833.google.com [IPv6:2607:f8b0:4864:20::833])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9B73AC
-	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 08:04:46 -0700 (PDT)
-Received: by mail-qt1-x833.google.com with SMTP id d75a77b69052e-4036bd4fff1so345591cf.0
-        for <netdev@vger.kernel.org>; Fri, 04 Aug 2023 08:04:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691161486; x=1691766286;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=k0gPH/5fLsW5OXxY6UosW9Su29KJ2LezAZusZZgYyjc=;
-        b=Mrqg6W8E+MYoAwQG7E7CZDp7LrntRm3k1tvAO5pyQwBEg1x6P0QLCPpuRc0nYkKu08
-         W1bSQg9L3hwfYy8OWcP20FfQAR8CgQ2hVH2wUP7QzmJWBBPG8Iwo3db8KPDmgtKYRDFs
-         Y4w0MY4aV3yQIGZoigSyPmWgsxAluO/WSWDvBtWFLUzj30BWeKpKnvqGSfI3AXqBv/wx
-         ta9DGkl03aKiQYHiBFU5tjEiGuhJc6VEHHeUucE2XvS8m8gWurHq/wUOW9cdzSvA3MJH
-         wrpvlZA1Zb0eDpE8VBn2eiReRu6o7YlWM+towgMHS4z+Ht0S1keDPwnwRul/+rZK+zwV
-         WSXg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691161486; x=1691766286;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=k0gPH/5fLsW5OXxY6UosW9Su29KJ2LezAZusZZgYyjc=;
-        b=TJEvxdeHMtG7AG/zT/cFhtCWZUahPpKtX03pV9EHvaNFLE+tTE9JHQv/fuOyJwYR3Z
-         Y1nQIsQb7tSV7OKtYyUtyev1jKgZSJggWgBVQOqrRdeKWRXzVf4Nykhj46kGuuapEoi1
-         IwMl4lSwAZZRWQSd6KvUO70hh3fAqAWJ4rM4VREWDQud/FIVZiQDIPsi39HA+oATtt/p
-         px034I+IHKJCMxRS1TCiXDL6Xl1ZWGp4QRcemUDZns/uBXpI+oA9gxMemn+tICWDyoH9
-         +6P+d15T16n8ggEajmFr6wwTFnnLNqyXhvcmo8tPFH34TsdUC3dI/Lap/bs8+TKagNnL
-         TPdg==
-X-Gm-Message-State: AOJu0Yw9X/W+0yn2LFFbsi78Ch5RKDbT1VNCR4sO3bDLTDwZysRTYNGv
-	j56MGmKK6md5i+vJyL3Jf3/QQotwj1APAtpaHFvjsw==
-X-Google-Smtp-Source: AGHT+IEzENuBMs0742Mcg8ZVz683CWJmgot4aVByS9fV39OXrApvJMx70h8AljPstXbfl1Dd96MkaKAs6NVg/nc0/g8=
-X-Received: by 2002:ac8:5c10:0:b0:3f8:e0a:3e66 with SMTP id
- i16-20020ac85c10000000b003f80e0a3e66mr201760qti.3.1691161485734; Fri, 04 Aug
- 2023 08:04:45 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F4E3BA3B
+	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 15:06:03 +0000 (UTC)
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC72549D8;
+	Fri,  4 Aug 2023 08:05:59 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 3CEA51F86A;
+	Fri,  4 Aug 2023 15:05:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+	t=1691161558; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=R2CNUU0poJf8y+6hqEdygzh3lBlBrvnrBDyeSv19c4k=;
+	b=GJ3DiR9hJlKov7uKmukzuCiKZvgPHbQCtv6GznjKDSH3Wufmkm3gAd63DOCvPWr8FXJXPZ
+	oTsfyjNNrjx8TL2IU77yV6aQu5/XSy6H5j41b8k+bisrOQ77z/29XOT5JJjJm6YUGqM/nn
+	7QSRNv4ZeR6gFkfOMGgrFgUW+BeyzIs=
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+	(No client certificate requested)
+	by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 0816B133B5;
+	Fri,  4 Aug 2023 15:05:58 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+	by imap2.suse-dmz.suse.de with ESMTPSA
+	id PwItAdYTzWRwSQAAMHmgww
+	(envelope-from <petr.pavlu@suse.com>); Fri, 04 Aug 2023 15:05:58 +0000
+From: Petr Pavlu <petr.pavlu@suse.com>
+To: tariqt@nvidia.com,
+	yishaih@nvidia.com,
+	leon@kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	jgg@ziepe.ca,
+	netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Petr Pavlu <petr.pavlu@suse.com>
+Subject: [PATCH net-next 00/10] Convert mlx4 to use auxiliary bus
+Date: Fri,  4 Aug 2023 17:05:17 +0200
+Message-Id: <20230804150527.6117-1-petr.pavlu@suse.com>
+X-Mailer: git-send-email 2.35.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <16be6307909b25852744a67b2caf570efbb83c7f.1684502478.git.asml.silence@gmail.com>
- <ZM0QHZNKLQ9kVlJ8@zx2c4.com> <CANn89i+_DoEDcFY9SfNqQ+8bqJ0kFpt4waQ8CSvhchE4aP2Dhw@mail.gmail.com>
- <ZM0Sm6cx4Y76XLQ9@zx2c4.com>
-In-Reply-To: <ZM0Sm6cx4Y76XLQ9@zx2c4.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 4 Aug 2023 17:04:34 +0200
-Message-ID: <CANn89iLTn6vv9=PvAUccpRNNw6CKcXktixusDpqxqvo+UeLviQ@mail.gmail.com>
-Subject: Re: [PATCH net-next] net/tcp: refactor tcp_inet6_sk()
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc: Pavel Begunkov <asml.silence@gmail.com>, netdev@vger.kernel.org, davem@davemloft.net, 
-	dsahern@kernel.org, pabeni@redhat.com, kuba@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Aug 4, 2023 at 5:02=E2=80=AFPM Jason A. Donenfeld <Jason@zx2c4.com>=
- wrote:
->
-> Hi Eric,
->
-> On Fri, Aug 04, 2023 at 04:57:04PM +0200, Eric Dumazet wrote:
-> > I think my patch fixed this issue, can you double check ?
-> >
-> > f5f80e32de12fad2813d37270e8364a03e6d3ef0 ipv6: remove hard coded
-> > limitation on ipv6_pinfo
-> >
-> > I was not sure if Pavel was problematic or not, I only guessed.
->
-> That appears to fix the issue indeed, thanks. As this is only in
-> net-next, you may want to pick it into net for 6.5.
+This series converts the mlx4 drivers to use auxiliary bus, similarly to
+how mlx5 was converted [1]. The first 6 patches are preparatory changes,
+the remaining 4 are the final conversion.
 
-Sure, we will mark this patch as a stable candidate for 6.5
+Initial motivation for this change was to address a problem related to
+loading mlx4_en/mlx4_ib by mlx4_core using request_module_nowait(). When
+doing such a load in initrd, the operation is asynchronous to any init
+control and can get unexpectedly affected/interrupted by an eventual
+root switch. Using an auxiliary bus leaves these module loads to udevd
+which better integrates with systemd processing. [2]
 
-Thanks.
+General benefit is to get rid of custom interface logic and instead use
+a common facility available for this task. An obvious risk is that some
+new bug is introduced by the conversion.
+
+Leon Romanovsky was kind enough to check for me that the series passes
+their verification tests.
+
+[1] https://lore.kernel.org/netdev/20201101201542.2027568-1-leon@kernel.org/
+[2] https://lore.kernel.org/netdev/0a361ac2-c6bd-2b18-4841-b1b991f0635e@suse.com/
+
+Petr Pavlu (10):
+  mlx4: Get rid of the mlx4_interface.get_dev callback
+  mlx4: Rename member mlx4_en_dev.nb to netdev_nb
+  mlx4: Replace the mlx4_interface.event callback with a notifier
+  mlx4: Get rid of the mlx4_interface.activate callback
+  mlx4: Move the bond work to the core driver
+  mlx4: Avoid resetting MLX4_INTFF_BONDING per driver
+  mlx4: Register mlx4 devices to an auxiliary virtual bus
+  mlx4: Connect the ethernet part to the auxiliary bus
+  mlx4: Connect the infiniband part to the auxiliary bus
+  mlx4: Delete custom device management logic
+
+ drivers/infiniband/hw/mlx4/main.c             | 207 ++++++----
+ drivers/infiniband/hw/mlx4/mlx4_ib.h          |   2 +
+ drivers/net/ethernet/mellanox/mlx4/Kconfig    |   1 +
+ drivers/net/ethernet/mellanox/mlx4/en_main.c  | 141 ++++---
+ .../net/ethernet/mellanox/mlx4/en_netdev.c    |  64 +---
+ drivers/net/ethernet/mellanox/mlx4/intf.c     | 361 ++++++++++++------
+ drivers/net/ethernet/mellanox/mlx4/main.c     | 110 ++++--
+ drivers/net/ethernet/mellanox/mlx4/mlx4.h     |  16 +-
+ drivers/net/ethernet/mellanox/mlx4/mlx4_en.h  |   4 +-
+ include/linux/mlx4/device.h                   |  20 +
+ include/linux/mlx4/driver.h                   |  42 +-
+ 11 files changed, 572 insertions(+), 396 deletions(-)
+
+
+base-commit: 86b7e033d684a9d4ca20ad8e6f8b9300cf99668f
+-- 
+2.35.3
+
 
