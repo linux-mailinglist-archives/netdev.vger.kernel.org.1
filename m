@@ -1,74 +1,99 @@
-Return-Path: <netdev+bounces-23848-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-23834-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9434476DDC7
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 04:00:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B852276DD24
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 03:28:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C3A081C21051
-	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 02:00:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5C62B1C213C8
+	for <lists+netdev@lfdr.de>; Thu,  3 Aug 2023 01:28:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A60011FBC;
-	Thu,  3 Aug 2023 02:00:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5AF51FB5;
+	Thu,  3 Aug 2023 01:28:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F6257F
-	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 02:00:42 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D1D4C433C8;
-	Thu,  3 Aug 2023 02:00:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691028042;
-	bh=Z5aWxJBi0e7hIPzWUxMtGRgPbOWyMuVi4/7/7MSOAtM=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Oq6dfdONFoo/G9s8gWch26lK4bW7D34X8R4VFu7dtlgWCw2CE7jrLT+sNQcykXTjU
-	 SJhDu/52OBVK6O0eSNyhyxGdFpjk18qHT+HnDn4Rwx9tuKCeOGNJx21NNzQwvBiUv7
-	 3gPx65N/kmuL7iMaULOdKi1EuqeMY7DnjQoJl0se99Ax831uFEc68km/mlu1alBans
-	 +l7F8QD3A/2au0Tq7XxRaVT9M8P1IdtzsUlkyvHVLKVLzwhE48MkwOe5QeIX47GCUo
-	 dNXDyjAa9i4Ll9YczF6by/NtfOAPykZlYG3vikd8mLMp7M3fvsNS03bu3DXOp0cBeE
-	 JOb8St4ky/ZXQ==
-Message-ID: <e8ca99dd-416a-f1a0-c858-1d8889a83592@kernel.org>
-Date: Wed, 2 Aug 2023 20:00:40 -0600
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A21747F;
+	Thu,  3 Aug 2023 01:28:19 +0000 (UTC)
+Received: from mail.nfschina.com (unknown [42.101.60.195])
+	by lindbergh.monkeyblade.net (Postfix) with SMTP id 3647C26BA;
+	Wed,  2 Aug 2023 18:28:17 -0700 (PDT)
+Received: from localhost.localdomain (unknown [219.141.250.2])
+	by mail.nfschina.com (Maildata Gateway V2.8.8) with ESMTPA id 3EEF1602E666B;
+	Thu,  3 Aug 2023 09:28:14 +0800 (CST)
+X-MD-Sfrom: kunyu@nfschina.com
+X-MD-SrcIP: 219.141.250.2
+From: Li kunyu <kunyu@nfschina.com>
+To: martin.lau@linux.dev,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	andrii@kernel.org,
+	song@kernel.org,
+	yhs@fb.com,
+	john.fastabend@gmail.com,
+	kpsingh@kernel.org,
+	sdf@google.com,
+	haoluo@google.com,
+	jolsa@kernel.org
+Cc: bpf@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Li kunyu <kunyu@nfschina.com>
+Subject: [PATCH bpf-next v2] bpf: bpf_struct_ops: Remove unnecessary initial values of variables
+Date: Sat,  5 Aug 2023 01:59:29 +0800
+Message-Id: <20230804175929.2867-1-kunyu@nfschina.com>
+X-Mailer: git-send-email 2.18.2
+X-Spam-Status: No, score=0.9 required=5.0 tests=BAYES_00,DATE_IN_FUTURE_24_48,
+	RDNS_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.13.0
-Subject: Re: [PATCH net-next v5 1/2] net/ipv6: Remove expired routes with a
- separated list of routes.
-Content-Language: en-US
-To: thinker.li@gmail.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, netdev@vger.kernel.org, pabeni@redhat.com,
- martin.lau@linux.dev, kernel-team@meta.com, yhs@meta.com
-Cc: sinquersw@gmail.com, kuifeng@meta.com
-References: <20230802004303.567266-1-thinker.li@gmail.com>
- <20230802004303.567266-2-thinker.li@gmail.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20230802004303.567266-2-thinker.li@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
 
-On 8/1/23 6:43 PM, thinker.li@gmail.com wrote:
-> diff --git a/net/ipv6/ip6_fib.c b/net/ipv6/ip6_fib.c
-> index bac768d36cc1..3059e439817a 100644
-> --- a/net/ipv6/ip6_fib.c
-> +++ b/net/ipv6/ip6_fib.c
-> @@ -1480,6 +1488,9 @@ int fib6_add(struct fib6_node *root, struct fib6_info *rt,
->  			list_add(&rt->nh_list, &rt->nh->f6i_list);
->  		__fib6_update_sernum_upto_root(rt, fib6_new_sernum(info->nl_net));
->  		fib6_start_gc(info->nl_net, rt);
-> +
-> +		if (fib6_has_expires(rt))
-> +			hlist_add_head(&rt->gc_link, &table->tb6_gc_hlist);
+err and tlinks is assigned first, so it does not need to initialize the
+assignment.
 
-This should go before the start_gc.
+Signed-off-by: Li kunyu <kunyu@nfschina.com>
+---
+ v2:
+   Remove tlinks initialization assignment.
 
---
-pw-bot: cr
+ kernel/bpf/bpf_struct_ops.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/kernel/bpf/bpf_struct_ops.c b/kernel/bpf/bpf_struct_ops.c
+index d3f0a4825fa6..c05585ed1f37 100644
+--- a/kernel/bpf/bpf_struct_ops.c
++++ b/kernel/bpf/bpf_struct_ops.c
+@@ -374,9 +374,9 @@ static long bpf_struct_ops_map_update_elem(struct bpf_map *map, void *key,
+ 	struct bpf_struct_ops_value *uvalue, *kvalue;
+ 	const struct btf_member *member;
+ 	const struct btf_type *t = st_ops->type;
+-	struct bpf_tramp_links *tlinks = NULL;
++	struct bpf_tramp_links *tlinks;
+ 	void *udata, *kdata;
+-	int prog_fd, err = 0;
++	int prog_fd, err;
+ 	void *image, *image_end;
+ 	u32 i;
+ 
+@@ -818,7 +818,7 @@ static int bpf_struct_ops_map_link_update(struct bpf_link *link, struct bpf_map
+ 	struct bpf_struct_ops_map *st_map, *old_st_map;
+ 	struct bpf_map *old_map;
+ 	struct bpf_struct_ops_link *st_link;
+-	int err = 0;
++	int err;
+ 
+ 	st_link = container_of(link, struct bpf_struct_ops_link, link);
+ 	st_map = container_of(new_map, struct bpf_struct_ops_map, map);
+-- 
+2.18.2
+
 
