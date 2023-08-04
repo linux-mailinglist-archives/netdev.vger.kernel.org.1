@@ -1,233 +1,126 @@
-Return-Path: <netdev+bounces-24503-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24504-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 918A9770654
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 18:51:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9330C770664
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 18:54:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4D68C282823
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 16:51:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C44241C20CBC
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 16:54:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C41C1805D;
-	Fri,  4 Aug 2023 16:51:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 589BC1AA60;
+	Fri,  4 Aug 2023 16:54:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E637BE7C
-	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 16:51:34 +0000 (UTC)
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2061.outbound.protection.outlook.com [40.107.223.61])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E71041994;
-	Fri,  4 Aug 2023 09:51:32 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=bVrhZuBL0raP08m77cWqVmuvLKzvRrrQK6Rf4LJrwR6s44+oHS1JfnlyRDyNEfNMObBkPFzSkNjUsORpA8fvsVj0WW/lxGdtK8bmpi/GLCbpb8GPi6PLA7UKZ+SVtrRvi9FZiDhIzxrOQ7InTOzxI/vzMqpFL1HGmz8HkLwTahpTOfCv6rxo4dN2rBaoQLlRZCfm9vEqLHdvoQChmy14JsOHO93x8MAsR9gVCHWN3Ez1Rn1NAshoBQtA73TLtuVvORT8ZdZF8v3WXOSqZEsoOPR5Co2UEIRoboxSb8pHarkJzoWa7kPfiERJo/nRw9e+zp7k6bhJW9LXMbW6kVSHlg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=lAN2gxDToXnbmOndznQSaQmy6ZhAGSA95vBqW5CTp/U=;
- b=blEQsUOq8cAAVZemwmkdQNPfF8HtJafMz+u/MF+qhob9ucitZG/azHLBFoaSijCPxlvPoOQhrEnp3S8582NQ7pFu8jXD/3RGYktFVE9y0hNqE+quEO4wgbXO1+xZgUR/eJLomTEtnir/xHNeHjUmlHxtsQU5J2U0Sz395zyE96ovAftdwqR8ym9yilSwVqM8gmTstnKJS/TUGi9qB5qD4PchivdorcBxdK+B8SLNtPKsSXFr7aN5oNc22PTj5gbb2iceE0jkjIeaSFfJ1vil4aRyejBsaMJDk1tCtIQqnMKtPkDaUZ9LOu6v6ZDvg2ieVlQjezx2odorKw2Zb5v0GQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=lAN2gxDToXnbmOndznQSaQmy6ZhAGSA95vBqW5CTp/U=;
- b=juH5LOUWDgYeYqeQzS9fX1dO/URp2diIeHEjuMmiwDtJ6qo6h7+fQE922kJSQQjeKKqF8QRY+NrwZkxr+CVN+mKotILj1SkDCUp9/9XtzeBdmxtclcu4hHfuHD98vzDbyNfAXx1otyumoEWOr+JuswkO99gt/a1h9UsaWniGdHGHkHwUM90Q0+QewZczqanTCqMFJdeNOf72ekBf7ptk7KuOCAa8NbJzpbvNV3VvLyJppuz+Yq2/tDi/vEkstmb+XrTRd8MzPNuRlqoVscBwHI0NppGbArtVDSeW23coPh2X/PVMZYXF/KCO3Ly0js/E1yUMiB2T2lXkEN0BlQLqwg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by LV8PR12MB9406.namprd12.prod.outlook.com (2603:10b6:408:20b::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.47; Fri, 4 Aug
- 2023 16:51:31 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::5111:16e8:5afe:1da1]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::5111:16e8:5afe:1da1%6]) with mapi id 15.20.6631.046; Fri, 4 Aug 2023
- 16:51:31 +0000
-Date: Fri, 4 Aug 2023 13:51:29 -0300
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Brett Creeley <brett.creeley@amd.com>
-Cc: kvm@vger.kernel.org, netdev@vger.kernel.org, alex.williamson@redhat.com,
-	yishaih@nvidia.com, shameerali.kolothum.thodi@huawei.com,
-	kevin.tian@intel.com, simon.horman@corigine.com,
-	shannon.nelson@amd.com
-Subject: Re: [PATCH v13 vfio 1/7] vfio: Commonize combine_ranges for use in
- other VFIO drivers
-Message-ID: <ZM0skSmMTNbfRrQ0@nvidia.com>
-References: <20230725214025.9288-1-brett.creeley@amd.com>
- <20230725214025.9288-2-brett.creeley@amd.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230725214025.9288-2-brett.creeley@amd.com>
-X-ClientProxiedBy: MN2PR07CA0003.namprd07.prod.outlook.com
- (2603:10b6:208:1a0::13) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B38F198BA
+	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 16:54:43 +0000 (UTC)
+Received: from mail-vs1-xe36.google.com (mail-vs1-xe36.google.com [IPv6:2607:f8b0:4864:20::e36])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C42A746B1
+	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 09:54:41 -0700 (PDT)
+Received: by mail-vs1-xe36.google.com with SMTP id ada2fe7eead31-447a3d97d77so1018938137.1
+        for <netdev@vger.kernel.org>; Fri, 04 Aug 2023 09:54:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=draconx-ca.20221208.gappssmtp.com; s=20221208; t=1691168081; x=1691772881;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :references:in-reply-to:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=54IgYWW4ZMPvtaxEboRz9NGB20nt0nl5l0+8sVW/viE=;
+        b=RkYhRqCBnlpbJc3F1PcsJLhqGkhfrA75zJTFAgKcANVQv1aOAvoBh3BgwCIGCDbgxi
+         jXt5qs6zRhUu+PP8A7R0OvESoKJROFJb9vH5aHiNTmMJqUYbSMT/MAgrqDrkvghaT2Vs
+         WoaQA8OY/8l/hqeNs7B4G+huqW8n26EI/b3TjRqUWPHjvjPyyBxQei+f6voYCQHk9wpP
+         zRuoM+JszZ4m5WXvs38VretjXIV9lBiSJ7Ai54XvxMbO0u44hlF/Gk+U86FZ4gZZmpRe
+         3LAc6221tSH07bq+P2GleS79z1WQ4ASFQAJ6LzU+UA8e6Q22Gs73JsenMl5/qLSzJbIz
+         qtmQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691168081; x=1691772881;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :references:in-reply-to:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=54IgYWW4ZMPvtaxEboRz9NGB20nt0nl5l0+8sVW/viE=;
+        b=TS3EIxqgX9xE227eaXmaazf9/F9NgWumNodEhi0dGaBc1pbdu8Z/7feHf2NPJk9ho+
+         jdOOcc33aZ/BZgMV7CWHJb56eHN1+t5aIsLzOD+X2r3gD2wRRiLamxwCAvC0lDVJlf5N
+         KBQ6UdQYqOGQRbKj+2/96GaPkQWRYrwWZVxtk4YR9mzBSTt/6CHNQtP2VchZx49G2owd
+         t+/FkDntbApYAI0xY2l74gTDxIjVPV9TXTsP398vcDiIrIGrBw+CcGL9BX5jJ/wArNOX
+         +fe7y22aFPtCFU/wipjrCfaYUAKH5IQuypDpfHax1SAzKoyp8Rj2c+ZZmy4Q0jKpsC8J
+         Anig==
+X-Gm-Message-State: AOJu0Yzk9XHQC9dhbMqxuvrtY/EQIX/KDRbiCe+8PYRbEfBUpUjYwYcn
+	vEM4uysueWDWUH/1gh8CIQyeIGD6NQmp/HRuiD4o309uekliBp17
+X-Google-Smtp-Source: AGHT+IHKs1OgapRWNM/ErWvi+4Hrbz+MQG8ZgaBq+vxKTIFeKiht3rQXF6DXqsfPORXrYYOopdR8+sG6KMVuWIJ9N6A=
+X-Received: by 2002:a67:fb99:0:b0:447:8d49:bfe9 with SMTP id
+ n25-20020a67fb99000000b004478d49bfe9mr1753068vsr.24.1691168080821; Fri, 04
+ Aug 2023 09:54:40 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|LV8PR12MB9406:EE_
-X-MS-Office365-Filtering-Correlation-Id: c7cd5d90-9f31-41e7-20e5-08db950b0d80
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	Uh/lgwSRhbJrIqtE9q+p4l1ajrBXWVz8b3Kiaa6xysC9ltFxnSyfns1aRtXJp2cAkgEW3mibJJQ9bk95KDJSMoL9r2opm2xy3pxWlx1FxcVwOHE0jYfkNWxtkMJXg5HGunrMH4rG2/FPYHyNnyxrk0Phl1Ltl/HHOQbAgSBpGnodBhbxqdatKtVCyNLVgdddJPq6ey4XMKNGmK4il8ryGG0EIQ4NtQxVqSgCmX22iK/EclWRQWGxKIiHbZ/gAtIfff/9675nmC2bxwbmrx8g/b2s704Bq4/Fhn7+YRc0sSczzu9b3mpcCe79CEkncyjJY5ACP60CZ13ptTa6sSNMmgEJruNfd6E5AVSnxzqsCJOwrgKywXVCucgeahexBhyEMlqrAmvRU5LJasU5SIEmCGk9hStBZFLskm1tHf9hc5XZAodhSoCAvUx6VG8hgbY/zvPEp5Ir97kjbue/pbE2sEQGJ1IpkTYrjnZ5uEXxNlNCZxWJmewI2S3Fvsy/7uzfAZp5D2g9pVVVpUELyK5UM3vsFXGKEmyZlh7unlclGJ6CPYtTIf5T3m1CgmEcoCnA
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(376002)(366004)(39860400002)(346002)(136003)(1800799003)(451199021)(186006)(2616005)(26005)(6506007)(8676002)(4326008)(2906002)(66476007)(316002)(66946007)(5660300002)(6916009)(66556008)(8936002)(41300700001)(6486002)(6512007)(478600001)(38100700002)(83380400001)(36756003)(86362001)(66899021);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?KZalLPoWRLoa4vvis8CkDy504bRU+KAk1tOLOphv3hggmCwOX6D6rCHy/xdd?=
- =?us-ascii?Q?Zb80R2Q6JkA10wr6aouaMJ8XjhDUxJ5l+3cgArKRpD7ibHGR5fgws7oUqVVr?=
- =?us-ascii?Q?PmozR+CtQdkwdrA4H5OM76FPPlMeC1peRLrFP9Wmz7Lit0qv9BsdQoO1h65K?=
- =?us-ascii?Q?d2Lj7K9S7Rb/4IUCxrfimaxovWZWrZaLnMS8Q587OH20U7CNvVtWG7S7O6O7?=
- =?us-ascii?Q?UqAW5WrMwC6ShCt3U1tqfSCPEZY8wUv4OGTejCjsQJhhmHdRYj7MKH9fwymW?=
- =?us-ascii?Q?J8XYWzsdHglRnKNDsaRAz2aMMocTIT96VFm3Ym3LRNwyNqHIgH3o0+QExh1o?=
- =?us-ascii?Q?uq7mrIN99TWO799kc9+qHB3Il9Vs/JpSeXCG9hbrEPVkoF/AFAW5MXeoOhzg?=
- =?us-ascii?Q?BEvsrHY21S6fdqzWu4zidDDbkyY6cTBgGZQ/nEqpT1cpEgwyfLVRTcJGHtZs?=
- =?us-ascii?Q?n6KuH3UFitvwEA11oIO7TKMpbqM+pRJM8g+9VEbhA/YVy15X+IOmZ0nZWvKD?=
- =?us-ascii?Q?e1SJT6rqvpKozUYbomX3twodM0s2SqBkMSPUG4Ulvqj8F/0M1YL/HNQpGfb5?=
- =?us-ascii?Q?Jv4OQ2bhQ8a6Nhq9u1TmcsZ/OVzkfcrHNpn3NNja2XpheoTbAjOag7Gkh5+3?=
- =?us-ascii?Q?hLzgjSogAzDsjZw+8FoCztXOIuR4FL+/hHHZkCvDvxe5V9htsl2iEXEqnGMr?=
- =?us-ascii?Q?5Pqls/SjurQMWMSPr5n0BMEVxvm6FJYSQszEFo5TrzX2ocIWEsM1HpAFLdaF?=
- =?us-ascii?Q?oXDY4CSCXb7UGN8RrFc185feeAdIwWWT+BRgxhXN3QG93lpsl5ayxFt8uiOR?=
- =?us-ascii?Q?ziTdB+l9rQs3q8U/Hpksi+me0kQvuvNTSv+rrdJisCyy8AQshvL4Fe5X0MMh?=
- =?us-ascii?Q?wnIH6mfrqpm1t6WVyIC73BCImvYuQc69WP7PQLW/l/oI5uiMKEpYUYpCHTjc?=
- =?us-ascii?Q?/v/jFG6fEBeqvQZ96ZVOIfPkL9Ttg49Vkic2rkqKkHhK4E4r2fUMfY48q7P3?=
- =?us-ascii?Q?CFjLttZRloN0byTordMsb+I71IPc5fK1d8PxNvLzkiqZnRNuz/LXR2gYkY1d?=
- =?us-ascii?Q?d/uoAwpsVYu37MS6j+036E2/9P+73WmzUbvdmIMSrXzpg5ye8bY1BuYhQY5V?=
- =?us-ascii?Q?xrddOJTHJgabklpwRVIOq4hQsFjQ5t/0yAoZM52Mmmo7zwutICQf4X9ayREo?=
- =?us-ascii?Q?n4uAFPEx2wm4wvr9gzrbra8wajWEumMM3g9xNb0NyLz1O5q6CizzfmlvZ0GS?=
- =?us-ascii?Q?4aKsU9Gfq9iEWLbQIEWnmRJCsviMLdNnEdXOevAcTlZU7OeMa69NhfDs/6Xr?=
- =?us-ascii?Q?500UCS3NDfPYZT8Ry6ebm4nbji6gtBtGql4mW7R2Aowo1fh7VqY6zzexIcY1?=
- =?us-ascii?Q?raWyH8lCBIKBJp376zOqRaDJPjGfZyde9sylLIHk94qkAL45zOzlEWZVIGVS?=
- =?us-ascii?Q?9Uab2pKWnyYGCxACZnQW3svmOKngoUubIKB/RMvOfzypK4b2HDAAchm0Pd+r?=
- =?us-ascii?Q?6k15UEyR/4kucIOwKyNQ7t2TehptC3esse+oxCCWkFAraQLwTQbDZzrxXC5J?=
- =?us-ascii?Q?7wpziMhE8UGn5iezR7iljUPW3+Pgmen+UZ9SglJs?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c7cd5d90-9f31-41e7-20e5-08db950b0d80
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Aug 2023 16:51:30.9019
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: kJ6EfgJOLcfmHBXTllnzAxVXXKbUHm/LFpqywp99EN4b7JEB2xlysdODfrZJHquU
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR12MB9406
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
+Received: by 2002:ab0:6209:0:b0:794:1113:bb24 with HTTP; Fri, 4 Aug 2023
+ 09:54:40 -0700 (PDT)
+X-Originating-IP: [24.53.241.2]
+In-Reply-To: <CADyTPEwgG0=R_b5DNBP0J0auDXu2BNTOwkSUFg-s7pLJUPC+Tg@mail.gmail.com>
+References: <CADyTPEzqf8oQAPSFRWJLxAhd-WE4fX2zdoe9Vu6V9hZMn1Yc8g@mail.gmail.com>
+ <CAL_JsqLrErF__GGHfanRFCpfbOh6fvz4-aJv32h8OfDjUeZPSg@mail.gmail.com> <CADyTPEwgG0=R_b5DNBP0J0auDXu2BNTOwkSUFg-s7pLJUPC+Tg@mail.gmail.com>
+From: Nick Bowler <nbowler@draconx.ca>
+Date: Fri, 4 Aug 2023 12:54:40 -0400
+Message-ID: <CADyTPExgjcaUeKiR108geQhr0KwFC0A8qa_n_ST2RxhbSczomQ@mail.gmail.com>
+Subject: Re: PROBLEM: Broken or delayed ethernet on Xilinx ZCU104 since 5.18 (regression)
+To: Rob Herring <robh@kernel.org>
+Cc: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	netdev@vger.kernel.org, regressions@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Jul 25, 2023 at 02:40:19PM -0700, Brett Creeley wrote:
-> Currently only Mellanox uses the combine_ranges function. The
-> new pds_vfio driver also needs this function. So, move it to
-> a common location for other vendor drivers to use.
-> 
-> Also, fix RCT ordering while moving/renaming the function.
-> 
-> Cc: Yishai Hadas <yishaih@nvidia.com>
-> Signed-off-by: Brett Creeley <brett.creeley@amd.com>
-> Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
-> Reviewed-by: Simon Horman <simon.horman@corigine.com>
-> ---
->  drivers/vfio/pci/mlx5/cmd.c | 48 +------------------------------------
->  drivers/vfio/vfio_main.c    | 47 ++++++++++++++++++++++++++++++++++++
->  include/linux/vfio.h        |  3 +++
->  3 files changed, 51 insertions(+), 47 deletions(-)
-> 
-> diff --git a/drivers/vfio/pci/mlx5/cmd.c b/drivers/vfio/pci/mlx5/cmd.c
-> index deed156e6165..7f6c51992a15 100644
-> --- a/drivers/vfio/pci/mlx5/cmd.c
-> +++ b/drivers/vfio/pci/mlx5/cmd.c
-> @@ -732,52 +732,6 @@ void mlx5fv_cmd_clean_migf_resources(struct mlx5_vf_migration_file *migf)
->  	mlx5vf_cmd_dealloc_pd(migf);
->  }
->  
-> -static void combine_ranges(struct rb_root_cached *root, u32 cur_nodes,
-> -			   u32 req_nodes)
-> -{
-> -	struct interval_tree_node *prev, *curr, *comb_start, *comb_end;
-> -	unsigned long min_gap;
-> -	unsigned long curr_gap;
-> -
-> -	/* Special shortcut when a single range is required */
-> -	if (req_nodes == 1) {
-> -		unsigned long last;
-> -
-> -		curr = comb_start = interval_tree_iter_first(root, 0, ULONG_MAX);
-> -		while (curr) {
-> -			last = curr->last;
-> -			prev = curr;
-> -			curr = interval_tree_iter_next(curr, 0, ULONG_MAX);
-> -			if (prev != comb_start)
-> -				interval_tree_remove(prev, root);
-> -		}
-> -		comb_start->last = last;
-> -		return;
-> -	}
-> -
-> -	/* Combine ranges which have the smallest gap */
-> -	while (cur_nodes > req_nodes) {
-> -		prev = NULL;
-> -		min_gap = ULONG_MAX;
-> -		curr = interval_tree_iter_first(root, 0, ULONG_MAX);
-> -		while (curr) {
-> -			if (prev) {
-> -				curr_gap = curr->start - prev->last;
-> -				if (curr_gap < min_gap) {
-> -					min_gap = curr_gap;
-> -					comb_start = prev;
-> -					comb_end = curr;
-> -				}
-> -			}
-> -			prev = curr;
-> -			curr = interval_tree_iter_next(curr, 0, ULONG_MAX);
-> -		}
-> -		comb_start->last = comb_end->last;
-> -		interval_tree_remove(comb_end, root);
-> -		cur_nodes--;
-> -	}
-> -}
-> -
->  static int mlx5vf_create_tracker(struct mlx5_core_dev *mdev,
->  				 struct mlx5vf_pci_core_device *mvdev,
->  				 struct rb_root_cached *ranges, u32 nnodes)
-> @@ -800,7 +754,7 @@ static int mlx5vf_create_tracker(struct mlx5_core_dev *mdev,
->  	int i;
->  
->  	if (num_ranges > max_num_range) {
-> -		combine_ranges(ranges, nnodes, max_num_range);
-> +		vfio_combine_iova_ranges(ranges, nnodes, max_num_range);
->  		num_ranges = max_num_range;
->  	}
->  
-> diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
-> index f0ca33b2e1df..3bde62f7e08b 100644
-> --- a/drivers/vfio/vfio_main.c
-> +++ b/drivers/vfio/vfio_main.c
-> @@ -865,6 +865,53 @@ static int vfio_ioctl_device_feature_migration(struct vfio_device *device,
->  	return 0;
->  }
->  
-> +void vfio_combine_iova_ranges(struct rb_root_cached *root, u32 cur_nodes,
-> +			      u32 req_nodes)
-> +{
+On 2023-08-04, Nick Bowler <nbowler@draconx.ca> wrote:
+> On 04/08/2023, Rob Herring <robh@kernel.org> wrote:
+>> On Fri, Aug 4, 2023 at 9:27=E2=80=AFAM Nick Bowler <nbowler@draconx.ca> =
+wrote:
+>>>   commit e461bd6f43f4e568f7436a8b6bc21c4ce6914c36
+>>>   Author: Robert Hancock <robert.hancock@calian.com>
+>>>   Date:   Thu Jan 27 10:37:36 2022 -0600
+>>>
+>>>       arm64: dts: zynqmp: Added GEM reset definitions
+>>>
+>>> Reverting this fixes the problem on 5.18.  Reverting this fixes the
+>>> problem on 6.1.  Reverting this fixes the problem on 6.4.  In all of
+>>> these versions, with this change reverted, the network device appears
+>>> without delay.
+>>
+>> With the above change, the kernel is going to be waiting for the reset
+>> driver which either didn't exist or wasn't enabled in your config
+>> (maybe kconfig needs to be tweaked to enable it automatically).
+>
+> The dts defines a reset-controller node with
+>
+>   compatible =3D "xlnx,zynqmp-reset"
+>
+> As far as I can see, this is supposed to be handled by the code in
+> drivers/reset/zynqmp-reset.c driver, it is enabled by CONFIG_ARCH_ZYNQMP,
+> and I have that set to "y", and it appears to be getting compiled in (tha=
+t
+> is, there is a drivers/reset/zynqmp-reset.o file in the build directory).
 
-It should really gain a kdoc now.
+Oh, I get it, to include this driver I need to also enable:
 
-But the code is fine
+  CONFIG_RESET_CONTROLLER=3Dy
 
-Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+Setting this fixes 6.4.  Perhaps CONFIG_ARCH_ZYNQMP should select it?
+I guess the reset-zynqmp.o file that was in my build directory must
+have been leftover garbage from a long time ago.
 
-Jason
+However, even with this option enabled, 6.5-rc4 remains broken (no
+change in behaviour wrt. the network device).  I will bisect this
+now.
+
+Cheers,
+  Nick
 
