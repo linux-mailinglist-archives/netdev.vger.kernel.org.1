@@ -1,129 +1,116 @@
-Return-Path: <netdev+bounces-24285-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24289-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C30EE76FA12
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 08:27:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE65276FA6D
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 08:50:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7C7562824B8
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 06:27:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7B4B11C21772
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 06:50:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A22DA524E;
-	Fri,  4 Aug 2023 06:27:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9653A6ADF;
+	Fri,  4 Aug 2023 06:50:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96AF61FC2
-	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 06:27:38 +0000 (UTC)
-Received: from fllv0016.ext.ti.com (fllv0016.ext.ti.com [198.47.19.142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2004420F;
-	Thu,  3 Aug 2023 23:27:33 -0700 (PDT)
-Received: from fllv0035.itg.ti.com ([10.64.41.0])
-	by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id 3746RG70004029;
-	Fri, 4 Aug 2023 01:27:16 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1691130436;
-	bh=aVMkm0fvjJq74xKoRYCdUE5Kf1yzRBggpT42jKgZ5yg=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=cIaTf2EeK34kk3is6LYN2Ee1SNV7kjfLEf9op4Y5ztmEVhj9+cHnVKOwzFKnEaLDe
-	 ohEevU5sKLCpr7JzWIbuTU7Kok6NHP9Dps3ctlKU2qxSgmU4IhyCa/L6vbf8nBhDU3
-	 wJD/ZlRBDWD2RR88rp09+RIGQWuuNBCMGOSgEqRc=
-Received: from DLEE106.ent.ti.com (dlee106.ent.ti.com [157.170.170.36])
-	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 3746RG69078710
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Fri, 4 Aug 2023 01:27:16 -0500
-Received: from DLEE115.ent.ti.com (157.170.170.26) by DLEE106.ent.ti.com
- (157.170.170.36) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Fri, 4
- Aug 2023 01:27:15 -0500
-Received: from lelv0327.itg.ti.com (10.180.67.183) by DLEE115.ent.ti.com
- (157.170.170.26) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Fri, 4 Aug 2023 01:27:15 -0500
-Received: from [172.24.227.217] (ileaxei01-snat2.itg.ti.com [10.180.69.6])
-	by lelv0327.itg.ti.com (8.15.2/8.15.2) with ESMTP id 3746R9hp109638;
-	Fri, 4 Aug 2023 01:27:09 -0500
-Message-ID: <8e0da18c-3856-d9af-3940-85dcc7f698a0@ti.com>
-Date: Fri, 4 Aug 2023 11:57:08 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BB6879CD
+	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 06:50:19 +0000 (UTC)
+Received: from pegase1.c-s.fr (pegase1.c-s.fr [93.17.236.30])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89575E53;
+	Thu,  3 Aug 2023 23:50:18 -0700 (PDT)
+Received: from localhost (mailhub3.si.c-s.fr [192.168.12.233])
+	by localhost (Postfix) with ESMTP id 4RHGKY0KLJz9t1K;
+	Fri,  4 Aug 2023 08:39:45 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from pegase1.c-s.fr ([192.168.12.234])
+	by localhost (pegase1.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id PBkbf-SYzAEb; Fri,  4 Aug 2023 08:39:44 +0200 (CEST)
+Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
+	by pegase1.c-s.fr (Postfix) with ESMTP id 4RHGKX6jwTz9t11;
+	Fri,  4 Aug 2023 08:39:44 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id DF5138B779;
+	Fri,  4 Aug 2023 08:39:44 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from messagerie.si.c-s.fr ([127.0.0.1])
+	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
+	with ESMTP id 7WqvV--2KeIG; Fri,  4 Aug 2023 08:39:44 +0200 (CEST)
+Received: from PO20335.IDSI0.si.c-s.fr (unknown [192.168.232.144])
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id 85A428B778;
+	Fri,  4 Aug 2023 08:39:44 +0200 (CEST)
+Received: from PO20335.IDSI0.si.c-s.fr (localhost [127.0.0.1])
+	by PO20335.IDSI0.si.c-s.fr (8.17.1/8.16.1) with ESMTPS id 3746dadg629327
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Fri, 4 Aug 2023 08:39:36 +0200
+Received: (from chleroy@localhost)
+	by PO20335.IDSI0.si.c-s.fr (8.17.1/8.17.1/Submit) id 3746dZeL629290;
+	Fri, 4 Aug 2023 08:39:35 +0200
+X-Authentication-Warning: PO20335.IDSI0.si.c-s.fr: chleroy set sender to christophe.leroy@csgroup.eu using -f
+From: Christophe Leroy <christophe.leroy@csgroup.eu>
+To: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+        Pantelis Antoniou <pantelis.antoniou@gmail.com>,
+        Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
+Cc: Christophe Leroy <christophe.leroy@csgroup.eu>,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: [PATCH net-next v1 00/10] net: fs_enet: Driver cleanup
+Date: Fri,  4 Aug 2023 08:39:24 +0200
+Message-ID: <cover.1691130766.git.christophe.leroy@csgroup.eu>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH 2/4] net: ti: icss-iep: Add IEP driver
-Content-Language: en-US
-To: Simon Horman <horms@kernel.org>, MD Danish Anwar <danishanwar@ti.com>
-CC: Randy Dunlap <rdunlap@infradead.org>, Roger Quadros <rogerq@kernel.org>,
-        Vignesh Raghavendra <vigneshr@ti.com>, Andrew Lunn <andrew@lunn.ch>,
-        Richard
- Cochran <richardcochran@gmail.com>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Rob Herring
-	<robh+dt@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-        Jakub Kicinski
-	<kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
-        "David S. Miller"
-	<davem@davemloft.net>, <nm@ti.com>, <srk@ti.com>,
-        <linux-kernel@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <linux-omap@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>
-References: <20230803110153.3309577-1-danishanwar@ti.com>
- <20230803110153.3309577-3-danishanwar@ti.com> <ZMvE63ooNyoRZK/y@kernel.org>
-From: Md Danish Anwar <a0501179@ti.com>
-Organization: Texas Instruments
-In-Reply-To: <ZMvE63ooNyoRZK/y@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1691131163; l=1724; i=christophe.leroy@csgroup.eu; s=20211009; h=from:subject:message-id; bh=NMUfvHd1Ivx2h5MBFE/4m/aSsKWUI9X9JLiIVGg+yys=; b=gcH9l4OhKTgKy9wZXQxvOCgGGCCmDxTMignpXDTvOVXvUntmMccsxxh1oQdKejks6fLSf+N/K 61JbL+O9erIAhEstgFmunehOrMHTnUi+coanAyfqdGBmbFlcJVwCKgY
+X-Developer-Key: i=christophe.leroy@csgroup.eu; a=ed25519; pk=HIzTzUj91asvincQGOFx6+ZF5AoUuP9GdOtQChs7Mm0=
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 03/08/23 8:46 pm, Simon Horman wrote:
-> On Thu, Aug 03, 2023 at 04:31:51PM +0530, MD Danish Anwar wrote:
->> From: Roger Quadros <rogerq@ti.com>
->>
->> Add a driver for Industrial Ethernet Peripheral (IEP) block of PRUSS to
->> support timestamping of ethernet packets and thus support PTP and PPS
->> for PRU ethernet ports.
->>
->> Signed-off-by: Roger Quadros <rogerq@ti.com>
->> Signed-off-by: Lokesh Vutla <lokeshvutla@ti.com>
->> Signed-off-by: Murali Karicheri <m-karicheri2@ti.com>
->> Signed-off-by: Vignesh Raghavendra <vigneshr@ti.com>
->> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
-> 
-> ...
-> 
->> +static int icss_iep_pps_enable(struct icss_iep *iep, int on)
->> +{
->> +	int ret = 0;
->> +	struct timespec64 ts;
->> +	struct ptp_clock_request rq;
->> +	unsigned long flags;
->> +	u64 ns;
-> 
-> For networking code, please arrange local variables in reverse xmas tree
-> order - longest line to shortest.
-> 
-> https://github.com/ecree-solarflare/xmastree is your friend here.
-> 
-> ...
+Over the years, platform and driver initialisation have evolved into
+more generic ways, and driver or platform specific stuff has gone
+away, leaving stale objects behind.
 
-Sure Simon, I will take care of this in next revision.
+This series aims at cleaning all that up for fs_enet ethernet driver.
+
+
+Christophe Leroy (10):
+  net: fs_enet: Remove set but not used variable
+  net: fs_enet: Fix address space and base types mismatches
+  net: fs_enet: Remove fs_get_id()
+  net: fs_enet: Remove unused fields in fs_platform_info struct
+  net: fs_enet: Remove has_phy field in fs_platform_info struct
+  net: fs_enet: Remove stale prototypes from fsl_soc.c
+  net: fs_enet: Move struct fs_platform_info into fs_enet.h
+  net: fs_enet: Don't include fs_enet_pd.h when not needed
+  net: fs_enet: Remove linux/fs_enet_pd.h
+  net: fs_enet: Use cpm_muram_xxx() functions instead of cpm_dpxxx()
+    macros
+
+ MAINTAINERS                                   |   1 -
+ arch/powerpc/platforms/8xx/adder875.c         |   1 -
+ arch/powerpc/platforms/8xx/mpc885ads_setup.c  |   1 -
+ arch/powerpc/platforms/8xx/tqm8xx_setup.c     |   1 -
+ arch/powerpc/sysdev/fsl_soc.c                 |   3 -
+ .../ethernet/freescale/fs_enet/fs_enet-main.c |   2 -
+ .../net/ethernet/freescale/fs_enet/fs_enet.h  |  19 +-
+ .../net/ethernet/freescale/fs_enet/mac-fcc.c  |   4 +-
+ .../net/ethernet/freescale/fs_enet/mac-fec.c  |  14 --
+ .../net/ethernet/freescale/fs_enet/mac-scc.c  |   8 +-
+ .../ethernet/freescale/fs_enet/mii-bitbang.c  |   4 +-
+ .../net/ethernet/freescale/fs_enet/mii-fec.c  |   1 +
+ include/linux/fs_enet_pd.h                    | 165 ------------------
+ 13 files changed, 27 insertions(+), 197 deletions(-)
+ delete mode 100644 include/linux/fs_enet_pd.h
 
 -- 
-Thanks and Regards,
-Danish.
+2.41.0
+
 
