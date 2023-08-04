@@ -1,120 +1,94 @@
-Return-Path: <netdev+bounces-24406-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24412-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BEDBF7701A7
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 15:32:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 82D317701F1
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 15:38:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 59E1228267A
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 13:32:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3D9172826E5
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 13:38:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBCA7C148;
-	Fri,  4 Aug 2023 13:32:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AD47C135;
+	Fri,  4 Aug 2023 13:38:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A588779EB;
-	Fri,  4 Aug 2023 13:32:06 +0000 (UTC)
-Received: from out1-smtp.messagingengine.com (out1-smtp.messagingengine.com [66.111.4.25])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBCDD4C05;
-	Fri,  4 Aug 2023 06:31:46 -0700 (PDT)
-Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
-	by mailout.nyi.internal (Postfix) with ESMTP id 442185C013F;
-	Fri,  4 Aug 2023 09:31:44 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute4.internal (MEProxy); Fri, 04 Aug 2023 09:31:44 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:sender:subject
-	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-	:x-sasl-enc; s=fm3; t=1691155904; x=1691242304; bh=jt/eqP4aPwn04
-	aS2T+/sFSLK8MZIFtCXDP4UokE+Qio=; b=dLoDFeQZyoLisNWmOXcJb2viKeyzU
-	7fGNJ+GlsUV/xif7+JuiY89mdb1djfgWc7YRiVNqkc1rmMKex0VMQp7py4U7P+Rl
-	gtUniQth10aQyyzCPPmyW2Q+fxsPkxUOQZ1COjVF/hlC0rgyje7MDaHFCfN6qOdU
-	uAHJO0x6a5x+x8n0v1oRgay7qPIAzCBG8LUArsexYiwHJooRy7aR3MCRpq5YqbwY
-	v0hr/P8lXL912thzs7v9JEGu+jP5A6I+dWFjXqvPqqTnsZoPkjv2bnLkM3/qDHiQ
-	GZkY3oOxuRs9Nx0zkT3OaVuWJiXVx+NUllEJNxAjdaeyEUq4i6rpasXJA==
-X-ME-Sender: <xms:wP3MZOkocCCz6uMr1bdnJ_hMKWPPTC_ErMpRBTrDbFj3ddDUZA-Wug>
-    <xme:wP3MZF3dRKF8gZ3ylcnrPnIQKHddEjiMOoMHubyK2h9_jEMrcPLr153r4AfIzlF-z
-    1OYpQZJtNtP0ng>
-X-ME-Received: <xmr:wP3MZMomUDjQR3wVfALFdsL487_NLuwBq-9fA9CAGAcC1f2aAxpvyMHp7kelu52238AG0i3dfpsbw_A4SxzkbPleXD1kXA>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrkeeggdeigecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
-    fjughrpeffhffvvefukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpefkughoucfu
-    tghhihhmmhgvlhcuoehiughoshgthhesihguohhstghhrdhorhhgqeenucggtffrrghtth
-    gvrhhnpeehhfdtjedviefffeduuddvffegteeiieeguefgudffvdfftdefheeijedthfej
-    keenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuvehluhhsthgvrhfuihiivgeptd
-    enucfrrghrrghmpehmrghilhhfrhhomhepihguohhstghhsehiughoshgthhdrohhrgh
-X-ME-Proxy: <xmx:wP3MZClsFTC4heq81SnS1v8rFuQnBa6i0oMKkdwWVU98tS_myf-0_w>
-    <xmx:wP3MZM2nWzhw8YxEXnxiw-3e363ocEoffiDCNPEO8WCo4IiqKQRlNQ>
-    <xmx:wP3MZJs8q08vf7uSs9eAGUs6xsY8UlTIEM-WTMnQKjxKgziab0JUOg>
-    <xmx:wP3MZGqazbGqtl2mN3L125zG27U7nQnC6O-ppkOmLYKgWl9vIpo_4g>
-Feedback-ID: i494840e7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 4 Aug 2023 09:31:43 -0400 (EDT)
-Date: Fri, 4 Aug 2023 16:31:39 +0300
-From: Ido Schimmel <idosch@idosch.org>
-To: Gal Pressman <gal@nvidia.com>
-Cc: Daniel Borkmann <daniel@iogearbox.net>, kuba@kernel.org, ast@kernel.org,
-	bpf@vger.kernel.org, netdev@vger.kernel.org,
-	syzbot+bdcf141f362ef83335cf@syzkaller.appspotmail.com,
-	syzbot+b202b7208664142954fa@syzkaller.appspotmail.com,
-	syzbot+14736e249bce46091c18@syzkaller.appspotmail.com
-Subject: Re: [PATCH net-next] tcx: Fix splat in ingress_destroy upon
- tcx_entry_free
-Message-ID: <ZMz9u+yZtk8vf+OP@shredder>
-References: <20230721233330.5678-1-daniel@iogearbox.net>
- <bdfc2640-8f65-5b56-4472-db8e2b161aab@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F6EEAD37
+	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 13:38:05 +0000 (UTC)
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96AFF46B1;
+	Fri,  4 Aug 2023 06:37:43 -0700 (PDT)
+Received: from canpemm500007.china.huawei.com (unknown [172.30.72.53])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RHRVQ4MDWzGpn3;
+	Fri,  4 Aug 2023 21:33:02 +0800 (CST)
+Received: from localhost (10.174.179.215) by canpemm500007.china.huawei.com
+ (7.192.104.62) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Fri, 4 Aug
+ 2023 21:36:29 +0800
+From: Yue Haibing <yuehaibing@huawei.com>
+To: <johannes@sipsolutions.net>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <yuehaibing@huawei.com>,
+	<horms@kernel.org>
+CC: <linux-wireless@vger.kernel.org>, <netdev@vger.kernel.org>
+Subject: [PATCH v2] wifi: iw_handler.h: Remove unused declaration dev_get_wireless_info()
+Date: Fri, 4 Aug 2023 21:36:17 +0800
+Message-ID: <20230804133617.43564-1-yuehaibing@huawei.com>
+X-Mailer: git-send-email 2.10.2.windows.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <bdfc2640-8f65-5b56-4472-db8e2b161aab@nvidia.com>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_PASS,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+Content-Type: text/plain
+X-Originating-IP: [10.174.179.215]
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ canpemm500007.china.huawei.com (7.192.104.62)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Aug 03, 2023 at 02:10:51PM +0300, Gal Pressman wrote:
-> Our nightly regression testing picked up new memory leaks which were
-> bisected to this commit.
-> Unfortunately, I do not know the exact repro steps to trigger it, maybe
-> the attached kmemeleak logs can help?
+Commit 556829657397 ("[NL80211]: add netlink interface to cfg80211")
+declared but never implemented this, remove it.
 
-[...]
+Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
+---
+v2: fix comment
+---
+ include/net/iw_handler.h | 11 ++---------
+ 1 file changed, 2 insertions(+), 9 deletions(-)
 
-> unreferenced object 0xffff88812acdebc0 (size 16):
->   comm "umount.nfs", pid 11626, jiffies 4295354796 (age 45.472s)
->   hex dump (first 16 bytes):
->     73 65 72 76 65 72 2d 32 00 eb cd 2a 81 88 ff ff  server-2...*....
->   backtrace:
->     [<0000000010fb5130>] __kmalloc_node_track_caller+0x4c/0x170
->     [<00000000b866a733>] kvasprintf+0xb0/0x130
->     [<00000000b3564fca>] kasprintf+0xa6/0xd0
->     [<00000000f01d6cb3>] nfs_sysfs_move_sb_to_server+0x49/0xd0
->     [<000000009608708f>] nfs_kill_super+0x5f/0x90
->     [<0000000090d4108b>] deactivate_locked_super+0x80/0x130
->     [<000000000856aeb1>] cleanup_mnt+0x258/0x370
->     [<0000000040582e39>] task_work_run+0x12c/0x210
->     [<00000000378ea041>] exit_to_user_mode_prepare+0x1a0/0x1b0
->     [<00000000025e63dd>] syscall_exit_to_user_mode+0x19/0x50
->     [<00000000f34ad3ee>] do_syscall_64+0x4a/0x90
->     [<000000009d3e2403>] entry_SYSCALL_64_after_hwframe+0x46/0xb0
+diff --git a/include/net/iw_handler.h b/include/net/iw_handler.h
+index d2ea5863eedc..b2cf243ebe44 100644
+--- a/include/net/iw_handler.h
++++ b/include/net/iw_handler.h
+@@ -426,17 +426,10 @@ struct iw_public_data {
+ 
+ /**************************** PROTOTYPES ****************************/
+ /*
+- * Functions part of the Wireless Extensions (defined in net/core/wireless.c).
+- * Those may be called only within the kernel.
++ * Functions part of the Wireless Extensions (defined in net/wireless/wext-core.c).
++ * Those may be called by driver modules.
+  */
+ 
+-/* First : function strictly used inside the kernel */
+-
+-/* Handle /proc/net/wireless, called in net/code/dev.c */
+-int dev_get_wireless_info(char *buffer, char **start, off_t offset, int length);
+-
+-/* Second : functions that may be called by driver modules */
+-
+ /* Send a single event to user space */
+ void wireless_send_event(struct net_device *dev, unsigned int cmd,
+ 			 union iwreq_data *wrqu, const char *extra);
+-- 
+2.34.1
 
-This one is caused by commit 1c7251187dc0 ("NFS: add superblock sysfs
-entries") and fixed by [1], so I'm not sure the bisection result is
-reliable.
-
-[1] https://lore.kernel.org/linux-nfs/6702796fee0365bf399800326bbe6c88e5f73f68.1689014440.git.bcodding@redhat.com/
 
