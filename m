@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-24325-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24326-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6F6676FC79
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 10:50:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B144876FC93
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 10:51:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D3CE281FED
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 08:50:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6C45C282591
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 08:51:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 757F59469;
-	Fri,  4 Aug 2023 08:49:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FA7E9467;
+	Fri,  4 Aug 2023 08:51:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ADC38F7D
-	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 08:49:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93FF063DB
+	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 08:51:19 +0000 (UTC)
 Received: from mxct.zte.com.cn (mxct.zte.com.cn [58.251.27.85])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F243C49FC;
-	Fri,  4 Aug 2023 01:49:08 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1C225FD6
+	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 01:50:55 -0700 (PDT)
 Received: from mxde.zte.com.cn (unknown [10.35.20.165])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mxct.zte.com.cn (FangMail) with ESMTPS id 4RHKBl75klzZK6m;
-	Fri,  4 Aug 2023 16:49:03 +0800 (CST)
+	by mxct.zte.com.cn (FangMail) with ESMTPS id 4RHKDj2JH6zbhY8
+	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 16:50:45 +0800 (CST)
 Received: from mxhk.zte.com.cn (unknown [192.168.250.137])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mxde.zte.com.cn (FangMail) with ESMTPS id 4RHKBS5XZ3z5BfmN;
-	Fri,  4 Aug 2023 16:48:48 +0800 (CST)
-Received: from mse-fl1.zte.com.cn (unknown [10.5.228.132])
+	by mxde.zte.com.cn (FangMail) with ESMTPS id 4RHKDX2dycz5BnwJ
+	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 16:50:36 +0800 (CST)
+Received: from mse-fl2.zte.com.cn (unknown [10.5.228.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mxhk.zte.com.cn (FangMail) with ESMTPS id 4RHKBP46FGz7QYS7;
-	Fri,  4 Aug 2023 16:48:45 +0800 (CST)
-Received: from szxlzmapp05.zte.com.cn ([10.5.230.85])
-	by mse-fl1.zte.com.cn with SMTP id 3748mV09049239;
-	Fri, 4 Aug 2023 16:48:31 +0800 (+08)
+	by mxhk.zte.com.cn (FangMail) with ESMTPS id 4RHKD94pTFz7S5Hk;
+	Fri,  4 Aug 2023 16:50:17 +0800 (CST)
+Received: from szxlzmapp02.zte.com.cn ([10.5.231.79])
+	by mse-fl2.zte.com.cn with SMTP id 3748nisU010349;
+	Fri, 4 Aug 2023 16:49:44 +0800 (+08)
 	(envelope-from yang.yang29@zte.com.cn)
 Received: from mapi (szxlzmapp01[null])
 	by mapi (Zmail) with MAPI id mid14;
-	Fri, 4 Aug 2023 16:48:33 +0800 (CST)
-Date: Fri, 4 Aug 2023 16:48:33 +0800 (CST)
-X-Zmail-TransId: 2b0364ccbb6161e-7e8ca
+	Fri, 4 Aug 2023 16:49:46 +0800 (CST)
+Date: Fri, 4 Aug 2023 16:49:46 +0800 (CST)
+X-Zmail-TransId: 2b0364ccbbaaffffffff989-81c32
 X-Mailer: Zmail v1.0
-Message-ID: <202308041648338823694@zte.com.cn>
+Message-ID: <202308041649468563730@zte.com.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,81 +57,63 @@ From: <yang.yang29@zte.com.cn>
 To: <davem@davemloft.net>
 Cc: <dsahern@kernel.org>, <edumazet@google.com>, <kuba@kernel.org>,
         <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: =?UTF-8?B?W1BBVENIXSBuZXQvaXB2NDogcmV0dXJuIHRoZSByZWFsIGVycm5vIGluc3RlYWQgb2YgLUVJTlZBTA==?=
+Subject: =?UTF-8?B?W1BBVENIXSB1ZHBfdHVubmVsX25pYzogYWRkIG5ldCBkZXZpY2UgcmVmY291bnQgdHJhY2tlcg==?=
 Content-Type: text/plain;
 	charset="UTF-8"
-X-MAIL:mse-fl1.zte.com.cn 3748mV09049239
+X-MAIL:mse-fl2.zte.com.cn 3748nisU010349
 X-Fangmail-Gw-Spam-Type: 0
 X-Fangmail-Anti-Spam-Filtered: true
-X-Fangmail-MID-QID: 64CCBB7E.001/4RHKBl75klzZK6m
+X-Fangmail-MID-QID: 64CCBBE4.000/4RHKDj2JH6zbhY8
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
 	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY autolearn=ham autolearn_force=no version=3.4.6
+	UNPARSEABLE_RELAY autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
 From: xu xin <xu.xin16@zte.com.cn>
 
-For now, no matter what error pointer ip_neigh_for_gw() returns,
-ip_finish_output2() always return -EINVAL, which may mislead the upper
-users.
-
-For exemple, an application uses sendto to send an UDP packet, but when the
-neighbor table overflows, sendto() will get a value of -EINVAL, and it will
-cause users to waste a lot of time checking parameters for errors.
-
-Return the real errno instead of -EINVAL.
+Add net device refcount tracker to udp_tunnel_nic.c.
 
 Signed-off-by: xu xin <xu.xin16@zte.com.cn>
 Reviewed-by: Yang Yang <yang.yang29@zte.com.cn>
-Cc: Si Hao <si.hao@zte.com.cn>
-Cc: Dai Shixin <dai.shixin@zte.com.cn>
-Cc: Jiang Xuexin <jiang.xuexin@zte.com.cn>
+Cc: Kuang Mingfu <kuang.mingfu@zte.com.cn>
 ---
- net/ipv4/ip_output.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+ net/ipv4/udp_tunnel_nic.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/net/ipv4/ip_output.c b/net/ipv4/ip_output.c
-index 6ba1a0fafbaa..2d7cf083dff9 100644
---- a/net/ipv4/ip_output.c
-+++ b/net/ipv4/ip_output.c
-@@ -201,6 +201,7 @@ static int ip_finish_output2(struct net *net, struct sock *sk, struct sk_buff *s
- 	unsigned int hh_len = LL_RESERVED_SPACE(dev);
- 	struct neighbour *neigh;
- 	bool is_v6gw = false;
-+	int res;
+diff --git a/net/ipv4/udp_tunnel_nic.c b/net/ipv4/udp_tunnel_nic.c
+index 029219749785..ce8f5c82b0a1 100644
+--- a/net/ipv4/udp_tunnel_nic.c
++++ b/net/ipv4/udp_tunnel_nic.c
+@@ -55,6 +55,9 @@ struct udp_tunnel_nic {
+  */
+ static struct workqueue_struct *udp_tunnel_nic_workqueue;
 
- 	if (rt->rt_type == RTN_MULTICAST) {
- 		IP_UPD_PO_STATS(net, IPSTATS_MIB_OUTMCAST, skb->len);
-@@ -214,8 +215,7 @@ static int ip_finish_output2(struct net *net, struct sock *sk, struct sk_buff *s
++/* To track netdev_hold and netdev_put */
++static netdevice_tracker udp_tunnel_nic_devtracker;
++
+ static const char *udp_tunnel_nic_tunnel_type_name(unsigned int type)
+ {
+ 	switch (type) {
+@@ -825,7 +828,7 @@ static int udp_tunnel_nic_register(struct net_device *dev)
  	}
 
- 	if (lwtunnel_xmit_redirect(dst->lwtstate)) {
--		int res = lwtunnel_xmit(skb);
--
-+		res = lwtunnel_xmit(skb);
- 		if (res < 0 || res == LWTUNNEL_XMIT_DONE)
- 			return res;
- 	}
-@@ -223,8 +223,6 @@ static int ip_finish_output2(struct net *net, struct sock *sk, struct sk_buff *s
- 	rcu_read_lock();
- 	neigh = ip_neigh_for_gw(rt, skb, &is_v6gw);
- 	if (!IS_ERR(neigh)) {
--		int res;
--
- 		sock_confirm_neigh(skb, neigh);
- 		/* if crossing protocols, can not use the cached header */
- 		res = neigh_output(neigh, skb, is_v6gw);
-@@ -236,7 +234,8 @@ static int ip_finish_output2(struct net *net, struct sock *sk, struct sk_buff *s
- 	net_dbg_ratelimited("%s: No header cache and no neighbour!\n",
- 			    __func__);
- 	kfree_skb_reason(skb, SKB_DROP_REASON_NEIGH_CREATEFAIL);
--	return -EINVAL;
-+	res = PTR_ERR(neigh);
-+	return res;
+ 	utn->dev = dev;
+-	dev_hold(dev);
++	netdev_hold(dev, &udp_tunnel_nic_devtracker, GFP_KERNEL);
+ 	dev->udp_tunnel_nic = utn;
+
+ 	if (!(info->flags & UDP_TUNNEL_NIC_INFO_OPEN_ONLY))
+@@ -879,7 +882,7 @@ udp_tunnel_nic_unregister(struct net_device *dev, struct udp_tunnel_nic *utn)
+ 	udp_tunnel_nic_free(utn);
+ release_dev:
+ 	dev->udp_tunnel_nic = NULL;
+-	dev_put(dev);
++	netdev_put(dev, &udp_tunnel_nic_devtracker);
  }
 
- static int ip_finish_output_gso(struct net *net, struct sock *sk,
+ static int
 -- 
 2.15.2
 
