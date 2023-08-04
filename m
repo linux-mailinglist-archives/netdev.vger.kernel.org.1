@@ -1,171 +1,112 @@
-Return-Path: <netdev+bounces-24536-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24537-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45C067707A4
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 20:14:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4381C7707BB
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 20:23:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EA192280ED3
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 18:14:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EA91928289A
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 18:23:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1213C1BEFA;
-	Fri,  4 Aug 2023 18:14:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F6171BEFD;
+	Fri,  4 Aug 2023 18:23:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F30DC1BEEE
-	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 18:14:42 +0000 (UTC)
-Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3339149FF
-	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 11:14:40 -0700 (PDT)
-Received: by mail-lf1-x134.google.com with SMTP id 2adb3069b0e04-4f58444a410so261e87.0
-        for <netdev@vger.kernel.org>; Fri, 04 Aug 2023 11:14:39 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93CBE440E
+	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 18:23:11 +0000 (UTC)
+Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3C6749FF;
+	Fri,  4 Aug 2023 11:23:09 -0700 (PDT)
+Received: by mail-wm1-x331.google.com with SMTP id 5b1f17b1804b1-3fe1fc8768aso23148555e9.1;
+        Fri, 04 Aug 2023 11:23:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691172878; x=1691777678;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cdZCwFa36JO7BjsIbThExqBKcO0c7z5StX355eJbFLg=;
-        b=B4vuBvEhpk4Vafi4VodSqggfnJv5xvaegTgwDg1KmoR+wxH9QfrK75UPXgOtgto3z+
-         IyK/IeaRS6PagqSGvjBmNgTv10I+HqxxTRXJr/hiURPtBhtuFd/bXer5ZoyO4Ozt3sfA
-         FXJufW5eM8TcNYvxg/wFI29rrKPs7irClTgKVcPi8uYjbqGzEea0w91nIfomJaI2XSd3
-         Yv+TzxLSwT6hOjVfSu4eZr5Fqttuc3zkjRvvt1LYoWW5U8zQr6jVng6BMzSjsmOxNCOI
-         pULdwRDrVOeKIsHetyWai2aZeOqYGcJ9QDMLX548Zv5Is6p7TRXQIic+Bs/cde+IFaOZ
-         yN3g==
+        d=gmail.com; s=20221208; t=1691173388; x=1691778188;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=e9RjHAaTmtqplqyd9TcAqVVbw6vEHay+aiqiJorNXr4=;
+        b=TWAD2SuThA81VPEMChQHTLdafS9mLNVS61GnYk/kjJnpVjWYFSMSVlazVgRQnHbRZb
+         1iQ8rVJyKw+w1cFWacZ8I8MlGW/LOkt8Vr3INoT9NxBS/jWWPBLAA41pZjg+Yg5esdGa
+         QeotBDDU2dkcq4fzpNwOJE46VJDE9MODsYNxv+6TQYl4byznJRQ5QkwA5CN5BqI3bCqI
+         jeqocHRYsJSUIVzos/i4Zz66gsamuGbtCi1EOHRBYT+QaQEIxGl8Nv18GXq/vfNNdR4l
+         ZbKxa2gXSWc4saQoJHJLpboCmLHT3ObzrIPOgyN9G9UEueXUKqB+KBswcYXQynIV3RdC
+         0TGA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691172878; x=1691777678;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=cdZCwFa36JO7BjsIbThExqBKcO0c7z5StX355eJbFLg=;
-        b=b5ZOlvpSkh/v0SbnPrKXPsmRwz/CMpS018R0b1nTdV5YvkmhbqBulbnrXS9ecmoPBG
-         Z5PHB5Bn6HcOCxKDOMQ3BlWHbAZjY8l6VrpLG8i3FDw81SQB00NwaQrpO6JQi2m3tDUX
-         nZjmHKK8AuseHIDX1h5J38T8tGRTduN7j8R1v8p8/KVXUks18/lEUCd7C8vZZOrCfUhQ
-         /1p+ew/osq60Srqp/sIrFIqvS2hybvOOgh6MeAYZeSAqNyFUKQKZgujMURqvZUL/y/md
-         BZijlMMY0tRG+w1YGu6QyROo1jMJTklSYPphWXyZuW7y5+1jL3xXdEsEB3pQStL4y1ws
-         PMWQ==
-X-Gm-Message-State: AOJu0Yw9n8E9XFpZMFuvB9lWUIJUZ/G9ucA5uBDGSvlFiaU4IBWJHHfA
-	FAYenorhteMKwgqx71qd1BxLua+/taBgyGYvkoXNn+yV/RysEM1XbEY=
-X-Google-Smtp-Source: AGHT+IEymirBKkbuOvMuquqrRLiBptCAS+xzd4xHI2CiNUt73PeaxC9xk3HwrkjRk/5C/MCL+dgCbYpQxaY72s5/ClI=
-X-Received: by 2002:ac2:44cb:0:b0:4fe:3b86:ce7d with SMTP id
- d11-20020ac244cb000000b004fe3b86ce7dmr6508lfm.7.1691172877916; Fri, 04 Aug
- 2023 11:14:37 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1691173388; x=1691778188;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=e9RjHAaTmtqplqyd9TcAqVVbw6vEHay+aiqiJorNXr4=;
+        b=lNQcE2DtytSOQCzfvCVqKqjvmdeHxzsaTkS8vlubzj5923q/y823AvNmYpTxOpyDbz
+         VMDHRYBJrCwJ6+A6brFp5Qu7y9JoC+zErjZbo3bgQyG+4tJ4OGcndGlES1/uJKefrXfi
+         OthlyZmoq3RZpPVyRiV+qkTgob9C2Jzc6sDxOlU8aKBnw3jPAx5lyF0spnoFPdNdk1u1
+         vqwKWDvh9GHqMmgYDVVru+N8xPxCwenr8MoYHw20yHkM/MXC3dhSw1oMKHx/TDyIDdXN
+         fYKzq2NqITyhF/hVSL8De2eSer6FZhpeTcBOeIL1fpnq5tFe2vpfdgRiQKY2Kc8gpgrO
+         TR+A==
+X-Gm-Message-State: AOJu0Yw+uU1F4W8YxN/wUx0OCsHuB/m/VvziJAjv5E/INxcKFuxpLEgg
+	kSYp3QNL/jO8sSiYcHsiGfc=
+X-Google-Smtp-Source: AGHT+IHEE6/IhBd3elcfIhdXbZcFQ5bfE+5UdmSOSb4iTuT+SpASg0JoQW95YXU9/yTgdxIUvhb9iA==
+X-Received: by 2002:a1c:7205:0:b0:3f5:fff8:d4f3 with SMTP id n5-20020a1c7205000000b003f5fff8d4f3mr2117493wmc.7.1691173388107;
+        Fri, 04 Aug 2023 11:23:08 -0700 (PDT)
+Received: from localhost (cpc154979-craw9-2-0-cust193.16-3.cable.virginm.net. [80.193.200.194])
+        by smtp.gmail.com with ESMTPSA id c10-20020a05600c0aca00b003fe17e04269sm2961822wmr.40.2023.08.04.11.23.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 04 Aug 2023 11:23:07 -0700 (PDT)
+From: Colin Ian King <colin.i.king@gmail.com>
+To: Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Jianbo Liu <jianbol@nvidia.com>,
+	netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Cc: kernel-janitors@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH][next] net/mlx5e: Fix spelling mistake "Faided" -> "Failed"
+Date: Fri,  4 Aug 2023 19:23:06 +0100
+Message-Id: <20230804182306.843673-1-colin.i.king@gmail.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230804144616.3938718-1-edumazet@google.com> <20230804144616.3938718-7-edumazet@google.com>
-In-Reply-To: <20230804144616.3938718-7-edumazet@google.com>
-From: Soheil Hassas Yeganeh <soheil@google.com>
-Date: Fri, 4 Aug 2023 14:14:01 -0400
-Message-ID: <CACSApva+Yvejq25dwCi7JjodLkuCi9_K+bCb3to0iyND6CnZVw@mail.gmail.com>
-Subject: Re: [PATCH net-next 6/6] tcp: set TCP_DEFER_ACCEPT locklessly
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Aug 4, 2023 at 10:46=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> rskq_defer_accept field can be read/written without
-> the need of holding the socket lock.
->
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
+There is a spelling mistake in a warning message. Fix it.
 
-Acked-by: Soheil Hassas Yeganeh <soheil@google.com>
+Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
+---
+ drivers/net/ethernet/mellanox/mlx5/core/esw/ipsec_fs.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Very nice series! Thank you!  I doulbechecked every field and they are
-all READ_ONCE/WRITE_ONCE paired.
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/esw/ipsec_fs.c b/drivers/net/ethernet/mellanox/mlx5/core/esw/ipsec_fs.c
+index 455746952260..095f31f380fa 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/esw/ipsec_fs.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/esw/ipsec_fs.c
+@@ -316,7 +316,7 @@ void mlx5_esw_ipsec_restore_dest_uplink(struct mlx5_core_dev *mdev)
+ 			err = mlx5_esw_ipsec_modify_flow_dests(esw, flow);
+ 			if (err)
+ 				mlx5_core_warn_once(mdev,
+-						    "Faided to modify flow dests for IPsec");
++						    "Failed to modify flow dests for IPsec");
+ 		}
+ 		rhashtable_walk_stop(&iter);
+ 		rhashtable_walk_exit(&iter);
+-- 
+2.39.2
 
-> ---
->  net/ipv4/tcp.c           | 13 ++++++-------
->  net/ipv4/tcp_input.c     |  2 +-
->  net/ipv4/tcp_minisocks.c |  2 +-
->  3 files changed, 8 insertions(+), 9 deletions(-)
->
-> diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-> index 5c71b4fe11d1c34456976d60eb8742641111dd62..4fbc7ff8c53c05cbef3d10852=
-7239c7ec8c1363e 100644
-> --- a/net/ipv4/tcp.c
-> +++ b/net/ipv4/tcp.c
-> @@ -3479,6 +3479,12 @@ int do_tcp_setsockopt(struct sock *sk, int level, =
-int optname,
->                 else
->                         WRITE_ONCE(tp->linger2, val * HZ);
->                 return 0;
-> +       case TCP_DEFER_ACCEPT:
-> +               /* Translate value in seconds to number of retransmits */
-> +               WRITE_ONCE(icsk->icsk_accept_queue.rskq_defer_accept,
-> +                          secs_to_retrans(val, TCP_TIMEOUT_INIT / HZ,
-> +                                          TCP_RTO_MAX / HZ));
-> +               return 0;
->         }
->
->         sockopt_lock_sock(sk);
-> @@ -3584,13 +3590,6 @@ int do_tcp_setsockopt(struct sock *sk, int level, =
-int optname,
->                         tp->save_syn =3D val;
->                 break;
->
-> -       case TCP_DEFER_ACCEPT:
-> -               /* Translate value in seconds to number of retransmits */
-> -               WRITE_ONCE(icsk->icsk_accept_queue.rskq_defer_accept,
-> -                          secs_to_retrans(val, TCP_TIMEOUT_INIT / HZ,
-> -                                          TCP_RTO_MAX / HZ));
-> -               break;
-> -
->         case TCP_WINDOW_CLAMP:
->                 err =3D tcp_set_window_clamp(sk, val);
->                 break;
-> diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-> index f445f5a7c0ebf5f7ab2b2402357f3749d954c0e8..972c3b16369589293eb15febe=
-52e72d5c596b032 100644
-> --- a/net/ipv4/tcp_input.c
-> +++ b/net/ipv4/tcp_input.c
-> @@ -6325,7 +6325,7 @@ static int tcp_rcv_synsent_state_process(struct soc=
-k *sk, struct sk_buff *skb,
->                 if (fastopen_fail)
->                         return -1;
->                 if (sk->sk_write_pending ||
-> -                   icsk->icsk_accept_queue.rskq_defer_accept ||
-> +                   READ_ONCE(icsk->icsk_accept_queue.rskq_defer_accept) =
-||
->                     inet_csk_in_pingpong_mode(sk)) {
->                         /* Save one ACK. Data will be ready after
->                          * several ticks, if write_pending is set.
-> diff --git a/net/ipv4/tcp_minisocks.c b/net/ipv4/tcp_minisocks.c
-> index c8f2aa0033871ed3f8b6b045c2cbca6e88bf2b61..32a70e3530db3247986ab5cb0=
-8c8a46babf86ad6 100644
-> --- a/net/ipv4/tcp_minisocks.c
-> +++ b/net/ipv4/tcp_minisocks.c
-> @@ -794,7 +794,7 @@ struct sock *tcp_check_req(struct sock *sk, struct sk=
-_buff *skb,
->                 return sk;
->
->         /* While TCP_DEFER_ACCEPT is active, drop bare ACK. */
-> -       if (req->num_timeout < inet_csk(sk)->icsk_accept_queue.rskq_defer=
-_accept &&
-> +       if (req->num_timeout < READ_ONCE(inet_csk(sk)->icsk_accept_queue.=
-rskq_defer_accept) &&
->             TCP_SKB_CB(skb)->end_seq =3D=3D tcp_rsk(req)->rcv_isn + 1) {
->                 inet_rsk(req)->acked =3D 1;
->                 __NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPDEFERACCEPTDRO=
-P);
-> --
-> 2.41.0.640.ga95def55d0-goog
->
 
