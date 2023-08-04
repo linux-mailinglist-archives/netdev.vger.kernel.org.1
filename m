@@ -1,141 +1,120 @@
-Return-Path: <netdev+bounces-24410-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24406-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6AC87701B6
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 15:34:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BEDBF7701A7
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 15:32:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A377E1C217D0
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 13:34:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 59E1228267A
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 13:32:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22F94C135;
-	Fri,  4 Aug 2023 13:33:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBCA7C148;
+	Fri,  4 Aug 2023 13:32:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 173F3BE6D
-	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 13:33:26 +0000 (UTC)
-Received: from pegase1.c-s.fr (pegase1.c-s.fr [93.17.236.30])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CEA8646BB;
-	Fri,  4 Aug 2023 06:33:06 -0700 (PDT)
-Received: from localhost (mailhub3.si.c-s.fr [192.168.12.233])
-	by localhost (Postfix) with ESMTP id 4RHRRy1GGbz9tG5;
-	Fri,  4 Aug 2023 15:30:54 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from pegase1.c-s.fr ([192.168.12.234])
-	by localhost (pegase1.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id VImivCgygkXB; Fri,  4 Aug 2023 15:30:54 +0200 (CEST)
-Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
-	by pegase1.c-s.fr (Postfix) with ESMTP id 4RHRRr33gxz9tGB;
-	Fri,  4 Aug 2023 15:30:48 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id 641CB8B776;
-	Fri,  4 Aug 2023 15:30:48 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from messagerie.si.c-s.fr ([127.0.0.1])
-	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
-	with ESMTP id UdjxQeK1Vpcn; Fri,  4 Aug 2023 15:30:48 +0200 (CEST)
-Received: from PO20335.IDSI0.si.c-s.fr (unknown [192.168.232.144])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id AC4C68B77C;
-	Fri,  4 Aug 2023 15:30:47 +0200 (CEST)
-Received: from PO20335.IDSI0.si.c-s.fr (localhost [127.0.0.1])
-	by PO20335.IDSI0.si.c-s.fr (8.17.1/8.16.1) with ESMTPS id 374DUf0v693361
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Fri, 4 Aug 2023 15:30:41 +0200
-Received: (from chleroy@localhost)
-	by PO20335.IDSI0.si.c-s.fr (8.17.1/8.17.1/Submit) id 374DUfNK693360;
-	Fri, 4 Aug 2023 15:30:41 +0200
-X-Authentication-Warning: PO20335.IDSI0.si.c-s.fr: chleroy set sender to christophe.leroy@csgroup.eu using -f
-From: Christophe Leroy <christophe.leroy@csgroup.eu>
-To: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-        Pantelis Antoniou <pantelis.antoniou@gmail.com>,
-        Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Nicholas Piggin <npiggin@gmail.com>, robh@kernel.org
-Cc: Christophe Leroy <christophe.leroy@csgroup.eu>,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH net-next v2 10/10] net: fs_enet: Use cpm_muram_xxx() functions instead of cpm_dpxxx() macros
-Date: Fri,  4 Aug 2023 15:30:20 +0200
-Message-ID: <2400b3156891adb653dc387fff6393de10cf2b24.1691155347.git.christophe.leroy@csgroup.eu>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <cover.1691155346.git.christophe.leroy@csgroup.eu>
-References: <cover.1691155346.git.christophe.leroy@csgroup.eu>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A588779EB;
+	Fri,  4 Aug 2023 13:32:06 +0000 (UTC)
+Received: from out1-smtp.messagingengine.com (out1-smtp.messagingengine.com [66.111.4.25])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBCDD4C05;
+	Fri,  4 Aug 2023 06:31:46 -0700 (PDT)
+Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
+	by mailout.nyi.internal (Postfix) with ESMTP id 442185C013F;
+	Fri,  4 Aug 2023 09:31:44 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute4.internal (MEProxy); Fri, 04 Aug 2023 09:31:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:sender:subject
+	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+	:x-sasl-enc; s=fm3; t=1691155904; x=1691242304; bh=jt/eqP4aPwn04
+	aS2T+/sFSLK8MZIFtCXDP4UokE+Qio=; b=dLoDFeQZyoLisNWmOXcJb2viKeyzU
+	7fGNJ+GlsUV/xif7+JuiY89mdb1djfgWc7YRiVNqkc1rmMKex0VMQp7py4U7P+Rl
+	gtUniQth10aQyyzCPPmyW2Q+fxsPkxUOQZ1COjVF/hlC0rgyje7MDaHFCfN6qOdU
+	uAHJO0x6a5x+x8n0v1oRgay7qPIAzCBG8LUArsexYiwHJooRy7aR3MCRpq5YqbwY
+	v0hr/P8lXL912thzs7v9JEGu+jP5A6I+dWFjXqvPqqTnsZoPkjv2bnLkM3/qDHiQ
+	GZkY3oOxuRs9Nx0zkT3OaVuWJiXVx+NUllEJNxAjdaeyEUq4i6rpasXJA==
+X-ME-Sender: <xms:wP3MZOkocCCz6uMr1bdnJ_hMKWPPTC_ErMpRBTrDbFj3ddDUZA-Wug>
+    <xme:wP3MZF3dRKF8gZ3ylcnrPnIQKHddEjiMOoMHubyK2h9_jEMrcPLr153r4AfIzlF-z
+    1OYpQZJtNtP0ng>
+X-ME-Received: <xmr:wP3MZMomUDjQR3wVfALFdsL487_NLuwBq-9fA9CAGAcC1f2aAxpvyMHp7kelu52238AG0i3dfpsbw_A4SxzkbPleXD1kXA>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrkeeggdeigecutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+    fjughrpeffhffvvefukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpefkughoucfu
+    tghhihhmmhgvlhcuoehiughoshgthhesihguohhstghhrdhorhhgqeenucggtffrrghtth
+    gvrhhnpeehhfdtjedviefffeduuddvffegteeiieeguefgudffvdfftdefheeijedthfej
+    keenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuvehluhhsthgvrhfuihiivgeptd
+    enucfrrghrrghmpehmrghilhhfrhhomhepihguohhstghhsehiughoshgthhdrohhrgh
+X-ME-Proxy: <xmx:wP3MZClsFTC4heq81SnS1v8rFuQnBa6i0oMKkdwWVU98tS_myf-0_w>
+    <xmx:wP3MZM2nWzhw8YxEXnxiw-3e363ocEoffiDCNPEO8WCo4IiqKQRlNQ>
+    <xmx:wP3MZJs8q08vf7uSs9eAGUs6xsY8UlTIEM-WTMnQKjxKgziab0JUOg>
+    <xmx:wP3MZGqazbGqtl2mN3L125zG27U7nQnC6O-ppkOmLYKgWl9vIpo_4g>
+Feedback-ID: i494840e7:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 4 Aug 2023 09:31:43 -0400 (EDT)
+Date: Fri, 4 Aug 2023 16:31:39 +0300
+From: Ido Schimmel <idosch@idosch.org>
+To: Gal Pressman <gal@nvidia.com>
+Cc: Daniel Borkmann <daniel@iogearbox.net>, kuba@kernel.org, ast@kernel.org,
+	bpf@vger.kernel.org, netdev@vger.kernel.org,
+	syzbot+bdcf141f362ef83335cf@syzkaller.appspotmail.com,
+	syzbot+b202b7208664142954fa@syzkaller.appspotmail.com,
+	syzbot+14736e249bce46091c18@syzkaller.appspotmail.com
+Subject: Re: [PATCH net-next] tcx: Fix splat in ingress_destroy upon
+ tcx_entry_free
+Message-ID: <ZMz9u+yZtk8vf+OP@shredder>
+References: <20230721233330.5678-1-daniel@iogearbox.net>
+ <bdfc2640-8f65-5b56-4472-db8e2b161aab@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1691155810; l=2234; i=christophe.leroy@csgroup.eu; s=20211009; h=from:subject:message-id; bh=h5ydkcduy6lioiqJjfCSwkFEzxsJekIZbyhS9VYCwaM=; b=rEkA1UmOUQoKpStLkJMOJeVAurg3D56c1hmAACywr+Epgc1FCWW/eh4FLVR5EX3iBJQqZcFFT sg4QqZDgBf5DxknwEAPur/IqSkozATbtjAO2awOclmTqq8Ell3Y+sGG
-X-Developer-Key: i=christophe.leroy@csgroup.eu; a=ed25519; pk=HIzTzUj91asvincQGOFx6+ZF5AoUuP9GdOtQChs7Mm0=
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <bdfc2640-8f65-5b56-4472-db8e2b161aab@nvidia.com>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_PASS,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-cpm_dpxxx() macros are now always referring to cpm_muram_xxx() fonctions
-directly since commit 3dd82a1ea724 ("[POWERPC] CPM: Always use new
-binding.")
+On Thu, Aug 03, 2023 at 02:10:51PM +0300, Gal Pressman wrote:
+> Our nightly regression testing picked up new memory leaks which were
+> bisected to this commit.
+> Unfortunately, I do not know the exact repro steps to trigger it, maybe
+> the attached kmemeleak logs can help?
 
-Use cpm_muram_xxx() functions directly so that the cpm_dpxxx() macros
-can be removed in the near future.
+[...]
 
-Signed-off-by: Christophe Leroy <christophe.leroy@csgroup.eu>
----
- drivers/net/ethernet/freescale/fs_enet/mac-fcc.c | 2 +-
- drivers/net/ethernet/freescale/fs_enet/mac-scc.c | 8 ++++----
- 2 files changed, 5 insertions(+), 5 deletions(-)
+> unreferenced object 0xffff88812acdebc0 (size 16):
+>   comm "umount.nfs", pid 11626, jiffies 4295354796 (age 45.472s)
+>   hex dump (first 16 bytes):
+>     73 65 72 76 65 72 2d 32 00 eb cd 2a 81 88 ff ff  server-2...*....
+>   backtrace:
+>     [<0000000010fb5130>] __kmalloc_node_track_caller+0x4c/0x170
+>     [<00000000b866a733>] kvasprintf+0xb0/0x130
+>     [<00000000b3564fca>] kasprintf+0xa6/0xd0
+>     [<00000000f01d6cb3>] nfs_sysfs_move_sb_to_server+0x49/0xd0
+>     [<000000009608708f>] nfs_kill_super+0x5f/0x90
+>     [<0000000090d4108b>] deactivate_locked_super+0x80/0x130
+>     [<000000000856aeb1>] cleanup_mnt+0x258/0x370
+>     [<0000000040582e39>] task_work_run+0x12c/0x210
+>     [<00000000378ea041>] exit_to_user_mode_prepare+0x1a0/0x1b0
+>     [<00000000025e63dd>] syscall_exit_to_user_mode+0x19/0x50
+>     [<00000000f34ad3ee>] do_syscall_64+0x4a/0x90
+>     [<000000009d3e2403>] entry_SYSCALL_64_after_hwframe+0x46/0xb0
 
-diff --git a/drivers/net/ethernet/freescale/fs_enet/mac-fcc.c b/drivers/net/ethernet/freescale/fs_enet/mac-fcc.c
-index ce63fd56df89..d903a9012db0 100644
---- a/drivers/net/ethernet/freescale/fs_enet/mac-fcc.c
-+++ b/drivers/net/ethernet/freescale/fs_enet/mac-fcc.c
-@@ -105,7 +105,7 @@ static int do_pd_setup(struct fs_enet_private *fep)
- 		goto out_ep;
- 
- 	fep->fcc.mem = (void __iomem *)cpm2_immr;
--	fpi->dpram_offset = cpm_dpalloc(128, 32);
-+	fpi->dpram_offset = cpm_muram_alloc(128, 32);
- 	if (IS_ERR_VALUE(fpi->dpram_offset)) {
- 		ret = fpi->dpram_offset;
- 		goto out_fcccp;
-diff --git a/drivers/net/ethernet/freescale/fs_enet/mac-scc.c b/drivers/net/ethernet/freescale/fs_enet/mac-scc.c
-index 66d40da5cde0..a64cb6270515 100644
---- a/drivers/net/ethernet/freescale/fs_enet/mac-scc.c
-+++ b/drivers/net/ethernet/freescale/fs_enet/mac-scc.c
-@@ -133,13 +133,13 @@ static int allocate_bd(struct net_device *dev)
- 	struct fs_enet_private *fep = netdev_priv(dev);
- 	const struct fs_platform_info *fpi = fep->fpi;
- 
--	fep->ring_mem_addr = cpm_dpalloc((fpi->tx_ring + fpi->rx_ring) *
--					 sizeof(cbd_t), 8);
-+	fep->ring_mem_addr = cpm_muram_alloc((fpi->tx_ring + fpi->rx_ring) *
-+					     sizeof(cbd_t), 8);
- 	if (IS_ERR_VALUE(fep->ring_mem_addr))
- 		return -ENOMEM;
- 
- 	fep->ring_base = (void __iomem __force*)
--		cpm_dpram_addr(fep->ring_mem_addr);
-+		cpm_muram_addr(fep->ring_mem_addr);
- 
- 	return 0;
- }
-@@ -149,7 +149,7 @@ static void free_bd(struct net_device *dev)
- 	struct fs_enet_private *fep = netdev_priv(dev);
- 
- 	if (fep->ring_base)
--		cpm_dpfree(fep->ring_mem_addr);
-+		cpm_muram_free(fep->ring_mem_addr);
- }
- 
- static void cleanup_data(struct net_device *dev)
--- 
-2.41.0
+This one is caused by commit 1c7251187dc0 ("NFS: add superblock sysfs
+entries") and fixed by [1], so I'm not sure the bisection result is
+reliable.
 
+[1] https://lore.kernel.org/linux-nfs/6702796fee0365bf399800326bbe6c88e5f73f68.1689014440.git.bcodding@redhat.com/
 
