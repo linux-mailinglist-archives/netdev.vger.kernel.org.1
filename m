@@ -1,119 +1,103 @@
-Return-Path: <netdev+bounces-24500-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24501-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC800770642
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 18:48:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A943777064B
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 18:49:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A75E52827FF
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 16:48:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB6021C218D3
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 16:49:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6101156E4;
-	Fri,  4 Aug 2023 16:48:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9224A18041;
+	Fri,  4 Aug 2023 16:49:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB646C15C
-	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 16:48:05 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (unknown [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D322B2D5F;
-	Fri,  4 Aug 2023 09:48:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=RO4eJJfHRg8JOKGHnZzYhOFDDcQwqh/3jOnjYiqw8e0=; b=UbnbJ9890f1fQ9/fLFUZ28vKyU
-	HAWNJQeq5/GgnN0yxRdgYFrGrXn9Hq2lH3mYRviTPvojAfw3EokKG38IypVaaMGofzK45jWxnvhDn
-	AOYVOyyd+yWvROJdIb9tZF+/Kck9Jhgv+zDE/XgbMOzZPEkTyDdtbrAB614BS140Rg0S5LRB6hSJh
-	IO7u5wHLpg8JF+bw6V+aEhueLmzI79pYNj/iH1kNWhw6qjzHRw3Y6EBaQI7SxDPIYsF5VSTWSn1QL
-	Q3sCjqQCERdHixBetKi8/ZGIkXqe3+1MMNGkgh8Vr1n68IMPSFzR8b+evsShcm8JzDe075OLnCweY
-	AoBDfZPQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:50246)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qRxy1-0000T8-1b;
-	Fri, 04 Aug 2023 17:47:57 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qRxy1-000493-1S; Fri, 04 Aug 2023 17:47:57 +0100
-Date: Fri, 4 Aug 2023 17:47:56 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Nick Bowler <nbowler@draconx.ca>
-Cc: Rob Herring <robh@kernel.org>, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
-	regressions@lists.linux.dev
-Subject: Re: PROBLEM: Broken or delayed ethernet on Xilinx ZCU104 since 5.18
- (regression)
-Message-ID: <ZM0rvEkQ3XLlrbQC@shell.armlinux.org.uk>
-References: <CADyTPEzqf8oQAPSFRWJLxAhd-WE4fX2zdoe9Vu6V9hZMn1Yc8g@mail.gmail.com>
- <CAL_JsqLrErF__GGHfanRFCpfbOh6fvz4-aJv32h8OfDjUeZPSg@mail.gmail.com>
- <CADyTPEwgG0=R_b5DNBP0J0auDXu2BNTOwkSUFg-s7pLJUPC+Tg@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86C3DBE7C
+	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 16:49:54 +0000 (UTC)
+Received: from mail-qt1-x829.google.com (mail-qt1-x829.google.com [IPv6:2607:f8b0:4864:20::829])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DEFE3C23
+	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 09:49:53 -0700 (PDT)
+Received: by mail-qt1-x829.google.com with SMTP id d75a77b69052e-403a3df88a8so16107751cf.3
+        for <netdev@vger.kernel.org>; Fri, 04 Aug 2023 09:49:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1691167792; x=1691772592;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=LkUL2PlOzfT58q9qudjtzFzvb7OK02mCRFsTl32ovnU=;
+        b=kUyybcKNzzLZ7ehNjnqiw18cmIQMfGtVGlv/zhCpGofq95hPLktzHm0FWZ0gMitYpx
+         yL+BC6jbA3nUwlUG4S4mDOVQsSdrkhbr6jgrXYwC5ezRKdka6S3+ySUnpYtgwvvuYGCG
+         aadp/6aNQzJOZ62ymVGZjgtzBoPTTHTEfz1FGnzQb42Sz4BArQ4bPFLvsqsu9auDdPt/
+         aK63jDpd5hyPPpGb0G7+L+7ruCHNtEtcBi77gJMLKEaLy2eTQyaMy3k5XJWpqnj2r5Y9
+         gP2Hder6QnLQy90m4zXSFcRdTkSHHgrr9TImCthlq18CvvVkSPyW8VOoHvGkXtQm3s6n
+         QlKA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691167792; x=1691772592;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LkUL2PlOzfT58q9qudjtzFzvb7OK02mCRFsTl32ovnU=;
+        b=ZAv1YnNvcYaTFU5ScDX0S38xLuZF360F0Aw/cCmq0xnKOOpFnqL1rSPPM78UrnLX2N
+         5S+22I0w8jqc9hocyr7QgaLzcuDWbpFwaosR+v/Vzvk5dPRNuf5ySb9ZdlD3WsN4U03E
+         V5BREQW5cnIx7gejUTuos39/YR3KPMEcWeVCRD6+dHnNw0uI3UBP8OeD3wKDAqa7AZfm
+         i1DvMza8sQDmUF/RbwerX3qd/UIZXQ4DIxbPylwQYsLQDEF33iWrK5VpclSQuqtr3vF2
+         5XGdXsoSpNPEb/W6TkR5Uc9WKEnK2Og0Qn/yo4ue3nba6w5OkqKdbd3Syfg2G7gCoq35
+         q/kQ==
+X-Gm-Message-State: AOJu0YwZvty5vWCY/KTi9rzLBNp3NIHiedpMrAXkEDMiQVx3synA0Hjk
+	PkodcOONVW1o3mmAgdCGE529Yg==
+X-Google-Smtp-Source: AGHT+IHj+Quw/k2Ut+pAvKfZ2oiDEj8XGnx9S5QXbT4XVTYEsHM+FYwYA29FEaM1sPq0Tck85Et93A==
+X-Received: by 2002:ac8:5945:0:b0:404:c430:6695 with SMTP id 5-20020ac85945000000b00404c4306695mr3396490qtz.53.1691167792218;
+        Fri, 04 Aug 2023 09:49:52 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-68-25-194.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.25.194])
+        by smtp.gmail.com with ESMTPSA id e7-20020ac84147000000b00403c82c609asm783399qtm.14.2023.08.04.09.49.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 04 Aug 2023 09:49:51 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.95)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1qRxzq-003v4Y-SY;
+	Fri, 04 Aug 2023 13:49:50 -0300
+Date: Fri, 4 Aug 2023 13:49:50 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Petr Pavlu <petr.pavlu@suse.com>
+Cc: tariqt@nvidia.com, yishaih@nvidia.com, leon@kernel.org,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 00/10] Convert mlx4 to use auxiliary bus
+Message-ID: <ZM0sLsxnP3PoI0lm@ziepe.ca>
+References: <20230804150527.6117-1-petr.pavlu@suse.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CADyTPEwgG0=R_b5DNBP0J0auDXu2BNTOwkSUFg-s7pLJUPC+Tg@mail.gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RDNS_NONE,
-	SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=no autolearn_force=no
+In-Reply-To: <20230804150527.6117-1-petr.pavlu@suse.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Aug 04, 2023 at 12:24:02PM -0400, Nick Bowler wrote:
-> On 04/08/2023, Rob Herring <robh@kernel.org> wrote:
-> > On Fri, Aug 4, 2023 at 9:27 AM Nick Bowler <nbowler@draconx.ca> wrote:
-> >>   commit e461bd6f43f4e568f7436a8b6bc21c4ce6914c36
-> >>   Author: Robert Hancock <robert.hancock@calian.com>
-> >>   Date:   Thu Jan 27 10:37:36 2022 -0600
-> >>
-> >>       arm64: dts: zynqmp: Added GEM reset definitions
-> >>
-> >> Reverting this fixes the problem on 5.18.  Reverting this fixes the
-> >> problem on 6.1.  Reverting this fixes the problem on 6.4.  In all of
-> >> these versions, with this change reverted, the network device appears
-> >> without delay.
-> >
-> > With the above change, the kernel is going to be waiting for the reset
-> > driver which either didn't exist or wasn't enabled in your config
-> > (maybe kconfig needs to be tweaked to enable it automatically).
+On Fri, Aug 04, 2023 at 05:05:17PM +0200, Petr Pavlu wrote:
+> This series converts the mlx4 drivers to use auxiliary bus, similarly to
+> how mlx5 was converted [1]. The first 6 patches are preparatory changes,
+> the remaining 4 are the final conversion.
 > 
-> The dts defines a reset-controller node with
-> 
->   compatible = "xlnx,zynqmp-reset"
-> 
-> As far as I can see, this is supposed to be handled by the code in
-> drivers/reset/zynqmp-reset.c driver, it is enabled by CONFIG_ARCH_ZYNQMP,
-> and I have that set to "y", and it appears to be getting compiled in (that
-> is, there is a drivers/reset/zynqmp-reset.o file in the build directory).
+> Initial motivation for this change was to address a problem related to
+> loading mlx4_en/mlx4_ib by mlx4_core using request_module_nowait(). When
+> doing such a load in initrd, the operation is asynchronous to any init
+> control and can get unexpectedly affected/interrupted by an eventual
+> root switch. Using an auxiliary bus leaves these module loads to udevd
+> which better integrates with systemd processing. [2]
 
-Isn't the driver called reset-zynqmp.c and reset-zynqmp.o ?
+Neat, I didn't realize that was a pain point for distros.
 
-> However, unlike with the other firmware devices, I do not see this driver
-> under /sys/bus/platform/drivers, and there is no "driver" symlink under
-> /sys/bus/platform/devices/firmware:zynqmp-firmware:reset-controller
-
-The driver name would be the kbuild modname, which would be
-reset-zynqmp rather than zynqmp-reset - given how often you're typing
-zynqmp-reset rather than zynqmp-reset, could you have missed it
-through looking for the wrong name?
-
-If the driver is built-in, there is no reason it should fail to show
-up in /sys/bus/platform/drivers/reset-zynqmp.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Jason
 
