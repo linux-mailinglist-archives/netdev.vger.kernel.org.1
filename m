@@ -1,123 +1,100 @@
-Return-Path: <netdev+bounces-24582-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24583-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D14AE770AFE
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 23:31:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C5B5770B0C
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 23:34:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8BE47282382
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 21:31:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5B45C1C21526
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 21:34:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 917C61ED5C;
-	Fri,  4 Aug 2023 21:31:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D26F61F92A;
+	Fri,  4 Aug 2023 21:34:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86C6F19891
-	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 21:31:31 +0000 (UTC)
-Received: from mail-vs1-xe33.google.com (mail-vs1-xe33.google.com [IPv6:2607:f8b0:4864:20::e33])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34E39268B
-	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 14:31:23 -0700 (PDT)
-Received: by mail-vs1-xe33.google.com with SMTP id ada2fe7eead31-44779e3e394so1134465137.0
-        for <netdev@vger.kernel.org>; Fri, 04 Aug 2023 14:31:23 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C575119891
+	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 21:34:49 +0000 (UTC)
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3710E2
+	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 14:34:47 -0700 (PDT)
+Received: by mail-pg1-x54a.google.com with SMTP id 41be03b00d2f7-56438e966baso1702261a12.2
+        for <netdev@vger.kernel.org>; Fri, 04 Aug 2023 14:34:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=draconx-ca.20221208.gappssmtp.com; s=20221208; t=1691184682; x=1691789482;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :references:in-reply-to:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4wgSDWxrxVZiPe9PKOQ5nehYLRx5JXmpKDK7pPAaQEc=;
-        b=CzbssBraeCJGuHQUAt/Sfe5yrmbDMT3r8+MSa6a/KeoJ/q/xyXFdUVzTV63QPwPoX+
-         FknePgnNRBHdAJq4gtFJZv6mBgdShTVaOZ+PlxzJol0VPMx3YHZkpnunKZubeTFviKv8
-         BYC80q+xgJ0M2QeGDz8whD65V0lRff0TFmajWEXzOG9ZLstp0/0QSS8xZtpwOVBAD8rI
-         wgTwHwzBfl68OIy9xzaae4TL341qZx/XX6okTQhOA3HtnzZSLciba+/6pDZ0pct77c4J
-         aoRKoLat+q7ie6PViLLY9i+Sp1IEo7OeUXBlnw0b85aAU6HoH9xj32ZAaPGaNsXc9RdZ
-         pr3g==
+        d=google.com; s=20221208; t=1691184887; x=1691789687;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=iBL8NikCgIrVBzLpRB5a5oHEpwB3eha8bDhNyxoWivc=;
+        b=4nsKcQCjeAsiLZ0iNyZn5S0w8lJY2cS3+KWkkUMPZOrmXrdSJM8vdrb6Wo3/eni56F
+         6p0GOjeNXY6Qm4MbPij7cevf/t76u0J4cgYCze1To0r325Dtq9+4HNLg0gaOyNu2FnDs
+         wCzUaLeXa37B1CEDn94+N37773uCTT+waiz71xg4VzH59YP+7i5c5JNAqMcvkt/4GeXy
+         wwujSaxAPCdB6OCUAtsrOL0XdfqRgOKFfE/9WdFG+xvadZjhSjGCddk4qHm8+CT/fUm8
+         0yS+QSQOq0UZwXp0MNKWEGbX6+6NjpJsrSk0dR7/LMJxj8DVj2aARcCWQB3h7+Pchccw
+         lfmA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691184682; x=1691789482;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :references:in-reply-to:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4wgSDWxrxVZiPe9PKOQ5nehYLRx5JXmpKDK7pPAaQEc=;
-        b=XVvdb5oq9TvB8sfjoXiRPzHgRu3v6u+SBGTKlt0/BOJWQnB1jKeBiGORTg2+95BafJ
-         MWk8htEp3rWsVsokjZTUGx/4BR4g3EjY77Vihif5gP/Dk17+HpaZCvqd2G3yAiXzkcSQ
-         lN9V/9pKvJXWFzQDbK1D+pKw9XZ9fipFSLDzPPscX+c0dZ/iNN9nukc8kdEQDj7EEp2J
-         rE/bNCf4rmjVy5IV+MbjMjcxfTn6d8JBtMMM18npCOsNsa62olIhLxT6roPCBrU+ChLF
-         Lpb2FjWa1HUL30euJE6nnevHOiY7uVjrDXlMSTKsZ/8pDra0p/MBAWoAgcqfOyTq+76r
-         vsjw==
-X-Gm-Message-State: AOJu0Yyail+q26faX9/AB75QdK29aC5b382kC4zP4stkpVtN4782RoNe
-	PZusnHJh5WNMk3pXD4t9rrMqeWTBZr7DXxj4R2bxXw==
-X-Google-Smtp-Source: AGHT+IHkeWcu5pSL+NXE/vtQuegT1kdwjEfT+C7bYVQ80I5JaMOKEk3YOWFw8Ln2hYau3FxYFEMedkeiggsWc+MVPqQ=
-X-Received: by 2002:a67:fd86:0:b0:443:8898:2a50 with SMTP id
- k6-20020a67fd86000000b0044388982a50mr2187951vsq.35.1691184682195; Fri, 04 Aug
- 2023 14:31:22 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1691184887; x=1691789687;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=iBL8NikCgIrVBzLpRB5a5oHEpwB3eha8bDhNyxoWivc=;
+        b=j10ciV2iCzcaIbXOD4kecP+ZMuGeqvxkuYy0qsPGSpJ8PVu1n13OWKuwh+WxkKk3yx
+         KGPixiad6H+zg4Nfrh1QUqmy45QQj0/HUu6MMsQ9tUNlqDB8D625/3lwhVI5vKc2nUEv
+         wswEQ4bmv/33ULWMt/R28op/Z0KKgw/mfJ/aSgYyZ4h2UUpeu59kic79t42mU5hkdE3b
+         izd1m8ZEfaOpGfLTv2pbU7z1X0a80Y8Djy3e0ILVMVKb2NGSAVYoVA6V5ZY1K/kXbyym
+         35kRsnIZatl8VLLpl+WI3LXOOxTUI8wVsBotRRZXibQWckPnrFYiocLTlrTW9T5/1799
+         FbGA==
+X-Gm-Message-State: AOJu0YxqucKnd+Sq62vvj8hIlaDXR1RtgV0iH8aoPGEWjd9qtPJjdYEW
+	tuWozsG9XupIuX31B5rFWprhmFefO4JUTcmZ4b0JJgxNYODFikoUSErKTKJ79/NxyH0nM86zIht
+	D4kElxCZ/8PFdsb+AHswmEtuFSaZ2OgDt9HBu/6cftteBPqLotfOYLfG5hvGCPLjs
+X-Google-Smtp-Source: AGHT+IFIzQPjMOPK9r/DcerB/0bkkEHuo9OuRxxPSIuerZUwd999Yt4T/qD1c6c1bLjAG/WOr7zD/hDawzcA
+X-Received: from wrushilg.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:2168])
+ (user=rushilg job=sendgmr) by 2002:a63:b512:0:b0:564:9785:75c with SMTP id
+ y18-20020a63b512000000b005649785075cmr119pge.10.1691184886957; Fri, 04 Aug
+ 2023 14:34:46 -0700 (PDT)
+Date: Fri,  4 Aug 2023 21:34:40 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Received: by 2002:ab0:6209:0:b0:794:1113:bb24 with HTTP; Fri, 4 Aug 2023
- 14:31:21 -0700 (PDT)
-X-Originating-IP: [24.53.241.2]
-In-Reply-To: <CAL_JsqKGAFtwB+TWc1yKAe_0M4BziEpFnApuWuR3h+Go_=djFg@mail.gmail.com>
-References: <CADyTPEzqf8oQAPSFRWJLxAhd-WE4fX2zdoe9Vu6V9hZMn1Yc8g@mail.gmail.com>
- <CAL_JsqLrErF__GGHfanRFCpfbOh6fvz4-aJv32h8OfDjUeZPSg@mail.gmail.com>
- <CADyTPEwgG0=R_b5DNBP0J0auDXu2BNTOwkSUFg-s7pLJUPC+Tg@mail.gmail.com>
- <CADyTPExgjcaUeKiR108geQhr0KwFC0A8qa_n_ST2RxhbSczomQ@mail.gmail.com>
- <CAL_Jsq+N2W0hVN7fUC1rxGL-Hw9B8eQvLgSwyQ3n41kqwDbxyg@mail.gmail.com>
- <CADyTPEyT4NJPrChtvtY=_GePZNeSDRAr9j3KRAk1hkjD=5+i8A@mail.gmail.com> <CAL_JsqKGAFtwB+TWc1yKAe_0M4BziEpFnApuWuR3h+Go_=djFg@mail.gmail.com>
-From: Nick Bowler <nbowler@draconx.ca>
-Date: Fri, 4 Aug 2023 17:31:21 -0400
-Message-ID: <CADyTPEwY4ydUKGtGNayf+iQSqRVBQncLiv0TpO9QivBVrmOc4g@mail.gmail.com>
-Subject: Re: PROBLEM: Broken or delayed ethernet on Xilinx ZCU104 since 5.18 (regression)
-To: Rob Herring <robh@kernel.org>
-Cc: Saravana Kannan <saravanak@google.com>, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org, 
-	regressions@lists.linux.dev
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.41.0.585.gd2178a4bd4-goog
+Message-ID: <20230804213444.2792473-1-rushilg@google.com>
+Subject: [PATCH net-next v2 0/4] Add QPL mode for DQO descriptor format
+From: Rushil Gupta <rushilg@google.com>
+To: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, 
+	willemb@google.com, edumazet@google.com, pabeni@redhat.com
+Cc: Rushil Gupta <rushilg@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 2023-08-04, Rob Herring <robh@kernel.org> wrote:
-> On Fri, Aug 4, 2023 at 11:52=E2=80=AFAM Nick Bowler <nbowler@draconx.ca> =
-wrote:
->> I don't know about the deferred probe timeout, but I bisected the 6.5-rc=
-4
->> breakage to this commit:
->>
->>   commit c720a1f5e6ee8cb39c28435efc0819cec84d6ee2
->>   Author: Michal Simek <michal.simek@amd.com>
->>   Date:   Mon May 22 16:59:48 2023 +0200
->>
->>       arm64: zynqmp: Describe TI phy as ethernet-phy-id
->
-> I don't see anything obviously problematic with that commit. (The
-> #phy-cells property added is wrong as ethernet phys don't use the phy
-> binding, but that should just be ignored). I'd check if the phy probed
-> and has a DT node associated with it.
+GVE supports QPL ("queue-page-list") mode where
+all data is communicated through a set of pre-registered
+pages. Adding this mode to DQO.
 
-I think the answer is "no, the phy was not probed".  Without reverting
-that commit, there is absolutely nothing in /sys/bus/mdio_bus/devices.
-There is no phy device link under /sys/bus/mdio_bus/drivers/"TI DP83867",
-and there is no mdio_bus under /sys/bus/platform/devices/ff0e0000.ethernet.
+Rushil Gupta (4):
+  gve: Control path for DQO-QPL
+  gve: Tx path for DQO-QPL
+  gve: RX path for DQO-QPL
+  gve: update gve.rst
 
-When I revert that commit, I can locate the phy device under all these
-locations.
+ .../device_drivers/ethernet/google/gve.rst    |   9 +
+ drivers/net/ethernet/google/gve/gve.h         | 112 ++++-
+ drivers/net/ethernet/google/gve/gve_adminq.c  |  89 +++-
+ drivers/net/ethernet/google/gve/gve_adminq.h  |  10 +
+ drivers/net/ethernet/google/gve/gve_main.c    |  20 +-
+ drivers/net/ethernet/google/gve/gve_rx_dqo.c  | 126 +++++-
+ drivers/net/ethernet/google/gve/gve_tx_dqo.c  | 404 ++++++++++++++----
+ 7 files changed, 649 insertions(+), 121 deletions(-)
 
-> fw_devlink tracks parent-child dependencies and maybe changing to
-> parent-grandchild affected that. We don't yet track 'phy-handle'
-> dependencies, but we'd have a circular one here if we did (though that
-> should be handled). Does "fw_devlink=3Doff" help?
+-- 
+2.41.0.585.gd2178a4bd4-goog
 
-Booting with fw_devlink=3Doff results in no obvious change in behaviour.
-
-Thanks,
-  Nick
 
