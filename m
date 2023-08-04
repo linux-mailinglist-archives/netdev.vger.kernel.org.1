@@ -1,139 +1,126 @@
-Return-Path: <netdev+bounces-24487-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24488-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC73E77053F
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 17:51:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BFE76770545
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 17:52:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E58931C21910
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 15:51:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A38851C218C5
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 15:52:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B8ED18054;
-	Fri,  4 Aug 2023 15:51:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A8C218056;
+	Fri,  4 Aug 2023 15:52:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20310BE7B
-	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 15:51:20 +0000 (UTC)
-Received: from mail-wm1-x330.google.com (mail-wm1-x330.google.com [IPv6:2a00:1450:4864:20::330])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8454170F
-	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 08:51:18 -0700 (PDT)
-Received: by mail-wm1-x330.google.com with SMTP id 5b1f17b1804b1-3fe2d620d17so104095e9.0
-        for <netdev@vger.kernel.org>; Fri, 04 Aug 2023 08:51:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691164277; x=1691769077;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WKI6r/logEv/dW6g10zi6Oac1f5KZSTaa9X0AtvaRYU=;
-        b=2Yf9DOFb7PgaLFH78yiFUpMEAkQ6cULIE0l7NiBj4+zRARbcoPNU7AVf9CFqEgOsoL
-         DWCy68BGKSMsq8cksWu8wcjT6sEp/mlO8wg1GvsECFbjXC05lPKQ1nmjL6YQGapg4xAI
-         ezmIT/ZHUBVDM1G38eAlq5/8OzMRX5FTrVNxQjYQgASk579h6nrfHg7DTPVz7lQE63Ie
-         8Y1GHstk6EPW4tRFZ3/0YBRoarOuNOa2zv842xbDQ9Xi/gpZZoPYMA2SbqLBVlDzfx9Y
-         OrhtcDgCh8zPZOMsFEnVkWfpO3DfqzgVRL/7L8yCZatOfYB8ReQ0RrwmksQ9YamXV3sP
-         VU/w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691164277; x=1691769077;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=WKI6r/logEv/dW6g10zi6Oac1f5KZSTaa9X0AtvaRYU=;
-        b=RyMaILTY2qjHAVjadGqfaH3CmuzARi/8tyeTSpn6En7c0yFwoBTBmvqayhnndeiKQe
-         YyK1Q0fuwWvnMuq2oSTHKUpxIKbHLNB62zBOoqdz7nipbcbbeZtwhtxX+RQx6mAUz0Fp
-         CRNXXO64Wcf1TffB1/NyPs2Og8AntiGNEtR3hSptaQm0S4YrwLhHs1ViCYo8gEJxWCN0
-         O1v5FiAsRcbHTYezXqnl9xoGmI76Svg4TYPm3YBvuJ5bwK+xD88nuSuTpVl9oVHJYtp3
-         PsMAfo0IaeVjUrMHIua0Xn+E8I4heHE/E6ol8feB5nG6xvem6UxM/XWOyBVoJRc7iGA/
-         KNbg==
-X-Gm-Message-State: AOJu0Yw4xFjmVxoAx58vl/LIEZV3no/b1VdQpbhUvjrH23r0MCB4Le5t
-	nq/lrdya7fXB4fX0OeRRYXWgWTWRpUw8hgPqNuM0CA==
-X-Google-Smtp-Source: AGHT+IEV6GH+fIcR7e8IVaM+CaAjVEyILzJJP/uxW02JJzqKlrXosN+HTZh5TA2ipsG5uKc0Kl+RjAUedzNr4r5EVsQ=
-X-Received: by 2002:a05:600c:1d1d:b0:3f4:2736:b5eb with SMTP id
- l29-20020a05600c1d1d00b003f42736b5ebmr78938wms.1.1691164277312; Fri, 04 Aug
- 2023 08:51:17 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59D7E18053
+	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 15:52:35 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E50B5C433CA;
+	Fri,  4 Aug 2023 15:52:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1691164354;
+	bh=LOq7RS20TqfH4Hdkn/iEhzGYnzzqU4MxbtyZDje5DTM=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=db/QpyGWZiGv+hOkDcQmId64EfLtCECXdj6SVN9iqNnUz87wDzhSDSDKkPqhesxXc
+	 XkYO8574UAfmZclBZdnsGi8VAqj7rHu/+xeRD5KvG+ijc7xo9ROK2jfD8yKTKqRCsq
+	 zX7BT0Uug6JnRWvDTte1vdDZs+zBhkIs/jjQPHMmwIvSG5BIkp48BbFKST0uVCujlZ
+	 cjAylaRSCFsl6gdna/65Ckv7KfS6T+R/op7i0mliGSpS53yTpBcmy7X+2F4JyUZyFj
+	 GtkGEVfoBBfJpXmPTUq+8Kd9wNfncXOGt2deJxPXuSrP9bccesOId7cwFMM5+Q17UG
+	 R0JgvLmb+aF9g==
+Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-2b9b9f0387dso35377221fa.0;
+        Fri, 04 Aug 2023 08:52:34 -0700 (PDT)
+X-Gm-Message-State: AOJu0YwqQwElZ+9EW5E8jDLO+uma3SHv/xdX+z8dcOj3ad9CUYgwuOPY
+	Qezacz6yOc2vvZJLp6AO/yw0rB+E2HANBn2XmQ==
+X-Google-Smtp-Source: AGHT+IGTRbQZ164zyFuRSDnd5vaQ7H79WmuECLzjpyyzN1RdAra6RmdexIM3oHlL3swhcI2UIbnez1POXc8rZk7AbpE=
+X-Received: by 2002:a2e:9d5a:0:b0:2b9:53bd:47a7 with SMTP id
+ y26-20020a2e9d5a000000b002b953bd47a7mr1705190ljj.30.1691164352899; Fri, 04
+ Aug 2023 08:52:32 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230804144616.3938718-1-edumazet@google.com> <20230804144616.3938718-5-edumazet@google.com>
-In-Reply-To: <20230804144616.3938718-5-edumazet@google.com>
-From: Soheil Hassas Yeganeh <soheil@google.com>
-Date: Fri, 4 Aug 2023 11:50:40 -0400
-Message-ID: <CACSApvY-H8kMn3OXD-kbApGQ11H+pK7X7-gQH4ifGMU-g57rKQ@mail.gmail.com>
-Subject: Re: [PATCH net-next 4/6] tcp: set TCP_KEEPCNT locklessly
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
+References: <CADyTPEzqf8oQAPSFRWJLxAhd-WE4fX2zdoe9Vu6V9hZMn1Yc8g@mail.gmail.com>
+In-Reply-To: <CADyTPEzqf8oQAPSFRWJLxAhd-WE4fX2zdoe9Vu6V9hZMn1Yc8g@mail.gmail.com>
+From: Rob Herring <robh@kernel.org>
+Date: Fri, 4 Aug 2023 09:52:20 -0600
+X-Gmail-Original-Message-ID: <CAL_JsqLrErF__GGHfanRFCpfbOh6fvz4-aJv32h8OfDjUeZPSg@mail.gmail.com>
+Message-ID: <CAL_JsqLrErF__GGHfanRFCpfbOh6fvz4-aJv32h8OfDjUeZPSg@mail.gmail.com>
+Subject: Re: PROBLEM: Broken or delayed ethernet on Xilinx ZCU104 since 5.18 (regression)
+To: Nick Bowler <nbowler@draconx.ca>
+Cc: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	netdev@vger.kernel.org, regressions@lists.linux.dev
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-On Fri, Aug 4, 2023 at 10:46=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
-wrote:
+On Fri, Aug 4, 2023 at 9:27=E2=80=AFAM Nick Bowler <nbowler@draconx.ca> wro=
+te:
 >
-> tp->keepalive_probes can be set locklessly, readers
-> are already taking care of this field being potentially
-> set by other threads.
+> Hi,
 >
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> With recent kernels (5.18 and newer) the ethernet is all wonky on my
+> ZCU104 board.
+>
+> There is some behaviour inconsistency between kernel versions identified
+> during bisection, so maybe there is more than one issue with the ethernet=
+?
+>
+>   6.5-rc4: after 10 seconds, the following message is printed:
+>
+>     [   10.761808] platform ff0e0000.ethernet: deferred probe pending
+>
+>   but the network device seemingly never appears (I waited about a minute=
+).
+>
+>   6.1 and 6.4: after 10 seconds, the device suddenly appears and starts
+>   working (but this is way too late).
 
-Acked-by: Soheil Hassas Yeganeh <soheil@google.com>
+10 sec is probably the deferred probe timeout. You can set this to
+less time on the kernel command line.
 
-> ---
->  net/ipv4/tcp.c | 10 ++--------
->  1 file changed, 2 insertions(+), 8 deletions(-)
+>   5.18: the device never appears and no unusual messages are printed
+>   (I waited ten minutes).
 >
-> diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-> index 75d6359ee5750d8a867fb36ec2de960869d8c76a..e74a9593283c91aa23fe23fdd=
-125d4ba680a542c 100644
-> --- a/net/ipv4/tcp.c
-> +++ b/net/ipv4/tcp.c
-> @@ -3358,10 +3358,8 @@ int tcp_sock_set_keepcnt(struct sock *sk, int val)
->         if (val < 1 || val > MAX_TCP_KEEPCNT)
->                 return -EINVAL;
+> With 5.17 and earlier versions, the eth0 device appears without any delay=
+.
 >
-> -       lock_sock(sk);
->         /* Paired with READ_ONCE() in keepalive_probes() */
->         WRITE_ONCE(tcp_sk(sk)->keepalive_probes, val);
-> -       release_sock(sk);
->         return 0;
->  }
->  EXPORT_SYMBOL(tcp_sock_set_keepcnt);
-> @@ -3471,6 +3469,8 @@ int do_tcp_setsockopt(struct sock *sk, int level, i=
-nt optname,
->                 return tcp_sock_set_user_timeout(sk, val);
->         case TCP_KEEPINTVL:
->                 return tcp_sock_set_keepintvl(sk, val);
-> +       case TCP_KEEPCNT:
-> +               return tcp_sock_set_keepcnt(sk, val);
->         }
+> Unfortunately, as bisection closed on the problematic section, all the
+> built kernels became untestable as they appear to crash during early
+> boot.  Nevertheless, I manually selected a commit that sounded relevant:
 >
->         sockopt_lock_sock(sk);
-> @@ -3568,12 +3568,6 @@ int do_tcp_setsockopt(struct sock *sk, int level, =
-int optname,
->         case TCP_KEEPIDLE:
->                 err =3D tcp_sock_set_keepidle_locked(sk, val);
->                 break;
-> -       case TCP_KEEPCNT:
-> -               if (val < 1 || val > MAX_TCP_KEEPCNT)
-> -                       err =3D -EINVAL;
-> -               else
-> -                       WRITE_ONCE(tp->keepalive_probes, val);
-> -               break;
->         case TCP_SAVE_SYN:
->                 /* 0: disable, 1: enable, 2: start from ether_header */
->                 if (val < 0 || val > 2)
-> --
-> 2.41.0.640.ga95def55d0-goog
+>   commit e461bd6f43f4e568f7436a8b6bc21c4ce6914c36
+>   Author: Robert Hancock <robert.hancock@calian.com>
+>   Date:   Thu Jan 27 10:37:36 2022 -0600
 >
+>       arm64: dts: zynqmp: Added GEM reset definitions
+>
+> Reverting this fixes the problem on 5.18.  Reverting this fixes the
+> problem on 6.1.  Reverting this fixes the problem on 6.4.  In all of
+> these versions, with this change reverted, the network device appears
+> without delay.
+
+With the above change, the kernel is going to be waiting for the reset
+driver which either didn't exist or wasn't enabled in your config
+(maybe kconfig needs to be tweaked to enable it automatically).
+
+There's not really a better solution than the probe timeout when the
+DT was incomplete and new dependencies get added.
+
+> Unfortunately, it seems this is not sufficient to correct the problem on
+> 6.5-rc4 -- there is no apparent change in behaviour, so maybe there is
+> a new, different problem?
+
+Probably. You might check what changed with fw_devlink in that period.
+(Offhand, I don't recall many changes)
+
+> I guess I can kick off another bisection to find out when this revert
+> stops fixing things...
+
+That always helps.
+
+Rob
 
