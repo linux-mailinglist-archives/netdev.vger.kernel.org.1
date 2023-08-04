@@ -1,180 +1,170 @@
-Return-Path: <netdev+bounces-24505-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24506-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA7E4770668
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 18:55:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A23977066E
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 18:56:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 952BA2827F6
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 16:55:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7F9B71C2181A
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 16:56:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB2261AA60;
-	Fri,  4 Aug 2023 16:55:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DE101AA62;
+	Fri,  4 Aug 2023 16:56:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8D081802C
-	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 16:55:37 +0000 (UTC)
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 579A91994;
-	Fri,  4 Aug 2023 09:55:36 -0700 (PDT)
-Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 374GsCXR030477;
-	Fri, 4 Aug 2023 16:55:33 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=klf/zpAgkamTeULJUvE8a5qaeWINoTqzaeqh5+nOfiQ=;
- b=sjoM4JreZG3QFmIjBAlC+dkssSunLSK0UC+pGdI68GKc4UOGvaoz2vHSIJMPNZ7nEvPw
- 1QSBQSTCjna4KynYScdyXwYg00+dLK8wtwqrcXSWMcAjOxghZYoAPfhvrB3fJhbFj5ho
- 9FZqUfRv+H85bHiDiX6TBO5FFykU56JQLmbGku6PbOtjNsAcD/ZmriSGLIHU/caqc9jg
- X4svHT89prK1Fb7GwlhExcz8INcx6XEByP/8/lG8p7IdklU+eq79IGqROVd2M2FGsHLv
- 0hCjYO8vsbkJFiQwwDSOtDgV1o289RFAmBcNuyYNuhJKJNJ1Cia2+l/2G4FbrDXcE1Ll 0w== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3s955405ee-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 04 Aug 2023 16:55:32 +0000
-Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 374Glr3P005279;
-	Fri, 4 Aug 2023 16:55:31 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3s955405e1-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 04 Aug 2023 16:55:31 +0000
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 374G0YVW015848;
-	Fri, 4 Aug 2023 16:55:30 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3s8kn77ecm-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 04 Aug 2023 16:55:30 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 374GtRVX45810252
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 4 Aug 2023 16:55:27 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E676920049;
-	Fri,  4 Aug 2023 16:55:26 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id B04B220040;
-	Fri,  4 Aug 2023 16:55:26 +0000 (GMT)
-Received: from [9.155.208.153] (unknown [9.155.208.153])
-	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri,  4 Aug 2023 16:55:26 +0000 (GMT)
-Message-ID: <c493ef8fa5b735fe32be0c720be77db18e660dfb.camel@linux.ibm.com>
-Subject: Re: [PATCH net-next v3 0/2] net/smc: Fix effective buffer size
-From: Gerd Bayer <gbayer@linux.ibm.com>
-To: Wenjia Zhang <wenjia@linux.ibm.com>, Jan Karcher <jaka@linux.ibm.com>,
-        Tony Lu <tonylu@linux.alibaba.com>, Paolo Abeni <pabeni@redhat.com>
-Cc: Karsten Graul <kgraul@linux.ibm.com>,
-        "D . Wythe"
- <alibuda@linux.alibaba.com>,
-        Wen Gu <guwen@linux.alibaba.com>,
-        "David S .
- Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>,
-        linux-s390@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Date: Fri, 04 Aug 2023 18:55:26 +0200
-In-Reply-To: <20230804163049.937185-1-gbayer@linux.ibm.com>
-References: <20230804163049.937185-1-gbayer@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.4 (3.48.4-1.module_f38+17164+63eeee4a) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28FE1C2CA
+	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 16:56:19 +0000 (UTC)
+Received: from mail-wm1-x344.google.com (mail-wm1-x344.google.com [IPv6:2a00:1450:4864:20::344])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9C0049D8
+	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 09:56:07 -0700 (PDT)
+Received: by mail-wm1-x344.google.com with SMTP id 5b1f17b1804b1-3fe490c05c9so4932285e9.0
+        for <netdev@vger.kernel.org>; Fri, 04 Aug 2023 09:56:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1691168166; x=1691772966;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=1zH1gfAZL/CHXWhUKBOjRWmStytVRzUGZT7A4tTO4es=;
+        b=Iwt5fF26kFAKOEDoWE21JxOS6w1Ag4sQhIBKYJITAfYlSILdX1jvNUzcZ3NuLZG+3g
+         I4mg8INmtIQQuatK1qOmGW8v4i1Lc5BH6WrjNJ11Xt5NnmbQupW/bLmKd+vz7J4I7Xo2
+         xWAIDXzj3yfQmdDHOciLmU5zpCKqjr0KBWxinPffzUo+RD3khnJ5FgTHAbyyaPLKHTUb
+         cGbibjH5FxweXxul4Y+ow9fBLoRxsdQkVr5pST1x0c0xawcMBmoKYIXWicApAR0KsJ98
+         c5gdspe06MEnOVLtKpE9pJfhGA4zESuoB9UbQbreSh7BMK2KZwj/GAdu3ga6gWjLL9ZK
+         Xn3Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691168166; x=1691772966;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1zH1gfAZL/CHXWhUKBOjRWmStytVRzUGZT7A4tTO4es=;
+        b=F9Ptb2b5HC78xYAS2zHQg8fjllMDpJpdKldWSUPyO5bvZ8bfIOjOBZuDPV3i/vBwRt
+         INqgQ3EEL7+uGKRErlCrvikTIbl0CCgeQLotpZkay/pzNicqaI5r5CaYg0fViDzREC3/
+         WaYnednv0vbTQUp6HRjmUUTyEOvtoGI0KU2hIupZ2xrE7J1tvgXcpP/CLc0FNP04zEs7
+         KmTcy6lbe9lvxrwryr4SsOjS/koR5vvLSpL+rX6KkdufdKsJVpx6gxtsBd+H0T5WIhSn
+         OaRfG0PU9JHoAeUPDceCtJBhGTNi8dKuTg04jwYixuYZk9hJRaznt8iqc1BHKA9UbQDx
+         QBag==
+X-Gm-Message-State: AOJu0Yy5Zf2K0bVdRqKBzp8NVwsy68ommjUvhtoC0rVvoTYJnoIEviLR
+	7CeOuuZ2+TiO7P58IUjsZG/CHw==
+X-Google-Smtp-Source: AGHT+IGOvjd3Aba85DiZ9dQCEMUuiJQ4rHnqoYQ9tnOqgC10PPzUObF8ODN/dL+gVMemokXgWeuOng==
+X-Received: by 2002:adf:ebc7:0:b0:313:e2e3:d431 with SMTP id v7-20020adfebc7000000b00313e2e3d431mr159375wrn.12.1691168166141;
+        Fri, 04 Aug 2023 09:56:06 -0700 (PDT)
+Received: from localhost ([212.23.236.67])
+        by smtp.gmail.com with ESMTPSA id b12-20020a05600010cc00b0031432f1528csm2938483wrx.45.2023.08.04.09.56.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 04 Aug 2023 09:56:05 -0700 (PDT)
+Date: Fri, 4 Aug 2023 18:56:04 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: shaozhengchao <shaozhengchao@huawei.com>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	weiyongjun1@huawei.com, yuehaibing@huawei.com
+Subject: Re: [PATCH net-next 6/6] team: remove unused input parameters in
+ lb_htpm_select_tx_port and lb_hash_select_tx_port
+Message-ID: <ZM0tpBCYYmNPnwRI@nanopsycho>
+References: <20230804123116.2495908-1-shaozhengchao@huawei.com>
+ <20230804123116.2495908-7-shaozhengchao@huawei.com>
+ <ZM0A51WuvXQa67CS@nanopsycho>
+ <4b0bde83-5187-521d-e90b-1f36da541ce8@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: gDs8TKHLs1rXvMYKtcgSwtmA0biIi9m1
-X-Proofpoint-ORIG-GUID: aZkpbM4PmZs9UFOtWdyUelVQ4KL01Peb
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-08-04_16,2023-08-03_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- clxscore=1015 spamscore=0 mlxlogscore=647 adultscore=0 mlxscore=0
- priorityscore=1501 impostorscore=0 malwarescore=0 suspectscore=0
- phishscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2306200000 definitions=main-2308040149
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4b0bde83-5187-521d-e90b-1f36da541ce8@huawei.com>
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS,TRACKER_ID autolearn=ham autolearn_force=no
-	version=3.4.6
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, 2023-08-04 at 18:30 +0200, Gerd Bayer wrote:
-> Hi all,
->=20
-> commit 0227f058aa29 ("net/smc: Unbind r/w buffer size from clcsock
-> and make them tunable") started to derive the effective buffer size
-> for
-> SMC connections inconsistently in case a TCP fallback was used and
-> memory consumption of SMC with the default settings was doubled when
-> a connection negotiated SMC. That was not what we want.
->=20
-> This series consolidates the resulting effective buffer size that is
-> used with SMC sockets, which is based on Jan Karcher's effort (see=20
-> [1]). For all TCP exchanges (in particular in case of a fall back
-> when
-> no SMC connection was possible) the values from net.ipv4.tcp_[rw]mem
-> are used. If SMC succeeds in establishing a SMC connection, the newly
-> introduced values from net.smc.[rw]mem are used.
->=20
-> net.smc.[rw]mem is initialized to 64kB, respectively. Internal test=20
-> have show this to be a good compromise between throughput/latency=20
-> and memory consumption. Also net.smc.[rw]mem is now decoupled
-> completely
-> from any tuning through net.ipv4.tcp_[rw]mem.
->=20
-> If a user chose to tune a socket's receive or send buffer size with
-> setsockopt, this tuning is now consistently applied to either fall-
-> back
-> TCP or proper SMC connections over the socket.
->=20
-> Thanks,
-> Gerd=20
->=20
-> v2 - v3:
-> =C2=A0- Rebase to and resolve conflict of second patch with latest
-> net/master.
-> v1 - v2:
-> =C2=A0- In second patch, use sock_net() helper as suggested by Tony and
-> demanded
-> =C2=A0=C2=A0 by kernel test robot.
->=20
->=20
-> Gerd Bayer (2):
-> =C2=A0 net/smc: Fix setsockopt and sysctl to specify same buffer size
-> again
-> =C2=A0 net/smc: Use correct buffer sizes when switching between TCP and
-> SMC
->=20
-> =C2=A0net/smc/af_smc.c=C2=A0=C2=A0=C2=A0=C2=A0 | 77 +++++++++++++++++++++=
-+++++++++------------
-> --
-> =C2=A0net/smc/smc.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 2 +=
--
-> =C2=A0net/smc/smc_clc.c=C2=A0=C2=A0=C2=A0 |=C2=A0 4 +--
-> =C2=A0net/smc/smc_core.c=C2=A0=C2=A0 | 25 +++++++-------
-> =C2=A0net/smc/smc_sysctl.c | 10 ++++--
-> =C2=A05 files changed, 76 insertions(+), 42 deletions(-)
->=20
->=20
-> base-commit: 1733d0be68ab1b89358a3b0471ef425fd61de7c5
+Fri, Aug 04, 2023 at 04:06:39PM CEST, shaozhengchao@huawei.com wrote:
+>
+>
+>On 2023/8/4 21:45, Jiri Pirko wrote:
+>> Fri, Aug 04, 2023 at 02:31:16PM CEST, shaozhengchao@huawei.com wrote:
+>> > The input parameters "lb_priv" and "skb" in lb_htpm_select_tx_port and
+>> > lb_hash_select_tx_port are unused, so remove them.
+>> > 
+>> > Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
+>> > ---
+>> > drivers/net/team/team_mode_loadbalance.c | 10 ++--------
+>> > 1 file changed, 2 insertions(+), 8 deletions(-)
+>> > 
+>> > diff --git a/drivers/net/team/team_mode_loadbalance.c b/drivers/net/team/team_mode_loadbalance.c
+>> > index a6021ae51d0d..00f8989c29c0 100644
+>> > --- a/drivers/net/team/team_mode_loadbalance.c
+>> > +++ b/drivers/net/team/team_mode_loadbalance.c
+>> > @@ -30,8 +30,6 @@ static rx_handler_result_t lb_receive(struct team *team, struct team_port *port,
+>> > struct lb_priv;
+>> > 
+>> > typedef struct team_port *lb_select_tx_port_func_t(struct team *,
+>> > -						   struct lb_priv *,
+>> > -						   struct sk_buff *,
+>> > 						   unsigned char);
+>> > 
+>> > #define LB_TX_HASHTABLE_SIZE 256 /* hash is a char */
+>> > @@ -118,8 +116,6 @@ static void lb_tx_hash_to_port_mapping_null_port(struct team *team,
+>> > 
+>> > /* Basic tx selection based solely by hash */
+>> > static struct team_port *lb_hash_select_tx_port(struct team *team,
+>> > -						struct lb_priv *lb_priv,
+>> > -						struct sk_buff *skb,
+>> > 						unsigned char hash)
+>> > {
+>> > 	int port_index = team_num_to_port_index(team, hash);
+>> > @@ -129,8 +125,6 @@ static struct team_port *lb_hash_select_tx_port(struct team *team,
+>> > 
+>> > /* Hash to port mapping select tx port */
+>> > static struct team_port *lb_htpm_select_tx_port(struct team *team,
+>> > -						struct lb_priv *lb__priv,
+>> 
+>> Squash the previous patch in this one to avoid this odd "__" thing.
+>> 
+>> Thanks!
+>> 
+>Hi Jiri:
+>	Thank you for your review. I will change it and send v2.
 
-Oh boy,
+Did you hear about netdev rules by any chance?
 
-this should have gone as v3 against "net" instead of "net-next".
-Resending ASAP.
+https://www.kernel.org/doc/html/v6.5-rc4/process/maintainer-netdev.html?highlight=24h
 
-Sorry for the noise,
-Gerd
+Could you please read it?
 
+
+>
+>Zhengchao Shao
+>> 
+>> > -						struct sk_buff *skb,
+>> > 						unsigned char hash)
+>> > {
+>> > 	struct lb_priv *lb_priv = get_lb_priv(team);
+>> > @@ -140,7 +134,7 @@ static struct team_port *lb_htpm_select_tx_port(struct team *team,
+>> > 	if (likely(port))
+>> > 		return port;
+>> > 	/* If no valid port in the table, fall back to simple hash */
+>> > -	return lb_hash_select_tx_port(team, lb_priv, skb, hash);
+>> > +	return lb_hash_select_tx_port(team, hash);
+>> > }
+>> > 
+>> > struct lb_select_tx_port {
+>> > @@ -230,7 +224,7 @@ static bool lb_transmit(struct team *team, struct sk_buff *skb)
+>> > 
+>> > 	hash = lb_get_skb_hash(lb_priv, skb);
+>> > 	select_tx_port_func = rcu_dereference_bh(lb_priv->select_tx_port_func);
+>> > -	port = select_tx_port_func(team, lb_priv, skb, hash);
+>> > +	port = select_tx_port_func(team, hash);
+>> > 	if (unlikely(!port))
+>> > 		goto drop;
+>> > 	if (team_dev_queue_xmit(team, port, skb))
+>> > -- 
+>> > 2.34.1
+>> > 
+>> 
 
