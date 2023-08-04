@@ -1,126 +1,180 @@
-Return-Path: <netdev+bounces-24504-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24505-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9330C770664
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 18:54:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA7E4770668
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 18:55:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C44241C20CBC
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 16:54:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 952BA2827F6
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 16:55:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 589BC1AA60;
-	Fri,  4 Aug 2023 16:54:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB2261AA60;
+	Fri,  4 Aug 2023 16:55:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B38F198BA
-	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 16:54:43 +0000 (UTC)
-Received: from mail-vs1-xe36.google.com (mail-vs1-xe36.google.com [IPv6:2607:f8b0:4864:20::e36])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C42A746B1
-	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 09:54:41 -0700 (PDT)
-Received: by mail-vs1-xe36.google.com with SMTP id ada2fe7eead31-447a3d97d77so1018938137.1
-        for <netdev@vger.kernel.org>; Fri, 04 Aug 2023 09:54:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=draconx-ca.20221208.gappssmtp.com; s=20221208; t=1691168081; x=1691772881;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :references:in-reply-to:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=54IgYWW4ZMPvtaxEboRz9NGB20nt0nl5l0+8sVW/viE=;
-        b=RkYhRqCBnlpbJc3F1PcsJLhqGkhfrA75zJTFAgKcANVQv1aOAvoBh3BgwCIGCDbgxi
-         jXt5qs6zRhUu+PP8A7R0OvESoKJROFJb9vH5aHiNTmMJqUYbSMT/MAgrqDrkvghaT2Vs
-         WoaQA8OY/8l/hqeNs7B4G+huqW8n26EI/b3TjRqUWPHjvjPyyBxQei+f6voYCQHk9wpP
-         zRuoM+JszZ4m5WXvs38VretjXIV9lBiSJ7Ai54XvxMbO0u44hlF/Gk+U86FZ4gZZmpRe
-         3LAc6221tSH07bq+P2GleS79z1WQ4ASFQAJ6LzU+UA8e6Q22Gs73JsenMl5/qLSzJbIz
-         qtmQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691168081; x=1691772881;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :references:in-reply-to:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=54IgYWW4ZMPvtaxEboRz9NGB20nt0nl5l0+8sVW/viE=;
-        b=TS3EIxqgX9xE227eaXmaazf9/F9NgWumNodEhi0dGaBc1pbdu8Z/7feHf2NPJk9ho+
-         jdOOcc33aZ/BZgMV7CWHJb56eHN1+t5aIsLzOD+X2r3gD2wRRiLamxwCAvC0lDVJlf5N
-         KBQ6UdQYqOGQRbKj+2/96GaPkQWRYrwWZVxtk4YR9mzBSTt/6CHNQtP2VchZx49G2owd
-         t+/FkDntbApYAI0xY2l74gTDxIjVPV9TXTsP398vcDiIrIGrBw+CcGL9BX5jJ/wArNOX
-         +fe7y22aFPtCFU/wipjrCfaYUAKH5IQuypDpfHax1SAzKoyp8Rj2c+ZZmy4Q0jKpsC8J
-         Anig==
-X-Gm-Message-State: AOJu0Yzk9XHQC9dhbMqxuvrtY/EQIX/KDRbiCe+8PYRbEfBUpUjYwYcn
-	vEM4uysueWDWUH/1gh8CIQyeIGD6NQmp/HRuiD4o309uekliBp17
-X-Google-Smtp-Source: AGHT+IHKs1OgapRWNM/ErWvi+4Hrbz+MQG8ZgaBq+vxKTIFeKiht3rQXF6DXqsfPORXrYYOopdR8+sG6KMVuWIJ9N6A=
-X-Received: by 2002:a67:fb99:0:b0:447:8d49:bfe9 with SMTP id
- n25-20020a67fb99000000b004478d49bfe9mr1753068vsr.24.1691168080821; Fri, 04
- Aug 2023 09:54:40 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8D081802C
+	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 16:55:37 +0000 (UTC)
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 579A91994;
+	Fri,  4 Aug 2023 09:55:36 -0700 (PDT)
+Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 374GsCXR030477;
+	Fri, 4 Aug 2023 16:55:33 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=klf/zpAgkamTeULJUvE8a5qaeWINoTqzaeqh5+nOfiQ=;
+ b=sjoM4JreZG3QFmIjBAlC+dkssSunLSK0UC+pGdI68GKc4UOGvaoz2vHSIJMPNZ7nEvPw
+ 1QSBQSTCjna4KynYScdyXwYg00+dLK8wtwqrcXSWMcAjOxghZYoAPfhvrB3fJhbFj5ho
+ 9FZqUfRv+H85bHiDiX6TBO5FFykU56JQLmbGku6PbOtjNsAcD/ZmriSGLIHU/caqc9jg
+ X4svHT89prK1Fb7GwlhExcz8INcx6XEByP/8/lG8p7IdklU+eq79IGqROVd2M2FGsHLv
+ 0hCjYO8vsbkJFiQwwDSOtDgV1o289RFAmBcNuyYNuhJKJNJ1Cia2+l/2G4FbrDXcE1Ll 0w== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3s955405ee-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 04 Aug 2023 16:55:32 +0000
+Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 374Glr3P005279;
+	Fri, 4 Aug 2023 16:55:31 GMT
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3s955405e1-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 04 Aug 2023 16:55:31 +0000
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 374G0YVW015848;
+	Fri, 4 Aug 2023 16:55:30 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3s8kn77ecm-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 04 Aug 2023 16:55:30 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 374GtRVX45810252
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 4 Aug 2023 16:55:27 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id E676920049;
+	Fri,  4 Aug 2023 16:55:26 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id B04B220040;
+	Fri,  4 Aug 2023 16:55:26 +0000 (GMT)
+Received: from [9.155.208.153] (unknown [9.155.208.153])
+	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Fri,  4 Aug 2023 16:55:26 +0000 (GMT)
+Message-ID: <c493ef8fa5b735fe32be0c720be77db18e660dfb.camel@linux.ibm.com>
+Subject: Re: [PATCH net-next v3 0/2] net/smc: Fix effective buffer size
+From: Gerd Bayer <gbayer@linux.ibm.com>
+To: Wenjia Zhang <wenjia@linux.ibm.com>, Jan Karcher <jaka@linux.ibm.com>,
+        Tony Lu <tonylu@linux.alibaba.com>, Paolo Abeni <pabeni@redhat.com>
+Cc: Karsten Graul <kgraul@linux.ibm.com>,
+        "D . Wythe"
+ <alibuda@linux.alibaba.com>,
+        Wen Gu <guwen@linux.alibaba.com>,
+        "David S .
+ Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>,
+        linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Date: Fri, 04 Aug 2023 18:55:26 +0200
+In-Reply-To: <20230804163049.937185-1-gbayer@linux.ibm.com>
+References: <20230804163049.937185-1-gbayer@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.4 (3.48.4-1.module_f38+17164+63eeee4a) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Received: by 2002:ab0:6209:0:b0:794:1113:bb24 with HTTP; Fri, 4 Aug 2023
- 09:54:40 -0700 (PDT)
-X-Originating-IP: [24.53.241.2]
-In-Reply-To: <CADyTPEwgG0=R_b5DNBP0J0auDXu2BNTOwkSUFg-s7pLJUPC+Tg@mail.gmail.com>
-References: <CADyTPEzqf8oQAPSFRWJLxAhd-WE4fX2zdoe9Vu6V9hZMn1Yc8g@mail.gmail.com>
- <CAL_JsqLrErF__GGHfanRFCpfbOh6fvz4-aJv32h8OfDjUeZPSg@mail.gmail.com> <CADyTPEwgG0=R_b5DNBP0J0auDXu2BNTOwkSUFg-s7pLJUPC+Tg@mail.gmail.com>
-From: Nick Bowler <nbowler@draconx.ca>
-Date: Fri, 4 Aug 2023 12:54:40 -0400
-Message-ID: <CADyTPExgjcaUeKiR108geQhr0KwFC0A8qa_n_ST2RxhbSczomQ@mail.gmail.com>
-Subject: Re: PROBLEM: Broken or delayed ethernet on Xilinx ZCU104 since 5.18 (regression)
-To: Rob Herring <robh@kernel.org>
-Cc: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	netdev@vger.kernel.org, regressions@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: gDs8TKHLs1rXvMYKtcgSwtmA0biIi9m1
+X-Proofpoint-ORIG-GUID: aZkpbM4PmZs9UFOtWdyUelVQ4KL01Peb
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-08-04_16,2023-08-03_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ clxscore=1015 spamscore=0 mlxlogscore=647 adultscore=0 mlxscore=0
+ priorityscore=1501 impostorscore=0 malwarescore=0 suspectscore=0
+ phishscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2306200000 definitions=main-2308040149
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS,TRACKER_ID autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 2023-08-04, Nick Bowler <nbowler@draconx.ca> wrote:
-> On 04/08/2023, Rob Herring <robh@kernel.org> wrote:
->> On Fri, Aug 4, 2023 at 9:27=E2=80=AFAM Nick Bowler <nbowler@draconx.ca> =
-wrote:
->>>   commit e461bd6f43f4e568f7436a8b6bc21c4ce6914c36
->>>   Author: Robert Hancock <robert.hancock@calian.com>
->>>   Date:   Thu Jan 27 10:37:36 2022 -0600
->>>
->>>       arm64: dts: zynqmp: Added GEM reset definitions
->>>
->>> Reverting this fixes the problem on 5.18.  Reverting this fixes the
->>> problem on 6.1.  Reverting this fixes the problem on 6.4.  In all of
->>> these versions, with this change reverted, the network device appears
->>> without delay.
->>
->> With the above change, the kernel is going to be waiting for the reset
->> driver which either didn't exist or wasn't enabled in your config
->> (maybe kconfig needs to be tweaked to enable it automatically).
->
-> The dts defines a reset-controller node with
->
->   compatible =3D "xlnx,zynqmp-reset"
->
-> As far as I can see, this is supposed to be handled by the code in
-> drivers/reset/zynqmp-reset.c driver, it is enabled by CONFIG_ARCH_ZYNQMP,
-> and I have that set to "y", and it appears to be getting compiled in (tha=
-t
-> is, there is a drivers/reset/zynqmp-reset.o file in the build directory).
+On Fri, 2023-08-04 at 18:30 +0200, Gerd Bayer wrote:
+> Hi all,
+>=20
+> commit 0227f058aa29 ("net/smc: Unbind r/w buffer size from clcsock
+> and make them tunable") started to derive the effective buffer size
+> for
+> SMC connections inconsistently in case a TCP fallback was used and
+> memory consumption of SMC with the default settings was doubled when
+> a connection negotiated SMC. That was not what we want.
+>=20
+> This series consolidates the resulting effective buffer size that is
+> used with SMC sockets, which is based on Jan Karcher's effort (see=20
+> [1]). For all TCP exchanges (in particular in case of a fall back
+> when
+> no SMC connection was possible) the values from net.ipv4.tcp_[rw]mem
+> are used. If SMC succeeds in establishing a SMC connection, the newly
+> introduced values from net.smc.[rw]mem are used.
+>=20
+> net.smc.[rw]mem is initialized to 64kB, respectively. Internal test=20
+> have show this to be a good compromise between throughput/latency=20
+> and memory consumption. Also net.smc.[rw]mem is now decoupled
+> completely
+> from any tuning through net.ipv4.tcp_[rw]mem.
+>=20
+> If a user chose to tune a socket's receive or send buffer size with
+> setsockopt, this tuning is now consistently applied to either fall-
+> back
+> TCP or proper SMC connections over the socket.
+>=20
+> Thanks,
+> Gerd=20
+>=20
+> v2 - v3:
+> =C2=A0- Rebase to and resolve conflict of second patch with latest
+> net/master.
+> v1 - v2:
+> =C2=A0- In second patch, use sock_net() helper as suggested by Tony and
+> demanded
+> =C2=A0=C2=A0 by kernel test robot.
+>=20
+>=20
+> Gerd Bayer (2):
+> =C2=A0 net/smc: Fix setsockopt and sysctl to specify same buffer size
+> again
+> =C2=A0 net/smc: Use correct buffer sizes when switching between TCP and
+> SMC
+>=20
+> =C2=A0net/smc/af_smc.c=C2=A0=C2=A0=C2=A0=C2=A0 | 77 +++++++++++++++++++++=
++++++++++------------
+> --
+> =C2=A0net/smc/smc.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 2 +=
+-
+> =C2=A0net/smc/smc_clc.c=C2=A0=C2=A0=C2=A0 |=C2=A0 4 +--
+> =C2=A0net/smc/smc_core.c=C2=A0=C2=A0 | 25 +++++++-------
+> =C2=A0net/smc/smc_sysctl.c | 10 ++++--
+> =C2=A05 files changed, 76 insertions(+), 42 deletions(-)
+>=20
+>=20
+> base-commit: 1733d0be68ab1b89358a3b0471ef425fd61de7c5
 
-Oh, I get it, to include this driver I need to also enable:
+Oh boy,
 
-  CONFIG_RESET_CONTROLLER=3Dy
+this should have gone as v3 against "net" instead of "net-next".
+Resending ASAP.
 
-Setting this fixes 6.4.  Perhaps CONFIG_ARCH_ZYNQMP should select it?
-I guess the reset-zynqmp.o file that was in my build directory must
-have been leftover garbage from a long time ago.
+Sorry for the noise,
+Gerd
 
-However, even with this option enabled, 6.5-rc4 remains broken (no
-change in behaviour wrt. the network device).  I will bisect this
-now.
-
-Cheers,
-  Nick
 
