@@ -1,170 +1,196 @@
-Return-Path: <netdev+bounces-24425-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24399-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF7FA770259
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 15:55:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86DA077017A
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 15:28:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 35FE81C2186C
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 13:55:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 02738282679
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 13:28:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A87FC2DD;
-	Fri,  4 Aug 2023 13:55:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1EF6BE7B;
+	Fri,  4 Aug 2023 13:28:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F14BBE7B
-	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 13:55:55 +0000 (UTC)
-Received: from out1-smtp.messagingengine.com (out1-smtp.messagingengine.com [66.111.4.25])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC8E51990;
-	Fri,  4 Aug 2023 06:55:50 -0700 (PDT)
-Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
-	by mailout.nyi.internal (Postfix) with ESMTP id 2E9CE5C0140;
-	Fri,  4 Aug 2023 09:24:13 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute4.internal (MEProxy); Fri, 04 Aug 2023 09:24:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:sender:subject
-	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-	:x-sasl-enc; s=fm3; t=1691155453; x=1691241853; bh=pJgUfuzwp2Plw
-	j/vIlzlhZLLY3But/roBXSqjo4nu/c=; b=1KtCmIz6+wCPyTbyMCiknH/MxS6Tp
-	1MqI3ACSZkoIQYejSLXXjmn2piqvZzK67qAi/DM9qLPq/Wr1vZl+Js8aN0082e7+
-	fhCdqW6wV7cIcGSdWihNAz/ZZvgtvSi5o30G9d47wMjHfqN0KSq0fnb+eG9omvIS
-	4S9vduEUbnHb0aH+zhJem6arkmNOJbfTqR9en5ce70uHjMhk8VsDhzoFrRY2swUf
-	STNSAluJGUu6eUnS+aTblWE5ESxsXbjUeZkrARVapRBJV3HmTWkqKuHOgWEMXdSV
-	WOJ9oLSKA6QjTnQJWh1hL/ld+OodUx3TUN8op6cjhuc8HuMHaBy/GmBhw==
-X-ME-Sender: <xms:_PvMZKysGiyXN0tJxC_5GZvEztQDNwD0Oqs9gYYriwTke3UOaW2P5A>
-    <xme:_PvMZGQpBF0nnwXFECqDb_4iq5p06g210OdpB_3R4fszMOkd6jYNRaIPgdQubpajs
-    N4zEQ4e_dTOTdM>
-X-ME-Received: <xmr:_PvMZMXPhS_39KEi4UnBMO4gSgGX0tXPpl0uyjLP9a-K4E1oOtkuFrLBMreeGDRS5_DObdZFHX4az8gYpcfE76aQsGP-sw>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrkeeggdeifecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
-    fjughrpeffhffvvefukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpefkughoucfu
-    tghhihhmmhgvlhcuoehiughoshgthhesihguohhstghhrdhorhhgqeenucggtffrrghtth
-    gvrhhnpedvteehheeiieekjeffudekhfdthfevudettdelgeehveegteeflefhvdehieeg
-    jeenucffohhmrghinhepkhgvrhhnvghlrdhorhhgpdhlihhnuhigthgvshhtihhnghdroh
-    hrghenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehi
-    ughoshgthhesihguohhstghhrdhorhhg
-X-ME-Proxy: <xmx:_PvMZAjhIxkuv5x6bR_Mi1Ng8r1H5BBpHXMN87BABaCgIWX64oNV8A>
-    <xmx:_PvMZMDEF5B6Bv1ht3LqRIUB1SERNZB4GSZQJ9mEL1iysg-eyeF59g>
-    <xmx:_PvMZBLiyRYJPWDqNlP31sMR1xGozjZK8uleMU4i4K7V0h7pAA3XbA>
-    <xmx:_fvMZI0zjFlKtKPPQuXsnC9a9epchcjdRx1xC_Ct5GQIyIgzG1emiQ>
-Feedback-ID: i494840e7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 4 Aug 2023 09:24:11 -0400 (EDT)
-Date: Fri, 4 Aug 2023 16:24:08 +0300
-From: Ido Schimmel <idosch@idosch.org>
-To: Fedor Pchelkin <pchelkin@ispras.ru>
-Cc: Roopa Prabhu <roopa@nvidia.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3039BE6E
+	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 13:28:27 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1809F3598
+	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 06:28:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1691155696;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=MaywohC+LFSW7AF7nVGv9yHzowQamawqHZwaoNWo3B0=;
+	b=Wp3jRJNOJpPJqUudx/bFrISGgPURd/ZN3UsrcKy63Xbhkbw3rVn9HYIR7M0qX/AP6+K2eQ
+	Pv4QFrNXx5TnMnj24rULObOw1voIrkf+25N6x0lLPlEmyVqnJcTVulKKK5QMRQ712W+iVs
+	5BrKc4y7Ns1tVfFBhXadSccGv4y2/bM=
+Received: from mail-oo1-f69.google.com (mail-oo1-f69.google.com
+ [209.85.161.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-518-LDq8H02-MA2Qqi6T6rq8zA-1; Fri, 04 Aug 2023 09:28:14 -0400
+X-MC-Unique: LDq8H02-MA2Qqi6T6rq8zA-1
+Received: by mail-oo1-f69.google.com with SMTP id 006d021491bc7-56d43b5863fso1663882eaf.0
+        for <netdev@vger.kernel.org>; Fri, 04 Aug 2023 06:28:14 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691155694; x=1691760494;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=MaywohC+LFSW7AF7nVGv9yHzowQamawqHZwaoNWo3B0=;
+        b=LKfWtA95DmKgCpkTxnFYLEIyQA8q+Vd96/mi5dAPlIOZQUKOau3u/g+l1f3sd7FaSy
+         5XA7PxSjUnmDg7kjfoxVAHTnpTjasEC7AiMSUe5QNWqNTO3fo0LLbwhrbs631lQC0qZz
+         vMLt5DdtNrFGQq/brVGoy2sluyl4G3DCAPq+/tWandROlSxjEy41HHBJ5LSR9EZ4RpIl
+         aW34AaAkCPKpl9sM8jD0qdKKDgjSEqi9V7EXc6I/ERX2sBvEh1lcA8Av26At6ACZXkFr
+         XDX4qvWZzZcAeS2HzuCi+jq21SqEcBjtdDpdPpEI+zkaNuV/bRGn8qNX7fzxmx8HXhAg
+         mRWw==
+X-Gm-Message-State: AOJu0YwD6RyibPpsmfMwVA4+2fflf5oJOuncKwCEN8iZtWMKIjzUZ+xT
+	gj7nkjfi/khabLpuSPlQB1GrMYcBsxKU5R3ltmmDSKFMIPV9jiwjmBw0Ty7riARtEtZwHlmepzS
+	KRj9y1JrWLps+6cwD
+X-Received: by 2002:aca:90e:0:b0:3a7:5327:b38e with SMTP id 14-20020aca090e000000b003a75327b38emr1804319oij.39.1691155693983;
+        Fri, 04 Aug 2023 06:28:13 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEXYwMED4nkJFgaoRaWCsJQatWRY5bbMvaEPJcytTfZDIMrL14uAu8ltS1chCmTD6xPCLaeog==
+X-Received: by 2002:aca:90e:0:b0:3a7:5327:b38e with SMTP id 14-20020aca090e000000b003a75327b38emr1804293oij.39.1691155693643;
+        Fri, 04 Aug 2023 06:28:13 -0700 (PDT)
+Received: from debian ([2001:4649:fcb8:0:dc2e:5d37:b73a:3fff])
+        by smtp.gmail.com with ESMTPSA id n7-20020a0cdc87000000b0063d152e5d9asm654103qvk.120.2023.08.04.06.28.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 04 Aug 2023 06:28:13 -0700 (PDT)
+Date: Fri, 4 Aug 2023 15:28:08 +0200
+From: Guillaume Nault <gnault@redhat.com>
+To: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Alexey Khoroshilov <khoroshilov@ispras.ru>,
-	lvc-project@linuxtesting.org
-Subject: Re: [PATCH] drivers: vxlan: vnifilter: free percpu vni stats on
- error path
-Message-ID: <ZMz7+Mk+OYj4q8xe@shredder>
-References: <20230803193834.23340-1-pchelkin@ispras.ru>
+	Eric Dumazet <edumazet@google.com>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Alexei Starovoitov <ast@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org,
+	bpf@vger.kernel.org, stable@vger.kernel.org,
+	Siwar Zitouni <siwar.zitouni@6wind.com>
+Subject: Re: [PATCH net v2] net: handle ARPHRD_PPP in dev_is_mac_header_xmit()
+Message-ID: <ZMz86ADsBWV1gAal@debian>
+References: <20230802122106.3025277-1-nicolas.dichtel@6wind.com>
+ <ZMtpSdLUQx2A6bdx@debian>
+ <34f246ba-3ebc-1257-fe8d-5b7e0670a4a6@6wind.com>
+ <ZMuI5mxR704O9nDq@debian>
+ <62a8762c-40b4-f03f-ca8f-13d33db84f10@6wind.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20230803193834.23340-1-pchelkin@ispras.ru>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_PASS,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <62a8762c-40b4-f03f-ca8f-13d33db84f10@6wind.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Prefix should be "PATCH net". See:
-https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
+On Thu, Aug 03, 2023 at 02:22:17PM +0200, Nicolas Dichtel wrote:
+> Le 03/08/2023 à 13:00, Guillaume Nault a écrit :
+> > On Thu, Aug 03, 2023 at 11:37:00AM +0200, Nicolas Dichtel wrote:
+> >> Le 03/08/2023 à 10:46, Guillaume Nault a écrit :
+> >>> On Wed, Aug 02, 2023 at 02:21:06PM +0200, Nicolas Dichtel wrote:
+> >>>> This kind of interface doesn't have a mac header.
+> >>>
+> >>> Well, PPP does have a link layer header.
+> >> It has a link layer, but not an ethernet header.
+> > 
+> > This is generic code. The layer two protocol involved doesn't matter.
+> > What matter is that the device requires a specific l2 header.
+> Ok. Note, that addr_len is set to 0 for these devices:
+> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/net/ppp/ppp_generic.c#n1614
 
-On Thu, Aug 03, 2023 at 10:38:32PM +0300, Fedor Pchelkin wrote:
-> In case rhashtable_lookup_insert_fast() fails inside vxlan_vni_add(), the
-> allocated percpu vni stats are not freed on the error path.
+PPP has no hardware address. It doesn't need any since it's point to
+point. But it still has an l2 header.
+
+> >>> Do you instead mean that PPP automatically adds it?
+> >>>
+> >>>> This patch fixes bpf_redirect() to a ppp interface.
+> >>>
+> >>> Can you give more details? Which kind of packets are you trying to
+> >>> redirect to PPP interfaces?
+> >> My ebpf program redirect an IP packet (eth / ip) from a physical ethernet device
+> >> at ingress to a ppp device at egress.
+> > 
+> > So you're kind of bridging two incompatible layer two protocols.
+> > I see no reason to be surprised if that doesn't work out of the box.
+> I don't see the difference with a gre or ip tunnel. This kind of "bridging" is
+> supported.
+
+From a protocol point of view, this feature just needs to strip the l2
+header (or add it for the other way around). Here we have to remove the
+previous l2 header, then add a new one of a different kind.
+
+But honestly, even for the l3-tunnel<->Ethernet "bridging", I don't
+really like how the code tries to be too clever. It'd have been much
+simpler to just require the user to drop the l2 headers explicitely.
+Anyway, that ship has sailed.
+
+> > Let me be clearer too. As I said, this patch may be the best we can do.
+> > Making a proper l2 generic BPF-redirect/TC-mirred might require too
+> > much work for the expected gain (how many users of non-Ethernet l2
+> > devices are going to use this). But at least we should make it clear in
+> > the commit message and in the code why we're finding it convenient to
+> > treat PPP as an l3 device. Like
+> > 
+> > +	/* PPP adds its l2 header automatically in ppp_start_xmit().
+> > +	 * This makes it look like an l3 device to __bpf_redirect() and
+> > +	 * tcf_mirred_init().
+> > +	 */
+> > +	case ARPHRD_PPP:
+> I better understand your point with this comment, I can add it, no problem.
+> But I fail to see why it is different from a L3 device. ip, gre, etc. tunnels
+> also add automatically another header (ipip.c has dev->addr_len configured to 4,
+> ip6_tunnels.c to 16, etc.).
+
+These are encapsulation protocols. They glue the inner and outer
+packets together. PPP doesn't do that, it's just an l2 protocol.
+To encapsulate PPP into IP or UDP, you need another protocol, like
+L2TP.
+
+We can compare GRE or IPIP to L2TP (to some extend), not to PPP.
+
+> A tcpdump on the physical output interface shows the same kind of packets (the
+> outer hdr (ppp / ip / etc.) followed by the encapsulated packet and a tcpdump on
+> the ppp or ip tunnel device shows only the inner packet.
+
+Packets captured on ppp interfaces seem to be a bit misleading. They
+don't show the l2-header, but the "Linux cooked capture" header
+instead. I don't know the reasoning behind that, maybe to help people
+differenciate between Rx and Tx packets. Anyway, that's different from
+the raw IP packets captured on ipip devices for example.
+
+Really, PPP isn't like any ip tunnel protocol. It's just not an
+encapsulation protocol. PPP is like Ethernet. And just like Ethernet,
+it can be encapsulated by tunnels, but that requires a separate
+tunneling protocol. As an example, Ethernet has VXLAN and PPP has L2TP.
+
+> Without my patch, a redirect from a ppp interface to another ppp interface would
+> have the same problem.
+
+True, but that's because the PPP code is so old and unmaintained, it
+hasn't evolved with the rest of the networking stack. And again, I
+agree that your patch is the easiest way to make it work. But it will
+also expose inconsistencies in how BPF and tc-mirred handle different
+l2 protocols. That makes the logic hard to get from a developper point
+of view and that's why I'm asking for a better commit message and some
+comments in the code. For the user space inconsistencies, well, I guess
+nobody will really care :(.
+
+> Regards,
+> Nicolas
 > 
-> Free them on the rhashtable_lookup_insert_fast() error path in
-> vxlan_vni_add().
-> 
-> Found by Linux Verification Center (linuxtesting.org).
-> 
-> Fixes: 4095e0e1328a ("drivers: vxlan: vnifilter: per vni stats")
-> Signed-off-by: Fedor Pchelkin <pchelkin@ispras.ru>
-> ---
->  drivers/net/vxlan/vxlan_vnifilter.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/drivers/net/vxlan/vxlan_vnifilter.c b/drivers/net/vxlan/vxlan_vnifilter.c
-> index a3de081cda5e..321cd0b450cc 100644
-> --- a/drivers/net/vxlan/vxlan_vnifilter.c
-> +++ b/drivers/net/vxlan/vxlan_vnifilter.c
-> @@ -740,6 +740,7 @@ static int vxlan_vni_add(struct vxlan_dev *vxlan,
->  					    &vninode->vnode,
->  					    vxlan_vni_rht_params);
->  	if (err) {
-> +		free_percpu(vninode->stats);
 
-This oversight (and future ones) wouldn't have happened if
-vxlan_vni_alloc() had a corresponding vxlan_vni_free(). I suggest
-something like [1].
-
-BTW, I think the GFP_ATOMIC in vxlan_vni_alloc() should be GFP_KERNEL. I
-will take care of it in net-next.
-
->  		kfree(vninode);
->  		return err;
->  	}
-> -- 
-> 2.41.0
-
-[1]
-diff --git a/drivers/net/vxlan/vxlan_vnifilter.c b/drivers/net/vxlan/vxlan_vnifilter.c
-index a3de081cda5e..c3ff30ab782e 100644
---- a/drivers/net/vxlan/vxlan_vnifilter.c
-+++ b/drivers/net/vxlan/vxlan_vnifilter.c
-@@ -713,6 +713,12 @@ static struct vxlan_vni_node *vxlan_vni_alloc(struct vxlan_dev *vxlan,
-        return vninode;
- }
- 
-+static void vxlan_vni_free(struct vxlan_vni_node *vninode)
-+{
-+       free_percpu(vninode->stats);
-+       kfree(vninode);
-+}
-+
- static int vxlan_vni_add(struct vxlan_dev *vxlan,
-                         struct vxlan_vni_group *vg,
-                         u32 vni, union vxlan_addr *group,
-@@ -740,7 +746,7 @@ static int vxlan_vni_add(struct vxlan_dev *vxlan,
-                                            &vninode->vnode,
-                                            vxlan_vni_rht_params);
-        if (err) {
--               kfree(vninode);
-+               vxlan_vni_free(vninode);
-                return err;
-        }
- 
-@@ -763,8 +769,7 @@ static void vxlan_vni_node_rcu_free(struct rcu_head *rcu)
-        struct vxlan_vni_node *v;
- 
-        v = container_of(rcu, struct vxlan_vni_node, rcu);
--       free_percpu(v->stats);
--       kfree(v);
-+       vxlan_vni_free(v);
- }
- 
- static int vxlan_vni_del(struct vxlan_dev *vxlan,
 
