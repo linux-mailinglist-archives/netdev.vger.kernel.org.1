@@ -1,389 +1,186 @@
-Return-Path: <netdev+bounces-24473-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24474-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD3C177040D
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 17:09:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D95C1770414
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 17:09:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0C1BE1C20A5A
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 15:09:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 086F21C21804
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 15:09:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 851D31988A;
-	Fri,  4 Aug 2023 15:06:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A172612B66;
+	Fri,  4 Aug 2023 15:09:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 754EA1AA66
-	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 15:06:24 +0000 (UTC)
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA43149D6;
-	Fri,  4 Aug 2023 08:06:14 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 180BA21892;
-	Fri,  4 Aug 2023 15:06:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-	t=1691161573; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=OkPMFyTxTaVld9drnJlwQB73X9hoguASDIsCqQgORSI=;
-	b=ZUcSVI4x7dqV+ZETnU+id9ax1nx9ZTaMtx51p/+hjxZRqbWAXJPoU52zzEz2LVRUGOSWzx
-	LbCqmCs1dFWwmyd8/S76jVtcClRTYUa7w0kocGCYI3+25i/7rncX/y9NyihbJq/anWoPUz
-	1ekWch33SVvcjQQnoYYWDTZN8HnYD7w=
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-	(No client certificate requested)
-	by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id D745D133B5;
-	Fri,  4 Aug 2023 15:06:12 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-	by imap2.suse-dmz.suse.de with ESMTPSA
-	id kFPFM+QTzWRwSQAAMHmgww
-	(envelope-from <petr.pavlu@suse.com>); Fri, 04 Aug 2023 15:06:12 +0000
-From: Petr Pavlu <petr.pavlu@suse.com>
-To: tariqt@nvidia.com,
-	yishaih@nvidia.com,
-	leon@kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	jgg@ziepe.ca,
-	netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Petr Pavlu <petr.pavlu@suse.com>
-Subject: [PATCH net-next 10/10] mlx4: Delete custom device management logic
-Date: Fri,  4 Aug 2023 17:05:27 +0200
-Message-Id: <20230804150527.6117-11-petr.pavlu@suse.com>
-X-Mailer: git-send-email 2.35.3
-In-Reply-To: <20230804150527.6117-1-petr.pavlu@suse.com>
-References: <20230804150527.6117-1-petr.pavlu@suse.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ED14CA6E
+	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 15:09:55 +0000 (UTC)
+Received: from EUR02-VI1-obe.outbound.protection.outlook.com (mail-vi1eur02on2057.outbound.protection.outlook.com [40.107.241.57])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0F324C05;
+	Fri,  4 Aug 2023 08:09:28 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=n6ul/sbE9l4Zl7OpCJPpZQHpRrD066c1giEoumNYCYjk0Fr1wAa/YkQWTfUZSOWmE088QxmINlVfJOLak+JBP57S7q/VGNorXZhs+hfthwyGCvFkL4eXncUJlhXg1xEkyUeGLyY7VjBZVdwXse9vVbRNK6a78NXuvB6wsncD49kMxGeY8JbH8ZQ858iNN/xrgaDfRz60yF2529B85Per4RXiNfR8xtnbT+T+lxDjhsVS9gejOrJTO+HTshKPvCZ7RovJscgaNbsKXCgNWYyKgZR0RpV9YMhAZyyUZjj5CJRg0H8ZjvWO1a5FCPbJ2KyB6YLnrxi+EkAPOfaEjFMeRw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=J76+y6Nww2N39iFBmfZQ7ChqR5jp/K3julaLCHkHVqE=;
+ b=mnhTyL/vdxV2oWMyh+YjklalcF+eBpLE/SSXmIhPwTK7azfT6QCTZcjVeNFmur+HLMZpmkTCVRWPRRjJv9irFCBFw7q3w6kvKzeJI9ZC/O5a6taI71pBzg9MZP14M/0PgxtDXYncoT+xqxe8gh1DbOLLbFw2/PLrQzUeqfnx0ApSbIaDN3He6GLfsHEF0VKZU7Qh8540zjfoWZVsCYHJpH5/NsZro0I0f08INaX6p0Jw+sSed6D3PWlU2zpRR73TUpo/HyjvYj1o1ietL3+mW5azVZbFcIL/bq4eot5WfCCCLGM/rTzw+AVtLQKgRA91daxSiLVq2CvfslWkp/MRkQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=J76+y6Nww2N39iFBmfZQ7ChqR5jp/K3julaLCHkHVqE=;
+ b=VLk8C42mOoDjhzKI6v28+AhMFFIhs5VmvwWcCVofg6554N2NG0BAXeFc3KCA6C8Jc9vINxQZIlXJnuuQetmz8vH7szTzVQqWN5HKUs9nWpMrw8ZupiodoPyDIya57NicW+rPQexZozY9Eekx992TCx3rdT2yLpiynTrqUudz4RQ=
+Received: from PAXPR04MB9185.eurprd04.prod.outlook.com (2603:10a6:102:231::11)
+ by AM8PR04MB7763.eurprd04.prod.outlook.com (2603:10a6:20b:246::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.21; Fri, 4 Aug
+ 2023 15:08:57 +0000
+Received: from PAXPR04MB9185.eurprd04.prod.outlook.com
+ ([fe80::d4ee:8daa:92f4:9671]) by PAXPR04MB9185.eurprd04.prod.outlook.com
+ ([fe80::d4ee:8daa:92f4:9671%3]) with mapi id 15.20.6631.046; Fri, 4 Aug 2023
+ 15:08:56 +0000
+From: Shenwei Wang <shenwei.wang@nxp.com>
+To: Russell King <linux@armlinux.org.uk>
+CC: Marc Kleine-Budde <mkl@pengutronix.de>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin
+	<mcoquelin.stm32@gmail.com>, Shawn Guo <shawnguo@kernel.org>, Sascha Hauer
+	<s.hauer@pengutronix.de>, Neil Armstrong <neil.armstrong@linaro.org>, Kevin
+ Hilman <khilman@baylibre.com>, Vinod Koul <vkoul@kernel.org>, Chen-Yu Tsai
+	<wens@csie.org>, Jernej Skrabec <jernej.skrabec@gmail.com>, Samuel Holland
+	<samuel@sholland.org>, Giuseppe Cavallaro <peppe.cavallaro@st.com>, Alexandre
+ Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>, Fabio Estevam
+	<festevam@gmail.com>, dl-linux-imx <linux-imx@nxp.com>, Jerome Brunet
+	<jbrunet@baylibre.com>, Martin Blumenstingl
+	<martin.blumenstingl@googlemail.com>, Bhupesh Sharma
+	<bhupesh.sharma@linaro.org>, Nobuhiro Iwamatsu
+	<nobuhiro1.iwamatsu@toshiba.co.jp>, Simon Horman <simon.horman@corigine.com>,
+	Andrew Halaney <ahalaney@redhat.com>, Bartosz Golaszewski
+	<bartosz.golaszewski@linaro.org>, Wong Vee Khee <veekhee@apple.com>, Revanth
+ Kumar Uppala <ruppala@nvidia.com>, Jochen Henneberg
+	<jh@henneberg-systemdesign.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "linux-stm32@st-md-mailman.stormreply.com"
+	<linux-stm32@st-md-mailman.stormreply.com>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "linux-amlogic@lists.infradead.org"
+	<linux-amlogic@lists.infradead.org>, "imx@lists.linux.dev"
+	<imx@lists.linux.dev>, Frank Li <frank.li@nxp.com>
+Subject: RE: [EXT] Re: [PATCH v4 net-next 2/2] net: stmmac: dwmac-imx: pause
+ the TXC clock in fixed-link
+Thread-Topic: [EXT] Re: [PATCH v4 net-next 2/2] net: stmmac: dwmac-imx: pause
+ the TXC clock in fixed-link
+Thread-Index: AQHZxuKiZUs/AXOMS0qXmBpSCSPAEK/aOeGAgAACu7A=
+Date: Fri, 4 Aug 2023 15:08:56 +0000
+Message-ID:
+ <PAXPR04MB9185B0397B5C9C37F99CBF518909A@PAXPR04MB9185.eurprd04.prod.outlook.com>
+References: <20230804144629.358455-1-shenwei.wang@nxp.com>
+ <20230804144629.358455-3-shenwei.wang@nxp.com>
+ <ZM0Rk4paok5cAvp5@shell.armlinux.org.uk>
+In-Reply-To: <ZM0Rk4paok5cAvp5@shell.armlinux.org.uk>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PAXPR04MB9185:EE_|AM8PR04MB7763:EE_
+x-ms-office365-filtering-correlation-id: 4a4976ec-10ef-4058-f7f1-08db94fcb994
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ TrwhU/m2Q1LWPrKGLZveoT90rRYce0C+b83jiDux+HU/3M9Q5ZlR1AnDp5nTGC7/wJUB40YqUv5576lbzwJsWjG491s3QkMQYZCjOeuTC5gavy+IJqnWDpPe0Ye8S5as8nkXpfQjHHX87MgKZSF1KcNFNLxDXwZzlGdMfqpGhPu29L/Wn2jmMYZoiJBaMj9Qotsn6F0HwnkdWTNc1ToXCOdu/l7U3qqKSjtd/3FMiJ+0N6xyqH7ZOFSxscKR3H5XsmIKNgluGBRZPy/CTruCKSFeX6V8IKZRjhBFO2EdVvDevOvR5a7HFHVxadFpI+dN74HvB0A25RKelpXYtuqaD/olr5cQsFivOWfZYQuKbFp5ew3hptrqcQhf4Nc3fjkJhWxvBJS/eaH8dK/xcUGXbsLM7VeaBSHUZREBjjDu2sZDsuvkwIvXZKfTFdZQ2s+TfCq2AOGrvDIxGj7i6hh+L25V11SRI8R2TRtQXpidaOsQsm5O8cdqw/FKcLBZwamO/i6MTl3hMQW0lGpfK+v3nuNYxUm24aA9+2b5qlfFfphSMuuX1r5YrXGNm9QW1qnZipPDYRGihpTYf/e/0HuXoD7FYLAI84BH+I043ZK2NGI=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB9185.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(396003)(366004)(346002)(136003)(376002)(1800799003)(186006)(451199021)(8936002)(8676002)(4744005)(26005)(45080400002)(478600001)(55016003)(966005)(86362001)(9686003)(7696005)(33656002)(71200400001)(316002)(41300700001)(5660300002)(64756008)(4326008)(66476007)(66556008)(66446008)(66946007)(6916009)(44832011)(52536014)(83380400001)(7416002)(7406005)(54906003)(2906002)(76116006)(6506007)(122000001)(38100700002)(55236004)(53546011)(38070700005);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?LOtBrqsJSdLPY7vQJuzTmm2Ii/SaQPltCVsxCDYLIxVICUJZxla6n7sVt/ms?=
+ =?us-ascii?Q?z6HDos4NZRqFoKVyLGh6P8MPl8W/By9ku3N2+y2jO5fTGzl+AjqikjmawfHA?=
+ =?us-ascii?Q?OTVBdIaaNFnbWKcWgk3OypTcwkkoti5hQaxd57jNlMzbhE+++gMx+w2g82lr?=
+ =?us-ascii?Q?ObTpWfB9eryr+2Q1qAcfNQTvOV5qAFl3SRVzqiymtwAsN6fO9SRa36IBu0eS?=
+ =?us-ascii?Q?fY9M7D93x+6/49MKSvZJVAETeZFngZEib7v94XGwy+wfrMMicsq/x0PVT8MV?=
+ =?us-ascii?Q?Iwfn5d8WvmpVwtDPBC+Kl6xIWF/fDJHQ0xsbv/1EMzlyh9SG4DxY2vi7xcJg?=
+ =?us-ascii?Q?V9ysaszn7gVuZHKgqZ3RlL4MObjR90gxjF8FJVy9nYnxvRrtL9vCaI2jz/Rp?=
+ =?us-ascii?Q?UcRkXysQfLcafs0MZ2tPlWh47gqtglDSwODHgKsS42myfISsqu4qwDbLnh9T?=
+ =?us-ascii?Q?bAqu2KUx9bZkCfNS2t5hLwLRT1n3oLttbDvr0ZSSGbNRIDc6v8meLkSnOEY4?=
+ =?us-ascii?Q?A2yOxhd9aEGjDKbJ54aSuuIq3T/Pyo6W4YwwTSZf1tQv0pCRXxIbnyIwlNUC?=
+ =?us-ascii?Q?T5+oWWHBbjtCqEP2Ti4JvEmKk/9tTwfkuXk2ared9zzjVLrppFueaQ/IRPyR?=
+ =?us-ascii?Q?38dxiEqDPkWS8t0ZEfZpm5kqpC8DSYZOVaM8WG3TORWgeFUKTx/zJKcFRUPN?=
+ =?us-ascii?Q?kZ1A+O+I7JRnTVADkOE/XiMdXOgMqu9AhpEtYJ4hYeBDNi6HGMFHN3/L0zxp?=
+ =?us-ascii?Q?AYiwiHU1VEERdMH2MjfTr97NINQJ2yw6zOqVTzh+Qbh05GiBCMBsgticUHYi?=
+ =?us-ascii?Q?TCS7nQLsJw+kGFj882vk7S+Ai34sjADZ7395mPHZ2VZhIFqve5+z0v94Iw5W?=
+ =?us-ascii?Q?vbIc6OTYTSiLhgXrix9QQnFnQV6mWa/pOd6psaj5Y3aEDuCe5rkvV98gb4K6?=
+ =?us-ascii?Q?cycuBgSulAEcHpFvxPNjlLMPm/StwD7uinrLlU9Lcwlwc12SIDN4e6Tx6SQe?=
+ =?us-ascii?Q?NjmT3VHrXXy71lk/9Y8wQ4uizP3ObGfEUJsJgTUxnFfBMtbfPyKnzVaqplzp?=
+ =?us-ascii?Q?yj1eFqjZEAtu3tvXD6oZY+mw6uMSGw9fDc3E3CSkMG0znx9rBIZp3s2ZeWJ1?=
+ =?us-ascii?Q?uuilSShgSYcUYwTRRPBbi+tIKPZ9+1q3ZVqwZufih6ndhnZBJtcLev2rHuNW?=
+ =?us-ascii?Q?DQ42yZUmDQbAcBFzWgYDpBU3BLbl0xgozQoa0JFyMeJ358hzd7xpsYktnKlQ?=
+ =?us-ascii?Q?Syzkrii2tybo16Rzoen4yVaPNTgvh8B1STF3XdopwJ5ciWtO5w6u0c31ENIU?=
+ =?us-ascii?Q?2Im3n138uZ0O9vnEhoiX5XfHPQjN3de9KcTzD3mtxv5WPDtpcx7b9HecYv38?=
+ =?us-ascii?Q?1gIu2teoi4OPgPJVTu9TC8isHmM/DgRMusi1hTWA8zeo2AWgc3X/j/aO23y1?=
+ =?us-ascii?Q?C/Y29qsxuTKGrs/AcuQnI2GZ7IKi2Ifm8KHgtA+7phs8YqdFEDkHkiRuQMZm?=
+ =?us-ascii?Q?G+9p4LgzNzDHUia68SkiJPJOaJ2ioQDy23YE46SHEsXFO4Iaxn1+dpqDhTxK?=
+ =?us-ascii?Q?81lSasndv0nlfRuFjmFLT+TwAEiJIWHY3mKOrlDv?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB9185.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4a4976ec-10ef-4058-f7f1-08db94fcb994
+X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Aug 2023 15:08:56.9141
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: qciY6Um68e0zZJwucHKU11q8ox/WdHXW4t0uKdn5rYgbTJLgXneKccbSNS3yP6g8zqZgZlqQYfOuRQQRmn9WUQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM8PR04MB7763
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-After the conversion to use the auxiliary bus, the custom device
-management is not needed anymore and can be deleted.
 
-Signed-off-by: Petr Pavlu <petr.pavlu@suse.com>
-Tested-by: Leon Romanovsky <leon@kernel.org>
----
- drivers/net/ethernet/mellanox/mlx4/intf.c | 125 ----------------------
- drivers/net/ethernet/mellanox/mlx4/main.c |  28 -----
- drivers/net/ethernet/mellanox/mlx4/mlx4.h |   3 -
- include/linux/mlx4/driver.h               |  10 --
- 4 files changed, 166 deletions(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx4/intf.c b/drivers/net/ethernet/mellanox/mlx4/intf.c
-index 16b2c99ff737..c7697ee0dd05 100644
---- a/drivers/net/ethernet/mellanox/mlx4/intf.c
-+++ b/drivers/net/ethernet/mellanox/mlx4/intf.c
-@@ -38,15 +38,6 @@
- 
- #include "mlx4.h"
- 
--struct mlx4_device_context {
--	struct list_head	list;
--	struct list_head	bond_list;
--	struct mlx4_interface  *intf;
--	void		       *context;
--};
--
--static LIST_HEAD(intf_list);
--static LIST_HEAD(dev_list);
- static DEFINE_MUTEX(intf_mutex);
- static DEFINE_IDA(mlx4_adev_ida);
- 
-@@ -156,77 +147,6 @@ static void del_adev(struct auxiliary_device *adev)
- 	auxiliary_device_uninit(adev);
- }
- 
--static void mlx4_add_device(struct mlx4_interface *intf, struct mlx4_priv *priv)
--{
--	struct mlx4_device_context *dev_ctx;
--
--	dev_ctx = kmalloc(sizeof(*dev_ctx), GFP_KERNEL);
--	if (!dev_ctx)
--		return;
--
--	dev_ctx->intf    = intf;
--	dev_ctx->context = intf->add(&priv->dev);
--
--	if (dev_ctx->context) {
--		spin_lock_irq(&priv->ctx_lock);
--		list_add_tail(&dev_ctx->list, &priv->ctx_list);
--		spin_unlock_irq(&priv->ctx_lock);
--	} else
--		kfree(dev_ctx);
--
--}
--
--static void mlx4_remove_device(struct mlx4_interface *intf, struct mlx4_priv *priv)
--{
--	struct mlx4_device_context *dev_ctx;
--
--	list_for_each_entry(dev_ctx, &priv->ctx_list, list)
--		if (dev_ctx->intf == intf) {
--			spin_lock_irq(&priv->ctx_lock);
--			list_del(&dev_ctx->list);
--			spin_unlock_irq(&priv->ctx_lock);
--
--			intf->remove(&priv->dev, dev_ctx->context);
--			kfree(dev_ctx);
--			return;
--		}
--}
--
--int mlx4_register_interface(struct mlx4_interface *intf)
--{
--	struct mlx4_priv *priv;
--
--	if (!intf->add || !intf->remove)
--		return -EINVAL;
--
--	mutex_lock(&intf_mutex);
--
--	list_add_tail(&intf->list, &intf_list);
--	list_for_each_entry(priv, &dev_list, dev_list) {
--		mlx4_add_device(intf, priv);
--	}
--
--	mutex_unlock(&intf_mutex);
--
--	return 0;
--}
--EXPORT_SYMBOL_GPL(mlx4_register_interface);
--
--void mlx4_unregister_interface(struct mlx4_interface *intf)
--{
--	struct mlx4_priv *priv;
--
--	mutex_lock(&intf_mutex);
--
--	list_for_each_entry(priv, &dev_list, dev_list)
--		mlx4_remove_device(intf, priv);
--
--	list_del(&intf->list);
--
--	mutex_unlock(&intf_mutex);
--}
--EXPORT_SYMBOL_GPL(mlx4_unregister_interface);
--
- int mlx4_register_auxiliary_driver(struct mlx4_adrv *madrv)
- {
- 	return auxiliary_driver_register(&madrv->adrv);
-@@ -242,10 +162,7 @@ EXPORT_SYMBOL_GPL(mlx4_unregister_auxiliary_driver);
- int mlx4_do_bond(struct mlx4_dev *dev, bool enable)
- {
- 	struct mlx4_priv *priv = mlx4_priv(dev);
--	struct mlx4_device_context *dev_ctx = NULL, *temp_dev_ctx;
--	unsigned long flags;
- 	int i, ret;
--	LIST_HEAD(bond_list);
- 
- 	if (!(dev->caps.flags2 & MLX4_DEV_CAP_FLAG2_PORT_REMAP))
- 		return -EOPNOTSUPP;
-@@ -267,36 +184,6 @@ int mlx4_do_bond(struct mlx4_dev *dev, bool enable)
- 		dev->flags &= ~MLX4_FLAG_BONDED;
- 	}
- 
--	spin_lock_irqsave(&priv->ctx_lock, flags);
--	list_for_each_entry_safe(dev_ctx, temp_dev_ctx, &priv->ctx_list, list) {
--		if (!(dev_ctx->intf->flags & MLX4_INTFF_BONDING))
--			continue;
--
--		if (mlx4_is_mfunc(dev)) {
--			mlx4_dbg(dev,
--				 "SRIOV, disabled HA mode for intf proto %d\n",
--				 dev_ctx->intf->protocol);
--			continue;
--		}
--
--		list_add_tail(&dev_ctx->bond_list, &bond_list);
--		list_del(&dev_ctx->list);
--	}
--	spin_unlock_irqrestore(&priv->ctx_lock, flags);
--
--	list_for_each_entry(dev_ctx, &bond_list, bond_list) {
--		dev_ctx->intf->remove(dev, dev_ctx->context);
--		dev_ctx->context =  dev_ctx->intf->add(dev);
--
--		spin_lock_irqsave(&priv->ctx_lock, flags);
--		list_add_tail(&dev_ctx->list, &priv->ctx_list);
--		spin_unlock_irqrestore(&priv->ctx_lock, flags);
--
--		mlx4_dbg(dev, "Interface for protocol %d restarted with bonded mode %s\n",
--			 dev_ctx->intf->protocol, enable ?
--			 "enabled" : "disabled");
--	}
--
- 	mutex_lock(&intf_mutex);
- 
- 	for (i = 0; i < ARRAY_SIZE(mlx4_adev_devices); i++) {
-@@ -447,16 +334,11 @@ static int rescan_drivers_locked(struct mlx4_dev *dev)
- 
- int mlx4_register_device(struct mlx4_dev *dev)
- {
--	struct mlx4_priv *priv = mlx4_priv(dev);
--	struct mlx4_interface *intf;
- 	int ret;
- 
- 	mutex_lock(&intf_mutex);
- 
- 	dev->persist->interface_state |= MLX4_INTERFACE_STATE_UP;
--	list_add_tail(&priv->dev_list, &dev_list);
--	list_for_each_entry(intf, &intf_list, list)
--		mlx4_add_device(intf, priv);
- 
- 	ret = rescan_drivers_locked(dev);
- 
-@@ -474,9 +356,6 @@ int mlx4_register_device(struct mlx4_dev *dev)
- 
- void mlx4_unregister_device(struct mlx4_dev *dev)
- {
--	struct mlx4_priv *priv = mlx4_priv(dev);
--	struct mlx4_interface *intf;
--
- 	if (!(dev->persist->interface_state & MLX4_INTERFACE_STATE_UP))
- 		return;
- 
-@@ -495,10 +374,6 @@ void mlx4_unregister_device(struct mlx4_dev *dev)
- 	}
- 	mutex_lock(&intf_mutex);
- 
--	list_for_each_entry(intf, &intf_list, list)
--		mlx4_remove_device(intf, priv);
--
--	list_del(&priv->dev_list);
- 	dev->persist->interface_state &= ~MLX4_INTERFACE_STATE_UP;
- 
- 	rescan_drivers_locked(dev);
-diff --git a/drivers/net/ethernet/mellanox/mlx4/main.c b/drivers/net/ethernet/mellanox/mlx4/main.c
-index c4ec7377aa71..2581226836b5 100644
---- a/drivers/net/ethernet/mellanox/mlx4/main.c
-+++ b/drivers/net/ethernet/mellanox/mlx4/main.c
-@@ -42,7 +42,6 @@
- #include <linux/slab.h>
- #include <linux/io-mapping.h>
- #include <linux/delay.h>
--#include <linux/kmod.h>
- #include <linux/etherdevice.h>
- #include <net/devlink.h>
- 
-@@ -1091,27 +1090,6 @@ static int mlx4_slave_cap(struct mlx4_dev *dev)
- 	return err;
- }
- 
--static void mlx4_request_modules(struct mlx4_dev *dev)
--{
--	int port;
--	int has_ib_port = false;
--	int has_eth_port = false;
--#define EN_DRV_NAME	"mlx4_en"
--#define IB_DRV_NAME	"mlx4_ib"
--
--	for (port = 1; port <= dev->caps.num_ports; port++) {
--		if (dev->caps.port_type[port] == MLX4_PORT_TYPE_IB)
--			has_ib_port = true;
--		else if (dev->caps.port_type[port] == MLX4_PORT_TYPE_ETH)
--			has_eth_port = true;
--	}
--
--	if (has_eth_port)
--		request_module_nowait(EN_DRV_NAME);
--	if (has_ib_port || (dev->caps.flags & MLX4_DEV_CAP_FLAG_IBOE))
--		request_module_nowait(IB_DRV_NAME);
--}
--
- /*
-  * Change the port configuration of the device.
-  * Every user of this function must hold the port mutex.
-@@ -1147,7 +1125,6 @@ int mlx4_change_port_types(struct mlx4_dev *dev,
- 			mlx4_err(dev, "Failed to register device\n");
- 			goto out;
- 		}
--		mlx4_request_modules(dev);
- 	}
- 
- out:
-@@ -3426,9 +3403,6 @@ static int mlx4_load_one(struct pci_dev *pdev, int pci_dev_data,
- 	devl_assert_locked(devlink);
- 	dev = &priv->dev;
- 
--	INIT_LIST_HEAD(&priv->ctx_list);
--	spin_lock_init(&priv->ctx_lock);
--
- 	err = mlx4_adev_init(dev);
- 	if (err)
- 		return err;
-@@ -3732,8 +3706,6 @@ static int mlx4_load_one(struct pci_dev *pdev, int pci_dev_data,
- 	if (err)
- 		goto err_port;
- 
--	mlx4_request_modules(dev);
--
- 	mlx4_sense_init(dev);
- 	mlx4_start_sense(dev);
- 
-diff --git a/drivers/net/ethernet/mellanox/mlx4/mlx4.h b/drivers/net/ethernet/mellanox/mlx4/mlx4.h
-index d5050bfb342f..d707b790536f 100644
---- a/drivers/net/ethernet/mellanox/mlx4/mlx4.h
-+++ b/drivers/net/ethernet/mellanox/mlx4/mlx4.h
-@@ -882,9 +882,6 @@ enum {
- struct mlx4_priv {
- 	struct mlx4_dev		dev;
- 
--	struct list_head	dev_list;
--	struct list_head	ctx_list;
--	spinlock_t		ctx_lock;
- 	struct mlx4_adev	**adev;
- 	int			adev_idx;
- 	struct atomic_notifier_head event_nh;
-diff --git a/include/linux/mlx4/driver.h b/include/linux/mlx4/driver.h
-index 9cf157d381c6..69825223081f 100644
---- a/include/linux/mlx4/driver.h
-+++ b/include/linux/mlx4/driver.h
-@@ -58,22 +58,12 @@ enum {
- 	MLX4_INTFF_BONDING	= 1 << 0
- };
- 
--struct mlx4_interface {
--	void *			(*add)	 (struct mlx4_dev *dev);
--	void			(*remove)(struct mlx4_dev *dev, void *context);
--	struct list_head	list;
--	enum mlx4_protocol	protocol;
--	int			flags;
--};
--
- struct mlx4_adrv {
- 	struct auxiliary_driver	adrv;
- 	enum mlx4_protocol	protocol;
- 	int			flags;
- };
- 
--int mlx4_register_interface(struct mlx4_interface *intf);
--void mlx4_unregister_interface(struct mlx4_interface *intf);
- int mlx4_register_auxiliary_driver(struct mlx4_adrv *madrv);
- void mlx4_unregister_auxiliary_driver(struct mlx4_adrv *madrv);
- 
--- 
-2.35.3
+> -----Original Message-----
+> From: Russell King <linux@armlinux.org.uk>
+> Sent: Friday, August 4, 2023 9:56 AM
+> To: Shenwei Wang <shenwei.wang@nxp.com>
+> On Fri, Aug 04, 2023 at 09:46:29AM -0500, Shenwei Wang wrote:
+> > +     if (dwmac->ops->fix_soc_reset)
+> > +             plat_dat->fix_mac_speed =3D dwmac->ops->fix_mac_speed;
+>
+> The if() condition looks like a typo to me.
+>
 
+My bad. Thank you very much for pointing that out!
+
+Thanks,
+Shenwei
+
+> --
+> RMK's Patch system:
+> https://www.ar/
+> mlinux.org.uk%2Fdeveloper%2Fpatches%2F&data=3D05%7C01%7Cshenwei.wang
+> %40nxp.com%7C893e89bfb80c46549b3c08db94fafd80%7C686ea1d3bc2b4c6fa
+> 92cd99c5c301635%7C0%7C0%7C638267577931730269%7CUnknown%7CTWFp
+> bGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6
+> Mn0%3D%7C3000%7C%7C%7C&sdata=3DxR58pNE5yNXCj6Fl8aWS1an5wgdDI%2F
+> k1mv%2Fw%2BnLBhl0%3D&reserved=3D0
+> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
