@@ -1,115 +1,156 @@
-Return-Path: <netdev+bounces-24587-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24589-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBE41770B19
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 23:36:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C6496770B4D
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 23:59:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ED3821C21761
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 21:36:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BB23E1C20AFC
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 21:59:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBF8921D2D;
-	Fri,  4 Aug 2023 21:35:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A98321D39;
+	Fri,  4 Aug 2023 21:59:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D17691ED5C
-	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 21:35:08 +0000 (UTC)
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64A97C5
-	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 14:35:07 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d1ebc896bd7so2479890276.2
-        for <netdev@vger.kernel.org>; Fri, 04 Aug 2023 14:35:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691184906; x=1691789706;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=WambZPDGoqKCs5xLMf1qXXSOXzbwiYHANSsAy4QHxdA=;
-        b=DvHIJmnUiqF79V6DniFzD0MICQkGDuTZsuk+skbMnLy6OBq7/KDzbOFhCUAbgUnxke
-         3jVLW2FuOhQ2Vl2WaWl4Aphliqm6QxDn2LjjwFp7aOF8t70OWUf2TCbKtH2vx8BuddkD
-         PFH2z0ZhovjYD4Wjle1W8Y/0n8vJRGtj0cz/AP9qxEonwyZxNfigYGvhs2Kzow1v2geT
-         w++315olmFRd6PA9Td/GQoywLWTm0JOR47ce273Czjf3pF/32q+nBHSFZoNWt07qydMy
-         LbJGa89h2+PMgXoHUPbUWbyy0CRqnFHIE2bYaZWKzLk4PwBUjzLeslIHgdUgNTvfPg4Y
-         2c/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691184906; x=1691789706;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WambZPDGoqKCs5xLMf1qXXSOXzbwiYHANSsAy4QHxdA=;
-        b=a20JzMchuoUJ/RX1uhrkffo8JXbws5+vAgRbpKPQl8ry3+RXfry+1o9KFFh+g3FFea
-         3nne6bOT/2NNMsSszV+IgkdlWKJuAFzYz90XEI7I6DyQUKMTEm6e+jDxpiBMJubYSGwq
-         v5tBoijBVFBMuwIJrugnhlRn7qfoEthvNok0EB7N6vPzIw3aDf1GXJoAJflPBrVSGTIQ
-         D+owGTbQis0EWi2vkcYG1LGFcEO4kEsuSeNd8iKNSt1Cn/SngsR/M9KnDDWf+R0DXWAK
-         8yUwTCQOHx91Op5UUYE4EftTGG4MugpKifxK5SFfbw9mlECNbA8kBqGqhTXb3vq8o6XU
-         2Q/w==
-X-Gm-Message-State: AOJu0YxDcnx0bHtewvImUyM/HX1lLElItd564tgdLUq57eFDtJjVwbyo
-	62KJYI9ugaIdfV8VtOMM3vMM6jdqV9m3tiqHdwXyjEj3ArY0QqXjymwmZY1RXJ6xnpP8vp4pWgm
-	MvgMqjS9z0m/8O77+OOUmeUVDE3w8QvnAKgzGDvy7VD9OdwQ0adOMtFgtmS0UEVwu
-X-Google-Smtp-Source: AGHT+IE9GEZ/kDl4o6dAZ6GZTAhd2RfYoOgyVSa+h9jWfzdH0aCzEBV0i9g2sroQxAv7lwf+sEKVjHXO/JhU
-X-Received: from wrushilg.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:2168])
- (user=rushilg job=sendgmr) by 2002:a05:6902:1614:b0:d0d:c74a:a6c0 with SMTP
- id bw20-20020a056902161400b00d0dc74aa6c0mr15123ybb.2.1691184906551; Fri, 04
- Aug 2023 14:35:06 -0700 (PDT)
-Date: Fri,  4 Aug 2023 21:34:44 +0000
-In-Reply-To: <20230804213444.2792473-1-rushilg@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FE671AA8B
+	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 21:59:47 +0000 (UTC)
+X-Greylist: delayed 601 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 04 Aug 2023 14:59:44 PDT
+Received: from smtp.uniroma2.it (smtp.uniroma2.it [160.80.6.23])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDEAB180;
+	Fri,  4 Aug 2023 14:59:44 -0700 (PDT)
+Received: from smtpauth-2019-1.uniroma2.it (smtpauth-2019-1.uniroma2.it [160.80.5.46])
+	by smtp-2015.uniroma2.it (8.14.4/8.14.4/Debian-8) with ESMTP id 374LdqY3031774;
+	Fri, 4 Aug 2023 23:39:58 +0200
+Received: from [192.168.1.55] (host-79-18-185-225.retail.telecomitalia.it [79.18.185.225])
+	by smtpauth-2019-1.uniroma2.it (Postfix) with ESMTPSA id 2F7C01209D4;
+	Fri,  4 Aug 2023 23:39:48 +0200 (CEST)
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=uniroma2.it;
+	s=ed201904; t=1691185189; h=from:from:sender:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=L2eY65w4QX2NFbKU1+DDTyYdgcmreNvLmXgo7ENzCQY=;
+	b=z57vFvjdKrtJ+iilaAJJLfVIouzA+c8OFSmCnw4GuawqK8M0dmlNn0k/Fy2e7u96x1ehCF
+	DIOPPKSst3eLXXCQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniroma2.it; s=rsa201904;
+	t=1691185189; h=from:from:sender:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=L2eY65w4QX2NFbKU1+DDTyYdgcmreNvLmXgo7ENzCQY=;
+	b=Ox71sguE0YicW+Ke/W0Pw44zeXJ7qgQKqTLeTdr1t1m7lMROPyrvdm7pHujGvWzolsGQbM
+	r/YxW2A49ma1vaWo3TwleiR8Xnx+Hxpd4zY6dm7cLWU9sKUx437ovbKOK9qop6dUaNIf/a
+	Fev0p2Q8qan4LabWBH7lARiDS7KOeTqSa5ShLVlI8Hpc4jc35iWrjLSKgQ7R00B08OkOHy
+	GTlBxLksejW4WEFrZQoe1cjo3dfvCe4YplSnn1CSddwGDw69bh+bavF2gz0GTuVk8tA9eM
+	E4g4qEEJSMVHKAPJMO5Pvcix+YdUtTXjTDULLD/YGm5BgKJCwxu9Ohp0uM9n8g==
+Message-ID: <f778eef0-a035-0a29-3108-0f6f53a475ed@uniroma2.it>
+Date: Fri, 4 Aug 2023 23:39:47 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20230804213444.2792473-1-rushilg@google.com>
-X-Mailer: git-send-email 2.41.0.585.gd2178a4bd4-goog
-Message-ID: <20230804213444.2792473-5-rushilg@google.com>
-Subject: [PATCH net-next v2 4/4] gve: update gve.rst
-From: Rushil Gupta <rushilg@google.com>
-To: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, 
-	willemb@google.com, edumazet@google.com, pabeni@redhat.com
-Cc: Rushil Gupta <rushilg@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>, 
-	Bailey Forrest <bcf@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-	autolearn=ham autolearn_force=no version=3.4.6
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.13.1
+Subject: Re: [net-next 2/2] selftests: seg6: add selftest for NEXT-C-SID
+ flavor in SRv6 End.X behavior
+To: Paolo Abeni <pabeni@redhat.com>, Andrea Mayer <andrea.mayer@uniroma2.it>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        David Ahern <dsahern@kernel.org>, Shuah Khan <shuah@kernel.org>,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kselftest@vger.kernel.org
+Cc: Stefano Salsano <stefano.salsano@uniroma2.it>,
+        Ahmed Abdelsalam <ahabdels.dev@gmail.com>,
+        Hangbin Liu
+ <liuhangbin@gmail.com>,
+        Paolo Lungaroni <paolo.lungaroni@uniroma2.it>
+References: <20230731175117.17376-1-andrea.mayer@uniroma2.it>
+ <20230731175117.17376-3-andrea.mayer@uniroma2.it>
+ <9916825da00d375a33abdcb0aa773c5520a307e1.camel@redhat.com>
+From: Paolo Lungaroni <paolo.lungaroni@uniroma2.it>
+In-Reply-To: <9916825da00d375a33abdcb0aa773c5520a307e1.camel@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Antivirus: Avast (VPS 230804-6, 4/8/2023), Outbound message
+X-Antivirus-Status: Clean
+X-Virus-Scanned: clamav-milter 0.100.0 at smtp-2015
+X-Virus-Status: Clean
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Add a note about QPL and RDA mode
+Hi Paolo,
 
-Signed-off-by: Rushil Gupta <rushilg@google.com>
-Reviewed-by: Willem de Bruijn <willemb@google.com>
-Signed-off-by: Praveen Kaligineedi <pkaligineedi@google.com>
-Signed-off-by: Bailey Forrest <bcf@google.com>
----
-No change in v2
- .../networking/device_drivers/ethernet/google/gve.rst    | 9 +++++++++
- 1 file changed, 9 insertions(+)
+please see my answer below, thanks.
 
-diff --git a/Documentation/networking/device_drivers/ethernet/google/gve.rst b/Documentation/networking/device_drivers/ethernet/google/gve.rst
-index 6d73ee78f3d7..31d621bca82e 100644
---- a/Documentation/networking/device_drivers/ethernet/google/gve.rst
-+++ b/Documentation/networking/device_drivers/ethernet/google/gve.rst
-@@ -52,6 +52,15 @@ Descriptor Formats
- GVE supports two descriptor formats: GQI and DQO. These two formats have
- entirely different descriptors, which will be described below.
- 
-+Addressing Mode
-+------------------
-+GVE supports two addressing modes: QPL and RDA.
-+QPL ("queue-page-list") mode communicates data through a set of
-+pre-registered pages.
-+
-+For RDA ("raw DMA addressing") mode, the set of pages is dynamic.
-+Therefore, the packet buffers can be anywhere in guest memory.
-+
- Registers
- ---------
- All registers are MMIO.
--- 
-2.41.0.585.gd2178a4bd4-goog
+Il 03/08/2023 10:07, Paolo Abeni ha scritto:
+> On Mon, 2023-07-31 at 19:51 +0200, Andrea Mayer wrote:
+>> From: Paolo Lungaroni <paolo.lungaroni@uniroma2.it>
+>>
+>> This selftest is designed for testing the support of NEXT-C-SID flavor
+>> for SRv6 End.X behavior. It instantiates a virtual network composed of
+>> several nodes: hosts and SRv6 routers. Each node is realized using a
+>> network namespace that is properly interconnected to others through veth
+>> pairs, according to the topology depicted in the selftest script file.
+>> The test considers SRv6 routers implementing IPv4/IPv6 L3 VPNs leveraged
+>> by hosts for communicating with each other. Such routers i) apply
+>> different SRv6 Policies to the traffic received from connected hosts,
+>> considering the IPv4 or IPv6 protocols; ii) use the NEXT-C-SID
+>> compression mechanism for encoding several SRv6 segments within a single
+>> 128-bit SID address, referred to as a Compressed SID (C-SID) container.
+>>
+>> The NEXT-C-SID is provided as a "flavor" of the SRv6 End.X behavior,
+>> enabling it to properly process the C-SID containers. The correct
+>> execution of the enabled NEXT-C-SID SRv6 End.X behavior is verified
+>> through reachability tests carried out between hosts belonging to the
+>> same VPN.
+>>
+>> Signed-off-by: Andrea Mayer <andrea.mayer@uniroma2.it>
+>> Signed-off-by: Paolo Lungaroni <paolo.lungaroni@uniroma2.it>
+> 
+> The patches LGTM, but there is a minor issues WRT the tag area. Since
+> this patch contains a
+> 
+> From: Paolo Lungaroni <paolo.lungaroni@uniroma2.it>
+> 
+> tag, Paolo's sob should come first.
+> 
+> According to the the newly created shell script comments, it looks like
+> the patch as been co developed by both Paolo abd Andrea.
+> 
+> In that case the correct tag sequence would be:
+> 
+> SoB Paolo
+> Co-devel Andrea
+> SoB Andrea
+> 
+> Since the above is relevant for correct patch authorship attribution I
+> suggest to address that in a new revision.
 
+We will follow your suggestions and we resubmit the v2 patch with
+the tags in the correct order.
+
+> 
+> BTW, I a really appreciate the descriptive-but-not-too-verbose commit
+> message!
+> 
+> Thanks,
+> 
+> Paolo
+> 
+
+Ciao,
+Paolo
 
