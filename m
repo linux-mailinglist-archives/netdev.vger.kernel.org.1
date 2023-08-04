@@ -1,146 +1,123 @@
-Return-Path: <netdev+bounces-24590-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24591-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CFE7770BEF
-	for <lists+netdev@lfdr.de>; Sat,  5 Aug 2023 00:27:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FE59770BFA
+	for <lists+netdev@lfdr.de>; Sat,  5 Aug 2023 00:40:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EC50E2826E2
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 22:27:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 42E871C20D9B
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 22:39:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C9BE2417E;
-	Fri,  4 Aug 2023 22:27:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFC3EAD4A;
+	Fri,  4 Aug 2023 22:39:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09B7E1AA8B
-	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 22:27:39 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (unknown [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC6FE10F0;
-	Fri,  4 Aug 2023 15:27:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=oe3R1YKPMSS61Kql1VVF1wpgWu78Kb9TP4tIQw5QCgw=; b=SomGhhLqgNBWYw3yU37FFm8NyK
-	s731vyDc2/mwtHBDHIGN42h/VWqKhR7ykKos0RTCgVNWEeRLTW6cjMRygXWyWOw0tRkaJNoU8ihMt
-	joVIvLvs/SLsrlOSbDgQwuDcUf2tUgAXvZ06MdHxlSEi4slkyS8RXcw3xQXQpGACzxue2JTNuaUKE
-	8UjyA+Ru1k97X35qsFFUdXPQi408YX9k/nEMxwhC5z9COVi+ma3TUCk9he6zHNWSdYUXob5U+7FAk
-	+gTTRgTTtyhAfUAnGBToBl5TlJnE/mL9gLGS99weNkN5FiRMeCGbXfp9pnNeM6Behz7BUwJueWHfK
-	JWUbifAw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:47482)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qS3Gf-0000pF-0M;
-	Fri, 04 Aug 2023 23:27:33 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qS3Ge-0004MT-Q1; Fri, 04 Aug 2023 23:27:32 +0100
-Date: Fri, 4 Aug 2023 23:27:32 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Nick Bowler <nbowler@draconx.ca>
-Cc: Rob Herring <robh@kernel.org>, Saravana Kannan <saravanak@google.com>,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	netdev@vger.kernel.org, regressions@lists.linux.dev
-Subject: Re: PROBLEM: Broken or delayed ethernet on Xilinx ZCU104 since 5.18
- (regression)
-Message-ID: <ZM17VKzDBdm4uMNY@shell.armlinux.org.uk>
-References: <CADyTPEzqf8oQAPSFRWJLxAhd-WE4fX2zdoe9Vu6V9hZMn1Yc8g@mail.gmail.com>
- <CAL_JsqLrErF__GGHfanRFCpfbOh6fvz4-aJv32h8OfDjUeZPSg@mail.gmail.com>
- <CADyTPEwgG0=R_b5DNBP0J0auDXu2BNTOwkSUFg-s7pLJUPC+Tg@mail.gmail.com>
- <CADyTPExgjcaUeKiR108geQhr0KwFC0A8qa_n_ST2RxhbSczomQ@mail.gmail.com>
- <CAL_Jsq+N2W0hVN7fUC1rxGL-Hw9B8eQvLgSwyQ3n41kqwDbxyg@mail.gmail.com>
- <CADyTPEyT4NJPrChtvtY=_GePZNeSDRAr9j3KRAk1hkjD=5+i8A@mail.gmail.com>
- <CAL_JsqKGAFtwB+TWc1yKAe_0M4BziEpFnApuWuR3h+Go_=djFg@mail.gmail.com>
- <CADyTPEwY4ydUKGtGNayf+iQSqRVBQncLiv0TpO9QivBVrmOc4g@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B158FA23
+	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 22:39:56 +0000 (UTC)
+Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2266446B3
+	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 15:39:55 -0700 (PDT)
+Received: by mail-pl1-x630.google.com with SMTP id d9443c01a7336-1bb775625e2so18127355ad.1
+        for <netdev@vger.kernel.org>; Fri, 04 Aug 2023 15:39:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1691188794; x=1691793594;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=wPee1J6TpdjMsw6ipZy9FBWL3pUhaM/U7Pcka80w5kY=;
+        b=kU1NJ699RieHvnZynhRR1tZDgaq8FOa9KWHMnWwOMc6nsQdpABZmSV8OBW2SdDqaf+
+         YtUFXleebjAbPK9esqDMYQxYaFCfRwdRtUfqRTDxT62sI/0MUhOv6P43eURVaAtSBeR5
+         Om+xtqnyhNlvLUsSwU3Xj/u9zNP9L00Cur0cE=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691188794; x=1691793594;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wPee1J6TpdjMsw6ipZy9FBWL3pUhaM/U7Pcka80w5kY=;
+        b=k9WWdVF6JeLddQQV4XQXzbpKO01h5Zx6XLbp4aG0gdZBM/88CkOjB91MN4UhTyE63O
+         7zO9IvsnM9/4UgX5e7Fh/oCIu0Acyvvop2qwlACp1FAfmRZ1sC6myZtxVrzEhqwt1V0Z
+         6EP5pW5XWE2em6x5AaEMgMuHzPofB023fN1EFGjvs5ZlTDZ72ZzYeXbn+gB7Hq/3ag2W
+         S7uAuR8EWOjfDV31NwgRPWZpleovVxFgSLwfEBwAPsiemd0Y7yJkfPMF1P3JzucevFc6
+         lVzN0xAySSISQ2boadvMXWDY+JQrLjN1vVzVjsruNrceODHNA9mUXCiN4cnb9LsMSVjV
+         qsUA==
+X-Gm-Message-State: AOJu0YypBqnImdWnO27SS8pgNs1I+OlgVLQkvi8Uu+ID+naEVixuAw3d
+	528y0mpvWgrEQT4p1yZ2fgE3/w==
+X-Google-Smtp-Source: AGHT+IE9GkA47jrZXTpxd4BjO6ZlWM4VsVLbDWn4hEr0gD9DC20BTj1V4ibSytY8ZYpCblhIwgYfrA==
+X-Received: by 2002:a17:902:dac1:b0:1ba:fe6a:3845 with SMTP id q1-20020a170902dac100b001bafe6a3845mr1311380plx.11.1691188794640;
+        Fri, 04 Aug 2023 15:39:54 -0700 (PDT)
+Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
+        by smtp.gmail.com with ESMTPSA id a13-20020a170902b58d00b001bb04755212sm2218960pls.228.2023.08.04.15.39.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 04 Aug 2023 15:39:54 -0700 (PDT)
+Date: Fri, 4 Aug 2023 15:39:53 -0700
+From: Kees Cook <keescook@chromium.org>
+To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Cc: Jacob Keller <jacob.e.keller@intel.com>,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	Alexander Lobakin <aleksander.lobakin@intel.com>
+Subject: Re: [RFC net-next 1/2] overflow: add DECLARE_FLEX() for on-stack
+ allocs
+Message-ID: <202308041539.888828AC3@keescook>
+References: <20230801111923.118268-1-przemyslaw.kitszel@intel.com>
+ <20230801111923.118268-2-przemyslaw.kitszel@intel.com>
+ <202308011403.E0A8D25CE@keescook>
+ <e0cb5bf2-2278-b83f-c45c-0556927787a6@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CADyTPEwY4ydUKGtGNayf+iQSqRVBQncLiv0TpO9QivBVrmOc4g@mail.gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RDNS_NONE,
-	SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.6
+In-Reply-To: <e0cb5bf2-2278-b83f-c45c-0556927787a6@intel.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Aug 04, 2023 at 05:31:21PM -0400, Nick Bowler wrote:
-> On 2023-08-04, Rob Herring <robh@kernel.org> wrote:
-> > On Fri, Aug 4, 2023 at 11:52 AM Nick Bowler <nbowler@draconx.ca> wrote:
-> >> I don't know about the deferred probe timeout, but I bisected the 6.5-rc4
-> >> breakage to this commit:
-> >>
-> >>   commit c720a1f5e6ee8cb39c28435efc0819cec84d6ee2
-> >>   Author: Michal Simek <michal.simek@amd.com>
-> >>   Date:   Mon May 22 16:59:48 2023 +0200
-> >>
-> >>       arm64: zynqmp: Describe TI phy as ethernet-phy-id
-> >
-> > I don't see anything obviously problematic with that commit. (The
-> > #phy-cells property added is wrong as ethernet phys don't use the phy
-> > binding, but that should just be ignored). I'd check if the phy probed
-> > and has a DT node associated with it.
+On Fri, Aug 04, 2023 at 03:47:48PM +0200, Przemek Kitszel wrote:
+> On 8/2/23 00:31, Kees Cook wrote:
 > 
-> I think the answer is "no, the phy was not probed".  Without reverting
-> that commit, there is absolutely nothing in /sys/bus/mdio_bus/devices.
-> There is no phy device link under /sys/bus/mdio_bus/drivers/"TI DP83867",
-> and there is no mdio_bus under /sys/bus/platform/devices/ff0e0000.ethernet.
+> [...]
 > 
-> When I revert that commit, I can locate the phy device under all these
-> locations.
+> > Initially I was struggling to make __counted_by work, but it seems we can
+> > use an initializer for that member, as long as we don't touch the flexible
+> > array member in the initializer. So we just need to add the counted-by
+> > member to the macro, and use a union to do the initialization. And if
+> > we take the address of the union (and not the struct within it), the
+> > compiler will see the correct object size with __builtin_object_size:
+> > 
+> > #define DEFINE_FLEX(type, name, flex, counter, count) \
+> >      union { \
+> >          u8   bytes[struct_size_t(type, flex, count)]; \
+> >          type obj; \
+> >      } name##_u __aligned(_Alignof(type)) = { .obj.counter = count }; \
+> >      /* take address of whole union to get the correct __builtin_object_size */ \
+> >      type *name = (type *)&name##_u
+> > 
+> > i.e. __builtin_object_size(name, 1) (as used by FORTIFY_SOURCE, etc)
+> > works correctly here, but breaks (sees a zero-sized flex array member)
+> > if this macro ends with:
+> > 
+> >      type *name = &name##_u.obj
 > 
-> > fw_devlink tracks parent-child dependencies and maybe changing to
-> > parent-grandchild affected that. We don't yet track 'phy-handle'
-> > dependencies, but we'd have a circular one here if we did (though that
-> > should be handled). Does "fw_devlink=off" help?
-> 
-> Booting with fw_devlink=off results in no obvious change in behaviour.
+> __builtin_object_size(name, 0) works fine for both versions (with and
+> without .obj at the end)
 
-I think we need to rewind a tad.
+Mode 0 will be unchanged, but mode 1 is what most of FORTIFY uses for
+keep the scope narrow.
 
-My understanding is that this uses the Cadence macb driver.
+> however it does not work for builds without -O2 switch, so struct_size_t()
+> is rather a way to go :/
 
-In your original message, you said that the ethernet driver wasn't
-being bound to the driver.
-
-Since the ethernet driver is responsible for spotting the "mdio"
-sub-node and creating the MDIO bus, if the driver isn't being
-successfully bound, then the MDIO bus and the PHYs on the bus won't be
-created, so you won't find them in /sys/bus/mdio_bus/devices.
-
-Moreover, the Cadence macb driver, and this doesn't care about the
-presence of the PHY at probe time, only when the network interface is
-brought up. See macb_phylink_connect() which is called from
-macb_open().
-
-So, I think that the deferred probing has nothing to do with PHYs, and
-that's just a wild goose chase.
-
-I think instead we need to be concentrating on what's going on with
-the ethernet driver, and why the ethernet driver is deferring its
-probe. Is macb_probe() getting called at all? How far through
-macb_probe() do we get before we defer?
-
-I think those are the key questions that need answering.
-
-Maybe, if you can get access to the machine while the driver is
-deferring, /sys/kernel/debug/devices_deferred might give some
-useful information, but that's just a hope.
+FORTIFY depends on -O2, so no worries. :)
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Kees Cook
 
