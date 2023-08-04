@@ -1,160 +1,88 @@
-Return-Path: <netdev+bounces-24244-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24245-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F8B076F6E7
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 03:24:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2AD1176F6EA
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 03:25:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D06721C20A3F
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 01:24:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5B45F1C21543
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 01:25:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5051010E5;
-	Fri,  4 Aug 2023 01:24:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E30B3EA8;
+	Fri,  4 Aug 2023 01:25:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42614EA8
-	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 01:24:17 +0000 (UTC)
-Received: from out-64.mta0.migadu.com (out-64.mta0.migadu.com [91.218.175.64])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 754684482
-	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 18:24:14 -0700 (PDT)
-Message-ID: <1bf7f5cf-a944-a284-28af-83a6603542fb@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1691112252; h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TwdQIDXC+f6jYe3ZTrZ/P/Tt5JCmVzAqF6vdm1RcH34=;
-	b=EJq+OHpmy8Ae5Kzsn+Rk9cCzs8Bdjk3+rM9n/ZWHWa7AwJtUTWcIxOiaFJRRI5LXziL3Vy
-	z+MCWlHk4CLZgXiQ3H3ySYUOoC+8O4lI3VE/VFr5uxPUbuaTh7BJdvjkCtShagdtx3ZbXW
-	+BM9KumVGOzPUeECcI9noVdsLG4ETZ8=
-Date: Thu, 3 Aug 2023 18:23:57 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7E1FA4E
+	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 01:25:45 +0000 (UTC)
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DA7C423E;
+	Thu,  3 Aug 2023 18:25:41 -0700 (PDT)
+Received: from kwepemi500008.china.huawei.com (unknown [172.30.72.57])
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4RH7Kv0nW8z1KCCn;
+	Fri,  4 Aug 2023 09:24:35 +0800 (CST)
+Received: from [10.67.109.254] (10.67.109.254) by
+ kwepemi500008.china.huawei.com (7.221.188.139) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Fri, 4 Aug 2023 09:25:38 +0800
+Message-ID: <cd9cef17-7d59-6779-80d5-8322055163fd@huawei.com>
+Date: Fri, 4 Aug 2023 09:25:38 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Reply-To: yonghong.song@linux.dev
-Subject: Re: [PATCH bpf-next v9 4/4] selftests/bpf: Add mptcpify test
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.0
+Subject: Re: [PATCH net-next] net/mlx5: remove many unnecessary NULL values
 Content-Language: en-US
-To: Geliang Tang <geliang.tang@suse.com>, Alexei Starovoitov
- <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
- <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
- Yonghong Song <yhs@fb.com>, John Fastabend <john.fastabend@gmail.com>,
- KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
- Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
- Florent Revest <revest@chromium.org>, Brendan Jackman
- <jackmanb@chromium.org>, Matthieu Baerts <matthieu.baerts@tessares.net>,
- Mat Martineau <martineau@kernel.org>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- John Johansen <john.johansen@canonical.com>, Paul Moore
- <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
- "Serge E. Hallyn" <serge@hallyn.com>,
- Stephen Smalley <stephen.smalley.work@gmail.com>,
- Eric Paris <eparis@parisplace.org>, Mykola Lysenko <mykolal@fb.com>,
- Shuah Khan <shuah@kernel.org>, Simon Horman <horms@kernel.org>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, mptcp@lists.linux.dev,
- apparmor@lists.ubuntu.com, linux-security-module@vger.kernel.org,
- selinux@vger.kernel.org, linux-kselftest@vger.kernel.org
-References: <cover.1691069778.git.geliang.tang@suse.com>
- <92ee6be5a465601ff3a2df29b6a517086e87ca3c.1691069778.git.geliang.tang@suse.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yonghong Song <yonghong.song@linux.dev>
-In-Reply-To: <92ee6be5a465601ff3a2df29b6a517086e87ca3c.1691069778.git.geliang.tang@suse.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To: Leon Romanovsky <leon@kernel.org>
+CC: <borisp@nvidia.com>, <saeedm@nvidia.com>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<linux-rdma@vger.kernel.org>, <netdev@vger.kernel.org>
+References: <20230801123854.375155-1-ruanjinjie@huawei.com>
+ <20230803181730.GG53714@unreal>
+From: Ruan Jinjie <ruanjinjie@huawei.com>
+In-Reply-To: <20230803181730.GG53714@unreal>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+X-Originating-IP: [10.67.109.254]
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ kwepemi500008.china.huawei.com (7.221.188.139)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
 
 
-On 8/3/23 6:41 AM, Geliang Tang wrote:
-> Implement a new test program mptcpify: if the family is AF_INET or
-> AF_INET6, the type is SOCK_STREAM, and the protocol ID is 0 or
-> IPPROTO_TCP, set it to IPPROTO_MPTCP. It will be hooked in
-> update_socket_protocol().
+On 2023/8/4 2:17, Leon Romanovsky wrote:
+> On Tue, Aug 01, 2023 at 08:38:54PM +0800, Ruan Jinjie wrote:
+>> Ther are many pointers assigned first, which need not to be initialized, so
 > 
-> Extend the MPTCP test base, add a selftest test_mptcpify() for the
-> mptcpify case. Open and load the mptcpify test prog to mptcpify the
-> TCP sockets dynamically, then use start_server() and connect_to_fd()
-> to create a TCP socket, but actually what's created is an MPTCP
-> socket, which can be verified through the outputs of 'ss' and 'nstat'
-> commands.
+> Ther -> There
 > 
-> Reviewed-by: Matthieu Baerts <matthieu.baerts@tessares.net>
-> Signed-off-by: Geliang Tang <geliang.tang@suse.com>
-> ---
->   .../testing/selftests/bpf/prog_tests/mptcp.c  | 94 +++++++++++++++++++
->   tools/testing/selftests/bpf/progs/mptcpify.c  | 25 +++++
->   2 files changed, 119 insertions(+)
->   create mode 100644 tools/testing/selftests/bpf/progs/mptcpify.c
+>> remove the NULL assignment.
 > 
-> diff --git a/tools/testing/selftests/bpf/prog_tests/mptcp.c b/tools/testing/selftests/bpf/prog_tests/mptcp.c
-> index 4407bd5c9e9a..caab3aa6a162 100644
-> --- a/tools/testing/selftests/bpf/prog_tests/mptcp.c
-> +++ b/tools/testing/selftests/bpf/prog_tests/mptcp.c
-> @@ -6,6 +6,7 @@
->   #include "cgroup_helpers.h"
->   #include "network_helpers.h"
->   #include "mptcp_sock.skel.h"
-> +#include "mptcpify.skel.h"
->   
->   char NS_TEST[32];
->   
-> @@ -195,8 +196,101 @@ static void test_base(void)
->   	close(cgroup_fd);
->   }
->   
-> +static void send_byte(int fd)
-> +{
-> +	char b = 0x55;
-> +
-> +	ASSERT_EQ(write(fd, &b, sizeof(b)), 1, "send single byte");
-> +}
-> +
-> +static int verify_mptcpify(void)
-> +{
-> +	char cmd[256];
-> +	int err = 0;
-> +
-> +	snprintf(cmd, sizeof(cmd),
-> +		 "ip netns exec %s ss -tOni | grep -q '%s'",
-> +		 NS_TEST, "tcp-ulp-mptcp");
+> assignment -> assignments.
 
-Could you show what is the expected output from the above command line
-   ip netns exec %s ss -tOni
-?
-This way, users can easily reason about the ss states based on tests.
+Thank you! I'll fix the issues sooner.
 
-> +	if (!ASSERT_OK(system(cmd), "No tcp-ulp-mptcp found!"))
-> +		err++;
-> +
-> +	snprintf(cmd, sizeof(cmd),
-> +		 "ip netns exec %s nstat -asz %s | awk '%s' | grep -q '%s'",
-> +		 NS_TEST, "MPTcpExtMPCapableSYNACKRX",
-> +		 "NR==1 {next} {print $2}", "1");
-
-The same thing here. Could you show the expected output with
-    ip netns exec %s nstat -asz %s
-?
-
-> +	if (!ASSERT_OK(system(cmd), "No MPTcpExtMPCapableSYNACKRX found!"))
-> +		err++;
-> +
-> +	return err;
-> +}
-> +
-[...]
+> 
+>>
+>> Signed-off-by: Ruan Jinjie <ruanjinjie@huawei.com>
+>> ---
+>>  drivers/net/ethernet/mellanox/mlx5/core/fpga/core.c   | 4 ++--
+>>  drivers/net/ethernet/mellanox/mlx5/core/lib/hv_vhca.c | 2 +-
+>>  2 files changed, 3 insertions(+), 3 deletions(-)
+>>
+> 
+> Thanks,
+> Reviewed-by: Leon Romanovsky <leonro@nvidia.com>
 
