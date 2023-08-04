@@ -1,43 +1,39 @@
-Return-Path: <netdev+bounces-24344-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24346-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A3D076FDFA
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 12:00:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 061BB76FE29
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 12:10:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BBC9D1C2167C
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 10:00:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 385581C2179E
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 10:10:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15833AD28;
-	Fri,  4 Aug 2023 10:00:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6999AD29;
+	Fri,  4 Aug 2023 10:10:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08A99A959
-	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 10:00:18 +0000 (UTC)
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6049646AA
-	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 03:00:17 -0700 (PDT)
-Received: from kwepemi500012.china.huawei.com (unknown [172.30.72.53])
-	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4RHLjk6BHLz1Z1SQ;
-	Fri,  4 Aug 2023 17:57:30 +0800 (CST)
-Received: from huawei.com (10.90.53.73) by kwepemi500012.china.huawei.com
- (7.221.188.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Fri, 4 Aug
- 2023 18:00:15 +0800
-From: Li Zetao <lizetao1@huawei.com>
-To: <ioana.ciornei@nxp.com>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>
-CC: <lizetao1@huawei.com>, <netdev@vger.kernel.org>
-Subject: [PATCH net-next 2/2] net: dpaa2-switch: Remove redundant initialization owner in dpaa2_switch_drv
-Date: Fri, 4 Aug 2023 17:59:46 +0800
-Message-ID: <20230804095946.99956-3-lizetao1@huawei.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230804095946.99956-1-lizetao1@huawei.com>
-References: <20230804095946.99956-1-lizetao1@huawei.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 869A4A92F
+	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 10:10:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id DFD83C433C8;
+	Fri,  4 Aug 2023 10:10:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1691143820;
+	bh=Xc3OKQSd3PrTUhz9ThOXVWsk0oIpJWblGCBXe2VUwrc=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=NElv208tUJZtArIw3syRtQy2EfGQfk0a+GQbY1mYyHCYWze7XxV5ecQYsKzKX+4NN
+	 rwF8asWqK16M4ZVdbePm+itvGthfKQ56fNibdP4Dba+XYoBxLhe/vqYDmaYkeoLOzd
+	 0mAJKxOhnIt9x6llO0gGeh7M0rSIi1qJ2/OSZVIi5q5ilH4sanDfr7pI0rvGx5K3uj
+	 8fPiB3gn/T5t6bi4AlINGd/4dmt5RSXzSlatgOLznLLSBdJSbaNCRMkyti8y2Vqctd
+	 eysMGq2GslWmUjUS65CdO1MR1u6goCTvK1N9xeYS99Gv2e1630px8LUVWdgs3Rg9py
+	 HHDR3j+d1y9uQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C1C69C395F3;
+	Fri,  4 Aug 2023 10:10:20 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -45,39 +41,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.90.53.73]
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- kwepemi500012.china.huawei.com (7.221.188.12)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Subject: Re: [PATCH net-next] net: vlan: update wrong comments
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169114382079.5978.17989706850682909943.git-patchwork-notify@kernel.org>
+Date: Fri, 04 Aug 2023 10:10:20 +0000
+References: <20230803071426.2012024-1-edumazet@google.com>
+In-Reply-To: <20230803071426.2012024-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com
 
-The fsl_mc_driver_register() will set "THIS_MODULE" to driver.owner when
-register a fsl_mc_driver driver, so it is redundant initialization to set
-driver.owner in dpaa2_switch_drv statement. Remove it for clean code.
+Hello:
 
-Signed-off-by: Li Zetao <lizetao1@huawei.com>
----
- drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c | 1 -
- 1 file changed, 1 deletion(-)
+This patch was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-diff --git a/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c b/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
-index 21cc4e52425a..97d3151076d5 100644
---- a/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
-+++ b/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
-@@ -3457,7 +3457,6 @@ MODULE_DEVICE_TABLE(fslmc, dpaa2_switch_match_id_table);
- static struct fsl_mc_driver dpaa2_switch_drv = {
- 	.driver = {
- 		.name = KBUILD_MODNAME,
--		.owner = THIS_MODULE,
- 	},
- 	.probe = dpaa2_switch_probe,
- 	.remove = dpaa2_switch_remove,
+On Thu,  3 Aug 2023 07:14:26 +0000 you wrote:
+> vlan_insert_tag() and friends do not allocate a new skb.
+> However they might allocate a new skb->head.
+> Update their comments to better describe their behavior.
+> 
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> ---
+>  include/linux/if_vlan.h | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+
+Here is the summary with links:
+  - [net-next] net: vlan: update wrong comments
+    https://git.kernel.org/netdev/net-next/c/7740bb882fde
+
+You are awesome, thank you!
 -- 
-2.34.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
