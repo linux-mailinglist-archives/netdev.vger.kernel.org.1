@@ -1,203 +1,90 @@
-Return-Path: <netdev+bounces-24440-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24441-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 536F477032D
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 16:34:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C0BA77032F
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 16:35:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 226021C2182C
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 14:34:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 66EA61C20EDD
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 14:35:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D3A3BA4D;
-	Fri,  4 Aug 2023 14:34:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3333FBE4F;
+	Fri,  4 Aug 2023 14:35:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9108BAD48
-	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 14:34:35 +0000 (UTC)
-Received: from mail-wr1-x42d.google.com (mail-wr1-x42d.google.com [IPv6:2a00:1450:4864:20::42d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA6D946B1;
-	Fri,  4 Aug 2023 07:34:33 -0700 (PDT)
-Received: by mail-wr1-x42d.google.com with SMTP id ffacd0b85a97d-3178fa77b27so1861128f8f.2;
-        Fri, 04 Aug 2023 07:34:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1691159672; x=1691764472;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=gnhR6SqlKyDtfBKJC4hNeKHd23FEMdH8MGwQaGtGRdI=;
-        b=jAVLI8CesXmbCkwfHUEQ7nlVPwVVPpZ17eac7OEK4AGytdty7Ue5rFx1iL4gI80Cyh
-         qRRccNopZyDI0/uixBpnI72bvA1U7YshZK0MxVs3hqovUQD7JANmLBs6IR1n75WVcnbP
-         aFFX1/J0T7ir6Md0RtqZIq79WRxCgKjV9B+nh3M3Uj2w14jI/LmYeGByf1Jg+XV7XIkT
-         0gcXxIK9wfWmY+A82lMMnt5EbQ02btBWu9ueGa12WI3fs/XUMl39DMOYMs0XN1nwNIUF
-         VLTjGxSxOYecZbj7zlMjYkRinSlPlScdVLqD3qB0NVqMGQtLeWv/6IEVDwbwLvx5e/Az
-         F0HA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691159672; x=1691764472;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gnhR6SqlKyDtfBKJC4hNeKHd23FEMdH8MGwQaGtGRdI=;
-        b=DpLrq7fR3N+/tjyTR1QP1iTh+BOmka+utf4C0wvUd//KTGa6HLKtPMIIoeIWFJdPGe
-         UXxeDmiwtxSJGrVyt+ctI6/SCQ2mC53RPh/20uoYyN16+1qhnOr7h6tEfTZxLowjgELH
-         Ww5xvrNdwkhfavugMmRyz0rt4/yEcbaEp+xpO/MTh/eKFme7Iy+000/JCnw+ig9Y0T11
-         j138F8WtSMFHZPi1qNjol61Si8IPe5t/Sx2APd+mcsOn/hj/fbEh+YwhTvyoaKiiqGdQ
-         hcCVIEWJy5CHPpXBzyPOQxT2rLDpD1cfka432w4NPMBWCu74W4sVeIuQIBk9DzL9cTnR
-         XVZQ==
-X-Gm-Message-State: AOJu0Yzk43UZAH5yNcn/pRgKEtKem35U3gX+Tm7FC+vnM35oYYfO4jxA
-	+YXh74pyqCXgTvejcwVzTbw=
-X-Google-Smtp-Source: AGHT+IEtCU4yB/eEUU3/q/nAeiU30tSC/qjpFrK1WeBDTdo/eu542EPuiVzE/9hJyK/GDrCa9u5DbA==
-X-Received: by 2002:adf:ea42:0:b0:313:e741:1caa with SMTP id j2-20020adfea42000000b00313e7411caamr1440426wrn.25.1691159672151;
-        Fri, 04 Aug 2023 07:34:32 -0700 (PDT)
-Received: from [10.9.105.115] ([41.86.56.122])
-        by smtp.gmail.com with ESMTPSA id s9-20020adfecc9000000b0031416362e23sm2715524wro.3.2023.08.04.07.34.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 04 Aug 2023 07:34:31 -0700 (PDT)
-Message-ID: <140bb8ec-f443-79f9-662b-0c4e972c8dd6@gmail.com>
-Date: Fri, 4 Aug 2023 17:34:20 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FCB4BA4D
+	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 14:35:06 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D8BBC433C7;
+	Fri,  4 Aug 2023 14:35:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1691159706;
+	bh=lI3Yz8yyI1OekaPbi6kQfjrKofOteaQVZnmEx+XbDVQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=jCQUEn3kKTRpq8LNxvB8atg3pEf55bRiqS83dVV4mR9nGKMe7n+WwbNFdcj50i2+5
+	 tkxnMifwxXdiQHzJbzWCNwjBiiVCGybNy+8qggbvi+49V6wqFywsV2w+nprqQopEQL
+	 HM7HkjeCX3DBNHQKrxqUerxN3YUxVrKLIZUlsPLnypldZ2PUdQpyFX/7RqY3mI2PGE
+	 5afKAIgLXD6CJqzdD5D0jTf4cHxOuyQourKnWJD3JKHmRd0aX8DyelF1ruCXPoEcMV
+	 n4afMB2IpFFexRq9TElS9z5T7fXIy+NM+PwZ21T+aP0qkxCSrbzFTMfk5fU7Asx59z
+	 dk5EEmYkvx73A==
+Date: Fri, 4 Aug 2023 16:35:02 +0200
+From: Simon Horman <horms@kernel.org>
+To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org,
+	Tony Nguyen <anthony.l.nguyen@intel.com>, netdev@vger.kernel.org,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>
+Subject: Re: [PATCH iwl-next v2] ice: split ice_aq_wait_for_event() func into
+ two
+Message-ID: <ZM0MlhZduLVa6YZV@kernel.org>
+References: <20230803151347.23322-1-przemyslaw.kitszel@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.2
-Subject: Re: [RFC PATCH v1 1/2] vsock: send SIGPIPE on write to shutdowned
- socket
-Content-Language: en-US
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: Arseniy Krasnov <AVKrasnov@sberdevices.ru>,
- Stefan Hajnoczi <stefanha@redhat.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Bobby Eshleman <bobby.eshleman@bytedance.com>, kvm@vger.kernel.org,
- virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, kernel@sberdevices.ru
-References: <20230801141727.481156-1-AVKrasnov@sberdevices.ru>
- <20230801141727.481156-2-AVKrasnov@sberdevices.ru>
- <qgn26mgfotc7qxzp6ad7ezkdex6aqniv32c5tvehxh4hljsnvs@x7wvyvptizxx>
- <44fef482-579a-fed6-6e8c-d400546285fc@gmail.com>
- <bzkwqp26joyzgvqyoypyv43wv7t3b6rzs3v5hkch45yggmrzp6@25byvzqwiztb>
-From: Arseniy Krasnov <oxffffaa@gmail.com>
-In-Reply-To: <bzkwqp26joyzgvqyoypyv43wv7t3b6rzs3v5hkch45yggmrzp6@25byvzqwiztb>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,HK_RANDOM_ENVFROM,
-	HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230803151347.23322-1-przemyslaw.kitszel@intel.com>
 
+On Thu, Aug 03, 2023 at 11:13:47AM -0400, Przemek Kitszel wrote:
+> Mitigate race between registering on wait list and receiving
+> AQ Response from FW.
+> 
+> ice_aq_prep_for_event() should be called before sending AQ command,
+> ice_aq_wait_for_event() should be called after sending AQ command,
+> to wait for AQ Response.
+> 
+> struct ice_aq_task is exposed to callers, what takes burden of memory
+> ownership out from AQ-wait family of functions.
+> 
+> Embed struct ice_rq_event_info event into struct ice_aq_task
+> (instead of it being a ptr), to remove some more code from the callers.
+> 
+> Additional fix: one of the checks in ice_aq_check_events() was off by one.
 
+Hi Przemek,
 
-On 04.08.2023 17:28, Stefano Garzarella wrote:
-> On Fri, Aug 04, 2023 at 03:46:47PM +0300, Arseniy Krasnov wrote:
->> Hi Stefano,
->>
->> On 02.08.2023 10:46, Stefano Garzarella wrote:
->>> On Tue, Aug 01, 2023 at 05:17:26PM +0300, Arseniy Krasnov wrote:
->>>> POSIX requires to send SIGPIPE on write to SOCK_STREAM socket which was
->>>> shutdowned with SHUT_WR flag or its peer was shutdowned with SHUT_RD
->>>> flag. Also we must not send SIGPIPE if MSG_NOSIGNAL flag is set.
->>>>
->>>> Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
->>>> ---
->>>> net/vmw_vsock/af_vsock.c | 3 +++
->>>> 1 file changed, 3 insertions(+)
->>>>
->>>> diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
->>>> index 020cf17ab7e4..013b65241b65 100644
->>>> --- a/net/vmw_vsock/af_vsock.c
->>>> +++ b/net/vmw_vsock/af_vsock.c
->>>> @@ -1921,6 +1921,9 @@ static int vsock_connectible_sendmsg(struct socket *sock, struct msghdr *msg,
->>>>             err = total_written;
->>>>     }
->>>> out:
->>>> +    if (sk->sk_type == SOCK_STREAM)
->>>> +        err = sk_stream_error(sk, msg->msg_flags, err);
->>>
->>> Do you know why we don't need this for SOCK_SEQPACKET and SOCK_DGRAM?
->>
->> Yes, here is my explanation:
->>
->> This function checks that input error is SIGPIPE, and if so it sends SIGPIPE to the 'current' thread
->> (except case when MSG_NOSIGNAL flag is set). This behaviour is described in POSIX:
->>
->> Page 367 (description of defines from sys/socket.h):
->> MSG_NOSIGNAL: No SIGPIPE generated when an attempt to send is made on a stream-
->> oriented socket that is no longer connected.
->>
->> Page 497 (description of SOCK_STREAM):
->> A SIGPIPE signal is raised if a thread sends on a broken stream (one that is
->> no longer connected).
-> 
-> Okay, but I think we should do also for SEQPACKET:
-> 
-> https://pubs.opengroup.org/onlinepubs/009696699/functions/xsh_chap02_10.html
-> 
-> In 2.10.6 Socket Types:
-> 
-> "The SOCK_SEQPACKET socket type is similar to the SOCK_STREAM type, and
-> is also connection-oriented. The only difference between these types is
-> that record boundaries ..."
-> 
-> Then in  2.10.14 Signals:
-> 
-> "The SIGPIPE signal shall be sent to a thread that attempts to send data
-> on a socket that is no longer able to send. In addition, the send
-> operation fails with the error [EPIPE]."
-> 
-> It's honestly not super clear, but I assume the problem is similar with
-> seqpacket since it's connection-oriented, or did I miss something?
-> 
-> For example in sctp_sendmsg() IIUC we raise a SIGPIPE regardless of
-> whether the socket is STREAM or SEQPACKET.
+This patch seems to be doing three things:
 
-Hm, yes, you're right. Seems check for socket type is not needed in this case,
-as this function is only for connection oriented sockets.
+1. Refactoring code, in order to allow
+2. Addressing a race condition
+3. Correcting an off-by-one error
 
-> 
->>
->> Page 1802 (description of 'send()' call):
->> MSG_NOSIGNAL
->>
->> Requests not to send the SIGPIPE signal if an attempt to
->> send is made on a stream-oriented socket that is no
->> longer connected. The [EPIPE] error shall still be
->> returned
->>
->> And the same for 'sendto()' and 'sendmsg()'
->>
->> Link to the POSIX document:
->> https://www.open-std.org/jtc1/sc22/open/n4217.pdf
->>
->> TCP (I think we must rely on it), KCM, SMC sockets (all of them are stream) work in the same
->> way by calling this function. AF_UNIX also works in the same way, but it implements SIGPIPE handling
->> without this function.
-> 
-> I'm okay calling this function.
-> 
->>
->> The only thing that confused me a little bit, that sockets above returns EPIPE when
->> we have only SEND_SHUTDOWN set, but for AF_VSOCK EPIPE is returned for RCV_SHUTDOWN
->> also, but I think it is related to this patchset.
-> 
-> Do you mean that it is NOT related to this patchset?
+All good stuff. But all complex, and 1 somewhat buries 2 and 3.
+I'm wondering if the patch could be broken up into smaller patches
+to aid both review new and inspection later.
 
-Yes, **NOT**
+The above notwithstanding, the code does seems fine to me.
 
-> 
-> Thanks,
-> Stefano
->
+> Please note, that this was found by reading the code,
+> an actual race has not yet materialized.
 
+Sure. But I do wonder if a fixes tag might be appropriate anyway.
 
-Thanks, Arseniy
- 
+> Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 
