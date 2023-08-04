@@ -1,113 +1,223 @@
-Return-Path: <netdev+bounces-24376-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24377-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27EA677001A
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 14:20:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 535C9770025
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 14:23:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 588B91C217FD
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 12:20:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7EB491C217C3
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 12:23:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7EE3BA55;
-	Fri,  4 Aug 2023 12:20:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38FBBBA57;
+	Fri,  4 Aug 2023 12:23:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C613FBA50
-	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 12:20:32 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD46F46B1
-	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 05:20:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1691151627;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Bi7oZhJ0pwsGnsF8DihtaSZ95yhE0U9tzdVwK9en+qo=;
-	b=F0APe8blov0GVMVIT4Cgr/DgFt1wWMVf1qk5cgFmFa39HxwrB7XWAIWFM0cOv8OHa2HeBz
-	zvArAhwoCEUMBI9XMshbyYzMn10VkrIrI1be2+Bv8l0+/SYDOYBw4qYRSscYlsrl889ZDI
-	acRT3pDOQMuYmfpXRO6BxoadVx9JGGU=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-205-4JDI8jaOPTm4SGbyil7H2A-1; Fri, 04 Aug 2023 08:20:24 -0400
-X-MC-Unique: 4JDI8jaOPTm4SGbyil7H2A-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1061E10113C1;
-	Fri,  4 Aug 2023 12:20:24 +0000 (UTC)
-Received: from RHTPC1VM0NT (unknown [10.22.33.16])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 1DF93492CA6;
-	Fri,  4 Aug 2023 12:20:22 +0000 (UTC)
-From: Aaron Conole <aconole@redhat.com>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org,  dev@openvswitch.org,
-  linux-kselftest@vger.kernel.org,  linux-kernel@vger.kernel.org,  Shuah
- Khan <shuah@kernel.org>,  Jakub Kicinski <kuba@kernel.org>,  Eric Dumazet
- <edumazet@google.com>,  "David S. Miller" <davem@davemloft.net>,  Pravin B
- Shelar <pshelar@ovn.org>,  Adrian Moreno <amorenoz@redhat.com>,  Ilya
- Maximets <i.maximets@ovn.org>
-Subject: Re: [PATCH v3 net-next 0/5] selftests: openvswitch: add flow
- programming cases
-References: <20230801212226.909249-1-aconole@redhat.com>
-	<8470c431e0930d2ea204a9363a60937289b7fdbe.camel@redhat.com>
-Date: Fri, 04 Aug 2023 08:20:21 -0400
-In-Reply-To: <8470c431e0930d2ea204a9363a60937289b7fdbe.camel@redhat.com>
-	(Paolo Abeni's message of "Thu, 03 Aug 2023 15:22:12 +0200")
-Message-ID: <f7tbkfn6ltm.fsf@redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4AEC9479
+	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 12:23:32 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 73A3FC433C7;
+	Fri,  4 Aug 2023 12:23:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1691151812;
+	bh=QppzQhsRlg4qPDIGbiHxaRS4WDCRfQmv3ibRAOj0YdU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=cSvgSbgBUMcktZ54wPo/skPThBHzsKTN0GaE0ctMtuybUqP1A85EUCZYhi6JPqKpT
+	 93FzryH5cLPf88Kvxu8RZRfvp+FPgbbZd20HTAywQ6xQU+L8Mn9ZqwiShkJnSFBr6R
+	 pTPcNjpVH8wN1rN34MF4EG5uizJkMwBOMn+9yK9QAYWG6L11A0sV4Sj2ZzEtQY9btY
+	 mr5UZYIk7YbWhtsV/E6N0qA+FEMYrcH9U/wlmmlZr6zseaW3lIHxRBzk7bG2GDDMb8
+	 +RascKFz6fBXMpmBewbeuKzdkuthZoHi1JK67FjWKe54kXxiB6Ov0ghl8/6z9ZgmIG
+	 UY3U50xHvbkKg==
+Received: by mercury (Postfix, from userid 1000)
+	id B92A71061B1F; Fri,  4 Aug 2023 14:23:29 +0200 (CEST)
+Date: Fri, 4 Aug 2023 14:23:29 +0200
+From: Sebastian Reichel <sre@kernel.org>
+To: Claudiu Beznea <claudiu.beznea@tuxon.dev>
+Cc: nicolas.ferre@microchip.com, conor.dooley@microchip.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, lgirdwood@gmail.com, broonie@kernel.org,
+	perex@perex.cz, tiwai@suse.com, maz@kernel.org,
+	srinivas.kandagatla@linaro.org, thierry.reding@gmail.com,
+	u.kleine-koenig@pengutronix.de,
+	linux-arm-kernel@lists.infradead.org, linux-pm@vger.kernel.org,
+	linux-pwm@vger.kernel.org, alsa-devel@alsa-project.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] MAINTAINERS: update Claudiu Beznea's email address
+Message-ID: <20230804122329.l6wytey6tlt4zjub@mercury.elektranox.org>
+References: <20230804050007.235799-1-claudiu.beznea@tuxon.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="ayavysskzyo2pjbe"
+Content-Disposition: inline
+In-Reply-To: <20230804050007.235799-1-claudiu.beznea@tuxon.dev>
 
-Paolo Abeni <pabeni@redhat.com> writes:
 
-> On Tue, 2023-08-01 at 17:22 -0400, Aaron Conole wrote:
->> The openvswitch selftests currently contain a few cases for managing the
->> datapath, which includes creating datapath instances, adding interfaces,
->> and doing some basic feature / upcall tests.  This is useful to validate
->> the control path.
->> 
->> Add the ability to program some of the more common flows with actions. This
->> can be improved overtime to include regression testing, etc.
->> 
->> v2->v3:
->> 1. Dropped support for ipv6 in nat() case
->> 2. Fixed a spelling mistake in 2/5 commit message.
->> 
->> v1->v2:
->> 1. Fix issue when parsing ipv6 in the NAT action
->> 2. Fix issue calculating length during ctact parsing
->> 3. Fix error message when invalid bridge is passed
->> 4. Fold in Adrian's patch to support key masks
->
-> FTR, this apparently requires an [un?]fairly recent version of
-> pyroute2. Perhaps you could explicitly check for a minimum working
-> version and otherwise bail out (skip) the add-flow tests.
+--ayavysskzyo2pjbe
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I'll make sure to get a follow up out ASAP that includes some check for
-supported version and will skip if not.  I will try to also include some
-additional robustness checks.
+Hi,
 
-Thanks Paolo!
+On Fri, Aug 04, 2023 at 08:00:07AM +0300, Claudiu Beznea wrote:
+> Update MAINTAINERS entries with a valid email address as the Microchip
+> one is no longer valid.
+>=20
+> Acked-by: Conor Dooley <conor.dooley@microchip.com>
+> Acked-by: Nicolas Ferre <nicolas.ferre@microchip.com>
+> Signed-off-by: Claudiu Beznea <claudiu.beznea@tuxon.dev>
+> ---
 
-> Cheers,
->
-> Paolo
+Acked-by: Sebastian Reichel <sre@kernel.org>
 
+-- Sebastian
+
+> Changes in v2:
+> - collected tags
+> - extended the recipients list to include individual subsystem
+>   maintainers and lists instead using only linux-kernel@vger.kernel.org
+>   as suggested initially by get_maintainers.pl
+>=20
+>  MAINTAINERS | 22 +++++++++++-----------
+>  1 file changed, 11 insertions(+), 11 deletions(-)
+>=20
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 128fd295f86f..d48d8e857f57 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -2351,7 +2351,7 @@ F:	drivers/phy/mediatek/
+>  ARM/MICROCHIP (ARM64) SoC support
+>  M:	Conor Dooley <conor@kernel.org>
+>  M:	Nicolas Ferre <nicolas.ferre@microchip.com>
+> -M:	Claudiu Beznea <claudiu.beznea@microchip.com>
+> +M:	Claudiu Beznea <claudiu.beznea@tuxon.dev>
+>  L:	linux-arm-kernel@lists.infradead.org (moderated for non-subscribers)
+>  S:	Supported
+>  T:	git https://git.kernel.org/pub/scm/linux/kernel/git/at91/linux.git
+> @@ -2360,7 +2360,7 @@ F:	arch/arm64/boot/dts/microchip/
+>  ARM/Microchip (AT91) SoC support
+>  M:	Nicolas Ferre <nicolas.ferre@microchip.com>
+>  M:	Alexandre Belloni <alexandre.belloni@bootlin.com>
+> -M:	Claudiu Beznea <claudiu.beznea@microchip.com>
+> +M:	Claudiu Beznea <claudiu.beznea@tuxon.dev>
+>  L:	linux-arm-kernel@lists.infradead.org (moderated for non-subscribers)
+>  S:	Supported
+>  W:	http://www.linux4sam.org
+> @@ -3265,7 +3265,7 @@ F:	include/uapi/linux/atm*
+> =20
+>  ATMEL MACB ETHERNET DRIVER
+>  M:	Nicolas Ferre <nicolas.ferre@microchip.com>
+> -M:	Claudiu Beznea <claudiu.beznea@microchip.com>
+> +M:	Claudiu Beznea <claudiu.beznea@tuxon.dev>
+>  S:	Supported
+>  F:	drivers/net/ethernet/cadence/
+> =20
+> @@ -13880,7 +13880,7 @@ F:	Documentation/devicetree/bindings/serial/atmel=
+,at91-usart.yaml
+>  F:	drivers/spi/spi-at91-usart.c
+> =20
+>  MICROCHIP AUDIO ASOC DRIVERS
+> -M:	Claudiu Beznea <claudiu.beznea@microchip.com>
+> +M:	Claudiu Beznea <claudiu.beznea@tuxon.dev>
+>  L:	alsa-devel@alsa-project.org (moderated for non-subscribers)
+>  S:	Supported
+>  F:	Documentation/devicetree/bindings/sound/atmel*
+> @@ -13903,7 +13903,7 @@ S:	Maintained
+>  F:	drivers/crypto/atmel-ecc.*
+> =20
+>  MICROCHIP EIC DRIVER
+> -M:	Claudiu Beznea <claudiu.beznea@microchip.com>
+> +M:	Claudiu Beznea <claudiu.beznea@tuxon.dev>
+>  L:	linux-arm-kernel@lists.infradead.org (moderated for non-subscribers)
+>  S:	Supported
+>  F:	Documentation/devicetree/bindings/interrupt-controller/microchip,sama=
+7g5-eic.yaml
+> @@ -13976,7 +13976,7 @@ F:	drivers/video/fbdev/atmel_lcdfb.c
+>  F:	include/video/atmel_lcdc.h
+> =20
+>  MICROCHIP MCP16502 PMIC DRIVER
+> -M:	Claudiu Beznea <claudiu.beznea@microchip.com>
+> +M:	Claudiu Beznea <claudiu.beznea@tuxon.dev>
+>  L:	linux-arm-kernel@lists.infradead.org (moderated for non-subscribers)
+>  S:	Supported
+>  F:	Documentation/devicetree/bindings/regulator/mcp16502-regulator.txt
+> @@ -14003,7 +14003,7 @@ F:	Documentation/devicetree/bindings/mtd/atmel-na=
+nd.txt
+>  F:	drivers/mtd/nand/raw/atmel/*
+> =20
+>  MICROCHIP OTPC DRIVER
+> -M:	Claudiu Beznea <claudiu.beznea@microchip.com>
+> +M:	Claudiu Beznea <claudiu.beznea@tuxon.dev>
+>  L:	linux-arm-kernel@lists.infradead.org (moderated for non-subscribers)
+>  S:	Supported
+>  F:	Documentation/devicetree/bindings/nvmem/microchip,sama7g5-otpc.yaml
+> @@ -14042,7 +14042,7 @@ F:	Documentation/devicetree/bindings/fpga/microch=
+ip,mpf-spi-fpga-mgr.yaml
+>  F:	drivers/fpga/microchip-spi.c
+> =20
+>  MICROCHIP PWM DRIVER
+> -M:	Claudiu Beznea <claudiu.beznea@microchip.com>
+> +M:	Claudiu Beznea <claudiu.beznea@tuxon.dev>
+>  L:	linux-arm-kernel@lists.infradead.org (moderated for non-subscribers)
+>  L:	linux-pwm@vger.kernel.org
+>  S:	Supported
+> @@ -14058,7 +14058,7 @@ F:	drivers/iio/adc/at91-sama5d2_adc.c
+>  F:	include/dt-bindings/iio/adc/at91-sama5d2_adc.h
+> =20
+>  MICROCHIP SAMA5D2-COMPATIBLE SHUTDOWN CONTROLLER
+> -M:	Claudiu Beznea <claudiu.beznea@microchip.com>
+> +M:	Claudiu Beznea <claudiu.beznea@tuxon.dev>
+>  S:	Supported
+>  F:	Documentation/devicetree/bindings/power/reset/atmel,sama5d2-shdwc.yaml
+>  F:	drivers/power/reset/at91-sama5d2_shdwc.c
+> @@ -14075,7 +14075,7 @@ S:	Supported
+>  F:	drivers/spi/spi-atmel.*
+> =20
+>  MICROCHIP SSC DRIVER
+> -M:	Claudiu Beznea <claudiu.beznea@microchip.com>
+> +M:	Claudiu Beznea <claudiu.beznea@tuxon.dev>
+>  L:	linux-arm-kernel@lists.infradead.org (moderated for non-subscribers)
+>  S:	Supported
+>  F:	Documentation/devicetree/bindings/misc/atmel-ssc.txt
+> @@ -14104,7 +14104,7 @@ F:	drivers/usb/gadget/udc/atmel_usba_udc.*
+> =20
+>  MICROCHIP WILC1000 WIFI DRIVER
+>  M:	Ajay Singh <ajay.kathat@microchip.com>
+> -M:	Claudiu Beznea <claudiu.beznea@microchip.com>
+> +M:	Claudiu Beznea <claudiu.beznea@tuxon.dev>
+>  L:	linux-wireless@vger.kernel.org
+>  S:	Supported
+>  F:	drivers/net/wireless/microchip/wilc1000/
+> --=20
+> 2.39.2
+>=20
+
+--ayavysskzyo2pjbe
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCgAdFiEE72YNB0Y/i3JqeVQT2O7X88g7+poFAmTM7akACgkQ2O7X88g7
++prINg//RcuW5D688+v0Q2OnYj7jCRdH2H+xmYorC7m7Z6DH3pjUQWl4b2PS2aQz
+iQWEtRsBEMiGgiYIhmwYMqUAClPdGRFyJFilrupoQQezDwvwdgmKMDX652VjH+F8
+InoIfuPaXfJPxscO2FXX6A0HM+8Qy14zH/Sf8Tyjc5TYFTdwWqsJMdYXYX2S/Gk9
+Uu1KL5ZUWvSooN127dgAC3EijnxV7T8y12gXd2gSrWu1moOYGEc3CJG61rTSa31u
+WzD00rEvPVUq9KX5r+uQWP4tub9hGSoy6E/u6K7NKjXWqn6rOjHaz2aw0FEU1/tp
+AtGDCOslPmvqFEmJs0bbHo51VlvHEpvDNU7EdKFsOXRIfij72l6SF8pD3Wj5ramA
+LrbV+A3kPZRlAudfxBc7ufzdP6wgyR6jgD394Ovhe5XDB+fANTMwCf38Gx62lsUD
+x4HnCksQoEZfkLsLtavbHqEpBmwgEHEX8TuZ68HxSDZIAgts8K86zNOnPZvpstak
+hLU0Bz0LVJiIz2DWIqE5gxNAaPSAUpT9KflPUiQISAHC7NB+yuNP8UbkOU4DoDQW
+K19om2Id4TjnyR7MDk1xb56uIPh9pj9I1sYmvsUkHmhxqh74gq7acYCntwapIyqb
+ebwZctmSOe18RQBGJzWciIJsgqDQRpm+9rY+sqRaSALim4llvbM=
+=ciPO
+-----END PGP SIGNATURE-----
+
+--ayavysskzyo2pjbe--
 
