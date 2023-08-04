@@ -1,45 +1,71 @@
-Return-Path: <netdev+bounces-24417-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24418-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6BE477021A
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 15:44:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB75177021E
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 15:45:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D83361C2182A
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 13:44:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A593F2826E1
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 13:45:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F6D2C148;
-	Fri,  4 Aug 2023 13:44:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6508C149;
+	Fri,  4 Aug 2023 13:45:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7121DA929
-	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 13:44:31 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75A74C433C7;
-	Fri,  4 Aug 2023 13:44:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691156671;
-	bh=uDkY58UkthYs6rYU1ibKDJwSFeKpnh9PwS5wusjzbl0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=IdQ1XsdSCjR9lRj1/dZNLcwM/cNvf+CHqSCjkzrcsd8iUDsViB6xS2sIT6oQ6Qdjw
-	 gOCjXDXtskKzE2+fQbOJq0SUx+cpDt/lVHWKbk3tUQedlGl1dOnQ+fvTLOPY1n/Fzq
-	 VOTi8N3eD1JcyuvZjlP4toGCsFn7QtS9jMkwVcEZD1XNO17ajGGvFTsOxsKrgQFI45
-	 RlZM7qCFIyF3PDGvRwC2+wL20hWVMxe5Y/erC7R7PVGLhz8GHG1/hm4ya0B9BShQrm
-	 Y6Ab5AsStXhdmfJeV7AkKI+euN4ohI1QBHlgC2olSisU9AIVHLgU2fwDC1Wvf+mtpi
-	 qQvVqQcONICxA==
-Date: Fri, 4 Aug 2023 15:44:26 +0200
-From: Simon Horman <horms@kernel.org>
-To: edward.cree@amd.com
-Cc: linux-net-drivers@amd.com, davem@davemloft.net, kuba@kernel.org,
-	edumazet@google.com, pabeni@redhat.com,
-	Edward Cree <ecree.xilinx@gmail.com>, netdev@vger.kernel.org,
-	habetsm.xilinx@gmail.com
-Subject: Re: [PATCH net-next 0/7] sfc: basic conntrack offload
-Message-ID: <ZM0AurjKOt8q0ezk@kernel.org>
-References: <cover.1691063675.git.ecree.xilinx@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8A38BE6D
+	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 13:45:21 +0000 (UTC)
+Received: from mail-yw1-x112d.google.com (mail-yw1-x112d.google.com [IPv6:2607:f8b0:4864:20::112d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4E2D195
+	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 06:45:14 -0700 (PDT)
+Received: by mail-yw1-x112d.google.com with SMTP id 00721157ae682-583f837054eso23154017b3.3
+        for <netdev@vger.kernel.org>; Fri, 04 Aug 2023 06:45:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1691156714; x=1691761514;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=xFjOj5n/pnoN1dMFIl4rP1O9RZ0CMtGw4Zpf0LApXq4=;
+        b=X6Tg9Hj0FPC7j0g0E8SVZc9As5oqGp8Wc2bHTV5BWGlJzJfVHJXqLJ/z2+wq+q7iOn
+         YXyA5fJq7wNvImJyxlznrlYC6OpTy4lPcqjrS82Xtg6Zq9lO4i/YMTkXFxnM4v9//70M
+         uyCGVZK3vvLB6GHu9OkwVRmJzTfRYeYeRUUQVxS7JlV/n0pv9rz1zjcKc216b3i2YL96
+         S+OAy0sAOeIqAQbymxPCDSzVTnwTqs5HdHmRNelm+dRJkhUQ75q53zmAeUi0ra7OsxWD
+         1Tm51b10i5QBRJm8KW54zEmn2E6OOOQ2tyvomVxeraG14Jqim6cXlsA3vKxBbFdx+0vl
+         /tsw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691156714; x=1691761514;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xFjOj5n/pnoN1dMFIl4rP1O9RZ0CMtGw4Zpf0LApXq4=;
+        b=NKqna2W0tn4GQ65dV+QVdSHGQVIfIXaCpQdyICFu6x4kV6v7A/ZApRGgh4TcUskEEz
+         2B/GiNYwgw4p4m9FE/+peGjjpVBl7HzuHoVx/5LtJhGjj/38Tm0t7PIunRt7u1J/Lm9W
+         50UZ+iqENVbMIunxvfjlcaePpMdRnypvWn0xPHa1sdSKUJBJfiJuH4CouTHIMqylNK9l
+         faqY8w2VKM/Ju481OI56YPt8bLzHIrd5pYNpVbltfN70xyxdLIZkCQxrXi13LXVhQAaf
+         MkiD1FLQtViiJwjZ6sDUnP7wW4sGY0MITF91sy//dqiCymWyNZh0sgfwVpPxP1Oh0v9I
+         o16w==
+X-Gm-Message-State: AOJu0YywN906WE7hWX9gUTxhbLu+XOnzQawaJGLf5HJ0cMjViDz5DOfp
+	tWZf6vxfLliSLUqXpfEx886AGA==
+X-Google-Smtp-Source: AGHT+IGsmsbyIAE5Wg5xYkedvbP55jv1I5DOFPFlN68/nYITNiTw0nmASOEROfoxmXtVy6Ck6NnxbQ==
+X-Received: by 2002:a81:8704:0:b0:583:9018:29ec with SMTP id x4-20020a818704000000b00583901829ecmr1730320ywf.32.1691156714023;
+        Fri, 04 Aug 2023 06:45:14 -0700 (PDT)
+Received: from localhost ([212.23.236.67])
+        by smtp.gmail.com with ESMTPSA id w128-20020a0ded86000000b00583f8f41cb8sm717094ywe.63.2023.08.04.06.45.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 04 Aug 2023 06:45:13 -0700 (PDT)
+Date: Fri, 4 Aug 2023 15:45:11 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Zhengchao Shao <shaozhengchao@huawei.com>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	weiyongjun1@huawei.com, yuehaibing@huawei.com
+Subject: Re: [PATCH net-next 6/6] team: remove unused input parameters in
+ lb_htpm_select_tx_port and lb_hash_select_tx_port
+Message-ID: <ZM0A51WuvXQa67CS@nanopsycho>
+References: <20230804123116.2495908-1-shaozhengchao@huawei.com>
+ <20230804123116.2495908-7-shaozhengchao@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -48,22 +74,78 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <cover.1691063675.git.ecree.xilinx@gmail.com>
+In-Reply-To: <20230804123116.2495908-7-shaozhengchao@huawei.com>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Thu, Aug 03, 2023 at 12:56:16PM +0100, edward.cree@amd.com wrote:
-> From: Edward Cree <ecree.xilinx@gmail.com>
+Fri, Aug 04, 2023 at 02:31:16PM CEST, shaozhengchao@huawei.com wrote:
+>The input parameters "lb_priv" and "skb" in lb_htpm_select_tx_port and
+>lb_hash_select_tx_port are unused, so remove them.
+>
+>Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
+>---
+> drivers/net/team/team_mode_loadbalance.c | 10 ++--------
+> 1 file changed, 2 insertions(+), 8 deletions(-)
+>
+>diff --git a/drivers/net/team/team_mode_loadbalance.c b/drivers/net/team/team_mode_loadbalance.c
+>index a6021ae51d0d..00f8989c29c0 100644
+>--- a/drivers/net/team/team_mode_loadbalance.c
+>+++ b/drivers/net/team/team_mode_loadbalance.c
+>@@ -30,8 +30,6 @@ static rx_handler_result_t lb_receive(struct team *team, struct team_port *port,
+> struct lb_priv;
 > 
-> Support offloading tracked connections and matching against them in
->  TC chains on the PF and on representors.
-> Later patch serieses will add NAT and conntrack-on-tunnel-netdevs;
->  keep it simple for now.
+> typedef struct team_port *lb_select_tx_port_func_t(struct team *,
+>-						   struct lb_priv *,
+>-						   struct sk_buff *,
+> 						   unsigned char);
+> 
+> #define LB_TX_HASHTABLE_SIZE 256 /* hash is a char */
+>@@ -118,8 +116,6 @@ static void lb_tx_hash_to_port_mapping_null_port(struct team *team,
+> 
+> /* Basic tx selection based solely by hash */
+> static struct team_port *lb_hash_select_tx_port(struct team *team,
+>-						struct lb_priv *lb_priv,
+>-						struct sk_buff *skb,
+> 						unsigned char hash)
+> {
+> 	int port_index = team_num_to_port_index(team, hash);
+>@@ -129,8 +125,6 @@ static struct team_port *lb_hash_select_tx_port(struct team *team,
+> 
+> /* Hash to port mapping select tx port */
+> static struct team_port *lb_htpm_select_tx_port(struct team *team,
+>-						struct lb_priv *lb__priv,
 
-Hi Ed,
+Squash the previous patch in this one to avoid this odd "__" thing.
 
-I did provide a minr nit on patch 7/7, in response to that patch,
-but overall this patchset looks good to me.
+Thanks!
 
-For the series,
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+>-						struct sk_buff *skb,
+> 						unsigned char hash)
+> {
+> 	struct lb_priv *lb_priv = get_lb_priv(team);
+>@@ -140,7 +134,7 @@ static struct team_port *lb_htpm_select_tx_port(struct team *team,
+> 	if (likely(port))
+> 		return port;
+> 	/* If no valid port in the table, fall back to simple hash */
+>-	return lb_hash_select_tx_port(team, lb_priv, skb, hash);
+>+	return lb_hash_select_tx_port(team, hash);
+> }
+> 
+> struct lb_select_tx_port {
+>@@ -230,7 +224,7 @@ static bool lb_transmit(struct team *team, struct sk_buff *skb)
+> 
+> 	hash = lb_get_skb_hash(lb_priv, skb);
+> 	select_tx_port_func = rcu_dereference_bh(lb_priv->select_tx_port_func);
+>-	port = select_tx_port_func(team, lb_priv, skb, hash);
+>+	port = select_tx_port_func(team, hash);
+> 	if (unlikely(!port))
+> 		goto drop;
+> 	if (team_dev_queue_xmit(team, port, skb))
+>-- 
+>2.34.1
+>
 
