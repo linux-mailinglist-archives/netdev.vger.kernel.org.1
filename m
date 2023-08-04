@@ -1,89 +1,91 @@
-Return-Path: <netdev+bounces-24258-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24259-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7ED7976F841
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 05:12:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C10A576F890
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 05:54:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B632A1C21710
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 03:12:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EC9581C21702
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 03:54:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83A071118;
-	Fri,  4 Aug 2023 03:12:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A11EB15D2;
+	Fri,  4 Aug 2023 03:54:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D8FE1101
-	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 03:12:14 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 049F2C433C7;
-	Fri,  4 Aug 2023 03:12:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691118733;
-	bh=JRNDrr8Q5XicQAEnr/UMUDvJf9uks/FyRXeJTq4Lonc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=R0WGwn2s0vAe/DsI3XGK11OMvfOJmtznPvIDw84m40aHVTpIpcqb2BBYLuzfuLVXk
-	 dZ9acA9IAQwtQzTU28t9fuHvoxracxbRDCqOkzLX1LeJe0NAsASu8TMADmINbZgGdd
-	 BX1P/gy9WCmjlM0BVG0hX4jELQWFjCNAAo0NB2evy4APrirEumPedKRUVDBkxVBYCa
-	 fUd1SRVIjlviVLoEWElgozH8jaA3DN65SmuYGQbu3LeHFnLKFAiUC4/TJ29BR+GhsW
-	 RhGkM/EcwsZYTxHL13maI270zR85GYjtNQTRlmot3tdxlHuqRiD6Jvh+6E17duy9Fk
-	 pAi6/OWVkJa3g==
-Date: Thu, 3 Aug 2023 20:12:12 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Tariq Toukan <ttoukan.linux@gmail.com>
-Cc: David Howells <dhowells@redhat.com>, netdev@vger.kernel.org, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Willem de Bruijn
- <willemdebruijn.kernel@gmail.com>, David Ahern <dsahern@kernel.org>,
- Matthew Wilcox <willy@infradead.org>, Al Viro <viro@zeniv.linux.org.uk>,
- Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>, Jeff
- Layton <jlayton@kernel.org>, Christian Brauner <brauner@kernel.org>, Chuck
- Lever III <chuck.lever@oracle.com>, Linus Torvalds
- <torvalds@linux-foundation.org>, linux-fsdevel@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-mm@kvack.org, Boris Pismenny
- <borisp@nvidia.com>, John Fastabend <john.fastabend@gmail.com>, Gal
- Pressman <gal@nvidia.com>, ranro@nvidia.com, samiram@nvidia.com,
- drort@nvidia.com, Tariq Toukan <tariqt@nvidia.com>
-Subject: Re: [PATCH net-next v10 08/16] tls: Inline do_tcp_sendpages()
-Message-ID: <20230803201212.1d5dd0f9@kernel.org>
-In-Reply-To: <852cef0c-2c1a-fdcd-4ee9-4a0bca3f54c5@gmail.com>
-References: <ecbb5d7e-7238-28e2-1a17-686325e2bb50@gmail.com>
-	<4c49176f-147a-4283-f1b1-32aac7b4b996@gmail.com>
-	<20230522121125.2595254-1-dhowells@redhat.com>
-	<20230522121125.2595254-9-dhowells@redhat.com>
-	<2267272.1686150217@warthog.procyon.org.uk>
-	<5a9d4ffb-a569-3f60-6ac8-070ab5e5f5ad@gmail.com>
-	<776549.1687167344@warthog.procyon.org.uk>
-	<7337a904-231d-201d-397a-7bbe7cae929f@gmail.com>
-	<20230630102143.7deffc30@kernel.org>
-	<f0538006-6641-eaf6-b7b5-b3ef57afc652@gmail.com>
-	<20230705091914.5bee12f8@kernel.org>
-	<bbdce803-0f23-7d3f-f75a-2bc3cfb794af@gmail.com>
-	<20230725173036.442ba8ba@kernel.org>
-	<852cef0c-2c1a-fdcd-4ee9-4a0bca3f54c5@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95B8915D0
+	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 03:54:40 +0000 (UTC)
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D67B62D69;
+	Thu,  3 Aug 2023 20:54:38 -0700 (PDT)
+Received: from kwepemi500008.china.huawei.com (unknown [172.30.72.54])
+	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4RHBbq6wqtzJrHg;
+	Fri,  4 Aug 2023 11:51:51 +0800 (CST)
+Received: from huawei.com (10.90.53.73) by kwepemi500008.china.huawei.com
+ (7.221.188.139) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Fri, 4 Aug
+ 2023 11:54:35 +0800
+From: Ruan Jinjie <ruanjinjie@huawei.com>
+To: <sgoutham@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <jesse.brandeburg@intel.com>,
+	<anthony.l.nguyen@intel.com>, <tariqt@nvidia.com>, <s.shtylyov@omp.ru>,
+	<aspriel@gmail.com>, <franky.lin@broadcom.com>,
+	<hante.meuleman@broadcom.com>, <kvalo@kernel.org>,
+	<richardcochran@gmail.com>, <yoshihiro.shimoda.uh@renesas.com>,
+	<ruanjinjie@huawei.com>, <u.kleine-koenig@pengutronix.de>,
+	<mkl@pengutronix.de>, <lee@kernel.org>, <set_pte_at@outlook.com>,
+	<linux-arm-kernel@lists.infradead.org>, <netdev@vger.kernel.org>,
+	<intel-wired-lan@lists.osuosl.org>, <linux-rdma@vger.kernel.org>,
+	<linux-renesas-soc@vger.kernel.org>, <linux-wireless@vger.kernel.org>,
+	<brcm80211-dev-list.pdl@broadcom.com>, <SHA-cyfmac-dev-list@infineon.com>
+Subject: [PATCH -next 0/6] net: Remove unnecessary ternary operators
+Date: Fri, 4 Aug 2023 11:53:40 +0800
+Message-ID: <20230804035346.2879318-1-ruanjinjie@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.90.53.73]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ kwepemi500008.china.huawei.com (7.221.188.139)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Thu, 3 Aug 2023 14:47:35 +0300 Tariq Toukan wrote:
-> When applying this patch, repro disappears! :)
-> Apparently it is related to the warning.
-> Please go on and submit it.
+There are a little ternary operators, the true or false judgement
+of which is unnecessary in C language semantics.
 
-I have no idea how. I found a different bug, staring at this code
-for another hour. But I still don't get how we can avoid UaF on
-a page by having the TCP take a ref on it rather than copy it.
+Ruan Jinjie (6):
+  net: thunderx: Remove unnecessary ternary operators
+  ethernet/intel: Remove unnecessary ternary operators
+  net/mlx4: Remove an unnecessary ternary operator
+  net: ethernet: renesas: rswitch: Remove an unnecessary ternary
+    operator
+  net: fjes: Remove an unnecessary ternary operator
+  brcm80211: Remove an unnecessary ternary operator
 
-If anything we should have 2 refs on any page in the sg, one because
-it's on the sg, and another held by the re-tx handling.
+ drivers/net/ethernet/cavium/thunder/nic_main.c               | 2 +-
+ drivers/net/ethernet/cavium/thunder/thunder_bgx.c            | 2 +-
+ drivers/net/ethernet/intel/igb/e1000_phy.c                   | 2 +-
+ drivers/net/ethernet/intel/igc/igc_phy.c                     | 2 +-
+ drivers/net/ethernet/mellanox/mlx4/port.c                    | 2 +-
+ drivers/net/ethernet/renesas/rcar_gen4_ptp.c                 | 2 +-
+ drivers/net/fjes/fjes_main.c                                 | 2 +-
+ drivers/net/wireless/broadcom/brcm80211/brcmsmac/phy/phy_n.c | 3 +--
+ 8 files changed, 8 insertions(+), 9 deletions(-)
 
-So I'm afraid we're papering over something here :( We need to keep
-digging.
+-- 
+2.34.1
+
 
