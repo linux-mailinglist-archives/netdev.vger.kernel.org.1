@@ -1,65 +1,93 @@
-Return-Path: <netdev+bounces-24422-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24423-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35073770235
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 15:50:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E75F77024E
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 15:51:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DD5FD2826BF
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 13:50:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD2391C21837
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 13:51:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF021C156;
-	Fri,  4 Aug 2023 13:50:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 701CDC2DB;
+	Fri,  4 Aug 2023 13:51:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2C75AD37
-	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 13:50:00 +0000 (UTC)
-Received: from EUR03-DBA-obe.outbound.protection.outlook.com (mail-dbaeur03on2065.outbound.protection.outlook.com [40.107.104.65])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22A16B1
-	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 06:49:59 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D677C151
+	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 13:51:52 +0000 (UTC)
+Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05on2051.outbound.protection.outlook.com [40.107.20.51])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8A3A4EED;
+	Fri,  4 Aug 2023 06:51:26 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=nDXIcLgNO+yyX/9Ddbbmtlqg2cW76/ophsvwv0rR4wXIisf2iRNufSfEcNvWrOdMA4obiDRUQTgy3UjZko1t01aOciNw3czxTCL5gdmToPGu4Nkx4J3EQEuoWkLjyVrMQHr9UfZaQUMViamYLXQiDX+NOs8qZW4opJQKpJG4KY7RQA52i49kwkm9tTHfUfTWmOjjJlWPsOdPriDdCcDDbBQ4Dq8tZmgjkdyXhEZd2H+greOsCyR6aKC4vMC5yL1Bo/h0FXAdwsikjLVX9X4hsTaztAmiezKXsiZdVpQhn3CyOOrARnlLlKjXGLDezKZ0TBJYJyqiQ74v0KlpApikVA==
+ b=lsRSFDD/P+pHAHxkqj5GaVVbqAM6u477uTQsqkdnzRBsk5WsCR6adPu9v10kH5QXY9ue23dIzhy5nRfcxy4f+NvmdeJ+NArjdfd58K6BYUIBjO5S7E/HTy8U9aflyIISuVLPiZ28mF3UphcXI1xWNSF/K2RuwwqGc/OH846S0kURghBzmXImPLRcmGoRETXoUHB2j8W7m8p2rsk/NgPCzb9xg52T7PglIPV1+2w8uweFR771NkAWfijEdrOwjfc6kbwH8o4L4W6iozAMx4gex21XzE84cMI2wVJzIkLhJFW8kgSughcBbX1J6VrafaB1UmCdN5Itj9fRGZATPCY8Rg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=PFMbS8cPUToWrEW+zWLq0b2eBrdq3EOING88M/vutfI=;
- b=EFgSM0OBLVlPhpV8U2BXYj6rzP7kL9CtlozfG4IH2zm6JM67hHisWjdOKLcQWCgP4/jOSgjFO7GvUUTHwQ0xwcLWxwp49c5p859dXgTnSqJsb0clDIHOSybqVXyGgGRlgVVnFbG6b5m7ZbgndkQrOAlxlEsJHl3vZZbXpJC/Spgqxa0qXhAj4bvl9QH+sJj8xVSAL6FtpqKpZ//RUl1BFLA3UkHC6wFnFF7xNISnAAKTG7wUuxMkmKjMSKd+c/PQBtREg52pHRsHqEG3UTOnZEGpc7rTOg93zJnyM8RCOZcSTlCTmxTYza5f8HWGKFHufY4MJnoS+db8+jORe4hrww==
+ bh=25FXIWZr7HFO/KtGICcieze5mrHkV/URIhUjR+awnh4=;
+ b=FDKsrLCysCmxuOwlkhOvBM1tKMRyHk6ucqccgam0cZgIJC4nFhiNbLqD+2nMaeSFi9dPGoKC5W0nK0OehR5ghnBsdb3y7iBd1l99bHbLzWQsgGsGbs4TLY2beX/e8eNG+H3/KAIgHJ9J4lf9bpR87vNy9uKT2hymxuTtOF3imk6vrczmXV1XwSWToclweYNbkNelBfKtzEAGpnF99gk0mSeNx/hIF5c/l+GBJ8p8viZzMRynq/D4pLiAbgL/Mi5sCU/1x2F5tpASkUuco8GsZCnrXmA/JuacYNANk6jEr2rZc52oDGk9gfIYMLO3c5aidx9+MVV0jNxsJSnbXdat9g==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=PFMbS8cPUToWrEW+zWLq0b2eBrdq3EOING88M/vutfI=;
- b=m3jD4u+y6jQCawwc31yyfA+G4snRe7RpeqCq9jCoCclKsozI3worbn9NJCLLLsL5/7CXQu349IKU2mX7xk7Stjn+Q7cn0C5SHUSNk9upFZulfdIf2pMk7lfw9oOoEM6CFUMbsraQpaxwJh/qAykZrPkkSPsV/AzuGfRsHlsQy10=
+ bh=25FXIWZr7HFO/KtGICcieze5mrHkV/URIhUjR+awnh4=;
+ b=FpfDSOlmq9Gq/IdT3cgYO/sSEh8wQMea+0tHDnZZqTbaxJvYNf7Zy/B2fkkRq5MLYzOsDisGg8sqYP9Wo2sK9/XX8vv1O3a2TtnaucE6AjrlxEp6p4NWVwUHmM8/2m0cFwjJOmNl5X1KcxACU4pniXMrw29+CKTIwdKTCQwLK2U=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nxp.com;
 Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
- by GVXPR04MB9903.eurprd04.prod.outlook.com (2603:10a6:150:11c::21) with
+ by DBAPR04MB7240.eurprd04.prod.outlook.com (2603:10a6:10:1af::23) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.47; Fri, 4 Aug
- 2023 13:49:56 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.21; Fri, 4 Aug
+ 2023 13:51:08 +0000
 Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
  ([fe80::d4ed:20a0:8c0a:d9cf]) by AM0PR04MB6452.eurprd04.prod.outlook.com
  ([fe80::d4ed:20a0:8c0a:d9cf%6]) with mapi id 15.20.6652.021; Fri, 4 Aug 2023
- 13:49:56 +0000
+ 13:51:07 +0000
+Date: Fri, 4 Aug 2023 16:51:02 +0300
 From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next] net: omit ndo_hwtstamp_get() call when possible in dev_set_hwtstamp_phylib()
-Date: Fri,  4 Aug 2023 16:49:39 +0300
-Message-Id: <20230804134939.3109763-1-vladimir.oltean@nxp.com>
-X-Mailer: git-send-email 2.34.1
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: BE1P281CA0290.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:b10:8a::11) To AM0PR04MB6452.eurprd04.prod.outlook.com
+To: Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Maxim Georgiev <glipus@gmail.com>,
+	Horatiu Vultur <horatiu.vultur@microchip.com>,
+	=?utf-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Gerhard Engleder <gerhard@engleder-embedded.com>,
+	Hangbin Liu <liuhangbin@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Jay Vosburgh <j.vosburgh@gmail.com>,
+	Andy Gospodarek <andy@greyhouse.net>, Wei Fang <wei.fang@nxp.com>,
+	Shenwei Wang <shenwei.wang@nxp.com>,
+	Clark Wang <xiaoning.wang@nxp.com>,
+	NXP Linux Team <linux-imx@nxp.com>, UNGLinuxDriver@microchip.com,
+	Lars Povlsen <lars.povlsen@microchip.com>,
+	Steen Hegelund <Steen.Hegelund@microchip.com>,
+	Daniel Machon <daniel.machon@microchip.com>,
+	Simon Horman <simon.horman@corigine.com>,
+	Casper Andersson <casper.casan@gmail.com>,
+	Sergey Organov <sorganov@gmail.com>,
+	Michal Kubecek <mkubecek@suse.cz>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v9 net-next 12/12] net: remove phy_has_hwtstamp() ->
+ phy_mii_ioctl() decision from converted drivers
+Message-ID: <20230804135102.u3i6lz2bjhh3p2rn@skbuf>
+References: <20230801142824.1772134-1-vladimir.oltean@nxp.com>
+ <20230801142824.1772134-13-vladimir.oltean@nxp.com>
+ <CANn89iLOspJsvjPj+y8jikg7erXDomWe8sqHMdfL_2LQSFrPAg@mail.gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CANn89iLOspJsvjPj+y8jikg7erXDomWe8sqHMdfL_2LQSFrPAg@mail.gmail.com>
+X-ClientProxiedBy: BE1P281CA0115.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:b10:7b::9) To AM0PR04MB6452.eurprd04.prod.outlook.com
  (2603:10a6:208:16d::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -68,137 +96,101 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|GVXPR04MB9903:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6898e755-a06d-42e6-ebdf-08db94f1afe9
+X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|DBAPR04MB7240:EE_
+X-MS-Office365-Filtering-Correlation-Id: a26d69cf-bfce-4773-3628-08db94f1da6d
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	ERaFLagDkFP+M1kSkw4THvGgAXAJEMSt6Fkxzf/91rLWQbBjJvlSuie2ZOz5arL6TtQWcGcwNy6PinKoJ8u0Qmw2FQtlUHnHg2LG3nnsupuxEPHUTDkmdEJuxgvmWphNZk0FRgQ7bEyjg3uki+c1WresOq2sYgVD/B3VxPs122Pd70P9H2qPNbFFhCS/BWWmy71TJG+/+R2B+hzHyPytJJLNDJUCbonar23/CNWxNfjrwRHr5HPOPdwWgbWa8H+tWVrKAZV2CJH+WiAwA7JZU2dTvcjpzkueMemvfOjxIsRPGpJeHl9XC0U44ykzxaYehYFxFZemeIZXcMn1TcTjc32SHjIWIdZkT7SrFRrObOC7d5Cd3RuyszQEIOUJFup+girYMjwZG7NoOWn/BxjGqVyuLNa00uPnWEN/v/eUXRmF/rEDEk/NrY0RiZ9BUcdvE32sMTjR6UJ56SHy18QxziGeZGOZJiy2yiXeFuNvh8V9ykzfxFcQbpB6V0pGgy2UEZ5OCgPuxuCX3tkgU7Ol6sx74KARlHgyoatijhYpVmS1WBkLaACyzVL2Z1PbgH7axCPE3gcKhw+jIdv+CRiOn50wfPHb58erE9gCnL7RxhM=
+	cpMs2s204hNtGozhd1UnlBuREES/Vk4qqDNsdczVkE4C9fcadZRfr4/fv7qxfolQbfF54v2JDiUzI+2FDVS8KMMUi2YzRUG29qsJtRi8WRbv06rNuNYDdYUHWhwjtTG770fqPedjL1p9/oFMGT25n04fM5V4puSK596jIPBcvcH7kNCLF03IReiWfkXqdwhT4kifym4yceiZatZ0tzI6gehrVGquTt9wlb1IWrHApD58Q70YARI2lSFVvobcwPU/VV8y+QXjHupZ2ZxtW709knDATXaJru8zmekQCG9vof0sHONq30XD9+hxVQk/kqO3KvTDhG9pA97A5IeIxdR+MAgdhERP0C8eRHDfu5QrMz6QJX9V0z6SmPq1bO1Fi1RN534DXtNU4j3gm/sHhIzcZSxFx+oHOQ4ACDx712wtITAbq+6bOhUCiCzvhRdvUlxeTZ/NmSKLPrkufWUlSvMsyUYLmLQ5ts0QbgsdjBjPfS/khuTqhykzp+R6X4PNskQ4mGmJEbVcu89pcED6qsYyL74bApDM+ZVwCnKBM36ryUM=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(346002)(396003)(39860400002)(136003)(376002)(366004)(451199021)(1800799003)(186006)(2616005)(1076003)(83380400001)(26005)(6506007)(8676002)(316002)(66556008)(2906002)(5660300002)(66946007)(66476007)(6916009)(4326008)(44832011)(41300700001)(8936002)(6486002)(6512007)(6666004)(966005)(54906003)(52116002)(478600001)(38350700002)(38100700002)(86362001)(36756003)(66899021);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(7916004)(376002)(136003)(346002)(366004)(396003)(39860400002)(186006)(451199021)(1800799003)(44832011)(66476007)(66946007)(66556008)(4326008)(6916009)(2906002)(38100700002)(1076003)(6506007)(7416002)(7406005)(83380400001)(33716001)(54906003)(86362001)(9686003)(6512007)(966005)(26005)(478600001)(6486002)(6666004)(8936002)(8676002)(5660300002)(41300700001)(316002);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?xe2+GNRvZMflQCC+4KGvPevRUC02WcLRFvMUsnmkK4rgkQDD9qF+6NmsOnI9?=
- =?us-ascii?Q?BxPmlmDZl7agnbBsNjD4bQ53Qbo4fBSLn16xpyb7hcbyh+jLi8LJQrmaguxr?=
- =?us-ascii?Q?QGeNXA4mj05LY62BSpd9B5XW/Vnc/wZmtvcGuqfqiObsuj3KATdJ2uHK29ne?=
- =?us-ascii?Q?XX8rPDfdywvueL1sbpQPiA4TghLRh8jHaF5+AtS8hDFpaaznOfHD4kUNdexg?=
- =?us-ascii?Q?O0h5fuvfiyiU7A5WxwpkahBLHtAFXugijWBYaIkLBxUAXiZ8y13OnZ94IeSC?=
- =?us-ascii?Q?8Oreue7LOGH8wCK55rRCapJF/1sU4ADHfFQ+WEULg1F3WTtyCNtajt1QvTRY?=
- =?us-ascii?Q?tSUhgCPkvWJP6KIXlNEjDhbU2I+V0SPSDViz+bn23D3JnWQKeQe8gTjHFDcu?=
- =?us-ascii?Q?llNrY/3rsovdORN5YFLuLQaq2TfIg4uzXIFYRRMUy94kKuNC3BnkvYsyHK2q?=
- =?us-ascii?Q?+q1bPaRc3987MqvuAnMEM+t1CuiuvrKfoLdT2lzvIKzucrumLOW+CzkMXkRL?=
- =?us-ascii?Q?4zOPWtkgFJ46TRRyx04tQBNASPmu3q8PoQCVy5M62ilEmbgr+htUNiKM+hRp?=
- =?us-ascii?Q?cVYxhbTQ0oDt16F0Rkbf1OQsg3y93zjgvuluoMQ+sc785Uo2Gc7DH3bumVHn?=
- =?us-ascii?Q?rY3HmjTlKW6w4KP4pX0bvjdm1gNyxp1xFQ5Nmv5xflgLSHK/vTUuFA5jRKTt?=
- =?us-ascii?Q?pLX2NiVj8fhdmJTah8PsvZUL3+1jMkNqUsdXNrO0fkEp33r56vIpMDYay+dM?=
- =?us-ascii?Q?At11GL7r07TVsGQXSgwOwlDT3Z9hcvs139TZmeu0fnQuCjnSp7RArraRv7FP?=
- =?us-ascii?Q?ph6jkD02jQYrzSVc+014Ns9VOCaCsnN3xU3/PmY/cHL93PrKgiLj+JbIwmWC?=
- =?us-ascii?Q?TbWZ6wrvhrH0Zv75E47GWSub42o6uEY//qSycxLIrQYzrcqJ9BKVlB7kUB7w?=
- =?us-ascii?Q?DTqfg8QUF59cl81P7V/+onPcJB3PhkCvgSnU64SqI5aMEE2ourIc90YE8kYz?=
- =?us-ascii?Q?CSSjrpOlv8t9lLANszOMAXvtLKtl9X17gVJVARk/lXnjKG1eW/OO06gp/VQT?=
- =?us-ascii?Q?cglIXQnqOl6psJmIa6uONgmeqTkM4bcb9sksCo1UpZ/nZQ9JDFiv4BwEJUIN?=
- =?us-ascii?Q?cNFEFNhltM/p28ib8VwW7dN0Y0VkmbzJshYbvfTa9B03I78pjIDE3Zwrxhdv?=
- =?us-ascii?Q?ZaWFVMnaqB6TPMmWqY7qpsR1VhHCO7C0rl4Av5SHxfHE8u9IVxUOdR9PnUwy?=
- =?us-ascii?Q?3Pn0icd7wUrLl2TH63ODyrNHL4zuSASdoAou+kWy+zYJoTsLm7F62/VX0HHH?=
- =?us-ascii?Q?btImL5s3VoxUHGIEFm6c2WdbUGVBS8ril6KNex00TR50X52hQwCF8knbPEzC?=
- =?us-ascii?Q?iLe/jX6FXrqprcL6ZN9kO2oe+CNaPdVORYfVS/KgvgWjMz6GrBIMhq5ufExi?=
- =?us-ascii?Q?oHp/1/dBxXH/FcprXlZRAnOVTPlMzSdAQF6L0n2hev5dJSKMMEO1bS88ZniN?=
- =?us-ascii?Q?dLCM2cdnjuBCHxaq1bKFas9gPc9njEGVH55AWi25wZLemVRQKQx7YZizbg6r?=
- =?us-ascii?Q?4GMnfzPCiQexaX+lRAv2mgDYcl244416FYwsvROlVEVCZ747yfUxXYZt8a8X?=
- =?us-ascii?Q?1g=3D=3D?=
+	=?us-ascii?Q?NwM1Y6QGWawJSVTlzanyBe2SbjwCT850aFIdJL75aARieiFPJ5ELljjhWMmc?=
+ =?us-ascii?Q?swawT9Bh5+Brzbme+hVTzYzIxtwF4iaTGRVNYswevC9gS8VGAm54hV1EFndW?=
+ =?us-ascii?Q?0G3D74FphhOFywBblqS1CJ8VNtu+Qua+i4ZZZ3u1TplRwAAcNp852NEwI3Io?=
+ =?us-ascii?Q?ZwMG0PuhLMJ8shPYt5KXgmWOL/NHd69XWM/HRwdqqsqmcpaFFnscLwlItSK0?=
+ =?us-ascii?Q?PVcoucmNr/DqShkDTe9YxtYBA2GM78O2NHJF30xAwh5/VUKXgd9X8SvOAJrX?=
+ =?us-ascii?Q?I0ncp0hmioUVlJYhGNAYwbrnyqDiqcGwm99670SIfeSU5sdRWQKjF5/4uPJr?=
+ =?us-ascii?Q?4UxvlTK3boMVPC4LFtiY7fJlTLl254B+CAZzzG7AFC84sJJyKq54FMSwJFzo?=
+ =?us-ascii?Q?E8h8Kz+cuW48hJsNloLZNjzmYEzbK8lT2o3Iz1CTu40NsirpRWKlAOfmWPa2?=
+ =?us-ascii?Q?9ITx04ZrvuTOmwzweEbWa/vwfCi4JHwYBGXjjyCT5+NMONup94Aa+4pFUeFd?=
+ =?us-ascii?Q?UNi4/YslK1JPBtO8hIjxy0z7yi6c0NVYC2UX6Fhs1pVunsSsuaqTXMaIeGa+?=
+ =?us-ascii?Q?ATKfOumYuRcn25I61siaV8BfBHUrpfOTgnj0KKg1CojhIE75fcWTiPvtQ4zL?=
+ =?us-ascii?Q?NVq4VqAKQy7OKwD7tinns1SYGgG4yavHzROCDccIBY8PBJDkjs1L8iCzDhTi?=
+ =?us-ascii?Q?Egg4+gRYBz7o/4NYQMRS3+2X8Yatkq0xauh2oOMQs/cZazWZeUo/eEGFQPfk?=
+ =?us-ascii?Q?FPQq0YPqrUXoyNM3hdOx33qEui5OQ184ikFJ4lGOyVIMsZOYoMhob4Zs8vwq?=
+ =?us-ascii?Q?23Vm8NYVEtfuajasGWCo46rLQx/kTfF3avW3AjyNZMQWDgaSFEf580Sty/eY?=
+ =?us-ascii?Q?OhjSZloPWJrW8wfNImyM8vhOFOgt9HQLv8ryX8mhgD3ko+byPHwD/Snpgc94?=
+ =?us-ascii?Q?sEm6Rb4QQKOddb9xh6MCyc3MGQQN3phVEGF6ATDfj80AYEWwMW3jxcIyQYa0?=
+ =?us-ascii?Q?y4djfLSm6xy3FPl0IM/WjnNIPa3Pjz6l5Gy1IR8ZpByZwXIu6YoghBH1y3/T?=
+ =?us-ascii?Q?baJNsY4xps7peO4mlG/mIVCAfHmYHTol6QP4p236/ALYRKHJUC87Po0n3ytJ?=
+ =?us-ascii?Q?WyqcVT0T0WkJArPq+rFFmfpkLkLQKvgi7snQM7Tb39WhSx4hTKnj5EFQiCv3?=
+ =?us-ascii?Q?hW2tOwSPuY/4z+0+loH2BtZI3dSuip9KS2lKOFwFN9PEa1QypMf/SQwTFCPs?=
+ =?us-ascii?Q?1HCFVz5BxV7TgUaXRLcZ+bEqQYgANdOtvW9p1YJUMh0o30Dr8OAd5uUTX1JF?=
+ =?us-ascii?Q?0an71jEWxnsVipCvAIGsEqGw1NNZF1Foxvgsl2F0cLdSm3z7q3O+V7o/v0a6?=
+ =?us-ascii?Q?u/9WqK/9qtmjGqb1f3H60EaOGgweIFq3NmViji+ykOq1L1KzIjbPuGaR8bw8?=
+ =?us-ascii?Q?wXYzyec3Ss+AoKCvAD3i4XNVXmCOGZ3OBefNwFCQW8wD4wGs75gGJtBmT9TX?=
+ =?us-ascii?Q?Op6c19ztEg8O6zgJGgdTYsR57g25sB80MnP4cKzXpYLG0uj//B49n34LGKzh?=
+ =?us-ascii?Q?TvJ2icEHLYcgDeSW7uf8xLYFdI1iAKMRiGhAzg5j4QobAn9z/y1ogfNKgNf8?=
+ =?us-ascii?Q?Eg=3D=3D?=
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6898e755-a06d-42e6-ebdf-08db94f1afe9
+X-MS-Exchange-CrossTenant-Network-Message-Id: a26d69cf-bfce-4773-3628-08db94f1da6d
 X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Aug 2023 13:49:56.3865
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Aug 2023 13:51:07.7538
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: v9gj4the25UAXch6fpzn4HJyGWcXqaObhWYVplDfksDry1UtsONhVHym1CG2rvOGBXor52cxg+oUHPYdbkYk8A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: GVXPR04MB9903
+X-MS-Exchange-CrossTenant-UserPrincipalName: EBjyPPy7q0qqUDXw6Lo9F71XxUffj/xuzSY4ZY7QvyImvuBOcuWrEX+8mHWsFO28SUmd+rTvscr1TogUqq7Atg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBAPR04MB7240
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Setting dev->priv_flags & IFF_SEE_ALL_HWTSTAMP_REQUESTS is only legal
-for drivers which were converted to ndo_hwtstamp_get() and
-ndo_hwtstamp_set(), and it is only there that we call ndo_hwtstamp_set()
-for a request that otherwise goes to phylib (for stuff like packet traps,
-which need to be undone if phylib failed, hence the old_cfg logic).
+On Fri, Aug 04, 2023 at 09:21:28AM +0200, Eric Dumazet wrote:
+> > +/**
+> > + * dev_set_hwtstamp_phylib() - Change hardware timestamping of NIC
+> > + *     or of attached phylib PHY
+> > + * @dev: Network device
+> > + * @cfg: Timestamping configuration structure
+> > + * @extack: Netlink extended ack message structure, for error reporting
+> > + *
+> > + * Helper for enforcing a common policy that phylib timestamping, if available,
+> > + * should take precedence in front of hardware timestamping provided by the
+> > + * netdev. If the netdev driver needs to perform specific actions even for PHY
+> > + * timestamping to work properly (a switch port must trap the timestamped
+> > + * frames and not forward them), it must set IFF_SEE_ALL_HWTSTAMP_REQUESTS in
+> > + * dev->priv_flags.
+> > + */
+> > +static int dev_set_hwtstamp_phylib(struct net_device *dev,
+> > +                                  struct kernel_hwtstamp_config *cfg,
+> > +                                  struct netlink_ext_ack *extack)
+> > +{
+> > +       const struct net_device_ops *ops = dev->netdev_ops;
+> > +       bool phy_ts = phy_has_hwtstamp(dev->phydev);
+> > +       struct kernel_hwtstamp_config old_cfg = {};
+> > +       bool changed = false;
+> > +       int err;
+> > +
+> > +       cfg->source = phy_ts ? HWTSTAMP_SOURCE_PHYLIB : HWTSTAMP_SOURCE_NETDEV;
+> > +
+> > +       if (!phy_ts || (dev->priv_flags & IFF_SEE_ALL_HWTSTAMP_REQUESTS)) {
+> > +               err = ops->ndo_hwtstamp_get(dev, &old_cfg);
+> 
+> old_cfg.ifr is NULL at this point.
+> 
+> This causes a crash later in generic_hwtstamp_ioctl_lower()
+> 
+>     ifrr.ifr_ifru = kernel_cfg->ifr->ifr_ifru;
 
-The problem is that we end up calling ndo_hwtstamp_get() when we don't
-need to (even if the SIOCSHWTSTAMP wasn't intended for phylib, or if it
-was, but the driver didn't set IFF_SEE_ALL_HWTSTAMP_REQUESTS). For those
-unnecessary conditions, we share a code path with virtual drivers (vlan,
-macvlan, bonding) where ndo_hwtstamp_get() is implemented as
-generic_hwtstamp_get_lower(), and may be resolved through
-generic_hwtstamp_ioctl_lower() if the lower device is unconverted.
+Thanks for reporting. My control flow is all wrong, it seems. I've sent
+this patch for addressing the breakage:
 
-I.e. this situation:
-
-$ ip link add link eno0 name eno0.100 type vlan id 100
-$ hwstamp_ctl -i eno0.100 -t 1
-
-We are unprepared to deal with this, because if ndo_hwtstamp_get() is
-resolved through a legacy ndo_eth_ioctl(SIOCGHWTSTAMP) lower_dev
-implementation, that needs a non-NULL old_cfg.ifr pointer, and we don't
-have it.
-
-But we don't even need to deal with it either. In the general case,
-drivers may not even implement SIOCGHWTSTAMP handling, only SIOCSHWTSTAMP,
-so it makes sense to completely avoid a SIOCGHWTSTAMP call if we can.
-
-The solution is to split the single "if" condition into 3 smaller ones,
-thus separating the decision to call ndo_hwtstamp_get() from the
-decision to call ndo_hwtstamp_set(). The third "if" condition is
-identical to the first one, and both are subsets of the second one.
-Thus, the "cfg" argument of kernel_hwtstamp_config_changed() is always
-valid.
-
-Reported-by: Eric Dumazet <edumazet@google.com>
-Closes: https://lore.kernel.org/netdev/CANn89iLOspJsvjPj+y8jikg7erXDomWe8sqHMdfL_2LQSFrPAg@mail.gmail.com/
-Fixes: fd770e856e22 ("net: remove phy_has_hwtstamp() -> phy_mii_ioctl() decision from converted drivers")
-Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
----
- net/core/dev_ioctl.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
-
-diff --git a/net/core/dev_ioctl.c b/net/core/dev_ioctl.c
-index 72e077022348..b46aedc36939 100644
---- a/net/core/dev_ioctl.c
-+++ b/net/core/dev_ioctl.c
-@@ -334,20 +334,23 @@ static int dev_set_hwtstamp_phylib(struct net_device *dev,
- 
- 	cfg->source = phy_ts ? HWTSTAMP_SOURCE_PHYLIB : HWTSTAMP_SOURCE_NETDEV;
- 
--	if (!phy_ts || (dev->priv_flags & IFF_SEE_ALL_HWTSTAMP_REQUESTS)) {
-+	if (phy_ts && (dev->priv_flags & IFF_SEE_ALL_HWTSTAMP_REQUESTS)) {
- 		err = ops->ndo_hwtstamp_get(dev, &old_cfg);
- 		if (err)
- 			return err;
-+	}
- 
-+	if (!phy_ts || (dev->priv_flags & IFF_SEE_ALL_HWTSTAMP_REQUESTS)) {
- 		err = ops->ndo_hwtstamp_set(dev, cfg, extack);
- 		if (err) {
- 			if (extack->_msg)
- 				netdev_err(dev, "%s\n", extack->_msg);
- 			return err;
- 		}
-+	}
- 
-+	if (phy_ts && (dev->priv_flags & IFF_SEE_ALL_HWTSTAMP_REQUESTS))
- 		changed = kernel_hwtstamp_config_changed(&old_cfg, cfg);
--	}
- 
- 	if (phy_ts) {
- 		err = phy_hwtstamp_set(dev->phydev, cfg, extack);
--- 
-2.34.1
-
+https://lore.kernel.org/netdev/20230804134939.3109763-1-vladimir.oltean@nxp.com/
 
