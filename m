@@ -1,201 +1,103 @@
-Return-Path: <netdev+bounces-24387-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24389-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9227F770063
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 14:42:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19C0F77007E
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 14:48:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4CEDF282654
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 12:42:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4AE7F1C2187B
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 12:48:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67933AD30;
-	Fri,  4 Aug 2023 12:42:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A3C4BA4E;
+	Fri,  4 Aug 2023 12:48:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BC59A940
-	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 12:42:03 +0000 (UTC)
-Received: from smtp.uniroma2.it (smtp.uniroma2.it [160.80.6.23])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3959649C3;
-	Fri,  4 Aug 2023 05:41:56 -0700 (PDT)
-Received: from smtpauth-2019-1.uniroma2.it (smtpauth-2019-1.uniroma2.it [160.80.5.46])
-	by smtp-2015.uniroma2.it (8.14.4/8.14.4/Debian-8) with ESMTP id 374CfN4s017716;
-	Fri, 4 Aug 2023 14:41:29 +0200
-Received: from lubuntu-18.04 (unknown [160.80.103.126])
-	by smtpauth-2019-1.uniroma2.it (Postfix) with ESMTPSA id 04DE81228D4;
-	Fri,  4 Aug 2023 14:41:19 +0200 (CEST)
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=uniroma2.it;
-	s=ed201904; t=1691152879; h=from:from:sender:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Mpqujni+uUs6kbHm3bEUAhcFvBpdkTUmqXcXtvrVaoo=;
-	b=TumY6hYxXgZQTBmIy5hErBfYPZ1GZOdp4504cmJ5gqOzMMqWqFsQ8U3IBOvWeLhmJpf5X0
-	f0nKcIdKD0lEMRAQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniroma2.it; s=rsa201904;
-	t=1691152879; h=from:from:sender:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Mpqujni+uUs6kbHm3bEUAhcFvBpdkTUmqXcXtvrVaoo=;
-	b=ADadoJ8+mvV91PflQw6Il4je0kpvdT4e2CecqC0awvXrQiBkit3ATEddczxIMju6JuB0y8
-	ZtUOwHRoupN2fLI3bB/W8QEi7TIY+NSvTJBdc2Cn4xs2LipIGFbSuESG8s1DB8gy95E9qA
-	t7usNoPIZ54dv0GTh5qOhNfKgQvbc5XbbpTQhex28GPwN9sGKNgqvUNQPlggvwpS68uN66
-	A0d6BLzzaarLQqz6cEtlmGvFUGBfJjQB77BI9G5dQCq7l0kvVmPZDFJAtcf9M73Hxbn/GC
-	MD1vk268h/gR0KWQ4WGZhBEDFImrlF2mFivTqgCKVffnk6UhwbRufSte6NxUDQ==
-Date: Fri, 4 Aug 2023 14:41:18 +0200
-From: Andrea Mayer <andrea.mayer@uniroma2.it>
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni
- <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>,
-        Shuah Khan
- <shuah@kernel.org>, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        Stefano Salsano
- <stefano.salsano@uniroma2.it>,
-        Paolo Lungaroni
- <paolo.lungaroni@uniroma2.it>,
-        Ahmed Abdelsalam <ahabdels.dev@gmail.com>,
-        Andrea Mayer <andrea.mayer@uniroma2.it>
-Subject: Re: [net-next 1/2] seg6: add NEXT-C-SID support for SRv6 End.X
- behavior
-Message-Id: <20230804144118.a52808dc5fecda09751fae9d@uniroma2.it>
-In-Reply-To: <ZMtztGiOWV6bqCLg@Laptop-X1>
-References: <20230731175117.17376-1-andrea.mayer@uniroma2.it>
-	<20230731175117.17376-2-andrea.mayer@uniroma2.it>
-	<ZMtztGiOWV6bqCLg@Laptop-X1>
-X-Mailer: Sylpheed 3.5.1 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EB09BE4D
+	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 12:48:14 +0000 (UTC)
+Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08ACF4EDB
+	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 05:47:39 -0700 (PDT)
+Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-2b9b5ee9c5aso32689281fa.1
+        for <netdev@vger.kernel.org>; Fri, 04 Aug 2023 05:47:38 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691153214; x=1691758014;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=j6bo7YAIJDA7TBCCdgRaQ0LwEZt1vJ23UYJuiriXq9k=;
+        b=RdvLxuJ1vUOsIoNqIho+GvZOGBqBHsNyriP6U16yJKIgIh1efjek92p0X3dhDSVlgL
+         W75jCxH3Clx/MlN2h4eQzj0/M+1x8DceKwjbwOqPkJwsEqIBaalL86VLkYiTRUYCMV0R
+         bVkHc7Qs43E+gNZsP5WA2cvIu6z+kg/rVd4YC90U0T8JmsUvHTBEAaprLJ1/RNLIZVFK
+         NLNowGMeja383hbtjB0iLAC9DdVcNEpdpTIb73Zttx75A0dTrZwDocFKHPr2kXWsreLO
+         F0xr/+zODvukRFw2oFBp2/Yc+wTb3EVVeF54urxU/10/ctZT+ENx7RkkpUjG9+4TXvdu
+         qkrA==
+X-Gm-Message-State: AOJu0Yw4CN8cPFsYUh1WBoBBwZUz28LU73jcAde02WiytlLMxRuKmmIA
+	76VxqZl8snvO8hHeDRWqZrc=
+X-Google-Smtp-Source: AGHT+IFZ3SiMSn+66SCToEbI3wWd32kld6l/f7G+uDsqkG0PwAqW5T7dDFZmpnqodMnP/9xroXSLug==
+X-Received: by 2002:a2e:b714:0:b0:2b9:e304:5f81 with SMTP id j20-20020a2eb714000000b002b9e3045f81mr1419708ljo.23.1691153214395;
+        Fri, 04 Aug 2023 05:46:54 -0700 (PDT)
+Received: from localhost (fwdproxy-cln-021.fbsv.net. [2a03:2880:31ff:15::face:b00c])
+        by smtp.gmail.com with ESMTPSA id e3-20020a170906504300b0099329b3ab67sm1268269ejk.71.2023.08.04.05.46.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 04 Aug 2023 05:46:53 -0700 (PDT)
+From: Breno Leitao <leitao@debian.org>
+To: rdunlap@infradead.org,
+	benjamin.poirier@gmail.com,
+	davem@davemloft.net,
+	kuba@kernel.org,
+	edumazet@google.com
+Cc: netdev@vger.kernel.org,
+	pabeni@redhat.com
+Subject: [PATCH net-next v4 0/2] netconsole: Enable compile time configuration
+Date: Fri,  4 Aug 2023 05:43:19 -0700
+Message-Id: <20230804124322.113506-1-leitao@debian.org>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Virus-Scanned: clamav-milter 0.100.0 at smtp-2015
-X-Virus-Status: Clean
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Hangbin,
-thanks for your time. Please see below.
+Enable netconsole features to be set at compilation time. Create two
+Kconfig options that allow users to set extended logs and release
+prepending features at compilation time.
 
-On Thu, 3 Aug 2023 17:30:28 +0800
-Hangbin Liu <liuhangbin@gmail.com> wrote:
+The first patch de-duplicates the initialization code, and the second
+patch adds the support in the de-duplicated code, avoiding touching two
+different functions with the same change.
 
-> On Mon, Jul 31, 2023 at 07:51:16PM +0200, Andrea Mayer wrote:
-> > +/* Processing of SRv6 End, End.X, and End.T behaviors can be extended through
-> > + * the flavors framework. These behaviors must report the subset of (flavor)
-> > + * operations they currently implement. In this way, if a user specifies a
-> > + * flavor combination that is not supported by a given End* behavior, the
-> > + * kernel refuses to instantiate the tunnel reporting the error.
-> > + */
-> > +static int seg6_flv_supp_ops_by_action(int action, __u32 *fops)
-> > +{
-> > +	switch (action) {
-> > +	case SEG6_LOCAL_ACTION_END:
-> > +		*fops = SEG6_LOCAL_END_FLV_SUPP_OPS;
-> > +		break;
-> > +	case SEG6_LOCAL_ACTION_END_X:
-> > +		*fops = SEG6_LOCAL_END_X_FLV_SUPP_OPS;
-> > +		break;
-> > +	default:
-> > +		return -EOPNOTSUPP;
-> > +	}
-> > +
-> > +	return 0;
-> >  }
-> >  
-> 
-> ...
-> 
-> > @@ -2070,7 +2131,8 @@ static int parse_nla_flavors(struct nlattr **attrs, struct seg6_local_lwt *slwt,
-> >  {
-> >  	struct seg6_flavors_info *finfo = &slwt->flv_info;
-> >  	struct nlattr *tb[SEG6_LOCAL_FLV_MAX + 1];
-> > -	unsigned long fops;
-> > +	int action = slwt->action;
-> > +	__u32 fops, supp_fops = 0;
-> >  	int rc;
-> >  
-> >  	rc = nla_parse_nested_deprecated(tb, SEG6_LOCAL_FLV_MAX,
-> > @@ -2086,7 +2148,8 @@ static int parse_nla_flavors(struct nlattr **attrs, struct seg6_local_lwt *slwt,
-> >  		return -EINVAL;
-> >  
-> >  	fops = nla_get_u32(tb[SEG6_LOCAL_FLV_OPERATION]);
-> > -	if (fops & ~SEG6_LOCAL_FLV_SUPP_OPS) {
-> > +	rc = seg6_flv_supp_ops_by_action(action, &supp_fops);
-> > +	if (rc < 0 || !supp_fops || (fops & ~supp_fops)) {
-> 
-> if rc == 0, the supp_fops won't be 0.
-> 
+  v1 -> v2:
+	* Improvements in the Kconfig help section.
 
-Yes, you're right.
+  v2 -> v3:
+	* Honour the Kconfig settings when creating sysfs targets
+	* Add "by default" in a Kconfig help.
 
-In this patch, supp_fops is always set properly when rc == 0.
-Since seg6_flv_supp_ops_by_action() should be extended in the event that other
-behaviors receive flavors support, I added this check in case the "supp_fops"
-field was set incorrectly or not set at all.
-Note that supp_fops == 0 must be considered an inadmissible value.
+  v3 -> v4:
+	* Create an additional patch, de-duplicating the initialization
+	  code for netconsole_target, and just patching it.
 
+Breno Leitao (2):
+  netconsole: Create a allocation helper
+  netconsole: Enable compile time configuration
 
-So, I think we have two possibilities:
-  i) remove this "defensive" check, assuming that supp_fops will always be set
-     correctly by seg6_flv_supp_ops_by_action() (when rc == 0, like in this
-     patch); 
- ii) improve the check by explicitly indicating with a pr_warn_once, for
-     example, the condition that is occurring is unexpected.
+ drivers/net/Kconfig      | 22 +++++++++++++++++++
+ drivers/net/netconsole.c | 46 +++++++++++++++++++++-------------------
+ 2 files changed, 46 insertions(+), 22 deletions(-)
 
-for (ii), something like this:
+-- 
+2.34.1
 
-parse_nla_flavors(...)
-{
-    [...]
-    supp_fops = 0;
-    [...]
-
-    rc = seg6_flv_supp_ops_by_action(action, &supp_fops);
-    if (!rc && !supp_fops) {
-   	 /* supported flavors mask cannot be zero as it is considered to
-   	  * be invalid.
-   	  */
-   	 pr_warn_once("seg6local: invalid Flavor operation(s)");
-   	 return -EINVAL;
-    }
-
-    fops = nla_get_u32(tb[SEG6_LOCAL_FLV_OPERATION]);
-    if (rc < 0 || (fops & ~supp_fops)) {
-   	 NL_SET_ERR_MSG(extack, "Unsupported Flavor operation(s)");
-   	 return -EOPNOTSUPP;
-    }
-
-    finfo->flv_ops = fops;
-
-    [...]
-}
-
-parse_nla_flavors() is called in the control path so another check would not
-hit performance. I am more inclined to consider solution (ii).
-
-What do you think?
-
-> Thanks
-> Hangbin
-
-Ciao,
-Andrea
 
