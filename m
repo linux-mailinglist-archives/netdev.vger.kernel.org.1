@@ -1,73 +1,78 @@
-Return-Path: <netdev+bounces-24358-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24359-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F0C076FF3B
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 13:10:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0946776FF4C
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 13:14:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 055502824FD
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 11:10:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2C66E1C215CD
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 11:14:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD08AAD43;
-	Fri,  4 Aug 2023 11:10:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9521AD46;
+	Fri,  4 Aug 2023 11:14:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97E8A5250
-	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 11:10:53 +0000 (UTC)
-Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05on2048.outbound.protection.outlook.com [40.107.22.48])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06FC6AC
-	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 04:10:52 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3139AD42
+	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 11:14:45 +0000 (UTC)
+Received: from EUR04-VI1-obe.outbound.protection.outlook.com (mail-vi1eur04on2041.outbound.protection.outlook.com [40.107.8.41])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA87AE69;
+	Fri,  4 Aug 2023 04:14:37 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ltncyftWeuyo6zCxVDEW0Qp4uQJXl24GsYo7WO/08ERXh4Udm/C3CnE/A6/UnmM8CeP305Xuv3y3xp8lI3q0KB/B9qrJUQ/GRQ7hmp5i4uBPpXDarXiSWtMTp1zMPoUr9Kiax+Juv/+MRymDaFYzGCGHMFauJcIHYRLpVShVfZSxsLPWD5MvtLrC1CxBfrKjBfsEnfcbz/qD+KeZg842ihtZdj1okTsfR9VrLvf2/hq+DFAbFlxjCRMljUGwNuYSiPP3mpbAjpxc/k3kzX9mg+dKZOS6l8yMrqlTs1zJJNaVnSJHtSwVm0PSvSYpSXE0MlkVgOO8nlBBuNZaaZ74/A==
+ b=fGbeMFhjX1WNF4XPjqkCxQuieOv97SqPX/SDUn9ZArVwW/+MdJY0o51DQmnO/jLH6UYxib+PZX2Va4vWg051f8R+f1pVmxRI7HCrMrxRbpDLNPdswHAvRGR+sozPFmkyk8h3LAfv+H74ZrJgBHd2poidZJ5ntGSZHhOrC0y93HTBrxwwIXjgFZbR3qGiE6x7ZF4E2OOUCJ8OO6v8f7kIFTnrOr9QsBIl8+f2g330y/2+1i4vFh1qfwcxO8VEHWG+61Yk0ZP5xuqQayQ/ZOl4+ww+aSkydecW9CnoSMRs9qDSKChQmGYtHx1vlmn4BYqUCFWnxzdLyAbHXfpDWVR0XA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=IjGLSNh0wi7PoQjxVUIdj9wLNeSBKKwgUmFHjT7rQ0Y=;
- b=MDlTZxBi2L4BwdcGDTdL+X/crJRLh+gEoWwp68v3vVB81vKEX5RxZmQxMOzxKpIOI2qnVdV3JYAdebloSUbAd9LhVYxw8X2G0jyIxZLEd6yy5LTREMUVCtCW7H5xR5tQn0YY11onLFE4zdsB5iA7ysPhC3KgNTqTMn3tfG5ktPMvL3JtWTnNqsS9ZBJD8kKQEvPQ70EEDC/GAAFqfUobZR7wWeOY/YDpsq4x55TtnO/ft0WmDm97EOkvJdNXQIjTqvlHnp7w2L1q8W1Sm2V8aMcQy9f6tTXZaxPw/OECqpbfv8Vxcby3fJZWqg3Xhay19aeXEtqGs3UHw6HWZKnwwg==
+ bh=Jua2KVCnWp+yRIYvJe0Wrr31FT8Ljf12uiAR9De33q8=;
+ b=VpfdmK7BZkMN2WZ6fRO8mY4I4sqmmhLyb0/BUp+DnDoikx260jrSkvTNIEIEr8M3WF6LX1lyuYBFSdCaOd+8uj3WGol4OKFNGXJOtwdHOfjKsIjeebx3TkzPPgx4kOgBK0jA1Jt2npN+2aTcjDS3kxmk7MpCw3XSE0WDBKkxpgddDPOyaTSeq2XlVIZ660ajdpSb3yRVZhSr8Eaey48ET1OFKAmElLOENemBbzuXPbKwQ7ArK5NWjbqnfJt+GCfmYFoVxoEwxjw34F57aPsvDuf46D439k8tzJVQsMtqHKusDov4NlM6YQgzfN+X6MV4RqbUOlM0ui1XuwMt+r7J1A==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=IjGLSNh0wi7PoQjxVUIdj9wLNeSBKKwgUmFHjT7rQ0Y=;
- b=S+4Bj7USKn7aX3vtmn3PHAlt8RMuJdiLbsJCSUS6pJc3xgHh5YuxUHmEQ8ieUZ5eJeIhx044FsyQhzSWSJMaAY9TSswlSguAKSp7qzJOpiwoeVsh33PZDWfeUTkhVsJsDTB088utpbj8om31oemaQF/ruMYmCIZt25K8xhxq2WM=
+ bh=Jua2KVCnWp+yRIYvJe0Wrr31FT8Ljf12uiAR9De33q8=;
+ b=fZhZJOnsczHeFeLiEZUb1g33l+Kl6e7JgA2EEAe3TSVrqEmxzoqbS9120uTKgRvGsWqAHV4IY+JSUPm44UKoaq8ytaMXCWrvZjwrHFHQ4QlIr1S/9URwevrRLnOdFFceFDEVENcD8ka7RhzKlfSuospasqnL2kDR9hokspX5TLo=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nxp.com;
 Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
- by GVXPR04MB10021.eurprd04.prod.outlook.com (2603:10a6:150:112::20) with
+ by AS1PR04MB9357.eurprd04.prod.outlook.com (2603:10a6:20b:4dd::12) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.47; Fri, 4 Aug
- 2023 11:10:49 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.21; Fri, 4 Aug
+ 2023 11:14:35 +0000
 Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
  ([fe80::d4ed:20a0:8c0a:d9cf]) by AM0PR04MB6452.eurprd04.prod.outlook.com
  ([fe80::d4ed:20a0:8c0a:d9cf%6]) with mapi id 15.20.6652.021; Fri, 4 Aug 2023
- 11:10:49 +0000
-Date: Fri, 4 Aug 2023 14:10:45 +0300
+ 11:14:35 +0000
+Date: Fri, 4 Aug 2023 14:14:31 +0300
 From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: Simon Horman <horms@kernel.org>
+To: Victor Nogueira <victor@mojatatu.com>
 Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Claudiu Manoil <claudiu.manoil@nxp.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	UNGLinuxDriver@microchip.com,
-	Colin Foster <colin.foster@in-advantage.com>
-Subject: Re: [PATCH net] net: dsa: ocelot: call dsa_tag_8021q_unregister()
- under rtnl_lock() on driver remove
-Message-ID: <20230804111045.rk3yvo5xb4wxyvoa@skbuf>
-References: <20230803134253.2711124-1-vladimir.oltean@nxp.com>
- <ZMwAImhL8nH+6KLf@kernel.org>
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
+	linux-kernel@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
+	Muhammad Husaini Zulkifli <muhammad.husaini.zulkifli@intel.com>,
+	Peilin Ye <yepeilin.cs@gmail.com>,
+	Pedro Tammela <pctammela@mojatatu.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Zhengchao Shao <shaozhengchao@huawei.com>,
+	Maxim Georgiev <glipus@gmail.com>
+Subject: Re: [PATCH v3 net-next 09/10] selftests/tc-testing: test that taprio
+ can only be attached as root
+Message-ID: <20230804111431.cjtj3kbcwhk5wcaf@skbuf>
+References: <20230801182421.1997560-1-vladimir.oltean@nxp.com>
+ <20230801182421.1997560-10-vladimir.oltean@nxp.com>
+ <918bf9fc-1c8f-a006-560e-b437581c6ec2@mojatatu.com>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZMwAImhL8nH+6KLf@kernel.org>
-X-ClientProxiedBy: BE1P281CA0266.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:b10:86::15) To AM0PR04MB6452.eurprd04.prod.outlook.com
+In-Reply-To: <918bf9fc-1c8f-a006-560e-b437581c6ec2@mojatatu.com>
+X-ClientProxiedBy: BE1P281CA0070.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:b10:26::19) To AM0PR04MB6452.eurprd04.prod.outlook.com
  (2603:10a6:208:16d::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -76,56 +81,56 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|GVXPR04MB10021:EE_
-X-MS-Office365-Filtering-Correlation-Id: 48703f30-7bd7-4198-731e-08db94db7571
+X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|AS1PR04MB9357:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6e31edb2-cc0d-42e3-2f5e-08db94dbfc38
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	sCJFjTMaSZFLr74+RY0AtjzeAM6SVy5ezJiw6Lp07sn+0CE8tYm0helbwcxkphR/cVLoLX20sBl2FNA18T5cdnL3aI1NWuynhTumCLZLP+tprw0N8+8nEPtGWP6qOqzxpNmTc6L+yG9ekZYXYeJB2oF8Y0fhvnTbm4PTxZMDNTwgVW0XEyNd5/RukBc6BfzT1nDExrp9yaCeFpEp+fzRGqEE6PL2z26l7rpDscNV9xLgv6gB5qK3qaBUgvxcTlKkSlbX2h6VtUE5LrI5JjRvDTPBYyI6zQnRKOtdDCT3WodprYWURl/Dgys869haBwsThAAiLHkumZRVdzn99H2jRvlAGiy9RGGZFWpq6oenWOjpmkuawtWoKSpUk9u4WuuvWBKQwmkAy1UHypaM53fk3Y3/JwW5uPsCPtqEFYindoq6Mn5EkmlK/gzRGTsuMpPOQiJrHJS1mHpHX3Y4bY6TuMQVCOFjLyKx45f3Cfnhn8RG5jkCywn2vxX+mIudrdakOvRWLziABOqBExDBSskWlOQ2CS7dhKpJ1/aDB7JfjoaYE5JDgUnbe//fZYqDxnkU
+	FR2k/ybMND6MGITIcCVpR+dd8/PvdX0f0+UlMKky8PmEsjZ5N3P4poiEhpUamO7qb9xClqi3tT39Ej9Xh3IgAl19E6KFFjTe/FuA/kElZnbD5x+63a22CRGy70xn0Nvf8MtyijvPsl5tLEiIJLPv0zcrsZ3W+YL98DaOYs7QWxqcC4/Z0w3/d/4VoanFxOYot+/fPJby50QFbCXVdZNvRn2TGsy2PF7pzpFs6iyCYZup/9sm0lACUP79PN49hp5Zw5/4CmSp0OC3SxYRp4TWwRvtguynC7GAAAPOa7woixyt8Y12zzIImT2hR+EWcIF8dhTgSMtp7ZrdUdEmCZL4SX9PvuPtjg3YHwj8aNa0oX3jont5fqR0v0ZUcOb4iC254f8942Fc36gGrwNTKhbmCpdEahY9ra5ZAtPxIvKb+mS88ccq3obgVcvV7quC8IcjfOUqKKlmyWZ75Um5FbUuGkwjHZnJ8UkzAuMbMT7lkINO8RricPoXsoawiYngeC+1fM+cXTUxvrVfoqxnnwmixDUc1hNQMJyq3zVUXq2/vFvnqhytVPFujQgiyBd/1Kdw
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(7916004)(396003)(39860400002)(366004)(136003)(376002)(346002)(451199021)(1800799003)(186006)(41300700001)(8936002)(8676002)(83380400001)(26005)(6506007)(1076003)(33716001)(38100700002)(86362001)(316002)(6916009)(478600001)(9686003)(6486002)(6512007)(54906003)(66556008)(66476007)(4326008)(6666004)(2906002)(5660300002)(66946007)(44832011)(7416002);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(7916004)(4636009)(396003)(136003)(39860400002)(346002)(366004)(376002)(451199021)(1800799003)(186006)(53546011)(6506007)(1076003)(38100700002)(26005)(83380400001)(2906002)(5660300002)(8936002)(8676002)(44832011)(7416002)(478600001)(6666004)(86362001)(54906003)(6512007)(9686003)(6486002)(316002)(41300700001)(33716001)(6916009)(4326008)(66946007)(66476007)(66556008);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?Br5FJvy9Szkc35wx32lHMxmTIEBz4rQwpBIdr+7y8jt9BKzVe5c2ZIgIH9K/?=
- =?us-ascii?Q?3ZaPpaX4KRDQH9zUmTYdkzsHyRacH3YUQxLZANJbxIqqNdlkZgn1NxGoH+qJ?=
- =?us-ascii?Q?889V64CMJq3O+jm8CHkelFCTmPxONS64Vm8mkwG6O8/vOGXvzIyzEbEPScU/?=
- =?us-ascii?Q?vsT5Msw8FkCz8UuH4C+0LVp+1caZQM89LeJBVH2bYIqZvjRWBUZ25cHfo8Jq?=
- =?us-ascii?Q?N51S65VDh41SDuyAAmRNJNNTOpAzViU7TE/AHaEyZYUrKCZXLxvAL9jxO8QT?=
- =?us-ascii?Q?izGbwtFYmCwHD/zVoUp5pUrmj+NX+DqcxnpfQD77wEuQSXyhuexh6E7apt+P?=
- =?us-ascii?Q?HBYYmVH5nt233Tzu6/fCBgWiGrlrcKNa98qIFwY3NcFxziGUqwmq7nrJHSN4?=
- =?us-ascii?Q?wywobnS5qYUcW2L3hs4nsLd9DHnrdG/gORw3UUkfUUO1t9jL2gAkFMoEGo0i?=
- =?us-ascii?Q?J71BFhaA/1bYDm2RYk9vxatKvZ07yzadN7QsW2pHpE3PqP58LjvA73mLikgb?=
- =?us-ascii?Q?BalTjbTz8TIcGLj6tNu0M7EgHkhjS3iIXIf3MloVHhMH71MlAf5CoWaGP13i?=
- =?us-ascii?Q?8APIc6D96uzGq/vl773ntnykS2RendqRvONE5KCKVCDNrIkT3EK1OH1cOc0j?=
- =?us-ascii?Q?nwvhZUJXZlSv6SMqu/9C7FAVS9f+JCM8i2zMzcwCoHZfIO7DIAeOcxcQIc01?=
- =?us-ascii?Q?7FCSESp6q3c9MptPemb+2ivFR4uUHijpIMlHxt9UtWzr7mr/2iPlg+BlI52x?=
- =?us-ascii?Q?5L0BujvWDDyX5ERbxkscSPKHL3EZiB2dfSuFcLod7xhNZ0cHVIOFdGJ5GzIO?=
- =?us-ascii?Q?63engtRCeUbhyRUyyG4fh2ixpB63wGhFPft7xVXsseTdtG5KKSlyO5AsPEUT?=
- =?us-ascii?Q?dbWSDCKjm4Ca+jUqwDkA0ZYTozCpQA4mHV8E11E31FgxLby+MxNL7N4dkgsS?=
- =?us-ascii?Q?nC1IzazRdgLcKSh6zS6exsDlJWZ9Bywk5pAfITJhe733IcuDTPD2hGxU81mV?=
- =?us-ascii?Q?w7yOGpxGA4H00bSvVDMT9x1OvhggAofvkrdhLJPWzx6eLxi+le8DK4DXoWWX?=
- =?us-ascii?Q?p6zURaiWuCVrpUvMTbOmtxEthPzPN1JRUXpFcW9lUHfX5iboTznczQoU8l3D?=
- =?us-ascii?Q?ODF856WvgM33gHI/Pj5YYh2FgP43GGBxWYEbvq0gOyXDdiH6iiiIuYuYhdkn?=
- =?us-ascii?Q?fnla6negXwNX5I82Zr4xpJFFWvkKHRaFR8i1h500GQ2gA2UTnub1G+8+Eoua?=
- =?us-ascii?Q?co+EBiKVb4gIuk9tjJaR+PSbAdAPsPdM6z5TMUlouUI4hca4bbP/NRJChvbX?=
- =?us-ascii?Q?OAam8v8+uxHPYPLLRfCHgLkLTz6XRjgBIQnVrT6Nr66bOB4zeJuI7Kuis/1+?=
- =?us-ascii?Q?iJUckGPE6ZwAR+hLp+a4kbDPq7xNtx+eQjmOvQDKo1d4BZGXyfcgw7Nb0EdV?=
- =?us-ascii?Q?GWc6vdbCh74FamZhY+sIljbeew8t2p5HKNMjIuQGmwmgvTpRQhGSlgi0ylvy?=
- =?us-ascii?Q?+l9c1CDMyBoGvazJj8Xp/RuPlNJIqPads3R6tUPEFTthDvmV0rj+X0qFJh+l?=
- =?us-ascii?Q?s2JVZI5/Jc6KjpWwFwlVnrPHNFudY2ahzpKTn0jd/9qc2N3f/f/l5QwQuRiE?=
- =?us-ascii?Q?4w=3D=3D?=
+	=?us-ascii?Q?6YQnOHAED9Wm1UfeiQtUg1AeE9Lgb9QnSWWe0zBd7U1P2driYqbGqciJ7+SP?=
+ =?us-ascii?Q?9QDsHvJ4Pf4bA9JccNYm97n2jq1mf+IDvk9QIgjOj9sXoF7MDqMVaFcxUM7U?=
+ =?us-ascii?Q?AP4lJdCoRGA3Ek1TVS9pgJgns5vY8RnXVIp5Zzsb5NJbGdwYvoL8vPeQRC2n?=
+ =?us-ascii?Q?YNCXhfKGHJsVio9n5SXjntDU4Aejyn5Sar9f7YsqSQ9hViwIksKFVerwx43b?=
+ =?us-ascii?Q?aegwFSNOXhs1ukblWZyrWdM6SrywVMtEC/gbkwdRGKFWMT91W/ei958WuPqw?=
+ =?us-ascii?Q?oX8USRPp1qUKX7EP7ceGJhBfEhlYOcGjfsLHx3h2yV9YJcIOVpp8Ikyw38eM?=
+ =?us-ascii?Q?eb64t3wdJezipN9vCLkXfcuqQlO5us6COW7FSOxo9HksxqsXco1mt0jeRfzu?=
+ =?us-ascii?Q?6wrzbFvBKxDxZonxl47o2D0j/j/198npqsKoA9enrlQpiz1E+R9Hg5ClXEQD?=
+ =?us-ascii?Q?UBzRFj9ABqG0XgiC13EiVRGapzGYyNhHzDeoRK2J//qGXxPsNBrPZPeMhzkk?=
+ =?us-ascii?Q?fqyCA40nZ3qxwmXNFrYBRiu3SoWz58kt/JzYwa3ALONFD313/QKn/pFJ8qsg?=
+ =?us-ascii?Q?boF2uDgQ8sUHhdzBSZh4zl8dzZ3+JmL9Mo3rQX4fb4oOg3UF8uSLYUjyR/pG?=
+ =?us-ascii?Q?mQ/eoXSrXARr9KT+VyI1zefwmwIaajNF4IIYu2D8U+oCMEmtvnmEQ+8fVFE0?=
+ =?us-ascii?Q?Z/FhA2j6h1BVbrri5thX6gMmPOJ2ii35IaoYtAh4ADun8XJ23lvQWiqGAhwc?=
+ =?us-ascii?Q?rjiOkctChg8zKGzLwYLSIijHmkydSHOBNUtPZzR/St2S9zUOntEcmSJocnKt?=
+ =?us-ascii?Q?6LD6NljDVC+eAa8a9c2Eg8RExEPn8QaELtgY2pwP849M32XkWnL9GEXMMdXN?=
+ =?us-ascii?Q?OH3jQO8MHiNNsJudDpcjI3Y2ZLILIOZExuolc1zOepy2QF+/DD08UsjhLpSZ?=
+ =?us-ascii?Q?8S/V+nu4YzXSNj/iTLyglM1F9Hhz8I0/b2D5ISZwa3aZaunCMDSer5+bjN+M?=
+ =?us-ascii?Q?tN4Gz+UpaiBVrLOrkUsJ3ZAWny683RG4qCjLAVxEyJJwfKb6LUmIUuPnFt6K?=
+ =?us-ascii?Q?UkOeo5mLQLXQV0SF9zm89pLyfEnR/FwD3ZXSU6FMxUIXWg2JaUDt/zXSCYpO?=
+ =?us-ascii?Q?q2OZT5rFt0+MZf7Phq7BcpTpNF0ko3tJRK6eYCsE3BZUdpgZSsaFPOWq7hcw?=
+ =?us-ascii?Q?eEBD1GyoJv6mZMvEJJcXlPeEfX7KSB+PLtFap0e6OrzmZIZ5KMrCFkhKmdwm?=
+ =?us-ascii?Q?p777Y2rJnFCjyHzSjMWqzb54me4XyEazZ4+Ni6mpspZ2zuHTXDiGVwFLUy7M?=
+ =?us-ascii?Q?05AuDw8S8dJHMDAoqUQe5TlgZmTPaIp8hMleSwTVwM51ABTJGjtrpyqmAt4f?=
+ =?us-ascii?Q?I1JE0F/GBrmec2P+86CAtAonChO8NhCPA4Fmjs8QE6cNIwDJXCtatUfPPUEG?=
+ =?us-ascii?Q?hymsQHwVG3R3A6h8m9RyEEpAU8QssXc/TJOBZWRTiNZSu3Nb8cv8pOXfCbsj?=
+ =?us-ascii?Q?pA4tzMzoQdlMkgexinQ51xcHMrIScAoxfIr//PcFLd2HWxdpsZXRJXZYmwV8?=
+ =?us-ascii?Q?rpk3aYYZClf3GB5V2hbpcuecu9WrgL2i1hFUgzh/pinKWhUqSWIjcvesKChh?=
+ =?us-ascii?Q?mQ=3D=3D?=
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 48703f30-7bd7-4198-731e-08db94db7571
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6e31edb2-cc0d-42e3-2f5e-08db94dbfc38
 X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Aug 2023 11:10:49.3658
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Aug 2023 11:14:35.4652
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: aVs/DO/wTCKltxfUqD20T0dAqXZvpClauOpCrSoIbTRSWRvgmz721r7r53aKgPPX2zhr76zSCSB8/oC4WqOzlw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: GVXPR04MB10021
+X-MS-Exchange-CrossTenant-UserPrincipalName: xgioAPEe6Yws8W73jK98IYnfoqIaDrVQUNzQEIP7OCnoMi0bxQwNOQtBcaB6A5gNd2MLCkYNrSrhIfYD+Vtwlw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS1PR04MB9357
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
 	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham
@@ -133,36 +138,25 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Aug 03, 2023 at 09:29:38PM +0200, Simon Horman wrote:
-> On Thu, Aug 03, 2023 at 04:42:53PM +0300, Vladimir Oltean wrote:
-> > diff --git a/drivers/net/dsa/ocelot/felix.c b/drivers/net/dsa/ocelot/felix.c
-> > index fd7eb4a52918..9a3e5ec16972 100644
-> > --- a/drivers/net/dsa/ocelot/felix.c
-> > +++ b/drivers/net/dsa/ocelot/felix.c
-> > @@ -1619,8 +1619,10 @@ static void felix_teardown(struct dsa_switch *ds)
-> >  	struct felix *felix = ocelot_to_felix(ocelot);
-> >  	struct dsa_port *dp;
-> >  
-> > +	rtnl_lock();
-> >  	if (felix->tag_proto_ops)
-> >  		felix->tag_proto_ops->teardown(ds);
-> > +	rtnl_unlock();
-> 
-> Hi Vladimir,
-> 
-> I am curious to know if RTNL could be taken in
-> felix_tag_8021q_teardown() instead.
+On Thu, Aug 03, 2023 at 02:21:07PM -0300, Victor Nogueira wrote:
+> On 01/08/2023 15:24, Vladimir Oltean wrote:
+> > Check that the "Can only be attached as root qdisc" error message from
+> > taprio is effective by attempting to attach it to a class of another
+> > taprio qdisc. That operation should fail.
+> > 
+> > In the bug that was squashed by change "net/sched: taprio: try again to
+> > report q->qdiscs[] to qdisc_leaf()", grafting a child taprio to a root
+> > software taprio would be misinterpreted as a change() to the root
+> > taprio. Catch this by looking at whether the base-time of the root
+> > taprio has changed to follow the base-time of the child taprio,
+> > something which should have absolutely never happened assuming correct
+> > semantics.
+> > 
+> > Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+> > Reviewed-by: Pedro Tammela <pctammela@mojatatu.com>
+> If I understood correctly, these tests depend on CONFIG_PTP_1588_CLOCK_MOCK.
+> If that is the case, you should add it to the tdc
+> config file (tools/testing/selftests/tc-testing/config).
 
-Negative. This call path also exists:
-
-dsa_tree_change_tag_proto()
--> rtnl_trylock()
--> dsa_tree_notify(dst, DSA_NOTIFIER_TAG_PROTO, &info)
-   -> dsa_switch_change_tag_proto()
-      -> ds->ops->change_tag_protocol()
-         -> felix_change_tag_protocol()
-            -> old_proto_ops->teardown()
-               -> felix_tag_8021q_teardown()
-
-where the rtnl_mutex is already held.
+Thanks, will do.
 
