@@ -1,150 +1,198 @@
-Return-Path: <netdev+bounces-24451-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24452-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66F28770376
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 16:48:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E9C65770378
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 16:48:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 983B91C2188F
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 14:48:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 26BCC1C2183F
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 14:48:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35BBB17FE8;
-	Fri,  4 Aug 2023 14:46:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63997CA43;
+	Fri,  4 Aug 2023 14:47:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29DD718036
-	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 14:46:29 +0000 (UTC)
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B2F946B2
-	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 07:46:28 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-585f254c41aso23896407b3.1
-        for <netdev@vger.kernel.org>; Fri, 04 Aug 2023 07:46:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691160387; x=1691765187;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=I3jydhN5UAsbY+pcwR4cDXJ7Mt5/LfgJ82P0rT9nXoE=;
-        b=wGni3e6tkZzrB7kV9Pme0rgkcdDIH2P8SuUSYhzvi7x+U8waEXxWcw4hxhyubE8/KD
-         g6ElcyOOMo0aQuR050jbnQbzU7QSGfUQZUBZLfK1aPRSoDscFeKcuYZ1KE0ZljUzer+L
-         OboubygLyuuf+YUEtzRo8hV5nG/yXbPf+Tyjx/Btg9RfazwkrwwD6i8BD0+AsIYDAyxo
-         2yqoh26OMWEWsuGFrs0C/QRJsnUPBa1izp+ffltA4vnxQwjPfKI3/uTHFBNEHjgdisU+
-         JvTZYFBNa2THwW/P2/kOBXeO4zySkVHXXw0xwfWXLgnmCrXVxl0d7pBml92VZp1CLV0Q
-         QFRA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691160387; x=1691765187;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=I3jydhN5UAsbY+pcwR4cDXJ7Mt5/LfgJ82P0rT9nXoE=;
-        b=YceuOAHfoKKO1ypodYgaqskYHnzp7vNLd+eCEG5ER4oef5UXfe9qFkSHw7L7QbP+Ql
-         53t1C+7GRQHJfAJ7gBPjXQf6PXYodixRLDyUuyZGIXV4BjXx7iqG4UyYWCuxgLwE8CbD
-         TYSSLoDzg00dy9PtZUsY3Va9n6E4Lt641C8vTKNakzJdSx6jUGZ1l9KD087Rat8SL/Ld
-         y4UZKe487qUNQgZnu9JNW6EYHseTgxIyardGssB0TRy7fiQXdin17P3b/NJiajIPpxQN
-         ch6yRW6s6Fm0mSN/P4puHV3dLgiByVEfy2d/eVNHF05Sj97wnP11AmBJNdyYjb8RXxIB
-         Pagg==
-X-Gm-Message-State: AOJu0YwQ2aZorPZW93jo2l8VELAcbwtIvwEJnYgujDTMUvHTRTP4ouii
-	hUagJeobzTdv+XfIgHCqhabW7HP7IX2hAw==
-X-Google-Smtp-Source: AGHT+IFeMJNwFiCJ0cdalO3ET+X9Q0sDGKmGCA0aGvBX4JdOpcVzcZNvatJGzZ1P0wgur8wpHpLrBwpvPigflQ==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a81:e448:0:b0:586:b332:8617 with SMTP id
- t8-20020a81e448000000b00586b3328617mr5795ywl.9.1691160387350; Fri, 04 Aug
- 2023 07:46:27 -0700 (PDT)
-Date: Fri,  4 Aug 2023 14:46:16 +0000
-In-Reply-To: <20230804144616.3938718-1-edumazet@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FD10C14A
+	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 14:47:39 +0000 (UTC)
+Received: from EUR02-VI1-obe.outbound.protection.outlook.com (mail-vi1eur02on2082.outbound.protection.outlook.com [40.107.241.82])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71FD646B2;
+	Fri,  4 Aug 2023 07:47:37 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=kycI4w915hlNrI26AiieVaSQRW25dNb7DAq2d35oyCjJd8hzrlpdi9U0echtNAEAGWLOuPGJiNH0TJoxLPja2C15zkdUKFckPUtSB02InNUnijm2C2JTRD0TXZdNohbx2DNvoH+g75tjpgU9jE+Y7BlVVjY4MJjLDZ3teptX26AYrW0BCKTx9zo+OYxVQ/bQjJuM5HxNtehzlIUxHpF0gCq54wanbIvHsLnsK66CAPq9ZL4wNGaUuB+n+Htf3Vjc9Bg1mfD/v5wRq5daGQ0g5QwJOSc525cwCj77Lvv1Kj2qke5mKdGAKgX9h+NGLQ2D2D4d5SThoSFMgro6x2K2vA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=g7PCIZr7xnTTm/OGx58lZL32KK8CrwjGpq5TlHRlB2Q=;
+ b=lSFNJocEf2Ihog4b9CLlptqgE7e3Q4VIlA9pIIlpjdtzDpAb4s1yTlVG/BmMz9KETMlRCxZ0azpqbeN1tnd76eXFWOSFEiTxGxkkpBugJmImXLQO0Ftvogk6iEy9FNzXi6+Q9VLtJYcEJlG3VVsF5TaixwPrFj7dGNL9P5JbWbB2mDirx9qmJk3QG3KH6HgdwJ9E86qRP+jvl4oJenJ5BdGVEz2oKA/ekpaB/gtJkuLkb069JLJZIve6kvzG4UV8IW9v6lsWhQbSsrQG5Xe1V9O9o1YalohmiMAlo2b3uObRA68UX6gqQ+GIsF9mDCX7t4IGn72gM+otU7TQJaKujQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=g7PCIZr7xnTTm/OGx58lZL32KK8CrwjGpq5TlHRlB2Q=;
+ b=jgh+b5vz1A5MFE6OyoyFTXMhmAGmcWhtt3KHF/8+WqD5nKkCd8kAYWxfzcq9EzdkoD1SZlc8b/YG1cPxLYJbUodTAWjAcg8o9hR7BwjIaaxMpaRhh6X2eIhcgSFdPVUXvxSLOj1KVZm8fP/BtP2VLFg86CFpJLFBdyhHHt2iJEs=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from PAXPR04MB9185.eurprd04.prod.outlook.com (2603:10a6:102:231::11)
+ by DB8PR04MB7164.eurprd04.prod.outlook.com (2603:10a6:10:129::23) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.47; Fri, 4 Aug
+ 2023 14:47:33 +0000
+Received: from PAXPR04MB9185.eurprd04.prod.outlook.com
+ ([fe80::d4ee:8daa:92f4:9671]) by PAXPR04MB9185.eurprd04.prod.outlook.com
+ ([fe80::d4ee:8daa:92f4:9671%3]) with mapi id 15.20.6631.046; Fri, 4 Aug 2023
+ 14:47:33 +0000
+From: Shenwei Wang <shenwei.wang@nxp.com>
+To: Marc Kleine-Budde <mkl@pengutronix.de>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Shawn Guo <shawnguo@kernel.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	Kevin Hilman <khilman@baylibre.com>,
+	Vinod Koul <vkoul@kernel.org>,
+	Chen-Yu Tsai <wens@csie.org>,
+	Jernej Skrabec <jernej.skrabec@gmail.com>,
+	Samuel Holland <samuel@sholland.org>
+Cc: Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>,
+	NXP Linux Team <linux-imx@nxp.com>,
+	Jerome Brunet <jbrunet@baylibre.com>,
+	Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
+	Bhupesh Sharma <bhupesh.sharma@linaro.org>,
+	Nobuhiro Iwamatsu <nobuhiro1.iwamatsu@toshiba.co.jp>,
+	Simon Horman <simon.horman@corigine.com>,
+	Andrew Halaney <ahalaney@redhat.com>,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
+	Shenwei Wang <shenwei.wang@nxp.com>,
+	Wong Vee Khee <veekhee@apple.com>,
+	Revanth Kumar Uppala <ruppala@nvidia.com>,
+	Jochen Henneberg <jh@henneberg-systemdesign.com>,
+	netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	linux-amlogic@lists.infradead.org,
+	imx@lists.linux.dev
+Subject: [PATCH v4 net-next 0/2] update stmmac fix_mac_speed
+Date: Fri,  4 Aug 2023 09:46:27 -0500
+Message-Id: <20230804144629.358455-1-shenwei.wang@nxp.com>
+X-Mailer: git-send-email 2.34.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SJ0PR13CA0183.namprd13.prod.outlook.com
+ (2603:10b6:a03:2c3::8) To PAXPR04MB9185.eurprd04.prod.outlook.com
+ (2603:10a6:102:231::11)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20230804144616.3938718-1-edumazet@google.com>
-X-Mailer: git-send-email 2.41.0.640.ga95def55d0-goog
-Message-ID: <20230804144616.3938718-7-edumazet@google.com>
-Subject: [PATCH net-next 6/6] tcp: set TCP_DEFER_ACCEPT locklessly
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Soheil Hassas Yeganeh <soheil@google.com>, Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-	autolearn=ham autolearn_force=no version=3.4.6
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PAXPR04MB9185:EE_|DB8PR04MB7164:EE_
+X-MS-Office365-Filtering-Correlation-Id: a99dd553-c584-4e61-1e6a-08db94f9bc98
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	6RHEvYUpH3vQGwlKzQsn5GMhpPBxtAHnSzxV7FeVzvS6NVhpkujt3Hzz3HX202u2JGcRSo9zPDL05CGzEX2joEJYFArGchTHTDdp8z8aZs0wsYQ+0ZV3bDo/iS490/+q4SiADCCk+5SnSy/uxVHRUDN+KwwV3pHuPBis5PUdGGItBBEqpq+6XCLqS0dQqYKi5DTlndsosnlkiuXk1qoMegnbXWDwjuHM2VkkyaT6YfXXjhH91oioh9Bz2ICQA152pNqFxg+LgULYF7Fe+hN818SA2VRBLwKgbSosjHgnssjii7oExuW+xr32XRiv1At7BjHRmF3G+F1GQ9EL2fY+8p1KOwYORLRQCkIh/IPIHYrmE/44h9StVPufiCRbW6dNIbgE73zrPQLdpjuFHfb+3K9EfENEo1gjCfbrPRj1TftGneeBAWnxFHXItSCG2XvcIV67K1/SS7mQFilYZ9OGDkfF5c9FVTfKgaQcywUffuaBBMsGZz5fzGYdwKil/qfdtcvhgfbmrbvqrQznIMfKfyxjvLCtm0JZfsxqdfx6Lshvffl5u+2YUPIVw1srDMHAPzZCPHoobc2pifLC20jJUjGZL+7GLKvtL1sHBj6XdX3Jkm7evT7epfQ1s9BioMr9tObidPo/WAb77Hzxm5PP6g==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB9185.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(346002)(396003)(39860400002)(136003)(376002)(366004)(451199021)(1800799003)(186006)(2616005)(1076003)(83380400001)(55236004)(26005)(6506007)(8676002)(316002)(66556008)(2906002)(5660300002)(66946007)(66476007)(4326008)(44832011)(7416002)(41300700001)(8936002)(6486002)(7406005)(6512007)(6666004)(54906003)(52116002)(478600001)(110136005)(921005)(38350700002)(38100700002)(86362001)(36756003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?92uk+Mj6qX4LxxSNJ70jkXJiwKb+EUAphswRKqjHe3ZFi3VdQ10fq9rTdTMc?=
+ =?us-ascii?Q?mKbhobiBLyWCDVHiL/wKcH+pskYfiZwWh5aYiWZq96u5LP3iNOA4M3VtSULN?=
+ =?us-ascii?Q?rb+lTp8yeBxggIxUIZSWCigqz+OEtHkq2dmaVBp4Y33Llkixj1UaZ2pMepNS?=
+ =?us-ascii?Q?JNyPXOTWGIbMPhnbJeJHyIbNcQnEm7rB4n9yRF13rDziWs1X8GaL2dpEqjWc?=
+ =?us-ascii?Q?zJQgrOFkQqoGJkt5PCfm84GcWx4zbrr/jOLt6mM55IpDlMkxtZMH69+z5kF9?=
+ =?us-ascii?Q?jhnC0okCLetIz66q7+Hl0Cq8lNWAv3mgCqjJR7yYmoNtuAorh4drjBbl2A3g?=
+ =?us-ascii?Q?kAKXnhrVrl/7RpQ9vutk4Tl81zaSiHnf0zcD+vhYRDFUefJpd2ZxkgK7VqRe?=
+ =?us-ascii?Q?b2us9DIL/QU3UmRW8sHCBeCA7Hxbtx0hZAJIIfefH4pBcxeP6snNUICVzQPh?=
+ =?us-ascii?Q?I9WlVdq1wSDxowVodqGdAovIF61uPAQ3CTS1jb2VlIiZXIsSklH9f55VAOo8?=
+ =?us-ascii?Q?QAqYdRuYkxUmKXyA0m7G+IdAKe75Jn+JB8Ca5JJlCAXtOKviv6gCObX1MEJH?=
+ =?us-ascii?Q?EjMJR8WRNbaEVqOElmp5810NFbWEp9D8A1UHABhrqBAhVQ+jgFxCNqvAARwM?=
+ =?us-ascii?Q?RTT8h74h5jVhbcvMafz5VD7APtfbNb1uXgTRYoM7gsiJCaIzFxK+qkz1JVBH?=
+ =?us-ascii?Q?7P2Wj7FKTpRYSezQFwTIMLiNVHiZy0IteoZm/YJZc4Bzm43GsPDpaqNl7dGC?=
+ =?us-ascii?Q?5ndoN6J2tYwkzCSyNRY9Td5nOeeaW85/jznyhtcgk3VRENhqE/owX2zAzXYX?=
+ =?us-ascii?Q?3ihhqiMQSw3X9iluH0Ht41Rjbs5dvIYQg5UFPYEAx0EvePJR8u6X4iNS5kKx?=
+ =?us-ascii?Q?9efK5PDZCVFQPeu0TYQl8YZAqEAOJPpGC/ZB2GmW6UqRrPnlnNOkiGlIak+A?=
+ =?us-ascii?Q?frqPqZaDihOHleMo7BGAiTfncivIoy0tGGGxoy94S4VXDN0Yb+ntmfCIBIMY?=
+ =?us-ascii?Q?45Ug2YuxB5ThlWPIoN9N5RHVQD3zlEIoGBPgC0Ueqo/UfTLDBQa61Q3LnKwO?=
+ =?us-ascii?Q?86WT58JMRQvYlvAnrKr8726yq5KHdyEoDvjkPeEfaU9GBM0qf9Y1yjMSH9i3?=
+ =?us-ascii?Q?Oe8ZM3drmVGzTNZXdmFs69SKzGEPpSBofJNkmu6Lg88rEkQ2V7jl5bvR5lww?=
+ =?us-ascii?Q?nY3Gxze034hIkxKaNY+0lGc8SSprZ2lwnS5jNImCTrPzvOjxVXXC7kTirzvj?=
+ =?us-ascii?Q?37R2ssfeCor2bwxcy+MU2TJYH4ofBjeTENknahHioRA6DVYDFPEYBUj1hgtY?=
+ =?us-ascii?Q?T83dH+ZqPBBr2EzsL05dnvSstS8/hOZJAq+eDszFxt04fUbuSEF7rX7Dbco5?=
+ =?us-ascii?Q?Q6nBkgcozkDsqW8SHK8piNdxqFnoWLfkWr8OX0AUVjP71MQWGaLeybVaa9b1?=
+ =?us-ascii?Q?LFQBeUotVgp9bp7IfUcfS38a2I0CJXX4zrAZkHG3Z7WdCyV5FmEjt50Nbg9i?=
+ =?us-ascii?Q?C6E/El+OSl32ml9BizD+ADloWyqkKR2dzBNMxutQfA7xExqwrClwXrmuKkud?=
+ =?us-ascii?Q?7P5OU8B9KD+QURdfQX2k6l41llt8+hU20hD0eHcE?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a99dd553-c584-4e61-1e6a-08db94f9bc98
+X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB9185.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Aug 2023 14:47:33.6944
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: H4/hRFLoIT/Kkft/V5XtlsaUHV7Hp2XfMhgG3+pFBlsJ/d1mEML0E0m/uo6wJJxLRTA88VXWlVdUS4PpMAmoMQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR04MB7164
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-rskq_defer_accept field can be read/written without
-the need of holding the socket lock.
+Changes in V4:
+  - Keep the 'unsigned int' type specifier in the fix_mac_speed
+    function declarations.
+  - Move imx93_dwmac_fix_mac_speed into the SoC specific ops.
+  - Use a read back to replace the wmb() instruction.
+  - Correct the target to 'net-next'.
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- net/ipv4/tcp.c           | 13 ++++++-------
- net/ipv4/tcp_input.c     |  2 +-
- net/ipv4/tcp_minisocks.c |  2 +-
- 3 files changed, 8 insertions(+), 9 deletions(-)
+Changes in V3:
+  - fixed the build errors reported by 'kernel test robot'.
+  - Only perform clock pause in RGMII fixed-link usecase.
 
-diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index 5c71b4fe11d1c34456976d60eb8742641111dd62..4fbc7ff8c53c05cbef3d108527239c7ec8c1363e 100644
---- a/net/ipv4/tcp.c
-+++ b/net/ipv4/tcp.c
-@@ -3479,6 +3479,12 @@ int do_tcp_setsockopt(struct sock *sk, int level, int optname,
- 		else
- 			WRITE_ONCE(tp->linger2, val * HZ);
- 		return 0;
-+	case TCP_DEFER_ACCEPT:
-+		/* Translate value in seconds to number of retransmits */
-+		WRITE_ONCE(icsk->icsk_accept_queue.rskq_defer_accept,
-+			   secs_to_retrans(val, TCP_TIMEOUT_INIT / HZ,
-+					   TCP_RTO_MAX / HZ));
-+		return 0;
- 	}
- 
- 	sockopt_lock_sock(sk);
-@@ -3584,13 +3590,6 @@ int do_tcp_setsockopt(struct sock *sk, int level, int optname,
- 			tp->save_syn = val;
- 		break;
- 
--	case TCP_DEFER_ACCEPT:
--		/* Translate value in seconds to number of retransmits */
--		WRITE_ONCE(icsk->icsk_accept_queue.rskq_defer_accept,
--			   secs_to_retrans(val, TCP_TIMEOUT_INIT / HZ,
--					   TCP_RTO_MAX / HZ));
--		break;
--
- 	case TCP_WINDOW_CLAMP:
- 		err = tcp_set_window_clamp(sk, val);
- 		break;
-diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-index f445f5a7c0ebf5f7ab2b2402357f3749d954c0e8..972c3b16369589293eb15febe52e72d5c596b032 100644
---- a/net/ipv4/tcp_input.c
-+++ b/net/ipv4/tcp_input.c
-@@ -6325,7 +6325,7 @@ static int tcp_rcv_synsent_state_process(struct sock *sk, struct sk_buff *skb,
- 		if (fastopen_fail)
- 			return -1;
- 		if (sk->sk_write_pending ||
--		    icsk->icsk_accept_queue.rskq_defer_accept ||
-+		    READ_ONCE(icsk->icsk_accept_queue.rskq_defer_accept) ||
- 		    inet_csk_in_pingpong_mode(sk)) {
- 			/* Save one ACK. Data will be ready after
- 			 * several ticks, if write_pending is set.
-diff --git a/net/ipv4/tcp_minisocks.c b/net/ipv4/tcp_minisocks.c
-index c8f2aa0033871ed3f8b6b045c2cbca6e88bf2b61..32a70e3530db3247986ab5cb08c8a46babf86ad6 100644
---- a/net/ipv4/tcp_minisocks.c
-+++ b/net/ipv4/tcp_minisocks.c
-@@ -794,7 +794,7 @@ struct sock *tcp_check_req(struct sock *sk, struct sk_buff *skb,
- 		return sk;
- 
- 	/* While TCP_DEFER_ACCEPT is active, drop bare ACK. */
--	if (req->num_timeout < inet_csk(sk)->icsk_accept_queue.rskq_defer_accept &&
-+	if (req->num_timeout < READ_ONCE(inet_csk(sk)->icsk_accept_queue.rskq_defer_accept) &&
- 	    TCP_SKB_CB(skb)->end_seq == tcp_rsk(req)->rcv_isn + 1) {
- 		inet_rsk(req)->acked = 1;
- 		__NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPDEFERACCEPTDROP);
--- 
-2.41.0.640.ga95def55d0-goog
+Changes in V2:
+  - Call fix_mac_speed() with new mode parameter added.
+  - reorg the function of imx_dwmac_fix_speed_mx93 by using the
+    mode parameter.
+
+Shenwei Wang (2):
+  net: stmmac: add new mode parameter for fix_mac_speed
+  net: stmmac: dwmac-imx: pause the TXC clock in fixed-link
+
+ .../stmicro/stmmac/dwmac-dwc-qos-eth.c        |  2 +-
+ .../net/ethernet/stmicro/stmmac/dwmac-imx.c   | 45 ++++++++++++++++++-
+ .../stmicro/stmmac/dwmac-intel-plat.c         |  4 +-
+ .../ethernet/stmicro/stmmac/dwmac-ipq806x.c   |  2 +-
+ .../net/ethernet/stmicro/stmmac/dwmac-meson.c |  2 +-
+ .../stmicro/stmmac/dwmac-qcom-ethqos.c        |  2 +-
+ .../net/ethernet/stmicro/stmmac/dwmac-rk.c    |  2 +-
+ .../ethernet/stmicro/stmmac/dwmac-socfpga.c   |  2 +-
+ .../ethernet/stmicro/stmmac/dwmac-starfive.c  |  2 +-
+ .../net/ethernet/stmicro/stmmac/dwmac-sunxi.c |  2 +-
+ .../ethernet/stmicro/stmmac/dwmac-visconti.c  |  2 +-
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c |  2 +-
+ include/linux/stmmac.h                        |  2 +-
+ 13 files changed, 57 insertions(+), 14 deletions(-)
+
+--
+2.34.1
 
 
