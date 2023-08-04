@@ -1,157 +1,180 @@
-Return-Path: <netdev+bounces-24283-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24284-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA20476F9BD
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 07:57:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35C8C76FA0C
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 08:27:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9977C282404
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 05:57:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BFD2A28249D
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 06:26:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3E2C522A;
-	Fri,  4 Aug 2023 05:57:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C346524B;
+	Fri,  4 Aug 2023 06:26:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 952E51FC8
-	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 05:57:48 +0000 (UTC)
-Received: from smtpbg151.qq.com (smtpbg151.qq.com [18.169.211.239])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81EFE2708
-	for <netdev@vger.kernel.org>; Thu,  3 Aug 2023 22:57:44 -0700 (PDT)
-X-QQ-mid:Yeas47t1691128596t732t56834
-Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [125.119.251.0])
-X-QQ-SSF:00400000000000F0FQF000000000000
-From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
-X-BIZMAIL-ID: 8784499072271469170
-To: "'Russell King \(Oracle\)'" <linux@armlinux.org.uk>
-Cc: <netdev@vger.kernel.org>,
-	<andrew@lunn.ch>,
-	<hkallweit1@gmail.com>,
-	<Jose.Abreu@synopsys.com>,
-	<mengyuanlou@net-swift.com>
-References: <20230724102341.10401-5-jiawenwu@trustnetic.com> <ZL5TujWbCDuFUXb2@shell.armlinux.org.uk> <03cc01d9be9c$6e51cad0$4af56070$@trustnetic.com> <ZL9+XZA8t1vaSVmG@shell.armlinux.org.uk> <03f101d9bedd$763b06d0$62b11470$@trustnetic.com> <ZL+cwbCd6eTU4sC8@shell.armlinux.org.uk> <ZL+fF4365f0Q9QDD@shell.armlinux.org.uk> <052c01d9c13b$edc25ef0$c9471cd0$@trustnetic.com> <ZMOZkzCqiUZP/uQ8@shell.armlinux.org.uk> <068501d9c5b1$0e263ad0$2a72b070$@trustnetic.com> <ZMuLKa2HX9/LiCPn@shell.armlinux.org.uk>
-In-Reply-To: <ZMuLKa2HX9/LiCPn@shell.armlinux.org.uk>
-Subject: RE: [PATCH net-next 4/7] net: pcs: xpcs: adapt Wangxun NICs for SGMII mode
-Date: Fri, 4 Aug 2023 13:56:35 +0800
-Message-ID: <071c01d9c698$6d814fa0$4883eee0$@trustnetic.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66D2F1FD0
+	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 06:26:57 +0000 (UTC)
+Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D9E5468A;
+	Thu,  3 Aug 2023 23:26:44 -0700 (PDT)
+Received: from lelv0266.itg.ti.com ([10.180.67.225])
+	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 3746QR3W014030;
+	Fri, 4 Aug 2023 01:26:27 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1691130387;
+	bh=FOBxZe1iIrsfnpRnsy5tLGnb3OV7R2WOTStpJEJck/g=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=k6Orwcv8QSwZHqMVXga5AwOHzGzX9R48UFKRexVV5GZbg0mczd7ofd5+rt7htOiUH
+	 tYzaBJ3jmRnuHi1fjeasgMfajx+kVqWlf7v3nCWOzttwyfDWdrr7Vr67F0jYPFudVq
+	 7HoFwPspSVafojoudG1aIPK59YM9bX3lZXs6zvRQ=
+Received: from DFLE111.ent.ti.com (dfle111.ent.ti.com [10.64.6.32])
+	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 3746QQbO096969
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Fri, 4 Aug 2023 01:26:26 -0500
+Received: from DFLE100.ent.ti.com (10.64.6.21) by DFLE111.ent.ti.com
+ (10.64.6.32) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Fri, 4
+ Aug 2023 01:26:26 -0500
+Received: from fllv0039.itg.ti.com (10.64.41.19) by DFLE100.ent.ti.com
+ (10.64.6.21) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Fri, 4 Aug 2023 01:26:26 -0500
+Received: from [172.24.227.217] (ileaxei01-snat2.itg.ti.com [10.180.69.6])
+	by fllv0039.itg.ti.com (8.15.2/8.15.2) with ESMTP id 3746QKrw119574;
+	Fri, 4 Aug 2023 01:26:20 -0500
+Message-ID: <d3d53a4f-a1f8-09d4-77e8-a881829fac68@ti.com>
+Date: Fri, 4 Aug 2023 11:56:19 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-X-Mailer: Microsoft Outlook 16.0
-Thread-Index: AQHlV8ySIJxDOVsue1vtJKXvPgm7WQHq1YyvAkVmz6sBytGrVAIdGgySAzyQo7ECIz2R/AHpKtnAAfaBl44C3nHZLAFERt5frxZm9QA=
-Content-Language: zh-cn
-X-QQ-SENDSIZE: 520
-Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz5a-1
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,FROM_EXCESS_BASE64,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,UNPARSEABLE_RELAY
-	autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH 1/4] dt-bindings: net: Add ICSS IEP
+Content-Language: en-US
+To: Conor Dooley <conor@kernel.org>, MD Danish Anwar <danishanwar@ti.com>
+CC: Randy Dunlap <rdunlap@infradead.org>, Roger Quadros <rogerq@kernel.org>,
+        Simon Horman <simon.horman@corigine.com>,
+        Vignesh Raghavendra
+	<vigneshr@ti.com>, Andrew Lunn <andrew@lunn.ch>,
+        Richard Cochran
+	<richardcochran@gmail.com>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Krzysztof
+ Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Rob Herring
+	<robh+dt@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+        Jakub Kicinski
+	<kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+        "David S. Miller"
+	<davem@davemloft.net>, <nm@ti.com>, <srk@ti.com>,
+        <linux-kernel@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <linux-omap@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>
+References: <20230803110153.3309577-1-danishanwar@ti.com>
+ <20230803110153.3309577-2-danishanwar@ti.com>
+ <20230803-guacamole-buddy-d8179f11615e@spud>
+From: Md Danish Anwar <a0501179@ti.com>
+Organization: Texas Instruments
+In-Reply-To: <20230803-guacamole-buddy-d8179f11615e@spud>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thursday, August 3, 2023 7:11 PM, Russell King (Oracle) wrote:
-> On Thu, Aug 03, 2023 at 10:20:22AM +0800, Jiawen Wu wrote:
-> > > No there isn't, and it conforms with the above.
-> > >
-> > > A read looks like this:
-> > >
-> > >       Address  Data                   Address  Data     Data
-> > > Start 10101100 000yyyyy RepeatedStart 10101101 DDDDDDDD DDDDDDDD =
-Stop
-> > >                       or Stop followed
-> > > 		          by Start
-> > >
-> > > The terms "Address" and "Data" here are as per the I=B2C =
-specification.
-> > > You will notice that the first part has one byte of address and =
-*one*
-> > > byte of data to convey the register address. This is what the "1" =
-you
-> > > are referring to above is for.
-> > >
-> > > For completness, a write looks like this:
-> > >
-> > >       Address  Data     Data     Data
-> > > Start 10101100 000yyyyy DDDDDDDD DDDDDDDD Stop
-> > >
-> > > Essentially, in all cases, when 0x56 is addressed with the data
-> > > direction in write mode, the very first byte is _always_ the =
-register
-> > > address and the remainder contain the data. When the data =
-direction is
-> > > in read mode, the bytes are always data.
-> > >
-> > > The description you quote above is poor because it doesn't make it
-> > > clear whether "read" and "write" apply to the bus transactions or =
-to
-> > > the device operations. However, I can assure you that what is
-> > > implemented is correct, since this is the standard small 24xx =
-memory
-> > > device protocol, and I've been programming that on various
-> > > microcontrollers and such like for the last 30 years.
-> > >
-> > > Are you seeing a problem with the data read or written to the PHY?
-> >
-> > Hi Russell,
-> >
-> > I really don't know how to deal with "MAC side SGMII", could you =
-please
-> > help me?
-> >
-> > From the test results, when I config PCS in "PHY side SGMII", the =
-link status
-> > of PHY in copper SFP is read by I2C after AN complete. Then PHY's =
-link up
-> > status is informed to PHYLINK, then PCS will check its status. But =
-when I just
-> > change PCS to "MAC side SGMII", I2C will keep reading timeouts since =
-AN
-> > complete. I checked the register of PCS to confirm AN complete, but =
-PHY's
-> > link status would never be updated in PHYLINK.
->=20
-> I don't understand what is going on here either - but what I do know
-> is that there is _zero_ difference as far as the network link is
-> concerned between an on-board PHY using SGMII to the MAC/PCS and a SFP
-> with a PHY using SGMII.
->=20
-> In both situations the PHY behaves the same - it presents a PHY-side
-> SGMII interface, so it sends to the MAC/PCS the speed and duplex
-> settings, and expects the MAC/PCS to acknowledge them.
->=20
-> The name "MAC side SGMII" suggests that this mode provides the
-> acknowledgement, whereas "PHY side SGMII" suggests that this mode
-> provides a speed and duplex.
->=20
-> Given all this, using "PHY side SGMII" with a SFP, and "MAC side
-> SGMII" for an on-board PHY just seems utterly wrong - and I can't
-> make head nor tail of it.
+Hi Conor,
 
-Since no reasonable explanation can be given, can we assume that there =
-is a
-design flaw in the hardware? Although it's not clear to the designers...
+On 03/08/23 8:57 pm, Conor Dooley wrote:
+> On Thu, Aug 03, 2023 at 04:31:50PM +0530, MD Danish Anwar wrote:
+>> From: Md Danish Anwar <danishanwar@ti.com>
+>>
+>> Add DT binding documentation for ICSS IEP module.
+>>
+>> Signed-off-by: Md Danish Anwar <danishanwar@ti.com>
+>> ---
+>>  .../devicetree/bindings/net/ti,icss-iep.yaml  | 37 +++++++++++++++++++
+>>  1 file changed, 37 insertions(+)
+>>  create mode 100644 Documentation/devicetree/bindings/net/ti,icss-iep.yaml
+>>
+>> diff --git a/Documentation/devicetree/bindings/net/ti,icss-iep.yaml b/Documentation/devicetree/bindings/net/ti,icss-iep.yaml
+>> new file mode 100644
+>> index 000000000000..79cd72b330a6
+>> --- /dev/null
+>> +++ b/Documentation/devicetree/bindings/net/ti,icss-iep.yaml
+>> @@ -0,0 +1,37 @@
+>> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+>> +%YAML 1.2
+>> +---
+>> +$id: http://devicetree.org/schemas/net/ti,icss-iep.yaml#
+>> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+>> +
+>> +title: Texas Instruments ICSS Industrial Ethernet Peripheral (IEP) module
+>> +
+>> +maintainers:
+>> +  - Md Danish Anwar <danishanwar@ti.com>
+>> +
+>> +properties:
+>> +  compatible:
+>> +    enum:
+>> +      - ti,am654-icss-iep   # for K3 AM65x, J721E and AM64x SoCs
+> 
+> No. ti,am654-icss-iep is for am654. You should really have compatibles
+> specific to the SoC - is there a reason why this has not been done?
+> 
 
->=20
-> > It's kind of weird to me, how does the configuration of PCS relate =
-to I2C?
->=20
-> I2C is just the access method for PHYs on SFPs - because there are
-> no MDIO bus pins on SFP modules, only I2C pins mainly for accessing
-> the identification EEPROM and diagnostics, but many copper SFPs have
-> a way to access the PHY.
->=20
-> I2C is transparent as far as phylib is concerned - the mdio-i2c
-> driver makes the PHY "appear" as if it is on a conventional MDIO
-> bus.
-=20
+Yes, ti,am654-icss-iep is for am654. You are right, the compatibles should be
+specific to SoC. Currently the upstream support is being added for only AM65x.
 
+I will remove J721E and AM64x SoCs from the comment above and these compatibles
+when their support is enabled in future.
+
+Below is the updated compatible property.
+
+properties:
+  compatible:
+    enum:
+      - ti,am654-icss-iep   # for K3 AM65x SoCs
+
+> 
+>> +
+>> +  reg:
+>> +    maxItems: 1
+>> +
+>> +  clocks:
+>> +    maxItems: 1
+>> +    description: phandle to the IEP source clock
+>> +
+>> +required:
+>> +  - compatible
+>> +  - reg
+>> +  - clocks
+>> +
+>> +additionalProperties: false
+>> +
+>> +examples:
+>> +  - |
+>> +    icssg0_iep0: iep@2e000 {
+>> +        compatible = "ti,am654-icss-iep";
+>> +        reg = <0x2e000 0x1000>;
+>> +        clocks = <&icssg0_iepclk_mux>;
+>> +    };
+>> -- 
+>> 2.34.1
+>>
+
+-- 
+Thanks and Regards,
+Danish.
 
