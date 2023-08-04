@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-24294-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24288-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 814B276FA7B
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 08:52:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B77276FA6B
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 08:50:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B25071C21799
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 06:52:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 55D512824D1
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 06:50:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDA4379EF;
-	Fri,  4 Aug 2023 06:51:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C22D36FC7;
+	Fri,  4 Aug 2023 06:50:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D28F66FA6
-	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 06:51:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B720C6FBD
+	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 06:50:16 +0000 (UTC)
 Received: from pegase1.c-s.fr (pegase1.c-s.fr [93.17.236.30])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A385149F2;
-	Thu,  3 Aug 2023 23:51:05 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 818A3B1;
+	Thu,  3 Aug 2023 23:50:15 -0700 (PDT)
 Received: from localhost (mailhub3.si.c-s.fr [192.168.12.233])
-	by localhost (Postfix) with ESMTP id 4RHGKf2x2Jz9t1J;
-	Fri,  4 Aug 2023 08:39:50 +0200 (CEST)
+	by localhost (Postfix) with ESMTP id 4RHGKh10HHz9t1c;
+	Fri,  4 Aug 2023 08:39:52 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at c-s.fr
 Received: from pegase1.c-s.fr ([192.168.12.234])
 	by localhost (pegase1.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Qon1uB55dXyx; Fri,  4 Aug 2023 08:39:50 +0200 (CEST)
+	with ESMTP id 21yZm80-utjm; Fri,  4 Aug 2023 08:39:52 +0200 (CEST)
 Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
-	by pegase1.c-s.fr (Postfix) with ESMTP id 4RHGKc4lCXz9t1H;
+	by pegase1.c-s.fr (Postfix) with ESMTP id 4RHGKc4r1fz9t1j;
 	Fri,  4 Aug 2023 08:39:48 +0200 (CEST)
 Received: from localhost (localhost [127.0.0.1])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id 9D2D68B77B;
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id A01928B77C;
 	Fri,  4 Aug 2023 08:39:48 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at c-s.fr
 Received: from messagerie.si.c-s.fr ([127.0.0.1])
 	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
-	with ESMTP id vL93FjFTPzho; Fri,  4 Aug 2023 08:39:48 +0200 (CEST)
+	with ESMTP id nTDwYITAFqRh; Fri,  4 Aug 2023 08:39:48 +0200 (CEST)
 Received: from PO20335.IDSI0.si.c-s.fr (unknown [192.168.232.144])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id 391EB8B763;
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id 3F0F38B775;
 	Fri,  4 Aug 2023 08:39:48 +0200 (CEST)
 Received: from PO20335.IDSI0.si.c-s.fr (localhost [127.0.0.1])
-	by PO20335.IDSI0.si.c-s.fr (8.17.1/8.16.1) with ESMTPS id 3746dgmr629351
+	by PO20335.IDSI0.si.c-s.fr (8.17.1/8.16.1) with ESMTPS id 3746dgIt629355
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
 	Fri, 4 Aug 2023 08:39:42 +0200
 Received: (from chleroy@localhost)
-	by PO20335.IDSI0.si.c-s.fr (8.17.1/8.17.1/Submit) id 3746dgP6629348;
+	by PO20335.IDSI0.si.c-s.fr (8.17.1/8.17.1/Submit) id 3746dgTR629354;
 	Fri, 4 Aug 2023 08:39:42 +0200
 X-Authentication-Warning: PO20335.IDSI0.si.c-s.fr: chleroy set sender to christophe.leroy@csgroup.eu using -f
 From: Christophe Leroy <christophe.leroy@csgroup.eu>
@@ -55,9 +55,9 @@ To: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
         Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
 Cc: Christophe Leroy <christophe.leroy@csgroup.eu>,
         linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH net-next v1 05/10] net: fs_enet: Remove has_phy field in fs_platform_info struct
-Date: Fri,  4 Aug 2023 08:39:29 +0200
-Message-ID: <bb5264e09e18f0ce8a0dbee399926a59f33cb248.1691130766.git.christophe.leroy@csgroup.eu>
+Subject: [PATCH net-next v1 06/10] net: fs_enet: Remove stale prototypes from fsl_soc.c
+Date: Fri,  4 Aug 2023 08:39:30 +0200
+Message-ID: <f2f2db5dce3242eaa4a2aad6c226ba587fb0f513.1691130766.git.christophe.leroy@csgroup.eu>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <cover.1691130766.git.christophe.leroy@csgroup.eu>
 References: <cover.1691130766.git.christophe.leroy@csgroup.eu>
@@ -67,7 +67,7 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1691131164; l=2058; i=christophe.leroy@csgroup.eu; s=20211009; h=from:subject:message-id; bh=M35boY3oJLnv+Ktg3fVSjFga7v0KalODYTNO8b5c+ww=; b=c/Y+gtatEUKB3nUAtsJRw1YwtiSwPNCo3hRYAeuV1mPCHBqh9bnskbvRNt6HM4lJyS9kHSgKO +Gk3ONYZS+oAR74YckiEpVrZl+E1qzCZsQcJJovFRUvvDZrv6jtcjxB
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1691131164; l=1158; i=christophe.leroy@csgroup.eu; s=20211009; h=from:subject:message-id; bh=d/WCjiasQLANg6IJlHtfimSgbCJSyWoFsctV/aZN7Qo=; b=Re9e+iEa3pHoJ0lO2y7nAu/kZWm8M+BuMscCfGDlmcsdspiNh8Xp6fpv6kjEHfe7cIEStzV2y eSvutf8G/6aC1XY//TqBU8qTyotWQKa+khamxNZ4KPjard1apwZu5LE
 X-Developer-Key: i=christophe.leroy@csgroup.eu; a=ed25519; pk=HIzTzUj91asvincQGOFx6+ZF5AoUuP9GdOtQChs7Mm0=
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
@@ -76,62 +76,39 @@ X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Since commit 3dd82a1ea724 ("[POWERPC] CPM: Always use new binding.")
-has_phy field is never set.
+Commit 3dd82a1ea724 ("[POWERPC] CPM: Always use new binding.")
+removed last use of init_fec_ioports() and init_fcc_ioports().
 
-Remove dead code and remove the field.
+Remove stale prototypes then don't include anymore fs_enet_pd.h
+which was only included to provide fs_platform_info structure
+for the prototypes.
 
 Signed-off-by: Christophe Leroy <christophe.leroy@csgroup.eu>
 ---
- drivers/net/ethernet/freescale/fs_enet/mac-fec.c | 14 --------------
- include/linux/fs_enet_pd.h                       |  1 -
- 2 files changed, 15 deletions(-)
+ arch/powerpc/sysdev/fsl_soc.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-diff --git a/drivers/net/ethernet/freescale/fs_enet/mac-fec.c b/drivers/net/ethernet/freescale/fs_enet/mac-fec.c
-index f609dc112458..cdc89d83cf07 100644
---- a/drivers/net/ethernet/freescale/fs_enet/mac-fec.c
-+++ b/drivers/net/ethernet/freescale/fs_enet/mac-fec.c
-@@ -339,11 +339,7 @@ static void restart(struct net_device *dev)
- static void stop(struct net_device *dev)
- {
- 	struct fs_enet_private *fep = netdev_priv(dev);
--	const struct fs_platform_info *fpi = fep->fpi;
- 	struct fec __iomem *fecp = fep->fec.fecp;
--
--	struct fec_info *feci = dev->phydev->mdio.bus->priv;
--
- 	int i;
+diff --git a/arch/powerpc/sysdev/fsl_soc.c b/arch/powerpc/sysdev/fsl_soc.c
+index 68709743450e..c11771542bec 100644
+--- a/arch/powerpc/sysdev/fsl_soc.c
++++ b/arch/powerpc/sysdev/fsl_soc.c
+@@ -23,7 +23,6 @@
+ #include <linux/phy.h>
+ #include <linux/spi/spi.h>
+ #include <linux/fsl_devices.h>
+-#include <linux/fs_enet_pd.h>
+ #include <linux/fs_uart_pd.h>
+ #include <linux/reboot.h>
  
- 	if ((FR(fecp, ecntrl) & FEC_ECNTRL_ETHER_EN) == 0)
-@@ -363,16 +359,6 @@ static void stop(struct net_device *dev)
- 	FC(fecp, ecntrl, FEC_ECNTRL_ETHER_EN);
+@@ -37,8 +36,6 @@
+ #include <asm/cpm2.h>
+ #include <asm/fsl_hcalls.h>	/* For the Freescale hypervisor */
  
- 	fs_cleanup_bds(dev);
--
--	/* shut down FEC1? that's where the mii bus is */
--	if (fpi->has_phy) {
--		FS(fecp, r_cntrl, fpi->use_rmii ?
--				FEC_RCNTRL_RMII_MODE :
--				FEC_RCNTRL_MII_MODE);	/* MII/RMII enable */
--		FS(fecp, ecntrl, FEC_ECNTRL_PINMUX | FEC_ECNTRL_ETHER_EN);
--		FW(fecp, ievent, FEC_ENET_MII);
--		FW(fecp, mii_speed, feci->mii_speed);
--	}
- }
+-extern void init_fcc_ioports(struct fs_platform_info*);
+-extern void init_fec_ioports(struct fs_platform_info*);
+ extern void init_smc_ioports(struct fs_uart_platform_info*);
+ static phys_addr_t immrbase = -1;
  
- static void napi_clear_event_fs(struct net_device *dev)
-diff --git a/include/linux/fs_enet_pd.h b/include/linux/fs_enet_pd.h
-index a1905e41c167..2b351b676467 100644
---- a/include/linux/fs_enet_pd.h
-+++ b/include/linux/fs_enet_pd.h
-@@ -123,7 +123,6 @@ struct fs_platform_info {
- 	int napi_weight;	/* NAPI weight                 */
- 
- 	int use_rmii;		/* use RMII mode 	       */
--	int has_phy;            /* if the network is phy container as well...*/
- 
- 	struct clk *clk_per;	/* 'per' clock for register access */
- };
 -- 
 2.41.0
 
