@@ -1,96 +1,112 @@
-Return-Path: <netdev+bounces-24393-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24394-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C50B770087
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 14:50:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A83D277008B
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 14:52:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 88BE71C20A58
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 12:50:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 35A3B28268F
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 12:52:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 737B8BA5D;
-	Fri,  4 Aug 2023 12:50:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F2DBBA5E;
+	Fri,  4 Aug 2023 12:52:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68A85A929
-	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 12:50:08 +0000 (UTC)
-Received: from out3-smtp.messagingengine.com (out3-smtp.messagingengine.com [66.111.4.27])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2565C49F9
-	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 05:49:49 -0700 (PDT)
-Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
-	by mailout.nyi.internal (Postfix) with ESMTP id 928945C012E;
-	Fri,  4 Aug 2023 08:49:25 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute4.internal (MEProxy); Fri, 04 Aug 2023 08:49:25 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:sender:subject
-	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-	:x-sasl-enc; s=fm3; t=1691153365; x=1691239765; bh=ZkTw5kO1c2ZG3
-	7EkceTgB9peVFdVCQxiEDEIZ4UVvnk=; b=hgVY4Yltdjy0F/s22o8xzzye98Eei
-	Pswg1ehVdc+dKepaPrOFBJ9liulpQ4Fog1Bvj5OQxibtyl8yL8qsDIdhjxuqSh7j
-	u/8KX02vBnBIFYg4KrALAu/sCvP4oYAH0dcqPtJbSvW/muQ4fgLWTzcQMqZbsBxV
-	eTRA55FjOEPNNx6S0zQdiSDUkgAa+7PIzElHZTyOZ0GL7mtSEsB1IC/5+aZ4OjfA
-	REMzabs/dYMfcEP37UgbYKopTBqS7ZEOsVHkdrLE8pbWCL+mYsmQm0ETJltSNLZl
-	6+62jPRDzWFdPikwlsAD95QzIHC7HSyX1v87V4WEXRfTz80FApz19mZLQ==
-X-ME-Sender: <xms:1fPMZBRyAs0kHTEF0HC_TXRgimSjgPD3eKTXnclVA58b5u5My-Almw>
-    <xme:1fPMZKym7kayBAT4wMHxxqJ_IWj59JcC_mQY229SuTGoB6Rmb-qXFUl2yE9ZcLctO
-    ov5ofB4814wnxE>
-X-ME-Received: <xmr:1fPMZG3XS2Py6nCjfRE8asGjceun5jN0kqOPraj7qoWGaQ_DVBIhDEB8JZ38e_J_XS-e68BDGOsl0hjsb9vzr1o-0gUGnA>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrkeeggdehiecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
-    fjughrpeffhffvvefukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpefkughoucfu
-    tghhihhmmhgvlhcuoehiughoshgthhesihguohhstghhrdhorhhgqeenucggtffrrghtth
-    gvrhhnpedvudefveekheeugeeftddvveefgfduieefudeifefgleekheegleegjeejgeeg
-    hfenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehiug
-    hoshgthhesihguohhstghhrdhorhhg
-X-ME-Proxy: <xmx:1fPMZJATNs40C-77E1h9cS4fOFm1n4ALCKpeLJukeyVi9JR8wz6vCw>
-    <xmx:1fPMZKh4nYf1UmPUW3PAZRXgg7AmpCPC1Nc0DnXh08EJ4_grJDGAtw>
-    <xmx:1fPMZNrrOaRs9CqZT1ts2He26a-07uqH6DElzZ9w0XfCtb5c8VrTXw>
-    <xmx:1fPMZMYvVikvP_TDn1hyCMC_taxqNZy1uLZEqOE9BS52jdWVs9JD7Q>
-Feedback-ID: i494840e7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 4 Aug 2023 08:49:24 -0400 (EDT)
-Date: Fri, 4 Aug 2023 15:49:21 +0300
-From: Ido Schimmel <idosch@idosch.org>
-To: Yue Haibing <yuehaibing@huawei.com>
-Cc: idosch@nvidia.com, petrm@nvidia.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next] mlxsw: spectrum: Remove unused function
- declarations
-Message-ID: <ZMzz0fkoFt/QbJ+D@shredder>
-References: <20230803142047.42660-1-yuehaibing@huawei.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43ED2A929
+	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 12:52:18 +0000 (UTC)
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87DBF46A8
+	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 05:52:16 -0700 (PDT)
+Received: from canpemm500007.china.huawei.com (unknown [172.30.72.57])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RHQWM3NvQzGpnc;
+	Fri,  4 Aug 2023 20:48:47 +0800 (CST)
+Received: from localhost (10.174.179.215) by canpemm500007.china.huawei.com
+ (7.192.104.62) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Fri, 4 Aug
+ 2023 20:52:13 +0800
+From: Yue Haibing <yuehaibing@huawei.com>
+To: <jesse.brandeburg@intel.com>, <anthony.l.nguyen@intel.com>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <daniel@veobot.com>, <yuehaibing@huawei.com>
+CC: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>
+Subject: [PATCH net-next] ixgbe: Remove unused function declarations
+Date: Fri, 4 Aug 2023 20:52:03 +0800
+Message-ID: <20230804125203.30924-1-yuehaibing@huawei.com>
+X-Mailer: git-send-email 2.10.2.windows.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230803142047.42660-1-yuehaibing@huawei.com>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_PASS,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+Content-Type: text/plain
+X-Originating-IP: [10.174.179.215]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ canpemm500007.china.huawei.com (7.192.104.62)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Aug 03, 2023 at 10:20:47PM +0800, Yue Haibing wrote:
-> Commit c3d2ed93b14d ("mlxsw: Remove old parsing depth infrastructure")
-> left behind mlxsw_sp_nve_inc_parsing_depth_get()/mlxsw_sp_nve_inc_parsing_depth_put().
-> And commit 532b49e41e64 ("mlxsw: spectrum_span: Derive SBIB from maximum port speed & MTU")
-> remove mlxsw_sp_span_port_mtu_update()/mlxsw_sp_span_speed_update_work() but leave the
-> declarations.
-> 
-> Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
+Commit dc166e22ede5 ("ixgbe: DCB remove ixgbe_fcoe_getapp routine")
+leave ixgbe_fcoe_getapp() unused.
+Commit ffed21bcee7a ("ixgbe: Don't bother clearing buffer memory for descriptor rings")
+leave ixgbe_unmap_and_free_tx_resource() declaration unused.
+And commit 3b3bf3b92b31 ("ixgbe: remove unused fcoe.tc field and fcoe_setapp()")
+removed the ixgbe_fcoe_setapp() implementation.
 
-Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+Commit c44ade9ef8ff ("ixgbe: update to latest common code module")
+declared but never implemented ixgbe_init_ops_generic().
+
+Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
+---
+ drivers/net/ethernet/intel/ixgbe/ixgbe.h        | 6 ------
+ drivers/net/ethernet/intel/ixgbe/ixgbe_common.h | 1 -
+ 2 files changed, 7 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe.h b/drivers/net/ethernet/intel/ixgbe/ixgbe.h
+index 63d4e32df029..b6f0376e42f4 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe.h
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe.h
+@@ -945,8 +945,6 @@ void ixgbe_update_pf_promisc_vlvf(struct ixgbe_adapter *adapter, u32 vid);
+ void ixgbe_clear_interrupt_scheme(struct ixgbe_adapter *adapter);
+ netdev_tx_t ixgbe_xmit_frame_ring(struct sk_buff *, struct ixgbe_adapter *,
+ 				  struct ixgbe_ring *);
+-void ixgbe_unmap_and_free_tx_resource(struct ixgbe_ring *,
+-				      struct ixgbe_tx_buffer *);
+ void ixgbe_alloc_rx_buffers(struct ixgbe_ring *, u16);
+ void ixgbe_write_eitr(struct ixgbe_q_vector *);
+ int ixgbe_poll(struct napi_struct *napi, int budget);
+@@ -997,10 +995,6 @@ int ixgbe_setup_fcoe_ddp_resources(struct ixgbe_adapter *adapter);
+ void ixgbe_free_fcoe_ddp_resources(struct ixgbe_adapter *adapter);
+ int ixgbe_fcoe_enable(struct net_device *netdev);
+ int ixgbe_fcoe_disable(struct net_device *netdev);
+-#ifdef CONFIG_IXGBE_DCB
+-u8 ixgbe_fcoe_getapp(struct ixgbe_adapter *adapter);
+-u8 ixgbe_fcoe_setapp(struct ixgbe_adapter *adapter, u8 up);
+-#endif /* CONFIG_IXGBE_DCB */
+ int ixgbe_fcoe_get_wwn(struct net_device *netdev, u64 *wwn, int type);
+ int ixgbe_fcoe_get_hbainfo(struct net_device *netdev,
+ 			   struct netdev_fcoe_hbainfo *info);
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_common.h b/drivers/net/ethernet/intel/ixgbe/ixgbe_common.h
+index 4b531e8ae38a..34761e691d52 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_common.h
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_common.h
+@@ -8,7 +8,6 @@
+ #include "ixgbe.h"
+ 
+ u16 ixgbe_get_pcie_msix_count_generic(struct ixgbe_hw *hw);
+-s32 ixgbe_init_ops_generic(struct ixgbe_hw *hw);
+ s32 ixgbe_init_hw_generic(struct ixgbe_hw *hw);
+ s32 ixgbe_start_hw_generic(struct ixgbe_hw *hw);
+ s32 ixgbe_start_hw_gen2(struct ixgbe_hw *hw);
+-- 
+2.34.1
+
 
