@@ -1,223 +1,81 @@
-Return-Path: <netdev+bounces-24377-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24378-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 535C9770025
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 14:23:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8BD5D77002D
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 14:26:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7EB491C217C3
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 12:23:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3D76C282612
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 12:26:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38FBBBA57;
-	Fri,  4 Aug 2023 12:23:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A458BE46;
+	Fri,  4 Aug 2023 12:26:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4AEC9479
-	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 12:23:32 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 73A3FC433C7;
-	Fri,  4 Aug 2023 12:23:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691151812;
-	bh=QppzQhsRlg4qPDIGbiHxaRS4WDCRfQmv3ibRAOj0YdU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=cSvgSbgBUMcktZ54wPo/skPThBHzsKTN0GaE0ctMtuybUqP1A85EUCZYhi6JPqKpT
-	 93FzryH5cLPf88Kvxu8RZRfvp+FPgbbZd20HTAywQ6xQU+L8Mn9ZqwiShkJnSFBr6R
-	 pTPcNjpVH8wN1rN34MF4EG5uizJkMwBOMn+9yK9QAYWG6L11A0sV4Sj2ZzEtQY9btY
-	 mr5UZYIk7YbWhtsV/E6N0qA+FEMYrcH9U/wlmmlZr6zseaW3lIHxRBzk7bG2GDDMb8
-	 +RascKFz6fBXMpmBewbeuKzdkuthZoHi1JK67FjWKe54kXxiB6Ov0ghl8/6z9ZgmIG
-	 UY3U50xHvbkKg==
-Received: by mercury (Postfix, from userid 1000)
-	id B92A71061B1F; Fri,  4 Aug 2023 14:23:29 +0200 (CEST)
-Date: Fri, 4 Aug 2023 14:23:29 +0200
-From: Sebastian Reichel <sre@kernel.org>
-To: Claudiu Beznea <claudiu.beznea@tuxon.dev>
-Cc: nicolas.ferre@microchip.com, conor.dooley@microchip.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, lgirdwood@gmail.com, broonie@kernel.org,
-	perex@perex.cz, tiwai@suse.com, maz@kernel.org,
-	srinivas.kandagatla@linaro.org, thierry.reding@gmail.com,
-	u.kleine-koenig@pengutronix.de,
-	linux-arm-kernel@lists.infradead.org, linux-pm@vger.kernel.org,
-	linux-pwm@vger.kernel.org, alsa-devel@alsa-project.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] MAINTAINERS: update Claudiu Beznea's email address
-Message-ID: <20230804122329.l6wytey6tlt4zjub@mercury.elektranox.org>
-References: <20230804050007.235799-1-claudiu.beznea@tuxon.dev>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84E0E9479;
+	Fri,  4 Aug 2023 12:26:29 +0000 (UTC)
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCAA546B2;
+	Fri,  4 Aug 2023 05:26:27 -0700 (PDT)
+Received: from dggpeml500026.china.huawei.com (unknown [172.30.72.53])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RHPxb11bpzGpn3;
+	Fri,  4 Aug 2023 20:22:59 +0800 (CST)
+Received: from huawei.com (10.175.101.6) by dggpeml500026.china.huawei.com
+ (7.185.36.106) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Fri, 4 Aug
+ 2023 20:26:25 +0800
+From: Zhengchao Shao <shaozhengchao@huawei.com>
+To: <netdev@vger.kernel.org>, <bpf@vger.kernel.org>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>
+CC: <jiri@resnulli.us>, <weiyongjun1@huawei.com>, <yuehaibing@huawei.com>,
+	<shaozhengchao@huawei.com>
+Subject: [PATCH net-next 0/6] team: do some cleanups in team driver
+Date: Fri, 4 Aug 2023 20:31:10 +0800
+Message-ID: <20230804123116.2495908-1-shaozhengchao@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="ayavysskzyo2pjbe"
-Content-Disposition: inline
-In-Reply-To: <20230804050007.235799-1-claudiu.beznea@tuxon.dev>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.175.101.6]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ dggpeml500026.china.huawei.com (7.185.36.106)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
+Do some cleanups in team driver.
 
---ayavysskzyo2pjbe
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Zhengchao Shao (6):
+  team: add __exit modifier to team_nl_fini()
+  team: remove unreferenced header in activebackup/broadcast/roundrobin
+    files
+  team: change the init function in the team_option structure to void
+  team: change the getter function in the team_option structure to void
+  team: get lb_priv from team directly in lb_htpm_select_tx_port
+  team: remove unused input parameters in lb_htpm_select_tx_port and
+    lb_hash_select_tx_port
 
-Hi,
+ drivers/net/team/team.c                   | 62 +++++++++--------------
+ drivers/net/team/team_mode_activebackup.c |  9 ++--
+ drivers/net/team/team_mode_broadcast.c    |  1 -
+ drivers/net/team/team_mode_loadbalance.c  | 50 +++++++-----------
+ drivers/net/team/team_mode_roundrobin.c   |  1 -
+ include/linux/if_team.h                   |  4 +-
+ 6 files changed, 48 insertions(+), 79 deletions(-)
 
-On Fri, Aug 04, 2023 at 08:00:07AM +0300, Claudiu Beznea wrote:
-> Update MAINTAINERS entries with a valid email address as the Microchip
-> one is no longer valid.
->=20
-> Acked-by: Conor Dooley <conor.dooley@microchip.com>
-> Acked-by: Nicolas Ferre <nicolas.ferre@microchip.com>
-> Signed-off-by: Claudiu Beznea <claudiu.beznea@tuxon.dev>
-> ---
+-- 
+2.34.1
 
-Acked-by: Sebastian Reichel <sre@kernel.org>
-
--- Sebastian
-
-> Changes in v2:
-> - collected tags
-> - extended the recipients list to include individual subsystem
->   maintainers and lists instead using only linux-kernel@vger.kernel.org
->   as suggested initially by get_maintainers.pl
->=20
->  MAINTAINERS | 22 +++++++++++-----------
->  1 file changed, 11 insertions(+), 11 deletions(-)
->=20
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 128fd295f86f..d48d8e857f57 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -2351,7 +2351,7 @@ F:	drivers/phy/mediatek/
->  ARM/MICROCHIP (ARM64) SoC support
->  M:	Conor Dooley <conor@kernel.org>
->  M:	Nicolas Ferre <nicolas.ferre@microchip.com>
-> -M:	Claudiu Beznea <claudiu.beznea@microchip.com>
-> +M:	Claudiu Beznea <claudiu.beznea@tuxon.dev>
->  L:	linux-arm-kernel@lists.infradead.org (moderated for non-subscribers)
->  S:	Supported
->  T:	git https://git.kernel.org/pub/scm/linux/kernel/git/at91/linux.git
-> @@ -2360,7 +2360,7 @@ F:	arch/arm64/boot/dts/microchip/
->  ARM/Microchip (AT91) SoC support
->  M:	Nicolas Ferre <nicolas.ferre@microchip.com>
->  M:	Alexandre Belloni <alexandre.belloni@bootlin.com>
-> -M:	Claudiu Beznea <claudiu.beznea@microchip.com>
-> +M:	Claudiu Beznea <claudiu.beznea@tuxon.dev>
->  L:	linux-arm-kernel@lists.infradead.org (moderated for non-subscribers)
->  S:	Supported
->  W:	http://www.linux4sam.org
-> @@ -3265,7 +3265,7 @@ F:	include/uapi/linux/atm*
-> =20
->  ATMEL MACB ETHERNET DRIVER
->  M:	Nicolas Ferre <nicolas.ferre@microchip.com>
-> -M:	Claudiu Beznea <claudiu.beznea@microchip.com>
-> +M:	Claudiu Beznea <claudiu.beznea@tuxon.dev>
->  S:	Supported
->  F:	drivers/net/ethernet/cadence/
-> =20
-> @@ -13880,7 +13880,7 @@ F:	Documentation/devicetree/bindings/serial/atmel=
-,at91-usart.yaml
->  F:	drivers/spi/spi-at91-usart.c
-> =20
->  MICROCHIP AUDIO ASOC DRIVERS
-> -M:	Claudiu Beznea <claudiu.beznea@microchip.com>
-> +M:	Claudiu Beznea <claudiu.beznea@tuxon.dev>
->  L:	alsa-devel@alsa-project.org (moderated for non-subscribers)
->  S:	Supported
->  F:	Documentation/devicetree/bindings/sound/atmel*
-> @@ -13903,7 +13903,7 @@ S:	Maintained
->  F:	drivers/crypto/atmel-ecc.*
-> =20
->  MICROCHIP EIC DRIVER
-> -M:	Claudiu Beznea <claudiu.beznea@microchip.com>
-> +M:	Claudiu Beznea <claudiu.beznea@tuxon.dev>
->  L:	linux-arm-kernel@lists.infradead.org (moderated for non-subscribers)
->  S:	Supported
->  F:	Documentation/devicetree/bindings/interrupt-controller/microchip,sama=
-7g5-eic.yaml
-> @@ -13976,7 +13976,7 @@ F:	drivers/video/fbdev/atmel_lcdfb.c
->  F:	include/video/atmel_lcdc.h
-> =20
->  MICROCHIP MCP16502 PMIC DRIVER
-> -M:	Claudiu Beznea <claudiu.beznea@microchip.com>
-> +M:	Claudiu Beznea <claudiu.beznea@tuxon.dev>
->  L:	linux-arm-kernel@lists.infradead.org (moderated for non-subscribers)
->  S:	Supported
->  F:	Documentation/devicetree/bindings/regulator/mcp16502-regulator.txt
-> @@ -14003,7 +14003,7 @@ F:	Documentation/devicetree/bindings/mtd/atmel-na=
-nd.txt
->  F:	drivers/mtd/nand/raw/atmel/*
-> =20
->  MICROCHIP OTPC DRIVER
-> -M:	Claudiu Beznea <claudiu.beznea@microchip.com>
-> +M:	Claudiu Beznea <claudiu.beznea@tuxon.dev>
->  L:	linux-arm-kernel@lists.infradead.org (moderated for non-subscribers)
->  S:	Supported
->  F:	Documentation/devicetree/bindings/nvmem/microchip,sama7g5-otpc.yaml
-> @@ -14042,7 +14042,7 @@ F:	Documentation/devicetree/bindings/fpga/microch=
-ip,mpf-spi-fpga-mgr.yaml
->  F:	drivers/fpga/microchip-spi.c
-> =20
->  MICROCHIP PWM DRIVER
-> -M:	Claudiu Beznea <claudiu.beznea@microchip.com>
-> +M:	Claudiu Beznea <claudiu.beznea@tuxon.dev>
->  L:	linux-arm-kernel@lists.infradead.org (moderated for non-subscribers)
->  L:	linux-pwm@vger.kernel.org
->  S:	Supported
-> @@ -14058,7 +14058,7 @@ F:	drivers/iio/adc/at91-sama5d2_adc.c
->  F:	include/dt-bindings/iio/adc/at91-sama5d2_adc.h
-> =20
->  MICROCHIP SAMA5D2-COMPATIBLE SHUTDOWN CONTROLLER
-> -M:	Claudiu Beznea <claudiu.beznea@microchip.com>
-> +M:	Claudiu Beznea <claudiu.beznea@tuxon.dev>
->  S:	Supported
->  F:	Documentation/devicetree/bindings/power/reset/atmel,sama5d2-shdwc.yaml
->  F:	drivers/power/reset/at91-sama5d2_shdwc.c
-> @@ -14075,7 +14075,7 @@ S:	Supported
->  F:	drivers/spi/spi-atmel.*
-> =20
->  MICROCHIP SSC DRIVER
-> -M:	Claudiu Beznea <claudiu.beznea@microchip.com>
-> +M:	Claudiu Beznea <claudiu.beznea@tuxon.dev>
->  L:	linux-arm-kernel@lists.infradead.org (moderated for non-subscribers)
->  S:	Supported
->  F:	Documentation/devicetree/bindings/misc/atmel-ssc.txt
-> @@ -14104,7 +14104,7 @@ F:	drivers/usb/gadget/udc/atmel_usba_udc.*
-> =20
->  MICROCHIP WILC1000 WIFI DRIVER
->  M:	Ajay Singh <ajay.kathat@microchip.com>
-> -M:	Claudiu Beznea <claudiu.beznea@microchip.com>
-> +M:	Claudiu Beznea <claudiu.beznea@tuxon.dev>
->  L:	linux-wireless@vger.kernel.org
->  S:	Supported
->  F:	drivers/net/wireless/microchip/wilc1000/
-> --=20
-> 2.39.2
->=20
-
---ayavysskzyo2pjbe
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEE72YNB0Y/i3JqeVQT2O7X88g7+poFAmTM7akACgkQ2O7X88g7
-+prINg//RcuW5D688+v0Q2OnYj7jCRdH2H+xmYorC7m7Z6DH3pjUQWl4b2PS2aQz
-iQWEtRsBEMiGgiYIhmwYMqUAClPdGRFyJFilrupoQQezDwvwdgmKMDX652VjH+F8
-InoIfuPaXfJPxscO2FXX6A0HM+8Qy14zH/Sf8Tyjc5TYFTdwWqsJMdYXYX2S/Gk9
-Uu1KL5ZUWvSooN127dgAC3EijnxV7T8y12gXd2gSrWu1moOYGEc3CJG61rTSa31u
-WzD00rEvPVUq9KX5r+uQWP4tub9hGSoy6E/u6K7NKjXWqn6rOjHaz2aw0FEU1/tp
-AtGDCOslPmvqFEmJs0bbHo51VlvHEpvDNU7EdKFsOXRIfij72l6SF8pD3Wj5ramA
-LrbV+A3kPZRlAudfxBc7ufzdP6wgyR6jgD394Ovhe5XDB+fANTMwCf38Gx62lsUD
-x4HnCksQoEZfkLsLtavbHqEpBmwgEHEX8TuZ68HxSDZIAgts8K86zNOnPZvpstak
-hLU0Bz0LVJiIz2DWIqE5gxNAaPSAUpT9KflPUiQISAHC7NB+yuNP8UbkOU4DoDQW
-K19om2Id4TjnyR7MDk1xb56uIPh9pj9I1sYmvsUkHmhxqh74gq7acYCntwapIyqb
-ebwZctmSOe18RQBGJzWciIJsgqDQRpm+9rY+sqRaSALim4llvbM=
-=ciPO
------END PGP SIGNATURE-----
-
---ayavysskzyo2pjbe--
 
