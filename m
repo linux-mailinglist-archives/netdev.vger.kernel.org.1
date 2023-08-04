@@ -1,109 +1,100 @@
-Return-Path: <netdev+bounces-24305-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24306-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B35376FB5A
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 09:50:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DCA7276FB5E
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 09:50:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D40F3282510
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 07:50:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 196FC1C2173A
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 07:50:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D13178480;
-	Fri,  4 Aug 2023 07:50:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EDDD8483;
+	Fri,  4 Aug 2023 07:50:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE8B88471
-	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 07:50:17 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6327B421E
-	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 00:50:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1691135415;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=EJNCjBbUaxpHFi81g2fq9zXIhVcgdwCTwZCKF8pxHv8=;
-	b=csf0Tqp6AWC8HYl9beXKgYkCTS/+o17LWk+VIliad4H2MnkPG+e7ZgJQDmh3asaEa5qVR9
-	idbaSYL7qt5UUfzhPqOguU6ItQs+UOFR3t2zpSDMNceZLmJ7KOQz7O6nnE1pqM80p0ChvU
-	DlPubDNfEdMNNEePJ92zPdUMZDB3tFc=
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
- [209.85.160.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-511-R1tEHMsFN9SUz5KjHBpwiQ-1; Fri, 04 Aug 2023 03:50:14 -0400
-X-MC-Unique: R1tEHMsFN9SUz5KjHBpwiQ-1
-Received: by mail-qt1-f200.google.com with SMTP id d75a77b69052e-40c8f2f17c3so24741961cf.2
-        for <netdev@vger.kernel.org>; Fri, 04 Aug 2023 00:50:13 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691135413; x=1691740213;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EJNCjBbUaxpHFi81g2fq9zXIhVcgdwCTwZCKF8pxHv8=;
-        b=i+RA9X2FWAEjIWa80BmdsEzPAoHhgPvasp4jWD4qI3aRH9o7vqqnDNuz0BfP+Jna0T
-         al5DoChtOXisGgaantdLYoNBDuaWKho/bHFWHYwqtkClga2IQdq6alInnIEH9dN3tVCw
-         ZM5AkEr8PhY3i2BRH7kkxnWWxq0sOIUvN+f5ZVcZPPbnBt6TCB6aLuQh21HnrqSnYOqG
-         HV1e5OgPAC3KpbdzolNFITetQy5U03zY/KPzcl9Dsn8ulAtFWFQsQWL+FnW7uObmpfKN
-         w90QRK+Ky1srXxUyg5rpfnCs10/6WnNwYwchy50SbuX0Yw9rot5spj5mtfvGtB+BMOZw
-         Yekg==
-X-Gm-Message-State: AOJu0Ywya9LHtnqgnaA2mUngrDntQypqVNkwrzfqZol6KfPhBfApPU6J
-	J9+6zcYnLm3AQRl4op37lUR/Swzz8qgbWEohHsEcytFJSLdSHXB8QhLGiiPnIjo5+1hlYootNpy
-	P+XxPFXHNhVXP4qyf
-X-Received: by 2002:a05:622a:651:b0:405:49e0:899f with SMTP id a17-20020a05622a065100b0040549e0899fmr1604383qtb.39.1691135413412;
-        Fri, 04 Aug 2023 00:50:13 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGdJhhhHo66q8mOj5/wTJahLgvxWofEBXXNIVMVbM5UXM0NqJORuYMOilvr66YHHR5o9ji0/w==
-X-Received: by 2002:a05:622a:651:b0:405:49e0:899f with SMTP id a17-20020a05622a065100b0040549e0899fmr1604364qtb.39.1691135413153;
-        Fri, 04 Aug 2023 00:50:13 -0700 (PDT)
-Received: from sgarzare-redhat (host-82-57-51-214.retail.telecomitalia.it. [82.57.51.214])
-        by smtp.gmail.com with ESMTPSA id c24-20020ac80098000000b003f7fd3ce69fsm485256qtg.59.2023.08.04.00.50.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Aug 2023 00:50:12 -0700 (PDT)
-Date: Fri, 4 Aug 2023 09:50:06 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Simon Horman <horms@kernel.org>
-Cc: Yue Haibing <yuehaibing@huawei.com>, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, bobby.eshleman@bytedance.com, 
-	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
-Subject: Re: [PATCH -next] af_vsock: Remove unused declaration
- vsock_release_pending()/vsock_init_tap()
-Message-ID: <xjs5cdmrcnsnzvbezd24lzvb4fgoofkyamvbxzbcwpetslhizc@seph4jwbpziv>
-References: <20230803134507.22660-1-yuehaibing@huawei.com>
- <ZMwBFdw8BTno3dn2@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E60B58471
+	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 07:50:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 61747C433C9;
+	Fri,  4 Aug 2023 07:50:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1691135423;
+	bh=OH3gniLFnPYrsPir9qBAOn8UQ6Wk+SDu8xHH9xs5YNE=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=mxBIU+xf7MQLWpD13qDK8PrbNkDuHRAQDJJbyj/VMv0eajyIrF0uE8n5GN/LkFpGG
+	 KMXUw0CndD295pjg+2sI2JPNPM5mpxYlLv+PoPM0aAahOk0bhli35H9dwucCovkVBT
+	 SjtSs+xGz0X7hw4sqoaaJpnb8vujDEZjZE7DNoVpeTyJEYCpoR3ZDcUJVnqy5VPc7H
+	 BRxRpof3Xvp9ldrbrRe1OMyhNhIXvWeoOmP5rS0M0NEC0TF7Qk7kknfonmZSdQe1Xe
+	 5e5yjVV6f0l4pW6SLV7p55XFuBGQawirlRUtad3rX+RD5FUuY7lxy8eBFWrUlrpFJe
+	 aZqK2yEhyZEUA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3C6A0C41620;
+	Fri,  4 Aug 2023 07:50:23 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <ZMwBFdw8BTno3dn2@kernel.org>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next 1/9] can: flexcan: fix the return value handle for
+ platform_get_irq()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169113542324.10721.6590687568774577784.git-patchwork-notify@kernel.org>
+Date: Fri, 04 Aug 2023 07:50:23 +0000
+References: <20230803080830.1386442-2-mkl@pengutronix.de>
+In-Reply-To: <20230803080830.1386442-2-mkl@pengutronix.de>
+To: Marc Kleine-Budde <mkl@pengutronix.de>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+ linux-can@vger.kernel.org, kernel@pengutronix.de, ruanjinjie@huawei.com
 
-On Thu, Aug 03, 2023 at 09:33:41PM +0200, Simon Horman wrote:
->On Thu, Aug 03, 2023 at 09:45:07PM +0800, Yue Haibing wrote:
->> Commit d021c344051a ("VSOCK: Introduce VM Sockets") declared but never implemented
->> vsock_release_pending(). Also vsock_init_tap() never implemented since introduction
->> in commit 531b374834c8 ("VSOCK: Add vsockmon tap functions").
->>
->> Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
->
->Hi Yue Haibing,
->
->FWIIW, I think this should be targeted at net-next.
+Hello:
 
-Yep, please send to net-next.
+This series was applied to netdev/net-next.git (main)
+by Marc Kleine-Budde <mkl@pengutronix.de>:
 
-Looks good also to me:
+On Thu,  3 Aug 2023 10:08:22 +0200 you wrote:
+> From: Ruan Jinjie <ruanjinjie@huawei.com>
+> 
+> There is no possible for platform_get_irq() to return 0
+> and the return value of platform_get_irq() is more sensible
+> to show the error reason.
+> 
+> Signed-off-by: Ruan Jinjie <ruanjinjie@huawei.com>
+> Link: https://lore.kernel.org/all/20230731075252.359965-1-ruanjinjie@huawei.com
+> Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
+> 
+> [...]
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+Here is the summary with links:
+  - [net-next,1/9] can: flexcan: fix the return value handle for platform_get_irq()
+    https://git.kernel.org/netdev/net-next/c/53b8d2be4d71
+  - [net-next,2/9] dt-bindings: can: tcan4x5x: Add tcan4552 and tcan4553 variants
+    https://git.kernel.org/netdev/net-next/c/e332873dc7e2
+  - [net-next,3/9] can: tcan4x5x: Remove reserved register 0x814 from writable table
+    https://git.kernel.org/netdev/net-next/c/fbe534f7bf21
+  - [net-next,4/9] can: tcan4x5x: Check size of mram configuration
+    https://git.kernel.org/netdev/net-next/c/c1b17ea7dd7c
+  - [net-next,5/9] can: tcan4x5x: Rename ID registers to match datasheet
+    https://git.kernel.org/netdev/net-next/c/0d6f3b25ac2f
+  - [net-next,6/9] can: tcan4x5x: Add support for tcan4552/4553
+    https://git.kernel.org/netdev/net-next/c/142c6dc6d9d7
+  - [net-next,7/9] can: tcan4x5x: Add error messages in probe
+    https://git.kernel.org/netdev/net-next/c/35e7aaab3e00
+  - [net-next,8/9] can: c_can: Do not check for 0 return after calling platform_get_irq()
+    https://git.kernel.org/netdev/net-next/c/db31e6f170f3
+  - [net-next,9/9] can: esd_usb: Add support for esd CAN-USB/3
+    (no matching commit)
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
