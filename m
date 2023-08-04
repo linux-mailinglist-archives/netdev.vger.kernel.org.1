@@ -1,141 +1,201 @@
-Return-Path: <netdev+bounces-24386-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24387-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 922B577005B
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 14:40:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9227F770063
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 14:42:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4B1DD28263D
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 12:40:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4CEDF282654
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 12:42:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CBECA95F;
-	Fri,  4 Aug 2023 12:40:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67933AD30;
+	Fri,  4 Aug 2023 12:42:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E3DE8F52
-	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 12:40:24 +0000 (UTC)
-Received: from out3-smtp.messagingengine.com (out3-smtp.messagingengine.com [66.111.4.27])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E07046A8
-	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 05:40:23 -0700 (PDT)
-Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
-	by mailout.nyi.internal (Postfix) with ESMTP id 199FE5C0091;
-	Fri,  4 Aug 2023 08:40:22 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute6.internal (MEProxy); Fri, 04 Aug 2023 08:40:22 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:sender:subject
-	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-	:x-sasl-enc; s=fm3; t=1691152822; x=1691239222; bh=MjhgaDQPL21nI
-	hvSns7G9GQAMxGe71mmFz1UUc6CMtE=; b=DUZQ+CRDQsQRSW51/c2ZHELkuLBfZ
-	Y3GVsGnu/Iu0mbZo+7OGTV32y7Hj6uHrBEWyEvbu5qHdelren6lxsLpTCBOFHyLr
-	L+9eSPJr9hx7hgVqo+8pa2zVODxy+W+cgTR7H8mlI0l/Vbx1cv8XE6JvPPJNMs8/
-	eMhOnr4vyj5PffRFXCU+VQ+1gq4uwgPqBMxze6Od4h6BekJFkt+GR6ZISXusKVgw
-	rnYMxxxKvFKYnE6gS8K+3KLTnjZM1zuyuzaqRzyYFfjKLYmD26cyxDZjNHjzqWqU
-	uKeJiljqNJ0rSxyQPDhmrl9wMF4mSlK0MsHersmAOtMcQZGmaa4vErZLQ==
-X-ME-Sender: <xms:tfHMZJ3y34xUIZ0ZZKrXxc9JH20wBb1Spvs-N5O7n3almST5rWfBEg>
-    <xme:tfHMZAF3BUabuWd05A-R9C8R9P-E-q1s0B9KOBOvD6RPBp0FHgL_QBETVWRlNePVP
-    bLwoORpA9TBZ-w>
-X-ME-Received: <xmr:tfHMZJ7pikMNMGlWkb7RdE6T6ybKF8Da8ppGDgb7IAygbkVV5hTnTwzlsuFYfmiHtRD9ZUxFNP2x48gcBrBYWkNGILc9Tw>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrkeeggdehfecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecunecujfgurhepfffhvfevuffkfhggtggujgesthdtre
-    dttddtvdenucfhrhhomhepkfguohcuufgthhhimhhmvghluceoihguohhstghhsehiugho
-    shgthhdrohhrgheqnecuggftrfgrthhtvghrnhepvddufeevkeehueegfedtvdevfefgud
-    eifeduieefgfelkeehgeelgeejjeeggefhnecuvehluhhsthgvrhfuihiivgeptdenucfr
-    rghrrghmpehmrghilhhfrhhomhepihguohhstghhsehiughoshgthhdrohhrgh
-X-ME-Proxy: <xmx:tfHMZG3YlDYtKz8L8nwgo2KYaKbVpkJkFW8nE_fxjQoL67qaFoVDiA>
-    <xmx:tfHMZMHYkT6FcisiEbNKUiYh5hyPRK6k6plKR15TbPCM9HexT-md3A>
-    <xmx:tfHMZH9MqV39lkLYKoYLBscf5IsqDtbEZiIAfJERWksQcKlyHfeEXQ>
-    <xmx:tvHMZKZ1X4_eQjGKxSpBpQFlU7pG31Uk2GBVWm0_ZtLn4yIkVjMKhg>
-Feedback-ID: i494840e7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 4 Aug 2023 08:40:20 -0400 (EDT)
-Date: Fri, 4 Aug 2023 15:40:17 +0300
-From: Ido Schimmel <idosch@idosch.org>
-To: Ziyang Xuan <william.xuanziyang@huawei.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, j.vosburgh@gmail.com, andy@greyhouse.net,
-	tglx@linutronix.de, vadim.fedorenko@linux.dev, kaber@trash.net,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net v2] bonding: Fix incorrect deletion of ETH_P_8021AD
- protocol vid from slaves
-Message-ID: <ZMzxsYwiejVov13M@shredder>
-References: <20230802114320.4156068-1-william.xuanziyang@huawei.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BC59A940
+	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 12:42:03 +0000 (UTC)
+Received: from smtp.uniroma2.it (smtp.uniroma2.it [160.80.6.23])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3959649C3;
+	Fri,  4 Aug 2023 05:41:56 -0700 (PDT)
+Received: from smtpauth-2019-1.uniroma2.it (smtpauth-2019-1.uniroma2.it [160.80.5.46])
+	by smtp-2015.uniroma2.it (8.14.4/8.14.4/Debian-8) with ESMTP id 374CfN4s017716;
+	Fri, 4 Aug 2023 14:41:29 +0200
+Received: from lubuntu-18.04 (unknown [160.80.103.126])
+	by smtpauth-2019-1.uniroma2.it (Postfix) with ESMTPSA id 04DE81228D4;
+	Fri,  4 Aug 2023 14:41:19 +0200 (CEST)
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=uniroma2.it;
+	s=ed201904; t=1691152879; h=from:from:sender:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Mpqujni+uUs6kbHm3bEUAhcFvBpdkTUmqXcXtvrVaoo=;
+	b=TumY6hYxXgZQTBmIy5hErBfYPZ1GZOdp4504cmJ5gqOzMMqWqFsQ8U3IBOvWeLhmJpf5X0
+	f0nKcIdKD0lEMRAQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniroma2.it; s=rsa201904;
+	t=1691152879; h=from:from:sender:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Mpqujni+uUs6kbHm3bEUAhcFvBpdkTUmqXcXtvrVaoo=;
+	b=ADadoJ8+mvV91PflQw6Il4je0kpvdT4e2CecqC0awvXrQiBkit3ATEddczxIMju6JuB0y8
+	ZtUOwHRoupN2fLI3bB/W8QEi7TIY+NSvTJBdc2Cn4xs2LipIGFbSuESG8s1DB8gy95E9qA
+	t7usNoPIZ54dv0GTh5qOhNfKgQvbc5XbbpTQhex28GPwN9sGKNgqvUNQPlggvwpS68uN66
+	A0d6BLzzaarLQqz6cEtlmGvFUGBfJjQB77BI9G5dQCq7l0kvVmPZDFJAtcf9M73Hxbn/GC
+	MD1vk268h/gR0KWQ4WGZhBEDFImrlF2mFivTqgCKVffnk6UhwbRufSte6NxUDQ==
+Date: Fri, 4 Aug 2023 14:41:18 +0200
+From: Andrea Mayer <andrea.mayer@uniroma2.it>
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni
+ <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>,
+        Shuah Khan
+ <shuah@kernel.org>, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        Stefano Salsano
+ <stefano.salsano@uniroma2.it>,
+        Paolo Lungaroni
+ <paolo.lungaroni@uniroma2.it>,
+        Ahmed Abdelsalam <ahabdels.dev@gmail.com>,
+        Andrea Mayer <andrea.mayer@uniroma2.it>
+Subject: Re: [net-next 1/2] seg6: add NEXT-C-SID support for SRv6 End.X
+ behavior
+Message-Id: <20230804144118.a52808dc5fecda09751fae9d@uniroma2.it>
+In-Reply-To: <ZMtztGiOWV6bqCLg@Laptop-X1>
+References: <20230731175117.17376-1-andrea.mayer@uniroma2.it>
+	<20230731175117.17376-2-andrea.mayer@uniroma2.it>
+	<ZMtztGiOWV6bqCLg@Laptop-X1>
+X-Mailer: Sylpheed 3.5.1 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230802114320.4156068-1-william.xuanziyang@huawei.com>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_PASS,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Virus-Scanned: clamav-milter 0.100.0 at smtp-2015
+X-Virus-Status: Clean
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Aug 02, 2023 at 07:43:20PM +0800, Ziyang Xuan wrote:
-> BUG_ON(!vlan_info) is triggered in unregister_vlan_dev() with
-> following testcase:
-> 
->   # ip netns add ns1
->   # ip netns exec ns1 ip link add bond0 type bond mode 0
->   # ip netns exec ns1 ip link add bond_slave_1 type veth peer veth2
->   # ip netns exec ns1 ip link set bond_slave_1 master bond0
->   # ip netns exec ns1 ip link add link bond_slave_1 name vlan10 type vlan id 10 protocol 802.1ad
->   # ip netns exec ns1 ip link add link bond0 name bond0_vlan10 type vlan id 10 protocol 802.1ad
->   # ip netns exec ns1 ip link set bond_slave_1 nomaster
->   # ip netns del ns1
-> 
-> The logical analysis of the problem is as follows:
-> 
-> 1. create ETH_P_8021AD protocol vlan10 for bond_slave_1:
-> register_vlan_dev()
->   vlan_vid_add()
->     vlan_info_alloc()
->     __vlan_vid_add() // add [ETH_P_8021AD, 10] vid to bond_slave_1
-> 
-> 2. create ETH_P_8021AD protocol bond0_vlan10 for bond0:
-> register_vlan_dev()
->   vlan_vid_add()
->     __vlan_vid_add()
->       vlan_add_rx_filter_info()
->           if (!vlan_hw_filter_capable(dev, proto)) // condition established because bond0 without NETIF_F_HW_VLAN_STAG_FILTER
->               return 0;
-> 
->           if (netif_device_present(dev))
->               return dev->netdev_ops->ndo_vlan_rx_add_vid(dev, proto, vid); // will be never called
->               // The slaves of bond0 will not refer to the [ETH_P_8021AD, 10] vid.
-> 
-> 3. detach bond_slave_1 from bond0:
-> __bond_release_one()
->   vlan_vids_del_by_dev()
->     list_for_each_entry(vid_info, &vlan_info->vid_list, list)
->         vlan_vid_del(dev, vid_info->proto, vid_info->vid);
->         // bond_slave_1 [ETH_P_8021AD, 10] vid will be deleted.
->         // bond_slave_1->vlan_info will be assigned NULL.
-> 
-> 4. delete vlan10 during delete ns1:
-> default_device_exit_batch()
->   dev->rtnl_link_ops->dellink() // unregister_vlan_dev() for vlan10
->     vlan_info = rtnl_dereference(real_dev->vlan_info); // real_dev of vlan10 is bond_slave_1
-> 	BUG_ON(!vlan_info); // bond_slave_1->vlan_info is NULL now, bug is triggered!!!
-> 
-> Add S-VLAN tag related features support to bond driver. So the bond driver
-> will always propagate the VLAN info to its slaves.
-> 
-> Fixes: 8ad227ff89a7 ("net: vlan: add 802.1ad support")
-> Suggested-by: Ido Schimmel <idosch@idosch.org>
-> Signed-off-by: Ziyang Xuan <william.xuanziyang@huawei.com>
+Hi Hangbin,
+thanks for your time. Please see below.
 
-Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+On Thu, 3 Aug 2023 17:30:28 +0800
+Hangbin Liu <liuhangbin@gmail.com> wrote:
+
+> On Mon, Jul 31, 2023 at 07:51:16PM +0200, Andrea Mayer wrote:
+> > +/* Processing of SRv6 End, End.X, and End.T behaviors can be extended through
+> > + * the flavors framework. These behaviors must report the subset of (flavor)
+> > + * operations they currently implement. In this way, if a user specifies a
+> > + * flavor combination that is not supported by a given End* behavior, the
+> > + * kernel refuses to instantiate the tunnel reporting the error.
+> > + */
+> > +static int seg6_flv_supp_ops_by_action(int action, __u32 *fops)
+> > +{
+> > +	switch (action) {
+> > +	case SEG6_LOCAL_ACTION_END:
+> > +		*fops = SEG6_LOCAL_END_FLV_SUPP_OPS;
+> > +		break;
+> > +	case SEG6_LOCAL_ACTION_END_X:
+> > +		*fops = SEG6_LOCAL_END_X_FLV_SUPP_OPS;
+> > +		break;
+> > +	default:
+> > +		return -EOPNOTSUPP;
+> > +	}
+> > +
+> > +	return 0;
+> >  }
+> >  
+> 
+> ...
+> 
+> > @@ -2070,7 +2131,8 @@ static int parse_nla_flavors(struct nlattr **attrs, struct seg6_local_lwt *slwt,
+> >  {
+> >  	struct seg6_flavors_info *finfo = &slwt->flv_info;
+> >  	struct nlattr *tb[SEG6_LOCAL_FLV_MAX + 1];
+> > -	unsigned long fops;
+> > +	int action = slwt->action;
+> > +	__u32 fops, supp_fops = 0;
+> >  	int rc;
+> >  
+> >  	rc = nla_parse_nested_deprecated(tb, SEG6_LOCAL_FLV_MAX,
+> > @@ -2086,7 +2148,8 @@ static int parse_nla_flavors(struct nlattr **attrs, struct seg6_local_lwt *slwt,
+> >  		return -EINVAL;
+> >  
+> >  	fops = nla_get_u32(tb[SEG6_LOCAL_FLV_OPERATION]);
+> > -	if (fops & ~SEG6_LOCAL_FLV_SUPP_OPS) {
+> > +	rc = seg6_flv_supp_ops_by_action(action, &supp_fops);
+> > +	if (rc < 0 || !supp_fops || (fops & ~supp_fops)) {
+> 
+> if rc == 0, the supp_fops won't be 0.
+> 
+
+Yes, you're right.
+
+In this patch, supp_fops is always set properly when rc == 0.
+Since seg6_flv_supp_ops_by_action() should be extended in the event that other
+behaviors receive flavors support, I added this check in case the "supp_fops"
+field was set incorrectly or not set at all.
+Note that supp_fops == 0 must be considered an inadmissible value.
+
+
+So, I think we have two possibilities:
+  i) remove this "defensive" check, assuming that supp_fops will always be set
+     correctly by seg6_flv_supp_ops_by_action() (when rc == 0, like in this
+     patch); 
+ ii) improve the check by explicitly indicating with a pr_warn_once, for
+     example, the condition that is occurring is unexpected.
+
+for (ii), something like this:
+
+parse_nla_flavors(...)
+{
+    [...]
+    supp_fops = 0;
+    [...]
+
+    rc = seg6_flv_supp_ops_by_action(action, &supp_fops);
+    if (!rc && !supp_fops) {
+   	 /* supported flavors mask cannot be zero as it is considered to
+   	  * be invalid.
+   	  */
+   	 pr_warn_once("seg6local: invalid Flavor operation(s)");
+   	 return -EINVAL;
+    }
+
+    fops = nla_get_u32(tb[SEG6_LOCAL_FLV_OPERATION]);
+    if (rc < 0 || (fops & ~supp_fops)) {
+   	 NL_SET_ERR_MSG(extack, "Unsupported Flavor operation(s)");
+   	 return -EOPNOTSUPP;
+    }
+
+    finfo->flv_ops = fops;
+
+    [...]
+}
+
+parse_nla_flavors() is called in the control path so another check would not
+hit performance. I am more inclined to consider solution (ii).
+
+What do you think?
+
+> Thanks
+> Hangbin
+
+Ciao,
+Andrea
 
