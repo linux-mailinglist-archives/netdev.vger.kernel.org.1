@@ -1,173 +1,84 @@
-Return-Path: <netdev+bounces-24247-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24240-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CC5A76F709
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 03:38:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A054B76F6C2
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 03:10:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DB3B6282423
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 01:38:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CD61E1C216D1
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 01:10:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC2C4A4E;
-	Fri,  4 Aug 2023 01:38:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E329A4E;
+	Fri,  4 Aug 2023 01:10:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C11AA10E5
-	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 01:38:51 +0000 (UTC)
-X-Greylist: delayed 2702 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 03 Aug 2023 18:38:49 PDT
-Received: from sender4-of-o50.zoho.com (sender4-of-o50.zoho.com [136.143.188.50])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0EE2423F;
-	Thu,  3 Aug 2023 18:38:49 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1691110419; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=Fg9X9UvLF8+SRneMqQ/G5RozikPMr77zZ8JuukEY51+w0mAOkIUoFAMVIcNAz9gTgadhEL2JsxrnkAXxjsVua4jw6M4MtKlY08gvHp1jcYXcUBH2lZL2+/yi3w0fJfEFE3cRoLSh40VYpJLow4TA08KthVOKnfVUndQojUbjKrw=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1691110419; h=Content-Type:Content-Transfer-Encoding:Date:From:MIME-Version:Message-ID:Subject:To; 
-	bh=CgF7acTqP7qFlr5Qba5M3iybNkb7FVjw+xpTqeOdCzs=; 
-	b=OLJT+CNZWdX5PavarRiih19c35nqJQ3aihqM4y9v+jt3Os+nDCWzacbNPI/vDwM+AYhGn4DTfdtyOz4gLI5MzyJg3iNGFE1LVDTIVu4oDPbP+kFWuqOxM9RY0DU4RkAZ9t1KcmNw7IaVcC/ZwWOsmWSHjYBbmo17/f2kdNuIhyg=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=mitchellaugustin.com;
-	spf=pass  smtp.mailfrom=mitchell@mitchellaugustin.com;
-	dmarc=pass header.from=<mitchell@mitchellaugustin.com>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1691110419;
-	s=zoho; d=mitchellaugustin.com; i=mitchell@mitchellaugustin.com;
-	h=Message-ID:Date:Date:MIME-Version:To:To:From:From:Subject:Subject:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To:Cc;
-	bh=CgF7acTqP7qFlr5Qba5M3iybNkb7FVjw+xpTqeOdCzs=;
-	b=c7c8lFkZDolQNwXJq7sqHZhFpBXJDJRfVBTwOLEhypfLtraLSGEIoOa6oFO7s+Yi
-	HVZg6Ng0XFAIeJrrhsN5uSyAeCl5E6cfZN2LmFj2XMy/qZHY5u3QW9Iw7NVeOt6vmJe
-	Z/ZIkwk0ESZjGTfSX7rplGrMCDi9/YfLuIrltlFY=
-Received: from [192.168.10.116] (xpress10810.htc.net [216.114.108.10]) by mx.zohomail.com
-	with SMTPS id 169111041747214.423010192525567; Thu, 3 Aug 2023 17:53:37 -0700 (PDT)
-Message-ID: <c1b6c01d-b0dd-1ec4-bbe2-af353035060a@mitchellaugustin.com>
-Date: Thu, 3 Aug 2023 19:53:36 -0500
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B9057E5;
+	Fri,  4 Aug 2023 01:10:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id AE8D3C433C7;
+	Fri,  4 Aug 2023 01:10:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1691111421;
+	bh=4rWS7fKouJlmX9vgplTxwMHi8wgS2ZAlyi0J8AgXOB4=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=aTqWw1UKH26rn0R5KknzqCdp6ljrDjmONEepDMHuRwH/XSYu8KJQiWz3bjlu3HT40
+	 U1NnmyNe6+otb9Qw9aewjEIld9DzzPGhW+5f8+bWoLkQnPCmywBLTu44M0X0in+l4p
+	 irRlHK+FzbbloB4pDz2fhCkM7n7yN4q9RZQeWKhVmxcvJ3wTtxXws7mhl+niKr98kj
+	 NoVl7T9Rfwg+VfQiJrgsrAA1ZEAgP+BQ3J0OZrBPg7kekRD5uYr58kWOi8qoFSEBYG
+	 SEeSXCuFYkE0m/jqftgSYQz5UNjOG+FzzPS2pDztpTFvzWXzfCuTC5FgpAmTIe/xZp
+	 fPi+93pbBtE6g==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 8C8F7C595C1;
+	Fri,  4 Aug 2023 01:10:21 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Content-Language: en-US
-To: Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang
- <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
- "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-From: Mitchell Augustin <mitchell@mitchellaugustin.com>
-Subject: [PATCH] net/sched: sch_qfq: account for stab overhead in qfq_enqueue
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-ZohoMailClient: External
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Subject: Re: [PATCH bpf-next v2] bpf: bpf_struct_ops: Remove unnecessary initial
+ values of variables
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169111142156.15722.3750188534512850509.git-patchwork-notify@kernel.org>
+Date: Fri, 04 Aug 2023 01:10:21 +0000
+References: <20230804175929.2867-1-kunyu@nfschina.com>
+In-Reply-To: <20230804175929.2867-1-kunyu@nfschina.com>
+To: Li kunyu <kunyu@nfschina.com>
+Cc: martin.lau@linux.dev, ast@kernel.org, daniel@iogearbox.net,
+ andrii@kernel.org, song@kernel.org, yhs@fb.com, john.fastabend@gmail.com,
+ kpsingh@kernel.org, sdf@google.com, haoluo@google.com, jolsa@kernel.org,
+ bpf@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
- From cb3f87086b7d412df344f120ecd324412103c903 Thu Aug 3 19:28:04 2023
-From: Mitchell Augustin <mitchell@mitchellaugustin.com>
-Date: Thu, 3 Aug 2023 19:28:04 -0500
-Subject: [PATCH] net/sched: sch_qfq: account for stab overhead in 
-qfq_enqueue
+Hello:
 
-[ Upstream commit 3e337087c3b5805fe0b8a46ba622a962880b5d64 ]
+This patch was applied to bpf/bpf-next.git (master)
+by Martin KaFai Lau <martin.lau@kernel.org>:
 
-I'm backporting this patch from the mainline 6.5-rc4 branch (the above 
-commit). This is my first "real" kernel patch, so please let me know if 
-I have done anything incorrect here. Thanks!
+On Sat,  5 Aug 2023 01:59:29 +0800 you wrote:
+> err and tlinks is assigned first, so it does not need to initialize the
+> assignment.
+> 
+> Signed-off-by: Li kunyu <kunyu@nfschina.com>
+> ---
+>  v2:
+>    Remove tlinks initialization assignment.
+> 
+> [...]
 
-Lion says:
--------
-In the QFQ scheduler a similar issue to CVE-2023-31436
-persists.
+Here is the summary with links:
+  - [bpf-next,v2] bpf: bpf_struct_ops: Remove unnecessary initial values of variables
+    https://git.kernel.org/bpf/bpf-next/c/5964d1e4594e
 
-Consider the following code in net/sched/sch_qfq.c:
-
-static int qfq_enqueue(struct sk_buff *skb, struct Qdisc *sch,
-                 struct sk_buff **to_free)
-{
-      unsigned int len = qdisc_pkt_len(skb), gso_segs;
-
-     // ...
-
-      if (unlikely(cl->agg->lmax < len)) {
-          pr_debug("qfq: increasing maxpkt from %u to %u for class %u",
-               cl->agg->lmax, len, cl->common.classid);
-          err = qfq_change_agg(sch, cl, cl->agg->class_weight, len);
-          if (err) {
-              cl->qstats.drops++;
-              return qdisc_drop(skb, sch, to_free);
-          }
-
-     // ...
-
-      }
-
-Similarly to CVE-2023-31436, "lmax" is increased without any bounds
-checks according to the packet length "len". Usually this would not
-impose a problem because packet sizes are naturally limited.
-
-This is however not the actual packet length, rather the
-"qdisc_pkt_len(skb)" which might apply size transformations according to
-"struct qdisc_size_table" as created by "qdisc_get_stab()" in
-net/sched/sch_api.c if the TCA_STAB option was set when modifying the qdisc.
-
-A user may choose virtually any size using such a table.
-
-As a result the same issue as in CVE-2023-31436 can occur, allowing heap
-out-of-bounds read / writes in the kmalloc-8192 cache.
--------
-
-We can create the issue with the following commands:
-
-tc qdisc add dev $DEV root handle 1: stab mtu 2048 tsize 512 mpu 0 \
-overhead 999999999 linklayer ethernet qfq
-tc class add dev $DEV parent 1: classid 1:1 htb rate 6mbit burst 15k
-tc filter add dev $DEV parent 1: matchall classid 1:1
-ping -I $DEV 1.1.1.2
-
-This is caused by incorrectly assuming that qdisc_pkt_len() returns a
-length within the QFQ_MIN_LMAX < len < QFQ_MAX_LMAX.
----
-  net/sched/sch_qfq.c | 8 +++++++-
-  1 file changed, 7 insertions(+), 1 deletion(-)
-
-diff --git a/net/sched/sch_qfq.c b/net/sched/sch_qfq.c
-index c2a68f6e427e..81ebe7741463 100644
---- a/net/sched/sch_qfq.c
-+++ b/net/sched/sch_qfq.c
-@@ -116,6 +116,7 @@
-
-  #define QFQ_MTU_SHIFT        16    /* to support TSO/GSO */
-  #define QFQ_MIN_LMAX        512    /* see qfq_slot_insert */
-+#define QFQ_MAX_LMAX        (1UL << QFQ_MTU_SHIFT)
-
-  #define QFQ_MAX_AGG_CLASSES    8 /* max num classes per aggregate 
-allowed */
-
-@@ -387,8 +388,13 @@ static int qfq_change_agg(struct Qdisc *sch, struct 
-qfq_class *cl, u32 weight,
-                 u32 lmax)
-  {
-      struct qfq_sched *q = qdisc_priv(sch);
--    struct qfq_aggregate *new_agg = qfq_find_agg(q, lmax, weight);
-+    struct qfq_aggregate *new_agg;
-
-+    /* 'lmax' can range from [QFQ_MIN_LMAX, pktlen + stab overhead] */
-+    if (lmax > QFQ_MAX_LMAX)
-+        return -EINVAL;
-+
-+    new_agg = qfq_find_agg(q, lmax, weight);
-      if (new_agg == NULL) { /* create new aggregate */
-          new_agg = kzalloc(sizeof(*new_agg), GFP_ATOMIC);
-          if (new_agg == NULL)
+You are awesome, thank you!
 -- 
-2.34.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
