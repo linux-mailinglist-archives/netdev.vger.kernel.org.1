@@ -1,196 +1,123 @@
-Return-Path: <netdev+bounces-24399-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24400-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86DA077017A
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 15:28:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E26D077018E
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 15:30:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 02738282679
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 13:28:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9DD93282681
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 13:30:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1EF6BE7B;
-	Fri,  4 Aug 2023 13:28:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C44F3C124;
+	Fri,  4 Aug 2023 13:30:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3039BE6E
-	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 13:28:27 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1809F3598
-	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 06:28:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1691155696;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=MaywohC+LFSW7AF7nVGv9yHzowQamawqHZwaoNWo3B0=;
-	b=Wp3jRJNOJpPJqUudx/bFrISGgPURd/ZN3UsrcKy63Xbhkbw3rVn9HYIR7M0qX/AP6+K2eQ
-	Pv4QFrNXx5TnMnj24rULObOw1voIrkf+25N6x0lLPlEmyVqnJcTVulKKK5QMRQ712W+iVs
-	5BrKc4y7Ns1tVfFBhXadSccGv4y2/bM=
-Received: from mail-oo1-f69.google.com (mail-oo1-f69.google.com
- [209.85.161.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-518-LDq8H02-MA2Qqi6T6rq8zA-1; Fri, 04 Aug 2023 09:28:14 -0400
-X-MC-Unique: LDq8H02-MA2Qqi6T6rq8zA-1
-Received: by mail-oo1-f69.google.com with SMTP id 006d021491bc7-56d43b5863fso1663882eaf.0
-        for <netdev@vger.kernel.org>; Fri, 04 Aug 2023 06:28:14 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691155694; x=1691760494;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=MaywohC+LFSW7AF7nVGv9yHzowQamawqHZwaoNWo3B0=;
-        b=LKfWtA95DmKgCpkTxnFYLEIyQA8q+Vd96/mi5dAPlIOZQUKOau3u/g+l1f3sd7FaSy
-         5XA7PxSjUnmDg7kjfoxVAHTnpTjasEC7AiMSUe5QNWqNTO3fo0LLbwhrbs631lQC0qZz
-         vMLt5DdtNrFGQq/brVGoy2sluyl4G3DCAPq+/tWandROlSxjEy41HHBJ5LSR9EZ4RpIl
-         aW34AaAkCPKpl9sM8jD0qdKKDgjSEqi9V7EXc6I/ERX2sBvEh1lcA8Av26At6ACZXkFr
-         XDX4qvWZzZcAeS2HzuCi+jq21SqEcBjtdDpdPpEI+zkaNuV/bRGn8qNX7fzxmx8HXhAg
-         mRWw==
-X-Gm-Message-State: AOJu0YwD6RyibPpsmfMwVA4+2fflf5oJOuncKwCEN8iZtWMKIjzUZ+xT
-	gj7nkjfi/khabLpuSPlQB1GrMYcBsxKU5R3ltmmDSKFMIPV9jiwjmBw0Ty7riARtEtZwHlmepzS
-	KRj9y1JrWLps+6cwD
-X-Received: by 2002:aca:90e:0:b0:3a7:5327:b38e with SMTP id 14-20020aca090e000000b003a75327b38emr1804319oij.39.1691155693983;
-        Fri, 04 Aug 2023 06:28:13 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEXYwMED4nkJFgaoRaWCsJQatWRY5bbMvaEPJcytTfZDIMrL14uAu8ltS1chCmTD6xPCLaeog==
-X-Received: by 2002:aca:90e:0:b0:3a7:5327:b38e with SMTP id 14-20020aca090e000000b003a75327b38emr1804293oij.39.1691155693643;
-        Fri, 04 Aug 2023 06:28:13 -0700 (PDT)
-Received: from debian ([2001:4649:fcb8:0:dc2e:5d37:b73a:3fff])
-        by smtp.gmail.com with ESMTPSA id n7-20020a0cdc87000000b0063d152e5d9asm654103qvk.120.2023.08.04.06.28.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Aug 2023 06:28:13 -0700 (PDT)
-Date: Fri, 4 Aug 2023 15:28:08 +0200
-From: Guillaume Nault <gnault@redhat.com>
-To: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Alexei Starovoitov <ast@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org,
-	bpf@vger.kernel.org, stable@vger.kernel.org,
-	Siwar Zitouni <siwar.zitouni@6wind.com>
-Subject: Re: [PATCH net v2] net: handle ARPHRD_PPP in dev_is_mac_header_xmit()
-Message-ID: <ZMz86ADsBWV1gAal@debian>
-References: <20230802122106.3025277-1-nicolas.dichtel@6wind.com>
- <ZMtpSdLUQx2A6bdx@debian>
- <34f246ba-3ebc-1257-fe8d-5b7e0670a4a6@6wind.com>
- <ZMuI5mxR704O9nDq@debian>
- <62a8762c-40b4-f03f-ca8f-13d33db84f10@6wind.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B607F946D
+	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 13:30:48 +0000 (UTC)
+Received: from pegase1.c-s.fr (pegase1.c-s.fr [93.17.236.30])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5021170F;
+	Fri,  4 Aug 2023 06:30:41 -0700 (PDT)
+Received: from localhost (mailhub3.si.c-s.fr [192.168.12.233])
+	by localhost (Postfix) with ESMTP id 4RHRRh3ljyz9tG3;
+	Fri,  4 Aug 2023 15:30:40 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from pegase1.c-s.fr ([192.168.12.234])
+	by localhost (pegase1.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id zK77aMXGU9lj; Fri,  4 Aug 2023 15:30:40 +0200 (CEST)
+Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
+	by pegase1.c-s.fr (Postfix) with ESMTP id 4RHRRh2ywKz9tG1;
+	Fri,  4 Aug 2023 15:30:40 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id 5F86E8B778;
+	Fri,  4 Aug 2023 15:30:40 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from messagerie.si.c-s.fr ([127.0.0.1])
+	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
+	with ESMTP id CmQq5yIrOg0V; Fri,  4 Aug 2023 15:30:40 +0200 (CEST)
+Received: from PO20335.IDSI0.si.c-s.fr (unknown [192.168.232.144])
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id 1623F8B763;
+	Fri,  4 Aug 2023 15:30:40 +0200 (CEST)
+Received: from PO20335.IDSI0.si.c-s.fr (localhost [127.0.0.1])
+	by PO20335.IDSI0.si.c-s.fr (8.17.1/8.16.1) with ESMTPS id 374DUWjS693287
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Fri, 4 Aug 2023 15:30:32 +0200
+Received: (from chleroy@localhost)
+	by PO20335.IDSI0.si.c-s.fr (8.17.1/8.17.1/Submit) id 374DURcu693276;
+	Fri, 4 Aug 2023 15:30:27 +0200
+X-Authentication-Warning: PO20335.IDSI0.si.c-s.fr: chleroy set sender to christophe.leroy@csgroup.eu using -f
+From: Christophe Leroy <christophe.leroy@csgroup.eu>
+To: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+        Pantelis Antoniou <pantelis.antoniou@gmail.com>,
+        Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Nicholas Piggin <npiggin@gmail.com>, robh@kernel.org
+Cc: Christophe Leroy <christophe.leroy@csgroup.eu>,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org
+Subject: [PATCH net-next v2 00/10] net: fs_enet: Driver cleanup
+Date: Fri,  4 Aug 2023 15:30:10 +0200
+Message-ID: <cover.1691155346.git.christophe.leroy@csgroup.eu>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1691155809; l=1935; i=christophe.leroy@csgroup.eu; s=20211009; h=from:subject:message-id; bh=ERiVOYi/hcC3N9RhqhqL5vBOu5ySuRFBAgWoxBGT7XA=; b=qwBZpnRniiyPqhAr7qozkF6azp5RYmtMfCw1aItBfkeTlPH+znV55YtB54Qqd7/NG7FJHNG19 rdMFKByDTH9AZR+2mzRaCIZx/OQ8XdH/S7+cfk5TrfjVWScTwADopiC
+X-Developer-Key: i=christophe.leroy@csgroup.eu; a=ed25519; pk=HIzTzUj91asvincQGOFx6+ZF5AoUuP9GdOtQChs7Mm0=
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <62a8762c-40b4-f03f-ca8f-13d33db84f10@6wind.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Aug 03, 2023 at 02:22:17PM +0200, Nicolas Dichtel wrote:
-> Le 03/08/2023 à 13:00, Guillaume Nault a écrit :
-> > On Thu, Aug 03, 2023 at 11:37:00AM +0200, Nicolas Dichtel wrote:
-> >> Le 03/08/2023 à 10:46, Guillaume Nault a écrit :
-> >>> On Wed, Aug 02, 2023 at 02:21:06PM +0200, Nicolas Dichtel wrote:
-> >>>> This kind of interface doesn't have a mac header.
-> >>>
-> >>> Well, PPP does have a link layer header.
-> >> It has a link layer, but not an ethernet header.
-> > 
-> > This is generic code. The layer two protocol involved doesn't matter.
-> > What matter is that the device requires a specific l2 header.
-> Ok. Note, that addr_len is set to 0 for these devices:
-> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/net/ppp/ppp_generic.c#n1614
+Over the years, platform and driver initialisation have evolved into
+more generic ways, and driver or platform specific stuff has gone
+away, leaving stale objects behind.
 
-PPP has no hardware address. It doesn't need any since it's point to
-point. But it still has an l2 header.
+This series aims at cleaning all that up for fs_enet ethernet driver.
 
-> >>> Do you instead mean that PPP automatically adds it?
-> >>>
-> >>>> This patch fixes bpf_redirect() to a ppp interface.
-> >>>
-> >>> Can you give more details? Which kind of packets are you trying to
-> >>> redirect to PPP interfaces?
-> >> My ebpf program redirect an IP packet (eth / ip) from a physical ethernet device
-> >> at ingress to a ppp device at egress.
-> > 
-> > So you're kind of bridging two incompatible layer two protocols.
-> > I see no reason to be surprised if that doesn't work out of the box.
-> I don't see the difference with a gre or ip tunnel. This kind of "bridging" is
-> supported.
+Changes in v2:
+- Remove a trailing whitespace in the old struct moved in patch 7.
+- Include powerpc people and list that I forgot when sending v1
+(and Rob as expected by Patchwork for patch 6, not sure why)
 
-From a protocol point of view, this feature just needs to strip the l2
-header (or add it for the other way around). Here we have to remove the
-previous l2 header, then add a new one of a different kind.
+Christophe Leroy (10):
+  net: fs_enet: Remove set but not used variable
+  net: fs_enet: Fix address space and base types mismatches
+  net: fs_enet: Remove fs_get_id()
+  net: fs_enet: Remove unused fields in fs_platform_info struct
+  net: fs_enet: Remove has_phy field in fs_platform_info struct
+  net: fs_enet: Remove stale prototypes from fsl_soc.c
+  net: fs_enet: Move struct fs_platform_info into fs_enet.h
+  net: fs_enet: Don't include fs_enet_pd.h when not needed
+  net: fs_enet: Remove linux/fs_enet_pd.h
+  net: fs_enet: Use cpm_muram_xxx() functions instead of cpm_dpxxx()
+    macros
 
-But honestly, even for the l3-tunnel<->Ethernet "bridging", I don't
-really like how the code tries to be too clever. It'd have been much
-simpler to just require the user to drop the l2 headers explicitely.
-Anyway, that ship has sailed.
+ MAINTAINERS                                   |   1 -
+ arch/powerpc/platforms/8xx/adder875.c         |   1 -
+ arch/powerpc/platforms/8xx/mpc885ads_setup.c  |   1 -
+ arch/powerpc/platforms/8xx/tqm8xx_setup.c     |   1 -
+ arch/powerpc/sysdev/fsl_soc.c                 |   3 -
+ .../ethernet/freescale/fs_enet/fs_enet-main.c |   2 -
+ .../net/ethernet/freescale/fs_enet/fs_enet.h  |  19 +-
+ .../net/ethernet/freescale/fs_enet/mac-fcc.c  |   4 +-
+ .../net/ethernet/freescale/fs_enet/mac-fec.c  |  14 --
+ .../net/ethernet/freescale/fs_enet/mac-scc.c  |   8 +-
+ .../ethernet/freescale/fs_enet/mii-bitbang.c  |   4 +-
+ .../net/ethernet/freescale/fs_enet/mii-fec.c  |   1 +
+ include/linux/fs_enet_pd.h                    | 165 ------------------
+ 13 files changed, 27 insertions(+), 197 deletions(-)
+ delete mode 100644 include/linux/fs_enet_pd.h
 
-> > Let me be clearer too. As I said, this patch may be the best we can do.
-> > Making a proper l2 generic BPF-redirect/TC-mirred might require too
-> > much work for the expected gain (how many users of non-Ethernet l2
-> > devices are going to use this). But at least we should make it clear in
-> > the commit message and in the code why we're finding it convenient to
-> > treat PPP as an l3 device. Like
-> > 
-> > +	/* PPP adds its l2 header automatically in ppp_start_xmit().
-> > +	 * This makes it look like an l3 device to __bpf_redirect() and
-> > +	 * tcf_mirred_init().
-> > +	 */
-> > +	case ARPHRD_PPP:
-> I better understand your point with this comment, I can add it, no problem.
-> But I fail to see why it is different from a L3 device. ip, gre, etc. tunnels
-> also add automatically another header (ipip.c has dev->addr_len configured to 4,
-> ip6_tunnels.c to 16, etc.).
-
-These are encapsulation protocols. They glue the inner and outer
-packets together. PPP doesn't do that, it's just an l2 protocol.
-To encapsulate PPP into IP or UDP, you need another protocol, like
-L2TP.
-
-We can compare GRE or IPIP to L2TP (to some extend), not to PPP.
-
-> A tcpdump on the physical output interface shows the same kind of packets (the
-> outer hdr (ppp / ip / etc.) followed by the encapsulated packet and a tcpdump on
-> the ppp or ip tunnel device shows only the inner packet.
-
-Packets captured on ppp interfaces seem to be a bit misleading. They
-don't show the l2-header, but the "Linux cooked capture" header
-instead. I don't know the reasoning behind that, maybe to help people
-differenciate between Rx and Tx packets. Anyway, that's different from
-the raw IP packets captured on ipip devices for example.
-
-Really, PPP isn't like any ip tunnel protocol. It's just not an
-encapsulation protocol. PPP is like Ethernet. And just like Ethernet,
-it can be encapsulated by tunnels, but that requires a separate
-tunneling protocol. As an example, Ethernet has VXLAN and PPP has L2TP.
-
-> Without my patch, a redirect from a ppp interface to another ppp interface would
-> have the same problem.
-
-True, but that's because the PPP code is so old and unmaintained, it
-hasn't evolved with the rest of the networking stack. And again, I
-agree that your patch is the easiest way to make it work. But it will
-also expose inconsistencies in how BPF and tc-mirred handle different
-l2 protocols. That makes the logic hard to get from a developper point
-of view and that's why I'm asking for a better commit message and some
-comments in the code. For the user space inconsistencies, well, I guess
-nobody will really care :(.
-
-> Regards,
-> Nicolas
-> 
+-- 
+2.41.0
 
 
