@@ -1,117 +1,169 @@
-Return-Path: <netdev+bounces-24508-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24509-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E1EE77069A
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 19:03:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 174B477069D
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 19:03:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DC5DE282834
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 17:03:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C075A282813
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 17:03:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB9A31AA68;
-	Fri,  4 Aug 2023 17:02:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8A141AA6B;
+	Fri,  4 Aug 2023 17:03:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B110C2CA
-	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 17:02:58 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27219C433C8;
-	Fri,  4 Aug 2023 17:02:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691168578;
-	bh=9zCz6fL5uLMjhsXTrlMBXoPcdM5rWmBh0zdD9+OFthM=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=JuPQC6NMfJmKhwXjC9hw0IyI6awcWX10lGP77HyRKArnWc24fxcRhe3ZVmZw2jWsM
-	 QBCtJBYR3FKUBMQTxSHwkVijfh/P21aje/h9Y1eCfDZTbDeqHmmj7HXf7vMu9sCd/f
-	 2+T2IZiFRSQ3rc79xqI9FBd9vC5PNwX612+VcLIDIO97qJZoM3f3DbcFoYhxGlaDRF
-	 L+5hs73HlgbzuQEV4cB75YYB7HrGydRVdmhlyiWdfAaHIxRQ1PIkqG5UPrSXjSAhjH
-	 ZAIyS7XNktAPtCsXHDPC0LEVx7TPTFeISwVNILDXmxXhirP7cwzy9Fb1+eUNcx7zfB
-	 k1+RicqNSWtGg==
-Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2b9ba3d6157so37688851fa.3;
-        Fri, 04 Aug 2023 10:02:58 -0700 (PDT)
-X-Gm-Message-State: AOJu0YyUB1uLN7Cs3tYqgvHK5iWg6fITzCXQftAoz4LrObUGkCDMRhF7
-	HAldhZ9lkk4fvEGLTKXgR6D8LDcxJ3zvMDWdsg==
-X-Google-Smtp-Source: AGHT+IFpT3Jz9eUUjz8gBnEl/G9Wl5TYudwVd5Pkn2WF4/7vexUzQc9k4OYkWaDaebvVLGxtZGKoszr3GFCQ9fUyBfw=
-X-Received: by 2002:a2e:781a:0:b0:2b9:ac48:d7fb with SMTP id
- t26-20020a2e781a000000b002b9ac48d7fbmr2055634ljc.41.1691168576159; Fri, 04
- Aug 2023 10:02:56 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C62C01AA62
+	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 17:03:48 +0000 (UTC)
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2040.outbound.protection.outlook.com [40.107.236.40])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DD584C31;
+	Fri,  4 Aug 2023 10:03:30 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=RSnyv2MB30Zcetfx/jWToG4S9r/d4oz5otqmbk2AVK9wvpxyRgTICHurO2MRqg0cJrHFXAO1qdHoPE/5nC67yu2SugT661A0poE4sJkLFFM9Kyj4g+CCSM8Zj7r+fy+XcAjJF70W6JtwlgQsggEGJScwwI7BiBV//R9NHtHJ1b3wUk/Bw1hY4k1+ZMs6K2+8frg/LuVaKiMXRaQVepZUQKTUodFMruqk35fMsFEmT9oXGSgalsNP3iLPSw2nYVaFW3JT0CknOgq0expr+YJ7XrHe6868FxI5xCqnxKQCmduNPOFsSMPWgPZcREpKTDD2mPrrYQ7UWMMNXTcbih/UGQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=hnXc2zZlROYpxVbQ1wjjrFn7p6EuDw01Cxf12ace1no=;
+ b=jxT/TtAaJ5z2xIYg8kzx0T8pTk+ALkC028cDAWuGAjIrzhs4fC2TRMZfLopGSNsUI15F4te44uSd5ivcN3+j5SwpuDSvBqPx+U92o0PHJvn/jEhPiUQAF9mEy+GN4u+COsvuRvrUlQGf4n6JQPlNiTwroen9scZ1wBu03KwTPjNG4MTkBmJKUuFqKdz0DUmaew31HuGlduuFMjrx5lPOgnnxqku3jpmrJioi2ic/sWpibmVB4GWjYIqV98rXy9WvkXePqSE6P0HXitIZqZmEWE4uYENqkhmuW6VhIk55gSQ8o2vtvWDa6pwwWBVM7D8Ud7Xz2W9V7XkOE3amrCKmIA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=hnXc2zZlROYpxVbQ1wjjrFn7p6EuDw01Cxf12ace1no=;
+ b=BOS9DxFGPurJjUiR0NV00DBKyc2IBiY71VUg+4kDptKakcq23EzdMi3vtKjX1ikmPGtZT0KaE45cQAE9pWMyMKj8OLkwoldZYe474pULYrK/W+F8uLvOSMLLfsxZeHGh/kIj3/mYaXxlcB7gWK9+mMijrgmKy1yxXeTR01IgZXPISs14BcOBObpN91u5IlthxxxfXl2l0HUzM/HFR5ba+Tr68QHDNl9JnSHpJiL11xfEhdOkNdUZH8aBOO+1rtVf69hwO1et/jg5AUnX0tRPewF8izKd6Lw1XA13ZREtX/QBEky7wEwauKAaCM+2wbMOhv9jRMWWGzSA0rRVjuRieA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by PH7PR12MB5903.namprd12.prod.outlook.com (2603:10b6:510:1d7::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.20; Fri, 4 Aug
+ 2023 17:03:11 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::5111:16e8:5afe:1da1]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::5111:16e8:5afe:1da1%6]) with mapi id 15.20.6631.046; Fri, 4 Aug 2023
+ 17:03:11 +0000
+Date: Fri, 4 Aug 2023 14:03:10 -0300
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Brett Creeley <brett.creeley@amd.com>
+Cc: kvm@vger.kernel.org, netdev@vger.kernel.org, alex.williamson@redhat.com,
+	yishaih@nvidia.com, shameerali.kolothum.thodi@huawei.com,
+	kevin.tian@intel.com, simon.horman@corigine.com,
+	shannon.nelson@amd.com
+Subject: Re: [PATCH v13 vfio 3/7] vfio/pds: register with the pds_core PF
+Message-ID: <ZM0vTlNQnglE7Pjy@nvidia.com>
+References: <20230725214025.9288-1-brett.creeley@amd.com>
+ <20230725214025.9288-4-brett.creeley@amd.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230725214025.9288-4-brett.creeley@amd.com>
+X-ClientProxiedBy: BL0PR02CA0074.namprd02.prod.outlook.com
+ (2603:10b6:208:51::15) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CADyTPEzqf8oQAPSFRWJLxAhd-WE4fX2zdoe9Vu6V9hZMn1Yc8g@mail.gmail.com>
- <CAL_JsqLrErF__GGHfanRFCpfbOh6fvz4-aJv32h8OfDjUeZPSg@mail.gmail.com>
- <CADyTPEwgG0=R_b5DNBP0J0auDXu2BNTOwkSUFg-s7pLJUPC+Tg@mail.gmail.com> <CADyTPExgjcaUeKiR108geQhr0KwFC0A8qa_n_ST2RxhbSczomQ@mail.gmail.com>
-In-Reply-To: <CADyTPExgjcaUeKiR108geQhr0KwFC0A8qa_n_ST2RxhbSczomQ@mail.gmail.com>
-From: Rob Herring <robh@kernel.org>
-Date: Fri, 4 Aug 2023 11:02:43 -0600
-X-Gmail-Original-Message-ID: <CAL_Jsq+N2W0hVN7fUC1rxGL-Hw9B8eQvLgSwyQ3n41kqwDbxyg@mail.gmail.com>
-Message-ID: <CAL_Jsq+N2W0hVN7fUC1rxGL-Hw9B8eQvLgSwyQ3n41kqwDbxyg@mail.gmail.com>
-Subject: Re: PROBLEM: Broken or delayed ethernet on Xilinx ZCU104 since 5.18 (regression)
-To: Nick Bowler <nbowler@draconx.ca>
-Cc: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	netdev@vger.kernel.org, regressions@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|PH7PR12MB5903:EE_
+X-MS-Office365-Filtering-Correlation-Id: 294dac5e-ceff-4be2-3834-08db950caf09
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	D4UFjX9tt6eA5CB9VGqvovmzHSXFHJF871rBYkHb728izMBS3AF7CGHkR23oF79DyAU85SpAAajcVBaD2ulUttq+EVZ92d+jpo9ld778KBlbavTpxvV6et9JnsYzIVu9JkVKHt3rpi7rcKidKKFE7tTx0ZM4jJF70vEkEbFjYaU4/Lf605xJpFr5PAfW1wkQrFmzslOD3J+PfUUHUrsgQLPYbs5qDMarni4Qpkv+rn8T76FqlV7V3FOoOKmcWM6RYT2SRil+7ZZaMeLoYgYcMTpEzdBJBa/BGWYP1iT5cTzJ0pnzCz0BCNuY4iCVNUpoyycJOpMRRHMjC8kijnkEZXOC0Dj53e9ZOVacwngbXo+SG2q8SLumEdYKpjn+Z4+KPnz/9EqFHTdElJLp2P5XqPQsZGXUt7eV2Hmtm0lPOYf4BvRRIA8IPLVWWTcIu+O65QjG0yUG02BHFkX2DslIuZCIDztz+07yZpWT5wDDh5g1JJI82+q8bTII0TRBX0xlwzco4rB21u40K6z7EhVfvZGqi+YxB3sxOFnT6vAvHWEzQfMy/BLlZqKaqamYSlB+
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(366004)(376002)(136003)(39860400002)(396003)(346002)(451199021)(1800799003)(186006)(41300700001)(8936002)(8676002)(83380400001)(26005)(6506007)(2616005)(38100700002)(86362001)(316002)(6916009)(478600001)(6486002)(6512007)(66556008)(66476007)(36756003)(4326008)(2906002)(5660300002)(66946007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?uiSKCHRVmcrA663N1lqmeBnyzNkHKkW2ln+ecmMV6dz+5jTdkJiLvxfMEff7?=
+ =?us-ascii?Q?3x7xao082QN/1VSZaa2zq8iXYdQ0jSQV9fGALFt1znY+cqZkmh8uLEkVndfh?=
+ =?us-ascii?Q?P7PWn9XSbg8IyMEfT7b0RT1WW1kZCtSiN6+1wd1DH6yzaOf7jC7WmC7WMr5T?=
+ =?us-ascii?Q?LpnPKh8mX6nUvqy8mJ23qL+ec4hNduHHW1k68zm1gEy4WR5bC3NVmGM9cSm5?=
+ =?us-ascii?Q?nXmwtyZqMWw2jSkHqXt6C8UON2+1f+BFkCAL//HpAeEGIy4q0JNdPiZCbU6y?=
+ =?us-ascii?Q?zG6r3WQAboYsR2Q+YfV1qQSFwO8qP2QGJZMlsRCwIid5IAwaO5XwMBwiYN4T?=
+ =?us-ascii?Q?0InM5bJ4Euegm0tJQcZYE6sOr/8RwszFgXLbdgmHN9XT76vnQORFdaKiddj1?=
+ =?us-ascii?Q?GDVZExgDOT5FgJmOYi4IS3VNDwW2iZ4I0XcI8J6KO7BAF3k+D8QqcIlEBCbb?=
+ =?us-ascii?Q?cmOSOJjLHSbl7wR+Mp6SkY1K3M+fsT+c8j0rr9rNAud9SbVbtR2c1Q04KRkS?=
+ =?us-ascii?Q?7rt4XOMhgoJLFZpawgmnGyxGFv/3XkgbuDSklwQMWedVm3qSh9hlkOswdwqN?=
+ =?us-ascii?Q?7uPF8ihs2FOkyO+nXEDl9zZLtCE3wAc+cor2VBpBvusJks5R1EcyL8Q+IHks?=
+ =?us-ascii?Q?SpH5kQ/og7bwy9U6QaKmg6O3s0n6XZlaqbYfBkTgUsRVrvIm+vwaops+eilc?=
+ =?us-ascii?Q?ljqbnajC/WLILDHzr6D+HPRaHel1H7V277jf2ur6wsgPeSSHzYhnFKorM8Ar?=
+ =?us-ascii?Q?RCA0FG9PFNgAzoj0LbhAqI2tENjFPuQACpWeRMwbIXulDUsBG0athoYgvAET?=
+ =?us-ascii?Q?dLWwzYzai7wWOH2igtYLe/PRCTEDBH6DsHqSo7ujOECeG84pAoh1EeP9NDpp?=
+ =?us-ascii?Q?HW+t1waO6lFKkyze8EDwCSChhdQOZuPVeYLma/YlpZasazYXPtN/vCrnoUcy?=
+ =?us-ascii?Q?6MijG2lAQnHm0y4fPCBoFBZQ6gC8vNbi7kOsYRGczjD4lBa5q8OyHSTwSQl5?=
+ =?us-ascii?Q?xcLZm1KoIg//N10LLNQiTK1WAAy6oP3ruUML7V8Co/dsO6H7occX8jn33qhM?=
+ =?us-ascii?Q?OV5h0uC1+N/qFHCauNpWH1z8+irkyjDe6nBFnDqxwHY3UZ+DcbtZ/QHeM8Vi?=
+ =?us-ascii?Q?dpo85uh9DR+DSTc//BhMvYr1fACPqAVBPu+RDmc67ZLtD2yJWcLC+Svg8S7R?=
+ =?us-ascii?Q?eCJatTH5FV/94suaDdvQhxZJAZmYwEufBZovm6zjSdx5OjMPlNuc4PZHgazj?=
+ =?us-ascii?Q?NnnuhtPMelHHou23ZCMlZkYxg2Q69/weY4rHKH+pT4ZgoL9EzT5IY2mZJBds?=
+ =?us-ascii?Q?Hc2FKk2mb3TbFvdaOH4dmGyvRhgoyzo/ofzdP3od+w1Z4DtLf9+5OPY1t0zm?=
+ =?us-ascii?Q?csqTLfi+VQPDpnQiyKI8LhMqtIVymVJLmJkulH6mnZE5oA7CK6JLwYOixcWP?=
+ =?us-ascii?Q?OSrLuBDzGnE3m0EnZ5ck2vCNuXL+/cpBuSZxklO8HVv8yqHKdcL1nVxnxf5A?=
+ =?us-ascii?Q?pHZZT6DPcGKFOZxehzPuBzNvYzrrOdd9C4anBVxpfWdNtMvoepUCbKoynGry?=
+ =?us-ascii?Q?UWnIQif3olIZvLM3vBtRNI9A4M0QnuZAVeoieham?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 294dac5e-ceff-4be2-3834-08db950caf09
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Aug 2023 17:03:11.3135
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 3qbf0UtqpSB5YAiCtNvhTgvD4bA0N8Ez7t/m2weJwB+4LGHanZcJaq8GzJqUU7B9
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB5903
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Fri, Aug 4, 2023 at 10:54=E2=80=AFAM Nick Bowler <nbowler@draconx.ca> wr=
-ote:
->
-> On 2023-08-04, Nick Bowler <nbowler@draconx.ca> wrote:
-> > On 04/08/2023, Rob Herring <robh@kernel.org> wrote:
-> >> On Fri, Aug 4, 2023 at 9:27=E2=80=AFAM Nick Bowler <nbowler@draconx.ca=
-> wrote:
-> >>>   commit e461bd6f43f4e568f7436a8b6bc21c4ce6914c36
-> >>>   Author: Robert Hancock <robert.hancock@calian.com>
-> >>>   Date:   Thu Jan 27 10:37:36 2022 -0600
-> >>>
-> >>>       arm64: dts: zynqmp: Added GEM reset definitions
-> >>>
-> >>> Reverting this fixes the problem on 5.18.  Reverting this fixes the
-> >>> problem on 6.1.  Reverting this fixes the problem on 6.4.  In all of
-> >>> these versions, with this change reverted, the network device appears
-> >>> without delay.
-> >>
-> >> With the above change, the kernel is going to be waiting for the reset
-> >> driver which either didn't exist or wasn't enabled in your config
-> >> (maybe kconfig needs to be tweaked to enable it automatically).
-> >
-> > The dts defines a reset-controller node with
-> >
-> >   compatible =3D "xlnx,zynqmp-reset"
-> >
-> > As far as I can see, this is supposed to be handled by the code in
-> > drivers/reset/zynqmp-reset.c driver, it is enabled by CONFIG_ARCH_ZYNQM=
-P,
-> > and I have that set to "y", and it appears to be getting compiled in (t=
-hat
-> > is, there is a drivers/reset/zynqmp-reset.o file in the build directory=
-).
->
-> Oh, I get it, to include this driver I need to also enable:
->
->   CONFIG_RESET_CONTROLLER=3Dy
->
-> Setting this fixes 6.4.  Perhaps CONFIG_ARCH_ZYNQMP should select it?
+On Tue, Jul 25, 2023 at 02:40:21PM -0700, Brett Creeley wrote:
 
-Maybe. Do other platforms do that?
+> diff --git a/drivers/vfio/pci/pds/cmds.c b/drivers/vfio/pci/pds/cmds.c
+> new file mode 100644
+> index 000000000000..198e8e2ed002
+> --- /dev/null
+> +++ b/drivers/vfio/pci/pds/cmds.c
+> @@ -0,0 +1,44 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/* Copyright(c) 2023 Advanced Micro Devices, Inc. */
+> +
+> +#include <linux/io.h>
+> +#include <linux/types.h>
+> +
+> +#include <linux/pds/pds_common.h>
+> +#include <linux/pds/pds_core_if.h>
+> +#include <linux/pds/pds_adminq.h>
+> +
+> +#include "vfio_dev.h"
+> +#include "cmds.h"
+> +
+> +int pds_vfio_register_client_cmd(struct pds_vfio_pci_device *pds_vfio)
+> +{
+> +	struct pci_dev *pdev = pds_vfio_to_pci_dev(pds_vfio);
+> +	char devname[PDS_DEVNAME_LEN];
+> +	int ci;
+> +
+> +	snprintf(devname, sizeof(devname), "%s.%d-%u", PDS_VFIO_LM_DEV_NAME,
+> +		 pci_domain_nr(pdev->bus),
+> +		 PCI_DEVID(pdev->bus->number, pdev->devfn));
+> +
+> +	ci = pds_client_register(pci_physfn(pdev), devname);
+> +	if (ci < 0)
+> +		return ci;
 
-> I guess the reset-zynqmp.o file that was in my build directory must
-> have been leftover garbage from a long time ago.
->
-> However, even with this option enabled, 6.5-rc4 remains broken (no
-> change in behaviour wrt. the network device).  I will bisect this
-> now.
+This is not the right way to get the drvdata of a PCI PF from a VF,
+you must call pci_iov_get_pf_drvdata(). 
 
-It would be good to know why the deferred probe timeout doesn't work.
-If you disable modules, the kernel shouldn't wait past late_initcall.
-Though this functionality keeps getting tweaked, so I may be off on
-the current behavior.
-
-Rob
+Jason
 
