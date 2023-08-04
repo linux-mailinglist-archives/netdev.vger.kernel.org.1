@@ -1,38 +1,38 @@
-Return-Path: <netdev+bounces-24594-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24598-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59020770C00
-	for <lists+netdev@lfdr.de>; Sat,  5 Aug 2023 00:41:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1C31770C06
+	for <lists+netdev@lfdr.de>; Sat,  5 Aug 2023 00:42:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 897931C2174B
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 22:41:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 91F712827C7
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 22:42:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E761C253AE;
-	Fri,  4 Aug 2023 22:40:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3983426B03;
+	Fri,  4 Aug 2023 22:40:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F8C61DA31;
-	Fri,  4 Aug 2023 22:40:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C6FCAC433CC;
-	Fri,  4 Aug 2023 22:40:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1089253A2
+	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 22:40:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id EB41BC43397;
+	Fri,  4 Aug 2023 22:40:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691188822;
-	bh=viJvzKCYhnnEJkDUh8kUaB3lgnY2RkYgHxBnD66dVQw=;
+	s=k20201202; t=1691188824;
+	bh=evxm0groU6hWtBA+U5OubSlnQW/H8Sr7BBorrpcJ97w=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=gvTQ1gidWx/zrSUmzLXp+S6P74yQKoqqIqviT8MKDgH4q0cGj4pgM9dZFCgt1UmV/
-	 bE3PZAQ51kjOg6dDwyLZzXaHG8576CpFxTQv9msl1vNf4ymBZjApvZZuA8jTCjyafz
-	 l0cAFPzzuQROYMBQMQ4bRBuoae3ZD3nMcPoGFv0tMIWKs72NJCcErD9ENncfH0a3tE
-	 vNfne0brfnpWTdO90UIikcXCVSG8qK6nF0k7r7HzsnFVvzuAQQVTn98m2yNzFmXUJX
-	 ehbLmquBbLKdXcEIIvkjV3T6/AuEy/rMGXtL0kAaxXNF7Qu3OhFIshMF0k2HAjpAz9
-	 H3G1j5OApzX7A==
+	b=GDy+fLUdswiRvWUByp/1FEewsj3Jp9Ao30B6rVafEKFjExPLbktezzWz2Fnk2zFla
+	 6y+6WnL7I8FqxD0/AkoElIctDvC5SOddmv40koVJjn9MxfdEjHLwVcOzSMbl7i6cq3
+	 a2iPBNWqe3w/2Cz0yVZCLFosN5BtnHZQGWITnBQPwR4v6EP+pJGptLzGhiwlYx3sC0
+	 Bt/o8plimVFNcZxYKUjm80igebXxjw1ynXrFzbPZeb8x8s5Kv9mHKZL8rOMC2NyL4I
+	 bd2cc6SedMn6r2UHHndCsslQTs92zWlldrX+6XfsvTmo0VCsfI8PEIgQkkyU8yPSc2
+	 xvr5A1PLxeP2w==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id AF9BBC64458;
-	Fri,  4 Aug 2023 22:40:22 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D0476C64458;
+	Fri,  4 Aug 2023 22:40:23 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -41,36 +41,35 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH -next] mptcp: fix the incorrect judgment for msk->cb_flags
+Subject: Re: [PATCH net-next] net: llc: Remove unused function declarations
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <169118882271.4114.18105742009856428701.git-patchwork-notify@kernel.org>
-Date: Fri, 04 Aug 2023 22:40:22 +0000
-References: <20230803072438.1847500-1-xiangyang3@huawei.com>
-In-Reply-To: <20230803072438.1847500-1-xiangyang3@huawei.com>
-To: Xiang Yang <xiangyang3@huawei.com>
-Cc: matthieu.baerts@tessares.net, martineau@kernel.org, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, mptcp@lists.linux.dev
+ <169118882384.4114.10170437589941606899.git-patchwork-notify@kernel.org>
+Date: Fri, 04 Aug 2023 22:40:23 +0000
+References: <20230803134747.41512-1-yuehaibing@huawei.com>
+In-Reply-To: <20230803134747.41512-1-yuehaibing@huawei.com>
+To: Yue Haibing <yuehaibing@huawei.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, netdev@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 3 Aug 2023 07:24:38 +0000 you wrote:
-> Coccicheck reports the error below:
-> net/mptcp/protocol.c:3330:15-28: ERROR: test of a variable/field address
+On Thu, 3 Aug 2023 21:47:47 +0800 you wrote:
+> llc_conn_ac_send_i_rsp_as_ack() and llc_conn_ev_sendack_tmr_exp()
+> are never implemented since beginning of git history.
 > 
-> Since the address of msk->cb_flags is used in __test_and_clear_bit, the
-> address should not be NULL. The judgment for if (unlikely(msk->cb_flags))
-> will always be true, we should check the real value of msk->cb_flags here.
-> 
-> [...]
+> Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
+> ---
+>  include/net/llc_c_ac.h | 1 -
+>  include/net/llc_c_ev.h | 1 -
+>  2 files changed, 2 deletions(-)
 
 Here is the summary with links:
-  - [-next] mptcp: fix the incorrect judgment for msk->cb_flags
-    https://git.kernel.org/netdev/net/c/17ebf8a4c38b
+  - [net-next] net: llc: Remove unused function declarations
+    https://git.kernel.org/netdev/net-next/c/57ecc157b68e
 
 You are awesome, thank you!
 -- 
