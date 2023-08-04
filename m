@@ -1,98 +1,96 @@
-Return-Path: <netdev+bounces-24563-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24564-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B343D7709C8
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 22:35:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F018E7709DA
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 22:38:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6DC7C2826DE
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 20:35:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2ABE01C209A4
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 20:38:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C5ED1AA95;
-	Fri,  4 Aug 2023 20:35:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C5C81BEF6;
+	Fri,  4 Aug 2023 20:38:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AB9FCA4C
-	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 20:35:14 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D82BC433C8;
-	Fri,  4 Aug 2023 20:35:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691181314;
-	bh=52KUF7ASXjYC/XDXuwqGaqu5PqSMpO06sMHL33KXuLg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=q9lDEPahh6/mGcVWoYorDTP41TyrASjNn1raO9nzESg9Xg9RdYzbrJ0ale8vjR5Ww
-	 HEjk3xwyFz4s1ynj5VOSdsYmosK/Rk3MrjkLbzlzDv+PRR+Qo1klI6d/QNIfNIX0xj
-	 NXdPxlYQesAL8pEMwmLdbBua6ZKIaPuOHrwUl5LsrlHQdO+hBdrlAyNQqZZ/px5bQm
-	 q+ZzPQN6heyqVTZWDM6FbfcwQBmg0mpkfJ+Rray8441uEbfnx5tbWvO0DrKtY9rTJq
-	 As5Zi07F7ytQvw4tN81AF+g1MsYibJNTW0zylti775g+Pmb9dphAon2nsF9/hAdmp2
-	 Tu8oOQ46hm4Tg==
-Date: Fri, 4 Aug 2023 13:35:12 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: Ratheesh Kannoth <rkannoth@marvell.com>, "netdev@vger.kernel.org"
- <netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
- <linux-kernel@vger.kernel.org>, "Sunil Kovvuri Goutham"
- <sgoutham@marvell.com>, Geethasowjanya Akula <gakula@marvell.com>,
- Subbaraya Sundeep Bhatta <sbhatta@marvell.com>, Hariprasad Kelam
- <hkelam@marvell.com>, "davem@davemloft.net" <davem@davemloft.net>,
- "edumazet@google.com" <edumazet@google.com>, "pabeni@redhat.com"
- <pabeni@redhat.com>
-Subject: Re: [EXT] Re: [PATCH net] octeontx2-pf: Set maximum queue size to
- 16K
-Message-ID: <20230804133512.4dbbbc16@kernel.org>
-In-Reply-To: <8732499b-df8c-0ee0-bf0e-815736cf4de2@intel.com>
-References: <20230802105227.3691713-1-rkannoth@marvell.com>
-	<18fec8cd-fc91-736e-7c01-453a18f4e9c5@intel.com>
-	<CY4PR1801MB1911E15D518A77535F6E51E2D308A@CY4PR1801MB1911.namprd18.prod.outlook.com>
-	<f04cf074-1cff-d30a-4237-ad11f62290b1@intel.com>
-	<MWHPR1801MB1918C41E2A44527D178F213CD309A@MWHPR1801MB1918.namprd18.prod.outlook.com>
-	<8732499b-df8c-0ee0-bf0e-815736cf4de2@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 815311BEE1
+	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 20:38:50 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (unknown [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 014D04C2D
+	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 13:38:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=gsTp/8RqKjRXhoBtimhZThHQUikCRunY6gzHuzVbGzQ=; b=brHYBWvTNp//ZgB/+R2OVoXzTD
+	BtmZYCW8QaUeyF5cI9bIYVwLSb1AtkdQ4Az/v7ounPcwDwg+ttfkLEGctU8weBzkcDQ8CUpj0tfGq
+	yknXf7Sl6PKtEB+e0vchejunphmheqt84cg+D5CH7Zkfe1qChzQ54juUTS0Da8mMtkya8KCyI2XSC
+	732BayLSJkcrgtYy9LfCRbMFKL9X7sq41CVNeGlz26JY450wx/BYket9TpsqrDm2pJP1VAcHE8V/q
+	9K3Yy/ygj4FRCtNjbVVpm3nMKQjRxPf7wAeoLZmS9KinbXbZh1jwDPfsz+wpNMkMMEpDUweRMaBLm
+	IzizfEKA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:55502)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qS1Z9-0000i2-07;
+	Fri, 04 Aug 2023 21:38:31 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qS1Z4-0004I9-Hn; Fri, 04 Aug 2023 21:38:26 +0100
+Date: Fri, 4 Aug 2023 21:38:26 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Feiyang Chen <chenfeiyang@loongson.cn>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com,
+	alexandre.torgue@foss.st.com, joabreu@synopsys.com,
+	chenhuacai@loongson.cn, dongbiao@loongson.cn,
+	loongson-kernel@lists.loongnix.cn, netdev@vger.kernel.org,
+	loongarch@lists.linux.dev, chris.chenfeiyang@gmail.com
+Subject: Re: [PATCH v3 14/16] net: stmmac: dwmac-loongson: Disable flow
+ control for GMAC
+Message-ID: <ZM1hwjttrnM8jFXJ@shell.armlinux.org.uk>
+References: <cover.1691047285.git.chenfeiyang@loongson.cn>
+ <021e4047c3b0f2c462e1aa891e25ae710705ed29.1691047285.git.chenfeiyang@loongson.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <021e4047c3b0f2c462e1aa891e25ae710705ed29.1691047285.git.chenfeiyang@loongson.cn>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RDNS_NONE,
+	SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Fri, 4 Aug 2023 16:43:51 +0200 Alexander Lobakin wrote:
-> > So, will clamp to 2048 in page_pool_init() ? But it looks odd to me, as 
-> > User requests > 2048,  but will never be aware that it is clamped to 2048.  
-> 
-> Why should he be aware of that? :D
-> But seriously, I can't just say: "hey, I promise you that your driver
-> will work best when PP size is clamped to 2048, just blindly follow",
-> it's more of a preference right now. Because...
-> 
-> > Better do this clamping in Driver and print a warning  message ?   
-> 
-> ...because you just need to test your driver with different PP sizes and
-> decide yourself which upper cap to set. If it works the same when queues
-> are 16k and PPs are 2k versus 16k + 16k -- fine, you can stop on that.
-> If 16k + 16k or 16 + 8 or whatever works better -- stop on that. No hard
-> reqs.
-> 
-> Just don't cap maximum queue length due to PP sanity check, it doesn't
-> make sense.
+On Thu, Aug 03, 2023 at 07:30:35PM +0800, Feiyang Chen wrote:
+> +
+> +		if (priv->plat->disable_flow_control) {
+> +			phy_support_sym_pause(dev->phydev);
+> +			phy_set_sym_pause(dev->phydev, false, false, true);
+> +		}
 
-IDK if I agree with you here :S Tuning this in the driver relies on
-the assumption that the HW / driver is the thing that matters.
-I'd think that the workload, platform (CPU) and config (e.g. is IOMMU
-enabled?) will matter at least as much. While driver developers will end
-up tuning to whatever servers they have, random single config and most
-likely.. iperf.
+Given that stmmac uses phylink, control over the PHY is given over to
+phylink to manage on the driver's behalf. Therefore, the above is not
+very useful.
 
-IMO it's much better to re-purpose "pool_size" and treat it as the ring
-size, because that's what most drivers end up putting there. 
-Defer tuning of the effective ring size to the core and user input 
-(via the "it will be added any minute now" netlink API for configuring
-page pools)...
+The correct way to deal with this is via
+	priv->phylink_config.mac_capabilities
 
-So capping the recycle ring to 32k instead of returning the error seems
-like an okay solution for now.
+in stmmac_phy_setup().
+
+Thanks.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
