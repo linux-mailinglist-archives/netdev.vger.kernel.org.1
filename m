@@ -1,153 +1,140 @@
-Return-Path: <netdev+bounces-24479-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24480-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 859417704E4
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 17:36:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4FB84770508
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 17:41:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3B952282778
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 15:36:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2C8621C217FB
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 15:41:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BA141803D;
-	Fri,  4 Aug 2023 15:36:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3B3518044;
+	Fri,  4 Aug 2023 15:41:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAC8E134B3
-	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 15:35:58 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 176D5C433C7;
-	Fri,  4 Aug 2023 15:35:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691163358;
-	bh=cQbVZMK/+oE/3CK/u6/7Zqr0SXiVGxH3ROY1UV0fNX8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=J8moY05okVRv86wuUbFDhMkLLt15SDi8maNVhLU4Ol14LWWPW3EMrOFiMVag7d8I4
-	 IsZb9iBlZ29WLWmyJVYLmhJsuvquDaUzKGGAmWgPJGX9I+9ubwM83dDCoj4rSXfAU+
-	 AQUxD4YP9NWNJbx/vOUQaDjCbMTzguV59oBKSosyAqOYJpTExQGI1ytda5prxdVYQF
-	 BTKAQZmzQyqGYqHrpbbHXViEW/SS3HFOE9VpBMTPPyeakOA+64czmVdN6F3VT1K73K
-	 blJ3Vlg89ewIN/g6k8NPB0yGJ43aNjPB+SuJLS+SV/AyvsWUMCLG/0hVQN2KLINlpP
-	 8A4hY/KB/1sfA==
-Date: Fri, 4 Aug 2023 16:35:51 +0100
-From: Conor Dooley <conor@kernel.org>
-To: Md Danish Anwar <a0501179@ti.com>
-Cc: MD Danish Anwar <danishanwar@ti.com>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Roger Quadros <rogerq@kernel.org>,
-	Simon Horman <simon.horman@corigine.com>,
-	Vignesh Raghavendra <vigneshr@ti.com>, Andrew Lunn <andrew@lunn.ch>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Rob Herring <robh+dt@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	"David S. Miller" <davem@davemloft.net>, nm@ti.com, srk@ti.com,
-	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
-	netdev@vger.kernel.org, linux-omap@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH 1/4] dt-bindings: net: Add ICSS IEP
-Message-ID: <20230804-uncombed-escalate-d46b38ce37a2@spud>
-References: <20230803110153.3309577-1-danishanwar@ti.com>
- <20230803110153.3309577-2-danishanwar@ti.com>
- <20230803-guacamole-buddy-d8179f11615e@spud>
- <d3d53a4f-a1f8-09d4-77e8-a881829fac68@ti.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D01D2CA6E
+	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 15:41:31 +0000 (UTC)
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9628149D4;
+	Fri,  4 Aug 2023 08:41:30 -0700 (PDT)
+Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 374Fb7Rj012525;
+	Fri, 4 Aug 2023 15:41:21 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=hg5vWj/L9yQlhLXAx6slUTmOqegnMigK9ZEoBQ88Ev4=;
+ b=N2eaiLU1LGR426Yp7fq9ey0g96ufpmAS9Vp3DVzZOpolLie1DXaEQBioeGQN/rKZ6hF8
+ oyKYqCxAJnnRMwcJB62rivuA2Bqgzds0mGbZ5P1zBPpVr2MMQBUnS4Rjjx6TsOj9MLzn
+ EbN8DgLbXhJc09jI7UF8W2ap7JfSflSmldiV5FING/xV8ywANi4vUHZRsfLFzUcZ3YPY
+ NZ4o3oLTM0s+e2LcT/yt7GNUVFEusCylkJu7wGLjtj4aAHhpxtjplvu8crCwvOhiKj6q
+ VmJcZSAS5jFfn2laQEjSP1BQvAgbCdGjjCBXeEWilrW6COMQl34/9NcDNt00jUngY4a1 Ww== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3s93rs1780-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 04 Aug 2023 15:41:20 +0000
+Received: from m0353726.ppops.net (m0353726.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 374Fb8eW012709;
+	Fri, 4 Aug 2023 15:41:20 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3s93rs1772-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 04 Aug 2023 15:41:20 +0000
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 374E6iOl023488;
+	Fri, 4 Aug 2023 15:41:18 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3s8km9pxec-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 04 Aug 2023 15:41:18 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 374FfFTt57934112
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 4 Aug 2023 15:41:15 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 332FB20043;
+	Fri,  4 Aug 2023 15:41:15 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 9F6D020040;
+	Fri,  4 Aug 2023 15:41:14 +0000 (GMT)
+Received: from [9.155.208.153] (unknown [9.155.208.153])
+	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Fri,  4 Aug 2023 15:41:14 +0000 (GMT)
+Message-ID: <129c1c96eaafd7d3e57b05ca96354ffc129fd4e3.camel@linux.ibm.com>
+Subject: Re: [PATCH net v2 0/2] net/smc: Fix effective buffer size
+From: Gerd Bayer <gbayer@linux.ibm.com>
+To: Simon Horman <horms@kernel.org>
+Cc: Wenjia Zhang <wenjia@linux.ibm.com>, Jan Karcher <jaka@linux.ibm.com>,
+        Tony Lu <tonylu@linux.alibaba.com>, Paolo Abeni <pabeni@redhat.com>,
+        Karsten Graul <kgraul@linux.ibm.com>,
+        "D . Wythe"
+ <alibuda@linux.alibaba.com>,
+        Wen Gu <guwen@linux.alibaba.com>,
+        "David S .
+ Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>,
+        linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Date: Fri, 04 Aug 2023 17:41:13 +0200
+In-Reply-To: <ZM0IX/YnaawWT9sm@kernel.org>
+References: <20230803144605.477903-1-gbayer@linux.ibm.com>
+	 <ZM0IX/YnaawWT9sm@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.48.4 (3.48.4-1.module_f38+17164+63eeee4a) 
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 93xwT36h812AQdB-danA66Y7QZep2xAe
+X-Proofpoint-ORIG-GUID: vpLe3iivhdMOlReEyY1GrrG-76cL_6jA
+Content-Transfer-Encoding: quoted-printable
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="3mKgAWLJHpCzOPKl"
-Content-Disposition: inline
-In-Reply-To: <d3d53a4f-a1f8-09d4-77e8-a881829fac68@ti.com>
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-08-04_15,2023-08-03_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ lowpriorityscore=0 adultscore=0 clxscore=1011 mlxscore=0
+ priorityscore=1501 impostorscore=0 bulkscore=0 spamscore=0 phishscore=0
+ suspectscore=0 mlxlogscore=478 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2306200000 definitions=main-2308040139
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-
---3mKgAWLJHpCzOPKl
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Fri, Aug 04, 2023 at 11:56:19AM +0530, Md Danish Anwar wrote:
-> Hi Conor,
->=20
-> On 03/08/23 8:57 pm, Conor Dooley wrote:
-> > On Thu, Aug 03, 2023 at 04:31:50PM +0530, MD Danish Anwar wrote:
-> >> From: Md Danish Anwar <danishanwar@ti.com>
-> >>
-> >> Add DT binding documentation for ICSS IEP module.
-> >>
-> >> Signed-off-by: Md Danish Anwar <danishanwar@ti.com>
-> >> ---
-> >>  .../devicetree/bindings/net/ti,icss-iep.yaml  | 37 +++++++++++++++++++
-> >>  1 file changed, 37 insertions(+)
-> >>  create mode 100644 Documentation/devicetree/bindings/net/ti,icss-iep.=
-yaml
-> >>
-> >> diff --git a/Documentation/devicetree/bindings/net/ti,icss-iep.yaml b/=
-Documentation/devicetree/bindings/net/ti,icss-iep.yaml
-> >> new file mode 100644
-> >> index 000000000000..79cd72b330a6
-> >> --- /dev/null
-> >> +++ b/Documentation/devicetree/bindings/net/ti,icss-iep.yaml
-> >> @@ -0,0 +1,37 @@
-> >> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> >> +%YAML 1.2
-> >> +---
-> >> +$id: http://devicetree.org/schemas/net/ti,icss-iep.yaml#
-> >> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> >> +
-> >> +title: Texas Instruments ICSS Industrial Ethernet Peripheral (IEP) mo=
-dule
-> >> +
-> >> +maintainers:
-> >> +  - Md Danish Anwar <danishanwar@ti.com>
-> >> +
-> >> +properties:
-> >> +  compatible:
-> >> +    enum:
-> >> +      - ti,am654-icss-iep   # for K3 AM65x, J721E and AM64x SoCs
+On Fri, 2023-08-04 at 16:17 +0200, Simon Horman wrote:
+> On Thu, Aug 03, 2023 at 04:46:03PM +0200, Gerd Bayer wrote:
+> > Hi all,
 > >=20
-> > No. ti,am654-icss-iep is for am654. You should really have compatibles
-> > specific to the SoC - is there a reason why this has not been done?
+[...]
+> > v1 - v2:
+> > =C2=A0- In second patch, use sock_net() helper as suggested by Tony and
+> > demanded
+> > =C2=A0=C2=A0 by kernel test robot.
 > >=20
+> > [1]
+> > https://lore.kernel.org/netdev/20221123104907.14624-1-jaka@linux.ibm.com
 >=20
-> Yes, ti,am654-icss-iep is for am654. You are right, the compatibles shoul=
-d be
-> specific to SoC. Currently the upstream support is being added for only A=
-M65x.
+> Hi Gerd,
 >=20
-> I will remove J721E and AM64x SoCs from the comment above and these compa=
-tibles
-> when their support is enabled in future.
+> unfortunately this patchset does not appear to apply to current
+> 'net'.
+>=20
+> Could you rebase and send a v3?
+>=20
+Hi Simon,
 
-So the comment was totally wrong? Or does the same code work for all 3
-of these SoC types & you used the same compatible on each of the 3?
+sure, working on it.
 
 Thanks,
-Conor.
-
-
-> Below is the updated compatible property.
->=20
-> properties:
->   compatible:
->     enum:
->       - ti,am654-icss-iep   # for K3 AM65x SoCs
-
---3mKgAWLJHpCzOPKl
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZM0a1wAKCRB4tDGHoIJi
-0kZLAQDt0yOMq+c+G7AcANr7kuJDAC5wZyoKewJmytYeOKITywEAxxaoRDlceLUD
-irO27APk1pQvWbA9qMb6vB02LrMZ/go=
-=seKc
------END PGP SIGNATURE-----
-
---3mKgAWLJHpCzOPKl--
+Gerd
 
