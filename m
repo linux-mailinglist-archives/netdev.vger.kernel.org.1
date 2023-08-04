@@ -1,207 +1,137 @@
-Return-Path: <netdev+bounces-24324-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24325-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30AD876FC6F
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 10:49:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A6F6676FC79
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 10:50:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E093928113D
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 08:49:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D3CE281FED
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 08:50:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA0789467;
-	Fri,  4 Aug 2023 08:48:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 757F59469;
+	Fri,  4 Aug 2023 08:49:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9EBF9449;
-	Fri,  4 Aug 2023 08:48:34 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D36830EA;
-	Fri,  4 Aug 2023 01:48:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1691138913; x=1722674913;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=SxjVHGiN7hS1KZCKUjEw/sIjBaSoR9+Z8Xrm4m78es4=;
-  b=cMhTfAUQPH9hnKnP6rR5BklNP4TQBhVWDb/JMUAGDdOETpmw7GU8bKns
-   OQGeYA6s4I6HtTtpcYFRuICW+jOT/UVNm+mkyQWgZzaF8hNXHPANM+wHO
-   Qf8r7jr1n4wh1Fi22wlmTbsjxpUdQYMFrA5+/rkgD42yfbDCaZ2pexweh
-   0a1VJMhBEk6EZdtpt/K8th43jmoYMMFB4EBoiwjTJ9HpmSN8s33FeW6pn
-   ciDnNn878lsRBOMAew6JcA7mAx80qgQVZR6kd7BCVr+V/hRtVIgEktZ6P
-   HvBfDYfaAn2O0EVX8L+3Ru5XwjouPnqlDh6Efqd5/2Xy7wkNg11R0BYru
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10791"; a="456478823"
-X-IronPort-AV: E=Sophos;i="6.01,254,1684825200"; 
-   d="scan'208";a="456478823"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Aug 2023 01:48:07 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10791"; a="765018428"
-X-IronPort-AV: E=Sophos;i="6.01,254,1684825200"; 
-   d="scan'208";a="765018428"
-Received: from yongliang-ubuntu20-ilbpg12.png.intel.com ([10.88.229.33])
-  by orsmga001.jf.intel.com with ESMTP; 04 Aug 2023 01:47:57 -0700
-From: Choong Yong Liang <yong.liang.choong@linux.intel.com>
-To: Rajneesh Bhardwaj <irenic.rajneesh@gmail.com>,
-	David E Box <david.e.box@linux.intel.com>,
-	Hans de Goede <hdegoede@redhat.com>,
-	Mark Gross <markgross@kernel.org>,
-	Jose Abreu <Jose.Abreu@synopsys.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	=?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>,
-	Jean Delvare <jdelvare@suse.com>,
-	Guenter Roeck <linux@roeck-us.net>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Wong Vee Khee <veekhee@apple.com>,
-	Jon Hunter <jonathanh@nvidia.com>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Revanth Kumar Uppala <ruppala@nvidia.com>,
-	Shenwei Wang <shenwei.wang@nxp.com>,
-	Andrey Konovalov <andrey.konovalov@linaro.org>,
-	Jochen Henneberg <jh@henneberg-systemdesign.com>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	platform-driver-x86@vger.kernel.org,
-	linux-hwmon@vger.kernel.org,
-	bpf@vger.kernel.org,
-	Voon Wei Feng <weifeng.voon@intel.com>,
-	Tan Tee Min <tee.min.tan@linux.intel.com>,
-	Michael Sit Wei Hong <michael.wei.hong.sit@intel.com>,
-	Lai Peter Jun Ann <jun.ann.lai@intel.com>
-Subject: [PATCH net-next v2 5/5] stmmac: intel: Add 1G/2.5G auto-negotiation support for ADL-N
-Date: Fri,  4 Aug 2023 16:45:27 +0800
-Message-Id: <20230804084527.2082302-6-yong.liang.choong@linux.intel.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20230804084527.2082302-1-yong.liang.choong@linux.intel.com>
-References: <20230804084527.2082302-1-yong.liang.choong@linux.intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ADC38F7D
+	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 08:49:12 +0000 (UTC)
+Received: from mxct.zte.com.cn (mxct.zte.com.cn [58.251.27.85])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F243C49FC;
+	Fri,  4 Aug 2023 01:49:08 -0700 (PDT)
+Received: from mxde.zte.com.cn (unknown [10.35.20.165])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mxct.zte.com.cn (FangMail) with ESMTPS id 4RHKBl75klzZK6m;
+	Fri,  4 Aug 2023 16:49:03 +0800 (CST)
+Received: from mxhk.zte.com.cn (unknown [192.168.250.137])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mxde.zte.com.cn (FangMail) with ESMTPS id 4RHKBS5XZ3z5BfmN;
+	Fri,  4 Aug 2023 16:48:48 +0800 (CST)
+Received: from mse-fl1.zte.com.cn (unknown [10.5.228.132])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mxhk.zte.com.cn (FangMail) with ESMTPS id 4RHKBP46FGz7QYS7;
+	Fri,  4 Aug 2023 16:48:45 +0800 (CST)
+Received: from szxlzmapp05.zte.com.cn ([10.5.230.85])
+	by mse-fl1.zte.com.cn with SMTP id 3748mV09049239;
+	Fri, 4 Aug 2023 16:48:31 +0800 (+08)
+	(envelope-from yang.yang29@zte.com.cn)
+Received: from mapi (szxlzmapp01[null])
+	by mapi (Zmail) with MAPI id mid14;
+	Fri, 4 Aug 2023 16:48:33 +0800 (CST)
+Date: Fri, 4 Aug 2023 16:48:33 +0800 (CST)
+X-Zmail-TransId: 2b0364ccbb6161e-7e8ca
+X-Mailer: Zmail v1.0
+Message-ID: <202308041648338823694@zte.com.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+Mime-Version: 1.0
+From: <yang.yang29@zte.com.cn>
+To: <davem@davemloft.net>
+Cc: <dsahern@kernel.org>, <edumazet@google.com>, <kuba@kernel.org>,
+        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: =?UTF-8?B?W1BBVENIXSBuZXQvaXB2NDogcmV0dXJuIHRoZSByZWFsIGVycm5vIGluc3RlYWQgb2YgLUVJTlZBTA==?=
+Content-Type: text/plain;
+	charset="UTF-8"
+X-MAIL:mse-fl1.zte.com.cn 3748mV09049239
+X-Fangmail-Gw-Spam-Type: 0
+X-Fangmail-Anti-Spam-Filtered: true
+X-Fangmail-MID-QID: 64CCBB7E.001/4RHKBl75klzZK6m
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Add modphy register lane to have 1G/2.5G auto-negotiation support for
-ADL-N.
+From: xu xin <xu.xin16@zte.com.cn>
 
-Signed-off-by: Michael Sit Wei Hong <michael.wei.hong.sit@intel.com>
-Signed-off-by: Choong Yong Liang <yong.liang.choong@linux.intel.com>
+For now, no matter what error pointer ip_neigh_for_gw() returns,
+ip_finish_output2() always return -EINVAL, which may mislead the upper
+users.
+
+For exemple, an application uses sendto to send an UDP packet, but when the
+neighbor table overflows, sendto() will get a value of -EINVAL, and it will
+cause users to waste a lot of time checking parameters for errors.
+
+Return the real errno instead of -EINVAL.
+
+Signed-off-by: xu xin <xu.xin16@zte.com.cn>
+Reviewed-by: Yang Yang <yang.yang29@zte.com.cn>
+Cc: Si Hao <si.hao@zte.com.cn>
+Cc: Dai Shixin <dai.shixin@zte.com.cn>
+Cc: Jiang Xuexin <jiang.xuexin@zte.com.cn>
 ---
- .../net/ethernet/stmicro/stmmac/dwmac-intel.c | 49 ++++++++++++++++++-
- .../net/ethernet/stmicro/stmmac/dwmac-intel.h |  2 +
- 2 files changed, 50 insertions(+), 1 deletion(-)
+ net/ipv4/ip_output.c | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
-index 9f560f18132a..437c7697640f 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
-@@ -960,6 +960,53 @@ static int adls_sgmii_phy1_data(struct pci_dev *pdev,
- static struct stmmac_pci_info adls_sgmii1g_phy1_info = {
- 	.setup = adls_sgmii_phy1_data,
- };
-+
-+static int adln_common_data(struct pci_dev *pdev,
-+			    struct plat_stmmacenet_data *plat)
-+{
-+	struct intel_priv_data *intel_priv = plat->bsp_priv;
-+
-+	plat->rx_queues_to_use = 6;
-+	plat->tx_queues_to_use = 4;
-+	plat->clk_ptp_rate = 204800000;
-+
-+	plat->safety_feat_cfg->tsoee = 1;
-+	plat->safety_feat_cfg->mrxpee = 0;
-+	plat->safety_feat_cfg->mestee = 1;
-+	plat->safety_feat_cfg->mrxee = 1;
-+	plat->safety_feat_cfg->mtxee = 1;
-+	plat->safety_feat_cfg->epsi = 0;
-+	plat->safety_feat_cfg->edpp = 0;
-+	plat->safety_feat_cfg->prtyen = 0;
-+	plat->safety_feat_cfg->tmouten = 0;
-+
-+	intel_priv->tsn_lane_registers = adln_tsn_lane_registers;
-+	intel_priv->max_tsn_lane_registers = ARRAY_SIZE(adln_tsn_lane_registers);
-+
-+	return intel_mgbe_common_data(pdev, plat);
-+}
-+
-+static int adln_sgmii_phy0_data(struct pci_dev *pdev,
-+				struct plat_stmmacenet_data *plat)
-+{
-+	struct intel_priv_data *intel_priv = plat->bsp_priv;
-+
-+	plat->bus_id = 1;
-+	plat->phy_interface = PHY_INTERFACE_MODE_SGMII;
-+	plat->max_speed = SPEED_2500;
-+	plat->serdes_powerup = intel_serdes_powerup;
-+	plat->serdes_powerdown = intel_serdes_powerdown;
-+	plat->config_serdes = intel_config_serdes;
-+
-+	intel_priv->pid_modphy = PID_MODPHY1;
-+
-+	return adln_common_data(pdev, plat);
-+}
-+
-+static struct stmmac_pci_info adln_sgmii1g_phy0_info = {
-+	.setup = adln_sgmii_phy0_data,
-+};
-+
- static const struct stmmac_pci_func_data galileo_stmmac_func_data[] = {
- 	{
- 		.func = 6,
-@@ -1342,7 +1389,7 @@ static const struct pci_device_id intel_eth_pci_id_table[] = {
- 	{ PCI_DEVICE_DATA(INTEL, TGLH_SGMII1G_1, &tgl_sgmii1g_phy1_info) },
- 	{ PCI_DEVICE_DATA(INTEL, ADLS_SGMII1G_0, &adls_sgmii1g_phy0_info) },
- 	{ PCI_DEVICE_DATA(INTEL, ADLS_SGMII1G_1, &adls_sgmii1g_phy1_info) },
--	{ PCI_DEVICE_DATA(INTEL, ADLN_SGMII1G, &tgl_sgmii1g_phy0_info) },
-+	{ PCI_DEVICE_DATA(INTEL, ADLN_SGMII1G, &adln_sgmii1g_phy0_info) },
- 	{ PCI_DEVICE_DATA(INTEL, RPLP_SGMII1G, &tgl_sgmii1g_phy0_info) },
- 	{}
- };
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.h b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.h
-index 75a336cf8af1..349c160c17b3 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.h
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.h
-@@ -124,8 +124,10 @@ static const struct pmc_serdes_regs pid_modphy1_2p5g_regs[] = {
- 	{}
- };
- 
-+static const int adln_tsn_lane_registers[] = {6};
- static const int ehl_tsn_lane_registers[] = {7, 8, 9, 10, 11};
- #else
-+static const int adln_tsn_lane_registers[] = {};
- static const int ehl_tsn_lane_registers[] = {};
- #endif /* CONFIG_INTEL_PMC_CORE */
- 
+diff --git a/net/ipv4/ip_output.c b/net/ipv4/ip_output.c
+index 6ba1a0fafbaa..2d7cf083dff9 100644
+--- a/net/ipv4/ip_output.c
++++ b/net/ipv4/ip_output.c
+@@ -201,6 +201,7 @@ static int ip_finish_output2(struct net *net, struct sock *sk, struct sk_buff *s
+ 	unsigned int hh_len = LL_RESERVED_SPACE(dev);
+ 	struct neighbour *neigh;
+ 	bool is_v6gw = false;
++	int res;
+
+ 	if (rt->rt_type == RTN_MULTICAST) {
+ 		IP_UPD_PO_STATS(net, IPSTATS_MIB_OUTMCAST, skb->len);
+@@ -214,8 +215,7 @@ static int ip_finish_output2(struct net *net, struct sock *sk, struct sk_buff *s
+ 	}
+
+ 	if (lwtunnel_xmit_redirect(dst->lwtstate)) {
+-		int res = lwtunnel_xmit(skb);
+-
++		res = lwtunnel_xmit(skb);
+ 		if (res < 0 || res == LWTUNNEL_XMIT_DONE)
+ 			return res;
+ 	}
+@@ -223,8 +223,6 @@ static int ip_finish_output2(struct net *net, struct sock *sk, struct sk_buff *s
+ 	rcu_read_lock();
+ 	neigh = ip_neigh_for_gw(rt, skb, &is_v6gw);
+ 	if (!IS_ERR(neigh)) {
+-		int res;
+-
+ 		sock_confirm_neigh(skb, neigh);
+ 		/* if crossing protocols, can not use the cached header */
+ 		res = neigh_output(neigh, skb, is_v6gw);
+@@ -236,7 +234,8 @@ static int ip_finish_output2(struct net *net, struct sock *sk, struct sk_buff *s
+ 	net_dbg_ratelimited("%s: No header cache and no neighbour!\n",
+ 			    __func__);
+ 	kfree_skb_reason(skb, SKB_DROP_REASON_NEIGH_CREATEFAIL);
+-	return -EINVAL;
++	res = PTR_ERR(neigh);
++	return res;
+ }
+
+ static int ip_finish_output_gso(struct net *net, struct sock *sk,
 -- 
-2.25.1
-
+2.15.2
 
