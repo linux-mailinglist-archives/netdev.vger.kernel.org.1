@@ -1,61 +1,64 @@
-Return-Path: <netdev+bounces-24389-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24390-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19C0F77007E
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 14:48:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D133A770080
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 14:48:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4AE7F1C2187B
-	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 12:48:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8CAB5282670
+	for <lists+netdev@lfdr.de>; Fri,  4 Aug 2023 12:48:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A3C4BA4E;
-	Fri,  4 Aug 2023 12:48:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A117DBE57;
+	Fri,  4 Aug 2023 12:48:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EB09BE4D
-	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 12:48:14 +0000 (UTC)
-Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08ACF4EDB
-	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 05:47:39 -0700 (PDT)
-Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-2b9b5ee9c5aso32689281fa.1
-        for <netdev@vger.kernel.org>; Fri, 04 Aug 2023 05:47:38 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96C18BE4D
+	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 12:48:15 +0000 (UTC)
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DA54E7;
+	Fri,  4 Aug 2023 05:47:42 -0700 (PDT)
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-52164adea19so2589528a12.1;
+        Fri, 04 Aug 2023 05:47:42 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691153214; x=1691758014;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=j6bo7YAIJDA7TBCCdgRaQ0LwEZt1vJ23UYJuiriXq9k=;
-        b=RdvLxuJ1vUOsIoNqIho+GvZOGBqBHsNyriP6U16yJKIgIh1efjek92p0X3dhDSVlgL
-         W75jCxH3Clx/MlN2h4eQzj0/M+1x8DceKwjbwOqPkJwsEqIBaalL86VLkYiTRUYCMV0R
-         bVkHc7Qs43E+gNZsP5WA2cvIu6z+kg/rVd4YC90U0T8JmsUvHTBEAaprLJ1/RNLIZVFK
-         NLNowGMeja383hbtjB0iLAC9DdVcNEpdpTIb73Zttx75A0dTrZwDocFKHPr2kXWsreLO
-         F0xr/+zODvukRFw2oFBp2/Yc+wTb3EVVeF54urxU/10/ctZT+ENx7RkkpUjG9+4TXvdu
-         qkrA==
-X-Gm-Message-State: AOJu0Yw4CN8cPFsYUh1WBoBBwZUz28LU73jcAde02WiytlLMxRuKmmIA
-	76VxqZl8snvO8hHeDRWqZrc=
-X-Google-Smtp-Source: AGHT+IFZ3SiMSn+66SCToEbI3wWd32kld6l/f7G+uDsqkG0PwAqW5T7dDFZmpnqodMnP/9xroXSLug==
-X-Received: by 2002:a2e:b714:0:b0:2b9:e304:5f81 with SMTP id j20-20020a2eb714000000b002b9e3045f81mr1419708ljo.23.1691153214395;
-        Fri, 04 Aug 2023 05:46:54 -0700 (PDT)
-Received: from localhost (fwdproxy-cln-021.fbsv.net. [2a03:2880:31ff:15::face:b00c])
-        by smtp.gmail.com with ESMTPSA id e3-20020a170906504300b0099329b3ab67sm1268269ejk.71.2023.08.04.05.46.53
+        d=1e100.net; s=20221208; t=1691153216; x=1691758016;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=PRqehSRIoi9nVHhMtBn7xUoJn1aGYwvHr/iVwpeswiM=;
+        b=ZF0s80KYufNhFMc+tfd4OXXc6USP3+WylaPsP61+Ao/qcbNDEf/+Gy4PNnii8xA/RB
+         T6rA+TpV0xr9iALeYUttLdFtQGPcaFXUqo6XYMFhx/sazjuXZiAViOjGjOKx/5tcB8Ga
+         sirYz2cLlTOdP+cuF3VIx9OGqeYpjWRklskfQ70l3EsEx55wZ6Nxg92NHLe4555/ZtGn
+         U5ihSuSsa5XR4gwaOs4wgZizEx0jFCX23eqRqA5iHyuC6wNiSZcx7F0TSqXeC/RTHhUp
+         hSn6h6OxDaXPa7JuWGMUVp0LCP/Bh7BBzSpLpcs04J9t6Eyl4Deen9Z7SyotkI/Qe8yG
+         hg3w==
+X-Gm-Message-State: AOJu0YxaudFrdbLXkX8n1qNp5mbmKIru+5BXxckL3UO6Uza91FAFmBLs
+	s2y/dKxhOWfapU5sMGMeNMg=
+X-Google-Smtp-Source: AGHT+IGSvUO6FcynF+zGxK7Ax+EVejx9GwM0nzc8z8ex+AmCy4QavFcSbHoInYsEvvqX89lnvOhWqQ==
+X-Received: by 2002:aa7:d0c3:0:b0:523:1436:578d with SMTP id u3-20020aa7d0c3000000b005231436578dmr1364108edo.8.1691153216034;
+        Fri, 04 Aug 2023 05:46:56 -0700 (PDT)
+Received: from localhost (fwdproxy-cln-020.fbsv.net. [2a03:2880:31ff:14::face:b00c])
+        by smtp.gmail.com with ESMTPSA id g8-20020a056402180800b005227ead61d0sm1215674edy.83.2023.08.04.05.46.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Aug 2023 05:46:53 -0700 (PDT)
+        Fri, 04 Aug 2023 05:46:55 -0700 (PDT)
 From: Breno Leitao <leitao@debian.org>
 To: rdunlap@infradead.org,
 	benjamin.poirier@gmail.com,
 	davem@davemloft.net,
 	kuba@kernel.org,
-	edumazet@google.com
+	edumazet@google.com,
+	Paolo Abeni <pabeni@redhat.com>
 Cc: netdev@vger.kernel.org,
-	pabeni@redhat.com
-Subject: [PATCH net-next v4 0/2] netconsole: Enable compile time configuration
-Date: Fri,  4 Aug 2023 05:43:19 -0700
-Message-Id: <20230804124322.113506-1-leitao@debian.org>
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH net-next v4 1/2] netconsole: Create a allocation helper
+Date: Fri,  4 Aug 2023 05:43:20 -0700
+Message-Id: <20230804124322.113506-2-leitao@debian.org>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230804124322.113506-1-leitao@debian.org>
+References: <20230804124322.113506-1-leitao@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,38 +68,101 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
 	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.6
+	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Enable netconsole features to be set at compilation time. Create two
-Kconfig options that allow users to set extended logs and release
-prepending features at compilation time.
+De-duplicate the initialization and allocation code for struct
+netconsole_target.
 
-The first patch de-duplicates the initialization code, and the second
-patch adds the support in the de-duplicated code, avoiding touching two
-different functions with the same change.
+The same allocation and initialization code is duplicated in two
+different places in the netconsole subsystem, when the netconsole target
+is initialized by command line parameters (alloc_param_target()), and
+dynamically by sysfs (make_netconsole_target()).
 
-  v1 -> v2:
-	* Improvements in the Kconfig help section.
+Create a helper function, and call it from the two different functions.
 
-  v2 -> v3:
-	* Honour the Kconfig settings when creating sysfs targets
-	* Add "by default" in a Kconfig help.
+Suggested-by: Eric Dumazet <edumazet@google.com>
+Signed-off-by: Breno Leitao <leitao@debian.org>
+---
+ drivers/net/netconsole.c | 41 +++++++++++++++++++---------------------
+ 1 file changed, 19 insertions(+), 22 deletions(-)
 
-  v3 -> v4:
-	* Create an additional patch, de-duplicating the initialization
-	  code for netconsole_target, and just patching it.
-
-Breno Leitao (2):
-  netconsole: Create a allocation helper
-  netconsole: Enable compile time configuration
-
- drivers/net/Kconfig      | 22 +++++++++++++++++++
- drivers/net/netconsole.c | 46 +++++++++++++++++++++-------------------
- 2 files changed, 46 insertions(+), 22 deletions(-)
-
+diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
+index 87f18aedd3bd..a7df782530cf 100644
+--- a/drivers/net/netconsole.c
++++ b/drivers/net/netconsole.c
+@@ -167,19 +167,15 @@ static void netconsole_target_put(struct netconsole_target *nt)
+ 
+ #endif	/* CONFIG_NETCONSOLE_DYNAMIC */
+ 
+-/* Allocate new target (from boot/module param) and setup netpoll for it */
+-static struct netconsole_target *alloc_param_target(char *target_config)
++/* Allocate and initialize with defaults.
++ * Note that these targets get their config_item fields zeroed-out.
++ */
++static struct netconsole_target *alloc_and_init(void)
+ {
+-	int err = -ENOMEM;
+-	struct netconsole_target *nt;
++	struct netconsole_target *nt = kzalloc(sizeof(*nt), GFP_KERNEL);
+ 
+-	/*
+-	 * Allocate and initialize with defaults.
+-	 * Note that these targets get their config_item fields zeroed-out.
+-	 */
+-	nt = kzalloc(sizeof(*nt), GFP_KERNEL);
+ 	if (!nt)
+-		goto fail;
++		return nt;
+ 
+ 	nt->np.name = "netconsole";
+ 	strscpy(nt->np.dev_name, "eth0", IFNAMSIZ);
+@@ -187,6 +183,18 @@ static struct netconsole_target *alloc_param_target(char *target_config)
+ 	nt->np.remote_port = 6666;
+ 	eth_broadcast_addr(nt->np.remote_mac);
+ 
++	return nt;
++}
++
++/* Allocate new target (from boot/module param) and setup netpoll for it */
++static struct netconsole_target *alloc_param_target(char *target_config)
++{
++	struct netconsole_target *nt = alloc_and_init();
++	int err = -ENOMEM;
++
++	if (!nt)
++		goto fail;
++
+ 	if (*target_config == '+') {
+ 		nt->extended = true;
+ 		target_config++;
+@@ -664,23 +672,12 @@ static const struct config_item_type netconsole_target_type = {
+ static struct config_item *make_netconsole_target(struct config_group *group,
+ 						  const char *name)
+ {
++	struct netconsole_target *nt = alloc_and_init();
+ 	unsigned long flags;
+-	struct netconsole_target *nt;
+ 
+-	/*
+-	 * Allocate and initialize with defaults.
+-	 * Target is disabled at creation (!enabled).
+-	 */
+-	nt = kzalloc(sizeof(*nt), GFP_KERNEL);
+ 	if (!nt)
+ 		return ERR_PTR(-ENOMEM);
+ 
+-	nt->np.name = "netconsole";
+-	strscpy(nt->np.dev_name, "eth0", IFNAMSIZ);
+-	nt->np.local_port = 6665;
+-	nt->np.remote_port = 6666;
+-	eth_broadcast_addr(nt->np.remote_mac);
+-
+ 	/* Initialize the config_item member */
+ 	config_item_init_type_name(&nt->item, name, &netconsole_target_type);
+ 
 -- 
 2.34.1
 
