@@ -1,151 +1,138 @@
-Return-Path: <netdev+bounces-24626-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24627-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD765770E30
-	for <lists+netdev@lfdr.de>; Sat,  5 Aug 2023 08:46:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F3C5770E37
+	for <lists+netdev@lfdr.de>; Sat,  5 Aug 2023 08:57:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DBA961C20CD2
-	for <lists+netdev@lfdr.de>; Sat,  5 Aug 2023 06:46:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7D1EE1C20E63
+	for <lists+netdev@lfdr.de>; Sat,  5 Aug 2023 06:57:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 450E81FA5;
-	Sat,  5 Aug 2023 06:46:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FE8820F9;
+	Sat,  5 Aug 2023 06:57:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3938B3FF4
-	for <netdev@vger.kernel.org>; Sat,  5 Aug 2023 06:46:10 +0000 (UTC)
-Received: from mail-pg1-x543.google.com (mail-pg1-x543.google.com [IPv6:2607:f8b0:4864:20::543])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2B9F4EDD;
-	Fri,  4 Aug 2023 23:46:09 -0700 (PDT)
-Received: by mail-pg1-x543.google.com with SMTP id 41be03b00d2f7-5645bbc82aaso1965352a12.2;
-        Fri, 04 Aug 2023 23:46:09 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 929E81FDD
+	for <netdev@vger.kernel.org>; Sat,  5 Aug 2023 06:57:16 +0000 (UTC)
+Received: from mail-vs1-xe32.google.com (mail-vs1-xe32.google.com [IPv6:2607:f8b0:4864:20::e32])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 502453C2D
+	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 23:57:14 -0700 (PDT)
+Received: by mail-vs1-xe32.google.com with SMTP id ada2fe7eead31-4475df91bb1so1243834137.3
+        for <netdev@vger.kernel.org>; Fri, 04 Aug 2023 23:57:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1691217969; x=1691822769;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Ajr4QLjd6Rc1PuAnxwRP/L4oJ5MAFVSkzlw/8yRBgC8=;
-        b=h8NU5D89GbEww2egnB9jM+tYETO5t4H7CEIrEYSTNwcxa0UKVRtWaj0FSbVMQEtxsp
-         k4IutRNvozDQ94f3zarpzOsvwXOqAVmJ6i9RpWHez/EKtSeznqsoF+o2YcmCG1v56vwN
-         0ud+UZRSCQY2O+Xt0p4kOvSXzxWyR60pZertUfflvjvP+ojSBOiG/5+VzEyKME/7vBgD
-         qUMpvw+ZNtKJxVZUYG0BGRZ8cSuebKnIb5tthkPabpIh7MMK30vgB1F0xMe0LkmqT3M+
-         /Ej1xhBnGOQf7Yxc1LXVuEa8kFqI4Iqw/+/8NaGWOMPebBGepBHIsYRCZ2xmH5AUfMJb
-         /bpA==
+        d=draconx-ca.20221208.gappssmtp.com; s=20221208; t=1691218633; x=1691823433;
+        h=cc:to:subject:message-id:date:from:references:in-reply-to
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=GakJ4004HfKzStoDWvRep5JehYxyKkuk704LbpteieY=;
+        b=iXBxP50Z/hxP49Fr1mP4ijKIdFt/Wca0mrpbiwcgNitt4mM0w/27tDndE7fedOi+fV
+         X8RBY/eFIIrVU0tcQ9uiBw7+rvw7bzf8kgcCLHginYB6tqEfTm6Hmp4EGx4/qYsZrf+b
+         vUfqarqvWrTEH5wemNLD7aGkB1zWAZxLI4HB+4emq7fYwEKSQ6EzliqIFDx8AM8zl5p9
+         guEdKZZ0/o3Sq4G0XPzmD2VVAD1qd4XsbRr2J+OftEDTAoKUehZeLxpQcHrYPdK1KzIL
+         c/IxVaztYohQe7k8/+dHV/jeLdE6BdKTD/pcBCLgi5TlR70HI0frWYUogaQh+PN5Ch5c
+         nY2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691217969; x=1691822769;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Ajr4QLjd6Rc1PuAnxwRP/L4oJ5MAFVSkzlw/8yRBgC8=;
-        b=EYK0naLYXlv6tTl6qVxHqRxQTgyPtWW93myOj9CTZh3zKs3n3mwEfJP1Y7ZqiEScs9
-         eia9Lh9U+jsMB+OM6CX7lQPtiWipY+mYQzW05w6wH8Rw9LaMgMRYZL6uwKpVsV8faDn9
-         Z5f25w0U3nWbyPelieD0IgumRcsrdhHNLLNYQZtmVVTFRFhpu2PhXDuqzVnN/J5tNuKW
-         w59/IShU/VfzWx4tZsR0Ir+nEYxKmOtuR1npaqyU82dfiQK1DGjw1qRRuV3wzpEXJuEJ
-         fw/yKDZAYnbO2m5fjx2zUM/zI1N/GBfTQF9iK0dN1NE77YuXc/pJPT//t4SmxbhZhX2G
-         JKNQ==
-X-Gm-Message-State: AOJu0YxkHfSTcG7K+Ux1GxSGDsiZFQskz3RQnCB8LWxc23xq44RRlBFo
-	4cJocwy5BjG5QoMMSW2v0xE=
-X-Google-Smtp-Source: AGHT+IHyL8TMjLqkckuhsndfFZq1zCmMzhQmtrjuWyBaJmr3Jq4aQa4KmblEsZjRJ9pKSTjTrl6MJQ==
-X-Received: by 2002:a17:90a:d0f:b0:268:42a2:35db with SMTP id t15-20020a17090a0d0f00b0026842a235dbmr3257478pja.48.1691217969277;
-        Fri, 04 Aug 2023 23:46:09 -0700 (PDT)
-Received: from localhost.localdomain ([193.203.214.57])
-        by smtp.gmail.com with ESMTPSA id 30-20020a17090a005e00b0025023726fc4sm5520425pjb.26.2023.08.04.23.46.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Aug 2023 23:46:08 -0700 (PDT)
-From: xu <xu.xin.sc@gmail.com>
-X-Google-Original-From: xu <xu.xin16@zte.com.cn>
-To: edumazet@google.com
-Cc: davem@davemloft.net,
-	dsahern@kernel.org,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	yang.yang29@zte.com.cn
-Subject: [PATCH] net: add net device refcount tracker to pneigh_queue
-Date: Sat,  5 Aug 2023 06:46:06 +0000
-Message-Id: <20230805064606.237648-1-xu.xin16@zte.com.cn>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <CANn89iK61nt5o7KBZyjqVP6Q1EREvzg-x_bos8hSGSmwfwZRBw@mail.gmail.com>
-References: <CANn89iK61nt5o7KBZyjqVP6Q1EREvzg-x_bos8hSGSmwfwZRBw@mail.gmail.com>
+        d=1e100.net; s=20221208; t=1691218633; x=1691823433;
+        h=cc:to:subject:message-id:date:from:references:in-reply-to
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=GakJ4004HfKzStoDWvRep5JehYxyKkuk704LbpteieY=;
+        b=ilkw8lfG9MDcbArrQh5xw7Iu+gFVvqRat7suSAJfhufhGcUZBIlqdYaW8LB1B7SjnA
+         dI4ZpGRVOHoFLmgR3Vjb41QuWdbOfK0Q2EOIBpDlMeo7iA0xaU6x2eDIaRjvjKCWAMV+
+         bXlPg48txjIFQq3RW8z4US5wUqyBHdiHpDZcWZtO6upB33p3vZkyksUrswZw0nPv3Oak
+         C1aDyV5RYG9SffIPV31/SUarQ21DMVb8Bx+EX2QIjSyiNZrV0r3kX5CcWtebNHAaARLC
+         ZztD8gleDL5WHcYhKdhJPUb/wnrNCVGsuEdMWdYAs1/OazmhcEl4MoNB+BKmHiXeu9Cs
+         sW0A==
+X-Gm-Message-State: AOJu0YyAixuRFHfDiViDF5wTVduwvfOS/jku6uMSThZGd8lQImija2XR
+	JYApAL9TD++jYDkuWk2vKnpMFbrNHdNdZHZRj+D+v8/SMS+TnNYIQmM=
+X-Google-Smtp-Source: AGHT+IGJSssBp6wvD/ScMXX2ZJ5l6Cgn5Cbf4aMBixrBRvq30NTEpF11cjhncxgjo4CIKM5TaJkCDGafT0aOC6Zh/tA=
+X-Received: by 2002:a1f:bf0e:0:b0:487:177a:d0f8 with SMTP id
+ p14-20020a1fbf0e000000b00487177ad0f8mr2419082vkf.1.1691218633382; Fri, 04 Aug
+ 2023 23:57:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+Received: by 2002:ab0:6209:0:b0:794:1113:bb24 with HTTP; Fri, 4 Aug 2023
+ 23:57:12 -0700 (PDT)
+X-Originating-IP: [24.53.241.2]
+In-Reply-To: <ZM17VKzDBdm4uMNY@shell.armlinux.org.uk>
+References: <CADyTPEzqf8oQAPSFRWJLxAhd-WE4fX2zdoe9Vu6V9hZMn1Yc8g@mail.gmail.com>
+ <CAL_JsqLrErF__GGHfanRFCpfbOh6fvz4-aJv32h8OfDjUeZPSg@mail.gmail.com>
+ <CADyTPEwgG0=R_b5DNBP0J0auDXu2BNTOwkSUFg-s7pLJUPC+Tg@mail.gmail.com>
+ <CADyTPExgjcaUeKiR108geQhr0KwFC0A8qa_n_ST2RxhbSczomQ@mail.gmail.com>
+ <CAL_Jsq+N2W0hVN7fUC1rxGL-Hw9B8eQvLgSwyQ3n41kqwDbxyg@mail.gmail.com>
+ <CADyTPEyT4NJPrChtvtY=_GePZNeSDRAr9j3KRAk1hkjD=5+i8A@mail.gmail.com>
+ <CAL_JsqKGAFtwB+TWc1yKAe_0M4BziEpFnApuWuR3h+Go_=djFg@mail.gmail.com>
+ <CADyTPEwY4ydUKGtGNayf+iQSqRVBQncLiv0TpO9QivBVrmOc4g@mail.gmail.com> <ZM17VKzDBdm4uMNY@shell.armlinux.org.uk>
+From: Nick Bowler <nbowler@draconx.ca>
+Date: Sat, 5 Aug 2023 02:57:12 -0400
+Message-ID: <CADyTPEyqG7D-_iuo+5WFGhhidK7p_fmvDhbgz05xogSU042Uag@mail.gmail.com>
+Subject: Re: PROBLEM: Broken or delayed ethernet on Xilinx ZCU104 since 5.18 (regression)
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Rob Herring <robh@kernel.org>, Saravana Kannan <saravanak@google.com>, linux-kernel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org, 
+	regressions@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
->> Add a static net device refcount tracker to neighbour.c to track
->> dev's refcnt when pneigh enqueuing and dequeuing.
->>
->> Signed-off-by: xu xin <xu.xin16@zte.com.cn>
->> Reviewed-by: Yang Yang <yang.yang.29@zte.com.cn>
->> Cc: Kuang Mingfu <kuang.mingfu@zte.com.cn>
->> ---
+On 2023-08-04, Russell King (Oracle) <linux@armlinux.org.uk> wrote:
+> I think we need to rewind a tad.
 >
->
->Can you explain how this patch was tested ?
->
->Thanks.
+> My understanding is that this uses the Cadence macb driver.
 
-Sorry, I misunderstand the usage of netdev_hold and its netdevice_tracker.
+Correct.
 
-I thought this tracker was simple enough, so I just added an additional netdev_hold
-in the same postion and test if there is a warning "unregister_netdevice: waiting for ...".
-
-But as you said, we need a separate netdevice_tracker per netdev_hold(), and specially `per dev`?
-
-Actually, I'm still a little confused.
-
-For example, here, can I move this netdevice_tracker into struct sk_buff ?
-
->diff --git a/net/core/neighbour.c b/net/core/neighbour.c
->index ddd0f32de20e..56e87130fa95 100644
->--- a/net/core/neighbour.c
->+++ b/net/core/neighbour.c
->@@ -61,6 +61,7 @@ static int pneigh_ifdown_and_unlock(struct neigh_table *tbl,
-> static const struct seq_operations neigh_stat_seq_ops;
-> #endif
+> In your original message, you said that the ethernet driver wasn't
+> being bound to the driver.
+[...]
+> So, I think that the deferred probing has nothing to do with PHYs, and
+> that's just a wild goose chase.
 >
->+static netdevice_tracker pneigh_queue_dev_tracker;
-> /*
->    Neighbour hash table buckets are protected with rwlock tbl->lock.
+> I think instead we need to be concentrating on what's going on with
+> the ethernet driver, and why the ethernet driver is deferring its
+> probe. Is macb_probe() getting called at all?
+
+I added some prints to the driver.  The macb_probe is called five times
+on this one device initially at boot, then ten seconds later it is
+called one last time, returning -EPROBE_DEFER each time.
+
+> How far through macb_probe() do we get before we defer?
+
+The result is the same for all six calls.  The macb_mdiobus_register
+function returns -EPROBE_DEFER, which comes from the topmost call
+to of_mdiobus_register within that function.  That is, this is the
+part that returns -EPROBE_DEFER:
+
+	child = of_get_child_by_name(np, "mdio");
+	if (child) {
+		int ret = of_mdiobus_register(bp->mii_bus, child);
+
+		of_node_put(child);
+		return ret;
+	}
+
+> I think those are the key questions that need answering.
 >
->@@ -364,7 +365,7 @@ static void pneigh_queue_purge(struct sk_buff_head *list, struct net *net,
-> 	spin_unlock_irqrestore(&list->lock, flags);
->
-> 	while ((skb = __skb_dequeue(&tmp))) {
->-		dev_put(skb->dev);
->+		netdev_put(skb->dev, &pneigh_queue_dev_tracker);
-> 		kfree_skb(skb);
-> 	}
-> }
->@@ -1633,7 +1634,7 @@ static void neigh_proxy_process(struct timer_list *t)
-> 				kfree_skb(skb);
-> 			}
->
->-			dev_put(dev);
->+			netdev_put(skb->dev, &pneigh_queue_dev_tracker);
-> 		} else if (!sched_next || tdif < sched_next)
-> 			sched_next = tdif;
-> 	}
->@@ -1673,7 +1674,7 @@ void pneigh_enqueue(struct neigh_table *tbl, struct neigh_parms *p,
-> 			sched_next = tbl->proxy_timer.expires;
-> 	}
-> 	skb_dst_drop(skb);
->-	dev_hold(skb->dev);
->+	netdev_hold(skb->dev, &pneigh_queue_dev_tracker, GFP_KERNEL);
-> 	__skb_queue_tail(&tbl->proxy_queue, skb);
-> 	p->qlen++;
-> 	mod_timer(&tbl->proxy_timer, sched_next);
+> Maybe, if you can get access to the machine while the driver is
+> deferring, /sys/kernel/debug/devices_deferred might give some
+> useful information, but that's just a hope.
+
+This just contains one line:
+
+  ff0e0000.ethernet
+
+which is the name of the ethernet device that is not working.
+
+Thanks,
+  Nick
 
