@@ -1,93 +1,200 @@
-Return-Path: <netdev+bounces-24658-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24659-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27146770F65
-	for <lists+netdev@lfdr.de>; Sat,  5 Aug 2023 13:00:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1427A770F6A
+	for <lists+netdev@lfdr.de>; Sat,  5 Aug 2023 13:12:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5211B1C20A91
-	for <lists+netdev@lfdr.de>; Sat,  5 Aug 2023 11:00:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 51307282508
+	for <lists+netdev@lfdr.de>; Sat,  5 Aug 2023 11:12:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB573A93B;
-	Sat,  5 Aug 2023 11:00:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A0CAA93D;
+	Sat,  5 Aug 2023 11:12:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE0C4A920
-	for <netdev@vger.kernel.org>; Sat,  5 Aug 2023 11:00:21 +0000 (UTC)
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9843468C
-	for <netdev@vger.kernel.org>; Sat,  5 Aug 2023 04:00:18 -0700 (PDT)
-Received: from canpemm500007.china.huawei.com (unknown [172.30.72.56])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4RJ02P0dV7zrS4b;
-	Sat,  5 Aug 2023 18:59:09 +0800 (CST)
-Received: from localhost (10.174.179.215) by canpemm500007.china.huawei.com
- (7.192.104.62) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Sat, 5 Aug
- 2023 19:00:15 +0800
-From: Yue Haibing <yuehaibing@huawei.com>
-To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <kuniyu@amazon.com>
-CC: <netdev@vger.kernel.org>, <yuehaibing@huawei.com>
-Subject: [PATCH net-next] udp/udplite: Remove unused function declarations udp{,lite}_get_port()
-Date: Sat, 5 Aug 2023 19:00:09 +0800
-Message-ID: <20230805110009.44560-1-yuehaibing@huawei.com>
-X-Mailer: git-send-email 2.10.2.windows.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AE66523E
+	for <netdev@vger.kernel.org>; Sat,  5 Aug 2023 11:12:43 +0000 (UTC)
+Received: from mail-wm1-x32a.google.com (mail-wm1-x32a.google.com [IPv6:2a00:1450:4864:20::32a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31A854215;
+	Sat,  5 Aug 2023 04:12:42 -0700 (PDT)
+Received: by mail-wm1-x32a.google.com with SMTP id 5b1f17b1804b1-3fe4a89e8c4so10364555e9.3;
+        Sat, 05 Aug 2023 04:12:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1691233960; x=1691838760;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=AgWNyMxZp4Y1lh0jk2J1qrZPUTJ7GIIzr1e92o6ob7k=;
+        b=cKmgs4BJFFxaeuZ5IzJVkWbattNKwAIpvXEbiG+5x2RXmSHhuMydTXXJuwD91FmNUN
+         EKpnlNizgvrkXzwk9ZBoWiokiIbJkgnKgZAZ4fJ91rW3xbyyyfH+fFNwWGtv5fmyjdFT
+         vAddfbPfNLiXwz1D/swITFXSrrol1g8R5/AgWaMlrLhfx+E3ykwmNj2qRR+RYAh7smrF
+         BC8wtEk9wp1MdqWtpFBSfKNQgxyKYO8BMVBQd1WCajnk0WnYFr2tUZ38trEMXI8Kamlo
+         rR91p6OY50F7YylO7E70NuH4EFy70sHU/tsjFT5UcChoPqwb0Eb0Man9sc+7MYfCVs11
+         sT+Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691233960; x=1691838760;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=AgWNyMxZp4Y1lh0jk2J1qrZPUTJ7GIIzr1e92o6ob7k=;
+        b=UNZfHDBcvaq/FwBQdtpbiBDRGTucxuOD0yX4IpqILhbc1ZNlpR5cNzbLHJtcfTbgtZ
+         4yzQ6z9nNlbnmpZ3BGJNmzMVeS9y3d9ESgiUzJxmK1qm35PE1dv09B7HKgXQmlGWBVMy
+         ljJpnLKjh4s8ziN49jxvn6HTkoNq/PFrvgd2fynK3vI3GaT+6JEQBk6JgnnJH4A97yLn
+         XoIpHGAsuL2BvVKJ/lSxoL0V8RZZVwjnXKLX+Ff91ULqZ2as+01FpCaJpSKenDOTEZOn
+         wO8DfJUV7T5RH+viX+a36L0zitfYWkYOQWz6TlAGOy88BEo/ExRODZsyVcQfHAIAKJ5f
+         DXeQ==
+X-Gm-Message-State: AOJu0YzwgwlRpwtLd5G9Jpeatm/AZPNmLiWExG0ukudXpdaeOmM4C3OV
+	vgiKSHGqcMvC8aa+4nK/LCc=
+X-Google-Smtp-Source: AGHT+IHO+ScG2K5CxPHsNMjHBz7qpit0hydbZUw0LLo5aF8s89U16DxNKWlP5CNpZlsFcq7lFoCGZA==
+X-Received: by 2002:a1c:f717:0:b0:3fe:45e7:1d6f with SMTP id v23-20020a1cf717000000b003fe45e71d6fmr3073239wmh.21.1691233960365;
+        Sat, 05 Aug 2023 04:12:40 -0700 (PDT)
+Received: from [192.168.22.144] ([41.86.43.41])
+        by smtp.gmail.com with ESMTPSA id y8-20020a7bcd88000000b003fe2b081661sm9165411wmj.30.2023.08.05.04.12.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 05 Aug 2023 04:12:39 -0700 (PDT)
+Message-ID: <0e1a5faf-88b7-87c5-ff92-413991878894@gmail.com>
+Date: Sat, 5 Aug 2023 14:12:33 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.174.179.215]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- canpemm500007.china.huawei.com (7.192.104.62)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.2
+Subject: Re: [PATCH net-next v5 4/4] vsock/virtio: MSG_ZEROCOPY flag support
+Content-Language: en-US
+To: Paolo Abeni <pabeni@redhat.com>,
+ Arseniy Krasnov <AVKrasnov@sberdevices.ru>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ Stefano Garzarella <sgarzare@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Jason Wang <jasowang@redhat.com>,
+ Bobby Eshleman <bobby.eshleman@bytedance.com>
+Cc: kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kernel@sberdevices.ru
+References: <20230730085905.3420811-1-AVKrasnov@sberdevices.ru>
+ <20230730085905.3420811-5-AVKrasnov@sberdevices.ru>
+ <8a7772a50a16fbbcb82fc0c5e09f9e31f3427e3d.camel@redhat.com>
+From: Arseniy Krasnov <oxffffaa@gmail.com>
+In-Reply-To: <8a7772a50a16fbbcb82fc0c5e09f9e31f3427e3d.camel@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,HK_RANDOM_ENVFROM,
+	HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Commit 6ba5a3c52da0 ("[UDP]: Make full use of proto.h.udp_hash innovation.")
-removed these implementations but leave declarations.
 
-Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
----
- include/net/udp.h     | 3 ---
- include/net/udplite.h | 2 --
- 2 files changed, 5 deletions(-)
 
-diff --git a/include/net/udp.h b/include/net/udp.h
-index 5a8421cd9083..488a6d2babcc 100644
---- a/include/net/udp.h
-+++ b/include/net/udp.h
-@@ -273,9 +273,6 @@ static inline struct sk_buff *skb_recv_udp(struct sock *sk, unsigned int flags,
- 
- int udp_v4_early_demux(struct sk_buff *skb);
- bool udp_sk_rx_dst_set(struct sock *sk, struct dst_entry *dst);
--int udp_get_port(struct sock *sk, unsigned short snum,
--		 int (*saddr_cmp)(const struct sock *,
--				  const struct sock *));
- int udp_err(struct sk_buff *, u32);
- int udp_abort(struct sock *sk, int err);
- int udp_sendmsg(struct sock *sk, struct msghdr *msg, size_t len);
-diff --git a/include/net/udplite.h b/include/net/udplite.h
-index 299c14ce2bb9..bd33ff2b8f42 100644
---- a/include/net/udplite.h
-+++ b/include/net/udplite.h
-@@ -81,6 +81,4 @@ static inline __wsum udplite_csum(struct sk_buff *skb)
- }
- 
- void udplite4_register(void);
--int udplite_get_port(struct sock *sk, unsigned short snum,
--		     int (*scmp)(const struct sock *, const struct sock *));
- #endif	/* _UDPLITE_H */
--- 
-2.34.1
+On 01.08.2023 16:34, Paolo Abeni wrote:
+> On Sun, 2023-07-30 at 11:59 +0300, Arseniy Krasnov wrote:
+>> +static int virtio_transport_fill_skb(struct sk_buff *skb,
+>> +				     struct virtio_vsock_pkt_info *info,
+>> +				     size_t len,
+>> +				     bool zcopy)
+>> +{
+>> +	if (zcopy) {
+>> +		return __zerocopy_sg_from_iter(info->msg, NULL, skb,
+>> +					      &info->msg->msg_iter,
+>> +					      len);
+>> +	} else {
+> 
+> 
+> No need for an else statement after 'return'
+> 
+>> +		void *payload;
+>> +		int err;
+>> +
+>> +		payload = skb_put(skb, len);
+>> +		err = memcpy_from_msg(payload, info->msg, len);
+>> +		if (err)
+>> +			return -1;
+>> +
+>> +		if (msg_data_left(info->msg))
+>> +			return 0;
+>> +
+> 
+> This path does not update truesize, evem if it increases the skb len...
 
+Sorry, but what is potential problem here ? In this path I copy data from the user's
+buffer to the linear skb (there is no fragged part in this case). I think 'truesize'
+is constant in this case - it is SKB_TRUESIZE(length of skb buffer) - there is no need
+to update it as 'truesize' does not show amount of data in skb, only real size of
+skb's buffer.
+
+For non-linear case, __zerocopy_sg_from_iter() always updates 'sk_wmem_alloc' of the
+socket during iterating over frags array.
+
+Also 'skb_set_owner_w()' is called before this code, thus setting 'sk_wmem_alloc' to the
+'truesize' value of the skb.
+
+Thanks, Arseniy
+
+> 
+>> +		return 0;
+>> +	}
+>> +}
+> 
+> [...]
+> 
+>> @@ -214,6 +251,70 @@ static u16 virtio_transport_get_type(struct sock *sk)
+>>  		return VIRTIO_VSOCK_TYPE_SEQPACKET;
+>>  }
+>>  
+>> +static struct sk_buff *virtio_transport_alloc_skb(struct vsock_sock *vsk,
+>> +						  struct virtio_vsock_pkt_info *info,
+>> +						  size_t payload_len,
+>> +						  bool zcopy,
+>> +						  u32 src_cid,
+>> +						  u32 src_port,
+>> +						  u32 dst_cid,
+>> +						  u32 dst_port)
+>> +{
+>> +	struct sk_buff *skb;
+>> +	size_t skb_len;
+>> +
+>> +	skb_len = VIRTIO_VSOCK_SKB_HEADROOM;
+>> +
+>> +	if (!zcopy)
+>> +		skb_len += payload_len;
+>> +
+>> +	skb = virtio_vsock_alloc_skb(skb_len, GFP_KERNEL);
+>> +	if (!skb)
+>> +		return NULL;
+>> +
+>> +	virtio_transport_init_hdr(skb, info, src_cid, src_port,
+>> +				  dst_cid, dst_port,
+>> +				  payload_len);
+>> +
+>> +	/* Set owner here, because '__zerocopy_sg_from_iter()' uses
+>> +	 * owner of skb without check to update 'sk_wmem_alloc'.
+>> +	 */
+>> +	if (vsk)
+>> +		skb_set_owner_w(skb, sk_vsock(vsk));
+> 
+> ... which can lead to bad things(TM) if the skb goes trough some later
+> non trivial processing, due to the above skb_set_owner_w().
+> 
+> Additionally can be the following condition be true:
+> 
+> 	vsk == NULL && (info->msg && payload_len > 0) && zcopy
+> 
+> ???
+> 
+> If so it looks like skb can go through __zerocopy_sg_from_iter() even
+> without a prior skb_set_owner_w()...
+> 
+> 
+> Cheers,
+> 
+> Paolo
+> 
 
