@@ -1,41 +1,40 @@
-Return-Path: <netdev+bounces-24657-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24658-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70119770F63
-	for <lists+netdev@lfdr.de>; Sat,  5 Aug 2023 12:57:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27146770F65
+	for <lists+netdev@lfdr.de>; Sat,  5 Aug 2023 13:00:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1312D282439
-	for <lists+netdev@lfdr.de>; Sat,  5 Aug 2023 10:57:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5211B1C20A91
+	for <lists+netdev@lfdr.de>; Sat,  5 Aug 2023 11:00:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10C1DA937;
-	Sat,  5 Aug 2023 10:57:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB573A93B;
+	Sat,  5 Aug 2023 11:00:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01B085238
-	for <netdev@vger.kernel.org>; Sat,  5 Aug 2023 10:57:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE0C4A920
+	for <netdev@vger.kernel.org>; Sat,  5 Aug 2023 11:00:21 +0000 (UTC)
 Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41B7610CF
-	for <netdev@vger.kernel.org>; Sat,  5 Aug 2023 03:57:43 -0700 (PDT)
-Received: from canpemm500007.china.huawei.com (unknown [172.30.72.53])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4RHzzQ6lPnzrSBY;
-	Sat,  5 Aug 2023 18:56:34 +0800 (CST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9843468C
+	for <netdev@vger.kernel.org>; Sat,  5 Aug 2023 04:00:18 -0700 (PDT)
+Received: from canpemm500007.china.huawei.com (unknown [172.30.72.56])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4RJ02P0dV7zrS4b;
+	Sat,  5 Aug 2023 18:59:09 +0800 (CST)
 Received: from localhost (10.174.179.215) by canpemm500007.china.huawei.com
  (7.192.104.62) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Sat, 5 Aug
- 2023 18:57:41 +0800
+ 2023 19:00:15 +0800
 From: Yue Haibing <yuehaibing@huawei.com>
-To: <linux@armlinux.org.uk>, <andrew@lunn.ch>, <hkallweit1@gmail.com>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <rmk+kernel@armlinux.org.uk>
+To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <kuniyu@amazon.com>
 CC: <netdev@vger.kernel.org>, <yuehaibing@huawei.com>
-Subject: [PATCH net-next] net: sfp: Remove unused function declaration sfp_link_configure()
-Date: Sat, 5 Aug 2023 18:57:40 +0800
-Message-ID: <20230805105740.45980-1-yuehaibing@huawei.com>
+Subject: [PATCH net-next] udp/udplite: Remove unused function declarations udp{,lite}_get_port()
+Date: Sat, 5 Aug 2023 19:00:09 +0800
+Message-ID: <20230805110009.44560-1-yuehaibing@huawei.com>
 X-Mailer: git-send-email 2.10.2.windows.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -45,7 +44,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain
 X-Originating-IP: [10.174.179.215]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
  canpemm500007.china.huawei.com (7.192.104.62)
 X-CFilter-Loop: Reflected
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
@@ -54,26 +53,40 @@ X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Commit ce0aa27ff3f6 ("sfp: add sfp-bus to bridge between network devices and sfp cages")
-declared but never implemented it.
+Commit 6ba5a3c52da0 ("[UDP]: Make full use of proto.h.udp_hash innovation.")
+removed these implementations but leave declarations.
 
 Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
 ---
- drivers/net/phy/sfp.h | 1 -
- 1 file changed, 1 deletion(-)
+ include/net/udp.h     | 3 ---
+ include/net/udplite.h | 2 --
+ 2 files changed, 5 deletions(-)
 
-diff --git a/drivers/net/phy/sfp.h b/drivers/net/phy/sfp.h
-index c7cb50d10099..1fd097dccb9f 100644
---- a/drivers/net/phy/sfp.h
-+++ b/drivers/net/phy/sfp.h
-@@ -37,7 +37,6 @@ int sfp_module_insert(struct sfp_bus *bus, const struct sfp_eeprom_id *id,
- void sfp_module_remove(struct sfp_bus *bus);
- int sfp_module_start(struct sfp_bus *bus);
- void sfp_module_stop(struct sfp_bus *bus);
--int sfp_link_configure(struct sfp_bus *bus, const struct sfp_eeprom_id *id);
- struct sfp_bus *sfp_register_socket(struct device *dev, struct sfp *sfp,
- 				    const struct sfp_socket_ops *ops);
- void sfp_unregister_socket(struct sfp_bus *bus);
+diff --git a/include/net/udp.h b/include/net/udp.h
+index 5a8421cd9083..488a6d2babcc 100644
+--- a/include/net/udp.h
++++ b/include/net/udp.h
+@@ -273,9 +273,6 @@ static inline struct sk_buff *skb_recv_udp(struct sock *sk, unsigned int flags,
+ 
+ int udp_v4_early_demux(struct sk_buff *skb);
+ bool udp_sk_rx_dst_set(struct sock *sk, struct dst_entry *dst);
+-int udp_get_port(struct sock *sk, unsigned short snum,
+-		 int (*saddr_cmp)(const struct sock *,
+-				  const struct sock *));
+ int udp_err(struct sk_buff *, u32);
+ int udp_abort(struct sock *sk, int err);
+ int udp_sendmsg(struct sock *sk, struct msghdr *msg, size_t len);
+diff --git a/include/net/udplite.h b/include/net/udplite.h
+index 299c14ce2bb9..bd33ff2b8f42 100644
+--- a/include/net/udplite.h
++++ b/include/net/udplite.h
+@@ -81,6 +81,4 @@ static inline __wsum udplite_csum(struct sk_buff *skb)
+ }
+ 
+ void udplite4_register(void);
+-int udplite_get_port(struct sock *sk, unsigned short snum,
+-		     int (*scmp)(const struct sock *, const struct sock *));
+ #endif	/* _UDPLITE_H */
 -- 
 2.34.1
 
