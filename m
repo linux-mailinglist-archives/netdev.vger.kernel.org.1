@@ -1,165 +1,117 @@
-Return-Path: <netdev+bounces-24670-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24671-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B302E770F8C
-	for <lists+netdev@lfdr.de>; Sat,  5 Aug 2023 14:12:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D4BD770FC5
+	for <lists+netdev@lfdr.de>; Sat,  5 Aug 2023 15:01:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5E9B2282451
-	for <lists+netdev@lfdr.de>; Sat,  5 Aug 2023 12:12:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 288EA281D29
+	for <lists+netdev@lfdr.de>; Sat,  5 Aug 2023 13:01:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36D44BE72;
-	Sat,  5 Aug 2023 12:12:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AE19C121;
+	Sat,  5 Aug 2023 13:01:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27646523E
-	for <netdev@vger.kernel.org>; Sat,  5 Aug 2023 12:12:42 +0000 (UTC)
-Received: from AUS01-SY4-obe.outbound.protection.outlook.com (mail-sy4aus01olkn2184.outbound.protection.outlook.com [40.92.62.184])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D87844BD
-	for <netdev@vger.kernel.org>; Sat,  5 Aug 2023 05:12:41 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=fs4f84OpvXD8CC19faCoNpLSjcc+ze9n3wE+r1idxBii4J2imwS11ByIsSBxZPFQL9qUh5UDDGmrBxV6A6avI5LCWLwfMzERffa3FC34dWpz2NbcGYI70mZ21RwfUWvs8baey9p/hqt4K4+Z0+Mb0nDi7s8Vf9J5CDBBLazFOEpKhdFGuXzJBhlykhoLjDvBReuE7Dw9SEBejfPbpqAgt5Hmva3fSRHae2R9aFFZLvmHFCx2jc8d/u1KfiTv19c8g4E+aZgNjtz/0GxP7LiU6fuojpaCaQkE9yF0BhFU3tXzj4bGcCOz0c/LwlcKYZ2OQIfh3Cp60sUH9STMRFo8rQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=8eIWT/CjISC6aT/7gp7t6IAyfXMrgCdYjpKd8UTKTl8=;
- b=FIs6SdZnkBIuKxAGSFO3a59MlTI3aXUP2eONSwe2oThuutpzZZEtxi6xoxA5AXIDxDHQvhGIdEtaAzh3rcixROSW1+Os+ODN8lXFFRtGdRDUqP9Ijkl0w9ec4vyvW7HQDf9TbDHrarWeDZJmzDQ+w+PD+bRwPMKNMv/5dXa27oyanfrTFGOOmGLB4xgHvDn9qkZToMMVjCezK4ZYBYhm43c5LgtH44xpIisD3rd6frE0YPGQDqOJ9daSNiEJZaasx9+BWEGKRMQCGI62zLgmd9iA70SRxaNcKMKo96intz6OCD5vYT3C+0CfN6NJgavlhYL09jzEZhVbuyZWrmS4qA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hotmail.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8eIWT/CjISC6aT/7gp7t6IAyfXMrgCdYjpKd8UTKTl8=;
- b=ZhfZltJ7Zbs3JE2tBNvZaLDCfTsYirwZq0Y37O60pc6TQaRN5/Z9cdRa9B6RnRtQKvlz36T3tId/aeGgUQn7C4BVsR68ZB0H64O9tI322CAuoiexzn3RHUC2se9i6pyI0BIOfNbGBCZBVOzA9GGrS0p3E0sqJobQMV8yfBQ6VxBWDBPid+ws7O8tK6KUfMxeSXM3RCdf9d/f0H+ceu7GGX0P7F55l1c3MihDIY9uW5KXy5KVf2kwqAbvhnByEspdLiXec2mtOLaF2aMdmLXB201WxklUwyhmTW06IpzDqBGCrXLTlZOvPSj7mA5jdr1eIYgd3w8tE6tz4QMBBa5p6g==
-Received: from MEYP282MB2697.AUSP282.PROD.OUTLOOK.COM (2603:10c6:220:14c::12)
- by MEAP282MB0053.AUSP282.PROD.OUTLOOK.COM (2603:10c6:220:69::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.22; Sat, 5 Aug
- 2023 12:12:33 +0000
-Received: from MEYP282MB2697.AUSP282.PROD.OUTLOOK.COM
- ([fe80::826:d9a5:23be:3b14]) by MEYP282MB2697.AUSP282.PROD.OUTLOOK.COM
- ([fe80::826:d9a5:23be:3b14%3]) with mapi id 15.20.6652.022; Sat, 5 Aug 2023
- 12:12:33 +0000
-From: Jinjian Song <songjinjian@hotmail.com>
-To: jiri@resnulli.us
-Cc: chandrashekar.devegowda@intel.com,
-	chiranjeevi.rapolu@linux.intel.com,
-	danielwinkler@google.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	haijun.liu@mediatek.com,
-	ilpo.jarvinen@linux.intel.com,
-	jesse.brandeburg@intel.com,
-	jinjian.song@fibocom.com,
-	johannes@sipsolutions.net,
-	kuba@kernel.org,
-	linuxwwan@intel.com,
-	linuxwwan_5g@intel.com,
-	loic.poulain@linaro.org,
-	m.chetan.kumar@linux.intel.com,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	ricardo.martinez@linux.intel.com,
-	ryazanov.s.a@gmail.com,
-	songjinjian@hotmail.com,
-	soumya.prakash.mishra@intel.com
-Subject: Re: [net-next 2/6] net: wwan: t7xx: Driver registers with Devlink framework
-Date: Sat,  5 Aug 2023 20:12:13 +0800
-Message-ID:
- <MEYP282MB26973DD342BDD69914C06FCFBB0EA@MEYP282MB2697.AUSP282.PROD.OUTLOOK.COM>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <MEYP282MB269720DC5940AEA0904569B3BB08A@MEYP282MB2697.AUSP282.PROD.OUTLOOK.COM>
-References: <20230803021812.6126-1-songjinjian@hotmail.com> <MEYP282MB269720DC5940AEA0904569B3BB08A@MEYP282MB2697.AUSP282.PROD.OUTLOOK.COM>
-Precedence: bulk
-X-Mailing-List: netdev@vger.kernel.org
-List-Id: <netdev.vger.kernel.org>
-List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
-List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	MAILING_LIST_MULTI,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,
-	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
-Content-Transfer-Encoding: 8bit
-X-TMN: [B30g2hR/GE9NhefoDb9rd40cEdVqnbdt]
-X-ClientProxiedBy: SG3P274CA0011.SGPP274.PROD.OUTLOOK.COM (2603:1096:4:be::23)
- To MEYP282MB2697.AUSP282.PROD.OUTLOOK.COM (2603:10c6:220:14c::12)
-X-Microsoft-Original-Message-ID: <ZMt6ZZxIHMrml0+E@nanopsycho>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A29BBE73
+	for <netdev@vger.kernel.org>; Sat,  5 Aug 2023 13:01:37 +0000 (UTC)
+Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B881E6A
+	for <netdev@vger.kernel.org>; Sat,  5 Aug 2023 06:01:35 -0700 (PDT)
+Received: by mail-lj1-x233.google.com with SMTP id 38308e7fff4ca-2b9bb097c1bso46152681fa.0
+        for <netdev@vger.kernel.org>; Sat, 05 Aug 2023 06:01:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google; t=1691240494; x=1691845294;
+        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
+         :user-agent:references:from:to:cc:subject:date:message-id:reply-to;
+        bh=dRV58ZuqIHr62s8jVTTF7sud2wPl6LgH9o3my4nfupE=;
+        b=drkrnYo8zHWRJrA8k21pI/DxDCEvqqKXUhhE50l6oQpsyLeQ89vhwdWKdgJY+iutly
+         Xvi9+GZpa/dL5LkAwv4r6dZ0tfeoz3oe5bkuR9gKz9sx7wq1qYiuPIV06cyWPDIfeVry
+         Kp9JoOvDLxc+GCjOb/7CwYv6jCkzDqDVsXNSU=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691240494; x=1691845294;
+        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
+         :user-agent:references:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dRV58ZuqIHr62s8jVTTF7sud2wPl6LgH9o3my4nfupE=;
+        b=dtJNdrqi9xE38v1BkBDC7v8Vl+AJUWf0xa02M7NYG3yq90ovPFPqlZHUKAo6TkGXmz
+         Q//ukoAYc6WElf8l/wB5T36FWAOuEOOGrJ4fDytyHZSFJlI5+3zoZmovZ65RMG54nDwp
+         hSa7uHa4yKtonlsD/UsWN3j39YFYUEMCjYlAeI0R15FCmPO/h0x4gWJjQroKixW8fwJS
+         fstzlQDHO2pbVtPUK50IMLhRi+TWFxRMKdwiM3ZecnIw3GYr4JS4v3n25EoEXaN4Ywdk
+         2ksvwgbeqAYOufBGKs9efe+Ktd9kLMbY+SGBbtEZ4ObrutxdvkLiO0fFrGmCsDBpJLtt
+         G1iw==
+X-Gm-Message-State: AOJu0YzhhTkXENCXcmGfUrS03oF9oQIjuxS1guTBD0bZzQoKjoOi9Aa8
+	ORkXWTClVoCo2eIHKXpVTfwd7Q==
+X-Google-Smtp-Source: AGHT+IExKHwUZjQ1vXwuJjYczNX+RYz5WQdOtC4so+TWOm+pJnuR4HaYjKrvXq+Vfe1w6U6Yasrkgg==
+X-Received: by 2002:a2e:9190:0:b0:2b6:e651:8591 with SMTP id f16-20020a2e9190000000b002b6e6518591mr3527372ljg.37.1691240493638;
+        Sat, 05 Aug 2023 06:01:33 -0700 (PDT)
+Received: from cloudflare.com (79.184.136.135.ipv4.supernova.orange.pl. [79.184.136.135])
+        by smtp.gmail.com with ESMTPSA id fx15-20020a170906b74f00b0099c157cba46sm2659887ejb.119.2023.08.05.06.01.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 05 Aug 2023 06:01:32 -0700 (PDT)
+References: <20230805094254.1082999-1-liujian56@huawei.com>
+User-agent: mu4e 1.6.10; emacs 28.2
+From: Jakub Sitnicki <jakub@cloudflare.com>
+To: Liu Jian <liujian56@huawei.com>
+Cc: john.fastabend@gmail.com, ast@kernel.org, daniel@iogearbox.net,
+ andrii@kernel.org, martin.lau@linux.dev, song@kernel.org,
+ yonghong.song@linux.dev, kpsingh@kernel.org, sdf@google.com,
+ haoluo@google.com, jolsa@kernel.org, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ dsahern@kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org
+Subject: Re: [PATCH bpf-next] bpf, sockmap: add BPF_F_PERMANENTLY flag for
+ skmsg redirect
+Date: Sat, 05 Aug 2023 14:51:44 +0200
+In-reply-to: <20230805094254.1082999-1-liujian56@huawei.com>
+Message-ID: <87sf8xwslw.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MEYP282MB2697:EE_|MEAP282MB0053:EE_
-X-MS-Office365-Filtering-Correlation-Id: f6289b85-7666-4069-3ec5-08db95ad3fc4
-X-MS-Exchange-SLBlob-MailProps:
-	WaIXnCbdHrMnac85kNyRxquJglHdERmYmKwD+BM2hh9+vpqBMwncHdpeUHzf8oJi/iWjHAv3nK4Nc41ucTbL6R9pkZUPauLQbnpDbA8JHreq7bcojgLzlmtlUAgZzA/IxC18RPcFLrA0kcJLd/L5oxkdlDPUzNrC/ozSkuhsnnHCFbfdza3ThbyQLY9s5MzU+iqitu/8bfcFbPe+3kbxw0py/j6kEAbshbym5kl8152tIb4irBZZ7/XitQ7kqGnweByAr2zhh/anjoY7s8jpEc/ecXdSn5cdvjuzpTP7CbCjABi6DgEhsFPTot/LVCaLrofxGYZ/kycRLWpx75u07VADk2ih5Q0nEwkTf+oHHRmQbYNE5LzXwStoYCk95NQHV8WdVMa7WW2CETyLxkcAsyBaLmK4eRh5X0UAE/81SUvZSkCuQDF1BGxCOVdvrtHbkAqJpZF40pDl+XGLoix+Ag0zULUZ4Oih9sL+nA2htgkMEhD6ATh0pGzvQQPzdGJ93Km2RYcO11O8Shj6owHcueBHHkgWIzI1/1mFbdesXuOZD9Ba1fGDOEAYlm4m6R3DqJJf5Oax+Ngl5qW+lNG3vGJVDU703OQtyvj0s/IR8xP/g84BBYb41lzSZGo8x+WPW56V0bA1YzhFTCd9Low8R5jfR55jsHqqSibs5mNMy//XmTt/W4TqaM15JSGI65XAlpuKVBpA/P/6B/jTKjsvUreFi4ycokfrQpG6/zGx5WmMNF2kigumypBTsIiOrO7w7YU6BgHb3l8=
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	mIUBEa1WpaEZa68V+3xdi4THeiTipgOmPRiiRrIixitlOgiGhVuFjcoy+CDo7JVKzZXcsAkkqDuHqB59LLH+HtOyfGS1D0J5AGNOK/KLwVAwmWE+7osGdHS7n0avGZfoyyLo2dz2JzOmDXOa5YFzUiQdvzDRVucAdJOGw9L308vyhFsG8v43nEGCcgLPSHlYmF4pC9kMW/B4yqi7SI4oUhHiKGJb2YnG+Cyp9dlQJDo7hfPNmL4pTv703wUCiakUQSCiIsITgS74FTBV3aysx06aYsvyl/2GbyknWzggBU3RrUqrldBFN8Lx2yHLi3m9POS3fCKGL03ldjecMaaLsbdteJSRu1eGcd4SdCiv8DHkpzzA/6SestI8j6uyW+1VinJsMOe9wuTGQ6+Ir6MRMSh/TKqbT8uS7eDPFPOpZ/r/VlOGAzrqbR+1uyVNzRqLDQ7w5mi91FtcL5LauDuw1v08pUOi2gKwtyCboXJqSpTpmNi5yqG3MA47WLU431j6EE9P6Zt8no9+S/bB2G40RFFp6JR3XPjyejQzX4qekTD0xxJ0nnRJeL3orX+1b9DL1jC9RE/3gxuLD9s5l80Wyh3Z+fYNs9Yxn4zphZuGTbM=
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?M/nrkpiUlKEHtVCJrMsiLklxl2Spu+Gvsfw6vHU6Y4WFwFzihTzoF+Yqkv4J?=
- =?us-ascii?Q?v8LR3r9WMZFXREVeSWlYhvQhtXhF5IN+mTEa5t9NmLKeDynP3z2DCD9p37ld?=
- =?us-ascii?Q?1nDLaPP+NcRSz1AczZCXUsdd8NLMq7wmWFA6NlgvVorGa2WVpoDYVHx9HRdi?=
- =?us-ascii?Q?0yUnjk+O56y6B+9Ac9am923tu0lCsqGidX/fsF8p9O9LDkzaFNGwZ4jqIw5u?=
- =?us-ascii?Q?yrtbYUekjsQIN9ooK9hpuRm80xv0ekSp9GN5QOXsDfTmDP4qY2gRtGCrsLUU?=
- =?us-ascii?Q?wY6toIWxx3IQeTF1vBRE9ZiUs0EZmdW/9CcXyCCHJuVXEuSzF0HFc1EWvPg+?=
- =?us-ascii?Q?6m0tJiwFvW0s4Y1VYvIuii67jKORHaxa0OpvdQTe7QWzhpfqD5sEYx9larDF?=
- =?us-ascii?Q?6IjpJ/lC/BvOA6hSekNogFxxDkeYveH+DqiDY+2Hx/AAp2m4fMqHwtLnxPPu?=
- =?us-ascii?Q?e8UYfpnYS9uLx2lkvZhM+TSoEV7Cmi+e6LlIxip4T55oIyYb2SV+Vmk3JLgC?=
- =?us-ascii?Q?obugpjdLQFv4NZXuYiED79bU8OWsxsbjLCTyFYElFgQLeUS9GrYPPf/fdyDN?=
- =?us-ascii?Q?l7kNmz2W4cBbAyxBrHu7KEBGQ4ZSBZ4tJcdqpiq/DCpIlDjQI/D2wYG3ai3o?=
- =?us-ascii?Q?op1jlP+6TdX18psJPhrQ21YRWRkpiE/3EvL0f/6K/7JTRwKRbq1CC2XrFp7V?=
- =?us-ascii?Q?e7kPBqDlxddy0gtG1CzMebrRxtH4+Ag36Tw23iE2Svk5IMel0rBVyAVi0Vog?=
- =?us-ascii?Q?a2B6VnSN78WKn6fRlOUcpzUGbxZp3GfdGr72v003KTmB8hdt2Np800PNZwL2?=
- =?us-ascii?Q?mJ2JB2v7eY7KNeIU7PUmsh2i1zIxOOB+Wf/hPtn4NVvZS9bCX5ejAXZKCTmY?=
- =?us-ascii?Q?vAJLo0eXiF9JFVnz3bJ+Ro0ylg9d/MT92QVtQL4JXAIwZGjsRYKOX1rwSXsm?=
- =?us-ascii?Q?/wPbZ/f7Du6MeWX26bJO3TO11zSJywsWxcYicBf7r1bVwkF819TmU/lyIfFi?=
- =?us-ascii?Q?sizw+W9DJ6I2bWo2BHgmw34/Tu74tdRiYg/vrOTojkWKrZieRxzeJcbr9WPD?=
- =?us-ascii?Q?5UB7M8xIK7kE4efnSQKFE4etFCGRafN0e3wBIoYLAjZyGty2yt8aS1JnOC4R?=
- =?us-ascii?Q?nEU1vYu3NuOwOSzGv3cBIYCHP80S+Vl0lT0GYMnDVIfClz55Tbss/0q9TKLw?=
- =?us-ascii?Q?FqbQiXPEdIOg+E9RDzgV6oZPoG1rt4gZ8ch6fcV6aXYVZgwkpUF/QTFGGcw?=
- =?us-ascii?Q?=3D?=
-X-OriginatorOrg: sct-15-20-4755-11-msonline-outlook-746f3.templateTenant
-X-MS-Exchange-CrossTenant-Network-Message-Id: f6289b85-7666-4069-3ec5-08db95ad3fc4
-X-MS-Exchange-CrossTenant-AuthSource: MEYP282MB2697.AUSP282.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Aug 2023 12:12:33.8314
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
-	00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MEAP282MB0053
+Content-Type: text/plain
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Thu, Aug 03, 2023 at 04:18:08AM CEST, songjinjian@hotmail.com wrote:
-
-[...]
-
->>+static const struct devlink_param t7xx_devlink_params[] = {
->>+	DEVLINK_PARAM_DRIVER(T7XX_DEVLINK_PARAM_ID_FASTBOOT,
->>+			     "fastboot", DEVLINK_PARAM_TYPE_BOOL,
->>+			     BIT(DEVLINK_PARAM_CMODE_DRIVERINIT),
->>+			     NULL, NULL, NULL),
+On Sat, Aug 05, 2023 at 05:42 PM +08, Liu Jian wrote:
+> If the sockmap msg redirection function is used only to forward packets
+> and no other operation, the execution result of the BPF_SK_MSG_VERDICT
+> program is the same each time. In this case, the BPF program only needs to
+> be run once. Add BPF_F_PERMANENTLY flag to bpf_msg_redirect_map() and
+> bpf_msg_redirect_hash() to implement this ability.
 >
->driver init params is there so the user could configure driver instance
->and then hit devlink reload in order to reinitialize with the new param
->values. In your case, it is a device command. Does not make any sense to
->have it as param.
+> Then we can enable this function in the bpf program as follows:
+> bpf_msg_redirect_hash(xx, xx, xx, BPF_F_INGRESS | BPF_F_PERMANENTLY);
 >
->NAK
+> Test results using netperf  TCP_STREAM mode:
+> for i in 1 64 128 512 1k 2k 32k 64k 100k 500k 1m;then
+> netperf -T 1,2 -t TCP_STREAM -H 127.0.0.1 -l 20 -- -m $i -s 100m,100m -S 100m,100m
+> done
+>
+> before:
+> 3.84 246.52 496.89 1885.03 3415.29 6375.03 40749.09 48764.40 51611.34 55678.26 55992.78
+> after:
+> 4.43 279.20 555.82 2080.79 3870.70 7105.44 41836.41 49709.75 51861.56 55211.00 54566.85
+>
+> Signed-off-by: Liu Jian <liujian56@huawei.com>
+> ---
 
-Thanks for your review, so drop this param and set this param insider driver when driver_reinit,
-is that fine?
+Interesting idea. Potentially opens up the way to redirect without
+fallback to backlog thread in the future. If we know the target, then we
+can propagate backpressure.
+
+If we go this route, we will need tests. selftests/test_sockmap would
+need to be extended, and we will also need some unit tests in test_progs
+for corner cases. Corner cases to cover that come to mind: redirect to
+self, redirect target socket closed.
+
+I'm out next week, so won't be able to give it a proper review.
 
