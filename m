@@ -1,461 +1,112 @@
-Return-Path: <netdev+bounces-24673-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24674-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5465D771027
-	for <lists+netdev@lfdr.de>; Sat,  5 Aug 2023 16:30:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91FD2771031
+	for <lists+netdev@lfdr.de>; Sat,  5 Aug 2023 16:43:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 362041C20A56
-	for <lists+netdev@lfdr.de>; Sat,  5 Aug 2023 14:30:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9F1D01C20A85
+	for <lists+netdev@lfdr.de>; Sat,  5 Aug 2023 14:43:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45349A92A;
-	Sat,  5 Aug 2023 14:30:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 662E8C14D;
+	Sat,  5 Aug 2023 14:43:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31FC4C2CB
-	for <netdev@vger.kernel.org>; Sat,  5 Aug 2023 14:30:06 +0000 (UTC)
-X-Greylist: delayed 16008 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sat, 05 Aug 2023 07:29:44 PDT
-Received: from out-87.mta1.migadu.com (out-87.mta1.migadu.com [95.215.58.87])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71CD344AA
-	for <netdev@vger.kernel.org>; Sat,  5 Aug 2023 07:29:44 -0700 (PDT)
-Message-ID: <72a98e55-46b0-66d6-b4b3-4f6d14e1fd7b@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1691245782;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0d2/HWw/t4KftogUmOniaysvCJK7HhLWbKWsyTbkz+0=;
-	b=L5JmuClvl8yxJqbTomikxt1FaaRynUJHsKi1bKAxeFsZVoZ2u6njLiy42IP0PlhNbJnMLV
-	8cwaSAc5kJ7/kXhE1CkjdC6Tcvv5pjiNK9Ijo46qs8CiWYt2T86qfz6x8+88C6xQZGXx3K
-	r2LcEbnXdJ2dvyygA2LX8H8maJZS+8Y=
-Date: Sat, 5 Aug 2023 22:29:29 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58EBD8489
+	for <netdev@vger.kernel.org>; Sat,  5 Aug 2023 14:43:41 +0000 (UTC)
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8A4B1FE6;
+	Sat,  5 Aug 2023 07:43:38 -0700 (PDT)
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.96)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1qSIUq-0000N9-0A;
+	Sat, 05 Aug 2023 14:43:12 +0000
+Date: Sat, 5 Aug 2023 15:42:58 +0100
+From: Daniel Golle <daniel@makrotopia.org>
+To: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	=?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Landen Chao <Landen.Chao@mediatek.com>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: [PATCH RESEND net-next 1/2] net: dsa: mt7530: register OF node for
+ internal MDIO bus
+Message-ID: <6eb1b7b8dbc3a4b14becad15f0707d4f624ee18b.1691246461.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next 03/10] mlx4: Replace the mlx4_interface.event
- callback with a notifier
-To: Petr Pavlu <petr.pavlu@suse.com>, tariqt@nvidia.com, yishaih@nvidia.com,
- leon@kernel.org
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, jgg@ziepe.ca, netdev@vger.kernel.org,
- linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20230804150527.6117-1-petr.pavlu@suse.com>
- <20230804150527.6117-4-petr.pavlu@suse.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Zhu Yanjun <yanjun.zhu@linux.dev>
-In-Reply-To: <20230804150527.6117-4-petr.pavlu@suse.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-在 2023/8/4 23:05, Petr Pavlu 写道:
-> Use a notifier to implement mlx4_dispatch_event() in preparation to
-> switch mlx4_en and mlx4_ib to be an auxiliary device.
-> 
-> A problem is that if the mlx4_interface.event callback was replaced with
-> something as mlx4_adrv.event then the implementation of
-> mlx4_dispatch_event() would need to acquire a lock on a given device
-> before executing this callback. That is necessary because otherwise
-> there is no guarantee that the associated driver cannot get unbound when
-> the callback is running. However, taking this lock is not possible
-> because mlx4_dispatch_event() can be invoked from the hardirq context.
-> Using an atomic notifier allows the driver to accurately record when it
-> wants to receive these events and solves this problem.
-> 
-> A handler registration is done by both mlx4_en and mlx4_ib at the end of
-> their mlx4_interface.add callback. This matches the current situation
-> when mlx4_add_device() would enable events for a given device
-> immediately after this callback, by adding the device on the
-> mlx4_priv.list.
-> 
-> Signed-off-by: Petr Pavlu <petr.pavlu@suse.com>
-> Tested-by: Leon Romanovsky <leon@kernel.org>
-> ---
->   drivers/infiniband/hw/mlx4/main.c            | 41 +++++++++++++-------
->   drivers/infiniband/hw/mlx4/mlx4_ib.h         |  2 +
->   drivers/net/ethernet/mellanox/mlx4/en_main.c | 25 ++++++++----
->   drivers/net/ethernet/mellanox/mlx4/intf.c    | 24 ++++++++----
->   drivers/net/ethernet/mellanox/mlx4/main.c    |  2 +
->   drivers/net/ethernet/mellanox/mlx4/mlx4.h    |  2 +
->   drivers/net/ethernet/mellanox/mlx4/mlx4_en.h |  2 +
->   include/linux/mlx4/driver.h                  |  8 +++-
->   8 files changed, 76 insertions(+), 30 deletions(-)
-> 
-> diff --git a/drivers/infiniband/hw/mlx4/main.c b/drivers/infiniband/hw/mlx4/main.c
-> index 7dd70d778b6b..458b4b11dffa 100644
-> --- a/drivers/infiniband/hw/mlx4/main.c
-> +++ b/drivers/infiniband/hw/mlx4/main.c
-> @@ -82,6 +82,8 @@ static const char mlx4_ib_version[] =
->   static void do_slave_init(struct mlx4_ib_dev *ibdev, int slave, int do_init);
->   static enum rdma_link_layer mlx4_ib_port_link_layer(struct ib_device *device,
->   						    u32 port_num);
-> +static int mlx4_ib_event(struct notifier_block *this, unsigned long event,
-> +			 void *ptr);
->   
->   static struct workqueue_struct *wq;
->   
-> @@ -2836,6 +2838,12 @@ static void *mlx4_ib_add(struct mlx4_dev *dev)
->   				do_slave_init(ibdev, j, 1);
->   		}
->   	}
-> +
-> +	/* register mlx4 core notifier */
-> +	ibdev->mlx_nb.notifier_call = mlx4_ib_event;
-> +	err = mlx4_register_event_notifier(dev, &ibdev->mlx_nb);
-> +	WARN(err, "failed to register mlx4 event notifier (%d)", err);
-> +
->   	return ibdev;
->   
->   err_notif:
-> @@ -2953,6 +2961,8 @@ static void mlx4_ib_remove(struct mlx4_dev *dev, void *ibdev_ptr)
->   	int p;
->   	int i;
->   
-> +	mlx4_unregister_event_notifier(dev, &ibdev->mlx_nb);
-> +
->   	mlx4_foreach_port(i, dev, MLX4_PORT_TYPE_IB)
->   		devlink_port_type_clear(mlx4_get_devlink_port(dev, i));
->   	ibdev->ib_active = false;
-> @@ -3173,11 +3183,14 @@ void mlx4_sched_ib_sl2vl_update_work(struct mlx4_ib_dev *ibdev,
->   	}
->   }
->   
-> -static void mlx4_ib_event(struct mlx4_dev *dev, void *ibdev_ptr,
-> -			  enum mlx4_dev_event event, unsigned long param)
-> +static int mlx4_ib_event(struct notifier_block *this,
-> +			 unsigned long event /*mlx4_dev_event*/, void *ptr)
+From: David Bauer <mail@david-bauer.net>
 
-/*mlx4_dev_event*/ should be removed?
+The MT753x switches provide a switch-internal MDIO bus for the embedded
+PHYs.
 
-Zhu Yanjun
+Register a OF sub-node on the switch OF-node for this internal MDIO bus.
+This allows to configure the embedded PHYs using device-tree.
 
->   {
-> +	struct mlx4_ib_dev *ibdev =
-> +		container_of(this, struct mlx4_ib_dev, mlx_nb);
-> +	struct mlx4_dev *dev = ibdev->dev;
-> +	unsigned long param = *(unsigned long *)ptr;
->   	struct ib_event ibev;
-> -	struct mlx4_ib_dev *ibdev = to_mdev((struct ib_device *) ibdev_ptr);
->   	struct mlx4_eqe *eqe = NULL;
->   	struct ib_event_work *ew;
->   	int p = 0;
-> @@ -3187,11 +3200,11 @@ static void mlx4_ib_event(struct mlx4_dev *dev, void *ibdev_ptr,
->   	    (event == MLX4_DEV_EVENT_PORT_DOWN))) {
->   		ew = kmalloc(sizeof(*ew), GFP_ATOMIC);
->   		if (!ew)
-> -			return;
-> +			return NOTIFY_DONE;
->   		INIT_WORK(&ew->work, handle_bonded_port_state_event);
->   		ew->ib_dev = ibdev;
->   		queue_work(wq, &ew->work);
-> -		return;
-> +		return NOTIFY_DONE;
->   	}
->   
->   	if (event == MLX4_DEV_EVENT_PORT_MGMT_CHANGE)
-> @@ -3202,7 +3215,7 @@ static void mlx4_ib_event(struct mlx4_dev *dev, void *ibdev_ptr,
->   	switch (event) {
->   	case MLX4_DEV_EVENT_PORT_UP:
->   		if (p > ibdev->num_ports)
-> -			return;
-> +			return NOTIFY_DONE;
->   		if (!mlx4_is_slave(dev) &&
->   		    rdma_port_get_link_layer(&ibdev->ib_dev, p) ==
->   			IB_LINK_LAYER_INFINIBAND) {
-> @@ -3217,7 +3230,7 @@ static void mlx4_ib_event(struct mlx4_dev *dev, void *ibdev_ptr,
->   
->   	case MLX4_DEV_EVENT_PORT_DOWN:
->   		if (p > ibdev->num_ports)
-> -			return;
-> +			return NOTIFY_DONE;
->   		ibev.event = IB_EVENT_PORT_ERR;
->   		break;
->   
-> @@ -3230,7 +3243,7 @@ static void mlx4_ib_event(struct mlx4_dev *dev, void *ibdev_ptr,
->   	case MLX4_DEV_EVENT_PORT_MGMT_CHANGE:
->   		ew = kmalloc(sizeof *ew, GFP_ATOMIC);
->   		if (!ew)
-> -			return;
-> +			return NOTIFY_DONE;
->   
->   		INIT_WORK(&ew->work, handle_port_mgmt_change_event);
->   		memcpy(&ew->ib_eqe, eqe, sizeof *eqe);
-> @@ -3240,7 +3253,7 @@ static void mlx4_ib_event(struct mlx4_dev *dev, void *ibdev_ptr,
->   			queue_work(wq, &ew->work);
->   		else
->   			handle_port_mgmt_change_event(&ew->work);
-> -		return;
-> +		return NOTIFY_DONE;
->   
->   	case MLX4_DEV_EVENT_SLAVE_INIT:
->   		/* here, p is the slave id */
-> @@ -3256,7 +3269,7 @@ static void mlx4_ib_event(struct mlx4_dev *dev, void *ibdev_ptr,
->   								       1);
->   			}
->   		}
-> -		return;
-> +		return NOTIFY_DONE;
->   
->   	case MLX4_DEV_EVENT_SLAVE_SHUTDOWN:
->   		if (mlx4_is_master(dev)) {
-> @@ -3272,22 +3285,22 @@ static void mlx4_ib_event(struct mlx4_dev *dev, void *ibdev_ptr,
->   		}
->   		/* here, p is the slave id */
->   		do_slave_init(ibdev, p, 0);
-> -		return;
-> +		return NOTIFY_DONE;
->   
->   	default:
-> -		return;
-> +		return NOTIFY_DONE;
->   	}
->   
-> -	ibev.device	      = ibdev_ptr;
-> +	ibev.device	      = &ibdev->ib_dev;
->   	ibev.element.port_num = mlx4_is_bonded(ibdev->dev) ? 1 : (u8)p;
->   
->   	ib_dispatch_event(&ibev);
-> +	return NOTIFY_DONE;
->   }
->   
->   static struct mlx4_interface mlx4_ib_interface = {
->   	.add		= mlx4_ib_add,
->   	.remove		= mlx4_ib_remove,
-> -	.event		= mlx4_ib_event,
->   	.protocol	= MLX4_PROT_IB_IPV6,
->   	.flags		= MLX4_INTFF_BONDING
->   };
-> diff --git a/drivers/infiniband/hw/mlx4/mlx4_ib.h b/drivers/infiniband/hw/mlx4/mlx4_ib.h
-> index 17fee1e73a45..41ca1114a995 100644
-> --- a/drivers/infiniband/hw/mlx4/mlx4_ib.h
-> +++ b/drivers/infiniband/hw/mlx4/mlx4_ib.h
-> @@ -38,6 +38,7 @@
->   #include <linux/list.h>
->   #include <linux/mutex.h>
->   #include <linux/idr.h>
-> +#include <linux/notifier.h>
->   
->   #include <rdma/ib_verbs.h>
->   #include <rdma/ib_umem.h>
-> @@ -644,6 +645,7 @@ struct mlx4_ib_dev {
->   	spinlock_t		reset_flow_resource_lock;
->   	struct list_head		qp_list;
->   	struct mlx4_ib_diag_counters diag_counters[MLX4_DIAG_COUNTERS_TYPES];
-> +	struct notifier_block	mlx_nb;
->   };
->   
->   struct ib_event_work {
-> diff --git a/drivers/net/ethernet/mellanox/mlx4/en_main.c b/drivers/net/ethernet/mellanox/mlx4/en_main.c
-> index be8ba34c9025..8384bff5c37d 100644
-> --- a/drivers/net/ethernet/mellanox/mlx4/en_main.c
-> +++ b/drivers/net/ethernet/mellanox/mlx4/en_main.c
-> @@ -183,17 +183,20 @@ static void mlx4_en_get_profile(struct mlx4_en_dev *mdev)
->   	}
->   }
->   
-> -static void mlx4_en_event(struct mlx4_dev *dev, void *endev_ptr,
-> -			  enum mlx4_dev_event event, unsigned long port)
-> +static int mlx4_en_event(struct notifier_block *this,
-> +			 unsigned long event /*mlx4_dev_event*/, void *ptr)
->   {
-> -	struct mlx4_en_dev *mdev = (struct mlx4_en_dev *) endev_ptr;
-> +	struct mlx4_en_dev *mdev =
-> +		container_of(this, struct mlx4_en_dev, mlx_nb);
-> +	struct mlx4_dev *dev = mdev->dev;
-> +	unsigned long port = *(unsigned long *)ptr;
->   	struct mlx4_en_priv *priv;
->   
->   	switch (event) {
->   	case MLX4_DEV_EVENT_PORT_UP:
->   	case MLX4_DEV_EVENT_PORT_DOWN:
->   		if (!mdev->pndev[port])
-> -			return;
-> +			return NOTIFY_DONE;
->   		priv = netdev_priv(mdev->pndev[port]);
->   		/* To prevent races, we poll the link state in a separate
->   		  task rather than changing it here */
-> @@ -211,10 +214,12 @@ static void mlx4_en_event(struct mlx4_dev *dev, void *endev_ptr,
->   	default:
->   		if (port < 1 || port > dev->caps.num_ports ||
->   		    !mdev->pndev[port])
-> -			return;
-> -		mlx4_warn(mdev, "Unhandled event %d for port %d\n", event,
-> +			return NOTIFY_DONE;
-> +		mlx4_warn(mdev, "Unhandled event %d for port %d\n", (int) event,
->   			  (int) port);
->   	}
-> +
-> +	return NOTIFY_DONE;
->   }
->   
->   static void mlx4_en_remove(struct mlx4_dev *dev, void *endev_ptr)
-> @@ -222,6 +227,8 @@ static void mlx4_en_remove(struct mlx4_dev *dev, void *endev_ptr)
->   	struct mlx4_en_dev *mdev = endev_ptr;
->   	int i;
->   
-> +	mlx4_unregister_event_notifier(dev, &mdev->mlx_nb);
-> +
->   	mutex_lock(&mdev->state_lock);
->   	mdev->device_up = false;
->   	mutex_unlock(&mdev->state_lock);
-> @@ -326,6 +333,11 @@ static void *mlx4_en_add(struct mlx4_dev *dev)
->   	mutex_init(&mdev->state_lock);
->   	mdev->device_up = true;
->   
-> +	/* register mlx4 core notifier */
-> +	mdev->mlx_nb.notifier_call = mlx4_en_event;
-> +	err = mlx4_register_event_notifier(dev, &mdev->mlx_nb);
-> +	WARN(err, "failed to register mlx4 event notifier (%d)", err);
-> +
->   	return mdev;
->   
->   err_mr:
-> @@ -346,7 +358,6 @@ static void *mlx4_en_add(struct mlx4_dev *dev)
->   static struct mlx4_interface mlx4_en_interface = {
->   	.add		= mlx4_en_add,
->   	.remove		= mlx4_en_remove,
-> -	.event		= mlx4_en_event,
->   	.protocol	= MLX4_PROT_ETH,
->   	.activate	= mlx4_en_activate,
->   };
-> diff --git a/drivers/net/ethernet/mellanox/mlx4/intf.c b/drivers/net/ethernet/mellanox/mlx4/intf.c
-> index 28d7da925d36..a7c3e2efa464 100644
-> --- a/drivers/net/ethernet/mellanox/mlx4/intf.c
-> +++ b/drivers/net/ethernet/mellanox/mlx4/intf.c
-> @@ -183,17 +183,27 @@ void mlx4_dispatch_event(struct mlx4_dev *dev, enum mlx4_dev_event type,
->   			 unsigned long param)
->   {
->   	struct mlx4_priv *priv = mlx4_priv(dev);
-> -	struct mlx4_device_context *dev_ctx;
-> -	unsigned long flags;
->   
-> -	spin_lock_irqsave(&priv->ctx_lock, flags);
-> +	atomic_notifier_call_chain(&priv->event_nh, type, &param);
-> +}
->   
-> -	list_for_each_entry(dev_ctx, &priv->ctx_list, list)
-> -		if (dev_ctx->intf->event)
-> -			dev_ctx->intf->event(dev, dev_ctx->context, type, param);
-> +int mlx4_register_event_notifier(struct mlx4_dev *dev,
-> +				 struct notifier_block *nb)
-> +{
-> +	struct mlx4_priv *priv = mlx4_priv(dev);
->   
-> -	spin_unlock_irqrestore(&priv->ctx_lock, flags);
-> +	return atomic_notifier_chain_register(&priv->event_nh, nb);
-> +}
-> +EXPORT_SYMBOL(mlx4_register_event_notifier);
-> +
-> +int mlx4_unregister_event_notifier(struct mlx4_dev *dev,
-> +				   struct notifier_block *nb)
-> +{
-> +	struct mlx4_priv *priv = mlx4_priv(dev);
-> +
-> +	return atomic_notifier_chain_unregister(&priv->event_nh, nb);
->   }
-> +EXPORT_SYMBOL(mlx4_unregister_event_notifier);
->   
->   int mlx4_register_device(struct mlx4_dev *dev)
->   {
-> diff --git a/drivers/net/ethernet/mellanox/mlx4/main.c b/drivers/net/ethernet/mellanox/mlx4/main.c
-> index 8a5409b00530..5f3ba8385e23 100644
-> --- a/drivers/net/ethernet/mellanox/mlx4/main.c
-> +++ b/drivers/net/ethernet/mellanox/mlx4/main.c
-> @@ -3378,6 +3378,8 @@ static int mlx4_load_one(struct pci_dev *pdev, int pci_dev_data,
->   	INIT_LIST_HEAD(&priv->ctx_list);
->   	spin_lock_init(&priv->ctx_lock);
->   
-> +	ATOMIC_INIT_NOTIFIER_HEAD(&priv->event_nh);
-> +
->   	mutex_init(&priv->port_mutex);
->   	mutex_init(&priv->bond_mutex);
->   
-> diff --git a/drivers/net/ethernet/mellanox/mlx4/mlx4.h b/drivers/net/ethernet/mellanox/mlx4/mlx4.h
-> index 6ccf340660d9..10f12e4992f1 100644
-> --- a/drivers/net/ethernet/mellanox/mlx4/mlx4.h
-> +++ b/drivers/net/ethernet/mellanox/mlx4/mlx4.h
-> @@ -47,6 +47,7 @@
->   #include <linux/spinlock.h>
->   #include <net/devlink.h>
->   #include <linux/rwsem.h>
-> +#include <linux/notifier.h>
->   
->   #include <linux/mlx4/device.h>
->   #include <linux/mlx4/driver.h>
-> @@ -878,6 +879,7 @@ struct mlx4_priv {
->   	struct list_head	dev_list;
->   	struct list_head	ctx_list;
->   	spinlock_t		ctx_lock;
-> +	struct atomic_notifier_head event_nh;
->   
->   	int			pci_dev_data;
->   	int                     removed;
-> diff --git a/drivers/net/ethernet/mellanox/mlx4/mlx4_en.h b/drivers/net/ethernet/mellanox/mlx4/mlx4_en.h
-> index 72a3fea36702..efe3f97b874f 100644
-> --- a/drivers/net/ethernet/mellanox/mlx4/mlx4_en.h
-> +++ b/drivers/net/ethernet/mellanox/mlx4/mlx4_en.h
-> @@ -49,6 +49,7 @@
->   #include <linux/ptp_clock_kernel.h>
->   #include <linux/irq.h>
->   #include <net/xdp.h>
-> +#include <linux/notifier.h>
->   
->   #include <linux/mlx4/device.h>
->   #include <linux/mlx4/qp.h>
-> @@ -433,6 +434,7 @@ struct mlx4_en_dev {
->   	struct ptp_clock	*ptp_clock;
->   	struct ptp_clock_info	ptp_clock_info;
->   	struct notifier_block	netdev_nb;
-> +	struct notifier_block	mlx_nb;
->   };
->   
->   
-> diff --git a/include/linux/mlx4/driver.h b/include/linux/mlx4/driver.h
-> index 923951e19300..228da8ed7e75 100644
-> --- a/include/linux/mlx4/driver.h
-> +++ b/include/linux/mlx4/driver.h
-> @@ -34,6 +34,7 @@
->   #define MLX4_DRIVER_H
->   
->   #include <net/devlink.h>
-> +#include <linux/notifier.h>
->   #include <linux/mlx4/device.h>
->   
->   struct mlx4_dev;
-> @@ -57,8 +58,6 @@ enum {
->   struct mlx4_interface {
->   	void *			(*add)	 (struct mlx4_dev *dev);
->   	void			(*remove)(struct mlx4_dev *dev, void *context);
-> -	void			(*event) (struct mlx4_dev *dev, void *context,
-> -					  enum mlx4_dev_event event, unsigned long param);
->   	void			(*activate)(struct mlx4_dev *dev, void *context);
->   	struct list_head	list;
->   	enum mlx4_protocol	protocol;
-> @@ -87,6 +86,11 @@ struct mlx4_port_map {
->   
->   int mlx4_port_map_set(struct mlx4_dev *dev, struct mlx4_port_map *v2p);
->   
-> +int mlx4_register_event_notifier(struct mlx4_dev *dev,
-> +				 struct notifier_block *nb);
-> +int mlx4_unregister_event_notifier(struct mlx4_dev *dev,
-> +				   struct notifier_block *nb);
-> +
->   struct devlink_port *mlx4_get_devlink_port(struct mlx4_dev *dev, int port);
->   
->   #endif /* MLX4_DRIVER_H */
+Signed-off-by: David Bauer <mail@david-bauer.net>
+Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+---
+ drivers/net/dsa/mt7530.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
+diff --git a/drivers/net/dsa/mt7530.c b/drivers/net/dsa/mt7530.c
+index 8fbda739c1b35..9bb805de397a9 100644
+--- a/drivers/net/dsa/mt7530.c
++++ b/drivers/net/dsa/mt7530.c
+@@ -2152,10 +2152,13 @@ mt7530_setup_mdio(struct mt7530_priv *priv)
+ {
+ 	struct dsa_switch *ds = priv->ds;
+ 	struct device *dev = priv->dev;
++	struct device_node *np, *mnp;
+ 	struct mii_bus *bus;
+ 	static int idx;
+ 	int ret;
+ 
++	np = priv->dev->of_node;
++
+ 	bus = devm_mdiobus_alloc(dev);
+ 	if (!bus)
+ 		return -ENOMEM;
+@@ -2174,7 +2177,9 @@ mt7530_setup_mdio(struct mt7530_priv *priv)
+ 	if (priv->irq)
+ 		mt7530_setup_mdio_irq(priv);
+ 
+-	ret = devm_mdiobus_register(dev, bus);
++	mnp = of_get_child_by_name(np, "mdio");
++	ret = devm_of_mdiobus_register(dev, bus, mnp);
++	of_node_put(mnp);
+ 	if (ret) {
+ 		dev_err(dev, "failed to register MDIO bus: %d\n", ret);
+ 		if (priv->irq)
+-- 
+2.41.0
 
