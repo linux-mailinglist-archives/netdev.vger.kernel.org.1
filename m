@@ -1,183 +1,106 @@
-Return-Path: <netdev+bounces-24604-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24605-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2DAC8770CC0
-	for <lists+netdev@lfdr.de>; Sat,  5 Aug 2023 02:40:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 67964770CCD
+	for <lists+netdev@lfdr.de>; Sat,  5 Aug 2023 02:57:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3DA8D1C215D8
-	for <lists+netdev@lfdr.de>; Sat,  5 Aug 2023 00:40:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 86EDD1C215C1
+	for <lists+netdev@lfdr.de>; Sat,  5 Aug 2023 00:57:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EF827E1;
-	Sat,  5 Aug 2023 00:40:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 195517E2;
+	Sat,  5 Aug 2023 00:57:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81D6A622
-	for <netdev@vger.kernel.org>; Sat,  5 Aug 2023 00:40:23 +0000 (UTC)
-Received: from out-94.mta0.migadu.com (out-94.mta0.migadu.com [IPv6:2001:41d0:1004:224b::5e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E76F4EE1
-	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 17:40:20 -0700 (PDT)
-Message-ID: <adb657e4-5f8a-6ecc-ac29-8168f4ca2ed9@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1691196018;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Tx4PIylCl9DQLUqlVHfva86omqX7eBYd3AzAD/mghWY=;
-	b=i/vD4fWReijjUK9556DPqLzrJ8Zwky2dJOnf5Ik5fhl82vx3zINv6/O8QZAUxzOyv7I2/X
-	5p32Hn9q1ImMZuTlsvr4+c6oWKvMGWdwr8EXx84ncXcpXtiVfWcgA3d3aIaJp6iXAHirpF
-	vdLc7G7eykmRsJmg2HtIRUj6PPWFNHk=
-Date: Fri, 4 Aug 2023 17:40:09 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D84C4622
+	for <netdev@vger.kernel.org>; Sat,  5 Aug 2023 00:57:02 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0B7DC433C7;
+	Sat,  5 Aug 2023 00:57:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1691197022;
+	bh=R11BsqXSVi4wUiZMEOD+B5oPYL6Hoa/QtR76MRpQdPE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=QNyPckaj6Xfs59VP9W+BxQt8XDvbRSHL1DA/MM+IzkQ4Y7gWtOOEx8pO81ml3VE8h
+	 LpCQUXtROEGRadxtrvLLVRiB4Fm+ypTvysCA/AHkV0E+TUDQ4Htbv7IHpVRHDWnAQI
+	 EjQ9V4r32ddBXRXIcyAkVmbZNoREIHET0m+psPUudGZMv2cM/ZkHUyRIhBBptIsWxk
+	 nLB+5Ir0N2EN0Eq/uHsl0VWorzAHb3ymBtnK3SyPvwmRUX/zQUAHzNKemUmcKbXJoI
+	 QwKQsHMyqBTMMHRy4xx1+s9G9VojQNpwH21ycRv+MsFIxXZoKvTf1MetNG/5xXUJPV
+	 HzseGUOu5gR3w==
+Date: Fri, 4 Aug 2023 17:57:00 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Hannes Reinecke <hare@suse.de>
+Cc: Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>, Keith
+ Busch <kbusch@kernel.org>, linux-nvme@lists.infradead.org, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH] net/tls: avoid TCP window full during ->read_sock()
+Message-ID: <20230804175700.1f88604b@kernel.org>
+In-Reply-To: <20230803100809.29864-1-hare@suse.de>
+References: <20230803100809.29864-1-hare@suse.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v11 5/5] selftests/bpf: Add mptcpify test
-Content-Language: en-US
-To: Geliang Tang <geliang.tang@suse.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, mptcp@lists.linux.dev,
- apparmor@lists.ubuntu.com, linux-security-module@vger.kernel.org,
- selinux@vger.kernel.org, linux-kselftest@vger.kernel.org,
- Yonghong Song <yonghong.song@linux.dev>, Alexei Starovoitov
- <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Andrii Nakryiko <andrii@kernel.org>, Song Liu <song@kernel.org>,
- Yonghong Song <yhs@fb.com>, John Fastabend <john.fastabend@gmail.com>,
- KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
- Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
- Florent Revest <revest@chromium.org>, Brendan Jackman
- <jackmanb@chromium.org>, Matthieu Baerts <matthieu.baerts@tessares.net>,
- Mat Martineau <martineau@kernel.org>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- John Johansen <john.johansen@canonical.com>, Paul Moore
- <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
- "Serge E. Hallyn" <serge@hallyn.com>,
- Stephen Smalley <stephen.smalley.work@gmail.com>,
- Eric Paris <eparis@parisplace.org>, Mykola Lysenko <mykolal@fb.com>,
- Shuah Khan <shuah@kernel.org>, Simon Horman <horms@kernel.org>
-References: <cover.1691125344.git.geliang.tang@suse.com>
- <1effb0a793140532be749aebbd7912798245745e.1691125344.git.geliang.tang@suse.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <1effb0a793140532be749aebbd7912798245745e.1691125344.git.geliang.tang@suse.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-On 8/3/23 10:07 PM, Geliang Tang wrote:
-> diff --git a/tools/testing/selftests/bpf/prog_tests/mptcp.c b/tools/testing/selftests/bpf/prog_tests/mptcp.c
-> index 3dc0ba2e7590..e6aafb4cfa8e 100644
-> --- a/tools/testing/selftests/bpf/prog_tests/mptcp.c
-> +++ b/tools/testing/selftests/bpf/prog_tests/mptcp.c
-> @@ -6,6 +6,7 @@
->   #include "cgroup_helpers.h"
->   #include "network_helpers.h"
->   #include "mptcp_sock.skel.h"
-> +#include "mptcpify.skel.h"
->   
->   char NS_TEST[32];
->   
-> @@ -185,8 +186,105 @@ static void test_base(void)
->   	close(cgroup_fd);
->   }
->   
-> +static void send_byte(int fd)
-> +{
-> +	char b = 0x55;
-> +
-> +	ASSERT_EQ(write(fd, &b, sizeof(b)), 1, "send single byte");
-> +}
-> +
-> +static int verify_mptcpify(void)
-> +{
-> +	char cmd[256];
-> +	int err = 0;
-> +
-> +	/* Output of ss:
-> +	 *
-> +	 * ESTAB 0      0          127.0.0.1:44180    127.0.0.1:42225 cubic
-> +	 * ... tcp-ulp-mptcp flags:Mmec ...
-> +	 */
-> +	snprintf(cmd, sizeof(cmd),
-> +		 "ip netns exec %s ss -tOni | grep -q '%s'",
-> +		 NS_TEST, "tcp-ulp-mptcp");
-> +	if (!ASSERT_OK(system(cmd), "No tcp-ulp-mptcp found!"))
-> +		err++;
-> +
-> +	/* Output of nstat:
-> +	 *
-> +	 * #kernel
-> +	 * MPTcpExtMPCapableSYNACKRX       1                  0.0
-> +	 */
-> +	snprintf(cmd, sizeof(cmd),
-> +		 "ip netns exec %s nstat -asz %s | awk '%s' | grep -q '%s'",
-> +		 NS_TEST, "MPTcpExtMPCapableSYNACKRX",
-> +		 "NR==1 {next} {print $2}", "1");
-> +	if (!ASSERT_OK(system(cmd), "No MPTcpExtMPCapableSYNACKRX found!"))
-> +		err++;
+On Thu,  3 Aug 2023 12:08:09 +0200 Hannes Reinecke wrote:
+> When flushing the backlog after decoding each record in ->read_sock()
+> we may end up with really long records, causing a TCP window full as
+> the TCP window would only be increased again after we process the
+> record. So we should rather process the record first to allow the
+> TCP window to be increased again before flushing the backlog.
 
-The idea is to confirm the protocol has been changed. Is it more direct to use 
-getsockopt(SO_PROTOCOL) on the created fd(s)?
+> -			released = tls_read_flush_backlog(sk, prot, rxm->full_len, to_decrypt,
+> -							  decrypted, &flushed_at);
+>  			skb = darg.skb;
+> +			/* TLS 1.3 may have updated the length by more than overhead */
 
-> +
-> +	return err;
-> +}
-> +
-> +static int run_mptcpify(int cgroup_fd)
-> +{
-> +	int server_fd, client_fd, err = 0;
-> +	struct mptcpify *mptcpify_skel;
-> +
-> +	mptcpify_skel = mptcpify__open_and_load();
-> +	if (!ASSERT_OK_PTR(mptcpify_skel, "skel_open_load"))
-> +		return -EIO;
+> +			rxm = strp_msg(skb);
+> +			tlm = tls_msg(skb);
+>  			decrypted += rxm->full_len;
+>  
+>  			tls_rx_rec_done(ctx);
+> @@ -2280,6 +2275,12 @@ int tls_sw_read_sock(struct sock *sk, read_descriptor_t *desc,
+>  			goto read_sock_requeue;
+>  		}
+>  		copied += used;
+> +		/*
+> +		 * flush backlog after processing the TLS record, otherwise we might
+> +		 * end up with really large records and triggering a TCP window full.
+> +		 */
+> +		released = tls_read_flush_backlog(sk, prot, decrypted - copied, decrypted,
+> +						  copied, &flushed_at);
 
-Although the return value does not matter much, -EIO looks weird for the error 
-from mptcpify__open_and_load(). May be 'return libbpf_get_error(mptcpify_skel);'
+I'm surprised moving the flushing out makes a difference.
+rx_list should generally hold at most 1 skb (16kB) unless something 
+is PEEKing the data.
 
---
+Looking at it closer I think the problem may be calling args to
+tls_read_flush_backlog(). Since we don't know how much data
+reader wants we can't sensibly evaluate the first condition,
+so how would it work if instead of this patch we did:
+
+-			released = tls_read_flush_backlog(sk, prot, rxm->full_len, to_decrypt,
++			released = tls_read_flush_backlog(sk, prot, INT_MAX, 0,
+							  decrypted, &flushed_at);
+
+That would give us a flush every 128k of data (or every record if
+inq is shorter than 16kB).
+
+side note - I still prefer 80 char max lines, please. It seems to result
+in prettier code ovarall as it forces people to think more about code
+structure.
+
+>  		if (used < rxm->full_len) {
+>  			rxm->offset += used;
+>  			rxm->full_len -= used;
+-- 
 pw-bot: cr
-
-> +
-> +	err = mptcpify__attach(mptcpify_skel);
-> +	if (!ASSERT_OK(err, "skel_attach"))
-> +		goto out;
-> +
-> +	/* without MPTCP */
-> +	server_fd = start_server(AF_INET, SOCK_STREAM, NULL, 0, 0);
-> +	if (!ASSERT_GE(server_fd, 0, "start_server")) {
-> +		err = -EIO;
-> +		goto out;
-> +	}
-> +
-> +	client_fd = connect_to_fd(server_fd, 0);
-> +	if (!ASSERT_GE(client_fd, 0, "connect to fd")) {
-> +		err = -EIO;
-> +		goto close_server;
-> +	}
-> +
-> +	send_byte(client_fd);
-> +	err = verify_mptcpify();
-> +
-> +	close(client_fd);
-> +close_server:
-> +	close(server_fd);
-> +out:
-> +	mptcpify__destroy(mptcpify_skel);
-> +	return err;
-> +}
-> +
-
 
