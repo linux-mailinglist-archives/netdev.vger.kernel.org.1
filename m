@@ -1,129 +1,110 @@
-Return-Path: <netdev+bounces-24623-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24624-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3D1C770E14
-	for <lists+netdev@lfdr.de>; Sat,  5 Aug 2023 08:27:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B6E4770E1F
+	for <lists+netdev@lfdr.de>; Sat,  5 Aug 2023 08:33:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 16B46282783
-	for <lists+netdev@lfdr.de>; Sat,  5 Aug 2023 06:27:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 55AED1C20D49
+	for <lists+netdev@lfdr.de>; Sat,  5 Aug 2023 06:33:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 075141FC5;
-	Sat,  5 Aug 2023 06:27:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0061417C6;
+	Sat,  5 Aug 2023 06:33:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECE3A17C6
-	for <netdev@vger.kernel.org>; Sat,  5 Aug 2023 06:27:06 +0000 (UTC)
-Received: from mail-pj1-x1044.google.com (mail-pj1-x1044.google.com [IPv6:2607:f8b0:4864:20::1044])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F9CC4ED6;
-	Fri,  4 Aug 2023 23:27:05 -0700 (PDT)
-Received: by mail-pj1-x1044.google.com with SMTP id 98e67ed59e1d1-26871992645so1841320a91.0;
-        Fri, 04 Aug 2023 23:27:05 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8E2F180
+	for <netdev@vger.kernel.org>; Sat,  5 Aug 2023 06:33:35 +0000 (UTC)
+Received: from mail-io1-xd2e.google.com (mail-io1-xd2e.google.com [IPv6:2607:f8b0:4864:20::d2e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DB1FFC
+	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 23:33:32 -0700 (PDT)
+Received: by mail-io1-xd2e.google.com with SMTP id ca18e2360f4ac-790cc395896so102526839f.1
+        for <netdev@vger.kernel.org>; Fri, 04 Aug 2023 23:33:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1691216825; x=1691821625;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=925QF3HnEkWSXdDDliA9Rsgs4P8TSRLdziSE4x6a8Qs=;
-        b=YBwgSekYDVhSDkc0X0jh8gOjr+P3cdEi+8YIua5bJoTOTQBay++JIntuUWnoZLjPgV
-         NhTSC3FJFP2meyYSCWHy6IVX761SmIhRJ5pQe2tJKRmfMcz7aGxMyxseoPzsdBnSzJ7c
-         NdnhEEScgWWQ7IjK8dpVvYtOZZOeRxFrpH/gQK0x0Uqhrb6Z0bkd2uNZf09j2Jfw5bhO
-         dnn6DAyuAaR3h/32Ck/eonBQd5dfUj2xqsfqNpISTqduqG7GdAbqCU6i+tDARdV2WRWs
-         AiyPboOmz1ktxHzI8EDBMHAGVMWidZ4T+aQX+ny47GXaND/Gzv+OBqnbnTBMu/8U+9Z9
-         TgIA==
+        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1691217211; x=1691822011;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=pc3WoibZYZDYFLA/vnf/DW8hjMxBlg+bH0Lqd2MjA0g=;
+        b=cCSR8EfA591i6DXa8gmsVWDkQErirJBSU/kcKJCIweOtdK8J/b/3yOw4HE/5zn16HB
+         p64IzxjeqsOtWUtQUl6atZCL9x1zGHTpFWq8zLtmAPXedJ6cTQgK27I4Aqso5dGXD4cn
+         AyFMGrfGikr1ocC0R0mxaC79s95mS90JAU5gM8lJhHMDPA95GV61fds+mdPGHrMPoMS4
+         IRYOULP0o5nMU0J1krqn1XEytKeOT03JXPmhctrynWtPX1Uz1ZY+YGM6XlGIgjQP5FxT
+         DZkiQiswF99UwjsJcmQJskwzRHIRZEcfZ0Y4gqrFGtwL3ad8KaHlgn2BeEB4u3vN/2lQ
+         5RDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691216825; x=1691821625;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=925QF3HnEkWSXdDDliA9Rsgs4P8TSRLdziSE4x6a8Qs=;
-        b=VMPyMa9hL4BzB7F2/0YHB/m/+w7ngtCFJ+sfp+d1FBJ2NEFR8grnP4bOeb2lZTzGKh
-         IqcCtW26iYObyI5/rCl7Ij8RfuFsR8S2wwgfraf2F7THiyHshnBY7KAHy3crJGAxpy6f
-         KetV0EUaZlbL8v6TAHP2tk74+gNpdWwoVIilmjfkYdcU8mylDzRWF0ug3ZXqmu0Ctcqk
-         Agz2gb6yXXf4coX8etSAif0d3t/w5wJSWhzbRRK7fljwNkqvmnLxCS83Jij/YhynIoJN
-         e58R3oKbBvf/KuD0TZUjpy+3Wm5E23RwJEqmAM/z8L10EXfoQxKG7eCewaKS9wYX0K0O
-         j1YA==
-X-Gm-Message-State: AOJu0YxiWG4C9TtgXukEP6hdZlEd7WNlZbsIWukhXorQj84QJFvmRo2Z
-	YOu7xN2Zw4NJMeVMBb1RPUs=
-X-Google-Smtp-Source: AGHT+IF+0ObRVcsyK7SmE9Yc3Gh4YUUPn96IbcOM5005ryI7mXjhqYYpuJNV5ikejPOpyJu3JAkIRw==
-X-Received: by 2002:a17:90a:d242:b0:267:ffcf:e9e3 with SMTP id o2-20020a17090ad24200b00267ffcfe9e3mr3964107pjw.46.1691216824872;
-        Fri, 04 Aug 2023 23:27:04 -0700 (PDT)
-Received: from localhost.localdomain ([193.203.214.57])
-        by smtp.gmail.com with ESMTPSA id oj3-20020a17090b4d8300b0025bcdada95asm2375362pjb.38.2023.08.04.23.27.02
+        d=1e100.net; s=20221208; t=1691217211; x=1691822011;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pc3WoibZYZDYFLA/vnf/DW8hjMxBlg+bH0Lqd2MjA0g=;
+        b=VeI+vgiZ61yKWVgpyOtfa+Wm+n+7bJn7+7nRSceUwHYQsaxYyT7j8orlMvce166a2c
+         p3AW4ZkCoe/K91wxGW8s+hqEU7iDlg+paO/ilJmASe6vD3UeJExAxMC/mpGPwBwwZ8Gs
+         JFG8vpsllKUnHmEHA9zcSDXrPVjInxPwk8lQx5mdg4NG8Jm5pDPklXFjuFoyMMBpb0ae
+         w8ov7l+TkFQ8IeaYfha9mYU0qI/y3AExJ5Ry5RLU6EyVvJekd/P5bqJp4BCd8Gx/kaWT
+         qh/dO2sNJgCZ3+v0gL4TYs/q0H5XLdBEbttRFZnbnmfHsK2nZ7uUJVEFIfPz9B3j8dDK
+         7szQ==
+X-Gm-Message-State: AOJu0Yy7ntKKCCzJnqkOorZzYQ54loeL2zQEt6p/U3g7JdyAnY7Vauq2
+	m9NMEFpqgWsFtkyzmbg/Emq95A==
+X-Google-Smtp-Source: AGHT+IEO97yCCN1nbSk23P2S5d2yOkPqmV8YKtj0bApL6YXwzwWRqmPw13KsoClY7SVHvbBC/0HyvQ==
+X-Received: by 2002:a6b:f20f:0:b0:791:280:839f with SMTP id q15-20020a6bf20f000000b007910280839fmr357424ioh.13.1691217211579;
+        Fri, 04 Aug 2023 23:33:31 -0700 (PDT)
+Received: from localhost ([212.23.236.67])
+        by smtp.gmail.com with ESMTPSA id p22-20020a5d8d16000000b00786f5990435sm1132203ioj.7.2023.08.04.23.33.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Aug 2023 23:27:04 -0700 (PDT)
-From: xu <xu.xin.sc@gmail.com>
-X-Google-Original-From: xu <xu.xin16@zte.com.cn>
-To: edumazet@google.com
-Cc: davem@davemloft.net,
-	dsahern@kernel.org,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	yang.yang29@zte.com.cn,
-	xu.xin16@zte.com.cn
-Subject: Re: [PATCH] udp_tunnel_nic: add net device refcount tracker
-Date: Sat,  5 Aug 2023 06:27:00 +0000
-Message-Id: <20230805062700.235515-1-xu.xin16@zte.com.cn>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <CANn89i+FTKRkgVodoQaCXH632rXx04AEe2_dJkqPiCEdtG0zQA@mail.gmail.com>
-References: <CANn89i+FTKRkgVodoQaCXH632rXx04AEe2_dJkqPiCEdtG0zQA@mail.gmail.com>
+        Fri, 04 Aug 2023 23:33:30 -0700 (PDT)
+Date: Sat, 5 Aug 2023 08:33:28 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org
+Subject: Re: ynl - mutiple policies for one nested attr used in multiple cmds
+Message-ID: <ZM3tOOHifjFQqorV@nanopsycho>
+References: <ZM01ezEkJw4D27Xl@nanopsycho>
+ <20230804125816.11431885@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230804125816.11431885@kernel.org>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
->> ---
->>  net/ipv4/udp_tunnel_nic.c | 7 +++++--
->>  1 file changed, 5 insertions(+), 2 deletions(-)
->>
->> diff --git a/net/ipv4/udp_tunnel_nic.c b/net/ipv4/udp_tunnel_nic.c
->> index 029219749785..ce8f5c82b0a1 100644
->> --- a/net/ipv4/udp_tunnel_nic.c
->> +++ b/net/ipv4/udp_tunnel_nic.c
->> @@ -55,6 +55,9 @@ struct udp_tunnel_nic {
->>   */
->>  static struct workqueue_struct *udp_tunnel_nic_workqueue;
->>
->> +/* To track netdev_hold and netdev_put */
->> +static netdevice_tracker udp_tunnel_nic_devtracker;
+Fri, Aug 04, 2023 at 09:58:16PM CEST, kuba@kernel.org wrote:
+>On Fri, 4 Aug 2023 19:29:31 +0200 Jiri Pirko wrote:
+>> I need to have one nested attribute but according to what cmd it is used
+>> with, there will be different nested policy.
+>> 
+>> If I'm looking at the codes correctly, that is not currenly supported,
+>> correct?
+>> 
+>> If not, why idea how to format this in yaml file?
 >
->This looks wrong.
->
->> +
->>  static const char *udp_tunnel_nic_tunnel_type_name(unsigned int type)
->>  {
->>         switch (type) {
->> @@ -825,7 +828,7 @@ static int udp_tunnel_nic_register(struct net_device *dev)
->>         }
->>
->>         utn->dev = dev;
->> -       dev_hold(dev);
->> +       netdev_hold(dev, &udp_tunnel_nic_devtracker, GFP_KERNEL);
->
->This is wrong. You need a separate netdevice_tracker per netdev_hold()
->
->For instance, this would need to be in "(struct udp_tunnel_nic)->dev_tracker"
+>I'm not sure if you'll like it but my first choice would be to skip
+>the selector attribute. Put the attributes directly into the message.
+>There is no functional purpose the wrapping serves, right?
 
-Oh, Sorry, I misunderstand the usage of netdev_hold and its netdevice_tracker.
+Well, the only reason is backward compatibility.
+Currently, there is no attr parsing during dump, which is ensured by
+GENL_DONT_VALIDATE_DUMP flag. That means if user passes any attr, it is
+ignored.
 
-But cound you please add this this useful information into netdev_hold()' comment,
+Now if we allow attrs to select, previously ignored attributes would be
+processed now. User that passed crap with old kernel can gen different
+results with new kernel.
 
-to prevent others from making the same mistakes with me.
+That is why I decided to add selector attr and put attrs inside, doing
+strict parsing, so if selector attr is not supported by kernel, user
+gets message back.
 
-Thanks!
-
+So what do you suggest? Do per-dump strict parsing policy of root
+attributes serving to do selection?
 
