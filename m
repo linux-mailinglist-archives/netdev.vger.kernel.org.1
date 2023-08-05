@@ -1,64 +1,118 @@
-Return-Path: <netdev+bounces-24687-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24688-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 460067711BD
-	for <lists+netdev@lfdr.de>; Sat,  5 Aug 2023 21:25:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BDFAC771207
+	for <lists+netdev@lfdr.de>; Sat,  5 Aug 2023 22:15:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 05A7A1C20A4D
-	for <lists+netdev@lfdr.de>; Sat,  5 Aug 2023 19:25:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D0BDC1C20A56
+	for <lists+netdev@lfdr.de>; Sat,  5 Aug 2023 20:15:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E0D1C8C8;
-	Sat,  5 Aug 2023 19:25:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C8A7C8DC;
+	Sat,  5 Aug 2023 20:15:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CEF02CA6
-	for <netdev@vger.kernel.org>; Sat,  5 Aug 2023 19:25:00 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1C3FC433C8;
-	Sat,  5 Aug 2023 19:24:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691263500;
-	bh=qoVovonkDlCZAGyHdpkcLhNyRI9P5U68HXbWXLRHeeM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=iq9AqL8t+LduND4co3bPZubsqBrA8Kkg4SFb8PFmOr1qN6jUW7tjAUfETfvySdhaX
-	 bAsyX9TRz7XeysHeq6AGx4fbH7Oqod9pYfgnrhOeBNoXhwWB/RJX/diSv1Wx5cDVJG
-	 sNBkpQx0jPieBMlbjpgSdXjkebLkRXSEoBMf6We5460yRi907NIp5PVFzLdAJ0MZMd
-	 5g2X6remQeEZklQa1pTIp6C4uQ5Dqdk994YVa1kBK1V+2oJzzoKI7KUYgvsHM5sKNv
-	 sKTxx4wuG8ak23vOgxl4TnY8xyXfbNHvS6TCeZ2Wpq+fAHwW7puNZHGJ1H38aZQQR5
-	 wOK4ERwfqOxNg==
-Date: Sat, 5 Aug 2023 21:24:53 +0200
-From: Simon Horman <horms@kernel.org>
-To: Yue Haibing <yuehaibing@huawei.com>
-Cc: pablo@netfilter.org, kadlec@netfilter.org, fw@strlen.de,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next] netfilter: conntrack: Remove unused function
- declarations
-Message-ID: <ZM6iBSr3/Sd8Uarl@vergenet.net>
-References: <20230804134149.39748-1-yuehaibing@huawei.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71A852CA6
+	for <netdev@vger.kernel.org>; Sat,  5 Aug 2023 20:15:31 +0000 (UTC)
+Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36ED81735;
+	Sat,  5 Aug 2023 13:15:26 -0700 (PDT)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id D199E40002;
+	Sat,  5 Aug 2023 20:15:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
+	t=1691266524;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=sB0DYsnKTLjhfxTTwRqjmaAwhvS5Yj9DfCBbL9YyVtQ=;
+	b=ihlfUg8Wv/z9rdF68pSORNQLzSef2eaYYFg2w+fLwW8qapqdRFc0qvnIAV8eE7+cuXfwYy
+	6tRwUkiz16SPA+PiE5yIsx1EvDhp0uVlQvWYO8SCxLf0nz+5DlkGXod9v0FAkpiRPY3D6N
+	5ZUtPQNfI/cF7IH5OFzEZQogO+wjuzgkU77B4XHB4vZhuIqTdtXhdUj0N23p9sGBzEPmSX
+	HxiaE8C2hvesqwDOAnyQOQ6Ob9pl9ksqezvRDQUEeGHjYh4uM1Zmcw+rZGnD5fQUHe2mfU
+	3t3gyPMtZvs/70Rwao1QNYYjg4bMeINSi+b1SazRNIChMqrbfaSOdpIDaSh68Q==
+Message-ID: <dcb981b9-b435-c0e5-8e47-d66add207fdc@arinc9.com>
+Date: Sat, 5 Aug 2023 23:15:15 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230804134149.39748-1-yuehaibing@huawei.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RESEND net-next 2/2] dt-bindings: net: dsa:
+ mediatek,mt7530: document MDIO-bus
+Content-Language: en-US
+To: Daniel Golle <daniel@makrotopia.org>, Andrew Lunn <andrew@lunn.ch>,
+ Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean
+ <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>, Matthias Brugger
+ <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Landen Chao <Landen.Chao@mediatek.com>, DENG Qingfang <dqfext@gmail.com>,
+ Sean Wang <sean.wang@mediatek.com>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
+References: <6eb1b7b8dbc3a4b14becad15f0707d4f624ee18b.1691246461.git.daniel@makrotopia.org>
+ <9aec0fe0cb676b76132c388bb3ead46f596a6e6e.1691246461.git.daniel@makrotopia.org>
+From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+In-Reply-To: <9aec0fe0cb676b76132c388bb3ead46f596a6e6e.1691246461.git.daniel@makrotopia.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: arinc.unal@arinc9.com
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Fri, Aug 04, 2023 at 09:41:49PM +0800, Yue Haibing wrote:
-> Commit 1015c3de23ee ("netfilter: conntrack: remove extension register api")
-> leave nf_conntrack_acct_fini() and nf_conntrack_labels_init() unused, remove it.
-> And commit a0ae2562c6c4 ("netfilter: conntrack: remove l3proto abstraction")
-> leave behind nf_ct_l3proto_try_module_get() and nf_ct_l3proto_module_put().
+I don't see a reason to resubmit this without addressing the requested 
+change.
+
+>> Wouldn't we just skip the whole issue by documenting the need for defining all PHYs
+>> used on the switch when defining the MDIO bus?
 > 
-> Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
+> Good idea, please do that.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+https://lore.kernel.org/netdev/0f501bb6-18a0-1713-b08c-6ad244c022ec@arinc9.com/
 
+Arınç
+
+On 5.08.2023 17:43, Daniel Golle wrote:
+> From: David Bauer <mail@david-bauer.net>
+> 
+> Document the ability to add nodes for the MDIO bus connecting the
+> switch-internal PHYs.
+> 
+> Signed-off-by: David Bauer <mail@david-bauer.net>
+> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+> ---
+>   .../devicetree/bindings/net/dsa/mediatek,mt7530.yaml        | 6 ++++++
+>   1 file changed, 6 insertions(+)
+> 
+> diff --git a/Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml b/Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml
+> index e532c6b795f4f..50f8f83cc440f 100644
+> --- a/Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml
+> +++ b/Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml
+> @@ -128,6 +128,12 @@ properties:
+>         See Documentation/devicetree/bindings/regulator/mt6323-regulator.txt for
+>         details for the regulator setup on these boards.
+>   
+> +  mdio:
+> +    $ref: /schemas/net/mdio.yaml#
+> +    unevaluatedProperties: false
+> +    description:
+> +      Node for the internal MDIO bus connected to the embedded ethernet-PHYs.
+> +
+>     mediatek,mcm:
+>       type: boolean
+>       description:
 
