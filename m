@@ -1,118 +1,129 @@
-Return-Path: <netdev+bounces-24622-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24623-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D898C770E0E
-	for <lists+netdev@lfdr.de>; Sat,  5 Aug 2023 08:16:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3D1C770E14
+	for <lists+netdev@lfdr.de>; Sat,  5 Aug 2023 08:27:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 936462826F4
-	for <lists+netdev@lfdr.de>; Sat,  5 Aug 2023 06:16:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 16B46282783
+	for <lists+netdev@lfdr.de>; Sat,  5 Aug 2023 06:27:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6C251FC5;
-	Sat,  5 Aug 2023 06:16:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 075141FC5;
+	Sat,  5 Aug 2023 06:27:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B1331FBE
-	for <netdev@vger.kernel.org>; Sat,  5 Aug 2023 06:16:07 +0000 (UTC)
-Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B76DC4ED0
-	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 23:16:05 -0700 (PDT)
-Received: by mail-lf1-x12c.google.com with SMTP id 2adb3069b0e04-4fe2d152f62so4721558e87.0
-        for <netdev@vger.kernel.org>; Fri, 04 Aug 2023 23:16:05 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECE3A17C6
+	for <netdev@vger.kernel.org>; Sat,  5 Aug 2023 06:27:06 +0000 (UTC)
+Received: from mail-pj1-x1044.google.com (mail-pj1-x1044.google.com [IPv6:2607:f8b0:4864:20::1044])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F9CC4ED6;
+	Fri,  4 Aug 2023 23:27:05 -0700 (PDT)
+Received: by mail-pj1-x1044.google.com with SMTP id 98e67ed59e1d1-26871992645so1841320a91.0;
+        Fri, 04 Aug 2023 23:27:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1691216164; x=1691820964;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20221208; t=1691216825; x=1691821625;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Dh6SRGbJORTbe+GAilPaW6UAhKkkXC3v6kD9gFIi0D8=;
-        b=O2ppzbiRiIufLekbkyXFJVNImwWXCXfDZZ7A/asBFIyTqOkzUuJN3RLT7Zk8GiGdib
-         0jtCxMgMUlBOxr2FRKBPdjhWgTZ12RiM6dNOWT8yy15OSL9ym6cru3jSC75Vuur/2Dbm
-         yIZCadSD9CPDDZTjhJdSRmfhH8Xbj+Uq4xAeq7lTSIxn1GO43JirwVVCK30c/MYiKNCZ
-         bYtoDsKi3GTmGyEWkVuEv3HHAeLRlhaKh4SmIifvgijYeOipCFsH+RM65r6NRSAagnD2
-         /1feQ2YOkhS0YSoOdAAozId94yKfnwSMkGcpegDja2edIEncjg2cW+l6lAUyKmEn2eYp
-         uaTg==
+        bh=925QF3HnEkWSXdDDliA9Rsgs4P8TSRLdziSE4x6a8Qs=;
+        b=YBwgSekYDVhSDkc0X0jh8gOjr+P3cdEi+8YIua5bJoTOTQBay++JIntuUWnoZLjPgV
+         NhTSC3FJFP2meyYSCWHy6IVX761SmIhRJ5pQe2tJKRmfMcz7aGxMyxseoPzsdBnSzJ7c
+         NdnhEEScgWWQ7IjK8dpVvYtOZZOeRxFrpH/gQK0x0Uqhrb6Z0bkd2uNZf09j2Jfw5bhO
+         dnn6DAyuAaR3h/32Ck/eonBQd5dfUj2xqsfqNpISTqduqG7GdAbqCU6i+tDARdV2WRWs
+         AiyPboOmz1ktxHzI8EDBMHAGVMWidZ4T+aQX+ny47GXaND/Gzv+OBqnbnTBMu/8U+9Z9
+         TgIA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691216164; x=1691820964;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20221208; t=1691216825; x=1691821625;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Dh6SRGbJORTbe+GAilPaW6UAhKkkXC3v6kD9gFIi0D8=;
-        b=cQvX2pp4mPWTqSJoviOHbwzbBV6cApMSb/Su/ENLD7BbPxlOiBkV9ituchAJSBcAAB
-         CeK4yIxnEdjuCpwN/9wb0oFFZNTi4a5MAG81YYgk2cuz9V/7wxQ+1t5gKg1AhQWqtrKS
-         z7WVVxcHsF5K+VJ3U3OWVtFiBI1MFVCJ8tt6Tgax9u/zsISdqIcbeJsk3zXxCiyvR+zp
-         7uQxctGkA4wP+ZJ2DoWbIOAndxDxxaj+cD6ap8+LfCOcl1nlWFnwtpWf90kMELNFVjyw
-         Yn89Xv1FtGjgH5RgQ68CkOZwW68j7wvpwd9NMhtDI2c1F7kIA9KGr2po439bdhXmODnf
-         vKpw==
-X-Gm-Message-State: AOJu0Yy9MtXirLfDcNBptyb2y/laHKvOO8t/2WBfNTrkSygAp9MKOpke
-	na8DzbiCrFXjQVxa7h+yDhEuvHLB4oaspZj1sWg=
-X-Google-Smtp-Source: AGHT+IEUBdCZnd/K1wZelx2W44FaqV4Fg0ZaSZR5Q9IiNBU6y8iF7wu6rjZT4H6nayPnFiY3lte7UyGdnssLv8qt3H4=
-X-Received: by 2002:a05:6512:12c8:b0:4f9:556b:93c2 with SMTP id
- p8-20020a05651212c800b004f9556b93c2mr3247385lfg.1.1691216163857; Fri, 04 Aug
- 2023 23:16:03 -0700 (PDT)
+        bh=925QF3HnEkWSXdDDliA9Rsgs4P8TSRLdziSE4x6a8Qs=;
+        b=VMPyMa9hL4BzB7F2/0YHB/m/+w7ngtCFJ+sfp+d1FBJ2NEFR8grnP4bOeb2lZTzGKh
+         IqcCtW26iYObyI5/rCl7Ij8RfuFsR8S2wwgfraf2F7THiyHshnBY7KAHy3crJGAxpy6f
+         KetV0EUaZlbL8v6TAHP2tk74+gNpdWwoVIilmjfkYdcU8mylDzRWF0ug3ZXqmu0Ctcqk
+         Agz2gb6yXXf4coX8etSAif0d3t/w5wJSWhzbRRK7fljwNkqvmnLxCS83Jij/YhynIoJN
+         e58R3oKbBvf/KuD0TZUjpy+3Wm5E23RwJEqmAM/z8L10EXfoQxKG7eCewaKS9wYX0K0O
+         j1YA==
+X-Gm-Message-State: AOJu0YxiWG4C9TtgXukEP6hdZlEd7WNlZbsIWukhXorQj84QJFvmRo2Z
+	YOu7xN2Zw4NJMeVMBb1RPUs=
+X-Google-Smtp-Source: AGHT+IF+0ObRVcsyK7SmE9Yc3Gh4YUUPn96IbcOM5005ryI7mXjhqYYpuJNV5ikejPOpyJu3JAkIRw==
+X-Received: by 2002:a17:90a:d242:b0:267:ffcf:e9e3 with SMTP id o2-20020a17090ad24200b00267ffcfe9e3mr3964107pjw.46.1691216824872;
+        Fri, 04 Aug 2023 23:27:04 -0700 (PDT)
+Received: from localhost.localdomain ([193.203.214.57])
+        by smtp.gmail.com with ESMTPSA id oj3-20020a17090b4d8300b0025bcdada95asm2375362pjb.38.2023.08.04.23.27.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 04 Aug 2023 23:27:04 -0700 (PDT)
+From: xu <xu.xin.sc@gmail.com>
+X-Google-Original-From: xu <xu.xin16@zte.com.cn>
+To: edumazet@google.com
+Cc: davem@davemloft.net,
+	dsahern@kernel.org,
+	kuba@kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	yang.yang29@zte.com.cn,
+	xu.xin16@zte.com.cn
+Subject: Re: [PATCH] udp_tunnel_nic: add net device refcount tracker
+Date: Sat,  5 Aug 2023 06:27:00 +0000
+Message-Id: <20230805062700.235515-1-xu.xin16@zte.com.cn>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <CANn89i+FTKRkgVodoQaCXH632rXx04AEe2_dJkqPiCEdtG0zQA@mail.gmail.com>
+References: <CANn89i+FTKRkgVodoQaCXH632rXx04AEe2_dJkqPiCEdtG0zQA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1691047285.git.chenfeiyang@loongson.cn> <021e4047c3b0f2c462e1aa891e25ae710705ed29.1691047285.git.chenfeiyang@loongson.cn>
- <ZM1hwjttrnM8jFXJ@shell.armlinux.org.uk>
-In-Reply-To: <ZM1hwjttrnM8jFXJ@shell.armlinux.org.uk>
-From: Feiyang Chen <chris.chenfeiyang@gmail.com>
-Date: Sat, 5 Aug 2023 14:15:51 +0800
-Message-ID: <CACWXhKnK+iJgmXacvOjBcxn_283n4_e-7jfnZEJD1HKaJxrPvw@mail.gmail.com>
-Subject: Re: [PATCH v3 14/16] net: stmmac: dwmac-loongson: Disable flow
- control for GMAC
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Feiyang Chen <chenfeiyang@loongson.cn>, andrew@lunn.ch, hkallweit1@gmail.com, 
-	peppe.cavallaro@st.com, alexandre.torgue@foss.st.com, joabreu@synopsys.com, 
-	chenhuacai@loongson.cn, dongbiao@loongson.cn, 
-	loongson-kernel@lists.loongnix.cn, netdev@vger.kernel.org, 
-	loongarch@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sat, Aug 5, 2023 at 4:38=E2=80=AFAM Russell King (Oracle)
-<linux@armlinux.org.uk> wrote:
+>> ---
+>>  net/ipv4/udp_tunnel_nic.c | 7 +++++--
+>>  1 file changed, 5 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/net/ipv4/udp_tunnel_nic.c b/net/ipv4/udp_tunnel_nic.c
+>> index 029219749785..ce8f5c82b0a1 100644
+>> --- a/net/ipv4/udp_tunnel_nic.c
+>> +++ b/net/ipv4/udp_tunnel_nic.c
+>> @@ -55,6 +55,9 @@ struct udp_tunnel_nic {
+>>   */
+>>  static struct workqueue_struct *udp_tunnel_nic_workqueue;
+>>
+>> +/* To track netdev_hold and netdev_put */
+>> +static netdevice_tracker udp_tunnel_nic_devtracker;
 >
-> On Thu, Aug 03, 2023 at 07:30:35PM +0800, Feiyang Chen wrote:
-> > +
-> > +             if (priv->plat->disable_flow_control) {
-> > +                     phy_support_sym_pause(dev->phydev);
-> > +                     phy_set_sym_pause(dev->phydev, false, false, true=
-);
-> > +             }
+>This looks wrong.
 >
-> Given that stmmac uses phylink, control over the PHY is given over to
-> phylink to manage on the driver's behalf. Therefore, the above is not
-> very useful.
+>> +
+>>  static const char *udp_tunnel_nic_tunnel_type_name(unsigned int type)
+>>  {
+>>         switch (type) {
+>> @@ -825,7 +828,7 @@ static int udp_tunnel_nic_register(struct net_device *dev)
+>>         }
+>>
+>>         utn->dev = dev;
+>> -       dev_hold(dev);
+>> +       netdev_hold(dev, &udp_tunnel_nic_devtracker, GFP_KERNEL);
 >
-> The correct way to deal with this is via
->         priv->phylink_config.mac_capabilities
+>This is wrong. You need a separate netdevice_tracker per netdev_hold()
 >
-> in stmmac_phy_setup().
+>For instance, this would need to be in "(struct udp_tunnel_nic)->dev_tracker"
 
-Hi, Russell,
+Oh, Sorry, I misunderstand the usage of netdev_hold and its netdevice_tracker.
 
-OK.
+But cound you please add this this useful information into netdev_hold()' comment,
 
-Thanks,
-Feiyang
+to prevent others from making the same mistakes with me.
 
->
-> Thanks.
->
-> --
-> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Thanks!
+
 
