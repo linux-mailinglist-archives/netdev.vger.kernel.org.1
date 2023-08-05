@@ -1,58 +1,48 @@
-Return-Path: <netdev+bounces-24629-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24630-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5DF43770E3F
-	for <lists+netdev@lfdr.de>; Sat,  5 Aug 2023 09:03:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 93368770E46
+	for <lists+netdev@lfdr.de>; Sat,  5 Aug 2023 09:07:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 11C23282596
-	for <lists+netdev@lfdr.de>; Sat,  5 Aug 2023 07:03:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 965261C20B15
+	for <lists+netdev@lfdr.de>; Sat,  5 Aug 2023 07:07:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB6593D82;
-	Sat,  5 Aug 2023 07:03:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D51213D82;
+	Sat,  5 Aug 2023 07:07:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF63120F9
-	for <netdev@vger.kernel.org>; Sat,  5 Aug 2023 07:03:42 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FF093C2D;
-	Sat,  5 Aug 2023 00:03:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=eNV9BJHzRKJBCMh2KS7xG2A2ieDViFw7iaV7Z866HoU=; b=SmYRgD9fHnbUw8sA4F3TkjVaWL
-	04c2G2g7fDHqKZMQOrI9MqCFbE9+B2szxgdbrL+Byz8ahJJ2kMhKXCnVyEH/rJIkNCJkCv2ZGF0C6
-	oM4WV7uA6DreaLPqmqk9YlFNFR3EJJbHEQAAuLONzG2q4PxcoBCkxYg9+n7lHfqiqraQ=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qSBK1-003AZW-93; Sat, 05 Aug 2023 09:03:33 +0200
-Date: Sat, 5 Aug 2023 09:03:33 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Nick Bowler <nbowler@draconx.ca>
-Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
-	Rob Herring <robh@kernel.org>,
-	Saravana Kannan <saravanak@google.com>,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	netdev@vger.kernel.org, regressions@lists.linux.dev
-Subject: Re: PROBLEM: Broken or delayed ethernet on Xilinx ZCU104 since 5.18
- (regression)
-Message-ID: <bc983c94-6276-4282-8b59-7e706932f903@lunn.ch>
-References: <CADyTPEzqf8oQAPSFRWJLxAhd-WE4fX2zdoe9Vu6V9hZMn1Yc8g@mail.gmail.com>
- <CAL_JsqLrErF__GGHfanRFCpfbOh6fvz4-aJv32h8OfDjUeZPSg@mail.gmail.com>
- <CADyTPEwgG0=R_b5DNBP0J0auDXu2BNTOwkSUFg-s7pLJUPC+Tg@mail.gmail.com>
- <CADyTPExgjcaUeKiR108geQhr0KwFC0A8qa_n_ST2RxhbSczomQ@mail.gmail.com>
- <CAL_Jsq+N2W0hVN7fUC1rxGL-Hw9B8eQvLgSwyQ3n41kqwDbxyg@mail.gmail.com>
- <CADyTPEyT4NJPrChtvtY=_GePZNeSDRAr9j3KRAk1hkjD=5+i8A@mail.gmail.com>
- <CAL_JsqKGAFtwB+TWc1yKAe_0M4BziEpFnApuWuR3h+Go_=djFg@mail.gmail.com>
- <CADyTPEwY4ydUKGtGNayf+iQSqRVBQncLiv0TpO9QivBVrmOc4g@mail.gmail.com>
- <ZM17VKzDBdm4uMNY@shell.armlinux.org.uk>
- <CADyTPEyqG7D-_iuo+5WFGhhidK7p_fmvDhbgz05xogSU042Uag@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8289620F9
+	for <netdev@vger.kernel.org>; Sat,  5 Aug 2023 07:07:35 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21463C433C7;
+	Sat,  5 Aug 2023 07:07:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1691219254;
+	bh=l/hkjP/u+NI/cILXTP4zyOL3JgMXsdwmGgFmfGGWzNU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=h8Vto4rzERi1ASF1y/RMcGP14YgUfPTN4iFuHpvpRLQtrnsospzAZf9XoYWznQGqI
+	 f1el3XQOcJ5/8dLOYzMdmx9rAYgchZW/Um1kUI4CYvTcrQ4hXbER4uC9csq19aC3G9
+	 +8E5x/HSEOSRAG3PkAoFGirCrOZN8maR61XOUEMsUqnTXia621/Cx6lCopX2wGZNMy
+	 4DEK0vFddVCgzavu/AF1kIxF2wDHH4G4iNeFKTNM8YaGGi172pRo5mtK7F7r1EONZQ
+	 VH16+U48jiSeE1sCzhoj8HIwCYTS6rTxYrUQCDjV3B4KKyDJy/NR8VyP7zXlACCI54
+	 RBxCYA0CcIgnA==
+Date: Sat, 5 Aug 2023 09:07:30 +0200
+From: Simon Horman <horms@kernel.org>
+To: Florian Westphal <fw@strlen.de>
+Cc: netdev@vger.kernel.org, sbrivio@redhat.com,
+	"David S. Miller" <davem@davemloft.net>, dsahern@kernel.org,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	shuah@kernel.org
+Subject: Re: [PATCH net 1/2] tunnels: fix kasan splat when generating ipv4
+ pmtu error
+Message-ID: <ZM31Mnl3yhYLMouc@vergenet.net>
+References: <20230803152653.29535-1-fw@strlen.de>
+ <20230803152653.29535-2-fw@strlen.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,35 +51,54 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CADyTPEyqG7D-_iuo+5WFGhhidK7p_fmvDhbgz05xogSU042Uag@mail.gmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+In-Reply-To: <20230803152653.29535-2-fw@strlen.de>
 
-> The result is the same for all six calls.  The macb_mdiobus_register
-> function returns -EPROBE_DEFER, which comes from the topmost call
-> to of_mdiobus_register within that function.  That is, this is the
-> part that returns -EPROBE_DEFER:
+On Thu, Aug 03, 2023 at 05:26:49PM +0200, Florian Westphal wrote:
+> If we try to emit an icmp error in response to a nonliner skb, we get
 > 
-> 	child = of_get_child_by_name(np, "mdio");
-> 	if (child) {
-> 		int ret = of_mdiobus_register(bp->mii_bus, child);
+> BUG: KASAN: slab-out-of-bounds in ip_compute_csum+0x134/0x220
+> Read of size 4 at addr ffff88811c50db00 by task iperf3/1691
+> CPU: 2 PID: 1691 Comm: iperf3 Not tainted 6.5.0-rc3+ #309
+> [..]
+>  kasan_report+0x105/0x140
+>  ip_compute_csum+0x134/0x220
+>  iptunnel_pmtud_build_icmp+0x554/0x1020
+>  skb_tunnel_check_pmtu+0x513/0xb80
+>  vxlan_xmit_one+0x139e/0x2ef0
+>  vxlan_xmit+0x1867/0x2760
+>  dev_hard_start_xmit+0x1ee/0x4f0
+>  br_dev_queue_push_xmit+0x4d1/0x660
+>  [..]
 > 
-> 		of_node_put(child);
-> 		return ret;
-> 	}
+> ip_compute_csum() cannot deal with nonlinear skbs, so avoid it.
+> After this change, splat is gone and iperf3 is no longer stuck.
 
-So you need to keep going down and seeing where is EPROBE_DEFER is
-coming from.
+Hi Florian,
 
-You are missing some resource somewhere, probably because you are
-missing a driver. Sometimes it is worth running a distro kernel which
-has nearly everything enabled as modules, so you can find out what you
-actually need. Then use 'make localmodconfig' to reduce the
-configuration down to just what you need.
+I wonder if there are other cases lurking elsewhere.
+Did you happen to take a look at that?
 
-	Andrew
+> Fixes: 4cb47a8644cc ("tunnels: PMTU discovery support for directly bridged IP packets")
+> Signed-off-by: Florian Westphal <fw@strlen.de>
+> ---
+>  net/ipv4/ip_tunnel_core.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/net/ipv4/ip_tunnel_core.c b/net/ipv4/ip_tunnel_core.c
+> index 92c02c886fe7..586b1b3e35b8 100644
+> --- a/net/ipv4/ip_tunnel_core.c
+> +++ b/net/ipv4/ip_tunnel_core.c
+> @@ -224,7 +224,7 @@ static int iptunnel_pmtud_build_icmp(struct sk_buff *skb, int mtu)
+>  		.un.frag.__unused	= 0,
+>  		.un.frag.mtu		= htons(mtu),
+>  	};
+> -	icmph->checksum = ip_compute_csum(icmph, len);
+> +	icmph->checksum = csum_fold(skb_checksum(skb, 0, len, 0));
+>  	skb_reset_transport_header(skb);
+>  
+>  	niph = skb_push(skb, sizeof(*niph));
+> -- 
+> 2.41.0
+> 
+> 
 
