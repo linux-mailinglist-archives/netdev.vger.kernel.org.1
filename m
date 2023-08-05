@@ -1,108 +1,151 @@
-Return-Path: <netdev+bounces-24625-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24626-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5BEA770E2D
-	for <lists+netdev@lfdr.de>; Sat,  5 Aug 2023 08:46:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD765770E30
+	for <lists+netdev@lfdr.de>; Sat,  5 Aug 2023 08:46:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 917A5282571
-	for <lists+netdev@lfdr.de>; Sat,  5 Aug 2023 06:46:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DBA961C20CD2
+	for <lists+netdev@lfdr.de>; Sat,  5 Aug 2023 06:46:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 815FC1FA5;
-	Sat,  5 Aug 2023 06:46:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 450E81FA5;
+	Sat,  5 Aug 2023 06:46:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75EE5180
-	for <netdev@vger.kernel.org>; Sat,  5 Aug 2023 06:46:02 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 538F3E72;
-	Fri,  4 Aug 2023 23:45:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=MzuIUE4dAyNI/9puD5m3erQkj7sXAAK5ZQfiS6oDIQg=; b=gl2caWxRTz/6U4PiMCjjKpXfyA
-	asb3CKqwHiqMAZFcUF7H+1AkB/UglMSdMob/zzh44cD762TRYkuaPBwgMUC0m+M43H+OVZ1qz7bQP
-	jrwCl7AFqMfGbzsE01/SMEjqOJpxuDhr3RSzjcs9r2zX4hPYm0xrRGH3RlOf2alSdPKo=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qSB2i-003AWH-HG; Sat, 05 Aug 2023 08:45:40 +0200
-Date: Sat, 5 Aug 2023 08:45:40 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Hawkins, Nick" <nick.hawkins@hpe.com>
-Cc: "christophe.jaillet@wanadoo.fr" <christophe.jaillet@wanadoo.fr>,
-	"simon.horman@corigine.com" <simon.horman@corigine.com>,
-	"Verdun, Jean-Marie" <verdun@hpe.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"robh+dt@kernel.org" <robh+dt@kernel.org>,
-	"krzysztof.kozlowski+dt@linaro.org" <krzysztof.kozlowski+dt@linaro.org>,
-	"conor+dt@kernel.org" <conor+dt@kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2 4/5] net: hpe: Add GXP UMAC Driver
-Message-ID: <61c541c9-be30-4a43-aa85-53816d5848f9@lunn.ch>
-References: <20230802201824.3683-1-nick.hawkins@hpe.com>
- <20230802201824.3683-5-nick.hawkins@hpe.com>
- <fb656c31-ecc3-408a-a719-cba65a6aa984@lunn.ch>
- <933D6861-A193-4145-9533-A7EE8E6DD32F@hpe.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3938B3FF4
+	for <netdev@vger.kernel.org>; Sat,  5 Aug 2023 06:46:10 +0000 (UTC)
+Received: from mail-pg1-x543.google.com (mail-pg1-x543.google.com [IPv6:2607:f8b0:4864:20::543])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2B9F4EDD;
+	Fri,  4 Aug 2023 23:46:09 -0700 (PDT)
+Received: by mail-pg1-x543.google.com with SMTP id 41be03b00d2f7-5645bbc82aaso1965352a12.2;
+        Fri, 04 Aug 2023 23:46:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1691217969; x=1691822769;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Ajr4QLjd6Rc1PuAnxwRP/L4oJ5MAFVSkzlw/8yRBgC8=;
+        b=h8NU5D89GbEww2egnB9jM+tYETO5t4H7CEIrEYSTNwcxa0UKVRtWaj0FSbVMQEtxsp
+         k4IutRNvozDQ94f3zarpzOsvwXOqAVmJ6i9RpWHez/EKtSeznqsoF+o2YcmCG1v56vwN
+         0ud+UZRSCQY2O+Xt0p4kOvSXzxWyR60pZertUfflvjvP+ojSBOiG/5+VzEyKME/7vBgD
+         qUMpvw+ZNtKJxVZUYG0BGRZ8cSuebKnIb5tthkPabpIh7MMK30vgB1F0xMe0LkmqT3M+
+         /Ej1xhBnGOQf7Yxc1LXVuEa8kFqI4Iqw/+/8NaGWOMPebBGepBHIsYRCZ2xmH5AUfMJb
+         /bpA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691217969; x=1691822769;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Ajr4QLjd6Rc1PuAnxwRP/L4oJ5MAFVSkzlw/8yRBgC8=;
+        b=EYK0naLYXlv6tTl6qVxHqRxQTgyPtWW93myOj9CTZh3zKs3n3mwEfJP1Y7ZqiEScs9
+         eia9Lh9U+jsMB+OM6CX7lQPtiWipY+mYQzW05w6wH8Rw9LaMgMRYZL6uwKpVsV8faDn9
+         Z5f25w0U3nWbyPelieD0IgumRcsrdhHNLLNYQZtmVVTFRFhpu2PhXDuqzVnN/J5tNuKW
+         w59/IShU/VfzWx4tZsR0Ir+nEYxKmOtuR1npaqyU82dfiQK1DGjw1qRRuV3wzpEXJuEJ
+         fw/yKDZAYnbO2m5fjx2zUM/zI1N/GBfTQF9iK0dN1NE77YuXc/pJPT//t4SmxbhZhX2G
+         JKNQ==
+X-Gm-Message-State: AOJu0YxkHfSTcG7K+Ux1GxSGDsiZFQskz3RQnCB8LWxc23xq44RRlBFo
+	4cJocwy5BjG5QoMMSW2v0xE=
+X-Google-Smtp-Source: AGHT+IHyL8TMjLqkckuhsndfFZq1zCmMzhQmtrjuWyBaJmr3Jq4aQa4KmblEsZjRJ9pKSTjTrl6MJQ==
+X-Received: by 2002:a17:90a:d0f:b0:268:42a2:35db with SMTP id t15-20020a17090a0d0f00b0026842a235dbmr3257478pja.48.1691217969277;
+        Fri, 04 Aug 2023 23:46:09 -0700 (PDT)
+Received: from localhost.localdomain ([193.203.214.57])
+        by smtp.gmail.com with ESMTPSA id 30-20020a17090a005e00b0025023726fc4sm5520425pjb.26.2023.08.04.23.46.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 04 Aug 2023 23:46:08 -0700 (PDT)
+From: xu <xu.xin.sc@gmail.com>
+X-Google-Original-From: xu <xu.xin16@zte.com.cn>
+To: edumazet@google.com
+Cc: davem@davemloft.net,
+	dsahern@kernel.org,
+	kuba@kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	yang.yang29@zte.com.cn
+Subject: [PATCH] net: add net device refcount tracker to pneigh_queue
+Date: Sat,  5 Aug 2023 06:46:06 +0000
+Message-Id: <20230805064606.237648-1-xu.xin16@zte.com.cn>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <CANn89iK61nt5o7KBZyjqVP6Q1EREvzg-x_bos8hSGSmwfwZRBw@mail.gmail.com>
+References: <CANn89iK61nt5o7KBZyjqVP6Q1EREvzg-x_bos8hSGSmwfwZRBw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <933D6861-A193-4145-9533-A7EE8E6DD32F@hpe.com>
+Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Aug 04, 2023 at 08:55:58PM +0000, Hawkins, Nick wrote:
-> Greetings Andrew,
-> 
-> For some reason I do not see your replies for v1 of this patch or
-> the mdio driver on lore.kernel. Apologies as I did not intend to
-> not address your previous review comments. My mistake.
-> 
-> >> +static int umac_int_phy_init(struct umac_priv *umac)
-> >> +{
-> >> + struct phy_device *phy_dev = umac->int_phy_dev;
-> >> + unsigned int value;
-> >> +
-> >> + value = phy_read(phy_dev, 0);
-> >> + if (value & 0x4000)
-> >> + pr_info("Internal PHY loopback is enabled - clearing\n");
-> 
-> > How is the PHY getting into loopback mode? The MAC driver should never
-> > touch the PHY, because you have no idea what the PHY actually is,
-> > unless it is internal. 
-> 
-> It would only be in loopback mode if it was previously configured
-> that way. I will remove it. The PHY is internal to the ASIC 
-> and is always the same. Given that information is it acceptable
+>> Add a static net device refcount tracker to neighbour.c to track
+>> dev's refcnt when pneigh enqueuing and dequeuing.
+>>
+>> Signed-off-by: xu xin <xu.xin16@zte.com.cn>
+>> Reviewed-by: Yang Yang <yang.yang.29@zte.com.cn>
+>> Cc: Kuang Mingfu <kuang.mingfu@zte.com.cn>
+>> ---
+>
+>
+>Can you explain how this patch was tested ?
+>
+>Thanks.
 
-Hi Nick
+Sorry, I misunderstand the usage of netdev_hold and its netdevice_tracker.
 
-So what you call a PHY is probably a PCS. Please look at the API used
-in driver/net/pcs/. The real PHYs are external.
+I thought this tracker was simple enough, so I just added an additional netdev_hold
+in the same postion and test if there is a warning "unregister_netdevice: waiting for ...".
 
-Given that this is a BMC, you probably have lots of i2c busses. So you
-can support an SFP on the SERDES. So it would be better if you used
-the phylink interface, not phylib. This should also solve your
-interface mode switching.
+But as you said, we need a separate netdevice_tracker per netdev_hold(), and specially `per dev`?
 
-    Andrew
+Actually, I'm still a little confused.
+
+For example, here, can I move this netdevice_tracker into struct sk_buff ?
+
+>diff --git a/net/core/neighbour.c b/net/core/neighbour.c
+>index ddd0f32de20e..56e87130fa95 100644
+>--- a/net/core/neighbour.c
+>+++ b/net/core/neighbour.c
+>@@ -61,6 +61,7 @@ static int pneigh_ifdown_and_unlock(struct neigh_table *tbl,
+> static const struct seq_operations neigh_stat_seq_ops;
+> #endif
+>
+>+static netdevice_tracker pneigh_queue_dev_tracker;
+> /*
+>    Neighbour hash table buckets are protected with rwlock tbl->lock.
+>
+>@@ -364,7 +365,7 @@ static void pneigh_queue_purge(struct sk_buff_head *list, struct net *net,
+> 	spin_unlock_irqrestore(&list->lock, flags);
+>
+> 	while ((skb = __skb_dequeue(&tmp))) {
+>-		dev_put(skb->dev);
+>+		netdev_put(skb->dev, &pneigh_queue_dev_tracker);
+> 		kfree_skb(skb);
+> 	}
+> }
+>@@ -1633,7 +1634,7 @@ static void neigh_proxy_process(struct timer_list *t)
+> 				kfree_skb(skb);
+> 			}
+>
+>-			dev_put(dev);
+>+			netdev_put(skb->dev, &pneigh_queue_dev_tracker);
+> 		} else if (!sched_next || tdif < sched_next)
+> 			sched_next = tdif;
+> 	}
+>@@ -1673,7 +1674,7 @@ void pneigh_enqueue(struct neigh_table *tbl, struct neigh_parms *p,
+> 			sched_next = tbl->proxy_timer.expires;
+> 	}
+> 	skb_dst_drop(skb);
+>-	dev_hold(skb->dev);
+>+	netdev_hold(skb->dev, &pneigh_queue_dev_tracker, GFP_KERNEL);
+> 	__skb_queue_tail(&tbl->proxy_queue, skb);
+> 	p->qlen++;
+> 	mod_timer(&tbl->proxy_timer, sched_next);
 
