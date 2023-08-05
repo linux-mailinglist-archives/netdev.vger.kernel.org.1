@@ -1,118 +1,113 @@
-Return-Path: <netdev+bounces-24688-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24689-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDFAC771207
-	for <lists+netdev@lfdr.de>; Sat,  5 Aug 2023 22:15:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95B0A771214
+	for <lists+netdev@lfdr.de>; Sat,  5 Aug 2023 22:25:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D0BDC1C20A56
-	for <lists+netdev@lfdr.de>; Sat,  5 Aug 2023 20:15:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 34933281D26
+	for <lists+netdev@lfdr.de>; Sat,  5 Aug 2023 20:25:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C8A7C8DC;
-	Sat,  5 Aug 2023 20:15:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54807C8DE;
+	Sat,  5 Aug 2023 20:24:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71A852CA6
-	for <netdev@vger.kernel.org>; Sat,  5 Aug 2023 20:15:31 +0000 (UTC)
-Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36ED81735;
-	Sat,  5 Aug 2023 13:15:26 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id D199E40002;
-	Sat,  5 Aug 2023 20:15:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
-	t=1691266524;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=sB0DYsnKTLjhfxTTwRqjmaAwhvS5Yj9DfCBbL9YyVtQ=;
-	b=ihlfUg8Wv/z9rdF68pSORNQLzSef2eaYYFg2w+fLwW8qapqdRFc0qvnIAV8eE7+cuXfwYy
-	6tRwUkiz16SPA+PiE5yIsx1EvDhp0uVlQvWYO8SCxLf0nz+5DlkGXod9v0FAkpiRPY3D6N
-	5ZUtPQNfI/cF7IH5OFzEZQogO+wjuzgkU77B4XHB4vZhuIqTdtXhdUj0N23p9sGBzEPmSX
-	HxiaE8C2hvesqwDOAnyQOQ6Ob9pl9ksqezvRDQUEeGHjYh4uM1Zmcw+rZGnD5fQUHe2mfU
-	3t3gyPMtZvs/70Rwao1QNYYjg4bMeINSi+b1SazRNIChMqrbfaSOdpIDaSh68Q==
-Message-ID: <dcb981b9-b435-c0e5-8e47-d66add207fdc@arinc9.com>
-Date: Sat, 5 Aug 2023 23:15:15 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 435261FA0;
+	Sat,  5 Aug 2023 20:24:58 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA7B513E;
+	Sat,  5 Aug 2023 13:24:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=dNu2egnhMUuwuP0JymsvaeCUIB7L8YRoiDijl0XGqF4=; b=1bIGNScm0IlJWgpkYH1OZiiSSD
+	uHkr6jYSWQ5cc3wxwc1OdW+tKzWVw1aYJr/qO0+4yBJ+eG/TKtZMchreUC63QrMnYOqh5wjNate88
+	Iqffy5k7Xm5gMKqojm+G4Z4okBjK1iIjdgyGu0bPyz3bSZ0IgPK4CR3fmqraKDsaPO3I=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qSNp9-003DAy-Il; Sat, 05 Aug 2023 22:24:31 +0200
+Date: Sat, 5 Aug 2023 22:24:31 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Matthew Cover <werekraken@gmail.com>
+Cc: Michael Chan <michael.chan@broadcom.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Matthew Cover <matthew.cover@stackpath.com>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: Re: [PATCH net-next] Add bnxt_netlink to facilitate representor pair
+ configurations.
+Message-ID: <3987add6-4928-4cd9-9fe6-a232f202ecc6@lunn.ch>
+References: <20230804212954.98868-1-matthew.cover@stackpath.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RESEND net-next 2/2] dt-bindings: net: dsa:
- mediatek,mt7530: document MDIO-bus
-Content-Language: en-US
-To: Daniel Golle <daniel@makrotopia.org>, Andrew Lunn <andrew@lunn.ch>,
- Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean
- <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>, Matthias Brugger
- <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Landen Chao <Landen.Chao@mediatek.com>, DENG Qingfang <dqfext@gmail.com>,
- Sean Wang <sean.wang@mediatek.com>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
-References: <6eb1b7b8dbc3a4b14becad15f0707d4f624ee18b.1691246461.git.daniel@makrotopia.org>
- <9aec0fe0cb676b76132c388bb3ead46f596a6e6e.1691246461.git.daniel@makrotopia.org>
-From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-In-Reply-To: <9aec0fe0cb676b76132c388bb3ead46f596a6e6e.1691246461.git.daniel@makrotopia.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: arinc.unal@arinc9.com
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230804212954.98868-1-matthew.cover@stackpath.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-I don't see a reason to resubmit this without addressing the requested 
-change.
+On Fri, Aug 04, 2023 at 02:29:54PM -0700, Matthew Cover wrote:
+> To leverage the SmartNIC capabilities available in Broadcom
+> NetXtreme-C/E ethernet devices, representor pairs must be configured
+> via bnxt-ctl
 
->> Wouldn't we just skip the whole issue by documenting the need for defining all PHYs
->> used on the switch when defining the MDIO bus?
-> 
-> Good idea, please do that.
+Could you give a link to the bnxt-ctl sources. Also give a brief
+description of what they do. 
 
-https://lore.kernel.org/netdev/0f501bb6-18a0-1713-b08c-6ad244c022ec@arinc9.com/
+> @@ -0,0 +1,231 @@
+> +/* Broadcom NetXtreme-C/E network driver.
+> + *
+> + * Copyright (c) 2014-2016 Broadcom Corporation
+> + * Copyright (c) 2016-2017 Broadcom Limited
+> + *
+> + * This program is free software; you can redistribute it and/or modify
+> + * it under the terms of the GNU General Public License as published by
+> + * the Free Software Foundation.
 
-Arınç
+Please remove the license boilerplate and use a SPDX-License-Identifier.
 
-On 5.08.2023 17:43, Daniel Golle wrote:
-> From: David Bauer <mail@david-bauer.net>
-> 
-> Document the ability to add nodes for the MDIO bus connecting the
-> switch-internal PHYs.
-> 
-> Signed-off-by: David Bauer <mail@david-bauer.net>
-> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
-> ---
->   .../devicetree/bindings/net/dsa/mediatek,mt7530.yaml        | 6 ++++++
->   1 file changed, 6 insertions(+)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml b/Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml
-> index e532c6b795f4f..50f8f83cc440f 100644
-> --- a/Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml
-> +++ b/Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml
-> @@ -128,6 +128,12 @@ properties:
->         See Documentation/devicetree/bindings/regulator/mt6323-regulator.txt for
->         details for the regulator setup on these boards.
->   
-> +  mdio:
-> +    $ref: /schemas/net/mdio.yaml#
-> +    unevaluatedProperties: false
-> +    description:
-> +      Node for the internal MDIO bus connected to the embedded ethernet-PHYs.
+> + */
+> +#include <linux/netdevice.h>
+> +#include <linux/pci.h>
+> +#include "bnxt_hsi.h"
+> +#include "bnxt_netlink.h"
+> +#include "bnxt.h"
+> +#include "bnxt_hwrm.h"
 > +
->     mediatek,mcm:
->       type: boolean
->       description:
+> +/* attribute policy */
+> +static struct nla_policy bnxt_netlink_policy[BNXT_NUM_ATTRS] = {
+> +	[BNXT_ATTR_PID] = { .type = NLA_U32 },
+> +	[BNXT_ATTR_IF_INDEX] = { .type = NLA_U32 },
+> +	[BNXT_ATTR_REQUEST] = { .type = NLA_BINARY },
+> +	[BNXT_ATTR_RESPONSE] = { .type = NLA_BINARY },
+
+Passing binary blobs from user space to firmware will not be
+accepted. You need well defined and documented individual commands.
+
+
+    Andrew
+
+---
+pw-bot: cr
 
