@@ -1,48 +1,54 @@
-Return-Path: <netdev+bounces-24641-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24642-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0C4F770EA6
-	for <lists+netdev@lfdr.de>; Sat,  5 Aug 2023 10:04:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 04263770EAD
+	for <lists+netdev@lfdr.de>; Sat,  5 Aug 2023 10:10:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E57211C20AEB
-	for <lists+netdev@lfdr.de>; Sat,  5 Aug 2023 08:04:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3559C1C20AC2
+	for <lists+netdev@lfdr.de>; Sat,  5 Aug 2023 08:10:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78F1C79D8;
-	Sat,  5 Aug 2023 08:03:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD57179E6;
+	Sat,  5 Aug 2023 08:10:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 246611FDD
-	for <netdev@vger.kernel.org>; Sat,  5 Aug 2023 08:03:58 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8361EC433C8;
-	Sat,  5 Aug 2023 08:03:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C034C1FDD
+	for <netdev@vger.kernel.org>; Sat,  5 Aug 2023 08:10:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD433C433C8;
+	Sat,  5 Aug 2023 08:10:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691222638;
-	bh=ysdwb2f9JBYVRhXs8E7OHn6011Cc8W/DnSqtWah111w=;
+	s=k20201202; t=1691223012;
+	bh=b3lFk+3qxJar1a/a6y8htzcysOKtSt7NnVMDTyzWGAA=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=InQWLTmImug2DrZP2/oD68GklkjvTF0cKUnTgVhR3IixzMrN+y0dbw34eA33DzfoZ
-	 LUHDqNHOCYlJnAB5O8c2BN3CM0RPkX8olq8xpJvou3FTmLtkWi3L0Y5jHTPzHmSsXw
-	 0w3dW9XfdYNtbvgczGlnHQ4OPxFVVtbqE46Uf1vodWnCNdOSMiZvUDJjkFpu7hSKZE
-	 vvmLTlQwGygX3sDOKIBBPEhBGAUlA8EmwJNZPqdgJPiu1t1wd0FfzE7Kq2If4gcnfL
-	 TowUArw6YrwjCcVXSqINm6R5+49v4pbfcQY8pbiim11rbbFhe3kWS/jaKjKp/lt79m
-	 RyGoEbv0IsXQA==
-Date: Sat, 5 Aug 2023 10:03:54 +0200
+	b=kGPdHloRUkJXgp/bDsVFAZiLZCIxsalDyraQ+xKiUbIVnjSjg7VenFnhwopnFnKwt
+	 g6sam34Nqwoz3Yqg0R16TgRpYackurW5z+mXq/JcLItBmci6DNy8f+kwcyqQp6QOf/
+	 EZ7byJ93eXrWRCZ06W0NgHW2Cg+qsQ0yZKyXpjOzcwbC6b2MEJPHWjrZzkQWs0Iaet
+	 WRjSun0SQwgek63toZbThEPN4hdnIVRTbe7DMwZ8VsicyhU/p48PXwr1u4UAIEMH+P
+	 mSERX7+SQEm6Ah2Wp/5Adi+MGSrG39XbNB3h+NmXH1YN1R3LWpyX2bKKERr4yLZicv
+	 BkTYVOZALGjvw==
+Date: Sat, 5 Aug 2023 10:10:07 +0200
 From: Simon Horman <horms@kernel.org>
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Cc: Simon Horman <horms@kernel.org>, intel-wired-lan@lists.osuosl.org,
-	Tony Nguyen <anthony.l.nguyen@intel.com>, netdev@vger.kernel.org,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>
-Subject: Re: [PATCH iwl-next v2] ice: split ice_aq_wait_for_event() func into
- two
-Message-ID: <ZM4CajvI1uNYRNf0@vergenet.net>
-References: <20230803151347.23322-1-przemyslaw.kitszel@intel.com>
- <ZM0MlhZduLVa6YZV@kernel.org>
- <385c8607-bc52-af0b-829a-5b058f4a152d@intel.com>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Claudiu Manoil <claudiu.manoil@nxp.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	UNGLinuxDriver@microchip.com,
+	Colin Foster <colin.foster@in-advantage.com>
+Subject: Re: [PATCH net] net: dsa: ocelot: call dsa_tag_8021q_unregister()
+ under rtnl_lock() on driver remove
+Message-ID: <ZM4D3/ZKI80MLSDU@vergenet.net>
+References: <20230803134253.2711124-1-vladimir.oltean@nxp.com>
+ <ZMwAImhL8nH+6KLf@kernel.org>
+ <20230804111045.rk3yvo5xb4wxyvoa@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -51,83 +57,49 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <385c8607-bc52-af0b-829a-5b058f4a152d@intel.com>
+In-Reply-To: <20230804111045.rk3yvo5xb4wxyvoa@skbuf>
 
-On Fri, Aug 04, 2023 at 04:54:48PM +0200, Przemek Kitszel wrote:
-> On 8/4/23 16:35, Simon Horman wrote:
-> > On Thu, Aug 03, 2023 at 11:13:47AM -0400, Przemek Kitszel wrote:
-> > > Mitigate race between registering on wait list and receiving
-> > > AQ Response from FW.
-> > > 
-> > > ice_aq_prep_for_event() should be called before sending AQ command,
-> > > ice_aq_wait_for_event() should be called after sending AQ command,
-> > > to wait for AQ Response.
-> > > 
-> > > struct ice_aq_task is exposed to callers, what takes burden of memory
-> > > ownership out from AQ-wait family of functions.
-> > > 
-> > > Embed struct ice_rq_event_info event into struct ice_aq_task
-> > > (instead of it being a ptr), to remove some more code from the callers.
-> 
-> see [1] below
-> 
-> > > 
-> > > Additional fix: one of the checks in ice_aq_check_events() was off by one.
+On Fri, Aug 04, 2023 at 02:10:45PM +0300, Vladimir Oltean wrote:
+> On Thu, Aug 03, 2023 at 09:29:38PM +0200, Simon Horman wrote:
+> > On Thu, Aug 03, 2023 at 04:42:53PM +0300, Vladimir Oltean wrote:
+> > > diff --git a/drivers/net/dsa/ocelot/felix.c b/drivers/net/dsa/ocelot/felix.c
+> > > index fd7eb4a52918..9a3e5ec16972 100644
+> > > --- a/drivers/net/dsa/ocelot/felix.c
+> > > +++ b/drivers/net/dsa/ocelot/felix.c
+> > > @@ -1619,8 +1619,10 @@ static void felix_teardown(struct dsa_switch *ds)
+> > >  	struct felix *felix = ocelot_to_felix(ocelot);
+> > >  	struct dsa_port *dp;
+> > >  
+> > > +	rtnl_lock();
+> > >  	if (felix->tag_proto_ops)
+> > >  		felix->tag_proto_ops->teardown(ds);
+> > > +	rtnl_unlock();
 > > 
-> > Hi Przemek,
+> > Hi Vladimir,
 > > 
-> > This patch seems to be doing three things:
-> > 
-> > 1. Refactoring code, in order to allow
-> > 2. Addressing a race condition
+> > I am curious to know if RTNL could be taken in
+> > felix_tag_8021q_teardown() instead.
 > 
-> those two are hard to split, perhaps some shuffling of code prior to actual
-> 2., eg [1] above.
-
-Sure, that is a reasonable point.
-
-> > 3. Correcting an off-by-one error
+> Negative. This call path also exists:
 > 
-> That's literally one line-fix, which would be overwritten/touched by next
-> patch then.
-
-True. But it also a bit hard to find in the current setup.
-Anyway, I don't feel particularly strongly about this,
-it was more a point for consideration.
-
-> > All good stuff. But all complex, and 1 somewhat buries 2 and 3.
-> > I'm wondering if the patch could be broken up into smaller patches
-> > to aid both review new and inspection later.
+> dsa_tree_change_tag_proto()
+> -> rtnl_trylock()
+> -> dsa_tree_notify(dst, DSA_NOTIFIER_TAG_PROTO, &info)
+>    -> dsa_switch_change_tag_proto()
+>       -> ds->ops->change_tag_protocol()
+>          -> felix_change_tag_protocol()
+>             -> old_proto_ops->teardown()
+>                -> felix_tag_8021q_teardown()
 > 
-> Overall, I've started with more patches locally when developing that, and
-> with "avoid trashing" principle concluded to squash.
-> Still, I agree that next attempt at splitting would be beneficial, will post
-> v3.
-> 
-> > 
-> > The above notwithstanding, the code does seems fine to me.
-> > 
-> > > Please note, that this was found by reading the code,
-> > > an actual race has not yet materialized.
-> > 
-> > Sure. But I do wonder if a fixes tag might be appropriate anyway.
-> 
-> For this off-by-one, (3. on your list) sure.
-> 
-> For the race (2.), I think it's not so good - ice_aq_wait_for_event() was
-> introduced to handle FW update that is counted in seconds, so the race was
-> theoretical in that scenario. Later we started adding new usages to
-> (general, in principle) waiting "API", with more to come, so still worth
-> "fixing".
+> where the rtnl_mutex is already held.
 
-Understood.
+Ack. Thanks for confirming.
+In that case this looks good to me.
 
-I think this does make me lean towards 3. being better off a separate patch.
-But it's your call.
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-> > > Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> 
-> Anyway, let's see what v3 will bring :)
 
-:)
+
+
+
 
