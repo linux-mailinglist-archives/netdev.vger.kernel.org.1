@@ -1,109 +1,95 @@
-Return-Path: <netdev+bounces-24639-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24640-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50BD5770E76
-	for <lists+netdev@lfdr.de>; Sat,  5 Aug 2023 09:34:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 06670770E95
+	for <lists+netdev@lfdr.de>; Sat,  5 Aug 2023 09:53:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 825D11C20B31
-	for <lists+netdev@lfdr.de>; Sat,  5 Aug 2023 07:34:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A7477282263
+	for <lists+netdev@lfdr.de>; Sat,  5 Aug 2023 07:53:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CC866D24;
-	Sat,  5 Aug 2023 07:34:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F4107477;
+	Sat,  5 Aug 2023 07:53:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31C0D1FDD
-	for <netdev@vger.kernel.org>; Sat,  5 Aug 2023 07:34:28 +0000 (UTC)
-Received: from mail-qk1-x72c.google.com (mail-qk1-x72c.google.com [IPv6:2607:f8b0:4864:20::72c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FFFC4EC9
-	for <netdev@vger.kernel.org>; Sat,  5 Aug 2023 00:34:24 -0700 (PDT)
-Received: by mail-qk1-x72c.google.com with SMTP id af79cd13be357-76af2cb7404so216465385a.0
-        for <netdev@vger.kernel.org>; Sat, 05 Aug 2023 00:34:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=draconx-ca.20221208.gappssmtp.com; s=20221208; t=1691220863; x=1691825663;
-        h=cc:to:subject:message-id:date:from:references:in-reply-to
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=w9uyawjZHnUZYQY4bK5UiV75xekF3m7LclUMpvxGdxc=;
-        b=IbJDK+jO92ODgVuLtNd5BBX5bHS0jhghWsv4QkoqAzLulspcFU8J8yP5oK/BKCNU5A
-         TImYgK80BkmW2VgCAHSNC1BDqZAXspVbZqkioNomL687pSAlRxTa4r05UdShc7p8lNHi
-         C7D9tHV2ZJ2JwPthfG7VlYJhyKxhnpivk4/OdMpf08pr6L83MKupPBa10hBkLEaq1HVK
-         Xzv8LTPaBfkLBggHQlTmWmU4Fb+5wIppzN/iuFeUlynHviv5lq2coOcmHdjzAKfprwUy
-         mrERV9Ciy4ScmEU9XmK3ArrstMjEqBph4wRxHI1O9AYBkOXm3R3gfUI83zbDkyveYui9
-         1oRA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691220863; x=1691825663;
-        h=cc:to:subject:message-id:date:from:references:in-reply-to
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=w9uyawjZHnUZYQY4bK5UiV75xekF3m7LclUMpvxGdxc=;
-        b=H4dsWw/VKAaa2r3qsMnMBWa3gLS5S214S1gSMLgx9NQIf3M3WnzpZpSjWEqQD9xFJZ
-         XrfcmntDgnI/pbA+G/W8sA/y8xDICFBXiOdpZiBC09Pd6tQ+IRS8K7Da55At6kaqogy2
-         udJ6YK4Xp/dj+J0WI4ez+xjHcDsqshqFqhz4wJwDamDN6GWFttP0Ld9rAPFDjfzgaEde
-         et9t9+LhUfes8PIrJ9eTMMBocyhPcZXkjTn8st78flj4Pzju11OGMSgFt0pMSNz/+3z8
-         s3c5C/P9m94ve5Wb+oIewYiu7g+ScvtkDRBGeZqjT3DFdD73fehnDhU+Kko8WOkgFQgZ
-         0KHw==
-X-Gm-Message-State: AOJu0YwxbzV9P/V8/O3QowWGQD7rbmdoOTtfvq2B8MQBMloS1RQ7Vsnl
-	hiMbujZ676+kbrR/mmkD8r9NjsSl8VutnCvBKiHZTg==
-X-Google-Smtp-Source: AGHT+IFdYcostVh57kE1L1S3kadAFjg+9iFXDHE2FAEn7ZWsTWYXPzw41CWvawMnXI34J9XRxsLPlCDQgPGLl/MPP7c=
-X-Received: by 2002:a05:620a:c47:b0:76c:97fd:c106 with SMTP id
- u7-20020a05620a0c4700b0076c97fdc106mr5134931qki.70.1691220863327; Sat, 05 Aug
- 2023 00:34:23 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 195771FDD
+	for <netdev@vger.kernel.org>; Sat,  5 Aug 2023 07:53:34 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C14E3C433C8;
+	Sat,  5 Aug 2023 07:53:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1691222014;
+	bh=PC4Ds+J+Yy1q1eDBiTjeR+7fVZu+dB4pJP5K8KhcD5I=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=l3XT0SKMsPKL14Fz+XIRl9a7t3Iqnhp/UEgS79yXdF+v/b80tcgdOjuNPlX7yYGUA
+	 t01YUkjylxIm2EHaEjLtT0SbVpknlEmgyGIfNKLHV4HPjC3eTCIdvvnbtisX2/Kxyc
+	 S87yn/rAMBvjy17oG7jJy6UwZ4z0fyvcHGy0J7oaU1PD/Vp4jamVsI6KK7/FmLA1qb
+	 PDcYYlJev86p+lOFqF/xHAi9SNO42aUcH9xQa+VCuf28C/Dkv8PoMPHDNWrHDmMkq3
+	 Tey2R1Uum3GyG4CRWD5Wqpanq3c+UhGeohYHkZHfFt61q2ejVqln6qkVyMF0FT9G+S
+	 Hx/sliQYgvJGQ==
+Date: Sat, 5 Aug 2023 09:53:30 +0200
+From: Simon Horman <horms@kernel.org>
+To: Yue Haibing <yuehaibing@huawei.com>
+Cc: johannes@sipsolutions.net, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v2] wifi: iw_handler.h: Remove unused declaration
+ dev_get_wireless_info()
+Message-ID: <ZM3/+pY9Fovc5AC9@vergenet.net>
+References: <20230804133617.43564-1-yuehaibing@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Received: by 2002:ab0:6209:0:b0:794:1113:bb24 with HTTP; Sat, 5 Aug 2023
- 00:34:22 -0700 (PDT)
-X-Originating-IP: [24.53.241.2]
-In-Reply-To: <c38e208b-4ffa-4310-ae00-412447fc4269@lunn.ch>
-References: <CADyTPEzqf8oQAPSFRWJLxAhd-WE4fX2zdoe9Vu6V9hZMn1Yc8g@mail.gmail.com>
- <CAL_JsqLrErF__GGHfanRFCpfbOh6fvz4-aJv32h8OfDjUeZPSg@mail.gmail.com>
- <CADyTPEwgG0=R_b5DNBP0J0auDXu2BNTOwkSUFg-s7pLJUPC+Tg@mail.gmail.com>
- <CADyTPExgjcaUeKiR108geQhr0KwFC0A8qa_n_ST2RxhbSczomQ@mail.gmail.com>
- <CAL_Jsq+N2W0hVN7fUC1rxGL-Hw9B8eQvLgSwyQ3n41kqwDbxyg@mail.gmail.com>
- <CADyTPEyT4NJPrChtvtY=_GePZNeSDRAr9j3KRAk1hkjD=5+i8A@mail.gmail.com>
- <CAL_JsqKGAFtwB+TWc1yKAe_0M4BziEpFnApuWuR3h+Go_=djFg@mail.gmail.com>
- <CADyTPEwY4ydUKGtGNayf+iQSqRVBQncLiv0TpO9QivBVrmOc4g@mail.gmail.com>
- <173b1b67-7f5a-4e74-a2e7-5c70e57ecae5@lunn.ch> <CADyTPExypWjMW2PF0EfSFc+vvdzRtNEi_H0p3S-mw1BNWyq6VQ@mail.gmail.com>
- <c38e208b-4ffa-4310-ae00-412447fc4269@lunn.ch>
-From: Nick Bowler <nbowler@draconx.ca>
-Date: Sat, 5 Aug 2023 03:34:22 -0400
-Message-ID: <CADyTPEyQcHd5-A2TLf_-U5KdtA5WKZ_mNYKvx3DSMjkNi99E0g@mail.gmail.com>
-Subject: Re: PROBLEM: Broken or delayed ethernet on Xilinx ZCU104 since 5.18 (regression)
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Rob Herring <robh@kernel.org>, Saravana Kannan <saravanak@google.com>, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org, 
-	regressions@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230804133617.43564-1-yuehaibing@huawei.com>
 
-On 2023-08-05, Andrew Lunn <andrew@lunn.ch> wrote:
->> > It was also commented out before that change. It could be that gpio
->> > controller is missing. Do you have the driver for the tca6416 in
->> > your kernel configuration?
->>
->> I have CONFIG_GPIO_PCA953X=y which I think is the correct driver?
->
-> It does appear to be the correct driver. But check if it has
-> loaded. It is an i2c device, so maybe you are missing the I2C bus
-> master device?
+On Fri, Aug 04, 2023 at 09:36:17PM +0800, Yue Haibing wrote:
+> Commit 556829657397 ("[NL80211]: add netlink interface to cfg80211")
+> declared but never implemented this, remove it.
+> 
+> Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
+> ---
+> v2: fix comment
+> ---
+>  include/net/iw_handler.h | 11 ++---------
+>  1 file changed, 2 insertions(+), 9 deletions(-)
+> 
+> diff --git a/include/net/iw_handler.h b/include/net/iw_handler.h
+> index d2ea5863eedc..b2cf243ebe44 100644
+> --- a/include/net/iw_handler.h
+> +++ b/include/net/iw_handler.h
+> @@ -426,17 +426,10 @@ struct iw_public_data {
+>  
+>  /**************************** PROTOTYPES ****************************/
+>  /*
+> - * Functions part of the Wireless Extensions (defined in net/core/wireless.c).
+> - * Those may be called only within the kernel.
+> + * Functions part of the Wireless Extensions (defined in net/wireless/wext-core.c).
 
-That's it!  I needed to set
+Can I confirm that the wireless.c -> wext-core.c change is intentional?
+It doesn't seem strictly related to the patch description.
 
-  CONFIG_I2C_CADENCE=y
-
-and now things are working again!
-
-Thanks,
-  Nick
+> + * Those may be called by driver modules.
+>   */
+>  
+> -/* First : function strictly used inside the kernel */
+> -
+> -/* Handle /proc/net/wireless, called in net/code/dev.c */
+> -int dev_get_wireless_info(char *buffer, char **start, off_t offset, int length);
+> -
+> -/* Second : functions that may be called by driver modules */
+> -
+>  /* Send a single event to user space */
+>  void wireless_send_event(struct net_device *dev, unsigned int cmd,
+>  			 union iwreq_data *wrqu, const char *extra);
+> -- 
+> 2.34.1
+> 
 
