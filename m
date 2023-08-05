@@ -1,68 +1,59 @@
-Return-Path: <netdev+bounces-24624-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24625-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B6E4770E1F
-	for <lists+netdev@lfdr.de>; Sat,  5 Aug 2023 08:33:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5BEA770E2D
+	for <lists+netdev@lfdr.de>; Sat,  5 Aug 2023 08:46:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 55AED1C20D49
-	for <lists+netdev@lfdr.de>; Sat,  5 Aug 2023 06:33:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 917A5282571
+	for <lists+netdev@lfdr.de>; Sat,  5 Aug 2023 06:46:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0061417C6;
-	Sat,  5 Aug 2023 06:33:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 815FC1FA5;
+	Sat,  5 Aug 2023 06:46:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8E2F180
-	for <netdev@vger.kernel.org>; Sat,  5 Aug 2023 06:33:35 +0000 (UTC)
-Received: from mail-io1-xd2e.google.com (mail-io1-xd2e.google.com [IPv6:2607:f8b0:4864:20::d2e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DB1FFC
-	for <netdev@vger.kernel.org>; Fri,  4 Aug 2023 23:33:32 -0700 (PDT)
-Received: by mail-io1-xd2e.google.com with SMTP id ca18e2360f4ac-790cc395896so102526839f.1
-        for <netdev@vger.kernel.org>; Fri, 04 Aug 2023 23:33:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1691217211; x=1691822011;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=pc3WoibZYZDYFLA/vnf/DW8hjMxBlg+bH0Lqd2MjA0g=;
-        b=cCSR8EfA591i6DXa8gmsVWDkQErirJBSU/kcKJCIweOtdK8J/b/3yOw4HE/5zn16HB
-         p64IzxjeqsOtWUtQUl6atZCL9x1zGHTpFWq8zLtmAPXedJ6cTQgK27I4Aqso5dGXD4cn
-         AyFMGrfGikr1ocC0R0mxaC79s95mS90JAU5gM8lJhHMDPA95GV61fds+mdPGHrMPoMS4
-         IRYOULP0o5nMU0J1krqn1XEytKeOT03JXPmhctrynWtPX1Uz1ZY+YGM6XlGIgjQP5FxT
-         DZkiQiswF99UwjsJcmQJskwzRHIRZEcfZ0Y4gqrFGtwL3ad8KaHlgn2BeEB4u3vN/2lQ
-         5RDA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691217211; x=1691822011;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pc3WoibZYZDYFLA/vnf/DW8hjMxBlg+bH0Lqd2MjA0g=;
-        b=VeI+vgiZ61yKWVgpyOtfa+Wm+n+7bJn7+7nRSceUwHYQsaxYyT7j8orlMvce166a2c
-         p3AW4ZkCoe/K91wxGW8s+hqEU7iDlg+paO/ilJmASe6vD3UeJExAxMC/mpGPwBwwZ8Gs
-         JFG8vpsllKUnHmEHA9zcSDXrPVjInxPwk8lQx5mdg4NG8Jm5pDPklXFjuFoyMMBpb0ae
-         w8ov7l+TkFQ8IeaYfha9mYU0qI/y3AExJ5Ry5RLU6EyVvJekd/P5bqJp4BCd8Gx/kaWT
-         qh/dO2sNJgCZ3+v0gL4TYs/q0H5XLdBEbttRFZnbnmfHsK2nZ7uUJVEFIfPz9B3j8dDK
-         7szQ==
-X-Gm-Message-State: AOJu0Yy7ntKKCCzJnqkOorZzYQ54loeL2zQEt6p/U3g7JdyAnY7Vauq2
-	m9NMEFpqgWsFtkyzmbg/Emq95A==
-X-Google-Smtp-Source: AGHT+IEO97yCCN1nbSk23P2S5d2yOkPqmV8YKtj0bApL6YXwzwWRqmPw13KsoClY7SVHvbBC/0HyvQ==
-X-Received: by 2002:a6b:f20f:0:b0:791:280:839f with SMTP id q15-20020a6bf20f000000b007910280839fmr357424ioh.13.1691217211579;
-        Fri, 04 Aug 2023 23:33:31 -0700 (PDT)
-Received: from localhost ([212.23.236.67])
-        by smtp.gmail.com with ESMTPSA id p22-20020a5d8d16000000b00786f5990435sm1132203ioj.7.2023.08.04.23.33.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Aug 2023 23:33:30 -0700 (PDT)
-Date: Sat, 5 Aug 2023 08:33:28 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org
-Subject: Re: ynl - mutiple policies for one nested attr used in multiple cmds
-Message-ID: <ZM3tOOHifjFQqorV@nanopsycho>
-References: <ZM01ezEkJw4D27Xl@nanopsycho>
- <20230804125816.11431885@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75EE5180
+	for <netdev@vger.kernel.org>; Sat,  5 Aug 2023 06:46:02 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 538F3E72;
+	Fri,  4 Aug 2023 23:45:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=MzuIUE4dAyNI/9puD5m3erQkj7sXAAK5ZQfiS6oDIQg=; b=gl2caWxRTz/6U4PiMCjjKpXfyA
+	asb3CKqwHiqMAZFcUF7H+1AkB/UglMSdMob/zzh44cD762TRYkuaPBwgMUC0m+M43H+OVZ1qz7bQP
+	jrwCl7AFqMfGbzsE01/SMEjqOJpxuDhr3RSzjcs9r2zX4hPYm0xrRGH3RlOf2alSdPKo=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qSB2i-003AWH-HG; Sat, 05 Aug 2023 08:45:40 +0200
+Date: Sat, 5 Aug 2023 08:45:40 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Hawkins, Nick" <nick.hawkins@hpe.com>
+Cc: "christophe.jaillet@wanadoo.fr" <christophe.jaillet@wanadoo.fr>,
+	"simon.horman@corigine.com" <simon.horman@corigine.com>,
+	"Verdun, Jean-Marie" <verdun@hpe.com>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"robh+dt@kernel.org" <robh+dt@kernel.org>,
+	"krzysztof.kozlowski+dt@linaro.org" <krzysztof.kozlowski+dt@linaro.org>,
+	"conor+dt@kernel.org" <conor+dt@kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2 4/5] net: hpe: Add GXP UMAC Driver
+Message-ID: <61c541c9-be30-4a43-aa85-53816d5848f9@lunn.ch>
+References: <20230802201824.3683-1-nick.hawkins@hpe.com>
+ <20230802201824.3683-5-nick.hawkins@hpe.com>
+ <fb656c31-ecc3-408a-a719-cba65a6aa984@lunn.ch>
+ <933D6861-A193-4145-9533-A7EE8E6DD32F@hpe.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,40 +62,47 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230804125816.11431885@kernel.org>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
+In-Reply-To: <933D6861-A193-4145-9533-A7EE8E6DD32F@hpe.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Fri, Aug 04, 2023 at 09:58:16PM CEST, kuba@kernel.org wrote:
->On Fri, 4 Aug 2023 19:29:31 +0200 Jiri Pirko wrote:
->> I need to have one nested attribute but according to what cmd it is used
->> with, there will be different nested policy.
->> 
->> If I'm looking at the codes correctly, that is not currenly supported,
->> correct?
->> 
->> If not, why idea how to format this in yaml file?
->
->I'm not sure if you'll like it but my first choice would be to skip
->the selector attribute. Put the attributes directly into the message.
->There is no functional purpose the wrapping serves, right?
+On Fri, Aug 04, 2023 at 08:55:58PM +0000, Hawkins, Nick wrote:
+> Greetings Andrew,
+> 
+> For some reason I do not see your replies for v1 of this patch or
+> the mdio driver on lore.kernel. Apologies as I did not intend to
+> not address your previous review comments. My mistake.
+> 
+> >> +static int umac_int_phy_init(struct umac_priv *umac)
+> >> +{
+> >> + struct phy_device *phy_dev = umac->int_phy_dev;
+> >> + unsigned int value;
+> >> +
+> >> + value = phy_read(phy_dev, 0);
+> >> + if (value & 0x4000)
+> >> + pr_info("Internal PHY loopback is enabled - clearing\n");
+> 
+> > How is the PHY getting into loopback mode? The MAC driver should never
+> > touch the PHY, because you have no idea what the PHY actually is,
+> > unless it is internal. 
+> 
+> It would only be in loopback mode if it was previously configured
+> that way. I will remove it. The PHY is internal to the ASIC 
+> and is always the same. Given that information is it acceptable
 
-Well, the only reason is backward compatibility.
-Currently, there is no attr parsing during dump, which is ensured by
-GENL_DONT_VALIDATE_DUMP flag. That means if user passes any attr, it is
-ignored.
+Hi Nick
 
-Now if we allow attrs to select, previously ignored attributes would be
-processed now. User that passed crap with old kernel can gen different
-results with new kernel.
+So what you call a PHY is probably a PCS. Please look at the API used
+in driver/net/pcs/. The real PHYs are external.
 
-That is why I decided to add selector attr and put attrs inside, doing
-strict parsing, so if selector attr is not supported by kernel, user
-gets message back.
+Given that this is a BMC, you probably have lots of i2c busses. So you
+can support an SFP on the SERDES. So it would be better if you used
+the phylink interface, not phylib. This should also solve your
+interface mode switching.
 
-So what do you suggest? Do per-dump strict parsing policy of root
-attributes serving to do selection?
+    Andrew
 
