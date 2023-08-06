@@ -1,37 +1,63 @@
-Return-Path: <netdev+bounces-24718-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24719-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 755BC77165E
-	for <lists+netdev@lfdr.de>; Sun,  6 Aug 2023 19:53:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1622577168F
+	for <lists+netdev@lfdr.de>; Sun,  6 Aug 2023 21:35:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 239EA2811AD
-	for <lists+netdev@lfdr.de>; Sun,  6 Aug 2023 17:53:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7446028116C
+	for <lists+netdev@lfdr.de>; Sun,  6 Aug 2023 19:35:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9BC663A4;
-	Sun,  6 Aug 2023 17:53:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51FE28F50;
+	Sun,  6 Aug 2023 19:35:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8857D5696
-	for <netdev@vger.kernel.org>; Sun,  6 Aug 2023 17:53:41 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5CE5BC433C7;
-	Sun,  6 Aug 2023 17:53:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691344421;
-	bh=TiEcOPbSzVD11ZN5C0JGXcIfrthE91VTmMn1kJ2hHw8=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=PLYFUhc4c2EfIWmheHVngM7CkBbPeNKza7QyeGlk8VaDRUZSqt3uEDlcZgFcEq/nA
-	 caNltPlf76c6Gt5SorNokpC60hbI3TysPqPcA8ACp+YjygEGwlyAhm0WeOjqljiIHy
-	 8wEYdbet8HkYehfMjTJVU4y5E+e/WHbxgmBFdaOHXc8SIzFK2qu98D22WERhFWEdyK
-	 dgkoi5QkYG38JrfdW5aLlJNEwnByYpW8Ujwi7KVB4MZtCuKEALPvlxuEXCx6iPtDiT
-	 L4rRKrRMHP6oJOe8P+r4oVKtlDkr6fDSEefoo0/jDkYs4XuLG6ZLuaag/LA+rDNsus
-	 kAbg6awR19i2A==
-Message-ID: <5b4bd1cd-ff2d-3aef-8e14-ec3b3c158864@kernel.org>
-Date: Sun, 6 Aug 2023 12:53:38 -0500
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4217B7F0
+	for <netdev@vger.kernel.org>; Sun,  6 Aug 2023 19:35:11 +0000 (UTC)
+Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46B7D171A
+	for <netdev@vger.kernel.org>; Sun,  6 Aug 2023 12:35:08 -0700 (PDT)
+Received: by mail-ed1-x52f.google.com with SMTP id 4fb4d7f45d1cf-52307552b03so5372382a12.0
+        for <netdev@vger.kernel.org>; Sun, 06 Aug 2023 12:35:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1691350507; x=1691955307;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=3bqbe2tDZsZm0END83UpLyo6EdqTZMUT086jdCCRrYw=;
+        b=g0jyzXc60snOi9Q61ciF87VgVXpMoKnvYizbfZgb2HjPkUaMyTBZig89TnI7J6YQ1s
+         K/EowG8j8K+l6ZuxtPoNMk568mXiq3LsDY1LWJevmEh+kA17IkB/ExBG5CbCNwYveV85
+         KiP8DOjX6xCwsW0l0W4CGt2RceYmAOFGEPC4d25smdzCgQUd+Bu5LPSJH7pdcQoQ/7Y0
+         uny9KeKT67FTZ4fflMOOI4Q8B29TKmVZzoAsx6Jb3p0GRyaY+V8q6dznj70w8fGRtRuM
+         aa4eJ24jFHCxakE+2duVWIx9By8XJKslLsOb4zYfHySZmq8AnxARrRSGbZUbKyV+c4+Q
+         bMTg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691350507; x=1691955307;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=3bqbe2tDZsZm0END83UpLyo6EdqTZMUT086jdCCRrYw=;
+        b=SVlWka9RDa/zV9pEt+A99XQOM5dZlrJdva6Vi86XvhpXLlcC/6LmpsSNnEYmtwSnSR
+         s/YodNBmOKMMz5cRVuv+1aBM+xhfq5bsDigJ/ftSms2cMFMg8npd9P2mpbmaYIQmdI82
+         O7eHOIKp58JxEQjSii/GWli0JcWGhmRKj3v3ogcX6/SLxvC5xZ9ALodUMc65pwOh0T83
+         rOIGRcCvOo2jBwRM43dOVbe6ixEUDsl0hhKteyU9D5N+rWAZoeFq9qNs5PRctrdTMOJM
+         3DETvUV0A5J17QzjYYXB75dkB622Pn9iAzVM3K9wcFqnwXyISRimTQ6iNieO5cLiv6ZG
+         Z3yA==
+X-Gm-Message-State: AOJu0Yw2Jd8L0OGHKo+WsaYFVXFccpkRlbM9SPo5DMc2VY4wCHZeeSp0
+	2nmqA1gNqoBXc/JqcSjrzHs3fw==
+X-Google-Smtp-Source: AGHT+IG/79s2xg9v9Za0JIriROoPvnlkRv0Jug22nma7i4hEv1WIE4RafrrohEpmmoAaMt55gaOUXA==
+X-Received: by 2002:aa7:d148:0:b0:523:2873:8323 with SMTP id r8-20020aa7d148000000b0052328738323mr4168789edo.35.1691350506747;
+        Sun, 06 Aug 2023 12:35:06 -0700 (PDT)
+Received: from [192.168.1.20] ([178.197.222.113])
+        by smtp.gmail.com with ESMTPSA id o4-20020aa7c504000000b00522828d438csm4212648edq.7.2023.08.06.12.35.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 06 Aug 2023 12:35:06 -0700 (PDT)
+Message-ID: <6fcd8e51-7e97-1261-7cd5-5e18840aaf8e@linaro.org>
+Date: Sun, 6 Aug 2023 21:35:03 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -39,84 +65,47 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH v3 3/5] dt-bindings: clock: add Intel Agilex5 clock
+ Thunderbird/102.14.0
+Subject: Re: [PATCH v2 3/5] dt-bindings: clock: add Intel Agilex5 clock
  manager
 Content-Language: en-US
-To: "Rabara, Niravkumar L" <niravkumar.l.rabara@intel.com>,
- Conor Dooley <conor.dooley@microchip.com>
-Cc: "Ng, Adrian Ho Yin" <adrian.ho.yin.ng@intel.com>,
- "andrew@lunn.ch" <andrew@lunn.ch>, "conor+dt@kernel.org"
- <conor+dt@kernel.org>,
- "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
- "krzysztof.kozlowski+dt@linaro.org" <krzysztof.kozlowski+dt@linaro.org>,
- "linux-clk@vger.kernel.org" <linux-clk@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "Turquette, Mike" <mturquette@baylibre.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "p.zabel@pengutronix.de" <p.zabel@pengutronix.de>,
- "richardcochran@gmail.com" <richardcochran@gmail.com>,
- "robh+dt@kernel.org" <robh+dt@kernel.org>,
- "sboyd@kernel.org" <sboyd@kernel.org>,
- "wen.ping.teh@intel.com" <wen.ping.teh@intel.com>
-References: <20230801010234.792557-4-niravkumar.l.rabara@intel.com>
- <20230802025842.1260345-1-niravkumar.l.rabara@intel.com>
- <20230802-reuse-diffusion-d41ed8175390@wendy>
- <DM6PR11MB3291627AB955685C345F7B71A20BA@DM6PR11MB3291.namprd11.prod.outlook.com>
-From: Dinh Nguyen <dinguyen@kernel.org>
-In-Reply-To: <DM6PR11MB3291627AB955685C345F7B71A20BA@DM6PR11MB3291.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To: niravkumar.l.rabara@intel.com
+Cc: adrian.ho.yin.ng@intel.com, andrew@lunn.ch, conor+dt@kernel.org,
+ devicetree@vger.kernel.org, dinguyen@kernel.org,
+ krzysztof.kozlowski+dt@linaro.org, linux-clk@vger.kernel.org,
+ linux-kernel@vger.kernel.org, mturquette@baylibre.com,
+ netdev@vger.kernel.org, p.zabel@pengutronix.de, richardcochran@gmail.com,
+ robh+dt@kernel.org, sboyd@kernel.org, wen.ping.teh@intel.com
+References: <20230618132235.728641-1-niravkumar.l.rabara@intel.com>
+ <20230801010234.792557-1-niravkumar.l.rabara@intel.com>
+ <20230801010234.792557-4-niravkumar.l.rabara@intel.com>
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+In-Reply-To: <20230801010234.792557-4-niravkumar.l.rabara@intel.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-6.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-
-
-On 8/2/23 02:14, Rabara, Niravkumar L wrote:
+On 01/08/2023 03:02, niravkumar.l.rabara@intel.com wrote:
+> From: Niravkumar L Rabara <niravkumar.l.rabara@intel.com>
 > 
+> Add clock ID definitions for Intel Agilex5 SoCFPGA.
+> The registers in Agilex5 handling the clock is named as clock manager.
 > 
->> -----Original Message-----
->> From: Conor Dooley <conor.dooley@microchip.com>
->> Sent: Wednesday, 2 August, 2023 3:02 PM
->> To: Rabara, Niravkumar L <niravkumar.l.rabara@intel.com>
->> Cc: Ng, Adrian Ho Yin <adrian.ho.yin.ng@intel.com>; andrew@lunn.ch;
->> conor+dt@kernel.org; devicetree@vger.kernel.org; dinguyen@kernel.org;
->> krzysztof.kozlowski+dt@linaro.org; linux-clk@vger.kernel.org; linux-
->> kernel@vger.kernel.org; Turquette, Mike <mturquette@baylibre.com>;
->> netdev@vger.kernel.org; p.zabel@pengutronix.de;
->> richardcochran@gmail.com; robh+dt@kernel.org; sboyd@kernel.org;
->> wen.ping.teh@intel.com
->> Subject: Re: [PATCH v3 3/5] dt-bindings: clock: add Intel Agilex5 clock
->> manager
->>
->> On Wed, Aug 02, 2023 at 10:58:42AM +0800, niravkumar.l.rabara@intel.com
->> wrote:
->>> From: Niravkumar L Rabara <niravkumar.l.rabara@intel.com>
->>>
->>> Add clock ID definitions for Intel Agilex5 SoCFPGA.
->>> The registers in Agilex5 handling the clock is named as clock manager.
->>>
->>> Signed-off-by: Teh Wen Ping <wen.ping.teh@intel.com>
->>> Reviewed-by: Dinh Nguyen <dinguyen@kernel.org>
->>> Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
->>> Signed-off-by: Niravkumar L Rabara <niravkumar.l.rabara@intel.com>
->>
->> Damn, I was too late - you already sent a v3 :/
->>
->> However, there only seems to be a v3 of this one patch and it was sent in
->> reply to the v2 series? The normal thing to do is resend the entire series, not
->> just one patch, as a new thread. Not using a new thread may make it harder
->> to apply & will also bury the email in people's mailboxes that use things like
->> mutt. A single patch as a reply is also confusing, as the rest of the v3 looks like
->> it is missing!
->>
->> Thanks,
->> Conor.
-> 
-> Sorry I made a mistake.
-> Should I send out entire series with PATCH v3 subject? Or should I wait for review comment on remaining patches and then send entire series with rework and  subject prefix PATCH v3?
-> 
+> Signed-off-by: Teh Wen Ping <wen.ping.teh@intel.com>
+> Reviewed-by: Dinh Nguyen <dinguyen@kernel.org>
+> Signed-off-by: Niravkumar L Rabara <niravkumar.l.rabara@intel.com>
+> ---
 
-No need to send out a V3. I've applied patches 1-3 and 5. Will give a 
-little more time for the clk patch.
+Do not attach (thread) your patchsets to some other threads (unrelated
+or older versions). This buries them deep in the mailbox and might
+interfere with applying entire sets.
 
-Dinh
+Best regards,
+Krzysztof
+
 
