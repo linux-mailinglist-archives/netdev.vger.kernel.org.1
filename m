@@ -1,143 +1,199 @@
-Return-Path: <netdev+bounces-24690-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24691-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CAD6977121B
-	for <lists+netdev@lfdr.de>; Sat,  5 Aug 2023 22:25:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 79BC9771348
+	for <lists+netdev@lfdr.de>; Sun,  6 Aug 2023 04:49:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 79894281BAE
-	for <lists+netdev@lfdr.de>; Sat,  5 Aug 2023 20:25:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 079BE281454
+	for <lists+netdev@lfdr.de>; Sun,  6 Aug 2023 02:49:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 412BAC8DF;
-	Sat,  5 Aug 2023 20:25:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA61F17D1;
+	Sun,  6 Aug 2023 02:49:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 357FF1FA0
-	for <netdev@vger.kernel.org>; Sat,  5 Aug 2023 20:25:51 +0000 (UTC)
-Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2FF02D72
-	for <netdev@vger.kernel.org>; Sat,  5 Aug 2023 13:25:43 -0700 (PDT)
-Received: by mail-lf1-x12a.google.com with SMTP id 2adb3069b0e04-4fe61ae020bso1376587e87.2
-        for <netdev@vger.kernel.org>; Sat, 05 Aug 2023 13:25:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=shruggie-ro.20221208.gappssmtp.com; s=20221208; t=1691267142; x=1691871942;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=S/suAOSQGI0i2N3TQ0S3FcTenWc2CSU80rhZyaL3wWQ=;
-        b=vzJu69AXVlydBjMeUkuoOsvDJvYRRLiVtN3vpYzV7KWnnwNzVoZypW7GzRHN+hCQYS
-         OBwgfHGkgBxeehtuNnIih7ti7zDd47ca/m63PBHw8wlLosA/Ok1kRG4El9Q43mPo8F1H
-         o1lZZUphOMIBDfDpQeB6Mc6QMb7V5rCzWRCo7hpDF/gkSJkgH5ho+ff1CsDNlmuezW1I
-         kpeA8VU6PZQuY5ktaYv50ioKuVBlWnmFp5e13CP58FPPkotFFbysNpclhKPLRaINQE79
-         dbMymKfjz7W969iN6RuZcHq13fEcQQ3GCXfQSrbNnYLkoglQQzdbNW/6m5d57KXwmR+t
-         Eysw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691267142; x=1691871942;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=S/suAOSQGI0i2N3TQ0S3FcTenWc2CSU80rhZyaL3wWQ=;
-        b=Dm++t/z+5Did0153eLGxzz0bbA7K9A2IPWMyy0OMcO7N8tdPLNoSJ5WFzckwq4tVF5
-         9zogurbH+PQY06IvqphZQJ1nSeuByIPyccyay2Rl51APLvkTnkbyi0+uummOzCnEtl3S
-         EOekRMg+i71Y+Cj/5UcRkdvsXzAVPEsWBm1vtt5jV5erMfWwj7jWU6hULcDJuUiX8TUf
-         1qbOS3xEDmpFEJHIgV2T5XC/tXUW1gNTQ0Tf/WcDamK7r/hfEt7lqDdpaVt7BnVMe6lv
-         hkS+mWy9T9sCs0ucLv+9kl/U5Yvpf7wND40Tcc6lGSpV2jGMuGsuFMsVpUx45yOes+F6
-         9juA==
-X-Gm-Message-State: AOJu0Yy4FVdQ/jx+NrC1rReoQfR04ZgP6o+D/5co8C1k5Zz9D3VIY+bD
-	1E5ebj3TenxUEHmF3IgpFa3QOTCORm93HtoSRlIC+w==
-X-Google-Smtp-Source: AGHT+IG1fHQr26PowhIL+bVvPOeVUOf1J8ORZz4zxqcjR8Suj7CJa+qKReyYYbylTbh064RiNIq8iVo4LWxVZcGb9/Y=
-X-Received: by 2002:a05:6512:32cb:b0:4f8:6dfd:faa0 with SMTP id
- f11-20020a05651232cb00b004f86dfdfaa0mr3894093lfg.2.1691267141788; Sat, 05 Aug
- 2023 13:25:41 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA95217D0
+	for <netdev@vger.kernel.org>; Sun,  6 Aug 2023 02:49:09 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B65DE130
+	for <netdev@vger.kernel.org>; Sat,  5 Aug 2023 19:49:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1691290147; x=1722826147;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=PhAZR5+gYK6dezZ4NV0mKUs5qP6QH8F/+UUezWgYV/8=;
+  b=UIJDDplLt8e1nm9Clx4MrCAk/CDtx5lnTmbq82XrkjC/InHOeC9OPium
+   r4BTM2pKCxkbQtM3XFQ5D26y4w5UgTfE4ibUr62KB3VeeB6b6hAyn2YIy
+   v2zzHOx8fEwmmhOezxoYV3ZwL/tQhaRoQ4WvK5kCxuiYgsnRnhnub7iLZ
+   sh6+BjmRcuxmhisQcEjSbRd+F6ucYdjQb8bBULK47Bn1y0eGjiXfOtniu
+   RAcOnSNSTKeCyTJnEOa7PSPzbBrfrhzYJxyOI8b0vZpsWxjoKoEhfYHGG
+   7ml6Hu1UYm6q+kJYoPF2sfvpSh6Zr5PFBAdCAt0Ho9zwAhxOOfrpN/I4d
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10793"; a="350662138"
+X-IronPort-AV: E=Sophos;i="6.01,259,1684825200"; 
+   d="scan'208";a="350662138"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Aug 2023 19:49:07 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10793"; a="800528124"
+X-IronPort-AV: E=Sophos;i="6.01,259,1684825200"; 
+   d="scan'208";a="800528124"
+Received: from lkp-server01.sh.intel.com (HELO d1ccc7e87e8f) ([10.239.97.150])
+  by fmsmga004.fm.intel.com with ESMTP; 05 Aug 2023 19:48:59 -0700
+Received: from kbuild by d1ccc7e87e8f with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1qSTpD-0003zv-0K;
+	Sun, 06 Aug 2023 02:48:59 +0000
+Date: Sun, 6 Aug 2023 10:48:18 +0800
+From: kernel test robot <lkp@intel.com>
+To: Shenwei Wang <shenwei.wang@nxp.com>,
+	Marc Kleine-Budde <mkl@pengutronix.de>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Shawn Guo <shawnguo@kernel.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	Kevin Hilman <khilman@baylibre.com>, Vinod Koul <vkoul@kernel.org>,
+	Chen-Yu Tsai <wens@csie.org>,
+	Jernej Skrabec <jernej.skrabec@gmail.com>,
+	Samuel Holland <samuel@sholland.org>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>,
+	NXP Linux Team <linux-imx@nxp.com>,
+	Jerome Brunet <jbrunet@baylibre.com>,
+	Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
+	Bhupesh Sharma <bhupesh.sharma@linaro.org>,
+	Nobuhiro Iwamatsu <nobuhiro1.iwamatsu@toshiba.co.jp>,
+	Simon Horman <simon.horman@corigine.com>,
+	Andrew Halaney <ahalaney@redhat.com>,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
+	Shenwei Wang <shenwei.wang@nxp.com>
+Subject: Re: [PATCH v4 net-next 1/2] net: stmmac: add new mode parameter for
+ fix_mac_speed
+Message-ID: <202308061048.nLnNqNUP-lkp@intel.com>
+References: <20230804144629.358455-2-shenwei.wang@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230713202123.231445-1-alex@shruggie.ro> <20230713202123.231445-2-alex@shruggie.ro>
- <20230714172444.GA4003281-robh@kernel.org> <CAH3L5Qoj+sue=QnR2Lp12x3Hz2t2BNnarZHJiqxL3Gtf6M=bsA@mail.gmail.com>
- <7fa2d457-4ae9-42f5-be73-80549aae558c@lunn.ch>
-In-Reply-To: <7fa2d457-4ae9-42f5-be73-80549aae558c@lunn.ch>
-From: Alexandru Ardelean <alex@shruggie.ro>
-Date: Sat, 5 Aug 2023 23:25:31 +0300
-Message-ID: <CAH3L5Qpd+6740SeQJh+1J8MjC1BjHE=EEReK9AOuJW_Ey3V4mA@mail.gmail.com>
-Subject: Re: [PATCH v2 2/2] dt-bindings: net: phy: vsc8531: document
- 'vsc8531,clkout-freq-mhz' property
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Rob Herring <robh@kernel.org>, netdev@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, krzysztof.kozlowski+dt@linaro.org, 
-	conor+dt@kernel.org, hkallweit1@gmail.com, linux@armlinux.org.uk, 
-	olteanv@gmail.com, marius.muresan@mxt.ro
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230804144629.358455-2-shenwei.wang@nxp.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sun, Jul 16, 2023 at 6:07=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
->
-> > So, there's the adin.c PHY driver which has a similar functionality
-> > with the adin_config_clk_out().
-> > Something in the micrel.c PHY driver (with
-> > micrel,rmii-reference-clock-select-25-mhz); hopefully I did not
-> > misread the code about that one.
-> > And the at803x.c PHY driver has a 'qca,clk-out-frequency' property too.
-> >
-> > Now with the mscc.c driver, there is a common-ality that could use a fr=
-amework.
-> >
-> > @Rob are you suggesting something like registering a clock provider
-> > (somewhere in the PHY framework) and let the PHY drivers use it?
-> > Usually, these clock signals (once enabled on startup), don't get
-> > turned off; but I've worked mostly on reference designs; somewhere
-> > down the line some people get different requirements.
-> > These clocks get connected back to the MAC (usually), and are usually
-> > like a "fixed-clock" driver.
->
-> They are not necessarily fixed clocks. The clock you are adding here
-> has three frequencies. Two frequencies is common for PHY devices. So
-> you need to use something more than clk-fixed-rate.c. Also, mostly
-> PHYs allows the clock to be gated.
->
-> > In our case, turning off the clock would be needed if the PHY
-> > negotiates a non-gigabit link; i.e 100 or 10 Mbps; in that case, the
-> > CLKOUT signal is not needed and it can be turned off.
->
-> Who does not need it? The PHY, or the MAC? If it is the MAC, it should
-> really be the MAC driver which uses the common clock API to turn it
-> off. Just watch out for deadlocks with phydev->lock.
+Hi Shenwei,
 
-The MAC needs the clock in GMII mode, when going in gigabit mode.
+kernel test robot noticed the following build errors:
 
->
-> > Maybe start out with a hook in 'struct phy_driver'?
-> > Like "int (*config_clk_out)(struct phy_device *dev);" or something?
-> > And underneath, this delegates to the CLK framework?
->
-> Yes, have phy_device.c implement that registration/unregister of the
-> clock, deal with locking, and call into the PHY driver to actually
-> manipulate the clock. You missed the requested frequency in the
-> function prototype. I would also call it refclk. Three is sometimes
-> confusion about the different clocks.
+[auto build test ERROR on net-next/main]
 
-Ack.
-Then something like:
-int (*config_refclk)(struct phy_device *dev, uint32_t frequency);
+url:    https://github.com/intel-lab-lkp/linux/commits/Shenwei-Wang/net-stmmac-add-new-mode-parameter-for-fix_mac_speed/20230804-224841
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20230804144629.358455-2-shenwei.wang%40nxp.com
+patch subject: [PATCH v4 net-next 1/2] net: stmmac: add new mode parameter for fix_mac_speed
+config: x86_64-allyesconfig (https://download.01.org/0day-ci/archive/20230806/202308061048.nLnNqNUP-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
+reproduce: (https://download.01.org/0day-ci/archive/20230806/202308061048.nLnNqNUP-lkp@intel.com/reproduce)
 
->
-> Traditionally, clk_enable() can be called in atomic context, but that
-> is not allowed with phylib, it always assume thread context. I don't
-> know if the clock framework has some helpers for that, but i also
-> don't see there being a real need for MAC to enable the clock in
-> atomic context.
->
->         Andrew
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202308061048.nLnNqNUP-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   drivers/net/ethernet/stmicro/stmmac/dwmac-sti.c: In function 'sti_dwmac_probe':
+>> drivers/net/ethernet/stmicro/stmmac/dwmac-sti.c:295:33: error: assignment to 'void (*)(void *, unsigned int,  unsigned int)' from incompatible pointer type 'void (*)(void *, unsigned int)' [-Werror=incompatible-pointer-types]
+     295 |         plat_dat->fix_mac_speed = data->fix_retime_src;
+         |                                 ^
+   cc1: some warnings being treated as errors
+
+
+vim +295 drivers/net/ethernet/stmicro/stmmac/dwmac-sti.c
+
+d15891ca1fdd7f Srinivas Kandagatla 2014-02-11  257  
+8387ee21f972de Joachim Eastwood    2015-07-29  258  static int sti_dwmac_probe(struct platform_device *pdev)
+d15891ca1fdd7f Srinivas Kandagatla 2014-02-11  259  {
+8387ee21f972de Joachim Eastwood    2015-07-29  260  	struct plat_stmmacenet_data *plat_dat;
+07ca3749cec2b8 Joachim Eastwood    2015-07-29  261  	const struct sti_dwmac_of_data *data;
+8387ee21f972de Joachim Eastwood    2015-07-29  262  	struct stmmac_resources stmmac_res;
+d15891ca1fdd7f Srinivas Kandagatla 2014-02-11  263  	struct sti_dwmac *dwmac;
+d15891ca1fdd7f Srinivas Kandagatla 2014-02-11  264  	int ret;
+d15891ca1fdd7f Srinivas Kandagatla 2014-02-11  265  
+149adedd7696cb Joachim Eastwood    2015-07-29  266  	data = of_device_get_match_data(&pdev->dev);
+149adedd7696cb Joachim Eastwood    2015-07-29  267  	if (!data) {
+149adedd7696cb Joachim Eastwood    2015-07-29  268  		dev_err(&pdev->dev, "No OF match data provided\n");
+149adedd7696cb Joachim Eastwood    2015-07-29  269  		return -EINVAL;
+149adedd7696cb Joachim Eastwood    2015-07-29  270  	}
+149adedd7696cb Joachim Eastwood    2015-07-29  271  
+8387ee21f972de Joachim Eastwood    2015-07-29  272  	ret = stmmac_get_platform_resources(pdev, &stmmac_res);
+8387ee21f972de Joachim Eastwood    2015-07-29  273  	if (ret)
+8387ee21f972de Joachim Eastwood    2015-07-29  274  		return ret;
+8387ee21f972de Joachim Eastwood    2015-07-29  275  
+83216e3988cd19 Michael Walle       2021-04-12  276  	plat_dat = stmmac_probe_config_dt(pdev, stmmac_res.mac);
+8387ee21f972de Joachim Eastwood    2015-07-29  277  	if (IS_ERR(plat_dat))
+8387ee21f972de Joachim Eastwood    2015-07-29  278  		return PTR_ERR(plat_dat);
+8387ee21f972de Joachim Eastwood    2015-07-29  279  
+d15891ca1fdd7f Srinivas Kandagatla 2014-02-11  280  	dwmac = devm_kzalloc(&pdev->dev, sizeof(*dwmac), GFP_KERNEL);
+d2ed0a7755fe14 Johan Hovold        2016-11-30  281  	if (!dwmac) {
+d2ed0a7755fe14 Johan Hovold        2016-11-30  282  		ret = -ENOMEM;
+d2ed0a7755fe14 Johan Hovold        2016-11-30  283  		goto err_remove_config_dt;
+d2ed0a7755fe14 Johan Hovold        2016-11-30  284  	}
+d15891ca1fdd7f Srinivas Kandagatla 2014-02-11  285  
+d15891ca1fdd7f Srinivas Kandagatla 2014-02-11  286  	ret = sti_dwmac_parse_data(dwmac, pdev);
+d15891ca1fdd7f Srinivas Kandagatla 2014-02-11  287  	if (ret) {
+d15891ca1fdd7f Srinivas Kandagatla 2014-02-11  288  		dev_err(&pdev->dev, "Unable to parse OF data\n");
+d2ed0a7755fe14 Johan Hovold        2016-11-30  289  		goto err_remove_config_dt;
+d15891ca1fdd7f Srinivas Kandagatla 2014-02-11  290  	}
+d15891ca1fdd7f Srinivas Kandagatla 2014-02-11  291  
+16b1adbb16c8a5 Joachim Eastwood    2015-07-29  292  	dwmac->fix_retime_src = data->fix_retime_src;
+16b1adbb16c8a5 Joachim Eastwood    2015-07-29  293  
+8387ee21f972de Joachim Eastwood    2015-07-29  294  	plat_dat->bsp_priv = dwmac;
+16b1adbb16c8a5 Joachim Eastwood    2015-07-29 @295  	plat_dat->fix_mac_speed = data->fix_retime_src;
+8387ee21f972de Joachim Eastwood    2015-07-29  296  
+b89cbfb01a2855 Joachim Eastwood    2016-11-04  297  	ret = clk_prepare_enable(dwmac->clk);
+8387ee21f972de Joachim Eastwood    2015-07-29  298  	if (ret)
+d2ed0a7755fe14 Johan Hovold        2016-11-30  299  		goto err_remove_config_dt;
+8387ee21f972de Joachim Eastwood    2015-07-29  300  
+0eebedc2fd284e Joachim Eastwood    2016-11-04  301  	ret = sti_dwmac_set_mode(dwmac);
+b89cbfb01a2855 Joachim Eastwood    2016-11-04  302  	if (ret)
+b89cbfb01a2855 Joachim Eastwood    2016-11-04  303  		goto disable_clk;
+b89cbfb01a2855 Joachim Eastwood    2016-11-04  304  
+b89cbfb01a2855 Joachim Eastwood    2016-11-04  305  	ret = stmmac_dvr_probe(&pdev->dev, plat_dat, &stmmac_res);
+b89cbfb01a2855 Joachim Eastwood    2016-11-04  306  	if (ret)
+b89cbfb01a2855 Joachim Eastwood    2016-11-04  307  		goto disable_clk;
+b89cbfb01a2855 Joachim Eastwood    2016-11-04  308  
+b89cbfb01a2855 Joachim Eastwood    2016-11-04  309  	return 0;
+b89cbfb01a2855 Joachim Eastwood    2016-11-04  310  
+b89cbfb01a2855 Joachim Eastwood    2016-11-04  311  disable_clk:
+b89cbfb01a2855 Joachim Eastwood    2016-11-04  312  	clk_disable_unprepare(dwmac->clk);
+d2ed0a7755fe14 Johan Hovold        2016-11-30  313  err_remove_config_dt:
+d2ed0a7755fe14 Johan Hovold        2016-11-30  314  	stmmac_remove_config_dt(pdev, plat_dat);
+0a9e22715ee384 Johan Hovold        2016-11-30  315  
+b89cbfb01a2855 Joachim Eastwood    2016-11-04  316  	return ret;
+d15891ca1fdd7f Srinivas Kandagatla 2014-02-11  317  }
+d15891ca1fdd7f Srinivas Kandagatla 2014-02-11  318  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
