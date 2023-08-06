@@ -1,478 +1,142 @@
-Return-Path: <netdev+bounces-24693-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24694-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89E52771395
-	for <lists+netdev@lfdr.de>; Sun,  6 Aug 2023 06:19:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 716E37713AF
+	for <lists+netdev@lfdr.de>; Sun,  6 Aug 2023 07:12:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 768271C20966
-	for <lists+netdev@lfdr.de>; Sun,  6 Aug 2023 04:19:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2497E1C20979
+	for <lists+netdev@lfdr.de>; Sun,  6 Aug 2023 05:12:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C22FF17F9;
-	Sun,  6 Aug 2023 04:19:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99F6B187F;
+	Sun,  6 Aug 2023 05:12:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE85317F6
-	for <netdev@vger.kernel.org>; Sun,  6 Aug 2023 04:19:13 +0000 (UTC)
-Received: from mail-ot1-f78.google.com (mail-ot1-f78.google.com [209.85.210.78])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B8841FDE
-	for <netdev@vger.kernel.org>; Sat,  5 Aug 2023 21:19:09 -0700 (PDT)
-Received: by mail-ot1-f78.google.com with SMTP id 46e09a7af769-6bb1755ee51so6090458a34.1
-        for <netdev@vger.kernel.org>; Sat, 05 Aug 2023 21:19:09 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691295548; x=1691900348;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=E+X+IKnyndSBhTYVS/xhJd3tcTWpCXp75Nd45F3AMQI=;
-        b=W5AkscLAFZ85LfSUQEtedu0nT0x/Gok8fDdf0//6rbSdtxAzkiC4tM3ggKHd8B9xFr
-         DFRiiGq1T/UI4pRR9AJOhYGFuRaYBb1LEcHzszRTEF0OHcsfXnuhOoOwqKT4Th3McupW
-         z0azGSy0WGySVUAK5JS2iXVwNTC9PneNJeIdxzTMYrlaR5amsHbQx+mIJ1HS8kalxum/
-         UzS318L+2jL9+699yzG+t3lcOTikKlhHbiENvF6TzoqwfJBsDC3jdSQOpVZt4d3ZAlut
-         9mtP4vzpB77sazqXRclbU3FHy56y4OMyVKv33X6csU1EDeVCb5Q6Vfw7iTDDA9JeGalZ
-         +57w==
-X-Gm-Message-State: AOJu0Yyb+wViGS6iojJ5asVxpz7rneoTjtwVL+u5EHCurgbbcvfhmxM5
-	DbgUb6jHfCR4JCC8Ch7e9BTlUTXTKyHEdxFe+XnFISdAXkdH
-X-Google-Smtp-Source: AGHT+IFw4luIMOZvsURttPTyktmmzr6d1QgkzN7PwE693zIMKZ/QalCmyObLXUcaYDOnHuGZrLdA32THqiPWIEbZChqhrp0ZYWOm
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 878111864
+	for <netdev@vger.kernel.org>; Sun,  6 Aug 2023 05:12:08 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B28481FCB;
+	Sat,  5 Aug 2023 22:12:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1691298726; x=1722834726;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=PyntLaLBLC94wFX1lFmqWsYNfnYmddus6IUHc4nSyaM=;
+  b=IOp36way2gp5NP9sHWA5N/mlFBoDEPCwlCWvT10q8oXR3S4tkGq6jgyc
+   +8tK7S/tUDlO1a6r7PkWJHnoY0Mi+FpW99sCEjAgNfqhU9xTNZns0uDRM
+   uydHA6uwOXDW1gqLPgX4Fr5uhm0bJCQ8zZT9vq5RcjJnMKaABa9gLyTDO
+   DxQg0MYaP1Sfa5jtkm4gCJ0UW5ydE+mVmIyuMJtAL7dyhTdfzTtW5UbYS
+   mpB3NRnDW2o2fJ2Ezm9kt0yaF3M7Voe91wwiircVicgR4Qi3YbhT4Ngtp
+   OhB9fnPdumXeciJt9qncnF0+hAmMnb0HMFkuAABSd3b2iuD+VRSPwsj7p
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10793"; a="456735977"
+X-IronPort-AV: E=Sophos;i="6.01,259,1684825200"; 
+   d="scan'208";a="456735977"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Aug 2023 22:12:05 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10793"; a="730516340"
+X-IronPort-AV: E=Sophos;i="6.01,259,1684825200"; 
+   d="scan'208";a="730516340"
+Received: from lkp-server01.sh.intel.com (HELO d1ccc7e87e8f) ([10.239.97.150])
+  by orsmga002.jf.intel.com with ESMTP; 05 Aug 2023 22:12:01 -0700
+Received: from kbuild by d1ccc7e87e8f with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1qSW3c-00042R-1b;
+	Sun, 06 Aug 2023 05:12:00 +0000
+Date: Sun, 6 Aug 2023 13:11:53 +0800
+From: kernel test robot <lkp@intel.com>
+To: Da Xue <da@libre.computer>, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	Kevin Hilman <khilman@baylibre.com>,
+	Jerome Brunet <jbrunet@baylibre.com>,
+	Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	Da Xue <da@libre.computer>, Luke Lu <luke.lu@libre.computer>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-amlogic@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] [PATCH v2] net: phy: meson-gxl: implement
+ meson_gxl_phy_resume()
+Message-ID: <202308061204.L4tEEJAa-lkp@intel.com>
+References: <20230804201903.1303713-1-da@libre.computer>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6870:a104:b0:1b0:5d42:a889 with SMTP id
- m4-20020a056870a10400b001b05d42a889mr5975051oae.4.1691295548321; Sat, 05 Aug
- 2023 21:19:08 -0700 (PDT)
-Date: Sat, 05 Aug 2023 21:19:08 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000005e37070602396ea9@google.com>
-Subject: [syzbot] [ppp?] possible deadlock in ap_get
-From: syzbot <syzbot+cb575960cbf993938435@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, linux-ppp@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, paulus@samba.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=0.9 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,
-	RCVD_IN_MSPIKE_WL,SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS autolearn=no
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230804201903.1303713-1-da@libre.computer>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hello,
+Hi Da,
 
-syzbot found the following issue on:
+kernel test robot noticed the following build errors:
 
-HEAD commit:    f6a691685962 Merge tag '6.5-rc4-smb3-client-fix' of git://..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=155b4093a80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=fa5bd4cd5ab6259d
-dashboard link: https://syzkaller.appspot.com/bug?extid=cb575960cbf993938435
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+[auto build test ERROR on net-next/main]
+[also build test ERROR on net/main linus/master v6.5-rc4 next-20230804]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Unfortunately, I don't have any reproducer for this issue yet.
+url:    https://github.com/intel-lab-lkp/linux/commits/Da-Xue/net-phy-meson-gxl-implement-meson_gxl_phy_resume/20230805-042033
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20230804201903.1303713-1-da%40libre.computer
+patch subject: [PATCH] [PATCH v2] net: phy: meson-gxl: implement meson_gxl_phy_resume()
+config: x86_64-allyesconfig (https://download.01.org/0day-ci/archive/20230806/202308061204.L4tEEJAa-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
+reproduce: (https://download.01.org/0day-ci/archive/20230806/202308061204.L4tEEJAa-lkp@intel.com/reproduce)
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/402b1d665760/disk-f6a69168.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/e18b9495da50/vmlinux-f6a69168.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/0a8d1f7341ec/bzImage-f6a69168.xz
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202308061204.L4tEEJAa-lkp@intel.com/
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+cb575960cbf993938435@syzkaller.appspotmail.com
+All errors (new ones prefixed by >>):
 
-========================================================
-WARNING: possible irq lock inversion dependency detected
-6.5.0-rc4-syzkaller-00245-gf6a691685962 #0 Not tainted
---------------------------------------------------------
-syz-executor.3/5705 just changed the state of lock:
-ffffffff8d9463f8 (disc_data_lock){.?.-}-{2:2}, at: ap_get+0x18/0xf0 drivers/net/ppp/ppp_async.c:136
-but this lock was taken by another, HARDIRQ-safe lock in the past:
- (&port_lock_key){-.-.}-{2:2}
-
-
-and interrupts could create inverse lock ordering between them.
-
-
-other info that might help us debug this:
- Possible interrupt unsafe locking scenario:
-
-       CPU0                    CPU1
-       ----                    ----
-  lock(disc_data_lock);
-                               local_irq_disable();
-                               lock(&port_lock_key);
-                               lock(disc_data_lock);
-  <Interrupt>
-    lock(&port_lock_key);
-
- *** DEADLOCK ***
-
-1 lock held by syz-executor.3/5705:
- #0: ffff888079948098 (&tty->ldisc_sem){++++}-{0:0}, at: tty_ldisc_ref_wait+0x24/0x80 drivers/tty/tty_ldisc.c:243
-
-the shortest dependencies between 2nd lock and 1st lock:
- -> (&port_lock_key){-.-.}-{2:2} {
-    IN-HARDIRQ-W at:
-                      lock_acquire kernel/locking/lockdep.c:5761 [inline]
-                      lock_acquire+0x1ae/0x510 kernel/locking/lockdep.c:5726
-                      __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
-                      _raw_spin_lock_irqsave+0x3a/0x50 kernel/locking/spinlock.c:162
-                      serial8250_handle_irq+0x91/0xbe0 drivers/tty/serial/8250/8250_port.c:1917
-                      serial8250_default_handle_irq+0x94/0x210 drivers/tty/serial/8250/8250_port.c:1963
-                      serial8250_interrupt+0xfc/0x200 drivers/tty/serial/8250/8250_core.c:127
-                      __handle_irq_event_percpu+0x22a/0x740 kernel/irq/handle.c:158
-                      handle_irq_event_percpu kernel/irq/handle.c:193 [inline]
-                      handle_irq_event+0xab/0x1e0 kernel/irq/handle.c:210
-                      handle_edge_irq+0x261/0xcf0 kernel/irq/chip.c:834
-                      generic_handle_irq_desc include/linux/irqdesc.h:161 [inline]
-                      handle_irq arch/x86/kernel/irq.c:238 [inline]
-                      __common_interrupt+0x9f/0x220 arch/x86/kernel/irq.c:257
-                      common_interrupt+0xa9/0xd0 arch/x86/kernel/irq.c:247
-                      asm_common_interrupt+0x26/0x40 arch/x86/include/asm/idtentry.h:636
-                      native_safe_halt arch/x86/include/asm/irqflags.h:48 [inline]
-                      arch_safe_halt arch/x86/include/asm/irqflags.h:86 [inline]
-                      acpi_safe_halt+0x1b/0x20 drivers/acpi/processor_idle.c:112
-                      acpi_idle_enter+0xc5/0x160 drivers/acpi/processor_idle.c:707
-                      cpuidle_enter_state+0x82/0x500 drivers/cpuidle/cpuidle.c:267
-                      cpuidle_enter+0x4e/0xa0 drivers/cpuidle/cpuidle.c:388
-                      cpuidle_idle_call kernel/sched/idle.c:215 [inline]
-                      do_idle+0x315/0x3f0 kernel/sched/idle.c:282
-                      cpu_startup_entry+0x18/0x20 kernel/sched/idle.c:379
-                      rest_init+0x16f/0x2b0 init/main.c:726
-                      arch_call_rest_init+0x13/0x30 init/main.c:823
-                      start_kernel+0x39f/0x480 init/main.c:1068
-                      x86_64_start_reservations+0x18/0x30 arch/x86/kernel/head64.c:556
-                      x86_64_start_kernel+0xb2/0xc0 arch/x86/kernel/head64.c:537
-                      secondary_startup_64_no_verify+0x167/0x16b
-    IN-SOFTIRQ-W at:
-                      lock_acquire kernel/locking/lockdep.c:5761 [inline]
-                      lock_acquire+0x1ae/0x510 kernel/locking/lockdep.c:5726
-                      __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
-                      _raw_spin_lock_irqsave+0x3a/0x50 kernel/locking/spinlock.c:162
-                      serial8250_handle_irq+0x91/0xbe0 drivers/tty/serial/8250/8250_port.c:1917
-                      serial8250_default_handle_irq+0x94/0x210 drivers/tty/serial/8250/8250_port.c:1963
-                      serial8250_interrupt+0xfc/0x200 drivers/tty/serial/8250/8250_core.c:127
-                      __handle_irq_event_percpu+0x22a/0x740 kernel/irq/handle.c:158
-                      handle_irq_event_percpu kernel/irq/handle.c:193 [inline]
-                      handle_irq_event+0xab/0x1e0 kernel/irq/handle.c:210
-                      handle_edge_irq+0x261/0xcf0 kernel/irq/chip.c:834
-                      generic_handle_irq_desc include/linux/irqdesc.h:161 [inline]
-                      handle_irq arch/x86/kernel/irq.c:238 [inline]
-                      __common_interrupt+0x9f/0x220 arch/x86/kernel/irq.c:257
-                      common_interrupt+0x51/0xd0 arch/x86/kernel/irq.c:247
-                      asm_common_interrupt+0x26/0x40 arch/x86/include/asm/idtentry.h:636
-                      variable_ffs arch/x86/include/asm/bitops.h:319 [inline]
-                      __do_softirq+0x1dd/0x965 kernel/softirq.c:541
-                      invoke_softirq kernel/softirq.c:427 [inline]
-                      __irq_exit_rcu kernel/softirq.c:632 [inline]
-                      irq_exit_rcu+0xb7/0x120 kernel/softirq.c:644
-                      sysvec_apic_timer_interrupt+0x93/0xc0 arch/x86/kernel/apic/apic.c:1109
-                      asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:645
-                      arch_atomic_read arch/x86/include/asm/atomic.h:23 [inline]
-                      raw_atomic_read include/linux/atomic/atomic-arch-fallback.h:444 [inline]
-                      rcu_dynticks_curr_cpu_in_eqs include/linux/context_tracking.h:122 [inline]
-                      rcu_is_watching+0x5c/0xb0 kernel/rcu/tree.c:695
-                      rcu_read_lock_held_common kernel/rcu/update.c:108 [inline]
-                      rcu_read_lock_held+0x1a/0x40 kernel/rcu/update.c:348
-                      xa_entry include/linux/xarray.h:1198 [inline]
-                      xas_descend+0x2ba/0x480 lib/xarray.c:206
-                      xas_load+0xe0/0x140 lib/xarray.c:244
-                      xas_find+0x60b/0x870 lib/xarray.c:1250
-                      first_map_page mm/filemap.c:3482 [inline]
-                      filemap_map_pages+0x1f8/0x1150 mm/filemap.c:3509
-                      do_fault_around mm/memory.c:4510 [inline]
-                      do_read_fault mm/memory.c:4542 [inline]
-                      do_fault mm/memory.c:4670 [inline]
-                      do_pte_missing mm/memory.c:3664 [inline]
-                      handle_pte_fault mm/memory.c:4939 [inline]
-                      __handle_mm_fault+0x2784/0x3b80 mm/memory.c:5079
-                      handle_mm_fault+0x2ab/0x9d0 mm/memory.c:5233
-                      do_user_addr_fault+0x446/0xfc0 arch/x86/mm/fault.c:1392
-                      handle_page_fault arch/x86/mm/fault.c:1486 [inline]
-                      exc_page_fault+0x5c/0xd0 arch/x86/mm/fault.c:1542
-                      asm_exc_page_fault+0x26/0x30 arch/x86/include/asm/idtentry.h:570
-    INITIAL USE at:
-                     lock_acquire kernel/locking/lockdep.c:5761 [inline]
-                     lock_acquire+0x1ae/0x510 kernel/locking/lockdep.c:5726
-                     __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
-                     _raw_spin_lock_irqsave+0x3a/0x50 kernel/locking/spinlock.c:162
-                     serial8250_do_set_termios+0x334/0x1240 drivers/tty/serial/8250/8250_port.c:2794
-                     serial8250_set_termios+0x6b/0x80 drivers/tty/serial/8250/8250_port.c:2913
-                     uart_set_options+0x30e/0x5e0 drivers/tty/serial/serial_core.c:2284
-                     serial8250_console_setup+0x18a/0x430 drivers/tty/serial/8250/8250_port.c:3507
-                     univ8250_console_setup+0x168/0x210 drivers/tty/serial/8250/8250_core.c:631
-                     try_enable_preferred_console+0x24d/0x470 kernel/printk/printk.c:3228
-                     register_console+0x331/0x10d0 kernel/printk/printk.c:3401
-                     univ8250_console_init+0x35/0x50 drivers/tty/serial/8250/8250_core.c:716
-                     console_init+0xba/0x5c0 kernel/printk/printk.c:3601
-                     start_kernel+0x25a/0x480 init/main.c:1004
-                     x86_64_start_reservations+0x18/0x30 arch/x86/kernel/head64.c:556
-                     x86_64_start_kernel+0xb2/0xc0 arch/x86/kernel/head64.c:537
-                     secondary_startup_64_no_verify+0x167/0x16b
-  }
-  ... key      at: [<ffffffff92407120>] port_lock_key+0x0/0x40
-  ... acquired at:
-   __raw_read_lock include/linux/rwlock_api_smp.h:150 [inline]
-   _raw_read_lock+0x3a/0x70 kernel/locking/spinlock.c:228
-   ap_get+0x18/0xf0 drivers/net/ppp/ppp_async.c:136
-   ppp_asynctty_wakeup+0x18/0xb0 drivers/net/ppp/ppp_async.c:360
-   tty_wakeup+0xe5/0x120 drivers/tty/tty_io.c:525
-   tty_port_default_wakeup+0x2a/0x40 drivers/tty/tty_port.c:71
-   serial8250_tx_chars+0x542/0xf60 drivers/tty/serial/8250/8250_port.c:1839
-   serial8250_handle_irq+0x5fb/0xbe0 drivers/tty/serial/8250/8250_port.c:1943
-   serial8250_default_handle_irq+0x94/0x210 drivers/tty/serial/8250/8250_port.c:1963
-   serial8250_interrupt+0xfc/0x200 drivers/tty/serial/8250/8250_core.c:127
-   __handle_irq_event_percpu+0x22a/0x740 kernel/irq/handle.c:158
-   handle_irq_event_percpu kernel/irq/handle.c:193 [inline]
-   handle_irq_event+0xab/0x1e0 kernel/irq/handle.c:210
-   handle_edge_irq+0x261/0xcf0 kernel/irq/chip.c:834
-   generic_handle_irq_desc include/linux/irqdesc.h:161 [inline]
-   handle_irq arch/x86/kernel/irq.c:238 [inline]
-   __common_interrupt+0x9f/0x220 arch/x86/kernel/irq.c:257
-   common_interrupt+0xa9/0xd0 arch/x86/kernel/irq.c:247
-   asm_common_interrupt+0x26/0x40 arch/x86/include/asm/idtentry.h:636
-   __raw_spin_unlock_irqrestore include/linux/spinlock_api_smp.h:151 [inline]
-   _raw_spin_unlock_irqrestore+0x31/0x70 kernel/locking/spinlock.c:194
-   spin_unlock_irqrestore include/linux/spinlock.h:406 [inline]
-   serial_port_runtime_resume+0x2ae/0x330 drivers/tty/serial/serial_port.c:41
-   __rpm_callback+0xc5/0x4c0 drivers/base/power/runtime.c:392
-   rpm_callback+0x1da/0x220 drivers/base/power/runtime.c:446
-   rpm_resume+0xdb9/0x1980 drivers/base/power/runtime.c:912
-   pm_runtime_work+0x12e/0x180 drivers/base/power/runtime.c:977
-   process_one_work+0xaa2/0x16f0 kernel/workqueue.c:2597
-   worker_thread+0x687/0x1110 kernel/workqueue.c:2748
-   kthread+0x33a/0x430 kernel/kthread.c:389
-   ret_from_fork+0x2c/0x70 arch/x86/kernel/process.c:145
-   ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:304
-
--> (disc_data_lock){.?.-}-{2:2} {
-   IN-HARDIRQ-R at:
-                    lock_acquire kernel/locking/lockdep.c:5761 [inline]
-                    lock_acquire+0x1ae/0x510 kernel/locking/lockdep.c:5726
-                    __raw_read_lock include/linux/rwlock_api_smp.h:150 [inline]
-                    _raw_read_lock+0x3a/0x70 kernel/locking/spinlock.c:228
-                    ap_get+0x18/0xf0 drivers/net/ppp/ppp_async.c:136
-                    ppp_asynctty_wakeup+0x18/0xb0 drivers/net/ppp/ppp_async.c:360
-                    tty_wakeup+0xe5/0x120 drivers/tty/tty_io.c:525
-                    tty_port_default_wakeup+0x2a/0x40 drivers/tty/tty_port.c:71
-                    serial8250_tx_chars+0x542/0xf60 drivers/tty/serial/8250/8250_port.c:1839
-                    serial8250_handle_irq+0x5fb/0xbe0 drivers/tty/serial/8250/8250_port.c:1943
-                    serial8250_default_handle_irq+0x94/0x210 drivers/tty/serial/8250/8250_port.c:1963
-                    serial8250_interrupt+0xfc/0x200 drivers/tty/serial/8250/8250_core.c:127
-                    __handle_irq_event_percpu+0x22a/0x740 kernel/irq/handle.c:158
-                    handle_irq_event_percpu kernel/irq/handle.c:193 [inline]
-                    handle_irq_event+0xab/0x1e0 kernel/irq/handle.c:210
-                    handle_edge_irq+0x261/0xcf0 kernel/irq/chip.c:834
-                    generic_handle_irq_desc include/linux/irqdesc.h:161 [inline]
-                    handle_irq arch/x86/kernel/irq.c:238 [inline]
-                    __common_interrupt+0x9f/0x220 arch/x86/kernel/irq.c:257
-                    common_interrupt+0xa9/0xd0 arch/x86/kernel/irq.c:247
-                    asm_common_interrupt+0x26/0x40 arch/x86/include/asm/idtentry.h:636
-                    __raw_spin_unlock_irqrestore include/linux/spinlock_api_smp.h:151 [inline]
-                    _raw_spin_unlock_irqrestore+0x31/0x70 kernel/locking/spinlock.c:194
-                    spin_unlock_irqrestore include/linux/spinlock.h:406 [inline]
-                    serial_port_runtime_resume+0x2ae/0x330 drivers/tty/serial/serial_port.c:41
-                    __rpm_callback+0xc5/0x4c0 drivers/base/power/runtime.c:392
-                    rpm_callback+0x1da/0x220 drivers/base/power/runtime.c:446
-                    rpm_resume+0xdb9/0x1980 drivers/base/power/runtime.c:912
-                    pm_runtime_work+0x12e/0x180 drivers/base/power/runtime.c:977
-                    process_one_work+0xaa2/0x16f0 kernel/workqueue.c:2597
-                    worker_thread+0x687/0x1110 kernel/workqueue.c:2748
-                    kthread+0x33a/0x430 kernel/kthread.c:389
-                    ret_from_fork+0x2c/0x70 arch/x86/kernel/process.c:145
-                    ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:304
-   HARDIRQ-ON-R at:
-                    lock_acquire kernel/locking/lockdep.c:5761 [inline]
-                    lock_acquire+0x1ae/0x510 kernel/locking/lockdep.c:5726
-                    __raw_read_lock include/linux/rwlock_api_smp.h:150 [inline]
-                    _raw_read_lock+0x5f/0x70 kernel/locking/spinlock.c:228
-                    ap_get+0x18/0xf0 drivers/net/ppp/ppp_async.c:136
-                    ppp_asynctty_ioctl+0x23/0x2c0 drivers/net/ppp/ppp_async.c:286
-                    tty_ioctl+0x706/0x1580 drivers/tty/tty_io.c:2795
-                    vfs_ioctl fs/ioctl.c:51 [inline]
-                    __do_sys_ioctl fs/ioctl.c:870 [inline]
-                    __se_sys_ioctl fs/ioctl.c:856 [inline]
-                    __x64_sys_ioctl+0x18f/0x210 fs/ioctl.c:856
-                    do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-                    do_syscall_64+0x38/0xb0 arch/x86/entry/common.c:80
-                    entry_SYSCALL_64_after_hwframe+0x63/0xcd
-   IN-SOFTIRQ-R at:
-                    lock_acquire kernel/locking/lockdep.c:5761 [inline]
-                    lock_acquire+0x1ae/0x510 kernel/locking/lockdep.c:5726
-                    __raw_read_lock include/linux/rwlock_api_smp.h:150 [inline]
-                    _raw_read_lock+0x3a/0x70 kernel/locking/spinlock.c:228
-                    ap_get+0x18/0xf0 drivers/net/ppp/ppp_async.c:136
-                    ppp_asynctty_wakeup+0x18/0xb0 drivers/net/ppp/ppp_async.c:360
-                    tty_wakeup+0xe5/0x120 drivers/tty/tty_io.c:525
-                    tty_port_default_wakeup+0x2a/0x40 drivers/tty/tty_port.c:71
-                    serial8250_tx_chars+0x542/0xf60 drivers/tty/serial/8250/8250_port.c:1839
-                    serial8250_handle_irq+0x5fb/0xbe0 drivers/tty/serial/8250/8250_port.c:1943
-                    serial8250_default_handle_irq+0x94/0x210 drivers/tty/serial/8250/8250_port.c:1963
-                    serial8250_interrupt+0xfc/0x200 drivers/tty/serial/8250/8250_core.c:127
-                    __handle_irq_event_percpu+0x22a/0x740 kernel/irq/handle.c:158
-                    handle_irq_event_percpu kernel/irq/handle.c:193 [inline]
-                    handle_irq_event+0xab/0x1e0 kernel/irq/handle.c:210
-                    handle_edge_irq+0x261/0xcf0 kernel/irq/chip.c:834
-                    generic_handle_irq_desc include/linux/irqdesc.h:161 [inline]
-                    handle_irq arch/x86/kernel/irq.c:238 [inline]
-                    __common_interrupt+0x9f/0x220 arch/x86/kernel/irq.c:257
-                    common_interrupt+0x51/0xd0 arch/x86/kernel/irq.c:247
-                    asm_common_interrupt+0x26/0x40 arch/x86/include/asm/idtentry.h:636
-                    variable_ffs arch/x86/include/asm/bitops.h:319 [inline]
-                    __do_softirq+0x1dd/0x965 kernel/softirq.c:541
-                    invoke_softirq kernel/softirq.c:427 [inline]
-                    __irq_exit_rcu kernel/softirq.c:632 [inline]
-                    irq_exit_rcu+0xb7/0x120 kernel/softirq.c:644
-                    sysvec_apic_timer_interrupt+0x93/0xc0 arch/x86/kernel/apic/apic.c:1109
-                    asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:645
-                    synchronize_rcu+0x0/0x3b0 kernel/rcu/tree_exp.h:285
-                    lockdep_unregister_key+0x29a/0x490 kernel/locking/lockdep.c:6482
-                    wq_unregister_lockdep kernel/workqueue.c:3812 [inline]
-                    pwq_unbound_release_workfn+0x255/0x330 kernel/workqueue.c:4060
-                    process_one_work+0xaa2/0x16f0 kernel/workqueue.c:2597
-                    worker_thread+0x687/0x1110 kernel/workqueue.c:2748
-                    kthread+0x33a/0x430 kernel/kthread.c:389
-                    ret_from_fork+0x2c/0x70 arch/x86/kernel/process.c:145
-                    ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:304
-   INITIAL USE at:
-                   lock_acquire kernel/locking/lockdep.c:5761 [inline]
-                   lock_acquire+0x1ae/0x510 kernel/locking/lockdep.c:5726
-                   __raw_write_lock_irq include/linux/rwlock_api_smp.h:195 [inline]
-                   _raw_write_lock_irq+0x36/0x50 kernel/locking/spinlock.c:326
-                   ppp_asynctty_close+0x1c/0x1c0 drivers/net/ppp/ppp_async.c:219
-                   tty_ldisc_close+0x111/0x190 drivers/tty/tty_ldisc.c:455
-                   tty_ldisc_kill+0x94/0x150 drivers/tty/tty_ldisc.c:607
-                   tty_ldisc_release+0x17b/0x2a0 drivers/tty/tty_ldisc.c:775
-                   tty_release_struct+0x23/0xe0 drivers/tty/tty_io.c:1698
-                   tty_release+0xe23/0x1410 drivers/tty/tty_io.c:1869
-                   __fput+0x3fd/0xac0 fs/file_table.c:384
-                   task_work_run+0x14d/0x240 kernel/task_work.c:179
-                   get_signal+0x1075/0x2770 kernel/signal.c:2657
-                   arch_do_signal_or_restart+0x89/0x5f0 arch/x86/kernel/signal.c:308
-                   exit_to_user_mode_loop kernel/entry/common.c:168 [inline]
-                   exit_to_user_mode_prepare+0x11f/0x240 kernel/entry/common.c:204
-                   __syscall_exit_to_user_mode_work kernel/entry/common.c:286 [inline]
-                   syscall_exit_to_user_mode+0x1d/0x50 kernel/entry/common.c:297
-                   do_syscall_64+0x44/0xb0 arch/x86/entry/common.c:86
-                   entry_SYSCALL_64_after_hwframe+0x63/0xcd
-   INITIAL READ USE at:
-                        lock_acquire kernel/locking/lockdep.c:5761 [inline]
-                        lock_acquire+0x1ae/0x510 kernel/locking/lockdep.c:5726
-                        __raw_read_lock include/linux/rwlock_api_smp.h:150 [inline]
-                        _raw_read_lock+0x3a/0x70 kernel/locking/spinlock.c:228
-                        ap_get+0x18/0xf0 drivers/net/ppp/ppp_async.c:136
-                        ppp_asynctty_wakeup+0x18/0xb0 drivers/net/ppp/ppp_async.c:360
-                        tty_wakeup+0xe5/0x120 drivers/tty/tty_io.c:525
-                        tty_port_default_wakeup+0x2a/0x40 drivers/tty/tty_port.c:71
-                        serial8250_tx_chars+0x542/0xf60 drivers/tty/serial/8250/8250_port.c:1839
-                        serial8250_handle_irq+0x5fb/0xbe0 drivers/tty/serial/8250/8250_port.c:1943
-                        serial8250_default_handle_irq+0x94/0x210 drivers/tty/serial/8250/8250_port.c:1963
-                        serial8250_interrupt+0xfc/0x200 drivers/tty/serial/8250/8250_core.c:127
-                        __handle_irq_event_percpu+0x22a/0x740 kernel/irq/handle.c:158
-                        handle_irq_event_percpu kernel/irq/handle.c:193 [inline]
-                        handle_irq_event+0xab/0x1e0 kernel/irq/handle.c:210
-                        handle_edge_irq+0x261/0xcf0 kernel/irq/chip.c:834
-                        generic_handle_irq_desc include/linux/irqdesc.h:161 [inline]
-                        handle_irq arch/x86/kernel/irq.c:238 [inline]
-                        __common_interrupt+0x9f/0x220 arch/x86/kernel/irq.c:257
-                        common_interrupt+0xa9/0xd0 arch/x86/kernel/irq.c:247
-                        asm_common_interrupt+0x26/0x40 arch/x86/include/asm/idtentry.h:636
-                        __raw_spin_unlock_irqrestore include/linux/spinlock_api_smp.h:151 [inline]
-                        _raw_spin_unlock_irqrestore+0x31/0x70 kernel/locking/spinlock.c:194
-                        spin_unlock_irqrestore include/linux/spinlock.h:406 [inline]
-                        serial_port_runtime_resume+0x2ae/0x330 drivers/tty/serial/serial_port.c:41
-                        __rpm_callback+0xc5/0x4c0 drivers/base/power/runtime.c:392
-                        rpm_callback+0x1da/0x220 drivers/base/power/runtime.c:446
-                        rpm_resume+0xdb9/0x1980 drivers/base/power/runtime.c:912
-                        pm_runtime_work+0x12e/0x180 drivers/base/power/runtime.c:977
-                        process_one_work+0xaa2/0x16f0 kernel/workqueue.c:2597
-                        worker_thread+0x687/0x1110 kernel/workqueue.c:2748
-                        kthread+0x33a/0x430 kernel/kthread.c:389
-                        ret_from_fork+0x2c/0x70 arch/x86/kernel/process.c:145
-                        ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:304
- }
- ... key      at: [<ffffffff8d9463f8>] disc_data_lock+0x18/0x60
- ... acquired at:
-   mark_usage kernel/locking/lockdep.c:4586 [inline]
-   __lock_acquire+0x13a5/0x5de0 kernel/locking/lockdep.c:5098
-   lock_acquire kernel/locking/lockdep.c:5761 [inline]
-   lock_acquire+0x1ae/0x510 kernel/locking/lockdep.c:5726
-   __raw_read_lock include/linux/rwlock_api_smp.h:150 [inline]
-   _raw_read_lock+0x5f/0x70 kernel/locking/spinlock.c:228
-   ap_get+0x18/0xf0 drivers/net/ppp/ppp_async.c:136
-   ppp_asynctty_ioctl+0x23/0x2c0 drivers/net/ppp/ppp_async.c:286
-   tty_ioctl+0x706/0x1580 drivers/tty/tty_io.c:2795
-   vfs_ioctl fs/ioctl.c:51 [inline]
-   __do_sys_ioctl fs/ioctl.c:870 [inline]
-   __se_sys_ioctl fs/ioctl.c:856 [inline]
-   __x64_sys_ioctl+0x18f/0x210 fs/ioctl.c:856
-   do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-   do_syscall_64+0x38/0xb0 arch/x86/entry/common.c:80
-   entry_SYSCALL_64_after_hwframe+0x63/0xcd
+   drivers/net/phy/meson-gxl.c: In function 'meson_gxl_phy_resume':
+>> drivers/net/phy/meson-gxl.c:139:9: error: too few arguments to function 'genphy_resume'
+     139 |         genphy_resume();
+         |         ^~~~~~~~~~~~~
+   In file included from drivers/net/phy/meson-gxl.c:13:
+   include/linux/phy.h:1794:5: note: declared here
+    1794 | int genphy_resume(struct phy_device *phydev);
+         |     ^~~~~~~~~~~~~
 
 
-stack backtrace:
-CPU: 1 PID: 5705 Comm: syz-executor.3 Not tainted 6.5.0-rc4-syzkaller-00245-gf6a691685962 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/12/2023
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0xd9/0x1b0 lib/dump_stack.c:106
- print_irq_inversion_bug.part.0+0x3e1/0x590 kernel/locking/lockdep.c:4087
- print_irq_inversion_bug kernel/locking/lockdep.c:4040 [inline]
- check_usage_forwards kernel/locking/lockdep.c:4118 [inline]
- mark_lock_irq kernel/locking/lockdep.c:4250 [inline]
- mark_lock+0x920/0x1950 kernel/locking/lockdep.c:4685
- mark_usage kernel/locking/lockdep.c:4586 [inline]
- __lock_acquire+0x13a5/0x5de0 kernel/locking/lockdep.c:5098
- lock_acquire kernel/locking/lockdep.c:5761 [inline]
- lock_acquire+0x1ae/0x510 kernel/locking/lockdep.c:5726
- __raw_read_lock include/linux/rwlock_api_smp.h:150 [inline]
- _raw_read_lock+0x5f/0x70 kernel/locking/spinlock.c:228
- ap_get+0x18/0xf0 drivers/net/ppp/ppp_async.c:136
- ppp_asynctty_ioctl+0x23/0x2c0 drivers/net/ppp/ppp_async.c:286
- tty_ioctl+0x706/0x1580 drivers/tty/tty_io.c:2795
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:870 [inline]
- __se_sys_ioctl fs/ioctl.c:856 [inline]
- __x64_sys_ioctl+0x18f/0x210 fs/ioctl.c:856
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x38/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
-RIP: 0033:0x7fbb1967cae9
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 20 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fbb1a4710c8 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 00007fbb1979c050 RCX: 00007fbb1967cae9
-RDX: 00000000200001c0 RSI: 0000000040045431 RDI: 0000000000000003
-RBP: 00007fbb196c847a R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 000000000000006e R14: 00007fbb1979c050 R15: 00007fbb198bfa48
- </TASK>
+vim +/genphy_resume +139 drivers/net/phy/meson-gxl.c
 
+   134	
+   135	static int meson_gxl_phy_resume(struct phy_device *phydev)
+   136	{
+   137		int ret;
+   138	
+ > 139		genphy_resume();
+   140		ret = meson_gxl_config_init(phydev);
+   141		if (ret)
+   142			return ret;
+   143	
+   144		return 0;
+   145	}
+   146	
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the bug is already fixed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to change bug's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the bug is a duplicate of another bug, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
