@@ -1,184 +1,122 @@
-Return-Path: <netdev+bounces-24717-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24718-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4DD37771650
-	for <lists+netdev@lfdr.de>; Sun,  6 Aug 2023 19:31:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 755BC77165E
+	for <lists+netdev@lfdr.de>; Sun,  6 Aug 2023 19:53:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7A9BD1C208D2
-	for <lists+netdev@lfdr.de>; Sun,  6 Aug 2023 17:31:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 239EA2811AD
+	for <lists+netdev@lfdr.de>; Sun,  6 Aug 2023 17:53:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E5315CB0;
-	Sun,  6 Aug 2023 17:31:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9BC663A4;
+	Sun,  6 Aug 2023 17:53:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2D053D63
-	for <netdev@vger.kernel.org>; Sun,  6 Aug 2023 17:31:45 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F63AC433C8;
-	Sun,  6 Aug 2023 17:31:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8857D5696
+	for <netdev@vger.kernel.org>; Sun,  6 Aug 2023 17:53:41 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5CE5BC433C7;
+	Sun,  6 Aug 2023 17:53:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691343105;
-	bh=WqQcq/iEINXz8RMnCvagZGNodm+OM0Vsc80wKSLiO8s=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=IKEg7He7kFUl20AIIDoHuxBcTaAREW7VOD8eI3toZ9y+9qGYMhnjDGnOUlDjRifcR
-	 UrRZbEKDp+JE/25p6YyGgYpfavyiNv3nhHSiGZnOxRDBXGi+YEhGI6reJLaWaxWvOW
-	 //vh2vD9+RridiJxcIej5D6SspDL1fRgo/VWAbZoIYeQkpeQNmsc4LKCAMCuxWRXJI
-	 0jmLfv9GnH7cNhfEXxoLFfnPesjZiXwHcukekgX7aOPPKvwgvoOU+rOdXWi8T92rWb
-	 s5EM9mzqxlNGSwVbelT5lfeks7vnvek8uhzcHziVotAe1d7T325DOksT/+TD9MGOW8
-	 Neuu6smhSFg3A==
-Date: Sun, 6 Aug 2023 19:31:40 +0200
-From: Simon Horman <horms@kernel.org>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Cc: Jakub Kicinski <kuba@kernel.org>, Jiri Pirko <jiri@resnulli.us>,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
-	Jonathan Lemon <jonathan.lemon@gmail.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Milena Olech <milena.olech@intel.com>,
-	Michal Michalik <michal.michalik@intel.com>,
-	linux-arm-kernel@lists.infradead.org, poros@redhat.com,
-	mschmidt@redhat.com, netdev@vger.kernel.org,
-	linux-clk@vger.kernel.org, Bart Van Assche <bvanassche@acm.org>,
-	intel-wired-lan@lists.osuosl.org
-Subject: Re: [PATCH net-next v2 6/9] ice: add admin commands to access cgu
- configuration
-Message-ID: <ZM/Y/PjPVNxbwLOL@vergenet.net>
-References: <20230804190454.394062-1-vadim.fedorenko@linux.dev>
- <20230804190454.394062-7-vadim.fedorenko@linux.dev>
+	s=k20201202; t=1691344421;
+	bh=TiEcOPbSzVD11ZN5C0JGXcIfrthE91VTmMn1kJ2hHw8=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=PLYFUhc4c2EfIWmheHVngM7CkBbPeNKza7QyeGlk8VaDRUZSqt3uEDlcZgFcEq/nA
+	 caNltPlf76c6Gt5SorNokpC60hbI3TysPqPcA8ACp+YjygEGwlyAhm0WeOjqljiIHy
+	 8wEYdbet8HkYehfMjTJVU4y5E+e/WHbxgmBFdaOHXc8SIzFK2qu98D22WERhFWEdyK
+	 dgkoi5QkYG38JrfdW5aLlJNEwnByYpW8Ujwi7KVB4MZtCuKEALPvlxuEXCx6iPtDiT
+	 L4rRKrRMHP6oJOe8P+r4oVKtlDkr6fDSEefoo0/jDkYs4XuLG6ZLuaag/LA+rDNsus
+	 kAbg6awR19i2A==
+Message-ID: <5b4bd1cd-ff2d-3aef-8e14-ec3b3c158864@kernel.org>
+Date: Sun, 6 Aug 2023 12:53:38 -0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230804190454.394062-7-vadim.fedorenko@linux.dev>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH v3 3/5] dt-bindings: clock: add Intel Agilex5 clock
+ manager
+Content-Language: en-US
+To: "Rabara, Niravkumar L" <niravkumar.l.rabara@intel.com>,
+ Conor Dooley <conor.dooley@microchip.com>
+Cc: "Ng, Adrian Ho Yin" <adrian.ho.yin.ng@intel.com>,
+ "andrew@lunn.ch" <andrew@lunn.ch>, "conor+dt@kernel.org"
+ <conor+dt@kernel.org>,
+ "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+ "krzysztof.kozlowski+dt@linaro.org" <krzysztof.kozlowski+dt@linaro.org>,
+ "linux-clk@vger.kernel.org" <linux-clk@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "Turquette, Mike" <mturquette@baylibre.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "p.zabel@pengutronix.de" <p.zabel@pengutronix.de>,
+ "richardcochran@gmail.com" <richardcochran@gmail.com>,
+ "robh+dt@kernel.org" <robh+dt@kernel.org>,
+ "sboyd@kernel.org" <sboyd@kernel.org>,
+ "wen.ping.teh@intel.com" <wen.ping.teh@intel.com>
+References: <20230801010234.792557-4-niravkumar.l.rabara@intel.com>
+ <20230802025842.1260345-1-niravkumar.l.rabara@intel.com>
+ <20230802-reuse-diffusion-d41ed8175390@wendy>
+ <DM6PR11MB3291627AB955685C345F7B71A20BA@DM6PR11MB3291.namprd11.prod.outlook.com>
+From: Dinh Nguyen <dinguyen@kernel.org>
+In-Reply-To: <DM6PR11MB3291627AB955685C345F7B71A20BA@DM6PR11MB3291.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Aug 04, 2023 at 08:04:51PM +0100, Vadim Fedorenko wrote:
-> From: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+
+
+On 8/2/23 02:14, Rabara, Niravkumar L wrote:
 > 
-> Add firmware admin command to access clock generation unit
-> configuration, it is required to enable Extended PTP and SyncE features
-> in the driver.
-> Add definitions of possible hardware variations of input and output pins
-> related to clock generation unit and functions to access the data.
 > 
-> Signed-off-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-> Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+>> -----Original Message-----
+>> From: Conor Dooley <conor.dooley@microchip.com>
+>> Sent: Wednesday, 2 August, 2023 3:02 PM
+>> To: Rabara, Niravkumar L <niravkumar.l.rabara@intel.com>
+>> Cc: Ng, Adrian Ho Yin <adrian.ho.yin.ng@intel.com>; andrew@lunn.ch;
+>> conor+dt@kernel.org; devicetree@vger.kernel.org; dinguyen@kernel.org;
+>> krzysztof.kozlowski+dt@linaro.org; linux-clk@vger.kernel.org; linux-
+>> kernel@vger.kernel.org; Turquette, Mike <mturquette@baylibre.com>;
+>> netdev@vger.kernel.org; p.zabel@pengutronix.de;
+>> richardcochran@gmail.com; robh+dt@kernel.org; sboyd@kernel.org;
+>> wen.ping.teh@intel.com
+>> Subject: Re: [PATCH v3 3/5] dt-bindings: clock: add Intel Agilex5 clock
+>> manager
+>>
+>> On Wed, Aug 02, 2023 at 10:58:42AM +0800, niravkumar.l.rabara@intel.com
+>> wrote:
+>>> From: Niravkumar L Rabara <niravkumar.l.rabara@intel.com>
+>>>
+>>> Add clock ID definitions for Intel Agilex5 SoCFPGA.
+>>> The registers in Agilex5 handling the clock is named as clock manager.
+>>>
+>>> Signed-off-by: Teh Wen Ping <wen.ping.teh@intel.com>
+>>> Reviewed-by: Dinh Nguyen <dinguyen@kernel.org>
+>>> Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
+>>> Signed-off-by: Niravkumar L Rabara <niravkumar.l.rabara@intel.com>
+>>
+>> Damn, I was too late - you already sent a v3 :/
+>>
+>> However, there only seems to be a v3 of this one patch and it was sent in
+>> reply to the v2 series? The normal thing to do is resend the entire series, not
+>> just one patch, as a new thread. Not using a new thread may make it harder
+>> to apply & will also bury the email in people's mailboxes that use things like
+>> mutt. A single patch as a reply is also confusing, as the rest of the v3 looks like
+>> it is missing!
+>>
+>> Thanks,
+>> Conor.
+> 
+> Sorry I made a mistake.
+> Should I send out entire series with PATCH v3 subject? Or should I wait for review comment on remaining patches and then send entire series with rework and  subject prefix PATCH v3?
+> 
 
-Hi Arkadiusz and Vadim,
+No need to send out a V3. I've applied patches 1-3 and 5. Will give a 
+little more time for the clk patch.
 
-> diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
-
-...
-
-> +/**
-> + * ice_aq_get_cgu_dpll_status - get dpll status
-> + * @hw: pointer to the HW struct
-> + * @dpll_num: DPLL index
-> + * @ref_state: Reference clock state
-> + * @config: current DPLL config
-> + * @dpll_state: current DPLL state
-> + * @phase_offset: Phase offset in ns
-> + * @eec_mode: EEC_mode
-> + *
-> + * Get CGU DPLL status (0x0C66)
-> + * Return: 0 on success or negative value on failure.
-> + */
-> +int
-> +ice_aq_get_cgu_dpll_status(struct ice_hw *hw, u8 dpll_num, u8 *ref_state,
-> +			   u8 *dpll_state, u8 *config, s64 *phase_offset,
-> +			   u8 *eec_mode)
-> +{
-> +	struct ice_aqc_get_cgu_dpll_status *cmd;
-> +	const s64 NSEC_PER_PSEC = 1000LL;
-
-Probably this should be in lower case, or an (upper case) #define.
-In the case of the latter it should probably be moved outside of the
-function.
-
-> +	struct ice_aq_desc desc;
-> +	int status;
-> +
-> +	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_get_cgu_dpll_status);
-> +	cmd = &desc.params.get_cgu_dpll_status;
-> +	cmd->dpll_num = dpll_num;
-> +
-> +	status = ice_aq_send_cmd(hw, &desc, NULL, 0, NULL);
-> +	if (!status) {
-> +		*ref_state = cmd->ref_state;
-> +		*dpll_state = cmd->dpll_state;
-> +		*config = cmd->config;
-> +		*phase_offset = le32_to_cpu(cmd->phase_offset_h);
-> +		*phase_offset <<= 32;
-> +		*phase_offset += le32_to_cpu(cmd->phase_offset_l);
-> +		*phase_offset = sign_extend64(*phase_offset, 47) /
-> +			NSEC_PER_PSEC;
-
-This causes a build failure on x86_32.
-
-  ERROR: modpost: "__divdi3" [drivers/net/ethernet/intel/ice/ice.ko] undefined!
-
-Possibly you want (please do check for yourself):
-
-		*phase_offset = div64_s64(sign_extend64(*phase_offset, 47),
-					  NSEC_PER_PSEC);
-
-> +		*eec_mode = cmd->eec_mode;
-> +	}
-> +
-> +	return status;
-> +}
-> +
-> +/**
-> + * ice_aq_set_cgu_dpll_config - set dpll config
-> + * @hw: pointer to the HW struct
-> + * @dpll_num: DPLL index
-> + * @ref_state: Reference clock state
-> + * @config: DPLL config
-> + * @eec_mode: EEC mode
-> + *
-> + * Set CGU DPLL config (0x0C67)
-> + * Return: 0 on success or negative value on failure.
-> + */
-> +int
-> +ice_aq_set_cgu_dpll_config(struct ice_hw *hw, u8 dpll_num, u8 ref_state,
-> +			   u8 config, u8 eec_mode)
-> +{
-> +	struct ice_aqc_set_cgu_dpll_config *cmd;
-> +	struct ice_aq_desc desc;
-> +
-> +	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_set_cgu_dpll_config);
-> +	cmd = &desc.params.set_cgu_dpll_config;
-> +	cmd->dpll_num = dpll_num;
-> +	cmd->ref_state = ref_state;
-> +	cmd->config = config;
-> +	cmd->eec_mode = eec_mode;
-> +
-> +	return ice_aq_send_cmd(hw, &desc, NULL, 0, NULL);
-> +}
-> +
-> +/**
-> + * ice_aq_set_cgu_ref_prio - set input refernce priority
-
-nit: refernce -> reference
-
-> + * @hw: pointer to the HW struct
-> + * @dpll_num: DPLL index
-> + * @ref_idx: Reference pin index
-> + * @ref_priority: Reference input priority
-> + *
-> + * Set CGU reference priority (0x0C68)
-> + * Return: 0 on success or negative value on failure.
-> + */
-
-...
-
--- 
-pw-bot: changes-requested
-
+Dinh
 
