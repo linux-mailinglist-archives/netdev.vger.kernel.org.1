@@ -1,142 +1,96 @@
-Return-Path: <netdev+bounces-24694-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24696-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 716E37713AF
-	for <lists+netdev@lfdr.de>; Sun,  6 Aug 2023 07:12:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F4DC7713C5
+	for <lists+netdev@lfdr.de>; Sun,  6 Aug 2023 08:35:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2497E1C20979
-	for <lists+netdev@lfdr.de>; Sun,  6 Aug 2023 05:12:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5196F1C20982
+	for <lists+netdev@lfdr.de>; Sun,  6 Aug 2023 06:35:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99F6B187F;
-	Sun,  6 Aug 2023 05:12:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 477131FAF;
+	Sun,  6 Aug 2023 06:35:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 878111864
-	for <netdev@vger.kernel.org>; Sun,  6 Aug 2023 05:12:08 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B28481FCB;
-	Sat,  5 Aug 2023 22:12:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1691298726; x=1722834726;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=PyntLaLBLC94wFX1lFmqWsYNfnYmddus6IUHc4nSyaM=;
-  b=IOp36way2gp5NP9sHWA5N/mlFBoDEPCwlCWvT10q8oXR3S4tkGq6jgyc
-   +8tK7S/tUDlO1a6r7PkWJHnoY0Mi+FpW99sCEjAgNfqhU9xTNZns0uDRM
-   uydHA6uwOXDW1gqLPgX4Fr5uhm0bJCQ8zZT9vq5RcjJnMKaABa9gLyTDO
-   DxQg0MYaP1Sfa5jtkm4gCJ0UW5ydE+mVmIyuMJtAL7dyhTdfzTtW5UbYS
-   mpB3NRnDW2o2fJ2Ezm9kt0yaF3M7Voe91wwiircVicgR4Qi3YbhT4Ngtp
-   OhB9fnPdumXeciJt9qncnF0+hAmMnb0HMFkuAABSd3b2iuD+VRSPwsj7p
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10793"; a="456735977"
-X-IronPort-AV: E=Sophos;i="6.01,259,1684825200"; 
-   d="scan'208";a="456735977"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Aug 2023 22:12:05 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10793"; a="730516340"
-X-IronPort-AV: E=Sophos;i="6.01,259,1684825200"; 
-   d="scan'208";a="730516340"
-Received: from lkp-server01.sh.intel.com (HELO d1ccc7e87e8f) ([10.239.97.150])
-  by orsmga002.jf.intel.com with ESMTP; 05 Aug 2023 22:12:01 -0700
-Received: from kbuild by d1ccc7e87e8f with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1qSW3c-00042R-1b;
-	Sun, 06 Aug 2023 05:12:00 +0000
-Date: Sun, 6 Aug 2023 13:11:53 +0800
-From: kernel test robot <lkp@intel.com>
-To: Da Xue <da@libre.computer>, Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Neil Armstrong <neil.armstrong@linaro.org>,
-	Kevin Hilman <khilman@baylibre.com>,
-	Jerome Brunet <jbrunet@baylibre.com>,
-	Martin Blumenstingl <martin.blumenstingl@googlemail.com>
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	Da Xue <da@libre.computer>, Luke Lu <luke.lu@libre.computer>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-amlogic@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] [PATCH v2] net: phy: meson-gxl: implement
- meson_gxl_phy_resume()
-Message-ID: <202308061204.L4tEEJAa-lkp@intel.com>
-References: <20230804201903.1303713-1-da@libre.computer>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C5111C26
+	for <netdev@vger.kernel.org>; Sun,  6 Aug 2023 06:35:46 +0000 (UTC)
+Received: from out-101.mta1.migadu.com (out-101.mta1.migadu.com [95.215.58.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 916E61FD3
+	for <netdev@vger.kernel.org>; Sat,  5 Aug 2023 23:35:43 -0700 (PDT)
+Date: Sun, 6 Aug 2023 16:33:45 +1000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jookia.org; s=key1;
+	t=1691303741;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5QcmFk87OSOnLQz2aC/rzCVz9SI5NqtxQgcc/xuSFnA=;
+	b=LO2GkUBlLmae2f6NePMseHTBEkOx1tEX3Yh/67CHOPK6ihrmJRjULSCAwvj14677WkG0qT
+	7COuiuLJW7wr4nYYQa+EzPAzxWSUxZ7vga+KLjBqeqkm0pttUvzjLNMUgzghEmohDlhhei
+	YdJxam8rOiLsBK8F5Rt7wAPHwc3zQYeicMhrWYj+/04OMt+2YzWvs+v8vP1900mSbuNMUa
+	F4mt7aFnA/RuP2aAi8FI26v7Havt2VjuUy73zzQrgyY6JWvsWCAT5TX9IZjc7VLorDKy3f
+	/YgmTjXbgrgtHZy87OmgUAOxHnEFQZ965CsSdbYcurOl89yc4rtzvg8NPK0VIA==
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: John Watts <contact@jookia.org>
+To: Jernej =?utf-8?Q?=C5=A0krabec?= <jernej.skrabec@gmail.com>
+Cc: Maksim Kiselev <bigunclemax@gmail.com>, aou@eecs.berkeley.edu,
+	conor+dt@kernel.org, davem@davemloft.net,
+	devicetree@vger.kernel.org, edumazet@google.com,
+	krzysztof.kozlowski+dt@linaro.org, kuba@kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-can@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org,
+	linux-sunxi@lists.linux.dev, mkl@pengutronix.de,
+	netdev@vger.kernel.org, pabeni@redhat.com, palmer@dabbelt.com,
+	paul.walmsley@sifive.com, robh+dt@kernel.org, samuel@sholland.org,
+	wens@csie.org, wg@grandegger.com
+Subject: Re: [PATCH v2 2/4] riscv: dts: allwinner: d1: Add CAN controller
+ nodes
+Message-ID: <ZM8-yfRVscYjxp2p@titan>
+References: <20230721221552.1973203-4-contact@jookia.org>
+ <20230805164052.669184-1-bigunclemax@gmail.com>
+ <ZM5-Ke-59o0R5AtY@titan>
+ <2690764.mvXUDI8C0e@jernej-laptop>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20230804201903.1303713-1-da@libre.computer>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <2690764.mvXUDI8C0e@jernej-laptop>
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Da,
+On Sat, Aug 05, 2023 at 07:49:51PM +0200, Jernej Škrabec wrote:
+> Dne sobota, 05. avgust 2023 ob 18:51:53 CEST je John Watts napisal(a):
+> > On Sat, Aug 05, 2023 at 07:40:52PM +0300, Maksim Kiselev wrote:
+> > > Hi John, Jernej
+> > > Should we also keep a pinctrl nodes itself in alphabetical order?
+> > > I mean placing a CAN nodes before `clk_pg11_pin` node?
+> > > Looks like the other nodes sorted in this way...
+> > 
+> > Good catch. Now that you mention it, the device tree nodes are sorted
+> > by memory order too! These should be after i2c3.
+> > 
+> > It looks like I might need to do a patch to re-order those too.
+> 
+> It would be better if DT patches are dropped from netdev tree and then post 
+> new versions.
+> 
+> Best regards,
+> Jernej
 
-kernel test robot noticed the following build errors:
+Agreed. Is there a way to request that? Or will the maintainer just read this?
 
-[auto build test ERROR on net-next/main]
-[also build test ERROR on net/main linus/master v6.5-rc4 next-20230804]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Da-Xue/net-phy-meson-gxl-implement-meson_gxl_phy_resume/20230805-042033
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20230804201903.1303713-1-da%40libre.computer
-patch subject: [PATCH] [PATCH v2] net: phy: meson-gxl: implement meson_gxl_phy_resume()
-config: x86_64-allyesconfig (https://download.01.org/0day-ci/archive/20230806/202308061204.L4tEEJAa-lkp@intel.com/config)
-compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
-reproduce: (https://download.01.org/0day-ci/archive/20230806/202308061204.L4tEEJAa-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202308061204.L4tEEJAa-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   drivers/net/phy/meson-gxl.c: In function 'meson_gxl_phy_resume':
->> drivers/net/phy/meson-gxl.c:139:9: error: too few arguments to function 'genphy_resume'
-     139 |         genphy_resume();
-         |         ^~~~~~~~~~~~~
-   In file included from drivers/net/phy/meson-gxl.c:13:
-   include/linux/phy.h:1794:5: note: declared here
-    1794 | int genphy_resume(struct phy_device *phydev);
-         |     ^~~~~~~~~~~~~
-
-
-vim +/genphy_resume +139 drivers/net/phy/meson-gxl.c
-
-   134	
-   135	static int meson_gxl_phy_resume(struct phy_device *phydev)
-   136	{
-   137		int ret;
-   138	
- > 139		genphy_resume();
-   140		ret = meson_gxl_config_init(phydev);
-   141		if (ret)
-   142			return ret;
-   143	
-   144		return 0;
-   145	}
-   146	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+John.
 
