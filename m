@@ -1,111 +1,124 @@
-Return-Path: <netdev+bounces-24702-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24703-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79584771452
-	for <lists+netdev@lfdr.de>; Sun,  6 Aug 2023 12:08:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82741771492
+	for <lists+netdev@lfdr.de>; Sun,  6 Aug 2023 13:42:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 814BC1C20987
-	for <lists+netdev@lfdr.de>; Sun,  6 Aug 2023 10:08:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5B199281352
+	for <lists+netdev@lfdr.de>; Sun,  6 Aug 2023 11:42:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 127752595;
-	Sun,  6 Aug 2023 10:08:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 723203C21;
+	Sun,  6 Aug 2023 11:42:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0476F2581
-	for <netdev@vger.kernel.org>; Sun,  6 Aug 2023 10:08:47 +0000 (UTC)
-Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59655131
-	for <netdev@vger.kernel.org>; Sun,  6 Aug 2023 03:08:46 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.143])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4RJZsk1l2lz4f3m8J
-	for <netdev@vger.kernel.org>; Sun,  6 Aug 2023 18:08:42 +0800 (CST)
-Received: from [10.174.178.55] (unknown [10.174.178.55])
-	by APP4 (Coremail) with SMTP id gCh0CgBH16kocc9kmbRAAA--.49293S3;
-	Sun, 06 Aug 2023 18:08:42 +0800 (CST)
-Subject: Re: [PATCH] net: hns: Remove a redundant check in hns_mdio_probe()
-To: Simon Horman <horms@kernel.org>
-Cc: Yisen Zhuang <yisen.zhuang@huawei.com>,
- Salil Mehta <salil.mehta@huawei.com>, "David S . Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org, Zhen Lei <thunder.leizhen@huawei.com>
-References: <20230804092753.1207-1-thunder.leizhen@huaweicloud.com>
- <ZM4yrM11M86Qy3vd@vergenet.net>
-From: "Leizhen (ThunderTown)" <thunder.leizhen@huaweicloud.com>
-Message-ID: <021855b4-972c-4df0-71c3-f1f415f9a881@huaweicloud.com>
-Date: Sun, 6 Aug 2023 18:08:40 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6658E3C0D
+	for <netdev@vger.kernel.org>; Sun,  6 Aug 2023 11:42:33 +0000 (UTC)
+Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC84FE50;
+	Sun,  6 Aug 2023 04:42:31 -0700 (PDT)
+Received: by mail-ed1-x52a.google.com with SMTP id 4fb4d7f45d1cf-5232bb5e47bso1148006a12.2;
+        Sun, 06 Aug 2023 04:42:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1691322150; x=1691926950;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HumppwNUn3TA8YpQ0fQzm7WpQytFg98rX1E8vNluGYU=;
+        b=COX4FRzPg5Df7S7scGkL1a1jxSkgE4lsLMpzoAKRInM2N2donpYwiXDjSi/uGQQJdm
+         wnKu5zkOi4+z2eDvgysSiv8+wnzUSluY4wQ5tf23SqJnRh34l9MsjY0f81HXTwdimI/K
+         GW8UQJRJil0ochVBGECpvNlVOUpC2TpR46BNRdtqybtoE/quddDakVx+BSAAn7/1Sdlz
+         XZkfNvlLlGjfuEjcvAlf6iTnTjcI9tIHvIk9iB2wzLyKG0GKDLCon/LnZE/cu205nyvc
+         ZpUbvtf3cSHF9m1L8NZHvlpkWXujyLx4Z8+cLnkrtFr4Tat+wekNAvvveNMSRtuJZOmO
+         bM3w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691322150; x=1691926950;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=HumppwNUn3TA8YpQ0fQzm7WpQytFg98rX1E8vNluGYU=;
+        b=ER4NSspLt7vKD+ld0Sjxtbdvp8KRIQ3s53joN+bw8EhxGVMvYNBCFV87QuDN14qGOu
+         z1S6yWVxH1SYYLT4Jnv2pw3UNbLvmTdIHs0wyaJcwx0e48stW/CExIUjm/LKAi6r3qUX
+         tWa4F7BrTAT7iC0XAlbsoroUBr+wgDXW4vInK2qrFuwRrLtouCrgEspl/TXELCfuWxt9
+         vjcVdEyDABJRq7k7///mmMUC18BDMJ+MgKRpYCsythHmDUXGf3tOlJIu/MVMD6VAI3Vv
+         vTCJvy4kNaiSrXdtyLcfW/CLD4MNDpb4piADbPnondLb0iX88SBNjPJprZ+vjotJJTIg
+         O6fA==
+X-Gm-Message-State: AOJu0YzQVfCqg6mx2Fp1tKpbyc5ts3qxlBPMdcKeBJ36bBIeWUkglVBZ
+	q6LhhLbq3Te6JbbWkK5xOSU=
+X-Google-Smtp-Source: AGHT+IEEg3PkfDxHcETaO7LHnXNw+qJwjWb90KaZ3707q9E0qH0cZ2HLszMui/vhh35dCWWOEYUkRQ==
+X-Received: by 2002:a50:fc12:0:b0:522:c0ea:15d with SMTP id i18-20020a50fc12000000b00522c0ea015dmr4929062edr.41.1691322150093;
+        Sun, 06 Aug 2023 04:42:30 -0700 (PDT)
+Received: from jernej-laptop.localnet (82-149-1-233.dynamic.telemach.net. [82.149.1.233])
+        by smtp.gmail.com with ESMTPSA id d2-20020a056402516200b0052275deb475sm3787539ede.23.2023.08.06.04.42.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 06 Aug 2023 04:42:29 -0700 (PDT)
+From: Jernej =?utf-8?B?xaBrcmFiZWM=?= <jernej.skrabec@gmail.com>
+To: John Watts <contact@jookia.org>
+Cc: Maksim Kiselev <bigunclemax@gmail.com>, aou@eecs.berkeley.edu,
+ conor+dt@kernel.org, davem@davemloft.net, devicetree@vger.kernel.org,
+ edumazet@google.com, krzysztof.kozlowski+dt@linaro.org, kuba@kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-can@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org,
+ linux-sunxi@lists.linux.dev, mkl@pengutronix.de, netdev@vger.kernel.org,
+ pabeni@redhat.com, palmer@dabbelt.com, paul.walmsley@sifive.com,
+ robh+dt@kernel.org, samuel@sholland.org, wens@csie.org, wg@grandegger.com
+Subject:
+ Re: [PATCH v2 2/4] riscv: dts: allwinner: d1: Add CAN controller nodes
+Date: Sun, 06 Aug 2023 13:42:28 +0200
+Message-ID: <4848155.31r3eYUQgx@jernej-laptop>
+In-Reply-To: <ZM8-yfRVscYjxp2p@titan>
+References:
+ <20230721221552.1973203-4-contact@jookia.org>
+ <2690764.mvXUDI8C0e@jernej-laptop> <ZM8-yfRVscYjxp2p@titan>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <ZM4yrM11M86Qy3vd@vergenet.net>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-CM-TRANSID:gCh0CgBH16kocc9kmbRAAA--.49293S3
-X-Coremail-Antispam: 1UD129KBjvdXoWruF1rAr1fKrW3Aw4UJr45GFg_yoW3AwcEvr
-	WjkwnrCr4fJF47CanxA34avryxKrWIyr95Jry0yrnIgF95XFykXF4S9wn0vw1rKFWkAF9I
-	g3ZxAFWvkr4UWjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUbzxYFVCjjxCrM7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E6xAIw20E
-	Y4v20xvaj40_JFC_Wr1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwV
-	A0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW8JVW5JwA2z4x0Y4vE2Ix0cI8IcVCY1x02
-	67AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267
-	AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80
-	ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4
-	AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij64vI
-	r41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8Gjc
-	xK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0
-	cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8V
-	AvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7Cj
-	xVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IU1zuWJUUUUU==
-X-CM-SenderInfo: hwkx0vthuozvpl2kv046kxt4xhlfz01xgou0bp/
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,KHOP_HELO_FCRDNS,
-	MAY_BE_FORGED,NICE_REPLY_A,SPF_HELO_NONE,SPF_NONE autolearn=ham
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+Dne nedelja, 06. avgust 2023 ob 08:33:45 CEST je John Watts napisal(a):
+> On Sat, Aug 05, 2023 at 07:49:51PM +0200, Jernej =C5=A0krabec wrote:
+> > Dne sobota, 05. avgust 2023 ob 18:51:53 CEST je John Watts napisal(a):
+> > > On Sat, Aug 05, 2023 at 07:40:52PM +0300, Maksim Kiselev wrote:
+> > > > Hi John, Jernej
+> > > > Should we also keep a pinctrl nodes itself in alphabetical order?
+> > > > I mean placing a CAN nodes before `clk_pg11_pin` node?
+> > > > Looks like the other nodes sorted in this way...
+> > >=20
+> > > Good catch. Now that you mention it, the device tree nodes are sorted
+> > > by memory order too! These should be after i2c3.
+> > >=20
+> > > It looks like I might need to do a patch to re-order those too.
+> >=20
+> > It would be better if DT patches are dropped from netdev tree and then
+> > post
+> > new versions.
+> >=20
+> > Best regards,
+> > Jernej
+>=20
+> Agreed. Is there a way to request that? Or will the maintainer just read
+> this?
+
+Hopefully it will.
+
+Best regards,
+Jernej
 
 
-On 2023/8/5 19:29, Simon Horman wrote:
-> On Fri, Aug 04, 2023 at 05:27:53PM +0800, thunder.leizhen@huaweicloud.com wrote:
->> From: Zhen Lei <thunder.leizhen@huawei.com>
->>
->> Traverse all devices when a new driver is installed, or, traverse all
->> drivers when a new device is added. In any case, the input argument
->> 'pdev' of drv->probe() cannot be NULL.
->>
->> Signed-off-by: Zhen Lei <thunder.leizhen@huawei.com>
-> 
-> Please specify the target tree, net-next or net, for patches for this
-> driver. In this case, as it isn't a bug fix, it would be net-next.
-> 
-> 	Subject: [PATCH net-next] ...
 
-Sorry, this is my first patch for the net module. Do it next time.
-
-> 
-> That aside, this looks good to me.
-
-Thanks.
-
-> 
-> Reviewed-by: Simon Horman <horms@kernel.org>
-> .
-> 
-
--- 
-Regards,
-  Zhen Lei
 
 
