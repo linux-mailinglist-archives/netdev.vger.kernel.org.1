@@ -1,48 +1,45 @@
-Return-Path: <netdev+bounces-24721-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24722-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8BFE7716A2
-	for <lists+netdev@lfdr.de>; Sun,  6 Aug 2023 21:46:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 188F57716A7
+	for <lists+netdev@lfdr.de>; Sun,  6 Aug 2023 21:51:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 506BE281191
-	for <lists+netdev@lfdr.de>; Sun,  6 Aug 2023 19:46:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B3873281183
+	for <lists+netdev@lfdr.de>; Sun,  6 Aug 2023 19:51:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D702A941;
-	Sun,  6 Aug 2023 19:46:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB406A949;
+	Sun,  6 Aug 2023 19:51:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF3557F0
-	for <netdev@vger.kernel.org>; Sun,  6 Aug 2023 19:46:07 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 703E8C433C7;
-	Sun,  6 Aug 2023 19:46:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 891C97F0
+	for <netdev@vger.kernel.org>; Sun,  6 Aug 2023 19:51:34 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60A88C433C7;
+	Sun,  6 Aug 2023 19:51:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691351167;
-	bh=TDJUetIfQcwJA+iDgDBpACqiiqFqkpNv89uYxLEA+tk=;
+	s=k20201202; t=1691351493;
+	bh=wv7mtAHZJr2vZeWnUM1Beb+dSs/Qq2Vp36EkkPj9g1M=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=MAcIgKNrq46/nluizDztZ4flghx9/W2RnL8hrSZATKsBLcU97RtxSMx15tT8hJHAL
-	 mZEbe0M4IMjjidIpd3qrJTrHAJffNM3uVc/83lN0S2KFx0WeDm+hc5NEAaM9wGEyJ6
-	 cJ2l1JI7LG4GzC6bu+tafFLsvswd12AzZ5YjdjxC9/M9Bw8jZ18+cBKbeyl2NU4v56
-	 wmvBZS/W40JtxzAhUvyvFSw7vocAnV3ylZwqayxNqjlNwHKjxxJsS0lVjIHw305GNq
-	 Q2IQg46iT3u08J49iMXKgJaEUiYIMHGKsQXlOXiHE1uygM598efxt+7CLH52p5CNJC
-	 eD4DjVYhe2KQA==
-Date: Sun, 6 Aug 2023 21:46:01 +0200
+	b=l0Vh9B6yDi1z2HfT80A6yDd/ZUhnPq6Ot51QorbDetx2LDATIK3EsklcgbkVwR00l
+	 8lF2dN10cfGjkxZZ9YKJ7aLJt1427MjFmYxmK8sRhunSKyFdOWh/0h7p742Z8WB0hx
+	 MGpT634+O6jGo6GHn0EwX5sWeGSOTRD4jk/LHqX64I/syC4ki6+UnXha5hMNBYX9m0
+	 UvORuvoEhQsts/Ml0+XtqtaL9Azo4yRfYxP5MPArAN1A5FfnC1q528oqbotIB4Woia
+	 dViongoUvqmhykZnW/SN8hxmUrHaCKB4QFWoLkK23l0zuP5hUgXJUx/07BqT83ux4i
+	 EILWDbQlSVKBA==
+Date: Sun, 6 Aug 2023 21:51:28 +0200
 From: Simon Horman <horms@kernel.org>
-To: Yue Haibing <yuehaibing@huawei.com>
-Cc: Simon Horman <horms@kernel.org>, johannes@sipsolutions.net,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, linux-wireless@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH v2] wifi: iw_handler.h: Remove unused declaration
- dev_get_wireless_info()
-Message-ID: <ZM/4eUvFj7CnIUJi@vergenet.net>
-References: <20230804133617.43564-1-yuehaibing@huawei.com>
- <ZM3/+pY9Fovc5AC9@vergenet.net>
- <e19091f1-497a-b673-9010-2e0a48d5942e@huawei.com>
+To: Simon Horman <horms@kernel.org>
+Cc: yang.yang29@zte.com.cn, jmaloy@redhat.com, davem@davemloft.net,
+	ying.xue@windriver.com, edumazet@google.com, kuba@kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: tipc: add net device refcount tracker for bearer
+Message-ID: <ZM/5wD5hZqgDNg3i@vergenet.net>
+References: <202308041653414100323@zte.com.cn>
+ <ZM4yAOKtdcTBXQQY@vergenet.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -51,42 +48,53 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <e19091f1-497a-b673-9010-2e0a48d5942e@huawei.com>
+In-Reply-To: <ZM4yAOKtdcTBXQQY@vergenet.net>
 
-On Sat, Aug 05, 2023 at 04:24:04PM +0800, Yue Haibing wrote:
-> On 2023/8/5 15:53, Simon Horman wrote:
-> > On Fri, Aug 04, 2023 at 09:36:17PM +0800, Yue Haibing wrote:
-> >> Commit 556829657397 ("[NL80211]: add netlink interface to cfg80211")
-> >> declared but never implemented this, remove it.
-> >>
-> >> Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
-> >> ---
-> >> v2: fix comment
-> >> ---
-> >>  include/net/iw_handler.h | 11 ++---------
-> >>  1 file changed, 2 insertions(+), 9 deletions(-)
-> >>
-> >> diff --git a/include/net/iw_handler.h b/include/net/iw_handler.h
-> >> index d2ea5863eedc..b2cf243ebe44 100644
-> >> --- a/include/net/iw_handler.h
-> >> +++ b/include/net/iw_handler.h
-> >> @@ -426,17 +426,10 @@ struct iw_public_data {
-> >>  
-> >>  /**************************** PROTOTYPES ****************************/
-> >>  /*
-> >> - * Functions part of the Wireless Extensions (defined in net/core/wireless.c).
-> >> - * Those may be called only within the kernel.
-> >> + * Functions part of the Wireless Extensions (defined in net/wireless/wext-core.c).
+On Sat, Aug 05, 2023 at 01:26:56PM +0200, Simon Horman wrote:
+> On Fri, Aug 04, 2023 at 04:53:41PM +0800, yang.yang29@zte.com.cn wrote:
+> > From: xu xin <xu.xin16@zte.com.cn>
 > > 
-> > Can I confirm that the wireless.c -> wext-core.c change is intentional?
-> > It doesn't seem strictly related to the patch description.
+> > Add net device refcount tracker to the struct tipc_bearer.
+> > 
+> > Signed-off-by: xu xin <xu.xin16@zte.com.cn>
+> > Reviewed-by: Yang Yang <yang.yang.29@zte.com.cn>
+> > Cc: Kuang Mingfu <kuang.mingfu@zte.com.cn>
 > 
-> Commit 11433ee450eb ("[WEXT]: Move to net/wireless") rename  net/core/wireless.c to net/wireless/wext.c
-> then commit 3d23e349d807 ("wext: refactor") refactor wext.c to wext-core.c
-> The wext functions now sits in net/wireless/wext-core.c
-> This may need describe in patch description.
+> ...
+> 
+> > @@ -479,7 +479,7 @@ void tipc_disable_l2_media(struct tipc_bearer *b)
+> >  	dev_remove_pack(&b->pt);
+> >  	RCU_INIT_POINTER(dev->tipc_ptr, NULL);
+> >  	synchronize_net();
+> > -	dev_put(dev);
+> > +	netdev_put(dev, &b->devtracker);
+> >  }
+> > 
+> >  /**
+> > diff --git a/net/tipc/bearer.h b/net/tipc/bearer.h
+> > index 41eac1ee0c09..1adeaf94aa62 100644
+> > --- a/net/tipc/bearer.h
+> > +++ b/net/tipc/bearer.h
+> > @@ -174,6 +174,7 @@ struct tipc_bearer {
+> >  	u16 encap_hlen;
+> >  	unsigned long up;
+> >  	refcount_t refcnt;
+> > +	netdevice_tracker	devtracker;
+> 
+> Hi Xu Xin and Yang Yang,
+> 
+> Please add netdevice_tracker to the kernel doc for struct tipc_bearer,
+> which appears just above the definition of the structure.
+> 
+> >  };
+> > 
+> >  struct tipc_bearer_names {
+> 
+> With that fixed, feel free to add:
+> 
+> Reviewed-by: Simon Horman <horms@kernel.org>
 
-Thanks, I think that would be best
-
-...
+Given review of other, similar patches, by Eric.
+I think it would be best to confirm that this patch
+has been tested.
 
