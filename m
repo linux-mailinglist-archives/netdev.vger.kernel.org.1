@@ -1,111 +1,91 @@
-Return-Path: <netdev+bounces-24719-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24720-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1622577168F
-	for <lists+netdev@lfdr.de>; Sun,  6 Aug 2023 21:35:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E808771697
+	for <lists+netdev@lfdr.de>; Sun,  6 Aug 2023 21:38:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7446028116C
-	for <lists+netdev@lfdr.de>; Sun,  6 Aug 2023 19:35:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1718B281192
+	for <lists+netdev@lfdr.de>; Sun,  6 Aug 2023 19:38:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51FE28F50;
-	Sun,  6 Aug 2023 19:35:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2396C8F7F;
+	Sun,  6 Aug 2023 19:38:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4217B7F0
-	for <netdev@vger.kernel.org>; Sun,  6 Aug 2023 19:35:11 +0000 (UTC)
-Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46B7D171A
-	for <netdev@vger.kernel.org>; Sun,  6 Aug 2023 12:35:08 -0700 (PDT)
-Received: by mail-ed1-x52f.google.com with SMTP id 4fb4d7f45d1cf-52307552b03so5372382a12.0
-        for <netdev@vger.kernel.org>; Sun, 06 Aug 2023 12:35:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1691350507; x=1691955307;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=3bqbe2tDZsZm0END83UpLyo6EdqTZMUT086jdCCRrYw=;
-        b=g0jyzXc60snOi9Q61ciF87VgVXpMoKnvYizbfZgb2HjPkUaMyTBZig89TnI7J6YQ1s
-         K/EowG8j8K+l6ZuxtPoNMk568mXiq3LsDY1LWJevmEh+kA17IkB/ExBG5CbCNwYveV85
-         KiP8DOjX6xCwsW0l0W4CGt2RceYmAOFGEPC4d25smdzCgQUd+Bu5LPSJH7pdcQoQ/7Y0
-         uny9KeKT67FTZ4fflMOOI4Q8B29TKmVZzoAsx6Jb3p0GRyaY+V8q6dznj70w8fGRtRuM
-         aa4eJ24jFHCxakE+2duVWIx9By8XJKslLsOb4zYfHySZmq8AnxARrRSGbZUbKyV+c4+Q
-         bMTg==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 164D37F0
+	for <netdev@vger.kernel.org>; Sun,  6 Aug 2023 19:38:33 +0000 (UTC)
+Received: from mail-oi1-f200.google.com (mail-oi1-f200.google.com [209.85.167.200])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3347F171E
+	for <netdev@vger.kernel.org>; Sun,  6 Aug 2023 12:38:32 -0700 (PDT)
+Received: by mail-oi1-f200.google.com with SMTP id 5614622812f47-3a5ab57036fso7002017b6e.3
+        for <netdev@vger.kernel.org>; Sun, 06 Aug 2023 12:38:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691350507; x=1691955307;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20221208; t=1691350711; x=1691955511;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3bqbe2tDZsZm0END83UpLyo6EdqTZMUT086jdCCRrYw=;
-        b=SVlWka9RDa/zV9pEt+A99XQOM5dZlrJdva6Vi86XvhpXLlcC/6LmpsSNnEYmtwSnSR
-         s/YodNBmOKMMz5cRVuv+1aBM+xhfq5bsDigJ/ftSms2cMFMg8npd9P2mpbmaYIQmdI82
-         O7eHOIKp58JxEQjSii/GWli0JcWGhmRKj3v3ogcX6/SLxvC5xZ9ALodUMc65pwOh0T83
-         rOIGRcCvOo2jBwRM43dOVbe6ixEUDsl0hhKteyU9D5N+rWAZoeFq9qNs5PRctrdTMOJM
-         3DETvUV0A5J17QzjYYXB75dkB622Pn9iAzVM3K9wcFqnwXyISRimTQ6iNieO5cLiv6ZG
-         Z3yA==
-X-Gm-Message-State: AOJu0Yw2Jd8L0OGHKo+WsaYFVXFccpkRlbM9SPo5DMc2VY4wCHZeeSp0
-	2nmqA1gNqoBXc/JqcSjrzHs3fw==
-X-Google-Smtp-Source: AGHT+IG/79s2xg9v9Za0JIriROoPvnlkRv0Jug22nma7i4hEv1WIE4RafrrohEpmmoAaMt55gaOUXA==
-X-Received: by 2002:aa7:d148:0:b0:523:2873:8323 with SMTP id r8-20020aa7d148000000b0052328738323mr4168789edo.35.1691350506747;
-        Sun, 06 Aug 2023 12:35:06 -0700 (PDT)
-Received: from [192.168.1.20] ([178.197.222.113])
-        by smtp.gmail.com with ESMTPSA id o4-20020aa7c504000000b00522828d438csm4212648edq.7.2023.08.06.12.35.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 06 Aug 2023 12:35:06 -0700 (PDT)
-Message-ID: <6fcd8e51-7e97-1261-7cd5-5e18840aaf8e@linaro.org>
-Date: Sun, 6 Aug 2023 21:35:03 +0200
+        bh=wHAFAUtlpPTsblmGRi8/yz/rtfn+G6tOKLxXyDwkU7c=;
+        b=iTNkbwHAw2CqJrnMCGXsphXJPDXnaRdy3/oHsSFQQKRYCdL5ZcBIO4Pk9+wJgPUokk
+         XT/1k6BG2o0pn/s6diL+ZmuWya47qN9QVpR5cOoFCVJjpH3j4nzdOSL9RVJWYtpGGv9f
+         LI+qtXA1bSEmnbUmHsmXhX/S/R2mZtb9Ju0jOUW3cHgg5PznP20Xhft7rITkJsEefnlN
+         Kg/9Ie3okulI+PHPn9q4Q+qiBI69sHglzAZvVzrC1GMIYci6nkfcuLhAzAO71ILD8rde
+         HmaYrp+5bap8yALVrpH/3wC1sItyGf8dUv8bOd5k/bWm9AkJ6RvSzPBpo/9MPKM2XTjX
+         wymg==
+X-Gm-Message-State: AOJu0YzEdJSxRzqivC4HQ+uMaGQ+TZgoAuoXfsg8ZTG5Za1I07Ph60en
+	oF6fKszR/GOUaR48JqxP1F8zqeaQLvcUc02IC8OpMH6oz0fj
+X-Google-Smtp-Source: AGHT+IF40jj0zFbkkF2AkDSkU6OeSWL//98qOUQ8SLl2cjxFtDsY+SqCrZULINynDdtK/cdLxjdxmz+HSUoxFnDSbnBts8CbBw0I
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.14.0
-Subject: Re: [PATCH v2 3/5] dt-bindings: clock: add Intel Agilex5 clock
- manager
-Content-Language: en-US
-To: niravkumar.l.rabara@intel.com
-Cc: adrian.ho.yin.ng@intel.com, andrew@lunn.ch, conor+dt@kernel.org,
- devicetree@vger.kernel.org, dinguyen@kernel.org,
- krzysztof.kozlowski+dt@linaro.org, linux-clk@vger.kernel.org,
- linux-kernel@vger.kernel.org, mturquette@baylibre.com,
- netdev@vger.kernel.org, p.zabel@pengutronix.de, richardcochran@gmail.com,
- robh+dt@kernel.org, sboyd@kernel.org, wen.ping.teh@intel.com
-References: <20230618132235.728641-1-niravkumar.l.rabara@intel.com>
- <20230801010234.792557-1-niravkumar.l.rabara@intel.com>
- <20230801010234.792557-4-niravkumar.l.rabara@intel.com>
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-In-Reply-To: <20230801010234.792557-4-niravkumar.l.rabara@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-6.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.6
+X-Received: by 2002:a05:6808:3020:b0:3a7:275a:dc69 with SMTP id
+ ay32-20020a056808302000b003a7275adc69mr11976106oib.1.1691350711498; Sun, 06
+ Aug 2023 12:38:31 -0700 (PDT)
+Date: Sun, 06 Aug 2023 12:38:31 -0700
+In-Reply-To: <0000000000005003fe05a8af2231@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000597f580602464669@google.com>
+Subject: Re: [syzbot] [wireless?] INFO: trying to register non-static key in skb_queue_tail
+From: syzbot <syzbot+743547b2a7fd655ffb6d@syzkaller.appspotmail.com>
+To: andreyknvl@google.com, ath9k-devel@qca.qualcomm.com, 
+	brookebasile@gmail.com, davem@davemloft.net, kuba@kernel.org, 
+	kvalo@codeaurora.org, kvalo@kernel.org, linux-kernel@vger.kernel.org, 
+	linux-usb@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, pchelkin@ispras.ru, 
+	quic_kvalo@quicinc.com, syzkaller-bugs@googlegroups.com, toke@toke.dk
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=0.9 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
+	SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 01/08/2023 03:02, niravkumar.l.rabara@intel.com wrote:
-> From: Niravkumar L Rabara <niravkumar.l.rabara@intel.com>
-> 
-> Add clock ID definitions for Intel Agilex5 SoCFPGA.
-> The registers in Agilex5 handling the clock is named as clock manager.
-> 
-> Signed-off-by: Teh Wen Ping <wen.ping.teh@intel.com>
-> Reviewed-by: Dinh Nguyen <dinguyen@kernel.org>
-> Signed-off-by: Niravkumar L Rabara <niravkumar.l.rabara@intel.com>
-> ---
+syzbot suspects this issue was fixed by commit:
 
-Do not attach (thread) your patchsets to some other threads (unrelated
-or older versions). This buries them deep in the mailbox and might
-interfere with applying entire sets.
+commit 061b0cb9327b80d7a0f63a33e7c3e2a91a71f142
+Author: Fedor Pchelkin <pchelkin@ispras.ru>
+Date:   Wed May 17 15:03:17 2023 +0000
 
-Best regards,
-Krzysztof
+    wifi: ath9k: don't allow to overwrite ENDPOINT0 attributes
 
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1243d549a80000
+start commit:   559089e0a93d vmalloc: replace VM_NO_HUGE_VMAP with VM_ALLO..
+git tree:       upstream
+kernel config:  https://syzkaller.appspot.com/x/.config?x=dd7c9a79dfcfa205
+dashboard link: https://syzkaller.appspot.com/bug?extid=743547b2a7fd655ffb6d
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15d5d7f4f00000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=106ff834f00000
+
+If the result looks correct, please mark the issue as fixed by replying with:
+
+#syz fix: wifi: ath9k: don't allow to overwrite ENDPOINT0 attributes
+
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
