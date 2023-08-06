@@ -1,91 +1,92 @@
-Return-Path: <netdev+bounces-24720-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24721-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E808771697
-	for <lists+netdev@lfdr.de>; Sun,  6 Aug 2023 21:38:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8BFE7716A2
+	for <lists+netdev@lfdr.de>; Sun,  6 Aug 2023 21:46:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1718B281192
-	for <lists+netdev@lfdr.de>; Sun,  6 Aug 2023 19:38:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 506BE281191
+	for <lists+netdev@lfdr.de>; Sun,  6 Aug 2023 19:46:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2396C8F7F;
-	Sun,  6 Aug 2023 19:38:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D702A941;
+	Sun,  6 Aug 2023 19:46:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 164D37F0
-	for <netdev@vger.kernel.org>; Sun,  6 Aug 2023 19:38:33 +0000 (UTC)
-Received: from mail-oi1-f200.google.com (mail-oi1-f200.google.com [209.85.167.200])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3347F171E
-	for <netdev@vger.kernel.org>; Sun,  6 Aug 2023 12:38:32 -0700 (PDT)
-Received: by mail-oi1-f200.google.com with SMTP id 5614622812f47-3a5ab57036fso7002017b6e.3
-        for <netdev@vger.kernel.org>; Sun, 06 Aug 2023 12:38:32 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691350711; x=1691955511;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wHAFAUtlpPTsblmGRi8/yz/rtfn+G6tOKLxXyDwkU7c=;
-        b=iTNkbwHAw2CqJrnMCGXsphXJPDXnaRdy3/oHsSFQQKRYCdL5ZcBIO4Pk9+wJgPUokk
-         XT/1k6BG2o0pn/s6diL+ZmuWya47qN9QVpR5cOoFCVJjpH3j4nzdOSL9RVJWYtpGGv9f
-         LI+qtXA1bSEmnbUmHsmXhX/S/R2mZtb9Ju0jOUW3cHgg5PznP20Xhft7rITkJsEefnlN
-         Kg/9Ie3okulI+PHPn9q4Q+qiBI69sHglzAZvVzrC1GMIYci6nkfcuLhAzAO71ILD8rde
-         HmaYrp+5bap8yALVrpH/3wC1sItyGf8dUv8bOd5k/bWm9AkJ6RvSzPBpo/9MPKM2XTjX
-         wymg==
-X-Gm-Message-State: AOJu0YzEdJSxRzqivC4HQ+uMaGQ+TZgoAuoXfsg8ZTG5Za1I07Ph60en
-	oF6fKszR/GOUaR48JqxP1F8zqeaQLvcUc02IC8OpMH6oz0fj
-X-Google-Smtp-Source: AGHT+IF40jj0zFbkkF2AkDSkU6OeSWL//98qOUQ8SLl2cjxFtDsY+SqCrZULINynDdtK/cdLxjdxmz+HSUoxFnDSbnBts8CbBw0I
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF3557F0
+	for <netdev@vger.kernel.org>; Sun,  6 Aug 2023 19:46:07 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 703E8C433C7;
+	Sun,  6 Aug 2023 19:46:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1691351167;
+	bh=TDJUetIfQcwJA+iDgDBpACqiiqFqkpNv89uYxLEA+tk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=MAcIgKNrq46/nluizDztZ4flghx9/W2RnL8hrSZATKsBLcU97RtxSMx15tT8hJHAL
+	 mZEbe0M4IMjjidIpd3qrJTrHAJffNM3uVc/83lN0S2KFx0WeDm+hc5NEAaM9wGEyJ6
+	 cJ2l1JI7LG4GzC6bu+tafFLsvswd12AzZ5YjdjxC9/M9Bw8jZ18+cBKbeyl2NU4v56
+	 wmvBZS/W40JtxzAhUvyvFSw7vocAnV3ylZwqayxNqjlNwHKjxxJsS0lVjIHw305GNq
+	 Q2IQg46iT3u08J49iMXKgJaEUiYIMHGKsQXlOXiHE1uygM598efxt+7CLH52p5CNJC
+	 eD4DjVYhe2KQA==
+Date: Sun, 6 Aug 2023 21:46:01 +0200
+From: Simon Horman <horms@kernel.org>
+To: Yue Haibing <yuehaibing@huawei.com>
+Cc: Simon Horman <horms@kernel.org>, johannes@sipsolutions.net,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, linux-wireless@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH v2] wifi: iw_handler.h: Remove unused declaration
+ dev_get_wireless_info()
+Message-ID: <ZM/4eUvFj7CnIUJi@vergenet.net>
+References: <20230804133617.43564-1-yuehaibing@huawei.com>
+ <ZM3/+pY9Fovc5AC9@vergenet.net>
+ <e19091f1-497a-b673-9010-2e0a48d5942e@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6808:3020:b0:3a7:275a:dc69 with SMTP id
- ay32-20020a056808302000b003a7275adc69mr11976106oib.1.1691350711498; Sun, 06
- Aug 2023 12:38:31 -0700 (PDT)
-Date: Sun, 06 Aug 2023 12:38:31 -0700
-In-Reply-To: <0000000000005003fe05a8af2231@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000597f580602464669@google.com>
-Subject: Re: [syzbot] [wireless?] INFO: trying to register non-static key in skb_queue_tail
-From: syzbot <syzbot+743547b2a7fd655ffb6d@syzkaller.appspotmail.com>
-To: andreyknvl@google.com, ath9k-devel@qca.qualcomm.com, 
-	brookebasile@gmail.com, davem@davemloft.net, kuba@kernel.org, 
-	kvalo@codeaurora.org, kvalo@kernel.org, linux-kernel@vger.kernel.org, 
-	linux-usb@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, pchelkin@ispras.ru, 
-	quic_kvalo@quicinc.com, syzkaller-bugs@googlegroups.com, toke@toke.dk
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=0.9 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
-	SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e19091f1-497a-b673-9010-2e0a48d5942e@huawei.com>
 
-syzbot suspects this issue was fixed by commit:
+On Sat, Aug 05, 2023 at 04:24:04PM +0800, Yue Haibing wrote:
+> On 2023/8/5 15:53, Simon Horman wrote:
+> > On Fri, Aug 04, 2023 at 09:36:17PM +0800, Yue Haibing wrote:
+> >> Commit 556829657397 ("[NL80211]: add netlink interface to cfg80211")
+> >> declared but never implemented this, remove it.
+> >>
+> >> Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
+> >> ---
+> >> v2: fix comment
+> >> ---
+> >>  include/net/iw_handler.h | 11 ++---------
+> >>  1 file changed, 2 insertions(+), 9 deletions(-)
+> >>
+> >> diff --git a/include/net/iw_handler.h b/include/net/iw_handler.h
+> >> index d2ea5863eedc..b2cf243ebe44 100644
+> >> --- a/include/net/iw_handler.h
+> >> +++ b/include/net/iw_handler.h
+> >> @@ -426,17 +426,10 @@ struct iw_public_data {
+> >>  
+> >>  /**************************** PROTOTYPES ****************************/
+> >>  /*
+> >> - * Functions part of the Wireless Extensions (defined in net/core/wireless.c).
+> >> - * Those may be called only within the kernel.
+> >> + * Functions part of the Wireless Extensions (defined in net/wireless/wext-core.c).
+> > 
+> > Can I confirm that the wireless.c -> wext-core.c change is intentional?
+> > It doesn't seem strictly related to the patch description.
+> 
+> Commit 11433ee450eb ("[WEXT]: Move to net/wireless") rename  net/core/wireless.c to net/wireless/wext.c
+> then commit 3d23e349d807 ("wext: refactor") refactor wext.c to wext-core.c
+> The wext functions now sits in net/wireless/wext-core.c
+> This may need describe in patch description.
 
-commit 061b0cb9327b80d7a0f63a33e7c3e2a91a71f142
-Author: Fedor Pchelkin <pchelkin@ispras.ru>
-Date:   Wed May 17 15:03:17 2023 +0000
+Thanks, I think that would be best
 
-    wifi: ath9k: don't allow to overwrite ENDPOINT0 attributes
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1243d549a80000
-start commit:   559089e0a93d vmalloc: replace VM_NO_HUGE_VMAP with VM_ALLO..
-git tree:       upstream
-kernel config:  https://syzkaller.appspot.com/x/.config?x=dd7c9a79dfcfa205
-dashboard link: https://syzkaller.appspot.com/bug?extid=743547b2a7fd655ffb6d
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15d5d7f4f00000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=106ff834f00000
-
-If the result looks correct, please mark the issue as fixed by replying with:
-
-#syz fix: wifi: ath9k: don't allow to overwrite ENDPOINT0 attributes
-
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+...
 
