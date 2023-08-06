@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-24700-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24699-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 649977713DF
-	for <lists+netdev@lfdr.de>; Sun,  6 Aug 2023 09:41:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD16F7713DE
+	for <lists+netdev@lfdr.de>; Sun,  6 Aug 2023 09:40:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1D86D2813B6
-	for <lists+netdev@lfdr.de>; Sun,  6 Aug 2023 07:41:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C954C1C20962
+	for <lists+netdev@lfdr.de>; Sun,  6 Aug 2023 07:40:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BDE8259A;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13C9B1FAF;
 	Sun,  6 Aug 2023 07:40:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0711023B7;
-	Sun,  6 Aug 2023 07:40:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 57B41C433D9;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1ABB23B3
+	for <netdev@vger.kernel.org>; Sun,  6 Aug 2023 07:40:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 3F659C433C9;
 	Sun,  6 Aug 2023 07:40:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1691307622;
-	bh=Bam6N1dYm20mOTjZTEj2DEAzIMxdEcmcfrPsLZbH6U0=;
+	bh=i9plfC/05H8gvp/5XulnZa1CX+BdMG6qJk3MrAMZFKM=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=EMF/fh3fkVw3JCZlEJoUyH02FIGagIvDeMSJeXWCYRwbniEbN+eXa4oXkcdtWgK/c
-	 80XFJz+SkFLFL9mLeOL6o855y2roYf1mKSLaWyhr088DSaRKiJmkZu6fz+nRy/KDOF
-	 F7xVSlXE2YaI9ccJ85LJhyJtdOX52WDKEyevtIP4n5QV7NxFtbzDs54okST56knVNY
-	 7mxGePFrNj/HeT7tlLLI37LEufLUOvqQN4zr+CMQfpl0LFOBzo2hZTdPmpA9Nnj/N5
-	 2k1PtoWd/SAWTFkjaNWW0JvYfghrhCvYC47Ea1nMO70F3ZBLSYOSitnOm092qmd7Of
-	 vxKiGYsRTTygQ==
+	b=DHiqX59aB/hk5DUBsZY04DfV05V72naDyLv19j3Z+w4Vs7PkNloPgJD0IEp3wdTtP
+	 TgHHkIxTi9MtSVvf4bHDQCR8l5hL5YJCY1rNayWHHfH2mUZHA7V1EeSKkca7eOtPKL
+	 I4wSsLdLcum7vOipcl2tistdi0qjVwrVDmSiE4U5Hl+bRdVs8vEBwsUjkeS6kX0XVq
+	 Y8UFrF72QVzOdEzl/UqiXsseeTSSmfn3z3C57pOLN2lW1LTiGWZc+qioiUBrWq4AyU
+	 TpQzOcdPcEVD9mBtScyxI+AmxBMgYrwNWP6Fq79CmYowBO0paplxgE8tdoH7EwLATy
+	 Yv3KctHJgGKjw==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 352ACC73FE1;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 2CBD2C595C3;
 	Sun,  6 Aug 2023 07:40:22 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -41,44 +41,44 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH V6,net-next] net: mana: Add page pool for RX buffers
+Subject: Re: [PATCH net-next v2 0/4] Add QPL mode for DQO descriptor format
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <169130762221.9536.13208185445739206217.git-patchwork-notify@kernel.org>
+ <169130762217.9536.6358439352294485363.git-patchwork-notify@kernel.org>
 Date: Sun, 06 Aug 2023 07:40:22 +0000
-References: <1691181233-25286-1-git-send-email-haiyangz@microsoft.com>
-In-Reply-To: <1691181233-25286-1-git-send-email-haiyangz@microsoft.com>
-To: Haiyang Zhang <haiyangz@microsoft.com>
-Cc: linux-hyperv@vger.kernel.org, netdev@vger.kernel.org, decui@microsoft.com,
- kys@microsoft.com, paulros@microsoft.com, olaf@aepfle.de,
- vkuznets@redhat.com, davem@davemloft.net, wei.liu@kernel.org,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, leon@kernel.org,
- longli@microsoft.com, ssengar@linux.microsoft.com,
- linux-rdma@vger.kernel.org, daniel@iogearbox.net, john.fastabend@gmail.com,
- bpf@vger.kernel.org, ast@kernel.org, sharmaajay@microsoft.com,
- hawk@kernel.org, tglx@linutronix.de, shradhagupta@linux.microsoft.com,
- linux-kernel@vger.kernel.org
+References: <20230804213444.2792473-1-rushilg@google.com>
+In-Reply-To: <20230804213444.2792473-1-rushilg@google.com>
+To: Rushil Gupta <rushilg@google.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+ willemb@google.com, edumazet@google.com, pabeni@redhat.com
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
+This series was applied to netdev/net-next.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Fri,  4 Aug 2023 13:33:53 -0700 you wrote:
-> Add page pool for RX buffers for faster buffer cycle and reduce CPU
-> usage.
+On Fri,  4 Aug 2023 21:34:40 +0000 you wrote:
+> GVE supports QPL ("queue-page-list") mode where
+> all data is communicated through a set of pre-registered
+> pages. Adding this mode to DQO.
 > 
-> The standard page pool API is used.
-> 
-> With iperf and 128 threads test, this patch improved the throughput
-> by 12-15%, and decreased the IRQ associated CPU's usage from 99-100% to
-> 10-50%.
+> Rushil Gupta (4):
+>   gve: Control path for DQO-QPL
+>   gve: Tx path for DQO-QPL
+>   gve: RX path for DQO-QPL
+>   gve: update gve.rst
 > 
 > [...]
 
 Here is the summary with links:
-  - [V6,net-next] net: mana: Add page pool for RX buffers
-    https://git.kernel.org/netdev/net-next/c/b1d13f7a3b53
+  - [net-next,v2,1/4] gve: Control path for DQO-QPL
+    https://git.kernel.org/netdev/net-next/c/66ce8e6b49df
+  - [net-next,v2,2/4] gve: Tx path for DQO-QPL
+    https://git.kernel.org/netdev/net-next/c/a6fb8d5a8b69
+  - [net-next,v2,3/4] gve: RX path for DQO-QPL
+    https://git.kernel.org/netdev/net-next/c/e7075ab4fb6b
+  - [net-next,v2,4/4] gve: update gve.rst
+    https://git.kernel.org/netdev/net-next/c/5a3f8d123107
 
 You are awesome, thank you!
 -- 
