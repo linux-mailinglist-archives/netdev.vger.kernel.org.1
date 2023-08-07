@@ -1,39 +1,63 @@
-Return-Path: <netdev+bounces-25122-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25123-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E378377303A
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 22:20:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B8CFE77309D
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 22:47:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 201DF1C20B86
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 20:20:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DD2F11C20C8F
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 20:47:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EB25174EB;
-	Mon,  7 Aug 2023 20:20:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D600125C3;
+	Mon,  7 Aug 2023 20:47:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C77816408
-	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 20:20:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id CF103C433C8;
-	Mon,  7 Aug 2023 20:20:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691439623;
-	bh=V9AFzfpmpeFOjhnhAQI/RQMk0Kz5hdHnESDiZoo0NE0=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ZBLyIvkTP6BBmNj0Hw8jMi44b6gjK4DwS8jvbZVclYdwWi1kFgkt8v95qVsiaho7n
-	 ntMLXdtZmc3F7GYidww1VJZ0sR+hvnBYjKJiBL46mkHIPFRb4CP8a+61uuvTdsBpBS
-	 l6HKVoB4wBUmnCJpFpTvizNq30D4XNUxH5/N0dhbdLaiDoXFh/f9Sz2DJNt4+8mM76
-	 xkDK/yKk5h9B42oYwhs0cD7OzYJI/YNRaFrYHYUCfAPZhBfyvrye+hcyo+6bH9YZuW
-	 +14X7q/s3fJin4CfmY+JKGGiKEb+gsOa3rcHzEIuLns+hJyhI2UTLBhmA/m/LwV7D8
-	 u6T/fo2GIDYlg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B3FCAE505D5;
-	Mon,  7 Aug 2023 20:20:23 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F5393D9C
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 20:47:06 +0000 (UTC)
+Received: from smtp-fw-9105.amazon.com (smtp-fw-9105.amazon.com [207.171.188.204])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD351189;
+	Mon,  7 Aug 2023 13:47:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1691441226; x=1722977226;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=i3BspMO1SbyaVrPL43K1PgldA9iQctRpaOUukh+SQm0=;
+  b=m7hnTHmYsgih5/c6G+Gd0jAODsQfKnWA/wKrhNUsDMzP8GR1sfWuuPiC
+   u+Ac9FA1SKGJKbG1mnHJtvQ4DhropoQHJbf4AgwAvsdAqYkpiJVUy1Mdm
+   E1NFRuUcSe2Fsfxuux6nOS3I5xeRlKAp5xqJX8NrgfvdV0dnV2BxWDYHs
+   w=;
+X-IronPort-AV: E=Sophos;i="6.01,263,1684800000"; 
+   d="scan'208";a="665009981"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-pdx-2a-m6i4x-1197e3af.us-west-2.amazon.com) ([10.25.36.214])
+  by smtp-border-fw-9105.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Aug 2023 20:47:00 +0000
+Received: from EX19MTAUWC002.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
+	by email-inbound-relay-pdx-2a-m6i4x-1197e3af.us-west-2.amazon.com (Postfix) with ESMTPS id 7766510064B;
+	Mon,  7 Aug 2023 20:46:59 +0000 (UTC)
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Mon, 7 Aug 2023 20:46:59 +0000
+Received: from 88665a182662.ant.amazon.com.com (10.187.170.12) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1118.30;
+ Mon, 7 Aug 2023 20:46:56 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <mirsad.todorovac@alu.unizg.hr>
+CC: <alexander@mihalicyn.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<fw@strlen.de>, <kuba@kernel.org>, <kuniyu@amazon.com>,
+	<linux-kernel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <shuah@kernel.org>
+Subject: Re: selftests: net/af_unix test_unix_oob [FAILED]
+Date: Mon, 7 Aug 2023 13:46:47 -0700
+Message-ID: <20230807204648.50070-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <abf98942-0058-f2ad-8e55-fbdd83b7c2d6@alu.unizg.hr>
+References: <abf98942-0058-f2ad-8e55-fbdd83b7c2d6@alu.unizg.hr>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -41,59 +65,77 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v4 0/6] page_pool: a couple of assorted optimizations
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169143962373.20323.15736867821555960200.git-patchwork-notify@kernel.org>
-Date: Mon, 07 Aug 2023 20:20:23 +0000
-References: <20230804180529.2483231-1-aleksander.lobakin@intel.com>
-In-Reply-To: <20230804180529.2483231-1-aleksander.lobakin@intel.com>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, maciej.fijalkowski@intel.com, larysa.zaremba@intel.com,
- linyunsheng@huawei.com, alexanderduyck@fb.com, hawk@kernel.org,
- ilias.apalodimas@linaro.org, simon.horman@corigine.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain
+X-Originating-IP: [10.187.170.12]
+X-ClientProxiedBy: EX19D045UWC004.ant.amazon.com (10.13.139.203) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Precedence: Bulk
+X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,T_SPF_PERMERROR autolearn=no autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Fri,  4 Aug 2023 20:05:23 +0200 you wrote:
-> That initially was a spin-off of the IAVF PP series[0], but has grown
-> (and shrunk) since then a bunch. In fact, it consists of three
-> semi-independent blocks:
+From: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
+Date: Mon, 7 Aug 2023 21:44:41 +0200
+> Hi all,
 > 
-> * #1-2: Compile-time optimization. Split page_pool.h into 2 headers to
->   not overbloat the consumers not needing complex inline helpers and
->   then stop including it in skbuff.h at all. The first patch is also
->   prereq for the whole series.
-> * #3: Improve cacheline locality for users of the Page Pool frag API.
-> * #4-6: Use direct cache recycling more aggressively, when it is safe
->   obviously. In addition, make sure nobody wants to use Page Pool API
->   with disabled interrupts.
+> In the kernel 6.5-rc5 build on Ubuntu 22.04 LTS (jammy jellyfish) on a Ryzen 7950 assembled box,
+> vanilla torvalds tree kernel, the test test_unix_oob unexpectedly fails:
 > 
-> [...]
+> # selftests: net/af_unix: test_unix_oob
+> # Test 2 failed, sigurg 23 len 63 OOB %
+> 
+> It is this code:
+> 
+>          /* Test 2:
+>           * Verify that the first OOB is over written by
+>           * the 2nd one and the first OOB is returned as
+>           * part of the read, and sigurg is received.
+>           */
+>          wait_for_data(pfd, POLLIN | POLLPRI);
+>          len = 0;
+>          while (len < 70)
+>                  len = recv(pfd, buf, 1024, MSG_PEEK);
+>          len = read_data(pfd, buf, 1024);
+>          read_oob(pfd, &oob);
+>          if (!signal_recvd || len != 127 || oob != '#') {
+>                  fprintf(stderr, "Test 2 failed, sigurg %d len %d OOB %c\n",
+>                  signal_recvd, len, oob);
+>                  die(1);
+>          }
+> 
+> In 6.5-rc4, this test was OK, so it might mean we have a regression?
 
-Here is the summary with links:
-  - [net-next,v4,1/6] page_pool: split types and declarations from page_pool.h
-    https://git.kernel.org/netdev/net-next/c/a9ca9f9ceff3
-  - [net-next,v4,2/6] net: skbuff: don't include <net/page_pool/types.h> to <linux/skbuff.h>
-    https://git.kernel.org/netdev/net-next/c/75eaf63ea7af
-  - [net-next,v4,3/6] page_pool: place frag_* fields in one cacheline
-    https://git.kernel.org/netdev/net-next/c/06d0fbdad612
-  - [net-next,v4,4/6] net: skbuff: avoid accessing page_pool if !napi_safe when returning page
-    https://git.kernel.org/netdev/net-next/c/5b899c33b3b8
-  - [net-next,v4,5/6] page_pool: add a lockdep check for recycling in hardirq
-    https://git.kernel.org/netdev/net-next/c/ff4e538c8c3e
-  - [net-next,v4,6/6] net: skbuff: always try to recycle PP pages directly when in softirq
-    https://git.kernel.org/netdev/net-next/c/4a36d0180c45
+Thanks for reporting.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+I confirmed the test doesn't fail on net-next at least, but it's based
+on v6.5-rc4.
+
+  ---8<---
+  [root@localhost ~]# ./test_unix_oob 
+  [root@localhost ~]# echo $?
+  0
+  [root@localhost ~]# uname -r
+  6.5.0-rc4-01192-g66244337512f
+  ---8<---
+
+I'll check 6.5-rc5 later.
 
 
+> 
+> marvin@defiant:~/linux/kernel/linux_torvalds$ grep test_unix_oob ../kselftest-6.5-rc4-1.log
+> /net/af_unix/test_unix_oob
+> # selftests: net/af_unix: test_unix_oob
+> ok 2 selftests: net/af_unix: test_unix_oob
+> marvin@defiant:~/linux/kernel/linux_torvalds$
+> 
+> Hope this helps.
+> 
+> NOTE: the kernel is vanilla torvalds tree, only "dirty" because the selftests were modified.
+> 
+> Kind regards,
+> Mirsad Todorovac
 
