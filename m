@@ -1,214 +1,256 @@
-Return-Path: <netdev+bounces-25080-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25081-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E521D772DE7
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 20:33:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4993772DED
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 20:35:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 224A01C20D05
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 18:33:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6783C281363
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 18:35:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B629215AC2;
-	Mon,  7 Aug 2023 18:33:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DCEC156CA;
+	Mon,  7 Aug 2023 18:35:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B27716410;
-	Mon,  7 Aug 2023 18:33:37 +0000 (UTC)
-Received: from out3-smtp.messagingengine.com (out3-smtp.messagingengine.com [66.111.4.27])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31602171A;
-	Mon,  7 Aug 2023 11:33:33 -0700 (PDT)
-Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
-	by mailout.nyi.internal (Postfix) with ESMTP id C79B65C0159;
-	Mon,  7 Aug 2023 14:33:30 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute2.internal (MEProxy); Mon, 07 Aug 2023 14:33:30 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manjusaka.me; h=
-	cc:cc:content-transfer-encoding:content-type:date:date:from:from
-	:in-reply-to:message-id:mime-version:reply-to:sender:subject
-	:subject:to:to; s=fm3; t=1691433210; x=1691519610; bh=DRvg+yWrex
-	nAnSV98wMNJk8fdPpNOtRsOx0xI68DJjk=; b=qiAHe5FdIJqaYwx0rcigl6dBud
-	Rg2tnNy20s+bA2ayPEf84TCsT++DsA6Ohc4YoEXNuNWXqjUILFScLDVeIvrLwj9+
-	NZXDNzA1Zg1Dvx/B+Dj0vGUxTlUYDpd1f9H7PqQ9M7giGZOz59Gz5pzqDzTXkRqd
-	2xomMXvY6Y3px0A818c6ab0j6X9cE3ms3AwRm66q8ZLkUGwn64ev5mFyODm4po/g
-	Iic1oyGsHv93MaL3sRPooybgsv+W+Tpu2B1gJ82iVdg7kTbkiVeVKWDkqFXVkGrY
-	LhY5rCAHP7vqBvdLvsCJqmVjKlBG5LBaTbx8TXUZh71MXuwUzImYZWdQX0XQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:message-id:mime-version:reply-to:sender:subject
-	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-	:x-sasl-enc; s=fm3; t=1691433210; x=1691519610; bh=DRvg+yWrexnAn
-	SV98wMNJk8fdPpNOtRsOx0xI68DJjk=; b=AKJlkPbH6czuweAxLwLh3HzQzCBvo
-	Mx73WEW4EzMNmuIkcLBVcaMjDSHlN8v6utwiS1Zrd0i4HJIJfQsc0XB4DEwUJYo3
-	PpQ0Q/b69La76ZlB7IhXbh470+k519iLWziFJM9XdNH353UrwLkRwo1hdAXQ4j5h
-	IDHgp/wXP+OwyDC9f2IjO5m2JP28Xm6jpnP51zxD/cAMBeOes48im56LoRizZcy8
-	spZdnb10nbJwEsGAU1kJrTFXNx9+pZpn8dH3PAulDY4aeGPc/lbiFUFbL1TOXSF2
-	/VlHG25PGVrLfXe3OCjxzpDFje+qqpm6JIoYsYRW/l2jCymhynSbA8fSw==
-X-ME-Sender: <xms:-jjRZIPzCPFLgOdmelOScrtvbBb_tzbQK6hXEo9KaaOSg11lB1Nmdg>
-    <xme:-jjRZO98UQpsUTc8jlLvDVfA6xYeSDWfraG1BOCRW6x1EMJWa_SNzmtm81LVHefjf
-    nW32_0HEoErtjMcEEI>
-X-ME-Received: <xmr:-jjRZPRDpQACdtLHE0LOphcaA5CpxXX9q10Gh4N1tUDD69GiI3O4nTHR-u_ECNxkZvHcipUV_A>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrledtgdduvddtucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucenucfjughrpefhvfevufffkffoggfgsedtkeertd
-    ertddtnecuhfhrohhmpeforghnjhhushgrkhgruceomhgvsehmrghnjhhushgrkhgrrdhm
-    vgeqnecuggftrfgrthhtvghrnhepvddujeetiefgheehvefhveetieeuudeutdehhedtue
-    etueehjeffhefhueeutdejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehm
-    rghilhhfrhhomhepmhgvsehmrghnjhhushgrkhgrrdhmvg
-X-ME-Proxy: <xmx:-jjRZAuTPkND5FlrRHANWKN3_eh9pLUyPXtxwBsOjObXfHOUU9GQ9g>
-    <xmx:-jjRZAdCKC4JDSdXrq8l8DNvcj2mWMRyi8YheAU521x-3aC9_erm9g>
-    <xmx:-jjRZE0D0UMTqpOiOHA1exvvdB0YdzK3_nj6uGF5f10vDNjO56RGLQ>
-    <xmx:-jjRZBVkTyRBPnIVc3JPMab5sE1QlXYs7E4B4WWiPeDx2vFRZNfdsw>
-Feedback-ID: i3ea9498d:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 7 Aug 2023 14:33:26 -0400 (EDT)
-From: Manjusaka <me@manjusaka.me>
-To: edumazet@google.com,
-	mhiramat@kernel.org,
-	rostedt@goodmis.org,
-	davem@davemloft.net,
-	dsahern@kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org,
-	bpf@vger.kernel.org,
-	Manjusaka <me@manjusaka.me>
-Subject: [PATCH] tracepoint: add new `tcp:tcp_ca_event_set` trace event
-Date: Mon,  7 Aug 2023 18:33:08 +0000
-Message-Id: <20230807183308.9015-1-me@manjusaka.me>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A9BA107B6
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 18:35:01 +0000 (UTC)
+Received: from mail-oi1-x22b.google.com (mail-oi1-x22b.google.com [IPv6:2607:f8b0:4864:20::22b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97506171E
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 11:34:59 -0700 (PDT)
+Received: by mail-oi1-x22b.google.com with SMTP id 5614622812f47-3a78604f47fso2312186b6e.1
+        for <netdev@vger.kernel.org>; Mon, 07 Aug 2023 11:34:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1691433299; x=1692038099;
+        h=in-reply-to:from:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=j6vOTn5WQVDB1eRx8kVi6EhwetYAP1mdFvRYAVXppIg=;
+        b=OcIFhzotsoPKx3QD53NF1/C9MJ6OoZjB80g9JHnNXyxjFPK+J9Dsxa4lRrbzFJcAw7
+         tGq6dnhxrC2Tu3Toiym2Haho8UkcwGhFKHXdVvHyYG6GulT1Xt2a8WVE65UqvtFcWkNM
+         81kD5OLADlXytDPCVuETUrsA9F3LFqms/8mPA=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691433299; x=1692038099;
+        h=in-reply-to:from:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=j6vOTn5WQVDB1eRx8kVi6EhwetYAP1mdFvRYAVXppIg=;
+        b=V3UGOsQ6AGZHT5zUHkux81BQhuoIULFUx6PePDPY7MyPZLlx/WEAtB4Gdo7PXmbsmy
+         W1dKyuGVty5WhokycJJ348JCnUE1q8pgvSRR2BdxOBVL1abw+01d6vP4aecjeuCSdF5i
+         7UF2S1UuEjL3T154v/+Jvk1FaebDvEkxTaCcrLChtClaTFdnfGiC+XHT1msCsUwzdtXV
+         GKkePr59QPGJAC9wWbqkzOiRipbMysHdjczs5CtzbziZnCq/c8uyJpleKvYi757svVpn
+         Wn0qUGOn5KTWfOqog+QxTZsW5Cx6SHqVWrsyD0CS1AUq9JrSrICECsrccQ0s77jCs3sw
+         9mRA==
+X-Gm-Message-State: AOJu0YyfUeX06kUMomys857rbzeCoXjOGVR2/1db4oCmAJAeAtTnnBCe
+	Iq5DiUstf9dZalKeReuEifUbiw==
+X-Google-Smtp-Source: AGHT+IG9NAQtcjPFK4JNKNNlGMMfzZ4dN7Ep5MTuf1ABSqRKCB+eFAUP334SUsk+T0H1kNFyn9lV/g==
+X-Received: by 2002:aca:1905:0:b0:3a7:46d2:5203 with SMTP id l5-20020aca1905000000b003a746d25203mr9865896oii.51.1691433298823;
+        Mon, 07 Aug 2023 11:34:58 -0700 (PDT)
+Received: from [10.67.48.245] ([192.19.223.252])
+        by smtp.gmail.com with ESMTPSA id w70-20020a638249000000b0056368adf5e2sm5291227pgd.87.2023.08.07.11.34.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 07 Aug 2023 11:34:58 -0700 (PDT)
+Message-ID: <ee134dae-8353-5735-e02d-e2cb1088c428@broadcom.com>
+Date: Mon, 7 Aug 2023 11:34:55 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: ARM board lockups/hangs triggered by locks and mutexes
+To: =?UTF-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>,
+ Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
+ Will Deacon <will@kernel.org>, Waiman Long <longman@redhat.com>,
+ Boqun Feng <boqun.feng@gmail.com>, Russell King <linux@armlinux.org.uk>,
+ Daniel Lezcano <daniel.lezcano@linaro.org>,
+ Thomas Gleixner <tglx@linutronix.de>, Florian Fainelli
+ <f.fainelli@gmail.com>, linux-clk@vger.kernel.org,
+ "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>,
+ Network Development <netdev@vger.kernel.org>,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Cc: OpenWrt Development List <openwrt-devel@lists.openwrt.org>,
+ bcm-kernel-feedback-list <bcm-kernel-feedback-list@broadcom.com>
+References: <CACna6rxpzDWE5-gnmpgMgfzPmmHvEGTZk4GJvJ8jLSMazh2bVA@mail.gmail.com>
+ <bd5feeb3-bc44-d4d2-7708-eea9243b49a4@gmail.com>
+ <0f9d0cd6-d344-7915-7bc1-7a090b8305d2@gmail.com>
+From: Florian Fainelli <florian.fainelli@broadcom.com>
+In-Reply-To: <0f9d0cd6-d344-7915-7bc1-7a090b8305d2@gmail.com>
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="000000000000f4dc6d06025980be"
+X-Spam-Status: No, score=-3.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-In normal use case, the tcp_ca_event would be changed in high frequency.
+--000000000000f4dc6d06025980be
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-It's a good indicator to represent the network quanlity.
+On 8/7/23 04:10, Rafał Miłecki wrote:
+> On 4.08.2023 13:07, Rafał Miłecki wrote:
+>> I triple checked that. Dropping a single unused function breaks kernel /
+>> device stability on BCM53573!
+>>
+>> AFAIK the only thing below diff actually affects is location of symbols
+>> (I actually verified that by comparing System.map before and after -
+>> over 22'000 of relocated symbols).
+>>
+>> Can some unfortunate location of symbols cause those hangs/lockups?
+> 
+> I performed another experiment. First I dropped mtd_check_of_node() to
+> bring kernel back to the stable state.
+> 
+> Then I started adding useless code to the mtdchar_unlocked_ioctl(). I
+> ended up adding just enough to make sure all post-mtd symbols in
+> System.map got the same offset as in case of backporting
+> mtd_check_of_node().
+> 
+> I started experiencing lockups/hangs again.
+> 
+> I repeated the same test with adding dumb code to the brcm_nvram_probe()
+> and verifying symbols offsets following brcm_nvram_probe one.
+> 
+> I believe this confirms that this problem is about offset or alignment
+> of some specific symbol(s). The remaining question is what symbols and
+> how to fix or workaround that.
 
-So I propose to add a `tcp:tcp_ca_event_set` trace event
-like `tcp:tcp_cong_state_set` to help the people to
-trace the TCP connection status
+In the config.gz file you attached in your first email, both 
+CONFIG_MTD_* and CONFIG_NVMEM_* so it is not like we are reaching into 
+module space for code and/or data and need veneers or anything, it is 
+part of the kernel image so we can assert the maximum distance between 
+instructions etc.
 
-Signed-off-by: Manjusaka <me@manjusaka.me>
----
- include/net/tcp.h          |  9 ++------
- include/trace/events/tcp.h | 45 ++++++++++++++++++++++++++++++++++++++
- net/ipv4/tcp_cong.c        | 10 +++++++++
- 3 files changed, 57 insertions(+), 7 deletions(-)
+Now is it just that specific mutex that is an issue, or do other mutexes 
+through the system do cause problems as well?
 
-diff --git a/include/net/tcp.h b/include/net/tcp.h
-index 0ca972ebd3dd..a68c5b61889c 100644
---- a/include/net/tcp.h
-+++ b/include/net/tcp.h
-@@ -1154,13 +1154,8 @@ static inline bool tcp_ca_needs_ecn(const struct sock *sk)
- 	return icsk->icsk_ca_ops->flags & TCP_CONG_NEEDS_ECN;
- }
- 
--static inline void tcp_ca_event(struct sock *sk, const enum tcp_ca_event event)
--{
--	const struct inet_connection_sock *icsk = inet_csk(sk);
--
--	if (icsk->icsk_ca_ops->cwnd_event)
--		icsk->icsk_ca_ops->cwnd_event(sk, event);
--}
-+/* from tcp_cong.c */
-+void tcp_ca_event(struct sock *sk, const enum tcp_ca_event event);
- 
- /* From tcp_cong.c */
- void tcp_set_ca_state(struct sock *sk, const u8 ca_state);
-diff --git a/include/trace/events/tcp.h b/include/trace/events/tcp.h
-index bf06db8d2046..38415c5f1d52 100644
---- a/include/trace/events/tcp.h
-+++ b/include/trace/events/tcp.h
-@@ -416,6 +416,51 @@ TRACE_EVENT(tcp_cong_state_set,
- 		  __entry->cong_state)
- );
- 
-+TRACE_EVENT(tcp_ca_event_set,
-+
-+	TP_PROTO(struct sock *sk, const u8 ca_event),
-+
-+	TP_ARGS(sk, ca_event),
-+
-+	TP_STRUCT__entry(
-+		__field(const void *, skaddr)
-+		__field(__u16, sport)
-+		__field(__u16, dport)
-+		__array(__u8, saddr, 4)
-+		__array(__u8, daddr, 4)
-+		__array(__u8, saddr_v6, 16)
-+		__array(__u8, daddr_v6, 16)
-+		__field(__u8, ca_event)
-+	),
-+
-+	TP_fast_assign(
-+		struct inet_sock *inet = inet_sk(sk);
-+		__be32 *p32;
-+
-+		__entry->skaddr = sk;
-+
-+		__entry->sport = ntohs(inet->inet_sport);
-+		__entry->dport = ntohs(inet->inet_dport);
-+
-+		p32 = (__be32 *) __entry->saddr;
-+		*p32 = inet->inet_saddr;
-+
-+		p32 = (__be32 *) __entry->daddr;
-+		*p32 =  inet->inet_daddr;
-+
-+		TP_STORE_ADDRS(__entry, inet->inet_saddr, inet->inet_daddr,
-+			   sk->sk_v6_rcv_saddr, sk->sk_v6_daddr);
-+
-+		__entry->ca_event = ca_event;
-+	),
-+
-+	TP_printk("sport=%hu dport=%hu saddr=%pI4 daddr=%pI4 saddrv6=%pI6c daddrv6=%pI6c ca_event=%u",
-+		  __entry->sport, __entry->dport,
-+		  __entry->saddr, __entry->daddr,
-+		  __entry->saddr_v6, __entry->daddr_v6,
-+		  __entry->ca_event)
-+);
-+
- #endif /* _TRACE_TCP_H */
- 
- /* This part must be outside protection */
-diff --git a/net/ipv4/tcp_cong.c b/net/ipv4/tcp_cong.c
-index 1b34050a7538..08e02850d3de 100644
---- a/net/ipv4/tcp_cong.c
-+++ b/net/ipv4/tcp_cong.c
-@@ -34,6 +34,16 @@ struct tcp_congestion_ops *tcp_ca_find(const char *name)
- 	return NULL;
- }
- 
-+void tcp_ca_event(struct sock *sk, const enum tcp_ca_event event)
-+{
-+	const struct inet_connection_sock *icsk = inet_csk(sk);
-+
-+	trace_tcp_ca_event_set(sk, (u8)event);
-+
-+	if (icsk->icsk_ca_ops->cwnd_event)
-+		icsk->icsk_ca_ops->cwnd_event(sk, event);
-+}
-+
- void tcp_set_ca_state(struct sock *sk, const u8 ca_state)
- {
- 	struct inet_connection_sock *icsk = inet_csk(sk);
+Do we suspect the toolchain to be possibly problematic?
+
+> 
+> Following dump change brings back lockups/hangs:
+> 
+> diff --git a/drivers/mtd/mtdchar.c b/drivers/mtd/mtdchar.c
+> index ee437af41..0a24dec55 100644
+> --- a/drivers/mtd/mtdchar.c
+> +++ b/drivers/mtd/mtdchar.c
+> @@ -1028,6 +1028,22 @@ static long mtdchar_unlocked_ioctl(struct file 
+> *file, u_int cmd, u_long arg)
+>   {
+>       int ret;
+> 
+> +    if (!file)
+> +        pr_info("Missing\n");
+> +    WARN_ON(!file);
+> +    WARN_ON(cmd == 1234);
+> +    WARN_ON(cmd == 5678);
+> +    WARN_ON(cmd == 1234);
+> +    WARN_ON(cmd == 5678);
+> +    WARN_ON(cmd == 1234);
+> +    WARN_ON(cmd == 5678);
+> +    WARN_ON(cmd == 1234);
+> +    WARN_ON(cmd == 5678);
+> +    WARN_ON(cmd == 1234);
+> +    WARN_ON(cmd == 5678);
+> +    WARN_ON(cmd == 1234);
+> +    WARN_ON(cmd == 5678);
+> +
+>       mutex_lock(&mtd_mutex);
+>       ret = mtdchar_ioctl(file, cmd, arg);
+>       mutex_unlock(&mtd_mutex);
+> 
+
 -- 
-2.34.1
+Florian
 
+
+--000000000000f4dc6d06025980be
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
+
+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
+riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
+QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
+UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
+M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
+Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
+14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
+a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
+XzCCBVgwggRAoAMCAQICDBP8P9hKRVySg3Qv5DANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
+RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
+UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAxMjE4MTFaFw0yNTA5MTAxMjE4MTFaMIGW
+MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
+BgNVBAoTDUJyb2FkY29tIEluYy4xGTAXBgNVBAMTEEZsb3JpYW4gRmFpbmVsbGkxLDAqBgkqhkiG
+9w0BCQEWHWZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tMIIBIjANBgkqhkiG9w0BAQEFAAOC
+AQ8AMIIBCgKCAQEA+oi3jMmHltY4LMUy8Up5+1zjd1iSgUBXhwCJLj1GJQF+GwP8InemBbk5rjlC
+UwbQDeIlOfb8xGqHoQFGSW8p9V1XUw+cthISLkycex0AJ09ufePshLZygRLREU0H4ecNPMejxCte
+KdtB4COST4uhBkUCo9BSy1gkl8DJ8j/BQ1KNUx6oYe0CntRag+EnHv9TM9BeXBBLfmMRnWNhvOSk
+nSmRX0J3d9/G2A3FIC6WY2XnLW7eAZCQPa1Tz3n2B5BGOxwqhwKLGLNu2SRCPHwOdD6e0drURF7/
+Vax85/EqkVnFNlfxtZhS0ugx5gn2pta7bTdBm1IG4TX+A3B1G57rVwIDAQABo4IB3jCCAdowDgYD
+VR0PAQH/BAQDAgWgMIGjBggrBgEFBQcBAQSBljCBkzBOBggrBgEFBQcwAoZCaHR0cDovL3NlY3Vy
+ZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAuY3J0MEEG
+CCsGAQUFBzABhjVodHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWdu
+MmNhMjAyMDBNBgNVHSAERjBEMEIGCisGAQQBoDIBKAowNDAyBggrBgEFBQcCARYmaHR0cHM6Ly93
+d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIwADBJBgNVHR8EQjBAMD6gPKA6
+hjhodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNy
+bDAoBgNVHREEITAfgR1mbG9yaWFuLmZhaW5lbGxpQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggr
+BgEFBQcDBDAfBgNVHSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQUUwwfJ6/F
+KL0fRdVROal/Lp4lAF0wDQYJKoZIhvcNAQELBQADggEBAKBgfteDc1mChZjKBY4xAplC6uXGyBrZ
+kNGap1mHJ+JngGzZCz+dDiHRQKGpXLxkHX0BvEDZLW6LGOJ83ImrW38YMOo3ZYnCYNHA9qDOakiw
+2s1RH00JOkO5SkYdwCHj4DB9B7KEnLatJtD8MBorvt+QxTuSh4ze96Jz3kEIoHMvwGFkgObWblsc
+3/YcLBmCgaWpZ3Ksev1vJPr5n8riG3/N4on8gO5qinmmr9Y7vGeuf5dmZrYMbnb+yCBalkUmZQwY
+NxADYvcRBA0ySL6sZpj8BIIhWiXiuusuBmt2Mak2eEv0xDbovE6Z6hYyl/ZnRadbgK/ClgbY3w+O
+AfUXEZ0xggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52
+LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwT
+/D/YSkVckoN0L+QwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIEWhoOXxk0RhVNuR
+uy7XDF/MMj9GpPcQi6ZqAl+HxMf/MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcN
+AQkFMQ8XDTIzMDgwNzE4MzQ1OVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZI
+AWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEH
+MAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQAPQYgxCVsB8REBNkIw9FccqITUY58doMjY
+/cRDez2mWPU/N0+EQNMhS1BMuYm18MDgMin7Ymqr7HnsISJVa6k8+WBALE2r7L9y7g7cptOIdu4z
+X02dMvEZZPlPotYwHfWjY8VqOgXpivy5zULGDdhhBqo2mLeAKlULM6tk70aX54fonMKCqNPThWWN
+q+yglQ4cJuhoWj5ugsAPiF9/oknzOHSUPPspGN2L9BWvnUrCRxAH3NnFjIyBSobaln9KQyieOjbA
+6NKALXV641AkvQIrVRRS/5/VIgGA4r/6ECgOaa+6RGVtGOHS+GqvaBz/tRYnOdVXa5B3FI1oFINI
+HOqq
+--000000000000f4dc6d06025980be--
 
