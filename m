@@ -1,122 +1,188 @@
-Return-Path: <netdev+bounces-24737-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24739-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDD5A7717BF
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 03:23:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8FED37717E8
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 03:43:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2B7EF1C20934
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 01:23:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B77551C2090B
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 01:43:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 093B320F8;
-	Mon,  7 Aug 2023 01:21:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58E22649;
+	Mon,  7 Aug 2023 01:43:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7BC31FC9;
-	Mon,  7 Aug 2023 01:21:17 +0000 (UTC)
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E17BB1712;
-	Sun,  6 Aug 2023 18:21:16 -0700 (PDT)
-Received: from dggpeml500026.china.huawei.com (unknown [172.30.72.57])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RJz2g4GSnzGpwQ;
-	Mon,  7 Aug 2023 09:17:47 +0800 (CST)
-Received: from huawei.com (10.175.101.6) by dggpeml500026.china.huawei.com
- (7.185.36.106) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Mon, 7 Aug
- 2023 09:21:14 +0800
-From: Zhengchao Shao <shaozhengchao@huawei.com>
-To: <netdev@vger.kernel.org>, <bpf@vger.kernel.org>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>
-CC: <jiri@resnulli.us>, <weiyongjun1@huawei.com>, <yuehaibing@huawei.com>,
-	<shaozhengchao@huawei.com>
-Subject: [PATCH net-next,v3 5/5] team: remove unused input parameters in lb_htpm_select_tx_port and lb_hash_select_tx_port
-Date: Mon, 7 Aug 2023 09:25:56 +0800
-Message-ID: <20230807012556.3146071-6-shaozhengchao@huawei.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230807012556.3146071-1-shaozhengchao@huawei.com>
-References: <20230807012556.3146071-1-shaozhengchao@huawei.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D802392
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 01:43:30 +0000 (UTC)
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6B51F1713;
+	Sun,  6 Aug 2023 18:43:26 -0700 (PDT)
+Authenticated-By: 
+X-SpamFilter-By: ArmorX SpamTrap 5.77 with qID 3771dYi55025316, This message is accepted by code: ctloc85258
+Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
+	by rtits2.realtek.com.tw (8.15.2/2.81/5.90) with ESMTPS id 3771dYi55025316
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=FAIL);
+	Mon, 7 Aug 2023 09:39:35 +0800
+Received: from RTEXMBS03.realtek.com.tw (172.21.6.96) by
+ RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.17; Mon, 7 Aug 2023 09:39:51 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXMBS03.realtek.com.tw (172.21.6.96) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.7; Mon, 7 Aug 2023 09:39:50 +0800
+Received: from RTEXMBS04.realtek.com.tw ([fe80::e138:e7f1:4709:ff4d]) by
+ RTEXMBS04.realtek.com.tw ([fe80::e138:e7f1:4709:ff4d%5]) with mapi id
+ 15.01.2375.007; Mon, 7 Aug 2023 09:39:50 +0800
+From: Ping-Ke Shih <pkshih@realtek.com>
+To: Ruan Jinjie <ruanjinjie@huawei.com>,
+        "sgoutham@marvell.com"
+	<sgoutham@marvell.com>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "edumazet@google.com" <edumazet@google.com>,
+        "kuba@kernel.org"
+	<kuba@kernel.org>,
+        "pabeni@redhat.com" <pabeni@redhat.com>,
+        "jesse.brandeburg@intel.com" <jesse.brandeburg@intel.com>,
+        "anthony.l.nguyen@intel.com" <anthony.l.nguyen@intel.com>,
+        "tariqt@nvidia.com" <tariqt@nvidia.com>,
+        "s.shtylyov@omp.ru"
+	<s.shtylyov@omp.ru>,
+        "aspriel@gmail.com" <aspriel@gmail.com>,
+        "franky.lin@broadcom.com" <franky.lin@broadcom.com>,
+        "hante.meuleman@broadcom.com" <hante.meuleman@broadcom.com>,
+        "kvalo@kernel.org" <kvalo@kernel.org>,
+        "richardcochran@gmail.com"
+	<richardcochran@gmail.com>,
+        "yoshihiro.shimoda.uh@renesas.com"
+	<yoshihiro.shimoda.uh@renesas.com>,
+        "u.kleine-koenig@pengutronix.de"
+	<u.kleine-koenig@pengutronix.de>,
+        "mkl@pengutronix.de" <mkl@pengutronix.de>,
+        "lee@kernel.org" <lee@kernel.org>,
+        "set_pte_at@outlook.com"
+	<set_pte_at@outlook.com>,
+        "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+        "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>,
+        "intel-wired-lan@lists.osuosl.org"
+	<intel-wired-lan@lists.osuosl.org>,
+        "linux-rdma@vger.kernel.org"
+	<linux-rdma@vger.kernel.org>,
+        "linux-renesas-soc@vger.kernel.org"
+	<linux-renesas-soc@vger.kernel.org>,
+        "linux-wireless@vger.kernel.org"
+	<linux-wireless@vger.kernel.org>,
+        "brcm80211-dev-list.pdl@broadcom.com"
+	<brcm80211-dev-list.pdl@broadcom.com>,
+        "SHA-cyfmac-dev-list@infineon.com"
+	<SHA-cyfmac-dev-list@infineon.com>
+Subject: RE: [PATCH -next 1/6] net: thunderx: Remove unnecessary ternary operators
+Thread-Topic: [PATCH -next 1/6] net: thunderx: Remove unnecessary ternary
+ operators
+Thread-Index: AQHZxoduaAYTDJlTBUyphtGbEFvm5q/eErLw
+Date: Mon, 7 Aug 2023 01:39:50 +0000
+Message-ID: <15759f98483947999393a25b857bc4fe@realtek.com>
+References: <20230804035346.2879318-1-ruanjinjie@huawei.com>
+ <20230804035346.2879318-2-ruanjinjie@huawei.com>
+In-Reply-To: <20230804035346.2879318-2-ruanjinjie@huawei.com>
+Accept-Language: en-US, zh-TW
+Content-Language: zh-TW
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-originating-ip: [172.21.69.188]
+x-kse-serverinfo: RTEXMBS03.realtek.com.tw, 9
+x-kse-antispam-interceptor-info: fallback
+x-kse-antivirus-interceptor-info: fallback
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.175.101.6]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- dggpeml500026.china.huawei.com (7.185.36.106)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-5.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
+X-KSE-AntiSpam-Interceptor-Info: fallback
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-The input parameters "lb_priv" and "skb" in lb_htpm_select_tx_port and
-lb_hash_select_tx_port are unused, so remove them.
 
-Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
----
- drivers/net/team/team_mode_loadbalance.c | 11 +++--------
- 1 file changed, 3 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/net/team/team_mode_loadbalance.c b/drivers/net/team/team_mode_loadbalance.c
-index 2f1573f253ec..00f8989c29c0 100644
---- a/drivers/net/team/team_mode_loadbalance.c
-+++ b/drivers/net/team/team_mode_loadbalance.c
-@@ -30,8 +30,6 @@ static rx_handler_result_t lb_receive(struct team *team, struct team_port *port,
- struct lb_priv;
- 
- typedef struct team_port *lb_select_tx_port_func_t(struct team *,
--						   struct lb_priv *,
--						   struct sk_buff *,
- 						   unsigned char);
- 
- #define LB_TX_HASHTABLE_SIZE 256 /* hash is a char */
-@@ -118,8 +116,6 @@ static void lb_tx_hash_to_port_mapping_null_port(struct team *team,
- 
- /* Basic tx selection based solely by hash */
- static struct team_port *lb_hash_select_tx_port(struct team *team,
--						struct lb_priv *lb_priv,
--						struct sk_buff *skb,
- 						unsigned char hash)
- {
- 	int port_index = team_num_to_port_index(team, hash);
-@@ -129,17 +125,16 @@ static struct team_port *lb_hash_select_tx_port(struct team *team,
- 
- /* Hash to port mapping select tx port */
- static struct team_port *lb_htpm_select_tx_port(struct team *team,
--						struct lb_priv *lb_priv,
--						struct sk_buff *skb,
- 						unsigned char hash)
- {
-+	struct lb_priv *lb_priv = get_lb_priv(team);
- 	struct team_port *port;
- 
- 	port = rcu_dereference_bh(LB_HTPM_PORT_BY_HASH(lb_priv, hash));
- 	if (likely(port))
- 		return port;
- 	/* If no valid port in the table, fall back to simple hash */
--	return lb_hash_select_tx_port(team, lb_priv, skb, hash);
-+	return lb_hash_select_tx_port(team, hash);
- }
- 
- struct lb_select_tx_port {
-@@ -229,7 +224,7 @@ static bool lb_transmit(struct team *team, struct sk_buff *skb)
- 
- 	hash = lb_get_skb_hash(lb_priv, skb);
- 	select_tx_port_func = rcu_dereference_bh(lb_priv->select_tx_port_func);
--	port = select_tx_port_func(team, lb_priv, skb, hash);
-+	port = select_tx_port_func(team, hash);
- 	if (unlikely(!port))
- 		goto drop;
- 	if (team_dev_queue_xmit(team, port, skb))
--- 
-2.34.1
+> -----Original Message-----
+> From: Ruan Jinjie <ruanjinjie@huawei.com>
+> Sent: Friday, August 4, 2023 11:54 AM
+> To: sgoutham@marvell.com; davem@davemloft.net; edumazet@google.com; kuba@=
+kernel.org; pabeni@redhat.com;
+> jesse.brandeburg@intel.com; anthony.l.nguyen@intel.com; tariqt@nvidia.com=
+; s.shtylyov@omp.ru;
+> aspriel@gmail.com; franky.lin@broadcom.com; hante.meuleman@broadcom.com; =
+kvalo@kernel.org;
+> richardcochran@gmail.com; yoshihiro.shimoda.uh@renesas.com; ruanjinjie@hu=
+awei.com;
+> u.kleine-koenig@pengutronix.de; mkl@pengutronix.de; lee@kernel.org; set_p=
+te_at@outlook.com;
+> linux-arm-kernel@lists.infradead.org; netdev@vger.kernel.org; intel-wired=
+-lan@lists.osuosl.org;
+> linux-rdma@vger.kernel.org; linux-renesas-soc@vger.kernel.org; linux-wire=
+less@vger.kernel.org;
+> brcm80211-dev-list.pdl@broadcom.com; SHA-cyfmac-dev-list@infineon.com
+> Subject: [PATCH -next 1/6] net: thunderx: Remove unnecessary ternary oper=
+ators
+>=20
+> Ther are a little ternary operators, the true or false judgement
+> of which is unnecessary in C language semantics.
+>=20
+> Signed-off-by: Ruan Jinjie <ruanjinjie@huawei.com>
+> ---
+>  drivers/net/ethernet/cavium/thunder/nic_main.c    | 2 +-
+>  drivers/net/ethernet/cavium/thunder/thunder_bgx.c | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/drivers/net/ethernet/cavium/thunder/nic_main.c
+> b/drivers/net/ethernet/cavium/thunder/nic_main.c
+> index 0ec65ec634df..b7cf4ba89b7c 100644
+> --- a/drivers/net/ethernet/cavium/thunder/nic_main.c
+> +++ b/drivers/net/ethernet/cavium/thunder/nic_main.c
+> @@ -174,7 +174,7 @@ static void nic_mbx_send_ready(struct nicpf *nic, int=
+ vf)
+>                 if (mac)
+>                         ether_addr_copy((u8 *)&mbx.nic_cfg.mac_addr, mac)=
+;
+>         }
+> -       mbx.nic_cfg.sqs_mode =3D (vf >=3D nic->num_vf_en) ? true : false;
+> +       mbx.nic_cfg.sqs_mode =3D vf >=3D nic->num_vf_en;
+>         mbx.nic_cfg.node_id =3D nic->node;
+>=20
+>         mbx.nic_cfg.loopback_supported =3D vf < nic->num_vf_en;
+> diff --git a/drivers/net/ethernet/cavium/thunder/thunder_bgx.c
+> b/drivers/net/ethernet/cavium/thunder/thunder_bgx.c
+> index a317feb8decb..9e467cecc33a 100644
+> --- a/drivers/net/ethernet/cavium/thunder/thunder_bgx.c
+> +++ b/drivers/net/ethernet/cavium/thunder/thunder_bgx.c
+> @@ -957,7 +957,7 @@ static void bgx_poll_for_sgmii_link(struct lmac *lmac=
+)
+>                 goto next_poll;
+>         }
+>=20
+> -       lmac->link_up =3D ((pcs_link & PCS_MRX_STATUS_LINK) !=3D 0) ? tru=
+e : false;
+> +       lmac->link_up =3D (pcs_link & PCS_MRX_STATUS_LINK) !=3D 0;
 
+lmac->link_up =3D !!(pcs_link & PCS_MRX_STATUS_LINK);
+
+>         an_result =3D bgx_reg_read(lmac->bgx, lmac->lmacid,
+>                                  BGX_GMP_PCS_ANX_AN_RESULTS);
+>=20
+> --
+> 2.34.1
+>=20
+>=20
+> ------Please consider the environment before printing this e-mail.
 
