@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-25054-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25055-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30766772CB3
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 19:22:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3E7D772CC6
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 19:24:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 61EFB1C20C5E
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 17:22:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9C6FB281216
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 17:24:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E253814AB3;
-	Mon,  7 Aug 2023 17:22:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7405156C8;
+	Mon,  7 Aug 2023 17:24:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2D7614AAB
-	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 17:22:17 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6A9BC433C8;
-	Mon,  7 Aug 2023 17:22:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C1703C2B
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 17:24:08 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4B70C433C7;
+	Mon,  7 Aug 2023 17:24:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691428937;
-	bh=Btos6yEe/pTyrhgNSa9UQH62RHapqhrdMCY/H1ZIIUw=;
+	s=k20201202; t=1691429048;
+	bh=yzYxk54oxZUBgAaJwMtLsxtiDTx1ixEvK0h1G7PwdS8=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=nb8VGOo1PMsc4g0x+peqbaUowavB9SZT+KJAn6EZYprxEAVjjjIGOhlCPhxlVGJZD
-	 m71ht22A38Zpohb3HnKzamiFKfYd/us+Ra8OHo7pSvj9B7ZpRXTsuwpMYsbEH2jIne
-	 jXdFKZwyaMr0QuiP0YfGCY+lRyHVy4VMsrtM1QqLBAMVMqqkFEqiTm52rG54vYdUra
-	 D56s0L+xh6cLY48aVEEeehrMWplwQmbq1RQvaLrJm1I+1AK5IZcVIM7w6wBKrND6Am
-	 JVPLMdpu1Db7IKiW0HgBu9ehielZxrocv5XBfbYaumlal/sDXWSkGs9933/AHHuElq
-	 tb2OBuRmIK1vQ==
-Date: Mon, 7 Aug 2023 10:22:15 -0700
+	b=BFQt7RcOU7f236ghJMxfl6I3L2M29oyDzMj+NAcB5SraIoXMn28oE3F7FwHv6062b
+	 xKXp5I5Ctdo8oGIs+wsprPbqEnw7iVSqBzVxwMZIbaZbOlYOFWAhsUklxcXF8JRc30
+	 AxsN93ZR68NgDgGVBOFVrHOspco7u4rVWUw0oRIAgv0Q7xfoTwYamUZU0srut4zNkg
+	 +gIoH3oRYiH1bkkkSZ9PZOCRiT88jJ2mquOcvrJjC7zSHsjKV5ew23jNMuLg7E+mfU
+	 k4iSOwyJ4lLuHi5+jKIS4x2SRrnIL8jj6R8F0abyOKrtWC/gcfjurwqhdcayg+4xhD
+	 JgdFZHXvN/WQA==
+Date: Mon, 7 Aug 2023 10:24:06 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Xinyu Liu <LXYbhu@buaa.edu.cn>
-Cc: marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- baijiaju1990@gmail.com, sy2239101@buaa.edu.cn,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org
-Subject: Re: [BUG]Bluetooth: possible semantic bug when the status field of
- the HCI_Connection_Complete packet set to non-zero
-Message-ID: <20230807102215.75d3322d@kernel.org>
-In-Reply-To: <ed32aad7-41c0-c84d-c1f3-085a4d43ce09@buaa.edu.cn>
-References: <ed32aad7-41c0-c84d-c1f3-085a4d43ce09@buaa.edu.cn>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: netdev@vger.kernel.org
+Subject: Re: ynl - mutiple policies for one nested attr used in multiple
+ cmds
+Message-ID: <20230807102406.19a131d3@kernel.org>
+In-Reply-To: <ZNEl/hit/c65UmYk@nanopsycho>
+References: <ZM01ezEkJw4D27Xl@nanopsycho>
+	<20230804125816.11431885@kernel.org>
+	<ZM3tOOHifjFQqorV@nanopsycho>
+	<20230807100313.2f7b043a@kernel.org>
+	<ZNEl/hit/c65UmYk@nanopsycho>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,11 +52,11 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Sat, 5 Aug 2023 12:35:25 +0800 Xinyu Liu wrote:
-> Our fuzzing tool finds a possible semantic bug in the Bluetooth system 
-> in Linux 6.2
+On Mon, 7 Aug 2023 19:12:30 +0200 Jiri Pirko wrote:
+> >How does the situation look with the known user apps? Is anyone
+> >that we know of putting attributes into dump requests?  
+> 
+> I'm not aware of that.
 
-Sorry this is independent from your report.
-Why are you fuzzing 6.2? It's end of life. Even 6.3 is at this point.
-Please use latest kernels in your testing.
+I vote to risk it and skip the nest, then :)
 
