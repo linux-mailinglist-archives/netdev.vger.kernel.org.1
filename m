@@ -1,204 +1,339 @@
-Return-Path: <netdev+bounces-24745-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24746-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9508077182D
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 04:10:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62985771858
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 04:32:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 50178280FFD
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 02:10:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6D94E1C20920
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 02:32:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 674AB392;
-	Mon,  7 Aug 2023 02:10:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 263C538D;
+	Mon,  7 Aug 2023 02:32:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5480265C
-	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 02:10:38 +0000 (UTC)
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2136.outbound.protection.outlook.com [40.107.223.136])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A37AE1703
-	for <netdev@vger.kernel.org>; Sun,  6 Aug 2023 19:10:35 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13C8338C
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 02:32:48 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52C2A97;
+	Sun,  6 Aug 2023 19:32:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1691375566; x=1722911566;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=onC7K8NB1Xczq7BMmDrmK0HAm266VBasqP/X31w6yM0=;
+  b=k4BPDXl4CSsGdjAI/5aAJEqLOjUvLG5GaCjTIDVJ0iaIX89vjBkgV3lE
+   fqJUh1pqFsqAqR+vHITtvFv2zIOnrTBsnM0SUWGYGKRCCtjgGpCyOYXxA
+   MsOv14hZBJJWoVoaNhMiqBkZhWID5piw7ahWQ6BrScVSLv7zNlWMI0ZoM
+   K6Y7py4D1I/aB7Z7DvoW6rVk7tHypzgKVr7BHpBz1ZhyQPQiv/PIsLlIw
+   KelguutMHZofNHdeyC5z/C17vN6qWsef8f2BTkG+GVKea/zLhrX94fvFh
+   pC0jkA8MmGZ0ZRjjSn48dcGfawZEwsszSsRYWmwB8su99D7nLhr8ki6LA
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10794"; a="373192109"
+X-IronPort-AV: E=Sophos;i="6.01,261,1684825200"; 
+   d="scan'208";a="373192109"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Aug 2023 19:32:28 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10794"; a="707691437"
+X-IronPort-AV: E=Sophos;i="6.01,261,1684825200"; 
+   d="scan'208";a="707691437"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by orsmga006.jf.intel.com with ESMTP; 06 Aug 2023 19:32:28 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Sun, 6 Aug 2023 19:32:27 -0700
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27 via Frontend Transport; Sun, 6 Aug 2023 19:32:27 -0700
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.169)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.27; Sun, 6 Aug 2023 19:32:27 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=YEZaL4gaF+ZkAk21A33HsM8b8qLQ0EB/MOO9stANN5S5SOz3f3aykHGMFki1brM7GglQq7CUAuXD3xM7DVjYhaWBH97GEQPckJnP7PeWBqwOuU/t+3X4R/Rs7F5uxHx3W+gfDTpRgHLQbCqHTul573Sc8Yjfdmj2OS4H99M4CCLCkFJWtbHi4olqWDe+98by+lRR9pzY+kjMEx8HAFB3TYAD0ODuqOfRZH7yUkr28xro/kffaxHWBgj1RLf4xtFI7Osn3yz+9IwdTlUC8ZA9TU2Fhqfp5hpk/+DCPEebwO3aQC1k+BGoIbW1hWVCg3s6dVB9J7aJh7fB23BSI5nm5A==
+ b=mkuQHHhMlX/UdKqFYUY3/zXHYMy2lb+iVYSyqOEr9vrQwqYmRmBZGyXtqKsQdMVcLx0PKUIDXIeMGEy3J0GaUpuiWrSpjUAN1MUpRsRQOMmfbk8LjVR4EI1VQp3GV5k/nnsceZw3mpCnArmDsj4ALvMxP302qRyqA4FXYHRqZVWwZMVZFwiw+BcPPxsGBNHYpfsmFw0Uhprzl6Mo8NtsS4O1MzJ2E9zGkBirwGieuxHLe8pqKBM0OBZQNLzwuem+9yh5z82Xp1lrFUhgsUVAQvbwrl13vvJsmSRsQ7MeIUqo3uXGtaCst9p31bH53/Dj3AjnoyRqoPOZXMgJBEZzlw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Dyor89NvC7x/o/g951SbpQTArs3XSn9WZkWoWNrsLBw=;
- b=TQnTKeDBKRFvSVhYRKQkTg/RG3fjq6vOMHUyOqITIZTwp5BceGCSLV6nJAnKv8A5ItXn+0OaItdMSno8Jeg/r6qp40Zs6ksVCC9RUmzDo7oI44PKd9vPDpz75L6wKZ8v2/gk6yFRX2MKF3GoTLPTDRj1w3DbWlf5KpRUtPqbJlbHzesKV1OdzSjt8wJojnoslE/+4DKnfaYgwKtqnArfueboPxPHCccPRF0xoq6jxlismgwm6RcEI+7oYTs/siJ50lu/L7nQwoZ8Yg5mfJ2Fn7fT4/+XbZto/BxxgCkKrZ6tBI/5Sd3yaOIpZsEDI1uQzLS+VhDtMhH+Z8Hy+ONHNg==
+ bh=1TTdyNBcMpXLJYn7ywc3l0zAzBIl7+K+kbYdBf3jDa8=;
+ b=EdUQsM7PTGeVraohB3q+trnFu6guaTggJITe1pkp/LLo9EO/O/TWR1GdanKVnCekalKFo3EFLJ+9lgTfVrT3Is09+lzrxh1af5OPIuXhIKoa4h55jF31+XzpecXoE9Xze6UP2rGCAIpJgEFjrFDnkOvFqSwJkNDeNvXGK0zMYBABePU54pw4HzD5LPos0PRnvj4iy06MgOj+O9Xv+JNYNhdtfx4VlARVkiMoxAO1EqHGH69GHlVenRLnL7Cl7X02G/kiwn7KgoL/TCCEFnbOLi+bdMccpXBtgVZ2UvTPpTVCarl+u+L1uw2gLS4IB1O6GUmLGiQ5/1duoGDi/vbsWQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
- dkim=pass header.d=corigine.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Dyor89NvC7x/o/g951SbpQTArs3XSn9WZkWoWNrsLBw=;
- b=K5tVN63eZ10Scee498bqJcKTIKPmBgNOHG/FEFlKbjsWLvBX95t0wj2/mZ/zYQOAKycYl8kJfDcS320zfZd75EgDADBrS/YnAZQDn9uDuahuALsvULSTHe8VvSBTGR1WlX8aD8loeZRB6D+BtVG/XfMseyAXEQwSOsOXeBNfDfE=
-Received: from DM6PR13MB3705.namprd13.prod.outlook.com (2603:10b6:5:24c::16)
- by SJ0PR13MB5523.namprd13.prod.outlook.com (2603:10b6:a03:425::15) with
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from PH0PR11MB4839.namprd11.prod.outlook.com (2603:10b6:510:42::18)
+ by LV3PR11MB8483.namprd11.prod.outlook.com (2603:10b6:408:1b0::7) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.25; Mon, 7 Aug
- 2023 02:10:32 +0000
-Received: from DM6PR13MB3705.namprd13.prod.outlook.com
- ([fe80::38ff:ef02:e756:bf23]) by DM6PR13MB3705.namprd13.prod.outlook.com
- ([fe80::38ff:ef02:e756:bf23%7]) with mapi id 15.20.6652.026; Mon, 7 Aug 2023
- 02:10:32 +0000
-From: Yinjun Zhang <yinjun.zhang@corigine.com>
-To: "lkp@intel.com" <lkp@intel.com>
-CC: "davem@davemloft.net" <davem@davemloft.net>, "kuba@kernel.org"
-	<kuba@kernel.org>, Louis Peens <louis.peens@corigine.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"oe-kbuild-all@lists.linux.dev" <oe-kbuild-all@lists.linux.dev>, oss-drivers
-	<oss-drivers@corigine.com>, "pabeni@redhat.com" <pabeni@redhat.com>, Simon
- Horman <simon.horman@corigine.com>, Tianyu Yuan <tianyu.yuan@nephogine.com>
-Subject: RE: [PATCH net-next 05/12] nfp: introduce keepalive mechanism for
- multi-PF setup
-Thread-Topic: [PATCH net-next 05/12] nfp: introduce keepalive mechanism for
- multi-PF setup
-Thread-Index: AQHZvhQYMXFUsQ7fhk+vZca4nvPCAa/RODWAgACOxgCADGS08A==
-Date: Mon, 7 Aug 2023 02:10:31 +0000
-Message-ID:
- <DM6PR13MB3705AE29E99E9E90E62ED398FC0CA@DM6PR13MB3705.namprd13.prod.outlook.com>
-References: <202307300422.oPy5E1hB-lkp@intel.com>
- <20230730045158.1443547-1-yinjun.zhang@corigine.com>
-In-Reply-To: <20230730045158.1443547-1-yinjun.zhang@corigine.com>
-Accept-Language: en-US, zh-CN
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=corigine.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM6PR13MB3705:EE_|SJ0PR13MB5523:EE_
-x-ms-office365-filtering-correlation-id: c345dcb8-ce51-4471-15b7-08db96eb7a7e
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- j1H2OXvOA+q3lkpZDk2XT77yNOauf6Z2TgTCGDKP2+cHtQqwTKCbxZYpwDSe4UH9YBbeoqkhNlQtpPQeSW1Ql26mFy/WT5w8rU9QSaVW11XiNpKaM5rjL9DZjGc9keLFAo2e5eVLMsylMqdP+iV+39MCYa9rrfqyJGoyUPam9NI/D2uP8MfMN9Jp0q1I91GQDCs+lh7tP/6RAOUi/WRquojlRKi51qAKgUG4S1EXGLihfYbsP/UXfWJnhUEQWv8onBln9bRc4sVPPXkAr0IcsowAV0TgieZwnBe9tU2bBSDrDZ2kGYexqtnzZVQORZd5iAgCIwkMXjDP++RZBOAJ85Yv54EfD4NWJOT1d7R4/ZgJIPE79jmAssI78u2lnyz7z5I92qKsYKxIue2/+X6YCHPi+8NcUU82gnXsaq8xYcSWkpGezQrkW6URJmHQ5n0s1X9NNqz4VWha7oIAh/g7iLi8aKbF2eAuakeNEh9BJlzA43d0Sc5pTirwx9sVzyfSSvK3ZMgtV/rqkX5Qqo2GvZmUi3T9etupMSuDSuFqlhdttNC2LaT/FGfGrxkWLm63bjprSt8iqdH2UZk/vSDd7yMK4hZ7fHdUzo6fWyQQmZwFiFJUVNcfVe/SGHTq5Zde/RQuzp3bZ5iat1P46cy5dtyIjhN899ZRCr1DtneuIWY=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR13MB3705.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(136003)(396003)(346002)(366004)(376002)(39830400003)(1800799003)(186006)(451199021)(122000001)(38100700002)(5660300002)(52536014)(12101799015)(2906002)(44832011)(33656002)(38070700005)(76116006)(4326008)(9686003)(107886003)(55016003)(86362001)(6916009)(66476007)(66946007)(64756008)(41300700001)(8676002)(66446008)(8936002)(66556008)(83380400001)(316002)(54906003)(26005)(6506007)(53546011)(966005)(71200400001)(478600001)(7696005);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?BMg4GFI8ofDHY2OeNByZQYsAzSFc8LDr4iwQmcYCr4c4cRgnQ8RCJhhVys7E?=
- =?us-ascii?Q?sEA4JKxuXvNsUpD9ZznAir945uJzUqa+ds6SHF6V5i/Y2Wwfc+j/gLl1R5CB?=
- =?us-ascii?Q?rrukT34/cbbFXS7tr0M+YBM/sTGsGUDDBMlcACNAB5UnvB0qGJ9/mI/b+jn6?=
- =?us-ascii?Q?TpOIMy8n1AWYyMJ8C9KmbV2DeNjjsol5PmtdJDYFgrG/9IF6QjlfLxvKmU8b?=
- =?us-ascii?Q?fALqgXiJa5t48CtWvnCqYPY0sDeZAXfYI9MHzdJe/0Lz7Oz7LFdjAxWwCKpR?=
- =?us-ascii?Q?KNVsYvJYhTP7f3FsWMf539f9np0jZyptBdJolx3i/tIRB9Xz3XXc7gfD/wNF?=
- =?us-ascii?Q?MJ+uohSeohxocFxYO/CfmhcowDLyYhwXp0+Qam7v/m/HOZjYw4Q+l3jszWcf?=
- =?us-ascii?Q?YTD/2Lb1dWw2FVPaYcQusfRGw1MsAvjx/nSCzCTcZt7WHhROWy2wAWIT0njZ?=
- =?us-ascii?Q?1+9Ceecz8qv2SzH3/rFBC9bmOKf5P/4+/fKexBO2oCVrD84MjeR0SLljG6tZ?=
- =?us-ascii?Q?1NBiz3yvwfSFnxAokDNaZKFuWXt4ePeL3M/CmwuuoUgT8B3gk9/9Md/kPUU9?=
- =?us-ascii?Q?Usyjdno2GHBXm6VuL1oqvLjcOT7V2HnO0SB2gPPSjGHzcPVtzFVEyAYoVNoj?=
- =?us-ascii?Q?g4Hi6v4Jq/8Ljy60YWRBQQVpCRds7d18MeY8gY4onSbPzeqHIlkfxO3pbBsH?=
- =?us-ascii?Q?UXP/vJcDs/CkPrDpbVPKriiTbQPT1vzl1ZaouHo5V04qz1FDWzFeIjzo+un/?=
- =?us-ascii?Q?wym/vCs/GFzTTOZhWuBsPurw1GDVhesdO40JPdN7lOcvPqC6mR34Up4oEvpD?=
- =?us-ascii?Q?nfpUdB8JdOCUmOeUVdh1I++ZSYhhk4dmmNc7jrjZ9CG3v9Rtdp05P4TKVIo6?=
- =?us-ascii?Q?8FtwI0E55KyLdPOleUBdP5C5+JeAi81iweURtj3y1UCdrv4MyB9p06vtFQaB?=
- =?us-ascii?Q?ZyuFzrvwRHODwF66c4IfXRrClljyqqnwIQoOvkErLQhYahQvLNkOe69TSe2G?=
- =?us-ascii?Q?tlOv+MdnUimZhsvxQ/tfpyUi3wGf6MrO3DQf+mOfVa3kNSNDR20Z1Ie6f4h+?=
- =?us-ascii?Q?gql9/P7gnjVAcSwIXPwaNRCkv7E+va1R1IcmFCgWdUp4ZIUU/XP3By9Um3Lb?=
- =?us-ascii?Q?7zFkX/Z0OdI7LKjmkZ/7RjmekJBFXHKDJjkYpTh+jt/p/C49S/AeVizdAaoi?=
- =?us-ascii?Q?6sq8HQBXslbTb2nMNjC6s+iwldD/AS1e8j9nqfSiNi03fAiDgtSuA40TixwA?=
- =?us-ascii?Q?K8NNJvzcA7oJg/xGoJCV9j9oJpn3taITITi4Xlxu2hrHMbAHMGK8SfDtXusF?=
- =?us-ascii?Q?AkwzWFT0HG+Z6SmyRLL810quLMb7y9w+3KTimXd+V9wNNYh+Sa8i6Wp//JJ7?=
- =?us-ascii?Q?QkIwQGo91jLrjBnPtekS6sf44n6nx58R3oNosX1XfafWw+IUIcJKFDdm6sKQ?=
- =?us-ascii?Q?DWlGwK5jP6SXHMuda76wIjhRHypUXFi4cNsLm4X8PQ+DMSfvHS/ZHh+06PZC?=
- =?us-ascii?Q?/IhzMvPcR4OZTbrmvYwCT7g8jN7hNo1i7Xfsjk1zdH4B4GQ7fzb6MXdOVefN?=
- =?us-ascii?Q?ZyijcZfY/Pa7rT8P3tYPOzQar+WzMfsNwLr8VtZw?=
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.26; Mon, 7 Aug
+ 2023 02:32:25 +0000
+Received: from PH0PR11MB4839.namprd11.prod.outlook.com
+ ([fe80::38b4:292a:6bad:7775]) by PH0PR11MB4839.namprd11.prod.outlook.com
+ ([fe80::38b4:292a:6bad:7775%4]) with mapi id 15.20.6652.026; Mon, 7 Aug 2023
+ 02:32:25 +0000
+Date: Mon, 7 Aug 2023 10:34:50 +0800
+From: Pengfei Xu <pengfei.xu@intel.com>
+To: Brian Foster <bfoster@redhat.com>
+CC: syzbot <syzbot+5050ad0fb47527b1808a@syzkaller.appspotmail.com>,
+	<adilger.kernel@dilger.ca>, <linux-ext4@vger.kernel.org>,
+	<linux-fsdevel@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <syzkaller-bugs@googlegroups.com>, <tytso@mit.edu>,
+	<heng.su@intel.com>
+Subject: Re: [syzbot] [ext4?] WARNING in ext4_file_write_iter
+Message-ID: <ZNBYSso27S6L3sgS@xpf.sh.intel.com>
+References: <0000000000007faf0005fe4f14b9@google.com>
+ <000000000000a3f45805ffcbb21f@google.com>
+ <ZMsE2q9VX2sQFh/g@xpf.sh.intel.com>
+ <ZM0Aj6sBk/5TPdLS@bfoster>
 Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+In-Reply-To: <ZM0Aj6sBk/5TPdLS@bfoster>
+X-ClientProxiedBy: SG2PR02CA0051.apcprd02.prod.outlook.com
+ (2603:1096:4:54::15) To PH0PR11MB4839.namprd11.prod.outlook.com
+ (2603:10b6:510:42::18)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: corigine.com
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR11MB4839:EE_|LV3PR11MB8483:EE_
+X-MS-Office365-Filtering-Correlation-Id: f2d1d3a1-772e-476c-5bcd-08db96ee8936
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: gXp85wkgJyPR/pOp8t08VKwMDhNIZO7iSNwcVyPJTbEbh7sVePJTF35jIc6MHhoZsK1Rx97VU4TovKs8+WC+tMF+y6YTBQVJNG5OYumtpmV6yT21RTqSVAD3XLAHQ2AhBMG9NCUm93Pfjb6miR82LnVFQ/bRGDne1PHooRkqGVGOQZLUBjX//zTNYSl09/svp/Pw487S6gp0z0LteVA2Pn/innw6r/AOZPFEJHnWNHmOG5SnjKhQMzBgzoQQi8yBqC+GIOubutyLMSPsDaYrzrcWNeKaSh3v979QwggXSmDoNf9VphQWm3GfGJHT4LwtnH4JqzbPLZiByyt+4sDfgPZAFeRiY4HeToYKAz5H6sQtXJQeocfcKXvw6s5hhpU1tZh8tRsyL+rNBxkkEdCJFVTo6+bEm4PxK31vsJOU0Ak7evYoAaeqnl5e7JAGBpx27/dvLg8U6XlRo3eBkM7li0iJHEL6Lwc85rYWKcrXigyJIFKkiMo3SzQr48Wy9nlsqWOV4GUNsH2nOpDIrOEYQi2tHa9q0wOIuQzVOuZIRQUj3kplDu8C841gRVpCGjVWxQTKeS8NOoui8YOBGVYbIpxuArMB32oZGMWyKi1Zko5FtkZMUnuJMo2q2bZPQfmIKkBBk4Ph6KkImas1oQVyCA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB4839.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(39860400002)(366004)(396003)(376002)(346002)(136003)(451199021)(1800799003)(186006)(2906002)(83380400001)(5660300002)(6666004)(38100700002)(6486002)(66476007)(66556008)(6916009)(66946007)(966005)(6512007)(82960400001)(45080400002)(4326008)(316002)(41300700001)(86362001)(44832011)(107886003)(8936002)(8676002)(26005)(6506007)(478600001)(53546011)(99710200001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?MHOgbZbKCVCULdlvFyT1OU1QbqAgt00pfIvt1u4wpu2+aullwepEq7cBLtjr?=
+ =?us-ascii?Q?X3t+waiMp7ZaTRles4KeYpxIdFk2f30V0mRSyGV7jNqLA6GinVNi49vxW7Wf?=
+ =?us-ascii?Q?ikqH+O3uCDTwA4XgwoqH5oHeemuYv+OGI21AtZ/ty2rkdr3ED1Q4ECMApRBj?=
+ =?us-ascii?Q?tMdvEqYW8vHJ4i56b1qMu6spg07e9c+Clw7F8xJ5yY4h1iiw5Gnd+Qm6Ab9r?=
+ =?us-ascii?Q?kq1WQLyjR/YWR0rVot2LDijZll/dpZlDK/VE66qotwgZ9wUP9Q3xiG9d0bET?=
+ =?us-ascii?Q?eCu20ctQVihRdAgTYcXQbSf6OlGmkF19CgbdBgPBlsh0lnf46dQ4XUTIdRNf?=
+ =?us-ascii?Q?8nwEau889Qr+XFvBAOFhgKaq8pztiuoRuz1BcFVlYRHO8psRVTj3wGqi1VvF?=
+ =?us-ascii?Q?Qh8/NQCxHXP7Z4fnGjLnyhkQAPDSb2vhXuWkqrfu9a411oWWWgmhJNWJ9Upg?=
+ =?us-ascii?Q?BATHPQmoXmM0vu9/UrYpW6MSQ73cgUJcUUbFdoFrhrkEHhU3286hEhvAeRk/?=
+ =?us-ascii?Q?OhErYZqBYUSyfmYdhQdZIP4q6mWhA8DIYhYLMQpAP2298OtVmrqgWotO9L7D?=
+ =?us-ascii?Q?46Gc7qjnCNBd7cD1cI6iIxGbACgETjh+8NAYngQgsGH/ZPldPti4pFihBi89?=
+ =?us-ascii?Q?DDp+kzs36DOTxM0KRCo9kVPT0Jwr15CpQEQ2MUtrmSnfXgQ4yoc6Z5ucIuuj?=
+ =?us-ascii?Q?yW7Y8sRjP/N1RHKb81YfPNCWa6OOe1srjOQ+lrZwqcRO4tjfS2wbJka8Cj+R?=
+ =?us-ascii?Q?SD5edbTg8A0Zu3FLfuP719IOP6O0IOtYwnso653rpC3FrplXxVF/K1dPztIe?=
+ =?us-ascii?Q?6lAZ65Cu5MyE3nmRBddAKkDzikvHjBwcMziOqFcQgNbIkmCPDy8Vb+1rbajj?=
+ =?us-ascii?Q?DD2O/XwB19miTfiqbOaHa8Xuu+2RrnUsUGAwhLK/6pHS4LRh27JccCbrnnas?=
+ =?us-ascii?Q?GWLDhcdUQlrF9EeITtcES+8RDCkYKZyKrMTZS2uuvBgOYgZ6pqtMZ/wQAxea?=
+ =?us-ascii?Q?b5Ho4Mpv61ndmQxPpNOXyPElPcEU1KzJzMfqCSYIl0mcwV0Zo0AtLl0I2XVL?=
+ =?us-ascii?Q?B3BScJFe+Tm5W29WNglOJAfMKBl14d2511ZdbhBkr2GM7AOw8CW2B00Jp6EF?=
+ =?us-ascii?Q?+wiHqhRg2JctcoNV8N4aKUmJaIvjNeHDwO1FvpnBe/6ZxvNQJaPyMbPfQQai?=
+ =?us-ascii?Q?YmxqB5kmTN8Bj6cUM72fh4KNwbMp8vaCjXHR3lSpTQhWTBK9AvglCVvY+xQO?=
+ =?us-ascii?Q?FnmIjQHt6t5R+vQbJqmJoUZQy199eWrKkExNPfzP09nBJ4Q0ruXgiaLdS4Rb?=
+ =?us-ascii?Q?G3NENa/b1NHBtg0ABqPQjHD7P2Oc2dAzH8JZaKGX0Whs8oplnTUUVA0r6Ibu?=
+ =?us-ascii?Q?rjmyLxWroY5dMM17lmT8jnp2KqdoPI0eGfN8vPFkEgjxPBYcJxxNq/3H8Lhx?=
+ =?us-ascii?Q?sRIKCQEYmKCfU/4vi6dwWjrfi5g3Ap0oy7vD2XviFOY4qwAmzW2VnBpLaHAl?=
+ =?us-ascii?Q?DsqkVBLXHNPwk6Re2k4WW305zRZaBrvHBCPMmkcn317a+vyHF+4QyRxwZ37N?=
+ =?us-ascii?Q?tKExUVD8QaXQslnVNEnjD6IPYLxEAkyeO+j+JTX0?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: f2d1d3a1-772e-476c-5bcd-08db96ee8936
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB4839.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR13MB3705.namprd13.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c345dcb8-ce51-4471-15b7-08db96eb7a7e
-X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Aug 2023 02:10:31.9360
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Aug 2023 02:32:25.2794
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: fe128f2c-073b-4c20-818e-7246a585940c
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: WTpVIx6p8pqV6bgflG3PX8dpmVKMf92LuMRagrj72wNXB+qt6bc9/qzPcdh0SkekdFsMEIQ7v0FHCvepTLC48czUmTSR1CJMg2mD90i/0dM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR13MB5523
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: F3bRbPmOvPc9Qokc1oav8Eo3uGQm97t0xq1gsVA5y+17N5UIgt0Pp+dMjg9NqXp02IDO7Ox8P8XqISw55FvJnQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR11MB8483
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+Hi Brian,
 
-On Sunday, July 30, 2023 12:52 PM, Yinjun Zhang wrote:
-> On Sun, 30 Jul 2023 04:20:57 +0800, kernel test robot wrote:
-> > Hi Louis,
-> >
-> > kernel test robot noticed the following build warnings:
-> >
-> > [auto build test WARNING on net-next/main]
-> >
-> > url:    https://github.com/intel-lab-lkp/linux/commits/Louis-Peens/nsp-
-> generate-nsp-command-with-variable-nsp-major-version/20230724-180015
-> > base:   net-next/main
-> > patch link:    https://lore.kernel.org/r/20230724094821.14295-6-
-> louis.peens%40corigine.com
-> > patch subject: [PATCH net-next 05/12] nfp: introduce keepalive mechanis=
-m
-> for multi-PF setup
-> > config: openrisc-randconfig-r081-20230730 (https://download.01.org/0day=
--
-> ci/archive/20230730/202307300422.oPy5E1hB-lkp@intel.com/config)
-> > compiler: or1k-linux-gcc (GCC) 12.3.0
-> > reproduce: (https://download.01.org/0day-
-> ci/archive/20230730/202307300422.oPy5E1hB-lkp@intel.com/reproduce)
-> >
-> > If you fix the issue in a separate patch/commit (i.e. not just a new ve=
-rsion of
-> > the same patch/commit), kindly add following tags
-> > | Reported-by: kernel test robot <lkp@intel.com>
-> > | Closes: https://lore.kernel.org/oe-kbuild-all/202307300422.oPy5E1hB-
-> lkp@intel.com/
-> >
-> > sparse warnings: (new ones prefixed by >>)
-> >    drivers/net/ethernet/netronome/nfp/nfp_main.c: note: in included fil=
-e
-> (through drivers/net/ethernet/netronome/nfp/nfp_net.h):
-> > >> include/linux/io-64-nonatomic-hi-lo.h:22:16: sparse: sparse: cast
-> truncates bits from constant value (6e66702e62656174 becomes 62656174)
->=20
-> I think it's more like a callee's problem instead of the caller's.
-> `writeq` is supposed to be able to be fed with a constant. WDYT?
+On 2023-08-04 at 09:43:43 -0400, Brian Foster wrote:
+> On Thu, Aug 03, 2023 at 09:37:30AM +0800, Pengfei Xu wrote:
+> > On 2023-07-05 at 23:33:43 -0700, syzbot wrote:
+> > > syzbot has found a reproducer for the following issue on:
+> > > 
+> > > HEAD commit:    6843306689af Merge tag 'net-6.5-rc1' of git://git.kernel.o..
+> > > git tree:       net
+> > > console output: https://syzkaller.appspot.com/x/log.txt?x=114522aca80000
+> > > kernel config:  https://syzkaller.appspot.com/x/.config?x=7ad417033279f15a
+> > > dashboard link: https://syzkaller.appspot.com/bug?extid=5050ad0fb47527b1808a
+> > > compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+> > > syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=102cb190a80000
+> > > C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=17c49d90a80000
+> > > 
+> > > Downloadable assets:
+> > > disk image: https://storage.googleapis.com/syzbot-assets/f6adc10dbd71/disk-68433066.raw.xz
+> > > vmlinux: https://storage.googleapis.com/syzbot-assets/5c3fa1329201/vmlinux-68433066.xz
+> > > kernel image: https://storage.googleapis.com/syzbot-assets/84db3452bac5/bzImage-68433066.xz
+> > > 
+> > > IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> > > Reported-by: syzbot+5050ad0fb47527b1808a@syzkaller.appspotmail.com
+> > > 
+> > > ------------[ cut here ]------------
+> > > WARNING: CPU: 1 PID: 5382 at fs/ext4/file.c:611 ext4_dio_write_iter fs/ext4/file.c:611 [inline]
+> > > WARNING: CPU: 1 PID: 5382 at fs/ext4/file.c:611 ext4_file_write_iter+0x1470/0x1880 fs/ext4/file.c:720
+> > > Modules linked in:
+> > > CPU: 1 PID: 5382 Comm: syz-executor288 Not tainted 6.4.0-syzkaller-11989-g6843306689af #0
+> > > Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/27/2023
+> > > RIP: 0010:ext4_dio_write_iter fs/ext4/file.c:611 [inline]
+> > > RIP: 0010:ext4_file_write_iter+0x1470/0x1880 fs/ext4/file.c:720
+> > > Code: 84 03 00 00 48 8b 04 24 31 ff 8b 40 20 89 c3 89 44 24 10 83 e3 08 89 de e8 5d 5a 5b ff 85 db 0f 85 d5 fc ff ff e8 30 5e 5b ff <0f> 0b e9 c9 fc ff ff e8 24 5e 5b ff 48 8b 4c 24 40 4c 89 fa 4c 89
+> > > RSP: 0018:ffffc9000522fc30 EFLAGS: 00010293
+> > > RAX: 0000000000000000 RBX: 0000000000000000 RCX: 0000000000000000
+> > > RDX: ffff8880277a3b80 RSI: ffffffff82298140 RDI: 0000000000000005
+> > > RBP: 0000000000000001 R08: 0000000000000005 R09: 0000000000000000
+> > > R10: 0000000000000000 R11: 0000000000000001 R12: ffffffff8a832a60
+> > > R13: 0000000000000000 R14: 0000000000000000 R15: fffffffffffffff5
+> > > FS:  00007f154db95700(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
+> > > CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> > > CR2: 00007f154db74718 CR3: 000000006bcc7000 CR4: 00000000003506e0
+> > > DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> > > DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> > > Call Trace:
+> > >  <TASK>
+> > >  call_write_iter include/linux/fs.h:1871 [inline]
+> > >  new_sync_write fs/read_write.c:491 [inline]
+> > >  vfs_write+0x981/0xda0 fs/read_write.c:584
+> > >  ksys_write+0x122/0x250 fs/read_write.c:637
+> > >  do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+> > >  do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
+> > >  entry_SYSCALL_64_after_hwframe+0x63/0xcd
+> > > RIP: 0033:0x7f154dc094f9
+> > > Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 15 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+> > > RSP: 002b:00007f154db952f8 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
+> > > RAX: ffffffffffffffda RBX: 00007f154dc924f0 RCX: 00007f154dc094f9
+> > > RDX: 0000000000248800 RSI: 0000000020000000 RDI: 0000000000000006
+> > > RBP: 00007f154dc5f628 R08: 0000000000000000 R09: 0000000000000000
+> > > R10: 0000000000000000 R11: 0000000000000246 R12: 652e79726f6d656d
+> > > R13: 656c6c616b7a7973 R14: 6465646165726874 R15: 00007f154dc924f8
+> > >  </TASK>
+> > > 
+> > 
+> > Above issue in dmesg is:
+> > "WARNING: CPU: 1 PID: 5382 at fs/ext4/file.c:611 ext4_dio_write_iter fs/ext4/file.c:611 [inline]"
+> > 
+> > I found the similar behavior issue:
+> > "WARNING: CPU: 0 PID: 182134 at fs/ext4/file.c:611 ext4_dio_write_iter fs/ext4/file.c:611 [inline]"
+> > repro.report shows similar details.
+> > 
+> > Updated the bisect info for the above similar issue:
+> > Bisected and the problem commit was:
+> > "
+> > 310ee0902b8d9d0a13a5a13e94688a5863fa29c2: ext4: allow concurrent unaligned dio overwrites
+> > "
+> > After reverted the commit on top of v6.5-rc3, this issue was gone.
+> > 
+> 
+> Hi Pengfei,
+> 
+> Thanks for narrowing this down (and sorry for missing the earlier
+> report). Unfortunately I've not been able to reproduce this locally
+> using the generated reproducer. I tried both running the test program on
+> a local test vm as well as booting the generated disk image directly.
+> 
+> That said, I have received another report of this warning that happens
+> to be related to io_uring. The cause in that particular case is that
+> io_uring sets IOCB_HIPRI, which iomap dio turns into
+> REQ_POLLED|REQ_NOWAIT on the bio without necessarily having IOCB_NOWAIT
+> set on the request. This means we can expect -EAGAIN returns from the
+> storage layer without necessarily passing DIO_OVERWRITE_ONLY to iomap,
+> which in turn basically means that the warning added by this commit is
+> wrong.
+> 
+> I did submit the test patch at the link [1] referenced below to syzbot
+> to see if the OVERWRITE_ONLY flag is set and the results I got this
+> morning only showed the original !IOCB_NOWAIT warning. So while I still
+> do not know the source of the -EAGAIN in the syzbot test (and I would
+> like to), this shows that the overwrite flag is not involved and thus
+> the -EAGAIN is presumably unrelated to that logic.
+> 
+> So in summary I think the right fix is to just remove the overwrite flag
+> and warning from this ext4 codepath. It was always intended as an extra
+> precaution to support the warning, and the latter is clearly wrong. I'll
+> submit another test change in a separate mail just to see if syzbot
+> finds anything else and plan to send a proper patch to the list. In the
+> meantime, if you have any suggestions to help reproduce via the
+> generated program, I'm still interested in trying to grok where that
+> particular -EAGAIN comes from.. Thanks.
 
-There's no response for one week. To compromise, I'm going to change
-the caller in driver side. Let me know if anybody has some other comments.
+Thanks for your patch! I'm glad it's helpful.
 
->=20
-> >
-> > vim +22 include/linux/io-64-nonatomic-hi-lo.h
-> >
-> > 797a796a13df6b include/asm-generic/io-64-nonatomic-hi-lo.h Hitoshi
-> Mitake 2012-02-07  18
-> > 3a044178cccfeb include/asm-generic/io-64-nonatomic-hi-lo.h Jason Baron
-> 2014-07-04  19  static inline void hi_lo_writeq(__u64 val, volatile void
-> __iomem *addr)
-> > 797a796a13df6b include/asm-generic/io-64-nonatomic-hi-lo.h Hitoshi
-> Mitake 2012-02-07  20  {
-> > 797a796a13df6b include/asm-generic/io-64-nonatomic-hi-lo.h Hitoshi
-> Mitake 2012-02-07  21  	writel(val >> 32, addr + 4);
-> > 797a796a13df6b include/asm-generic/io-64-nonatomic-hi-lo.h Hitoshi
-> Mitake 2012-02-07 @22  	writel(val, addr);
-> > 797a796a13df6b include/asm-generic/io-64-nonatomic-hi-lo.h Hitoshi
-> Mitake 2012-02-07  23  }
-> > 3a044178cccfeb include/asm-generic/io-64-nonatomic-hi-lo.h Jason Baron
-> 2014-07-04  24
-> >
-> > --
-> > 0-DAY CI Kernel Test Service
-> > https://github.com/intel/lkp-tests/wiki
+It could not be reproduced immediately and it takes more than 200s to
+reproduce this issue, anyway here is my reproduced steps.
+As following link info for example, it's not my reproduced environment and it's
+alsmost the same for issue reproducing:
+https://lore.kernel.org/all/0000000000007faf0005fe4f14b9@google.com/T/#mf1678f17b7b7c4b3cc73abef436aac68787397ae
+  -> disk image: https://storage.googleapis.com/syzbot-assets/f6adc10dbd71/disk-68433066.raw.xz
+  -> kernel image: https://storage.googleapis.com/syzbot-assets/84db3452bac5/bzImage-68433066.xz
+
+I used below simple script to boot up vm:
+"
+#!/bin/bash
+
+bzimage=$1
+
+[[ -z "$bzimage" ]] && bzimage="./bzImage-68433066"
+qemu-system-x86_64 \
+        -m 2G \
+        -smp 2 \
+        -kernel $bzimage \
+        -append "console=ttyS0 root=/dev/sda1 earlyprintk=serial net.ifnames=0 thunderbolt.dyndbg" \
+        -drive file=./disk-68433066.raw,format=raw \
+        -net user,host=10.0.2.10,hostfwd=tcp:127.0.0.1:10023-:22 \
+        -cpu host \
+        -net nic,model=e1000 \
+        -enable-kvm \
+        -nographic \
+        2>&1 | tee vmd.log
+"
+
+gcc -pthread -o repro repro.c
+scp -P 10023 repro root@localhost:/root/
+
+And then access to above vm and execute the reproduced binary to reproduce.
+Sometimes it takes some time to reproduce the problem.
+Hope the above information helps you to reproduce the problem next time.
+
+I saw syzbot already verified your latest patch and it's passed.
+https://syzkaller.appspot.com/x/log.txt?x=17939bc1a80000
+
+Best Regards,
+Thanks!
+
+> 
+> Brian
+> 
+> [1] https://syzkaller.appspot.com/x/patch.diff?x=109a7c96a80000
+> 
+> > All information: https://github.com/xupengfe/syzkaller_logs/tree/main/230730_134501_ext4_file_write_iter
+> > Reproduced code: https://github.com/xupengfe/syzkaller_logs/blob/main/230730_134501_ext4_file_write_iter/repro.c
+> > repro.prog(syscall reproduced steps): https://github.com/xupengfe/syzkaller_logs/blob/main/230730_134501_ext4_file_write_iter/repro.prog
+> > repro.report: https://github.com/xupengfe/syzkaller_logs/blob/main/230730_134501_ext4_file_write_iter/repro.report
+> > Bisect log: https://github.com/xupengfe/syzkaller_logs/blob/main/230730_134501_ext4_file_write_iter/bisect_info.log
+> > Kconfig: https://github.com/xupengfe/syzkaller_logs/blob/main/230730_134501_ext4_file_write_iter/kconfig_origin
+> > Issue dmesg: https://github.com/xupengfe/syzkaller_logs/blob/main/230730_134501_ext4_file_write_iter/6eaae198076080886b9e7d57f4ae06fa782f90ef_dmesg.log
+> > 
+> > Best Regards,
+> > Thanks!
+> > 
+> > > 
+> > > ---
+> > > If you want syzbot to run the reproducer, reply with:
+> > > #syz test: git://repo/address.git branch-or-commit-hash
+> > > If you attach or paste a git patch, syzbot will apply it before testing.
+> > 
+> 
 
