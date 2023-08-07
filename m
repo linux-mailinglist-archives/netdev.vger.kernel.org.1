@@ -1,133 +1,210 @@
-Return-Path: <netdev+bounces-25047-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25028-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD28B772BC5
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 18:56:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A66AA772B5C
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 18:45:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 668D9281487
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 16:56:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C15811C20C1B
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 16:45:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D0F3125CE;
-	Mon,  7 Aug 2023 16:54:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE28411184;
+	Mon,  7 Aug 2023 16:45:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89319134B1
-	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 16:54:10 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 450C2C433CB;
-	Mon,  7 Aug 2023 16:54:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691427250;
-	bh=meIPlCLi1bchsiAPHa2YkAHiZoy6af5a6nvWxPBXByQ=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=T8+xLqHNrEOI5ubSRNwSnODx9PNj3Y8aPp+tRzdpDXrHdHfLT2wsmNdVDHVLv8oAg
-	 dYpGMCTnv83a9TyKjdjUMULv641OUyCNzV/lg3zHMUn9C1EnfwWSdNbAixUi6k8/Se
-	 dmV48RAleYf6zULf7Bk83NUaPJsXQcPYAltfqosGAvNhhAx4hvw5qF9geXMuMYENkW
-	 PwhBcTN1XAfywgY/lENUWxjya0dCfHJYBI6zoEIAGvX6kbAwjsxNfHZ/9nNip34ezG
-	 +B5ao3HxhZwXZ4W0ulDZFce3Iozuk1iTgyxw8w7Rp5zVuQMmEaNT6jsAYudXJkFdB0
-	 ndIGPd4ALY/5w==
-From: Jisheng Zhang <jszhang@kernel.org>
-To: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org
-Subject: [PATCH net-next v2 10/10] net: stmmac: platform: support parsing per channel irq from DT
-Date: Tue,  8 Aug 2023 00:41:51 +0800
-Message-Id: <20230807164151.1130-11-jszhang@kernel.org>
-X-Mailer: git-send-email 2.40.0
-In-Reply-To: <20230807164151.1130-1-jszhang@kernel.org>
-References: <20230807164151.1130-1-jszhang@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99D58FC01
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 16:45:11 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37E1610DE
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 09:45:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1691426710; x=1722962710;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=mUX2kbMM0Pa79UXd8tlqzwEziR26LArvX4o2fxop+38=;
+  b=nW5MFgZek8LRlcpTw52u2OmLlYpWbS3LdjFKgunmZI5YDL+qFgI70ZRS
+   faSW3ofv2ak19g4gvCYFhAID7S7WkAvhuZhCqJw9v9yK6I5yxt+VKqrxn
+   L6QF+kagb18xyfkr+yolaDaap3a/s2x+s6/uZEkHDcMtA7/s4JhX8BrKm
+   hcv03p6c+Q2qZFkLX3VHmrwKYDRz+EiZg16Zo5iKvq4+qlSo3bW3jDfKR
+   LeMNLDBgb/KxLgATul4iR8Bg0/ZXmDzgaoP+gV1nq+70J6ic5vfreFyZM
+   augJ6RgwjoSRoeMSFDGWxrj87wH/XpD4fvwkZu+gCnVSFp4Q79NWeJenT
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10795"; a="373348991"
+X-IronPort-AV: E=Sophos;i="6.01,262,1684825200"; 
+   d="scan'208";a="373348991"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Aug 2023 09:45:09 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10795"; a="731034025"
+X-IronPort-AV: E=Sophos;i="6.01,262,1684825200"; 
+   d="scan'208";a="731034025"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by orsmga002.jf.intel.com with ESMTP; 07 Aug 2023 09:45:09 -0700
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Mon, 7 Aug 2023 09:45:09 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Mon, 7 Aug 2023 09:45:09 -0700
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27 via Frontend Transport; Mon, 7 Aug 2023 09:45:09 -0700
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.108)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.27; Mon, 7 Aug 2023 09:45:09 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=nCzq+/4lbKiPxVBiLa2kViHhpXHbq3MIN4Szuk7fy0ZV2caAymA7KoHLdTpN8WCyKsHk60MuQCvwBxOXrrZdu41b8u7+9BqN9HutGWTNMx1jVR+AWR7uuyZ8xTfNo24nCNzNNPZtCV9ad8WsszA1rtzq/OB7qS64EujCQ095TVnVycKw8BF0Q7wrEueumUkr/3iLvkB975ny8PeWaLA9AyfWqP7EmKctrJj6ynZ0Qd7CEYmct1UhcRFJTWVmaZMMvhqE7BCgK0iDEWSJz2We2aFh5xKIgPSDgXnh32QzmTyxG3XLYqHdOTh/7+nx7a1zi3wHgLrTdmptaHHLMo68Gg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=zS3jURkksmemYyBNJ04gpmNyhA8mSMgdipg72iVFdLI=;
+ b=MS/uDYqaV++lN620/hcsd+i6lENRYwWwOFCAUe2ISAxbVJ8BgIy23Wi5do7vdQjaqSBB87v+cITnnwUzq4YQQq2fl76kesQEPXn9+2Dv6FWn3g3QeEa0e5pIeAQ53NwDDEEk5Ebfi0RlbcYKQuUQkdYMVQxW9b2zhqYYgJDBWdQlhWO1z3J/hl3HyJcPC98wedlvye29iV9KuiIabm64GsUDQEEA389VukBWLHonAu0LsP4KC6N0IZOyY5YYUp/t8CEmJ1hEIGJzNhLIiSkWD2rTToK7nIqFzUGqe9qgeKXzlBKIWaCMTzqd2U1MeXvibsBs2ohz+xbHeDk18H9uaw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
+ by MN6PR11MB8195.namprd11.prod.outlook.com (2603:10b6:208:47f::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.27; Mon, 7 Aug
+ 2023 16:45:07 +0000
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::cb4c:eb85:42f6:e3ae]) by CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::cb4c:eb85:42f6:e3ae%7]) with mapi id 15.20.6652.026; Mon, 7 Aug 2023
+ 16:45:07 +0000
+From: "Keller, Jacob E" <jacob.e.keller@intel.com>
+To: "Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Nguyen, Anthony L"
+	<anthony.l.nguyen@intel.com>, Simon Horman <horms@kernel.org>
+Subject: RE: [PATCH iwl-next v3 0/3] ice: split ice_aq_wait_for_event() func
+ into two
+Thread-Topic: [PATCH iwl-next v3 0/3] ice: split ice_aq_wait_for_event() func
+ into two
+Thread-Index: AQHZyUh300W4SdHXXUCreRrxEBIELK/fCmew
+Date: Mon, 7 Aug 2023 16:45:07 +0000
+Message-ID: <CO1PR11MB5089E3BE7EFA7E9534F53038D60CA@CO1PR11MB5089.namprd11.prod.outlook.com>
+References: <20230807155848.90907-1-przemyslaw.kitszel@intel.com>
+In-Reply-To: <20230807155848.90907-1-przemyslaw.kitszel@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: CO1PR11MB5089:EE_|MN6PR11MB8195:EE_
+x-ms-office365-filtering-correlation-id: bced98de-f1cb-4392-0580-08db9765a846
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: D/Qr7Qk8ZFzljW8BALfVr2CNXdP5lCZiElAPvzU3NMnyFHippwMuDtx4mmzSvtLirjeUYrJYAYeMDErqqXxGn9vu4rIuFwFmlfcmK6HzTxqwY2ddbQ1RoY6nbUVZQz5qk26LZu4Dyl04QKi3eAkduyWueDlKw2nuP+4HGa+vfkm5Wts5Ktpevh68OXdMBYSsVWabJxE21z9058fkImqBq0fk+qqwnZuLr6cvJYfhEcp8C0CWOBTpXdZ0W5rUb+ZEqa4176gYHiPkmQM7lIb8rm855Vdtl/DKtHG4+NBH/RV9xUCtQFIHeivzLrSYyn1vu70h3BmTtt6B42/68fAoMhwq2HeCo68ox+qFpcq4GELYtB+NqIoV01n186QCJ7cZdfmkXT79FbNlVV0AueeSX9YI9JRpzTPs4lpLPoVjV7Ynlq6/aNLn9ya3wWVbVaSDq4bQ5NQJFSyDDtW5NauQmOBfFtN40oWKYXFOuC2CdL779gfJ80QQZarGaL5M1IvsxgoGtDrUOyIXu8CnQJVwIdy19Z+WOB5j/h6LWhR7Ra2uZ8Hs5oI1aTIFe0GOi8Q9htBUMLqWVE9bP0jy2neoMonysShJw3IxZqB5CtnILH2gF2LPYLYcdjd1wPUMnTCt
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(366004)(396003)(346002)(376002)(136003)(39860400002)(451199021)(1800799003)(186006)(82960400001)(478600001)(122000001)(55016003)(38100700002)(54906003)(110136005)(86362001)(9686003)(53546011)(6506007)(26005)(71200400001)(7696005)(33656002)(4326008)(66556008)(76116006)(66446008)(64756008)(66476007)(66946007)(2906002)(52536014)(38070700005)(5660300002)(8676002)(8936002)(316002)(41300700001)(83380400001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?C0BHJvwBUOdfY/bshBf64NZ6wNSPY2Hh6rFsKv0qc+NO40rPRzmoz3L8nSJA?=
+ =?us-ascii?Q?FmgyNze8ZuQu4JJpm7QLS35m6OUkTPHpqhmpj0NGog2iXLeT75HUaOuwMNAc?=
+ =?us-ascii?Q?mKRHL2P3EVBUOl6wHrrpsBIu2Dmzd9TIEj2uQGzl00kvvSov1JEaKbCkMX5S?=
+ =?us-ascii?Q?H9byRBtLjLH1FLYLnTS0MRt37Fx2QR/RziojlpwdrrkwY7LK3WvbzNGpUy8u?=
+ =?us-ascii?Q?Tvm+G4en3i1h5532vchzRlbA54kPW2U0LwBj3qmFBHfAHL88f/F/6H718WER?=
+ =?us-ascii?Q?Iz0gGuzYI6ZDjOzYNdqTu1cw0JxuPSWf39SPHume1qImfi4JXrdId/vRFDXo?=
+ =?us-ascii?Q?bU1wVssilxqthexAbPc+plfqfvB9miM16Y7rwU4QyZUScqUoG36mSP4SzkSW?=
+ =?us-ascii?Q?oZ72WBPdqnRteX1jXXDYOTOL7V1bxzZRCrjeT2cMcRfe1jRsUhYMO5vWerRT?=
+ =?us-ascii?Q?xZohHRxXgvID1UwHvn++HDfe/LNHszYBuKwGIWzcDBKZ8olZ2use98FS0FWH?=
+ =?us-ascii?Q?v5zXnoS3vl8o3wbZ9EkNXiKrgu+Jl2xSeVoiTmFMKAB3FFXMKS/Pd5XwNlJ5?=
+ =?us-ascii?Q?KhhhJEUhMtmwiNqJkqsa91xJFn770fTsXdFgTmzVUj16dRvHDYr/u2dmNzk/?=
+ =?us-ascii?Q?L7TgMOnFJyZl0VY7X0i67q3CcGs8HgrU6TpedH51wr/3I1UhQmKOmznqH9L5?=
+ =?us-ascii?Q?XExvG+0MsfIxTD2Ar3Dm1BE6Nz879nbKLKFTs3QPyXSzU3tALN2WHXwuw6YO?=
+ =?us-ascii?Q?lZSaQ2zmWDvFCmJC1AKn54TzclD8P+U/pBbltus1lvUUJnsjYUhcCbgYAS+d?=
+ =?us-ascii?Q?A+QxZGds/jn6jP9AVMwV7qJHQTdn/ZTk35fokV+zbgpxlTyl3Kxh7xqJj7GD?=
+ =?us-ascii?Q?MM0ig5kZpPljYFK8sU3ylk2ZzQvWbozolVQ/qvG8sJes3tphVQ8MqPzl6nga?=
+ =?us-ascii?Q?R+GRybh92Teh1HbjkFIP2yX4cEKrjeM3W+zb52U3vauiE5tEWoSHy9iZwulS?=
+ =?us-ascii?Q?oi9rpFtYM9NgrmrOXkavHTJONXcTXWnZUKri3buvRxV4prd2EBBshDG1uB1j?=
+ =?us-ascii?Q?1rderswzgrLbfPg7sK+S24dUVLsT/sKld6vTOM78stFmcFw/blLwPlU9Fn3y?=
+ =?us-ascii?Q?KHJfb+eYeWdnfYrYYHfDoSHe+f05wwNKaeQ+cTufpy7IKw+/ZH5l0PNgtnSY?=
+ =?us-ascii?Q?bm9HA/c9LBdqhFaoT3Ao0ShDbySGTC9mmpB4RevNl3047eM6mYme0VCwSvcQ?=
+ =?us-ascii?Q?1tfdkgo3jz1Q8Ch6BqTnMy6Tdw5hag8Vhpk7sq0TkvtxhZQrZBWO+T3ZoBNF?=
+ =?us-ascii?Q?cjbAX+SKUskEVVLPCWbfNdF5LcWYrlH8d0uthkzcJbmW67U5THFzVgN6GrYa?=
+ =?us-ascii?Q?VGhGD6UAwr0XBXA+i1MloqVk/+60eJRQOPVWxIaZF7NXefMd5fy8RwDIKaW6?=
+ =?us-ascii?Q?kEoqJqOICgqo0PsTfCGR6auxYn9r0pZy2g/Z2YF5oLTyxs/vLYf6og6eOrP9?=
+ =?us-ascii?Q?ndwof+KnxKG6O9AkWL7ZWbQJyvKlSDUyMIAo9oWogJeZLUWrZ1ZD8kky8xNu?=
+ =?us-ascii?Q?i0J2twxRO3Ovf1bWBh/oSWh6ns1nOStzSxn4ISbv?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: bced98de-f1cb-4392-0580-08db9765a846
+X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Aug 2023 16:45:07.3481
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: USuYk4OeBi5MhcuB9XmQTC8SFRwlZKuoYy8dwOihFnHO1wucOSmy9EMtacs3eRUxcXfZiBmxa7ai69fxrJsOsC/ZCVNu/sr6BY1TW7QpJ6A=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN6PR11MB8195
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-The snps dwmac IP may support per channel interrupt. Add support to
-parse the per channel irq from DT.
 
-Signed-off-by: Jisheng Zhang <jszhang@kernel.org>
----
- .../net/ethernet/stmicro/stmmac/stmmac_main.c |  6 +++--
- .../ethernet/stmicro/stmmac/stmmac_platform.c | 23 +++++++++++++++++++
- 2 files changed, 27 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index 4ed5c976c7a3..7c607ef6f364 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -7278,8 +7278,10 @@ int stmmac_dvr_probe(struct device *device,
- 	priv->plat = plat_dat;
- 	priv->ioaddr = res->addr;
- 	priv->dev->base_addr = (unsigned long)res->addr;
--	priv->plat->dma_cfg->perch_irq_en =
--		(priv->plat->flags & STMMAC_FLAG_PERCH_IRQ_EN);
-+	if (res->rx_irq[0] && res->tx_irq[0]) {
-+		priv->plat->flags |= STMMAC_FLAG_PERCH_IRQ_EN;
-+		priv->plat->dma_cfg->perch_irq_en = true;
-+	}
- 
- 	priv->dev->irq = res->irq;
- 	priv->wol_irq = res->wol_irq;
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-index 29145682b57b..9b46775b41ab 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-@@ -705,6 +705,9 @@ EXPORT_SYMBOL_GPL(stmmac_remove_config_dt);
- int stmmac_get_platform_resources(struct platform_device *pdev,
- 				  struct stmmac_resources *stmmac_res)
- {
-+	char irq_name[8];
-+	int i;
-+
- 	memset(stmmac_res, 0, sizeof(*stmmac_res));
- 
- 	/* Get IRQ information early to have an ability to ask for deferred
-@@ -738,6 +741,26 @@ int stmmac_get_platform_resources(struct platform_device *pdev,
- 		dev_info(&pdev->dev, "IRQ eth_lpi not found\n");
- 	}
- 
-+	for (i = 0; i < MTL_MAX_RX_QUEUES; i++) {
-+		snprintf(irq_name, sizeof(irq_name), "rx%i", i);
-+		stmmac_res->rx_irq[i] = platform_get_irq_byname_optional(pdev, irq_name);
-+		if (stmmac_res->rx_irq[i] < 0) {
-+			if (stmmac_res->rx_irq[i] == -EPROBE_DEFER)
-+				return -EPROBE_DEFER;
-+			break;
-+		}
-+	}
-+
-+	for (i = 0; i < MTL_MAX_TX_QUEUES; i++) {
-+		snprintf(irq_name, sizeof(irq_name), "tx%i", i);
-+		stmmac_res->tx_irq[i] = platform_get_irq_byname_optional(pdev, irq_name);
-+		if (stmmac_res->tx_irq[i] < 0) {
-+			if (stmmac_res->tx_irq[i] == -EPROBE_DEFER)
-+				return -EPROBE_DEFER;
-+			break;
-+		}
-+	}
-+
- 	stmmac_res->sfty_ce_irq = platform_get_irq_byname_optional(pdev, "sfty_ce");
- 	if (stmmac_res->sfty_ce_irq < 0) {
- 		if (stmmac_res->sfty_ce_irq == -EPROBE_DEFER)
--- 
-2.40.1
+> -----Original Message-----
+> From: Kitszel, Przemyslaw <przemyslaw.kitszel@intel.com>
+> Sent: Monday, August 7, 2023 8:59 AM
+> To: intel-wired-lan@lists.osuosl.org
+> Cc: netdev@vger.kernel.org; Keller, Jacob E <jacob.e.keller@intel.com>; N=
+guyen,
+> Anthony L <anthony.l.nguyen@intel.com>; Simon Horman <horms@kernel.org>;
+> Kitszel, Przemyslaw <przemyslaw.kitszel@intel.com>
+> Subject: [PATCH iwl-next v3 0/3] ice: split ice_aq_wait_for_event() func =
+into two
+>=20
+> Mitigate race between registering on wait list and receiving
+> AQ Response from FW.
+>=20
+> The first patch fixes bound check to be more inclusive;
+> the second one refactors code to make the third one smaller,
+> which is an actual fix for the race.
+>=20
+> Thanks Simon Horman for pushing into split, it's easier to follow now.
+>=20
+> v3: split into 3 commits
+>=20
+> Przemek Kitszel (3):
+>   ice: ice_aq_check_events: fix off-by-one check when filling buffer
+>   ice: embed &ice_rq_event_info event into struct ice_aq_task
+>   ice: split ice_aq_wait_for_event() func into two
+>=20
+>  drivers/net/ethernet/intel/ice/ice.h          |  21 +++-
+>  .../net/ethernet/intel/ice/ice_fw_update.c    |  45 ++++----
+>  drivers/net/ethernet/intel/ice/ice_main.c     | 100 +++++++++---------
+>  3 files changed, 94 insertions(+), 72 deletions(-)
+>=20
+>=20
+> base-commit: 1efaa6ca8af14114dafb99924bc922daa135f870
+> --
+> 2.40.1
 
+This series looks good to me.
+
+Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+
+Thanks,
+Jake
 
