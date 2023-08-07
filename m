@@ -1,102 +1,64 @@
-Return-Path: <netdev+bounces-25022-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25023-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01DBE772A29
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 18:08:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C1F5772A2A
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 18:09:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 24AF41C20BBE
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 16:08:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 482821C20C37
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 16:09:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E11811C88;
-	Mon,  7 Aug 2023 16:08:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA34411C88;
+	Mon,  7 Aug 2023 16:09:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B2E7125AD
-	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 16:08:02 +0000 (UTC)
-Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05on2068.outbound.protection.outlook.com [40.107.21.68])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B6A2E76;
-	Mon,  7 Aug 2023 09:08:00 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6D53125A3
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 16:09:02 +0000 (UTC)
+Received: from EUR02-AM0-obe.outbound.protection.outlook.com (mail-am0eur02on2067.outbound.protection.outlook.com [40.107.247.67])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05D02171A
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 09:08:45 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=SfWIMHdGKVPVWgR6sTJinqpwlWoHEnCgETSkmINLfzE3ATXfjhckf8FK2q6RAdih3Ek3CzTCSOsMCQZFbNTdM6P5DXnk8SENwKzFY7CnLDlTN2GW2bmVCla6BhoHXPL7fbtd1oCbLVKpKkEP0qPKif8xeY3wvvupFYlkXeUdGe/6V7PIXd7mvt/7GLlAFEV4IPHnQQXbYIPtJCtZ4Ba94yvCKf2iikmiZDGy7gAlxEBIXu0AGIX8OqWELNx7Lhmraem1qwZNGxPVyXoEjFfTfuCp54J9iJ0oBybX8qy4eI/P6JZC0qrKtgn62jFcc7zQb9KSMsF3JSW1axN08Z9kgA==
+ b=XLxZddNpMpI1QMeZPrkpDyw9jgip+k85w5JeSIyZ6UYcOPsCQERe0Z6JFP4qWzg9Yrz05FdO1ckfOY+Xj9OwX2TJ67drZ8YLi9v/jeHNg/CDGnEmNiJPqG7pirzRmVN78XLWWS8wsKdAP4AwDbB4okO6d5XIBFmB1Z+n9ldBZ175uKtXoJCmHaK1qA3MjOsJqtKp/utmKMZDKErFlz3s857k1SW20D4y4kRTfl+LNhVYJmigE15dUcxAJ2uNAXg943POGl0stdGMjRQ8Iqib6esQyLZ1tIEtJ3YzDOGlhcVe722seLN5LvE5+pJ0PCLRE+LNl5DCe4QS41y2J7m2CA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=qJnhaw4KNyuyfDYecq4DLlXtg+TIxjX+jy33NxMGBb8=;
- b=hBkg6nD7rRMao3eE/YfAuS/egMfXaHEEw2ko7sgCADy7oPFalfd9087WrCzv7GXI/bQDvqBm+aGHe3Azcrj+pbICkxGfirHap/49FUd5Zpb0uPSBOgEbb+zGAsafo+Fq97aGZmBQTo05QUPn1BEvQMIbpxPkds7uAdkOKWrjFHxGPymq8yc0rfyftJY+aieFkCHGdRHGq5IGORWe82usLnFTZEYaOlrVgFjfNrfaSi94DRjYsad8IyWpY+/+Bqq+JRuXJen1XDy9IwdmPbp0WaL7kkgptHoGlnXnu17rDlkuOcprbBwbWwYq1b0SE2BjPvsTs+LcQW+rPfHG3AAd2Q==
+ bh=/ojRdZUVUb0brb47nACVPz+n5h/EuHL3M/GdNB4CDO8=;
+ b=SKzGn6Q/2aSVJ9soMtSF1JCBmJOej/0oWr/FFXx2sh9SlUcL3F0u1PR3nFBcs/3ssQ6EsAgLHrkLl23/mJbT48Lp5M/37dYps3JhCRWP+YrJOTEq0fqlV+HEl09uNoAGNgq8Gg41uPuil0F2/XfKecBxIuu8m0v1HqMQ4aZtpIZjor6D0Bx2j4cMEag/xAWubVGlpwko9hm0L0DNJQwFLiJ8IgNJab1UtSzQg00GVDoyzE/LLtYt2XNJV1y/OrnpivjqTN92Ei0NFQPz7MAutcCnpR2w7U5x+Kvl+Qjwi8v5953Pmk2wcveXDXBpk3xba0reLgb2fea1I8nOwSFHEQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=qJnhaw4KNyuyfDYecq4DLlXtg+TIxjX+jy33NxMGBb8=;
- b=Rtl5noMuJMaB2aO4pxlmj9DIZQmffJ894q7ZinRyDnnkyeph5X/3/VZlJYTp6CCmP3Mb/5Hlj82r0EhEk41VZvcQxi99ynMYpU9qCFJuLNwp5sfAVc2KifjqsBTBMeHV6DIJaNT2i+95UAqzPOBWx7i1hzx/Fmj2GOcPhb2Wq0k=
+ bh=/ojRdZUVUb0brb47nACVPz+n5h/EuHL3M/GdNB4CDO8=;
+ b=SzaFN/G1nAr/2SdU0eqGPS43fT0lTuHHKuBEj5Y1PD0QrK+jPuTYAyrXkhNDtVqLf5eOVMfVPA+o2Xh42mbAFf+lJP+hY8YKboiMg1wnaaozIo65PQjINWnrUfDldtn+Jv5e82HxyBOdg+h4yGto/MhkZuMkg1/VLYtnrBYDUd0=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from PAXPR04MB9185.eurprd04.prod.outlook.com (2603:10a6:102:231::11)
- by AM9PR04MB8414.eurprd04.prod.outlook.com (2603:10a6:20b:3ef::10) with
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
+ by AS8PR04MB7798.eurprd04.prod.outlook.com (2603:10a6:20b:2a3::11) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.26; Mon, 7 Aug
- 2023 16:07:57 +0000
-Received: from PAXPR04MB9185.eurprd04.prod.outlook.com
- ([fe80::d4ee:8daa:92f4:9671]) by PAXPR04MB9185.eurprd04.prod.outlook.com
- ([fe80::d4ee:8daa:92f4:9671%3]) with mapi id 15.20.6652.026; Mon, 7 Aug 2023
- 16:07:57 +0000
-From: Shenwei Wang <shenwei.wang@nxp.com>
-To: Marc Kleine-Budde <mkl@pengutronix.de>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Shawn Guo <shawnguo@kernel.org>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Neil Armstrong <neil.armstrong@linaro.org>,
-	Kevin Hilman <khilman@baylibre.com>,
-	Vinod Koul <vkoul@kernel.org>,
-	Chen-Yu Tsai <wens@csie.org>,
-	Jernej Skrabec <jernej.skrabec@gmail.com>,
-	Samuel Holland <samuel@sholland.org>
-Cc: Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Fabio Estevam <festevam@gmail.com>,
-	NXP Linux Team <linux-imx@nxp.com>,
-	Jerome Brunet <jbrunet@baylibre.com>,
-	Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
-	Bhupesh Sharma <bhupesh.sharma@linaro.org>,
-	Nobuhiro Iwamatsu <nobuhiro1.iwamatsu@toshiba.co.jp>,
-	Simon Horman <simon.horman@corigine.com>,
-	Andrew Halaney <ahalaney@redhat.com>,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
-	Shenwei Wang <shenwei.wang@nxp.com>,
-	Wong Vee Khee <veekhee@apple.com>,
-	Revanth Kumar Uppala <ruppala@nvidia.com>,
-	Jochen Henneberg <jh@henneberg-systemdesign.com>,
-	netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	linux-amlogic@lists.infradead.org,
-	imx@lists.linux.dev,
-	Frank Li <frank.li@nxp.com>
-Subject: [PATCH v5 net-next 2/2] net: stmmac: dwmac-imx: pause the TXC clock in fixed-link
-Date: Mon,  7 Aug 2023 11:07:16 -0500
-Message-Id: <20230807160716.259072-3-shenwei.wang@nxp.com>
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.25; Mon, 7 Aug
+ 2023 16:08:43 +0000
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::d4ed:20a0:8c0a:d9cf]) by AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::d4ed:20a0:8c0a:d9cf%6]) with mapi id 15.20.6652.026; Mon, 7 Aug 2023
+ 16:08:43 +0000
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: netdev@vger.kernel.org
+Cc: David Ahern <dsahern@kernel.org>,
+	Stephen Hemminger <stephen@networkplumber.org>,
+	Vinicius Costa Gomes <vinicius.gomes@intel.com>
+Subject: [PATCH iproute2 1/2] tc/taprio: don't print netlink attributes which weren't reported by the kernel
+Date: Mon,  7 Aug 2023 19:08:26 +0300
+Message-Id: <20230807160827.4087483-1-vladimir.oltean@nxp.com>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230807160716.259072-1-shenwei.wang@nxp.com>
-References: <20230807160716.259072-1-shenwei.wang@nxp.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: SJ0PR05CA0047.namprd05.prod.outlook.com
- (2603:10b6:a03:33f::22) To PAXPR04MB9185.eurprd04.prod.outlook.com
- (2603:10a6:102:231::11)
+X-ClientProxiedBy: AM4PR05CA0022.eurprd05.prod.outlook.com (2603:10a6:205::35)
+ To AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -104,55 +66,56 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PAXPR04MB9185:EE_|AM9PR04MB8414:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6eca23d8-fcbf-44e3-ee8b-08db976076fc
+X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|AS8PR04MB7798:EE_
+X-MS-Office365-Filtering-Correlation-Id: d5b1e047-26a0-434d-6bf5-08db9760926c
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	uwEIt4Sh3KYtQGJSA45rJgiK8JnRKtwZh7l1AYeWniNxM8Zirrgojtb6eyeXkgUvtQn0Pxj8hUXbN+f2RNwTm3HkS1ShQygodlYlGnrekTGL0ynU+cmxDZaiy2H5jnbbmBVtipwwsmySfsv200oXa82qEnBsKXKk9PJSQKnktrXYs45zqkQFaMiVRj6w5bO+QBDm8dtHeVKrY1dtqsDk/VTm9DmJQOax7ZpBHiq5+Ds6WHNXfi3jOboBgZYwF45suMeWHO+W2+zzBrLfr1KO/vivOFb7f0VS9H5GuKOvJOLgnqsgW7Mq2i2Mh6yKiPkZKf0eEomd/VhWVGsvJsRXvapjXoV2Dg5QEQJFQSUvCEd8RdktjtP0eaitOmQ4WPaDzcu1MAUKsbrScSxgb1QQOGLj/nwcliSfWweqYnvIIPDBt8eTrQxBDIT2Ea1C3NVAp4eNsnX7ozAk5yveV1VQEre5E/+dnSHgp/QDniSwHkfNQRWfdAX8fH9DVb5dMgNO4r3skIG3vUEzYn583pkE48j4vZI/f76xy5UVp7D59m4RIzUEJzcAleLDZfF9pZRvbW7wBLzLOXDUC54ZVhVqalXgH0QaBh4QOE8qiSwoDqEu5EcK9NmP0E8S8IV9Sva1y1NHg+iYhkaD2NGn6uw3sA==
+	rEnv4UkFKuqBlhNNlS3OFeM1+1fGsuoonAb/yQovE+V3CNtTFrcnLuL8VD9zdCiteNi9wrkpSby/suiPq4dU9vDEXyOqmsymrVMAwDBVY4hf2gf1uPgAcCjJui4hiiSM73HRlxQjhX/9WgYcXSWSrPeGBr2EzXTG7edXT42+yDJOihFdwTlxlZuZfKX8YQd6hX5BFVgFwakRH0MnNjmqO81xpkPoenjkTw9zDQrE8+MqQnYdc5VkP3t+QXf7bNBC0uC9I5lUoQLyEsDHkNPNEYX4U0d9bUSJVH6fpIZpn7tFdlHiM18tcQgqgLnujoAJxCzgv9dcLYIYxARq8WN/CBct/Wq0LtE4J3URwYyqA0/8eE2KZNcuXygWnKPpkr+QOWzwPirqlMJbqQ8VkhBUTqenhtVzAgEv2xncEBj1olNk54VQsQwm0Q1CQLsR5BjyXfb+Vubdqy7+CLbiwsriL+dgR0DwomJ53fhRyaCS8E2dBJdEK/L7TLxEAbnulG0lmk8IccbIkfJg4wMci+lDYNLrMrrjaIZu2EmE6heI4Knm2OYmBAVBTBi8hRcoY/OyHx/uvpgk11rNqqYp9yDOGHnvq7vFETW2mzD41tsCWhc=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB9185.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(136003)(376002)(366004)(346002)(39860400002)(396003)(186006)(1800799003)(451199021)(83380400001)(2616005)(921005)(54906003)(110136005)(2906002)(38350700002)(4326008)(316002)(5660300002)(8936002)(7406005)(44832011)(8676002)(7416002)(66946007)(66476007)(66556008)(38100700002)(86362001)(6512007)(478600001)(6666004)(6486002)(52116002)(41300700001)(36756003)(6506007)(26005)(1076003)(55236004);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(136003)(39860400002)(366004)(346002)(376002)(451199021)(186006)(1800799003)(2616005)(36756003)(966005)(6512007)(4326008)(316002)(6916009)(86362001)(38350700002)(38100700002)(54906003)(52116002)(66946007)(6666004)(478600001)(6486002)(66556008)(66476007)(6506007)(41300700001)(1076003)(26005)(8676002)(8936002)(2906002)(83380400001)(5660300002)(44832011);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?jo5axwpVWmwem3lUm5ksMpgsrayOwdMs7z46d1r2C2pBynmJntO5XnBxedII?=
- =?us-ascii?Q?qoncl0chMjNIzMOaciWK/vA5xGUR79T3Wu/sN6URxDLQB/9So/M86bK5ErA/?=
- =?us-ascii?Q?7CsMpJiDd9D+WYQ3dIT0f3MbiWTCk/Seuf5EaI8ARsyquBaX+mFrZzzDnVwY?=
- =?us-ascii?Q?gxG5c8QLpMvFM/WtEqtGheem5T8w+TaSMDDql9p719vS9yk85iBwfWhritrk?=
- =?us-ascii?Q?sVsm2NiCkXHINonsXNUoPvdPkK/2jYS5L2d3aCHeoaQ4Xe7tOgeJMqheo42x?=
- =?us-ascii?Q?P/is2vHIJDFOXx8jVRgM2j0eXYunVvS8yvv+W08lnqvOtJSGmhIcNgmztJvc?=
- =?us-ascii?Q?uajbQz52IIW4KgAVHhIK7H3pPqUufzyPppN1hg6Tn5CfzkEkbjJk0jhdBQ6N?=
- =?us-ascii?Q?3QjNuNbENzWl01zjHmmDp1qNrseHA7/vC3fhPS1b7547fub4RgB+vgzV2HrZ?=
- =?us-ascii?Q?DC5v3CblS3+3PJz14WV7MQTKtTJu9/nCKw9X6bh5njdta2IkrCB3h7ri9jlV?=
- =?us-ascii?Q?S8LpXhgA7/IzdNq7YUG2Y3VSAs42ZOIE/yxjXwdkylrFp8iQ3Gy0YAYRpDJG?=
- =?us-ascii?Q?PeZrnAn8xU6olfpOjgiQqK+YKcCoisU0zMvD47z69Yac/LR9FZ8CR9AzZeAn?=
- =?us-ascii?Q?mGvFjr55TYbEKZTrepD7TjXM8muu4lN0SNpUJ8Coi4nOpJOlO5ilU4k4lwng?=
- =?us-ascii?Q?x7iDdu9q6zdB4gH+ejS+U4x2eQKLhUZnHEAsueSxFmoRokg4/VDNF97H39iG?=
- =?us-ascii?Q?rE/EfXmkl+EpCzVfrUz6hZ+hTafzJibRI7BkSQVUnMknjghvAY9YDXXdSEI6?=
- =?us-ascii?Q?F9lfYE87bymth37JeTczHoXwmllUdu/6B6F7iBN4vMn/uARCMSZrIHVOSFSf?=
- =?us-ascii?Q?5Gy8gjvpQhb0gGqj5FiQ/b3ZJ/GRc8AqTIwimo+85hTQ0N3U8T3tKSNIZGp9?=
- =?us-ascii?Q?JoWtuTr1mbP/uSUCPQPXA+bnBG0QrF/8w/7iDjFlL7aUZpeoXEWcWm9KTOI1?=
- =?us-ascii?Q?YRcpsp4k+vz+DH9MFOuyGilCnLjudu+CXQ25uelUotgXy3Fy9heWMRNf7SVZ?=
- =?us-ascii?Q?ndJ0DdfSZETn7sf6BYAr8ca+P4pn5qikJckqTqdymto1v+jIjbukkKPCJdZf?=
- =?us-ascii?Q?Y3Jrw/7PBebEkinc0H3eI9DwUXHMP8me6oBNgko3oziRgStXuf7+b5eIuO74?=
- =?us-ascii?Q?U244kWB5jwoqEwvoMSM7mLyrCLsIZwz5GCpc2GGBp1YdEW4nYGYJBMiPYF1G?=
- =?us-ascii?Q?uBDHiF5/7Dr5Z3vtuO7uPjY+MOGxTfTL6j+tEJxW4EHPMdWuNjY5CZjmgK/A?=
- =?us-ascii?Q?4NwI6rq1a3jgM2EreBcEJdraLqxy+qooWKUaFeFtTt8NXaGubPxxyzmfAQpS?=
- =?us-ascii?Q?yQrmMYjrRx941uKx63PRXVD93EzRzBJqYrfGyKtv+cn4Er0Q60pcUuJRW0fM?=
- =?us-ascii?Q?+gGuFuLPYb6hvItIFPmsrECTbRkBFdj0VjCuToBwCwkxK2F1roSVrRC3qDyE?=
- =?us-ascii?Q?07FvYSyTIkaRFHd7Q1RizurUnr9qPN4Lx5lc5KJHkz4puawJ1E+bvGDz/4Hk?=
- =?us-ascii?Q?kz4QzhGPD22kMkd+vvkNjjT8zZ4Oc/UCvY+wuVEg?=
+	=?us-ascii?Q?HexqLDZ46UOcdrxdrGBXxpp9p7kPYgBzDUHGkBb1gp5McfZGpnQiph3Bc6nt?=
+ =?us-ascii?Q?FftwDwyJ6TcyvXOpPN0XuKLVx+Je6EUKOma1ODUHfntwkvoUwSBK3PSAIYfk?=
+ =?us-ascii?Q?xsRQOvoNMgxufQsycE6rP1RgH2rWwTSjnP1zWDDztISkoHIaSmgsIkZhHSMk?=
+ =?us-ascii?Q?KJhlrqDwLmcIiNhk0wKXWqIUTn+la11b7Th6LjBQwpRIZ2S+VcMNA6rEVIam?=
+ =?us-ascii?Q?0tirGQCjZSJ+lqydV9yWnpV3J8Go8pqGUwG7nTkjrjL4SM+nDmoAPmE3Kr2Y?=
+ =?us-ascii?Q?0qibK57LMqxlVe0e6JHu4IwJZY63/VXl3Px/PriCVTL6oocHaL5ZgP+wruWJ?=
+ =?us-ascii?Q?9eUPu6/VA4gXP24p4j+LBgkP8bX8XNoPb5szh0zOaNTyBd49TtDL7W0skyVT?=
+ =?us-ascii?Q?DD9M16gcv1WEtTCZpX+aWFSRR7N6fXxO4texnbr5B4OsTX7AxUcgE9vj6jji?=
+ =?us-ascii?Q?+eCk2uP31+4E53B5D9bzGT6nCmadFZ2kh3S39BwYFfminrLACqIZMx4MciCY?=
+ =?us-ascii?Q?qei2UdYbsa+4ahXBBaPZJcoJqn0hP4d/IdfFWWpttM1N4ZRpXSiWf3haRk1s?=
+ =?us-ascii?Q?cBHMpxKTfrNd0VOc99VBn18mMgOHwIZIze5BCCeDkY19jx3Et9ngndeiaNrh?=
+ =?us-ascii?Q?cli4Cj73RDeF2/AUP6DJflOMFyVDy4nXav8DoYbdJh8pmfe2I8WG6VP/QXe5?=
+ =?us-ascii?Q?aDsjcxK56myvjSGJnhKsWC/wN0sV/tW8aIrFmfeOhe2VD0VwIvZrak+bim0V?=
+ =?us-ascii?Q?411eCdImfxT3TvE1a26088zrRHNOzLjwm4MTcu77ws9Cs1Jkq7ZcvOE2Ekjs?=
+ =?us-ascii?Q?ZA3Cb67ZXhgDIzWKaDHL8vlJoE1Jqq6AQW49p1zYlL/bwcV/wDX+kZrhvIyv?=
+ =?us-ascii?Q?xskI1HyLWf+tDFi6JVjOkxIXj46Xt34aagY9FRL4IP24sKPIaR1Y/x/bRBbA?=
+ =?us-ascii?Q?F+1EAsnFZ4ED2J6AdRQsz0f3JmZiPAgnay05Iq8+qjOLfTF6vSjQca4NNl8R?=
+ =?us-ascii?Q?8NfUth5X/Wb1H8BP+qfUK/jqzVrJcs5xPcMnfANjt1FHXk57I32ld0jkuiXz?=
+ =?us-ascii?Q?CUPP1lAuRO1wgvm/KH41lc0fkihhwgYvaAXT5aLWLXR1MwWyXhXN/eL6zqpB?=
+ =?us-ascii?Q?8R1CJiS0YA26zqnVnRrdK0WBEFtViyuqfKwBZSgVQwTE4dunKAruDFJ2+640?=
+ =?us-ascii?Q?avI6MYlAK9XQqRurt1TOOxB/NXkPuB3l3oYXPTq87Kmu4lwryPAcc7p21kIT?=
+ =?us-ascii?Q?YFxXihIAUsJLIsribgnMusAu4PReNTTKluEo9dKRHWuL/i+zWrREOAZQd506?=
+ =?us-ascii?Q?a9/FzvLpPPSr0ZbrhhY0dJBIRgSHW8bzVeyQwa9fX260fZh1UxFPgGslsSDP?=
+ =?us-ascii?Q?EDNyT2A4WgQG+4uRhc0bRvTmPRxjSqeY4ivKXe6MTBkcoBAz/tisgI00D/cm?=
+ =?us-ascii?Q?cZHiYse1ZRohUgDryEOPx1jfUSbTV3ogcGACPQIchg+QEcANp/qq+xasY6Um?=
+ =?us-ascii?Q?UPy6lGqHoI9uN8gq91nIo80hPJKH3wD/jympuoAUqqCpjAZ+txhaB/p3M0In?=
+ =?us-ascii?Q?5lotYMBd0F8EIVmDTtPb0lTzBPsZG+sE9DP5VhMWsus13XSamgIJ/pI2lUq5?=
+ =?us-ascii?Q?HQ=3D=3D?=
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6eca23d8-fcbf-44e3-ee8b-08db976076fc
-X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB9185.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d5b1e047-26a0-434d-6bf5-08db9760926c
+X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Aug 2023 16:07:57.4833
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Aug 2023 16:08:43.4877
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: JiRWqnlGtCwqsmIxXnxxjJzaLxpo70v+ZsAazU0DQqrMCJDBJungrqM+ognr4tsjTYMfRcfh9o6QMkPBIeLQTA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR04MB8414
+X-MS-Exchange-CrossTenant-UserPrincipalName: ACGQO+CQ8+IzBSwlx44yZz0TT5Ul5Duics344rbvIP9yucs0sA6fsFyF3vELSWCOJIXYqYjgB5NVQbZHXB7Q6g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB7798
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
 	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
@@ -160,129 +123,153 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-When using a fixed-link setup, certain devices like the SJA1105 require a
-small pause in the TXC clock line to enable their internal tunable
-delay line (TDL).
+When an admin schedule is pending and hasn't yet become operational, the
+kernel will report only the parameters of the admin schedule in a nested
+TCA_TAPRIO_ATTR_ADMIN_SCHED attribute.
 
-To satisfy this requirement, this patch temporarily disables the TX clock,
-and restarts it after a required period. This provides the required
-silent interval on the clock line for SJA1105 to complete the frequency
-transition and enable the internal TDLs. This action occurs before the link
-is built up, so it does not impact a normal device too. There is no
-need to identify if the connected device is an SJA1105 alike or not during
-the implementation.
+However, we default to printing zeroes even for the parameters of the
+operational base time, when that doesn't exist.
 
-So far we have only enabled this feature on the i.MX93 platform.
-
-Signed-off-by: Shenwei Wang <shenwei.wang@nxp.com>
-Reviewed-by: Frank Li <frank.li@nxp.com>
+Link: https://lore.kernel.org/netdev/87il9w0xx7.fsf@intel.com/
+Fixes: 0dd16449356f ("tc: Add support for configuring the taprio scheduler")
+Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 ---
- .../net/ethernet/stmicro/stmmac/dwmac-imx.c   | 43 +++++++++++++++++++
- 1 file changed, 43 insertions(+)
+ tc/q_taprio.c | 91 ++++++++++++++++++++++++++++++---------------------
+ 1 file changed, 53 insertions(+), 38 deletions(-)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c
-index 3eb6b4457494..43ff19b009d4 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c
-@@ -32,6 +32,7 @@
- #define GPR_ENET_QOS_RGMII_EN		(0x1 << 21)
- 
- #define MX93_GPR_ENET_QOS_INTF_MODE_MASK	GENMASK(3, 0)
-+#define MX93_GPR_ENET_QOS_INTF_MASK		GENMASK(3, 1)
- #define MX93_GPR_ENET_QOS_INTF_SEL_MII		(0x0 << 1)
- #define MX93_GPR_ENET_QOS_INTF_SEL_RMII		(0x4 << 1)
- #define MX93_GPR_ENET_QOS_INTF_SEL_RGMII	(0x1 << 1)
-@@ -40,6 +41,7 @@
- #define DMA_BUS_MODE			0x00001000
- #define DMA_BUS_MODE_SFT_RESET		(0x1 << 0)
- #define RMII_RESET_SPEED		(0x3 << 14)
-+#define CTRL_SPEED_MASK			GENMASK(15, 14)
- 
- struct imx_dwmac_ops {
- 	u32 addr_width;
-@@ -47,6 +49,7 @@ struct imx_dwmac_ops {
- 
- 	int (*fix_soc_reset)(void *priv, void __iomem *ioaddr);
- 	int (*set_intf_mode)(struct plat_stmmacenet_data *plat_dat);
-+	void (*fix_mac_speed)(void *priv, unsigned int speed, unsigned int mode);
- };
- 
- struct imx_priv_data {
-@@ -56,6 +59,7 @@ struct imx_priv_data {
- 	struct regmap *intf_regmap;
- 	u32 intf_reg_off;
- 	bool rmii_refclk_ext;
-+	void __iomem *base_addr;
- 
- 	const struct imx_dwmac_ops *ops;
- 	struct plat_stmmacenet_data *plat_dat;
-@@ -212,6 +216,41 @@ static void imx_dwmac_fix_speed(void *priv, unsigned int speed, unsigned int mod
- 		dev_err(dwmac->dev, "failed to set tx rate %lu\n", rate);
+diff --git a/tc/q_taprio.c b/tc/q_taprio.c
+index 913197f68caa..795c013c1c2a 100644
+--- a/tc/q_taprio.c
++++ b/tc/q_taprio.c
+@@ -416,14 +416,11 @@ static int taprio_parse_opt(struct qdisc_util *qu, int argc,
+ 	return 0;
  }
  
-+static void imx93_dwmac_fix_speed(void *priv, unsigned int speed, unsigned int mode)
-+{
-+	struct imx_priv_data *dwmac = priv;
-+	unsigned int iface;
-+	int ctrl, old_ctrl;
-+
-+	imx_dwmac_fix_speed(priv, speed, mode);
-+
-+	if (!dwmac || mode != MLO_AN_FIXED)
-+		return;
-+
-+	if (regmap_read(dwmac->intf_regmap, dwmac->intf_reg_off, &iface))
-+		return;
-+
-+	iface &= MX93_GPR_ENET_QOS_INTF_MASK;
-+	if (iface != MX93_GPR_ENET_QOS_INTF_SEL_RGMII)
-+		return;
-+
-+	old_ctrl = readl(dwmac->base_addr + MAC_CTRL_REG);
-+	ctrl = old_ctrl & ~CTRL_SPEED_MASK;
-+	regmap_update_bits(dwmac->intf_regmap, dwmac->intf_reg_off,
-+			   MX93_GPR_ENET_QOS_INTF_MODE_MASK, 0);
-+	writel(ctrl, dwmac->base_addr + MAC_CTRL_REG);
-+
-+	 /* Ensure the settings for CTRL are applied. */
-+	readl(dwmac->base_addr + MAC_CTRL_REG);
-+
-+	usleep_range(10, 20);
-+	iface |= MX93_GPR_ENET_QOS_CLK_GEN_EN;
-+	regmap_update_bits(dwmac->intf_regmap, dwmac->intf_reg_off,
-+			   MX93_GPR_ENET_QOS_INTF_MODE_MASK, iface);
-+
-+	writel(old_ctrl, dwmac->base_addr + MAC_CTRL_REG);
-+}
-+
- static int imx_dwmac_mx93_reset(void *priv, void __iomem *ioaddr)
+-static int print_sched_list(FILE *f, struct rtattr *list)
++static void print_sched_list(FILE *f, struct rtattr *list)
  {
- 	struct plat_stmmacenet_data *plat_dat = priv;
-@@ -319,6 +358,7 @@ static int imx_dwmac_probe(struct platform_device *pdev)
- 	plat_dat->fix_mac_speed = imx_dwmac_fix_speed;
- 	plat_dat->bsp_priv = dwmac;
- 	dwmac->plat_dat = plat_dat;
-+	dwmac->base_addr = stmmac_res.addr;
+-	struct rtattr *item;
++	struct rtattr *item, *nla;
+ 	int rem;
  
- 	ret = imx_dwmac_clks_config(dwmac, true);
- 	if (ret)
-@@ -328,6 +368,8 @@ static int imx_dwmac_probe(struct platform_device *pdev)
- 	if (ret)
- 		goto err_dwmac_init;
+-	if (list == NULL)
+-		return 0;
+-
+ 	rem = RTA_PAYLOAD(list);
  
-+	if (dwmac->ops->fix_mac_speed)
-+		plat_dat->fix_mac_speed = dwmac->ops->fix_mac_speed;
- 	dwmac->plat_dat->fix_soc_reset = dwmac->ops->fix_soc_reset;
+ 	open_json_array(PRINT_JSON, "schedule");
+@@ -432,60 +429,78 @@ static int print_sched_list(FILE *f, struct rtattr *list)
  
- 	ret = stmmac_dvr_probe(&pdev->dev, plat_dat, &stmmac_res);
-@@ -364,6 +406,7 @@ static struct imx_dwmac_ops imx93_dwmac_data = {
- 	.mac_rgmii_txclk_auto_adj = true,
- 	.set_intf_mode = imx93_set_intf_mode,
- 	.fix_soc_reset = imx_dwmac_mx93_reset,
-+	.fix_mac_speed = imx93_dwmac_fix_speed,
- };
+ 	for (item = RTA_DATA(list); RTA_OK(item, rem); item = RTA_NEXT(item, rem)) {
+ 		struct rtattr *tb[TCA_TAPRIO_SCHED_ENTRY_MAX + 1];
+-		__u32 index = 0, gatemask = 0, interval = 0;
+-		__u8 command = 0;
++		__u32 index, gatemask, interval;
++		__u8 command;
  
- static const struct of_device_id imx_dwmac_match[] = {
+ 		parse_rtattr_nested(tb, TCA_TAPRIO_SCHED_ENTRY_MAX, item);
+ 
+-		if (tb[TCA_TAPRIO_SCHED_ENTRY_INDEX])
+-			index = rta_getattr_u32(tb[TCA_TAPRIO_SCHED_ENTRY_INDEX]);
++		open_json_object(NULL);
++
++		nla = tb[TCA_TAPRIO_SCHED_ENTRY_INDEX];
++		if (nla) {
++			index = rta_getattr_u32(nla);
++			print_uint(PRINT_ANY, "index", "\tindex %u", index);
++		}
+ 
+-		if (tb[TCA_TAPRIO_SCHED_ENTRY_CMD])
+-			command = rta_getattr_u8(tb[TCA_TAPRIO_SCHED_ENTRY_CMD]);
++		nla = tb[TCA_TAPRIO_SCHED_ENTRY_CMD];
++		if (nla) {
++			command = rta_getattr_u8(nla);
++			print_string(PRINT_ANY, "cmd", " cmd %s",
++				     entry_cmd_to_str(command));
++		}
+ 
+-		if (tb[TCA_TAPRIO_SCHED_ENTRY_GATE_MASK])
+-			gatemask = rta_getattr_u32(tb[TCA_TAPRIO_SCHED_ENTRY_GATE_MASK]);
++		nla = tb[TCA_TAPRIO_SCHED_ENTRY_GATE_MASK];
++		if (nla) {
++			gatemask = rta_getattr_u32(nla);
++			print_0xhex(PRINT_ANY, "gatemask", " gatemask %#llx",
++				    gatemask);
++		}
+ 
+-		if (tb[TCA_TAPRIO_SCHED_ENTRY_INTERVAL])
+-			interval = rta_getattr_u32(tb[TCA_TAPRIO_SCHED_ENTRY_INTERVAL]);
++		nla = tb[TCA_TAPRIO_SCHED_ENTRY_INTERVAL];
++		if (nla) {
++			interval = rta_getattr_u32(nla);
++			print_uint(PRINT_ANY, "interval", " interval %u",
++				   interval);
++		}
+ 
+-		open_json_object(NULL);
+-		print_uint(PRINT_ANY, "index", "\tindex %u", index);
+-		print_string(PRINT_ANY, "cmd", " cmd %s", entry_cmd_to_str(command));
+-		print_0xhex(PRINT_ANY, "gatemask", " gatemask %#llx", gatemask);
+-		print_uint(PRINT_ANY, "interval", " interval %u", interval);
+ 		close_json_object();
+ 
+ 		print_nl();
+ 	}
+ 
+ 	close_json_array(PRINT_ANY, "");
+-
+-	return 0;
+ }
+ 
+ static int print_schedule(FILE *f, struct rtattr **tb)
+ {
+-	int64_t base_time = 0, cycle_time = 0, cycle_time_extension = 0;
+-
+-	if (tb[TCA_TAPRIO_ATTR_SCHED_BASE_TIME])
+-		base_time = rta_getattr_s64(tb[TCA_TAPRIO_ATTR_SCHED_BASE_TIME]);
++	int64_t base_time, cycle_time, cycle_time_extension;
++	struct rtattr *nla;
++
++	nla = tb[TCA_TAPRIO_ATTR_SCHED_BASE_TIME];
++	if (nla) {
++		base_time = rta_getattr_s64(nla);
++		print_lluint(PRINT_ANY, "base_time", "\tbase-time %lld",
++			     base_time);
++	}
+ 
+-	if (tb[TCA_TAPRIO_ATTR_SCHED_CYCLE_TIME])
++	nla = tb[TCA_TAPRIO_ATTR_SCHED_CYCLE_TIME];
++	if (nla) {
+ 		cycle_time = rta_getattr_s64(tb[TCA_TAPRIO_ATTR_SCHED_CYCLE_TIME]);
++		print_lluint(PRINT_ANY, "cycle_time", " cycle-time %lld",
++			     cycle_time);
++	}
+ 
+-	if (tb[TCA_TAPRIO_ATTR_SCHED_CYCLE_TIME_EXTENSION])
+-		cycle_time_extension = rta_getattr_s64(
+-			tb[TCA_TAPRIO_ATTR_SCHED_CYCLE_TIME_EXTENSION]);
+-
+-	print_lluint(PRINT_ANY, "base_time", "\tbase-time %lld", base_time);
+-
+-	print_lluint(PRINT_ANY, "cycle_time", " cycle-time %lld", cycle_time);
+-
+-	print_lluint(PRINT_ANY, "cycle_time_extension",
+-		     " cycle-time-extension %lld", cycle_time_extension);
++	nla = tb[TCA_TAPRIO_ATTR_SCHED_CYCLE_TIME_EXTENSION];
++	if (nla) {
++		cycle_time_extension = rta_getattr_s64(nla);
++		print_lluint(PRINT_ANY, "cycle_time_extension",
++			     " cycle-time-extension %lld",
++			     cycle_time_extension);
++	}
+ 
+-	print_sched_list(f, tb[TCA_TAPRIO_ATTR_SCHED_ENTRY_LIST]);
++	nla = tb[TCA_TAPRIO_ATTR_SCHED_ENTRY_LIST];
++	if (nla)
++		print_sched_list(f, nla);
+ 
+ 	return 0;
+ }
 -- 
 2.34.1
 
