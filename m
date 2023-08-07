@@ -1,141 +1,129 @@
-Return-Path: <netdev+bounces-25147-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25148-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6603773108
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 23:15:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E26277310D
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 23:15:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 816921C20A03
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 21:15:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 08831281598
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 21:15:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E50C174F7;
-	Mon,  7 Aug 2023 21:15:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4775F174F8;
+	Mon,  7 Aug 2023 21:15:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11D3F4432
-	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 21:15:21 +0000 (UTC)
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07298E5B
-	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 14:15:21 -0700 (PDT)
-Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 377L84W8004525;
-	Mon, 7 Aug 2023 21:15:15 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=z+C72kzpIhGL1Y2bGJyvLEJt8HwImOTaOHvOjVqenBc=;
- b=mLc/bEzhL2EaDtkl5OHDsD5e+2qK3PPX2S0VUstDJuQWyhaEfWexsvNx4XQoJGFIUuPO
- i5MbhK0Of8XptutuWszSJLmYf+MVlJhkzMUJfxsL5Jut0CyyYvbpUXqOZGt2lC13loCJ
- BqrUs4QwHNJ1q2cd2q1T8pUhePDDLEsJotSmIwHzAMzJVUzOOybho28y0JYgt2roBMTT
- /PdS8uld1736aipiwJIhon1ZACGRsLNmTwCt7MAqCVgpkfzP/5LBTk3DrZ6g8txjEHn9
- BNKwAc+2RQaglWE2lumA8nNDasArab1lvBLFXzaVmP6WJXpfrBLHMD0LQkgFqYhmV5no aw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3sb839rbsx-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 07 Aug 2023 21:15:14 +0000
-Received: from m0353728.ppops.net (m0353728.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 377LBEHD014762;
-	Mon, 7 Aug 2023 21:15:14 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3sb839rbse-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 07 Aug 2023 21:15:13 +0000
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 377JCA02030374;
-	Mon, 7 Aug 2023 21:15:12 GMT
-Received: from smtprelay05.dal12v.mail.ibm.com ([172.16.1.7])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3sa1rn0ntv-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 07 Aug 2023 21:15:12 +0000
-Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
-	by smtprelay05.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 377LFBfu459384
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 7 Aug 2023 21:15:12 GMT
-Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id A6B875805D;
-	Mon,  7 Aug 2023 21:15:11 +0000 (GMT)
-Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 151DA5805B;
-	Mon,  7 Aug 2023 21:15:11 +0000 (GMT)
-Received: from [9.41.99.4] (unknown [9.41.99.4])
-	by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Mon,  7 Aug 2023 21:15:11 +0000 (GMT)
-Message-ID: <11386c9a-6c07-2274-3d8f-eaa471b182df@linux.vnet.ibm.com>
-Date: Mon, 7 Aug 2023 16:15:10 -0500
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AEE24432
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 21:15:38 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0E2C1722
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 14:15:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1691442934;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ye5A6Jw6eWidJwu3XWNBZr93qlVRCWc3OvMx6RGhxc4=;
+	b=c3dysyfkHkaXJigafXScLcZqd1tc98TZ5ssV0TJeCeD0aPGJrHRsLVEnJr3RISoD5wU4ae
+	1A26UN/lj5Vo1RJgFdDls07W5Zeed0GkZxHWk7HJY5mrpYf9QqtY96ObjNPOwhgSrjK1Mh
+	ncCKWLMXwPqxvHm4NtzHYvoJyrzhpvo=
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-638--wLu1dbsPKyoQFCNn7quOw-1; Mon, 07 Aug 2023 17:15:32 -0400
+X-MC-Unique: -wLu1dbsPKyoQFCNn7quOw-1
+Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-768197bad1bso399388185a.3
+        for <netdev@vger.kernel.org>; Mon, 07 Aug 2023 14:15:31 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691442931; x=1692047731;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ye5A6Jw6eWidJwu3XWNBZr93qlVRCWc3OvMx6RGhxc4=;
+        b=UX3XTYmt5m9pIZDJU8fMNA55+GHmMtTUrn3FjZyd9ceOX2vmm/mSmOYypgRC6/c38m
+         IO6Vjnpe7p8PUuoPjsu/FGGtBVvTfaQvzloXVGx8VTvCS4yZOFqmap0VPCPe/iLOOy3g
+         3V6JVF7mS1gE4AKGg61NLJfgb3VHC1mai9uKnB5cYSg9E0V+rlGrZt318ARUY2MntIlD
+         YkTmAkGCYjWj2VfSE6HUabKDHKV99UAPTOU1oTf6vKXgjgYqE/0j59U2kNNE5g9Ox193
+         qlWl6EBywa9V1p6UXhmaSIY7zICL4W6bK1LCjg9mz/+mmxA1vu7wfihoPqDLijN8+Rhx
+         Qydw==
+X-Gm-Message-State: AOJu0Yw0FcZP6kf360FvYBe4OgZw2PVDe7xeVLKyC+4YUAY7fGrR7lxY
+	gXp9KxRYiElLsRcQSZUvteQow4Wtk6sYQHIp3UCN0FzS/3v4/CoywzHuScIPWZq52roRO7WXhcY
+	BYSoxG1s+xzrT4Kbr
+X-Received: by 2002:a05:620a:44c6:b0:76c:af3e:3c14 with SMTP id y6-20020a05620a44c600b0076caf3e3c14mr8603223qkp.71.1691442931212;
+        Mon, 07 Aug 2023 14:15:31 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEs6cY258Pte+EWAopO2m1NTOSfKDpS5t4ZtseNKSU54HCauQLwYxyIy58E/V+PpQfupC6BsA==
+X-Received: by 2002:a05:620a:44c6:b0:76c:af3e:3c14 with SMTP id y6-20020a05620a44c600b0076caf3e3c14mr8603197qkp.71.1691442930969;
+        Mon, 07 Aug 2023 14:15:30 -0700 (PDT)
+Received: from fedora ([2600:1700:1ff0:d0e0::37])
+        by smtp.gmail.com with ESMTPSA id oq6-20020a05620a610600b0076d0312b8basm1350731qkn.131.2023.08.07.14.15.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Aug 2023 14:15:30 -0700 (PDT)
+Date: Mon, 7 Aug 2023 16:15:28 -0500
+From: Andrew Halaney <ahalaney@redhat.com>
+To: Bartosz Golaszewski <brgl@bgdev.pl>
+Cc: Andy Gross <agross@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
+	Konrad Dybcio <konrad.dybcio@linaro.org>, Rob Herring <robh+dt@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Alex Elder <elder@linaro.org>, Srini Kandagatla <srinivas.kandagatla@linaro.org>, 
+	linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Subject: Re: [PATCH 3/9] arm64: dts: qcom: sa8775p-ride: enable the second
+ SerDes PHY
+Message-ID: <adcu2mjmpfnncwfhmwkdwwakk26ob6ee2lwyr4lz32n5zes27r@c6qkjmgoaz53>
+References: <20230807193507.6488-1-brgl@bgdev.pl>
+ <20230807193507.6488-4-brgl@bgdev.pl>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.14.0
-Subject: Re: [PATCH v4] bnx2x: Fix error recovering in switch configuration
-Content-Language: en-US
-To: Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>
-Cc: aelior@marvell.com, davem@davemloft.net, edumazet@google.com,
-        manishc@marvell.com, netdev@vger.kernel.org, skalluru@marvell.com,
-        drc@linux.vnet.ibm.com, abdhalee@in.ibm.com, simon.horman@corigine.com
-References: <20220916195114.2474829-1-thinhtr@linux.vnet.ibm.com>
- <20230728211133.2240873-1-thinhtr@linux.vnet.ibm.com>
- <20230731174716.0898ff62@kernel.org>
- <cd2b2456b1853d71b1c84c152164732f3a39f4dc.camel@redhat.com>
-From: Thinh Tran <thinhtr@linux.vnet.ibm.com>
-In-Reply-To: <cd2b2456b1853d71b1c84c152164732f3a39f4dc.camel@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: mtA6LrSeVO_xEs23fUw9gA4TrbOWj5hb
-X-Proofpoint-GUID: yyuI3eiR9q2FkNZLm5jafx8E0HWtvLEt
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-08-07_23,2023-08-03_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 impostorscore=0
- phishscore=0 suspectscore=0 adultscore=0 spamscore=0 bulkscore=0
- mlxscore=0 mlxlogscore=872 lowpriorityscore=0 malwarescore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2306200000 definitions=main-2308070193
-X-Spam-Status: No, score=-3.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230807193507.6488-4-brgl@bgdev.pl>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi,
-Thanks for the review.
-
-On 8/1/2023 3:30 AM, Paolo Abeni wrote:
-> On Mon, 2023-07-31 at 17:47 -0700, Jakub Kicinski wrote:
-
->>> @@ -4987,6 +4983,12 @@ void bnx2x_tx_timeout(struct net_device *dev, unsigned int txqueue)
->>>   {
->>>   	struct bnx2x *bp = netdev_priv(dev);
->>>   
->>> +	/* Immediately indicate link as down */
->>> +	bp->link_vars.link_up = 0;
->>> +	bp->force_link_down = true;
->>> +	netif_carrier_off(dev);
->>> +	BNX2X_ERR("Indicating link is down due to Tx-timeout\n");
->>
->> Is this code move to make the shutdown more immediate?
->> That could also be a separate patch.
+On Mon, Aug 07, 2023 at 09:35:01PM +0200, Bartosz Golaszewski wrote:
+> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 > 
-> Note that the original code run under the rtnl lock and this is not
-> lockless, it that safe?
->
-Yes, it is safe.
-The caller, dev_watchdog() is a holding a spin_lock of the net_device.
-
-> Cheers,
+> Enable the second SerDes PHY on sa8775p-ride development board.
 > 
-> Paolo
+> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+
+Matches what I see downstream wrt the supply, so:
+
+Reviewed-by: Andrew Halaney <ahalaney@redhat.com>
+
+> ---
+>  arch/arm64/boot/dts/qcom/sa8775p-ride.dts | 5 +++++
+>  1 file changed, 5 insertions(+)
+> 
+> diff --git a/arch/arm64/boot/dts/qcom/sa8775p-ride.dts b/arch/arm64/boot/dts/qcom/sa8775p-ride.dts
+> index ed76680410b4..09ae6e153282 100644
+> --- a/arch/arm64/boot/dts/qcom/sa8775p-ride.dts
+> +++ b/arch/arm64/boot/dts/qcom/sa8775p-ride.dts
+> @@ -448,6 +448,11 @@ &serdes0 {
+>  	status = "okay";
+>  };
+>  
+> +&serdes1 {
+> +	phy-supply = <&vreg_l5a>;
+> +	status = "okay";
+> +};
+> +
+>  &sleep_clk {
+>  	clock-frequency = <32764>;
+>  };
+> -- 
+> 2.39.2
 > 
 
-Thanks,
-Thinh Tran
 
