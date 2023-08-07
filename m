@@ -1,120 +1,145 @@
-Return-Path: <netdev+bounces-25115-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25116-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 858BA773003
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 21:59:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 093C177300B
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 22:00:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5923F1C20C97
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 19:59:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B64292814FB
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 20:00:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C561B174D9;
-	Mon,  7 Aug 2023 19:59:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3187C174E4;
+	Mon,  7 Aug 2023 20:00:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B72EB15ACD
-	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 19:59:08 +0000 (UTC)
-Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 182EDB1
-	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 12:59:07 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25FD515ACD
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 20:00:39 +0000 (UTC)
+Received: from mail-ua1-x92e.google.com (mail-ua1-x92e.google.com [IPv6:2607:f8b0:4864:20::92e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B2BBB1
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 13:00:37 -0700 (PDT)
+Received: by mail-ua1-x92e.google.com with SMTP id a1e0cc1a2514c-79ad4ffc6e6so1330167241.3
+        for <netdev@vger.kernel.org>; Mon, 07 Aug 2023 13:00:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1691438348; x=1722974348;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=KEwoikW7N6924/M/SdohnuwOWBj/lx6wTWicF2DDoBU=;
-  b=a1ZYvPKzWIhN8/H4AYiPGVaRerlLUEFObAujBy65oLoHhv3qHZvsTGkW
-   AKhTv7qmXKcLUebgxD9IqG1zlI1D+jjstVaqF1SVzrKlcZlBuKxFA1kMm
-   JMyiadIA96upOZRd+LZhPdk0Mgl4z4z2OqGoXRAKQEIKN8XFfHbNnIa+J
-   w=;
-X-IronPort-AV: E=Sophos;i="6.01,262,1684800000"; 
-   d="scan'208";a="356013438"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-pdx-2b-m6i4x-26a610d2.us-west-2.amazon.com) ([10.25.36.210])
-  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Aug 2023 19:59:02 +0000
-Received: from EX19MTAUWB001.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
-	by email-inbound-relay-pdx-2b-m6i4x-26a610d2.us-west-2.amazon.com (Postfix) with ESMTPS id E450340D52;
-	Mon,  7 Aug 2023 19:59:00 +0000 (UTC)
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Mon, 7 Aug 2023 19:59:00 +0000
-Received: from 88665a182662.ant.amazon.com.com (10.187.170.12) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Mon, 7 Aug 2023 19:58:57 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <william.xuanziyang@huawei.com>
-CC: <adobriyan@gmail.com>, <davem@davemloft.net>, <dsahern@kernel.org>,
-	<edumazet@google.com>, <kuba@kernel.org>, <netdev@vger.kernel.org>,
-	<pabeni@redhat.com>, <kuniyu@amazon.com>
-Subject: Re: [PATCH net-next] ipv6: exthdrs: Replace opencoded swap() implementation
-Date: Mon, 7 Aug 2023 12:58:48 -0700
-Message-ID: <20230807195848.43547-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20230807020947.1991716-1-william.xuanziyang@huawei.com>
-References: <20230807020947.1991716-1-william.xuanziyang@huawei.com>
+        d=google.com; s=20221208; t=1691438436; x=1692043236;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mVQdRv1Yvag9pZf4ApwFuqYgv2RsqMJxrynRlvroKKI=;
+        b=OfneyUN/2lerRgrz+LIZo4dK4kbguaa6/Vk3KCO8tPslYWmyMT0iw2hGT3DjJhMtPW
+         +cXO8gED1UB4/QDs8B+gSQJuG1LuSkgcEaoY/W7Ir/NnGfS2aCUxUhElndRMvxe26+PY
+         p+J0HeEO1KC3C7NxI/hNU6L2oH8zZi6exeqbHDfvIaPihhCrnGPQN060l+N9kzB4f+po
+         t8XcRQGm1ccOtyq9pheseBUNMDq8R4jUTaVP1VOm3H6wT2OIryggbq/jcM/xZHErj187
+         1Bv5P4B/bFGSl3cNjovdYXeuzQVfuoC+abgfQn7/2S4Gce3GZ/C4+6pol3Jq/NzEZE/5
+         F9Jw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691438436; x=1692043236;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=mVQdRv1Yvag9pZf4ApwFuqYgv2RsqMJxrynRlvroKKI=;
+        b=E8u+E1LWcKhjy0XaGS5R7l1bppUvYvxIlRB17uveYOiXShNOX2G/0eAnDZZToFqklj
+         3JkY177WsjrXWzJN/cwUkwE0PhD3PDyWHJU9bt90lQ2UXBRg/PYhrSxEo1PJ5/6AMFut
+         HUug4bEJLaAyab1qt5aJFkuStZcOpXTrwU3rdsSJ4pt+KuIVQiqbjLso3A49QuYd3YaA
+         BwNZwYDw01wVvtbmvdbgQCY355wT4HxFo6/6T5+gtX/4x1DAWk6NxMW5nC2pBJnhZB3J
+         BDmowXZKi5fz/+NvQsHUlAOKsleP4QIHQ3Aye3jLWu67/j6M1A0req3ZV54+w1ty1kis
+         us0g==
+X-Gm-Message-State: AOJu0Yz9ThzsPkeLMRkCbqjf7Gnj/ZiBFgcEhA6ADjuP2/tTGJozjFRT
+	f2Ae5/qPgn1KVo8e2+TzPpl/WXfEslOuJIQq7of1xQ==
+X-Google-Smtp-Source: AGHT+IEjizJJCB4nnVxo3w+/QZ+ihPBzKEyUWREcezwYPLVdOJJlDAIz2ug7nc/eYnPsuXNuBnjo8muQh7/Fjn3MnQs=
+X-Received: by 2002:a67:e3b7:0:b0:444:eedd:1aea with SMTP id
+ j23-20020a67e3b7000000b00444eedd1aeamr4591925vsm.17.1691438436080; Mon, 07
+ Aug 2023 13:00:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.187.170.12]
-X-ClientProxiedBy: EX19D046UWB003.ant.amazon.com (10.13.139.174) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
-Precedence: Bulk
-X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-	T_SPF_PERMERROR autolearn=ham autolearn_force=no version=3.4.6
+References: <20230807183308.9015-1-me@manjusaka.me>
+In-Reply-To: <20230807183308.9015-1-me@manjusaka.me>
+From: Neal Cardwell <ncardwell@google.com>
+Date: Mon, 7 Aug 2023 16:00:18 -0400
+Message-ID: <CADVnQyn3UMa3Qx6cC1Rx97xLjQdG0eKsiF7oY9UR=b9vU4R-yA@mail.gmail.com>
+Subject: Re: [PATCH] tracepoint: add new `tcp:tcp_ca_event_set` trace event
+To: Manjusaka <me@manjusaka.me>
+Cc: edumazet@google.com, mhiramat@kernel.org, rostedt@goodmis.org, 
+	davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org, pabeni@redhat.com, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-trace-kernel@vger.kernel.org, bpf@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Ziyang Xuan <william.xuanziyang@huawei.com>
-Date: Mon, 7 Aug 2023 10:09:47 +0800
-> Get a coccinelle warning as follows:
-> net/ipv6/exthdrs.c:800:29-30: WARNING opportunity for swap()
-> 
-> Use swap() to replace opencoded implementation.
-> 
-> Signed-off-by: Ziyang Xuan <william.xuanziyang@huawei.com>
-
-Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-
-
+On Mon, Aug 7, 2023 at 2:33=E2=80=AFPM Manjusaka <me@manjusaka.me> wrote:
+>
+> In normal use case, the tcp_ca_event would be changed in high frequency.
+>
+> It's a good indicator to represent the network quanlity.
+>
+> So I propose to add a `tcp:tcp_ca_event_set` trace event
+> like `tcp:tcp_cong_state_set` to help the people to
+> trace the TCP connection status
+>
+> Signed-off-by: Manjusaka <me@manjusaka.me>
 > ---
->  net/ipv6/exthdrs.c | 5 +----
->  1 file changed, 1 insertion(+), 4 deletions(-)
-> 
-> diff --git a/net/ipv6/exthdrs.c b/net/ipv6/exthdrs.c
-> index f4bfccae003c..4952ae792450 100644
-> --- a/net/ipv6/exthdrs.c
-> +++ b/net/ipv6/exthdrs.c
-> @@ -648,7 +648,6 @@ static int ipv6_rthdr_rcv(struct sk_buff *skb)
->  	struct inet6_dev *idev = __in6_dev_get(skb->dev);
->  	struct inet6_skb_parm *opt = IP6CB(skb);
->  	struct in6_addr *addr = NULL;
-> -	struct in6_addr daddr;
->  	int n, i;
->  	struct ipv6_rt_hdr *hdr;
->  	struct rt0_hdr *rthdr;
-> @@ -796,9 +795,7 @@ static int ipv6_rthdr_rcv(struct sk_buff *skb)
->  		return -1;
->  	}
->  
-> -	daddr = *addr;
-> -	*addr = ipv6_hdr(skb)->daddr;
-> -	ipv6_hdr(skb)->daddr = daddr;
-> +	swap(*addr, ipv6_hdr(skb)->daddr);
->  
->  	ip6_route_input(skb);
->  	if (skb_dst(skb)->error) {
-> -- 
-> 2.25.1
+>  include/net/tcp.h          |  9 ++------
+>  include/trace/events/tcp.h | 45 ++++++++++++++++++++++++++++++++++++++
+>  net/ipv4/tcp_cong.c        | 10 +++++++++
+>  3 files changed, 57 insertions(+), 7 deletions(-)
+>
+> diff --git a/include/net/tcp.h b/include/net/tcp.h
+> index 0ca972ebd3dd..a68c5b61889c 100644
+> --- a/include/net/tcp.h
+> +++ b/include/net/tcp.h
+> @@ -1154,13 +1154,8 @@ static inline bool tcp_ca_needs_ecn(const struct s=
+ock *sk)
+>         return icsk->icsk_ca_ops->flags & TCP_CONG_NEEDS_ECN;
+>  }
+>
+> -static inline void tcp_ca_event(struct sock *sk, const enum tcp_ca_event=
+ event)
+> -{
+> -       const struct inet_connection_sock *icsk =3D inet_csk(sk);
+> -
+> -       if (icsk->icsk_ca_ops->cwnd_event)
+> -               icsk->icsk_ca_ops->cwnd_event(sk, event);
+> -}
+> +/* from tcp_cong.c */
+> +void tcp_ca_event(struct sock *sk, const enum tcp_ca_event event);
+>
+>  /* From tcp_cong.c */
+>  void tcp_set_ca_state(struct sock *sk, const u8 ca_state);
+> diff --git a/include/trace/events/tcp.h b/include/trace/events/tcp.h
+> index bf06db8d2046..38415c5f1d52 100644
+> --- a/include/trace/events/tcp.h
+> +++ b/include/trace/events/tcp.h
+> @@ -416,6 +416,51 @@ TRACE_EVENT(tcp_cong_state_set,
+>                   __entry->cong_state)
+>  );
+>
+> +TRACE_EVENT(tcp_ca_event_set,
+
+Regarding the proposed name, "tcp_ca_event_set"... including "set" in
+the name is confusing, since the tcp_ca_event() function is not really
+setting anything. :-)
+
+The trace_tcp_cong_state_set() call you are using as a model has "set"
+in the name because the function it is tracing, tcp_set_ca_state(),
+has "set" in the name. :-)
+
+Would it work to use something like:
+  TRACE_EVENT(tcp_ca_event,
+
+thanks,
+neal
 
