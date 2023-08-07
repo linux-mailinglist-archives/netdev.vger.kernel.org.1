@@ -1,60 +1,61 @@
-Return-Path: <netdev+bounces-24937-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24938-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D29E9772364
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 14:05:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D6F177238D
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 14:15:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 95D401C20A4F
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 12:05:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 192402812A4
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 12:15:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03CC6FC17;
-	Mon,  7 Aug 2023 12:05:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15A64100CA;
+	Mon,  7 Aug 2023 12:15:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA3FCFC0E
-	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 12:05:45 +0000 (UTC)
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B773116
-	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 05:05:44 -0700 (PDT)
-Received: by mail-pj1-x1036.google.com with SMTP id 98e67ed59e1d1-2685102cd16so2235809a91.1
-        for <netdev@vger.kernel.org>; Mon, 07 Aug 2023 05:05:44 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 090C84436
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 12:15:25 +0000 (UTC)
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38D26E44
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 05:15:24 -0700 (PDT)
+Received: by mail-pj1-x102e.google.com with SMTP id 98e67ed59e1d1-26854159c05so2364617a91.2
+        for <netdev@vger.kernel.org>; Mon, 07 Aug 2023 05:15:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1691409944; x=1692014744;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=UxNPOJp2gtDhfWZRzOWarZZZVlOwdeuN9g0kWHnf9gs=;
-        b=WsVfgJHsSXlOYhSa7RnTOFdsaoX0xEoReCh4sis0XDX/ZC4AZZ4i7l+6ft+Dh8q6vB
-         ZANsA/Dtc2VdW8u7FnrP6vhl0HCYwl+0lqeYM5BgkcxalSXu0RgUX8YfcOrtCb+IU5qh
-         8tfYLBfQRD8KRBSA3FfUsqZ5ZRrfd2q9Ypk+RU6CqBzKSdW79JSEAfOtj3sDInliciF5
-         MIBhYmv1/CGoUDgvZSIAlmIyn9r6HsjyaSq7lbNiasxCJUaJDvoHvCPyqcFX66qUV2iP
-         je8aXyp/+daaeX0IfqkVrnyT7rGBLtqve+JO7YPpk4qVZ/pOITQZ/mPUFQmjBzWa0+eY
-         sz4g==
+        d=bytedance.com; s=google; t=1691410523; x=1692015323;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uLQYdihKrZnqzA8pyJFR0KmRfev22Y9Nk5IK1CsNWSQ=;
+        b=bEAsqH3EjC2u0IGUnDABZVNA3fbPjqYFRA+b6OttdreALvj5DL7l7Ckx1qTRiEI13l
+         /MNN1P3o3BUJAbMyJ5RZk7d1fAqiWmKhRsmLQRel5SV+JfC6akLzqW9B/w0QwXMG+Axx
+         EbhFL6nmoNWKymjJleYouiGVXtulkdgMMReMJ48ag1EerhFmBMPRRxPb4+VYYK78FigG
+         H8+2tCLHg7Q5ZF78UsXOv+7taDaXBCWTD0bY26hvadEh1o3oxyl8/xWhkUrT6uL19SQs
+         ifTEX5J9eqOjtREpgVr+LfniIynboIEd/NlIcpVj3S468oO+PrfuwNV2Lw0N/Icu+Bif
+         mfvg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691409944; x=1692014744;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=UxNPOJp2gtDhfWZRzOWarZZZVlOwdeuN9g0kWHnf9gs=;
-        b=DIMV1I0MH3vGm2Oy2u7GmodJh7b+gPiyLn13LaSsBQhXyDBNwZPGntmaAWzu+psqwO
-         qOtugj9mu4IcAFJqRTyNq6s0v6KUWMuSbajFk/DgqDWURCnXPjmp/pB/guhWXFexRcGx
-         Xl02Zlhb0WPkkuWjiQZWxQ16D7Xdv4TaehXwN9Z0euVTUOdCd+IhLWLzCPIMSW+UGtnY
-         m/7eTfixGxfUNVQ2ac+nxuXaS1ON/Qfhi4QJ1jxXPa+PCRhuARARziAqB0dTkai5G8hF
-         StISLTvMTz8HeMcrwTWZYL3LhLrEgIEZMzpD6FMWu9QF1ZUSzHcXQQVXWvBGQqrAq988
-         5tIg==
-X-Gm-Message-State: AOJu0YyT6qPRgR4FdyoDRZUIkcsVmetOfjKgWrPPVcA2AlSfx9QYK3b0
-	8kAovddClIpneqgtHcZ+s9vZ8Q==
-X-Google-Smtp-Source: AGHT+IGIntJFzxEfnZfu0K5hC4TFi3jmhVJZWB+WVqNK9Sop7DxQpbxBhPnmG4v2fW+FmoyvjvB0Ag==
-X-Received: by 2002:a17:90a:a095:b0:263:53be:5120 with SMTP id r21-20020a17090aa09500b0026353be5120mr6488176pjp.36.1691409943733;
-        Mon, 07 Aug 2023 05:05:43 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1691410523; x=1692015323;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=uLQYdihKrZnqzA8pyJFR0KmRfev22Y9Nk5IK1CsNWSQ=;
+        b=MnvtguvUWTIdjEn7p6SbN7ANvJTOHGAFgqlTr9vQ4nkyWORJdEu0Ult8MKPSNQ1lz0
+         nH3kPO4Ds0OysDm/WjGyguI7lqoq6F3XO9nivvwHOOb5e5cbqpHy3Ijoa7kkqBIa7DXo
+         H5F95uNH5c4ELEW+gPsQBbuDL3TRcnhR2ZjQNivSIJ04oCmiHNjvXVDzugnRWlUOBkHb
+         PDczbXWqskLropIy2S2McdOR+BiBfMRpALXKpL2uOCSBF33LzAPc2FqfZ2jTKpT1fde9
+         /0H58MEUtqNE25wHaql6iOOde4vy2BuxUHGemYbTTsVkArgast1NNTneTgqoQWjXDHt4
+         R9GQ==
+X-Gm-Message-State: AOJu0Yy0WmCdJbus0TxPtpBLw7o9uJNfbuy6Z+VNuKt8EfZJFnn4VQGe
+	FVk/a2jn7o235XcYvoowTWJbzA==
+X-Google-Smtp-Source: AGHT+IEFVp6KMtDbFDIQLBkpU/u99kKhhVeErfazpqq/dYJkpUEs2Le54iKKZ2BwOj5rl02nFUtamA==
+X-Received: by 2002:a17:90b:3e88:b0:269:3771:7342 with SMTP id rj8-20020a17090b3e8800b0026937717342mr4621802pjb.18.1691410523675;
+        Mon, 07 Aug 2023 05:15:23 -0700 (PDT)
 Received: from C02FG34NMD6R.bytedance.net ([2408:8656:30f8:e020::b])
-        by smtp.gmail.com with ESMTPSA id bx6-20020a17090af48600b00263f8915aa3sm8578098pjb.31.2023.08.07.05.05.38
+        by smtp.gmail.com with ESMTPSA id n12-20020a17090ac68c00b00268320ab9f2sm8645761pjt.6.2023.08.07.05.15.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Aug 2023 05:05:43 -0700 (PDT)
+        Mon, 07 Aug 2023 05:15:23 -0700 (PDT)
 From: Albert Huang <huangjie.albert@bytedance.com>
 To: 
 Cc: Albert Huang <huangjie.albert@bytedance.com>,
@@ -62,126 +63,67 @@ Cc: Albert Huang <huangjie.albert@bytedance.com>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	=?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn@kernel.org>,
-	Magnus Karlsson <magnus.karlsson@intel.com>,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	Jonathan Lemon <jonathan.lemon@gmail.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Pavel Begunkov <asml.silence@gmail.com>,
-	Richard Gobert <richardbgobert@gmail.com>,
-	Menglong Dong <imagedong@tencent.com>,
-	Yunsheng Lin <linyunsheng@huawei.com>,
 	netdev@vger.kernel.org (open list:NETWORKING DRIVERS),
-	linux-kernel@vger.kernel.org (open list),
-	bpf@vger.kernel.org (open list:XDP SOCKETS (AF_XDP))
-Subject: [RFC v2 Optimizing veth xsk performance 0/9]
-Date: Mon,  7 Aug 2023 20:04:20 +0800
-Message-Id: <20230807120434.83644-1-huangjie.albert@bytedance.com>
+	linux-kernel@vger.kernel.org (open list)
+Subject: [RFC v2 Optimizing veth xsk performance 1/9] veth: Implement ethtool's get_ringparam() callback
+Date: Mon,  7 Aug 2023 20:15:10 +0800
+Message-Id: <20230807121510.84113-1-huangjie.albert@bytedance.com>
 X-Mailer: git-send-email 2.37.1 (Apple Git-137.1)
+In-Reply-To: <20230807120434.83644-1-huangjie.albert@bytedance.com>
+References: <20230807120434.83644-1-huangjie.albert@bytedance.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=yes
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-AF_XDP is a kernel bypass technology that can greatly improve performance.
-However, for virtual devices like veth, even with the use of AF_XDP sockets,
-there are still many additional software paths that consume CPU resources. 
-This patch series focuses on optimizing the performance of AF_XDP sockets 
-for veth virtual devices. Patches 1 to 4 mainly involve preparatory work. 
-Patch 5 introduces tx queue and tx napi for packet transmission, while 
-patch 8 primarily implements batch sending for IPv4 UDP packets, and patch 9
-add support for AF_XDP tx need_wakup feature. These optimizations significantly
-reduce the software path and support checksum offload.
+some xsk library calls get_ringparam() API to get the queue length
+to init the xsk umem.
 
-I tested those feature with
-A typical topology is shown below:
-client(send):                                        server:(recv)
-veth<-->veth-peer                                    veth1-peer<--->veth1
-  1       |                                                  |   7
-          |2                                                6|
-          |                                                  |
-        bridge<------->eth0(mlnx5)- switch -eth1(mlnx5)<--->bridge1
-                  3                    4                 5    
-             (machine1)                              (machine2)    
-AF_XDP socket is attach to veth and veth1. and send packets to physical NIC(eth0)
-veth:(172.17.0.2/24)
-bridge:(172.17.0.1/24)
-eth0:(192.168.156.66/24)
+Implement that in veth so those scenarios can work properly.
 
-eth1(172.17.0.2/24)
-bridge1:(172.17.0.1/24)
-eth0:(192.168.156.88/24)
+Signed-off-by: Albert Huang <huangjie.albert@bytedance.com>
+---
+ drivers/net/veth.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-after set default route、snat、dnat. we can have a tests
-to get the performance results.
-
-packets send from veth to veth1:
-af_xdp test tool:
-link:https://github.com/cclinuxer/libxudp
-send:(veth)
-./objs/xudpperf send --dst 192.168.156.88:6002 -l 1300
-recv:(veth1)
-./objs/xudpperf recv --src 172.17.0.2:6002
-
-udp test tool:iperf3
-send:(veth)
-iperf3 -c 192.168.156.88 -p 6002 -l 1300 -b 0 -u
-recv:(veth1)
-iperf3 -s -p 6002
-
-performance:
-performance:(test weth libxudp lib)
-UDP                              : 320 Kpps (with 100% cpu)
-AF_XDP   no  zerocopy + no batch : 480 Kpps (with ksoftirqd 100% cpu)
-AF_XDP  with  batch  +  zerocopy : 1.5 Mpps (with ksoftirqd 15% cpu)
-
-With af_xdp batch, the libxudp user-space program reaches a bottleneck.
-Therefore, the softirq did not reach the limit.
-
-This is just an RFC patch series, and some code details still need 
-further consideration. Please review this proposal.
-
-thanks!
-
-v1->v2:
-- all the patches pass checkpatch.pl test. suggested by Simon Horman.
-- iperf3 tested with -b 0, update the test results. suggested by Paolo Abeni.
-- refactor code to make code structure clearer.
-- delete some useless code logic in the veth_xsk_tx_xmit function.
-- add support for AF_XDP tx need_wakup feature.
-
-Albert Huang (9):
-  veth: Implement ethtool's get_ringparam() callback
-  xsk: add dma_check_skip for skipping dma check
-  veth: add support for send queue
-  xsk: add xsk_tx_completed_addr function
-  veth: use send queue tx napi to xmit xsk tx desc
-  veth: add ndo_xsk_wakeup callback for veth
-  sk_buff: add destructor_arg_xsk_pool for zero copy
-  veth: af_xdp tx batch support for ipv4 udp
-  veth: add support for AF_XDP tx need_wakup feature
-
- drivers/net/veth.c          | 679 +++++++++++++++++++++++++++++++++++-
- include/linux/skbuff.h      |   2 +
- include/net/xdp_sock_drv.h  |   1 +
- include/net/xsk_buff_pool.h |   1 +
- net/xdp/xsk.c               |   6 +
- net/xdp/xsk_buff_pool.c     |   3 +-
- net/xdp/xsk_queue.h         |  10 +
- 7 files changed, 700 insertions(+), 2 deletions(-)
-
+diff --git a/drivers/net/veth.c b/drivers/net/veth.c
+index 614f3e3efab0..77e12d52ca2b 100644
+--- a/drivers/net/veth.c
++++ b/drivers/net/veth.c
+@@ -255,6 +255,17 @@ static void veth_get_channels(struct net_device *dev,
+ static int veth_set_channels(struct net_device *dev,
+ 			     struct ethtool_channels *ch);
+ 
++static void veth_get_ringparam(struct net_device *dev,
++			       struct ethtool_ringparam *ring,
++			     struct kernel_ethtool_ringparam *kernel_ring,
++			     struct netlink_ext_ack *extack)
++{
++	ring->rx_max_pending = VETH_RING_SIZE;
++	ring->tx_max_pending = VETH_RING_SIZE;
++	ring->rx_pending = VETH_RING_SIZE;
++	ring->tx_pending = VETH_RING_SIZE;
++}
++
+ static const struct ethtool_ops veth_ethtool_ops = {
+ 	.get_drvinfo		= veth_get_drvinfo,
+ 	.get_link		= ethtool_op_get_link,
+@@ -265,6 +276,7 @@ static const struct ethtool_ops veth_ethtool_ops = {
+ 	.get_ts_info		= ethtool_op_get_ts_info,
+ 	.get_channels		= veth_get_channels,
+ 	.set_channels		= veth_set_channels,
++	.get_ringparam		= veth_get_ringparam,
+ };
+ 
+ /* general routines */
 -- 
 2.20.1
 
