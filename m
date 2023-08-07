@@ -1,56 +1,56 @@
-Return-Path: <netdev+bounces-25008-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25007-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D64177286B
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 16:58:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44ED1772865
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 16:58:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9ED461C20BBC
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 14:58:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5F9A11C20C0C
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 14:58:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F6CF11181;
-	Mon,  7 Aug 2023 14:57:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2AB31096D;
+	Mon,  7 Aug 2023 14:57:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3985410977
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFCBC1096C
 	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 14:57:58 +0000 (UTC)
-Received: from mail-qt1-x835.google.com (mail-qt1-x835.google.com [IPv6:2607:f8b0:4864:20::835])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DC2D10CC
-	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 07:57:35 -0700 (PDT)
-Received: by mail-qt1-x835.google.com with SMTP id d75a77b69052e-40fd2f6bd7cso34018701cf.1
-        for <netdev@vger.kernel.org>; Mon, 07 Aug 2023 07:57:35 -0700 (PDT)
+Received: from mail-qk1-x735.google.com (mail-qk1-x735.google.com [IPv6:2607:f8b0:4864:20::735])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1F5610CB
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 07:57:36 -0700 (PDT)
+Received: by mail-qk1-x735.google.com with SMTP id af79cd13be357-76c93abeb83so370285785a.0
+        for <netdev@vger.kernel.org>; Mon, 07 Aug 2023 07:57:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1691420254; x=1692025054;
+        d=broadcom.com; s=google; t=1691420256; x=1692025056;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=v/pGctMRN7SGGQx+NANiFZCqMwD07SP6OQq21vFSNQo=;
-        b=VnAyuuL9i9Q6j/vcvj+mvIImGvvI+Qq8DwRua0rUWWHjHfIVOb8pWo10vbwi7vVwy1
-         a3xspq0i5ZKJoLaQtKkEgm2NBcu3ys067umnMPDtad9gHOJYTBVU7UtWJdGJuoah6+ug
-         ly8AFJAfO3RCTNGio4Rg29gnmYHLxv6IfgxIY=
+        bh=GBqiI27yAPZPynJE10dhC10JdHqkRtThu8wvqom5m4g=;
+        b=djBUrWagVVxP9oz3aSReQWIVWox+O10n/8VbGzcreyMjyPM5YgDNlgFdQQ9yehmpE0
+         voNVKNrZzBIoYiMzTVo1B96gCpGpvgVxqXtamtzZo8UBqJ8WPcaBU8Pichfi1MgRZC3q
+         jH3MJWz948yJphsR4jxrLupj0z5XlZkUE92CA=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691420254; x=1692025054;
+        d=1e100.net; s=20221208; t=1691420256; x=1692025056;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=v/pGctMRN7SGGQx+NANiFZCqMwD07SP6OQq21vFSNQo=;
-        b=NgEMh+LIjptzarZ1N9idnlcAFe+6urDBly+XC98+KUmpZUeTPMCJaxVxsgTIX820LI
-         06Xwadlpo46U1xFCc2Y48/0TEFlldo6T+r596n2wSS705xjLbYvj4PUvMVNOfW9p4cAw
-         EbrLJIHBXLWHOMvFJPNvVTWhGHvFL673KW/1Ch5Fx9H652TMmI7xzheMl1AHYEUKh3rX
-         blFruez9/pT+kd8p6bTBBW3rrbwCd/SQF2DO8Tvp/94at+dfYLWTkRl8h9Et62llXHe4
-         veLmfm6x62RELSH90l3CVOunq9J7bQB/YEOJTrJwOjMOkktu8hWwg+lW6tZcO0+tLvTr
-         pnZA==
-X-Gm-Message-State: AOJu0Yx2MuRQcv8Nih93HVrJdL5qRKwvIqxoXRiQ6FjTCuNpa/+MIxv0
-	B+1sl30gs4ZSThLno8aWnJK2Wg==
-X-Google-Smtp-Source: AGHT+IHmnZHeIN5B2dNqs0+YfmzQzefBX7pDMxn276WyTDSd2S7MBl0sp7ZhqRPhzs4DI1eRJLFleQ==
-X-Received: by 2002:ac8:5ccb:0:b0:410:684:c3cf with SMTP id s11-20020ac85ccb000000b004100684c3cfmr8606159qta.11.1691420254277;
-        Mon, 07 Aug 2023 07:57:34 -0700 (PDT)
+        bh=GBqiI27yAPZPynJE10dhC10JdHqkRtThu8wvqom5m4g=;
+        b=bJDui5EOh5pBj9ArD6QeGfLkBnUyBxxzoH+zyTMBqkCYER+vWjxp1yhrda8GqR88RS
+         zYayYuE5G72Y38xGk+sDp5HezIh/1od1EX6ivMaW3aMTs5RS2Fhnd/jOJc/q9eL8JbaM
+         /wH3XGf6fUf4h98vylxmuetM6qTczkv8m3ol3Ot/RI4rksxniUn2P9sB3/rWlA4IzF3V
+         V0cqxZW1PGUzdYzODtVnlHhrlMHbUj4IVR5kLG1HH9aD0vUmz+NR6R2cZO3bEKAvXicd
+         ZLI6hdbrGxJA+/K+fzT0f7vUo+5rX3u6tIpigx//8HFeA4Fl4khsKKoaWdMu0LWPP8Ha
+         G7PA==
+X-Gm-Message-State: AOJu0YwtKQTEu/4kod2GUvHvqDsUycUFtiOjyMlAimhbokiDMjiiEo6x
+	DO9k0MeFuFB7buBeQbFQa08SdA==
+X-Google-Smtp-Source: AGHT+IE4wTvxC1oWp2iAxfxaIwGd+lVBXwxyaz/ZJFKfbJcgEUuoTBeTzl1ZqFTH/5ZICOMHhSUZOw==
+X-Received: by 2002:a05:620a:459f:b0:76c:54bc:a8f7 with SMTP id bp31-20020a05620a459f00b0076c54bca8f7mr12643007qkb.68.1691420255666;
+        Mon, 07 Aug 2023 07:57:35 -0700 (PDT)
 Received: from lvnvda5233.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id d18-20020ac800d2000000b00407906a4c6fsm2720973qtg.71.2023.08.07.07.57.32
+        by smtp.gmail.com with ESMTPSA id d18-20020ac800d2000000b00407906a4c6fsm2720973qtg.71.2023.08.07.07.57.34
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 07 Aug 2023 07:57:33 -0700 (PDT)
+        Mon, 07 Aug 2023 07:57:35 -0700 (PDT)
 From: Michael Chan <michael.chan@broadcom.com>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -58,11 +58,10 @@ Cc: netdev@vger.kernel.org,
 	kuba@kernel.org,
 	pabeni@redhat.com,
 	gospo@broadcom.com,
-	gustavo@embeddedor.com,
-	Andy Gospodarek <andrew.gospodarek@broadcom.com>
-Subject: [PATCH net-next 1/2] bnxt_en: Fix W=1 warning in bnxt_dcb.c from fortify memcpy()
-Date: Mon,  7 Aug 2023 07:57:19 -0700
-Message-Id: <20230807145720.159645-2-michael.chan@broadcom.com>
+	gustavo@embeddedor.com
+Subject: [PATCH net-next 2/2] bnxt_en: Fix W=stringop-overflow warning in bnxt_dcb.c
+Date: Mon,  7 Aug 2023 07:57:20 -0700
+Message-Id: <20230807145720.159645-3-michael.chan@broadcom.com>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20230807145720.159645-1-michael.chan@broadcom.com>
 References: <20230807145720.159645-1-michael.chan@broadcom.com>
@@ -73,7 +72,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000007475ed06025677d2"
+	boundary="000000000000895afb06025677a8"
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
 	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,UPPERCASE_50_75
@@ -81,405 +80,399 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
---0000000000007475ed06025677d2
+--000000000000895afb06025677a8
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
 Fix the following warning:
 
-inlined from ‘bnxt_hwrm_queue_cos2bw_qcfg’ at drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.c:165:3,
-./include/linux/fortify-string.h:592:4: error: call to ‘__read_overflow2_field’ declared with attribute warning: detected read beyond size of field (2nd parameter); maybe use struct_group()? [-Werror]
-    __read_overflow2_field(q_size_field, size);
-    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.c: In function ‘bnxt_hwrm_queue_cos2bw_cfg’:
+cc1: error: writing 12 bytes into a region of size 1 [-Werror=stringop-overflow ]
+In file included from drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.c:19:
+drivers/net/ethernet/broadcom/bnxt/bnxt_hsi.h:6045:17: note: destination object ‘unused_0’ of size 1
+ 6045 |         u8      unused_0;
 
-Modify the FW interface defintion of struct hwrm_queue_cos2bw_qcfg_output
-to use an array of sub struct for the queue1 to queue7 fields.  Note that
-the layout of the queue0 fields are different and these are not part of
-the array.  This makes the code much cleaner by removing the pointer
-arithmetic for memcpy().
+Fix it by modifying struct hwrm_queue_cos2bw_cfg_input to use an array
+of sub struct similar to the previous patch.  This will eliminate the
+pointer arithmetc to calculate the destination pointer passed to
+memcpy().
 
-Link: https://lore.kernel.org/netdev/20230727190726.1859515-2-kuba@kernel.org/
-Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
+Link: https://lore.kernel.org/netdev/CACKFLinikvXmKcxr4kjWO9TPYxTd2cb5agT1j=w9Qyj5-24s5A@mail.gmail.com/
 Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.c |  15 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.c |  11 +-
  drivers/net/ethernet/broadcom/bnxt/bnxt_hsi.h | 322 +++---------------
- 2 files changed, 52 insertions(+), 285 deletions(-)
+ 2 files changed, 49 insertions(+), 284 deletions(-)
 
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.c
-index 31f85f3e2364..052a0821153e 100644
+index 052a0821153e..63e067038385 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.c
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.c
-@@ -144,7 +144,6 @@ static int bnxt_hwrm_queue_cos2bw_qcfg(struct bnxt *bp, struct ieee_ets *ets)
- 	struct hwrm_queue_cos2bw_qcfg_output *resp;
- 	struct hwrm_queue_cos2bw_qcfg_input *req;
+@@ -98,7 +98,6 @@ static int bnxt_hwrm_queue_cos2bw_cfg(struct bnxt *bp, struct ieee_ets *ets,
+ {
+ 	struct hwrm_queue_cos2bw_cfg_input *req;
  	struct bnxt_cos2bw_cfg cos2bw;
 -	void *data;
  	int rc, i;
  
- 	rc = hwrm_req_init(bp, req, HWRM_QUEUE_COS2BW_QCFG);
-@@ -158,13 +157,19 @@ static int bnxt_hwrm_queue_cos2bw_qcfg(struct bnxt *bp, struct ieee_ets *ets)
- 		return rc;
- 	}
- 
--	data = &resp->queue_id0 + offsetof(struct bnxt_cos2bw_cfg, queue_id);
--	for (i = 0; i < bp->max_tc; i++, data += sizeof(cos2bw.cfg)) {
-+	for (i = 0; i < bp->max_tc; i++) {
- 		int tc;
- 
--		memcpy(&cos2bw.cfg, data, sizeof(cos2bw.cfg));
--		if (i == 0)
-+		if (i == 0) {
- 			cos2bw.queue_id = resp->queue_id0;
-+			cos2bw.min_bw = resp->queue_id0_min_bw;
-+			cos2bw.max_bw = resp->queue_id0_max_bw;
-+			cos2bw.tsa = resp->queue_id0_tsa_assign;
-+			cos2bw.pri_lvl = resp->queue_id0_pri_lvl;
-+			cos2bw.bw_weight = resp->queue_id0_bw_weight;
+ 	rc = hwrm_req_init(bp, req, HWRM_QUEUE_COS2BW_CFG);
+@@ -129,11 +128,15 @@ static int bnxt_hwrm_queue_cos2bw_cfg(struct bnxt *bp, struct ieee_ets *ets,
+ 				cpu_to_le32((ets->tc_tx_bw[i] * 100) |
+ 					    BW_VALUE_UNIT_PERCENT1_100);
+ 		}
+-		data = &req->unused_0 + qidx * (sizeof(cos2bw) - 4);
+-		memcpy(data, &cos2bw.cfg, sizeof(cos2bw) - 4);
+ 		if (qidx == 0) {
+ 			req->queue_id0 = cos2bw.queue_id;
+-			req->unused_0 = 0;
++			req->queue_id0_min_bw = cos2bw.min_bw;
++			req->queue_id0_max_bw = cos2bw.max_bw;
++			req->queue_id0_tsa_assign = cos2bw.tsa;
++			req->queue_id0_pri_lvl = cos2bw.pri_lvl;
++			req->queue_id0_bw_weight = cos2bw.bw_weight;
 +		} else {
-+			memcpy(&cos2bw.cfg, &resp->cfg[i - 1], sizeof(cos2bw.cfg));
-+		}
- 
- 		tc = bnxt_queue_to_tc(bp, cos2bw.queue_id);
- 		if (tc < 0)
++			memcpy(&req->cfg[i - 1], &cos2bw.cfg, sizeof(cos2bw.cfg));
+ 		}
+ 	}
+ 	return hwrm_req_send(bp, req);
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_hsi.h b/drivers/net/ethernet/broadcom/bnxt/bnxt_hsi.h
-index b31de4cf6534..fd38d5dcbc25 100644
+index fd38d5dcbc25..f178ed9899a9 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_hsi.h
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_hsi.h
-@@ -5739,286 +5739,48 @@ struct hwrm_queue_cos2bw_qcfg_output {
- 	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID0_TSA_ASSIGN_RESERVED_LAST  0xffUL
+@@ -5844,286 +5844,48 @@ struct hwrm_queue_cos2bw_cfg_input {
+ 	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID0_TSA_ASSIGN_RESERVED_LAST  0xffUL
  	u8	queue_id0_pri_lvl;
  	u8	queue_id0_bw_weight;
 -	u8	queue_id1;
 -	__le32	queue_id1_min_bw;
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID1_MIN_BW_BW_VALUE_MASK             0xfffffffUL
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID1_MIN_BW_BW_VALUE_SFT              0
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID1_MIN_BW_SCALE                     0x10000000UL
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID1_MIN_BW_SCALE_BITS                  (0x0UL << 28)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID1_MIN_BW_SCALE_BYTES                 (0x1UL << 28)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID1_MIN_BW_SCALE_LAST                 QUEUE_COS2BW_QCFG_RESP_QUEUE_ID1_MIN_BW_SCALE_BYTES
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID1_MIN_BW_BW_VALUE_UNIT_MASK        0xe0000000UL
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID1_MIN_BW_BW_VALUE_UNIT_SFT         29
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID1_MIN_BW_BW_VALUE_UNIT_MEGA          (0x0UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID1_MIN_BW_BW_VALUE_UNIT_KILO          (0x2UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID1_MIN_BW_BW_VALUE_UNIT_BASE          (0x4UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID1_MIN_BW_BW_VALUE_UNIT_GIGA          (0x6UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID1_MIN_BW_BW_VALUE_UNIT_PERCENT1_100  (0x1UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID1_MIN_BW_BW_VALUE_UNIT_INVALID       (0x7UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID1_MIN_BW_BW_VALUE_UNIT_LAST         QUEUE_COS2BW_QCFG_RESP_QUEUE_ID1_MIN_BW_BW_VALUE_UNIT_INVALID
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID1_MIN_BW_BW_VALUE_MASK             0xfffffffUL
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID1_MIN_BW_BW_VALUE_SFT              0
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID1_MIN_BW_SCALE                     0x10000000UL
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID1_MIN_BW_SCALE_BITS                  (0x0UL << 28)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID1_MIN_BW_SCALE_BYTES                 (0x1UL << 28)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID1_MIN_BW_SCALE_LAST                 QUEUE_COS2BW_CFG_REQ_QUEUE_ID1_MIN_BW_SCALE_BYTES
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID1_MIN_BW_BW_VALUE_UNIT_MASK        0xe0000000UL
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID1_MIN_BW_BW_VALUE_UNIT_SFT         29
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID1_MIN_BW_BW_VALUE_UNIT_MEGA          (0x0UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID1_MIN_BW_BW_VALUE_UNIT_KILO          (0x2UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID1_MIN_BW_BW_VALUE_UNIT_BASE          (0x4UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID1_MIN_BW_BW_VALUE_UNIT_GIGA          (0x6UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID1_MIN_BW_BW_VALUE_UNIT_PERCENT1_100  (0x1UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID1_MIN_BW_BW_VALUE_UNIT_INVALID       (0x7UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID1_MIN_BW_BW_VALUE_UNIT_LAST         QUEUE_COS2BW_CFG_REQ_QUEUE_ID1_MIN_BW_BW_VALUE_UNIT_INVALID
 -	__le32	queue_id1_max_bw;
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID1_MAX_BW_BW_VALUE_MASK             0xfffffffUL
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID1_MAX_BW_BW_VALUE_SFT              0
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID1_MAX_BW_SCALE                     0x10000000UL
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID1_MAX_BW_SCALE_BITS                  (0x0UL << 28)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID1_MAX_BW_SCALE_BYTES                 (0x1UL << 28)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID1_MAX_BW_SCALE_LAST                 QUEUE_COS2BW_QCFG_RESP_QUEUE_ID1_MAX_BW_SCALE_BYTES
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID1_MAX_BW_BW_VALUE_UNIT_MASK        0xe0000000UL
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID1_MAX_BW_BW_VALUE_UNIT_SFT         29
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID1_MAX_BW_BW_VALUE_UNIT_MEGA          (0x0UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID1_MAX_BW_BW_VALUE_UNIT_KILO          (0x2UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID1_MAX_BW_BW_VALUE_UNIT_BASE          (0x4UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID1_MAX_BW_BW_VALUE_UNIT_GIGA          (0x6UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID1_MAX_BW_BW_VALUE_UNIT_PERCENT1_100  (0x1UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID1_MAX_BW_BW_VALUE_UNIT_INVALID       (0x7UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID1_MAX_BW_BW_VALUE_UNIT_LAST         QUEUE_COS2BW_QCFG_RESP_QUEUE_ID1_MAX_BW_BW_VALUE_UNIT_INVALID
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID1_MAX_BW_BW_VALUE_MASK             0xfffffffUL
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID1_MAX_BW_BW_VALUE_SFT              0
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID1_MAX_BW_SCALE                     0x10000000UL
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID1_MAX_BW_SCALE_BITS                  (0x0UL << 28)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID1_MAX_BW_SCALE_BYTES                 (0x1UL << 28)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID1_MAX_BW_SCALE_LAST                 QUEUE_COS2BW_CFG_REQ_QUEUE_ID1_MAX_BW_SCALE_BYTES
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID1_MAX_BW_BW_VALUE_UNIT_MASK        0xe0000000UL
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID1_MAX_BW_BW_VALUE_UNIT_SFT         29
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID1_MAX_BW_BW_VALUE_UNIT_MEGA          (0x0UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID1_MAX_BW_BW_VALUE_UNIT_KILO          (0x2UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID1_MAX_BW_BW_VALUE_UNIT_BASE          (0x4UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID1_MAX_BW_BW_VALUE_UNIT_GIGA          (0x6UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID1_MAX_BW_BW_VALUE_UNIT_PERCENT1_100  (0x1UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID1_MAX_BW_BW_VALUE_UNIT_INVALID       (0x7UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID1_MAX_BW_BW_VALUE_UNIT_LAST         QUEUE_COS2BW_CFG_REQ_QUEUE_ID1_MAX_BW_BW_VALUE_UNIT_INVALID
 -	u8	queue_id1_tsa_assign;
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID1_TSA_ASSIGN_SP             0x0UL
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID1_TSA_ASSIGN_ETS            0x1UL
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID1_TSA_ASSIGN_RESERVED_FIRST 0x2UL
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID1_TSA_ASSIGN_RESERVED_LAST  0xffUL
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID1_TSA_ASSIGN_SP             0x0UL
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID1_TSA_ASSIGN_ETS            0x1UL
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID1_TSA_ASSIGN_RESERVED_FIRST 0x2UL
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID1_TSA_ASSIGN_RESERVED_LAST  0xffUL
 -	u8	queue_id1_pri_lvl;
 -	u8	queue_id1_bw_weight;
 -	u8	queue_id2;
 -	__le32	queue_id2_min_bw;
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID2_MIN_BW_BW_VALUE_MASK             0xfffffffUL
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID2_MIN_BW_BW_VALUE_SFT              0
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID2_MIN_BW_SCALE                     0x10000000UL
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID2_MIN_BW_SCALE_BITS                  (0x0UL << 28)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID2_MIN_BW_SCALE_BYTES                 (0x1UL << 28)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID2_MIN_BW_SCALE_LAST                 QUEUE_COS2BW_QCFG_RESP_QUEUE_ID2_MIN_BW_SCALE_BYTES
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID2_MIN_BW_BW_VALUE_UNIT_MASK        0xe0000000UL
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID2_MIN_BW_BW_VALUE_UNIT_SFT         29
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID2_MIN_BW_BW_VALUE_UNIT_MEGA          (0x0UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID2_MIN_BW_BW_VALUE_UNIT_KILO          (0x2UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID2_MIN_BW_BW_VALUE_UNIT_BASE          (0x4UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID2_MIN_BW_BW_VALUE_UNIT_GIGA          (0x6UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID2_MIN_BW_BW_VALUE_UNIT_PERCENT1_100  (0x1UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID2_MIN_BW_BW_VALUE_UNIT_INVALID       (0x7UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID2_MIN_BW_BW_VALUE_UNIT_LAST         QUEUE_COS2BW_QCFG_RESP_QUEUE_ID2_MIN_BW_BW_VALUE_UNIT_INVALID
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID2_MIN_BW_BW_VALUE_MASK             0xfffffffUL
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID2_MIN_BW_BW_VALUE_SFT              0
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID2_MIN_BW_SCALE                     0x10000000UL
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID2_MIN_BW_SCALE_BITS                  (0x0UL << 28)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID2_MIN_BW_SCALE_BYTES                 (0x1UL << 28)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID2_MIN_BW_SCALE_LAST                 QUEUE_COS2BW_CFG_REQ_QUEUE_ID2_MIN_BW_SCALE_BYTES
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID2_MIN_BW_BW_VALUE_UNIT_MASK        0xe0000000UL
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID2_MIN_BW_BW_VALUE_UNIT_SFT         29
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID2_MIN_BW_BW_VALUE_UNIT_MEGA          (0x0UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID2_MIN_BW_BW_VALUE_UNIT_KILO          (0x2UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID2_MIN_BW_BW_VALUE_UNIT_BASE          (0x4UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID2_MIN_BW_BW_VALUE_UNIT_GIGA          (0x6UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID2_MIN_BW_BW_VALUE_UNIT_PERCENT1_100  (0x1UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID2_MIN_BW_BW_VALUE_UNIT_INVALID       (0x7UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID2_MIN_BW_BW_VALUE_UNIT_LAST         QUEUE_COS2BW_CFG_REQ_QUEUE_ID2_MIN_BW_BW_VALUE_UNIT_INVALID
 -	__le32	queue_id2_max_bw;
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID2_MAX_BW_BW_VALUE_MASK             0xfffffffUL
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID2_MAX_BW_BW_VALUE_SFT              0
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID2_MAX_BW_SCALE                     0x10000000UL
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID2_MAX_BW_SCALE_BITS                  (0x0UL << 28)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID2_MAX_BW_SCALE_BYTES                 (0x1UL << 28)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID2_MAX_BW_SCALE_LAST                 QUEUE_COS2BW_QCFG_RESP_QUEUE_ID2_MAX_BW_SCALE_BYTES
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID2_MAX_BW_BW_VALUE_UNIT_MASK        0xe0000000UL
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID2_MAX_BW_BW_VALUE_UNIT_SFT         29
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID2_MAX_BW_BW_VALUE_UNIT_MEGA          (0x0UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID2_MAX_BW_BW_VALUE_UNIT_KILO          (0x2UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID2_MAX_BW_BW_VALUE_UNIT_BASE          (0x4UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID2_MAX_BW_BW_VALUE_UNIT_GIGA          (0x6UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID2_MAX_BW_BW_VALUE_UNIT_PERCENT1_100  (0x1UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID2_MAX_BW_BW_VALUE_UNIT_INVALID       (0x7UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID2_MAX_BW_BW_VALUE_UNIT_LAST         QUEUE_COS2BW_QCFG_RESP_QUEUE_ID2_MAX_BW_BW_VALUE_UNIT_INVALID
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID2_MAX_BW_BW_VALUE_MASK             0xfffffffUL
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID2_MAX_BW_BW_VALUE_SFT              0
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID2_MAX_BW_SCALE                     0x10000000UL
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID2_MAX_BW_SCALE_BITS                  (0x0UL << 28)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID2_MAX_BW_SCALE_BYTES                 (0x1UL << 28)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID2_MAX_BW_SCALE_LAST                 QUEUE_COS2BW_CFG_REQ_QUEUE_ID2_MAX_BW_SCALE_BYTES
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID2_MAX_BW_BW_VALUE_UNIT_MASK        0xe0000000UL
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID2_MAX_BW_BW_VALUE_UNIT_SFT         29
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID2_MAX_BW_BW_VALUE_UNIT_MEGA          (0x0UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID2_MAX_BW_BW_VALUE_UNIT_KILO          (0x2UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID2_MAX_BW_BW_VALUE_UNIT_BASE          (0x4UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID2_MAX_BW_BW_VALUE_UNIT_GIGA          (0x6UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID2_MAX_BW_BW_VALUE_UNIT_PERCENT1_100  (0x1UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID2_MAX_BW_BW_VALUE_UNIT_INVALID       (0x7UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID2_MAX_BW_BW_VALUE_UNIT_LAST         QUEUE_COS2BW_CFG_REQ_QUEUE_ID2_MAX_BW_BW_VALUE_UNIT_INVALID
 -	u8	queue_id2_tsa_assign;
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID2_TSA_ASSIGN_SP             0x0UL
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID2_TSA_ASSIGN_ETS            0x1UL
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID2_TSA_ASSIGN_RESERVED_FIRST 0x2UL
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID2_TSA_ASSIGN_RESERVED_LAST  0xffUL
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID2_TSA_ASSIGN_SP             0x0UL
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID2_TSA_ASSIGN_ETS            0x1UL
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID2_TSA_ASSIGN_RESERVED_FIRST 0x2UL
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID2_TSA_ASSIGN_RESERVED_LAST  0xffUL
 -	u8	queue_id2_pri_lvl;
 -	u8	queue_id2_bw_weight;
 -	u8	queue_id3;
 -	__le32	queue_id3_min_bw;
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID3_MIN_BW_BW_VALUE_MASK             0xfffffffUL
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID3_MIN_BW_BW_VALUE_SFT              0
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID3_MIN_BW_SCALE                     0x10000000UL
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID3_MIN_BW_SCALE_BITS                  (0x0UL << 28)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID3_MIN_BW_SCALE_BYTES                 (0x1UL << 28)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID3_MIN_BW_SCALE_LAST                 QUEUE_COS2BW_QCFG_RESP_QUEUE_ID3_MIN_BW_SCALE_BYTES
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID3_MIN_BW_BW_VALUE_UNIT_MASK        0xe0000000UL
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID3_MIN_BW_BW_VALUE_UNIT_SFT         29
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID3_MIN_BW_BW_VALUE_UNIT_MEGA          (0x0UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID3_MIN_BW_BW_VALUE_UNIT_KILO          (0x2UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID3_MIN_BW_BW_VALUE_UNIT_BASE          (0x4UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID3_MIN_BW_BW_VALUE_UNIT_GIGA          (0x6UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID3_MIN_BW_BW_VALUE_UNIT_PERCENT1_100  (0x1UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID3_MIN_BW_BW_VALUE_UNIT_INVALID       (0x7UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID3_MIN_BW_BW_VALUE_UNIT_LAST         QUEUE_COS2BW_QCFG_RESP_QUEUE_ID3_MIN_BW_BW_VALUE_UNIT_INVALID
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID3_MIN_BW_BW_VALUE_MASK             0xfffffffUL
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID3_MIN_BW_BW_VALUE_SFT              0
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID3_MIN_BW_SCALE                     0x10000000UL
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID3_MIN_BW_SCALE_BITS                  (0x0UL << 28)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID3_MIN_BW_SCALE_BYTES                 (0x1UL << 28)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID3_MIN_BW_SCALE_LAST                 QUEUE_COS2BW_CFG_REQ_QUEUE_ID3_MIN_BW_SCALE_BYTES
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID3_MIN_BW_BW_VALUE_UNIT_MASK        0xe0000000UL
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID3_MIN_BW_BW_VALUE_UNIT_SFT         29
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID3_MIN_BW_BW_VALUE_UNIT_MEGA          (0x0UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID3_MIN_BW_BW_VALUE_UNIT_KILO          (0x2UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID3_MIN_BW_BW_VALUE_UNIT_BASE          (0x4UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID3_MIN_BW_BW_VALUE_UNIT_GIGA          (0x6UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID3_MIN_BW_BW_VALUE_UNIT_PERCENT1_100  (0x1UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID3_MIN_BW_BW_VALUE_UNIT_INVALID       (0x7UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID3_MIN_BW_BW_VALUE_UNIT_LAST         QUEUE_COS2BW_CFG_REQ_QUEUE_ID3_MIN_BW_BW_VALUE_UNIT_INVALID
 -	__le32	queue_id3_max_bw;
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID3_MAX_BW_BW_VALUE_MASK             0xfffffffUL
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID3_MAX_BW_BW_VALUE_SFT              0
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID3_MAX_BW_SCALE                     0x10000000UL
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID3_MAX_BW_SCALE_BITS                  (0x0UL << 28)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID3_MAX_BW_SCALE_BYTES                 (0x1UL << 28)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID3_MAX_BW_SCALE_LAST                 QUEUE_COS2BW_QCFG_RESP_QUEUE_ID3_MAX_BW_SCALE_BYTES
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID3_MAX_BW_BW_VALUE_UNIT_MASK        0xe0000000UL
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID3_MAX_BW_BW_VALUE_UNIT_SFT         29
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID3_MAX_BW_BW_VALUE_UNIT_MEGA          (0x0UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID3_MAX_BW_BW_VALUE_UNIT_KILO          (0x2UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID3_MAX_BW_BW_VALUE_UNIT_BASE          (0x4UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID3_MAX_BW_BW_VALUE_UNIT_GIGA          (0x6UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID3_MAX_BW_BW_VALUE_UNIT_PERCENT1_100  (0x1UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID3_MAX_BW_BW_VALUE_UNIT_INVALID       (0x7UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID3_MAX_BW_BW_VALUE_UNIT_LAST         QUEUE_COS2BW_QCFG_RESP_QUEUE_ID3_MAX_BW_BW_VALUE_UNIT_INVALID
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID3_MAX_BW_BW_VALUE_MASK             0xfffffffUL
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID3_MAX_BW_BW_VALUE_SFT              0
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID3_MAX_BW_SCALE                     0x10000000UL
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID3_MAX_BW_SCALE_BITS                  (0x0UL << 28)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID3_MAX_BW_SCALE_BYTES                 (0x1UL << 28)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID3_MAX_BW_SCALE_LAST                 QUEUE_COS2BW_CFG_REQ_QUEUE_ID3_MAX_BW_SCALE_BYTES
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID3_MAX_BW_BW_VALUE_UNIT_MASK        0xe0000000UL
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID3_MAX_BW_BW_VALUE_UNIT_SFT         29
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID3_MAX_BW_BW_VALUE_UNIT_MEGA          (0x0UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID3_MAX_BW_BW_VALUE_UNIT_KILO          (0x2UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID3_MAX_BW_BW_VALUE_UNIT_BASE          (0x4UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID3_MAX_BW_BW_VALUE_UNIT_GIGA          (0x6UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID3_MAX_BW_BW_VALUE_UNIT_PERCENT1_100  (0x1UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID3_MAX_BW_BW_VALUE_UNIT_INVALID       (0x7UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID3_MAX_BW_BW_VALUE_UNIT_LAST         QUEUE_COS2BW_CFG_REQ_QUEUE_ID3_MAX_BW_BW_VALUE_UNIT_INVALID
 -	u8	queue_id3_tsa_assign;
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID3_TSA_ASSIGN_SP             0x0UL
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID3_TSA_ASSIGN_ETS            0x1UL
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID3_TSA_ASSIGN_RESERVED_FIRST 0x2UL
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID3_TSA_ASSIGN_RESERVED_LAST  0xffUL
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID3_TSA_ASSIGN_SP             0x0UL
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID3_TSA_ASSIGN_ETS            0x1UL
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID3_TSA_ASSIGN_RESERVED_FIRST 0x2UL
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID3_TSA_ASSIGN_RESERVED_LAST  0xffUL
 -	u8	queue_id3_pri_lvl;
 -	u8	queue_id3_bw_weight;
 -	u8	queue_id4;
 -	__le32	queue_id4_min_bw;
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID4_MIN_BW_BW_VALUE_MASK             0xfffffffUL
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID4_MIN_BW_BW_VALUE_SFT              0
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID4_MIN_BW_SCALE                     0x10000000UL
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID4_MIN_BW_SCALE_BITS                  (0x0UL << 28)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID4_MIN_BW_SCALE_BYTES                 (0x1UL << 28)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID4_MIN_BW_SCALE_LAST                 QUEUE_COS2BW_QCFG_RESP_QUEUE_ID4_MIN_BW_SCALE_BYTES
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID4_MIN_BW_BW_VALUE_UNIT_MASK        0xe0000000UL
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID4_MIN_BW_BW_VALUE_UNIT_SFT         29
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID4_MIN_BW_BW_VALUE_UNIT_MEGA          (0x0UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID4_MIN_BW_BW_VALUE_UNIT_KILO          (0x2UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID4_MIN_BW_BW_VALUE_UNIT_BASE          (0x4UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID4_MIN_BW_BW_VALUE_UNIT_GIGA          (0x6UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID4_MIN_BW_BW_VALUE_UNIT_PERCENT1_100  (0x1UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID4_MIN_BW_BW_VALUE_UNIT_INVALID       (0x7UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID4_MIN_BW_BW_VALUE_UNIT_LAST         QUEUE_COS2BW_QCFG_RESP_QUEUE_ID4_MIN_BW_BW_VALUE_UNIT_INVALID
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID4_MIN_BW_BW_VALUE_MASK             0xfffffffUL
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID4_MIN_BW_BW_VALUE_SFT              0
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID4_MIN_BW_SCALE                     0x10000000UL
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID4_MIN_BW_SCALE_BITS                  (0x0UL << 28)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID4_MIN_BW_SCALE_BYTES                 (0x1UL << 28)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID4_MIN_BW_SCALE_LAST                 QUEUE_COS2BW_CFG_REQ_QUEUE_ID4_MIN_BW_SCALE_BYTES
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID4_MIN_BW_BW_VALUE_UNIT_MASK        0xe0000000UL
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID4_MIN_BW_BW_VALUE_UNIT_SFT         29
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID4_MIN_BW_BW_VALUE_UNIT_MEGA          (0x0UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID4_MIN_BW_BW_VALUE_UNIT_KILO          (0x2UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID4_MIN_BW_BW_VALUE_UNIT_BASE          (0x4UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID4_MIN_BW_BW_VALUE_UNIT_GIGA          (0x6UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID4_MIN_BW_BW_VALUE_UNIT_PERCENT1_100  (0x1UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID4_MIN_BW_BW_VALUE_UNIT_INVALID       (0x7UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID4_MIN_BW_BW_VALUE_UNIT_LAST         QUEUE_COS2BW_CFG_REQ_QUEUE_ID4_MIN_BW_BW_VALUE_UNIT_INVALID
 -	__le32	queue_id4_max_bw;
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID4_MAX_BW_BW_VALUE_MASK             0xfffffffUL
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID4_MAX_BW_BW_VALUE_SFT              0
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID4_MAX_BW_SCALE                     0x10000000UL
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID4_MAX_BW_SCALE_BITS                  (0x0UL << 28)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID4_MAX_BW_SCALE_BYTES                 (0x1UL << 28)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID4_MAX_BW_SCALE_LAST                 QUEUE_COS2BW_QCFG_RESP_QUEUE_ID4_MAX_BW_SCALE_BYTES
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID4_MAX_BW_BW_VALUE_UNIT_MASK        0xe0000000UL
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID4_MAX_BW_BW_VALUE_UNIT_SFT         29
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID4_MAX_BW_BW_VALUE_UNIT_MEGA          (0x0UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID4_MAX_BW_BW_VALUE_UNIT_KILO          (0x2UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID4_MAX_BW_BW_VALUE_UNIT_BASE          (0x4UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID4_MAX_BW_BW_VALUE_UNIT_GIGA          (0x6UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID4_MAX_BW_BW_VALUE_UNIT_PERCENT1_100  (0x1UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID4_MAX_BW_BW_VALUE_UNIT_INVALID       (0x7UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID4_MAX_BW_BW_VALUE_UNIT_LAST         QUEUE_COS2BW_QCFG_RESP_QUEUE_ID4_MAX_BW_BW_VALUE_UNIT_INVALID
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID4_MAX_BW_BW_VALUE_MASK             0xfffffffUL
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID4_MAX_BW_BW_VALUE_SFT              0
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID4_MAX_BW_SCALE                     0x10000000UL
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID4_MAX_BW_SCALE_BITS                  (0x0UL << 28)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID4_MAX_BW_SCALE_BYTES                 (0x1UL << 28)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID4_MAX_BW_SCALE_LAST                 QUEUE_COS2BW_CFG_REQ_QUEUE_ID4_MAX_BW_SCALE_BYTES
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID4_MAX_BW_BW_VALUE_UNIT_MASK        0xe0000000UL
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID4_MAX_BW_BW_VALUE_UNIT_SFT         29
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID4_MAX_BW_BW_VALUE_UNIT_MEGA          (0x0UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID4_MAX_BW_BW_VALUE_UNIT_KILO          (0x2UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID4_MAX_BW_BW_VALUE_UNIT_BASE          (0x4UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID4_MAX_BW_BW_VALUE_UNIT_GIGA          (0x6UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID4_MAX_BW_BW_VALUE_UNIT_PERCENT1_100  (0x1UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID4_MAX_BW_BW_VALUE_UNIT_INVALID       (0x7UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID4_MAX_BW_BW_VALUE_UNIT_LAST         QUEUE_COS2BW_CFG_REQ_QUEUE_ID4_MAX_BW_BW_VALUE_UNIT_INVALID
 -	u8	queue_id4_tsa_assign;
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID4_TSA_ASSIGN_SP             0x0UL
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID4_TSA_ASSIGN_ETS            0x1UL
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID4_TSA_ASSIGN_RESERVED_FIRST 0x2UL
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID4_TSA_ASSIGN_RESERVED_LAST  0xffUL
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID4_TSA_ASSIGN_SP             0x0UL
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID4_TSA_ASSIGN_ETS            0x1UL
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID4_TSA_ASSIGN_RESERVED_FIRST 0x2UL
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID4_TSA_ASSIGN_RESERVED_LAST  0xffUL
 -	u8	queue_id4_pri_lvl;
 -	u8	queue_id4_bw_weight;
 -	u8	queue_id5;
 -	__le32	queue_id5_min_bw;
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID5_MIN_BW_BW_VALUE_MASK             0xfffffffUL
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID5_MIN_BW_BW_VALUE_SFT              0
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID5_MIN_BW_SCALE                     0x10000000UL
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID5_MIN_BW_SCALE_BITS                  (0x0UL << 28)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID5_MIN_BW_SCALE_BYTES                 (0x1UL << 28)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID5_MIN_BW_SCALE_LAST                 QUEUE_COS2BW_QCFG_RESP_QUEUE_ID5_MIN_BW_SCALE_BYTES
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID5_MIN_BW_BW_VALUE_UNIT_MASK        0xe0000000UL
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID5_MIN_BW_BW_VALUE_UNIT_SFT         29
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID5_MIN_BW_BW_VALUE_UNIT_MEGA          (0x0UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID5_MIN_BW_BW_VALUE_UNIT_KILO          (0x2UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID5_MIN_BW_BW_VALUE_UNIT_BASE          (0x4UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID5_MIN_BW_BW_VALUE_UNIT_GIGA          (0x6UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID5_MIN_BW_BW_VALUE_UNIT_PERCENT1_100  (0x1UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID5_MIN_BW_BW_VALUE_UNIT_INVALID       (0x7UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID5_MIN_BW_BW_VALUE_UNIT_LAST         QUEUE_COS2BW_QCFG_RESP_QUEUE_ID5_MIN_BW_BW_VALUE_UNIT_INVALID
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID5_MIN_BW_BW_VALUE_MASK             0xfffffffUL
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID5_MIN_BW_BW_VALUE_SFT              0
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID5_MIN_BW_SCALE                     0x10000000UL
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID5_MIN_BW_SCALE_BITS                  (0x0UL << 28)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID5_MIN_BW_SCALE_BYTES                 (0x1UL << 28)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID5_MIN_BW_SCALE_LAST                 QUEUE_COS2BW_CFG_REQ_QUEUE_ID5_MIN_BW_SCALE_BYTES
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID5_MIN_BW_BW_VALUE_UNIT_MASK        0xe0000000UL
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID5_MIN_BW_BW_VALUE_UNIT_SFT         29
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID5_MIN_BW_BW_VALUE_UNIT_MEGA          (0x0UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID5_MIN_BW_BW_VALUE_UNIT_KILO          (0x2UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID5_MIN_BW_BW_VALUE_UNIT_BASE          (0x4UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID5_MIN_BW_BW_VALUE_UNIT_GIGA          (0x6UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID5_MIN_BW_BW_VALUE_UNIT_PERCENT1_100  (0x1UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID5_MIN_BW_BW_VALUE_UNIT_INVALID       (0x7UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID5_MIN_BW_BW_VALUE_UNIT_LAST         QUEUE_COS2BW_CFG_REQ_QUEUE_ID5_MIN_BW_BW_VALUE_UNIT_INVALID
 -	__le32	queue_id5_max_bw;
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID5_MAX_BW_BW_VALUE_MASK             0xfffffffUL
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID5_MAX_BW_BW_VALUE_SFT              0
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID5_MAX_BW_SCALE                     0x10000000UL
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID5_MAX_BW_SCALE_BITS                  (0x0UL << 28)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID5_MAX_BW_SCALE_BYTES                 (0x1UL << 28)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID5_MAX_BW_SCALE_LAST                 QUEUE_COS2BW_QCFG_RESP_QUEUE_ID5_MAX_BW_SCALE_BYTES
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID5_MAX_BW_BW_VALUE_UNIT_MASK        0xe0000000UL
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID5_MAX_BW_BW_VALUE_UNIT_SFT         29
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID5_MAX_BW_BW_VALUE_UNIT_MEGA          (0x0UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID5_MAX_BW_BW_VALUE_UNIT_KILO          (0x2UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID5_MAX_BW_BW_VALUE_UNIT_BASE          (0x4UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID5_MAX_BW_BW_VALUE_UNIT_GIGA          (0x6UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID5_MAX_BW_BW_VALUE_UNIT_PERCENT1_100  (0x1UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID5_MAX_BW_BW_VALUE_UNIT_INVALID       (0x7UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID5_MAX_BW_BW_VALUE_UNIT_LAST         QUEUE_COS2BW_QCFG_RESP_QUEUE_ID5_MAX_BW_BW_VALUE_UNIT_INVALID
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID5_MAX_BW_BW_VALUE_MASK             0xfffffffUL
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID5_MAX_BW_BW_VALUE_SFT              0
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID5_MAX_BW_SCALE                     0x10000000UL
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID5_MAX_BW_SCALE_BITS                  (0x0UL << 28)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID5_MAX_BW_SCALE_BYTES                 (0x1UL << 28)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID5_MAX_BW_SCALE_LAST                 QUEUE_COS2BW_CFG_REQ_QUEUE_ID5_MAX_BW_SCALE_BYTES
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID5_MAX_BW_BW_VALUE_UNIT_MASK        0xe0000000UL
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID5_MAX_BW_BW_VALUE_UNIT_SFT         29
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID5_MAX_BW_BW_VALUE_UNIT_MEGA          (0x0UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID5_MAX_BW_BW_VALUE_UNIT_KILO          (0x2UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID5_MAX_BW_BW_VALUE_UNIT_BASE          (0x4UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID5_MAX_BW_BW_VALUE_UNIT_GIGA          (0x6UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID5_MAX_BW_BW_VALUE_UNIT_PERCENT1_100  (0x1UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID5_MAX_BW_BW_VALUE_UNIT_INVALID       (0x7UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID5_MAX_BW_BW_VALUE_UNIT_LAST         QUEUE_COS2BW_CFG_REQ_QUEUE_ID5_MAX_BW_BW_VALUE_UNIT_INVALID
 -	u8	queue_id5_tsa_assign;
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID5_TSA_ASSIGN_SP             0x0UL
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID5_TSA_ASSIGN_ETS            0x1UL
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID5_TSA_ASSIGN_RESERVED_FIRST 0x2UL
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID5_TSA_ASSIGN_RESERVED_LAST  0xffUL
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID5_TSA_ASSIGN_SP             0x0UL
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID5_TSA_ASSIGN_ETS            0x1UL
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID5_TSA_ASSIGN_RESERVED_FIRST 0x2UL
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID5_TSA_ASSIGN_RESERVED_LAST  0xffUL
 -	u8	queue_id5_pri_lvl;
 -	u8	queue_id5_bw_weight;
 -	u8	queue_id6;
 -	__le32	queue_id6_min_bw;
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID6_MIN_BW_BW_VALUE_MASK             0xfffffffUL
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID6_MIN_BW_BW_VALUE_SFT              0
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID6_MIN_BW_SCALE                     0x10000000UL
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID6_MIN_BW_SCALE_BITS                  (0x0UL << 28)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID6_MIN_BW_SCALE_BYTES                 (0x1UL << 28)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID6_MIN_BW_SCALE_LAST                 QUEUE_COS2BW_QCFG_RESP_QUEUE_ID6_MIN_BW_SCALE_BYTES
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID6_MIN_BW_BW_VALUE_UNIT_MASK        0xe0000000UL
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID6_MIN_BW_BW_VALUE_UNIT_SFT         29
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID6_MIN_BW_BW_VALUE_UNIT_MEGA          (0x0UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID6_MIN_BW_BW_VALUE_UNIT_KILO          (0x2UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID6_MIN_BW_BW_VALUE_UNIT_BASE          (0x4UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID6_MIN_BW_BW_VALUE_UNIT_GIGA          (0x6UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID6_MIN_BW_BW_VALUE_UNIT_PERCENT1_100  (0x1UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID6_MIN_BW_BW_VALUE_UNIT_INVALID       (0x7UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID6_MIN_BW_BW_VALUE_UNIT_LAST         QUEUE_COS2BW_QCFG_RESP_QUEUE_ID6_MIN_BW_BW_VALUE_UNIT_INVALID
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID6_MIN_BW_BW_VALUE_MASK             0xfffffffUL
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID6_MIN_BW_BW_VALUE_SFT              0
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID6_MIN_BW_SCALE                     0x10000000UL
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID6_MIN_BW_SCALE_BITS                  (0x0UL << 28)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID6_MIN_BW_SCALE_BYTES                 (0x1UL << 28)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID6_MIN_BW_SCALE_LAST                 QUEUE_COS2BW_CFG_REQ_QUEUE_ID6_MIN_BW_SCALE_BYTES
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID6_MIN_BW_BW_VALUE_UNIT_MASK        0xe0000000UL
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID6_MIN_BW_BW_VALUE_UNIT_SFT         29
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID6_MIN_BW_BW_VALUE_UNIT_MEGA          (0x0UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID6_MIN_BW_BW_VALUE_UNIT_KILO          (0x2UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID6_MIN_BW_BW_VALUE_UNIT_BASE          (0x4UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID6_MIN_BW_BW_VALUE_UNIT_GIGA          (0x6UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID6_MIN_BW_BW_VALUE_UNIT_PERCENT1_100  (0x1UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID6_MIN_BW_BW_VALUE_UNIT_INVALID       (0x7UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID6_MIN_BW_BW_VALUE_UNIT_LAST         QUEUE_COS2BW_CFG_REQ_QUEUE_ID6_MIN_BW_BW_VALUE_UNIT_INVALID
 -	__le32	queue_id6_max_bw;
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID6_MAX_BW_BW_VALUE_MASK             0xfffffffUL
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID6_MAX_BW_BW_VALUE_SFT              0
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID6_MAX_BW_SCALE                     0x10000000UL
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID6_MAX_BW_SCALE_BITS                  (0x0UL << 28)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID6_MAX_BW_SCALE_BYTES                 (0x1UL << 28)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID6_MAX_BW_SCALE_LAST                 QUEUE_COS2BW_QCFG_RESP_QUEUE_ID6_MAX_BW_SCALE_BYTES
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID6_MAX_BW_BW_VALUE_UNIT_MASK        0xe0000000UL
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID6_MAX_BW_BW_VALUE_UNIT_SFT         29
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID6_MAX_BW_BW_VALUE_UNIT_MEGA          (0x0UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID6_MAX_BW_BW_VALUE_UNIT_KILO          (0x2UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID6_MAX_BW_BW_VALUE_UNIT_BASE          (0x4UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID6_MAX_BW_BW_VALUE_UNIT_GIGA          (0x6UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID6_MAX_BW_BW_VALUE_UNIT_PERCENT1_100  (0x1UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID6_MAX_BW_BW_VALUE_UNIT_INVALID       (0x7UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID6_MAX_BW_BW_VALUE_UNIT_LAST         QUEUE_COS2BW_QCFG_RESP_QUEUE_ID6_MAX_BW_BW_VALUE_UNIT_INVALID
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID6_MAX_BW_BW_VALUE_MASK             0xfffffffUL
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID6_MAX_BW_BW_VALUE_SFT              0
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID6_MAX_BW_SCALE                     0x10000000UL
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID6_MAX_BW_SCALE_BITS                  (0x0UL << 28)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID6_MAX_BW_SCALE_BYTES                 (0x1UL << 28)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID6_MAX_BW_SCALE_LAST                 QUEUE_COS2BW_CFG_REQ_QUEUE_ID6_MAX_BW_SCALE_BYTES
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID6_MAX_BW_BW_VALUE_UNIT_MASK        0xe0000000UL
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID6_MAX_BW_BW_VALUE_UNIT_SFT         29
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID6_MAX_BW_BW_VALUE_UNIT_MEGA          (0x0UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID6_MAX_BW_BW_VALUE_UNIT_KILO          (0x2UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID6_MAX_BW_BW_VALUE_UNIT_BASE          (0x4UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID6_MAX_BW_BW_VALUE_UNIT_GIGA          (0x6UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID6_MAX_BW_BW_VALUE_UNIT_PERCENT1_100  (0x1UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID6_MAX_BW_BW_VALUE_UNIT_INVALID       (0x7UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID6_MAX_BW_BW_VALUE_UNIT_LAST         QUEUE_COS2BW_CFG_REQ_QUEUE_ID6_MAX_BW_BW_VALUE_UNIT_INVALID
 -	u8	queue_id6_tsa_assign;
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID6_TSA_ASSIGN_SP             0x0UL
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID6_TSA_ASSIGN_ETS            0x1UL
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID6_TSA_ASSIGN_RESERVED_FIRST 0x2UL
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID6_TSA_ASSIGN_RESERVED_LAST  0xffUL
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID6_TSA_ASSIGN_SP             0x0UL
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID6_TSA_ASSIGN_ETS            0x1UL
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID6_TSA_ASSIGN_RESERVED_FIRST 0x2UL
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID6_TSA_ASSIGN_RESERVED_LAST  0xffUL
 -	u8	queue_id6_pri_lvl;
 -	u8	queue_id6_bw_weight;
 -	u8	queue_id7;
 -	__le32	queue_id7_min_bw;
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID7_MIN_BW_BW_VALUE_MASK             0xfffffffUL
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID7_MIN_BW_BW_VALUE_SFT              0
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID7_MIN_BW_SCALE                     0x10000000UL
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID7_MIN_BW_SCALE_BITS                  (0x0UL << 28)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID7_MIN_BW_SCALE_BYTES                 (0x1UL << 28)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID7_MIN_BW_SCALE_LAST                 QUEUE_COS2BW_QCFG_RESP_QUEUE_ID7_MIN_BW_SCALE_BYTES
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID7_MIN_BW_BW_VALUE_UNIT_MASK        0xe0000000UL
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID7_MIN_BW_BW_VALUE_UNIT_SFT         29
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID7_MIN_BW_BW_VALUE_UNIT_MEGA          (0x0UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID7_MIN_BW_BW_VALUE_UNIT_KILO          (0x2UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID7_MIN_BW_BW_VALUE_UNIT_BASE          (0x4UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID7_MIN_BW_BW_VALUE_UNIT_GIGA          (0x6UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID7_MIN_BW_BW_VALUE_UNIT_PERCENT1_100  (0x1UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID7_MIN_BW_BW_VALUE_UNIT_INVALID       (0x7UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID7_MIN_BW_BW_VALUE_UNIT_LAST         QUEUE_COS2BW_QCFG_RESP_QUEUE_ID7_MIN_BW_BW_VALUE_UNIT_INVALID
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID7_MIN_BW_BW_VALUE_MASK             0xfffffffUL
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID7_MIN_BW_BW_VALUE_SFT              0
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID7_MIN_BW_SCALE                     0x10000000UL
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID7_MIN_BW_SCALE_BITS                  (0x0UL << 28)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID7_MIN_BW_SCALE_BYTES                 (0x1UL << 28)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID7_MIN_BW_SCALE_LAST                 QUEUE_COS2BW_CFG_REQ_QUEUE_ID7_MIN_BW_SCALE_BYTES
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID7_MIN_BW_BW_VALUE_UNIT_MASK        0xe0000000UL
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID7_MIN_BW_BW_VALUE_UNIT_SFT         29
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID7_MIN_BW_BW_VALUE_UNIT_MEGA          (0x0UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID7_MIN_BW_BW_VALUE_UNIT_KILO          (0x2UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID7_MIN_BW_BW_VALUE_UNIT_BASE          (0x4UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID7_MIN_BW_BW_VALUE_UNIT_GIGA          (0x6UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID7_MIN_BW_BW_VALUE_UNIT_PERCENT1_100  (0x1UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID7_MIN_BW_BW_VALUE_UNIT_INVALID       (0x7UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID7_MIN_BW_BW_VALUE_UNIT_LAST         QUEUE_COS2BW_CFG_REQ_QUEUE_ID7_MIN_BW_BW_VALUE_UNIT_INVALID
 -	__le32	queue_id7_max_bw;
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID7_MAX_BW_BW_VALUE_MASK             0xfffffffUL
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID7_MAX_BW_BW_VALUE_SFT              0
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID7_MAX_BW_SCALE                     0x10000000UL
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID7_MAX_BW_SCALE_BITS                  (0x0UL << 28)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID7_MAX_BW_SCALE_BYTES                 (0x1UL << 28)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID7_MAX_BW_SCALE_LAST                 QUEUE_COS2BW_QCFG_RESP_QUEUE_ID7_MAX_BW_SCALE_BYTES
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID7_MAX_BW_BW_VALUE_UNIT_MASK        0xe0000000UL
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID7_MAX_BW_BW_VALUE_UNIT_SFT         29
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID7_MAX_BW_BW_VALUE_UNIT_MEGA          (0x0UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID7_MAX_BW_BW_VALUE_UNIT_KILO          (0x2UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID7_MAX_BW_BW_VALUE_UNIT_BASE          (0x4UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID7_MAX_BW_BW_VALUE_UNIT_GIGA          (0x6UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID7_MAX_BW_BW_VALUE_UNIT_PERCENT1_100  (0x1UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID7_MAX_BW_BW_VALUE_UNIT_INVALID       (0x7UL << 29)
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID7_MAX_BW_BW_VALUE_UNIT_LAST         QUEUE_COS2BW_QCFG_RESP_QUEUE_ID7_MAX_BW_BW_VALUE_UNIT_INVALID
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID7_MAX_BW_BW_VALUE_MASK             0xfffffffUL
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID7_MAX_BW_BW_VALUE_SFT              0
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID7_MAX_BW_SCALE                     0x10000000UL
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID7_MAX_BW_SCALE_BITS                  (0x0UL << 28)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID7_MAX_BW_SCALE_BYTES                 (0x1UL << 28)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID7_MAX_BW_SCALE_LAST                 QUEUE_COS2BW_CFG_REQ_QUEUE_ID7_MAX_BW_SCALE_BYTES
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID7_MAX_BW_BW_VALUE_UNIT_MASK        0xe0000000UL
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID7_MAX_BW_BW_VALUE_UNIT_SFT         29
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID7_MAX_BW_BW_VALUE_UNIT_MEGA          (0x0UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID7_MAX_BW_BW_VALUE_UNIT_KILO          (0x2UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID7_MAX_BW_BW_VALUE_UNIT_BASE          (0x4UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID7_MAX_BW_BW_VALUE_UNIT_GIGA          (0x6UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID7_MAX_BW_BW_VALUE_UNIT_PERCENT1_100  (0x1UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID7_MAX_BW_BW_VALUE_UNIT_INVALID       (0x7UL << 29)
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID7_MAX_BW_BW_VALUE_UNIT_LAST         QUEUE_COS2BW_CFG_REQ_QUEUE_ID7_MAX_BW_BW_VALUE_UNIT_INVALID
 -	u8	queue_id7_tsa_assign;
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID7_TSA_ASSIGN_SP             0x0UL
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID7_TSA_ASSIGN_ETS            0x1UL
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID7_TSA_ASSIGN_RESERVED_FIRST 0x2UL
--	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID7_TSA_ASSIGN_RESERVED_LAST  0xffUL
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID7_TSA_ASSIGN_SP             0x0UL
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID7_TSA_ASSIGN_ETS            0x1UL
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID7_TSA_ASSIGN_RESERVED_FIRST 0x2UL
+-	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID7_TSA_ASSIGN_RESERVED_LAST  0xffUL
 -	u8	queue_id7_pri_lvl;
 -	u8	queue_id7_bw_weight;
 +	struct {
 +		u8	queue_id;
 +		__le32	queue_id_min_bw;
-+	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID_MIN_BW_BW_VALUE_MASK             0xfffffffUL
-+	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID_MIN_BW_BW_VALUE_SFT              0
-+	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID_MIN_BW_SCALE                     0x10000000UL
-+	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID_MIN_BW_SCALE_BITS                  (0x0UL << 28)
-+	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID_MIN_BW_SCALE_BYTES                 (0x1UL << 28)
-+	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID_MIN_BW_SCALE_LAST                 QUEUE_COS2BW_QCFG_RESP_QUEUE_ID_MIN_BW_SCALE_BYTES
-+	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID_MIN_BW_BW_VALUE_UNIT_MASK        0xe0000000UL
-+	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID_MIN_BW_BW_VALUE_UNIT_SFT         29
-+	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID_MIN_BW_BW_VALUE_UNIT_MEGA          (0x0UL << 29)
-+	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID_MIN_BW_BW_VALUE_UNIT_KILO          (0x2UL << 29)
-+	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID_MIN_BW_BW_VALUE_UNIT_BASE          (0x4UL << 29)
-+	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID_MIN_BW_BW_VALUE_UNIT_GIGA          (0x6UL << 29)
-+	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID_MIN_BW_BW_VALUE_UNIT_PERCENT1_100  (0x1UL << 29)
-+	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID_MIN_BW_BW_VALUE_UNIT_INVALID       (0x7UL << 29)
-+	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID_MIN_BW_BW_VALUE_UNIT_LAST         QUEUE_COS2BW_QCFG_RESP_QUEUE_ID_MIN_BW_BW_VALUE_UNIT_INVALID
++	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID_MIN_BW_BW_VALUE_MASK             0xfffffffUL
++	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID_MIN_BW_BW_VALUE_SFT              0
++	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID_MIN_BW_SCALE                     0x10000000UL
++	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID_MIN_BW_SCALE_BITS                  (0x0UL << 28)
++	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID_MIN_BW_SCALE_BYTES                 (0x1UL << 28)
++	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID_MIN_BW_SCALE_LAST                 QUEUE_COS2BW_CFG_REQ_QUEUE_ID_MIN_BW_SCALE_BYTES
++	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID_MIN_BW_BW_VALUE_UNIT_MASK        0xe0000000UL
++	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID_MIN_BW_BW_VALUE_UNIT_SFT         29
++	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID_MIN_BW_BW_VALUE_UNIT_MEGA          (0x0UL << 29)
++	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID_MIN_BW_BW_VALUE_UNIT_KILO          (0x2UL << 29)
++	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID_MIN_BW_BW_VALUE_UNIT_BASE          (0x4UL << 29)
++	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID_MIN_BW_BW_VALUE_UNIT_GIGA          (0x6UL << 29)
++	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID_MIN_BW_BW_VALUE_UNIT_PERCENT1_100  (0x1UL << 29)
++	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID_MIN_BW_BW_VALUE_UNIT_INVALID       (0x7UL << 29)
++	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID_MIN_BW_BW_VALUE_UNIT_LAST         QUEUE_COS2BW_CFG_REQ_QUEUE_ID_MIN_BW_BW_VALUE_UNIT_INVALID
 +		__le32	queue_id_max_bw;
-+	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID_MAX_BW_BW_VALUE_MASK             0xfffffffUL
-+	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID_MAX_BW_BW_VALUE_SFT              0
-+	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID_MAX_BW_SCALE                     0x10000000UL
-+	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID_MAX_BW_SCALE_BITS                  (0x0UL << 28)
-+	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID_MAX_BW_SCALE_BYTES                 (0x1UL << 28)
-+	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID_MAX_BW_SCALE_LAST                 QUEUE_COS2BW_QCFG_RESP_QUEUE_ID_MAX_BW_SCALE_BYTES
-+	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID_MAX_BW_BW_VALUE_UNIT_MASK        0xe0000000UL
-+	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID_MAX_BW_BW_VALUE_UNIT_SFT         29
-+	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID_MAX_BW_BW_VALUE_UNIT_MEGA          (0x0UL << 29)
-+	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID_MAX_BW_BW_VALUE_UNIT_KILO          (0x2UL << 29)
-+	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID_MAX_BW_BW_VALUE_UNIT_BASE          (0x4UL << 29)
-+	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID_MAX_BW_BW_VALUE_UNIT_GIGA          (0x6UL << 29)
-+	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID_MAX_BW_BW_VALUE_UNIT_PERCENT1_100  (0x1UL << 29)
-+	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID_MAX_BW_BW_VALUE_UNIT_INVALID       (0x7UL << 29)
-+	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID_MAX_BW_BW_VALUE_UNIT_LAST         QUEUE_COS2BW_QCFG_RESP_QUEUE_ID_MAX_BW_BW_VALUE_UNIT_INVALID
++	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID_MAX_BW_BW_VALUE_MASK             0xfffffffUL
++	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID_MAX_BW_BW_VALUE_SFT              0
++	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID_MAX_BW_SCALE                     0x10000000UL
++	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID_MAX_BW_SCALE_BITS                  (0x0UL << 28)
++	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID_MAX_BW_SCALE_BYTES                 (0x1UL << 28)
++	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID_MAX_BW_SCALE_LAST                 QUEUE_COS2BW_CFG_REQ_QUEUE_ID_MAX_BW_SCALE_BYTES
++	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID_MAX_BW_BW_VALUE_UNIT_MASK        0xe0000000UL
++	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID_MAX_BW_BW_VALUE_UNIT_SFT         29
++	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID_MAX_BW_BW_VALUE_UNIT_MEGA          (0x0UL << 29)
++	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID_MAX_BW_BW_VALUE_UNIT_KILO          (0x2UL << 29)
++	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID_MAX_BW_BW_VALUE_UNIT_BASE          (0x4UL << 29)
++	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID_MAX_BW_BW_VALUE_UNIT_GIGA          (0x6UL << 29)
++	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID_MAX_BW_BW_VALUE_UNIT_PERCENT1_100  (0x1UL << 29)
++	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID_MAX_BW_BW_VALUE_UNIT_INVALID       (0x7UL << 29)
++	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID_MAX_BW_BW_VALUE_UNIT_LAST         QUEUE_COS2BW_CFG_REQ_QUEUE_ID_MAX_BW_BW_VALUE_UNIT_INVALID
 +		u8	queue_id_tsa_assign;
-+	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID_TSA_ASSIGN_SP             0x0UL
-+	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID_TSA_ASSIGN_ETS            0x1UL
-+	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID_TSA_ASSIGN_RESERVED_FIRST 0x2UL
-+	#define QUEUE_COS2BW_QCFG_RESP_QUEUE_ID_TSA_ASSIGN_RESERVED_LAST  0xffUL
++	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID_TSA_ASSIGN_SP             0x0UL
++	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID_TSA_ASSIGN_ETS            0x1UL
++	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID_TSA_ASSIGN_RESERVED_FIRST 0x2UL
++	#define QUEUE_COS2BW_CFG_REQ_QUEUE_ID_TSA_ASSIGN_RESERVED_LAST  0xffUL
 +		u8	queue_id_pri_lvl;
 +		u8	queue_id_bw_weight;
 +	} __packed cfg[7];
- 	u8	unused_2[4];
- 	u8	valid;
+ 	u8	unused_1[5];
  };
+ 
 -- 
 2.30.1
 
 
---0000000000007475ed06025677d2
+--000000000000895afb06025677a8
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -550,14 +543,14 @@ hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
 E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
 aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
 EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIKxQEGQxMTn3KoNvQ2eaDOiXRvXMk5Ua
-juAmZR3N4QDzMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMDgw
-NzE0NTczNFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIBxbi2+CBcDOhZ+bGOZhDxePM1zg9N3V
+3hrs32ZSVNn7MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMDgw
+NzE0NTczNlowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
 SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQBDLfdjdX9yQNJXhNm5CudqeZ0GSusl7bTaL6XpZmOuo8fomCrN
-YH7oLNnHmOvjIBguSCUiPyPFBClJbkBl1wmmJoFUirP0N9G3YTDAbc2CyxD3YfUrRfQNgJ02dGVU
-ZXCXC1fjDLDJIWdB8w4EoMr6riNWkxeGCswyn2ixo4lYKDmY3IDQyuUe0Te99IqaXJ7cQVJeTwEl
-tbbBkNoWblOAW6qnDOxybKaVuPMAsN7Dy0q3Te8dGfH360xyy73bn/qByIMlUyjX7wJbr86/+1fN
-dFVnKGde7avyTIMFr/L/EtpIpwd121VZf8asABNWv0Ow7pmAorQeWZvvLX/zqx6L
---0000000000007475ed06025677d2--
+ATANBgkqhkiG9w0BAQEFAASCAQBAPuP5hO5Mk9gq6Bd5QR1yGhw+jfXMSqSv/M69wHn2Nt+pzPoO
+ECBvohXa1XtvYlUPLMT0MIRFYeVXH3gLsOV6eB7KTQH0lVvp7V3RjriA6Je56zJOjpvnxXwrFgK5
+tWmO5du8reHE/ftsMeuEroynGhuDj1B1ogQROZf0P8WqOaWcHl0PEsifq/cCxzXRuxMEg20B2kSO
+D/w2NvPRWPa6GpMrdGGshFGWBtlCG0drVbCjmZP5JbZMnBJEDiGakuc2D1m8VE+4DWRxX8TzFTcH
+AD+/Bc/eADSvc4n0vqehhxXhEP7DhmuluBiZuHvbzfbF6in6FeFW7szA8vt7N3p2
+--000000000000895afb06025677a8--
 
