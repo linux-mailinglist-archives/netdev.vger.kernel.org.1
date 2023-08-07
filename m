@@ -1,216 +1,87 @@
-Return-Path: <netdev+bounces-25163-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25164-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD94277313E
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 23:29:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56EAF77313F
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 23:30:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 19EE11C20D30
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 21:29:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 509F91C20D8D
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 21:30:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F76B198BD;
-	Mon,  7 Aug 2023 21:26:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 857BE1772D;
+	Mon,  7 Aug 2023 21:28:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4109E198A7
-	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 21:26:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 09AA8C433B7;
-	Mon,  7 Aug 2023 21:26:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691443586;
-	bh=X27WxB6mVa5sWQ+rXGlNvF0aA08PANkyXOTW40Y2sTc=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=M8RTt8X2SDTUcmRSaED7B/UcW8oEy2fm6TLQxFWnx3JH32BMtgY3gaofo9V09pmLE
-	 KlozBsJLEEmJisZgQ6dJ7dynKCa94QE1hWsPr3DLaN8dxSnKicDK2ZbtqI62VDIv7G
-	 XgTSU6aN0xjSHWSkYyagZzj8gURbFk/3XyxGx2uHhWL/C66ZCpFL+2ENPmU/+eVeJg
-	 fput9H2vBm6Od9nke90ApntLBXmFpoWnoRJ2YFyr4Z6pjGXgjT7VIjUIAF+EXZTmDB
-	 nlS3O+50OQtMLHwQtYvJ0/aPtLBYwnIdWvaYxshvprffZoFq2pF85p+XnNrve85ds8
-	 sdzEcysnme8uQ==
-From: Saeed Mahameed <saeed@kernel.org>
-To: "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>
-Cc: Saeed Mahameed <saeedm@nvidia.com>,
-	netdev@vger.kernel.org,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Lama Kayal <lkayal@nvidia.com>,
-	Gal Pressman <gal@nvidia.com>,
-	Rahul Rameshbabu <rrameshbabu@nvidia.com>,
-	Maher Sanalla <msanalla@nvidia.com>
-Subject: [net 11/11] net/mlx5e: Add capability check for vnic counters
-Date: Mon,  7 Aug 2023 14:26:07 -0700
-Message-ID: <20230807212607.50883-12-saeed@kernel.org>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230807212607.50883-1-saeed@kernel.org>
-References: <20230807212607.50883-1-saeed@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7826A174FF
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 21:28:23 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3EFEAE7F;
+	Mon,  7 Aug 2023 14:28:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=M0+0V5eNJK3sPp7H1pvx9nX1Hca+m0XF31IaZ7yS9Os=; b=cthWTZf14I53+5yyjbk9Sio8GX
+	Hs1+O7RGj9xIM/FlbFlqGd2vhldl6PAiJN6knathHWG+IbVfZRLn92/2SXBqSqnvkiybvEV8vzsE9
+	V3zwstfKOapKg7OOswAfoTVBl+0WDDnZPqlY+i/3hGNTXCX01g2MMCw4Y35IT80Ta6JU=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qT7lv-003OXY-RH; Mon, 07 Aug 2023 23:28:15 +0200
+Date: Mon, 7 Aug 2023 23:28:15 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Andrew Halaney <ahalaney@redhat.com>
+Cc: Bartosz Golaszewski <brgl@bgdev.pl>, Andy Gross <agross@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>, Alex Elder <elder@linaro.org>,
+	Srini Kandagatla <srinivas.kandagatla@linaro.org>,
+	linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Subject: Re: [PATCH 1/9] arm64: dts: qcom: sa8775p: add a node for the second
+ serdes PHY
+Message-ID: <b5e30baf-4cf4-4a7f-aa2f-348de843226f@lunn.ch>
+References: <20230807193507.6488-1-brgl@bgdev.pl>
+ <20230807193507.6488-2-brgl@bgdev.pl>
+ <qdagbipfnukpsn5a7f6hswbktrwutizluf3zom2gq6q4q6w6df@h4lkoi3mjzes>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <qdagbipfnukpsn5a7f6hswbktrwutizluf3zom2gq6q4q6w6df@h4lkoi3mjzes>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-From: Lama Kayal <lkayal@nvidia.com>
+On Mon, Aug 07, 2023 at 04:10:34PM -0500, Andrew Halaney wrote:
+> On Mon, Aug 07, 2023 at 09:34:59PM +0200, Bartosz Golaszewski wrote:
+> > From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> > 
+> > Add a node for the SerDes PHY used by EMAC1 on sa8775p-ride.
+> > 
+> > Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> 
+> FWIW this seems to match downstream sources.
+> 
+> Reviewed-by: Andrew Halaney <ahalaney@redhat.com>
 
-Add missing capability check for each of the vnic counters exposed by
-devlink health reporter, and thus avoid unexpected behavior due to
-invalid access to registers.
+Why does matching downstream make it correct and deserve a
+Reviewed-by?
 
-While at it, read only the exact number of bits for each counter whether
-it was 32 bits or 64 bits.
+Did you actually review the change?
 
-Fixes: b0bc615df488 ("net/mlx5: Add vnic devlink health reporter to PFs/VFs")
-Fixes: a33682e4e78e ("net/mlx5e: Expose catastrophic steering error counters")
-Signed-off-by: Lama Kayal <lkayal@nvidia.com>
-Reviewed-by: Gal Pressman <gal@nvidia.com>
-Reviewed-by: Rahul Rameshbabu <rrameshbabu@nvidia.com>
-Reviewed-by: Maher Sanalla <msanalla@nvidia.com>
-Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
----
- .../mellanox/mlx5/core/diag/reporter_vnic.c   | 116 ++++++++++--------
- 1 file changed, 67 insertions(+), 49 deletions(-)
-
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/diag/reporter_vnic.c b/drivers/net/ethernet/mellanox/mlx5/core/diag/reporter_vnic.c
-index b0128336ff01..e869c65d8e90 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/diag/reporter_vnic.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/diag/reporter_vnic.c
-@@ -2,6 +2,7 @@
- /* Copyright (c) 2023, NVIDIA CORPORATION & AFFILIATES. */
- 
- #include "reporter_vnic.h"
-+#include "en_stats.h"
- #include "devlink.h"
- 
- #define VNIC_ENV_GET64(vnic_env_stats, c) \
-@@ -36,55 +37,72 @@ int mlx5_reporter_vnic_diagnose_counters(struct mlx5_core_dev *dev,
- 	if (err)
- 		return err;
- 
--	err = devlink_fmsg_u64_pair_put(fmsg, "total_error_queues",
--					VNIC_ENV_GET64(&vnic, total_error_queues));
--	if (err)
--		return err;
--
--	err = devlink_fmsg_u64_pair_put(fmsg, "send_queue_priority_update_flow",
--					VNIC_ENV_GET64(&vnic, send_queue_priority_update_flow));
--	if (err)
--		return err;
--
--	err = devlink_fmsg_u64_pair_put(fmsg, "comp_eq_overrun",
--					VNIC_ENV_GET64(&vnic, comp_eq_overrun));
--	if (err)
--		return err;
--
--	err = devlink_fmsg_u64_pair_put(fmsg, "async_eq_overrun",
--					VNIC_ENV_GET64(&vnic, async_eq_overrun));
--	if (err)
--		return err;
--
--	err = devlink_fmsg_u64_pair_put(fmsg, "cq_overrun",
--					VNIC_ENV_GET64(&vnic, cq_overrun));
--	if (err)
--		return err;
--
--	err = devlink_fmsg_u64_pair_put(fmsg, "invalid_command",
--					VNIC_ENV_GET64(&vnic, invalid_command));
--	if (err)
--		return err;
--
--	err = devlink_fmsg_u64_pair_put(fmsg, "quota_exceeded_command",
--					VNIC_ENV_GET64(&vnic, quota_exceeded_command));
--	if (err)
--		return err;
--
--	err = devlink_fmsg_u64_pair_put(fmsg, "nic_receive_steering_discard",
--					VNIC_ENV_GET64(&vnic, nic_receive_steering_discard));
--	if (err)
--		return err;
--
--	err = devlink_fmsg_u64_pair_put(fmsg, "generated_pkt_steering_fail",
--					VNIC_ENV_GET64(&vnic, generated_pkt_steering_fail));
--	if (err)
--		return err;
--
--	err = devlink_fmsg_u64_pair_put(fmsg, "handled_pkt_steering_fail",
--					VNIC_ENV_GET64(&vnic, handled_pkt_steering_fail));
--	if (err)
--		return err;
-+	if (MLX5_CAP_GEN(dev, vnic_env_queue_counters)) {
-+		err = devlink_fmsg_u32_pair_put(fmsg, "total_error_queues",
-+						VNIC_ENV_GET(&vnic, total_error_queues));
-+		if (err)
-+			return err;
-+
-+		err = devlink_fmsg_u32_pair_put(fmsg, "send_queue_priority_update_flow",
-+						VNIC_ENV_GET(&vnic,
-+							     send_queue_priority_update_flow));
-+		if (err)
-+			return err;
-+	}
-+
-+	if (MLX5_CAP_GEN(dev, eq_overrun_count)) {
-+		err = devlink_fmsg_u32_pair_put(fmsg, "comp_eq_overrun",
-+						VNIC_ENV_GET(&vnic, comp_eq_overrun));
-+		if (err)
-+			return err;
-+
-+		err = devlink_fmsg_u32_pair_put(fmsg, "async_eq_overrun",
-+						VNIC_ENV_GET(&vnic, async_eq_overrun));
-+		if (err)
-+			return err;
-+	}
-+
-+	if (MLX5_CAP_GEN(dev, vnic_env_cq_overrun)) {
-+		err = devlink_fmsg_u32_pair_put(fmsg, "cq_overrun",
-+						VNIC_ENV_GET(&vnic, cq_overrun));
-+		if (err)
-+			return err;
-+	}
-+
-+	if (MLX5_CAP_GEN(dev, invalid_command_count)) {
-+		err = devlink_fmsg_u32_pair_put(fmsg, "invalid_command",
-+						VNIC_ENV_GET(&vnic, invalid_command));
-+		if (err)
-+			return err;
-+	}
-+
-+	if (MLX5_CAP_GEN(dev, quota_exceeded_count)) {
-+		err = devlink_fmsg_u32_pair_put(fmsg, "quota_exceeded_command",
-+						VNIC_ENV_GET(&vnic, quota_exceeded_command));
-+		if (err)
-+			return err;
-+	}
-+
-+	if (MLX5_CAP_GEN(dev, nic_receive_steering_discard)) {
-+		err = devlink_fmsg_u64_pair_put(fmsg, "nic_receive_steering_discard",
-+						VNIC_ENV_GET64(&vnic,
-+							       nic_receive_steering_discard));
-+		if (err)
-+			return err;
-+	}
-+
-+	if (MLX5_CAP_GEN(dev, vnic_env_cnt_steering_fail)) {
-+		err = devlink_fmsg_u64_pair_put(fmsg, "generated_pkt_steering_fail",
-+						VNIC_ENV_GET64(&vnic,
-+							       generated_pkt_steering_fail));
-+		if (err)
-+			return err;
-+
-+		err = devlink_fmsg_u64_pair_put(fmsg, "handled_pkt_steering_fail",
-+						VNIC_ENV_GET64(&vnic, handled_pkt_steering_fail));
-+		if (err)
-+			return err;
-+	}
- 
- 	err = devlink_fmsg_obj_nest_end(fmsg);
- 	if (err)
--- 
-2.41.0
-
+    Andrew
 
