@@ -1,125 +1,225 @@
-Return-Path: <netdev+bounces-24997-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24998-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 202A47727F3
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 16:36:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 503A9772807
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 16:40:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F42131C20BF4
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 14:36:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8282E1C20BBF
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 14:40:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 991E6D2EA;
-	Mon,  7 Aug 2023 14:36:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B325D537;
+	Mon,  7 Aug 2023 14:40:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A885443A
-	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 14:36:47 +0000 (UTC)
-Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::224])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA9E010F3;
-	Mon,  7 Aug 2023 07:36:31 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id B7938E0008;
-	Mon,  7 Aug 2023 14:36:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1691418990;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 264BBD2EA
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 14:40:25 +0000 (UTC)
+Received: from out-66.mta0.migadu.com (out-66.mta0.migadu.com [91.218.175.66])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4158010FD
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 07:40:23 -0700 (PDT)
+Message-ID: <bc69afd6-6eec-a070-ab96-05ab137aaf0b@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1691419221; h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:mime-version:mime-version:
+	 content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=CoovJrYPxkDFGogd5wvVhZC1R5Dq4lKn3YHaDGn4/LM=;
-	b=HmQ6EWLUrDj97BUk7IGsXLcmAJ2miJvyMgaSQlOietWT5pvqGoMYmO6yr+Bhc0Lx67tKD6
-	df7Z6+KBom37uNEQWfw8FJht1ZSI3QWLiHNjcNXBmvIwSynDxYMQivLHbJtb7uzGw5pJZ2
-	EAinCJbElQ6rO13JeWO3s9sPGU4+27Q8M5T52pS7PcbF+R8WyuQKAjhFeLCmKcp+6TWkuR
-	IdO0UMWLzMibIMpfP4ahj/zKwHCDxTgVc0R059ZGQaSUIC06o5hsPMQ2XYgtkWYBNaUzS4
-	qP1VmAe+U2gpEDS1hmzhbhx0eTbGq6h1G2uNh4GG0oC80TOYZeIgosi77P7S8A==
-Date: Mon, 7 Aug 2023 16:36:26 +0200
-From: Herve Codina <herve.codina@bootlin.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Linus Walleij <linus.walleij@linaro.org>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
- <robh+dt@kernel.org>, Krzysztof Kozlowski
- <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
- Lee Jones <lee@kernel.org>, Qiang Zhao <qiang.zhao@nxp.com>, Li Yang
- <leoyang.li@nxp.com>, Liam Girdwood <lgirdwood@gmail.com>, Mark Brown
- <broonie@kernel.org>, Jaroslav Kysela <perex@perex.cz>, Takashi Iwai
- <tiwai@suse.com>, Shengjiu Wang <shengjiu.wang@gmail.com>, Xiubo Li
- <Xiubo.Lee@gmail.com>, Fabio Estevam <festevam@gmail.com>, Nicolin Chen
- <nicoleotsuka@gmail.com>, Christophe Leroy <christophe.leroy@csgroup.eu>,
- Randy Dunlap <rdunlap@infradead.org>, netdev@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, alsa-devel@alsa-project.org, Thomas
- Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH v2 24/28] pinctrl: Add support for the Lantic PEF2256
- pinmux
-Message-ID: <20230807163626.79a5ca7b@bootlin.com>
-In-Reply-To: <eb99e739-6578-4aee-a0f4-7a0c5e5e81ef@lunn.ch>
-References: <20230726150225.483464-1-herve.codina@bootlin.com>
-	<20230726150225.483464-25-herve.codina@bootlin.com>
-	<CACRpkdYXCQRd3ZXNGHwMaQYiJc7tGtAJnBaSh5O-8ruDAJVdiA@mail.gmail.com>
-	<CACRpkdZebvrdGXooLXmgXhUcgdgxBczJBpdEoEyJDR39abaAqQ@mail.gmail.com>
-	<eb99e739-6578-4aee-a0f4-7a0c5e5e81ef@lunn.ch>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
+	bh=o+OIVP1YK+9jwAPITublGsuGiAOtFhZlPBMKuZ8xpOU=;
+	b=vKEhzisigQ7rkFFRgQhn4r7VZzO75TnS0qtkm3O+D4xArIYeQMSJWCjyKr5anVuIts95k3
+	Rev3/M4EjZIUv3nMOLE2/fjCoh1f4IF97Z8qxLqiIR8ubjM+J9KnSAXVWR4oJYATJeimmd
+	oygDOZzMqb+HGSQ7ornKZ4QROtBCKK8=
+Date: Mon, 7 Aug 2023 07:40:12 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: herve.codina@bootlin.com
+Reply-To: yonghong.song@linux.dev
+Subject: Re: [syzbot] [bpf?] KMSAN: uninit-value in
+ ieee802154_subif_start_xmit
+Content-Language: en-US
+To: Eduard Zingerman <eddyz87@gmail.com>,
+ syzbot <syzbot+d61b595e9205573133b3@syzkaller.appspotmail.com>,
+ andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org,
+ daniel@iogearbox.net, davem@davemloft.net, haoluo@google.com,
+ hawk@kernel.org, john.fastabend@gmail.com, jolsa@kernel.org,
+ kpsingh@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org,
+ martin.lau@linux.dev, netdev@vger.kernel.org, sdf@google.com,
+ song@kernel.org, syzkaller-bugs@googlegroups.com
+References: <0000000000002098bc0602496cc3@google.com>
+ <d520bd6c-bfd3-47f1-c794-ab451905256b@linux.dev>
+ <9c8f04a0bf90db4bb8e6192824ab71f58244b74b.camel@gmail.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yonghong Song <yonghong.song@linux.dev>
+In-Reply-To: <9c8f04a0bf90db4bb8e6192824ab71f58244b74b.camel@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,LOTS_OF_MONEY,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Linus, Andrew,
 
-On Mon, 7 Aug 2023 15:17:11 +0200
-Andrew Lunn <andrew@lunn.ch> wrote:
 
-> On Mon, Aug 07, 2023 at 03:06:42PM +0200, Linus Walleij wrote:
-> > On Mon, Aug 7, 2023 at 3:05 PM Linus Walleij <linus.walleij@linaro.org> wrote:
-> >   
-> > > > Signed-off-by: Herve Codina <herve.codina@bootlin.com>  
-> > >
-> > > So it is a bridge chip? Please use that terminology since Linux
-> > > DRM often talks about bridges.  
-> > 
-> > Replying to self: no it's not a bridge, it's a WAN thingy.
-> > 
-> > So perhaps write that this is a WAN interface adapter chip.  
+On 8/7/23 6:11 AM, Eduard Zingerman wrote:
+> On Sun, 2023-08-06 at 23:40 -0700, Yonghong Song wrote:
+>>
+>> On 8/6/23 4:23 PM, syzbot wrote:
+>>> Hello,
+>>>
+>>> syzbot found the following issue on:
+>>>
+>>> HEAD commit:    25ad10658dc1 riscv, bpf: Adapt bpf trampoline to optimized..
+>>> git tree:       bpf-next
+>>> console+strace: https://syzkaller.appspot.com/x/log.txt?x=147cbb29a80000
+>>> kernel config:  https://syzkaller.appspot.com/x/.config?x=8acaeb93ad7c6aaa
+>>> dashboard link: https://syzkaller.appspot.com/bug?extid=d61b595e9205573133b3
+>>> compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+>>> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=14d73ccea80000
+>>> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1276aedea80000
+>>>
+>>> Downloadable assets:
+>>> disk image: https://storage.googleapis.com/syzbot-assets/3d378cc13d42/disk-25ad1065.raw.xz
+>>> vmlinux: https://storage.googleapis.com/syzbot-assets/44580fd5d1af/vmlinux-25ad1065.xz
+>>> kernel image: https://storage.googleapis.com/syzbot-assets/840587618b41/bzImage-25ad1065.xz
+>>>
+>>> The issue was bisected to:
+>>>
+>>> commit 8100928c881482a73ed8bd499d602bab0fe55608
+>>> Author: Yonghong Song <yonghong.song@linux.dev>
+>>> Date:   Fri Jul 28 01:12:02 2023 +0000
+>>>
+>>>       bpf: Support new sign-extension mov insns
+>>
+>> Thanks for reporting. I will look into this ASAP.
 > 
-> Hi Linus
+> Hi Yonghong,
 > 
-> In the E1/T1/J1 world, framer is a well understood concept. Maybe the
-> text needs a bit more background information to explain what this is
-> to somebody who does not have an old school telecoms background.
+> I guess it's your night and my morning, so I did some initial assessment.
+> The BPF program being loaded is:
 > 
->    Andrew
+>    0 : (62) *(u32 *)(r10 -8) = 553656332
+>    1 : (bf) r1 = (s16)r10
+>    2 : (07) r1 += -8
+>    3 : (b7) r2 = 3
+>    4 : (bd) if r2 <= r1 goto pc+0
+>    5 : (85) call bpf_trace_printk#6
+>    6 : (b7) r0 = 0
+>    7 : (95) exit
+> 
+> (Note: when using bpftool (prog dump xlated id <some-id>) the disassembly
+>   of the instruction #1 is incorrectly printed as "1: (bf) r1 = r10")
+>   
+> The error occurs when instruction #5 (call to printk) is executed.
+> An incorrect address for the format string is passed to printk.
+> Disassembly of the jited program looks as follows:
+> 
+>    $ bpftool prog dump jited id <some-id>
+>    bpf_prog_ebeed182d92b487f:
+>       0: nopl    (%rax,%rax)
+>       5: nop
+>       7: pushq   %rbp
+>       8: movq    %rsp, %rbp
+>       b: subq    $8, %rsp
+>      12: movl    $553656332, -8(%rbp)
+>      19: movswq  %bp, %rdi            ; <---- Note movswq %bp !
+>      1d: addq    $-8, %rdi
+>      21: movl    $3, %esi
+>      26: cmpq    %rdi, %rsi
+>      29: jbe 0x2b
+>      2b: callq   0xffffffffe11c484c
+>      30: xorl    %eax, %eax
+>      32: leave
+>      33: retq
+> 
+> Note jit instruction #19 corresponding to BPF instruction #1, which
+> loads truncated and sign-extended value of %rbp's first byte as an
+> address of format string.
+> 
+> Here is how verifier log looks for (slightly modified) program:
+> 
+>    func#0 @0
+>    0: R1=ctx(off=0,imm=0) R10=fp0
+>    ; asm volatile ("			\n\
+>    0: (b7) r1 = 553656332                ; R1_w=553656332
+>    1: (63) *(u32 *)(r10 -8) = r1         ; R1_w=553656332 R10=fp0 fp-8=553656332
+>    2: (bf) r1 = (s16)r10                 ; R1_w=fp0 R10=fp0
+>    3: (07) r1 += -8                      ; R1_w=fp-8
+>    4: (b7) r2 = 3                        ; R2_w=3
+>    5: (bd) if r2 <= r1 goto pc+0         ; R1_w=fp-8 R2_w=3
+>    6: (85) call bpf_trace_printk#6
+>    mark_precise: frame0: last_idx 6 first_idx 0 subseq_idx -1
+>    ...
+>    mark_precise: frame0: falling back to forcing all scalars precise
+>    7: R0=scalar()
+>    7: (b7) r0 = 0                        ; R0_w=0
+>    8: (95) exit
+>    
+>    from 5 to 6: R1_w=fp-8 R2_w=3 R10=fp0 fp-8=553656332
+>    6: (85) call bpf_trace_printk#6
+>    mark_precise: frame0: last_idx 6 first_idx 0 subseq_idx -1
+>    ...
+>    mark_precise: frame0: falling back to forcing all scalars precise
+>    7: safe
+> 
+> Note the following line:
+> 
+>    2: (bf) r1 = (s16)r10                 ; R1_w=fp0 R10=fp0
+> 
+> Verifier incorrectly marked r1 as fp0, hence not noticing the problem
+> with address passed to printk.
 
-Maybe I can add in my commit log:
---- 8< ---
-This kind of component can be found in old telecommunication system.
-It was used to digital transmission of many simultaneous telephone calls
-by time-division multiplexing. Also using HDLC protocol, WAN networks
-can be reached through the framer.
---- 8< ---
+Thanks, Eduard. Right. I am also able to dump xlated code like
+below:
 
-Do you think it will be better ?
+    0: (62) *(u32 *)(r10 -8) = 553656332
+    1: (bf) r1 = (s16)r10
+    2: (07) r1 += -8
+    3: (b7) r2 = 3
+    4: (bd) if r2 <= r1 goto pc+0
+    5: (85) call bpf_trace_printk#-138320
+    6: (b7) r0 = 0
+    7: (95) exit
 
-Regards,
-Hervé Codina
+Something like below can fix the problem,
 
--- 
-Hervé Codina, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
+diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
+index 132f25dab931..db72619551b2 100644
+--- a/kernel/bpf/verifier.c
++++ b/kernel/bpf/verifier.c
+@@ -13171,6 +13171,7 @@ static int check_alu_op(struct bpf_verifier_env 
+*env, struct bpf_insn *insn)
+                                         if (no_sext && need_id)
+                                                 src_reg->id = 
+++env->id_gen;
+                                         copy_register_state(dst_reg, 
+src_reg);
++                                       dst_reg->type = SCALAR_VALUE;
+                                         if (!no_sext)
+                                                 dst_reg->id = 0;
+                                         coerce_reg_to_size_sx(dst_reg, 
+insn->off >> 3);
+
+After insn 1, we need change r1 type to SCALAR_VALUE. Will add
+the the test to selftest and submit the patch to fix the problem
+today.
+
+> 
+> Thanks,
+> Eduard.
+> 
+>>>
+>>> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=17970c5da80000
+>>> final oops:     https://syzkaller.appspot.com/x/report.txt?x=14570c5da80000
+>>> console output: https://syzkaller.appspot.com/x/log.txt?x=10570c5da80000
+>>>
+[...]
 
