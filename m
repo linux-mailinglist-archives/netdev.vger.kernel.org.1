@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-24805-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24810-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CFEC771BF5
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 10:00:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B15ED771BFA
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 10:02:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DD2A72810A0
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 08:00:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6B61528120B
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 08:02:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B99DC2F2;
-	Mon,  7 Aug 2023 08:00:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 651BAC2F2;
+	Mon,  7 Aug 2023 08:00:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7E0F17E3
-	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 08:00:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 6315EC433C8;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA615CA70
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 08:00:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 99A0FC433B6;
 	Mon,  7 Aug 2023 08:00:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1691395222;
-	bh=hBZi8YKviSxwd+u/UhgkENJSF5xyybQlcARmMAbVMbE=;
+	bh=/w6Ef22oJHP0zz2QP4zPpsWK7gAQARFp0bGa/bkMC00=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=SN+EfZfNF48tk8MJ88nv+uYyvCa0SXZfW7yTVu5uGhZkN7DN8nWmgdsB6CMaZUXjX
-	 zWL3iH2og3tujfMR21HyXZgPjJ2ITpcQnkv8SHZnRljGWYC9WcTnM5IrXAkdedk6yO
-	 2pL/aSbteHvu+vYbHGn1bqpwRHXoyHbqUWkge+UJbMNeDU/KvcEwDJgDfBRcclPNEI
-	 FYlLUdKIvIeVTieYATsdgqRpCiZbEFPT8zjjS3QH/2WTodOaa+k86xGMwtz3f2ge2+
-	 4sc1J9zxM/Ihz7K/o1bJne3wWInHgXaiw1smi99wqOFJ/vdtkqD6vEq8u59/LnRJ5H
-	 mkZZPr+2SR1oQ==
+	b=Gw/kL/nyN3yeuMLZKcmv7QkgO5Jfr1hGsUq1V2T2ypaiqJuue69joSo/CRy30hnYG
+	 73/oYmYg9GIzeAF5FcjIAZArAXiTJooGgKqul044kqRA4UYIQoX81VN+A11I5K37zg
+	 9OcG8x7rAPwjCQ+ixvXCJtLUInusFhG7hzZOMdd3WcPRVAjFBdIVyPG3KHmklqFJKX
+	 WwOgQrTM4FRsV6KMo7TbQJYIZdgU5+AFz7QiT7dkT01Cw8Kbx1SlDcp2XHarczSYxW
+	 5+UprDNxIg+HG4JTQ+8L2WGPz0Cq5tyALMI5N/ZWhD0KyU09IB9yky3pxgCNRYk6Hp
+	 XqwMJJgfcPuHA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 42003E505D1;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 7E940E270C3;
 	Mon,  7 Aug 2023 08:00:22 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -41,35 +41,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net/tls: Remove unused function declarations
+Subject: Re: [PATCH net-next] net: sfp: Remove unused function declaration
+ sfp_link_configure()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <169139522225.32661.1766199176306782363.git-patchwork-notify@kernel.org>
+ <169139522251.32661.7802155445996134133.git-patchwork-notify@kernel.org>
 Date: Mon, 07 Aug 2023 08:00:22 +0000
-References: <20230805104811.45356-1-yuehaibing@huawei.com>
-In-Reply-To: <20230805104811.45356-1-yuehaibing@huawei.com>
+References: <20230805105740.45980-1-yuehaibing@huawei.com>
+In-Reply-To: <20230805105740.45980-1-yuehaibing@huawei.com>
 To: Yue Haibing <yuehaibing@huawei.com>
-Cc: borisp@nvidia.com, john.fastabend@gmail.com, kuba@kernel.org,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- netdev@vger.kernel.org
+Cc: linux@armlinux.org.uk, andrew@lunn.ch, hkallweit1@gmail.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ rmk+kernel@armlinux.org.uk, netdev@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Sat, 5 Aug 2023 18:48:11 +0800 you wrote:
-> Commit 3c4d7559159b ("tls: kernel TLS support") declared but never implemented
-> these functions.
+On Sat, 5 Aug 2023 18:57:40 +0800 you wrote:
+> Commit ce0aa27ff3f6 ("sfp: add sfp-bus to bridge between network devices and sfp cages")
+> declared but never implemented it.
 > 
 > Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
 > ---
->  net/tls/tls.h | 4 ----
->  1 file changed, 4 deletions(-)
+>  drivers/net/phy/sfp.h | 1 -
+>  1 file changed, 1 deletion(-)
 
 Here is the summary with links:
-  - [net-next] net/tls: Remove unused function declarations
-    https://git.kernel.org/netdev/net-next/c/f6ecb68b38a5
+  - [net-next] net: sfp: Remove unused function declaration sfp_link_configure()
+    https://git.kernel.org/netdev/net-next/c/a6ab5c29b8d2
 
 You are awesome, thank you!
 -- 
