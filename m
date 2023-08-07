@@ -1,73 +1,82 @@
-Return-Path: <netdev+bounces-24938-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24939-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D6F177238D
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 14:15:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37B047723B3
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 14:20:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 192402812A4
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 12:15:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 727A71C20B83
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 12:20:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15A64100CA;
-	Mon,  7 Aug 2023 12:15:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80EB1101CE;
+	Mon,  7 Aug 2023 12:20:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 090C84436
-	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 12:15:25 +0000 (UTC)
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38D26E44
-	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 05:15:24 -0700 (PDT)
-Received: by mail-pj1-x102e.google.com with SMTP id 98e67ed59e1d1-26854159c05so2364617a91.2
-        for <netdev@vger.kernel.org>; Mon, 07 Aug 2023 05:15:24 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73D02FC17
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 12:20:02 +0000 (UTC)
+Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46208E68
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 05:19:39 -0700 (PDT)
+Received: by mail-pl1-x635.google.com with SMTP id d9443c01a7336-1b9c5e07c1bso39606975ad.2
+        for <netdev@vger.kernel.org>; Mon, 07 Aug 2023 05:19:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1691410523; x=1692015323;
+        d=bytedance.com; s=google; t=1691410772; x=1692015572;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=uLQYdihKrZnqzA8pyJFR0KmRfev22Y9Nk5IK1CsNWSQ=;
-        b=bEAsqH3EjC2u0IGUnDABZVNA3fbPjqYFRA+b6OttdreALvj5DL7l7Ckx1qTRiEI13l
-         /MNN1P3o3BUJAbMyJ5RZk7d1fAqiWmKhRsmLQRel5SV+JfC6akLzqW9B/w0QwXMG+Axx
-         EbhFL6nmoNWKymjJleYouiGVXtulkdgMMReMJ48ag1EerhFmBMPRRxPb4+VYYK78FigG
-         H8+2tCLHg7Q5ZF78UsXOv+7taDaXBCWTD0bY26hvadEh1o3oxyl8/xWhkUrT6uL19SQs
-         ifTEX5J9eqOjtREpgVr+LfniIynboIEd/NlIcpVj3S468oO+PrfuwNV2Lw0N/Icu+Bif
-         mfvg==
+        bh=CSkaRhEoax/kU+S7BeIv84prtFC3VRpkmwXx3cyNhW4=;
+        b=lNSdc/+v7DVvIEdGXmh9m6TWjMuePx5ixHEq5A3moRUidZPbc2VkVmgz1HIHwnketG
+         iYbjjR8DZZK5NGxcmtk9G8i7h01IWnAeFmogRREbWXxQdB2EObvt44H1JoEpCjKbiuHC
+         T57RpuMx0LOtogAgDRmTcNHhLJhyJTLgUnc2UgsniuZpFVkr4JH6dprrwRSG2kSfmWgt
+         wadkCo10VcLkZ+OEiFVhdCQdxybRGB5eoyhqF5gj/aQr4p6d9334in9xO74pK7dl6UVJ
+         4d7212QuSx1U5p8qpETqLnQRyUeq2pHeC2RruKBBb4hgNQeHaypp1chUN9oxFR4w2mK9
+         +A3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691410523; x=1692015323;
+        d=1e100.net; s=20221208; t=1691410772; x=1692015572;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=uLQYdihKrZnqzA8pyJFR0KmRfev22Y9Nk5IK1CsNWSQ=;
-        b=MnvtguvUWTIdjEn7p6SbN7ANvJTOHGAFgqlTr9vQ4nkyWORJdEu0Ult8MKPSNQ1lz0
-         nH3kPO4Ds0OysDm/WjGyguI7lqoq6F3XO9nivvwHOOb5e5cbqpHy3Ijoa7kkqBIa7DXo
-         H5F95uNH5c4ELEW+gPsQBbuDL3TRcnhR2ZjQNivSIJ04oCmiHNjvXVDzugnRWlUOBkHb
-         PDczbXWqskLropIy2S2McdOR+BiBfMRpALXKpL2uOCSBF33LzAPc2FqfZ2jTKpT1fde9
-         /0H58MEUtqNE25wHaql6iOOde4vy2BuxUHGemYbTTsVkArgast1NNTneTgqoQWjXDHt4
-         R9GQ==
-X-Gm-Message-State: AOJu0Yy0WmCdJbus0TxPtpBLw7o9uJNfbuy6Z+VNuKt8EfZJFnn4VQGe
-	FVk/a2jn7o235XcYvoowTWJbzA==
-X-Google-Smtp-Source: AGHT+IEFVp6KMtDbFDIQLBkpU/u99kKhhVeErfazpqq/dYJkpUEs2Le54iKKZ2BwOj5rl02nFUtamA==
-X-Received: by 2002:a17:90b:3e88:b0:269:3771:7342 with SMTP id rj8-20020a17090b3e8800b0026937717342mr4621802pjb.18.1691410523675;
-        Mon, 07 Aug 2023 05:15:23 -0700 (PDT)
+        bh=CSkaRhEoax/kU+S7BeIv84prtFC3VRpkmwXx3cyNhW4=;
+        b=CSe7AiNn1H2i3xcIocoLPYTOIV5ywSHffSh9qRYFLUNQPlrO26IyWDh60kXjeR5rlq
+         qj9tUAuos50FEcB4iPq9VfUdIMdgPs35XG26/V/YM61EhGpWasEI+K8JV8Se4IWatl6t
+         /jOVUwepSzxNMUBebt0k1upCcpmajknW/xdHO4GXGE5ALEg6cWrcKNMKCKFmLbguI835
+         WZHJZx5MPOT6qGA2c2Tn6OEjzRZxtLfTnHwMpGJ15cECVETCQj9QG0RiN5CkXH1LRUnn
+         YM16WCX1ElWzaZaDgClMFeFuGksv0bDCD6Z9GJAkyl1ioAAjcUabeiFdTPOShds1P6ou
+         N2OA==
+X-Gm-Message-State: AOJu0YyUr8ELwvD9Uhf0opQB1skhGIdcarCunZF+mFPmxEo4vpgZGv75
+	HHVYoqPTk0B97jEKCTqdLzu+Pg==
+X-Google-Smtp-Source: AGHT+IG0EOJYPbVCZdHWLuCBSIWm1P+FwFwIuu5YzmQQNlmkkc7aqTPCBYttrj4ssxYQsG4YxAEaPw==
+X-Received: by 2002:a17:902:e743:b0:1bb:8e13:deba with SMTP id p3-20020a170902e74300b001bb8e13debamr11182082plf.11.1691410772101;
+        Mon, 07 Aug 2023 05:19:32 -0700 (PDT)
 Received: from C02FG34NMD6R.bytedance.net ([2408:8656:30f8:e020::b])
-        by smtp.gmail.com with ESMTPSA id n12-20020a17090ac68c00b00268320ab9f2sm8645761pjt.6.2023.08.07.05.15.21
+        by smtp.gmail.com with ESMTPSA id m1-20020a170902db0100b001b9d95945afsm6758444plx.155.2023.08.07.05.19.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Aug 2023 05:15:23 -0700 (PDT)
+        Mon, 07 Aug 2023 05:19:31 -0700 (PDT)
 From: Albert Huang <huangjie.albert@bytedance.com>
 To: 
 Cc: Albert Huang <huangjie.albert@bytedance.com>,
+	=?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn@kernel.org>,
+	Magnus Karlsson <magnus.karlsson@intel.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Jonathan Lemon <jonathan.lemon@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org (open list:NETWORKING DRIVERS),
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	netdev@vger.kernel.org (open list:XDP SOCKETS (AF_XDP)),
+	bpf@vger.kernel.org (open list:XDP SOCKETS (AF_XDP)),
 	linux-kernel@vger.kernel.org (open list)
-Subject: [RFC v2 Optimizing veth xsk performance 1/9] veth: Implement ethtool's get_ringparam() callback
-Date: Mon,  7 Aug 2023 20:15:10 +0800
-Message-Id: <20230807121510.84113-1-huangjie.albert@bytedance.com>
+Subject: [RFC v2 Optimizing veth xsk performance 2/9] xsk: add dma_check_skip for skipping dma check
+Date: Mon,  7 Aug 2023 20:19:17 +0800
+Message-Id: <20230807121917.84905-1-huangjie.albert@bytedance.com>
 X-Mailer: git-send-email 2.37.1 (Apple Git-137.1)
 In-Reply-To: <20230807120434.83644-1-huangjie.albert@bytedance.com>
 References: <20230807120434.83644-1-huangjie.albert@bytedance.com>
@@ -80,50 +89,72 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+	SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-some xsk library calls get_ringparam() API to get the queue length
-to init the xsk umem.
+for the virtual net device such as veth, there is
+no need to do dma check if we support zero copy.
 
-Implement that in veth so those scenarios can work properly.
+add this flag after unaligned. beacause there is 4 bytes hole
+pahole -V ./net/xdp/xsk_buff_pool.o:
+-----------
+...
+	/* --- cacheline 3 boundary (192 bytes) --- */
+	u32                        chunk_size;           /*   192     4 */
+	u32                        frame_len;            /*   196     4 */
+	u8                         cached_need_wakeup;   /*   200     1 */
+	bool                       uses_need_wakeup;     /*   201     1 */
+	bool                       dma_need_sync;        /*   202     1 */
+	bool                       unaligned;            /*   203     1 */
+
+	/* XXX 4 bytes hole, try to pack */
+
+	void *                     addrs;                /*   208     8 */
+	spinlock_t                 cq_lock;              /*   216     4 */
+...
+-----------
 
 Signed-off-by: Albert Huang <huangjie.albert@bytedance.com>
 ---
- drivers/net/veth.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ include/net/xsk_buff_pool.h | 1 +
+ net/xdp/xsk_buff_pool.c     | 3 ++-
+ 2 files changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/veth.c b/drivers/net/veth.c
-index 614f3e3efab0..77e12d52ca2b 100644
---- a/drivers/net/veth.c
-+++ b/drivers/net/veth.c
-@@ -255,6 +255,17 @@ static void veth_get_channels(struct net_device *dev,
- static int veth_set_channels(struct net_device *dev,
- 			     struct ethtool_channels *ch);
+diff --git a/include/net/xsk_buff_pool.h b/include/net/xsk_buff_pool.h
+index b0bdff26fc88..fe31097dc11b 100644
+--- a/include/net/xsk_buff_pool.h
++++ b/include/net/xsk_buff_pool.h
+@@ -81,6 +81,7 @@ struct xsk_buff_pool {
+ 	bool uses_need_wakeup;
+ 	bool dma_need_sync;
+ 	bool unaligned;
++	bool dma_check_skip;
+ 	void *addrs;
+ 	/* Mutual exclusion of the completion ring in the SKB mode. Two cases to protect:
+ 	 * NAPI TX thread and sendmsg error paths in the SKB destructor callback and when
+diff --git a/net/xdp/xsk_buff_pool.c b/net/xdp/xsk_buff_pool.c
+index b3f7b310811e..ed251b8e8773 100644
+--- a/net/xdp/xsk_buff_pool.c
++++ b/net/xdp/xsk_buff_pool.c
+@@ -85,6 +85,7 @@ struct xsk_buff_pool *xp_create_and_assign_umem(struct xdp_sock *xs,
+ 		XDP_PACKET_HEADROOM;
+ 	pool->umem = umem;
+ 	pool->addrs = umem->addrs;
++	pool->dma_check_skip = false;
+ 	INIT_LIST_HEAD(&pool->free_list);
+ 	INIT_LIST_HEAD(&pool->xskb_list);
+ 	INIT_LIST_HEAD(&pool->xsk_tx_list);
+@@ -202,7 +203,7 @@ int xp_assign_dev(struct xsk_buff_pool *pool,
+ 	if (err)
+ 		goto err_unreg_pool;
  
-+static void veth_get_ringparam(struct net_device *dev,
-+			       struct ethtool_ringparam *ring,
-+			     struct kernel_ethtool_ringparam *kernel_ring,
-+			     struct netlink_ext_ack *extack)
-+{
-+	ring->rx_max_pending = VETH_RING_SIZE;
-+	ring->tx_max_pending = VETH_RING_SIZE;
-+	ring->rx_pending = VETH_RING_SIZE;
-+	ring->tx_pending = VETH_RING_SIZE;
-+}
-+
- static const struct ethtool_ops veth_ethtool_ops = {
- 	.get_drvinfo		= veth_get_drvinfo,
- 	.get_link		= ethtool_op_get_link,
-@@ -265,6 +276,7 @@ static const struct ethtool_ops veth_ethtool_ops = {
- 	.get_ts_info		= ethtool_op_get_ts_info,
- 	.get_channels		= veth_get_channels,
- 	.set_channels		= veth_set_channels,
-+	.get_ringparam		= veth_get_ringparam,
- };
- 
- /* general routines */
+-	if (!pool->dma_pages) {
++	if (!pool->dma_pages && !pool->dma_check_skip) {
+ 		WARN(1, "Driver did not DMA map zero-copy buffers");
+ 		err = -EINVAL;
+ 		goto err_unreg_xsk;
 -- 
 2.20.1
 
