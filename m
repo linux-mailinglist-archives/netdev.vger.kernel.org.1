@@ -1,139 +1,200 @@
-Return-Path: <netdev+bounces-24757-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24759-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 743FF77193D
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 07:00:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2A397719A7
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 07:52:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 29233281080
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 05:00:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A4F2F281158
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 05:52:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1868080E;
-	Mon,  7 Aug 2023 05:00:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93C471369;
+	Mon,  7 Aug 2023 05:52:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C010194
-	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 05:00:41 +0000 (UTC)
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE6CC10FA;
-	Sun,  6 Aug 2023 22:00:39 -0700 (PDT)
-Received: from kwepemi500008.china.huawei.com (unknown [172.30.72.55])
-	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4RK3wY0dzpz1Z1Y9;
-	Mon,  7 Aug 2023 12:57:49 +0800 (CST)
-Received: from [10.67.109.254] (10.67.109.254) by
- kwepemi500008.china.huawei.com (7.221.188.139) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Mon, 7 Aug 2023 13:00:35 +0800
-Message-ID: <e4d0e004-e436-6a43-17d2-96c0fe4dd551@huawei.com>
-Date: Mon, 7 Aug 2023 13:00:35 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8751717D9
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 05:52:52 +0000 (UTC)
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2047.outbound.protection.outlook.com [40.107.243.47])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE0881708;
+	Sun,  6 Aug 2023 22:52:44 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=jTVDUkyDaREjVhi9oFfH7QrbRink8zNan7M0KldD1pC5RfsSITWGEL0sMdywc44KrOysmBm8E40BKJhSMchulovzOLknVY6UgLq34AV3JdmHhl2xycWvb9p59HGJ+p6ZtNFMp8eLe02PuTjn9r15gAhFqe6e1LEzu0Apb/1C8IDA/V0wFSkHZlaGwl2MxZId3VRXbDTARsBbZZLhDtdcsdLqaPKl7VGehmw8ezDtsVAHY2/gq8vt4BqMbEPSFFMsoR6vgW7g1u7n4zjtzfHT+Mkm8ZHtqHITap/D7RmY6i2E7x9ZO0uaOcXi9ujqNXd0W9csrf8Z0Ll55brlyNATag==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=I1BcLQIjOQ8tbltc5V5QqZ847OyGNE07UJWyIqHHuCM=;
+ b=VhFK9N7mxo5EuGqHk5msWqzYEmSGsU+e2Ra7D9ceeOglD9f8QfJXCMieHKIweGD6yIp1PHjGe4c1zS2fauycnnPuWYXdK0CnZgX4Yu6c57ByWrcDs8skfbeeyjTzYK+4Ex1g/DOTB7mnI3PeYFUqQwIVDkSRrwdWQB+TEZjTeradked8PvEMpzkro007ViZTIBMCzRm18VQoxxcZwbm9i/xZLHkeQ0KbHtBcLRJK31UBodJYaqYsU0rh8EcLzecSrhkymKWuHmuJkgMKkrxVT2y6lOD1ouGA3q0LmD5tCuSaXO2ygqFamLIbCU9ATJSsbCHQnBQMba5gao0M+Tq4mw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=kernel.org smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=I1BcLQIjOQ8tbltc5V5QqZ847OyGNE07UJWyIqHHuCM=;
+ b=wwiGLFTRA/BacLyjrsGHx1pdddG2e3+HDouazpBeeQFL9aBa2D7GYbqgsAQPDuBjxCtC8r709uNYm8fLpz36z+gHbLtjYgW43b89aBv3iefoXmXr4ZUotRa8gPaAjkXnPR8Q9vo9pgUSytcS5sVThq3/gYnGjUoHYKjBdrK58JA=
+Received: from CYZPR05CA0009.namprd05.prod.outlook.com (2603:10b6:930:89::26)
+ by CH0PR12MB5347.namprd12.prod.outlook.com (2603:10b6:610:d6::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.26; Mon, 7 Aug
+ 2023 05:52:40 +0000
+Received: from CY4PEPF0000E9D2.namprd03.prod.outlook.com
+ (2603:10b6:930:89:cafe::2c) by CYZPR05CA0009.outlook.office365.com
+ (2603:10b6:930:89::26) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6678.15 via Frontend
+ Transport; Mon, 7 Aug 2023 05:52:42 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ CY4PEPF0000E9D2.mail.protection.outlook.com (10.167.241.145) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.6652.19 via Frontend Transport; Mon, 7 Aug 2023 05:52:42 +0000
+Received: from SATLEXMB04.amd.com (10.181.40.145) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Mon, 7 Aug
+ 2023 00:52:09 -0500
+Received: from xhdradheys41.xilinx.com (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server id 15.1.2507.27 via Frontend
+ Transport; Mon, 7 Aug 2023 00:52:00 -0500
+From: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>
+To: <vkoul@kernel.org>, <robh+dt@kernel.org>,
+	<krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
+	<michal.simek@amd.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <linux@armlinux.org.uk>
+CC: <dmaengine@vger.kernel.org>, <devicetree@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <git@amd.com>, Radhey Shyam Pandey
+	<radhey.shyam.pandey@amd.com>
+Subject: [PATCH net-next v5 00/10] net: axienet: Introduce dmaengine
+Date: Mon, 7 Aug 2023 11:21:39 +0530
+Message-ID: <1691387509-2113129-1-git-send-email-radhey.shyam.pandey@amd.com>
+X-Mailer: git-send-email 2.1.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.0
-Subject: Re: [PATCH -next 6/6] brcm80211: Remove an unnecessary ternary
- operator
-Content-Language: en-US
-To: Ping-Ke Shih <pkshih@realtek.com>, "sgoutham@marvell.com"
-	<sgoutham@marvell.com>, "davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
-	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
-	"jesse.brandeburg@intel.com" <jesse.brandeburg@intel.com>,
-	"anthony.l.nguyen@intel.com" <anthony.l.nguyen@intel.com>,
-	"tariqt@nvidia.com" <tariqt@nvidia.com>, "s.shtylyov@omp.ru"
-	<s.shtylyov@omp.ru>, "aspriel@gmail.com" <aspriel@gmail.com>,
-	"franky.lin@broadcom.com" <franky.lin@broadcom.com>,
-	"hante.meuleman@broadcom.com" <hante.meuleman@broadcom.com>,
-	"kvalo@kernel.org" <kvalo@kernel.org>, "richardcochran@gmail.com"
-	<richardcochran@gmail.com>, "yoshihiro.shimoda.uh@renesas.com"
-	<yoshihiro.shimoda.uh@renesas.com>, "u.kleine-koenig@pengutronix.de"
-	<u.kleine-koenig@pengutronix.de>, "mkl@pengutronix.de" <mkl@pengutronix.de>,
-	"lee@kernel.org" <lee@kernel.org>, "set_pte_at@outlook.com"
-	<set_pte_at@outlook.com>, "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "intel-wired-lan@lists.osuosl.org"
-	<intel-wired-lan@lists.osuosl.org>, "linux-rdma@vger.kernel.org"
-	<linux-rdma@vger.kernel.org>, "linux-renesas-soc@vger.kernel.org"
-	<linux-renesas-soc@vger.kernel.org>, "linux-wireless@vger.kernel.org"
-	<linux-wireless@vger.kernel.org>, "brcm80211-dev-list.pdl@broadcom.com"
-	<brcm80211-dev-list.pdl@broadcom.com>, "SHA-cyfmac-dev-list@infineon.com"
-	<SHA-cyfmac-dev-list@infineon.com>
-References: <20230804035346.2879318-1-ruanjinjie@huawei.com>
- <20230804035346.2879318-7-ruanjinjie@huawei.com>
- <f72991b36d6a449ea5cf476d438bcd1d@realtek.com>
-From: Ruan Jinjie <ruanjinjie@huawei.com>
-In-Reply-To: <f72991b36d6a449ea5cf476d438bcd1d@realtek.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.67.109.254]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- kwepemi500008.china.huawei.com (7.221.188.139)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-6.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000E9D2:EE_|CH0PR12MB5347:EE_
+X-MS-Office365-Filtering-Correlation-Id: 97b7bac7-7e3e-4aeb-a7e4-08db970a8433
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	1st/JGOFzcmFhtsUICIW7rm0ZC99JXZzHOda3WbsvBOWJ16rsd0B2Cz4Twr4hYhmK8ocIHtHku11HTEsz7soG8VOS+VJoOoK+oRTnz9/KNSDCXuky6NXwuWG7mYfs5WpDpm/bugjWQXcpDTuTFABdANfVPJhdhLew1tIz3GXXDEaemosVE7Z66W5lcPZQYC/8EEbpsr8OlDHrhudpMrURoE0tZ9251bPqJll0SbdkIQU3S1fXWflQNvzaSjg+H4NGvyZbzPJswXiuoZ72YNt7WkIpOaAtumGr69rLQSPAsFKHwaT2YNRrCriXAGsfckkR5UjqqaEbfZHHDW5xYux7VsMpHbY48qLNbcK0xnAS0mnAueyrK3a8JvVO9sBBODejVBBYt5/Gd8Ez9hb5hfHS9iAgk1OdkoEeHZaGNqtz6otlrMVmFDMGB+Gqpa/qljRk/zvRAMB4kdorE64RzmVAxdrWbFOcFZColaeJ7UIJZcCpR5h+g5pmZdLtiDNsmpYW62fYDO3ls3gQVxTkffl6tvYfbT7hmdHlJDHW1+ickg7aEKysKWOBbVfq3a5b9nvdnNwGi/XqcXslTjXVDh5LDgNqStfwo4ysuX/ciJ5sKbbKCXltuCROAQzFZZH97GFBSVXh10GDnMRKFOcQ6LqCRkExJqB3EK9uA8/O2jMNWQoqieItcwKdPBCPhkuEYwRY88CZUVqAbBDiVOrLCFbjIDgK90t+kEnswg0pmjqCUBiFNTRChH9PyCpWuBk2VF5rDWAxN8Icun0qrGLgG5zxMA9vOUUMldxkJ8FxuWCRbqm+KMckUAf5RbyUy334nOM
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(376002)(346002)(396003)(136003)(39860400002)(82310400008)(1800799003)(186006)(451199021)(40470700004)(46966006)(36840700001)(426003)(41300700001)(26005)(2906002)(5660300002)(83380400001)(7416002)(66899021)(36860700001)(47076005)(8936002)(8676002)(2616005)(40460700003)(40480700001)(336012)(478600001)(81166007)(86362001)(921005)(316002)(82740400003)(356005)(110136005)(54906003)(70206006)(70586007)(6666004)(966005)(4326008)(36756003)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Aug 2023 05:52:42.5408
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 97b7bac7-7e3e-4aeb-a7e4-08db970a8433
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CY4PEPF0000E9D2.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR12MB5347
+X-Spam-Status: No, score=3.0 required=5.0 tests=AC_FROM_MANY_DOTS,BAYES_00,
+	DKIMWL_WL_HIGH,DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	FORGED_SPF_HELO,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
+	SPF_NONE autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Level: **
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+The axiethernet driver can use the dmaengine framework to communicate
+with the xilinx DMAengine driver(AXIDMA, MCDMA). The inspiration behind
+this dmaengine adoption is to reuse the in-kernel xilinx dma engine
+driver[1] and remove redundant dma programming sequence[2] from the
+ethernet driver. This simplifies the ethernet driver and also makes
+it generic to be hooked to any complaint dma IP i.e AXIDMA, MCDMA
+without any modification.
+
+The dmaengine framework was extended for metadata API support during
+the axidma RFC[3] discussion. However, it still needs further
+enhancements to make it well suited for ethernet usecases.
+
+Comments, suggestions, thoughts to implement remaining functional
+features are very welcome!
+
+[1]: https://github.com/torvalds/linux/blob/master/drivers/dma/xilinx/xilinx_dma.c
+[2]: https://github.com/torvalds/linux/blob/master/drivers/net/ethernet/xilinx/xilinx_axienet_main.c#L238
+[3]: http://lkml.iu.edu/hypermail/linux/kernel/1804.0/00367.html
+[4]: https://lore.kernel.org/all/20221124102745.2620370-1-sarath.babu.naidu.gaddam@amd.com
 
 
-On 2023/8/7 9:42, Ping-Ke Shih wrote:
-> 
-> 
->> -----Original Message-----
->> From: Ruan Jinjie <ruanjinjie@huawei.com>
->> Sent: Friday, August 4, 2023 11:54 AM
->> To: sgoutham@marvell.com; davem@davemloft.net; edumazet@google.com; kuba@kernel.org; pabeni@redhat.com;
->> jesse.brandeburg@intel.com; anthony.l.nguyen@intel.com; tariqt@nvidia.com; s.shtylyov@omp.ru;
->> aspriel@gmail.com; franky.lin@broadcom.com; hante.meuleman@broadcom.com; kvalo@kernel.org;
->> richardcochran@gmail.com; yoshihiro.shimoda.uh@renesas.com; ruanjinjie@huawei.com;
->> u.kleine-koenig@pengutronix.de; mkl@pengutronix.de; lee@kernel.org; set_pte_at@outlook.com;
->> linux-arm-kernel@lists.infradead.org; netdev@vger.kernel.org; intel-wired-lan@lists.osuosl.org;
->> linux-rdma@vger.kernel.org; linux-renesas-soc@vger.kernel.org; linux-wireless@vger.kernel.org;
->> brcm80211-dev-list.pdl@broadcom.com; SHA-cyfmac-dev-list@infineon.com
->> Subject: [PATCH -next 6/6] brcm80211: Remove an unnecessary ternary operator
->>
->> There is a ternary operator, the true or false judgement of which
->> is unnecessary in C language semantics.
->>
->> Signed-off-by: Ruan Jinjie <ruanjinjie@huawei.com>
->> ---
->>  drivers/net/wireless/broadcom/brcm80211/brcmsmac/phy/phy_n.c | 3 +--
->>  1 file changed, 1 insertion(+), 2 deletions(-)
->>
->> diff --git a/drivers/net/wireless/broadcom/brcm80211/brcmsmac/phy/phy_n.c
->> b/drivers/net/wireless/broadcom/brcm80211/brcmsmac/phy/phy_n.c
->> index 8580a2754789..8328b22829c5 100644
->> --- a/drivers/net/wireless/broadcom/brcm80211/brcmsmac/phy/phy_n.c
->> +++ b/drivers/net/wireless/broadcom/brcm80211/brcmsmac/phy/phy_n.c
->> @@ -27351,8 +27351,7 @@ static int wlc_phy_cal_rxiq_nphy_rev3(struct brcms_phy *pi,
->>
->>         for (rx_core = 0; rx_core < pi->pubpi.phy_corenum; rx_core++) {
->>
->> -               skip_rxiqcal =
->> -                       ((rxcore_state & (1 << rx_core)) == 0) ? true : false;
->> +               skip_rxiqcal = (rxcore_state & (1 << rx_core)) == 0;
-> 
-> skip_rxiqcal = !(rxcore_state & (1 << rx_core));
+Changes in v5:
+- Fix git am failure on net-next
+- Addressed DT binding review comments i.e Modified commit description to
+  remove dmaengine framework references and instead describe how
+  axiethernet IP uses DMA channels.
+- Fix "^[tr]x_chan[0-9]|1[0-5]$" -> "^[tr]x_chan([0-9]|1[0-5])$"
+- Drop generic dmas description.
+- Fix kmem_cache resource leak.
+- Merge Xilinx DMA enhancements and optimization[4] into this series.
 
+Changes in V4:
+- Updated commit description about tx/rx channels name(1/3).
+- Removed "dt-bindings" and "dmaengine" strings in subject(1/3).
+- Extended dmas and dma-names to support MCDMA channel names(1/3).
+- Rename has_dmas to use_dmaegine(2/3).
+- Remove the AXIENET_USE_DMA(2/3).
+- Remove the AXIENET_USE_DMA(3/3).
+- Add dev_err_probe for dma_request_chan error handling(3/3).
+- Add kmem_cache_destroy for create in axienet_setup_dma_chan(3/3).
 
-Thank you! I'll improve it sooner.
+Changes in V3:
+- Moved RFC to PATCH.
+- Removed ethtool get/set coalesce, will be added later.
+- Added backward comapatible support.
+- Split the dmaengine support patch of V2 into two patches(2/3 and 3/3).
+https://lore.kernel.org/all/20220920055703.13246-4-sarath.babu.naidu.gaddam@amd.com/
 
-> 
->>
->>                 wlc_phy_rxcal_physetup_nphy(pi, rx_core);
->>
->> --
->> 2.34.1
->>
->>
->> ------Please consider the environment before printing this e-mail.
-> 
+Changes in V2:
+- Add ethtool get/set coalesce and DMA reset using DMAengine framework.
+- Add performance numbers.
+- Remove .txt and change the name of file to xlnx,axiethernet.yaml.
+- Fix DT check warning(Fix DT check warning('device_type' does not match
+   any of the regexes:'pinctrl-[0-9]+' From schema: Documentation/
+   devicetree/bindings/net/xilinx_axienet.yaml).
+
+Radhey Shyam Pandey (9):
+  dt-bindings: dmaengine: xilinx_dma:Add xlnx,axistream-connected
+    property
+  dt-bindings: dmaengine: xilinx_dma: Add xlnx,irq-delay property
+  dmaengine: xilinx_dma: Pass AXI4-Stream control words to dma client
+  dmaengine: xilinx_dma: Increase AXI DMA transaction segment count
+  dmaengine: xilinx_dma: Freeup active list based on descriptor
+    completion bit
+  dmaengine: xilinx_dma: Use tasklet_hi_schedule for timing critical
+    usecase
+  dmaengine: xilinx_dma: Program interrupt delay timeout
+  dt-bindings: net: xlnx,axi-ethernet: Introduce DMA support
+  net: axienet: Introduce dmaengine support
+
+Sarath Babu Naidu Gaddam (1):
+  net: axienet: Preparatory changes for dmaengine support
+
+ .../bindings/dma/xilinx/xilinx_dma.txt        |   6 +
+ .../bindings/net/xlnx,axi-ethernet.yaml       |  16 +
+ drivers/dma/xilinx/xilinx_dma.c               |  70 +-
+ drivers/net/ethernet/xilinx/Kconfig           |   1 +
+ drivers/net/ethernet/xilinx/xilinx_axienet.h  |  10 +
+ .../net/ethernet/xilinx/xilinx_axienet_main.c | 622 ++++++++++++++----
+ 6 files changed, 591 insertions(+), 134 deletions(-)
+
+-- 
+2.34.1
+
 
