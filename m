@@ -1,866 +1,250 @@
-Return-Path: <netdev+bounces-25078-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25079-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FB85772D7F
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 20:05:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AEEEA772D8A
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 20:10:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B8E92281450
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 18:05:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 68AF4280F77
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 18:09:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7448015AC1;
-	Mon,  7 Aug 2023 18:05:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD846156FC;
+	Mon,  7 Aug 2023 18:09:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6136D156F5
-	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 18:05:14 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BABFFC433CA;
-	Mon,  7 Aug 2023 18:05:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691431514;
-	bh=IgjbFevivCXo4ewfMKN+yGUOMJi1tDfFv5Sz4EP/Oic=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=scqfgbyH4mg1GH1zj6iqJmY+JgRjXz6n8cFt+7p23WVjbJ8tASw4HqEDBQHWMGoAJ
-	 AzYX17gleOwHxfwbh+fr/G2L/l0K/BUq2zI+nDHG/zjdwOZxiyowuLQn2WRW6Q6HXT
-	 AkIexrAVpjOKcPg1NtLweJV/J+uf4jArlbm+3DZMTs3QKiWuXLoXMUfFwNldY+1MpC
-	 /FF5p3bvS6NnPAA7uan0Fevv+6dkLFvaAYig3zQxqAG7j/SpM+kGbMHCHZ5AStdXeA
-	 Wap24+StCxhDEEocCSjRj9YCKBmIBjS0DGntCSeKjvypoiP0tE/Gou+PVVVxtekDM0
-	 ePaI0v6c5/l+A==
-From: Saeed Mahameed <saeed@kernel.org>
-To: "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>
-Cc: Saeed Mahameed <saeedm@nvidia.com>,
-	netdev@vger.kernel.org,
-	Tariq Toukan <tariqt@nvidia.com>,
-	linux-hwmon@vger.kernel.org,
-	Jean Delvare <jdelvare@suse.com>,
-	Guenter Roeck <linux@roeck-us.net>,
-	Adham Faris <afaris@nvidia.com>,
-	Gal Pressman <gal@nvidia.com>
-Subject: [PATCH net-next V2 2/2] net/mlx5: Expose NIC temperature via hardware monitoring kernel API
-Date: Mon,  7 Aug 2023 11:05:07 -0700
-Message-ID: <20230807180507.22984-3-saeed@kernel.org>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230807180507.22984-1-saeed@kernel.org>
-References: <20230807180507.22984-1-saeed@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A275314A93
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 18:09:47 +0000 (UTC)
+Received: from out-122.mta1.migadu.com (out-122.mta1.migadu.com [IPv6:2001:41d0:203:375::7a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7EB67172A
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 11:09:45 -0700 (PDT)
+Message-ID: <9207911d-65b4-f874-3dcb-52d0c0a4950f@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1691431783; h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=PiMCJQvBwmGZzCubvzQ9nvDlPtCBq1jGBQ90JT2c/tY=;
+	b=tiMLNCvgcNMIiukNEN8tmcRYRkxeOAvZogkEJwjm0GiWWuT/TxmX2YckOvt01qfEpt00sZ
+	kieP+x41URdNQeQBxYWOlSikueNTHsyr2u7NCxKeqQ5MoIN3gDsfx6882EYmuO/kygRTuj
+	vZAfFDveynOt3R+clAQ9WgEfevjD7Nk=
+Date: Mon, 7 Aug 2023 11:09:35 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Reply-To: yonghong.song@linux.dev
+Subject: Re: [syzbot] [bpf?] KMSAN: uninit-value in
+ ieee802154_subif_start_xmit
+Content-Language: en-US
+To: Eduard Zingerman <eddyz87@gmail.com>,
+ syzbot <syzbot+d61b595e9205573133b3@syzkaller.appspotmail.com>,
+ andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org,
+ daniel@iogearbox.net, davem@davemloft.net, haoluo@google.com,
+ hawk@kernel.org, john.fastabend@gmail.com, jolsa@kernel.org,
+ kpsingh@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org,
+ martin.lau@linux.dev, netdev@vger.kernel.org, sdf@google.com,
+ song@kernel.org, syzkaller-bugs@googlegroups.com
+References: <0000000000002098bc0602496cc3@google.com>
+ <d520bd6c-bfd3-47f1-c794-ab451905256b@linux.dev>
+ <9c8f04a0bf90db4bb8e6192824ab71f58244b74b.camel@gmail.com>
+ <bc69afd6-6eec-a070-ab96-05ab137aaf0b@linux.dev>
+ <72e2ff187fb8cd031a6330e4c3cd8e66a0590fc1.camel@gmail.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yonghong Song <yonghong.song@linux.dev>
+In-Reply-To: <72e2ff187fb8cd031a6330e4c3cd8e66a0590fc1.camel@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,LOTS_OF_MONEY,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-From: Adham Faris <afaris@nvidia.com>
 
-Expose NIC temperature by implementing hwmon kernel API, which turns
-current thermal zone kernel API to redundant.
 
-For each one of the supported and exposed thermal diode sensors, expose
-the following attributes:
-1) Input temperature.
-2) Highest temperature.
-3) Temperature label:
-   Depends on the firmware capability, if firmware doesn't support
-   sensors naming, the fallback naming convention would be: "sensorX",
-   where X is the HW spec (MTMP register) sensor index.
-4) Temperature critical max value:
-   refers to the high threshold of Warning Event. Will be exposed as
-   `tempY_crit` hwmon attribute (RO attribute). For example for
-   ConnectX5 HCA's this temperature value will be 105 Celsius, 10
-   degrees lower than the HW shutdown temperature).
-5) Temperature reset history: resets highest temperature.
+On 8/7/23 7:45 AM, Eduard Zingerman wrote:
+> On Mon, 2023-08-07 at 07:40 -0700, Yonghong Song wrote:
+>>
+>> On 8/7/23 6:11 AM, Eduard Zingerman wrote:
+>>> On Sun, 2023-08-06 at 23:40 -0700, Yonghong Song wrote:
+>>>>
+>>>> On 8/6/23 4:23 PM, syzbot wrote:
+>>>>> Hello,
+>>>>>
+>>>>> syzbot found the following issue on:
+>>>>>
+>>>>> HEAD commit:    25ad10658dc1 riscv, bpf: Adapt bpf trampoline to optimized..
+>>>>> git tree:       bpf-next
+>>>>> console+strace: https://syzkaller.appspot.com/x/log.txt?x=147cbb29a80000
+>>>>> kernel config:  https://syzkaller.appspot.com/x/.config?x=8acaeb93ad7c6aaa
+>>>>> dashboard link: https://syzkaller.appspot.com/bug?extid=d61b595e9205573133b3
+>>>>> compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+>>>>> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=14d73ccea80000
+>>>>> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1276aedea80000
+>>>>>
+>>>>> Downloadable assets:
+>>>>> disk image: https://storage.googleapis.com/syzbot-assets/3d378cc13d42/disk-25ad1065.raw.xz
+>>>>> vmlinux: https://storage.googleapis.com/syzbot-assets/44580fd5d1af/vmlinux-25ad1065.xz
+>>>>> kernel image: https://storage.googleapis.com/syzbot-assets/840587618b41/bzImage-25ad1065.xz
+>>>>>
+>>>>> The issue was bisected to:
+>>>>>
+>>>>> commit 8100928c881482a73ed8bd499d602bab0fe55608
+>>>>> Author: Yonghong Song <yonghong.song@linux.dev>
+>>>>> Date:   Fri Jul 28 01:12:02 2023 +0000
+>>>>>
+>>>>>        bpf: Support new sign-extension mov insns
+>>>>
+>>>> Thanks for reporting. I will look into this ASAP.
+>>>
+>>> Hi Yonghong,
+>>>
+>>> I guess it's your night and my morning, so I did some initial assessment.
+>>> The BPF program being loaded is:
+>>>
+>>>     0 : (62) *(u32 *)(r10 -8) = 553656332
+>>>     1 : (bf) r1 = (s16)r10
+>>>     2 : (07) r1 += -8
+>>>     3 : (b7) r2 = 3
+>>>     4 : (bd) if r2 <= r1 goto pc+0
+>>>     5 : (85) call bpf_trace_printk#6
+>>>     6 : (b7) r0 = 0
+>>>     7 : (95) exit
+>>>
+>>> (Note: when using bpftool (prog dump xlated id <some-id>) the disassembly
+>>>    of the instruction #1 is incorrectly printed as "1: (bf) r1 = r10")
+>>>    
+>>> The error occurs when instruction #5 (call to printk) is executed.
+>>> An incorrect address for the format string is passed to printk.
+>>> Disassembly of the jited program looks as follows:
+>>>
+>>>     $ bpftool prog dump jited id <some-id>
+>>>     bpf_prog_ebeed182d92b487f:
+>>>        0: nopl    (%rax,%rax)
+>>>        5: nop
+>>>        7: pushq   %rbp
+>>>        8: movq    %rsp, %rbp
+>>>        b: subq    $8, %rsp
+>>>       12: movl    $553656332, -8(%rbp)
+>>>       19: movswq  %bp, %rdi            ; <---- Note movswq %bp !
+>>>       1d: addq    $-8, %rdi
+>>>       21: movl    $3, %esi
+>>>       26: cmpq    %rdi, %rsi
+>>>       29: jbe 0x2b
+>>>       2b: callq   0xffffffffe11c484c
+>>>       30: xorl    %eax, %eax
+>>>       32: leave
+>>>       33: retq
+>>>
+>>> Note jit instruction #19 corresponding to BPF instruction #1, which
+>>> loads truncated and sign-extended value of %rbp's first byte as an
+>>> address of format string.
+>>>
+>>> Here is how verifier log looks for (slightly modified) program:
+>>>
+>>>     func#0 @0
+>>>     0: R1=ctx(off=0,imm=0) R10=fp0
+>>>     ; asm volatile ("			\n\
+>>>     0: (b7) r1 = 553656332                ; R1_w=553656332
+>>>     1: (63) *(u32 *)(r10 -8) = r1         ; R1_w=553656332 R10=fp0 fp-8=553656332
+>>>     2: (bf) r1 = (s16)r10                 ; R1_w=fp0 R10=fp0
+>>>     3: (07) r1 += -8                      ; R1_w=fp-8
+>>>     4: (b7) r2 = 3                        ; R2_w=3
+>>>     5: (bd) if r2 <= r1 goto pc+0         ; R1_w=fp-8 R2_w=3
+>>>     6: (85) call bpf_trace_printk#6
+>>>     mark_precise: frame0: last_idx 6 first_idx 0 subseq_idx -1
+>>>     ...
+>>>     mark_precise: frame0: falling back to forcing all scalars precise
+>>>     7: R0=scalar()
+>>>     7: (b7) r0 = 0                        ; R0_w=0
+>>>     8: (95) exit
+>>>     
+>>>     from 5 to 6: R1_w=fp-8 R2_w=3 R10=fp0 fp-8=553656332
+>>>     6: (85) call bpf_trace_printk#6
+>>>     mark_precise: frame0: last_idx 6 first_idx 0 subseq_idx -1
+>>>     ...
+>>>     mark_precise: frame0: falling back to forcing all scalars precise
+>>>     7: safe
+>>>
+>>> Note the following line:
+>>>
+>>>     2: (bf) r1 = (s16)r10                 ; R1_w=fp0 R10=fp0
+>>>
+>>> Verifier incorrectly marked r1 as fp0, hence not noticing the problem
+>>> with address passed to printk.
+>>
+>> Thanks, Eduard. Right. I am also able to dump xlated code like
+>> below:
+>>
+>>      0: (62) *(u32 *)(r10 -8) = 553656332
+>>      1: (bf) r1 = (s16)r10
+>>      2: (07) r1 += -8
+>>      3: (b7) r2 = 3
+>>      4: (bd) if r2 <= r1 goto pc+0
+>>      5: (85) call bpf_trace_printk#-138320
+>>      6: (b7) r0 = 0
+>>      7: (95) exit
+>>
+>> Something like below can fix the problem,
+>>
+>> diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
+>> index 132f25dab931..db72619551b2 100644
+>> --- a/kernel/bpf/verifier.c
+>> +++ b/kernel/bpf/verifier.c
+>> @@ -13171,6 +13171,7 @@ static int check_alu_op(struct bpf_verifier_env
+>> *env, struct bpf_insn *insn)
+>>                                           if (no_sext && need_id)
+>>                                                   src_reg->id =
+>> ++env->id_gen;
+>>                                           copy_register_state(dst_reg,
+>> src_reg);
+>> +                                       dst_reg->type = SCALAR_VALUE;
+>>                                           if (!no_sext)
+>>                                                   dst_reg->id = 0;
+>>                                           coerce_reg_to_size_sx(dst_reg,
+>> insn->off >> 3);
+>>
+>> After insn 1, we need change r1 type to SCALAR_VALUE. Will add
+>> the the test to selftest and submit the patch to fix the problem
+>> today.
+> 
+> Should this be an error?
+> Like in the same function but slightly below, when u32 moves are
+> processed:
+> 
+>      /* R1 = (u32) R2 */
+>      if (is_pointer_value(env, insn->src_reg)) {
+>          verbose(env,
+>              "R%d partial copy of pointer\n",
+>              insn->src_reg);
+>          return -EACCES;
+>      } else { ...
 
-For example, for dualport ConnectX5 NIC with a single IC thermal diode
-sensor will have 2 hwmon directories (one for each PCI function)
-under "/sys/class/hwmon/hwmon[X,Y]".
+Right, this is indeed better for unprivileged prog run.
+I have submitted a patch to fix the issue reported by syzbot.
+Please help review. Thanks!
 
-Listing one of the directories above (hwmonX/Y) generates the
-corresponding output below:
-
-$ grep -H -d skip . /sys/class/hwmon/hwmon0/*
-
-Output
-=======================================================================
-/sys/class/hwmon/hwmon0/name:mlx5
-/sys/class/hwmon/hwmon0/temp1_crit:105000
-/sys/class/hwmon/hwmon0/temp1_highest:48000
-/sys/class/hwmon/hwmon0/temp1_input:46000
-/sys/class/hwmon/hwmon0/temp1_label:asic
-grep: /sys/class/hwmon/hwmon0/temp1_reset_history: Permission denied
-
-In addition, displaying the sensors data via lm_sensors generates the
-corresponding output below:
-
-$ sensors
-
-Output
-=======================================================================
-mlx5-pci-0800
-Adapter: PCI adapter
-asic:         +46.0°C  (crit = +105.0°C, highest = +48.0°C)
-
-mlx5-pci-0801
-Adapter: PCI adapter
-asic:         +46.0°C  (crit = +105.0°C, highest = +48.0°C)
-
-CC: linux-hwmon@vger.kernel.org
-CC: Jean Delvare <jdelvare@suse.com>
-CC: Guenter Roeck <linux@roeck-us.net>
-Signed-off-by: Adham Faris <afaris@nvidia.com>
-Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
-Reviewed-by: Gal Pressman <gal@nvidia.com>
-Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
----
- .../net/ethernet/mellanox/mlx5/core/Kconfig   |   1 +
- .../net/ethernet/mellanox/mlx5/core/Makefile  |   2 +-
- .../net/ethernet/mellanox/mlx5/core/hwmon.c   | 418 ++++++++++++++++++
- .../net/ethernet/mellanox/mlx5/core/hwmon.h   |  24 +
- .../net/ethernet/mellanox/mlx5/core/main.c    |   8 +-
- .../net/ethernet/mellanox/mlx5/core/thermal.c | 114 -----
- .../net/ethernet/mellanox/mlx5/core/thermal.h |  20 -
- include/linux/mlx5/driver.h                   |   3 +-
- include/linux/mlx5/mlx5_ifc.h                 |  14 +-
- 9 files changed, 463 insertions(+), 141 deletions(-)
- create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/hwmon.c
- create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/hwmon.h
- delete mode 100644 drivers/net/ethernet/mellanox/mlx5/core/thermal.c
- delete mode 100644 drivers/net/ethernet/mellanox/mlx5/core/thermal.h
-
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/Kconfig b/drivers/net/ethernet/mellanox/mlx5/core/Kconfig
-index bb1d7b039a7e..d537d517cabe 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/Kconfig
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/Kconfig
-@@ -12,6 +12,7 @@ config MLX5_CORE
- 	depends on MLXFW || !MLXFW
- 	depends on PTP_1588_CLOCK_OPTIONAL
- 	depends on PCI_HYPERV_INTERFACE || !PCI_HYPERV_INTERFACE
-+	depends on HWMON || !HWMON
- 	help
- 	  Core driver for low level functionality of the ConnectX-4 and
- 	  Connect-IB cards by Mellanox Technologies.
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/Makefile b/drivers/net/ethernet/mellanox/mlx5/core/Makefile
-index 63a2f2bb80a6..946310390659 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/Makefile
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/Makefile
-@@ -82,7 +82,7 @@ endif
- mlx5_core-$(CONFIG_MLX5_BRIDGE)    += esw/bridge.o esw/bridge_mcast.o esw/bridge_debugfs.o \
- 				      en/rep/bridge.o
- 
--mlx5_core-$(CONFIG_THERMAL)        += thermal.o
-+mlx5_core-$(CONFIG_HWMON)          += hwmon.o
- mlx5_core-$(CONFIG_MLX5_MPFS)      += lib/mpfs.o
- mlx5_core-$(CONFIG_VXLAN)          += lib/vxlan.o
- mlx5_core-$(CONFIG_PTP_1588_CLOCK) += lib/clock.o
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/hwmon.c b/drivers/net/ethernet/mellanox/mlx5/core/hwmon.c
-new file mode 100644
-index 000000000000..353f81dccd1c
---- /dev/null
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/hwmon.c
-@@ -0,0 +1,418 @@
-+// SPDX-License-Identifier: GPL-2.0 OR Linux-OpenIB
-+// Copyright (c) 2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved
-+
-+#include <linux/hwmon.h>
-+#include <linux/bitmap.h>
-+#include <linux/mlx5/device.h>
-+#include <linux/mlx5/mlx5_ifc.h>
-+#include <linux/mlx5/port.h>
-+#include "mlx5_core.h"
-+#include "hwmon.h"
-+
-+#define CHANNELS_TYPE_NUM 2 /* chip channel and temp channel */
-+#define CHIP_CONFIG_NUM 1
-+
-+/* module 0 is mapped to sensor_index 64 in MTMP register */
-+#define to_mtmp_module_sensor_idx(idx) (64 + (idx))
-+
-+/* All temperatures retrieved in units of 0.125C. hwmon framework expect
-+ * it in units of millidegrees C. Hence multiply values by 125.
-+ */
-+#define mtmp_temp_to_mdeg(temp) ((temp) * 125)
-+
-+struct temp_channel_desc {
-+	u32 sensor_index;
-+	char sensor_name[32];
-+};
-+
-+/* chip_channel_config and channel_info arrays must be 0-terminated, hence + 1 */
-+struct mlx5_hwmon {
-+	struct mlx5_core_dev *mdev;
-+	struct device *hwmon_dev;
-+	struct hwmon_channel_info chip_info;
-+	u32 chip_channel_config[CHIP_CONFIG_NUM + 1];
-+	struct hwmon_channel_info temp_info;
-+	u32 *temp_channel_config;
-+	const struct hwmon_channel_info *channel_info[CHANNELS_TYPE_NUM + 1];
-+	struct hwmon_chip_info chip;
-+	struct temp_channel_desc *temp_channel_desc;
-+	u32 asic_platform_scount;
-+	u32 module_scount;
-+};
-+
-+static int mlx5_hwmon_query_mtmp(struct mlx5_core_dev *mdev, u32 sensor_index, u32 *mtmp_out)
-+{
-+	u32 mtmp_in[MLX5_ST_SZ_DW(mtmp_reg)] = {};
-+
-+	MLX5_SET(mtmp_reg, mtmp_in, sensor_index, sensor_index);
-+
-+	return mlx5_core_access_reg(mdev, mtmp_in,  sizeof(mtmp_in),
-+				    mtmp_out, MLX5_ST_SZ_BYTES(mtmp_reg),
-+				    MLX5_REG_MTMP, 0, 0);
-+}
-+
-+static int mlx5_hwmon_reset_max_temp(struct mlx5_core_dev *mdev, int sensor_index)
-+{
-+	u32 mtmp_out[MLX5_ST_SZ_DW(mtmp_reg)] = {};
-+	u32 mtmp_in[MLX5_ST_SZ_DW(mtmp_reg)] = {};
-+
-+	MLX5_SET(mtmp_reg, mtmp_in, sensor_index, sensor_index);
-+	MLX5_SET(mtmp_reg, mtmp_in, mtr, 1);
-+
-+	return mlx5_core_access_reg(mdev, mtmp_in,  sizeof(mtmp_in),
-+				    mtmp_out, sizeof(mtmp_out),
-+				    MLX5_REG_MTMP, 0, 0);
-+}
-+
-+static int mlx5_hwmon_enable_max_temp(struct mlx5_core_dev *mdev, int sensor_index)
-+{
-+	u32 mtmp_out[MLX5_ST_SZ_DW(mtmp_reg)] = {};
-+	u32 mtmp_in[MLX5_ST_SZ_DW(mtmp_reg)] = {};
-+	int err;
-+
-+	err = mlx5_hwmon_query_mtmp(mdev, sensor_index, mtmp_in);
-+	if (err)
-+		return err;
-+
-+	MLX5_SET(mtmp_reg, mtmp_in, mte, 1);
-+	return mlx5_core_access_reg(mdev, mtmp_in,  sizeof(mtmp_in),
-+				    mtmp_out, sizeof(mtmp_out),
-+				    MLX5_REG_MTMP, 0, 1);
-+}
-+
-+static int mlx5_hwmon_read(struct device *dev, enum hwmon_sensor_types type, u32 attr,
-+			   int channel, long *val)
-+{
-+	struct mlx5_hwmon *hwmon = dev_get_drvdata(dev);
-+	u32 mtmp_out[MLX5_ST_SZ_DW(mtmp_reg)] = {};
-+	int err;
-+
-+	if (type != hwmon_temp)
-+		return -EOPNOTSUPP;
-+
-+	err = mlx5_hwmon_query_mtmp(hwmon->mdev, hwmon->temp_channel_desc[channel].sensor_index,
-+				    mtmp_out);
-+	if (err)
-+		return err;
-+
-+	switch (attr) {
-+	case hwmon_temp_input:
-+		*val = mtmp_temp_to_mdeg(MLX5_GET(mtmp_reg, mtmp_out, temperature));
-+		return 0;
-+	case hwmon_temp_highest:
-+		*val = mtmp_temp_to_mdeg(MLX5_GET(mtmp_reg, mtmp_out, max_temperature));
-+		return 0;
-+	case hwmon_temp_crit:
-+		*val = mtmp_temp_to_mdeg(MLX5_GET(mtmp_reg, mtmp_out, temp_threshold_hi));
-+		return 0;
-+	default:
-+		return -EOPNOTSUPP;
-+	}
-+}
-+
-+static int mlx5_hwmon_write(struct device *dev, enum hwmon_sensor_types type, u32 attr,
-+			    int channel, long val)
-+{
-+	struct mlx5_hwmon *hwmon = dev_get_drvdata(dev);
-+
-+	if (type != hwmon_temp || attr != hwmon_temp_reset_history)
-+		return -EOPNOTSUPP;
-+
-+	return mlx5_hwmon_reset_max_temp(hwmon->mdev,
-+				hwmon->temp_channel_desc[channel].sensor_index);
-+}
-+
-+static umode_t mlx5_hwmon_is_visible(const void *data, enum hwmon_sensor_types type, u32 attr,
-+				     int channel)
-+{
-+	if (type != hwmon_temp)
-+		return 0;
-+
-+	switch (attr) {
-+	case hwmon_temp_input:
-+	case hwmon_temp_highest:
-+	case hwmon_temp_crit:
-+	case hwmon_temp_label:
-+		return 0444;
-+	case hwmon_temp_reset_history:
-+		return 0200;
-+	default:
-+		return 0;
-+	}
-+}
-+
-+static int mlx5_hwmon_read_string(struct device *dev, enum hwmon_sensor_types type, u32 attr,
-+				  int channel, const char **str)
-+{
-+	struct mlx5_hwmon *hwmon = dev_get_drvdata(dev);
-+
-+	if (type != hwmon_temp || attr != hwmon_temp_label)
-+		return -EOPNOTSUPP;
-+
-+	*str = (const char *)hwmon->temp_channel_desc[channel].sensor_name;
-+	return 0;
-+}
-+
-+static const struct hwmon_ops mlx5_hwmon_ops = {
-+	.read = mlx5_hwmon_read,
-+	.read_string = mlx5_hwmon_read_string,
-+	.is_visible = mlx5_hwmon_is_visible,
-+	.write = mlx5_hwmon_write,
-+};
-+
-+static int mlx5_hwmon_init_channels_names(struct mlx5_hwmon *hwmon)
-+{
-+	u32 i;
-+
-+	for (i = 0; i < hwmon->asic_platform_scount + hwmon->module_scount; i++) {
-+		u32 mtmp_out[MLX5_ST_SZ_DW(mtmp_reg)] = {};
-+		char *sensor_name;
-+		int err;
-+
-+		err = mlx5_hwmon_query_mtmp(hwmon->mdev, hwmon->temp_channel_desc[i].sensor_index,
-+					    mtmp_out);
-+		if (err)
-+			return err;
-+
-+		sensor_name = MLX5_ADDR_OF(mtmp_reg, mtmp_out, sensor_name_hi);
-+		if (!*sensor_name) {
-+			snprintf(hwmon->temp_channel_desc[i].sensor_name,
-+				 sizeof(hwmon->temp_channel_desc[i].sensor_name), "sensor%u",
-+				 hwmon->temp_channel_desc[i].sensor_index);
-+			continue;
-+		}
-+
-+		memcpy(&hwmon->temp_channel_desc[i].sensor_name, sensor_name,
-+		       MLX5_FLD_SZ_BYTES(mtmp_reg, sensor_name_hi) +
-+		       MLX5_FLD_SZ_BYTES(mtmp_reg, sensor_name_lo));
-+	}
-+
-+	return 0;
-+}
-+
-+static int mlx5_hwmon_get_module_sensor_index(struct mlx5_core_dev *mdev, u32 *module_index)
-+{
-+	int module_num;
-+	int err;
-+
-+	err = mlx5_query_module_num(mdev, &module_num);
-+	if (err)
-+		return err;
-+
-+	*module_index = to_mtmp_module_sensor_idx(module_num);
-+
-+	return 0;
-+}
-+
-+static int mlx5_hwmon_init_sensors_indexes(struct mlx5_hwmon *hwmon, u64 sensor_map)
-+{
-+	DECLARE_BITMAP(smap, BITS_PER_TYPE(sensor_map));
-+	unsigned long bit_pos;
-+	int err = 0;
-+	int i = 0;
-+
-+	bitmap_from_u64(smap, sensor_map);
-+
-+	for_each_set_bit(bit_pos, smap, BITS_PER_TYPE(sensor_map)) {
-+		hwmon->temp_channel_desc[i].sensor_index = bit_pos;
-+		i++;
-+	}
-+
-+	if (hwmon->module_scount)
-+		err = mlx5_hwmon_get_module_sensor_index(hwmon->mdev,
-+							 &hwmon->temp_channel_desc[i].sensor_index);
-+
-+	return err;
-+}
-+
-+static void mlx5_hwmon_channel_info_init(struct mlx5_hwmon *hwmon)
-+{
-+	int i;
-+
-+	hwmon->channel_info[0] = &hwmon->chip_info;
-+	hwmon->channel_info[1] = &hwmon->temp_info;
-+
-+	hwmon->chip_channel_config[0] = HWMON_C_REGISTER_TZ;
-+	hwmon->chip_info.config = (const u32 *)hwmon->chip_channel_config;
-+	hwmon->chip_info.type = hwmon_chip;
-+
-+	for (i = 0; i < hwmon->asic_platform_scount + hwmon->module_scount; i++)
-+		hwmon->temp_channel_config[i] = HWMON_T_INPUT | HWMON_T_HIGHEST | HWMON_T_CRIT |
-+					     HWMON_T_RESET_HISTORY | HWMON_T_LABEL;
-+
-+	hwmon->temp_info.config = (const u32 *)hwmon->temp_channel_config;
-+	hwmon->temp_info.type = hwmon_temp;
-+}
-+
-+static int mlx5_hwmon_is_module_mon_cap(struct mlx5_core_dev *mdev, bool *mon_cap)
-+{
-+	u32 mtmp_out[MLX5_ST_SZ_DW(mtmp_reg)];
-+	u32 module_index;
-+	int err;
-+
-+	err = mlx5_hwmon_get_module_sensor_index(mdev, &module_index);
-+	if (err)
-+		return err;
-+
-+	err = mlx5_hwmon_query_mtmp(mdev, module_index, mtmp_out);
-+	if (err)
-+		return err;
-+
-+	if (MLX5_GET(mtmp_reg, mtmp_out, temperature))
-+		*mon_cap = true;
-+
-+	return 0;
-+}
-+
-+static int mlx5_hwmon_get_sensors_count(struct mlx5_core_dev *mdev, u32 *asic_platform_scount)
-+{
-+	u32 mtcap_out[MLX5_ST_SZ_DW(mtcap_reg)] = {};
-+	u32 mtcap_in[MLX5_ST_SZ_DW(mtcap_reg)] = {};
-+	int err;
-+
-+	err = mlx5_core_access_reg(mdev, mtcap_in,  sizeof(mtcap_in),
-+				   mtcap_out, sizeof(mtcap_out),
-+				   MLX5_REG_MTCAP, 0, 0);
-+	if (err)
-+		return err;
-+
-+	*asic_platform_scount = MLX5_GET(mtcap_reg, mtcap_out, sensor_count);
-+
-+	return 0;
-+}
-+
-+static void mlx5_hwmon_free(struct mlx5_hwmon *hwmon)
-+{
-+	if (!hwmon)
-+		return;
-+
-+	kfree(hwmon->temp_channel_config);
-+	kfree(hwmon->temp_channel_desc);
-+	kfree(hwmon);
-+}
-+
-+static struct mlx5_hwmon *mlx5_hwmon_alloc(struct mlx5_core_dev *mdev)
-+{
-+	struct mlx5_hwmon *hwmon;
-+	bool mon_cap = false;
-+	u32 sensors_count;
-+	int err;
-+
-+	hwmon = kzalloc(sizeof(*mdev->hwmon), GFP_KERNEL);
-+	if (!hwmon)
-+		return ERR_PTR(-ENOMEM);
-+
-+	err = mlx5_hwmon_get_sensors_count(mdev, &hwmon->asic_platform_scount);
-+	if (err)
-+		goto err_free_hwmon;
-+
-+	/* check if module sensor has thermal mon cap. if yes, allocate channel desc for it */
-+	err = mlx5_hwmon_is_module_mon_cap(mdev, &mon_cap);
-+	if (err)
-+		goto err_free_hwmon;
-+
-+	hwmon->module_scount = mon_cap ? 1 : 0;
-+	sensors_count = hwmon->asic_platform_scount + hwmon->module_scount;
-+	hwmon->temp_channel_desc = kcalloc(sensors_count, sizeof(*hwmon->temp_channel_desc),
-+					   GFP_KERNEL);
-+	if (!hwmon->temp_channel_desc) {
-+		err = -ENOMEM;
-+		goto err_free_hwmon;
-+	}
-+
-+	/* sensors configuration values array, must be 0-terminated hence, + 1 */
-+	hwmon->temp_channel_config = kcalloc(sensors_count + 1, sizeof(*hwmon->temp_channel_config),
-+					     GFP_KERNEL);
-+	if (!hwmon->temp_channel_config) {
-+		err = -ENOMEM;
-+		goto err_free_temp_channel_desc;
-+	}
-+
-+	hwmon->mdev = mdev;
-+
-+	return hwmon;
-+
-+err_free_temp_channel_desc:
-+	kfree(hwmon->temp_channel_desc);
-+err_free_hwmon:
-+	kfree(hwmon);
-+	return ERR_PTR(err);
-+}
-+
-+static int mlx5_hwmon_dev_init(struct mlx5_hwmon *hwmon)
-+{
-+	u32 mtcap_out[MLX5_ST_SZ_DW(mtcap_reg)] = {};
-+	u32 mtcap_in[MLX5_ST_SZ_DW(mtcap_reg)] = {};
-+	int err;
-+	int i;
-+
-+	err =  mlx5_core_access_reg(hwmon->mdev, mtcap_in,  sizeof(mtcap_in),
-+				    mtcap_out, sizeof(mtcap_out),
-+				    MLX5_REG_MTCAP, 0, 0);
-+	if (err)
-+		return err;
-+
-+	mlx5_hwmon_channel_info_init(hwmon);
-+	mlx5_hwmon_init_sensors_indexes(hwmon, MLX5_GET64(mtcap_reg, mtcap_out, sensor_map));
-+	err = mlx5_hwmon_init_channels_names(hwmon);
-+	if (err)
-+		return err;
-+
-+	for (i = 0; i < hwmon->asic_platform_scount + hwmon->module_scount; i++) {
-+		err = mlx5_hwmon_enable_max_temp(hwmon->mdev,
-+						 hwmon->temp_channel_desc[i].sensor_index);
-+		if (err)
-+			return err;
-+	}
-+
-+	hwmon->chip.ops = &mlx5_hwmon_ops;
-+	hwmon->chip.info = (const struct hwmon_channel_info **)hwmon->channel_info;
-+
-+	return 0;
-+}
-+
-+int mlx5_hwmon_dev_register(struct mlx5_core_dev *mdev)
-+{
-+	struct device *dev = mdev->device;
-+	struct mlx5_hwmon *hwmon;
-+	int err;
-+
-+	if (!MLX5_CAP_MCAM_REG(mdev, mtmp))
-+		return 0;
-+
-+	hwmon = mlx5_hwmon_alloc(mdev);
-+	if (IS_ERR(hwmon))
-+		return PTR_ERR(hwmon);
-+
-+	err = mlx5_hwmon_dev_init(hwmon);
-+	if (err)
-+		goto err_free_hwmon;
-+
-+	hwmon->hwmon_dev = hwmon_device_register_with_info(dev, "mlx5",
-+							   hwmon,
-+							   &hwmon->chip,
-+							   NULL);
-+	if (IS_ERR(hwmon->hwmon_dev)) {
-+		err = PTR_ERR(hwmon->hwmon_dev);
-+		goto err_free_hwmon;
-+	}
-+
-+	mdev->hwmon = hwmon;
-+	return 0;
-+
-+err_free_hwmon:
-+	mlx5_hwmon_free(hwmon);
-+	return err;
-+}
-+
-+void mlx5_hwmon_dev_unregister(struct mlx5_core_dev *mdev)
-+{
-+	struct mlx5_hwmon *hwmon = mdev->hwmon;
-+
-+	if (!hwmon)
-+		return;
-+
-+	hwmon_device_unregister(hwmon->hwmon_dev);
-+	mlx5_hwmon_free(hwmon);
-+	mdev->hwmon = NULL;
-+}
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/hwmon.h b/drivers/net/ethernet/mellanox/mlx5/core/hwmon.h
-new file mode 100644
-index 000000000000..999654a9b9da
---- /dev/null
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/hwmon.h
-@@ -0,0 +1,24 @@
-+/* SPDX-License-Identifier: GPL-2.0 OR Linux-OpenIB
-+ * Copyright (c) 2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved
-+ */
-+#ifndef __MLX5_HWMON_H__
-+#define __MLX5_HWMON_H__
-+
-+#include <linux/mlx5/driver.h>
-+
-+#if IS_ENABLED(CONFIG_HWMON)
-+
-+int mlx5_hwmon_dev_register(struct mlx5_core_dev *mdev);
-+void mlx5_hwmon_dev_unregister(struct mlx5_core_dev *mdev);
-+
-+#else
-+static inline int mlx5_hwmon_dev_register(struct mlx5_core_dev *mdev)
-+{
-+	return 0;
-+}
-+
-+static inline void mlx5_hwmon_dev_unregister(struct mlx5_core_dev *mdev) {}
-+
-+#endif
-+
-+#endif /* __MLX5_HWMON_H__ */
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/main.c b/drivers/net/ethernet/mellanox/mlx5/core/main.c
-index db2e8e4f848d..0389e84f9815 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/main.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/main.c
-@@ -49,7 +49,6 @@
- #include <linux/version.h>
- #include <net/devlink.h>
- #include "mlx5_core.h"
--#include "thermal.h"
- #include "lib/eq.h"
- #include "fs_core.h"
- #include "lib/mpfs.h"
-@@ -73,6 +72,7 @@
- #include "sf/dev/dev.h"
- #include "sf/sf.h"
- #include "mlx5_irq.h"
-+#include "hwmon.h"
- 
- MODULE_AUTHOR("Eli Cohen <eli@mellanox.com>");
- MODULE_DESCRIPTION("Mellanox 5th generation network adapters (ConnectX series) core driver");
-@@ -1930,9 +1930,9 @@ static int probe_one(struct pci_dev *pdev, const struct pci_device_id *id)
- 	if (err)
- 		dev_err(&pdev->dev, "mlx5_crdump_enable failed with error code %d\n", err);
- 
--	err = mlx5_thermal_init(dev);
-+	err = mlx5_hwmon_dev_register(dev);
- 	if (err)
--		dev_err(&pdev->dev, "mlx5_thermal_init failed with error code %d\n", err);
-+		mlx5_core_err(dev, "mlx5_hwmon_dev_register failed with error code %d\n", err);
- 
- 	pci_save_state(pdev);
- 	devlink_register(devlink);
-@@ -1964,7 +1964,7 @@ static void remove_one(struct pci_dev *pdev)
- 	mlx5_drain_health_wq(dev);
- 	devlink_unregister(devlink);
- 	mlx5_sriov_disable(pdev, false);
--	mlx5_thermal_uninit(dev);
-+	mlx5_hwmon_dev_unregister(dev);
- 	mlx5_crdump_disable(dev);
- 	mlx5_uninit_one(dev);
- 	mlx5_pci_close(dev);
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/thermal.c b/drivers/net/ethernet/mellanox/mlx5/core/thermal.c
-deleted file mode 100644
-index 52199d39657e..000000000000
---- a/drivers/net/ethernet/mellanox/mlx5/core/thermal.c
-+++ /dev/null
-@@ -1,114 +0,0 @@
--// SPDX-License-Identifier: GPL-2.0 OR Linux-OpenIB
--// Copyright (c) 2023, NVIDIA CORPORATION & AFFILIATES.
--
--#include <linux/kernel.h>
--#include <linux/types.h>
--#include <linux/device.h>
--#include <linux/thermal.h>
--#include <linux/err.h>
--#include <linux/mlx5/driver.h>
--#include "mlx5_core.h"
--#include "thermal.h"
--
--#define MLX5_THERMAL_POLL_INT_MSEC	1000
--#define MLX5_THERMAL_NUM_TRIPS		0
--#define MLX5_THERMAL_ASIC_SENSOR_INDEX	0
--
--/* Bit string indicating the writeablility of trip points if any */
--#define MLX5_THERMAL_TRIP_MASK	(BIT(MLX5_THERMAL_NUM_TRIPS) - 1)
--
--struct mlx5_thermal {
--	struct mlx5_core_dev *mdev;
--	struct thermal_zone_device *tzdev;
--};
--
--static int mlx5_thermal_get_mtmp_temp(struct mlx5_core_dev *mdev, u32 id, int *p_temp)
--{
--	u32 mtmp_out[MLX5_ST_SZ_DW(mtmp_reg)] = {};
--	u32 mtmp_in[MLX5_ST_SZ_DW(mtmp_reg)] = {};
--	int err;
--
--	MLX5_SET(mtmp_reg, mtmp_in, sensor_index, id);
--
--	err = mlx5_core_access_reg(mdev, mtmp_in,  sizeof(mtmp_in),
--				   mtmp_out, sizeof(mtmp_out),
--				   MLX5_REG_MTMP, 0, 0);
--
--	if (err)
--		return err;
--
--	*p_temp = MLX5_GET(mtmp_reg, mtmp_out, temperature);
--
--	return 0;
--}
--
--static int mlx5_thermal_get_temp(struct thermal_zone_device *tzdev,
--				 int *p_temp)
--{
--	struct mlx5_thermal *thermal = thermal_zone_device_priv(tzdev);
--	struct mlx5_core_dev *mdev = thermal->mdev;
--	int err;
--
--	err = mlx5_thermal_get_mtmp_temp(mdev, MLX5_THERMAL_ASIC_SENSOR_INDEX, p_temp);
--
--	if (err)
--		return err;
--
--	/* The unit of temp returned is in 0.125 C. The thermal
--	 * framework expects the value in 0.001 C.
--	 */
--	*p_temp *= 125;
--
--	return 0;
--}
--
--static struct thermal_zone_device_ops mlx5_thermal_ops = {
--	.get_temp = mlx5_thermal_get_temp,
--};
--
--int mlx5_thermal_init(struct mlx5_core_dev *mdev)
--{
--	char data[THERMAL_NAME_LENGTH];
--	struct mlx5_thermal *thermal;
--	int err;
--
--	if (!mlx5_core_is_pf(mdev) && !mlx5_core_is_ecpf(mdev))
--		return 0;
--
--	err = snprintf(data, sizeof(data), "mlx5_%s", dev_name(mdev->device));
--	if (err < 0 || err >= sizeof(data)) {
--		mlx5_core_err(mdev, "Failed to setup thermal zone name, %d\n", err);
--		return -EINVAL;
--	}
--
--	thermal = kzalloc(sizeof(*thermal), GFP_KERNEL);
--	if (!thermal)
--		return -ENOMEM;
--
--	thermal->mdev = mdev;
--	thermal->tzdev = thermal_zone_device_register_with_trips(data,
--								 NULL,
--								 MLX5_THERMAL_NUM_TRIPS,
--								 MLX5_THERMAL_TRIP_MASK,
--								 thermal,
--								 &mlx5_thermal_ops,
--								 NULL, 0, MLX5_THERMAL_POLL_INT_MSEC);
--	if (IS_ERR(thermal->tzdev)) {
--		err = PTR_ERR(thermal->tzdev);
--		mlx5_core_err(mdev, "Failed to register thermal zone device (%s) %d\n", data, err);
--		kfree(thermal);
--		return err;
--	}
--
--	mdev->thermal = thermal;
--	return 0;
--}
--
--void mlx5_thermal_uninit(struct mlx5_core_dev *mdev)
--{
--	if (!mdev->thermal)
--		return;
--
--	thermal_zone_device_unregister(mdev->thermal->tzdev);
--	kfree(mdev->thermal);
--}
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/thermal.h b/drivers/net/ethernet/mellanox/mlx5/core/thermal.h
-deleted file mode 100644
-index 7d752c122192..000000000000
---- a/drivers/net/ethernet/mellanox/mlx5/core/thermal.h
-+++ /dev/null
-@@ -1,20 +0,0 @@
--/* SPDX-License-Identifier: GPL-2.0 OR Linux-OpenIB
-- * Copyright (c) 2023, NVIDIA CORPORATION & AFFILIATES.
-- */
--#ifndef __MLX5_THERMAL_DRIVER_H
--#define __MLX5_THERMAL_DRIVER_H
--
--#if IS_ENABLED(CONFIG_THERMAL)
--int mlx5_thermal_init(struct mlx5_core_dev *mdev);
--void mlx5_thermal_uninit(struct mlx5_core_dev *mdev);
--#else
--static inline int mlx5_thermal_init(struct mlx5_core_dev *mdev)
--{
--	mdev->thermal = NULL;
--	return 0;
--}
--
--static inline void mlx5_thermal_uninit(struct mlx5_core_dev *mdev) { }
--#endif
--
--#endif /* __MLX5_THERMAL_DRIVER_H */
-diff --git a/include/linux/mlx5/driver.h b/include/linux/mlx5/driver.h
-index fa70c25423b2..3134dbc398a5 100644
---- a/include/linux/mlx5/driver.h
-+++ b/include/linux/mlx5/driver.h
-@@ -134,6 +134,7 @@ enum {
- 	MLX5_REG_PCAM		 = 0x507f,
- 	MLX5_REG_NODE_DESC	 = 0x6001,
- 	MLX5_REG_HOST_ENDIANNESS = 0x7004,
-+	MLX5_REG_MTCAP		 = 0x9009,
- 	MLX5_REG_MTMP		 = 0x900A,
- 	MLX5_REG_MCIA		 = 0x9014,
- 	MLX5_REG_MFRL		 = 0x9028,
-@@ -805,7 +806,7 @@ struct mlx5_core_dev {
- 	struct mlx5_rsc_dump    *rsc_dump;
- 	u32                      vsc_addr;
- 	struct mlx5_hv_vhca	*hv_vhca;
--	struct mlx5_thermal	*thermal;
-+	struct mlx5_hwmon	*hwmon;
- 	u64			num_block_tc;
- 	u64			num_block_ipsec;
- };
-diff --git a/include/linux/mlx5/mlx5_ifc.h b/include/linux/mlx5/mlx5_ifc.h
-index b3ad6b9852ec..87fd6f9ed82c 100644
---- a/include/linux/mlx5/mlx5_ifc.h
-+++ b/include/linux/mlx5/mlx5_ifc.h
-@@ -10196,7 +10196,9 @@ struct mlx5_ifc_mcam_access_reg_bits {
- 	u8         mrtc[0x1];
- 	u8         regs_44_to_32[0xd];
- 
--	u8         regs_31_to_0[0x20];
-+	u8         regs_31_to_10[0x16];
-+	u8         mtmp[0x1];
-+	u8         regs_8_to_0[0x9];
- };
- 
- struct mlx5_ifc_mcam_access_reg_bits1 {
-@@ -10949,6 +10951,15 @@ struct mlx5_ifc_mrtc_reg_bits {
- 	u8         time_l[0x20];
- };
- 
-+struct mlx5_ifc_mtcap_reg_bits {
-+	u8         reserved_at_0[0x19];
-+	u8         sensor_count[0x7];
-+
-+	u8         reserved_at_20[0x20];
-+
-+	u8         sensor_map[0x40];
-+};
-+
- struct mlx5_ifc_mtmp_reg_bits {
- 	u8         reserved_at_0[0x14];
- 	u8         sensor_index[0xc];
-@@ -11036,6 +11047,7 @@ union mlx5_ifc_ports_control_registers_document_bits {
- 	struct mlx5_ifc_mfrl_reg_bits mfrl_reg;
- 	struct mlx5_ifc_mtutc_reg_bits mtutc_reg;
- 	struct mlx5_ifc_mrtc_reg_bits mrtc_reg;
-+	struct mlx5_ifc_mtcap_reg_bits mtcap_reg;
- 	struct mlx5_ifc_mtmp_reg_bits mtmp_reg;
- 	u8         reserved_at_0[0x60e0];
- };
--- 
-2.41.0
-
+> 
+>>
+>>>
+>>> Thanks,
+>>> Eduard.
+>>>
+>>>>>
+>>>>> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=17970c5da80000
+>>>>> final oops:     https://syzkaller.appspot.com/x/report.txt?x=14570c5da80000
+>>>>> console output: https://syzkaller.appspot.com/x/log.txt?x=10570c5da80000
+>>>>>
+>> [...]
+> 
+> 
 
