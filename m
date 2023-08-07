@@ -1,82 +1,82 @@
-Return-Path: <netdev+bounces-24980-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24983-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5249977268D
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 15:51:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EB3F3772695
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 15:52:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0697C280624
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 13:51:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A1502280E5B
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 13:52:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C51E411199;
-	Mon,  7 Aug 2023 13:49:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5172511CA0;
+	Mon,  7 Aug 2023 13:49:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF8631118A
-	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 13:49:40 +0000 (UTC)
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2041.outbound.protection.outlook.com [40.107.220.41])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41D1F1998
-	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 06:49:25 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40B8511C93
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 13:49:43 +0000 (UTC)
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2086.outbound.protection.outlook.com [40.107.94.86])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E429119B5
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 06:49:29 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=CztAevHcN2uv1WI85wRtblhZhEJc8pQdI3X+qKFKIYMMOtspRiK/BCF3qCttfpHFpf1yitU/wbZ3PXNVFGnPWmdPZFihLSp5RBhD8fsJeiE9XK/Ln6PAnuJQTIsjSYb+90KTtXKKa8feMrhroHTatkTEq1cTWQaAK3z7BIlyjOY0DR3MYEoZ7ADlPjS39ae3UYS0yt2EK50Y8scCcbP8kBMx778KzPLbNp+kaFQZMnMWbyRyAMimABcdeBrrGGLxeok1aqYjwlkK/haoodoy0762fAOUiGDihUGe0lsbE5L5oKKcFa2663jc9AJ0OjHUblxoB2dJshrB+KutRp2Wfw==
+ b=i2psIFi1lr/mOJiNUGIR7pQrudY/TqQ1Mk//JBNTkzvoBp0QGVD5HH3wBxB/8vkj/WXaltUQjqCeIczZDNs/pM/HI9VzsAl2/QJDMt6KkW5xmJ5XkfKFi3GHFcwbwoTCCtmH3wx6sxEqui+PXbbK4tTEVvWJNYiP4JZ70a9YgirrkNLkAuqK9rY//VxUPyYSNyfVQLMr61XMC74QaCfUd07lE53jPZ7TlwXUK31tirn5os8f6N05KC7IZxzm6O4rorK/pL3Wqod01VIveoaF4izMcRHlNA4g2OezrV5JfWZcwd02CcycfigXi9UVEFfyBO8pOqtJQval+sq+Bc9mew==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=JSic2QC/y1iRZ7xYGiB7kqzZdwh2hDF66VduSmgwJKY=;
- b=LqMjtVaalOxbAf7k5xauOZ4t9Mj/ztlJs4loleOrBB6NzPQSo1yCtU9sl5okahytbdl0JSbCMuAazHnbUwGfQTuK/hnEL8j3GY2gZV/o0JJnKX/xf5EsWaK9mzElWKSHXeCaKWlmU20O2hzOqVP7p866AihfBCcDmvyLaZP/PegbxZ0wk3n6S8zZJ4+ln7LglMzQzPZPqnNoLcgiGZ4bFXbKgV+s9BlPI5ksV4mFfY4e+iLQaALyQ7u720J4p1aHpxhQBFRulQJZWO5/5K3do7g6J6Ezxisl0vKnTF5P1fO4VRm2weNM+E/MzCIAOMZQYbSXb4SYA2jzM+en38uEow==
+ bh=f7QZs87E/DEeiexnbnDG3QjpEVs+MsDBxgAxWtql91U=;
+ b=f/Lj24lj0305OjOa9rebcvkZHabQqVhMo2AGgOzyzcN3J9I2EDClXuUTRZCfds1NN1AAfeS4iXUP7M2SqJlPZmCSZhoM+pL5y2OIR5njP5H88oPnEkuZ31QYa1fQcVIiUzNSdh9qt7k92xTuf6G3icYpAwsXHki2/xrcFKy5mh52hiq/yVkL6L7U3hhayK2E77baNbiG+lvtJr2GqW6GoQmBA80+OBxs5VzpuLB9yETFqsbE71nMTN1nrp2HBtSlc5PPBn2xeaY3ATBH6/l4zPXFbFHHspHNfPE9Pg6OsLSRUc/Qy6jHkOenGQULaIDeUOF+nKvc6gcEbA9NCmQ1rQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=davemloft.net smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=JSic2QC/y1iRZ7xYGiB7kqzZdwh2hDF66VduSmgwJKY=;
- b=m1O2i40bL7lui3iWYPrbiZPjjPyKZh748TQoviUqTAG0uVPeBbEdqrnwxei8eGQMcfGPu8rZx09GXB/b103/dlPLVfWFkc4y2JDOwrx6oJ5sNPdJe72qJysaSFC6xi0lZ9rb0EcOzCzA0e9MT7G3B9123s/e1jq1+dQ3ObCbP2g=
-Received: from CYXPR03CA0075.namprd03.prod.outlook.com (2603:10b6:930:d3::21)
- by MW4PR12MB6998.namprd12.prod.outlook.com (2603:10b6:303:20a::22) with
+ bh=f7QZs87E/DEeiexnbnDG3QjpEVs+MsDBxgAxWtql91U=;
+ b=Z6+dlq3lRuhwzpiqp/fRrP2pLaYwAnLzpb42nF+r0st/3ddJZVv6cM53fy0IeHrsgWMxFkSXuBppffxM4ycs24o2oUexMhz7ac/DIljp8Td3Nt3bqPwcJnnWD9GM4nkeR0YJu88CGSbwe9TTstwCbDQVUy1hFy1HgESNQ52XWOY=
+Received: from SJ0PR05CA0124.namprd05.prod.outlook.com (2603:10b6:a03:33d::9)
+ by CY5PR12MB6382.namprd12.prod.outlook.com (2603:10b6:930:3e::10) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.26; Mon, 7 Aug
- 2023 13:49:22 +0000
-Received: from CY4PEPF0000E9D7.namprd05.prod.outlook.com
- (2603:10b6:930:d3:cafe::1f) by CYXPR03CA0075.outlook.office365.com
- (2603:10b6:930:d3::21) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.27 via Frontend
- Transport; Mon, 7 Aug 2023 13:49:22 +0000
+ 2023 13:49:23 +0000
+Received: from CO1PEPF000042A7.namprd03.prod.outlook.com
+ (2603:10b6:a03:33d:cafe::a1) by SJ0PR05CA0124.outlook.office365.com
+ (2603:10b6:a03:33d::9) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6678.16 via Frontend
+ Transport; Mon, 7 Aug 2023 13:49:25 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
 Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB03.amd.com; pr=C
-Received: from SATLEXMB03.amd.com (165.204.84.17) by
- CY4PEPF0000E9D7.mail.protection.outlook.com (10.167.241.78) with Microsoft
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ CO1PEPF000042A7.mail.protection.outlook.com (10.167.243.36) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6652.19 via Frontend Transport; Mon, 7 Aug 2023 13:49:22 +0000
-Received: from SATLEXMB05.amd.com (10.181.40.146) by SATLEXMB03.amd.com
- (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
+ 15.20.6652.19 via Frontend Transport; Mon, 7 Aug 2023 13:49:25 +0000
+Received: from SATLEXMB05.amd.com (10.181.40.146) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Mon, 7 Aug
- 2023 08:49:21 -0500
+ 2023 08:49:23 -0500
 Received: from SATLEXMB04.amd.com (10.181.40.145) by SATLEXMB05.amd.com
  (10.181.40.146) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Mon, 7 Aug
- 2023 08:49:21 -0500
+ 2023 08:49:22 -0500
 Received: from xcbecree41x.xilinx.com (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27 via Frontend
- Transport; Mon, 7 Aug 2023 08:49:20 -0500
+ Transport; Mon, 7 Aug 2023 08:49:21 -0500
 From: <edward.cree@amd.com>
 To: <linux-net-drivers@amd.com>, <davem@davemloft.net>, <kuba@kernel.org>,
 	<edumazet@google.com>, <pabeni@redhat.com>
 CC: Edward Cree <ecree.xilinx@gmail.com>, <netdev@vger.kernel.org>,
 	<habetsm.xilinx@gmail.com>, Pieter Jansen van Vuuren
 	<pieter.jansen-van-vuuren@amd.com>, Simon Horman <horms@kernel.org>
-Subject: [PATCH v2 net-next 6/7] sfc: conntrack state matches in TC rules
-Date: Mon, 7 Aug 2023 14:48:10 +0100
-Message-ID: <9c8e85dfdf0a339f55285ab586e83485e0acb005.1691415479.git.ecree.xilinx@gmail.com>
+Subject: [PATCH v2 net-next 7/7] sfc: offload left-hand side rules for conntrack
+Date: Mon, 7 Aug 2023 14:48:11 +0100
+Message-ID: <20312c0c5950aa97a48a5a6a30ac294bec92c8e6.1691415479.git.ecree.xilinx@gmail.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <cover.1691415479.git.ecree.xilinx@gmail.com>
 References: <cover.1691415479.git.ecree.xilinx@gmail.com>
@@ -90,26 +90,26 @@ Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000E9D7:EE_|MW4PR12MB6998:EE_
-X-MS-Office365-Filtering-Correlation-Id: de9de8b2-85c9-436b-bd7b-08db974d1af7
+X-MS-TrafficTypeDiagnostic: CO1PEPF000042A7:EE_|CY5PR12MB6382:EE_
+X-MS-Office365-Filtering-Correlation-Id: eee63b80-f79d-4826-2925-08db974d1d14
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	PW8PBocpG/xtT75eXkEsBsBGRXsC/X5VHGm2gr4E6/wSW+xEopatjQ5jD+ibIt1C/PDPQM/ue+fzfp0UxvIOUFyspOhEa2Ncfcm/yRc674Zo60QcNuPeyeFY4ryc3yZuROj3za7i8CUQ3XmVRnkh+/t2V4fvSin9BA5J9rIt89gjJP1DdTgZ1UQVwHX2yhX6HLOgfkEY3fl5kQzIl5VBFfgb3EWd1Ci+QNTl2wVNeaqBaQ2p/PDR0JIh/F5zVhLwQVA/XlCzQinUEYo8xr1bhV3GSq1SwHY93xIzQL6JtTXfokrczBzoypV13Ik/3d5dy5ZhC2XZMHJu/lXzHUpoKjUnGADEFcZZDEfX+PeOPswQ/ARvcac3nxUSmdbHLfVIKfelBcvk1nF9L5JuIXlh5chiwgsdv6nbYMRZug9vc+oBPewLtEGvBD0DpYJdmgcDDLttah0xWtxchwTXMgDxeBEE6xlgX6m0Zw8NYWCvc2RC9bhGdbSSGWcSMF0fjWgfJQtBd+q5NW+hv42SPCPgT+xox32J3G9LHgnu18lcjEqSsX5OoW2pJT0VfFZEWQ/jnd/4iG8VGW4mVY8anhQH1XE5k2d+2IBvFtWiyqlCQAXFbLEBPDF55+wpc60e6gOT6GpKJbs9vYhluI3zPldYmCGCffBP+wh0FFHg9NSDKM3DdJKIB1EnJZYkkYePip21owJcS2gvHAcjkcu4CsNN7whgRYs6r2stHRxPmb1/AQL+sZrSzEIhRIa4l9EvAsf3FYx6I5I17aCHw0BKfujTiQ==
+	fAJE1dIWQDcC/sjPqgPcdu+EO+JOfO6o4GoXxMvv9DMjJpyUFMiG1oYpnrMqLOohP0TGwpiswfOln+ZZOJWK+gE3HtzWQsu51XZb+IY7ij3xM/6gV8E+lECvv81A4dG4560RVW7VoQHOwfDtLdxsPlmH5kPTnr1Ff9Tyx3puYpoEoLJVEzw5Y+GiQs28bJfe+Hk6MMMrgtkXvykW+oPQjPPklKYAMBz/SHYytdfwMgOAXEWUj3zpmw3kRoKt7B884WxhX4ke/eBNLSWwP8PYgz0NVPkvChX1Y/GELIoydBt5yqruDHT3Y7yQYICfviz/AjUZ/Rrdj8zbGDnQWcHvi6qAekVloMbOXz7rp8/RSbA1pQ7aH5aylAsWQlghZmMRDEA1VPY09MXlXSY3ufUHpoJ0DdYCZQJYFpTb4pWQIUk9pH91YznAKcV2yHkaFxIpDtMJ7nw6tITDS+drK8vzVYUzNAdLw8tYI4WFMCWKeRA44IAVt2nFdx5RrWg+IVlwkXgAj0Eno3nexvCudQKePasSnsjhjFhzqouVPRybB8Q/FThYGBLRFK5SiEIfSS8gBmebZM5qnoPmmD9SQ0gBTTjzLQQDtmGmiwwZo4y1NssV2/CtUIL3Idr6+n2BgAlrDxXdRc0lhAVan3JrmQChfXYeVjk6K4yVEmLdXBNujKXnh8K6ErLosGpP4B/AAzIqY5buA9b43aprVbfG6UHE185m/5+oYU1ip5Wvj7ws2A6Rbq4kbix3GEU/ejljsKMJmJFBecG5lnd0Xk7gImRCyLVpD8pU4Cc+om8qUWwnxAI=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB03.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(396003)(39860400002)(376002)(346002)(136003)(82310400008)(451199021)(1800799003)(186006)(46966006)(36840700001)(40470700004)(36860700001)(36756003)(86362001)(55446002)(83380400001)(81166007)(356005)(82740400003)(40460700003)(40480700001)(9686003)(6666004)(336012)(26005)(316002)(41300700001)(70206006)(4326008)(478600001)(54906003)(110136005)(2876002)(2906002)(5660300002)(426003)(47076005)(8936002)(8676002)(70586007)(36900700001);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(396003)(376002)(136003)(346002)(39860400002)(451199021)(186006)(1800799003)(82310400008)(40470700004)(46966006)(36840700001)(40480700001)(336012)(40460700003)(36756003)(9686003)(4326008)(316002)(86362001)(81166007)(55446002)(478600001)(54906003)(110136005)(356005)(70206006)(6666004)(70586007)(82740400003)(41300700001)(26005)(426003)(8676002)(8936002)(47076005)(36860700001)(2876002)(2906002)(30864003)(83380400001)(5660300002)(36900700001)(309714004);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Aug 2023 13:49:22.2682
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Aug 2023 13:49:25.7631
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: de9de8b2-85c9-436b-bd7b-08db974d1af7
+X-MS-Exchange-CrossTenant-Network-Message-Id: eee63b80-f79d-4826-2925-08db974d1d14
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB03.amd.com]
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	CY4PEPF0000E9D7.namprd05.prod.outlook.com
+	CO1PEPF000042A7.namprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB6998
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR12MB6382
 X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
 	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
@@ -119,219 +119,787 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 
 From: Edward Cree <ecree.xilinx@gmail.com>
 
-Parse ct_state trk/est, mark and zone out of flower keys, and plumb
- them through to the hardware, performing some minor translations.
-Nothing can actually hit them yet as we're not offloading any DO_CT
- actions.
+Handle the (comparatively) simple case of a -trk rule on an efx netdev
+ (i.e. not a tunnel decap rule) with ct and goto chain actions.
 
 Reviewed-by: Pieter Jansen van Vuuren <pieter.jansen-van-vuuren@amd.com>
 Reviewed-by: Simon Horman <horms@kernel.org>
 Signed-off-by: Edward Cree <ecree.xilinx@gmail.com>
 ---
- drivers/net/ethernet/sfc/mae.c  | 33 +++++++++++++++--
- drivers/net/ethernet/sfc/mcdi.h |  5 +++
- drivers/net/ethernet/sfc/tc.c   | 66 +++++++++++++++++++++++++++++++++
- drivers/net/ethernet/sfc/tc.h   |  5 +++
- 4 files changed, 105 insertions(+), 4 deletions(-)
+Changed in v2:
+* added break to pacify a clang implicit-fallthrough warning (nipa, Simon)
+---
+ drivers/net/ethernet/sfc/bitfield.h |   2 +
+ drivers/net/ethernet/sfc/mae.c      | 287 ++++++++++++++++++++++++++++
+ drivers/net/ethernet/sfc/mae.h      |   6 +
+ drivers/net/ethernet/sfc/mcdi.h     |   6 +
+ drivers/net/ethernet/sfc/tc.c       | 282 +++++++++++++++++++++++++++
+ drivers/net/ethernet/sfc/tc.h       |  16 ++
+ 6 files changed, 599 insertions(+)
 
+diff --git a/drivers/net/ethernet/sfc/bitfield.h b/drivers/net/ethernet/sfc/bitfield.h
+index 1f981dfe4bdc..89665fc9b8d0 100644
+--- a/drivers/net/ethernet/sfc/bitfield.h
++++ b/drivers/net/ethernet/sfc/bitfield.h
+@@ -26,6 +26,8 @@
+ /* Lowest bit numbers and widths */
+ #define EFX_DUMMY_FIELD_LBN 0
+ #define EFX_DUMMY_FIELD_WIDTH 0
++#define EFX_BYTE_0_LBN 0
++#define EFX_BYTE_0_WIDTH 8
+ #define EFX_WORD_0_LBN 0
+ #define EFX_WORD_0_WIDTH 16
+ #define EFX_WORD_1_LBN 16
 diff --git a/drivers/net/ethernet/sfc/mae.c b/drivers/net/ethernet/sfc/mae.c
-index 8ebf71a54bf9..1fa0958d5262 100644
+index 1fa0958d5262..3b8780c76b6e 100644
 --- a/drivers/net/ethernet/sfc/mae.c
 +++ b/drivers/net/ethernet/sfc/mae.c
-@@ -695,8 +695,13 @@ int efx_mae_match_check_caps(struct efx_nic *efx,
- 	    CHECK(L4_SPORT, l4_sport) ||
- 	    CHECK(L4_DPORT, l4_dport) ||
- 	    CHECK(TCP_FLAGS, tcp_flags) ||
-+	    CHECK_BIT(TCP_SYN_FIN_RST, tcp_syn_fin_rst) ||
- 	    CHECK_BIT(IS_IP_FRAG, ip_frag) ||
- 	    CHECK_BIT(IP_FIRST_FRAG, ip_firstfrag) ||
-+	    CHECK_BIT(DO_CT, ct_state_trk) ||
-+	    CHECK_BIT(CT_HIT, ct_state_est) ||
-+	    CHECK(CT_MARK, ct_mark) ||
-+	    CHECK(CT_DOMAIN, ct_zone) ||
- 	    CHECK(RECIRC_ID, recirc_id))
- 		return rc;
- 	/* Matches on outer fields are done in a separate hardware table,
-@@ -1672,20 +1677,40 @@ static int efx_mae_populate_match_criteria(MCDI_DECLARE_STRUCT_PTR(match_crit),
+@@ -727,6 +727,90 @@ int efx_mae_match_check_caps(struct efx_nic *efx,
  	}
- 	MCDI_STRUCT_SET_DWORD(match_crit, MAE_FIELD_MASK_VALUE_PAIRS_V2_INGRESS_MPORT_SELECTOR_MASK,
- 			      match->mask.ingress_port);
--	EFX_POPULATE_DWORD_2(*_MCDI_STRUCT_DWORD(match_crit, MAE_FIELD_MASK_VALUE_PAIRS_V2_FLAGS),
-+	EFX_POPULATE_DWORD_5(*_MCDI_STRUCT_DWORD(match_crit, MAE_FIELD_MASK_VALUE_PAIRS_V2_FLAGS),
-+			     MAE_FIELD_MASK_VALUE_PAIRS_V2_DO_CT,
-+			     match->value.ct_state_trk,
-+			     MAE_FIELD_MASK_VALUE_PAIRS_V2_CT_HIT,
-+			     match->value.ct_state_est,
- 			     MAE_FIELD_MASK_VALUE_PAIRS_V2_IS_IP_FRAG,
- 			     match->value.ip_frag,
- 			     MAE_FIELD_MASK_VALUE_PAIRS_V2_IP_FIRST_FRAG,
--			     match->value.ip_firstfrag);
--	EFX_POPULATE_DWORD_2(*_MCDI_STRUCT_DWORD(match_crit, MAE_FIELD_MASK_VALUE_PAIRS_V2_FLAGS_MASK),
-+			     match->value.ip_firstfrag,
-+			     MAE_FIELD_MASK_VALUE_PAIRS_V2_TCP_SYN_FIN_RST,
-+			     match->value.tcp_syn_fin_rst);
-+	EFX_POPULATE_DWORD_5(*_MCDI_STRUCT_DWORD(match_crit, MAE_FIELD_MASK_VALUE_PAIRS_V2_FLAGS_MASK),
-+			     MAE_FIELD_MASK_VALUE_PAIRS_V2_DO_CT,
-+			     match->mask.ct_state_trk,
-+			     MAE_FIELD_MASK_VALUE_PAIRS_V2_CT_HIT,
-+			     match->mask.ct_state_est,
- 			     MAE_FIELD_MASK_VALUE_PAIRS_V2_IS_IP_FRAG,
- 			     match->mask.ip_frag,
- 			     MAE_FIELD_MASK_VALUE_PAIRS_V2_IP_FIRST_FRAG,
--			     match->mask.ip_firstfrag);
-+			     match->mask.ip_firstfrag,
-+			     MAE_FIELD_MASK_VALUE_PAIRS_V2_TCP_SYN_FIN_RST,
-+			     match->mask.tcp_syn_fin_rst);
- 	MCDI_STRUCT_SET_BYTE(match_crit, MAE_FIELD_MASK_VALUE_PAIRS_V2_RECIRC_ID,
- 			     match->value.recirc_id);
- 	MCDI_STRUCT_SET_BYTE(match_crit, MAE_FIELD_MASK_VALUE_PAIRS_V2_RECIRC_ID_MASK,
- 			     match->mask.recirc_id);
-+	MCDI_STRUCT_SET_DWORD(match_crit, MAE_FIELD_MASK_VALUE_PAIRS_V2_CT_MARK,
-+			      match->value.ct_mark);
-+	MCDI_STRUCT_SET_DWORD(match_crit, MAE_FIELD_MASK_VALUE_PAIRS_V2_CT_MARK_MASK,
-+			      match->mask.ct_mark);
-+	MCDI_STRUCT_SET_WORD(match_crit, MAE_FIELD_MASK_VALUE_PAIRS_V2_CT_DOMAIN,
-+			     match->value.ct_zone);
-+	MCDI_STRUCT_SET_WORD(match_crit, MAE_FIELD_MASK_VALUE_PAIRS_V2_CT_DOMAIN_MASK,
-+			     match->mask.ct_zone);
- 	MCDI_STRUCT_SET_WORD_BE(match_crit, MAE_FIELD_MASK_VALUE_PAIRS_V2_ETHER_TYPE_BE,
- 				match->value.eth_proto);
- 	MCDI_STRUCT_SET_WORD_BE(match_crit, MAE_FIELD_MASK_VALUE_PAIRS_V2_ETHER_TYPE_BE_MASK,
-diff --git a/drivers/net/ethernet/sfc/mcdi.h b/drivers/net/ethernet/sfc/mcdi.h
-index 995a26686fd8..700d0252aebd 100644
---- a/drivers/net/ethernet/sfc/mcdi.h
-+++ b/drivers/net/ethernet/sfc/mcdi.h
-@@ -229,6 +229,11 @@ void efx_mcdi_sensor_event(struct efx_nic *efx, efx_qword_t *ev);
- 	BUILD_BUG_ON(MC_CMD_ ## _field ## _OFST & 1);			\
- 	*(__force __le16 *)MCDI_PTR(_buf, _field) = cpu_to_le16(_value);\
- 	} while (0)
-+#define MCDI_STRUCT_SET_WORD(_buf, _field, _value) do {			\
-+	BUILD_BUG_ON(_field ## _LEN != 2);				\
-+	BUILD_BUG_ON(_field ## _OFST & 1);				\
-+	*(__force __le16 *)MCDI_STRUCT_PTR(_buf, _field) = cpu_to_le16(_value);\
-+	} while (0)
- #define MCDI_WORD(_buf, _field)						\
- 	((u16)BUILD_BUG_ON_ZERO(MC_CMD_ ## _field ## _LEN != 2) +	\
- 	 le16_to_cpu(*(__force const __le16 *)MCDI_PTR(_buf, _field)))
-diff --git a/drivers/net/ethernet/sfc/tc.c b/drivers/net/ethernet/sfc/tc.c
-index 181636d07024..a9f4bfaacac3 100644
---- a/drivers/net/ethernet/sfc/tc.c
-+++ b/drivers/net/ethernet/sfc/tc.c
-@@ -222,6 +222,7 @@ static int efx_tc_flower_parse_match(struct efx_nic *efx,
- 	      BIT_ULL(FLOW_DISSECTOR_KEY_ENC_IP) |
- 	      BIT_ULL(FLOW_DISSECTOR_KEY_ENC_PORTS) |
- 	      BIT_ULL(FLOW_DISSECTOR_KEY_ENC_CONTROL) |
-+	      BIT_ULL(FLOW_DISSECTOR_KEY_CT) |
- 	      BIT_ULL(FLOW_DISSECTOR_KEY_TCP) |
- 	      BIT_ULL(FLOW_DISSECTOR_KEY_IP))) {
- 		NL_SET_ERR_MSG_FMT_MOD(extack, "Unsupported flower keys %#llx",
-@@ -363,6 +364,31 @@ static int efx_tc_flower_parse_match(struct efx_nic *efx,
- 				       dissector->used_keys);
- 		return -EOPNOTSUPP;
- 	}
-+	if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_CT)) {
-+		struct flow_match_ct fm;
-+
-+		flow_rule_match_ct(rule, &fm);
-+		match->value.ct_state_trk = !!(fm.key->ct_state & TCA_FLOWER_KEY_CT_FLAGS_TRACKED);
-+		match->mask.ct_state_trk = !!(fm.mask->ct_state & TCA_FLOWER_KEY_CT_FLAGS_TRACKED);
-+		match->value.ct_state_est = !!(fm.key->ct_state & TCA_FLOWER_KEY_CT_FLAGS_ESTABLISHED);
-+		match->mask.ct_state_est = !!(fm.mask->ct_state & TCA_FLOWER_KEY_CT_FLAGS_ESTABLISHED);
-+		if (fm.mask->ct_state & ~(TCA_FLOWER_KEY_CT_FLAGS_TRACKED |
-+					  TCA_FLOWER_KEY_CT_FLAGS_ESTABLISHED)) {
-+			NL_SET_ERR_MSG_FMT_MOD(extack,
-+					       "Unsupported ct_state match %#x",
-+					       fm.mask->ct_state);
-+			return -EOPNOTSUPP;
-+		}
-+		match->value.ct_mark = fm.key->ct_mark;
-+		match->mask.ct_mark = fm.mask->ct_mark;
-+		match->value.ct_zone = fm.key->ct_zone;
-+		match->mask.ct_zone = fm.mask->ct_zone;
-+
-+		if (memchr_inv(fm.mask->ct_labels, 0, sizeof(fm.mask->ct_labels))) {
-+			NL_SET_ERR_MSG_MOD(extack, "Matching on ct_label not supported");
-+			return -EOPNOTSUPP;
-+		}
-+	}
- 
  	return 0;
  }
-@@ -758,6 +784,26 @@ static int efx_tc_flower_replace_foreign(struct efx_nic *efx,
- 	}
- 	match.mask.recirc_id = 0xff;
- 
-+	/* AR table can't match on DO_CT (+trk).  But a commonly used pattern is
-+	 * +trk+est, which is strictly implied by +est, so rewrite it to that.
-+	 */
-+	if (match.mask.ct_state_trk && match.value.ct_state_trk &&
-+	    match.mask.ct_state_est && match.value.ct_state_est)
-+		match.mask.ct_state_trk = 0;
-+	/* Thanks to CT_TCP_FLAGS_INHIBIT, packets with interesting flags could
-+	 * match +trk-est (CT_HIT=0) despite being on an established connection.
-+	 * So make -est imply -tcp_syn_fin_rst match to ensure these packets
-+	 * still hit the software path.
-+	 */
-+	if (match.mask.ct_state_est && !match.value.ct_state_est) {
-+		if (match.value.tcp_syn_fin_rst) {
-+			/* Can't offload this combination */
-+			rc = -EOPNOTSUPP;
-+			goto release;
-+		}
-+		match.mask.tcp_syn_fin_rst = true;
-+	}
 +
- 	flow_action_for_each(i, fa, &fr->action) {
- 		switch (fa->id) {
- 		case FLOW_ACTION_REDIRECT:
-@@ -1089,6 +1135,26 @@ static int efx_tc_flower_replace(struct efx_nic *efx,
- 	}
- 	match.mask.recirc_id = 0xff;
- 
-+	/* AR table can't match on DO_CT (+trk).  But a commonly used pattern is
-+	 * +trk+est, which is strictly implied by +est, so rewrite it to that.
-+	 */
-+	if (match.mask.ct_state_trk && match.value.ct_state_trk &&
-+	    match.mask.ct_state_est && match.value.ct_state_est)
-+		match.mask.ct_state_trk = 0;
-+	/* Thanks to CT_TCP_FLAGS_INHIBIT, packets with interesting flags could
-+	 * match +trk-est (CT_HIT=0) despite being on an established connection.
-+	 * So make -est imply -tcp_syn_fin_rst match to ensure these packets
-+	 * still hit the software path.
-+	 */
-+	if (match.mask.ct_state_est && !match.value.ct_state_est) {
-+		if (match.value.tcp_syn_fin_rst) {
-+			/* Can't offload this combination */
-+			rc = -EOPNOTSUPP;
-+			goto release;
-+		}
-+		match.mask.tcp_syn_fin_rst = true;
-+	}
++/* Checks for match fields not supported in LHS Outer Rules */
++#define UNSUPPORTED(_field)	({					       \
++	enum mask_type typ = classify_mask((const u8 *)&mask->_field,	       \
++					   sizeof(mask->_field));	       \
++									       \
++	if (typ != MASK_ZEROES) {					       \
++		NL_SET_ERR_MSG_MOD(extack, "Unsupported match field " #_field);\
++		rc = -EOPNOTSUPP;					       \
++	}								       \
++	rc;								       \
++})
++#define UNSUPPORTED_BIT(_field)	({					       \
++	if (mask->_field) {						       \
++		NL_SET_ERR_MSG_MOD(extack, "Unsupported match field " #_field);\
++		rc = -EOPNOTSUPP;					       \
++	}								       \
++	rc;								       \
++})
 +
- 	rc = efx_mae_match_check_caps(efx, &match.mask, extack);
- 	if (rc)
- 		goto release;
-diff --git a/drivers/net/ethernet/sfc/tc.h b/drivers/net/ethernet/sfc/tc.h
-index af15020c8da7..ce8e30743a3a 100644
---- a/drivers/net/ethernet/sfc/tc.h
-+++ b/drivers/net/ethernet/sfc/tc.h
-@@ -60,6 +60,7 @@ struct efx_tc_match_fields {
- 	/* L4 */
- 	__be16 l4_sport, l4_dport; /* Ports (UDP, TCP) */
- 	__be16 tcp_flags;
-+	bool tcp_syn_fin_rst; /* true if ANY of SYN/FIN/RST are set */
- 	/* Encap.  The following are *outer* fields.  Note that there are no
- 	 * outer eth (L2) fields; this is because TC doesn't have them.
- 	 */
-@@ -68,6 +69,10 @@ struct efx_tc_match_fields {
- 	u8 enc_ip_tos, enc_ip_ttl;
- 	__be16 enc_sport, enc_dport;
- 	__be32 enc_keyid; /* e.g. VNI, VSID */
-+	/* Conntrack. */
-+	u16 ct_state_trk:1, ct_state_est:1;
-+	u32 ct_mark;
-+	u16 ct_zone;
++/* LHS rules are (normally) inserted in the Outer Rule table, which means
++ * they use ENC_ fields in hardware to match regular (not enc_) fields from
++ * &struct efx_tc_match_fields.
++ */
++int efx_mae_match_check_caps_lhs(struct efx_nic *efx,
++				 const struct efx_tc_match_fields *mask,
++				 struct netlink_ext_ack *extack)
++{
++	const u8 *supported_fields = efx->tc->caps->outer_rule_fields;
++	__be32 ingress_port = cpu_to_be32(mask->ingress_port);
++	enum mask_type ingress_port_mask_type;
++	int rc;
++
++	/* Check for _PREFIX assumes big-endian, so we need to convert */
++	ingress_port_mask_type = classify_mask((const u8 *)&ingress_port,
++					       sizeof(ingress_port));
++	rc = efx_mae_match_check_cap_typ(supported_fields[MAE_FIELD_INGRESS_PORT],
++					 ingress_port_mask_type);
++	if (rc) {
++		NL_SET_ERR_MSG_FMT_MOD(extack, "No support for %s mask in field %s\n",
++				       mask_type_name(ingress_port_mask_type),
++				       "ingress_port");
++		return rc;
++	}
++	if (CHECK(ENC_ETHER_TYPE, eth_proto) ||
++	    CHECK(ENC_VLAN0_TCI, vlan_tci[0]) ||
++	    CHECK(ENC_VLAN0_PROTO, vlan_proto[0]) ||
++	    CHECK(ENC_VLAN1_TCI, vlan_tci[1]) ||
++	    CHECK(ENC_VLAN1_PROTO, vlan_proto[1]) ||
++	    CHECK(ENC_ETH_SADDR, eth_saddr) ||
++	    CHECK(ENC_ETH_DADDR, eth_daddr) ||
++	    CHECK(ENC_IP_PROTO, ip_proto) ||
++	    CHECK(ENC_IP_TOS, ip_tos) ||
++	    CHECK(ENC_IP_TTL, ip_ttl) ||
++	    CHECK_BIT(ENC_IP_FRAG, ip_frag) ||
++	    UNSUPPORTED_BIT(ip_firstfrag) ||
++	    CHECK(ENC_SRC_IP4, src_ip) ||
++	    CHECK(ENC_DST_IP4, dst_ip) ||
++#ifdef CONFIG_IPV6
++	    CHECK(ENC_SRC_IP6, src_ip6) ||
++	    CHECK(ENC_DST_IP6, dst_ip6) ||
++#endif
++	    CHECK(ENC_L4_SPORT, l4_sport) ||
++	    CHECK(ENC_L4_DPORT, l4_dport) ||
++	    UNSUPPORTED(tcp_flags) ||
++	    CHECK_BIT(TCP_SYN_FIN_RST, tcp_syn_fin_rst))
++		return rc;
++	if (efx_tc_match_is_encap(mask)) {
++		/* can't happen; disallowed for local rules, translated
++		 * for foreign rules.
++		 */
++		NL_SET_ERR_MSG_MOD(extack, "Unexpected encap match in LHS rule");
++		return -EOPNOTSUPP;
++	}
++	if (UNSUPPORTED(enc_keyid) ||
++	    /* Can't filter on conntrack in LHS rules */
++	    UNSUPPORTED_BIT(ct_state_trk) ||
++	    UNSUPPORTED_BIT(ct_state_est) ||
++	    UNSUPPORTED(ct_mark) ||
++	    UNSUPPORTED(recirc_id))
++		return rc;
++	return 0;
++}
++#undef UNSUPPORTED
+ #undef CHECK_BIT
+ #undef CHECK
+ 
+@@ -1409,6 +1493,209 @@ int efx_mae_unregister_encap_match(struct efx_nic *efx,
+ 	return 0;
+ }
+ 
++static int efx_mae_populate_lhs_match_criteria(MCDI_DECLARE_STRUCT_PTR(match_crit),
++					       const struct efx_tc_match *match)
++{
++	if (match->mask.ingress_port) {
++		if (~match->mask.ingress_port)
++			return -EOPNOTSUPP;
++		MCDI_STRUCT_SET_DWORD(match_crit,
++				      MAE_ENC_FIELD_PAIRS_INGRESS_MPORT_SELECTOR,
++				      match->value.ingress_port);
++	}
++	MCDI_STRUCT_SET_DWORD(match_crit, MAE_ENC_FIELD_PAIRS_INGRESS_MPORT_SELECTOR_MASK,
++			      match->mask.ingress_port);
++	MCDI_STRUCT_SET_WORD_BE(match_crit, MAE_ENC_FIELD_PAIRS_ENC_ETHER_TYPE_BE,
++				match->value.eth_proto);
++	MCDI_STRUCT_SET_WORD_BE(match_crit, MAE_ENC_FIELD_PAIRS_ENC_ETHER_TYPE_BE_MASK,
++				match->mask.eth_proto);
++	MCDI_STRUCT_SET_WORD_BE(match_crit, MAE_ENC_FIELD_PAIRS_ENC_VLAN0_TCI_BE,
++				match->value.vlan_tci[0]);
++	MCDI_STRUCT_SET_WORD_BE(match_crit, MAE_ENC_FIELD_PAIRS_ENC_VLAN0_TCI_BE_MASK,
++				match->mask.vlan_tci[0]);
++	MCDI_STRUCT_SET_WORD_BE(match_crit, MAE_ENC_FIELD_PAIRS_ENC_VLAN0_PROTO_BE,
++				match->value.vlan_proto[0]);
++	MCDI_STRUCT_SET_WORD_BE(match_crit, MAE_ENC_FIELD_PAIRS_ENC_VLAN0_PROTO_BE_MASK,
++				match->mask.vlan_proto[0]);
++	MCDI_STRUCT_SET_WORD_BE(match_crit, MAE_ENC_FIELD_PAIRS_ENC_VLAN1_TCI_BE,
++				match->value.vlan_tci[1]);
++	MCDI_STRUCT_SET_WORD_BE(match_crit, MAE_ENC_FIELD_PAIRS_ENC_VLAN1_TCI_BE_MASK,
++				match->mask.vlan_tci[1]);
++	MCDI_STRUCT_SET_WORD_BE(match_crit, MAE_ENC_FIELD_PAIRS_ENC_VLAN1_PROTO_BE,
++				match->value.vlan_proto[1]);
++	MCDI_STRUCT_SET_WORD_BE(match_crit, MAE_ENC_FIELD_PAIRS_ENC_VLAN1_PROTO_BE_MASK,
++				match->mask.vlan_proto[1]);
++	memcpy(MCDI_STRUCT_PTR(match_crit, MAE_ENC_FIELD_PAIRS_ENC_ETH_SADDR_BE),
++	       match->value.eth_saddr, ETH_ALEN);
++	memcpy(MCDI_STRUCT_PTR(match_crit, MAE_ENC_FIELD_PAIRS_ENC_ETH_SADDR_BE_MASK),
++	       match->mask.eth_saddr, ETH_ALEN);
++	memcpy(MCDI_STRUCT_PTR(match_crit, MAE_ENC_FIELD_PAIRS_ENC_ETH_DADDR_BE),
++	       match->value.eth_daddr, ETH_ALEN);
++	memcpy(MCDI_STRUCT_PTR(match_crit, MAE_ENC_FIELD_PAIRS_ENC_ETH_DADDR_BE_MASK),
++	       match->mask.eth_daddr, ETH_ALEN);
++	MCDI_STRUCT_SET_BYTE(match_crit, MAE_ENC_FIELD_PAIRS_ENC_IP_PROTO,
++			     match->value.ip_proto);
++	MCDI_STRUCT_SET_BYTE(match_crit, MAE_ENC_FIELD_PAIRS_ENC_IP_PROTO_MASK,
++			     match->mask.ip_proto);
++	MCDI_STRUCT_SET_BYTE(match_crit, MAE_ENC_FIELD_PAIRS_ENC_IP_TOS,
++			     match->value.ip_tos);
++	MCDI_STRUCT_SET_BYTE(match_crit, MAE_ENC_FIELD_PAIRS_ENC_IP_TOS_MASK,
++			     match->mask.ip_tos);
++	MCDI_STRUCT_SET_BYTE(match_crit, MAE_ENC_FIELD_PAIRS_ENC_IP_TTL,
++			     match->value.ip_ttl);
++	MCDI_STRUCT_SET_BYTE(match_crit, MAE_ENC_FIELD_PAIRS_ENC_IP_TTL_MASK,
++			     match->mask.ip_ttl);
++	MCDI_STRUCT_POPULATE_BYTE_1(match_crit,
++				    MAE_ENC_FIELD_PAIRS_ENC_VLAN_FLAGS,
++				    MAE_ENC_FIELD_PAIRS_ENC_IP_FRAG,
++				    match->value.ip_frag);
++	MCDI_STRUCT_POPULATE_BYTE_1(match_crit,
++				    MAE_ENC_FIELD_PAIRS_ENC_VLAN_FLAGS_MASK,
++				    MAE_ENC_FIELD_PAIRS_ENC_IP_FRAG_MASK,
++				    match->mask.ip_frag);
++	MCDI_STRUCT_SET_DWORD_BE(match_crit, MAE_ENC_FIELD_PAIRS_ENC_SRC_IP4_BE,
++				 match->value.src_ip);
++	MCDI_STRUCT_SET_DWORD_BE(match_crit, MAE_ENC_FIELD_PAIRS_ENC_SRC_IP4_BE_MASK,
++				 match->mask.src_ip);
++	MCDI_STRUCT_SET_DWORD_BE(match_crit, MAE_ENC_FIELD_PAIRS_ENC_DST_IP4_BE,
++				 match->value.dst_ip);
++	MCDI_STRUCT_SET_DWORD_BE(match_crit, MAE_ENC_FIELD_PAIRS_ENC_DST_IP4_BE_MASK,
++				 match->mask.dst_ip);
++#ifdef CONFIG_IPV6
++	memcpy(MCDI_STRUCT_PTR(match_crit, MAE_ENC_FIELD_PAIRS_ENC_SRC_IP6_BE),
++	       &match->value.src_ip6, sizeof(struct in6_addr));
++	memcpy(MCDI_STRUCT_PTR(match_crit, MAE_ENC_FIELD_PAIRS_ENC_SRC_IP6_BE_MASK),
++	       &match->mask.src_ip6, sizeof(struct in6_addr));
++	memcpy(MCDI_STRUCT_PTR(match_crit, MAE_ENC_FIELD_PAIRS_ENC_DST_IP6_BE),
++	       &match->value.dst_ip6, sizeof(struct in6_addr));
++	memcpy(MCDI_STRUCT_PTR(match_crit, MAE_ENC_FIELD_PAIRS_ENC_DST_IP6_BE_MASK),
++	       &match->mask.dst_ip6, sizeof(struct in6_addr));
++#endif
++	MCDI_STRUCT_SET_WORD_BE(match_crit, MAE_ENC_FIELD_PAIRS_ENC_L4_SPORT_BE,
++				match->value.l4_sport);
++	MCDI_STRUCT_SET_WORD_BE(match_crit, MAE_ENC_FIELD_PAIRS_ENC_L4_SPORT_BE_MASK,
++				match->mask.l4_sport);
++	MCDI_STRUCT_SET_WORD_BE(match_crit, MAE_ENC_FIELD_PAIRS_ENC_L4_DPORT_BE,
++				match->value.l4_dport);
++	MCDI_STRUCT_SET_WORD_BE(match_crit, MAE_ENC_FIELD_PAIRS_ENC_L4_DPORT_BE_MASK,
++				match->mask.l4_dport);
++	/* No enc-keys in LHS rules.  Caps check should have caught this; any
++	 * enc-keys from an fLHS should have been translated to regular keys
++	 * and any EM should be a pseudo (we're an OR so can't have a direct
++	 * EM with another OR).
++	 */
++	if (WARN_ON_ONCE(match->encap && !match->encap->type))
++		return -EOPNOTSUPP;
++	if (WARN_ON_ONCE(match->mask.enc_src_ip))
++		return -EOPNOTSUPP;
++	if (WARN_ON_ONCE(match->mask.enc_dst_ip))
++		return -EOPNOTSUPP;
++#ifdef CONFIG_IPV6
++	if (WARN_ON_ONCE(!ipv6_addr_any(&match->mask.enc_src_ip6)))
++		return -EOPNOTSUPP;
++	if (WARN_ON_ONCE(!ipv6_addr_any(&match->mask.enc_dst_ip6)))
++		return -EOPNOTSUPP;
++#endif
++	if (WARN_ON_ONCE(match->mask.enc_ip_tos))
++		return -EOPNOTSUPP;
++	if (WARN_ON_ONCE(match->mask.enc_ip_ttl))
++		return -EOPNOTSUPP;
++	if (WARN_ON_ONCE(match->mask.enc_sport))
++		return -EOPNOTSUPP;
++	if (WARN_ON_ONCE(match->mask.enc_dport))
++		return -EOPNOTSUPP;
++	if (WARN_ON_ONCE(match->mask.enc_keyid))
++		return -EOPNOTSUPP;
++	return 0;
++}
++
++static int efx_mae_insert_lhs_outer_rule(struct efx_nic *efx,
++					 struct efx_tc_lhs_rule *rule, u32 prio)
++{
++	MCDI_DECLARE_BUF(inbuf, MC_CMD_MAE_OUTER_RULE_INSERT_IN_LEN(MAE_ENC_FIELD_PAIRS_LEN));
++	MCDI_DECLARE_BUF(outbuf, MC_CMD_MAE_OUTER_RULE_INSERT_OUT_LEN);
++	MCDI_DECLARE_STRUCT_PTR(match_crit);
++	const struct efx_tc_lhs_action *act;
++	size_t outlen;
++	int rc;
++
++	MCDI_SET_DWORD(inbuf, MAE_OUTER_RULE_INSERT_IN_PRIO, prio);
++	/* match */
++	match_crit = _MCDI_DWORD(inbuf, MAE_OUTER_RULE_INSERT_IN_FIELD_MATCH_CRITERIA);
++	rc = efx_mae_populate_lhs_match_criteria(match_crit, &rule->match);
++	if (rc)
++		return rc;
++
++	/* action */
++	act = &rule->lhs_act;
++	MCDI_SET_DWORD(inbuf, MAE_OUTER_RULE_INSERT_IN_ENCAP_TYPE,
++		       MAE_MCDI_ENCAP_TYPE_NONE);
++	/* We always inhibit CT lookup on TCP_INTERESTING_FLAGS, since the
++	 * SW path needs to process the packet to update the conntrack tables
++	 * on connection establishment (SYN) or termination (FIN, RST).
++	 */
++	MCDI_POPULATE_DWORD_6(inbuf, MAE_OUTER_RULE_INSERT_IN_LOOKUP_CONTROL,
++			      MAE_OUTER_RULE_INSERT_IN_DO_CT, !!act->zone,
++			      MAE_OUTER_RULE_INSERT_IN_CT_TCP_FLAGS_INHIBIT, 1,
++			      MAE_OUTER_RULE_INSERT_IN_CT_DOMAIN,
++			      act->zone ? act->zone->zone : 0,
++			      MAE_OUTER_RULE_INSERT_IN_CT_VNI_MODE,
++			      MAE_CT_VNI_MODE_ZERO,
++			      MAE_OUTER_RULE_INSERT_IN_DO_COUNT, !!act->count,
++			      MAE_OUTER_RULE_INSERT_IN_RECIRC_ID,
++			      act->rid ? act->rid->fw_id : 0);
++	if (act->count)
++		MCDI_SET_DWORD(inbuf, MAE_OUTER_RULE_INSERT_IN_COUNTER_ID,
++			       act->count->cnt->fw_id);
++	rc = efx_mcdi_rpc(efx, MC_CMD_MAE_OUTER_RULE_INSERT, inbuf,
++			  sizeof(inbuf), outbuf, sizeof(outbuf), &outlen);
++	if (rc)
++		return rc;
++	if (outlen < sizeof(outbuf))
++		return -EIO;
++	rule->fw_id = MCDI_DWORD(outbuf, MAE_OUTER_RULE_INSERT_OUT_OR_ID);
++	return 0;
++}
++
++int efx_mae_insert_lhs_rule(struct efx_nic *efx, struct efx_tc_lhs_rule *rule,
++			    u32 prio)
++{
++	return efx_mae_insert_lhs_outer_rule(efx, rule, prio);
++}
++
++static int efx_mae_remove_lhs_outer_rule(struct efx_nic *efx,
++					 struct efx_tc_lhs_rule *rule)
++{
++	MCDI_DECLARE_BUF(outbuf, MC_CMD_MAE_OUTER_RULE_REMOVE_OUT_LEN(1));
++	MCDI_DECLARE_BUF(inbuf, MC_CMD_MAE_OUTER_RULE_REMOVE_IN_LEN(1));
++	size_t outlen;
++	int rc;
++
++	MCDI_SET_DWORD(inbuf, MAE_OUTER_RULE_REMOVE_IN_OR_ID, rule->fw_id);
++	rc = efx_mcdi_rpc(efx, MC_CMD_MAE_OUTER_RULE_REMOVE, inbuf,
++			  sizeof(inbuf), outbuf, sizeof(outbuf), &outlen);
++	if (rc)
++		return rc;
++	if (outlen < sizeof(outbuf))
++		return -EIO;
++	/* FW freed a different ID than we asked for, should also never happen.
++	 * Warn because it means we've now got a different idea to the FW of
++	 * what encap_mds exist, which could cause mayhem later.
++	 */
++	if (WARN_ON(MCDI_DWORD(outbuf, MAE_OUTER_RULE_REMOVE_OUT_REMOVED_OR_ID) != rule->fw_id))
++		return -EIO;
++	/* We're probably about to free @rule, but let's just make sure its
++	 * fw_id is blatted so that it won't look valid if it leaks out.
++	 */
++	rule->fw_id = MC_CMD_MAE_OUTER_RULE_INSERT_OUT_OUTER_RULE_ID_NULL;
++	return 0;
++}
++
++int efx_mae_remove_lhs_rule(struct efx_nic *efx, struct efx_tc_lhs_rule *rule)
++{
++	return efx_mae_remove_lhs_outer_rule(efx, rule);
++}
++
+ /* Populating is done by taking each byte of @value in turn and storing
+  * it in the appropriate bits of @row.  @value must be big-endian; we
+  * convert it to little-endianness as we go.
+diff --git a/drivers/net/ethernet/sfc/mae.h b/drivers/net/ethernet/sfc/mae.h
+index 24f29a4fc0e1..e88e80574f15 100644
+--- a/drivers/net/ethernet/sfc/mae.h
++++ b/drivers/net/ethernet/sfc/mae.h
+@@ -84,6 +84,9 @@ int efx_mae_get_caps(struct efx_nic *efx, struct mae_caps *caps);
+ int efx_mae_match_check_caps(struct efx_nic *efx,
+ 			     const struct efx_tc_match_fields *mask,
+ 			     struct netlink_ext_ack *extack);
++int efx_mae_match_check_caps_lhs(struct efx_nic *efx,
++				 const struct efx_tc_match_fields *mask,
++				 struct netlink_ext_ack *extack);
+ int efx_mae_check_encap_match_caps(struct efx_nic *efx, bool ipv6,
+ 				   u8 ip_tos_mask, __be16 udp_sport_mask,
+ 				   struct netlink_ext_ack *extack);
+@@ -112,6 +115,9 @@ int efx_mae_register_encap_match(struct efx_nic *efx,
+ 				 struct efx_tc_encap_match *encap);
+ int efx_mae_unregister_encap_match(struct efx_nic *efx,
+ 				   struct efx_tc_encap_match *encap);
++int efx_mae_insert_lhs_rule(struct efx_nic *efx, struct efx_tc_lhs_rule *rule,
++			    u32 prio);
++int efx_mae_remove_lhs_rule(struct efx_nic *efx, struct efx_tc_lhs_rule *rule);
+ struct efx_tc_ct_entry; /* see tc_conntrack.h */
+ int efx_mae_insert_ct(struct efx_nic *efx, struct efx_tc_ct_entry *conn);
+ int efx_mae_remove_ct(struct efx_nic *efx, struct efx_tc_ct_entry *conn);
+diff --git a/drivers/net/ethernet/sfc/mcdi.h b/drivers/net/ethernet/sfc/mcdi.h
+index 700d0252aebd..ea612c619874 100644
+--- a/drivers/net/ethernet/sfc/mcdi.h
++++ b/drivers/net/ethernet/sfc/mcdi.h
+@@ -218,6 +218,12 @@ void efx_mcdi_sensor_event(struct efx_nic *efx, efx_qword_t *ev);
+ 	BUILD_BUG_ON(_field ## _LEN != 1);				\
+ 	*(u8 *)MCDI_STRUCT_PTR(_buf, _field) = _value;			\
+ 	} while (0)
++#define MCDI_STRUCT_POPULATE_BYTE_1(_buf, _field, _name, _value) do {	\
++	efx_dword_t _temp;						\
++	EFX_POPULATE_DWORD_1(_temp, _name, _value);			\
++	MCDI_STRUCT_SET_BYTE(_buf, _field,				\
++			     EFX_DWORD_FIELD(_temp, EFX_BYTE_0));	\
++	} while (0)
+ #define MCDI_BYTE(_buf, _field)						\
+ 	((void)BUILD_BUG_ON_ZERO(MC_CMD_ ## _field ## _LEN != 1),	\
+ 	 *MCDI_PTR(_buf, _field))
+diff --git a/drivers/net/ethernet/sfc/tc.c b/drivers/net/ethernet/sfc/tc.c
+index a9f4bfaacac3..246657222958 100644
+--- a/drivers/net/ethernet/sfc/tc.c
++++ b/drivers/net/ethernet/sfc/tc.c
+@@ -12,6 +12,7 @@
+ #include <net/pkt_cls.h>
+ #include <net/vxlan.h>
+ #include <net/geneve.h>
++#include <net/tc_act/tc_ct.h>
+ #include "tc.h"
+ #include "tc_bindings.h"
+ #include "tc_encap_actions.h"
+@@ -97,6 +98,12 @@ static const struct rhashtable_params efx_tc_match_action_ht_params = {
+ 	.head_offset	= offsetof(struct efx_tc_flow_rule, linkage),
  };
  
- static inline bool efx_tc_match_is_encap(const struct efx_tc_match_fields *mask)
++static const struct rhashtable_params efx_tc_lhs_rule_ht_params = {
++	.key_len	= sizeof(unsigned long),
++	.key_offset	= offsetof(struct efx_tc_lhs_rule, cookie),
++	.head_offset	= offsetof(struct efx_tc_lhs_rule, linkage),
++};
++
+ static const struct rhashtable_params efx_tc_recirc_ht_params = {
+ 	.key_len	= offsetof(struct efx_tc_recirc_id, linkage),
+ 	.key_offset	= 0,
+@@ -736,6 +743,163 @@ static bool efx_tc_flower_action_order_ok(const struct efx_tc_action_set *act,
+ 	}
+ }
+ 
++/**
++ * DOC: TC conntrack sequences
++ *
++ * The MAE hardware can handle at most two rounds of action rule matching,
++ * consequently we support conntrack through the notion of a "left-hand side
++ * rule".  This is a rule which typically contains only the actions "ct" and
++ * "goto chain N", and corresponds to one or more "right-hand side rules" in
++ * chain N, which typically match on +trk+est, and may perform ct(nat) actions.
++ * RHS rules go in the Action Rule table as normal but with a nonzero recirc_id
++ * (the hardware equivalent of chain_index), while LHS rules may go in either
++ * the Action Rule or the Outer Rule table, the latter being preferred for
++ * performance reasons, and set both DO_CT and a recirc_id in their response.
++ *
++ * Besides the RHS rules, there are often also similar rules matching on
++ * +trk+new which perform the ct(commit) action.  These are not offloaded.
++ */
++
++static bool efx_tc_rule_is_lhs_rule(struct flow_rule *fr,
++				    struct efx_tc_match *match)
++{
++	const struct flow_action_entry *fa;
++	int i;
++
++	flow_action_for_each(i, fa, &fr->action) {
++		switch (fa->id) {
++		case FLOW_ACTION_GOTO:
++			return true;
++		case FLOW_ACTION_CT:
++			/* If rule is -trk, or doesn't mention trk at all, then
++			 * a CT action implies a conntrack lookup (hence it's an
++			 * LHS rule).  If rule is +trk, then a CT action could
++			 * just be ct(nat) or even ct(commit) (though the latter
++			 * can't be offloaded).
++			 */
++			if (!match->mask.ct_state_trk || !match->value.ct_state_trk)
++				return true;
++			break;
++		default:
++			break;
++		}
++	}
++	return false;
++}
++
++static int efx_tc_flower_handle_lhs_actions(struct efx_nic *efx,
++					    struct flow_cls_offload *tc,
++					    struct flow_rule *fr,
++					    struct net_device *net_dev,
++					    struct efx_tc_lhs_rule *rule)
++
++{
++	struct netlink_ext_ack *extack = tc->common.extack;
++	struct efx_tc_lhs_action *act = &rule->lhs_act;
++	const struct flow_action_entry *fa;
++	bool pipe = true;
++	int i;
++
++	flow_action_for_each(i, fa, &fr->action) {
++		struct efx_tc_ct_zone *ct_zone;
++		struct efx_tc_recirc_id *rid;
++
++		if (!pipe) {
++			/* more actions after a non-pipe action */
++			NL_SET_ERR_MSG_MOD(extack, "Action follows non-pipe action");
++			return -EINVAL;
++		}
++		switch (fa->id) {
++		case FLOW_ACTION_GOTO:
++			if (!fa->chain_index) {
++				NL_SET_ERR_MSG_MOD(extack, "Can't goto chain 0, no looping in hw");
++				return -EOPNOTSUPP;
++			}
++			rid = efx_tc_get_recirc_id(efx, fa->chain_index,
++						   net_dev);
++			if (IS_ERR(rid)) {
++				NL_SET_ERR_MSG_MOD(extack, "Failed to allocate a hardware recirculation ID for this chain_index");
++				return PTR_ERR(rid);
++			}
++			act->rid = rid;
++			if (fa->hw_stats) {
++				struct efx_tc_counter_index *cnt;
++
++				if (!(fa->hw_stats & FLOW_ACTION_HW_STATS_DELAYED)) {
++					NL_SET_ERR_MSG_FMT_MOD(extack,
++							       "hw_stats_type %u not supported (only 'delayed')",
++							       fa->hw_stats);
++					return -EOPNOTSUPP;
++				}
++				cnt = efx_tc_flower_get_counter_index(efx, tc->cookie,
++								      EFX_TC_COUNTER_TYPE_OR);
++				if (IS_ERR(cnt)) {
++					NL_SET_ERR_MSG_MOD(extack, "Failed to obtain a counter");
++					return PTR_ERR(cnt);
++				}
++				WARN_ON(act->count); /* can't happen */
++				act->count = cnt;
++			}
++			pipe = false;
++			break;
++		case FLOW_ACTION_CT:
++			if (act->zone) {
++				NL_SET_ERR_MSG_MOD(extack, "Can't offload multiple ct actions");
++				return -EOPNOTSUPP;
++			}
++			if (fa->ct.action & (TCA_CT_ACT_COMMIT |
++					     TCA_CT_ACT_FORCE)) {
++				NL_SET_ERR_MSG_MOD(extack, "Can't offload ct commit/force");
++				return -EOPNOTSUPP;
++			}
++			if (fa->ct.action & TCA_CT_ACT_CLEAR) {
++				NL_SET_ERR_MSG_MOD(extack, "Can't clear ct in LHS rule");
++				return -EOPNOTSUPP;
++			}
++			if (fa->ct.action & (TCA_CT_ACT_NAT |
++					     TCA_CT_ACT_NAT_SRC |
++					     TCA_CT_ACT_NAT_DST)) {
++				NL_SET_ERR_MSG_MOD(extack, "Can't perform NAT in LHS rule - packet isn't conntracked yet");
++				return -EOPNOTSUPP;
++			}
++			if (fa->ct.action) {
++				NL_SET_ERR_MSG_FMT_MOD(extack, "Unhandled ct.action %u for LHS rule\n",
++						       fa->ct.action);
++				return -EOPNOTSUPP;
++			}
++			ct_zone = efx_tc_ct_register_zone(efx, fa->ct.zone,
++							  fa->ct.flow_table);
++			if (IS_ERR(ct_zone)) {
++				NL_SET_ERR_MSG_MOD(extack, "Failed to register for CT updates");
++				return PTR_ERR(ct_zone);
++			}
++			act->zone = ct_zone;
++			break;
++		default:
++			NL_SET_ERR_MSG_FMT_MOD(extack, "Unhandled action %u for LHS rule\n",
++					       fa->id);
++			return -EOPNOTSUPP;
++		}
++	}
++
++	if (pipe) {
++		NL_SET_ERR_MSG_MOD(extack, "Missing goto chain in LHS rule");
++		return -EOPNOTSUPP;
++	}
++	return 0;
++}
++
++static void efx_tc_flower_release_lhs_actions(struct efx_nic *efx,
++					      struct efx_tc_lhs_action *act)
++{
++	if (act->rid)
++		efx_tc_put_recirc_id(efx, act->rid);
++	if (act->zone)
++		efx_tc_ct_unregister_zone(efx, act->zone);
++	if (act->count)
++		efx_tc_flower_put_counter_index(efx, act->count);
++}
++
+ static int efx_tc_flower_replace_foreign(struct efx_nic *efx,
+ 					 struct net_device *net_dev,
+ 					 struct flow_cls_offload *tc)
+@@ -1050,6 +1214,78 @@ static int efx_tc_flower_replace_foreign(struct efx_nic *efx,
+ 	return rc;
+ }
+ 
++static int efx_tc_flower_replace_lhs(struct efx_nic *efx,
++				     struct flow_cls_offload *tc,
++				     struct flow_rule *fr,
++				     struct efx_tc_match *match,
++				     struct efx_rep *efv,
++				     struct net_device *net_dev)
++{
++	struct netlink_ext_ack *extack = tc->common.extack;
++	struct efx_tc_lhs_rule *rule, *old;
++	int rc;
++
++	if (tc->common.chain_index) {
++		NL_SET_ERR_MSG_MOD(extack, "LHS rule only allowed in chain 0");
++		return -EOPNOTSUPP;
++	}
++
++	if (match->mask.ct_state_trk && match->value.ct_state_trk) {
++		NL_SET_ERR_MSG_MOD(extack, "LHS rule can never match +trk");
++		return -EOPNOTSUPP;
++	}
++	/* LHS rules are always -trk, so we don't need to match on that */
++	match->mask.ct_state_trk = 0;
++	match->value.ct_state_trk = 0;
++
++	rc = efx_mae_match_check_caps_lhs(efx, &match->mask, extack);
++	if (rc)
++		return rc;
++
++	rule = kzalloc(sizeof(*rule), GFP_USER);
++	if (!rule)
++		return -ENOMEM;
++	rule->cookie = tc->cookie;
++	old = rhashtable_lookup_get_insert_fast(&efx->tc->lhs_rule_ht,
++						&rule->linkage,
++						efx_tc_lhs_rule_ht_params);
++	if (old) {
++		netif_dbg(efx, drv, efx->net_dev,
++			  "Already offloaded rule (cookie %lx)\n", tc->cookie);
++		rc = -EEXIST;
++		NL_SET_ERR_MSG_MOD(extack, "Rule already offloaded");
++		goto release;
++	}
++
++	/* Parse actions */
++	/* See note in efx_tc_flower_replace() regarding passed net_dev
++	 * (used for efx_tc_get_recirc_id()).
++	 */
++	rc = efx_tc_flower_handle_lhs_actions(efx, tc, fr, efx->net_dev, rule);
++	if (rc)
++		goto release;
++
++	rule->match = *match;
++
++	rc = efx_mae_insert_lhs_rule(efx, rule, EFX_TC_PRIO_TC);
++	if (rc) {
++		NL_SET_ERR_MSG_MOD(extack, "Failed to insert rule in hw");
++		goto release;
++	}
++	netif_dbg(efx, drv, efx->net_dev,
++		  "Successfully parsed lhs rule (cookie %lx)\n",
++		  tc->cookie);
++	return 0;
++
++release:
++	efx_tc_flower_release_lhs_actions(efx, &rule->lhs_act);
++	if (!old)
++		rhashtable_remove_fast(&efx->tc->lhs_rule_ht, &rule->linkage,
++				       efx_tc_lhs_rule_ht_params);
++	kfree(rule);
++	return rc;
++}
++
+ static int efx_tc_flower_replace(struct efx_nic *efx,
+ 				 struct net_device *net_dev,
+ 				 struct flow_cls_offload *tc,
+@@ -1105,6 +1341,10 @@ static int efx_tc_flower_replace(struct efx_nic *efx,
+ 		return -EOPNOTSUPP;
+ 	}
+ 
++	if (efx_tc_rule_is_lhs_rule(fr, &match))
++		return efx_tc_flower_replace_lhs(efx, tc, fr, &match, efv,
++						 net_dev);
++
+ 	/* chain_index 0 is always recirc_id 0 (and does not appear in recirc_ht).
+ 	 * Conveniently, match.rid == NULL and match.value.recirc_id == 0 owing
+ 	 * to the initial memset(), so we don't need to do anything in that case.
+@@ -1512,8 +1752,26 @@ static int efx_tc_flower_destroy(struct efx_nic *efx,
+ 				 struct flow_cls_offload *tc)
+ {
+ 	struct netlink_ext_ack *extack = tc->common.extack;
++	struct efx_tc_lhs_rule *lhs_rule;
+ 	struct efx_tc_flow_rule *rule;
+ 
++	lhs_rule = rhashtable_lookup_fast(&efx->tc->lhs_rule_ht, &tc->cookie,
++					  efx_tc_lhs_rule_ht_params);
++	if (lhs_rule) {
++		/* Remove it from HW */
++		efx_mae_remove_lhs_rule(efx, lhs_rule);
++		/* Delete it from SW */
++		efx_tc_flower_release_lhs_actions(efx, &lhs_rule->lhs_act);
++		rhashtable_remove_fast(&efx->tc->lhs_rule_ht, &lhs_rule->linkage,
++				       efx_tc_lhs_rule_ht_params);
++		if (lhs_rule->match.encap)
++			efx_tc_flower_release_encap_match(efx, lhs_rule->match.encap);
++		netif_dbg(efx, drv, efx->net_dev, "Removed (lhs) filter %lx\n",
++			  lhs_rule->cookie);
++		kfree(lhs_rule);
++		return 0;
++	}
++
+ 	rule = rhashtable_lookup_fast(&efx->tc->match_action_ht, &tc->cookie,
+ 				      efx_tc_match_action_ht_params);
+ 	if (!rule) {
+@@ -1880,6 +2138,24 @@ static void efx_tc_recirc_free(void *ptr, void *arg)
+ 	kfree(rid);
+ }
+ 
++static void efx_tc_lhs_free(void *ptr, void *arg)
++{
++	struct efx_tc_lhs_rule *rule = ptr;
++	struct efx_nic *efx = arg;
++
++	netif_err(efx, drv, efx->net_dev,
++		  "tc lhs_rule %lx still present at teardown, removing\n",
++		  rule->cookie);
++
++	if (rule->lhs_act.zone)
++		efx_tc_ct_unregister_zone(efx, rule->lhs_act.zone);
++	if (rule->lhs_act.count)
++		efx_tc_flower_put_counter_index(efx, rule->lhs_act.count);
++	efx_mae_remove_lhs_rule(efx, rule);
++
++	kfree(rule);
++}
++
+ static void efx_tc_flow_free(void *ptr, void *arg)
+ {
+ 	struct efx_tc_flow_rule *rule = ptr;
+@@ -1926,6 +2202,9 @@ int efx_init_struct_tc(struct efx_nic *efx)
+ 	rc = rhashtable_init(&efx->tc->match_action_ht, &efx_tc_match_action_ht_params);
+ 	if (rc < 0)
+ 		goto fail_match_action_ht;
++	rc = rhashtable_init(&efx->tc->lhs_rule_ht, &efx_tc_lhs_rule_ht_params);
++	if (rc < 0)
++		goto fail_lhs_rule_ht;
+ 	rc = efx_tc_init_conntrack(efx);
+ 	if (rc < 0)
+ 		goto fail_conntrack;
+@@ -1948,6 +2227,8 @@ int efx_init_struct_tc(struct efx_nic *efx)
+ fail_recirc_ht:
+ 	efx_tc_destroy_conntrack(efx);
+ fail_conntrack:
++	rhashtable_destroy(&efx->tc->lhs_rule_ht);
++fail_lhs_rule_ht:
+ 	rhashtable_destroy(&efx->tc->match_action_ht);
+ fail_match_action_ht:
+ 	rhashtable_destroy(&efx->tc->encap_match_ht);
+@@ -1978,6 +2259,7 @@ void efx_fini_struct_tc(struct efx_nic *efx)
+ 			     MC_CMD_MAE_ACTION_SET_LIST_ALLOC_OUT_ACTION_SET_LIST_ID_NULL);
+ 	EFX_WARN_ON_PARANOID(efx->tc->facts.reps.fw_id !=
+ 			     MC_CMD_MAE_ACTION_SET_LIST_ALLOC_OUT_ACTION_SET_LIST_ID_NULL);
++	rhashtable_free_and_destroy(&efx->tc->lhs_rule_ht, efx_tc_lhs_free, efx);
+ 	rhashtable_free_and_destroy(&efx->tc->match_action_ht, efx_tc_flow_free,
+ 				    efx);
+ 	rhashtable_free_and_destroy(&efx->tc->encap_match_ht,
+diff --git a/drivers/net/ethernet/sfc/tc.h b/drivers/net/ethernet/sfc/tc.h
+index ce8e30743a3a..40d2c803fca8 100644
+--- a/drivers/net/ethernet/sfc/tc.h
++++ b/drivers/net/ethernet/sfc/tc.h
+@@ -140,6 +140,12 @@ struct efx_tc_action_set_list {
+ 	u32 fw_id;
+ };
+ 
++struct efx_tc_lhs_action {
++	struct efx_tc_recirc_id *rid;
++	struct efx_tc_ct_zone *zone;
++	struct efx_tc_counter_index *count;
++};
++
+ struct efx_tc_flow_rule {
+ 	unsigned long cookie;
+ 	struct rhash_head linkage;
+@@ -149,6 +155,14 @@ struct efx_tc_flow_rule {
+ 	u32 fw_id;
+ };
+ 
++struct efx_tc_lhs_rule {
++	unsigned long cookie;
++	struct efx_tc_match match;
++	struct efx_tc_lhs_action lhs_act;
++	struct rhash_head linkage;
++	u32 fw_id;
++};
++
+ enum efx_tc_rule_prios {
+ 	EFX_TC_PRIO_TC, /* Rule inserted by TC */
+ 	EFX_TC_PRIO_DFLT, /* Default switch rule; one of efx_tc_default_rules */
+@@ -208,6 +222,7 @@ struct efx_tc_table_ct { /* TABLE_ID_CONNTRACK_TABLE */
+  * @encap_ht: Hashtable of TC encap actions
+  * @encap_match_ht: Hashtable of TC encap matches
+  * @match_action_ht: Hashtable of TC match-action rules
++ * @lhs_rule_ht: Hashtable of TC left-hand (act ct & goto chain) rules
+  * @ct_zone_ht: Hashtable of TC conntrack flowtable bindings
+  * @ct_ht: Hashtable of TC conntrack flow entries
+  * @neigh_ht: Hashtable of neighbour watches (&struct efx_neigh_binder)
+@@ -244,6 +259,7 @@ struct efx_tc_state {
+ 	struct rhashtable encap_ht;
+ 	struct rhashtable encap_match_ht;
+ 	struct rhashtable match_action_ht;
++	struct rhashtable lhs_rule_ht;
+ 	struct rhashtable ct_zone_ht;
+ 	struct rhashtable ct_ht;
+ 	struct rhashtable neigh_ht;
 
