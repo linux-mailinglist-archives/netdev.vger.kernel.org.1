@@ -1,35 +1,35 @@
-Return-Path: <netdev+bounces-25152-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25153-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0036577312E
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 23:26:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C0D777312F
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 23:26:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AC572281586
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 21:26:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 552E8280F80
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 21:26:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A497917722;
-	Mon,  7 Aug 2023 21:26:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B77917735;
+	Mon,  7 Aug 2023 21:26:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DFB14432
-	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 21:26:14 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24D13C433C7;
-	Mon,  7 Aug 2023 21:26:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E6EB174DF
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 21:26:15 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0948DC433C8;
+	Mon,  7 Aug 2023 21:26:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691443574;
-	bh=JnkS8EFwYgogtGdFo6zpdHWOtKj55kJBIHRvFzKKAV0=;
-	h=From:To:Cc:Subject:Date:From;
-	b=EVTag0d1IqmN/uQLoKncVwG8xAkRymbenkdgjS101RbfowiGXLSxAmqk/u/9NIc54
-	 INp9ub0eliIqBNNUY3uz4Z2hnGDTEv7Gp20HYxCxgnLresIy8sZisVpvR9kylrlzYy
-	 HpvLamZN/gZUYPTjjJms2jIBI+Fgfz4bS7ESzU2CrDWLZX3S+xRMb45NHMQkkIdRLO
-	 GCJxSuYYvcVnMF9/s3MMQ6C9qqzTx5OVdiVUE408el8D6mVPBe9v6HymCu0Q8+IzPX
-	 dEqi/iV8FHs4BBTSvkqsl0KHfE5xt6XEGyVfF0uCwK3QmP/JNt4Sa5/Kcs7V360jl8
-	 0k04lW7x8d2OA==
+	s=k20201202; t=1691443575;
+	bh=RRfNWQyNi4I/sy91Z7YFB+5MPwjCobXMRA6TO0fJooI=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=LB2uRaJzACbw6mXldR4+g83scwxVfrRNIFfePRmWzv1SMrM+meymQxEDM8VDN4udP
+	 TxMdISPgKsHY+Dkt5evFFGv1JwNdcoER/ARULoPxa46qrwQm8eOmGgyQTXDQY/EC06
+	 R2ZgISV37Ze/LTooLjZnGZY6/hm73CQkn/EKei777HfjZRpmYofL2rhj7YUAydW9FR
+	 2ncEc94TGx4CxvCK2UOaG5M/iax0uE5L/w0wJCIg5sEi2Hj40h1XTSF4ql/l+hcgcz
+	 Nkw/6E9g4RrbRilrJPg/PTseQ/E+XAZT66tKFXkZp6DTRe597dv/NEXjlhLH2QNz9a
+	 zgYZoF1gWfx/g==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -37,11 +37,14 @@ To: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>
 Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	netdev@vger.kernel.org,
-	Tariq Toukan <tariqt@nvidia.com>
-Subject: [pull request][net 00/11] mlx5 fixes 2023-08-07
-Date: Mon,  7 Aug 2023 14:25:56 -0700
-Message-ID: <20230807212607.50883-1-saeed@kernel.org>
+	Tariq Toukan <tariqt@nvidia.com>,
+	Gal Pressman <gal@nvidia.com>
+Subject: [net 01/11] net/mlx5e: Take RTNL lock when needed before calling xdp_set_features()
+Date: Mon,  7 Aug 2023 14:25:57 -0700
+Message-ID: <20230807212607.50883-2-saeed@kernel.org>
 X-Mailer: git-send-email 2.41.0
+In-Reply-To: <20230807212607.50883-1-saeed@kernel.org>
+References: <20230807212607.50883-1-saeed@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,68 +53,128 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Saeed Mahameed <saeedm@nvidia.com>
+From: Gal Pressman <gal@nvidia.com>
 
-This series provides bug fixes to mlx5 driver.
-Please pull and let me know if there is any problem.
+Hold RTNL lock when calling xdp_set_features() with a registered netdev,
+as the call triggers the netdev notifiers. This could happen when
+switching from uplink rep to nic profile for example.
 
-Thanks,
-Saeed.
+This resolves the following call trace:
 
+RTNL: assertion failed at net/core/dev.c (1953)
+WARNING: CPU: 6 PID: 112670 at net/core/dev.c:1953 call_netdevice_notifiers_info+0x7c/0x80
+Modules linked in: sch_mqprio sch_mqprio_lib act_tunnel_key act_mirred act_skbedit cls_matchall nfnetlink_cttimeout act_gact cls_flower sch_ingress bonding ib_umad ip_gre rdma_ucm mlx5_vfio_pci ipip tunnel4 ip6_gre gre mlx5_ib vfio_pci vfio_pci_core vfio_iommu_type1 ib_uverbs vfio mlx5_core ib_ipoib geneve nf_tables ip6_tunnel tunnel6 iptable_raw openvswitch nsh rpcrdma ib_iser libiscsi scsi_transport_iscsi rdma_cm iw_cm ib_cm ib_core xt_conntrack xt_MASQUERADE nf_conntrack_netlink nfnetlink xt_addrtype iptable_nat nf_nat br_netfilter rpcsec_gss_krb5 auth_rpcgss oid_registry overlay zram zsmalloc fuse [last unloaded: ib_uverbs]
+CPU: 6 PID: 112670 Comm: devlink Not tainted 6.4.0-rc7_for_upstream_min_debug_2023_06_28_17_02 #1
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS rel-1.13.0-0-gf21b5a4aeb02-prebuilt.qemu.org 04/01/2014
+RIP: 0010:call_netdevice_notifiers_info+0x7c/0x80
+Code: 90 ff 80 3d 2d 6b f7 00 00 75 c5 ba a1 07 00 00 48 c7 c6 e4 ce 0b 82 48 c7 c7 c8 f4 04 82 c6 05 11 6b f7 00 01 e8 a4 7c 8e ff <0f> 0b eb a2 0f 1f 44 00 00 55 48 89 e5 41 54 48 83 e4 f0 48 83 ec
+RSP: 0018:ffff8882a21c3948 EFLAGS: 00010282
+RAX: 0000000000000000 RBX: ffffffff82e6f880 RCX: 0000000000000027
+RDX: ffff88885f99b5c8 RSI: 0000000000000001 RDI: ffff88885f99b5c0
+RBP: 0000000000000028 R08: ffff88887ffabaa8 R09: 0000000000000003
+R10: ffff88887fecbac0 R11: ffff88887ff7bac0 R12: ffff8882a21c3968
+R13: ffff88811c018940 R14: 0000000000000000 R15: ffff8881274401a0
+FS:  00007fe141c81800(0000) GS:ffff88885f980000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f787c28b948 CR3: 000000014bcf3005 CR4: 0000000000370ea0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ ? __warn+0x79/0x120
+ ? call_netdevice_notifiers_info+0x7c/0x80
+ ? report_bug+0x17c/0x190
+ ? handle_bug+0x3c/0x60
+ ? exc_invalid_op+0x14/0x70
+ ? asm_exc_invalid_op+0x16/0x20
+ ? call_netdevice_notifiers_info+0x7c/0x80
+ ? call_netdevice_notifiers_info+0x7c/0x80
+ call_netdevice_notifiers+0x2e/0x50
+ mlx5e_set_xdp_feature+0x21/0x50 [mlx5_core]
+ mlx5e_nic_init+0xf1/0x1a0 [mlx5_core]
+ mlx5e_netdev_init_profile+0x76/0x110 [mlx5_core]
+ mlx5e_netdev_attach_profile+0x1f/0x90 [mlx5_core]
+ mlx5e_netdev_change_profile+0x92/0x160 [mlx5_core]
+ mlx5e_netdev_attach_nic_profile+0x1b/0x30 [mlx5_core]
+ mlx5e_vport_rep_unload+0xaa/0xc0 [mlx5_core]
+ __esw_offloads_unload_rep+0x52/0x60 [mlx5_core]
+ mlx5_esw_offloads_rep_unload+0x52/0x70 [mlx5_core]
+ esw_offloads_unload_rep+0x34/0x70 [mlx5_core]
+ esw_offloads_disable+0x2b/0x90 [mlx5_core]
+ mlx5_eswitch_disable_locked+0x1b9/0x210 [mlx5_core]
+ mlx5_devlink_eswitch_mode_set+0xf5/0x630 [mlx5_core]
+ ? devlink_get_from_attrs_lock+0x9e/0x110
+ devlink_nl_cmd_eswitch_set_doit+0x60/0xe0
+ genl_family_rcv_msg_doit.isra.0+0xc2/0x110
+ genl_rcv_msg+0x17d/0x2b0
+ ? devlink_get_from_attrs_lock+0x110/0x110
+ ? devlink_nl_cmd_eswitch_get_doit+0x290/0x290
+ ? devlink_pernet_pre_exit+0xf0/0xf0
+ ? genl_family_rcv_msg_doit.isra.0+0x110/0x110
+ netlink_rcv_skb+0x54/0x100
+ genl_rcv+0x24/0x40
+ netlink_unicast+0x1f6/0x2c0
+ netlink_sendmsg+0x232/0x4a0
+ sock_sendmsg+0x38/0x60
+ ? _copy_from_user+0x2a/0x60
+ __sys_sendto+0x110/0x160
+ ? __count_memcg_events+0x48/0x90
+ ? handle_mm_fault+0x161/0x260
+ ? do_user_addr_fault+0x278/0x6e0
+ __x64_sys_sendto+0x20/0x30
+ do_syscall_64+0x3d/0x90
+ entry_SYSCALL_64_after_hwframe+0x46/0xb0
+RIP: 0033:0x7fe141b1340a
+Code: d8 64 89 02 48 c7 c0 ff ff ff ff eb b8 0f 1f 00 f3 0f 1e fa 41 89 ca 64 8b 04 25 18 00 00 00 85 c0 75 15 b8 2c 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 7e c3 0f 1f 44 00 00 41 54 48 83 ec 30 44 89
+RSP: 002b:00007fff61d03de8 EFLAGS: 00000246 ORIG_RAX: 000000000000002c
+RAX: ffffffffffffffda RBX: 0000000000afab00 RCX: 00007fe141b1340a
+RDX: 0000000000000038 RSI: 0000000000afab00 RDI: 0000000000000003
+RBP: 0000000000afa910 R08: 00007fe141d80200 R09: 000000000000000c
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000001
+ </TASK>
 
-The following changes since commit 52417a95ff2d810dc31a68ae71102e741efea772:
+Fixes: 4d5ab0ad964d ("net/mlx5e: take into account device reconfiguration for xdp_features flag")
+Signed-off-by: Gal Pressman <gal@nvidia.com>
+Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
+Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
+---
+ drivers/net/ethernet/mellanox/mlx5/core/en_main.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-  ionic: Add missing err handling for queue reconfig (2023-08-06 16:44:03 +0100)
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+index 1c820119e438..c27df14df145 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+@@ -5266,6 +5266,7 @@ void mlx5e_destroy_q_counters(struct mlx5e_priv *priv)
+ static int mlx5e_nic_init(struct mlx5_core_dev *mdev,
+ 			  struct net_device *netdev)
+ {
++	const bool take_rtnl = netdev->reg_state == NETREG_REGISTERED;
+ 	struct mlx5e_priv *priv = netdev_priv(netdev);
+ 	struct mlx5e_flow_steering *fs;
+ 	int err;
+@@ -5294,9 +5295,19 @@ static int mlx5e_nic_init(struct mlx5_core_dev *mdev,
+ 		mlx5_core_err(mdev, "TLS initialization failed, %d\n", err);
+ 
+ 	mlx5e_health_create_reporters(priv);
++
++	/* If netdev is already registered (e.g. move from uplink to nic profile),
++	 * RTNL lock must be held before triggering netdev notifiers.
++	 */
++	if (take_rtnl)
++		rtnl_lock();
++
+ 	/* update XDP supported features */
+ 	mlx5e_set_xdp_feature(netdev);
+ 
++	if (take_rtnl)
++		rtnl_unlock();
++
+ 	return 0;
+ }
+ 
+-- 
+2.41.0
 
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/saeed/linux.git tags/mlx5-fixes-2023-08-07
-
-for you to fetch changes up to 548ee049b19fb9a3d0a4335314d0d1217a521bc5:
-
-  net/mlx5e: Add capability check for vnic counters (2023-08-07 11:48:40 -0700)
-
-----------------------------------------------------------------
-mlx5-fixes-2023-08-07
-
-----------------------------------------------------------------
-Chris Mi (1):
-      net/mlx5e: Unoffload post act rule when handling FIB events
-
-Daniel Jurgens (3):
-      net/mlx5: Return correct EC_VF function ID
-      net/mlx5: Allow 0 for total host VFs
-      net/mlx5: Fix devlink controller number for ECVF
-
-Gal Pressman (1):
-      net/mlx5e: Take RTNL lock when needed before calling xdp_set_features()
-
-Jianbo Liu (1):
-      net/mlx5e: TC, Fix internal port memory leak
-
-Lama Kayal (1):
-      net/mlx5e: Add capability check for vnic counters
-
-Moshe Shemesh (2):
-      net/mlx5: Skip clock update work when device is in error state
-      net/mlx5: Reload auxiliary devices in pci error handlers
-
-Shay Drory (1):
-      net/mlx5: LAG, Check correct bucket when modifying LAG
-
-Yevgeny Kliteynik (1):
-      net/mlx5: DR, Fix wrong allocation of modify hdr pattern
-
- .../mellanox/mlx5/core/diag/reporter_vnic.c        | 116 ++++++++++++---------
- .../ethernet/mellanox/mlx5/core/en/tc_tun_encap.c  |   6 +-
- drivers/net/ethernet/mellanox/mlx5/core/en_main.c  |  11 ++
- drivers/net/ethernet/mellanox/mlx5/core/en_tc.c    |  21 ++--
- .../ethernet/mellanox/mlx5/core/esw/devlink_port.c |   2 +-
- .../net/ethernet/mellanox/mlx5/core/lag/port_sel.c |   2 +-
- .../net/ethernet/mellanox/mlx5/core/lib/clock.c    |   5 +
- drivers/net/ethernet/mellanox/mlx5/core/main.c     |   2 +-
- .../net/ethernet/mellanox/mlx5/core/mlx5_core.h    |   2 +-
- drivers/net/ethernet/mellanox/mlx5/core/sriov.c    |   3 +-
- .../ethernet/mellanox/mlx5/core/steering/dr_ptrn.c |   2 +-
- 11 files changed, 106 insertions(+), 66 deletions(-)
 
