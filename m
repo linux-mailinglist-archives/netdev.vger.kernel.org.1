@@ -1,35 +1,35 @@
-Return-Path: <netdev+bounces-25060-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25061-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B340D772D55
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 19:56:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 78CC8772D59
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 19:57:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E45471C20C4C
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 17:56:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 615851C20C7B
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 17:57:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6CB6156D8;
-	Mon,  7 Aug 2023 17:56:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 631B8156EC;
+	Mon,  7 Aug 2023 17:56:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BBF53C2B
-	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 17:56:53 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A298DC433C8;
-	Mon,  7 Aug 2023 17:56:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CD3B156D6
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 17:56:54 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92BA4C433C9;
+	Mon,  7 Aug 2023 17:56:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691431013;
-	bh=22xeyfFdT5yJ++Q7XN67fpO7hobiIuZAYx1j+wFXA1o=;
-	h=From:To:Cc:Subject:Date:From;
-	b=npa/18hU1a2Rpp7mt2EpYUyIYxbeY+C2jWn2l4au5FpcLfObw/+eMOntGdRiUacHI
-	 Nck3wX6OQfbRKTcqx1jgQoq3siYp3FnDtDu5csOOZwAfQ17DGyh4c0v/qwENAthWJ4
-	 huPKMaTBwVuc3Lp2S2tDS9/xG2PgiNfjv4EGiXuHqSqwb8FzkNpA/12xmCqtqjIdZx
-	 5T3sC+nMzpPq/HPQp7TyZ2mB19pXZqzDgQqWsY3NaYtoACGSXoqSS7PgAXF90jAmZv
-	 KHK0LlEiyeHSM0yeaogdOFU3wx/ueZwf64qXhQtYwRWjlCQAW7ufAOXIMjGa7Qj0j6
-	 Hb0jS4BRUfbNw==
+	s=k20201202; t=1691431014;
+	bh=R5gg7WR3WkVLxE0UPf6rnXaB+MurObAXpkSGtEW59a0=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=Sy7XrdrD1p70CxRL8C8zaBm6dJcJGj1OFwfI6jbhAXb7b/cXANQI1rjoDn7uR06tw
+	 Rnxi9/ASsIntLi2gzVmdS+ibbQ6dzanYrMjr7AKL9FYdIImHtLMzxsZlKzNVpJCpqZ
+	 hHValLVGQjGZdk0oEVvv88SPNKuE4FpJMVDWUvaRv2BFuAvZQVfM/PMbgJxvFCWzEa
+	 SGEWqne3MbyY68xSaw616eyLFLMNw2g2CiMn7E/ukaHGxol0bKh+XSgiCvsePusGvo
+	 kb/yKOzuM6k7Ma7zrwdTNxCXcsFFSPKdSjLrvkufYwpBBy+yvI8vFeRe6gXGWYmn3T
+	 B2c1GkX7P0Wiw==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -37,11 +37,16 @@ To: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>
 Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	netdev@vger.kernel.org,
-	Tariq Toukan <tariqt@nvidia.com>
-Subject: [pull request][net-next 00/15] mlx5 updates 2023-08-07
-Date: Mon,  7 Aug 2023 10:56:27 -0700
-Message-ID: <20230807175642.20834-1-saeed@kernel.org>
+	Tariq Toukan <tariqt@nvidia.com>,
+	Maher Sanalla <msanalla@nvidia.com>,
+	Shay Drory <shayd@nvidia.com>,
+	Moshe Shemesh <moshe@nvidia.com>
+Subject: [net-next 01/15] net/mlx5: Track the current number of completion EQs
+Date: Mon,  7 Aug 2023 10:56:28 -0700
+Message-ID: <20230807175642.20834-2-saeed@kernel.org>
 X-Mailer: git-send-email 2.41.0
+In-Reply-To: <20230807175642.20834-1-saeed@kernel.org>
+References: <20230807175642.20834-1-saeed@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,102 +55,140 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Saeed Mahameed <saeedm@nvidia.com>
+From: Maher Sanalla <msanalla@nvidia.com>
 
-This series provides some minor cleanup and Dynamic completion EQ
-allocation mechanism in the mlx5 driver.
+In preparation to allocate completion EQs, add a counter to track the
+number of completion EQs currently allocated. Store the maximum number
+of EQs in max_comp_eqs variable.
 
-For more information please see tag log below.
+Signed-off-by: Maher Sanalla <msanalla@nvidia.com>
+Reviewed-by: Shay Drory <shayd@nvidia.com>
+Reviewed-by: Moshe Shemesh <moshe@nvidia.com>
+Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
+---
+ drivers/net/ethernet/mellanox/mlx5/core/eq.c | 24 ++++++++++++--------
+ 1 file changed, 14 insertions(+), 10 deletions(-)
 
-Please pull and let me know if there is any problem.
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eq.c b/drivers/net/ethernet/mellanox/mlx5/core/eq.c
+index 3db4866d7880..66257f7879b7 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/eq.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/eq.c
+@@ -58,7 +58,8 @@ struct mlx5_eq_table {
+ 	struct mlx5_nb          cq_err_nb;
+ 
+ 	struct mutex            lock; /* sync async eqs creations */
+-	int			num_comp_eqs;
++	int			curr_comp_eqs;
++	int			max_comp_eqs;
+ 	struct mlx5_irq_table	*irq_table;
+ 	struct mlx5_irq         **comp_irqs;
+ 	struct mlx5_irq         *ctrl_irq;
+@@ -452,6 +453,7 @@ int mlx5_eq_table_init(struct mlx5_core_dev *dev)
+ 		ATOMIC_INIT_NOTIFIER_HEAD(&eq_table->nh[i]);
+ 
+ 	eq_table->irq_table = mlx5_irq_table_get(dev);
++	eq_table->curr_comp_eqs = 0;
+ 	return 0;
+ }
+ 
+@@ -807,7 +809,7 @@ static void comp_irqs_release_pci(struct mlx5_core_dev *dev)
+ {
+ 	struct mlx5_eq_table *table = dev->priv.eq_table;
+ 
+-	mlx5_irqs_release_vectors(table->comp_irqs, table->num_comp_eqs);
++	mlx5_irqs_release_vectors(table->comp_irqs, table->max_comp_eqs);
+ }
+ 
+ static int comp_irqs_request_pci(struct mlx5_core_dev *dev)
+@@ -821,7 +823,7 @@ static int comp_irqs_request_pci(struct mlx5_core_dev *dev)
+ 	int cpu;
+ 	int i;
+ 
+-	ncomp_eqs = table->num_comp_eqs;
++	ncomp_eqs = table->max_comp_eqs;
+ 	cpus = kcalloc(ncomp_eqs, sizeof(*cpus), GFP_KERNEL);
+ 	if (!cpus)
+ 		return -ENOMEM;
+@@ -847,13 +849,13 @@ static void comp_irqs_release_sf(struct mlx5_core_dev *dev)
+ {
+ 	struct mlx5_eq_table *table = dev->priv.eq_table;
+ 
+-	mlx5_irq_affinity_irqs_release(dev, table->comp_irqs, table->num_comp_eqs);
++	mlx5_irq_affinity_irqs_release(dev, table->comp_irqs, table->max_comp_eqs);
+ }
+ 
+ static int comp_irqs_request_sf(struct mlx5_core_dev *dev)
+ {
+ 	struct mlx5_eq_table *table = dev->priv.eq_table;
+-	int ncomp_eqs = table->num_comp_eqs;
++	int ncomp_eqs = table->max_comp_eqs;
+ 
+ 	return mlx5_irq_affinity_irqs_request_auto(dev, ncomp_eqs, table->comp_irqs);
+ }
+@@ -874,7 +876,7 @@ static int comp_irqs_request(struct mlx5_core_dev *dev)
+ 	int ncomp_eqs;
+ 	int ret;
+ 
+-	ncomp_eqs = table->num_comp_eqs;
++	ncomp_eqs = table->max_comp_eqs;
+ 	table->comp_irqs = kcalloc(ncomp_eqs, sizeof(*table->comp_irqs), GFP_KERNEL);
+ 	if (!table->comp_irqs)
+ 		return -ENOMEM;
+@@ -901,7 +903,7 @@ static int alloc_rmap(struct mlx5_core_dev *mdev)
+ 	if (mlx5_core_is_sf(mdev))
+ 		return 0;
+ 
+-	eq_table->rmap = alloc_irq_cpu_rmap(eq_table->num_comp_eqs);
++	eq_table->rmap = alloc_irq_cpu_rmap(eq_table->max_comp_eqs);
+ 	if (!eq_table->rmap)
+ 		return -ENOMEM;
+ 	return 0;
+@@ -934,6 +936,7 @@ static void destroy_comp_eqs(struct mlx5_core_dev *dev)
+ 				       eq->core.eqn);
+ 		tasklet_disable(&eq->tasklet_ctx.task);
+ 		kfree(eq);
++		table->curr_comp_eqs--;
+ 	}
+ 	comp_irqs_release(dev);
+ 	free_rmap(dev);
+@@ -973,6 +976,7 @@ static int create_comp_eqs(struct mlx5_core_dev *dev)
+ 		goto err_irqs_req;
+ 	}
+ 
++	table->max_comp_eqs = ncomp_eqs;
+ 	INIT_LIST_HEAD(&table->comp_eqs_list);
+ 	nent = comp_eq_depth_devlink_param_get(dev);
+ 
+@@ -1008,9 +1012,9 @@ static int create_comp_eqs(struct mlx5_core_dev *dev)
+ 		mlx5_core_dbg(dev, "allocated completion EQN %d\n", eq->core.eqn);
+ 		/* add tail, to keep the list ordered, for mlx5_vector2eqn to work */
+ 		list_add_tail(&eq->list, &table->comp_eqs_list);
++		table->curr_comp_eqs++;
+ 	}
+ 
+-	table->num_comp_eqs = ncomp_eqs;
+ 	return 0;
+ 
+ clean_eq:
+@@ -1057,7 +1061,7 @@ int mlx5_vector2irqn(struct mlx5_core_dev *dev, int vector, unsigned int *irqn)
+ 
+ unsigned int mlx5_comp_vectors_count(struct mlx5_core_dev *dev)
+ {
+-	return dev->priv.eq_table->num_comp_eqs;
++	return dev->priv.eq_table->max_comp_eqs;
+ }
+ EXPORT_SYMBOL(mlx5_comp_vectors_count);
+ 
+@@ -1148,7 +1152,7 @@ int mlx5_eq_table_create(struct mlx5_core_dev *dev)
+ 	struct mlx5_eq_table *eq_table = dev->priv.eq_table;
+ 	int err;
+ 
+-	eq_table->num_comp_eqs = get_num_eqs(dev);
++	eq_table->max_comp_eqs = get_num_eqs(dev);
+ 	err = create_async_eqs(dev);
+ 	if (err) {
+ 		mlx5_core_err(dev, "Failed to create async EQs\n");
+-- 
+2.41.0
 
-Thanks,
-Saeed.
-
-
-The following changes since commit cc97777c80fdfabe12997581131872a03fdcf683:
-
-  udp/udplite: Remove unused function declarations udp{,lite}_get_port() (2023-08-07 08:53:55 +0100)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/saeed/linux.git tags/mlx5-updates-2023-08-07
-
-for you to fetch changes up to b56fb19c337951fc4daba646fab2c50bb4c41c58:
-
-  net/mlx5: Bridge, Only handle registered netdev bridge events (2023-08-07 10:53:52 -0700)
-
-----------------------------------------------------------------
-mlx5-updates-2023-08-07
-1) Few cleanups
-
-2) Dynamic completion EQs
-
-The driver creates completion EQs for all vectors directly on driver
-load, even if those EQs will not be utilized later on.
-
-To allow more flexibility in managing completion EQs and to reduce the
-memory overhead of driver load, this series will adjust completion EQs
-creation to be dynamic. Meaning, completion EQs will be created only
-when needed.
-
-Patch #1 introduces a counter for tracking the current number of
-completion EQs.
-Patches #2-6 refactor the existing infrastructure of managing completion
-EQs and completion IRQs to be compatible with per-vector
-allocation/release requests.
-Patches #7-8 modify the CPU-to-IRQ affinity calculation to be resilient
-in case the affinity is requested but completion IRQ is not allocated yet.
-Patch #9 function rename.
-Patch #10 handles the corner case of SF performing an IRQ request when no
-SF IRQ pool is found, and no PF IRQ exists for the same vector.
-Patch #11 modify driver to use dynamically allocate completion EQs.
-
-----------------------------------------------------------------
-Gal Pressman (1):
-      net/mlx5: Fix typo reminder -> remainder
-
-Maher Sanalla (11):
-      net/mlx5: Track the current number of completion EQs
-      net/mlx5: Refactor completion IRQ request/release API
-      net/mlx5: Use xarray to store and manage completion IRQs
-      net/mlx5: Refactor completion IRQ request/release handlers in EQ layer
-      net/mlx5: Use xarray to store and manage completion EQs
-      net/mlx5: Implement single completion EQ create/destroy methods
-      net/mlx5: Introduce mlx5_cpumask_default_spread
-      net/mlx5: Add IRQ vector to CPU lookup function
-      net/mlx5: Rename mlx5_comp_vectors_count() to mlx5_comp_vectors_max()
-      net/mlx5: Handle SF IRQ request in the absence of SF IRQ pool
-      net/mlx5: Allocate completion EQs dynamically
-
-Roi Dayan (2):
-      net/mlx5: E-Switch, Remove redundant arg ignore_flow_lvl
-      net/mlx5: Bridge, Only handle registered netdev bridge events
-
-Ruan Jinjie (1):
-      net/mlx5: remove many unnecessary NULL values
-
- drivers/infiniband/hw/mlx5/cq.c                    |   2 +-
- drivers/infiniband/hw/mlx5/devx.c                  |   2 +-
- drivers/infiniband/hw/mlx5/main.c                  |   2 +-
- drivers/net/ethernet/mellanox/mlx5/core/en.h       |   2 +-
- .../ethernet/mellanox/mlx5/core/en/rep/bridge.c    |   4 +
- drivers/net/ethernet/mellanox/mlx5/core/en/trap.c  |   2 +-
- drivers/net/ethernet/mellanox/mlx5/core/en_main.c  |  10 +-
- drivers/net/ethernet/mellanox/mlx5/core/eq.c       | 360 ++++++++++++---------
- drivers/net/ethernet/mellanox/mlx5/core/esw/qos.c  |   6 +-
- .../ethernet/mellanox/mlx5/core/eswitch_offloads.c |   6 +-
- .../net/ethernet/mellanox/mlx5/core/fpga/conn.c    |   2 +-
- .../net/ethernet/mellanox/mlx5/core/fpga/core.c    |   4 +-
- .../net/ethernet/mellanox/mlx5/core/irq_affinity.c |  78 ++---
- drivers/net/ethernet/mellanox/mlx5/core/lib/aso.c  |   2 +-
- drivers/net/ethernet/mellanox/mlx5/core/lib/eq.h   |   2 +-
- .../net/ethernet/mellanox/mlx5/core/lib/hv_vhca.c  |   2 +-
- drivers/net/ethernet/mellanox/mlx5/core/mlx5_irq.h |  26 +-
- drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c  |  60 ++--
- .../ethernet/mellanox/mlx5/core/steering/dr_send.c |   4 +-
- drivers/vdpa/mlx5/net/mlx5_vnet.c                  |   2 +-
- drivers/vfio/pci/mlx5/cmd.c                        |   4 +-
- include/linux/mlx5/driver.h                        |   7 +-
- 22 files changed, 309 insertions(+), 280 deletions(-)
 
