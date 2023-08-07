@@ -1,174 +1,152 @@
-Return-Path: <netdev+bounces-24952-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24953-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D9617724B9
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 14:51:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D57857724CF
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 14:58:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7EC2B1C20A4D
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 12:51:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D18D51C20B5B
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 12:58:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22003101C2;
-	Mon,  7 Aug 2023 12:51:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82984101D4;
+	Mon,  7 Aug 2023 12:58:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11C57D51D;
-	Mon,  7 Aug 2023 12:51:23 +0000 (UTC)
-Received: from out5-smtp.messagingengine.com (out5-smtp.messagingengine.com [66.111.4.29])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADDBFC9;
-	Mon,  7 Aug 2023 05:51:21 -0700 (PDT)
-Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
-	by mailout.nyi.internal (Postfix) with ESMTP id 248F45C00AF;
-	Mon,  7 Aug 2023 08:51:21 -0400 (EDT)
-Received: from imap48 ([10.202.2.98])
-  by compute4.internal (MEProxy); Mon, 07 Aug 2023 08:51:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manjusaka.me; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:sender:subject:subject:to:to; s=fm3; t=
-	1691412681; x=1691499081; bh=Lt8hOx2s13NynnFjaOie8s5FfN5HGBhA+5k
-	SEKOK+zc=; b=QodS85LZyPZ3yoGP1hEd5iCF2fM0nFMaO5nA/Zoe8c+0zxYqoaK
-	i7uxbDKtMfj0k9spjPC4dAsgCjkWGwIfu91A8OYeKL1KMTqdqpvSLSdvPj9qTMlV
-	KdCDLt1bAil53Oy5t68Ry7iZiethODhcusrezTd2QmpSTErRlKBnXgsVz6aI2j5P
-	4rixov0B96J0LMUtzHrsJSplo0au/TIds9Hgpjj25qCHBVbMdkU4RacKG+cEsOgS
-	lZj5rliz+r5l/PXy62eXi6pbXw0P9r6pq9YBuzGj+8HyrldEAbYkFROl1DfvSbqf
-	969LhD+wMU+g5mFzv/aKXBWaZjI1/YROlJA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:sender:subject:subject:to:to:x-me-proxy
-	:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1691412681; x=1691499081; bh=Lt8hOx2s13NynnFjaOie8s5FfN5HGBhA+5k
-	SEKOK+zc=; b=hRCDQ0LY3RH0+tWuYz92V/SIeW5z6Vw7kCOIG9j7fTzoHKaPAbt
-	lp9Kb/l8W2dzPYQxybwvhljH7A4/EAJlZUDaF7b01eAqFNEfAQVsNt4RK2rtxbBm
-	XZgUh3FfLK/813CYmkUqmloP3XJ1DZCS8qwDgYJi5wBorG+i2KMv+VDBFUuFrbKK
-	mgPqaBnGS60VXzCtfGFAYQmqw0b+OXkneFzyku878ThSfMBgyVELTSw1xqrSSB+A
-	GXOUGDylhwyjExAXXkCETO6vUblWmON2zQP5e/DkBK/MG4bGjFauo4HPVBfDsikZ
-	C5Fek/3laeT2NVh9jIALO0ItbOCy5yPCtoQ==
-X-ME-Sender: <xms:yejQZK5M36t4a2oD3bxXAxns2etV5uRqb6eu21EiPp_zMnfxsfscOg>
-    <xme:yejQZD4WVqmVThIfd2VubbdgMjGW7bLe__0tqqkZHh3D_bzAsYWLf7TpEA7ktfbiq
-    Wkil1mPob_i4hVW3GY>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrledtgdehiecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
-    fjughrpefofgggkfgjfhffhffvvefutgfgsehtqhertderreejnecuhfhrohhmpeforghn
-    jhhushgrkhgruceomhgvsehmrghnjhhushgrkhgrrdhmvgeqnecuggftrfgrthhtvghrnh
-    epffdvfeejleefjeegfedtieeuleelhffhuedufeevkeeltdelgeetiefgkefhvddvnecu
-    ffhomhgrihhnpegsohhothhlihhnrdgtohhmnecuvehluhhsthgvrhfuihiivgeptdenuc
-    frrghrrghmpehmrghilhhfrhhomhepmhgvsehmrghnjhhushgrkhgrrdhmvg
-X-ME-Proxy: <xmx:yejQZJeEK6667LgtwumI09ZH6UK9qv3-ljNzgnvkObxoeWRCMrv8Kw>
-    <xmx:yejQZHKKvrPaPpMWLq6hr9cKIBnRM3E_fK9bIvPzkTGtXTHtMKV7Dw>
-    <xmx:yejQZOIi33H1SC6G8cs5vsGZN0Fwwmbrbs3qOekr-caAjTBQlYC7qg>
-    <xmx:yejQZN_AMHyrrh4QUSJk6wLHteV9-yMErJ5VC1GNuYEnEFYpjoF3Iw>
-Feedback-ID: i3ea9498d:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-	id EAA2831A0064; Mon,  7 Aug 2023 08:51:20 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.9.0-alpha0-624-g7714e4406d-fm-20230801.001-g7714e440
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 754F9DDB8
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 12:58:39 +0000 (UTC)
+Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0A101BC
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 05:58:34 -0700 (PDT)
+Received: by mail-wm1-x335.google.com with SMTP id 5b1f17b1804b1-3fe5c0e5747so5552885e9.0
+        for <netdev@vger.kernel.org>; Mon, 07 Aug 2023 05:58:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1691413113; x=1692017913;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=MvacMVpAsU0PJ38BwBv52IDwW/AO4HfrNL9EzEYyK4A=;
+        b=vwk5lrDpHxcBerPC5N4M/ELdQ2tEBOVsoi2J0eCPJr9kZplRFm4O0A6S1jcphYWJYm
+         bLeIC+h93FMyBy1dSsSBwux0iSbkXFk6bJ4lugPafYM9ErAldmHk7r+LZGJh/Om+rAPW
+         3/pTFzg43TStFj1sZ1YEOlUmpJIlCNTLM9fMCxV3npuEQjfKAX/3UhOiYFpaH6/Zjbxq
+         NrituDwLbxgKVmff5IX+6RBEjENN6nuTcIAdGO4CGwiGRSmWFmTCHp3J8gB1Qj7R8JCD
+         fXkds9DCX9EseT4JdC0gFUnTZdOaWArCsCKIB5bCCi7aEodjyUsHbv0aqYz1WkNWuWUO
+         Im4g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691413113; x=1692017913;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MvacMVpAsU0PJ38BwBv52IDwW/AO4HfrNL9EzEYyK4A=;
+        b=KoGVPD7sUfe2wePftsXbsDomC8Fv81jiR4liw2dpKS3p7+QdGgQQD8CPj8KUPQLT8Q
+         EEYNhi4UsmO84KsyA4MtI1W2zNXVFyWak3aoGOUvEqHtOtEypzpjMPltwmSG5jry/JNd
+         hP5DEBG3cFSRcQPoUNaAFvLL8Stb9+OEZpquUeG5F15KcmOVNy+36T1J+uUZpyGviRLH
+         X0M7xDbn8ejWdA2wUXFx/y4sUqRj2LVvDlRyaSOBA0hlZs+n3ct6G7P97WxO65npHHT1
+         24zgSluXOuqY/GYIDlxCcrqFA0TVHU3iH2zH/4lPcDPNOCBs4VDO5rMBpXbSADHIvPiB
+         Ugaw==
+X-Gm-Message-State: AOJu0YxtyYlnDMEOxowAz282eLOPHCk1kmdnxKF3vOD2263PaI38r7Kq
+	IaiZXKESJS1Lz6HbTKnh7VIyWQ==
+X-Google-Smtp-Source: AGHT+IFW1vQksXlahNSa4nnlcdnGOsIRUlhZxipyWvj+litSr2gHu6keq8IYKhhOeMVdDKciFxLEXw==
+X-Received: by 2002:a05:600c:210e:b0:3fe:215e:44a0 with SMTP id u14-20020a05600c210e00b003fe215e44a0mr5335248wml.18.1691413113247;
+        Mon, 07 Aug 2023 05:58:33 -0700 (PDT)
+Received: from localhost ([212.23.236.67])
+        by smtp.gmail.com with ESMTPSA id f17-20020a7bcd11000000b003fc00212c1esm10593722wmj.28.2023.08.07.05.58.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Aug 2023 05:58:32 -0700 (PDT)
+Date: Mon, 7 Aug 2023 14:58:31 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jinjian Song <songjinjian@hotmail.com>
+Cc: chandrashekar.devegowda@intel.com, chiranjeevi.rapolu@linux.intel.com,
+	danielwinkler@google.com, davem@davemloft.net, edumazet@google.com,
+	haijun.liu@mediatek.com, ilpo.jarvinen@linux.intel.com,
+	jesse.brandeburg@intel.com, jinjian.song@fibocom.com,
+	johannes@sipsolutions.net, kuba@kernel.org, linuxwwan@intel.com,
+	linuxwwan_5g@intel.com, loic.poulain@linaro.org,
+	m.chetan.kumar@linux.intel.com, netdev@vger.kernel.org,
+	pabeni@redhat.com, ricardo.martinez@linux.intel.com,
+	ryazanov.s.a@gmail.com, soumya.prakash.mishra@intel.com
+Subject: Re: [net-next 2/6] net: wwan: t7xx: Driver registers with Devlink
+ framework
+Message-ID: <ZNDqd3oee/nLuSO+@nanopsycho>
+References: <20230803021812.6126-1-songjinjian@hotmail.com>
+ <MEYP282MB269720DC5940AEA0904569B3BB08A@MEYP282MB2697.AUSP282.PROD.OUTLOOK.COM>
+ <MEYP282MB26973DD342BDD69914C06FCFBB0EA@MEYP282MB2697.AUSP282.PROD.OUTLOOK.COM>
+ <ME3P282MB270324EC4CEEB864D04ECDB2BB0CA@ME3P282MB2703.AUSP282.PROD.OUTLOOK.COM>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Message-Id: <a4d189f4-ab60-49ca-b8fe-03b374518b18@app.fastmail.com>
-In-Reply-To: 
- <CANn89i+bMh-xU7PCxf_O5N+vy=83S+V=23mAAmbCuhjuP5Ob9g@mail.gmail.com>
-References: <20230806075216.13378-1-me@manjusaka.me>
- <CANn89i+bMh-xU7PCxf_O5N+vy=83S+V=23mAAmbCuhjuP5Ob9g@mail.gmail.com>
-Date: Mon, 07 Aug 2023 20:51:00 +0800
-From: Manjusaka <me@manjusaka.me>
-To: "Eric Dumazet" <edumazet@google.com>
-Cc: mhiramat@kernel.org, rostedt@goodmis.org, davem@davemloft.net,
- dsahern@kernel.org, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-trace-kernel@vger.kernel.org, bpf@vger.kernel.org
-Subject: Re: [PATCH] [RFC PATCH] tcp event: add new tcp:tcp_cwnd_restart event
-Content-Type: text/plain;charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ME3P282MB270324EC4CEEB864D04ECDB2BB0CA@ME3P282MB2703.AUSP282.PROD.OUTLOOK.COM>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-> Do not include code before variable declarations.
-Sorry about that. I will update the code later.
+Mon, Aug 07, 2023 at 02:44:00PM CEST, songjinjian@hotmail.com wrote:
+>Sat, Aug 05, 2023 at 02:12:13PM CEST, songjinjian@hotmail.com wrote:
+>>>Thu, Aug 03, 2023 at 04:18:08AM CEST, songjinjian@hotmail.com wrote:
+>>>
+>>>[...]
+>>>
+>>>>>+static const struct devlink_param t7xx_devlink_params[] = {
+>>>>>+	DEVLINK_PARAM_DRIVER(T7XX_DEVLINK_PARAM_ID_FASTBOOT,
+>>>>>+			     "fastboot", DEVLINK_PARAM_TYPE_BOOL,
+>>>>>+			     BIT(DEVLINK_PARAM_CMODE_DRIVERINIT),
+>>>>>+			     NULL, NULL, NULL),
+>>>>
+>>>>driver init params is there so the user could configure driver instance
+>>>>and then hit devlink reload in order to reinitialize with the new param
+>>>>values. In your case, it is a device command. Does not make any sense to
+>>>>have it as param.
+>>>>
+>>>>NAK
+>>>
+>>>Thanks for your review, so drop this param and set this param insider driver when driver_reinit,
+>>>is that fine?
+>>
+>>I don't understand the question, sorry.
+>
+>Thanks for your review, I mean if I don't define fastboot param like devlink_param above, I will
 
-> I would rather add a trace in tcp_ca_event(), this would be more gener=
-ic ?
-
-https://elixir.bootlin.com/linux/latest/source/net/ipv4/tcp_cong.c#L41
-
-I think maybe we already have the tcp_ca_event but named tcp_cong_state_=
-set?
+Could you not thank me in every reply, please?
 
 
-On Mon, Aug 7, 2023, at 8:34 PM, Eric Dumazet wrote:
-> On Sun, Aug 6, 2023 at 9:52=E2=80=AFAM Manjusaka <me@manjusaka.me> wro=
-te:
-> >
-> > The tcp_cwnd_restart function would be called if the user has enable=
-d the
-> > tcp_slow_start_after_idle configuration and would be triggered when =
-the
-> > connection is idle (like LONG RTO etc.). I think it would be great to
-> > add a new trace event named 'tcp:tcp_cwnd_reset'; it would help peop=
-le
-> > to monitor the TCP state in a complicated network environment(like
-> > overlay/underlay SDN in Kubernetes, etc)
-> >
-> > Signed-off-by: Manjusaka <me@manjusaka.me>
-> > ---
-> >  include/trace/events/tcp.h | 7 +++++++
-> >  net/ipv4/tcp_output.c      | 1 +
-> >  2 files changed, 8 insertions(+)
-> >
-> > diff --git a/include/trace/events/tcp.h b/include/trace/events/tcp.h
-> > index bf06db8d2046..fa44191cc609 100644
-> > --- a/include/trace/events/tcp.h
-> > +++ b/include/trace/events/tcp.h
-> > @@ -187,6 +187,13 @@ DEFINE_EVENT(tcp_event_sk, tcp_rcv_space_adjust,
-> >         TP_ARGS(sk)
-> >  );
-> >
-> > +DEFINE_EVENT(tcp_event_sk, tcp_cwnd_restart,
-> > +
-> > +       TP_PROTO(struct sock *sk),
-> > +
-> > +       TP_ARGS(sk)
-> > +);
-> > +
-> >  TRACE_EVENT(tcp_retransmit_synack,
-> >
-> >         TP_PROTO(const struct sock *sk, const struct request_sock *r=
-eq),
-> > diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
-> > index 51d8638d4b4c..e902fa74303d 100644
-> > --- a/net/ipv4/tcp_output.c
-> > +++ b/net/ipv4/tcp_output.c
-> > @@ -141,6 +141,7 @@ static __u16 tcp_advertise_mss(struct sock *sk)
-> >   */
-> >  void tcp_cwnd_restart(struct sock *sk, s32 delta)
-> >  {
-> > +       trace_tcp_cwnd_restart(sk);
->=20
-> Do not include code before variable declarations.
->=20
-> >         struct tcp_sock *tp =3D tcp_sk(sk);
-> >         u32 restart_cwnd =3D tcp_init_cwnd(tp, __sk_dst_get(sk));
-> >         u32 cwnd =3D tcp_snd_cwnd(tp);
-> > --
-> > 2.34.1
-> >
->=20
-> I would rather add a trace in tcp_ca_event(), this would be more gener=
-ic ?
->=20
+>define a global bool variable in driver, then when devlink ... driver_reinit, set this variable to true.
+
+That would be very wrong. Driver reinit should just reload the driver,
+recreate the entities created. should not be trigger to change
+behaviour.
+
+
+>
+>like:
+>   t7xx_devlink { 
+>       ....
+>       bool reset_to_fastboot;
+>   }
+>
+>
+>   t7xx_devlink_reload_down () {
+>       ...
+>       case DEVLINK_RELOAD_ACTION_DRIVER_REINIT:
+>           t7xx_devlink.reset_to_fastboot = true;
+>       ...
+>   }
+>
+>   other functions use this variable:
+>
+>   if (t7xx_devlink.reset_to_fastboot) {
+>        iowrite(reg, "reset to fastboot");
+>   }
+>
+>Intel colleague has change to the way of devlink_param, so I hope to keep this.
+>
+>>
 
