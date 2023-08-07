@@ -1,248 +1,325 @@
-Return-Path: <netdev+bounces-24878-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24879-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8EDDC771F2A
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 13:03:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CCC61771F2B
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 13:03:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 483552812B8
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 11:03:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 82D402812D0
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 11:03:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85734D2EE;
-	Mon,  7 Aug 2023 11:02:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50D37D2F9;
+	Mon,  7 Aug 2023 11:02:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72E64D50B
-	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 11:02:04 +0000 (UTC)
-Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E2AC199B;
-	Mon,  7 Aug 2023 04:01:43 -0700 (PDT)
-Received: from lelv0266.itg.ti.com ([10.180.67.225])
-	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 377B1SNj125865;
-	Mon, 7 Aug 2023 06:01:28 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1691406088;
-	bh=4xePQOXDVm56GWzIWBUHKlzDg6y45LjtpmC9Kz61C/k=;
-	h=From:To:CC:Subject:Date:In-Reply-To:References;
-	b=Df5RTn7hzS4Z2QbofR7Zb0AR5B1SNW8sQM9vhGg5b7pxwQ43agq9mxUG9D7i44r22
-	 OrmO4J53N8TWTPJAcIH2WMk1kJQIvssvEOTQZzwdNPXwbpzDWuknyzOf5IiHHxzs/E
-	 +qBiymSCscJQXzPuK3u7q/h05J9aOxAGw8Z082Ko=
-Received: from DLEE114.ent.ti.com (dlee114.ent.ti.com [157.170.170.25])
-	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 377B1SUw075250
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Mon, 7 Aug 2023 06:01:28 -0500
-Received: from DLEE104.ent.ti.com (157.170.170.34) by DLEE114.ent.ti.com
- (157.170.170.25) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Mon, 7
- Aug 2023 06:01:28 -0500
-Received: from fllv0040.itg.ti.com (10.64.41.20) by DLEE104.ent.ti.com
- (157.170.170.34) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Mon, 7 Aug 2023 06:01:28 -0500
-Received: from fllv0122.itg.ti.com (fllv0122.itg.ti.com [10.247.120.72])
-	by fllv0040.itg.ti.com (8.15.2/8.15.2) with ESMTP id 377B1SeZ073705;
-	Mon, 7 Aug 2023 06:01:28 -0500
-Received: from localhost (uda0501179.dhcp.ti.com [172.24.227.217])
-	by fllv0122.itg.ti.com (8.14.7/8.14.7) with ESMTP id 377B1RHB028460;
-	Mon, 7 Aug 2023 06:01:28 -0500
-From: MD Danish Anwar <danishanwar@ti.com>
-To: Randy Dunlap <rdunlap@infradead.org>, Roger Quadros <rogerq@kernel.org>,
-        Simon Horman <simon.horman@corigine.com>,
-        Vignesh Raghavendra
-	<vigneshr@ti.com>, Andrew Lunn <andrew@lunn.ch>,
-        Richard Cochran
-	<richardcochran@gmail.com>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Krzysztof
- Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Rob Herring
-	<robh+dt@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-        Jakub Kicinski
-	<kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        MD Danish Anwar <danishanwar@ti.com>
-CC: <nm@ti.com>, <srk@ti.com>, <linux-kernel@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-omap@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>
-Subject: [PATCH v2 5/5] net: ti: icssg-prueth: am65x SR2.0 add 10M full duplex support
-Date: Mon, 7 Aug 2023 16:30:48 +0530
-Message-ID: <20230807110048.2611456-6-danishanwar@ti.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230807110048.2611456-1-danishanwar@ti.com>
-References: <20230807110048.2611456-1-danishanwar@ti.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F2F7D2F5
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 11:02:32 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AEFE11BFF
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 04:02:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1691406137;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=4tVoX28GTGtCUXdSQaBJtaWNWRKg0UVBLfIJI4oLwi0=;
+	b=f54uQ9wDTCAncOyoTEDVTngyx2J74k1myFrtcVj5c29v1EmPCgLYAzUG00Z1eiWxspUxJE
+	XggSfqmqzVP2QlP/a6nCfZPqtIYES5Y7ZogetERZdpaycWFsZpea4fbPANykFLWtKP7uVX
+	0PetFQWzNCxoUQOT7rFX3MymNUQ9CBI=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-262-9pj9q5dSPd-Y3SWIAUdMIw-1; Mon, 07 Aug 2023 07:02:15 -0400
+X-MC-Unique: 9pj9q5dSPd-Y3SWIAUdMIw-1
+Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-5230e9ef0e6so2780058a12.0
+        for <netdev@vger.kernel.org>; Mon, 07 Aug 2023 04:02:14 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691406133; x=1692010933;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=4tVoX28GTGtCUXdSQaBJtaWNWRKg0UVBLfIJI4oLwi0=;
+        b=BV+PnbQZZ6AytCwrZrNS5g7AJ2sb8dSd5LFm6DozTmBJqZsQ+Nyhbs4WRZ8lTZXj8A
+         tclryPr53MJjLgyaXcizt0bE/foLx7Qh+xANYqySFQKe/LSPhSHMJEPWZ0v1Vkh0Uotw
+         57dloSMUVGpejf5OTGwdLd1v1h9/uWv0eTUS2byf5mURevehoAOIZqivNXD2Gj2R4wqf
+         UNcSJ4RGPgenrsRlI7ZDK/MnmbWtbwbbAKOeQA4FpKAGAnmuSK2i965QGrVDx2hqlYj2
+         SMcmmS99mGtBFdV1+NfkZzJ6GA14GD1oq5DaXVaali3jB3pTYvmkL8C29y3YTFn0w/V4
+         SS5g==
+X-Gm-Message-State: AOJu0Yx3u2qV8t0+uTfZcISDFGnRBSNK7hKcJep8YOVVtahLtsAgBRDf
+	x/KteXP/BjUWHdYcoeWYRZENjrejd/4WkeMp3INvxoONlibCFmqDbeOjI6KS/HTC958uazVS42b
+	Btw3G/XBsx52tmonC
+X-Received: by 2002:aa7:da91:0:b0:523:f29:a912 with SMTP id q17-20020aa7da91000000b005230f29a912mr5825473eds.21.1691406133621;
+        Mon, 07 Aug 2023 04:02:13 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEpV1CiOzHk73Q0S1VjzXSs0/DvHhdz0S3B8+70wxb75oVf2/18bmu8foLRZEbGwYEDxL6b1A==
+X-Received: by 2002:aa7:da91:0:b0:523:f29:a912 with SMTP id q17-20020aa7da91000000b005230f29a912mr5825448eds.21.1691406133282;
+        Mon, 07 Aug 2023 04:02:13 -0700 (PDT)
+Received: from [10.40.98.142] ([78.108.130.194])
+        by smtp.gmail.com with ESMTPSA id t10-20020aa7d4ca000000b005226f281bc5sm5036828edr.25.2023.08.07.04.02.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 07 Aug 2023 04:02:12 -0700 (PDT)
+Message-ID: <145d7375-0e58-b7cf-6240-5d8bc16b0344@redhat.com>
+Date: Mon, 7 Aug 2023 13:02:11 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH net-next v2 1/5] platform/x86: intel_pmc_core: Add IPC
+ mailbox accessor function and add SoC register access
+Content-Language: en-US
+To: Choong Yong Liang <yong.liang.choong@linux.intel.com>,
+ Rajneesh Bhardwaj <irenic.rajneesh@gmail.com>,
+ David E Box <david.e.box@linux.intel.com>, Mark Gross
+ <markgross@kernel.org>, Jose Abreu <Jose.Abreu@synopsys.com>,
+ Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Russell King <linux@armlinux.org.uk>, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ =?UTF-8?Q?Marek_Beh=c3=ban?= <kabel@kernel.org>,
+ Jean Delvare <jdelvare@suse.com>, Guenter Roeck <linux@roeck-us.net>,
+ Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Richard Cochran <richardcochran@gmail.com>,
+ Philipp Zabel <p.zabel@pengutronix.de>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>, Wong Vee Khee
+ <veekhee@apple.com>, Jon Hunter <jonathanh@nvidia.com>,
+ Jesse Brandeburg <jesse.brandeburg@intel.com>,
+ Shenwei Wang <shenwei.wang@nxp.com>,
+ Andrey Konovalov <andrey.konovalov@linaro.org>,
+ Jochen Henneberg <jh@henneberg-systemdesign.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, platform-driver-x86@vger.kernel.org,
+ linux-hwmon@vger.kernel.org, bpf@vger.kernel.org,
+ Voon Wei Feng <weifeng.voon@intel.com>,
+ Tan Tee Min <tee.min.tan@linux.intel.com>,
+ Michael Sit Wei Hong <michael.wei.hong.sit@intel.com>,
+ Lai Peter Jun Ann <jun.ann.lai@intel.com>
+References: <20230804084527.2082302-1-yong.liang.choong@linux.intel.com>
+ <20230804084527.2082302-2-yong.liang.choong@linux.intel.com>
+From: Hans de Goede <hdegoede@redhat.com>
+In-Reply-To: <20230804084527.2082302-2-yong.liang.choong@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+	SPF_NONE autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Grygorii Strashko <grygorii.strashko@ti.com>
+Hi David,
 
-For AM65x SR2.0 it's required to enable IEP1 in raw 64bit mode which is
-used by PRU FW to monitor the link and apply w/a for 10M link issue.
-Note. No public errata available yet.
+On 8/4/23 10:45, Choong Yong Liang wrote:
+> From: "David E. Box" <david.e.box@linux.intel.com>
+> 
+> - Exports intel_pmc_core_ipc() for host access to the PMC IPC mailbox
+> - Add support to use IPC command allows host to access SoC registers
+> through PMC firmware that are otherwise inaccessible to the host due to
+> security policies.
+> 
+> Signed-off-by: David E. Box <david.e.box@linux.intel.com>
+> Signed-off-by: Chao Qin <chao.qin@intel.com>
+> Signed-off-by: Choong Yong Liang <yong.liang.choong@linux.intel.com>
 
-Without this w/a the PRU FW will stuck if link state changes under TX
-traffic pressure.
+The new exported intel_pmc_core_ipc() function does not seem to
+depend on any existing PMC code.
 
-Hence, add support for 10M full duplex for AM65x SR2.0:
- - add new IEP API to enable IEP, but without PTP support
- - add pdata quirk_10m_link_issue to enable 10M link issue w/a.
+IMHO it would be better to put this in a new .c file under
+arch/x86/platform/intel/ this is where similar helpers like
+the iosf_mbi functions also live.
 
-Signed-off-by: Grygorii Strashko <grygorii.strashko@ti.com>
-Signed-off-by: Vignesh Raghavendra <vigneshr@ti.com>
-Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
----
- drivers/net/ethernet/ti/icssg/icss_iep.c     | 26 ++++++++++++++++++++
- drivers/net/ethernet/ti/icssg/icss_iep.h     |  2 ++
- drivers/net/ethernet/ti/icssg/icssg_config.c |  6 +++++
- drivers/net/ethernet/ti/icssg/icssg_prueth.c | 17 +++++++++++--
- 4 files changed, 49 insertions(+), 2 deletions(-)
+This also avoids Kconfig complications. Currently the
+drivers/platform/x86/intel/pmc/core.c code is only
+build if CONFIG_X86_PLATFORM_DEVICES and
+CONFIG_INTEL_PMC_CORE are both set. So if a driver
+wants to make sure this is enabled by selecting them
+then it needs to select both.
 
-diff --git a/drivers/net/ethernet/ti/icssg/icss_iep.c b/drivers/net/ethernet/ti/icssg/icss_iep.c
-index 455c803dea36..527f17430f05 100644
---- a/drivers/net/ethernet/ti/icssg/icss_iep.c
-+++ b/drivers/net/ethernet/ti/icssg/icss_iep.c
-@@ -721,6 +721,32 @@ void icss_iep_put(struct icss_iep *iep)
- }
- EXPORT_SYMBOL_GPL(icss_iep_put);
- 
-+void icss_iep_init_fw(struct icss_iep *iep)
-+{
-+	/* start IEP for FW use in raw 64bit mode, no PTP support */
-+	iep->clk_tick_time = iep->def_inc;
-+	iep->cycle_time_ns = 0;
-+	iep->ops = NULL;
-+	iep->clockops_data = NULL;
-+	icss_iep_set_default_inc(iep, iep->def_inc);
-+	icss_iep_set_compensation_inc(iep, iep->def_inc);
-+	icss_iep_set_compensation_count(iep, 0);
-+	regmap_write(iep->map, ICSS_IEP_SYNC_PWIDTH_REG, iep->refclk_freq / 10); /* 100 ms pulse */
-+	regmap_write(iep->map, ICSS_IEP_SYNC0_PERIOD_REG, 0);
-+	if (iep->plat_data->flags & ICSS_IEP_SLOW_COMPEN_REG_SUPPORT)
-+		icss_iep_set_slow_compensation_count(iep, 0);
-+
-+	icss_iep_enable(iep);
-+	icss_iep_settime(iep, 0);
-+}
-+EXPORT_SYMBOL_GPL(icss_iep_init_fw);
-+
-+void icss_iep_exit_fw(struct icss_iep *iep)
-+{
-+	icss_iep_disable(iep);
-+}
-+EXPORT_SYMBOL_GPL(icss_iep_exit_fw);
-+
- int icss_iep_init(struct icss_iep *iep, const struct icss_iep_clockops *clkops,
- 		  void *clockops_data, u32 cycle_time_ns)
- {
-diff --git a/drivers/net/ethernet/ti/icssg/icss_iep.h b/drivers/net/ethernet/ti/icssg/icss_iep.h
-index 9c7f4d0a0916..803a4b714893 100644
---- a/drivers/net/ethernet/ti/icssg/icss_iep.h
-+++ b/drivers/net/ethernet/ti/icssg/icss_iep.h
-@@ -35,5 +35,7 @@ int icss_iep_exit(struct icss_iep *iep);
- int icss_iep_get_count_low(struct icss_iep *iep);
- int icss_iep_get_count_hi(struct icss_iep *iep);
- int icss_iep_get_ptp_clock_idx(struct icss_iep *iep);
-+void icss_iep_init_fw(struct icss_iep *iep);
-+void icss_iep_exit_fw(struct icss_iep *iep);
- 
- #endif /* __NET_TI_ICSS_IEP_H */
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_config.c b/drivers/net/ethernet/ti/icssg/icssg_config.c
-index ab648d3efe85..4c2b5d496670 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_config.c
-+++ b/drivers/net/ethernet/ti/icssg/icssg_config.c
-@@ -210,6 +210,9 @@ void icssg_config_ipg(struct prueth_emac *emac)
- 	case SPEED_100:
- 		icssg_mii_update_ipg(prueth->mii_rt, slice, MII_RT_TX_IPG_100M);
- 		break;
-+	case SPEED_10:
-+		icssg_mii_update_ipg(prueth->mii_rt, slice, MII_RT_TX_IPG_100M);
-+		break;
- 	default:
- 		/* Other links speeds not supported */
- 		netdev_err(emac->ndev, "Unsupported link speed\n");
-@@ -440,6 +443,9 @@ void icssg_config_set_speed(struct prueth_emac *emac)
- 	case SPEED_100:
- 		fw_speed = FW_LINK_SPEED_100M;
- 		break;
-+	case SPEED_10:
-+		fw_speed = FW_LINK_SPEED_10M;
-+		break;
- 	default:
- 		/* Other links speeds not supported */
- 		netdev_err(emac->ndev, "Unsupported link speed\n");
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-index b82a718fd602..216918162960 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-+++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-@@ -1131,7 +1131,6 @@ static int emac_phy_connect(struct prueth_emac *emac)
- 
- 	/* remove unsupported modes */
- 	phy_remove_link_mode(ndev->phydev, ETHTOOL_LINK_MODE_10baseT_Half_BIT);
--	phy_remove_link_mode(ndev->phydev, ETHTOOL_LINK_MODE_10baseT_Full_BIT);
- 	phy_remove_link_mode(ndev->phydev, ETHTOOL_LINK_MODE_100baseT_Half_BIT);
- 	phy_remove_link_mode(ndev->phydev, ETHTOOL_LINK_MODE_1000baseT_Half_BIT);
- 	phy_remove_link_mode(ndev->phydev, ETHTOOL_LINK_MODE_Pause_BIT);
-@@ -2081,13 +2080,20 @@ static int prueth_probe(struct platform_device *pdev)
- 		goto free_pool;
- 	}
- 
-+	if (prueth->pdata.quirk_10m_link_issue) {
-+		/* Enable IEP1 for FW in 64bit mode as W/A for 10M FD link detect issue under TX
-+		 * traffic.
-+		 */
-+		icss_iep_init_fw(prueth->iep1);
-+	}
-+
- 	/* setup netdev interfaces */
- 	if (eth0_node) {
- 		ret = prueth_netdev_init(prueth, eth0_node);
- 		if (ret) {
- 			dev_err_probe(dev, ret, "netdev init %s failed\n",
- 				      eth0_node->name);
--			goto netdev_exit;
-+			goto exit_iep;
- 		}
- 		prueth->emac[PRUETH_MAC0]->iep = prueth->iep0;
- 	}
-@@ -2158,6 +2164,10 @@ static int prueth_probe(struct platform_device *pdev)
- 		prueth_netdev_exit(prueth, eth_node);
- 	}
- 
-+exit_iep:
-+	if (prueth->pdata.quirk_10m_link_issue)
-+		icss_iep_exit_fw(prueth->iep1);
-+
- free_pool:
- 	gen_pool_free(prueth->sram_pool,
- 		      (unsigned long)prueth->msmcram.va, msmc_ram_size);
-@@ -2203,6 +2213,9 @@ static void prueth_remove(struct platform_device *pdev)
- 		prueth_netdev_exit(prueth, eth_node);
- 	}
- 
-+	if (prueth->pdata.quirk_10m_link_issue)
-+		icss_iep_exit_fw(prueth->iep1);
-+
- 	icss_iep_put(prueth->iep1);
- 	icss_iep_put(prueth->iep0);
- 
--- 
-2.34.1
+Talking about Kconfig:
+
+#if IS_ENABLED(CONFIG_INTEL_PMC_CORE)
+int intel_pmc_core_ipc(struct pmc_ipc_cmd *ipc_cmd, u32 *rbuf);
+#else
+static inline int intel_pmc_core_ipc(struct pmc_ipc_cmd *ipc_cmd, u32 *rbuf)
+{
+	return -ENODEV;
+}
+#endif /* CONFIG_INTEL_PMC_CORE */
+
+Notice that CONFIG_INTEL_PMC_CORE is a tristate, so pmc might be build as a module where as a consumer of intel_pmc_core_ipc() might end up builtin in which case this will not work without extra Kconfig protection. And if you are going to add extra Kconfig you might just as well select or depend on INTEL_PMC_CORE and drop the #if .
+
+Regards,
+
+Hans
+
+
+
+
+
+
+> ---
+>  MAINTAINERS                                   |  1 +
+>  drivers/platform/x86/intel/pmc/core.c         | 60 +++++++++++++++++++
+>  .../linux/platform_data/x86/intel_pmc_core.h  | 41 +++++++++++++
+>  3 files changed, 102 insertions(+)
+>  create mode 100644 include/linux/platform_data/x86/intel_pmc_core.h
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 069e176d607a..8a034dee9da9 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -10648,6 +10648,7 @@ L:	platform-driver-x86@vger.kernel.org
+>  S:	Maintained
+>  F:	Documentation/ABI/testing/sysfs-platform-intel-pmc
+>  F:	drivers/platform/x86/intel/pmc/
+> +F:	linux/platform_data/x86/intel_pmc_core.h
+>  
+>  INTEL PMIC GPIO DRIVERS
+>  M:	Andy Shevchenko <andy@kernel.org>
+> diff --git a/drivers/platform/x86/intel/pmc/core.c b/drivers/platform/x86/intel/pmc/core.c
+> index 5a36b3f77bc5..6fb1b0f453d8 100644
+> --- a/drivers/platform/x86/intel/pmc/core.c
+> +++ b/drivers/platform/x86/intel/pmc/core.c
+> @@ -20,6 +20,7 @@
+>  #include <linux/pci.h>
+>  #include <linux/slab.h>
+>  #include <linux/suspend.h>
+> +#include <linux/platform_data/x86/intel_pmc_core.h>
+>  
+>  #include <asm/cpu_device_id.h>
+>  #include <asm/intel-family.h>
+> @@ -28,6 +29,8 @@
+>  
+>  #include "core.h"
+>  
+> +#define PMC_IPCS_PARAM_COUNT           7
+> +
+>  /* Maximum number of modes supported by platfoms that has low power mode capability */
+>  const char *pmc_lpm_modes[] = {
+>  	"S0i2.0",
+> @@ -53,6 +56,63 @@ const struct pmc_bit_map msr_map[] = {
+>  	{}
+>  };
+>  
+> +int intel_pmc_core_ipc(struct pmc_ipc_cmd *ipc_cmd, u32 *rbuf)
+> +{
+> +	struct acpi_buffer buffer = { ACPI_ALLOCATE_BUFFER, NULL };
+> +	union acpi_object params[PMC_IPCS_PARAM_COUNT] = {
+> +		{.type = ACPI_TYPE_INTEGER,},
+> +		{.type = ACPI_TYPE_INTEGER,},
+> +		{.type = ACPI_TYPE_INTEGER,},
+> +		{.type = ACPI_TYPE_INTEGER,},
+> +		{.type = ACPI_TYPE_INTEGER,},
+> +		{.type = ACPI_TYPE_INTEGER,},
+> +		{.type = ACPI_TYPE_INTEGER,},
+> +	};
+> +	struct acpi_object_list arg_list = { PMC_IPCS_PARAM_COUNT, params };
+> +	union acpi_object *obj;
+> +	int status;
+> +
+> +	if (!ipc_cmd || !rbuf)
+> +		return -EINVAL;
+> +
+> +	/*
+> +	 * 0: IPC Command
+> +	 * 1: IPC Sub Command
+> +	 * 2: Size
+> +	 * 3-6: Write Buffer for offset
+> +	 */
+> +	params[0].integer.value = ipc_cmd->cmd;
+> +	params[1].integer.value = ipc_cmd->sub_cmd;
+> +	params[2].integer.value = ipc_cmd->size;
+> +	params[3].integer.value = ipc_cmd->wbuf[0];
+> +	params[4].integer.value = ipc_cmd->wbuf[1];
+> +	params[5].integer.value = ipc_cmd->wbuf[2];
+> +	params[6].integer.value = ipc_cmd->wbuf[3];
+> +
+> +	status = acpi_evaluate_object(NULL, "\\IPCS", &arg_list, &buffer);
+> +	if (ACPI_FAILURE(status))
+> +		return -ENODEV;
+> +
+> +	obj = buffer.pointer;
+> +	/* Check if the number of elements in package is 5 */
+> +	if (obj && obj->type == ACPI_TYPE_PACKAGE && obj->package.count == 5) {
+> +		const union acpi_object *objs = obj->package.elements;
+> +
+> +		if ((u8)objs[0].integer.value != 0)
+> +			return -EINVAL;
+> +
+> +		rbuf[0] = objs[1].integer.value;
+> +		rbuf[1] = objs[2].integer.value;
+> +		rbuf[2] = objs[3].integer.value;
+> +		rbuf[3] = objs[4].integer.value;
+> +	} else {
+> +		return -EINVAL;
+> +	}
+> +
+> +	return 0;
+> +}
+> +EXPORT_SYMBOL(intel_pmc_core_ipc);
+> +
+>  static inline u32 pmc_core_reg_read(struct pmc *pmc, int reg_offset)
+>  {
+>  	return readl(pmc->regbase + reg_offset);
+> diff --git a/include/linux/platform_data/x86/intel_pmc_core.h b/include/linux/platform_data/x86/intel_pmc_core.h
+> new file mode 100644
+> index 000000000000..9bb3394fedcf
+> --- /dev/null
+> +++ b/include/linux/platform_data/x86/intel_pmc_core.h
+> @@ -0,0 +1,41 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/*
+> + * Intel Core SoC Power Management Controller Header File
+> + *
+> + * Copyright (c) 2023, Intel Corporation.
+> + * All Rights Reserved.
+> + *
+> + * Authors: Choong Yong Liang <yong.liang.choong@linux.intel.com>
+> + *          David E. Box <david.e.box@linux.intel.com>
+> + */
+> +#ifndef INTEL_PMC_CORE_H
+> +#define INTEL_PMC_CORE_H
+> +
+> +#define IPC_SOC_REGISTER_ACCESS			0xAA
+> +#define IPC_SOC_SUB_CMD_READ			0x00
+> +#define IPC_SOC_SUB_CMD_WRITE			0x01
+> +
+> +struct pmc_ipc_cmd {
+> +	u32 cmd;
+> +	u32 sub_cmd;
+> +	u32 size;
+> +	u32 wbuf[4];
+> +};
+> +
+> +#if IS_ENABLED(CONFIG_INTEL_PMC_CORE)
+> +/**
+> + * intel_pmc_core_ipc() - PMC IPC Mailbox accessor
+> + * @ipc_cmd:  struct pmc_ipc_cmd prepared with input to send
+> + * @rbuf:     Allocated u32[4] array for returned IPC data
+> + *
+> + * Return: 0 on success. Non-zero on mailbox error
+> + */
+> +int intel_pmc_core_ipc(struct pmc_ipc_cmd *ipc_cmd, u32 *rbuf);
+> +#else
+> +static inline int intel_pmc_core_ipc(struct pmc_ipc_cmd *ipc_cmd, u32 *rbuf)
+> +{
+> +	return -ENODEV;
+> +}
+> +#endif /* CONFIG_INTEL_PMC_CORE */
+> +
+> +#endif /* INTEL_PMC_CORE_H */
 
 
