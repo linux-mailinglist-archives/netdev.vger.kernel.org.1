@@ -1,161 +1,227 @@
-Return-Path: <netdev+bounces-25002-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25003-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3645F772828
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 16:49:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 521C877282F
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 16:50:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 706791C20A05
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 14:49:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0B652281244
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 14:50:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A592FC11;
-	Mon,  7 Aug 2023 14:48:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C91EFC0C;
+	Mon,  7 Aug 2023 14:50:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F539D521
-	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 14:48:58 +0000 (UTC)
-Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 974FA10CA;
-	Mon,  7 Aug 2023 07:48:57 -0700 (PDT)
-Received: by mail-pf1-x42e.google.com with SMTP id d2e1a72fcca58-686f19b6dd2so3045229b3a.2;
-        Mon, 07 Aug 2023 07:48:57 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B84CC2E3
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 14:50:26 +0000 (UTC)
+Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 212EB10FC
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 07:50:24 -0700 (PDT)
+Received: by mail-pg1-x52b.google.com with SMTP id 41be03b00d2f7-53482b44007so2594652a12.2
+        for <netdev@vger.kernel.org>; Mon, 07 Aug 2023 07:50:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1691419737; x=1692024537;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=aXST5XxnGg1D08Ob0oYRqu+Z1E9omOLSCpAH/+XiMLs=;
-        b=bNDMN7arOAYFRZ2/QkHGwK14diK23U2mN4xbnZ94Aq8NWczhGROVH+bOBcDZ36WBCB
-         WJOMSqlXJGejs6VRuf1vySrPWjenvkn2r73YkKVfZs9PomjujonCjM2w+mbYgPH4aro+
-         HvIdyZDJoOdvOwXBEh+JJXDsaDjROlZwhMdBDy8QQpPmFI3YgRd5kCoqDISsZhO1dP91
-         NMVlcb2/w/EIcpMpJwiAef3YrydNoL1YVO8ODy6GwiB7qenRhxyK8wVIxxOX81on2lby
-         3DkG6WigvNZpARt9cmrkDwvyB3HkC+SYfvl2jSZSLfsmX0xyZ56EcmPqNp491Mq7C6lK
-         V9sg==
+        d=broadcom.com; s=google; t=1691419823; x=1692024623;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=0qtID4Mb4bWNtHToykI4Bbukd1qRriOTqpr0YsmAG60=;
+        b=A+hSaFqXkwxxs9Mh3iaZ/jkFYfZIzylPKphR8mCho8J/z4f5Jqp/awRXrocsrSzm3C
+         VQjHlqwW3TBuZ1AHWzSAuI6KZ94KZDvRG9pSDww9EGgndFuupgzjdJTiv9OyppD+45kA
+         yb47WuaZn+r4gQdKyhf/iL4CHAOTNp744kPe4=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691419737; x=1692024537;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=aXST5XxnGg1D08Ob0oYRqu+Z1E9omOLSCpAH/+XiMLs=;
-        b=lCKlU7cSH2iTe7fzkfUnHllvjgP28x7EklQvnjwCYZHFlsSz/LrFT1dCNFdU2QV2Rx
-         16yhKeZn6r7VoAUKwcG9MLN1xkEe6Ca7bICMueVK8jHgNxE9/r6JDI4Dl3RZOEXapdj2
-         /6Mv4kn2wLxYEXa4HmXnFE4ya6WSuEnxgbmimM5ksGuIWJJYqR77LpjMM3Xtou1feC+R
-         qygZapCBJ5kx6mG9HrT+oXwzqepdDRxMaK2AUMUu9zfKvlcZgrcRwiL4d2jBisIHty4x
-         XuGHV9ytxsZZCnsM46JY+VtAnA42AsorXa54EKwRwoCaKujYdPlTrUYXPxS4euTPms38
-         CjFw==
-X-Gm-Message-State: AOJu0Yzi2D1PIdo8wYfqCWzi7ux5NPGimwvdwhWoRqcPavKT9RI1hu0H
-	WRIqwoq0SC0/JlNf79l8x8M=
-X-Google-Smtp-Source: AGHT+IGkGhlsT77JX5NjIBC+P5CszcxwznFI8rPMg/L56P5rbDzLbURH8+oaRk+RVPq1WwkRen4KEQ==
-X-Received: by 2002:a05:6a20:258e:b0:13b:7776:ceed with SMTP id k14-20020a056a20258e00b0013b7776ceedmr9332434pzd.26.1691419736966;
-        Mon, 07 Aug 2023 07:48:56 -0700 (PDT)
-Received: from ?IPv6:2605:59c8:448:b800:82ee:73ff:fe41:9a02? ([2605:59c8:448:b800:82ee:73ff:fe41:9a02])
-        by smtp.googlemail.com with ESMTPSA id d20-20020a170902c19400b001bbb7af4963sm7035140pld.68.2023.08.07.07.48.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Aug 2023 07:48:56 -0700 (PDT)
-Message-ID: <692d71dc8068b3d27aba39d7141c811755965786.camel@gmail.com>
-Subject: Re: [PATCH net-next v4 5/6] page_pool: add a lockdep check for
- recycling in hardirq
-From: Alexander H Duyck <alexander.duyck@gmail.com>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>, "David S. Miller"
-	 <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	 <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Maciej Fijalkowski <maciej.fijalkowski@intel.com>, Larysa Zaremba
- <larysa.zaremba@intel.com>, Yunsheng Lin <linyunsheng@huawei.com>,
- Alexander Duyck <alexanderduyck@fb.com>, Jesper Dangaard Brouer
- <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, Simon
- Horman <simon.horman@corigine.com>,  netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Date: Mon, 07 Aug 2023 07:48:54 -0700
-In-Reply-To: <20230804180529.2483231-6-aleksander.lobakin@intel.com>
-References: <20230804180529.2483231-1-aleksander.lobakin@intel.com>
-	 <20230804180529.2483231-6-aleksander.lobakin@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.3 (3.48.3-1.fc38) 
+        d=1e100.net; s=20221208; t=1691419823; x=1692024623;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=0qtID4Mb4bWNtHToykI4Bbukd1qRriOTqpr0YsmAG60=;
+        b=HDZfXDZMhyScCdkTrdGtNnjAdIYPohkSTQBq5XW6QvqD1RcCJh0FZA7t5JWyNfd0kx
+         k8mLNASwQZkoOley8WVbB2a5gjBfcOgFAaIEMcsnjJcsETyaVwAzZksJcPmR+gNlixPE
+         YtH7agmYEFi9AzeMZiKaxZfy6am+lfJhwCX4K9chPx1pGAKF69lgVa5NllCnQoY5SN7t
+         MbV6BB5ZMnkUoMF9F0zkw/6nk874TlrIU1+jFDPCwNOWCO283MkVp770cr9UOuwq5Z0d
+         kE5cA1p/dgeRaf+B7FZUh+QzJp4JGc7JBNbH/nzMyuc3F/MU6qrajtxZyar5xDxsjt96
+         yuJA==
+X-Gm-Message-State: AOJu0YxftHYpaCFsOH2RyXvtm/a1PcJV873a8chstA7zezKSz3Vr3gxm
+	pmEMS0eiklfUbSY5cbAIFwcoSb1+NQiPRcSnn8YmaQ==
+X-Google-Smtp-Source: AGHT+IGGzKyw7cuNk5lIfNWQlspf7SlK91F7ZVgVr7IWdICebUz11BERDe23BErWebohA51NyXJ+LWGW7Bv8bK/gNV0=
+X-Received: by 2002:a17:90a:d193:b0:268:a26:d9ee with SMTP id
+ fu19-20020a17090ad19300b002680a26d9eemr7603249pjb.46.1691419823467; Mon, 07
+ Aug 2023 07:50:23 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+References: <1691405402-2641-1-git-send-email-shradhagupta@linux.microsoft.com>
+In-Reply-To: <1691405402-2641-1-git-send-email-shradhagupta@linux.microsoft.com>
+From: Pavan Chebbi <pavan.chebbi@broadcom.com>
+Date: Mon, 7 Aug 2023 20:20:11 +0530
+Message-ID: <CALs4sv1OGqYguPUVoErc25tcEDetVA6z1ANjz9+vNp3q7WTR=Q@mail.gmail.com>
+Subject: Re: [PATCH net-next] net: mana: Add gdma stats to ethtool output for mana
+To: Shradha Gupta <shradhagupta@linux.microsoft.com>
+Cc: linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org, 
+	linux-rdma@vger.kernel.org, netdev@vger.kernel.org, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Ajay Sharma <sharmaajay@microsoft.com>, Leon Romanovsky <leon@kernel.org>, 
+	Thomas Gleixner <tglx@linutronix.de>, Sebastian Andrzej Siewior <bigeasy@linutronix.de>, 
+	"K. Y. Srinivasan" <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, 
+	Dexuan Cui <decui@microsoft.com>, Long Li <longli@microsoft.com>, 
+	Michael Kelley <mikelley@microsoft.com>
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="000000000000c48dc50602565dff"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, 2023-08-04 at 20:05 +0200, Alexander Lobakin wrote:
-> From: Jakub Kicinski <kuba@kernel.org>
->=20
-> Page pool use in hardirq is prohibited, add debug checks
-> to catch misuses. IIRC we previously discussed using
-> DEBUG_NET_WARN_ON_ONCE() for this, but there were concerns
-> that people will have DEBUG_NET enabled in perf testing.
-> I don't think anyone enables lockdep in perf testing,
-> so use lockdep to avoid pushback and arguing :)
->=20
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> Acked-by: Jesper Dangaard Brouer <hawk@kernel.org>
-> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+--000000000000c48dc50602565dff
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+On Mon, Aug 7, 2023 at 4:29=E2=80=AFPM Shradha Gupta
+<shradhagupta@linux.microsoft.com> wrote:
+>
+> Extended performance counter stats in 'ethtool -S <interface>'
+> for MANA VF to include GDMA tx LSO packets and bytes count.
+>
+> Tested-on: Ubuntu22
+> Testcases:
+> 1. LISA testcase:
+> PERF-NETWORK-TCP-THROUGHPUT-MULTICONNECTION-NTTTCP-Synthetic
+> 2. LISA testcase:
+> PERF-NETWORK-TCP-THROUGHPUT-MULTICONNECTION-NTTTCP-SRIOV
+> 3. Validated the GDMA stat packets and byte counters
+> Signed-off-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
 > ---
->  include/linux/lockdep.h | 7 +++++++
->  net/core/page_pool.c    | 2 ++
->  2 files changed, 9 insertions(+)
->=20
-> diff --git a/include/linux/lockdep.h b/include/linux/lockdep.h
-> index 310f85903c91..dc2844b071c2 100644
-> --- a/include/linux/lockdep.h
-> +++ b/include/linux/lockdep.h
-> @@ -625,6 +625,12 @@ do {									\
->  	WARN_ON_ONCE(__lockdep_enabled && !this_cpu_read(hardirq_context)); \
->  } while (0)
-> =20
-> +#define lockdep_assert_no_hardirq()					\
-> +do {									\
-> +	WARN_ON_ONCE(__lockdep_enabled && (this_cpu_read(hardirq_context) || \
-> +					   !this_cpu_read(hardirqs_enabled))); \
-> +} while (0)
+>  drivers/net/ethernet/microsoft/mana/mana_en.c | 40 +++++++++
+>  .../ethernet/microsoft/mana/mana_ethtool.c    | 15 ++++
+>  include/net/mana/mana.h                       | 88 +++++++++++++++++++
+>  3 files changed, 143 insertions(+)
+>
+> diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/=
+ethernet/microsoft/mana/mana_en.c
+> index ac2acc9aca9d..eb5e4164b9bf 100644
+> --- a/drivers/net/ethernet/microsoft/mana/mana_en.c
+> +++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
+> @@ -2234,6 +2234,46 @@ int mana_config_rss(struct mana_port_context *apc,=
+ enum TRI_STATE rx,
+>         return 0;
+>  }
+>
+> +void mana_query_gf_stats(struct mana_port_context *apc)
+> +{
+> +       struct mana_query_gf_stat_req   req =3D {};
+
+nit: remove the space before 'req' and rearrange in reverse x-mas order
+
+> +       struct mana_query_gf_stat_resp resp =3D {};
+> +       struct net_device *ndev =3D apc->ndev;
+
+> +#define STATISTICS_FLAGS_HC_TX_BCAST_PACKETS           0x000000000100000=
+0
+> +#define STATISTICS_FLAGS_HC_TX_BCAST_BYTES             0x000000000200000=
+0
+> +/* Tx error */
+> +#define STATISTICS_FLAGS_TX_ERRORS_GDMA_ERROR          0x000000000400000=
+0
 > +
->  #define lockdep_assert_preemption_enabled()				\
->  do {									\
->  	WARN_ON_ONCE(IS_ENABLED(CONFIG_PREEMPT_COUNT)	&&		\
-> @@ -659,6 +665,7 @@ do {									\
->  # define lockdep_assert_irqs_enabled() do { } while (0)
->  # define lockdep_assert_irqs_disabled() do { } while (0)
->  # define lockdep_assert_in_irq() do { } while (0)
-> +# define lockdep_assert_no_hardirq() do { } while (0)
-> =20
->  # define lockdep_assert_preemption_enabled() do { } while (0)
->  # define lockdep_assert_preemption_disabled() do { } while (0)
-> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-> index 03ad74d25959..77cb75e63aca 100644
-> --- a/net/core/page_pool.c
-> +++ b/net/core/page_pool.c
-> @@ -587,6 +587,8 @@ static __always_inline struct page *
->  __page_pool_put_page(struct page_pool *pool, struct page *page,
->  		     unsigned int dma_sync_size, bool allow_direct)
->  {
-> +	lockdep_assert_no_hardirq();
 > +
->  	/* This allocator is optimized for the XDP mode that uses
->  	 * one-frame-per-page, but have fallbacks that act like the
->  	 * regular page allocator APIs.
 
-So two points.
+Checkpatch is warning about this.
+Otherwise it looks good.
 
-First could we look at moving this inside the if statement just before
-we return the page, as there isn't a risk until we get into that path
-of needing a lock.
+>  #define MANA_MAX_NUM_QUEUES 64
+>
+>  #define MANA_SHORT_VPORT_OFFSET_MAX ((1U << 8) - 1)
+> --
+> 2.34.1
+>
+>
 
-Secondly rather than returning an error is there any reason why we
-couldn't just look at not returning page and instead just drop into the
-release path which wouldn't take the locks in the first place? Either
-that or I would even be good with some combination of the two where we
-threw a warning, but still just dropped the page so we reduce our risk
-further of actually locking things up.
+--000000000000c48dc50602565dff
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
+
+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
+OltyqaGBuzv+bJTUL+bmV7E4QBLIqGt4jVr1R9hJdH6KxXwJdyfHZ9C6qXmoe2NQhiFUyBOJ0wgk
+dB9Z1IU7nCwvNKYg2JMoJs93tIgbhPJg/D7pqW8gabkCAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
+AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
+c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
+AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
+TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
+bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
+L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
+BB0wG4EZcGF2YW4uY2hlYmJpQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
+HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQUEV6y/89alKPoFbKUaJXsvWu5
+fdowDQYJKoZIhvcNAQELBQADggEBAEHSIB6g652wVb+r2YCmfHW47Jo+5TuCBD99Hla8PYhaWGkd
+9HIyD3NPhb6Vb6vtMWJW4MFGQF42xYRrAS4LZj072DuMotr79rI09pbOiWg0FlRRFt6R9vgUgebu
+pWSH7kmwVXcPtY94XSMMak4b7RSKig2mKbHDpD4bC7eGlwl5RxzYkgrHtMNRmHmQor5Nvqe52cFJ
+25Azqtwvjt5nbrEd81iBmboNTEnLaKuxbbCtLaMEP8xKeDjAKnNOqHUMps0AsQT8c0EGq39YHpjp
+Wn1l67VU0rMShbEFsiUf9WYgE677oinpdm0t2mdCjxr35tryxptoTZXKHDxr/Yy6l6ExggJtMIIC
+aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
+EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwV/XkICjVscn4SNZMw
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIJiesv3e9epEKyUz29WFEjPI/LmJywQc
+9lYbrf/DE+8TMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMDgw
+NzE0NTAyM1owaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
+ATANBgkqhkiG9w0BAQEFAASCAQBJMEDdt42sVy60TQERvqVWmnYT8oEvvg576hxbucyT0+JblibD
+8cdgMYoB0F1ZrVxsVxauaIK2Ik9VcxJuzZRPYrbIFwY7sgZUi7KOZZultSeFH9hb08hnpXfgn99y
+I8YPDEehieWS7hku8FDbUsx6u8YteRz0mR6fnlOwjkV2BaT4Nk0V24yEiZoEnaSSPqvaYfr7J9RO
+lG9AF43K5k4PR3+8CDBSqe3L7Q0bX3tXxJuyHdKIZ8FaFPdQOSiKCXgIkw24E1XrksstJqDyw+wR
+UZFG2q67QvN7kODEeZJA1Wj6gfqNQTU76IoU9l8x8Lvsu6m7EVSdx7qVk1LXIiuk
+--000000000000c48dc50602565dff--
 
