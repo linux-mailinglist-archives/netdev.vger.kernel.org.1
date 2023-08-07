@@ -1,68 +1,64 @@
-Return-Path: <netdev+bounces-24942-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24943-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB74B7723CA
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 14:23:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF0B07723D6
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 14:25:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DC1601C20B26
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 12:23:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0DC3F1C20B36
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 12:25:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B4AD101D2;
-	Mon,  7 Aug 2023 12:23:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D66E101E3;
+	Mon,  7 Aug 2023 12:25:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D29B4436
-	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 12:23:45 +0000 (UTC)
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED6F31B1
-	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 05:23:43 -0700 (PDT)
-Received: by mail-pl1-x62c.google.com with SMTP id d9443c01a7336-1bb2468257fso26578785ad.0
-        for <netdev@vger.kernel.org>; Mon, 07 Aug 2023 05:23:43 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C54C4436
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 12:25:02 +0000 (UTC)
+Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6341DE6F
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 05:24:59 -0700 (PDT)
+Received: by mail-pl1-x636.google.com with SMTP id d9443c01a7336-1bc34b32785so28032855ad.3
+        for <netdev@vger.kernel.org>; Mon, 07 Aug 2023 05:24:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1691411023; x=1692015823;
+        d=bytedance.com; s=google; t=1691411099; x=1692015899;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=foBrBXdOwtDKCq/cydfflnj4IbGd0R2nKQL39Yldago=;
-        b=GnmYBiNpOf2ZKoNDZSeQ7wUkAcu+xKnDmwbHrK34Y7Ua2erUZDLoT8JJxk5fl8TGiB
-         OoHuCCiTUoQ2wtEX7kztN7VB5MCCVQGv/wy5MNOVhivYLoAGl9+OeQx/Kw/+jDyh+IZk
-         Xf34XG9jJ7w+QASgtv2fyUxkkyrMGyP6/I0vtcn4k1nIAQ0LStSdIMZUtZi7KPcerJJm
-         ttyh2eo2Mr2IAudL5/+IPgdfq3sDTaPtRnlakn9I6901GtcSgiHbI4JxFOOvxNdmgD/v
-         L3YtslWMidkywD9iDeTKaE3PmiyYyUFd8OWljozaVGFRKrWaaUvz+k4RQubOkOeKf9I2
-         XGDA==
+        bh=tzvycUSp6fj3lhy6v0s47NdlhPCC8jzqygliYQ4HaF8=;
+        b=kZ3jGdcXWEZ4oyg0oP0T/xcd6VEXp/7aa/nPih+VNkFf6OkCznLwQRb9/jRzCzHOCk
+         3Vi0RhO2IHMdpKPcwYMUEb2tKvyMWFfgmC83p57OWVM5GdbK7Yh3YguUZMlVEAzOmpb9
+         QaYVLP38DAub6T6A99e8dHKpv5/z/3099Ssdut5thWefm6PuSyc6y5r0mED2/XGGgsiH
+         q7HTKm58Nd6dnoI2I9ZF1gotW+WfkyGGGKLUwJP4EBLEGjCDhCBPYri9J4TBngYufbN6
+         RmJwVW1DngJ7cVDGCf3Z/HGNPPArBcaE+fAAjSeprwM8uDvTYDbTJXU1ThQ5I23awoaU
+         mr/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691411023; x=1692015823;
+        d=1e100.net; s=20221208; t=1691411099; x=1692015899;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=foBrBXdOwtDKCq/cydfflnj4IbGd0R2nKQL39Yldago=;
-        b=PESv4Dka5U4TEwXnc5zroQvkjzyiscyJv/S8OVxVuUEDpVdzgKE0tOr9VN4s+MFdpz
-         +71YL6D6ky0u+jpdIdixNAfNlO3HLKI+i2C7iXc3bvSApfAuWGijqB6J9NdG2DRRfRKl
-         3hvYntj0YMwbMccYKXS54SEdteHAsWTrvQjN0xSaJgDhCWuXZvmrIAEx6MZ+93eobQN+
-         NH7TVD51JQ+6USU2kFNJpvNK5S77np18RuDfNPm/4Q2wB11C0a4atMT0caY1dHK0oK4G
-         prnHYLtPJcH7VjpLialWtmS7e89rsFLIhh6v5o6oQKNJrPYuDe/0gGz/YKhy8TUpQZfw
-         r37g==
-X-Gm-Message-State: AOJu0YxsgAJngNdcff0INPJreaA7Uzp6/K0WRYo/+HHMnP8eZ+SQyDJX
-	+tuRdhAESObDE9x2qmRftiKaog==
-X-Google-Smtp-Source: AGHT+IHC5uCrys4OzS5COe5Y4fFinKxUPnbKTC2Fp/O9uWUOctQ/U/MnuwwTmOi5qU48U+ui/3Lqbg==
-X-Received: by 2002:a17:903:18d:b0:1bc:5d0:e8e8 with SMTP id z13-20020a170903018d00b001bc05d0e8e8mr8191638plg.20.1691411023337;
-        Mon, 07 Aug 2023 05:23:43 -0700 (PDT)
-Received: from C02FG34NMD6R.bytedance.net ([2408:8656:30f8:e020::b])
-        by smtp.gmail.com with ESMTPSA id u16-20020a170902e81000b001ab2b4105ddsm6766864plg.60.2023.08.07.05.23.38
+        bh=tzvycUSp6fj3lhy6v0s47NdlhPCC8jzqygliYQ4HaF8=;
+        b=ixObidqEC12mCfO/3z2EnHudgS9dU6rbFrR6zkawYB9T26VX+SXqQpaIiWnRmMghgf
+         55VZ+EfvvbYu4ZivfW8qPuMgy/Qq2Zyy90hDLuLE8WPeVm/oYnCCFUy1/LoiqxhkNnCI
+         ef83DXlF4+sjkOkmundWXAL92C05f2xgnrtpjhL5jqDhJezKBbgs5xYiZRzruBVhIEA2
+         F/MXX2FlwaeF47RIz52rlLLK50IBf7OqvVc59pXI3NWOGcKnuzdbxcWW5/9n4+vqqLIl
+         dPSn6Bsqhazu9TxPUnCcv+hUvRkwf5CyaGHF5LfN79j3i/DaVX2gLJnbNYy7d4zfw8YH
+         P8EQ==
+X-Gm-Message-State: AOJu0YzK3VoU4sc1EMvAizjft4a++kaMAKcxs4P5f1yqjgCVus5CHxLv
+	lNnNor0ehignnc3/7F4gVSp4rA==
+X-Google-Smtp-Source: AGHT+IEboynI5V/8G38VpIJprkiWU7gjnmIYItz7meICAcRwBMHQ5y3CElE3+GIyHu1Z1mmgIEzXvA==
+X-Received: by 2002:a17:902:e84e:b0:1b6:4bbd:c3a7 with SMTP id t14-20020a170902e84e00b001b64bbdc3a7mr8900815plg.66.1691411098793;
+        Mon, 07 Aug 2023 05:24:58 -0700 (PDT)
+Received: from C02FG34NMD6R.bytedance.net ([139.177.225.252])
+        by smtp.gmail.com with ESMTPSA id b10-20020a170902a9ca00b001bc16bc9f5fsm6746674plr.284.2023.08.07.05.24.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Aug 2023 05:23:42 -0700 (PDT)
+        Mon, 07 Aug 2023 05:24:58 -0700 (PDT)
 From: Albert Huang <huangjie.albert@bytedance.com>
 To: 
 Cc: Albert Huang <huangjie.albert@bytedance.com>,
-	=?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn@kernel.org>,
-	Magnus Karlsson <magnus.karlsson@intel.com>,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	Jonathan Lemon <jonathan.lemon@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -71,12 +67,12 @@ Cc: Albert Huang <huangjie.albert@bytedance.com>,
 	Daniel Borkmann <daniel@iogearbox.net>,
 	Jesper Dangaard Brouer <hawk@kernel.org>,
 	John Fastabend <john.fastabend@gmail.com>,
-	netdev@vger.kernel.org (open list:XDP SOCKETS (AF_XDP)),
-	bpf@vger.kernel.org (open list:XDP SOCKETS (AF_XDP)),
-	linux-kernel@vger.kernel.org (open list)
-Subject: [RFC v2 Optimizing veth xsk performance 4/9] xsk: add xsk_tx_completed_addr function
-Date: Mon,  7 Aug 2023 20:23:32 +0800
-Message-Id: <20230807122332.85628-1-huangjie.albert@bytedance.com>
+	netdev@vger.kernel.org (open list:NETWORKING DRIVERS),
+	linux-kernel@vger.kernel.org (open list),
+	bpf@vger.kernel.org (open list:XDP (eXpress Data Path))
+Subject: [RFC v2 Optimizing veth xsk performance 5/9] veth: use send queue tx napi to xmit xsk tx desc
+Date: Mon,  7 Aug 2023 20:24:47 +0800
+Message-Id: <20230807122447.85725-1-huangjie.albert@bytedance.com>
 X-Mailer: git-send-email 2.37.1 (Apple Git-137.1)
 In-Reply-To: <20230807120434.83644-1-huangjie.albert@bytedance.com>
 References: <20230807120434.83644-1-huangjie.albert@bytedance.com>
@@ -86,72 +82,296 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Return desc to the cq by using the descriptor address.
+use send queue tx napi to xmit xsk tx desc
 
 Signed-off-by: Albert Huang <huangjie.albert@bytedance.com>
 ---
- include/net/xdp_sock_drv.h |  1 +
- net/xdp/xsk.c              |  6 ++++++
- net/xdp/xsk_queue.h        | 10 ++++++++++
- 3 files changed, 17 insertions(+)
+ drivers/net/veth.c | 230 ++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 229 insertions(+), 1 deletion(-)
 
-diff --git a/include/net/xdp_sock_drv.h b/include/net/xdp_sock_drv.h
-index 1f6fc8c7a84c..5220454bff5c 100644
---- a/include/net/xdp_sock_drv.h
-+++ b/include/net/xdp_sock_drv.h
-@@ -15,6 +15,7 @@
- #ifdef CONFIG_XDP_SOCKETS
+diff --git a/drivers/net/veth.c b/drivers/net/veth.c
+index 25faba879505..28b891dd8dc9 100644
+--- a/drivers/net/veth.c
++++ b/drivers/net/veth.c
+@@ -27,6 +27,8 @@
+ #include <linux/bpf_trace.h>
+ #include <linux/net_tstamp.h>
+ #include <net/page_pool.h>
++#include <net/xdp_sock_drv.h>
++#include <net/xdp.h>
  
- void xsk_tx_completed(struct xsk_buff_pool *pool, u32 nb_entries);
-+void xsk_tx_completed_addr(struct xsk_buff_pool *pool, u64 addr);
- bool xsk_tx_peek_desc(struct xsk_buff_pool *pool, struct xdp_desc *desc);
- u32 xsk_tx_peek_release_desc_batch(struct xsk_buff_pool *pool, u32 max);
- void xsk_tx_release(struct xsk_buff_pool *pool);
-diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
-index 4f1e0599146e..b2b8aa7b0bcf 100644
---- a/net/xdp/xsk.c
-+++ b/net/xdp/xsk.c
-@@ -396,6 +396,12 @@ void xsk_tx_completed(struct xsk_buff_pool *pool, u32 nb_entries)
- }
- EXPORT_SYMBOL(xsk_tx_completed);
- 
-+void xsk_tx_completed_addr(struct xsk_buff_pool *pool, u64 addr)
-+{
-+	xskq_prod_submit_addr(pool->cq, addr);
-+}
-+EXPORT_SYMBOL(xsk_tx_completed_addr);
-+
- void xsk_tx_release(struct xsk_buff_pool *pool)
- {
- 	struct xdp_sock *xs;
-diff --git a/net/xdp/xsk_queue.h b/net/xdp/xsk_queue.h
-index 13354a1e4280..3a5e26a81dc2 100644
---- a/net/xdp/xsk_queue.h
-+++ b/net/xdp/xsk_queue.h
-@@ -428,6 +428,16 @@ static inline void __xskq_prod_submit(struct xsk_queue *q, u32 idx)
- 	smp_store_release(&q->ring->producer, idx); /* B, matches C */
+ #define DRV_NAME	"veth"
+ #define DRV_VERSION	"1.0"
+@@ -1061,6 +1063,141 @@ static int veth_poll(struct napi_struct *napi, int budget)
+ 	return done;
  }
  
-+static inline void xskq_prod_submit_addr(struct xsk_queue *q, u64 addr)
++static struct sk_buff *veth_build_skb(void *head, int headroom, int len,
++				      int buflen)
 +{
-+	struct xdp_umem_ring *ring = (struct xdp_umem_ring *)q->ring;
-+	u32 idx = q->ring->producer;
++	struct sk_buff *skb;
 +
-+	ring->desc[idx++ & q->ring_mask] = addr;
++	skb = build_skb(head, buflen);
++	if (!skb)
++		return NULL;
 +
-+	__xskq_prod_submit(q, idx);
++	skb_reserve(skb, headroom);
++	skb_put(skb, len);
++
++	return skb;
 +}
 +
- static inline void xskq_prod_submit(struct xsk_queue *q)
++static int veth_xsk_tx_xmit(struct veth_sq *sq, struct xsk_buff_pool *xsk_pool, int budget)
++{
++	struct veth_priv *priv, *peer_priv;
++	struct net_device *dev, *peer_dev;
++	struct veth_stats stats = {};
++	struct sk_buff *skb = NULL;
++	struct veth_rq *peer_rq;
++	struct xdp_desc desc;
++	int done = 0;
++
++	dev = sq->dev;
++	priv = netdev_priv(dev);
++	peer_dev = priv->peer;
++	peer_priv = netdev_priv(peer_dev);
++
++	/* todo: queue index must set before this */
++	peer_rq = &peer_priv->rq[sq->queue_index];
++
++	/* set xsk wake up flag, to do: where to disable */
++	if (xsk_uses_need_wakeup(xsk_pool))
++		xsk_set_tx_need_wakeup(xsk_pool);
++
++	while (budget-- > 0) {
++		unsigned int truesize = 0;
++		struct page *page;
++		void *vaddr;
++		void *addr;
++
++		if (!xsk_tx_peek_desc(xsk_pool, &desc))
++			break;
++
++		addr = xsk_buff_raw_get_data(xsk_pool, desc.addr);
++
++		/* can not hold all data in a page */
++		truesize =  SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
++		truesize += desc.len + xsk_pool->headroom;
++		if (truesize > PAGE_SIZE) {
++			xsk_tx_completed_addr(xsk_pool, desc.addr);
++			stats.xdp_drops++;
++			break;
++		}
++
++		page = dev_alloc_page();
++		if (!page) {
++			xsk_tx_completed_addr(xsk_pool, desc.addr);
++			stats.xdp_drops++;
++			break;
++		}
++		vaddr = page_to_virt(page);
++
++		memcpy(vaddr + xsk_pool->headroom, addr, desc.len);
++		xsk_tx_completed_addr(xsk_pool, desc.addr);
++
++		skb = veth_build_skb(vaddr, xsk_pool->headroom, desc.len, PAGE_SIZE);
++		if (!skb) {
++			put_page(page);
++			stats.xdp_drops++;
++			break;
++		}
++		skb->protocol = eth_type_trans(skb, peer_dev);
++		napi_gro_receive(&peer_rq->xdp_napi, skb);
++
++		stats.xdp_bytes += desc.len;
++		done++;
++	}
++
++	/* release, move consumer，and wakeup the producer */
++	if (done) {
++		napi_schedule(&peer_rq->xdp_napi);
++		xsk_tx_release(xsk_pool);
++	}
++
++	u64_stats_update_begin(&sq->stats.syncp);
++	sq->stats.vs.xdp_packets += done;
++	sq->stats.vs.xdp_bytes += stats.xdp_bytes;
++	sq->stats.vs.xdp_drops += stats.xdp_drops;
++	u64_stats_update_end(&sq->stats.syncp);
++
++	return done;
++}
++
++static int veth_poll_tx(struct napi_struct *napi, int budget)
++{
++	struct veth_sq *sq = container_of(napi, struct veth_sq, xdp_napi);
++	struct xsk_buff_pool *pool;
++	int done = 0;
++
++	sq->xsk.last_cpu = smp_processor_id();
++
++	/* xmit for tx queue */
++	rcu_read_lock();
++	pool = rcu_dereference(sq->xsk.pool);
++	if (pool)
++		done  = veth_xsk_tx_xmit(sq, pool, budget);
++
++	rcu_read_unlock();
++
++	if (done < budget) {
++		/* if done < budget, the tx ring is no buffer */
++		napi_complete_done(napi, done);
++	}
++
++	return done;
++}
++
++static int veth_napi_add_tx(struct net_device *dev)
++{
++	struct veth_priv *priv = netdev_priv(dev);
++	int i;
++
++	for (i = 0; i < dev->real_num_rx_queues; i++) {
++		struct veth_sq *sq = &priv->sq[i];
++
++		netif_napi_add(dev, &sq->xdp_napi, veth_poll_tx);
++		napi_enable(&sq->xdp_napi);
++	}
++
++	return 0;
++}
++
+ static int veth_create_page_pool(struct veth_rq *rq)
  {
- 	__xskq_prod_submit(q, q->cached_prod);
+ 	struct page_pool_params pp_params = {
+@@ -1153,6 +1290,19 @@ static void veth_napi_del_range(struct net_device *dev, int start, int end)
+ 	}
+ }
+ 
++static void veth_napi_del_tx(struct net_device *dev)
++{
++	struct veth_priv *priv = netdev_priv(dev);
++	int i;
++
++	for (i = 0; i < dev->real_num_rx_queues; i++) {
++		struct veth_sq *sq = &priv->sq[i];
++
++		napi_disable(&sq->xdp_napi);
++		__netif_napi_del(&sq->xdp_napi);
++	}
++}
++
+ static void veth_napi_del(struct net_device *dev)
+ {
+ 	veth_napi_del_range(dev, 0, dev->real_num_rx_queues);
+@@ -1360,7 +1510,7 @@ static void veth_set_xdp_features(struct net_device *dev)
+ 		struct veth_priv *priv_peer = netdev_priv(peer);
+ 		xdp_features_t val = NETDEV_XDP_ACT_BASIC |
+ 				     NETDEV_XDP_ACT_REDIRECT |
+-				     NETDEV_XDP_ACT_RX_SG;
++				     NETDEV_XDP_ACT_RX_SG | NETDEV_XDP_ACT_XSK_ZEROCOPY;
+ 
+ 		if (priv_peer->_xdp_prog || veth_gro_requested(peer))
+ 			val |= NETDEV_XDP_ACT_NDO_XMIT |
+@@ -1737,11 +1887,89 @@ static int veth_xdp_set(struct net_device *dev, struct bpf_prog *prog,
+ 	return err;
+ }
+ 
++static int veth_xsk_pool_enable(struct net_device *dev, struct xsk_buff_pool *pool, u16 qid)
++{
++	struct veth_priv *peer_priv;
++	struct veth_priv *priv = netdev_priv(dev);
++	struct net_device *peer_dev = priv->peer;
++	int err = 0;
++
++	if (qid >= dev->real_num_tx_queues)
++		return -EINVAL;
++
++	if (!peer_dev)
++		return -EINVAL;
++
++	/* no dma, so we just skip dma skip in xsk zero copy */
++	pool->dma_check_skip = true;
++
++	peer_priv = netdev_priv(peer_dev);
++
++	/* enable peer tx xdp here, this side
++	 * xdp is enable by veth_xdp_set
++	 * to do: we need to check whther this side is already enable xdp
++	 * maybe it do not have xdp prog
++	 */
++	if (!(peer_priv->_xdp_prog) && (!veth_gro_requested(peer_dev))) {
++		/*  peer should enable napi*/
++		err = veth_napi_enable(peer_dev);
++		if (err)
++			return err;
++	}
++
++	/* Here is already protected by rtnl_lock, so rcu_assign_pointer
++	 * is safe.
++	 */
++	rcu_assign_pointer(priv->sq[qid].xsk.pool, pool);
++
++	veth_napi_add_tx(dev);
++
++	return err;
++}
++
++static int veth_xsk_pool_disable(struct net_device *dev, u16 qid)
++{
++	struct veth_priv *peer_priv;
++	struct veth_priv *priv = netdev_priv(dev);
++	struct net_device *peer_dev = priv->peer;
++	int err = 0;
++
++	if (qid >= dev->real_num_tx_queues)
++		return -EINVAL;
++
++	if (!peer_dev)
++		return -EINVAL;
++
++	peer_priv = netdev_priv(peer_dev);
++
++	/* to do: this may be failed */
++	if (!(peer_priv->_xdp_prog) && (!veth_gro_requested(peer_dev))) {
++		/*  disable peer napi */
++		veth_napi_del(peer_dev);
++	}
++
++	veth_napi_del_tx(dev);
++
++	rcu_assign_pointer(priv->sq[qid].xsk.pool, NULL);
++	return err;
++}
++
++/* this  is for setup xdp */
++static int veth_xsk_pool_setup(struct net_device *dev, struct netdev_bpf *xdp)
++{
++	if (xdp->xsk.pool)
++		return veth_xsk_pool_enable(dev, xdp->xsk.pool, xdp->xsk.queue_id);
++	else
++		return veth_xsk_pool_disable(dev, xdp->xsk.queue_id);
++}
++
+ static int veth_xdp(struct net_device *dev, struct netdev_bpf *xdp)
+ {
+ 	switch (xdp->command) {
+ 	case XDP_SETUP_PROG:
+ 		return veth_xdp_set(dev, xdp->prog, xdp->extack);
++	case XDP_SETUP_XSK_POOL:
++		return veth_xsk_pool_setup(dev, xdp);
+ 	default:
+ 		return -EINVAL;
+ 	}
 -- 
 2.20.1
 
