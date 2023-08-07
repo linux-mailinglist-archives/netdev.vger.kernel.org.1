@@ -1,82 +1,162 @@
-Return-Path: <netdev+bounces-24993-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24994-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E769C7727AA
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 16:26:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72CA17727B0
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 16:27:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A087128136B
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 14:26:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3255F281371
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 14:27:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E78C10976;
-	Mon,  7 Aug 2023 14:26:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4163910977;
+	Mon,  7 Aug 2023 14:27:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48014443A
-	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 14:26:24 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B00BE10CF;
-	Mon,  7 Aug 2023 07:26:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=CpqEEwNfMg9Nl8avg6ECsYgEqF//t/hCgcHJJMEuTZQ=; b=xuST3q4YWc1nrvYdwDluySms90
-	oD74Z7Lr68n7Kd1U0dzeRM0ZHByT64oFUhZx97pnmaBlKv7FxP64EE3Z5m48M6FnIqQOycQs2eoPL
-	vaHHf60BM8z15huezOjlpTmFqVbiL10vSowhgsrJWlHKCPwAeezcfl/zxwsP910IpiaI=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qT1BH-003KOz-TY; Mon, 07 Aug 2023 16:25:59 +0200
-Date: Mon, 7 Aug 2023 16:25:59 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: MD Danish Anwar <danishanwar@ti.com>
-Cc: Randy Dunlap <rdunlap@infradead.org>, Roger Quadros <rogerq@kernel.org>,
-	Simon Horman <simon.horman@corigine.com>,
-	Vignesh Raghavendra <vigneshr@ti.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Rob Herring <robh+dt@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	"David S. Miller" <davem@davemloft.net>, nm@ti.com, srk@ti.com,
-	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
-	netdev@vger.kernel.org, linux-omap@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v2 5/5] net: ti: icssg-prueth: am65x SR2.0 add 10M full
- duplex support
-Message-ID: <dd0e538a-9369-4682-8eda-753d7cb83fb1@lunn.ch>
-References: <20230807110048.2611456-1-danishanwar@ti.com>
- <20230807110048.2611456-6-danishanwar@ti.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35696FC16
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 14:27:35 +0000 (UTC)
+Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E764AE79;
+	Mon,  7 Aug 2023 07:27:29 -0700 (PDT)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id A286EFF808;
+	Mon,  7 Aug 2023 14:27:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1691418448;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nSKlAqEgzEsFnBW7d8u/9h1ZprRRwuRKRLFQ+P/wUY8=;
+	b=LywQYvYZoJqcYSSsOLGqNNJCC9NtdSGpEXpSP7h89QnexEqHiRwsI7y1Fopm8khwM4Jado
+	UYh+3ucNoG1TlHOxwycpd6wl86Ww1bH1aU60cma+N9WOR0OpLat30VEL6CeBvM4lykiuLw
+	YTsewxWRSsSjNtpcSTDCC/w5lLkMGaNv7Xw1yRiyjXwkVqDQrnGE9qAK5QvgIhhrsRkXmb
+	mp7wMTZO2Ss/rYbZR46XbfqZndue72KIO/PVTyaSLyZCXcr1LoUkH4LYGHzC6pgv3/FZsS
+	y1yxUPZoU8Fr9gDi5km21Xjd+hZnD+9mY+D/84flAYhqMYAgZ0XHWK6gTENonw==
+Date: Mon, 7 Aug 2023 16:27:21 +0200
+From: Herve Codina <herve.codina@bootlin.com>
+To: Linus Walleij <linus.walleij@linaro.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>, Rob Herring
+ <robh+dt@kernel.org>, Krzysztof Kozlowski
+ <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
+ Lee Jones <lee@kernel.org>, Qiang Zhao <qiang.zhao@nxp.com>, Li Yang
+ <leoyang.li@nxp.com>, Liam Girdwood <lgirdwood@gmail.com>, Mark Brown
+ <broonie@kernel.org>, Jaroslav Kysela <perex@perex.cz>, Takashi Iwai
+ <tiwai@suse.com>, Shengjiu Wang <shengjiu.wang@gmail.com>, Xiubo Li
+ <Xiubo.Lee@gmail.com>, Fabio Estevam <festevam@gmail.com>, Nicolin Chen
+ <nicoleotsuka@gmail.com>, Christophe Leroy <christophe.leroy@csgroup.eu>,
+ Randy Dunlap <rdunlap@infradead.org>, netdev@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, alsa-devel@alsa-project.org, Thomas
+ Petazzoni <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH v2 24/28] pinctrl: Add support for the Lantic PEF2256
+ pinmux
+Message-ID: <20230807162721.56318743@bootlin.com>
+In-Reply-To: <CACRpkdYXCQRd3ZXNGHwMaQYiJc7tGtAJnBaSh5O-8ruDAJVdiA@mail.gmail.com>
+References: <20230726150225.483464-1-herve.codina@bootlin.com>
+	<20230726150225.483464-25-herve.codina@bootlin.com>
+	<CACRpkdYXCQRd3ZXNGHwMaQYiJc7tGtAJnBaSh5O-8ruDAJVdiA@mail.gmail.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230807110048.2611456-6-danishanwar@ti.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: herve.codina@bootlin.com
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-> @@ -210,6 +210,9 @@ void icssg_config_ipg(struct prueth_emac *emac)
->  	case SPEED_100:
->  		icssg_mii_update_ipg(prueth->mii_rt, slice, MII_RT_TX_IPG_100M);
->  		break;
-> +	case SPEED_10:
-> +		icssg_mii_update_ipg(prueth->mii_rt, slice, MII_RT_TX_IPG_100M);
-> +		break;
+Hi Linus,
 
-Since that looks like a typO, you might want to add a comment.
+On Mon, 7 Aug 2023 15:05:15 +0200
+Linus Walleij <linus.walleij@linaro.org> wrote:
 
-      Adnrew
+> Hi Herve,
+> 
+> thanks for your patch!
+> 
+> First: is this patch something we could merge separately? I don't see
+> any dependency on the other patches.
+
+It depends on pef2256:
+in drivers/pinctrl/Kconfig:
+--- 8< ---
++config PINCTRL_PEF2256
++	tristate "Lantiq PEF2256 (FALC56) pin controller driver"
++	depends on OF && FRAMER_PEF2256
+--- 8< ---
+in drivers/pinctrl/pinctrl-pef2256.c
+--- 8< ---
++#include <linux/framer/pef2256.h>
+--- 8< ---
+
+All the pef2256 it depends on is provided by
+ path 23/28 "net: wan: framer: Add support for the Lantiq PEF2256 framer"
+
+> 
+> On Wed, Jul 26, 2023 at 5:04 PM Herve Codina <herve.codina@bootlin.com> wrote:
+> 
+> > The Lantiq PEF2256 is a framer and line interface component designed to
+> > fulfill all required interfacing between an analog E1/T1/J1 line and the
+> > digital PCM system highway/H.100 bus.
+> >
+> > This pinmux support handles the pin muxing part (pins RP(A..D) and pins
+> > XP(A..D)) of the PEF2256.
+> >
+> > Signed-off-by: Herve Codina <herve.codina@bootlin.com>  
+> 
+> So it is a bridge chip? Please use that terminology since Linux
+> DRM often talks about bridges.
+> 
+> > +++ b/drivers/pinctrl/pinctrl-pef2256-regs.h  
+> (...)
+> > +#include "linux/bitfield.h"  
+> 
+> Really? I don't think there is such a file there.
+> 
+> Do you mean <linux/bitfield.h> and does this even compile?
+
+Yes and it compiles (even with quoted included file).
+I will be changed to <linux/bitfield.h> in the next interation.
+
+> 
+> > diff --git a/drivers/pinctrl/pinctrl-pef2256.c b/drivers/pinctrl/pinctrl-pef2256.c  
+> (...)
+> > +struct pef2256_pinctrl {
+> > +       struct device *dev;
+> > +       struct regmap *regmap;
+> > +       enum pef2256_version version;
+> > +       struct {
+> > +               struct pinctrl_desc pctrl_desc;
+> > +               const struct pef2256_function_desc *functions;
+> > +               unsigned int nfunctions;
+> > +       } pinctrl;  
+> 
+> Uh anonymous struct... can't you just define the struct separately
+> with a name? Or fold it into struct pef2256_pinctrl without the
+> additional struct? Thanks.
+
+I will fold it into struct pef2256_pinctrl in the next iteration.
+
+Thanks
+Hervé
+
+> 
+> Otherwise it looks neat!
+> 
+> Yours,
+> Linus Walleij
 
