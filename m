@@ -1,280 +1,194 @@
-Return-Path: <netdev+bounces-25024-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25025-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3A52772A2E
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 18:09:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A29E7772A32
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 18:10:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EED161C20B67
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 16:09:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6C7B51C20AF6
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 16:10:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1962311CBA;
-	Mon,  7 Aug 2023 16:09:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1062011C8B;
+	Mon,  7 Aug 2023 16:10:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06DFE11CB4
-	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 16:09:03 +0000 (UTC)
-Received: from EUR02-VI1-obe.outbound.protection.outlook.com (mail-vi1eur02on2079.outbound.protection.outlook.com [40.107.241.79])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1A10E76
-	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 09:08:46 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=fCqK1cTx8nrW+QfD6z7L4uye0cvr3utiZDM+q7JF7S7ilU6LKM0Ayhr57P/GWJnCjL5n/kzAouTfoXznpaJJ0lgcw6u1878p/pNuI7h51e+SJUhpy+HSU6fptCKzvlFB0VMxywiXced/pQrYgLc4eiApGZssiTyBe8NJsp/er5iA6s+vqrclz9p5MGFnEMjgfP0edtw+BOhy7flC5cc88QXKBhcBkTkv5vnDmxRc4WTVSllvOL/56OnbBWGg1WXjuHIeaIXHY9/chD13F14ZBspigFjBFSLSNBNycSJKGkQ8+DYcVNrBnb5w2adcC8l47F+CJDS8yHad1Pnuv7yKbg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=8K16O5we05p9UuONIMMsXCqT9D5j7HOPs1EUjw5cE6I=;
- b=SSqaXEx/pFq0G5xXiFBK99pG5z7Wmp60Ol5h542uXtIF5dFP7hw6DuLKqOymRXLAsfK0KczCdg5AiTCG7vm7IRrK3WhTs9k/jfC2g13fVQyQ8RBM2Cvl446Yr1HBoYP217UjAOviAZny9D+ofJfYCoswtQLe29B5xwCunxblpykZYVZ9qvONydcARjbFb/RnWIM0WdO+c2LLOGL7uz0WyY042eepIoQ7iSCjE7rNzeDYEF5cxPm5PbmskYDR7P/15ngUoQBWejlrRfGMiJsg1zpK0P9xKH/SgCJJwTL1wd5i8hwfGhQNt/Qk4yzPTLtaeMVlOnD1YCaxQY2k+YLfcQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8K16O5we05p9UuONIMMsXCqT9D5j7HOPs1EUjw5cE6I=;
- b=rjWluqCXrnJmEzUzqYCFQ/qizwKZpVWyXZWrk1bHIf+5fm5q0YOsmbo5+O2V1BoBjdc02C8E2mfNrMI0yTX3Uwl9WwR7hy6gSmL32Zec+sO2l1NLfoQKAQEA1lkuJBk4M+g7LaF9zRMpuhYdvW8Wqvv4YWE0h4Bzb8FUZLnZLjk=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
- by PAXPR04MB9186.eurprd04.prod.outlook.com (2603:10a6:102:232::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.26; Mon, 7 Aug
- 2023 16:08:44 +0000
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::d4ed:20a0:8c0a:d9cf]) by AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::d4ed:20a0:8c0a:d9cf%6]) with mapi id 15.20.6652.026; Mon, 7 Aug 2023
- 16:08:44 +0000
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: netdev@vger.kernel.org
-Cc: David Ahern <dsahern@kernel.org>,
-	Stephen Hemminger <stephen@networkplumber.org>,
-	Vinicius Costa Gomes <vinicius.gomes@intel.com>
-Subject: [PATCH iproute2 2/2] tc/taprio: fix JSON output when TCA_TAPRIO_ATTR_ADMIN_SCHED is present
-Date: Mon,  7 Aug 2023 19:08:27 +0300
-Message-Id: <20230807160827.4087483-2-vladimir.oltean@nxp.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F299A111A9
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 16:10:50 +0000 (UTC)
+Received: from mail-il1-x12b.google.com (mail-il1-x12b.google.com [IPv6:2607:f8b0:4864:20::12b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FBFB10E5;
+	Mon,  7 Aug 2023 09:10:49 -0700 (PDT)
+Received: by mail-il1-x12b.google.com with SMTP id e9e14a558f8ab-348db491d0eso22537825ab.3;
+        Mon, 07 Aug 2023 09:10:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1691424649; x=1692029449;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=KVadzo05Trppr5PYepmjmmUny3lh84/3p0xio4Ziz2w=;
+        b=C/jZXjXV1AoWmOBfnXi6kglvKcSI8zQIDgpQrLVrCjN+FD77GCjFc5ONs1CkYN0sSz
+         KUTfj6bsLNC1B3NxPqMZPh2J+P8IHDMzNn4z36lfYZIev5GXoxIdrw5xlZo5fZv+Kqiq
+         rxqMHeWFUIHCnalT9uxeg2bFd1//JN7c/AtUtFCRO1clMiN+bnu/SEMvmRLwsiKPEFaY
+         s2CTNCOcT8ZgaCiQ96Nly8hDs7lek2/8/VK4GJFVLR9bt5x20xUuhNr/YvV533fFOw8E
+         6C2TOERUEDhYnHe6c/vKj5uKdgIaSaFiIVvDoVMfnh7sojeTn6Ks0Nzq5l0kai2e2U2s
+         gzew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691424649; x=1692029449;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=KVadzo05Trppr5PYepmjmmUny3lh84/3p0xio4Ziz2w=;
+        b=lW1iYoYEd2CMDvCb1J5Qhm1MbiWR4ItQCE4jM6UBoAH4Y1CB1LO8CtrToG4bYLHqTO
+         fLup0HfPp+bWx7HpTOACBcmb4IwnZBaVvN02sCJrDc7FvjTK/fzbOX8KUcb3Yym85BB/
+         6Q9uCew8BtGjvM++0opoIpQnAqLGqw+/SKESk+mbgL43+pKyaHV3+CRlC+Hxx0u5Q7Wt
+         /P5D2UDx22ZPxj3hOCnHXJ+ug3RkLyZ70nC+NO+iu9ZZOJo1C9IMZSWlJ/ZrnDVk7UXZ
+         0iVCuAUkYyCe3HoolwM/ywOWHLxhTt1yMsC6LidsSDfJQsQhbGWB1vUHCzrmmyGD6NkZ
+         UbLg==
+X-Gm-Message-State: AOJu0Yz7IEFp0Q8MXOwI7j/3QPr742Lg11lAbgpkVgI5pL6FQqbGB+BE
+	eyVxNCTbPbtV/pR/VOZUU3Y=
+X-Google-Smtp-Source: AGHT+IHUY9s7W+bsFQGLPuSFqwSaDO55W8bwT4Q/REJIBx4fPtyJTkTe5sZvn+OjbgbPNjhuyZHpNw==
+X-Received: by 2002:a05:6e02:154d:b0:349:1d60:f038 with SMTP id j13-20020a056e02154d00b003491d60f038mr11792029ilu.27.1691424648826;
+        Mon, 07 Aug 2023 09:10:48 -0700 (PDT)
+Received: from localhost.localdomain ([198.211.45.220])
+        by smtp.googlemail.com with ESMTPSA id k14-20020a637b4e000000b005533b6cb3a6sm5074741pgn.16.2023.08.07.09.10.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Aug 2023 09:10:48 -0700 (PDT)
+From: Furong Xu <0x1207@gmail.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Simon Horman <horms@kernel.org>,
+	Joao Pinto <Joao.Pinto@synopsys.com>
+Cc: netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	xfr@outlook.com,
+	rock.xu@nio.com,
+	Furong Xu <0x1207@gmail.com>
+Subject: [PATCH net-next] net: stmmac: xgmac: RX queue routing configuration
+Date: Tue,  8 Aug 2023 00:09:55 +0800
+Message-Id: <20230807160955.1111104-1-0x1207@gmail.com>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230807160827.4087483-1-vladimir.oltean@nxp.com>
-References: <20230807160827.4087483-1-vladimir.oltean@nxp.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: AM4PR05CA0022.eurprd05.prod.outlook.com (2603:10a6:205::35)
- To AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|PAXPR04MB9186:EE_
-X-MS-Office365-Filtering-Correlation-Id: 16c1032a-13c2-4709-b46c-08db976092d7
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	9bZ5xD8p27cjcnVnOs//k+wfHgJ+JkNiI2cgfE/2Nrvdu0y3Ii3boponvPcGD1jE7pL9t8WdfTnMSXp7s8Ve3UQc0/dXXB8Iw7fTfP3gcrRJd0wGbhBfX9c6ur8VEtG43ZxCs5xm0Ln4ayvp2C2wrk3ZPpVJlecz/oaFNkbA57V9D7qBnu230v5FEXziahESFy5rY3VgFW6gEJ+wg1ZGDTibGqMNWjsiG0IoJ5Gaaw5VF+sRf3JuNULvWzyX7U7a+CLPN5KX9Ikg/DOxZITLeK4j0W95oFMh7/Us0c1QbrBy8yND/R0z5AXZF6wTDs6I0dZ77htYppUk6R1L5YzDBFhDH3z4JXuDZqhQCrCUVYJ0RoXWHRr/J+EXuepCR2yDDiHHk9tFMsDqmutDMcsZATIwk/o9cs/Psyn0PNAXlUB6EsRjZFS8/cPogoscDfZis/A9vbse1I11ZnjMQFIuj/+mPIiiWKulcHZe7zk5brTnCueDyihLOBVv9+Zo85pcqNYSobf/t33yDdds5GZVuOOUOoFiaGWb7pd8C3lOm0lOs/kgNobh0qDgSxhc/bT87G/NVvPTahRK5M1POKuXt0MCDNrAYIg2zLkjgGtZo0Qown0U/RqLtoYgdl3wJ/Bb
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(366004)(39860400002)(376002)(346002)(136003)(451199021)(186006)(1800799003)(86362001)(44832011)(41300700001)(478600001)(1076003)(6506007)(8676002)(8936002)(26005)(52116002)(38100700002)(38350700002)(6486002)(6666004)(2616005)(5660300002)(83380400001)(2906002)(36756003)(54906003)(316002)(66556008)(66476007)(66946007)(6916009)(4326008)(6512007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?YOI0EzHQgfH8KS6ahOgQytA6VlYbdxE1bsGtk30C8ombSFrFwLvMxTSYqEYw?=
- =?us-ascii?Q?go3q6NY4sL6lqiOVN7NxXjbskwb13MGr+3c8FlSLw5pL9QwQcvd0+Vx9Zye+?=
- =?us-ascii?Q?3WhfXRLt3YLvY8Al80C/rBw/kTybEIuqN/w4U2UYmdrU7dTnFr1SzoYUciiZ?=
- =?us-ascii?Q?QSA1GGQ58OAc1oXqUdmG3PEua7d8U+9c9teaIOiPaSWlJskZ2EeqL/kcXrGe?=
- =?us-ascii?Q?CTvMA7N/cQhtvIQv4K8SGIxgr5CKUhpF/KjuC/MoCFps5ZPhDb9SNvvnvHQ3?=
- =?us-ascii?Q?jIgunrjBTogHu8UTWQHG5ilko3lhSAYAkkWKq/W8ILJRiRDqFy8zmLNkWsZJ?=
- =?us-ascii?Q?7GIn8htw43Y1k8b62T7iw4sPGJIDVlJt17QN5l7sTdJq83B2b7nRU3yx+P0h?=
- =?us-ascii?Q?MfGdw0ua9KqrrDQCuPb2vGvBKhfVIK37HDXWxdzNGBxHqZzvR5gL6+8XSlM2?=
- =?us-ascii?Q?h6QRDnwS6/07MPdb2Ri/tKxXi1IhQMZvJwXYkedjPxtwwsYHvaVauqwWHIZa?=
- =?us-ascii?Q?ffDGoJ24vpPB+FwPVWrF6J0CBbopEP+GFpjTqV42Q0XUIpMHlbBNfcMR1HAU?=
- =?us-ascii?Q?KTuVqgFxkefH4r2ZVwWauwrKNPLtZF1N79vtD2f2b57gGndBhm6BaaKaa5m4?=
- =?us-ascii?Q?punbTww8PDixf3e+w/PuNGu+vUdEw655rb7V5IuIcJGzvrVgclwtbjfjjrwG?=
- =?us-ascii?Q?8SV27r6bHtmm6fk3b13OiIu46XeHwnDnOic27AszM3nKwD+M0EDumxni/lQH?=
- =?us-ascii?Q?7jCTFnj0X/HbYl7CkQWszyaS1qOtHl8ekUBqisqX3AldaSAapy6G0uDwcQ8H?=
- =?us-ascii?Q?WZcpLBmiLQrJC+9kCr2X1mRjpxRGG88vGgxcJnG6D+ds6hGXvtfIdOoZH/Nw?=
- =?us-ascii?Q?cWfcNcODuaHEpMuhJScsoCacM5OUPB4DlvCkBIOA3CYTzNMAofcihQyj81iN?=
- =?us-ascii?Q?iN5IqqKQq5Bz3+sWVN5pn/Yw1nmYMMrhAITyqSY0qpliZ25Hq1g6oIsc58ug?=
- =?us-ascii?Q?MRltRr0zwF+n5bSJjgKijZoJs+ZO1oS6mZcaR0jdlQHrM6bpGZ9fUBRhXo+/?=
- =?us-ascii?Q?IussnPTvhvfYIh6sg/9rea81LW7+2evLCgsKtE9A7Xu+izKfkZQ/r0BtHtr7?=
- =?us-ascii?Q?HWFJ4wQuXgTTNY+lFJRlVDm9DHnp94GdfiTUo5w85UYk3OGNXi79eBjZGyhB?=
- =?us-ascii?Q?iNTDRoDndqUXZiXJNq3WmeXyir1O3tVwzszA2E1vTZ0LwqB0/zM8fv8ypZaZ?=
- =?us-ascii?Q?/sok3DCZrrQoqAQ0/4OHYzhruw69T87bOQHl1m7pNrl+IpIwu3gWpJfVKIjN?=
- =?us-ascii?Q?M6WxPvKCulDMZ0GBR1203/oKaQqnG2msnQUkeEZ9FJ8vbg2qTTbKGkfXQAHu?=
- =?us-ascii?Q?QbNYbkI40vHD2g7m+EltbcNiLzbJ1t6hHqI4NjR6YRL7nwnqCieMykp4B0Dc?=
- =?us-ascii?Q?kY9+3EP6RhTpUmNTIASOQpR7WIxc8QxbrJeG57zhv1tSLm4Jznv6kVDpWCG9?=
- =?us-ascii?Q?NSwgKC6SIuV0HfEaaTPeX0/gF7Y1Pokg3K4+lRLuihiPF6VMy7qOLksa6zGa?=
- =?us-ascii?Q?bP4sDiUR6q2zkeI+V9vR+eHyJbqhWtcwCAfhUTLkfLRsh5tAB+NzelraAvll?=
- =?us-ascii?Q?Rw=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 16c1032a-13c2-4709-b46c-08db976092d7
-X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Aug 2023 16:08:44.2070
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ZI5I5ErT9HcoLPBKmw1UrJk8RbVU8ckHO4nUSDb7PiLb15LVaKBw3lZ4TGG70fZti6VZDW/wg/+Z8eM2dHC96g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR04MB9186
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+	FREEMAIL_FROM,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-When the kernel reports that a configuration change is pending
-(and that the schedule is still in the administrative state and
-not yet operational), we (tc -j -p qdisc show) produce the following
-output:
+Commit abe80fdc6ee6 ("net: stmmac: RX queue routing configuration")
+introduced RX queue routing to DWMAC4 core.
+This patch extend the support to XGMAC2 core.
 
-[ {
-        "kind": "taprio",
-        "handle": "8001:",
-        "root": true,
-        "refcnt": 9,
-        "options": {
-            "tc": 8,
-            "map": [ 0,1,2,3,4,5,6,7,0,0,0,0,0,0,0,0 ],
-            "queues": [ {
-                    "offset": 0,
-                    "count": 1
-                },{
-                    "offset": 1,
-                    "count": 1
-                },{
-                    "offset": 2,
-                    "count": 1
-                },{
-                    "offset": 3,
-                    "count": 1
-                },{
-                    "offset": 4,
-                    "count": 1
-                },{
-                    "offset": 5,
-                    "count": 1
-                },{
-                    "offset": 6,
-                    "count": 1
-                },{
-                    "offset": 7,
-                    "count": 1
-                } ],
-            "clockid": "TAI",
-            "base_time": 0,
-            "cycle_time": 20000000,
-            "cycle_time_extension": 0,
-            "schedule": [ {
-                    "index": 0,
-                    "cmd": "S",
-                    "gatemask": "0xff",
-                    "interval": 20000000
-                } ],{
-                "base_time": 1691160103110424418,
-                "cycle_time": 20000000,
-                "cycle_time_extension": 0,
-                "schedule": [ {
-                        "index": 0,
-                        "cmd": "S",
-                        "gatemask": "0xff",
-                        "interval": 20000000
-                    } ]
-            },
-            "max-sdu": [ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 ],
-            "fp": [ "E","E","E","E","E","E","E","E","E","E","E","E","E","E","E","E" ]
-        }
-    } ]
-
-which is invalid json, because the second group of "base_time",
-"cycle_time", etc etc is placed in an unlabeled sub-object. If we pipe
-it into jq, it complains:
-
-parse error: Objects must consist of key:value pairs at line 53, column 14
-
-Since it represents the administrative schedule, give this unnamed JSON
-object the "admin" name. We now print valid JSON which looks like this:
-
-[ {
-        "kind": "taprio",
-        "handle": "8001:",
-        "root": true,
-        "refcnt": 9,
-        "options": {
-            "tc": 8,
-            "map": [ 0,1,2,3,4,5,6,7,0,0,0,0,0,0,0,0 ],
-            "queues": [ {
-                    "offset": 0,
-                    "count": 1
-                },{
-                    "offset": 1,
-                    "count": 1
-                },{
-                    "offset": 2,
-                    "count": 1
-                },{
-                    "offset": 3,
-                    "count": 1
-                },{
-                    "offset": 4,
-                    "count": 1
-                },{
-                    "offset": 5,
-                    "count": 1
-                },{
-                    "offset": 6,
-                    "count": 1
-                },{
-                    "offset": 7,
-                    "count": 1
-                } ],
-            "clockid": "TAI",
-            "base_time": 0,
-            "cycle_time": 20000000,
-            "cycle_time_extension": 0,
-            "schedule": [ {
-                    "index": 0,
-                    "cmd": "S",
-                    "gatemask": "0xff",
-                    "interval": 20000000
-                } ],
-            "admin": {
-                "base_time": 1691160511783528178,
-                "cycle_time": 20000000,
-                "cycle_time_extension": 0,
-                "schedule": [ {
-                        "index": 0,
-                        "cmd": "S",
-                        "gatemask": "0xff",
-                        "interval": 20000000
-                    } ]
-            },
-            "max-sdu": [ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 ],
-            "fp": [ "E","E","E","E","E","E","E","E","E","E","E","E","E","E","E","E" ]
-        }
-    } ]
-
-Fixes: 602fae856d80 ("taprio: Add support for changing schedules")
-Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+Signed-off-by: Furong Xu <0x1207@gmail.com>
 ---
- tc/q_taprio.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ .../net/ethernet/stmicro/stmmac/dwxgmac2.h    | 14 +++++++
+ .../ethernet/stmicro/stmmac/dwxgmac2_core.c   | 37 ++++++++++++++++++-
+ 2 files changed, 49 insertions(+), 2 deletions(-)
 
-diff --git a/tc/q_taprio.c b/tc/q_taprio.c
-index 795c013c1c2a..16a4992d70d2 100644
---- a/tc/q_taprio.c
-+++ b/tc/q_taprio.c
-@@ -650,7 +650,7 @@ static int taprio_print_opt(struct qdisc_util *qu, FILE *f, struct rtattr *opt)
- 		parse_rtattr_nested(t, TCA_TAPRIO_ATTR_MAX,
- 				    tb[TCA_TAPRIO_ATTR_ADMIN_SCHED]);
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
+index 1913385df685..a2498da7406b 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
++++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
+@@ -74,8 +74,22 @@
+ #define XGMAC_RXQEN(x)			GENMASK((x) * 2 + 1, (x) * 2)
+ #define XGMAC_RXQEN_SHIFT(x)		((x) * 2)
+ #define XGMAC_RXQ_CTRL1			0x000000a4
++#define XGMAC_AVCPQ			GENMASK(31, 28)
++#define XGMAC_AVCPQ_SHIFT		28
++#define XGMAC_PTPQ			GENMASK(27, 24)
++#define XGMAC_PTPQ_SHIFT		24
++#define XGMAC_TACPQE			BIT(23)
++#define XGMAC_TACPQE_SHIFT		23
++#define XGMAC_DCBCPQ			GENMASK(19, 16)
++#define XGMAC_DCBCPQ_SHIFT		16
++#define XGMAC_MCBCQEN			BIT(15)
++#define XGMAC_MCBCQEN_SHIFT		15
++#define XGMAC_MCBCQ			GENMASK(11, 8)
++#define XGMAC_MCBCQ_SHIFT		8
+ #define XGMAC_RQ			GENMASK(7, 4)
+ #define XGMAC_RQ_SHIFT			4
++#define XGMAC_UPQ			GENMASK(3, 0)
++#define XGMAC_UPQ_SHIFT			0
+ #define XGMAC_RXQ_CTRL2			0x000000a8
+ #define XGMAC_RXQ_CTRL3			0x000000ac
+ #define XGMAC_PSRQ(x)			GENMASK((x) * 8 + 7, (x) * 8)
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
+index a0c2ef8bb0ac..097b891a608d 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
+@@ -127,6 +127,39 @@ static void dwxgmac2_tx_queue_prio(struct mac_device_info *hw, u32 prio,
+ 	writel(value, ioaddr + reg);
+ }
  
--		open_json_object(NULL);
-+		open_json_object("admin");
- 
- 		print_schedule(f, t);
- 
++static void dwxgmac2_rx_queue_routing(struct mac_device_info *hw,
++				      u8 packet, u32 queue)
++{
++	void __iomem *ioaddr = hw->pcsr;
++	u32 value;
++
++	static const struct stmmac_rx_routing dwxgmac2_route_possibilities[] = {
++		{ XGMAC_AVCPQ, XGMAC_AVCPQ_SHIFT },
++		{ XGMAC_PTPQ, XGMAC_PTPQ_SHIFT },
++		{ XGMAC_DCBCPQ, XGMAC_DCBCPQ_SHIFT },
++		{ XGMAC_UPQ, XGMAC_UPQ_SHIFT },
++		{ XGMAC_MCBCQ, XGMAC_MCBCQ_SHIFT },
++	};
++
++	value = readl(ioaddr + XGMAC_RXQ_CTRL1);
++
++	/* routing configuration */
++	value &= ~dwxgmac2_route_possibilities[packet - 1].reg_mask;
++	value |= (queue << dwxgmac2_route_possibilities[packet - 1].reg_shift) &
++		 dwxgmac2_route_possibilities[packet - 1].reg_mask;
++
++	/* some packets require extra ops */
++	if (packet == PACKET_AVCPQ) {
++		value &= ~XGMAC_TACPQE;
++		value |= 0x1 << XGMAC_TACPQE_SHIFT;
++	} else if (packet == PACKET_MCBCQ) {
++		value &= ~XGMAC_MCBCQEN;
++		value |= 0x1 << XGMAC_MCBCQEN_SHIFT;
++	}
++
++	writel(value, ioaddr + XGMAC_RXQ_CTRL1);
++}
++
+ static void dwxgmac2_prog_mtl_rx_algorithms(struct mac_device_info *hw,
+ 					    u32 rx_alg)
+ {
+@@ -1463,7 +1496,7 @@ const struct stmmac_ops dwxgmac210_ops = {
+ 	.rx_queue_enable = dwxgmac2_rx_queue_enable,
+ 	.rx_queue_prio = dwxgmac2_rx_queue_prio,
+ 	.tx_queue_prio = dwxgmac2_tx_queue_prio,
+-	.rx_queue_routing = NULL,
++	.rx_queue_routing = dwxgmac2_rx_queue_routing,
+ 	.prog_mtl_rx_algorithms = dwxgmac2_prog_mtl_rx_algorithms,
+ 	.prog_mtl_tx_algorithms = dwxgmac2_prog_mtl_tx_algorithms,
+ 	.set_mtl_tx_queue_weight = dwxgmac2_set_mtl_tx_queue_weight,
+@@ -1524,7 +1557,7 @@ const struct stmmac_ops dwxlgmac2_ops = {
+ 	.rx_queue_enable = dwxlgmac2_rx_queue_enable,
+ 	.rx_queue_prio = dwxgmac2_rx_queue_prio,
+ 	.tx_queue_prio = dwxgmac2_tx_queue_prio,
+-	.rx_queue_routing = NULL,
++	.rx_queue_routing = dwxgmac2_rx_queue_routing,
+ 	.prog_mtl_rx_algorithms = dwxgmac2_prog_mtl_rx_algorithms,
+ 	.prog_mtl_tx_algorithms = dwxgmac2_prog_mtl_tx_algorithms,
+ 	.set_mtl_tx_queue_weight = dwxgmac2_set_mtl_tx_queue_weight,
 -- 
 2.34.1
 
