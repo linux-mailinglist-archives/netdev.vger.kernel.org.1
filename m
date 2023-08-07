@@ -1,136 +1,181 @@
-Return-Path: <netdev+bounces-25005-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25006-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C4EC772838
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 16:53:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 866C577285E
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 16:58:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4DAA81C20AE7
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 14:53:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A8CB11C20BD8
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 14:57:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA20A101FD;
-	Mon,  7 Aug 2023 14:53:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E31A610780;
+	Mon,  7 Aug 2023 14:57:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE2BB20FE
-	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 14:53:10 +0000 (UTC)
-Received: from mail-oi1-x22a.google.com (mail-oi1-x22a.google.com [IPv6:2607:f8b0:4864:20::22a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BA93107;
-	Mon,  7 Aug 2023 07:53:09 -0700 (PDT)
-Received: by mail-oi1-x22a.google.com with SMTP id 5614622812f47-3a76cbd4bbfso3569296b6e.3;
-        Mon, 07 Aug 2023 07:53:09 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5D32D521
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 14:57:56 +0000 (UTC)
+Received: from mail-vk1-xa31.google.com (mail-vk1-xa31.google.com [IPv6:2607:f8b0:4864:20::a31])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB17510D1
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 07:57:33 -0700 (PDT)
+Received: by mail-vk1-xa31.google.com with SMTP id 71dfb90a1353d-48719fc6b18so1065994e0c.1
+        for <netdev@vger.kernel.org>; Mon, 07 Aug 2023 07:57:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1691419988; x=1692024788;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
+        d=broadcom.com; s=google; t=1691420253; x=1692025053;
+        h=mime-version:message-id:date:subject:cc:to:from:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=gPyaQLNjb03ouvrVyzPL3TMkSNOyEwc/JBGegxpaeoQ=;
-        b=YV8CMowsfVp8X6lMPHl/4+xuV9+mbuGldWgDG9uuV3GYK4sRZmzQacSaGoVaGXGrFL
-         TCTYYAH589fxwBm8SRCBSSf06Pp/XTN7WaSI5MiN2GH8275qYCfKGNbQNzUxlbCRVkZ1
-         iCGrn9ClTh0mOSTiJRgvgOlJLGc4VH3MyhD90tT0Uupg5ZIJQgtPwEu7cpXeyjoGt2rJ
-         98qzrj0JMndq0M8Yd7UWERIn/7ww5tld01a8IbiNg+mAcF8pOMnhNKLHfjLb2hvzOxuL
-         spLcbF0IFnhss8bzwh2Q+PDi3INuSrYO7RVIbesqQE4olgA792oWqbNDQZjOWa0bthlF
-         cKxQ==
+        bh=NJbqwgL0tJ7dhtPHyxF3pJweRzZLQpkxCX+KVv8z3UQ=;
+        b=Dvwt7qEEU87VO7zKsU9XG6eukuHfhHkhz8ggViWSqnkFXKwYa2QrAKOCcPeS3/DsPf
+         uPz3/E6+//LYDT/kXRoYdbAtZlqWoWZadefSruP7Vv5zA0GDrzSmiCAbs/Kq/Z4oegDO
+         5M9Ef1alnJSeY1UJV9+7OOLLCbwBcb8LhTLq4=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691419988; x=1692024788;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+        d=1e100.net; s=20221208; t=1691420253; x=1692025053;
+        h=mime-version:message-id:date:subject:cc:to:from:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=gPyaQLNjb03ouvrVyzPL3TMkSNOyEwc/JBGegxpaeoQ=;
-        b=TUbHzXQpabe1u+fp5Cg9vp/++l9qgzBVMEoH3pWBave7aFOXF4hYe0QMF0iXNKzjc5
-         JziFf/eeil6BjGXlWMaE7JegBmXcnnT07V2JqNJsfGcMrs48rqA1eL+PDA43E/khzUj7
-         1LivL+XcD5dt1nLtr1Z1lJReV1R9k7j3Qw/4UQ0AvSSRunFxOwY1m+9y6GR1EjJdw4pX
-         CPyXCJ6fZvKrd/9kYjA6qk4cBS638tI4RYshwrDyWV1nQ91vGjtJrO3aXumPW4MVkFKM
-         w23yQgFe+Q8KnzPA7JetsD1ZSIvKDab1c07RHN8awGcjGMxdwtWDXH2tUmR7idQyBQkG
-         xVbg==
-X-Gm-Message-State: AOJu0YyQZEmrirlCSQL474Eq0UiyYGydPeArvoWmHP+GGdBVCr9o+U1O
-	uPnKbGWTEdkr0+T2+IsZX8s=
-X-Google-Smtp-Source: AGHT+IGQy+/2WjTiRQlHtjorkHwUnq3HFiuiWRlKIjB42JMnDCj4CZgQt28EvYw9iJNEkeYresq4Kg==
-X-Received: by 2002:aca:6506:0:b0:3a7:540f:ca71 with SMTP id m6-20020aca6506000000b003a7540fca71mr10003496oim.53.1691419988476;
-        Mon, 07 Aug 2023 07:53:08 -0700 (PDT)
-Received: from ?IPv6:2605:59c8:448:b800:82ee:73ff:fe41:9a02? ([2605:59c8:448:b800:82ee:73ff:fe41:9a02])
-        by smtp.googlemail.com with ESMTPSA id w184-20020a6362c1000000b00563feb7113dsm5013767pgb.91.2023.08.07.07.53.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Aug 2023 07:53:08 -0700 (PDT)
-Message-ID: <db73f4943475a1cd7f79d70896e331204102ea4e.camel@gmail.com>
-Subject: Re: [PATCH net-next v4 0/6] page_pool: a couple of assorted
- optimizations
-From: Alexander H Duyck <alexander.duyck@gmail.com>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>, "David S. Miller"
-	 <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	 <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Maciej Fijalkowski <maciej.fijalkowski@intel.com>, Larysa Zaremba
- <larysa.zaremba@intel.com>, Yunsheng Lin <linyunsheng@huawei.com>,
- Alexander Duyck <alexanderduyck@fb.com>, Jesper Dangaard Brouer
- <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, Simon
- Horman <simon.horman@corigine.com>,  netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Date: Mon, 07 Aug 2023 07:53:06 -0700
-In-Reply-To: <20230804180529.2483231-1-aleksander.lobakin@intel.com>
-References: <20230804180529.2483231-1-aleksander.lobakin@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.3 (3.48.3-1.fc38) 
+        bh=NJbqwgL0tJ7dhtPHyxF3pJweRzZLQpkxCX+KVv8z3UQ=;
+        b=RO3/QHLnTGyMI2c9dEkIoEVcAjG1SAzz8Q+l/jDLymEg112pPYROXHR862Td/d5/Mg
+         oeibFa9wgjViP5cZD4a/tBILB1iBIRF+V3dVnIfTniH0azpza7xO2k09VdvpmrNuz9pL
+         YDyEQ03H2ie+iYoAZ0/2lzx4uq/FlhSlgfIGNPK2rbu+k9DHm3+jmWozo1lcMYwxobl1
+         az0JU4ItrRqmGOf9hyag8dg+U9d41o6ku6FlfmJpNVpdRjfYWUMffWHmw4okU5wBw6p0
+         YCPz4jsDGJp3UeMITBT0hbRR24mi5/VJvhkTMUsyVlL3+hFKBFL24X70X4xSWgzfMshK
+         9FfQ==
+X-Gm-Message-State: AOJu0YwxpmmQVBRbeFwvut4GRShInxNdAkmgfGAoo1ZStYxWlzx4LqLf
+	FyKobM0Wocexz2xwcK7cQBk7FQ==
+X-Google-Smtp-Source: AGHT+IH2IeKpjR/MaoPQeN11JfuI7Q5ZMqRKK/asMh693MDhJvG38xGYhwukZ2NrUc+TLG7w6g74yw==
+X-Received: by 2002:a1f:cd41:0:b0:487:5ee4:b800 with SMTP id d62-20020a1fcd41000000b004875ee4b800mr735030vkg.5.1691420252622;
+        Mon, 07 Aug 2023 07:57:32 -0700 (PDT)
+Received: from lvnvda5233.lvn.broadcom.net ([192.19.161.250])
+        by smtp.gmail.com with ESMTPSA id d18-20020ac800d2000000b00407906a4c6fsm2720973qtg.71.2023.08.07.07.57.30
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 07 Aug 2023 07:57:31 -0700 (PDT)
+From: Michael Chan <michael.chan@broadcom.com>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	gospo@broadcom.com,
+	gustavo@embeddedor.com
+Subject: [PATCH net-next 0/2] bnxt_en: Fix 2 compile warnings in bnxt_dcb.c
+Date: Mon,  7 Aug 2023 07:57:18 -0700
+Message-Id: <20230807145720.159645-1-michael.chan@broadcom.com>
+X-Mailer: git-send-email 2.32.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="00000000000059f20a0602567774"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, 2023-08-04 at 20:05 +0200, Alexander Lobakin wrote:
-> That initially was a spin-off of the IAVF PP series[0], but has grown
-> (and shrunk) since then a bunch. In fact, it consists of three
-> semi-independent blocks:
->=20
-> * #1-2: Compile-time optimization. Split page_pool.h into 2 headers to
->   not overbloat the consumers not needing complex inline helpers and
->   then stop including it in skbuff.h at all. The first patch is also
->   prereq for the whole series.
-> * #3: Improve cacheline locality for users of the Page Pool frag API.
-> * #4-6: Use direct cache recycling more aggressively, when it is safe
->   obviously. In addition, make sure nobody wants to use Page Pool API
->   with disabled interrupts.
->=20
-> Patches #1 and #5 are authored by Yunsheng and Jakub respectively, with
-> small modifications from my side as per ML discussions.
-> For the perf numbers for #3-6, please see individual commit messages.
->=20
-> Also available on my GH with many more Page Pool goodies[1].
->=20
-> [0] https://lore.kernel.org/netdev/20230530150035.1943669-1-aleksander.lo=
-bakin@intel.com
-> [1] https://github.com/alobakin/linux/commits/iavf-pp-frag
->=20
-> Alexander Lobakin (4):
->   net: skbuff: don't include <net/page_pool/types.h> to <linux/skbuff.h>
->   page_pool: place frag_* fields in one cacheline
->   net: skbuff: avoid accessing page_pool if !napi_safe when returning
->     page
->   net: skbuff: always try to recycle PP pages directly when in softirq
->=20
-> Jakub Kicinski (1):
->   page_pool: add a lockdep check for recycling in hardirq
->=20
-> Yunsheng Lin (1):
->   page_pool: split types and declarations from page_pool.h
+--00000000000059f20a0602567774
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-So the series mostly looks good to me. My only concern would be with
-path 5 since I am not sure why we are just throwing a WARN_ON when we
-could just take action on the info to prevent the problem in the first
-place. That said the change doesn't hurt anything as-is so I would be
-good with us thinking about changing that as a follow-up.
+Fix 2 similar warnings in bnxt_dcb.c related to the cos2bw interface
+definitions in bnxt_hsi.h.
 
-Reviewed-by: Alexander Duyck <alexanderduyck@fb.com>
+Michael Chan (2):
+  bnxt_en: Fix W=1 warning in bnxt_dcb.c from fortify memcpy()
+  bnxt_en: Fix W=stringop-overflow warning in bnxt_dcb.c
 
+ drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.c |  26 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt_hsi.h | 644 +++---------------
+ 2 files changed, 101 insertions(+), 569 deletions(-)
+
+-- 
+2.30.1
+
+
+--00000000000059f20a0602567774
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
+
+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
+OnaLEot1MoQO7BIe5S9H4AcCEXXcrJJiAtMCl47ARpyHmvQFQFFTrHgUYEd9V+9bOzY7MBIGSV1N
+/JfsT1sZw6HT0lJkSQefhPGpBniAob62DJP3qr11tu8CAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
+AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
+c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
+AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
+TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
+bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
+L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
+BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
+HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQU31rAyTdZweIF0tJTFYwfOv2w
+L4QwDQYJKoZIhvcNAQELBQADggEBACcuyaGmk0NSZ7Kio7O7WSZ0j0f9xXcBnLbJvQXFYM7JI5uS
+kw5ozATEN5gfmNIe0AHzqwoYjAf3x8Dv2w7HgyrxWdpjTKQFv5jojxa3A5LVuM8mhPGZfR/L5jSk
+5xc3llsKqrWI4ov4JyW79p0E99gfPA6Waixoavxvv1CZBQ4Stu7N660kTu9sJrACf20E+hdKLoiU
+hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
+E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
+aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
+EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIE/WZtfQISDdDv+AfFBOd6WgpZiAFMQ/
+CvQZiyZvEsOdMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMDgw
+NzE0NTczM1owaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
+ATANBgkqhkiG9w0BAQEFAASCAQB717PoDYO75msCzqxzOmZ10Zy8V/W4b7nmI+0denY6cdrdYzhW
+xciCEgaGUPgD5F24ZVtf3PCR/TFwBaMGl8pwaunrscZMBHhJAH3+005dub61Ny+u6OEueHAQZV5Z
+/23pKmOzNky8svoMo1UVK3GiWaSQ4/MCnqeYyNghFTkSthg2Unw1xHGSU4t1H2cYzq/Fi0eDZ0Oh
+FHxpS5rTfm2tuRPwivCjzj+XQPSNtokHiOYlT/XiUSKnRtGuwok+jh7QJCcMWZhx3swm528r5MIU
+mP8adYhROZq/2qDEMNDwwnkZRa2GKWkLSSHzzyOFt2DpMeDrH2LIlEemyU2gBoDi
+--00000000000059f20a0602567774--
 
