@@ -1,64 +1,68 @@
-Return-Path: <netdev+bounces-24941-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24942-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD2607723C6
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 14:23:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB74B7723CA
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 14:23:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 67A12281248
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 12:22:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DC1601C20B26
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 12:23:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1C6D101CA;
-	Mon,  7 Aug 2023 12:22:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B4AD101D2;
+	Mon,  7 Aug 2023 12:23:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9709FDF71
-	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 12:22:57 +0000 (UTC)
-Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47490E79
-	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 05:22:47 -0700 (PDT)
-Received: by mail-pl1-x62f.google.com with SMTP id d9443c01a7336-1bb7b8390e8so27108085ad.2
-        for <netdev@vger.kernel.org>; Mon, 07 Aug 2023 05:22:47 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D29B4436
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 12:23:45 +0000 (UTC)
+Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED6F31B1
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 05:23:43 -0700 (PDT)
+Received: by mail-pl1-x62c.google.com with SMTP id d9443c01a7336-1bb2468257fso26578785ad.0
+        for <netdev@vger.kernel.org>; Mon, 07 Aug 2023 05:23:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1691410967; x=1692015767;
+        d=bytedance.com; s=google; t=1691411023; x=1692015823;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=9C7bHaMSd+SY+pPB7Vtx4/6UZIJ72tWmfxoauVOSVx0=;
-        b=l4xJiWEEbz2IEuorkINwxBVQ/5PnK9fhGmaLj2DODmbsWX93ppJtAyvJqtF6Ztvco0
-         qKs5yAkD9hAZSetvftFm3zxR/knZZ++YSY80dIXgMn379PWrH9U+ANOEFtJ5x6RdTS6y
-         XYQRI5TmfzgqmA/jmahEN6XMtndm/UPo/TG3A38K7ZeoLVOpfRYn0RtvpgZ6YhmhUr1J
-         CI+kA1hDqOrfZX6Sz9COvQCAz3m1QiMtcNQs5WrsThDatldjRHsjJs4H/HTeQfp2eoCk
-         DWewbiMqktZxszv2kbOsjYlz7Zxvm2rJ0/8QkdTvMZdbCRocQG6aL3AflCYjgw6/LhuT
-         Q8vA==
+        bh=foBrBXdOwtDKCq/cydfflnj4IbGd0R2nKQL39Yldago=;
+        b=GnmYBiNpOf2ZKoNDZSeQ7wUkAcu+xKnDmwbHrK34Y7Ua2erUZDLoT8JJxk5fl8TGiB
+         OoHuCCiTUoQ2wtEX7kztN7VB5MCCVQGv/wy5MNOVhivYLoAGl9+OeQx/Kw/+jDyh+IZk
+         Xf34XG9jJ7w+QASgtv2fyUxkkyrMGyP6/I0vtcn4k1nIAQ0LStSdIMZUtZi7KPcerJJm
+         ttyh2eo2Mr2IAudL5/+IPgdfq3sDTaPtRnlakn9I6901GtcSgiHbI4JxFOOvxNdmgD/v
+         L3YtslWMidkywD9iDeTKaE3PmiyYyUFd8OWljozaVGFRKrWaaUvz+k4RQubOkOeKf9I2
+         XGDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691410967; x=1692015767;
+        d=1e100.net; s=20221208; t=1691411023; x=1692015823;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=9C7bHaMSd+SY+pPB7Vtx4/6UZIJ72tWmfxoauVOSVx0=;
-        b=hO3696jJkSWPTHtPQbXNFQZkjTX/hBm8TnX4FxjT9GyJsbFI3ry5ALyv6pqOxwexTy
-         NRCl+tjXdI9LZtQS77ak3wsWRdAQz0D+v3If9OaecwKBKb1ONuOichzvV7gSlKW5/oJB
-         SPRrUHXSD6wz7MVBcgVkO+t9Jn1lzIGvCD0QHnKPGwstV32k4kBgCl92znFcAB9R0VMW
-         RnQtui+PTgWvxRD0HoHWZpxs73UX4l7+zPOt2Vq//VU8ZADPTTO/E7WM3oRX5HpD1AXd
-         ZPdwDWCpAJBu5qy2esA+CN/zUSM6CNl4cY5KIcjJcThSsG0ZUAVtG++X9cLcexYi3V/q
-         UR8Q==
-X-Gm-Message-State: AOJu0YwOdzAWbQDTTVX8hao8/8Hn0g/Mpt1JwoBqxoHXFJeI+X8HmLQE
-	U3JK5l1MBs6MvgjKiGKyUcDJEQ==
-X-Google-Smtp-Source: AGHT+IE89np5AUQBiPFRPVGYnS82GPk320IaciVQZYSLKkUoZ+GQA8NGhOsYaOaNrp4N9CL1ZFsYag==
-X-Received: by 2002:a17:902:82c5:b0:1b8:6cae:4400 with SMTP id u5-20020a17090282c500b001b86cae4400mr7028201plz.37.1691410966789;
-        Mon, 07 Aug 2023 05:22:46 -0700 (PDT)
+        bh=foBrBXdOwtDKCq/cydfflnj4IbGd0R2nKQL39Yldago=;
+        b=PESv4Dka5U4TEwXnc5zroQvkjzyiscyJv/S8OVxVuUEDpVdzgKE0tOr9VN4s+MFdpz
+         +71YL6D6ky0u+jpdIdixNAfNlO3HLKI+i2C7iXc3bvSApfAuWGijqB6J9NdG2DRRfRKl
+         3hvYntj0YMwbMccYKXS54SEdteHAsWTrvQjN0xSaJgDhCWuXZvmrIAEx6MZ+93eobQN+
+         NH7TVD51JQ+6USU2kFNJpvNK5S77np18RuDfNPm/4Q2wB11C0a4atMT0caY1dHK0oK4G
+         prnHYLtPJcH7VjpLialWtmS7e89rsFLIhh6v5o6oQKNJrPYuDe/0gGz/YKhy8TUpQZfw
+         r37g==
+X-Gm-Message-State: AOJu0YxsgAJngNdcff0INPJreaA7Uzp6/K0WRYo/+HHMnP8eZ+SQyDJX
+	+tuRdhAESObDE9x2qmRftiKaog==
+X-Google-Smtp-Source: AGHT+IHC5uCrys4OzS5COe5Y4fFinKxUPnbKTC2Fp/O9uWUOctQ/U/MnuwwTmOi5qU48U+ui/3Lqbg==
+X-Received: by 2002:a17:903:18d:b0:1bc:5d0:e8e8 with SMTP id z13-20020a170903018d00b001bc05d0e8e8mr8191638plg.20.1691411023337;
+        Mon, 07 Aug 2023 05:23:43 -0700 (PDT)
 Received: from C02FG34NMD6R.bytedance.net ([2408:8656:30f8:e020::b])
-        by smtp.gmail.com with ESMTPSA id jk21-20020a170903331500b001bbfa86ca3bsm6819846plb.78.2023.08.07.05.22.43
+        by smtp.gmail.com with ESMTPSA id u16-20020a170902e81000b001ab2b4105ddsm6766864plg.60.2023.08.07.05.23.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Aug 2023 05:22:46 -0700 (PDT)
+        Mon, 07 Aug 2023 05:23:42 -0700 (PDT)
 From: Albert Huang <huangjie.albert@bytedance.com>
 To: 
 Cc: Albert Huang <huangjie.albert@bytedance.com>,
+	=?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn@kernel.org>,
+	Magnus Karlsson <magnus.karlsson@intel.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Jonathan Lemon <jonathan.lemon@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -67,12 +71,12 @@ Cc: Albert Huang <huangjie.albert@bytedance.com>,
 	Daniel Borkmann <daniel@iogearbox.net>,
 	Jesper Dangaard Brouer <hawk@kernel.org>,
 	John Fastabend <john.fastabend@gmail.com>,
-	netdev@vger.kernel.org (open list:NETWORKING DRIVERS),
-	linux-kernel@vger.kernel.org (open list),
-	bpf@vger.kernel.org (open list:XDP (eXpress Data Path))
-Subject: [RFC v2 Optimizing veth xsk performance 3/9] veth: add support for send queue
-Date: Mon,  7 Aug 2023 20:22:38 +0800
-Message-Id: <20230807122238.85463-1-huangjie.albert@bytedance.com>
+	netdev@vger.kernel.org (open list:XDP SOCKETS (AF_XDP)),
+	bpf@vger.kernel.org (open list:XDP SOCKETS (AF_XDP)),
+	linux-kernel@vger.kernel.org (open list)
+Subject: [RFC v2 Optimizing veth xsk performance 4/9] xsk: add xsk_tx_completed_addr function
+Date: Mon,  7 Aug 2023 20:23:32 +0800
+Message-Id: <20230807122332.85628-1-huangjie.albert@bytedance.com>
 X-Mailer: git-send-email 2.37.1 (Apple Git-137.1)
 In-Reply-To: <20230807120434.83644-1-huangjie.albert@bytedance.com>
 References: <20230807120434.83644-1-huangjie.albert@bytedance.com>
@@ -84,86 +88,70 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
 	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-in order to support native af_xdp for veth. we
-need support for send queue for napi tx.
-the upcoming patch will make use of it.
+Return desc to the cq by using the descriptor address.
 
 Signed-off-by: Albert Huang <huangjie.albert@bytedance.com>
 ---
- drivers/net/veth.c | 29 +++++++++++++++++++++++++++++
- 1 file changed, 29 insertions(+)
+ include/net/xdp_sock_drv.h |  1 +
+ net/xdp/xsk.c              |  6 ++++++
+ net/xdp/xsk_queue.h        | 10 ++++++++++
+ 3 files changed, 17 insertions(+)
 
-diff --git a/drivers/net/veth.c b/drivers/net/veth.c
-index 77e12d52ca2b..25faba879505 100644
---- a/drivers/net/veth.c
-+++ b/drivers/net/veth.c
-@@ -56,6 +56,11 @@ struct veth_rq_stats {
- 	struct u64_stats_sync	syncp;
- };
+diff --git a/include/net/xdp_sock_drv.h b/include/net/xdp_sock_drv.h
+index 1f6fc8c7a84c..5220454bff5c 100644
+--- a/include/net/xdp_sock_drv.h
++++ b/include/net/xdp_sock_drv.h
+@@ -15,6 +15,7 @@
+ #ifdef CONFIG_XDP_SOCKETS
  
-+struct veth_sq_stats {
-+	struct veth_stats	vs;
-+	struct u64_stats_sync	syncp;
-+};
-+
- struct veth_rq {
- 	struct napi_struct	xdp_napi;
- 	struct napi_struct __rcu *napi; /* points to xdp_napi when the latter is initialized */
-@@ -69,11 +74,25 @@ struct veth_rq {
- 	struct page_pool	*page_pool;
- };
+ void xsk_tx_completed(struct xsk_buff_pool *pool, u32 nb_entries);
++void xsk_tx_completed_addr(struct xsk_buff_pool *pool, u64 addr);
+ bool xsk_tx_peek_desc(struct xsk_buff_pool *pool, struct xdp_desc *desc);
+ u32 xsk_tx_peek_release_desc_batch(struct xsk_buff_pool *pool, u32 max);
+ void xsk_tx_release(struct xsk_buff_pool *pool);
+diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
+index 4f1e0599146e..b2b8aa7b0bcf 100644
+--- a/net/xdp/xsk.c
++++ b/net/xdp/xsk.c
+@@ -396,6 +396,12 @@ void xsk_tx_completed(struct xsk_buff_pool *pool, u32 nb_entries)
+ }
+ EXPORT_SYMBOL(xsk_tx_completed);
  
-+struct veth_sq {
-+	struct napi_struct	xdp_napi;
-+	struct net_device	*dev;
-+	struct xdp_mem_info	xdp_mem;
-+	struct veth_sq_stats	stats;
-+	u32 queue_index;
-+	/* for xsk */
-+	struct {
-+		struct xsk_buff_pool __rcu *pool;
-+		u32 last_cpu;
-+	} xsk;
-+};
++void xsk_tx_completed_addr(struct xsk_buff_pool *pool, u64 addr)
++{
++	xskq_prod_submit_addr(pool->cq, addr);
++}
++EXPORT_SYMBOL(xsk_tx_completed_addr);
 +
- struct veth_priv {
- 	struct net_device __rcu	*peer;
- 	atomic64_t		dropped;
- 	struct bpf_prog		*_xdp_prog;
- 	struct veth_rq		*rq;
-+	struct veth_sq		*sq;
- 	unsigned int		requested_headroom;
- };
- 
-@@ -1495,6 +1514,15 @@ static int veth_alloc_queues(struct net_device *dev)
- 		u64_stats_init(&priv->rq[i].stats.syncp);
- 	}
- 
-+	priv->sq = kcalloc(dev->num_tx_queues, sizeof(*priv->sq), GFP_KERNEL);
-+	if (!priv->sq)
-+		return -ENOMEM;
-+
-+	for (i = 0; i < dev->num_tx_queues; i++) {
-+		priv->sq[i].dev = dev;
-+		u64_stats_init(&priv->sq[i].stats.syncp);
-+	}
-+
- 	return 0;
+ void xsk_tx_release(struct xsk_buff_pool *pool)
+ {
+ 	struct xdp_sock *xs;
+diff --git a/net/xdp/xsk_queue.h b/net/xdp/xsk_queue.h
+index 13354a1e4280..3a5e26a81dc2 100644
+--- a/net/xdp/xsk_queue.h
++++ b/net/xdp/xsk_queue.h
+@@ -428,6 +428,16 @@ static inline void __xskq_prod_submit(struct xsk_queue *q, u32 idx)
+ 	smp_store_release(&q->ring->producer, idx); /* B, matches C */
  }
  
-@@ -1503,6 +1531,7 @@ static void veth_free_queues(struct net_device *dev)
- 	struct veth_priv *priv = netdev_priv(dev);
- 
- 	kfree(priv->rq);
-+	kfree(priv->sq);
- }
- 
- static int veth_dev_init(struct net_device *dev)
++static inline void xskq_prod_submit_addr(struct xsk_queue *q, u64 addr)
++{
++	struct xdp_umem_ring *ring = (struct xdp_umem_ring *)q->ring;
++	u32 idx = q->ring->producer;
++
++	ring->desc[idx++ & q->ring_mask] = addr;
++
++	__xskq_prod_submit(q, idx);
++}
++
+ static inline void xskq_prod_submit(struct xsk_queue *q)
+ {
+ 	__xskq_prod_submit(q, q->cached_prod);
 -- 
 2.20.1
 
