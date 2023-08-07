@@ -1,321 +1,151 @@
-Return-Path: <netdev+bounces-25184-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25185-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96BD97734A5
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 01:09:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 83B0E7734AA
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 01:11:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BA10F1C20D8E
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 23:09:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B44991C20DF0
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 23:11:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B76517FF3;
-	Mon,  7 Aug 2023 23:09:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4913518007;
+	Mon,  7 Aug 2023 23:11:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2836218020
-	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 23:09:44 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BCFF30FC;
-	Mon,  7 Aug 2023 16:09:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1691449755; x=1722985755;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=X+EBfCWuttTi30h4bfff97doqJN+1vnLYZoSC8zqgCU=;
-  b=Tz73j1pHLdqEZd60QrGoP+G0c1rLfpu6AMuGkai6MOGj/167WiTZmlG7
-   bqciCkHXhjNVX469V43nPNjkZv9c4SfX0hMtoJt/W7m4MaGfKRfuu4dUc
-   6Mah7zAcDTNXTSZhWXFM4xbSX2vvBNmynLAQAh7dZI4Cx+G7cyIEMDGgu
-   0tk+uhwBOK51qe9rx5fmyPEIQ++zMp+Dkp7Jj/tjnTNzRQXQYZdxLG6LR
-   knG3QCKbbbXOyiE1uwh6Y0jqBj0e43k22W60Yhi1NnGiiFVVSmG+6bLyh
-   S3rFZx+61arneg3uPMF8itH01wLyWCBL9K/fIrILw75T7cxc1/fQHpASN
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10795"; a="401631686"
-X-IronPort-AV: E=Sophos;i="6.01,263,1684825200"; 
-   d="scan'208";a="401631686"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Aug 2023 16:08:22 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10795"; a="796501506"
-X-IronPort-AV: E=Sophos;i="6.01,263,1684825200"; 
-   d="scan'208";a="796501506"
-Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
-  by fmsmga008.fm.intel.com with ESMTP; 07 Aug 2023 16:08:21 -0700
-Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Mon, 7 Aug 2023 16:08:21 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Mon, 7 Aug 2023 16:08:21 -0700
-Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27 via Frontend Transport; Mon, 7 Aug 2023 16:08:21 -0700
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.169)
- by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.27; Mon, 7 Aug 2023 16:08:21 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=CHbnoCTun3xQ+KKB4ayXzTXM5J76OJSLDdGhZV15uBcPJgumsBHpjPrgFuqrskTiX7+VcaLxcJzcmWxWtWH8aQKAI3NUvZXjbuVD6hqg2K5nnOp9YbewgfXNAuS62f1px7FOXBTlBFsXdiMdWcj3tMkZGJmrgxLrCGAyMmVvcHvENk8sW2N6qwifx3Q5K1VQzOf1e6VtJ+H8fOG7DB/T47tVOcADxvfYnaR2ruMX+HoIuot/UxDPTS5i9/kpkkWaXDlhzt1W/0UhWcwAhLArfz1ckbyzikuNRB1ZM1bdANQgoVdW2p30F2qGyclMcyUNZCM0aeuo+h7SxOuMYpNMfw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Z45MZ0BD0WkXyg8lIwRSEiD8/5T4R9pLPvu1DAcSg1A=;
- b=F9URBuHxIYSqZqdVyEUYlszuwNlyy0FQaTjLDb0TV6jUvV+kfJ7bLlCtXOAbVhQXVwdecGwe6AtClzA5/nl1GSjO+GiNg6z4KqLfY/el8VTdUITEgaXq8xITyp1mI6XzAD+u8I6Y7QO9f2c7ordvlPV0aexsrDzpC1RP1jZxfr3nZ3f//9ZmRMDRKAKP6ayXJ6nkTllkBCJpcmxm3oIemd28HfB/h+7g5nYkT5GxuQY8dJmqZJ0Lim9LxrXKaE84mV4EDmkLslRN4KeNtCAImBETNN+ru4kpI9I5ch+yGkvPzmyRASCDjogzh0FqBjVbQXz9faPtjgZhurOZZLImjA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from DM6PR11MB4657.namprd11.prod.outlook.com (2603:10b6:5:2a6::7) by
- CY8PR11MB7685.namprd11.prod.outlook.com (2603:10b6:930:73::17) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6652.21; Mon, 7 Aug 2023 23:08:13 +0000
-Received: from DM6PR11MB4657.namprd11.prod.outlook.com
- ([fe80::c3cd:b8d0:5231:33a8]) by DM6PR11MB4657.namprd11.prod.outlook.com
- ([fe80::c3cd:b8d0:5231:33a8%5]) with mapi id 15.20.6652.026; Mon, 7 Aug 2023
- 23:08:13 +0000
-From: "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>
-To: Simon Horman <horms@kernel.org>, Vadim Fedorenko
-	<vadim.fedorenko@linux.dev>
-CC: Jakub Kicinski <kuba@kernel.org>, Jiri Pirko <jiri@resnulli.us>, "Jonathan
- Lemon" <jonathan.lemon@gmail.com>, Paolo Abeni <pabeni@redhat.com>, "Olech,
- Milena" <milena.olech@intel.com>, "Michalik, Michal"
-	<michal.michalik@intel.com>, "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, poros <poros@redhat.com>, mschmidt
-	<mschmidt@redhat.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-clk@vger.kernel.org" <linux-clk@vger.kernel.org>, Bart Van Assche
-	<bvanassche@acm.org>, "intel-wired-lan@lists.osuosl.org"
-	<intel-wired-lan@lists.osuosl.org>
-Subject: RE: [PATCH net-next v2 6/9] ice: add admin commands to access cgu
- configuration
-Thread-Topic: [PATCH net-next v2 6/9] ice: add admin commands to access cgu
- configuration
-Thread-Index: AQHZxwbCEAx9MO6vs0irTseMzSA5w6/diaoAgAHv6PA=
-Date: Mon, 7 Aug 2023 23:08:13 +0000
-Message-ID: <DM6PR11MB46577E9609111FDE34A4F7469B0CA@DM6PR11MB4657.namprd11.prod.outlook.com>
-References: <20230804190454.394062-1-vadim.fedorenko@linux.dev>
- <20230804190454.394062-7-vadim.fedorenko@linux.dev>
- <ZM/Y/PjPVNxbwLOL@vergenet.net>
-In-Reply-To: <ZM/Y/PjPVNxbwLOL@vergenet.net>
-Accept-Language: pl-PL, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM6PR11MB4657:EE_|CY8PR11MB7685:EE_
-x-ms-office365-filtering-correlation-id: 1c9eeef2-35d7-43a6-e66a-08db979b2ce4
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: o5b9lpmE0YU36AmMnnjYta9YZBqt5OTZBIzInx3RzbfI43Ztl37bBV6Jbomp5AVvlrB01zXQ9ayJCyfes9lT5fniZxGmjH3/ts6uopqIiAt+YEGB8X/VZ4eOTvWfPQXjm94sBkRrbkKnr9b60Sqm20zmM4CsBupNCZKLSv3OiHx3teGG4N/0UwUYzwht28vWRXFTa1LIx933VlIBbqx+ZRhbQL2VznqRQogfQ08Ng4uuYCxAgbOgBeoHM7+5JbfyEkkxPF3lcVgqaj7mNrAsLlCDPIi5xRNGFe6OyitCGsjKMTVI3cYzFBmrjm7axeI19vHWdUpKMy/HZyXRFutqZVfyDisQawA1mR8GHihsyMgChh8ZV+03t7Y+5DcNW4FPN1UnXF9vJNM1qj2ISMnceo2LaU1afhzN+EV4Qjcf+kmXmeXLXt0xe/sNlQFSSIDpZCA7PEn3hbzo52w6uRXD3FViEh9kh7NZlvWEX3SvMYv0tqe2CLMq9IJ/R5jTi2iW/+NvCyOQ2zw3FyYoLmkUFjWhI/Brc58q+DQSY1RyfR3+rMca9hWvXPBHEgDxeAHQWELBtRh5cQy8nrUNIx03XGZI0Jk8XkqkhDMTaeprmNeqn59SLkeYoghMFrSDgKNnY6i8vSPP3SoEUPncL3T9LCOwBfiuKGiOQDi9OLTEpKzE2RZoe0uzDV+G/ewDjxxN
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB4657.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(396003)(39860400002)(346002)(376002)(366004)(136003)(451199021)(90011799007)(90021799007)(186006)(1800799003)(55016003)(9686003)(4326008)(316002)(86362001)(478600001)(122000001)(54906003)(110136005)(38100700002)(71200400001)(76116006)(66946007)(6506007)(82960400001)(66446008)(66476007)(64756008)(66556008)(33656002)(7696005)(41300700001)(26005)(52536014)(38070700005)(8936002)(8676002)(2906002)(83380400001)(7416002)(5660300002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?UHifpVNQuV8ujsPXEaSOq9dR3+gzEGTEIQ4b0VnQG0D77e6AGNZfetxpznMQ?=
- =?us-ascii?Q?VJCCcRpI3gdhMxtbkImcndO6DNBpw9qVqhPzeryU3lHF6d+xJKJNMFPfJGUt?=
- =?us-ascii?Q?qsNMAimx7n0pnWCJZUCbsmFrRYPTKmPFf4UC9s/F2omaTihAxXpJr+gxsX0l?=
- =?us-ascii?Q?4DLJLjERMcxDcGYLU9p05zrKg/2y/VnJzOsV1WjOzaZ7wtZe9QHDQ71BDbWq?=
- =?us-ascii?Q?uElZR9CVksdgxGmouPRYJ8cpewrgpSgcQRdIyvvgag2rCTfOistkvtLEosgK?=
- =?us-ascii?Q?tVpEONj93szH+XxQ17LMw6dmE6MxoB6COrewwRycryOzmE8A79+HJyyAElEO?=
- =?us-ascii?Q?SDe0nIB+PNw/SxDfcRs+tVQOIHVuyxtChe27Ld4kUvGeofb45lyuWW2AfJh9?=
- =?us-ascii?Q?e4MeSO5KyVviAjh2t8qML738sYpZUVa3xZoZfY1hK3rVK9uEpe6cjl8Z8xSw?=
- =?us-ascii?Q?fqCKscH1U8dX5e740wfPqRYH61eYEEuU+JXo1QiEuAMWBpM3OnGYnhQqff32?=
- =?us-ascii?Q?FKBLRpETChnVFN0OvQIvaEXsWGHZVBaykZAIj8rgXzkkGgb3VtXU+V09DZEm?=
- =?us-ascii?Q?jyY4/OiywSwaoZEJkcBmFxdQl+Yl5B5YiYPmpJM7z9JV2/qv7mXd/zaZzmUy?=
- =?us-ascii?Q?nSmySkzDmCmO5sJ0q4ZQm4BEA+CRjMSv8C/yMKpKMHbF2zr+4Ug5vlx1H6YK?=
- =?us-ascii?Q?RQL1PVpIEIPChljnC4d9aRkIuT5/orGtt1i0ba6AHfpgzQAcRng+WucgSu2J?=
- =?us-ascii?Q?md/EwOOyDnYVldfJBp47R0jCbOJZb5mTejyHUObIhRY1l3QtU/NR/BU4WBHt?=
- =?us-ascii?Q?tn7oJEzN/1YNwafCi60Nmbtff6FHR9BZySYY+jz2wfIJOHh3zhqbSsLcwk1u?=
- =?us-ascii?Q?enIAehMutd8sjOkpeMHh3HxrGFKsFh6B3QUW/T0sv/DpV0BFqumMuJPS4TIC?=
- =?us-ascii?Q?sS0hqB0yhTejTvNNY/1g5Px/14fmkcvu/NDiE45cgl5vftvB5e874KOiQcFp?=
- =?us-ascii?Q?Mpn0duQ3UhmnPPKguBymm2Kp4HP6AwmOeAiHb/mbgXcvdjWC8CdXT7jUNIBa?=
- =?us-ascii?Q?0beevuwNJvEurXoeXH+OFaDfjneG7TJiBJgrB2VEccKto5DSDSk3ZzhZs0Cp?=
- =?us-ascii?Q?b1FLj84xg50zNClPaSUAHMI897Ng1mQSVxz04xmOHRU6+QRz0mRKRfSAhUHL?=
- =?us-ascii?Q?QQdYUur0WYiN8pSSX70LziJ0K83riltnRe3U5q6t+tGumhtTKx/f2epQCKyx?=
- =?us-ascii?Q?at2RszZcqF/RUJmuiL4XJtU08YLo23MIW7x+SXTlEVkprQxPiiUNKKGQ2y0D?=
- =?us-ascii?Q?PAStPZt4hVQVcXiVdu8csllpUEFCljE5FQ7ewVUsaqiual7oHSgI5pnlfEMm?=
- =?us-ascii?Q?OjMcf05uRTOyqxL6S6Qjd9OF8xLuUhe6jDp0oqOUD8A7fyHEHvoIMhrRSnOX?=
- =?us-ascii?Q?5DKWzRpDhySV8scF4iyMBqEvcQkasmF1P5T0mQw/rJrwUGTIjd1lmnkQpifG?=
- =?us-ascii?Q?grjI109OPlK3xsfSLgkBY/LnxhFDT7gKmWoeyVSuuFoDnXfrzEWJhX9IVdhC?=
- =?us-ascii?Q?aziYnOB1f1+Zo9qG9TH85jMQF91lOOxBRC7HndUb9XJCKzLoVPi1EBusmv07?=
- =?us-ascii?Q?HA=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DA9A156D3
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 23:11:07 +0000 (UTC)
+Received: from domac.alu.hr (domac.alu.unizg.hr [161.53.235.3])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E0B83C33;
+	Mon,  7 Aug 2023 16:10:42 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+	by domac.alu.hr (Postfix) with ESMTP id A89986016E;
+	Tue,  8 Aug 2023 01:09:25 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
+	t=1691449765; bh=5kH3G7SOdJsK3v0zmGHR2YGa5sxralM4yYJ6vyKKQF8=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=MIZSO1E4Q9EAcqYFHs4xLh7tvjSBsVZ5cxD7d3uGFQBIBgiAcTuSsPS9BiRHw8eOJ
+	 BkFCwZEulYD164KZNT4R7tmjH+PG6WG87PvFrJPOhVMB7KTwcOAUmzWmIRiZkIez/4
+	 FpB0XlNtcUm3CxZAnEEM6Lq+CbxxQANKGCF6A5jij4yNvmx+/PUETdvafMhPDJFuac
+	 4tsA+H+ceofSjDP+FsQGYNKpfR5MEz3HL1oBuR/d9sQrD1sgYUZsEf6Z3lRJCYb7D+
+	 Z6nMEOuoTj8IhcvrejgeMMpbwMU4uWIwqLlSJVX5b8wzEEW6HDp0aXilgHaB+VbYn8
+	 fNNNkvxMVaVHQ==
+X-Virus-Scanned: Debian amavisd-new at domac.alu.hr
+Received: from domac.alu.hr ([127.0.0.1])
+	by localhost (domac.alu.hr [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id hJz7glUKPKCV; Tue,  8 Aug 2023 01:09:23 +0200 (CEST)
+Received: from [192.168.1.6] (unknown [94.250.191.183])
+	by domac.alu.hr (Postfix) with ESMTPSA id 8A7946015F;
+	Tue,  8 Aug 2023 01:09:08 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
+	t=1691449763; bh=5kH3G7SOdJsK3v0zmGHR2YGa5sxralM4yYJ6vyKKQF8=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=z51qnLKhhBZGiD0+HvaTrQsNIDgkAgAj2HRABb68liPOwvh3zfwwhMXC75gir+1lg
+	 n9QgWhaDdk6fJmo9ZhJLQryileun0o4rXRyHXtvypXZSjxacIOCCX8DAJWdqwRiU08
+	 +9G9sCZ1AJFsGvTMFNit1zYDeTKYKjihsTtQmx/UO5wc/O0uH6cY2OMXJBzRy9NiOG
+	 L76+hihzAm2XkvBtA7L0q82vwve+E0MxpPbl4BwN/zWVzp5eT7aLKMzzMXpFZ7MpGo
+	 JkrFIieEct8+pe1sXhXwKLNaIy2n04SydrM+zH1e7GN7q6Tm+AAscJEM4xFdDsq+9s
+	 +W97wZsxowuLw==
+Message-ID: <ba4da366-b8cf-ca36-e2dc-cce7260cccf8@alu.unizg.hr>
+Date: Tue, 8 Aug 2023 01:09:03 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB4657.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1c9eeef2-35d7-43a6-e66a-08db979b2ce4
-X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Aug 2023 23:08:13.2046
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: IG15myC+MBvLGArTbwXx65UnY/zV5tU3WnZvzCUiixWpc1hHAYFkgmxf99U7DT4AYUxR1fas7p8FP4o3g/DRYh4EpoeXeAnn3SRAL5B+3ts=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR11MB7685
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.14.0
+Subject: Re: selftests: net/af_unix test_unix_oob [FAILED]
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: alexander@mihalicyn.com, davem@davemloft.net, edumazet@google.com,
+ fw@strlen.de, kuba@kernel.org, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com,
+ shuah@kernel.org
+References: <abf98942-0058-f2ad-8e55-fbdd83b7c2d6@alu.unizg.hr>
+ <20230807204648.50070-1-kuniyu@amazon.com>
+Content-Language: en-US
+From: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
+In-Reply-To: <20230807204648.50070-1-kuniyu@amazon.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
->From: Simon Horman <horms@kernel.org>
->Sent: Sunday, August 6, 2023 7:32 PM
->
->On Fri, Aug 04, 2023 at 08:04:51PM +0100, Vadim Fedorenko wrote:
->> From: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+On 8/7/23 22:46, Kuniyuki Iwashima wrote:
+> From: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
+> Date: Mon, 7 Aug 2023 21:44:41 +0200
+>> Hi all,
 >>
->> Add firmware admin command to access clock generation unit
->> configuration, it is required to enable Extended PTP and SyncE features
->> in the driver.
->> Add definitions of possible hardware variations of input and output pins
->> related to clock generation unit and functions to access the data.
+>> In the kernel 6.5-rc5 build on Ubuntu 22.04 LTS (jammy jellyfish) on a Ryzen 7950 assembled box,
+>> vanilla torvalds tree kernel, the test test_unix_oob unexpectedly fails:
 >>
->> Signed-off-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
->> Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
->
->Hi Arkadiusz and Vadim,
->
->> diff --git a/drivers/net/ethernet/intel/ice/ice_common.c
->b/drivers/net/ethernet/intel/ice/ice_common.c
->
->...
->
->> +/**
->> + * ice_aq_get_cgu_dpll_status - get dpll status
->> + * @hw: pointer to the HW struct
->> + * @dpll_num: DPLL index
->> + * @ref_state: Reference clock state
->> + * @config: current DPLL config
->> + * @dpll_state: current DPLL state
->> + * @phase_offset: Phase offset in ns
->> + * @eec_mode: EEC_mode
->> + *
->> + * Get CGU DPLL status (0x0C66)
->> + * Return: 0 on success or negative value on failure.
->> + */
->> +int
->> +ice_aq_get_cgu_dpll_status(struct ice_hw *hw, u8 dpll_num, u8
->>*ref_state,
->> +			   u8 *dpll_state, u8 *config, s64 *phase_offset,
->> +			   u8 *eec_mode)
->> +{
->> +	struct ice_aqc_get_cgu_dpll_status *cmd;
->> +	const s64 NSEC_PER_PSEC =3D 1000LL;
->
->Probably this should be in lower case, or an (upper case) #define.
->In the case of the latter it should probably be moved outside of the
->function.
+>> # selftests: net/af_unix: test_unix_oob
+>> # Test 2 failed, sigurg 23 len 63 OOB %
+>>
+>> It is this code:
+>>
+>>           /* Test 2:
+>>            * Verify that the first OOB is over written by
+>>            * the 2nd one and the first OOB is returned as
+>>            * part of the read, and sigurg is received.
+>>            */
+>>           wait_for_data(pfd, POLLIN | POLLPRI);
+>>           len = 0;
+>>           while (len < 70)
+>>                   len = recv(pfd, buf, 1024, MSG_PEEK);
+>>           len = read_data(pfd, buf, 1024);
+>>           read_oob(pfd, &oob);
+>>           if (!signal_recvd || len != 127 || oob != '#') {
+>>                   fprintf(stderr, "Test 2 failed, sigurg %d len %d OOB %c\n",
+>>                   signal_recvd, len, oob);
+>>                   die(1);
+>>           }
+>>
+>> In 6.5-rc4, this test was OK, so it might mean we have a regression?
+> 
+> Thanks for reporting.
+> 
+> I confirmed the test doesn't fail on net-next at least, but it's based
+> on v6.5-rc4.
+> 
+>    ---8<---
+>    [root@localhost ~]# ./test_unix_oob
+>    [root@localhost ~]# echo $?
+>    0
+>    [root@localhost ~]# uname -r
+>    6.5.0-rc4-01192-g66244337512f
+>    ---8<---
+> 
+> I'll check 6.5-rc5 later.
 
-Hi Simon,
+Hi, Kuniyuki,
 
-Sure, will fix.
+It seems that there is a new development. I could reproduce the error with the failed test 2
+as early as 6.0-rc1. However, the gotcha is that the error appears to be sporadically manifested
+(possibly a race)?
 
->
->> +	struct ice_aq_desc desc;
->> +	int status;
->> +
->> +	ice_fill_dflt_direct_cmd_desc(&desc,
->>ice_aqc_opc_get_cgu_dpll_status);
->> +	cmd =3D &desc.params.get_cgu_dpll_status;
->> +	cmd->dpll_num =3D dpll_num;
->> +
->> +	status =3D ice_aq_send_cmd(hw, &desc, NULL, 0, NULL);
->> +	if (!status) {
->> +		*ref_state =3D cmd->ref_state;
->> +		*dpll_state =3D cmd->dpll_state;
->> +		*config =3D cmd->config;
->> +		*phase_offset =3D le32_to_cpu(cmd->phase_offset_h);
->> +		*phase_offset <<=3D 32;
->> +		*phase_offset +=3D le32_to_cpu(cmd->phase_offset_l);
->> +		*phase_offset =3D sign_extend64(*phase_offset, 47) /
->> +			NSEC_PER_PSEC;
->
->This causes a build failure on x86_32.
->
->  ERROR: modpost: "__divdi3" [drivers/net/ethernet/intel/ice/ice.ko]
->undefined!
->
->Possibly you want (please do check for yourself):
->
->		*phase_offset =3D div64_s64(sign_extend64(*phase_offset, 47),
->					  NSEC_PER_PSEC);
->
+I am currently attempting a bisect.
 
-Yes, makes sense, thanks for catching this, will fix.
+Kind regards,
+Mirsad
 
->> +		*eec_mode =3D cmd->eec_mode;
->> +	}
->> +
->> +	return status;
->> +}
->> +
->> +/**
->> + * ice_aq_set_cgu_dpll_config - set dpll config
->> + * @hw: pointer to the HW struct
->> + * @dpll_num: DPLL index
->> + * @ref_state: Reference clock state
->> + * @config: DPLL config
->> + * @eec_mode: EEC mode
->> + *
->> + * Set CGU DPLL config (0x0C67)
->> + * Return: 0 on success or negative value on failure.
->> + */
->> +int
->> +ice_aq_set_cgu_dpll_config(struct ice_hw *hw, u8 dpll_num, u8 ref_state=
-,
->> +			   u8 config, u8 eec_mode)
->> +{
->> +	struct ice_aqc_set_cgu_dpll_config *cmd;
->> +	struct ice_aq_desc desc;
->> +
->> +	ice_fill_dflt_direct_cmd_desc(&desc,
->>ice_aqc_opc_set_cgu_dpll_config);
->> +	cmd =3D &desc.params.set_cgu_dpll_config;
->> +	cmd->dpll_num =3D dpll_num;
->> +	cmd->ref_state =3D ref_state;
->> +	cmd->config =3D config;
->> +	cmd->eec_mode =3D eec_mode;
->> +
->> +	return ice_aq_send_cmd(hw, &desc, NULL, 0, NULL);
->> +}
->> +
->> +/**
->> + * ice_aq_set_cgu_ref_prio - set input refernce priority
->
->nit: refernce -> reference
->
-
-Sure, will fix.
-
-Thank you!
-Arkadiusz
-
->> + * @hw: pointer to the HW struct
->> + * @dpll_num: DPLL index
->> + * @ref_idx: Reference pin index
->> + * @ref_priority: Reference input priority
->> + *
->> + * Set CGU reference priority (0x0C68)
->> + * Return: 0 on success or negative value on failure.
->> + */
->
->...
->
->--
->pw-bot: changes-requested
-
+>> marvin@defiant:~/linux/kernel/linux_torvalds$ grep test_unix_oob ../kselftest-6.5-rc4-1.log
+>> /net/af_unix/test_unix_oob
+>> # selftests: net/af_unix: test_unix_oob
+>> ok 2 selftests: net/af_unix: test_unix_oob
+>> marvin@defiant:~/linux/kernel/linux_torvalds$
+>>
+>> Hope this helps.
+>>
+>> NOTE: the kernel is vanilla torvalds tree, only "dirty" because the selftests were modified.
+>>
+>> Kind regards,
+>> Mirsad Todorovac
 
