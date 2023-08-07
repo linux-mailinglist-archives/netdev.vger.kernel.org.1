@@ -1,81 +1,125 @@
-Return-Path: <netdev+bounces-24996-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24997-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C768D7727D2
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 16:32:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 202A47727F3
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 16:36:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7DB902813EB
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 14:32:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F42131C20BF4
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 14:36:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE4D611192;
-	Mon,  7 Aug 2023 14:32:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 991E6D2EA;
+	Mon,  7 Aug 2023 14:36:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0704111A4
-	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 14:32:24 +0000 (UTC)
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D194AF0
-	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 07:32:22 -0700 (PDT)
-Received: from canpemm500007.china.huawei.com (unknown [172.30.72.57])
-	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4RKJc71GwQz1Z1Wb;
-	Mon,  7 Aug 2023 22:29:27 +0800 (CST)
-Received: from localhost (10.174.179.215) by canpemm500007.china.huawei.com
- (7.192.104.62) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Mon, 7 Aug
- 2023 22:32:15 +0800
-From: Yue Haibing <yuehaibing@huawei.com>
-To: <jiri@resnulli.us>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>
-CC: <netdev@vger.kernel.org>, <yuehaibing@huawei.com>
-Subject: [PATCH net-next] devlink: Remove unused devlink_dpipe_table_resource_set() declaration
-Date: Mon, 7 Aug 2023 22:32:14 +0800
-Message-ID: <20230807143214.46648-1-yuehaibing@huawei.com>
-X-Mailer: git-send-email 2.10.2.windows.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A885443A
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 14:36:47 +0000 (UTC)
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::224])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA9E010F3;
+	Mon,  7 Aug 2023 07:36:31 -0700 (PDT)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id B7938E0008;
+	Mon,  7 Aug 2023 14:36:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1691418990;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=CoovJrYPxkDFGogd5wvVhZC1R5Dq4lKn3YHaDGn4/LM=;
+	b=HmQ6EWLUrDj97BUk7IGsXLcmAJ2miJvyMgaSQlOietWT5pvqGoMYmO6yr+Bhc0Lx67tKD6
+	df7Z6+KBom37uNEQWfw8FJht1ZSI3QWLiHNjcNXBmvIwSynDxYMQivLHbJtb7uzGw5pJZ2
+	EAinCJbElQ6rO13JeWO3s9sPGU4+27Q8M5T52pS7PcbF+R8WyuQKAjhFeLCmKcp+6TWkuR
+	IdO0UMWLzMibIMpfP4ahj/zKwHCDxTgVc0R059ZGQaSUIC06o5hsPMQ2XYgtkWYBNaUzS4
+	qP1VmAe+U2gpEDS1hmzhbhx0eTbGq6h1G2uNh4GG0oC80TOYZeIgosi77P7S8A==
+Date: Mon, 7 Aug 2023 16:36:26 +0200
+From: Herve Codina <herve.codina@bootlin.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Linus Walleij <linus.walleij@linaro.org>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
+ <robh+dt@kernel.org>, Krzysztof Kozlowski
+ <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
+ Lee Jones <lee@kernel.org>, Qiang Zhao <qiang.zhao@nxp.com>, Li Yang
+ <leoyang.li@nxp.com>, Liam Girdwood <lgirdwood@gmail.com>, Mark Brown
+ <broonie@kernel.org>, Jaroslav Kysela <perex@perex.cz>, Takashi Iwai
+ <tiwai@suse.com>, Shengjiu Wang <shengjiu.wang@gmail.com>, Xiubo Li
+ <Xiubo.Lee@gmail.com>, Fabio Estevam <festevam@gmail.com>, Nicolin Chen
+ <nicoleotsuka@gmail.com>, Christophe Leroy <christophe.leroy@csgroup.eu>,
+ Randy Dunlap <rdunlap@infradead.org>, netdev@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, alsa-devel@alsa-project.org, Thomas
+ Petazzoni <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH v2 24/28] pinctrl: Add support for the Lantic PEF2256
+ pinmux
+Message-ID: <20230807163626.79a5ca7b@bootlin.com>
+In-Reply-To: <eb99e739-6578-4aee-a0f4-7a0c5e5e81ef@lunn.ch>
+References: <20230726150225.483464-1-herve.codina@bootlin.com>
+	<20230726150225.483464-25-herve.codina@bootlin.com>
+	<CACRpkdYXCQRd3ZXNGHwMaQYiJc7tGtAJnBaSh5O-8ruDAJVdiA@mail.gmail.com>
+	<CACRpkdZebvrdGXooLXmgXhUcgdgxBczJBpdEoEyJDR39abaAqQ@mail.gmail.com>
+	<eb99e739-6578-4aee-a0f4-7a0c5e5e81ef@lunn.ch>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.174.179.215]
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- canpemm500007.china.huawei.com (7.192.104.62)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: herve.codina@bootlin.com
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Commit f6b19b354d50 ("net: devlink: select NET_DEVLINK from drivers")
-removed this but leave the declaration.
+Hi Linus, Andrew,
 
-Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
----
- include/net/devlink.h | 3 ---
- 1 file changed, 3 deletions(-)
+On Mon, 7 Aug 2023 15:17:11 +0200
+Andrew Lunn <andrew@lunn.ch> wrote:
 
-diff --git a/include/net/devlink.h b/include/net/devlink.h
-index a1a8e1b6e7df..f7fec0791acc 100644
---- a/include/net/devlink.h
-+++ b/include/net/devlink.h
-@@ -1743,9 +1743,6 @@ int devl_resource_size_get(struct devlink *devlink,
- int devl_dpipe_table_resource_set(struct devlink *devlink,
- 				  const char *table_name, u64 resource_id,
- 				  u64 resource_units);
--int devlink_dpipe_table_resource_set(struct devlink *devlink,
--				     const char *table_name, u64 resource_id,
--				     u64 resource_units);
- void devl_resource_occ_get_register(struct devlink *devlink,
- 				    u64 resource_id,
- 				    devlink_resource_occ_get_t *occ_get,
+> On Mon, Aug 07, 2023 at 03:06:42PM +0200, Linus Walleij wrote:
+> > On Mon, Aug 7, 2023 at 3:05 PM Linus Walleij <linus.walleij@linaro.org> wrote:
+> >   
+> > > > Signed-off-by: Herve Codina <herve.codina@bootlin.com>  
+> > >
+> > > So it is a bridge chip? Please use that terminology since Linux
+> > > DRM often talks about bridges.  
+> > 
+> > Replying to self: no it's not a bridge, it's a WAN thingy.
+> > 
+> > So perhaps write that this is a WAN interface adapter chip.  
+> 
+> Hi Linus
+> 
+> In the E1/T1/J1 world, framer is a well understood concept. Maybe the
+> text needs a bit more background information to explain what this is
+> to somebody who does not have an old school telecoms background.
+> 
+>    Andrew
+
+Maybe I can add in my commit log:
+--- 8< ---
+This kind of component can be found in old telecommunication system.
+It was used to digital transmission of many simultaneous telephone calls
+by time-division multiplexing. Also using HDLC protocol, WAN networks
+can be reached through the framer.
+--- 8< ---
+
+Do you think it will be better ?
+
+Regards,
+Hervé Codina
+
 -- 
-2.34.1
-
+Hervé Codina, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
 
