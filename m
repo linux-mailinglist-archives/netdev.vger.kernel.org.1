@@ -1,243 +1,152 @@
-Return-Path: <netdev+bounces-24754-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24755-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63E7877191F
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 06:47:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C72D771935
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 06:59:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 166E3281042
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 04:47:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 50D001C208A7
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 04:59:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B59667F7;
-	Mon,  7 Aug 2023 04:46:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1081B80E;
+	Mon,  7 Aug 2023 04:59:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A79BE194
-	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 04:46:59 +0000 (UTC)
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33F2E10FA
-	for <netdev@vger.kernel.org>; Sun,  6 Aug 2023 21:46:57 -0700 (PDT)
-Received: from ptx.hi.pengutronix.de ([2001:67c:670:100:1d::c0])
-	by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1qSs8d-0007YL-53; Mon, 07 Aug 2023 06:46:39 +0200
-Received: from ore by ptx.hi.pengutronix.de with local (Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1qSs8Y-00077x-2w; Mon, 07 Aug 2023 06:46:34 +0200
-Date: Mon, 7 Aug 2023 06:46:34 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Ziqi Zhao <astrajoan@yahoo.com>
-Cc: davem@davemloft.net, edumazet@google.com, ivan.orlov0322@gmail.com,
-	kernel@pengutronix.de, kuba@kernel.org, linux@rempel-privat.de,
-	linux-can@vger.kernel.org, mkl@pengutronix.de, pabeni@redhat.com,
-	robin@protonic.nl, skhan@linuxfoundation.org,
-	socketcan@hartkopp.net, arnd@arndb.de, netdev@vger.kernel.org,
-	bridge@lists.linux-foundation.org, syzkaller-bugs@googlegroups.com,
-	linux-kernel@vger.kernel.org, mudongliangabcd@gmail.com,
-	nikolay@nvidia.com,
-	syzbot+1591462f226d9cbf0564@syzkaller.appspotmail.com,
-	roopa@nvidia.com,
-	syzbot+881d65229ca4f9ae8c84@syzkaller.appspotmail.com
-Subject: Re: [PATCH] can: j1939: prevent deadlock by changing
- j1939_socks_lock to rwlock
-Message-ID: <20230807044634.GA5736@pengutronix.de>
-References: <20230704064710.3189-1-astrajoan@yahoo.com>
- <20230721162226.8639-1-astrajoan@yahoo.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00DFA194
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 04:59:48 +0000 (UTC)
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C984510FA;
+	Sun,  6 Aug 2023 21:59:43 -0700 (PDT)
+Received: from kwepemi500008.china.huawei.com (unknown [172.30.72.53])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4RK3xM2nf2zrSFk;
+	Mon,  7 Aug 2023 12:58:31 +0800 (CST)
+Received: from [10.67.109.254] (10.67.109.254) by
+ kwepemi500008.china.huawei.com (7.221.188.139) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Mon, 7 Aug 2023 12:59:39 +0800
+Message-ID: <815f4639-7a21-4438-b9dc-0b36f9b08b17@huawei.com>
+Date: Mon, 7 Aug 2023 12:59:38 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20230721162226.8639-1-astrajoan@yahoo.com>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-SA-Exim-Connect-IP: 2001:67c:670:100:1d::c0
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.0
+Subject: Re: [PATCH -next 1/6] net: thunderx: Remove unnecessary ternary
+ operators
+Content-Language: en-US
+To: Ping-Ke Shih <pkshih@realtek.com>, "sgoutham@marvell.com"
+	<sgoutham@marvell.com>, "davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
+	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"jesse.brandeburg@intel.com" <jesse.brandeburg@intel.com>,
+	"anthony.l.nguyen@intel.com" <anthony.l.nguyen@intel.com>,
+	"tariqt@nvidia.com" <tariqt@nvidia.com>, "s.shtylyov@omp.ru"
+	<s.shtylyov@omp.ru>, "aspriel@gmail.com" <aspriel@gmail.com>,
+	"franky.lin@broadcom.com" <franky.lin@broadcom.com>,
+	"hante.meuleman@broadcom.com" <hante.meuleman@broadcom.com>,
+	"kvalo@kernel.org" <kvalo@kernel.org>, "richardcochran@gmail.com"
+	<richardcochran@gmail.com>, "yoshihiro.shimoda.uh@renesas.com"
+	<yoshihiro.shimoda.uh@renesas.com>, "u.kleine-koenig@pengutronix.de"
+	<u.kleine-koenig@pengutronix.de>, "mkl@pengutronix.de" <mkl@pengutronix.de>,
+	"lee@kernel.org" <lee@kernel.org>, "set_pte_at@outlook.com"
+	<set_pte_at@outlook.com>, "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "intel-wired-lan@lists.osuosl.org"
+	<intel-wired-lan@lists.osuosl.org>, "linux-rdma@vger.kernel.org"
+	<linux-rdma@vger.kernel.org>, "linux-renesas-soc@vger.kernel.org"
+	<linux-renesas-soc@vger.kernel.org>, "linux-wireless@vger.kernel.org"
+	<linux-wireless@vger.kernel.org>, "brcm80211-dev-list.pdl@broadcom.com"
+	<brcm80211-dev-list.pdl@broadcom.com>, "SHA-cyfmac-dev-list@infineon.com"
+	<SHA-cyfmac-dev-list@infineon.com>
+References: <20230804035346.2879318-1-ruanjinjie@huawei.com>
+ <20230804035346.2879318-2-ruanjinjie@huawei.com>
+ <15759f98483947999393a25b857bc4fe@realtek.com>
+From: Ruan Jinjie <ruanjinjie@huawei.com>
+In-Reply-To: <15759f98483947999393a25b857bc4fe@realtek.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.67.109.254]
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ kwepemi500008.china.huawei.com (7.221.188.139)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-7.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Jul 21, 2023 at 09:22:26AM -0700, Ziqi Zhao wrote:
-> The following 3 locks would race against each other, causing the
-> deadlock situation in the Syzbot bug report:
-> 
-> - j1939_socks_lock
-> - active_session_list_lock
-> - sk_session_queue_lock
-> 
-> A reasonable fix is to change j1939_socks_lock to an rwlock, since in
-> the rare situations where a write lock is required for the linked list
-> that j1939_socks_lock is protecting, the code does not attempt to
-> acquire any more locks. This would break the circular lock dependency,
-> where, for example, the current thread already locks j1939_socks_lock
-> and attempts to acquire sk_session_queue_lock, and at the same time,
-> another thread attempts to acquire j1939_socks_lock while holding
-> sk_session_queue_lock.
-> 
-> NOTE: This patch along does not fix the unregister_netdevice bug
-> reported by Syzbot; instead, it solves a deadlock situation to prepare
-> for one or more further patches to actually fix the Syzbot bug, which
-> appears to be a reference counting problem within the j1939 codebase.
-> 
-> Reported-by: syzbot+1591462f226d9cbf0564@syzkaller.appspotmail.com
-> Signed-off-by: Ziqi Zhao <astrajoan@yahoo.com>
 
-Acked-by: Oleksij Rempel <o.rempel@pengutronix.de>
 
-Thank you!
+On 2023/8/7 9:39, Ping-Ke Shih wrote:
+> 
+> 
+>> -----Original Message-----
+>> From: Ruan Jinjie <ruanjinjie@huawei.com>
+>> Sent: Friday, August 4, 2023 11:54 AM
+>> To: sgoutham@marvell.com; davem@davemloft.net; edumazet@google.com; kuba@kernel.org; pabeni@redhat.com;
+>> jesse.brandeburg@intel.com; anthony.l.nguyen@intel.com; tariqt@nvidia.com; s.shtylyov@omp.ru;
+>> aspriel@gmail.com; franky.lin@broadcom.com; hante.meuleman@broadcom.com; kvalo@kernel.org;
+>> richardcochran@gmail.com; yoshihiro.shimoda.uh@renesas.com; ruanjinjie@huawei.com;
+>> u.kleine-koenig@pengutronix.de; mkl@pengutronix.de; lee@kernel.org; set_pte_at@outlook.com;
+>> linux-arm-kernel@lists.infradead.org; netdev@vger.kernel.org; intel-wired-lan@lists.osuosl.org;
+>> linux-rdma@vger.kernel.org; linux-renesas-soc@vger.kernel.org; linux-wireless@vger.kernel.org;
+>> brcm80211-dev-list.pdl@broadcom.com; SHA-cyfmac-dev-list@infineon.com
+>> Subject: [PATCH -next 1/6] net: thunderx: Remove unnecessary ternary operators
+>>
+>> Ther are a little ternary operators, the true or false judgement
+>> of which is unnecessary in C language semantics.
+>>
+>> Signed-off-by: Ruan Jinjie <ruanjinjie@huawei.com>
+>> ---
+>>  drivers/net/ethernet/cavium/thunder/nic_main.c    | 2 +-
+>>  drivers/net/ethernet/cavium/thunder/thunder_bgx.c | 2 +-
+>>  2 files changed, 2 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/drivers/net/ethernet/cavium/thunder/nic_main.c
+>> b/drivers/net/ethernet/cavium/thunder/nic_main.c
+>> index 0ec65ec634df..b7cf4ba89b7c 100644
+>> --- a/drivers/net/ethernet/cavium/thunder/nic_main.c
+>> +++ b/drivers/net/ethernet/cavium/thunder/nic_main.c
+>> @@ -174,7 +174,7 @@ static void nic_mbx_send_ready(struct nicpf *nic, int vf)
+>>                 if (mac)
+>>                         ether_addr_copy((u8 *)&mbx.nic_cfg.mac_addr, mac);
+>>         }
+>> -       mbx.nic_cfg.sqs_mode = (vf >= nic->num_vf_en) ? true : false;
+>> +       mbx.nic_cfg.sqs_mode = vf >= nic->num_vf_en;
+>>         mbx.nic_cfg.node_id = nic->node;
+>>
+>>         mbx.nic_cfg.loopback_supported = vf < nic->num_vf_en;
+>> diff --git a/drivers/net/ethernet/cavium/thunder/thunder_bgx.c
+>> b/drivers/net/ethernet/cavium/thunder/thunder_bgx.c
+>> index a317feb8decb..9e467cecc33a 100644
+>> --- a/drivers/net/ethernet/cavium/thunder/thunder_bgx.c
+>> +++ b/drivers/net/ethernet/cavium/thunder/thunder_bgx.c
+>> @@ -957,7 +957,7 @@ static void bgx_poll_for_sgmii_link(struct lmac *lmac)
+>>                 goto next_poll;
+>>         }
+>>
+>> -       lmac->link_up = ((pcs_link & PCS_MRX_STATUS_LINK) != 0) ? true : false;
+>> +       lmac->link_up = (pcs_link & PCS_MRX_STATUS_LINK) != 0;
+> 
+> lmac->link_up = !!(pcs_link & PCS_MRX_STATUS_LINK);
 
-> ---
->  net/can/j1939/j1939-priv.h |  2 +-
->  net/can/j1939/main.c       |  2 +-
->  net/can/j1939/socket.c     | 25 +++++++++++++------------
->  3 files changed, 15 insertions(+), 14 deletions(-)
-> 
-> diff --git a/net/can/j1939/j1939-priv.h b/net/can/j1939/j1939-priv.h
-> index 16af1a7f80f6..74f15592d170 100644
-> --- a/net/can/j1939/j1939-priv.h
-> +++ b/net/can/j1939/j1939-priv.h
-> @@ -86,7 +86,7 @@ struct j1939_priv {
->  	unsigned int tp_max_packet_size;
->  
->  	/* lock for j1939_socks list */
-> -	spinlock_t j1939_socks_lock;
-> +	rwlock_t j1939_socks_lock;
->  	struct list_head j1939_socks;
->  
->  	struct kref rx_kref;
-> diff --git a/net/can/j1939/main.c b/net/can/j1939/main.c
-> index ecff1c947d68..a6fb89fa6278 100644
-> --- a/net/can/j1939/main.c
-> +++ b/net/can/j1939/main.c
-> @@ -274,7 +274,7 @@ struct j1939_priv *j1939_netdev_start(struct net_device *ndev)
->  		return ERR_PTR(-ENOMEM);
->  
->  	j1939_tp_init(priv);
-> -	spin_lock_init(&priv->j1939_socks_lock);
-> +	rwlock_init(&priv->j1939_socks_lock);
->  	INIT_LIST_HEAD(&priv->j1939_socks);
->  
->  	mutex_lock(&j1939_netdev_lock);
-> diff --git a/net/can/j1939/socket.c b/net/can/j1939/socket.c
-> index feaec4ad6d16..a8b981dc2065 100644
-> --- a/net/can/j1939/socket.c
-> +++ b/net/can/j1939/socket.c
-> @@ -80,16 +80,16 @@ static void j1939_jsk_add(struct j1939_priv *priv, struct j1939_sock *jsk)
->  	jsk->state |= J1939_SOCK_BOUND;
->  	j1939_priv_get(priv);
->  
-> -	spin_lock_bh(&priv->j1939_socks_lock);
-> +	write_lock_bh(&priv->j1939_socks_lock);
->  	list_add_tail(&jsk->list, &priv->j1939_socks);
-> -	spin_unlock_bh(&priv->j1939_socks_lock);
-> +	write_unlock_bh(&priv->j1939_socks_lock);
->  }
->  
->  static void j1939_jsk_del(struct j1939_priv *priv, struct j1939_sock *jsk)
->  {
-> -	spin_lock_bh(&priv->j1939_socks_lock);
-> +	write_lock_bh(&priv->j1939_socks_lock);
->  	list_del_init(&jsk->list);
-> -	spin_unlock_bh(&priv->j1939_socks_lock);
-> +	write_unlock_bh(&priv->j1939_socks_lock);
->  
->  	j1939_priv_put(priv);
->  	jsk->state &= ~J1939_SOCK_BOUND;
-> @@ -329,13 +329,13 @@ bool j1939_sk_recv_match(struct j1939_priv *priv, struct j1939_sk_buff_cb *skcb)
->  	struct j1939_sock *jsk;
->  	bool match = false;
->  
-> -	spin_lock_bh(&priv->j1939_socks_lock);
-> +	read_lock_bh(&priv->j1939_socks_lock);
->  	list_for_each_entry(jsk, &priv->j1939_socks, list) {
->  		match = j1939_sk_recv_match_one(jsk, skcb);
->  		if (match)
->  			break;
->  	}
-> -	spin_unlock_bh(&priv->j1939_socks_lock);
-> +	read_unlock_bh(&priv->j1939_socks_lock);
->  
->  	return match;
->  }
-> @@ -344,11 +344,11 @@ void j1939_sk_recv(struct j1939_priv *priv, struct sk_buff *skb)
->  {
->  	struct j1939_sock *jsk;
->  
-> -	spin_lock_bh(&priv->j1939_socks_lock);
-> +	read_lock_bh(&priv->j1939_socks_lock);
->  	list_for_each_entry(jsk, &priv->j1939_socks, list) {
->  		j1939_sk_recv_one(jsk, skb);
->  	}
-> -	spin_unlock_bh(&priv->j1939_socks_lock);
-> +	read_unlock_bh(&priv->j1939_socks_lock);
->  }
->  
->  static void j1939_sk_sock_destruct(struct sock *sk)
-> @@ -484,6 +484,7 @@ static int j1939_sk_bind(struct socket *sock, struct sockaddr *uaddr, int len)
->  
->  		priv = j1939_netdev_start(ndev);
->  		dev_put(ndev);
-> +
->  		if (IS_ERR(priv)) {
->  			ret = PTR_ERR(priv);
->  			goto out_release_sock;
-> @@ -1078,12 +1079,12 @@ void j1939_sk_errqueue(struct j1939_session *session,
->  	}
->  
->  	/* spread RX notifications to all sockets subscribed to this session */
-> -	spin_lock_bh(&priv->j1939_socks_lock);
-> +	read_lock_bh(&priv->j1939_socks_lock);
->  	list_for_each_entry(jsk, &priv->j1939_socks, list) {
->  		if (j1939_sk_recv_match_one(jsk, &session->skcb))
->  			__j1939_sk_errqueue(session, &jsk->sk, type);
->  	}
-> -	spin_unlock_bh(&priv->j1939_socks_lock);
-> +	read_unlock_bh(&priv->j1939_socks_lock);
->  };
->  
->  void j1939_sk_send_loop_abort(struct sock *sk, int err)
-> @@ -1271,7 +1272,7 @@ void j1939_sk_netdev_event_netdown(struct j1939_priv *priv)
->  	struct j1939_sock *jsk;
->  	int error_code = ENETDOWN;
->  
-> -	spin_lock_bh(&priv->j1939_socks_lock);
-> +	read_lock_bh(&priv->j1939_socks_lock);
->  	list_for_each_entry(jsk, &priv->j1939_socks, list) {
->  		jsk->sk.sk_err = error_code;
->  		if (!sock_flag(&jsk->sk, SOCK_DEAD))
-> @@ -1279,7 +1280,7 @@ void j1939_sk_netdev_event_netdown(struct j1939_priv *priv)
->  
->  		j1939_sk_queue_drop_all(priv, jsk, error_code);
->  	}
-> -	spin_unlock_bh(&priv->j1939_socks_lock);
-> +	read_unlock_bh(&priv->j1939_socks_lock);
->  }
->  
->  static int j1939_sk_no_ioctlcmd(struct socket *sock, unsigned int cmd,
-> -- 
-> 2.34.1
-> 
-> 
-> 
+Thank you! I'll improve it sooner.
 
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+> 
+>>         an_result = bgx_reg_read(lmac->bgx, lmac->lmacid,
+>>                                  BGX_GMP_PCS_ANX_AN_RESULTS);
+>>
+>> --
+>> 2.34.1
+>>
+>>
+>> ------Please consider the environment before printing this e-mail.
+> 
 
