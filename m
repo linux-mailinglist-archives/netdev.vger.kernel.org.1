@@ -1,140 +1,130 @@
-Return-Path: <netdev+bounces-24935-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24930-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C280772331
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 13:56:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF2CB7722D2
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 13:39:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BC8681C20A78
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 11:56:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F01B01C20403
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 11:39:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A938F100CA;
-	Mon,  7 Aug 2023 11:56:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADD7AFBF0;
+	Mon,  7 Aug 2023 11:39:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E597100BD
-	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 11:56:21 +0000 (UTC)
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D0F69D;
-	Mon,  7 Aug 2023 04:56:19 -0700 (PDT)
-Received: from kwepemm600007.china.huawei.com (unknown [172.30.72.57])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4RKDpj0RJ0zfbnM;
-	Mon,  7 Aug 2023 19:38:21 +0800 (CST)
-Received: from localhost.localdomain (10.67.165.2) by
- kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Mon, 7 Aug 2023 19:39:29 +0800
-From: Jijie Shao <shaojijie@huawei.com>
-To: <yisen.zhuang@huawei.com>, <salil.mehta@huawei.com>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>
-CC: <shenjian15@huawei.com>, <wangjie125@huawei.com>,
-	<liuyonglong@huawei.com>, <wangpeiyang1@huawei.com>, <shaojijie@huawei.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH V2 net 4/4] net: hns3: fix deadlock issue when externel_lb and reset are executed together
-Date: Mon, 7 Aug 2023 19:34:52 +0800
-Message-ID: <20230807113452.474224-5-shaojijie@huawei.com>
-X-Mailer: git-send-email 2.30.0
-In-Reply-To: <20230807113452.474224-1-shaojijie@huawei.com>
-References: <20230807113452.474224-1-shaojijie@huawei.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1F3CDF71
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 11:39:43 +0000 (UTC)
+Received: from mail-wm1-x332.google.com (mail-wm1-x332.google.com [IPv6:2a00:1450:4864:20::332])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45B4A268A
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 04:39:18 -0700 (PDT)
+Received: by mail-wm1-x332.google.com with SMTP id 5b1f17b1804b1-3fe32ec7201so97275e9.1
+        for <netdev@vger.kernel.org>; Mon, 07 Aug 2023 04:39:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1691408299; x=1692013099;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8W+bofDGJlB4M5uPfge6sirfCHYwbUhgLAeHUFoaWIs=;
+        b=oK6l60z3Y/5Wy8fWWjBLc/gvsatLjg8OEhPFkO7kO+u77JF6wUsxpXgdPSy9a5bo7W
+         zKkWWxjj/9Wt3AGNzGGGSE3JL0YqxAwmng2sHl6++BVkQa6MRVUZ0pTuMkqhonqp7cVL
+         ooxMdgywEpg3u69CuhN/PSltoIPqWxsH2dKODl/IJ+j0Qibff4MoI0VZG2s5MSIOLiMm
+         Hv7xGb8InonKy5qRRtaVSo6bIJGE7CxKsH+pICSO4LHQ08tIoAyhjOS8H3uEcQsel7wS
+         XV+KpClkKXgOdMvNiCEBdnDJNddhHbV9f0w3sYEdSkPRTNAEZZbjDntaHS60Jembj3gk
+         6f5Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691408299; x=1692013099;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8W+bofDGJlB4M5uPfge6sirfCHYwbUhgLAeHUFoaWIs=;
+        b=edIVmc0ytPY5Vm8BkGpNEWPR4DNCJNqUDodj8GArS+4RLZP8FDNQ/xXnPikyqhugiL
+         gxevraysxryiUiY6xCpziErSVGeyh0ub3ml8oGrHxMjJHiSt9X7rVyMHcGll92lDrvni
+         V6vpr+EP7RoA4cchBn+MnedZhlutgyTDzNHrYPiofIs9pzw835zZdi1JJOFnrXNIDDRY
+         LjlqbfWEH8ewjuguZWMkPCCqx5bUvGCPQ9nB5l62MtHP0KW89d0lvvKS8DObH79u0AKl
+         GinbM/5BdT06kVy8dbOFIjMwzf7Dyqyg1+bKkQ2ctWSOVnAy5kxd6LYXWvzJ/g+aS+Ap
+         m4Vw==
+X-Gm-Message-State: AOJu0YzdeP9WIsmYEli9kKHf2X2mzw+35iM4f8jzafFGPEXtQZ8x26Ik
+	kso3RJII2duBZGnPb7nACKN0B2UYCmemuJT+T08Evw==
+X-Google-Smtp-Source: AGHT+IGmhutOzq3fC03uoNya0cqOJh4UT8fO+Jie4zzFpBH4+HCUPwSHATUE0aSXieDtSvPS6NpGxhP3oVmADaOnfiE=
+X-Received: by 2002:a05:600c:1d13:b0:3fe:b38:5596 with SMTP id
+ l19-20020a05600c1d1300b003fe0b385596mr143015wms.6.1691408299251; Mon, 07 Aug
+ 2023 04:38:19 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.67.165.2]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- kwepemm600007.china.huawei.com (7.193.23.208)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+References: <0000000000005003fe05a8af2231@google.com> <000000000000597f580602464669@google.com>
+In-Reply-To: <000000000000597f580602464669@google.com>
+From: Aleksandr Nogikh <nogikh@google.com>
+Date: Mon, 7 Aug 2023 13:38:07 +0200
+Message-ID: <CANp29Y7srmhGbKYB_6Y5KvijXrgHtzU9NqKcBcnit0wLmvbdCA@mail.gmail.com>
+Subject: Re: [syzbot] [wireless?] INFO: trying to register non-static key in skb_queue_tail
+To: syzbot <syzbot+743547b2a7fd655ffb6d@syzkaller.appspotmail.com>
+Cc: andreyknvl@google.com, ath9k-devel@qca.qualcomm.com, 
+	brookebasile@gmail.com, davem@davemloft.net, kuba@kernel.org, 
+	kvalo@codeaurora.org, kvalo@kernel.org, linux-kernel@vger.kernel.org, 
+	linux-usb@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, pchelkin@ispras.ru, 
+	quic_kvalo@quicinc.com, syzkaller-bugs@googlegroups.com, toke@toke.dk
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-15.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SORTED_RECIPS,
+	SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+	autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Yonglong Liu <liuyonglong@huawei.com>
+On Sun, Aug 6, 2023 at 9:38=E2=80=AFPM syzbot
+<syzbot+743547b2a7fd655ffb6d@syzkaller.appspotmail.com> wrote:
+>
+> syzbot suspects this issue was fixed by commit:
+>
+> commit 061b0cb9327b80d7a0f63a33e7c3e2a91a71f142
+> Author: Fedor Pchelkin <pchelkin@ispras.ru>
+> Date:   Wed May 17 15:03:17 2023 +0000
+>
+>     wifi: ath9k: don't allow to overwrite ENDPOINT0 attributes
+>
+> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=3D1243d549a8=
+0000
+> start commit:   559089e0a93d vmalloc: replace VM_NO_HUGE_VMAP with VM_ALL=
+O..
+> git tree:       upstream
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=3Ddd7c9a79dfcfa=
+205
+> dashboard link: https://syzkaller.appspot.com/bug?extid=3D743547b2a7fd655=
+ffb6d
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=3D15d5d7f4f00=
+000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=3D106ff834f0000=
+0
+>
+> If the result looks correct, please mark the issue as fixed by replying w=
+ith:
+>
+> #syz fix: wifi: ath9k: don't allow to overwrite ENDPOINT0 attributes
 
-When externel_lb and reset are executed together, a deadlock may
-occur:
-[ 3147.217009] INFO: task kworker/u321:0:7 blocked for more than 120 seconds.
-[ 3147.230483] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-[ 3147.238999] task:kworker/u321:0  state:D stack:    0 pid:    7 ppid:     2 flags:0x00000008
-[ 3147.248045] Workqueue: hclge hclge_service_task [hclge]
-[ 3147.253957] Call trace:
-[ 3147.257093]  __switch_to+0x7c/0xbc
-[ 3147.261183]  __schedule+0x338/0x6f0
-[ 3147.265357]  schedule+0x50/0xe0
-[ 3147.269185]  schedule_preempt_disabled+0x18/0x24
-[ 3147.274488]  __mutex_lock.constprop.0+0x1d4/0x5dc
-[ 3147.279880]  __mutex_lock_slowpath+0x1c/0x30
-[ 3147.284839]  mutex_lock+0x50/0x60
-[ 3147.288841]  rtnl_lock+0x20/0x2c
-[ 3147.292759]  hclge_reset_prepare+0x68/0x90 [hclge]
-[ 3147.298239]  hclge_reset_subtask+0x88/0xe0 [hclge]
-[ 3147.303718]  hclge_reset_service_task+0x84/0x120 [hclge]
-[ 3147.309718]  hclge_service_task+0x2c/0x70 [hclge]
-[ 3147.315109]  process_one_work+0x1d0/0x490
-[ 3147.319805]  worker_thread+0x158/0x3d0
-[ 3147.324240]  kthread+0x108/0x13c
-[ 3147.328154]  ret_from_fork+0x10/0x18
+Seems reasonable.
 
-In externel_lb process, the hns3 driver call napi_disable()
-first, then the reset happen, then the restore process of the
-externel_lb will fail, and will not call napi_enable(). When
-doing externel_lb again, napi_disable() will be double call,
-cause a deadlock of rtnl_lock().
+#syz fix: wifi: ath9k: don't allow to overwrite ENDPOINT0 attributes
 
-This patch use the HNS3_NIC_STATE_DOWN state to protect the
-calling of napi_disable() and napi_enable() in externel_lb
-process, just as the usage in ndo_stop() and ndo_start().
-
-Fixes: 04b6ba143521 ("net: hns3: add support for external loopback test")
-Signed-off-by: Yonglong Liu <liuyonglong@huawei.com>
-Signed-off-by: Jijie Shao <shaojijie@huawei.com>
----
- drivers/net/ethernet/hisilicon/hns3/hns3_enet.c | 14 +++++++++++++-
- 1 file changed, 13 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
-index 9f6890059666..b7b51e56b030 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
-@@ -5854,6 +5854,9 @@ void hns3_external_lb_prepare(struct net_device *ndev, bool if_running)
- 	if (!if_running)
- 		return;
- 
-+	if (test_and_set_bit(HNS3_NIC_STATE_DOWN, &priv->state))
-+		return;
-+
- 	netif_carrier_off(ndev);
- 	netif_tx_disable(ndev);
- 
-@@ -5882,7 +5885,16 @@ void hns3_external_lb_restore(struct net_device *ndev, bool if_running)
- 	if (!if_running)
- 		return;
- 
--	hns3_nic_reset_all_ring(priv->ae_handle);
-+	if (hns3_nic_resetting(ndev))
-+		return;
-+
-+	if (!test_bit(HNS3_NIC_STATE_DOWN, &priv->state))
-+		return;
-+
-+	if (hns3_nic_reset_all_ring(priv->ae_handle))
-+		return;
-+
-+	clear_bit(HNS3_NIC_STATE_DOWN, &priv->state);
- 
- 	for (i = 0; i < priv->vector_num; i++)
- 		hns3_vector_enable(&priv->tqp_vector[i]);
--- 
-2.30.0
-
+>
+> For information about bisection process see: https://goo.gl/tpsmEJ#bisect=
+ion
+>
+> --
+> You received this message because you are subscribed to the Google Groups=
+ "syzkaller-bugs" group.
+> To unsubscribe from this group and stop receiving emails from it, send an=
+ email to syzkaller-bugs+unsubscribe@googlegroups.com.
+> To view this discussion on the web visit https://groups.google.com/d/msgi=
+d/syzkaller-bugs/000000000000597f580602464669%40google.com.
 
