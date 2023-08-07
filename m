@@ -1,151 +1,236 @@
-Return-Path: <netdev+bounces-25185-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25186-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83B0E7734AA
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 01:11:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 904C67734F9
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 01:28:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B44991C20DF0
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 23:11:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A41FA280DB1
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 23:28:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4913518007;
-	Mon,  7 Aug 2023 23:11:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DFE21802B;
+	Mon,  7 Aug 2023 23:28:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DA9A156D3
-	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 23:11:07 +0000 (UTC)
-Received: from domac.alu.hr (domac.alu.unizg.hr [161.53.235.3])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E0B83C33;
-	Mon,  7 Aug 2023 16:10:42 -0700 (PDT)
-Received: from localhost (localhost [127.0.0.1])
-	by domac.alu.hr (Postfix) with ESMTP id A89986016E;
-	Tue,  8 Aug 2023 01:09:25 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
-	t=1691449765; bh=5kH3G7SOdJsK3v0zmGHR2YGa5sxralM4yYJ6vyKKQF8=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=MIZSO1E4Q9EAcqYFHs4xLh7tvjSBsVZ5cxD7d3uGFQBIBgiAcTuSsPS9BiRHw8eOJ
-	 BkFCwZEulYD164KZNT4R7tmjH+PG6WG87PvFrJPOhVMB7KTwcOAUmzWmIRiZkIez/4
-	 FpB0XlNtcUm3CxZAnEEM6Lq+CbxxQANKGCF6A5jij4yNvmx+/PUETdvafMhPDJFuac
-	 4tsA+H+ceofSjDP+FsQGYNKpfR5MEz3HL1oBuR/d9sQrD1sgYUZsEf6Z3lRJCYb7D+
-	 Z6nMEOuoTj8IhcvrejgeMMpbwMU4uWIwqLlSJVX5b8wzEEW6HDp0aXilgHaB+VbYn8
-	 fNNNkvxMVaVHQ==
-X-Virus-Scanned: Debian amavisd-new at domac.alu.hr
-Received: from domac.alu.hr ([127.0.0.1])
-	by localhost (domac.alu.hr [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id hJz7glUKPKCV; Tue,  8 Aug 2023 01:09:23 +0200 (CEST)
-Received: from [192.168.1.6] (unknown [94.250.191.183])
-	by domac.alu.hr (Postfix) with ESMTPSA id 8A7946015F;
-	Tue,  8 Aug 2023 01:09:08 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
-	t=1691449763; bh=5kH3G7SOdJsK3v0zmGHR2YGa5sxralM4yYJ6vyKKQF8=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=z51qnLKhhBZGiD0+HvaTrQsNIDgkAgAj2HRABb68liPOwvh3zfwwhMXC75gir+1lg
-	 n9QgWhaDdk6fJmo9ZhJLQryileun0o4rXRyHXtvypXZSjxacIOCCX8DAJWdqwRiU08
-	 +9G9sCZ1AJFsGvTMFNit1zYDeTKYKjihsTtQmx/UO5wc/O0uH6cY2OMXJBzRy9NiOG
-	 L76+hihzAm2XkvBtA7L0q82vwve+E0MxpPbl4BwN/zWVzp5eT7aLKMzzMXpFZ7MpGo
-	 JkrFIieEct8+pe1sXhXwKLNaIy2n04SydrM+zH1e7GN7q6Tm+AAscJEM4xFdDsq+9s
-	 +W97wZsxowuLw==
-Message-ID: <ba4da366-b8cf-ca36-e2dc-cce7260cccf8@alu.unizg.hr>
-Date: Tue, 8 Aug 2023 01:09:03 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A3BD16403
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 23:28:52 +0000 (UTC)
+Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3305919A1
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 16:28:49 -0700 (PDT)
+Received: by mail-pf1-x42a.google.com with SMTP id d2e1a72fcca58-686b9964ae2so3587538b3a.3
+        for <netdev@vger.kernel.org>; Mon, 07 Aug 2023 16:28:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fromorbit-com.20221208.gappssmtp.com; s=20221208; t=1691450928; x=1692055728;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=0xqamAux0UTVG6klbJHwJNM84FqVsjBhqmY+h06Y7S4=;
+        b=adlg0mZ+HbNffKaKec2p7cVEI4EUlpFfVSVpmG5fvHzHnQEOdBYZjEy4QnkJtTu7lu
+         YmN6EGaH1vJkJ2ZOmqiBcV/yaN6Y4JVna47CjKD7nPXpOiMzYNw9UySGma80pWoaj7Dk
+         jUxXtUXqouB4bUXn3WeUBdMeMQNzv8NtKVfvER+m7KEKe99ZrQWUTG4Y9TUCDw4Kbcew
+         TFF8/aAopaaIk2YO3rVVNpTSZmvFLss5lfJ8bn13k+LTkCPg51SMuEfV97r2Zvr+7s3C
+         AcdJXj3qJcnQFWBnyvELMIWQLaBKzEk7yCwrvdFLv4Z0y5aFUIdjan9j2uUGZT7xZ3GX
+         Ib8A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691450928; x=1692055728;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0xqamAux0UTVG6klbJHwJNM84FqVsjBhqmY+h06Y7S4=;
+        b=PyBn4uWvRh3j5AioV8Ev46D0R2T/9TJiA1jlrPW5ydD99Jg2ChfAlJ8ZZ880d5Cq/s
+         Kg0DH6zwQOyxjfas2dIO9PWFwvtPUnFX4H0aJ62V/FlMidqzrMWW1CBl5GDtwCW3urVA
+         zMUuL7DNWrUKZ0PFekZxVQ2YPsLwWsF1vc8mjCgh11nrNSPfss3MOTq6hdgbnOV0gATv
+         xt1T5bRDKO4Fvdk06t6VPtgvtxwPTQNHefvTi9ddtGPwKk02USObDiWredtQzq5mYg58
+         if4wacUt/ooua2PFEBjOInyhfo7Q7B8mQ8cef92HcEsFQGzofJRTk+kJpmJ2s6V2zR5J
+         hR3w==
+X-Gm-Message-State: AOJu0YxLZkdL9liZTEU1qBV3gvgHgDHlFvHqqDM1ERJrFT0lxz0JhJm1
+	nkzSQDkdUBNElHsTkBD+MQvR9w==
+X-Google-Smtp-Source: AGHT+IHWcHOenJQfOaWa9c7YDyMdy3l3j1H0rEzsEcwqog5HJ9HhPve3KCBNDXb4QQT+YEAg/cljWw==
+X-Received: by 2002:a05:6a20:8e04:b0:13c:8e50:34b8 with SMTP id y4-20020a056a208e0400b0013c8e5034b8mr12892217pzj.35.1691450928413;
+        Mon, 07 Aug 2023 16:28:48 -0700 (PDT)
+Received: from dread.disaster.area (pa49-180-166-213.pa.nsw.optusnet.com.au. [49.180.166.213])
+        by smtp.gmail.com with ESMTPSA id e18-20020aa78c52000000b0068620bee456sm6663729pfd.209.2023.08.07.16.28.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Aug 2023 16:28:47 -0700 (PDT)
+Received: from dave by dread.disaster.area with local (Exim 4.96)
+	(envelope-from <david@fromorbit.com>)
+	id 1qT9eW-002TeM-1d;
+	Tue, 08 Aug 2023 09:28:44 +1000
+Date: Tue, 8 Aug 2023 09:28:44 +1000
+From: Dave Chinner <david@fromorbit.com>
+To: Qi Zheng <zhengqi.arch@bytedance.com>
+Cc: akpm@linux-foundation.org, tkhai@ya.ru, vbabka@suse.cz,
+	roman.gushchin@linux.dev, djwong@kernel.org, brauner@kernel.org,
+	paulmck@kernel.org, tytso@mit.edu, steven.price@arm.com,
+	cel@kernel.org, senozhatsky@chromium.org, yujie.liu@intel.com,
+	gregkh@linuxfoundation.org, muchun.song@linux.dev,
+	simon.horman@corigine.com, dlemoal@kernel.org,
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org, x86@kernel.org,
+	kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
+	linux-erofs@lists.ozlabs.org,
+	linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
+	linux-nfs@vger.kernel.org, linux-mtd@lists.infradead.org,
+	rcu@vger.kernel.org, netdev@vger.kernel.org,
+	dri-devel@lists.freedesktop.org, linux-arm-msm@vger.kernel.org,
+	dm-devel@redhat.com, linux-raid@vger.kernel.org,
+	linux-bcache@vger.kernel.org,
+	virtualization@lists.linux-foundation.org,
+	linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
+	linux-xfs@vger.kernel.org, linux-btrfs@vger.kernel.org
+Subject: Re: [PATCH v4 45/48] mm: shrinker: make global slab shrink lockless
+Message-ID: <ZNF+LLUpKWHDEG1u@dread.disaster.area>
+References: <20230807110936.21819-1-zhengqi.arch@bytedance.com>
+ <20230807110936.21819-46-zhengqi.arch@bytedance.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.14.0
-Subject: Re: selftests: net/af_unix test_unix_oob [FAILED]
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: alexander@mihalicyn.com, davem@davemloft.net, edumazet@google.com,
- fw@strlen.de, kuba@kernel.org, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com,
- shuah@kernel.org
-References: <abf98942-0058-f2ad-8e55-fbdd83b7c2d6@alu.unizg.hr>
- <20230807204648.50070-1-kuniyu@amazon.com>
-Content-Language: en-US
-From: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
-In-Reply-To: <20230807204648.50070-1-kuniyu@amazon.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230807110936.21819-46-zhengqi.arch@bytedance.com>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 8/7/23 22:46, Kuniyuki Iwashima wrote:
-> From: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
-> Date: Mon, 7 Aug 2023 21:44:41 +0200
->> Hi all,
->>
->> In the kernel 6.5-rc5 build on Ubuntu 22.04 LTS (jammy jellyfish) on a Ryzen 7950 assembled box,
->> vanilla torvalds tree kernel, the test test_unix_oob unexpectedly fails:
->>
->> # selftests: net/af_unix: test_unix_oob
->> # Test 2 failed, sigurg 23 len 63 OOB %
->>
->> It is this code:
->>
->>           /* Test 2:
->>            * Verify that the first OOB is over written by
->>            * the 2nd one and the first OOB is returned as
->>            * part of the read, and sigurg is received.
->>            */
->>           wait_for_data(pfd, POLLIN | POLLPRI);
->>           len = 0;
->>           while (len < 70)
->>                   len = recv(pfd, buf, 1024, MSG_PEEK);
->>           len = read_data(pfd, buf, 1024);
->>           read_oob(pfd, &oob);
->>           if (!signal_recvd || len != 127 || oob != '#') {
->>                   fprintf(stderr, "Test 2 failed, sigurg %d len %d OOB %c\n",
->>                   signal_recvd, len, oob);
->>                   die(1);
->>           }
->>
->> In 6.5-rc4, this test was OK, so it might mean we have a regression?
-> 
-> Thanks for reporting.
-> 
-> I confirmed the test doesn't fail on net-next at least, but it's based
-> on v6.5-rc4.
-> 
->    ---8<---
->    [root@localhost ~]# ./test_unix_oob
->    [root@localhost ~]# echo $?
->    0
->    [root@localhost ~]# uname -r
->    6.5.0-rc4-01192-g66244337512f
->    ---8<---
-> 
-> I'll check 6.5-rc5 later.
+On Mon, Aug 07, 2023 at 07:09:33PM +0800, Qi Zheng wrote:
+> The shrinker_rwsem is a global read-write lock in shrinkers subsystem,
+> which protects most operations such as slab shrink, registration and
+> unregistration of shrinkers, etc. This can easily cause problems in the
+> following cases.
+....
+> This commit uses the refcount+RCU method [5] proposed by Dave Chinner
+> to re-implement the lockless global slab shrink. The memcg slab shrink is
+> handled in the subsequent patch.
+....
+> ---
+>  include/linux/shrinker.h | 17 ++++++++++
+>  mm/shrinker.c            | 70 +++++++++++++++++++++++++++++-----------
+>  2 files changed, 68 insertions(+), 19 deletions(-)
 
-Hi, Kuniyuki,
+There's no documentation in the code explaining how the lockless
+shrinker algorithm works. It's left to the reader to work out how
+this all goes together....
 
-It seems that there is a new development. I could reproduce the error with the failed test 2
-as early as 6.0-rc1. However, the gotcha is that the error appears to be sporadically manifested
-(possibly a race)?
+> diff --git a/include/linux/shrinker.h b/include/linux/shrinker.h
+> index eb342994675a..f06225f18531 100644
+> --- a/include/linux/shrinker.h
+> +++ b/include/linux/shrinker.h
+> @@ -4,6 +4,8 @@
+>  
+>  #include <linux/atomic.h>
+>  #include <linux/types.h>
+> +#include <linux/refcount.h>
+> +#include <linux/completion.h>
+>  
+>  #define SHRINKER_UNIT_BITS	BITS_PER_LONG
+>  
+> @@ -87,6 +89,10 @@ struct shrinker {
+>  	int seeks;	/* seeks to recreate an obj */
+>  	unsigned flags;
+>  
+> +	refcount_t refcount;
+> +	struct completion done;
+> +	struct rcu_head rcu;
 
-I am currently attempting a bisect.
+What does the refcount protect, why do we need the completion, etc?
 
-Kind regards,
-Mirsad
+> +
+>  	void *private_data;
+>  
+>  	/* These are for internal use */
+> @@ -120,6 +126,17 @@ struct shrinker *shrinker_alloc(unsigned int flags, const char *fmt, ...);
+>  void shrinker_register(struct shrinker *shrinker);
+>  void shrinker_free(struct shrinker *shrinker);
+>  
+> +static inline bool shrinker_try_get(struct shrinker *shrinker)
+> +{
+> +	return refcount_inc_not_zero(&shrinker->refcount);
+> +}
+> +
+> +static inline void shrinker_put(struct shrinker *shrinker)
+> +{
+> +	if (refcount_dec_and_test(&shrinker->refcount))
+> +		complete(&shrinker->done);
+> +}
+> +
+>  #ifdef CONFIG_SHRINKER_DEBUG
+>  extern int __printf(2, 3) shrinker_debugfs_rename(struct shrinker *shrinker,
+>  						  const char *fmt, ...);
+> diff --git a/mm/shrinker.c b/mm/shrinker.c
+> index 1911c06b8af5..d318f5621862 100644
+> --- a/mm/shrinker.c
+> +++ b/mm/shrinker.c
+> @@ -2,6 +2,7 @@
+>  #include <linux/memcontrol.h>
+>  #include <linux/rwsem.h>
+>  #include <linux/shrinker.h>
+> +#include <linux/rculist.h>
+>  #include <trace/events/vmscan.h>
+>  
+>  #include "internal.h"
+> @@ -577,33 +578,42 @@ unsigned long shrink_slab(gfp_t gfp_mask, int nid, struct mem_cgroup *memcg,
+>  	if (!mem_cgroup_disabled() && !mem_cgroup_is_root(memcg))
+>  		return shrink_slab_memcg(gfp_mask, nid, memcg, priority);
+>  
+> -	if (!down_read_trylock(&shrinker_rwsem))
+> -		goto out;
+> -
+> -	list_for_each_entry(shrinker, &shrinker_list, list) {
+> +	rcu_read_lock();
+> +	list_for_each_entry_rcu(shrinker, &shrinker_list, list) {
+>  		struct shrink_control sc = {
+>  			.gfp_mask = gfp_mask,
+>  			.nid = nid,
+>  			.memcg = memcg,
+>  		};
+>  
+> +		if (!shrinker_try_get(shrinker))
+> +			continue;
+> +
+> +		/*
+> +		 * We can safely unlock the RCU lock here since we already
+> +		 * hold the refcount of the shrinker.
+> +		 */
+> +		rcu_read_unlock();
+> +
+>  		ret = do_shrink_slab(&sc, shrinker, priority);
+>  		if (ret == SHRINK_EMPTY)
+>  			ret = 0;
+>  		freed += ret;
+> +
+>  		/*
+> -		 * Bail out if someone want to register a new shrinker to
+> -		 * prevent the registration from being stalled for long periods
+> -		 * by parallel ongoing shrinking.
+> +		 * This shrinker may be deleted from shrinker_list and freed
+> +		 * after the shrinker_put() below, but this shrinker is still
+> +		 * used for the next traversal. So it is necessary to hold the
+> +		 * RCU lock first to prevent this shrinker from being freed,
+> +		 * which also ensures that the next shrinker that is traversed
+> +		 * will not be freed (even if it is deleted from shrinker_list
+> +		 * at the same time).
+>  		 */
 
->> marvin@defiant:~/linux/kernel/linux_torvalds$ grep test_unix_oob ../kselftest-6.5-rc4-1.log
->> /net/af_unix/test_unix_oob
->> # selftests: net/af_unix: test_unix_oob
->> ok 2 selftests: net/af_unix: test_unix_oob
->> marvin@defiant:~/linux/kernel/linux_torvalds$
->>
->> Hope this helps.
->>
->> NOTE: the kernel is vanilla torvalds tree, only "dirty" because the selftests were modified.
->>
->> Kind regards,
->> Mirsad Todorovac
+This comment really should be at the head of the function,
+describing the algorithm used within the function itself. i.e. how
+reference counts are used w.r.t. the rcu_read_lock() usage to
+guarantee existence of the shrinker and the validity of the list
+walk.
+
+I'm not going to remember all these little details when I look at
+this code in another 6 months time, and having to work it out from
+first principles every time I look at the code will waste of a lot
+of time...
+
+-Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
 
