@@ -1,25 +1,25 @@
-Return-Path: <netdev+bounces-25035-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25036-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5E6E772B6D
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 18:48:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1541C772B6F
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 18:48:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 235191C20BE9
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 16:48:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4FA9B1C20C0A
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 16:48:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A5D212B86;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2AC712B97;
 	Mon,  7 Aug 2023 16:46:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19AF812B68
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E687D12B68
 	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 16:46:09 +0000 (UTC)
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59DF5171E
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CB6A172A
 	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 09:46:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
 	s=mimecast20190719; t=1691426766;
@@ -27,23 +27,23 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=45nGWtZKAy2fwMUQmEuIIIyB6oO7h5D7dVtXiw/s1cM=;
-	b=eWtBmmU9DAmZB0j0CrKmwoHOeidyKV4DjXciHhBLgqkoXw/PXjXn/9VdjngojvQZZlJEPc
-	osmZc64aesY63zLq2unSTwsGKi6HqiEYpFgl/ad6s9y6eYJUGMGPwVpcs/dK1FzymqmqDd
-	9a3t38xNEqjROM1TquzZiXTIQMJAqGQ=
+	bh=X0H27HUs/4N6894tkBGV+HMZ74Rlqaf1W5bXuDoUZCU=;
+	b=UIGbL/MHPzRQh1C0+Xlos0eeoMVQR7+Lh7QEeTqPrZIyhV6rILuE+tIPJjzWVI0rS1Rkso
+	/nhASp8/RfZAWYk3W3fCMqSBE9zRDCkgi0Qw0bf8IofQ4b2uwGJlxNrCK+BUNu1FED+qU3
+	XZcSCbxbYOj2D9F0LytCG97d1w8/+dI=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-487-vJivMZWjP-eHU3QsDlLu1w-1; Mon, 07 Aug 2023 12:46:02 -0400
-X-MC-Unique: vJivMZWjP-eHU3QsDlLu1w-1
+ us-mta-549-JNaXd5GJOEmMBwun2DOe8w-1; Mon, 07 Aug 2023 12:46:03 -0400
+X-MC-Unique: JNaXd5GJOEmMBwun2DOe8w-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5C896185A7A3;
-	Mon,  7 Aug 2023 16:46:01 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id CCE41185A78F;
+	Mon,  7 Aug 2023 16:46:02 +0000 (UTC)
 Received: from antares.redhat.com (unknown [10.39.194.141])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 34E762166B25;
-	Mon,  7 Aug 2023 16:46:00 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id A09EE2166B25;
+	Mon,  7 Aug 2023 16:46:01 +0000 (UTC)
 From: Adrian Moreno <amorenoz@redhat.com>
 To: netdev@vger.kernel.org
 Cc: Adrian Moreno <amorenoz@redhat.com>,
@@ -51,9 +51,9 @@ Cc: Adrian Moreno <amorenoz@redhat.com>,
 	i.maximets@ovn.org,
 	eric@garver.life,
 	dev@openvswitch.org
-Subject: [net-next v3 5/7] net: openvswitch: add misc error drop reasons
-Date: Mon,  7 Aug 2023 18:45:46 +0200
-Message-ID: <20230807164551.553365-6-amorenoz@redhat.com>
+Subject: [net-next v3 6/7] selftests: openvswitch: add drop reason testcase
+Date: Mon,  7 Aug 2023 18:45:47 +0200
+Message-ID: <20230807164551.553365-7-amorenoz@redhat.com>
 In-Reply-To: <20230807164551.553365-1-amorenoz@redhat.com>
 References: <20230807164551.553365-1-amorenoz@redhat.com>
 Precedence: bulk
@@ -71,138 +71,106 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Use drop reasons from include/net/dropreason-core.h when a reasonable
-candidate exists.
+Test if the correct drop reason is reported when OVS drops a packet due
+to an explicit flow.
 
 Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
 ---
- net/openvswitch/actions.c   | 17 ++++++++++-------
- net/openvswitch/conntrack.c |  3 ++-
- net/openvswitch/drop.h      |  6 ++++++
- 3 files changed, 18 insertions(+), 8 deletions(-)
+ .../selftests/net/openvswitch/openvswitch.sh  | 67 ++++++++++++++++++-
+ 1 file changed, 66 insertions(+), 1 deletion(-)
 
-diff --git a/net/openvswitch/actions.c b/net/openvswitch/actions.c
-index e204c7eee8ef..5d9c31f46693 100644
---- a/net/openvswitch/actions.c
-+++ b/net/openvswitch/actions.c
-@@ -782,7 +782,7 @@ static int ovs_vport_output(struct net *net, struct sock *sk,
- 	struct vport *vport = data->vport;
+diff --git a/tools/testing/selftests/net/openvswitch/openvswitch.sh b/tools/testing/selftests/net/openvswitch/openvswitch.sh
+index dced4f612a78..a10c345f40ef 100755
+--- a/tools/testing/selftests/net/openvswitch/openvswitch.sh
++++ b/tools/testing/selftests/net/openvswitch/openvswitch.sh
+@@ -16,7 +16,8 @@ tests="
+ 	connect_v4				ip4-xon: Basic ipv4 ping between two NS
+ 	nat_connect_v4				ip4-nat-xon: Basic ipv4 tcp connection via NAT
+ 	netlink_checks				ovsnl: validate netlink attrs and settings
+-	upcall_interfaces			ovs: test the upcall interfaces"
++	upcall_interfaces			ovs: test the upcall interfaces
++	drop_reason				drop: test drop reasons are emitted"
  
- 	if (skb_cow_head(skb, data->l2_len) < 0) {
--		kfree_skb(skb);
-+		kfree_skb_reason(skb, SKB_DROP_REASON_NOMEM);
- 		return -ENOMEM;
- 	}
- 
-@@ -853,6 +853,7 @@ static void ovs_fragment(struct net *net, struct vport *vport,
- 			 struct sk_buff *skb, u16 mru,
- 			 struct sw_flow_key *key)
- {
-+	enum ovs_drop_reason reason;
- 	u16 orig_network_offset = 0;
- 
- 	if (eth_p_mpls(skb->protocol)) {
-@@ -862,6 +863,7 @@ static void ovs_fragment(struct net *net, struct vport *vport,
- 
- 	if (skb_network_offset(skb) > MAX_L2_LEN) {
- 		OVS_NLERR(1, "L2 header too long to fragment");
-+		reason = OVS_DROP_FRAG_L2_TOO_LONG;
- 		goto err;
- 	}
- 
-@@ -902,12 +904,13 @@ static void ovs_fragment(struct net *net, struct vport *vport,
- 		WARN_ONCE(1, "Failed fragment ->%s: eth=%04x, MRU=%d, MTU=%d.",
- 			  ovs_vport_name(vport), ntohs(key->eth.type), mru,
- 			  vport->dev->mtu);
-+		reason = OVS_DROP_FRAG_INVALID_PROTO;
- 		goto err;
- 	}
- 
- 	return;
- err:
--	kfree_skb(skb);
-+	kfree_skb_reason(skb, reason);
+ info() {
+     [ $VERBOSE = 0 ] || echo $*
+@@ -141,6 +142,25 @@ ovs_add_flow () {
+ 	return 0
  }
  
- static void do_output(struct datapath *dp, struct sk_buff *skb, int out_port,
-@@ -934,10 +937,10 @@ static void do_output(struct datapath *dp, struct sk_buff *skb, int out_port,
- 
- 			ovs_fragment(net, vport, skb, mru, key);
- 		} else {
--			kfree_skb(skb);
-+			kfree_skb_reason(skb, SKB_DROP_REASON_PKT_TOO_BIG);
- 		}
- 	} else {
--		kfree_skb(skb);
-+		kfree_skb_reason(skb, SKB_DROP_REASON_DEV_READY);
- 	}
++ovs_drop_record_and_run () {
++	local sbx=$1
++	shift
++
++	perf record -a -q -e skb:kfree_skb -o ${ovs_dir}/perf.data $* \
++		>> ${ovs_dir}/stdout 2>> ${ovs_dir}/stderr
++	return $?
++}
++
++ovs_drop_reason_count()
++{
++	local reason=$1
++
++	local perf_output=`perf script -i ${ovs_dir}/perf.data -F trace:event,trace`
++	local pattern="skb:kfree_skb:.*reason: $reason"
++
++	return `echo "$perf_output" | grep "$pattern" | wc -l`
++}
++
+ usage() {
+ 	echo
+ 	echo "$0 [OPTIONS] [TEST]..."
+@@ -155,6 +175,51 @@ usage() {
+ 	exit 1
  }
  
-@@ -1011,7 +1014,7 @@ static int dec_ttl_exception_handler(struct datapath *dp, struct sk_buff *skb,
- 		return clone_execute(dp, skb, key, 0, nla_data(actions),
- 				     nla_len(actions), true, false);
- 
--	consume_skb(skb);
-+	kfree_skb_reason(skb, OVS_DROP_IP_TTL);
- 	return 0;
- }
- 
-@@ -1564,7 +1567,7 @@ static int clone_execute(struct datapath *dp, struct sk_buff *skb,
- 		/* Out of per CPU action FIFO space. Drop the 'skb' and
- 		 * log an error.
- 		 */
--		kfree_skb(skb);
-+		kfree_skb_reason(skb, OVS_DROP_DEFERRED_LIMIT);
- 
- 		if (net_ratelimit()) {
- 			if (actions) { /* Sample action */
-@@ -1616,7 +1619,7 @@ int ovs_execute_actions(struct datapath *dp, struct sk_buff *skb,
- 	if (unlikely(level > OVS_RECURSION_LIMIT)) {
- 		net_crit_ratelimited("ovs: recursion limit reached on datapath %s, probable configuration error\n",
- 				     ovs_dp_name(dp));
--		kfree_skb(skb);
-+		kfree_skb_reason(skb, OVS_DROP_RECURSION_LIMIT);
- 		err = -ENETDOWN;
- 		goto out;
- 	}
-diff --git a/net/openvswitch/conntrack.c b/net/openvswitch/conntrack.c
-index fa955e892210..b03ebd4a8fae 100644
---- a/net/openvswitch/conntrack.c
-+++ b/net/openvswitch/conntrack.c
-@@ -29,6 +29,7 @@
- #include <net/netfilter/nf_conntrack_act_ct.h>
- 
- #include "datapath.h"
-+#include "drop.h"
- #include "conntrack.h"
- #include "flow.h"
- #include "flow_netlink.h"
-@@ -1035,7 +1036,7 @@ int ovs_ct_execute(struct net *net, struct sk_buff *skb,
- 
- 	skb_push_rcsum(skb, nh_ofs);
- 	if (err)
--		kfree_skb(skb);
-+		kfree_skb_reason(skb, OVS_DROP_CONNTRACK);
- 	return err;
- }
- 
-diff --git a/net/openvswitch/drop.h b/net/openvswitch/drop.h
-index 1ba866c408e5..e5a03cdec4e1 100644
---- a/net/openvswitch/drop.h
-+++ b/net/openvswitch/drop.h
-@@ -13,6 +13,12 @@
- 	R(OVS_DROP_EXPLICIT_ACTION)		\
- 	R(OVS_DROP_EXPLICIT_ACTION_ERROR)	\
- 	R(OVS_DROP_METER)			\
-+	R(OVS_DROP_RECURSION_LIMIT)		\
-+	R(OVS_DROP_DEFERRED_LIMIT)		\
-+	R(OVS_DROP_FRAG_L2_TOO_LONG)		\
-+	R(OVS_DROP_FRAG_INVALID_PROTO)		\
-+	R(OVS_DROP_CONNTRACK)			\
-+	R(OVS_DROP_IP_TTL)			\
- 	/* deliberate comment for trailing \ */
- 
- enum ovs_drop_reason {
++# drop_reason test
++# - drop packets and verify the right drop reason is reported
++test_drop_reason() {
++	which perf >/dev/null 2>&1 || return $ksft_skip
++
++	sbx_add "test_drop_reason" || return $?
++
++	ovs_add_dp "test_drop_reason" dropreason || return 1
++
++	info "create namespaces"
++	for ns in client server; do
++		ovs_add_netns_and_veths "test_drop_reason" "dropreason" "$ns" \
++			"${ns:0:1}0" "${ns:0:1}1" || return 1
++	done
++
++	# Setup client namespace
++	ip netns exec client ip addr add 172.31.110.10/24 dev c1
++	ip netns exec client ip link set c1 up
++
++	# Setup server namespace
++	ip netns exec server ip addr add 172.31.110.20/24 dev s1
++	ip netns exec server ip link set s1 up
++
++	# Allow ARP
++	ovs_add_flow "test_drop_reason" dropreason \
++		'in_port(1),eth(),eth_type(0x0806),arp()' '2' || return 1
++	ovs_add_flow "test_drop_reason" dropreason \
++		'in_port(2),eth(),eth_type(0x0806),arp()' '1' || return 1
++
++	# Allow client ICMP traffic but drop return path
++	ovs_add_flow "test_drop_reason" dropreason \
++		"in_port(1),eth(),eth_type(0x0800),ipv4(src=172.31.110.10,proto=1),icmp()" '2'
++	ovs_add_flow "test_drop_reason" dropreason \
++		"in_port(2),eth(),eth_type(0x0800),ipv4(src=172.31.110.20,proto=1),icmp()" 'drop'
++
++	ovs_drop_record_and_run "test_drop_reason" ip netns exec client ping -c 2 172.31.110.20
++	ovs_drop_reason_count 0x30001 # OVS_DROP_FLOW_ACTION
++	if [[ "$?" -ne "2" ]]; then
++		info "Did not detect expected drops: $?"
++		return 1
++	fi
++
++	return 0
++}
++
+ # arp_ping test
+ # - client has 1500 byte MTU
+ # - server has 1500 byte MTU
 -- 
 2.41.0
 
