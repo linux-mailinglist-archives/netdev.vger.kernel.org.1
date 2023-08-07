@@ -1,47 +1,51 @@
-Return-Path: <netdev+bounces-24964-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24965-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 610C5772584
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 15:24:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE1C5772590
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 15:24:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1ACBA2811F0
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 13:24:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 965591C20A59
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 13:24:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C81AE1079D;
-	Mon,  7 Aug 2023 13:24:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF374107AD;
+	Mon,  7 Aug 2023 13:24:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3CAF101C9
-	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 13:24:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 847A9C433C8;
-	Mon,  7 Aug 2023 13:24:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A30AB10799
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 13:24:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F9D8C433C7;
+	Mon,  7 Aug 2023 13:24:26 +0000 (UTC)
 Authentication-Results: smtp.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="FsZ+SLx2"
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="fq0Ns74s"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-	t=1691414662;
+	t=1691414665;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=ZOYaSREXK4Be+PXshGUAvd5TJdyR6dMjLlqekTJmEx8=;
-	b=FsZ+SLx2oGN8oVMLZtlmC2FkrAtO04MwSxag8amAgxdHXHDeVmRNORBQvCJypAO7aeMj8U
-	0V7tGptyMeVN4+CtdhhYkxDUVrF/ZA1iH8FKBMTIbTOgBE03tc2K27MrMebqmVVWHUX0Lk
-	fqceUtMeXKUsM0Cop6b5AD2s2fSAg5A=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=rcicnn3ynTAB6IFLFNRyVdMCpVfvSQ8Rr0HQSIv6cqk=;
+	b=fq0Ns74s1vrhuuCLvS2+dSB77YSGER8h0UpJvsNBOebMIWcmNEAPelAZNVBhmJkqRxESd4
+	CA7N/soEiDPkDaYOIC+BiCBgD7BQs4Juu67r0gzxNsez+LUPKpJ0b2Ald9/kr3estkOkx+
+	SZW2eYFcvDaIIFgnU89yEZkO9r6ovKw=
 Received: 
-	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id aab24fa0 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-	Mon, 7 Aug 2023 13:24:21 +0000 (UTC)
+	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 9573abe4 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+	Mon, 7 Aug 2023 13:24:24 +0000 (UTC)
 From: "Jason A. Donenfeld" <Jason@zx2c4.com>
 To: netdev@vger.kernel.org,
 	davem@davemloft.net,
 	kuba@kernel.org
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: [PATCH net 0/1] wireguard fixes for 6.5-rc6
-Date: Mon,  7 Aug 2023 15:21:26 +0200
-Message-ID: <20230807132146.2191597-1-Jason@zx2c4.com>
+Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
+	stable@vger.kernel.org
+Subject: [PATCH net 1/1] wireguard: allowedips: expand maximum node depth
+Date: Mon,  7 Aug 2023 15:21:27 +0200
+Message-ID: <20230807132146.2191597-2-Jason@zx2c4.com>
+In-Reply-To: <20230807132146.2191597-1-Jason@zx2c4.com>
+References: <20230807132146.2191597-1-Jason@zx2c4.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,26 +54,95 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Hi Davkub,
+In the allowedips self-test, nodes are inserted into the tree, but it
+generated an even amount of nodes, but for checking maximum node depth,
+there is of course the root node, which makes the total number
+necessarily odd. With two few nodes added, it never triggered the
+maximum depth check like it should have. So, add 129 nodes instead of
+128 nodes, and do so with a more straightforward scheme, starting with
+all the bits set, and shifting over one each time. Then increase the
+maximum depth to 129, and choose a better name for that variable to
+make it clear that it represents depth as opposed to bits.
 
-Just one patch this time, somewhat late in the cycle:
-
-1) Fix an off-by-one calculation for the maximum node depth size in the
-   allowedips trie data structure, and also adjust the self-tests to hit
-   this case so it doesn't regress again in the future.
-
-This is marked for stable@ and has a fixes tag as well.
-
-Thanks,
-Jason
-
-Jason A. Donenfeld (1):
-  wireguard: allowedips: expand maximum node depth
-
+Cc: stable@vger.kernel.org
+Fixes: e7096c131e51 ("net: WireGuard secure network tunnel")
+Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+---
  drivers/net/wireguard/allowedips.c          |  8 ++++----
  drivers/net/wireguard/selftest/allowedips.c | 16 ++++++++++------
  2 files changed, 14 insertions(+), 10 deletions(-)
 
+diff --git a/drivers/net/wireguard/allowedips.c b/drivers/net/wireguard/allowedips.c
+index 5bf7822c53f1..0ba714ca5185 100644
+--- a/drivers/net/wireguard/allowedips.c
++++ b/drivers/net/wireguard/allowedips.c
+@@ -6,7 +6,7 @@
+ #include "allowedips.h"
+ #include "peer.h"
+ 
+-enum { MAX_ALLOWEDIPS_BITS = 128 };
++enum { MAX_ALLOWEDIPS_DEPTH = 129 };
+ 
+ static struct kmem_cache *node_cache;
+ 
+@@ -42,7 +42,7 @@ static void push_rcu(struct allowedips_node **stack,
+ 		     struct allowedips_node __rcu *p, unsigned int *len)
+ {
+ 	if (rcu_access_pointer(p)) {
+-		if (WARN_ON(IS_ENABLED(DEBUG) && *len >= MAX_ALLOWEDIPS_BITS))
++		if (WARN_ON(IS_ENABLED(DEBUG) && *len >= MAX_ALLOWEDIPS_DEPTH))
+ 			return;
+ 		stack[(*len)++] = rcu_dereference_raw(p);
+ 	}
+@@ -55,7 +55,7 @@ static void node_free_rcu(struct rcu_head *rcu)
+ 
+ static void root_free_rcu(struct rcu_head *rcu)
+ {
+-	struct allowedips_node *node, *stack[MAX_ALLOWEDIPS_BITS] = {
++	struct allowedips_node *node, *stack[MAX_ALLOWEDIPS_DEPTH] = {
+ 		container_of(rcu, struct allowedips_node, rcu) };
+ 	unsigned int len = 1;
+ 
+@@ -68,7 +68,7 @@ static void root_free_rcu(struct rcu_head *rcu)
+ 
+ static void root_remove_peer_lists(struct allowedips_node *root)
+ {
+-	struct allowedips_node *node, *stack[MAX_ALLOWEDIPS_BITS] = { root };
++	struct allowedips_node *node, *stack[MAX_ALLOWEDIPS_DEPTH] = { root };
+ 	unsigned int len = 1;
+ 
+ 	while (len > 0 && (node = stack[--len])) {
+diff --git a/drivers/net/wireguard/selftest/allowedips.c b/drivers/net/wireguard/selftest/allowedips.c
+index 78ebe2892a78..3d1f64ff2e12 100644
+--- a/drivers/net/wireguard/selftest/allowedips.c
++++ b/drivers/net/wireguard/selftest/allowedips.c
+@@ -593,16 +593,20 @@ bool __init wg_allowedips_selftest(void)
+ 	wg_allowedips_remove_by_peer(&t, a, &mutex);
+ 	test_negative(4, a, 192, 168, 0, 1);
+ 
+-	/* These will hit the WARN_ON(len >= MAX_ALLOWEDIPS_BITS) in free_node
++	/* These will hit the WARN_ON(len >= MAX_ALLOWEDIPS_DEPTH) in free_node
+ 	 * if something goes wrong.
+ 	 */
+-	for (i = 0; i < MAX_ALLOWEDIPS_BITS; ++i) {
+-		part = cpu_to_be64(~(1LLU << (i % 64)));
+-		memset(&ip, 0xff, 16);
+-		memcpy((u8 *)&ip + (i < 64) * 8, &part, 8);
++	for (i = 0; i < 64; ++i) {
++		part = cpu_to_be64(~0LLU << i);
++		memset(&ip, 0xff, 8);
++		memcpy((u8 *)&ip + 8, &part, 8);
++		wg_allowedips_insert_v6(&t, &ip, 128, a, &mutex);
++		memcpy(&ip, &part, 8);
++		memset((u8 *)&ip + 8, 0, 8);
+ 		wg_allowedips_insert_v6(&t, &ip, 128, a, &mutex);
+ 	}
+-
++	memset(&ip, 0, 16);
++	wg_allowedips_insert_v6(&t, &ip, 128, a, &mutex);
+ 	wg_allowedips_free(&t, &mutex);
+ 
+ 	wg_allowedips_init(&t);
 -- 
 2.41.0
 
