@@ -1,78 +1,49 @@
-Return-Path: <netdev+bounces-24972-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24973-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C947E772671
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 15:48:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D8D26772672
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 15:48:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 059951C20BED
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 13:48:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9297C281292
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 13:48:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FD721095F;
-	Mon,  7 Aug 2023 13:47:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0688D107B3;
+	Mon,  7 Aug 2023 13:48:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0495C10952
-	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 13:47:23 +0000 (UTC)
-Received: from mail-pl1-x643.google.com (mail-pl1-x643.google.com [IPv6:2607:f8b0:4864:20::643])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D547910EF;
-	Mon,  7 Aug 2023 06:47:20 -0700 (PDT)
-Received: by mail-pl1-x643.google.com with SMTP id d9443c01a7336-1bc0d39b52cso29353785ad.2;
-        Mon, 07 Aug 2023 06:47:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1691416040; x=1692020840;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hO5ffsMV1x2LeSF6TZmYSUDXcFSKo+pDvUEfomBe2w0=;
-        b=m8bkI8THG1kg0LlHLz7Op4k5P/2LGhgnUZNsP4jww5zkGTS5mLQckMwLq5W8uPTkHL
-         CJy7/c9Hg1u17DUGPLp1kXQxWSYpk0EWnP/D8ZCzVi0u9ZxbcKaZEbL7YolDWoPIecTH
-         pLL4rw8Mp8eAfLlf51k+gQzJuIMVeEE1noTMRlCf34XgI//hv/7WRZ4OvaLVQsk3gALn
-         2xKEvSYqOKhTY+vW9mh9z1P3wvkBf3BBmA1SowChXtSMo0HFd757qVwHt7RD7Jn0U+5m
-         R87IpLGfLKVCzIpzYyh7f9X8BN/ki4VsrI/62Zm1lt9NVsy/9kOjuFOO0l++vsx1SV9a
-         nNOA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691416040; x=1692020840;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hO5ffsMV1x2LeSF6TZmYSUDXcFSKo+pDvUEfomBe2w0=;
-        b=QvtWckJ96ogN4dLSui7NooDmbxHBmyQQ2SN1cU/hM7f2MUjbb0rYsxQF7vRQ+PNaT/
-         Uv+DaW2l+QHY2uLiZDiNMqC8WIE8bhIHUen61IFbeugaf56tFxuCXDhMrL3A9Cyl68Vo
-         PisnvLbLC/fbpcLSzopS7KU32GbkEKLHTl3JfBjUnOXysgPIhEppW8nmJyydnLGrLLsF
-         Ap3qFrX9nxRg29xlOYt4WUSyF6yPxAf2z4sbSIa8QGakhlW0tQmo1JgHuG2ZNGDqwYqF
-         qc5TKMEwub/QSB5Okb/G7iVOR+rD7l4cDMh+dT0toWJbVDiBt5QfZriTn1UD2l1JXEC1
-         jRAA==
-X-Gm-Message-State: AOJu0YxB8HWCDllhvmY+OcM4B8AMHfmd+MxvP+n0SJxRYvSnAtRS1hHK
-	FSGF9bC3bZKyMh8YJAFp3uGkKAqBtWQvhPNXSrU=
-X-Google-Smtp-Source: AGHT+IHsQDpDGnSeuUYdXSPmTGGakiREXwsTWbkp15hPGMNkUKXmL3k+eyzM0T/sSXEjGASLoCJCaA==
-X-Received: by 2002:a17:903:2449:b0:1bc:1189:17f with SMTP id l9-20020a170903244900b001bc1189017fmr10891246pls.42.1691416040181;
-        Mon, 07 Aug 2023 06:47:20 -0700 (PDT)
-Received: from localhost.localdomain ([203.205.141.23])
-        by smtp.gmail.com with ESMTPSA id h2-20020a170902704200b001b54a88e4a6sm6912097plt.51.2023.08.07.06.47.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Aug 2023 06:47:19 -0700 (PDT)
-From: menglong8.dong@gmail.com
-X-Google-Original-From: imagedong@tencent.com
-To: edumazet@google.com,
-	ncardwell@google.com
-Cc: davem@davemloft.net,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFD18107A0
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 13:48:28 +0000 (UTC)
+Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E0B919B7;
+	Mon,  7 Aug 2023 06:48:07 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.143])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4RKHhB5VLTz4f3lWx;
+	Mon,  7 Aug 2023 21:47:54 +0800 (CST)
+Received: from hulk-vt.huawei.com (unknown [10.67.174.111])
+	by APP2 (Coremail) with SMTP id Syh0CgCnyW0N9tBkkl+cAA--.36243S2;
+	Mon, 07 Aug 2023 21:47:57 +0800 (CST)
+From: Xiang Yang <xiangyang@huaweicloud.com>
+To: clement.leger@bootlin.com,
+	hkallweit1@gmail.com,
+	linux@armlinux.org.uk,
+	davem@davemloft.net,
+	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	dsahern@kernel.org,
+	olteanv@gmail.com,
+	f.fainelli@gmail.com
+Cc: linux-renesas-soc@vger.kernel.org,
 	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Menglong Dong <imagedong@tencent.com>
-Subject: [PATCH net-next v2 3/3] net: tcp: fix unexcepted socket die when snd_wnd is 0
-Date: Mon,  7 Aug 2023 21:45:47 +0800
-Message-Id: <20230807134547.2782227-4-imagedong@tencent.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20230807134547.2782227-1-imagedong@tencent.com>
-References: <20230807134547.2782227-1-imagedong@tencent.com>
+	xiangyang3@huawei.com
+Subject: [PATCH -next] net: pcs: Add missing put_device call in miic_create
+Date: Mon,  7 Aug 2023 13:47:14 +0000
+Message-Id: <20230807134714.2048214-1-xiangyang@huaweicloud.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,77 +51,58 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-CM-TRANSID:Syh0CgCnyW0N9tBkkl+cAA--.36243S2
+X-Coremail-Antispam: 1UD129KBjvdXoWrurWDGr47ZFWxuF4fuw1rJFb_yoWDWFcE93
+	y7Zr1fXr45Gwnaq34UAw43ZFyFkFs2qFWrWF4IgryrJ3yxWFs7Xrs7ursIq3y3Xa9FgasF
+	9rn8AFZF93yxKjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUb7kYFVCjjxCrM7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E6xAIw20E
+	Y4v20xvaj40_JrC_JFWl1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwV
+	A0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8IcVCY1x02
+	67AKxVWxJVW8Jr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxV
+	AFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2
+	j2WlYx0E2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7x
+	kEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACI402YVCY1x02628vn2kIc2xKxwCF04k20xvY
+	0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I
+	0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAI
+	cVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcV
+	CF04k26cxKx2IYs7xG6Fyj6rWUJwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv
+	6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUOyCJDUUUU
+X-CM-SenderInfo: x0ld0wp1dqwq5kxd4v5lfo033gof0z/
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Menglong Dong <imagedong@tencent.com>
+From: Xiang Yang <xiangyang3@huawei.com>
 
-In tcp_retransmit_timer(), a window shrunk connection will be regarded
-as timeout if 'tcp_jiffies32 - tp->rcv_tstamp > TCP_RTO_MAX'. This is not
-right all the time.
+The reference of pdev->dev is taken by of_find_device_by_node, so
+it should be released when error out.
 
-The retransmits will become zero-window probes in tcp_retransmit_timer()
-if the 'snd_wnd==0'. Therefore, the icsk->icsk_rto will come up to
-TCP_RTO_MAX sooner or later.
-
-However, the timer is not precise enough, as it base on timer wheel.
-Sorry that I am not good at timer, but I know the concept of time-wheel.
-The longer of the timer, the rougher it will be. So the timeout is not
-triggered after TCP_RTO_MAX, but 122877ms as I tested.
-
-Therefore, 'tcp_jiffies32 - tp->rcv_tstamp > TCP_RTO_MAX' is always true
-once the RTO come up to TCP_RTO_MAX, and the socket will die.
-
-Fix this by replacing the 'tcp_jiffies32' with '(u32)icsk->icsk_timeout',
-which is exact the timestamp of the timeout. Meanwhile, using
-"max(tp->retrans_stamp, tp->rcv_tstamp)" as the last updated timestamp in
-the receiving path, as "tp->rcv_tstamp" can restart from idle, then
-tp->rcv_tstamp could already be a long time (minutes or hours) in the
-past even on the first RTO.
-
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Link: https://lore.kernel.org/netdev/CADxym3YyMiO+zMD4zj03YPM3FBi-1LHi6gSD2XT8pyAMM096pg@mail.gmail.com/
-Signed-off-by: Menglong Dong <imagedong@tencent.com>
+Fixes: 7dc54d3b8d91 ("net: pcs: add Renesas MII converter driver")
+Signed-off-by: Xiang Yang <xiangyang3@huawei.com>
 ---
-v2:
-- consider the case of the connection restart from idle, as Neal comment
----
- net/ipv4/tcp_timer.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+ drivers/net/pcs/pcs-rzn1-miic.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/net/ipv4/tcp_timer.c b/net/ipv4/tcp_timer.c
-index d45c96c7f5a4..e4b2d8706cae 100644
---- a/net/ipv4/tcp_timer.c
-+++ b/net/ipv4/tcp_timer.c
-@@ -454,6 +454,14 @@ static void tcp_fastopen_synack_timer(struct sock *sk, struct request_sock *req)
- 			  req->timeout << req->num_timeout, TCP_RTO_MAX);
- }
+diff --git a/drivers/net/pcs/pcs-rzn1-miic.c b/drivers/net/pcs/pcs-rzn1-miic.c
+index e5d642c67a2c..d097f123635a 100644
+--- a/drivers/net/pcs/pcs-rzn1-miic.c
++++ b/drivers/net/pcs/pcs-rzn1-miic.c
+@@ -318,8 +318,10 @@ struct phylink_pcs *miic_create(struct device *dev, struct device_node *np)
+ 		return ERR_PTR(-EPROBE_DEFER);
  
-+static bool tcp_rtx_probe0_timed_out(struct sock *sk)
-+{
-+	struct tcp_sock *tp = tcp_sk(sk);
-+	u32 last_ts;
-+
-+	last_ts = max(tp->retrans_stamp, tp->rcv_tstamp);
-+	return inet_csk(sk)->icsk_timeout - last_ts > TCP_RTO_MAX;
-+}
+ 	miic_port = kzalloc(sizeof(*miic_port), GFP_KERNEL);
+-	if (!miic_port)
++	if (!miic_port) {
++		put_device(&pdev->dev);
+ 		return ERR_PTR(-ENOMEM);
++	}
  
- /**
-  *  tcp_retransmit_timer() - The TCP retransmit timeout handler
-@@ -519,7 +527,7 @@ void tcp_retransmit_timer(struct sock *sk)
- 					    tp->snd_una, tp->snd_nxt);
- 		}
- #endif
--		if (tcp_jiffies32 - tp->rcv_tstamp > TCP_RTO_MAX) {
-+		if (tcp_rtx_probe0_timed_out(sk)) {
- 			tcp_write_err(sk);
- 			goto out;
- 		}
+ 	miic = platform_get_drvdata(pdev);
+ 	device_link_add(dev, miic->dev, DL_FLAG_AUTOREMOVE_CONSUMER);
 -- 
-2.40.1
+2.34.1
 
 
