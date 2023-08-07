@@ -1,124 +1,155 @@
-Return-Path: <netdev+bounces-24789-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24792-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08C6D771B2C
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 09:09:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A35C8771B61
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 09:18:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1108B1C20966
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 07:09:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5DAD8280FBA
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 07:18:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C85B93D81;
-	Mon,  7 Aug 2023 07:08:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34BE83FFA;
+	Mon,  7 Aug 2023 07:18:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAA21210D
-	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 07:08:57 +0000 (UTC)
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C842010EC
-	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 00:08:54 -0700 (PDT)
-Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-3159b524c56so973757f8f.1
-        for <netdev@vger.kernel.org>; Mon, 07 Aug 2023 00:08:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691392133; x=1691996933;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=kWV3RfP0hrUSuT+rQTv0qiwOZILUNksPQ3sV763KM68=;
-        b=QIe4mobvyZQvKMTz9xBD24cpRgncF9Cz80MB9RDSMCPvYRVSUmtjffFEkUC48R7bZ5
-         5QuhDD1t7aDx7ymFhi8IAo8mRHkvJ/M1J8HqVv0c2SbvKDtnGRLrmVkTM/Ftq2JaVyVC
-         YPeZvrIpATbsKz7uEHekS0cEfcdBU7VxOu9ZTdl/tkqxUa+5UNbU5ILwFu69p07mTbJI
-         /dYY9d2DoKrbBD0+D7iP2LXUvaWnPRZTG1NdKLn8WCDIIAGuZVpe0APiwq/ekzJaEQwa
-         KbMVV27mhp5U6EdSXXtxLufCprEenY9ba4BVpNtAi5FHjIxfmORq5yX0w6zv7O9Sx3Vj
-         6dbQ==
-X-Gm-Message-State: ABy/qLZzOcO/rzNOMLQ4sjsyqpDhLou9w9lfjgF/ptgb1tnS0JFQkqIl
-	Z36yZUmmLXZwCnE6O0IV7vg=
-X-Google-Smtp-Source: APBJJlGpZcydgX6SXxywKayHnJPbGM42xAyFmfoOBPthu8aX/ZBLl806eV2weN4x6XBZ03vt0JkBRg==
-X-Received: by 2002:a5d:4443:0:b0:317:3d35:b809 with SMTP id x3-20020a5d4443000000b003173d35b809mr18190349wrr.2.1691392133058;
-        Mon, 07 Aug 2023 00:08:53 -0700 (PDT)
-Received: from [192.168.64.157] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
-        by smtp.gmail.com with ESMTPSA id j6-20020adfff86000000b003175f00e555sm9555878wrr.97.2023.08.07.00.08.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 07 Aug 2023 00:08:52 -0700 (PDT)
-Message-ID: <5e04afe0-7bf3-1bdf-f4f1-49b0c7bb5dba@grimberg.me>
-Date: Mon, 7 Aug 2023 10:08:50 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28A723D9C
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 07:18:43 +0000 (UTC)
+X-Greylist: delayed 571 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 07 Aug 2023 00:18:41 PDT
+Received: from affectionate-fermi.94-131-99-128.plesk.page (unknown [94.131.99.128])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CC2E10F0
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 00:18:41 -0700 (PDT)
+Received: by affectionate-fermi.94-131-99-128.plesk.page (Postfix)
+	id 911441E30A07; Mon,  7 Aug 2023 09:09:01 +0200 (CEST)
+Date: Mon,  7 Aug 2023 09:09:01 +0200 (CEST)
+From: MAILER-DAEMON@affectionate-fermi.94-131-99-128.plesk.page (Mail Delivery System)
+Subject: Undelivered Mail Returned to Sender
+To: netdev@vger.kernel.org
+Auto-Submitted: auto-replied
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH] net/tls: avoid TCP window full during ->read_sock()
-Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>, Hannes Reinecke <hare@suse.de>
-Cc: Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>,
- linux-nvme@lists.infradead.org, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
-References: <20230803100809.29864-1-hare@suse.de>
- <20230804175700.1f88604b@kernel.org>
-From: Sagi Grimberg <sagi@grimberg.me>
-In-Reply-To: <20230804175700.1f88604b@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-5.5 required=5.0 tests=BAYES_00,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: multipart/report; report-type=delivery-status;
+	boundary="EDC051E30CD1.1691392141/affectionate-fermi.94-131-99-128.plesk.page"
+Message-Id: <20230807070901.911441E30A07@affectionate-fermi.94-131-99-128.plesk.page>
+X-Spam-Status: No, score=1.8 required=5.0 tests=BAYES_50,
+	HTML_FONT_LOW_CONTRAST,HTML_MESSAGE,MAY_BE_FORGED,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE autolearn=no autolearn_force=no
+	version=3.4.6
+X-Spam-Level: *
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+This is a MIME-encapsulated message.
 
->> When flushing the backlog after decoding each record in ->read_sock()
->> we may end up with really long records, causing a TCP window full as
->> the TCP window would only be increased again after we process the
->> record. So we should rather process the record first to allow the
->> TCP window to be increased again before flushing the backlog.
-> 
->> -			released = tls_read_flush_backlog(sk, prot, rxm->full_len, to_decrypt,
->> -							  decrypted, &flushed_at);
->>   			skb = darg.skb;
->> +			/* TLS 1.3 may have updated the length by more than overhead */
-> 
->> +			rxm = strp_msg(skb);
->> +			tlm = tls_msg(skb);
->>   			decrypted += rxm->full_len;
->>   
->>   			tls_rx_rec_done(ctx);
->> @@ -2280,6 +2275,12 @@ int tls_sw_read_sock(struct sock *sk, read_descriptor_t *desc,
->>   			goto read_sock_requeue;
->>   		}
->>   		copied += used;
->> +		/*
->> +		 * flush backlog after processing the TLS record, otherwise we might
->> +		 * end up with really large records and triggering a TCP window full.
->> +		 */
->> +		released = tls_read_flush_backlog(sk, prot, decrypted - copied, decrypted,
->> +						  copied, &flushed_at);
-> 
-> I'm surprised moving the flushing out makes a difference.
-> rx_list should generally hold at most 1 skb (16kB) unless something
-> is PEEKing the data.
-> 
-> Looking at it closer I think the problem may be calling args to
-> tls_read_flush_backlog(). Since we don't know how much data
-> reader wants we can't sensibly evaluate the first condition,
-> so how would it work if instead of this patch we did:
-> 
-> -			released = tls_read_flush_backlog(sk, prot, rxm->full_len, to_decrypt,
-> +			released = tls_read_flush_backlog(sk, prot, INT_MAX, 0,
-> 							  decrypted, &flushed_at);
-> 
-> That would give us a flush every 128k of data (or every record if
-> inq is shorter than 16kB).
+--EDC051E30CD1.1691392141/affectionate-fermi.94-131-99-128.plesk.page
+Content-Description: Notification
+Content-Type: text/plain; charset=us-ascii
 
-What happens if the window is smaller than 128K ? isn't that what
-Hannes is trying to solve for?
+This is the mail system at host affectionate-fermi.94-131-99-128.plesk.page.
 
-Hannes, do you have some absolute numbers to how the window behaves?
+I'm sorry to have to inform you that your message could not
+be delivered to one or more recipients. It's attached below.
+
+For further assistance, please send mail to postmaster.
+
+If you do so, please include this problem report. You can
+delete your own text from the attached returned message.
+
+                   The mail system
+
+<netdev@vger.kernel.org>: host vger.kernel.org[23.128.96.18] said: 550 5.7.1
+    Spamassassin considers this message SPAM. In case you disagree, send the
+    ENTIRE message (preferably as a saved attachment) plus this error message
+    to <postmaster@vger.kernel.org>  (in reply to end of DATA command)
+
+--EDC051E30CD1.1691392141/affectionate-fermi.94-131-99-128.plesk.page
+Content-Description: Delivery report
+Content-Type: message/delivery-status
+
+Reporting-MTA: dns; affectionate-fermi.94-131-99-128.plesk.page
+X-Postfix-Queue-ID: EDC051E30CD1
+X-Postfix-Sender: rfc822; netdev@vger.kernel.org
+Arrival-Date: Mon,  7 Aug 2023 09:01:02 +0200 (CEST)
+
+Final-Recipient: rfc822; netdev@vger.kernel.org
+Original-Recipient: rfc822;netdev@vger.kernel.org
+Action: failed
+Status: 5.7.1
+Remote-MTA: dns; vger.kernel.org
+Diagnostic-Code: smtp; 550 5.7.1 Spamassassin considers this message SPAM. In
+    case you disagree, send the ENTIRE message (preferably as a saved
+    attachment) plus this error message to <postmaster@vger.kernel.org>
+
+--EDC051E30CD1.1691392141/affectionate-fermi.94-131-99-128.plesk.page
+Content-Description: Undelivered Message
+Content-Type: message/rfc822
+
+Return-Path: <netdev@vger.kernel.org>
+Received: from remondis.de (unknown [37.120.222.183])
+	by affectionate-fermi.94-131-99-128.plesk.page (Postfix) with ESMTPSA id EDC051E30CD1
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 09:01:02 +0200 (CEST)
+Authentication-Results: affectionate-fermi.94-131-99-128.plesk.page;
+	spf=pass (sender IP is 37.120.222.183) smtp.mailfrom=netdev@vger.kernel.org smtp.helo=remondis.de
+Received-SPF: pass (affectionate-fermi.94-131-99-128.plesk.page: connection is authenticated)
+From: Accounts Receivable Department <netdev@vger.kernel.org>
+To: netdev@vger.kernel.org
+Subject: Open Invoice List
+Date: 07 Aug 2023 00:01:03 -0700
+Message-ID: <20230807000101.FB7B819FE62A7C2D@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/html;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+
+<HTML><HEAD>
+<META name=3DGENERATOR content=3D"MSHTML 11.00.9600.21068"></HEAD>
+<body>
+<DIV role=3Dregion class=3Drightcol aria-labelledby=3Daria-label-messagebod=
+y>
+<DIV id=3Dmessagebody>
+<DIV id=3Dmessage-htmlpart1 class=3Dmessage-htmlpart><!-- html ignored --><=
+!-- head ignored --><!-- meta ignored -->
+<DIV class=3DrcmBody>
+<P><SPAN style=3D"FONT-SIZE: 14px; FONT-FAMILY: 'Segoe UI'; COLOR: #3f3f3f"=
+><BR><SPAN style=3D"COLOR: #595959"><BR><SPAN style=3D"FONT-SIZE: 14px; FON=
+T-FAMILY: 'Segoe UI'; COLOR: #595959">Attn:&nbsp; Accounts Payable,</SPAN><=
+STRONG style=3D"FONT-SIZE: 14px; FONT-FAMILY: 'Segoe UI'; COLOR: #595959">&=
+nbsp;</STRONG><BR><BR><SPAN style=3D"COLOR: #595959"><STRONG><SPAN style=3D=
+"COLOR: #31859b">Attached is a list of open/unpaid invoices as of today's d=
+ate.</SPAN>&nbsp;&nbsp;&nbsp;</STRONG></SPAN><BR>
+<BR><SPAN style=3D"FONT-FAMILY: Tahoma; COLOR: #e36c09"><STRONG><SPAN style=
+=3D"COLOR: #31859b">Missing an invoice?&nbsp;</SPAN><SPAN style=3D"COLOR: #=
+31859b"> &nbsp;Click the INVOICE COPIES button to download a copy and revie=
+w.&nbsp;<STRONG style=3D"FONT-SIZE: 14px; FONT-FAMILY: Tahoma; COLOR: #e36c=
+09"><STRONG><SPAN style=3D"FONT-SIZE: 16px; COLOR: #31859b; text-decoration=
+-line: underline"></SPAN></STRONG></STRONG></SPAN></STRONG></SPAN></SPAN></=
+SPAN></P>
+<table cellspacing=3D"0" cellpadding=3D"0" width=3D"100%">
+<TBODY>
+<TR>
+<td>
+<table cellspacing=3D"0" cellpadding=3D"0">
+<TBODY>
+<TR>
+<td style=3D"border-radius: 2px" bgcolor=3D"#1fb6c1">
+<A style=3D"FONT-SIZE: 14px; TEXT-DECORATION: none; BORDER-TOP: #1fb6c1 1px=
+ solid; FONT-FAMILY: Helvetica, Arial, sans-serif; BORDER-RIGHT: #1fb6c1 1p=
+x solid; BORDER-BOTTOM: #1fb6c1 1px solid; FONT-WEIGHT: bold; COLOR: #fffff=
+f; PADDING-BOTTOM: 8px; PADDING-TOP: 8px; PADDING-LEFT: 12px; BORDER-LEFT: =
+#1fb6c1 1px solid; DISPLAY: inline-block; PADDING-RIGHT: 12px; border-radiu=
+s: 2px" href=3D"https://versesallyall.com/ligr/customer/index.php/guest/#ne=
+tdev@vger.kernel.org" rel=3Dnoreferrer target=3D_blank>
+INVOICE COPIES </A></TD></TR>
+<TR></TR></TBODY></TABLE></TD></TR>
+<TR></TR></TBODY></TABLE>&nbsp;<SPAN style=3D"COLOR: #595959"><BR>Accounts =
+Receivable Dept.</SPAN></DIV></DIV></DIV></DIV></BODY></HTML>
+
+--EDC051E30CD1.1691392141/affectionate-fermi.94-131-99-128.plesk.page--
 
