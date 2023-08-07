@@ -1,84 +1,85 @@
-Return-Path: <netdev+bounces-24815-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24817-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0CAE771C5B
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 10:35:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B66CB771C6D
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 10:40:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 652D728119D
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 08:35:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A30E41C209F2
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 08:40:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 739D53D60;
-	Mon,  7 Aug 2023 08:35:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 760B64426;
+	Mon,  7 Aug 2023 08:40:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD21C210C;
-	Mon,  7 Aug 2023 08:35:12 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E921C433CC;
-	Mon,  7 Aug 2023 08:35:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D1D63D79
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 08:40:39 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18376C433C7;
+	Mon,  7 Aug 2023 08:40:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691397312;
-	bh=dQQYVCV202V1fkp+H9UYGcqK9NudKTkhkMb/AaQNtto=;
-	h=Date:Cc:Subject:To:References:From:In-Reply-To:From;
-	b=AHBpwm2yXk/zDdi/IuT5WptLqTuta3FroC6SuurxaOy3UnmeMYJzT2/FD+N7S1K99
-	 VhT+tOE4K5IzfA7Fc+lS6dkK72uTWhw9BtgS+9LVnJRUeUxGgPNTMpySIt0JLqlEkV
-	 CdHA10dcbgLn97pcYK+cxXKYzI2Ymw5wpMempKkf5GT8ZwG7JJ1iZDVlsBHVt011k1
-	 Gy6JhhtpXZkdXr6F+4I6nCoRusAMES8rB2YZYQp3nVyWmkEoEDitjcx+MASrmXOVgu
-	 g5mtLIEZOKj9z38imh4oKyzKDQdX+O5vjGrnlWeDICBFLN2uxAMHMj17h9WWWIHlJn
-	 q//0thIlNzCyA==
-Message-ID: <6f69bd92-a063-1934-2bd8-42a5950254a7@kernel.org>
-Date: Mon, 7 Aug 2023 10:35:05 +0200
+	s=k20201202; t=1691397639;
+	bh=lY3AhzLehSM9XmaWfdlkVqeIlo+2AgKdiuMGe+Kh2wU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=D4QSMN+0J4JnHx8SYLkYm2TNcjZZ7GVaX4phXYBknWiwb0pb8vRoQf2O2wJ3m+zTQ
+	 SaBX3KSDimh+Z+4vrKvXvCsDuhj8PhcHtRkNNo2z0e/EtGbPZxujfyD/5Dl4QIEP3c
+	 RUXEnWSgChvjFLTqYFnsDckfI2SmMlU4MzIppZWje4uy+bUsXwjkcD/rAI2oKKyAC6
+	 GqmqvvbpIRHaL+rUMiVtL5GnO0CHjUaUoGBDFKTMRK/76tsPuduKo8vHEb1lyZyGaI
+	 hZH6NDUbavWXI6fHAMqa1bBs4Ck2zD0EcosaoaWclKbo9pwAVdHgIPkoTB7j2A2eU4
+	 lgV0SYr3g+DfA==
+Date: Mon, 7 Aug 2023 10:40:35 +0200
+From: Christian Brauner <brauner@kernel.org>
+To: David Rheinsberg <david@readahead.eu>
+Cc: netdev@vger.kernel.org, Alexander Mikhalitsyn <alexander@mihalicyn.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Stanislav Fomichev <sdf@google.com>,
+	Luca Boccassi <bluca@debian.org>,
+	Eric Dumazet <edumazet@google.com>
+Subject: Re: [PATCH] net/unix: use consistent error code in SO_PEERPIDFD
+Message-ID: <20230807-schnupfen-pechschwarz-5d81026b1c4a@brauner>
+References: <20230807081225.816199-1-david@readahead.eu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Cc: decui@microsoft.com, kys@microsoft.com, paulros@microsoft.com,
- olaf@aepfle.de, vkuznets@redhat.com, davem@davemloft.net,
- wei.liu@kernel.org, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- leon@kernel.org, longli@microsoft.com, ssengar@linux.microsoft.com,
- linux-rdma@vger.kernel.org, daniel@iogearbox.net, john.fastabend@gmail.com,
- bpf@vger.kernel.org, ast@kernel.org, sharmaajay@microsoft.com,
- hawk@kernel.org, tglx@linutronix.de, shradhagupta@linux.microsoft.com,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH V6,net-next] net: mana: Add page pool for RX buffers
-Content-Language: en-US
-To: Haiyang Zhang <haiyangz@microsoft.com>, linux-hyperv@vger.kernel.org,
- netdev@vger.kernel.org
-References: <1691181233-25286-1-git-send-email-haiyangz@microsoft.com>
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <1691181233-25286-1-git-send-email-haiyangz@microsoft.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20230807081225.816199-1-david@readahead.eu>
 
-
-
-On 04/08/2023 22.33, Haiyang Zhang wrote:
-> Add page pool for RX buffers for faster buffer cycle and reduce CPU
-> usage.
+On Mon, Aug 07, 2023 at 10:12:25AM +0200, David Rheinsberg wrote:
+> Change the new (unreleased) SO_PEERPIDFD sockopt to return ENODATA
+> rather than ESRCH if a socket type does not support remote peer-PID
+> queries.
 > 
-> The standard page pool API is used.
+> Currently, SO_PEERPIDFD returns ESRCH when the socket in question is
+> not an AF_UNIX socket. This is quite unexpected, given that one would
+> assume ESRCH means the peer process already exited and thus cannot be
+> found. However, in that case the sockopt actually returns EINVAL (via
+> pidfd_prepare()). This is rather inconsistent with other syscalls, which
+> usually return ESRCH if a given PID refers to a non-existant process.
 > 
-> With iperf and 128 threads test, this patch improved the throughput
-> by 12-15%, and decreased the IRQ associated CPU's usage from 99-100% to
-> 10-50%.
+> This changes SO_PEERPIDFD to return ENODATA instead. This is also what
+> SO_PEERGROUPS returns, and thus keeps a consistent behavior across
+> sockopts.
 > 
-> Signed-off-by: Haiyang Zhang<haiyangz@microsoft.com>
-> Reviewed-by: Jesse Brandeburg<jesse.brandeburg@intel.com>
+> Note that this code is returned in 2 cases: First, if the socket type is
+> not AF_UNIX, and secondly if the socket was not yet connected. In both
+> cases ENODATA seems suitable.
+> 
+> Signed-off-by: David Rheinsberg <david@readahead.eu>
+> ---
+> Hi!
+> 
+> The SO_PEERPIDFD sockopt has been queued for 6.5, so hopefully we can
+> get that in before the release?
 
-For the record I want to provide my ACK as page_pool maintainer:
+Shouldn't be an issue afaict.
 
-Acked-by: Jesper Dangaard Brouer <hawk@kernel.org>
-
-As patch was applied Sunday, my ACK will not reach the git tree
-  https://git.kernel.org/netdev/net-next/c/b1d13f7a3b53
-
---Jesper
+Looks good to me,
+Reviewed-by: Christian Brauner <brauner@kernel.org>
 
