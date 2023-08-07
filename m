@@ -1,51 +1,48 @@
-Return-Path: <netdev+bounces-25013-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25014-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 027047728E7
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 17:19:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A8C8772900
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 17:21:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 931A028121D
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 15:19:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 62A1D1C203DE
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 15:21:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B9F810970;
-	Mon,  7 Aug 2023 15:19:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24EE810975;
+	Mon,  7 Aug 2023 15:21:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B7721078E
-	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 15:18:59 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 275B4C433C7;
-	Mon,  7 Aug 2023 15:18:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C325810957
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 15:21:51 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 455CEC433C8;
+	Mon,  7 Aug 2023 15:21:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691421538;
-	bh=Ol5bMly7ZqSw89nfp8mGDx2BhxDc6aLMJTh/iG345hs=;
+	s=k20201202; t=1691421711;
+	bh=eKeOwnUilQvBQlfyJP6vAB2J5JPookLqOqnK6bxP1ak=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=YRp/HqOwWwHkISGl6UlLg2lhuOJ3o0X4pe3nR6DzFJ6au08VpBT9ZQPWXQ2jgpCEz
-	 8IZLlaeQVQNCQrn9p49EF7NkJQ3aZ0m0DG+RdLt5rKwOAfWinT8Q24WbwuqofDvtpR
-	 itQgofis4FrIyi0nxdIEdKehqg9yJATp6vdSotCLcjsjbu9cMXulryywabJ2OgQYr5
-	 gRBBPX6y9ROcoTv5J2E3HSKQcQyCSK7f7qoF7Brg5Mv81gdJL8OKWyXnRVMJ4/omNJ
-	 sPbQQzirY9MYcN1gFDpaZVQPqQ4XsPapJ1kycY9apdtExhLO4rQ7Rpbhpe6bqHSZHI
-	 RYwJTvM+Grrlw==
-Date: Mon, 7 Aug 2023 17:18:53 +0200
+	b=WnWM64mAcr3BbMWMRRT+DrK7ilmVcRbK8xjvF66wlMS54tv5rEuG7/lQrIieChzR3
+	 JqJAFTLcEBTcNZ2ulxtBMyr+qX8opnPheb46zFH5YtLoPkSPUQV0auZiNaNEcUKYv7
+	 v4uM3izi3sbc6xwcDLodd8ecfYkZm1dGAwyHJu0QkpVzlWKStbdH8WSENckquJ8dbg
+	 8k/6pk7JkLRlU4kG+jcCNrIQW5EewFhtRgjPr/mC+UgU/oM3CfQwOls8693bbd7W2W
+	 uOAs5kdW+SvcTjVyPyfyJXbEU3GCvlaXCUUWZ5fuFRLyCyCmkxGWEuOYL5al1CMwEX
+	 iltcix4f6mJ/Q==
+Date: Mon, 7 Aug 2023 17:21:46 +0200
 From: Simon Horman <horms@kernel.org>
-To: Furong Xu <0x1207@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Joao Pinto <jpinto@synopsys.com>, netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	xfr@outlook.com, rock.xu@nio.com
-Subject: Re: [PATCH] net: stmmac: xgmac: RX queue routing configuration
-Message-ID: <ZNELXd4I8r+YlWXP@vergenet.net>
-References: <20230807065609.1096076-1-0x1207@gmail.com>
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] net: dsa: mt7530: improve and relax PHY driver
+ dependency
+Message-ID: <ZNEMCub3K+WSuEQu@vergenet.net>
+References: <3ae907b7b60792e36bc5292c2e0bab74f84285e7.1691246642.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -54,75 +51,15 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230807065609.1096076-1-0x1207@gmail.com>
+In-Reply-To: <3ae907b7b60792e36bc5292c2e0bab74f84285e7.1691246642.git.daniel@makrotopia.org>
 
-On Mon, Aug 07, 2023 at 02:56:09PM +0800, Furong Xu wrote:
-> Commit abe80fdc6ee6 ("net: stmmac: RX queue routing configuration")
-> introduced RX queue routing to DWMAC4 core.
-> This patch extend the support to XGMAC2 core.
+On Sat, Aug 05, 2023 at 03:45:36PM +0100, Daniel Golle wrote:
+> Different MT7530 variants require different PHY drivers.
+> Use 'imply' instead of 'select' to relax the dependency on the PHY
+> driver, and choose the appropriate driver.
 > 
-> Signed-off-by: Furong Xu <0x1207@gmail.com>
+> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 
-Hi Furong Xu,
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-as this is a feature for a Networking it (probably) should
-be targeted at net-next - as opposed to net, which is for bug fixes.
-The target tree should be included in the subject.
-
-  Subject: [PATCH net-next] ...
-
-...
-
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
-> index a0c2ef8bb0ac..24918d95f612 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
-> @@ -127,6 +127,39 @@ static void dwxgmac2_tx_queue_prio(struct mac_device_info *hw, u32 prio,
->  	writel(value, ioaddr + reg);
->  }
->  
-> +static void dwxgmac2_rx_queue_routing(struct mac_device_info *hw,
-> +				      u8 packet, u32 queue)
-> +{
-> +	void __iomem *ioaddr = hw->pcsr;
-> +	u32 value;
-> +
-> +	static const struct stmmac_rx_routing dwxgmac2_route_possibilities[] = {
-> +		{ XGMAC_AVCPQ, XGMAC_AVCPQ_SHIFT },
-> +		{ XGMAC_PTPQ, XGMAC_PTPQ_SHIFT },
-> +		{ XGMAC_DCBCPQ, XGMAC_DCBCPQ_SHIFT },
-> +		{ XGMAC_UPQ, XGMAC_UPQ_SHIFT },
-> +		{ XGMAC_MCBCQ, XGMAC_MCBCQ_SHIFT },
-> +	};
-> +
-> +	value = readl(ioaddr + XGMAC_RXQ_CTRL1);
-> +
-> +	/* routing configuration */
-> +	value &= ~dwxgmac2_route_possibilities[packet - 1].reg_mask;
-> +	value |= (queue << dwxgmac2_route_possibilities[packet-1].reg_shift) &
-> +		dwxgmac2_route_possibilities[packet - 1].reg_mask;
-> +
-> +	/* some packets require extra ops */
-> +	if (packet == PACKET_AVCPQ) {
-> +		value &= ~XGMAC_TACPQE;
-> +		value |= 0x1 << XGMAC_TACPQE_SHIFT;
-
-FIELD_PREP seems appropriate here.
-
-> +	} else if (packet == PACKET_MCBCQ) {
-> +		value &= ~XGMAC_MCBCQEN;
-> +		value |= 0x1 << XGMAC_MCBCQEN_SHIFT;
-
-And here.
-
-> +	}
-> +
-> +	writel(value, ioaddr + XGMAC_RXQ_CTRL1);
-> +}
-> +
->  static void dwxgmac2_prog_mtl_rx_algorithms(struct mac_device_info *hw,
->  					    u32 rx_alg)
->  {
-
-...
 
