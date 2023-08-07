@@ -1,63 +1,61 @@
-Return-Path: <netdev+bounces-25123-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25125-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8CFE77309D
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 22:47:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 659E47730B4
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 22:55:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DD2F11C20C8F
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 20:47:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9F6761C20CEE
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 20:55:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D600125C3;
-	Mon,  7 Aug 2023 20:47:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58BD916404;
+	Mon,  7 Aug 2023 20:55:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F5393D9C
-	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 20:47:06 +0000 (UTC)
-Received: from smtp-fw-9105.amazon.com (smtp-fw-9105.amazon.com [207.171.188.204])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD351189;
-	Mon,  7 Aug 2023 13:47:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1691441226; x=1722977226;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=i3BspMO1SbyaVrPL43K1PgldA9iQctRpaOUukh+SQm0=;
-  b=m7hnTHmYsgih5/c6G+Gd0jAODsQfKnWA/wKrhNUsDMzP8GR1sfWuuPiC
-   u+Ac9FA1SKGJKbG1mnHJtvQ4DhropoQHJbf4AgwAvsdAqYkpiJVUy1Mdm
-   E1NFRuUcSe2Fsfxuux6nOS3I5xeRlKAp5xqJX8NrgfvdV0dnV2BxWDYHs
-   w=;
-X-IronPort-AV: E=Sophos;i="6.01,263,1684800000"; 
-   d="scan'208";a="665009981"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-pdx-2a-m6i4x-1197e3af.us-west-2.amazon.com) ([10.25.36.214])
-  by smtp-border-fw-9105.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Aug 2023 20:47:00 +0000
-Received: from EX19MTAUWC002.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
-	by email-inbound-relay-pdx-2a-m6i4x-1197e3af.us-west-2.amazon.com (Postfix) with ESMTPS id 7766510064B;
-	Mon,  7 Aug 2023 20:46:59 +0000 (UTC)
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Mon, 7 Aug 2023 20:46:59 +0000
-Received: from 88665a182662.ant.amazon.com.com (10.187.170.12) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1118.30;
- Mon, 7 Aug 2023 20:46:56 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <mirsad.todorovac@alu.unizg.hr>
-CC: <alexander@mihalicyn.com>, <davem@davemloft.net>, <edumazet@google.com>,
-	<fw@strlen.de>, <kuba@kernel.org>, <kuniyu@amazon.com>,
-	<linux-kernel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <shuah@kernel.org>
-Subject: Re: selftests: net/af_unix test_unix_oob [FAILED]
-Date: Mon, 7 Aug 2023 13:46:47 -0700
-Message-ID: <20230807204648.50070-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <abf98942-0058-f2ad-8e55-fbdd83b7c2d6@alu.unizg.hr>
-References: <abf98942-0058-f2ad-8e55-fbdd83b7c2d6@alu.unizg.hr>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DD6B3D9C
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 20:55:16 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B96E10F8
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 13:55:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1691441715; x=1722977715;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=2WyO3cf73Rdb/ZXHW16vbwxb+yETO8U052IGXPC3WHE=;
+  b=QspIYLplOQzcpPWENbGpjOjEs/8fO0BBE79o4zeBaWmcWpFDSodmaCvy
+   +M6+zH78q/g/v5bEa5fjuzfed4GtoBrks2y2KBQm3dDAY1y1OvcYOG/jJ
+   4ae3hSmk0oI4bj/AA/yxNowV/20JqIzrWa53RvevXsO7ENw0/SElM7rx8
+   JSP5AGBHSESlv6YqAy2QJ/FTNNfEB1SPqVZLNGd9peJjRvYmK/Bllkro4
+   lZWpZZwXIDbaghyvqT7HtZkEGZhtDeWit6oq0z06j6cS2MMKCDaED+T+j
+   CDUPlmHPqtE1atQqQ7l6km0kQwjNkfb48oVQOgFjlcNk1CNhWDJBX/XLW
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10795"; a="350952441"
+X-IronPort-AV: E=Sophos;i="6.01,263,1684825200"; 
+   d="scan'208";a="350952441"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Aug 2023 13:55:14 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10795"; a="734226829"
+X-IronPort-AV: E=Sophos;i="6.01,263,1684825200"; 
+   d="scan'208";a="734226829"
+Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
+  by fmsmga007.fm.intel.com with ESMTP; 07 Aug 2023 13:55:13 -0700
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	netdev@vger.kernel.org
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>
+Subject: [PATCH net-next v2 0/6][pull request] Intel Wired LAN Driver Updates 2023-08-07 (ice)
+Date: Mon,  7 Aug 2023 13:48:29 -0700
+Message-Id: <20230807204835.3129164-1-anthony.l.nguyen@intel.com>
+X-Mailer: git-send-email 2.38.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,77 +63,71 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.187.170.12]
-X-ClientProxiedBy: EX19D045UWC004.ant.amazon.com (10.13.139.203) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
-Precedence: Bulk
-X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,T_SPF_PERMERROR autolearn=no autolearn_force=no
-	version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
-Date: Mon, 7 Aug 2023 21:44:41 +0200
-> Hi all,
-> 
-> In the kernel 6.5-rc5 build on Ubuntu 22.04 LTS (jammy jellyfish) on a Ryzen 7950 assembled box,
-> vanilla torvalds tree kernel, the test test_unix_oob unexpectedly fails:
-> 
-> # selftests: net/af_unix: test_unix_oob
-> # Test 2 failed, sigurg 23 len 63 OOB %
-> 
-> It is this code:
-> 
->          /* Test 2:
->           * Verify that the first OOB is over written by
->           * the 2nd one and the first OOB is returned as
->           * part of the read, and sigurg is received.
->           */
->          wait_for_data(pfd, POLLIN | POLLPRI);
->          len = 0;
->          while (len < 70)
->                  len = recv(pfd, buf, 1024, MSG_PEEK);
->          len = read_data(pfd, buf, 1024);
->          read_oob(pfd, &oob);
->          if (!signal_recvd || len != 127 || oob != '#') {
->                  fprintf(stderr, "Test 2 failed, sigurg %d len %d OOB %c\n",
->                  signal_recvd, len, oob);
->                  die(1);
->          }
-> 
-> In 6.5-rc4, this test was OK, so it might mean we have a regression?
+This series contains updates to ice driver only.
 
-Thanks for reporting.
+Wojciech allows for LAG interfaces to be used for bridge offloads.
 
-I confirmed the test doesn't fail on net-next at least, but it's based
-on v6.5-rc4.
+Marcin tracks additional metadata for filtering rules to aid in proper
+differentiation of similar rules. He also renames some flags that
+do not entirely describe their representation.
 
-  ---8<---
-  [root@localhost ~]# ./test_unix_oob 
-  [root@localhost ~]# echo $?
-  0
-  [root@localhost ~]# uname -r
-  6.5.0-rc4-01192-g66244337512f
-  ---8<---
+Karol and Jan add additional waiting for firmware load on devices that
+require it.
 
-I'll check 6.5-rc5 later.
+Przemek refactors RSS implementation to clarify/simplify configurations.
+---
+v2:
+- Drop patch 'ice: Support untagged VLAN traffic in br offload'
+- Make ice_aq_get_netlist_node() static
+- Remove excess declaration of ice_is_pf_c827()
 
+v1: https://lore.kernel.org/netdev/20230801173112.3625977-1-anthony.l.nguyen@intel.com/
 
-> 
-> marvin@defiant:~/linux/kernel/linux_torvalds$ grep test_unix_oob ../kselftest-6.5-rc4-1.log
-> /net/af_unix/test_unix_oob
-> # selftests: net/af_unix: test_unix_oob
-> ok 2 selftests: net/af_unix: test_unix_oob
-> marvin@defiant:~/linux/kernel/linux_torvalds$
-> 
-> Hope this helps.
-> 
-> NOTE: the kernel is vanilla torvalds tree, only "dirty" because the selftests were modified.
-> 
-> Kind regards,
-> Mirsad Todorovac
+The following are changes since commit cc97777c80fdfabe12997581131872a03fdcf683:
+  udp/udplite: Remove unused function declarations udp{,lite}_get_port()
+and are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue 100GbE
+
+Jan Sokolowski (1):
+  ice: add FW load wait
+
+Karol Kolacinski (1):
+  ice: Add get C827 PHY index function
+
+Marcin Szycik (2):
+  ice: Add direction metadata
+  ice: Rename enum ice_pkt_flags values
+
+Przemek Kitszel (1):
+  ice: clean up __ice_aq_get_set_rss_lut()
+
+Wojciech Drewek (1):
+  ice: Accept LAG netdevs in bridge offloads
+
+ .../net/ethernet/intel/ice/ice_adminq_cmd.h   |  54 +++--
+ drivers/net/ethernet/intel/ice/ice_common.c   | 205 ++++++++++--------
+ drivers/net/ethernet/intel/ice/ice_common.h   |   1 +
+ .../net/ethernet/intel/ice/ice_eswitch_br.c   |  47 +++-
+ .../net/ethernet/intel/ice/ice_hw_autogen.h   |   3 +-
+ drivers/net/ethernet/intel/ice/ice_lib.c      |  20 +-
+ drivers/net/ethernet/intel/ice/ice_main.c     |  37 ++++
+ .../ethernet/intel/ice/ice_protocol_type.h    |   9 +-
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.h   |   3 +
+ drivers/net/ethernet/intel/ice/ice_switch.c   |  11 +-
+ drivers/net/ethernet/intel/ice/ice_switch.h   |   1 +
+ drivers/net/ethernet/intel/ice/ice_tc_lib.c   |  34 +--
+ drivers/net/ethernet/intel/ice/ice_type.h     |   9 +-
+ drivers/net/ethernet/intel/ice/ice_virtchnl.c |   6 +-
+ 14 files changed, 279 insertions(+), 161 deletions(-)
+
+-- 
+2.38.1
+
 
