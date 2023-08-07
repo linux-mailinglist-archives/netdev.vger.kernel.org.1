@@ -1,98 +1,136 @@
-Return-Path: <netdev+bounces-25004-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25005-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D75D772832
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 16:50:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C4EC772838
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 16:53:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5C87D1C20BF3
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 14:50:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4DAA81C20AE7
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 14:53:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BFE4FC0C;
-	Mon,  7 Aug 2023 14:50:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA20A101FD;
+	Mon,  7 Aug 2023 14:53:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 204C010780
-	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 14:50:48 +0000 (UTC)
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3101D10FD;
-	Mon,  7 Aug 2023 07:50:45 -0700 (PDT)
-Received: from canpemm500007.china.huawei.com (unknown [172.30.72.53])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RKK0c73clzNmqK;
-	Mon,  7 Aug 2023 22:47:12 +0800 (CST)
-Received: from localhost (10.174.179.215) by canpemm500007.china.huawei.com
- (7.192.104.62) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Mon, 7 Aug
- 2023 22:50:40 +0800
-From: Yue Haibing <yuehaibing@huawei.com>
-To: <johannes@sipsolutions.net>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <yuehaibing@huawei.com>
-CC: <linux-wireless@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<horms@kernel.org>
-Subject: [PATCH v3] wifi: iw_handler.h: Remove unused declaration dev_get_wireless_info()
-Date: Mon, 7 Aug 2023 22:50:32 +0800
-Message-ID: <20230807145032.44768-1-yuehaibing@huawei.com>
-X-Mailer: git-send-email 2.10.2.windows.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE2BB20FE
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 14:53:10 +0000 (UTC)
+Received: from mail-oi1-x22a.google.com (mail-oi1-x22a.google.com [IPv6:2607:f8b0:4864:20::22a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BA93107;
+	Mon,  7 Aug 2023 07:53:09 -0700 (PDT)
+Received: by mail-oi1-x22a.google.com with SMTP id 5614622812f47-3a76cbd4bbfso3569296b6e.3;
+        Mon, 07 Aug 2023 07:53:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1691419988; x=1692024788;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=gPyaQLNjb03ouvrVyzPL3TMkSNOyEwc/JBGegxpaeoQ=;
+        b=YV8CMowsfVp8X6lMPHl/4+xuV9+mbuGldWgDG9uuV3GYK4sRZmzQacSaGoVaGXGrFL
+         TCTYYAH589fxwBm8SRCBSSf06Pp/XTN7WaSI5MiN2GH8275qYCfKGNbQNzUxlbCRVkZ1
+         iCGrn9ClTh0mOSTiJRgvgOlJLGc4VH3MyhD90tT0Uupg5ZIJQgtPwEu7cpXeyjoGt2rJ
+         98qzrj0JMndq0M8Yd7UWERIn/7ww5tld01a8IbiNg+mAcF8pOMnhNKLHfjLb2hvzOxuL
+         spLcbF0IFnhss8bzwh2Q+PDi3INuSrYO7RVIbesqQE4olgA792oWqbNDQZjOWa0bthlF
+         cKxQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691419988; x=1692024788;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=gPyaQLNjb03ouvrVyzPL3TMkSNOyEwc/JBGegxpaeoQ=;
+        b=TUbHzXQpabe1u+fp5Cg9vp/++l9qgzBVMEoH3pWBave7aFOXF4hYe0QMF0iXNKzjc5
+         JziFf/eeil6BjGXlWMaE7JegBmXcnnT07V2JqNJsfGcMrs48rqA1eL+PDA43E/khzUj7
+         1LivL+XcD5dt1nLtr1Z1lJReV1R9k7j3Qw/4UQ0AvSSRunFxOwY1m+9y6GR1EjJdw4pX
+         CPyXCJ6fZvKrd/9kYjA6qk4cBS638tI4RYshwrDyWV1nQ91vGjtJrO3aXumPW4MVkFKM
+         w23yQgFe+Q8KnzPA7JetsD1ZSIvKDab1c07RHN8awGcjGMxdwtWDXH2tUmR7idQyBQkG
+         xVbg==
+X-Gm-Message-State: AOJu0YyQZEmrirlCSQL474Eq0UiyYGydPeArvoWmHP+GGdBVCr9o+U1O
+	uPnKbGWTEdkr0+T2+IsZX8s=
+X-Google-Smtp-Source: AGHT+IGQy+/2WjTiRQlHtjorkHwUnq3HFiuiWRlKIjB42JMnDCj4CZgQt28EvYw9iJNEkeYresq4Kg==
+X-Received: by 2002:aca:6506:0:b0:3a7:540f:ca71 with SMTP id m6-20020aca6506000000b003a7540fca71mr10003496oim.53.1691419988476;
+        Mon, 07 Aug 2023 07:53:08 -0700 (PDT)
+Received: from ?IPv6:2605:59c8:448:b800:82ee:73ff:fe41:9a02? ([2605:59c8:448:b800:82ee:73ff:fe41:9a02])
+        by smtp.googlemail.com with ESMTPSA id w184-20020a6362c1000000b00563feb7113dsm5013767pgb.91.2023.08.07.07.53.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Aug 2023 07:53:08 -0700 (PDT)
+Message-ID: <db73f4943475a1cd7f79d70896e331204102ea4e.camel@gmail.com>
+Subject: Re: [PATCH net-next v4 0/6] page_pool: a couple of assorted
+ optimizations
+From: Alexander H Duyck <alexander.duyck@gmail.com>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>, "David S. Miller"
+	 <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	 <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Maciej Fijalkowski <maciej.fijalkowski@intel.com>, Larysa Zaremba
+ <larysa.zaremba@intel.com>, Yunsheng Lin <linyunsheng@huawei.com>,
+ Alexander Duyck <alexanderduyck@fb.com>, Jesper Dangaard Brouer
+ <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, Simon
+ Horman <simon.horman@corigine.com>,  netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Date: Mon, 07 Aug 2023 07:53:06 -0700
+In-Reply-To: <20230804180529.2483231-1-aleksander.lobakin@intel.com>
+References: <20230804180529.2483231-1-aleksander.lobakin@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.3 (3.48.3-1.fc38) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.174.179.215]
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- canpemm500007.china.huawei.com (7.192.104.62)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Commit 556829657397 ("[NL80211]: add netlink interface to cfg80211")
-declared but never implemented this, remove it.
-Commit 11433ee450eb ("[WEXT]: Move to net/wireless") rename net/core/wireless.c
-to net/wireless/wext.c, then commit 3d23e349d807 ("wext: refactor") refactor
-wext.c to wext-core.c, fix the wext comment.
+On Fri, 2023-08-04 at 20:05 +0200, Alexander Lobakin wrote:
+> That initially was a spin-off of the IAVF PP series[0], but has grown
+> (and shrunk) since then a bunch. In fact, it consists of three
+> semi-independent blocks:
+>=20
+> * #1-2: Compile-time optimization. Split page_pool.h into 2 headers to
+>   not overbloat the consumers not needing complex inline helpers and
+>   then stop including it in skbuff.h at all. The first patch is also
+>   prereq for the whole series.
+> * #3: Improve cacheline locality for users of the Page Pool frag API.
+> * #4-6: Use direct cache recycling more aggressively, when it is safe
+>   obviously. In addition, make sure nobody wants to use Page Pool API
+>   with disabled interrupts.
+>=20
+> Patches #1 and #5 are authored by Yunsheng and Jakub respectively, with
+> small modifications from my side as per ML discussions.
+> For the perf numbers for #3-6, please see individual commit messages.
+>=20
+> Also available on my GH with many more Page Pool goodies[1].
+>=20
+> [0] https://lore.kernel.org/netdev/20230530150035.1943669-1-aleksander.lo=
+bakin@intel.com
+> [1] https://github.com/alobakin/linux/commits/iavf-pp-frag
+>=20
+> Alexander Lobakin (4):
+>   net: skbuff: don't include <net/page_pool/types.h> to <linux/skbuff.h>
+>   page_pool: place frag_* fields in one cacheline
+>   net: skbuff: avoid accessing page_pool if !napi_safe when returning
+>     page
+>   net: skbuff: always try to recycle PP pages directly when in softirq
+>=20
+> Jakub Kicinski (1):
+>   page_pool: add a lockdep check for recycling in hardirq
+>=20
+> Yunsheng Lin (1):
+>   page_pool: split types and declarations from page_pool.h
 
-Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
----
-v3: add commit log about comment fixup
-v2: fix wext comment
----
- include/net/iw_handler.h | 11 ++---------
- 1 file changed, 2 insertions(+), 9 deletions(-)
+So the series mostly looks good to me. My only concern would be with
+path 5 since I am not sure why we are just throwing a WARN_ON when we
+could just take action on the info to prevent the problem in the first
+place. That said the change doesn't hurt anything as-is so I would be
+good with us thinking about changing that as a follow-up.
 
-diff --git a/include/net/iw_handler.h b/include/net/iw_handler.h
-index d2ea5863eedc..b2cf243ebe44 100644
---- a/include/net/iw_handler.h
-+++ b/include/net/iw_handler.h
-@@ -426,17 +426,10 @@ struct iw_public_data {
- 
- /**************************** PROTOTYPES ****************************/
- /*
-- * Functions part of the Wireless Extensions (defined in net/core/wireless.c).
-- * Those may be called only within the kernel.
-+ * Functions part of the Wireless Extensions (defined in net/wireless/wext-core.c).
-+ * Those may be called by driver modules.
-  */
- 
--/* First : function strictly used inside the kernel */
--
--/* Handle /proc/net/wireless, called in net/code/dev.c */
--int dev_get_wireless_info(char *buffer, char **start, off_t offset, int length);
--
--/* Second : functions that may be called by driver modules */
--
- /* Send a single event to user space */
- void wireless_send_event(struct net_device *dev, unsigned int cmd,
- 			 union iwreq_data *wrqu, const char *extra);
--- 
-2.34.1
+Reviewed-by: Alexander Duyck <alexanderduyck@fb.com>
 
 
