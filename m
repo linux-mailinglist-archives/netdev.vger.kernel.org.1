@@ -1,43 +1,43 @@
-Return-Path: <netdev+bounces-24740-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24741-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 562417717F0
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 03:44:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B9DD7717F8
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 03:46:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 567E81C2090E
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 01:44:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 443B61C20904
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 01:46:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23B9C392;
-	Mon,  7 Aug 2023 01:44:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1871D649;
+	Mon,  7 Aug 2023 01:46:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 127F87F7
-	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 01:44:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05F83392
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 01:45:59 +0000 (UTC)
 Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id E59DB170B;
-	Sun,  6 Aug 2023 18:43:52 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5DFFC19AF;
+	Sun,  6 Aug 2023 18:45:39 -0700 (PDT)
 Authenticated-By: 
-X-SpamFilter-By: ArmorX SpamTrap 5.77 with qID 3771fdYB3029494, This message is accepted by code: ctloc85258
+X-SpamFilter-By: ArmorX SpamTrap 5.77 with qID 3771hFiC5030517, This message is accepted by code: ctloc85258
 Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
-	by rtits2.realtek.com.tw (8.15.2/2.81/5.90) with ESMTPS id 3771fdYB3029494
+	by rtits2.realtek.com.tw (8.15.2/2.81/5.90) with ESMTPS id 3771hFiC5030517
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=FAIL);
-	Mon, 7 Aug 2023 09:41:39 +0800
-Received: from RTEXDAG02.realtek.com.tw (172.21.6.101) by
+	Mon, 7 Aug 2023 09:43:15 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
  RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.17; Mon, 7 Aug 2023 09:41:34 +0800
+ 15.1.2507.17; Mon, 7 Aug 2023 09:42:43 +0800
 Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXDAG02.realtek.com.tw (172.21.6.101) with Microsoft SMTP Server
+ RTEXMBS04.realtek.com.tw (172.21.6.97) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.7; Mon, 7 Aug 2023 09:41:33 +0800
+ 15.1.2375.7; Mon, 7 Aug 2023 09:42:43 +0800
 Received: from RTEXMBS04.realtek.com.tw ([fe80::e138:e7f1:4709:ff4d]) by
  RTEXMBS04.realtek.com.tw ([fe80::e138:e7f1:4709:ff4d%5]) with mapi id
- 15.01.2375.007; Mon, 7 Aug 2023 09:41:33 +0800
+ 15.01.2375.007; Mon, 7 Aug 2023 09:42:43 +0800
 From: Ping-Ke Shih <pkshih@realtek.com>
 To: Ruan Jinjie <ruanjinjie@huawei.com>,
         "sgoutham@marvell.com"
@@ -82,21 +82,21 @@ To: Ruan Jinjie <ruanjinjie@huawei.com>,
 	<brcm80211-dev-list.pdl@broadcom.com>,
         "SHA-cyfmac-dev-list@infineon.com"
 	<SHA-cyfmac-dev-list@infineon.com>
-Subject: RE: [PATCH -next 3/6] net/mlx4: Remove an unnecessary ternary operator
-Thread-Topic: [PATCH -next 3/6] net/mlx4: Remove an unnecessary ternary
+Subject: RE: [PATCH -next 6/6] brcm80211: Remove an unnecessary ternary operator
+Thread-Topic: [PATCH -next 6/6] brcm80211: Remove an unnecessary ternary
  operator
-Thread-Index: AQHZxodwyq+yd8Ng70KD3Dr7pngH66/eE0hg
-Date: Mon, 7 Aug 2023 01:41:33 +0000
-Message-ID: <fd3e9bb40d12421caaddda7279aece7a@realtek.com>
+Thread-Index: AQHZxodyLvV38Vq6lUarMSYN6WoMea/eE5fw
+Date: Mon, 7 Aug 2023 01:42:43 +0000
+Message-ID: <f72991b36d6a449ea5cf476d438bcd1d@realtek.com>
 References: <20230804035346.2879318-1-ruanjinjie@huawei.com>
- <20230804035346.2879318-4-ruanjinjie@huawei.com>
-In-Reply-To: <20230804035346.2879318-4-ruanjinjie@huawei.com>
+ <20230804035346.2879318-7-ruanjinjie@huawei.com>
+In-Reply-To: <20230804035346.2879318-7-ruanjinjie@huawei.com>
 Accept-Language: en-US, zh-TW
 Content-Language: zh-TW
 X-MS-Has-Attach:
 X-MS-TNEF-Correlator:
 x-originating-ip: [172.21.69.188]
-x-kse-serverinfo: RTEXDAG02.realtek.com.tw, 9
+x-kse-serverinfo: RTEXMBS04.realtek.com.tw, 9
 x-kse-antispam-interceptor-info: fallback
 x-kse-antivirus-interceptor-info: fallback
 Content-Type: text/plain; charset="us-ascii"
@@ -133,34 +133,38 @@ te_at@outlook.com;
 > linux-rdma@vger.kernel.org; linux-renesas-soc@vger.kernel.org; linux-wire=
 less@vger.kernel.org;
 > brcm80211-dev-list.pdl@broadcom.com; SHA-cyfmac-dev-list@infineon.com
-> Subject: [PATCH -next 3/6] net/mlx4: Remove an unnecessary ternary operat=
-or
+> Subject: [PATCH -next 6/6] brcm80211: Remove an unnecessary ternary opera=
+tor
 >=20
-> There is a ternary operator, the true or false judgement
-> of which is unnecessary in C language semantics.
+> There is a ternary operator, the true or false judgement of which
+> is unnecessary in C language semantics.
 >=20
 > Signed-off-by: Ruan Jinjie <ruanjinjie@huawei.com>
 > ---
->  drivers/net/ethernet/mellanox/mlx4/port.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  drivers/net/wireless/broadcom/brcm80211/brcmsmac/phy/phy_n.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
 >=20
-> diff --git a/drivers/net/ethernet/mellanox/mlx4/port.c b/drivers/net/ethe=
-rnet/mellanox/mlx4/port.c
-> index 256a06b3c096..1c289488d050 100644
-> --- a/drivers/net/ethernet/mellanox/mlx4/port.c
-> +++ b/drivers/net/ethernet/mellanox/mlx4/port.c
-> @@ -176,7 +176,7 @@ static bool mlx4_need_mf_bond(struct mlx4_dev *dev)
->         mlx4_foreach_port(i, dev, MLX4_PORT_TYPE_ETH)
->                 ++num_eth_ports;
+> diff --git a/drivers/net/wireless/broadcom/brcm80211/brcmsmac/phy/phy_n.c
+> b/drivers/net/wireless/broadcom/brcm80211/brcmsmac/phy/phy_n.c
+> index 8580a2754789..8328b22829c5 100644
+> --- a/drivers/net/wireless/broadcom/brcm80211/brcmsmac/phy/phy_n.c
+> +++ b/drivers/net/wireless/broadcom/brcm80211/brcmsmac/phy/phy_n.c
+> @@ -27351,8 +27351,7 @@ static int wlc_phy_cal_rxiq_nphy_rev3(struct brcm=
+s_phy *pi,
 >=20
-> -       return (num_eth_ports =3D=3D  2) ? true : false;
-> +       return num_eth_ports =3D=3D  2;
+>         for (rx_core =3D 0; rx_core < pi->pubpi.phy_corenum; rx_core++) {
+>=20
+> -               skip_rxiqcal =3D
+> -                       ((rxcore_state & (1 << rx_core)) =3D=3D 0) ? true=
+ : false;
+> +               skip_rxiqcal =3D (rxcore_state & (1 << rx_core)) =3D=3D 0=
+;
 
-It should be one space between '=3D' and '2'.
+skip_rxiqcal =3D !(rxcore_state & (1 << rx_core));
 
->  }
 >=20
->  int __mlx4_register_mac(struct mlx4_dev *dev, u8 port, u64 mac)
+>                 wlc_phy_rxcal_physetup_nphy(pi, rx_core);
+>=20
 > --
 > 2.34.1
 >=20
