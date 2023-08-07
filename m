@@ -1,149 +1,109 @@
-Return-Path: <netdev+bounces-24965-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24966-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE1C5772590
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 15:24:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41E9077259C
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 15:27:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 965591C20A59
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 13:24:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DA11E28120A
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 13:27:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF374107AD;
-	Mon,  7 Aug 2023 13:24:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B31E8107A0;
+	Mon,  7 Aug 2023 13:27:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A30AB10799
-	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 13:24:27 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F9D8C433C7;
-	Mon,  7 Aug 2023 13:24:26 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="fq0Ns74s"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-	t=1691414665;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rcicnn3ynTAB6IFLFNRyVdMCpVfvSQ8Rr0HQSIv6cqk=;
-	b=fq0Ns74s1vrhuuCLvS2+dSB77YSGER8h0UpJvsNBOebMIWcmNEAPelAZNVBhmJkqRxESd4
-	CA7N/soEiDPkDaYOIC+BiCBgD7BQs4Juu67r0gzxNsez+LUPKpJ0b2Ald9/kr3estkOkx+
-	SZW2eYFcvDaIIFgnU89yEZkO9r6ovKw=
-Received: 
-	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 9573abe4 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-	Mon, 7 Aug 2023 13:24:24 +0000 (UTC)
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-To: netdev@vger.kernel.org,
-	davem@davemloft.net,
-	kuba@kernel.org
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
-	stable@vger.kernel.org
-Subject: [PATCH net 1/1] wireguard: allowedips: expand maximum node depth
-Date: Mon,  7 Aug 2023 15:21:27 +0200
-Message-ID: <20230807132146.2191597-2-Jason@zx2c4.com>
-In-Reply-To: <20230807132146.2191597-1-Jason@zx2c4.com>
-References: <20230807132146.2191597-1-Jason@zx2c4.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8161DDB8
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 13:27:21 +0000 (UTC)
+Received: from mail-qt1-x82a.google.com (mail-qt1-x82a.google.com [IPv6:2607:f8b0:4864:20::82a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B84D1BF4
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 06:27:02 -0700 (PDT)
+Received: by mail-qt1-x82a.google.com with SMTP id d75a77b69052e-40a47e8e38dso438641cf.1
+        for <netdev@vger.kernel.org>; Mon, 07 Aug 2023 06:27:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1691414768; x=1692019568;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=aV86SNTrsedHb/4GViYCEi4y0WkKBp0siTYx3zahDc8=;
+        b=4S7gV7c2cdcuEpB2T5mX/CpOL0kpeYdnmSvNbTa56EyndJ1AvAzRNKOCHIXMgx0KOG
+         m3pW2Po9Xpwb5mBlkkTlDX7BdfoeEdLud2EtxxftfD36WTiHHe2nEeXaITwz2BDbbA0E
+         mSvp6S22gXS5JjA4PzFAz3yxbfL/xwTpchOOFlQes8Q9oNXqFc9aOWbePypmk7q1dk4A
+         a4vRst4pzFXh9rN/C4cxoJLZMGwpmyH5jRV3WLEwpNBiRYis7cS9NoowQ/CtsnQCP+xr
+         DEBbVtZs2zdvHzsuMXpeRoX/6pa4fjpkmdII9AdqLI15u6AO9N5fAAXHrXdcgBZmZLKS
+         kpZw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691414768; x=1692019568;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=aV86SNTrsedHb/4GViYCEi4y0WkKBp0siTYx3zahDc8=;
+        b=HdCN9g1LacrbSDNr+eAHgAbY7FmqyUKB47ZXXzAY3JBWeaP34H1sRgSO/FC8yUB/aG
+         mz9mtwUgMoJskdodc7FByST1fXPINS7+mCYFL8MVOJZxdcFr18P6x0cE8sHHyewquvdQ
+         dvDniJMuq/IrtVXdusgz6QPUdhfGRRKkJnxyIP9CA1gHgQ8t0vRfxn8kpRx29DnEeTNC
+         nrl6CmI5I4hL5EYGnv6WeukX0EjnXUzYz1+p+hnS3fqrrf095UWsIqoCZtp5zpEZ9371
+         QheSRja2MSfGvDyxHLKwpXPTs0repw4w6VdLF769vKu1x0y4KZB8GCb32uBsjEK0uIl5
+         YsaQ==
+X-Gm-Message-State: AOJu0Yx5tG3M6HK5JOwZNaRwY/6Tb4pjNNmnGawQLoLfzOlJXwN/yYQ+
+	H577yiuPj8ZSDyvQjSZ/y6qdIoaAiD2lyVCRjfNJvg==
+X-Google-Smtp-Source: AGHT+IH7l8fz/va80d2V76Roj1BsoAMY57SE1UROxLkV3dyWOxXlttc6h2gDN6ZO1f9HDD+7BbQ8h6jdtiwhSOmFGN4=
+X-Received: by 2002:a05:622a:1806:b0:403:ac17:c18a with SMTP id
+ t6-20020a05622a180600b00403ac17c18amr454405qtc.14.1691414768116; Mon, 07 Aug
+ 2023 06:26:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20230806075216.13378-1-me@manjusaka.me> <CANn89i+bMh-xU7PCxf_O5N+vy=83S+V=23mAAmbCuhjuP5Ob9g@mail.gmail.com>
+ <8d25f9e8-9653-4e9b-b88b-c5434ce8aabf@app.fastmail.com>
+In-Reply-To: <8d25f9e8-9653-4e9b-b88b-c5434ce8aabf@app.fastmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 7 Aug 2023 15:25:56 +0200
+Message-ID: <CANn89iJAu5CLq1LkRLt0qJ+ytFGXWGqymMHBnMevcPS4Z2GAXQ@mail.gmail.com>
+Subject: Re: [PATCH] [RFC PATCH] tcp event: add new tcp:tcp_cwnd_restart event
+To: Manjusaka <me@manjusaka.me>
+Cc: mhiramat@kernel.org, rostedt@goodmis.org, davem@davemloft.net, 
+	dsahern@kernel.org, kuba@kernel.org, pabeni@redhat.com, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-trace-kernel@vger.kernel.org, bpf@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-In the allowedips self-test, nodes are inserted into the tree, but it
-generated an even amount of nodes, but for checking maximum node depth,
-there is of course the root node, which makes the total number
-necessarily odd. With two few nodes added, it never triggered the
-maximum depth check like it should have. So, add 129 nodes instead of
-128 nodes, and do so with a more straightforward scheme, starting with
-all the bits set, and shifting over one each time. Then increase the
-maximum depth to 129, and choose a better name for that variable to
-make it clear that it represents depth as opposed to bits.
+On Mon, Aug 7, 2023 at 2:49=E2=80=AFPM Manjusaka <me@manjusaka.me> wrote:
+>
+> > Do not include code before variable declarations.
+> Sorry about that. I will update the code later.
+>
+> > I would rather add a trace in tcp_ca_event(), this would be more generi=
+c ?
+>
+> https://elixir.bootlin.com/linux/latest/source/net/ipv4/tcp_cong.c#L41
+>
+> I think maybe we already have the tcp_ca_event but named tcp_cong_state_s=
+et?
 
-Cc: stable@vger.kernel.org
-Fixes: e7096c131e51 ("net: WireGuard secure network tunnel")
-Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
----
- drivers/net/wireguard/allowedips.c          |  8 ++++----
- drivers/net/wireguard/selftest/allowedips.c | 16 ++++++++++------
- 2 files changed, 14 insertions(+), 10 deletions(-)
+I am speaking of tcp_ca_event()...
 
-diff --git a/drivers/net/wireguard/allowedips.c b/drivers/net/wireguard/allowedips.c
-index 5bf7822c53f1..0ba714ca5185 100644
---- a/drivers/net/wireguard/allowedips.c
-+++ b/drivers/net/wireguard/allowedips.c
-@@ -6,7 +6,7 @@
- #include "allowedips.h"
- #include "peer.h"
- 
--enum { MAX_ALLOWEDIPS_BITS = 128 };
-+enum { MAX_ALLOWEDIPS_DEPTH = 129 };
- 
- static struct kmem_cache *node_cache;
- 
-@@ -42,7 +42,7 @@ static void push_rcu(struct allowedips_node **stack,
- 		     struct allowedips_node __rcu *p, unsigned int *len)
- {
- 	if (rcu_access_pointer(p)) {
--		if (WARN_ON(IS_ENABLED(DEBUG) && *len >= MAX_ALLOWEDIPS_BITS))
-+		if (WARN_ON(IS_ENABLED(DEBUG) && *len >= MAX_ALLOWEDIPS_DEPTH))
- 			return;
- 		stack[(*len)++] = rcu_dereference_raw(p);
- 	}
-@@ -55,7 +55,7 @@ static void node_free_rcu(struct rcu_head *rcu)
- 
- static void root_free_rcu(struct rcu_head *rcu)
- {
--	struct allowedips_node *node, *stack[MAX_ALLOWEDIPS_BITS] = {
-+	struct allowedips_node *node, *stack[MAX_ALLOWEDIPS_DEPTH] = {
- 		container_of(rcu, struct allowedips_node, rcu) };
- 	unsigned int len = 1;
- 
-@@ -68,7 +68,7 @@ static void root_free_rcu(struct rcu_head *rcu)
- 
- static void root_remove_peer_lists(struct allowedips_node *root)
- {
--	struct allowedips_node *node, *stack[MAX_ALLOWEDIPS_BITS] = { root };
-+	struct allowedips_node *node, *stack[MAX_ALLOWEDIPS_DEPTH] = { root };
- 	unsigned int len = 1;
- 
- 	while (len > 0 && (node = stack[--len])) {
-diff --git a/drivers/net/wireguard/selftest/allowedips.c b/drivers/net/wireguard/selftest/allowedips.c
-index 78ebe2892a78..3d1f64ff2e12 100644
---- a/drivers/net/wireguard/selftest/allowedips.c
-+++ b/drivers/net/wireguard/selftest/allowedips.c
-@@ -593,16 +593,20 @@ bool __init wg_allowedips_selftest(void)
- 	wg_allowedips_remove_by_peer(&t, a, &mutex);
- 	test_negative(4, a, 192, 168, 0, 1);
- 
--	/* These will hit the WARN_ON(len >= MAX_ALLOWEDIPS_BITS) in free_node
-+	/* These will hit the WARN_ON(len >= MAX_ALLOWEDIPS_DEPTH) in free_node
- 	 * if something goes wrong.
- 	 */
--	for (i = 0; i < MAX_ALLOWEDIPS_BITS; ++i) {
--		part = cpu_to_be64(~(1LLU << (i % 64)));
--		memset(&ip, 0xff, 16);
--		memcpy((u8 *)&ip + (i < 64) * 8, &part, 8);
-+	for (i = 0; i < 64; ++i) {
-+		part = cpu_to_be64(~0LLU << i);
-+		memset(&ip, 0xff, 8);
-+		memcpy((u8 *)&ip + 8, &part, 8);
-+		wg_allowedips_insert_v6(&t, &ip, 128, a, &mutex);
-+		memcpy(&ip, &part, 8);
-+		memset((u8 *)&ip + 8, 0, 8);
- 		wg_allowedips_insert_v6(&t, &ip, 128, a, &mutex);
- 	}
--
-+	memset(&ip, 0, 16);
-+	wg_allowedips_insert_v6(&t, &ip, 128, a, &mutex);
- 	wg_allowedips_free(&t, &mutex);
- 
- 	wg_allowedips_init(&t);
--- 
-2.41.0
+For instance, tcp_cwnd_restart() calls tcp_ca_event(sk, CA_EVENT_CWND_RESTA=
+RT);
 
+tcp_set_ca_state() can only set icsk_ca_state to one value from enum
+tcp_ca_state:
+TCP_CA_Open, TCP_CA_Disorder, TCP_CA_CWR, TCP_CA_Recovery, TCP_CA_Loss
+
+enum tcp_ca_event has instead:
+CA_EVENT_TX_START, CA_EVENT_CWND_RESTART, CA_EVENT_COMPLETE_CWR,
+CA_EVENT_LOSS, CA_EVENT_ECN_NO_CE, CA_EVENT_ECN_IS_CE
 
