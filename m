@@ -1,67 +1,67 @@
-Return-Path: <netdev+bounces-25148-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25149-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E26277310D
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 23:15:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC6FA77311C
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 23:18:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 08831281598
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 21:15:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 101D91C20CDA
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 21:18:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4775F174F8;
-	Mon,  7 Aug 2023 21:15:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D4E8174F9;
+	Mon,  7 Aug 2023 21:18:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AEE24432
-	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 21:15:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C787174EC
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 21:18:31 +0000 (UTC)
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0E2C1722
-	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 14:15:35 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6145DE76
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 14:18:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1691442934;
+	s=mimecast20190719; t=1691443106;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=ye5A6Jw6eWidJwu3XWNBZr93qlVRCWc3OvMx6RGhxc4=;
-	b=c3dysyfkHkaXJigafXScLcZqd1tc98TZ5ssV0TJeCeD0aPGJrHRsLVEnJr3RISoD5wU4ae
-	1A26UN/lj5Vo1RJgFdDls07W5Zeed0GkZxHWk7HJY5mrpYf9QqtY96ObjNPOwhgSrjK1Mh
-	ncCKWLMXwPqxvHm4NtzHYvoJyrzhpvo=
+	bh=IoOblYBETmyEulfRzdGlHBsHmabJ0o2kE+I2LBLgwC8=;
+	b=fPpp9VWGwUV+YmDUFwqxNykExHWovNpzA8V/rv3Jlpw3g4dIQbHrkeMl4qGe29Go7GwE2A
+	ORLezFjmmL+lAXnqps+b7M/MQ8bgVqWjVxvF3Oqtia6jWkEMhZ1gLZgAYj8ZHCBR2RyPo7
+	3R2HTWfqg4H9nG2UdBfROtV0wkHSxkA=
 Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
  [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-638--wLu1dbsPKyoQFCNn7quOw-1; Mon, 07 Aug 2023 17:15:32 -0400
-X-MC-Unique: -wLu1dbsPKyoQFCNn7quOw-1
-Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-768197bad1bso399388185a.3
-        for <netdev@vger.kernel.org>; Mon, 07 Aug 2023 14:15:31 -0700 (PDT)
+ us-mta-408-8lRj2MbTMpeNrhStAl9g7A-1; Mon, 07 Aug 2023 17:18:25 -0400
+X-MC-Unique: 8lRj2MbTMpeNrhStAl9g7A-1
+Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-763c36d4748so472091785a.0
+        for <netdev@vger.kernel.org>; Mon, 07 Aug 2023 14:18:25 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691442931; x=1692047731;
+        d=1e100.net; s=20221208; t=1691443104; x=1692047904;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ye5A6Jw6eWidJwu3XWNBZr93qlVRCWc3OvMx6RGhxc4=;
-        b=UX3XTYmt5m9pIZDJU8fMNA55+GHmMtTUrn3FjZyd9ceOX2vmm/mSmOYypgRC6/c38m
-         IO6Vjnpe7p8PUuoPjsu/FGGtBVvTfaQvzloXVGx8VTvCS4yZOFqmap0VPCPe/iLOOy3g
-         3V6JVF7mS1gE4AKGg61NLJfgb3VHC1mai9uKnB5cYSg9E0V+rlGrZt318ARUY2MntIlD
-         YkTmAkGCYjWj2VfSE6HUabKDHKV99UAPTOU1oTf6vKXgjgYqE/0j59U2kNNE5g9Ox193
-         qlWl6EBywa9V1p6UXhmaSIY7zICL4W6bK1LCjg9mz/+mmxA1vu7wfihoPqDLijN8+Rhx
-         Qydw==
-X-Gm-Message-State: AOJu0Yw0FcZP6kf360FvYBe4OgZw2PVDe7xeVLKyC+4YUAY7fGrR7lxY
-	gXp9KxRYiElLsRcQSZUvteQow4Wtk6sYQHIp3UCN0FzS/3v4/CoywzHuScIPWZq52roRO7WXhcY
-	BYSoxG1s+xzrT4Kbr
-X-Received: by 2002:a05:620a:44c6:b0:76c:af3e:3c14 with SMTP id y6-20020a05620a44c600b0076caf3e3c14mr8603223qkp.71.1691442931212;
-        Mon, 07 Aug 2023 14:15:31 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEs6cY258Pte+EWAopO2m1NTOSfKDpS5t4ZtseNKSU54HCauQLwYxyIy58E/V+PpQfupC6BsA==
-X-Received: by 2002:a05:620a:44c6:b0:76c:af3e:3c14 with SMTP id y6-20020a05620a44c600b0076caf3e3c14mr8603197qkp.71.1691442930969;
-        Mon, 07 Aug 2023 14:15:30 -0700 (PDT)
+        bh=IoOblYBETmyEulfRzdGlHBsHmabJ0o2kE+I2LBLgwC8=;
+        b=EEDotALFW1U5Ve2y5gyKvupk+aiZliPBMYvwytutklTImuzK463fzQCPNvs+9ckO58
+         5kJNj4QyYvP2ED39HSGmnNaV+QdfDvrjLBUKD8txyZ5JRla/XRfl6ZIJIfCcIFFV0crs
+         n3t68AbU91d6837Uxyd8Ey3mAeJJkDLurRlY/KvyAMrqIef21uSH8VEnOYeoAQ7zMWuA
+         T5wzNNejV1aaTBIB7qDnfi3u/Ya6SOpVlmDVjPEaCxKzJwjL8VLydHnCAIrBkKCnw7uX
+         kJTG0SpGtr1+gDWXBQwKEiFqTF6WDgBagAmaEoYeHGI+C1OT2xCkjrxi7PZ8BhZ9N8Ts
+         Y3ZQ==
+X-Gm-Message-State: AOJu0Yw1i7jtEv/Z3pm0aHO7FSH39zj58pCrz/i1sQ43oDWrkSra00wF
+	ah5z8wHN1xRwovEBxCD+RLww9K7lecrCC75LAjuK2R7/4I1YkIwnNgBJjQs52u6KVI/XeqyKy/i
+	8h2MDweIEAR7OsnvI2I+UhlDR
+X-Received: by 2002:a05:620a:4407:b0:76c:5952:7317 with SMTP id v7-20020a05620a440700b0076c59527317mr12231396qkp.3.1691443104335;
+        Mon, 07 Aug 2023 14:18:24 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGJiZ/UaGfvXt9A7FbU4f37zUtzcv+NxPI0dw4fVHbqmXGCPAH9jAsqse5T/ZluBmnq31oYbQ==
+X-Received: by 2002:a05:620a:4407:b0:76c:5952:7317 with SMTP id v7-20020a05620a440700b0076c59527317mr12231385qkp.3.1691443104055;
+        Mon, 07 Aug 2023 14:18:24 -0700 (PDT)
 Received: from fedora ([2600:1700:1ff0:d0e0::37])
-        by smtp.gmail.com with ESMTPSA id oq6-20020a05620a610600b0076d0312b8basm1350731qkn.131.2023.08.07.14.15.29
+        by smtp.gmail.com with ESMTPSA id pj48-20020a05620a1db000b0076cd5b510f1sm2855141qkn.38.2023.08.07.14.18.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Aug 2023 14:15:30 -0700 (PDT)
-Date: Mon, 7 Aug 2023 16:15:28 -0500
+        Mon, 07 Aug 2023 14:18:23 -0700 (PDT)
+Date: Mon, 7 Aug 2023 16:18:21 -0500
 From: Andrew Halaney <ahalaney@redhat.com>
 To: Bartosz Golaszewski <brgl@bgdev.pl>
 Cc: Andy Gross <agross@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
@@ -70,11 +70,11 @@ Cc: Andy Gross <agross@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
 	Alex Elder <elder@linaro.org>, Srini Kandagatla <srinivas.kandagatla@linaro.org>, 
 	linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
 	netdev@vger.kernel.org, Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Subject: Re: [PATCH 3/9] arm64: dts: qcom: sa8775p-ride: enable the second
- SerDes PHY
-Message-ID: <adcu2mjmpfnncwfhmwkdwwakk26ob6ee2lwyr4lz32n5zes27r@c6qkjmgoaz53>
+Subject: Re: [PATCH 4/9] arm64: dts: qcom: sa8775p-ride: add pin functions
+ for ethernet1
+Message-ID: <3ocnhpal77jmsqabcmnvekk4sqgookk5sunrvb3hstaupqfaj2@whnb7uj6w7ue>
 References: <20230807193507.6488-1-brgl@bgdev.pl>
- <20230807193507.6488-4-brgl@bgdev.pl>
+ <20230807193507.6488-5-brgl@bgdev.pl>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,7 +83,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230807193507.6488-4-brgl@bgdev.pl>
+In-Reply-To: <20230807193507.6488-5-brgl@bgdev.pl>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
 	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
@@ -91,39 +91,45 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Aug 07, 2023 at 09:35:01PM +0200, Bartosz Golaszewski wrote:
+On Mon, Aug 07, 2023 at 09:35:02PM +0200, Bartosz Golaszewski wrote:
 > From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 > 
-> Enable the second SerDes PHY on sa8775p-ride development board.
+> Add the MDC and MDIO pin functions for ethernet1 on sa8775p-ride.
 > 
 > Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-
-Matches what I see downstream wrt the supply, so:
-
-Reviewed-by: Andrew Halaney <ahalaney@redhat.com>
-
 > ---
->  arch/arm64/boot/dts/qcom/sa8775p-ride.dts | 5 +++++
->  1 file changed, 5 insertions(+)
+>  arch/arm64/boot/dts/qcom/sa8775p-ride.dts | 16 ++++++++++++++++
+>  1 file changed, 16 insertions(+)
 > 
 > diff --git a/arch/arm64/boot/dts/qcom/sa8775p-ride.dts b/arch/arm64/boot/dts/qcom/sa8775p-ride.dts
-> index ed76680410b4..09ae6e153282 100644
+> index 09ae6e153282..38327aff18b0 100644
 > --- a/arch/arm64/boot/dts/qcom/sa8775p-ride.dts
 > +++ b/arch/arm64/boot/dts/qcom/sa8775p-ride.dts
-> @@ -448,6 +448,11 @@ &serdes0 {
->  	status = "okay";
->  };
+> @@ -480,6 +480,22 @@ ethernet0_mdio: ethernet0-mdio-pins {
+>  		};
+>  	};
 >  
-> +&serdes1 {
-> +	phy-supply = <&vreg_l5a>;
-> +	status = "okay";
-> +};
+> +	ethernet1_default: ethernet1-default-state {
+> +		ethernet1_mdc: ethernet1-mdc-pins {
+> +			pins = "gpio20";
+> +			function = "emac1_mdc";
+> +			drive-strength = <16>;
+> +			bias-pull-up;
+> +		};
 > +
->  &sleep_clk {
->  	clock-frequency = <32764>;
->  };
-> -- 
-> 2.39.2
-> 
+> +		ethernet1_mdio: ethernet1-mdio-pins {
+> +			pins = "gpio21";
+> +			function = "emac1_mdio";
+> +			drive-strength = <16>;
+> +			bias-pull-up;
+> +		};
+> +	};
+> +
+
+With the whole "EMAC0 MDIO handles the ethernet phy for EMAC1", this
+doesn't seem to make sense.
+
+I don't have all the schematics, but these pins are not connected from
+what I see.
 
 
