@@ -1,176 +1,95 @@
-Return-Path: <netdev+bounces-24821-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24822-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22453771CEE
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 11:14:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 559D9771D61
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 11:48:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 04BCA1C209D5
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 09:14:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2ECE81C209FB
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 09:48:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FAD7C8CF;
-	Mon,  7 Aug 2023 09:14:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8DCCC8D9;
+	Mon,  7 Aug 2023 09:48:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A71EC2D6
-	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 09:14:51 +0000 (UTC)
-Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [20.231.56.155])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id AC917E7F;
-	Mon,  7 Aug 2023 02:14:46 -0700 (PDT)
-Received: from localhost.localdomain (unknown [115.206.160.170])
-	by mail-app2 (Coremail) with SMTP id by_KCgCXDxvXtdBkKGQpCw--.25311S4;
-	Mon, 07 Aug 2023 17:14:00 +0800 (CST)
-From: Lin Ma <linma@zju.edu.cn>
-To: michael.chan@broadcom.com,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE78A4434
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 09:48:43 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFC5810CC
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 02:48:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1691401721;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=mCbJj/vVAJbYyM13q10h5V9OXKZQO+l4vJHMyz5zA34=;
+	b=K73bG0/wz0uV4I+T4vYnLh7LW3K9rojK0qktIoLcxG6Yr3NQvaDAvU9jgXl0V51BiV47QM
+	J4+AybftTHiNZ9opUZA9rygevwr6FdAA5R85GUkK1fIGzDryntgNheWLkVoN9/zNMqaAeW
+	mHj4DEQY88mRAI+enYmLCc+/VWc2O6U=
+Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-288-tPRH4S_9O9qMixjTX2NOpg-1; Mon, 07 Aug 2023 05:48:35 -0400
+X-MC-Unique: tPRH4S_9O9qMixjTX2NOpg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7BBFA3C13922;
+	Mon,  7 Aug 2023 09:48:34 +0000 (UTC)
+Received: from swamp.redhat.com (unknown [10.45.226.148])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id EC1381121314;
+	Mon,  7 Aug 2023 09:48:31 +0000 (UTC)
+From: Petr Oros <poros@redhat.com>
+To: netdev@vger.kernel.org
+Cc: jesse.brandeburg@intel.com,
+	anthony.l.nguyen@intel.com,
 	davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	ajit.khaparde@broadcom.com,
-	sriharsha.basavapatna@broadcom.com,
-	somnath.kotur@broadcom.com,
-	jesse.brandeburg@intel.com,
-	anthony.l.nguyen@intel.com,
-	saeedm@nvidia.com,
-	leon@kernel.org,
-	simon.horman@corigine.com,
-	louis.peens@corigine.com,
-	yinjun.zhang@corigine.com,
-	huanhuan.wang@corigine.com,
-	tglx@linutronix.de,
-	na.wang@corigine.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
+	Jacob.e.keller@intel.com,
+	przemyslawx.patynowski@intel.com,
+	kamil.maziarz@intel.com,
+	dawidx.wesierski@intel.com,
+	mateusz.palczewski@intel.com,
+	slawomirx.laba@intel.com,
+	norbertx.zulinski@intel.com,
 	intel-wired-lan@lists.osuosl.org,
-	linux-rdma@vger.kernel.org,
-	oss-drivers@corigine.com
-Cc: Lin Ma <linma@zju.edu.cn>
-Subject: [PATCH net-next v2] rtnetlink: remove redundant checks for nlattr IFLA_BRIDGE_MODE
-Date: Mon,  7 Aug 2023 17:13:47 +0800
-Message-Id: <20230807091347.3804523-1-linma@zju.edu.cn>
-X-Mailer: git-send-email 2.17.1
-X-CM-TRANSID:by_KCgCXDxvXtdBkKGQpCw--.25311S4
-X-Coremail-Antispam: 1UD129KBjvJXoWxZw1DXF1xXw4xWrW3Gw17Wrg_yoWrGFyDpa
-	1UJa4xZ3yvqr15Xan7Ja18ZF9Yqay7t398uF4Sya1rZw1vvFyDCr4DKF9I9ryUArWUGF13
-	tr4UAF13Aas8X3JanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvG14x267AKxVW5JVWrJwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4U
-	JVW0owA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
-	n2kIc2xKxwCY02Avz4vE14v_GFWl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr
-	0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY
-	17CE14v26r4a6rW5MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcV
-	C0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY
-	6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa
-	73UjIFyTuYvjfUeF4EDUUUU
-X-CM-SenderInfo: qtrwiiyqvtljo62m3hxhgxhubq/
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,RCVD_IN_MSPIKE_H5,
-	RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net 0/2] Fix VF to VM attach detach
+Date: Mon,  7 Aug 2023 11:48:29 +0200
+Message-ID: <20230807094831.696626-1-poros@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-The commit d73ef2d69c0d ("rtnetlink: let rtnl_bridge_setlink checks
-IFLA_BRIDGE_MODE length") added the nla_len check in rtnl_bridge_setlink,
-which is the only caller for ndo_bridge_setlink handlers defined in
-low-level driver codes. Hence, this patch cleanups the redundant checks in
-each ndo_bridge_setlink handler function.
+Petr Oros (2):
+  Revert "ice: Fix ice VF reset during iavf initialization"
+  ice: Fix NULL pointer deref during VF reset
 
-Suggested-by: Hangbin Liu <liuhangbin@gmail.com>
-Signed-off-by: Lin Ma <linma@zju.edu.cn>
----
-V1->V2: delete the link to last commit as it already in tree
+ drivers/net/ethernet/intel/ice/ice_sriov.c    |  8 ++---
+ drivers/net/ethernet/intel/ice/ice_vf_lib.c   | 34 +++++--------------
+ drivers/net/ethernet/intel/ice/ice_vf_lib.h   |  1 -
+ drivers/net/ethernet/intel/ice/ice_virtchnl.c |  1 -
+ 4 files changed, 12 insertions(+), 32 deletions(-)
 
- drivers/net/ethernet/broadcom/bnxt/bnxt.c           | 3 ---
- drivers/net/ethernet/emulex/benet/be_main.c         | 3 ---
- drivers/net/ethernet/intel/ixgbe/ixgbe_main.c       | 3 ---
- drivers/net/ethernet/mellanox/mlx5/core/en_main.c   | 3 ---
- drivers/net/ethernet/netronome/nfp/nfp_net_common.c | 3 ---
- 5 files changed, 15 deletions(-)
-
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index e5b54e6025be..9e098c1cf1ab 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -13101,9 +13101,6 @@ static int bnxt_bridge_setlink(struct net_device *dev, struct nlmsghdr *nlh,
- 		if (nla_type(attr) != IFLA_BRIDGE_MODE)
- 			continue;
- 
--		if (nla_len(attr) < sizeof(mode))
--			return -EINVAL;
--
- 		mode = nla_get_u16(attr);
- 		if (mode == bp->br_mode)
- 			break;
-diff --git a/drivers/net/ethernet/emulex/benet/be_main.c b/drivers/net/ethernet/emulex/benet/be_main.c
-index 18c2fc880d09..e8abc43a7061 100644
---- a/drivers/net/ethernet/emulex/benet/be_main.c
-+++ b/drivers/net/ethernet/emulex/benet/be_main.c
-@@ -4985,9 +4985,6 @@ static int be_ndo_bridge_setlink(struct net_device *dev, struct nlmsghdr *nlh,
- 		if (nla_type(attr) != IFLA_BRIDGE_MODE)
- 			continue;
- 
--		if (nla_len(attr) < sizeof(mode))
--			return -EINVAL;
--
- 		mode = nla_get_u16(attr);
- 		if (BE3_chip(adapter) && mode == BRIDGE_MODE_VEPA)
- 			return -EOPNOTSUPP;
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-index 1726297f2e0d..d1381b1b3f3a 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-@@ -10042,9 +10042,6 @@ static int ixgbe_ndo_bridge_setlink(struct net_device *dev,
- 		if (nla_type(attr) != IFLA_BRIDGE_MODE)
- 			continue;
- 
--		if (nla_len(attr) < sizeof(mode))
--			return -EINVAL;
--
- 		mode = nla_get_u16(attr);
- 		status = ixgbe_configure_bridge_mode(adapter, mode);
- 		if (status)
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-index defb1efccb78..b2df8e517a85 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-@@ -4883,9 +4883,6 @@ static int mlx5e_bridge_setlink(struct net_device *dev, struct nlmsghdr *nlh,
- 		if (nla_type(attr) != IFLA_BRIDGE_MODE)
- 			continue;
- 
--		if (nla_len(attr) < sizeof(mode))
--			return -EINVAL;
--
- 		mode = nla_get_u16(attr);
- 		if (mode > BRIDGE_MODE_VEPA)
- 			return -EINVAL;
-diff --git a/drivers/net/ethernet/netronome/nfp/nfp_net_common.c b/drivers/net/ethernet/netronome/nfp/nfp_net_common.c
-index 6b1fb5708434..85f36ec2f986 100644
---- a/drivers/net/ethernet/netronome/nfp/nfp_net_common.c
-+++ b/drivers/net/ethernet/netronome/nfp/nfp_net_common.c
-@@ -2068,9 +2068,6 @@ static int nfp_net_bridge_setlink(struct net_device *dev, struct nlmsghdr *nlh,
- 		if (nla_type(attr) != IFLA_BRIDGE_MODE)
- 			continue;
- 
--		if (nla_len(attr) < sizeof(mode))
--			return -EINVAL;
--
- 		new_ctrl = nn->dp.ctrl;
- 		mode = nla_get_u16(attr);
- 		if (mode == BRIDGE_MODE_VEPA)
 -- 
-2.17.1
+2.41.0
 
 
