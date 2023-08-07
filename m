@@ -1,66 +1,83 @@
-Return-Path: <netdev+bounces-24732-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-24733-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32F627717A9
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 03:07:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BA05E7717B7
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 03:21:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4C72F1C208FA
-	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 01:07:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 78D5E1C2090A
+	for <lists+netdev@lfdr.de>; Mon,  7 Aug 2023 01:21:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08657392;
-	Mon,  7 Aug 2023 01:07:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BD4F621;
+	Mon,  7 Aug 2023 01:21:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A850A19D
-	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 01:07:32 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF224C433C7;
-	Mon,  7 Aug 2023 01:07:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691370452;
-	bh=d5q7CgXL6qUP6LA9FNwOW1h25EJKgRKBpWbldXr5fgM=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Hgqm5m/lyecX9tQqQm059ocJUSzHNxvuwapBgdXSnt4iv34fv+Pknxf1ow87CynEG
-	 jXj9B+aLQa9lv8ujxE/3vBz0I2DE1oL1KLR4gMNHwXpS33lWkvqiUXIC/5Q/u32KWK
-	 QtTEeADrabrW3NfkJhLGg7i6AcumKjbkSWI2OHz1vcnJZ+D7qut6Ih/uTgfz362xMY
-	 nB0Xu1u7/Y2pBVOY4I95Ahjp/HrlWwWZDmeuU+T2U1AS8rgIo9x3stVxj5B+r/2JI8
-	 ijbLLVzUSAhMZSbpDS32MCMdAOjjljFYphEhQtc4z5yu5QEqvSH6YbRuWZw3xqeene
-	 SFp2rN//YBZfg==
-Message-ID: <ee919c2c-090f-2613-6545-d69e05f95e3f@kernel.org>
-Date: Sun, 6 Aug 2023 19:07:31 -0600
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81042392;
+	Mon,  7 Aug 2023 01:21:16 +0000 (UTC)
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7C661712;
+	Sun,  6 Aug 2023 18:21:14 -0700 (PDT)
+Received: from dggpeml500026.china.huawei.com (unknown [172.30.72.53])
+	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4RJz3P1Lnmz1Z1XF;
+	Mon,  7 Aug 2023 09:18:25 +0800 (CST)
+Received: from huawei.com (10.175.101.6) by dggpeml500026.china.huawei.com
+ (7.185.36.106) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Mon, 7 Aug
+ 2023 09:21:12 +0800
+From: Zhengchao Shao <shaozhengchao@huawei.com>
+To: <netdev@vger.kernel.org>, <bpf@vger.kernel.org>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>
+CC: <jiri@resnulli.us>, <weiyongjun1@huawei.com>, <yuehaibing@huawei.com>,
+	<shaozhengchao@huawei.com>
+Subject: [PATCH net-next,v3 0/5] team: do some cleanups in team driver
+Date: Mon, 7 Aug 2023 09:25:51 +0800
+Message-ID: <20230807012556.3146071-1-shaozhengchao@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.13.0
-Subject: Re: [PATCH net-next] neighbour: Remove unused function declaration
- pneigh_for_each()
-Content-Language: en-US
-To: Yue Haibing <yuehaibing@huawei.com>, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-Cc: netdev@vger.kernel.org
-References: <20230805105033.45700-1-yuehaibing@huawei.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20230805105033.45700-1-yuehaibing@huawei.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.175.101.6]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ dggpeml500026.china.huawei.com (7.185.36.106)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On 8/5/23 4:50 AM, Yue Haibing wrote:
-> pneigh_for_each() is never implemented since the beginning of git history.
-> 
-> Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
-> ---
->  include/net/neighbour.h | 2 --
->  1 file changed, 2 deletions(-)
-> 
+Do some cleanups in team driver.
 
-Reviewed-by: David Ahern <dsahern@kernel.org>
+---
+v3: add header file back to team_mode_activebackup.c
+v2: combine patch 5/6 and patch 6/6 into patch 5/5
+---
+Zhengchao Shao (5):
+  team: add __exit modifier to team_nl_fini()
+  team: remove unreferenced header in broadcast and roundrobin files
+  team: change the init function in the team_option structure to void
+  team: change the getter function in the team_option structure to void
+  team: remove unused input parameters in lb_htpm_select_tx_port and
+    lb_hash_select_tx_port
+
+ drivers/net/team/team.c                   | 62 +++++++++--------------
+ drivers/net/team/team_mode_activebackup.c |  8 ++-
+ drivers/net/team/team_mode_broadcast.c    |  1 -
+ drivers/net/team/team_mode_loadbalance.c  | 50 +++++++-----------
+ drivers/net/team/team_mode_roundrobin.c   |  1 -
+ include/linux/if_team.h                   |  4 +-
+ 6 files changed, 48 insertions(+), 78 deletions(-)
+
+-- 
+2.34.1
 
 
