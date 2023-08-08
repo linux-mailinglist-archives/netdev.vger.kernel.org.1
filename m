@@ -1,145 +1,163 @@
-Return-Path: <netdev+bounces-25417-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25369-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8D61773EB0
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 18:34:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB324773CE3
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 18:11:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DDBFE2816EF
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 16:34:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 186351C20EAE
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 16:11:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C26A714265;
-	Tue,  8 Aug 2023 16:33:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F90B13FFF;
+	Tue,  8 Aug 2023 15:56:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7D3115495
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 16:33:51 +0000 (UTC)
-X-Greylist: delayed 1802 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 08 Aug 2023 09:33:37 PDT
-Received: from mail.toke.dk (mail.toke.dk [IPv6:2a0c:4d80:42:2001::664])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30D773103C;
-	Tue,  8 Aug 2023 09:33:37 -0700 (PDT)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=toke.dk; s=20161023;
-	t=1691503571; bh=DO+diXcZ9utTjLCydk3zF1T+72EgE+BXHMNyOGRq6Ag=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=Ufsvvw3XC+ndybpKuDXPhTRnlV6E36AEoC6EXNd+4roQ2Jp/HEutKL5Nny90eexIl
-	 8iqgnPGKQs5VN8ciMrQ5/h4EptP8dN+TV0EGxphvodVJCGK2SLyrUZi1H4l5QMHepM
-	 2lT+STOPbPw19sL/dqJCQ5ZHC0EHX+7NrLyLcA+jyQmVELEjeKJCDVwSYRU4s38U83
-	 lHQPU5zX5Jluu00S52QeTfYOQU8xASQaPu796EbxAPZUgWCS/sy73wvscKGss1Sk5d
-	 9ob6Ai26rmgSuYxEstT2KrPzEof1DzBrHu9Tkt9YR6Ulzah58YZEdAcqwbE3BAy3xO
-	 wwL5gVq1sTMCQ==
-To: Fedor Pchelkin <pchelkin@ispras.ru>, Kalle Vallo <kvalo@kernel.org>
-Cc: Fedor Pchelkin <pchelkin@ispras.ru>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Senthil
- Balasubramanian <senthilkumar@atheros.com>, "John W. Linville"
- <linville@tuxdriver.com>, Vasanthakumar Thiagarajan <vasanth@atheros.com>,
- Sujith <Sujith.Manoharan@atheros.com>, linux-wireless@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Alexey Khoroshilov
- <khoroshilov@ispras.ru>, lvc-project@linuxtesting.org,
- syzbot+f2cb6e0ffdb961921e4d@syzkaller.appspotmail.com, Hillf Danton
- <hdanton@sina.com>
-Subject: Re: [PATCH v3 1/2] wifi: ath9k: fix races between ath9k_wmi_cmd and
- ath9k_wmi_ctrl_rx
-In-Reply-To: <20230425192607.18015-1-pchelkin@ispras.ru>
-References: <20230425192607.18015-1-pchelkin@ispras.ru>
-Date: Tue, 08 Aug 2023 16:06:07 +0200
-X-Clacks-Overhead: GNU Terry Pratchett
-Message-ID: <87edkdbpdc.fsf@toke.dk>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94E8333E1
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 15:56:04 +0000 (UTC)
+Received: from mail-il1-x12c.google.com (mail-il1-x12c.google.com [IPv6:2607:f8b0:4864:20::12c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00D249190
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 08:55:47 -0700 (PDT)
+Received: by mail-il1-x12c.google.com with SMTP id e9e14a558f8ab-348ccbf27eeso24462285ab.0
+        for <netdev@vger.kernel.org>; Tue, 08 Aug 2023 08:55:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bgdev-pl.20221208.gappssmtp.com; s=20221208; t=1691510121; x=1692114921;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vgs4Fm92pOwgiTtgi3t0TURwZ645hXw810Qm9YB3fW0=;
+        b=1hsy8o58UxsUIQ3JqXj8nnGSuI5CQ/6WzEjxf4ZIOzOgrr6EaOA7cpZ3GvUui5EnFT
+         KndhVctqzgmunFGhBtNTa1/NtNvofo3ruKivQ+T7FuAba0MJ5O5Y5mUO4krW3lVSIq4c
+         OX56N60aQg6DYwr2jPN8JTwK0SPh7WZF79MR7HYBRxs6mMPAbwx8JdWY/MkUJcudQfuN
+         urG1dfzGi3SMcnG+XO3X0SmHlKEd0b+ZnZSIXhkayX735qNtCJF4XAdcKSW0CNOdc82z
+         YQjn29BdK5SRBg8O6KeDIxQ4v8DW5EBdaTyhtopIRe4PQgR3y16SnAfkfjqk1ERwnFuV
+         KK+Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691510121; x=1692114921;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=vgs4Fm92pOwgiTtgi3t0TURwZ645hXw810Qm9YB3fW0=;
+        b=jJcQ629j8Ala1RuHlS2juqsutoUiuf57r+ueBmBLrQ3CpdwwhzootX01NuxKmvV56F
+         71CfSEkyDi/CYs0+BXxhknxA9bpC/GRmiYMD28ZrbhL3TEE5mdlnkprLmCbbOODipd64
+         uRcUVVnprWTsW8lokKKg+RyOAZeboo5YB3z1oiOGs5dwBk6o7sCKOuM0zm4mzJAfEmhB
+         gXiArkvlMJt8Q9WZ/nMcjAXuXsQrUonUtqMfIzuD03eNHfJW7rowb52E0fyRzuhuTKyN
+         WOZwZ5VqEB8WZMTmcm7CWpcPEwmRqi4XzPkBjpqlJ6GreZEJ4R+m7UAieHFnYIqWKPZN
+         HzNA==
+X-Gm-Message-State: AOJu0Yw6RCjoV+KuocOgY2RX9kzDbPGa3HHOpdBCPWEh+qw7MwcCREHV
+	NBMvtplTgMMagYDZsTZ7gJcfaFsP8eNx187jUXR3qyeNne/odSsv3ZI=
+X-Google-Smtp-Source: AGHT+IEUOZn+oWGOzEe6eb18PD1LJbJH+AEz15hO43+Evd9T1seVx+elc0H04Xz8tIq6S3q/dujX/7mkZrhXRTgW+JU=
+X-Received: by 2002:a05:6358:c19:b0:139:e3a4:7095 with SMTP id
+ f25-20020a0563580c1900b00139e3a47095mr14782675rwj.7.1691503762572; Tue, 08
+ Aug 2023 07:09:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+References: <20230807193102.6374-1-brgl@bgdev.pl> <54421791-75fa-4ed3-8432-e21184556cde@lunn.ch>
+ <CAMRc=Mc6COaxM6GExHF2M+=v2TBpz87RciAv=9kHr41HkjQhCg@mail.gmail.com> <ZNJChfKPkAuhzDCO@shell.armlinux.org.uk>
+In-Reply-To: <ZNJChfKPkAuhzDCO@shell.armlinux.org.uk>
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+Date: Tue, 8 Aug 2023 16:09:11 +0200
+Message-ID: <CAMRc=MczKgBFvuEanKu=mERYX-6qf7oUO2S4B53sPc+hrkYqxg@mail.gmail.com>
+Subject: Re: [PATCH 0/2] net: stmmac: allow sharing MDIO lines
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Rob Herring <robh+dt@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Andrew Halaney <ahalaney@redhat.com>, 
+	Alex Elder <elder@linaro.org>, Srini Kandagatla <srinivas.kandagatla@linaro.org>, 
+	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Fedor Pchelkin <pchelkin@ispras.ru> writes:
+On Tue, Aug 8, 2023 at 3:26=E2=80=AFPM Russell King (Oracle)
+<linux@armlinux.org.uk> wrote:
+>
+> On Tue, Aug 08, 2023 at 10:13:09AM +0200, Bartosz Golaszewski wrote:
+> > Ok so upon some further investigation, the actual culprit is in stmmac
+> > platform code - it always tries to register an MDIO bus - independent
+> > of whether there is an actual mdio child node - unless the MAC is
+> > marked explicitly as having a fixed-link.
+> >
+> > When I fixed that, MAC1's probe is correctly deferred until MAC0 has
+> > created the MDIO bus.
+> >
+> > Even so, isn't it useful to actually reference the shared MDIO bus in s=
+ome way?
+> >
+> > If the schematics look something like this:
+> >
+> > --------           -------
+> > | MAC0 |--MDIO-----| PHY |
+> > -------- |     |   -------
+> >          |     |
+> > -------- |     |   -------
+> > | MAC1 |--     ----| PHY |
+> > --------           -------
+> >
+> > Then it would make sense to model it on the device tree?
+>
+> So I think what you're saying is that MAC0 and MAC1's have MDIO bus
+> masters, and the hardware designer decided to tie both together to
+> a single set of clock and data lines, which then go to two PHYs.
 
-> Currently, the synchronization between ath9k_wmi_cmd() and
-> ath9k_wmi_ctrl_rx() is exposed to a race condition which, although being
-> rather unlikely, can lead to invalid behaviour of ath9k_wmi_cmd().
->
-> Consider the following scenario:
->
-> CPU0					CPU1
->
-> ath9k_wmi_cmd(...)
->   mutex_lock(&wmi->op_mutex)
->   ath9k_wmi_cmd_issue(...)
->   wait_for_completion_timeout(...)
->   ---
->   timeout
->   ---
-> 					/* the callback is being processed
-> 					 * before last_seq_id became zero
-> 					 */
-> 					ath9k_wmi_ctrl_rx(...)
-> 					  spin_lock_irqsave(...)
-> 					  /* wmi->last_seq_id check here
-> 					   * doesn't detect timeout yet
-> 					   */
-> 					  spin_unlock_irqrestore(...)
->   /* last_seq_id is zeroed to
->    * indicate there was a timeout
->    */
->   wmi->last_seq_id =3D 0
->   mutex_unlock(&wmi->op_mutex)
->   return -ETIMEDOUT
->
-> ath9k_wmi_cmd(...)
->   mutex_lock(&wmi->op_mutex)
->   /* the buffer is replaced with
->    * another one
->    */
->   wmi->cmd_rsp_buf =3D rsp_buf
->   wmi->cmd_rsp_len =3D rsp_len
->   ath9k_wmi_cmd_issue(...)
->     spin_lock_irqsave(...)
->     spin_unlock_irqrestore(...)
->   wait_for_completion_timeout(...)
-> 					/* the continuation of the
-> 					 * callback left after the first
-> 					 * ath9k_wmi_cmd call
-> 					 */
-> 					  ath9k_wmi_rsp_callback(...)
-> 					    /* copying data designated
-> 					     * to already timeouted
-> 					     * WMI command into an
-> 					     * inappropriate wmi_cmd_buf
-> 					     */
-> 					    memcpy(...)
-> 					    complete(&wmi->cmd_wait)
->   /* awakened by the bogus callback
->    * =3D> invalid return result
->    */
->   mutex_unlock(&wmi->op_mutex)
->   return 0
->
-> To fix this, update last_seq_id on timeout path inside ath9k_wmi_cmd()
-> under the wmi_lock. Move ath9k_wmi_rsp_callback() under wmi_lock inside
-> ath9k_wmi_ctrl_rx() so that the wmi->cmd_wait can be completed only for
-> initially designated wmi_cmd call, otherwise the path would be rejected
-> with last_seq_id check.
->
-> Found by Linux Verification Center (linuxtesting.org) with Syzkaller.
->
-> Fixes: fb9987d0f748 ("ath9k_htc: Support for AR9271 chipset.")
-> Signed-off-by: Fedor Pchelkin <pchelkin@ispras.ru>
+The schematics I have are not very clear on that, but now that you
+mention this, it's most likely the case.
 
-Alright, finally took the time to dig into this and convince myself that
-the fix if correct. Sorry for taking so long!
+>
+> In that case, I would strongly advise only registering one MDIO bus,
+> and avoid registering the second one - thereby preventing any issues
+> caused by both MDIO bus masters trying to talk at the same time.
+>
 
-Acked-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@toke.dk>
+I sent a patch for that earlier today.
+
+> The PHYs should be populated in firmware on just one of the buses.
+>
+> You will also need to ensure that whatever registers the bus does
+> make sure that the clocks necessary for communicating on the bus
+> are under control of the MDIO bus code and not the ethernet MAC
+> code. We've run into problems in the past where this has not been
+> the case, and it means - taking your example above - that when MAC1
+> wants to talk to its PHY, if MAC0 isn't alive it can't.
+
+Good point, but it's worse than that: when MAC0 is unbound, it will
+unregister the MDIO bus and destroy all PHY devices. These are not
+refcounted so they will literally go from under MAC1. Not sure how
+this can be dealt with?
+
+>
+> So just be aware of the clocking situation and make sure that your
+> MDIO bus code is managing the clocks necessary for the MDIO bus
+> master to work.
+
+Doesn't seem like stmmac is ready for it as it is now so this is going
+to be fun...
+
+Bartosz
+
+>
+> In regard to sharing of the MDIO bus signals between two bus
+> masters, I do not believe that is permissible - there's no
+> collision detection in hardware like there is on I=E6=B6=8E. So
+> having two MDIO bus masters talking at the same time would
+> end up corrupting the MDC (clock) and MDIO (data) signals if
+> both were active at the same time.
+>
 
