@@ -1,131 +1,149 @@
-Return-Path: <netdev+bounces-25502-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25503-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9FC8A7745BB
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 20:45:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8207774612
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 20:52:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CEAF21C20EA3
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 18:45:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AB1271C20EA7
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 18:52:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C21614F99;
-	Tue,  8 Aug 2023 18:45:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61D7A15494;
+	Tue,  8 Aug 2023 18:52:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 619BA13AFA
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 18:45:19 +0000 (UTC)
-Received: from smtp-fw-33001.amazon.com (smtp-fw-33001.amazon.com [207.171.190.10])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3FC81A58BD
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 11:14:47 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55C3213AFA
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 18:52:44 +0000 (UTC)
+Received: from mail-ua1-x92f.google.com (mail-ua1-x92f.google.com [IPv6:2607:f8b0:4864:20::92f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4AA2BFE5C
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 11:26:34 -0700 (PDT)
+Received: by mail-ua1-x92f.google.com with SMTP id a1e0cc1a2514c-79aa1f24ba2so1583031241.2
+        for <netdev@vger.kernel.org>; Tue, 08 Aug 2023 11:26:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1691518488; x=1723054488;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=MV/rudRg4tHDKU0zjcs6eE3WlXWXeqg569eZ1V8bJsw=;
-  b=t8ogbPb36YSls358bO8xQT8QfBQnGTnULam9chVM6Ap07KJdrzFWByiG
-   Qc4AAfxv5Qw99AEOLougL7EkcLDcsCfKngEkUhkxQyP7sP+gHymeipplE
-   Clne4/14bKH8ie3v2sfLoFvGUhlbk7Jf0mgK7gItffeQJYKuPddCzOTg3
-   o=;
-X-IronPort-AV: E=Sophos;i="6.01,156,1684800000"; 
-   d="scan'208";a="299116068"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-iad-1a-m6i4x-617e30c2.us-east-1.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-33001.sea14.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Aug 2023 18:14:42 +0000
-Received: from EX19MTAUWA002.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan2.iad.amazon.com [10.40.163.34])
-	by email-inbound-relay-iad-1a-m6i4x-617e30c2.us-east-1.amazon.com (Postfix) with ESMTPS id A92EE67698;
-	Tue,  8 Aug 2023 18:14:39 +0000 (UTC)
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Tue, 8 Aug 2023 18:14:38 +0000
-Received: from 88665a182662.ant.amazon.com (10.106.101.26) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Tue, 8 Aug 2023 18:14:35 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <edumazet@google.com>
-CC: <davem@davemloft.net>, <eric.dumazet@gmail.com>, <kuba@kernel.org>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <syzkaller@googlegroups.com>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>
-Subject: Re: [PATCH net-next] net: annotate data-races around sock->ops
-Date: Tue, 8 Aug 2023 11:14:25 -0700
-Message-ID: <20230808181426.3420-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20230808135809.2300241-1-edumazet@google.com>
-References: <20230808135809.2300241-1-edumazet@google.com>
+        d=bgdev-pl.20221208.gappssmtp.com; s=20221208; t=1691519193; x=1692123993;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NbSuxAH1dmgDI1cFhSw3+FjHgNgeooTpwVKeZW63XUA=;
+        b=omX3M6W7HI4CkdKEejiKetClW4YUWnvCPUq8gKc/AoVUAnqTLGguQDDx/Sp7R778JN
+         J9TSo32CN6hMaWQKcsB0qNqnAfUmpGbESPtgNucK5ozybmP7dGop+fVUtC7USzhv0x20
+         JypPvqhLY7OCKJtBcfnX+96fYG5NsovjpKeVeQyTpMIw8hCNkqz97Nj5+31R97GKArfx
+         FvTCBQ21Dt/3FRicqjABaU4W4VS+jqKz5MgCjjWoW7/8fz5NgBnX8wQtxRvChUJ90vs8
+         M6mrEFvM5V+hgB099+64rLexf3D68SYLB6togDUSjQ9USqOosVkxu49B4wTl+yHLi33a
+         3Kiw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691519193; x=1692123993;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=NbSuxAH1dmgDI1cFhSw3+FjHgNgeooTpwVKeZW63XUA=;
+        b=RQ0gUfEq4s4qoDi51dQzUYGI5aU0bGY5BWCZpfSTJHpwEoVPVyAl2TSnwvYAhuNWXm
+         +I2i+/vaau5KyRQ8erSmcFA3hEE3kiVTEXnCtxU8Y6FUH6fh3fvuSFqmwo5rLgTB+Y1z
+         Ul9ZAHYasq5uM+++8lkyZgBmEv2HL4GJX5mUuTIbIUPdTpkFvTb3N6XcEwtVYTDWQ3qf
+         dcbmW2V6nKOBg4Uy0GEpRn4aMrSpxKnBoM2a6zi3OXml5fhi5d6q+Q0hsua223SGQg0o
+         iClkS7L+YVvENSDBBOLeImg1caUwTT6bgIpow4BXMtcDyWNsWyKZR+pNIdJ4/iudjDtM
+         ykTQ==
+X-Gm-Message-State: AOJu0YzAO/md2pREzeeKCCZt1LotsiUFOVr4rnSRxzOsn0Ysn70ohCuL
+	uNNDngRlPBMprTeXLoUuiEZL1xKli85b9zpE5KJtQA==
+X-Google-Smtp-Source: AGHT+IG8ilz+lyyZPz/QTN9yYwu4PQ8UFXiUmVfIAYHkY7cO5/Ehx+F7e2EvG0Tpci9f03MzRW/uy/lDk0h8r21yu9I=
+X-Received: by 2002:a67:f905:0:b0:443:677e:246e with SMTP id
+ t5-20020a67f905000000b00443677e246emr716156vsq.5.1691519193393; Tue, 08 Aug
+ 2023 11:26:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.106.101.26]
-X-ClientProxiedBy: EX19D040UWB003.ant.amazon.com (10.13.138.8) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
-Precedence: Bulk
-X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-	T_SPF_PERMERROR autolearn=ham autolearn_force=no version=3.4.6
+References: <20230807193102.6374-1-brgl@bgdev.pl> <54421791-75fa-4ed3-8432-e21184556cde@lunn.ch>
+ <CAMRc=Mc6COaxM6GExHF2M+=v2TBpz87RciAv=9kHr41HkjQhCg@mail.gmail.com>
+ <ZNJChfKPkAuhzDCO@shell.armlinux.org.uk> <CAMRc=MczKgBFvuEanKu=mERYX-6qf7oUO2S4B53sPc+hrkYqxg@mail.gmail.com>
+ <65b53003-23cf-40fa-b9d7-f0dbb45a4cb2@lunn.ch> <CAMRc=MecYHi=rPaT44kuX_XMog=uwB9imVZknSjnmTBW+fb5WQ@mail.gmail.com>
+ <xfme5pgj4eqlgao3vmyg6vazaqk6qz2wq6kitgujtorouogjty@cklyof3xz2zm> <d021b8ae-a6a3-4697-a683-c9bd45e6c74b@lunn.ch>
+In-Reply-To: <d021b8ae-a6a3-4697-a683-c9bd45e6c74b@lunn.ch>
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+Date: Tue, 8 Aug 2023 20:26:22 +0200
+Message-ID: <CAMRc=MegMdB0LZNRRrCfqFGZQWMFdBhd8o+_NBxwLk0xS99M_w@mail.gmail.com>
+Subject: Re: [PATCH 0/2] net: stmmac: allow sharing MDIO lines
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Andrew Halaney <ahalaney@redhat.com>, "Russell King (Oracle)" <linux@armlinux.org.uk>, 
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alex Elder <elder@linaro.org>, 
+	Srini Kandagatla <srinivas.kandagatla@linaro.org>, netdev@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue,  8 Aug 2023 13:58:09 +0000
-> IPV6_ADDRFORM socket option is evil, because it can change sock->ops
-> while other threads might read it. Same issue for sk->sk_family
-> being set to AF_INET.
-> 
-> Adding READ_ONCE() over sock->ops reads is needed for sockets
-> that might be impacted by IPV6_ADDRFORM.
-> 
-> Note that mptcp_is_tcpsk() can also overwrite sock->ops.
-> 
-> Adding annotations for all sk->sk_family reads will require
-> more patches :/
-> 
-> BUG: KCSAN: data-race in ____sys_sendmsg / do_ipv6_setsockopt
-> 
-> write to 0xffff888109f24ca0 of 8 bytes by task 4470 on cpu 0:
-> do_ipv6_setsockopt+0x2c5e/0x2ce0 net/ipv6/ipv6_sockglue.c:491
-> ipv6_setsockopt+0x57/0x130 net/ipv6/ipv6_sockglue.c:1012
-> udpv6_setsockopt+0x95/0xa0 net/ipv6/udp.c:1690
-> sock_common_setsockopt+0x61/0x70 net/core/sock.c:3663
-> __sys_setsockopt+0x1c3/0x230 net/socket.c:2273
-> __do_sys_setsockopt net/socket.c:2284 [inline]
-> __se_sys_setsockopt net/socket.c:2281 [inline]
-> __x64_sys_setsockopt+0x66/0x80 net/socket.c:2281
-> do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-> do_syscall_64+0x41/0xc0 arch/x86/entry/common.c:80
-> entry_SYSCALL_64_after_hwframe+0x63/0xcd
-> 
-> read to 0xffff888109f24ca0 of 8 bytes by task 4469 on cpu 1:
-> sock_sendmsg_nosec net/socket.c:724 [inline]
-> sock_sendmsg net/socket.c:747 [inline]
-> ____sys_sendmsg+0x349/0x4c0 net/socket.c:2503
-> ___sys_sendmsg net/socket.c:2557 [inline]
-> __sys_sendmmsg+0x263/0x500 net/socket.c:2643
-> __do_sys_sendmmsg net/socket.c:2672 [inline]
-> __se_sys_sendmmsg net/socket.c:2669 [inline]
-> __x64_sys_sendmmsg+0x57/0x60 net/socket.c:2669
-> do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-> do_syscall_64+0x41/0xc0 arch/x86/entry/common.c:80
-> entry_SYSCALL_64_after_hwframe+0x63/0xcd
-> 
-> value changed: 0xffffffff850e32b8 -> 0xffffffff850da890
-> 
-> Reported by Kernel Concurrency Sanitizer on:
-> CPU: 1 PID: 4469 Comm: syz-executor.1 Not tainted 6.4.0-rc5-syzkaller-00313-g4c605260bc60 #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/25/2023
-> 
-> Reported-by: syzbot <syzkaller@googlegroups.com>
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
+On Tue, Aug 8, 2023 at 5:15=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
+>
+> > I'll make the water muddier (hopefully clearer?). I have access to the
+> > board schematic (not SIP/SOM stuff though), but that should help here.
+> >
+> > MAC0 owns its own MDIO bus (we'll call it MDIO0). It is pinmuxed to
+> > gpio8/gpio9 for mdc/mdio. MAC1 owns its own bus (MDIO1) which is
+> > pinmuxed to gpio21/22.
+> >
+> > On MDIO0 there are two SGMII ethernet phys. One is connected to MAC0,
+> > one is connected to MAC1.
+> >
+> > MDIO1 is not connected to anything on the board. So there is only one
+> > MDIO master, MAC0 on MDIO0, and it manages the ethernet phy for both
+> > MAC0/MAC1.
+> >
+> > Does that make sense? I don't think from a hardware design standpoint
+> > this is violating anything, it isn't a multimaster setup on MDIO.
+>
+> Thanks for taking a detailed look at the schematics. This is how i
+> would expect it to be.
+>
+> > > > > Good point, but it's worse than that: when MAC0 is unbound, it wi=
+ll
+> > > > > unregister the MDIO bus and destroy all PHY devices. These are no=
+t
+> > > > > refcounted so they will literally go from under MAC1. Not sure ho=
+w
+> > > > > this can be dealt with?
+> > > >
+> > > > unbinding is not a normal operation. So i would just live with it, =
+and
+> > > > if root decides to shoot herself in the foot, that is her choice.
+> > > >
+> > >
+> > > I disagree. Unbinding is very much a normal operation.
+>
+> What do you use it for?
+>
+> I don't think i've ever manually done it. Maybe as part of a script to
+> unbind the FTDI driver from an FTDI device in order to use user space
+> tools to program the EEPROM? But that is about it.
+>
+> I actually expect many unbind operations are broken because it is very
+> rarely used.
+>
 
-Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+When I say "device unbind", I don't just mean manual unbinding using
+sysfs. I mean any code path (rmmod, unplugging the USB, etc.) that
+leads to the device being detached from its driver. This is a
+perfectly normal situation and should work correctly.
+
+I won't be fixing it for this series but may end up looking into
+establishing some kind of device links between MACs and their "remote"
+PHYs that would allow to safely unbind them.
+
+Bart
 
