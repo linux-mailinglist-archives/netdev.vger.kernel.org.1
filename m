@@ -1,145 +1,178 @@
-Return-Path: <netdev+bounces-25349-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25363-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A623773C57
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 18:04:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C498773CBB
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 18:09:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2BB281C21096
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 16:04:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4C4E71C210FF
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 16:09:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50D4D1427F;
-	Tue,  8 Aug 2023 15:50:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D9CE154A3;
+	Tue,  8 Aug 2023 15:52:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43F3A1BF01
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 15:50:03 +0000 (UTC)
-Received: from fllv0016.ext.ti.com (fllv0016.ext.ti.com [198.47.19.142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70304A5C5;
-	Tue,  8 Aug 2023 08:49:37 -0700 (PDT)
-Received: from fllv0035.itg.ti.com ([10.64.41.0])
-	by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id 378Crmb0079989;
-	Tue, 8 Aug 2023 07:53:48 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1691499228;
-	bh=Ro/GgzwhdHfAK9/N9xH4XxQOrPc8OUvp0lMlPy6GJjE=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=RMf18YGhmgutHSzou1ClazOLIcYe/spDSK0taQNXKHlJkL/tTii0icalPTBzOhTrC
-	 UZB1CTiOL8P0RQ5NSonkKH0suDjJxpi2p1VweX9FomLmuB5dNQ4P/QkHQ6QJwCk/zW
-	 vX+tJ3JhOM6HrjPdiVsAhXLoXvIdhaUVXbFJQd3o=
-Received: from DLEE107.ent.ti.com (dlee107.ent.ti.com [157.170.170.37])
-	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 378Crm5o104927
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Tue, 8 Aug 2023 07:53:48 -0500
-Received: from DLEE103.ent.ti.com (157.170.170.33) by DLEE107.ent.ti.com
- (157.170.170.37) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Tue, 8
- Aug 2023 07:53:47 -0500
-Received: from lelv0326.itg.ti.com (10.180.67.84) by DLEE103.ent.ti.com
- (157.170.170.33) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Tue, 8 Aug 2023 07:53:47 -0500
-Received: from [172.24.227.217] (ileaxei01-snat.itg.ti.com [10.180.69.5])
-	by lelv0326.itg.ti.com (8.15.2/8.15.2) with ESMTP id 378CrfOT010693;
-	Tue, 8 Aug 2023 07:53:42 -0500
-Message-ID: <264084f5-9c26-c777-2c4c-01d166b24a85@ti.com>
-Date: Tue, 8 Aug 2023 18:23:41 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8166D134C3
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 15:52:07 +0000 (UTC)
+Received: from mail-yb1-xb44.google.com (mail-yb1-xb44.google.com [IPv6:2607:f8b0:4864:20::b44])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22AE031003;
+	Tue,  8 Aug 2023 08:51:52 -0700 (PDT)
+Received: by mail-yb1-xb44.google.com with SMTP id 3f1490d57ef6-d3563cb41e9so4861208276.0;
+        Tue, 08 Aug 2023 08:51:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1691509900; x=1692114700;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=B6N1XKRd3IIvzmwYdc5soH1xY2QJlkn+NV481zGwNtg=;
+        b=gA5H2P/CsEIG4nBsIESEDyKqk/3VGmxS2MDtlHxdbbgKwmgA063kHzW1zY8OiAEMjP
+         hh8dvf3+j3532UMnUC5osOXad8E3xVVWmv5LiwWLaiXkSnVKZEALiHknhE+iP+ruwBvu
+         z0rTRRKbC4bGEpF1OpMDhbJeihEsoL5nBvWaC1U7/XRbUqc769v7iuhIDo1jYQmoji3N
+         60QzjlC3ZEEpRqxQclcVRD5qeA1UNgDiXeIYV4V+d4X0LYyJdFaXeettw4083t47B6oY
+         fpiHggLgCtz7Se1Hu2IH3KhbeDYJWrEHGb1E0tLXMtKjge/JkXonxnQQPGUjKIoDygI1
+         05bQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691509900; x=1692114700;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=B6N1XKRd3IIvzmwYdc5soH1xY2QJlkn+NV481zGwNtg=;
+        b=YwcC8ENviiC4D8L1SPzevtcjh4mGhvFX4Z1sgX/u7k2Gb2P5hWLadLYbkFC5fVjGev
+         DnJzuDaZoyaszxSa3QubHKCvFhSMGafX/ZyFRN0QDUGMy0g2XWoqKLsyC9nFxB81f9R2
+         2I5WWPQU2HtGvjycxisV2mJgSP9WTAPCXKyMe+IQoWNKMxSt0VZHiAISn4se8u18Uuaz
+         RsjSblhX+rWijMpPNH+YJplZekNNp64tXmOK75VlQxbgwBtnYca8wLivoAP1Xrb/Onat
+         2ZQmo1oezp192/TribDDKWE0xiXAhZvhplAJapRwljxO2pBjZaVwUX+L6qhIPeTTtdRV
+         mapA==
+X-Gm-Message-State: AOJu0YwOfFcieAoWfGi50FtlytezC/jnCEVS+BtLlXZEjahyXBHqEheZ
+	umynDtHegCTQyVh43xy48Od4IS3Aa1xGR2Ey
+X-Google-Smtp-Source: AGHT+IEQyuj601LKf1oS+UK2OGZHjSTR0IUIgF5tB9/SucUWs48lti84aZvNpk40HX2GcVefw3oldQ==
+X-Received: by 2002:a17:902:ba95:b0:1bc:4722:1146 with SMTP id k21-20020a170902ba9500b001bc47221146mr9174308pls.4.1691500069950;
+        Tue, 08 Aug 2023 06:07:49 -0700 (PDT)
+Received: from smtpclient.apple ([103.7.29.6])
+        by smtp.gmail.com with ESMTPSA id u1-20020a170902e80100b001bc0f974117sm8951304plg.57.2023.08.08.06.07.46
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 08 Aug 2023 06:07:49 -0700 (PDT)
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH v2 2/5] dt-bindings: net: Add iep property in ICSSG dt
- binding
-Content-Language: en-US
-To: Roger Quadros <rogerq@kernel.org>, MD Danish Anwar <danishanwar@ti.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Simon Horman
-	<simon.horman@corigine.com>,
-        Vignesh Raghavendra <vigneshr@ti.com>, Andrew
- Lunn <andrew@lunn.ch>,
-        Richard Cochran <richardcochran@gmail.com>,
-        Conor
- Dooley <conor+dt@kernel.org>,
-        Krzysztof Kozlowski
-	<krzysztof.kozlowski+dt@linaro.org>,
-        Rob Herring <robh+dt@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>,
-        Jakub Kicinski <kuba@kernel.org>, Eric Dumazet
-	<edumazet@google.com>,
-        "David S. Miller" <davem@davemloft.net>
-CC: <nm@ti.com>, <srk@ti.com>, <linux-kernel@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-omap@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>
-References: <20230807110048.2611456-1-danishanwar@ti.com>
- <20230807110048.2611456-3-danishanwar@ti.com>
- <e98f134a-a57a-3cbc-3cb1-378d6b411406@kernel.org>
-From: Md Danish Anwar <a0501179@ti.com>
-Organization: Texas Instruments
-In-Reply-To: <e98f134a-a57a-3cbc-3cb1-378d6b411406@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
-X-Spam-Status: No, score=-6.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_MED,SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3731.700.6\))
+Subject: Re: [PATCH net-next v3 3/3] net: tcp: fix unexcepted socket die when
+ snd_wnd is 0
+From: Menglong Dong <menglong8.dong@gmail.com>
+In-Reply-To: <CANn89iK16069CvbA+p=WyZVYftvHs=FviQp1GSWUTG2ihRfKDA@mail.gmail.com>
+Date: Tue, 8 Aug 2023 21:07:40 +0800
+Cc: ncardwell@google.com,
+ davem@davemloft.net,
+ kuba@kernel.org,
+ pabeni@redhat.com,
+ dsahern@kernel.org,
+ netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org,
+ flyingpeng@tencent.com,
+ Menglong Dong <imagedong@tencent.com>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <19C01818-58B5-43BF-9D59-123B30949B95@gmail.com>
+References: <20230808115835.2862058-1-imagedong@tencent.com>
+ <20230808115835.2862058-4-imagedong@tencent.com>
+ <CANn89iK16069CvbA+p=WyZVYftvHs=FviQp1GSWUTG2ihRfKDA@mail.gmail.com>
+To: Eric Dumazet <edumazet@google.com>
+X-Mailer: Apple Mail (2.3731.700.6)
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 08/08/23 4:12 pm, Roger Quadros wrote:
-> 
-> 
-> On 07/08/2023 14:00, MD Danish Anwar wrote:
->> Add iep node in ICSSG driver dt binding document.
-> 
-> s/iep/IEP here and in subject
-> s/dt/DT here and in subject
-> 
 
-Sure Roger, will do this.
 
->>
->> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
->> ---
->>  Documentation/devicetree/bindings/net/ti,icssg-prueth.yaml | 7 +++++++
->>  1 file changed, 7 insertions(+)
->>
->> diff --git a/Documentation/devicetree/bindings/net/ti,icssg-prueth.yaml b/Documentation/devicetree/bindings/net/ti,icssg-prueth.yaml
->> index 8ec30b3eb760..36870238f92f 100644
->> --- a/Documentation/devicetree/bindings/net/ti,icssg-prueth.yaml
->> +++ b/Documentation/devicetree/bindings/net/ti,icssg-prueth.yaml
->> @@ -52,6 +52,12 @@ properties:
->>      description:
->>        phandle to MII_RT module's syscon regmap
->>  
->> +  ti,iep:
->> +    $ref: /schemas/types.yaml#/definitions/phandle-array
->> +    maxItems: 2
->> +    description:
->> +      phandle to IEP (Industrial Ethernet Peripheral) for ICSSG driver
+> On Aug 8, 2023, at 20:49, Eric Dumazet <edumazet@google.com> wrote:
+>=20
+> On Tue, Aug 8, 2023 at 1:59=E2=80=AFPM <menglong8.dong@gmail.com> =
+wrote:
+>>=20
+[=E2=80=A6=E2=80=A6]
+>>=20
+>> diff --git a/net/ipv4/tcp_timer.c b/net/ipv4/tcp_timer.c
+>> index d45c96c7f5a4..f30d1467771c 100644
+>> --- a/net/ipv4/tcp_timer.c
+>> +++ b/net/ipv4/tcp_timer.c
+>> @@ -454,6 +454,18 @@ static void tcp_fastopen_synack_timer(struct =
+sock *sk, struct request_sock *req)
+>>                          req->timeout << req->num_timeout, =
+TCP_RTO_MAX);
+>> }
+>>=20
+>> +static bool tcp_rtx_probe0_timed_out(struct sock *sk)
+>=20
+> const struct sock *sk
+>=20
+>> +{
+>> +       struct tcp_sock *tp =3D tcp_sk(sk);
+>=20
+> const struct tcp_sock *tp =3D tcp_sk(sk);
+>=20
+>> +       u32 timeout_ts, rtx_ts, rcv_ts;
 >> +
->>    interrupts:
->>      maxItems: 2
->>      description:
->> @@ -155,6 +161,7 @@ examples:
->>                      "tx1-0", "tx1-1", "tx1-2", "tx1-3",
->>                      "rx0", "rx1";
->>          ti,mii-g-rt = <&icssg2_mii_g_rt>;
->> +        ti,iep = <&icssg2_iep0>, <&icssg2_iep1>;
->>          interrupt-parent = <&icssg2_intc>;
->>          interrupts = <24 0 2>, <25 1 3>;
->>          interrupt-names = "tx_ts0", "tx_ts1";
-> 
+>> +       rtx_ts =3D tp->retrans_stamp;
+>> +       rcv_ts =3D tp->rcv_tstamp;
+>> +       timeout_ts =3D after(rtx_ts, rcv_ts) ? rtx_ts : rcv_ts;
+>> +       timeout_ts +=3D TCP_RTO_MAX;
+>=20
+> If we are concerned with a socket dying too soon, I would suggest
+> adding 2*TCP_RTO_MAX instead of TCP_RTO_MAX
+>=20
+> When a receiver is OOMing, it is possible the ACK RWIN 0 can not be =
+sent all,
+> so tp->rcv_tstamp will not be refreshed. Or ACK could be lost in the
+> network path.
 
--- 
-Thanks and Regards,
-Danish.
+Yeah, I concern abort this too. I introduce the funtion =
+=E2=80=9Ctcp_rtx_probe0_timed_out()=E2=80=9D
+here is to offer a more reliable way to check the timeout in the =
+feature.
+And for this time, we can fix the problem first, as you advised, adding
+2*TCP_RTO_MAX instead of TCP_RTO_MAX.
+
+> This also suggests the net_dbg_ratelimited("Peer %pI4:%u/%u
+> unexpectedly shrunk window %u:%u (repaired)\n"...) messages
+> are slightly wrong, because they could be printed even if we did not
+> receive a new ACK packet from the remote peer.
+>=20
+> Perhaps we should change them to include delays (how long @skb stayed
+> in rtx queue, how old is the last ACK we received)
+
+Sounds great, which is more valuable. I=E2=80=99ll change them
+in the next version.
+
+Thanks!
+Menglong Dong
+
+>> +
+>> +       return after(inet_csk(sk)->icsk_timeout, timeout_ts);
+>> +}
+>>=20
+>> /**
+>>  *  tcp_retransmit_timer() - The TCP retransmit timeout handler
+>> @@ -519,7 +531,7 @@ void tcp_retransmit_timer(struct sock *sk)
+>>                                            tp->snd_una, tp->snd_nxt);
+>>                }
+>> #endif
+>> -               if (tcp_jiffies32 - tp->rcv_tstamp > TCP_RTO_MAX) {
+>> +               if (tcp_rtx_probe0_timed_out(sk)) {
+>>                        tcp_write_err(sk);
+>>                        goto out;
+>>                }
+>> --
+>> 2.40.1
+
+
 
