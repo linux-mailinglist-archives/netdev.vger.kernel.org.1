@@ -1,109 +1,84 @@
-Return-Path: <netdev+bounces-25237-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25239-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50CB0773697
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 04:28:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17AD37736A6
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 04:30:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0B8E528139E
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 02:28:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 47FF21C20DE2
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 02:30:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05C2B813;
-	Tue,  8 Aug 2023 02:28:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A80E7160;
+	Tue,  8 Aug 2023 02:30:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECEF97FE
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 02:28:50 +0000 (UTC)
-Received: from out-115.mta1.migadu.com (out-115.mta1.migadu.com [95.215.58.115])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94B89185
-	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 19:28:48 -0700 (PDT)
-Content-Type: text/plain;
-	charset=us-ascii
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1691461726;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=b018wDD09q8ybQHeVjJQlHvcOhDGiPGtV/Qkh1+P4Jk=;
-	b=qG+f2yssWczIj/c36Dv6lyS9LMH4Qo3IpX5TeG1prf8Sjbf2TndiPspYdq8X2q9u4a0d4+
-	mAWwkzbtPW05nR7/h47VG61cI5kT4JFrqpqLlXTjX8sbawq1mwyPUSZYPolnAScsj79wmk
-	u8AjZlHRxpLLihMJimmgVrAhX04JcfM=
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E555EAD1
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 02:30:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id BB34BC433C9;
+	Tue,  8 Aug 2023 02:30:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1691461822;
+	bh=/+DRvaBB5Nd3aAt5Veav+v9Zfcn0y2zUi12SaKI4aKo=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=NV1GKiWymmQBxJ/6zZrUypC/032+6OnsONu7VcwHa3l1rPAKxfX1Si1Td7xw0PZqC
+	 ijefgIA4x7s2hbkp+whgM+dGHah98qwNxKP+iJaNRezb1t7yQJKv/Zsfmjpx2RLpCY
+	 Z6SVsyMc0oGjiiE52oHcSe3hpUQHNf2FVZ+WEWozU8G1nKp5PqB9x2EUPIzGxwv3hh
+	 FiaX/g1CLKyFM9CVs5304/reISWFADYeRqmvHDgZWBRtkeGaOCsvrMzXWNfQ9wwGj3
+	 P/GHAE1ShUpZqwbFG/A4KvPljL2IsObar89TzoGbmKFUHLyOG2xGLHNh6TAkDyUb9g
+	 WfrpvVeIP2orw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A168DE26D5F;
+	Tue,  8 Aug 2023 02:30:22 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v4 19/48] rcu: dynamically allocate the rcu-kfree shrinker
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Muchun Song <muchun.song@linux.dev>
-In-Reply-To: <20230807110936.21819-20-zhengqi.arch@bytedance.com>
-Date: Tue, 8 Aug 2023 10:28:00 +0800
-Cc: Andrew Morton <akpm@linux-foundation.org>,
- david@fromorbit.com,
- tkhai@ya.ru,
- Vlastimil Babka <vbabka@suse.cz>,
- Roman Gushchin <roman.gushchin@linux.dev>,
- djwong@kernel.org,
- Christian Brauner <brauner@kernel.org>,
- "Paul E. McKenney" <paulmck@kernel.org>,
- tytso@mit.edu,
- steven.price@arm.com,
- cel@kernel.org,
- Sergey Senozhatsky <senozhatsky@chromium.org>,
- yujie.liu@intel.com,
- Greg KH <gregkh@linuxfoundation.org>,
- simon.horman@corigine.com,
- dlemoal@kernel.org,
- LKML <linux-kernel@vger.kernel.org>,
- Linux-MM <linux-mm@kvack.org>,
- x86@kernel.org,
- kvm@vger.kernel.org,
- xen-devel@lists.xenproject.org,
- linux-erofs@lists.ozlabs.org,
- linux-f2fs-devel@lists.sourceforge.net,
- cluster-devel@redhat.com,
- linux-nfs@vger.kernel.org,
- linux-mtd@lists.infradead.org,
- rcu@vger.kernel.org,
- netdev <netdev@vger.kernel.org>,
- dri-devel@lists.freedesktop.org,
- linux-arm-msm@vger.kernel.org,
- dm-devel@redhat.com,
- linux-raid@vger.kernel.org,
- linux-bcache@vger.kernel.org,
- virtualization@lists.linux-foundation.org,
- linux-fsdevel@vger.kernel.org,
- linux-ext4@vger.kernel.org,
- linux-xfs@vger.kernel.org,
- linux-btrfs@vger.kernel.org
-Content-Transfer-Encoding: 7bit
-Message-Id: <0C2FEFBD-B866-46C4-B684-1FB9A048B899@linux.dev>
-References: <20230807110936.21819-1-zhengqi.arch@bytedance.com>
- <20230807110936.21819-20-zhengqi.arch@bytedance.com>
-To: Qi Zheng <zhengqi.arch@bytedance.com>
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next 0/2] net: Remove redundant initialization owner
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169146182265.15123.6784529323477269174.git-patchwork-notify@kernel.org>
+Date: Tue, 08 Aug 2023 02:30:22 +0000
+References: <20230804095946.99956-1-lizetao1@huawei.com>
+In-Reply-To: <20230804095946.99956-1-lizetao1@huawei.com>
+To: Li Zetao <lizetao1@huawei.com>
+Cc: ioana.ciornei@nxp.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org
 
+Hello:
 
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-> On Aug 7, 2023, at 19:09, Qi Zheng <zhengqi.arch@bytedance.com> wrote:
+On Fri, 4 Aug 2023 17:59:44 +0800 you wrote:
+> This patch set removes redundant initialization owner when register a
+> fsl_mc_driver driver
 > 
-> Use new APIs to dynamically allocate the rcu-kfree shrinker.
+> Li Zetao (2):
+>   net: dpaa2-eth: Remove redundant initialization owner in
+>     dpaa2_eth_driver
+>   net: dpaa2-switch: Remove redundant initialization owner in
+>     dpaa2_switch_drv
 > 
-> Signed-off-by: Qi Zheng <zhengqi.arch@bytedance.com>
+> [...]
 
-Reviewed-by: Muchun Song <songmuchun@bytedance.com>
+Here is the summary with links:
+  - [net-next,1/2] net: dpaa2-eth: Remove redundant initialization owner in dpaa2_eth_driver
+    https://git.kernel.org/netdev/net-next/c/43265d3fceeb
+  - [net-next,2/2] net: dpaa2-switch: Remove redundant initialization owner in dpaa2_switch_drv
+    https://git.kernel.org/netdev/net-next/c/ca46d207c972
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
 
