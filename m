@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-25598-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25595-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9034B774E0E
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 00:11:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D08A5774E05
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 00:10:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C1B011C20FAF
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 22:11:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8465C1C20F9F
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 22:10:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BD381BEE4;
-	Tue,  8 Aug 2023 22:10:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C63918037;
+	Tue,  8 Aug 2023 22:10:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE4F51802F
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB15F1802B
 	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 22:10:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 830B9C433CA;
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 8A9E9C433CB;
 	Tue,  8 Aug 2023 22:10:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1691532626;
-	bh=ElzwQNB5k4o9+Lw4DzC4a7QoKVmgp4dLbavyMvqdX4o=;
+	bh=WKGXWxFTPGe5rOCTFMv7qFop5jSm+DWrw9yT4MUWMDY=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=HaEtjISl7bsUid68IEO4GasfSC01wI2nfCS5A1XTvlxVsyFHrOezgLr5URdJhgUvv
-	 u+Rntsk+AJIQgNnZR/cll7sPy4C0gFohNytM5SGE3MkDMtm+Czipr+PEyww9ALVkxK
-	 077GFkbV0lq/yrYPouoEUYwp7Yk1EcoPnyv1F4CCk93T9x+EQEQh2zIff00b+4wk3r
-	 hwA5hYyHFVfZN4KFvH2H4vDdTmXog7P/B7vfCbgE1hjyxyy3EHKIbn/PvGx1ZNNtHp
-	 EXX0pFAN0un/m3EXCVPTnxnLROfJ/P2CSQ9dFse9hYN3fh8ui12PNrQMXY74QBBduZ
-	 P5bjSyqXDp0jg==
+	b=dBW8i2C+BR9TzecA0g2WKsO+Y6z0JagxoNsDWY3B8yRmknYGxoHY3dgXxdPYdWm9G
+	 s/0EVT5/gcF60QD7tnAh35hc4PJF0kyDEDag8K0z12wfjAusPHeuqQw0/sCsAcWa0e
+	 NXt9RU9ZvqrYe5VsB7TydbYEikEGu7YCgruDRlqkUt9P/OrA5WVMLtNOO17uO2Pgl8
+	 8yZeRbIkDi0Z3RP1BwSRPJRyRwdl/8gE5G1OHXUQlP6C7TAhVQM65NuWydsiwOnZU8
+	 O5bcUmFTeL6iteds4UQZ8g64oInP5G2In8CWF8kTZ+fOMy0u88XFUtyrgijK4zHKLk
+	 mqt1WUDYy1vBw==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 677DBC64459;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 70AA6E33094;
 	Tue,  8 Aug 2023 22:10:26 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -41,59 +41,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 00/10] net: fs_enet: Driver cleanup
+Subject: Re: [PATCH net-next 0/2] bnxt_en: Fix 2 compile warnings in bnxt_dcb.c
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <169153262641.13746.13289621238747032969.git-patchwork-notify@kernel.org>
+ <169153262645.13746.15905080876234597676.git-patchwork-notify@kernel.org>
 Date: Tue, 08 Aug 2023 22:10:26 +0000
-References: <cover.1691155346.git.christophe.leroy@csgroup.eu>
-In-Reply-To: <cover.1691155346.git.christophe.leroy@csgroup.eu>
-To: Christophe Leroy <christophe.leroy@csgroup.eu>
-Cc: davem@davemloft.net, kuba@kernel.org, pantelis.antoniou@gmail.com,
- edumazet@google.com, pabeni@redhat.com, mpe@ellerman.id.au,
- npiggin@gmail.com, robh@kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+References: <20230807145720.159645-1-michael.chan@broadcom.com>
+In-Reply-To: <20230807145720.159645-1-michael.chan@broadcom.com>
+To: Michael Chan <michael.chan@broadcom.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, gospo@broadcom.com,
+ gustavo@embeddedor.com
 
 Hello:
 
 This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri,  4 Aug 2023 15:30:10 +0200 you wrote:
-> Over the years, platform and driver initialisation have evolved into
-> more generic ways, and driver or platform specific stuff has gone
-> away, leaving stale objects behind.
+On Mon,  7 Aug 2023 07:57:18 -0700 you wrote:
+> Fix 2 similar warnings in bnxt_dcb.c related to the cos2bw interface
+> definitions in bnxt_hsi.h.
 > 
-> This series aims at cleaning all that up for fs_enet ethernet driver.
-> 
-> Changes in v2:
-> - Remove a trailing whitespace in the old struct moved in patch 7.
-> - Include powerpc people and list that I forgot when sending v1
-> (and Rob as expected by Patchwork for patch 6, not sure why)
+> Michael Chan (2):
+>   bnxt_en: Fix W=1 warning in bnxt_dcb.c from fortify memcpy()
+>   bnxt_en: Fix W=stringop-overflow warning in bnxt_dcb.c
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v2,01/10] net: fs_enet: Remove set but not used variable
-    https://git.kernel.org/netdev/net-next/c/78d3902795f0
-  - [net-next,v2,02/10] net: fs_enet: Fix address space and base types mismatches
-    https://git.kernel.org/netdev/net-next/c/ae9e78a9dc88
-  - [net-next,v2,03/10] net: fs_enet: Remove fs_get_id()
-    https://git.kernel.org/netdev/net-next/c/26bbbef8ff40
-  - [net-next,v2,04/10] net: fs_enet: Remove unused fields in fs_platform_info struct
-    https://git.kernel.org/netdev/net-next/c/caaf482e2654
-  - [net-next,v2,05/10] net: fs_enet: Remove has_phy field in fs_platform_info struct
-    https://git.kernel.org/netdev/net-next/c/9359a48c65a3
-  - [net-next,v2,06/10] net: fs_enet: Remove stale prototypes from fsl_soc.c
-    https://git.kernel.org/netdev/net-next/c/62e106c802c5
-  - [net-next,v2,07/10] net: fs_enet: Move struct fs_platform_info into fs_enet.h
-    https://git.kernel.org/netdev/net-next/c/7a76918371fe
-  - [net-next,v2,08/10] net: fs_enet: Don't include fs_enet_pd.h when not needed
-    https://git.kernel.org/netdev/net-next/c/33deffc9f19f
-  - [net-next,v2,09/10] net: fs_enet: Remove linux/fs_enet_pd.h
-    https://git.kernel.org/netdev/net-next/c/7149b38dc7cb
-  - [net-next,v2,10/10] net: fs_enet: Use cpm_muram_xxx() functions instead of cpm_dpxxx() macros
-    https://git.kernel.org/netdev/net-next/c/5e6cb39a256d
+  - [net-next,1/2] bnxt_en: Fix W=1 warning in bnxt_dcb.c from fortify memcpy()
+    https://git.kernel.org/netdev/net-next/c/ac1b8c978a7a
+  - [net-next,2/2] bnxt_en: Fix W=stringop-overflow warning in bnxt_dcb.c
+    https://git.kernel.org/netdev/net-next/c/3d5ecada049f
 
 You are awesome, thank you!
 -- 
