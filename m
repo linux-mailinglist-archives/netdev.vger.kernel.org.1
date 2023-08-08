@@ -1,182 +1,102 @@
-Return-Path: <netdev+bounces-25422-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25368-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B371E773EE8
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 18:39:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 30330773CE1
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 18:11:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E37981C20E1F
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 16:39:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 606CE1C20E5E
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 16:11:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EE9215AF8;
-	Tue,  8 Aug 2023 16:37:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 417DB13FF8;
+	Tue,  8 Aug 2023 15:55:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 036D11C9E5
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 16:37:52 +0000 (UTC)
-Received: from mail-yb1-xb30.google.com (mail-yb1-xb30.google.com [IPv6:2607:f8b0:4864:20::b30])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F42614595;
-	Tue,  8 Aug 2023 09:37:38 -0700 (PDT)
-Received: by mail-yb1-xb30.google.com with SMTP id 3f1490d57ef6-d593a63e249so1291681276.3;
-        Tue, 08 Aug 2023 09:37:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1691512628; x=1692117428;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=o1NFY3VdQSb9Zqy0SLKHAuSu4mepElX+9AY6ISptc7A=;
-        b=lnjNTk76EJhxe170Ber/m2Ta5V/1jtLHDBLmMD0JYx7yevLbvSYvVGGDAu0GW3D/6U
-         Sa8ChHydFDVZmbX0tTfE9p8ENZ0pybIQ48smkQNCSh7bk2nIx4uCPinzCsm+EER//nVF
-         3/6BT1ghjjupgQKsNaYGxT2x/g90u0xnAGn5dJQmT+HuBHoZ4HTl/Bi//ktD1jPQdX98
-         CKzDpoWYu5sPRplLUxF/viKmvBqSqpLiAUI+JOb3LmRJPJ8OZq8s8ZgB7vOOR2bl073w
-         6wUd9eQ3qc7uszytp3WCqmSeonZGwguAEm+6VVP1qSBHUK471ZEJ5QEQOLdrgNvpMSjI
-         kNSg==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3594B1C29
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 15:55:42 +0000 (UTC)
+Received: from mail-oi1-f199.google.com (mail-oi1-f199.google.com [209.85.167.199])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2040B16547
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 08:55:18 -0700 (PDT)
+Received: by mail-oi1-f199.google.com with SMTP id 5614622812f47-3a1c2d69709so10432008b6e.1
+        for <netdev@vger.kernel.org>; Tue, 08 Aug 2023 08:55:18 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691512628; x=1692117428;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=o1NFY3VdQSb9Zqy0SLKHAuSu4mepElX+9AY6ISptc7A=;
-        b=I56n8FPRclMCGrjoxKPhcIJJVVcoSDA5SRK7Y7g7RByHzaAYt3B/xCJpTUYUHKrvt3
-         RD9sbtZcUsF6JqOgpU3FP/F4unbamIm6K/8iDsdkcZvEiMlCJL9VDIJmxnWgzeOwIyQb
-         vgKTAp5YD2YMkzwn8WjUvu16TUsny7DirspRHanPqSPCMbLOfRsPLc0ELIhWveqtnzdF
-         w01xc0Cfs9DumxWNzsksdAKuM/6h6QCCgtTrVK7MfOTJ/Ry6vTvuIAwI/3NG59VIgSlw
-         ucWR/RHCBM/LlRmNajTDtK96snVUPiYKt4vOJnZs7prSZlJQ0t4iaI1jpUvXMDOCglOX
-         5tIA==
-X-Gm-Message-State: AOJu0YwRe+iF2SDYo+t0pI08hJyVv5NcDZ2k3rxcrCghUXTMt3qIAQL1
-	6XB/MiF+g+D+aKfD2zBKa8iFOVxXak/jJa++BtEfLX3f
-X-Google-Smtp-Source: AGHT+IHTpkThIqFuGfK/2amDNPTDmnfieKGEWv6tFlNYZqVK0lo9FRR56ROQMjc00EwVtS4enzsrcJtq/ZwK297L3Rw=
-X-Received: by 2002:a17:90a:1f41:b0:268:e5db:6e19 with SMTP id
- y1-20020a17090a1f4100b00268e5db6e19mr9233015pjy.20.1691502363028; Tue, 08 Aug
- 2023 06:46:03 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1691510070; x=1692114870;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=try7kLiqOvWBbDWNv3AsjzJNZ1pHNvllo2yNmM+PfCo=;
+        b=bXOYXLqc2ci870MfOjbmesRwuawbZSHJqyvq+kgr5MNe2MP+uPg5tQiMTqJKZsj+x2
+         QvuVsv4Y12ykFnuY4x+dkznphVvVicwnwVe7MbcKvxTazKsJDs1K6o/kMYuWQqErxlvv
+         kdob42O55HaBpaTnJKQM4MqAKVkfHFrg/SijuA6G9aD099FErGkexpJrt9vTUABEWJ8F
+         +P4/EmtdjP0t8xMBEIBuZrxbu0Q+wBKcQ1rV5YRP8/G6mYQdeO6bFsi30Gq31qCZ7/tt
+         o9aVeoMT5QtLwNvrVvaA/K6WbG2zOy9s7YggpOO1SIrrdKaDRZU6ID2W3ZRm0HfhtA9i
+         CcPA==
+X-Gm-Message-State: AOJu0YxUwWxFa8LKxiJV3jpLKM/fxNPvwW/2gXJnQKpyHHvZa09gI2QR
+	CuQJ14QcphK04QkpHfLI2V8Vx968I8PzC0KDt/uV8w1rFa0n
+X-Google-Smtp-Source: AGHT+IHVxzz7rv3Yc6Ex9nVZyfccRlIl4YuPHqh33kxidSRG2ZsY/cJC8dt7jVr/W6xkY4FX1aCJajbFNScBQQQ0cLLlU2M2U+jQ
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230804180529.2483231-1-aleksander.lobakin@intel.com>
- <20230804180529.2483231-6-aleksander.lobakin@intel.com> <692d71dc8068b3d27aba39d7141c811755965786.camel@gmail.com>
- <601c0203-ee5f-03a3-e9dd-fdb241f3bcdc@intel.com>
-In-Reply-To: <601c0203-ee5f-03a3-e9dd-fdb241f3bcdc@intel.com>
-From: Alexander Duyck <alexander.duyck@gmail.com>
-Date: Tue, 8 Aug 2023 06:45:26 -0700
-Message-ID: <CAKgT0Uc0pLzaOfqFbvd9jFErAbTbsUMNNw5e_XY5NfCnO0=g0g@mail.gmail.com>
-Subject: Re: [PATCH net-next v4 5/6] page_pool: add a lockdep check for
- recycling in hardirq
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>, Larysa Zaremba <larysa.zaremba@intel.com>, 
-	Yunsheng Lin <linyunsheng@huawei.com>, Alexander Duyck <alexanderduyck@fb.com>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
-	Simon Horman <simon.horman@corigine.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
+X-Received: by 2002:a05:6870:c794:b0:1ba:7bf5:67cd with SMTP id
+ dy20-20020a056870c79400b001ba7bf567cdmr16115130oab.11.1691502890465; Tue, 08
+ Aug 2023 06:54:50 -0700 (PDT)
+Date: Tue, 08 Aug 2023 06:54:50 -0700
+In-Reply-To: <0000000000009393ba059691c6a3@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000ec3e1f060269b476@google.com>
+Subject: Re: [syzbot] KASAN: use-after-free Read in j1939_session_get_by_addr
+From: syzbot <syzbot+d9536adc269404a984f8@syzkaller.appspotmail.com>
+To: Jose.Abreu@synopsys.com, arvid.brodin@alten.se, davem@davemloft.net, 
+	dvyukov@google.com, ilias.apalodimas@linaro.org, joabreu@synopsys.com, 
+	jose.abreu@synopsys.com, kernel@pengutronix.de, linux-can@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux@rempel-privat.de, mkl@pengutronix.de, 
+	netdev@vger.kernel.org, nogikh@google.com, robin@protonic.nl, 
+	socketcan@hartkopp.net, syzkaller-bugs@googlegroups.com, 
+	tonymarislogistics@yandex.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=0.9 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,
+	SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Aug 8, 2023 at 6:16=E2=80=AFAM Alexander Lobakin
-<aleksander.lobakin@intel.com> wrote:
->
-> From: Alexander H Duyck <alexander.duyck@gmail.com>
-> Date: Mon, 07 Aug 2023 07:48:54 -0700
->
-> > On Fri, 2023-08-04 at 20:05 +0200, Alexander Lobakin wrote:
-> >> From: Jakub Kicinski <kuba@kernel.org>
-> >>
-> >> Page pool use in hardirq is prohibited, add debug checks
-> >> to catch misuses. IIRC we previously discussed using
-> >> DEBUG_NET_WARN_ON_ONCE() for this, but there were concerns
-> >> that people will have DEBUG_NET enabled in perf testing.
-> >> I don't think anyone enables lockdep in perf testing,
-> >> so use lockdep to avoid pushback and arguing :)
-> >>
-> >> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> >> Acked-by: Jesper Dangaard Brouer <hawk@kernel.org>
-> >> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-> >> ---
-> >>  include/linux/lockdep.h | 7 +++++++
-> >>  net/core/page_pool.c    | 2 ++
-> >>  2 files changed, 9 insertions(+)
-> >>
-> >> diff --git a/include/linux/lockdep.h b/include/linux/lockdep.h
-> >> index 310f85903c91..dc2844b071c2 100644
-> >> --- a/include/linux/lockdep.h
-> >> +++ b/include/linux/lockdep.h
-> >> @@ -625,6 +625,12 @@ do {                                             =
-                       \
-> >>      WARN_ON_ONCE(__lockdep_enabled && !this_cpu_read(hardirq_context)=
-); \
-> >>  } while (0)
-> >>
-> >> +#define lockdep_assert_no_hardirq()                                 \
-> >> +do {                                                                 =
-       \
-> >> +    WARN_ON_ONCE(__lockdep_enabled && (this_cpu_read(hardirq_context)=
- || \
-> >> +                                       !this_cpu_read(hardirqs_enable=
-d))); \
-> >> +} while (0)
-> >> +
-> >>  #define lockdep_assert_preemption_enabled()                         \
-> >>  do {                                                                 =
-       \
-> >>      WARN_ON_ONCE(IS_ENABLED(CONFIG_PREEMPT_COUNT)   &&              \
-> >> @@ -659,6 +665,7 @@ do {                                              =
-                       \
-> >>  # define lockdep_assert_irqs_enabled() do { } while (0)
-> >>  # define lockdep_assert_irqs_disabled() do { } while (0)
-> >>  # define lockdep_assert_in_irq() do { } while (0)
-> >> +# define lockdep_assert_no_hardirq() do { } while (0)
-> >>
-> >>  # define lockdep_assert_preemption_enabled() do { } while (0)
-> >>  # define lockdep_assert_preemption_disabled() do { } while (0)
-> >> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-> >> index 03ad74d25959..77cb75e63aca 100644
-> >> --- a/net/core/page_pool.c
-> >> +++ b/net/core/page_pool.c
-> >> @@ -587,6 +587,8 @@ static __always_inline struct page *
-> >>  __page_pool_put_page(struct page_pool *pool, struct page *page,
-> >>                   unsigned int dma_sync_size, bool allow_direct)
-> >>  {
-> >> +    lockdep_assert_no_hardirq();
-> >> +
-> >>      /* This allocator is optimized for the XDP mode that uses
-> >>       * one-frame-per-page, but have fallbacks that act like the
-> >>       * regular page allocator APIs.
-> >
-> > So two points.
-> >
-> > First could we look at moving this inside the if statement just before
-> > we return the page, as there isn't a risk until we get into that path
-> > of needing a lock.
-> >
-> > Secondly rather than returning an error is there any reason why we
-> > couldn't just look at not returning page and instead just drop into the
-> > release path which wouldn't take the locks in the first place? Either
->
-> That is exception path to quickly catch broken drivers and fix them, why
-> bother? It's not something we have to live with.
+This bug is marked as fixed by commit:
+can: j1939: transport: make sure the aborted session will be
 
-My concern is that the current "fix" consists of stalling a Tx ring.
-We need to have a way to allow forward progress when somebody mixes
-xdp_frame and skb traffic as I suspect we will end up with a number of
-devices doing this since they cannot handle recycling the pages in
-hardirq context.
+But I can't find it in the tested trees[1] for more than 90 days.
+Is it a correct commit? Please update it by replying:
 
-The only reason why the skbs don't have the problem is that they are
-queued and then cleaned up in the net_tx_action. That is why I wonder
-if we shouldn't look at adding some sort of support for doing
-something like that with xdp_frame as well. Something like a
-dev_kfree_pp_page_any to go along with the dev_kfree_skb_any.
+#syz fix: exact-commit-title
+
+Until then the bug is still considered open and new crashes with
+the same signature are ignored.
+
+Kernel: Linux
+Dashboard link: https://syzkaller.appspot.com/bug?extid=d9536adc269404a984f8
+
+---
+[1] I expect the commit to be present in:
+
+1. for-kernelci branch of
+git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git
+
+2. master branch of
+git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git
+
+3. master branch of
+git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git
+
+4. main branch of
+git://git.kernel.org/pub/scm/linux/kernel/git/davem/net-next.git
+
+The full list of 9 trees can be found at
+https://syzkaller.appspot.com/upstream/repos
 
