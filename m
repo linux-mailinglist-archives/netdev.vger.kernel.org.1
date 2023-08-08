@@ -1,123 +1,198 @@
-Return-Path: <netdev+bounces-25402-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25381-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4E1E773DD9
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 18:23:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 898E2773D45
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 18:15:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9FCC5280F7A
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 16:23:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1CA242814F0
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 16:15:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85F8E14294;
-	Tue,  8 Aug 2023 16:23:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74FC31426E;
+	Tue,  8 Aug 2023 16:01:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AF3713AF9
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 16:23:00 +0000 (UTC)
-Received: from mail-qt1-x849.google.com (mail-qt1-x849.google.com [IPv6:2607:f8b0:4864:20::849])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D69A8B4F21
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 09:22:41 -0700 (PDT)
-Received: by mail-qt1-x849.google.com with SMTP id d75a77b69052e-40ff238340fso54944281cf.1
-        for <netdev@vger.kernel.org>; Tue, 08 Aug 2023 09:22:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691511739; x=1692116539;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Z/HtqSSo24ZSf94NQl8ByRHElK56950aw4c8N6JXUUo=;
-        b=3tk2DsMD+RjTzlNELXCoNDEiK33BIBp4ZZekHPPuMft5RVkb4Ym6q+iBW5B+F/WyYo
-         xubS6dYWNbL+wWDj3juiS1jJv+BZHH5F+jGu6uzX4EWNczX2/hNVoo3gxKeg8GEk3+Hs
-         1p9EujkWuXblvw2dZ6N5jC/S91ginHhw/3qPrd7u89s8UGydnnbnsWpUgW3Xu0F9Dl4N
-         KCHCc712ejHSZBfeK/FF1UGF1s3gmUelUQ27nuC334S5bssipMFLeeoCxZyq3UsK0ENH
-         qrw8YiNp+Q7PkZ15XNeHT+PfEQsBany7Af3CnEnSQ5pW3BEnfRp3OHWwqxU9EFNJDmm5
-         olpw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691511739; x=1692116539;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Z/HtqSSo24ZSf94NQl8ByRHElK56950aw4c8N6JXUUo=;
-        b=gcVtrV19HIVsvvlrkRygXUGtF54fLz3dBJxHyEnh78Nx7wAHtA4cnOg9SMohctdQtD
-         Xni1lUsIZ1YfkY17gTccEI1eqY+ZdeBqh0UZ7wVhD/RLO9go3jneCemdCwRxHFmRN4Z9
-         84G9+NL88dG+530ku3kS7sfckwI6VU1omD5CUiDBC0REG/tvTVp6vXVyJtSBss8ORfAD
-         Fl72+dIpMaPv2X3s/jJ+x0g0NQXkHisYzB5X4GBem/a8sifLaH9n+SZKUdRbKxSlV3OS
-         O79scBl1MtKh6InFZPQL+erbCcjnM8ShjmLljo66MC8cGkQRL4qsvqmuZ2Nx7f5sX6dm
-         oBqg==
-X-Gm-Message-State: AOJu0Ywds95SfVUwzodxTbtu+wzN3KIYjgw9dRPVyqBPHMWHA/cXOBtK
-	ov5VyMHuWZuTqbrePsCUm98QHIsGaMq7GA==
-X-Google-Smtp-Source: AGHT+IHudCzS86GVLQoZMAY5Vb3X73K+rWWtPFCQvAr3TG3Gv4/smSiPCjLplnDdEfEG7fkYSR85/HZXAZryDA==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a25:cc4d:0:b0:d0f:a0a6:8e87 with SMTP id
- l74-20020a25cc4d000000b00d0fa0a68e87mr68507ybf.2.1691484570168; Tue, 08 Aug
- 2023 01:49:30 -0700 (PDT)
-Date: Tue,  8 Aug 2023 08:49:23 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69B8213ADC
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 16:01:27 +0000 (UTC)
+Received: from domac.alu.hr (domac.alu.unizg.hr [IPv6:2001:b68:2:2800::3])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB0D258F8D;
+	Tue,  8 Aug 2023 09:01:13 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+	by domac.alu.hr (Postfix) with ESMTP id A6E1660173;
+	Tue,  8 Aug 2023 10:53:57 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
+	t=1691484837; bh=tkIdjaCIZxuCMCril+uMFLD30L4EwBbIMx25+pZyiFc=;
+	h=Date:From:Subject:To:Cc:References:In-Reply-To:From;
+	b=VTLtJO2lgounct7FeM0VWk10tM5AnVCMV4tbccq2a60ZGpktif0DKBZ+jtTIYUQVA
+	 +sUNTnfJBLIF1h/vs9TR07doW69kzMxWd+yVYtw50SZrAcie/VngdXdI56CLL1XL8H
+	 reHAb/5NnPHwdM5y2jE51baWzrLXsTZQitqxN+wlzg4OMqFaiuKyy8hzb90a4DrAsB
+	 ifMFQ06sOhXA1VgtuXViMuNwkuybVEhnHL3IVeFOrUNoqy3zewvwXoRpf/nXEM4VuK
+	 9kpMBrRhvNWkUtbQ0qBzzj/a1I2eqZYy2frVrRgl27TPT8Hexu97JN7tMCbZyHEhOz
+	 CGZz1dJREIXyA==
+X-Virus-Scanned: Debian amavisd-new at domac.alu.hr
+Received: from domac.alu.hr ([127.0.0.1])
+	by localhost (domac.alu.hr [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id mWdK7oF-jwBA; Tue,  8 Aug 2023 10:53:55 +0200 (CEST)
+Received: from [192.168.1.6] (unknown [94.250.191.183])
+	by domac.alu.hr (Postfix) with ESMTPSA id BB78A6015F;
+	Tue,  8 Aug 2023 10:53:40 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
+	t=1691484835; bh=tkIdjaCIZxuCMCril+uMFLD30L4EwBbIMx25+pZyiFc=;
+	h=Date:From:Subject:To:Cc:References:In-Reply-To:From;
+	b=0PBv/ik5TAMYekzrraheXTmOBkzHPVfCKFbBTr4cLyaU/wGwFwV+Qk/h4kUe9Nj3W
+	 irzHthPYuUUrelWzDSrSF2uG9OJbth6JsfP69OzdWtsgchBQdXXERWOGHCfZYIzeUs
+	 nMsTZi+vXGBXIadoE9ZL/SIKI/XYBYsPgba6W4OQRVGE0g22SOPa1gUUiKiXx4YHrh
+	 GLDbdmUPvt9qF2w6glJL3BgwpRj/E2MIfS49cRaPJhhaCDFu35H9UqfOseyumD3OJ5
+	 8/Tjzdgp4gR/eCoZfrFsgDyxqwT96XKx/HrEuIB+VjWYuj9vjFz1y6u697+Q8ys18/
+	 NHxw6XzrbPsww==
+Message-ID: <25d01cd0-e6a1-1701-a066-f96a23767361@alu.unizg.hr>
+Date: Tue, 8 Aug 2023 10:53:36 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.41.0.640.ga95def55d0-goog
-Message-ID: <20230808084923.2239142-1-edumazet@google.com>
-Subject: [PATCH net] tcp: add missing family to tcp_set_ca_state() tracepoint
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, Ping Gan <jacky_gam_2001@163.com>, 
-	Manjusaka <me@manjusaka.me>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-8.1 required=5.0 tests=BAYES_00,DATE_IN_PAST_06_12,
-	DKIMWL_WL_MED,DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-	autolearn=no autolearn_force=no version=3.4.6
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.14.0
+From: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
+Subject: Re: selftests: net/af_unix test_unix_oob [FAILED]
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: alexander@mihalicyn.com, davem@davemloft.net, edumazet@google.com,
+ fw@strlen.de, kuba@kernel.org, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com,
+ shuah@kernel.org
+References: <abf98942-0058-f2ad-8e55-fbdd83b7c2d6@alu.unizg.hr>
+ <20230807204648.50070-1-kuniyu@amazon.com>
+ <ba4da366-b8cf-ca36-e2dc-cce7260cccf8@alu.unizg.hr>
+Content-Language: en-US
+In-Reply-To: <ba4da366-b8cf-ca36-e2dc-cce7260cccf8@alu.unizg.hr>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-3.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Before this code is copied, add the missing family, as we did in
-commit 3dd344ea84e1 ("net: tracepoint: exposing sk_family in all tcp:tracepoints")
+On 8/8/23 01:09, Mirsad Todorovac wrote:
+> On 8/7/23 22:46, Kuniyuki Iwashima wrote:
+>> From: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
+>> Date: Mon, 7 Aug 2023 21:44:41 +0200
+>>> Hi all,
+>>>
+>>> In the kernel 6.5-rc5 build on Ubuntu 22.04 LTS (jammy jellyfish) on a Ryzen 7950 assembled box,
+>>> vanilla torvalds tree kernel, the test test_unix_oob unexpectedly fails:
+>>>
+>>> # selftests: net/af_unix: test_unix_oob
+>>> # Test 2 failed, sigurg 23 len 63 OOB %
+>>>
+>>> It is this code:
+>>>
+>>>           /* Test 2:
+>>>            * Verify that the first OOB is over written by
+>>>            * the 2nd one and the first OOB is returned as
+>>>            * part of the read, and sigurg is received.
+>>>            */
+>>>           wait_for_data(pfd, POLLIN | POLLPRI);
+>>>           len = 0;
+>>>           while (len < 70)
+>>>                   len = recv(pfd, buf, 1024, MSG_PEEK);
+>>>           len = read_data(pfd, buf, 1024);
+>>>           read_oob(pfd, &oob);
+>>>           if (!signal_recvd || len != 127 || oob != '#') {
+>>>                   fprintf(stderr, "Test 2 failed, sigurg %d len %d OOB %c\n",
+>>>                   signal_recvd, len, oob);
+>>>                   die(1);
+>>>           }
+>>>
+>>> In 6.5-rc4, this test was OK, so it might mean we have a regression?
+>>
+>> Thanks for reporting.
+>>
+>> I confirmed the test doesn't fail on net-next at least, but it's based
+>> on v6.5-rc4.
+>>
+>>    ---8<---
+>>    [root@localhost ~]# ./test_unix_oob
+>>    [root@localhost ~]# echo $?
+>>    0
+>>    [root@localhost ~]# uname -r
+>>    6.5.0-rc4-01192-g66244337512f
+>>    ---8<---
+>>
+>> I'll check 6.5-rc5 later.
+> 
+> Hi, Kuniyuki,
+> 
+> It seems that there is a new development. I could reproduce the error with the failed test 2
+> as early as 6.0-rc1. However, the gotcha is that the error appears to be sporadically manifested
+> (possibly a race)?
+> 
+> I am currently attempting a bisect.
 
-Fixes: 15fcdf6ae116 ("tcp: Add tracepoint for tcp_set_ca_state")
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Cc: Ping Gan <jacky_gam_2001@163.com>
-Cc: Manjusaka <me@manjusaka.me>
----
- include/trace/events/tcp.h | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+Bisect had shown that the condition existed already at 5.11 torvalds tree.
 
-diff --git a/include/trace/events/tcp.h b/include/trace/events/tcp.h
-index bf06db8d2046c4a7f59070b724ce6fc7762f9d4b..7b1ddffa3dfc825f431bc575f4e86a3509dc9426 100644
---- a/include/trace/events/tcp.h
-+++ b/include/trace/events/tcp.h
-@@ -381,6 +381,7 @@ TRACE_EVENT(tcp_cong_state_set,
- 		__field(const void *, skaddr)
- 		__field(__u16, sport)
- 		__field(__u16, dport)
-+		__field(__u16, family)
- 		__array(__u8, saddr, 4)
- 		__array(__u8, daddr, 4)
- 		__array(__u8, saddr_v6, 16)
-@@ -396,6 +397,7 @@ TRACE_EVENT(tcp_cong_state_set,
- 
- 		__entry->sport = ntohs(inet->inet_sport);
- 		__entry->dport = ntohs(inet->inet_dport);
-+		__entry->family = sk->sk_family;
- 
- 		p32 = (__be32 *) __entry->saddr;
- 		*p32 = inet->inet_saddr;
-@@ -409,7 +411,8 @@ TRACE_EVENT(tcp_cong_state_set,
- 		__entry->cong_state = ca_state;
- 	),
- 
--	TP_printk("sport=%hu dport=%hu saddr=%pI4 daddr=%pI4 saddrv6=%pI6c daddrv6=%pI6c cong_state=%u",
-+	TP_printk("family=%s sport=%hu dport=%hu saddr=%pI4 daddr=%pI4 saddrv6=%pI6c daddrv6=%pI6c cong_state=%u",
-+		  show_family_name(__entry->family),
- 		  __entry->sport, __entry->dport,
- 		  __entry->saddr, __entry->daddr,
- 		  __entry->saddr_v6, __entry->daddr_v6,
--- 
-2.41.0.640.ga95def55d0-goog
+It has to do with the configs chosen (I used the configs from seltests/*/config merged), but it
+is also present in the Ubuntu production build:
 
+marvin@defiant:~$ cd linux/kernel/linux_torvalds
+marvin@defiant:~/linux/kernel/linux_torvalds$ for a in {0..1000}; do tools/testing/selftests/net/af_unix/test_unix_oob ; done
+marvin@defiant:~/linux/kernel/linux_torvalds$ for a in {0..1000}; do tools/testing/selftests/net/af_unix/test_unix_oob ; done
+marvin@defiant:~/linux/kernel/linux_torvalds$ for a in {0..1000}; do tools/testing/selftests/net/af_unix/test_unix_oob ; done
+marvin@defiant:~/linux/kernel/linux_torvalds$ for a in {0..1000}; do tools/testing/selftests/net/af_unix/test_unix_oob ; done
+marvin@defiant:~/linux/kernel/linux_torvalds$ for a in {0..1000}; do tools/testing/selftests/net/af_unix/test_unix_oob ; done
+Test 2 failed, sigurg 23 len 63 OOB %
+marvin@defiant:~/linux/kernel/linux_torvalds$ uname -rms
+Linux 6.4.8-060408-generic x86_64
+marvin@defiant:~/linux/kernel/linux_torvalds$ for a in {0..1000}; do tools/testing/selftests/net/af_unix/test_unix_oob ; done
+marvin@defiant:~/linux/kernel/linux_torvalds$ for a in {0..1000}; do tools/testing/selftests/net/af_unix/test_unix_oob ; done
+marvin@defiant:~/linux/kernel/linux_torvalds$ for a in {0..1000}; do tools/testing/selftests/net/af_unix/test_unix_oob ; done
+marvin@defiant:~/linux/kernel/linux_torvalds$ for a in {0..1000}; do tools/testing/selftests/net/af_unix/test_unix_oob ; done
+marvin@defiant:~/linux/kernel/linux_torvalds$ for a in {0..1000}; do tools/testing/selftests/net/af_unix/test_unix_oob ; done
+marvin@defiant:~/linux/kernel/linux_torvalds$ for a in {0..1000}; do tools/testing/selftests/net/af_unix/test_unix_oob ; done
+marvin@defiant:~/linux/kernel/linux_torvalds$ for a in {0..1000}; do tools/testing/selftests/net/af_unix/test_unix_oob ; done
+marvin@defiant:~/linux/kernel/linux_torvalds$ for a in {0..1000}; do tools/testing/selftests/net/af_unix/test_unix_oob ; done
+marvin@defiant:~/linux/kernel/linux_torvalds$ for a in {0..1000}; do tools/testing/selftests/net/af_unix/test_unix_oob ; done
+marvin@defiant:~/linux/kernel/linux_torvalds$ for a in {0..1000}; do tools/testing/selftests/net/af_unix/test_unix_oob ; done
+marvin@defiant:~/linux/kernel/linux_torvalds$ for a in {0..1000}; do tools/testing/selftests/net/af_unix/test_unix_oob ; done
+marvin@defiant:~/linux/kernel/linux_torvalds$ for a in {0..1000}; do tools/testing/selftests/net/af_unix/test_unix_oob ; done
+marvin@defiant:~/linux/kernel/linux_torvalds$ for a in {0..1000}; do tools/testing/selftests/net/af_unix/test_unix_oob ; done
+Test 1 failed sigurg 0 len 63
+marvin@defiant:~/linux/kernel/linux_torvalds$
+
+It happens on rare occasions, so it seems to be a hard-to-spot race.
+
+Normal test running test_unix_oob once never noticed that, save by accident, which brought the problem to attention ...
+
+However, the problem seems to be config-driven rather than kernel-version-driven.
+
+marvin@defiant:~/linux/kernel/linux_torvalds$ for a in {0..100000}; do tools/testing/selftests/net/af_unix/test_unix_oob ; done
+Test 3.1 Inline failed, len 1 oob % atmark 0
+Test 1 Inline failed, sigurg 0 len 63
+Test 1 Inline failed, sigurg 0 len 63
+Test 1 Inline failed, sigurg 0 len 63
+Test 2 Inline failed, len 63 atmark 1
+Test 3 Inline failed, sigurg 23 len 63 data x
+Test 3 Inline failed, sigurg 23 len 63 data x
+Test 3 Inline failed, sigurg 23 len 63 data x
+Test 3 Inline failed, sigurg 23 len 63 data x
+Test 2 Inline failed, len 63 atmark 1
+Test 3.1 Inline failed, len 1 oob % atmark 0
+Test 2 failed, sigurg 23 len 63 OOB %
+marvin@defiant:~/linux/kernel/linux_torvalds$ uname -rms
+Linux 6.5.0-060500rc4-generic x86_64
+marvin@defiant:~/linux/kernel/linux_torvalds$
+
+At moments, I was able to reproduce with certain configs, but now something odd happens.
+
+I will keep investigating.
+
+Kind regards,
+Mirsad
 
