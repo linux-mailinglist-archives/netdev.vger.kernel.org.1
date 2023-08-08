@@ -1,89 +1,238 @@
-Return-Path: <netdev+bounces-25451-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25355-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 676027741BE
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 19:27:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E3977773C79
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 18:06:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 231D52814BC
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 17:27:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9C3CE280BE2
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 16:06:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 477F014F67;
-	Tue,  8 Aug 2023 17:27:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5CAE14F81;
+	Tue,  8 Aug 2023 15:51:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D41B1400A
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 17:27:47 +0000 (UTC)
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D40D2D75
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 10:16:58 -0700 (PDT)
-Received: from canpemm500007.china.huawei.com (unknown [172.30.72.55])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RKwyf26h0zVjhR;
-	Tue,  8 Aug 2023 22:47:38 +0800 (CST)
-Received: from [10.174.179.215] (10.174.179.215) by
- canpemm500007.china.huawei.com (7.192.104.62) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Tue, 8 Aug 2023 22:49:31 +0800
-Subject: Re: [PATCH net-next] net: phy: Remove two unused function
- declarations
-To: <jiri@resnulli.us>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>
-CC: <netdev@vger.kernel.org>
-References: <20230808144545.37484-1-yuehaibing@huawei.com>
-From: Yue Haibing <yuehaibing@huawei.com>
-Message-ID: <fa3d6558-a340-f8fb-a7da-9c12106742c9@huawei.com>
-Date: Tue, 8 Aug 2023 22:49:31 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.5.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C550513AD7
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 15:51:27 +0000 (UTC)
+Received: from mail-ot1-x32f.google.com (mail-ot1-x32f.google.com [IPv6:2607:f8b0:4864:20::32f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D831D12527;
+	Tue,  8 Aug 2023 08:51:04 -0700 (PDT)
+Received: by mail-ot1-x32f.google.com with SMTP id 46e09a7af769-6bc9811558cso4837756a34.0;
+        Tue, 08 Aug 2023 08:51:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1691509859; x=1692114659;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HB3IbLDDH4dHIpXftssp7QgZTWqPnFJDBjmyEtR5DK4=;
+        b=duoUumTVjOyL7tQbqKRPwotvWXD9hEObA/wDR9lEWvDc9PT7DHoWcCW9bC5LB9Df+r
+         VlggSUAHtrhWQsRQNw6UtfvBpQZZzj4znYfu+7r+0hjjietfNsufaw6WVgQrItTatLY8
+         4pffBit6ABC2QFlCUUtZ14/uRg6ll5NBNkSuMcPxA7C4cfuDrqAnYiivguifhBlCkmm5
+         GmyCNbHQ4L7xOwG5MtU4jeDlNwlsxob3DQ/gNnhZdY3c3E9ZUQB2Kx9BCl9Sg4Rn0+mF
+         i2xyzZoMVSdZU3Q9fsQpBOMOWazMdiSSEjmyfEOi23ujxAIvY9iMV5NB0OKrH853pNvn
+         Ncjg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691509859; x=1692114659;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=HB3IbLDDH4dHIpXftssp7QgZTWqPnFJDBjmyEtR5DK4=;
+        b=JxFlCIfuWcfAjXYVtE4JHhqgfsFbtixLlDcrAuM2WtJLz9DGBACs55IZjdCrEU/yfm
+         pRICT2fWT1j/bGOitHGGlJmJ+klc/TDKr7zGU+Ylv1LDCgaRtknc4cDQJk3urYIP4ESI
+         42PrhLkdbDdKKGYtDwCtMyW4HokQ118klqWa1dFeeoJtiwei5AF2GHg5jTVqZF9JHlG1
+         D9yVSiLNLflMOPou34q5bCG5x+raY0HMdTJ9sP9IxhN5jGl0NxebJmwYxWYiXyV8DDJ8
+         36kg5xojaFK4ub0UvYyi0PAXf0SxeHihB3c3czsI/4A/XZr8iGyYL5zDVO9MFbb9tUnK
+         kstg==
+X-Gm-Message-State: AOJu0YztFOaCs53ig7DNNfmRHqUInWlLLaOS+1rCEeNrRjogYkU3TE87
+	FVX33YNhQwxnZwhOuCNURgf/4UitnrIwwg0wkI3a0HqA
+X-Google-Smtp-Source: AGHT+IHYs2UczeXJuZ1GHWZCjGOfnzcKmZaaEwYQYwNVRvre0QM6ozs9r+lDjtt+Z/nAxw598+97/YKCN9PRlnTUol4=
+X-Received: by 2002:a25:69c7:0:b0:d3b:3baf:2db2 with SMTP id
+ e190-20020a2569c7000000b00d3b3baf2db2mr10633275ybc.51.1691506390104; Tue, 08
+ Aug 2023 07:53:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20230808144545.37484-1-yuehaibing@huawei.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.179.215]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- canpemm500007.china.huawei.com (7.192.104.62)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-3.7 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+References: <20230804180529.2483231-1-aleksander.lobakin@intel.com>
+ <20230804180529.2483231-6-aleksander.lobakin@intel.com> <692d71dc8068b3d27aba39d7141c811755965786.camel@gmail.com>
+ <601c0203-ee5f-03a3-e9dd-fdb241f3bcdc@intel.com> <CAKgT0Uc0pLzaOfqFbvd9jFErAbTbsUMNNw5e_XY5NfCnO0=g0g@mail.gmail.com>
+ <ca096c35-6ce4-6c1d-7e26-a017348f6ece@intel.com>
+In-Reply-To: <ca096c35-6ce4-6c1d-7e26-a017348f6ece@intel.com>
+From: Alexander Duyck <alexander.duyck@gmail.com>
+Date: Tue, 8 Aug 2023 07:52:32 -0700
+Message-ID: <CAKgT0UcZspvhYcfiKs90snAfwwb+CMn-vhA62XcSTRiV0BfOqw@mail.gmail.com>
+Subject: Re: [PATCH net-next v4 5/6] page_pool: add a lockdep check for
+ recycling in hardirq
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>, Larysa Zaremba <larysa.zaremba@intel.com>, 
+	Yunsheng Lin <linyunsheng@huawei.com>, Alexander Duyck <alexanderduyck@fb.com>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
+	Simon Horman <simon.horman@corigine.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Sorry, pls ignore this, will resend to correct maintainers.
+On Tue, Aug 8, 2023 at 6:59=E2=80=AFAM Alexander Lobakin
+<aleksander.lobakin@intel.com> wrote:
+>
+> From: Alexander Duyck <alexander.duyck@gmail.com>
+> Date: Tue, 8 Aug 2023 06:45:26 -0700
+>
+> > On Tue, Aug 8, 2023 at 6:16=E2=80=AFAM Alexander Lobakin
+> > <aleksander.lobakin@intel.com> wrote:
+> >>
+> >> From: Alexander H Duyck <alexander.duyck@gmail.com>
+> >> Date: Mon, 07 Aug 2023 07:48:54 -0700
+> >>
+> >>> On Fri, 2023-08-04 at 20:05 +0200, Alexander Lobakin wrote:
+> >>>> From: Jakub Kicinski <kuba@kernel.org>
+> >>>>
+> >>>> Page pool use in hardirq is prohibited, add debug checks
+> >>>> to catch misuses. IIRC we previously discussed using
+> >>>> DEBUG_NET_WARN_ON_ONCE() for this, but there were concerns
+> >>>> that people will have DEBUG_NET enabled in perf testing.
+> >>>> I don't think anyone enables lockdep in perf testing,
+> >>>> so use lockdep to avoid pushback and arguing :)
+> >>>>
+> >>>> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> >>>> Acked-by: Jesper Dangaard Brouer <hawk@kernel.org>
+> >>>> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+> >>>> ---
+> >>>>  include/linux/lockdep.h | 7 +++++++
+> >>>>  net/core/page_pool.c    | 2 ++
+> >>>>  2 files changed, 9 insertions(+)
+> >>>>
+> >>>> diff --git a/include/linux/lockdep.h b/include/linux/lockdep.h
+> >>>> index 310f85903c91..dc2844b071c2 100644
+> >>>> --- a/include/linux/lockdep.h
+> >>>> +++ b/include/linux/lockdep.h
+> >>>> @@ -625,6 +625,12 @@ do {                                           =
+                         \
+> >>>>      WARN_ON_ONCE(__lockdep_enabled && !this_cpu_read(hardirq_contex=
+t)); \
+> >>>>  } while (0)
+> >>>>
+> >>>> +#define lockdep_assert_no_hardirq()                                =
+ \
+> >>>> +do {                                                               =
+         \
+> >>>> +    WARN_ON_ONCE(__lockdep_enabled && (this_cpu_read(hardirq_contex=
+t) || \
+> >>>> +                                       !this_cpu_read(hardirqs_enab=
+led))); \
+> >>>> +} while (0)
+> >>>> +
+> >>>>  #define lockdep_assert_preemption_enabled()                        =
+ \
+> >>>>  do {                                                               =
+         \
+> >>>>      WARN_ON_ONCE(IS_ENABLED(CONFIG_PREEMPT_COUNT)   &&             =
+ \
+> >>>> @@ -659,6 +665,7 @@ do {                                            =
+                         \
+> >>>>  # define lockdep_assert_irqs_enabled() do { } while (0)
+> >>>>  # define lockdep_assert_irqs_disabled() do { } while (0)
+> >>>>  # define lockdep_assert_in_irq() do { } while (0)
+> >>>> +# define lockdep_assert_no_hardirq() do { } while (0)
+> >>>>
+> >>>>  # define lockdep_assert_preemption_enabled() do { } while (0)
+> >>>>  # define lockdep_assert_preemption_disabled() do { } while (0)
+> >>>> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+> >>>> index 03ad74d25959..77cb75e63aca 100644
+> >>>> --- a/net/core/page_pool.c
+> >>>> +++ b/net/core/page_pool.c
+> >>>> @@ -587,6 +587,8 @@ static __always_inline struct page *
+> >>>>  __page_pool_put_page(struct page_pool *pool, struct page *page,
+> >>>>                   unsigned int dma_sync_size, bool allow_direct)
+> >>>>  {
+> >>>> +    lockdep_assert_no_hardirq();
+> >>>> +
+> >>>>      /* This allocator is optimized for the XDP mode that uses
+> >>>>       * one-frame-per-page, but have fallbacks that act like the
+> >>>>       * regular page allocator APIs.
+> >>>
+> >>> So two points.
+> >>>
+> >>> First could we look at moving this inside the if statement just befor=
+e
+> >>> we return the page, as there isn't a risk until we get into that path
+> >>> of needing a lock.
+> >>>
+> >>> Secondly rather than returning an error is there any reason why we
+> >>> couldn't just look at not returning page and instead just drop into t=
+he
+> >>> release path which wouldn't take the locks in the first place? Either
+> >>
+> >> That is exception path to quickly catch broken drivers and fix them, w=
+hy
+> >> bother? It's not something we have to live with.
+> >
+> > My concern is that the current "fix" consists of stalling a Tx ring.
+> > We need to have a way to allow forward progress when somebody mixes
+> > xdp_frame and skb traffic as I suspect we will end up with a number of
+> > devices doing this since they cannot handle recycling the pages in
+> > hardirq context.
+>
+> You could've seen that several vendors already disabled recycling XDP
+> buffers when in hardirq (=3D netpoll) in their drivers. hardirq is in
+> general not for networking-related operations.
 
-On 2023/8/8 22:45, Yue Haibing wrote:
-> Commit 1e2dc14509fd ("net: ethtool: Add helpers for reporting test results")
-> declared but never implemented these function.
-> 
-> Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
-> ---
->  include/linux/phy.h | 4 ----
->  1 file changed, 4 deletions(-)
-> 
-> diff --git a/include/linux/phy.h b/include/linux/phy.h
-> index ba08b0e60279..b963ce22e7c7 100644
-> --- a/include/linux/phy.h
-> +++ b/include/linux/phy.h
-> @@ -1732,10 +1732,6 @@ int phy_start_cable_test_tdr(struct phy_device *phydev,
->  }
->  #endif
->  
-> -int phy_cable_test_result(struct phy_device *phydev, u8 pair, u16 result);
-> -int phy_cable_test_fault_length(struct phy_device *phydev, u8 pair,
-> -				u16 cm);
-> -
->  static inline void phy_device_reset(struct phy_device *phydev, int value)
->  {
->  	mdio_device_reset(&phydev->mdio, value);
-> 
+The whole idea behind the netpoll cleanup is to get the Tx buffers out
+of the way so that we can transmit even after the system has crashed.
+The idea isn't to transmit XDP buffers, but to get the buffers out of
+the way in the cases where somebody is combining both xdp_frame and
+sk_buff on the same queue due to a limited number of rings being
+present on the device.
+
+My concern is that at some point in the near future somebody is going
+to have a system crash and instead of being able to get the crash log
+message out via their netconsole it is going to get cut off because
+the driver stopped cleaning the Tx ring because somebody was also
+using it as an XDP redirect destination.
+
+> >
+> > The only reason why the skbs don't have the problem is that they are
+> > queued and then cleaned up in the net_tx_action. That is why I wonder
+> > if we shouldn't look at adding some sort of support for doing
+> > something like that with xdp_frame as well. Something like a
+> > dev_kfree_pp_page_any to go along with the dev_kfree_skb_any.
+>
+> I still don't get why we may need to clean XDP buffers in hardirq, maybe
+> someone could give me some links to read why we may need this and how
+> that happens? netpoll is a very specific thing for some debug
+> operations, isn't it? XDP shouldn't in general be enabled when this
+> happens, should it?
+
+I think I kind of explained it above. It isn't so much about cleaning
+the XDP buffers as getting them off of the ring and out of the way. If
+we block a Tx queue because of an XDP buffer then we cannot use that
+Tx queue. I would be good with us just deferring the cleanup like we
+do with an sk_buff in dev_kfree_skb_irq, the only issue is we don't
+have the ability to put them on a queue since they don't have
+prev/next pointers.
+
+I suppose an alternative to cleaning them might be to make a mandatory
+requirement that you cannot support netpoll and mix xdp_frame and
+sk_buff on the same queue. If we enforced that then my concern about
+them blocking a queue would be addressed.
+
+> (unrelated: 6:58 AM West Coast, you use to wake up early or traveling?
+>  :D)
+
+I am usually up pretty early, especially this time of year. Sunrise
+here is 6AM and I am usually up a little before that.. :)
 
