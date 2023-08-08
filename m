@@ -1,231 +1,135 @@
-Return-Path: <netdev+bounces-25393-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25442-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3D18773DA3
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 18:20:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C4BAB773FC7
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 18:52:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C710A1C203BB
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 16:20:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 012B41C20DDF
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 16:52:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCE4A1400A;
-	Tue,  8 Aug 2023 16:18:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0B4B1B7FA;
+	Tue,  8 Aug 2023 16:52:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B14563C37
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 16:18:44 +0000 (UTC)
-Received: from mail-ot1-x32c.google.com (mail-ot1-x32c.google.com [IPv6:2607:f8b0:4864:20::32c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD61F238FF
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 09:18:29 -0700 (PDT)
-Received: by mail-ot1-x32c.google.com with SMTP id 46e09a7af769-6bd092cba5dso3276a34.1
-        for <netdev@vger.kernel.org>; Tue, 08 Aug 2023 09:18:29 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5D3A1B7E5
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 16:52:43 +0000 (UTC)
+Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03DA74D23D;
+	Tue,  8 Aug 2023 09:52:30 -0700 (PDT)
+Received: by mail-lj1-x230.google.com with SMTP id 38308e7fff4ca-2b9c55e0fbeso91203741fa.2;
+        Tue, 08 Aug 2023 09:52:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1691511470; x=1692116270;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=kb4epZ0hVQjvrS5RqNy38MOhVst2cqtQlkC7YBmZyjc=;
-        b=qPiSpphU1nGWmLAMPSpg56ArnaGieug80cZl14oqXoQvdmJ1mUTgiwlF3TfND7UmS3
-         fKUosktLSZH36oc5h2PS1CT4B9IvplOi5toAhdX3Ap0C5nPZH4e/TGPS8QpU5FeOuK0U
-         BpaT9BYqbURFphBrX7orqubjlq1X7442TD5RQI6m4qyQl5BYyvqbG2t+sxP3jmpoZoYG
-         Eyu5FQnwa3GWBMIwMUTW52tah6rpkfNRTB/72Vb/FobjOAiAnigMJwqlPDZ28OXnQIUZ
-         MMZ2yr1705c4JQmS2btsXjwpvhqwjzMoE2YjBR7LXSegtsGITupnI+L0tdDCp1M4nYmE
-         FgsQ==
+        d=gmail.com; s=20221208; t=1691513547; x=1692118347;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=4GZEtgKcvcc8+oIk59W0NrrRnhk8BlCIE1dNVvTtSjk=;
+        b=aQV+jZ4uj/9HDShaRtKJhaVlG7NDnXkPWz+5lh6k1U7V6YXP1LZqKDACAZ7Cw1JIbG
+         5AfiSMw21R8XHEKo7X2cGGS/K19ButihYopcdNFxz6ljc+NV2mdK7zGDnPjoRt6BlDt7
+         6vaz7SkwtSO1aAObyjlVm59tIWenREC7iNdhIo26RQwlnIZVXRWuxNHoXS1ya3d2aMaJ
+         /m48WuwDvpJBQ71gYH0PFFHRs6eHO3LXiBjgJyTxla7YwtsC3uNhuaZ8nRrjGgiDVejP
+         Rn1TUvMIlKz1684Br0Cf0zYIFaMdZK8MV2FAaniS8Un7AEThLj9Z1g1X0WHIrAPtmic9
+         pnCw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691511470; x=1692116270;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=kb4epZ0hVQjvrS5RqNy38MOhVst2cqtQlkC7YBmZyjc=;
-        b=OymqgkT0rli0FTe80rJHmRxXH1PLerKcLr6wRDOTCqxcpOdWTmw42vy7+tuiyBlt9P
-         6Mph2XEq2QSjEG/e9brezLWmZQWEf+OcKoX/ZpfzcM0l9CFWa6lkD0Tl2OHo7yO5Hgc7
-         p6HtiOeYdnnS6BBnut0qk8KtKN1Ni+NDc8wa1kc3p72ba50ns2aeXflNHBB1+iOkKoRd
-         edaciGH9sYmY5TYsXWh1kj9CbgyfSeEuWlcVduWDqitjVV1HWLB8qRzkvV3D9Jz/sawl
-         A4F7KUivvcKqe2rFaHRBi2iZ8KLvU7+ZMZeiiY95Cnhy+qZ7eA0vry27zUfAl5Gwlq7e
-         CY6A==
-X-Gm-Message-State: AOJu0YwnWHPjk1aNgS0fMV069kMiLGGq3DT6fp8woPuXqy8bwKE6c1C2
-	ni1AcjWLAIzxk0vBnTl4E05jBw+xjckW4dcAkwhYNimgO9H+dWR5
-X-Google-Smtp-Source: AGHT+IF66ZIg71BsvfIXpCtaWYgCcZU8SNpF3fi8QtXBlp/Ozl2bOkN0RcX0VeXVj4YAJiEXbN2H1G1ZyCw5KxmnN8o=
-X-Received: by 2002:a25:aa21:0:b0:d15:3761:3513 with SMTP id
- s30-20020a25aa21000000b00d1537613513mr9704045ybi.19.1691486159218; Tue, 08
- Aug 2023 02:15:59 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1691513547; x=1692118347;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4GZEtgKcvcc8+oIk59W0NrrRnhk8BlCIE1dNVvTtSjk=;
+        b=dPE8QAveMYZVppEz0OD81mFvCeb8byv7CpG/3MNrP3FNXvZnv9z20o7gthb27JeaxL
+         4kAR9JZrEjfTL11eorpD+UzCJcnhAUlBjWopAmHv+DhF+TJsRwoKZ/gupFAhpQG9dnev
+         wPHIeEeNVnpf5fGV7OZ4DHw++LQRMkC9d/g/dvNGr2hkUcG7hlYOoPr3v3Wu1iGZcq47
+         U4xU5f0JegVcFxE39qr6LdRH33S8eE8F9yyVtUeMMOKa/V9s88+l7xge17549sqgqyy9
+         LpHTcCVEv/WPMr/0k+JSKxPh/g4me2b8kmQs4XKwLij+eqNmgN1fL+WTDwL5LHbz6ci3
+         xW7g==
+X-Gm-Message-State: AOJu0Yzw3y5Btl8aB9BNQoJO8klJEN/r4IKTVbAi/dq3cLdnEX75WnfL
+	J7lP8OUzIioHzZwkVU1tvfd6ulgvor+tu2+p
+X-Google-Smtp-Source: AGHT+IFYYU0MR/Zcqb6+J48CUkgoJvTqm8kc0Jcx/tngfuJAbIwWw7yERBewTaL/SuluU9Sy9QSbtA==
+X-Received: by 2002:aa7:cd5a:0:b0:523:363e:f6e3 with SMTP id v26-20020aa7cd5a000000b00523363ef6e3mr5195385edw.15.1691487332516;
+        Tue, 08 Aug 2023 02:35:32 -0700 (PDT)
+Received: from skbuf ([188.27.184.201])
+        by smtp.gmail.com with ESMTPSA id i22-20020a50fc16000000b005232e637c24sm3676212edr.84.2023.08.08.02.35.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Aug 2023 02:35:32 -0700 (PDT)
+Date: Tue, 8 Aug 2023 12:35:29 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Daniel Golle <daniel@makrotopia.org>,
+	Russell King <linux@armlinux.org.uk>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] net: dsa: mt7530: improve and relax PHY driver
+ dependency
+Message-ID: <20230808093529.yeatw7tsecgo6ikx@skbuf>
+References: <3ae907b7b60792e36bc5292c2e0bab74f84285e7.1691246642.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230801173544.1929519-1-hch@lst.de> <20230801173544.1929519-3-hch@lst.de>
-In-Reply-To: <20230801173544.1929519-3-hch@lst.de>
-From: Ulf Hansson <ulf.hansson@linaro.org>
-Date: Tue, 8 Aug 2023 11:15:23 +0200
-Message-ID: <CAPDyKForXd2GFVmXXM8hsnAYSQcKhp84t1aOunppUY+MFe0qag@mail.gmail.com>
-Subject: Re: [PATCH 2/5] mmc: au1xmmc: force non-modular build and remove
- symbol_get usage
-To: Christoph Hellwig <hch@lst.de>
-Cc: Luis Chamberlain <mcgrof@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	Daniel Mack <daniel@zonque.org>, Haojian Zhuang <haojian.zhuang@gmail.com>, 
-	Robert Jarzmik <robert.jarzmik@free.fr>, Manuel Lauss <manuel.lauss@gmail.com>, 
-	Yangbo Lu <yangbo.lu@nxp.com>, Joshua Kinard <kumba@gentoo.org>, 
-	Daniel Vetter <daniel.vetter@ffwll.ch>, Arnd Bergmann <arnd@arndb.de>, 
-	linux-arm-kernel@lists.infradead.org, 
-	open list <linux-kernel@vger.kernel.org>, linux-mmc@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-rtc@vger.kernel.org, 
-	linux-modules@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-0.6 required=5.0 tests=BAYES_00,DATE_IN_PAST_06_12,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3ae907b7b60792e36bc5292c2e0bab74f84285e7.1691246642.git.daniel@makrotopia.org>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, 1 Aug 2023 at 19:36, Christoph Hellwig <hch@lst.de> wrote:
->
-> au1xmmc is split somewhat awkwardly into the main mmc subsystem driver,
-> and callbacks in platform_data that sit under arch/mips/ and are
-> always built in.  The latter than call mmc_detect_change through
-> symbol_get.  Remove the use of symbol_get by requiring the driver
-> to be built in.  In the future the interrupt handlers for card
-> insert/eject detection should probably be moved into the main driver,
-> and which point it can be built modular again.
->
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-
-If not too late, feel free to add:
-
-Acked-by: Ulf Hansson <ulf.hansson@linaro.org>
-
-Kind regards
-Uffe
-
+On Sat, Aug 05, 2023 at 03:45:36PM +0100, Daniel Golle wrote:
+> Different MT7530 variants require different PHY drivers.
+> Use 'imply' instead of 'select' to relax the dependency on the PHY
+> driver, and choose the appropriate driver.
+> 
+> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 > ---
->  arch/mips/alchemy/devboards/db1000.c |  8 +-------
->  arch/mips/alchemy/devboards/db1200.c | 19 ++-----------------
->  arch/mips/alchemy/devboards/db1300.c | 10 +---------
->  drivers/mmc/host/Kconfig             |  4 ++--
->  4 files changed, 6 insertions(+), 35 deletions(-)
->
-> diff --git a/arch/mips/alchemy/devboards/db1000.c b/arch/mips/alchemy/devboards/db1000.c
-> index 79d66faa84828d..012da042d0a4f7 100644
-> --- a/arch/mips/alchemy/devboards/db1000.c
-> +++ b/arch/mips/alchemy/devboards/db1000.c
-> @@ -14,7 +14,6 @@
->  #include <linux/interrupt.h>
->  #include <linux/leds.h>
->  #include <linux/mmc/host.h>
-> -#include <linux/module.h>
->  #include <linux/platform_device.h>
->  #include <linux/pm.h>
->  #include <linux/spi/spi.h>
-> @@ -167,12 +166,7 @@ static struct platform_device db1x00_audio_dev = {
->
->  static irqreturn_t db1100_mmc_cd(int irq, void *ptr)
->  {
-> -       void (*mmc_cd)(struct mmc_host *, unsigned long);
-> -       /* link against CONFIG_MMC=m */
-> -       mmc_cd = symbol_get(mmc_detect_change);
-> -       mmc_cd(ptr, msecs_to_jiffies(500));
-> -       symbol_put(mmc_detect_change);
-> -
-> +       mmc_detect_change(ptr, msecs_to_jiffies(500));
->         return IRQ_HANDLED;
->  }
->
-> diff --git a/arch/mips/alchemy/devboards/db1200.c b/arch/mips/alchemy/devboards/db1200.c
-> index 1864eb935ca57f..76080c71a2a7b6 100644
-> --- a/arch/mips/alchemy/devboards/db1200.c
-> +++ b/arch/mips/alchemy/devboards/db1200.c
-> @@ -10,7 +10,6 @@
->  #include <linux/gpio.h>
->  #include <linux/i2c.h>
->  #include <linux/init.h>
-> -#include <linux/module.h>
->  #include <linux/interrupt.h>
->  #include <linux/io.h>
->  #include <linux/leds.h>
-> @@ -340,14 +339,7 @@ static irqreturn_t db1200_mmc_cd(int irq, void *ptr)
->
->  static irqreturn_t db1200_mmc_cdfn(int irq, void *ptr)
->  {
-> -       void (*mmc_cd)(struct mmc_host *, unsigned long);
-> -
-> -       /* link against CONFIG_MMC=m */
-> -       mmc_cd = symbol_get(mmc_detect_change);
-> -       if (mmc_cd) {
-> -               mmc_cd(ptr, msecs_to_jiffies(200));
-> -               symbol_put(mmc_detect_change);
-> -       }
-> +       mmc_detect_change(ptr, msecs_to_jiffies(200));
->
->         msleep(100);    /* debounce */
->         if (irq == DB1200_SD0_INSERT_INT)
-> @@ -431,14 +423,7 @@ static irqreturn_t pb1200_mmc1_cd(int irq, void *ptr)
->
->  static irqreturn_t pb1200_mmc1_cdfn(int irq, void *ptr)
->  {
-> -       void (*mmc_cd)(struct mmc_host *, unsigned long);
-> -
-> -       /* link against CONFIG_MMC=m */
-> -       mmc_cd = symbol_get(mmc_detect_change);
-> -       if (mmc_cd) {
-> -               mmc_cd(ptr, msecs_to_jiffies(200));
-> -               symbol_put(mmc_detect_change);
-> -       }
-> +       mmc_detect_change(ptr, msecs_to_jiffies(200));
->
->         msleep(100);    /* debounce */
->         if (irq == PB1200_SD1_INSERT_INT)
-> diff --git a/arch/mips/alchemy/devboards/db1300.c b/arch/mips/alchemy/devboards/db1300.c
-> index e70e529ddd914d..ff61901329c626 100644
-> --- a/arch/mips/alchemy/devboards/db1300.c
-> +++ b/arch/mips/alchemy/devboards/db1300.c
-> @@ -17,7 +17,6 @@
->  #include <linux/interrupt.h>
->  #include <linux/ata_platform.h>
->  #include <linux/mmc/host.h>
-> -#include <linux/module.h>
->  #include <linux/mtd/mtd.h>
->  #include <linux/mtd/platnand.h>
->  #include <linux/platform_device.h>
-> @@ -459,14 +458,7 @@ static irqreturn_t db1300_mmc_cd(int irq, void *ptr)
->
->  static irqreturn_t db1300_mmc_cdfn(int irq, void *ptr)
->  {
-> -       void (*mmc_cd)(struct mmc_host *, unsigned long);
-> -
-> -       /* link against CONFIG_MMC=m.  We can only be called once MMC core has
-> -        * initialized the controller, so symbol_get() should always succeed.
-> -        */
-> -       mmc_cd = symbol_get(mmc_detect_change);
-> -       mmc_cd(ptr, msecs_to_jiffies(200));
-> -       symbol_put(mmc_detect_change);
-> +       mmc_detect_change(ptr, msecs_to_jiffies(200));
->
->         msleep(100);    /* debounce */
->         if (irq == DB1300_SD1_INSERT_INT)
-> diff --git a/drivers/mmc/host/Kconfig b/drivers/mmc/host/Kconfig
-> index 159a3e9490aed8..f7afd179dd10bf 100644
-> --- a/drivers/mmc/host/Kconfig
-> +++ b/drivers/mmc/host/Kconfig
-> @@ -526,11 +526,11 @@ config MMC_ALCOR
->           of Alcor Micro PCI-E card reader
->
->  config MMC_AU1X
-> -       tristate "Alchemy AU1XX0 MMC Card Interface support"
-> +       bool "Alchemy AU1XX0 MMC Card Interface support"
->         depends on MIPS_ALCHEMY
->         help
->           This selects the AMD Alchemy(R) Multimedia card interface.
-> -         If you have a Alchemy platform with a MMC slot, say Y or M here.
-> +         If you have a Alchemy platform with a MMC slot, say Y here.
->
->           If unsure, say N.
->
-> --
-> 2.39.2
->
+>  drivers/net/dsa/Kconfig | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/dsa/Kconfig b/drivers/net/dsa/Kconfig
+> index 3ed5391bb18d6..f8c1d73b251d0 100644
+> --- a/drivers/net/dsa/Kconfig
+> +++ b/drivers/net/dsa/Kconfig
+> @@ -37,7 +37,6 @@ config NET_DSA_LANTIQ_GSWIP
+>  config NET_DSA_MT7530
+>  	tristate "MediaTek MT7530 and MT7531 Ethernet switch support"
+>  	select NET_DSA_TAG_MTK
+> -	select MEDIATEK_GE_PHY
+>  	imply NET_DSA_MT7530_MDIO
+>  	imply NET_DSA_MT7530_MMIO
+>  	help
+> @@ -49,6 +48,7 @@ config NET_DSA_MT7530
+>  config NET_DSA_MT7530_MDIO
+>  	tristate "MediaTek MT7530 MDIO interface driver"
+>  	depends on NET_DSA_MT7530
+> +	imply MEDIATEK_GE_PHY
+>  	select PCS_MTK_LYNXI
+>  	help
+>  	  This enables support for the MediaTek MT7530 and MT7531 switch
+> @@ -60,6 +60,7 @@ config NET_DSA_MT7530_MMIO
+>  	tristate "MediaTek MT7530 MMIO interface driver"
+>  	depends on NET_DSA_MT7530
+>  	depends on HAS_IOMEM
+> +	imply MEDIATEK_GE_SOC_PHY
+>  	help
+>  	  This enables support for the built-in Ethernet switch found
+>  	  in the MediaTek MT7988 SoC.
+> -- 
+> 2.41.0
+
+Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
+
+But I did a tree-wide search for "imply .*_PHY" and I didn't find any
+other usage patterns, so I'm adding all phylib maintainers to make sure
+that the practice isn't discouraged. If not, I guess it should be used
+more often with internal PHYs for which the driver is known.
 
