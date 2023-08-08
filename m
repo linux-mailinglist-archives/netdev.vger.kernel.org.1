@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-25606-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25608-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57F7E774E8E
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 00:48:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 190D2774EA0
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 00:49:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B469928197E
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 22:48:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C607B2817B4
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 22:49:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EE08171A0;
-	Tue,  8 Aug 2023 22:48:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A95BF168BF;
+	Tue,  8 Aug 2023 22:48:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5034B156F8
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 22:48:36 +0000 (UTC)
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBE1D106
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 15:48:34 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-586bd766310so35963647b3.0
-        for <netdev@vger.kernel.org>; Tue, 08 Aug 2023 15:48:34 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D8E21BB44
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 22:48:37 +0000 (UTC)
+Received: from mail-oi1-x24a.google.com (mail-oi1-x24a.google.com [IPv6:2607:f8b0:4864:20::24a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A346109
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 15:48:36 -0700 (PDT)
+Received: by mail-oi1-x24a.google.com with SMTP id 5614622812f47-39cdf9f9d10so9549012b6e.3
+        for <netdev@vger.kernel.org>; Tue, 08 Aug 2023 15:48:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691534914; x=1692139714;
+        d=google.com; s=20221208; t=1691534915; x=1692139715;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=TmxbnIjb/GqnmOwdg1rDIRZFSHSZsVM8YSAQMHLnbME=;
-        b=aIe42t0D+ftKfG+ClAKmcOJv9mfebYDaQmvdUgboDYiuG7ilotz/5nbttvtF9fDi1O
-         rDs+7df7Cjn2shLvTm3qNsiEBm8OAhAGyBYA8+AW/pofGiv6RHPapbcws6nbEk9HrPGS
-         jdpUQ2BCppjQpV6sMqGiCLG4WGKm2D7YKRlPEGM+eVzHKsUpnoDU0g025UZnAtmR5xKS
-         69kyYON2cNSaE9f11a+LbFMqSZNt4tUq/usnE638ystMj35JNiukiKDpxLr0+iFW4Iwk
-         J0bUrgboDjs3jAOSnOJyEJ65ZJ5Jx29Wa8GeSwiRYeXVg8OBaqUv/tSju9f+CoMdqa+d
-         o0+g==
+        bh=2n+nft1J+ou/Hn4BoHtSydnM2Q6o7LrROT4GXzieyqk=;
+        b=Z4tv8uuXCuHU3DyrL7CiwM7GRo//gKoN1gu49jVnkLDa77GxmOTvrZb6iVPtpovqAa
+         y/YZP94ASRtbfUFGv2+k/+4bVka6Zb8iEhQgqrCavmKZqb5Vf3DMxM1GXr8d184OeWox
+         Jkmar07CKdQd0GpGqnTygT2rhd0kL32dr73jAc1qnhLAgdE130ZeCZfffAKAkJ6p4g+3
+         Dhu8FFeDILrfEK66hbM9G62Cn84pEjVIyl6RtRVPcwxUI4pmvlJGyT/b7ZFu6jTEPe4q
+         d4n4ZEeUzxKpvL+rOyjg+0S0zqmMfzBzAsT4DyiSxbJFnPTWrd8jZrG0UVA3jQ81IpYK
+         PMoQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691534914; x=1692139714;
+        d=1e100.net; s=20221208; t=1691534915; x=1692139715;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=TmxbnIjb/GqnmOwdg1rDIRZFSHSZsVM8YSAQMHLnbME=;
-        b=MiXHlc4ireMbKYfEx8D/F9TUSsurfx9X2ra1qKKbJa4j8ttY+1vqzCoFFrCDK+OQCH
-         2/yQAs338mpMBfh3psHqJXv+rVLZ7OnqG8XPsdvapEO6U1k+5NxSbvGpRHQodcNnAAy6
-         B9OWUndKWSoi4O9Dahj5zg2k64l5rCkdt7bIrJwK6SZ4pbkypeXXuv0mqMBQi3H4X/JF
-         UQRhD5ltagL76i/Io0RqoItMP7XPbgziqlHk7jja3VEZPoW0J8sgwSrkl0yltYZIRHi9
-         guhC7Uofsl2Wco7fyDP5CeC3AOXA0vb8TEW0ROA8uZF5UQEkTMVjiH69Y6tlnsHNMJik
-         DrgQ==
-X-Gm-Message-State: AOJu0YwCArKioPMGewQhj2KPeoEQQRahfFJZHGnG9SwvFKYdSmj/IMEr
-	BvvL8L5luNfvQCwuSvNWcNkg4LGkS2wvlxma0w==
-X-Google-Smtp-Source: AGHT+IH1R6MtPcgGGYPgM2RykK/TeOvNqFtYstVlX2iypy2EipYIxRKnBXKcog/LYd4QF5rzW3sffHKNadArPUWkLg==
+        bh=2n+nft1J+ou/Hn4BoHtSydnM2Q6o7LrROT4GXzieyqk=;
+        b=CvkFz5L7nwosTcsG4ubPQB1UpzA+wzxbP9ivMsmSiydtTwcUMn7TzxVuS20eEvufZy
+         IIP+vAb0GlxYpqGL1hcu19QmYCCi4PsTGFMq0MtvBCNFYl4VE9i0fBmZQagjhXNIxsBg
+         ZUmyhR9dBx4yLXpqsGBI9gauzhuXvnhA0tqbGjaFY64AYUefLpyx6AbXtN9rgHuKg//4
+         6/IRMctaDYZM/RM0upR7kt9Gy48AOCVTXlURax9tIiZ+XzyMDfKs9AEPLNMP8q92a7HT
+         Qt8PVEm063r6moK0Ur+rH2iE5vNDVrN+6aEgLacTxMn3GSuJVONKYz744dC7KI6cmPp0
+         aBuQ==
+X-Gm-Message-State: AOJu0YybrbY7/kSU/1Nq9hBiabpaikAUCREeer6/dQd3LKWZAFAIvNMU
+	9uL6RS4al2YcaB6/7BeYX7oLjZhSKaFsyYOdHA==
+X-Google-Smtp-Source: AGHT+IG33SMyJD9jmKUFIKwhFa1OIm3UDBC6wsCIb+3jj0vK9d47zhFOBFyzd3Ind1lxI6YX0YxchI++1WpiDqFOxQ==
 X-Received: from jstitt-linux1.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:23b5])
- (user=justinstitt job=sendgmr) by 2002:a81:440f:0:b0:576:9519:7085 with SMTP
- id r15-20020a81440f000000b0057695197085mr21593ywa.7.1691534914271; Tue, 08
- Aug 2023 15:48:34 -0700 (PDT)
-Date: Tue, 08 Aug 2023 22:48:06 +0000
+ (user=justinstitt job=sendgmr) by 2002:a05:6808:180f:b0:3a6:feb1:bb83 with
+ SMTP id bh15-20020a056808180f00b003a6feb1bb83mr630290oib.3.1691534915476;
+ Tue, 08 Aug 2023 15:48:35 -0700 (PDT)
+Date: Tue, 08 Aug 2023 22:48:07 +0000
 In-Reply-To: <20230808-net-netfilter-v1-0-efbbe4ec60af@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -62,13 +62,13 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20230808-net-netfilter-v1-0-efbbe4ec60af@google.com>
 X-Developer-Key: i=justinstitt@google.com; a=ed25519; pk=tC3hNkJQTpNX/gLKxTNQKDmiQl6QjBNCGKJINqAdJsE=
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1691534912; l=2289;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1691534912; l=1355;
  i=justinstitt@google.com; s=20230717; h=from:subject:message-id;
- bh=DmlnBBnHsP5QeIGI++tEAn9BIzXi+bfjHimTMSaz/pg=; b=620tlRlsF6w/UUZG5WGZx2U4Mf2LH5YYLrf8rikieAPOtoORP/uUHedtmuqLWAwhLMG5oiohV
- aRW3uUVCq+7BzN6wbjpH81lJbtdkmWqFFVPVtC/eGuYqCKR1vIDbvcj
+ bh=h9/FJ0Derc+kHy1+HyfJeM72Jn/xHxsLrarMyJSTkdI=; b=nCzazijk+LV8MhghKkMBl3+PR9A0KP6j7aeC8rKtHaGSgAXmI98rCZPOtIh3eqAsdnnK140X5
+ 2tW2f/G0EY9C+Xes0E05fHk1dEoFtF75/yOMaNAtBErqXMEO7z5CTOV
 X-Mailer: b4 0.12.3
-Message-ID: <20230808-net-netfilter-v1-1-efbbe4ec60af@google.com>
-Subject: [PATCH 1/7] netfilter: ipset: refactor deprecated strncpy
+Message-ID: <20230808-net-netfilter-v1-2-efbbe4ec60af@google.com>
+Subject: [PATCH 2/7] netfilter: nf_tables: refactor deprecated strncpy
 From: Justin Stitt <justinstitt@google.com>
 To: Pablo Neira Ayuso <pablo@netfilter.org>, Jozsef Kadlecsik <kadlec@netfilter.org>, 
 	Florian Westphal <fw@strlen.de>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
@@ -81,72 +81,43 @@ Content-Type: text/plain; charset="utf-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
 	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-	autolearn=unavailable autolearn_force=no version=3.4.6
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Fixes several buffer overread bugs present in `ip_set_core.c` by using
-`strscpy` over `strncpy`.
+Prefer `strscpy` over `strncpy`.
 
-Link: https://github.com/KSPP/linux/issues/90
-Cc: linux-hardening@vger.kernel.org
 Signed-off-by: Justin Stitt <justinstitt@google.com>
 
 ---
-There exists several potential buffer overread bugs here. These bugs
-exist due to the fact that the destination and source strings may have
-the same length which is equal to the max length `IPSET_MAXNAMELEN`.
-
-Here's an example:
-|  #define MAXLEN 5
-|  char dest[MAXLEN];
-|  const char *src = "hello";
-|  strncpy(dest, src, MAXLEN); // -> should use strscpy()
-|  // dest is now not NUL-terminated
-
 Note:
-This patch means that truncation now happens silently (which is better
-than a silent bug) but perhaps we should have some assertions that
-fail when a truncation is imminent. Thoughts?
----
- net/netfilter/ipset/ip_set_core.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+It is hard to tell if there was a bug here in the first place but it's better
+to use a more robust and less ambiguous interface anyways.
 
-diff --git a/net/netfilter/ipset/ip_set_core.c b/net/netfilter/ipset/ip_set_core.c
-index 0b68e2e2824e..fc77080d41a2 100644
---- a/net/netfilter/ipset/ip_set_core.c
-+++ b/net/netfilter/ipset/ip_set_core.c
-@@ -872,7 +872,7 @@ ip_set_name_byindex(struct net *net, ip_set_id_t index, char *name)
- 	BUG_ON(!set);
- 
- 	read_lock_bh(&ip_set_ref_lock);
--	strncpy(name, set->name, IPSET_MAXNAMELEN);
-+	strscpy(name, set->name, IPSET_MAXNAMELEN);
- 	read_unlock_bh(&ip_set_ref_lock);
- }
- EXPORT_SYMBOL_GPL(ip_set_name_byindex);
-@@ -1326,7 +1326,7 @@ static int ip_set_rename(struct sk_buff *skb, const struct nfnl_info *info,
- 			goto out;
- 		}
- 	}
--	strncpy(set->name, name2, IPSET_MAXNAMELEN);
-+	strscpy(set->name, name2, IPSET_MAXNAMELEN);
- 
- out:
- 	write_unlock_bh(&ip_set_ref_lock);
-@@ -1380,9 +1380,9 @@ static int ip_set_swap(struct sk_buff *skb, const struct nfnl_info *info,
- 		return -EBUSY;
- 	}
- 
--	strncpy(from_name, from->name, IPSET_MAXNAMELEN);
--	strncpy(from->name, to->name, IPSET_MAXNAMELEN);
--	strncpy(to->name, from_name, IPSET_MAXNAMELEN);
-+	strscpy(from_name, from->name, IPSET_MAXNAMELEN);
-+	strscpy(from->name, to->name, IPSET_MAXNAMELEN);
-+	strscpy(to->name, from_name, IPSET_MAXNAMELEN);
- 
- 	swap(from->ref, to->ref);
- 	ip_set(inst, from_id) = to;
+`helper->name` has a size of 16 and the 3rd argument to `strncpy`
+(NF_CT_HELPER_LEN) is also 16. This means that depending on where
+`dest`'s offset is relative to `regs->data` which has a length of 20,
+there may be a chance the dest buffer ends up non NUL-terminated. This
+is probably fine though as the destination buffer in this case may be
+fine being non NUL-terminated. If this is the case, we should probably
+opt for `strtomem` instead of `strscpy`.
+---
+ net/netfilter/nft_ct.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/netfilter/nft_ct.c b/net/netfilter/nft_ct.c
+index 38958e067aa8..10126559038b 100644
+--- a/net/netfilter/nft_ct.c
++++ b/net/netfilter/nft_ct.c
+@@ -108,7 +108,7 @@ static void nft_ct_get_eval(const struct nft_expr *expr,
+ 		helper = rcu_dereference(help->helper);
+ 		if (helper == NULL)
+ 			goto err;
+-		strncpy((char *)dest, helper->name, NF_CT_HELPER_NAME_LEN);
++		strscpy((char *)dest, helper->name, NF_CT_HELPER_NAME_LEN);
+ 		return;
+ #ifdef CONFIG_NF_CONNTRACK_LABELS
+ 	case NFT_CT_LABELS: {
 
 -- 
 2.41.0.640.ga95def55d0-goog
