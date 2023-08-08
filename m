@@ -1,181 +1,200 @@
-Return-Path: <netdev+bounces-25299-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25317-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3EE27773B37
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 17:46:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E295773B9B
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 17:53:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6EDCC1C20FE1
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 15:46:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 07CE6280982
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 15:53:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51460134D7;
-	Tue,  8 Aug 2023 15:42:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 082F5134D1;
+	Tue,  8 Aug 2023 15:44:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41EFD1401E
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 15:42:22 +0000 (UTC)
-Received: from FRA01-PR2-obe.outbound.protection.outlook.com (mail-pr2fra01on2049.outbound.protection.outlook.com [40.107.12.49])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 728724487;
-	Tue,  8 Aug 2023 08:41:59 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=So3h4Cbm1t3xR8OVeMaOcRuENQ15ov21BdSlS0XnZCvafwYCv7q0zZLMKr7URauqDSBVLlJ5zeH5kaOy6AGH0fnC/8Xb4LKA4+0fST9Mpqfl7Tz0Bx7njKX42UTh5rIcFpEr8JJQd3D4SJMuoVgkjW62sTKu4IhY9IioIvxFJczWoBD//aeNHl0zH66z4lH2MkJ8cYFrXJLvVQrQTcRVWki1H8gHD3tP9GhDBvBoAyl4mlPgc864iPiRvmwbXiep5qgF02tIN3OGS1SOzNqV2Exw8UAcO8UHUnhveoS5200bol6UVioWCQI7KZlYiMvyFkV+u97EERveUs20rhwZkg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ATg+SZLlfBEpiTAS0IMVsxiLhcLARH5H5wo5nfSJ/Io=;
- b=EM+vJKA4g7Ca+xesIrdh62pQcjP94F2k59C+XCD5A7qL7QUuZLWAW4DgSMfc6IqpMS76n4SQVPbHq45RCELTfxGyEBvJS3nFwJNMQ981Xoukpw6U1zOHLfRxCxIxBQtpN4GJ11wJFO2GH4/766/0zoEDdMJmrK9vKiN98RrQfYgf73QTigrphBbdgRin8jZY4jW6bLNfzDW/iZhhf3ueMFKUFtcmWVR8uaOTsob8GFmp7tmfzH8SaLwAuKuDNbGOBEW0UfdfeKfEobzGZ616dpmzeR6UGRqgn9MJRSMDnzGToacUBeh7U38uuvyFalbZc0zLr0Wk5U/7eVRIspM85w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=csgroup.eu; dmarc=pass action=none header.from=csgroup.eu;
- dkim=pass header.d=csgroup.eu; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=csgroup.eu;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ATg+SZLlfBEpiTAS0IMVsxiLhcLARH5H5wo5nfSJ/Io=;
- b=lCbybCsbnxi3kDQTbzTLt0Ha6AowWSzTbkf+C0eCdiGgf0xZDSaqKPdfGmzUigpUNq/aWs01VINwra6SSAoD7TT0nvio+eM6+VB4plfJDRDq475wv30cJo84r+SF6adclAVhQLefKH54Ztla2uttqzw6Pr2YcgQ2f78Lcn+xaDU0/OZoAAde7WAyowixFRLFpUkvbTJlTlIN1ZBlCIWYRAa9KVcpfKVNKbgWpUUd3lJNDmcvAYVgDG7aCPrmk0BSqAhvDlVauxMTMdCWe/WQ/p2nATjP8MRbtrkCjIBucX5/So+y/SjZtT1gaNOtjHkMAPyuuYTLHj7pbOS8rEzg2Q==
-Received: from MRZP264MB2988.FRAP264.PROD.OUTLOOK.COM (2603:10a6:501:31::15)
- by PAZP264MB2415.FRAP264.PROD.OUTLOOK.COM (2603:10a6:102:1f1::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.27; Tue, 8 Aug
- 2023 08:17:02 +0000
-Received: from MRZP264MB2988.FRAP264.PROD.OUTLOOK.COM
- ([fe80::2820:d3a6:1cdf:c60e]) by MRZP264MB2988.FRAP264.PROD.OUTLOOK.COM
- ([fe80::2820:d3a6:1cdf:c60e%6]) with mapi id 15.20.6652.026; Tue, 8 Aug 2023
- 08:17:01 +0000
-From: Christophe Leroy <christophe.leroy@csgroup.eu>
-To: Herve Codina <herve.codina@bootlin.com>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn
-	<andrew@lunn.ch>, Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski
-	<krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, Lee
- Jones <lee@kernel.org>, Linus Walleij <linus.walleij@linaro.org>, Qiang Zhao
-	<qiang.zhao@nxp.com>, Li Yang <leoyang.li@nxp.com>, Liam Girdwood
-	<lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, Jaroslav Kysela
-	<perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, Shengjiu Wang
-	<shengjiu.wang@gmail.com>, Xiubo Li <Xiubo.Lee@gmail.com>, Fabio Estevam
-	<festevam@gmail.com>, Nicolin Chen <nicoleotsuka@gmail.com>, Randy Dunlap
-	<rdunlap@infradead.org>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-gpio@vger.kernel.org" <linux-gpio@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "alsa-devel@alsa-project.org"
-	<alsa-devel@alsa-project.org>, Thomas Petazzoni
-	<thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH v2 25/28] MAINTAINERS: Add the Lantiq PEF2256 driver entry
-Thread-Topic: [PATCH v2 25/28] MAINTAINERS: Add the Lantiq PEF2256 driver
- entry
-Thread-Index: AQHZv9Ju/UNBTldwcEK857iq3KR/uq/gIcSA
-Date: Tue, 8 Aug 2023 08:17:01 +0000
-Message-ID: <5aea6971-1ada-aa16-91b3-843fe258b6d6@csgroup.eu>
-References: <20230726150225.483464-1-herve.codina@bootlin.com>
- <20230726150225.483464-26-herve.codina@bootlin.com>
-In-Reply-To: <20230726150225.483464-26-herve.codina@bootlin.com>
-Accept-Language: fr-FR, en-US
-Content-Language: fr-FR
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=csgroup.eu;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MRZP264MB2988:EE_|PAZP264MB2415:EE_
-x-ms-office365-filtering-correlation-id: b21c0e04-0ff2-47f1-0831-08db97e7d7be
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- S3Vv5IRTSsrnI09zcAurFZ9hz3t9tSUudfODp1OH0bwyONkvviFG5SvjEfNtd3T1YvovY+0KiWopynff7Nd23Qx4evDBV3pzw8meD2hmLpErf5mAP8KxcLZmQKBOtKy7Q5W2ArsCQS46GaEMrpZWOJo1nu2a9RDxzeBXjs7yz809tmsa8AByeIcipHMgYuBuvytYTrikqGiZ6f8/VWZ0/KJCWF/t8C62t1yEFET5/2Nt4OoKXUjsZbEGWBgMi6dVjpUHnBAIlSu4pa9aCxDrfuEXRQFqedRxEflLbiKe1QtyJzWUliSeENXYe/+Rtl36SpXAo9US8i+TPW5h2JVVbYnTs5FPASuPd6/+F3OARa84WzfAZnx7D8FSpBf5gC2WBRY2L+Fm3BLbh8FkVaf1MwQj2cxnWqiMPWS87Cug0ptdE4XfXHe3w+P3gGY+4KmFTzp04MN9vVFirauyvgSHGYOA3NCZj7PGdhlf8aSs2KCcu42MFfEgrwvspuwMiNs3GTqXawaOhSR9u3tskDeVMCo8c9+pebNE2Ku8hOrPOPRzUt6C/CZgYTAO9HlzGjrbqvU0kdZDs7VT71JfkxNTltuZq6TIdBMb6ZPDXm+A3NnYlrC6I+uRxwfmCXgG7Hk3GeBp3nC4ZTWLWMT3JNHXQdzillZ0Pm0hYY79t3/Lk3mt2wEGl1Zmm9nVo3IfiNa2zPD2fVNOA4kk0ODP4Uds+n/ZTKdF2R4P/QKeV9HWfc4VhIX3qbFjqMqzzsHGAcXUdP6rJZNJwW2Ux7ZOLIlmYw==
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MRZP264MB2988.FRAP264.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230028)(136003)(346002)(396003)(39850400004)(366004)(376002)(186006)(1800799003)(90021799007)(90011799007)(451199021)(2616005)(26005)(6506007)(6512007)(71200400001)(6486002)(31686004)(122000001)(921005)(478600001)(110136005)(54906003)(38100700002)(36756003)(66476007)(66556008)(66946007)(91956017)(66446008)(76116006)(64756008)(4326008)(316002)(41300700001)(8936002)(8676002)(5660300002)(38070700005)(7406005)(44832011)(7416002)(4744005)(2906002)(31696002)(86362001)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?YXYrOG1mb1ZwN0pOWkVHZ29ZcUlOZ25ZWGZibzNUcElxbGMxNXo2MFVKYytj?=
- =?utf-8?B?U0xNMk91MFNjV3R6aHducCtVY1o0aTRySFFMQ3FWa1ZoNlQwSzVaMVpmbXEy?=
- =?utf-8?B?OS9lVUVmWEtUSXZWZk05L09mZGIra3NJam1FTG1CdlczY1NObU5ISk1yem9G?=
- =?utf-8?B?WlFZS2VjNEo5cWpLS09sNFJsU2szcmZydUtid1lCRXlncGcxbkN4SElPM3Z3?=
- =?utf-8?B?Q1h4SGxjNk9Kb1lFUnlkTEU0VHFUQ2lpWHlzQWszeHBxVG1aU0tGQjZLTmg3?=
- =?utf-8?B?V0JvU3grUm9XemkzMGdBcmVxK1BVbEREd2RJZnFQSHFtTW5PQTdtd3RXVklC?=
- =?utf-8?B?RGxiVjFxYlNwRzg1NGFoVDM0VXIyNXZuSnc5L3V3QUtVdi9qWjF5MDZTZVpN?=
- =?utf-8?B?c21tdmJ1L21jZGlEZDk4Vm93aXNiclViaGMzZ3RaVHNPdkNZT0FjaW1ub3Fr?=
- =?utf-8?B?dHBTaklDNm1FZ2FhMFlTR2xBdGhyeFRsR1ZKMzNBbTh3U0U1alE4Nzk3cVpK?=
- =?utf-8?B?bFk3YTB4bmN2K3VWaDliYUd3NTFQemdYajhOS3BNQTZGQUI2RWc0eWtpWmpG?=
- =?utf-8?B?OTV1dkdwSDhOUzBjbFlacnJpZTlHTm1yNVY1c2RTdGluaStvZy9odmV6bnpl?=
- =?utf-8?B?OGUzbHdSTFRjYkpaYVF3eFpRbXlhcFdsQ0FvMDc5c2V2cnBVV2o2a1cxR2Fl?=
- =?utf-8?B?MTh3NXlwaXdldWwzSU16VjhRYUwxcUdnS0lMZFVaVjh3TUVMc1ptcDJPWVVm?=
- =?utf-8?B?Z3lQc3RjQ1R3anErRjZXK3Awb01QbmRqdjBoTU1QREQ2cGQ2TzRmM1lLQTU0?=
- =?utf-8?B?Z1NhWk1hNGZ1c2MzV05KNGdsR0VXOWJWVi90c1VyWjlrUjMraWhQRUJGT2kw?=
- =?utf-8?B?U2k4d0x3Q1F2NTRoS3R4V0Z6UFB3Ny91NHh3Wis1YzB4VFA3SE1IaUM5N0l3?=
- =?utf-8?B?cUMzY2t6dTNlSkZPalpJV1JVbytqVVd6QTdBV0VGSTlQNmpaRjRpUGRRMEhO?=
- =?utf-8?B?dUVxT0FBdkpLczkyQjBlSVRDQWgxVXlSSGlJTXlUdVFiMkZUaU5NMHlxM3Jr?=
- =?utf-8?B?VXpNWndNQmQ4a1I3Y3hJVWZ5MlBqQ0YwTWtSWUhMVTNGUzF3eHVmbkdoNHNn?=
- =?utf-8?B?c3c1OW5IKzRMcXJIb25LR0YvSXNFWmxQVW1Jcm1nVjJ6SHl0WldrUjRGTkRC?=
- =?utf-8?B?TGZVbFFKQWNCakN6N2kzdlR3N3R6bEd3RTcxbCt0RFduL2p1UTlXd1ZHN29n?=
- =?utf-8?B?akpCdHFlUkl6YzhuUUJUUlovaFIzUmJDMGw3TjJnMFA1ZEVLTGs5NlVHaVhV?=
- =?utf-8?B?Tlc5VG1jSERIVHZWcmF4d2dWeWFuYlBSMjBWOXgyY05BSzF1bUNaWVBlNWw5?=
- =?utf-8?B?cmUwd0JEaDBEQ3hHbDlKL2JOdjBWRlcwdGtkeERtZ3dyOVg2SE01MXRqUmJp?=
- =?utf-8?B?YzZTaTZBVWI0TktSTEMwaFB4dnUrZDI2aVRpK1E0WXpXVXBMUkowSmNxMXds?=
- =?utf-8?B?aHQvTE9mZUJNL3hUSTM4cTU4Y3VYbVNFR0p3aDlLd2t1UERzSGFhZStvUlhE?=
- =?utf-8?B?TDErQ1VseWwxS2RBYU9ucDl6TkRaQ09PaGtoWXd6TlQrTFh6R3lHWFpvZUdx?=
- =?utf-8?B?ckdCYks3YWF4eXpJUkx5cXBCc0ZuY3ROdHNkRGFvZzZxMEMwVnE2Sll5ZW4y?=
- =?utf-8?B?NGR4VWdGT0haNGdIbUdaTHNzdnJBM2tNMEh3ZFFiSXFLWkI4ZEpGYlFmem56?=
- =?utf-8?B?NTZLYit0UlFnRXVjRzhnZTh4aXZzZlFZOFRkYnFJY3F4TFFDNzVndVRxL3Fh?=
- =?utf-8?B?K2l6QmJlZlpYU2RkbktxRWRQcUR1MmdkTnNiemZZTUpGMHRBMGoyMjZFcUsx?=
- =?utf-8?B?TnJTL3p0OHR2MGl0QW4xcE5ja3Q2YzFYU2w5anczOTdpb0Z3UDNwSkpIN3pp?=
- =?utf-8?B?Rkd1c2hJdVBKRUVRRmljYXdqRFM5Njg1Uk05dHZWYTA5MTZkQWlUNXdKUFho?=
- =?utf-8?B?N2lRenhWdmRWdEhSQjlPY3BNaVJOZk1hbFNkWExVYXloL3J6NlkvQzVvTElm?=
- =?utf-8?B?TmpxejBYTVpWRm0ycDNGY0w3aWN4Sm5pZjlGRlJIMFNjajgyOWkwbWphYTNo?=
- =?utf-8?Q?36MWc/GSci/Tgo0GD9F8eIISY?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <EFD78C4DC505954A9FE35BB820042761@FRAP264.PROD.OUTLOOK.COM>
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F10D51C29
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 15:44:19 +0000 (UTC)
+Received: from mail-il1-x135.google.com (mail-il1-x135.google.com [IPv6:2607:f8b0:4864:20::135])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1E291BC8
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 08:43:57 -0700 (PDT)
+Received: by mail-il1-x135.google.com with SMTP id e9e14a558f8ab-3490b737f9aso151055ab.0
+        for <netdev@vger.kernel.org>; Tue, 08 Aug 2023 08:43:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1691509437; x=1692114237;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Zn2bzFezk/UZyxUtkuS/wxumoulHOnZ5vgKYBp+qi5w=;
+        b=C9GUiTbucm1/aSD+b9/ASm9MZkMfHwYegEaO3Dku+dQrXjlkMS120cpy0F23YuVJ6/
+         BKFj8XBxvsgm2fY2VOdsWBDjtC8cfa1/L7YHBS3SbeoIfha3tsorsqbmP/lmdpiEBzmQ
+         I41k58UqsUIFBxi6kl9VHw+v/DHgQWvCoAlAhuxUUWi1sohhC34pBPn3TD7J5B++Aq3v
+         TZ8mlPmtKUPyhxx7Hdea6uUuyA7Oy5OQw/DvhwPh8zM0LjfYEy4q/6aK//s3QlXHqFC1
+         tA5R8EzD911zhQHNrvsoH+3LxPwcvDf10N6aKYEkfhCduDPS2PDPbkZInTiq06+z7zH8
+         ILfw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691509437; x=1692114237;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Zn2bzFezk/UZyxUtkuS/wxumoulHOnZ5vgKYBp+qi5w=;
+        b=Xm4GW26Q8Yy6yvYjl5ntCY2CqE55auJw+XK4TAphZ1wxYSeqxhZIarbTMxNXv+zpVv
+         rwx1UXySUQKMpkgHmlXhlpEXRlTOaguudhqyYZzVMkgOwUbvOhQHEIgGwC77JKBNcVLj
+         iYYN5UNTXGQiTN+8/WL4vfRBkfKw1Q9TmbB9Q8siGjfWLN+RX+XTIarBnLLkcg/kiXO4
+         N4KPWB8Jw3Lf2D6ZmlhAILWpz1cLO5l6p7n+NJUv51HJu/BJqyo3kOLwEMtWNf3gQJLZ
+         Wy/Tmeqbccdhog+bLyV75r9V0XWRG9lzZZqbtA4nH3tKUgvuoe1F11aF176DoW5UxxUx
+         XlhQ==
+X-Gm-Message-State: AOJu0Yz2QPE8f0pp/9YxmKwWyubI+n+HTe8IOm9eZN8vY8RN0q//QHZh
+	DR6kstnwSHm6ARosL4BfyDE5kW861cKnB+htFtFqEhmtFwNMO64B3x0Rkg==
+X-Google-Smtp-Source: AGHT+IF/S2chbVVgN+yPnHABejpoo8ifP2bZqpJf8cs3Tyc6YLaH9rDxpT5eAuURhdr8o0ULbCZm5CbGz0HFlBZF3Nc=
+X-Received: by 2002:a05:622a:d0:b0:403:aa88:cf7e with SMTP id
+ p16-20020a05622a00d000b00403aa88cf7emr595630qtw.29.1691483209473; Tue, 08 Aug
+ 2023 01:26:49 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: csgroup.eu
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MRZP264MB2988.FRAP264.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-Network-Message-Id: b21c0e04-0ff2-47f1-0831-08db97e7d7be
-X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Aug 2023 08:17:01.5661
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 9914def7-b676-4fda-8815-5d49fb3b45c8
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: XXNXglXVkTk4SGwfrbxXeNsUBfnF/vHDhFrg/9FxGjiP4p+7fvNx3Jb1nierCJXvlOIMz7D5RxBMvKFNGGAQpPVEcBDpHCHveXovw0EN+Z4=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAZP264MB2415
-X-Spam-Status: No, score=-3.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.6
+References: <CADVnQyn3UMa3Qx6cC1Rx97xLjQdG0eKsiF7oY9UR=b9vU4R-yA@mail.gmail.com>
+ <20230808055817.3979-1-me@manjusaka.me>
+In-Reply-To: <20230808055817.3979-1-me@manjusaka.me>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 8 Aug 2023 10:26:36 +0200
+Message-ID: <CANn89iKxJThy4ZVq4do6Z1bOZsRptfN6N8ydPaHQAmYKCjtOnw@mail.gmail.com>
+Subject: Re: [PATCH v2] tracepoint: add new `tcp:tcp_ca_event` trace event
+To: Manjusaka <me@manjusaka.me>
+Cc: ncardwell@google.com, bpf@vger.kernel.org, davem@davemloft.net, 
+	dsahern@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	linux-trace-kernel@vger.kernel.org, mhiramat@kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, rostedt@goodmis.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-16.1 required=5.0 tests=BAYES_00,DATE_IN_PAST_06_12,
+	DKIMWL_WL_MED,DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=no autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-DQoNCkxlIDI2LzA3LzIwMjMgw6AgMTc6MDIsIEhlcnZlIENvZGluYSBhIMOpY3JpdMKgOg0KPiBB
-ZnRlciBjb250cmlidXRpbmcgdGhlIGRyaXZlciwgYWRkIG15c2VsZiBhcyB0aGUgbWFpbnRhaW5l
-ciBmb3IgdGhlDQo+IExhbnRpcSBQRUYyMjU2IGRyaXZlci4NCj4gDQo+IFNpZ25lZC1vZmYtYnk6
-IEhlcnZlIENvZGluYSA8aGVydmUuY29kaW5hQGJvb3RsaW4uY29tPg0KDQpSZXZpZXdlZC1ieTog
-Q2hyaXN0b3BoZSBMZXJveSA8Y2hyaXN0b3BoZS5sZXJveUBjc2dyb3VwLmV1Pg0KDQo+IC0tLQ0K
-PiAgIE1BSU5UQUlORVJTIHwgOSArKysrKysrKysNCj4gICAxIGZpbGUgY2hhbmdlZCwgOSBpbnNl
-cnRpb25zKCspDQo+IA0KPiBkaWZmIC0tZ2l0IGEvTUFJTlRBSU5FUlMgYi9NQUlOVEFJTkVSUw0K
-PiBpbmRleCAxNDA0MWQ5MGY5YzguLjA3YTdkOWZjYTNjNCAxMDA2NDQNCj4gLS0tIGEvTUFJTlRB
-SU5FUlMNCj4gKysrIGIvTUFJTlRBSU5FUlMNCj4gQEAgLTExNzc2LDYgKzExNzc2LDE1IEBAIFM6
-CU1haW50YWluZWQNCj4gICBGOglhcmNoL21pcHMvbGFudGlxDQo+ICAgRjoJZHJpdmVycy9zb2Mv
-bGFudGlxDQo+ICAgDQo+ICtMQU5USVEgUEVGMjI1NiBEUklWRVINCj4gK006CUhlcnZlIENvZGlu
-YSA8aGVydmUuY29kaW5hQGJvb3RsaW4uY29tPg0KPiArUzoJTWFpbnRhaW5lZA0KPiArRjoJRG9j
-dW1lbnRhdGlvbi9kZXZpY2V0cmVlL2JpbmRpbmdzL25ldC9sYW50aXEscGVmMjI1Ni55YW1sDQo+
-ICtGOglkcml2ZXJzL25ldC93YW4vZnJhbWVyL3BlZjIyNTYvDQo+ICtGOglkcml2ZXJzL3BpbmN0
-cmwvcGluY3RybC1wZWYyMjU2LXJlZ3MuaA0KPiArRjoJZHJpdmVycy9waW5jdHJsL3BpbmN0cmwt
-cGVmMjI1Ni5jDQo+ICtGOglpbmNsdWRlL2xpbnV4L2ZyYW1lci9wZWYyMjU2LmgNCj4gKw0KPiAg
-IExBU0kgNTNjNzAwIGRyaXZlciBmb3IgUEFSSVNDDQo+ICAgTToJIkphbWVzIEUuSi4gQm90dG9t
-bGV5IiA8SmFtZXMuQm90dG9tbGV5QEhhbnNlblBhcnRuZXJzaGlwLmNvbT4NCj4gICBMOglsaW51
-eC1zY3NpQHZnZXIua2VybmVsLm9yZw0K
+On Tue, Aug 8, 2023 at 7:59=E2=80=AFAM Manjusaka <me@manjusaka.me> wrote:
+>
+> In normal use case, the tcp_ca_event would be changed in high frequency.
+>
+> It's a good indicator to represent the network quanlity.
+
+quality ?
+
+Honestly, it is more about TCP stack tracing than 'network quality'
+
+>
+> So I propose to add a `tcp:tcp_ca_event` trace event
+> like `tcp:tcp_cong_state_set` to help the people to
+> trace the TCP connection status
+>
+> Signed-off-by: Manjusaka <me@manjusaka.me>
+> ---
+>  include/net/tcp.h          |  9 ++------
+>  include/trace/events/tcp.h | 45 ++++++++++++++++++++++++++++++++++++++
+>  net/ipv4/tcp_cong.c        | 10 +++++++++
+>  3 files changed, 57 insertions(+), 7 deletions(-)
+>
+> diff --git a/include/net/tcp.h b/include/net/tcp.h
+> index 0ca972ebd3dd..a68c5b61889c 100644
+> --- a/include/net/tcp.h
+> +++ b/include/net/tcp.h
+> @@ -1154,13 +1154,8 @@ static inline bool tcp_ca_needs_ecn(const struct s=
+ock *sk)
+>         return icsk->icsk_ca_ops->flags & TCP_CONG_NEEDS_ECN;
+>  }
+>
+> -static inline void tcp_ca_event(struct sock *sk, const enum tcp_ca_event=
+ event)
+> -{
+> -       const struct inet_connection_sock *icsk =3D inet_csk(sk);
+> -
+> -       if (icsk->icsk_ca_ops->cwnd_event)
+> -               icsk->icsk_ca_ops->cwnd_event(sk, event);
+> -}
+> +/* from tcp_cong.c */
+> +void tcp_ca_event(struct sock *sk, const enum tcp_ca_event event);
+>
+>  /* From tcp_cong.c */
+>  void tcp_set_ca_state(struct sock *sk, const u8 ca_state);
+> diff --git a/include/trace/events/tcp.h b/include/trace/events/tcp.h
+> index bf06db8d2046..b374eb636af9 100644
+> --- a/include/trace/events/tcp.h
+> +++ b/include/trace/events/tcp.h
+> @@ -416,6 +416,51 @@ TRACE_EVENT(tcp_cong_state_set,
+>                   __entry->cong_state)
+>  );
+>
+> +TRACE_EVENT(tcp_ca_event,
+> +
+> +       TP_PROTO(struct sock *sk, const u8 ca_event),
+> +
+> +       TP_ARGS(sk, ca_event),
+> +
+> +       TP_STRUCT__entry(
+> +               __field(const void *, skaddr)
+> +               __field(__u16, sport)
+> +               __field(__u16, dport)
+> +               __array(__u8, saddr, 4)
+> +               __array(__u8, daddr, 4)
+> +               __array(__u8, saddr_v6, 16)
+> +               __array(__u8, daddr_v6, 16)
+> +               __field(__u8, ca_event)
+> +       ),
+> +
+
+Please add the family (look at commit 3dd344ea84e1 ("net: tracepoint:
+exposing sk_family in all tcp:tracepoints"))
+
+
+
+> +       TP_fast_assign(
+> +               struct inet_sock *inet =3D inet_sk(sk);
+> +               __be32 *p32;
+> +
+> +               __entry->skaddr =3D sk;
+> +
+> +               __entry->sport =3D ntohs(inet->inet_sport);
+> +               __entry->dport =3D ntohs(inet->inet_dport);
+> +
+> +               p32 =3D (__be32 *) __entry->saddr;
+> +               *p32 =3D inet->inet_saddr;
+> +
+> +               p32 =3D (__be32 *) __entry->daddr;
+> +               *p32 =3D  inet->inet_daddr;
+
+We keep copying IPv4 addresses that might contain garbage for IPv6 sockets =
+:/
+
+> +
+> +               TP_STORE_ADDRS(__entry, inet->inet_saddr, inet->inet_dadd=
+r,
+> +                          sk->sk_v6_rcv_saddr, sk->sk_v6_daddr);
+
+I will send a cleanup, because IP_STORE_ADDRS() should really take
+care of all details.
+
+
+> +
+> +               __entry->ca_event =3D ca_event;
+> +       ),
+> +
+> +       TP_printk("sport=3D%hu dport=3D%hu saddr=3D%pI4 daddr=3D%pI4 sadd=
+rv6=3D%pI6c daddrv6=3D%pI6c ca_event=3D%u",
+> +                 __entry->sport, __entry->dport,
+> +                 __entry->saddr, __entry->daddr,
+> +                 __entry->saddr_v6, __entry->daddr_v6,
+> +                 __entry->ca_event)
+
+Please print the symbol instead of numeric ca_event.
+
+Look at show_tcp_state_name() for instance.
 
