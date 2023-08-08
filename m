@@ -1,103 +1,112 @@
-Return-Path: <netdev+bounces-25231-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25223-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19524773661
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 04:13:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AFBD2773632
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 04:07:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DE4D11C20DF1
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 02:13:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6957C28163E
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 02:07:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84B3B659;
-	Tue,  8 Aug 2023 02:13:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D6C337E;
+	Tue,  8 Aug 2023 02:06:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6372537E
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 02:13:41 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D19CFC433C7;
-	Tue,  8 Aug 2023 02:13:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691460821;
-	bh=hIQVyIVKa1+wJpqh5robkngECkA8ABSIuJqROobHfJ8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=edC9yk2r/XOjRcTvRytMFoUIb23G/AG33ZeYVn3iv8oLaSuBKOhyN7oV/fyjKnhtX
-	 owDadoai/wYzTQcQ1LqhkCWoZsRlkEE/JLozzIl4L/MKarVVmHQHgkga1cLZwYOzud
-	 leyFXFALlM2bA31ixh/zx9BUN45St2r674GVej2DOLrkx2oAPLxaexox3ey98o9PPG
-	 qsqL+9c9PUfD5sxsZe5rtuBu6XtMVAgBzlX1tZ/yilR/yTvFUpVcpwBOnZse//qtnD
-	 ieG85Ky4CRT955VqEiEQsDX1RBF4MJKHUHKQyuE6/OS16yaBrq0ntMZdz096HgdVlb
-	 B75Fqi/7IyikQ==
-Date: Mon, 7 Aug 2023 19:13:39 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Nick Child <nnac123@linux.ibm.com>
-Cc: netdev@vger.kernel.org, haren@linux.ibm.com, ricklind@us.ibm.com,
- danymadden@us.ibm.com, tlfalcon@linux.ibm.com, bjking1@linux.ibm.com
-Subject: Re: [PATCH net 5/5] ibmvnic: Ensure login failure recovery is safe
- from other resets
-Message-ID: <20230807191339.709dc247@kernel.org>
-In-Reply-To: <20230803202010.37149-5-nnac123@linux.ibm.com>
-References: <20230803202010.37149-1-nnac123@linux.ibm.com>
-	<20230803202010.37149-5-nnac123@linux.ibm.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72AACA53
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 02:06:58 +0000 (UTC)
+Received: from smtpbg151.qq.com (smtpbg151.qq.com [18.169.211.239])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DFD2138
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 19:06:56 -0700 (PDT)
+X-QQ-mid: bizesmtp73t1691460265tjcoc2ye
+Received: from wxdbg.localdomain.com ( [115.195.149.19])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Tue, 08 Aug 2023 10:04:00 +0800 (CST)
+X-QQ-SSF: 01400000000000K0Z000000A0000000
+X-QQ-FEAT: C46Rb8GPIEdTPJ4ttKDJhyd2N8MxHYSpgUMdrbNV46SZATBhUoNCM/diEGOgE
+	89phebOo6fImoR8j3mytDDHZ4ks3khuYlqZebv0ssJrNSQh3qjH2f6FX/8lfi3N4eIDHMPh
+	PUAo5kpFNqWkm35Ws7koHylZVZayjCThA2xscW44oMS6MLVjAoe89oBdrf0nx/BXbVTKwgt
+	HDqTlk78hofQwzG+cOgMSi5QAoIGRr8IYxGVP7fvDg/9x6+eDru4cswaKX1xfFNS8gwqwEJ
+	P5go3N0St/yiaKTFkMdinwwVIp55EACqwoJrEb7W6J/CxSCiVVGF8TblPJb7FELuOhg+Tco
+	qEi+tUYXacPZmUt0r5095yzlbUcV2g5xAt8CeN5i6JF1cW+RJA=
+X-QQ-GoodBg: 2
+X-BIZMAIL-ID: 10118867861635307495
+From: Jiawen Wu <jiawenwu@trustnetic.com>
+To: netdev@vger.kernel.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	andrew@lunn.ch,
+	hkallweit1@gmail.com,
+	linux@armlinux.org.uk,
+	Jose.Abreu@synopsys.com,
+	rmk+kernel@armlinux.org.uk
+Cc: mengyuanlou@net-swift.com,
+	Jiawen Wu <jiawenwu@trustnetic.com>
+Subject: [PATCH net-next v2 0/7] support more link mode for TXGBE
+Date: Tue,  8 Aug 2023 10:17:01 +0800
+Message-Id: <20230808021708.196160-1-jiawenwu@trustnetic.com>
+X-Mailer: git-send-email 2.27.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtp:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz5a-1
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Thu,  3 Aug 2023 15:20:10 -0500 Nick Child wrote:
-> +			do {
-> +				reinit_init_done(adapter);
-> +				/* Clear any failovers we got in the previous
-> +				 * pass since we are re-initializing the CRQ
-> +				 */
-> +				adapter->failover_pending = false;
-> +				release_crq_queue(adapter);
-> +				/* If we don't sleep here then we risk an
-> +				 * unnecessary failover event from the VIOS.
-> +				 * This is a known VIOS issue caused by a vnic
-> +				 * device freeing and registering a CRQ too
-> +				 * quickly.
-> +				 */
-> +				msleep(1500);
-> +				/* Avoid any resets, since we are currently
-> +				 * resetting.
-> +				 */
-> +				spin_lock_irqsave(&adapter->rwi_lock, flags);
-> +				flush_reset_queue(adapter);
-> +				spin_unlock_irqrestore(&adapter->rwi_lock,
-> +						       flags);
-> +
-> +				rc = init_crq_queue(adapter);
-> +				if (rc) {
-> +					netdev_err(netdev, "login recovery: init CRQ failed %d\n",
-> +						   rc);
-> +					return -EIO;
-> +				}
->  
-> -			rc = ibmvnic_reset_init(adapter, false);
-> -			if (rc) {
-> -				netdev_err(netdev, "login recovery: Reset init failed %d\n",
-> -					   rc);
-> -				return -EIO;
-> -			}
-> +				rc = ibmvnic_reset_init(adapter, false);
-> +				if (rc)
-> +					netdev_err(netdev, "login recovery: Reset init failed %d\n",
-> +						   rc);
-> +				/* IBMVNIC_CRQ_INIT will return EAGAIN if it
-> +				 * fails, since ibmvnic_reset_init will free
-> +				 * irq's in failure, we won't be able to receive
-> +				 * new CRQs so we need to keep trying. probe()
-> +				 * handles this similarly.
-> +				 */
-> +			} while (rc == -EAGAIN);
+There are three new interface mode support for Wangxun 10Gb NICs:
+1000BASE-X, SGMII and XAUI.
 
-Isn't this potentially an infinite loop? Can we limit the max number of
-iterations here or something already makes this loop safe?
+Specific configurations are added to XPCS. And external PHY attaching
+is added for copper NICs. 
+
+v1 -> v2:
+- use the string "txgbe_pcs_mdio_bus" directly
+- use dev_err() instead of pr_err()
+- add device quirk flag
+- add more macro definitions to explain PMA registers
+- move txgbe_enable_sec_tx_path() to mac_finish()
+- implement phylink for copper NICs
+
+Jiawen Wu (7):
+  net: pcs: xpcs: add specific vendor supoprt for Wangxun 10Gb NICs
+  net: pcs: xpcs: support to switch mode for Wangxun NICs
+  net: pcs: xpcs: add 1000BASE-X AN interrupt support
+  net: pcs: xpcs: adapt Wangxun NICs for SGMII mode
+  net: txgbe: support switching mode to 1000BASE-X and SGMII
+  net: txgbe: support copper NIC with external PHY
+  net: ngbe: move mdio access registers to libwx
+
+ MAINTAINERS                                   |   1 +
+ drivers/net/ethernet/wangxun/Kconfig          |   1 +
+ drivers/net/ethernet/wangxun/libwx/wx_type.h  |  28 +++
+ drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c |  84 +++----
+ drivers/net/ethernet/wangxun/ngbe/ngbe_type.h |  19 --
+ drivers/net/ethernet/wangxun/txgbe/txgbe_hw.c |  41 +++-
+ drivers/net/ethernet/wangxun/txgbe/txgbe_hw.h |   2 +
+ .../net/ethernet/wangxun/txgbe/txgbe_main.c   |  53 ++++-
+ .../net/ethernet/wangxun/txgbe/txgbe_phy.c    | 176 ++++++++++++++-
+ drivers/net/pcs/Makefile                      |   2 +-
+ drivers/net/pcs/pcs-xpcs-wx.c                 | 209 ++++++++++++++++++
+ drivers/net/pcs/pcs-xpcs.c                    |  85 ++++++-
+ drivers/net/pcs/pcs-xpcs.h                    |  16 ++
+ include/linux/pcs/pcs-xpcs.h                  |   5 +
+ 14 files changed, 630 insertions(+), 92 deletions(-)
+ create mode 100644 drivers/net/pcs/pcs-xpcs-wx.c
+
+-- 
+2.27.0
+
 
