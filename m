@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-25572-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25573-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88ED1774C77
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 23:10:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89B9F774C7F
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 23:10:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4298728186E
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 21:10:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 17ADC280FCD
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 21:10:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 154C7171BE;
-	Tue,  8 Aug 2023 21:09:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0B78171BF;
+	Tue,  8 Aug 2023 21:10:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A1C21641C
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 21:09:59 +0000 (UTC)
-Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9258955AE
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 14:09:57 -0700 (PDT)
-Received: by mail-lj1-x235.google.com with SMTP id 38308e7fff4ca-2b72161c6e9so3218791fa.0
-        for <netdev@vger.kernel.org>; Tue, 08 Aug 2023 14:09:57 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEF4F168CF
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 21:10:27 +0000 (UTC)
+Received: from mail-lj1-x232.google.com (mail-lj1-x232.google.com [IPv6:2a00:1450:4864:20::232])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FF5E423A
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 14:10:26 -0700 (PDT)
+Received: by mail-lj1-x232.google.com with SMTP id 38308e7fff4ca-2b9cbaee7a9so99520221fa.0
+        for <netdev@vger.kernel.org>; Tue, 08 Aug 2023 14:10:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1691528996; x=1692133796;
+        d=linaro.org; s=google; t=1691529024; x=1692133824;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=iXyE8v0DPggQOKqmpTZtifsWJXGLTZ2e/kzK5ZWjYzg=;
-        b=hZ53BGDdZA9erXITpu5VkzHFU61QcR+DYYlI1z9TFI/GQdId8Cm6+3yjVYnwTkGCku
-         Tj9t93G8lguo1Ms44UxeCBDtUPy3hCOvfaC291bjJ148t1c/xZAY0B56NBqwz4/fohCK
-         DKhb4QWzX2Eh9dYYdNlqw5IAdYd9wWqNy0/qSGfNfB+GxTFuktxuxjYRwChNuySkWwqU
-         zF+RWOzEdpRTnhgVMjBLaizECzALwKP1iyLsSx+9ZkiHCvj7nBZ6XDIO230cEIfeQX3T
-         kzHN+NLLdpc/3mk6o3Uhu2+LURtM55se7xeSgnay5l6TOOGOzJFOGIB3MVXSEwTA/6S0
-         jiDw==
+        bh=XaBNWgQB7LrOJPzr/75/ffHvkyouEp6SQVPCaSkExdY=;
+        b=MWUV/QTLf7LHcNpY1U03uCSbhnn+4x4p9TLtwApa2ku1LvirhSuP1FhhWP464c9E5K
+         mlWe1kwfGrU2Mt5grK1cXZ7oVX9wqzAXs2q5hXADV+95Injx2P11u0YBCU57pJjoocRb
+         tmGHcs2rKriZgClXMAXPFXsX6s6UImeGQmyzhc3tRstT/r9N7maIBvBSimQeQQSjzWVe
+         59+LpxWY+TgE95oid3sa+by8axgm1MObdZBdiMXPaoWsc+Nqhs8ve8PLCxZd2y1QZc6Q
+         LwnoxgKc3NDQ8hfiQ9b5jDOmOVKU/Fm8HoMM+Kf6Vgx3F3bgUsuHu/Y2GlxsT102oUGZ
+         ok9g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691528996; x=1692133796;
+        d=1e100.net; s=20221208; t=1691529024; x=1692133824;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=iXyE8v0DPggQOKqmpTZtifsWJXGLTZ2e/kzK5ZWjYzg=;
-        b=U37/btfCRQ/GRv/1RVvgUxDiOllOPVD7dFKgaYLQT/gF+wdQ0AOM8bw7OL3s7XwmwM
-         WIXiQ/y3xO7DyFZtFf9drd6wxp/CS9B7aVHnjWfagKdN7BhcrpZP61cxlp28ksR//MGB
-         V10lE8A0vHtjjbwvdWJRGP6EZzNc2sWUytVWjl7W5b4qt2izx1o+b2fYaJ3ir8gF4E50
-         WzaqjcQna0VxId1zfr3kySTHjTBqaHVx2pa2sR0rsBKeoc31uJLKH7Sq/FEieOyhjVSS
-         ife3Opa8XA7UzbIleeQFtZmShF0w7gCm/hEhhaSJPpEOLORK1/AlsYxdAGov7lWqkR7r
-         YXAg==
-X-Gm-Message-State: AOJu0YxMnVdy6pcZ7ze06Bv4nEHmh2ll6gghqKAHzLnusPKYE0og1IH+
-	si+32xYjbrVROZNzdixUGZnt/Q==
-X-Google-Smtp-Source: AGHT+IEZ9oERy5d0Pv48QmhrSJbMNUdy7khczXZBZP2YAY5NI6z66TEvo8wGXAnaHeTsTTZFyq358Q==
-X-Received: by 2002:a2e:87ce:0:b0:2b6:cecb:c4a3 with SMTP id v14-20020a2e87ce000000b002b6cecbc4a3mr313090ljj.23.1691528995941;
-        Tue, 08 Aug 2023 14:09:55 -0700 (PDT)
+        bh=XaBNWgQB7LrOJPzr/75/ffHvkyouEp6SQVPCaSkExdY=;
+        b=H2UQmiD+cMoU4PmzuOvXoPFLM+8g3G7J+0sXtRITBsVG8KbCeBRXT7bfpl5J3VIDcO
+         vF5AW1O5SdNn1wFRVkGqxauZymGW1ByKWDB4fDPX9zF++818tYpnDqSPg8YN966yYImI
+         8jVebFthyAYXC7jvNx678au/8+6pOa/Aoo1j52hpN4Mi4d13b4iWYj2sDl8hJlTYFFAn
+         V/ZQunr3tFJSEwYb9H9QO2ekaqFbod3nT6geS1UgCGn6LB02sEwIrHDB3Sbg2RZb50wZ
+         SBI5Q5jVYBSmjgt4PMPUQ7yGsTJDFl7JqHVsPo/Y0GfDiZ03UZCrMFgUPaCvfTud1IBj
+         qFcA==
+X-Gm-Message-State: AOJu0YzAId4FZPB9h7M5nSYrGieBZ/hpXwtdnQ60bsLfxm3EICjcclO/
+	499dlVjX1JMrlw5Fmz74L2iSpg==
+X-Google-Smtp-Source: AGHT+IEk93vkbMNaswg47vA00LvEKQegqiJoOFJjz5ZJ1GSAzKZC45dJlSxdSDE11y5fbNP+INnGPg==
+X-Received: by 2002:a2e:a282:0:b0:2b9:e93e:65e6 with SMTP id k2-20020a2ea282000000b002b9e93e65e6mr411305lja.35.1691529024492;
+        Tue, 08 Aug 2023 14:10:24 -0700 (PDT)
 Received: from [192.168.1.101] (abxi185.neoplus.adsl.tpnet.pl. [83.9.2.185])
-        by smtp.gmail.com with ESMTPSA id l13-20020a2e700d000000b002b9c0822951sm2395753ljc.119.2023.08.08.14.09.54
+        by smtp.gmail.com with ESMTPSA id l13-20020a2e700d000000b002b9c0822951sm2395753ljc.119.2023.08.08.14.10.23
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 08 Aug 2023 14:09:55 -0700 (PDT)
-Message-ID: <ec4ce742-c0e6-4a8f-a63d-c6a668ae253a@linaro.org>
-Date: Tue, 8 Aug 2023 23:09:54 +0200
+        Tue, 08 Aug 2023 14:10:24 -0700 (PDT)
+Message-ID: <37c18c0e-5b29-496b-8956-64a69f189ac1@linaro.org>
+Date: Tue, 8 Aug 2023 23:10:23 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,8 +65,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 6/8] arm64: dts: qcom: sa8775p-ride: add the second
- SGMII PHY
+Subject: Re: [PATCH v2 7/8] arm64: dts: qcom: sa8775p-ride: add an alias for
+ ethernet0
 Content-Language: en-US
 To: Bartosz Golaszewski <brgl@bgdev.pl>, Andy Gross <agross@kernel.org>,
  Bjorn Andersson <andersson@kernel.org>, Rob Herring <robh+dt@kernel.org>,
@@ -78,7 +78,7 @@ Cc: linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
  linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
  Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 References: <20230808190144.19999-1-brgl@bgdev.pl>
- <20230808190144.19999-7-brgl@bgdev.pl>
+ <20230808190144.19999-8-brgl@bgdev.pl>
 From: Konrad Dybcio <konrad.dybcio@linaro.org>
 Autocrypt: addr=konrad.dybcio@linaro.org; keydata=
  xsFNBF9ALYUBEADWAhxdTBWrwAgDQQzc1O/bJ5O7b6cXYxwbBd9xKP7MICh5YA0DcCjJSOum
@@ -115,7 +115,7 @@ Autocrypt: addr=konrad.dybcio@linaro.org; keydata=
  bGqMHex48FVZhexNPYOd58EY9/7mL5u0sJmo+jTeb4JBgIbFPJCFyng4HwbniWgQJZ1WqaUC
  nas9J77uICis2WH7N8Bs9jy0wQYezNzqS+FxoNXmDQg2jetX8en4bO2Di7Pmx0jXA4TOb9TM
  izWDgYvmBE8=
-In-Reply-To: <20230808190144.19999-7-brgl@bgdev.pl>
+In-Reply-To: <20230808190144.19999-8-brgl@bgdev.pl>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -128,11 +128,10 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 On 8.08.2023 21:01, Bartosz Golaszewski wrote:
 > From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 > 
-> Add a second SGMII PHY that will be used by EMAC1 on sa8775p-ride.
+> Once we add a second ethernet node, the MDIO bus names will conflict
+> unless we provide aliases. Add one for the existing ethernet node.
 > 
 > Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 > ---
-Reviewed-by: Konrad Dybcio <konrad.dybcio@linaro.org>
-
-Konrad
+ideally this would be sorted
 
