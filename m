@@ -1,53 +1,64 @@
-Return-Path: <netdev+bounces-25558-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25559-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9A48774B93
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 22:50:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6CD9774BA6
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 22:52:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 067AC1C20FAB
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 20:50:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 16B6E28157D
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 20:52:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9BB115495;
-	Tue,  8 Aug 2023 20:50:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAC581549A;
+	Tue,  8 Aug 2023 20:52:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFD1610FF
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 20:50:29 +0000 (UTC)
-Received: from out-123.mta1.migadu.com (out-123.mta1.migadu.com [95.215.58.123])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F97E11CDC
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 13:50:13 -0700 (PDT)
-Message-ID: <e0e08b40-4917-7b41-e3fb-1e347275be43@linux.dev>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C051A10FF
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 20:52:03 +0000 (UTC)
+Received: from out-96.mta0.migadu.com (out-96.mta0.migadu.com [91.218.175.96])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 624A315C41
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 13:52:01 -0700 (PDT)
+Message-ID: <bcd25b8c-536a-482a-bd79-095bc983baea@linux.dev>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1691527811;
+	t=1691527919;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=0wO51R1rpXagvmAqQLUK3W1Qk21JeQvWYbe9/wfKEmM=;
-	b=i+06nOX4eaxGuPpGXCN+nwEaTvrpo6OAA8K8kjoRU/j08daCcOuaODCr8EH4GIGxlYcPqm
-	m8fHftzLTomoHBMbTqJfY1b69hURAcHmEARtcmarQMzyZJb6eQIaBshdthwmpwjSLQs3Ji
-	nmoEsRJpUQnuzrNItghoXDB50z2pZqM=
-Date: Tue, 8 Aug 2023 21:50:07 +0100
+	bh=0xvoeirahWFZ+3tNj8n9ficPcKAPak4lBFOk6V+FiJU=;
+	b=NPb2ggKevHGdvXHMqS//lDI8x3nQGwGQPb6cUdkEMzTsiejj/VSYBxdNqn5UmY8lHHB/S1
+	+/Ng0nHQnpOnpnsQq0MxS1qC/Oy0q0Zjqge3DvakcnmYHiAHovNty6TNGkAu3NIF7g6E28
+	zQqWf+vcCwqAB400CTa7tQYQGMaWl0E=
+Date: Tue, 8 Aug 2023 21:51:55 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next] tools: ynl-gen: add missing empty line between
- policies
+Subject: Re: [PATCH net-next v2 2/9] dpll: spec: Add Netlink spec in YAML
 Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
-Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com
-References: <20230808200907.1290647-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Jiri Pirko <jiri@resnulli.us>,
+ Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+ Jonathan Lemon <jonathan.lemon@gmail.com>, Paolo Abeni <pabeni@redhat.com>,
+ Milena Olech <milena.olech@intel.com>,
+ Michal Michalik <michal.michalik@intel.com>,
+ linux-arm-kernel@lists.infradead.org, poros@redhat.com, mschmidt@redhat.com,
+ netdev@vger.kernel.org, linux-clk@vger.kernel.org,
+ Bart Van Assche <bvanassche@acm.org>, intel-wired-lan@lists.osuosl.org,
+ Simon Horman <simon.horman@corigine.com>
+References: <20230804190454.394062-1-vadim.fedorenko@linux.dev>
+ <20230804190454.394062-3-vadim.fedorenko@linux.dev>
+ <ZNCjwfn8MBnx4k6a@nanopsycho>
+ <a7e2f7e1-e36a-2c79-46c3-874550d24575@linux.dev>
+ <20230808130327.5638d15b@kernel.org> <20230808130617.5ad74486@kernel.org>
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20230808200907.1290647-1-kuba@kernel.org>
+In-Reply-To: <20230808130617.5ad74486@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Migadu-Flow: FLOW_OUT
@@ -58,15 +69,24 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 08/08/2023 21:09, Jakub Kicinski wrote:
-> We're missing empty line between policies.
-> DPLL will need this.
+On 08/08/2023 21:06, Jakub Kicinski wrote:
+> On Tue, 8 Aug 2023 13:03:27 -0700 Jakub Kicinski wrote:
+>>>    const struct nla_policy dpll_pin_parent_pin_nl_policy[DPLL_A_PIN_STATE
+>>> + 1] = {
+>>>           [DPLL_A_PIN_STATE] = NLA_POLICY_RANGE(NLA_U8, 1, 3),
+>>>           [DPLL_A_PIN_ID] = { .type = NLA_U32, },
+>>>
+>>>
+>>> The "/* private: */" comment was added to the generator after Simon's
+>>> comment. But I'll include this part into the next version.
+>>
+>> We only added private for enum masks, I'll send a patch for nlattrs.
 > 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> On closer look these have no kdoc, so the priv markings are not
+> necessary, dropping them sounds right.
 
-Yep, now it works perfect.
+Ok, I'll add the version which is generated by the script with the
+lastest patch, I mean with new line and priv markings.
 
-Tested-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-
-
+Thanks.
 
