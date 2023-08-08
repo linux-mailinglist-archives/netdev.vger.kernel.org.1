@@ -1,220 +1,278 @@
-Return-Path: <netdev+bounces-25309-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25285-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B576773B6C
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 17:50:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68E5E773B13
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 17:41:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9BE431C203B7
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 15:50:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 703851C20FFB
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 15:41:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42D2114F7F;
-	Tue,  8 Aug 2023 15:42:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF0A0134A2;
+	Tue,  8 Aug 2023 15:40:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31A4614F6B;
-	Tue,  8 Aug 2023 15:42:56 +0000 (UTC)
-Received: from out4-smtp.messagingengine.com (out4-smtp.messagingengine.com [66.111.4.28])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 338C94C38;
-	Tue,  8 Aug 2023 08:42:34 -0700 (PDT)
-Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
-	by mailout.nyi.internal (Postfix) with ESMTP id 044825C01BA;
-	Tue,  8 Aug 2023 01:59:23 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute6.internal (MEProxy); Tue, 08 Aug 2023 01:59:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manjusaka.me; h=
-	cc:cc:content-transfer-encoding:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:sender:subject:subject:to:to; s=fm3; t=1691474362; x=
-	1691560762; bh=DViu5+0VvFfaGHH4bzT/NrPHRN0WXpyoHKoK6Q4aOkI=; b=k
-	5wQGPWUw4F7d0kNcULOsKRRvNERd+x8S3N/Gzh/ouKapiXE8gTWvy6iPORO0R1ho
-	8Vk5IeLuF6xTYi+QAIZXJFf2j9a9ygFnOVGnVAn+WgEfNwlSVXfgo39kJEjvf5Xa
-	jCdqj306zdf1JecU7gm5Htq93lNVnhpEUCQBL4CWiRAf2d7s3g9FAQXh5BJXpUJn
-	MMVo1l+yk4KBUF+Qfcl2i0a3ELjijJQKd1fOPdQjplLRm2vnvAmER9MBZjnMq2+2
-	I69EJmofA4RDgcOpatHODOn6zMgK33Mvd3cGZWRsO+ElIR7REV8GNXFPEdM2SmUY
-	e5IbrVupJpClUXi1KIiQw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:sender:subject:subject:to:to:x-me-proxy:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1691474362; x=
-	1691560762; bh=DViu5+0VvFfaGHH4bzT/NrPHRN0WXpyoHKoK6Q4aOkI=; b=k
-	Ovmb2E8ZAuPC+h1pMiB3lK4QJ5WhxflTLs+Ad4JUxasXzZQzvrteJzw60xPyZncT
-	lSLiiaFsz3A/0fOVEupPP/mgpuQNzPWVuVMkUGYzUGDp8GN/o0SyOwYepo8K5XQ+
-	lFFQFDaNmlJtd8KUUeGrIi6d0866WigMF339l/i5jM3Bkt9nToQwQJRcfCBr6RCN
-	e01tOKfudxUsxf7qfAGPiCakk3sx5cdTLneCUs5zfqEUZ8fIMz3W454TaMXag0CW
-	1ZCzE2D61SC/xrfb/DhcUtbR4jzzRblGmM7vZ27ruEBt/7FaZzJH/4xpzcOZbGxt
-	N0lqpl13oBdHlMQVKz7zw==
-X-ME-Sender: <xms:utnRZBmAiPKwNTgpZEZiHeDu_knbVl_F6AxC-nV0NzKcqdkprMbEJw>
-    <xme:utnRZM0cN_Q8uiG3EhaEoVjnGMwULTzlUJtBz1sbste0oH5l2ZWy-0fKYS3Mb2hnb
-    v51mPxpVf3H_ExfpHY>
-X-ME-Received: <xmr:utnRZHrJs8luwdOd8P7K-5CamtmRUWj5Iv2eR_voaHWFGOeITBw3StjPVH4gbMHhT4qFgO0mcw>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrledugdellecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecunecujfgurhephffvvefufffkofgjfhgggfestdekre
-    dtredttdenucfhrhhomhepofgrnhhjuhhsrghkrgcuoehmvgesmhgrnhhjuhhsrghkrgdr
-    mhgvqeenucggtffrrghtthgvrhhnpeeuhfejieefgedvvdeuhffhvedvjeegkeejveeihf
-    egueethfevfeeikedvvdffgfenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhep
-    mhgrihhlfhhrohhmpehmvgesmhgrnhhjuhhsrghkrgdrmhgv
-X-ME-Proxy: <xmx:utnRZBnR6zWGVBJ4I24iveAG8ubLjxMsI3XVUxTs3XefEuuAHefDNw>
-    <xmx:utnRZP1BlID-dPisFNsBApjThwf_hUZxY68W-YYJfs5Dkqs8YguGOg>
-    <xmx:utnRZAsDjK6aOnLmSFgAzG0tBG0dB5LNeWFmAdebYyBXY27SE5z8Yw>
-    <xmx:utnRZIvuJCkm_lRvHB9jIqSW6ohjUnYcqHiqmOOdkPh_E8atcK-0JQ>
-Feedback-ID: i3ea9498d:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 8 Aug 2023 01:59:18 -0400 (EDT)
-From: Manjusaka <me@manjusaka.me>
-To: ncardwell@google.com
-Cc: bpf@vger.kernel.org,
-	davem@davemloft.net,
-	dsahern@kernel.org,
-	edumazet@google.com,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org,
-	me@manjusaka.me,
-	mhiramat@kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	rostedt@goodmis.org
-Subject: [PATCH v2] tracepoint: add new `tcp:tcp_ca_event` trace event
-Date: Tue,  8 Aug 2023 05:58:18 +0000
-Message-Id: <20230808055817.3979-1-me@manjusaka.me>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <CADVnQyn3UMa3Qx6cC1Rx97xLjQdG0eKsiF7oY9UR=b9vU4R-yA@mail.gmail.com>
-References: <CADVnQyn3UMa3Qx6cC1Rx97xLjQdG0eKsiF7oY9UR=b9vU4R-yA@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E306310E8
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 15:40:57 +0000 (UTC)
+Received: from mail-yw1-x112d.google.com (mail-yw1-x112d.google.com [IPv6:2607:f8b0:4864:20::112d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E7353A8B
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 08:40:35 -0700 (PDT)
+Received: by mail-yw1-x112d.google.com with SMTP id 00721157ae682-5867457e02fso4173457b3.1
+        for <netdev@vger.kernel.org>; Tue, 08 Aug 2023 08:40:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1691509203; x=1692114003;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=if5VWB18nVWwRp6UCb6aPEiH47g9I/o9CGJnGCggs6I=;
+        b=HSpsAmlxzmTTzKUFVtgDoU5q62mM0S8J0JPqoKpUT2ED6sNjNMii2ynY7tQK7hrw9r
+         ELEg22Q8hJUokOyi/dpXjOF+iSowJ/orezRlwxNXKXX+RohGRpKsmVr4h3y27MH0l8+V
+         lKOdgeUvL4SfcB2JZzMwkCTT0yYJ+6Zc2qSM5zMbi6N7BckEvxVip+UkeoPEmn1atBEY
+         gvYmHrFqocqldk0hqcSB/APVPsqCNSs5oIDEmDaxbY0VppL+mokc6QQb+KBxMsPruwQK
+         sEYZVw7jP0AUrI2VAUNrnCPGBGqXCaNbgo9FbHQaEKAj/e4k1oMv1AsbEIdf1i8PoNls
+         nF2g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691509203; x=1692114003;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=if5VWB18nVWwRp6UCb6aPEiH47g9I/o9CGJnGCggs6I=;
+        b=F/aG6poLDaHqu59Vxxbj5UTk2pvBDRGINhM0AuEvgrhwU2J8Ud38nIDlr/mLV9CPFr
+         1jgr2LrEHPM4dv0uNvGYhnKUzXlBLo2RfrJyvdPIqiksAY2SzUKa6sT8PdHJc0KGwr3V
+         AbTozOONX5xdqMrIxLWi45vslZ3X7wTgor024xjNqTYIuiHqjFoR166cTSeElz559H3r
+         1fA+stKZGE7Tmz7PFPO0QwclZtzK/b5mXix0qjQPnRe79BCmw082YbH/hHoBZMjVmytY
+         jt3pHu/FluhJtEb7bdGjhZ/LHaZv818rDEGrIdc9F7APAukS/QQFGGBORH43MZhI6ekY
+         NIkw==
+X-Gm-Message-State: AOJu0Yyu4T14rrQ5urFOEUJem2vaoJYZiKKF+D/BolAIyfB3EfCy4/E2
+	25ftqKL2s2KRmg+/adt8Q+2imwSxhpoMTjMUj9c=
+X-Google-Smtp-Source: AGHT+IGrIAD/R1XG8iT7hZdid4m31qfruz9y309af9L0+sAELwy0z1r+YzLKvbiH8nyqlY1j6mrYWw==
+X-Received: by 2002:a92:2802:0:b0:349:7518:4877 with SMTP id l2-20020a922802000000b0034975184877mr3215795ilf.0.1691479385787;
+        Tue, 08 Aug 2023 00:23:05 -0700 (PDT)
+Received: from [10.70.252.135] ([203.208.167.146])
+        by smtp.gmail.com with ESMTPSA id s15-20020a63af4f000000b00564ca424f79sm4948391pgo.48.2023.08.08.00.22.53
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 08 Aug 2023 00:23:05 -0700 (PDT)
+Message-ID: <0fdb926c-0d61-d81f-1a52-4ef634b51804@bytedance.com>
+Date: Tue, 8 Aug 2023 15:22:51 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.14.0
+Subject: Re: [PATCH v4 45/48] mm: shrinker: make global slab shrink lockless
+Content-Language: en-US
+To: Dave Chinner <david@fromorbit.com>
+Cc: akpm@linux-foundation.org, tkhai@ya.ru, vbabka@suse.cz,
+ roman.gushchin@linux.dev, djwong@kernel.org, brauner@kernel.org,
+ paulmck@kernel.org, tytso@mit.edu, steven.price@arm.com, cel@kernel.org,
+ senozhatsky@chromium.org, yujie.liu@intel.com, gregkh@linuxfoundation.org,
+ muchun.song@linux.dev, simon.horman@corigine.com, dlemoal@kernel.org,
+ linux-kernel@vger.kernel.org, linux-mm@kvack.org, x86@kernel.org,
+ kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
+ linux-erofs@lists.ozlabs.org, linux-f2fs-devel@lists.sourceforge.net,
+ cluster-devel@redhat.com, linux-nfs@vger.kernel.org,
+ linux-mtd@lists.infradead.org, rcu@vger.kernel.org, netdev@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linux-arm-msm@vger.kernel.org,
+ dm-devel@redhat.com, linux-raid@vger.kernel.org,
+ linux-bcache@vger.kernel.org, virtualization@lists.linux-foundation.org,
+ linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
+ linux-xfs@vger.kernel.org, linux-btrfs@vger.kernel.org
+References: <20230807110936.21819-1-zhengqi.arch@bytedance.com>
+ <20230807110936.21819-46-zhengqi.arch@bytedance.com>
+ <ZNGnSbiPN0lDLpSW@dread.disaster.area>
+From: Qi Zheng <zhengqi.arch@bytedance.com>
+In-Reply-To: <ZNGnSbiPN0lDLpSW@dread.disaster.area>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.0 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-In normal use case, the tcp_ca_event would be changed in high frequency.
+Hi Dave,
 
-It's a good indicator to represent the network quanlity.
+On 2023/8/8 10:24, Dave Chinner wrote:
+> On Mon, Aug 07, 2023 at 07:09:33PM +0800, Qi Zheng wrote:
+>> diff --git a/include/linux/shrinker.h b/include/linux/shrinker.h
+>> index eb342994675a..f06225f18531 100644
+>> --- a/include/linux/shrinker.h
+>> +++ b/include/linux/shrinker.h
+>> @@ -4,6 +4,8 @@
+>>   
+>>   #include <linux/atomic.h>
+>>   #include <linux/types.h>
+>> +#include <linux/refcount.h>
+>> +#include <linux/completion.h>
+>>   
+>>   #define SHRINKER_UNIT_BITS	BITS_PER_LONG
+>>   
+>> @@ -87,6 +89,10 @@ struct shrinker {
+>>   	int seeks;	/* seeks to recreate an obj */
+>>   	unsigned flags;
+>>   
+>> +	refcount_t refcount;
+>> +	struct completion done;
+>> +	struct rcu_head rcu;
+> 
+> Documentation, please. What does the refcount protect, what does the
+> completion provide, etc.
 
-So I propose to add a `tcp:tcp_ca_event` trace event
-like `tcp:tcp_cong_state_set` to help the people to
-trace the TCP connection status
+How about the following:
 
-Signed-off-by: Manjusaka <me@manjusaka.me>
----
- include/net/tcp.h          |  9 ++------
- include/trace/events/tcp.h | 45 ++++++++++++++++++++++++++++++++++++++
- net/ipv4/tcp_cong.c        | 10 +++++++++
- 3 files changed, 57 insertions(+), 7 deletions(-)
+	/*
+	 * reference count of this shrinker, holding this can guarantee
+	 * that the shrinker will not be released.
+	 */
+	refcount_t refcount;
+	/*
+	 * Wait for shrinker::refcount to reach 0, that is, no shrinker
+	 * is running or will run again.
+	 */
+	struct completion done;
 
-diff --git a/include/net/tcp.h b/include/net/tcp.h
-index 0ca972ebd3dd..a68c5b61889c 100644
---- a/include/net/tcp.h
-+++ b/include/net/tcp.h
-@@ -1154,13 +1154,8 @@ static inline bool tcp_ca_needs_ecn(const struct sock *sk)
- 	return icsk->icsk_ca_ops->flags & TCP_CONG_NEEDS_ECN;
- }
- 
--static inline void tcp_ca_event(struct sock *sk, const enum tcp_ca_event event)
--{
--	const struct inet_connection_sock *icsk = inet_csk(sk);
--
--	if (icsk->icsk_ca_ops->cwnd_event)
--		icsk->icsk_ca_ops->cwnd_event(sk, event);
--}
-+/* from tcp_cong.c */
-+void tcp_ca_event(struct sock *sk, const enum tcp_ca_event event);
- 
- /* From tcp_cong.c */
- void tcp_set_ca_state(struct sock *sk, const u8 ca_state);
-diff --git a/include/trace/events/tcp.h b/include/trace/events/tcp.h
-index bf06db8d2046..b374eb636af9 100644
---- a/include/trace/events/tcp.h
-+++ b/include/trace/events/tcp.h
-@@ -416,6 +416,51 @@ TRACE_EVENT(tcp_cong_state_set,
- 		  __entry->cong_state)
- );
- 
-+TRACE_EVENT(tcp_ca_event,
-+
-+	TP_PROTO(struct sock *sk, const u8 ca_event),
-+
-+	TP_ARGS(sk, ca_event),
-+
-+	TP_STRUCT__entry(
-+		__field(const void *, skaddr)
-+		__field(__u16, sport)
-+		__field(__u16, dport)
-+		__array(__u8, saddr, 4)
-+		__array(__u8, daddr, 4)
-+		__array(__u8, saddr_v6, 16)
-+		__array(__u8, daddr_v6, 16)
-+		__field(__u8, ca_event)
-+	),
-+
-+	TP_fast_assign(
-+		struct inet_sock *inet = inet_sk(sk);
-+		__be32 *p32;
-+
-+		__entry->skaddr = sk;
-+
-+		__entry->sport = ntohs(inet->inet_sport);
-+		__entry->dport = ntohs(inet->inet_dport);
-+
-+		p32 = (__be32 *) __entry->saddr;
-+		*p32 = inet->inet_saddr;
-+
-+		p32 = (__be32 *) __entry->daddr;
-+		*p32 =  inet->inet_daddr;
-+
-+		TP_STORE_ADDRS(__entry, inet->inet_saddr, inet->inet_daddr,
-+			   sk->sk_v6_rcv_saddr, sk->sk_v6_daddr);
-+
-+		__entry->ca_event = ca_event;
-+	),
-+
-+	TP_printk("sport=%hu dport=%hu saddr=%pI4 daddr=%pI4 saddrv6=%pI6c daddrv6=%pI6c ca_event=%u",
-+		  __entry->sport, __entry->dport,
-+		  __entry->saddr, __entry->daddr,
-+		  __entry->saddr_v6, __entry->daddr_v6,
-+		  __entry->ca_event)
-+);
-+
- #endif /* _TRACE_TCP_H */
- 
- /* This part must be outside protection */
-diff --git a/net/ipv4/tcp_cong.c b/net/ipv4/tcp_cong.c
-index 1b34050a7538..fb7ec6ebbbd0 100644
---- a/net/ipv4/tcp_cong.c
-+++ b/net/ipv4/tcp_cong.c
-@@ -34,6 +34,16 @@ struct tcp_congestion_ops *tcp_ca_find(const char *name)
- 	return NULL;
- }
- 
-+void tcp_ca_event(struct sock *sk, const enum tcp_ca_event event)
-+{
-+	const struct inet_connection_sock *icsk = inet_csk(sk);
-+
-+	trace_tcp_ca_event(sk, (u8)event);
-+
-+	if (icsk->icsk_ca_ops->cwnd_event)
-+		icsk->icsk_ca_ops->cwnd_event(sk, event);
-+}
-+
- void tcp_set_ca_state(struct sock *sk, const u8 ca_state)
- {
- 	struct inet_connection_sock *icsk = inet_csk(sk);
--- 
-2.34.1
+> 
+>> +
+>>   	void *private_data;
+>>   
+>>   	/* These are for internal use */
+>> @@ -120,6 +126,17 @@ struct shrinker *shrinker_alloc(unsigned int flags, const char *fmt, ...);
+>>   void shrinker_register(struct shrinker *shrinker);
+>>   void shrinker_free(struct shrinker *shrinker);
+>>   
+>> +static inline bool shrinker_try_get(struct shrinker *shrinker)
+>> +{
+>> +	return refcount_inc_not_zero(&shrinker->refcount);
+>> +}
+>> +
+>> +static inline void shrinker_put(struct shrinker *shrinker)
+>> +{
+>> +	if (refcount_dec_and_test(&shrinker->refcount))
+>> +		complete(&shrinker->done);
+>> +}
+>> +
+>>   #ifdef CONFIG_SHRINKER_DEBUG
+>>   extern int __printf(2, 3) shrinker_debugfs_rename(struct shrinker *shrinker,
+>>   						  const char *fmt, ...);
+>> diff --git a/mm/shrinker.c b/mm/shrinker.c
+>> index 1911c06b8af5..d318f5621862 100644
+>> --- a/mm/shrinker.c
+>> +++ b/mm/shrinker.c
+>> @@ -2,6 +2,7 @@
+>>   #include <linux/memcontrol.h>
+>>   #include <linux/rwsem.h>
+>>   #include <linux/shrinker.h>
+>> +#include <linux/rculist.h>
+>>   #include <trace/events/vmscan.h>
+>>   
+>>   #include "internal.h"
+>> @@ -577,33 +578,42 @@ unsigned long shrink_slab(gfp_t gfp_mask, int nid, struct mem_cgroup *memcg,
+>>   	if (!mem_cgroup_disabled() && !mem_cgroup_is_root(memcg))
+>>   		return shrink_slab_memcg(gfp_mask, nid, memcg, priority);
+>>   
+>> -	if (!down_read_trylock(&shrinker_rwsem))
+>> -		goto out;
+>> -
+>> -	list_for_each_entry(shrinker, &shrinker_list, list) {
+>> +	rcu_read_lock();
+>> +	list_for_each_entry_rcu(shrinker, &shrinker_list, list) {
+>>   		struct shrink_control sc = {
+>>   			.gfp_mask = gfp_mask,
+>>   			.nid = nid,
+>>   			.memcg = memcg,
+>>   		};
+>>   
+>> +		if (!shrinker_try_get(shrinker))
+>> +			continue;
+>> +
+>> +		/*
+>> +		 * We can safely unlock the RCU lock here since we already
+>> +		 * hold the refcount of the shrinker.
+>> +		 */
+>> +		rcu_read_unlock();
+>> +
+>>   		ret = do_shrink_slab(&sc, shrinker, priority);
+>>   		if (ret == SHRINK_EMPTY)
+>>   			ret = 0;
+>>   		freed += ret;
+>> +
+>>   		/*
+>> -		 * Bail out if someone want to register a new shrinker to
+>> -		 * prevent the registration from being stalled for long periods
+>> -		 * by parallel ongoing shrinking.
+>> +		 * This shrinker may be deleted from shrinker_list and freed
+>> +		 * after the shrinker_put() below, but this shrinker is still
+>> +		 * used for the next traversal. So it is necessary to hold the
+>> +		 * RCU lock first to prevent this shrinker from being freed,
+>> +		 * which also ensures that the next shrinker that is traversed
+>> +		 * will not be freed (even if it is deleted from shrinker_list
+>> +		 * at the same time).
+>>   		 */
+> 
+> This needs to be moved to the head of the function, and document
+> the whole list walk, get, put and completion parts of the algorithm
+> that make it safe. There's more to this than "we hold a reference
+> count", especially the tricky "we might see the shrinker before it
+> is fully initialised" case....
 
+How about moving these documents to before list_for_each_entry_rcu(),
+and then go to the head of shrink_slab_memcg() to explain the memcg
+slab shrink case.
+
+> 
+> 
+> .....
+>>   void shrinker_free(struct shrinker *shrinker)
+>>   {
+>>   	struct dentry *debugfs_entry = NULL;
+>> @@ -686,9 +712,18 @@ void shrinker_free(struct shrinker *shrinker)
+>>   	if (!shrinker)
+>>   		return;
+>>   
+>> +	if (shrinker->flags & SHRINKER_REGISTERED) {
+>> +		shrinker_put(shrinker);
+>> +		wait_for_completion(&shrinker->done);
+>> +	}
+> 
+> Needs a comment explaining why we need to wait here...
+
+/*
+  * Wait for all lookups of the shrinker to complete, after that, no
+  * shrinker is running or will run again, then we can safely free
+  * the structure where the shrinker is located, such as super_block
+  * etc.
+  */
+
+>> +
+>>   	down_write(&shrinker_rwsem);
+>>   	if (shrinker->flags & SHRINKER_REGISTERED) {
+>> -		list_del(&shrinker->list);
+>> +		/*
+>> +		 * Lookups on the shrinker are over and will fail in the future,
+>> +		 * so we can now remove it from the lists and free it.
+>> +		 */
+> 
+> .... rather than here after the wait has been done and provided the
+> guarantee that no shrinker is running or will run again...
+
+With the above comment, how about simplifying the comment here to the
+following:
+
+/*
+  * Now we can safely remove it from the shrinker_list and free it.
+  */
+
+Thanks,
+Qi
+
+> 
+> -Dave.
 
