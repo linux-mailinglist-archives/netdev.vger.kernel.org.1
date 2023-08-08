@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-25418-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25464-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4333773ECB
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 18:36:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69CE1774364
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 20:03:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EDD3B1C20AE6
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 16:35:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2333F28172A
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 18:03:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2353C14294;
-	Tue,  8 Aug 2023 16:35:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 623C6154B4;
+	Tue,  8 Aug 2023 18:02:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17E3714A9C
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 16:35:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 412E5154A2
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 18:02:43 +0000 (UTC)
 Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E26C90B6;
-	Tue,  8 Aug 2023 09:35:44 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E2F9A798;
+	Tue,  8 Aug 2023 10:08:42 -0700 (PDT)
 Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 378A7a2E025348;
-	Tue, 8 Aug 2023 04:27:23 -0700
+	by mx0b-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 378A8kv1028961;
+	Tue, 8 Aug 2023 04:27:29 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
  subject : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding : content-type; s=pfpt0220;
- bh=XByIP5J2zsR9geHAsK/CerIO4PGvyKW3M+zGye7jZX0=;
- b=b74fqsCcinabAizFq6litCed7y3LGuFuq0WjC8AlunabRKiTWk4D6O2wr4DEtURcUNYc
- K+TRXAw0oGd/lQEP6b4bh8OqoXFa/Vm698dvrMiR0jlmdGqZ4+ewyinEZvn/PRft8PUJ
- jFXEbvuQIoyW5C1+CO4go5Sx3WywQfIcHz4xGLLQZi3BKjnVn1gJZK7Y7F6fUX/vwkFQ
- HlpurUH5boGkjFZic8QMt4INX2CENHXtzNPRte1Awhhj+tW1n07lvtn5LxeOoa39KrJL
- KAz0LS+2OvarQX6OmcALO/D4w7/oPyh00SrnVpu5W8GmV2BYEMnZO5oZ6psU+6asl8mX QQ== 
+ bh=/KczjdWXBqcacQStwDVxBoq896dhu2pYE9pTKn9oB9U=;
+ b=DY4gzrroDMnlyTsCoOg/Y7WFA3OC1YSRZbrUSqBKKMPtPfM4oRtGv2H7ZWa7L/M+CmdL
+ 2DXOu+XDLqrdT/tKUQYkAMRmW/JsYtvq3fPOsTgdWc5C5YsBYep92BzOgCAyZfutG0X9
+ FHN46gm0Uo2IJz1yQleCSqprVQe1YnF5CXGU/Pj1ruR8bSLUa25hxOz4BTiNYGeahLOe
+ hmSNG0BMFItvz3GHUOL2wlvGXfdUQ7DtYIxiy6qGADF1PoAgowE5zeyX9qeql79G+GhF
+ BVx4DanRZ7udtUZa0XUDx66AC4YdSMKxqxz58GSqsKYc21DfNM9thQTFj/L6imoSrn+6 Hw== 
 Received: from dc5-exch01.marvell.com ([199.233.59.181])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3sbkntg7m3-1
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3sbkntg7mb-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Tue, 08 Aug 2023 04:27:23 -0700
+	Tue, 08 Aug 2023 04:27:29 -0700
 Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH01.marvell.com
  (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Tue, 8 Aug
- 2023 04:27:21 -0700
+ 2023 04:27:27 -0700
 Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
  (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Tue, 8 Aug 2023 04:27:21 -0700
+ Transport; Tue, 8 Aug 2023 04:27:27 -0700
 Received: from localhost.localdomain (unknown [10.28.36.166])
-	by maili.marvell.com (Postfix) with ESMTP id E49255B6945;
-	Tue,  8 Aug 2023 04:27:16 -0700 (PDT)
+	by maili.marvell.com (Postfix) with ESMTP id 7B17A3F7045;
+	Tue,  8 Aug 2023 04:27:22 -0700 (PDT)
 From: Suman Ghosh <sumang@marvell.com>
 To: <sgoutham@marvell.com>, <gakula@marvell.com>, <sbhatta@marvell.com>,
         <hkelam@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
@@ -53,9 +53,9 @@ To: <sgoutham@marvell.com>, <gakula@marvell.com>, <sbhatta@marvell.com>,
         <linux-kernel@vger.kernel.org>, <lcherian@marvell.com>,
         <jerinj@marvell.com>
 CC: Suman Ghosh <sumang@marvell.com>
-Subject: [net PATCH 1/3] octeontx2-pf: Update PFC configuration
-Date: Tue, 8 Aug 2023 16:57:06 +0530
-Message-ID: <20230808112708.3179218-2-sumang@marvell.com>
+Subject: [net PATCH 2/3] octeontx2-pf: Fix PFC TX scheduler free
+Date: Tue, 8 Aug 2023 16:57:07 +0530
+Message-ID: <20230808112708.3179218-3-sumang@marvell.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230808112708.3179218-1-sumang@marvell.com>
 References: <20230808112708.3179218-1-sumang@marvell.com>
@@ -67,8 +67,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-Proofpoint-GUID: U_RTILSdDK6FK-52pNCIXQUTiIX5Mh88
-X-Proofpoint-ORIG-GUID: U_RTILSdDK6FK-52pNCIXQUTiIX5Mh88
+X-Proofpoint-GUID: eS4NXuSJoSW2m5x_67yFXByO4XI6-D43
+X-Proofpoint-ORIG-GUID: eS4NXuSJoSW2m5x_67yFXByO4XI6-D43
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
  definitions=2023-08-08_09,2023-08-08_01,2023-05-22_02
@@ -79,50 +79,43 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-As of now we are creating/deleting Tx schedulers when user is
-setting PFC on/off. The problem is if we have a running traffic on
-the interface and as we are updating the sq->smq mapping on the fly,
-we might loose completion interrupt for some packets. As a result of
-that a watchdog reset is hit from BQL.
-This patch solves the issue by simply calling interface off/on APIs
-which will reconfigure all the queues. We might loss the running traffic
-momentarily but that should be fine.
+During PFC TX schedulers free, flag TXSCHQ_FREE_ALL was being set
+which caused free up all schedulers other than the PFC schedulers.
+This patch fixes that to free only the PFC Tx schedulers.
 
 Fixes: 99c969a83d82 ("octeontx2-pf: Add egress PFC support")
 Signed-off-by: Suman Ghosh <sumang@marvell.com>
 ---
- .../net/ethernet/marvell/octeontx2/nic/otx2_dcbnl.c  | 12 ++++--------
- 1 file changed, 4 insertions(+), 8 deletions(-)
+ .../ethernet/marvell/octeontx2/nic/otx2_dcbnl.c   | 15 ++++-----------
+ 1 file changed, 4 insertions(+), 11 deletions(-)
 
 diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_dcbnl.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_dcbnl.c
-index ccaf97bb1ce0..d54edfa8fcc9 100644
+index d54edfa8fcc9..c75435bab411 100644
 --- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_dcbnl.c
 +++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_dcbnl.c
-@@ -406,6 +406,7 @@ static int otx2_dcbnl_ieee_getpfc(struct net_device *dev, struct ieee_pfc *pfc)
- static int otx2_dcbnl_ieee_setpfc(struct net_device *dev, struct ieee_pfc *pfc)
+@@ -125,19 +125,12 @@ int otx2_pfc_txschq_alloc(struct otx2_nic *pfvf)
+ 
+ static int otx2_pfc_txschq_stop_one(struct otx2_nic *pfvf, u8 prio)
  {
- 	struct otx2_nic *pfvf = netdev_priv(dev);
-+	bool if_up = netif_running(dev);
- 	int err;
+-	struct nix_txsch_free_req *free_req;
++	int lvl;
  
- 	/* Save PFC configuration to interface */
-@@ -426,14 +427,9 @@ static int otx2_dcbnl_ieee_setpfc(struct net_device *dev, struct ieee_pfc *pfc)
- 	if (err)
- 		return err;
- 
--	/* Request Per channel Bpids */
--	if (pfc->pfc_en)
--		otx2_nix_config_bp(pfvf, true);
+-	mutex_lock(&pfvf->mbox.lock);
+ 	/* free PFC TLx nodes */
+-	free_req = otx2_mbox_alloc_msg_nix_txsch_free(&pfvf->mbox);
+-	if (!free_req) {
+-		mutex_unlock(&pfvf->mbox.lock);
+-		return -ENOMEM;
+-	}
 -
--	err = otx2_pfc_txschq_update(pfvf);
--	if (err) {
--		dev_err(pfvf->dev, "%s failed to update TX schedulers\n", __func__);
--		return err;
-+	if (if_up) {
-+		otx2_stop(dev);
-+		otx2_open(dev);
- 	}
+-	free_req->flags = TXSCHQ_FREE_ALL;
+-	otx2_sync_mbox_msg(&pfvf->mbox);
+-	mutex_unlock(&pfvf->mbox.lock);
++	for (lvl = 0; lvl < pfvf->hw.txschq_link_cfg_lvl; lvl++)
++		otx2_txschq_free_one(pfvf, lvl,
++				     pfvf->pfc_schq_list[lvl][prio]);
  
+ 	pfvf->pfc_alloc_status[prio] = false;
  	return 0;
 -- 
 2.25.1
