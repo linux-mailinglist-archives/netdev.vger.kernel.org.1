@@ -1,279 +1,182 @@
-Return-Path: <netdev+bounces-25319-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25283-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91D40773BB3
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 17:54:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B8C52773B05
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 17:37:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 47123280A00
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 15:54:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7B66F2818B3
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 15:37:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5775F15AD2;
-	Tue,  8 Aug 2023 15:44:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95CB312B8E;
+	Tue,  8 Aug 2023 15:37:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B2291C29
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 15:44:33 +0000 (UTC)
-Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05on2063.outbound.protection.outlook.com [40.107.21.63])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12DEB2703;
-	Tue,  8 Aug 2023 08:44:13 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=GZdUKLzPkZvXfTfaKr+siFGw1vsZ+KMubbWW8+zacvWNfo4qtgjaNG96MyatyZ4Y7n6VdBT48LrjNfqqzka+AcEnaGJNv+U74p1E2+1wps6I0e4EN+vuyQyRQr2o4r+ch6tLMdMT+eRqaRdY4b+HfpPkD1WbAo6updmiY8jHZzLgL8zHa38CJIvsHA950w7Pb4f3fyUTTxcSgravudRxgEJukb+yrB+vRzmNtF+bYc8cn6pHmnqJpr/HltNGkgeL+Zn9dcrH1lAJ36qgnKHzkbK2y7GbyPlV9J2tfuzpBcMlGpZ2Qa4OS0tExtG5nQsEkvYqQqk3cVWtuGZm9LYSJg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=N12KerHdu1ydYS1SiMV7LxAfl8IAef5F8oDw90Umk+I=;
- b=FsbZKcAF3yN2rWs9yvkTrI8Ga3ny2ZhyaKB78QE++p6opX3LeS2gMH5QXUHNI8DAk/haZbSlSobFh2uqvBzH5TOjP9PZTaLVsUcoYxjhcOP5v0U3EFS92TC32XzBoqcOak2DAfsaVkMfhUq8OTDpDWD5BDdL06SvoMoJW1m0/J5Ni1PQikp9PAdmcjnm/T+qLRFI7ksHu5W7BEpltjRw0Vc9AMSGTi+SC8c7G2+zKqyDifeHvFJ3dO0E+Ni7ccrUtF5Gq9O1cBYhTUH3lJJvLN9m/Xcomtv30kwAkDmqPyPQbU5dzxphEfMT8P8j1+K7j+8cUSVrtCWoPH9iNExM1Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=suse.com; dmarc=pass action=none header.from=suse.com;
- dkim=pass header.d=suse.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=N12KerHdu1ydYS1SiMV7LxAfl8IAef5F8oDw90Umk+I=;
- b=5psEx+8WLW9yYB3+t2qFA4oZtB1R33+0uFdvtQI7c+27VI45LAfEUqiTTnKDmUW4d9lqS44wuwqyWCCYDAR0dzQ99XnPk38k2pForWA/it2o69J9qzz/x6N/8s3LvcIaPBypOReygl0gv4LfYyCsUsjEhKJ9Le5OPk9dmawSMySZAx3+kv11+pAgTGYoGiRhxJYvv7jO+TUNHq6KFQcv/hVzSXSWlXDxVQFnq2IGo6zJ9Wnvad4cFLDpO+8ARRjq5XAzipaxDsImSEajefq1p7siCGh8OkahAQQPf9vx6nLIqUJyG3jCx4IS1urEh3nIVXT0bXg2PAmkNmooBbHubQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=suse.com;
-Received: from AM0PR0402MB3395.eurprd04.prod.outlook.com
- (2603:10a6:208:1a::16) by AM8PR04MB8019.eurprd04.prod.outlook.com
- (2603:10a6:20b:24b::12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.27; Tue, 8 Aug
- 2023 12:17:55 +0000
-Received: from AM0PR0402MB3395.eurprd04.prod.outlook.com
- ([fe80::da23:cf17:3db5:8010]) by AM0PR0402MB3395.eurprd04.prod.outlook.com
- ([fe80::da23:cf17:3db5:8010%3]) with mapi id 15.20.6652.026; Tue, 8 Aug 2023
- 12:17:55 +0000
-Message-ID: <b3c9f23c-71e5-bd2c-1574-119027636b15@suse.com>
-Date: Tue, 8 Aug 2023 14:17:53 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 07/10] mlx4: Register mlx4 devices to an
- auxiliary virtual bus
-Content-Language: en-US
-To: Zhu Yanjun <yanjun.zhu@linux.dev>
-Cc: tariqt@nvidia.com, yishaih@nvidia.com, leon@kernel.org,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, jgg@ziepe.ca, netdev@vger.kernel.org,
- linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20230804150527.6117-1-petr.pavlu@suse.com>
- <20230804150527.6117-8-petr.pavlu@suse.com>
- <4479c1a6-6e9b-b3ff-fda8-b6ef9955637b@linux.dev>
-From: Petr Pavlu <petr.pavlu@suse.com>
-In-Reply-To: <4479c1a6-6e9b-b3ff-fda8-b6ef9955637b@linux.dev>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: VI1PR0502CA0010.eurprd05.prod.outlook.com
- (2603:10a6:803:1::23) To AM0PR0402MB3395.eurprd04.prod.outlook.com
- (2603:10a6:208:1a::16)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8054E134A2
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 15:37:22 +0000 (UTC)
+Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F877103
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 08:36:28 -0700 (PDT)
+Received: by mail-ej1-x62d.google.com with SMTP id a640c23a62f3a-99c10ba30afso1456000466b.1
+        for <netdev@vger.kernel.org>; Tue, 08 Aug 2023 08:36:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1691508986; x=1692113786;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Fn7IE2pryGOHb2DoJQeDxIJbX1ZjycHHaLdxqy0m/QU=;
+        b=kV++EJwwvuuVtOA5cszXd5QxJKnjb6aM2gqdWJXUhwAsnxftnRmplw/0mqhARHQy74
+         BVvI+Zr18fwLEjqr7Xf49HOsndk+FychQxSCTs2cNEsBLMsMnHqxua/y3nSjtQXHEQZ1
+         03ikBMqy7RMHrw+VC6nM71ntE4o3L2xfVK6f2FWBU9WgQSveThHWb/b6SLuZtW//FLgJ
+         QcBWhOeiZB+7vWC6BD9FRGkiZ9/iawcJeAF1BWN6xNnIiru8ZtDbCKqq+726BRD4/e5S
+         XcA1pHcpjrcEab6r0NOhQnSymrz5sqvh8UUyDY3Ft1pjZ0+0aQzmy/N5dBu66z8EH/ww
+         7JoA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691508986; x=1692113786;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Fn7IE2pryGOHb2DoJQeDxIJbX1ZjycHHaLdxqy0m/QU=;
+        b=UmzkH2gLTs+ngNwjoIth2AiKCI8vYpokhT315Kfu3s88rhMc+ss7nGs8rfaZrP0sI+
+         vtVljmmfOUSz5EhfNqSGz4PptBJdCZL9f7r0mUnttFLdq1DpXU9tLydRtDmx0t743+od
+         shYj9QQo68oqppWgLl11O5XATdnjl3uR29k2IhqZhtv5pDFVzRABW9pMGUA51gEWMaI2
+         cAXMzZJgzPSMbl7OYnd3oJ7mJINTV4TkWr4HsDRjPNan+a4HHI7D3BSIQJG3Q2tBq2+w
+         Qg4JEaSgmuybDGQUV/6/+WUC4lr1/VoqC+GVsCSOXQoO/N0Tn2ohLxiZ+K6gJnijFFcQ
+         p4zQ==
+X-Gm-Message-State: AOJu0Yzp3qE0pcqdMKW/O8FwMf+IHQFsrr1UupNXQx4BbJF1AOtM7K1D
+	nPZJ51rFS8YIVhIWcGXLuc2nPPBjRxk=
+X-Google-Smtp-Source: AGHT+IHjsOdCNKq22sHt98MLgYlUN6bTBstt/T/RhNyJk+//HgCweo9nalaGYZ6RIlK9mtBq1YjyIg==
+X-Received: by 2002:ac2:4c4d:0:b0:4fe:d15:e1d2 with SMTP id o13-20020ac24c4d000000b004fe0d15e1d2mr3642191lfk.12.1691498592013;
+        Tue, 08 Aug 2023 05:43:12 -0700 (PDT)
+Received: from saproj-Latitude-5501.yandex.net ([2a02:6b8:0:51e:9737:440c:8f23:2506])
+        by smtp.gmail.com with ESMTPSA id a3-20020a056512020300b004fb7b4700ffsm1880821lfo.268.2023.08.08.05.43.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Aug 2023 05:43:11 -0700 (PDT)
+From: Sergei Antonov <saproj@gmail.com>
+To: netdev@vger.kernel.org
+Cc: vladimir.oltean@nxp.com,
+	Sergei Antonov <saproj@gmail.com>
+Subject: [PATCH net-next v2] net: ftmac100: add multicast filtering possibility
+Date: Tue,  8 Aug 2023 15:43:07 +0300
+Message-Id: <20230808124307.2252938-1-saproj@gmail.com>
+X-Mailer: git-send-email 2.37.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM0PR0402MB3395:EE_|AM8PR04MB8019:EE_
-X-MS-Office365-Filtering-Correlation-Id: 779dd7e5-0728-4a67-cc3c-08db98097e9a
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	/cVIt+okjc/LgdV6GX0jlp/LRgM6ArROeIizVElECWL8jntkZm2NII/wcoCpd2Hpy/DR3OcwMBlKRQntnjPi2zt2KUrI6Tl5W2mPDo3PImChMyZPeJskvw4e0jIe17xGbamLyYeeBDTdf9tFOXBImesUVSC4lxdirH9MpQXLoZinWsIpGBy/y+SJhsCnhC0UdgYuC5FJ0xM0Q5vyCksisogTSAIvG4W7ePl+0LfjETmPwFzXWwubE5poOIwNCLLozLnPqn4MznyXld8h7MtSBzlfk0iCI/KFUf212RGsqmiBGZmZFsPgPnWJQGqIE30b2zIayTKyHvGokr8gOEJKWCph3+h7xkPblrO0Ljko/mnGoEkDDE2guiSY/lIRKXc+9tij+28hcMESL+fwaZQsT7sHe46lBYeOVDZVlETheKC9QZXJHK1MHLn+a/y717WyMAI8eexR5Bh3oETPOI7TgL3OBGmB30qq1ylT6jUh3G/slQNpJUvRBkp0FpGBuuciWojgy4vUBpnjywjtXZ1nwTeeL4WZF/95ErtgaB814qKrmW7ijYYP+tjhqnM0WPm+sevUVLU16hrfm3VhMWDB0c7w487K51OEfhh7us0EjdEUF6/n+0gJuoKpCmJQ7lI1csP2jEfOSu1hYlTU1zZLQg==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR0402MB3395.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(346002)(376002)(366004)(136003)(396003)(39860400002)(186006)(1800799003)(451199021)(41300700001)(26005)(2906002)(44832011)(5660300002)(83380400001)(31686004)(7416002)(8936002)(8676002)(2616005)(478600001)(6916009)(86362001)(6506007)(316002)(31696002)(53546011)(38100700002)(66556008)(66476007)(6486002)(66946007)(6512007)(4326008)(36756003)(55236004)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?T3V6R2pRN1hhU1N2ME0rbERwRVNXelFqRzYrclAxQWRMU3hVVUpoMnJ1U0xp?=
- =?utf-8?B?VUJ1SElobHJZeXBXOXBDM1RrMVc1ampSb2xHVHJsWGtrZzBnT3hTZWVSUSsy?=
- =?utf-8?B?dWdWeC9hbjUwQkUwMmM1YUJ4UmMyNHpTTDhZY2QzaHdmak5leWVRZGFXUkor?=
- =?utf-8?B?djJDRkE0QkZXR1VWZmZoOGgwSklxbk00TDRNNkxQODFwSVk5SExvd0hCL2lZ?=
- =?utf-8?B?bUlyYnJOcVQ0MVpBbXVaR0VVbXhiMC9IUUxlZnNDNnBxYk5qcUlES1RhQlhp?=
- =?utf-8?B?RE90MXl4UDMzUEpMRHdIZFkrUE9TWkl3UVR6VW5iV2JwZTdBY1RsQlFNdy8w?=
- =?utf-8?B?OTVmd2lmaldLY3FCcVkyS0doMXA0UmtOVGtoZEQ5QmROaDhNK1JPbHpDWlIz?=
- =?utf-8?B?V2xqRHo2S1NuM3FVeHQyblNoeXo4VWpMSE42R3hmblRFZnBPeisrMlR3R3E3?=
- =?utf-8?B?ZiszZmJqSUlDS1EzeVVnMW16OWEwOWQ4MnlxSlV5ODUyYzJPOW9xU3R4aThN?=
- =?utf-8?B?YjlxbXByd3ZKSG9OMlhlYlpVZjJoRnFRSmJ3SVVtZ1c0QmtTWTdIRmtCYkor?=
- =?utf-8?B?VlFmMTFvM2RidnpzcnVTLzk2aHV3Qkd4aUZqSWZ4dzA0Wlp0MmluOXJzN3Vo?=
- =?utf-8?B?NjlDRTNzcU1Vb01oTnVZR3hsTGxZRFBydWlyRTBVcXRlQzFLMkp6YlRaazJD?=
- =?utf-8?B?bVpyK3JxWW5ZSUVIMTJGR2JVRGxlTmJwZmExTm5FdE05N1pUSEM0bmZLNjkx?=
- =?utf-8?B?UHFpSmkwS0pCQVBhWnV0WmNYU0p4cVRFcWl0di91MXBweW9Rd3lDV1JqeVpB?=
- =?utf-8?B?dW9HbmVkMmdmbUE4eUZORjkxODE5eENEckhOTEVTZlFKa1VkWGxPOXBWaEp3?=
- =?utf-8?B?Y3hJRUhwOXFMNXRzTW5MTmx6bnFCWlVzdHVuN3lVQXNFcXVVSDNOMnVocjRk?=
- =?utf-8?B?dDBzNlRwMktkUHRkMzhNNXRheVZjV0hoTUJMQ0tCZ0NrRHducEpHRGQwaUti?=
- =?utf-8?B?WUZOSU96ckk0cWZkUTBsNDhFNVRPb0F4UTE1dm1oWm9wUWg2Z1YzU2xrc0dH?=
- =?utf-8?B?NGl3c3lDaklMeHgwYklRKzIvTEw4TldUcUZqUWQzdWVlWjNLZXl1MkdseG5N?=
- =?utf-8?B?N3RuSWJadFc1Z3JnZXJyc2toMFIrVFJNRUs4ZlI1RDdmOHYwaU52VDRVRUV4?=
- =?utf-8?B?OUN5YmV6Q1IzTWpOQmNmNCtPYlowU1BzN2l3UkxDOU1zR1dxclhuMlBqY2pT?=
- =?utf-8?B?NWpMaHluWHBDWlM1dzZ3WkgyRmlyRUxxc01HM3V6Y09xcVZvWVVFcTF2M1dy?=
- =?utf-8?B?MVJGNU9nblZKaThTRmdqZkdleVYrcVFucUdOSHlxOU9ocTdIakRTWGNKU0RQ?=
- =?utf-8?B?eUpoTERuL21OcFpIVE42b0Z0TmkvVEQ1dm9HT3Irc1VPTDV6OWdVb25sK0Qy?=
- =?utf-8?B?bGtpdGlMMFhKSHkyZ1pnTWovcmlJTVBlWjRzdFp5dkVETG5OV2psTGlNemI0?=
- =?utf-8?B?VGZKZ3dEVGNFWndwaDlWbGNKejhrUEt3TFFTdnJBTmx1aitQdXVNbTFYdzh4?=
- =?utf-8?B?UnVoTkZkd2lQWHN0VnFLUXBDMTZlMkJOcVVQL0RYeFNZQmhOcTZFelZZc3pW?=
- =?utf-8?B?blFIaWlRQ3A0My9Qa0ZjN1l1OVhmRUcvZ09VZ2twR2FVYWFPNjRXVjdwVzBC?=
- =?utf-8?B?YlBYMFFiMStLSUtSaXE2REFiOGwrc21ONGNOZ1poWWlmWXhtSWRmcW5nUGRM?=
- =?utf-8?B?blBCSE9uWUV2ZStQN1BndURNT1dFYXV2S3ZjWkxoU2FyS2t5czdXUGJiaEJw?=
- =?utf-8?B?SzY0TldaNmN6clNvNUpJMndPYVhQcG9OdFBtTTdmRFlPeEsxaUliN0pXUFFk?=
- =?utf-8?B?TDc4ODJ3V2NSNGhOTERaWEhRWkFSVmluUDNTOXp2bng1bklGdGlqaTRtTzZ0?=
- =?utf-8?B?UHRVaHYzZ2FLbWVEUUFoSE5QVmZETVRQaTNBQXNuTGg3bnFpR2wzMWNOT1Jr?=
- =?utf-8?B?R2hCZGp1bzlsZWVhVnpQN3ppRjQySDFkNmxBQk9xSEhXOGlyYzNVWkRpMnl4?=
- =?utf-8?B?TU1SN0FmNjFMNXR0SzJwcjNLZUE4QmZ6QzRRVG5QZ3VOaXBWekV0ck1OWVdC?=
- =?utf-8?Q?LJG75qcQHVWM+0VS8SoZDGpUY?=
-X-OriginatorOrg: suse.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 779dd7e5-0728-4a67-cc3c-08db98097e9a
-X-MS-Exchange-CrossTenant-AuthSource: AM0PR0402MB3395.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Aug 2023 12:17:55.0690
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: f7a17af6-1c5c-4a36-aa8b-f5be247aa4ba
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: UszCcZZfk6N7hM41+2ZzronyHTe+YDOqFIRIUyexa8PTy2IBRrLuN3QmQHs8+lK1Le4pt2aEqFhXn4FSsMvTAA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM8PR04MB8019
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 8/6/23 05:16, Zhu Yanjun wrote:
-> 在 2023/8/4 23:05, Petr Pavlu 写道:
->> Add an auxiliary virtual bus to model the mlx4 driver structure. The
->> code is added along the current custom device management logic.
->> Subsequent patches switch mlx4_en and mlx4_ib to the auxiliary bus and
->> the old interface is then removed.
->>
->> Structure mlx4_priv gains a new adev dynamic array to keep track of its
->> auxiliary devices. Access to the array is protected by the global
->> mlx4_intf mutex.
->>
->> Functions mlx4_register_device() and mlx4_unregister_device() are
->> updated to expose auxiliary devices on the bus in order to load mlx4_en
->> and/or mlx4_ib. Functions mlx4_register_auxiliary_driver() and
->> mlx4_unregister_auxiliary_driver() are added to substitute
->> mlx4_register_interface() and mlx4_unregister_interface(), respectively.
->> Function mlx4_do_bond() is adjusted to walk over the adev array and
->> re-adds a specific auxiliary device if its driver sets the
->> MLX4_INTFF_BONDING flag.
->>
->> Signed-off-by: Petr Pavlu <petr.pavlu@suse.com>
->> Tested-by: Leon Romanovsky <leon@kernel.org>
->> ---
->>   drivers/net/ethernet/mellanox/mlx4/Kconfig |   1 +
->>   drivers/net/ethernet/mellanox/mlx4/intf.c  | 230 ++++++++++++++++++++-
->>   drivers/net/ethernet/mellanox/mlx4/main.c  |  17 +-
->>   drivers/net/ethernet/mellanox/mlx4/mlx4.h  |   6 +
->>   include/linux/mlx4/device.h                |   7 +
->>   include/linux/mlx4/driver.h                |  11 +
->>   6 files changed, 268 insertions(+), 4 deletions(-)
->>
->> diff --git a/drivers/net/ethernet/mellanox/mlx4/Kconfig b/drivers/net/ethernet/mellanox/mlx4/Kconfig
->> index 1b4b1f642317..825e05fb8607 100644
->> --- a/drivers/net/ethernet/mellanox/mlx4/Kconfig
->> +++ b/drivers/net/ethernet/mellanox/mlx4/Kconfig
->> @@ -27,6 +27,7 @@ config MLX4_EN_DCB
->>   config MLX4_CORE
->>   	tristate
->>   	depends on PCI
->> +	select AUXILIARY_BUS
->>   	select NET_DEVLINK
->>   	default n
->>   
->> diff --git a/drivers/net/ethernet/mellanox/mlx4/intf.c b/drivers/net/ethernet/mellanox/mlx4/intf.c
->> index 30aead34ce08..4b1e18e4a682 100644
->> --- a/drivers/net/ethernet/mellanox/mlx4/intf.c
->> +++ b/drivers/net/ethernet/mellanox/mlx4/intf.c
->> @@ -48,6 +48,89 @@ struct mlx4_device_context {
->>   static LIST_HEAD(intf_list);
->>   static LIST_HEAD(dev_list);
->>   static DEFINE_MUTEX(intf_mutex);
->> +static DEFINE_IDA(mlx4_adev_ida);
->> +
->> +static const struct mlx4_adev_device {
->> +	const char *suffix;
->> +	bool (*is_supported)(struct mlx4_dev *dev);
->> +} mlx4_adev_devices[1] = {};
->> +
->> +int mlx4_adev_init(struct mlx4_dev *dev)
->> +{
->> +	struct mlx4_priv *priv = mlx4_priv(dev);
->> +
->> +	priv->adev_idx = ida_alloc(&mlx4_adev_ida, GFP_KERNEL);
->> +	if (priv->adev_idx < 0)
->> +		return priv->adev_idx;
->> +
->> +	priv->adev = kcalloc(ARRAY_SIZE(mlx4_adev_devices),
->> +			     sizeof(struct mlx4_adev *), GFP_KERNEL);
->> +	if (!priv->adev) {
->> +		ida_free(&mlx4_adev_ida, priv->adev_idx);
->> +		return -ENOMEM;
->> +	}
->> +
->> +	return 0;
->> +}
->> +
->> +void mlx4_adev_cleanup(struct mlx4_dev *dev)
->> +{
->> +	struct mlx4_priv *priv = mlx4_priv(dev);
->> +
->> +	kfree(priv->adev);
->> +	ida_free(&mlx4_adev_ida, priv->adev_idx);
->> +}
->> +
->> +static void adev_release(struct device *dev)
->> +{
->> +	struct mlx4_adev *mlx4_adev =
->> +		container_of(dev, struct mlx4_adev, adev.dev);
->> +	struct mlx4_priv *priv = mlx4_priv(mlx4_adev->mdev);
->> +	int idx = mlx4_adev->idx;
->> +
->> +	kfree(mlx4_adev);
->> +	priv->adev[idx] = NULL;
->> +}
->> +
->> +static struct mlx4_adev *add_adev(struct mlx4_dev *dev, int idx)
->> +{
->> +	struct mlx4_priv *priv = mlx4_priv(dev);
->> +	const char *suffix = mlx4_adev_devices[idx].suffix;
->> +	struct auxiliary_device *adev;
->> +	struct mlx4_adev *madev;
->> +	int ret;
->> +
->> +	madev = kzalloc(sizeof(*madev), GFP_KERNEL);
->> +	if (!madev)
->> +		return ERR_PTR(-ENOMEM);
->> +
->> +	adev = &madev->adev;
->> +	adev->id = priv->adev_idx;
->> +	adev->name = suffix;
->> +	adev->dev.parent = &dev->persist->pdev->dev;
->> +	adev->dev.release = adev_release;
->> +	madev->mdev = dev;
->> +	madev->idx = idx;
->> +
->> +	ret = auxiliary_device_init(adev);
->> +	if (ret) {
->> +		kfree(madev);
->> +		return ERR_PTR(ret);
->> +	}
->> +
->> +	ret = auxiliary_device_add(adev);
->> +	if (ret) {
-> 
-> madev is allocated, but it is not handled here when auxiliary_device_add 
-> error. It should be freed, too?
-> That is, add "kfree(madev);" here?
-> 
-> If madev will be handled in other place, please add some comments here 
-> to indicate madev is handled in other place.
+If netdev_mc_count() is not zero and not IFF_ALLMULTI, filter
+incoming multicast packets. The chip has a Multicast Address Hash Table
+for allowed multicast addresses, so we fill it.
 
-A successful call to auxiliary_device_init() registers the device's
-.release callback. The madev storage is freed by calling
-auxiliary_device_uninit() which invokes adev_release() -> kfree().
+Implement .ndo_set_rx_mode and recalculate multicast hash table. Also
+observe change of IFF_PROMISC and IFF_ALLMULTI netdev flags.
 
-Thanks,
-Petr
+Signed-off-by: Sergei Antonov <saproj@gmail.com>
+---
+v1 -> v2:
+* fix hashing algorithm (the old one was based on bad testing)
+* observe change of IFF_PROMISC, IFF_ALLMULTI in set_rx_mode
+* u64 and BIT_ULL code simplification suggested by Vladimir Oltean
+---
+ drivers/net/ethernet/faraday/ftmac100.c | 50 ++++++++++++++++++++++---
+ 1 file changed, 45 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/net/ethernet/faraday/ftmac100.c b/drivers/net/ethernet/faraday/ftmac100.c
+index 139fe66f8bcd..183069581bc0 100644
+--- a/drivers/net/ethernet/faraday/ftmac100.c
++++ b/drivers/net/ethernet/faraday/ftmac100.c
+@@ -149,6 +149,40 @@ static void ftmac100_set_mac(struct ftmac100 *priv, const unsigned char *mac)
+ 	iowrite32(laddr, priv->base + FTMAC100_OFFSET_MAC_LADR);
+ }
+ 
++static void ftmac100_setup_mc_ht(struct ftmac100 *priv)
++{
++	struct netdev_hw_addr *ha;
++	u64 maht = 0; /* Multicast Address Hash Table */
++
++	netdev_for_each_mc_addr(ha, priv->netdev) {
++		u32 hash = ether_crc(ETH_ALEN, ha->addr) >> 26;
++
++		maht |= BIT_ULL(hash);
++	}
++
++	iowrite32(lower_32_bits(maht), priv->base + FTMAC100_OFFSET_MAHT0);
++	iowrite32(upper_32_bits(maht), priv->base + FTMAC100_OFFSET_MAHT1);
++}
++
++static void ftmac100_set_rx_bits(struct ftmac100 *priv, unsigned int *maccr)
++{
++	struct net_device *netdev = priv->netdev;
++
++	/* Clear all */
++	*maccr &= ~(FTMAC100_MACCR_RCV_ALL | FTMAC100_MACCR_RX_MULTIPKT |
++		   FTMAC100_MACCR_HT_MULTI_EN);
++
++	/* Set the requested bits */
++	if (netdev->flags & IFF_PROMISC)
++		*maccr |= FTMAC100_MACCR_RCV_ALL;
++	if (netdev->flags & IFF_ALLMULTI)
++		*maccr |= FTMAC100_MACCR_RX_MULTIPKT;
++	else if (netdev_mc_count(netdev)) {
++		*maccr |= FTMAC100_MACCR_HT_MULTI_EN;
++		ftmac100_setup_mc_ht(priv);
++	}
++}
++
+ #define MACCR_ENABLE_ALL	(FTMAC100_MACCR_XMT_EN	| \
+ 				 FTMAC100_MACCR_RCV_EN	| \
+ 				 FTMAC100_MACCR_XDMA_EN	| \
+@@ -182,11 +216,7 @@ static int ftmac100_start_hw(struct ftmac100 *priv)
+ 	if (netdev->mtu > ETH_DATA_LEN)
+ 		maccr |= FTMAC100_MACCR_RX_FTL;
+ 
+-	/* Add other bits as needed */
+-	if (netdev->flags & IFF_PROMISC)
+-		maccr |= FTMAC100_MACCR_RCV_ALL;
+-	if (netdev->flags & IFF_ALLMULTI)
+-		maccr |= FTMAC100_MACCR_RX_MULTIPKT;
++	ftmac100_set_rx_bits(priv, &maccr);
+ 
+ 	iowrite32(maccr, priv->base + FTMAC100_OFFSET_MACCR);
+ 	return 0;
+@@ -1067,6 +1097,15 @@ static int ftmac100_change_mtu(struct net_device *netdev, int mtu)
+ 	return 0;
+ }
+ 
++static void ftmac100_set_rx_mode(struct net_device *netdev)
++{
++	struct ftmac100 *priv = netdev_priv(netdev);
++	unsigned int maccr = ioread32(priv->base + FTMAC100_OFFSET_MACCR);
++
++	ftmac100_set_rx_bits(priv, &maccr);
++	iowrite32(maccr, priv->base + FTMAC100_OFFSET_MACCR);
++}
++
+ static const struct net_device_ops ftmac100_netdev_ops = {
+ 	.ndo_open		= ftmac100_open,
+ 	.ndo_stop		= ftmac100_stop,
+@@ -1075,6 +1114,7 @@ static const struct net_device_ops ftmac100_netdev_ops = {
+ 	.ndo_validate_addr	= eth_validate_addr,
+ 	.ndo_eth_ioctl		= ftmac100_do_ioctl,
+ 	.ndo_change_mtu		= ftmac100_change_mtu,
++	.ndo_set_rx_mode	= ftmac100_set_rx_mode,
+ };
+ 
+ /******************************************************************************
+-- 
+2.37.2
+
 
