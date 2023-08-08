@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-25492-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25493-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE020774528
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 20:38:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 559D9774532
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 20:38:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8CE3828186C
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 18:38:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 31D381C20E89
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 18:38:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8520A13AFA;
-	Tue,  8 Aug 2023 18:37:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8436313FF5;
+	Tue,  8 Aug 2023 18:38:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A12814290
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 18:37:45 +0000 (UTC)
-Received: from mail-yw1-x112e.google.com (mail-yw1-x112e.google.com [IPv6:2607:f8b0:4864:20::112e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A827CE88A
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 11:03:31 -0700 (PDT)
-Received: by mail-yw1-x112e.google.com with SMTP id 00721157ae682-5768a7e3adbso1770137b3.0
-        for <netdev@vger.kernel.org>; Tue, 08 Aug 2023 11:03:31 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79F0214AB2
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 18:38:01 +0000 (UTC)
+Received: from mail-yw1-x112b.google.com (mail-yw1-x112b.google.com [IPv6:2607:f8b0:4864:20::112b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A8EAF3A3E
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 11:03:32 -0700 (PDT)
+Received: by mail-yw1-x112b.google.com with SMTP id 00721157ae682-586df08bba0so27646627b3.3
+        for <netdev@vger.kernel.org>; Tue, 08 Aug 2023 11:03:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1691517810; x=1692122610;
+        d=gmail.com; s=20221208; t=1691517811; x=1692122611;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=pnmYH4oSRZk/a+0UAjLBAVyQf+tUSWrjkce2OBniiiI=;
-        b=Er2rYBzbaprkZRAn8+2DZovz0nOHuJB894ttwRGV9CHrUbk2tLwlYGPP1iwx5GcNN5
-         66jw+QXGTXFJJ1AT54f2o6gpgAVWhMivmKGFhoP8FTfXX6c74pwRxLFnf7QIiBnMaAlv
-         tN0BvTXvOmRmrbol7M/xfHj/FSEKGnPlHTzFz4K4D2x37WlTdRcS8Ue9pXzZzxa/plfp
-         egWNVP3OK/KTKLHwFZ8CBHMQfkLAAXuyyvoWkgp/DMo5+jF0FkU46G01T8fq3JDC9Uv0
-         708KX0hT6X1X1rVSwxPmuzKJ27D0uOBz1vmm3HpGIdE6q6uHWjjUbIelRaubjJ/670/e
-         UwTQ==
+        bh=r2EqL7a+3pT/pYF2vK7r1x0jpubF0xUW9s343oZ/t8w=;
+        b=R5WIpzjt9nXJ8d2bcdblJj7WjyhNGeOOAsPd8AWGuKANynbYnF9uZuJluF7UEUQgsL
+         HZNjPu/sjVLrds39+lpq5zpA5gI6oGMmprRtLrtW3/7prjAyKQ1J0/beOfZAyUlrmnbz
+         x/kv71SyOEf0ryGLz5bX2bx0fMtwOw4pOSk+9q1MDuw0b4pNzhKinmXn2gOz3YpMlsad
+         nIpl8WR+9yazbBiKNuJAaqpUfr/iXGRj6RPrYdSgtwhEkBPlt6g2zyTvbXB9jACnBNth
+         GqjOkzZQQUGlerILBBOJpK83Yah6bkI3Q6GeI8LoSE+yW307+mXyo/hwayMn+Jtwl9MT
+         lzgg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691517810; x=1692122610;
+        d=1e100.net; s=20221208; t=1691517811; x=1692122611;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=pnmYH4oSRZk/a+0UAjLBAVyQf+tUSWrjkce2OBniiiI=;
-        b=LKJaCaCJZ1OQPbsq3j7uTjd0FCSQi7FlORR7CYOP+8x7nj26Qg8ZClDBnzKVZazSFj
-         c9DokSLp3nIfi67qjpW8JMlJd9lWgfF6kKNCdU7KgE09xqoiheQd4GZDdUjw5AGQDgkE
-         ft0cm2dVpGZ51Ec4Wsd+OVs1Rruy83pLknsmgZ/3SpQGDKh2nh6aYDuW3RIxKZGW+61T
-         hPpZt/2bSkf2EPEfwwFABpXe4n5QMZunbufPYtEZHNJg+wAAkNp8+foV/qmQ9xtsspXp
-         uyF30H2+Z724TM2DuUXVtv9qhORm9/MCMp0NgTyiMluuMe+p8VJGbQQsCWORk8oFnUi8
-         3eZA==
-X-Gm-Message-State: AOJu0Yx8sXe33dsAaIloFqZ6WY/atonSs4Tx/FnYxi3C53VC0ddg5fV/
-	L+RiIQ5atSEL5xcKa0k9igzJg2fe/3TI2A==
-X-Google-Smtp-Source: AGHT+IGEuIWv4X5DR+jNnjeQqeFeO0qMqHSIPcAEdcJOtFZRqAXrGWKHySqPC3gRx+U9Pce/W3H7DQ==
-X-Received: by 2002:a81:6c45:0:b0:586:9384:ffd7 with SMTP id h66-20020a816c45000000b005869384ffd7mr11633826ywc.9.1691517810289;
-        Tue, 08 Aug 2023 11:03:30 -0700 (PDT)
+        bh=r2EqL7a+3pT/pYF2vK7r1x0jpubF0xUW9s343oZ/t8w=;
+        b=e+G5vf50m8yE1i3G5eDtaF62/IXNYI/F9/HR780rzjgQY8Mizridgs9c9KAKCSsUBE
+         zKKlnn10Hah2Hwg6Ci//hiwiiMfxZuLUX8Xwcsqi98LYHoSYQri2ziO6qlOXXgXeZ6ow
+         06AsqM3qAuL+v5KXzWUXvh2j0JrhQ32RgD/KdYGodBFbDbN/+wtvqB9iI4NJ+Vw5jJem
+         blAPNxmnV7eg4pBK1MJQDfKLzxOtMLULYq4wRoYjnp8KzFFB9COrN9uI4zLBHClaJ3s+
+         +GLu8xArx8U70pv+EYb4jPi5F8CtUKJbmbtWv6SJWYfqi1YOSRJHUcriBEaE23GKMChs
+         sFYw==
+X-Gm-Message-State: AOJu0YzUtrhlH7uNoUqNnAX1gWkkCmg4gyu3BNagpx3bffTVyW98p7AL
+	3QoSZqzkxGWTv8TmfX6q1vU=
+X-Google-Smtp-Source: AGHT+IEZvBplLbmw1SLxwuCnkXSv2Ogl1GGBQbBglgMxx0DR6LW7RROurgPNifZ7tZ6Av9vAiAxs9g==
+X-Received: by 2002:a0d:ddcb:0:b0:576:98e0:32a6 with SMTP id g194-20020a0dddcb000000b0057698e032a6mr496023ywe.14.1691517811594;
+        Tue, 08 Aug 2023 11:03:31 -0700 (PDT)
 Received: from kickker.attlocal.net ([2600:1700:6cf8:1240:791:e1e6:ba74:485a])
-        by smtp.gmail.com with ESMTPSA id s6-20020a815e06000000b005731dbd4928sm3458358ywb.69.2023.08.08.11.03.29
+        by smtp.gmail.com with ESMTPSA id s6-20020a815e06000000b005731dbd4928sm3458358ywb.69.2023.08.08.11.03.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Aug 2023 11:03:29 -0700 (PDT)
+        Tue, 08 Aug 2023 11:03:31 -0700 (PDT)
 From: thinker.li@gmail.com
 To: dsahern@kernel.org,
 	davem@davemloft.net,
@@ -69,9 +69,9 @@ To: dsahern@kernel.org,
 Cc: sinquersw@gmail.com,
 	kuifeng@meta.com,
 	Kui-Feng Lee <thinker.li@gmail.com>
-Subject: [PATCH net-next v6 1/2] net/ipv6: Remove expired routes with a separated list of routes.
-Date: Tue,  8 Aug 2023 11:03:08 -0700
-Message-Id: <20230808180309.542341-2-thinker.li@gmail.com>
+Subject: [PATCH net-next v6 2/2] selftests: fib_tests: Add a test case for IPv6 garbage collection
+Date: Tue,  8 Aug 2023 11:03:09 -0700
+Message-Id: <20230808180309.542341-3-thinker.li@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230808180309.542341-1-thinker.li@gmail.com>
 References: <20230808180309.542341-1-thinker.li@gmail.com>
@@ -91,266 +91,121 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 
 From: Kui-Feng Lee <thinker.li@gmail.com>
 
-FIB6 GC walks trees of fib6_tables to remove expired routes. Walking a tree
-can be expensive if the number of routes in a table is big, even if most of
-them are permanent. Checking routes in a separated list of routes having
-expiration will avoid this potential issue.
+Add 1000 IPv6 routes with expiration time (w/ and w/o additional 5000
+permanet routes in the background.)  Wait for a few seconds to make sure
+they are removed correctly.
+
+The expected output of the test looks like the following example.
+
+> Fib6 garbage collection test
+>     TEST: ipv6 route garbage collection [ OK ]
 
 Signed-off-by: Kui-Feng Lee <thinker.li@gmail.com>
 ---
- include/net/ip6_fib.h | 65 ++++++++++++++++++++++++++++++++++---------
- net/ipv6/ip6_fib.c    | 57 +++++++++++++++++++++++++++++++++----
- net/ipv6/route.c      |  6 ++--
- 3 files changed, 106 insertions(+), 22 deletions(-)
+ tools/testing/selftests/net/fib_tests.sh | 72 +++++++++++++++++++++++-
+ 1 file changed, 69 insertions(+), 3 deletions(-)
 
-diff --git a/include/net/ip6_fib.h b/include/net/ip6_fib.h
-index 05e6f756feaf..e6f4d986fb63 100644
---- a/include/net/ip6_fib.h
-+++ b/include/net/ip6_fib.h
-@@ -179,6 +179,9 @@ struct fib6_info {
+diff --git a/tools/testing/selftests/net/fib_tests.sh b/tools/testing/selftests/net/fib_tests.sh
+index 35d89dfa6f11..c14ad6e75c1e 100755
+--- a/tools/testing/selftests/net/fib_tests.sh
++++ b/tools/testing/selftests/net/fib_tests.sh
+@@ -9,13 +9,16 @@ ret=0
+ ksft_skip=4
  
- 	refcount_t			fib6_ref;
- 	unsigned long			expires;
-+
-+	struct hlist_node		gc_link;
-+
- 	struct dst_metrics		*fib6_metrics;
- #define fib6_pmtu		fib6_metrics->metrics[RTAX_MTU-1]
+ # all tests in this script. Can be overridden with -t option
+-TESTS="unregister down carrier nexthop suppress ipv6_notify ipv4_notify ipv6_rt ipv4_rt ipv6_addr_metric ipv4_addr_metric ipv6_route_metrics ipv4_route_metrics ipv4_route_v6_gw rp_filter ipv4_del_addr ipv4_mangle ipv6_mangle ipv4_bcast_neigh"
++TESTS="unregister down carrier nexthop suppress ipv6_notify ipv4_notify \
++       ipv6_rt ipv4_rt ipv6_addr_metric ipv4_addr_metric ipv6_route_metrics \
++       ipv4_route_metrics ipv4_route_v6_gw rp_filter ipv4_del_addr \
++       ipv4_mangle ipv6_mangle ipv4_bcast_neigh fib6_gc_test"
  
-@@ -247,19 +250,6 @@ static inline bool fib6_requires_src(const struct fib6_info *rt)
- 	return rt->fib6_src.plen > 0;
+ VERBOSE=0
+ PAUSE_ON_FAIL=no
+ PAUSE=no
+-IP="ip -netns ns1"
+-NS_EXEC="ip netns exec ns1"
++IP="$(which ip) -netns ns1"
++NS_EXEC="$(which ip) netns exec ns1"
+ 
+ which ping6 > /dev/null 2>&1 && ping6=$(which ping6) || ping6=$(which ping)
+ 
+@@ -747,6 +750,68 @@ fib_notify_test()
+ 	cleanup &> /dev/null
  }
  
--static inline void fib6_clean_expires(struct fib6_info *f6i)
--{
--	f6i->fib6_flags &= ~RTF_EXPIRES;
--	f6i->expires = 0;
--}
--
--static inline void fib6_set_expires(struct fib6_info *f6i,
--				    unsigned long expires)
--{
--	f6i->expires = expires;
--	f6i->fib6_flags |= RTF_EXPIRES;
--}
--
- static inline bool fib6_check_expired(const struct fib6_info *f6i)
++fib6_gc_test()
++{
++	setup
++
++	echo
++	echo "Fib6 garbage collection test"
++	set -e
++
++	EXPIRE=3
++
++	# Check expiration of routes every $EXPIRE seconds (GC)
++	$NS_EXEC sysctl -wq net.ipv6.route.gc_interval=$EXPIRE
++
++	$IP link add dummy_10 type dummy
++	$IP link set dev dummy_10 up
++	$IP -6 address add 2001:10::1/64 dev dummy_10
++
++	$NS_EXEC sysctl -wq net.ipv6.route.flush=1
++
++	# Temporary routes
++	for i in $(seq 1 1000); do
++	    # Expire route after $EXPIRE seconds
++	    $IP -6 route add 2001:20::$i \
++		via 2001:10::2 dev dummy_10 expires $EXPIRE
++	done
++	sleep $(($EXPIRE * 2))
++	N_EXP_SLEEP=$($IP -6 route list |grep expires|wc -l)
++	if [ $N_EXP_SLEEP -ne 0 ]; then
++	    echo "FAIL: expected 0 routes with expires, got $N_EXP_SLEEP"
++	    ret=1
++	else
++	    ret=0
++	fi
++
++	# Permanent routes
++	for i in $(seq 1 5000); do
++	    $IP -6 route add 2001:30::$i \
++		via 2001:10::2 dev dummy_10
++	done
++	# Temporary routes
++	for i in $(seq 1 1000); do
++	    # Expire route after $EXPIRE seconds
++	    $IP -6 route add 2001:20::$i \
++		via 2001:10::2 dev dummy_10 expires $EXPIRE
++	done
++	sleep $(($EXPIRE * 2))
++	N_EXP_SLEEP=$($IP -6 route list |grep expires|wc -l)
++	if [ $N_EXP_SLEEP -ne 0 ]; then
++	    echo "FAIL: expected 0 routes with expires," \
++		 "got $N_EXP_SLEEP (5000 permanent routes)"
++	    ret=1
++	else
++	    ret=0
++	fi
++
++	set +e
++
++	log_test $ret 0 "ipv6 route garbage collection"
++
++	cleanup &> /dev/null
++}
++
+ fib_suppress_test()
  {
- 	if (f6i->fib6_flags & RTF_EXPIRES)
-@@ -267,6 +257,11 @@ static inline bool fib6_check_expired(const struct fib6_info *f6i)
- 	return false;
- }
+ 	echo
+@@ -2217,6 +2282,7 @@ do
+ 	ipv4_mangle)			ipv4_mangle_test;;
+ 	ipv6_mangle)			ipv6_mangle_test;;
+ 	ipv4_bcast_neigh)		ipv4_bcast_neigh_test;;
++	fib6_gc_test|ipv6_gc)		fib6_gc_test;;
  
-+static inline bool fib6_has_expires(const struct fib6_info *f6i)
-+{
-+	return f6i->fib6_flags & RTF_EXPIRES;
-+}
-+
- /* Function to safely get fn->fn_sernum for passed in rt
-  * and store result in passed in cookie.
-  * Return true if we can get cookie safely
-@@ -388,6 +383,7 @@ struct fib6_table {
- 	struct inet_peer_base	tb6_peers;
- 	unsigned int		flags;
- 	unsigned int		fib_seq;
-+	struct hlist_head       tb6_gc_hlist;	/* GC candidates */
- #define RT6_TABLE_HAS_DFLT_ROUTER	BIT(0)
- };
- 
-@@ -504,6 +500,49 @@ void fib6_gc_cleanup(void);
- 
- int fib6_init(void);
- 
-+/* fib6_info must be locked by the caller, and fib6_info->fib6_table can be
-+ * NULL.
-+ */
-+static inline void fib6_set_expires_locked(struct fib6_info *f6i, unsigned long expires)
-+{
-+	struct fib6_table *tb6;
-+
-+	tb6 = f6i->fib6_table;
-+	f6i->expires = expires;
-+	if (tb6 && !fib6_has_expires(f6i))
-+		hlist_add_head(&f6i->gc_link, &tb6->tb6_gc_hlist);
-+	f6i->fib6_flags |= RTF_EXPIRES;
-+}
-+
-+/* fib6_info must be locked by the caller, and fib6_info->fib6_table can be
-+ * NULL.  If fib6_table is NULL, the fib6_info will no be inserted into the
-+ * list of GC candidates until it is inserted into a table.
-+ */
-+static inline void fib6_set_expires(struct fib6_info *f6i, unsigned long expires)
-+{
-+	spin_lock_bh(&f6i->fib6_table->tb6_lock);
-+	fib6_set_expires_locked(f6i, expires);
-+	spin_unlock_bh(&f6i->fib6_table->tb6_lock);
-+}
-+
-+static inline void fib6_clean_expires_locked(struct fib6_info *f6i)
-+{
-+	struct fib6_table *tb6;
-+
-+	tb6 = f6i->fib6_table;
-+	if (tb6 && fib6_has_expires(f6i))
-+		hlist_del_init(&f6i->gc_link);
-+	f6i->fib6_flags &= ~RTF_EXPIRES;
-+	f6i->expires = 0;
-+}
-+
-+static inline void fib6_clean_expires(struct fib6_info *f6i)
-+{
-+	spin_lock_bh(&f6i->fib6_table->tb6_lock);
-+	fib6_clean_expires_locked(f6i);
-+	spin_unlock_bh(&f6i->fib6_table->tb6_lock);
-+}
-+
- struct ipv6_route_iter {
- 	struct seq_net_private p;
- 	struct fib6_walker w;
-diff --git a/net/ipv6/ip6_fib.c b/net/ipv6/ip6_fib.c
-index bac768d36cc1..8e86b67fe5ef 100644
---- a/net/ipv6/ip6_fib.c
-+++ b/net/ipv6/ip6_fib.c
-@@ -160,6 +160,8 @@ struct fib6_info *fib6_info_alloc(gfp_t gfp_flags, bool with_fib6_nh)
- 	INIT_LIST_HEAD(&f6i->fib6_siblings);
- 	refcount_set(&f6i->fib6_ref, 1);
- 
-+	INIT_HLIST_NODE(&f6i->gc_link);
-+
- 	return f6i;
- }
- 
-@@ -246,6 +248,7 @@ static struct fib6_table *fib6_alloc_table(struct net *net, u32 id)
- 				   net->ipv6.fib6_null_entry);
- 		table->tb6_root.fn_flags = RTN_ROOT | RTN_TL_ROOT | RTN_RTINFO;
- 		inet_peer_base_init(&table->tb6_peers);
-+		INIT_HLIST_HEAD(&table->tb6_gc_hlist);
- 	}
- 
- 	return table;
-@@ -1057,6 +1060,11 @@ static void fib6_purge_rt(struct fib6_info *rt, struct fib6_node *fn,
- 				    lockdep_is_held(&table->tb6_lock));
- 		}
- 	}
-+
-+	if (fib6_has_expires(rt)) {
-+		hlist_del_init(&rt->gc_link);
-+		rt->fib6_flags &= ~RTF_EXPIRES;
-+	}
- }
- 
- /*
-@@ -1118,9 +1126,9 @@ static int fib6_add_rt2node(struct fib6_node *fn, struct fib6_info *rt,
- 				if (!(iter->fib6_flags & RTF_EXPIRES))
- 					return -EEXIST;
- 				if (!(rt->fib6_flags & RTF_EXPIRES))
--					fib6_clean_expires(iter);
-+					fib6_clean_expires_locked(iter);
- 				else
--					fib6_set_expires(iter, rt->expires);
-+					fib6_set_expires_locked(iter, rt->expires);
- 
- 				if (rt->fib6_pmtu)
- 					fib6_metric_set(iter, RTAX_MTU,
-@@ -1479,6 +1487,10 @@ int fib6_add(struct fib6_node *root, struct fib6_info *rt,
- 		if (rt->nh)
- 			list_add(&rt->nh_list, &rt->nh->f6i_list);
- 		__fib6_update_sernum_upto_root(rt, fib6_new_sernum(info->nl_net));
-+
-+		if (fib6_has_expires(rt))
-+			hlist_add_head(&rt->gc_link, &table->tb6_gc_hlist);
-+
- 		fib6_start_gc(info->nl_net, rt);
- 	}
- 
-@@ -2285,9 +2297,8 @@ static void fib6_flush_trees(struct net *net)
-  *	Garbage collection
-  */
- 
--static int fib6_age(struct fib6_info *rt, void *arg)
-+static int fib6_age(struct fib6_info *rt, struct fib6_gc_args *gc_args)
- {
--	struct fib6_gc_args *gc_args = arg;
- 	unsigned long now = jiffies;
- 
- 	/*
-@@ -2295,7 +2306,7 @@ static int fib6_age(struct fib6_info *rt, void *arg)
- 	 *	Routes are expired even if they are in use.
- 	 */
- 
--	if (rt->fib6_flags & RTF_EXPIRES && rt->expires) {
-+	if (fib6_has_expires(rt) && rt->expires) {
- 		if (time_after(now, rt->expires)) {
- 			RT6_TRACE("expiring %p\n", rt);
- 			return -1;
-@@ -2312,6 +2323,40 @@ static int fib6_age(struct fib6_info *rt, void *arg)
- 	return 0;
- }
- 
-+static void fib6_gc_table(struct net *net,
-+			  struct fib6_table *tb6,
-+			  struct fib6_gc_args *gc_args)
-+{
-+	struct fib6_info *rt;
-+	struct hlist_node *n;
-+	struct nl_info info = {
-+		.nl_net = net,
-+		.skip_notify = false,
-+	};
-+
-+	hlist_for_each_entry_safe(rt, n, &tb6->tb6_gc_hlist, gc_link)
-+		if (fib6_age(rt, gc_args) == -1)
-+			fib6_del(rt, &info);
-+}
-+
-+static void fib6_gc_all(struct net *net, struct fib6_gc_args *gc_args)
-+{
-+	struct fib6_table *table;
-+	struct hlist_head *head;
-+	unsigned int h;
-+
-+	rcu_read_lock();
-+	for (h = 0; h < FIB6_TABLE_HASHSZ; h++) {
-+		head = &net->ipv6.fib_table_hash[h];
-+		hlist_for_each_entry_rcu(table, head, tb6_hlist) {
-+			spin_lock_bh(&table->tb6_lock);
-+			fib6_gc_table(net, table, gc_args);
-+			spin_unlock_bh(&table->tb6_lock);
-+		}
-+	}
-+	rcu_read_unlock();
-+}
-+
- void fib6_run_gc(unsigned long expires, struct net *net, bool force)
- {
- 	struct fib6_gc_args gc_args;
-@@ -2327,7 +2372,7 @@ void fib6_run_gc(unsigned long expires, struct net *net, bool force)
- 			  net->ipv6.sysctl.ip6_rt_gc_interval;
- 	gc_args.more = 0;
- 
--	fib6_clean_all(net, fib6_age, &gc_args);
-+	fib6_gc_all(net, &gc_args);
- 	now = jiffies;
- 	net->ipv6.ip6_rt_last_gc = now;
- 
-diff --git a/net/ipv6/route.c b/net/ipv6/route.c
-index 10751df16dab..db10c36f34bb 100644
---- a/net/ipv6/route.c
-+++ b/net/ipv6/route.c
-@@ -3761,10 +3761,10 @@ static struct fib6_info *ip6_route_info_create(struct fib6_config *cfg,
- 		rt->dst_nocount = true;
- 
- 	if (cfg->fc_flags & RTF_EXPIRES)
--		fib6_set_expires(rt, jiffies +
--				clock_t_to_jiffies(cfg->fc_expires));
-+		fib6_set_expires_locked(rt, jiffies +
-+					clock_t_to_jiffies(cfg->fc_expires));
- 	else
--		fib6_clean_expires(rt);
-+		fib6_clean_expires_locked(rt);
- 
- 	if (cfg->fc_protocol == RTPROT_UNSPEC)
- 		cfg->fc_protocol = RTPROT_BOOT;
+ 	help) echo "Test names: $TESTS"; exit 0;;
+ 	esac
 -- 
 2.34.1
 
