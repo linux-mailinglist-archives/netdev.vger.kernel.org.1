@@ -1,116 +1,131 @@
-Return-Path: <netdev+bounces-25500-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25502-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A37477455E
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 20:42:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FC8A7745BB
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 20:45:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 339E4281740
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 18:42:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CEAF21C20EA3
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 18:45:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B036814F96;
-	Tue,  8 Aug 2023 18:41:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C21614F99;
+	Tue,  8 Aug 2023 18:45:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A626813AFA
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 18:41:48 +0000 (UTC)
-Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFD4E14B92F
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 11:09:22 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 2E81E40004;
-	Tue,  8 Aug 2023 18:09:19 +0000 (UTC)
-Message-ID: <d3eb91d9-7ce5-8ac9-e718-4212ab838696@ovn.org>
-Date: Tue, 8 Aug 2023 20:10:01 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 619BA13AFA
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 18:45:19 +0000 (UTC)
+Received: from smtp-fw-33001.amazon.com (smtp-fw-33001.amazon.com [207.171.190.10])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3FC81A58BD
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 11:14:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1691518488; x=1723054488;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=MV/rudRg4tHDKU0zjcs6eE3WlXWXeqg569eZ1V8bJsw=;
+  b=t8ogbPb36YSls358bO8xQT8QfBQnGTnULam9chVM6Ap07KJdrzFWByiG
+   Qc4AAfxv5Qw99AEOLougL7EkcLDcsCfKngEkUhkxQyP7sP+gHymeipplE
+   Clne4/14bKH8ie3v2sfLoFvGUhlbk7Jf0mgK7gItffeQJYKuPddCzOTg3
+   o=;
+X-IronPort-AV: E=Sophos;i="6.01,156,1684800000"; 
+   d="scan'208";a="299116068"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-iad-1a-m6i4x-617e30c2.us-east-1.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-33001.sea14.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Aug 2023 18:14:42 +0000
+Received: from EX19MTAUWA002.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan2.iad.amazon.com [10.40.163.34])
+	by email-inbound-relay-iad-1a-m6i4x-617e30c2.us-east-1.amazon.com (Postfix) with ESMTPS id A92EE67698;
+	Tue,  8 Aug 2023 18:14:39 +0000 (UTC)
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Tue, 8 Aug 2023 18:14:38 +0000
+Received: from 88665a182662.ant.amazon.com (10.106.101.26) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Tue, 8 Aug 2023 18:14:35 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <edumazet@google.com>
+CC: <davem@davemloft.net>, <eric.dumazet@gmail.com>, <kuba@kernel.org>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <syzkaller@googlegroups.com>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>
+Subject: Re: [PATCH net-next] net: annotate data-races around sock->ops
+Date: Tue, 8 Aug 2023 11:14:25 -0700
+Message-ID: <20230808181426.3420-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20230808135809.2300241-1-edumazet@google.com>
+References: <20230808135809.2300241-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Cc: i.maximets@ovn.org, Eric Garver <eric@garver.life>, aconole@redhat.com,
- dev@openvswitch.org
-Content-Language: en-US
-To: Adrian Moreno <amorenoz@redhat.com>, netdev@vger.kernel.org
-References: <20230807164551.553365-1-amorenoz@redhat.com>
- <20230807164551.553365-4-amorenoz@redhat.com>
-From: Ilya Maximets <i.maximets@ovn.org>
-Subject: Re: [net-next v3 3/7] net: openvswitch: add explicit drop action
-In-Reply-To: <20230807164551.553365-4-amorenoz@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GND-Sasl: i.maximets@ovn.org
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.106.101.26]
+X-ClientProxiedBy: EX19D040UWB003.ant.amazon.com (10.13.138.8) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Precedence: Bulk
+X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+	T_SPF_PERMERROR autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 8/7/23 18:45, Adrian Moreno wrote:
-> From: Eric Garver <eric@garver.life>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue,  8 Aug 2023 13:58:09 +0000
+> IPV6_ADDRFORM socket option is evil, because it can change sock->ops
+> while other threads might read it. Same issue for sk->sk_family
+> being set to AF_INET.
 > 
-> From: Eric Garver <eric@garver.life>
+> Adding READ_ONCE() over sock->ops reads is needed for sockets
+> that might be impacted by IPV6_ADDRFORM.
 > 
-> This adds an explicit drop action. This is used by OVS to drop packets
-> for which it cannot determine what to do. An explicit action in the
-> kernel allows passing the reason _why_ the packet is being dropped or
-> zero to indicate no particular error happened (i.e: OVS intentionally
-> dropped the packet).
+> Note that mptcp_is_tcpsk() can also overwrite sock->ops.
 > 
-> Since the error codes coming from userspace mean nothing for the kernel,
-> we squash all of them into only two drop reasons:
-> - OVS_DROP_EXPLICIT_ACTION_ERROR to indicate a non-zero value was passed
-> - OVS_DROP_EXPLICIT_ACTION to indicate a zero value was passed (no
->   error)
+> Adding annotations for all sk->sk_family reads will require
+> more patches :/
 > 
-> e.g. trace all OVS dropped skbs
+> BUG: KCSAN: data-race in ____sys_sendmsg / do_ipv6_setsockopt
 > 
->  # perf trace -e skb:kfree_skb --filter="reason >= 0x30000"
->  [..]
->  106.023 ping/2465 skb:kfree_skb(skbaddr: 0xffffa0e8765f2000, \
->   location:0xffffffffc0d9b462, protocol: 2048, reason: 196611)
+> write to 0xffff888109f24ca0 of 8 bytes by task 4470 on cpu 0:
+> do_ipv6_setsockopt+0x2c5e/0x2ce0 net/ipv6/ipv6_sockglue.c:491
+> ipv6_setsockopt+0x57/0x130 net/ipv6/ipv6_sockglue.c:1012
+> udpv6_setsockopt+0x95/0xa0 net/ipv6/udp.c:1690
+> sock_common_setsockopt+0x61/0x70 net/core/sock.c:3663
+> __sys_setsockopt+0x1c3/0x230 net/socket.c:2273
+> __do_sys_setsockopt net/socket.c:2284 [inline]
+> __se_sys_setsockopt net/socket.c:2281 [inline]
+> __x64_sys_setsockopt+0x66/0x80 net/socket.c:2281
+> do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+> do_syscall_64+0x41/0xc0 arch/x86/entry/common.c:80
+> entry_SYSCALL_64_after_hwframe+0x63/0xcd
 > 
-> reason: 196611 --> 0x30003 (OVS_DROP_EXPLICIT_ACTION)
+> read to 0xffff888109f24ca0 of 8 bytes by task 4469 on cpu 1:
+> sock_sendmsg_nosec net/socket.c:724 [inline]
+> sock_sendmsg net/socket.c:747 [inline]
+> ____sys_sendmsg+0x349/0x4c0 net/socket.c:2503
+> ___sys_sendmsg net/socket.c:2557 [inline]
+> __sys_sendmmsg+0x263/0x500 net/socket.c:2643
+> __do_sys_sendmmsg net/socket.c:2672 [inline]
+> __se_sys_sendmmsg net/socket.c:2669 [inline]
+> __x64_sys_sendmmsg+0x57/0x60 net/socket.c:2669
+> do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+> do_syscall_64+0x41/0xc0 arch/x86/entry/common.c:80
+> entry_SYSCALL_64_after_hwframe+0x63/0xcd
 > 
-> Signed-off-by: Eric Garver <eric@garver.life>
-> Co-developed-by: Adrian Moreno <amorenoz@redhat.com>
-> Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
-> ---
->  include/uapi/linux/openvswitch.h                     |  2 ++
->  net/openvswitch/actions.c                            |  9 +++++++++
->  net/openvswitch/drop.h                               |  2 ++
->  net/openvswitch/flow_netlink.c                       | 10 +++++++++-
->  tools/testing/selftests/net/openvswitch/ovs-dpctl.py |  3 +++
->  5 files changed, 25 insertions(+), 1 deletion(-)
+> value changed: 0xffffffff850e32b8 -> 0xffffffff850da890
+> 
+> Reported by Kernel Concurrency Sanitizer on:
+> CPU: 1 PID: 4469 Comm: syz-executor.1 Not tainted 6.4.0-rc5-syzkaller-00313-g4c605260bc60 #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/25/2023
+> 
+> Reported-by: syzbot <syzkaller@googlegroups.com>
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
 
-<snip>
-
-> diff --git a/net/openvswitch/drop.h b/net/openvswitch/drop.h
-> index 3cd6489a5a2b..be51ff5039fb 100644
-> --- a/net/openvswitch/drop.h
-> +++ b/net/openvswitch/drop.h
-> @@ -10,6 +10,8 @@
->  #define OVS_DROP_REASONS(R)			\
->  	R(OVS_DROP_FLOW)		        \
->  	R(OVS_DROP_ACTION_ERROR)		\
-> +	R(OVS_DROP_EXPLICIT_ACTION)		\
-> +	R(OVS_DROP_EXPLICIT_ACTION_ERROR)	\
-
-These drop reasons are a bit unclear as well.  Especially since we
-have OVS_DROP_ACTION_ERROR and OVS_DROP_EXPLICIT_ACTION_ERROR that
-mean completely different things while having similar names.
-
-Maybe remove the 'ACTION' part from these and add a word 'with'?
-E.g. OVS_DROP_EXPLICIT and OVS_DROP_EXPLICIT_WITH_ERROR.  I suppose,
-'WITH' can also be shortened to 'W'.  It's fairly obvious that
-explicit drops are caused by the explicit drop action.
-
-What do you think?
-
-Best regards, Ilya Maximets.
+Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
