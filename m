@@ -1,152 +1,199 @@
-Return-Path: <netdev+bounces-25211-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25212-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B67E6773608
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 03:50:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 63D9B77360D
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 03:54:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4C3D12815F3
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 01:50:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1086D281611
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 01:54:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A9B6391;
-	Tue,  8 Aug 2023 01:50:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED1D7393;
+	Tue,  8 Aug 2023 01:53:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F31CB37E
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 01:50:08 +0000 (UTC)
-Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78229F1;
-	Mon,  7 Aug 2023 18:50:06 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.143])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4RKbjP5CKYz4f3k5k;
-	Tue,  8 Aug 2023 09:50:01 +0800 (CST)
-Received: from vm-fedora-38.huawei.com (unknown [10.67.174.164])
-	by APP4 (Coremail) with SMTP id gCh0CgD306ZIn9Fk9jvFAA--.36706S2;
-	Tue, 08 Aug 2023 09:50:02 +0800 (CST)
-From: "GONG, Ruiqi" <gongruiqi@huaweicloud.com>
-To: Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Florian Westphal <fw@strlen.de>,
-	Roopa Prabhu <roopa@nvidia.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Kees Cook <keescook@chromium.org>
-Cc: netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
-	netdev@vger.kernel.org,
-	linux-hardening@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Wang Weiyang <wangweiyang2@huawei.com>,
-	Xiu Jianfeng <xiujianfeng@huawei.com>,
-	gongruiqi@huaweicloud.com
-Subject: [PATCH] netfilter: ebtables: fix fortify warnings
-Date: Tue,  8 Aug 2023 09:48:21 +0800
-Message-ID: <20230808014821.241688-1-gongruiqi@huaweicloud.com>
-X-Mailer: git-send-email 2.41.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D71D337E
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 01:53:57 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B722BB
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 18:53:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1691459635; x=1722995635;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=yCX1f0D63BhxyBJ5lB2UOaTd7ZrJLybm3hSvnHjlN3A=;
+  b=SjZF3JUyoInsZx3thUDEWYyGD+lvKsJ5rBzJYo8KjHwViP7Qo8XU6px9
+   9Jt9QScjgnemFmcrEr/VqAm7jbsZgwjbvMazWn+0slBGU2a9wMu05bGlP
+   vAeat+6XIrTTkcDd2naNtPKhxf9PDdsQW5SuMuw8niJN2JRCjw7+UaIuT
+   dHr55pUtCgRJPJxRqPEpEAMGVKS5iUN1EtUj5clXURCFlo5GWCXh5RBRA
+   bg7ifAUR1dw6jJIvBaEryBYZjvyu7ZY4u0Lh7dy7V65f2oPmia0xVSxom
+   Zz11MZcYVyJ7D2X72Ze3kP8d3mVrgVY7DkIxGldCQseumAddttx0zz7Av
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10795"; a="350997434"
+X-IronPort-AV: E=Sophos;i="6.01,263,1684825200"; 
+   d="scan'208";a="350997434"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Aug 2023 18:53:54 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10795"; a="801162721"
+X-IronPort-AV: E=Sophos;i="6.01,263,1684825200"; 
+   d="scan'208";a="801162721"
+Received: from dpdk-wuwenjun-icelake-ii.sh.intel.com ([10.67.110.188])
+  by fmsmga004.fm.intel.com with ESMTP; 07 Aug 2023 18:53:52 -0700
+From: Wenjun Wu <wenjun1.wu@intel.com>
+To: intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org
+Cc: xuejun.zhang@intel.com,
+	madhu.chittim@intel.com,
+	qi.z.zhang@intel.com,
+	anthony.l.nguyen@intel.com,
+	Wenjun Wu <wenjun1.wu@intel.com>
+Subject: [PATCH iwl-next v2 0/5] iavf: Add devlink and devlink rate support
+Date: Tue,  8 Aug 2023 09:57:29 +0800
+Message-Id: <20230808015734.1060525-1-wenjun1.wu@intel.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230727021021.961119-1-wenjun1.wu@intel.com>
+References: <20230727021021.961119-1-wenjun1.wu@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgD306ZIn9Fk9jvFAA--.36706S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxXF1xJw4UCw4xZw1DCw18Grg_yoW5Ww4kpF
-	1qka45trWrJ3yakw4fJw1vvr1ruw1kWa43ArW7C34rKFyjqFyDXa9akryjka4kJws09F43
-	tr90qFWfWrWDAaUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvY14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_Jrv_JF1lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
-	Y2ka0xkIwI1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
-	xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43
-	MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I
-	0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v2
-	6r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0J
-	Up6wZUUUUU=
-X-CM-SenderInfo: pjrqw2pxltxq5kxd4v5lfo033gof0z/
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: "GONG, Ruiqi" <gongruiqi1@huawei.com>
+To allow user to configure queue bandwidth, devlink port support
+is added to support devlink port rate API. [1]
 
-When compiling with gcc 13 and CONFIG_FORTIFY_SOURCE=y, the following
-warning appears:
+Add devlink framework registration/unregistration on iavf driver
+initialization and remove, and devlink port of DEVLINK_PORT_FLAVOUR_VIRTUAL
+is created to be associated iavf netdevice.
 
-In function ‘fortify_memcpy_chk’,
-    inlined from ‘size_entry_mwt’ at net/bridge/netfilter/ebtables.c:2118:2:
-./include/linux/fortify-string.h:592:25: error: call to ‘__read_overflow2_field’
-declared with attribute warning: detected read beyond size of field (2nd parameter);
-maybe use struct_group()? [-Werror=attribute-warning]
-  592 |                         __read_overflow2_field(q_size_field, size);
-      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+iavf rate tree with root node, queue nodes, and leaf node is created
+and registered with devlink rate when iavf adapter is configured, and
+if PF indicates support of VIRTCHNL_VF_OFFLOAD_QOS through VF Resource /
+Capability Exchange.
 
-The compiler is complaining:
+[root@localhost ~]# devlink port function rate show
+pci/0000:af:01.0/txq_15: type node parent iavf_root
+pci/0000:af:01.0/txq_14: type node parent iavf_root
+pci/0000:af:01.0/txq_13: type node parent iavf_root
+pci/0000:af:01.0/txq_12: type node parent iavf_root
+pci/0000:af:01.0/txq_11: type node parent iavf_root
+pci/0000:af:01.0/txq_10: type node parent iavf_root
+pci/0000:af:01.0/txq_9: type node parent iavf_root
+pci/0000:af:01.0/txq_8: type node parent iavf_root
+pci/0000:af:01.0/txq_7: type node parent iavf_root
+pci/0000:af:01.0/txq_6: type node parent iavf_root
+pci/0000:af:01.0/txq_5: type node parent iavf_root
+pci/0000:af:01.0/txq_4: type node parent iavf_root
+pci/0000:af:01.0/txq_3: type node parent iavf_root
+pci/0000:af:01.0/txq_2: type node parent iavf_root
+pci/0000:af:01.0/txq_1: type node parent iavf_root
+pci/0000:af:01.0/txq_0: type node parent iavf_root
+pci/0000:af:01.0/iavf_root: type node
 
-memcpy(&offsets[1], &entry->watchers_offset,
-                       sizeof(offsets) - sizeof(offsets[0]));
 
-where memcpy reads beyong &entry->watchers_offset to copy
-{watchers,target,next}_offset altogether into offsets[]. Silence the
-warning by wrapping these three up via struct_group().
+                         +---------+
+                         |   root  |
+                         +----+----+
+                              |
+            |-----------------|-----------------|
+       +----v----+       +----v----+       +----v----+
+       |  txq_0  |       |  txq_1  |       |  txq_x  |
+       +----+----+       +----+----+       +----+----+
 
-Signed-off-by: GONG, Ruiqi <gongruiqi1@huawei.com>
+User can configure the tx_max and tx_share of each queue. Once any one of the
+queues are fully configured, VIRTCHNL opcodes of VIRTCHNL_OP_CONFIG_QUEUE_BW
+and VIRTCHNL_OP_CONFIG_QUANTA will be sent to PF to configure queues allocated
+to VF
+
+Example:
+
+1.To Set the queue tx_share:
+devlink port function rate set pci/0000:af:01.0 txq_0 tx_share 100 MBps
+
+2.To Set the queue tx_max:
+devlink port function rate set pci/0000:af:01.0 txq_0 tx_max 200 MBps
+
+3.To Show Current devlink port rate info:
+devlink port function rate function show
+[root@localhost ~]# devlink port function rate show
+pci/0000:af:01.0/txq_15: type node parent iavf_root
+pci/0000:af:01.0/txq_14: type node parent iavf_root
+pci/0000:af:01.0/txq_13: type node parent iavf_root
+pci/0000:af:01.0/txq_12: type node parent iavf_root
+pci/0000:af:01.0/txq_11: type node parent iavf_root
+pci/0000:af:01.0/txq_10: type node parent iavf_root
+pci/0000:af:01.0/txq_9: type node parent iavf_root
+pci/0000:af:01.0/txq_8: type node parent iavf_root
+pci/0000:af:01.0/txq_7: type node parent iavf_root
+pci/0000:af:01.0/txq_6: type node parent iavf_root
+pci/0000:af:01.0/txq_5: type node parent iavf_root
+pci/0000:af:01.0/txq_4: type node parent iavf_root
+pci/0000:af:01.0/txq_3: type node parent iavf_root
+pci/0000:af:01.0/txq_2: type node parent iavf_root
+pci/0000:af:01.0/txq_1: type node parent iavf_root
+pci/0000:af:01.0/txq_0: type node tx_share 800Mbit tx_max 1600Mbit parent iavf_root
+pci/0000:af:01.0/iavf_root: type node
+
+
+[1]https://lore.kernel.org/netdev/20221115104825.172668-1-michal.wilczynski@intel.com/
+
+Change log:
+
+v2:
+- Change static array to flex array
+- Use struct_size helper
+- Align all the error code types in the function
+- Move the register field definitions to the right place in the file
+- Fix coding style
+- Adapted to queue bw cfg and qos cap list virtchnl message with flex array fields
+
 ---
- include/uapi/linux/netfilter_bridge/ebtables.h | 14 ++++++++------
- net/bridge/netfilter/ebtables.c                |  3 +--
- 2 files changed, 9 insertions(+), 8 deletions(-)
+Jun Zhang (3):
+  iavf: Add devlink and devlink port support
+  iavf: Add devlink port function rate API support
+  iavf: Add VIRTCHNL Opcodes Support for Queue bw Setting
 
-diff --git a/include/uapi/linux/netfilter_bridge/ebtables.h b/include/uapi/linux/netfilter_bridge/ebtables.h
-index a494cf43a755..e634da196d08 100644
---- a/include/uapi/linux/netfilter_bridge/ebtables.h
-+++ b/include/uapi/linux/netfilter_bridge/ebtables.h
-@@ -182,12 +182,14 @@ struct ebt_entry {
- 	unsigned char sourcemsk[ETH_ALEN];
- 	unsigned char destmac[ETH_ALEN];
- 	unsigned char destmsk[ETH_ALEN];
--	/* sizeof ebt_entry + matches */
--	unsigned int watchers_offset;
--	/* sizeof ebt_entry + matches + watchers */
--	unsigned int target_offset;
--	/* sizeof ebt_entry + matches + watchers + target */
--	unsigned int next_offset;
-+	struct_group(offsets,
-+		/* sizeof ebt_entry + matches */
-+		unsigned int watchers_offset;
-+		/* sizeof ebt_entry + matches + watchers */
-+		unsigned int target_offset;
-+		/* sizeof ebt_entry + matches + watchers + target */
-+		unsigned int next_offset;
-+	);
- 	unsigned char elems[0] __attribute__ ((aligned (__alignof__(struct ebt_replace))));
- };
- 
-diff --git a/net/bridge/netfilter/ebtables.c b/net/bridge/netfilter/ebtables.c
-index 757ec46fc45a..5ec66b1ebb64 100644
---- a/net/bridge/netfilter/ebtables.c
-+++ b/net/bridge/netfilter/ebtables.c
-@@ -2115,8 +2115,7 @@ static int size_entry_mwt(const struct ebt_entry *entry, const unsigned char *ba
- 		return ret;
- 
- 	offsets[0] = sizeof(struct ebt_entry); /* matches come first */
--	memcpy(&offsets[1], &entry->watchers_offset,
--			sizeof(offsets) - sizeof(offsets[0]));
-+	memcpy(&offsets[1], &entry->offsets, sizeof(offsets) - sizeof(offsets[0]));
- 
- 	if (state->buf_kern_start) {
- 		buf_start = state->buf_kern_start + state->buf_kern_offset;
+Wenjun Wu (2):
+  virtchnl: support queue rate limit and quanta size configuration
+  ice: Support VF queue rate limit and quanta size configuration
+
+ drivers/net/ethernet/intel/Kconfig            |   1 +
+ drivers/net/ethernet/intel/iavf/Makefile      |   2 +-
+ drivers/net/ethernet/intel/iavf/iavf.h        |  20 +
+ .../net/ethernet/intel/iavf/iavf_devlink.c    | 388 ++++++++++++++++++
+ .../net/ethernet/intel/iavf/iavf_devlink.h    |  39 ++
+ drivers/net/ethernet/intel/iavf/iavf_main.c   |  60 ++-
+ .../net/ethernet/intel/iavf/iavf_virtchnl.c   | 228 +++++++++-
+ drivers/net/ethernet/intel/ice/ice.h          |   2 +
+ drivers/net/ethernet/intel/ice/ice_base.c     |   2 +
+ drivers/net/ethernet/intel/ice/ice_common.c   |  19 +
+ .../net/ethernet/intel/ice/ice_hw_autogen.h   |   8 +
+ drivers/net/ethernet/intel/ice/ice_txrx.h     |   2 +
+ drivers/net/ethernet/intel/ice/ice_type.h     |   1 +
+ drivers/net/ethernet/intel/ice/ice_vf_lib.h   |   9 +
+ drivers/net/ethernet/intel/ice/ice_virtchnl.c | 312 ++++++++++++++
+ drivers/net/ethernet/intel/ice/ice_virtchnl.h |  11 +
+ .../intel/ice/ice_virtchnl_allowlist.c        |   6 +
+ include/linux/avf/virtchnl.h                  | 114 +++++
+ 18 files changed, 1221 insertions(+), 3 deletions(-)
+ create mode 100644 drivers/net/ethernet/intel/iavf/iavf_devlink.c
+ create mode 100644 drivers/net/ethernet/intel/iavf/iavf_devlink.h
+
 -- 
-2.41.0
+2.34.1
 
 
