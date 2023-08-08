@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-25530-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25534-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D45D77474C
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 21:13:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91C3777477B
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 21:15:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BF7E82816FA
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 19:13:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C1DE01C20C2D
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 19:15:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B20CE15ADE;
-	Tue,  8 Aug 2023 19:13:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EDE7171A5;
+	Tue,  8 Aug 2023 19:13:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5EBB13FE6
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 19:13:54 +0000 (UTC)
-Received: from mail-wr1-x441.google.com (mail-wr1-x441.google.com [IPv6:2a00:1450:4864:20::441])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 282DF21279
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 12:01:58 -0700 (PDT)
-Received: by mail-wr1-x441.google.com with SMTP id ffacd0b85a97d-31792ac0fefso4526469f8f.2
-        for <netdev@vger.kernel.org>; Tue, 08 Aug 2023 12:01:58 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83CE3171A4
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 19:13:57 +0000 (UTC)
+Received: from mail-wm1-x329.google.com (mail-wm1-x329.google.com [IPv6:2a00:1450:4864:20::329])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50B5D217A3
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 12:01:59 -0700 (PDT)
+Received: by mail-wm1-x329.google.com with SMTP id 5b1f17b1804b1-3fe5eb84d8bso17743005e9.2
+        for <netdev@vger.kernel.org>; Tue, 08 Aug 2023 12:01:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20221208.gappssmtp.com; s=20221208; t=1691521316; x=1692126116;
+        d=bgdev-pl.20221208.gappssmtp.com; s=20221208; t=1691521318; x=1692126118;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=NErAZ1+jiHK36qRuqDrSYR1o6Tx2jw6JcGAy27EXYPg=;
-        b=vfFJq+w5TuOejiJncLe4a2+IEnq7wzFU4ePJqSO7nx6b+fb/O4vsCKbFHRoru3wUvi
-         GZ1jFCyGMdT5CyP10iQf5oGi3HL/mEVYt/WdbCyIIRSi0W6wZQY0n4FfNvQVRKP2uFV1
-         xwVIrBfPk3psX4jGhXKywfv5hkoXg8IFAZlolAAuQMoaVAtdIU0MKR7GdFh5mVelIYVv
-         94FClmm9qPxSWK81RBZ8K2e3om3Lod1o5E83aU3ywmrgV8EXmGWkRPgj3R/mogCuigxM
-         WL+xkYxe/5ywCGaZYz3wfMETYXoc9fPU3eWA8tZrwH7YNj4uFd3s5CJz9VXeIkSSD6Kk
-         JhCw==
+        bh=OmT9PzSta8Xptuy25Nk3Dl9DmZNJ19laWsjgvsxKz6Y=;
+        b=GVJmei0inJ0pPMlkTW2uh++vKy1E8M/6nFMSD/TvCfbJpSdadN13sEm64EImWmjNSa
+         XeHdSPFdksGwLJHCq0jdOOPEJMoQZz2JYdLVWCuuLDzIhKT3vJ7nlGXfxzR5yLedeQcX
+         bRb/ZFdykcJMEJpYY2IJnDnYv5rrzW6K+UeeHj5Yqucz+jk0DKV2bFu4K1aBW9I/oIa0
+         h+YaOElDyIjmIIpxlJoiSx2LdwVJt9sL/E+GUyqzZBCBLAFh16xW572G+DWYDuJ1rBKv
+         Nc6dknghuTCa6MJZ4n+z61Z2Neq1svT/bafnNdwLMshnHMqIPNqZwUDxm55Rhi33KY9m
+         niFg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691521316; x=1692126116;
+        d=1e100.net; s=20221208; t=1691521318; x=1692126118;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=NErAZ1+jiHK36qRuqDrSYR1o6Tx2jw6JcGAy27EXYPg=;
-        b=DzNxYzijMa1E3hd9i8Qpqg7PvjaBYRSxKlfjViE4j3fY+9sHqPOT8wNCDn443AmJTj
-         xX8vSB3xHcWWKDBk6ydv0aZ/ppTsaFJ2lYbe5R/kDc/OneLI/M/rs7IRdXuS1Vsr20Dq
-         JxCc6cd1QGZf8QJFpPP1fLMOg4Ems595M0wAlFESHF4KexD6IUACoQFnI0hghMRzAP6+
-         dQZ97wskCeK7eXoto4znyAbglT2oyq9aBEu0BgUBDZ2W6XBsEswCu6HllxMfpl7P5Zqe
-         xvmgte3sCDoTiZsX6py1uj+0qRaf6CRMVgvEjAlf3HS4WbqCCH09F7tEROu/Tj2YF8lA
-         Xz8A==
-X-Gm-Message-State: AOJu0YzYrSTIkqedSJoQwArVJF/iGnmvYGUjvpkJJs1yZAooBqQx53p9
-	D3qf9AsxC2IX0LJMTzOR7qyQOA==
-X-Google-Smtp-Source: AGHT+IHK1nSfjLQhmgz72gMIFZ2orkvarCJjeX2mHFN1UvNmOPFtHDSoMZP26Fm+oXW+HCYMKMKKDg==
-X-Received: by 2002:adf:df06:0:b0:317:5ed4:d821 with SMTP id y6-20020adfdf06000000b003175ed4d821mr221121wrl.55.1691521316726;
-        Tue, 08 Aug 2023 12:01:56 -0700 (PDT)
+        bh=OmT9PzSta8Xptuy25Nk3Dl9DmZNJ19laWsjgvsxKz6Y=;
+        b=BcN74CE9lar9W/tdlpj95VezzmIHwF23J+BT9mBcFPwtM0338BlyTNzaOLeYOHI0NM
+         tQ7ALHSqPA40Nm3v3u2TMvPXhtH7bk6kSLuylLRDGFPq5uCWv5eTAjnoYHlrO3OBZ4C1
+         vgUQZcOpH/vsFajv0ArhhvkVi9Tmfcw/iysy5W7u13bFaZkSNdUOSEQsKavj+xj/lDhi
+         4m0wfv7VIYaebKcvOUq9KnyOtgrjftRtHzNNYqE5y+mlQCQ33fZZQ3XgoxBVgRBmqRhe
+         A4IdHGSV9tFQAl5aPUKtG6i1NiJ4mdj5AxOgoF6c32g1DDpaW6TO2+IMQyvlmxwmc04u
+         6mhQ==
+X-Gm-Message-State: AOJu0YwMgqehmRHRohzjsb9iekn85EzgH3sBZosAPwsHSt1AG316+eGL
+	gkPaMyH/2IBoNK179Rf4JElP5w==
+X-Google-Smtp-Source: AGHT+IFV/uBYBdBvXQ69ksH0nRx5//stS4hJaZqVO1Ze5T08JW/n9sbqQeUFby/pGOgKndKDYgR6pw==
+X-Received: by 2002:a5d:6781:0:b0:313:f1c8:a968 with SMTP id v1-20020a5d6781000000b00313f1c8a968mr197129wru.2.1691521317843;
+        Tue, 08 Aug 2023 12:01:57 -0700 (PDT)
 Received: from brgl-uxlite.home ([2a01:cb1d:334:ac00:6a08:bcc0:ae83:e1dc])
-        by smtp.gmail.com with ESMTPSA id z14-20020adfe54e000000b00317e9f8f194sm7301055wrm.34.2023.08.08.12.01.55
+        by smtp.gmail.com with ESMTPSA id z14-20020adfe54e000000b00317e9f8f194sm7301055wrm.34.2023.08.08.12.01.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Aug 2023 12:01:56 -0700 (PDT)
+        Tue, 08 Aug 2023 12:01:57 -0700 (PDT)
 From: Bartosz Golaszewski <brgl@bgdev.pl>
 To: Andy Gross <agross@kernel.org>,
 	Bjorn Andersson <andersson@kernel.org>,
@@ -71,9 +71,9 @@ Cc: linux-arm-msm@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org,
 	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Subject: [PATCH v2 4/8] arm64: dts: qcom: sa8775p-ride: move the reset-gpios property of the PHY
-Date: Tue,  8 Aug 2023 21:01:40 +0200
-Message-Id: <20230808190144.19999-5-brgl@bgdev.pl>
+Subject: [PATCH v2 5/8] arm64: dts: qcom: sa8775p-ride: index the first SGMII PHY
+Date: Tue,  8 Aug 2023 21:01:41 +0200
+Message-Id: <20230808190144.19999-6-brgl@bgdev.pl>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230808190144.19999-1-brgl@bgdev.pl>
 References: <20230808190144.19999-1-brgl@bgdev.pl>
@@ -85,57 +85,44 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
 From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 
-Device-tree bindings for MDIO define per-PHY reset-gpios as well as a
-global reset-gpios property at the MDIO node level which controls all
-devices on the bus. The latter is most likely a workaround for the
-chicken-and-egg problem where we cannot read the ID of the PHY before
-bringing it out of reset but we cannot bring it out of reset until we've
-read its ID.
+We'll be adding a second SGMII PHY on the same MDIO bus, so let's index
+the first one for better readability.
 
-I have proposed a comprehensive solution for this problem in 2020 but it
-never got upstream. We do however have workaround in place which allows
-us to hard-code the PHY id in the compatible property, thus skipping the
-ID scanning.
-
-Let's make the device-tree for sa8775p-ride slightly more correct by
-moving the reset-gpios property to the PHY node with its ID put into the
-PHY node's compatible.
-
-Link: https://lore.kernel.org/all/20200622093744.13685-1-brgl@bgdev.pl/
 Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Reviewed-by: Andrew Halaney <ahalaney@redhat.com>
 ---
- arch/arm64/boot/dts/qcom/sa8775p-ride.dts | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ arch/arm64/boot/dts/qcom/sa8775p-ride.dts | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/arch/arm64/boot/dts/qcom/sa8775p-ride.dts b/arch/arm64/boot/dts/qcom/sa8775p-ride.dts
-index 09ae6e153282..a03a4c17c8f0 100644
+index a03a4c17c8f0..f9e1a017798e 100644
 --- a/arch/arm64/boot/dts/qcom/sa8775p-ride.dts
 +++ b/arch/arm64/boot/dts/qcom/sa8775p-ride.dts
-@@ -279,13 +279,13 @@ mdio {
+@@ -263,7 +263,7 @@ vreg_l8e: ldo8 {
+ 
+ &ethernet0 {
+ 	phy-mode = "sgmii";
+-	phy-handle = <&sgmii_phy>;
++	phy-handle = <&sgmii_phy0>;
+ 
+ 	pinctrl-0 = <&ethernet0_default>;
+ 	pinctrl-names = "default";
+@@ -279,7 +279,7 @@ mdio {
  		#address-cells = <1>;
  		#size-cells = <0>;
  
--		reset-gpios = <&pmm8654au_2_gpios 8 GPIO_ACTIVE_LOW>;
--		reset-delay-us = <11000>;
--		reset-post-delay-us = <70000>;
--
- 		sgmii_phy: phy@8 {
-+			compatible = "ethernet-phy-id0141.0dd4";
+-		sgmii_phy: phy@8 {
++		sgmii_phy0: phy@8 {
+ 			compatible = "ethernet-phy-id0141.0dd4";
  			reg = <0x8>;
  			device_type = "ethernet-phy";
-+			reset-gpios = <&pmm8654au_2_gpios 8 GPIO_ACTIVE_LOW>;
-+			reset-assert-us = <11000>;
-+			reset-deassert-us = <70000>;
- 		};
- 	};
- 
 -- 
 2.39.2
 
