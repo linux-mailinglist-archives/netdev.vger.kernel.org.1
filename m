@@ -1,163 +1,205 @@
-Return-Path: <netdev+bounces-25429-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25445-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB4D6773F17
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 18:43:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1FB6774033
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 19:00:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 18CB81C20FB6
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 16:43:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E5781281494
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 17:00:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 442411B7FE;
-	Tue,  8 Aug 2023 16:40:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0189213FEE;
+	Tue,  8 Aug 2023 17:00:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37F941B7F0
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 16:40:29 +0000 (UTC)
-Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4614A1558D;
-	Tue,  8 Aug 2023 09:40:13 -0700 (PDT)
-Received: from lelv0265.itg.ti.com ([10.180.67.224])
-	by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 378CaIN5068834;
-	Tue, 8 Aug 2023 07:36:18 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1691498178;
-	bh=3hSAAtFdQ/105wifDbT6bIs+ir+qYDjjLCrmTGs7Z1o=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=Rcx9vaEnILLhkC3B9hzEUK2foLJmPTNEvoEdk/LAOh0NbBxi2CEmd3/aZfQm4lZ2P
-	 oNp5vJCWu1U+p3RYi/dimEbU9XzUQHneN/xSTw23IAmJek9lPNU1nR9+9kmDVu018Q
-	 D3hbEXl0jNiqwu+CLWxUVJ+PWh0mTXGk3sboSAuk=
-Received: from DFLE110.ent.ti.com (dfle110.ent.ti.com [10.64.6.31])
-	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 378CaISm018836
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Tue, 8 Aug 2023 07:36:18 -0500
-Received: from DFLE111.ent.ti.com (10.64.6.32) by DFLE110.ent.ti.com
- (10.64.6.31) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Tue, 8
- Aug 2023 07:36:18 -0500
-Received: from fllv0040.itg.ti.com (10.64.41.20) by DFLE111.ent.ti.com
- (10.64.6.32) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Tue, 8 Aug 2023 07:36:18 -0500
-Received: from [172.24.227.217] (ileaxei01-snat2.itg.ti.com [10.180.69.6])
-	by fllv0040.itg.ti.com (8.15.2/8.15.2) with ESMTP id 378CaC1W125832;
-	Tue, 8 Aug 2023 07:36:12 -0500
-Message-ID: <8bb5a1eb-3912-c418-88fe-b3d8870e7157@ti.com>
-Date: Tue, 8 Aug 2023 18:06:11 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E823A1B7C3
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 17:00:17 +0000 (UTC)
+Received: from mail-wr1-x436.google.com (mail-wr1-x436.google.com [IPv6:2a00:1450:4864:20::436])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F89713C42F
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 09:59:26 -0700 (PDT)
+Received: by mail-wr1-x436.google.com with SMTP id ffacd0b85a97d-31771a876b5so4439042f8f.3
+        for <netdev@vger.kernel.org>; Tue, 08 Aug 2023 09:59:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1691513964; x=1692118764;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=uhEqjQrPXRTh/6hUY9Sp+WGRHv8Oum6SCOIHBnhXB/Y=;
+        b=dQBV8JjVtsHunWnhwQwQ91C3Tfs2wChX4ucnVofJEE6gccsXGm8xoEvOfSe4+95BG8
+         KgxLHuWctBEIlW0QOlYIt7jZ94AR74T/kq7pnvrKsNY+b+lMe51gvIkkUlUmIisLgYSG
+         NorLtSbNgBaHk1D2XNIyy5/ZKzTaWPgvfsRCm0njNxHUQyaR4PuorsbDAex+35iWUYHz
+         GVDpRD5C7Cps2txoZXoKICBhT8R6XUr+z1MPHpCkluQrqktMj9UpQkl0NfCK1dbtN5Qz
+         L1JZDS0SxShAYTDnCxSq7I6lnhgVOqPi2B8+4Npt9UUMENke50FO2HBfzclwu0Y08Jnn
+         vaFA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691513964; x=1692118764;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uhEqjQrPXRTh/6hUY9Sp+WGRHv8Oum6SCOIHBnhXB/Y=;
+        b=UiM+NGxlsRBXcLVV30YvXbMD9P0lCdOL2oyGtMqlA/a+UXFIFQSH9xGQdqHLHdC7wh
+         iKbaHqV1LDnE2ZHyqmCJGHG6OX66nzSC7aiBpFHE2BMxdDRkLyf4UDN8v7VtRwhsp26F
+         GTF1lW1RBh4wKarayjXk8nXe0xz5p8FX43ux958nmTW7ObcPjJhCaVPJrY/Hua7rBdWx
+         FprlD7VpHhliUmnfhs/ptVEUvxIBTj8i6hUOz3c6heQog995qIuKA0EKkYJmZDctCrau
+         AWuxdhTZlTi1hi0tN2YvQ3up4PwpUJEeG816YQS9iGIFfzkNQ6obURnTfEjX2FuMjhwk
+         MSVQ==
+X-Gm-Message-State: AOJu0YxhsYhfaciRPWtvA9VONKe6BvaovdWJM7/CtBjW32ray7IZkcVK
+	K56V947FQVU3Mz/1H/p6ozRm3zDd4ePP/D8W
+X-Google-Smtp-Source: AGHT+IEwN+9FaI3mvSgAcrRvfG1Ksgyu5mEwuhMLJmDCODYgidG2mYE1qjzJbsbKIwJh3zzfhaZMMw==
+X-Received: by 2002:a05:6512:68d:b0:4f6:1779:b1c1 with SMTP id t13-20020a056512068d00b004f61779b1c1mr9820470lfe.48.1691498344375;
+        Tue, 08 Aug 2023 05:39:04 -0700 (PDT)
+Received: from skbuf ([188.27.184.201])
+        by smtp.gmail.com with ESMTPSA id bo17-20020a0564020b3100b0051e0cb4692esm6587374edb.17.2023.08.08.05.39.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Aug 2023 05:39:04 -0700 (PDT)
+Date: Tue, 8 Aug 2023 15:39:01 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net-next] net: dsa: mark parsed interface mode for legacy
+ switch drivers
+Message-ID: <20230808123901.3jrqsx7pe357hwkh@skbuf>
+References: <E1qTKdM-003Cpx-Eh@rmk-PC.armlinux.org.uk>
+ <E1qTKdM-003Cpx-Eh@rmk-PC.armlinux.org.uk>
+ <20230808120652.fehnyzporzychfct@skbuf>
+ <E1qTKdM-003Cpx-Eh@rmk-PC.armlinux.org.uk>
+ <E1qTKdM-003Cpx-Eh@rmk-PC.armlinux.org.uk>
+ <20230808120652.fehnyzporzychfct@skbuf>
+ <ZNI1WA3mGMl93ib8@shell.armlinux.org.uk>
+ <ZNI1WA3mGMl93ib8@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH v2 0/5] Introduce IEP driver and packet timestamping
- support
-Content-Language: en-US
-To: Roger Quadros <rogerq@kernel.org>, Conor Dooley <conor@kernel.org>,
-        MD
- Danish Anwar <danishanwar@ti.com>
-CC: Randy Dunlap <rdunlap@infradead.org>,
-        Simon Horman
-	<simon.horman@corigine.com>,
-        Vignesh Raghavendra <vigneshr@ti.com>, Andrew
- Lunn <andrew@lunn.ch>,
-        Richard Cochran <richardcochran@gmail.com>,
-        Conor
- Dooley <conor+dt@kernel.org>,
-        Krzysztof Kozlowski
-	<krzysztof.kozlowski+dt@linaro.org>,
-        Rob Herring <robh+dt@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>,
-        Jakub Kicinski <kuba@kernel.org>, Eric Dumazet
-	<edumazet@google.com>,
-        "David S. Miller" <davem@davemloft.net>, <nm@ti.com>, <srk@ti.com>,
-        <linux-kernel@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <linux-omap@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>
-References: <20230807110048.2611456-1-danishanwar@ti.com>
- <20230808-unnerving-press-7b61f9c521dc@spud>
- <1c8e5369-648e-98cb-cb14-08d700a38283@ti.com>
- <529218f6-2871-79a2-42bb-8f7886ae12c3@kernel.org>
-From: Md Danish Anwar <a0501179@ti.com>
-Organization: Texas Instruments
-In-Reply-To: <529218f6-2871-79a2-42bb-8f7886ae12c3@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
-X-Spam-Status: No, score=-3.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZNI1WA3mGMl93ib8@shell.armlinux.org.uk>
+ <ZNI1WA3mGMl93ib8@shell.armlinux.org.uk>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 08/08/23 5:52 pm, Roger Quadros wrote:
+On Tue, Aug 08, 2023 at 01:30:16PM +0100, Russell King (Oracle) wrote:
+> On Tue, Aug 08, 2023 at 03:06:52PM +0300, Vladimir Oltean wrote:
+> > Hi Russell,
+> > 
+> > On Tue, Aug 08, 2023 at 12:12:16PM +0100, Russell King (Oracle) wrote:
+> > > If we successfully parsed an interface mode with a legacy switch
+> > > driver, populate that mode into phylink's supported interfaces rather
+> > > than defaulting to the internal and gmii interfaces.
+> > > 
+> > > This hasn't caused an issue so far, because when the interface doesn't
+> > > match a supported one, phylink_validate() doesn't clear the supported
+> > > mask, but instead returns -EINVAL. phylink_parse_fixedlink() doesn't
+> > > check this return value, and merely relies on the supported ethtool
+> > > link modes mask being cleared. Therefore, the fixed link settings end
+> > > up being allowed despite validation failing.
+> > > 
+> > > Before this causes a problem, arrange for DSA to more accurately
+> > > populate phylink's supported interfaces mask so validation can
+> > > correctly succeed.
+> > > 
+> > > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> > > ---
+> > 
+> > How did you notice this? Is there any unconverted DSA switch which has a
+> > phy-mode which isn't PHY_INTERFACE_MODE_INTERNAL or PHY_INTERFACE_MODE_NA?
 > 
+> By looking at some of the legacy drivers, finding their DT compatibles
+> and then grepping the dts files.
 > 
-> On 08/08/2023 15:18, Md Danish Anwar wrote:
->> On 08/08/23 5:38 pm, Conor Dooley wrote:
->>> On Mon, Aug 07, 2023 at 04:30:43PM +0530, MD Danish Anwar wrote:
->>>> This series introduces Industrial Ethernet Peripheral (IEP) driver to
->>>> support timestamping of ethernet packets and thus support PTP and PPS
->>>> for PRU ICSSG ethernet ports.
->>>>
->>>> This series also adds 10M full duplex support for ICSSG ethernet driver.
->>>>
->>>> There are two IEP instances. IEP0 is used for packet timestamping while IEP1
->>>> is used for 10M full duplex support.
->>>>
->>>> This is v2 of the series [v1]. It addresses comments made on [v1].
->>>> This series is based on linux-next(#next-20230807). 
->>>>
->>>> Changes from v1 to v2:
->>>> *) Addressed Simon's comment to fix reverse xmas tree declaration. Some APIs
->>>>    in patch 3 and 4 were not following reverse xmas tree variable declaration.
->>>>    Fixed it in this version.
->>>> *) Addressed Conor's comments and removed unsupported SoCs from compatible
->>>>    comment in patch 1. 
->>>
->>> I'm sorry I missed responding there before you sent v2, it was a bank
->>> holiday yesterday. I'm curious why you removed them, rather than just
->>> added them with a fallback to the ti,am654-icss-iep compatible, given
->>> your comment that "the same compatible currently works for all these
->>> 3 SoCs".
->>
->> I removed them as currently the driver is being upstreamed only for AM654x,
->> once I start up-streaming the ICSSG driver for AM64 and any other SoC. I will
->> add them here. If at that time we are still using same compatible, then I will
->> modify the comment otherwise add new compatible.
->>
->> As of now, I don't see the need of adding other SoCs in iep binding as IEP
->> driver up-streaming is only planned for AM654x as of now.
+> For example, vitesse,vsc73* compatibles show up here:
 > 
-> But, is there any difference in IEP hardware/driver for the other SoCs?
-> AFAIK the same IP is used on all SoCs.
+> arch/arm/boot/dts/gemini/gemini-sq201.dts
 > 
-> If there is no hardware/code change then we don't need to introduce a new compatible.
-> The comment for all SoCs can already be there right from the start.
+> and generally, the ports are listed as:
 > 
+>                                 port@0 {
+>                                         reg = <0>;
+>                                         label = "lan1";
+>                                 };
+> 
+> except for the CPU port which has:
+> 
+>                                 vsc: port@6 {
+>                                         reg = <6>;
+>                                         label = "cpu";
+>                                         ethernet = <&gmac1>;
+>                                         phy-mode = "rgmii";
+>                                         fixed-link {
+>                                                 speed = <1000>;
+>                                                 full-duplex;
+>                                                 pause;
+>                                         };
+>                                 };
+> 
+> Since the vitesse DSA driver doesn't populate .phylink_get_caps, it
+> would have been failing as you discovered with dsa_loop before the
+> previous patch.
+> 
+> Fixing this by setting GMII and INTERNAL worked around the additional
+> check that was using that failure and will work fine for the LAN
+> ports as listed above.
+> 
+> However, that CPU port uses "rgmii" which doesn't match the GMII and
+> INTERNAL bits in the supported mask.
+> 
+> Since phylink_validate() does this:
+> 
+>         const unsigned long *interfaces = pl->config->supported_interfaces;
+> 
+> 	if (state->interface == PHY_INTERFACE_MODE_NA)
+> 
+> ... it isn't, so we move on...
+> 
+>         if (!test_bit(state->interface, interfaces))
+>                 return -EINVAL;
+> 
+> This will trigger and phylink_validate() in phylink_parse_fixedlink()
+> will return -EINVAL without touching the passed supported mask.
+> 
+> phylink_parse_fixedlink() does:
+> 
+>         bitmap_fill(pl->supported, __ETHTOOL_LINK_MODE_MASK_NBITS);
+>         linkmode_copy(pl->link_config.advertising, pl->supported);
+>         phylink_validate(pl, MLO_AN_FIXED, pl->supported, &pl->link_config);
+> 
+> and then we have:
+> 
+>         s = phy_lookup_setting(pl->link_config.speed, pl->link_config.duplex,
+>                                pl->supported, true);
+> 
+> ...
+>         if (s) {
+> 		... success ...
+>         } else {
+>                 phylink_warn(pl, "fixed link %s duplex %dMbps not recognised\n",
+>                              pl->link_config.duplex == DUPLEX_FULL ? "full" : "half",
+>                              pl->link_config.speed);
+>         }
+> 
+> So, since phylink_validate() with an apparently unsupported interface
+> exits early with -EINVAL, pl->supported ends up with all bits set,
+> and phy_lookup_setting() allows any speed.
+> 
+> If someone decides to fix that phylink_validate() error checking, then
+> this will then lead to a warning/failure.
+> 
+> I want to avoid that happening - fixing that latent bug before it
+> becomes a problem.
 
-There is no code change. The same compatible is used for other SoCs. Even if
-the code is same I was thinking to keep the compatible as below now
-
-- ti,am654-icss-iep   # for K3 AM65x SoCs
-
-and once other SoCs are introduced, I will just modify the comment,
-
-- ti,am654-icss-iep   # for K3 AM65x, AM64x SoCs
-
-But we can also keep the all SoCs in comment right from start as well. I am
-fine with both.
-
-Conor / Roger, Please let me know which approach should I go with in next revision?
-
--- 
-Thanks and Regards,
-Danish.
+Aha, ok, thanks for explaining.
 
