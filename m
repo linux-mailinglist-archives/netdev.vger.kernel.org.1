@@ -1,94 +1,99 @@
-Return-Path: <netdev+bounces-25209-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25210-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9243773606
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 03:44:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C18D773607
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 03:47:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E0CD61C20DA1
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 01:44:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E21C5281611
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 01:47:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70C83391;
-	Tue,  8 Aug 2023 01:44:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2FE0391;
+	Tue,  8 Aug 2023 01:47:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5814937E
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 01:44:39 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5712FC433C8;
-	Tue,  8 Aug 2023 01:44:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691459079;
-	bh=SVibUrrPgb3NdfR3BmD/NxT/18CFMoOaOrIpU+j8lTc=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=HyqLENdfysq3Jioueguw2gE3rNouDLXSVYSjE25JGIB8sU97gq8lkfhvAS/FQ4n7U
-	 qrqBjUVnghvNbYTbuIpMorqJQRTdurYRjs3avqeosdxe65uDI1sYbNz8zyU2fPUoZm
-	 qVjKyI6srImvdQoyQdsLRi9tpFZ3zyhSnxrQl5LY4ddAh9myrQ5z+mD6bMKffIZ6aM
-	 oEyhti7xNGjtN4gLiuYbtJ6RUheJeqt7JY6tm7+sKsTCD+LD950lUlfddyUjtSNTBe
-	 aCMRPzqEfcDLw+syTNK6lrMB840aXa/MaWQkanfSnrXfky3s4a8qOq9W8faGFqN/+r
-	 JZ3XdKZoDje9Q==
-Message-ID: <8f5d2cae-17a2-f75d-7659-647d0691083b@kernel.org>
-Date: Mon, 7 Aug 2023 19:44:38 -0600
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B43B637E
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 01:47:30 +0000 (UTC)
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C50B410F3
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 18:47:28 -0700 (PDT)
+Received: from kwepemi500012.china.huawei.com (unknown [172.30.72.55])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4RKbZR1wwJztS5Z;
+	Tue,  8 Aug 2023 09:43:59 +0800 (CST)
+Received: from huawei.com (10.90.53.73) by kwepemi500012.china.huawei.com
+ (7.221.188.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Tue, 8 Aug
+ 2023 09:47:26 +0800
+From: Li Zetao <lizetao1@huawei.com>
+To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>
+CC: <lizetao1@huawei.com>, <shayagr@amazon.com>, <thomas.lendacky@amd.com>,
+	<leon@kernel.org>, <khalasa@piap.pl>, <u.kleine-koenig@pengutronix.de>,
+	<wsa+renesas@sang-engineering.com>, <netdev@vger.kernel.org>
+Subject: [PATCH net-next] bcm63xx_enet: Remove redundant initialization owner
+Date: Tue, 8 Aug 2023 09:47:02 +0800
+Message-ID: <20230808014702.2712699-1-lizetao1@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.14.0
-Subject: Re: [PATCH net-next] ipv4/fib: send RTM_DELROUTE notify when flush
- fib
-Content-Language: en-US
-To: Thomas Haller <thaller@redhat.com>, nicolas.dichtel@6wind.com,
- Stephen Hemminger <stephen@networkplumber.org>,
- Hangbin Liu <liuhangbin@gmail.com>
-Cc: Ido Schimmel <idosch@idosch.org>, netdev@vger.kernel.org,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-References: <ZLZnGkMxI+T8gFQK@shredder> <20230718085814.4301b9dd@hermes.local>
- <ZLjncWOL+FvtaHcP@Laptop-X1> <ZLlE5of1Sw1pMPlM@shredder>
- <ZLngmOaz24y5yLz8@Laptop-X1>
- <d6a204b1-e606-f6ad-660a-28cc5469be2e@kernel.org>
- <ZLobpQ7jELvCeuoD@Laptop-X1> <ZLzY42I/GjWCJ5Do@shredder>
- <ZL48xbowL8QQRr9s@Laptop-X1> <20230724084820.4aa133cc@hermes.local>
- <ZL+F6zUIXfyhevmm@Laptop-X1> <20230725093617.44887eb1@hermes.local>
- <6b53e392-ca84-c50b-9d77-4f89e801d4f3@6wind.com>
- <7e08dd3b-726d-3b1b-9db7-eddb21773817@kernel.org>
- <640715e60e92583d08568a604c0ebb215271d99f.camel@redhat.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <640715e60e92583d08568a604c0ebb215271d99f.camel@redhat.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.90.53.73]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ kwepemi500012.china.huawei.com (7.221.188.12)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On 8/2/23 3:10 AM, Thomas Haller wrote:
-> On Fri, 2023-07-28 at 09:42 -0600, David Ahern wrote:
->> On 7/28/23 7:01 AM, Nicolas Dichtel wrote:
->>
->>> Managing a cache with this is not so obvious 😉
->>
->>
->> FRR works well with Linux at this point, 
-> 
-> Interesting. Do you have a bit more information?
-> 
->> and libnl's caching was updated
->> ad fixed by folks from Cumulus Networks so it should be a good too.
-> 
-> 
-> Which "libnl" do you mean?
+The platform_register_drivers() will set "THIS_MODULE" to driver.owner when
+register a platform_driver driver, so it is redundant initialization to set
+driver.owner in the statement. Remove it for clean code.
 
-yes. https://github.com/thom311/libnl.git
+Signed-off-by: Li Zetao <lizetao1@huawei.com>
+---
+ drivers/net/ethernet/broadcom/bcm63xx_enet.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-> 
-> Route caching in libnl3 upstream is very broken (which I am to blame
-> for, as I am the maintainer).
-> 
+diff --git a/drivers/net/ethernet/broadcom/bcm63xx_enet.c b/drivers/net/ethernet/broadcom/bcm63xx_enet.c
+index 2cf96892e565..a741070f1f9a 100644
+--- a/drivers/net/ethernet/broadcom/bcm63xx_enet.c
++++ b/drivers/net/ethernet/broadcom/bcm63xx_enet.c
+@@ -1940,7 +1940,6 @@ static struct platform_driver bcm63xx_enet_driver = {
+ 	.remove	= bcm_enet_remove,
+ 	.driver	= {
+ 		.name	= "bcm63xx_enet",
+-		.owner  = THIS_MODULE,
+ 	},
+ };
+ 
+@@ -2761,7 +2760,6 @@ static struct platform_driver bcm63xx_enetsw_driver = {
+ 	.remove	= bcm_enetsw_remove,
+ 	.driver	= {
+ 		.name	= "bcm63xx_enetsw",
+-		.owner  = THIS_MODULE,
+ 	},
+ };
+ 
+@@ -2791,7 +2789,6 @@ struct platform_driver bcm63xx_enet_shared_driver = {
+ 	.probe	= bcm_enet_shared_probe,
+ 	.driver	= {
+ 		.name	= "bcm63xx_enet_shared",
+-		.owner  = THIS_MODULE,
+ 	},
+ };
+ 
+-- 
+2.34.1
 
-as someone who sent in patches it worked for all of Cumulus' uses cases
-around 2018-2019 time frame. Can't speak for the status today.
 
