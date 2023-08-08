@@ -1,171 +1,84 @@
-Return-Path: <netdev+bounces-25436-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25458-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6BA5773F47
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 18:45:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F0BD77426A
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 19:44:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9FEA6281107
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 16:45:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DD9BB2816D5
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 17:44:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5ABAA1B7DB;
-	Tue,  8 Aug 2023 16:43:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E322D14F87;
+	Tue,  8 Aug 2023 17:44:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FE981B7C3
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 16:43:26 +0000 (UTC)
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2F7244804
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 09:43:13 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-585fb08172bso68630707b3.2
-        for <netdev@vger.kernel.org>; Tue, 08 Aug 2023 09:43:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691512992; x=1692117792;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=OBiU5cpEymtSFa0lJKPFUvBh/2b8Gf4WF5QO44qLmLU=;
-        b=5p7S+cLnEHd/fXCmhE+uQ/kiLmkMXjGinO6FUB18zkN6dfsuuG1McKRj3ZAg6NxW66
-         jDjHe/hPVjGqq+EZGuFhiMF/oL6bFNJAqmaEMLy2KgxcdEobwXBl7MTwj4MYqUCtCnuO
-         kBAQoPTu7rsyD9UsNRnK4elMl73GZldAivfgdXvmrDH0UUhjwHzZuehUhryIccUswFoq
-         rtFN9pQMWqLZVAM3RGmuoYM5SYGYK92g8IaDPahxvKehy/aHRz0CD9MGlQPBYpUPaWYI
-         wcXKWYXO3MIMv6KrigQwwzVR7rxwYzWhdJG+d7/Y6SLxjgoWpvVa+++K5zHdf1FOG33V
-         4oNQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691512992; x=1692117792;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=OBiU5cpEymtSFa0lJKPFUvBh/2b8Gf4WF5QO44qLmLU=;
-        b=ia6wRL51TuVwvx2qqx3KjMJF4Cp5CTaUptIexlB8pLLNUkWNBMgm2MfuixWaMwks6e
-         Nk1ke87PFCLZ4TfuTyzObM+AN+SfBjLLFbW2mPD6phJaj+ru2NjtKeTsgF2+PuofWhD8
-         7qdrHWGsVFZZ650ryp13QFY1FP2Vk9QnvdaAO0jO210EPJkbgQ8aECP3i4YzdDTHLIJL
-         lDQ4TYPe+kggprjTfrag3tBuSZ7NYGr31C7hwjIggs73ISk/dVBKKm1A2afvd0OJhvI6
-         aPIo4SQv3gQ9ewKf/zMQDqliSY7qo4i9pvjiFRApvfAN1G5JBFx5Gy/yaEIUFhpqcbOw
-         5QJA==
-X-Gm-Message-State: AOJu0YypOIUE5WXpYCf0BIOSnB8Kw2BYu9oee+fOE+u3XxeXTFbwkzXF
-	q69Ah7ct9glXondHtqTD1ZfdNflDpGebyrnhLyQ=
-X-Google-Smtp-Source: AGHT+IGjuJqezd5qjQwP0YWEA1rZcmYCDvPAP6MuVBFDZpSKoy0gNLyehpvsSCwku5oYFzZCna0CwimGyjH3LDhA6Ik=
-X-Received: from ndesaulniers-desktop.svl.corp.google.com ([2620:15c:2d1:203:cc03:38d0:9718:e90b])
- (user=ndesaulniers job=sendgmr) by 2002:a25:6884:0:b0:d18:73fc:40af with SMTP
- id d126-20020a256884000000b00d1873fc40afmr1538ybc.5.1691512992070; Tue, 08
- Aug 2023 09:43:12 -0700 (PDT)
-Date: Tue, 08 Aug 2023 09:43:09 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D79D414F7C
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 17:44:35 +0000 (UTC)
+Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2F9C21E7F
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 10:32:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=desiato.20200630; h=Content-Transfer-Encoding:Content-Type
+	:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:
+	Sender:Reply-To:Content-ID:Content-Description;
+	bh=H4KnvWUgvi3LsDxgjze5WSJwUO0zv/U5QpcYXEsZsDQ=; b=QAe4q24k+cS/lG8y6UhWFdP9Of
+	qZl4qF5NrnuC4VJo6b2v9pz0aTbn+msg78xSm3BXZ+06w/F+66acDXcU2t79VkT4UNW/tPAHdr+hN
+	Lh+/dM2b/lL7kAEdZRh5kw5etq3qV6kf3WLzHUnqa3Tdq/oPJGx2Ze7y2bpaPk1o4J63UFGkwk9vB
+	HrbXkCWcERfIsf4aFGN3bY9lGO9ay0ZStySZqCRwVvd/uiVMOJ6vfmVjoEYDtqAfQqHaKTVfQIX8u
+	SISe4qWnRSUuEvvfAtlwyos1JLvkACMofuEB5cEynsyWLSmtUOituSpr0r1MBrHRYReRfcWlVcKsT
+	TtT3jhZw==;
+Received: from 108-90-42-56.lightspeed.sntcca.sbcglobal.net ([108.90.42.56] helo=[192.168.1.80])
+	by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+	id 1qTQZA-004wq0-36;
+	Tue, 08 Aug 2023 17:32:21 +0000
+Message-ID: <0a0249e9-c408-696c-1ee1-c74b053c488b@infradead.org>
+Date: Tue, 8 Aug 2023 10:32:09 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-B4-Tracking: v=1; b=H4sIAJxw0mQC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
- vPSU3UzU4B8JSMDI2MDCwML3Zyc5PjiksSSzGTdlFSTlJSU5GQzkyQTJaCGgqLUtMwKsGHRsbW 1AMp0+6FcAAAA
-X-Developer-Key: i=ndesaulniers@google.com; a=ed25519; pk=UIrHvErwpgNbhCkRZAYSX0CFd/XFEwqX3D0xqtqjNug=
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1691512990; l=3123;
- i=ndesaulniers@google.com; s=20220923; h=from:subject:message-id;
- bh=ULYFBK9Xx9ov9cv3SaccplqC+dWtT9P4vNAPt+juZOk=; b=x3UcI6Ljs8gOpumBOkSLWbhNNjNfVFpG3MxM6+CcDUZTVSmRzfTmK5ZgiH48jbyCoaoSfPddQ
- sZe5t5A5r1TA2xyN5chFck1l3DgqFYfntxS8aG4Ao5mKH4wSurIR0ad
-X-Mailer: b4 0.12.3
-Message-ID: <20230808-llc_static-v1-1-c140c4c297e4@google.com>
-Subject: [PATCH] net/llc/llc_conn.c: fix 4 instances of -Wmissing-variable-declarations
-From: Nick Desaulniers <ndesaulniers@google.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Nathan Chancellor <nathan@kernel.org>, Tom Rix <trix@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, llvm@lists.linux.dev, 
-	kernel test robot <lkp@intel.com>, Nick Desaulniers <ndesaulniers@google.com>
-Content-Type: text/plain; charset="utf-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH -next] net/ps3_gelic_net: Use ether_addr_to_u64() to
+ convert ethernet address
+To: Li Zetao <lizetao1@huawei.com>, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, mpe@ellerman.id.au, npiggin@gmail.com,
+ christophe.leroy@csgroup.eu
+Cc: netdev@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+References: <20230808114050.4034547-1-lizetao1@huawei.com>
+Content-Language: en-US
+From: Geoff Levand <geoff@infradead.org>
+In-Reply-To: <20230808114050.4034547-1-lizetao1@huawei.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-I'm looking to enable -Wmissing-variable-declarations behind W=1. 0day
-bot spotted the following instances:
+Hi,
 
-  net/llc/llc_conn.c:44:5: warning: no previous extern declaration for
-  non-static variable 'sysctl_llc2_ack_timeout'
-  [-Wmissing-variable-declarations]
-  44 | int sysctl_llc2_ack_timeout = LLC2_ACK_TIME * HZ;
-     |     ^
-  net/llc/llc_conn.c:44:1: note: declare 'static' if the variable is not
-  intended to be used outside of this translation unit
-  44 | int sysctl_llc2_ack_timeout = LLC2_ACK_TIME * HZ;
-     | ^
-  net/llc/llc_conn.c:45:5: warning: no previous extern declaration for
-  non-static variable 'sysctl_llc2_p_timeout'
-  [-Wmissing-variable-declarations]
-  45 | int sysctl_llc2_p_timeout = LLC2_P_TIME * HZ;
-     |     ^
-  net/llc/llc_conn.c:45:1: note: declare 'static' if the variable is not
-  intended to be used outside of this translation unit
-  45 | int sysctl_llc2_p_timeout = LLC2_P_TIME * HZ;
-     | ^
-  net/llc/llc_conn.c:46:5: warning: no previous extern declaration for
-  non-static variable 'sysctl_llc2_rej_timeout'
-  [-Wmissing-variable-declarations]
-  46 | int sysctl_llc2_rej_timeout = LLC2_REJ_TIME * HZ;
-     |     ^
-  net/llc/llc_conn.c:46:1: note: declare 'static' if the variable is not
-  intended to be used outside of this translation unit
-  46 | int sysctl_llc2_rej_timeout = LLC2_REJ_TIME * HZ;
-     | ^
-  net/llc/llc_conn.c:47:5: warning: no previous extern declaration for
-  non-static variable 'sysctl_llc2_busy_timeout'
-  [-Wmissing-variable-declarations]
-  47 | int sysctl_llc2_busy_timeout = LLC2_BUSY_TIME * HZ;
-     |     ^
-  net/llc/llc_conn.c:47:1: note: declare 'static' if the variable is not
-  intended to be used outside of this translation unit
-  47 | int sysctl_llc2_busy_timeout = LLC2_BUSY_TIME * HZ;
-     | ^
+On 8/8/23 04:40, Li Zetao wrote:
+> Use ether_addr_to_u64() to convert an Ethernet address into a u64 value,
+> instead of directly calculating, as this is exactly what
+> this function does.
+> 
+> Signed-off-by: Li Zetao <lizetao1@huawei.com>
+> ---
+>  drivers/net/ethernet/toshiba/ps3_gelic_net.c | 8 +-------
+>  1 file changed, 1 insertion(+), 7 deletions(-)
 
-These symbols are referenced by more than one translation unit, so make
-include the correct header for their declarations. Finally, sort the
-list of includes to help keep them tidy.
+I tested this on PS3 and it seems to be working OK.
+Thanks for your contribution.
 
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/llvm/202308081000.tTL1ElTr-lkp@intel.com/
-Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
----
- net/llc/llc_conn.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
-
-diff --git a/net/llc/llc_conn.c b/net/llc/llc_conn.c
-index d037009ee10f..0a3f5e0bec00 100644
---- a/net/llc/llc_conn.c
-+++ b/net/llc/llc_conn.c
-@@ -14,14 +14,15 @@
- 
- #include <linux/init.h>
- #include <linux/slab.h>
--#include <net/llc_sap.h>
--#include <net/llc_conn.h>
--#include <net/sock.h>
--#include <net/tcp_states.h>
--#include <net/llc_c_ev.h>
-+#include <net/llc.h>
- #include <net/llc_c_ac.h>
-+#include <net/llc_c_ev.h>
- #include <net/llc_c_st.h>
-+#include <net/llc_conn.h>
- #include <net/llc_pdu.h>
-+#include <net/llc_sap.h>
-+#include <net/sock.h>
-+#include <net/tcp_states.h>
- 
- #if 0
- #define dprintk(args...) printk(KERN_DEBUG args)
-
----
-base-commit: 14f9643dc90adea074a0ffb7a17d337eafc6a5cc
-change-id: 20230808-llc_static-de4dddcc64b4
-
-Best regards,
--- 
-Nick Desaulniers <ndesaulniers@google.com>
+Tested-by: Geoff Levand <geoff@infradead.org>
 
 
