@@ -1,80 +1,130 @@
-Return-Path: <netdev+bounces-25588-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25589-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DCB80774D87
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 23:58:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B635774D91
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 23:59:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6F4AF281969
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 21:58:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8F15D281429
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 21:59:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D8A717AAC;
-	Tue,  8 Aug 2023 21:57:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7270B17AAC;
+	Tue,  8 Aug 2023 21:59:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0255E10FF
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 21:57:31 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59890EE;
-	Tue,  8 Aug 2023 14:57:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=Iw353CUGOaR9ntV/GhP6nXoYL9ZHZ1HVuitTAIcTyoA=; b=wQ6jQi1x24Y1QysBckKRqSeilr
-	hExPc9tz1kVg313OrEORcp5T7arVJJ/0mnUea8bN4R5/meR8OQ6NyBWpXdLsxqP231KRTfbBAllB6
-	fUT2mvCOXZRSLRY1LPidKNd2+orscVZV2i94XeNENT6L6eQMSdS9AEZO7CTGLbDa41hU=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qTUhQ-003WUv-RA; Tue, 08 Aug 2023 23:57:08 +0200
-Date: Tue, 8 Aug 2023 23:57:08 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Luke Lu <luke.lu@libre.computer>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>, Da Xue <da@libre.computer>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Neil Armstrong <neil.armstrong@linaro.org>,
-	Kevin Hilman <khilman@baylibre.com>,
-	Jerome Brunet <jbrunet@baylibre.com>,
-	Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
-	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-amlogic@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3] net: phy: meson-gxl: implement meson_gxl_phy_resume()
-Message-ID: <ef7000ae-721c-49ac-b0b3-b5d94fd82a4d@lunn.ch>
-References: <20230808050016.1911447-1-da@libre.computer>
- <b8931b6c-5b35-8477-d50f-b7a43b13615f@gmail.com>
- <CAAzmgs75L6Y3PU1SF8Uvh1Z2cqt86HmaRKFn088yzRK73mfnLA@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 664D010FF
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 21:59:46 +0000 (UTC)
+Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6216C10C6;
+	Tue,  8 Aug 2023 14:59:45 -0700 (PDT)
+Received: by mail-pf1-x436.google.com with SMTP id d2e1a72fcca58-686fc0d3c92so4241164b3a.0;
+        Tue, 08 Aug 2023 14:59:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1691531985; x=1692136785;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Owbz00M7iohX87g/2/5u/phT80tkAEnf0f7QG4IA1+Q=;
+        b=I7ZVnBQ9VbFL0XpGG5/qpEui8bjlyYuPsH7pcbu+dXyu9Z9zrtbbYXJ/8yBfIIDyAZ
+         LTFyZxn3bj/OdwfhWYbHswt6QB70AeUH3bZQrDUn6h70XaGsLjXP8+m8nU3PYkcbOysj
+         8MagYaqFM3mOnr/QCAHAZn0mX1U/VOLKic+gSwiuLafuaKKVT3FGVRTXxR91rOzEHd1W
+         g9r7vSLRAChfPIESSdXD1nlj3V6txBXJG0cediSlFTRyQP8pfcFEbn5yQhV3kG8jNQEy
+         I2nnIuM9hsQjReB4gdkn3XuNPVfBQJjiJvHq/jn9u0dM5d6sr8swGtYB2cpEEpbpJjLp
+         iVTQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691531985; x=1692136785;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Owbz00M7iohX87g/2/5u/phT80tkAEnf0f7QG4IA1+Q=;
+        b=hb7+58MBHN31EjLEEqH5uy+3rHmlEBaUgRhSsqcfIcfO6DzwnofODs1dnn1tbJSEKu
+         wZ5rtvxP+x5Pv/sWwUvJsPydBbuBNZ5yZ0lorGk6bfrfm5h9+EKNtL+BbizmD3gGcB7n
+         xSKdL+GMy87dfLD2Fo1uVyiP134V6O1fJDB/OmIzHggRQ5peH/vT7K/fSd5YreuGyWqb
+         bq3sw0GzCdI5CHxJV56T9c+/wL2BX7VoaAVtkyKRUxSzCjnFEs6a1gZDoYbcR6uzd5pT
+         2JPRka1FKE9XOQ+seWOYnUSJdCzwFmvvhyVG3H0nL/4Z9/XG1LxIlZj8u2o22Xuwzo2f
+         skUA==
+X-Gm-Message-State: AOJu0Yx74mBH3CwnTnOWpFaUG4BddNPMQefueXjj4MbRVDvho1ZQoUXc
+	YjWFr92XSW8jdSZP4zS96uU=
+X-Google-Smtp-Source: AGHT+IFCWeA5cJ0ieW2bjEh18QtQl5AGXERxX4enVNqI9WO93Ft02oKurtYfNmG5XGwrfF7rHunt4w==
+X-Received: by 2002:a05:6a00:9a6:b0:666:b254:1c9c with SMTP id u38-20020a056a0009a600b00666b2541c9cmr900956pfg.27.1691531984757;
+        Tue, 08 Aug 2023 14:59:44 -0700 (PDT)
+Received: from [10.67.48.245] ([192.19.223.252])
+        by smtp.googlemail.com with ESMTPSA id n26-20020a62e51a000000b0068338b6667asm8514501pff.212.2023.08.08.14.59.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 08 Aug 2023 14:59:44 -0700 (PDT)
+Message-ID: <1e438a02-6964-ce65-5584-e8ea57a694bb@gmail.com>
+Date: Tue, 8 Aug 2023 14:59:41 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAAzmgs75L6Y3PU1SF8Uvh1Z2cqt86HmaRKFn088yzRK73mfnLA@mail.gmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH] net: phy: Don't disable irqs on shutdown if WoL is
+ enabled
+Content-Language: en-US
+To: Jakub Kicinski <kuba@kernel.org>,
+ "Russell King (Oracle)" <linux@armlinux.org.uk>, Andrew Lunn
+ <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
+Cc: =?UTF-8?Q?Uwe_Kleine-K=c3=b6nig?= <u.kleine-koenig@pengutronix.de>,
+ Ioana Ciornei <ciorneiioana@gmail.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Ioana Ciornei <ioana.ciornei@nxp.com>,
+ Alexandru Ardelean <alexandru.ardelean@analog.com>,
+ Andre Edich <andre.edich@microchip.com>, Antoine Tenart
+ <atenart@kernel.org>, Baruch Siach <baruch@tkos.co.il>,
+ Christophe Leroy <christophe.leroy@c-s.fr>,
+ Divya Koppera <Divya.Koppera@microchip.com>,
+ Hauke Mehrtens <hauke@hauke-m.de>, Jerome Brunet <jbrunet@baylibre.com>,
+ Kavya Sree Kotagiri <kavyasree.kotagiri@microchip.com>,
+ Linus Walleij <linus.walleij@linaro.org>,
+ Marco Felsch <m.felsch@pengutronix.de>, Marek Vasut <marex@denx.de>,
+ Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
+ Mathias Kresin <dev@kresin.me>, Maxim Kochetkov <fido_max@inbox.ru>,
+ Michael Walle <michael@walle.cc>, Neil Armstrong <narmstrong@baylibre.com>,
+ Nisar Sayed <Nisar.Sayed@microchip.com>,
+ Oleksij Rempel <o.rempel@pengutronix.de>,
+ Philippe Schenker <philippe.schenker@toradex.com>,
+ Willy Liu <willy.liu@realtek.com>, Yuiko Oshino <yuiko.oshino@microchip.com>
+References: <20230804071757.383971-1-u.kleine-koenig@pengutronix.de>
+ <20230808145325.343c5098@kernel.org>
+From: Florian Fainelli <f.fainelli@gmail.com>
+In-Reply-To: <20230808145325.343c5098@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-3.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-> > And a formal remark: Your patch misses the net / net-next annotation.
-> >
-> Not sure if we understand this correctly, do you mean the one line
-> summary of this patch?
-> or the content of the commit message that needs to improve to reflect this is an
-> ethernet/net related fix?
+On 8/8/23 14:53, Jakub Kicinski wrote:
+> On Fri,  4 Aug 2023 09:17:57 +0200 Uwe Kleine-König wrote:
+>> Most PHYs signal WoL using an interrupt. So disabling interrupts breaks
+>> WoL at least on PHYs covered by the marvell driver. So skip disabling
+>> irqs on shutdown if WoL is enabled.
+>>
+>> While at it also explain the motivation that irqs are disabled at all.
+>>
+>> Fixes: e2f016cf7751 ("net: phy: add a shutdown procedure")
+>> Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
+> 
+> What do we do with this one? It sounded like Russell was leaning
+> towards a revert?
 
-https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html#netdev-faq
+Yes, though I believe this will create a different kind of regression 
+for what Iona was addressing initially. Then it becomes a choice of 
+which regression do we consider to be the worst to handle until 
+something better comes up.
 
-	Andrew
+Russell what are your thoughts?
+-- 
+Florian
+
 
