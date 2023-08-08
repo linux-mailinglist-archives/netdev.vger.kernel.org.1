@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-25566-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25568-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6493B774C57
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 23:06:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B0E90774C59
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 23:07:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8A9721C20E27
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 21:06:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 69A64281876
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 21:07:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B98A171BF;
-	Tue,  8 Aug 2023 21:06:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CBAB171CE;
+	Tue,  8 Aug 2023 21:06:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91157171AE
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 21:06:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12344174C4
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 21:06:05 +0000 (UTC)
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D710527F
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 14:05:50 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ABC865984
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 14:05:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	s=20171124; h=Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:
 	Message-Id:Date:Subject:Cc:To:From:From:Sender:Reply-To:Subject:Date:
 	Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=ERZ4yk73eKLw3Udcm/7OnM/8sOxCK5k7z7jRh4jbW1o=; b=UDjkSx8Xu82pHuUci3dxqNMOwx
-	5aRACGZ1qJUWcAVN8FoWuTqNmsuXq6oYLOLc644Wexh/k/Ve6MFHdagqT++ZPVXqOsWCTMAMxCHcb
-	BlNexzKXWNEfdBngr3i3J0Ov+6EXxrBha/ysxFtmFCnw92JhLcqrH1rpbyexbj0XeBOc=;
+	bh=p6JBqzgvusdX0yBwmxsvK8rTDOrg73rE8hTECOvIQ0Q=; b=vjNrIZwibsvJW+k4bwS6hTsC+6
+	r6k+L2SjJuyj99BM3VStd57X62bfLvX1zy0W9sgBqiiB8SCcJBJsXIB4406ajwSMxkeOSU98AhF8t
+	yr2Vs/9B0DO00CdLcio2FNcNPqG6MBagQjmXLuOZ3QVvkb8JYshI1WiScv8o/xYzDcRE=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1qTTsw-003WGP-RM; Tue, 08 Aug 2023 23:04:58 +0200
+	id 1qTTsw-003WGT-SS; Tue, 08 Aug 2023 23:04:58 +0200
 From: Andrew Lunn <andrew@lunn.ch>
 To: netdev <netdev@vger.kernel.org>
 Cc: Heiner Kallweit <hkallweit1@gmail.com>,
@@ -40,9 +40,9 @@ Cc: Heiner Kallweit <hkallweit1@gmail.com>,
 	Christian Marangi <ansuelsmth@gmail.com>,
 	Daniel Golle <daniel@makrotopia.org>,
 	Andrew Lunn <andrew@lunn.ch>
-Subject: [PATCH net-next v3 1/4] led: trig: netdev: Fix requesting offload device
-Date: Tue,  8 Aug 2023 23:04:33 +0200
-Message-Id: <20230808210436.838995-2-andrew@lunn.ch>
+Subject: [PATCH net-next v3 2/4] net: phy: phy_device: Call into the PHY driver to set LED offload
+Date: Tue,  8 Aug 2023 23:04:34 +0200
+Message-Id: <20230808210436.838995-3-andrew@lunn.ch>
 X-Mailer: git-send-email 2.37.2
 In-Reply-To: <20230808210436.838995-1-andrew@lunn.ch>
 References: <20230808210436.838995-1-andrew@lunn.ch>
@@ -60,57 +60,150 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-When the netdev trigger is activates, it tries to determine what
-device the LED blinks for, and what the current blink mode is.
-
-The documentation for hw_control_get() says:
-
-	 * Return 0 on success, a negative error number on failing parsing the
-	 * initial mode. Error from this function is NOT FATAL as the device
-	 * may be in a not supported initial state by the attached LED trigger.
-	 */
-
-For the Marvell PHY and the Armada 370-rd board, the initial LED blink
-mode is not supported by the trigger, so it returns an error. This
-resulted in not getting the device the LED is blinking for. As a
-result, the device is unknown and offloaded is never performed.
-
-Change to condition to always get the device if offloading is
-supported, and reduce the scope of testing for an error from
-hw_control_get() to skip setting trigger internal state if there is an
-error.
+Linux LEDs can be requested to perform hardware accelerated blinking
+to indicate link, RX, TX etc. Pass the rules for blinking to the PHY
+driver, if it implements the ops needed to determine if a given
+pattern can be offloaded, to offload it, and what the current offload
+is. Additionally implement the op needed to get what device the LED is
+for.
 
 Reviewed-by: Simon Horman <simon.horman@corigine.com>
 Signed-off-by: Andrew Lunn <andrew@lunn.ch>
 ---
- drivers/leds/trigger/ledtrig-netdev.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+ drivers/net/phy/phy_device.c | 68 ++++++++++++++++++++++++++++++++++++
+ include/linux/phy.h          | 33 +++++++++++++++++
+ 2 files changed, 101 insertions(+)
 
-diff --git a/drivers/leds/trigger/ledtrig-netdev.c b/drivers/leds/trigger/ledtrig-netdev.c
-index c9bc5a91ec83..3d215a556e20 100644
---- a/drivers/leds/trigger/ledtrig-netdev.c
-+++ b/drivers/leds/trigger/ledtrig-netdev.c
-@@ -564,15 +564,17 @@ static int netdev_trig_activate(struct led_classdev *led_cdev)
- 	/* Check if hw control is active by default on the LED.
- 	 * Init already enabled mode in hw control.
- 	 */
--	if (supports_hw_control(led_cdev) &&
--	    !led_cdev->hw_control_get(led_cdev, &mode)) {
-+	if (supports_hw_control(led_cdev)) {
- 		dev = led_cdev->hw_control_get_device(led_cdev);
- 		if (dev) {
- 			const char *name = dev_name(dev);
+diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
+index 3e9909b30938..17cb3e07216a 100644
+--- a/drivers/net/phy/phy_device.c
++++ b/drivers/net/phy/phy_device.c
+@@ -3020,6 +3020,61 @@ static int phy_led_blink_set(struct led_classdev *led_cdev,
+ 	return err;
+ }
  
- 			set_device_name(trigger_data, name, strlen(name));
- 			trigger_data->hw_control = true;
--			trigger_data->mode = mode;
++static __maybe_unused struct device *
++phy_led_hw_control_get_device(struct led_classdev *led_cdev)
++{
++	struct phy_led *phyled = to_phy_led(led_cdev);
++	struct phy_device *phydev = phyled->phydev;
 +
-+			rc = led_cdev->hw_control_get(led_cdev, &mode);
-+			if (!rc)
-+				trigger_data->mode = mode;
- 		}
- 	}
- 
++	if (phydev->attached_dev)
++		return &phydev->attached_dev->dev;
++	return NULL;
++}
++
++static int __maybe_unused
++phy_led_hw_control_get(struct led_classdev *led_cdev,
++		       unsigned long *rules)
++{
++	struct phy_led *phyled = to_phy_led(led_cdev);
++	struct phy_device *phydev = phyled->phydev;
++	int err;
++
++	mutex_lock(&phydev->lock);
++	err = phydev->drv->led_hw_control_get(phydev, phyled->index, rules);
++	mutex_unlock(&phydev->lock);
++
++	return err;
++}
++
++static int __maybe_unused
++phy_led_hw_control_set(struct led_classdev *led_cdev,
++		       unsigned long rules)
++{
++	struct phy_led *phyled = to_phy_led(led_cdev);
++	struct phy_device *phydev = phyled->phydev;
++	int err;
++
++	mutex_lock(&phydev->lock);
++	err = phydev->drv->led_hw_control_set(phydev, phyled->index, rules);
++	mutex_unlock(&phydev->lock);
++
++	return err;
++}
++
++static __maybe_unused int phy_led_hw_is_supported(struct led_classdev *led_cdev,
++						  unsigned long rules)
++{
++	struct phy_led *phyled = to_phy_led(led_cdev);
++	struct phy_device *phydev = phyled->phydev;
++	int err;
++
++	mutex_lock(&phydev->lock);
++	err = phydev->drv->led_hw_is_supported(phydev, phyled->index, rules);
++	mutex_unlock(&phydev->lock);
++
++	return err;
++}
++
+ static void phy_leds_unregister(struct phy_device *phydev)
+ {
+ 	struct phy_led *phyled;
+@@ -3057,6 +3112,19 @@ static int of_phy_led(struct phy_device *phydev,
+ 		cdev->brightness_set_blocking = phy_led_set_brightness;
+ 	if (phydev->drv->led_blink_set)
+ 		cdev->blink_set = phy_led_blink_set;
++
++#ifdef CONFIG_LEDS_TRIGGERS
++	if (phydev->drv->led_hw_is_supported &&
++	    phydev->drv->led_hw_control_set &&
++	    phydev->drv->led_hw_control_get) {
++		cdev->hw_control_is_supported = phy_led_hw_is_supported;
++		cdev->hw_control_set = phy_led_hw_control_set;
++		cdev->hw_control_get = phy_led_hw_control_get;
++		cdev->hw_control_trigger = "netdev";
++	}
++
++	cdev->hw_control_get_device = phy_led_hw_control_get_device;
++#endif
+ 	cdev->max_brightness = 1;
+ 	init_data.devicename = dev_name(&phydev->mdio.dev);
+ 	init_data.fwnode = of_fwnode_handle(led);
+diff --git a/include/linux/phy.h b/include/linux/phy.h
+index ba08b0e60279..fbcc985b5670 100644
+--- a/include/linux/phy.h
++++ b/include/linux/phy.h
+@@ -1105,6 +1105,39 @@ struct phy_driver {
+ 	int (*led_blink_set)(struct phy_device *dev, u8 index,
+ 			     unsigned long *delay_on,
+ 			     unsigned long *delay_off);
++	/**
++	 * @led_hw_is_supported: Can the HW support the given rules.
++	 * @dev: PHY device which has the LED
++	 * @index: Which LED of the PHY device
++	 * @rules The core is interested in these rules
++	 *
++	 * Return 0 if yes,  -EOPNOTSUPP if not, or an error code.
++	 */
++	int (*led_hw_is_supported)(struct phy_device *dev, u8 index,
++				   unsigned long rules);
++	/**
++	 * @led_hw_control_set: Set the HW to control the LED
++	 * @dev: PHY device which has the LED
++	 * @index: Which LED of the PHY device
++	 * @rules The rules used to control the LED
++	 *
++	 * Returns 0, or a an error code.
++	 */
++	int (*led_hw_control_set)(struct phy_device *dev, u8 index,
++				  unsigned long rules);
++	/**
++	 * @led_hw_control_get: Get how the HW is controlling the LED
++	 * @dev: PHY device which has the LED
++	 * @index: Which LED of the PHY device
++	 * @rules Pointer to the rules used to control the LED
++	 *
++	 * Set *@rules to how the HW is currently blinking. Returns 0
++	 * on success, or a error code if the current blinking cannot
++	 * be represented in rules, or some other error happens.
++	 */
++	int (*led_hw_control_get)(struct phy_device *dev, u8 index,
++				  unsigned long *rules);
++
+ };
+ #define to_phy_driver(d) container_of(to_mdio_common_driver(d),		\
+ 				      struct phy_driver, mdiodrv)
 -- 
 2.40.1
 
