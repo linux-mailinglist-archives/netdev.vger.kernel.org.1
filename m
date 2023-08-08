@@ -1,224 +1,157 @@
-Return-Path: <netdev+bounces-25286-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25343-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76617773B14
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 17:41:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2739C773C35
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 18:02:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 999AF1C2102F
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 15:41:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 56FAE1C20FD0
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 16:02:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBE9D134A4;
-	Tue,  8 Aug 2023 15:41:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E7A314292;
+	Tue,  8 Aug 2023 15:48:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF24F134A2
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 15:41:06 +0000 (UTC)
-Received: from smtp.uniroma2.it (smtp.uniroma2.it [160.80.6.23])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 353753A98;
-	Tue,  8 Aug 2023 08:40:37 -0700 (PDT)
-Received: from smtpauth-2019-1.uniroma2.it (smtpauth-2019-1.uniroma2.it [160.80.5.46])
-	by smtp-2015.uniroma2.it (8.14.4/8.14.4/Debian-8) with ESMTP id 378Dq6vp018430;
-	Tue, 8 Aug 2023 15:52:13 +0200
-Received: from lubuntu-18.04 (unknown [160.80.103.126])
-	by smtpauth-2019-1.uniroma2.it (Postfix) with ESMTPSA id 47D7A1208B1;
-	Tue,  8 Aug 2023 15:52:02 +0200 (CEST)
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=uniroma2.it;
-	s=ed201904; t=1691502722; h=from:from:sender:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZYJ2Hbc6jQGJN61PVddVdQYgnFTt3pXorVwXhXM9k0w=;
-	b=dFaSqe5C6cG5BeVyTeXP0E+57SwBzb9/aX0Ui4GDgADgSrlfQee5GMOG9j/9aVNMzmKBb0
-	5rp66vkqjBRFBdBA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniroma2.it; s=rsa201904;
-	t=1691502722; h=from:from:sender:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZYJ2Hbc6jQGJN61PVddVdQYgnFTt3pXorVwXhXM9k0w=;
-	b=NJJzP625Sm/qY8uuK5i+R5ihru0V0zf7NB0bVCHU1KZSlMuN9hgPbtMy8NaqPpfWy+Zr0Y
-	dCO82WwDHF182M7aeEV5h9d0Z8TZBCsqMD7WfATeFfQDs0iZ8is3Gfx6pWFpbZ/KqJSouQ
-	AWHAHab+fbzEPZDDc3ysNFb7DTcE8b2Lo4FJojR7YgM7AmdkkDGwC25oo3TjPQ/9JcSaNj
-	n0VwS9k5K2A/E6lONczelVK7WgOrniQp/l6OydXESXV7N5WbjN7fZ/Rv7SysARYbvLHJT9
-	fUbz3Qp3a5t/ooH2ej0uAkEa1paYxztDEj+2DA4KWri+vfByCM2vbVwivtbzoQ==
-Date: Tue, 8 Aug 2023 15:52:01 +0200
-From: Andrea Mayer <andrea.mayer@uniroma2.it>
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni
- <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>,
-        Shuah Khan
- <shuah@kernel.org>, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        Stefano Salsano
- <stefano.salsano@uniroma2.it>,
-        Paolo Lungaroni
- <paolo.lungaroni@uniroma2.it>,
-        Ahmed Abdelsalam <ahabdels.dev@gmail.com>,
-        Andrea Mayer <andrea.mayer@uniroma2.it>
-Subject: Re: [net-next 1/2] seg6: add NEXT-C-SID support for SRv6 End.X
- behavior
-Message-Id: <20230808155201.d80cead76984031211da396b@uniroma2.it>
-In-Reply-To: <ZM4Ff0Rk2SBiDdC0@Laptop-X1>
-References: <20230731175117.17376-1-andrea.mayer@uniroma2.it>
-	<20230731175117.17376-2-andrea.mayer@uniroma2.it>
-	<ZMtztGiOWV6bqCLg@Laptop-X1>
-	<20230804144118.a52808dc5fecda09751fae9d@uniroma2.it>
-	<ZM4Ff0Rk2SBiDdC0@Laptop-X1>
-X-Mailer: Sylpheed 3.5.1 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 635BB3C31
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 15:48:01 +0000 (UTC)
+Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B9A583CC
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 08:48:00 -0700 (PDT)
+Received: by mail-wr1-x430.google.com with SMTP id ffacd0b85a97d-3178dd81ac4so4829240f8f.3
+        for <netdev@vger.kernel.org>; Tue, 08 Aug 2023 08:48:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1691509679; x=1692114479;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=2Nxtamw13aVajS7LnLP/B+Gnu6It4lKYjWeawet8By8=;
+        b=fXY57z7CIxsus/lNBpMPuufkegYDM6s1klYLjV/YGHRqj8h8VPilIs4Bwu0DhNyP4I
+         S7Vwrx97kp4akSd5R1uLIvEH9A1KTq2abEGYyCnWSHnI8C3+qs05uj07EoLg0nourqse
+         O1K3pU2m4Qyr5hrr/baCkjPz+B7mIjkNZmv1W1sEzpggk4vN4DbKUSqJ4O82G1nxSe3B
+         FCA5FZYqrSnWBiviEnv0tCxnKE99GJQujsxKQoZW7iIN7hdtn96o2gjv6GtE9gr5FNjH
+         DBqk0DKAY/uqx6ot5Nsa3wmwnD29zWMZBLAuJv9TggDr+5kmIlj9P350VciGJqNFoWaq
+         vC3w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691509679; x=1692114479;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2Nxtamw13aVajS7LnLP/B+Gnu6It4lKYjWeawet8By8=;
+        b=l6VbrITlM5c45DPG1dGu6SR0JwSVcetBWZGVkxfhZELxqw1sZ2VcqFQqLuq4HrRzG0
+         UYtcqmhlIjXZgz59EH6/L8Nh+H86VBccHa3AovFGeUbTbiOPCFwDkpTAMVlysdLKrofH
+         +uH9qxYfKXaR42nAjBPEiX/EykBYHY11K4O4xK6DaG6QJMB4096b4NyspP0I6iRbYtDZ
+         5faCQ3hpReohlJ9gwHyYTy43LsY9agy0yxw3w3bS4InC6qJ1UkfDk5TbhgKNoVqQK0oM
+         WjfU5HmfgaLseSbw5lkQgJQSGtW1swGpIcbDGHFGnERwYbrh+evIO9+LQGAfm+TCSHF+
+         IdXQ==
+X-Gm-Message-State: AOJu0YwqlHzVcSLw6fFDRFNDTHMDLFjXrKSC/cTrNNu+x7dCrybwguMn
+	p9bDxYxVF3+W+6d5r1DtJ/qSLsB4Z5REPVJr
+X-Google-Smtp-Source: AGHT+IEgsCqb+LUswu7L73X7ahs3p/ivLy8dshTxhVKh8RXJDYh2eOW2yNFA4gwBKVLvrF9EHDJVdg==
+X-Received: by 2002:a50:fe8c:0:b0:522:1fd1:1035 with SMTP id d12-20020a50fe8c000000b005221fd11035mr9596721edt.6.1691502738195;
+        Tue, 08 Aug 2023 06:52:18 -0700 (PDT)
+Received: from skbuf ([188.27.184.201])
+        by smtp.gmail.com with ESMTPSA id q22-20020a056402041600b005222c160464sm6686830edv.72.2023.08.08.06.52.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Aug 2023 06:52:17 -0700 (PDT)
+Date: Tue, 8 Aug 2023 16:52:15 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net-next] net: dsa: mark parsed interface mode for legacy
+ switch drivers
+Message-ID: <20230808135215.tqhw4mmfwp2c3zy2@skbuf>
+References: <E1qTKdM-003Cpx-Eh@rmk-PC.armlinux.org.uk>
+ <E1qTKdM-003Cpx-Eh@rmk-PC.armlinux.org.uk>
+ <20230808120652.fehnyzporzychfct@skbuf>
+ <E1qTKdM-003Cpx-Eh@rmk-PC.armlinux.org.uk>
+ <E1qTKdM-003Cpx-Eh@rmk-PC.armlinux.org.uk>
+ <20230808120652.fehnyzporzychfct@skbuf>
+ <ZNI1WA3mGMl93ib8@shell.armlinux.org.uk>
+ <ZNI1WA3mGMl93ib8@shell.armlinux.org.uk>
+ <20230808123901.3jrqsx7pe357hwkh@skbuf>
+ <ZNI7x9uMe6UP2Xhr@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Virus-Scanned: clamav-milter 0.100.0 at smtp-2015
-X-Virus-Status: Clean
-X-Spam-Status: No, score=-2.0 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.6
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZNI7x9uMe6UP2Xhr@shell.armlinux.org.uk>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sat, 5 Aug 2023 16:17:03 +0800
-Hangbin Liu <liuhangbin@gmail.com> wrote:
-
-> On Fri, Aug 04, 2023 at 02:41:18PM +0200, Andrea Mayer wrote:
-> > Hi Hangbin,
-> > thanks for your time. Please see below.
-> > 
-> > On Thu, 3 Aug 2023 17:30:28 +0800
-> > Hangbin Liu <liuhangbin@gmail.com> wrote:
-> > 
-> > > On Mon, Jul 31, 2023 at 07:51:16PM +0200, Andrea Mayer wrote:
-> > > > +/* Processing of SRv6 End, End.X, and End.T behaviors can be extended through
-> > > > + * the flavors framework. These behaviors must report the subset of (flavor)
-> > > > + * operations they currently implement. In this way, if a user specifies a
-> > > > + * flavor combination that is not supported by a given End* behavior, the
-> > > > + * kernel refuses to instantiate the tunnel reporting the error.
-> > > > + */
-> > > > +static int seg6_flv_supp_ops_by_action(int action, __u32 *fops)
-> > > > +{
-> > > > +	switch (action) {
-> > > > +	case SEG6_LOCAL_ACTION_END:
-> > > > +		*fops = SEG6_LOCAL_END_FLV_SUPP_OPS;
-> > > > +		break;
-> > > > +	case SEG6_LOCAL_ACTION_END_X:
-> > > > +		*fops = SEG6_LOCAL_END_X_FLV_SUPP_OPS;
-> > > > +		break;
-> > > > +	default:
-> > > > +		return -EOPNOTSUPP;
-> > > > +	}
-> > > > +
-> > > > +	return 0;
-> > > >  }
-> > > >  
-> > > 
-> > > ...
-> > > 
-> > > > @@ -2070,7 +2131,8 @@ static int parse_nla_flavors(struct nlattr **attrs, struct seg6_local_lwt *slwt,
-> > > >  {
-> > > >  	struct seg6_flavors_info *finfo = &slwt->flv_info;
-> > > >  	struct nlattr *tb[SEG6_LOCAL_FLV_MAX + 1];
-> > > > -	unsigned long fops;
-> > > > +	int action = slwt->action;
-> > > > +	__u32 fops, supp_fops = 0;
-> > > >  	int rc;
-> > > >  
-> > > >  	rc = nla_parse_nested_deprecated(tb, SEG6_LOCAL_FLV_MAX,
-> > > > @@ -2086,7 +2148,8 @@ static int parse_nla_flavors(struct nlattr **attrs, struct seg6_local_lwt *slwt,
-> > > >  		return -EINVAL;
-> > > >  
-> > > >  	fops = nla_get_u32(tb[SEG6_LOCAL_FLV_OPERATION]);
-> > > > -	if (fops & ~SEG6_LOCAL_FLV_SUPP_OPS) {
-> > > > +	rc = seg6_flv_supp_ops_by_action(action, &supp_fops);
-> > > > +	if (rc < 0 || !supp_fops || (fops & ~supp_fops)) {
-> > > 
-> > > if rc == 0, the supp_fops won't be 0.
-> > > 
-> > 
-> > Yes, you're right.
-> > 
-> > In this patch, supp_fops is always set properly when rc == 0.
-> > Since seg6_flv_supp_ops_by_action() should be extended in the event that other
-> > behaviors receive flavors support, I added this check in case the "supp_fops"
-> > field was set incorrectly or not set at all.
-> > Note that supp_fops == 0 must be considered an inadmissible value.
-> > 
-> > 
-> > So, I think we have two possibilities:
-> >   i) remove this "defensive" check, assuming that supp_fops will always be set
-> >      correctly by seg6_flv_supp_ops_by_action() (when rc == 0, like in this
-> >      patch); 
-> >  ii) improve the check by explicitly indicating with a pr_warn_once, for
-> >      example, the condition that is occurring is unexpected.
-> > 
-> > for (ii), something like this:
-> > 
-> > parse_nla_flavors(...)
-> > {
-> >     [...]
-> >     supp_fops = 0;
-> >     [...]
-> > 
-> >     rc = seg6_flv_supp_ops_by_action(action, &supp_fops);
-> >     if (!rc && !supp_fops) {
-> >    	 /* supported flavors mask cannot be zero as it is considered to
-> >    	  * be invalid.
-> >    	  */
-> >    	 pr_warn_once("seg6local: invalid Flavor operation(s)");
-> >    	 return -EINVAL;
-> >     }
+On Tue, Aug 08, 2023 at 01:57:43PM +0100, Russell King (Oracle) wrote:
+> Thanks for the r-b.
 > 
-> Do you mean there is a possibility *in future* that the supp_fops could be 0
-> with rc == 0? If yes, this check would make sense(although we can add this
-> check when it's true). If not. I don't see a need to have this check.
+> At risk of delaying this patch through further discussion... so I'll
+> say now that we're going off into discussions about future changes.
 > 
-> And some static analysis tool would report warn for this code.
+> I believe all DSA drivers that provide .phylink_get_caps fill in the
+> .mac_capabilities member, which leaves just a few drivers that do not,
+> which are:
 > 
+> $ git grep -l dsa_switch_ops.*= drivers/net/dsa/ | xargs grep -L '\.phylink_get_caps'
+> drivers/net/dsa/dsa_loop.c
+> drivers/net/dsa/mv88e6060.c
+> drivers/net/dsa/realtek/rtl8366rb.c
+> drivers/net/dsa/vitesse-vsc73xx-core.c
+> 
+> I've floated the idea to Linus W and Arinc about setting
+> .mac_capabilities in the non-phylink_get_caps path as well, suggesting:
 
-Good points, thanks.
-There is no possibility at the moment that supp_fops could be 0 with rc == 0.
-That check is going to be removed in v2.
+Not sure what you mean by "in the non-phylink_get_caps path" (what is
+that other path). Don't you mean that we should implement phylink_get_caps()
+for these drivers, to have a unified code flow for everyone?
 
-> Thanks
-> Hangbin
+> 
+> 	MAC_1000 | MAC_100 | MAC_10 | MAC_SYM_PAUSE | MAC_ASYM_PAUSE
+> 
+> support more than 1G speeds. I think the only exception to that may
+> be dsa_loop, but as I think that makes use of the old fixed-link
+> software emulated PHYs, I believe that would be limited to max. 1G
+> as well.
 
-Ciao,
-Andrea
+I don't believe that dsa_loop makes use of fixed-link at all. Its user
+ports use phy/gmii mode through the non-OF-based dsa_slave_phy_connect()
+to the ds->slave_mii_bus, and the CPU port goes through the non-OF code
+path ("else" block) here (because dsa_loop_bdinfo.c _is_ non-OF-based):
 
-> > 
-> >     fops = nla_get_u32(tb[SEG6_LOCAL_FLV_OPERATION]);
-> >     if (rc < 0 || (fops & ~supp_fops)) {
-> >    	 NL_SET_ERR_MSG(extack, "Unsupported Flavor operation(s)");
-> >    	 return -EOPNOTSUPP;
-> >     }
-> > 
-> >     finfo->flv_ops = fops;
-> > 
-> >     [...]
-> > }
-> > 
-> > parse_nla_flavors() is called in the control path so another check would not
-> > hit performance. I am more inclined to consider solution (ii).
-> > 
-> > What do you think?
-> > 
-> > > Thanks
-> > > Hangbin
-> > 
-> > Ciao,
-> > Andrea
+dsa_port_setup:
+	case DSA_PORT_TYPE_CPU:
+		if (dp->dn) {
+			err = dsa_shared_port_link_register_of(dp);
+			if (err)
+				break;
+			dsa_port_link_registered = true;
+		} else {
+			dev_warn(ds->dev,
+				 "skipping link registration for CPU port %d\n",
+				 dp->index);
+		}
+
+> If we did set .mac_capabilities, then dsa_port_phylink_validate() would
+> always call phylink_generic_validate() for all DSA drivers, and at that
+> point, we don't need dsa_port_phylink_validate() anymore as it provides
+> nothing that isn't already done inside phylink.
+> 
+> Once dsa_port_phylink_validate() is gone, then I believe there are no
+> drivers populating the .validate method in phylink_mac_ops, which
+> then means there is the possibility to remove that method.
+
+Assuming I understand correctly, I agree it would be beneficial for
+mv88e6060, rtl8366rb and vsc73xx to populate mac_capabilities and
+supported_interfaces.
 
