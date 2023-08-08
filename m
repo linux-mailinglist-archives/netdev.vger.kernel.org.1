@@ -1,110 +1,121 @@
-Return-Path: <netdev+bounces-25474-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25516-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94C9877437E
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 20:06:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9042E7746E7
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 21:06:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C37E61C20E84
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 18:06:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C02801C20F33
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 19:06:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 628E11773F;
-	Tue,  8 Aug 2023 18:02:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0121C15ADC;
+	Tue,  8 Aug 2023 19:06:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A596171B8
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 18:02:43 +0000 (UTC)
-Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [205.139.111.44])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E35C9E58
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 10:35:13 -0700 (PDT)
-Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-248-5m0yJHpmNG2Itb77j3EMGw-1; Tue, 08 Aug 2023 11:22:14 -0400
-X-MC-Unique: 5m0yJHpmNG2Itb77j3EMGw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7EC3E3815EF1;
-	Tue,  8 Aug 2023 15:22:13 +0000 (UTC)
-Received: from hog (unknown [10.45.224.100])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 5BB9540BC780;
-	Tue,  8 Aug 2023 15:22:12 +0000 (UTC)
-Date: Tue, 8 Aug 2023 17:22:11 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: "Radu Pirea (NXP OSS)" <radu-nicolae.pirea@oss.nxp.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: macsec: use TX SCI as MAC address
-Message-ID: <ZNJdo6bow7uK8bTn@hog>
-References: <20230808141429.220830-1-radu-nicolae.pirea@oss.nxp.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6FC3156FE
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 19:06:23 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (unknown [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 837D180B0;
+	Tue,  8 Aug 2023 11:50:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=r10h6nVMk04j6nRxoY62Y1rHsX1nNYozakCPbJXDblk=; b=G0AnBQDNcml/ZR//sKTnjynE4r
+	80iRL3AcMWA776SfbTIHkbVQK9yPk08vd1NrwK8Ldc+zL8AdcbA87tN2wNNu8HSiAdL7x+w0Xb2rI
+	4Bu+QljQkFUgQQuKBwvVGQy7OljI5Fwy7qMhFCiev8lJ8yrHkMJ+64VA8SYIQSzQDm80tgCyli72X
+	fGpsOaMoUUM61OdT4sIWsEtyqnKHyS9qBg2DlDD/rb/7AO2POmVMtMAWv2OJc4NseezFPDWFSwybl
+	0IM1vqtSyHBh9OAiaKgjzBL7iKLwQAhhMlzyVP0j3J8jlbtWev83mp4aaZEV1ZxuH8S6KN+pWdOuw
+	M5PrwVUA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:36762)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qTOc1-0000HF-2P;
+	Tue, 08 Aug 2023 16:27:09 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qTObz-0008Dn-JR; Tue, 08 Aug 2023 16:27:07 +0100
+Date: Tue, 8 Aug 2023 16:27:07 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Andrew Halaney <ahalaney@redhat.com>,
+	Bartosz Golaszewski <brgl@bgdev.pl>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alex Elder <elder@linaro.org>,
+	Srini Kandagatla <srinivas.kandagatla@linaro.org>,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Subject: Re: [PATCH 0/2] net: stmmac: allow sharing MDIO lines
+Message-ID: <ZNJeyxeZIr2DahTl@shell.armlinux.org.uk>
+References: <20230807193102.6374-1-brgl@bgdev.pl>
+ <54421791-75fa-4ed3-8432-e21184556cde@lunn.ch>
+ <CAMRc=Mc6COaxM6GExHF2M+=v2TBpz87RciAv=9kHr41HkjQhCg@mail.gmail.com>
+ <ZNJChfKPkAuhzDCO@shell.armlinux.org.uk>
+ <CAMRc=MczKgBFvuEanKu=mERYX-6qf7oUO2S4B53sPc+hrkYqxg@mail.gmail.com>
+ <65b53003-23cf-40fa-b9d7-f0dbb45a4cb2@lunn.ch>
+ <CAMRc=MecYHi=rPaT44kuX_XMog=uwB9imVZknSjnmTBW+fb5WQ@mail.gmail.com>
+ <xfme5pgj4eqlgao3vmyg6vazaqk6qz2wq6kitgujtorouogjty@cklyof3xz2zm>
+ <d021b8ae-a6a3-4697-a683-c9bd45e6c74b@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230808141429.220830-1-radu-nicolae.pirea@oss.nxp.com>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_LOW,
-	SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+In-Reply-To: <d021b8ae-a6a3-4697-a683-c9bd45e6c74b@lunn.ch>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RDNS_NONE,
+	SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=no autolearn_force=no
 	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-2023-08-08, 17:14:29 +0300, Radu Pirea (NXP OSS) wrote:
-> According to IEEE 802.1AE the SCI comprises the MAC address and the port
-> identifier.
-
-I don't think the SCI needs to be composed of the actual device's MAC
-address. 8.2.1 says that the MAC address *can* be used to compose the
-SCI, but doesn't mandate it.
-
-If you want the SCI to match the device's MAC address, why not use
-IFLA_MACSEC_PORT instead?
-
-> If a new MACsec interface is created with a specific TX SCI, use that
-> SCI to set the MAC address of the new interface.
+On Tue, Aug 08, 2023 at 05:15:45PM +0200, Andrew Lunn wrote:
+> > > > > Good point, but it's worse than that: when MAC0 is unbound, it will
+> > > > > unregister the MDIO bus and destroy all PHY devices. These are not
+> > > > > refcounted so they will literally go from under MAC1. Not sure how
+> > > > > this can be dealt with?
+> > > >
+> > > > unbinding is not a normal operation. So i would just live with it, and
+> > > > if root decides to shoot herself in the foot, that is her choice.
+> > > >
+> > > 
+> > > I disagree. Unbinding is very much a normal operation.
 > 
-> Signed-off-by: Radu Pirea (NXP OSS) <radu-nicolae.pirea@oss.nxp.com>
-> ---
->  drivers/net/macsec.c | 8 +++++---
->  1 file changed, 5 insertions(+), 3 deletions(-)
+> What do you use it for?
 > 
-> diff --git a/drivers/net/macsec.c b/drivers/net/macsec.c
-> index 984dfa5d6c11..6db69daf880d 100644
-> --- a/drivers/net/macsec.c
-> +++ b/drivers/net/macsec.c
-> @@ -4103,12 +4103,14 @@ static int macsec_newlink(struct net *net, struct net_device *dev,
->  	/* need to be already registered so that ->init has run and
->  	 * the MAC addr is set
->  	 */
-> -	if (data && data[IFLA_MACSEC_SCI])
-> +	if (data && data[IFLA_MACSEC_SCI]) {
->  		sci = nla_get_sci(data[IFLA_MACSEC_SCI]);
-> -	else if (data && data[IFLA_MACSEC_PORT])
-> +		eth_hw_addr_set(dev, (u8 *)&sci);
-> +	} else if (data && data[IFLA_MACSEC_PORT]) {
->  		sci = dev_to_sci(dev, nla_get_be16(data[IFLA_MACSEC_PORT]));
-> -	else
-> +	} else {
->  		sci = dev_to_sci(dev, MACSEC_PORT_ES);
-> +	}
->  
->  	if (rx_handler && sci_exists(real_dev, sci)) {
->  		err = -EBUSY;
-> -- 
-> 2.34.1
+> I don't think i've ever manually done it. Maybe as part of a script to
+> unbind the FTDI driver from an FTDI device in order to use user space
+> tools to program the EEPROM? But that is about it.
 > 
+> I actually expect many unbind operations are broken because it is very
+> rarely used.
+
+rmmod! Particularly useful during driver development, I tend to use it
+extensively - and it has the advantage of testing those unbind paths!
 
 -- 
-Sabrina
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
