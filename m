@@ -1,241 +1,221 @@
-Return-Path: <netdev+bounces-25234-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25235-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6792B77367C
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 04:24:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EA9BD77368F
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 04:26:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9671028132E
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 02:24:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A074F281102
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 02:26:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A50F4801;
-	Tue,  8 Aug 2023 02:24:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83779A38;
+	Tue,  8 Aug 2023 02:26:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9923E7FE
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 02:24:25 +0000 (UTC)
-Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FED719BC
-	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 19:24:14 -0700 (PDT)
-Received: by mail-pl1-x62a.google.com with SMTP id d9443c01a7336-1b8ad8383faso46445135ad.0
-        for <netdev@vger.kernel.org>; Mon, 07 Aug 2023 19:24:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fromorbit-com.20221208.gappssmtp.com; s=20221208; t=1691461454; x=1692066254;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=HUGk8Gm4qWKcvYyYW1oMdtOdnxgdWZtLrf0WmvG8aOg=;
-        b=E8R/sNcxrOK1IUnWWdPxuHAURfzEKsQXFvPF/8WoYIocyBzrOF6C/15wk0bBTyq8fp
-         w+9skh2POsCjChG96SdxCE1ukUJoo7U6iUCJoOHux3qHabiPQt2q8GYhzVnnqh4Ia8gf
-         otMrpF/u+4+6GZvnjfH9iZQVLX7oYyO80eB3aSg/65gqSdDxQ6TBQ0eTbg/7hck8CRIR
-         N2poqJrxPUv+xHM8+kwldwyyrpY8ClA2gjcNqxK3I6Rjaxj3f+CIGTw2aTNSrwyrBhAC
-         fS1NWvmq7XKVFcVROA15iTu7BqzTlMOOgRsfusR61dD9uCRFfNfvH5SixHmdTB0ZZ2at
-         NUZw==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 716D8659
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 02:26:22 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D845C1711
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 19:26:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1691461579;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=S3bPtKkgi1i397NDq9plny0QBkcNq3/yfnepW49dbsU=;
+	b=DAWrkLw/OfWnLYJmhHuELtqTbaOEbGbqgdvQ/22hj7Fopw55EjKQKZxJtvliCll7QFMRV2
+	It2GUi09GNeP5lTNdHVioxZGQod/e2Mj/AxTyQcZWrt634qNgVFp9wmQj/O/Lv/R8cTnJA
+	A5yYsKJzH1ORd9rn9PmhyMgPJA2KnAQ=
+Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
+ [209.85.208.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-152-hTDaKkIINmqfMJr6CNbLOw-1; Mon, 07 Aug 2023 22:26:18 -0400
+X-MC-Unique: hTDaKkIINmqfMJr6CNbLOw-1
+Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-2b9cd6a555aso49365971fa.3
+        for <netdev@vger.kernel.org>; Mon, 07 Aug 2023 19:26:17 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691461454; x=1692066254;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HUGk8Gm4qWKcvYyYW1oMdtOdnxgdWZtLrf0WmvG8aOg=;
-        b=ZHM6YsjzEa3e43eZgQ1G5oygXCOY8ytvKE2bYSm2r+H3yQ2uqUQSQWKokvLA11IOBp
-         dYms6R0mmtiL+1Gy3TaQ9O8CarO5J9TQKJWdzEG2/2dzGHOYvpxAes6HpatcdnMmCUzC
-         +B3UiWBKoH30rsrbWL9Xj7ArRRQcoG8p1BhS9HN29gs/zGvAre/T3DNO9LBYIQiKsYLE
-         F/OgqZt0ngPLgnYLGgN3GhOPAcnuXeioMpfZGAItw5Sx593VQ5x8vgLp+2GvMDH3XbSD
-         dg0E3zsXx0iTEGR8EhEsywDwzu+HM28Y2b86YowuPBNu3WJQESy5eNDCG+B4LSGQVftU
-         mDjg==
-X-Gm-Message-State: AOJu0Yy5C4W/XrNjthymq9caXi7Z+DM6V8rIBZ83twNdtn8JIZJ2THq6
-	FEAlQF+RCk1SsPh8o8Vkg3XLQw==
-X-Google-Smtp-Source: AGHT+IEzrDGpXyLCXRNBmZGxK80nBmbnZ3Zc29NdEkVzSJ3QNXEJvOFh13D52+77LsVxnWz7HKqTHA==
-X-Received: by 2002:a17:902:8692:b0:1b9:d307:c1df with SMTP id g18-20020a170902869200b001b9d307c1dfmr10722096plo.17.1691461453690;
-        Mon, 07 Aug 2023 19:24:13 -0700 (PDT)
-Received: from dread.disaster.area (pa49-180-166-213.pa.nsw.optusnet.com.au. [49.180.166.213])
-        by smtp.gmail.com with ESMTPSA id h17-20020a170902f55100b001b864add154sm7583543plf.154.2023.08.07.19.24.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Aug 2023 19:24:13 -0700 (PDT)
-Received: from dave by dread.disaster.area with local (Exim 4.96)
-	(envelope-from <david@fromorbit.com>)
-	id 1qTCOH-002Wjl-2u;
-	Tue, 08 Aug 2023 12:24:09 +1000
-Date: Tue, 8 Aug 2023 12:24:09 +1000
-From: Dave Chinner <david@fromorbit.com>
-To: Qi Zheng <zhengqi.arch@bytedance.com>
-Cc: akpm@linux-foundation.org, tkhai@ya.ru, vbabka@suse.cz,
-	roman.gushchin@linux.dev, djwong@kernel.org, brauner@kernel.org,
-	paulmck@kernel.org, tytso@mit.edu, steven.price@arm.com,
-	cel@kernel.org, senozhatsky@chromium.org, yujie.liu@intel.com,
-	gregkh@linuxfoundation.org, muchun.song@linux.dev,
-	simon.horman@corigine.com, dlemoal@kernel.org,
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org, x86@kernel.org,
-	kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
-	linux-erofs@lists.ozlabs.org,
-	linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
-	linux-nfs@vger.kernel.org, linux-mtd@lists.infradead.org,
-	rcu@vger.kernel.org, netdev@vger.kernel.org,
-	dri-devel@lists.freedesktop.org, linux-arm-msm@vger.kernel.org,
-	dm-devel@redhat.com, linux-raid@vger.kernel.org,
-	linux-bcache@vger.kernel.org,
-	virtualization@lists.linux-foundation.org,
-	linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
-	linux-xfs@vger.kernel.org, linux-btrfs@vger.kernel.org
-Subject: Re: [PATCH v4 45/48] mm: shrinker: make global slab shrink lockless
-Message-ID: <ZNGnSbiPN0lDLpSW@dread.disaster.area>
-References: <20230807110936.21819-1-zhengqi.arch@bytedance.com>
- <20230807110936.21819-46-zhengqi.arch@bytedance.com>
+        d=1e100.net; s=20221208; t=1691461576; x=1692066376;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=S3bPtKkgi1i397NDq9plny0QBkcNq3/yfnepW49dbsU=;
+        b=Z5A4OZjHUSaU4q+AUoP/KweDJlJwxg8w2gVR+TmkbHfoBCZgfKkotkFLnVXze01OLc
+         4CbhU2ZcNa695LPY9LulbFC4y3HQBo5srwAhzIR9zFXcxWoz2EyzCJ8RteMfkJL+/R1r
+         FDcHq5WYp1XA6hwux+onAoJGWMLEP4qBnclhuZS9dgycvjohALNqi6D/EFSNLlsYaR+6
+         NzyfysRN5PIsGBvRReDZ7I/xmNSRr7CRu2jwmnOyhJWydDEkPTgv6XMpOJP8JEa8ObGV
+         TX5et9mKioxSOvLh4zY7wvdmLopL/dhwXBQ/31gxUBN44q8Sfc60PjdKziVLEgFwYRXa
+         KTKw==
+X-Gm-Message-State: AOJu0Yw4z7abBR9AU22smSZ6RkgEZlWvIRM6aw4IB8PuDb6fRRrmTiR9
+	ZrJ6PVFlJ/AHkWGUCG4E6/PB5rButVWqs0N0icBlC4ErmoVZSDB1yO8zmzmQq5WRWEtvwUssqPN
+	SMugyzNU4d5enD14a1/Xjj2wj+xE//vL/
+X-Received: by 2002:a2e:9dd2:0:b0:2b9:e24d:21f6 with SMTP id x18-20020a2e9dd2000000b002b9e24d21f6mr8537846ljj.20.1691461576628;
+        Mon, 07 Aug 2023 19:26:16 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFNEm+Y6WWl+v6SW3V5FlF+qxZoMtf5PiRX9TeSa9v9sMGFuEkcW6A6jSYVhkrmtuO0whT+JZmflWz4uo7ct/I=
+X-Received: by 2002:a2e:9dd2:0:b0:2b9:e24d:21f6 with SMTP id
+ x18-20020a2e9dd2000000b002b9e24d21f6mr8537832ljj.20.1691461576310; Mon, 07
+ Aug 2023 19:26:16 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230807110936.21819-46-zhengqi.arch@bytedance.com>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.6
+References: <20230710034237.12391-1-xuanzhuo@linux.alibaba.com>
+ <20230710034237.12391-6-xuanzhuo@linux.alibaba.com> <ZK/cxNHzI23I6efc@infradead.org>
+ <20230713104805-mutt-send-email-mst@kernel.org> <ZLjSsmTfcpaL6H/I@infradead.org>
+ <20230720131928-mutt-send-email-mst@kernel.org> <ZL6qPvd6X1CgUD4S@infradead.org>
+ <1690251228.3455179-1-xuanzhuo@linux.alibaba.com> <20230725033321-mutt-send-email-mst@kernel.org>
+ <1690283243.4048996-1-xuanzhuo@linux.alibaba.com> <1690524153.3603117-1-xuanzhuo@linux.alibaba.com>
+ <20230801121543-mutt-send-email-mst@kernel.org> <1690940971.9409487-2-xuanzhuo@linux.alibaba.com>
+ <1691388845.9121156-1-xuanzhuo@linux.alibaba.com>
+In-Reply-To: <1691388845.9121156-1-xuanzhuo@linux.alibaba.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Tue, 8 Aug 2023 10:26:04 +0800
+Message-ID: <CACGkMEsoivXfBV75whjyB0yreUNh7HeucGLw3Bq9Zvu1NGnj_g@mail.gmail.com>
+Subject: Re: [PATCH vhost v11 05/10] virtio_ring: introduce virtqueue_dma_dev()
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Christoph Hellwig <hch@infradead.org>, 
+	virtualization@lists.linux-foundation.org, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org, bpf@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Aug 07, 2023 at 07:09:33PM +0800, Qi Zheng wrote:
-> diff --git a/include/linux/shrinker.h b/include/linux/shrinker.h
-> index eb342994675a..f06225f18531 100644
-> --- a/include/linux/shrinker.h
-> +++ b/include/linux/shrinker.h
-> @@ -4,6 +4,8 @@
->  
->  #include <linux/atomic.h>
->  #include <linux/types.h>
-> +#include <linux/refcount.h>
-> +#include <linux/completion.h>
->  
->  #define SHRINKER_UNIT_BITS	BITS_PER_LONG
->  
-> @@ -87,6 +89,10 @@ struct shrinker {
->  	int seeks;	/* seeks to recreate an obj */
->  	unsigned flags;
->  
-> +	refcount_t refcount;
-> +	struct completion done;
-> +	struct rcu_head rcu;
+On Mon, Aug 7, 2023 at 2:15=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba.co=
+m> wrote:
+>
+> On Wed, 2 Aug 2023 09:49:31 +0800, Xuan Zhuo <xuanzhuo@linux.alibaba.com>=
+ wrote:
+> > On Tue, 1 Aug 2023 12:17:47 -0400, "Michael S. Tsirkin" <mst@redhat.com=
+> wrote:
+> > > On Fri, Jul 28, 2023 at 02:02:33PM +0800, Xuan Zhuo wrote:
+> > > > On Tue, 25 Jul 2023 19:07:23 +0800, Xuan Zhuo <xuanzhuo@linux.aliba=
+ba.com> wrote:
+> > > > > On Tue, 25 Jul 2023 03:34:34 -0400, "Michael S. Tsirkin" <mst@red=
+hat.com> wrote:
+> > > > > > On Tue, Jul 25, 2023 at 10:13:48AM +0800, Xuan Zhuo wrote:
+> > > > > > > On Mon, 24 Jul 2023 09:43:42 -0700, Christoph Hellwig <hch@in=
+fradead.org> wrote:
+> > > > > > > > On Thu, Jul 20, 2023 at 01:21:07PM -0400, Michael S. Tsirki=
+n wrote:
+> > > > > > > > > Well I think we can add wrappers like virtio_dma_sync and=
+ so on.
+> > > > > > > > > There are NOP for non-dma so passing the dma device is ha=
+rmless.
+> > > > > > > >
+> > > > > > > > Yes, please.
+> > > > > > >
+> > > > > > >
+> > > > > > > I am not sure I got this fully.
+> > > > > > >
+> > > > > > > Are you mean this:
+> > > > > > > https://lore.kernel.org/all/20230214072704.126660-8-xuanzhuo@=
+linux.alibaba.com/
+> > > > > > > https://lore.kernel.org/all/20230214072704.126660-9-xuanzhuo@=
+linux.alibaba.com/
+> > > > > > >
+> > > > > > > Then the driver must do dma operation(map and sync) by these =
+virtio_dma_* APIs.
+> > > > > > > No care the device is non-dma device or dma device.
+> > > > > >
+> > > > > > yes
+> > > > > >
+> > > > > > > Then the AF_XDP must use these virtio_dma_* APIs for virtio d=
+evice.
+> > > > > >
+> > > > > > We'll worry about AF_XDP when the patch is posted.
+> > > > >
+> > > > > YES.
+> > > > >
+> > > > > We discussed it. They voted 'no'.
+> > > > >
+> > > > > http://lore.kernel.org/all/20230424082856.15c1e593@kernel.org
+> > > >
+> > > >
+> > > > Hi guys, this topic is stuck again. How should I proceed with this =
+work?
+> > > >
+> > > > Let me briefly summarize:
+> > > > 1. The problem with adding virtio_dma_{map, sync} api is that, for =
+AF_XDP and
+> > > > the driver layer, we need to support these APIs. The current conclu=
+sion of
+> > > > AF_XDP is no.
+> > > >
+> > > > 2. Set dma_set_mask_and_coherent, then we can use DMA API uniformly=
+ inside
+> > > > driver. This idea seems to be inconsistent with the framework desig=
+n of DMA. The
+> > > > conclusion is no.
+> > > >
+> > > > 3. We noticed that if the virtio device supports VIRTIO_F_ACCESS_PL=
+ATFORM, it
+> > > > uses DMA API. And this type of device is the future direction, so w=
+e only
+> > > > support DMA premapped for this type of virtio device. The problem w=
+ith this
+> > > > solution is that virtqueue_dma_dev() only returns dev in some cases=
+, because
+> > > > VIRTIO_F_ACCESS_PLATFORM is supported in such cases.
 
-Documentation, please. What does the refcount protect, what does the
-completion provide, etc.
+Could you explain the issue a little bit more?
 
-> +
->  	void *private_data;
->  
->  	/* These are for internal use */
-> @@ -120,6 +126,17 @@ struct shrinker *shrinker_alloc(unsigned int flags, const char *fmt, ...);
->  void shrinker_register(struct shrinker *shrinker);
->  void shrinker_free(struct shrinker *shrinker);
->  
-> +static inline bool shrinker_try_get(struct shrinker *shrinker)
-> +{
-> +	return refcount_inc_not_zero(&shrinker->refcount);
-> +}
-> +
-> +static inline void shrinker_put(struct shrinker *shrinker)
-> +{
-> +	if (refcount_dec_and_test(&shrinker->refcount))
-> +		complete(&shrinker->done);
-> +}
-> +
->  #ifdef CONFIG_SHRINKER_DEBUG
->  extern int __printf(2, 3) shrinker_debugfs_rename(struct shrinker *shrinker,
->  						  const char *fmt, ...);
-> diff --git a/mm/shrinker.c b/mm/shrinker.c
-> index 1911c06b8af5..d318f5621862 100644
-> --- a/mm/shrinker.c
-> +++ b/mm/shrinker.c
-> @@ -2,6 +2,7 @@
->  #include <linux/memcontrol.h>
->  #include <linux/rwsem.h>
->  #include <linux/shrinker.h>
-> +#include <linux/rculist.h>
->  #include <trace/events/vmscan.h>
->  
->  #include "internal.h"
-> @@ -577,33 +578,42 @@ unsigned long shrink_slab(gfp_t gfp_mask, int nid, struct mem_cgroup *memcg,
->  	if (!mem_cgroup_disabled() && !mem_cgroup_is_root(memcg))
->  		return shrink_slab_memcg(gfp_mask, nid, memcg, priority);
->  
-> -	if (!down_read_trylock(&shrinker_rwsem))
-> -		goto out;
-> -
-> -	list_for_each_entry(shrinker, &shrinker_list, list) {
-> +	rcu_read_lock();
-> +	list_for_each_entry_rcu(shrinker, &shrinker_list, list) {
->  		struct shrink_control sc = {
->  			.gfp_mask = gfp_mask,
->  			.nid = nid,
->  			.memcg = memcg,
->  		};
->  
-> +		if (!shrinker_try_get(shrinker))
-> +			continue;
-> +
-> +		/*
-> +		 * We can safely unlock the RCU lock here since we already
-> +		 * hold the refcount of the shrinker.
-> +		 */
-> +		rcu_read_unlock();
-> +
->  		ret = do_shrink_slab(&sc, shrinker, priority);
->  		if (ret == SHRINK_EMPTY)
->  			ret = 0;
->  		freed += ret;
-> +
->  		/*
-> -		 * Bail out if someone want to register a new shrinker to
-> -		 * prevent the registration from being stalled for long periods
-> -		 * by parallel ongoing shrinking.
-> +		 * This shrinker may be deleted from shrinker_list and freed
-> +		 * after the shrinker_put() below, but this shrinker is still
-> +		 * used for the next traversal. So it is necessary to hold the
-> +		 * RCU lock first to prevent this shrinker from being freed,
-> +		 * which also ensures that the next shrinker that is traversed
-> +		 * will not be freed (even if it is deleted from shrinker_list
-> +		 * at the same time).
->  		 */
+E.g if we limit AF_XDP to ACESS_PLATFROM only, why does
+virtqueue_dma_dev() only return dev in some cases?
 
-This needs to be moved to the head of the function, and document
-the whole list walk, get, put and completion parts of the algorithm
-that make it safe. There's more to this than "we hold a reference
-count", especially the tricky "we might see the shrinker before it
-is fully initialised" case....
+Thanks
 
+>Otherwise NULL is returned.
+> > > > This option is currently NO.
+> > > >
+> > > > So I'm wondering what should I do, from a DMA point of view, is the=
+re any
+> > > > solution in case of using DMA API?
+> > > >
+> > > > Thank you
+> > >
+> > >
+> > > I think it's ok at this point, Christoph just asked you
+> > > to add wrappers for map/unmap for use in virtio code.
+> > > Seems like a cosmetic change, shouldn't be hard.
+> >
+> > Yes, that is not hard, I has this code.
+> >
+> > But, you mean that the wrappers is just used for the virtio driver code=
+?
+> > And we also offer the  API virtqueue_dma_dev() at the same time?
+> > Then the driver will has two chooses to do DMA.
+> >
+> > Is that so?
+>
+> Ping.
+>
+> Thanks
+>
+> >
+> >
+> > > Otherwise I haven't seen significant comments.
+> > >
+> > >
+> > > Christoph do I summarize what you are saying correctly?
+> > > --
+> > > MST
+> > >
+> >
+>
 
-.....
->  void shrinker_free(struct shrinker *shrinker)
->  {
->  	struct dentry *debugfs_entry = NULL;
-> @@ -686,9 +712,18 @@ void shrinker_free(struct shrinker *shrinker)
->  	if (!shrinker)
->  		return;
->  
-> +	if (shrinker->flags & SHRINKER_REGISTERED) {
-> +		shrinker_put(shrinker);
-> +		wait_for_completion(&shrinker->done);
-> +	}
-
-Needs a comment explaining why we need to wait here...
-> +
->  	down_write(&shrinker_rwsem);
->  	if (shrinker->flags & SHRINKER_REGISTERED) {
-> -		list_del(&shrinker->list);
-> +		/*
-> +		 * Lookups on the shrinker are over and will fail in the future,
-> +		 * so we can now remove it from the lists and free it.
-> +		 */
-
-.... rather than here after the wait has been done and provided the
-guarantee that no shrinker is running or will run again...
-
--Dave.
--- 
-Dave Chinner
-david@fromorbit.com
 
