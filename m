@@ -1,113 +1,148 @@
-Return-Path: <netdev+bounces-25413-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25387-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8693773E78
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 18:30:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9932F773D6A
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 18:18:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E843E1C20BA6
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 16:30:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AC2E01C21079
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 16:18:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23F4414A86;
-	Tue,  8 Aug 2023 16:30:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B356615486;
+	Tue,  8 Aug 2023 16:08:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18E771989B
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 16:30:45 +0000 (UTC)
-Received: from mail-ej1-x642.google.com (mail-ej1-x642.google.com [IPv6:2a00:1450:4864:20::642])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 063EED4BE3
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 09:30:28 -0700 (PDT)
-Received: by mail-ej1-x642.google.com with SMTP id a640c23a62f3a-99c93638322so3638666b.1
-        for <netdev@vger.kernel.org>; Tue, 08 Aug 2023 09:30:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1691512208; x=1692117008;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=rboElf/BVI2bc3A5WovY2cK4t5A5anr+6YjghXJ6T/I=;
-        b=a90BiLmFG3sYlSbJ++1THe2SrdqdmA8ilBdv2KVlcSCjxlI3DXPatsDo0Zp8GbhdT2
-         qla6QAHyD8VyFS8Bk2YEqoil8xRt/6cx/sAvm91FWSUOoTR9U84eLkCFWMLBGDBRcvZY
-         5wNd0o5UHBOmEqNmz8i721wVvCBhACmcincl+b++1VDEMq6RgFCS5PLSbh2nHDVn1GJH
-         iPGe2sayjU2nar90NW6Gw4nV0zbopflab+iYnV+OBbcoFfU4qXa/j1a2MxQ1ydPgtpzN
-         e/XfQ2RYWAeBjvHzkVanmkQtkgFmv9fGQRNVVtFSgdbsobY0Fi6JcBEiQ8sVxg+kbjuL
-         0WSA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691512208; x=1692117008;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=rboElf/BVI2bc3A5WovY2cK4t5A5anr+6YjghXJ6T/I=;
-        b=FM9+lWmAeQyYEXTlTk1r1Y92DooNeVgQosX4RLK2git6hAM/yzKPu1rW05IawoXkt+
-         JuASbE4xsybBKT0Co0iKgms+Zumdb1wjVVrlGNGEeWu7SNRlWsTxi+Mn82080k4QQn2P
-         SEyTM5lcmPupJ5wskMF+xOOOlIEPP/QG+oUBlklMlyFzMiKCGv9EzXMmiqzTahRsxs3g
-         IAdMXp47aMzuZkvrO2U6s7gY1RTL3WEYQ+Etc80XosGbnXg9wqAxe3MK53YCtJl2ypuf
-         pTmv/S1ZdQRvyqvTgFp9Zn4WLO9W+DoBLWsnTcVbaK1R1fx+fRobNnrjxvqN8SXzSBok
-         OG8A==
-X-Gm-Message-State: AOJu0YxP9sVJuLQxNX8fJCldMVK84wvybBbRPbmu4ydtRN3Xw5815bck
-	c8triMAXAYhcTRJDcNU0uD3NDH29Vs5gianhVhhJgZW01i4=
-X-Google-Smtp-Source: AGHT+IG8QmO1vMNrgxAHbE9HRffpYK/5oXTWBdoPWU3/u5EHF1MovgR+2EUUpq/0rKo2JilVYz98Zg==
-X-Received: by 2002:a5d:6ac5:0:b0:317:6570:afec with SMTP id u5-20020a5d6ac5000000b003176570afecmr7711119wrw.3.1691485426111;
-        Tue, 08 Aug 2023 02:03:46 -0700 (PDT)
-Received: from localhost ([212.23.236.67])
-        by smtp.gmail.com with ESMTPSA id h3-20020a5d5483000000b0030ae53550f5sm12916742wrv.51.2023.08.08.02.03.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Aug 2023 02:03:45 -0700 (PDT)
-From: Jiri Pirko <jiri@resnulli.us>
-To: netdev@vger.kernel.org
-Cc: kuba@kernel.org,
-	pabeni@redhat.com,
-	davem@davemloft.net,
-	edumazet@google.com
-Subject: [patch net-next] ynl-gen-c.py: avoid rendering empty validate field
-Date: Tue,  8 Aug 2023 11:03:44 +0200
-Message-ID: <20230808090344.1368874-1-jiri@resnulli.us>
-X-Mailer: git-send-email 2.41.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7D4614F9F
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 16:08:23 +0000 (UTC)
+Received: from mslow1.mail.gandi.net (mslow1.mail.gandi.net [217.70.178.240])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C19A21DD3A;
+	Tue,  8 Aug 2023 09:08:07 -0700 (PDT)
+Received: from relay5-d.mail.gandi.net (unknown [IPv6:2001:4b98:dc4:8::225])
+	by mslow1.mail.gandi.net (Postfix) with ESMTP id E5694C6AB4;
+	Tue,  8 Aug 2023 09:06:22 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 167A31C000E;
+	Tue,  8 Aug 2023 09:06:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1691485578;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=yV4jZ6QrskrDU/HVotl7NEUNo5CW4ftnk7BIqgEB1+w=;
+	b=flZfpRXqaC4cOa0lUVXQGmj6OEssvWZubCe2w5MHqI8U2vWQwtOj0FQFAqgAJBxJ8I75XZ
+	I0TZlmNSRmqSWR5xLTIKJ/1FDCZ4stZY0pIriPzLH17o1+eZR+fqsAFgkHhfKw1IeHA6F/
+	BRImFTSpS5Rv0R1y0afDagZYKTek8UGg0TZs9w8hjDyqKGA3Umv42FjNTa+dNkNUSu3Gue
+	Tx2D6FfesdOvac81rHxEHFQ6xKJfocvJHBN0OnBZAPqs83Owy9ptNTQG7K7UjxPB67/rcA
+	8c/v/aUZh+TVfJDMed/1Ph30nJadiv+LXoAjitpDUEWw4zjs+hG26YAH/4HjPQ==
+Date: Tue, 8 Aug 2023 11:06:13 +0200
+From: Herve Codina <herve.codina@bootlin.com>
+To: Christophe Leroy <christophe.leroy@csgroup.eu>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>, Rob Herring
+ <robh+dt@kernel.org>, Krzysztof Kozlowski
+ <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
+ Lee Jones <lee@kernel.org>, Linus Walleij <linus.walleij@linaro.org>, Qiang
+ Zhao <qiang.zhao@nxp.com>, Li Yang <leoyang.li@nxp.com>, Liam Girdwood
+ <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, Jaroslav Kysela
+ <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, Shengjiu Wang
+ <shengjiu.wang@gmail.com>, Xiubo Li <Xiubo.Lee@gmail.com>, Fabio Estevam
+ <festevam@gmail.com>, Nicolin Chen <nicoleotsuka@gmail.com>, Randy Dunlap
+ <rdunlap@infradead.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+ "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "linux-gpio@vger.kernel.org" <linux-gpio@vger.kernel.org>,
+ "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>, "alsa-devel@alsa-project.org"
+ <alsa-devel@alsa-project.org>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH v2 26/28] ASoC: codecs: Add support for the framer codec
+Message-ID: <20230808110613.07e222a3@bootlin.com>
+In-Reply-To: <a1b5120b-feb0-5c87-0605-e1e170d9268d@csgroup.eu>
+References: <20230726150225.483464-1-herve.codina@bootlin.com>
+	<20230726150225.483464-27-herve.codina@bootlin.com>
+	<a1b5120b-feb0-5c87-0605-e1e170d9268d@csgroup.eu>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+X-GND-Sasl: herve.codina@bootlin.com
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Jiri Pirko <jiri@nvidia.com>
+On Tue, 8 Aug 2023 08:26:16 +0000
+Christophe Leroy <christophe.leroy@csgroup.eu> wrote:
 
-When dont-validate flags are filtered out for do/dump op, the list may
-be empty. In that case, avoid rendering the validate field.
+> Le 26/07/2023 à 17:02, Herve Codina a écrit :
+> > The framer codec interracts with a framer.
+> > It allows to use some of the framer timeslots as audio channels to
+> > transport audio data over the framer E1/T1/J1 lines.
+> > It also reports line carrier detection events through the ALSA jack
+> > detection feature.
+> > 
+> > Signed-off-by: Herve Codina <herve.codina@bootlin.com>  
+> 
+> Reviewed-by: Christophe Leroy <christophe.leroy@csgroup.eu>
+> 
+> See below
+> 
+> > +static int framer_dai_hw_rule_channels_by_format(struct snd_soc_dai *dai,
+> > +						 struct snd_pcm_hw_params *params,
+> > +						 unsigned int nb_ts)
+> > +{
+> > +	struct snd_interval *c = hw_param_interval(params, SNDRV_PCM_HW_PARAM_CHANNELS);
+> > +	snd_pcm_format_t format = params_format(params);
+> > +	struct snd_interval ch = {0};
+> > +
+> > +	switch (snd_pcm_format_physical_width(format)) {
+> > +	case 8:
+> > +		ch.max = nb_ts;
+> > +		break;
+> > +	case 16:
+> > +		ch.max = nb_ts / 2;
+> > +		break;
+> > +	case 32:
+> > +		ch.max = nb_ts / 4;
+> > +		break;
+> > +	case 64:
+> > +		ch.max = nb_ts / 8;
+> > +		break;
+> > +	default:
+> > +		dev_err(dai->dev, "format physical width %u not supported\n",
+> > +			snd_pcm_format_physical_width(format));
+> > +		return -EINVAL;
+> > +	}  
+> 
+> What about
+> 
+> 	width = snd_pcm_format_physical_width(format);
+> 
+> 	if (width == 8 || width == 16 || width == 32 || width == 64) {
+> 		ch.max = nb_ts * 8 / width;
+> 	} else {
+> 		dev_err(dai->dev, "format physical width %u not supported\n", width);
+> 		return -EINVAL;
+> 	}
+> 
 
-Fixes: fa8ba3502ade ("ynl-gen-c.py: render netlink policies static for split ops")
-Signed-off-by: Jiri Pirko <jiri@nvidia.com>
----
- tools/net/ynl/ynl-gen-c.py | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+Yes, indeed.
+Will be changed in the next iteration.
 
-diff --git a/tools/net/ynl/ynl-gen-c.py b/tools/net/ynl/ynl-gen-c.py
-index e64311331726..6b9d9380a6ab 100755
---- a/tools/net/ynl/ynl-gen-c.py
-+++ b/tools/net/ynl/ynl-gen-c.py
-@@ -2000,9 +2000,10 @@ def print_kernel_op_table(family, cw):
-                             continue
-                         dont_validate.append(x)
- 
--                    members.append(('validate',
--                                    ' | '.join([c_upper('genl-dont-validate-' + x)
--                                                for x in dont_validate])), )
-+                    if dont_validate:
-+                        members.append(('validate',
-+                                        ' | '.join([c_upper('genl-dont-validate-' + x)
-+                                                    for x in dont_validate])), )
-                 name = c_lower(f"{family.name}-nl-{op_name}-{op_mode}it")
-                 if 'pre' in op[op_mode]:
-                     members.append((cb_names[op_mode]['pre'], c_lower(op[op_mode]['pre'])))
--- 
-2.41.0
-
+Regards,
+Hervé
 
