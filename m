@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-25388-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25403-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CAFAD773D7E
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 18:18:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17AE1773DDA
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 18:24:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EEB2D1C20F2E
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 16:18:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C539C280A69
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 16:24:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F8B5171D7;
-	Tue,  8 Aug 2023 16:09:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A771014AAF;
+	Tue,  8 Aug 2023 16:23:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 951DB3C37
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 16:09:54 +0000 (UTC)
-Received: from mail-oa1-x42.google.com (mail-oa1-x42.google.com [IPv6:2001:4860:4864:20::42])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 327CB1E5B3;
-	Tue,  8 Aug 2023 09:09:45 -0700 (PDT)
-Received: by mail-oa1-x42.google.com with SMTP id 586e51a60fabf-1bb89ac2013so4346882fac.1;
-        Tue, 08 Aug 2023 09:09:45 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C3AA14A88
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 16:23:00 +0000 (UTC)
+Received: from mail-qk1-x743.google.com (mail-qk1-x743.google.com [IPv6:2607:f8b0:4864:20::743])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A1FD9EC4;
+	Tue,  8 Aug 2023 09:22:42 -0700 (PDT)
+Received: by mail-qk1-x743.google.com with SMTP id af79cd13be357-76c8dd2ce79so553474785a.1;
+        Tue, 08 Aug 2023 09:22:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1691510958; x=1692115758;
+        d=gmail.com; s=20221208; t=1691511740; x=1692116540;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=c3VeUl42GIsBJoy2db7FH5pZ3W66hnMuj1immbzSRdg=;
-        b=ALM6FMLRl3lAWGDKvzWKfwt8peQVQnGhNNub989Bf17M8NiO6I1AzvPjVfvvDd/A9R
-         Cf44N/sNQq6L6iupbwagbLv6jwsROj7mocc/f5rSzUQdoFA2PaF6YKItZKTcMdmF8yrN
-         6HQoiDS2TbmfI23/uSMkeA4zSe8LiJpyJ06dk63zsu+boRQAttdUzm2gFfvJFooe6SII
-         W70d+8WSUyKmQHvM+QqvL/OrslwiQavSa3fIYpEEdAqH+622792cwFTESOfT+u74GCM9
-         kemvSs3iHR/mw0m0xLUSRa5xqGhOqIbwZjeTnHfLfXmToaIaDgzA6EkDAzP/4331wyye
-         gM3Q==
+        bh=1nhz2+yXHajZnOYlDCo8CCrQ4By4cAhwFG/S6tJ/BEs=;
+        b=smgq4l5pqVlPVvW/cItPB+/vNnEpRlbTOqquu8fjl0JTgwlDWqCHxptoR5z0/pqiUU
+         i3jZVELHVmZPdmLsO06WA2TGsc0eo+LRMWYa2pM3wDK8q2E938BvNL3P2ml60Z55AwKv
+         Igd7K8q9MIN4OIDRc1mzMvfmIZYl/X5nn55QKL5tjVanXWOH5zf1Eyxl5hXd3h+JEnN2
+         Ga3xzRO3Mop3Sh/eBsFctiJvHKnWh6X5BCdLFCpVaNR3+wvYmlROlx7tBnh8R69YqO6+
+         Q0ZhCrMiAp6oosTtRxDYWMx3QA8FAUysieU8DkRUOyJg4hHsD2tHe9DiYJWy1sU9pIBL
+         y5/Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691510958; x=1692115758;
+        d=1e100.net; s=20221208; t=1691511740; x=1692116540;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=c3VeUl42GIsBJoy2db7FH5pZ3W66hnMuj1immbzSRdg=;
-        b=Mlx1/4AijOUbwOdNzSfR7oh5cIcMwRP6BTxEemvmwNGK7VDc/11zIc9N22NZ0ZApWO
-         04MjxC5LcByh0ZAa321QKRy2pjrmzYOzhGL0TE/Oj2KBj9BLDnfCfx9ZHPs6JhxyTo2d
-         eSLGPdGUZQ3ySEWxFPREzvYiW/WFPhsCzwknwvPEdkPLOLnLHrzZtZBoML+QUML8OgAE
-         PuYAN61c/n2HXrS6Qt84w8xhaEc+/FN6Id4ic8L32GLgQGxKB0MRjeMvBNaDKdp/21T8
-         5Exltq6vlQZUFgnuir9mPwXjmdzfQqlu2PS3/LiGgvci8kvhlMDLVzU/my7/ZtzhQTJ3
-         sivg==
-X-Gm-Message-State: AOJu0YzQ9xdxT/Kaz9+AO5Of/YYUtC9vfz/hIDG0ZCezV6yAakSHpJyP
-	Mz8XIV5q21UT8wzRhQ6pK2r/ALDNIR7SHzcOZQc=
-X-Google-Smtp-Source: AGHT+IHuonVLAW9IJHEHvANu9pDz/t/I0xK1OV57MEExw5JgK2y2La9FkqeNB7I92r0IcYXlbhYiRg==
-X-Received: by 2002:a05:6a20:3205:b0:12f:382d:2a37 with SMTP id hl5-20020a056a20320500b0012f382d2a37mr12123960pzc.15.1691495951097;
-        Tue, 08 Aug 2023 04:59:11 -0700 (PDT)
+        bh=1nhz2+yXHajZnOYlDCo8CCrQ4By4cAhwFG/S6tJ/BEs=;
+        b=In0mTEB76cZ/WqcWPYeua8tTSx1tSN07WZjmRPj575ObMQHRWQK/Cucqa4OEoPFw8/
+         KHcTmk9VLdY0iEbOe8vvjt2ggBamlz6MgKAudhHVvaaQyZtMV4y7QGoyE/KQ9O6lBmC/
+         AuxGy05w9qYBEGvMemgMBOzcFBqRNNJ9dHdE3ihWT2+ARHbxyb5qbsnbNEO0k7gHodvb
+         17CtNn9G7mBshuipM0bFSENDmqTn8YO61Lsiq+XfngFcb3qzEXNboBPWNMWOpG5NYndN
+         U9rJaxQFqfb2FR24uJue11TyZzCitidqHCjIUjnYNNVr1o3ofx+M/Q5uNAif/QWfGOt5
+         K1sQ==
+X-Gm-Message-State: AOJu0YyLxG13YVn/XD8x7bxtP9RNVAQApaXaWeGIoDjYLxAj11/lL1Bq
+	3UN2Xu4hYHi7xwUwbsWQRjHdYBjn1ZP4pF9t/u4=
+X-Google-Smtp-Source: AGHT+IGDcprBdU/YGEJVmxmD2MiUy10xqa6E8xYjXFsuq2GGfBWfr75xn14FdeRLImTlStc0nYy2wA==
+X-Received: by 2002:a05:6a20:1057:b0:13d:ac08:6b72 with SMTP id gt23-20020a056a20105700b0013dac086b72mr9944937pzc.18.1691495953949;
+        Tue, 08 Aug 2023 04:59:13 -0700 (PDT)
 Received: from localhost.localdomain ([203.205.141.11])
-        by smtp.gmail.com with ESMTPSA id j22-20020a63e756000000b00563b36264besm6484136pgk.85.2023.08.08.04.59.08
+        by smtp.gmail.com with ESMTPSA id j22-20020a63e756000000b00563b36264besm6484136pgk.85.2023.08.08.04.59.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Aug 2023 04:59:10 -0700 (PDT)
+        Tue, 08 Aug 2023 04:59:13 -0700 (PDT)
 From: menglong8.dong@gmail.com
 X-Google-Original-From: imagedong@tencent.com
 To: edumazet@google.com,
@@ -68,9 +68,9 @@ Cc: davem@davemloft.net,
 	linux-kernel@vger.kernel.org,
 	flyingpeng@tencent.com,
 	Menglong Dong <imagedong@tencent.com>
-Subject: [PATCH net-next v3 1/3] net: tcp: send zero-window ACK when no memory
-Date: Tue,  8 Aug 2023 19:58:33 +0800
-Message-Id: <20230808115835.2862058-2-imagedong@tencent.com>
+Subject: [PATCH net-next v3 2/3] net: tcp: allow zero-window ACK update the window
+Date: Tue,  8 Aug 2023 19:58:34 +0800
+Message-Id: <20230808115835.2862058-3-imagedong@tencent.com>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20230808115835.2862058-1-imagedong@tencent.com>
 References: <20230808115835.2862058-1-imagedong@tencent.com>
@@ -90,97 +90,36 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 
 From: Menglong Dong <imagedong@tencent.com>
 
-For now, skb will be dropped when no memory, which makes client keep
-retrans util timeout and it's not friendly to the users.
+Fow now, an ACK can update the window in following case, according to
+the tcp_may_update_window():
 
-In this patch, we reply an ACK with zero-window in this case to update
-the snd_wnd of the sender to 0. Therefore, the sender won't timeout the
-connection and will probe the zero-window with the retransmits.
+1. the ACK acknowledged new data
+2. the ACK has new data
+3. the ACK expand the window and the seq of it is valid
+
+Now, we allow the ACK update the window if the window is 0, and the
+seq/ack of it is valid. This is for the case that the receiver replies
+an zero-window ACK when it is under memory stress and can't queue the new
+data.
 
 Signed-off-by: Menglong Dong <imagedong@tencent.com>
 ---
-v3:
-- refactor the code to avoid code duplication
-v2:
-- send 0 rwin ACK for the receive queue empty case when necessary
-- send the ACK immediately by using the ICSK_ACK_NOW flag
----
- include/net/inet_connection_sock.h |  3 ++-
- net/ipv4/tcp_input.c               | 18 ++++++++++++------
- net/ipv4/tcp_output.c              | 14 +++++++++++---
- 3 files changed, 25 insertions(+), 10 deletions(-)
+ net/ipv4/tcp_input.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/include/net/inet_connection_sock.h b/include/net/inet_connection_sock.h
-index c2b15f7e5516..be3c858a2ebb 100644
---- a/include/net/inet_connection_sock.h
-+++ b/include/net/inet_connection_sock.h
-@@ -164,7 +164,8 @@ enum inet_csk_ack_state_t {
- 	ICSK_ACK_TIMER  = 2,
- 	ICSK_ACK_PUSHED = 4,
- 	ICSK_ACK_PUSHED2 = 8,
--	ICSK_ACK_NOW = 16	/* Send the next ACK immediately (once) */
-+	ICSK_ACK_NOW = 16,	/* Send the next ACK immediately (once) */
-+	ICSK_ACK_NOMEM = 32,
- };
- 
- void inet_csk_init_xmit_timers(struct sock *sk,
 diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-index 8e96ebe373d7..2ac059483410 100644
+index 2ac059483410..d34d52fdfdb1 100644
 --- a/net/ipv4/tcp_input.c
 +++ b/net/ipv4/tcp_input.c
-@@ -5059,13 +5059,19 @@ static void tcp_data_queue(struct sock *sk, struct sk_buff *skb)
- 
- 		/* Ok. In sequence. In window. */
- queue_and_out:
--		if (skb_queue_len(&sk->sk_receive_queue) == 0)
--			sk_forced_mem_schedule(sk, skb->truesize);
--		else if (tcp_try_rmem_schedule(sk, skb, skb->truesize)) {
--			reason = SKB_DROP_REASON_PROTO_MEM;
--			NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPRCVQDROP);
-+		if (tcp_try_rmem_schedule(sk, skb, skb->truesize)) {
-+			/* TODO: maybe ratelimit these WIN 0 ACK ? */
-+			inet_csk(sk)->icsk_ack.pending |=
-+					(ICSK_ACK_NOMEM | ICSK_ACK_NOW);
-+			inet_csk_schedule_ack(sk);
- 			sk->sk_data_ready(sk);
--			goto drop;
-+
-+			if (skb_queue_len(&sk->sk_receive_queue)) {
-+				reason = SKB_DROP_REASON_PROTO_MEM;
-+				NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPRCVQDROP);
-+				goto drop;
-+			}
-+			sk_forced_mem_schedule(sk, skb->truesize);
- 		}
- 
- 		eaten = tcp_queue_rcv(sk, skb, &fragstolen);
-diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
-index c5412ee77fc8..769a558159ee 100644
---- a/net/ipv4/tcp_output.c
-+++ b/net/ipv4/tcp_output.c
-@@ -257,11 +257,19 @@ EXPORT_SYMBOL(tcp_select_initial_window);
- static u16 tcp_select_window(struct sock *sk)
+@@ -3525,7 +3525,7 @@ static inline bool tcp_may_update_window(const struct tcp_sock *tp,
  {
- 	struct tcp_sock *tp = tcp_sk(sk);
--	u32 old_win = tp->rcv_wnd;
--	u32 cur_win = tcp_receive_window(tp);
--	u32 new_win = __tcp_select_window(sk);
- 	struct net *net = sock_net(sk);
-+	u32 old_win = tp->rcv_wnd;
-+	u32 cur_win, new_win;
-+
-+	/* Make the window 0 if we failed to queue the data because we
-+	 * are out of memory. The window is temporary, so we don't store
-+	 * it on the socket.
-+	 */
-+	if (unlikely(inet_csk(sk)->icsk_ack.pending & ICSK_ACK_NOMEM))
-+		return 0;
+ 	return	after(ack, tp->snd_una) ||
+ 		after(ack_seq, tp->snd_wl1) ||
+-		(ack_seq == tp->snd_wl1 && nwin > tp->snd_wnd);
++		(ack_seq == tp->snd_wl1 && (nwin > tp->snd_wnd || !nwin));
+ }
  
-+	cur_win = tcp_receive_window(tp);
-+	new_win = __tcp_select_window(sk);
- 	if (new_win < cur_win) {
- 		/* Danger Will Robinson!
- 		 * Don't update rcv_wup/rcv_wnd here or else
+ /* If we update tp->snd_una, also update tp->bytes_acked */
 -- 
 2.40.1
 
