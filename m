@@ -1,90 +1,241 @@
-Return-Path: <netdev+bounces-25233-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25234-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26C6477366D
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 04:20:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6792B77367C
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 04:24:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 537DA1C20B85
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 02:20:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9671028132E
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 02:24:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 183457FD;
-	Tue,  8 Aug 2023 02:20:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A50F4801;
+	Tue,  8 Aug 2023 02:24:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 121DC37E
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 02:20:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 886B7C433C9;
-	Tue,  8 Aug 2023 02:20:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691461221;
-	bh=kIyAQMukGXX9hkfOIlUbx01Y94cwkm21Uaczx4ozoPo=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=R4+Ff2oWweI6Pxzul5oURhFvP7LdJM1JFZBYoGuJL+we1MR4sM+t+WlNoG+wW2ZPw
-	 9SLsUtp4Jj+ZnHDT1LNtt3nud3r5ifP8IcUaHQwODJSzb0qIY9tFMSXmU4ZFmgyI5g
-	 ke2yztGbfb2aJglQPCwUB71T1bbUcO5PN05NZVX98wykp/Ovkx39SyKhdNCQSWJlga
-	 E1JOrcuBeMZjwmfFaPKxhLcY4dCTGrHTHMxArIY6PqE1+QKs1WA6RqIocVEiAZCS9T
-	 rZPlqmkaUEZRJ9eMI4nA+jblkgXqCTyoHGcL3uYb0MNB2gab1M4Sz4+3IYwJ2Ys1t/
-	 x1f4XgwtO8WJw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6DBA3E505D4;
-	Tue,  8 Aug 2023 02:20:21 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9923E7FE
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 02:24:25 +0000 (UTC)
+Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FED719BC
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 19:24:14 -0700 (PDT)
+Received: by mail-pl1-x62a.google.com with SMTP id d9443c01a7336-1b8ad8383faso46445135ad.0
+        for <netdev@vger.kernel.org>; Mon, 07 Aug 2023 19:24:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fromorbit-com.20221208.gappssmtp.com; s=20221208; t=1691461454; x=1692066254;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=HUGk8Gm4qWKcvYyYW1oMdtOdnxgdWZtLrf0WmvG8aOg=;
+        b=E8R/sNcxrOK1IUnWWdPxuHAURfzEKsQXFvPF/8WoYIocyBzrOF6C/15wk0bBTyq8fp
+         w+9skh2POsCjChG96SdxCE1ukUJoo7U6iUCJoOHux3qHabiPQt2q8GYhzVnnqh4Ia8gf
+         otMrpF/u+4+6GZvnjfH9iZQVLX7oYyO80eB3aSg/65gqSdDxQ6TBQ0eTbg/7hck8CRIR
+         N2poqJrxPUv+xHM8+kwldwyyrpY8ClA2gjcNqxK3I6Rjaxj3f+CIGTw2aTNSrwyrBhAC
+         fS1NWvmq7XKVFcVROA15iTu7BqzTlMOOgRsfusR61dD9uCRFfNfvH5SixHmdTB0ZZ2at
+         NUZw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691461454; x=1692066254;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HUGk8Gm4qWKcvYyYW1oMdtOdnxgdWZtLrf0WmvG8aOg=;
+        b=ZHM6YsjzEa3e43eZgQ1G5oygXCOY8ytvKE2bYSm2r+H3yQ2uqUQSQWKokvLA11IOBp
+         dYms6R0mmtiL+1Gy3TaQ9O8CarO5J9TQKJWdzEG2/2dzGHOYvpxAes6HpatcdnMmCUzC
+         +B3UiWBKoH30rsrbWL9Xj7ArRRQcoG8p1BhS9HN29gs/zGvAre/T3DNO9LBYIQiKsYLE
+         F/OgqZt0ngPLgnYLGgN3GhOPAcnuXeioMpfZGAItw5Sx593VQ5x8vgLp+2GvMDH3XbSD
+         dg0E3zsXx0iTEGR8EhEsywDwzu+HM28Y2b86YowuPBNu3WJQESy5eNDCG+B4LSGQVftU
+         mDjg==
+X-Gm-Message-State: AOJu0Yy5C4W/XrNjthymq9caXi7Z+DM6V8rIBZ83twNdtn8JIZJ2THq6
+	FEAlQF+RCk1SsPh8o8Vkg3XLQw==
+X-Google-Smtp-Source: AGHT+IEzrDGpXyLCXRNBmZGxK80nBmbnZ3Zc29NdEkVzSJ3QNXEJvOFh13D52+77LsVxnWz7HKqTHA==
+X-Received: by 2002:a17:902:8692:b0:1b9:d307:c1df with SMTP id g18-20020a170902869200b001b9d307c1dfmr10722096plo.17.1691461453690;
+        Mon, 07 Aug 2023 19:24:13 -0700 (PDT)
+Received: from dread.disaster.area (pa49-180-166-213.pa.nsw.optusnet.com.au. [49.180.166.213])
+        by smtp.gmail.com with ESMTPSA id h17-20020a170902f55100b001b864add154sm7583543plf.154.2023.08.07.19.24.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Aug 2023 19:24:13 -0700 (PDT)
+Received: from dave by dread.disaster.area with local (Exim 4.96)
+	(envelope-from <david@fromorbit.com>)
+	id 1qTCOH-002Wjl-2u;
+	Tue, 08 Aug 2023 12:24:09 +1000
+Date: Tue, 8 Aug 2023 12:24:09 +1000
+From: Dave Chinner <david@fromorbit.com>
+To: Qi Zheng <zhengqi.arch@bytedance.com>
+Cc: akpm@linux-foundation.org, tkhai@ya.ru, vbabka@suse.cz,
+	roman.gushchin@linux.dev, djwong@kernel.org, brauner@kernel.org,
+	paulmck@kernel.org, tytso@mit.edu, steven.price@arm.com,
+	cel@kernel.org, senozhatsky@chromium.org, yujie.liu@intel.com,
+	gregkh@linuxfoundation.org, muchun.song@linux.dev,
+	simon.horman@corigine.com, dlemoal@kernel.org,
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org, x86@kernel.org,
+	kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
+	linux-erofs@lists.ozlabs.org,
+	linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
+	linux-nfs@vger.kernel.org, linux-mtd@lists.infradead.org,
+	rcu@vger.kernel.org, netdev@vger.kernel.org,
+	dri-devel@lists.freedesktop.org, linux-arm-msm@vger.kernel.org,
+	dm-devel@redhat.com, linux-raid@vger.kernel.org,
+	linux-bcache@vger.kernel.org,
+	virtualization@lists.linux-foundation.org,
+	linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
+	linux-xfs@vger.kernel.org, linux-btrfs@vger.kernel.org
+Subject: Re: [PATCH v4 45/48] mm: shrinker: make global slab shrink lockless
+Message-ID: <ZNGnSbiPN0lDLpSW@dread.disaster.area>
+References: <20230807110936.21819-1-zhengqi.arch@bytedance.com>
+ <20230807110936.21819-46-zhengqi.arch@bytedance.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v5 1/2] drivers: net: prevent tun_build_skb() to
- exceed the packet size limit
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169146122144.9822.6352423513613934358.git-patchwork-notify@kernel.org>
-Date: Tue, 08 Aug 2023 02:20:21 +0000
-References: <20230803185947.2379988-1-andrew.kanner@gmail.com>
-In-Reply-To: <20230803185947.2379988-1-andrew.kanner@gmail.com>
-To: Andrew Kanner <andrew.kanner@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, jasowang@redhat.com, netdev@vger.kernel.org,
- hawk@kernel.org, jbrouer@redhat.com, dsahern@gmail.com,
- john.fastabend@gmail.com, linux-kernel@vger.kernel.org,
- linux-kernel-mentees@lists.linuxfoundation.org,
- syzbot+f817490f5bd20541b90a@syzkaller.appspotmail.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230807110936.21819-46-zhengqi.arch@bytedance.com>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
+On Mon, Aug 07, 2023 at 07:09:33PM +0800, Qi Zheng wrote:
+> diff --git a/include/linux/shrinker.h b/include/linux/shrinker.h
+> index eb342994675a..f06225f18531 100644
+> --- a/include/linux/shrinker.h
+> +++ b/include/linux/shrinker.h
+> @@ -4,6 +4,8 @@
+>  
+>  #include <linux/atomic.h>
+>  #include <linux/types.h>
+> +#include <linux/refcount.h>
+> +#include <linux/completion.h>
+>  
+>  #define SHRINKER_UNIT_BITS	BITS_PER_LONG
+>  
+> @@ -87,6 +89,10 @@ struct shrinker {
+>  	int seeks;	/* seeks to recreate an obj */
+>  	unsigned flags;
+>  
+> +	refcount_t refcount;
+> +	struct completion done;
+> +	struct rcu_head rcu;
 
-This series was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Documentation, please. What does the refcount protect, what does the
+completion provide, etc.
 
-On Thu,  3 Aug 2023 20:59:48 +0200 you wrote:
-> Using the syzkaller repro with reduced packet size it was discovered
-> that XDP_PACKET_HEADROOM is not checked in tun_can_build_skb(),
-> although pad may be incremented in tun_build_skb(). This may end up
-> with exceeding the PAGE_SIZE limit in tun_build_skb().
-> 
-> Jason Wang <jasowang@redhat.com> proposed to count XDP_PACKET_HEADROOM
-> always (e.g. without rcu_access_pointer(tun->xdp_prog)) in
-> tun_can_build_skb() since there's a window during which XDP program
-> might be attached between tun_can_build_skb() and tun_build_skb().
-> 
-> [...]
+> +
+>  	void *private_data;
+>  
+>  	/* These are for internal use */
+> @@ -120,6 +126,17 @@ struct shrinker *shrinker_alloc(unsigned int flags, const char *fmt, ...);
+>  void shrinker_register(struct shrinker *shrinker);
+>  void shrinker_free(struct shrinker *shrinker);
+>  
+> +static inline bool shrinker_try_get(struct shrinker *shrinker)
+> +{
+> +	return refcount_inc_not_zero(&shrinker->refcount);
+> +}
+> +
+> +static inline void shrinker_put(struct shrinker *shrinker)
+> +{
+> +	if (refcount_dec_and_test(&shrinker->refcount))
+> +		complete(&shrinker->done);
+> +}
+> +
+>  #ifdef CONFIG_SHRINKER_DEBUG
+>  extern int __printf(2, 3) shrinker_debugfs_rename(struct shrinker *shrinker,
+>  						  const char *fmt, ...);
+> diff --git a/mm/shrinker.c b/mm/shrinker.c
+> index 1911c06b8af5..d318f5621862 100644
+> --- a/mm/shrinker.c
+> +++ b/mm/shrinker.c
+> @@ -2,6 +2,7 @@
+>  #include <linux/memcontrol.h>
+>  #include <linux/rwsem.h>
+>  #include <linux/shrinker.h>
+> +#include <linux/rculist.h>
+>  #include <trace/events/vmscan.h>
+>  
+>  #include "internal.h"
+> @@ -577,33 +578,42 @@ unsigned long shrink_slab(gfp_t gfp_mask, int nid, struct mem_cgroup *memcg,
+>  	if (!mem_cgroup_disabled() && !mem_cgroup_is_root(memcg))
+>  		return shrink_slab_memcg(gfp_mask, nid, memcg, priority);
+>  
+> -	if (!down_read_trylock(&shrinker_rwsem))
+> -		goto out;
+> -
+> -	list_for_each_entry(shrinker, &shrinker_list, list) {
+> +	rcu_read_lock();
+> +	list_for_each_entry_rcu(shrinker, &shrinker_list, list) {
+>  		struct shrink_control sc = {
+>  			.gfp_mask = gfp_mask,
+>  			.nid = nid,
+>  			.memcg = memcg,
+>  		};
+>  
+> +		if (!shrinker_try_get(shrinker))
+> +			continue;
+> +
+> +		/*
+> +		 * We can safely unlock the RCU lock here since we already
+> +		 * hold the refcount of the shrinker.
+> +		 */
+> +		rcu_read_unlock();
+> +
+>  		ret = do_shrink_slab(&sc, shrinker, priority);
+>  		if (ret == SHRINK_EMPTY)
+>  			ret = 0;
+>  		freed += ret;
+> +
+>  		/*
+> -		 * Bail out if someone want to register a new shrinker to
+> -		 * prevent the registration from being stalled for long periods
+> -		 * by parallel ongoing shrinking.
+> +		 * This shrinker may be deleted from shrinker_list and freed
+> +		 * after the shrinker_put() below, but this shrinker is still
+> +		 * used for the next traversal. So it is necessary to hold the
+> +		 * RCU lock first to prevent this shrinker from being freed,
+> +		 * which also ensures that the next shrinker that is traversed
+> +		 * will not be freed (even if it is deleted from shrinker_list
+> +		 * at the same time).
+>  		 */
 
-Here is the summary with links:
-  - [net-next,v5,1/2] drivers: net: prevent tun_build_skb() to exceed the packet size limit
-    https://git.kernel.org/netdev/net/c/59eeb2329405
-  - [net-next,v5,2/2] net: core: remove unnecessary frame_sz check in bpf_xdp_adjust_tail()
-    https://git.kernel.org/netdev/net/c/d14eea09edf4
+This needs to be moved to the head of the function, and document
+the whole list walk, get, put and completion parts of the algorithm
+that make it safe. There's more to this than "we hold a reference
+count", especially the tricky "we might see the shrinker before it
+is fully initialised" case....
 
-You are awesome, thank you!
+
+.....
+>  void shrinker_free(struct shrinker *shrinker)
+>  {
+>  	struct dentry *debugfs_entry = NULL;
+> @@ -686,9 +712,18 @@ void shrinker_free(struct shrinker *shrinker)
+>  	if (!shrinker)
+>  		return;
+>  
+> +	if (shrinker->flags & SHRINKER_REGISTERED) {
+> +		shrinker_put(shrinker);
+> +		wait_for_completion(&shrinker->done);
+> +	}
+
+Needs a comment explaining why we need to wait here...
+> +
+>  	down_write(&shrinker_rwsem);
+>  	if (shrinker->flags & SHRINKER_REGISTERED) {
+> -		list_del(&shrinker->list);
+> +		/*
+> +		 * Lookups on the shrinker are over and will fail in the future,
+> +		 * so we can now remove it from the lists and free it.
+> +		 */
+
+.... rather than here after the wait has been done and provided the
+guarantee that no shrinker is running or will run again...
+
+-Dave.
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Dave Chinner
+david@fromorbit.com
 
