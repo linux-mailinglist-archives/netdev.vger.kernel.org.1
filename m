@@ -1,81 +1,103 @@
-Return-Path: <netdev+bounces-25230-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25231-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D93B773660
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 04:13:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19524773661
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 04:13:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D032C2815F7
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 02:13:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DE4D11C20DF1
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 02:13:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E182F638;
-	Tue,  8 Aug 2023 02:13:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84B3B659;
+	Tue,  8 Aug 2023 02:13:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7515394
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 02:13:06 +0000 (UTC)
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 978081711
-	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 19:13:04 -0700 (PDT)
-Received: from kwepemi500012.china.huawei.com (unknown [172.30.72.56])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4RKc7y4x9rztRmM;
-	Tue,  8 Aug 2023 10:09:34 +0800 (CST)
-Received: from huawei.com (10.90.53.73) by kwepemi500012.china.huawei.com
- (7.221.188.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Tue, 8 Aug
- 2023 10:13:02 +0800
-From: Li Zetao <lizetao1@huawei.com>
-To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>
-CC: <lizetao1@huawei.com>, <netdev@vger.kernel.org>
-Subject: [PATCH net-next] net: mhi: Remove redundant initialization owner in mhi_net_driver
-Date: Tue, 8 Aug 2023 10:12:38 +0800
-Message-ID: <20230808021238.2975585-1-lizetao1@huawei.com>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6372537E
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 02:13:41 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D19CFC433C7;
+	Tue,  8 Aug 2023 02:13:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1691460821;
+	bh=hIQVyIVKa1+wJpqh5robkngECkA8ABSIuJqROobHfJ8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=edC9yk2r/XOjRcTvRytMFoUIb23G/AG33ZeYVn3iv8oLaSuBKOhyN7oV/fyjKnhtX
+	 owDadoai/wYzTQcQ1LqhkCWoZsRlkEE/JLozzIl4L/MKarVVmHQHgkga1cLZwYOzud
+	 leyFXFALlM2bA31ixh/zx9BUN45St2r674GVej2DOLrkx2oAPLxaexox3ey98o9PPG
+	 qsqL+9c9PUfD5sxsZe5rtuBu6XtMVAgBzlX1tZ/yilR/yTvFUpVcpwBOnZse//qtnD
+	 ieG85Ky4CRT955VqEiEQsDX1RBF4MJKHUHKQyuE6/OS16yaBrq0ntMZdz096HgdVlb
+	 B75Fqi/7IyikQ==
+Date: Mon, 7 Aug 2023 19:13:39 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Nick Child <nnac123@linux.ibm.com>
+Cc: netdev@vger.kernel.org, haren@linux.ibm.com, ricklind@us.ibm.com,
+ danymadden@us.ibm.com, tlfalcon@linux.ibm.com, bjking1@linux.ibm.com
+Subject: Re: [PATCH net 5/5] ibmvnic: Ensure login failure recovery is safe
+ from other resets
+Message-ID: <20230807191339.709dc247@kernel.org>
+In-Reply-To: <20230803202010.37149-5-nnac123@linux.ibm.com>
+References: <20230803202010.37149-1-nnac123@linux.ibm.com>
+	<20230803202010.37149-5-nnac123@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.90.53.73]
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- kwepemi500012.china.huawei.com (7.221.188.12)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-The module_mhi_driver() will set "THIS_MODULE" to driver.owner when
-register a mhi_driver driver, so it is redundant initialization to set
-driver.owner in the statement. Remove it for clean code.
+On Thu,  3 Aug 2023 15:20:10 -0500 Nick Child wrote:
+> +			do {
+> +				reinit_init_done(adapter);
+> +				/* Clear any failovers we got in the previous
+> +				 * pass since we are re-initializing the CRQ
+> +				 */
+> +				adapter->failover_pending = false;
+> +				release_crq_queue(adapter);
+> +				/* If we don't sleep here then we risk an
+> +				 * unnecessary failover event from the VIOS.
+> +				 * This is a known VIOS issue caused by a vnic
+> +				 * device freeing and registering a CRQ too
+> +				 * quickly.
+> +				 */
+> +				msleep(1500);
+> +				/* Avoid any resets, since we are currently
+> +				 * resetting.
+> +				 */
+> +				spin_lock_irqsave(&adapter->rwi_lock, flags);
+> +				flush_reset_queue(adapter);
+> +				spin_unlock_irqrestore(&adapter->rwi_lock,
+> +						       flags);
+> +
+> +				rc = init_crq_queue(adapter);
+> +				if (rc) {
+> +					netdev_err(netdev, "login recovery: init CRQ failed %d\n",
+> +						   rc);
+> +					return -EIO;
+> +				}
+>  
+> -			rc = ibmvnic_reset_init(adapter, false);
+> -			if (rc) {
+> -				netdev_err(netdev, "login recovery: Reset init failed %d\n",
+> -					   rc);
+> -				return -EIO;
+> -			}
+> +				rc = ibmvnic_reset_init(adapter, false);
+> +				if (rc)
+> +					netdev_err(netdev, "login recovery: Reset init failed %d\n",
+> +						   rc);
+> +				/* IBMVNIC_CRQ_INIT will return EAGAIN if it
+> +				 * fails, since ibmvnic_reset_init will free
+> +				 * irq's in failure, we won't be able to receive
+> +				 * new CRQs so we need to keep trying. probe()
+> +				 * handles this similarly.
+> +				 */
+> +			} while (rc == -EAGAIN);
 
-Signed-off-by: Li Zetao <lizetao1@huawei.com>
----
- drivers/net/mhi_net.c | 1 -
- 1 file changed, 1 deletion(-)
-
-diff --git a/drivers/net/mhi_net.c b/drivers/net/mhi_net.c
-index 3d322ac4f6a5..ae169929a9d8 100644
---- a/drivers/net/mhi_net.c
-+++ b/drivers/net/mhi_net.c
-@@ -403,7 +403,6 @@ static struct mhi_driver mhi_net_driver = {
- 	.id_table = mhi_net_id_table,
- 	.driver = {
- 		.name = "mhi_net",
--		.owner = THIS_MODULE,
- 	},
- };
- 
--- 
-2.34.1
-
+Isn't this potentially an infinite loop? Can we limit the max number of
+iterations here or something already makes this loop safe?
 
