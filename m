@@ -1,52 +1,47 @@
-Return-Path: <netdev+bounces-25556-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25557-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D26B5774B25
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 22:42:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8803A774B8B
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 22:49:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 10F56281878
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 20:42:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 79F4C1C20F9C
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 20:49:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFACC14F90;
-	Tue,  8 Aug 2023 20:42:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 105EA14F87;
+	Tue,  8 Aug 2023 20:49:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEB6B1B7F0
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 20:42:12 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 035CF93D3
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 13:42:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=IUUupTrh01KI7GSQaLdgaJaq14w9m6HX6j5jdiwQCYE=; b=jjKpRVwhjiAdNnmitZ1TNXToKK
-	fqUR935hMAAcjLuIgnZOevPuVlndcKdvSq/weciOJpVXHXT2xUGlirC856sms/ECMdye+qS3663+m
-	1yS2KkwM7ye8tdjTyTaCosiNzInHhsrYInYSnX5RQDgizIlc5G0Dabubw0PpIRxYYxDs=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qTTWZ-003W4A-8j; Tue, 08 Aug 2023 22:41:51 +0200
-Date: Tue, 8 Aug 2023 22:41:51 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Jiawen Wu <jiawenwu@trustnetic.com>, netdev@vger.kernel.org,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, hkallweit1@gmail.com, Jose.Abreu@synopsys.com,
-	mengyuanlou@net-swift.com
-Subject: Re: [PATCH net-next v2 1/7] net: pcs: xpcs: add specific vendor
- supoprt for Wangxun 10Gb NICs
-Message-ID: <b53e4e02-dc74-4993-937d-6acd5d1cdd9b@lunn.ch>
-References: <20230808021708.196160-1-jiawenwu@trustnetic.com>
- <20230808021708.196160-2-jiawenwu@trustnetic.com>
- <ZNIJDMwlBa/LRJ0C@shell.armlinux.org.uk>
- <082101d9c9dd$2595f400$70c1dc00$@trustnetic.com>
- <ZNISkaXBNO5z6csw@shell.armlinux.org.uk>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE4F610FF
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 20:49:42 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A83BDC433C7;
+	Tue,  8 Aug 2023 20:49:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1691527782;
+	bh=JYHRhEx/YWaT7o/axmRTijT6ZjSVmkc8XuhZg3PcQ8w=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=HfjUR/oebhUhEd+UQfCAKdc3H9NQbZe1xja3nMcQStE1m++9lgjIRY+eZoEmqcSrX
+	 3cka0Z/YKxef3cHOw35HdxFPxPx6kolAGF5PNorYDNVHUwEx7zOl9JDU7IczPsgJDy
+	 ir/MR2qVArG/O0eo2cDfzFyHyePKYqo6OyJzP0CVScZ1hoHZhzWuIC9bUEqsXbxHR1
+	 r4R3pE8DmVgLffZ3gAL7iENBKUFz6xVdc+sEND0xAEXmDnPYoq1npWIsaBrhg91elY
+	 vYDcYuQPlOKSHShwMfAJORMaVSaJdQ5Zv5Seum/SCsJzTm0yr8Ni+0NGh5lO/IdgG4
+	 aKyoaSPDtAJvg==
+Date: Tue, 8 Aug 2023 22:49:38 +0200
+From: Simon Horman <horms@kernel.org>
+To: Wenjun Wu <wenjun1.wu@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	xuejun.zhang@intel.com, madhu.chittim@intel.com,
+	qi.z.zhang@intel.com, anthony.l.nguyen@intel.com
+Subject: Re: [PATCH iwl-next v2 4/5] iavf: Add devlink port function rate API
+ support
+Message-ID: <ZNKqYlC86siUsRzd@vergenet.net>
+References: <20230727021021.961119-1-wenjun1.wu@intel.com>
+ <20230808015734.1060525-1-wenjun1.wu@intel.com>
+ <20230808015734.1060525-5-wenjun1.wu@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,26 +50,67 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZNISkaXBNO5z6csw@shell.armlinux.org.uk>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+In-Reply-To: <20230808015734.1060525-5-wenjun1.wu@intel.com>
 
-> > > If the answer to that is yes, it would be preferable to use that
-> > > rather than adding a bitarray of flags to indicate various "quirks".
-> > 
-> > It has not been implemented yet. We could implement it in flash if it's wanted.
-> > But it would require upgrading to the new firmware.
+On Tue, Aug 08, 2023 at 09:57:33AM +0800, Wenjun Wu wrote:
+> From: Jun Zhang <xuejun.zhang@intel.com>
 > 
-> Andrew, do you any opinions? Do you think it would be a good idea to
-> use the device/package identifiers, rather than a bitfield of quirks?
+> To allow user to configure queue based parameters, devlink port function
+> rate api functions are added for setting node tx_max and tx_share
+> parameters.
+> 
+> iavf rate tree with root node and  queue nodes is created and registered
+> with devlink rate when iavf adapter is configured.
+> 
+> Signed-off-by: Jun Zhang <xuejun.zhang@intel.com>
 
-Using identifiers would be cleaner.
+...
 
-Does trustnetic or net-swift have an OUI?
+> +/**
+> + * iavf_update_queue_tx_max - sets tx max parameter
+> + * @adapter: iavf adapter struct instance
+> + * @node: iavf rate node struct instance
+> + * @bw: bandwidth in bytes per second
+> + * @extack: extended netdev ack structure
+> + *
+> + * This function sets max BW limit.
+> + */
+> +static int iavf_update_queue_tx_max(struct iavf_adapter *adapter,
+> +				    struct iavf_dev_rate_node *node,
+> +				    u64 bw, struct netlink_ext_ack *extack)
+> +{
+> +	/* Keep in kbps */
+> +	node->tx_max_temp = div_u64(bw, IAVF_RATE_DIV_FACTOR);
+> +	if (ADV_LINK_SUPPORT(adapter)) {
+> +		if (node->tx_max_temp / 1000 > adapter->link_speed_mbps)
+> +			return -EINVAL;
+> +	}
+> +
+> +	node->tx_update_flag |= IAVF_FLAG_TX_MAX_UPDATED;
+> +
+> +	return iavf_check_update_config(adapter, node);
+> +}
+> +
+> +/**
+> + * iavf_devlink_rate_node_tx_max_set - devlink_rate API for setting tx max
+> + * @rate_node: devlink rate struct instance
 
-     Andrew
+Hi Jun Zhang,
+
+Please describe all the parameters of iavf_devlink_rate_node_tx_max_set
+in it's kernel doc.
+
+./scripts/kernel-doc -none is your friend here.
+
+> + *
+> + * This function implements rate_node_tx_max_set function of devlink_ops
+> + */
+> +static int iavf_devlink_rate_node_tx_max_set(struct devlink_rate *rate_node,
+> +					     void *priv, u64 tx_max,
+> +					     struct netlink_ext_ack *extack)
+
+...
+
+-- 
+pw-bot: changes-requested
 
