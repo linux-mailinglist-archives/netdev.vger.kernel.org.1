@@ -1,131 +1,253 @@
-Return-Path: <netdev+bounces-25248-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25249-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F56677374E
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 05:07:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B29B77375A
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 05:08:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1843F2815B7
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 03:07:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E99F22815A3
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 03:08:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C7C010E8;
-	Tue,  8 Aug 2023 03:07:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3EE3801;
+	Tue,  8 Aug 2023 03:08:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 407FCECD
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 03:07:38 +0000 (UTC)
-Received: from mail-yw1-x112e.google.com (mail-yw1-x112e.google.com [IPv6:2607:f8b0:4864:20::112e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D722180;
-	Mon,  7 Aug 2023 20:07:36 -0700 (PDT)
-Received: by mail-yw1-x112e.google.com with SMTP id 00721157ae682-5861116fd74so49005587b3.0;
-        Mon, 07 Aug 2023 20:07:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1691464055; x=1692068855;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=0G2Gm44L7ws5E/quoPqMuJmdghfzOor5wGEa6AaRIig=;
-        b=MIB1dRWNV6Yb3HUd1qPb/bgwaoUzAlGVu8CxiiwIDYwN4TMseNzdPMVbuAfPyciWjI
-         AZzeBtiA00C4EVQ8EGlp9e8Q3pbBFc8aCRl+HJu3YtRoio8lAQY1qu2UvIE5hChxs5Q1
-         PKMC/y7tlRiDWg5YOtPXbZsaYs//GKuhiSEDo5WpI7edOLzGAaAJjqvFIOQWWQAuLo7Z
-         JBsPnB5UvxOuJ1p76ZyxSuA7+KQWE3J2jS89kM5pl3PIv+dMsBBD/LquAyRZomdcC7zN
-         v+sSG+iPprRQeQoEH+XZP/GEzjEboCjqHBhNwHzm7vxhsHdZplrvrz31A5i2G+xxBQ4/
-         u+EA==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D89741384
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 03:08:29 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54111121
+	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 20:08:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1691464107;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Hhbbf/y3ixYRtFGuR8fxsOg96UrZPCnLYZgyvI13pPE=;
+	b=KDUuGnVt36NiQKFSAGGyxEDJBwSyUPAjZgp9Sbkk/nKCWmL7gL6xhSfbxI8zyKZuxP2K1n
+	56U0qEzKEQJOzh/ZT/+2bSPEZCmlsu7DZrobiP9wQ4U5/mOQNbnAr0ssaJ7M7RGChw122j
+	PPL8oKXlhgLP3s5X/DeFX/SNoqcbRFo=
+Received: from mail-lj1-f199.google.com (mail-lj1-f199.google.com
+ [209.85.208.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-203-mePlvs3qOeagusILxkn2Hg-1; Mon, 07 Aug 2023 23:08:23 -0400
+X-MC-Unique: mePlvs3qOeagusILxkn2Hg-1
+Received: by mail-lj1-f199.google.com with SMTP id 38308e7fff4ca-2b9dc1bfdd2so54080901fa.1
+        for <netdev@vger.kernel.org>; Mon, 07 Aug 2023 20:08:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691464055; x=1692068855;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=0G2Gm44L7ws5E/quoPqMuJmdghfzOor5wGEa6AaRIig=;
-        b=cTAhVJDVEwS8pBrL0SXNg3xFgnu4vZIU6lfQn2gDq/eIdolAU9TIC+ou5tokaftI+9
-         mtUtgXKRyRudmqhl9YfrHSS43aDD0oD/K37mVVcecuoDRxxbolTEFoZf5vO/ky7XGkXH
-         7J3sW/KIiEJvkuaE9Dq5LNGNXhIwCGi1YpPyqDosfSTIRe2oRSicB+02CwgQSwuCwQbN
-         KfJwPJEo/DaesAeCnohgFjM6xjNJlKCn7L6seUd6sfmNskz8x1+HOllrVd9Yr9Jf0HoX
-         grksd3LcUPDn23cLuTdAeryouLh/sxwbnaOABtHmiMeHIxPe22tDDyD0VPGUus1usR5P
-         OL7A==
-X-Gm-Message-State: AOJu0YznfGMieNEkSIdc/xYwQunbD1ZgIZuYbs6BDwk+bZMW8qVnrafK
-	tMz721jgIzMLSSdVF+/WF+kouKBvwYAulTCE11k=
-X-Google-Smtp-Source: AGHT+IHQrIvich9PHSVbgRXTdmB7iIbb8QzxP6y5/ZjBG6gKIk1MkGZwx3L/64MT/J6/QOrL9i/+Y+FD0/7A7U+VjlM=
-X-Received: by 2002:a0d:dd4a:0:b0:589:642d:6d84 with SMTP id
- g71-20020a0ddd4a000000b00589642d6d84mr2728002ywe.23.1691464055184; Mon, 07
- Aug 2023 20:07:35 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1691464101; x=1692068901;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Hhbbf/y3ixYRtFGuR8fxsOg96UrZPCnLYZgyvI13pPE=;
+        b=OSPbAHDQmANyNMMlZSsqrf1woaCKJ8sR5MbdhF9JUVqGZXSmE6QGv1O0u69qmDKBrG
+         /0bFCcuZ+mAwUBM+t37/FJpHEhw6SyufeWlc1dg28w0qjZBYw4HUFp3J5dCORED0B63v
+         j8XTHTZPvlRcatpiLYIyt3kyOAm4w7V/qUn/6Fn0/OOPzMoPQdN92V6Io0tLdBeXhzWw
+         Y11rXdKwtRdNGfMY3hc55oNWNWoBSJgixNWQGBHmjvN6dt6lWhjI5GQqgv2wTrLn+Dr8
+         EGO//UyowaJjyPseCe2I9VMoZHAFWCoP/BbzixboGilNuewSvjs71VcgJmWIoY9c9dM4
+         pP+g==
+X-Gm-Message-State: AOJu0YxYD+c8CWYrOoFZEkN6WZP0tV8Lj0+5Tn9jP52O/73i/USlWZVO
+	mBextjucrcJB8iKUfgNVWLhQtqK8G6S72e44Ujribxbp17SyxvLr19ytkE/FUpZMz9gxMKdWXAH
+	rxfLOLPpAE2E3jNwy5P3YXd0iRUJdxeBW
+X-Received: by 2002:a2e:8e93:0:b0:2b9:412a:111d with SMTP id z19-20020a2e8e93000000b002b9412a111dmr8068877ljk.42.1691464101075;
+        Mon, 07 Aug 2023 20:08:21 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEkFzuKUSTBxvr8xUJFBGEljqkZL6F7AvfmOw6ZPETh0gBINujkhDUrVUJXH6NVreAEes81Trgg6dPGFpEKYN0=
+X-Received: by 2002:a2e:8e93:0:b0:2b9:412a:111d with SMTP id
+ z19-20020a2e8e93000000b002b9412a111dmr8068854ljk.42.1691464100720; Mon, 07
+ Aug 2023 20:08:20 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230731071728.3493794-1-j.granados@samsung.com>
- <ZMgpck0rjqHR74sl@bombadil.infradead.org> <ZNFlqwwvE6w6HyHl@bombadil.infradead.org>
- <CANnsUMG3WO_19GpnsNaXPqu6eEnpBvYUpkrf1QbHwsc9wEoCZQ@mail.gmail.com>
- <ZNGBrkP7J2g/BAWV@bombadil.infradead.org> <CANnsUMGRBnatKB4-3eYjb5aG7YnXDiZG6cjuwSgtjvVF6ErJNg@mail.gmail.com>
- <ZNGv3Q5VBsS2/w4e@bombadil.infradead.org>
-In-Reply-To: <ZNGv3Q5VBsS2/w4e@bombadil.infradead.org>
-From: Chris Maness <christopher.maness@gmail.com>
-Date: Mon, 7 Aug 2023 20:07:24 -0700
-Message-ID: <CANnsUMGHnurbph9F7mex=1s0mxhwpNgeQbKJ6j1r37Qmd6LAMQ@mail.gmail.com>
-Subject: Re: [PATCH v2 00/14] sysctl: Add a size argument to register
- functions in sysctl
-To: Luis Chamberlain <mcgrof@kernel.org>
-Cc: Alexander Aring <alex.aring@gmail.com>, Alexander Gordeev <agordeev@linux.ibm.com>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
-	"D. Wythe" <alibuda@linux.alibaba.com>, David Ahern <dsahern@kernel.org>, 
+References: <20230710034237.12391-1-xuanzhuo@linux.alibaba.com>
+ <20230710034237.12391-6-xuanzhuo@linux.alibaba.com> <ZK/cxNHzI23I6efc@infradead.org>
+ <20230713104805-mutt-send-email-mst@kernel.org> <ZLjSsmTfcpaL6H/I@infradead.org>
+ <20230720131928-mutt-send-email-mst@kernel.org> <ZL6qPvd6X1CgUD4S@infradead.org>
+ <1690251228.3455179-1-xuanzhuo@linux.alibaba.com> <20230725033321-mutt-send-email-mst@kernel.org>
+ <1690283243.4048996-1-xuanzhuo@linux.alibaba.com> <1690524153.3603117-1-xuanzhuo@linux.alibaba.com>
+ <20230801121543-mutt-send-email-mst@kernel.org> <1690940971.9409487-2-xuanzhuo@linux.alibaba.com>
+ <1691388845.9121156-1-xuanzhuo@linux.alibaba.com> <CACGkMEsoivXfBV75whjyB0yreUNh7HeucGLw3Bq9Zvu1NGnj_g@mail.gmail.com>
+ <1691462837.6043541-2-xuanzhuo@linux.alibaba.com>
+In-Reply-To: <1691462837.6043541-2-xuanzhuo@linux.alibaba.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Tue, 8 Aug 2023 11:08:09 +0800
+Message-ID: <CACGkMEsM4cPaMHz-XowU+qpKZL2atZUwYzcUMUfr7N-GN+J2nQ@mail.gmail.com>
+Subject: Re: [PATCH vhost v11 05/10] virtio_ring: introduce virtqueue_dma_dev()
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Christoph Hellwig <hch@infradead.org>, 
+	virtualization@lists.linux-foundation.org, 
 	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Florian Westphal <fw@strlen.de>, Heiko Carstens <hca@linux.ibm.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, Iurii Zaikin <yzaikin@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Jan Karcher <jaka@linux.ibm.com>, 
-	Joel Granados <joel.granados@gmail.com>, Joel Granados <j.granados@samsung.com>, 
-	Joerg Reuter <jreuter@yaina.de>, Jozsef Kadlecsik <kadlec@netfilter.org>, Julian Anastasov <ja@ssi.bg>, 
-	Karsten Graul <kgraul@linux.ibm.com>, Kees Cook <keescook@chromium.org>, 
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, Mat Martineau <martineau@kernel.org>, 
-	Matthieu Baerts <matthieu.baerts@tessares.net>, Miquel Raynal <miquel.raynal@bootlin.com>, 
-	Nikolay Aleksandrov <razor@blackwall.org>, Pablo Neira Ayuso <pablo@netfilter.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Ralf Baechle <ralf@linux-mips.org>, Roopa Prabhu <roopa@nvidia.com>, 
-	Santosh Shilimkar <santosh.shilimkar@oracle.com>, Simon Horman <horms@verge.net.au>, 
-	Stefan Schmidt <stefan@datenfreihafen.org>, Steffen Klassert <steffen.klassert@secunet.com>, 
-	Sven Schnelle <svens@linux.ibm.com>, Tony Lu <tonylu@linux.alibaba.com>, 
-	Vasily Gorbik <gor@linux.ibm.com>, Wen Gu <guwen@linux.alibaba.com>, 
-	Wenjia Zhang <wenjia@linux.ibm.com>, Will Deacon <will@kernel.org>, Xin Long <lucien.xin@gmail.com>, 
-	bridge@lists.linux-foundation.org, coreteam@netfilter.org, 
-	josh@joshtriplett.org, linux-arm-kernel@lists.infradead.org, 
-	linux-fsdevel@vger.kernel.org, linux-hams@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org, 
-	linux-s390@vger.kernel.org, linux-sctp@vger.kernel.org, 
-	linux-wpan@vger.kernel.org, lvs-devel@vger.kernel.org, mptcp@lists.linux.dev, 
-	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, 
-	rds-devel@oss.oracle.com, willy@infradead.org
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org, bpf@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+On Tue, Aug 8, 2023 at 10:52=E2=80=AFAM Xuan Zhuo <xuanzhuo@linux.alibaba.c=
+om> wrote:
 >
-> Are you reporting a separate regression that goes all the way back to v4 kernels?
+> On Tue, 8 Aug 2023 10:26:04 +0800, Jason Wang <jasowang@redhat.com> wrote=
+:
+> > On Mon, Aug 7, 2023 at 2:15=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibab=
+a.com> wrote:
+> > >
+> > > On Wed, 2 Aug 2023 09:49:31 +0800, Xuan Zhuo <xuanzhuo@linux.alibaba.=
+com> wrote:
+> > > > On Tue, 1 Aug 2023 12:17:47 -0400, "Michael S. Tsirkin" <mst@redhat=
+.com> wrote:
+> > > > > On Fri, Jul 28, 2023 at 02:02:33PM +0800, Xuan Zhuo wrote:
+> > > > > > On Tue, 25 Jul 2023 19:07:23 +0800, Xuan Zhuo <xuanzhuo@linux.a=
+libaba.com> wrote:
+> > > > > > > On Tue, 25 Jul 2023 03:34:34 -0400, "Michael S. Tsirkin" <mst=
+@redhat.com> wrote:
+> > > > > > > > On Tue, Jul 25, 2023 at 10:13:48AM +0800, Xuan Zhuo wrote:
+> > > > > > > > > On Mon, 24 Jul 2023 09:43:42 -0700, Christoph Hellwig <hc=
+h@infradead.org> wrote:
+> > > > > > > > > > On Thu, Jul 20, 2023 at 01:21:07PM -0400, Michael S. Ts=
+irkin wrote:
+> > > > > > > > > > > Well I think we can add wrappers like virtio_dma_sync=
+ and so on.
+> > > > > > > > > > > There are NOP for non-dma so passing the dma device i=
+s harmless.
+> > > > > > > > > >
+> > > > > > > > > > Yes, please.
+> > > > > > > > >
+> > > > > > > > >
+> > > > > > > > > I am not sure I got this fully.
+> > > > > > > > >
+> > > > > > > > > Are you mean this:
+> > > > > > > > > https://lore.kernel.org/all/20230214072704.126660-8-xuanz=
+huo@linux.alibaba.com/
+> > > > > > > > > https://lore.kernel.org/all/20230214072704.126660-9-xuanz=
+huo@linux.alibaba.com/
+> > > > > > > > >
+> > > > > > > > > Then the driver must do dma operation(map and sync) by th=
+ese virtio_dma_* APIs.
+> > > > > > > > > No care the device is non-dma device or dma device.
+> > > > > > > >
+> > > > > > > > yes
+> > > > > > > >
+> > > > > > > > > Then the AF_XDP must use these virtio_dma_* APIs for virt=
+io device.
+> > > > > > > >
+> > > > > > > > We'll worry about AF_XDP when the patch is posted.
+> > > > > > >
+> > > > > > > YES.
+> > > > > > >
+> > > > > > > We discussed it. They voted 'no'.
+> > > > > > >
+> > > > > > > http://lore.kernel.org/all/20230424082856.15c1e593@kernel.org
+> > > > > >
+> > > > > >
+> > > > > > Hi guys, this topic is stuck again. How should I proceed with t=
+his work?
+> > > > > >
+> > > > > > Let me briefly summarize:
+> > > > > > 1. The problem with adding virtio_dma_{map, sync} api is that, =
+for AF_XDP and
+> > > > > > the driver layer, we need to support these APIs. The current co=
+nclusion of
+> > > > > > AF_XDP is no.
+> > > > > >
+> > > > > > 2. Set dma_set_mask_and_coherent, then we can use DMA API unifo=
+rmly inside
+> > > > > > driver. This idea seems to be inconsistent with the framework d=
+esign of DMA. The
+> > > > > > conclusion is no.
+> > > > > >
+> > > > > > 3. We noticed that if the virtio device supports VIRTIO_F_ACCES=
+S_PLATFORM, it
+> > > > > > uses DMA API. And this type of device is the future direction, =
+so we only
+> > > > > > support DMA premapped for this type of virtio device. The probl=
+em with this
+> > > > > > solution is that virtqueue_dma_dev() only returns dev in some c=
+ases, because
+> > > > > > VIRTIO_F_ACCESS_PLATFORM is supported in such cases.
+> >
+> > Could you explain the issue a little bit more?
+> >
+> > E.g if we limit AF_XDP to ACESS_PLATFROM only, why does
+> > virtqueue_dma_dev() only return dev in some cases?
+>
+> The behavior of virtqueue_dma_dev() is not related to AF_XDP.
+>
+> The return value of virtqueue_dma_dev() is used for the DMA APIs. So it c=
+an
+> return dma dev when the virtio is with ACCESS_PLATFORM. If virtio is with=
+out
+> ACCESS_PLATFORM then it MUST return NULL.
+>
+> In the virtio-net driver, if the virtqueue_dma_dev() returns dma dev,
+> we can enable AF_XDP. If not, we return error to AF_XDP.
+
+Yes, as discussed, just having wrappers in the virtio_ring and doing
+the switch there. Then can virtio-net use them without worrying about
+DMA details?
+
+Thanks
+
+>
+> Thanks
+>
+>
+>
+>
+> >
+> > Thanks
+> >
+> > >Otherwise NULL is returned.
+> > > > > > This option is currently NO.
+> > > > > >
+> > > > > > So I'm wondering what should I do, from a DMA point of view, is=
+ there any
+> > > > > > solution in case of using DMA API?
+> > > > > >
+> > > > > > Thank you
+> > > > >
+> > > > >
+> > > > > I think it's ok at this point, Christoph just asked you
+> > > > > to add wrappers for map/unmap for use in virtio code.
+> > > > > Seems like a cosmetic change, shouldn't be hard.
+> > > >
+> > > > Yes, that is not hard, I has this code.
+> > > >
+> > > > But, you mean that the wrappers is just used for the virtio driver =
+code?
+> > > > And we also offer the  API virtqueue_dma_dev() at the same time?
+> > > > Then the driver will has two chooses to do DMA.
+> > > >
+> > > > Is that so?
+> > >
+> > > Ping.
+> > >
+> > > Thanks
+> > >
+> > > >
+> > > >
+> > > > > Otherwise I haven't seen significant comments.
+> > > > >
+> > > > >
+> > > > > Christoph do I summarize what you are saying correctly?
+> > > > > --
+> > > > > MST
+> > > > >
+> > > >
+> > >
+> >
 >
 
-I am not certain what you mean by regression.
-
-> > v2 is fine there.
->
-> What does this mean?
-
-I have to go all the way back to kernel version 2 for the serial 6PACK
-driver to work.  If I try to use it in Kernel version 4, 5, or 6 the
-kernel panics as soon as I attempt to connect to another station.
-
->
->   Luis
-
-Chris KQ6UP
-
-
--- 
-Thanks,
-Chris Maness
 
