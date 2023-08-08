@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-25592-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25594-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19AAA774DE2
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 00:01:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 217C9774DE4
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 00:01:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C75202813EA
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 22:01:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF7A1281983
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 22:01:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D04811BB21;
-	Tue,  8 Aug 2023 22:00:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 566AE18007;
+	Tue,  8 Aug 2023 22:00:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01EAD18007
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED70A17FF1
 	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 22:00:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 9E0A3C433D9;
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 86A7BC433CA;
 	Tue,  8 Aug 2023 22:00:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1691532022;
-	bh=8YuuElbFwVlpduRXxYXvgNc6H3UQeAUu2HC/SZZwh4s=;
+	bh=C0NTCNR5CFkS/JA5rIJm0bLzcxqLkSsSNsY6g3aQy0M=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=XbaSIomfIhRup/KQc8pMzNMimKjUbow5eH+febLDSdUuXimO2o5qLrh9jDvYE/9gK
-	 KUL/zJ1OVqYFlNy5jmGjkdYQp5blb45psNtfw10/IqhJ77Y8/6nla6O2dbWQ7kHq+e
-	 0TIVAB5tHoh8BPgWBtYjVaGh+brja29z32i7oWNlZhZg7ZqBnE4CkOm+Co5MyBYGfh
-	 8AlxCosNYDvAIHnNLkqvVNYL8xWe/xNMjZOUyKu7P9Cc7cN8S1SkyLjrO7U82y4Y0k
-	 4rWVsBGsjKcSaQnrysEvxK1dKy53u10yw0u53ltbiUXuwzJ7fJ0KwkvmURsny7Wrc5
-	 Ac+3f3SolTn8Q==
+	b=L8Ur7Dnl7Gh8nydvAeTfRbJK+GiNZ1VM4W1dQ24HiaGZZoIY1/BcyjXT3EzdP5jQ+
+	 6tM1U5B1SzKwTooXdMP7r87nObsbiohJhUHWTAJ/agWA0LZ713SzfnInXlfAnF7rJG
+	 n2Lj/xrj0CwtSVTjUgSQUX+X2g3DQ/KvFv/sGmb2+CUgX4lwyfc9SrjUboL8M3eWeh
+	 ag1vrB/Ul11GXIHlIevx5BvPP2Q6o+qtsmbH7Jq/sk32/XjzggYiIv3NdXCSJ+ooUO
+	 TjeRvlSat6lYA15KPY195deXWQRE/8JF3jegmZjSP/ieOTfLqNnPPKfE3epglyT+PW
+	 OQ1vfml7cJt+g==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 86C30C64459;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 7440EC395C5;
 	Tue,  8 Aug 2023 22:00:22 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -41,36 +41,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] ixgbe: Remove unused function declarations
+Subject: Re: [PATCH net-next] net: hns: Remove unused function declaration
+ mac_adjust_link()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <169153202254.6931.1809745921138635353.git-patchwork-notify@kernel.org>
+ <169153202247.6931.15704455132988684999.git-patchwork-notify@kernel.org>
 Date: Tue, 08 Aug 2023 22:00:22 +0000
-References: <20230804125203.30924-1-yuehaibing@huawei.com>
-In-Reply-To: <20230804125203.30924-1-yuehaibing@huawei.com>
+References: <20230804130048.39808-1-yuehaibing@huawei.com>
+In-Reply-To: <20230804130048.39808-1-yuehaibing@huawei.com>
 To: Yue Haibing <yuehaibing@huawei.com>
-Cc: jesse.brandeburg@intel.com, anthony.l.nguyen@intel.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- daniel@veobot.com, intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
+Cc: yisen.zhuang@huawei.com, salil.mehta@huawei.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 4 Aug 2023 20:52:03 +0800 you wrote:
-> Commit dc166e22ede5 ("ixgbe: DCB remove ixgbe_fcoe_getapp routine")
-> leave ixgbe_fcoe_getapp() unused.
-> Commit ffed21bcee7a ("ixgbe: Don't bother clearing buffer memory for descriptor rings")
-> leave ixgbe_unmap_and_free_tx_resource() declaration unused.
-> And commit 3b3bf3b92b31 ("ixgbe: remove unused fcoe.tc field and fcoe_setapp()")
-> removed the ixgbe_fcoe_setapp() implementation.
+On Fri, 4 Aug 2023 21:00:48 +0800 you wrote:
+> Commit 511e6bc071db ("net: add Hisilicon Network Subsystem DSAF support")
+> declared but never implemented this, remove it.
 > 
-> [...]
+> Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
+> ---
+>  drivers/net/ethernet/hisilicon/hns/hns_dsaf_mac.h | 1 -
+>  1 file changed, 1 deletion(-)
 
 Here is the summary with links:
-  - [net-next] ixgbe: Remove unused function declarations
-    https://git.kernel.org/netdev/net-next/c/ac0955f0ccb0
+  - [net-next] net: hns: Remove unused function declaration mac_adjust_link()
+    https://git.kernel.org/netdev/net-next/c/6ff0490cd810
 
 You are awesome, thank you!
 -- 
