@@ -1,123 +1,207 @@
-Return-Path: <netdev+bounces-25460-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25374-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F289077435B
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 20:02:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28DDA773CFF
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 18:13:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9DF5128176D
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 18:02:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 592011C211F4
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 16:13:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2849B14F9E;
-	Tue,  8 Aug 2023 18:02:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95D6A14013;
+	Tue,  8 Aug 2023 15:57:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C8FC14AB7
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 18:02:42 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59B5761B22;
-	Tue,  8 Aug 2023 10:07:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=ajwdCnT8njC9y5kbONtAi0NxS4A3FaITcmOZgzwf/nk=; b=eQBZkvjxp0IEb/UJPuCjaB0n9U
-	GWy8dZfyNBaMiwnXFECFy1K/3U/ALGlee1P8V+1bWgkDxMsQGq98TB042L7bTiflTtjccVhhGmFww
-	w3W7hwFV8sf4skQ3nFjQPaO6ioKfHOCZ3ew26CuHTwDVOEkxbJ1UUGLDMBVMe1tG+Zo8=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qTOQz-003Th8-1Y; Tue, 08 Aug 2023 17:15:45 +0200
-Date: Tue, 8 Aug 2023 17:15:45 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Andrew Halaney <ahalaney@redhat.com>
-Cc: Bartosz Golaszewski <brgl@bgdev.pl>,
-	"Russell King (Oracle)" <linux@armlinux.org.uk>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alex Elder <elder@linaro.org>,
-	Srini Kandagatla <srinivas.kandagatla@linaro.org>,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8979611C99
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 15:57:32 +0000 (UTC)
+Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DC444447B;
+	Tue,  8 Aug 2023 08:57:16 -0700 (PDT)
+Received: by mail-lf1-x132.google.com with SMTP id 2adb3069b0e04-4fe4762173bso9624702e87.3;
+        Tue, 08 Aug 2023 08:57:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1691510195; x=1692114995;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=EKR/mQxiWCp6UmZoc/ZIdm/CvMRbYORnLL2Bmf5WunY=;
+        b=iTep3vMy6Z8EHVl1pNEMn2tN+1w99+9Dgp6gAbfQO3hye73jDjBdCub0T2zqH9X7hD
+         noYURqNZ/iggYzokFPQFPUCJ+YaRsqyljdSvL3znPKS9FmhZ4/OkbBbZv2jVRlYmiEP1
+         vkTgmujWH7QdPoYhDSHUmN3kGqsy8spVGBdMriHHT+TIm6srxytss76c0BZzpd6eTVYo
+         HChuERSTjv7yicIqn3TmG7rfgl/GFLAbQZagCVVkY4E6/7GnxAYyCw9v+QUTQVxJUtle
+         NPW60gvllRzBqLHk9eOWD9RR52y7u8XOeCw6JWaKtqPMSAX5Yy2L1FzRT8dsoy+RWVd9
+         s0rA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691510195; x=1692114995;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=EKR/mQxiWCp6UmZoc/ZIdm/CvMRbYORnLL2Bmf5WunY=;
+        b=iz8fRiVPO5DYbcN1sqJmxrj6kfRfx2EHmXaZk4Hrzcy5rCVxguA5Bx7IlP+v2qP/br
+         UfmQVQiAboVgOGnLH2A4L0Ex7e0slkv9IoPkfy0+EGjO162zMQbxk27vCnJ/m1klKU1R
+         nAvREpSNg+FCVqeFJuOE8azncNSLAYzRxLdfjDkfzwRtjd6j7z3kSuQSA/KUYyWhhvVz
+         uL3zS3pqakebLxYFkLq2eZ1Lrr8r9yp3BJroA0bXyMa6ixfXq8k3kTI1VScAKXJah9c0
+         qzUu6qjMAeoYVfYCL74ggVClc1sAg/QdbENhzhW3cr93yoyim+BPjQgVwVcRi5Jw7CGs
+         BOTA==
+X-Gm-Message-State: AOJu0Yyrnnet/IFtl8CTde8u6iirhZCeAVTOI7MsdYEd/vO5nZ4rCEZO
+	wkJmwng9pTni8IvLVu8t3YkLG43UTdFaW//T
+X-Google-Smtp-Source: AGHT+IFnYhIzaS3Y+KcV0Lrw6qJXYUrYWCoAb9tRY2N+65/72vnKp1uSD5k97nShAi0GFBixW7Zi2Q==
+X-Received: by 2002:a05:6512:3b0a:b0:4fe:3f2:2efc with SMTP id f10-20020a0565123b0a00b004fe03f22efcmr11495192lfv.0.1691508221319;
+        Tue, 08 Aug 2023 08:23:41 -0700 (PDT)
+Received: from localhost (0x934e1fc8.cust.fastspeed.dk. [147.78.31.200])
+        by smtp.gmail.com with ESMTPSA id a3-20020a056512020300b004fcdd81355csm1920516lfo.269.2023.08.08.08.23.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Aug 2023 08:23:40 -0700 (PDT)
+Date: Tue, 8 Aug 2023 17:23:38 +0200
+From: Joel Granados <joel.granados@gmail.com>
+To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Cc: mcgrof@kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
+	Iurii Zaikin <yzaikin@google.com>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Kees Cook <keescook@chromium.org>,
+	"D. Wythe" <alibuda@linux.alibaba.com>, mptcp@lists.linux.dev,
+	Jakub Kicinski <kuba@kernel.org>, Vasily Gorbik <gor@linux.ibm.com>,
+	Paolo Abeni <pabeni@redhat.com>, coreteam@netfilter.org,
+	Jan Karcher <jaka@linux.ibm.com>,
+	Alexander Aring <alex.aring@gmail.com>,
+	Will Deacon <will@kernel.org>,
+	Stefan Schmidt <stefan@datenfreihafen.org>,
+	Matthieu Baerts <matthieu.baerts@tessares.net>,
+	bridge@lists.linux-foundation.org,
 	linux-arm-kernel@lists.infradead.org,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Subject: Re: [PATCH 0/2] net: stmmac: allow sharing MDIO lines
-Message-ID: <d021b8ae-a6a3-4697-a683-c9bd45e6c74b@lunn.ch>
-References: <20230807193102.6374-1-brgl@bgdev.pl>
- <54421791-75fa-4ed3-8432-e21184556cde@lunn.ch>
- <CAMRc=Mc6COaxM6GExHF2M+=v2TBpz87RciAv=9kHr41HkjQhCg@mail.gmail.com>
- <ZNJChfKPkAuhzDCO@shell.armlinux.org.uk>
- <CAMRc=MczKgBFvuEanKu=mERYX-6qf7oUO2S4B53sPc+hrkYqxg@mail.gmail.com>
- <65b53003-23cf-40fa-b9d7-f0dbb45a4cb2@lunn.ch>
- <CAMRc=MecYHi=rPaT44kuX_XMog=uwB9imVZknSjnmTBW+fb5WQ@mail.gmail.com>
- <xfme5pgj4eqlgao3vmyg6vazaqk6qz2wq6kitgujtorouogjty@cklyof3xz2zm>
+	Joerg Reuter <jreuter@yaina.de>, Julian Anastasov <ja@ssi.bg>,
+	David Ahern <dsahern@kernel.org>, netfilter-devel@vger.kernel.org,
+	Wen Gu <guwen@linux.alibaba.com>, linux-kernel@vger.kernel.org,
+	Santosh Shilimkar <santosh.shilimkar@oracle.com>,
+	linux-wpan@vger.kernel.org, lvs-devel@vger.kernel.org,
+	Karsten Graul <kgraul@linux.ibm.com>,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-sctp@vger.kernel.org, Tony Lu <tonylu@linux.alibaba.com>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Ralf Baechle <ralf@linux-mips.org>, Florian Westphal <fw@strlen.de>,
+	willy@infradead.org, Heiko Carstens <hca@linux.ibm.com>,
+	"David S. Miller" <davem@davemloft.net>, linux-rdma@vger.kernel.org,
+	Roopa Prabhu <roopa@nvidia.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Simon Horman <horms@verge.net.au>,
+	Mat Martineau <martineau@kernel.org>, josh@joshtriplett.org,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Eric Dumazet <edumazet@google.com>, linux-hams@vger.kernel.org,
+	Wenjia Zhang <wenjia@linux.ibm.com>, linux-fsdevel@vger.kernel.org,
+	linux-s390@vger.kernel.org, Xin Long <lucien.xin@gmail.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>, netdev@vger.kernel.org,
+	rds-devel@oss.oracle.com
+Subject: Re: [PATCH v2 11/14] networking: Update to register_net_sysctl_sz
+Message-ID: <20230808152338.aoubpvauxpcuwfuz@localhost>
+References: <20230731071728.3493794-1-j.granados@samsung.com>
+ <20230731071728.3493794-12-j.granados@samsung.com>
+ <CGME20230808112110eucas1p1332795fa88d771ac3f05825f33052cf9@eucas1p1.samsung.com>
+ <22e0e672-f9f6-6afe-6ce6-63de264e7b6d@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="ry2jlv6i2gzplzus"
 Content-Disposition: inline
-In-Reply-To: <xfme5pgj4eqlgao3vmyg6vazaqk6qz2wq6kitgujtorouogjty@cklyof3xz2zm>
+In-Reply-To: <22e0e672-f9f6-6afe-6ce6-63de264e7b6d@intel.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-> I'll make the water muddier (hopefully clearer?). I have access to the
-> board schematic (not SIP/SOM stuff though), but that should help here.
-> 
-> MAC0 owns its own MDIO bus (we'll call it MDIO0). It is pinmuxed to
-> gpio8/gpio9 for mdc/mdio. MAC1 owns its own bus (MDIO1) which is
-> pinmuxed to gpio21/22.
-> 
-> On MDIO0 there are two SGMII ethernet phys. One is connected to MAC0,
-> one is connected to MAC1.
-> 
-> MDIO1 is not connected to anything on the board. So there is only one
-> MDIO master, MAC0 on MDIO0, and it manages the ethernet phy for both
-> MAC0/MAC1.
-> 
-> Does that make sense? I don't think from a hardware design standpoint
-> this is violating anything, it isn't a multimaster setup on MDIO.
 
-Thanks for taking a detailed look at the schematics. This is how i
-would expect it to be.
+--ry2jlv6i2gzplzus
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> > > > Good point, but it's worse than that: when MAC0 is unbound, it will
-> > > > unregister the MDIO bus and destroy all PHY devices. These are not
-> > > > refcounted so they will literally go from under MAC1. Not sure how
-> > > > this can be dealt with?
-> > >
-> > > unbinding is not a normal operation. So i would just live with it, and
-> > > if root decides to shoot herself in the foot, that is her choice.
-> > >
-> > 
-> > I disagree. Unbinding is very much a normal operation.
+On Tue, Aug 08, 2023 at 01:20:36PM +0200, Przemek Kitszel wrote:
+> On 7/31/23 09:17, Joel Granados wrote:
+> > Move from register_net_sysctl to register_net_sysctl_sz for all the
+> > networking related files. Do this while making sure to mirror the NULL
+> > assignments with a table_size of zero for the unprivileged users.
+> >=20
+> > We need to move to the new function in preparation for when we change
+> > SIZE_MAX to ARRAY_SIZE() in the register_net_sysctl macro. Failing to do
+> > so would erroneously allow ARRAY_SIZE() to be called on a pointer. We
+> > hold off the SIZE_MAX to ARRAY_SIZE change until we have migrated all
+> > the relevant net sysctl registering functions to register_net_sysctl_sz
+> > in subsequent commits.
+> >=20
+> > An additional size function was added to the following files in order to
+> > calculate the size of an array that is defined in another file:
+> >      include/net/ipv6.h
+> >      net/ipv6/icmp.c
+> >      net/ipv6/route.c
 
-What do you use it for?
+=2E..
 
-I don't think i've ever manually done it. Maybe as part of a script to
-unbind the FTDI driver from an FTDI device in order to use user space
-tools to program the EEPROM? But that is about it.
+> > diff --git a/net/ipv6/route.c b/net/ipv6/route.c
+> > index 64e873f5895f..51c6cdae8723 100644
+> > --- a/net/ipv6/route.c
+> > +++ b/net/ipv6/route.c
+> > @@ -6447,14 +6447,19 @@ struct ctl_table * __net_init ipv6_route_sysctl=
+_init(struct net *net)
+> >   		table[8].data =3D &net->ipv6.sysctl.ip6_rt_min_advmss;
+> >   		table[9].data =3D &net->ipv6.sysctl.ip6_rt_gc_min_interval;
+> >   		table[10].data =3D &net->ipv6.sysctl.skip_notify_on_dev_down;
+> > -
+> > -		/* Don't export sysctls to unprivileged users */
+> > -		if (net->user_ns !=3D &init_user_ns)
+> > -			table[1].procname =3D NULL;
+Here I remove the setting of the procname to NULL for ipv6 sysctl
+registers in route.c and I do not replace that assignment anywhere.
+This means that we will export sysctls to unprivilged users for ipv6.
+I'll correct this in V3.
 
-I actually expect many unbind operations are broken because it is very
-rarely used.
+> >   	}
+> >   	return table;
+> >   }
+> > +
+> > +size_t ipv6_route_sysctl_table_size(struct net *net)
+> > +{
+> > +	/* Don't export sysctls to unprivileged users */
+> > +	if (net->user_ns !=3D &init_user_ns)
+> > +		return 0;
+> > +
+> > +	return ARRAY_SIZE(ipv6_route_table_template);
+> > +}
+> >   #endif
+> >   static int __net_init ip6_route_net_init(struct net *net)
 
-       Andrew
+--=20
+
+Joel Granados
+
+--ry2jlv6i2gzplzus
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQGzBAABCgAdFiEErkcJVyXmMSXOyyeQupfNUreWQU8FAmTSXfgACgkQupfNUreW
+QU9uhwv/YNoyTbkHH/5RMLpQdKDepd7w6f8Rtax3cD35VYfVbj2aNFy9lcELq0sL
+WWEkcnq1tZav3I+it4as5M7BUfGePS1Zj/D2OYSS7sR0ehwJMaO19qvfuGLiQLP9
+XQe6cyy071sk9U5fxmpZkZgfKtldzchYMt1GluPzw0/a1CRkUlQqaDkHS0/hiOAn
+JCY8mDLWC5DZwVZjz1Ai3UZ3lSIoxFqZbIk8IWpB6E6r9j+ulQUBw6CnYpSu8HMg
+JNHA2wqyYaNLKxwQzSDhG3E0AaK59dPzneyrLVRnpJhc4yMFY+yDSPAzAZTgr1Ny
++/lASH2c7d0obmafitPwIOhxg7xPPnp+AYKDP65ZMGp0olUCNYKqUhF0Mc8sWq75
+1kzOSul2jqUCTCkODYWut1aoqApizX5phuRCj/wCorVWBazLV7J9fDNopmAtmTYY
+MKPmbbgWQdQHKDCEN7aSL5GGY51bp1dl4M0G+rkmW3RXRPl1OJLTsxP6Vk7ZizpE
+4CYHvD9R
+=8NUh
+-----END PGP SIGNATURE-----
+
+--ry2jlv6i2gzplzus--
 
