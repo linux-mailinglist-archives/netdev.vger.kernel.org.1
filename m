@@ -1,125 +1,176 @@
-Return-Path: <netdev+bounces-25479-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25473-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52935774394
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 20:07:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C589774399
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 20:08:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 83EA11C20F2A
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 18:07:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1638D281268
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 18:08:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7E0B171A1;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 553D8174FB;
 	Tue,  8 Aug 2023 18:02:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3CC7171A0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11DF4154A2
 	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 18:02:43 +0000 (UTC)
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53FD47EF0
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 10:35:11 -0700 (PDT)
-Received: by mail-pg1-x54a.google.com with SMTP id 41be03b00d2f7-564fb0b4934so2639034a12.1
-        for <netdev@vger.kernel.org>; Tue, 08 Aug 2023 10:35:11 -0700 (PDT)
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0938C222D7;
+	Tue,  8 Aug 2023 10:36:05 -0700 (PDT)
+Received: by mail-pj1-x1033.google.com with SMTP id 98e67ed59e1d1-26928c430b2so2365317a91.0;
+        Tue, 08 Aug 2023 10:36:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691516111; x=1692120911;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=CbNixERlHqS43p9WnetIfE1bwp3ZFaI202y6cxjDISk=;
-        b=BtYnibgAq7g0L/okVpcz1sm6OulXBZOLXW68YAi0kE94x5HCN7bWDWiYRWfi91svGo
-         Xc79qQ233j8gXgGltAV/J8/uXgNtnFjybeQZD1f/61BdCanNXGvF03sIBuo0PLfw2n8V
-         M74JpyhSFxtW15aRUBl8P3VcNB0wjFg/9n39VGQsWXzGFLdytSDGhhjl7u1Z6CtvJuZN
-         /eAqJk8ulH9QCYWJViD5t8z1c0a8y4LlJj9wtw/p4CWVORUdKTqp/wxHXBJvv2h+a/vL
-         8rWrgpPqCe+14Q5CE8cj3cirPO2rMueXgtfqCD0+VzHSYfmiNnwNXQhCV4TlIpQyV+Ie
-         Hl0w==
+        d=gmail.com; s=20221208; t=1691516164; x=1692120964;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=K93XONmDEi8X/W9eYSAr8AD1FRn4ePqFJmaPb6kjhvc=;
+        b=TJeyNxoZV4eMzr09+2+Qc8m0d2uvGSpmF8etZ24xecjXCG/3CkjUFxo6thUhhRMUmp
+         BY56TxpfXeCJ3ONPeB8q1VWa4x3IGlqTyX0Xnc0UiebYhKVVCtqrgIyZzOEns3Wg1c7R
+         JpSGKSZ7Qj/epN8ssc6lYkPQosdMpTYO6wMPMdhP24W+rBjPq9ZbYmOwpHE13gGY1OJ3
+         6tZwc4A8uISUqXDk+6S7gvxvCHFEmREHPY19fqY27NCQYAgn4vbN6qXIz+lLNpqRMHzz
+         PeVMRJfxcURU+2sM18M7QfijGpvhrqvzwkq5jiUJjQ/QEK1v1O6PRo+GWLxt7dGvA5EX
+         Q3Cw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691516111; x=1692120911;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CbNixERlHqS43p9WnetIfE1bwp3ZFaI202y6cxjDISk=;
-        b=Q/3ef7H40cV7jVGW5G4+oNDGL3PQcswtLrx5L+Fv/Yc8zQzQkD94CR8bbEDtXpJYdu
-         Ehhot1qvDNJ+6mFm/W0O87V/wVX7EvHjfIVMZ2riXz+dQb4qoj9baw+F2QM3DD+viqWE
-         CHZo3XpqB9dOfoItLEzwopxZVQY46KY7qNPfm2pzwmNUTLGh41zA3o76vlSaqNNScSlh
-         CTbYdX7jjdlVIJXEq+/6AwpmSc5FzvT3zzezrHAY1Ln5reibDLaW60QjYBq+AQJeQ63E
-         y7bJVkdb7gvoTTAUwwwnb+AxALw6hCOtZWMRqX5FJ8XA1T8XavmQj36mdI6PM63pK5NW
-         d43w==
-X-Gm-Message-State: AOJu0YxvthO7Khnh4NejSpbPhXFQJevBmsJHR301q2aY3NJuyXvBUWWB
-	jir3PFTbXV7M+nrrO1njTr3Wdrk=
-X-Google-Smtp-Source: AGHT+IHneZnuNzdmec4p8IMznIadt3gvRYK8ETNwHwQuhWBeUw0E2l7zTwuivbDYUrt8/txQeEEsw9g=
-X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
- (user=sdf job=sendgmr) by 2002:a63:3443:0:b0:564:41a2:8d5a with SMTP id
- b64-20020a633443000000b0056441a28d5amr732pga.11.1691516110738; Tue, 08 Aug
- 2023 10:35:10 -0700 (PDT)
-Date: Tue, 8 Aug 2023 10:35:08 -0700
-In-Reply-To: <20230808134049.1407498-1-leitao@debian.org>
+        d=1e100.net; s=20221208; t=1691516164; x=1692120964;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=K93XONmDEi8X/W9eYSAr8AD1FRn4ePqFJmaPb6kjhvc=;
+        b=Lblkq7z5biWfzUmHIrNS9d1IfFBBEpHkveZj9/WPoOV2IBubWAf1v1aCChrMN+/V4L
+         uaae0h7Bj51xsEa41zr0zHtrNLdPggXOolQujVICwLe9xOP3Iy+oD9hK3+CxG/IUaNGR
+         kRH3x8SsO+npqAfMKPt1ESVBrdB95B+tBjkEKFZPmjjyx8ceNsiERQHTPAPA0zV0vAg2
+         glezpOwFaYwmsl81HdJ15nkOMGw9C6vMU1ZRqx/cPNrtQnSagAbIG7wy/Kt6hgKq4p/q
+         N9f4N8ruMlcyAKhPMWQESFMbf79AayDKQ3qpv2N/6y/J9fYq1f1gV3X5r/deg1xaj4qw
+         8MLg==
+X-Gm-Message-State: AOJu0Yz707iHS4IKTspsLnHgsecmzCBYS93G3BDZK6LFO+qnATNSYa6O
+	XvJSRg3ZSZU/7Tb5gUmKcgJu5MiS5IAAnNK1wRA=
+X-Google-Smtp-Source: AGHT+IFOXT/qmKdZXY2Lf+S+rrdfbZAjoh5vfaGE1XAD8It9lpANzelVL8FBdDRuOOXKQ8BzeJs9avflTU6jby7fhxY=
+X-Received: by 2002:a17:90a:6aca:b0:268:a691:412f with SMTP id
+ b10-20020a17090a6aca00b00268a691412fmr214311pjm.39.1691516164160; Tue, 08 Aug
+ 2023 10:36:04 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20230808134049.1407498-1-leitao@debian.org>
-Message-ID: <ZNJ8zGcYClv/VCwG@google.com>
-Subject: Re: [PATCH v2 0/8] io_uring: Initial support for {s,g}etsockopt commands
-From: Stanislav Fomichev <sdf@google.com>
-To: Breno Leitao <leitao@debian.org>
-Cc: axboe@kernel.dk, asml.silence@gmail.com, willemdebruijn.kernel@gmail.com, 
-	bpf@vger.kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	io-uring@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com
-Content-Type: text/plain; charset="utf-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+MIME-Version: 1.0
+References: <20230804180529.2483231-1-aleksander.lobakin@intel.com>
+ <20230804180529.2483231-6-aleksander.lobakin@intel.com> <692d71dc8068b3d27aba39d7141c811755965786.camel@gmail.com>
+ <601c0203-ee5f-03a3-e9dd-fdb241f3bcdc@intel.com> <CAKgT0Uc0pLzaOfqFbvd9jFErAbTbsUMNNw5e_XY5NfCnO0=g0g@mail.gmail.com>
+ <ca096c35-6ce4-6c1d-7e26-a017348f6ece@intel.com> <CAKgT0UcZspvhYcfiKs90snAfwwb+CMn-vhA62XcSTRiV0BfOqw@mail.gmail.com>
+ <8ee66e8f-cada-b492-d23f-e4e15cfef868@intel.com>
+In-Reply-To: <8ee66e8f-cada-b492-d23f-e4e15cfef868@intel.com>
+From: Alexander Duyck <alexander.duyck@gmail.com>
+Date: Tue, 8 Aug 2023 10:35:27 -0700
+Message-ID: <CAKgT0Ud0GFNW8cc+uxaVCEBn-A09SG-4GYNtE6zsCVpfA5HRFA@mail.gmail.com>
+Subject: Re: [PATCH net-next v4 5/6] page_pool: add a lockdep check for
+ recycling in hardirq
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>, Larysa Zaremba <larysa.zaremba@intel.com>, 
+	Yunsheng Lin <linyunsheng@huawei.com>, Alexander Duyck <alexanderduyck@fb.com>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
+	Simon Horman <simon.horman@corigine.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 08/08, Breno Leitao wrote:
-> This patchset adds support for getsockopt (SOCKET_URING_OP_GETSOCKOPT)
-> and setsockopt (SOCKET_URING_OP_SETSOCKOPT) in io_uring commands.
-> SOCKET_URING_OP_SETSOCKOPT implements generic case, covering all levels
-> nad optnames. On the other hand, SOCKET_URING_OP_GETSOCKOPT just
-> implements level SOL_SOCKET case, which seems to be the
-> most common level parameter for get/setsockopt(2).
-> 
-> struct proto_ops->setsockopt() uses sockptr instead of userspace
-> pointers, which makes it easy to bind to io_uring. Unfortunately
-> proto_ops->getsockopt() callback uses userspace pointers, except for
-> SOL_SOCKET, which is handled by sk_getsockopt(). Thus, this patchset
-> leverages sk_getsockopt() to imlpement the SOCKET_URING_OP_GETSOCKOPT
-> case.
-> 
-> In order to support BPF hooks, I modified the hooks to use  sockptr, so,
-> it is flexible enough to accept user or kernel pointers for
-> optval/optlen.
-> 
-> PS1: For getsockopt command, the optlen field is not a userspace
-> pointers, but an absolute value, so this is slightly different from
-> getsockopt(2) behaviour. The new optlen value is returned in cqe->res.
-> 
-> PS2: The userspace pointers need to be alive until the operation is
-> completed.
-> 
-> These changes were tested with a new test[1] in liburing. On the BPF
-> side, I tested that no regression was introduced by running "test_progs"
-> self test using "sockopt" test case.
-> 
-> [1] Link: https://github.com/leitao/liburing/blob/getsock/test/socket-getsetsock-cmd.c
-> 
-> RFC -> V1:
-> 	* Copy user memory at io_uring subsystem, and call proto_ops
-> 	  callbacks using kernel memory
-> 	* Implement all the cases for SOCKET_URING_OP_SETSOCKOPT
+On Tue, Aug 8, 2023 at 8:06=E2=80=AFAM Alexander Lobakin
+<aleksander.lobakin@intel.com> wrote:
+>
+> From: Alexander Duyck <alexander.duyck@gmail.com>
+> Date: Tue, 8 Aug 2023 07:52:32 -0700
+>
+> > On Tue, Aug 8, 2023 at 6:59=E2=80=AFAM Alexander Lobakin
+> > <aleksander.lobakin@intel.com> wrote:
+> >>
+> >> From: Alexander Duyck <alexander.duyck@gmail.com>
+> >> Date: Tue, 8 Aug 2023 06:45:26 -0700
+>
+> [...]
+>
+> >>>>> Secondly rather than returning an error is there any reason why we
+> >>>>> couldn't just look at not returning page and instead just drop into=
+ the
+> >>>>> release path which wouldn't take the locks in the first place? Eith=
+er
+> >>>>
+> >>>> That is exception path to quickly catch broken drivers and fix them,=
+ why
+> >>>> bother? It's not something we have to live with.
+> >>>
+> >>> My concern is that the current "fix" consists of stalling a Tx ring.
+> >>> We need to have a way to allow forward progress when somebody mixes
+> >>> xdp_frame and skb traffic as I suspect we will end up with a number o=
+f
+> >>> devices doing this since they cannot handle recycling the pages in
+> >>> hardirq context.
+> >>
+> >> You could've seen that several vendors already disabled recycling XDP
+> >> buffers when in hardirq (=3D netpoll) in their drivers. hardirq is in
+> >> general not for networking-related operations.
+> >
+> > The whole idea behind the netpoll cleanup is to get the Tx buffers out
+> > of the way so that we can transmit even after the system has crashed.
+> > The idea isn't to transmit XDP buffers, but to get the buffers out of
+> > the way in the cases where somebody is combining both xdp_frame and
+> > sk_buff on the same queue due to a limited number of rings being
+> > present on the device.
+>
+> I see now, thanks a lot!
+>
+> >
+> > My concern is that at some point in the near future somebody is going
+> > to have a system crash and instead of being able to get the crash log
+> > message out via their netconsole it is going to get cut off because
+> > the driver stopped cleaning the Tx ring because somebody was also
+> > using it as an XDP redirect destination.
+> >
+> >>>
+> >>> The only reason why the skbs don't have the problem is that they are
+> >>> queued and then cleaned up in the net_tx_action. That is why I wonder
+> >>> if we shouldn't look at adding some sort of support for doing
+> >>> something like that with xdp_frame as well. Something like a
+> >>> dev_kfree_pp_page_any to go along with the dev_kfree_skb_any.
+> >>
+> >> I still don't get why we may need to clean XDP buffers in hardirq, may=
+be
+> >> someone could give me some links to read why we may need this and how
+> >> that happens? netpoll is a very specific thing for some debug
+> >> operations, isn't it? XDP shouldn't in general be enabled when this
+> >> happens, should it?
+> >
+> > I think I kind of explained it above. It isn't so much about cleaning
+> > the XDP buffers as getting them off of the ring and out of the way. If
+> > we block a Tx queue because of an XDP buffer then we cannot use that
+> > Tx queue. I would be good with us just deferring the cleanup like we
+> > do with an sk_buff in dev_kfree_skb_irq, the only issue is we don't
+> > have the ability to put them on a queue since they don't have
+> > prev/next pointers.
+> >
+> > I suppose an alternative to cleaning them might be to make a mandatory
+> > requirement that you cannot support netpoll and mix xdp_frame and
+> > sk_buff on the same queue. If we enforced that then my concern about
+> > them blocking a queue would be addressed.
+>
+> I'm leaning more towards this one TBH. I don't feel sole netpoll as
+> a solid argument for introducing XDP frame deferred queues :s
 
-I did a quick pass, will take a close look later today. So far everything makes
-sense to me.
-
-Should we properly test it as well?
-We have tools/testing/selftests/bpf/prog_tests/sockopt.c which does
-most of the sanity checks, but it uses regular socket/{g,s}etsockopt
-syscalls. Seems like it should be pretty easy to extend this with
-io_uring path? tools/testing/selftests/net/io_uring_zerocopy_tx.c
-already implements minimal wrappers which we can most likely borrow.
+That was kind of my line of thought as well. That is why I was
+thinking that instead of bothering with a queue it might work just as
+well to just throw all recycling out the window and just call put_page
+if we are dealing with XDP in netpoll and just force it into the free
+path. Then it becomes more of an "_any" type handler.
 
