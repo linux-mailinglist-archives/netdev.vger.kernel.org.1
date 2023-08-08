@@ -1,99 +1,152 @@
-Return-Path: <netdev+bounces-25210-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25211-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C18D773607
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 03:47:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B67E6773608
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 03:50:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E21C5281611
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 01:47:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4C3D12815F3
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 01:50:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2FE0391;
-	Tue,  8 Aug 2023 01:47:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A9B6391;
+	Tue,  8 Aug 2023 01:50:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B43B637E
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 01:47:30 +0000 (UTC)
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C50B410F3
-	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 18:47:28 -0700 (PDT)
-Received: from kwepemi500012.china.huawei.com (unknown [172.30.72.55])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4RKbZR1wwJztS5Z;
-	Tue,  8 Aug 2023 09:43:59 +0800 (CST)
-Received: from huawei.com (10.90.53.73) by kwepemi500012.china.huawei.com
- (7.221.188.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Tue, 8 Aug
- 2023 09:47:26 +0800
-From: Li Zetao <lizetao1@huawei.com>
-To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>
-CC: <lizetao1@huawei.com>, <shayagr@amazon.com>, <thomas.lendacky@amd.com>,
-	<leon@kernel.org>, <khalasa@piap.pl>, <u.kleine-koenig@pengutronix.de>,
-	<wsa+renesas@sang-engineering.com>, <netdev@vger.kernel.org>
-Subject: [PATCH net-next] bcm63xx_enet: Remove redundant initialization owner
-Date: Tue, 8 Aug 2023 09:47:02 +0800
-Message-ID: <20230808014702.2712699-1-lizetao1@huawei.com>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F31CB37E
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 01:50:08 +0000 (UTC)
+Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78229F1;
+	Mon,  7 Aug 2023 18:50:06 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.143])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4RKbjP5CKYz4f3k5k;
+	Tue,  8 Aug 2023 09:50:01 +0800 (CST)
+Received: from vm-fedora-38.huawei.com (unknown [10.67.174.164])
+	by APP4 (Coremail) with SMTP id gCh0CgD306ZIn9Fk9jvFAA--.36706S2;
+	Tue, 08 Aug 2023 09:50:02 +0800 (CST)
+From: "GONG, Ruiqi" <gongruiqi@huaweicloud.com>
+To: Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	Florian Westphal <fw@strlen.de>,
+	Roopa Prabhu <roopa@nvidia.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Kees Cook <keescook@chromium.org>
+Cc: netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
+	netdev@vger.kernel.org,
+	linux-hardening@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Wang Weiyang <wangweiyang2@huawei.com>,
+	Xiu Jianfeng <xiujianfeng@huawei.com>,
+	gongruiqi@huaweicloud.com
+Subject: [PATCH] netfilter: ebtables: fix fortify warnings
+Date: Tue,  8 Aug 2023 09:48:21 +0800
+Message-ID: <20230808014821.241688-1-gongruiqi@huaweicloud.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.90.53.73]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- kwepemi500012.china.huawei.com (7.221.188.12)
+X-CM-TRANSID:gCh0CgD306ZIn9Fk9jvFAA--.36706S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxXF1xJw4UCw4xZw1DCw18Grg_yoW5Ww4kpF
+	1qka45trWrJ3yakw4fJw1vvr1ruw1kWa43ArW7C34rKFyjqFyDXa9akryjka4kJws09F43
+	tr90qFWfWrWDAaUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvY14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jrv_JF1lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
+	Y2ka0xkIwI1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
+	xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43
+	MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I
+	0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v2
+	6r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0J
+	Up6wZUUUUU=
+X-CM-SenderInfo: pjrqw2pxltxq5kxd4v5lfo033gof0z/
 X-CFilter-Loop: Reflected
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-The platform_register_drivers() will set "THIS_MODULE" to driver.owner when
-register a platform_driver driver, so it is redundant initialization to set
-driver.owner in the statement. Remove it for clean code.
+From: "GONG, Ruiqi" <gongruiqi1@huawei.com>
 
-Signed-off-by: Li Zetao <lizetao1@huawei.com>
+When compiling with gcc 13 and CONFIG_FORTIFY_SOURCE=y, the following
+warning appears:
+
+In function ‘fortify_memcpy_chk’,
+    inlined from ‘size_entry_mwt’ at net/bridge/netfilter/ebtables.c:2118:2:
+./include/linux/fortify-string.h:592:25: error: call to ‘__read_overflow2_field’
+declared with attribute warning: detected read beyond size of field (2nd parameter);
+maybe use struct_group()? [-Werror=attribute-warning]
+  592 |                         __read_overflow2_field(q_size_field, size);
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The compiler is complaining:
+
+memcpy(&offsets[1], &entry->watchers_offset,
+                       sizeof(offsets) - sizeof(offsets[0]));
+
+where memcpy reads beyong &entry->watchers_offset to copy
+{watchers,target,next}_offset altogether into offsets[]. Silence the
+warning by wrapping these three up via struct_group().
+
+Signed-off-by: GONG, Ruiqi <gongruiqi1@huawei.com>
 ---
- drivers/net/ethernet/broadcom/bcm63xx_enet.c | 3 ---
- 1 file changed, 3 deletions(-)
+ include/uapi/linux/netfilter_bridge/ebtables.h | 14 ++++++++------
+ net/bridge/netfilter/ebtables.c                |  3 +--
+ 2 files changed, 9 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/net/ethernet/broadcom/bcm63xx_enet.c b/drivers/net/ethernet/broadcom/bcm63xx_enet.c
-index 2cf96892e565..a741070f1f9a 100644
---- a/drivers/net/ethernet/broadcom/bcm63xx_enet.c
-+++ b/drivers/net/ethernet/broadcom/bcm63xx_enet.c
-@@ -1940,7 +1940,6 @@ static struct platform_driver bcm63xx_enet_driver = {
- 	.remove	= bcm_enet_remove,
- 	.driver	= {
- 		.name	= "bcm63xx_enet",
--		.owner  = THIS_MODULE,
- 	},
+diff --git a/include/uapi/linux/netfilter_bridge/ebtables.h b/include/uapi/linux/netfilter_bridge/ebtables.h
+index a494cf43a755..e634da196d08 100644
+--- a/include/uapi/linux/netfilter_bridge/ebtables.h
++++ b/include/uapi/linux/netfilter_bridge/ebtables.h
+@@ -182,12 +182,14 @@ struct ebt_entry {
+ 	unsigned char sourcemsk[ETH_ALEN];
+ 	unsigned char destmac[ETH_ALEN];
+ 	unsigned char destmsk[ETH_ALEN];
+-	/* sizeof ebt_entry + matches */
+-	unsigned int watchers_offset;
+-	/* sizeof ebt_entry + matches + watchers */
+-	unsigned int target_offset;
+-	/* sizeof ebt_entry + matches + watchers + target */
+-	unsigned int next_offset;
++	struct_group(offsets,
++		/* sizeof ebt_entry + matches */
++		unsigned int watchers_offset;
++		/* sizeof ebt_entry + matches + watchers */
++		unsigned int target_offset;
++		/* sizeof ebt_entry + matches + watchers + target */
++		unsigned int next_offset;
++	);
+ 	unsigned char elems[0] __attribute__ ((aligned (__alignof__(struct ebt_replace))));
  };
  
-@@ -2761,7 +2760,6 @@ static struct platform_driver bcm63xx_enetsw_driver = {
- 	.remove	= bcm_enetsw_remove,
- 	.driver	= {
- 		.name	= "bcm63xx_enetsw",
--		.owner  = THIS_MODULE,
- 	},
- };
+diff --git a/net/bridge/netfilter/ebtables.c b/net/bridge/netfilter/ebtables.c
+index 757ec46fc45a..5ec66b1ebb64 100644
+--- a/net/bridge/netfilter/ebtables.c
++++ b/net/bridge/netfilter/ebtables.c
+@@ -2115,8 +2115,7 @@ static int size_entry_mwt(const struct ebt_entry *entry, const unsigned char *ba
+ 		return ret;
  
-@@ -2791,7 +2789,6 @@ struct platform_driver bcm63xx_enet_shared_driver = {
- 	.probe	= bcm_enet_shared_probe,
- 	.driver	= {
- 		.name	= "bcm63xx_enet_shared",
--		.owner  = THIS_MODULE,
- 	},
- };
+ 	offsets[0] = sizeof(struct ebt_entry); /* matches come first */
+-	memcpy(&offsets[1], &entry->watchers_offset,
+-			sizeof(offsets) - sizeof(offsets[0]));
++	memcpy(&offsets[1], &entry->offsets, sizeof(offsets) - sizeof(offsets[0]));
  
+ 	if (state->buf_kern_start) {
+ 		buf_start = state->buf_kern_start + state->buf_kern_offset;
 -- 
-2.34.1
+2.41.0
 
 
