@@ -1,118 +1,188 @@
-Return-Path: <netdev+bounces-25482-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25526-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 147D07743B8
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 20:08:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CD3F77471B
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 21:09:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 453841C20EA5
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 18:08:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 300FE280FA1
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 19:09:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 143D31C9F0;
-	Tue,  8 Aug 2023 18:02:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 523BD171D8;
+	Tue,  8 Aug 2023 19:06:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7947F18037
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 18:02:44 +0000 (UTC)
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D54B62335C
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 10:41:17 -0700 (PDT)
-Received: from kwepemi500012.china.huawei.com (unknown [172.30.72.53])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4RKrv74ypLzrSPj;
-	Tue,  8 Aug 2023 19:44:19 +0800 (CST)
-Received: from huawei.com (10.90.53.73) by kwepemi500012.china.huawei.com
- (7.221.188.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Tue, 8 Aug
- 2023 19:45:29 +0800
-From: Li Zetao <lizetao1@huawei.com>
-To: <sgoutham@marvell.com>, <lcherian@marvell.com>, <gakula@marvell.com>,
-	<jerinj@marvell.com>, <hkelam@marvell.com>, <sbhatta@marvell.com>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>
-CC: <lizetao1@huawei.com>, <netdev@vger.kernel.org>
-Subject: [PATCH net-next 3/3] octeontx2-af: Remove redundant functions rvu_npc_exact_mac2u64()
-Date: Tue, 8 Aug 2023 19:45:04 +0800
-Message-ID: <20230808114504.4036008-4-lizetao1@huawei.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230808114504.4036008-1-lizetao1@huawei.com>
-References: <20230808114504.4036008-1-lizetao1@huawei.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46A411773F
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 19:06:24 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (unknown [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCB856AB3
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 11:50:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=q0JSWowIBE2LLM2B5JHvw7l7HGjSNR4189vyxXIcWI4=; b=AkC8drsOi6S38c6+c3mwFRX5Wy
+	EWSaDzOdri7RMOYN1h5By/k+ggZwMLAVfyzmTGzSonKoc5NWtkuEIpNxcR3V3khjsf+SyrpBA7g8l
+	7ou6UVtXeEBxEXAnVr5tRaAdew/uyB5hjWDSVR5ZesolreoQCnBtpM15u8M0tOdQy0W463ZbnBkIB
+	CaEyffn9HOoiA4bolMyhjTNhU8ia63wQjJeCeYrFmwu6uCerbvikMMeiskqRdN5ughOCzkKT8O1Uo
+	oQq13bbZhsxtraYAhnOgJru23F9E4p8GHD+w7DTxcL1yNVwiTjcZ+gl217AUt58pp4yvYJ24rbOep
+	3Qv/Wxdw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:35334)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qTLqs-0007ho-12;
+	Tue, 08 Aug 2023 13:30:18 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qTLqq-00085h-V6; Tue, 08 Aug 2023 13:30:16 +0100
+Date: Tue, 8 Aug 2023 13:30:16 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net-next] net: dsa: mark parsed interface mode for legacy
+ switch drivers
+Message-ID: <ZNI1WA3mGMl93ib8@shell.armlinux.org.uk>
+References: <E1qTKdM-003Cpx-Eh@rmk-PC.armlinux.org.uk>
+ <E1qTKdM-003Cpx-Eh@rmk-PC.armlinux.org.uk>
+ <20230808120652.fehnyzporzychfct@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.90.53.73]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- kwepemi500012.china.huawei.com (7.221.188.12)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230808120652.fehnyzporzychfct@skbuf>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RDNS_NONE,
+	SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-The rvu_npc_exact_mac2u64() is used to convert an Ethernet MAC address
-into a u64 value, as this is exactly what ether_addr_to_u64() does.
-Use ether_addr_to_u64() to replace the rvu_npc_exact_mac2u64().
+On Tue, Aug 08, 2023 at 03:06:52PM +0300, Vladimir Oltean wrote:
+> Hi Russell,
+> 
+> On Tue, Aug 08, 2023 at 12:12:16PM +0100, Russell King (Oracle) wrote:
+> > If we successfully parsed an interface mode with a legacy switch
+> > driver, populate that mode into phylink's supported interfaces rather
+> > than defaulting to the internal and gmii interfaces.
+> > 
+> > This hasn't caused an issue so far, because when the interface doesn't
+> > match a supported one, phylink_validate() doesn't clear the supported
+> > mask, but instead returns -EINVAL. phylink_parse_fixedlink() doesn't
+> > check this return value, and merely relies on the supported ethtool
+> > link modes mask being cleared. Therefore, the fixed link settings end
+> > up being allowed despite validation failing.
+> > 
+> > Before this causes a problem, arrange for DSA to more accurately
+> > populate phylink's supported interfaces mask so validation can
+> > correctly succeed.
+> > 
+> > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> > ---
+> 
+> How did you notice this? Is there any unconverted DSA switch which has a
+> phy-mode which isn't PHY_INTERFACE_MODE_INTERNAL or PHY_INTERFACE_MODE_NA?
 
-Signed-off-by: Li Zetao <lizetao1@huawei.com>
----
- .../marvell/octeontx2/af/rvu_npc_hash.c       | 20 ++-----------------
- 1 file changed, 2 insertions(+), 18 deletions(-)
+By looking at some of the legacy drivers, finding their DT compatibles
+and then grepping the dts files.
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_hash.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_hash.c
-index 7e20282c12d0..d2661e7fabdb 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_hash.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_hash.c
-@@ -390,22 +390,6 @@ int rvu_mbox_handler_npc_get_field_hash_info(struct rvu *rvu,
- 	return 0;
- }
- 
--/**
-- *	rvu_npc_exact_mac2u64 - utility function to convert mac address to u64.
-- *	@mac_addr: MAC address.
-- *	Return: mdata for exact match table.
-- */
--static u64 rvu_npc_exact_mac2u64(u8 *mac_addr)
--{
--	u64 mac = 0;
--	int index;
--
--	for (index = ETH_ALEN - 1; index >= 0; index--)
--		mac |= ((u64)*mac_addr++) << (8 * index);
--
--	return mac;
--}
--
- /**
-  *	rvu_exact_prepare_mdata - Make mdata for mcam entry
-  *	@mac: MAC address
-@@ -416,7 +400,7 @@ static u64 rvu_npc_exact_mac2u64(u8 *mac_addr)
-  */
- static u64 rvu_exact_prepare_mdata(u8 *mac, u16 chan, u16 ctype, u64 mask)
- {
--	u64 ldata = rvu_npc_exact_mac2u64(mac);
-+	u64 ldata = ether_addr_to_u64(mac);
- 
- 	/* Please note that mask is 48bit which excludes chan and ctype.
- 	 * Increase mask bits if we need to include them as well.
-@@ -604,7 +588,7 @@ static u64 rvu_exact_prepare_table_entry(struct rvu *rvu, bool enable,
- 					 u8 ctype, u16 chan, u8 *mac_addr)
- 
- {
--	u64 ldata = rvu_npc_exact_mac2u64(mac_addr);
-+	u64 ldata = ether_addr_to_u64(mac_addr);
- 
- 	/* Enable or disable */
- 	u64 mdata = FIELD_PREP(GENMASK_ULL(63, 63), enable ? 1 : 0);
+For example, vitesse,vsc73* compatibles show up here:
+
+arch/arm/boot/dts/gemini/gemini-sq201.dts
+
+and generally, the ports are listed as:
+
+                                port@0 {
+                                        reg = <0>;
+                                        label = "lan1";
+                                };
+
+except for the CPU port which has:
+
+                                vsc: port@6 {
+                                        reg = <6>;
+                                        label = "cpu";
+                                        ethernet = <&gmac1>;
+                                        phy-mode = "rgmii";
+                                        fixed-link {
+                                                speed = <1000>;
+                                                full-duplex;
+                                                pause;
+                                        };
+                                };
+
+Since the vitesse DSA driver doesn't populate .phylink_get_caps, it
+would have been failing as you discovered with dsa_loop before the
+previous patch.
+
+Fixing this by setting GMII and INTERNAL worked around the additional
+check that was using that failure and will work fine for the LAN
+ports as listed above.
+
+However, that CPU port uses "rgmii" which doesn't match the GMII and
+INTERNAL bits in the supported mask.
+
+Since phylink_validate() does this:
+
+        const unsigned long *interfaces = pl->config->supported_interfaces;
+
+	if (state->interface == PHY_INTERFACE_MODE_NA)
+
+... it isn't, so we move on...
+
+        if (!test_bit(state->interface, interfaces))
+                return -EINVAL;
+
+This will trigger and phylink_validate() in phylink_parse_fixedlink()
+will return -EINVAL without touching the passed supported mask.
+
+phylink_parse_fixedlink() does:
+
+        bitmap_fill(pl->supported, __ETHTOOL_LINK_MODE_MASK_NBITS);
+        linkmode_copy(pl->link_config.advertising, pl->supported);
+        phylink_validate(pl, MLO_AN_FIXED, pl->supported, &pl->link_config);
+
+and then we have:
+
+        s = phy_lookup_setting(pl->link_config.speed, pl->link_config.duplex,
+                               pl->supported, true);
+
+...
+        if (s) {
+		... success ...
+        } else {
+                phylink_warn(pl, "fixed link %s duplex %dMbps not recognised\n",
+                             pl->link_config.duplex == DUPLEX_FULL ? "full" : "half",
+                             pl->link_config.speed);
+        }
+
+So, since phylink_validate() with an apparently unsupported interface
+exits early with -EINVAL, pl->supported ends up with all bits set,
+and phy_lookup_setting() allows any speed.
+
+If someone decides to fix that phylink_validate() error checking, then
+this will then lead to a warning/failure.
+
+I want to avoid that happening - fixing that latent bug before it
+becomes a problem.
+
 -- 
-2.34.1
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
