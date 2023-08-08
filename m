@@ -1,175 +1,144 @@
-Return-Path: <netdev+bounces-25306-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25320-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC500773B5A
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 17:49:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DD97773BB5
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 17:54:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 086E81C21034
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 15:49:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CEB4B1C20341
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 15:54:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E8D114AAC;
-	Tue,  8 Aug 2023 15:42:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67B9315AF5;
+	Tue,  8 Aug 2023 15:44:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20D6F14AAB
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 15:42:50 +0000 (UTC)
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2060c.outbound.protection.outlook.com [IPv6:2a01:111:f400:7e88::60c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FADA1FD2
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 08:42:23 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 598791C29
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 15:44:36 +0000 (UTC)
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2046.outbound.protection.outlook.com [40.107.220.46])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5E8E213D
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 08:44:18 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=U025Sk+wABoqGlJHoi6Iu7mLBxLVxQkhVijpS6UqoPj5xo6oGPxag2f8QiGM7cr1lPLtu37SoAb9FDJ5cDu68ujZpfaHvdYH1bkY3PrX2WcCjLS21PQgc39f8if8X1xfPrIrtEAedvJ3vXxaUglbYceYqvSGEZV49yh4Pj+DtOul5NVPDDHZljQ9xaZ7GmiKVKgpzBP1i3/drvkA4ZpMJTNtpEHWO5VkiF1P4RKIa6/GEV2EtXJd19haxxHnRancgqOxiZwOtu1macolaJjFK/HNXpxD6+fYPNofvN0SHcah2FVDBc7uuWygWZ8hbY4vL1YImK9zCbRI/rHO/IxG1Q==
+ b=jCpxLPBTzOAt+fizPW92HfPjCygKmllPhKGh3xRNMK403qxGo7tVqz3LJbNK0TQWbwcNFLbjLAr2AWZsMyxX7uEsRx7EYN7DHZXE84dG51/iIlf21CU3+TZR20A0pPYM6seqgdCNnZxKRcgBrDRwoQwsWLgB7FmN5F2kEGj+ce6KIh9YHo/qXtx3ON/YOuHye/tRqJwD43YJII0CCULEjjnHHArUVWYuoS5K5blFkw1mShXPoiw22aQl2jC/Gb0rKuoKnVL7rHuh8X+Ak976SllHh8jlckLYF8KO+optA4PMZ68S8YdQeke2Z28Sxfv+3zMoTb9xOG24f9pc4yE3dg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=hY4LdH3HUJjXdfHMOCXvQlivPPQzWf2Vzu6e96uaQ48=;
- b=JewKV8dBu45v5hByJnRiCl7Fxi+EGf35xSDZASoYnhZWm7paBkfkuuVPeehOjt2CcXxuw5EyYvWQ+Zia58OZ5P9/nkz1RD6ufrKPuFmWFyIHEhkK8X99ytnrJK6GUtpeVKJo5LqXZ0F9Oqxw513fgOLKfmFDV7SDIrKuCy6croyUnK71p2z1peYTsFxzFy07GHJzM7Ce7/xXXoK+T5Fo5Ecp3vcpfuUZB7aKPrK+tpsLcsMwFbhaFHmY9mO9Cft8ZafmTrNpJ+SgSILUaeMS15qQDDBfYuWXoICp31e0OLthEqBfcOtXKnSUZ+T1z/FsQ1utez8bPdcB6gnfVW02NA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
+ bh=nw3wlZEn/dGjER021nHV/YEIC6tSofueHA9wOH63tTg=;
+ b=nNFIgicVC7CQf5Is4t4N0Kh2WFnN40rjWOSsOQeCx4/7Yg4A/Rogu4uJPdgDAWRl0N9bCzhay6Vs5eb2Pn5uUEsjvhwJjcjJjevsp30/IMmmYe64QakwmvBMypDwGoNBms8QIvNA8xdtu0yxfFuPyGXaZr2Tp4kjX2/nWLOxisk5YmUgACwlFtnuYbnTXEBcR3Jh86xdnZxzArgHTumkYjRO8bqvrBQKkZ4is5hPd7Vh5MPsJHCmZE4zvpxTdi+6L5WUU/97DKEW0BJdVb0Gvfg4rHdnK46WQJm838ORosUsHEHXxu1P05T6KX9E+GrQO5j4grnTrH/avESKEj1+Vg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=hY4LdH3HUJjXdfHMOCXvQlivPPQzWf2Vzu6e96uaQ48=;
- b=eCa/htmDqvubF0gcgM3wADZRhFPIrDnSZaTcV1PyejMGLQ4zaViBYrF4XUp9ErSE6EUHFQd6fGat8TCN8vkKCO85NyN64qKbhlQAMJ6kd3pJCuamRI0iI+JsRJE7z69ZXvh/1x1tWPRAKfcnNjcwnCH0L4yo7GjENQepiUQ+K+JH/xlXcckFaPHIM/Lf0WBYJP8hl77tvvuzaaLyMvSkRI4sUDlVgo7DeLb4wxdNJ5Yx+gkwBaWcj69zVWJU2JrWYWz1NfK96a7WUYvdYVY6gROLpc+lGif/toNay7vR4LWUcMpYMxewS7GfYFuUcrDr9ooqL84NLPm/3EdpyhfXtw==
-Received: from MW4PR04CA0359.namprd04.prod.outlook.com (2603:10b6:303:8a::34)
- by CH2PR12MB4133.namprd12.prod.outlook.com (2603:10b6:610:7a::13) with
+ bh=nw3wlZEn/dGjER021nHV/YEIC6tSofueHA9wOH63tTg=;
+ b=VCjfJ5aNsB2bfzuEbF8iQjMedG8YOlINupCiVfMbzoWq8dW+9vdf+7eGmpe5bRWfzaV5NW+DlmpAcUPHlA42+M8hJHi7Agm8VGzotd7M1GlWnbBLskOzXDg7o5sZvwne3GQtfNV3XdeIu9rprLyTnWIUrcNoXZNHojoL8O+WMNlFLNc1iRhengFH1yWo/3IEq8JjgPOJ4gvebEYsc64DB3Eg/jyh3gK0h6mfHieov4aa4QgsCKHK2uWd7dYI7WZX/Vgatxcdmbq09e+TQ2GxPqqMkuMhgalJL4cK93xl5E4dItqn+cKeuUzr5CAAV9bhgXzL9x88t0GrkHbN7jUoWw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CY5PR12MB6179.namprd12.prod.outlook.com (2603:10b6:930:24::22)
+ by MN2PR12MB4342.namprd12.prod.outlook.com (2603:10b6:208:264::7) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.27; Tue, 8 Aug
- 2023 14:16:34 +0000
-Received: from MWH0EPF000989EA.namprd02.prod.outlook.com
- (2603:10b6:303:8a:cafe::a4) by MW4PR04CA0359.outlook.office365.com
- (2603:10b6:303:8a::34) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.28 via Frontend
- Transport; Tue, 8 Aug 2023 14:16:34 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- MWH0EPF000989EA.mail.protection.outlook.com (10.167.241.137) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6652.19 via Frontend Transport; Tue, 8 Aug 2023 14:16:34 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Tue, 8 Aug 2023
- 07:16:21 -0700
-Received: from dev-r-vrt-155.mtr.labs.mlnx (10.126.230.35) by
- rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.37; Tue, 8 Aug 2023 07:16:18 -0700
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.26; Tue, 8 Aug
+ 2023 14:44:24 +0000
+Received: from CY5PR12MB6179.namprd12.prod.outlook.com
+ ([fe80::e8:f321:8a83:9a0c]) by CY5PR12MB6179.namprd12.prod.outlook.com
+ ([fe80::e8:f321:8a83:9a0c%6]) with mapi id 15.20.6652.025; Tue, 8 Aug 2023
+ 14:44:23 +0000
+Date: Tue, 8 Aug 2023 17:44:13 +0300
 From: Ido Schimmel <idosch@nvidia.com>
-To: <netdev@vger.kernel.org>
-CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<edumazet@google.com>, <petrm@nvidia.com>, <razor@blackwall.org>,
-	<mirsad.todorovac@alu.unizg.hr>, Ido Schimmel <idosch@nvidia.com>
-Subject: [PATCH net v2 17/17] selftests: forwarding: bridge_mdb: Make test more robust
-Date: Tue, 8 Aug 2023 17:15:03 +0300
-Message-ID: <20230808141503.4060661-18-idosch@nvidia.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20230808141503.4060661-1-idosch@nvidia.com>
-References: <20230808141503.4060661-1-idosch@nvidia.com>
+To: Ruan Jinjie <ruanjinjie@huawei.com>
+Cc: netdev@vger.kernel.org, Petr Machata <petrm@nvidia.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH -next] mlxsw: spectrum_switchdev: Use
+ is_zero_ether_addr() instead of ether_addr_equal()
+Message-ID: <ZNJUvRsToJvMFVDW@shredder>
+References: <20230808133528.4083501-1-ruanjinjie@huawei.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230808133528.4083501-1-ruanjinjie@huawei.com>
+X-ClientProxiedBy: TL2P290CA0025.ISRP290.PROD.OUTLOOK.COM
+ (2603:1096:950:3::20) To CY5PR12MB6179.namprd12.prod.outlook.com
+ (2603:10b6:930:24::22)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.126.230.35]
-X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MWH0EPF000989EA:EE_|CH2PR12MB4133:EE_
-X-MS-Office365-Filtering-Correlation-Id: b01a41b2-ef83-4787-4ad2-08db981a1236
+X-MS-TrafficTypeDiagnostic: CY5PR12MB6179:EE_|MN2PR12MB4342:EE_
+X-MS-Office365-Filtering-Correlation-Id: ea844d7c-6bed-4f1c-a786-08db981df4d2
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	hkMumO5Tzm+MmdFCO5FlANVk6Q5KA+kt+xBlOtalerMh2uM7nx1fvuAnqAPoCKZS5zlG/OkAwwSEmQBNAxwDfiy8cLRzsRRQHyGTOtuSRW/R99eRX4MvPco4W8WhP8h0vg+duNusZ5RV4+idaLda7mrlUS8OpbgiBWkZu2FxCmJqJtsyHL5APiym19XahIzqVZrjfR7pDG/h42Jgzp5Xxa8xk+sLtOV+Kgb8S0RsvaThJ9JLs1s30p6NuYtCznshrWj9fowjaN2z9yChttSRAlnHkXInDd+whNHHIOhLaOKe4iESc80RJgx4VblZuHGr2w3QSPxXEf349u6sG2dCUD3bi7btAicOul5rt7C3eEI0MMcG9LMGfDJKQM2MP+NFPA+SnjKJWXzZEZQFTwFYUknG1rbqz3U5JeTNXGvATBuEdKZ1GItVCILa7P3KP4QdJErjZkKcqCxH6lzfzslzU2bksEBwKN6d9vd8/24toFNwfXqhCRg+XYLxGRwUd3M4+4Auf0uZSNGEFT6llrrxo0IMUmLXbWPVXKckFzgSb8bkMhd857yNUfAUOSbMw/J7a4FKis5hnsthSvX9mARB9yE+Zs2aOjzSp7RI3CwZHvA4cRFE/QLwub2kJG+P6qZQ5JA8fTLbwlh1M/sy/hpdgD9712oFUFavz7zTw5lRhnrqGuT8qomp/Lryc1Mi45nltalMfYvN3/Du+HZIgGh6/iHZ10HC8MsCRLSNnYKLaAqI1x+ZmmsfD95b5aVLKF5ddRLAdvplhTPNrTCcbXvQYl43zP1LCS3Br3Q9VQygris=
+	YPnJlGutXqYqo00sU/LvrZKq2jypPqvwOsLqRssNn+K+sINqcWZ/u6frbls4u4foZWV+68R9/+sGKRG0L7WrDNIV7tuyO/DnVj4y8am0vqnP+eoB4alpmatgN+Oe8bPBIHaxJ2IFnQaAgzIGIfLiXWai1wMVBoqPFCccKYtyF0UVy8/ST5tvwW+jgzkwbqFzUK/NLp4iRLfDwng+a7LfrvcOyQ/0WSy2A71sYwHn+PsTi6NTb6pOJoLL0vh/dIvOFtJ3lGYxKFXOLQcCWCvdQmwgDujptN623EfT7/Ckp7+IvQ+4h66XKtI+hJGsqh3wQXPXbxlcJ6SIIWPLS5nVIgjFOP4axVC+o93k43326OzlPQAgTceP7tqAs4l9ed4/E//lF8/dDJLKhqHEzAgrdBynj/LLk9Se5SRCmiojEv29sTsV7hfNWV54qRebxmxMAd6Vw2LfpQbXvnDVEzQpIcuHSZWwM8ds9dvLjF//s9BzgPYlWqTU21p/R7cU5YvtsLoZds6Hk9pfd2bOmVrB4KZx6G98q7u/pBy3aFs/SZUeDntUNyWXNp/czU+Rt5XWRF/disGES5ZkzGqLa8E5Sg==
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(396003)(136003)(376002)(346002)(451199021)(82310400008)(1800799003)(186006)(46966006)(40470700004)(36840700001)(36860700001)(36756003)(86362001)(83380400001)(356005)(7636003)(82740400003)(40460700003)(40480700001)(6666004)(2906002)(966005)(336012)(1076003)(107886003)(26005)(16526019)(4326008)(41300700001)(316002)(70206006)(478600001)(6916009)(54906003)(5660300002)(47076005)(426003)(2616005)(8676002)(8936002)(70586007);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR12MB6179.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(7916004)(4636009)(136003)(346002)(396003)(39860400002)(366004)(376002)(1800799003)(186006)(451199021)(86362001)(38100700002)(33716001)(9686003)(6512007)(6486002)(6666004)(966005)(6506007)(26005)(316002)(66946007)(41300700001)(66556008)(66476007)(6916009)(4326008)(478600001)(4744005)(54906003)(2906002)(5660300002)(8936002)(8676002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?I3yhQ/RmeXSQGmVbozZ4nQruAZf0OoOqtjlfBb3GML2KqOCqul7g++IiiXuc?=
+ =?us-ascii?Q?FYmbpAbBUJDMeKrOv6AZByQBKijCaINMMYzTSHlAhHHcZoDQA7GCj6cMdr/a?=
+ =?us-ascii?Q?9rDRynqaq38PzGjay4vFGISTJI11eNSL3Px5GOh32ld3CAlLvLxwhLxEA9A6?=
+ =?us-ascii?Q?6Gy7DoQgVRwpah6zN9L3k0R8RvRPqmnjxyNvelmwRlgxlIO/y4BeyhcQcS5T?=
+ =?us-ascii?Q?5JiqRl77HMlcL6LLssIfTNGc/75LJmVE97dQrWsxxEWc373K0ml8PUGHqm5D?=
+ =?us-ascii?Q?OasSFyoSsIl3lIex1b+QXpmMzc6sUkijgEG8I/6QE/dy7j7u3ps4fmMbC4NY?=
+ =?us-ascii?Q?bWD+wKnGODze+rbgl4B2u8WfR2rveOsnE+VauSMBkMDYcactO6h/yrPiCNoh?=
+ =?us-ascii?Q?/UdRBQ+b6PnK+1ZWfuVbVcRnrQSTSqg5LwEDfNWa2FAoi0IYT1fL0+rGMpyl?=
+ =?us-ascii?Q?iKhsB0moqQZIyWxta0qsS1frHhd4vt3HfbAFHboyshG+0mTn3mBdpOu+9FmW?=
+ =?us-ascii?Q?x+941GIAIUfgLhbfF5lQMwSBttcov6f3/DK/tzqy72hiFH8unkUK7NKzuZu0?=
+ =?us-ascii?Q?bC09lmX+lJx2hcgsz3akpgwXqGW04KZZOFXWdgkLNapeFczVfCZrryHLq6BU?=
+ =?us-ascii?Q?KKgVfoIJo/natgrWuuJ+jXYHV31vdpEyJ8vkSTgvNdsQtJ9ZGBzYfT1Z3iTt?=
+ =?us-ascii?Q?rLF+/olKAFA2n5NPR6YoyBduEV0fTYQ9KTsY28LBRYbE/BV8xPqXgWFRVMHz?=
+ =?us-ascii?Q?qdtXpmQzvY5EyYTqx7HIHYpxQAXVaclzBBvWJR5pWLUYrhySr1oafPRUiPMS?=
+ =?us-ascii?Q?WYJ8V1OCCqLQrZvQA2oiI2LA8WqyunUlCeUh8oHcDPjyi58PWrpnujAyRBwz?=
+ =?us-ascii?Q?LFrjbHxQsqScDvS/rBqG3gLCaxIw4G6RSrvGP6BZCwM2DZFJ8Qhj1P8gffQQ?=
+ =?us-ascii?Q?8upUUBtOo5hWvpWFNJLsRRUIAGDGZ9NNXmAzwPSQntWZjNErxQ3ZKnk8Sv9r?=
+ =?us-ascii?Q?vTQmWZbnKR6jIwXWCN4owvP259aTFSMm40idLNGeNqXdSiluHZ/TQJSxXvoL?=
+ =?us-ascii?Q?aeG63FBoaINMIQko5tCRKKfdgw7n4lAaVsCsEMY+92nwkko+Bew9FLm640w4?=
+ =?us-ascii?Q?RfdNcHpcvCwLl+0hZHU7tibu1Mo/FBDmt1b+yZqVahPBR8DDXD6PCdB3pHaJ?=
+ =?us-ascii?Q?oaJPBsV38OJsfmHu+WnIh9MaZrd2dRm7c2gHcHD186QvjWRNWNg+n8P49I7P?=
+ =?us-ascii?Q?nFzhrJ+Td93SKCdJL0NvuYpOaJ2lGds2XfPNlRZ45KyKfZ09Zvx0IXsRy/g0?=
+ =?us-ascii?Q?ONgPjg1Ht+0VOWFfvEMM25VNenWbt0mz1qklf+SmC3PiCQSZT9TMOhF5Ahna?=
+ =?us-ascii?Q?oDLHa6ZTMOpM7ejLEWuE3EqZcOBNPKuBBxsCh8oDigSe/QV5YBINMwBzDJrr?=
+ =?us-ascii?Q?DQl77Ao05XTF1mZ4hySTak1O//yADP4vCbAL7s6DP6iGJ31g1f0A5Y0N1VPI?=
+ =?us-ascii?Q?GlCzpDQfwF1orKqhwXfOAAT7EQq8kE+6loTStodBCiBovM1vt2dNdCSaG2M9?=
+ =?us-ascii?Q?Z8IFMZRZ/lqm0NKjo4jC7PsL4q2cLzwHM2+UVs3w?=
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Aug 2023 14:16:34.3614
+X-MS-Exchange-CrossTenant-Network-Message-Id: ea844d7c-6bed-4f1c-a786-08db981df4d2
+X-MS-Exchange-CrossTenant-AuthSource: CY5PR12MB6179.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Aug 2023 14:44:23.3621
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: b01a41b2-ef83-4787-4ad2-08db981a1236
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	MWH0EPF000989EA.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4133
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: KIY1UV25w25t0lvF7OA1P/leC/g99UVPl/2Zbg8QNSn6bOlkqnh/bnt2gbjCEGjLb6/MJIDzAe2usbOZTgaZcg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4342
 X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_NONE,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.6
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Some test cases check that the group timer is (or isn't) 0. Instead of
-grepping for "0.00" grep for " 0.00" as the former can also match
-"260.00" which is the default group membership interval.
+In the future, please use the correct patch prefix for netdev
+submissions. See:
 
-Fixes: b6d00da08610 ("selftests: forwarding: Add bridge MDB test")
-Reported-by: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
-Closes: https://lore.kernel.org/netdev/adc5e40d-d040-a65e-eb26-edf47dac5b02@alu.unizg.hr/
-Signed-off-by: Ido Schimmel <idosch@nvidia.com>
-Tested-by: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
----
- tools/testing/selftests/net/forwarding/bridge_mdb.sh | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html#tl-dr
 
-diff --git a/tools/testing/selftests/net/forwarding/bridge_mdb.sh b/tools/testing/selftests/net/forwarding/bridge_mdb.sh
-index 4853b8e4f8d3..d0c6c499d5da 100755
---- a/tools/testing/selftests/net/forwarding/bridge_mdb.sh
-+++ b/tools/testing/selftests/net/forwarding/bridge_mdb.sh
-@@ -617,7 +617,7 @@ __cfg_test_port_ip_sg()
- 		grep -q "permanent"
- 	check_err $? "Entry not added as \"permanent\" when should"
- 	bridge -d -s mdb show dev br0 vid 10 | grep "$grp_key" | \
--		grep -q "0.00"
-+		grep -q " 0.00"
- 	check_err $? "\"permanent\" entry has a pending group timer"
- 	bridge mdb del dev br0 port $swp1 $grp_key vid 10
- 
-@@ -626,7 +626,7 @@ __cfg_test_port_ip_sg()
- 		grep -q "temp"
- 	check_err $? "Entry not added as \"temp\" when should"
- 	bridge -d -s mdb show dev br0 vid 10 | grep "$grp_key" | \
--		grep -q "0.00"
-+		grep -q " 0.00"
- 	check_fail $? "\"temp\" entry has an unpending group timer"
- 	bridge mdb del dev br0 port $swp1 $grp_key vid 10
- 
-@@ -659,7 +659,7 @@ __cfg_test_port_ip_sg()
- 		grep -q "permanent"
- 	check_err $? "Entry not marked as \"permanent\" after replace"
- 	bridge -d -s mdb show dev br0 vid 10 | grep "$grp_key" | \
--		grep -q "0.00"
-+		grep -q " 0.00"
- 	check_err $? "Entry has a pending group timer after replace"
- 
- 	bridge mdb replace dev br0 port $swp1 $grp_key vid 10 temp
-@@ -667,7 +667,7 @@ __cfg_test_port_ip_sg()
- 		grep -q "temp"
- 	check_err $? "Entry not marked as \"temp\" after replace"
- 	bridge -d -s mdb show dev br0 vid 10 | grep "$grp_key" | \
--		grep -q "0.00"
-+		grep -q " 0.00"
- 	check_fail $? "Entry has an unpending group timer after replace"
- 	bridge mdb del dev br0 port $swp1 $grp_key vid 10
- 
--- 
-2.40.1
+On Tue, Aug 08, 2023 at 09:35:28PM +0800, Ruan Jinjie wrote:
+> Use is_zero_ether_addr() instead of ether_addr_equal()
+> to check if the ethernet address is all zeros.
+> 
+> Signed-off-by: Ruan Jinjie <ruanjinjie@huawei.com>
 
+Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+
+Thanks
 
