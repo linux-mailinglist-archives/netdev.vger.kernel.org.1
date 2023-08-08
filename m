@@ -1,63 +1,60 @@
-Return-Path: <netdev+bounces-25385-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25420-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0AA3B773D68
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 18:17:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE4F8773EE0
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 18:38:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B7230280F61
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 16:17:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EF6BD1C20EE1
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 16:38:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A39A14F81;
-	Tue,  8 Aug 2023 16:07:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9319C14292;
+	Tue,  8 Aug 2023 16:37:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F23714AB7
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 16:07:44 +0000 (UTC)
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 669621E312;
-	Tue,  8 Aug 2023 09:07:30 -0700 (PDT)
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 378A8kv3028961;
-	Tue, 8 Aug 2023 04:27:35 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding : content-type; s=pfpt0220;
- bh=XAlOl3DDRS02zzgLra0tknIopDmIwtdliZJfkBFdVgQ=;
- b=CFfgTKuAdLKYJChLhCNGECFWt/E6QG/EbMxzXBE5V0U78OZhl7f7ty0eZdyzW+2lvtXf
- i4FqQObnGxqSIHe5T2UOKor5eP6haPlPVFaW5kSFB9GFW809glf7QrQBHZjb4i/PMtxD
- TequXOsoofBTQomX1ON+rYBlBzphp/4LI8RkF5nwhi7kMhCeJqjlT8pUY9pUSUbAZqf6
- xvsne4eLUWGz75kGcKBjKMKozCoxKqC58hTyyHhcDAalGyeW7l/ayJ+YVW7Z2Zm1FL+g
- 8QrHenOkaXhmjxESa6+lHYJZxQ/mjfo+MVkm67uTLyIiG8q3eiImLzi9G1CU+IzGcYX5 iA== 
-Received: from dc5-exch02.marvell.com ([199.233.59.182])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3sbkntg7mr-1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87D321805B
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 16:37:46 +0000 (UTC)
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D06C637CBA;
+	Tue,  8 Aug 2023 09:37:31 -0700 (PDT)
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3789rD5I020282;
+	Tue, 8 Aug 2023 04:42:50 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding :
+ content-type; s=pfpt0220; bh=cj0PB4+iw+OJxParcspUdcwyVcMKGRDC9aDS0DIq4Vg=;
+ b=GcS/O3ydduOGbRgzpCa39sc+aZLa9riOxC/ua5biSaAVPMtKATxr2YF77kBn/Lguh+BD
+ /uMte7EamIZ12ESG/UZgPxd0hAicAL7x7yglUUOPddC+kkZ+v+FnCn9JDTQfdwdNLVzE
+ nEtq1y2+DieXhr41cKfhWA+FREnzu+lvRH3q34+Kb/ic5YrG8zxKWU4ecP19udQcaOxs
+ kdtKmLuB6uLSw/LsIR5YeuvdZcSpW9Bc0/NRnyK88RNhz04NcDI+toKzC2RyRiLYBN0h
+ 0ltNCclx/aHMcKnTlNdIyYIo1lyTb0Cf7uCoIOaZdB0L01rqHQNCLY76IHepYuFjMUZ7 zA== 
+Received: from dc5-exch01.marvell.com ([199.233.59.181])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3sbkfggb5s-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Tue, 08 Aug 2023 04:27:34 -0700
-Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Tue, 8 Aug
- 2023 04:27:33 -0700
+	Tue, 08 Aug 2023 04:42:50 -0700
+Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Tue, 8 Aug
+ 2023 04:42:48 -0700
 Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
  (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Tue, 8 Aug 2023 04:27:33 -0700
-Received: from localhost.localdomain (unknown [10.28.36.166])
-	by maili.marvell.com (Postfix) with ESMTP id A7D113F7045;
-	Tue,  8 Aug 2023 04:27:28 -0700 (PDT)
-From: Suman Ghosh <sumang@marvell.com>
-To: <sgoutham@marvell.com>, <gakula@marvell.com>, <sbhatta@marvell.com>,
-        <hkelam@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <lcherian@marvell.com>,
-        <jerinj@marvell.com>
-Subject: [net PATCH 3/3] octeontx2-af: CN10KB: fix PFC configuration
-Date: Tue, 8 Aug 2023 16:57:08 +0530
-Message-ID: <20230808112708.3179218-4-sumang@marvell.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20230808112708.3179218-1-sumang@marvell.com>
-References: <20230808112708.3179218-1-sumang@marvell.com>
+ Transport; Tue, 8 Aug 2023 04:42:48 -0700
+Received: from setup-1.sclab.marvell.com (unknown [10.106.25.74])
+	by maili.marvell.com (Postfix) with ESMTP id 69EC63F703F;
+	Tue,  8 Aug 2023 04:42:48 -0700 (PDT)
+From: Sathesh Edara <sedara@marvell.com>
+To: <linux-kernel@vger.kernel.org>, <sburla@marvell.com>, <vburru@marvell.com>,
+        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <netdev@vger.kernel.org>, <hgani@marvell.com>,
+        <andrew@lunn.ch>
+CC: <sedara@marvell.com>
+Subject: [net-next PATCH v2] octeon_ep: Add control plane host and firmware versions.
+Date: Tue, 8 Aug 2023 04:42:25 -0700
+Message-ID: <20230808114225.516711-1-sedara@marvell.com>
+X-Mailer: git-send-email 2.37.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,99 +63,236 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-Proofpoint-GUID: cNhGZ-HWFY0j-uZTSBniOwBV2CxkuOyf
-X-Proofpoint-ORIG-GUID: cNhGZ-HWFY0j-uZTSBniOwBV2CxkuOyf
+X-Proofpoint-ORIG-GUID: FDNaP-8n6pVfty9mSsRLbqonCB_mBNIr
+X-Proofpoint-GUID: FDNaP-8n6pVfty9mSsRLbqonCB_mBNIr
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
  definitions=2023-08-08_09,2023-08-08_01,2023-05-22_02
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Hariprasad Kelam <hkelam@marvell.com>
+Implement control plane mailbox versions for host and firmware.
+Versions are published in info area of control mailbox bar4
+memory structure.Firmware will publish minimum and maximum
+supported versions.Control plane mailbox apis will check for
+firmware version before sending any control commands to firmware.
+Notifications from firmware will similarly be checked for host
+version compatibility.
 
-The previous patch which added new CN10KB RPM block support,
-has a bug due to which PFC is not getting configured properly.
-This patch fixes the same.
-
-Fixes: b9d0fedc6234 ("octeontx2-af: cn10kb: Add RPM_USX MAC support")
-Signed-off-by: Hariprasad Kelam <hkelam@marvell.com>
+Signed-off-by: Sathesh Edara <sedara@marvell.com>
 ---
- drivers/net/ethernet/marvell/octeontx2/af/rpm.c | 17 +++++++++--------
- .../net/ethernet/marvell/octeontx2/af/rvu_reg.c |  4 ++--
- 2 files changed, 11 insertions(+), 10 deletions(-)
+v2:
+  - Addressed review comments given by Andrew Lunn
+    1. Removed firmware version check
+    2. Fixed compilation error by adding missed header file
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rpm.c b/drivers/net/ethernet/marvell/octeontx2/af/rpm.c
-index b4fcb20c3f4f..af21e2030cff 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rpm.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rpm.c
-@@ -355,8 +355,8 @@ int rpm_lmac_enadis_pause_frm(void *rpmd, int lmac_id, u8 tx_pause,
- 
- void rpm_lmac_pause_frm_config(void *rpmd, int lmac_id, bool enable)
- {
-+	u64 cfg, pfc_class_mask_cfg;
- 	rpm_t *rpm = rpmd;
--	u64 cfg;
- 
- 	/* ALL pause frames received are completely ignored */
- 	cfg = rpm_read(rpm, lmac_id, RPMX_MTI_MAC100X_COMMAND_CONFIG);
-@@ -380,9 +380,11 @@ void rpm_lmac_pause_frm_config(void *rpmd, int lmac_id, bool enable)
- 		rpm_write(rpm, 0, RPMX_CMR_CHAN_MSK_OR, ~0ULL);
- 
- 	/* Disable all PFC classes */
--	cfg = rpm_read(rpm, lmac_id, RPMX_CMRX_PRT_CBFC_CTL);
-+	pfc_class_mask_cfg = is_dev_rpm2(rpm) ? RPM2_CMRX_PRT_CBFC_CTL :
-+						RPMX_CMRX_PRT_CBFC_CTL;
-+	cfg = rpm_read(rpm, lmac_id, pfc_class_mask_cfg);
- 	cfg = FIELD_SET(RPM_PFC_CLASS_MASK, 0, cfg);
--	rpm_write(rpm, lmac_id, RPMX_CMRX_PRT_CBFC_CTL, cfg);
-+	rpm_write(rpm, lmac_id, pfc_class_mask_cfg, cfg);
- }
- 
- int rpm_get_rx_stats(void *rpmd, int lmac_id, int idx, u64 *rx_stat)
-@@ -605,8 +607,11 @@ int rpm_lmac_pfc_config(void *rpmd, int lmac_id, u8 tx_pause, u8 rx_pause, u16 p
- 	if (!is_lmac_valid(rpm, lmac_id))
- 		return -ENODEV;
- 
-+	pfc_class_mask_cfg = is_dev_rpm2(rpm) ? RPM2_CMRX_PRT_CBFC_CTL :
-+						RPMX_CMRX_PRT_CBFC_CTL;
+ .../marvell/octeon_ep/octep_cp_version.h      | 11 ++++++++
+ .../marvell/octeon_ep/octep_ctrl_mbox.c       |  9 ++++++-
+ .../marvell/octeon_ep/octep_ctrl_mbox.h       |  6 +++++
+ .../marvell/octeon_ep/octep_ctrl_net.c        | 25 +++++++++++++++++--
+ .../marvell/octeon_ep/octep_ctrl_net.h        | 16 ++++++++++++
+ 5 files changed, 64 insertions(+), 3 deletions(-)
+ create mode 100644 drivers/net/ethernet/marvell/octeon_ep/octep_cp_version.h
+
+diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_cp_version.h b/drivers/net/ethernet/marvell/octeon_ep/octep_cp_version.h
+new file mode 100644
+index 000000000000..0c741e752db6
+--- /dev/null
++++ b/drivers/net/ethernet/marvell/octeon_ep/octep_cp_version.h
+@@ -0,0 +1,11 @@
++/* SPDX-License-Identifier: BSD-3-Clause
++ * Copyright (c) 2022 Marvell.
++ */
++#ifndef __OCTEP_CP_VERSION_H__
++#define __OCTEP_CP_VERSION_H__
 +
- 	cfg = rpm_read(rpm, lmac_id, RPMX_MTI_MAC100X_COMMAND_CONFIG);
--	class_en = rpm_read(rpm, lmac_id, RPMX_CMRX_PRT_CBFC_CTL);
-+	class_en = rpm_read(rpm, lmac_id, pfc_class_mask_cfg);
- 	pfc_en |= FIELD_GET(RPM_PFC_CLASS_MASK, class_en);
++#define OCTEP_CP_VERSION(a, b, c)	((((a) & 0xff) << 16) + \
++					 (((b) & 0xff) << 8) + \
++					  ((c) & 0xff))
++
++#endif /* __OCTEP_CP_VERSION_H__ */
+diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_mbox.c b/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_mbox.c
+index dab61cc1acb5..9d53c1402cb4 100644
+--- a/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_mbox.c
++++ b/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_mbox.c
+@@ -37,7 +37,9 @@
  
- 	if (rx_pause) {
-@@ -635,10 +640,6 @@ int rpm_lmac_pfc_config(void *rpmd, int lmac_id, u8 tx_pause, u8 rx_pause, u16 p
- 		cfg |= RPMX_MTI_MAC100X_COMMAND_CONFIG_PFC_MODE;
+ #define OCTEP_CTRL_MBOX_INFO_MAGIC_NUM(m)	(m)
+ #define OCTEP_CTRL_MBOX_INFO_BARMEM_SZ(m)	((m) + 8)
++#define OCTEP_CTRL_MBOX_INFO_HOST_VERSION(m)   ((m) + 16)
+ #define OCTEP_CTRL_MBOX_INFO_HOST_STATUS(m)	((m) + 24)
++#define OCTEP_CTRL_MBOX_INFO_FW_VERSION(m)     ((m) + 136)
+ #define OCTEP_CTRL_MBOX_INFO_FW_STATUS(m)	((m) + 144)
  
- 	rpm_write(rpm, lmac_id, RPMX_MTI_MAC100X_COMMAND_CONFIG, cfg);
--
--	pfc_class_mask_cfg = is_dev_rpm2(rpm) ? RPM2_CMRX_PRT_CBFC_CTL :
--						RPMX_CMRX_PRT_CBFC_CTL;
--
- 	rpm_write(rpm, lmac_id, pfc_class_mask_cfg, class_en);
+ #define OCTEP_CTRL_MBOX_H2FQ_INFO(m)	((m) + OCTEP_CTRL_MBOX_INFO_SZ)
+@@ -71,7 +73,7 @@ static u32 octep_ctrl_mbox_circq_depth(u32 pi, u32 ci, u32 sz)
  
- 	return 0;
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_reg.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_reg.c
-index b3150f053291..d46ac29adb96 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_reg.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_reg.c
-@@ -31,8 +31,8 @@ static struct hw_reg_map txsch_reg_map[NIX_TXSCH_LVL_CNT] = {
- 	{NIX_TXSCH_LVL_TL4, 3, 0xFFFF, {{0x0B00, 0x0B08}, {0x0B10, 0x0B18},
- 			      {0x1200, 0x12E0} } },
- 	{NIX_TXSCH_LVL_TL3, 4, 0xFFFF, {{0x1000, 0x10E0}, {0x1600, 0x1608},
--			      {0x1610, 0x1618}, {0x1700, 0x17B0} } },
--	{NIX_TXSCH_LVL_TL2, 2, 0xFFFF, {{0x0E00, 0x0EE0}, {0x1700, 0x17B0} } },
-+			      {0x1610, 0x1618}, {0x1700, 0x17C8} } },
-+	{NIX_TXSCH_LVL_TL2, 2, 0xFFFF, {{0x0E00, 0x0EE0}, {0x1700, 0x17C8} } },
- 	{NIX_TXSCH_LVL_TL1, 1, 0xFFFF, {{0x0C00, 0x0D98} } },
+ int octep_ctrl_mbox_init(struct octep_ctrl_mbox *mbox)
+ {
+-	u64 magic_num, status;
++	u64 magic_num, status, fw_versions;
+ 
+ 	if (!mbox)
+ 		return -EINVAL;
+@@ -93,6 +95,9 @@ int octep_ctrl_mbox_init(struct octep_ctrl_mbox *mbox)
+ 		return -EINVAL;
+ 	}
+ 
++	fw_versions = readq(OCTEP_CTRL_MBOX_INFO_FW_VERSION(mbox->barmem));
++	mbox->min_fw_version = ((fw_versions & 0xffffffff00000000ull) >> 32);
++	mbox->max_fw_version = (fw_versions & 0xffffffff);
+ 	mbox->barmem_sz = readl(OCTEP_CTRL_MBOX_INFO_BARMEM_SZ(mbox->barmem));
+ 
+ 	writeq(OCTEP_CTRL_MBOX_STATUS_INIT,
+@@ -113,6 +118,7 @@ int octep_ctrl_mbox_init(struct octep_ctrl_mbox *mbox)
+ 			  OCTEP_CTRL_MBOX_TOTAL_INFO_SZ +
+ 			  mbox->h2fq.sz;
+ 
++	writeq(mbox->version, OCTEP_CTRL_MBOX_INFO_HOST_VERSION(mbox->barmem));
+ 	/* ensure ready state is seen after everything is initialized */
+ 	wmb();
+ 	writeq(OCTEP_CTRL_MBOX_STATUS_READY,
+@@ -258,6 +264,7 @@ int octep_ctrl_mbox_uninit(struct octep_ctrl_mbox *mbox)
+ 	if (!mbox->barmem)
+ 		return -EINVAL;
+ 
++	writeq(0, OCTEP_CTRL_MBOX_INFO_HOST_VERSION(mbox->barmem));
+ 	writeq(OCTEP_CTRL_MBOX_STATUS_INVALID,
+ 	       OCTEP_CTRL_MBOX_INFO_HOST_STATUS(mbox->barmem));
+ 	/* ensure uninit state is written before uninitialization */
+diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_mbox.h b/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_mbox.h
+index 9c4ff0fba6a0..7f8135788efc 100644
+--- a/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_mbox.h
++++ b/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_mbox.h
+@@ -121,6 +121,8 @@ struct octep_ctrl_mbox_q {
  };
  
+ struct octep_ctrl_mbox {
++	/* control plane version */
++	u64 version;
+ 	/* size of bar memory */
+ 	u32 barmem_sz;
+ 	/* pointer to BAR memory */
+@@ -133,6 +135,10 @@ struct octep_ctrl_mbox {
+ 	struct mutex h2fq_lock;
+ 	/* lock for f2hq */
+ 	struct mutex f2hq_lock;
++	/* Min control plane version supported by firmware */
++	u32 min_fw_version;
++	/* Max control plane version supported by firmware */
++	u32 max_fw_version;
+ };
+ 
+ /* Initialize control mbox.
+diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.c b/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.c
+index 1cc6af2feb38..3e9f0a88cfca 100644
+--- a/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.c
++++ b/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.c
+@@ -14,6 +14,9 @@
+ #include "octep_main.h"
+ #include "octep_ctrl_net.h"
+ 
++/* Control plane version */
++#define OCTEP_CP_VERSION_CURRENT	OCTEP_CP_VERSION(1, 0, 0)
++
+ static const u32 req_hdr_sz = sizeof(union octep_ctrl_net_req_hdr);
+ static const u32 mtu_sz = sizeof(struct octep_ctrl_net_h2f_req_cmd_mtu);
+ static const u32 mac_sz = sizeof(struct octep_ctrl_net_h2f_req_cmd_mac);
+@@ -41,7 +44,13 @@ static int octep_send_mbox_req(struct octep_device *oct,
+ 			       struct octep_ctrl_net_wait_data *d,
+ 			       bool wait_for_response)
+ {
+-	int err, ret;
++	int err, ret, cmd;
++
++	/* check if firmware is compatible for this request */
++	cmd = d->data.req.hdr.s.cmd;
++	if (octep_ctrl_net_h2f_cmd_versions[cmd] > oct->ctrl_mbox.max_fw_version ||
++	    octep_ctrl_net_h2f_cmd_versions[cmd] < oct->ctrl_mbox.min_fw_version)
++		return -EOPNOTSUPP;
+ 
+ 	err = octep_ctrl_mbox_send(&oct->ctrl_mbox, &d->msg);
+ 	if (err < 0)
+@@ -84,12 +93,16 @@ int octep_ctrl_net_init(struct octep_device *oct)
+ 
+ 	/* Initialize control mbox */
+ 	ctrl_mbox = &oct->ctrl_mbox;
++	ctrl_mbox->version = OCTEP_CP_VERSION_CURRENT;
+ 	ctrl_mbox->barmem = CFG_GET_CTRL_MBOX_MEM_ADDR(oct->conf);
+ 	ret = octep_ctrl_mbox_init(ctrl_mbox);
+ 	if (ret) {
+ 		dev_err(&pdev->dev, "Failed to initialize control mbox\n");
+ 		return ret;
+ 	}
++	dev_info(&pdev->dev, "Control plane versions host: %llx, firmware: %x:%x\n",
++		 ctrl_mbox->version, ctrl_mbox->min_fw_version,
++		 ctrl_mbox->max_fw_version);
+ 	oct->ctrl_mbox_ifstats_offset = ctrl_mbox->barmem_sz;
+ 
+ 	return 0;
+@@ -273,9 +286,17 @@ static int process_mbox_notify(struct octep_device *oct,
+ {
+ 	struct net_device *netdev = oct->netdev;
+ 	struct octep_ctrl_net_f2h_req *req;
++	int cmd;
+ 
+ 	req = (struct octep_ctrl_net_f2h_req *)msg->sg_list[0].msg;
+-	switch (req->hdr.s.cmd) {
++	cmd = req->hdr.s.cmd;
++
++	/* check if we support this command */
++	if (octep_ctrl_net_f2h_cmd_versions[cmd] > OCTEP_CP_VERSION_CURRENT ||
++	    octep_ctrl_net_f2h_cmd_versions[cmd] < OCTEP_CP_VERSION_CURRENT)
++		return -EOPNOTSUPP;
++
++	switch (cmd) {
+ 	case OCTEP_CTRL_NET_F2H_CMD_LINK_STATUS:
+ 		if (netif_running(netdev)) {
+ 			if (req->link.state) {
+diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.h b/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.h
+index 37880dd79116..dd4f055fa8da 100644
+--- a/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.h
++++ b/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.h
+@@ -7,6 +7,8 @@
+ #ifndef __OCTEP_CTRL_NET_H__
+ #define __OCTEP_CTRL_NET_H__
+ 
++#include "octep_cp_version.h"
++
+ #define OCTEP_CTRL_NET_INVALID_VFID	(-1)
+ 
+ /* Supported commands */
+@@ -39,12 +41,26 @@ enum octep_ctrl_net_h2f_cmd {
+ 	OCTEP_CTRL_NET_H2F_CMD_LINK_STATUS,
+ 	OCTEP_CTRL_NET_H2F_CMD_RX_STATE,
+ 	OCTEP_CTRL_NET_H2F_CMD_LINK_INFO,
++	OCTEP_CTRL_NET_H2F_CMD_MAX
++};
++
++/* Control plane version in which OCTEP_CTRL_NET_H2F_CMD was added */
++static const u32 octep_ctrl_net_h2f_cmd_versions[OCTEP_CTRL_NET_H2F_CMD_MAX] = {
++	[OCTEP_CTRL_NET_H2F_CMD_INVALID ... OCTEP_CTRL_NET_H2F_CMD_LINK_INFO] =
++	 OCTEP_CP_VERSION(1, 0, 0)
+ };
+ 
+ /* Supported fw to host commands */
+ enum octep_ctrl_net_f2h_cmd {
+ 	OCTEP_CTRL_NET_F2H_CMD_INVALID = 0,
+ 	OCTEP_CTRL_NET_F2H_CMD_LINK_STATUS,
++	OCTEP_CTRL_NET_F2H_CMD_MAX
++};
++
++/* Control plane version in which OCTEP_CTRL_NET_F2H_CMD was added */
++static const u32 octep_ctrl_net_f2h_cmd_versions[OCTEP_CTRL_NET_F2H_CMD_MAX] = {
++	[OCTEP_CTRL_NET_F2H_CMD_INVALID ... OCTEP_CTRL_NET_F2H_CMD_LINK_STATUS] =
++	 OCTEP_CP_VERSION(1, 0, 0)
+ };
+ 
+ union octep_ctrl_net_req_hdr {
 -- 
-2.25.1
+2.37.3
 
 
