@@ -1,241 +1,175 @@
-Return-Path: <netdev+bounces-25357-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25348-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94919773C80
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 18:07:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 51A74773C50
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 18:04:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4827A280D80
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 16:07:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 829751C20FFE
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 16:04:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03E4E1CA09;
-	Tue,  8 Aug 2023 15:51:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 179C114F65;
+	Tue,  8 Aug 2023 15:49:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5C7613AD7
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 15:51:32 +0000 (UTC)
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2072.outbound.protection.outlook.com [40.107.101.72])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC91246B2
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 08:51:13 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 043BE1427F
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 15:49:53 +0000 (UTC)
+Received: from FRA01-MR2-obe.outbound.protection.outlook.com (mail-mr2fra01on2041.outbound.protection.outlook.com [40.107.9.41])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AAC10A265;
+	Tue,  8 Aug 2023 08:49:31 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=WwRN6QUPeyKuOI4Q3Cbmw8aA5rD/M9OyXP/4xgOWm52ELo3Wh1JE3ZffeVK5j9NoUalX2ydgLalfDrid5StmuFuMI7nvL9fOOBcXhrXi5gqIiUgkyw92NzlfYD+GJREHSdeX/ePOXaBeY0thsv7aVodHSfED2yU4pWWIt2gIR4aEOD46dR/3tFi+1IqmBGTdQKJlF8t5s3/ZlExhPsZUSBDWWXMKNkykZ+UFofkfAX3JgJS9TRTmO53Bt4JyhyC/9Roji/a08j54YB7KMXWOtw5spGMbNaUEhBvM0hH2yIvSZbXnv7t7ieaGsj5OpHRVRiyNTgTAe333NgVukLl3xg==
+ b=Y5TFc4c0nMjSvJQqee02D425bPFwX3IAHXUQX7B4dlcC6JLkIEZefSv/S2B0yFEGm52MeYghUTjtrhZhApxF6C1gz2tObfe19uxCS4C0s0+4GcqaVxgKyPHcxhaob8HnI8dWeBM4Ep6TkeDCPLqlGgUO96vOkZoLDo4xL+tlp9KiUN87hn+9ivskSxBwpZ/7GDdUPhAZFnjNqedYUc2Q/+8fwENyP8cujd5wtjMdR6PuucnNeMJ58Fwps8ZJTr54FayWe2JzH5PBKdZuVqRdwGcaPcfn/bJwh+bDI5V+3gE3oEZsQjd0qFv0a2X2DytzUJhkNXc/S2VStLR+bp5MNA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=QsMvnmW9BZ/h6TD5kZziA+Eo14tOrc0UpEhC18OAmOo=;
- b=H7xD9SNqsz7KSsgMqmGwO0WeaOjjFsSJffe1oivQA12Ec7KYTsQsH44YRZbA5maEHuKkxEo5LCBlwNqLtSv+NMzHF27gPDanN+8cf4RQLqmw7oUoMrtAkhtFMdyg2SqOCa7BDbazyTmpRyfFhbnmLEfF4cIlKxrVOl/8AKSbk230LNcpHifwLuhD7+Z46CKsp6MmASBSB/Q2DeC1IwNb3lYsUG89VXlMR3qFiq4KRYVk2USQhxIMUNaYHZtQYb2HHb125ZT85JUicB/qec5ebUd7SS/gGNAs1v0dLRVw3nB5yBKFbLpSeqBJJFXQJsG978axepuCqIfOktOgU82HDg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ bh=gEg0vpSaqg4odkNA2xuO84Ta66x8OGNSUmS+ICrCKbk=;
+ b=OwlpTkvpHmHvjYsi76kNCikYx40+HFJOUHNVzsyA4A2yzXtZwuexVEcV/lGYCuJSvAwddkfw+spENmr8QhDglkcUBypJvOdqUQlXZunwTbOKjnwuZyTcI5/kinLe6Q/AAwMnXFaU+JnNM+Ro70xke+1khuYszJdHUI+dEMC2Ei1c2nMJ7fggB7DEsThpSI1YHo+kVsMjSsoX9Pf6Z/o1kkh7+jBu5bE+I/eHi3H8XBB0O8hj5Ih/siIrxwXg9JR7XWI6ZFkk87CMklKqbZacYh5JgrG5pBVtkOP1CuP2ermpB+6fBWII5ZpRW8ASPjnD86UnX98JN1H8KZgChQSH5g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=csgroup.eu; dmarc=pass action=none header.from=csgroup.eu;
+ dkim=pass header.d=csgroup.eu; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=csgroup.eu;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=QsMvnmW9BZ/h6TD5kZziA+Eo14tOrc0UpEhC18OAmOo=;
- b=qM1//o80YmPga5eE5ysl1UVAM9Pxj42K789+06bOY0BiiYrUQQaCYtsAyKMJyktxFy213KMxre/WjSBghvg1rpyMylkt8Xi+YaOuo81G6yjUDb43pWRVbDXXYWG0rXdoVpaPTmtcc0GiCJy+21MBznsODFTbAZF2jtC28yH21v3pDfm2ihMVOp2c9bY8lcmzPQmpZAS1KT3C/3D7W2WzL3et4v41iC9NNZXn2Vw5QehJU4e79bKMkE/I0o0KOQD0Tg+1kp5ahloqoCsOrX3dnMqRMGVLFU85oLSLjv31l0FVd3sa26VqwgJGUkXxWW1tbefk+kNy0M5uKmL1cNxEbQ==
-Received: from SA1PR05CA0016.namprd05.prod.outlook.com (2603:10b6:806:2d2::25)
- by CH3PR12MB8076.namprd12.prod.outlook.com (2603:10b6:610:127::11) with
+ bh=gEg0vpSaqg4odkNA2xuO84Ta66x8OGNSUmS+ICrCKbk=;
+ b=lcvfBGSpeV1bTzR4WmbyyQ+hFBx76BK/d+cLuEr34fQVC5fd/S/AIGbxTlir1Gp+v/FgKBRcUYIZAr4wt3ITZHYWSDSWjqoQ5Vlr2QXLEgwDY6pjRm3CV/xthnuCjkILPmPdhJN+Od2T6MzRb4xf9QEh32rC1lRz2toMOXL9IKQb3HUGw01gtH2FFPwwP09ZBMHHfQL1iGQatxhYWlzBZYFE6CWINdr5Evk9drD3GXrqaV4ABt6MaXWyK1QWuJ4ilOICieYuOgvysothgW5432aIgrkkvst13gZibPOHqtKquDgSVHVWMNv48jlm8y3ttbS0MSpkW7PPPIyzDpoI6g==
+Received: from MRZP264MB2988.FRAP264.PROD.OUTLOOK.COM (2603:10a6:501:31::15)
+ by PR0P264MB3291.FRAP264.PROD.OUTLOOK.COM (2603:10a6:102:145::8) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.27; Tue, 8 Aug
- 2023 07:53:16 +0000
-Received: from SA2PEPF00001507.namprd04.prod.outlook.com
- (2603:10b6:806:2d2:cafe::5d) by SA1PR05CA0016.outlook.office365.com
- (2603:10b6:806:2d2::25) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6678.16 via Frontend
- Transport; Tue, 8 Aug 2023 07:53:19 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- SA2PEPF00001507.mail.protection.outlook.com (10.167.242.39) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6652.19 via Frontend Transport; Tue, 8 Aug 2023 07:53:19 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Tue, 8 Aug 2023
- 00:53:10 -0700
-Received: from dev-r-vrt-155.mtr.labs.mlnx (10.126.230.35) by
- rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.37; Tue, 8 Aug 2023 00:53:07 -0700
-From: Ido Schimmel <idosch@nvidia.com>
-To: <netdev@vger.kernel.org>
-CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<edumazet@google.com>, <dsahern@kernel.org>, <petrm@nvidia.com>, Ido Schimmel
-	<idosch@nvidia.com>
-Subject: [PATCH net 3/3] nexthop: Fix infinite nexthop bucket dump when using maximum nexthop ID
-Date: Tue, 8 Aug 2023 10:52:33 +0300
-Message-ID: <20230808075233.3337922-4-idosch@nvidia.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20230808075233.3337922-1-idosch@nvidia.com>
-References: <20230808075233.3337922-1-idosch@nvidia.com>
+ 2023 08:02:46 +0000
+Received: from MRZP264MB2988.FRAP264.PROD.OUTLOOK.COM
+ ([fe80::2820:d3a6:1cdf:c60e]) by MRZP264MB2988.FRAP264.PROD.OUTLOOK.COM
+ ([fe80::2820:d3a6:1cdf:c60e%6]) with mapi id 15.20.6652.026; Tue, 8 Aug 2023
+ 08:02:46 +0000
+From: Christophe Leroy <christophe.leroy@csgroup.eu>
+To: Herve Codina <herve.codina@bootlin.com>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn
+	<andrew@lunn.ch>, Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski
+	<krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, Lee
+ Jones <lee@kernel.org>, Linus Walleij <linus.walleij@linaro.org>, Qiang Zhao
+	<qiang.zhao@nxp.com>, Li Yang <leoyang.li@nxp.com>, Liam Girdwood
+	<lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, Jaroslav Kysela
+	<perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, Shengjiu Wang
+	<shengjiu.wang@gmail.com>, Xiubo Li <Xiubo.Lee@gmail.com>, Fabio Estevam
+	<festevam@gmail.com>, Nicolin Chen <nicoleotsuka@gmail.com>, Randy Dunlap
+	<rdunlap@infradead.org>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-gpio@vger.kernel.org" <linux-gpio@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "alsa-devel@alsa-project.org"
+	<alsa-devel@alsa-project.org>, Thomas Petazzoni
+	<thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH v2 06/28] net: wan: Add support for QMC HDLC
+Thread-Topic: [PATCH v2 06/28] net: wan: Add support for QMC HDLC
+Thread-Index: AQHZv9JEUyQ5iyCDNEeCyxTyaUOJ5K/gHcoA
+Date: Tue, 8 Aug 2023 08:02:46 +0000
+Message-ID: <a81edd8d-3b0c-4945-50c4-c299109de3a2@csgroup.eu>
+References: <20230726150225.483464-1-herve.codina@bootlin.com>
+ <20230726150225.483464-7-herve.codina@bootlin.com>
+In-Reply-To: <20230726150225.483464-7-herve.codina@bootlin.com>
+Accept-Language: fr-FR, en-US
+Content-Language: fr-FR
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+user-agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=csgroup.eu;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: MRZP264MB2988:EE_|PR0P264MB3291:EE_
+x-ms-office365-filtering-correlation-id: 27b04f50-8b5f-40c3-f540-08db97e5da28
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ Yo7l/Gyu1OO3UsxBV9cyB2pi3S3FFJ+8B6EqHFpjsXEkJxNPPwM5VlGs9GSrCnwiiC/zyN5ThQpB3vAhM6MAoBUjxfEnesApJwCxHwDGjosQcgRImJKqkucEVoF+LZEnHASLwGa+zcBwUN8PCRPhfMexSa+FoNwa91fbO6LdKWAlwB2VnV/y1MidzlH/gAPOHV2rLpQNamh7KqgCDiB90yiUTv6plnyDn4vY1KbaDMic4unJfNmQ9oJLyZolKH9NsIpzOK9Y0PzbgUjTg1nXADrmwMBPS1WkE2Y+SgPCGjZbNNtuvOWOANdl3Ql+hIos02QjJG9H4qL36rF3SPbUKNYEiApwZDsVrVJyREj2brVjUPf6FTJzU45OStOZ6ZosCZqZR43KkZhKQScc0Sm9Jdt8KaYXZSvePLPaxcQL83dtUFWeAp8SnEu5St8FXlhYqfIgd/vkfUufms12ZZDWkAVSk1BGKlYx4S+nk0zoY8hN74MK83eckeclJS6nkJwCVmYbGpMql8fe03OiwNcLatoTM1uDfwjMFRaUnvtVgGcvO2SmbA/QpRl7KCUHSO0rPTckP66YzHDMMkvNhvUuvxX9JS/Z7pX8W3g6aW6+8v7vh1j6kkddOMWGg7COGFusyudUnVbTDovb5xN1DPEXI8DbXp6TKP0PqZUAQLpUS/aHs3UQd0NIAm0jAxvd0hkl0y+2IKA+lJKi7VCWqB6O3pH9hooKGVg6CZVonMUEzyMfbNtT1DeurmaMY7qwS7PhIDJchMvwPrF8lOFfiBclqw==
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MRZP264MB2988.FRAP264.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230028)(366004)(376002)(39850400004)(346002)(396003)(136003)(1800799003)(90021799007)(186006)(451199021)(90011799007)(31686004)(478600001)(122000001)(921005)(6512007)(86362001)(6486002)(26005)(6506007)(66946007)(66556008)(66476007)(66446008)(64756008)(91956017)(76116006)(4326008)(71200400001)(110136005)(38100700002)(54906003)(2616005)(316002)(41300700001)(2906002)(4744005)(36756003)(38070700005)(44832011)(7406005)(7416002)(5660300002)(8936002)(8676002)(31696002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?WGt6QzhvQzNQS3crYnRpVDBVajRvM1FJZHlOeVdkMnJyeWU1dStwT0NTR0Zv?=
+ =?utf-8?B?c0EyTDZhY2lWNEhPK1RvbGJYNGhnd3k5UnZFcEFGWXR6K3NZRHhUeGVjNkI2?=
+ =?utf-8?B?Ym9idndmNFY3YnNpdVhSZGZnb2VjSDZwTlhDd1BPOHAwblJLRDlHTFd1eVZL?=
+ =?utf-8?B?Z2hSUm05eE5tMjRnVU1oUHdaUHE1Y3loYlFlalNpb3NMcnovbyt1WVZKUXJ2?=
+ =?utf-8?B?SHh0N0RtODJqUTQ3NDlHR2JHdC9ubVcxQWtBa0IzV2NtZ2w5azN1V29RbURF?=
+ =?utf-8?B?azR2RndiN3lsZXZtcGthOVdvbm5mUFVkUGI4RWhwK255eEFrYUZRSkdjRFc3?=
+ =?utf-8?B?ZUh0cUdtNXJPQW4yS2hBVVVsU3V0YjhGZzVkbzBBNkFHRjhvVXNVaUFYNzhG?=
+ =?utf-8?B?QWoxZG5VOExXNU9xckdpcmFGYzhYOFhTaFR6QzgzV1BTeEoxazROTnFSQlRX?=
+ =?utf-8?B?YXNCckQ2UHNabXd1VzMzYzJXZlpmL1lXRnpNK3NYRWVxSk8yZGR1aTM0SE9X?=
+ =?utf-8?B?K3BPc1hNMXB2NnlzZGc3Nm9JWmY2akJialkvbHdxcncxTHpWSnRpZTA5YkdT?=
+ =?utf-8?B?SFBjMklwU0RVWG5mck0rWGR1OCtuOXoyRzVSb1FSZVp0OSsya0d0aXhNbUtC?=
+ =?utf-8?B?L2ZPKzhsWEhMS3VnMFBiUE5nRTlOZ2xSUDlldG80Uis2d0lQN2hqZndlaFJ2?=
+ =?utf-8?B?YnNpaWRnajAvdzE3MmlUVEcwelh1MVNwR1d2WjJXRHBGYkkxenFIeXRCZVBL?=
+ =?utf-8?B?MzQ5WGRKMTBPdXdqeG9kT01IeGQwQlhRaG50dGsrcUpRbi9uamExMEJtNDhl?=
+ =?utf-8?B?bWZJS0NnZ0VhTU8zRXBCM2lmb0FpdkViTjN0L2RacnppR2FhZ2doL0tld2hy?=
+ =?utf-8?B?c3VlbFdvVXRHRUI2S1ozZVkxVHNRRzZKT0hhclpYMmZkQUZCbU1mWXFmZnNk?=
+ =?utf-8?B?c0lBaXpxb2Zmai93Y1pEelZUNlFjNzVYNStXZ3NlcnFId1lOR2FBeFFxL1Va?=
+ =?utf-8?B?UGsyY3FzczUxNWMxaTBIUDREaVB0REFWQnM0ZnJiYk5VWFZyWm5Pc1FZNUhh?=
+ =?utf-8?B?MGw1bzdPaWZIMGFNaThNaGRKRlZRL3ZMNTQyZHl2MEJjcVJ4cXpucHIxYUJO?=
+ =?utf-8?B?dmxQU0FyK2FVSjVPaTRBSGpqZkpnODlnamJoS1k0aWpEdkNNYkJNV3BXRUYw?=
+ =?utf-8?B?T1NGcmJKazk2YXBQMXV3d3NraFBNRjE5MlFud2ZlRmRKRWdnTDV1emxGdmR6?=
+ =?utf-8?B?ZE1DNVVNQUVxcDlDTmJSUlJVQmZoR1ZGKzBaTnlqRU85YTc5eTdxNk1LMW9I?=
+ =?utf-8?B?eXVnS3J5UzhNUjNKUVh0UzdwclJOR3lTbno4RlhTWWFGR2ZWbGtYTWlnNDNQ?=
+ =?utf-8?B?K3dVZGR0cFgwUGE5NUp4bGl5cllPYmtTUXNyVGZUa2JwNUo4cmpwQ3BMYjVn?=
+ =?utf-8?B?TlEzdUdCN29abG9XK09ObFJQR0lVU254THMxOVpuMElHSVJlU3QzNENDOXp2?=
+ =?utf-8?B?L3Yzeis0Q1BETXhmZ05QRmpFWU5rWTVGKzJ2SWRUMms0azhiamlnTVM2TXZs?=
+ =?utf-8?B?VEE0OHJidWNzNEJhOXNTL2IxS1JydzBBb3VGaFYrZjFyU28wbG1hQ3F0KzdU?=
+ =?utf-8?B?QU90NDJUc2JRaVc3SFpoR1BYaDhXUXFjQ29FdW5mK0Y3TkhXT0hpcTYwVmpn?=
+ =?utf-8?B?QUh2R3pLSHpmeFduM0pkNzBBOU1FaFFwZFhGWWYwOTFnWGNFaVpwekxBLzFV?=
+ =?utf-8?B?d08wWkNOSHUvQW1FZjlKM3NVZWd0dnRYVjVFa3pFVGJMTUNJSDd2Nm0rbFht?=
+ =?utf-8?B?SWJ3L0lvTE1QaGhyL011KzJTV0ZyZlh6S1VtS0VPcnJpVmdWVzFSNUdjTGVC?=
+ =?utf-8?B?TzBjL3pXOHVhWE9MQjBLTFVBRGdvYTc5RENTSzVOaWxGNVV3QVBxQk1iei8x?=
+ =?utf-8?B?ZHZxZ05RNWh2dkMybzBFSng2YzY3WTkrVjFiZHBtVWF5cTcvVDVPOWJsYnFl?=
+ =?utf-8?B?VUIyTHgya0xSV05YNUIwalVOU3N0NTNGcDJBR2xqOVlPWnN4T0xUVlBXUkNq?=
+ =?utf-8?B?U1RYdngyWER3UUx6RXhFTnkreUNqb0NQUEVrcVpNV1p0dTd1djJGa1FIbmFo?=
+ =?utf-8?B?NGhsMGRnSmVsTldabUd6akpSeWZueHJkeUdlWjBrNFVCVHdVUmwrZVRPTGhz?=
+ =?utf-8?B?Q1E9PQ==?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <B8317301DFECB54896D5361F5F561E92@FRAP264.PROD.OUTLOOK.COM>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.126.230.35]
-X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA2PEPF00001507:EE_|CH3PR12MB8076:EE_
-X-MS-Office365-Filtering-Correlation-Id: f0eed962-3046-437c-87ba-08db97e48864
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	wfp5FoQGlUX/rvVQU3hyY9PeD2DCWisC2X0pEzOXe9sRfGxb0o80s0O3HNlFIFQJXsd0z39BiTCh7dbo+YKlAMxOp9j30UoE73PF3kjtI+yoqrCLtnWHb5/ovHxRKctoXzZuIC0Y62yE6Q7p5PUhAtCY8FDvaLtpLy3iZ6hIqVTHprqw2gei5CCIoWITEir3FJer6ezlF+1qDqpOgpgFs2udwdRYCiOJfnJBSfvzvRbJCXoK9VSKw4Oo1kUptmb1lwg0xZDACsNmJ5N3NpLN9nxwoL+9A3fL8EdHFy7V2cx2nbnAfBnBUamgB+cEMuJmhjHVPY3RrR6thvXihY99EhJNBT9s+TQfFoEu7CfQr0H/Z+YnOkoIaJMcMhWITmZpYB4OWKNMFw4II52DiHdnvr0VUc/lM/9kThG//rIghOiRyDdEn8IXXJzefKjvzzxiR9FiMZ8jb2859Jy+I4nUKaqj5uQBDybGAtrliAHeW/4GFxYKmSRHv5MXFBNKF6mrCgY7RaRwK5gIs8OO22HnzB2e5quvHRzRvYk2PKZJZhMoZpu8iwa40mwgcFDZdS5VC5qzg8E1/I65CvZppljqdnwtD+derbU3HwWpyesV8sciKBBk5RrP3DBNPzOgNVmpMEfw3RWjfSZKXtkETCoXGyTzR4xV2smA0+b5VTG5H7Qv6PcprK2VHj7wdcA8mP9Sb0g/qBiRbRRdwDYDpZTB3uDjUk/Gmo/9IqYcPhfMXCOtC0HePTuaaVq/ipy9H7hoIFlqojtJgb5BN822DJrohH9Jz8SthV5DjOERCICVQ9VgdVJ55J8DOIpCpJ0dzWXf
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(376002)(346002)(396003)(136003)(39860400002)(90011799007)(451199021)(82310400008)(90021799007)(1800799003)(186006)(46966006)(40470700004)(36840700001)(8676002)(8936002)(5660300002)(6916009)(4326008)(41300700001)(426003)(316002)(47076005)(83380400001)(40480700001)(86362001)(40460700003)(36860700001)(2906002)(6666004)(2616005)(26005)(1076003)(107886003)(36756003)(16526019)(336012)(70586007)(70206006)(7636003)(356005)(478600001)(82740400003)(54906003);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Aug 2023 07:53:19.8278
+X-OriginatorOrg: csgroup.eu
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MRZP264MB2988.FRAP264.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-Network-Message-Id: 27b04f50-8b5f-40c3-f540-08db97e5da28
+X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Aug 2023 08:02:46.6406
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: f0eed962-3046-437c-87ba-08db97e48864
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SA2PEPF00001507.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8076
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 9914def7-b676-4fda-8815-5d49fb3b45c8
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 5I72VPAUpLvx4ONAg7neM7aa9FC56qZLJbw4kB9JM3iQBUgs7MGc7UlT12zryxa0bCuu659hcRlNheGOrQ0Tvco51ktsxR3s2v0fa9jnlP4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PR0P264MB3291
+X-Spam-Status: No, score=-3.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-A netlink dump callback can return a positive number to signal that more
-information needs to be dumped or zero to signal that the dump is
-complete. In the second case, the core netlink code will append the
-NLMSG_DONE message to the skb in order to indicate to user space that
-the dump is complete.
-
-The nexthop bucket dump callback always returns a positive number if
-nexthop buckets were filled in the provided skb, even if the dump is
-complete. This means that a dump will span at least two recvmsg() calls
-as long as nexthop buckets are present. In the last recvmsg() call the
-dump callback will not fill in any nexthop buckets because the previous
-call indicated that the dump should restart from the last dumped nexthop
-ID plus one.
-
- # ip link add name dummy1 up type dummy
- # ip nexthop add id 1 dev dummy1
- # ip nexthop add id 10 group 1 type resilient buckets 2
- # strace -e sendto,recvmsg -s 5 ip nexthop bucket
- sendto(3, [[{nlmsg_len=24, nlmsg_type=RTM_GETNEXTHOPBUCKET, nlmsg_flags=NLM_F_REQUEST|NLM_F_DUMP, nlmsg_seq=1691396980, nlmsg_pid=0}, {family=AF_UNSPEC, data="\x00\x00\x00\x00\x00"...}], {nlmsg_len=0, nlmsg_type=0 /* NLMSG_??? */, nlmsg_flags=0, nlmsg_seq=0, nlmsg_pid=0}], 152, 0, NULL, 0) = 152
- recvmsg(3, {msg_name={sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, msg_namelen=12, msg_iov=[{iov_base=NULL, iov_len=0}], msg_iovlen=1, msg_controllen=0, msg_flags=MSG_TRUNC}, MSG_PEEK|MSG_TRUNC) = 128
- recvmsg(3, {msg_name={sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, msg_namelen=12, msg_iov=[{iov_base=[[{nlmsg_len=64, nlmsg_type=RTM_NEWNEXTHOPBUCKET, nlmsg_flags=NLM_F_MULTI, nlmsg_seq=1691396980, nlmsg_pid=347}, {family=AF_UNSPEC, data="\x00\x00\x00\x00\x00"...}], [{nlmsg_len=64, nlmsg_type=RTM_NEWNEXTHOPBUCKET, nlmsg_flags=NLM_F_MULTI, nlmsg_seq=1691396980, nlmsg_pid=347}, {family=AF_UNSPEC, data="\x00\x00\x00\x00\x00"...}]], iov_len=32768}], msg_iovlen=1, msg_controllen=0, msg_flags=0}, 0) = 128
- id 10 index 0 idle_time 6.66 nhid 1
- id 10 index 1 idle_time 6.66 nhid 1
- recvmsg(3, {msg_name={sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, msg_namelen=12, msg_iov=[{iov_base=NULL, iov_len=0}], msg_iovlen=1, msg_controllen=0, msg_flags=MSG_TRUNC}, MSG_PEEK|MSG_TRUNC) = 20
- recvmsg(3, {msg_name={sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, msg_namelen=12, msg_iov=[{iov_base=[{nlmsg_len=20, nlmsg_type=NLMSG_DONE, nlmsg_flags=NLM_F_MULTI, nlmsg_seq=1691396980, nlmsg_pid=347}, 0], iov_len=32768}], msg_iovlen=1, msg_controllen=0, msg_flags=0}, 0) = 20
- +++ exited with 0 +++
-
-This behavior is both inefficient and buggy. If the last nexthop to be
-dumped had the maximum ID of 0xffffffff, then the dump will restart from
-0 (0xffffffff + 1) and never end:
-
- # ip link add name dummy1 up type dummy
- # ip nexthop add id 1 dev dummy1
- # ip nexthop add id $((2**32-1)) group 1 type resilient buckets 2
- # ip nexthop bucket
- id 4294967295 index 0 idle_time 5.55 nhid 1
- id 4294967295 index 1 idle_time 5.55 nhid 1
- id 4294967295 index 0 idle_time 5.55 nhid 1
- id 4294967295 index 1 idle_time 5.55 nhid 1
- [...]
-
-Fix by adjusting the dump callback to return zero when the dump is
-complete. After the fix only one recvmsg() call is made and the
-NLMSG_DONE message is appended to the RTM_NEWNEXTHOPBUCKET responses:
-
- # ip link add name dummy1 up type dummy
- # ip nexthop add id 1 dev dummy1
- # ip nexthop add id $((2**32-1)) group 1 type resilient buckets 2
- # strace -e sendto,recvmsg -s 5 ip nexthop bucket
- sendto(3, [[{nlmsg_len=24, nlmsg_type=RTM_GETNEXTHOPBUCKET, nlmsg_flags=NLM_F_REQUEST|NLM_F_DUMP, nlmsg_seq=1691396737, nlmsg_pid=0}, {family=AF_UNSPEC, data="\x00\x00\x00\x00\x00"...}], {nlmsg_len=0, nlmsg_type=0 /* NLMSG_??? */, nlmsg_flags=0, nlmsg_seq=0, nlmsg_pid=0}], 152, 0, NULL, 0) = 152
- recvmsg(3, {msg_name={sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, msg_namelen=12, msg_iov=[{iov_base=NULL, iov_len=0}], msg_iovlen=1, msg_controllen=0, msg_flags=MSG_TRUNC}, MSG_PEEK|MSG_TRUNC) = 148
- recvmsg(3, {msg_name={sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, msg_namelen=12, msg_iov=[{iov_base=[[{nlmsg_len=64, nlmsg_type=RTM_NEWNEXTHOPBUCKET, nlmsg_flags=NLM_F_MULTI, nlmsg_seq=1691396737, nlmsg_pid=350}, {family=AF_UNSPEC, data="\x00\x00\x00\x00\x00"...}], [{nlmsg_len=64, nlmsg_type=RTM_NEWNEXTHOPBUCKET, nlmsg_flags=NLM_F_MULTI, nlmsg_seq=1691396737, nlmsg_pid=350}, {family=AF_UNSPEC, data="\x00\x00\x00\x00\x00"...}], [{nlmsg_len=20, nlmsg_type=NLMSG_DONE, nlmsg_flags=NLM_F_MULTI, nlmsg_seq=1691396737, nlmsg_pid=350}, 0]], iov_len=32768}], msg_iovlen=1, msg_controllen=0, msg_flags=0}, 0) = 148
- id 4294967295 index 0 idle_time 6.61 nhid 1
- id 4294967295 index 1 idle_time 6.61 nhid 1
- +++ exited with 0 +++
-
-Note that if the NLMSG_DONE message cannot be appended because of size
-limitations, then another recvmsg() will be needed, but the core netlink
-code will not invoke the dump callback and simply reply with a
-NLMSG_DONE message since it knows that the callback previously returned
-zero.
-
-Add a test that fails before the fix:
-
- # ./fib_nexthops.sh -t basic_res
- [...]
- TEST: Maximum nexthop ID dump                                       [FAIL]
- [...]
-
-And passes after it:
-
- # ./fib_nexthops.sh -t basic_res
- [...]
- TEST: Maximum nexthop ID dump                                       [ OK ]
- [...]
-
-Fixes: 8a1bbabb034d ("nexthop: Add netlink handlers for bucket dump")
-Signed-off-by: Ido Schimmel <idosch@nvidia.com>
-Reviewed-by: Petr Machata <petrm@nvidia.com>
----
- net/ipv4/nexthop.c                          | 6 +-----
- tools/testing/selftests/net/fib_nexthops.sh | 5 +++++
- 2 files changed, 6 insertions(+), 5 deletions(-)
-
-diff --git a/net/ipv4/nexthop.c b/net/ipv4/nexthop.c
-index f365a4f63899..be5498f5dd31 100644
---- a/net/ipv4/nexthop.c
-+++ b/net/ipv4/nexthop.c
-@@ -3424,13 +3424,9 @@ static int rtm_dump_nexthop_bucket(struct sk_buff *skb,
- 
- 	if (err < 0) {
- 		if (likely(skb->len))
--			goto out;
--		goto out_err;
-+			err = skb->len;
- 	}
- 
--out:
--	err = skb->len;
--out_err:
- 	cb->seq = net->nexthop.seq;
- 	nl_dump_check_consistent(cb, nlmsg_hdr(skb));
- 	return err;
-diff --git a/tools/testing/selftests/net/fib_nexthops.sh b/tools/testing/selftests/net/fib_nexthops.sh
-index 10aa059b9f06..df8d90b51867 100755
---- a/tools/testing/selftests/net/fib_nexthops.sh
-+++ b/tools/testing/selftests/net/fib_nexthops.sh
-@@ -2206,6 +2206,11 @@ basic_res()
- 	run_cmd "$IP nexthop bucket list fdb"
- 	log_test $? 255 "Dump all nexthop buckets with invalid 'fdb' keyword"
- 
-+	# Dump should not loop endlessly when maximum nexthop ID is configured.
-+	run_cmd "$IP nexthop add id $((2**32-1)) group 1/2 type resilient buckets 4"
-+	run_cmd "timeout 5 $IP nexthop bucket"
-+	log_test $? 0 "Maximum nexthop ID dump"
-+
- 	#
- 	# resilient nexthop buckets get requests
- 	#
--- 
-2.40.1
-
+DQoNCkxlIDI2LzA3LzIwMjMgw6AgMTc6MDIsIEhlcnZlIENvZGluYSBhIMOpY3JpdMKgOg0KPiBU
+aGUgUU1DIEhETEMgZHJpdmVyIHByb3ZpZGVzIHN1cHBvcnQgZm9yIEhETEMgdXNpbmcgdGhlIFFN
+QyAoUVVJQ0MNCj4gTXVsdGljaGFubmVsIENvbnRyb2xsZXIpIHRvIHRyYW5zZmVyIHRoZSBIRExD
+IGRhdGEuDQo+IA0KPiBTaWduZWQtb2ZmLWJ5OiBIZXJ2ZSBDb2RpbmEgPGhlcnZlLmNvZGluYUBi
+b290bGluLmNvbT4NCg0KDQpSZXZpZXdlZC1ieTogQ2hyaXN0b3BoZSBMZXJveSA8Y2hyaXN0b3Bo
+ZS5sZXJveUBjc2dyb3VwLmV1Pg0KDQo+IGRpZmYgLS1naXQgYS9kcml2ZXJzL25ldC93YW4vZnNs
+X3FtY19oZGxjLmMgYi9kcml2ZXJzL25ldC93YW4vZnNsX3FtY19oZGxjLmMNCj4gbmV3IGZpbGUg
+bW9kZSAxMDA2NDQNCj4gaW5kZXggMDAwMDAwMDAwMDAwLi5iNGViYWU5NjNkMzkNCj4gLS0tIC9k
+ZXYvbnVsbA0KPiArKysgYi9kcml2ZXJzL25ldC93YW4vZnNsX3FtY19oZGxjLmMNCg0KPiArDQo+
+ICtzdGF0aWMgaW5saW5lIHN0cnVjdCBxbWNfaGRsYyAqbmV0ZGV2X3RvX3FtY19oZGxjKHN0cnVj
+dCBuZXRfZGV2aWNlICpuZXRkZXYpDQo+ICt7DQo+ICsJcmV0dXJuIChzdHJ1Y3QgcW1jX2hkbGMg
+KilkZXZfdG9faGRsYyhuZXRkZXYpLT5wcml2Ow0KDQotPnByaXYgaXMgdm9pZCogc28gbm8gY2Fz
+dCBzaG91bGQgYmUgbmVjZXNzYXJ5Lg0KDQo=
 
