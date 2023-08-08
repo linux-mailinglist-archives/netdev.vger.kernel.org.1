@@ -1,97 +1,130 @@
-Return-Path: <netdev+bounces-25340-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25342-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D55F773C2C
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 18:01:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7AB56773C34
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 18:01:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 35864280CF4
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 16:01:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3586C281678
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 16:01:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DCEC1426E;
-	Tue,  8 Aug 2023 15:47:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BD111BB43;
+	Tue,  8 Aug 2023 15:47:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02C1213AE5
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 15:47:12 +0000 (UTC)
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id A14C67DB2;
-	Tue,  8 Aug 2023 08:46:57 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.143])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4RKs9h38Tpz4f3tNb;
-	Tue,  8 Aug 2023 19:56:56 +0800 (CST)
-Received: from [10.67.110.72] (unknown [10.67.110.72])
-	by APP4 (Coremail) with SMTP id gCh0CgCXc6aGLdJkOOXmAA--.27824S2;
-	Tue, 08 Aug 2023 19:56:55 +0800 (CST)
-Message-ID: <9d309cd3-7c73-65fd-7e0b-d0491f1c2d67@huaweicloud.com>
-Date: Tue, 8 Aug 2023 19:56:53 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 610701426A
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 15:47:35 +0000 (UTC)
+Received: from mail-yw1-x1144.google.com (mail-yw1-x1144.google.com [IPv6:2607:f8b0:4864:20::1144])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DD9D3C18;
+	Tue,  8 Aug 2023 08:47:34 -0700 (PDT)
+Received: by mail-yw1-x1144.google.com with SMTP id 00721157ae682-583a8596e2aso55689217b3.1;
+        Tue, 08 Aug 2023 08:47:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1691509653; x=1692114453;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=yCidqtySevxmRsxsAwJHxSo9IPHRQMXZPUtf3xL6bjA=;
+        b=DYKB7ktSMxwhqg579FDm8Gjai7akSLbrNHw6WAZEUjWCl9MWq3t5+0tGYpHtZ1PV7e
+         qqCTgMPb97ygCwBw0Uacfq3x9gDVLWGqRsdlQUq3n0XiY0ZfBxeMmj0OZFc9D9XokxYI
+         D3EDzMegCwNPBgJ7FE5DfBzIacUBEZzcX1Evk8PCAxUcPlkx+qdG/8trIAgsm1ayLc7J
+         o308iwLpih0VEQvmF72vGiWgdHqKhCfkkWts4j7NNYFAW+CZjAwWYdn+jJOyu9herAkH
+         gChoVXoMdN5luXMMQIWa2xGM5S4JBhkOu8EqORjJR/y3+/XJc1o5/2p0vEYKTVi8h5VR
+         gAEQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691509653; x=1692114453;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=yCidqtySevxmRsxsAwJHxSo9IPHRQMXZPUtf3xL6bjA=;
+        b=bRc0du1jsRXpAZ2HmbFEgiV/8c9NIOn5c+vcM2ZsdJJikNybpddCtY5QsWsO8iYFF5
+         dtuolV1rO4qYDm1pRXaD1KCKKpKdFWCPwvVZcpkxQMmbqDPKXj+rHNZ0EpmuuHj3E0/W
+         HjQqLts65wZWQyNwDHy9hARF9IbDy8gJo9IYrA38pVzwDdwrUh9HrjM2xI11fdWuLcGc
+         2Oijdngt6Bf8NNFSU9E6OhjLY7Mi7Nf2wPbzlqPt69zHH0DhqeCTGMlk8XeUs6563L01
+         lWBfZy7v1YU0xbwpRiAiZjZV+giSHVtaw0oTzelTStlrcChzGSvUzientVTaSMfKRykQ
+         WsHA==
+X-Gm-Message-State: AOJu0YzMtiuhSt1AV3MlJFfx0J7z8w+rKCcZDv0JvXEZAU1GYptlXqyE
+	Cjs08/URCQXhWTHCXLI4/cvtpGWpIjaUbKQBYOc=
+X-Google-Smtp-Source: AGHT+IHAKIiPOtflnLvy4O6RaV4XTp94WQkpwRHIwm/xqXUcLvZw7Renn4clLc6U0V8mgGeK7kLtCg==
+X-Received: by 2002:a05:6a20:9183:b0:140:ed6d:9251 with SMTP id v3-20020a056a20918300b00140ed6d9251mr5691546pzd.27.1691495948230;
+        Tue, 08 Aug 2023 04:59:08 -0700 (PDT)
+Received: from localhost.localdomain ([203.205.141.11])
+        by smtp.gmail.com with ESMTPSA id j22-20020a63e756000000b00563b36264besm6484136pgk.85.2023.08.08.04.59.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Aug 2023 04:59:07 -0700 (PDT)
+From: menglong8.dong@gmail.com
+X-Google-Original-From: imagedong@tencent.com
+To: edumazet@google.com,
+	ncardwell@google.com
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	dsahern@kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	flyingpeng@tencent.com,
+	Menglong Dong <imagedong@tencent.com>
+Subject: [PATCH net-next v3 0/3] net: tcp: support probing OOM
+Date: Tue,  8 Aug 2023 19:58:32 +0800
+Message-Id: <20230808115835.2862058-1-imagedong@tencent.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.1
-Subject: Re: [PATCH -next] net: pcs: Add missing put_device call in
- miic_create
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: clement.leger@bootlin.com, hkallweit1@gmail.com, linux@armlinux.org.uk,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, f.fainelli@gmail.com, linux-renesas-soc@vger.kernel.org,
- netdev@vger.kernel.org, xiangyang3@huawei.com
-References: <20230807134714.2048214-1-xiangyang@huaweicloud.com>
- <20230808105456.3vbw3ijqube2yetn@skbuf>
-From: Xiang Yang <xiangyang@huaweicloud.com>
-In-Reply-To: <20230808105456.3vbw3ijqube2yetn@skbuf>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgCXc6aGLdJkOOXmAA--.27824S2
-X-Coremail-Antispam: 1UD129KBjvdXoWrKr1UCr1DXFykGF1kXryfCrg_yoWxtFcE9r
-	W0vrs3ArWrJF18GFyrAFy3Zr4Y9a4DtFWj9r47JF4rJFnaqFZ7GFs3G3yFy343Aa1kKF9r
-	KrW5Ar4q9w1UWjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUbIxYFVCjjxCrM7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E6xAIw20E
-	Y4v20xvaj40_JrC_JFWl1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwV
-	A0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8IcVCY1x02
-	67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
-	0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
-	x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
-	0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7I2V7IY0VAS
-	07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c
-	02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_
-	GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7
-	CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAF
-	wI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa
-	7IU1zuWJUUUUU==
-X-CM-SenderInfo: x0ld0wp1dqwq5kxd4v5lfo033gof0z/
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-3.7 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+From: Menglong Dong <imagedong@tencent.com>
 
+In this series, we make some small changes to make the tcp retransmission
+become zero-window probes if the receiver drops the skb because of memory
+pressure.
 
-在 2023/8/8 18:54, Vladimir Oltean 写道:
-> On Mon, Aug 07, 2023 at 01:47:14PM +0000, Xiang Yang wrote:
->> From: Xiang Yang <xiangyang3@huawei.com>
->>
->> The reference of pdev->dev is taken by of_find_device_by_node, so
->> it should be released when error out.
->>
->> Fixes: 7dc54d3b8d91 ("net: pcs: add Renesas MII converter driver")
->> Signed-off-by: Xiang Yang <xiangyang3@huawei.com>
->> ---
-> 
-> Also, the patch subject prefix needs to be "[PATCH net]" (indicative of
-> the fact that you want it to go to https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git)
-> and not "[PATCH -next]".
-Thanks, I will change the patch subject prefix and resend the patch of
-v2 with your advice.
+In the 1st patch, we reply a zero-window ACK if the skb is dropped
+because out of memory, instead of dropping the skb silently.
+
+In the 2nd patch, we allow a zero-window ACK to update the window.
+
+In the 3rd patch, fix unexcepted socket die when snd_wnd is 0 in
+tcp_retransmit_timer().
+
+After these changes, the tcp can probe the OOM of the receiver forever.
+
+Changes since v2:
+- refactor the code to avoid code duplication in the 1st patch
+- use after() instead of max() in tcp_rtx_probe0_timed_out()
+
+Changes since v1:
+- send 0 rwin ACK for the receive queue empty case when necessary in the
+  1st patch
+- send the ACK immediately by using the ICSK_ACK_NOW flag in the 1st
+  patch
+- consider the case of the connection restart from idle, as Neal comment,
+  in the 3rd patch
+
+Menglong Dong (3):
+  net: tcp: send zero-window ACK when no memory
+  net: tcp: allow zero-window ACK update the window
+  net: tcp: fix unexcepted socket die when snd_wnd is 0
+
+ include/net/inet_connection_sock.h |  3 ++-
+ net/ipv4/tcp_input.c               | 20 +++++++++++++-------
+ net/ipv4/tcp_output.c              | 14 +++++++++++---
+ net/ipv4/tcp_timer.c               | 14 +++++++++++++-
+ 4 files changed, 39 insertions(+), 12 deletions(-)
+
+-- 
+2.40.1
 
 
