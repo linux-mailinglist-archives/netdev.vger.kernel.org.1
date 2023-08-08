@@ -1,60 +1,42 @@
-Return-Path: <netdev+bounces-25379-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25454-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26883773D22
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 18:14:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0786377423F
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 19:38:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 823DD280DEE
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 16:14:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E891A1C20E5A
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 17:38:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B53F11401A;
-	Tue,  8 Aug 2023 15:58:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6723A14F75;
+	Tue,  8 Aug 2023 17:38:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1BEB1C29
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 15:58:57 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC4A718877
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 08:58:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1691510287;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7ihYmBKburYrjxyMGdbY3axgt0KR039q5LXQIGNpWXs=;
-	b=eal56J7AlK6H6JxklL3L2/HYjQA8CeoflIzYr4qh6K700SvIDtB10TzVi4QLZ+yuH/hsvv
-	nLEht9KPX/WKhSfrzJCiU3r/YhCc/Kd6CQPt5ZY2uSDB8Y1hqQOvonKbCsCqtt1vyDUBMP
-	8p51hcLlXLdJGpYVXZ4C1xt2yQRt6zQ=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-617-gd6f6SXUPNODZBa4ef_EtQ-1; Tue, 08 Aug 2023 10:56:04 -0400
-X-MC-Unique: gd6f6SXUPNODZBa4ef_EtQ-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 02738101A59D;
-	Tue,  8 Aug 2023 14:56:04 +0000 (UTC)
-Received: from RHTPC1VM0NT (unknown [10.22.8.251])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id BC636492C13;
-	Tue,  8 Aug 2023 14:56:03 +0000 (UTC)
-From: Aaron Conole <aconole@redhat.com>
-To: Adrian Moreno <amorenoz@redhat.com>
-Cc: netdev@vger.kernel.org,  i.maximets@ovn.org,  eric@garver.life,
-  dev@openvswitch.org
-Subject: Re: [net-next v3 5/7] net: openvswitch: add misc error drop reasons
-References: <20230807164551.553365-1-amorenoz@redhat.com>
-	<20230807164551.553365-6-amorenoz@redhat.com>
-Date: Tue, 08 Aug 2023 10:56:03 -0400
-In-Reply-To: <20230807164551.553365-6-amorenoz@redhat.com> (Adrian Moreno's
-	message of "Mon, 7 Aug 2023 18:45:46 +0200")
-Message-ID: <f7t5y5p4m7w.fsf@redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CC8D14F6D
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 17:38:03 +0000 (UTC)
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DA2217D490
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 10:26:18 -0700 (PDT)
+Received: from canpemm500007.china.huawei.com (unknown [172.30.72.56])
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4RKxD436dwz1GDTf;
+	Tue,  8 Aug 2023 22:59:16 +0800 (CST)
+Received: from localhost (10.174.179.215) by canpemm500007.china.huawei.com
+ (7.192.104.62) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Tue, 8 Aug
+ 2023 23:00:26 +0800
+From: Yue Haibing <yuehaibing@huawei.com>
+To: <jiri@resnulli.us>, <ivecera@redhat.com>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<petrm@nvidia.com>, <yuehaibing@huawei.com>
+CC: <netdev@vger.kernel.org>
+Subject: [PATCH net-next] net: switchdev: Remove unused declaration switchdev_port_fwd_mark_set()
+Date: Tue, 8 Aug 2023 22:59:55 +0800
+Message-ID: <20230808145955.2176-1-yuehaibing@huawei.com>
+X-Mailer: git-send-email 2.10.2.windows.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,22 +44,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-Originating-IP: [10.174.179.215]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ canpemm500007.china.huawei.com (7.192.104.62)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Adrian Moreno <amorenoz@redhat.com> writes:
+Commit 6bc506b4fb06 ("bridge: switchdev: Add forward mark support for stacked devices")
+removed the implementation but leave declaration.
 
-> Use drop reasons from include/net/dropreason-core.h when a reasonable
-> candidate exists.
->
-> Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
-> ---
+Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
+---
+ include/net/switchdev.h | 4 ----
+ 1 file changed, 4 deletions(-)
 
-Acked-by: Aaron Conole <aconole@redhat.com>
+diff --git a/include/net/switchdev.h b/include/net/switchdev.h
+index 0294cfec9c37..a43062d4c734 100644
+--- a/include/net/switchdev.h
++++ b/include/net/switchdev.h
+@@ -326,10 +326,6 @@ int call_switchdev_blocking_notifiers(unsigned long val, struct net_device *dev,
+ 				      struct switchdev_notifier_info *info,
+ 				      struct netlink_ext_ack *extack);
+ 
+-void switchdev_port_fwd_mark_set(struct net_device *dev,
+-				 struct net_device *group_dev,
+-				 bool joining);
+-
+ int switchdev_handle_fdb_event_to_device(struct net_device *dev, unsigned long event,
+ 		const struct switchdev_notifier_fdb_info *fdb_info,
+ 		bool (*check_cb)(const struct net_device *dev),
+-- 
+2.34.1
 
 
