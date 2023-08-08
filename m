@@ -1,103 +1,145 @@
-Return-Path: <netdev+bounces-25415-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25417-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CD8B773E87
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 18:32:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8D61773EB0
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 18:34:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 163BB281739
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 16:32:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DDBFE2816EF
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 16:34:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13F6413FE4;
-	Tue,  8 Aug 2023 16:32:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C26A714265;
+	Tue,  8 Aug 2023 16:33:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2D581DA36;
-	Tue,  8 Aug 2023 16:32:04 +0000 (UTC)
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A19530A49;
-	Tue,  8 Aug 2023 09:31:51 -0700 (PDT)
-Received: from canpemm500010.china.huawei.com (unknown [172.30.72.55])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4RKvyB3v3szrSP3;
-	Tue,  8 Aug 2023 22:02:10 +0800 (CST)
-Received: from [10.174.176.93] (10.174.176.93) by
- canpemm500010.china.huawei.com (7.192.105.118) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Tue, 8 Aug 2023 22:03:20 +0800
-Message-ID: <1f172347-4ed1-a571-18e9-9c5d951f213c@huawei.com>
-Date: Tue, 8 Aug 2023 22:02:58 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7D3115495
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 16:33:51 +0000 (UTC)
+X-Greylist: delayed 1802 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 08 Aug 2023 09:33:37 PDT
+Received: from mail.toke.dk (mail.toke.dk [IPv6:2a0c:4d80:42:2001::664])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30D773103C;
+	Tue,  8 Aug 2023 09:33:37 -0700 (PDT)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=toke.dk; s=20161023;
+	t=1691503571; bh=DO+diXcZ9utTjLCydk3zF1T+72EgE+BXHMNyOGRq6Ag=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=Ufsvvw3XC+ndybpKuDXPhTRnlV6E36AEoC6EXNd+4roQ2Jp/HEutKL5Nny90eexIl
+	 8iqgnPGKQs5VN8ciMrQ5/h4EptP8dN+TV0EGxphvodVJCGK2SLyrUZi1H4l5QMHepM
+	 2lT+STOPbPw19sL/dqJCQ5ZHC0EHX+7NrLyLcA+jyQmVELEjeKJCDVwSYRU4s38U83
+	 lHQPU5zX5Jluu00S52QeTfYOQU8xASQaPu796EbxAPZUgWCS/sy73wvscKGss1Sk5d
+	 9ob6Ai26rmgSuYxEstT2KrPzEof1DzBrHu9Tkt9YR6Ulzah58YZEdAcqwbE3BAy3xO
+	 wwL5gVq1sTMCQ==
+To: Fedor Pchelkin <pchelkin@ispras.ru>, Kalle Vallo <kvalo@kernel.org>
+Cc: Fedor Pchelkin <pchelkin@ispras.ru>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Senthil
+ Balasubramanian <senthilkumar@atheros.com>, "John W. Linville"
+ <linville@tuxdriver.com>, Vasanthakumar Thiagarajan <vasanth@atheros.com>,
+ Sujith <Sujith.Manoharan@atheros.com>, linux-wireless@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Alexey Khoroshilov
+ <khoroshilov@ispras.ru>, lvc-project@linuxtesting.org,
+ syzbot+f2cb6e0ffdb961921e4d@syzkaller.appspotmail.com, Hillf Danton
+ <hdanton@sina.com>
+Subject: Re: [PATCH v3 1/2] wifi: ath9k: fix races between ath9k_wmi_cmd and
+ ath9k_wmi_ctrl_rx
+In-Reply-To: <20230425192607.18015-1-pchelkin@ispras.ru>
+References: <20230425192607.18015-1-pchelkin@ispras.ru>
+Date: Tue, 08 Aug 2023 16:06:07 +0200
+X-Clacks-Overhead: GNU Terry Pratchett
+Message-ID: <87edkdbpdc.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.1
-Subject: Re: [PATCH bpf-next] bpf, sockmap: add BPF_F_PERMANENTLY flag for
- skmsg redirect
-To: Jakub Sitnicki <jakub@cloudflare.com>
-CC: <john.fastabend@gmail.com>, <ast@kernel.org>, <daniel@iogearbox.net>,
-	<andrii@kernel.org>, <martin.lau@linux.dev>, <song@kernel.org>,
-	<yonghong.song@linux.dev>, <kpsingh@kernel.org>, <sdf@google.com>,
-	<haoluo@google.com>, <jolsa@kernel.org>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<dsahern@kernel.org>, <netdev@vger.kernel.org>, <bpf@vger.kernel.org>
-References: <20230805094254.1082999-1-liujian56@huawei.com>
- <87sf8xwslw.fsf@cloudflare.com>
-From: "liujian (CE)" <liujian56@huawei.com>
-In-Reply-To: <87sf8xwslw.fsf@cloudflare.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.176.93]
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- canpemm500010.china.huawei.com (7.192.105.118)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-3.7 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+Fedor Pchelkin <pchelkin@ispras.ru> writes:
 
+> Currently, the synchronization between ath9k_wmi_cmd() and
+> ath9k_wmi_ctrl_rx() is exposed to a race condition which, although being
+> rather unlikely, can lead to invalid behaviour of ath9k_wmi_cmd().
+>
+> Consider the following scenario:
+>
+> CPU0					CPU1
+>
+> ath9k_wmi_cmd(...)
+>   mutex_lock(&wmi->op_mutex)
+>   ath9k_wmi_cmd_issue(...)
+>   wait_for_completion_timeout(...)
+>   ---
+>   timeout
+>   ---
+> 					/* the callback is being processed
+> 					 * before last_seq_id became zero
+> 					 */
+> 					ath9k_wmi_ctrl_rx(...)
+> 					  spin_lock_irqsave(...)
+> 					  /* wmi->last_seq_id check here
+> 					   * doesn't detect timeout yet
+> 					   */
+> 					  spin_unlock_irqrestore(...)
+>   /* last_seq_id is zeroed to
+>    * indicate there was a timeout
+>    */
+>   wmi->last_seq_id =3D 0
+>   mutex_unlock(&wmi->op_mutex)
+>   return -ETIMEDOUT
+>
+> ath9k_wmi_cmd(...)
+>   mutex_lock(&wmi->op_mutex)
+>   /* the buffer is replaced with
+>    * another one
+>    */
+>   wmi->cmd_rsp_buf =3D rsp_buf
+>   wmi->cmd_rsp_len =3D rsp_len
+>   ath9k_wmi_cmd_issue(...)
+>     spin_lock_irqsave(...)
+>     spin_unlock_irqrestore(...)
+>   wait_for_completion_timeout(...)
+> 					/* the continuation of the
+> 					 * callback left after the first
+> 					 * ath9k_wmi_cmd call
+> 					 */
+> 					  ath9k_wmi_rsp_callback(...)
+> 					    /* copying data designated
+> 					     * to already timeouted
+> 					     * WMI command into an
+> 					     * inappropriate wmi_cmd_buf
+> 					     */
+> 					    memcpy(...)
+> 					    complete(&wmi->cmd_wait)
+>   /* awakened by the bogus callback
+>    * =3D> invalid return result
+>    */
+>   mutex_unlock(&wmi->op_mutex)
+>   return 0
+>
+> To fix this, update last_seq_id on timeout path inside ath9k_wmi_cmd()
+> under the wmi_lock. Move ath9k_wmi_rsp_callback() under wmi_lock inside
+> ath9k_wmi_ctrl_rx() so that the wmi->cmd_wait can be completed only for
+> initially designated wmi_cmd call, otherwise the path would be rejected
+> with last_seq_id check.
+>
+> Found by Linux Verification Center (linuxtesting.org) with Syzkaller.
+>
+> Fixes: fb9987d0f748 ("ath9k_htc: Support for AR9271 chipset.")
+> Signed-off-by: Fedor Pchelkin <pchelkin@ispras.ru>
 
-On 2023/8/5 20:51, Jakub Sitnicki wrote:
-> On Sat, Aug 05, 2023 at 05:42 PM +08, Liu Jian wrote:
->> If the sockmap msg redirection function is used only to forward packets
->> and no other operation, the execution result of the BPF_SK_MSG_VERDICT
->> program is the same each time. In this case, the BPF program only needs to
->> be run once. Add BPF_F_PERMANENTLY flag to bpf_msg_redirect_map() and
->> bpf_msg_redirect_hash() to implement this ability.
->>
->> Then we can enable this function in the bpf program as follows:
->> bpf_msg_redirect_hash(xx, xx, xx, BPF_F_INGRESS | BPF_F_PERMANENTLY);
->>
->> Test results using netperf  TCP_STREAM mode:
->> for i in 1 64 128 512 1k 2k 32k 64k 100k 500k 1m;then
->> netperf -T 1,2 -t TCP_STREAM -H 127.0.0.1 -l 20 -- -m $i -s 100m,100m -S 100m,100m
->> done
->>
->> before:
->> 3.84 246.52 496.89 1885.03 3415.29 6375.03 40749.09 48764.40 51611.34 55678.26 55992.78
->> after:
->> 4.43 279.20 555.82 2080.79 3870.70 7105.44 41836.41 49709.75 51861.56 55211.00 54566.85
->>
->> Signed-off-by: Liu Jian <liujian56@huawei.com>
->> ---
-> 
-> Interesting idea. Potentially opens up the way to redirect without
-> fallback to backlog thread in the future. If we know the target, then we
-> can propagate backpressure.
-> 
-> If we go this route, we will need tests. selftests/test_sockmap would
-> need to be extended, and we will also need some unit tests in test_progs
-> for corner cases. Corner cases to cover that come to mind: redirect to
-> self, redirect target socket closed.
-Thanks. I will add some tests in v2.
-> 
-> I'm out next week, so won't be able to give it a proper review.
+Alright, finally took the time to dig into this and convince myself that
+the fix if correct. Sorry for taking so long!
+
+Acked-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@toke.dk>
 
