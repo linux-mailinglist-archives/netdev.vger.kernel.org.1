@@ -1,58 +1,81 @@
-Return-Path: <netdev+bounces-25221-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25232-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0467773630
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 04:07:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DEF977366B
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 04:19:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0ECFA1C20DE9
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 02:07:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CB06328125C
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 02:19:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A2C37F9;
-	Tue,  8 Aug 2023 02:06:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F255659;
+	Tue,  8 Aug 2023 02:19:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6899A659
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 02:06:38 +0000 (UTC)
-Received: from smtpbguseast1.qq.com (smtpbguseast1.qq.com [54.204.34.129])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03C33138
-	for <netdev@vger.kernel.org>; Mon,  7 Aug 2023 19:06:32 -0700 (PDT)
-X-QQ-mid: bizesmtp73t1691460298thri94fo
-Received: from wxdbg.localdomain.com ( [115.195.149.19])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Tue, 08 Aug 2023 10:04:57 +0800 (CST)
-X-QQ-SSF: 01400000000000K0Z000000A0000000
-X-QQ-FEAT: QityeSR92A0kJnU8u/pAUb/UlSAr820xuQp3hI2lnWqUhgRqMo2enJcMsGw5P
-	RcyGpU5Bc6wjJ48x9e+aGPdvinnwG46Nxr8haCiTUpBxva8f/bmU2Hp4shJOei+e12K6uCG
-	OUGd/QOu1vR8PiCoViB5lwlEVyD/DeqktbA9RVLnFNKOKhYGiqCt654AJxq2VudZhr7UIMq
-	A1c8exy/FQbkrjLek0tTkUUHpgEw/LbeQof62TArJy5ZPFbvs7oRMwrf949sxp7PtCe0MB3
-	xgJ8ovp56ETXIuoSsnZovFboEK00Ez2Wo4cOEGQiA503T+VSSBAU7xwI/pjG6QLb2HZpiDR
-	4MWiJ7TqGiVHbWCt01pgZeBq/TmkyDRNK5JY/bvxv/EH3b5RwRq5MiY33JzeiqGPcNOoRC+
-X-QQ-GoodBg: 2
-X-BIZMAIL-ID: 7676488841411236670
-From: Jiawen Wu <jiawenwu@trustnetic.com>
-To: netdev@vger.kernel.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	andrew@lunn.ch,
-	hkallweit1@gmail.com,
-	linux@armlinux.org.uk,
-	Jose.Abreu@synopsys.com,
-	rmk+kernel@armlinux.org.uk
-Cc: mengyuanlou@net-swift.com,
-	Jiawen Wu <jiawenwu@trustnetic.com>
-Subject: [PATCH net-next v2 7/7] net: ngbe: move mdio access registers to libwx
-Date: Tue,  8 Aug 2023 10:17:08 +0800
-Message-Id: <20230808021708.196160-8-jiawenwu@trustnetic.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20230808021708.196160-1-jiawenwu@trustnetic.com>
-References: <20230808021708.196160-1-jiawenwu@trustnetic.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AFC87FD
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 02:19:54 +0000 (UTC)
+Received: from mail-oi1-x22a.google.com (mail-oi1-x22a.google.com [IPv6:2607:f8b0:4864:20::22a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5E8D1705;
+	Mon,  7 Aug 2023 19:19:52 -0700 (PDT)
+Received: by mail-oi1-x22a.google.com with SMTP id 5614622812f47-3a37909a64eso3595516b6e.1;
+        Mon, 07 Aug 2023 19:19:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1691461192; x=1692065992;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=w2SLqdPoc24r3SU7DATTJAeepTTgjgASEEH+wJbfp+8=;
+        b=riVngxdTKsSRf7zXfXSL+qD0Y9DVtBRjJKYvZ/v+RGrtoKt2jqRdWIGY1s1cEYR/qX
+         mnMqz8NnTPAca/wgd3qX9s+/2HRmdijpDagu7AOB+NXdafhI/WATpb6oFJjBeU9TI5hd
+         jYynNZSw2+jSjtfEA+KpBodE2c5qagBxcR40d4hzGZ6m2FXk2i/9ePzEi+wEHpqNveJA
+         wS9m4UybfB/LsIsiFllnIm1fByZs2aGe+6i63UN7+kXgX6JXzLLIPwNhdgAV5u9iGYGU
+         XYZq+mXmuobQKRH3+VWUU2BZd7AGZZxu+6LzzE+pe58UPKcIY+vpP2nGPF7MhiSyuW8f
+         gtnw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691461192; x=1692065992;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=w2SLqdPoc24r3SU7DATTJAeepTTgjgASEEH+wJbfp+8=;
+        b=VPnhKGRVgL0Z5rQ+wq6OY0YKHYg9FB9y6mRVErZIMYOzrrgf9jpq0+YyqFRIeM9Brx
+         3hfi6Ap6V+54b0yXqvNKcSx4/IoVRZug4d0eNvQTDSkiYjtGrUrmyeDph6SxOgzDf2QE
+         fdIB3gC6mgk/+wfZDYE2PVvrEHQKBOWRhageft84EdJd3mHvb5u4/QEjqj54Lk9E2pes
+         ueZu/gwrHmrKBmHiv4QCo3OkFY6sVq2xfYlaRY8LYFqaKxHP/Pw3eVcH+6ifYMoL9+rS
+         y22nxiFRGjkQhgbX5Jb1R0LK9MZN/w7b3M+4I6JkOf58rvhqW60LKQ7wyc4rbx1wC8ps
+         t3jQ==
+X-Gm-Message-State: AOJu0YzEF0V1UqExXhmD7xmaaSw/JZD1y4hcKDy7blgtrjwj341uQELB
+	sTaap8rZjpTnnHCj2jLfyZg=
+X-Google-Smtp-Source: AGHT+IGH/g0JdiGrMleuVRrFWy33FO4h64b4qozK/olV66uDrtE31E68FjW4XEcWo7kvtPQnHeG1BQ==
+X-Received: by 2002:a05:6808:17aa:b0:3a7:7bd3:7a7d with SMTP id bg42-20020a05680817aa00b003a77bd37a7dmr15663696oib.23.1691461191836;
+        Mon, 07 Aug 2023 19:19:51 -0700 (PDT)
+Received: from localhost.localdomain ([198.211.45.220])
+        by smtp.googlemail.com with ESMTPSA id p18-20020aa78612000000b006871dad3e74sm6849000pfn.65.2023.08.07.19.19.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Aug 2023 19:19:51 -0700 (PDT)
+From: Furong Xu <0x1207@gmail.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Joao Pinto <jpinto@synopsys.com>,
+	Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	xfr@outlook.com,
+	rock.xu@nio.com,
+	Furong Xu <0x1207@gmail.com>
+Subject: [PATCH net-next v2 1/1] net: stmmac: xgmac: RX queue routing configuration
+Date: Tue,  8 Aug 2023 10:19:06 +0800
+Message-Id: <20230808021906.1120889-1-0x1207@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,190 +83,113 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtp:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz5a-1
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+	FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Registers of mdio accessing are common defined in libwx, remove the
-redundant macro definitions in ngbe driver.
+Commit abe80fdc6ee6 ("net: stmmac: RX queue routing configuration")
+introduced RX queue routing to DWMAC4 core.
+This patch extend the support to XGMAC2 core.
 
-Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
+Signed-off-by: Furong Xu <0x1207@gmail.com>
 ---
- drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c | 84 +++++++++----------
- drivers/net/ethernet/wangxun/ngbe/ngbe_type.h | 19 -----
- 2 files changed, 42 insertions(+), 61 deletions(-)
+Changes in v2:
+  - Convert the shift ops to FIELD_PREP
+---
+ .../net/ethernet/stmicro/stmmac/dwxgmac2.h    | 14 ++++++++
+ .../ethernet/stmicro/stmmac/dwxgmac2_core.c   | 34 +++++++++++++++++--
+ 2 files changed, 46 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c b/drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c
-index cc2f325a52f7..60fc996bb53e 100644
---- a/drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c
-+++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c
-@@ -37,24 +37,24 @@ static int ngbe_phy_read_reg_mdi_c22(struct mii_bus *bus, int phy_addr, int regn
- 
- 	wr32(wx, NGBE_MDIO_CLAUSE_SELECT, 0xF);
- 	/* setup and write the address cycle command */
--	command = NGBE_MSCA_RA(regnum) |
--		  NGBE_MSCA_PA(phy_addr) |
--		  NGBE_MSCA_DA(device_type);
--	wr32(wx, NGBE_MSCA, command);
--	command = NGBE_MSCC_CMD(NGBE_MSCA_CMD_READ) |
--		  NGBE_MSCC_BUSY |
--		  NGBE_MDIO_CLK(6);
--	wr32(wx, NGBE_MSCC, command);
-+	command = WX_MSCA_RA(regnum) |
-+		  WX_MSCA_PA(phy_addr) |
-+		  WX_MSCA_DA(device_type);
-+	wr32(wx, WX_MSCA, command);
-+	command = WX_MSCC_CMD(WX_MSCA_CMD_READ) |
-+		  WX_MSCC_BUSY |
-+		  WX_MDIO_CLK(6);
-+	wr32(wx, WX_MSCC, command);
- 
- 	/* wait to complete */
--	ret = read_poll_timeout(rd32, val, !(val & NGBE_MSCC_BUSY), 1000,
--				100000, false, wx, NGBE_MSCC);
-+	ret = read_poll_timeout(rd32, val, !(val & WX_MSCC_BUSY), 1000,
-+				100000, false, wx, WX_MSCC);
- 	if (ret) {
- 		wx_err(wx, "Mdio read c22 command did not complete.\n");
- 		return ret;
- 	}
- 
--	return (u16)rd32(wx, NGBE_MSCC);
-+	return (u16)rd32(wx, WX_MSCC);
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
+index 1913385df685..a2498da7406b 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
++++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
+@@ -74,8 +74,22 @@
+ #define XGMAC_RXQEN(x)			GENMASK((x) * 2 + 1, (x) * 2)
+ #define XGMAC_RXQEN_SHIFT(x)		((x) * 2)
+ #define XGMAC_RXQ_CTRL1			0x000000a4
++#define XGMAC_AVCPQ			GENMASK(31, 28)
++#define XGMAC_AVCPQ_SHIFT		28
++#define XGMAC_PTPQ			GENMASK(27, 24)
++#define XGMAC_PTPQ_SHIFT		24
++#define XGMAC_TACPQE			BIT(23)
++#define XGMAC_TACPQE_SHIFT		23
++#define XGMAC_DCBCPQ			GENMASK(19, 16)
++#define XGMAC_DCBCPQ_SHIFT		16
++#define XGMAC_MCBCQEN			BIT(15)
++#define XGMAC_MCBCQEN_SHIFT		15
++#define XGMAC_MCBCQ			GENMASK(11, 8)
++#define XGMAC_MCBCQ_SHIFT		8
+ #define XGMAC_RQ			GENMASK(7, 4)
+ #define XGMAC_RQ_SHIFT			4
++#define XGMAC_UPQ			GENMASK(3, 0)
++#define XGMAC_UPQ_SHIFT			0
+ #define XGMAC_RXQ_CTRL2			0x000000a8
+ #define XGMAC_RXQ_CTRL3			0x000000ac
+ #define XGMAC_PSRQ(x)			GENMASK((x) * 8 + 7, (x) * 8)
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
+index a0c2ef8bb0ac..38782662ff98 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
+@@ -127,6 +127,36 @@ static void dwxgmac2_tx_queue_prio(struct mac_device_info *hw, u32 prio,
+ 	writel(value, ioaddr + reg);
  }
  
- static int ngbe_phy_write_reg_mdi_c22(struct mii_bus *bus, int phy_addr, int regnum, u16 value)
-@@ -65,19 +65,19 @@ static int ngbe_phy_write_reg_mdi_c22(struct mii_bus *bus, int phy_addr, int reg
- 
- 	wr32(wx, NGBE_MDIO_CLAUSE_SELECT, 0xF);
- 	/* setup and write the address cycle command */
--	command = NGBE_MSCA_RA(regnum) |
--		  NGBE_MSCA_PA(phy_addr) |
--		  NGBE_MSCA_DA(device_type);
--	wr32(wx, NGBE_MSCA, command);
-+	command = WX_MSCA_RA(regnum) |
-+		  WX_MSCA_PA(phy_addr) |
-+		  WX_MSCA_DA(device_type);
-+	wr32(wx, WX_MSCA, command);
- 	command = value |
--		  NGBE_MSCC_CMD(NGBE_MSCA_CMD_WRITE) |
--		  NGBE_MSCC_BUSY |
--		  NGBE_MDIO_CLK(6);
--	wr32(wx, NGBE_MSCC, command);
-+		  WX_MSCC_CMD(WX_MSCA_CMD_WRITE) |
-+		  WX_MSCC_BUSY |
-+		  WX_MDIO_CLK(6);
-+	wr32(wx, WX_MSCC, command);
- 
- 	/* wait to complete */
--	ret = read_poll_timeout(rd32, val, !(val & NGBE_MSCC_BUSY), 1000,
--				100000, false, wx, NGBE_MSCC);
-+	ret = read_poll_timeout(rd32, val, !(val & WX_MSCC_BUSY), 1000,
-+				100000, false, wx, WX_MSCC);
- 	if (ret)
- 		wx_err(wx, "Mdio write c22 command did not complete.\n");
- 
-@@ -92,24 +92,24 @@ static int ngbe_phy_read_reg_mdi_c45(struct mii_bus *bus, int phy_addr, int devn
- 
- 	wr32(wx, NGBE_MDIO_CLAUSE_SELECT, 0x0);
- 	/* setup and write the address cycle command */
--	command = NGBE_MSCA_RA(regnum) |
--		  NGBE_MSCA_PA(phy_addr) |
--		  NGBE_MSCA_DA(devnum);
--	wr32(wx, NGBE_MSCA, command);
--	command = NGBE_MSCC_CMD(NGBE_MSCA_CMD_READ) |
--		  NGBE_MSCC_BUSY |
--		  NGBE_MDIO_CLK(6);
--	wr32(wx, NGBE_MSCC, command);
-+	command = WX_MSCA_RA(regnum) |
-+		  WX_MSCA_PA(phy_addr) |
-+		  WX_MSCA_DA(devnum);
-+	wr32(wx, WX_MSCA, command);
-+	command = WX_MSCC_CMD(WX_MSCA_CMD_READ) |
-+		  WX_MSCC_BUSY |
-+		  WX_MDIO_CLK(6);
-+	wr32(wx, WX_MSCC, command);
- 
- 	/* wait to complete */
--	ret = read_poll_timeout(rd32, val, !(val & NGBE_MSCC_BUSY), 1000,
--				100000, false, wx, NGBE_MSCC);
-+	ret = read_poll_timeout(rd32, val, !(val & WX_MSCC_BUSY), 1000,
-+				100000, false, wx, WX_MSCC);
- 	if (ret) {
- 		wx_err(wx, "Mdio read c45 command did not complete.\n");
- 		return ret;
- 	}
- 
--	return (u16)rd32(wx, NGBE_MSCC);
-+	return (u16)rd32(wx, WX_MSCC);
- }
- 
- static int ngbe_phy_write_reg_mdi_c45(struct mii_bus *bus, int phy_addr,
-@@ -121,19 +121,19 @@ static int ngbe_phy_write_reg_mdi_c45(struct mii_bus *bus, int phy_addr,
- 
- 	wr32(wx, NGBE_MDIO_CLAUSE_SELECT, 0x0);
- 	/* setup and write the address cycle command */
--	command = NGBE_MSCA_RA(regnum) |
--		  NGBE_MSCA_PA(phy_addr) |
--		  NGBE_MSCA_DA(devnum);
--	wr32(wx, NGBE_MSCA, command);
-+	command = WX_MSCA_RA(regnum) |
-+		  WX_MSCA_PA(phy_addr) |
-+		  WX_MSCA_DA(devnum);
-+	wr32(wx, WX_MSCA, command);
- 	command = value |
--		  NGBE_MSCC_CMD(NGBE_MSCA_CMD_WRITE) |
--		  NGBE_MSCC_BUSY |
--		  NGBE_MDIO_CLK(6);
--	wr32(wx, NGBE_MSCC, command);
-+		  WX_MSCC_CMD(WX_MSCA_CMD_WRITE) |
-+		  WX_MSCC_BUSY |
-+		  WX_MDIO_CLK(6);
-+	wr32(wx, WX_MSCC, command);
- 
- 	/* wait to complete */
--	ret = read_poll_timeout(rd32, val, !(val & NGBE_MSCC_BUSY), 1000,
--				100000, false, wx, NGBE_MSCC);
-+	ret = read_poll_timeout(rd32, val, !(val & WX_MSCC_BUSY), 1000,
-+				100000, false, wx, WX_MSCC);
- 	if (ret)
- 		wx_err(wx, "Mdio write c45 command did not complete.\n");
- 
-diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_type.h b/drivers/net/ethernet/wangxun/ngbe/ngbe_type.h
-index b70eca397b67..72c8cd2d5575 100644
---- a/drivers/net/ethernet/wangxun/ngbe/ngbe_type.h
-+++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_type.h
-@@ -59,25 +59,6 @@
- #define NGBE_EEPROM_VERSION_L			0x1D
- #define NGBE_EEPROM_VERSION_H			0x1E
- 
--/* mdio access */
--#define NGBE_MSCA				0x11200
--#define NGBE_MSCA_RA(v)				FIELD_PREP(U16_MAX, v)
--#define NGBE_MSCA_PA(v)				FIELD_PREP(GENMASK(20, 16), v)
--#define NGBE_MSCA_DA(v)				FIELD_PREP(GENMASK(25, 21), v)
--#define NGBE_MSCC				0x11204
--#define NGBE_MSCC_CMD(v)			FIELD_PREP(GENMASK(17, 16), v)
--
--enum NGBE_MSCA_CMD_value {
--	NGBE_MSCA_CMD_RSV = 0,
--	NGBE_MSCA_CMD_WRITE,
--	NGBE_MSCA_CMD_POST_READ,
--	NGBE_MSCA_CMD_READ,
--};
--
--#define NGBE_MSCC_SADDR				BIT(18)
--#define NGBE_MSCC_BUSY				BIT(22)
--#define NGBE_MDIO_CLK(v)			FIELD_PREP(GENMASK(21, 19), v)
--
- /* Media-dependent registers. */
- #define NGBE_MDIO_CLAUSE_SELECT			0x11220
- 
++static void dwxgmac2_rx_queue_routing(struct mac_device_info *hw,
++				      u8 packet, u32 queue)
++{
++	void __iomem *ioaddr = hw->pcsr;
++	u32 value;
++
++	static const struct stmmac_rx_routing dwxgmac2_route_possibilities[] = {
++		{ XGMAC_AVCPQ, XGMAC_AVCPQ_SHIFT },
++		{ XGMAC_PTPQ, XGMAC_PTPQ_SHIFT },
++		{ XGMAC_DCBCPQ, XGMAC_DCBCPQ_SHIFT },
++		{ XGMAC_UPQ, XGMAC_UPQ_SHIFT },
++		{ XGMAC_MCBCQ, XGMAC_MCBCQ_SHIFT },
++	};
++
++	value = readl(ioaddr + XGMAC_RXQ_CTRL1);
++
++	/* routing configuration */
++	value &= ~dwxgmac2_route_possibilities[packet - 1].reg_mask;
++	value |= (queue << dwxgmac2_route_possibilities[packet - 1].reg_shift) &
++		 dwxgmac2_route_possibilities[packet - 1].reg_mask;
++
++	/* some packets require extra ops */
++	if (packet == PACKET_AVCPQ)
++		value |= FIELD_PREP(XGMAC_TACPQE, 1);
++	else if (packet == PACKET_MCBCQ)
++		value |= FIELD_PREP(XGMAC_MCBCQEN, 1);
++
++	writel(value, ioaddr + XGMAC_RXQ_CTRL1);
++}
++
+ static void dwxgmac2_prog_mtl_rx_algorithms(struct mac_device_info *hw,
+ 					    u32 rx_alg)
+ {
+@@ -1463,7 +1493,7 @@ const struct stmmac_ops dwxgmac210_ops = {
+ 	.rx_queue_enable = dwxgmac2_rx_queue_enable,
+ 	.rx_queue_prio = dwxgmac2_rx_queue_prio,
+ 	.tx_queue_prio = dwxgmac2_tx_queue_prio,
+-	.rx_queue_routing = NULL,
++	.rx_queue_routing = dwxgmac2_rx_queue_routing,
+ 	.prog_mtl_rx_algorithms = dwxgmac2_prog_mtl_rx_algorithms,
+ 	.prog_mtl_tx_algorithms = dwxgmac2_prog_mtl_tx_algorithms,
+ 	.set_mtl_tx_queue_weight = dwxgmac2_set_mtl_tx_queue_weight,
+@@ -1524,7 +1554,7 @@ const struct stmmac_ops dwxlgmac2_ops = {
+ 	.rx_queue_enable = dwxlgmac2_rx_queue_enable,
+ 	.rx_queue_prio = dwxgmac2_rx_queue_prio,
+ 	.tx_queue_prio = dwxgmac2_tx_queue_prio,
+-	.rx_queue_routing = NULL,
++	.rx_queue_routing = dwxgmac2_rx_queue_routing,
+ 	.prog_mtl_rx_algorithms = dwxgmac2_prog_mtl_rx_algorithms,
+ 	.prog_mtl_tx_algorithms = dwxgmac2_prog_mtl_tx_algorithms,
+ 	.set_mtl_tx_queue_weight = dwxgmac2_set_mtl_tx_queue_weight,
 -- 
-2.27.0
+2.34.1
 
 
