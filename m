@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-25596-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25598-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF108774E06
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 00:10:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9034B774E0E
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 00:11:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9493328198D
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 22:10:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C1B011C20FAF
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 22:11:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B77219896;
-	Tue,  8 Aug 2023 22:10:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BD381BEE4;
+	Tue,  8 Aug 2023 22:10:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E117910FF;
-	Tue,  8 Aug 2023 22:10:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 77FB2C433C7;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE4F51802F
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 22:10:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 830B9C433CA;
 	Tue,  8 Aug 2023 22:10:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1691532626;
-	bh=vfOmk/AS3LgqOp5xnus7eud2KRDUgYjXyBTfQfQtKfE=;
+	bh=ElzwQNB5k4o9+Lw4DzC4a7QoKVmgp4dLbavyMvqdX4o=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=kQ8w+BBVGk81kyk8oRDS3k/goqa0Ze8h6dyEmos/EIYXMJyFq6lzg1xAmeg7OeOXq
-	 PabDluCBWognY+qAEM0QAQ4kXhRtdP4kXmm3+K1Q8qmuLkBRb6siY5tbgVLcwPsSTx
-	 PmByF98FDT5EiOJW9PVBve/sdzOjMuK0Ox0X5cWjsX88eKr2srcge168GxEsYKlOkH
-	 3qrkRqF81HLwHxDgerey/yB4zcWWc8dUZ7jpBvgXhEI6r4jXi5SgZSdSPKvQ0PVMJa
-	 vWc030f4hXFk1sk3z1Ed7VilKuBsjtrY0HbtCve31ypm7RQ2BQvqvu8YQhG4UCrh4m
-	 mTkurCqg55oxA==
+	b=HaEtjISl7bsUid68IEO4GasfSC01wI2nfCS5A1XTvlxVsyFHrOezgLr5URdJhgUvv
+	 u+Rntsk+AJIQgNnZR/cll7sPy4C0gFohNytM5SGE3MkDMtm+Czipr+PEyww9ALVkxK
+	 077GFkbV0lq/yrYPouoEUYwp7Yk1EcoPnyv1F4CCk93T9x+EQEQh2zIff00b+4wk3r
+	 hwA5hYyHFVfZN4KFvH2H4vDdTmXog7P/B7vfCbgE1hjyxyy3EHKIbn/PvGx1ZNNtHp
+	 EXX0pFAN0un/m3EXCVPTnxnLROfJ/P2CSQ9dFse9hYN3fh8ui12PNrQMXY74QBBduZ
+	 P5bjSyqXDp0jg==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 5E514E270C1;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 677DBC64459;
 	Tue,  8 Aug 2023 22:10:26 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -41,51 +41,59 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next,v3 0/5] team: do some cleanups in team driver
+Subject: Re: [PATCH net-next v2 00/10] net: fs_enet: Driver cleanup
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <169153262638.13746.11740842045529374068.git-patchwork-notify@kernel.org>
+ <169153262641.13746.13289621238747032969.git-patchwork-notify@kernel.org>
 Date: Tue, 08 Aug 2023 22:10:26 +0000
-References: <20230807012556.3146071-1-shaozhengchao@huawei.com>
-In-Reply-To: <20230807012556.3146071-1-shaozhengchao@huawei.com>
-To: Zhengchao Shao <shaozhengchao@huawei.com>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, jiri@resnulli.us,
- weiyongjun1@huawei.com, yuehaibing@huawei.com
+References: <cover.1691155346.git.christophe.leroy@csgroup.eu>
+In-Reply-To: <cover.1691155346.git.christophe.leroy@csgroup.eu>
+To: Christophe Leroy <christophe.leroy@csgroup.eu>
+Cc: davem@davemloft.net, kuba@kernel.org, pantelis.antoniou@gmail.com,
+ edumazet@google.com, pabeni@redhat.com, mpe@ellerman.id.au,
+ npiggin@gmail.com, robh@kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
 
 Hello:
 
 This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 7 Aug 2023 09:25:51 +0800 you wrote:
-> Do some cleanups in team driver.
+On Fri,  4 Aug 2023 15:30:10 +0200 you wrote:
+> Over the years, platform and driver initialisation have evolved into
+> more generic ways, and driver or platform specific stuff has gone
+> away, leaving stale objects behind.
 > 
-> ---
-> v3: add header file back to team_mode_activebackup.c
-> v2: combine patch 5/6 and patch 6/6 into patch 5/5
-> ---
-> Zhengchao Shao (5):
->   team: add __exit modifier to team_nl_fini()
->   team: remove unreferenced header in broadcast and roundrobin files
->   team: change the init function in the team_option structure to void
->   team: change the getter function in the team_option structure to void
->   team: remove unused input parameters in lb_htpm_select_tx_port and
->     lb_hash_select_tx_port
+> This series aims at cleaning all that up for fs_enet ethernet driver.
+> 
+> Changes in v2:
+> - Remove a trailing whitespace in the old struct moved in patch 7.
+> - Include powerpc people and list that I forgot when sending v1
+> (and Rob as expected by Patchwork for patch 6, not sure why)
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v3,1/5] team: add __exit modifier to team_nl_fini()
-    https://git.kernel.org/netdev/net-next/c/8958ef511a01
-  - [net-next,v3,2/5] team: remove unreferenced header in broadcast and roundrobin files
-    https://git.kernel.org/netdev/net-next/c/adac119421c3
-  - [net-next,v3,3/5] team: change the init function in the team_option structure to void
-    https://git.kernel.org/netdev/net-next/c/de3ecc4fd8bf
-  - [net-next,v3,4/5] team: change the getter function in the team_option structure to void
-    https://git.kernel.org/netdev/net-next/c/c3b41f4c7b7c
-  - [net-next,v3,5/5] team: remove unused input parameters in lb_htpm_select_tx_port and lb_hash_select_tx_port
-    https://git.kernel.org/netdev/net-next/c/7790eaeb688f
+  - [net-next,v2,01/10] net: fs_enet: Remove set but not used variable
+    https://git.kernel.org/netdev/net-next/c/78d3902795f0
+  - [net-next,v2,02/10] net: fs_enet: Fix address space and base types mismatches
+    https://git.kernel.org/netdev/net-next/c/ae9e78a9dc88
+  - [net-next,v2,03/10] net: fs_enet: Remove fs_get_id()
+    https://git.kernel.org/netdev/net-next/c/26bbbef8ff40
+  - [net-next,v2,04/10] net: fs_enet: Remove unused fields in fs_platform_info struct
+    https://git.kernel.org/netdev/net-next/c/caaf482e2654
+  - [net-next,v2,05/10] net: fs_enet: Remove has_phy field in fs_platform_info struct
+    https://git.kernel.org/netdev/net-next/c/9359a48c65a3
+  - [net-next,v2,06/10] net: fs_enet: Remove stale prototypes from fsl_soc.c
+    https://git.kernel.org/netdev/net-next/c/62e106c802c5
+  - [net-next,v2,07/10] net: fs_enet: Move struct fs_platform_info into fs_enet.h
+    https://git.kernel.org/netdev/net-next/c/7a76918371fe
+  - [net-next,v2,08/10] net: fs_enet: Don't include fs_enet_pd.h when not needed
+    https://git.kernel.org/netdev/net-next/c/33deffc9f19f
+  - [net-next,v2,09/10] net: fs_enet: Remove linux/fs_enet_pd.h
+    https://git.kernel.org/netdev/net-next/c/7149b38dc7cb
+  - [net-next,v2,10/10] net: fs_enet: Use cpm_muram_xxx() functions instead of cpm_dpxxx() macros
+    https://git.kernel.org/netdev/net-next/c/5e6cb39a256d
 
 You are awesome, thank you!
 -- 
