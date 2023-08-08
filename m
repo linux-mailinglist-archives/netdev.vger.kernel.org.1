@@ -1,66 +1,84 @@
-Return-Path: <netdev+bounces-25627-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25628-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6241774F37
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 01:18:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 84346774F3A
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 01:20:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E76AC1C21028
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 23:18:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 957902819CB
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 23:20:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB3531BB4E;
-	Tue,  8 Aug 2023 23:18:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1CAA1BB4B;
+	Tue,  8 Aug 2023 23:20:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B09C914017
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 23:18:35 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01D4FC433C7;
-	Tue,  8 Aug 2023 23:18:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B877C171C4
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 23:20:20 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 28371C433C9;
+	Tue,  8 Aug 2023 23:20:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691536715;
-	bh=dCP1Sczz5QNP9YMFm3vPSduI7fWsBBX66xzJTokuAZw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=katUyK8xdL08Dxi5cwX9+3IO7CmDiM0dqMpN+iV5epuOhNyN3HcEl9fFsfJ6/66CQ
-	 pukEP3ASLYiuVXO/BA22+f/ulKkaNRi7xrl50diRPI3PV5lM+HfYZuUjZLdBFuACAc
-	 jvd3NaL9dEmRoUCFKApgMb0WNvyUAnw6KutJxdoQYSzsfu5kY+2AaEPrSgE7QERom8
-	 ve2zA3JqrGKU+MMmJNxTDs0BGVs6Sy//3tWRlYbooYxMfRT3v1X4bqUV6Z5RprhkNN
-	 moNv+k79379V6JfhlFzvLYhcGXm18ATlvL4090WJr5sZAY0o6bBZZOhbgiH8JDSfzV
-	 uWgCjjklFvSXQ==
-Date: Tue, 8 Aug 2023 16:18:34 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Shay Drory <shayd@nvidia.com>
-Cc: <netdev@vger.kernel.org>, <pabeni@redhat.com>, <davem@davemloft.net>,
- <edumazet@google.com>, Jiri Pirko <jiri@nvidia.com>
-Subject: Re: [PATCH net] devlink: Delay health recover notification until
- devlink registered
-Message-ID: <20230808161834.71d5391d@kernel.org>
-In-Reply-To: <20230808133720.1402826-1-shayd@nvidia.com>
-References: <20230808133720.1402826-1-shayd@nvidia.com>
+	s=k20201202; t=1691536820;
+	bh=hDJyGT1EW9AJZNFTtNI/f9U9RD19MdRHN85tVl7Qga0=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Yh9XcnFJc2VHeOiXwXsZHkqD7YduBU2WuRKmQBloybekOmWTJzcpT/WkK5sYDygd6
+	 g9JNpefjB4uMZWJyrR5GB3HrDfK8G4FJezNr0nn4Zz+GnaLq7IpfQKnQ7tVDlxdSvQ
+	 WAZjmVaxTFSwjHDC/DskWUAJyd45fv9tOTGezBFZPsfOkkjm9PuMf4msNaqQYpLULF
+	 q9hg4bbfFNKIS4MXMqpUCz+ZdBNzq1QJ56dioXwny7iWrSzPZgIjhJePI4O+sh4sbK
+	 3bSr8JvOhLnsx6PWyhrZ+XUFbvGy2Mxv21LiI1lDjkLZ166pyXCAqkpPPzjt5+dBzQ
+	 0LjOx7RzTNb4Q==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 09E3AC395C5;
+	Tue,  8 Aug 2023 23:20:20 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] docs: net: page_pool: de-duplicate the intro comment
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169153682003.18545.14656413462759347609.git-patchwork-notify@kernel.org>
+Date: Tue, 08 Aug 2023 23:20:20 +0000
+References: <20230807210051.1014580-1-kuba@kernel.org>
+In-Reply-To: <20230807210051.1014580-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, hawk@kernel.org, ilias.apalodimas@linaro.org,
+ corbet@lwn.net, linux-doc@vger.kernel.org
 
-On Tue, 8 Aug 2023 16:37:20 +0300 Shay Drory wrote:
-> Currently, invoking health recover before devlink_register() triggers
-> a WARN_ON. However, it is possible for a device to have health errors
-> during its probing flow, before the device driver will call to
-> devlink_register(). e.g.: it is valid to invoke health recover before
-> devlink_register().
+Hello:
+
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Mon,  7 Aug 2023 14:00:51 -0700 you wrote:
+> In commit 82e896d992fa ("docs: net: page_pool: use kdoc to avoid
+> duplicating the information") I shied away from using the DOC:
+> comments when moving to kdoc for documenting page_pool API,
+> because I wasn't sure how familiar people are with it.
 > 
-> Hence, apply delay notification mechanism to health reporters.
+> Turns out there is already a DOC: comment for the intro, which
+> is the same in both places, modulo what looks like minor rewording.
+> Use the version from Documentation/ but keep the contents with
+> the code.
+> 
+> [...]
 
-devlink_register() is dead, long live devl_register().
+Here is the summary with links:
+  - [net-next] docs: net: page_pool: de-duplicate the intro comment
+    https://git.kernel.org/netdev/net-next/c/2c2b88748fd5
 
-At the very least the commit message should enlighten us as to why 
-the devlink instance can't be registered first, before the health
-reporter.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
