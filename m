@@ -1,79 +1,64 @@
-Return-Path: <netdev+bounces-25516-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25469-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9042E7746E7
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 21:06:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE27677437A
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 20:05:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C02801C20F33
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 19:06:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 67A1F2812F9
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 18:05:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0121C15ADC;
-	Tue,  8 Aug 2023 19:06:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3C42168DF;
+	Tue,  8 Aug 2023 18:02:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6FC3156FE
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 19:06:23 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (unknown [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 837D180B0;
-	Tue,  8 Aug 2023 11:50:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=r10h6nVMk04j6nRxoY62Y1rHsX1nNYozakCPbJXDblk=; b=G0AnBQDNcml/ZR//sKTnjynE4r
-	80iRL3AcMWA776SfbTIHkbVQK9yPk08vd1NrwK8Ldc+zL8AdcbA87tN2wNNu8HSiAdL7x+w0Xb2rI
-	4Bu+QljQkFUgQQuKBwvVGQy7OljI5Fwy7qMhFCiev8lJ8yrHkMJ+64VA8SYIQSzQDm80tgCyli72X
-	fGpsOaMoUUM61OdT4sIWsEtyqnKHyS9qBg2DlDD/rb/7AO2POmVMtMAWv2OJc4NseezFPDWFSwybl
-	0IM1vqtSyHBh9OAiaKgjzBL7iKLwQAhhMlzyVP0j3J8jlbtWev83mp4aaZEV1ZxuH8S6KN+pWdOuw
-	M5PrwVUA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:36762)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qTOc1-0000HF-2P;
-	Tue, 08 Aug 2023 16:27:09 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qTObz-0008Dn-JR; Tue, 08 Aug 2023 16:27:07 +0100
-Date: Tue, 8 Aug 2023 16:27:07 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Andrew Halaney <ahalaney@redhat.com>,
-	Bartosz Golaszewski <brgl@bgdev.pl>,
-	"David S . Miller" <davem@davemloft.net>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6CE21643F;
+	Tue,  8 Aug 2023 18:02:43 +0000 (UTC)
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE9A67729E;
+	Tue,  8 Aug 2023 10:21:07 -0700 (PDT)
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-99c1d03e124so777002566b.2;
+        Tue, 08 Aug 2023 10:21:07 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691515266; x=1692120066;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=A3ZAh9r49fKwc1AKqTyWDxZoXY6qm0Fmdzt3lhk9VUs=;
+        b=WR02V/T0UcnR5nLx2KNXnzhQEHmwbWN3zeepqTvW75xZnu3QDS2Igyku0LSLGOPiLY
+         3/qdX+Ow07LVAPPCKKnutMHsrB7vKCdD10Grl9sXdUTmSPk0fXAsldmANZYdlwF7EYMH
+         MO8djPXGMh//WrDgHVDxmqrmkDWVMQqatX/FUVnjoscbrQ32fdwg44uJTbJgDAHrws0M
+         KX75zAG3tdW47N6yhAJbL61Nk+ZLYrpl+TlEHVm09kdxzxtnkIkIAookFNW3Ap8xZz3b
+         nKRbtHNtT/FwoykaHMKTRGmo/mT+yUOQYdD1GnxoFxMmLZvWX5flxRrN6I256tfflbMW
+         FbVg==
+X-Gm-Message-State: AOJu0YyGa+qUyzItcIzltSth0txj711B7JhQv964UvbI3MLteYtO+MXn
+	dupcj01Mf4FF4yXEruvAMHk=
+X-Google-Smtp-Source: AGHT+IF2A/ocidBieGus/Vr73B1MNz6ycwBafdhHr/A40ZNyd3DmkgVoHbNBnNMPKEdk1otUqxKH3w==
+X-Received: by 2002:a17:906:31d4:b0:99c:b46d:22d9 with SMTP id f20-20020a17090631d400b0099cb46d22d9mr205772ejf.48.1691515266017;
+        Tue, 08 Aug 2023 10:21:06 -0700 (PDT)
+Received: from gmail.com (fwdproxy-cln-005.fbsv.net. [2a03:2880:31ff:5::face:b00c])
+        by smtp.gmail.com with ESMTPSA id pv10-20020a170907208a00b00977eec7b7e8sm6950262ejb.68.2023.08.08.10.21.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Aug 2023 10:21:05 -0700 (PDT)
+Date: Tue, 8 Aug 2023 10:21:03 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Hugo Villeneuve <hugo@hugovil.com>
+Cc: sdf@google.com, axboe@kernel.dk, asml.silence@gmail.com,
+	willemdebruijn.kernel@gmail.com,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alex Elder <elder@linaro.org>,
-	Srini Kandagatla <srinivas.kandagatla@linaro.org>,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Subject: Re: [PATCH 0/2] net: stmmac: allow sharing MDIO lines
-Message-ID: <ZNJeyxeZIr2DahTl@shell.armlinux.org.uk>
-References: <20230807193102.6374-1-brgl@bgdev.pl>
- <54421791-75fa-4ed3-8432-e21184556cde@lunn.ch>
- <CAMRc=Mc6COaxM6GExHF2M+=v2TBpz87RciAv=9kHr41HkjQhCg@mail.gmail.com>
- <ZNJChfKPkAuhzDCO@shell.armlinux.org.uk>
- <CAMRc=MczKgBFvuEanKu=mERYX-6qf7oUO2S4B53sPc+hrkYqxg@mail.gmail.com>
- <65b53003-23cf-40fa-b9d7-f0dbb45a4cb2@lunn.ch>
- <CAMRc=MecYHi=rPaT44kuX_XMog=uwB9imVZknSjnmTBW+fb5WQ@mail.gmail.com>
- <xfme5pgj4eqlgao3vmyg6vazaqk6qz2wq6kitgujtorouogjty@cklyof3xz2zm>
- <d021b8ae-a6a3-4697-a683-c9bd45e6c74b@lunn.ch>
+	bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, io-uring@vger.kernel.org
+Subject: Re: [PATCH v2 1/8] net: expose sock_use_custom_sol_socket
+Message-ID: <ZNJ5f1hR3cre0IPd@gmail.com>
+References: <20230808134049.1407498-1-leitao@debian.org>
+ <20230808134049.1407498-2-leitao@debian.org>
+ <20230808121323.bc144c719eba5979e161aac6@hugovil.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,40 +67,72 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <d021b8ae-a6a3-4697-a683-c9bd45e6c74b@lunn.ch>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RDNS_NONE,
-	SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.6
+In-Reply-To: <20230808121323.bc144c719eba5979e161aac6@hugovil.com>
+X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FSL_HELO_FAKE,
+	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Aug 08, 2023 at 05:15:45PM +0200, Andrew Lunn wrote:
-> > > > > Good point, but it's worse than that: when MAC0 is unbound, it will
-> > > > > unregister the MDIO bus and destroy all PHY devices. These are not
-> > > > > refcounted so they will literally go from under MAC1. Not sure how
-> > > > > this can be dealt with?
-> > > >
-> > > > unbinding is not a normal operation. So i would just live with it, and
-> > > > if root decides to shoot herself in the foot, that is her choice.
-> > > >
-> > > 
-> > > I disagree. Unbinding is very much a normal operation.
-> 
-> What do you use it for?
-> 
-> I don't think i've ever manually done it. Maybe as part of a script to
-> unbind the FTDI driver from an FTDI device in order to use user space
-> tools to program the EEPROM? But that is about it.
-> 
-> I actually expect many unbind operations are broken because it is very
-> rarely used.
+Hello  Hugo,
 
-rmmod! Particularly useful during driver development, I tend to use it
-extensively - and it has the advantage of testing those unbind paths!
+On Tue, Aug 08, 2023 at 12:13:23PM -0400, Hugo Villeneuve wrote:
+> On Tue,  8 Aug 2023 06:40:41 -0700
+> Breno Leitao <leitao@debian.org> wrote:
+> 
+> > Exposing function sock_use_custom_sol_socket(), so it could be used by
+> > io_uring subsystem.
+> > 
+> > This function will be used in the function io_uring_cmd_setsockopt() in
+> > the coming patch, so, let's move it to the socket.h header file.
+> 
+> Hi,
+> this description doesn't seem to match the code change below...
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+I re-read the patch comment and it seems to match what the code does,
+so, probably this description only makes sense to me (?).
+
+That said, hat have you understood from reading the description above?
+
+Thanks for the review,
+
+> > ---
+> >  include/linux/net.h | 5 +++++
+> >  net/socket.c        | 5 -----
+> >  2 files changed, 5 insertions(+), 5 deletions(-)
+> > 
+> > diff --git a/include/linux/net.h b/include/linux/net.h
+> > index 41c608c1b02c..14a956e4530e 100644
+> > --- a/include/linux/net.h
+> > +++ b/include/linux/net.h
+> > @@ -355,4 +355,9 @@ u32 kernel_sock_ip_overhead(struct sock *sk);
+> >  #define MODULE_ALIAS_NET_PF_PROTO_NAME(pf, proto, name) \
+> >  	MODULE_ALIAS("net-pf-" __stringify(pf) "-proto-" __stringify(proto) \
+> >  		     name)
+> > +
+> > +static inline bool sock_use_custom_sol_socket(const struct socket *sock)
+> > +{
+> > +	return test_bit(SOCK_CUSTOM_SOCKOPT, &sock->flags);
+> > +}
+> >  #endif	/* _LINUX_NET_H */
+> > diff --git a/net/socket.c b/net/socket.c
+> > index 1dc23f5298ba..8df54352af83 100644
+> > --- a/net/socket.c
+> > +++ b/net/socket.c
+> > @@ -2216,11 +2216,6 @@ SYSCALL_DEFINE4(recv, int, fd, void __user *, ubuf, size_t, size,
+> >  	return __sys_recvfrom(fd, ubuf, size, flags, NULL, NULL);
+> >  }
+> >  
+> > -static bool sock_use_custom_sol_socket(const struct socket *sock)
+> > -{
+> > -	return test_bit(SOCK_CUSTOM_SOCKOPT, &sock->flags);
+> > -}
+> > -
+> >  /*
+> >   *	Set a socket option. Because we don't know the option lengths we have
+> >   *	to pass the user mode parameter for the protocols to sort out.
+> > -- 
+> > 2.34.1
+> > 
 
