@@ -1,70 +1,72 @@
-Return-Path: <netdev+bounces-25384-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25409-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1748D773D62
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 18:17:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E05E6773E20
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 18:26:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C52F02814AA
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 16:17:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9BEBC2810A2
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 16:26:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB61014F74;
-	Tue,  8 Aug 2023 16:07:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12A071427B;
+	Tue,  8 Aug 2023 16:25:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE21F3C37
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 16:07:32 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 787D81DC9A;
-	Tue,  8 Aug 2023 09:07:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1691510832; x=1723046832;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=kJCDgp5sRmlWoO/VG7oNBaGSk6kyXjxy6z+c89DOgxk=;
-  b=gD01RJzfPQny10OtjNmvjHZHBggUGJjfKyYRpqP1mPEjGKZ/nd8W4r2b
-   141/s7F+sv/ohJdxAujuAmGBeZ/ahrk15eGsabW5F7458aWlknuPwtt3u
-   Sn5LjUwqXCWACdOhGFQx6xyR5ugLap//fTupiFo3NGoLVx0OYSwXzOQcf
-   Fb+KnHntHI/i+GI6EPKHxuPNdxJAdmBu4x+C4LxqE73Vc6D1TfcGlYzPl
-   Rgxwk7OLrV0kb8GANxx9kSikr5m8xrOcWfGhcgHkEgxdJ5qwKoW7pOqFl
-   xfeA48E+yyfpCbAw9U//t2AokylWa2YEAxMSKiZEN9p5vwc1U0UJ8/eKL
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10795"; a="351084472"
-X-IronPort-AV: E=Sophos;i="6.01,263,1684825200"; 
-   d="scan'208";a="351084472"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Aug 2023 03:17:59 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10795"; a="977798345"
-X-IronPort-AV: E=Sophos;i="6.01,263,1684825200"; 
-   d="scan'208";a="977798345"
-Received: from lkp-server01.sh.intel.com (HELO d1ccc7e87e8f) ([10.239.97.150])
-  by fmsmga006.fm.intel.com with ESMTP; 08 Aug 2023 03:17:55 -0700
-Received: from kbuild by d1ccc7e87e8f with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1qTJml-0005Hm-0D;
-	Tue, 08 Aug 2023 10:17:55 +0000
-Date: Tue, 8 Aug 2023 18:17:44 +0800
-From: kernel test robot <lkp@intel.com>
-To: "GONG, Ruiqi" <gongruiqi@huaweicloud.com>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Florian Westphal <fw@strlen.de>, Roopa Prabhu <roopa@nvidia.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Kees Cook <keescook@chromium.org>
-Cc: oe-kbuild-all@lists.linux.dev, netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org, netdev@vger.kernel.org,
-	linux-hardening@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Wang Weiyang <wangweiyang2@huawei.com>,
-	Xiu Jianfeng <xiujianfeng@huawei.com>, gongruiqi@huaweicloud.com
-Subject: Re: [PATCH] netfilter: ebtables: fix fortify warnings
-Message-ID: <202308081840.VN5BvVWf-lkp@intel.com>
-References: <20230808014821.241688-1-gongruiqi@huaweicloud.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 068131426F
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 16:25:13 +0000 (UTC)
+Received: from mail-wr1-x42d.google.com (mail-wr1-x42d.google.com [IPv6:2a00:1450:4864:20::42d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFAB2298A5;
+	Tue,  8 Aug 2023 09:25:01 -0700 (PDT)
+Received: by mail-wr1-x42d.google.com with SMTP id ffacd0b85a97d-317dcdae365so2649274f8f.1;
+        Tue, 08 Aug 2023 09:25:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1691511888; x=1692116688;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=rf4XxCrYgVizAAavMc52IH6DpERxZE+o/Obkfya7pmE=;
+        b=Pj0d9Z0qmLaM5eWmZ2ec3quM/MMR2tzZCYuYbb+aYNfLDKVoAjwUc7ygizqpmmRsdb
+         M9BXED4yoOnxfVx+9Loq74+KWMDvdlGHBPCGQpbCwPHARiC3ShgjdIHxYvpZ014a/gjy
+         VZLdFpvaiCNeaQCcLA3NHgP2fTvRJquwhyZBlGMCiDcPT6jfJtwIC766yLwpLfir+U6P
+         wBxcypOPR8OFOXxoZWQloLSdvhYmH9rtZzzpXnIE9laBEZKsqB4ClNO2L3ctrasXOQsn
+         6b2gUqzuuxu6IwJolRT3tVTzUhmviVs8hYUJQVh/vETDnPsAeqqhi8P5OhzAcID5mqZo
+         33mw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691511888; x=1692116688;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rf4XxCrYgVizAAavMc52IH6DpERxZE+o/Obkfya7pmE=;
+        b=XNmkmCoAZpb1sJ0zDGW4olotuDBt6XotPcNfRJ8wpg6wPSy5fdocLLEH+zpJeL4Dhe
+         2Ggt7f8fDMn+r2zpXxJrfsx/Up85q+ZlUBMpQMZFxRohCgbeQ8M7HE12Dk/LEmY7I54I
+         BeB6i+a1i8mmlGrh28vtr9uNsnmPmxryx53+NABjvtJS5TGAGV2R/f6hDlTcmZ+DCADc
+         dQCpbacujhkwZxvRIAhZp9dwwwD0RvbQgeDCCfbkImtkwRdEeUtsSC+vJAkJzh1VoB2J
+         tycAh2cNxr0dsMU2qiNq9nAVKaaTqen/iVs4bYuz7/miYKFKDNZExZXJzQWtepYZLx/L
+         E8Sw==
+X-Gm-Message-State: AOJu0YwEAE9nbqdzLrteeSXBYUX1y/km5QOeqjeYhie1HUUS1emngGJ+
+	fBdidAbBuPnfuSwok9qkVI6WJ8Qg3aLiRGZm
+X-Google-Smtp-Source: AGHT+IGl4IwprpVRhUbr2saNT8Z/71UnR6qHH7OBP3LIPnm13VJYE8SNOagzmc/jO6UfMutTNg6ycQ==
+X-Received: by 2002:a50:fb8a:0:b0:523:4933:b024 with SMTP id e10-20020a50fb8a000000b005234933b024mr862866edq.14.1691491999646;
+        Tue, 08 Aug 2023 03:53:19 -0700 (PDT)
+Received: from skbuf ([188.27.184.201])
+        by smtp.gmail.com with ESMTPSA id lf13-20020a170906ae4d00b0099cc402d3ddsm4114291ejb.202.2023.08.08.03.53.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Aug 2023 03:53:19 -0700 (PDT)
+Date: Tue, 8 Aug 2023 13:53:17 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Xiang Yang <xiangyang@huaweicloud.com>
+Cc: clement.leger@bootlin.com, hkallweit1@gmail.com, linux@armlinux.org.uk,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, f.fainelli@gmail.com,
+	linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org,
+	xiangyang3@huawei.com
+Subject: Re: [PATCH -next] net: pcs: Add missing put_device call in
+ miic_create
+Message-ID: <20230808105317.66o2gv66q2q3ulhl@skbuf>
+References: <20230807134714.2048214-1-xiangyang@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,49 +75,63 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230808014821.241688-1-gongruiqi@huaweicloud.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+In-Reply-To: <20230807134714.2048214-1-xiangyang@huaweicloud.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Ruiqi,
+On Mon, Aug 07, 2023 at 01:47:14PM +0000, Xiang Yang wrote:
+> From: Xiang Yang <xiangyang3@huawei.com>
+> 
+> The reference of pdev->dev is taken by of_find_device_by_node, so
+> it should be released when error out.
+> 
+> Fixes: 7dc54d3b8d91 ("net: pcs: add Renesas MII converter driver")
+> Signed-off-by: Xiang Yang <xiangyang3@huawei.com>
+> ---
 
-kernel test robot noticed the following build errors:
+Ok, but if of_find_device_by_node() requires a subsequent call to
+put_device(), then doesn't this mean that in the non-error case, the
+pdev refcount remains elevated, and will thus never be freed?
 
-[auto build test ERROR on linus/master]
-[also build test ERROR on horms-ipvs/master v6.5-rc5 next-20230808]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+I would expect another put_device(&pdev->dev) after the device_link_add(),
+which itself takes another set of references on the supplier and
+consumer devs, which are sufficient for this driver's runtime operation.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/GONG-Ruiqi/netfilter-ebtables-fix-fortify-warnings/20230808-095125
-base:   linus/master
-patch link:    https://lore.kernel.org/r/20230808014821.241688-1-gongruiqi%40huaweicloud.com
-patch subject: [PATCH] netfilter: ebtables: fix fortify warnings
-config: i386-randconfig-r011-20230808 (https://download.01.org/0day-ci/archive/20230808/202308081840.VN5BvVWf-lkp@intel.com/config)
-compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
-reproduce: (https://download.01.org/0day-ci/archive/20230808/202308081840.VN5BvVWf-lkp@intel.com/reproduce)
+Also, "if (!pdev)" and "if (!platform_get_drvdata(pdev)" here need
+different treatment. One needs to call put_device(&pdev->dev) and the
+other one doesn't.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202308081840.VN5BvVWf-lkp@intel.com/
+	pdev = of_find_device_by_node(pcs_np);
+	of_node_put(pcs_np);
+	if (!pdev || !platform_get_drvdata(pdev))
+		return ERR_PTR(-EPROBE_DEFER);
 
-All errors (new ones prefixed by >>):
+pw-bot: cr
 
-   In file included from <command-line>:
->> ./usr/include/linux/netfilter_bridge/ebtables.h:185:9: error: expected specifier-qualifier-list before 'struct_group'
-     185 |         struct_group(offsets,
-         |         ^~~~~~~~~~~~
-   ./usr/include/linux/netfilter_bridge/ebtables.h: In function 'ebt_get_target':
->> ./usr/include/linux/netfilter_bridge/ebtables.h:199:57: error: 'struct ebt_entry' has no member named 'target_offset'
-     199 |         return (struct ebt_entry_target *)((char *)e + e->target_offset);
-         |                                                         ^~
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+>  drivers/net/pcs/pcs-rzn1-miic.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/pcs/pcs-rzn1-miic.c b/drivers/net/pcs/pcs-rzn1-miic.c
+> index e5d642c67a2c..d097f123635a 100644
+> --- a/drivers/net/pcs/pcs-rzn1-miic.c
+> +++ b/drivers/net/pcs/pcs-rzn1-miic.c
+> @@ -318,8 +318,10 @@ struct phylink_pcs *miic_create(struct device *dev, struct device_node *np)
+>  		return ERR_PTR(-EPROBE_DEFER);
+>  
+>  	miic_port = kzalloc(sizeof(*miic_port), GFP_KERNEL);
+> -	if (!miic_port)
+> +	if (!miic_port) {
+> +		put_device(&pdev->dev);
+>  		return ERR_PTR(-ENOMEM);
+> +	}
+>  
+>  	miic = platform_get_drvdata(pdev);
+>  	device_link_add(dev, miic->dev, DL_FLAG_AUTOREMOVE_CONSUMER);
+> -- 
+> 2.34.1
+> 
 
