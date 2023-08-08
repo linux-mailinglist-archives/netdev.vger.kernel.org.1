@@ -1,99 +1,121 @@
-Return-Path: <netdev+bounces-25386-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25399-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B581773D69
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 18:18:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 297D3773DBE
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 18:22:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3C9EA1C210B8
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 16:18:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D795F280F67
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 16:22:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A182314F99;
-	Tue,  8 Aug 2023 16:08:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46EB314268;
+	Tue,  8 Aug 2023 16:22:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 956583C37
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 16:08:23 +0000 (UTC)
-Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3F961DD3B;
-	Tue,  8 Aug 2023 09:08:07 -0700 (PDT)
-Received: by mail-lf1-x12b.google.com with SMTP id 2adb3069b0e04-4fe1b00fce2so9191442e87.3;
-        Tue, 08 Aug 2023 09:08:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1691510874; x=1692115674;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=PYpXHERbytP8f76n5u1gZDzz4r3bl6ejOhKXKpWtnKY=;
-        b=YvZzgLNYmXceCs7wjkM4vm1j58GQPDEMnud74TQ0YkYBWG0mzqwdDjkVYT+7X2tCx1
-         IAy5acNTsBQUtqP30qD6Rk+gtq1Z0d7TkAwXHm+rEDkAD49UwnQXMLPVj99NWbvTSZBr
-         meei5WaHahczC9Fru97yEjHyck/00h1iT2xTNWOznrMIE1dHGiVrVgaKHfaqZNqDSgwt
-         8kol6vz4JrfyT5/a7zmeMWCnaYeXLZIFWLqixYKGA1jdh6GvBaLmSz8Mv3X2P67UkeC3
-         Lj5n2e75c4gFt0+Xn9U7B+ARbzf45Q/Gk1eHRiRIWgDGOEbhc57PmqYly0wUTcUCBJ4m
-         V2YA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691510874; x=1692115674;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PYpXHERbytP8f76n5u1gZDzz4r3bl6ejOhKXKpWtnKY=;
-        b=DMaLROAhOt4BTodEVbd5MU0vSernfeErWUptWAr2BXh/nvusCJDstzoi+IuSdYMEEe
-         CYzlW2Uw3gGYai/b20eyLmUH+Tk+oGSVTTtFByXkkCR8POw2ITohDaCg8rq1XuVwFY0d
-         sHJeF99e2k1sJwtZnPg7OI7bRmHhQoV/NYGeTL4oh1mhYfGkh+ztXs5FODRTFuTrTyW3
-         Ts9t2J9SCWBFaSt9jT6UCvfaBm8KOv8xslACXCQzapN7ZWOGPiVVTzfkz5M4SvufzHj+
-         W43pjS0Ra4fQf5qgoWV1ahLK2kNNlXtHXlg1oAXbQb8Q3fCT5CM3iUabDY4f/CP9jwNz
-         AvcQ==
-X-Gm-Message-State: AOJu0YxW4PBUXoWbV0aygcftlIjnXNTZyoN+0LMIeBhQxw6cVQmyy2Br
-	uwtsGVOZZqjCQ3cKgt4DKVBBdLJ5vJWOFLX2
-X-Google-Smtp-Source: AGHT+IHqZX5+i2tEw07zhkT2FhkqK/GmHYgxbB9OmZLX/xARTqjJQuHqNPFP3PyDgOT3RoEkND+lDA==
-X-Received: by 2002:a17:906:8a53:b0:991:cd1f:e67a with SMTP id gx19-20020a1709068a5300b00991cd1fe67amr9967570ejc.29.1691492098592;
-        Tue, 08 Aug 2023 03:54:58 -0700 (PDT)
-Received: from skbuf ([188.27.184.201])
-        by smtp.gmail.com with ESMTPSA id v19-20020a170906489300b0099bd1a78ef5sm6470175ejq.74.2023.08.08.03.54.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Aug 2023 03:54:58 -0700 (PDT)
-Date: Tue, 8 Aug 2023 13:54:56 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Xiang Yang <xiangyang@huaweicloud.com>
-Cc: clement.leger@bootlin.com, hkallweit1@gmail.com, linux@armlinux.org.uk,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, f.fainelli@gmail.com,
-	linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org,
-	xiangyang3@huawei.com
-Subject: Re: [PATCH -next] net: pcs: Add missing put_device call in
- miic_create
-Message-ID: <20230808105456.3vbw3ijqube2yetn@skbuf>
-References: <20230807134714.2048214-1-xiangyang@huaweicloud.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A33014015
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 16:22:13 +0000 (UTC)
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F84D26E46
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 09:21:57 -0700 (PDT)
+Received: from dggpemm500005.china.huawei.com (unknown [172.30.72.56])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4RKrG320YxzrSBt;
+	Tue,  8 Aug 2023 19:15:39 +0800 (CST)
+Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
+ (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Tue, 8 Aug
+ 2023 19:16:49 +0800
+Subject: Re: [RFC PATCH net-next v2 2/2] net: veth: Improving page pool pages
+ recycling
+To: Liang Chen <liangchen.linux@gmail.com>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <hawk@kernel.org>, <ilias.apalodimas@linaro.org>,
+	<daniel@iogearbox.net>, <ast@kernel.org>, <netdev@vger.kernel.org>
+References: <20230801061932.10335-1-liangchen.linux@gmail.com>
+ <20230801061932.10335-2-liangchen.linux@gmail.com>
+ <dd263b2b-4030-f274-7fe8-7ba751f04ab6@huawei.com>
+ <CAKhg4tKg7AjADOqpPMcdyu89pa3wox7t5VrTcj84ks-NGLhyXw@mail.gmail.com>
+From: Yunsheng Lin <linyunsheng@huawei.com>
+Message-ID: <11eb970b-31e5-2330-65a6-7b9e33556489@huawei.com>
+Date: Tue, 8 Aug 2023 19:16:41 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.2.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230807134714.2048214-1-xiangyang@huaweicloud.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+In-Reply-To: <CAKhg4tKg7AjADOqpPMcdyu89pa3wox7t5VrTcj84ks-NGLhyXw@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.69.30.204]
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ dggpemm500005.china.huawei.com (7.185.36.74)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-3.7 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Aug 07, 2023 at 01:47:14PM +0000, Xiang Yang wrote:
-> From: Xiang Yang <xiangyang3@huawei.com>
+On 2023/8/7 20:20, Liang Chen wrote:
+> On Wed, Aug 2, 2023 at 8:32 PM Yunsheng Lin <linyunsheng@huawei.com> wrote:
+>>
+>> On 2023/8/1 14:19, Liang Chen wrote:
+>>
+>>> @@ -862,9 +865,18 @@ static struct sk_buff *veth_xdp_rcv_skb(struct veth_rq *rq,
+>>>       case XDP_PASS:
+>>>               break;
+>>>       case XDP_TX:
+>>> -             veth_xdp_get(xdp);
+>>> -             consume_skb(skb);
+>>> -             xdp->rxq->mem = rq->xdp_mem;
+>>> +             if (skb != skb_orig) {
+>>> +                     xdp->rxq->mem = rq->xdp_mem_pp;
+>>> +                     kfree_skb_partial(skb, true);
+>>
+>> For this case, I suppose that we can safely call kfree_skb_partial()
+>> as we allocate the skb in the veth_convert_skb_to_xdp_buff(), but
+>> I am not sure about the !skb->pp_recycle case.
+>>
+>>> +             } else if (!skb->pp_recycle) {
+>>> +                     xdp->rxq->mem = rq->xdp_mem;
+>>> +                     kfree_skb_partial(skb, true);
+>>
+>> For consume_skb(), there is skb_unref() checking and other checking/operation.
+>> Can we really assume that we can call kfree_skb_partial() with head_stolen
+>> being true? Is it possible that skb->users is bigger than 1? If it is possible,
+>> don't we free the 'skb' back to skbuff_cache when other may still be using
+>> it?
+>>
 > 
-> The reference of pdev->dev is taken by of_find_device_by_node, so
-> it should be released when error out.
+> Thanks for raising the concern. If there are multiple references to
+> the skb (skb->users is greater than 1), the skb will be reallocated in
+> veth_convert_skb_to_xdp_buff(). So it should enter the skb != skb_orig
+> case.
 > 
-> Fixes: 7dc54d3b8d91 ("net: pcs: add Renesas MII converter driver")
-> Signed-off-by: Xiang Yang <xiangyang3@huawei.com>
-> ---
+> In fact, entering the !skb->pp_recycle case implies that the skb meets
+> the following conditions:
+> 1. It is neither shared nor cloned.
+> 2. It is not allocated using kmalloc.
+> 3. It does not have fragment data.
+> 4. The headroom of the skb is greater than XDP_PACKET_HEADROOM.
+> 
 
-Also, the patch subject prefix needs to be "[PATCH net]" (indicative of
-the fact that you want it to go to https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git)
-and not "[PATCH -next]".
+You are right, I missed the checking in veth_convert_skb_to_xdp_buff(),
+it seems the xdp is pretty strict about the buffer owner, it need to
+have exclusive access to all the buffer.
+
+And it seems there is only one difference left then, with
+kfree_skb_partial() calling 'kmem_cache_free(skbuff_cache, skb)' and
+consume_skb() calling 'kfree_skbmem(skb)'. If we are true about
+'skb' only allocated from 'skbuff_cache', this patch looks good to me
+then.
+
+> 
 
