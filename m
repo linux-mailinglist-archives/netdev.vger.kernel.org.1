@@ -1,144 +1,185 @@
-Return-Path: <netdev+bounces-25320-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25330-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9DD97773BB5
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 17:54:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id ACD25773BE6
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 17:57:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CEB4B1C20341
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 15:54:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CEFD81C20F75
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 15:57:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67B9315AF5;
-	Tue,  8 Aug 2023 15:44:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11DE214015;
+	Tue,  8 Aug 2023 15:46:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 598791C29
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 15:44:36 +0000 (UTC)
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2046.outbound.protection.outlook.com [40.107.220.46])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5E8E213D
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 08:44:18 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=jCpxLPBTzOAt+fizPW92HfPjCygKmllPhKGh3xRNMK403qxGo7tVqz3LJbNK0TQWbwcNFLbjLAr2AWZsMyxX7uEsRx7EYN7DHZXE84dG51/iIlf21CU3+TZR20A0pPYM6seqgdCNnZxKRcgBrDRwoQwsWLgB7FmN5F2kEGj+ce6KIh9YHo/qXtx3ON/YOuHye/tRqJwD43YJII0CCULEjjnHHArUVWYuoS5K5blFkw1mShXPoiw22aQl2jC/Gb0rKuoKnVL7rHuh8X+Ak976SllHh8jlckLYF8KO+optA4PMZ68S8YdQeke2Z28Sxfv+3zMoTb9xOG24f9pc4yE3dg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=nw3wlZEn/dGjER021nHV/YEIC6tSofueHA9wOH63tTg=;
- b=nNFIgicVC7CQf5Is4t4N0Kh2WFnN40rjWOSsOQeCx4/7Yg4A/Rogu4uJPdgDAWRl0N9bCzhay6Vs5eb2Pn5uUEsjvhwJjcjJjevsp30/IMmmYe64QakwmvBMypDwGoNBms8QIvNA8xdtu0yxfFuPyGXaZr2Tp4kjX2/nWLOxisk5YmUgACwlFtnuYbnTXEBcR3Jh86xdnZxzArgHTumkYjRO8bqvrBQKkZ4is5hPd7Vh5MPsJHCmZE4zvpxTdi+6L5WUU/97DKEW0BJdVb0Gvfg4rHdnK46WQJm838ORosUsHEHXxu1P05T6KX9E+GrQO5j4grnTrH/avESKEj1+Vg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=nw3wlZEn/dGjER021nHV/YEIC6tSofueHA9wOH63tTg=;
- b=VCjfJ5aNsB2bfzuEbF8iQjMedG8YOlINupCiVfMbzoWq8dW+9vdf+7eGmpe5bRWfzaV5NW+DlmpAcUPHlA42+M8hJHi7Agm8VGzotd7M1GlWnbBLskOzXDg7o5sZvwne3GQtfNV3XdeIu9rprLyTnWIUrcNoXZNHojoL8O+WMNlFLNc1iRhengFH1yWo/3IEq8JjgPOJ4gvebEYsc64DB3Eg/jyh3gK0h6mfHieov4aa4QgsCKHK2uWd7dYI7WZX/Vgatxcdmbq09e+TQ2GxPqqMkuMhgalJL4cK93xl5E4dItqn+cKeuUzr5CAAV9bhgXzL9x88t0GrkHbN7jUoWw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CY5PR12MB6179.namprd12.prod.outlook.com (2603:10b6:930:24::22)
- by MN2PR12MB4342.namprd12.prod.outlook.com (2603:10b6:208:264::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.26; Tue, 8 Aug
- 2023 14:44:24 +0000
-Received: from CY5PR12MB6179.namprd12.prod.outlook.com
- ([fe80::e8:f321:8a83:9a0c]) by CY5PR12MB6179.namprd12.prod.outlook.com
- ([fe80::e8:f321:8a83:9a0c%6]) with mapi id 15.20.6652.025; Tue, 8 Aug 2023
- 14:44:23 +0000
-Date: Tue, 8 Aug 2023 17:44:13 +0300
-From: Ido Schimmel <idosch@nvidia.com>
-To: Ruan Jinjie <ruanjinjie@huawei.com>
-Cc: netdev@vger.kernel.org, Petr Machata <petrm@nvidia.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH -next] mlxsw: spectrum_switchdev: Use
- is_zero_ether_addr() instead of ether_addr_equal()
-Message-ID: <ZNJUvRsToJvMFVDW@shredder>
-References: <20230808133528.4083501-1-ruanjinjie@huawei.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230808133528.4083501-1-ruanjinjie@huawei.com>
-X-ClientProxiedBy: TL2P290CA0025.ISRP290.PROD.OUTLOOK.COM
- (2603:1096:950:3::20) To CY5PR12MB6179.namprd12.prod.outlook.com
- (2603:10b6:930:24::22)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0649C13FE0
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 15:46:14 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B091C72A8
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 08:45:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1691509524;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Lr8QH1hJKMAeMGOo0M5b1qGrUuXmYrB7fQhjBLGi+k0=;
+	b=R2J7cwnsI8q631EqfYd8KJpPfdP88d+lXRtwthCmlAX6hxksiewxEKHTohIEBvY1kLXZyI
+	G7AkGBh/P57yBrIh07s1STnBzCtOYTJv5YC3G3MF2AFyrn8QxDfHvhEVpjvSc9ybabjp2b
+	hmVgfpmDXsExMtZApfHUPfEXSOg5ook=
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
+ [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-372-jrJHGb0XNP6uJEh4vpl8OQ-1; Tue, 08 Aug 2023 10:44:19 -0400
+X-MC-Unique: jrJHGb0XNP6uJEh4vpl8OQ-1
+Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-403affb3404so50293681cf.1
+        for <netdev@vger.kernel.org>; Tue, 08 Aug 2023 07:44:19 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691505859; x=1692110659;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Lr8QH1hJKMAeMGOo0M5b1qGrUuXmYrB7fQhjBLGi+k0=;
+        b=UHGa9QqH70kdhSOxbCC8T5Qb5Zm9VNcsKRgonC3U03lltbMav609p7OhT/IAAGdxNE
+         F7Wp/wCvLU4FXPDM/ECq74HdfU/YgNgugFxx3vITl1p/kLLsC+P04NAAD8k/h09rsORm
+         oIlzlwlayxnF4vgICLEdNK5Y6jfLWgd8cc9qJ3Cox9cP+BHAS/5Y/WMzESaPZXb9MbUH
+         uh9eM3dofSmpE+dhZzU/0Honv2swQ5Pl0HNgNGKXNkGJ0r0F9Mx9GVcrf3H5Un+bqGsb
+         93WfXw8z3eMk3kh0/J6k7Y/XuLOb2QwAcNXNJNybBKf82TDMSSMO6Yyzsvj/+KUU5GZq
+         44qw==
+X-Gm-Message-State: AOJu0YxnXG80MpqCebDgS4/fC0uKlutfPO2/hQTUl9ohOKPohWac7hYn
+	bwqlXWkclPxi9itBOieyd6S9QIGqaSooNvkVe6t/ATfV8RF0v0/OKUxtaUHPCkukz0Sd+wGnLuz
+	qwdFfZz/ci6oFX0wD
+X-Received: by 2002:ac8:5902:0:b0:40f:f44f:7f79 with SMTP id 2-20020ac85902000000b0040ff44f7f79mr2452qty.16.1691505859185;
+        Tue, 08 Aug 2023 07:44:19 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG4H/PhZU/WpPuHATF0/xjAxDvtaCGT5yE9Pf+IDINKw6+ypsWmrPVAHe6GEcDu06wD1x60qw==
+X-Received: by 2002:ac8:5902:0:b0:40f:f44f:7f79 with SMTP id 2-20020ac85902000000b0040ff44f7f79mr2428qty.16.1691505858889;
+        Tue, 08 Aug 2023 07:44:18 -0700 (PDT)
+Received: from fedora ([2600:1700:1ff0:d0e0::37])
+        by smtp.gmail.com with ESMTPSA id l5-20020ac84a85000000b0040fdf9a53e6sm3397095qtq.82.2023.08.08.07.44.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Aug 2023 07:44:18 -0700 (PDT)
+Date: Tue, 8 Aug 2023 09:44:16 -0500
+From: Andrew Halaney <ahalaney@redhat.com>
+To: Bartosz Golaszewski <brgl@bgdev.pl>
+Cc: Andrew Lunn <andrew@lunn.ch>, 
+	"Russell King (Oracle)" <linux@armlinux.org.uk>, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alex Elder <elder@linaro.org>, 
+	Srini Kandagatla <srinivas.kandagatla@linaro.org>, netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Subject: Re: [PATCH 0/2] net: stmmac: allow sharing MDIO lines
+Message-ID: <xfme5pgj4eqlgao3vmyg6vazaqk6qz2wq6kitgujtorouogjty@cklyof3xz2zm>
+References: <20230807193102.6374-1-brgl@bgdev.pl>
+ <54421791-75fa-4ed3-8432-e21184556cde@lunn.ch>
+ <CAMRc=Mc6COaxM6GExHF2M+=v2TBpz87RciAv=9kHr41HkjQhCg@mail.gmail.com>
+ <ZNJChfKPkAuhzDCO@shell.armlinux.org.uk>
+ <CAMRc=MczKgBFvuEanKu=mERYX-6qf7oUO2S4B53sPc+hrkYqxg@mail.gmail.com>
+ <65b53003-23cf-40fa-b9d7-f0dbb45a4cb2@lunn.ch>
+ <CAMRc=MecYHi=rPaT44kuX_XMog=uwB9imVZknSjnmTBW+fb5WQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY5PR12MB6179:EE_|MN2PR12MB4342:EE_
-X-MS-Office365-Filtering-Correlation-Id: ea844d7c-6bed-4f1c-a786-08db981df4d2
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	YPnJlGutXqYqo00sU/LvrZKq2jypPqvwOsLqRssNn+K+sINqcWZ/u6frbls4u4foZWV+68R9/+sGKRG0L7WrDNIV7tuyO/DnVj4y8am0vqnP+eoB4alpmatgN+Oe8bPBIHaxJ2IFnQaAgzIGIfLiXWai1wMVBoqPFCccKYtyF0UVy8/ST5tvwW+jgzkwbqFzUK/NLp4iRLfDwng+a7LfrvcOyQ/0WSy2A71sYwHn+PsTi6NTb6pOJoLL0vh/dIvOFtJ3lGYxKFXOLQcCWCvdQmwgDujptN623EfT7/Ckp7+IvQ+4h66XKtI+hJGsqh3wQXPXbxlcJ6SIIWPLS5nVIgjFOP4axVC+o93k43326OzlPQAgTceP7tqAs4l9ed4/E//lF8/dDJLKhqHEzAgrdBynj/LLk9Se5SRCmiojEv29sTsV7hfNWV54qRebxmxMAd6Vw2LfpQbXvnDVEzQpIcuHSZWwM8ds9dvLjF//s9BzgPYlWqTU21p/R7cU5YvtsLoZds6Hk9pfd2bOmVrB4KZx6G98q7u/pBy3aFs/SZUeDntUNyWXNp/czU+Rt5XWRF/disGES5ZkzGqLa8E5Sg==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR12MB6179.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(7916004)(4636009)(136003)(346002)(396003)(39860400002)(366004)(376002)(1800799003)(186006)(451199021)(86362001)(38100700002)(33716001)(9686003)(6512007)(6486002)(6666004)(966005)(6506007)(26005)(316002)(66946007)(41300700001)(66556008)(66476007)(6916009)(4326008)(478600001)(4744005)(54906003)(2906002)(5660300002)(8936002)(8676002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?I3yhQ/RmeXSQGmVbozZ4nQruAZf0OoOqtjlfBb3GML2KqOCqul7g++IiiXuc?=
- =?us-ascii?Q?FYmbpAbBUJDMeKrOv6AZByQBKijCaINMMYzTSHlAhHHcZoDQA7GCj6cMdr/a?=
- =?us-ascii?Q?9rDRynqaq38PzGjay4vFGISTJI11eNSL3Px5GOh32ld3CAlLvLxwhLxEA9A6?=
- =?us-ascii?Q?6Gy7DoQgVRwpah6zN9L3k0R8RvRPqmnjxyNvelmwRlgxlIO/y4BeyhcQcS5T?=
- =?us-ascii?Q?5JiqRl77HMlcL6LLssIfTNGc/75LJmVE97dQrWsxxEWc373K0ml8PUGHqm5D?=
- =?us-ascii?Q?OasSFyoSsIl3lIex1b+QXpmMzc6sUkijgEG8I/6QE/dy7j7u3ps4fmMbC4NY?=
- =?us-ascii?Q?bWD+wKnGODze+rbgl4B2u8WfR2rveOsnE+VauSMBkMDYcactO6h/yrPiCNoh?=
- =?us-ascii?Q?/UdRBQ+b6PnK+1ZWfuVbVcRnrQSTSqg5LwEDfNWa2FAoi0IYT1fL0+rGMpyl?=
- =?us-ascii?Q?iKhsB0moqQZIyWxta0qsS1frHhd4vt3HfbAFHboyshG+0mTn3mBdpOu+9FmW?=
- =?us-ascii?Q?x+941GIAIUfgLhbfF5lQMwSBttcov6f3/DK/tzqy72hiFH8unkUK7NKzuZu0?=
- =?us-ascii?Q?bC09lmX+lJx2hcgsz3akpgwXqGW04KZZOFXWdgkLNapeFczVfCZrryHLq6BU?=
- =?us-ascii?Q?KKgVfoIJo/natgrWuuJ+jXYHV31vdpEyJ8vkSTgvNdsQtJ9ZGBzYfT1Z3iTt?=
- =?us-ascii?Q?rLF+/olKAFA2n5NPR6YoyBduEV0fTYQ9KTsY28LBRYbE/BV8xPqXgWFRVMHz?=
- =?us-ascii?Q?qdtXpmQzvY5EyYTqx7HIHYpxQAXVaclzBBvWJR5pWLUYrhySr1oafPRUiPMS?=
- =?us-ascii?Q?WYJ8V1OCCqLQrZvQA2oiI2LA8WqyunUlCeUh8oHcDPjyi58PWrpnujAyRBwz?=
- =?us-ascii?Q?LFrjbHxQsqScDvS/rBqG3gLCaxIw4G6RSrvGP6BZCwM2DZFJ8Qhj1P8gffQQ?=
- =?us-ascii?Q?8upUUBtOo5hWvpWFNJLsRRUIAGDGZ9NNXmAzwPSQntWZjNErxQ3ZKnk8Sv9r?=
- =?us-ascii?Q?vTQmWZbnKR6jIwXWCN4owvP259aTFSMm40idLNGeNqXdSiluHZ/TQJSxXvoL?=
- =?us-ascii?Q?aeG63FBoaINMIQko5tCRKKfdgw7n4lAaVsCsEMY+92nwkko+Bew9FLm640w4?=
- =?us-ascii?Q?RfdNcHpcvCwLl+0hZHU7tibu1Mo/FBDmt1b+yZqVahPBR8DDXD6PCdB3pHaJ?=
- =?us-ascii?Q?oaJPBsV38OJsfmHu+WnIh9MaZrd2dRm7c2gHcHD186QvjWRNWNg+n8P49I7P?=
- =?us-ascii?Q?nFzhrJ+Td93SKCdJL0NvuYpOaJ2lGds2XfPNlRZ45KyKfZ09Zvx0IXsRy/g0?=
- =?us-ascii?Q?ONgPjg1Ht+0VOWFfvEMM25VNenWbt0mz1qklf+SmC3PiCQSZT9TMOhF5Ahna?=
- =?us-ascii?Q?oDLHa6ZTMOpM7ejLEWuE3EqZcOBNPKuBBxsCh8oDigSe/QV5YBINMwBzDJrr?=
- =?us-ascii?Q?DQl77Ao05XTF1mZ4hySTak1O//yADP4vCbAL7s6DP6iGJ31g1f0A5Y0N1VPI?=
- =?us-ascii?Q?GlCzpDQfwF1orKqhwXfOAAT7EQq8kE+6loTStodBCiBovM1vt2dNdCSaG2M9?=
- =?us-ascii?Q?Z8IFMZRZ/lqm0NKjo4jC7PsL4q2cLzwHM2+UVs3w?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ea844d7c-6bed-4f1c-a786-08db981df4d2
-X-MS-Exchange-CrossTenant-AuthSource: CY5PR12MB6179.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Aug 2023 14:44:23.3621
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: KIY1UV25w25t0lvF7OA1P/leC/g99UVPl/2Zbg8QNSn6bOlkqnh/bnt2gbjCEGjLb6/MJIDzAe2usbOZTgaZcg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4342
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAMRc=MecYHi=rPaT44kuX_XMog=uwB9imVZknSjnmTBW+fb5WQ@mail.gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-In the future, please use the correct patch prefix for netdev
-submissions. See:
-
-https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html#tl-dr
-
-On Tue, Aug 08, 2023 at 09:35:28PM +0800, Ruan Jinjie wrote:
-> Use is_zero_ether_addr() instead of ether_addr_equal()
-> to check if the ethernet address is all zeros.
+On Tue, Aug 08, 2023 at 04:30:05PM +0200, Bartosz Golaszewski wrote:
+> On Tue, Aug 8, 2023 at 4:25 PM Andrew Lunn <andrew@lunn.ch> wrote:
+> >
+> > > > On Tue, Aug 08, 2023 at 10:13:09AM +0200, Bartosz Golaszewski wrote:
+> > > > > Ok so upon some further investigation, the actual culprit is in stmmac
+> > > > > platform code - it always tries to register an MDIO bus - independent
+> > > > > of whether there is an actual mdio child node - unless the MAC is
+> > > > > marked explicitly as having a fixed-link.
+> > > > >
+> > > > > When I fixed that, MAC1's probe is correctly deferred until MAC0 has
+> > > > > created the MDIO bus.
+> > > > >
+> > > > > Even so, isn't it useful to actually reference the shared MDIO bus in some way?
+> > > > >
+> > > > > If the schematics look something like this:
+> > > > >
+> > > > > --------           -------
+> > > > > | MAC0 |--MDIO-----| PHY |
+> > > > > -------- |     |   -------
+> > > > >          |     |
+> > > > > -------- |     |   -------
+> > > > > | MAC1 |--     ----| PHY |
+> > > > > --------           -------
+> > > > >
+> > > > > Then it would make sense to model it on the device tree?
+> > > >
+> > > > So I think what you're saying is that MAC0 and MAC1's have MDIO bus
+> > > > masters, and the hardware designer decided to tie both together to
+> > > > a single set of clock and data lines, which then go to two PHYs.
+> > >
+> > > The schematics I have are not very clear on that, but now that you
+> > > mention this, it's most likely the case.
+> >
+> > I hope not. That would be very broken. As Russell pointed out, MDIO is
+> > not multi-master. You need to check with the hardware designer if the
+> > schematics are not clear.
 > 
-> Signed-off-by: Ruan Jinjie <ruanjinjie@huawei.com>
+> Sorry, it was not very clear. It's the case that two MDIO masters
+> share the MDC and data lines.
 
-Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+I'll make the water muddier (hopefully clearer?). I have access to the
+board schematic (not SIP/SOM stuff though), but that should help here.
 
-Thanks
+MAC0 owns its own MDIO bus (we'll call it MDIO0). It is pinmuxed to
+gpio8/gpio9 for mdc/mdio. MAC1 owns its own bus (MDIO1) which is
+pinmuxed to gpio21/22.
+
+On MDIO0 there are two SGMII ethernet phys. One is connected to MAC0,
+one is connected to MAC1.
+
+MDIO1 is not connected to anything on the board. So there is only one
+MDIO master, MAC0 on MDIO0, and it manages the ethernet phy for both
+MAC0/MAC1.
+
+Does that make sense? I don't think from a hardware design standpoint
+this is violating anything, it isn't a multimaster setup on MDIO.
+
+> 
+> >
+> > > Good point, but it's worse than that: when MAC0 is unbound, it will
+> > > unregister the MDIO bus and destroy all PHY devices. These are not
+> > > refcounted so they will literally go from under MAC1. Not sure how
+> > > this can be dealt with?
+> >
+> > unbinding is not a normal operation. So i would just live with it, and
+> > if root decides to shoot herself in the foot, that is her choice.
+> >
+> 
+> I disagree. Unbinding is very much a normal operation. Less so for
+> platform devices but still, it is there for a reason and should be
+> expected to work correctly. Or at the very least not crash and burn
+> the system.
+> 
+> On the other hand, I like your approach because I may get away without
+> having to fix it. But if I were to fix it - I would reference the MDIO
+> bus from the secondary mac by phandle and count its references before
+> dropping it. :)
+> 
+> Bartosz
+> 
+
 
