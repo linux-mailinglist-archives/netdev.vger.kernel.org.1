@@ -1,97 +1,116 @@
-Return-Path: <netdev+bounces-25490-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25500-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6AC0A7743EE
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 20:13:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A37477455E
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 20:42:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 258632812E5
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 18:13:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 339E4281740
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 18:42:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF0E61FA6;
-	Tue,  8 Aug 2023 18:09:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B036814F96;
+	Tue,  8 Aug 2023 18:41:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97BCC1B7C5
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 18:09:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6C7AC433C8;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A626813AFA
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 18:41:48 +0000 (UTC)
+Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFD4E14B92F
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 11:09:22 -0700 (PDT)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 2E81E40004;
 	Tue,  8 Aug 2023 18:09:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691518160;
-	bh=0Iglnq2fpte6cxrqAZ35FOOgTYJYUr/M3Egg8lt/i/o=;
-	h=From:To:Cc:Subject:Date:From;
-	b=D87HJEuRByRjIP5Ii5iVJddzuzcvbuwu2gx3ZrdN6g7/bI9JHED4Is3X1zsFEkD0z
-	 /g/MRu4pJHh5fhqEIgVyaviMRLXUHKgjdVGMLfU3D+MsNsGzvkDO5B9/dmOcI881mI
-	 clFhxm2hfhClH3DWXiP8aSDkZTThkAOnBO/tO3+rDT8hIQIryubkIqqPwfpRy0h8rg
-	 oL2dQA6y/VcmYWBBHearUOCDuYmvHkT53dyDDDhoz1O8H2LLPu06bNX4IRM+1mC3pI
-	 KT5lOUl8Ih89Mrw/B3FxD1+4KvhubvQWT3sYbFe+Kv26/qgLccZnmk6SD39g6wVj/S
-	 rxaLonQRptQLQ==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	Jakub Kicinski <kuba@kernel.org>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	borisp@nvidia.com,
-	john.fastabend@gmail.com,
-	dhowells@redhat.com
-Subject: [PATCH net] net: tls: set MSG_SPLICE_PAGES consistently
-Date: Tue,  8 Aug 2023 11:09:17 -0700
-Message-ID: <20230808180917.1243540-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.41.0
+Message-ID: <d3eb91d9-7ce5-8ac9-e718-4212ab838696@ovn.org>
+Date: Tue, 8 Aug 2023 20:10:01 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Cc: i.maximets@ovn.org, Eric Garver <eric@garver.life>, aconole@redhat.com,
+ dev@openvswitch.org
+Content-Language: en-US
+To: Adrian Moreno <amorenoz@redhat.com>, netdev@vger.kernel.org
+References: <20230807164551.553365-1-amorenoz@redhat.com>
+ <20230807164551.553365-4-amorenoz@redhat.com>
+From: Ilya Maximets <i.maximets@ovn.org>
+Subject: Re: [net-next v3 3/7] net: openvswitch: add explicit drop action
+In-Reply-To: <20230807164551.553365-4-amorenoz@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GND-Sasl: i.maximets@ovn.org
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-We used to change the flags for the last segment, because
-non-last segments had the MSG_SENDPAGE_NOTLAST flag set.
-That flag is no longer a thing so remove the setting.
+On 8/7/23 18:45, Adrian Moreno wrote:
+> From: Eric Garver <eric@garver.life>
+> 
+> From: Eric Garver <eric@garver.life>
+> 
+> This adds an explicit drop action. This is used by OVS to drop packets
+> for which it cannot determine what to do. An explicit action in the
+> kernel allows passing the reason _why_ the packet is being dropped or
+> zero to indicate no particular error happened (i.e: OVS intentionally
+> dropped the packet).
+> 
+> Since the error codes coming from userspace mean nothing for the kernel,
+> we squash all of them into only two drop reasons:
+> - OVS_DROP_EXPLICIT_ACTION_ERROR to indicate a non-zero value was passed
+> - OVS_DROP_EXPLICIT_ACTION to indicate a zero value was passed (no
+>   error)
+> 
+> e.g. trace all OVS dropped skbs
+> 
+>  # perf trace -e skb:kfree_skb --filter="reason >= 0x30000"
+>  [..]
+>  106.023 ping/2465 skb:kfree_skb(skbaddr: 0xffffa0e8765f2000, \
+>   location:0xffffffffc0d9b462, protocol: 2048, reason: 196611)
+> 
+> reason: 196611 --> 0x30003 (OVS_DROP_EXPLICIT_ACTION)
+> 
+> Signed-off-by: Eric Garver <eric@garver.life>
+> Co-developed-by: Adrian Moreno <amorenoz@redhat.com>
+> Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
+> ---
+>  include/uapi/linux/openvswitch.h                     |  2 ++
+>  net/openvswitch/actions.c                            |  9 +++++++++
+>  net/openvswitch/drop.h                               |  2 ++
+>  net/openvswitch/flow_netlink.c                       | 10 +++++++++-
+>  tools/testing/selftests/net/openvswitch/ovs-dpctl.py |  3 +++
+>  5 files changed, 25 insertions(+), 1 deletion(-)
 
-Since flags most likely don't have MSG_SPLICE_PAGES set
-this avoids passing parts of the sg as splice and parts
-as non-splice. Before commit under Fixes we'd have called
-tcp_sendpage() which would add the MSG_SPLICE_PAGES.
+<snip>
 
-Why this leads to trouble remains unclear but Tariq
-reports hitting the WARN_ON(!sendpage_ok()) due to
-page refcount of 0.
+> diff --git a/net/openvswitch/drop.h b/net/openvswitch/drop.h
+> index 3cd6489a5a2b..be51ff5039fb 100644
+> --- a/net/openvswitch/drop.h
+> +++ b/net/openvswitch/drop.h
+> @@ -10,6 +10,8 @@
+>  #define OVS_DROP_REASONS(R)			\
+>  	R(OVS_DROP_FLOW)		        \
+>  	R(OVS_DROP_ACTION_ERROR)		\
+> +	R(OVS_DROP_EXPLICIT_ACTION)		\
+> +	R(OVS_DROP_EXPLICIT_ACTION_ERROR)	\
 
-Fixes: e117dcfd646e ("tls: Inline do_tcp_sendpages()")
-Reported-by: Tariq Toukan <tariqt@nvidia.com>
-Link: https://lore.kernel.org/all/4c49176f-147a-4283-f1b1-32aac7b4b996@gmail.com/
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-CC: borisp@nvidia.com
-CC: john.fastabend@gmail.com
-CC: dhowells@redhat.com
----
- net/tls/tls_main.c | 3 ---
- 1 file changed, 3 deletions(-)
+These drop reasons are a bit unclear as well.  Especially since we
+have OVS_DROP_ACTION_ERROR and OVS_DROP_EXPLICIT_ACTION_ERROR that
+mean completely different things while having similar names.
 
-diff --git a/net/tls/tls_main.c b/net/tls/tls_main.c
-index 7dbb8cd8f809..f550c84f3408 100644
---- a/net/tls/tls_main.c
-+++ b/net/tls/tls_main.c
-@@ -139,9 +139,6 @@ int tls_push_sg(struct sock *sk,
- 
- 	ctx->splicing_pages = true;
- 	while (1) {
--		if (sg_is_last(sg))
--			msg.msg_flags = flags;
--
- 		/* is sending application-limited? */
- 		tcp_rate_check_app_limited(sk);
- 		p = sg_page(sg);
--- 
-2.41.0
+Maybe remove the 'ACTION' part from these and add a word 'with'?
+E.g. OVS_DROP_EXPLICIT and OVS_DROP_EXPLICIT_WITH_ERROR.  I suppose,
+'WITH' can also be shortened to 'W'.  It's fairly obvious that
+explicit drops are caused by the explicit drop action.
 
+What do you think?
+
+Best regards, Ilya Maximets.
 
