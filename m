@@ -1,33 +1,33 @@
-Return-Path: <netdev+bounces-25294-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25296-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF646773B25
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 17:44:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 70FF4773B32
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 17:45:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 884FB28142B
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 15:44:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2A3F5280A89
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 15:45:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90F2613FEB;
-	Tue,  8 Aug 2023 15:42:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E36E13FFE;
+	Tue,  8 Aug 2023 15:42:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8356A13FE0
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 15:42:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7110C13FE0
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 15:42:18 +0000 (UTC)
 Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on20601.outbound.protection.outlook.com [IPv6:2a01:111:f400:7eae::601])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7F7944B7
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 08:41:48 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8533C469F
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 08:41:55 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=YQ3PynHgrjpat+ts5ncKdACnf/czteGeR5J+8zFNXwN3cgE5lAIsg3FSCnrG+4LT5pBA9NqAralnCKSGAFRe2uVoJl5t4CwdVh3zhq0v2UDW38+VQJW1g8QNPuea8L/IOjnmXHy/nbsFq3Z2jS7uiaWMojLYjPv2RxlGT678IgZyfEf1Iy0TETrtWd4uRNQGxwUouu1NcGaBFtEbM5BuyGgD/ZYRlRkTjSbpNR4pDtWO1cnEmsJxGMHer5q9JLYBVea0wLwDDjRnOFrzIDD1qYySyQghwK6sD5Dql7WOJtJNjxCi1d8cT4ZR5IXQKHSW4Qk6zXWmCuIlju7/haqt+A==
+ b=UYkKgCe6v0fvnbPhsj2mzQZmhW7ANCQrkuIBCD6IVIR4T9K+PNUEGul9o/vxzBJVmOM5WraSZd4WU65YsE00NDoGS66/0GACaeDSdIS/uWg1Qgt1GxPs7miIG3gxhpx16m8ePA7LBU80G0La4fJyHn8wS27XV2Y256t4hsRMUzTbz+rhEahx9gO0zthSWW5JsqLtRIcWvm7WSOhC4nHEdzS6gg12i5sEM9hxMOvS8xNPmxkB0Qy06iFLC3/GvQ45ZU4X/CxiwRterzIp/g/kourVGnXDARaGCbZU2KaXpWiYQFqwuTaX3/JQs3atCzX8wgM9qV1J6Dp9I+jw7Ca4FQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=rfREWyNO25yJIz7rr+cssbXOGkP9Is5EGsMxq9XjX5c=;
- b=N/lm6+nl/ViCz79im9Za2AZCLLk9DbpIbZUhf2QPsaDvUtYGm+vT+2OTn1u3gdTmqnYzOm4vec/4cXP2fLWwZV+DKTeyTK/Tf8X0WyvIsjp1Qin2ytMqS30pHX/bT7s2XgYgWEMW1L/0aAYlOUSzlahotkgl9ZrEi3Iit3KzXsLEDFPpEn+vs1IyAJCMWGyVwZB2e8KU2siX/o64kaEOvjiYRXVlXDlrehouRWTaz30Key/4fpKjv3RiX2xKL9SoQ0Zb+8AtwmdVoH30rFjs8EfnLGUS1JmbsXTsBCrI0cmNa3vJMeZb/IFWicsBq+xKRh9RnPMgPLoESyr21txoyg==
+ bh=HAyjaKdkkSi4w9oUDn5Gji23Sdd6NQwuJmfyh+dK78M=;
+ b=NQ0TeW+d24BXF4YUD7YuYnlmV4Mb9M2HQeVGS12b/rwi38/bM6luv7Y7gBVsBR50h0WiawM+yea1sbcY6+7QU9M1Qj373mDi7t7sUxEb0RoLNH7+3agwvF2yYUhrr0fIGEoaSksZMqyypRpyLwKxad/DBCf2eK6HzzypEZLVcxP7X3xgQxs+QkUB4nbWL3dAvQA3jlh7SkWoSypjRY7xsa+heEnTwUxb0f72O/xT9TER4rHMoI5rjPqBcrJ1l37oShXMwEVWtuyIyS40qYe6EpEoUSF3ZZOypa446KTAK6zxm5GsQVmmBvd+0b6VlnCjgcKsmDfaqR49KurxRcNbdg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
@@ -35,18 +35,18 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=rfREWyNO25yJIz7rr+cssbXOGkP9Is5EGsMxq9XjX5c=;
- b=b4bH/VObuy5l82bZM0PfeQQtnT9AQMui7Qtr0+yC0lGNPyQKf8BPTiZzlzbmK27ChXVEhNkSxKCGHEQv853495ZjocphLuh1MCcTpBwAJS//j2MRTHPkDR84MbXWHHGvf261o3S/PyJlhDI8uqkTYVzSoN5//uV7uxgzJ0b7cYUahkc1jcvO4olgNnyUdrpfvrHROGsPGs5EpmE6H9TERPiy/BhpnqJIERnl66lBQkZNWcm9J4LOWXu/A3pW07o8UkAIH+L2E2s/NPDNK0+MTjiKWQruveMF1qhpvtCt3KERC+vGbsHN/0soqQnVcUjCXnMAzqpiApHNEaKRZ0FdOQ==
-Received: from MW4PR04CA0326.namprd04.prod.outlook.com (2603:10b6:303:82::31)
- by MW4PR12MB6826.namprd12.prod.outlook.com (2603:10b6:303:20c::8) with
+ bh=HAyjaKdkkSi4w9oUDn5Gji23Sdd6NQwuJmfyh+dK78M=;
+ b=WBA0C1jAYyM1PVoFEs/joWJ4dFEo2L2uc+6lcoLQ2wdzkIozOB5a4HBROcvwBA59tPYmBHKdFJZ3SQc/4ciwUURVWTlMsC9d1Zm6yri1N+D0GlVsajO6TtM63Cc/+1eU+nD7mkPWTw/0HmRPOgCmE6YsUipCV9Op+R7sKxSyHTjxAYEM/IKzAM9FuCWYE3kG1Oi4bw5EuQPen0uAryAaEMKjUJi5CV9EpVQb8ey2aiBCqYs2tbz5ccpm/fRrlIh0k7anBp40RVA8Mp4BCpC6f55P2Xrb1fXlxwj1sQBx5APZz7Ko2M8fwS+DuK0K8+DnWTpMcCIspPfazo2bpka53A==
+Received: from MW4PR03CA0237.namprd03.prod.outlook.com (2603:10b6:303:b9::32)
+ by BY1PR12MB8445.namprd12.prod.outlook.com (2603:10b6:a03:523::6) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.26; Tue, 8 Aug
- 2023 14:16:19 +0000
-Received: from MWH0EPF000989E9.namprd02.prod.outlook.com
- (2603:10b6:303:82:cafe::97) by MW4PR04CA0326.outlook.office365.com
- (2603:10b6:303:82::31) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.27 via Frontend
- Transport; Tue, 8 Aug 2023 14:16:19 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.44; Tue, 8 Aug
+ 2023 14:16:23 +0000
+Received: from MWH0EPF000989EC.namprd02.prod.outlook.com
+ (2603:10b6:303:b9:cafe::25) by MW4PR03CA0237.outlook.office365.com
+ (2603:10b6:303:b9::32) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.28 via Frontend
+ Transport; Tue, 8 Aug 2023 14:16:21 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
@@ -54,25 +54,26 @@ Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
  216.228.117.160 as permitted sender) receiver=protection.outlook.com;
  client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
 Received: from mail.nvidia.com (216.228.117.160) by
- MWH0EPF000989E9.mail.protection.outlook.com (10.167.241.136) with Microsoft
+ MWH0EPF000989EC.mail.protection.outlook.com (10.167.241.139) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6652.19 via Frontend Transport; Tue, 8 Aug 2023 14:16:19 +0000
+ 15.20.6652.19 via Frontend Transport; Tue, 8 Aug 2023 14:16:21 +0000
 Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
  (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Tue, 8 Aug 2023
- 07:16:06 -0700
+ 07:16:10 -0700
 Received: from dev-r-vrt-155.mtr.labs.mlnx (10.126.230.35) by
  rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.37; Tue, 8 Aug 2023 07:16:04 -0700
+ 15.2.986.37; Tue, 8 Aug 2023 07:16:07 -0700
 From: Ido Schimmel <idosch@nvidia.com>
 To: <netdev@vger.kernel.org>
 CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
 	<edumazet@google.com>, <petrm@nvidia.com>, <razor@blackwall.org>,
-	<mirsad.todorovac@alu.unizg.hr>, Ido Schimmel <idosch@nvidia.com>
-Subject: [PATCH net v2 12/17] selftests: forwarding: tc_flower: Relax success criterion
-Date: Tue, 8 Aug 2023 17:14:58 +0300
-Message-ID: <20230808141503.4060661-13-idosch@nvidia.com>
+	<mirsad.todorovac@alu.unizg.hr>, Ido Schimmel <idosch@nvidia.com>,
+	<dcaratti@redhat.com>
+Subject: [PATCH net v2 13/17] selftests: forwarding: tc_tunnel_key: Make filters more specific
+Date: Tue, 8 Aug 2023 17:14:59 +0300
+Message-ID: <20230808141503.4060661-14-idosch@nvidia.com>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20230808141503.4060661-1-idosch@nvidia.com>
 References: <20230808141503.4060661-1-idosch@nvidia.com>
@@ -89,26 +90,26 @@ X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
  rnnvmail201.nvidia.com (10.129.68.8)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MWH0EPF000989E9:EE_|MW4PR12MB6826:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7e3ce77c-94a6-4c7c-333a-08db981a0944
+X-MS-TrafficTypeDiagnostic: MWH0EPF000989EC:EE_|BY1PR12MB8445:EE_
+X-MS-Office365-Filtering-Correlation-Id: cb0c3c7f-7b2b-4715-55bc-08db981a0a89
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	zk4c1d15oIQdTI9jZn+WGajlz/8SyisSpBcIDi38+eSN7Q4g+0Ymk0FcGLYy8XKGzujx7AZZLloukQbCummT8jhikR+H00+1ZFZkjk7ZZNQx9vUZrNQpH3ilifImOqfEPyfnuPCmdMomplTdS0jqMFbWWvipjq78oB9eykIPCr6JGvIx9nGnJ66d3FjhJi9LBPV7o0qjk9BCbf5ENxb42NPY074kZEzIfZdLeUDtmI1nvEx3+uhQFwZR8L/57QZigzh5rmmQm3jXH9WOijqVVrUDUFlWibk6ZtaJ5DCzmkGKrdgUSFZp3Qvryuv49DisaB0yp9QmrD8lhTBstZemdMmBOznBiIUqlEC7hbt+380347ZE2M9ntHQuYjJA5hzOOQO5uyh4YjfMBo4CU0SysdaiFC4KhgqHe1Bv7mYhV8+tQoWZ+atiHf8K3J0XqclkJp2ZEQ2DEbpdcNYXoA+wBUvu1KWLRc6+GoiRxq1+1iIem7AHWXf+DWtBS6/8sxXvj8gsiCXyRoQ77Tym7j2USjoqeS+ARGLzxAKMhHsT7eE3MIQ5fQyFM3Ug9y8gRT/ziqwtJmnGA44GLIo6sPYt711AW0LWzG8glLCysiy3rIDkykIQVdMcQeUrPs6EID9cXm6sN3W0dBPaAB2eLG91UW4lonrzszkbcHEGjFzv3ojG+R+Z6QSFPu+RZZ35nZdOeKpHVVBlVtCIL4Kg2FJHdZdoTN8MLaVY7LT5u2LiaHEROS6NLnRZTHoRj1fcah65rxGpgvV2gP1stG/fnoE+ERtC7F92ec7wZlO7SjyzRpg=
+	AULA2DugIB3MOeB1RQFADx3fr2r5ywTe9fpHnS2oRzwwIwbGXqjwobqym5RGiEk0ZcAcOCYC4A+eTUh0EcgCpMQDXhc3dB4NbJieC20WCpGa9Lq1Nx2q3hU4w1gW3QbPqx+ltiQS89yijrMGKt4Hps3acPfpvTwCP/4jd5zBeSmiKvN3IoXDAT58LgWa0lvTQx+7A0y5r8Nw8PNMq7cfIwVUVauIB3hbbQFGOaLzJ+Ro+n21dJcmBiOfXw0nkJ6gmiUdB7mKTCEb/nkp+ymGfR0cnMRC/X0/h70w2LpERHmuc+526PhPl2QI/1MCTlM5rc7XBaLSKHBEHM0UevytIwOdQlDyuNwenkXKFB0XrVOajYR2SaQN16OtP1MB7yza13siRan3Mr0czY/C3rKcY+7umVbHq9lwUQK21EAiHKhDu0YyJz2PUpbQnlJGpzik6E6jo2O8zc67ZVwhwPNqGl9oLFglrabC5mleXU+mi7oNeJNV7KTAYn5y5nM2ZT2PvFUiZDlv7yR+LcuSAI8zvwrwUgsBv1HwwzqvFIRzRK4ovQGK6wwZrNPI5tQq8Mrm4e3v9jsDA+Ccc3aDhhCPgLCyQqdcGvXAKquxfX2vMFqNp9eqjDzjV4afyUSaDF7oyYdoT0F+zhuMXxgutHuaL0RJAC2ee1OlEvWDwG7kTT8AKZgKVKDEt7QUdEK4XYxQC1nzuWmM60P0uoyM9Hw4j2OhDgFCt23ArBEh6zQCgnc4oWjRa2aUNJ486hHaTfBMba+v3k0Kb/Acpr3tKDwQgLOGawue3c15yrNcbVPXlS8=
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(376002)(346002)(136003)(39860400002)(396003)(451199021)(82310400008)(1800799003)(186006)(36840700001)(46966006)(40470700004)(40480700001)(40460700003)(2616005)(336012)(6666004)(86362001)(478600001)(966005)(82740400003)(7636003)(26005)(36756003)(107886003)(1076003)(356005)(316002)(5660300002)(8936002)(6916009)(4326008)(2906002)(8676002)(70206006)(16526019)(41300700001)(54906003)(70586007)(83380400001)(47076005)(36860700001)(426003);DIR:OUT;SFP:1101;
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(346002)(136003)(376002)(39860400002)(396003)(186006)(451199021)(82310400008)(1800799003)(36840700001)(46966006)(40470700004)(83380400001)(426003)(36860700001)(47076005)(2616005)(40460700003)(40480700001)(6916009)(4326008)(8936002)(2906002)(5660300002)(316002)(8676002)(336012)(70586007)(70206006)(16526019)(966005)(478600001)(86362001)(7636003)(82740400003)(6666004)(54906003)(41300700001)(356005)(1076003)(36756003)(26005);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Aug 2023 14:16:19.3687
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Aug 2023 14:16:21.4838
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7e3ce77c-94a6-4c7c-333a-08db981a0944
+X-MS-Exchange-CrossTenant-Network-Message-Id: cb0c3c7f-7b2b-4715-55bc-08db981a0a89
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	MWH0EPF000989E9.namprd02.prod.outlook.com
+	MWH0EPF000989EC.namprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB6826
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY1PR12MB8445
 X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
 	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_NONE,URIBL_BLOCKED
@@ -116,50 +117,58 @@ X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-The test checks that filters that match on source or destination MAC
-were only hit once. A host can send more than one packet with a given
-source or destination MAC, resulting in failures.
+The test installs filters that match on various IP fragments (e.g., no
+fragment, first fragment) and expects a certain amount of packets to hit
+each filter. This is problematic as the filters are not specific enough
+and can match IP packets (e.g., IGMP) generated by the stack, resulting
+in failures [1].
 
-Fix by relaxing the success criterion and instead check that the filters
-were not hit zero times. Using tc_check_at_least_x_packets() is also an
-option, but it is not available in older kernels.
+Fix by making the filters more specific and match on more fields in the
+IP header: Source IP, destination IP and protocol.
 
-Fixes: 07e5c75184a1 ("selftests: forwarding: Introduce tc flower matching tests")
+[1]
+ # timeout set to 0
+ # selftests: net/forwarding: tc_tunnel_key.sh
+ # TEST: tunnel_key nofrag (skip_hw)                                   [FAIL]
+ #       packet smaller than MTU was not tunneled
+ # INFO: Could not test offloaded functionality
+ not ok 89 selftests: net/forwarding: tc_tunnel_key.sh # exit=1
+
+Fixes: 533a89b1940f ("selftests: forwarding: add tunnel_key "nofrag" test case")
 Reported-by: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
 Closes: https://lore.kernel.org/netdev/adc5e40d-d040-a65e-eb26-edf47dac5b02@alu.unizg.hr/
 Signed-off-by: Ido Schimmel <idosch@nvidia.com>
 Reviewed-by: Petr Machata <petrm@nvidia.com>
 Tested-by: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
+Acked-by: Davide Caratti <dcaratti@redhat.com>
 ---
- tools/testing/selftests/net/forwarding/tc_flower.sh | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+Cc: dcaratti@redhat.com
+---
+ tools/testing/selftests/net/forwarding/tc_tunnel_key.sh | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/tools/testing/selftests/net/forwarding/tc_flower.sh b/tools/testing/selftests/net/forwarding/tc_flower.sh
-index 683711f41aa9..b1daad19b01e 100755
---- a/tools/testing/selftests/net/forwarding/tc_flower.sh
-+++ b/tools/testing/selftests/net/forwarding/tc_flower.sh
-@@ -52,8 +52,8 @@ match_dst_mac_test()
- 	tc_check_packets "dev $h2 ingress" 101 1
- 	check_fail $? "Matched on a wrong filter"
+diff --git a/tools/testing/selftests/net/forwarding/tc_tunnel_key.sh b/tools/testing/selftests/net/forwarding/tc_tunnel_key.sh
+index 5ac184d51809..5a5dd9034819 100755
+--- a/tools/testing/selftests/net/forwarding/tc_tunnel_key.sh
++++ b/tools/testing/selftests/net/forwarding/tc_tunnel_key.sh
+@@ -104,11 +104,14 @@ tunnel_key_nofrag_test()
+ 	local i
  
--	tc_check_packets "dev $h2 ingress" 102 1
--	check_err $? "Did not match on correct filter"
-+	tc_check_packets "dev $h2 ingress" 102 0
-+	check_fail $? "Did not match on correct filter"
+ 	tc filter add dev $swp1 ingress protocol ip pref 100 handle 100 \
+-		flower ip_flags nofrag action drop
++		flower src_ip 192.0.2.1 dst_ip 192.0.2.2 ip_proto udp \
++		ip_flags nofrag action drop
+ 	tc filter add dev $swp1 ingress protocol ip pref 101 handle 101 \
+-		flower ip_flags firstfrag action drop
++		flower src_ip 192.0.2.1 dst_ip 192.0.2.2 ip_proto udp \
++		ip_flags firstfrag action drop
+ 	tc filter add dev $swp1 ingress protocol ip pref 102 handle 102 \
+-		flower ip_flags nofirstfrag action drop
++		flower src_ip 192.0.2.1 dst_ip 192.0.2.2 ip_proto udp \
++		ip_flags nofirstfrag action drop
  
- 	tc filter del dev $h2 ingress protocol ip pref 1 handle 101 flower
- 	tc filter del dev $h2 ingress protocol ip pref 2 handle 102 flower
-@@ -78,8 +78,8 @@ match_src_mac_test()
- 	tc_check_packets "dev $h2 ingress" 101 1
- 	check_fail $? "Matched on a wrong filter"
- 
--	tc_check_packets "dev $h2 ingress" 102 1
--	check_err $? "Did not match on correct filter"
-+	tc_check_packets "dev $h2 ingress" 102 0
-+	check_fail $? "Did not match on correct filter"
- 
- 	tc filter del dev $h2 ingress protocol ip pref 1 handle 101 flower
- 	tc filter del dev $h2 ingress protocol ip pref 2 handle 102 flower
+ 	# test 'nofrag' set
+ 	tc filter add dev h1-et egress protocol all pref 1 handle 1 matchall $tcflags \
 -- 
 2.40.1
 
