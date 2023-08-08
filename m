@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-25531-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25532-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 271C1774759
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 21:14:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BDFE8774765
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 21:14:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 56C461C20F41
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 19:14:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 89C0C1C20627
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 19:14:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 011611643A;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87B8D168BF;
 	Tue,  8 Aug 2023 19:13:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7EBC15AF8
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 19:13:54 +0000 (UTC)
-Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66F062127D
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 12:01:55 -0700 (PDT)
-Received: by mail-wr1-x433.google.com with SMTP id ffacd0b85a97d-313e742a787so91925f8f.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C184168BE
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 19:13:55 +0000 (UTC)
+Received: from mail-wr1-x42c.google.com (mail-wr1-x42c.google.com [IPv6:2a00:1450:4864:20::42c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1069D2178F
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 12:01:56 -0700 (PDT)
+Received: by mail-wr1-x42c.google.com with SMTP id ffacd0b85a97d-31792ac0fefso4526448f8f.2
         for <netdev@vger.kernel.org>; Tue, 08 Aug 2023 12:01:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20221208.gappssmtp.com; s=20221208; t=1691521313; x=1692126113;
+        d=bgdev-pl.20221208.gappssmtp.com; s=20221208; t=1691521314; x=1692126114;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=lVWCwLOI0RDSefmknyaUf7dplb4DpGR8Zf3HZcRuHo4=;
-        b=1wHx9o3c4Yz2BeeZHkHGOHcZ7QmYbWaBwzImwoUkKtTdUE7gcUEqg65Ywp8TyX7ZOz
-         i5YW7K5tIajPgn2Y2nLPv26Zt5GkrsAhc1YgQOe4h0Hm7GwYqDuuFsxCtAGKT4oLxv9G
-         qRtwgCh0j0yOIIhnKMENx16+kM6RfrRWfH7mkiPmdKdsN006Kvl3rv4qY8OhTrZ0dXq0
-         2BxlIghJlo4SaL+SKXv3kDjcVjru4ZKO+AKAsN9dZMBLcDYTGLL1RcFeUyINhPNXVQj8
-         ElJVfErnmvaj+OfkjXiLtN3rb+sztKz8UvOT04xDNprnyQ9ToBZZ/klOO3UunsHY+bp7
-         Sb+Q==
+        bh=6AVMi3m+Q5MvJdMExw+YrNYNaYdNKtgMOQAyEi8f+gA=;
+        b=SufPFQ91RJh5kAZrV8UXGUdeVb8XUeo2N7MuaHMHoPRXtKeXkBSsXtVjKRc/P5/VVQ
+         cGOk8AuS0O8HMC1CKtl979SOSTXU1wZ+qfGyL5M1O6Ksj4d0DB/RU/XbblowJcqgP2y/
+         0+IED/rEjXabX5Fm93I/HNr8kA4o4jMn/dZsge7sMKQDMziaeIrGu+s5ogyHLe0vlK4o
+         hH7jvaDBtaIXb285ZWJ7DbET57RwiNL/65ho1d36ZKAZ/s0iyKlcQVtmq7YN+ZFLX0Gv
+         /23lcbY7EZCXJYwkgj1/UiqBwqZtjjRbEMR4/oMO7DR6H8NricW2gMFteoLPHsTadxS5
+         5cnw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691521313; x=1692126113;
+        d=1e100.net; s=20221208; t=1691521314; x=1692126114;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=lVWCwLOI0RDSefmknyaUf7dplb4DpGR8Zf3HZcRuHo4=;
-        b=GuHnXXvhXypC8fJq+gqg4VR/IF1MKXmM2pBFEbpJh2YeXpk0moB/gJMFk5ytfhtCS1
-         0uC91fe0fpIfq1Jy5PK2zgRWTg/uzt+5lA8rP0jDiwqxXU89cxKjhtPutrm5oMbGz8qg
-         4ZkHQLdzLYyiRnfolJ2fCP8O+fJ/o7xTIihB9me2HgCmg9A9rpUqHI8uTaMNyEbV+8Bi
-         tAupOyzVPf2QeafBjFW8C8xLjiJjf1NLLlTtunfpzkYmVGo6fWzrdSp00n1pN+2wkRTS
-         r6Mj0UtZO5Vy3VyJFbmpDydorFq0veXZJsgPOeXfcGEtb1OfxRZAgdvRbmfsOKYoCMYS
-         +csg==
-X-Gm-Message-State: AOJu0Yykxu0wt45ArH//pQnq8Sy4h/9HNiI5RgrauoyCCRftSXmXmkyn
-	gOlxmLArLUTgyUhpTTVHORJ60w==
-X-Google-Smtp-Source: AGHT+IHtndLWibUQVcwtqnOkWRdaTuE84A1QwcAl7MRWdOnbv6AROq7OdLzJRoheCl6qZfsNQHrHtg==
-X-Received: by 2002:a5d:49c8:0:b0:315:acbc:cab6 with SMTP id t8-20020a5d49c8000000b00315acbccab6mr515129wrs.16.1691521313474;
-        Tue, 08 Aug 2023 12:01:53 -0700 (PDT)
+        bh=6AVMi3m+Q5MvJdMExw+YrNYNaYdNKtgMOQAyEi8f+gA=;
+        b=L6wSMmXa0RUjfknF3LsSYiqcdvHsL6KGfg4YD9/xOa6rJDhtyNHUWPKhB+lHHnUCll
+         vOky3AkhRlgP4geLReHwW+1f4K3g/s99twL70cI8mIk0nzUg8kgywmWy9RqgL6cF2AxM
+         5L9ei1MoZD8gqYJF5pdJNEo0xCOIcuJxWamRg/c9haDe2IwESx69WCdK6vmIvdtNMScx
+         npf+LxtuR1hbk/YgnyhAr6leYn4iNYiegc0hZjsw0yVlDap93O22Jca2ZxIEQjR6eYl0
+         XhQBLIYb2YeflK5TruhLNH1rQVFw0QYbov/HRuhyZnIrNBGmKgBEYFe12Gf/cFRbvk1n
+         09MQ==
+X-Gm-Message-State: AOJu0YyhKddI7w4qWh+o2gRR4eL3oJyk0pdnJjSAIjK5aCeHaGAQhU3o
+	BYDDEm6jJZSQl4K6MUlr0GVBxQ==
+X-Google-Smtp-Source: AGHT+IGeeYDtX1ov+h+ZegpFofb4lEN1A8Wq0j0TIu6j4ZZuQ8nE+uXnLpleqpYxsf8dm/hXfw/d7g==
+X-Received: by 2002:adf:dd8c:0:b0:317:612e:b764 with SMTP id x12-20020adfdd8c000000b00317612eb764mr289563wrl.58.1691521314580;
+        Tue, 08 Aug 2023 12:01:54 -0700 (PDT)
 Received: from brgl-uxlite.home ([2a01:cb1d:334:ac00:6a08:bcc0:ae83:e1dc])
-        by smtp.gmail.com with ESMTPSA id z14-20020adfe54e000000b00317e9f8f194sm7301055wrm.34.2023.08.08.12.01.52
+        by smtp.gmail.com with ESMTPSA id z14-20020adfe54e000000b00317e9f8f194sm7301055wrm.34.2023.08.08.12.01.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Aug 2023 12:01:53 -0700 (PDT)
+        Tue, 08 Aug 2023 12:01:54 -0700 (PDT)
 From: Bartosz Golaszewski <brgl@bgdev.pl>
 To: Andy Gross <agross@kernel.org>,
 	Bjorn Andersson <andersson@kernel.org>,
@@ -71,9 +71,9 @@ Cc: linux-arm-msm@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org,
 	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Subject: [PATCH v2 1/8] arm64: dts: qcom: sa8775p: add a node for the second serdes PHY
-Date: Tue,  8 Aug 2023 21:01:37 +0200
-Message-Id: <20230808190144.19999-2-brgl@bgdev.pl>
+Subject: [PATCH v2 2/8] arm64: dts: qcom: sa8775p: add a node for EMAC1
+Date: Tue,  8 Aug 2023 21:01:38 +0200
+Message-Id: <20230808190144.19999-3-brgl@bgdev.pl>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230808190144.19999-1-brgl@bgdev.pl>
 References: <20230808190144.19999-1-brgl@bgdev.pl>
@@ -92,34 +92,59 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 
 From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 
-Add a node for the SerDes PHY used by EMAC1 on sa8775p-ride.
+Add a node for the second MAC on sa8775p platforms.
 
 Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 Reviewed-by: Andrew Halaney <ahalaney@redhat.com>
 ---
- arch/arm64/boot/dts/qcom/sa8775p.dtsi | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ arch/arm64/boot/dts/qcom/sa8775p.dtsi | 34 +++++++++++++++++++++++++++
+ 1 file changed, 34 insertions(+)
 
 diff --git a/arch/arm64/boot/dts/qcom/sa8775p.dtsi b/arch/arm64/boot/dts/qcom/sa8775p.dtsi
-index 7b55cb701472..38d10af37ab0 100644
+index 38d10af37ab0..82af2e6cbda4 100644
 --- a/arch/arm64/boot/dts/qcom/sa8775p.dtsi
 +++ b/arch/arm64/boot/dts/qcom/sa8775p.dtsi
-@@ -1846,6 +1846,15 @@ serdes0: phy@8901000 {
- 			status = "disabled";
+@@ -2325,6 +2325,40 @@ cpufreq_hw: cpufreq@18591000 {
+ 			#freq-domain-cells = <1>;
  		};
  
-+		serdes1: phy@8902000 {
-+			compatible = "qcom,sa8775p-dwmac-sgmii-phy";
-+			reg = <0x0 0x08902000 0x0 0xe10>;
-+			clocks = <&gcc GCC_SGMI_CLKREF_EN>;
-+			clock-names = "sgmi_ref";
-+			#phy-cells = <0>;
++		ethernet1: ethernet@23000000 {
++			compatible = "qcom,sa8775p-ethqos";
++			reg = <0x0 0x23000000 0x0 0x10000>,
++			      <0x0 0x23016000 0x0 0x100>;
++			reg-names = "stmmaceth", "rgmii";
++
++			interrupts = <GIC_SPI 929 IRQ_TYPE_LEVEL_HIGH>;
++			interrupt-names = "macirq";
++
++			clocks = <&gcc GCC_EMAC1_AXI_CLK>,
++				 <&gcc GCC_EMAC1_SLV_AHB_CLK>,
++				 <&gcc GCC_EMAC1_PTP_CLK>,
++				 <&gcc GCC_EMAC1_PHY_AUX_CLK>;
++
++			clock-names = "stmmaceth",
++				      "pclk",
++				      "ptp_ref",
++				      "phyaux";
++
++			power-domains = <&gcc EMAC1_GDSC>;
++
++			phys = <&serdes1>;
++			phy-names = "serdes";
++
++			iommus = <&apps_smmu 0x140 0xf>;
++
++			snps,tso;
++			snps,pbl = <32>;
++			rx-fifo-depth = <16384>;
++			tx-fifo-depth = <16384>;
++
 +			status = "disabled";
 +		};
 +
- 		pdc: interrupt-controller@b220000 {
- 			compatible = "qcom,sa8775p-pdc", "qcom,pdc";
- 			reg = <0x0 0x0b220000 0x0 0x30000>,
+ 		ethernet0: ethernet@23040000 {
+ 			compatible = "qcom,sa8775p-ethqos";
+ 			reg = <0x0 0x23040000 0x0 0x10000>,
 -- 
 2.39.2
 
