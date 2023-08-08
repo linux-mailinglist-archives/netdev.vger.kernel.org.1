@@ -1,115 +1,113 @@
-Return-Path: <netdev+bounces-25416-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25413-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D17B773EAA
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 18:33:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B8693773E78
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 18:30:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7D0441C20FD0
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 16:33:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E843E1C20BA6
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 16:30:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A9E013FF3;
-	Tue,  8 Aug 2023 16:33:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23F4414A86;
+	Tue,  8 Aug 2023 16:30:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CE7926B21
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 16:33:49 +0000 (UTC)
-Received: from mail-qv1-xf30.google.com (mail-qv1-xf30.google.com [IPv6:2607:f8b0:4864:20::f30])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41324332AA
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 09:33:37 -0700 (PDT)
-Received: by mail-qv1-xf30.google.com with SMTP id 6a1803df08f44-63d1238c300so29465286d6.0
-        for <netdev@vger.kernel.org>; Tue, 08 Aug 2023 09:33:37 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18E771989B
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 16:30:45 +0000 (UTC)
+Received: from mail-ej1-x642.google.com (mail-ej1-x642.google.com [IPv6:2a00:1450:4864:20::642])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 063EED4BE3
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 09:30:28 -0700 (PDT)
+Received: by mail-ej1-x642.google.com with SMTP id a640c23a62f3a-99c93638322so3638666b.1
+        for <netdev@vger.kernel.org>; Tue, 08 Aug 2023 09:30:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1691512393; x=1692117193;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=h1jWjdgcMtkS8z/zWGRD8ihE010a+ozHwBFvKhqo23k=;
-        b=odM2CEY1FRyCoab/fC1eNBUzNXqqakMfkwAgLHsbSO+VTQHRpWzo+5hHv6o++4FEeE
-         gDXmHxCVWpOuyMw9v5BdhQhAkMVpH4QcxCeNp6Mh8x6MtW2Uq+xx1iMORxREVYOa4+dT
-         7inlQa5LbDVHN8N74x0BzdSr+MHx1UPCLhKPJQfDP06NiyljUJBblFEPqyp64EMQnyi+
-         /nq20T4xJe5rPOmIrifSlWDULzDchzhLYW7bpVgOa8zxsCQRCVeGBLylbOkqqxxYCTBm
-         gmYhKN4fSz//RH2XuUafiGZSqUh5O7HY/UsdIeXv1+8X+CozZEcwSey4xoQhR+yVIjbA
-         WH5Q==
+        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1691512208; x=1692117008;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=rboElf/BVI2bc3A5WovY2cK4t5A5anr+6YjghXJ6T/I=;
+        b=a90BiLmFG3sYlSbJ++1THe2SrdqdmA8ilBdv2KVlcSCjxlI3DXPatsDo0Zp8GbhdT2
+         qla6QAHyD8VyFS8Bk2YEqoil8xRt/6cx/sAvm91FWSUOoTR9U84eLkCFWMLBGDBRcvZY
+         5wNd0o5UHBOmEqNmz8i721wVvCBhACmcincl+b++1VDEMq6RgFCS5PLSbh2nHDVn1GJH
+         iPGe2sayjU2nar90NW6Gw4nV0zbopflab+iYnV+OBbcoFfU4qXa/j1a2MxQ1ydPgtpzN
+         e/XfQ2RYWAeBjvHzkVanmkQtkgFmv9fGQRNVVtFSgdbsobY0Fi6JcBEiQ8sVxg+kbjuL
+         0WSA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691512393; x=1692117193;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=h1jWjdgcMtkS8z/zWGRD8ihE010a+ozHwBFvKhqo23k=;
-        b=la5SA7HVOIQqHp/sIO2/1YeCuE0TDDkClXxdv4/LG9dV7Tz8l4Dk5RnuDS98TFoU1N
-         MQLVRqnvbXfgR0iAGERaMPzXAr2JEvCdH3fQFiiSP4shsKGD8Ne4wEVsd9vyZPX8YyIW
-         OOZ0hvm4C7NY9lO0W0++ujbXAco7XckePHRPKtcedciulAq1w5Anp6rmu6n0f5/HWt4q
-         eDf1v9d0YHs2D3iNeb3jxUdqyTDg0XkKr5zJUqFxuaCEp0G3MsyOudPfLq4Zb9CrQPdM
-         MqTgQluB+ArXddYWmv6m3bzPiOjNaUCu1k40ua2eKQr1tXK0O0g65K0o25UaDddzXsSn
-         oaWg==
-X-Gm-Message-State: AOJu0Yx/gWE22uMpoNfv/4ESclnRhTLtBMw/dwOLed71VY5LTQ0iDs35
-	U2pJVVdwwZsxQrCplnumTaYOcUfSELs0lci2d2TxG+Av0Plq+r4p
-X-Google-Smtp-Source: AGHT+IE/m/O86+1kRO0A1smGtafOuu/t8la0fmfi5L2yurMCmbtwgtH9QAEdX4VoPwi2Z4+7B32cwpghwJP0TuXuQTc=
-X-Received: by 2002:a25:5083:0:b0:d47:5994:c0fd with SMTP id
- e125-20020a255083000000b00d475994c0fdmr6301271ybb.49.1691485264866; Tue, 08
- Aug 2023 02:01:04 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1691512208; x=1692117008;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=rboElf/BVI2bc3A5WovY2cK4t5A5anr+6YjghXJ6T/I=;
+        b=FM9+lWmAeQyYEXTlTk1r1Y92DooNeVgQosX4RLK2git6hAM/yzKPu1rW05IawoXkt+
+         JuASbE4xsybBKT0Co0iKgms+Zumdb1wjVVrlGNGEeWu7SNRlWsTxi+Mn82080k4QQn2P
+         SEyTM5lcmPupJ5wskMF+xOOOlIEPP/QG+oUBlklMlyFzMiKCGv9EzXMmiqzTahRsxs3g
+         IAdMXp47aMzuZkvrO2U6s7gY1RTL3WEYQ+Etc80XosGbnXg9wqAxe3MK53YCtJl2ypuf
+         pTmv/S1ZdQRvyqvTgFp9Zn4WLO9W+DoBLWsnTcVbaK1R1fx+fRobNnrjxvqN8SXzSBok
+         OG8A==
+X-Gm-Message-State: AOJu0YxP9sVJuLQxNX8fJCldMVK84wvybBbRPbmu4ydtRN3Xw5815bck
+	c8triMAXAYhcTRJDcNU0uD3NDH29Vs5gianhVhhJgZW01i4=
+X-Google-Smtp-Source: AGHT+IG8QmO1vMNrgxAHbE9HRffpYK/5oXTWBdoPWU3/u5EHF1MovgR+2EUUpq/0rKo2JilVYz98Zg==
+X-Received: by 2002:a5d:6ac5:0:b0:317:6570:afec with SMTP id u5-20020a5d6ac5000000b003176570afecmr7711119wrw.3.1691485426111;
+        Tue, 08 Aug 2023 02:03:46 -0700 (PDT)
+Received: from localhost ([212.23.236.67])
+        by smtp.gmail.com with ESMTPSA id h3-20020a5d5483000000b0030ae53550f5sm12916742wrv.51.2023.08.08.02.03.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Aug 2023 02:03:45 -0700 (PDT)
+From: Jiri Pirko <jiri@resnulli.us>
+To: netdev@vger.kernel.org
+Cc: kuba@kernel.org,
+	pabeni@redhat.com,
+	davem@davemloft.net,
+	edumazet@google.com
+Subject: [patch net-next] ynl-gen-c.py: avoid rendering empty validate field
+Date: Tue,  8 Aug 2023 11:03:44 +0200
+Message-ID: <20230808090344.1368874-1-jiri@resnulli.us>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230726150225.483464-1-herve.codina@bootlin.com>
- <20230726150225.483464-25-herve.codina@bootlin.com> <CACRpkdYXCQRd3ZXNGHwMaQYiJc7tGtAJnBaSh5O-8ruDAJVdiA@mail.gmail.com>
- <8f80edf2-c93d-416f-bcab-f7be3badf64a@sirena.org.uk>
-In-Reply-To: <8f80edf2-c93d-416f-bcab-f7be3badf64a@sirena.org.uk>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Tue, 8 Aug 2023 11:00:53 +0200
-Message-ID: <CACRpkdYuJ+4hccip+m9SDv63DZQ1+knFnUm431Ki-K5qi49ExQ@mail.gmail.com>
-Subject: Re: [PATCH v2 24/28] pinctrl: Add support for the Lantic PEF2256 pinmux
-To: Mark Brown <broonie@kernel.org>
-Cc: Herve Codina <herve.codina@bootlin.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Andrew Lunn <andrew@lunn.ch>, Rob Herring <robh+dt@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Lee Jones <lee@kernel.org>, Qiang Zhao <qiang.zhao@nxp.com>, Li Yang <leoyang.li@nxp.com>, 
-	Liam Girdwood <lgirdwood@gmail.com>, Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, 
-	Shengjiu Wang <shengjiu.wang@gmail.com>, Xiubo Li <Xiubo.Lee@gmail.com>, 
-	Fabio Estevam <festevam@gmail.com>, Nicolin Chen <nicoleotsuka@gmail.com>, 
-	Christophe Leroy <christophe.leroy@csgroup.eu>, Randy Dunlap <rdunlap@infradead.org>, 
-	netdev@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-gpio@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	alsa-devel@alsa-project.org, Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-0.6 required=5.0 tests=BAYES_00,DATE_IN_PAST_06_12,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Aug 7, 2023 at 3:10=E2=80=AFPM Mark Brown <broonie@kernel.org> wrot=
-e:
-> On Mon, Aug 07, 2023 at 03:05:15PM +0200, Linus Walleij wrote:
-> > On Wed, Jul 26, 2023 at 5:04=E2=80=AFPM Herve Codina <herve.codina@boot=
-lin.com> wrote:
->
-> > > +#include "linux/bitfield.h"
->
-> > Really? I don't think there is such a file there.
->
-> > Do you mean <linux/bitfield.h> and does this even compile?
->
-> #include "" means "try the local directory first then fall back to
-> system includes" so it'll work, it picks up extra stuff on top of what
-> <> does.  There's a stylistic issue though.
+From: Jiri Pirko <jiri@nvidia.com>
 
-Wow that's a neat trick, I learn something new every day!
+When dont-validate flags are filtered out for do/dump op, the list may
+be empty. In that case, avoid rendering the validate field.
 
-But we probably wanna be sure to get the system include.
+Fixes: fa8ba3502ade ("ynl-gen-c.py: render netlink policies static for split ops")
+Signed-off-by: Jiri Pirko <jiri@nvidia.com>
+---
+ tools/net/ynl/ynl-gen-c.py | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-Yours,
-Linus Walleij
+diff --git a/tools/net/ynl/ynl-gen-c.py b/tools/net/ynl/ynl-gen-c.py
+index e64311331726..6b9d9380a6ab 100755
+--- a/tools/net/ynl/ynl-gen-c.py
++++ b/tools/net/ynl/ynl-gen-c.py
+@@ -2000,9 +2000,10 @@ def print_kernel_op_table(family, cw):
+                             continue
+                         dont_validate.append(x)
+ 
+-                    members.append(('validate',
+-                                    ' | '.join([c_upper('genl-dont-validate-' + x)
+-                                                for x in dont_validate])), )
++                    if dont_validate:
++                        members.append(('validate',
++                                        ' | '.join([c_upper('genl-dont-validate-' + x)
++                                                    for x in dont_validate])), )
+                 name = c_lower(f"{family.name}-nl-{op_name}-{op_mode}it")
+                 if 'pre' in op[op_mode]:
+                     members.append((cb_names[op_mode]['pre'], c_lower(op[op_mode]['pre'])))
+-- 
+2.41.0
+
 
