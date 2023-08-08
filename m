@@ -1,89 +1,140 @@
-Return-Path: <netdev+bounces-25569-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25570-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9BA1E774C5B
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 23:07:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F9D2774C6F
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 23:09:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5469E281852
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 21:07:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 95E1C2818B3
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 21:09:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 572AD171B2;
-	Tue,  8 Aug 2023 21:06:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DD48171B9;
+	Tue,  8 Aug 2023 21:09:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B6E2174C1
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 21:06:12 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 203ED5A74
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 14:06:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:
-	Message-Id:Date:Subject:Cc:To:From:From:Sender:Reply-To:Subject:Date:
-	Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=zXQU5nftJUwqDXbgW7ERPV1vkM/LkTMl+b3TCckj99o=; b=ab84kOno4qIrJvOJPOcYfDc/FK
-	nD/SaSkvV4Q4rXmX53vKCj5gNcKvaZx061z8jhMwYpCtk30eGeH1+t7MWo+pgBJQTx5I0gMjSXnMr
-	L0krI/k56GMoWD+prgQ9T3AspCdH2+GbMHQ/wMpJxedObwhvyKbe1QNOlSRFkLc878/M=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qTTsw-003WGb-Uh; Tue, 08 Aug 2023 23:04:58 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: netdev <netdev@vger.kernel.org>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <rmk+kernel@armlinux.org.uk>,
-	Simon Horman <simon.horman@corigine.com>,
-	Christian Marangi <ansuelsmth@gmail.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Andrew Lunn <andrew@lunn.ch>
-Subject: [PATCH net-next v3 4/4] leds: trig-netdev: Disable offload on deactivation of trigger
-Date: Tue,  8 Aug 2023 23:04:36 +0200
-Message-Id: <20230808210436.838995-5-andrew@lunn.ch>
-X-Mailer: git-send-email 2.37.2
-In-Reply-To: <20230808210436.838995-1-andrew@lunn.ch>
-References: <20230808210436.838995-1-andrew@lunn.ch>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FA041B7F0
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 21:09:20 +0000 (UTC)
+Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6B9B49FE
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 14:09:18 -0700 (PDT)
+Received: by mail-lj1-x22e.google.com with SMTP id 38308e7fff4ca-2b703a0453fso96352551fa.3
+        for <netdev@vger.kernel.org>; Tue, 08 Aug 2023 14:09:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1691528957; x=1692133757;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=BIVqZlvPJ9fgIaaNuTsdRAq85ukf0lxErXcc6/G+RDw=;
+        b=cgKD8XBmozGfOgW54nzq5EcoYV7HcP2vaLw+8iMB+rd3pQjaIs/IY9HMh/6uzJfZJo
+         6jYSi564yHGL2hg0stid4EoXcZfuclprPJgZutgb55YvCYARZlyHa+0MGZzUf+S7/ruV
+         EJETcwMTV7Qi4y5HE3DKawKJCwMQjuPYcoTqFMkIVVjAWl6vRnpcdFYxd8u4/uOqO8wQ
+         B0C/oYXExB07Vl0sDXrvW93AEiNqSUtRUkoQ7KQn1JYG074+ciAPzMwSPXUSukuVcaU9
+         n6vzppf6dwT0yk/bFjTKExjgjZ49TpXmzPJNf8GOVFjJCPQYo+JxhdO+I5O86Z0cp+iT
+         DP/g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691528957; x=1692133757;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=BIVqZlvPJ9fgIaaNuTsdRAq85ukf0lxErXcc6/G+RDw=;
+        b=Yc/C7nM9xVWPeLaF4dnAj7X9zFSYV+a6ZaxocmEXSY72r+0tfDm2ADzKoHPhSFivzf
+         SCGvripzRGBju1LQTtFCXVubRVmVR6HIcCQVcnnyq4+WITKysJA/IUYSZhNvTPPR4wcP
+         dDpPnVpCmBYBagk0wfESwE+9yML2Kscb6N+7U3laKnXP3UscZIx6VHvAeFpGscdHei7l
+         7iZ8JibX79zWfqV3VFS1eN18lk0GkR1pwAv8Qa6SkZ6aIYM2H4ubT8IiutkNu8KO7VZL
+         b404qClopfUoU7Yxi4kgXTMtmk9AHvHZHqBcecaOlgvJdcpqV6hraMY4nAdbnFEZ+QTQ
+         oSXg==
+X-Gm-Message-State: AOJu0YzcTOwknkST0g1I1vSuQCxFWKpoRbzEg7G6fOoCpCQaoWxBaTld
+	2ijWx6IrdCNW6O0IrRZ1ywMnCA==
+X-Google-Smtp-Source: AGHT+IEzO5jVRFsFGsfZ03UX1LalSIb1Qb+8s6PoBz0649mQjtw/9h3dPqrZr43hrT4zp5MpyRLpXw==
+X-Received: by 2002:a05:651c:151:b0:2b9:aa4d:3729 with SMTP id c17-20020a05651c015100b002b9aa4d3729mr478671ljd.28.1691528956955;
+        Tue, 08 Aug 2023 14:09:16 -0700 (PDT)
+Received: from [192.168.1.101] (abxi185.neoplus.adsl.tpnet.pl. [83.9.2.185])
+        by smtp.gmail.com with ESMTPSA id l13-20020a2e700d000000b002b9c0822951sm2395753ljc.119.2023.08.08.14.09.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 08 Aug 2023 14:09:16 -0700 (PDT)
+Message-ID: <4b9544e0-e947-467b-bc1f-5c5de8490642@linaro.org>
+Date: Tue, 8 Aug 2023 23:09:14 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 5/8] arm64: dts: qcom: sa8775p-ride: index the first
+ SGMII PHY
+Content-Language: en-US
+To: Bartosz Golaszewski <brgl@bgdev.pl>, Andy Gross <agross@kernel.org>,
+ Bjorn Andersson <andersson@kernel.org>, Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>, Alex Elder <elder@linaro.org>,
+ Srini Kandagatla <srinivas.kandagatla@linaro.org>,
+ Andrew Halaney <ahalaney@redhat.com>
+Cc: linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+References: <20230808190144.19999-1-brgl@bgdev.pl>
+ <20230808190144.19999-6-brgl@bgdev.pl>
+From: Konrad Dybcio <konrad.dybcio@linaro.org>
+Autocrypt: addr=konrad.dybcio@linaro.org; keydata=
+ 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
+ izWDgYvmBE8=
+In-Reply-To: <20230808190144.19999-6-brgl@bgdev.pl>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Ensure that the offloading of blinking is stopped when the trigger is
-deactivated. Calling led_set_brightness() is documented as stopping
-offload and setting the LED to a constant brightness.
+On 8.08.2023 21:01, Bartosz Golaszewski wrote:
+> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> 
+> We'll be adding a second SGMII PHY on the same MDIO bus, so let's index
+> the first one for better readability.
+> 
+> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> Reviewed-by: Andrew Halaney <ahalaney@redhat.com>
+> ---
+Reviewed-by: Konrad Dybcio <konrad.dybcio@linaro.org>
 
-Suggested-by: Daniel Golle <daniel@makrotopia.org>
-Signed-off-by: Andrew Lunn <andrew@lunn.ch>
----
- drivers/leds/trigger/ledtrig-netdev.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/drivers/leds/trigger/ledtrig-netdev.c b/drivers/leds/trigger/ledtrig-netdev.c
-index 3d215a556e20..42f758880ef8 100644
---- a/drivers/leds/trigger/ledtrig-netdev.c
-+++ b/drivers/leds/trigger/ledtrig-netdev.c
-@@ -595,6 +595,8 @@ static void netdev_trig_deactivate(struct led_classdev *led_cdev)
- 
- 	cancel_delayed_work_sync(&trigger_data->work);
- 
-+	led_set_brightness(led_cdev, LED_OFF);
-+
- 	dev_put(trigger_data->net_dev);
- 
- 	kfree(trigger_data);
--- 
-2.40.1
-
+Konrad
 
