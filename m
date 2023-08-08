@@ -1,197 +1,155 @@
-Return-Path: <netdev+bounces-25270-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25271-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF9C17739EA
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 13:33:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB90D773A0C
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 14:08:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7AA74281799
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 11:33:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D8B421C20F37
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 12:08:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68773100A1;
-	Tue,  8 Aug 2023 11:33:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2048B100A6;
+	Tue,  8 Aug 2023 12:08:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27154F9D5;
-	Tue,  8 Aug 2023 11:33:07 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A62B7C433C8;
-	Tue,  8 Aug 2023 11:33:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF32B100A3
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 12:08:06 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5CCADC433C8;
+	Tue,  8 Aug 2023 12:08:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691494387;
-	bh=zPQVZA2bYSxwCU7Qt24oCwtT7WsU+CJx5qmZPXjM4nw=;
-	h=Date:Cc:Subject:To:References:From:In-Reply-To:From;
-	b=W6z8p4EOQkKq8F4V6ISKH5JVTBVOxPy9s8s8k+1ozawe46TIvVUu2oUxM4GW6LAjV
-	 D024Kz2Woi6e/qCeiC4qXd1bHU/iMjZyXMuaRbNia1t8JvbY/r1PWpWWWEonbbSgTP
-	 ZZ73/6bqb4e1Q4kW1gtJd/d0muWJwhvfwvZJetpmynxTSQSKkYrc6kT+3P4dW3vw8t
-	 HQ/mKznQwl+VBI2SwjiGSc2DIInlzskkyZtkpIOZIKvhRKSqbjTkzilHY2tXa0CjfV
-	 FCW4Zi7kjIGGenoat+KfuntjFAGKBWuc9DM77xOVBrxYPZwitz9WEv1C1zcTYOltqk
-	 eta5+GSpR3Kcg==
-Message-ID: <aa9ec752-9f59-056f-da52-7ec5047e4642@kernel.org>
-Date: Tue, 8 Aug 2023 13:33:02 +0200
+	s=k20201202; t=1691496486;
+	bh=iKFqjhht/NXdZgjGWSjxol/XyOZYksQmyjVTIwqbqok=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=b+WW0w8h/Gbs8bpKCSYCtqnRjZTq3Ub0tNBt5pnkvUPjXE/936GbOIZKmpx8L8zKr
+	 HlQYtOfpaqqwpjC9h7cRK8rPo2E6b0Qw75oyRooQGgEtTKNtcUkG+SWeCiYLV77O2M
+	 sqQBJtRZ4GYHzpsl9r83Giab/iOx+A2Yudx/YRS/Kcyu9xRAPUsBZXhGLQ7sDr6/cu
+	 NzoSNRXCOzp5fygWFv4De+UcwhH/7LCqYMMoaYu86hGf13POhB1y3L1xq1v1Yct9OG
+	 6ovdTEIzSiIM49GuhPzeTTr19gS6H3iTpJ2gONcX0JGEIXr7yqcyQyAy/T4O5Sw1BK
+	 Y2nrkJa66ea7g==
+Date: Tue, 8 Aug 2023 13:08:00 +0100
+From: Conor Dooley <conor@kernel.org>
+To: MD Danish Anwar <danishanwar@ti.com>
+Cc: Randy Dunlap <rdunlap@infradead.org>, Roger Quadros <rogerq@kernel.org>,
+	Simon Horman <simon.horman@corigine.com>,
+	Vignesh Raghavendra <vigneshr@ti.com>, Andrew Lunn <andrew@lunn.ch>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Rob Herring <robh+dt@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>, nm@ti.com, srk@ti.com,
+	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
+	netdev@vger.kernel.org, linux-omap@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v2 0/5] Introduce IEP driver and packet timestamping
+ support
+Message-ID: <20230808-unnerving-press-7b61f9c521dc@spud>
+References: <20230807110048.2611456-1-danishanwar@ti.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Cc: "davem@davemloft.net" <davem@davemloft.net>,
- "edumazet@google.com" <edumazet@google.com>,
- "pabeni@redhat.com" <pabeni@redhat.com>, Shenwei Wang
- <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>,
- "ast@kernel.org" <ast@kernel.org>,
- "daniel@iogearbox.net" <daniel@iogearbox.net>,
- "john.fastabend@gmail.com" <john.fastabend@gmail.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- dl-linux-imx <linux-imx@nxp.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "bpf@vger.kernel.org" <bpf@vger.kernel.org>, Andrew Lunn <andrew@lunn.ch>
-Subject: Re: [PATCH V3 net-next] net: fec: add XDP_TX feature support
-Content-Language: en-US
-To: Wei Fang <wei.fang@nxp.com>, Jesper Dangaard Brouer <hawk@kernel.org>,
- Jesper Dangaard Brouer <jbrouer@redhat.com>, Jakub Kicinski <kuba@kernel.org>
-References: <20230731060025.3117343-1-wei.fang@nxp.com>
- <20230802104706.5ce541e9@kernel.org>
- <AM5PR04MB313985C61D92E183238809138808A@AM5PR04MB3139.eurprd04.prod.outlook.com>
- <1bf41ea8-5131-7d54-c373-00c1fbcac095@redhat.com>
- <AM5PR04MB31398ABF941EBDD0907E845B8808A@AM5PR04MB3139.eurprd04.prod.outlook.com>
- <cc24e860-7d6f-7ec8-49cb-a49cb066f618@kernel.org>
- <AM5PR04MB3139D8AAAB6B96B58425BBA08809A@AM5PR04MB3139.eurprd04.prod.outlook.com>
- <ba96db35-2273-9cc5-9a32-e924e8eff37c@kernel.org>
- <AM5PR04MB313903036E0DF277FEC45722880CA@AM5PR04MB3139.eurprd04.prod.outlook.com>
- <8fd0313b-8f6f-9814-247d-c2687d053e2a@kernel.org>
- <AM5PR04MB313980263DAD261D114B3DA4880DA@AM5PR04MB3139.eurprd04.prod.outlook.com>
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <AM5PR04MB313980263DAD261D114B3DA4880DA@AM5PR04MB3139.eurprd04.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="3Wq7r3DP1wfOlIpT"
+Content-Disposition: inline
+In-Reply-To: <20230807110048.2611456-1-danishanwar@ti.com>
 
 
+--3Wq7r3DP1wfOlIpT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 08/08/2023 07.02, Wei Fang wrote:
->>> For XDP_REDIRECT, the performance show as follow.
->>> root@imx8mpevk:~# ./xdp_redirect eth1 eth0 Redirecting from eth1
->>> (ifindex 3; driver st_gmac) to eth0 (ifindex 2; driver fec)
->>
->> This is not exactly the same as XDP_TX setup as here you choose to redirect
->> between eth1 (driver st_gmac) and to eth0 (driver fec).
->>
->> I would like to see eth0 to eth0 XDP_REDIRECT, so we can compare to
->> XDP_TX performance.
->> Sorry for all the requests, but can you provide those numbers?
->>
-> 
-> Oh, sorry, I thought what you wanted were XDP_REDIRECT results for different
-> NICs. Below is the result of XDP_REDIRECT on the same NIC.
-> root@imx8mpevk:~# ./xdp_redirect eth0 eth0
-> Redirecting from eth0 (ifindex 2; driver fec) to eth0 (ifindex 2; driver fec)
-> Summary        232,302 rx/s        0 err,drop/s      232,344 xmit/s
-> Summary        234,579 rx/s        0 err,drop/s      234,577 xmit/s
-> Summary        235,548 rx/s        0 err,drop/s      235,549 xmit/s
-> Summary        234,704 rx/s        0 err,drop/s      234,703 xmit/s
-> Summary        235,504 rx/s        0 err,drop/s      235,504 xmit/s
-> Summary        235,223 rx/s        0 err,drop/s      235,224 xmit/s
-> Summary        234,509 rx/s        0 err,drop/s      234,507 xmit/s
-> Summary        235,481 rx/s        0 err,drop/s      235,482 xmit/s
-> Summary        234,684 rx/s        0 err,drop/s      234,683 xmit/s
-> Summary        235,520 rx/s        0 err,drop/s      235,520 xmit/s
-> Summary        235,461 rx/s        0 err,drop/s      235,461 xmit/s
-> Summary        234,627 rx/s        0 err,drop/s      234,627 xmit/s
-> Summary        235,611 rx/s        0 err,drop/s      235,611 xmit/s
->    Packets received    : 3,053,753
->    Average packets/s   : 234,904
->    Packets transmitted : 3,053,792
->    Average transmit/s  : 234,907
->>
->> I'm puzzled that moving the MMIO write isn't change performance.
->>
->> Can you please verify that the packet generator machine is sending more
->> frame than the system can handle?
->>
->> (meaning the pktgen_sample03_burst_single_flow.sh script fast enough?)
->>
-> 
-> Thanks very much!
-> You remind me, I always started the pktgen script first and then ran the xdp2
-> program in the previous tests. So I saw the transmit speed of the generator
-> was always greater than the speed of XDP_TX when I stopped the script. But
-> actually, the real-time transmit speed of the generator was degraded to as
-> equal to the speed of XDP_TX.
-> 
+On Mon, Aug 07, 2023 at 04:30:43PM +0530, MD Danish Anwar wrote:
+> This series introduces Industrial Ethernet Peripheral (IEP) driver to
+> support timestamping of ethernet packets and thus support PTP and PPS
+> for PRU ICSSG ethernet ports.
+>=20
+> This series also adds 10M full duplex support for ICSSG ethernet driver.
+>=20
+> There are two IEP instances. IEP0 is used for packet timestamping while I=
+EP1
+> is used for 10M full duplex support.
+>=20
+> This is v2 of the series [v1]. It addresses comments made on [v1].
+> This series is based on linux-next(#next-20230807).=20
+>=20
+> Changes from v1 to v2:
+> *) Addressed Simon's comment to fix reverse xmas tree declaration. Some A=
+PIs
+>    in patch 3 and 4 were not following reverse xmas tree variable declara=
+tion.
+>    Fixed it in this version.
+> *) Addressed Conor's comments and removed unsupported SoCs from compatible
+>    comment in patch 1.=20
 
-Good that we finally found the root-cause, that explains why it seems
-our code changes didn't have any effect.  The generator gets affected
-and slowed down due to the traffic that is bounced back to it. (I tried
-to hint this earlier with the Ethernet Flow-Control settings).
+I'm sorry I missed responding there before you sent v2, it was a bank
+holiday yesterday. I'm curious why you removed them, rather than just
+added them with a fallback to the ti,am654-icss-iep compatible, given
+your comment that "the same compatible currently works for all these
+3 SoCs".
 
-> So I turned off the rx function of the generator in case of increasing the CPU
-> loading of the generator due to the returned traffic from xdp2. 
+Thanks,
+Conor.
 
-How did you turned off the rx function of the generator?
-(I a couple of tricks I use)
+> *) Addded patch 2 which was not part of v1. Patch 2, adds IEP node to dt
+>    bindings for ICSSG.
+>=20
+> [v1] https://lore.kernel.org/all/20230803110153.3309577-1-danishanwar@ti.=
+com/
+>=20
+> Thanks and Regards,
+> Md Danish Anwar
+>=20
+> Grygorii Strashko (1):
+>   net: ti: icssg-prueth: am65x SR2.0 add 10M full duplex support
+>=20
+> MD Danish Anwar (1):
+>   dt-bindings: net: Add iep node in ICSSG driver dt binding
+>=20
+> Md Danish Anwar (1):
+>   dt-bindings: net: Add ICSS IEP
+>=20
+> Roger Quadros (2):
+>   net: ti: icss-iep: Add IEP driver
+>   net: ti: icssg-prueth: add packet timestamping and ptp support
+>=20
+>  .../devicetree/bindings/net/ti,icss-iep.yaml  |  37 +
+>  .../bindings/net/ti,icssg-prueth.yaml         |   7 +
+>  drivers/net/ethernet/ti/Kconfig               |  12 +
+>  drivers/net/ethernet/ti/Makefile              |   1 +
+>  drivers/net/ethernet/ti/icssg/icss_iep.c      | 961 ++++++++++++++++++
+>  drivers/net/ethernet/ti/icssg/icss_iep.h      |  41 +
+>  drivers/net/ethernet/ti/icssg/icssg_config.c  |   6 +
+>  drivers/net/ethernet/ti/icssg/icssg_ethtool.c |  21 +
+>  drivers/net/ethernet/ti/icssg/icssg_prueth.c  | 433 +++++++-
+>  drivers/net/ethernet/ti/icssg/icssg_prueth.h  |  28 +-
+>  10 files changed, 1540 insertions(+), 7 deletions(-)
+>  create mode 100644 Documentation/devicetree/bindings/net/ti,icss-iep.yaml
+>  create mode 100644 drivers/net/ethernet/ti/icssg/icss_iep.c
+>  create mode 100644 drivers/net/ethernet/ti/icssg/icss_iep.h
+>=20
+> --=20
+> 2.34.1
+>=20
 
-> And I tested
-> the performance again. Below are the results.
-> 
-> Result 1: current method
-> root@imx8mpevk:~# ./xdp2 eth0
-> proto 17:     326539 pkt/s
-> proto 17:     326464 pkt/s
-> proto 17:     326528 pkt/s
-> proto 17:     326465 pkt/s
-> proto 17:     326550 pkt/s
-> 
-> Result 2: sync_dma_len method
-> root@imx8mpevk:~# ./xdp2 eth0
-> proto 17:     353918 pkt/s
-> proto 17:     352923 pkt/s
-> proto 17:     353900 pkt/s
-> proto 17:     352672 pkt/s
-> proto 17:     353912 pkt/s
-> 
+--3Wq7r3DP1wfOlIpT
+Content-Type: application/pgp-signature; name="signature.asc"
 
-This looks more promising:
-  ((353912/326550)-1)*100 = 8.37% faster.
+-----BEGIN PGP SIGNATURE-----
 
-Or gaining/saving approx 236 nanosec per packet ((1/326550-1/353912)*10^9).
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZNIwIAAKCRB4tDGHoIJi
+0g2dAP9kfFgMp83Kr/SnIeHz0AcFRVRxFOM13wTotQ4N7927ZwD/TYglqmJwOtcE
+rW1EGcQQYNr+DLVPAzsiIpVYIj4QOgs=
+=f/yq
+-----END PGP SIGNATURE-----
 
-> Note: the speed of the generator is about 935397pps.
-> 
-> Compared result 1 with result 2. The "sync_dma_len" method actually improves
-> the performance of XDP_TX, so the conclusion from the previous tests is *incorrect*.
-> I'm so sorry for that. :(
-> 
-
-I'm happy that we finally found the root-cause.
-Thanks for doing all the requested tests I asked for.
-
-> In addition, I also tried the "dma_sync_len" + not use xdp_convert_buff_to_frame()
-> method, the performance has been further improved. Below is the result.
-> 
-> Result 3: sync_dma_len + not use xdp_convert_buff_to_frame() method
-> root@imx8mpevk:~# ./xdp2 eth0
-> proto 17:     369261 pkt/s
-> proto 17:     369267 pkt/s
-> proto 17:     369206 pkt/s
-> proto 17:     369214 pkt/s
-> proto 17:     369126 pkt/s
-> 
-> Therefore, I'm intend to use the "dma_sync_len"+ not use xdp_convert_buff_to_frame()
-> method in the V5 patch. Thank you again, Jesper and Jakub. You really helped me a lot. :)
-> 
-
-I suggest, that V5 patch still use xdp_convert_buff_to_frame(), and then
-you send followup patch (or as 2/2 patch) that remove the use of
-xdp_convert_buff_to_frame() for XDP_TX.  This way it is easier to keep
-track of the changes and improvements.
-
-I would be very interested in knowing if the MMIO test change after this
-correction to the testlab/generator.
-
---Jesper
+--3Wq7r3DP1wfOlIpT--
 
