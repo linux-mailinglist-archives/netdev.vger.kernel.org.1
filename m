@@ -1,182 +1,149 @@
-Return-Path: <netdev+bounces-25377-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25359-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53708773D15
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 18:14:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 113C5773C94
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 18:07:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 832521C21221
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 16:14:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3A5E61C2074A
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 16:07:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4721F171A4;
-	Tue,  8 Aug 2023 15:57:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04CC61DA23;
+	Tue,  8 Aug 2023 15:51:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B9A4171A3
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 15:57:44 +0000 (UTC)
-Received: from mail-ed1-x52e.google.com (mail-ed1-x52e.google.com [IPv6:2a00:1450:4864:20::52e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8AA14AAB3
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 08:57:27 -0700 (PDT)
-Received: by mail-ed1-x52e.google.com with SMTP id 4fb4d7f45d1cf-52348b53bd3so1036619a12.1
-        for <netdev@vger.kernel.org>; Tue, 08 Aug 2023 08:57:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1691510210; x=1692115010;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=crkOG9q4R66ImJjW7bSEbQij1Zq/bE6EUz8snPgI08A=;
-        b=GFT+uJlpXneGawFgFajkwhQsx1pdpsk97WdrmyJWcEo2Ko3ZI81cNyRr4BRPmkMqeP
-         lZMhZZvhdqHw4dJ3+G1U5PYJaxXR+XzH8xwJV+FEnpgOiQ82iwmKfk/6R8gd6ldUAXjz
-         Mb/mpeHRkInJkHtDcayl1OegYtzLHJXf5MtgdjvlL+MeUn/JD9e/SDXZnb1vYOs8+6lV
-         ecmLNB4/JN3fdMg8+jBnScYsGuMxHcXmxHy8YYl00tYRYqwmP5NvUbVABU8JNliAmuDD
-         rZO/oZzHvZQYpv0HIrFKyOwwjIKsYeLY8WWgeE/fa4pqv4JuU6P3oYQMwNQ2Y9DtzsQh
-         vn1w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691510210; x=1692115010;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=crkOG9q4R66ImJjW7bSEbQij1Zq/bE6EUz8snPgI08A=;
-        b=bXp8z6xpOPuViCs1SqjzEv/5SPDCuoTfJhYFnc9uMqFTC3I8ia5IKwjjsz1/AqLr/l
-         nYYjFxWuoQuh+pSX7dJJJGJnx+1ZmB4beIleOi9494waIwvrU2S6NfrEpFDPsCSk4wvX
-         2FNOVM9A0F24KpemYDfzFeihgH8u9aTmJ8TV9RVmFQ6Tc2vV7vZf4SMZxJKh1Owzflyq
-         ywhHshVDDdMXTIP2ZNF5gpgeIf8rxY+zcM8p7dFd8eaE5yREseJHixz4iFeBilss8u0p
-         E9XsjQMfwOMaX2b0glVoSIIsaNaNgtNpLfrOWEjDeTLpQ0zFZc9HYIck1Zy45IfXoau1
-         yUZw==
-X-Gm-Message-State: AOJu0YzIO1JYdDw8MwhFdMSXziPTwGdu9pX8/V2FSZsjJTflm6zZQ0C0
-	/AmRrANaW7eca+vU2tFdkuqoBgBVWCnv4CSfdovbhQVP6+GoiA==
-X-Google-Smtp-Source: AGHT+IGwLWnv3+6pL/yyEmC55ESx4ZCzGTsydVzYPAfZHlxLd1MFqLLZbFEjc9xbX8Tms1RV11QyZb1uQnseqgkgWaQ=
-X-Received: by 2002:a05:6402:1049:b0:522:1d1d:1de8 with SMTP id
- e9-20020a056402104900b005221d1d1de8mr8647143edu.2.1691478729111; Tue, 08 Aug
- 2023 00:12:09 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7AE91CA1F
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 15:51:36 +0000 (UTC)
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2071.outbound.protection.outlook.com [40.107.93.71])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66D5F67CB
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 08:51:19 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=fXtc490MM5aIAiK7VOO98IThABEYa3ekko8QGrXMJzCmx47S63ouXVKUcU2mufijtX9F5397IQWFoF7LO1+qz3g6h3ALDAaCmLVk9K0ZKCEL01m0z2fPrmDlVaxlro3ehZNuj+jCDG6yK8Y7L9Iulx5BKGQlgA5fjf+deB7AZS0WcahvoFQ1mFgCMb7D8D6Fr7HwMW5CL6pRzXPDuiprObPMUW9sZ1h4O2E9XhTbr2RIcutTOEIkfv7IglIDvH8d/ue4td2ygZJW/qGNA0J7m7WGcU82wSh8dFm0QEv5EhV40fJHWxBfA01y960GMhzCzVPySSsMVpitkvc37nP4lw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=QAXhzczemSnTcSQzDh8EtQv93d/+8NXIVwfBy9cL5k0=;
+ b=i06d8K9QqiwFx/i/68tNmxxREPyZdoid0r3tSNxYNwUu6huFQkIT3Az1SWrhMwq4q0cUcoTgNq4vRQ9KJrRO7n9yl/E00T3ubjAsNdi5QC7ioxVvuYPo15lgYP/rSCwk6qokh4bY9wnPzuzoa6o+b5jEhspUuCrDHpFr6hpr63edsguuozU/f02kcMdv5F8Wm0pFsCtCr8hvPJKVD0aqCB1lWofcX03uqA0mpx3cModydhIq8EKWoF9xGd7aTw9dQ0khUktjVn9NJ5eawaywou5Rk2CxjBNSDFAutC9CQeQvC6rDSkhfCOpJWQnsJNpQKCUV2gsW2duVnBQmrMqwBw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=QAXhzczemSnTcSQzDh8EtQv93d/+8NXIVwfBy9cL5k0=;
+ b=IQ9+tJGLd6MdkQIPRAxLFYtNQiMEFsDcPTVAFohnVecLtCiny/sY8xZxN/QVKjZ1KlrAJe6C7pHCR8xfmrMQnkn/QMBIItOxsGu4DRvVyoVTeiccFskR02qm17JE0KAmOudntD3s+0AbwRRdSsUPaJ/Zdl0d4qoVXmv8mlaq5aimjcmxo75TAw2++95f3Ypjwdogo5kiuBTGc7kfh7G6YPVpD08qbewCZGT4Z9KQwm1E58N48k31ZQTaRQ6bUTBH3YbTOSCyh0iOyl5W2oYU3uy45k143xPs0KJHlTnrDDDkFL7heTCPqoyx4kZPfj/bfYoDSGXBOOpK1w6jVOjE4g==
+Received: from SA1P222CA0166.NAMP222.PROD.OUTLOOK.COM (2603:10b6:806:3c3::10)
+ by DM4PR12MB6591.namprd12.prod.outlook.com (2603:10b6:8:8e::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.27; Tue, 8 Aug
+ 2023 07:53:13 +0000
+Received: from SA2PEPF0000150A.namprd04.prod.outlook.com
+ (2603:10b6:806:3c3:cafe::83) by SA1P222CA0166.outlook.office365.com
+ (2603:10b6:806:3c3::10) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.27 via Frontend
+ Transport; Tue, 8 Aug 2023 07:53:13 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ SA2PEPF0000150A.mail.protection.outlook.com (10.167.242.42) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6652.19 via Frontend Transport; Tue, 8 Aug 2023 07:53:13 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Tue, 8 Aug 2023
+ 00:53:01 -0700
+Received: from dev-r-vrt-155.mtr.labs.mlnx (10.126.230.35) by
+ rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.986.37; Tue, 8 Aug 2023 00:52:59 -0700
+From: Ido Schimmel <idosch@nvidia.com>
+To: <netdev@vger.kernel.org>
+CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<edumazet@google.com>, <dsahern@kernel.org>, <petrm@nvidia.com>, Ido Schimmel
+	<idosch@nvidia.com>
+Subject: [PATCH net 0/3] nexthop: Nexthop dump fixes
+Date: Tue, 8 Aug 2023 10:52:30 +0300
+Message-ID: <20230808075233.3337922-1-idosch@nvidia.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CACymnh97H2XT4V87mCCr=NOhHVRaE5qLngUGObU_12K2rVWvzg@mail.gmail.com>
-In-Reply-To: <CACymnh97H2XT4V87mCCr=NOhHVRaE5qLngUGObU_12K2rVWvzg@mail.gmail.com>
-From: Yu Yat Ho <lagoho7@gmail.com>
-Date: Tue, 8 Aug 2023 15:11:31 +0800
-Message-ID: <CACymnh89U3b21S+fc4mkZm7GSN9=rYh5GTL4s8JnsdDR9AOS6g@mail.gmail.com>
-Subject: Re: [Linux Bug Report] Binding to IP address using bind(2) seems to
- leak traffic to other interfaces
-To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-0.3 required=5.0 tests=BAYES_00,DATE_IN_PAST_06_12,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	FREEMAIL_ENVFROM_END_DIGIT,FREEMAIL_FROM,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.126.230.35]
+X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA2PEPF0000150A:EE_|DM4PR12MB6591:EE_
+X-MS-Office365-Filtering-Correlation-Id: 67898cef-34b0-4986-c9a1-08db97e48483
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	SI/LpNK7d1hI2rvr4hjLkb8Mx6oWEmuOufiR+9fM1PS3YTT0c24hNp/ynWPbkMxJVnx+F/Ymcz4fqw6zy2+R3BXxd1LnCOWdtVFeqxcF7gwLT1Gs76bFuYaak1igprqRXEOJUFNBWVyUfPldX7fL3R37HbFsY/RugAp6MSNuDsfy3efoECowSNihbOMoXv2r5WPQkLsLPUWhuQB1GLxrOeT7MDvhNsYKRuaMsRmciL+a/1n0qJx2hQ25WI3HowtF7TdgFpkQYvgpLbjicnrAzAXsKGXlo1jDf+zWAXXKA5eu+hvjbpY71rImJF47Rc73vom7GlcZD41GMFAwtXtobuMo/KkiV0uhgPqJaDtuDomOU+CBfJ5CUau++81zX4sIGPtdKix/VR4mnpRWWYt5ZuV0r/AcqMluvtcWkzrIAx0gqsupfIEPtVr2EMIs+h1fszLGBGv0waJ+oLCKUe12ADyXEtJLlkrI8h1BiQlPcE8AhmcyhgAHIWhe1921H9jPdmgDk+QD8mko7fqw3gNClDrMpltb+WWu9HaLMdjeA5EC2Erwdfyx64CcbYrHoY8MOwv9uc77KhTycG/qxfXOng2FOl1t5vjDeoF8kJ+Nzvx8eTrMa/7e8QaBikVtMNk2CHqE4reTEl2Gf3FsYp1qB3AQz1pVk3fw6+OpR2+WAQeyA1MGBUYvwbyGfg3tMoAvRVCsTOyey/7Z0z5Xxi/IEKO58k4adj7rQFBxlP5JoDF42bSD6SiGN/TiytV+CG7v0CmiC2Hh8jg3AWTjf77LvyKngYK403MPAo9mI9wFq8o=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(396003)(136003)(346002)(39860400002)(376002)(451199021)(90011799007)(90021799007)(82310400008)(186006)(1800799003)(46966006)(36840700001)(40470700004)(40480700001)(336012)(16526019)(40460700003)(2616005)(36756003)(4326008)(316002)(6916009)(86362001)(478600001)(7636003)(54906003)(356005)(70206006)(6666004)(82740400003)(70586007)(41300700001)(1076003)(26005)(107886003)(426003)(8936002)(47076005)(8676002)(36860700001)(2906002)(83380400001)(5660300002);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Aug 2023 07:53:13.3217
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 67898cef-34b0-4986-c9a1-08db97e48483
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SA2PEPF0000150A.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6591
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Didn't realise I was supposed to file a bug report to the Linux
-distribution I was using instead of directly emailing you.
-Terribly sorry for taking up your precious time.
+Patches #1 and #3 fix two problems related to nexthops and nexthop
+buckets dump, respectively. Patch #2 is a preparation for the third
+patch.
 
-Just in case you are interested, the bug report I filed is at
-https://bugzilla.redhat.com/show_bug.cgi?id=2229902.
+The pattern described in these patches of splitting the NLMSG_DONE to a
+separate response is prevalent in other rtnetlink dump callbacks. I
+don't know if it's because I'm missing something or if this was done
+intentionally to ensure the message is delivered to user space. After
+commit 0642840b8bb0 ("af_netlink: ensure that NLMSG_DONE never fails in
+dumps") this is no longer necessary and I can improve these dump
+callbacks assuming this analysis is correct.
 
-Best regards,
-Yat
+No regressions in existing tests:
 
+ # ./fib_nexthops.sh
+ [...]
+ Tests passed: 230
+ Tests failed:   0
 
-On Tue, 8 Aug 2023 at 11:34, Yu Yat Ho <lagoho7@gmail.com> wrote:
->
-> Hi all,
->
-> I hope this is the correct place to report the bug I am experiencing.
->
-> The problem I am seeing is that data sent through a socket bound using bind(2) seems to be leaking to other network interfaces in the system. Here are some brief steps to demonstrate the problem, it works using wget too:
->
-> Set up a Linux VM (I am using Fedora 38 on VirtualBox) that has one NAT interface (has Internet access) and one host-only interface (no Internet access).
-> Try to send a request using curl that is bound to the host-only interface using its interface name. It should fail to connect as expected.
->
-> $ curl --interface enp0s8 icanhazip.com
->
-> Try to send another request, this time bind to the host-only interface using IP address. It will somehow successfully get a response.
->
-> $ curl --interface 192.168.56.103 icanhazip.com
->
-> The tcpdump output shows that the packets were originated from the NAT interface (enp0s3 is the NAT interface), but they have the source IP of the host-only interface:
->
-> # tcpdump -i any -nn host icanhazip.com
-> tcpdump: data link type LINUX_SLL2
-> dropped privs to tcpdump
-> tcpdump: verbose output suppressed, use -v[v]... for full protocol decode
-> listening on any, link-type LINUX_SLL2 (Linux cooked v2), snapshot length 262144 bytes
-> 10:56:34.264997 enp0s3 Out IP 192.168.56.103.57656 > 104.18.114.97.80: Flags [S], seq 2864717259, win 64240, options [mss 1460,sackOK,TS val 1169355339 ecr 0,nop,wscale 7], length 0
-> 10:56:35.320888 enp0s3 Out IP 192.168.56.103.57656 > 104.18.114.97.80: Flags [S], seq 2864717259, win 64240, options [mss 1460,sackOK,TS val 1169356395 ecr 0,nop,wscale 7], length 0
-> 10:56:37.368625 enp0s3 Out IP 192.168.56.103.57656 > 104.18.114.97.80: Flags [S], seq 2864717259, win 64240, options [mss 1460,sackOK,TS val 1169358443 ecr 0,nop,wscale 7], length 0
-> 10:56:40.726550 enp0s3 In  IP 104.18.114.97.80 > 192.168.56.103.57656: Flags [S.], seq 64001, ack 2864717260, win 65535, options [mss 1460], length 0
-> 10:56:40.726609 enp0s3 Out IP 192.168.56.103.57656 > 104.18.114.97.80: Flags [.], ack 1, win 64240, length 0
-> 10:56:40.727387 enp0s3 Out IP 192.168.56.103.57656 > 104.18.114.97.80: Flags [P.], seq 1:77, ack 1, win 64240, length 76: HTTP: GET / HTTP/1.1
-> 10:56:40.728146 enp0s3 In  IP 104.18.114.97.80 > 192.168.56.103.57656: Flags [.], ack 77, win 65535, length 0
-> 10:56:40.739934 enp0s3 In  IP 104.18.114.97.80 > 192.168.56.103.57656: Flags [P.], seq 1:550, ack 77, win 65535, length 549: HTTP: HTTP/1.1 200 OK
-> 10:56:40.739977 enp0s3 Out IP 192.168.56.103.57656 > 104.18.114.97.80: Flags [.], ack 550, win 63691, length 0
-> 10:56:40.742079 enp0s3 Out IP 192.168.56.103.57656 > 104.18.114.97.80: Flags [F.], seq 77, ack 550, win 63691, length 0
-> 10:56:40.742822 enp0s3 In  IP 104.18.114.97.80 > 192.168.56.103.57656: Flags [.], ack 78, win 65535, length 0
-> 10:56:40.751004 enp0s3 In  IP 104.18.114.97.80 > 192.168.56.103.57656: Flags [F.], seq 550, ack 78, win 65535, length 0
-> 10:56:40.751038 enp0s3 Out IP 192.168.56.103.57656 > 104.18.114.97.80: Flags [.], ack 551, win 63691, length 0
-> ^C
-> 13 packets captured
-> 17 packets received by filter
-> 0 packets dropped by kernel
->
-> Here are some more info that you may be interested in:
->
-> My uname -a output:
->
-> Linux f38-test 6.4.7-200.fc38.x86_64 #1 SMP PREEMPT_DYNAMIC Thu Jul 27 20:01:18 UTC 2023 x86_64 GNU/Linux
->
-> My curl -V output:
->
-> curl 8.0.1 (x86_64-redhat-linux-gnu) libcurl/8.0.1 OpenSSL/3.0.9 zlib/1.2.13 brotli/1.0.9 libidn2/2.3.4 libpsl/0.21.2 (+libidn2/2.3.4) libssh/0.10.5/openssl/zlib nghttp2/1.52.0
-> Release-Date: 2023-03-20
-> Protocols: dict file ftp ftps gopher gophers http https imap imaps ldap ldaps mqtt pop3 pop3s rtsp scp sftp smb smbs smtp smtps telnet tftp
-> Features: alt-svc AsynchDNS brotli GSS-API HSTS HTTP2 HTTPS-proxy IDN IPv6 Kerberos Largefile libz NTLM NTLM_WB PSL SPNEGO SSL threadsafe TLS-SRP UnixSockets
->
-> When --interface is specified, curl binds using SO_BINDTODEVICE when given an interface name, and bind(2) when given an IP address.
-> https://github.com/curl/curl/issues/11599#issuecomment-1667391636
->
-> My ifconfig output (enp0s3 is the NAT interface, enp0s8 is the host-only interface):
->
-> enp0s3: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
->         inet 10.0.2.15  netmask 255.255.255.0  broadcast 10.0.2.255
->         inet6 fe80::a00:27ff:fec5:2755  prefixlen 64  scopeid 0x20<link>
->         ether 08:00:27:c5:27:55  txqueuelen 1000  (Ethernet)
->         RX packets 20  bytes 2450 (2.3 KiB)
->         RX errors 0  dropped 0  overruns 0  frame 0
->         TX packets 35  bytes 3150 (3.0 KiB)
->         TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
->
-> enp0s8: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
->         inet 192.168.56.103  netmask 255.255.255.0  broadcast 192.168.56.255
->         inet6 fe80::a00:27ff:fe2f:7c6  prefixlen 64  scopeid 0x20<link>
->         ether 08:00:27:2f:07:c6  txqueuelen 1000  (Ethernet)
->         RX packets 147  bytes 14330 (13.9 KiB)
->         RX errors 0  dropped 0  overruns 0  frame 0
->         TX packets 256  bytes 33720 (32.9 KiB)
->         TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
->
-> lo: flags=73<UP,LOOPBACK,RUNNING>  mtu 65536
->         inet 127.0.0.1  netmask 255.0.0.0
->         inet6 ::1  prefixlen 128  scopeid 0x10<host>
->         loop  txqueuelen 1000  (Local Loopback)
->         RX packets 0  bytes 0 (0.0 B)
->         RX errors 0  dropped 0  overruns 0  frame 0
->         TX packets 0  bytes 0 (0.0 B)
->         TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
->
-> I will gladly provide more information should you need them, please let me know.
->
-> Best regards,
-> Yat
+Ido Schimmel (3):
+  nexthop: Fix infinite nexthop dump when using maximum nexthop ID
+  nexthop: Make nexthop bucket dump more efficient
+  nexthop: Fix infinite nexthop bucket dump when using maximum nexthop
+    ID
+
+ net/ipv4/nexthop.c                          | 28 ++++++---------------
+ tools/testing/selftests/net/fib_nexthops.sh | 10 ++++++++
+ 2 files changed, 17 insertions(+), 21 deletions(-)
+
+-- 
+2.40.1
+
 
