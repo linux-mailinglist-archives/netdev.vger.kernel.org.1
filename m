@@ -1,47 +1,61 @@
-Return-Path: <netdev+bounces-25560-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25561-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3320F774BB3
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 22:54:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BDDA9774BC7
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 22:55:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 699671C20E1A
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 20:54:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 77008281870
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 20:55:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD37B156CC;
-	Tue,  8 Aug 2023 20:54:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E05C156FC;
+	Tue,  8 Aug 2023 20:55:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A430014F71
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 20:54:15 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D38BC433C7;
-	Tue,  8 Aug 2023 20:54:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691528055;
-	bh=aaCGWt5PewNBgB1kC+KuCkVDdOigrAoZEpitBv3ac0Q=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=rGhtmt+xJ2HkR09dH5RhI0OOXKccePel7ybv3A9/oy2XMGpDzjrwefHU7jr6IxQpk
-	 V97686VSd7Qj1IdDdzoDcpMuSayOLjhPQFDTJrmG07sTN0Fh9OGYRKZ/HTtwuDe1Bq
-	 zVqe43inuHWlYgq8gNyBq8mgaTrvqSGtfaS/gLJEmO5polkaB1Rp2ANF+fZfBRB2yu
-	 8e7H8ZrSCANhBPOOMEv/h9HJaWzbWVDNYBhkhTNzmk0WG4dzAjgcRsxf0Al89PUKZ4
-	 +cNcKh+R6Om+ILjyhyEkisJmNm0pXnyiHd/UzUG1+pwDI1q29ZsKgFGB/fU4j1zW+6
-	 39y9uhpPL5Spg==
-Date: Tue, 8 Aug 2023 22:54:11 +0200
-From: Simon Horman <horms@kernel.org>
-To: Wenjun Wu <wenjun1.wu@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	xuejun.zhang@intel.com, madhu.chittim@intel.com,
-	qi.z.zhang@intel.com, anthony.l.nguyen@intel.com
-Subject: Re: [PATCH iwl-next v2 5/5] iavf: Add VIRTCHNL Opcodes Support for
- Queue bw Setting
-Message-ID: <ZNKrc6xchj8Jkct+@vergenet.net>
-References: <20230727021021.961119-1-wenjun1.wu@intel.com>
- <20230808015734.1060525-1-wenjun1.wu@intel.com>
- <20230808015734.1060525-6-wenjun1.wu@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2383F10FF
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 20:55:00 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CEC368936;
+	Tue,  8 Aug 2023 13:54:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=kugZc95gGx+gT4+czXKHKOoAY3GLr6Xku/WMAGPw3Fk=; b=qksDPq++8sAH+kPljwpqHKKOfm
+	8hVaowMT091tsZwRUs4vx+9cnNbDYHgiiq4thEEL8FkfsLgyjM9X62rP7qMiFV+UQ7dEKsU30VZi7
+	XkcdSzHRaOQRdNodZ54QDgC89ldeNENuoFT4DZgYQZnd3nobOcDPxpkrwkNLbPPWUzHU=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qTTj5-003WBH-1N; Tue, 08 Aug 2023 22:54:47 +0200
+Date: Tue, 8 Aug 2023 22:54:47 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Hawkins, Nick" <nick.hawkins@hpe.com>
+Cc: "christophe.jaillet@wanadoo.fr" <christophe.jaillet@wanadoo.fr>,
+	"simon.horman@corigine.com" <simon.horman@corigine.com>,
+	"Verdun, Jean-Marie" <verdun@hpe.com>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"robh+dt@kernel.org" <robh+dt@kernel.org>,
+	"krzysztof.kozlowski+dt@linaro.org" <krzysztof.kozlowski+dt@linaro.org>,
+	"conor+dt@kernel.org" <conor+dt@kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2 4/5] net: hpe: Add GXP UMAC Driver
+Message-ID: <06d1bc6a-0584-4d62-a2f4-61a42f236b3c@lunn.ch>
+References: <20230802201824.3683-1-nick.hawkins@hpe.com>
+ <20230802201824.3683-5-nick.hawkins@hpe.com>
+ <fb656c31-ecc3-408a-a719-cba65a6aa984@lunn.ch>
+ <933D6861-A193-4145-9533-A7EE8E6DD32F@hpe.com>
+ <61c541c9-be30-4a43-aa85-53816d5848f9@lunn.ch>
+ <DB60B268-85DA-43A2-A20F-52D684473348@hpe.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,47 +64,46 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230808015734.1060525-6-wenjun1.wu@intel.com>
+In-Reply-To: <DB60B268-85DA-43A2-A20F-52D684473348@hpe.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Tue, Aug 08, 2023 at 09:57:34AM +0800, Wenjun Wu wrote:
-> From: Jun Zhang <xuejun.zhang@intel.com>
-
-...
-
-> @@ -2471,6 +2687,16 @@ void iavf_virtchnl_completion(struct iavf_adapter *adapter,
->  		if (!v_retval)
->  			iavf_netdev_features_vlan_strip_set(netdev, false);
->  		break;
-> +	case VIRTCHNL_OP_GET_QOS_CAPS:
-> +		u16 len = struct_size(adapter->qos_caps, cap,
-> +				      IAVF_MAX_QOS_TC_NUM);
-
-Hi Jun Zhang and Wenju Wu,
-
-clang-16 complains about this quite a lot.
-I think it is because it wants the declaration of len - and thus
-the rest of this case - inside a block ({}).
-
- .../iavf_virtchnl.c:2691:3: error: expected expression
-                 u16 len = struct_size(adapter->qos_caps, cap,
-                 ^
- .../iavf_virtchnl.c:2693:46: error: use of undeclared identifier 'len'
-                 memcpy(adapter->qos_caps, msg, min(msglen, len));
-                                                            ^
- .../iavf_virtchnl.c:2693:46: error: use of undeclared identifier 'len'
-
-> +		memcpy(adapter->qos_caps, msg, min(msglen, len));
-> +		break;
-> +	case VIRTCHNL_OP_CONFIG_QUANTA:
-> +		iavf_notify_queue_config_complete(adapter);
-> +		break;
-> +	case VIRTCHNL_OP_CONFIG_QUEUE_BW:
-> +		break;
->  	default:
->  		if (adapter->current_op && (v_opcode != adapter->current_op))
->  			dev_warn(&adapter->pdev->dev, "Expected response %d from PF, received %d\n",
-> -- 
-> 2.34.1
+On Tue, Aug 08, 2023 at 08:39:39PM +0000, Hawkins, Nick wrote:
+> Hi Andrew,
 > 
+> Thank you for your feedback, I have several follow up questions:
 > 
+> > So what you call a PHY is probably a PCS. Please look at the API used
+> > in driver/net/pcs/. The real PHYs are external.
+> 
+> I doubled checked the internal PHY is considered a PHY, but I believe
+> I can represent it as a PCS.
+
+Is there proper documentation somewhere? register set? Is there
+registers to kick off Base1000X/SGMII auto-neg? Somewhere to get the
+results of the auto-neg? Since this is Base1000X/SGMII you want to
+know if the link between it and the external PHY has established. And
+if there is not an external PHY, but an SFP, this auto neg is with the
+link peer, not the PHY. If it follows 802.3 clause 37, there should
+already be a lot of helper code for you. Is this is licensed core?
+
+> To confirm: I believe you are suggesting that
+> we create a driver here for the handling of the internal PHY but not the
+> external PHY?
+
+The patches seem to suggest your board has an external Marvell PHY. So
+i would expect it to use drivers/net/phy/marvell.c. Other boards,
+using other PHYs, would use other PHY drivers.
+
+> If so would it be leveraging the MDIO driver already created in this
+> patchset? Or perhaps would it be replacing it for the internal PHY?
+
+Many of the PCS drivers in driver/net/pcs are MDIO devices, so yes, it
+would be layered on top of it.
+
+      Andrew
 
