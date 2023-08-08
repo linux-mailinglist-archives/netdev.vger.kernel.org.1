@@ -1,100 +1,97 @@
-Return-Path: <netdev+bounces-25290-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25340-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4FCC773B20
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 17:43:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D55F773C2C
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 18:01:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BBCFE1C2105B
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 15:43:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 35864280CF4
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 16:01:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7A6D134A2;
-	Tue,  8 Aug 2023 15:41:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DCEC1426E;
+	Tue,  8 Aug 2023 15:47:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBEB213AD8
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 15:41:56 +0000 (UTC)
-Received: from wout5-smtp.messagingengine.com (wout5-smtp.messagingengine.com [64.147.123.21])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8DD64237
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 08:41:34 -0700 (PDT)
-Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
-	by mailout.west.internal (Postfix) with ESMTP id 4D4003200908;
-	Tue,  8 Aug 2023 07:36:40 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute1.internal (MEProxy); Tue, 08 Aug 2023 07:36:40 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:sender:subject
-	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-	:x-sasl-enc; s=fm3; t=1691494599; x=1691580999; bh=3Q/eY5w9nDCM4
-	40MCQpwIzLyHwWfBJad9fCeXeySfn0=; b=rRg6E0MSecuXdO+2Z9d31GMkKdRUC
-	BOZZU7UiH6E1hgmRXVioSSqN2DFB8NO1vYpUEm5+kLq+QUSdA3CUMWSSm1KW2VXc
-	3dDf4U7sSrSd1kRW+5eO3diMQqm9ehhWwCwtYzMExnzcJ45c0INN70uL9MFM+MbN
-	tV39aQ0HvDP7SqaQvFaxNQNtQ6mq6FSxVOv86PjcRCE1i2nOaNKk2ZqXfjgaSNIi
-	LG2WbD0ImaMp9O8wK5KZOFiDyhCX9zzBQRrqCS3OTvAhI+QkaKvGJ81zVQB0+FgC
-	gkgl3v7GiC/iwnlTjkyXwEUle2Bscwq/dQ0nfpazwKZD9j2a4XXx4nAhw==
-X-ME-Sender: <xms:xyjSZJY9XwhEZw47Yy-xnnL56_1TwiM3RRaC-t6rKD8JFD7WGPZjmg>
-    <xme:xyjSZAYZIERuo5G5xUdIqe7oUHs3b_UpOWmyjy5cR51-TGyaGmRQkJPqRI5lZYWZj
-    rt5nhywx3loYeg>
-X-ME-Received: <xmr:xyjSZL9jDhWVmF75L9uPgFqnjyONDiYDOjH9Dmyk1dC5SnZhvBfHP6LMh3r_UAuJZZNSKJ0qQMbzhtr_XqkkH3JXG_MCGQ>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrledvgdegvdcutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
-    fjughrpeffhffvvefukfhfgggtuggjsehttdortddttddvnecuhfhrohhmpefkughoucfu
-    tghhihhmmhgvlhcuoehiughoshgthhesihguohhstghhrdhorhhgqeenucggtffrrghtth
-    gvrhhnpeffueevhffhuddvjeetfeeuudfgheegledvveehheeuueduvdehgedtteefheeg
-    feenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuvehluhhsthgvrhfuihiivgeptd
-    enucfrrghrrghmpehmrghilhhfrhhomhepihguohhstghhsehiughoshgthhdrohhrgh
-X-ME-Proxy: <xmx:xyjSZHp-tb_kjrGrzIYyeUHO3BRWx2ZgkpxgLMbNe_zwOsTUA_pbGw>
-    <xmx:xyjSZEo6pFAVwsqbaw624pBaT0ZZybTSfhz_IrpQuYrHyGnoc_3Qeg>
-    <xmx:xyjSZNTpaUtqd3GNEhYXY4G0WMGSh5W5sIB-G4K8xLlPv71VnBh3JA>
-    <xmx:xyjSZLSZttq1rOH_NXROP-f02SKEDj3hAVM157TComc-70rSSRJjQg>
-Feedback-ID: i494840e7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 8 Aug 2023 07:36:38 -0400 (EDT)
-Date: Tue, 8 Aug 2023 14:36:34 +0300
-From: Ido Schimmel <idosch@idosch.org>
-To: Nicolas Escande <nico.escande@gmail.com>
-Cc: stephen@networkplumber.org, netdev@vger.kernel.org
-Subject: Re: [iproute2,v2] man: bridge: update bridge link show
-Message-ID: <ZNIowqAsMJhhUtoq@shredder>
-References: <20230804164952.2649270-1-nico.escande@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02C1213AE5
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 15:47:12 +0000 (UTC)
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id A14C67DB2;
+	Tue,  8 Aug 2023 08:46:57 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.143])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4RKs9h38Tpz4f3tNb;
+	Tue,  8 Aug 2023 19:56:56 +0800 (CST)
+Received: from [10.67.110.72] (unknown [10.67.110.72])
+	by APP4 (Coremail) with SMTP id gCh0CgCXc6aGLdJkOOXmAA--.27824S2;
+	Tue, 08 Aug 2023 19:56:55 +0800 (CST)
+Message-ID: <9d309cd3-7c73-65fd-7e0b-d0491f1c2d67@huaweicloud.com>
+Date: Tue, 8 Aug 2023 19:56:53 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230804164952.2649270-1-nico.escande@gmail.com>
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,SPF_NONE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.1
+Subject: Re: [PATCH -next] net: pcs: Add missing put_device call in
+ miic_create
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: clement.leger@bootlin.com, hkallweit1@gmail.com, linux@armlinux.org.uk,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, f.fainelli@gmail.com, linux-renesas-soc@vger.kernel.org,
+ netdev@vger.kernel.org, xiangyang3@huawei.com
+References: <20230807134714.2048214-1-xiangyang@huaweicloud.com>
+ <20230808105456.3vbw3ijqube2yetn@skbuf>
+From: Xiang Yang <xiangyang@huaweicloud.com>
+In-Reply-To: <20230808105456.3vbw3ijqube2yetn@skbuf>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgCXc6aGLdJkOOXmAA--.27824S2
+X-Coremail-Antispam: 1UD129KBjvdXoWrKr1UCr1DXFykGF1kXryfCrg_yoWxtFcE9r
+	W0vrs3ArWrJF18GFyrAFy3Zr4Y9a4DtFWj9r47JF4rJFnaqFZ7GFs3G3yFy343Aa1kKF9r
+	KrW5Ar4q9w1UWjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUbIxYFVCjjxCrM7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E6xAIw20E
+	Y4v20xvaj40_JrC_JFWl1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwV
+	A0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8IcVCY1x02
+	67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
+	0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
+	x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
+	0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7I2V7IY0VAS
+	07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c
+	02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_
+	GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7
+	CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAF
+	wI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa
+	7IU1zuWJUUUUU==
+X-CM-SenderInfo: x0ld0wp1dqwq5kxd4v5lfo033gof0z/
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-3.7 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Aug 04, 2023 at 06:49:52PM +0200, Nicolas Escande wrote:
-> Add missing man page documentation for bridge link show features added in
-> 13a5d8fcb41b (bridge: link: allow filtering on bridge name) and
-> 64108901b737 (bridge: Add support for setting bridge port attributes)
 
-FYI, the convention is to refer to a commit in the following format:
 
-13a5d8fcb41b ("bridge: link: allow filtering on bridge name")
+在 2023/8/8 18:54, Vladimir Oltean 写道:
+> On Mon, Aug 07, 2023 at 01:47:14PM +0000, Xiang Yang wrote:
+>> From: Xiang Yang <xiangyang3@huawei.com>
+>>
+>> The reference of pdev->dev is taken by of_find_device_by_node, so
+>> it should be released when error out.
+>>
+>> Fixes: 7dc54d3b8d91 ("net: pcs: add Renesas MII converter driver")
+>> Signed-off-by: Xiang Yang <xiangyang3@huawei.com>
+>> ---
+> 
+> Also, the patch subject prefix needs to be "[PATCH net]" (indicative of
+> the fact that you want it to go to https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git)
+> and not "[PATCH -next]".
+Thanks, I will change the patch subject prefix and resend the patch of
+v2 with your advice.
 
-See [1], near the end of the section.
-
-[1] https://www.kernel.org/doc/html/latest/process/submitting-patches.html#describe-your-changes
-
-> Signed-off-by: Nicolas Escande <nico.escande@gmail.com>
-
-Reviewed-by: Ido Schimmel <idosch@nvidia.com>
-
-Thanks
 
