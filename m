@@ -1,51 +1,47 @@
-Return-Path: <netdev+bounces-25276-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25277-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CEF3F773A47
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 14:51:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0FE28773A4F
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 15:00:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 35B442817E7
-	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 12:51:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B87AC2817D4
+	for <lists+netdev@lfdr.de>; Tue,  8 Aug 2023 13:00:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22398101F0;
-	Tue,  8 Aug 2023 12:51:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A52F511181;
+	Tue,  8 Aug 2023 13:00:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1784911CBF
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 12:51:46 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9815BC433C7;
-	Tue,  8 Aug 2023 12:51:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 429BD107B0
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 13:00:15 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B9A2C433C7;
+	Tue,  8 Aug 2023 13:00:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691499106;
-	bh=czHewSu/ClbRoBJAOohHZjA2+Uw0usYmOLRzJpX+Gbs=;
+	s=k20201202; t=1691499615;
+	bh=9adJ+qtIOIy3KtEkatfZhz5gevID4T+P74hC7Kqi6Bg=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=QqCClGIeqYURWbJwbJ6UGvvGF1nj31U1Zj6RfvULDPR4ISd6EiPAw3ibb6fbOjIp0
-	 ze8z+VMY1X7Fd4SmiuGnxRwjqg71xm54CA1Dd/yyMTPKVk39X0Wt2PVpbYANWGYIA/
-	 3R6JliH2Msy0JfbNp6fhnLKQpqpTiOU2I4rrt4yVxaH5pZR8/brkRNkEGNGocoVYku
-	 Lwu/iNj1/fnR/tiSo6xo5mVwceepYwH4C+aUcQ1T4qH1fnkZRpU+plXFDTWlkM7j3y
-	 rju9ki2Z3awM2RHPAAUGhWz/XmWsmRlvti2jLd8AG5qxYwqSC9STIQh12W6dMYGVge
-	 VbulLnCCgWYig==
-Date: Tue, 8 Aug 2023 14:51:41 +0200
+	b=kbFezovZwuCfYCNVraKSH/2qUJSaCH36FBAW0tGpi9tn3Ka5AXPPpiGIlvsb2Ky1p
+	 7yyZiq+mjTENgDMTaq5/cu0YjocBtQ/CXhT8f4JPp4ezPN+MtqG56o+isefGjUaGER
+	 0YAxT2QNFa5U2v/Z5FwebVQHib+eXRtgew7eiHtOuKpoRZrOJA9vcu+m87DmLsuSVk
+	 QMeOui8yzkR7WNrtx5k7oOYNC7A7HlRvggH9PX6wWAyWkmrFJtFZF8H+Z/Rb1ORA1g
+	 84XZkAEp4KPoO2nPhCChGayR0iQFPKSWT0NP7s54YMAM4nvpMAIPB2ekM1ouPtZUE+
+	 jePWMmV/6P2Ng==
+Date: Tue, 8 Aug 2023 15:00:11 +0200
 From: Simon Horman <horms@kernel.org>
-To: Petr Oros <poros@redhat.com>
-Cc: netdev@vger.kernel.org, jesse.brandeburg@intel.com,
-	anthony.l.nguyen@intel.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	Jacob.e.keller@intel.com, przemyslawx.patynowski@intel.com,
-	kamil.maziarz@intel.com, dawidx.wesierski@intel.com,
-	mateusz.palczewski@intel.com, slawomirx.laba@intel.com,
-	norbertx.zulinski@intel.com, intel-wired-lan@lists.osuosl.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net 1/2] Revert "ice: Fix ice VF reset during iavf
- initialization"
-Message-ID: <ZNI6XSBM2ULz0CZM@vergenet.net>
-References: <20230807094831.696626-1-poros@redhat.com>
- <20230807094831.696626-2-poros@redhat.com>
+To: David Rheinsberg <david@readahead.eu>
+Cc: netdev@vger.kernel.org, Alexander Mikhalitsyn <alexander@mihalicyn.com>,
+	Christian Brauner <brauner@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Stanislav Fomichev <sdf@google.com>,
+	Luca Boccassi <bluca@debian.org>,
+	Eric Dumazet <edumazet@google.com>
+Subject: Re: [PATCH] net/unix: use consistent error code in SO_PEERPIDFD
+Message-ID: <ZNI8W78I3FxvT333@vergenet.net>
+References: <20230807081225.816199-1-david@readahead.eu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -54,22 +50,47 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230807094831.696626-2-poros@redhat.com>
+In-Reply-To: <20230807081225.816199-1-david@readahead.eu>
 
-On Mon, Aug 07, 2023 at 11:48:30AM +0200, Petr Oros wrote:
-> This reverts commit 7255355a0636b4eff08d5e8139c77d98f151c4fc.
+On Mon, Aug 07, 2023 at 10:12:25AM +0200, David Rheinsberg wrote:
+> Change the new (unreleased) SO_PEERPIDFD sockopt to return ENODATA
+> rather than ESRCH if a socket type does not support remote peer-PID
+> queries.
 > 
-> After this commit we are not able to attach VF to VM:
-> virsh attach-interface v0 hostdev --managed 0000:41:01.0 --mac 52:52:52:52:52:52
-> error: Failed to attach interface
-> error: Cannot set interface MAC to 52:52:52:52:52:52 for ifname enp65s0f0np0 vf 0: Resource temporarily unavailable
+> Currently, SO_PEERPIDFD returns ESRCH when the socket in question is
+> not an AF_UNIX socket. This is quite unexpected, given that one would
+> assume ESRCH means the peer process already exited and thus cannot be
+> found. However, in that case the sockopt actually returns EINVAL (via
+> pidfd_prepare()). This is rather inconsistent with other syscalls, which
+> usually return ESRCH if a given PID refers to a non-existant process.
 > 
-> ice_check_vf_ready_for_cfg() already contain waiting for reset.
-> New condition in ice_check_vf_ready_for_reset() causing only problems.
+> This changes SO_PEERPIDFD to return ENODATA instead. This is also what
+> SO_PEERGROUPS returns, and thus keeps a consistent behavior across
+> sockopts.
 > 
-> Fixes: 7255355a0636 ("ice: Fix ice VF reset during iavf initialization")
-> Signed-off-by: Petr Oros <poros@redhat.com>
+> Note that this code is returned in 2 cases: First, if the socket type is
+> not AF_UNIX, and secondly if the socket was not yet connected. In both
+> cases ENODATA seems suitable.
+> 
+> Signed-off-by: David Rheinsberg <david@readahead.eu>
+> ---
+> Hi!
+> 
+> The SO_PEERPIDFD sockopt has been queued for 6.5, so hopefully we can
+> get that in before the release?
+> 
+> Thanks
+> David
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+As a fix, it should probably have a fixes tag.
+This one seems appropriate.
 
+Fixes: 7b26952a91cf ("net: core: add getsockopt SO_PEERPIDFD")
+
+And the patch should be targeted at net
+
+	Subject: [PATCH net] ...
+
+It's probably not necessary to repost just to address these minor points.
+But please consider them if you need to post a v2 for some other reason.
 
