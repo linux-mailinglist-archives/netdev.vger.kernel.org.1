@@ -1,142 +1,113 @@
-Return-Path: <netdev+bounces-25674-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25675-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86161775176
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 05:41:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1D767751DD
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 06:18:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E11BD281A3D
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 03:40:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 13A6828114E
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 04:18:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8918EA2C;
-	Wed,  9 Aug 2023 03:40:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DF6D1C3B;
+	Wed,  9 Aug 2023 04:18:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A581632
-	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 03:40:56 +0000 (UTC)
-Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18F97C9;
-	Tue,  8 Aug 2023 20:40:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=201702; t=1691552453;
-	bh=eYzYCpPfk9mGCdjkiffMCkKG4XvwoVeUP6ZVEPKf4pU=;
-	h=Date:From:To:Cc:Subject:From;
-	b=oJyc+gp61EwOaT9IK+bZVCQEQ6FpEaTKOav5LJIpwHeI9db80+whzUSJrwlzvIQFv
-	 p5/UjrZLzo8NsCU0iDH8lKKDmeOZGAWNpTZBTUwNiFMISTFNKQwfhS7I2VOXjXS9D/
-	 wnCbxCin/AcF6GAwF6C4F2nwQ8ciNzwaYj+VlcAkzaaiI9w/Q+uO4ULTE161YoY2uM
-	 UaubInqub69xFoOQxEGVAh5oHju63X07mFvZLywVMfPPT1sGACFxNdpaUPCrNrffLO
-	 3sSkazErw9EQ5PasuidJg/CcwUHzfzb3ZAWJVSE/AZyFuf3WjeM/wORRQy7q0xOiFw
-	 EMbdxx//pMZMw==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4RLG6s1SYBz4wy5;
-	Wed,  9 Aug 2023 13:40:53 +1000 (AEST)
-Date: Wed, 9 Aug 2023 13:40:51 +1000
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: Greg KH <greg@kroah.com>, David Miller <davem@davemloft.net>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Networking <netdev@vger.kernel.org>, Christophe Leroy
- <christophe.leroy@csgroup.eu>, Greg Kroah-Hartman
- <gregkh@linuxfoundation.org>, Linux Kernel Mailing List
- <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>
-Subject: linux-next: manual merge of the tty tree with the net-next tree
-Message-ID: <20230809134051.1167e40d@canb.auug.org.au>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58061ED4;
+	Wed,  9 Aug 2023 04:18:04 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A062419A1;
+	Tue,  8 Aug 2023 21:18:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1691554683; x=1723090683;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=BiBLxiXXW0roMyU9uVFtT4aTm3ZZI6IWHSqR6mmpuy8=;
+  b=UpEhekEqiTEcFezXjUXhZ37Jaqj7pIwnumnX6Wy7Ck7+iC6SPEMtJNRB
+   tMvTKi6Of9kWotp4A+cZmrVjdZIQAYYdQxauXqGCRjAihkOrK9BUfxblh
+   lTbKq6wEuNrOWt+R2L9azyQCB91pLfIbe29shsJ1+CGGCDhhqsHWHVGJE
+   En67uX8e15HQKcN51L3jX/hLNh73yTf2ZmdmLVQfeCRIn9NLHs8xmrtdx
+   bv3qTtF/xAHMHXB678yGDmuuPkJ6kt2gQUsMQJtCAMJE5HzZj4y/pUIMW
+   Qfbh32a0oshuYKjiN5shm8Tj71xOHSbuvVWK4FOIOEcjSImeQp8+Jhi3F
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10795"; a="361140114"
+X-IronPort-AV: E=Sophos;i="6.01,158,1684825200"; 
+   d="scan'208";a="361140114"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Aug 2023 21:08:25 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10795"; a="978220412"
+X-IronPort-AV: E=Sophos;i="6.01,158,1684825200"; 
+   d="scan'208";a="978220412"
+Received: from lkp-server01.sh.intel.com (HELO d1ccc7e87e8f) ([10.239.97.150])
+  by fmsmga006.fm.intel.com with ESMTP; 08 Aug 2023 21:08:22 -0700
+Received: from kbuild by d1ccc7e87e8f with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1qTaUf-0005na-0d;
+	Wed, 09 Aug 2023 04:08:21 +0000
+Date: Wed, 9 Aug 2023 12:07:27 +0800
+From: kernel test robot <lkp@intel.com>
+To: Breno Leitao <leitao@debian.org>, sdf@google.com, axboe@kernel.dk,
+	asml.silence@gmail.com, willemdebruijn.kernel@gmail.com
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, io-uring@vger.kernel.org, kuba@kernel.org,
+	pabeni@redhat.com
+Subject: Re: [PATCH v2 2/8] io_uring/cmd: Introduce SOCKET_URING_OP_GETSOCKOPT
+Message-ID: <202308091103.ylvbuCww-lkp@intel.com>
+References: <20230808134049.1407498-3-leitao@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/YnfJMTaw1Wq4YKH1vQazNkL";
- protocol="application/pgp-signature"; micalg=pgp-sha256
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS,
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230808134049.1407498-3-leitao@debian.org>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
---Sig_/YnfJMTaw1Wq4YKH1vQazNkL
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Hi Breno,
 
-Hi all,
+kernel test robot noticed the following build errors:
 
-Today's linux-next merge of the tty tree got conflicts in:
+[auto build test ERROR on next-20230808]
+[cannot apply to bpf-next/master bpf/master net/main net-next/main linus/master horms-ipvs/master v6.5-rc5 v6.5-rc4 v6.5-rc3 v6.5-rc5]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-  arch/powerpc/platforms/8xx/mpc885ads_setup.c
-  arch/powerpc/platforms/8xx/tqm8xx_setup.c
+url:    https://github.com/intel-lab-lkp/linux/commits/Breno-Leitao/net-expose-sock_use_custom_sol_socket/20230809-011901
+base:   next-20230808
+patch link:    https://lore.kernel.org/r/20230808134049.1407498-3-leitao%40debian.org
+patch subject: [PATCH v2 2/8] io_uring/cmd: Introduce SOCKET_URING_OP_GETSOCKOPT
+config: hexagon-randconfig-r041-20230808 (https://download.01.org/0day-ci/archive/20230809/202308091103.ylvbuCww-lkp@intel.com/config)
+compiler: clang version 15.0.7 (https://github.com/llvm/llvm-project.git 8dfdcc7b7bf66834a761bd8de445840ef68e4d1a)
+reproduce: (https://download.01.org/0day-ci/archive/20230809/202308091103.ylvbuCww-lkp@intel.com/reproduce)
 
-between commit:
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202308091103.ylvbuCww-lkp@intel.com/
 
-  33deffc9f19f ("net: fs_enet: Don't include fs_enet_pd.h when not needed")
+All errors (new ones prefixed by >>):
 
-from the net-next tree and commit:
+>> ld.lld: error: undefined symbol: sk_getsockopt
+   >>> referenced by uring_cmd.c
+   >>>               io_uring/uring_cmd.o:(io_uring_cmd_sock) in archive vmlinux.a
+   >>> referenced by uring_cmd.c
+   >>>               io_uring/uring_cmd.o:(io_uring_cmd_sock) in archive vmlinux.a
 
-  a833b201d908 ("serial: cpm_uart: Don't include fs_uart_pd.h when not need=
-ed")
-
-from the tty tree.
-
-I fixed it up (see below) and can carry the fix as necessary. This
-is now fixed as far as linux-next is concerned, but any non trivial
-conflicts should be mentioned to your upstream maintainer when your tree
-is submitted for merging.  You may also want to consider cooperating
-with the maintainer of the conflicting tree to minimise any particularly
-complex conflicts.
-
---=20
-Cheers,
-Stephen Rothwell
-
-diff --cc arch/powerpc/platforms/8xx/mpc885ads_setup.c
-index c7c4f082b838,6ecc7fa2a816..000000000000
---- a/arch/powerpc/platforms/8xx/mpc885ads_setup.c
-+++ b/arch/powerpc/platforms/8xx/mpc885ads_setup.c
-@@@ -21,7 -21,7 +21,6 @@@
-  #include <linux/device.h>
-  #include <linux/delay.h>
- =20
-- #include <linux/fs_uart_pd.h>
- -#include <linux/fs_enet_pd.h>
-  #include <linux/fsl_devices.h>
-  #include <linux/mii.h>
-  #include <linux/of_address.h>
-diff --cc arch/powerpc/platforms/8xx/tqm8xx_setup.c
-index 6e56be852b2c,a451f5003abd..000000000000
---- a/arch/powerpc/platforms/8xx/tqm8xx_setup.c
-+++ b/arch/powerpc/platforms/8xx/tqm8xx_setup.c
-@@@ -24,7 -24,7 +24,6 @@@
-  #include <linux/device.h>
-  #include <linux/delay.h>
- =20
-- #include <linux/fs_uart_pd.h>
- -#include <linux/fs_enet_pd.h>
-  #include <linux/fsl_devices.h>
-  #include <linux/mii.h>
-  #include <linux/of_fdt.h>
-
---Sig_/YnfJMTaw1Wq4YKH1vQazNkL
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmTTCsMACgkQAVBC80lX
-0Gw5kwf/fAYuAin5HUdRUsmN/54+YLUDrHA3e6zW085taWz284bK9CbKSKYPNvyv
-HfgTtkWHm7nqznKTOilzJqMb68BmN0bSntTvhNtEVZ2IIbnqwOy1aGYztyCoHjk9
-1mfs5+cInfS35QC9P7rycXSFx5RoTEFlgfhAT10B+J31zIu5riqDuF+4QP1ZGoo3
-GkOfMw9n9CuZhbNnNM/RzejPuHZHw+6EOlr85RrpRDNm2NxZQs53vN4R6S3SbUcD
-VppR6tXDPH64e6uUiu9ZpU03yWajLPbZp4oVJ7IX/v2hm6kNrVDAOEEMFtFjQ5W2
-LlKwc9DuI3RKHYAeuYbN1b0CfFtw4g==
-=+N59
------END PGP SIGNATURE-----
-
---Sig_/YnfJMTaw1Wq4YKH1vQazNkL--
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
