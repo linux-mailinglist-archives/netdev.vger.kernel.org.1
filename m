@@ -1,69 +1,90 @@
-Return-Path: <netdev+bounces-26086-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26087-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5ACAF776C27
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 00:26:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A32A776C5A
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 00:40:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 900C0281E5A
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 22:26:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 064A61C21334
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 22:40:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8377D1DDF1;
-	Wed,  9 Aug 2023 22:26:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E03C1B7EC;
+	Wed,  9 Aug 2023 22:40:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53EF51C9E1
-	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 22:26:38 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4CD1BC433C7;
-	Wed,  9 Aug 2023 22:26:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73A78100D0
+	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 22:40:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id F402DC433C7;
+	Wed,  9 Aug 2023 22:40:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691619998;
-	bh=D86GAVma+0XKP4Z8hF6yc63R4h8X8o+QwNFVeaE3SjQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=HTFySCuPBdNPIER5Y7kPQ3iaxpQ/VJW8QTf5UuEQceOeOeLQR15lf7coUzMkMYo6N
-	 N/N9fouxUaNUIYoKJmTIWj4e/g88sqdU58pnJAit91LUaB3A2lJBiyrF2QR0+p6o0R
-	 OZWT95ZdhBaAz0yvyx3Y5E0/mNAiPzulfVimj9Pox4CauzURq4+Dkd6shNlFwgOwo7
-	 RTkgCkaJJvHGtUGxlSgNXSlhJKeZ9ZnOhuJmUbUpIUwSpJ6TlJspAgHb9vn9x3GL3P
-	 rzfdEEpqA6agZXgA8+SH3pi6I8+jd2vVVaFMEi6NiAcFzxq0t0jTFUUyV9lX8KYyWe
-	 PoRt0+yWYkFCQ==
-Date: Wed, 9 Aug 2023 15:26:37 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Hariprasad Kelam <hkelam@marvell.com>
-Cc: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
- <davem@davemloft.net>, <sgoutham@marvell.com>, <gakula@marvell.com>,
- <sbhatta@marvell.com>, <naveenm@marvell.com>, <edumazet@google.com>,
- <pabeni@redhat.com>
-Subject: Re: [net Patch] octeontx2-pf: Allow both ntuple and TC features on
- the interface
-Message-ID: <20230809152637.17888c9b@kernel.org>
-In-Reply-To: <20230808063623.22595-1-hkelam@marvell.com>
-References: <20230808063623.22595-1-hkelam@marvell.com>
+	s=k20201202; t=1691620823;
+	bh=Qa+u+HNwkJBG1WNPlROs0Ffs1y6RXzhud/JuEMuXgtk=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Xm2Yf2Afu1iOdZAbxQ2F2kKEO3Gn4A4q1kiK7wHqOh1rxZu5XhmHIKvuhJ8XzA5SR
+	 lJNGQ6q9TuK/3ApY3iB5kGmnsUTfZ5IK4tLw30IZc9WvFKjg4v1so5CHkQHpc/6BpR
+	 dTNsvUQyZVx0TmQ2c496YL1+8ITPTgh1CHLIpY+UHbpO7FUm8/ktjITHY2yvpTprUC
+	 SzBtOGftAl2cBikZkFW8yW0LXf+JikwXxPAuAEzqtsKrqpxSAdA0hw8Bj7p9+wikxa
+	 tgf7W356JGb6i6g2Avbz+brjcR1bO79UHjTOt4ropK/IitH/F+1ThkfQS0gMuqmabx
+	 tcRUgFyJh8Q4Q==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D9826C64459;
+	Wed,  9 Aug 2023 22:40:22 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next 0/3] Remove redundant functions and use generic
+ functions
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169162082288.25117.9951788837414613577.git-patchwork-notify@kernel.org>
+Date: Wed, 09 Aug 2023 22:40:22 +0000
+References: <20230808114504.4036008-1-lizetao1@huawei.com>
+In-Reply-To: <20230808114504.4036008-1-lizetao1@huawei.com>
+To: Li Zetao <lizetao1@huawei.com>
+Cc: sgoutham@marvell.com, lcherian@marvell.com, gakula@marvell.com,
+ jerinj@marvell.com, hkelam@marvell.com, sbhatta@marvell.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org
 
-On Tue, 8 Aug 2023 12:06:23 +0530 Hariprasad Kelam wrote:
-> The current implementation does not allow the user to enable both
-> hw-tc-offload and ntuple features on the interface. These checks
-> are added as TC flower offload and ntuple features internally configures
-> the same hardware resource MCAM. But TC HTB offload configures the
-> transmit scheduler which can be safely enabled on the interface with
-> ntuple feature.
+Hello:
+
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Tue, 8 Aug 2023 19:45:01 +0800 you wrote:
+> This patch set removes some redundant functions. In the network module,
+> two generic functions are provided to convert u64 value and Ethernet
+> MAC address. Using generic functions helps reduce redundant code and
+> improve code readability.
 > 
-> This patch fixes the issue by relaxing the checks and ensures
-> only TC flower offload and ntuple features are mutually exclusive.
+> Li Zetao (3):
+>   octeontx2-af: Remove redundant functions mac2u64() and cfg2mac()
+>   octeontx2-af: Use u64_to_ether_addr() to convert ethernet address
+>   octeontx2-af: Remove redundant functions rvu_npc_exact_mac2u64()
+> 
+> [...]
 
-Not enabling a feature is not a bug. And it will cause conflicts 
-with net-next. Resend for net-next without the Fixes tag, please.
+Here is the summary with links:
+  - [net-next,1/3] octeontx2-af: Remove redundant functions mac2u64() and cfg2mac()
+    https://git.kernel.org/netdev/net-next/c/7d0bc2602308
+  - [net-next,2/3] octeontx2-af: Use u64_to_ether_addr() to convert ethernet address
+    https://git.kernel.org/netdev/net-next/c/e62c7adfd4ac
+  - [net-next,3/3] octeontx2-af: Remove redundant functions rvu_npc_exact_mac2u64()
+    https://git.kernel.org/netdev/net-next/c/47f8dc0938e9
+
+You are awesome, thank you!
 -- 
-pw-bot: cr
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
