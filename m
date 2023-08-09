@@ -1,130 +1,75 @@
-Return-Path: <netdev+bounces-25770-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25771-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E4E8775692
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 11:41:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B0670775697
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 11:41:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 465B6281AD5
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 09:41:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E0E431C2116C
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 09:41:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6688A13FE1;
-	Wed,  9 Aug 2023 09:41:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E55B1426B;
+	Wed,  9 Aug 2023 09:41:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58D7953B7;
-	Wed,  9 Aug 2023 09:41:08 +0000 (UTC)
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B788A1FDF;
-	Wed,  9 Aug 2023 02:41:03 -0700 (PDT)
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-99c10ba30afso149166266b.1;
-        Wed, 09 Aug 2023 02:41:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691574062; x=1692178862;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=POZx1Czjl+EpbVC1OkzexxsQSbMIz0qrEmbKh1sujrs=;
-        b=B4a39S9KTbq8bLxQqLKVJXrN+p/wwuQ66aRgmEm5JgM5w4yyrmKMaUsByr7pdjkmOC
-         M+L4ZWD9Sywag1fHuQanISDLGszoPoq/af39OPswTyG4a+jd233euOJrqK0LRmbqRSH4
-         UWvuurdobJ901n0WZX8TeRI7eyiQWC+8oFpV4HVUQY41KMivkfwd6WZ+1WFijnK/XDwO
-         L857iEvCGQkfYHfPWBi8Lo3jDEXCGB/1x4pBt5M0RObUOhL7KAlbRZK8T+O/eqc/JGYu
-         0ggUUexnEXVPAVKLhcBLht4nswiDMln1W18Pt6PoEN3fT3ahaHiezSpKVyztIXYnmyhE
-         3VLg==
-X-Gm-Message-State: AOJu0YxZ94hLwN0z8xPQVc/u/rYBDotxoR1W4HU3EZeD0RYQ9oInKNPb
-	UvAmv/g9zhQgIhrbnwv4o5Y=
-X-Google-Smtp-Source: AGHT+IEMjS663ej8XAL1oDFmpG+FblomrzyFQBwSCqa4M2JYBvIf84H9BGmB0T1n+xQB6I9ZJpVg+w==
-X-Received: by 2002:a17:906:3298:b0:99c:7300:94b8 with SMTP id 24-20020a170906329800b0099c730094b8mr2601281ejw.10.1691574061783;
-        Wed, 09 Aug 2023 02:41:01 -0700 (PDT)
-Received: from gmail.com (fwdproxy-cln-118.fbsv.net. [2a03:2880:31ff:76::face:b00c])
-        by smtp.gmail.com with ESMTPSA id a1-20020a1709063a4100b0099275c59bc9sm7788999ejf.33.2023.08.09.02.41.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Aug 2023 02:41:01 -0700 (PDT)
-Date: Wed, 9 Aug 2023 02:40:59 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Stanislav Fomichev <sdf@google.com>
-Cc: axboe@kernel.dk, asml.silence@gmail.com,
-	willemdebruijn.kernel@gmail.com, bpf@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	io-uring@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com
-Subject: Re: [PATCH v2 0/8] io_uring: Initial support for {s,g}etsockopt
- commands
-Message-ID: <ZNNfK5e+lc0tsjj/@gmail.com>
-References: <20230808134049.1407498-1-leitao@debian.org>
- <ZNJ8zGcYClv/VCwG@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2370F613F
+	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 09:41:35 +0000 (UTC)
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 732AE1FE2
+	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 02:41:34 -0700 (PDT)
+Received: from dggpemm500006.china.huawei.com (unknown [172.30.72.54])
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4RLQ5c54Cpz1GF3c;
+	Wed,  9 Aug 2023 17:40:20 +0800 (CST)
+Received: from dggpemm500007.china.huawei.com (7.185.36.183) by
+ dggpemm500006.china.huawei.com (7.185.36.236) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Wed, 9 Aug 2023 17:41:31 +0800
+Received: from [10.174.178.174] (10.174.178.174) by
+ dggpemm500007.china.huawei.com (7.185.36.183) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Wed, 9 Aug 2023 17:41:31 +0800
+Subject: Re: [PATCH -next] net: ethernet: 8390: ne2k-pci: use
+ module_pci_driver() macro
+To: <netdev@vger.kernel.org>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <yangyingliang@huawei.com>
+References: <20230809093128.2825803-1-yangyingliang@huawei.com>
+From: Yang Yingliang <yangyingliang@huawei.com>
+Message-ID: <ae76b128-79a7-73a6-89df-b28a2da91e98@huawei.com>
+Date: Wed, 9 Aug 2023 17:41:30 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZNJ8zGcYClv/VCwG@google.com>
-X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FSL_HELO_FAKE,
-	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,
-	RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS autolearn=no
+In-Reply-To: <20230809093128.2825803-1-yangyingliang@huawei.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Originating-IP: [10.174.178.174]
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ dggpemm500007.china.huawei.com (7.185.36.183)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Aug 08, 2023 at 10:35:08AM -0700, Stanislav Fomichev wrote:
-> On 08/08, Breno Leitao wrote:
-> > This patchset adds support for getsockopt (SOCKET_URING_OP_GETSOCKOPT)
-> > and setsockopt (SOCKET_URING_OP_SETSOCKOPT) in io_uring commands.
-> > SOCKET_URING_OP_SETSOCKOPT implements generic case, covering all levels
-> > nad optnames. On the other hand, SOCKET_URING_OP_GETSOCKOPT just
-> > implements level SOL_SOCKET case, which seems to be the
-> > most common level parameter for get/setsockopt(2).
-> > 
-> > struct proto_ops->setsockopt() uses sockptr instead of userspace
-> > pointers, which makes it easy to bind to io_uring. Unfortunately
-> > proto_ops->getsockopt() callback uses userspace pointers, except for
-> > SOL_SOCKET, which is handled by sk_getsockopt(). Thus, this patchset
-> > leverages sk_getsockopt() to imlpement the SOCKET_URING_OP_GETSOCKOPT
-> > case.
-> > 
-> > In order to support BPF hooks, I modified the hooks to use  sockptr, so,
-> > it is flexible enough to accept user or kernel pointers for
-> > optval/optlen.
-> > 
-> > PS1: For getsockopt command, the optlen field is not a userspace
-> > pointers, but an absolute value, so this is slightly different from
-> > getsockopt(2) behaviour. The new optlen value is returned in cqe->res.
-> > 
-> > PS2: The userspace pointers need to be alive until the operation is
-> > completed.
-> > 
-> > These changes were tested with a new test[1] in liburing. On the BPF
-> > side, I tested that no regression was introduced by running "test_progs"
-> > self test using "sockopt" test case.
-> > 
-> > [1] Link: https://github.com/leitao/liburing/blob/getsock/test/socket-getsetsock-cmd.c
-> > 
-> > RFC -> V1:
-> > 	* Copy user memory at io_uring subsystem, and call proto_ops
-> > 	  callbacks using kernel memory
-> > 	* Implement all the cases for SOCKET_URING_OP_SETSOCKOPT
-> 
-> I did a quick pass, will take a close look later today. So far everything makes
-> sense to me.
-> 
-> Should we properly test it as well?
-> We have tools/testing/selftests/bpf/prog_tests/sockopt.c which does
-> most of the sanity checks, but it uses regular socket/{g,s}etsockopt
-> syscalls.
+Wrong prefix subject, drop this patch.
 
-Right, that is what I've been using to test the changes.
-
-> Seems like it should be pretty easy to extend this with
-> io_uring path? tools/testing/selftests/net/io_uring_zerocopy_tx.c
-> already implements minimal wrappers which we can most likely borrow.
-
-Sure, I can definitely do it. Do you want to see the new tests in this
-patchset, or, in a following patches?
+On 2023/8/9 17:31, Yang Yingliang wrote:
+> The driver init/exit() function don't do anything special, it
+> can use the module_pci_driver() macro to eliminate boilerplate
+> code.
+>
+> Signed-off-by: Yang Yingliang <yangyingliang@huawei.com>
+>
 
