@@ -1,109 +1,137 @@
-Return-Path: <netdev+bounces-25931-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25932-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66053776339
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 17:01:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25CDF77633E
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 17:01:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5046B1C2122E
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 15:01:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DC865281B88
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 15:01:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B453C18C1B;
-	Wed,  9 Aug 2023 15:01:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 685DE19BCB;
+	Wed,  9 Aug 2023 15:01:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8527372
-	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 15:01:35 +0000 (UTC)
-Received: from smtp-fw-52005.amazon.com (smtp-fw-52005.amazon.com [52.119.213.156])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 919511FF5;
-	Wed,  9 Aug 2023 08:01:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1691593294; x=1723129294;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=DiprBMaw8ZeBX/+k+AGZEjaYfi/yNQo5mvz8MWBt2/E=;
-  b=rNNfJR+KqrOWYlZ5OyHNkiwLwflIp/2nM/cX62HT2bo2/wMVBYZIj8Wh
-   nsnF+bpTNcYUwzYJQVIx0Y6qX9BmtwIutVwSdTCfiCSzTRI1Ii4u4nnLd
-   66vDhwMbYWrdTO4Z7lu1tUmRV48bpG0SAAXetzMPLJH7cuM5M1K1WT7oN
-   U=;
-X-IronPort-AV: E=Sophos;i="6.01,159,1684800000"; 
-   d="scan'208";a="597746206"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-pdx-2a-m6i4x-d47337e0.us-west-2.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-52005.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Aug 2023 15:01:33 +0000
-Received: from EX19MTAUWB001.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
-	by email-inbound-relay-pdx-2a-m6i4x-d47337e0.us-west-2.amazon.com (Postfix) with ESMTPS id 388AD60B08;
-	Wed,  9 Aug 2023 15:01:32 +0000 (UTC)
-Received: from EX19D019UWA003.ant.amazon.com (10.13.139.116) by
- EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Wed, 9 Aug 2023 15:01:31 +0000
-Received: from EX19D019UWA004.ant.amazon.com (10.13.139.126) by
- EX19D019UWA003.ant.amazon.com (10.13.139.116) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Wed, 9 Aug 2023 15:01:31 +0000
-Received: from EX19D019UWA004.ant.amazon.com ([fe80::445f:a79:89eb:e469]) by
- EX19D019UWA004.ant.amazon.com ([fe80::445f:a79:89eb:e469%5]) with mapi id
- 15.02.1118.030; Wed, 9 Aug 2023 15:01:31 +0000
-From: "Erdogan, Tahsin" <trdgn@amazon.com>
-To: "pabeni@redhat.com" <pabeni@redhat.com>, "jasowang@redhat.com"
-	<jasowang@redhat.com>, "willemdebruijn.kernel@gmail.com"
-	<willemdebruijn.kernel@gmail.com>, "herbert@gondor.apana.org.au"
-	<herbert@gondor.apana.org.au>, "davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
-	<kuba@kernel.org>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v3] tun: avoid high-order page allocation for packet
- header
-Thread-Topic: [PATCH v3] tun: avoid high-order page allocation for packet
- header
-Thread-Index: AQHZytJhxeluFQL13EmDwC1q708mvA==
-Date: Wed, 9 Aug 2023 15:01:31 +0000
-Message-ID: <a257dfa6333fea0d220d51b17b0512327e115060.camel@amazon.com>
-References: <20230808230920.1944738-1-trdgn@amazon.com>
-	 <64d3921ed1f1a_267bde294f2@willemb.c.googlers.com.notmuch>
-	 <fc219fe5f8c8dec66a6fdff08f40acf714b8328b.camel@amazon.com>
-	 <64d39c34bbd92_26add629414@willemb.c.googlers.com.notmuch>
-In-Reply-To: <64d39c34bbd92_26add629414@willemb.c.googlers.com.notmuch>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-originating-ip: [10.135.199.88]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <A1E832B2176F4A4C989E28E2D288B45E@amazon.com>
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E20218C1B
+	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 15:01:50 +0000 (UTC)
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::224])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 683402107;
+	Wed,  9 Aug 2023 08:01:48 -0700 (PDT)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 08F12E0008;
+	Wed,  9 Aug 2023 15:01:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1691593306;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=g0zvfLvyRJt7hOgvNIifYjQHxyaOMWD1ltEX2pdHMbc=;
+	b=iXnta/0eS8D5cHJ76Q4dwhU+XK3qsGA5Twh8/3mjUO44s+pEvR/n0UP3phDRDaRzknJJqg
+	U0Po6QG77G0tYGseNfrgZzZ+oWZIReHQUy/j7wwlAqPpgNMdWXCyXkv/pWCbZTB17U0vBq
+	09x+R9HSs6PA9O+bm3Z01VLxBArlIT/tenAyyV94zuJu4ABgfwHf1jlpBmT9JL/aTrx54e
+	xulDWbuzkyyvyvjDTlEeKHtRrqbNHF9NWfFODttuROxRsjNMQwXq4dUnuY5B9C5WUAcO8L
+	rl4cb1owoaMRbW2+7s4uQte7dbC1HrDGo95q3ov+1CrqQAidzdIy5MawOqVkLw==
+Date: Wed, 9 Aug 2023 17:01:39 +0200
+From: Herve Codina <herve.codina@bootlin.com>
+To: Randy Dunlap <rdunlap@infradead.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>, Rob Herring
+ <robh+dt@kernel.org>, Krzysztof Kozlowski
+ <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
+ Lee Jones <lee@kernel.org>, Linus Walleij <linus.walleij@linaro.org>, Qiang
+ Zhao <qiang.zhao@nxp.com>, Li Yang <leoyang.li@nxp.com>, Liam Girdwood
+ <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, Jaroslav Kysela
+ <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, Shengjiu Wang
+ <shengjiu.wang@gmail.com>, Xiubo Li <Xiubo.Lee@gmail.com>, Fabio Estevam
+ <festevam@gmail.com>, Nicolin Chen <nicoleotsuka@gmail.com>, Christophe
+ Leroy <christophe.leroy@csgroup.eu>, netdev@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, alsa-devel@alsa-project.org, Thomas
+ Petazzoni <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH v3 21/28] net: wan: Add framer framework support
+Message-ID: <20230809170139.2402e4a2@bootlin.com>
+In-Reply-To: <cc9417a3-ef86-bb46-9519-cf65b03b5f08@infradead.org>
+References: <20230809132757.2470544-1-herve.codina@bootlin.com>
+	<20230809132757.2470544-22-herve.codina@bootlin.com>
+	<cc9417a3-ef86-bb46-9519-cf65b03b5f08@infradead.org>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Precedence: Bulk
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: herve.codina@bootlin.com
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-T24gV2VkLCAyMDIzLTA4LTA5IGF0IDEwOjAxIC0wNDAwLCBXaWxsZW0gZGUgQnJ1aWpuIHdyb3Rl
-Og0KPiBFcmRvZ2FuLCBUYWhzaW4gd3JvdGU6DQo+ID4gT24gV2VkLCAyMDIzLTA4LTA5IGF0IDA5
-OjE4IC0wNDAwLCBXaWxsZW0gZGUgQnJ1aWpuIHdyb3RlOg0KPiA+ID4gVHVuIHNlbmRtc2cgaXMg
-YSBzcGVjaWFsIGNhc2UsIG9ubHkgdXNlZCBieSB2aG9zdC1uZXQgZnJvbSBpbnNpZGUNCj4gPiA+
-IHRoZQ0KPiA+ID4ga2VybmVsLiBBcmd1YWJseSBjb25zaXN0ZW5jeSB3aXRoIHBhY2tldF9zbmQv
-cGFja2V0X2FsbG9jX3NrYg0KPiA+ID4gd291bGQNCj4gPiA+IGJlDQo+ID4gPiBtb3JlIGltcG9y
-dGFudC4gVGhhdCBzYWlkLCB0aGlzIG1ha2VzIHNlbnNlIHRvIG1lLiBJIGFzc3VtZSB5b3VyDQo+
-ID4gPiBjb25maWd1cmluZyBhIGRldmljZSB3aXRoIHZlcnkgbGFyZ2UgTVRVPw0KPiA+IA0KPiA+
-IFRoYXQncyByaWdodC4gSSBhbSBzZXR0aW5nIE1UVSB0byA5MTAwIGluIG15IHRlc3QuDQo+IA0K
-PiBNYWtlcyBzZW5zZS4gVGhhdCdzIG5vdCBldmVuIHRoYXQgbGFyZ2UuDQo+IA0KPiBQbGVhc2Ug
-YWRkcmVzcyB0aGUgY29tbWl0IG1lc3NhZ2UgcG9pbnRzIGFib3V0IHZpcnRpb19uZXRfaGRyLmhk
-cl9sZW4NCj4gYW5kIHdyaXRlKCkgdnMgd3JpdGV2KCkuDQoNClllcywgSSB3aWxsIHVwZGF0ZSBj
-b21taXQgbWVzc2FnZSBpbiB2NC4gdGhhbmsgeW91Lg0K
+Hi Randy,
+
+On Wed, 9 Aug 2023 07:24:32 -0700
+Randy Dunlap <rdunlap@infradead.org> wrote:
+
+> Hi,
+> 
+> On 8/9/23 06:27, Herve Codina wrote:
+> > diff --git a/drivers/net/wan/framer/Kconfig b/drivers/net/wan/framer/Kconfig
+> > new file mode 100644
+> > index 000000000000..96ef1e7ba8eb
+> > --- /dev/null
+> > +++ b/drivers/net/wan/framer/Kconfig
+> > @@ -0,0 +1,19 @@
+> > +# SPDX-License-Identifier: GPL-2.0-only
+> > +#
+> > +# FRAMER
+> > +#
+> > +
+> > +menu "Framer Subsystem"
+> > +
+> > +config GENERIC_FRAMER
+> > +	bool "Framer Core"  
+> 
+> Just curious: any reason that this cannot be tristate (i.e., a loadable module)?
+> Thanks.
+
+For the same reasons as generic phy cannot be built as module
+  b51fbf9fb0c3 phy-core: Don't allow building phy-core as a module
+
+In the framer case, this allows to have the QMC HDLC driver built on systems
+without any framers (no providers and no framer core framework).
+Also the framer phandle is optional in the device tree QMC HDLC node.
+
+Regards,
+Hervé
+
+> 
+> > +	help
+> > +	  Generic Framer support.
+> > +
+> > +	  This framework is designed to provide a generic interface for framer
+> > +	  devices present in the kernel. This layer will have the generic
+> > +	  API by which framer drivers can create framer using the framer
+> > +	  framework and framer users can obtain reference to the framer.
+> > +	  All the users of this framework should select this config.
+> > +
+> > +endmenu  
+> 
+
+
+
+-- 
+Hervé Codina, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
 
