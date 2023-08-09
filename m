@@ -1,115 +1,119 @@
-Return-Path: <netdev+bounces-25665-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25666-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 518EF775148
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 05:13:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A592677515A
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 05:25:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 81EDE1C210EC
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 03:13:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C51CD281A34
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 03:25:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22AD4650;
-	Wed,  9 Aug 2023 03:13:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B648C654;
+	Wed,  9 Aug 2023 03:25:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 160FC181
-	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 03:13:41 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCD931BDA
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 20:13:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1691550819;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=Wjd3SYab4Y1nwTD504NwfsRbY6wAzHl3H30aZe/DTSg=;
-	b=bia3Z/RYEpz9uFASZtjczdUxoTxF1JZjxyDzl0Tegee7QHIebo5JkV7cYP2s1MOc5pQWbr
-	Q50V4TTCvUxLn7DA9c48oty1cbW1DcS9zkOtwEuHreqtzUSKfTCuUvg9hPSujyQFDi8tTc
-	jxuchY/C0Gxus7myJfW0JwdLlSTQTGE=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-306-JfaFoPH5N2-NyHhrA5Ff0w-1; Tue, 08 Aug 2023 23:13:35 -0400
-X-MC-Unique: JfaFoPH5N2-NyHhrA5Ff0w-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5AD4985C1A2;
-	Wed,  9 Aug 2023 03:13:35 +0000 (UTC)
-Received: from dell-per430-12.lab.eng.pek2.redhat.com (dell-per430-12.lab.eng.pek2.redhat.com [10.73.196.55])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 96A641121314;
-	Wed,  9 Aug 2023 03:13:31 +0000 (UTC)
-From: Jason Wang <jasowang@redhat.com>
-To: mst@redhat.com,
-	jasowang@redhat.com,
-	xuanzhuo@linux.alibaba.com
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	virtualization@lists.linux-foundation.org,
-	netdev@vger.kernel.org,
-	Dragos Tatulea <dtatulea@nvidia.com>
-Subject: [PATCH net] virtio-net: set queues after driver_ok
-Date: Tue,  8 Aug 2023 23:13:29 -0400
-Message-Id: <20230809031329.251362-1-jasowang@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA67E62C
+	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 03:25:52 +0000 (UTC)
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A0721BF1;
+	Tue,  8 Aug 2023 20:25:49 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.153])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4RLFnN5LKmz4f3wQh;
+	Wed,  9 Aug 2023 11:25:44 +0800 (CST)
+Received: from [10.67.110.48] (unknown [10.67.110.48])
+	by APP1 (Coremail) with SMTP id cCh0CgA3sy84B9NkGt0JAQ--.33760S2;
+	Wed, 09 Aug 2023 11:25:45 +0800 (CST)
+Message-ID: <b78cdc3b-8e08-6c75-de8e-15946789056f@huaweicloud.com>
+Date: Wed, 9 Aug 2023 11:25:44 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-type: text/plain
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH v2] netfilter: ebtables: fix fortify warnings
+Content-Language: en-US
+To: "Gustavo A. R. Silva" <gustavoars@kernel.org>
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
+ Jozsef Kadlecsik <kadlec@netfilter.org>, Florian Westphal <fw@strlen.de>,
+ Roopa Prabhu <roopa@nvidia.com>, Nikolay Aleksandrov <razor@blackwall.org>,
+ Kees Cook <keescook@chromium.org>, netfilter-devel@vger.kernel.org,
+ coreteam@netfilter.org, netdev@vger.kernel.org,
+ linux-hardening@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Wang Weiyang <wangweiyang2@huawei.com>, Xiu Jianfeng
+ <xiujianfeng@huawei.com>, gongruiqi1@huawei.com
+References: <20230808133038.771316-1-gongruiqi@huaweicloud.com>
+ <ZNJuMoe37L02TP20@work>
+From: "GONG, Ruiqi" <gongruiqi@huaweicloud.com>
+In-Reply-To: <ZNJuMoe37L02TP20@work>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-CM-TRANSID:cCh0CgA3sy84B9NkGt0JAQ--.33760S2
+X-Coremail-Antispam: 1UD129KBjvdXoW7Xr15Gr4rAw48Gw1kuFyxGrg_yoWkJrX_Aw
+	srZr97GrWjya4Dtr45J39xXrn3XwnYvFy7WryIqrW8ZwnxJr1jk39rXr9Yvw1rJryxCr4U
+	ArZ3GF98Gw1UGjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUbIxYFVCjjxCrM7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E6xAIw20E
+	Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwV
+	A0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x02
+	67AKxVWxJr0_GcWl84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxV
+	AFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2
+	j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7x
+	kEbVWUJVW8JwACjcxG0xvEwIxGrwACI402YVCY1x02628vn2kIc2xKxwCYjI0SjxkI62AI
+	1cAE67vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I
+	8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8
+	ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x
+	0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Wr1j6rW3Jr1lIxAIcVC2z280aVAF
+	wI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa
+	7IU1zuWJUUUUU==
+X-CM-SenderInfo: pjrqw2pxltxq5kxd4v5lfo033gof0z/
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-3.7 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Commit 25266128fe16 ("virtio-net: fix race between set queues and
-probe") tries to fix the race between set queues and probe by calling
-_virtnet_set_queues() before DRIVER_OK is set. This violates virtio
-spec. Fixing this by setting queues after virtio_device_ready().
 
-Fixes: 25266128fe16 ("virtio-net: fix race between set queues and probe")
-Reported-by: Dragos Tatulea <dtatulea@nvidia.com>
-Signed-off-by: Jason Wang <jasowang@redhat.com>
----
-The patch is needed for -stable.
----
- drivers/net/virtio_net.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+On 2023/08/09 0:32, Gustavo A. R. Silva wrote:
+>
+> [...]
+>
+>> diff --git a/net/bridge/netfilter/ebtables.c b/net/bridge/netfilter/ebtables.c
+>> index 757ec46fc45a..5ec66b1ebb64 100644
+>> --- a/net/bridge/netfilter/ebtables.c
+>> +++ b/net/bridge/netfilter/ebtables.c
+>> @@ -2115,8 +2115,7 @@ static int size_entry_mwt(const struct ebt_entry *entry, const unsigned char *ba
+>>  		return ret;
+>>  
+>>  	offsets[0] = sizeof(struct ebt_entry); /* matches come first */
+>> -	memcpy(&offsets[1], &entry->watchers_offset,
+>> -			sizeof(offsets) - sizeof(offsets[0]));
+>> +	memcpy(&offsets[1], &entry->offsets, sizeof(offsets) - sizeof(offsets[0]));
+> 							^^^^^^^^^^^^
+> You now can replace this ____________________________________|
+> with just `sizeof(entry->offsets)`
+> 
+> With that change you can add my
+> Reviewed-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+> 
+> Thank you
+> --
+> Gustavo
+> 
 
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index 1270c8d23463..ff03921e46df 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -4219,8 +4219,6 @@ static int virtnet_probe(struct virtio_device *vdev)
- 	if (vi->has_rss || vi->has_rss_hash_report)
- 		virtnet_init_default_rss(vi);
- 
--	_virtnet_set_queues(vi, vi->curr_queue_pairs);
--
- 	/* serialize netdev register + virtio_device_ready() with ndo_open() */
- 	rtnl_lock();
- 
-@@ -4233,6 +4231,8 @@ static int virtnet_probe(struct virtio_device *vdev)
- 
- 	virtio_device_ready(vdev);
- 
-+	_virtnet_set_queues(vi, vi->curr_queue_pairs);
-+
- 	/* a random MAC address has been assigned, notify the device.
- 	 * We don't fail probe if VIRTIO_NET_F_CTRL_MAC_ADDR is not there
- 	 * because many devices work fine without getting MAC explicitly
--- 
-2.39.3
+Will do. Thanks for the suggestion & review!
+
+>>  
+>>  	if (state->buf_kern_start) {
+>>  		buf_start = state->buf_kern_start + state->buf_kern_offset;
+>> -- 
+>> 2.41.0
+>>
 
 
