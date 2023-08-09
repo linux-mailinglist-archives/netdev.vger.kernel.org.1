@@ -1,178 +1,143 @@
-Return-Path: <netdev+bounces-25803-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25804-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 556A3775AA0
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 13:10:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55649775AE1
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 13:12:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 388FD1C21124
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 11:10:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8649D1C2118F
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 11:12:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A442717744;
-	Wed,  9 Aug 2023 11:09:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22D8F14F8E;
+	Wed,  9 Aug 2023 11:12:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F52C53B7;
-	Wed,  9 Aug 2023 11:09:57 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE6A7C433C9;
-	Wed,  9 Aug 2023 11:09:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691579397;
-	bh=3Wv/fOquDhwM4PQubxLEW0sEpc4CURoTiDKWKH6VRuI=;
-	h=Date:Cc:Subject:To:References:From:In-Reply-To:From;
-	b=CfPD9DpgGD7pma4wFzIKTbCQRrEN4QKfDTqWQCL/GzgESJrADcF57CKkt+P0XcOwN
-	 N7P6pOwnYnR6Y+u1GkD5KjfC3+2yCGGO1yWabC1QRUguhhjCcXfsnzfKdnyP32n0wq
-	 vrH9FxnU0hdH4KNngPLZdArA4WJYOAFvRr1Xq6k9avD86cbutzy/ayFzMWtbkKlzMe
-	 YP95BSi4dx7LEkK73HBgEFIXU9bVnpg2Ur3XKM0LLHsaCQdPCpPA0aqo8dz9m1nGys
-	 eFXFz5r27/etHlxHRgVOKRu0VFMhZsHJOBv6RJGJSuo+YP9QiW6fKdMFNBS99PmE8E
-	 rgu6TkQis76+Q==
-Message-ID: <68f73855-f206-80a2-a546-3d40864ee176@kernel.org>
-Date: Wed, 9 Aug 2023 13:09:50 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 179F21774C
+	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 11:12:27 +0000 (UTC)
+Received: from mail-wm1-x334.google.com (mail-wm1-x334.google.com [IPv6:2a00:1450:4864:20::334])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5F6F1FD7;
+	Wed,  9 Aug 2023 04:12:22 -0700 (PDT)
+Received: by mail-wm1-x334.google.com with SMTP id 5b1f17b1804b1-3fe5eb84dceso23478625e9.1;
+        Wed, 09 Aug 2023 04:12:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1691579541; x=1692184341;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=2u9xybsbUOSRAB2M9cpPBdGgS/COFb/KNUNOjet7l4I=;
+        b=j5vxLd3JusR2Fryuq/92gPcvkUHdMNsD1Yue0P8ajNw2dWEycci0mvf6KZiRYF8LZc
+         P/+7ZyFD1CNSQgYr8imdxdyFJL7J7kdyOsOOie5uX3IW6TVGsOFudIjd8i7Ii9MlUBQi
+         Eb0k5M3HvgL7B7lS4+SkIqWWT52+EBZOKP4LNm+VPfvlTvGr4GiOcQ1ELWYXiR9J0zsT
+         E58I6OhYyNY7W7tJ73VDWoSU0TRuJP+S00SsGRocIFui2zlOF9jssFzGA1h0SF/KIAfv
+         DsVtNoyP1ETYwqKyn6v51DqTjEG1SfeyjH4kBpmaDuvcseTqrp+zLk33YAN4NV7ZxFrG
+         YG1w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691579541; x=1692184341;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=2u9xybsbUOSRAB2M9cpPBdGgS/COFb/KNUNOjet7l4I=;
+        b=RXsTDpW1c9f2JC+BTAY31lX29y7Ol9BeAnJgGbNN/axVCLCA7ZG/GaVsaWxdWU6kCV
+         6GwD16juGRKrOAPDFfYnqEwVsWSX79WpTtZAM+BW8g4UZDW1Bbydx9UpTr4uF8tKGlM7
+         QumjMvvkRchxlc98cvnmwgYH4M0biQ6zr9dNExH8++Gemo4H0DK5ftGGdALuobgXsuTp
+         6Am4GZwCuLPfdChjP6cBIE3acPJxiYyJgZDjh5nVi0jncT9M8x161BQtL+9g0GZFZ+YQ
+         2YV+oBdwfmRsy5MT9gZK0b8AHnXQXm68ksFlSBuD/cHWakD7PgYseE0uhFxksn+f8EQr
+         Qzlg==
+X-Gm-Message-State: AOJu0Yx5ULR2mbhN9UDqoQWerNwyW6QGO52mimjOxrxYHckIhavSfp4z
+	m+jUD2TY4mE/YhrbnAeytio=
+X-Google-Smtp-Source: AGHT+IGbYVbwvxlmviv/YVXhuwz8atUZzkdpGmnlOLVcSWdw4XpCtgPNxAFeMbZ+MmQ4bsd0/SBuUw==
+X-Received: by 2002:a05:600c:2811:b0:3f7:4961:52ad with SMTP id m17-20020a05600c281100b003f7496152admr1945488wmb.3.1691579541026;
+        Wed, 09 Aug 2023 04:12:21 -0700 (PDT)
+Received: from [192.168.0.103] ([77.126.7.132])
+        by smtp.gmail.com with ESMTPSA id y9-20020a1c4b09000000b003fe215e4492sm1659169wma.4.2023.08.09.04.12.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 09 Aug 2023 04:12:20 -0700 (PDT)
+Message-ID: <a81b9b4a-d2c3-3136-9113-4568f2a87e97@gmail.com>
+Date: Wed, 9 Aug 2023 14:12:18 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
  Thunderbird/102.13.0
-Cc: =?UTF-8?Q?Toke_H=c3=b8iland-J=c3=b8rgensen?= <toke@redhat.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
- Jonathan Lemon <jonathan.lemon@gmail.com>,
- Pavel Begunkov <asml.silence@gmail.com>,
- Yunsheng Lin <linyunsheng@huawei.com>, Kees Cook <keescook@chromium.org>,
- Richard Gobert <richardbgobert@gmail.com>,
- "open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>,
- open list <linux-kernel@vger.kernel.org>,
- "open list:XDP (eXpress Data Path)" <bpf@vger.kernel.org>,
- Donald Hunter <donhunte@redhat.com>, Dave Tucker <datucker@redhat.com>
-Subject: Re: [RFC v3 Optimizing veth xsk performance 0/9]
+Subject: Re: [PATCH net-next 00/10] Convert mlx4 to use auxiliary bus
 Content-Language: en-US
-To: =?UTF-8?B?6buE5p2w?= <huangjie.albert@bytedance.com>,
- =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>,
- Magnus Karlsson <magnus.karlsson@intel.com>,
- Maryam Tahhan <mtahhan@redhat.com>
-References: <20230808031913.46965-1-huangjie.albert@bytedance.com>
- <87v8dpbv5r.fsf@toke.dk>
- <CABKxMyNrwSOrzpq6mhqtU_kEk5B9nKPODtmfjJO5_NmGpw_Oag@mail.gmail.com>
- <87msz04mb4.fsf@toke.dk>
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <87msz04mb4.fsf@toke.dk>
+To: Petr Pavlu <petr.pavlu@suse.com>, tariqt@nvidia.com, yishaih@nvidia.com,
+ leon@kernel.org
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, jgg@ziepe.ca, netdev@vger.kernel.org,
+ linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20230804150527.6117-1-petr.pavlu@suse.com>
+From: Tariq Toukan <ttoukan.linux@gmail.com>
+In-Reply-To: <20230804150527.6117-1-petr.pavlu@suse.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
 
-On 09/08/2023 11.06, Toke Høiland-Jørgensen wrote:
-> 黄杰 <huangjie.albert@bytedance.com> writes:
+
+On 04/08/2023 18:05, Petr Pavlu wrote:
+> This series converts the mlx4 drivers to use auxiliary bus, similarly to
+> how mlx5 was converted [1]. The first 6 patches are preparatory changes,
+> the remaining 4 are the final conversion.
 > 
->> Toke Høiland-Jørgensen <toke@redhat.com> 于2023年8月8日周二 20:01写道：
->>>
->>> Albert Huang <huangjie.albert@bytedance.com> writes:
->>>
->>>> AF_XDP is a kernel bypass technology that can greatly improve performance.
->>>> However,for virtual devices like veth,even with the use of AF_XDP sockets,
->>>> there are still many additional software paths that consume CPU resources.
->>>> This patch series focuses on optimizing the performance of AF_XDP sockets
->>>> for veth virtual devices. Patches 1 to 4 mainly involve preparatory work.
->>>> Patch 5 introduces tx queue and tx napi for packet transmission, while
->>>> patch 8 primarily implements batch sending for IPv4 UDP packets, and patch 9
->>>> add support for AF_XDP tx need_wakup feature. These optimizations significantly
->>>> reduce the software path and support checksum offload.
->>>>
->>>> I tested those feature with
->>>> A typical topology is shown below:
->>>> client(send):                                        server:(recv)
->>>> veth<-->veth-peer                                    veth1-peer<--->veth1
->>>>    1       |                                                  |   7
->>>>            |2                                                6|
->>>>            |                                                  |
->>>>          bridge<------->eth0(mlnx5)- switch -eth1(mlnx5)<--->bridge1
->>>>                    3                    4                 5
->>>>               (machine1)                              (machine2)
->>>
->>> I definitely applaud the effort to improve the performance of af_xdp
->>> over veth, this is something we have flagged as in need of improvement
->>> as well.
->>>
->>> However, looking through your patch series, I am less sure that the
->>> approach you're taking here is the right one.
->>>
->>> AFAIU (speaking about the TX side here), the main difference between
->>> AF_XDP ZC and the regular transmit mode is that in the regular TX mode
->>> the stack will allocate an skb to hold the frame and push that down the
->>> stack. Whereas in ZC mode, there's a driver NDO that gets called
->>> directly, bypassing the skb allocation entirely.
->>>
->>> In this series, you're implementing the ZC mode for veth, but the driver
->>> code ends up allocating an skb anyway. Which seems to be a bit of a
->>> weird midpoint between the two modes, and adds a lot of complexity to
->>> the driver that (at least conceptually) is mostly just a
->>> reimplementation of what the stack does in non-ZC mode (allocate an skb
->>> and push it through the stack).
->>>
->>> So my question is, why not optimise the non-zc path in the stack instead
->>> of implementing the zc logic for veth? It seems to me that it would be
->>> quite feasible to apply the same optimisations (bulking, and even GRO)
->>> to that path and achieve the same benefits, without having to add all
->>> this complexity to the veth driver?
->>>
->>> -Toke
->>>
->> thanks!
->> This idea is really good indeed. You've reminded me, and that's
->> something I overlooked. I will now consider implementing the solution
->> you've proposed and test the performance enhancement.
+> Initial motivation for this change was to address a problem related to
+> loading mlx4_en/mlx4_ib by mlx4_core using request_module_nowait(). When
+> doing such a load in initrd, the operation is asynchronous to any init
+> control and can get unexpectedly affected/interrupted by an eventual
+> root switch. Using an auxiliary bus leaves these module loads to udevd
+> which better integrates with systemd processing. [2]
 > 
-> Sounds good, thanks! :)
+> General benefit is to get rid of custom interface logic and instead use
+> a common facility available for this task. An obvious risk is that some
+> new bug is introduced by the conversion.
+> 
+> Leon Romanovsky was kind enough to check for me that the series passes
+> their verification tests.
+> 
+> [1] https://lore.kernel.org/netdev/20201101201542.2027568-1-leon@kernel.org/
+> [2] https://lore.kernel.org/netdev/0a361ac2-c6bd-2b18-4841-b1b991f0635e@suse.com/
+> 
+> Petr Pavlu (10):
+>    mlx4: Get rid of the mlx4_interface.get_dev callback
+>    mlx4: Rename member mlx4_en_dev.nb to netdev_nb
+>    mlx4: Replace the mlx4_interface.event callback with a notifier
+>    mlx4: Get rid of the mlx4_interface.activate callback
+>    mlx4: Move the bond work to the core driver
+>    mlx4: Avoid resetting MLX4_INTFF_BONDING per driver
+>    mlx4: Register mlx4 devices to an auxiliary virtual bus
+>    mlx4: Connect the ethernet part to the auxiliary bus
+>    mlx4: Connect the infiniband part to the auxiliary bus
+>    mlx4: Delete custom device management logic
+> 
+>   drivers/infiniband/hw/mlx4/main.c             | 207 ++++++----
+>   drivers/infiniband/hw/mlx4/mlx4_ib.h          |   2 +
+>   drivers/net/ethernet/mellanox/mlx4/Kconfig    |   1 +
+>   drivers/net/ethernet/mellanox/mlx4/en_main.c  | 141 ++++---
+>   .../net/ethernet/mellanox/mlx4/en_netdev.c    |  64 +---
+>   drivers/net/ethernet/mellanox/mlx4/intf.c     | 361 ++++++++++++------
+>   drivers/net/ethernet/mellanox/mlx4/main.c     | 110 ++++--
+>   drivers/net/ethernet/mellanox/mlx4/mlx4.h     |  16 +-
+>   drivers/net/ethernet/mellanox/mlx4/mlx4_en.h  |   4 +-
+>   include/linux/mlx4/device.h                   |  20 +
+>   include/linux/mlx4/driver.h                   |  42 +-
+>   11 files changed, 572 insertions(+), 396 deletions(-)
+> 
+> 
+> base-commit: 86b7e033d684a9d4ca20ad8e6f8b9300cf99668f
 
-Good to hear, that you want to optimize the non-zc TX path of AF_XDP, as
-Toke suggests.
+For the series:
+Acked-by: Tariq Toukan <tariqt@nvidia.com>
 
-There is a number of performance issues for AF_XDP non-zc TX that I've
-talked/complained to Magnus and Bjørn about over the years.
-I've recently started to work on fixing these myself, in collaboration
-with Maryam (cc).
-
-The most obvious is that non-zc TX uses socket memory accounting for the
-SKBs that gets allocated. (ZC TX obviously doesn't).  IMHO this doesn't
-make sense as AF_XDP concept is to pre-allocate memory, thus AF_XDP
-memory limits are already bounded at setup time.  Further more,
-__xsk_generic_xmit() already have a backpressure mechanism based on
-avail room in the CQ (Completion Queue) .  Hint: the call
-sock_alloc_send_skb() includes/does socket mem accounting.
-
-When AF_XDP gets combined with veth (or other layered software devices),
-the problem gets worse, because:
-
-  (1) the SKB that gets allocated by xsk_build_skb() doesn't have enough
-      headroom to satisfy XDP requirement XDP_PACKET_HEADROOM.
-
-  (2) the backing memory type from sock_alloc_send_skb() is not
-      compatible with generic/veth XDP.
-
-Both these issues, result in that when peer veth device RX the (AF_XDP)
-TX packet, then it have to reallocate memory+SKB and copy data *again*.
-
-I'm currently[1] looking into how to fix this and have some PoC patches
-to estimate the performance benefit from avoiding the realloc when
-entering veth.  With packet size 512, the numbers start at 828Kpps and
-after increase to 1002Kpps (and increase of 20% or 208 nanosec).
-
-  [1] 
-https://github.com/xdp-project/xdp-project/blob/veth-benchmark01/areas/core/veth_benchmark03.org
-
---
-Best regards,
-   Jesper Dangaard Brouer
-   MSc.CS, Sr. Principal Kernel Engineer at Red Hat
-   LinkedIn: http://www.linkedin.com/in/brouer
 
