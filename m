@@ -1,75 +1,65 @@
-Return-Path: <netdev+bounces-25682-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25683-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A17FD77525D
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 07:47:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 67A9E775271
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 08:02:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D612B1C21108
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 05:47:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C7D7281A1F
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 06:01:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D54E4430;
-	Wed,  9 Aug 2023 05:47:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26FA34689;
+	Wed,  9 Aug 2023 06:01:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F0BF81B
-	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 05:47:49 +0000 (UTC)
-Received: from out4-smtp.messagingengine.com (out4-smtp.messagingengine.com [66.111.4.28])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85C381BF0
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 22:47:48 -0700 (PDT)
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-	by mailout.nyi.internal (Postfix) with ESMTP id 025025C00A8;
-	Wed,  9 Aug 2023 01:47:48 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute5.internal (MEProxy); Wed, 09 Aug 2023 01:47:48 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:sender:subject
-	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-	:x-sasl-enc; s=fm3; t=1691560068; x=1691646468; bh=yLvlcFCleSMkH
-	jdDx+BJE+52uyRxuKQqUkkFUbCUpSM=; b=OGeTH9WVSoTriihSRTPgx+ybwkAXy
-	THDTz3+ZCnEtO+MuwwO9lKG4CpSHGqZA2tyGAALRadsBjPQrmO+mewRT5goQ4tKs
-	sDz/c9tsXDs30Q+uQXGQUf/6eKO4NrJIYsZOT/s4ybXW9OJsRm6FEhjd3Cxt7yHX
-	pPFPUYYBXGiHtc19tO1+uO9ozoYAtTemIK453ivKXgY4eBzGX4RDkItkSVygUn2X
-	a7XQN8uDixSGP8tM5iy9oDChcZVIYNDVwRK9d35kIYq+QhAi5gYYiNYqj4pCM2pt
-	Et3KxDsZsUEtk3ASdakgjercUiimViGZF4nvrGtA9CvSzCp06bx9rh4aA==
-X-ME-Sender: <xms:gyjTZF20fOgxcMsXBSDX8Oon86BKoHlJZCptmP9geLruILx193YSZQ>
-    <xme:gyjTZMF11jo7HljvRxzJZzGdDn57c-c5jqqlQ4zuhBFveZjK1QoTAu4ith5sdjFki
-    agtyNOzvn-YxuM>
-X-ME-Received: <xmr:gyjTZF7hZ57kX9bLrH0FCP1bNv2lhfEp5N1vY7MaN5dRxC2Ws_Wx8lcv_E0ZSLPkouIfe75bJ19fE6gKKF2co8_DoT6T8g>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrleefgdelkecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
-    fjughrpeffhffvvefukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpefkughoucfu
-    tghhihhmmhgvlhcuoehiughoshgthhesihguohhstghhrdhorhhgqeenucggtffrrghtth
-    gvrhhnpedvudefveekheeugeeftddvveefgfduieefudeifefgleekheegleegjeejgeeg
-    hfenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehiug
-    hoshgthhesihguohhstghhrdhorhhg
-X-ME-Proxy: <xmx:gyjTZC3VQFKfGYFWHs86Rh0ZxNHAFI-KISjM4c3kvenGWQ1CmGnm0Q>
-    <xmx:gyjTZIH24AwJ6-ie_gUSzjyV9VoRWCoQ0YwcHkaTuVqiKFRrRaL1SA>
-    <xmx:gyjTZD93EzfQtXgqIh-9nzD593-5oXcDGEdaEoRiA1Zmlqf08E1qIw>
-    <xmx:hCjTZD3yPEtIBqwSQCVBK6bj05LKkf5Mql81TpFommbKzkJIieaxcg>
-Feedback-ID: i494840e7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 9 Aug 2023 01:47:47 -0400 (EDT)
-Date: Wed, 9 Aug 2023 08:47:45 +0300
-From: Ido Schimmel <idosch@idosch.org>
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: Ido Schimmel <idosch@nvidia.com>, netdev@vger.kernel.org,
-	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
-	edumazet@google.com, petrm@nvidia.com, razor@blackwall.org,
-	mirsad.todorovac@alu.unizg.hr
-Subject: Re: [PATCH net v2 06/17] selftests: forwarding: Add a helper to skip
- test when using veth pairs
-Message-ID: <ZNMogU0whoFeerho@shredder>
-References: <20230808141503.4060661-1-idosch@nvidia.com>
- <20230808141503.4060661-7-idosch@nvidia.com>
- <ZNLyDT5X2GYQfqQR@Laptop-X1>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16182443F;
+	Wed,  9 Aug 2023 06:01:56 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79B211BFA;
+	Tue,  8 Aug 2023 23:01:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1691560915; x=1723096915;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=62vBEsNLqi1Mjl+DIxfpijOYd5i+/By8huTMmJzzxY0=;
+  b=FloBIzyXntx/8nTSs9MwLfFm9+YKtYYoUjHF34/1Hq4K+gbQGuq5zq7z
+   Vmbn+UNT/Ik4K09sk5j0dhAjAc2WKzAIikkwdxeJsSmDKdp84VN8tX0ug
+   9w5O36jbo1Fm8rFeS7RG4BgpEeRuBugppw2hPSg+9+Cc2Xo8k1EzxmHCz
+   wWqHpyx+kPouPFCbAwLzlnojyfC8rwiOQV+l9eQ94WBQ110vFQRyxQqHP
+   Al2KFHywR4QShyVuHmbxGtne7J5kJJb+k/x5LslC937XrdYTZBWE30mDT
+   0jkX+xdBLRIqwTx6/w8ek0pPuF/L2Fvmc/0yYz+aRulDmB21BTk/kFe0/
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10795"; a="355996472"
+X-IronPort-AV: E=Sophos;i="6.01,158,1684825200"; 
+   d="scan'208";a="355996472"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Aug 2023 23:01:26 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10795"; a="761224544"
+X-IronPort-AV: E=Sophos;i="6.01,158,1684825200"; 
+   d="scan'208";a="761224544"
+Received: from lkp-server01.sh.intel.com (HELO d1ccc7e87e8f) ([10.239.97.150])
+  by orsmga008.jf.intel.com with ESMTP; 08 Aug 2023 23:01:23 -0700
+Received: from kbuild by d1ccc7e87e8f with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1qTcG2-0005qi-2y;
+	Wed, 09 Aug 2023 06:01:22 +0000
+Date: Wed, 9 Aug 2023 14:01:20 +0800
+From: kernel test robot <lkp@intel.com>
+To: Breno Leitao <leitao@debian.org>, sdf@google.com, axboe@kernel.dk,
+	asml.silence@gmail.com, willemdebruijn.kernel@gmail.com
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, io-uring@vger.kernel.org, kuba@kernel.org,
+	pabeni@redhat.com
+Subject: Re: [PATCH v2 3/8] io_uring/cmd: Introduce SOCKET_URING_OP_SETSOCKOPT
+Message-ID: <202308091352.OnDIGFfN-lkp@intel.com>
+References: <20230808134049.1407498-4-leitao@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,24 +68,45 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZNLyDT5X2GYQfqQR@Laptop-X1>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_PASS,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+In-Reply-To: <20230808134049.1407498-4-leitao@debian.org>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,
+	SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Aug 09, 2023 at 09:55:25AM +0800, Hangbin Liu wrote:
-> On Tue, Aug 08, 2023 at 05:14:52PM +0300, Ido Schimmel wrote:
-> > A handful of tests require physical loopbacks to be used instead of veth
-> > pairs. Add a helper that these tests will invoke in order to be skipped
-> > when executed with veth pairs.
-> 
-> Hi Ido,
-> 
-> How to create physical loopbacks?
+Hi Breno,
 
-It's the same concept as veth. Take two physical ports and connect them
-with a cable.
+kernel test robot noticed the following build errors:
+
+[auto build test ERROR on next-20230808]
+[cannot apply to bpf-next/master bpf/master net/main net-next/main linus/master horms-ipvs/master v6.5-rc5 v6.5-rc4 v6.5-rc3 v6.5-rc5]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Breno-Leitao/net-expose-sock_use_custom_sol_socket/20230809-011901
+base:   next-20230808
+patch link:    https://lore.kernel.org/r/20230808134049.1407498-4-leitao%40debian.org
+patch subject: [PATCH v2 3/8] io_uring/cmd: Introduce SOCKET_URING_OP_SETSOCKOPT
+config: hexagon-randconfig-r041-20230808 (https://download.01.org/0day-ci/archive/20230809/202308091352.OnDIGFfN-lkp@intel.com/config)
+compiler: clang version 15.0.7 (https://github.com/llvm/llvm-project.git 8dfdcc7b7bf66834a761bd8de445840ef68e4d1a)
+reproduce: (https://download.01.org/0day-ci/archive/20230809/202308091352.OnDIGFfN-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202308091352.OnDIGFfN-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+>> ld.lld: error: undefined symbol: sock_setsockopt
+   >>> referenced by uring_cmd.c
+   >>>               io_uring/uring_cmd.o:(io_uring_cmd_sock) in archive vmlinux.a
+   >>> referenced by uring_cmd.c
+   >>>               io_uring/uring_cmd.o:(io_uring_cmd_sock) in archive vmlinux.a
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
