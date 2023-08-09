@@ -1,111 +1,115 @@
-Return-Path: <netdev+bounces-25664-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25665-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D46B5775132
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 05:06:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 518EF775148
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 05:13:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D5CD41C210EA
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 03:06:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 81EDE1C210EC
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 03:13:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57B9F62C;
-	Wed,  9 Aug 2023 03:05:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22AD4650;
+	Wed,  9 Aug 2023 03:13:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49811376
-	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 03:05:57 +0000 (UTC)
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 774111BEF;
-	Tue,  8 Aug 2023 20:05:56 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.169])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4RLFLS22rVz4f3tpx;
-	Wed,  9 Aug 2023 11:05:52 +0800 (CST)
-Received: from [10.67.110.48] (unknown [10.67.110.48])
-	by APP3 (Coremail) with SMTP id _Ch0CgC328ONAtNktWYIAQ--.34063S2;
-	Wed, 09 Aug 2023 11:05:50 +0800 (CST)
-Message-ID: <5095df45-c7bf-9040-1720-09a562b8714a@huaweicloud.com>
-Date: Wed, 9 Aug 2023 11:05:49 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 160FC181
+	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 03:13:41 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCD931BDA
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 20:13:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1691550819;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=Wjd3SYab4Y1nwTD504NwfsRbY6wAzHl3H30aZe/DTSg=;
+	b=bia3Z/RYEpz9uFASZtjczdUxoTxF1JZjxyDzl0Tegee7QHIebo5JkV7cYP2s1MOc5pQWbr
+	Q50V4TTCvUxLn7DA9c48oty1cbW1DcS9zkOtwEuHreqtzUSKfTCuUvg9hPSujyQFDi8tTc
+	jxuchY/C0Gxus7myJfW0JwdLlSTQTGE=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-306-JfaFoPH5N2-NyHhrA5Ff0w-1; Tue, 08 Aug 2023 23:13:35 -0400
+X-MC-Unique: JfaFoPH5N2-NyHhrA5Ff0w-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5AD4985C1A2;
+	Wed,  9 Aug 2023 03:13:35 +0000 (UTC)
+Received: from dell-per430-12.lab.eng.pek2.redhat.com (dell-per430-12.lab.eng.pek2.redhat.com [10.73.196.55])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 96A641121314;
+	Wed,  9 Aug 2023 03:13:31 +0000 (UTC)
+From: Jason Wang <jasowang@redhat.com>
+To: mst@redhat.com,
+	jasowang@redhat.com,
+	xuanzhuo@linux.alibaba.com
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	virtualization@lists.linux-foundation.org,
+	netdev@vger.kernel.org,
+	Dragos Tatulea <dtatulea@nvidia.com>
+Subject: [PATCH net] virtio-net: set queues after driver_ok
+Date: Tue,  8 Aug 2023 23:13:29 -0400
+Message-Id: <20230809031329.251362-1-jasowang@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH] netfilter: ebtables: fix fortify warnings
-Content-Language: en-US
-To: Florian Westphal <fw@strlen.de>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
- Jozsef Kadlecsik <kadlec@netfilter.org>, Roopa Prabhu <roopa@nvidia.com>,
- Nikolay Aleksandrov <razor@blackwall.org>, Kees Cook
- <keescook@chromium.org>, netfilter-devel@vger.kernel.org,
- coreteam@netfilter.org, netdev@vger.kernel.org,
- linux-hardening@vger.kernel.org, linux-kernel@vger.kernel.org,
- Wang Weiyang <wangweiyang2@huawei.com>, Xiu Jianfeng <xiujianfeng@huawei.com>
-References: <20230808014821.241688-1-gongruiqi@huaweicloud.com>
- <20230808155430.GB9741@breakpoint.cc>
-From: "GONG, Ruiqi" <gongruiqi@huaweicloud.com>
-In-Reply-To: <20230808155430.GB9741@breakpoint.cc>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-CM-TRANSID:_Ch0CgC328ONAtNktWYIAQ--.34063S2
-X-Coremail-Antispam: 1UD129KBjvdXoW7XrWDKF4kuFy7Cw4rKF1UAwb_yoWDuFg_Aw
-	n2kryDGr129r95tF40qFy7Gry5Ww1rCFy8Wa40qrsYqrZ8Ar1FgaykJr9xZw47t39akr9r
-	CFn0vr48u3Wj9jkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUbI8YFVCjjxCrM7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E6xAIw20E
-	Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwV
-	A0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x02
-	67AKxVWxJr0_GcWl84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxV
-	AFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2
-	j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7x
-	kEbVWUJVW8JwACjcxG0xvEwIxGrwACI402YVCY1x02628vn2kIc2xKxwCYjI0SjxkI62AI
-	1cAE67vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I
-	8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8
-	ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x
-	0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_WFyUJVCq3wCI42IY6I8E87Iv67AK
-	xVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvj
-	xUrR6zUUUUU
-X-CM-SenderInfo: pjrqw2pxltxq5kxd4v5lfo033gof0z/
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-3.7 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-type: text/plain
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+Commit 25266128fe16 ("virtio-net: fix race between set queues and
+probe") tries to fix the race between set queues and probe by calling
+_virtnet_set_queues() before DRIVER_OK is set. This violates virtio
+spec. Fixing this by setting queues after virtio_device_ready().
 
-On 2023/08/08 23:54, Florian Westphal wrote:
-> 
-> [...]
->>
->> diff --git a/include/uapi/linux/netfilter_bridge/ebtables.h b/include/uapi/linux/netfilter_bridge/ebtables.h
->> index a494cf43a755..e634da196d08 100644
->> --- a/include/uapi/linux/netfilter_bridge/ebtables.h
->> +++ b/include/uapi/linux/netfilter_bridge/ebtables.h
->> @@ -182,12 +182,14 @@ struct ebt_entry {
->>  	unsigned char sourcemsk[ETH_ALEN];
->>  	unsigned char destmac[ETH_ALEN];
->>  	unsigned char destmsk[ETH_ALEN];
->> -	/* sizeof ebt_entry + matches */
->> -	unsigned int watchers_offset;
->> -	/* sizeof ebt_entry + matches + watchers */
->> -	unsigned int target_offset;
->> -	/* sizeof ebt_entry + matches + watchers + target */
->> -	unsigned int next_offset;
->> +	struct_group(offsets,
->> +		/* sizeof ebt_entry + matches */
-> 
-> This is an UAPI header, I think you need to use __struct_group here.
+Fixes: 25266128fe16 ("virtio-net: fix race between set queues and probe")
+Reported-by: Dragos Tatulea <dtatulea@nvidia.com>
+Signed-off-by: Jason Wang <jasowang@redhat.com>
+---
+The patch is needed for -stable.
+---
+ drivers/net/virtio_net.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Thanks for the reminder! I've fixed it in v2:
-
-https://lore.kernel.org/all/20230808133038.771316-1-gongruiqi@huaweicloud.com/
-
-Please review it :)
+diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+index 1270c8d23463..ff03921e46df 100644
+--- a/drivers/net/virtio_net.c
++++ b/drivers/net/virtio_net.c
+@@ -4219,8 +4219,6 @@ static int virtnet_probe(struct virtio_device *vdev)
+ 	if (vi->has_rss || vi->has_rss_hash_report)
+ 		virtnet_init_default_rss(vi);
+ 
+-	_virtnet_set_queues(vi, vi->curr_queue_pairs);
+-
+ 	/* serialize netdev register + virtio_device_ready() with ndo_open() */
+ 	rtnl_lock();
+ 
+@@ -4233,6 +4231,8 @@ static int virtnet_probe(struct virtio_device *vdev)
+ 
+ 	virtio_device_ready(vdev);
+ 
++	_virtnet_set_queues(vi, vi->curr_queue_pairs);
++
+ 	/* a random MAC address has been assigned, notify the device.
+ 	 * We don't fail probe if VIRTIO_NET_F_CTRL_MAC_ADDR is not there
+ 	 * because many devices work fine without getting MAC explicitly
+-- 
+2.39.3
 
 
