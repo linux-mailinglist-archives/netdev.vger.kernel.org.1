@@ -1,61 +1,63 @@
-Return-Path: <netdev+bounces-25951-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25952-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D87E4776435
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 17:41:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F562776437
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 17:41:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1491F1C2128A
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 15:41:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0831E281CD8
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 15:41:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1103D1C9EB;
-	Wed,  9 Aug 2023 15:39:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16D401BB23;
+	Wed,  9 Aug 2023 15:41:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0603819BD2
-	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 15:39:04 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C3C126AB
-	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 08:38:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1691595532;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gJfti6a5A+csQdCoyBPfE66E5iEbqS3fEC9KGhUdBsk=;
-	b=CoHnxmdThCC9NENdpW66jHHzK2yta5RBHLfK06jT44SASI4eYx7JZaCtL4anWtVFnBYqCW
-	5eJpBMyKEscUbBiy6GUcyEaqZcal0xJp2z1eOkDJnXda6kFEtngpL4t2LAkgKe3lWAwuIR
-	W5v2Bd19ImiMyyS6CtI/vMOl8l0j97g=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-112-eVfBqEN2Pu6Kvd9AeM_WRA-1; Wed, 09 Aug 2023 11:38:49 -0400
-X-MC-Unique: eVfBqEN2Pu6Kvd9AeM_WRA-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 12A61185A7AB;
-	Wed,  9 Aug 2023 15:38:49 +0000 (UTC)
-Received: from antares.redhat.com (unknown [10.39.193.45])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id E65CD492C13;
-	Wed,  9 Aug 2023 15:38:47 +0000 (UTC)
-From: Adrian Moreno <amorenoz@redhat.com>
-To: netdev@vger.kernel.org
-Cc: Adrian Moreno <amorenoz@redhat.com>,
-	aconole@redhat.com,
-	i.maximets@ovn.org,
-	eric@garver.life,
-	dev@openvswitch.org
-Subject: [net-next v4 7/7] selftests: openvswitch: add explicit drop testcase
-Date: Wed,  9 Aug 2023 17:38:27 +0200
-Message-ID: <20230809153833.2363265-8-amorenoz@redhat.com>
-In-Reply-To: <20230809153833.2363265-1-amorenoz@redhat.com>
-References: <20230809153833.2363265-1-amorenoz@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 082A51AA83
+	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 15:41:23 +0000 (UTC)
+Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D1C9211C;
+	Wed,  9 Aug 2023 08:41:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1691595682; x=1723131682;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=PXQIZ+fPIH3bc8gxDN+g8b0rmUv7zu4isFxQBbk0R64=;
+  b=hkVOwlaKEEbp4TzWr9POvR/BIfcNwXKxEIiCTwzFe9xDBhJz917GaiG1
+   4D7EAnf8M2iXkrHewCgzfyD1JZ0ROtyLUygbB3INUH3HonfP8s0M9r/Kl
+   cLe/PM/lnCKodvwZ+ILTuZ/b12p9/BNOpbY4QHLCDm+r32ohJpWglh0tN
+   Q=;
+X-IronPort-AV: E=Sophos;i="6.01,159,1684800000"; 
+   d="scan'208";a="147543119"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-iad-1e-m6i4x-529f0975.us-east-1.amazon.com) ([10.43.8.2])
+  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Aug 2023 15:41:20 +0000
+Received: from EX19MTAUWB002.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
+	by email-inbound-relay-iad-1e-m6i4x-529f0975.us-east-1.amazon.com (Postfix) with ESMTPS id B516146BA6;
+	Wed,  9 Aug 2023 15:41:17 +0000 (UTC)
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Wed, 9 Aug 2023 15:41:16 +0000
+Received: from 88665a182662.ant.amazon.com (10.106.100.32) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Wed, 9 Aug 2023 15:41:13 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <horms@kernel.org>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<kuniyu@amazon.com>, <linux-kernel@vger.kernel.org>, <lkp@intel.com>,
+	<llvm@lists.linux.dev>, <nathan@kernel.org>, <ndesaulniers@google.com>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <trix@redhat.com>
+Subject: Re: [PATCH] net/llc/llc_conn.c: fix 4 instances of -Wmissing-variable-declarations
+Date: Wed, 9 Aug 2023 08:41:04 -0700
+Message-ID: <20230809154104.64963-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <ZNONx8N1/NFqmP6b@vergenet.net>
+References: <ZNONx8N1/NFqmP6b@vergenet.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,76 +65,117 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Originating-IP: [10.106.100.32]
+X-ClientProxiedBy: EX19D039UWA002.ant.amazon.com (10.13.139.32) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Precedence: Bulk
+X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,T_SPF_PERMERROR autolearn=no autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Test explicit drops generate the right drop reason. Also, verify that
-the kernel rejects flows with actions following an explicit drop.
+From: Simon Horman <horms@kernel.org>
+Date: Wed, 9 Aug 2023 14:59:51 +0200
+> + Kuniyuki Iwashima
 
-Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
----
- .../selftests/net/openvswitch/openvswitch.sh  | 35 +++++++++++++++++++
- 1 file changed, 35 insertions(+)
+Thanks Simon.
 
-diff --git a/tools/testing/selftests/net/openvswitch/openvswitch.sh b/tools/testing/selftests/net/openvswitch/openvswitch.sh
-index a10c345f40ef..9c2012d70b08 100755
---- a/tools/testing/selftests/net/openvswitch/openvswitch.sh
-+++ b/tools/testing/selftests/net/openvswitch/openvswitch.sh
-@@ -217,6 +217,31 @@ test_drop_reason() {
- 		return 1
- 	fi
- 
-+	# Drop UDP 6000 traffic with an explicit action and an error code.
-+	ovs_add_flow "test_drop_reason" dropreason \
-+		"in_port(1),eth(),eth_type(0x0800),ipv4(src=172.31.110.10,proto=17),udp(dst=6000)" \
-+                'drop(42)'
-+	# Drop UDP 7000 traffic with an explicit action with no error code.
-+	ovs_add_flow "test_drop_reason" dropreason \
-+		"in_port(1),eth(),eth_type(0x0800),ipv4(src=172.31.110.10,proto=17),udp(dst=7000)" \
-+                'drop(0)'
-+
-+	ovs_drop_record_and_run \
-+            "test_drop_reason" ip netns exec client nc -i 1 -zuv 172.31.110.20 6000
-+	ovs_drop_reason_count 0x30004 # OVS_DROP_EXPLICIT_ACTION_ERROR
-+	if [[ "$?" -ne "1" ]]; then
-+		info "Did not detect expected explicit error drops: $?"
-+		return 1
-+	fi
-+
-+	ovs_drop_record_and_run \
-+            "test_drop_reason" ip netns exec client nc -i 1 -zuv 172.31.110.20 7000
-+	ovs_drop_reason_count 0x30003 # OVS_DROP_EXPLICIT_ACTION
-+	if [[ "$?" -ne "1" ]]; then
-+		info "Did not detect expected explicit drops: $?"
-+		return 1
-+	fi
-+
- 	return 0
- }
- 
-@@ -458,6 +483,16 @@ test_netlink_checks () {
- 	    wc -l) == 2 ] || \
- 	      return 1
- 
-+	ERR_MSG="Flow actions may not be safe on all matching packets"
-+	PRE_TEST=$(dmesg | grep -c "${ERR_MSG}")
-+	ovs_add_flow "test_netlink_checks" nv0 \
-+		'in_port(1),eth(),eth_type(0x0806),arp()' 'drop(0),2' \
-+		&> /dev/null && return 1
-+	POST_TEST=$(dmesg | grep -c "${ERR_MSG}")
-+	if [ "$PRE_TEST" == "$POST_TEST" ]; then
-+		info "failed - error not generated"
-+		return 1
-+	fi
- 	return 0
- }
- 
--- 
-2.41.0
+> 
+> On Tue, Aug 08, 2023 at 09:43:09AM -0700, Nick Desaulniers wrote:
+> > I'm looking to enable -Wmissing-variable-declarations behind W=1. 0day
+> > bot spotted the following instances:
+> > 
+> >   net/llc/llc_conn.c:44:5: warning: no previous extern declaration for
+> >   non-static variable 'sysctl_llc2_ack_timeout'
+> >   [-Wmissing-variable-declarations]
+> >   44 | int sysctl_llc2_ack_timeout = LLC2_ACK_TIME * HZ;
+> >      |     ^
+> >   net/llc/llc_conn.c:44:1: note: declare 'static' if the variable is not
+> >   intended to be used outside of this translation unit
+> >   44 | int sysctl_llc2_ack_timeout = LLC2_ACK_TIME * HZ;
+> >      | ^
+> >   net/llc/llc_conn.c:45:5: warning: no previous extern declaration for
+> >   non-static variable 'sysctl_llc2_p_timeout'
+> >   [-Wmissing-variable-declarations]
+> >   45 | int sysctl_llc2_p_timeout = LLC2_P_TIME * HZ;
+> >      |     ^
+> >   net/llc/llc_conn.c:45:1: note: declare 'static' if the variable is not
+> >   intended to be used outside of this translation unit
+> >   45 | int sysctl_llc2_p_timeout = LLC2_P_TIME * HZ;
+> >      | ^
+> >   net/llc/llc_conn.c:46:5: warning: no previous extern declaration for
+> >   non-static variable 'sysctl_llc2_rej_timeout'
+> >   [-Wmissing-variable-declarations]
+> >   46 | int sysctl_llc2_rej_timeout = LLC2_REJ_TIME * HZ;
+> >      |     ^
+> >   net/llc/llc_conn.c:46:1: note: declare 'static' if the variable is not
+> >   intended to be used outside of this translation unit
+> >   46 | int sysctl_llc2_rej_timeout = LLC2_REJ_TIME * HZ;
+> >      | ^
+> >   net/llc/llc_conn.c:47:5: warning: no previous extern declaration for
+> >   non-static variable 'sysctl_llc2_busy_timeout'
+> >   [-Wmissing-variable-declarations]
+> >   47 | int sysctl_llc2_busy_timeout = LLC2_BUSY_TIME * HZ;
+> >      |     ^
+> >   net/llc/llc_conn.c:47:1: note: declare 'static' if the variable is not
+> >   intended to be used outside of this translation unit
+> >   47 | int sysctl_llc2_busy_timeout = LLC2_BUSY_TIME * HZ;
+> >      | ^
+> > 
+> > These symbols are referenced by more than one translation unit, so make
+> > include the correct header for their declarations. Finally, sort the
+> > list of includes to help keep them tidy.
+> > 
+> > Reported-by: kernel test robot <lkp@intel.com>
+> > Closes: https://lore.kernel.org/llvm/202308081000.tTL1ElTr-lkp@intel.com/
+> > Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
+> 
+> Reviewed-by: Simon Horman <horms@kernel.org>
 
+Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+
+Thanks!
+
+> 
+> > ---
+> >  net/llc/llc_conn.c | 11 ++++++-----
+> >  1 file changed, 6 insertions(+), 5 deletions(-)
+> > 
+> > diff --git a/net/llc/llc_conn.c b/net/llc/llc_conn.c
+> > index d037009ee10f..0a3f5e0bec00 100644
+> > --- a/net/llc/llc_conn.c
+> > +++ b/net/llc/llc_conn.c
+> > @@ -14,14 +14,15 @@
+> >  
+> >  #include <linux/init.h>
+> >  #include <linux/slab.h>
+> > -#include <net/llc_sap.h>
+> > -#include <net/llc_conn.h>
+> > -#include <net/sock.h>
+> > -#include <net/tcp_states.h>
+> > -#include <net/llc_c_ev.h>
+> > +#include <net/llc.h>
+> >  #include <net/llc_c_ac.h>
+> > +#include <net/llc_c_ev.h>
+> >  #include <net/llc_c_st.h>
+> > +#include <net/llc_conn.h>
+> >  #include <net/llc_pdu.h>
+> > +#include <net/llc_sap.h>
+> > +#include <net/sock.h>
+> > +#include <net/tcp_states.h>
+> >  
+> >  #if 0
+> >  #define dprintk(args...) printk(KERN_DEBUG args)
+> > 
+> > ---
+> > base-commit: 14f9643dc90adea074a0ffb7a17d337eafc6a5cc
+> > change-id: 20230808-llc_static-de4dddcc64b4
+> > 
+> > Best regards,
+> > -- 
+> > Nick Desaulniers <ndesaulniers@google.com>
 
