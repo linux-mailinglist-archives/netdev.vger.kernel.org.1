@@ -1,101 +1,155 @@
-Return-Path: <netdev+bounces-26057-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26058-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7E86776B05
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 23:34:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B8A6776B08
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 23:37:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AA07C281D9F
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 21:34:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B914E281DB0
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 21:37:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4889C1DA3E;
-	Wed,  9 Aug 2023 21:34:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9786F1DA50;
+	Wed,  9 Aug 2023 21:37:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D77324512
-	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 21:34:24 +0000 (UTC)
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FCC81BD9
-	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 14:34:23 -0700 (PDT)
-Received: from [127.0.0.1] (p578adb1c.dip0.t-ipconnect.de [87.138.219.28])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits))
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 889B21D2F1
+	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 21:37:02 +0000 (UTC)
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C997A1718;
+	Wed,  9 Aug 2023 14:36:55 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
 	(No client certificate requested)
-	(Authenticated sender: marex@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id 35D6D847D9;
-	Wed,  9 Aug 2023 23:34:19 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1691616861;
-	bh=SQ2gMbZkFtP4ProycxTU4dLT6hG6sGL/5lHN3vzhHGs=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=BPASzPw+AlNTg7SkTts0EmR+WCiXleKLpYLAio8ftvbK9LdYbODBkd0efFS8hu1D4
-	 3yc4iyl/rYBDCanSc2Oea92+heqtbPQYkCFIssVDvAS8l4qjA/MoqUkct8EaRaY/P3
-	 b01mv5HnxA4YKbEVQtJTiv3YWlsQqZsF4es4Yj267Ly9+rpaP6qo43Y+dDTSHe4sVj
-	 aF4O2aFlaIqDQlNNfMub3vR5MKIZ1cG6T7Zx0YVROBlVQ8I8IDpEQMhgfDHrd5z47I
-	 VnqHN3z4/8rxuY6YpRevqum4yUceyaCN0YkxjhQVdQMDIb+PDn068BoNb8qQEdJU4K
-	 GDUKUGfGb06VQ==
-Message-ID: <76131561-18d7-945e-cb52-3c96ed208638@denx.de>
-Date: Wed, 9 Aug 2023 23:34:19 +0200
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 5F80821857;
+	Wed,  9 Aug 2023 21:36:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1691617014; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=SBfO+cmTIVu68kmGmMkFCRYZIK4fBK6RzvP4dlFXVnA=;
+	b=1e3FnObzcmp2zYQGStCyHwb24hME1PrLq+75elZo5iQinGHhzdLPVocHPadgMHtWx0UFsM
+	E3lwKNHEWD3cxzX713U1/mW8fii3W9YlpPhFEkxg8fZZlmcHfYS2evj1/uZLYZybQGTnBS
+	+1pd420T0Zd1mWAoAgUFbxvRqyjZOCY=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1691617014;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=SBfO+cmTIVu68kmGmMkFCRYZIK4fBK6RzvP4dlFXVnA=;
+	b=al572XNxQRQGZPvywmTeGOmdKGFNSm9s0zV1KSY2p52G+OuhXQ0vFHv4ifEu2p4MMTMfoe
+	cLJ8TbQsks0dYlCA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+	(No client certificate requested)
+	by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id A40EF133B5;
+	Wed,  9 Aug 2023 21:36:50 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+	by imap2.suse-dmz.suse.de with ESMTPSA
+	id qq8oFfIG1GSFYgAAMHmgww
+	(envelope-from <neilb@suse.de>); Wed, 09 Aug 2023 21:36:50 +0000
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.14.0
-Subject: Re: [PATCH] net: phy: at803x: Improve hibernation support on start up
-Content-Language: en-US
-To: Andrew Lunn <andrew@lunn.ch>, Wei Fang <wei.fang@nxp.com>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Heiner Kallweit <hkallweit1@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
- Oleksij Rempel <linux@rempel-privat.de>, Paolo Abeni <pabeni@redhat.com>,
- Russell King <linux@armlinux.org.uk>
-References: <20230804175842.209537-1-marex@denx.de>
- <AM5PR04MB3139793206F9101A552FADA0880DA@AM5PR04MB3139.eurprd04.prod.outlook.com>
- <45b1ee70-8330-0b18-2de1-c94ddd35d817@denx.de>
- <AM5PR04MB31392C770BA3101BDFBA80318812A@AM5PR04MB3139.eurprd04.prod.outlook.com>
- <20230809043626.GG5736@pengutronix.de>
- <AM5PR04MB3139D8C0EBC9D2DFB0C778348812A@AM5PR04MB3139.eurprd04.prod.outlook.com>
- <d8990f01-f6c8-4fec-b8b8-3d9fe82af51b@lunn.ch>
-From: Marek Vasut <marex@denx.de>
-In-Reply-To: <d8990f01-f6c8-4fec-b8b8-3d9fe82af51b@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
-X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+From: "NeilBrown" <neilb@suse.de>
+To: "Yue Haibing" <yuehaibing@huawei.com>
+Cc: trond.myklebust@hammerspace.com, anna@kernel.org, chuck.lever@oracle.com,
+ jlayton@kernel.org, kolga@netapp.com, Dai.Ngo@oracle.com, tom@talpey.com,
+ yuehaibing@huawei.com, kuba@kernel.org, linux-nfs@vger.kernel.org,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH -next] SUNRPC: Remove unused declaration rpc_modcount()
+In-reply-to: <20230809141426.41192-1-yuehaibing@huawei.com>
+References: <20230809141426.41192-1-yuehaibing@huawei.com>
+Date: Thu, 10 Aug 2023 07:36:44 +1000
+Message-id: <169161700457.32308.8657894998370155540@noble.neil.brown.name>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,T_SPF_TEMPERROR,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 8/9/23 15:40, Andrew Lunn wrote:
->>> Hm.. how about officially defining this PHY as the clock provider and disable
->>> PHY automatic hibernation as long as clock is acquired?
->>>
->> Sorry, I don't know much about the clock provider/consumer, but I think there
->> will be more changes if we use clock provider/consume mechanism.
-> 
-> Less changes is not always best. What happens when a different PHY is
-> used?
+On Thu, 10 Aug 2023, Yue Haibing wrote:
+> These declarations are never implemented since the beginning of git history.
+> Remove these, then merge the two #ifdef block for simplification.
 
-Then the system wouldn't be affected by this AR803x specific behavior.
+For the historically minded, this was added in 2.1.79
+https://git.kernel.org/pub/scm/linux/kernel/git/history/history.git/diff/net/=
+sunrpc/stats.c?id=3Dae04feb38f319f0d389ea9e41d10986dba22b46d
 
-> By having a clock provider in the PHY, you are defining a clear
-> API that any PHY needs to provide to work with this MAC.
-> 
-> As Russell has point out, this is not the first time we have run into
-> this problem. So far, it seems everybody has tried to solve it for
-> just their system. So maybe now we should look at the whole picture
-> and put in place a generic solution which can be made to work for any
-> PHY.
+and removed in 2.3.27.
+https://git.kernel.org/pub/scm/linux/kernel/git/history/history.git/diff/net/=
+sunrpc/stats.c?id=3D53022f15f8c0381a9b55bbe2893a5f9f6abda6f3
 
-I'll see what I can do, it might take a while though.
+Reviewed-by: NeilBrown <neilb@suse.de>
+
+Thanks,
+NeilBRown
+
+>=20
+> Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
+> ---
+>  include/linux/sunrpc/stats.h | 23 +++++++----------------
+>  1 file changed, 7 insertions(+), 16 deletions(-)
+>=20
+> diff --git a/include/linux/sunrpc/stats.h b/include/linux/sunrpc/stats.h
+> index d94d4f410507..3ce1550d1beb 100644
+> --- a/include/linux/sunrpc/stats.h
+> +++ b/include/linux/sunrpc/stats.h
+> @@ -43,22 +43,6 @@ struct net;
+>  #ifdef CONFIG_PROC_FS
+>  int			rpc_proc_init(struct net *);
+>  void			rpc_proc_exit(struct net *);
+> -#else
+> -static inline int rpc_proc_init(struct net *net)
+> -{
+> -	return 0;
+> -}
+> -
+> -static inline void rpc_proc_exit(struct net *net)
+> -{
+> -}
+> -#endif
+> -
+> -#ifdef MODULE
+> -void			rpc_modcount(struct inode *, int);
+> -#endif
+> -
+> -#ifdef CONFIG_PROC_FS
+>  struct proc_dir_entry *	rpc_proc_register(struct net *,struct rpc_stat *);
+>  void			rpc_proc_unregister(struct net *,const char *);
+>  void			rpc_proc_zero(const struct rpc_program *);
+> @@ -69,7 +53,14 @@ void			svc_proc_unregister(struct net *, const char *);
+>  void			svc_seq_show(struct seq_file *,
+>  				     const struct svc_stat *);
+>  #else
+> +static inline int rpc_proc_init(struct net *net)
+> +{
+> +	return 0;
+> +}
+> =20
+> +static inline void rpc_proc_exit(struct net *net)
+> +{
+> +}
+>  static inline struct proc_dir_entry *rpc_proc_register(struct net *net, st=
+ruct rpc_stat *s) { return NULL; }
+>  static inline void rpc_proc_unregister(struct net *net, const char *p) {}
+>  static inline void rpc_proc_zero(const struct rpc_program *p) {}
+> --=20
+> 2.34.1
+>=20
+>=20
+
 
