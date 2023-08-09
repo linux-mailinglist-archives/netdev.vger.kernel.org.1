@@ -1,115 +1,60 @@
-Return-Path: <netdev+bounces-25910-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25911-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31F12776266
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 16:25:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A47177626A
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 16:27:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DF2BA281C47
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 14:25:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0A7491C211A7
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 14:27:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E81CD19BB9;
-	Wed,  9 Aug 2023 14:25:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CB9A19BBA;
+	Wed,  9 Aug 2023 14:27:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAD21612D
-	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 14:25:03 +0000 (UTC)
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D654410F5;
-	Wed,  9 Aug 2023 07:25:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
-	bh=cOZqaDWc3HsuU0Akcti+SHi//L0WYRljfoUAHEI5Mb4=; b=Qx9jDdZ8kaM/1t4qA31vsj3BF8
-	dJrmsjumeBsxCmbnQgrD4l+9TqTVj2NoRpg930BVIM4FPiFnDXrK3r0dE3c7aPB8z8i2YwInO7to9
-	ZmY4RWGF/oukSyMfAB3BtIUJ5a59AUfejt8ckDyqzRpvMTkoqIEH7NE4zEEW7++7Cy/EMtLYo9Pc3
-	4TUM8vxLJ1uHstQSOGAsS+ENaeA40kGzBDMDUeYTV9XnYR0ocbLYfozGNsP9hztOYLMxnVn/4L8Wh
-	sQORp47ZvgqIrwz5RNsjIYIqnbmiaXa5J9wWUmy6+XkP4b/3HWQ5XJyCA1lPZE1KEy5BCuRV63jGu
-	y4IOZS2w==;
-Received: from [2601:1c2:980:9ec0::2764]
-	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-	id 1qTk72-0059dS-2X;
-	Wed, 09 Aug 2023 14:24:36 +0000
-Message-ID: <cc9417a3-ef86-bb46-9519-cf65b03b5f08@infradead.org>
-Date: Wed, 9 Aug 2023 07:24:32 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CE1319BAB
+	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 14:27:15 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B804C433C8;
+	Wed,  9 Aug 2023 14:27:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1691591235;
+	bh=tYlEbi5+evjgrHRVEwMcn++R/SQS1SOurpc2+D9Uskk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=AC8ucGXuG8RHJC+TX0N+aTMkVi6mIRHw+Er0iaEFMvkgo7na+i6ulUpxpqYHS9on9
+	 mhKPcfSR8lMdiKMy2h1DaD0osIWgvGk3ElzPOyyB/pXNPnB1cqbqbncAQO0k6AnjwR
+	 Shsxr3SiJdjvYZTWvjtSDCfqzo5MTGyDiciRlwXAIWAiPSf+JN3vHzqeUs6wEh01fr
+	 qA/TAyW7Y9BuGKXeaXGw/xSvnXEz7/q/Lx2fjVjVNPiGtNMJrAuXosCe/qbc0GQHct
+	 JY3jSZ2Qrk4N302GY+Lm6JojYS8Wpanoprr99z2oG82imMClq+/cQcP/HNacekfCxc
+	 HbxD1rY7UktSw==
+Date: Wed, 9 Aug 2023 16:27:11 +0200
+From: Simon Horman <horms@kernel.org>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
+	davem@davemloft.net, edumazet@google.com
+Subject: Re: [patch net-next] devlink: clear flag on port register error path
+Message-ID: <ZNOiP7yu5h7d9mPQ@vergenet.net>
+References: <20230808082020.1363497-1-jiri@resnulli.us>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.14.0
-Subject: Re: [PATCH v3 21/28] net: wan: Add framer framework support
-Content-Language: en-US
-To: Herve Codina <herve.codina@bootlin.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Andrew Lunn <andrew@lunn.ch>, Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>, Lee Jones <lee@kernel.org>,
- Linus Walleij <linus.walleij@linaro.org>, Qiang Zhao <qiang.zhao@nxp.com>,
- Li Yang <leoyang.li@nxp.com>, Liam Girdwood <lgirdwood@gmail.com>,
- Mark Brown <broonie@kernel.org>, Jaroslav Kysela <perex@perex.cz>,
- Takashi Iwai <tiwai@suse.com>, Shengjiu Wang <shengjiu.wang@gmail.com>,
- Xiubo Li <Xiubo.Lee@gmail.com>, Fabio Estevam <festevam@gmail.com>,
- Nicolin Chen <nicoleotsuka@gmail.com>,
- Christophe Leroy <christophe.leroy@csgroup.eu>
-Cc: netdev@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-gpio@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- alsa-devel@alsa-project.org, Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-References: <20230809132757.2470544-1-herve.codina@bootlin.com>
- <20230809132757.2470544-22-herve.codina@bootlin.com>
-From: Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <20230809132757.2470544-22-herve.codina@bootlin.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230808082020.1363497-1-jiri@resnulli.us>
 
-Hi,
+On Tue, Aug 08, 2023 at 10:20:20AM +0200, Jiri Pirko wrote:
+> From: Jiri Pirko <jiri@nvidia.com>
+> 
+> When xarray insertion fails, clear the flag.
+> 
+> Fixes: 47b438cc2725 ("net: devlink: convert port_list into xarray")
+> Signed-off-by: Jiri Pirko <jiri@nvidia.com>
 
-On 8/9/23 06:27, Herve Codina wrote:
-> diff --git a/drivers/net/wan/framer/Kconfig b/drivers/net/wan/framer/Kconfig
-> new file mode 100644
-> index 000000000000..96ef1e7ba8eb
-> --- /dev/null
-> +++ b/drivers/net/wan/framer/Kconfig
-> @@ -0,0 +1,19 @@
-> +# SPDX-License-Identifier: GPL-2.0-only
-> +#
-> +# FRAMER
-> +#
-> +
-> +menu "Framer Subsystem"
-> +
-> +config GENERIC_FRAMER
-> +	bool "Framer Core"
-
-Just curious: any reason that this cannot be tristate (i.e., a loadable module)?
-Thanks.
-
-> +	help
-> +	  Generic Framer support.
-> +
-> +	  This framework is designed to provide a generic interface for framer
-> +	  devices present in the kernel. This layer will have the generic
-> +	  API by which framer drivers can create framer using the framer
-> +	  framework and framer users can obtain reference to the framer.
-> +	  All the users of this framework should select this config.
-> +
-> +endmenu
-
--- 
-~Randy
+Reviewed-by: Simon Horman <horms@kernel.org>
 
