@@ -1,105 +1,138 @@
-Return-Path: <netdev+bounces-25672-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25673-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ADF8477516E
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 05:32:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89B10775172
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 05:37:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6BB991C21093
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 03:32:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ADC8F28196B
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 03:37:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A55A80B;
-	Wed,  9 Aug 2023 03:32:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A91DA810;
+	Wed,  9 Aug 2023 03:37:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4015C632
-	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 03:32:15 +0000 (UTC)
-Received: from zg8tmtyylji0my4xnjqumte4.icoremail.net (zg8tmtyylji0my4xnjqumte4.icoremail.net [162.243.164.118])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id D3B86E0;
-	Tue,  8 Aug 2023 20:32:13 -0700 (PDT)
-Received: from localhost.localdomain (unknown [39.174.92.167])
-	by mail-app3 (Coremail) with SMTP id cC_KCgC3vRmvCNNkUbCEDA--.19833S4;
-	Wed, 09 Aug 2023 11:31:59 +0800 (CST)
-From: Lin Ma <linma@zju.edu.cn>
-To: johannes@sipsolutions.net,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	avraham.stern@intel.com,
-	luciano.coelho@intel.com,
-	linux-wireless@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Lin Ma <linma@zju.edu.cn>
-Subject: [PATCH net v2] nl80211/cfg80211: add forgetten nla_policy for BSS color attribute
-Date: Wed,  9 Aug 2023 11:31:51 +0800
-Message-Id: <20230809033151.768910-1-linma@zju.edu.cn>
-X-Mailer: git-send-email 2.17.1
-X-CM-TRANSID:cC_KCgC3vRmvCNNkUbCEDA--.19833S4
-X-Coremail-Antispam: 1UD129KBjvJXoW7tF1rZF47Jry7CFy8Ww4xXrb_yoW8Jw1kpr
-	W8CryUK3W3GrnrJrZ5Cw48ua47WanrG34rCa17ur13uan0q3WfJ34YgFy3tr4kZr48J393
-	ZFnYqr4ayF1Yq37anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvC14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_Jrv_JF1lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
-	Y2ka0xkIwI1lc2xSY4AK67AK6r48MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r
-	1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CE
-	b7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0x
-	vE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAI
-	cVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2Kf
-	nxnUUI43ZEXa7VUjCtC7UUUUU==
-X-CM-SenderInfo: qtrwiiyqvtljo62m3hxhgxhubq/
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A618181
+	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 03:37:32 +0000 (UTC)
+Received: from gandalf.ozlabs.org (mail.ozlabs.org [IPv6:2404:9400:2221:ea00::3])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C35110CF;
+	Tue,  8 Aug 2023 20:37:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1691552246;
+	bh=5K6DdPXa1vkuwi5HOOHYpyDluwjaZ9iS/L0MVwLWqKM=;
+	h=Date:From:To:Cc:Subject:From;
+	b=NUDbQ6tEcJuqTmfIdY89Z9T5Mp7g4L6krZEcEHX0s+lJrlmYQi7vCTPjY964GkIff
+	 AWo/h6mykHTIVCkPQQXIFsnr7R3qVE0STmVO6Iw2dZ6mXsldA2TjS2FQPNKfTW0Wnd
+	 ++dZxD6hiBMS9ii/PaEekCkW491vxdBPCZVi5cCk0T/4UlQ77sYBWL7zB68B5FvbiN
+	 DKr/A/LlE6sHCVyYSNsAEnzbnN2Ir1/NZrI1hQ7CnRE6h+dYV8q3eVqb95dl8WB8TU
+	 NNhegkdY+5tp3zvBP0m7rUr9BtjPIHQiWp2qeB2DzzoPtAit6TxpuZrU6d5jI4pOA8
+	 bk0ltoF81r8jQ==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4RLG2r6sqtz4wxQ;
+	Wed,  9 Aug 2023 13:37:24 +1000 (AEST)
+Date: Wed, 9 Aug 2023 13:37:23 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Greg KH <greg@kroah.com>, David Miller <davem@davemloft.net>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Networking <netdev@vger.kernel.org>, Christophe Leroy
+ <christophe.leroy@csgroup.eu>, Greg Kroah-Hartman
+ <gregkh@linuxfoundation.org>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>
+Subject: linux-next: manual merge of the tty tree with the net-next tree
+Message-ID: <20230809133723.2ebeddd7@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: multipart/signed; boundary="Sig_/Rau6+MCsb+9NMmQO3wcqyl_";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-The previous commit dd3e4fc75b4a ("nl80211/cfg80211: add BSS color to
-NDP ranging parameters") adds a parameter for NDP ranging by introducing
-a new attribute type named NL80211_PMSR_FTM_REQ_ATTR_BSS_COLOR.
+--Sig_/Rau6+MCsb+9NMmQO3wcqyl_
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-However, the author forgot to also describe the nla_policy at
-nl80211_pmsr_ftm_req_attr_policy (net/wireless/nl80211.c). Just
-complement it to avoid malformed attribute that causes out-of-attribute
-access.
+Hi all,
 
-Fixes: dd3e4fc75b4a ("nl80211/cfg80211: add BSS color to NDP ranging parameters")
-Signed-off-by: Lin Ma <linma@zju.edu.cn>
----
-v1 -> v2: resent due to the last version failed to reach public mail
-          list.
+Today's linux-next merge of the tty tree got a conflict in:
 
- net/wireless/nl80211.c | 1 +
- 1 file changed, 1 insertion(+)
+  arch/powerpc/sysdev/fsl_soc.c
 
-diff --git a/net/wireless/nl80211.c b/net/wireless/nl80211.c
-index 0da2e6a2a7ea..f729dba1cb5b 100644
---- a/net/wireless/nl80211.c
-+++ b/net/wireless/nl80211.c
-@@ -323,6 +323,7 @@ nl80211_pmsr_ftm_req_attr_policy[NL80211_PMSR_FTM_REQ_ATTR_MAX + 1] = {
- 	[NL80211_PMSR_FTM_REQ_ATTR_TRIGGER_BASED] = { .type = NLA_FLAG },
- 	[NL80211_PMSR_FTM_REQ_ATTR_NON_TRIGGER_BASED] = { .type = NLA_FLAG },
- 	[NL80211_PMSR_FTM_REQ_ATTR_LMR_FEEDBACK] = { .type = NLA_FLAG },
-+	[NL80211_PMSR_FTM_REQ_ATTR_BSS_COLOR] = { .type = NLA_U8 },
- };
- 
- static const struct nla_policy
--- 
-2.17.1
+between commit:
 
+  62e106c802c5 ("net: fs_enet: Remove stale prototypes from fsl_soc.c")
+
+from the net-next tree and commit:
+
+  80a8f487b9ba ("serial: cpm_uart: Remove stale prototype in powerpc/fsl_so=
+c.c")
+
+from the tty tree.
+
+I fixed it up (see below) and can carry the fix as necessary. This
+is now fixed as far as linux-next is concerned, but any non trivial
+conflicts should be mentioned to your upstream maintainer when your tree
+is submitted for merging.  You may also want to consider cooperating
+with the maintainer of the conflicting tree to minimise any particularly
+complex conflicts.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+diff --cc arch/powerpc/sysdev/fsl_soc.c
+index 528506f6e2b8,99fc4c3b94fa..000000000000
+--- a/arch/powerpc/sysdev/fsl_soc.c
++++ b/arch/powerpc/sysdev/fsl_soc.c
+@@@ -22,7 -22,8 +22,6 @@@
+  #include <linux/phy.h>
+  #include <linux/spi/spi.h>
+  #include <linux/fsl_devices.h>
+- #include <linux/fs_uart_pd.h>
+ -#include <linux/fs_enet_pd.h>
+  #include <linux/reboot.h>
+ =20
+  #include <linux/atomic.h>
+@@@ -35,7 -36,8 +34,6 @@@
+  #include <asm/cpm2.h>
+  #include <asm/fsl_hcalls.h>	/* For the Freescale hypervisor */
+ =20
+- extern void init_smc_ioports(struct fs_uart_platform_info*);
+ -extern void init_fcc_ioports(struct fs_platform_info*);
+ -extern void init_fec_ioports(struct fs_platform_info*);
+  static phys_addr_t immrbase =3D -1;
+ =20
+  phys_addr_t get_immrbase(void)
+
+--Sig_/Rau6+MCsb+9NMmQO3wcqyl_
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmTTCfMACgkQAVBC80lX
+0GwCmAf/b3T229KwkdzSkY9YhOkuOmEAh3uIvo0+I10hr7AOkg5P8O7zGGXE6OLP
+HxZjUVije4PS3G3VhrXTZs8f6hDXs1LRWuqabv7+SqQexiCFe63lzINkm1XSAaA0
+ENdWOW1DXVomEkwB1dhfE0AzDvOX2BMyT86oINsnxx87pWC1lUMMfuuDIVBnVaKz
+kKshMsOmYGcyvU8RtnXO9+rJk149hhUdAExNzjSme2kcSTdW1U75mMaOnWFqqgfz
+czfCBOArqfRrx+bWN+BNqwqYM/gMxBk1Ne9K17Uy4ywc1s2pEa9VyVUadzRW74v7
+sa1GQ8S2K8rLKUGLLME9Z6TV+QR3rQ==
+=z0Rb
+-----END PGP SIGNATURE-----
+
+--Sig_/Rau6+MCsb+9NMmQO3wcqyl_--
 
