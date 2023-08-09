@@ -1,47 +1,44 @@
-Return-Path: <netdev+bounces-25928-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25929-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73A54776302
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 16:50:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C030776317
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 16:54:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A477E1C2128C
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 14:50:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EBBC41C2128C
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 14:54:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2290819BC2;
-	Wed,  9 Aug 2023 14:50:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF35819BC6;
+	Wed,  9 Aug 2023 14:54:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC20817752
-	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 14:50:49 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94702C433C8;
-	Wed,  9 Aug 2023 14:50:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 749DC372
+	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 14:54:04 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7262FC433C8;
+	Wed,  9 Aug 2023 14:54:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691592649;
-	bh=zSfTo0+x3Zdgw9w7xkZDXGx9UFzzuK53v95kjaV1d2o=;
+	s=k20201202; t=1691592844;
+	bh=rQJJnX95ajeAM6wBPnt7GZ/zoWYaUGL41xN81TH/qxk=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=FkYY5iFlN8+f2+ag3TD7vYWSsLXQzylQp2Hh7gVr9F689asqfL7i2QnRmhS5VcL3L
-	 1WMWsuo/achkKnk/pOaifyzs3T3sf9mk0EMpxMVVproRSk9VcYT5SYWuaJa5xE+0Xs
-	 Cx8xygetNHmxuuK0Loeu6NKmzb1l2I+jdTlVz7V6bqIxR9cdFrgxh6BzyubBLMW/q5
-	 mwYjauOSA8WfI5z0ly+Zs02e8p4GYW+JfKTTQPugC6YafH5X90i8Jx5d3lQuejbDCp
-	 MrSdSMA7TQ2ziQ6RYfW/v1tL6MAsHAJ3beYiElYMZOJZV0+KPR8rat7xRDE5awdBh9
-	 lIpQ2xqGhT4jw==
-Date: Wed, 9 Aug 2023 16:50:44 +0200
+	b=rSfe8kKwDJSxCx15NQHRvoPAObeHDlDoyZzBXtrSbcrK+DG/woP9BsgKN7J048cL/
+	 iw9Kq2lKh/4YHo2dGfv+qk60ID9PQWEVNaK6UWfKv0g1Lpei/83JojPNg3NGnbDiSN
+	 wiZWHO0k7KpoBIodPO6QnBQ+eFepunEiVnWqtAoZ7RI8zNMrnIYpgbTxtJo3DgauNs
+	 J5eHmNFP2jYjq02Te5FZpbycRdpG8LyA/l7km2wv17JzOZPu1OVJ2BWyD+qvLSgmwu
+	 dr/eZUIvjHg+dyIndQDmPq5pbMFiXpqwLeon5JpPOQfiqoWpHk1cVUL762URo3BZHo
+	 0ftCKBHo7Bvhg==
+Date: Wed, 9 Aug 2023 16:54:00 +0200
 From: Simon Horman <horms@kernel.org>
-To: Petr Machata <petrm@nvidia.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, Ido Schimmel <idosch@nvidia.com>,
-	Danielle Ratson <danieller@nvidia.com>, mlxsw@nvidia.com
-Subject: Re: [PATCH net-next 0/2] mlxsw: Set port STP state on bridge
- enslavement
-Message-ID: <ZNOnxIdDNEsZN+j/@vergenet.net>
-References: <cover.1691498735.git.petrm@nvidia.com>
+To: Li Zetao <lizetao1@huawei.com>
+Cc: jdmason@kudzu.us, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next] ethernet: s2io: Use ether_addr_to_u64() to
+ convert ethernet address
+Message-ID: <ZNOoiGEKsadJIFbU@vergenet.net>
+References: <20230808113849.4033657-1-lizetao1@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,31 +47,14 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <cover.1691498735.git.petrm@nvidia.com>
+In-Reply-To: <20230808113849.4033657-1-lizetao1@huawei.com>
 
-On Tue, Aug 08, 2023 at 03:18:14PM +0200, Petr Machata wrote:
-> When the first port joins a LAG that already has a bridge upper, an
-> instance of struct mlxsw_sp_bridge_port is created for the LAG to keep
-> track of it as a bridge port. The bridge_port's STP state is initialized to
-> BR_STATE_DISABLED. This made sense previously, because mlxsw would only
-> ever allow a port to join a LAG if the LAG had no uppers. Thus if a
-> bridge_port was instantiated, it must have been because the LAG as such is
-> joining a bridge, and the STP state is correspondingly disabled.
+On Tue, Aug 08, 2023 at 07:38:49PM +0800, Li Zetao wrote:
+> Use ether_addr_to_u64() to convert an Ethernet address into a u64 value,
+> instead of directly calculating, as this is exactly what
+> this function does.
 > 
-> However as of commit 2c5ffe8d7226 ("mlxsw: spectrum: Permit enslavement to
-> netdevices with uppers"), mlxsw allows a port to join a LAG that is already
-> a member of a bridge. The STP state may be different than disabled in that
-> case. Initialize it properly by querying the actual state.
-> 
-> This bug may cause an issue as traffic on ports attached to a bridged LAG
-> gets dropped on ingress with discard_ingress_general counter bumped.
-> 
-> The above fix in patch #1. Patch #2 contains a selftest that would
-> sporadically reproduce the issue.
-> 
-> Petr Machata (2):
->   mlxsw: Set port STP state on bridge enslavement
->   selftests: mlxsw: router_bridge_lag: Add a new selftest
+> Signed-off-by: Li Zetao <lizetao1@huawei.com>
 
 Reviewed-by: Simon Horman <horms@kernel.org>
 
