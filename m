@@ -1,141 +1,126 @@
-Return-Path: <netdev+bounces-25659-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25660-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FAAE7750B2
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 04:09:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B01E7750C9
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 04:13:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A4CBE281996
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 02:08:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0DE7A1C2108C
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 02:13:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80F90632;
-	Wed,  9 Aug 2023 02:08:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49B8A648;
+	Wed,  9 Aug 2023 02:13:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4592662C
-	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 02:08:55 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 23BE4C433C8;
-	Wed,  9 Aug 2023 02:08:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691546935;
-	bh=PT0mLcVjBLrfgD4nTIjBAloiFkwt2JhnyC433VN+0e0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=pm/0Pyxgq4ql4H3TDzjZgEtGPCtzew/xPp4jABQVvsVElGP9Y+hHqmigHpwjpJ6i9
-	 Qd6eLSBDUfj+MT3AkG0oSZTF7OhNl4NA3h/J3nKoCP/59dDxBPW5SgrUS5opBlU/iG
-	 GEv6btU5zvrDd/iYrwIia2oYwO8sw9d44LTI/HanCN5+CKaBZcF6vIou3f53AjzLJ4
-	 Tq4Jd7NZqsZtpPCzMZ8/7GhB58/CmVlp1gvoGSfGCoObvAOOPke1Wjr5YSZCdmrQXw
-	 3lHWxvRVUngba/+wTSPBeq8O8OFSX5rJK1Ie+dW/lVdFwpRs9Gb93yoBnAaOEboe/9
-	 VOca2UqVviUjA==
-Date: Tue, 8 Aug 2023 19:08:53 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: "Linga, Pavan Kumar" <pavan.kumar.linga@intel.com>
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, <davem@davemloft.net>,
- <pabeni@redhat.com>, <edumazet@google.com>, <netdev@vger.kernel.org>,
- <emil.s.tantilov@intel.com>, <jesse.brandeburg@intel.com>,
- <sridhar.samudrala@intel.com>, <shiraz.saleem@intel.com>,
- <sindhu.devale@intel.com>, <willemb@google.com>, <decot@google.com>,
- <andrew@lunn.ch>, <leon@kernel.org>, <mst@redhat.com>,
- <simon.horman@corigine.com>, <shannon.nelson@amd.com>,
- <stephen@networkplumber.org>
-Subject: Re: [PATCH net-next v4 00/15][pull request] Introduce Intel IDPF
- driver
-Message-ID: <20230808190853.3edc88f4@kernel.org>
-In-Reply-To: <e1beeb14-fbb5-216c-f661-2bb9a84ba724@intel.com>
-References: <20230808003416.3805142-1-anthony.l.nguyen@intel.com>
-	<20230808133234.78504bca@kernel.org>
-	<e1beeb14-fbb5-216c-f661-2bb9a84ba724@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B7F262C
+	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 02:13:37 +0000 (UTC)
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 318151BCD;
+	Tue,  8 Aug 2023 19:13:36 -0700 (PDT)
+Received: from kwepemm600007.china.huawei.com (unknown [172.30.72.55])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4RLD8k2zPxzrSXp;
+	Wed,  9 Aug 2023 10:12:22 +0800 (CST)
+Received: from localhost.localdomain (10.67.165.2) by
+ kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Wed, 9 Aug 2023 10:13:33 +0800
+From: Jijie Shao <shaojijie@huawei.com>
+To: <yisen.zhuang@huawei.com>, <salil.mehta@huawei.com>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>
+CC: <shenjian15@huawei.com>, <wangjie125@huawei.com>,
+	<liuyonglong@huawei.com>, <chenhao418@huawei.com>, <shaojijie@huawei.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<stable@vger.kernel.org>
+Subject: [PATCH net] net: hns3: fix strscpy causing content truncation issue
+Date: Wed, 9 Aug 2023 10:09:02 +0800
+Message-ID: <20230809020902.1941471-1-shaojijie@huawei.com>
+X-Mailer: git-send-email 2.30.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.67.165.2]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ kwepemm600007.china.huawei.com (7.193.23.208)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Tue, 8 Aug 2023 17:35:27 -0700 Linga, Pavan Kumar wrote:
-> On 8/8/2023 1:32 PM, Jakub Kicinski wrote:
-> > On Mon,  7 Aug 2023 17:34:01 -0700 Tony Nguyen wrote:  
-> >> This patch series introduces the Intel Infrastructure Data Path Function
-> >> (IDPF) driver. It is used for both physical and virtual functions. Except
-> >> for some of the device operations the rest of the functionality is the
-> >> same for both PF and VF. IDPF uses virtchnl version2 opcodes and
-> >> structures defined in the virtchnl2 header file which helps the driver
-> >> to learn the capabilities and register offsets from the device
-> >> Control Plane (CP) instead of assuming the default values.  
-> > 
-> > Patches 4 and 10 add kdoc warnings, please fix those.
-> > And double check all the checkpatch warning about lines > 80 chars.  
-> 
-> Thanks for the feedback.
-> 
-> Will review the warnings regarding 80char limit. Are you wanting them 
-> all removed or is it okay to leave the ones that help readability?
+From: Hao Chen <chenhao418@huawei.com>
 
-For some definition of helps readability, yes.
-I glanced at the warnings on one of the first patches and most of them
-were just comments.
+hns3_dbg_fill_content()/hclge_dbg_fill_content() is aim to integrate some
+items to a string for content, and we add '\n' and '\0' in the last
+two bytes of content.
 
->  > drivers/net/ethernet/intel/idpf/idpf.h:123: warning: Enum value   
-> 'csum_caps' not described in enum 'idpf_cap_field'
->  > drivers/net/ethernet/intel/idpf/idpf.h:123: warning: Enum value   
-> 'seg_caps' not described in enum 'idpf_cap_field'
->  > drivers/net/ethernet/intel/idpf/idpf.h:123: warning: Enum value   
-> 'rss_caps' not described in enum 'idpf_cap_field'
->  > drivers/net/ethernet/intel/idpf/idpf.h:123: warning: Enum value   
-> 'hsplit_caps' not described in enum 'idpf_cap_field'
->  > drivers/net/ethernet/intel/idpf/idpf.h:123: warning: Enum value   
-> 'rsc_caps' not described in enum 'idpf_cap_field'
->  > drivers/net/ethernet/intel/idpf/idpf.h:123: warning: Enum value   
-> 'other_caps' not described in enum 'idpf_cap_field'
->  > drivers/net/ethernet/intel/idpf/idpf_txrx.h:153: warning: Function   
-> parameter or member 'DEFINE_DMA_UNMAP_ADDR(dma' not described in 
-> 'idpf_tx_buf'
->  > drivers/net/ethernet/intel/idpf/idpf_txrx.h:153: warning: Function   
-> parameter or member 'DEFINE_DMA_UNMAP_LEN(len' not described in 
-> 'idpf_tx_buf'
-> 
-> /**
->   * enum idpf_cap_field - Offsets into capabilities struct for specific caps
->   * @IDPF_BASE_CAPS: generic base capabilities
->   * @IDPF_CSUM_CAPS: checksum offload capabilities
-> ...
->   */
-> enum idpf_cap_field {
->           IDPF_BASE_CAPS          = -1,
->           IDPF_CSUM_CAPS          = offsetof(struct virtchnl2_get_capabilities,
->                                              csum_caps),
->           IDPF_SEG_CAPS           = offsetof(struct
-> ...
-> }
-> 
-> 
-> /**
->   * struct idpf_tx_buf
->   * @next_to_watch: Next descriptor to clean
->   * @skb: Pointer to the skb
->   * @dma: DMA address
->   * @len: DMA length
-> ...
->   */
-> struct idpf_tx_buf {
->          void *next_to_watch;
->          struct sk_buff *skb;
->          DEFINE_DMA_UNMAP_ADDR(dma);
->          DEFINE_DMA_UNMAP_LEN(len);
-> ...
-> }
-> 
-> The script is parsing the offsetof() argument as part of the enum, which 
-> is not true. I believe it to be a false positive. Same for the second 
-> one where it parses 'DEFINE_DMA_UNMAP_ADDR(dma'. Is it okay to use 'dma' 
-> and 'len' in the kdoc header as-is or please suggest if you prefer 
-> something?
+strscpy() will add '\0' in the last byte of destination buffer(one of
+items), it result in finishing content print ahead of schedule and some
+dump content truncation.
 
-The parser is in scripts/kernel-doc, it's not very complicated.
-You can teach it new tricks.
+One Error log shows as below:
+cat mac_list/uc
+UC MAC_LIST:
+
+Expected:
+UC MAC_LIST:
+FUNC_ID  MAC_ADDR            STATE
+pf       00:2b:19:05:03:00   ACTIVE
+
+The destination buffer is length-bounded and not required to be
+NUL-terminated, so just change strscpy() to memcpy() to fix it.
+
+Fixes: 1cf3d5567f27 ("net: hns3: fix strncpy() not using dest-buf length as length issue")
+Signed-off-by: Hao Chen <chenhao418@huawei.com>
+Signed-off-by: Jijie Shao <shaojijie@huawei.com>
+---
+ drivers/net/ethernet/hisilicon/hns3/hns3_debugfs.c         | 4 ++--
+ drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_debugfs.c | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_debugfs.c b/drivers/net/ethernet/hisilicon/hns3/hns3_debugfs.c
+index 52546f625c8b..f276b5ecb431 100644
+--- a/drivers/net/ethernet/hisilicon/hns3/hns3_debugfs.c
++++ b/drivers/net/ethernet/hisilicon/hns3/hns3_debugfs.c
+@@ -464,9 +464,9 @@ static void hns3_dbg_fill_content(char *content, u16 len,
+ 		if (result) {
+ 			if (item_len < strlen(result[i]))
+ 				break;
+-			strscpy(pos, result[i], strlen(result[i]));
++			memcpy(pos, result[i], strlen(result[i]));
+ 		} else {
+-			strscpy(pos, items[i].name, strlen(items[i].name));
++			memcpy(pos, items[i].name, strlen(items[i].name));
+ 		}
+ 		pos += item_len;
+ 		len -= item_len;
+diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_debugfs.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_debugfs.c
+index 409db2e70965..0fb2eaee3e8a 100644
+--- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_debugfs.c
++++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_debugfs.c
+@@ -111,9 +111,9 @@ static void hclge_dbg_fill_content(char *content, u16 len,
+ 		if (result) {
+ 			if (item_len < strlen(result[i]))
+ 				break;
+-			strscpy(pos, result[i], strlen(result[i]));
++			memcpy(pos, result[i], strlen(result[i]));
+ 		} else {
+-			strscpy(pos, items[i].name, strlen(items[i].name));
++			memcpy(pos, items[i].name, strlen(items[i].name));
+ 		}
+ 		pos += item_len;
+ 		len -= item_len;
+-- 
+2.30.0
+
 
